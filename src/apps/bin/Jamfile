@@ -12,6 +12,7 @@ StdBinCommands
 	listattr.cpp
 	setversion.cpp
 	shutdown.cpp
+	iroster.cpp
 	: be ;
 
 StdBinCommands
