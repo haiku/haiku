@@ -202,17 +202,19 @@ if $(GCC_VERSION[1]) >= 3 {
 	KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
 }
 
+DEBUG_FLAGS ?= -g ;
+
 # We might later want to introduce debug levels or handle the whole issue
 # differently. For now there's only on or off.
 #
 DEBUG ?= 0 ;
 if $(DEBUG) != 0 {
 	OPTIM ?= -O0 ;
-	CCFLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
-	C++FLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
-	KERNEL_CCFLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
-	KERNEL_C++FLAGS += -g [ FDefines DEBUG=$(DEBUG) ] ;
-	LINKFLAGS += -g ;
+	CCFLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
+	C++FLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
+	KERNEL_CCFLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
+	KERNEL_C++FLAGS += $(DEBUG_FLAGS) [ FDefines DEBUG=$(DEBUG) ] ;
+	LINKFLAGS += $(DEBUG_FLAGS) ;
 } else {
 	OPTIM ?= -O2 ;
 }
@@ -247,6 +249,13 @@ if $(OS) = BEOS {
 } else {
 	BUILD_LIBSTDC++ = stdc++ ;
 }
+
+if $(GCC_VERSION[1]) >= 3 {
+	C++_SUPPORT_LIBS = supc++ ;
+} else {
+	C++_SUPPORT_LIBS = ;
+}
+
 
 # If no OBOS_OBJECT_TARGET is not defined yet, use our default directory and
 # include our "OBOS_TARGET" as subdirectory in there (to prevent different
@@ -304,6 +313,8 @@ rule SetupIncludes
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	HDRS = [ FDirName $(OBOS_TOP) headers ] ;
+
+	HDRS = [ FDirName $(OBOS_TOP) headers cpp ] ;
 
 	# Use posix headers directory
 	HDRS += [ FDirName $(OBOS_TOP) headers posix ] ;
@@ -728,8 +739,8 @@ rule TestObjects
 
 	if ! $(NO_TEST_DEBUG) {
 		# Turn debugging on. That is usually desired for test code.
-		ObjectCcFlags $(objects) : "-g" ;
-		ObjectC++Flags $(objects) : "-g" ;
+		ObjectCcFlags $(objects) : $(DEBUG_FLAGS) ;
+		ObjectC++Flags $(objects) : $(DEBUG_FLAGS) ;
 
 		# Turn optimization on again.
 		OPTIM = $(optim) ;
@@ -777,8 +788,8 @@ rule SimpleTest
 	ObjectsDefines $(sources) : TEST_OBOS ;
 	if ! $(NO_TEST_DEBUG) {
 		# Turn debugging on. That is usually desired for test code.
-		ObjectCcFlags $(sources) : "-g" ;
-		ObjectC++Flags $(sources) : "-g" ;
+		ObjectCcFlags $(sources) : $(DEBUG_FLAGS) ;
+		ObjectC++Flags $(sources) : $(DEBUG_FLAGS) ;
 
 		# Turn optimization on again.
 		OPTIM = $(optim) ;
@@ -1035,6 +1046,8 @@ rule AddResources
 	}
 }
 
+if $(OS) = BEOS {
+
 rule ResComp
 {
 	# ResComp <resource file> : <rdef file> ;
@@ -1048,6 +1061,14 @@ rule ResComp
 	Depends $(1) : $(2) rc ;
 	LocalClean clean : $(1) ;
 	ResComp1 $(1) : rc $(2) ;
+}
+
+} else {
+
+rule ResComp
+{
+}
+
 }
 
 actions ResComp1
@@ -1921,6 +1942,9 @@ rule BuildPlatformMain
 	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
 
 	Main $(1) : $(2) ;
+
+	ObjectsDefines $(2) : _NO_INLINE_ASM ;
+		# Be careful with find_thread() and the like.
 
 	# Reset CCFLAGS and C++FLAGS to original values.
 	CCFLAGS = $(oldCCFLAGS) ;
