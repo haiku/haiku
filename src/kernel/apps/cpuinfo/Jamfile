@@ -5,3 +5,16 @@ KernelObjects
 	:
 	-fpic
 	;
+
+KernelLd cpuinfo :
+	libglue2.so
+	<$(SOURCE_GRIST)>main.o
+	libroot.so
+	:
+	../../ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/cpuinfo
+	;
+
