@@ -2,7 +2,6 @@
 <html>
 <head>
   <title>BPicture specifications</title>
-     
   <meta http-equiv="content-type"
  content="text/html; charset=ISO-8859-1">
   <meta name="author" content="Marc Flerackers(mflerackers@androme.be)">
@@ -10,7 +9,8 @@
  content="BPicture specifications for OpenBeOS">
 </head>
 <body>
-<span style="font-weight: bold; text-decoration: underline;">Picture data</span><br>
+<span style="font-weight: bold; text-decoration: underline;">Picture
+data</span><br>
 <br>
 The data of a BPicture is composed of instructions.<br>
 <br>
@@ -29,15 +29,14 @@ These instructions have a small header, which looks as follows:<br>
       <td valign="top">size</td>
       <td valign="top">The size of the data</td>
     </tr>
-  
   </tbody>
 </table>
 <br>
-After this header the data follows. There are two exceptions: EnterStateChange
-and EnterFontState. These are used to enclose state and font changes. For
-ExitStateChange and ExitFontState there are no instructions, this is not needed
-as we know the size of the instruction block in the header of the Enter*
-functions.<br>
+After this header the data follows. There are two exceptions:
+EnterStateChange and EnterFontState. These are used to enclose state and
+font changes. For ExitStateChange and ExitFontState there are no
+instructions, this is not needed as we know the size of the instruction
+block in the header of the Enter* functions.<br>
 <br>
 These are the known instructions at the moment:<br>
 <br>
@@ -149,7 +148,7 @@ bool isClosed<br>
       </td>
       <td valign="top">FillPolygon<br>
       </td>
-      <td valign="top">4 + point data size      </td>
+      <td valign="top">4 + point data size </td>
       <td valign="top">int32 numPoints<br>
 BPoint *points<br>
       </td>
@@ -161,13 +160,13 @@ BPoint *points<br>
       </td>
       <td valign="top">shape data size<br>
       </td>
-      <td valign="top">shape data, see below      </td>
+      <td valign="top">shape data, see below </td>
     </tr>
     <tr>
-      <td valign="top">0x010E      </td>
-      <td valign="top">FillShape      </td>
-      <td valign="top">shape data size      </td>
-      <td valign="top">shape data, see below      </td>
+      <td valign="top">0x010E </td>
+      <td valign="top">FillShape </td>
+      <td valign="top">shape data size </td>
+      <td valign="top">shape data, see below </td>
     </tr>
     <tr>
       <td valign="top">0x010F<br>
@@ -183,7 +182,7 @@ float deltay<br>
       </td>
     </tr>
     <tr>
-      <td valign="top">0x0110      </td>
+      <td valign="top">0x0110 </td>
       <td valign="top">DrawPixels<br>
       </td>
       <td valign="top">52 + pixel data size<br>
@@ -196,6 +195,17 @@ int32 bytesPerRow<br>
 int32 pixelFormat<br>
 int32 flags<br>
 pixel data<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0112<br>
+      </td>
+      <td valign="top">DrawPicture<br>
+      </td>
+      <td valign="top">12<br>
+      </td>
+      <td valign="top">BPoint where?<br>
+????<br>
       </td>
     </tr>
     <tr>
@@ -251,8 +261,19 @@ float arcTheta</td>
     <tr>
       <td valign="top">0x0201</td>
       <td valign="top">SetClippingRects</td>
-      <td valign="top">TODO</td>
-      <td valign="top">TODO</td>
+      <td valign="top">16 + size of rects<br>
+      </td>
+      <td valign="top">clipping_rect bound<br>
+clipping_rect *rect</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0202</td>
+      <td valign="top">ClipToPicture</td>
+      <td valign="top">7 + 8 + 1 </td>
+      <td valign="top">zero bytes<br>
+BPoint pt<br>
+bool clip_to_inverse_picture<br>
+      </td>
     </tr>
     <tr>
       <td valign="top">0x0203<br>
@@ -275,11 +296,11 @@ float arcTheta</td>
     <tr>
       <td valign="top">0x0205<br>
       </td>
-      <td valign="top">SetClippingRects<br>
+      <td valign="top">SetClippingRects </td>
+      <td valign="top">0 </td>
+      <td valign="top">This is a shorter instruction for 0 clipping
+rects.<br>
       </td>
-      <td valign="top">TODO<br>
-      </td>
-      <td valign="top">TODO</td>
     </tr>
     <tr>
       <td valign="top">0x0300<br>
@@ -378,6 +399,17 @@ float miterLimit<br>
       <td valign="top">font instructions</td>
     </tr>
     <tr>
+      <td valign="top">0x030A<br>
+      </td>
+      <td valign="top">SetBlendingMode<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">source_alpha alphaSrcMode<br>
+alpha_function alphaFncMode<br>
+      </td>
+    </tr>
+    <tr>
       <td valign="top">0x0380<br>
       </td>
       <td valign="top">SetFontFamily<br>
@@ -466,7 +498,6 @@ char style</td>
       <td valign="top">int32 flags<br>
       </td>
     </tr>
-  
   </tbody>
 </table>
 <br>
@@ -476,29 +507,22 @@ There are a few undocumented instructions:<br>
  style="text-align: left;" width="100%">
   <tbody>
     <tr>
-      <td valign="top">30A<br>
+      <td valign="top">0x0388<br>
       </td>
-      <td valign="top">????<br>
-      </td>
+      <td valign="top">SetFontBPP </td>
       <td valign="top">4<br>
       </td>
-      <td valign="top">some state change</td>
-    </tr>
-    <tr>
-      <td valign="top">388<br>
-      </td>
-      <td valign="top">????<br>
-      </td>
-      <td valign="top">4<br>
-      </td>
-      <td valign="top">some font change<br>
-      </td>
+      <td valign="top"> int32 bpp </td>
     </tr>
   </tbody>
 </table>
 <br>
-Also, not all instructions where checked yet. The SetClippingRects and DrawPixels
-data has still to be documented.<br>
+Also, not all instructions where checked yet. The SetClippingRects and
+DrawPixels data has still to be documented.<br>
+<br>
+Regarding DrawPicture and ClipToPicture, it seems the pictures to draw
+are not inside the flattened data, instead they are stored as messages
+in the BMessage in a field called "piclib".<br>
 <br>
 <span style="font-weight: bold; text-decoration: underline;">Shape data</span><br>
 <br>
@@ -514,13 +538,13 @@ The shape data contained in a BPicture is stored as follows:<br>
       </td>
     </tr>
     <tr>
-      <td valign="top" rowspan="1" colspan="1">int32 *instructions<br>
+      <td valign="top" rowspan="1" colspan="1">uint32 *instructions<br>
       </td>
-      <td valign="top" rowspan="1" colspan="1">Each instruction looks like:<br>
-First byte is the instruction id, MoveTo is not coded as a seperate instruction,
-but as a bitflag of the next instruction 0x80 see the table below.<br>
+      <td valign="top" rowspan="1" colspan="1">Each instruction looks
+like:<br>
+First byte is the instruction id<br>
 The next three bytes is the amount of points used*<br>
- </td>
+      </td>
     </tr>
     <tr>
     </tr>
@@ -531,9 +555,8 @@ The next three bytes is the amount of points used*<br>
       </td>
     </tr>
     <tr>
+      <td valign="top">BPoint *points </td>
       <td valign="top">points<br>
-      </td>
-      <td valign="top"><br>
       </td>
     </tr>
   </tbody>
@@ -553,10 +576,16 @@ The next three bytes is the amount of points used*<br>
       </th>
     </tr>
     <tr>
-      <td valign="top">0x0B</td>
+      <td valign="top">0x80</td>
       <td valign="top">MoveTo</td>
-      <td valign="top">1</td>
       <td valign="top"><br>
+      </td>
+      <td valign="top">
+      <ul>
+        <li>A "MoveTo" instruction doesn't stand alone, but is OR-ed
+with a "LineTo" or "BezierTo" instruction<br>
+        </li>
+      </ul>
       </td>
     </tr>
     <tr>
@@ -564,40 +593,61 @@ The next three bytes is the amount of points used*<br>
       <td valign="top">LineTo</td>
       <td valign="top">point count in instruction<br>
       </td>
-      <td valign="top"><br>
+      <td valign="top">
+      <ul>
+        <li>One "LineTo" instruction draws "count" lines</li>
+      </ul>
       </td>
     </tr>
     <tr>
       <td valign="top">0x90 </td>
       <td valign="top">MoveTo LineTo</td>
       <td valign="top">point count in instruction + 1</td>
-      <td valign="top"><br>
+      <td valign="top">
+      <ul>
+        <li>There is one extra point for the "MoveTo", which is not
+counted in the instruction.<br>
+        </li>
+      </ul>
       </td>
     </tr>
     <tr>
       <td valign="top">0x20 </td>
       <td valign="top">BezierTo</td>
       <td valign="top">point count in instruction</td>
-      <td valign="top">point count is always multiple of 3<br>
+      <td valign="top">
+      <ul>
+        <li>One "BezierTo" instruction draws "count" lines</li>
+      </ul>
       </td>
     </tr>
     <tr>
       <td valign="top">0xA0 </td>
       <td valign="top">MoveTo&nbsp;BezierTo</td>
       <td valign="top">point count in instruction + 1</td>
-      <td valign="top">point count is always multiple of 3</td>
+      <td valign="top">
+      <ul>
+        <li>There is one extra point for the "MoveTo", which is not
+counted in the instruction.<br>
+        </li>
+      </ul>
+      </td>
     </tr>
     <tr>
-      <td valign="top">0x70 </td>
+      <td valign="top">0x40 </td>
       <td valign="top">Close</td>
-      <td valign="top">0<br>
-      </td>
-      <td valign="top"><br>
+      <td valign="top">0 </td>
+      <td valign="top">
+      <ul>
+        <li>"Close" can only follow a "LineTo" or "BezierTo" instruction</li>
+        <li>If an instruction follows "Close", the new instruction is
+OR-ed with "Close" and replaces it instruction</li>
+        <li>A&nbsp;shape never starts with "Close"</li>
+      </ul>
       </td>
     </tr>
   </tbody>
 </table>
 <br>
- 
 </body>
 </html>
