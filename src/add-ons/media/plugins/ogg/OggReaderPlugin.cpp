@@ -287,7 +287,10 @@ OggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	*infoBuffer = 0;
 	*infoSize = 0;
 	OggTrack * track = static_cast<OggTrack*>(cookie);
-	return track->GetStreamInfo(frameCount, duration, format);
+	status_t status = track->GetStreamInfo(frameCount, duration, format);
+	TRACE("OggReader::GetStreamInfo: cookie=%x, frame count = %lld, duration = %lld.%lld seconds\n",
+	      *(int*)cookie, *frameCount, (*duration)/1000000, (*duration)%1000000);
+	return status;
 }
 
 
@@ -317,6 +320,8 @@ status_t
 OggReader::FindLastPages()
 {
 	TRACE("OggReader::FindLastPages\n");
+	bigtime_t start_time = system_time();
+
 	status_t result = B_ERROR;
 
 	const int read_size = 256*256;
@@ -331,10 +336,12 @@ OggReader::FindLastPages()
 	uint serial_count = 0;
 	while (serial_count < fCookies.size()) {
 		int offset;
+		ssize_t bytes = 0;
 		while ((offset = ogg_sync_pageseek(&sync, &page)) <= 0) {
 			left += -offset;
 			if (offset == 0) {
-				if (fSeekable->Position() >= right) {
+				off_t pos = fSeekable->Position();
+				if (pos >= right || bytes == 0) {
 					if (left == 0) {
 						TRACE("OggReader::FindLastPages: couldn't find some stream's page!!!\n");
 						goto done;
@@ -345,10 +352,9 @@ OggReader::FindLastPages()
 						goto done;
 					}
 					ogg_sync_reset(&sync);
-					continue;
 				}
 				char * buffer = ogg_sync_buffer(&sync, read_size);
-				ssize_t bytes = fSeekable->Read(buffer, read_size);
+				bytes = fSeekable->Read(buffer, read_size);
 				if (bytes < 0) {
 					TRACE("OggReader::FindLastPages: Read: error\n");
 					result = bytes;
@@ -381,6 +387,8 @@ OggReader::FindLastPages()
 	result = B_OK;
 done:
 	ogg_sync_clear(&sync);
+	TRACE("OggReader::FindLastPages took %lld microseconds\n", system_time() - start_time);
+
 	return result;
 }
 
