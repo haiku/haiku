@@ -15,6 +15,7 @@
 #include <debug.h>
 #include <memheap.h>
 #include <atomic.h>
+#include <stdlib.h>
 
 #include <arch/cpu.h>
 
@@ -39,6 +40,7 @@ struct elf_region {
 
 struct elf_image_info {
 	struct elf_image_info *next;
+	char *name;
 	image_id id;
 	int ref_count;
 	void *vnode;
@@ -80,6 +82,90 @@ static image_id next_image_id = 0;
 #define HASHTABSIZE(image) ((image)->symhash[0])
 #define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
+
+
+/* static */ int
+get_address_symbol_info(addr address, char *text, int maxtextlen)
+{
+	struct elf_image_info **ptr;
+	struct elf_image_info *image;
+	struct Elf32_Sym *sym;
+	struct elf_image_info *found_image;
+	struct Elf32_Sym *found_sym;
+	long found_delta;
+	int i,j,rv;
+
+	PRINT(("looking up %#x\n",address));
+
+	mutex_lock(&image_lock);
+
+	found_sym = 0;
+	found_image = 0;
+	found_delta = 0x7fffffff;
+	for(ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
+		image = *ptr;
+
+		PRINT((" image %p, base = %#x, size = %#x\n", image, image->regions[0].start, image->regions[0].size));
+		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
+			continue;
+
+		PRINT((" searching...\n"));
+		found_image = image;
+		for (i = 0; i < HASHTABSIZE(image); i++) {
+			for(j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+				long d;
+				sym = &image->syms[j];
+
+				PRINT(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),sym->st_value));
+				PRINT(("  symbol: %x (%x + %x)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
+
+				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
+					continue;
+
+				d = (long)address - (long)(sym->st_value + image->regions[0].delta);
+				if ((d >= 0) && (d < found_delta)) {
+					found_delta = d;
+					found_sym = sym;
+				}
+			}
+		}
+		break;
+	}
+	if (found_sym == 0) {
+		PRINT(("symbol not found!\n"));
+		strlcpy(text, "symbol not found", maxtextlen);
+		rv = -1;
+	} else {
+		PRINT(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
+		PRINT(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
+		PRINT(("addr = %#x, offset = %#x\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
+		// XXX should honor maxtextlen here
+		sprintf(text, "<%#lx:%s + %#lx> %s", (found_sym->st_value + found_image->regions[0].delta), SYMNAME(found_image, found_sym), found_delta, found_image->name);
+		rv = 0;
+	}
+
+	mutex_unlock(&image_lock);
+	return rv;
+}
+
+
+static int 
+print_address_info(int argc, char **argv)
+{
+	char text[128];
+	long address;
+
+	if(argc < 2) {
+		dprintf("not enough arguments\n");
+		return 0;
+	}
+
+	address = atoul(argv[1]);
+	
+	get_address_symbol_info(address, text, sizeof(text));
+	dprintf("%#lx = %s\n",address,text);
+	return 0;
+}
 
 
 static void
@@ -759,6 +845,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	}
 	image->vnode = vnode;
 	image->eheader = eheader;
+	image->name = kstrdup(path);
 
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader->e_phnum * eheader->e_phentsize);
 	if (pheaders == NULL) {
@@ -931,6 +1018,7 @@ elf_unload_image_final(struct elf_image_info *image)
 
 	remove_image_from_list(image);
 	kfree(image->eheader);
+	kfree(image->name);	
 	kfree(image);
 }
 
@@ -996,6 +1084,8 @@ elf_init(kernel_args *ka)
 
 	// build a image structure for the kernel, which has already been loaded
 	kernel_image = create_image_struct();
+	
+	kernel_image->name = kstrdup("kernel");
 
 	// text segment
 	kernel_image->regions[0].id = vm_find_region_by_name(vm_get_kernel_aspace_id(), "kernel_ro");
@@ -1023,6 +1113,8 @@ elf_init(kernel_args *ka)
 	// insert it first in the list of kernel images loaded
 	kernel_images = NULL;
 	insert_image_in_list(kernel_image);
+
+	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
 
 	return 0;
 }
