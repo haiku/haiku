@@ -200,7 +200,7 @@ extern status_t 	load_driver_symbols(const char *driverName);
 extern void			spin(bigtime_t microseconds);
 	/* does a busy delay loop for at least "microseconds" */
 
-typedef int (*daemon_hook)(void *arg, int iteration);
+typedef void (*daemon_hook)(void *arg, int iteration);
 
 extern status_t		register_kernel_daemon(daemon_hook hook, void *arg, int frequency);
 extern status_t		unregister_kernel_daemon(daemon_hook hook, void *arg);
