@@ -1,0 +1,22 @@
+# Settings file for the mga driver and accelerant
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+# mga.driver parameters
+# accelerant "mga.accelerant"
+
+# mga.accelerant parameters
+usebios    false			# if true rely on bios to coldstart the card instead of driver
+#memory     2			# in MB, override builtin memory size detection
+hardcursor true			# if true use on-chip cursor capabilities
+#logmask   0x00000000	# nothing logged, except errors, is default
+#logmask   0x80000000	# log card physical features
+#logmask   0x80000000	# log following mask
+#logmask   0x08000604	# log overlay use in full
+logmask 	0xffffffff		# log everything
+dumprom    false        		# dump bios rom in ~/mga.rom
+greensync	false			# if true generate sync on green output signal
+
+#--------- that's all.
