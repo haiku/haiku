@@ -57,6 +57,7 @@
 #include <TokenSpace.h>
 #include <MessageUtils.h>
 #include <Session.h>
+#include <ColorUtils.h>
 #include <ServerProtocol.h>
 
 // Local Includes --------------------------------------------------------------
@@ -3447,7 +3448,7 @@ void BView::InitData(BRect frame, const char *name, uint32 resizingMode, uint32 
 	f_is_printing		= false;
 
 	fPermanentState		= NULL;
-	fState				= new _view_attr_;
+	fState				= new ViewAttr;
 
 	fBounds				= frame.OffsetToCopy(0.0, 0.0);
 	fShelf				= NULL;
@@ -3844,7 +3845,7 @@ void BView::initCachedState(){
 	fState->viewColor.green	= 255;
 	fState->viewColor.alpha	= 255;
 	
-	memcpy( &(fState->patt), &B_SOLID_HIGH, sizeof(pattern) );
+	fState->patt=B_SOLID_HIGH;
 
 	fState->drawingMode		= B_OP_COPY;
 
@@ -4276,6 +4277,44 @@ void BView::PrintTree(){
 					spaces -= 2;
 				}
 		}
+}
+
+ViewAttr::ViewAttr(void)
+{
+	font=*be_plain_font;
+	fontFlags=font.Flags();
+
+	penPosition.Set(0,0);
+	penSize=1.0;
+	
+	// This probably needs to be set to bounds by the owning BView
+	clippingRegion.MakeEmpty();
+	
+	SetRGBColor(&highColor,0,0,0);
+	SetRGBColor(&lowColor,255,255,255);
+	SetRGBColor(&viewColor,255,255,255);
+	
+	patt=B_SOLID_HIGH;
+	drawingMode=B_OP_COPY;
+	
+	coordSysOrigin.Set(0,0);
+
+	lineJoin=B_BUTT_JOIN;
+	lineCap=B_BUTT_CAP;
+	miterLimit=B_DEFAULT_MITER_LIMIT;
+
+	alphaSrcMode=B_CONSTANT_ALPHA;
+	alphaFncMode=B_ALPHA_OVERLAY;
+	
+	scale=1.0;
+	fontAliasing=false;
+
+	// flags used for synchronization with app_server
+	// TODO: set this to the default value, whatever that is
+	flags=B_VIEW_CLIP_REGION_BIT;
+	
+	// TODO: find out what value this should have.
+	archivingFlags=B_VIEW_COORD_BIT;
 }
 
 //---------------------------------------------------------------------------
