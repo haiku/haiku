@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -59,11 +59,12 @@ load_kernel(stage2_args *args, Directory *volume)
 	close(fd);
 
 	if (status < B_OK) {
-		printf("loading kernel failed!\n");
+		printf("loading kernel failed: %ld!\n", status);
 		return status;
 	}
 
 	puts("kernel loaded successfully");
+
 /*	void *cookie;
 	if (volume->Open(&cookie, O_RDONLY) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
@@ -106,5 +107,6 @@ void
 start_kernel()
 {
 	// shouldn't return...
+	panic("starting the kernel is not yet implemented :)");
 }
 
