@@ -11,4 +11,5 @@
 #define USER_DATA_SEG 0x23
 #define TSS 0x28
 
-#endif
+#endif /* _KERNEL_ARCH_x86_DESCRIPTORS_H */
+
