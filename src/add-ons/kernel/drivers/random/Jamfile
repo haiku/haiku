@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel drivers random ;
+
+KernelObjects 
+	<$(SOURCE_GRIST)>driver.c 
+	:
+	-fno-pic -D_KERNEL_MODE -O99 -mpentiumpro -march=pentiumpro -Wno-missing-prototypes
+	;
+

@@ -11,6 +11,18 @@ Addon ich_ac97 : [ FDirName kernel drivers bin ] :
 	util.c   
 ;
 
+# For OpenBeOS we should be building the driver objects this way.
+#KernelObjects
+#	ac97_multi.c
+#	config.c
+#	debug.c
+#	ich.c
+#	io.c
+#	util.c   
+#	:
+#	-fno-pic -D_KERNEL_MODE
+#	;
+
 LinkSharedOSLibs ich_ac97 : /boot/develop/lib/x86/_KERNEL_ ;
 
 # Link to kernel/drivers/dev/audio/multi
