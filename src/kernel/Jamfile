@@ -61,6 +61,7 @@ KernelLd kernel.so :
 
 	linkhack.so
 
+	kernel_os_main.o
 	kernel_os_arch_$(OBOS_ARCH).o
 
 	kernel_posix_locale.o
@@ -333,16 +334,16 @@ KernelLd testapp :
 	bin/testapp
 	;
 
-KernelLd hostname :
+KernelLd tls_test :
 	libglue2.o
-	<$(SOURCE_GRIST)!apps!hostname>main.o
+	<$(SOURCE_GRIST)!apps>tls_test.o
 	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:
-	bin/hostname
+	bin/tls_test
 	;
 
 KernelLd filetest :
