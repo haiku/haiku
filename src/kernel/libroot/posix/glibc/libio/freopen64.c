@@ -54,8 +54,8 @@ freopen64 (filename, mode, fp)
     }
   INTUSE(_IO_file_close_it) (fp);
   _IO_JUMPS ((struct _IO_FILE_plus *) fp) = &INTUSE(_IO_file_jumps);
-  if (fp->_vtable_offset == 0 && fp->_wide_data != NULL)
-    fp->_wide_data->_wide_vtable = &INTUSE(_IO_wfile_jumps);
+//  if (fp->_vtable_offset == 0 && fp->_wide_data != NULL)
+//    fp->_wide_data->_wide_vtable = &INTUSE(_IO_wfile_jumps);
   result = INTUSE(_IO_file_fopen) (fp, filename, mode, 0);
   if (result != NULL)
     result = __fopen_maybe_mmap (result);

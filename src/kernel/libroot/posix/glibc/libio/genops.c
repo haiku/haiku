@@ -23,15 +23,15 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.  */
+   in files containing the exception.
+*/
 
 /* Generic or default I/O operations. */
 
 #include "libioP.h"
-#ifdef __STDC__
 #include <stdlib.h>
-#endif
 #include <string.h>
+
 
 #ifdef _IO_MTSAFE_IO
 static _IO_lock_t list_all_lock = _IO_lock_initializer;
@@ -43,6 +43,7 @@ static int _IO_list_all_stamp;
 
 static _IO_FILE *run_fp;
 
+#if 0
 static void
 flush_cleanup (void *not_used)
 {
@@ -52,10 +53,11 @@ flush_cleanup (void *not_used)
   _IO_lock_unlock (list_all_lock);
 #endif
 }
+#endif
+
 
 void
-_IO_un_link (fp)
-     struct _IO_FILE_plus *fp;
+_IO_un_link(struct _IO_FILE_plus *fp)
 {
   if (fp->file._flags & _IO_LINKED)
     {
@@ -226,17 +228,18 @@ _IO_switch_to_put_mode (fp)
 }
 #endif
 
+
 int
-__overflow (f, ch)
-     _IO_FILE *f;
-     int ch;
+__overflow(_IO_FILE *file, int character)
 {
-  /* This is a single-byte stream.  */
-  if (f->_mode == 0)
-    _IO_fwide (f, -1);
-  return _IO_OVERFLOW (f, ch);
+	/* This is a single-byte stream.  */
+	if (file->_mode == 0)
+		_IO_fwide(file, -1);
+
+	return _IO_OVERFLOW(file, character);
 }
-libc_hidden_def (__overflow)
+libc_hidden_def(__overflow)
+
 
 static int save_for_backup __P ((_IO_FILE *fp, char *end_p))
 #ifdef _LIBC
@@ -319,71 +322,75 @@ save_for_backup (fp, end_p)
   return 0;
 }
 
-int
-__underflow (fp)
-     _IO_FILE *fp;
-{
-#if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
-  if (fp->_vtable_offset == 0 && _IO_fwide (fp, -1) != -1)
-    return EOF;
-#endif
-
-  if (fp->_mode == 0)
-    _IO_fwide (fp, -1);
-  if (_IO_in_put_mode (fp))
-    if (INTUSE(_IO_switch_to_get_mode) (fp) == EOF)
-      return EOF;
-  if (fp->_IO_read_ptr < fp->_IO_read_end)
-    return *(unsigned char *) fp->_IO_read_ptr;
-  if (_IO_in_backup (fp))
-    {
-      _IO_switch_to_main_get_area (fp);
-      if (fp->_IO_read_ptr < fp->_IO_read_end)
-	return *(unsigned char *) fp->_IO_read_ptr;
-    }
-  if (_IO_have_markers (fp))
-    {
-      if (save_for_backup (fp, fp->_IO_read_end))
-	return EOF;
-    }
-  else if (_IO_have_backup (fp))
-    INTUSE(_IO_free_backup_area) (fp);
-  return _IO_UNDERFLOW (fp);
-}
-libc_hidden_def (__underflow)
 
 int
-__uflow (fp)
-     _IO_FILE *fp;
+__underflow(_IO_FILE *file)
 {
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
-  if (fp->_vtable_offset == 0 && _IO_fwide (fp, -1) != -1)
-    return EOF;
+	if (file->_vtable_offset == 0 && _IO_fwide(file, -1) != -1)
+		return EOF;
 #endif
 
-  if (fp->_mode == 0)
-    _IO_fwide (fp, -11);
-  if (_IO_in_put_mode (fp))
-    if (INTUSE(_IO_switch_to_get_mode) (fp) == EOF)
-      return EOF;
-  if (fp->_IO_read_ptr < fp->_IO_read_end)
-    return *(unsigned char *) fp->_IO_read_ptr++;
-  if (_IO_in_backup (fp))
-    {
-      _IO_switch_to_main_get_area (fp);
-      if (fp->_IO_read_ptr < fp->_IO_read_end)
-	return *(unsigned char *) fp->_IO_read_ptr++;
+	if (file->_mode == 0)
+		_IO_fwide(file, -1);
+
+	if (_IO_in_put_mode(file) && INTUSE(_IO_switch_to_get_mode)(file) == EOF)
+		return EOF;
+
+	if (file->_IO_read_ptr < file->_IO_read_end)
+		return *(unsigned char *)file->_IO_read_ptr;
+
+	if (_IO_in_backup(file)) {
+		_IO_switch_to_main_get_area(file);
+
+		if (file->_IO_read_ptr < file->_IO_read_end)
+			return *(unsigned char *)file->_IO_read_ptr;
     }
-  if (_IO_have_markers (fp))
-    {
-      if (save_for_backup (fp, fp->_IO_read_end))
-	return EOF;
-    }
-  else if (_IO_have_backup (fp))
-    INTUSE(_IO_free_backup_area) (fp);
-  return _IO_UFLOW (fp);
+	if (_IO_have_markers(file)) {
+		if (save_for_backup(file, file->_IO_read_end))
+			return EOF;
+    } else if (_IO_have_backup(file))
+		INTUSE(_IO_free_backup_area)(file);
+
+	return _IO_UNDERFLOW(file);
 }
-libc_hidden_def (__uflow)
+libc_hidden_def(__underflow)
+
+
+int
+__uflow(_IO_FILE *file)
+{
+#if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
+	if (file->_vtable_offset == 0 && _IO_fwide(file, -1) != -1)
+		return EOF;
+#endif
+
+	if (file->_mode == 0)
+		_IO_fwide(file, -11);
+
+	if (_IO_in_put_mode(file) && INTUSE(_IO_switch_to_get_mode)(file) == EOF)
+		return EOF;
+
+	if (file->_IO_read_ptr < file->_IO_read_end)
+		return *(unsigned char *)file->_IO_read_ptr++;
+
+	if (_IO_in_backup(file)) {
+		_IO_switch_to_main_get_area(file);
+
+		if (file->_IO_read_ptr < file->_IO_read_end)
+			return *(unsigned char *)file->_IO_read_ptr++;
+	}
+
+	if (_IO_have_markers(file)) {
+		if (save_for_backup(file, file->_IO_read_end))
+			return EOF;
+	} else if (_IO_have_backup(file))
+		INTUSE(_IO_free_backup_area)(file);
+
+	return _IO_UFLOW(file);
+}
+libc_hidden_def(__uflow)
+
 
 void
 _IO_setb (f, b, eb, a)

@@ -42,7 +42,7 @@
 # include <shlib-compat.h>
 #endif
 
-
+#if 0
 /* Prototypes of libio's codecvt functions.  */
 static enum __codecvt_result do_out (struct _IO_codecvt *codecvt,
 				     __mbstate_t *statep,
@@ -87,22 +87,24 @@ struct __gconv_trans_data __libio_translit attribute_hidden =
   .__trans_fct = __gconv_transliterate
 };
 #endif
-
+#endif
 
 /* Return orientation of stream.  If mode is nonzero try to change
-   the orientation first.  */
-#undef _IO_fwide
-int
-_IO_fwide (fp, mode)
-     _IO_FILE *fp;
-     int mode;
-{
-  /* Normalize the value.  */
-  mode = mode < 0 ? -1 : (mode == 0 ? 0 : 1);
+ * the orientation first.
+ */
 
-  if (mode == 0)
-    /* The caller simply wants to know about the current orientation.  */
-    return fp->_mode;
+#undef _IO_fwide
+
+int
+_IO_fwide(_IO_FILE *fp, int mode)
+{
+	/* Normalize the value.  */
+	mode = mode < 0 ? -1 : (mode == 0 ? 0 : 1);
+
+	if (mode == 0) {
+		/* The caller simply wants to know about the current orientation. */
+		return fp->_mode;
+	}
 
 #if defined SHARED && defined _LIBC \
     && SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
@@ -112,20 +114,25 @@ _IO_fwide (fp, mode)
     return -1;
 #endif
 
-  if (fp->_mode != 0)
-    /* The orientation already has been determined.  */
-    return fp->_mode;
+	if (fp->_mode != 0) {
+		/* The orientation already has been determined.  */
+		return fp->_mode;
+	}
 
-  /* Set the orientation appropriately.  */
-  if (mode > 0)
-    {
-      struct _IO_codecvt *cc = fp->_codecvt = &fp->_wide_data->_codecvt;
+	/* Set the orientation appropriately. */
+	if (mode > 0) {
+		// wide-orientation is currently disabled!
+		return -1;
+	}
+#if 0
+		struct _IO_codecvt *cc = fp->_codecvt = &fp->_wide_data->_codecvt;
 
-      fp->_wide_data->_IO_read_ptr = fp->_wide_data->_IO_read_end;
-      fp->_wide_data->_IO_write_ptr = fp->_wide_data->_IO_write_base;
+		fp->_wide_data->_IO_read_ptr = fp->_wide_data->_IO_read_end;
+		fp->_wide_data->_IO_write_ptr = fp->_wide_data->_IO_write_base;
 
-      /* Get the character conversion functions based on the currently
-	 selected locale for LC_CTYPE.  */
+		/* Get the character conversion functions based on the currently
+		 * selected locale for LC_CTYPE.
+		 */
 #ifdef _LIBC
       {
 	struct gconv_fcts fcts;
@@ -208,14 +215,15 @@ _IO_fwide (fp, mode)
 	 which allows the functions without knowing the position.  */
       fp->_offset = _IO_SYSSEEK (fp, 0, _IO_seek_cur);
     }
+#endif
 
-  /* Set the mode now.  */
-  fp->_mode = mode;
+	/* Set the mode now.  */
+	fp->_mode = mode;
 
-  return mode;
+	return mode;
 }
 
-
+#if 0
 static enum __codecvt_result
 do_out (struct _IO_codecvt *codecvt, __mbstate_t *statep,
 	const wchar_t *from_start, const wchar_t *from_end,
@@ -496,3 +504,4 @@ do_max_length (struct _IO_codecvt *codecvt)
   return MB_CUR_MAX;
 #endif
 }
+#endif

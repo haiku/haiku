@@ -68,6 +68,7 @@ _IO_new_fclose (fp)
   _IO_cleanup_region_end (0);
   if (fp->_mode > 0)
     {
+#if 0
 #if _LIBC
       /* This stream has a wide orientation.  This means we have to free
 	 the conversion functions.  */
@@ -75,6 +76,7 @@ _IO_new_fclose (fp)
 
       __gconv_release_step (cc->__cd_in.__cd.__steps);
       __gconv_release_step (cc->__cd_out.__cd.__steps);
+#endif
 #endif
     }
   else

@@ -35,7 +35,7 @@
 #include "libioP.h"
 
 #ifdef _IO_MTSAFE_IO
-# if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
+/*# if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static _IO_lock_t _IO_stdfile_##FD##_lock = _IO_lock_initializer; \
   static struct _IO_wide_data _IO_wide_data_##FD \
@@ -44,13 +44,15 @@
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, &_IO_wide_data_##FD), \
        &INTUSE(_IO_file_jumps)};
 # else
+*/
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static _IO_lock_t _IO_stdfile_##FD##_lock = _IO_lock_initializer; \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, NULL), \
        &INTUSE(_IO_file_jumps)};
-# endif
+//# endif
 #else
+/*
 # if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   static struct _IO_wide_data _IO_wide_data_##FD \
@@ -59,11 +61,12 @@
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, &_IO_wide_data_##FD), \
        &INTUSE(_IO_file_jumps)};
 # else
+*/
 #  define DEF_STDFILE(NAME, FD, CHAIN, FLAGS) \
   struct _IO_FILE_plus NAME \
     = {FILEBUF_LITERAL(CHAIN, FLAGS, FD, NULL), \
        &INTUSE(_IO_file_jumps)};
-# endif
+//# endif
 #endif
 
 DEF_STDFILE(_IO_2_1_stdin_, 0, 0, _IO_NO_WRITES);

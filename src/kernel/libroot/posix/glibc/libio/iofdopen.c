@@ -23,30 +23,21 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.  */
+   in files containing the exception.
+*/
+
 
 #include "libioP.h"
-#ifdef __STDC__
-# include <stdlib.h>
-#endif
+#include <stdlib.h>
 #include <fcntl.h>
 
 #ifdef _LIBC
 # include <shlib-compat.h>
 #endif
 
-#ifndef _IO_fcntl
-#ifdef _LIBC
-#define _IO_fcntl __fcntl
-#else
-#define _IO_fcntl fcntl
-#endif
-#endif
 
 _IO_FILE *
-_IO_new_fdopen (fd, mode)
-     int fd;
-     const char *mode;
+_IO_new_fdopen (int fd, const char *mode)
 {
   int read_write;
   int posix_mode = 0;
@@ -99,7 +90,7 @@ _IO_new_fdopen (fd, mode)
       break;
     }
 #ifdef F_GETFL
-  fd_flags = _IO_fcntl (fd, F_GETFL);
+  fd_flags = fcntl(fd, F_GETFL);
 #ifndef O_ACCMODE
 #define O_ACCMODE (O_RDONLY|O_WRONLY|O_RDWR)
 #endif
@@ -132,7 +123,7 @@ _IO_new_fdopen (fd, mode)
   if ((posix_mode & O_APPEND) && !(fd_flags & O_APPEND))
     {
 #ifdef F_SETFL
-      if (_IO_fcntl (fd, F_SETFL, fd_flags | O_APPEND) == -1)
+      if (fcntl(fd, F_SETFL, fd_flags | O_APPEND) == -1)
 #endif
 	return NULL;
     }

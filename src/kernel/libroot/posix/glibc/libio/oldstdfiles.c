@@ -25,8 +25,8 @@
    This exception applies to code released by its copyright holders
    in files containing the exception.  */
 
-#include <shlib-compat.h>
-#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
+//#include <shlib-compat.h>
+//#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
 
 /* This file provides definitions of _IO_stdin, _IO_stdout, and _IO_stderr
    for C code.  Compare stdstreams.cc.
@@ -56,8 +56,8 @@ DEF_STDFILE(_IO_stderr_, 2, &_IO_stdout_, _IO_NO_READS+_IO_UNBUFFERED);
 
 #include <stdio.h>
 
-extern const int _IO_stdin_used;
-weak_extern (_IO_stdin_used);
+//extern const int _IO_stdin_used;
+//weak_extern (_IO_stdin_used);
 
 #undef stdin
 #undef stdout
@@ -76,7 +76,8 @@ static void _IO_check_libio __P ((void)) __attribute__ ((constructor));
 static void
 _IO_check_libio ()
 {
-  if (&_IO_stdin_used == NULL)
+	_kern_debug_output("Hey dude!\n");
+  //if (&_IO_stdin_used == NULL)
     {
       /* We are using the old one. */
       _IO_stdin = stdin = (_IO_FILE *) &_IO_stdin_;
@@ -93,4 +94,4 @@ _IO_check_libio ()
 
 #endif
 
-#endif
+//#endif

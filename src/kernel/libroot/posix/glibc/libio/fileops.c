@@ -42,11 +42,13 @@
 #ifdef __STDC__
 #include <stdlib.h>
 #endif
+#if 0
 #if _LIBC
 # include "../wcsmbs/wcsmbsload.h"
 # include "../iconv/gconv_charset.h"
 # include "../iconv/gconv_int.h"
 # include <shlib-compat.h>
+#endif
 #endif
 #ifndef errno
 extern int errno;
@@ -55,13 +57,12 @@ extern int errno;
 # define __set_errno(Val) errno = (Val)
 #endif
 
-
 #ifdef _LIBC
-# define open(Name, Flags, Prot) __open (Name, Flags, Prot)
+/*# define open(Name, Flags, Prot) __open (Name, Flags, Prot)
 # define close(FD) __close (FD)
 # define lseek(FD, Offset, Whence) __lseek (FD, Offset, Whence)
 # define read(FD, Buf, NBytes) __read (FD, Buf, NBytes)
-# define write(FD, Buf, NBytes) __write (FD, Buf, NBytes)
+# define write(FD, Buf, NBytes) __write (FD, Buf, NBytes)*/
 # define _IO_do_write _IO_new_do_write /* For macro uses.  */
 #else
 # define _IO_new_do_write _IO_do_write
@@ -79,11 +80,11 @@ extern int errno;
 # define _IO_new_file_xsputn _IO_file_xsputn
 #endif
 
-
+#if 0
 #ifdef _LIBC
 extern struct __gconv_trans_data __libio_translit attribute_hidden;
 #endif
-
+#endif
 
 /* An fstream can be in at most one of put mode, get mode, or putback mode.
    Putback mode is a variant of get mode.
@@ -179,6 +180,7 @@ _IO_new_file_close_it (fp)
       _IO_setg (fp, NULL, NULL, NULL);
       _IO_setp (fp, NULL, NULL);
     }
+#if 0
 #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
   else
     {
@@ -188,6 +190,7 @@ _IO_new_file_close_it (fp)
       _IO_wsetg (fp, NULL, NULL, NULL);
       _IO_wsetp (fp, NULL, NULL);
     }
+#endif
 #endif
 
   INTUSE(_IO_un_link) ((struct _IO_FILE_plus *) fp);
@@ -250,12 +253,9 @@ _IO_file_open (fp, filename, posix_mode, prot, read_write, is32not64)
 }
 libc_hidden_def (_IO_file_open)
 
+
 _IO_FILE *
-_IO_new_file_fopen (fp, filename, mode, is32not64)
-     _IO_FILE *fp;
-     const char *filename;
-     const char *mode;
-     int is32not64;
+_IO_new_file_fopen(_IO_FILE *fp, const char *filename, const char *mode, int is32not64)
 {
   int oflags = 0, omode;
   int read_write;
@@ -263,7 +263,7 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
   int i;
   _IO_FILE *result;
 #ifdef _LIBC
-  const char *cs;
+//  const char *cs;
   const char *last_recognized;
 #endif
 
@@ -329,7 +329,7 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
   result = _IO_file_open (fp, filename, omode|oflags, oprot, read_write,
 			  is32not64);
 
-
+#if 0
 #ifdef _LIBC
   if (result != NULL)
     {
@@ -405,6 +405,7 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
 	}
     }
 #endif	/* GNU libc */
+#endif
 
   return result;
 }
@@ -449,28 +450,26 @@ INTDEF2(_IO_new_file_setbuf, _IO_file_setbuf)
 
 
 _IO_FILE *
-_IO_file_setbuf_mmap (fp, p, len)
-     _IO_FILE *fp;
-     char *p;
-     _IO_ssize_t len;
+_IO_file_setbuf_mmap(_IO_FILE *fp, char *p, _IO_ssize_t len)
 {
-  _IO_FILE *result;
+	_IO_FILE *result;
 
-  /* Change the function table.  */
-  _IO_JUMPS ((struct _IO_FILE_plus *) fp) = &INTUSE(_IO_file_jumps);
-  fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
+	/* Change the function table. */
+	_IO_JUMPS((struct _IO_FILE_plus *)fp) = &INTUSE(_IO_file_jumps);
+	fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
 
-  /* And perform the normal operation.  */
-  result = _IO_new_file_setbuf (fp, p, len);
+	/* And perform the normal operation. */
+	result = _IO_new_file_setbuf(fp, p, len);
 
-  /* If the call failed, restore to using mmap.  */
-  if (result == NULL)
-    {
-      _IO_JUMPS ((struct _IO_FILE_plus *) fp) = &_IO_file_jumps_mmap;
-      fp->_wide_data->_wide_vtable = &_IO_wfile_jumps_mmap;
-    }
+#if HAVE_MMAP
+	/* If the call failed, restore to using mmap. */
+	if (result == NULL) {
+		_IO_JUMPS((struct _IO_FILE_plus *)fp) = &_IO_file_jumps_mmap;
+		fp->_wide_data->_wide_vtable = &_IO_wfile_jumps_mmap;
+	}
+#endif
 
-  return result;
+	return result;
 }
 
 static int new_do_write __P ((_IO_FILE *, const char *, _IO_size_t));
@@ -703,21 +702,24 @@ mmap_remap_check (_IO_FILE *fp)
     }
   else
     {
-      /* Life is no longer good for mmap.  Punt it.  */
-      (void) __munmap (fp->_IO_buf_base,
-		       fp->_IO_buf_end - fp->_IO_buf_base);
-    punt:
-      fp->_IO_buf_base = fp->_IO_buf_end = NULL;
-      _IO_setg (fp, NULL, NULL, NULL);
-      if (fp->_mode <= 0)
-	_IO_JUMPS ((struct _IO_FILE_plus *) fp) = &INTUSE(_IO_file_jumps);
-      else
-	_IO_JUMPS ((struct _IO_FILE_plus *) fp) = &_IO_wfile_jumps;
-      fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
+		/* Life is no longer good for mmap.  Punt it.  */
+		__munmap (fp->_IO_buf_base, fp->_IO_buf_end - fp->_IO_buf_base);
 
-      return 1;
-    }
+punt:
+		fp->_IO_buf_base = fp->_IO_buf_end = NULL;
+		_IO_setg (fp, NULL, NULL, NULL);
+
+		if (fp->_mode <= 0)
+			_IO_JUMPS((struct _IO_FILE_plus *)fp) = &INTUSE(_IO_file_jumps);
+		else
+			_IO_JUMPS((struct _IO_FILE_plus *)fp) = &_IO_wfile_jumps;
+
+		fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
+
+		return 1;
+	}
 }
+
 
 /* Special callback replacing the underflow callbacks if we mmap the file.  */
 int
@@ -737,77 +739,80 @@ _IO_file_underflow_mmap (_IO_FILE *fp)
   return EOF;
 }
 
-static void
-decide_maybe_mmap (_IO_FILE *fp)
-{
-  /* We use the file in read-only mode.  This could mean we can
-     mmap the file and use it without any copying.  But not all
-     file descriptors are for mmap-able objects and on 32-bit
-     machines we don't want to map files which are too large since
-     this would require too much virtual memory.  */
-  struct _G_stat64 st;
 
-  if (_IO_SYSSTAT (fp, &st) == 0
-      && S_ISREG (st.st_mode) && st.st_size != 0
-      /* Limit the file size to 1MB for 32-bit machines.  */
-      && (sizeof (ptrdiff_t) > 4 || st.st_size < 1*1024*1024)
-      /* Sanity check.  */
-      && (fp->_offset == _IO_pos_BAD || fp->_offset <= st.st_size))
-    {
-      /* Try to map the file.  */
-      void *p;
+static void
+decide_maybe_mmap(_IO_FILE *fp)
+{
+	/* We use the file in read-only mode.  This could mean we can
+	 * mmap the file and use it without any copying.  But not all
+	 * file descriptors are for mmap-able objects and on 32-bit
+	 * machines we don't want to map files which are too large since
+	 * this would require too much virtual memory.
+	 */
+	struct _G_stat64 st;
+
+	if (_IO_SYSSTAT(fp, &st) == 0
+		&& S_ISREG (st.st_mode) && st.st_size != 0
+		/* Limit the file size to 1MB for 32-bit machines.  */
+		&& (sizeof(ptrdiff_t) > 4 || st.st_size < 1*1024*1024)
+		/* Sanity check.  */
+		&& (fp->_offset == _IO_pos_BAD || fp->_offset <= st.st_size))
+	{
+		/* Try to map the file.  */
+		void *p;
 
 # ifdef _G_MMAP64
-      p = _G_MMAP64 (NULL, st.st_size, PROT_READ, MAP_SHARED, fp->_fileno, 0);
+		p = _G_MMAP64(NULL, st.st_size, PROT_READ, MAP_SHARED, fp->_fileno, 0);
 # else
-      p = __mmap (NULL, st.st_size, PROT_READ, MAP_SHARED, fp->_fileno, 0);
+		p = __mmap(NULL, st.st_size, PROT_READ, MAP_SHARED, fp->_fileno, 0);
 # endif
-      if (p != MAP_FAILED)
-	{
-	  /* OK, we managed to map the file.  Set the buffer up and use a
-	     special jump table with simplified underflow functions which
-	     never tries to read anything from the file.  */
 
-	  if (
+		if (p != MAP_FAILED) {
+			/* OK, we managed to map the file.  Set the buffer up and use a
+			 * special jump table with simplified underflow functions which
+			 * never tries to read anything from the file.
+			 */
+
+			if (
 # ifdef _G_LSEEK64
 	      _G_LSEEK64
 # else
 	      __lseek
 # endif
-	      (fp->_fileno, st.st_size, SEEK_SET) != st.st_size)
-	    {
-	      (void) __munmap (p, st.st_size);
-	      fp->_offset = _IO_pos_BAD;
-	    }
-	  else
-	    {
-	      INTUSE(_IO_setb) (fp, p, (char *) p + st.st_size, 0);
+				(fp->_fileno, st.st_size, SEEK_SET) != st.st_size) {
+				(void) __munmap (p, st.st_size);
+				fp->_offset = _IO_pos_BAD;
+			} else {
+				INTUSE(_IO_setb) (fp, p, (char *) p + st.st_size, 0);
 
-	      if (fp->_offset == _IO_pos_BAD)
-		fp->_offset = 0;
+				if (fp->_offset == _IO_pos_BAD)
+					fp->_offset = 0;
 
-	      _IO_setg (fp, p, p + fp->_offset, p + st.st_size);
-	      fp->_offset = st.st_size;
+				_IO_setg (fp, p, p + fp->_offset, p + st.st_size);
+				fp->_offset = st.st_size;
 
-	      if (fp->_mode <= 0)
-		_IO_JUMPS ((struct _IO_FILE_plus *)fp) = &_IO_file_jumps_mmap;
-	      else
-		_IO_JUMPS ((struct _IO_FILE_plus *)fp) = &_IO_wfile_jumps_mmap;
-	      fp->_wide_data->_wide_vtable = &_IO_wfile_jumps_mmap;
+				if (fp->_mode <= 0)
+					_IO_JUMPS((struct _IO_FILE_plus *)fp) = &_IO_file_jumps_mmap;
+				else
+					_IO_JUMPS((struct _IO_FILE_plus *)fp) = &_IO_wfile_jumps_mmap;
 
-	      return;
-	    }
+				fp->_wide_data->_wide_vtable = &_IO_wfile_jumps_mmap;
+
+				return;
+			}
+		}
 	}
-    }
 
-  /* We couldn't use mmap, so revert to the vanilla file operations.  */
+	/* We couldn't use mmap, so revert to the vanilla file operations. */
 
-  if (fp->_mode <= 0)
-    _IO_JUMPS ((struct _IO_FILE_plus *) fp) = &INTUSE(_IO_file_jumps);
-  else
-    _IO_JUMPS ((struct _IO_FILE_plus *) fp) = &_IO_wfile_jumps;
-  fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
+	if (fp->_mode <= 0)
+		_IO_JUMPS((struct _IO_FILE_plus *)fp) = &INTUSE(_IO_file_jumps);
+	else
+		_IO_JUMPS((struct _IO_FILE_plus *)fp) = &_IO_wfile_jumps;
+
+	fp->_wide_data->_wide_vtable = &_IO_wfile_jumps;
 }
+
 
 int
 _IO_file_underflow_maybe_mmap (_IO_FILE *fp)

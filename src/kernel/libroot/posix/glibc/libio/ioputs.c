@@ -23,31 +23,34 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.  */
+   in files containing the exception.
+*/
+
 
 #include "libioP.h"
 #include <string.h>
 
+
 int
-_IO_puts (str)
-     const char *str;
+_IO_puts(const char *str)
 {
-  int result = EOF;
-  _IO_size_t len = strlen (str);
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile,
-			    _IO_stdout);
-  _IO_flockfile (_IO_stdout);
+	int result = EOF;
+	_IO_size_t len = strlen(str);
 
-  if ((_IO_stdout->_vtable_offset != 0 || _IO_fwide (_IO_stdout, -1) == -1)
-      && _IO_sputn (_IO_stdout, str, len) == len
-      && _IO_putc_unlocked ('\n', _IO_stdout) != EOF)
-    result = len + 1;
+	_IO_cleanup_region_start((void (*) __P ((void *))) _IO_funlockfile, _IO_stdout);
+	_IO_flockfile(_IO_stdout);
 
-  _IO_funlockfile (_IO_stdout);
-  _IO_cleanup_region_end (0);
-  return result;
+	if ((_IO_stdout->_vtable_offset != 0 || _IO_fwide(_IO_stdout, -1) == -1)
+		&& _IO_sputn(_IO_stdout, str, len) == len
+		&& _IO_putc_unlocked('\n', _IO_stdout) != EOF)
+		result = len + 1;
+
+	_IO_funlockfile(_IO_stdout);
+	_IO_cleanup_region_end(0);
+
+	return result;
 }
 
 #ifdef weak_alias
-weak_alias (_IO_puts, puts)
+weak_alias(_IO_puts, puts)
 #endif

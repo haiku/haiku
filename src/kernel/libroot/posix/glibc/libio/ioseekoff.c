@@ -52,7 +52,11 @@ _IO_seekoff_unlocked (fp, offset, dir, mode)
      callback may not know to do the right thing about it.
      This may be over-kill, but it'll do for now. TODO */
   if (mode != 0 && ((_IO_fwide (fp, 0) < 0 && _IO_have_backup (fp))
+#if 0
 		    || (_IO_fwide (fp, 0) > 0 && _IO_have_wbackup (fp))))
+#else
+			))
+#endif
     {
       if (dir == _IO_seek_cur && _IO_in_backup (fp))
 	{
@@ -63,8 +67,10 @@ _IO_seekoff_unlocked (fp, offset, dir, mode)
 	}
       if (_IO_fwide (fp, 0) < 0)
 	INTUSE(_IO_free_backup_area) (fp);
+#if 0
       else
 	INTUSE(_IO_free_wbackup_area) (fp);
+#endif
     }
 
   return _IO_SEEKOFF (fp, offset, dir, mode);

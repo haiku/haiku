@@ -29,7 +29,7 @@
 /* This is a compatibility file.  If we don't build the libc with
    versioning don't compile this file.  */
 #include <shlib-compat.h>
-#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)
+#if 1 /*SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_1)*/
 
 #ifndef _POSIX_SOURCE
 # define _POSIX_SOURCE
@@ -53,11 +53,11 @@ extern int errno;
 
 
 #ifdef _LIBC
-# define open(Name, Flags, Prot) __open (Name, Flags, Prot)
+/*# define open(Name, Flags, Prot) __open (Name, Flags, Prot)
 # define close(FD) __close (FD)
 # define lseek(FD, Offset, Whence) __lseek (FD, Offset, Whence)
 # define read(FD, Buf, NBytes) __read (FD, Buf, NBytes)
-# define write(FD, Buf, NBytes) __write (FD, Buf, NBytes)
+# define write(FD, Buf, NBytes) __write (FD, Buf, NBytes)*/
 #endif
 
 /* An fstream can be in at most one of put mode, get mode, or putback mode.
@@ -775,7 +775,7 @@ struct _IO_jump_t _IO_old_file_jumps =
   JUMP_INIT(close, INTUSE(_IO_file_close)),
   JUMP_INIT(stat, INTUSE(_IO_file_stat))
 };
-
+/*
 compat_symbol (libc, _IO_old_do_write, _IO_do_write, GLIBC_2_0);
 compat_symbol (libc, _IO_old_file_attach, _IO_file_attach, GLIBC_2_0);
 compat_symbol (libc, _IO_old_file_close_it, _IO_file_close_it, GLIBC_2_0);
@@ -789,5 +789,5 @@ compat_symbol (libc, _IO_old_file_seekoff, _IO_file_seekoff, GLIBC_2_0);
 compat_symbol (libc, _IO_old_file_underflow, _IO_file_underflow, GLIBC_2_0);
 compat_symbol (libc, _IO_old_file_write, _IO_file_write, GLIBC_2_0);
 compat_symbol (libc, _IO_old_file_xsputn, _IO_file_xsputn, GLIBC_2_0);
-
+*/
 #endif

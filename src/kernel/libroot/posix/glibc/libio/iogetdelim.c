@@ -23,12 +23,11 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.  */
+   in files containing the exception.
+*/
 
-#ifdef __STDC__
-#include <stdlib.h>
-#endif
 #include "libioP.h"
+#include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
@@ -39,11 +38,7 @@
    null terminator), or -1 on error or EOF.  */
 
 _IO_ssize_t
-_IO_getdelim (lineptr, n, delimiter, fp)
-     char **lineptr;
-     _IO_size_t *n;
-     int delimiter;
-     _IO_FILE *fp;
+_IO_getdelim(char **lineptr, _IO_size_t *n, int delimiter, _IO_FILE *fp)
 {
   int result;
   _IO_ssize_t cur_len = 0;

@@ -23,34 +23,36 @@
    however invalidate any other reasons why the executable file
    might be covered by the GNU Lesser General Public License.
    This exception applies to code released by its copyright holders
-   in files containing the exception.  */
+   in files containing the exception.
+*/
+
 
 #include <libioP.h>
 #include <stdio.h>
 #include <wchar.h>
 
+
 int
-fwide (fp, mode)
-     _IO_FILE *fp;
-     int mode;
+fwide(_IO_FILE *fp, int mode)
 {
-  int result;
+	int result;
 
-  /* Normalize the value.  */
-  mode = mode < 0 ? -1 : (mode == 0 ? 0 : 1);
+	/* Normalize the value.  */
+	mode = mode < 0 ? -1 : (mode == 0 ? 0 : 1);
 
-  if (mode == 0 || fp->_mode != 0)
-    /* The caller simply wants to know about the current orientation
-       or the orientation already has been determined.  */
-    return fp->_mode;
+	if (mode == 0 || fp->_mode != 0) {
+		// The caller simply wants to know about the current orientation
+		// or the orientation already has been determined.
+		return fp->_mode;
+	}
 
-  _IO_cleanup_region_start ((void (*) __P ((void *))) _IO_funlockfile, fp);
-  _IO_flockfile (fp);
+	_IO_cleanup_region_start((void (*) __P ((void *)))_IO_funlockfile, fp);
+	_IO_flockfile(fp);
 
-  result = _IO_fwide (fp, mode);
+	result = _IO_fwide(fp, mode);
 
-  _IO_funlockfile (fp);
-  _IO_cleanup_region_end (0);
+	_IO_funlockfile(fp);
+	_IO_cleanup_region_end(0);
 
-  return result;
+	return result;
 }

@@ -1,15 +1,17 @@
 SubDir OBOS_TOP src kernel libroot posix glibc libio ;
 
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
+#SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
+#SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
 SubDirCcFlags -imacrolibc-symbols.h ;
 
-# ToDo: for now, all wide character functions are disabled
+# For now, all wide character functions are disabled,
+# obprintf() is also disabled, because we don't have
+# obstack functionality
 
 KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>clearerr.c
@@ -22,24 +24,19 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>fileno.c
 	<$(SOURCE_GRIST)>filedoalloc.c
 	<$(SOURCE_GRIST)>fileops.c
+	<$(SOURCE_GRIST)>flockfile.c
 	<$(SOURCE_GRIST)>fputc.c
 	<$(SOURCE_GRIST)>fputc_u.c
-#	<$(SOURCE_GRIST)>fputwc.c
-#	<$(SOURCE_GRIST)>fputwc_u.c
 #	<$(SOURCE_GRIST)>freopen.c
 	<$(SOURCE_GRIST)>fseek.c
 	<$(SOURCE_GRIST)>fseeko.c
 	<$(SOURCE_GRIST)>ftello.c
 	<$(SOURCE_GRIST)>fwide.c
-	<$(SOURCE_GRIST)>fwprintf.c
-#	<$(SOURCE_GRIST)>fwscanf.c
 	<$(SOURCE_GRIST)>genops.c
 	<$(SOURCE_GRIST)>getc.c
 	<$(SOURCE_GRIST)>getc_u.c
 	<$(SOURCE_GRIST)>getchar.c
 	<$(SOURCE_GRIST)>getchar_u.c
-#	<$(SOURCE_GRIST)>getwc.c
-#	<$(SOURCE_GRIST)>getwc_u.c
 	<$(SOURCE_GRIST)>iofclose.c
 	<$(SOURCE_GRIST)>iofdopen.c
 	<$(SOURCE_GRIST)>iofflush.c
@@ -49,18 +46,16 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iofopen.c
 	<$(SOURCE_GRIST)>iofputs.c
 	<$(SOURCE_GRIST)>iofputs_u.c
-#	<$(SOURCE_GRIST)>iofputws.c
-#	<$(SOURCE_GRIST)>iofputws_u.c
 	<$(SOURCE_GRIST)>iofread.c
 	<$(SOURCE_GRIST)>iofread_u.c
 #	<$(SOURCE_GRIST)>iofsetpos.c
 	<$(SOURCE_GRIST)>ioftell.c
 	<$(SOURCE_GRIST)>iofwrite.c
 	<$(SOURCE_GRIST)>iofwrite_u.c
-#	<$(SOURCE_GRIST)>iofwide.c
+	<$(SOURCE_GRIST)>iofwide.c
+	<$(SOURCE_GRIST)>iogetdelim.c
 	<$(SOURCE_GRIST)>iogetline.c
-#	<$(SOURCE_GRIST)>iogets.c
-	<$(SOURCE_GRIST)>iogetwline.c
+	<$(SOURCE_GRIST)>iogets.c
 	<$(SOURCE_GRIST)>iopadn.c
 	<$(SOURCE_GRIST)>ioputs.c
 	<$(SOURCE_GRIST)>ioseekoff.c
@@ -68,33 +63,46 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iosetbuffer.c
 	<$(SOURCE_GRIST)>iosetvbuf.c
 	<$(SOURCE_GRIST)>ioungetc.c
-#	<$(SOURCE_GRIST)>ioungetwc.c
 	<$(SOURCE_GRIST)>iovdprintf.c
 	<$(SOURCE_GRIST)>iovsprintf.c
 	<$(SOURCE_GRIST)>iovsscanf.c
-#	<$(SOURCE_GRIST)>iovswscanf.c
-#	<$(SOURCE_GRIST)>iowpadn.c
-	<$(SOURCE_GRIST)>obprintf.c
+#	<$(SOURCE_GRIST)>obprintf.c
 	<$(SOURCE_GRIST)>peekc.c
 	<$(SOURCE_GRIST)>putc.c
 	<$(SOURCE_GRIST)>putc_u.c
 	<$(SOURCE_GRIST)>putchar.c
 	<$(SOURCE_GRIST)>putchar_u.c
-#	<$(SOURCE_GRIST)>putwc.c
-#	<$(SOURCE_GRIST)>putwc_u.c
-#	<$(SOURCE_GRIST)>putwchar.c
-#	<$(SOURCE_GRIST)>putwchar_u.c
 	<$(SOURCE_GRIST)>rewind.c
 	<$(SOURCE_GRIST)>setbuf.c
 	<$(SOURCE_GRIST)>setlinebuf.c
 	<$(SOURCE_GRIST)>stdfiles.c
 	<$(SOURCE_GRIST)>stdio.c
 	<$(SOURCE_GRIST)>strops.c
-#	<$(SOURCE_GRIST)>swprintf.c
-#	<$(SOURCE_GRIST)>swscanf.c
 	<$(SOURCE_GRIST)>vasprintf.c
 	<$(SOURCE_GRIST)>vscanf.c
 	<$(SOURCE_GRIST)>vsnprintf.c
+	<$(SOURCE_GRIST)>wfile_stubs.c
+
+	# wide character
+
+#	<$(SOURCE_GRIST)>fputwc.c
+#	<$(SOURCE_GRIST)>fputwc_u.c
+#	<$(SOURCE_GRIST)>fwprintf.c
+#	<$(SOURCE_GRIST)>fwscanf.c
+#	<$(SOURCE_GRIST)>getwc.c
+#	<$(SOURCE_GRIST)>getwc_u.c
+#	<$(SOURCE_GRIST)>iofputws.c
+#	<$(SOURCE_GRIST)>iofputws_u.c
+#	<$(SOURCE_GRIST)>iogetwline.c
+#	<$(SOURCE_GRIST)>ioungetwc.c
+#	<$(SOURCE_GRIST)>iovswscanf.c
+#	<$(SOURCE_GRIST)>iowpadn.c
+#	<$(SOURCE_GRIST)>putwc.c
+#	<$(SOURCE_GRIST)>putwc_u.c
+#	<$(SOURCE_GRIST)>putwchar.c
+#	<$(SOURCE_GRIST)>putwchar_u.c
+#	<$(SOURCE_GRIST)>swprintf.c
+#	<$(SOURCE_GRIST)>swscanf.c
 #	<$(SOURCE_GRIST)>vswprintf.c
 #	<$(SOURCE_GRIST)>vwprintf.c
 #	<$(SOURCE_GRIST)>vwscanf.c
