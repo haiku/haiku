@@ -29,6 +29,7 @@ public:
 #endif
 	void IdentifyTest();
 	void TranslateTest();
+	void ConfigMessageTest();
 };
 
 #endif	// TGA_TRANSLATOR_TEST_H

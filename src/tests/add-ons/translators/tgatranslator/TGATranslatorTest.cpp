@@ -60,7 +60,11 @@ TGATranslatorTest::Suite()
 
 	suite->addTest(
 		new TC("TGATranslator TranslateTest",
-			&TGATranslatorTest::TranslateTest));	
+			&TGATranslatorTest::TranslateTest));
+			
+	suite->addTest(
+		new TC("TGATranslator ConfigMessageTest",
+			&TGATranslatorTest::ConfigMessageTest));
 
 #if !TEST_R5
 	suite->addTest(
@@ -498,6 +502,57 @@ TGATranslatorTest::TranslateTest()
 	
 	delete proster;
 	proster = NULL;
+}
+
+// Make certain the TGATranslator
+// provides a valid configuration message
+void
+TGATranslatorTest::ConfigMessageTest()
+{
+	// Init
+	NextSubTest();
+	status_t result = B_ERROR;
+	BTranslatorRoster *proster = new BTranslatorRoster();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->AddTranslators(
+		"/boot/home/config/add-ons/Translators/TGATranslator") == B_OK);
+		
+	// GetAllTranslators
+	NextSubTest();
+	translator_id tid, *pids = NULL;
+	int32 count = 0;
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pids, &count) == B_OK);
+	CPPUNIT_ASSERT(pids);
+	CPPUNIT_ASSERT(count == 1);
+	tid = pids[0];
+	delete[] pids;
+	pids = NULL;
+	
+	// GetConfigurationMessage
+	NextSubTest();
+	BMessage msg;
+	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_OK);
+	CPPUNIT_ASSERT(!msg.IsEmpty());
+	
+	// B_TRANSLATOR_EXT_HEADER_ONLY
+	NextSubTest();
+	bool bheaderonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly) == B_OK);
+	CPPUNIT_ASSERT(bheaderonly == false);
+	
+	// B_TRANSLATOR_EXT_DATA_ONLY
+	NextSubTest();
+	bool bdataonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly) == B_OK);
+	CPPUNIT_ASSERT(bdataonly == false);
+	
+	// "tga /rle"
+	NextSubTest();
+	bool brle;
+	CPPUNIT_ASSERT(msg.FindBool("tga /rle", &brle) == B_OK);
+	CPPUNIT_ASSERT(brle == true || brle == false);
 }
 
 #if !TEST_R5

@@ -33,7 +33,11 @@ BMPTranslatorTest::Suite()
 
 	suite->addTest(
 		new TC("BMPTranslator TranslateTest",
-			&BMPTranslatorTest::TranslateTest));	
+			&BMPTranslatorTest::TranslateTest));
+			
+	suite->addTest(
+		new TC("BMPTranslator ConfigMessageTest",
+			&BMPTranslatorTest::ConfigMessageTest));
 
 #if !TEST_R5
 	suite->addTest(
@@ -1017,6 +1021,37 @@ BMPTranslatorTest::TranslateTest()
 	
 	delete proster;
 	proster = NULL;
+}
+
+// Make certain that the BMPTranslator does not
+// provide a configuration message
+void
+BMPTranslatorTest::ConfigMessageTest()
+{
+	// Init
+	NextSubTest();
+	status_t result = B_ERROR;
+	BTranslatorRoster *proster = new BTranslatorRoster();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->AddTranslators(
+		"/boot/home/config/add-ons/Translators/BMPTranslator") == B_OK);
+		
+	// GetAllTranslators
+	NextSubTest();
+	translator_id tid, *pids = NULL;
+	int32 count = 0;
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pids, &count) == B_OK);
+	CPPUNIT_ASSERT(pids);
+	CPPUNIT_ASSERT(count == 1);
+	tid = pids[0];
+	delete[] pids;
+	pids = NULL;
+	
+	// GetConfigurationMessage
+	NextSubTest();
+	BMessage msg;
+	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_ERROR);
+	CPPUNIT_ASSERT(msg.IsEmpty());
 }
 
 #if !TEST_R5
