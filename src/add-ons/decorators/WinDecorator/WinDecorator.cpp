@@ -142,19 +142,19 @@ SRegion * WinDecorator::GetFootprint(void)
 
 void WinDecorator::_DrawTitle(BRect r)
 {
-	// Designed simply to redraw the title when it has changed on
-	// the client side.
-/*	if(title)
+	_layerdata.highcolor=_colors->window_tab_text;
+	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+
+	int32 titlecount=_ClipTitle((_minimizerect.left-5)-(_tabrect.left+5));
+	BString titlestr=GetTitle();
+	if(titlecount<titlestr.CountChars())
 	{
-		_driver->SetDrawingMode(B_OP_OVER);
-		rgb_color tmpcol=_driver->HighColor();
-		_driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
-		_driver->DrawString((char *)string,strlen(string),
-			BPoint(_frame.left+textoffset,_closerect.bottom-1));
-		_driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
-		_driver->SetDrawingMode(B_OP_COPY);
+		titlestr.Truncate(titlecount-1);
+		titlestr+="...";
+		titlecount+=2;
 	}
-*/
+	_driver->DrawString(titlestr.String(),titlecount,
+		BPoint(_tabrect.left+5,_closerect.bottom-1),&_layerdata);
 }
 
 void WinDecorator::_SetFocus(void)

@@ -45,7 +45,7 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_minimize_state=false;
 	_zoom_state=false;
 	_has_focus=false;
-	_title_string=new BString("");
+	_title_string=new BString;
 	_driver=NULL;
 	
 	_closerect.Set(0,0,1,1);
@@ -551,3 +551,13 @@ click_type Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	return CLICK_NONE;
 }
 
+//! Hook function called when the decorator changes focus
+void Decorator::_SetFocus(void)
+{
+}
+
+//! Function for calculating layout for the decorator
+void Decorator::_DoLayout(void)
+{
+	
+}

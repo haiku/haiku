@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons decorators MacDecorator ;
+
+Addon MacDecorator : decorators :
+	MacDecorator.cpp
+	ColorSet.cpp
+	Decorator.cpp
+	DisplayDriver.cpp
+	RGBColor.cpp
+	SystemPalette.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+;
+
+LinkSharedOSLibs MacDecorator : be libopenbeos.so ;

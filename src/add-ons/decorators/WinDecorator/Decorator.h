@@ -108,8 +108,8 @@ protected:
 	virtual void _DrawTab(BRect r);
 	virtual void _DrawTitle(BRect r);
 	virtual void _DrawZoom(BRect r);
-	virtual void _SetFocus(void)=0;
-	virtual void _DoLayout(void)=0;
+	virtual void _SetFocus(void);
+	virtual void _DoLayout(void);
 	virtual void _SetColors(void);
 	
 	ColorSet *_colors;
