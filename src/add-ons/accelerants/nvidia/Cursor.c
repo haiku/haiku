@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003-4/2004
+	Rudolf Cornelissen 4/2003-5/2004
 */
 
 #define MODULE_BIT 0x20000000
@@ -96,8 +96,7 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	if ((hds!=si->dm.h_display_start) || (vds!=si->dm.v_display_start)) 
 	{
 		MOVE_DISPLAY(hds,vds);
-		//fixme: implement:
-		//move_overlay(hds,vds);
+		nv_bes_move_overlay();
 	}
 
 	/* put cursor in correct physical position, so stay onscreen (rel. to CRTC) */

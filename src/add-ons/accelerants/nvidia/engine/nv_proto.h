@@ -111,6 +111,7 @@ status_t nv_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
+void nv_bes_move_overlay(void);
 status_t nv_bes_to_crtc(bool crtc);
 status_t nv_bes_init(void);
 status_t nv_configure_bes
