@@ -14,8 +14,9 @@
 // kernel args
 typedef struct {
 	// architecture specific
-	addr_range page_table;	// maps where the page table is located, in physical memory
-	addr_range framebuffer;	// maps where the framebuffer is located, in physical memory
+	addr_range page_table;		// virtual address and size of the page table
+	addr_range exception_handlers;
+	addr_range framebuffer;		// maps where the framebuffer is located, in physical memory
 	int screen_x, screen_y, screen_depth;
 } arch_kernel_args;
 

@@ -5,7 +5,9 @@
 #ifndef _KERNEL_ARCH_PPC_CPU_H
 #define _KERNEL_ARCH_PPC_CPU_H
 
+
 #include <arch/ppc/thread_struct.h>
+#include <kernel.h>
 
 #define PAGE_SIZE 4096
 
@@ -15,7 +17,51 @@
 #define ATOMIC64_FUNCS_ARE_SYSCALLS 1
 
 struct iframe {
+	uint32 srr0;
+	uint32 srr1;
+	uint32 dar;
+	uint32 dsisr;
+	uint32 lr;
+	uint32 cr;
+	uint32 xer;
+	uint32 ctr;
+	uint32 r31;
+	uint32 r30;
+	uint32 r29;
+	uint32 r28;
+	uint32 r27;
+	uint32 r26;
+	uint32 r25;
+	uint32 r24;
+	uint32 r23;
+	uint32 r22;
+	uint32 r21;
+	uint32 r20;
+	uint32 r19;
+	uint32 r18;
+	uint32 r17;
+	uint32 r16;
+	uint32 r15;
+	uint32 r14;
+	uint32 r13;
+	uint32 r12;
+	uint32 r11;
+	uint32 r10;
+	uint32 r9;
+	uint32 r8;
+	uint32 r7;
+	uint32 r6;
+	uint32 r5;
+	uint32 r4;
+	uint32 r3;
+	uint32 r2;
+	uint32 r1;
+	uint32 r0;
 };
+
+#define MSR_IP	(1L << 6)
+
+struct block_address_translation;
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,10 +74,27 @@ extern void set_sr(void *virtualAddress, uint32 value);
 extern uint32 get_msr(void);
 extern uint32 set_msr(uint32 value);
 
+extern void set_ibat0(struct block_address_translation *bat);
+extern void set_ibat1(struct block_address_translation *bat);
+extern void set_ibat2(struct block_address_translation *bat);
+extern void set_ibat3(struct block_address_translation *bat);
+extern void set_dbat0(struct block_address_translation *bat);
+extern void set_dbat1(struct block_address_translation *bat);
+extern void set_dbat2(struct block_address_translation *bat);
+extern void set_dbat3(struct block_address_translation *bat);
+
+//extern void sethid0(unsigned int val);
+//extern unsigned int getl2cr(void);
+//extern void setl2cr(unsigned int val);
+extern long long get_time_base(void);
+
+extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
+
 #ifdef __cplusplus
 }
 #endif
 
 #define eieio()	asm volatile("eieio")
+#define isync() asm volatile("isync")
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */

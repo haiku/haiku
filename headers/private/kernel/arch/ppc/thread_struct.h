@@ -7,7 +7,7 @@
 
 // architecture specific thread info
 struct arch_thread {
-	// stack pointer
+	void *sp;	// stack pointer
 };
 
 struct arch_team {

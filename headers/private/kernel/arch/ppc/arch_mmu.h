@@ -7,7 +7,10 @@
 
 
 #include <SupportDefs.h>
+#include <string.h>
 
+
+/*** BAT - block address translation ***/
 
 enum bat_length {
 	BAT_LENGTH_128kB	= 0x0000,
@@ -32,11 +35,12 @@ enum bat_protection {
 struct block_address_translation {
 	// upper 32 bit
 	uint32	page_index : 15;				// BEPI, block effective page index
-	uint32	_reserved0 : 3;
-	uint32	length : 10;
-	uint32	kernel_valid : 1;
-	uint32	user_valid : 1;
+	uint32	_reserved0 : 4;
+	uint32	length : 11;
+	uint32	kernel_valid : 1;				// Vs, Supervisor-state valid
+	uint32	user_valid : 1;					// Vp, User-state valid
 	// lower 32 bit
+	uint32	physical_block_number : 15;		// BPRN
 	uint32	write_through : 1;				// WIMG
 	uint32	caching_inhibited : 1;
 	uint32	memory_coherent : 1;
@@ -44,9 +48,19 @@ struct block_address_translation {
 	uint32	_reserved1 : 1;
 	uint32	protection : 2;
 
-	void Reset()
+	void SetVirtualAddress(void *address)
 	{
-		*((uint32 *)this) = 0;
+		page_index = uint32(address) >> 17;
+	}
+
+	void SetPhysicalAddress(void *address)
+	{
+		physical_block_number = uint32(address) >> 17;
+	}
+
+	void Clear()
+	{
+		memset((void *)this, 0, sizeof(block_address_translation));
 	}
 };
 
@@ -59,11 +73,19 @@ struct segment_descriptor {
 	uint32	virtual_segment_id : 24;
 };
 
+
+/*** PTE - page table entry ***/
+
+enum pte_protection {
+	PTE_READ_ONLY	= 3,
+	PTE_READ_WRITE	= 2,
+};
+
 struct page_table_entry {
 	// upper 32 bit
 	uint32	valid : 1;
 	uint32	virtual_segment_id : 24;
-	uint32	hash : 1;
+	uint32	secondary_hash : 1;
 	uint32	abbr_page_index : 6;
 	// lower 32 bit
 	uint32	physical_page_number : 20;
@@ -86,7 +108,7 @@ struct page_table_entry_group {
 	struct page_table_entry entry[8];
 };
 
-extern void ppc_get_page_table(void **_pageTable, size_t *_size);
-extern void ppc_set_page_table(void *pageTable, size_t size);
+extern void ppc_get_page_table(page_table_entry_group **_pageTable, size_t *_size);
+extern void ppc_set_page_table(page_table_entry_group *pageTable, size_t size);
 
 #endif	/* _KERNEL_ARCH_PPC_MMU_H */
