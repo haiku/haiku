@@ -81,6 +81,10 @@ C++FLAGS += -nostdinc ;
 # issues, they deprecated that nice function. This will enable it again:
 C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
 
+if $(TARGET_PLATFORM) = r5 {
+	C++FLAGS += -DCOMPILE_FOR_R5 ;
+}
+
 # Determine if we're building on PPC or x86
 # Determine mimetype of executable
 # Cross compiling can come later
