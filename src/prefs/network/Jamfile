@@ -4,4 +4,4 @@ AddResources Network : Network.rsrc ;
 
 Preference Network : Network.cpp funcs.cpp ;
 
-LinkSharedOSLibs Appearance : be ;
+LinkSharedOSLibs Network : be root ;
