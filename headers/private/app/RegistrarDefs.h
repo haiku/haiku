@@ -41,6 +41,7 @@ enum {
 	// replies
 	B_REG_SUCCESS					= 'rgsu',
 	B_REG_ERROR						= 'rger',
+	B_REG_RESULT					= 'rgrz',
 	// general requests
 	B_REG_GET_MIME_MESSENGER		= 'rgmm',
 	B_REG_GET_CLIPBOARD_MESSENGER	= 'rgcm',
