@@ -51,12 +51,15 @@
 
 // Define this if you want the display driver to emulate the input server.
 // Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
-#define ENABLE_INPUT_SERVER_EMULATION
+#if DISPLAYDRIVER != HWDRIVER
+#	define ENABLE_INPUT_SERVER_EMULATION
+#endif
 
 // This is the application signature of our app_server when running as a
 // regular application. When running as the app_server, this is not used.
 #define SERVER_SIGNATURE "application/x-vnd.haiku-app-server"
 
+// ToDo: use find_directory() instead of absolute path names!
 // Directory for all app_server-related settings. Must include ending slash.
 #define SERVER_SETTINGS_DIR "/boot/home/config/settings/app_server/"
 
@@ -102,4 +105,4 @@
 // and ServerWindows
 #define DEFAULT_MONITOR_PORT_SIZE 30
 
-#endif
+#endif	/* _APPSERVER_CONFIG_H */
