@@ -276,7 +276,8 @@ Stream<Cache>::FindBlockRun(off_t pos,block_run &run,off_t &offset)
 			Cache cached(fVolume);
 
 			off_t start = pos - data->max_indirect_range;
-			int32 indirectSize = (16 << fVolume->BlockShift()) * (fVolume->BlockSize() / sizeof(block_run));
+			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + fVolume->BlockShift()))
+				* (fVolume->BlockSize() / sizeof(block_run));
 			int32 directSize = NUM_ARRAY_BLOCKS << fVolume->BlockShift();
 			int32 index = start / indirectSize;
 			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);

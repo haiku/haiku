@@ -88,9 +88,10 @@ struct data_stream
 
 // This defines the size of the indirect and double indirect
 // blocks. Note: the code may not work correctly at some places
-// if this value is changed (most notably Inode::FindBlockRun()).
-// In any way, the value must be a power of 2.
-#define NUM_ARRAY_BLOCKS	4
+// if this value is changed (it's not tested).
+#define NUM_ARRAY_BLOCKS		4
+#define ARRAY_BLOCKS_SHIFT		2
+#define INDIRECT_BLOCKS_SHIFT	(ARRAY_BLOCKS_SHIFT + ARRAY_BLOCKS_SHIFT)
 
 //**************************************
 

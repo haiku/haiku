@@ -985,6 +985,7 @@ Inode::FillGapWithZeros(off_t pos,off_t newSize)
 
 /** Allocates NUM_ARRAY_BLOCKS blocks, and clears their contents. Growing
  *	the indirect and double indirect range uses this method.
+ *	The allocated block_run is saved in "run"
  */
 
 status_t
@@ -1001,7 +1002,7 @@ Inode::AllocateBlockArray(Transaction *transaction, block_run &run)
 	CachedBlock cached(fVolume);
 	off_t block = fVolume->ToBlock(run);
 
-	for (int32 i = 1;i < run.length;i++) {
+	for (int32 i = 0;i < run.length;i++) {
 		block_run *runs = (block_run *)cached.SetTo(block + i, true);
 		if (runs == NULL)
 			return B_IO_ERROR;
@@ -1115,7 +1116,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 
 				data->max_indirect_range = data->max_direct_range;
 				// insert the block_run in the first block
-				runs = (block_run *)cached.SetTo(data->indirect, true);
+				runs = (block_run *)cached.SetTo(data->indirect);
 			} else {
 				uint32 numberOfRuns = fVolume->BlockSize() / sizeof(block_run);
 				block = fVolume->ToBlock(data->indirect);
@@ -1148,7 +1149,7 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 				} else {
 					runs[free] = run;
 				}
-				data->max_indirect_range += run.length * fVolume->BlockSize();
+				data->max_indirect_range += run.length << fVolume->BlockShift();
 				data->size = blocksNeeded > 0 ? data->max_indirect_range : size;
 
 				cached.WriteBack(transaction);
@@ -1159,9 +1160,6 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 		// Double indirect block range
 
 		if (data->size <= data->max_double_indirect_range || !data->max_double_indirect_range) {
-			FATAL(("growing in the double indirect range is not yet implemented!\n"));
-			// ToDo: implement growing into the double indirect range, please!
-
 			while ((run.length % NUM_ARRAY_BLOCKS) != 0) {
 				// The number of allocated blocks isn't a multiple of NUM_ARRAY_BLOCKS,
 				// so we have to change this. This can happen the first time the stream
@@ -1176,20 +1174,16 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 				if (status < B_OK)
 					return status;
 
-				// Are there any blocks left in the run? If not, allocate a new one
-				if (run.length == 0) {
-					int32 needed = (blocksNeeded + NUM_ARRAY_BLOCKS - 1) & ~(NUM_ARRAY_BLOCKS - 1);
+				blocksNeeded += rest;
+				blocks = (blocksNeeded + NUM_ARRAY_BLOCKS - 1) & ~(NUM_ARRAY_BLOCKS - 1);
+				minimum = NUM_ARRAY_BLOCKS;
 					// we make sure here that we have at minimum NUM_ARRAY_BLOCKS allocated,
-					// if this call succeeds, so we don't run into an endless loop
-					status = fVolume->Allocate(transaction, this, needed, run, NUM_ARRAY_BLOCKS);
-					if (status < B_OK)
-						return status;
-				}
-			}
+					// so if the allocation succeeds, we don't run into an endless loop
 
-			CachedBlock cached(fVolume);
-			block_run *runs = NULL;
-			int32 needed,index;
+				// Are there any blocks left in the run? If not, allocate a new one
+				if (run.length == 0)
+					continue;
+			}
 
 			// if there is no double indirect block yet, create one
 			if (data->double_indirect.IsZero()) {
@@ -1198,26 +1192,107 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 					return status;
 
 				data->max_double_indirect_range = data->max_indirect_range;
-				needed = run.length / NUM_ARRAY_BLOCKS;
-				index = 0;
-			} else {
-				// calculate array position where to insert the new blocks into
-
-				//index = 
-				//data->max_double_indirect_range = ;
-				needed = run.length / NUM_ARRAY_BLOCKS;
 			}
 
-			// allocate new block arrays
-			block_run *array;
+			// calculate the index where to insert the new blocks
+
+			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
+			int32 indirectSize = ((1L << INDIRECT_BLOCKS_SHIFT) << fVolume->BlockShift())
+				* runsPerBlock;
+			int32 directSize = NUM_ARRAY_BLOCKS << fVolume->BlockShift();
+			int32 runsPerArray = runsPerBlock << ARRAY_BLOCKS_SHIFT;
+
+			off_t start = data->max_double_indirect_range - data->max_indirect_range;
+			int32 indirectIndex = start / indirectSize;
+			int32 index = start / directSize;
+
+			// distribute the blocks to the array and allocate
+			// new array blocks when needed
+
+			CachedBlock cached(fVolume);
+			CachedBlock cachedDirect(fVolume);
+			block_run *array = NULL;
+			uint32 runLength = run.length;
+
+			// ToDo: the following code is commented - it could be used to
+			// preallocate all needed block arrays to see in advance if the
+			// allocation will succeed.
+			// I will probably remove it later, because it's no perfect solution
+			// either: if the allocation was broken up before (blocksNeeded != 0),
+			// it doesn't guarantee anything.
+			// And since failing in this case is not that common, it doesn't have
+			// to be optimized in that way.
+			// Anyway, I wanted to have it in CVS - all those lines, and they will
+			// be removed soon :-)
+/*
+			// allocate new block arrays if needed
+
+			off_t block = -1;
+
 			for (int32 i = 0;i < needed;i++) {
-				status = AllocateBlockArray(transaction, array[i]);
+				// get the block to insert the run into
+				block = fVolume->ToBlock(data->double_indirect) + i + indirectIndex / runsPerBlock;
+				if (cached.BlockNumber() != block)
+					array = (block_run *)cached.SetTo(block);
+
+				if (array == NULL)
+					return B_ERROR;
+
+				status = AllocateBlockArray(transaction, array[i + indirectIndex % runsPerBlock]);
 				if (status < B_OK)
 					return status;
-
-				// place new array entry somewhere...
 			}
-			//continue;
+*/
+
+			while (run.length) {
+				// get the indirect array block
+				if (array == NULL) {
+					if (cached.Block() != NULL
+						&& cached.WriteBack(transaction) < B_OK)
+						return B_IO_ERROR;
+
+					array = (block_run *)cached.SetTo(fVolume->ToBlock(data->double_indirect) +
+						indirectIndex / runsPerBlock);
+					if (array == NULL)
+						return B_IO_ERROR;
+				}
+
+				do {
+					// do we need a new array block?
+					if (array[indirectIndex % runsPerBlock].IsZero()) {
+						status = AllocateBlockArray(transaction, array[indirectIndex % runsPerBlock]);
+						if (status < B_OK)
+							return status;
+					}
+
+					block_run *runs = (block_run *)cachedDirect.SetTo(
+						fVolume->ToBlock(array[indirectIndex % runsPerBlock])
+						+ index / runsPerBlock);
+					if (runs == NULL)
+						return B_IO_ERROR;
+
+					do {
+						// insert the block_run into the array
+						runs[index % runsPerBlock] = run;
+						runs[index % runsPerBlock].length = NUM_ARRAY_BLOCKS;
+
+						// alter the remaining block_run
+						run.start += NUM_ARRAY_BLOCKS;
+						run.length -= NUM_ARRAY_BLOCKS;
+					} while ((++index % runsPerBlock) != 0 && run.length);
+
+					if (cachedDirect.WriteBack(transaction) < B_OK)
+						return B_IO_ERROR;
+				} while ((index % runsPerArray) != 0 && run.length);
+
+				if (++indirectIndex % runsPerBlock == 0)
+					array = NULL;
+			}
+
+			data->max_double_indirect_range += runLength << fVolume->BlockShift();
+			data->size = blocksNeeded > 0 ? data->max_double_indirect_range : size;
+
+			continue;
 		}
 
 		RETURN_ERROR(EFBIG);
@@ -1234,7 +1309,8 @@ Inode::FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,
 {
 	int32 indirectSize;
 	if (level == 0)
-		indirectSize = (16 << fVolume->BlockShift()) * (fVolume->BlockSize() / sizeof(block_run));
+		indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + fVolume->BlockShift()))
+			* (fVolume->BlockSize() / sizeof(block_run));
 	else if (level == 1)
 		indirectSize = 4 << fVolume->BlockShift();
 
