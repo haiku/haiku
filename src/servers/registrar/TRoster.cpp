@@ -30,6 +30,8 @@
 #include <Application.h>
 #include <AppMisc.h>
 #include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <storage_support.h>
 
 #include <errno.h>
@@ -41,6 +43,8 @@
 #include "RosterSettingsCharStream.h"
 #include "TRoster.h"
 #include "EventMaskWatcher.h"
+
+using namespace BPrivate;
 
 //------------------------------------------------------------------------------
 // Private local function declarations
@@ -82,8 +86,28 @@ static bool larger_index(const recent_entry *entry1, const recent_entry *entry2)
 //! The maximal period of time an app may be early pre-registered (60 s).
 const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
 
-const char *TRoster::kDefaultRosterSettingsFile =
-	"/boot/home/config/settings/Roster/OpenBeOSRosterSettings";
+
+// get_default_roster_settings_file
+/*!	\brief Returns the path to the default roster settings.
+	\param path BPath to be set to the roster settings path.
+	\return the settings path as C string (\code path.Path() \endcode).
+*/
+static
+const char *
+get_default_roster_settings_file(BPath &path)
+{
+	// get the path of the settings dir and append the subpath of our file
+	status_t error = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (error == B_OK)
+		error = path.Append("Roster/HaikuRosterSettings");
+
+	// If some error occurred, set the standard path (can only fail, if there's
+	// insufficient memory, which can't be helped anyway).
+	if (error != B_OK)
+		path.SetTo("/boot/home/config/settings/Roster/HaikuRosterSettings");
+
+	return path.Path();
+}
 
 // constructor
 /*!	\brief Creates a new roster.
@@ -1396,7 +1420,9 @@ TRoster::_HandleGetRecentEntries(BMessage *request)
 status_t
 TRoster::_LoadRosterSettings(const char *path)
 {
-	const char *settingsPath = path ? path : kDefaultRosterSettingsFile;
+	BPath _path;
+	const char *settingsPath
+		= path ? path : get_default_roster_settings_file(_path);
 
 	RosterSettingsCharStream stream;	
 	status_t error;
@@ -1554,7 +1580,9 @@ TRoster::_LoadRosterSettings(const char *path)
 status_t
 TRoster::_SaveRosterSettings(const char *path)
 {
-	const char *settingsPath = path ? path : kDefaultRosterSettingsFile;
+	BPath _path;
+	const char *settingsPath
+		= path ? path : get_default_roster_settings_file(_path);
 
 	status_t error;
 	FILE* file;
