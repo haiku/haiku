@@ -12,6 +12,33 @@ UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes 
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing ] ;
+
+if ( $(TARGET_PLATFORM) = haiku ) {
+	# This overrides the definition in private/servers/app/ServerConfig.h
+	defines = [ FDefines DISPLAYDRIVER=HWDRIVER ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+	
+	VIEW_DRIVER_SOURCES = AccelerantDriver.cpp ;
+} else {
+	VIEW_DRIVER_SOURCES =
+		fake_input_server.cpp
+		AccelerantDriver.cpp
+		BitmapDriver.cpp
+		ViewDriver.cpp
+		DirectDriver.cpp
+		# We'll just remove this from the build for a little while...
+		#ScreenDriver.cpp
+		# Painter based DisplayDriver Classes
+		BitmapBuffer.cpp
+		DisplayDriverPainter.cpp
+		HWInterface.cpp
+		UpdateQueue.cpp
+		ViewHWInterface.cpp
+		;
+}
+
 SharedLibrary appserver :
 	Angle.cpp
 	BGet++.cpp
@@ -20,15 +47,10 @@ SharedLibrary appserver :
 	CursorData.cpp
 	CursorHandler.cpp
 	Decorator.cpp
-	drawing/DisplayDriver.cpp
-	drawing/DisplayDriverImpl.cpp
-	drawing/DisplaySupport.cpp
 	FontFamily.cpp
 	GraphicsBuffer.cpp
 	IPoint.cpp
 	LayerData.cpp
-	drawing/PatternHandler.cpp
-	drawing/PixelRenderer.cpp
 	RectUtils.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
@@ -39,11 +61,14 @@ SharedLibrary appserver :
 	SystemPalette.cpp
 	TokenHandler.cpp
 	Utils.cpp
-;
 
-LinkSharedOSLibs libappserver.so : root be 							  
-	<boot!home!config!lib>libopenbeos.so
-	libfreetype.so ;
+	# drawing
+	PatternHandler.cpp
+	PixelRenderer.cpp
+	DisplayDriver.cpp
+	DisplayDriverImpl.cpp
+	DisplaySupport.cpp
+;
 
 Server app_server :
 	# Misc. Sources
@@ -60,21 +85,9 @@ Server app_server :
 	ServerWindow.cpp
 
 	# DisplayDriver Classes
-	drawing/fake_input_server.cpp
-	# Clipper.cpp
-	drawing/AccelerantDriver.cpp
-	drawing/BitmapDriver.cpp
-	drawing/ViewDriver.cpp
-	drawing/DirectDriver.cpp
-	# We'll just remove this from the build for a little while...
-	#drawing/ScreenDriver.cpp
-	# Painter based DisplayDriver Classes
-	drawing/BitmapBuffer.cpp
-	drawing/DisplayDriverPainter.cpp
-	drawing/HWInterface.cpp
-	drawing/UpdateQueue.cpp
-	drawing/ViewHWInterface.cpp
+	$(VIEW_DRIVER_SOURCES)
 
+	# Clipper.cpp
 	DefaultDecorator.cpp
 	Layer.cpp
 	RootLayer.cpp
@@ -82,15 +95,25 @@ Server app_server :
 	ServerScreen.cpp
 	WinBorder.cpp
 	Workspace.cpp
-
 ;
 
-LINKFLAGS on app_server ?= $(LINKFLAGS) ;
-LINKFLAGS on app_server += -lbe ;
+# link libraries for app_server and libappserver.so
 
-LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
-							  libpainter.a <boot!home!config!lib>libopenbeos.so 
-							  libagg.a libfreetype.so textencoding ;
+if $(TARGET_PLATFORM) = haiku {
+	LinkSharedOSLibs libappserver.so :
+		libroot.so libbe.so libfreetype.so ;
+	LinkSharedOSLibs app_server :
+		libroot.so libtranslation.so libz.so libpng.so libbe.so
+		libappserver.so libfreetype.so libtextencoding.so ;
+} else {
+	LinkSharedOSLibs libappserver.so :
+		root be <boot!home!config!lib>libopenbeos.so
+		libfreetype.so ;
+	LinkSharedOSLibs app_server :
+		root be game translation libz.so libpng.so libappserver.so
+		libpainter.a <boot!home!config!lib>libopenbeos.so 
+		libagg.a libfreetype.so textencoding ;
+}
 
 SubInclude OBOS_TOP src servers app fonts ;
 SubInclude OBOS_TOP src servers app drawing Painter ;

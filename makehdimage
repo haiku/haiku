@@ -116,9 +116,9 @@ BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtextencoding.so libz.so libfreetype.so libpng.so"
 
 BEOS_SYSTEM_SERVERS="registrar debug_server syslog_daemon media_server \
-	media_addon_server input_server"
+	media_addon_server input_server app_server"
 
-BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant"
+BEOS_ADD_ONS_ACCELERANTS="radeon.accelerant nv.accelerant mga.accelerant nm.accelerant"
 BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
 BEOS_ADD_ONS_MEDIA="mixer.media_addon legacy.media_addon multi_audio.media_addon"
 BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard"
@@ -133,6 +133,7 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader config_manage
 	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA $BEOS_ADD_ONS_INPUT_DEVICES \
 	libnet.so dprintf null zero random ps2_hid \<driver\>tty console \
 	\<driver\>config vga_text timezone_files keymap_files radeon.driver \
+	nv.driver nm.driver mga.driver \
 	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
@@ -242,7 +243,7 @@ done
 
 cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
 $scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
-for f in ps2_hid radeon.driver; do
+for f in ps2_hid radeon.driver nv.driver mga.driver nm.driver; do
 	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
@@ -346,7 +347,9 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/tty drivers/dev/zero \
 		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd \
 		drivers/dev/misc/config drivers/dev/input/ps2_hid \
-		drivers/dev/console drivers/dev/graphics/radeon.driver; do
+		drivers/dev/console drivers/dev/graphics/radeon.driver \
+		drivers/dev/graphics/nv.driver drivers/dev/graphics/mga.driver \
+		drivers/dev/graphics/nm.driver; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
