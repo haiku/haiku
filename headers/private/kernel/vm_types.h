@@ -147,7 +147,7 @@ typedef struct vm_store_ops {
 enum {
 	// ToDo: these are here only temporarily - it's a private
 	//	addition to the BeOS create_area() flags
-	B_EXACT_KERNEL_ADDRESS = 6
+	B_EXACT_KERNEL_ADDRESS = B_EXACT_ADDRESS
 };
 
 enum {
