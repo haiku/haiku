@@ -9,6 +9,8 @@ ModemWindow Header by Sikosis (beos@gravity24hr.com)
 #ifndef __MODEMWINDOW_H__
 #define __MODEMWINDOW_H__
 
+#include "ModemWindow.h"
+
 class ModemView; 
 
 class ModemWindow : public BWindow
@@ -18,32 +20,32 @@ public:
    ~ModemWindow();
    virtual void MessageReceived(BMessage *message);
 private:
-   void InitWindow(void);
-   ModemView* aModemview;
+	void InitWindow(void);
+	ModemView* aModemview;
    
-   BButton *btnModemWindowCustom;
-   BButton *btnModemWindowCancel;
-   BButton *btnModemWindowDone;
+    BButton *btnModemWindowCustom;
+    BButton *btnModemWindowCancel;
+    BButton *btnModemWindowDone;
    
-   BMenu *YourModemIsMenu;
-   BMenuField *YourModemIsMenuField;
-   BMenu *ConnectViaMenu;
-   BMenuField *ConnectViaMenuField;
-   BMenu *SpeedMenu;
-   BMenuField *SpeedMenuField;
+    BMenu *YourModemIsMenu;
+    BMenuField *YourModemIsMenuField;
+    BMenu *ConnectViaMenu;
+    BMenuField *ConnectViaMenuField;
+    BMenu *SpeedMenu;
+    BMenuField *SpeedMenuField;
    
-   BTextView *tvRedial;
-   BTextView *tvTimesBusySignal;
-   BTextView *tvUse;
-   BTextView *tvReadLogPath;
-   BTextView *tvWriteLogPath;
+    BTextView *tvRedial;
+    BTextView *tvTimesBusySignal;
+    BTextView *tvUse;
+    BTextView *tvReadLogPath;
+    BTextView *tvWriteLogPath;
    
-   BCheckBox *chkMakeConnection;
-   BCheckBox *chkShowTerminal;
-   BCheckBox *chkLogAll;
+    BCheckBox *chkMakeConnection;
+    BCheckBox *chkShowTerminal;
+    BCheckBox *chkLogAll;
    
-   BRadioButton *rbTone;
-   BRadioButton *rbPulse;
+    BRadioButton *rbTone;
+    BRadioButton *rbPulse;
 };
 
 #endif

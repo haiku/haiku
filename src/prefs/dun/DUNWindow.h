@@ -9,6 +9,8 @@ DUNWindow Header by Sikosis (beos@gravity24hr.com)
 #ifndef __DUNWINDOW_H__
 #define __DUNWINDOW_H__
 
+#include "ModemWindow.h"
+
 class DUNView; 
 
 class DUNWindow : public BWindow {
@@ -18,35 +20,37 @@ public:
    virtual bool QuitRequested();
    virtual void MessageReceived(BMessage *message);
 private:
-   void InitWindow(void);
-   DUNView* aDUNview;
+	ModemWindow *modemWindow;
+    void InitWindow(void);
+    DUNView* aDUNview;
+    
+    //BMenuBar *menubar;
+    BBox *topframe;
+    BBox *middleframe;
+    BBox *bottomframe;
    
-   //BMenuBar *menubar;
-   BBox *topframe;
-   BBox *middleframe;
-   BBox *bottomframe;
+    BButton *modembutton;
+    BButton *disconnectbutton;
+    BButton *connectbutton;
    
-   BButton *modembutton;
-   BButton *disconnectbutton;
-   BButton *connectbutton;
+    BCheckBox *disablecallwaiting;
+    BCheckBox *dialoutprefix;
    
-   BCheckBox *disablecallwaiting;
-   BCheckBox *dialoutprefix;
+    BOutlineListView *connectionlistitem;
+    BOutlineListView *locationlistitem;
    
-   BOutlineListView *connectionlistitem;
-   BOutlineListView *locationlistitem;
+    BMenuField *connectionmenufield;
+    BMenuField *locationmenufield;
    
-   BMenuField *connectionmenufield;
-   BMenuField *locationmenufield;
-   BMenu *conmenufield;
-   BMenu *locmenufield;
+    BMenu *conmenufield;
+    BMenu *locmenufield;
    
-   BTextView *tvConnectionProfile;
-   BTextView *tvCallWaiting;
-   BTextView *tvConnection;
-   BTextView *tvTimeOnline;
-   BTextView *tvLIP;
-   BTextView *tvLocalIPAddress;
+    BTextView *tvConnectionProfile;
+    BTextView *tvCallWaiting;
+    BTextView *tvConnection;
+    BTextView *tvTimeOnline;
+    BTextView *tvLIP;
+    BTextView *tvLocalIPAddress;
    
 };
 

@@ -9,6 +9,8 @@ DUN Header by Sikosis (beos@gravity24hr.com)
 #ifndef __DUN_H__
 #define __DUN_H__
 
+#include "DUNWindow.h"
+
 extern const char *APP_SIGNATURE;
 
 class DUN : public BApplication {
@@ -16,6 +18,7 @@ public:
    DUN();
    virtual void MessageReceived(BMessage *message);
 private:
+	DUNWindow* dunWindow;
 };
 
 #endif

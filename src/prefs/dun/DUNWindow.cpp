@@ -261,7 +261,7 @@ bool DUNWindow::QuitRequested() {
 void DUNWindow::MessageReceived (BMessage *message) {
    switch(message->what) {
    	   case BTN_MODEM:
-  	   	 new ModemWindow(windowRectModem);
+  	   	 modemWindow = new ModemWindow(windowRectModem);
   	   	 break;	
        default:
          BWindow::MessageReceived(message);

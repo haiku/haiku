@@ -44,8 +44,7 @@ const uint32 MENU_CON_NEW = 'MCNu';
 
 // DUN -- constructor for DUN Class
 DUN::DUN() : BApplication (APP_SIGNATURE) {
-   new DUNWindow(windowRect);
-   
+   dunWindow = new DUNWindow(windowRect);
 }
 // ------------------------------------------------------------------------------- //
 
