@@ -127,8 +127,6 @@ typedef union {
 
 static struct hostent *getanswer (const querybuf *, int, const char *, int);
 
-extern int h_errno;
-
 int
 _hokchar(p)
 	const char *p;

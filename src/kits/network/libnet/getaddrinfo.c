@@ -96,10 +96,6 @@
  */
 #include <stdarg.h>
 
-#undef h_errno
-	// was defined by netdb.h
-extern int h_errno;
-
 #ifdef YP
 #include <rpc/rpc.h>
 #include <rpcsvc/yp.h>

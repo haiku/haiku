@@ -16,9 +16,6 @@
 
 #include <TLS.h>
 
-extern int h_errno;
-#undef h_errno
-	// was defined by netdb.h
 static int32 h_errno_tls;
 
 void initialize_before(void);
@@ -70,9 +67,9 @@ _EXPORT void herror(const char *error)
 	printf("herror() not yet supported.");
 }
 
-_EXPORT int *_h_errnop()
+_EXPORT int * _h_errnop()
 {
-	return (int *)tls_address(h_errno_tls);
+	return (int *) tls_address(h_errno_tls);
 }
 
 

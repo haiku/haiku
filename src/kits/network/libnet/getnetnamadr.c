@@ -83,10 +83,6 @@
 #include <errno.h>
 #include <string.h>
 
-#undef h_errno
-	// was defined by netdb.h
-extern int h_errno;
-
 struct netent *_getnetbyaddr (in_addr_t net, int type);
 struct netent *_getnetbyname (const char *name);
 
