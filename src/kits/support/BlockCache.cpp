@@ -23,7 +23,7 @@
 #include <BlockCache.h>
 #include <Debug.h>
 #include <string.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <new>
 
 #define MAGIC1		0x9183f4d9
