@@ -75,8 +75,7 @@ class BScrollView : public BView {
 		BScrollView			&operator=(const BScrollView &);
 
 		static BRect		CalcFrame(BView *target, bool h, bool v, border_style);
-		int32				ModFlags(int32, border_style);
-		void				InitObject();
+		int32				ModFlags(int32 flags, border_style);
 
 		BView				*fTarget;
 		BScrollBar			*fHorizontalScrollBar;
