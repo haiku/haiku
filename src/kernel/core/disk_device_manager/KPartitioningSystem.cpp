@@ -11,7 +11,8 @@
 
 // constructor
 KPartitioningSystem::KPartitioningSystem(const char *name)
-	: KDiskSystem(name)
+	: KDiskSystem(name),
+	  fModule(NULL)
 {
 }
 

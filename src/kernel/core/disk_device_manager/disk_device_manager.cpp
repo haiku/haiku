@@ -1,9 +1,16 @@
 // disk_device_manager.cpp
 
+#include <stdio.h>
+
 #include "disk_device_manager.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KPartition.h"
+
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
 
 // write_lock_disk_device
 disk_device_data *
@@ -125,14 +132,18 @@ get_child_partition(partition_id partitionID, int32 index)
 // create_child_partition
 partition_data *
 create_child_partition(partition_id partitionID, int32 index,
-					   partition_id *childID)
+					   partition_id childID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (KPartition *partition = manager->FindPartition(partitionID)) {
 		KPartition *child = NULL;
-		if (partition->CreateChild(*childID, index, &child) == B_OK)
+		if (partition->CreateChild(childID, index, &child) == B_OK)
 			return child->PartitionData();
+else
+DBG(OUT("  creating child (%ld, %ld) failed\n", partitionID, index));
 	}
+else
+DBG(OUT("  partition %ld not found\n", partitionID));
 	return NULL;
 }
 

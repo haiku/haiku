@@ -8,11 +8,12 @@
 
 // constructor
 KDiskSystem::KDiskSystem(const char *name)
-	: fID(-1),
+	: fID(_NextID()),
 	  fName(NULL),
 	  fPrettyName(NULL),
 	  fLoadCounter(0)
 {
+	set_string(fName, name);
 }
 
 // destructor
@@ -25,8 +26,7 @@ KDiskSystem::~KDiskSystem()
 status_t
 KDiskSystem::Init()
 {
-	// to be implemented by derived classes
-	return B_OK;
+	return (fName ? B_OK : B_NO_MEMORY);
 }
 
 // SetID
@@ -410,4 +410,15 @@ KDiskSystem::SetPrettyName(const char *name)
 {
 	return set_string(fPrettyName, name);
 }
+
+// _NextID
+int32
+KDiskSystem::_NextID()
+{
+	return atomic_add(&fNextID, 1);
+}
+
+
+// fNextID
+int32 KDiskSystem::fNextID = 0;
 

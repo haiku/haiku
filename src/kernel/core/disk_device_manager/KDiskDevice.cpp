@@ -19,6 +19,7 @@ KDiskDevice::KDiskDevice(partition_id id)
 	  fShadowOwner(-1)
 {
 	Unset();
+	fDevice = this;
 }
 
 // destructor

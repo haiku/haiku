@@ -111,11 +111,15 @@ protected:
 
 	status_t SetPrettyName(const char *name);
 
+	static int32 _NextID();
+
 private:
 	disk_system_id	fID;
 	char			*fName;
 	char			*fPrettyName;
 	int32			fLoadCounter;
+
+	static int32	fNextID;
 };
 
 } // namespace DiskDevice

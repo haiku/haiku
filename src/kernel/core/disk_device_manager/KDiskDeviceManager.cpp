@@ -16,6 +16,11 @@
 #include "KPartition.h"
 #include "KPartitioningSystem.h"
 
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
+
 // TODO: Remove when not longer needed.
 using BPrivate::DiskDevice::KDiskDeviceJob;
 using BPrivate::DiskDevice::KDiskDeviceJobQueue;
@@ -37,6 +42,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 		for (size_t bufferSize = sizeof(moduleName);
 			 read_next_module_name(list, moduleName, &bufferSize) == B_OK;
 			 bufferSize = sizeof(moduleName)) {
+DBG(OUT("partitioning system: %s\n", moduleName));
 			_AddPartitioningSystem(moduleName);
 		}
 		close_module_list(list);
@@ -47,6 +53,7 @@ KDiskDeviceManager::KDiskDeviceManager()
 		for (size_t bufferSize = sizeof(moduleName);
 			 read_next_module_name(list, moduleName, &bufferSize) == B_OK;
 			 bufferSize = sizeof(moduleName)) {
+DBG(OUT("file system: %s\n", moduleName));
 			_AddFileSystem(moduleName);
 		}
 		close_module_list(list);
@@ -403,10 +410,12 @@ KDiskDeviceManager::InitialDeviceScan()
 		while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
 			if (device->WriteLock()) {
 				// scan the device
-				error = _ScanPartition(device);
-				if (error != B_OK) {
-					// ...
-					error = B_OK;
+				if (device->HasMedia()) {
+					error = _ScanPartition(device);
+					if (error != B_OK) {
+						// ...
+						error = B_OK;
+					}
 				}
 				device->WriteUnlock();
 			}
@@ -441,7 +450,7 @@ KDiskDeviceManager::_AddFileSystem(const char *name)
 		return B_NO_MEMORY;
 	return _AddDiskSystem(diskSystem);
 */
-	return B_ERROR;
+return B_ERROR;
 }
 
 // _AddDiskSystem
@@ -450,12 +459,35 @@ KDiskDeviceManager::_AddDiskSystem(KDiskSystem *diskSystem)
 {
 	if (!diskSystem)
 		return B_BAD_VALUE;
+DBG(OUT("KDiskDeviceManager::_AddDiskSystem(%s)\n", diskSystem->Name()));
 	status_t error = diskSystem->Init();
+if (error != B_OK)
+DBG(OUT("  initialization failed: %s\n", strerror(error)));
 	if (error == B_OK && !fDiskSystems.AddItem(diskSystem))
 		error = B_NO_MEMORY;
 	if (error != B_OK)
 		delete diskSystem;
+DBG(OUT("KDiskDeviceManager::_AddDiskSystem() done: %s\n", strerror(error)));
 	return error;
+}
+
+// _AddDevice
+bool
+KDiskDeviceManager::_AddDevice(KDiskDevice *device)
+{
+	if (!device || !PartitionAdded(device))
+		return false;
+	if (fDevices.AddItem(device))
+		return true;
+	PartitionRemoved(device);
+	return false;
+}
+
+// _RemoveDevice
+bool
+KDiskDeviceManager::_RemoveDevice(KDiskDevice *device)
+{
+	return (device && PartitionRemoved(device) && fDevices.RemoveItem(device));
 }
 
 // _Scan
@@ -489,6 +521,7 @@ KDiskDeviceManager::_Scan(const char *path)
 		int32 leafLen = strlen("/raw");
 		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
 			return B_ERROR;
+DBG(OUT("  found device: %s\n", path));
 		// create a KDiskDevice for it
 		KDiskDevice *device = new(nothrow) KDiskDevice;
 		if (!device)
@@ -496,7 +529,7 @@ KDiskDeviceManager::_Scan(const char *path)
 		// init the KDiskDevice
 		status_t error = device->SetTo(path);
 		// add the device
-		if (error == B_OK && !fDevices.AddItem(device))
+		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
 		// cleanup on error
 		if (error != B_OK)
@@ -512,14 +545,19 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
+char partitionPath[B_PATH_NAME_LENGTH];
+partition->GetPath(partitionPath);
+DBG(OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath));
 	// find the disk system that returns the best priority for this partition
 	float bestPriority = -1;
 	KDiskSystem *bestDiskSystem = NULL;
 	void *bestCookie = NULL;
-	int32 itCookie;
+	int32 itCookie = 0;
 	while (KDiskSystem *diskSystem = LoadNextDiskSystem(&itCookie)) {
+DBG(OUT("  trying: %s\n", diskSystem->Name()));
 		void *cookie = NULL;
 		float priority = diskSystem->Identify(partition, &cookie);
+DBG(OUT("  returned: %f\n", priority));
 		if (priority >= 0 && priority > bestPriority) {
 			// new best disk system
 			if (bestDiskSystem) {
@@ -539,8 +577,11 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 	// now, if we have found a disk system, let it scan the partition
 	status_t error = B_OK;
 	if (bestDiskSystem) {
+DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 		error = bestDiskSystem->Scan(partition, bestCookie);
 		if (error == B_OK) {
+// TODO: Maybe better move setting the partition's and children's disk system
+// in K{File,Partitioning}System::Scan()?
 			partition->SetDiskSystem(bestDiskSystem);
 			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
 				child->SetParentDiskSystem(bestDiskSystem);
@@ -548,6 +589,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 			}
 		} else {
 			// TODO: Handle the error.
+DBG(OUT("  scanning failed: %s\n", strerror(error)));
 		}
 		// now we can safely unload the disk system -- it has been loaded by
 		// the partition(s) and thus will not really be unloaded

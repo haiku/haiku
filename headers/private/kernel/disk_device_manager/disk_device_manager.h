@@ -78,9 +78,8 @@ partition_data *get_child_partition(partition_id partitionID, int32 index);
 // partition write access
 // (write lock required)
 partition_data *create_child_partition(partition_id partitionID, int32 index,
-									   partition_id *childID);
-	// childID is used for the return value, but is also an optional input
-	// parameter -- -1 to be ignored
+									   partition_id childID);
+	// childID is an optional input parameter -- -1 to be ignored
 bool delete_partition(partition_id partitionID);
 void partition_modified(partition_id partitionID);
 	// tells the disk device manager, that the parition has been modified

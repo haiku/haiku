@@ -90,6 +90,9 @@ private:
 	status_t _AddFileSystem(const char *name);
 	status_t _AddDiskSystem(KDiskSystem *diskSystem);
 
+	bool _AddDevice(KDiskDevice *device);
+	bool _RemoveDevice(KDiskDevice *device);
+
 	status_t _Scan(const char *path);
 	status_t _ScanPartition(KPartition *partition);
 
