@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-6/2004
+   Rudolf Cornelissen 11/2002-7/2004
 */
 
 #define MODULE_BIT 0x00020000
@@ -34,6 +34,9 @@ status_t nv_crtc2_validate_timing(
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
 
+	/* if hor. total does not adhere to max. blanking pulse width, decrease it! */
+	if (*ht > (*hd_e + 0x3f8)) *ht = (*hd_e + 0x3f8);
+
 	/* make sure sync pulse is not during display */
 	if (*hs_e > (*ht - 8)) *hs_e = (*ht - 8);
 	if (*hs_s < (*hd_e + 8)) *hs_s = (*hd_e + 8);
@@ -56,6 +59,9 @@ status_t nv_crtc2_validate_timing(
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
+
+	/* if vert. total does not adhere to max. blanking pulse width, decrease it! */
+	if (*vt > (*vd_e + 0xff)) *vt = (*vd_e + 0xff);
 
 	/* make sure sync pulse is not during display */
 	if (*vs_e > (*vt - 1)) *vs_e = (*vt - 1);
