@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -1071,7 +1071,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 	for (i = 0; i < eheader.e_phnum; i++) {
 		char regionName[64];
 		char *regionAddress;
-		region_id id;
+		area_id id;
 
 		if (pheaders[i].p_type != PT_LOAD)
 			continue;

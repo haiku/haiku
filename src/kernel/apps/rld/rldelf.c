@@ -66,7 +66,7 @@ enum {
 
 typedef
 struct elf_region_t {
-	region_id	id;
+	area_id		id;
 	addr_t		start;
 	addr_t		size;
 	addr_t		vmstart;
@@ -858,7 +858,7 @@ search_path_for_type(image_type type)
 	if (path != NULL)
 		return path;
 
-	switch(type) {
+	switch (type) {
 		case B_APP_IMAGE:
 			return "/boot/home/config/bin:"
 					"/bin:"

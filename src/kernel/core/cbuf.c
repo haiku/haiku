@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -47,9 +47,9 @@ static cbuf *sFreeBufferNoBlockList;
 static spinlock sNoBlockSpinlock;
 
 static spinlock sLowlevelSpinlock;
-static region_id sBufferArea;
+static area_id sBufferArea;
 static cbuf *sBuffer;
-static region_id sBitmapArea;
+static area_id sBitmapArea;
 static uint8 *sBitmap;
 
 
