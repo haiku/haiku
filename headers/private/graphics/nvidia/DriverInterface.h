@@ -197,7 +197,8 @@ typedef struct {
 		NV38,
 		NV40,
 		NV41,
-		NV43
+		NV43,
+		NV45
 	};
 	enum
 	{	// card_arch in order of date of NV chip design
