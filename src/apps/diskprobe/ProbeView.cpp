@@ -625,7 +625,7 @@ HeaderView::NotifyTarget()
 }
 
 
-void 
+void
 HeaderView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
@@ -676,11 +676,17 @@ HeaderView::MessageReceived(BMessage *message)
 		{
 			fLastPosition = fPosition;
 
+			off_t position;
 			int32 delta;
-			if (message->FindInt32("delta", &delta) != B_OK)
-				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
-			else
+			if (message->FindInt64("position", &position) == B_OK)
+				fPosition = position;
+			else if (message->FindInt32("delta", &delta) == B_OK)
 				fPosition += delta * off_t(fBlockSize);
+			else
+				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
+
+			fPosition = (fPosition / fBlockSize) * fBlockSize;
+				// round to block size
 
 			// update views
 			UpdatePositionViews();
@@ -1040,7 +1046,15 @@ ProbeView::AttachedToWindow()
 	item->SetTarget(fHeaderView);
 
 	BMenu *subMenu = new BMenu("Selection");
+	message = new BMessage(kMsgPositionUpdate);
+	message->AddInt64("position", 0);
+	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K', B_COMMAND_KEY));
+	fNativeMenuItem->SetTarget(fHeaderView);
+	message = new BMessage(*message);
+	subMenu->AddItem(fSwappedMenuItem = new BMenuItem("", message, 'L', B_COMMAND_KEY));
+	fSwappedMenuItem->SetTarget(fHeaderView);
 	menu->AddItem(new BMenuItem(subMenu));
+	UpdateSelectionMenuItems(0, 0);
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("Write", NULL, 'S', B_COMMAND_KEY));
@@ -1132,6 +1146,54 @@ ProbeView::WindowActivated(bool active)
 }
 
 
+void 
+ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
+{
+	int64 position = 0;
+	const uint8 *data = fDataView->DataAt(start);
+	if (data == NULL) {
+		fNativeMenuItem->SetEnabled(false);
+		fSwappedMenuItem->SetEnabled(false);
+		return;
+	}
+
+	// retrieve native endian position
+
+	int size;
+	if (end < start + 8)
+		size = end + 1 - start;
+	else
+		size = 8;
+
+	int64 bigEndianPosition = 0;
+	memcpy(&bigEndianPosition, data, size);
+
+	position = B_BENDIAN_TO_HOST_INT64(bigEndianPosition) >> (8 * (8 - size));
+
+	// update menu items
+
+	char buffer[128];
+	if (fDataView->Base() == kHexBase)
+		snprintf(buffer, sizeof(buffer), "Native: 0x%0*Lx", size * 2, position);
+	else
+		snprintf(buffer, sizeof(buffer), "Native: %Ld (0x%0*Lx)", position, size * 2, position);
+
+	fNativeMenuItem->SetLabel(buffer);
+	fNativeMenuItem->SetEnabled(position >= 0 && position < fEditor.FileSize());
+	fNativeMenuItem->Message()->ReplaceInt64("position", position * fEditor.BlockSize());
+
+	position = B_SWAP_INT64(position) >> (8 * (8 - size));
+	if (fDataView->Base() == kHexBase)
+		snprintf(buffer, sizeof(buffer), "Swapped: 0x%0*Lx", size * 2, position);
+	else
+		snprintf(buffer, sizeof(buffer), "Swapped: %Ld (0x%0*Lx)", position, size * 2, position);
+
+	fSwappedMenuItem->SetLabel(buffer);
+	fSwappedMenuItem->SetEnabled(position >= 0 && position < fEditor.FileSize());
+	fSwappedMenuItem->Message()->ReplaceInt64("position", position * fEditor.BlockSize());
+}
+
+
 void
 ProbeView::CheckClipboard()
 {
@@ -1158,6 +1220,24 @@ void
 ProbeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
+		case B_OBSERVER_NOTICE_CHANGE: {
+			int32 what;
+			if (message->FindInt32(B_OBSERVE_WHAT_CHANGE, &what) != B_OK)
+				break;
+
+			switch (what) {
+				case kDataViewSelection:
+				{
+					int64 start, end;
+					if (message->FindInt64("start", &start) == B_OK
+						&& message->FindInt64("end", &end) == B_OK)
+						UpdateSelectionMenuItems(start, end);
+					break;
+				}
+			}
+			break;
+		}
+
 		case kMsgBaseType:
 		{
 			int32 type;
@@ -1166,6 +1246,11 @@ ProbeView::MessageReceived(BMessage *message)
 
 			fHeaderView->SetBase((base_type)type);
 			fDataView->SetBase((base_type)type);
+
+			// The selection menu items depend on the base type as well
+			int32 start, end;
+			fDataView->GetSelection(start, end);
+			UpdateSelectionMenuItems(start, end);
 
 			// update the applications settings
 			BMessage update(*message);
