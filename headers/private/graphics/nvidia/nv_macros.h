@@ -737,6 +737,12 @@
 #define CFGR(A)   (nv_pci_access.offset=NVCFG_##A, ioctl(fd,NV_GET_PCI, &nv_pci_access,sizeof(nv_pci_access)), nv_pci_access.value)
 #define CFGW(A,B) (nv_pci_access.offset=NVCFG_##A, nv_pci_access.value = B, ioctl(fd,NV_SET_PCI,&nv_pci_access,sizeof(nv_pci_access)))
 
+/* read and write from ISA I/O space */
+#define ISAWB(A,B)(nv_isa_access.adress=A, nv_isa_access.data = (uint8)B, nv_isa_access.size = 1, ioctl(fd,NV_ISA_OUT, &nv_isa_access,sizeof(nv_isa_access)))
+#define ISAWW(A,B)(nv_isa_access.adress=A, nv_isa_access.data = B, nv_isa_access.size = 2, ioctl(fd,NV_ISA_OUT, &nv_isa_access,sizeof(nv_isa_access)))
+#define ISARB(A)  (nv_isa_access.adress=A, ioctl(fd,NV_ISA_IN, &nv_isa_access,sizeof(nv_isa_access)), (uint8)nv_isa_access.data)
+#define ISARW(A)  (nv_isa_access.adress=A, ioctl(fd,NV_ISA_IN, &nv_isa_access,sizeof(nv_isa_access)), nv_isa_access.data)
+
 /* read and write from the dac registers */
 #define DACR(A)   (NV_REG32(NVDAC_##A))
 #define DACW(A,B) (NV_REG32(NVDAC_##A)=B)
