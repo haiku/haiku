@@ -5,12 +5,21 @@
 #ifndef _DEVFS_H
 #define _DEVFS_H
 
-#include <vfs.h>
+
 #include <Drivers.h>
 
-status_t bootstrap_devfs(void);
 
-/* api drivers will use to publish devices */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+status_t devfs_unpublish_partition(const char *path);
+status_t devfs_publish_partition(const char *path, const partition_info *info);
+
 status_t devfs_publish_device(const char *path, void *ident, device_hooks *calls);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _DEVFS_H */
