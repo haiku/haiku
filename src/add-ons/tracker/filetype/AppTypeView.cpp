@@ -31,13 +31,16 @@ AppTypeView::AppTypeView(BRect viewFrame)
 	
 	BRect appSupportedTypesViewFrame = Bounds();
 	appSupportedTypesViewFrame.top = fAppFlagsView->Frame().bottom + 10;
-	appSupportedTypesViewFrame.left += 10;
+	appSupportedTypesViewFrame.left = appFlagsViewFrame.left;
 	appSupportedTypesViewFrame.right -= 10;
 	fSupportedTypesView = new AppTypeSupportedTypesView(appSupportedTypesViewFrame);
 	AddChild(fSupportedTypesView);
 		
 	BRect versionInfoViewFrame = Bounds();
-	versionInfoViewFrame.top = Bounds().Height()/2;
+	versionInfoViewFrame.top = fSupportedTypesView->Frame().bottom + 10;
+	versionInfoViewFrame.left = appSupportedTypesViewFrame.left;
+	versionInfoViewFrame.right = appSupportedTypesViewFrame.right;
+	versionInfoViewFrame.bottom -= 10;
 	fVersionInfoView = new AppTypeVersionInfoView(versionInfoViewFrame);
 	AddChild(fVersionInfoView);
 }

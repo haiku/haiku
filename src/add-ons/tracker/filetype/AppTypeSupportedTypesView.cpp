@@ -2,7 +2,8 @@
 #include <SupportDefs.h>
 
 AppTypeSupportedTypesView::AppTypeSupportedTypesView(BRect viewFrame)
-	: BView(viewFrame, "AppTypeSupportedTypesView", B_FOLLOW_ALL,
+	: BView(viewFrame, "AppTypeSupportedTypesView", 
+	        B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP,
 	        B_FRAME_EVENTS|B_WILL_DRAW)
 {
 	font_height fontHeight;
@@ -29,9 +30,7 @@ AppTypeSupportedTypesView::AppTypeSupportedTypesView(BRect viewFrame)
 	fRemoveButton->ResizeTo(buttonWidth,buttonHeight);
 	fAddButton->ResizeTo(buttonWidth,buttonHeight);
 	
-	fBox->AddChild(fAddButton);
 	fAddButton->MoveTo(fBox->Bounds().Width() - 60 - fAddButton->Bounds().Width(),14);
-	fBox->AddChild(fRemoveButton);
 	fRemoveButton->MoveTo(fAddButton->Frame().left,fAddButton->Frame().bottom);
 	
 	fListView = new BListView(Bounds(),"listview");
@@ -41,6 +40,8 @@ AppTypeSupportedTypesView::AppTypeSupportedTypesView(BRect viewFrame)
 	fScrollView = new BScrollView("scrollview",fListView,B_FOLLOW_ALL,
 	                              B_FRAME_EVENTS|B_WILL_DRAW,false,true);
 	fBox->AddChild(fScrollView);
+	fBox->AddChild(fAddButton);
+	fBox->AddChild(fRemoveButton);
 	fBox->ResizeTo(Bounds().Width(),fScrollView->Frame().bottom+8);
 	ResizeTo(fBox->Bounds().Width(),fBox->Bounds().Height());
 }

@@ -19,29 +19,31 @@ public:
 	bool IsClean() const;
 private:
 	
-	BBox			* fVersionInfoBox;
-	BMenu			* fVersionKindMenu;
-	BMenuItem		* fVersionApplicationMenuItem;
-	BMenuItem		* fVersionSystemMenuItem;
-	BMenuField		* fVersionKindMenuField;
-	BStringView		* fVersionStringView;
-	BTextControl	* fVersionMajorTextControl;
-	BTextControl	* fVersionMiddleTextControl;
-	BTextControl	* fVersionMinorTextControl;
+	BBox			* fBox;
+	BMenu			* fKindMenu;
+	BMenuItem		* fApplicationMenuItem;
+	BMenuItem		* fSystemMenuItem;
+	BMenuField		* fKindMenuField;
+	BStringView		* fStringView;
+	BTextControl	* fMajorTextControl;
+	BStringView		* fDot1StringView;
+	BTextControl	* fMiddleTextControl;
+	BStringView		* fDot2StringView;
+	BTextControl	* fMinorTextControl;
 	BMenu			* fVarietyMenu;
-	BMenuItem		* fVarietyDevelopmentMenuItem;
-	BMenuItem		* fVarietyAlphaMenuItem;
-	BMenuItem		* fVarietyBetaMenuItem;
-	BMenuItem		* fVarietyGammaMenuItem;
-	BMenuItem		* fVarietyGoldenMasterMenuItem;
-	BMenuItem		* fVarietyFinalMenuItem;
+	BMenuItem		* fDevelopmentMenuItem;
+	BMenuItem		* fAlphaMenuItem;
+	BMenuItem		* fBetaMenuItem;
+	BMenuItem		* fGammaMenuItem;
+	BMenuItem		* fGoldenMasterMenuItem;
+	BMenuItem		* fFinalMenuItem;
 	BMenuField		* fVarietyMenuField;
 	BStringView		* fSlashStringView;
 	BTextControl	* fInternalTextControl;
-	BStringView		* fShortDescriptionStringView;
-	BTextControl	* fShortDescriptionTextControl;
-	BStringView		* fLongDescriptionStringView;
-	BTextView		* fLongDescriptionTextView;
+	BStringView		* fShortStringView;
+	BTextControl	* fShortTextControl;
+	BStringView		* fLongStringView;
+	BTextView		* fLongTextView;
 };
 
 #endif // APP_TYPE_VERSION_INFO_VIEW_H
