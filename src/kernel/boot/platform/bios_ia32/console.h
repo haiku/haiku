@@ -20,7 +20,7 @@ enum console_color {
 	PURPLE,
 	BROWN,
 	GRAY,
-	// foreground colors only
+	// foreground colors only if blinking is enabled
 	DARK_GRAY,
 	BRIGHT_BLUE,
 	BRIGHT_GREEN,

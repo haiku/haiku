@@ -56,6 +56,21 @@ vga_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 }
 
 
+static void
+vga_enable_bright_background_colors(void)
+{
+	// reset attribute controller
+	in8(0x03da);
+
+	// select mode control register
+	out8(0x30, 0x03c0);
+
+	// read mode control register, change it (we need to clear bit 3), and write it back
+	uint8 mode = in8(0x03c1) & 0xf7;
+	out8(mode, 0x3c0);
+}
+
+
 //	#pragma mark -
 //	VESA functions
 
@@ -222,11 +237,10 @@ vesa_set_mode(uint16 mode)
 static status_t
 vesa_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 {
-#if 0
 	// is this an 8 bit indexed color mode?
-	if (gKernelArgs.fb.bit_depth = modeInfo.bits_per_pixel != 8)
+	if (gKernelArgs.frame_buffer.depth != 8)
 		return B_BAD_TYPE;
-#endif
+
 #if 0
 	struct bios_regs regs;
 	regs.eax = 0x4f09;
@@ -386,13 +400,18 @@ platform_switch_to_logo(void)
 extern "C" void
 platform_switch_to_text_mode(void)
 {
-	if (!gKernelArgs.frame_buffer.enabled)
+
+	if (!gKernelArgs.frame_buffer.enabled) {
+		vga_enable_bright_background_colors();
 		return;
+	}
 
 	bios_regs regs;
 	regs.eax = 3;
 	call_bios(0x10, &regs);
 	gKernelArgs.frame_buffer.enabled = 0;
+
+	vga_enable_bright_background_colors();
 }
 
 

@@ -34,9 +34,9 @@ static const console_color kItemBackgroundColor = kBackgroundColor;
 static const console_color kSelectedItemBackgroundColor = GRAY;
 static const console_color kDisabledColor = DARK_GRAY;
 
-static const console_color kSliderColor = GRAY;
-static const console_color kSliderBackgroundColor = CYAN;
-static const console_color kArrowColor = WHITE;
+static const console_color kSliderColor = CYAN;
+static const console_color kSliderBackgroundColor = DARK_GRAY;
+static const console_color kArrowColor = GRAY;
 
 static int32 sMenuOffset = 0;
 

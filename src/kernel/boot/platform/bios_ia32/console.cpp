@@ -125,7 +125,7 @@ console_set_cursor(int32 x, int32 y)
 void 
 console_set_color(int32 foreground, int32 background)
 {
-	sColor = (background & 0x7) << 12 | (foreground & 0xf) << 8;
+	sColor = (background & 0xf) << 12 | (foreground & 0xf) << 8;
 }
 
 
