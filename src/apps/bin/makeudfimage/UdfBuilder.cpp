@@ -186,10 +186,17 @@ UdfBuilder::Build()
 				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
 				             primaryExtent.location(), primaryExtent.length());
 		}
-		// reserve reserve vds
+		// reserve reserve vds. try to grab the 16 blocks preceding block 256. if
+		// that fails, just grab any 16. most commercial discs just put the reserve
+		// vds immediately following the primary vds, which seems a bit stupid to me,
+		// now that I think about it... 
 		if (!error) {
 			_PrintUpdate(VERBOSITY_MEDIUM, "udf: Reserving space for reserve vds");
-			error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveExtent);
+			reserveExtent.set_location(256-16);
+			reserveExtent.set_length(16 << _BlockShift());
+			error = _Allocator().GetExtent(reserveExtent);
+			if (error)
+				error = _Allocator().GetNextExtent(16 << _BlockShift(), true, reserveExtent);
 			if (!error) 
 				_PrintUpdate(VERBOSITY_HIGH, "udf: <location: %ld, length: %ld>",
 				             reserveExtent.location(), reserveExtent.length());
