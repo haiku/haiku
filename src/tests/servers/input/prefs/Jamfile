@@ -90,7 +90,7 @@ SEARCH on [ FGristFiles
 	= [ FDirName $(OBOS_TOP) src prefs mouse ] ;
 
 SimpleTest keymapTest :
-	key_map.cpp
+	main.cpp
 	Keymap.cpp
 
 	InterfaceDefs.cpp
@@ -103,10 +103,10 @@ if $(COMPILE_FOR_R5) {
 }
 
 SEARCH on [ FGristFiles
-	key_map.cpp
+	main.cpp
 	Keymap.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src apps bin keymap ] ;
+	= [ FDirName $(OBOS_TOP) src bin keymap ] ;
 
 SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ] 
 	= [ FDirName $(OBOS_TOP) src kits interface ] ;
