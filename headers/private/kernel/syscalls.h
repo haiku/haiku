@@ -155,7 +155,7 @@ extern status_t		_kern_read_index_stat(dev_t device, const char *name, struct st
 extern status_t		_kern_remove_index(dev_t device, const char *name);
 extern status_t		_kern_getcwd(char *buffer, size_t size);
 extern status_t		_kern_setcwd(int fd, const char *path);
-extern int			_kern_open_query(dev_t device, const char *query,
+extern int			_kern_open_query(dev_t device, const char *query, size_t queryLength,
 						uint32 flags, port_id port, int32 token);
 
 // file descriptor functions
