@@ -70,6 +70,8 @@ BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 
 BEOS_SYSTEM_SERVERS="registrar syslog_daemon"
 
+echo "Building executables and libraries..."
+
 jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	ide_isa bfs blkman fast_log ide_adapter locked_pool \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
@@ -82,6 +84,8 @@ jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 # create the image and the directory structure
 
 if [ ! $alreadyMounted ]; then
+	echo
+	echo "Creating image..."
 	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
 	mkbfs $imagePath Haiku
 	mkdir -p $targetDir
@@ -94,7 +98,11 @@ cd $targetDir
 
 # this avoids diskspace leaking with our current BFS version
 # (because of some unidentified bugs, of course :)
+echo
+echo "Deleting $targetDir/beos..."
 rm -rf beos
+
+echo "Creating directory structure..."
 
 mkdir -p beos/bin
 mkdir -p beos/etc
@@ -115,6 +123,8 @@ mkdir -p home/config/settings
 mkdir -p var/tmp
 
 # modules
+
+echo "Installing kernel modules..."
 
 cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
 
@@ -148,10 +158,12 @@ done
 
 
 # kernel
+echo "Installing kernel..."
 cp $sourceDir/objects/x86.R1/kernel/kernel $targetDir/beos/system/kernel_x86
 
 
 # libs
+echo "Installing libraries..."
 cd $sourceDir/distro/x86.R1/beos/system/lib
 cp $BEOS_SYSTEM_LIB $targetDir/beos/system/lib/
 cd $sourceDir/objects/x86.R1/kernel/
@@ -159,11 +171,14 @@ cp rld.so libroot.so $targetDir/beos/system/lib/
 
 
 # servers
+echo "Installing servers..."
 cd $sourceDir/distro/x86.R1/beos/system/servers
 cp $BEOS_SYSTEM_SERVERS $targetDir/beos/system/servers/
 
 
 # apps
+echo "Installing apps..."
+
 cd $sourceDir/objects/x86.R1/kernel
 for f in fortune uname; do
 	cp kernel_$f $targetDir/beos/bin/$f
@@ -174,6 +189,7 @@ cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
 cd $targetDir/beos/bin
 
 # scripts and data files
+echo "Installing scripts and data files..."
 cd $sourceDir
 cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
 cp data/etc/profile $targetDir/beos/etc/
@@ -182,11 +198,13 @@ cp -R distro/x86.R1/beos/etc $targetDir//beos/
 ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir//home/config/settings/timezone
 
 # boot loader
+echo "Installing boot loader..."
 cd $targetDir/beos/system
 objcopy -O binary $sourceDir/objects/x86.R1/kernel/boot_loader zbeos
 
 
 # boot module links
+echo "Creating boot module links..."
 cd $targetDir/beos/system/add-ons/kernel/boot
 for f in bus_managers/config_manager bus_managers/pci bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
 	ln -fs /boot/beos/system/add-ons/kernel/$f $(basename $f)
@@ -197,6 +215,7 @@ done
 
 
 # driver links
+echo "Creating driver links..."
 cd $targetDir/beos/system/add-ons/kernel
 for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/tty drivers/dev/zero \
@@ -216,8 +235,12 @@ done
 mimeDBSource=$sourceDir/src/data/beos_mime
 mimeDBDest=$targetDir/home/config/settings/beos_mime
 
+echo "Deleting old MIME database..."
+
 rm -rf $mimeDBDest
 mkdir -p $mimeDBDest
+
+echo "Installing MIME database..."
 
 for inSuperFile in $mimeDBSource/*.super; do
 	superType=$(basename $inSuperFile .super)
