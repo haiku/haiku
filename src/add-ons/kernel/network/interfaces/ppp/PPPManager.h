@@ -63,7 +63,7 @@ class PPPManager {
 		interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
 		
 		interface_id NextID()
-			{ return (interface_id) atomic_add((vint32*) &fNextID, 1); }
+			{ return (interface_id) atomic_add((int32*) &fNextID, 1); }
 		
 		void DeleterThreadEvent();
 		void Pulse();

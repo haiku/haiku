@@ -11,7 +11,7 @@
 
 #include <kernel_cpp.h>
 
-#include <KPPPDefs.h>
+#include <PPPDefs.h>
 #include "PPPManager.h"
 
 
@@ -202,7 +202,7 @@ DoesReport(ppp_report_type type, thread_id thread)
 }
 
 
-struct ppp_interface_module_info ppp_interface_module = {
+ppp_interface_module_info ppp_interface_module = {
 	{
 		{
 			PPP_INTERFACE_MODULE_NAME,
@@ -233,9 +233,7 @@ std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
-			get_module(NET_CORE_MODULE_NAME, (module_info**)&core);
-			
-			if(!core)
+			if(get_module(NET_CORE_MODULE_NAME, (module_info**)&core) != B_OK)
 				return B_ERROR;
 		return B_OK;
 		

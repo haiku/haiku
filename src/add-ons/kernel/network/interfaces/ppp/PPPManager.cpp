@@ -18,10 +18,61 @@
 
 #ifdef _KERNEL_MODE
 #define spawn_thread spawn_kernel_thread
+#define printf dprintf
 #endif
 
 
 static const char ppp_if_name_base[] = "ppp";
+
+
+static
+status_t
+interface_up_thread(void *data)
+{
+	interface_entry *entry = (interface_entry*) data;
+	
+	entry->interface->Up();
+	--entry->accessing;
+	
+	return B_OK;
+}
+
+
+static
+status_t
+bring_interface_up(interface_entry *entry)
+{
+	thread_id upThread = spawn_thread(interface_up_thread,
+		"PPPManager: up_thread", B_NORMAL_PRIORITY, entry);
+	resume_thread(upThread);
+	
+	return B_OK;
+}
+
+
+static
+status_t
+interface_down_thread(void *data)
+{
+	interface_entry *entry = (interface_entry*) data;
+	
+	entry->interface->Down();
+	--entry->accessing;
+	
+	return B_OK;
+}
+
+
+static
+status_t
+bring_interface_down(interface_entry *entry)
+{
+	thread_id downThread = spawn_thread(interface_down_thread,
+		"PPPManager: down_thread", B_NORMAL_PRIORITY, entry);
+	resume_thread(downThread);
+	
+	return B_OK;
+}
 
 
 static
@@ -112,7 +163,8 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	++entry->accessing;
 	locker.UnlockNow();
 	
-	if(ifp->if_flags & (IFF_UP | IFF_RUNNING) != (IFF_UP | IFF_RUNNING)) {
+	if(!entry->interface->DoesDialOnDemand()
+			&& ifp->if_flags & (IFF_UP | IFF_RUNNING) != (IFF_UP | IFF_RUNNING)) {
 		m_freem(buf);
 		--entry->accessing;
 		return ENETDOWN;
@@ -151,13 +203,14 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 	
 	switch(cmd) {
 		case SIOCSIFFLAGS:
-			if(((ifreq*)data)->ifr_flags & IFF_DOWN)
-				DeleteInterface(entry->interface->ID());
-			else if(((ifreq*)data)->ifr_flags & IFF_UP) {
-				int32 result = entry->interface->Up() ? B_OK : B_ERROR;
-				--entry->accessing;
-				return result;
-			}
+			if(((ifreq*)data)->ifr_flags & IFF_DOWN) {
+				if(entry->interface->DoesDialOnDemand()
+						&& entry->interface->Phase() == PPP_DOWN_PHASE)
+					DeleteInterface(entry->interface->ID());
+				else
+					return bring_interface_down(entry);
+			} else if(((ifreq*)data)->ifr_flags & IFF_UP)
+				return bring_interface_up(entry);
 		break;
 		
 		default:
@@ -181,7 +234,7 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	
 	interface_id id = NextID();
 	interface_entry *entry = new interface_entry;
-	entry->accessing = 0;
+	entry->accessing = 1;
 	entry->deleting = false;
 	entry->interface = new PPPInterface(id, settings,
 		parentEntry ? parentEntry->interface : NULL);
@@ -195,14 +248,13 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	fEntries.AddItem(entry);
 	locker.UnlockNow();
 	
-	if(Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
-			&id, sizeof(interface_id)) != B_OK) {
+	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
+			&id, sizeof(interface_id))) {
 		DeleteInterface(id);
-		return PPP_UNDEFINED_INTERFACE_ID;
+		id = PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
-	if(!entry->interface->DoesDialOnDemand())
-		entry->interface->Up();
+	--entry->accessing;
 	
 	return id;
 }
@@ -257,7 +309,7 @@ PPPManager::RegisterInterface(interface_id ID)
 	ifp->if_type = IFT_PPP;
 	ifp->name = ppp_if_name_base;
 	ifp->if_unit = FindUnit();
-	ifp->if_flags = IFF_POINTOPOINT | IFF_UP;
+	ifp->if_flags = IFF_POINTOPOINT;
 	ifp->rx_thread = ifp->tx_thread = -1;
 	ifp->start = NULL;
 	ifp->stop = ppp_ifnet_stop;
@@ -280,7 +332,7 @@ PPPManager::UnregisterInterface(interface_id ID)
 	
 	if(entry->interface->Ifnet()) {
 		if_detach(entry->interface->Ifnet());
-		delete entry->interface->Ifnet();
+		free(entry->interface->Ifnet());
 	}
 	
 	return true;
@@ -294,16 +346,16 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 	
 	switch(op) {
 		case PPPC_CREATE_INTERFACE: {
-			if(length < sizeof(pppc_create_interface_info) || !data)
+			if(length < sizeof(ppp_interface_settings_info) || !data)
 				return B_ERROR;
 			
-			pppc_create_interface_info *info = (pppc_create_interface_info*) data;
+			ppp_interface_settings_info *info = (ppp_interface_settings_info*) data;
 			if(!info->settings)
 				return B_ERROR;
 			
-			info->resultID = CreateInterface(info->settings);
+			info->interface = CreateInterface(info->settings);
 				// parents cannot be set from userland
-			return info->resultID != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
+			return info->interface != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
 		} break;
 		
 		case PPPC_DELETE_INTERFACE:
@@ -312,6 +364,32 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			
 			DeleteInterface(*(interface_id*)data);
 		break;
+		
+		case PPPC_BRING_INTERFACE_UP: {
+			if(length != sizeof(interface_id) || !data)
+				return B_ERROR;
+			
+			LockerHelper locker(fLock);
+			
+			interface_entry *entry = EntryFor(*(interface_id*)data);
+			if(!entry)
+				return B_BAD_INDEX;
+			
+			return bring_interface_up(entry);
+		} break;
+		
+		case PPPC_BRING_INTERFACE_DOWN: {
+			if(length != sizeof(interface_id) || !data)
+				return B_ERROR;
+			
+			LockerHelper locker(fLock);
+			
+			interface_entry *entry = EntryFor(*(interface_id*)data);
+			if(!entry)
+				return B_BAD_INDEX;
+			
+			return bring_interface_down(entry);
+		} break;
 		
 		case PPPC_CONTROL_INTERFACE: {
 			if(length < sizeof(ppp_control_info) || !data)
@@ -329,10 +407,10 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 		} break;
 		
 		case PPPC_GET_INTERFACES: {
-			if(length < sizeof(pppc_get_interfaces_info) || !data)
+			if(length < sizeof(ppp_get_interfaces_info) || !data)
 				return B_ERROR;
 			
-			pppc_get_interfaces_info *info = (pppc_get_interfaces_info*) data;
+			ppp_get_interfaces_info *info = (ppp_get_interfaces_info*) data;
 			if(!info->interfaces)
 				return B_ERROR;
 			
@@ -348,7 +426,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			return CountInterfaces(*(ppp_interface_filter*)data);
 		break;
 		
-		case PPPC_ENABLE_MANAGER_REPORTS: {
+		case PPPC_ENABLE_REPORTS: {
 			if(length < sizeof(ppp_report_request) || !data)
 				return B_ERROR;
 			
@@ -357,7 +435,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 				request->flags);
 		} break;
 		
-		case PPPC_DISABLE_MANAGER_REPORTS: {
+		case PPPC_DISABLE_REPORTS: {
 			if(length < sizeof(ppp_report_request) || !data)
 				return B_ERROR;
 			
