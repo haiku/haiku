@@ -4,6 +4,8 @@
 
 #include "disk_device_manager.h"
 #include "KDiskDevice.h"
+#include "KDiskDeviceJob.h"
+#include "KDiskDeviceJobQueue.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
@@ -188,5 +190,71 @@ find_disk_system(const char *name)
 			return diskSystem->ID();
 	}
 	return -1;
+}
+
+// update_disk_device_job_progress
+bool
+update_disk_device_job_progress(disk_job_id jobID, float progress)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
+			job->UpdateProgress(progress);
+			return true;
+		}
+	}
+	return false;
+}
+
+// update_disk_device_job_extra_progress
+bool
+update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
+			job->UpdateExtraProgress(info);
+			return true;
+		}
+	}
+	return false;
+}
+
+// update_disk_device_job_interrupt_properties
+uint32
+update_disk_device_job_interrupt_properties(disk_job_id jobID,
+											uint32 interruptProperties)
+{
+	bool paused = false;
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	do {
+		sem_id pauseSemaphore = -1;
+		if (ManagerLocker locker = manager) {
+			// get the job and the respective job queue
+			if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
+				if (KDiskDeviceJobQueue *jobQueue = job->JobQueue()) {
+					// terminate if canceled.
+					if (jobQueue->IsCanceled()) {
+						if (jobQueue->ShallReverse())
+							return B_DISK_DEVICE_JOB_REVERSE;
+						return B_DISK_DEVICE_JOB_CANCEL;
+					}
+					// set the new interrupt properties only when not
+					// requested to pause
+					if (jobQueue->IsPauseRequested())
+						pauseSemaphore = jobQueue->ReadyToPause();
+					else
+						job->SetInterruptProperties(interruptProperties);
+				}
+			}
+		}
+		// pause, if requested; redo the loop then
+		paused = (pauseSemaphore >= 0);
+		if (paused) {
+			acquire_sem(pauseSemaphore);
+			pauseSemaphore = -1;
+		}
+	} while (paused);
+	return B_DISK_DEVICE_JOB_CONTINUE;
 }
 

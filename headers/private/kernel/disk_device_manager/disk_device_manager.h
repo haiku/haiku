@@ -109,12 +109,10 @@ void partition_modified(partition_id partitionID);
 disk_system_id find_disk_system(const char *name);
 
 // jobs
-bool set_disk_device_job_status(disk_job_id job, uint32 status);
-	// probably not needed
-uint32 get_disk_device_job_status(disk_job_id job);
-bool update_disk_device_job_progress(disk_job_id job, float progress);
-bool update_disk_device_job_extra_progress(disk_job_id job, const char *info);
-uint32 update_disk_device_job_interrupt_properties(disk_job_id job,
+bool update_disk_device_job_progress(disk_job_id jobID, float progress);
+bool update_disk_device_job_extra_progress(disk_job_id jobID,
+										   const char *info);
+uint32 update_disk_device_job_interrupt_properties(disk_job_id jobID,
 												   uint32 interruptProperties);
 	// returns one of B_DISK_DEVICE_JOB_{CONTINUE,CANCEL,REVERSE}
 
