@@ -1793,7 +1793,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxL
 	{
 		fDuplicateNode = offset;
 
-		node = cached.SetTo(bplustree_node::FragmentOffset(fDuplicateNode),false);
+		node = cached.SetTo(bplustree_node::FragmentOffset(fDuplicateNode), false);
 		if (node == NULL)
 			RETURN_ERROR(B_ERROR);
 
@@ -1903,14 +1903,14 @@ TreeIterator::Stop()
 void 
 TreeIterator::Dump()
 {
-	__out("TreeIterator at %p:\n",this);
-	__out("\tfTree = %p\n",fTree);
-	__out("\tfCurrentNodeOffset = %Ld\n",fCurrentNodeOffset);
-	__out("\tfCurrentKey = %ld\n",fCurrentKey);
-	__out("\tfDuplicateNode = %Ld (%Ld, 0x%Lx)\n",bplustree_node::FragmentOffset(fDuplicateNode),fDuplicateNode,fDuplicateNode);
-	__out("\tfDuplicate = %u\n",fDuplicate);
-	__out("\tfNumDuplicates = %u\n",fNumDuplicates);
-	__out("\tfIsFragment = %s\n",fIsFragment ? "true" : "false");
+	__out("TreeIterator at %p:\n", this);
+	__out("\tfTree = %p\n", fTree);
+	__out("\tfCurrentNodeOffset = %Ld\n", fCurrentNodeOffset);
+	__out("\tfCurrentKey = %ld\n", fCurrentKey);
+	__out("\tfDuplicateNode = %Ld (%Ld, 0x%Lx)\n", bplustree_node::FragmentOffset(fDuplicateNode), fDuplicateNode, fDuplicateNode);
+	__out("\tfDuplicate = %u\n", fDuplicate);
+	__out("\tfNumDuplicates = %u\n", fNumDuplicates);
+	__out("\tfIsFragment = %s\n", fIsFragment ? "true" : "false");
 }
 #endif
 
@@ -2005,9 +2005,9 @@ compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, i
 	{
 	    case B_STRING_TYPE:
     	{
-			int len = min_c(keyLength1,keyLength2);
-			int result = strncmp((const char *)key1,(const char *)key2,len);
-			
+			int len = min_c(keyLength1, keyLength2);
+			int result = strncmp((const char *)key1, (const char *)key2, len);
+
 			if (result == 0
 				&& !(((const char *)key1)[len] == '\0' && ((const char *)key2)[len] == '\0'))
 				result = keyLength1 - keyLength2;
@@ -2066,7 +2066,9 @@ compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, i
 			return (result < 0.0) ? -1 : 1;
 		}
 	}
-	return 0;
+
+	// if the type is unknown, the entries don't match...
+	return -1;
 }
 
 

@@ -81,6 +81,12 @@ union value {
 	char	String[INODE_FILE_NAME_LENGTH];
 };
 
+// B_MIME_STRING_TYPE is defined in storage/Mime.h, but we
+// don't need the whole file here; the type can't change anyway
+#ifndef _MIME_H
+#	define B_MIME_STRING_TYPE 'MIMS'
+#endif
+
 class Term {
 	public:
 		Term(int8 op) : fOp(op), fParent(NULL) {}
@@ -651,12 +657,10 @@ Equation::ConvertValue(type_code type)
 	if (type == fType)
 		return B_OK;
 
-	fType = type;
 	char *string = fString;
 
 	switch (type) {
-		// B_MIME_STRING_TYPE is defined in Mime.h which I didn't want to include just for that
-		case 'MIMS':
+		case B_MIME_STRING_TYPE:
 			type = B_STRING_TYPE;
 			// supposed to fall through
 		case B_STRING_TYPE:
@@ -694,6 +698,8 @@ Equation::ConvertValue(type_code type)
 			return B_ERROR;
 	}
 
+	fType = type;
+
 	// patterns are only allowed for string types
 	if (fType != B_STRING_TYPE && fIsPattern)
 		fIsPattern = false;
@@ -716,14 +722,14 @@ Equation::CompareTo(const uint8 *value, uint16 size)
 		// we have already validated the pattern, so we don't check for failing
 		// here - if something is broken, and matchString() returns an error,
 		// we just don't match
-		compare = matchString(fValue.String,(char *)value) == MATCH_OK ? 0 : 1;
+		compare = matchString(fValue.String, (char *)value) == MATCH_OK ? 0 : 1;
 	} else if (fIsSpecialTime) {
 		// the index is a shifted int64 index, but we have to match
 		// against an unshifted value (i.e. the last_modified index)
 		int64 timeValue = *(int64 *)value >> INODE_TIME_SHIFT;
-		compare = compareKeys(fType,&timeValue,sizeof(int64),&fValue.Int64,sizeof(int64));
+		compare = compareKeys(fType, &timeValue, sizeof(int64), &fValue.Int64, sizeof(int64));
 	} else
-		compare = compareKeys(fType,value,size,Value(),fSize);
+		compare = compareKeys(fType, value, size, Value(), fSize);
 
 	switch (fOp) {
 		case OP_EQUAL:
@@ -739,7 +745,7 @@ Equation::CompareTo(const uint8 *value, uint16 size)
 		case OP_GREATER_THAN_OR_EQUAL:
 			return compare >= 0;
 	}
-	FATAL(("Unknown/Unsupported operation: %d\n",fOp));
+	FATAL(("Unknown/Unsupported operation: %d\n", fOp));
 	return false;
 }
 
@@ -1018,7 +1024,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			continue;
 		}
 
-		// check user permissions here - but which one?!
+		// ToDo: check user permissions here - but which one?!
 		// we could filter out all those where we don't have
 		// read access... (we should check for every parent
 		// directory if the X_OK is allowed)
@@ -1065,7 +1071,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			dirent->d_ino = offset;
 			dirent->d_pdev = volume->ID();
 			dirent->d_pino = volume->ToVnode(inode->Parent());
-			
+
 			if (inode->GetName(dirent->d_name) < B_OK)
 				FATAL(("inode %Ld in query has no name!\n", inode->BlockNumber()));
 
