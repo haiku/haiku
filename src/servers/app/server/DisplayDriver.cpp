@@ -1634,7 +1634,37 @@ bool DisplayDriver::IsCursorHidden(void)
 */
 void DisplayDriver::MoveCursorTo(const float &x, const float &y)
 {
+	Lock();
 	
+	if(cursorframe.left==x && cursorframe.top==y)
+	{
+		Unlock();
+		return;
+	}
+
+	if(_is_cursor_obscured)
+		_is_cursor_obscured=false;
+
+	oldcursorframe=cursorframe;
+	cursorframe.OffsetTo(x,y);
+	
+	if(_is_cursor_hidden)
+	{
+		Unlock();
+		return;
+	}	
+	
+//	if(!_cursorsave)
+//		_cursorsave=new ServerBitmap(_cursor);
+
+	CopyBitmap(_cursorsave,_cursor->Bounds(),saveframe,&_drawdata);
+	
+	CopyToBitmap(_cursorsave,cursorframe);
+	saveframe=cursorframe;
+	
+	CopyBitmap(_cursor,_cursor->Bounds(),cursorframe,&_drawdata);
+
+	Unlock();
 }
 
 /*!
@@ -1729,7 +1759,7 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	_cursor=new ServerCursor(cursor);
 	
 	if(visible)
-		_cursorsave=new ServerBitmap((ServerBitmap*)cursor);
+		_cursorsave=new UtilityBitmap((ServerBitmap*)cursor);
 	
 	// TODO: make this take the hotspot into account -- too tired to bother right now...
 	saveframe=_cursor->Bounds().OffsetToCopy(cursorframe.LeftTop());
@@ -2311,6 +2341,12 @@ void DisplayDriver::SetMode(const display_mode &mode)
 */
 void DisplayDriver::GetMode(display_mode *mode)
 {
+	if(!mode)
+		return;
+	
+	Lock();
+	*mode=_displaymode;
+	Unlock();
 }
 
 /*!

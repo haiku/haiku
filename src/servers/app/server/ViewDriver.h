@@ -42,7 +42,7 @@
 class BBitmap;
 class PortLink;
 class VDWindow;
-class LayerData;
+class DrawData;
 
 class VDView : public BView
 {
@@ -134,12 +134,14 @@ protected:
 	void FillPatternRect(const BRect &rect, const DrawData *d);
 	void StrokeSolidRect(const BRect &rect, RGBColor &color);
 	void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	void SetLayerData(LayerData *d, bool set_font_data=false);
+	void SetDrawData(const DrawData *d, bool set_font_data=false);
 	void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
+	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+	void CopyToBitmap(ServerBitmap *target, const BRect &source);
 	
-	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
-	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
-	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
+	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
+	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
+	rgb_color GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high=true);
 	int hide_cursor;
 	bool obscure_cursor;
 	BBitmap *framebuffer;

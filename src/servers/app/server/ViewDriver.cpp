@@ -974,7 +974,7 @@ void ViewDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
 	screenwin->Unlock();
 }
 
-void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
+void ViewDriver::SetDrawData(const DrawData *d, bool set_font_data)
 {
 	if(!is_initialized)
 		return;
@@ -982,6 +982,13 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 	if(!d)
 		return;
 
+	bool unlock=false;
+	if(!framebuffer->IsLocked())
+	{
+		framebuffer->Lock();
+		unlock=true;
+	}
+	
 	drawview->SetPenSize(d->pensize);
 	drawview->SetDrawingMode(d->draw_mode);
 	drawview->SetHighColor(d->highcolor.GetColor32());
@@ -991,7 +998,7 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 	if(set_font_data)
 	{
 		BFont font;
-		ServerFont *sf=&(d->font);
+		const ServerFont *sf=&(d->font);
 
 		if(!sf)
 			return;
@@ -1016,10 +1023,12 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 		font.SetSpacing(sf->Spacing());
 		drawview->SetFont(&font);
 	}
+	if(unlock)
+		framebuffer->Unlock();
 }
 
 /*
-float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
+float ViewDriver::StringWidth(const char *string, int32 length, DrawData *d)
 {
 	if(!string || !d || !is_initialized)
 		return 0.0;
@@ -1089,7 +1098,7 @@ float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	return returnval;
 }
 
-float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
+float ViewDriver::StringHeight(const char *string, int32 length, DrawData *d)
 {
 	if(!string || !d || !is_initialized)
 		return 0.0;
@@ -1146,7 +1155,7 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 }
 */
 /*
-void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
+void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, DrawData *d, escapement_delta *edelta)
 {
 	if(!is_initialized)
 		return;
@@ -1294,7 +1303,7 @@ void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerDa
 }
 */
 
-void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
+void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d)
 {
 	if(!is_initialized)
 		return;
@@ -1382,7 +1391,7 @@ void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 
 }
 
-void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
+void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d)
 {
 	if(!is_initialized)
 		return;
@@ -1499,7 +1508,7 @@ void ViewDriver::BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 	}
 }
 
-rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high)
+rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high)
 {
 	rgb_color returncolor={0,0,0,0};
 
@@ -1745,4 +1754,109 @@ status_t ViewDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
 	// Locking shouldn't be necessary here - R5 should handle this for us. :)
 	BScreen screen;
 	return screen.WaitForRetrace(timeout);
+}
+
+void ViewDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+{
+	if(!is_initialized || !bitmap || !d)
+		return;
+	
+	SetDrawData(d);
+	
+	// Oh, wow, is this going to be slow. Then again, ViewDriver was never meant to be very fast. It could
+	// be made significantly faster by directly copying from the source to the destination, but that would
+	// require implementing a lot of code. Eventually, this should be replaced, but for now, using
+	// DrawBitmap will at least work with a minimum of effort.
+	
+	BBitmap *mediator=new BBitmap(bitmap->Bounds(),bitmap->ColorSpace());
+	memcpy(mediator->Bits(),bitmap->Bits(),bitmap->BitsLength());
+	
+	screenwin->Lock();
+	framebuffer->Lock();
+
+	drawview->DrawBitmap(mediator,source,dest);
+	
+	framebuffer->Unlock();
+	screenwin->Unlock();
+	delete mediator;
+}
+
+void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
+{
+	if(!is_initialized || !destbmp)
+		return;
+	
+	if(destbmp->BitsPerPixel() != _buffer_depth)
+		return;
+	
+	BRect destrect(destbmp->Bounds()), source(sourcerect);
+	
+	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
+	
+	// First, clip source rect to destination
+	if(source.Width() > destrect.Width())
+		source.right=source.left+destrect.Width();
+	
+
+	if(source.Height() > destrect.Height())
+		source.bottom=source.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect;
+
+	work_rect.Set(	destbmp->Bounds().left,
+					destbmp->Bounds().top,
+					destbmp->Bounds().right,
+					destbmp->Bounds().bottom	);
+	if( !(work_rect.Contains(destrect)) )
+	{	// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+
+	if( !(work_rect.Contains(source)) )
+	{	// something in selection must be clipped
+		if(source.left < 0)
+			source.left = 0;
+		if(source.right > work_rect.right)
+			source.right = work_rect.right;
+		if(source.top < 0)
+			source.top = 0;
+		if(source.bottom > work_rect.bottom)
+			source.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
+	uint8 *src_bits = (uint8*) framebuffer->Bits();
+
+	// Get row widths for offset looping
+	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
+	uint32 src_width = uint32 (framebuffer->BytesPerRow());
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
+
+	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
+	{ 
+		memcpy(dest_bits,src_bits,line_length);
+
+		// Increment offsets
+   		src_bits += src_width;
+   		dest_bits += dest_width;
+	}
+
 }

@@ -89,7 +89,7 @@ ServerBitmap::~ServerBitmap(void)
 	\brief Gets the number of bytes occupied by the bitmap, including padding bytes.
 	\return The number of bytes occupied by the bitmap, including padding.
 */
-uint32 ServerBitmap::BitsLength(void)
+uint32 ServerBitmap::BitsLength(void) const
 {
 	return (uint32)(_bytesperrow*_height);
 }
@@ -249,4 +249,24 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 			_bpp=0;
 			break;
 	}
+}
+
+UtilityBitmap::UtilityBitmap(BRect rect,color_space space, int32 flags,
+	int32 bytesperline, screen_id screen)
+: ServerBitmap(rect,space,flags,bytesperline,screen)
+{
+	_AllocateBuffer();
+}
+
+UtilityBitmap::UtilityBitmap(const ServerBitmap *bmp)
+: ServerBitmap(bmp)
+{
+	_AllocateBuffer();
+	if(bmp->Bits())
+		memcpy(Bits(),bmp->Bits(),bmp->BitsLength());
+}
+
+UtilityBitmap::~UtilityBitmap(void)
+{
+	_FreeBuffer();
 }
