@@ -614,7 +614,8 @@ rule SplitPath
 	# Decomposes a path into its components.
 	local path = $(1:G=) ;
 	local components ;
-	while $(path:D)
+	# $(path:D) for "/" is "/". Therefore the second condition.
+	while $(path:D) && $(path:D) != $(path)
 	{
 		# Note: $(path:B) returns "." for "..", but $(path:D=) is fine.
 		components = $(path:D=) $(components) ;
