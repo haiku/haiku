@@ -100,6 +100,10 @@ WavReader::Sniff(int32 *streamCount)
 			return B_ERROR;
 		}
 		pos += sizeof(chunk);
+		if (UINT32(chunk.len) == 0) {
+			TRACE("WavReader::Sniff: Error: chunk of size 0 found\n");
+			return B_ERROR;
+		}
 		switch (UINT32(chunk.fourcc)) {
 			case FOURCC('f','m','t',' '):
 				if (UINT32(chunk.len) >= sizeof(format)) {

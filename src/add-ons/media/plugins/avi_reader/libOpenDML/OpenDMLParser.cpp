@@ -142,6 +142,11 @@ OpenDMLParser::Parse(BPositionIO *source)
 		}
 		pos += 4;
 		size = AVI_UINT32(temp);
+
+		if (size == 0) {
+			TRACE("OpenDMLParser::Parse: Error: chunk of size 0 found\n");
+			goto err;
+		}
 		
 		if (fourcc == FOURCC('J','U','N','K')) {
 			TRACE("OpenDMLParser::Parse: JUNK chunk ignored, size: %lu bytes\n", size);

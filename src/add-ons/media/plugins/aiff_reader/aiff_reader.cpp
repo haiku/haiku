@@ -89,6 +89,10 @@ aiffReader::Sniff(int32 *streamCount)
 			return B_ERROR;
 		}
 		pos += sizeof(chunk);
+		if (UINT32(chunk.chunk_size) == 0) {
+			TRACE("aiffReader::Sniff: Error: chunk of size 0 found\n");
+			return B_ERROR;
+		}
 		switch (UINT32(chunk.chunk_id)) {
 			case FOURCC('C','O','M','M'):
 			{
