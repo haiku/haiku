@@ -31,9 +31,9 @@ struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
 void scheduler_enqueue_in_run_queue(struct thread *thread);
 void scheduler_remove_from_run_queue(struct thread *thread);
 
-void thread_atkernel_entry(void);
+void thread_at_kernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
-void thread_atkernel_exit(void);
+void thread_at_kernel_exit(void);
 
 status_t thread_init(struct kernel_args *args);
 status_t thread_per_cpu_init(int32 cpu_num);
@@ -79,11 +79,6 @@ status_t _user_get_next_thread_info(team_id team, int32 *cookie, thread_info *in
 struct rlimit;
 int _user_getrlimit(int resource, struct rlimit * rlp);
 int _user_setrlimit(int resource, const struct rlimit * rlp);
-
-#if 1
-// XXX remove later
-int thread_test(void);
-#endif
 
 #ifdef __cplusplus
 }

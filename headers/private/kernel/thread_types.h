@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc.
+ * Copyright 2004-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -42,11 +42,6 @@ enum team_state {
 	TEAM_STATE_NORMAL,	// normal state
 	TEAM_STATE_BIRTH,	// being contructed
 	TEAM_STATE_DEATH	// being killed
-};
-
-enum {
-	KERNEL_TIME,
-	USER_TIME
 };
 
 #define THREAD_RETURN_EXIT			0x1
@@ -187,7 +182,6 @@ struct thread {
 	bigtime_t		user_time;
 	bigtime_t		kernel_time;
 	bigtime_t		last_time;
-	int32			last_time_type;	// KERNEL_TIME or USER_TIME
 
 	// architecture dependant section
 	struct arch_thread arch_info;

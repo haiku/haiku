@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -403,6 +403,9 @@ void
 arch_check_syscall_restart(struct thread *t)
 {
 	struct iframe *frame = i386_get_current_iframe();
+	if (frame == NULL)
+		// this thread is obviously new; we didn't come from an interrupt
+		return;
 
 	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR) {
 		frame->eax = frame->orig_eax;

@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 #include <vm.h>
 #include <int.h>
@@ -201,6 +201,9 @@ i386_handle_trap(struct iframe frame)
 	if (thread)
 		i386_push_iframe(thread, &frame);
 
+	if (frame.cs == USER_CODE_SEG)
+		thread_at_kernel_entry();
+
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
 
@@ -228,8 +231,8 @@ i386_handle_trap(struct iframe frame)
 			enable_interrupts();
 
 			ret = vm_page_fault(cr2, frame.eip,
-				(frame.error_code & 0x2) != 0,
-				(frame.error_code & 0x4) != 0,
+				(frame.error_code & 0x2) != 0,	// write access
+				(frame.error_code & 0x4) != 0,	// userland
 				&newip);
 			if (newip != 0) {
 				// the page fault handler wants us to modify the iframe to set the
@@ -238,12 +241,12 @@ i386_handle_trap(struct iframe frame)
 			}
 			break;
 		}
+
 		case 99:	// syscall
 		{
 			uint64 retcode;
 			unsigned int args[MAX_ARGS];
 
-			thread_atkernel_entry();
 #if 0
 {
 			int i;
@@ -253,13 +256,12 @@ i386_handle_trap(struct iframe frame)
 				dprintf("\t0x%x\n", ((unsigned int *)frame.edx)[i]);
 }
 #endif
-			/*
-			** syscall interface works as such:
-			** eax has syscall #
-			** ecx has number of args (0-16)
-			** edx has pointer to buffer containing args from first to last
-			** each is verified to make sure someone doesn't try to clobber it
-			*/
+			/* syscall interface works as such:
+			 *  %eax has syscall #
+			 *  %ecx has number of args (0-16)
+			 *  %edx has pointer to buffer containing args from first to last
+			 * each is verified to make sure someone doesn't try to clobber it
+			 */
 			if (frame.ecx <= MAX_ARGS) {
 				if (IS_KERNEL_ADDRESS(frame.edx)
 					|| user_memcpy(args, (void *)frame.edx, frame.ecx * sizeof(unsigned int)) < B_OK) {
@@ -274,6 +276,7 @@ i386_handle_trap(struct iframe frame)
 			frame.edx = retcode >> 32;
 			break;
 		}
+
 		default:
 			if (frame.vector >= 0x20) {
 				interrupt_ack(frame.vector); // ack the 8239 (if applicable)
@@ -296,8 +299,8 @@ i386_handle_trap(struct iframe frame)
 		restore_interrupts(state);
 	}
 
-	if (frame.cs == USER_CODE_SEG || frame.vector == 99)
-		thread_atkernel_exit();
+	if (frame.cs == USER_CODE_SEG)
+		thread_at_kernel_exit();
 
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
 

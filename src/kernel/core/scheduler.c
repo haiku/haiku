@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  * Distributed under the terms of the MIT License.
  *
@@ -70,7 +70,7 @@ dump_run_queue(int argc, char **argv)
 
 
 /** Enqueues the thread into the run queue.
- *	Note: THREAD_LOCK must be held when entering this function
+ *	Note: thread lock must be held when entering this function
  */
 
 void
@@ -90,6 +90,7 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 		else
 			prev = sRunQueue.head;
 	}
+
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
@@ -99,7 +100,7 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 
 
 /** Removes a thread from the run queue.
- *	Note: THREAD_LOCK must be held when entering this function
+ *	Note: thread lock must be held when entering this function
  */
 
 void
@@ -127,14 +128,9 @@ scheduler_remove_from_run_queue(struct thread *thread)
 static void
 context_switch(struct thread *fromThread, struct thread *toThread)
 {
-	bigtime_t now;
-
 	// track kernel & user time
-	now = system_time();
-	if (fromThread->last_time_type == KERNEL_TIME)
-		fromThread->kernel_time += now - fromThread->last_time;
-	else
-		fromThread->user_time += now - fromThread->last_time;
+	bigtime_t now = system_time();
+	fromThread->kernel_time += now - fromThread->last_time;
 	toThread->last_time = now;
 
 	toThread->cpu = fromThread->cpu;
@@ -156,7 +152,7 @@ reschedule_event(timer *unused)
 
 
 /** Runs the scheduler.
- *	NOTE: expects thread_spinlock to be held
+ *	Note: expects thread spinlock to be held
  */
 
 void
@@ -242,9 +238,9 @@ scheduler_reschedule(void)
 void
 start_scheduler(void)
 {
-	int state;
+	cpu_status state;
 
-	// XXX may not be the best place for this
+	// ToDo: may not be the best place for this
 	// invalidate all of the other processors' TLB caches
 	state = disable_interrupts();
 	arch_cpu_global_TLB_invalidate();

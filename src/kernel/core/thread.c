@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -193,7 +193,6 @@ create_thread_struct(const char *name)
 	t->user_time = 0;
 	t->kernel_time = 0;
 	t->last_time = 0;
-	t->last_time_type = KERNEL_TIME;
 	t->exit.status = 0;
 	t->exit.reason = 0;
 	list_init(&t->exit.waiters);
@@ -248,9 +247,15 @@ delete_thread_struct(struct thread *thread)
 static void
 thread_kthread_entry(void)
 {
+	struct thread *thread = thread_get_current_thread();
+
 	// simulates the thread spinlock release that would occur if the thread had been
 	// rescheded from. The resched didn't happen because the thread is new.
 	RELEASE_THREAD_LOCK();
+
+	// start tracking time
+	thread->last_time = system_time();
+
 	enable_interrupts(); // this essentially simulates a return-from-interrupt
 }
 
@@ -258,9 +263,9 @@ thread_kthread_entry(void)
 static void
 thread_kthread_exit(void)
 {
-	struct thread *t = thread_get_current_thread();
+	struct thread *thread = thread_get_current_thread();
 
-	t->exit.reason = THREAD_RETURN_EXIT;
+	thread->exit.reason = THREAD_RETURN_EXIT;
 	thread_exit();
 }
 
@@ -276,12 +281,8 @@ _create_user_thread_kentry(void)
 	struct thread *thread = thread_get_current_thread();
 
 	// a signal may have been delivered here
-	// ToDo: this looks broken
-//	thread_atkernel_exit();
-	// start tracking kernel & user time
-	thread->last_time = system_time();
-	thread->last_time_type = KERNEL_TIME;
-	thread->in_kernel = false;
+	thread_at_kernel_exit();
+
 	// jump to the entry point in user space
 	arch_thread_enter_uspace(thread, (addr_t)thread->entry, thread->args1, thread->args2);
 
@@ -297,15 +298,9 @@ static int
 _create_kernel_thread_kentry(void)
 {
 	struct thread *thread = thread_get_current_thread();
-	int (*func)(void *args);
-
-	// start tracking kernel & user time
-	thread->last_time = system_time();
-	thread->last_time_type = KERNEL_TIME;
+	int (*func)(void *args) = (void *)thread->entry;
 
 	// call the entry function with the appropriate args
-	func = (void *)thread->entry;
-
 	return func(thread->args1);
 }
 
@@ -974,64 +969,61 @@ thread_get_thread_struct_locked(thread_id id)
 }
 
 
-// called in the int handler code when a thread enters the kernel for any reason
+/** Called in the interrupt handler code when a thread enters
+ *	the kernel for any reason.
+ *	Only tracks time for now.
+ */
 
 void
-thread_atkernel_entry(void)
+thread_at_kernel_entry(void)
 {
+	struct thread *thread = thread_get_current_thread();
 	cpu_status state;
-	struct thread *t;
 	bigtime_t now;
 
-	t = thread_get_current_thread();
-
-	TRACE(("thread_atkernel_entry: entry thread 0x%lx\n", t->id));
+	TRACE(("thread_atkernel_entry: entry thread 0x%lx\n", thread->id));
 
 	state = disable_interrupts();
 
 	// track user time
 	now = system_time();
-	t->user_time += now - t->last_time;
-	t->last_time = now;
-	t->last_time_type = KERNEL_TIME;
+	thread->user_time += now - thread->last_time;
+	thread->last_time = now;
 
-	t->in_kernel = true;
+	thread->in_kernel = true;
 
 	restore_interrupts(state);
 }
 
 
-// called when a thread exits kernel space to user space
+/** Called whenever a thread exits kernel space to user space.
+ *	Tracks time, handles signals, ...
+ */
 
 void
-thread_atkernel_exit(void)
+thread_at_kernel_exit(void)
 {
+	struct thread *thread = thread_get_current_thread();
 	cpu_status state;
-	struct thread *t;
 	bigtime_t now;
 
 	TRACE(("thread_atkernel_exit: entry\n"));
 
-	// ToDo: this may be broken (when it is called, and what exactly should it do...)
-
-	t = thread_get_current_thread();
-
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	if (handle_signals(t, &state))
+	if (handle_signals(thread, &state))
 		scheduler_reschedule();
 	// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 
-	t->in_kernel = false;
+	thread->in_kernel = false;
 
 	RELEASE_THREAD_LOCK();
 
 	// track kernel time
 	now = system_time();
-	t->kernel_time += now - t->last_time;
-	t->last_time = now;
-	t->last_time_type = USER_TIME;
+	thread->kernel_time += now - thread->last_time;
+	thread->last_time = now;
 
 	restore_interrupts(state);
 }
@@ -1041,7 +1033,7 @@ thread_atkernel_exit(void)
 //	private kernel exported functions
 
 
-/** insert a thread onto the tail of a queue
+/** Insert a thread to the tail of a queue
  */
 
 void
