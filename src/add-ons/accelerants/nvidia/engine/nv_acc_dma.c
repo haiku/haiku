@@ -118,7 +118,7 @@ status_t nv_acc_init_dma()
 	 * able to do this, even though you should refresh them every few milliseconds or
 	 * so. (Large memory cell capacitors, though different cells vary a lot in their
 	 * capacity.)
-	 * Of course data valitidy is not certain by a long shot over this large
+	 * Of course data validity is not certain by a long shot over this large
 	 * amount of time.. */
 	for(cnt = 0; cnt < 0x0400; cnt++)
 		NV_REG32(NVACC_HT_HANDL_00 + (cnt << 2)) = 0;
@@ -176,16 +176,22 @@ status_t nv_acc_init_dma()
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
 	/* note:
-	 * CTX determines which HT handles point to what engine commands.
-	 * (CTX registers are actually a sort of RAM space.) */
+	 * CTX determines which HT handles point to what engine commands. */
+	/* note also:
+	 * CTX registers are in fact in the same GPU internal RAM space as the engine's
+	 * hashtable. This means that stuff programmed in here also survives resets and
+	 * power-outages! (confirmed NV11) */
 	if (si->ps.card_arch >= NV40A)
 	{
 		/* setup a DMA define for use by command defines below. */
 		ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
 									  * DMA target node is NVM (non-volatile memory?)
 									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit */
-		ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
+		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
+		ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
+									 /* DMA access type is READ_AND_WRITE;
+									  * memory starts at start of cardRAM (b12-31):
+									  * It's adress needs to be at a 4kb boundary! */
 		ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
 		/* setup set '0' for cmd NV_ROP5_SOLID */
 		ACCW(PR_CTX0_0, 0x02080043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
@@ -246,8 +252,11 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
 									  * DMA target node is NVM (non-volatile memory?)
 									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit */
-		ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
+		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
+		ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
+									 /* DMA access type is READ_AND_WRITE;
+									  * memory starts at start of cardRAM (b12-31):
+									  * It's adress needs to be at a 4kb boundary! */
 		ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
 		/* setup set '0' for cmd NV_ROP5_SOLID */
 		ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
@@ -359,11 +368,10 @@ status_t nv_acc_init_dma()
 				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
 		}
 
-		/* setup accesible card memory range for acc engine */
-		//fixme: should these two be zero after all??!!
+		/* setup location of active screen in framebuffer */
 		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-		//end fixme.
+		/* setup accesible card memory range */
 		ACCW(BLIMIT0, (si->ps.memory_size - 1));
 		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
@@ -432,10 +440,9 @@ status_t nv_acc_init_dma()
 
 			ACCW(NV10_TIL3PT, 0x2ffff800);
 			ACCW(NV10_TIL3ST, 0x00006000);
-			/* enable some DMA channel (split-up source and dest now or so) */
 			ACCW(NV4X_WHAT1, 0x01000000);
-			/* DMA instance = $1140 */
-			ACCW(NV4X_WHAT0, 0x00001140);
+			/* engine data source DMA instance = $1140 */
+			ACCW(NV4X_DMA_SRC, 0x00001140);
 			break;
 		case NV30A:
 /*
@@ -498,11 +505,10 @@ status_t nv_acc_init_dma()
 				ACCW(NV40_WHAT_T2, ACCR(NV20_FBWHAT0));
 				ACCW(NV40_WHAT_T3, ACCR(NV20_FBWHAT1));
 
-				/* setup accesible card memory range for acc engine */
-				//fixme: should these two be zero after all??!!
+				/* setup location of active screen in framebuffer */
 				ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 				ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				//end fixme.
+				/* setup accesible card memory range */
 				ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
 				ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
 			}
@@ -514,11 +520,10 @@ status_t nv_acc_init_dma()
 				ACCW(NV40P_WHAT_T2, ACCR(NV20_FBWHAT0));
 				ACCW(NV40P_WHAT_T3, ACCR(NV20_FBWHAT1));
 
-				/* setup accesible card memory range for acc engine */
-				//fixme: should these two be zero after all??!!
+				/* setup location of active screen in framebuffer */
 				ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 				ACCW(NV40P_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				//end fixme.
+				/* setup accesible card memory range */
 				ACCW(NV40P_BLIMIT6, (si->ps.memory_size - 1));
 				ACCW(NV40P_BLIMIT7, (si->ps.memory_size - 1));
 			}
@@ -582,7 +587,6 @@ status_t nv_acc_init_dma()
 	 * This define tells the engine where the DMA cmd buffer is and what it's size is;
 	 * inside that cmd buffer you'll find the engine handles for the FIFO channels,
 	 * followed by actual issued engine commands. */
-	//fixme: if needed...
 	ACCW(PF_CACH1_DMAI, 0x0000114e);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
@@ -764,7 +768,6 @@ status_t nv_acc_init_dma()
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
 
 	/*  set pattern colordepth (writing 2 32bit words) */
-	//fixme: switch to NV4_IMAGE_PATTERN from NV_IMAGE_PATTERN???
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
 

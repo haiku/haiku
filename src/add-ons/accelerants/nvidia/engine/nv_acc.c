@@ -165,7 +165,7 @@ status_t nv_acc_init()
 	 * able to do this, even though you should refresh them every few milliseconds or
 	 * so. (Large memory cell capacitors, though different cells vary a lot in their
 	 * capacity.)
-	 * Of course data valitidy is not certain by a long shot over this large
+	 * Of course data validity is not certain by a long shot over this large
 	 * amount of time.. */
 	for(cnt = 0; cnt < 0x0400; cnt++)
 		NV_REG32(NVACC_HT_HANDL_00 + (cnt << 2)) = 0;
@@ -236,15 +236,21 @@ status_t nv_acc_init()
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
 	/* note:
-	 * CTX determines which HT handles point to what engine commands.
-	 * (CTX registers are actually a sort of RAM space.) */
+	 * CTX determines which HT handles point to what engine commands. */
+	/* note also:
+	 * CTX registers are in fact in the same GPU internal RAM space as the engine's
+	 * hashtable. This means that stuff programmed in here also survives resets and
+	 * power-outages! (confirmed NV11) */
 	/* setup a DMA define for use by command defines below.
 	 * (would currently be used by CTX 'sets' 0x6 upto/including 0xe: 3D stuff.) */
 	ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
 								  * DMA target node is NVM (non-volatile memory?)
 								  * (instead of doing PCI or AGP transfers) */
-	ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit */
-	ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
+	ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
+	ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
+								 /* DMA access type is READ_AND_WRITE;
+								  * memory starts at start of cardRAM (b12-31):
+								  * It's adress needs to be at a 4kb boundary! */
 	ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
 	/* setup set '0' for cmd NV_ROP5_SOLID */
 	//fixme: for NV40 and up each set takes up 8 32-bit words instead of just 4..
@@ -856,11 +862,12 @@ status_t nv_acc_init()
 		ACCW(NV10_TIL7PT, ACCR(NV10_FBTIL7PT));
 		ACCW(NV10_TIL7ST, ACCR(NV10_FBTIL7ST));
 
-		/* unknown.. */
 		if (si->ps.card_arch >= NV40A)
 		{
+			/* unknown.. */
 			ACCW(NV4X_WHAT1, 0x01000000);
-			ACCW(NV4X_WHAT0, 0x00001200);
+			/* engine data source DMA instance is invalid */
+			ACCW(NV4X_DMA_SRC, 0x00000000);
 		}
 
 		/* setup (clear) pipe */
