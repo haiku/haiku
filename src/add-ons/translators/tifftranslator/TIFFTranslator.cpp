@@ -53,7 +53,7 @@ translation_format gInputFormats[] = {
 		TIFF_IN_QUALITY,
 		TIFF_IN_CAPABILITY,
 		"image/tiff",
-		"TIFF Image"
+		"TIFF image"
 	}
 };
 
@@ -73,7 +73,7 @@ translation_format gOutputFormats[] = {
 		TIFF_OUT_QUALITY,
 		TIFF_OUT_CAPABILITY,
 		"image/tiff",
-		"TIFF Image"
+		"TIFF image"
 	}
 };
 
@@ -163,6 +163,10 @@ TIFFTranslator::TIFFTranslator()
 // ---------------------------------------------------------------
 TIFFTranslator::~TIFFTranslator()
 {
+	delete fpblackTree;
+	fpblackTree = NULL;
+	delete fpwhiteTree;
+	fpwhiteTree = NULL;
 }
 
 // ---------------------------------------------------------------
@@ -417,6 +421,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		else
 			compression = ifd.GetUint(TAG_COMPRESSION);
 		
+		uint32 t4options = 0;
 		uint16 imageType = 0, bitsPerPixel = 0, fillOrder = 1;
 		switch (interpretation) {
 			// black and white or grayscale images
@@ -427,10 +432,11 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
 					return B_NO_TRANSLATOR;
 				
-				// Only the default value for T4 Options
-				// is supported
-				if (ifd.HasField(TAG_T4_OPTIONS) &&
-					ifd.GetUint(TAG_T4_OPTIONS) != 0)
+				// Only 1D and fill byte boundery t4options are
+				// supported
+				if (ifd.HasField(TAG_T4_OPTIONS))
+					t4options = ifd.GetUint(TAG_T4_OPTIONS);
+				if (t4options != 0 && t4options != T4_FILL_BYTE_BOUNDARY)
 					return B_NO_TRANSLATOR;
 					
 				// default value for bits per sample is 1
@@ -560,6 +566,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		pdetails->width				= width;
 		pdetails->height			= height;
 		pdetails->compression		= compression;
+		pdetails->t4options			= t4options;
 		pdetails->rowsPerStrip		= rowsPerStrip;
 		pdetails->stripsPerImage	= stripsPerImage;
 		pdetails->interpretation	= interpretation;
@@ -592,7 +599,7 @@ copy_tiff_name(char *strname, TiffDetails *pdetails, swap_action swp)
 	if (!strname || !pdetails)
 		return;
 		
-	strcpy(strname, "TIFF Image (");
+	strcpy(strname, "TIFF image (");
 	
 	// byte order
 	if (swp == B_SWAP_BENDIAN_TO_HOST)
@@ -1001,17 +1008,24 @@ TIFFTranslator::decode_t4(BitReader &stream, TiffDetails &details,
 	uint8 *pbits, bool bfirstLine)
 {
 	if (bfirstLine) {
+		// determine number of fill bits
+		// (if that T4Option is set)
+		uint32 fillbits = 0;
+		if (details.t4options & T4_FILL_BYTE_BOUNDARY) {
+			fillbits = (12 - stream.BitsInBuffer()) % 8;
+			if (fillbits)
+				fillbits = 8 - fillbits;
+		}
 		// read in and verify end-of-line sequence
-		uint32 nzeros = 11;
-		while (nzeros--)
-		{
+		uint32 nzeros = 11 + fillbits;
+		while (nzeros--) {
 			if (stream.NextBit() != 0) {
-				debugger("xxx");
+				debugger("EOL: expected zero bit");
 				return B_ERROR;
 			}
 		}
 		if (stream.NextBit() != 1) {
-			debugger("xxx");
+			debugger("EOL: expected one bit");
 			return B_ERROR;
 		}
 	}
@@ -1055,13 +1069,24 @@ TIFFTranslator::decode_t4(BitReader &stream, TiffDetails &details,
 			currentcolor = 1 - currentcolor;
 	}
 	
-	// read in end-of-line sequence
-	uint32 nzeros = 11;
-	while (nzeros--)
-	{
-		stream.NextBit();
+	// determine number of fill bits
+	// (if that T4Option is set)
+	uint32 fillbits = 0;
+	if (details.t4options & T4_FILL_BYTE_BOUNDARY) {
+		fillbits = (12 - stream.BitsInBuffer()) % 8;
+		if (fillbits)
+			fillbits = 8 - fillbits;
 	}
-	stream.NextBit();
+	// read in end-of-line sequence
+	uint32 ndontcare = 12 + fillbits;
+	status_t sbit = 0;
+	while (ndontcare--) {
+		sbit = stream.NextBit();
+		if (sbit != 0 && sbit != 1) {
+			debugger("EOL: couldn't read all bits");
+			return B_ERROR;
+		}
+	}
 	
 	return stream.BytesRead();
 }

@@ -75,6 +75,7 @@ public:
 	uint32 width;
 	uint32 height;
 	uint32 compression;
+	uint32 t4options;
 	uint32 rowsPerStrip;
 	uint32 stripsPerImage;
 	uint32 *pstripOffsets;

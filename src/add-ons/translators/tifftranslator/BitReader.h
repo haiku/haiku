@@ -47,6 +47,7 @@ public:
 	status_t InitCheck() const { return finitStatus; };
 	
 	uint32 BytesRead() const { return fnbytesRead; };
+	uint32 BitsInBuffer() const { return fcurrentbit; };
 	
 	// return the current bit and increment the position
 	// If the result is negative, an error occured
