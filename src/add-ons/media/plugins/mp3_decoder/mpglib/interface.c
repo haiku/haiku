@@ -22,6 +22,8 @@ void InitMP3(struct mpstr *mp)
 	mp->fr.single = -1;
 	mp->bsnum = 0;
 	mp->synth_bo = 1;
+	mp->bitindex = 0;
+	mp->wordpointer = 0;
 }
 
 void ExitMP3(struct mpstr *mp)
@@ -154,9 +156,9 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 	if(mp->fr.framesize > mp->bsize)
 		return MP3_NEED_MORE;
 
-	wordpointer = mp->bsspace[mp->bsnum] + 512;
+	mp->wordpointer = mp->bsspace[mp->bsnum] + 512;
 	mp->bsnum = (mp->bsnum + 1) & 0x1;
-	bitindex = 0;
+	mp->bitindex = 0;
 
 	len = 0;
 	while(len < mp->framesize) {
@@ -168,7 +170,7 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 		else {
                   nlen = blen;
                 }
-		memcpy(wordpointer+len,mp->tail->pnt+mp->tail->pos,nlen);
+		memcpy(mp->wordpointer+len,mp->tail->pnt+mp->tail->pos,nlen);
                 len += nlen;
                 mp->tail->pos += nlen;
 		mp->bsize -= nlen;
@@ -179,7 +181,7 @@ int decodeMP3(struct mpstr *mp,char *in,int isize,char *out,
 
 	*done = 0;
 	if(mp->fr.error_protection)
-           getbits(16);
+           getbits(mp, 16);
         switch(mp->fr.lay) {
           case 1:
 	    do_layer1(mp, &mp->fr,(unsigned char *) out,done);
@@ -206,9 +208,9 @@ int set_pointer(struct mpstr *mp, long backstep)
     return MP3_ERR;
   }
   bsbufold = mp->bsspace[mp->bsnum] + 512;
-  wordpointer -= backstep;
+  mp->wordpointer -= backstep;
   if (backstep)
-    memcpy(wordpointer,bsbufold+mp->fsizeold-backstep,backstep);
-  bitindex = 0;
+    memcpy(mp->wordpointer,bsbufold+mp->fsizeold-backstep,backstep);
+  mp->bitindex = 0;
   return MP3_OK;
 }

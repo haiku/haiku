@@ -37,10 +37,6 @@
 
 #define MAXFRAMESIZE 1792
 
-
-/* Pre Shift fo 16 to 8 bit converter table */
-#define AUSHIFT (3)
-
 struct mpstr;
 
 struct frame {
@@ -68,20 +64,10 @@ struct frame {
     void *alloc;
 };
 
-struct parameter {
-	int quiet;	/* shut up! */
-	int tryresync;  /* resync stream after error */
-	int verbose;    /* verbose level */
-	int checkrange;
-};
-
-extern unsigned int   get1bit(void);
-extern unsigned int   getbits(int);
-extern unsigned int   getbits_fast(int);
+extern unsigned int   get1bit(struct mpstr *mp);
+extern unsigned int   getbits(struct mpstr *mp, int);
+extern unsigned int   getbits_fast(struct mpstr *mp, int);
 extern int set_pointer(struct mpstr *mp, long backstep);
-
-extern unsigned char *wordpointer;
-extern int bitindex;
 
 extern void make_decode_tables(long scaleval);
 extern int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *,int *);
@@ -159,14 +145,10 @@ extern void make_decode_tables(long scale);
 extern void make_conv16to8_table(int);
 extern void dct64(real *,real *,real *);
 
-extern void synth_ntom_set_step(long,long);
-
 extern unsigned char *conv16to8;
 extern long freqs[9];
 extern real muls[27][64];
 extern real decwin[512+32];
 extern real *pnts[5];
-
-extern struct parameter param;
 
 #endif

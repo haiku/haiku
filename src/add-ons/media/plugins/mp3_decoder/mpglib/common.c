@@ -7,8 +7,7 @@
 #include <fcntl.h>
 
 #include "mpg123.h"
-
-struct parameter param = { 1 , 1 , 0 , 0 };
+#include "mpglib.h"
 
 int tabsel_123[2][3][16] = {
    { {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,},
@@ -23,12 +22,6 @@ int tabsel_123[2][3][16] = {
 long freqs[9] = { 44100, 48000, 32000,
                   22050, 24000, 16000 ,
                   11025 , 12000 , 8000 };
-
-int bitindex;
-unsigned char *wordpointer;
-unsigned char *pcm_sample;
-int pcm_point = 0;
-
 
 #define HDRCMPMASK 0xfffffd00
 
@@ -98,7 +91,6 @@ int decode_header(struct frame *fr,unsigned long newhead)
     switch(fr->lay)
     {
       case 1:
-#ifdef LAYER1
 #if 0
         fr->jsbound = (fr->mode == MPG_MD_JOINT_STEREO) ? 
                          (fr->mode_ext<<2)+4 : 32;
@@ -106,12 +98,8 @@ int decode_header(struct frame *fr,unsigned long newhead)
         fr->framesize  = (long) tabsel_123[fr->lsf][0][fr->bitrate_index] * 12000;
         fr->framesize /= freqs[fr->sampling_frequency];
         fr->framesize  = ((fr->framesize+fr->padding)<<2)-4;
-#else
-        fprintf(stderr,"Not supported!\n");
-#endif
         break;
       case 2:
-#ifdef LAYER2
 #if 0
         fr->jsbound = (fr->mode == MPG_MD_JOINT_STEREO) ?
                          (fr->mode_ext<<2)+4 : fr->II_sblimit;
@@ -119,9 +107,6 @@ int decode_header(struct frame *fr,unsigned long newhead)
         fr->framesize = (long) tabsel_123[fr->lsf][1][fr->bitrate_index] * 144000;
         fr->framesize /= freqs[fr->sampling_frequency];
         fr->framesize += fr->padding - 4;
-#else
-        fprintf(stderr,"Not supported!\n");
-#endif
         break;
       case 3:
 #if 0
@@ -179,7 +164,7 @@ void print_header_compact(struct frame *fr)
 
 #endif
 
-unsigned int getbits(int number_of_bits)
+unsigned int getbits(struct mpstr *mp, int number_of_bits)
 {
   unsigned long rval;
 
@@ -187,52 +172,52 @@ unsigned int getbits(int number_of_bits)
     return 0;
 
   {
-    rval = wordpointer[0];
+    rval = mp->wordpointer[0];
     rval <<= 8;
-    rval |= wordpointer[1];
+    rval |= mp->wordpointer[1];
     rval <<= 8;
-    rval |= wordpointer[2];
-    rval <<= bitindex;
+    rval |= mp->wordpointer[2];
+    rval <<= mp->bitindex;
     rval &= 0xffffff;
 
-    bitindex += number_of_bits;
+    mp->bitindex += number_of_bits;
 
     rval >>= (24-number_of_bits);
 
-    wordpointer += (bitindex>>3);
-    bitindex &= 7;
+    mp->wordpointer += (mp->bitindex>>3);
+    mp->bitindex &= 7;
   }
   return rval;
 }
 
-unsigned int getbits_fast(int number_of_bits)
+unsigned int getbits_fast(struct mpstr *mp, int number_of_bits)
 {
   unsigned long rval;
 
   {
-    rval = wordpointer[0];
+    rval = mp->wordpointer[0];
     rval <<= 8;	
-    rval |= wordpointer[1];
-    rval <<= bitindex;
+    rval |= mp->wordpointer[1];
+    rval <<= mp->bitindex;
     rval &= 0xffff;
-    bitindex += number_of_bits;
+    mp->bitindex += number_of_bits;
 
     rval >>= (16-number_of_bits);
 
-    wordpointer += (bitindex>>3);
-    bitindex &= 7;
+    mp->wordpointer += (mp->bitindex>>3);
+    mp->bitindex &= 7;
   }
   return rval;
 }
 
-unsigned int get1bit(void)
+unsigned int get1bit(struct mpstr *mp)
 {
   unsigned char rval;
-  rval = *wordpointer << bitindex;
+  rval = *mp->wordpointer << mp->bitindex;
 
-  bitindex++;
-  wordpointer += (bitindex>>3);
-  bitindex &= 7;
+  mp->bitindex++;
+  mp->wordpointer += (mp->bitindex>>3);
+  mp->bitindex &= 7;
 
   return rval>>7;
 }

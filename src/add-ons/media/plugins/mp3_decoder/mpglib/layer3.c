@@ -10,9 +10,6 @@
 #include "mpglib.h"
 #include "huffman.h"
 
-#define MPEG1
-
-
 static real ispow[8207];
 static real aa_ca[8],aa_cs[8];
 static real COS1[12][6];
@@ -291,22 +288,21 @@ void init_layer3(int down_sample_sblimit)
 /*
  * read additional side information
  */
-#ifdef MPEG1 
-static int III_get_side_info_1(struct III_sideinfo *si,int stereo,
+static int III_get_side_info_1(struct mpstr *mp, struct III_sideinfo *si, int stereo,
  int ms_stereo,long sfreq,int single)
 {
    int ch, gr;
    int powdiff = (single == 3) ? 4 : 0;
 
-   si->main_data_begin = getbits(9);
+   si->main_data_begin = getbits(mp, 9);
    if (stereo == 1)
-     si->private_bits = getbits_fast(5);
+     si->private_bits = getbits_fast(mp, 5);
    else 
-     si->private_bits = getbits_fast(3);
+     si->private_bits = getbits_fast(mp, 3);
 
    for (ch=0; ch<stereo; ch++) {
        si->ch[ch].gr[0].scfsi = -1;
-       si->ch[ch].gr[1].scfsi = getbits_fast(4);
+       si->ch[ch].gr[1].scfsi = getbits_fast(mp, 4);
    }
 
    for (gr=0; gr<2; gr++) 
@@ -315,31 +311,31 @@ static int III_get_side_info_1(struct III_sideinfo *si,int stereo,
      {
        register struct gr_info_s *gr_info = &(si->ch[ch].gr[gr]);
 
-       gr_info->part2_3_length = getbits(12);
-       gr_info->big_values = getbits_fast(9);
+       gr_info->part2_3_length = getbits(mp, 12);
+       gr_info->big_values = getbits_fast(mp, 9);
        if(gr_info->big_values > 288) {
           fprintf(stderr,"big_values too large!\n");
           gr_info->big_values = 288;
        }
-       gr_info->pow2gain = gainpow2+256 - getbits_fast(8) + powdiff;
+       gr_info->pow2gain = gainpow2+256 - getbits_fast(mp, 8) + powdiff;
        if(ms_stereo)
          gr_info->pow2gain += 2;
-       gr_info->scalefac_compress = getbits_fast(4);
+       gr_info->scalefac_compress = getbits_fast(mp, 4);
 /* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
-       if(get1bit()) 
+       if(get1bit(mp)) 
        {
          int i;
-         gr_info->block_type = getbits_fast(2);
-         gr_info->mixed_block_flag = get1bit();
-         gr_info->table_select[0] = getbits_fast(5);
-         gr_info->table_select[1] = getbits_fast(5);
+         gr_info->block_type = getbits_fast(mp, 2);
+         gr_info->mixed_block_flag = get1bit(mp);
+         gr_info->table_select[0] = getbits_fast(mp, 5);
+         gr_info->table_select[1] = getbits_fast(mp, 5);
          /*
           * table_select[2] not needed, because there is no region2,
           * but to satisfy some verifications tools we set it either.
           */
          gr_info->table_select[2] = 0;
          for(i=0;i<3;i++)
-           gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
+           gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(mp, 3)<<3);
 
          if(gr_info->block_type == 0) {
            fprintf(stderr,"Blocktype == 0 and window-switching == 1 not allowed.\n");
@@ -353,67 +349,66 @@ static int III_get_side_info_1(struct III_sideinfo *si,int stereo,
        {
          int i,r0c,r1c;
          for (i=0; i<3; i++)
-           gr_info->table_select[i] = getbits_fast(5);
-         r0c = getbits_fast(4);
-         r1c = getbits_fast(3);
+           gr_info->table_select[i] = getbits_fast(mp, 5);
+         r0c = getbits_fast(mp, 4);
+         r1c = getbits_fast(mp, 3);
          gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
          gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
          gr_info->block_type = 0;
          gr_info->mixed_block_flag = 0;
        }
-       gr_info->preflag = get1bit();
-       gr_info->scalefac_scale = get1bit();
-       gr_info->count1table_select = get1bit();
+       gr_info->preflag = get1bit(mp);
+       gr_info->scalefac_scale = get1bit(mp);
+       gr_info->count1table_select = get1bit(mp);
      }
    }
    return !0;
 }
-#endif
 
 /*
  * Side Info for MPEG 2.0 / LSF
  */
-static int III_get_side_info_2(struct III_sideinfo *si,int stereo,
+static int III_get_side_info_2(struct mpstr *mp, struct III_sideinfo *si,int stereo,
  int ms_stereo,long sfreq,int single)
 {
    int ch;
    int powdiff = (single == 3) ? 4 : 0;
 
-   si->main_data_begin = getbits(8);
+   si->main_data_begin = getbits(mp, 8);
    if (stereo == 1)
-     si->private_bits = get1bit();
+     si->private_bits = get1bit(mp);
    else 
-     si->private_bits = getbits_fast(2);
+     si->private_bits = getbits_fast(mp, 2);
 
    for (ch=0; ch<stereo; ch++) 
    {
        register struct gr_info_s *gr_info = &(si->ch[ch].gr[0]);
 
-       gr_info->part2_3_length = getbits(12);
-       gr_info->big_values = getbits_fast(9);
+       gr_info->part2_3_length = getbits(mp, 12);
+       gr_info->big_values = getbits_fast(mp, 9);
        if(gr_info->big_values > 288) {
          fprintf(stderr,"big_values too large!\n");
          gr_info->big_values = 288;
        }
-       gr_info->pow2gain = gainpow2+256 - getbits_fast(8) + powdiff;
+       gr_info->pow2gain = gainpow2+256 - getbits_fast(mp, 8) + powdiff;
        if(ms_stereo)
          gr_info->pow2gain += 2;
-       gr_info->scalefac_compress = getbits(9);
+       gr_info->scalefac_compress = getbits(mp, 9);
 /* window-switching flag == 1 for block_Type != 0 .. and block-type == 0 -> win-sw-flag = 0 */
-       if(get1bit()) 
+       if(get1bit(mp)) 
        {
          int i;
-         gr_info->block_type = getbits_fast(2);
-         gr_info->mixed_block_flag = get1bit();
-         gr_info->table_select[0] = getbits_fast(5);
-         gr_info->table_select[1] = getbits_fast(5);
+         gr_info->block_type = getbits_fast(mp, 2);
+         gr_info->mixed_block_flag = get1bit(mp);
+         gr_info->table_select[0] = getbits_fast(mp, 5);
+         gr_info->table_select[1] = getbits_fast(mp, 5);
          /*
           * table_select[2] not needed, because there is no region2,
           * but to satisfy some verifications tools we set it either.
           */
          gr_info->table_select[2] = 0;
          for(i=0;i<3;i++)
-           gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(3)<<3);
+           gr_info->full_gain[i] = gr_info->pow2gain + (getbits_fast(mp, 3)<<3);
 
          if(gr_info->block_type == 0) {
            fprintf(stderr,"Blocktype == 0 and window-switching == 1 not allowed.\n");
@@ -434,16 +429,16 @@ static int III_get_side_info_2(struct III_sideinfo *si,int stereo,
        {
          int i,r0c,r1c;
          for (i=0; i<3; i++)
-           gr_info->table_select[i] = getbits_fast(5);
-         r0c = getbits_fast(4);
-         r1c = getbits_fast(3);
+           gr_info->table_select[i] = getbits_fast(mp, 5);
+         r0c = getbits_fast(mp, 4);
+         r1c = getbits_fast(mp, 3);
          gr_info->region1start = bandInfo[sfreq].longIdx[r0c+1] >> 1 ;
          gr_info->region2start = bandInfo[sfreq].longIdx[r0c+1+r1c+1] >> 1;
          gr_info->block_type = 0;
          gr_info->mixed_block_flag = 0;
        }
-       gr_info->scalefac_scale = get1bit();
-       gr_info->count1table_select = get1bit();
+       gr_info->scalefac_scale = get1bit(mp);
+       gr_info->count1table_select = get1bit(mp);
    }
    return !0;
 }
@@ -451,8 +446,7 @@ static int III_get_side_info_2(struct III_sideinfo *si,int stereo,
 /*
  * read scalefactors
  */
-#ifdef MPEG1
-static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
+static int III_get_scale_factors_1(struct mpstr *mp, int *scf,struct gr_info_s *gr_info)
 {
    static const unsigned char slen[2][16] = {
      {0, 0, 0, 0, 3, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4},
@@ -468,15 +462,15 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
 
       if (gr_info->mixed_block_flag) {
          for (i=8;i;i--)
-           *scf++ = getbits_fast(num0);
+           *scf++ = getbits_fast(mp, num0);
          i = 9;
          numbits -= num0; /* num0 * 17 + num1 * 18 */
       }
 
       for (;i;i--)
-        *scf++ = getbits_fast(num0);
+        *scf++ = getbits_fast(mp, num0);
       for (i = 18; i; i--)
-        *scf++ = getbits_fast(num1);
+        *scf++ = getbits_fast(mp, num1);
       *scf++ = 0; *scf++ = 0; *scf++ = 0; /* short[13][0..2] = 0 */
     }
     else {
@@ -485,9 +479,9 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
 
       if(scfsi < 0) { /* scfsi < 0 => granule == 0 */
          for(i=11;i;i--)
-           *scf++ = getbits_fast(num0);
+           *scf++ = getbits_fast(mp, num0);
          for(i=10;i;i--)
-           *scf++ = getbits_fast(num1);
+           *scf++ = getbits_fast(mp, num1);
          numbits = (num0 + num1) * 10 + num0;
          *scf++ = 0;
       }
@@ -495,7 +489,7 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
         numbits = 0;
         if(!(scfsi & 0x8)) {
           for (i=0;i<6;i++)
-            *scf++ = getbits_fast(num0);
+            *scf++ = getbits_fast(mp, num0);
           numbits += num0 * 6;
         }
         else {
@@ -504,7 +498,7 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
 
         if(!(scfsi & 0x4)) {
           for (i=0;i<5;i++)
-            *scf++ = getbits_fast(num0);
+            *scf++ = getbits_fast(mp, num0);
           numbits += num0 * 5;
         }
         else {
@@ -513,7 +507,7 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
 
         if(!(scfsi & 0x2)) {
           for(i=0;i<5;i++)
-            *scf++ = getbits_fast(num1);
+            *scf++ = getbits_fast(mp, num1);
           numbits += num1 * 5;
         }
         else {
@@ -522,7 +516,7 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
 
         if(!(scfsi & 0x1)) {
           for (i=0;i<5;i++)
-            *scf++ = getbits_fast(num1);
+            *scf++ = getbits_fast(mp, num1);
           numbits += num1 * 5;
         }
         else {
@@ -533,10 +527,9 @@ static int III_get_scale_factors_1(int *scf,struct gr_info_s *gr_info)
     }
     return numbits;
 }
-#endif
 
 
-static int III_get_scale_factors_2(int *scf,struct gr_info_s *gr_info,int i_stereo)
+static int III_get_scale_factors_2(struct mpstr *mp, int *scf,struct gr_info_s *gr_info,int i_stereo)
 {
   unsigned char *pnt;
   int i,j;
@@ -573,7 +566,7 @@ static int III_get_scale_factors_2(int *scf,struct gr_info_s *gr_info,int i_ster
     slen >>= 3;
     if(num) {
       for(j=0;j<(int)(pnt[i]);j++)
-        *scf++ = getbits_fast(num);
+        *scf++ = getbits_fast(mp, num);
       numbits += pnt[i] * num;
     }
     else {
@@ -595,7 +588,7 @@ static int pretab2[22] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 /*
  * don't forget to apply the same changes to III_dequantize_sample_ms() !!! 
  */
-static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
+static int III_dequantize_sample(struct mpstr *mp, real xr[SBLIMIT][SSLIMIT],int *scf,
    struct gr_info_s *gr_info,int sfreq,int part2bits)
 {
   int shift = 1 + gr_info->scalefac_scale;
@@ -673,7 +666,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         {
           register short *val = h->table;
           while((y=*val++)<0) {
-            if (get1bit())
+            if (get1bit(mp))
               val -= y;
             part2remain--;
           }
@@ -683,15 +676,15 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         if(x == 15) {
           max[lwin] = cb;
           part2remain -= h->linbits+1;
-          x += getbits(h->linbits);
-          if(get1bit())
+          x += getbits(mp, h->linbits);
+          if(get1bit(mp))
             *xrpnt = -ispow[x] * v;
           else
             *xrpnt =  ispow[x] * v;
         }
         else if(x) {
           max[lwin] = cb;
-          if(get1bit())
+          if(get1bit(mp))
             *xrpnt = -ispow[x] * v;
           else
             *xrpnt =  ispow[x] * v;
@@ -703,15 +696,15 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         if(y == 15) {
           max[lwin] = cb;
           part2remain -= h->linbits+1;
-          y += getbits(h->linbits);
-          if(get1bit())
+          y += getbits(mp, h->linbits);
+          if(get1bit(mp))
             *xrpnt = -ispow[y] * v;
           else
             *xrpnt =  ispow[y] * v;
         }
         else if(y) {
           max[lwin] = cb;
-          if(get1bit())
+          if(get1bit(mp))
             *xrpnt = -ispow[y] * v;
           else
             *xrpnt =  ispow[y] * v;
@@ -733,7 +726,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
           a = 0;
           break;
         }
-        if (get1bit())
+        if (get1bit(mp))
           val -= a;
       }
 
@@ -762,7 +755,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
             part2remain++;
             break;
           }
-          if(get1bit()) 
+          if(get1bit(mp)) 
             *xrpnt = -v;
           else
             *xrpnt = v;
@@ -839,7 +832,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         {
           register short *val = h->table;
           while((y=*val++)<0) {
-            if (get1bit())
+            if (get1bit(mp))
               val -= y;
             part2remain--;
           }
@@ -849,15 +842,15 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         if (x == 15) {
           max = cb;
           part2remain -= h->linbits+1;
-          x += getbits(h->linbits);
-          if(get1bit())
+          x += getbits(mp, h->linbits);
+          if(get1bit(mp))
             *xrpnt++ = -ispow[x] * v;
           else
             *xrpnt++ =  ispow[x] * v;
         }
         else if(x) {
           max = cb;
-          if(get1bit())
+          if(get1bit(mp))
             *xrpnt++ = -ispow[x] * v;
           else
             *xrpnt++ =  ispow[x] * v;
@@ -869,15 +862,15 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
         if (y == 15) {
           max = cb;
           part2remain -= h->linbits+1;
-          y += getbits(h->linbits);
-          if(get1bit())
+          y += getbits(mp, h->linbits);
+          if(get1bit(mp))
             *xrpnt++ = -ispow[y] * v;
           else
             *xrpnt++ =  ispow[y] * v;
         }
         else if(y) {
           max = cb;
-          if(get1bit())
+          if(get1bit(mp))
             *xrpnt++ = -ispow[y] * v;
           else
             *xrpnt++ =  ispow[y] * v;
@@ -902,7 +895,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
           a = 0;
           break;
         }
-        if (get1bit())
+        if (get1bit(mp))
           val -= a;
       }
 
@@ -922,7 +915,7 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
             part2remain++;
             break;
           }
-          if(get1bit())
+          if(get1bit(mp))
             *xrpnt++ = -v;
           else
             *xrpnt++ = v;
@@ -945,11 +938,11 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
   }
 
   while( part2remain > 16 ) {
-    getbits(16); /* Dismiss stuffing Bits */
+    getbits(mp, 16); /* Dismiss stuffing Bits */
     part2remain -= 16;
   }
   if(part2remain > 0)
-    getbits(part2remain);
+    getbits(mp, part2remain);
   else if(part2remain < 0) {
     fprintf(stderr,"mpg123: Can't rewind stream by %d bits!\n",-part2remain);
     return 1; /* -> error */
@@ -1891,17 +1884,13 @@ int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *
 
   if(fr->lsf) {
     granules = 1;
-    if(!III_get_side_info_2(&sideinfo,stereo,ms_stereo,sfreq,single))
+    if(!III_get_side_info_2(mp, &sideinfo,stereo,ms_stereo,sfreq,single))
       return -1;
   }
   else {
     granules = 2;
-#ifdef MPEG1
-    if(!III_get_side_info_1(&sideinfo,stereo,ms_stereo,sfreq,single))
+    if(!III_get_side_info_1(mp, &sideinfo,stereo,ms_stereo,sfreq,single))
       return -1;
-#else
-    fprintf(stderr,"Not supported\n");
-#endif
   }
 
   if(set_pointer(mp, sideinfo.main_data_begin) == MP3_ERR)
@@ -1916,31 +1905,23 @@ int do_layer3(struct mpstr *mp, struct frame *fr,unsigned char *pcm_sample,int *
       struct gr_info_s *gr_info = &(sideinfo.ch[0].gr[gr]);
       long part2bits;
       if(fr->lsf)
-        part2bits = III_get_scale_factors_2(scalefacs[0],gr_info,0);
+        part2bits = III_get_scale_factors_2(mp, scalefacs[0],gr_info,0);
       else {
-#ifdef MPEG1
-        part2bits = III_get_scale_factors_1(scalefacs[0],gr_info);
-#else
-	fprintf(stderr,"Not supported\n");
-#endif
+        part2bits = III_get_scale_factors_1(mp, scalefacs[0],gr_info);
       }
-      if(III_dequantize_sample(hybridIn[0], scalefacs[0],gr_info,sfreq,part2bits))
+      if(III_dequantize_sample(mp, hybridIn[0], scalefacs[0],gr_info,sfreq,part2bits))
         return clip;
     }
     if(stereo == 2) {
       struct gr_info_s *gr_info = &(sideinfo.ch[1].gr[gr]);
       long part2bits;
       if(fr->lsf) 
-        part2bits = III_get_scale_factors_2(scalefacs[1],gr_info,i_stereo);
+        part2bits = III_get_scale_factors_2(mp, scalefacs[1],gr_info,i_stereo);
       else {
-#ifdef MPEG1
-        part2bits = III_get_scale_factors_1(scalefacs[1],gr_info);
-#else
-	fprintf(stderr,"Not supported\n");
-#endif
+        part2bits = III_get_scale_factors_1(mp, scalefacs[1],gr_info);
       }
 
-      if(III_dequantize_sample(hybridIn[1],scalefacs[1],gr_info,sfreq,part2bits))
+      if(III_dequantize_sample(mp, hybridIn[1],scalefacs[1],gr_info,sfreq,part2bits))
           return clip;
 
       if(ms_stereo) {

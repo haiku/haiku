@@ -22,15 +22,17 @@ struct mpstr {
 	struct buf *head,*tail;
 	int bsize;
 	int framesize;
-        int fsizeold;
+	int fsizeold;
 	struct frame fr;
-        unsigned char bsspace[2][MAXFRAMESIZE+512]; /* MAXFRAMESIZE */
+	unsigned char bsspace[2][MAXFRAMESIZE+512]; /* MAXFRAMESIZE */
 	real hybrid_block[2][2][SBLIMIT*SSLIMIT];
 	int hybrid_blc[2];
 	unsigned long header;
 	int bsnum;
 	real synth_buffs[2][2][0x110];
-        int  synth_bo;
+	int synth_bo;
+	int bitindex;
+	unsigned char *wordpointer;
 };
 
 #define MP3_ERR -1
