@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src add-ons kernel generic locked_pool ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon locked_pool : kernel generic :
+	locked_pool.c
+	;
