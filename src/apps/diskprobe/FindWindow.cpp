@@ -174,37 +174,24 @@ FindTextView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 
 			case B_BACKSPACE:
-			{
-				int32 start, end;
-				GetSelection(&start, &end);
-
-				if (bytes[0] == B_BACKSPACE) {
-					if (--start < 0 && end == 0)
-						return;
-
-					start = 0;
-				}
-
-				if (Text()[start] == ' ')
-					BTextView::KeyDown(bytes, numBytes);
-
-				BTextView::KeyDown(bytes, numBytes);
-
-				GetSelection(&start, &end);
-				HexReformat(start, start);
-				Select(start, start);
-				return;
-			}
-
 			case B_DELETE:
 			{
 				int32 start, end;
 				GetSelection(&start, &end);
 
-				if (Text()[start] == ' ')
+				if (bytes[0] == B_BACKSPACE && --start < 0) {
+					if (end == 0)
+						return;
+					start = 0;
+				}
+
+				if (ByteAt(start) == ' ')
 					BTextView::KeyDown(bytes, numBytes);
 
 				BTextView::KeyDown(bytes, numBytes);
+
+				if (bytes[0] == B_BACKSPACE)
+					GetSelection(&start, &end);
 
 				HexReformat(start, start);
 				Select(start, start);
