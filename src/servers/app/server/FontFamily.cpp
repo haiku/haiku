@@ -89,7 +89,7 @@ FontStyle::~FontStyle(void)
 */
 const char *FontStyle::Name(void)
 {
-	return path->String();
+	return name->String();
 }
 
 /*!
