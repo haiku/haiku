@@ -3,6 +3,7 @@
  * Copyright (c) 2000,2001 Fabrice Bellard.
  * H263+ support.
  * Copyright (c) 2001 Juan J. Sierralta P.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -479,9 +480,9 @@ void ff_clean_mpeg4_qscales(MpegEncContext *s){
     for(i=1; i<s->mb_num; i++){
         int mb_xy= s->mb_index2xy[i];
     
-        if(qscale_table[mb_xy] != qscale_table[s->mb_index2xy[i-1]] && (s->mb_type[mb_xy]&MB_TYPE_INTER4V)){
-            s->mb_type[mb_xy]&= ~MB_TYPE_INTER4V;
-            s->mb_type[mb_xy]|= MB_TYPE_INTER;
+        if(qscale_table[mb_xy] != qscale_table[s->mb_index2xy[i-1]] && (s->mb_type[mb_xy]&CANDIDATE_MB_TYPE_INTER4V)){
+            s->mb_type[mb_xy]&= ~CANDIDATE_MB_TYPE_INTER4V;
+            s->mb_type[mb_xy]|= CANDIDATE_MB_TYPE_INTER;
         }
     }
 
@@ -508,9 +509,9 @@ void ff_clean_mpeg4_qscales(MpegEncContext *s){
     
         for(i=1; i<s->mb_num; i++){
             int mb_xy= s->mb_index2xy[i];
-            if(qscale_table[mb_xy] != qscale_table[s->mb_index2xy[i-1]] && (s->mb_type[mb_xy]&MB_TYPE_DIRECT)){
-                s->mb_type[mb_xy]&= ~MB_TYPE_DIRECT;
-                s->mb_type[mb_xy]|= MB_TYPE_BIDIR;
+            if(qscale_table[mb_xy] != qscale_table[s->mb_index2xy[i-1]] && (s->mb_type[mb_xy]&CANDIDATE_MB_TYPE_DIRECT)){
+                s->mb_type[mb_xy]&= ~CANDIDATE_MB_TYPE_DIRECT;
+                s->mb_type[mb_xy]|= CANDIDATE_MB_TYPE_BIDIR;
             }
         }
     }
@@ -523,7 +524,7 @@ void ff_clean_mpeg4_qscales(MpegEncContext *s){
  */
 int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my){
     const int mb_index= s->mb_x + s->mb_y*s->mb_stride;
-    const int colocated_mb_type= s->next_picture.mb_type[mb_index]; //FIXME or next?
+    const int colocated_mb_type= s->next_picture.mb_type[mb_index];
     int xy= s->block_index[0];
     uint16_t time_pp= s->pp_time;
     uint16_t time_pb= s->pb_time;
@@ -547,18 +548,18 @@ int ff_mpeg4_set_direct_mv(MpegEncContext *s, int mx, int my){
         s->mv_type = MV_TYPE_FIELD;
         for(i=0; i<2; i++){
             if(s->top_field_first){
-                time_pp= s->pp_field_time - s->field_select_table[mb_index][i] + i;
-                time_pb= s->pb_field_time - s->field_select_table[mb_index][i] + i;
+                time_pp= s->pp_field_time - s->p_field_select_table[i][mb_index] + i;
+                time_pb= s->pb_field_time - s->p_field_select_table[i][mb_index] + i;
             }else{
-                time_pp= s->pp_field_time + s->field_select_table[mb_index][i] - i;
-                time_pb= s->pb_field_time + s->field_select_table[mb_index][i] - i;
+                time_pp= s->pp_field_time + s->p_field_select_table[i][mb_index] - i;
+                time_pb= s->pb_field_time + s->p_field_select_table[i][mb_index] - i;
             }
-            s->mv[0][i][0] = s->field_mv_table[mb_index][i][0]*time_pb/time_pp + mx;
-            s->mv[0][i][1] = s->field_mv_table[mb_index][i][1]*time_pb/time_pp + my;
-            s->mv[1][i][0] = mx ? s->mv[0][i][0] - s->field_mv_table[mb_index][i][0]
-                                : s->field_mv_table[mb_index][i][0]*(time_pb - time_pp)/time_pp;
-            s->mv[1][i][1] = my ? s->mv[0][i][1] - s->field_mv_table[mb_index][i][1] 
-                                : s->field_mv_table[mb_index][i][1]*(time_pb - time_pp)/time_pp;
+            s->mv[0][i][0] = s->p_field_mv_table[i][0][mb_index][0]*time_pb/time_pp + mx;
+            s->mv[0][i][1] = s->p_field_mv_table[i][0][mb_index][1]*time_pb/time_pp + my;
+            s->mv[1][i][0] = mx ? s->mv[0][i][0] - s->p_field_mv_table[i][0][mb_index][0]
+                                : s->p_field_mv_table[i][0][mb_index][0]*(time_pb - time_pp)/time_pp;
+            s->mv[1][i][1] = my ? s->mv[0][i][1] - s->p_field_mv_table[i][0][mb_index][1] 
+                                : s->p_field_mv_table[i][0][mb_index][1]*(time_pb - time_pp)/time_pp;
         }
         return MB_TYPE_DIRECT2 | MB_TYPE_16x8 | MB_TYPE_L0L1 | MB_TYPE_INTERLACED;
     }else{
@@ -598,9 +599,9 @@ void ff_h263_update_motion_val(MpegEncContext * s){
             motion_y = s->mv[0][0][1] + s->mv[0][1][1];
             motion_x = (motion_x>>1) | (motion_x&1);
             for(i=0; i<2; i++){
-                s->field_mv_table[mb_xy][i][0]= s->mv[0][i][0];
-                s->field_mv_table[mb_xy][i][1]= s->mv[0][i][1];
-                s->field_select_table[mb_xy][i]= s->field_select[0][i];
+                s->p_field_mv_table[i][0][mb_xy][0]= s->mv[0][i][0];
+                s->p_field_mv_table[i][0][mb_xy][1]= s->mv[0][i][1];
+                s->p_field_select_table[i][mb_xy]= s->field_select[0][i];
             }
         }
         
@@ -744,12 +745,14 @@ void mpeg4_encode_mb(MpegEncContext * s,
         if(s->pict_type==B_TYPE){
             static const int mb_type_table[8]= {-1, 2, 3, 1,-1,-1,-1, 0}; /* convert from mv_dir to type */
             int mb_type=  mb_type_table[s->mv_dir];
-            
+
             if(s->mb_x==0){
-                s->last_mv[0][0][0]= 
-                s->last_mv[0][0][1]= 
-                s->last_mv[1][0][0]= 
-                s->last_mv[1][0][1]= 0;
+                for(i=0; i<2; i++){
+                    s->last_mv[i][0][0]= 
+                    s->last_mv[i][0][1]= 
+                    s->last_mv[i][1][0]= 
+                    s->last_mv[i][1][1]= 0;
+                }
             }
             
             assert(s->dquant>=-2 && s->dquant<=2);
@@ -803,50 +806,64 @@ void mpeg4_encode_mb(MpegEncContext * s,
                 if(cbp)
                     put_bits(&s->pb, 1, s->interlaced_dct);
                 if(mb_type) // not diect mode
-                    put_bits(&s->pb, 1, 0); // no interlaced ME yet
+                    put_bits(&s->pb, 1, s->mv_type == MV_TYPE_FIELD);
             }
 
             if(interleaved_stats){
                 s->misc_bits+= get_bits_diff(s);
             }
 
-            switch(mb_type)
-            {
-            case 0: /* direct */
+            if(mb_type == 0){
+                assert(s->mv_dir & MV_DIRECT);
                 h263_encode_motion(s, motion_x, 1);
                 h263_encode_motion(s, motion_y, 1);                
                 s->b_count++;
                 s->f_count++;
-                break;
-            case 1: /* bidir */
-                h263_encode_motion(s, s->mv[0][0][0] - s->last_mv[0][0][0], s->f_code);
-                h263_encode_motion(s, s->mv[0][0][1] - s->last_mv[0][0][1], s->f_code);
-                h263_encode_motion(s, s->mv[1][0][0] - s->last_mv[1][0][0], s->b_code);
-                h263_encode_motion(s, s->mv[1][0][1] - s->last_mv[1][0][1], s->b_code);
-                s->last_mv[0][0][0]= s->mv[0][0][0];
-                s->last_mv[0][0][1]= s->mv[0][0][1];
-                s->last_mv[1][0][0]= s->mv[1][0][0];
-                s->last_mv[1][0][1]= s->mv[1][0][1];
-                s->b_count++;
-                s->f_count++;
-                break;
-            case 2: /* backward */
-                h263_encode_motion(s, motion_x - s->last_mv[1][0][0], s->b_code);
-                h263_encode_motion(s, motion_y - s->last_mv[1][0][1], s->b_code);
-                s->last_mv[1][0][0]= motion_x;
-                s->last_mv[1][0][1]= motion_y;
-                s->b_count++;
-                break;
-            case 3: /* forward */
-                h263_encode_motion(s, motion_x - s->last_mv[0][0][0], s->f_code);
-                h263_encode_motion(s, motion_y - s->last_mv[0][0][1], s->f_code);
-                s->last_mv[0][0][0]= motion_x;
-                s->last_mv[0][0][1]= motion_y;
-                s->f_count++;
-                break;
-            default:
-                av_log(s->avctx, AV_LOG_ERROR, "unknown mb type\n");
-                return;
+            }else{
+                assert(mb_type > 0 && mb_type < 4);
+                if(s->mv_type != MV_TYPE_FIELD){
+                    if(s->mv_dir & MV_DIR_FORWARD){
+                        h263_encode_motion(s, s->mv[0][0][0] - s->last_mv[0][0][0], s->f_code);
+                        h263_encode_motion(s, s->mv[0][0][1] - s->last_mv[0][0][1], s->f_code);
+                        s->last_mv[0][0][0]= s->last_mv[0][1][0]= s->mv[0][0][0];
+                        s->last_mv[0][0][1]= s->last_mv[0][1][1]= s->mv[0][0][1];
+                        s->f_count++;
+                    }
+                    if(s->mv_dir & MV_DIR_BACKWARD){
+                        h263_encode_motion(s, s->mv[1][0][0] - s->last_mv[1][0][0], s->b_code);
+                        h263_encode_motion(s, s->mv[1][0][1] - s->last_mv[1][0][1], s->b_code);
+                        s->last_mv[1][0][0]= s->last_mv[1][1][0]= s->mv[1][0][0];
+                        s->last_mv[1][0][1]= s->last_mv[1][1][1]= s->mv[1][0][1];
+                        s->b_count++;
+                    }
+                }else{
+                    if(s->mv_dir & MV_DIR_FORWARD){
+                        put_bits(&s->pb, 1, s->field_select[0][0]);
+                        put_bits(&s->pb, 1, s->field_select[0][1]);
+                    }
+                    if(s->mv_dir & MV_DIR_BACKWARD){
+                        put_bits(&s->pb, 1, s->field_select[1][0]);
+                        put_bits(&s->pb, 1, s->field_select[1][1]);
+                    }
+                    if(s->mv_dir & MV_DIR_FORWARD){
+                        for(i=0; i<2; i++){
+                            h263_encode_motion(s, s->mv[0][i][0] - s->last_mv[0][i][0]  , s->f_code);
+                            h263_encode_motion(s, s->mv[0][i][1] - s->last_mv[0][i][1]/2, s->f_code);
+                            s->last_mv[0][i][0]= s->mv[0][i][0];
+                            s->last_mv[0][i][1]= s->mv[0][i][1]*2;
+                        }
+                        s->f_count++;
+                    }
+                    if(s->mv_dir & MV_DIR_BACKWARD){
+                        for(i=0; i<2; i++){
+                            h263_encode_motion(s, s->mv[1][i][0] - s->last_mv[1][i][0]  , s->b_code);
+                            h263_encode_motion(s, s->mv[1][i][1] - s->last_mv[1][i][1]/2, s->b_code);
+                            s->last_mv[1][i][0]= s->mv[1][i][0];
+                            s->last_mv[1][i][1]= s->mv[1][i][1]*2;
+                        }
+                        s->b_count++;
+                    }
+                }
             }
 
             if(interleaved_stats){
@@ -861,6 +878,7 @@ void mpeg4_encode_mb(MpegEncContext * s,
             if(interleaved_stats){
                 s->p_tex_bits+= get_bits_diff(s);
             }
+
         }else{ /* s->pict_type==B_TYPE */
             cbp= get_p_cbp(s, block, motion_x, motion_y);
         
@@ -889,7 +907,7 @@ void mpeg4_encode_mb(MpegEncContext * s,
                         if(pic==NULL || pic->pict_type!=B_TYPE) break;
 
                         b_pic= pic->data[0] + offset + 16; //FIXME +16
-			diff= s->dsp.pix_abs16x16(p_pic, b_pic, s->linesize);
+			diff= s->dsp.sad[0](NULL, p_pic, b_pic, s->linesize, 16);
                         if(diff>s->qscale*70){ //FIXME check that 70 is optimal
                             s->mb_skiped=0;
                             break;
@@ -929,7 +947,7 @@ void mpeg4_encode_mb(MpegEncContext * s,
                 if(!s->progressive_sequence){
                     if(cbp)
                         put_bits(pb2, 1, s->interlaced_dct);
-                    put_bits(pb2, 1, 0); // no interlaced ME yet
+                    put_bits(pb2, 1, 0);
                 }
                     
                 if(interleaved_stats){
@@ -941,7 +959,38 @@ void mpeg4_encode_mb(MpegEncContext * s,
             
                 h263_encode_motion(s, motion_x - pred_x, s->f_code);
                 h263_encode_motion(s, motion_y - pred_y, s->f_code);
+            }else if(s->mv_type==MV_TYPE_FIELD){
+                if(s->dquant) cbpc+= 8;
+                put_bits(&s->pb,
+                        inter_MCBPC_bits[cbpc],
+                        inter_MCBPC_code[cbpc]);
+
+                put_bits(pb2, cbpy_tab[cbpy][1], cbpy_tab[cbpy][0]);
+                if(s->dquant)
+                    put_bits(pb2, 2, dquant_code[s->dquant+2]);
+
+                assert(!s->progressive_sequence);
+                if(cbp)
+                    put_bits(pb2, 1, s->interlaced_dct);
+                put_bits(pb2, 1, 1);
+                    
+                if(interleaved_stats){
+                    s->misc_bits+= get_bits_diff(s);
+                }
+
+                /* motion vectors: 16x8 interlaced mode */
+                h263_pred_motion(s, 0, &pred_x, &pred_y);
+                pred_y /=2;
+                
+                put_bits(&s->pb, 1, s->field_select[0][0]);
+                put_bits(&s->pb, 1, s->field_select[0][1]);
+            
+                h263_encode_motion(s, s->mv[0][0][0] - pred_x, s->f_code);
+                h263_encode_motion(s, s->mv[0][0][1] - pred_y, s->f_code);
+                h263_encode_motion(s, s->mv[0][1][0] - pred_x, s->f_code);
+                h263_encode_motion(s, s->mv[0][1][1] - pred_y, s->f_code);
             }else{
+                assert(s->mv_type==MV_TYPE_8X8);
                 put_bits(&s->pb,
                         inter_MCBPC_bits[cbpc+16],
                         inter_MCBPC_code[cbpc+16]);
@@ -1081,6 +1130,8 @@ void h263_encode_mb(MpegEncContext * s,
                 s->misc_bits++;
                 s->last_bits++;
             }
+            s->skip_count++;
+
             return;
         }
         put_bits(&s->pb, 1, 0);	/* mb coded */
@@ -1548,9 +1599,9 @@ int16_t *h263_pred_motion2(MpegEncContext * s, int block, int dir,
     static const int off[4]= {2, 1, 1, -1};
 
     wrap = s->b8_stride;
-    xy = s->mb_x + s->mb_y * wrap;
+    xy = 2*(s->mb_x + s->mb_y * wrap);
 
-    mot_val = s->current_picture.motion_val[0][dir] + xy;
+    mot_val = s->current_picture.motion_val[dir] + xy;
 
     A = mot_val[ - 1];
     /* special case for first (slice) line */
@@ -1983,7 +2034,7 @@ static void h263_encode_block(MpegEncContext * s, DCTELEM * block, int n)
         if (level == 128) //FIXME check rv10
             put_bits(&s->pb, 8, 0xff);
         else
-            put_bits(&s->pb, 8, level & 0xff);
+            put_bits(&s->pb, 8, level);
         i = 1;
     } else {
         i = 0;
@@ -2053,7 +2104,7 @@ static void h263_encode_block(MpegEncContext * s, DCTELEM * block, int n)
                 
                 assert(slevel != 0);
 
-                if(slevel < 128 && slevel > -128) 
+                if(level < 128) 
                     put_bits(&s->pb, 8, slevel & 0xff);
                 else{
                     put_bits(&s->pb, 8, 128);
@@ -2061,8 +2112,7 @@ static void h263_encode_block(MpegEncContext * s, DCTELEM * block, int n)
                     put_bits(&s->pb, 6, (slevel>>5)&0x3f);
                 }
               }else{
-                    if(slevel < 64 && slevel > -64) {
-                        /* 7-bit level */
+                if(level < 64) { // 7-bit level
                         put_bits(&s->pb, 1, 0);
                         put_bits(&s->pb, 1, last);
                         put_bits(&s->pb, 6, run);
@@ -2123,11 +2173,18 @@ void ff_set_mpeg4_time(MpegEncContext * s, int picture_number){
 
 static void mpeg4_encode_gop_header(MpegEncContext * s){
     int hours, minutes, seconds;
+    int64_t time;
     
     put_bits(&s->pb, 16, 0);
     put_bits(&s->pb, 16, GOP_STARTCODE);
     
-    seconds= s->time/s->time_increment_resolution;
+    if(s->current_picture_ptr->pts && s->reordered_input_picture[1]){
+        time= FFMIN(s->reordered_input_picture[1]->pts, s->current_picture_ptr->pts);
+        time= (time*s->time_increment_resolution + 500*1000)/(1000*1000);
+    }else
+        time= av_rescale(s->current_picture_ptr->coded_picture_number*(int64_t)s->avctx->frame_rate_base, s->time_increment_resolution, s->avctx->frame_rate);
+
+    seconds= time/s->time_increment_resolution;
     minutes= seconds/60; seconds %= 60;
     hours= minutes/60; minutes %= 60;
     hours%=24;
@@ -2137,8 +2194,10 @@ static void mpeg4_encode_gop_header(MpegEncContext * s){
     put_bits(&s->pb, 1, 1);
     put_bits(&s->pb, 6, seconds);
     
-    put_bits(&s->pb, 1, 0); //closed gov == NO
+    put_bits(&s->pb, 1, !!(s->flags&CODEC_FLAG_CLOSED_GOP)); 
     put_bits(&s->pb, 1, 0); //broken link == NO
+    
+    s->last_time_base= time / s->time_increment_resolution; 
 
     ff_mpeg4_stuffing(&s->pb);
 }
@@ -3815,15 +3874,15 @@ int ff_h263_decode_mb(MpegEncContext *s,
     } else if(s->pict_type==B_TYPE) {
         int mb_type;
         const int stride= s->b8_stride;
-        int16_t *mot_val0 = s->current_picture.motion_val[0][ s->mb_x + s->mb_y*stride ];
-        int16_t *mot_val1 = s->current_picture.motion_val[1][ s->mb_x + s->mb_y*stride ];
+        int16_t *mot_val0 = s->current_picture.motion_val[0][ 2*(s->mb_x + s->mb_y*stride) ];
+        int16_t *mot_val1 = s->current_picture.motion_val[1][ 2*(s->mb_x + s->mb_y*stride) ];
 //        const int mv_xy= s->mb_x + 1 + s->mb_y * s->mb_stride;
 
         //FIXME ugly 
-        mot_val0[0       ]= mot_val0[2       ]= mot_val0[0+stride]= mot_val0[2+stride]= 0;
-        mot_val0[1       ]= mot_val0[3       ]= mot_val0[1+stride]= mot_val0[3+stride]= 0;
-        mot_val1[0       ]= mot_val1[2       ]= mot_val1[0+stride]= mot_val1[2+stride]= 0;
-        mot_val1[1       ]= mot_val1[3       ]= mot_val1[1+stride]= mot_val1[3+stride]= 0;
+        mot_val0[0       ]= mot_val0[2       ]= mot_val0[0+2*stride]= mot_val0[2+2*stride]= 
+        mot_val0[1       ]= mot_val0[3       ]= mot_val0[1+2*stride]= mot_val0[3+2*stride]= 
+        mot_val1[0       ]= mot_val1[2       ]= mot_val1[0+2*stride]= mot_val1[2+2*stride]= 
+        mot_val1[1       ]= mot_val1[3       ]= mot_val1[1+2*stride]= mot_val1[3+2*stride]= 0;
 
         do{
             mb_type= get_vlc2(&s->gb, h263_mbtype_b_vlc.table, H263_MBTYPE_B_VLC_BITS, 2);
@@ -3877,22 +3936,24 @@ int ff_h263_decode_mb(MpegEncContext *s,
 
                 mx = h263_decode_motion(s, mx, 1);
                 my = h263_decode_motion(s, my, 1);
+                
                 s->mv[0][0][0] = mx;
                 s->mv[0][0][1] = my;
-                mot_val[0       ]= mot_val[2       ]= mot_val[0+stride]= mot_val[2+stride]= mx;
-                mot_val[1       ]= mot_val[3       ]= mot_val[1+stride]= mot_val[3+stride]= my;
+                mot_val[0       ]= mot_val[2       ]= mot_val[0+2*stride]= mot_val[2+2*stride]= mx;
+                mot_val[1       ]= mot_val[3       ]= mot_val[1+2*stride]= mot_val[3+2*stride]= my;
             }
     
             if(USES_LIST(mb_type, 1)){
                 int16_t *mot_val= h263_pred_motion2(s, 0, 1, &mx, &my);
                 s->mv_dir |= MV_DIR_BACKWARD;
-
+                
                 mx = h263_decode_motion(s, mx, 1);
                 my = h263_decode_motion(s, my, 1);
+
                 s->mv[1][0][0] = mx;
                 s->mv[1][0][1] = my;
-                mot_val[0       ]= mot_val[2       ]= mot_val[0+stride]= mot_val[2+stride]= mx;
-                mot_val[1       ]= mot_val[3       ]= mot_val[1+stride]= mot_val[3+stride]= my;
+                mot_val[0       ]= mot_val[2       ]= mot_val[0+2*stride]= mot_val[2+2*stride]= mx;
+                mot_val[1       ]= mot_val[3       ]= mot_val[1+2*stride]= mot_val[3+2*stride]= my;
             }
         }
           
@@ -4381,7 +4442,8 @@ static int h263_decode_block(MpegEncContext * s, DCTELEM * block,
             level = get_bits(&s->gb, 8);
             if((level&0x7F) == 0){
                 av_log(s->avctx, AV_LOG_ERROR, "illegal dc %d at %d %d\n", level, s->mb_x, s->mb_y);
-                return -1;
+                if(s->error_resilience >= FF_ER_COMPLIANT)
+                    return -1;
             }
             if (level == 255)
                 level = 128;

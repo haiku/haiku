@@ -1,6 +1,7 @@
 /*
  * DSP utils
  * Copyright (c) 2000, 2001, 2002 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,6 +45,7 @@ void j_rev_dct (DCTELEM *data);
 
 void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
+void ff_fdct_sse2(DCTELEM *block);
 
 /* encoding scans */
 extern const uint8_t ff_alternate_horizontal_scan[64];
@@ -79,6 +81,7 @@ void clear_blocks_c(DCTELEM *blocks);
 
 /* add and put pixel (decoding) */
 // blocksizes for op_pixels_func are 8x4,8x8 16x8 16x16
+//h for op_pixels_func is limited to {width/2, width} but never larger than 16 and never smaller then 4
 typedef void (*op_pixels_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int h);
 typedef void (*tpel_mc_func)(uint8_t *block/*align width (8 or 16)*/, const uint8_t *pixels/*align 1*/, int line_size, int w, int h);
 typedef void (*qpel_mc_func)(uint8_t *dst/*align width (8 or 16)*/, uint8_t *src/*align 1*/, int stride);
@@ -109,10 +112,9 @@ static void a(uint8_t *block, const uint8_t *pixels, int line_size, int h){\
 }
 
 /* motion estimation */
-
-typedef int (*op_pixels_abs_func)(uint8_t *blk1/*align width (8 or 16)*/, uint8_t *blk2/*align 1*/, int line_size)/* __attribute__ ((const))*/;
-
-typedef int (*me_cmp_func)(void /*MpegEncContext*/ *s, uint8_t *blk1/*align width (8 or 16)*/, uint8_t *blk2/*align 1*/, int line_size)/* __attribute__ ((const))*/;
+// h is limited to {width/2, width, 2*width} but never larger than 16 and never smaller then 2
+// allthough currently h<4 is not used as functions with width <8 are not used and neither implemented
+typedef int (*me_cmp_func)(void /*MpegEncContext*/ *s, uint8_t *blk1/*align width (8 or 16)*/, uint8_t *blk2/*align 1*/, int line_size, int h)/* __attribute__ ((const))*/;
 
 
 /**
@@ -136,25 +138,28 @@ typedef struct DSPContext {
     void (*clear_blocks)(DCTELEM *blocks/*align 16*/);
     int (*pix_sum)(uint8_t * pix, int line_size);
     int (*pix_norm1)(uint8_t * pix, int line_size);
-    me_cmp_func sad[2]; /* identical to pix_absAxA except additional void * */
-    me_cmp_func sse[2];
-    me_cmp_func hadamard8_diff[2];
-    me_cmp_func dct_sad[2];
-    me_cmp_func quant_psnr[2];
-    me_cmp_func bit[2];
-    me_cmp_func rd[2];
-    int (*hadamard8_abs )(uint8_t *src, int stride, int mean);
+// 16x16 8x8 4x4 2x2 16x8 8x4 4x2 8x16 4x8 2x4
+    
+    me_cmp_func sad[5]; /* identical to pix_absAxA except additional void * */
+    me_cmp_func sse[5];
+    me_cmp_func hadamard8_diff[5];
+    me_cmp_func dct_sad[5];
+    me_cmp_func quant_psnr[5];
+    me_cmp_func bit[5];
+    me_cmp_func rd[5];
+    me_cmp_func vsad[5];
+    me_cmp_func vsse[5];
 
-    me_cmp_func me_pre_cmp[11];
-    me_cmp_func me_cmp[11];
-    me_cmp_func me_sub_cmp[11];
-    me_cmp_func mb_cmp[11];
+    me_cmp_func me_pre_cmp[5];
+    me_cmp_func me_cmp[5];
+    me_cmp_func me_sub_cmp[5];
+    me_cmp_func mb_cmp[5];
+    me_cmp_func ildct_cmp[5]; //only width 16 used
 
-    /* maybe create an array for 16/8/4/2 functions */
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
      * this is an array[4][4] of motion compensation funcions for 4 
-     * horizontal blocksizes (2,4,8,16) and the 4 halfpel positions<br>
+     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination where the result is stored
      * @param pixels source
@@ -166,7 +171,7 @@ typedef struct DSPContext {
     /**
      * Halfpel motion compensation with rounding (a+b+1)>>1.
      * This is an array[4][4] of motion compensation functions for 4 
-     * horizontal blocksizes (2,4,8,16) and the 4 halfpel positions<br>
+     * horizontal blocksizes (8,16) and the 4 halfpel positions<br>
      * *pixels_tab[ 0->16xH 1->8xH ][ xhalfpel + 2*yhalfpel ]
      * @param block destination into which the result is averaged (a+b+1)>>1
      * @param pixels source
@@ -226,14 +231,7 @@ typedef struct DSPContext {
     qpel_mc_func put_h264_qpel_pixels_tab[3][16];
     qpel_mc_func avg_h264_qpel_pixels_tab[3][16];
     
-    op_pixels_abs_func pix_abs16x16;
-    op_pixels_abs_func pix_abs16x16_x2;
-    op_pixels_abs_func pix_abs16x16_y2;
-    op_pixels_abs_func pix_abs16x16_xy2;
-    op_pixels_abs_func pix_abs8x8;
-    op_pixels_abs_func pix_abs8x8_x2;
-    op_pixels_abs_func pix_abs8x8_y2;
-    op_pixels_abs_func pix_abs8x8_xy2;
+    me_cmp_func pix_abs[2][4];
     
     /* huffyuv specific */
     void (*add_bytes)(uint8_t *dst/*align 16*/, uint8_t *src/*align 16*/, int w);
@@ -297,6 +295,8 @@ void dsputil_init(DSPContext* p, AVCodecContext *avctx);
  * @param last last non zero element in scantable order
  */
 void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scantable, int last);
+
+void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type);
 
 #define	BYTE_VEC32(c)	((c)*0x01010101UL)
 
@@ -484,12 +484,24 @@ void ff_mdct_calc(MDCTContext *s, FFTSample *out,
                const FFTSample *input, FFTSample *tmp);
 void ff_mdct_end(MDCTContext *s);
 
-#define WARPER88_1616(name8, name16)\
-static int name16(void /*MpegEncContext*/ *s, uint8_t *dst, uint8_t *src, int stride){\
-    return name8(s, dst           , src           , stride)\
-          +name8(s, dst+8         , src+8         , stride)\
-          +name8(s, dst  +8*stride, src  +8*stride, stride)\
-          +name8(s, dst+8+8*stride, src+8+8*stride, stride);\
+#define WARPER8_16(name8, name16)\
+static int name16(void /*MpegEncContext*/ *s, uint8_t *dst, uint8_t *src, int stride, int h){\
+    return name8(s, dst           , src           , stride, h)\
+          +name8(s, dst+8         , src+8         , stride, h);\
+}
+
+#define WARPER8_16_SQ(name8, name16)\
+static int name16(void /*MpegEncContext*/ *s, uint8_t *dst, uint8_t *src, int stride, int h){\
+    int score=0;\
+    score +=name8(s, dst           , src           , stride, 8);\
+    score +=name8(s, dst+8         , src+8         , stride, 8);\
+    if(h==16){\
+        dst += 8*stride;\
+        src += 8*stride;\
+        score +=name8(s, dst           , src           , stride, 8);\
+        score +=name8(s, dst+8         , src+8         , stride, 8);\
+    }\
+    return score;\
 }
 
 #ifndef HAVE_LRINTF

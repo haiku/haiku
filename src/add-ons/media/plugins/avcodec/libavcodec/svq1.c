@@ -579,7 +579,7 @@ static void svq1_parse_string (GetBitContext *bitbuf, uint8_t *out) {
 
   seed = string_table[out[0]];
 
-  for (i=1; i < out[0]; i++) {
+  for (i=1; i <= out[0]; i++) {
     out[i] = get_bits (bitbuf, 8) ^ seed;
     seed   = string_table[out[i] ^ seed];
   }
@@ -789,7 +789,6 @@ static int svq1_decode_init(AVCodecContext *avctx)
     s->codec_id= avctx->codec->id;
     avctx->pix_fmt = PIX_FMT_YUV410P;
     avctx->has_b_frames= 1; // not true, but DP frames and these behave like unidirectional b frames
-    s->flags= avctx->flags;
     if (MPV_common_init(s) < 0) return -1;
 
     init_vlc(&svq1_block_type, 2, 4,

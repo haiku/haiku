@@ -1,6 +1,7 @@
 /*
  * DSP utils
  * Copyright (c) 2000, 2001 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -218,13 +219,13 @@ static void bswap_buf(uint32_t *dst, uint32_t *src, int w){
     }
 }
 
-static int sse8_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size)
+static int sse8_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size, int h)
 {
     int s, i;
     uint32_t *sq = squareTbl + 256;
 
     s = 0;
-    for (i = 0; i < 8; i++) {
+    for (i = 0; i < h; i++) {
         s += sq[pix1[0] - pix2[0]];
         s += sq[pix1[1] - pix2[1]];
         s += sq[pix1[2] - pix2[2]];
@@ -239,13 +240,13 @@ static int sse8_c(void *v, uint8_t * pix1, uint8_t * pix2, int line_size)
     return s;
 }
 
-static int sse16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size)
+static int sse16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
     uint32_t *sq = squareTbl + 256;
 
     s = 0;
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < h; i++) {
         s += sq[pix1[ 0] - pix2[ 0]];
         s += sq[pix1[ 1] - pix2[ 1]];
         s += sq[pix1[ 2] - pix2[ 2]];
@@ -2331,12 +2332,12 @@ static void h263_h_loop_filter_c(uint8_t *src, int stride, int qscale){
     }
 }
 
-static inline int pix_abs16x16_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static inline int pix_abs16_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
 
     s = 0;
-    for(i=0;i<16;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - pix2[0]);
         s += abs(pix1[1] - pix2[1]);
         s += abs(pix1[2] - pix2[2]);
@@ -2359,12 +2360,12 @@ static inline int pix_abs16x16_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs16x16_x2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs16_x2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
 
     s = 0;
-    for(i=0;i<16;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg2(pix2[0], pix2[1]));
         s += abs(pix1[1] - avg2(pix2[1], pix2[2]));
         s += abs(pix1[2] - avg2(pix2[2], pix2[3]));
@@ -2387,13 +2388,13 @@ static int pix_abs16x16_x2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs16x16_y2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs16_y2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
     uint8_t *pix3 = pix2 + line_size;
 
     s = 0;
-    for(i=0;i<16;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg2(pix2[0], pix3[0]));
         s += abs(pix1[1] - avg2(pix2[1], pix3[1]));
         s += abs(pix1[2] - avg2(pix2[2], pix3[2]));
@@ -2417,13 +2418,13 @@ static int pix_abs16x16_y2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs16x16_xy2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs16_xy2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
     uint8_t *pix3 = pix2 + line_size;
 
     s = 0;
-    for(i=0;i<16;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg4(pix2[0], pix2[1], pix3[0], pix3[1]));
         s += abs(pix1[1] - avg4(pix2[1], pix2[2], pix3[1], pix3[2]));
         s += abs(pix1[2] - avg4(pix2[2], pix2[3], pix3[2], pix3[3]));
@@ -2447,12 +2448,12 @@ static int pix_abs16x16_xy2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static inline int pix_abs8x8_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static inline int pix_abs8_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
 
     s = 0;
-    for(i=0;i<8;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - pix2[0]);
         s += abs(pix1[1] - pix2[1]);
         s += abs(pix1[2] - pix2[2]);
@@ -2467,12 +2468,12 @@ static inline int pix_abs8x8_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs8x8_x2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs8_x2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
 
     s = 0;
-    for(i=0;i<8;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg2(pix2[0], pix2[1]));
         s += abs(pix1[1] - avg2(pix2[1], pix2[2]));
         s += abs(pix1[2] - avg2(pix2[2], pix2[3]));
@@ -2487,13 +2488,13 @@ static int pix_abs8x8_x2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs8x8_y2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs8_y2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
     uint8_t *pix3 = pix2 + line_size;
 
     s = 0;
-    for(i=0;i<8;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg2(pix2[0], pix3[0]));
         s += abs(pix1[1] - avg2(pix2[1], pix3[1]));
         s += abs(pix1[2] - avg2(pix2[2], pix3[2]));
@@ -2509,13 +2510,13 @@ static int pix_abs8x8_y2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
     return s;
 }
 
-static int pix_abs8x8_xy2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
+static int pix_abs8_xy2_c(void *v, uint8_t *pix1, uint8_t *pix2, int line_size, int h)
 {
     int s, i;
     uint8_t *pix3 = pix2 + line_size;
 
     s = 0;
-    for(i=0;i<8;i++) {
+    for(i=0;i<h;i++) {
         s += abs(pix1[0] - avg4(pix2[0], pix2[1], pix3[0], pix3[1]));
         s += abs(pix1[1] - avg4(pix2[1], pix2[2], pix3[1], pix3[2]));
         s += abs(pix1[2] - avg4(pix2[2], pix2[3], pix3[2], pix3[3]));
@@ -2529,14 +2530,6 @@ static int pix_abs8x8_xy2_c(uint8_t *pix1, uint8_t *pix2, int line_size)
         pix3 += line_size;
     }
     return s;
-}
-
-static int sad16x16_c(void *s, uint8_t *a, uint8_t *b, int stride){
-    return pix_abs16x16_c(a,b,stride);
-}
-
-static int sad8x8_c(void *s, uint8_t *a, uint8_t *b, int stride){
-    return pix_abs8x8_c(a,b,stride);
 }
 
 /**
@@ -2565,6 +2558,53 @@ void ff_block_permute(DCTELEM *block, uint8_t *permutation, const uint8_t *scant
         const int j= scantable[i];
         const int perm_j= permutation[j];
         block[perm_j]= temp[j];
+    }
+}
+
+static int zero_cmp(void *s, uint8_t *a, uint8_t *b, int stride, int h){
+    return 0;
+}
+
+void ff_set_cmp(DSPContext* c, me_cmp_func *cmp, int type){
+    int i;
+    
+    memset(cmp, 0, sizeof(void*)*5);
+        
+    for(i=0; i<5; i++){
+        switch(type&0xFF){
+        case FF_CMP_SAD:
+            cmp[i]= c->sad[i];
+            break;
+        case FF_CMP_SATD:
+            cmp[i]= c->hadamard8_diff[i];
+            break;
+        case FF_CMP_SSE:
+            cmp[i]= c->sse[i];
+            break;
+        case FF_CMP_DCT:
+            cmp[i]= c->dct_sad[i];
+            break;
+        case FF_CMP_PSNR:
+            cmp[i]= c->quant_psnr[i];
+            break;
+        case FF_CMP_BIT:
+            cmp[i]= c->bit[i];
+            break;
+        case FF_CMP_RD:
+            cmp[i]= c->rd[i];
+            break;
+        case FF_CMP_VSAD:
+            cmp[i]= c->vsad[i];
+            break;
+        case FF_CMP_VSSE:
+            cmp[i]= c->vsse[i];
+            break;
+        case FF_CMP_ZERO:
+            cmp[i]= zero_cmp;
+            break;
+        default:
+            av_log(NULL, AV_LOG_ERROR,"internal error in cmp function selection\n");
+        }
     }
 }
 
@@ -2641,10 +2681,12 @@ o2= (i1)-(i2);
 
 #define BUTTERFLYA(x,y) (ABS((x)+(y)) + ABS((x)-(y)))
 
-static int hadamard8_diff_c(/*MpegEncContext*/ void *s, uint8_t *dst, uint8_t *src, int stride){
+static int hadamard8_diff8x8_c(/*MpegEncContext*/ void *s, uint8_t *dst, uint8_t *src, int stride, int h){
     int i;
     int temp[64];
     int sum=0;
+    
+    assert(h==8);
 
     for(i=0; i<8; i++){
         //FIXME try pointer walks
@@ -2691,17 +2733,19 @@ if(sum>maxi){
     return sum;
 }
 
-static int hadamard8_abs_c(uint8_t *src, int stride, int mean){
+static int hadamard8_intra8x8_c(/*MpegEncContext*/ void *s, uint8_t *src, uint8_t *dummy, int stride, int h){
     int i;
     int temp[64];
     int sum=0;
-//FIXME OOOPS ignore 0 term instead of mean mess
+    
+    assert(h==8);
+    
     for(i=0; i<8; i++){
         //FIXME try pointer walks
-        BUTTERFLY2(temp[8*i+0], temp[8*i+1], src[stride*i+0]-mean,src[stride*i+1]-mean);
-        BUTTERFLY2(temp[8*i+2], temp[8*i+3], src[stride*i+2]-mean,src[stride*i+3]-mean);
-        BUTTERFLY2(temp[8*i+4], temp[8*i+5], src[stride*i+4]-mean,src[stride*i+5]-mean);
-        BUTTERFLY2(temp[8*i+6], temp[8*i+7], src[stride*i+6]-mean,src[stride*i+7]-mean);
+        BUTTERFLY2(temp[8*i+0], temp[8*i+1], src[stride*i+0],src[stride*i+1]);
+        BUTTERFLY2(temp[8*i+2], temp[8*i+3], src[stride*i+2],src[stride*i+3]);
+        BUTTERFLY2(temp[8*i+4], temp[8*i+5], src[stride*i+4],src[stride*i+5]);
+        BUTTERFLY2(temp[8*i+6], temp[8*i+7], src[stride*i+6],src[stride*i+7]);
         
         BUTTERFLY1(temp[8*i+0], temp[8*i+2]);
         BUTTERFLY1(temp[8*i+1], temp[8*i+3]);
@@ -2732,14 +2776,18 @@ static int hadamard8_abs_c(uint8_t *src, int stride, int mean){
             +BUTTERFLYA(temp[8*3+i], temp[8*7+i]);
     }
     
+    sum -= ABS(temp[8*0] + temp[8*4]); // -mean
+    
     return sum;
 }
 
-static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride){
+static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     int sum=0, i;
+    
+    assert(h==8);
 
     s->dsp.diff_pixels(temp, src1, src2, stride);
     s->dsp.fdct(temp);
@@ -2752,13 +2800,14 @@ static int dct_sad8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2
 
 void simple_idct(DCTELEM *block); //FIXME
 
-static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride){
+static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64*2/8];
     DCTELEM * const temp= (DCTELEM*)aligned_temp;
     DCTELEM * const bak = ((DCTELEM*)aligned_temp)+64;
     int sum=0, i;
 
+    assert(h==8);
     s->mb_intra=0;
     
     s->dsp.diff_pixels(temp, src1, src2, stride);
@@ -2775,7 +2824,7 @@ static int quant_psnr8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *s
     return sum;
 }
 
-static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride){
+static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
     uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
@@ -2787,6 +2836,8 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
     uint8_t * length;
     uint8_t * last_length;
     
+    assert(h==8);
+
     for(i=0; i<8; i++){
         ((uint32_t*)(bak + i*stride))[0]= ((uint32_t*)(src2 + i*stride))[0];
         ((uint32_t*)(bak + i*stride))[1]= ((uint32_t*)(src2 + i*stride))[1];
@@ -2847,12 +2898,12 @@ static int rd8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int
     
     s->dsp.idct_add(bak, stride, temp);
     
-    distoration= s->dsp.sse[1](NULL, bak, src1, stride);
+    distoration= s->dsp.sse[1](NULL, bak, src1, stride, 8);
 
     return distoration + ((bits*s->qscale*s->qscale*109 + 64)>>7);
 }
 
-static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride){
+static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, int stride, int h){
     MpegEncContext * const s= (MpegEncContext *)c;
     const uint8_t *scantable= s->intra_scantable.permutated;
     uint64_t __align8 aligned_temp[sizeof(DCTELEM)*64/8];
@@ -2861,6 +2912,8 @@ static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, in
     const int esc_length= s->ac_esc_length;
     uint8_t * length;
     uint8_t * last_length;
+
+    assert(h==8);
     
     s->dsp.diff_pixels(temp, src1, src2, stride);
 
@@ -2910,12 +2963,73 @@ static int bit8x8_c(/*MpegEncContext*/ void *c, uint8_t *src1, uint8_t *src2, in
     return bits;
 }
 
+static int vsad_intra16_c(/*MpegEncContext*/ void *c, uint8_t *s, uint8_t *dummy, int stride, int h){
+    int score=0;
+    int x,y;
+    
+    for(y=1; y<h; y++){
+        for(x=0; x<16; x+=4){
+            score+= ABS(s[x  ] - s[x  +stride]) + ABS(s[x+1] - s[x+1+stride]) 
+                   +ABS(s[x+2] - s[x+2+stride]) + ABS(s[x+3] - s[x+3+stride]);
+        }
+        s+= stride;
+    }
+    
+    return score;
+}
 
-WARPER88_1616(hadamard8_diff_c, hadamard8_diff16_c)
-WARPER88_1616(dct_sad8x8_c, dct_sad16x16_c)
-WARPER88_1616(quant_psnr8x8_c, quant_psnr16x16_c)
-WARPER88_1616(rd8x8_c, rd16x16_c)
-WARPER88_1616(bit8x8_c, bit16x16_c)
+static int vsad16_c(/*MpegEncContext*/ void *c, uint8_t *s1, uint8_t *s2, int stride, int h){
+    int score=0;
+    int x,y;
+    
+    for(y=1; y<h; y++){
+        for(x=0; x<16; x++){
+            score+= ABS(s1[x  ] - s2[x ] - s1[x  +stride] + s2[x +stride]);
+        }
+        s1+= stride;
+        s2+= stride;
+    }
+    
+    return score;
+}
+
+#define SQ(a) ((a)*(a))
+static int vsse_intra16_c(/*MpegEncContext*/ void *c, uint8_t *s, uint8_t *dummy, int stride, int h){
+    int score=0;
+    int x,y;
+    
+    for(y=1; y<h; y++){
+        for(x=0; x<16; x+=4){
+            score+= SQ(s[x  ] - s[x  +stride]) + SQ(s[x+1] - s[x+1+stride]) 
+                   +SQ(s[x+2] - s[x+2+stride]) + SQ(s[x+3] - s[x+3+stride]);
+        }
+        s+= stride;
+    }
+    
+    return score;
+}
+
+static int vsse16_c(/*MpegEncContext*/ void *c, uint8_t *s1, uint8_t *s2, int stride, int h){
+    int score=0;
+    int x,y;
+    
+    for(y=1; y<h; y++){
+        for(x=0; x<16; x++){
+            score+= SQ(s1[x  ] - s2[x ] - s1[x  +stride] + s2[x +stride]);
+        }
+        s1+= stride;
+        s2+= stride;
+    }
+    
+    return score;
+}
+
+WARPER8_16_SQ(hadamard8_diff8x8_c, hadamard8_diff16_c)
+WARPER8_16_SQ(hadamard8_intra8x8_c, hadamard8_intra16_c)
+WARPER8_16_SQ(dct_sad8x8_c, dct_sad16_c)
+WARPER8_16_SQ(quant_psnr8x8_c, quant_psnr16_c)
+WARPER8_16_SQ(rd8x8_c, rd16_c)
+WARPER8_16_SQ(bit8x8_c, bit16_c)
 
 /* XXX: those functions should be suppressed ASAP when all IDCTs are
  converted */
@@ -2989,18 +3103,16 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->clear_blocks = clear_blocks_c;
     c->pix_sum = pix_sum_c;
     c->pix_norm1 = pix_norm1_c;
-    c->sse[0]= sse16_c;
-    c->sse[1]= sse8_c;
 
     /* TODO [0] 16  [1] 8 */
-    c->pix_abs16x16     = pix_abs16x16_c;
-    c->pix_abs16x16_x2  = pix_abs16x16_x2_c;
-    c->pix_abs16x16_y2  = pix_abs16x16_y2_c;
-    c->pix_abs16x16_xy2 = pix_abs16x16_xy2_c;
-    c->pix_abs8x8     = pix_abs8x8_c;
-    c->pix_abs8x8_x2  = pix_abs8x8_x2_c;
-    c->pix_abs8x8_y2  = pix_abs8x8_y2_c;
-    c->pix_abs8x8_xy2 = pix_abs8x8_xy2_c;
+    c->pix_abs[0][0] = pix_abs16_c;
+    c->pix_abs[0][1] = pix_abs16_x2_c;
+    c->pix_abs[0][2] = pix_abs16_y2_c;
+    c->pix_abs[0][3] = pix_abs16_xy2_c;
+    c->pix_abs[1][0] = pix_abs8_c;
+    c->pix_abs[1][1] = pix_abs8_x2_c;
+    c->pix_abs[1][2] = pix_abs8_y2_c;
+    c->pix_abs[1][3] = pix_abs8_xy2_c;
 
 #define dspfunc(PFX, IDX, NUM) \
     c->PFX ## _pixels_tab[IDX][0] = PFX ## _pixels ## NUM ## _c;     \
@@ -3097,24 +3209,24 @@ void dsputil_init(DSPContext* c, AVCodecContext *avctx)
     c->put_mspel_pixels_tab[6]= put_mspel8_mc22_c;
     c->put_mspel_pixels_tab[7]= put_mspel8_mc32_c;
         
-    c->hadamard8_diff[0]= hadamard8_diff16_c;
-    c->hadamard8_diff[1]= hadamard8_diff_c;
-    c->hadamard8_abs = hadamard8_abs_c;
+#define SET_CMP_FUNC(name) \
+    c->name[0]= name ## 16_c;\
+    c->name[1]= name ## 8x8_c;
     
-    c->dct_sad[0]= dct_sad16x16_c;
-    c->dct_sad[1]= dct_sad8x8_c;
-    
-    c->sad[0]= sad16x16_c;
-    c->sad[1]= sad8x8_c;
-    
-    c->quant_psnr[0]= quant_psnr16x16_c;
-    c->quant_psnr[1]= quant_psnr8x8_c;
-
-    c->rd[0]= rd16x16_c;
-    c->rd[1]= rd8x8_c;
-
-    c->bit[0]= bit16x16_c;
-    c->bit[1]= bit8x8_c;
+    SET_CMP_FUNC(hadamard8_diff)
+    c->hadamard8_diff[4]= hadamard8_intra16_c;
+    SET_CMP_FUNC(dct_sad)
+    c->sad[0]= pix_abs16_c;
+    c->sad[1]= pix_abs8_c;
+    c->sse[0]= sse16_c;
+    c->sse[1]= sse8_c;
+    SET_CMP_FUNC(quant_psnr)
+    SET_CMP_FUNC(rd)
+    SET_CMP_FUNC(bit)
+    c->vsad[0]= vsad16_c;
+    c->vsad[4]= vsad_intra16_c;
+    c->vsse[0]= vsse16_c;
+    c->vsse[4]= vsse_intra16_c;
         
     c->add_bytes= add_bytes_c;
     c->diff_bytes= diff_bytes_c;

@@ -18,6 +18,10 @@
 //#define A32_BITSTREAM_READER
 #define LIBMPEG2_BITSTREAM_READER_HACK //add BERO
 
+#ifndef M_PI
+#define M_PI    3.14159265358979323846
+#endif
+
 #ifdef HAVE_AV_CONFIG_H
 /* only include the following when compiling package */
 #    include "config.h"
@@ -36,10 +40,6 @@
 #    ifndef ENODATA
 #        define ENODATA  61
 #    endif
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846
-#endif
 
 #include <stddef.h>
 #ifndef offsetof
@@ -82,6 +82,29 @@ extern const struct AVOption avoptions_workaround_bug[11];
 #    define always_inline inline
 #endif
 
+#ifndef EMULATE_INTTYPES
+#   include <inttypes.h>
+#else
+    typedef signed char  int8_t;
+    typedef signed short int16_t;
+    typedef signed int   int32_t;
+    typedef unsigned char  uint8_t;
+    typedef unsigned short uint16_t;
+    typedef unsigned int   uint32_t;
+
+#   ifdef CONFIG_WIN32
+        typedef signed __int64   int64_t;
+        typedef unsigned __int64 uint64_t;
+#   else /* other OS */
+        typedef signed long long   int64_t;
+        typedef unsigned long long uint64_t;
+#   endif /* other OS */
+#endif /* HAVE_INTTYPES_H */
+
+#ifndef INT64_MAX
+#define INT64_MAX 9223372036854775807LL
+#endif
+
 #ifdef EMULATE_FAST_INT
 /* note that we don't emulate 64bit ints */
 typedef signed char int_fast8_t;
@@ -101,15 +124,6 @@ static inline float floorf(float f) {
 #ifdef CONFIG_WIN32
 
 /* windows */
-
-typedef unsigned short uint16_t;
-typedef signed short int16_t;
-typedef unsigned char uint8_t;
-typedef unsigned int uint32_t;
-typedef unsigned __int64 uint64_t;
-typedef signed char int8_t;
-typedef signed int int32_t;
-typedef signed __int64 int64_t;
 
 #    ifndef __MINGW32__
 #        define int64_t_C(c)     (c ## i64)
@@ -137,8 +151,6 @@ typedef signed __int64 int64_t;
 #elif defined (CONFIG_OS2)
 /* OS/2 EMX */
 
-#include <inttypes.h>
-
 #ifndef int64_t_C
 #define int64_t_C(c)     (c ## LL)
 #define uint64_t_C(c)    (c ## ULL)
@@ -158,8 +170,6 @@ typedef signed __int64 int64_t;
 #else
 
 /* unix */
-
-#include <inttypes.h>
 
 #ifndef int64_t_C
 #define int64_t_C(c)     (c ## LL)
@@ -201,13 +211,9 @@ inline void dprintf(const char* fmt,...) {}
 #    else
 
 #        ifdef DEBUG
-#            if defined(__BEOS__)
-#            	define dprintf(fmt...) printf(fmt)
-#            else
-#            	define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
-#            endif
+#            define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
 #        else
-#            if defined(__BEOS__)
+#            if defined(CONFIG_BEOS)
 #                define dprintf(fmt...)
 #            else
 #                define dprintf(fmt,...)
@@ -1014,23 +1020,31 @@ static inline int av_log2_16bit(unsigned int v)
     return n;
 }
 
-
 /* median of 3 */
 static inline int mid_pred(int a, int b, int c)
 {
-    int vmin, vmax;
-    vmax = vmin = a;
-    if (b < vmin)
-        vmin = b;
-    else
-	vmax = b;
+#if 0
+    int t= (a-b)&((a-b)>>31);
+    a-=t;
+    b+=t;
+    b-= (b-c)&((b-c)>>31);
+    b+= (a-b)&((a-b)>>31);
 
-    if (c < vmin)
-        vmin = c;
-    else if (c > vmax)
-        vmax = c;
-
-    return a + b + c - vmin - vmax;
+    return b;
+#else
+    if(a>b){
+        if(c>b){
+            if(c>a) b=a;
+            else    b=c;
+        }
+    }else{
+        if(b>c){
+            if(c>a) b=c;
+            else    b=a;
+        }
+    }
+    return b;
+#endif
 }
 
 static inline int clip(int a, int amin, int amax)

@@ -17,7 +17,7 @@ extern "C" {
 
 #define FFMPEG_VERSION_INT     0x000408
 #define FFMPEG_VERSION         "0.4.8"
-#define LIBAVCODEC_BUILD       4697
+#define LIBAVCODEC_BUILD       4699
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -89,6 +89,10 @@ enum CodecID {
     CODEC_ID_SMC,
     CODEC_ID_FLIC,
     CODEC_ID_TRUEMOTION1,
+    CODEC_ID_VMDVIDEO,
+    CODEC_ID_VMDAUDIO,
+    CODEC_ID_MSZH,
+    CODEC_ID_ZLIB,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE,
@@ -263,7 +267,10 @@ static const __attribute__((unused)) int Motion_Est_QTab[] =
 #define CODEC_FLAG_H263P_AIV      0x00000008 ///< H263 Alternative inter vlc
 #define CODEC_FLAG_OBMC           0x00000001 ///< OBMC
 #define CODEC_FLAG_LOOP_FILTER    0x00000800 ///< loop filter
-#define CODEC_FLAG_H263P_SLICE_STRUCT 0x10000000 
+#define CODEC_FLAG_H263P_SLICE_STRUCT 0x10000000
+#define CODEC_FLAG_INTERLACED_ME  0x20000000 ///< interlaced motion estimation
+#define CODEC_FLAG_SVCD_SCAN_OFFSET 0x40000000 ///< will reserve space for SVCD scan offset user data
+#define CODEC_FLAG_CLOSED_GOP     0x80000000
 /* Unsupported options :
  * 		Syntax Arithmetic coding (SAC)
  * 		Reference Picture Selection
@@ -956,6 +963,8 @@ typedef struct AVCodecContext {
 
     /**
      * qscale factor between p and i frames.
+     * if > 0 then the last p frame quantizer will be used (q= lastp_q*factor+offset)
+     * if < 0 then normal ratecontrol will be done (q= -normal_q*factor+offset)
      * - encoding: set by user.
      * - decoding: unused
      */
@@ -963,8 +972,6 @@ typedef struct AVCodecContext {
     
     /**
      * qscale offset between p and i frames.
-     * if > 0 then the last p frame quantizer will be used (q= lastp_q*factor+offset)
-     * if < 0 then normal ratecontrol will be done (q= -normal_q*factor+offset)
      * - encoding: set by user.
      * - decoding: unused
      */
@@ -1133,7 +1140,7 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_MB_TYPE   8
 #define FF_DEBUG_QP        16
 #define FF_DEBUG_MV        32
-#define FF_DEBUG_VIS_MV    0x00000040
+//#define FF_DEBUG_VIS_MV    0x00000040
 #define FF_DEBUG_SKIP      0x00000080
 #define FF_DEBUG_STARTCODE 0x00000100
 #define FF_DEBUG_PTS       0x00000200
@@ -1143,6 +1150,16 @@ typedef struct AVCodecContext {
 #define FF_DEBUG_VIS_QP    0x00002000
 #define FF_DEBUG_VIS_MB_TYPE 0x00004000
     
+    /**
+     * debug.
+     * - encoding: set by user.
+     * - decoding: set by user.
+     */
+    int debug_mv;
+#define FF_DEBUG_VIS_MV_P_FOR  0x00000001 //visualize forward predicted MVs of P frames
+#define FF_DEBUG_VIS_MV_B_FOR  0x00000002 //visualize forward predicted MVs of B frames
+#define FF_DEBUG_VIS_MV_B_BACK 0x00000004 //visualize backward predicted MVs of B frames
+
     /**
      * error.
      * - encoding: set by lavc if flags&CODEC_FLAG_PSNR
@@ -1182,6 +1199,12 @@ typedef struct AVCodecContext {
      * - decoding: unused
      */
     int mb_cmp;
+    /**
+     * interlaced dct compare function
+     * - encoding: set by user.
+     * - decoding: unused
+     */
+    int ildct_cmp;
 #define FF_CMP_SAD  0
 #define FF_CMP_SSE  1
 #define FF_CMP_SATD 2
@@ -1190,6 +1213,8 @@ typedef struct AVCodecContext {
 #define FF_CMP_BIT  5
 #define FF_CMP_RD   6
 #define FF_CMP_ZERO 7
+#define FF_CMP_VSAD 8
+#define FF_CMP_VSSE 9
 #define FF_CMP_CHROMA 256
     
     /**
@@ -1468,6 +1493,17 @@ typedef struct AVCodecContext {
      * - decoding: unused.
      */
     int error_rate;
+    
+    /**
+     * MP3 antialias algorithm, see FF_AA_* below.
+     * - encoding: unused
+     * - decoding: set by user
+     */
+    int antialias_algo;
+#define FF_AA_AUTO    0
+#define FF_AA_FASTINT 1 //not implemented yet
+#define FF_AA_INT     2
+#define FF_AA_FLOAT   3
 } AVCodecContext;
 
 
@@ -1591,6 +1627,7 @@ extern AVCodec asv2_encoder;
 extern AVCodec vcr1_encoder;
 extern AVCodec ffv1_encoder;
 extern AVCodec mdec_encoder;
+extern AVCodec zlib_encoder;
 
 extern AVCodec h263_decoder;
 extern AVCodec mpeg4_decoder;
@@ -1651,7 +1688,11 @@ extern AVCodec idcin_decoder;
 extern AVCodec eightbps_decoder;
 extern AVCodec smc_decoder;
 extern AVCodec flic_decoder;
+extern AVCodec vmdvideo_decoder;
+extern AVCodec vmdaudio_decoder;
 extern AVCodec truemotion1_decoder;
+extern AVCodec mszh_decoder;
+extern AVCodec zlib_decoder;
 extern AVCodec ra_144_decoder;
 extern AVCodec ra_288_decoder;
 extern AVCodec roq_dpcm_decoder;

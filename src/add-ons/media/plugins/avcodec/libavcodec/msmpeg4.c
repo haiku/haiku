@@ -1,6 +1,7 @@
 /*
  * MSMPEG4 backend for ffmpeg encoder and decoder
  * Copyright (c) 2001 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -730,6 +731,27 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
        necessitate to modify mpegvideo.c. The problem comes from the
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
+#if defined ARCH_X86 && !defined PIC
+    asm volatile(
+        "movl %3, %%eax		\n\t"
+	"shrl $1, %%eax		\n\t"
+	"addl %%eax, %2		\n\t"
+	"addl %%eax, %1		\n\t"
+	"addl %0, %%eax		\n\t"
+	"mull %4		\n\t"
+	"movl %%edx, %0		\n\t"
+	"movl %1, %%eax		\n\t"
+	"mull %4		\n\t"
+	"movl %%edx, %1		\n\t"
+	"movl %2, %%eax		\n\t"
+	"mull %4		\n\t"
+	"movl %%edx, %2		\n\t"
+	: "+b" (a), "+c" (b), "+D" (c)
+	: "g" (scale), "S" (inverse[scale])
+	: "%eax", "%edx"
+    );
+#else
+    /* #elif defined (ARCH_ALPHA) */
     /* Divisions are extremely costly on Alpha; optimize the most
        common case. But they are costly everywhere...
      */
@@ -742,6 +764,7 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
 	b = FASTDIV((b + (scale >> 1)), scale);
 	c = FASTDIV((c + (scale >> 1)), scale);
     }
+#endif
     /* XXX: WARNING: they did not choose the same test as MPEG4. This
        is very important ! */
     if(s->msmpeg4_version>3){

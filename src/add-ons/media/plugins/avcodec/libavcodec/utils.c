@@ -2,6 +2,7 @@
  * utils for libavcodec
  * Copyright (c) 2001 Fabrice Bellard.
  * Copyright (c) 2003 Michel Bardiaux for the av_log API
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -354,6 +355,7 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->lmin= FF_QP2LAMBDA * s->qmin;
     s->lmax= FF_QP2LAMBDA * s->qmax;
     s->sample_aspect_ratio= (AVRational){0,1};
+    s->ildct_cmp= FF_CMP_VSAD;
     
     s->intra_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
@@ -818,9 +820,9 @@ static void av_log_default_callback(AVCodecContext* avctx, int level, const char
     if(level>av_log_level)
 	    return;
     if(avctx && print_prefix)
-        fprintf(stderr, "[%s @ %p]", avctx->codec->name, avctx);
+        fprintf(stderr, "[%s @ %p]", avctx->codec ? avctx->codec->name : "?", avctx);
         
-    print_prefix= (int)strstr(fmt, "\n");
+    print_prefix= strstr(fmt, "\n") != NULL;
         
     vfprintf(stderr, fmt, vl);
 }

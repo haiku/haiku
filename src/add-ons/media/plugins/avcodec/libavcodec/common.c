@@ -1,6 +1,7 @@
 /*
  * Common bit i/o utils
  * Copyright (c) 2000, 2001 Fabrice Bellard.
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -59,7 +60,8 @@ void init_put_bits(PutBitContext *s, uint8_t *buffer, int buffer_size)
 #endif
 }
 
-#ifdef CONFIG_ENCODERS
+//#ifdef CONFIG_ENCODERS
+#if 1
 
 /* return the number of bits output */
 int get_bit_count(PutBitContext *s)

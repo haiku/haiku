@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src add-ons media plugins avcodec libavcodec ;
 
-CFLAGS += -fomit-frame-pointer -DPIC ;
+SubDirCcFlags -fomit-frame-pointer -DPIC ;
 DEFINES += HAVE_AV_CONFIG_H=1 ;
 
 StaticLibrary avcodec :

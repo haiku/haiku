@@ -2158,6 +2158,7 @@ static void common_init(H264Context *h){
     
     init_pred_ptrs(h);
 
+    s->unrestricted_mv=1;
     s->decode=1; //FIXME
 }
 
@@ -4130,6 +4131,7 @@ static int decode_frame(AVCodecContext *avctx,
     int buf_index;
     
     s->flags= avctx->flags;
+    s->flags2= avctx->flags2;
 
     *data_size = 0;
    
@@ -4171,7 +4173,7 @@ static int decode_frame(AVCodecContext *avctx,
     }
 
     *pict= *(AVFrame*)&s->current_picture; //FIXME 
-    ff_print_debug_info(s, s->current_picture_ptr);
+    ff_print_debug_info(s, pict);
     assert(pict->data[0]);
 //printf("out %d\n", (int)pict->data[0]);
 #if 0 //?

@@ -1,7 +1,7 @@
 /*
  * Error resilience / concealment
  *
- * Copyright (c) 2002 Michael Niedermayer <michaelni@gmx.at>
+ * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -582,8 +582,8 @@ static int is_intra_more_likely(MpegEncContext *s){
                 uint8_t *mb_ptr     = s->current_picture.data[0] + mb_x*16 + mb_y*16*s->linesize;
                 uint8_t *last_mb_ptr= s->last_picture.data   [0] + mb_x*16 + mb_y*16*s->linesize;
     
-		is_intra_likely += s->dsp.pix_abs16x16(last_mb_ptr, mb_ptr                    , s->linesize);
-                is_intra_likely -= s->dsp.pix_abs16x16(last_mb_ptr, last_mb_ptr+s->linesize*16, s->linesize);
+		is_intra_likely += s->dsp.sad[0](NULL, last_mb_ptr, mb_ptr                    , s->linesize, 16);
+                is_intra_likely -= s->dsp.sad[0](NULL, last_mb_ptr, last_mb_ptr+s->linesize*16, s->linesize, 16);
             }else{
                 if(IS_INTRA(s->current_picture.mb_type[mb_xy]))
                    is_intra_likely++;
@@ -673,10 +673,16 @@ void ff_er_frame_end(MpegEncContext *s){
     
     if(s->current_picture.motion_val[0] == NULL){
         int size = (2 * s->mb_width + 2) * (2 * s->mb_height + 2);
+        Picture *pic= s->current_picture_ptr;
         
         av_log(s->avctx, AV_LOG_ERROR, "Warning MVs not available\n");
-        
-        s->current_picture.motion_val[0]= av_mallocz(size * 2 * sizeof(int16_t)); //FIXME
+            
+        for(i=0; i<2; i++){
+            pic->motion_val_base[i]= av_mallocz((size+1) * 2 * sizeof(uint16_t)); //FIXME size
+            pic->motion_val[i]= pic->motion_val_base[i]+1;
+        }
+        pic->motion_subsample_log2= 3;
+        s->current_picture= *s->current_picture_ptr;
     }
     
     if(s->avctx->debug&FF_DEBUG_ER){
