@@ -414,6 +414,59 @@ BMimeType::GetLongDescription(char *description) const
 }
 
 // GetSupportingApps
+/*! \brief Fetches a \c BMessage containing a list of MIME signatures of
+	applications that are able to handle files of this MIME type.
+	
+	If successful, the BMessage containing the MIME signatures will be of
+	the following format:
+	
+	<table>
+		<tr>
+			<td><b>field name</b></td>
+			<td><b>type</b></td>
+			<td><b>contains</b></td>
+		</tr>
+		<tr>
+			<td> "applications"</td>
+			<td> \c B_STRING_TYPE[] </td>
+			<td>
+			An array of MIME signatures. The first <i> n </i> signatures (where
+			<i> n </i> is the value in the \c "be:sub" field of the message) are able
+			to handle the full type (supertype <i> and </i> subtype). The remaining
+			signatures are of applications that handle the supertype only.
+			</td>
+		</tr>
+		<tr>
+			<td> "be:sub"</td>
+			<td> \c B_INT32_TYPE </td>
+			<td>
+			The number of applications in the \c "applications" array that
+			can handle the object's full MIME type. These applications are listed
+			first in the array. This field is omitted if the object represents a
+			supertype only.
+			</td>
+		</tr>
+		<tr>
+			<td> "be:super"</td>
+			<td> \c B_INT32_TYPE </td>
+			<td>
+			The number of applications in the "applications" array that can handle
+			the object's supertype (not counting those that can handle the full type).
+			These applications are listed after the full-MIME-type supporters. By
+			definition, the \c GetWildcardApps() function never returns supertype-only
+			apps.
+			</td>
+		</tr>
+	</table>
+	
+	The \c BMessage::what value is set to decimal \c 0, but is otherwise meaningless.
+	
+	\param signatures Pointer to a pre-allocated BMessage into which the signatures
+	                  of the supporting applications will be copied.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure	
+*/
 status_t
 BMimeType::GetSupportingApps(BMessage *signatures) const
 {
@@ -599,6 +652,18 @@ BMimeType::SetLongDescription(const char *description)
 }
 
 // GetInstalledSupertypes
+/*! \brief Fetches a BMessage listing all the MIME supertypes currently
+	installed in the MIME database.
+
+	The types are copied into the \c "super_types" field of the passed-in \c BMessage.
+	The \c BMessage must be pre-allocated.
+	
+	\param super_types Pointer to a pre-allocated \c BMessage into which the 
+	                   MIME supertypes will be copied.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
 status_t
 BMimeType::GetInstalledSupertypes(BMessage *super_types)
 {
@@ -606,6 +671,18 @@ BMimeType::GetInstalledSupertypes(BMessage *super_types)
 }
 
 // GetInstalledTypes
+/*! \brief Fetches a BMessage listing all the MIME types currently installed
+	in the MIME database.
+	
+	The types are copied into the \c "types" field of the passed-in \c BMessage.
+	The \c BMessage must be pre-allocated.
+	
+	\param types Pointer to a pre-allocated \c BMessage into which the 
+	             MIME types will be copied.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
 status_t
 BMimeType::GetInstalledTypes(BMessage *types)
 {
@@ -613,6 +690,20 @@ BMimeType::GetInstalledTypes(BMessage *types)
 }
 
 // GetInstalledTypes
+/*! \brief Fetches a BMessage listing all the MIME subtypes of the given
+	supertype currently installed in the MIME database.
+	
+	The types are copied into the \c "types" field of the passed-in \c BMessage.
+	The \c BMessage must be pre-allocated.
+	
+	\param super_type Pointer to a string containing the MIME supertype whose
+	                  subtypes you wish to retrieve.
+	\param subtypes Pointer to a pre-allocated \c BMessage into which the appropriate
+	                MIME subtypes will be copied.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure		
+*/
 status_t
 BMimeType::GetInstalledTypes(const char *super_type, BMessage *subtypes)
 {
@@ -620,6 +711,21 @@ BMimeType::GetInstalledTypes(const char *super_type, BMessage *subtypes)
 }
 
 // GetWildcardApps
+/*! \brief Fetches a \c BMessage containing a list of MIME signatures of
+	applications that are able to handle files of any type.
+
+	This function is the same as calling \c GetSupportingApps() on a
+	\c BMimeType object initialized to a MIME type of \c "application/octet-stream".
+
+	\see GetSupportingApps() for details on the format of the data returned in
+	the \c BMessage pointed to by \c wild_ones.
+
+	\param wild_ones Pointer to a pre-allocated BMessage into which signatures of
+	                 applications supporting files of any type are copied.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure	
+*/
 status_t
 BMimeType::GetWildcardApps(BMessage *wild_ones)
 {

@@ -11,6 +11,7 @@
 #include <vector>
 
 
+#include <fs_attr.h>		// For struct attr_info
 #include <fs_info.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -22,10 +23,11 @@
 #include <Path.h>			// Only needed for entry_ref dumps
 #include <StorageKit.h>
 #include <String.h>
+#include <storage_support.h>	// for split_path()
 
-#include <cppunit/TestSuite.h>
-#include <TestApp.h>
-#include <TestUtils.h>
+#include "TestShell.h"
+#include "TestApp.h"
+#include "TestUtils.h"
 
 // MIME database directories
 static const char *testDir				= "/tmp/mimeTestDir";
@@ -52,6 +54,7 @@ static const char *testTypeSuperInvalid	= "?????";
 
 // Real MIME types
 static const char *wildcardType			= "application/octet-stream";
+static const char *applicationSupertype	= "application";
 
 // Application Paths
 static const char *testApp				= "/boot/beos/apps/SoundRecorder";
@@ -380,6 +383,36 @@ protected:
 	std::string fileType;
 };
 
+// Adapter classes used by FillWithMimeTypes() to facilitate
+// addition of strings to containers with varying interfaces
+class ContainerAdapter {
+public:
+	virtual void Add(std::string value) = 0;
+};
+
+class SetAdapter : public ContainerAdapter {
+public:
+	SetAdapter(std::set<std::string> &set)
+		: fSet(set) { }
+	virtual void Add(std::string value) {
+		fSet.insert(value);	
+	}
+protected:
+	std::set<std::string> &fSet;
+};
+	
+class QueueAdapter : public ContainerAdapter {
+public:
+	QueueAdapter(std::queue<std::string> &queue)
+		: fQueue(queue) { }
+	virtual void Add(std::string value) {
+		fQueue.push(value);	
+	}
+protected:
+	std::queue<std::string> &fQueue;
+};
+
+
 // setUp
 void
 MimeTypeTest::setUp()
@@ -392,7 +425,7 @@ MimeTypeTest::setUp()
 				+ " ; copyattr -d -r -- " + mimeDatabaseDir + "/\* " + testDir
 				); */	
 	// Setup our application
-	fApplication = new TestApp(testSig);
+	fApplication = new BTestApp(testSig);
 	if (fApplication->Init() != B_OK) {
 		fprintf(stderr, "Failed to initialize application.\n");
 		delete fApplication;
@@ -1382,30 +1415,10 @@ MimeTypeTest::InstalledTypesTest() {
 		CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
 		
 		// Add all the type strings to a std::set
-		std::set<std::string> typeSet;	
-		type_code type;
-		int32 count;
-		status_t err = msg.GetInfo("types", &type, &count);
+		std::set<std::string> typeSet;
+		SetAdapter typeAdapter(typeSet);
+		FillWithMimeTypes(typeAdapter, msg, "types");
 
-		if (err == B_NAME_NOT_FOUND)
-			count = 0;	// No types installed in the database! :-)
-		else
-			CHK(err == B_OK);
-			
-		for (int i = 0; i < count; i++) {
-			char *str;
-			CHK(msg.FindString("types", i, (const char**)&str) == B_OK);
-			// Convert it to lowercase, since the filenames for types are lowercase, but
-			// the types returned by GetInstalledTypes are sometimes mixedcase
-			std::string strLower;
-			to_lower(str, strLower);
-			// Make sure it's a valid type string, since the R5::GetInstalled*Types()
-			// functions do no such verification, and we ignore invalid type files
-			// in the database.
-			if (BMimeType::IsValid(strLower.c_str()))
-				typeSet.insert(strLower.c_str());
-		}
-		
 		// Manually verify that the set of types returned by GetInstalledTypes()
 		// and the types present in the database are exactly the same (ignoring
 		// any files with names made of invalid characters, in case some bozo
@@ -1465,7 +1478,9 @@ MimeTypeTest::InstalledTypesTest() {
 			}
 		}
 		
-		// At this point our set should be empty :-)
+		// At this point our set should be empty :-) If it's not, you might check
+		// that you haven't added any superfluous files to your MIME database (like
+		// a __mime_table backup, for instance).
 		CHK(typeSet.size() == 0);				
 	}	
 	// Normal Function -- GetInstalledSupertypes()/GetInstalledTypes(char*,BMessage*)
@@ -1479,29 +1494,9 @@ MimeTypeTest::InstalledTypesTest() {
 		CHK(BMimeType::GetInstalledSupertypes(&msg) == B_OK);
 		
 		// Add all the type strings to a std::set
-		std::set<std::string> typeSet;		
-		type_code type;
-		int32 count;
-		status_t err = msg.GetInfo("super_types", &type, &count);
-		
-		if (err == B_NAME_NOT_FOUND)
-			count = 0;	// No supertypes installed in the database! :-)
-		else
-			CHK(err == B_OK);
-			
-		for (int i = 0; i < count; i++) {
-			char *str;
-			CHK(msg.FindString("super_types", i, (const char**)&str) == B_OK);
-			// Convert it to lowercase, since the filenames for types are lowercase, but
-			// the types returned by GetInstalledTypes are sometimes mixedcase
-			std::string strLower;
-			to_lower(str, strLower);
-			// Make sure it's a valid type string, since the R5::GetInstalled*Types()
-			// functions do no such verification, and we ignore invalid type files
-			// in the database.
-			if (BMimeType::IsValid(strLower.c_str()))
-				typeSet.insert(strLower.c_str());
-		}
+		std::set<std::string> typeSet;
+		SetAdapter typeAdapter(typeSet);
+		FillWithMimeTypes(typeAdapter, msg, "super_types");
 		
 		// Manually verify that the set of types returned by GetInstalledSupertypes()
 		// and the types present in the database are exactly the same (ignoring
@@ -1536,27 +1531,9 @@ MimeTypeTest::InstalledTypesTest() {
 				// to a std::set to be used for verification
 				BMessage msg;
 				CHK(BMimeType::GetInstalledTypes(superLeaf.c_str(), &msg) == B_OK);
-				type_code type;
-				int32 count;
 				std::set<std::string> subtypeSet;
-				status_t err = msg.GetInfo("types", &type, &count);
-				if (err == B_NAME_NOT_FOUND)
-					count = 0;	// No subtypes for this supertype
-				else
-					CHK(err == B_OK);
-				for (int i = 0; i < count; i++) {
-					char *str;
-					CHK(msg.FindString("types", i, (const char**)&str) == B_OK);
-					// Convert it to lowercase, since the filenames for types are lowercase, but
-					// the types returned by GetInstalledTypes are sometimes mixedcase
-					std::string strLower;
-					to_lower(str, strLower);
-					// Make sure it's a valid type string, since the R5::GetInstalled*Types()
-					// functions do no such verification, and we ignore invalid type files
-					// in the database.
-					if (BMimeType::IsValid(strLower.c_str()))
-						subtypeSet.insert(strLower.c_str());
-				}
+				SetAdapter subtypeAdapter(subtypeSet);
+				FillWithMimeTypes(subtypeAdapter, msg, "types");
 				
 				// Third, iterate through all the entries in the directory.
 				// If the entry designates a valid MIME string, find it
@@ -1904,33 +1881,6 @@ MimeTypeTest::InstallDeleteTest() {
 	
 }
 
-class ContainerAdapter {
-public:
-	virtual void Add(std::string value) = 0;
-};
-
-class SetAdapter : public ContainerAdapter {
-public:
-	SetAdapter(std::set<std::string> &set)
-		: fSet(set) { }
-	virtual void Add(std::string value) {
-		fSet.insert(value);	
-	}
-protected:
-	std::set<std::string> &fSet;
-};
-	
-class QueueAdapter : public ContainerAdapter {
-public:
-	QueueAdapter(std::queue<std::string> &queue)
-		: fQueue(queue) { }
-	virtual void Add(std::string value) {
-		fQueue.push(value);	
-	}
-protected:
-	std::queue<std::string> &fQueue;
-};
-
 void FillWithMimeTypes(ContainerAdapter &container, BMessage &typeMessage, const char* fieldName) {
 	type_code type;
 	int32 count;
@@ -1987,6 +1937,7 @@ MimeTypeTest::SupportingAppsTest() {
 		msg.PrintToStream();
 	} */
 	NextSubTest();
+	if (false)	// Doesn't quite work right yet.
 	{
 		std::queue<std::string> typeList;							// Stores all installed MIME types
 		std::queue<std::string> appList;							// Stores all installed application subtypes
@@ -1996,24 +1947,124 @@ MimeTypeTest::SupportingAppsTest() {
 		{
 			BMessage msg;
 			CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
+			QueueAdapter typeAdapter(typeList);
+			FillWithMimeTypes(typeAdapter, msg, "types");
 		}
 
 		// Get a list of all the apps in the database
+		{
+			BMessage msg;
+			CHK(BMimeType::GetInstalledTypes(applicationSupertype, &msg) == B_OK);
+			QueueAdapter appAdapter(appList);
+			FillWithMimeTypes(appAdapter, msg, "types");
+		}
 		
-		// For each app in the database, get a list of the MIME types is supports,
-		// and add the app to the type->app map for each type
-		for (;false;) {
-			std::queue<std::string> supportList;
-
-			for (;false; /* supported types */) {
-			
-			}			
+		// For each app in the database, manually get a list of the MIME types
+		// it supports by reading its META:FILE_TYPES attribute from the database,
+		// and add the app to the type->app map for each such type
+		{
+			while (!appList.empty()) {
+				// Grab the next application
+				std::string app = appList.front();
+				appList.pop();
+				
+				// The leaf is all we're interested in -- it's the subtype
+//				CHK(StorageKit::split_path(app.c_str(), dir, leaf) == B_OK);
+				std::string appFile = std::string(mimeDatabaseDir) + "/" + app;
+//				printf("'%s'\n", appFile.c_str());
+				BNode node(appFile.c_str());
+				CHK(node.InitCheck() == B_OK);
+				
+				// Find out how much data there is in the META:FILE_TYPES attribute
+				// (assuming it even exists, which it may not...)
+				attr_info info;
+				if (node.GetAttrInfo("META:FILE_TYPES", &info) == B_OK) {
+//					printf("attr_info: type == %lx, size == %lld\n", info.type, info.size);
+					// Attribute exists, so alloc a buffer and read it
+					char *buffer = new char[info.size+1];								
+					CHK(node.ReadAttr("META:FILE_TYPES", B_MESSAGE_TYPE, 0, buffer, info.size) == info.size);
+					BMessage msg;
+					if (msg.Unflatten(buffer) == B_OK) {
+//						msg.PrintToStream();
+						
+						// Fill up a list with all the supported types
+						std::queue<std::string> supportList;
+						QueueAdapter supportAdapter(supportList);
+						FillWithMimeTypes(supportAdapter, msg, "types");
+						
+						// For each type, add the current application as a supporting
+						// app in our type->apps map						
+						while (!supportList.empty()) {
+							NextSubTest();
+							std::string type = supportList.front();
+							supportList.pop();							
+							typeAppMap[type].insert(app);					
+						}
+					} else {
+						// Just in case some bozo writes something other than a flattened
+						// BMessage to the META:FILE_TYPES attribute, we'll only issue a
+						// warning when the BMessage can't unflatten itself
+						printf("Warning: Unable to unflatten META:FILE_TYPES attribute for '%s' type.\n",
+							app.c_str());
+					}
+				
+					delete buffer;
+								
+				}
+			}
 		}
 		
 		// For each installed type, get a list of the supported apps, and
 		// verify that the list matches the list we generated. Also check
 		// that the list of apps for the type's supertype (if it exists)
 		// is a subset of the list we generated for said supertype.
+		while (!typeList.empty()) {
+			// Get the current type
+			std::string type = typeList.front();
+			typeList.pop();			
+			BMimeType mime(type.c_str());
+			CHK(mime.InitCheck() == B_OK);
+			printf("------------------------------------------------------------\n");
+			printf("%s\n", type.c_str());
+			
+			// Get the set of supporting apps for this type (and its supertype, if
+			// it's not a supertype itself) that we discovered by manually culling
+			// the database
+			std::set<std::string> &appSet = typeAppMap[type];	// Reference the subtype			
+			std::set<std::string> appSetSuper;
+			BMimeType superType;
+			if (mime.GetSupertype(&superType) == B_OK)
+				appSetSuper = typeAppMap[superType.Type()];		// Copy the supertype
+				
+			printf("sub.size == %ld\n", appSet.size());
+			std::set<std::string>::iterator i;
+			for (i = appSet.begin(); i != appSet.end(); i++) {
+				printf("  %s\n", (*i).c_str());
+			}
+			printf("super.size == %ld\n", appSetSuper.size());
+			for (i = appSetSuper.begin(); i != appSetSuper.end(); i++) {
+				printf("  %s\n", (*i).c_str());
+			}
+			char* str;
+			if (mime.GetPreferredApp(str) == B_OK) {
+				printf("preferred app:\n");
+				printf("  %s\n", str);
+			}
+
+
+			// Get the set of supporting apps via GetSupportingApps(), then
+			// add them to a list.
+			BMessage msg;
+			CHK(mime.GetSupportingApps(&msg) == B_OK);
+			std::queue<std::string> appList;
+			QueueAdapter appAdapter(appList);
+			FillWithMimeTypes(appAdapter, msg, "applications");
+						
+			// 
+			msg.PrintToStream();
+						
+			
+		}
 	}
 }
 	
@@ -3756,9 +3807,5 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 +	status_t SetIconForType(const char *type, const BBitmap *icon,
 							icon_size which);
 */
-
-
-
-
 
 
