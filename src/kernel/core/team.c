@@ -447,7 +447,8 @@ team_delete_team(struct team *team)
 		temp_thread = team->thread_list;
 		while (temp_thread) {
 			struct thread *next = temp_thread->team_next;
-			thread_kill_thread_nowait(temp_thread->id);
+
+			send_signal_etc(temp_thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 			temp_thread = next;
 		}
 		RELEASE_TEAM_LOCK();
