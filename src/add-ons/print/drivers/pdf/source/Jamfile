@@ -4,7 +4,7 @@ SubDir OBOS_TOP src add-ons print drivers pdf source ;
 Addon 
 	PDF
 	:
-	add-ons/Print
+	Print
 	:
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp
