@@ -4,7 +4,7 @@
  * by J. Kercheval, and on code written by Kenneth Almquist, though
  * it shares no code.
  *
- * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1573,29 +1573,47 @@ Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *
 	status_t oldStatus = fExpression->Root()->Match(inode, attribute, type, oldKey, oldLength);
 	status_t newStatus = fExpression->Root()->Match(inode, attribute, type, newKey, newLength);
 
-	int32 op;
-	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
-		// only send out a notification if the name was changed 
+	const char *name = NULL;
+	bool entryCreated;
+
+	if (oldStatus != MATCH_OK) {
+		if (newStatus != MATCH_OK) {
+			// nothing has changed
+			return;
+		}
+		entryCreated = true;
+	} else if (newStatus != MATCH_OK) {
+		// entry got removed
+		entryCreated = false;
+	} else {
+		// the entry stays in the query - only notify in case the name of the inode was changed
 		if (oldKey == NULL || strcmp(attribute, "name"))
 			return;
 
-		send_notification(fPort, fToken, B_QUERY_UPDATE, B_ENTRY_REMOVED, fVolume->ID(), 0,
-			fVolume->ToVnode(inode->Parent()), 0, inode->ID(), (const char *)oldKey);
-		op = B_ENTRY_CREATED;
-	} else if (oldStatus != MATCH_OK && newStatus != MATCH_OK) {
-		// nothing has changed
-		return;
-	} else if (oldStatus == MATCH_OK && newStatus != MATCH_OK)
-		op = B_ENTRY_REMOVED;
-	else
-		op = B_ENTRY_CREATED;
+		notify_query_entry_removed(fPort, fToken, fVolume->ID(),
+			fVolume->ToVnode(inode->Parent()), (const char *)oldKey, inode->ID());
+		name = (const char *)newKey;
+		entryCreated = true;
+	}
 
-	// if "value" is NULL, send_notification() crashes...
-	const char *value = (const char *)newKey;
-	if (type != B_STRING_TYPE || value == NULL)
-		value = "";
+	// we may need to get the name of the inode
 
-	send_notification(fPort, fToken, B_QUERY_UPDATE, op, fVolume->ID(), 0,
-		fVolume->ToVnode(inode->Parent()), 0, inode->ID(), value);
+	char nameBuffer[B_FILE_NAME_LENGTH];
+
+	if (name == NULL) {
+		if (inode->GetName(nameBuffer) != B_OK)
+			nameBuffer[0] = '\0';
+		name = nameBuffer;
+	}
+
+	// notify query listeners
+
+	if (entryCreated) {
+		notify_query_entry_created(fPort, fToken, fVolume->ID(),
+			fVolume->ToVnode(inode->Parent()), name, inode->ID());
+	} else {
+		notify_query_entry_removed(fPort, fToken, fVolume->ID(),
+			fVolume->ToVnode(inode->Parent()), name, inode->ID());
+	}
 }
 
