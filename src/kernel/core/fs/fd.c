@@ -102,9 +102,11 @@ err:
 void
 put_fd(struct file_descriptor *descriptor)
 {
+	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n", descriptor, descriptor->ref_count, descriptor->cookie));
+
 	// free the descriptor if we don't need it anymore
 	if (atomic_add(&descriptor->ref_count, -1) == 1) {
-		// close the underlying object (and free any resources allocated there)=
+		// close the underlying object (and free any resources allocated there)
 		if (descriptor->ops->fd_close)
 			descriptor->ops->fd_close(descriptor);
 		if (descriptor->ops->fd_free)
