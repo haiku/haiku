@@ -119,6 +119,10 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	TRACE(("paddr 0x%lx @ index %ld\n", physicalAddress,
 		(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE));
 	sPageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = physicalAddress | flags;
+
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+		// should not be necessary (as we can't free memory yet),
+		// but it won't hurt either :)
 }
 
 
@@ -228,6 +232,19 @@ init_page_directory()
 
 
 //	#pragma mark -
+
+
+extern "C" addr_t
+mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
+{
+	addr_t address = sNextVirtualAddress;
+
+	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+		map_page(get_next_virtual_page(), physicalAddress + offset, flags);
+	}
+
+	return address;
+}
 
 
 extern "C" void *

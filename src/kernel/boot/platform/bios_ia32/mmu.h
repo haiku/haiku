@@ -15,6 +15,7 @@ extern "C" {
 
 extern void mmu_init(void);
 extern void mmu_init_for_kernel(void);
+extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
 extern void *mmu_allocate(void *virtualAddress, size_t size);
 extern void mmu_free(void *virtualAddress, size_t size);
 
