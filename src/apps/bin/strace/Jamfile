@@ -1,0 +1,33 @@
+SubDir OBOS_TOP src apps bin strace ;
+
+# We need our objects dir in the include paths.
+SetupObjectsDir ;
+
+UseArchHeaders $(OBOS_ARCH) ;
+UsePrivateHeaders kernel ;
+UsePrivateHeaders shared ;
+
+local straceSources = strace.cpp MemoryReader.cpp TypeHandler.cpp ;
+
+local straceSyscallsIndices
+	= 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 ;
+
+local straceSyscallsSource = [ FGristFiles strace_syscalls.cpp ] ;
+local straceSyscallsObjects ;
+
+local i ;
+for i in $(straceSyscallsIndices) {
+	local object = [ FGristFiles strace_syscalls$(i).o ] ;
+	straceSyscallsObjects += $(object) ;
+
+	Object $(object) : $(straceSyscallsSource) ;
+
+	ObjectDefines $(object)
+		: GET_SYSCALLS=get_syscalls$(i) SYSCALLS_CHUNK_$(i) ;
+}
+
+BinCommand strace : $(straceSources)
+	: $(straceSyscallsObjects) libroot.so libstdc++.r4.so ;
+
+# We need to specify the dependency on the generated syscalls file explicitly.
+Includes $(straceSyscallsSource) : <syscalls>strace_syscalls.h ;
