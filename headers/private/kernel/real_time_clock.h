@@ -16,10 +16,6 @@ extern "C" {
 status_t rtc_init(kernel_args *ka);
 	// Initialize the real-time clock.
 
-void rtc_set_system_time(uint32 currentTime);
-	// Set the system time.  'currentTime' is the number of seconds
-	// elapsed since Jan. 1, 1970.
-
 bigtime_t rtc_boot_time(void);
 	// Returns the time at which the system was booted in microseconds since Jan 1, 1970.
 
