@@ -167,6 +167,8 @@ InputServer::~InputServer(void)
 	
 #ifdef COMPILE_FOR_R5
 	delete_port(fAsPort);
+	fAsPort = -1;
+	fAppBuffer = NULL;
 	delete_area(fCloneArea);
 #endif
 
@@ -323,6 +325,8 @@ InputServer::QuitRequested(void)
 	CALLED();
 	if (!BApplication::QuitRequested())
 		return false;
+		
+	PostMessage(SYSTEM_SHUTTING_DOWN);
 	
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
@@ -1220,7 +1224,8 @@ InputServer::DispatchEvent(BMessage *message)
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
 	
-	write_port(fAsPort, 0, buffer, length);
+	if (fAsPort>0)
+		write_port(fAsPort, 0, buffer, length);
 	
 #endif	// COMPILE_FOR_R5
 
