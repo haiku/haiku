@@ -378,10 +378,11 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		// Debug the new thread, if the parent thread required that (see above),
 		// or the respective global team debug flag is set. But only, if a
 		// debugger is installed for the team.
-		debugNewThread
-			|= (team->debug_info.flags & B_TEAM_DEBUG_STOP_NEW_THREADS);
+		debugNewThread |= (atomic_get(&team->debug_info.flags)
+			& B_TEAM_DEBUG_STOP_NEW_THREADS);
 		if (debugNewThread
-			&& (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
+			&& (atomic_get(&team->debug_info.flags)
+				& B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
 			t->debug_info.flags |= B_THREAD_DEBUG_STOP;
 		}
 
@@ -722,7 +723,7 @@ struct thread_exit_args {
 	cpu_status		int_state;
 	uint32			death_stack;
 	sem_id			death_sem;
-	team_id			teamID;
+	team_id			original_team_id;
 };
 
 
@@ -771,8 +772,10 @@ thread_exit2(void *_args)
 	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 
 	// notify the debugger
-	if (args.teamID >= 0 && args.teamID != team_get_kernel_team_id())
-		user_debug_thread_deleted(args.teamID, args.thread->id);
+	if (args.original_team_id >= 0
+		&& args.original_team_id != team_get_kernel_team_id()) {
+		user_debug_thread_deleted(args.original_team_id, args.thread->id);
+	}
 
 	// return the death stack and reschedule one last time
 	put_death_stack_and_reschedule(args.death_stack);
@@ -961,7 +964,7 @@ thread_exit(void)
 		args.old_kernel_stack = thread->kernel_stack_area;
 		args.death_stack = death_stack;
 		args.death_sem = cachedDeathSem;
-		args.teamID = teamID;
+		args.original_team_id = teamID;
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
