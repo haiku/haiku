@@ -976,6 +976,27 @@ StyledEditWindow::RevertToSaved()
 	entry_ref ref;
 	const char *name;
 
+	fSaveMessage->FindRef("directory", &ref);
+	fSaveMessage->FindString("name", &name);
+		
+	BDirectory dir(&ref);
+
+ 	BFile file(&dir, name, B_READ_ONLY);
+	status_t result;
+ 	result = file.InitCheck();
+ 	if (result != B_OK) {
+ 		BAlert *vanishedAlert;
+		BString alertText;
+		alertText.SetTo("Cannot revert, file not found: \"");
+		alertText<< name;
+		alertText<<"\".";
+		vanishedAlert = new BAlert("vanishedAlert",alertText.String(), "Bummer", 0, 0, 
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
+		vanishedAlert->SetShortcut(0, B_ESCAPE);
+		vanishedAlert->Go();
+		return;
+ 	}
+ 	
 	int32 buttonIndex= 0; 
 	BAlert *revertAlert;
 	BString alertText;
@@ -991,14 +1012,25 @@ StyledEditWindow::RevertToSaved()
 		return;
 	} 
 				
-	fSaveMessage->FindRef("directory", &ref);
-	fSaveMessage->FindString("name", &name);
-		
-	BDirectory dir(&ref);
-
- 	BFile file(&dir, name, B_READ_ONLY | B_CREATE_FILE);
 	fTextView->Reset();  			    //clear the textview...
-	fTextView->GetStyledText(&file); 	//and fill it from the file
+	result = fTextView->GetStyledText(&file); //he he he :)
+
+	if (result != B_OK) {
+		BAlert *loadFailedAlert;
+		BString alertText;
+		if (result == B_TRANSLATION_ERROR_BASE) {
+			alertText.SetTo("Translation error loading \"");
+		} else {
+			alertText.SetTo("Unknown error loading \"");
+		}			
+		alertText<< name;
+		alertText<<"\".";
+		loadFailedAlert= new BAlert("loadFailedAlert",alertText.String(), "Bummer", 0, 0, 
+			B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
+		loadFailedAlert->SetShortcut(0, B_ESCAPE);
+		loadFailedAlert->Go();
+		return;
+	}
 
 	// update alignment
 	switch (fTextView->Alignment()) {
