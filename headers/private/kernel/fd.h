@@ -19,8 +19,8 @@ extern "C" {
 struct select_sync;
 
 struct fd_ops {
-	ssize_t		(*fd_read)(struct file_descriptor *, off_t pos, void *buffer, size_t *length);
-	ssize_t		(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
+	status_t	(*fd_read)(struct file_descriptor *, off_t pos, void *buffer, size_t *length);
+	status_t	(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
 	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
 	status_t	(*fd_select)(struct file_descriptor *, uint8 event, uint32 ref, struct select_sync *sync);
