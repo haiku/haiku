@@ -184,6 +184,15 @@ get_seekable(BDataIO * data)
 		// really screwed
 		return 0;
 	}
+	// next try to seek to the end of the stream (absolutely)
+	if (seekable->Seek(0, SEEK_END) < 0) {
+		return 0;
+	}
+	// then seek back to where we started
+	if (seekable->Seek(current, SEEK_SET) < 0) {
+		// really screwed
+		return 0;
+	}
 	return seekable;
 }
 
