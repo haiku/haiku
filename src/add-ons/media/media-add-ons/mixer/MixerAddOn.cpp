@@ -83,7 +83,7 @@ BMediaNode *
 AudioMixerAddon::InstantiateNodeFor(const flavor_info* info, BMessage* config,
 									status_t* out_error)
 {
-	return new AudioMixer(this);
+	return new AudioMixer(this, false);
 }
 
 status_t
@@ -110,11 +110,7 @@ AudioMixerAddon::AutoStart(int in_index, BMediaNode ** out_node,
 		return B_ERROR;
 
 	*out_internal_id = 0;
-	AudioMixer *mixer = new AudioMixer(this);
-
-	// disable stop on the auto started (system) mixer
-	mixer->DisableNodeStop();
-
+	AudioMixer *mixer = new AudioMixer(this, true);
 	*out_node = mixer;
 	
 	return B_OK;

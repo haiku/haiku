@@ -34,7 +34,7 @@ class AudioMixer :
 
 	public:
 					
-					AudioMixer(BMediaAddOn *addOn);
+					AudioMixer(BMediaAddOn *addOn, bool isSystemMixer);
 					~AudioMixer();
 		
 		

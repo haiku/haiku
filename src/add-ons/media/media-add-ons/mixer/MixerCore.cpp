@@ -100,23 +100,23 @@ MixerCore::SetOutputAttenuation(float gain)
 	fOutputGain = gain;
 }
 
-bool
+MixerInput *
 MixerCore::AddInput(const media_input &input)
 {
 	ASSERT_LOCKED();
-	if (HasKawamba())
-		fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate * 1.5, fMixBufferFrameCount * 2));
-	else
-		fInputs->AddItem(new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount));
-	return true;
+	MixerInput *in = new MixerInput(this, input, fMixBufferFrameRate, fMixBufferFrameCount);
+	fInputs->AddItem(in);
+	return in;
 }
 
-bool
+MixerOutput *
 MixerCore::AddOutput(const media_output &output)
 {
 	ASSERT_LOCKED();
-	if (fOutput)
-		return false;
+	if (fOutput) {
+		ERROR("MixerCore::AddOutput: already connected\n");
+		return fOutput;
+	}
 	fOutput = new MixerOutput(this, output);
 	// the output format might have been adjusted inside MixerOutput
 	ApplyOutputFormat();
@@ -124,6 +124,8 @@ MixerCore::AddOutput(const media_output &output)
 	ASSERT(!fRunning);
 	if (fStarted && fOutputEnabled)
 		StartMixThread();
+		
+	return fOutput;
 }
 
 bool

@@ -9,6 +9,8 @@ class MixerSettings
 public:
 	MixerSettings();
 	~MixerSettings();
+	
+	void	SetSettingsFile(const char *file);
 
 	bool	AttenuateOutput();
 	void	SetAttenuateOutput(bool yesno);
@@ -37,16 +39,16 @@ public:
 	bool	RefuseInputFormatChange();
 	void	SetRefuseInputFormatChange(bool yesno);
 
-	void	SaveGain(MixerInput *input);
-	void	LoadGain(MixerInput *input);
+	void	SaveConnectionSettings(MixerInput *input);
+	void	LoadConnectionSettings(MixerInput *input);
 
-	void	SaveGain(MixerOutput *output);
-	void	LoadGain(MixerOutput *output);
+	void	SaveConnectionSettings(MixerOutput *output);
+	void	LoadConnectionSettings(MixerOutput *output);
 	
 protected:
 
-	void	SaveGainSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count);
-	void	LoadGainSetting(const char *name, uint32 channel_mask, float *gain, int gain_count);
+	void	SaveConnectionSettingsSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count);
+	void	LoadConnectionSettingsSetting(const char *name, uint32 channel_mask, float *gain, int gain_count);
 
 	void	SaveSetting(const char *name, int value);
 	void	LoadSetting(const char *name, int *value, int default_value = 0);
@@ -61,11 +63,13 @@ protected:
 	void 	SaveThread();
 	
 	BLocker		*fLocker;
-	bool		fSettingsDirty;
-	bigtime_t	fSettingsLastChange;
-	
-	thread_id	fSaveThread;
-	sem_id		fSaveThreadWaitSem;
+	BPath		*fSettingsFile;
+
+	volatile bool		fSettingsDirty;
+	volatile bigtime_t	fSettingsLastChange;
+	volatile thread_id	fSaveThread;
+	volatile sem_id		fSaveThreadWaitSem;
+	volatile bool		fSaveThreadRunning;
 
 	struct settings
 	{
@@ -80,7 +84,7 @@ protected:
 		bool	RefuseInputFormatChange;
 	};
 
-	settings	fSettings;
+	volatile settings	fSettings;
 };
 
 #endif //_MIXER_SETTINGS_H

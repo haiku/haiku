@@ -8,6 +8,8 @@
 #include <TimeSource.h>
 #include <ParameterWeb.h>
 #include <MediaRoster.h>
+#include <FindDirectory.h>
+#include <Path.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +42,7 @@ static void multi_audio_format_specialize(media_multi_audio_format *format, cons
 #define FORMAT_USER_DATA_MAGIC_1	0xc84173bd
 #define FORMAT_USER_DATA_MAGIC_2	0x4af62b7d
 
-AudioMixer::AudioMixer(BMediaAddOn *addOn)
+AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 		:	BMediaNode("Audio Mixer"),
 			BBufferConsumer(B_MEDIA_RAW_AUDIO),
 			BBufferProducer(B_MEDIA_RAW_AUDIO),
@@ -66,6 +68,18 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 	fDefaultFormat.u.raw_audio.channel_mask = 0;
 	fDefaultFormat.u.raw_audio.valid_bits = 0;
 	fDefaultFormat.u.raw_audio.matrix_mask = 0;
+	
+	if (isSystemMixer) {
+		// to get persistent settings, assign a settings file
+		BPath path;
+		if (B_OK != find_directory (B_USER_SETTINGS_DIRECTORY, &path))
+			path.SetTo("/boot/home/config/settings/");
+		path.Append("System Audio Mixer");
+		fCore->Settings()->SetSettingsFile(path.Path());
+		
+		// disable stop on the auto started (system) mixer
+		DisableNodeStop();
+	}
 	
 	ApplySettings();
 }
@@ -328,7 +342,10 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 		sprintf(out_input->name, "Input %ld", out_input->destination.id);
 
 	// add a new input to the mixer engine
-	fCore->AddInput(*out_input);
+	MixerInput *input;
+	input = fCore->AddInput(*out_input);
+
+	fCore->Settings()->LoadConnectionSettings(input);
 
 	fCore->Unlock();
 	
@@ -786,6 +803,9 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	fCore->EnableOutput(true);
 	fCore->SetTimingInfo(TimeSource(), fDownstreamLatency);
 	fCore->SetOutputBufferGroup(fBufferGroup);
+	
+	fCore->Settings()->LoadConnectionSettings(fCore->Output());
+
 	fCore->Unlock();
 
 	UpdateParameterWeb();
@@ -1353,6 +1373,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 				goto err;
 			output->SetOutputChannelSourceGain(PARAM_CHAN(id), PARAM_SRC(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]));
 		}
+		fCore->Settings()->SaveConnectionSettings(output);
 	} else {
 		MixerInput *input;
 		for (int i = 0; (input = fCore->Input(i)); i++)
@@ -1457,6 +1478,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			// but it will change the fokus from tab 3 to tab 1
 			update = true;
 		}
+		fCore->Settings()->SaveConnectionSettings(input);
 	}
 	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);
 err:

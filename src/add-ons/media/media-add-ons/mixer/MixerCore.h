@@ -29,8 +29,8 @@ public:
 	// the audio mixer node using SetOutputAttenuation()
 	void SetOutputAttenuation(float gain);
 	
-	bool AddInput(const media_input &input);
-	bool AddOutput(const media_output &output);
+	MixerInput * AddInput(const media_input &input);
+	MixerOutput * AddOutput(const media_output &output);
 
 	bool RemoveInput(int32 inputID);
 	bool RemoveOutput();

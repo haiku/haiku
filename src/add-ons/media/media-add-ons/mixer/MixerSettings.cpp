@@ -1,5 +1,6 @@
 #include <MediaDefs.h>
 #include <Locker.h>
+#include <Path.h>
 #include <OS.h>
 
 #include "MixerCore.h"
@@ -8,15 +9,17 @@
 #include "MixerSettings.h"
 #include "debug.h"
 
-#define SAVE_DELAY		8000000		// delay saving of settings for 8s
-#define SAVE_RUNTIME	40000000	// stop save thread after 40s inactivity
+#define SAVE_DELAY		5000000		// delay saving of settings for 5s
+#define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity
 
 MixerSettings::MixerSettings()
  :	fLocker(new BLocker),
+ 	fSettingsFile(0),
 	fSettingsDirty(false),
 	fSettingsLastChange(0),
 	fSaveThread(-1),
-	fSaveThreadWaitSem(-1)
+	fSaveThreadWaitSem(-1),
+	fSaveThreadRunning(false)
 {
 	Load();
 }
@@ -27,6 +30,16 @@ MixerSettings::~MixerSettings()
 	if (fSettingsDirty)
 		Save();
 	delete fLocker;
+	delete fSettingsFile;
+}
+
+void
+MixerSettings::SetSettingsFile(const char *file)
+{
+	fLocker->Lock();
+	delete fSettingsFile;
+	fSettingsFile = new BPath(file);
+	fLocker->Unlock();
 }
 
 bool
@@ -201,27 +214,29 @@ MixerSettings::SetRefuseInputFormatChange(bool yesno)
 }
 
 void
-MixerSettings::SaveGain(MixerInput *input)
+MixerSettings::SaveConnectionSettings(MixerInput *input)
+{
+	StartDeferredSave();
+}
+
+void
+MixerSettings::LoadConnectionSettings(MixerInput *input)
 {
 }
 
 void
-MixerSettings::LoadGain(MixerInput *input)
+MixerSettings::SaveConnectionSettings(MixerOutput *output)
+{
+	StartDeferredSave();
+}
+
+void
+MixerSettings::LoadConnectionSettings(MixerOutput *output)
 {
 }
 
 void
-MixerSettings::SaveGain(MixerOutput *output)
-{
-}
-
-void
-MixerSettings::LoadGain(MixerOutput *output)
-{
-}
-
-void
-MixerSettings::SaveGainSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count)
+MixerSettings::SaveConnectionSettingsSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count)
 {
 	fLocker->Lock();
 	
@@ -232,7 +247,7 @@ MixerSettings::SaveGainSetting(const char *name, uint32 channel_mask, const floa
 }
 
 void
-MixerSettings::LoadGainSetting(const char *name, uint32 channel_mask, float *gain, int gain_count)
+MixerSettings::LoadConnectionSettingsSetting(const char *name, uint32 channel_mask, float *gain, int gain_count)
 {
 	fLocker->Lock();
 	
@@ -266,7 +281,14 @@ void
 MixerSettings::Save()
 {
 	fLocker->Lock();
+	// if we don't have a settings file, don't continue
+	if (!fSettingsFile) {
+		fLocker->Unlock();
+		return;
+	}
 	TRACE("MixerSettings: SAVE!\n");
+
+
 
 	
 	// XXX work 
@@ -279,9 +301,7 @@ void
 MixerSettings::Load()
 {
 	fLocker->Lock();
-	
-	// XXX work
-	
+	// setup defaults
 	fSettings.AttenuateOutput = true;
 	fSettings.NonLinearGainSlider = true;
 	fSettings.UseBalanceControl = false;
@@ -292,6 +312,12 @@ MixerSettings::Load()
 	fSettings.RefuseOutputFormatChange = false;
 	fSettings.RefuseInputFormatChange = false;
 	
+	// if we don't have a settings file, don't continue
+	if (!fSettingsFile) {
+		fLocker->Unlock();
+		return;
+	}
+	
 	fLocker->Unlock();
 }
 
@@ -299,29 +325,45 @@ void
 MixerSettings::StartDeferredSave()
 {
 	fLocker->Lock();
+	
+	// if we don't have a settings file, don't save the settings
+	if (!fSettingsFile) {
+		fLocker->Unlock();
+		return;
+	}
 
 	fSettingsDirty = true;
 	fSettingsLastChange = system_time();
 	
-	if (fSaveThread < 0) {
-		ASSERT(fSaveThreadWaitSem < 0);
-		fSaveThreadWaitSem = create_sem(0, "save thread wait");
-		if (fSaveThreadWaitSem < B_OK) {
-			ERROR("MixerSettings: can't create semaphore\n");
-			Save();
-			fLocker->Unlock();
-			return;
-		}
-		fSaveThread = spawn_thread(_save_thread_, "deferred settings save", 7, this);
-		if (fSaveThread < B_OK) {
-			ERROR("MixerSettings: can't spawn thread\n");
-			delete_sem(fSaveThreadWaitSem);
-			fSaveThreadWaitSem = -1;
-			Save();
-			fLocker->Unlock();
-			return;
-		}
+	if (fSaveThreadRunning) {
+		fLocker->Unlock();
+		return;
 	}
+	
+	StopDeferredSave();
+	
+	ASSERT(fSaveThreadWaitSem < 0);
+	fSaveThreadWaitSem = create_sem(0, "save thread wait");
+	if (fSaveThreadWaitSem < B_OK) {
+		ERROR("MixerSettings: can't create semaphore\n");
+		Save();
+		fLocker->Unlock();
+		return;
+	}
+	ASSERT(fSaveThread < 0);
+	fSaveThread = spawn_thread(_save_thread_, "Attack of the Killer Tomatoes", 7, this);
+	if (fSaveThread < B_OK) {
+		ERROR("MixerSettings: can't spawn thread\n");
+		delete_sem(fSaveThreadWaitSem);
+		fSaveThreadWaitSem = -1;
+		Save();
+		fLocker->Unlock();
+		return;
+	}
+	resume_thread(fSaveThread);
+	
+	fSaveThreadRunning = true;
+
 	fLocker->Unlock();
 }
 
@@ -374,6 +416,7 @@ MixerSettings::SaveThread()
 		}
 
 		if (delta > SAVE_RUNTIME) {
+			fSaveThreadRunning = false;
 			fLocker->Unlock();
 			break;
 		}
