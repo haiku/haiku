@@ -53,3 +53,15 @@ OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/driv
 	<installed>net_stack_driver	: 
 	installed-symlink 
 ;
+
+Package openbeos-networkingkit-cvs :
+	net_stack_driver net_server_driver :
+	boot home config add-ons kernel drivers bin ;
+
+Package openbeos-networkingkit-cvs :
+	<kernel!drivers!dev!net>net_stack_driver :
+	boot home config add-ons kernel drivers dev net ;
+
+Package openbeos-networkingkit-cvs :
+	<kernel!drivers!dev!net>net_server_driver :
+	boot home config add-ons kernel drivers dev net ;
