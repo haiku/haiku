@@ -8,6 +8,7 @@
 
 /* Team functions */
 
+#include <debugger.h>
 #include <OS.h>
 
 #include <team.h>
@@ -689,6 +690,8 @@ create_team_struct(const char *name, bool kernel)
 
 	list_init(&team->image_list);
 
+	clear_team_debug_info(&team->debug_info);
+
 	if (arch_team_init_team_struct(team, kernel) < 0)
 		goto error2;
 
@@ -745,6 +748,13 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 void
 team_delete_team(struct team *team)
 {
+	// if the team was being debugged, stop that now
+	team_id teamID = team->id;
+	port_id debuggerPort
+		= (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED
+			? team->debug_info.debugger_port : -1);
+	destroy_team_debug_info(&team->debug_info);
+
 	if (team->num_threads > 0) {
 		// there are other threads still in this team,
 		// cycle through and signal kill on each of the threads
@@ -786,6 +796,15 @@ team_delete_team(struct team *team)
 	vfs_free_io_context(team->io_context);
 
 	free(team);
+
+	// notify the debugger, that the team is gone
+	if (debuggerPort >= 0) {
+		debug_team_deleted message;
+		message.team = teamID;
+		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
+			sizeof(message), B_RELATIVE_TIMEOUT, 0);
+			// ToDo: Would it be OK to wait here?
+	}
 }
 
 
