@@ -117,9 +117,13 @@ real_time_clock_usecs(void)
 //	public userland API
 
 
-void
+status_t
 _user_set_real_time_clock(uint32 time)
 {
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+
 	set_real_time_clock(time);
+	return B_OK;
 }
 
