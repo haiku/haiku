@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 	
 	Other authors:
-	Rudolf Cornelissen 10/2002-4/2003
+	Rudolf Cornelissen 10/2002-3/2004
 */
 
 #define MODULE_BIT 0x08000000
@@ -112,12 +112,12 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		/* only export 2D acceleration functions in modes that are capable of it */
 		/* used by the app_server and applications (BWindowScreen) */
 		CHKA(SCREEN_TO_SCREEN_BLIT);
-		CHKA(FILL_RECTANGLE);
-		CHKA(INVERT_RECTANGLE);
-		CHKA(FILL_SPAN);
+//		CHKA(FILL_RECTANGLE);
+//		CHKA(INVERT_RECTANGLE);
+//		CHKA(FILL_SPAN);
 		/* not (yet) used by the app_server:
 		 * so just for application use (BWindowScreen) */
-		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
+//		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
 		//CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
 	}
 

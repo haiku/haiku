@@ -1,7 +1,7 @@
 /* nm Acceleration functions */
-/* Authors:
-   Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-8/2003.
+
+/* Author:
+   Rudolf Cornelissen 3/2004.
 */
 
 #define MODULE_BIT 0x00080000
@@ -17,27 +17,16 @@ invert rectangle
 blit
 */
 
-/* G100 pre SRCORG/DSTORG registers */
-static uint32 src_dst;
-/* MIL1/2 adress linearisation does not always work */
-static uint8 y_lin;
-static uint8 depth;
-
-/* needed by MIL 1/2 because of adress linearisation constraints */
-#define ACCW_YDSTLEN(dst, len) do { \
-	if (y_lin) { \
-		ACCW(YDST,((dst)* (si->fbc.bytes_per_row / (depth >> 3))) >> 5); \
-		ACCW(LEN,len); \
-	} else ACCW(YDSTLEN,((dst)<<16)|(len)); \
-} while (0)
-
+//fixme: acc setup for NM2097 and NM2160 only for now...
 status_t nm_acc_wait_idle()
 {
-//	volatile int i;
-//	while (ACCR(STATUS)&(1<<16))
-//	{
-//		for (i=0;i<10000;i++); /*spin in place so I do not hammer the bus*/
-//	};
+	/* wait until engine completely idle */
+	while (ACCR(STATUS) & 0x00000001)
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100); 
+	}
+
 	return B_OK;
 }
 
@@ -45,172 +34,84 @@ status_t nm_acc_wait_idle()
  * Engine required init. */
 status_t nm_acc_init()
 {
-	/* used for convenience: MACCESS is a write only register! */
-	uint32 maccess = 0x00000000;
-
-	/* preset using hardware adress linearisation */
-	y_lin = 0x00;
-	/* reset depth */
-	depth = 0;
-
-	/* cleanup bitblt */
-	ACCW(OPMODE,0);
-
-	/* Set the Z origin to the start of FB (otherwise lockup on blits) */
-	ACCW(ZORG,0);
+	uint32 depth;
 
 	/* Set pixel width */
 	switch(si->dm.space)
 	{
 	case B_CMAP8:
-		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x00));
-		depth = 8;
+		/* b8-9 determine engine colordepth */
+		si->engine.control = (1 << 8);
+//	nAcl->ColorShiftAmt = 8;
+		depth = 1;
 		break;
 	case B_RGB15_LITTLE:case B_RGB16_LITTLE:
-		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x01)); 
-		depth = 16;
+		/* b8-9 determine engine colordepth */
+		si->engine.control = (2 << 8);
+//	nAcl->ColorShiftAmt = 0;
+		depth = 2;
 		break;
-	case B_RGB32_LITTLE:case B_RGBA32_LITTLE:
-		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x02));
-		depth = 32;
-		break;
+	case B_RGB24_LITTLE:
+		/* no acceleration supported on NM2097 and NM2160 */
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
 		return B_ERROR;
 	}
 
-	/* setup PITCH: very cardtype specific! */
-	switch (si->ps.card_type)
+	/* setup memory pitch (b10-12):
+	 * this works with a table, there are very few fixed settings.. */
+	switch(si->fbc.bytes_per_row / depth)
 	{
-	case G100:
-		/* always using hardware adress linearisation, because 2D/3D
-		 * engine works on every pitch multiple of 32 */
-		ACCW(PITCH, ((si->fbc.bytes_per_row / (depth >> 3)) & 0x0FFF));
+	case 640:
+		si->engine.control |= (2 << 10);
 		break;
-	default:
-		/* G200 and up are equal.. */
-		/* always using hardware adress linearisation, because 2D/3D
-		 * engine works on every pitch multiple of 32 */
-		ACCW(PITCH, ((si->fbc.bytes_per_row / (depth >> 3)) & 0x1FFF));
+	case 800:
+		si->engine.control |= (3 << 10);
+		break;
+	case 1024:
+		si->engine.control |= (4 << 10);
+		break;
+	case 1152:
+		si->engine.control |= (5 << 10);
+		break;
+	case 1280:
+		si->engine.control |= (6 << 10);
+		break;
+	case 1600:
+		si->engine.control |= (7 << 10);
 		break;
 	}
 
-	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
-	ACCW(PLNWT,0x00000000);
-	ACCW(PLNWT,0xffffffff);
-
-	if (si->ps.card_type >= G200) {
-		/*DSTORG - location of active screen in framebuffer*/
-		ACCW(DSTORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
-
-		/*SRCORG - init source address - same as dest*/
-		ACCW(SRCORG,((uint8*)si->fbc.frame_buffer) - ((uint8*)si->framebuffer));
-	}
-
-	/* init YDSTORG - apsed, if not inited, BitBlts may fails on <= G200 */
-	src_dst = 0;
-	ACCW(YDSTORG, src_dst);
-
-	/* <= G100 uses this register as SRCORG/DSTORG replacement, but
-	 * MIL 1/2 does not need framebuffer space for the hardcursor! */
-	if ((si->ps.card_type == G100) && (si->settings.hardcursor))
-	{
-		switch (si->dm.space)
-		{
-			case B_CMAP8:
-				src_dst = 1024 / 1;
-				break;
-			case B_RGB15_LITTLE:
-			case B_RGB16_LITTLE:
-				src_dst = 1024 / 2;
-				break;
-			case B_RGB32_LITTLE:
-				src_dst =  1024 / 4;
-				break;
-			default:
-				LOG(8,("ACC: G100 hardcursor not supported for current colorspace\n"));
-				return B_ERROR;
-		}		
-	}
-	ACCW(YDSTORG,src_dst);
-
-	/* clipping */
-	/* i.e. highest and lowest X pixel adresses */
-	ACCW(CXBNDRY,(((si->fbc.bytes_per_row / (depth >> 3)) - 1) << 16) | (0));
-
-	/* Y pixel addresses must be linear */
-	/* lowest adress */
-	ACCW(YTOP, 0 + src_dst);
-	/* highest adress */
-	ACCW(YBOT,((si->dm.virtual_height - 1) *
-		(si->fbc.bytes_per_row / (depth >> 3))) + src_dst);
+	/* fixme?: setup clipping */
 
 	return B_OK;
 }
 
-/* screen to screen blit - i.e. move windows around.
- * Engine function bitblit, paragraph 4.5.7.2 */
+/* screen to screen blit - i.e. move windows around and scroll within them. */
 status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
 	uint32 t_start,t_end,offset;
 	uint32 b_start,b_end;
 
-	/*find where the top,bottom and offset are*/
-	offset = (si->fbc.bytes_per_row / (depth >> 3));
+	/* make sure the previous command (if any) is completed */
+	nm_acc_wait_idle();
 
-	t_end = t_start = xs + (offset*ys) + src_dst;
-	t_end += w;
-
-	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
-	b_end +=w;
-
-	/* sgnzero bit _must_ be '0' before accessing SGN! */
-	ACCW(DWGCTL,0x00000000);
-
-	/*find which quadrant */
-	switch((yd>ys)|((xd>xs)<<1))
-	{
-	case 0: /*L->R,down*/ 
-		ACCW(SGN,0);
-
-		ACCW(AR3,t_start);
-		ACCW(AR0,t_end);
-		ACCW(AR5,offset);
-
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 1: /*L->R,up*/
-		ACCW(SGN,4);
-
-		ACCW(AR3,b_start);
-		ACCW(AR0,b_end);
-		ACCW(AR5,-offset);
-
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
-	case 2: /*R->L,down*/
-		ACCW(SGN,1);
-
-		ACCW(AR3,t_end);
-		ACCW(AR0,t_start);
-		ACCW(AR5,offset);
-
-		ACCW_YDSTLEN(yd,h+1);
-		break;
-	case 3: /*R->L,up*/
-		ACCW(SGN,5);
-
-		ACCW(AR3,b_end);
-		ACCW(AR0,b_start);
-		ACCW(AR5,-offset);
-
-		ACCW_YDSTLEN(yd+h,h+1);
-		break;
+    if ((yd < ys) || ((yd == ys) && (xd < xs)))
+    {
+		/* start with upper left corner */
+		ACCW(BLTCNTL, si->engine.control);
+		ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
+		ACCW(DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
+		ACCW(XYEXT, ((h << 16) | (w & 0x0000ffff)));
 	}
-	ACCW(FXBNDRY,((xd+w)<<16)|xd);
-
-	/*do the blit*/
-	ACCGO(DWGCTL,0x040C4018); // atype RSTR
+    else
+    {
+		/* start with lower right corner */
+		ACCW(BLTCNTL, (si->engine.control | 0x00000013));
+		ACCW(SRCSTARTOFF, (((ys + (h - 1)) << 16) | ((xs + (w - 1)) & 0x0000ffff)));
+		ACCW(DSTSTARTOFF, (((yd + (h - 1)) << 16) | ((xd + (w - 1)) & 0x0000ffff)));
+		ACCW(XYEXT, ((h << 16) | (w & 0x0000ffff)));
+	}
 
 	return B_OK;
 }
@@ -225,63 +126,63 @@ status_t nm_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 
 	return B_ERROR;
 
 	/*find where the top,bottom and offset are*/
-	offset = (si->fbc.bytes_per_row / (depth >> 3));
+//	offset = (si->fbc.bytes_per_row / (depth >> 3));
 
-	t_end = t_start = xs + (offset*ys) + src_dst;
+//	t_end = t_start = xs + (offset*ys) + src_dst;
 	t_end += w;
 
-	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
+//	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
 	b_end +=w;
 
 	/* sgnzero bit _must_ be '0' before accessing SGN! */
-	ACCW(DWGCTL,0x00000000);
+//	ACCW(DWGCTL,0x00000000);
 
 	/*find which quadrant */
 	switch((yd>ys)|((xd>xs)<<1))
 	{
 	case 0: /*L->R,down*/ 
-		ACCW(SGN,0);
+//		ACCW(SGN,0);
 
-		ACCW(AR3,t_start);
-		ACCW(AR0,t_end);
-		ACCW(AR5,offset);
+//		ACCW(AR3,t_start);
+//		ACCW(AR0,t_end);
+//		ACCW(AR5,offset);
 
-		ACCW_YDSTLEN(yd,h+1);
+//		ACCW_YDSTLEN(yd,h+1);
 		break;
 	case 1: /*L->R,up*/
-		ACCW(SGN,4);
+//		ACCW(SGN,4);
 
-		ACCW(AR3,b_start);
-		ACCW(AR0,b_end);
-		ACCW(AR5,-offset);
+//		ACCW(AR3,b_start);
+//		ACCW(AR0,b_end);
+//		ACCW(AR5,-offset);
 
-		ACCW_YDSTLEN(yd+h,h+1);
+//		ACCW_YDSTLEN(yd+h,h+1);
 		break;
 	case 2: /*R->L,down*/
-		ACCW(SGN,1);
+//		ACCW(SGN,1);
 
-		ACCW(AR3,t_end);
-		ACCW(AR0,t_start);
-		ACCW(AR5,offset);
+//		ACCW(AR3,t_end);
+//		ACCW(AR0,t_start);
+//		ACCW(AR5,offset);
 
-		ACCW_YDSTLEN(yd,h+1);
+//		ACCW_YDSTLEN(yd,h+1);
 		break;
 	case 3: /*R->L,up*/
-		ACCW(SGN,5);
+//		ACCW(SGN,5);
 
-		ACCW(AR3,b_end);
-		ACCW(AR0,b_start);
-		ACCW(AR5,-offset);
+//		ACCW(AR3,b_end);
+//		ACCW(AR0,b_start);
+//		ACCW(AR5,-offset);
 
-		ACCW_YDSTLEN(yd+h,h+1);
+//		ACCW_YDSTLEN(yd+h,h+1);
 		break;
 	}
-	ACCW(FXBNDRY,((xd+w)<<16)|xd);
+//	ACCW(FXBNDRY,((xd+w)<<16)|xd);
 	
 	/*do the blit*/
-	ACCW(FCOL,colour);
-	ACCW(BCOL,0xffffffff);
-	ACCGO(DWGCTL,0x440C4018); // atype RSTR
+//	ACCW(FCOL,colour);
+//	ACCW(BCOL,0xffffffff);
+//	ACCGO(DWGCTL,0x440C4018); // atype RSTR
 	return B_OK;
 }
 
@@ -298,20 +199,20 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col)
 	FCOL - foreground colour                a
 */
 
-	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
-	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
-	ACCW(FCOL,col);            /*set colour*/
+//	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
+//	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
+//	ACCW(FCOL,col);            /*set colour*/
 
 //acc fixme: checkout blockmode constraints for G100+ (mil: nc?): also add blockmode
 //	         for other functions, and use fastblt on MIL1/2 if possible...
 //or is CMAP8 contraint a non-blockmode contraint? (linearisation problem maybe?)
 	if (si->dm.space==B_CMAP8)
 	{
-		ACCGO(DWGCTL,0x400C7814); // atype RSTR
+//		ACCGO(DWGCTL,0x400C7814); // atype RSTR
 	}
 	else
 	{
-		ACCGO(DWGCTL,0x400C7844); // atype BLK 
+//		ACCGO(DWGCTL,0x400C7844); // atype BLK 
 	}
 	return B_OK;
 }
@@ -329,12 +230,12 @@ status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 
 	FCOL - foreground colour                a
 */
 
-	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
-	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
-	ACCW(FCOL,col);            /*set colour*/
+//	ACCW(FXBNDRY,(xe<<16)|xs); /*set x start and end*/
+//	ACCW_YDSTLEN(ys,yl); /*set y start and length*/
+//	ACCW(FCOL,col);            /*set colour*/
 	
 	/*draw it! top nibble is c is clipping enabled*/
-	ACCGO(DWGCTL,0x40057814); // atype RSTR
+//	ACCGO(DWGCTL,0x40057814); // atype RSTR
 
 	return B_OK;
 }
