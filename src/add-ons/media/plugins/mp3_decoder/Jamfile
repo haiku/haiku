@@ -4,6 +4,10 @@ UsePrivateHeaders media ;
 
 Addon mp3_decoder : media plugins :
 	mp3DecoderPlugin.cpp
+	: 
+	false
+	:  
+	$(OBOS_TOP)/objects/x86.R1/add-ons/media/plugins/mp3_decoder/mpglib/libmpglib.a
 ;
 
 LinkSharedOSLibs mp3_decoder : be libmedia.so ;

@@ -1,6 +1,8 @@
 #ifndef _MPGLIB_H
 #define _MPGLIB_H
 
+#include "mpg123.h"
+
 struct buf {
         unsigned char *pnt;
 	long size;
