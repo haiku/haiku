@@ -97,6 +97,16 @@ TiffIfd::LoadFields(uint32 offset, BPositionIO &io, swap_action swp)
 						finitStatus = fpfields[i]->InitCheck();
 						return;
 					}
+				} // for (i = 0; i < ffieldCount; i++, offset += 12)
+				
+				// Read address of next IFD entry
+				if (io.ReadAt(offset, &fnextIFDOffset, 4) != 4) {
+					finitStatus = B_IO_ERROR;
+					return;
+				}
+				if (swap_data(B_UINT32_TYPE, &nextIFDOffset, 4, swp) != B_OK) {
+					finitStauts = B_ERROR;
+					return;
 				}
 			}
 		}

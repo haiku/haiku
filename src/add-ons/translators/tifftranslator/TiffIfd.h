@@ -66,6 +66,8 @@ public:
 	bool HasField(uint16 tag);
 	uint32 GetCount(uint16 tag);
 		// throws: TiffIfdFieldNotFoundException()
+		
+	uint32 GetNextIfdOffset() { return fnextIFDOffset; };
 	
 	uint32 GetUint(uint16 tag, uint32 index = 0);
 		// index is the base one index for the desired
