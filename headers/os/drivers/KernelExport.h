@@ -129,6 +129,7 @@ extern long			get_memory_map(const void *buffer, ulong size,
 /* area protection flags for the kernel */
 #define B_KERNEL_READ_AREA			16
 #define B_KERNEL_WRITE_AREA			32
+#define B_USER_CLONEABLE_AREA		256
 
 /* call to map physical memory - typically used for memory-mapped i/o */
 
