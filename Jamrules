@@ -2099,9 +2099,28 @@ rule PackageInstallScript
 
 actions together PackageInstallScript
 {
-	
-	echo "#!/bin/sh" > $(1) ;
-    echo "unzip -d / install.zip" >> $(1) ;
+echo '#!/bin/sh
+base=`dirname "$0"`
+cd $base
+if [ -n "$TTY" ]
+then
+	unzip -d / install.zip
+else
+	response=`alert "Would you like to automatically overwrite existing files, or receive a prompt?" "Overwrite" "Prompt"`
+	if [ $response == "Overwrite" ]
+	then
+		unzip -od / install.zip
+		alert "Finished installing" "Thanks"
+	else
+		if [ -e /boot/beos/apps/Terminal ]
+		then
+			terminal=/boot/beos/apps/Terminal
+		else
+			terminal=`query Terminal | head -1`
+		fi
+		$terminal -t "installer" /bin/sh $0
+	fi
+fi' > $(1) ;
 	chmod 755 $(1) ;
 }
 
