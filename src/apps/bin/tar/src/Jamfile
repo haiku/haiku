@@ -26,9 +26,9 @@ BinCommand tar :
 	tar.c
 	update.c
 	utf8.c
-	: libtar.a  ;
+	: libtar.a : tar.rdef ;
 
 BinCommand rmt :
 	rmt.c
-	: libtar.a
+	: libtar.a : tar.rdef
 ;
