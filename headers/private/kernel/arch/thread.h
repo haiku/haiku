@@ -2,8 +2,8 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _KERNEL_ARCH_THREAD_H
-#define _KERNEL_ARCH_THREAD_H
+#ifndef KERNEL_ARCH_THREAD_H
+#define KERNEL_ARCH_THREAD_H
 
 #include <thread.h>
 
@@ -16,8 +16,13 @@ void arch_thread_dump_info(void *info);
 void arch_thread_enter_uspace(struct thread *t, addr entry, void *args1, void *args2);
 void arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg);
 
-//struct thread *arch_thread_get_current_thread(void);
-//void arch_thread_set_current_thread(struct thread *t);
+// ToDo: doing this this way is an ugly hack - please fix me!
+//		(those functions are "static inline" for x86 - since
+//		"extern inline" doesn't work for "gcc -g"...)
+#ifndef ARCH_x86
+struct thread *arch_thread_get_current_thread(void);
+void arch_thread_set_current_thread(struct thread *t);
+#endif
 
 void arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
 int64 arch_restore_signal_frame(void);
@@ -26,4 +31,4 @@ void arch_check_syscall_restart(struct thread *t);
 // for any inline overrides
 #include <arch_thread.h>
 
-#endif	/* _KERNEL_ARCH_THREAD_H */
+#endif	/* KERNEL_ARCH_THREAD_H */

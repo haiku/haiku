@@ -8,7 +8,7 @@
 
 #include <kernel.h>
 #include <ktypes.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #define PAGE_ALIGN(x) (((x) + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1))
 

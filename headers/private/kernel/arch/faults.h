@@ -2,13 +2,12 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _NEWOS_KERNEL_ARCH_FAULTS
-#define _NEWOS_KERNEL_ARCH_FAULTS
+#ifndef KERNEL_ARCH_FAULTS_H
+#define KERNEL_ARCH_FAULTS_H
 
-#include <stage2.h>
+struct kernel_args;
 
 int faults_init(kernel_args *ka);
 int arch_faults_init(kernel_args *ka);
 
-#endif
-
+#endif	/* KERNEL_ARCH_FAULTS_H */

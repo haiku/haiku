@@ -6,5 +6,6 @@
 #define _KERNEL_ARCH_DEBUG_H
 
 int arch_dbg_init(kernel_args *ka);
+void arch_dbg_save_registers(int *);
 
 #endif	/* _KERNEL_ARCH_DEBUG_H */

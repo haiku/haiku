@@ -14,6 +14,6 @@ extern int arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_p
 extern int arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len);
 
-//#include <arch_elf.h>
+#include <arch_elf.h>
 
 #endif	/* _KERNEL_ARCH_ELF_H */

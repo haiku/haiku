@@ -37,7 +37,6 @@
  */
 
 #include <sys/types.h>
-#include <sys/cdefs.h>
 #include <sys/stat.h>
 #ifdef __STDC__
 #include <machine/stdarg.h>
