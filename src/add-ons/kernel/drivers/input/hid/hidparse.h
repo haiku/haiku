@@ -130,12 +130,6 @@ typedef struct
 	report "instruction"
 */
 
-/* control types for game controllers */
-enum
-{
-	TYPE_NONE, TYPE_HAT, TYPE_AXIS, TYPE_AXIS_X, TYPE_AXIS_Y, TYPE_BUTTON
-};
-
 typedef struct
 {
 	unsigned int	usage_page, usage_id;
@@ -168,10 +162,3 @@ int parse_report_descriptor
 	size_t *num_insns,
 	size_t *total_report_size,
 	int *first_report_id);
-
-int count_controls
-	(report_insn *insns,
-	size_t num_insns,
-	int *num_axes,
-	int *num_hats,
-	int *num_buttons);

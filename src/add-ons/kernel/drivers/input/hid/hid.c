@@ -123,15 +123,14 @@ remove_device (my_device_info *my_dev)
 }
 
 
-/* gameport driver cookie (per open) */
+/* driver cookie (per open) */
 
 typedef struct driver_cookie
 {
 	struct driver_cookie	*next;
 
 	my_device_info			*my_dev;
-	bool					enhanced;
-
+	
 } driver_cookie;
 	
 /* NB global variables are valid only while driver is loaded */
@@ -459,13 +458,72 @@ set_leds(my_device_info *my_dev, uint8* data)
 	
 	st = usb->send_request (my_dev->dev, 
 		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
-		0x09,
+		USB_REQUEST_HID_SET_REPORT,
 		0x200 | report_id, my_dev->ifno, actual, 
 		&leds, actual, &actual);
 	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, st=%d, len=%d\n", 
 		leds, (int) st, (int)actual));
 }
 
+#define MAX_BUTTONS 16
+
+static int 
+sign_extend(int value, int size)
+{
+	if (value & (1 << (size - 1)))
+		return value | (UINT_MAX << size);
+	else
+		return value;
+}
+
+
+static void
+interpret_ms_buffer(my_device_info *my_dev)
+{
+	mouse_movement info;
+	uint8 *report = (uint8*)my_dev->buffer;
+	uint32 i;
+	
+	info.buttons = 0;
+	info.clicks = 0;
+	for (i = 0; i < my_dev->num_insns; i++) {
+		const report_insn *insn = &my_dev->insns [i];
+		int32 value = 
+			(((report [insn->byte_idx + 1] << 8) | 
+			   report [insn->byte_idx]) >> insn->bit_pos) 
+			& ((1 << insn->num_bits) - 1);
+
+		if (insn->usage_page == USAGE_PAGE_BUTTON) {
+			if ((insn->usage_id - 1) < MAX_BUTTONS) {
+				info.buttons |= 
+					(value & 1) << (insn->usage_id - 1);
+				info.clicks = 1;
+			}	
+		} else if (insn->usage_page == USAGE_PAGE_GENERIC_DESKTOP) {
+			if (insn->is_phy_signed) {
+				value = sign_extend (value, insn->num_bits);
+			}
+		
+			switch (insn->usage_id) {
+				case USAGE_ID_X:
+					info.xdelta = value;
+					break;
+				case USAGE_ID_Y:
+					info.ydelta = -value;
+					break;
+				case USAGE_ID_WHEEL:
+					info.wheel_delta = -value;
+					break;
+			}
+		}
+	}
+	
+	info.modifiers = 0;
+	info.timestamp = my_dev->timestamp;
+	
+	cbuf_putn(my_dev->cbuf, &info, sizeof(info));
+	release_sem_etc(my_dev->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+}
 
 /*
 	callback: got a report, issue next request
@@ -509,10 +567,11 @@ usb_callback(void *cookie, uint32 status,
 #endif
 		my_dev->timestamp = system_time ();
 		
-		if (my_dev->is_keyboard)
+		if (my_dev->is_keyboard) {
 			interpret_kb_buffer(my_dev);
-		
-		memcpy(my_dev->last_buffer, my_dev->buffer, my_dev->total_report_size);
+			memcpy(my_dev->last_buffer, my_dev->buffer, my_dev->total_report_size);
+		} else
+			interpret_ms_buffer(my_dev);
 		
 		release_sem (my_dev->sem_lock);
 	}
@@ -622,7 +681,6 @@ hid_device_added(const usb_device *dev, void **cookie)
 		close (fd);
 	}
 
-	/* XXX check application type */
 	/* Generic Desktop : Keyboard or Mouse */
 	
 	if (memcmp (rep_desc, "\x05\x01\x09\x06", 4) != 0 &&
@@ -669,10 +727,10 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	/* count axes, hats and buttons */
 
-	count_controls (my_dev->insns, my_dev->num_insns,
+	/*count_controls (my_dev->insns, my_dev->num_insns,
 		&my_dev->num_axes, &my_dev->num_hats, &my_dev->num_buttons);
 	DPRINTF_INFO ((MY_ID "%d axes, %d hats, %d buttons\n",
-		my_dev->num_axes, my_dev->num_hats, my_dev->num_buttons));
+		my_dev->num_axes, my_dev->num_hats, my_dev->num_buttons));*/
 
 	/* get initial state */
 	
@@ -762,7 +820,6 @@ hid_device_open(const char *name, uint32 flags,
 		return B_NO_MEMORY;
 
 	acquire_sem (my_dev->sem_lock);
-	cookie->enhanced = false;
 	cookie->my_dev = my_dev;
 	cookie->next = my_dev->open_fds;
 	my_dev->open_fds = cookie;
@@ -817,9 +874,9 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	if (!my_dev->active)
 		return B_ERROR;		/* already unplugged */
 
-	if (my_dev->is_keyboard) {
+	if (my_dev->is_keyboard)
 		switch (op) {
-			case 0x270f:
+			case KB_READ:
 	    		err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
@@ -827,18 +884,31 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				return err;
 				break;
 	    
-			case 0x2711:
+			case KB_SET_LEDS:
 				set_leds(my_dev, (uint8 *)arg);
 				break; 
-	
+		} 
+	else
+		switch (op) {
+			case MS_READ:
+				err = acquire_sem_etc(my_dev->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
+	    		if (err != B_OK)
+					return err;
+				cbuf_getn(my_dev->cbuf, arg, sizeof(mouse_movement));
+				return err;
+				break;
+	    	case MS_NUM_EVENTS:
+			{
+				int32 count;
+				get_sem_count(my_dev->sem_cb, &count);
+        		return count;
+      			break;
+			}
 			default:
 				/* not implemented */
 				break;
 		}
 
-	} else {
-	
-	}
 	return err;
 }
 
