@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src kernel glue arch ppc ;
+
+KernelObjects
+	crti.S
+	crtn.S
+	;
+
