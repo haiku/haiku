@@ -56,9 +56,9 @@ public:
 	cursor_which GetCursorWhich(void);
 	void ChangeCursor(cursor_which which, int32 token);
 	void SetDefaults(void);
-private:
 	ServerCursor *FindCursor(int32 token);
 
+private:
 	BList fCursorList;
 	TokenHandler fTokenizer;
 
