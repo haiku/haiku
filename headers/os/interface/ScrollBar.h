@@ -37,6 +37,9 @@
 #define B_V_SCROLL_BAR_WIDTH	14.0
 #define B_H_SCROLL_BAR_HEIGHT	14.0
 
+#define SCROLL_BAR_MAXIMUM_KNOB_SIZE	50
+#define SCROLL_BAR_MINIMUM_KNOB_SIZE	9
+
 //----------------------------------------------------------------
 //----- BScrollBar class -----------------------------------------
 
@@ -102,7 +105,8 @@ virtual status_t	Perform(perform_code d, void *arg);
 private:
 		friend class BScrollArrowButton;
 		friend class BScrollBarPrivateData;
-		friend status_t control_scrollbar(int8 command, void *data, BScrollBar *bar);
+		friend status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar);		// for use within the preflet
+		friend status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar);	// for use here within the IK
 virtual	void		_ReservedScrollBar1();
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();

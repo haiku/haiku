@@ -129,7 +129,7 @@ int32 BScrollBarPrivateData::ButtonRepeaterThread(void *data)
 	exitval=sb->privatedata->exit_repeater;
 	sb->Window()->Unlock();
 	
-	float scrollvalue;
+	float scrollvalue=0;
 
 	if(sb->privatedata->arrowdown==ARROW_LEFT || sb->privatedata->arrowdown==ARROW_UP)
 		scrollvalue=-sb->fSmallStep;
@@ -143,8 +143,8 @@ int32 BScrollBarPrivateData::ButtonRepeaterThread(void *data)
 	{
 		oldframe=sb->privatedata->thumbframe;
 		
-		returnval=control_scrollbar(SBC_SCROLLBYVALUE, &scrollvalue, sb);
-		
+		returnval = scroll_by_value(scrollvalue, sb);
+
 		snooze(50000);
 		
 		sb->Window()->Lock();
@@ -454,7 +454,7 @@ void BScrollBar::MouseDown(BPoint pt)
 				scrollval= -fSmallStep;
 				privatedata->arrowdown=ARROW_UP;
 				privatedata->buttondown=ARROW1;
-				returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+				returnval = scroll_by_value(scrollval, this);
 		
 				if(returnval==B_OK)
 				{
@@ -479,8 +479,8 @@ void BScrollBar::MouseDown(BPoint pt)
 				scrollval= fSmallStep;
 				privatedata->arrowdown=ARROW_DOWN;
 				privatedata->buttondown=ARROW4;
-				returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
-		
+				returnval = scroll_by_value(scrollval, this);
+
 				if(returnval==B_OK)
 				{
 					Draw(buttonrect);
@@ -505,7 +505,7 @@ void BScrollBar::MouseDown(BPoint pt)
 					scrollval= fSmallStep;
 					privatedata->arrowdown=ARROW_DOWN;
 					privatedata->buttondown=ARROW2;
-					returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+					returnval = scroll_by_value(scrollval, this);
 			
 					if(returnval==B_OK)
 					{
@@ -529,7 +529,7 @@ void BScrollBar::MouseDown(BPoint pt)
 					scrollval= -fSmallStep;
 					privatedata->arrowdown=ARROW_UP;
 					privatedata->buttondown=ARROW3;
-					returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+					returnval = scroll_by_value(scrollval, this);
 			
 					if(returnval==B_OK)
 					{
@@ -552,15 +552,9 @@ void BScrollBar::MouseDown(BPoint pt)
 			// TODO: add a repeater thread for large stepping and a call to it
 
 			if(pt.y<privatedata->thumbframe.top)
-			{
-				scrollval=-fLargeStep;
-				control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
-			}
+				scroll_by_value(-fLargeStep, this);  // do we not check the return value in these two cases like everywhere else?
 			else
-			{
-				scrollval=fLargeStep;
-				control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
-			}
+				scroll_by_value(fLargeStep, this);
 		}
 		else
 		{
@@ -569,7 +563,7 @@ void BScrollBar::MouseDown(BPoint pt)
 				scrollval= -fSmallStep;
 				privatedata->arrowdown=ARROW_LEFT;
 				privatedata->buttondown=ARROW1;
-				returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+				returnval = scroll_by_value(scrollval, this);
 		
 				if(returnval==B_OK)
 				{
@@ -593,7 +587,7 @@ void BScrollBar::MouseDown(BPoint pt)
 				scrollval= fSmallStep;
 				privatedata->arrowdown=ARROW_RIGHT;
 				privatedata->buttondown=ARROW4;
-				returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+				returnval = scroll_by_value(scrollval, this);
 		
 				if(returnval==B_OK)
 				{
@@ -619,7 +613,7 @@ void BScrollBar::MouseDown(BPoint pt)
 					scrollval= fSmallStep;
 					privatedata->buttondown=ARROW2;
 					privatedata->arrowdown=ARROW_LEFT;
-					returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+					returnval = scroll_by_value(scrollval, this);
 					
 					if(returnval==B_OK)
 					{
@@ -643,7 +637,7 @@ void BScrollBar::MouseDown(BPoint pt)
 					scrollval= -fSmallStep;
 					privatedata->buttondown=ARROW3;
 					privatedata->arrowdown=ARROW_RIGHT;
-					returnval=control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
+					returnval = scroll_by_value(scrollval, this);
 				
 					if(returnval==B_OK)
 					{
@@ -669,15 +663,10 @@ void BScrollBar::MouseDown(BPoint pt)
 
 
 			if(pt.x<privatedata->thumbframe.left)
-			{
-				scrollval=-fLargeStep;
-				control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
-			}
+				scroll_by_value(-fLargeStep, this);  // do we not check the return value in these two cases like everywhere else?
 			else
-			{
-				scrollval=fLargeStep;
-				control_scrollbar(SBC_SCROLLBYVALUE,&scrollval,this);
-			}
+				scroll_by_value(fLargeStep, this);
+
 		}
 		ValueChanged(fValue);
 		Draw(Bounds());
@@ -743,7 +732,7 @@ void BScrollBar::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 				return;
 			delta=pt.x-privatedata->mousept.x;
 		}
-		control_scrollbar(SBC_SCROLLBYVALUE, &delta, this);
+		scroll_by_value(delta, this);  // do we not check the return value here?
 		ValueChanged(fValue);
 		Draw(Bounds());
 		privatedata->mousept=pt;
@@ -952,166 +941,123 @@ BScrollBar &BScrollBar::operator=(const BScrollBar &)
 }
 
 /*
-	This cheat function will allow the scrollbar prefs app to act exactly like R5's and
-	perform other stuff without mucking around with the virtual tables B_BAD_VALUE is 
-	returned when a NULL scrollbar pointer is passed to it
-
-	Command list:
-
-	0:	Scroll By Value:	increment or decrement scrollbar's value by a certain amount.
-				data parameter is cast to a float * and used to modify the value.
-				Returns B_OK if everthing went well and the caller is to redraw the scrollbar
-				B_ERROR is returned if the caller doesn't need to do anything
-				B_BAD_VALUE is returned if data is NULL
-	1: Set Double:			set usage mode to either single or double.
-				data parameter is cast to a bool. true sets it to double, false sets to single
-				B_OK is always returned
-				B_BAD_VALUE is returned if data is NULL
-	2: Set Proportional:	set usage mode to either proportional or fixed thumbsize.
-				data parameter is cast to a bool. true sets it to proportional, false sets to fixed
-				B_OK is always returned
-				B_BAD_VALUE is returned if data is NULL
-	3: Set Style:			set thumb style to blank, 3 dots, or 3 lines
-				data parameter is cast to an int8. 0 is blank, 1 is dotted, 2 is lined
-				B_ERROR is returned for values != 0, 1, or 2
-				B_BAD_VALUE is returned if data is NULL
+	scroll_by_value: increment or decrement scrollbar's value by a certain amount.
+	
+	Returns B_OK if everthing went well and the caller is to redraw the scrollbar,
+			B_ERROR if the caller doesn't need to do anything, or
+			B_BAD_VALUE if data is NULL.
 */
-status_t control_scrollbar(int8 command, void *data, BScrollBar *sb)
+status_t scroll_by_value(float valueByWhichToScroll, BScrollBar *bar)
 {
-	if(!sb)
+	if(!bar)
+		return B_BAD_VALUE;
+
+	if(valueByWhichToScroll==0)
+		return B_ERROR;
+	
+	if(bar->fOrientation==B_VERTICAL)
+	{
+		if(valueByWhichToScroll<0)
+		{
+			if(bar->fValue + valueByWhichToScroll >= bar->fMin)
+			{
+				bar->fValue += valueByWhichToScroll;
+				if(bar->fTarget)
+					bar->fTarget->ScrollBy(0,valueByWhichToScroll);
+				bar->privatedata->thumbframe.OffsetBy(0,valueByWhichToScroll);
+				bar->fValue--;
+				return B_OK;
+			}
+			// fall through to return B_ERROR
+		}
+		else
+		{
+			if(bar->fValue + valueByWhichToScroll <= bar->fMax)
+			{
+				bar->fValue += valueByWhichToScroll;
+				if(bar->fTarget)
+					bar->fTarget->ScrollBy(0,valueByWhichToScroll);
+				bar->privatedata->thumbframe.OffsetBy(0,valueByWhichToScroll);
+				bar->fValue++;
+				return B_OK;
+			}
+			// fall through to return B_ERROR
+		}
+	}
+	else
+	{
+		if(valueByWhichToScroll<0)
+		{
+			if(bar->fValue + valueByWhichToScroll >= bar->fMin)
+			{
+				bar->fValue += valueByWhichToScroll;
+				if(bar->fTarget)
+					bar->fTarget->ScrollBy(valueByWhichToScroll,0);
+				bar->privatedata->thumbframe.OffsetBy(valueByWhichToScroll,0);
+				bar->fValue--;
+				return B_OK;
+			}
+			// fall through to return B_ERROR
+		}
+		else
+		{
+			if(bar->fValue + valueByWhichToScroll <= bar->fMax)
+			{
+				bar->fValue += valueByWhichToScroll;
+				if(bar->fTarget)
+					bar->fTarget->ScrollBy(valueByWhichToScroll,0);
+				bar->privatedata->thumbframe.OffsetBy(valueByWhichToScroll,0);
+				bar->fValue++;
+				return B_OK;
+			}
+			// fall through to return B_ERROR
+		}
+	}
+	return B_ERROR;
+}
+
+/*
+	This cheat function will allow the scrollbar prefs app to act like R5's and
+	perform other stuff without mucking around with the virtual tables.
+	
+	B_BAD_VALUE is returned when a NULL scrollbar pointer is passed to it.
+
+	The scroll_bar_info struct is read and used to re-style the given BScrollBar.
+*/
+status_t control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
+{
+	if(!bar || !info)
+		return B_BAD_VALUE;
+
+	if(bar->privatedata->sbinfo.double_arrows != info->double_arrows)
+	{
+		bar->privatedata->sbinfo.double_arrows = info->double_arrows;
+		
+		int8 multiplier=(info->double_arrows)?1:-1;
+		
+		if(bar->fOrientation==B_VERTICAL)
+			bar->privatedata->thumbframe.OffsetBy(0,multiplier*B_H_SCROLL_BAR_HEIGHT);
+		else
+			bar->privatedata->thumbframe.OffsetBy(multiplier*B_V_SCROLL_BAR_WIDTH,0);
+	}
+
+	bar->privatedata->sbinfo.proportional = info->proportional;
+
+	// TODO: Figure out how proportional relates to the size of the thumb
+		
+	// TODO: Add redraw code to reflect the changes
+
+	if(info->knob >= 0 && info->knob <= 2)
+		bar->privatedata->sbinfo.knob = info->knob;
+	else
 		return B_BAD_VALUE;
 	
-	switch(command)
-	{
-		case 0: 	// Scroll By Value
-		{
-			if(!data)
-				return B_BAD_VALUE;
-			
-			float datavalue=*((float *)data);
-			if(datavalue==0)
-				return B_ERROR;
-			
-			if(sb->fOrientation==B_VERTICAL)
-			{
-				if(datavalue<0)
-				{
-					if(sb->fValue + datavalue >= sb->fMin)
-					{
-						sb->fValue += datavalue;
-						if(sb->fTarget)
-							sb->fTarget->ScrollBy(0,datavalue);
-						sb->privatedata->thumbframe.OffsetBy(0,datavalue);
-						sb->fValue--;
-						return B_OK;
-					}
-					// fall through to return B_ERROR
-				}
-				else
-				{
-					if(sb->fValue + datavalue <= sb->fMax)
-					{
-						sb->fValue += datavalue;
-						if(sb->fTarget)
-							sb->fTarget->ScrollBy(0,datavalue);
-						sb->privatedata->thumbframe.OffsetBy(0,datavalue);
-						sb->fValue++;
-						return B_OK;
-					}
-					// fall through to return B_ERROR
-				}
-			}
-			else
-			{
-				if(datavalue<0)
-				{
-					if(sb->fValue + datavalue >= sb->fMin)
-					{
-						sb->fValue += datavalue;
-						if(sb->fTarget)
-							sb->fTarget->ScrollBy(datavalue,0);
-						sb->privatedata->thumbframe.OffsetBy(datavalue,0);
-						sb->fValue--;
-						return B_OK;
-					}
-					// fall through to return B_ERROR
-				}
-				else
-				{
-					if(sb->fValue + datavalue <= sb->fMax)
-					{
-						sb->fValue += datavalue;
-						if(sb->fTarget)
-							sb->fTarget->ScrollBy(datavalue,0);
-						sb->privatedata->thumbframe.OffsetBy(datavalue,0);
-						sb->fValue++;
-						return B_OK;
-					}
-					// fall through to return B_ERROR
-				}
-			}
-			return B_ERROR;
-		}// end case 0 (Scroll By Value)
-		
-		case 1:		// Set Double
-		{
-			if(!data)
-				return B_BAD_VALUE;
+	if(info->min_knob_size >= SCROLL_BAR_MINIMUM_KNOB_SIZE && info->min_knob_size <= SCROLL_BAR_MAXIMUM_KNOB_SIZE)
+		bar->privatedata->sbinfo.min_knob_size = info->min_knob_size;
+	else
+		return B_BAD_VALUE;
 
-			bool datavalue=*((bool *)data);
-
-			if(sb->privatedata->sbinfo.double_arrows==datavalue)
-				return B_OK;
-
-			sb->privatedata->sbinfo.double_arrows=datavalue;
-			
-			int8 multiplier=(datavalue)?1:-1;
-			
-			if(sb->fOrientation==B_VERTICAL)
-				sb->privatedata->thumbframe.OffsetBy(0,multiplier*B_H_SCROLL_BAR_HEIGHT);
-			else
-				sb->privatedata->thumbframe.OffsetBy(multiplier*B_V_SCROLL_BAR_WIDTH,0);
-			return B_OK;
-		}
-		
-		case 2:		// Set Proportional
-		{
-			// TODO: Figure out how proportional relates to the size of the thumb
-			
-			if(!data)
-				return B_BAD_VALUE;
-			
-			bool datavalue=*((bool *)data);
-			sb->privatedata->sbinfo.proportional=datavalue;
-			return B_OK;
-		}
-		
-		case 3:		// Set Style
-		{
-			// TODO: Add redraw code to reflect the changes
-
-			if(!data)
-				return B_BAD_VALUE;
-			
-			int8 datavalue=*((int8 *)data);
-			
-			if(datavalue!=0 && datavalue!=1 && datavalue!=2)
-				return B_BAD_VALUE;
-			
-			sb->privatedata->sbinfo.knob=datavalue;
-			return B_OK;
-		}
-		
-		default:
-		{
-			printf("Unknown command value %d in control_scrollbar\n",command);
-			break;
-		}
-	} // end command switch
-	
-	
-	// We should never get here unless I've done something dumb in calling the function
-	return B_BAD_VALUE;
+	return B_OK;
 }
 
 void BScrollBarPrivateData::DrawScrollBarButton(BScrollBar *owner, arrow_direction direction, 
