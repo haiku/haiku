@@ -9,6 +9,7 @@
 
 #include <thread.h>
 #include <arch/thread.h>
+#include <arch/user_debugger.h>
 #include <arch_cpu.h>
 #include <kernel.h>
 #include <debug.h>
@@ -78,13 +79,35 @@ i386_pop_iframe(struct thread *thread)
  *	from standard kernel threads.
  */
 
-struct iframe *
+static struct iframe *
 i386_get_current_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
 	ASSERT(thread->arch_info.iframe_ptr >= 0);
 	return thread->arch_info.iframes[thread->arch_info.iframe_ptr - 1];
+}
+
+
+/**	\brief Returns the current thread's topmost (i.e. most recent)
+ *	userland->kernel transition iframe (usually the first one, save for
+ *	interrupts in signal handlers).
+ *	\return The iframe, or \c NULL, if there is no such iframe (e.g. when
+ *			the thread is a kernel thread).
+ */
+struct iframe *
+i386_get_user_iframe(void)
+{
+	struct thread *thread = thread_get_current_thread();
+	int i;
+
+	for (i = thread->arch_info.iframe_ptr - 1; i >= 0; i--) {
+		struct iframe *frame = thread->arch_info.iframes[i];
+		if (frame->cs == USER_CODE_SEG) 
+			return frame;
+	}
+
+	return NULL;
 }
 
 
@@ -246,6 +269,11 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 
 	if (((uint32)new_pgdir % B_PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
+
+	// reinit debugging; necessary, if the thread was preempted after
+	// initializing debugging before returning to userland
+	if (t_to->team->aspace != NULL)
+		i386_reinit_user_debug_after_context_switch(t_to);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
 	i386_context_switch(&t_from->arch_info, &t_to->arch_info, (addr_t)new_pgdir);
