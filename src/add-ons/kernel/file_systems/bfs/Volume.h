@@ -71,8 +71,8 @@ class Volume {
 		off_t				ToOffset(block_run run) const { return ToBlock(run) << fSuperBlock.block_shift; }
 		off_t				ToBlock(block_run run) const { return ((((off_t)run.allocation_group) << fSuperBlock.ag_shift) | (off_t)run.start); }
 		block_run			ToBlockRun(off_t block) const;
-		status_t			IsValidBlockRun(block_run run);
-		
+		status_t			ValidateBlockRun(block_run run);
+
 		off_t				ToVnode(block_run run) const { return ToBlock(run); }
 		off_t				ToVnode(off_t block) const { return block; }
 		off_t				VnodeToBlock(vnode_id id) const { return (off_t)id; }

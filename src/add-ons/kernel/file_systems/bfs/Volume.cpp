@@ -206,7 +206,7 @@ Volume::Sync()
 
 
 status_t
-Volume::IsValidBlockRun(block_run run)
+Volume::ValidateBlockRun(block_run run)
 {
 	if (run.allocation_group < 0 || run.allocation_group > AllocationGroups()
 		|| run.start > (1LL << AllocationGroupShift())
