@@ -23,7 +23,7 @@
 
 #ifndef _STDIO_H
 
-#include <libioP.h>
+//#include <libioP.h>
 
 #if !defined __need_FILE && !defined __need___FILE
 # define _STDIO_H	1
