@@ -2247,7 +2247,6 @@ void BWindow::BuildTopView(){
 	top_view		= new BView( fFrame, "top_view",
 								 B_FOLLOW_ALL, B_WILL_DRAW);
 	top_view->top_level_view	= true;
-	top_view->fShowLevel		= 1;
 
 		// set top_view's owner, add it to window's eligible handler list
 		// and also set its next handler to this window.

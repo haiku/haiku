@@ -3648,7 +3648,7 @@ bool BView::attachView(BView *aView){
 	owner->session->WriteRect( aView->Frame() );
 	owner->session->WriteUInt32( aView->ResizingMode() );
 	owner->session->WriteUInt32( aView->Flags() );
-	owner->session->WriteBool( aView->IsHidden() );
+	owner->session->WriteBool( aView->IsHidden(aView) );
 	owner->session->WriteInt32( aView->CountChildren() );
 	
 	aView->setCachedState();
