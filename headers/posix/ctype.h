@@ -54,6 +54,8 @@ extern const int *__ctype_toupper;
 
 #define tolower(c) ((int)__ctype_tolower[(int)(c)])
 #define toupper(c) ((int)__ctype_toupper[(int)(c)])
+#define _tolower(c)	tolower(c)
+#define _toupper(c)	toupper(c)
 
 #define isalnum(c)	__isctype((c), _ISalnum)
 #define isalpha(c)	__isctype((c), _ISalpha)
