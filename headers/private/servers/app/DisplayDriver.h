@@ -21,6 +21,7 @@
 //
 //	File Name:		DisplayDriver.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//				Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	Mostly abstract class which handles all graphics output
 //					for the server
 //  
@@ -79,21 +80,31 @@ typedef struct
 
 #endif
 
-class AccLineCalc
+class DisplayDriver;
+
+typedef void (DisplayDriver::* SetPixelFuncType)(int x, int y);
+typedef void (DisplayDriver::* SetHorizontalLineFuncType)(int xstart, int xend, int y);
+typedef void (DisplayDriver::* SetVerticalLineFuncType)(int x, int ystart, int yend);
+typedef void (DisplayDriver::* SetRectangleFuncType)(int left, int top, int right, int bottom);
+
+class LineCalc
 {
 public:
-	AccLineCalc();
-	AccLineCalc(const BPoint &pta, const BPoint &ptb);
+	LineCalc();
+	LineCalc(const BPoint &pta, const BPoint &ptb);
 	void SetPoints(const BPoint &pta, const BPoint &ptb);
 	float GetX(float y);
 	float GetY(float x);
 	float Slope(void) { return slope; }
 	float Offset(void) { return offset; }
-	float MinX();
-	float MinY();
-	float MaxX();
-	float MaxY();
-	void Swap(AccLineCalc &from);
+	float MinX() { return minx; }
+	float MinY() { return miny; }
+	float MaxX() { return maxx; }
+	float MaxY() { return maxy; }
+	void Swap(LineCalc &from);
+	bool ClipToRect(const BRect& rect);
+	BPoint GetStart() { return start; }
+	BPoint GetEnd() { return end; }
 private:
 	float slope;
 	float offset;
@@ -129,15 +140,23 @@ public:
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
-	virtual void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	virtual void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	virtual void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
-	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
-	virtual void FillRect(BRect r, LayerData *d, const Pattern &pat);
-	virtual void FillRegion(BRegion *r, LayerData *d, const Pattern &pat);
-	virtual void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+	virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
+	virtual void FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillBezier(BPoint *pts, RGBColor& color);
+	virtual void FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillEllipse(BRect r, RGBColor& color);
+	virtual void FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRect(const BRect r, RGBColor& color);
+	virtual void FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRegion(BRegion& r, RGBColor& color);
+	virtual void FillRegion(BRegion& r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color);
+	virtual void FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
 //	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
+	virtual void FillTriangle(BPoint *pts, RGBColor& color);
+	virtual void FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
 
 	virtual void HideCursor(void);
 	virtual bool IsCursorHidden(void);
@@ -147,17 +166,29 @@ public:
 	virtual void ObscureCursor(void);
 	virtual void SetCursor(ServerCursor *cursor);
 
-	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	virtual void StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	virtual void StrokeEllipse(BRect r, LayerData *d, const Pattern &pat);
-	virtual void StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
-	virtual void StrokeRect(BRect r, LayerData *d, const Pattern &pat);
-	virtual void StrokeRegion(BRegion *r, LayerData *d, const Pattern &pat);
-	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color);
+	virtual void StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, RGBColor& color);
+	virtual void StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeEllipse(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color);
+	virtual void StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokePoint(BPoint& pt, RGBColor& color);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed=true);
+	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed=true);
+	virtual void StrokeRect(BRect r, float pensize, RGBColor& color);
+	virtual void StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeRegion(BRegion& r, float pensize, RGBColor& color);
+	virtual void StrokeRegion(BRegion& r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color);
+	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
 //	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
-	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
+	virtual void StrokeTriangle(BPoint *pts, float pensize, RGBColor& color);
+	virtual void StrokeTriangle(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
+
+	virtual void StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors);
+
 	virtual void SetMode(int32 mode);
 	virtual bool DumpToFile(const char *path);
 	virtual ServerBitmap *DumpToBitmap(void);
@@ -204,10 +235,34 @@ protected:
 	void _SetDPMSState(uint32 state);
 	void _SetDeviceInfo(const accelerant_device_info &infO);
 	ServerCursor *_GetCursor(void);
-	virtual void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
-	virtual void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
-	virtual void SetPixel(int x, int y, RGBColor col);
-	virtual void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
+	//virtual void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
+	//virtual void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
+	virtual void HLinePatternThick(int32 x1, int32 x2, int32 y);
+	virtual void VLinePatternThick(int32 x, int32 y1, int32 y2);
+	virtual void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
+	virtual void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
+	//virtual void SetPixel(int x, int y, RGBColor col);
+	//virtual void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
+	virtual void SetThickPatternPixel(int x, int y);
+
+	void FillArc(const BRect r, float angle, float span, DisplayDriver*, SetHorizontalLineFuncType setLine);
+	void FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
+	void FillEllipse(BRect r, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
+	void FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
+	void FillRegion(BRegion& r, DisplayDriver* driver, SetRectangleFuncType setRect);
+	void FillRoundRect(BRect r, float xrad, float yrad, DisplayDriver* driver, SetRectangleFuncType setRect, SetHorizontalLineFuncType setLine);
+	void FillTriangle(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
+	void StrokeArc(BRect r, float angle, float span, DisplayDriver* driver, SetPixelFuncType setPixel);
+	void StrokeBezier(BPoint *pts, DisplayDriver* driver, SetPixelFuncType setPixel);
+	void StrokeEllipse(BRect r, DisplayDriver* driver, SetPixelFuncType setPixel);
+	void StrokeLine(BPoint start, BPoint end, DisplayDriver* driver, SetPixelFuncType setPixel);
+	void StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* driver, SetPixelFuncType setPixel, bool is_closed=true);
+	void StrokeRect(BRect r, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine);
+	void StrokeRoundRect(BRect r, float xrad, float yrad, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine, SetPixelFuncType setPixel);
+
+	PatternHandler fDrawPattern;
+	RGBColor fDrawColor;
+	int fLineThickness;
 
 private:
 	BLocker *_locker;
