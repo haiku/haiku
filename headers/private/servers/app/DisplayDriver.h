@@ -307,10 +307,9 @@ class DisplayDriver {
 	virtual void				Unlock() = 0;
 
 	// display mode access
-	virtual void				SetMode(const display_mode &mode);
-			void				GetMode(display_mode *mode);
-	inline	const display_mode*	DisplayMode() const
-									{ return &fDisplayMode; }
+	virtual void				SetMode(const display_mode &mode) = 0;
+	virtual	void				GetMode(display_mode *mode) = 0;
+	virtual	const display_mode*	DisplayMode() = 0;
 	
 	virtual bool				DumpToFile(const char *path) = 0;
 	virtual ServerBitmap*		DumpToBitmap() = 0;
@@ -319,9 +318,9 @@ class DisplayDriver {
 												const LineArrayData *data,
 												const DrawData *d) = 0;
 
-	virtual status_t			SetDPMSMode(const uint32 &state);
-	virtual uint32				DPMSMode();
-	virtual uint32				DPMSCapabilities();
+	virtual status_t			SetDPMSMode(const uint32 &state) = 0;
+	virtual uint32				DPMSMode() = 0;
+	virtual uint32				DPMSCapabilities() = 0;
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
 
 	virtual status_t			GetModeList(display_mode **mode_list,
@@ -357,10 +356,6 @@ class DisplayDriver {
 	// needed by Layer
 	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
- protected:
-			display_mode		fDisplayMode;
-			uint32				fDPMSState;
-			uint32				fDPMSCaps;
 };
 
 #endif
