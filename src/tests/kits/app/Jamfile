@@ -12,6 +12,8 @@ CommonTestLib libapptest.so
 
 		# BApplication
 		ApplicationTest.cpp
+		AppQuitRequestedTester.cpp
+		AppQuitTester.cpp
 		AppRunner.cpp
 		AppRunTester.cpp
 		BApplicationTester.cpp

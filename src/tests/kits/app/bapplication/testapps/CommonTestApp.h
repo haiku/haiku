@@ -7,6 +7,16 @@
 
 #include <Application.h>
 
+class CommonTestApp;
+
+class EventHandler {
+public:
+	EventHandler() {}
+	virtual ~EventHandler() {}
+
+	virtual void HandleEvent(CommonTestApp *app) = 0;
+};
+
 class CommonTestApp : public BApplication {
 public:
 	CommonTestApp(const char *signature);
@@ -14,23 +24,31 @@ public:
 	virtual ~CommonTestApp();
 
 	virtual void ArgvReceived(int32 argc, char **argv);
+	virtual void MessageReceived(BMessage *message);
 	virtual bool QuitRequested();
 	virtual void ReadyToRun();
 	thread_id Run();
 
 	void SetQuittingPolicy(bool onSecondTry);
+	void SetReportDestruction(bool reportDestruction);
 
-	status_t RunQuitterThread(bigtime_t delay, int32 tries);
+	status_t RunEventThread(bigtime_t delay, int32 count,
+							EventHandler *handler);
+
+	void SetMessageHandler(BHandler *handler);
 
 private:
-	static int32 _QuitterEntry(void *data);
-	int32 _QuitterLoop();
+	static int32 _EventThreadEntry(void *data);
+	int32 _EventLoop();
 
 private:
-	bool		fQuitOnSecondTry;
-	thread_id	fQuitter;
-	bigtime_t	fQuittingDelay;
-	int32		fQuittingTries;
+	bool			fQuitOnSecondTry;
+	thread_id		fEventThread;
+	bigtime_t		fEventDelay;
+	int32			fEventCount;
+	EventHandler	*fEventHandler;
+	BHandler		*fMessageHandler;
+	bool			fReportDestruction;
 };
 
 status_t init_connection();

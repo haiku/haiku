@@ -121,10 +121,18 @@ case 22:launch the app two times: first: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
 		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
 		second app:	quits
 
-
 void Quit()
-TODO
+case 1:	not running application =>
+		Should delete the application object.
+case 2:	running application, call from looper thread =>
+		Run() should return. Should not delete the application object.
+case 3:	running application, call from other thread =>
+		Run() should return. Should not delete the application object.
+case 4:	running application, call from other thread, but don't lock before =>
+		Should print error message, but proceed anyway. Run() should return.
+		Should not delete the application object.
 
 bool QuitRequested()
-TODO
+case 1:	return false the first time, true the second time it is invoked =>
+		Should not quit after the first time, but after the second one.
 

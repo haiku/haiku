@@ -49,6 +49,9 @@ rule CopyBAppTestApp
 	}
 }
 
+# BApplication::BApplication() test apps
+#
+
 SimpleBAppTestApp BApplicationTestApp1.cpp ;
 SimpleBAppTestApp BApplicationTestApp1a.cpp ;
 SimpleBAppTestApp BApplicationTestApp1b.cpp ;
@@ -64,6 +67,10 @@ SimpleBAppTestApp BApplicationTestApp4b.cpp : BApplicationTestApp4.rsrc ;
 SimpleBAppTestApp BApplicationTestApp5.cpp : BApplicationTestApp5.rsrc ;
 SimpleBAppTestApp BApplicationTestApp5a.cpp : BApplicationTestApp5.rsrc ;
 SimpleBAppTestApp BApplicationTestApp5b.cpp : BApplicationTestApp5.rsrc ;
+
+
+# BApplication::Run() test apps
+#
 
 SimpleBAppTestApp AppRunTestApp1.cpp CommonTestApp.cpp	: AppRunTestApp1.rsrc ;
 SimpleBAppTestApp2 AppRunTestApp2 : AppRunTestApp1.o CommonTestApp.o
@@ -81,3 +88,18 @@ CopyBAppTestApp AppRunTestApp3a : AppRunTestApp3 ;
 CopyBAppTestApp AppRunTestApp4a : AppRunTestApp4 ;
 CopyBAppTestApp AppRunTestApp5a : AppRunTestApp5 ;
 CopyBAppTestApp AppRunTestApp6a : AppRunTestApp6 ;
+
+
+# BApplication::Quit() test apps
+#
+
+SimpleBAppTestApp AppQuitTestApp1.cpp CommonTestApp.o ;
+SimpleBAppTestApp AppQuitTestApp2.cpp CommonTestApp.o ;
+SimpleBAppTestApp AppQuitTestApp3.cpp CommonTestApp.o ;
+SimpleBAppTestApp AppQuitTestApp4.cpp CommonTestApp.o ;
+
+
+# BApplication::QuitRequested() test apps
+#
+
+SimpleBAppTestApp AppQuitRequestedTestApp1.cpp CommonTestApp.o ;

@@ -64,7 +64,6 @@ void AppRunTester::RunTest1()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp1") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp1") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -103,7 +102,6 @@ void AppRunTester::RunTest2()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp1", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp1", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -132,7 +130,6 @@ void AppRunTester::RunTest3()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp2") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp2") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -170,7 +167,6 @@ void AppRunTester::RunTest4()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp2", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp2", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -201,7 +197,6 @@ void AppRunTester::RunTest5()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp3") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp3") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -234,7 +229,6 @@ void AppRunTester::RunTest6()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp3", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp3", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -265,7 +259,6 @@ void AppRunTester::RunTest7()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp4") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp4") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -301,7 +294,6 @@ void AppRunTester::RunTest8()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp4", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp4", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -331,7 +323,6 @@ void AppRunTester::RunTest9()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp3") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp3a") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -370,7 +361,6 @@ void AppRunTester::RunTest10()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp3", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp3a", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -400,7 +390,6 @@ void AppRunTester::RunTest11()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp4") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp4a") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -439,7 +428,6 @@ void AppRunTester::RunTest12()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp4", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp4a", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -470,7 +458,6 @@ void AppRunTester::RunTest13()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp5") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp5") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -503,7 +490,6 @@ void AppRunTester::RunTest14()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp5", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp5", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -534,7 +520,6 @@ void AppRunTester::RunTest15()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp6") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp6") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -570,7 +555,6 @@ void AppRunTester::RunTest16()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp6", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp6", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -602,7 +586,6 @@ void AppRunTester::RunTest17()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp5") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp5a") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -636,7 +619,6 @@ void AppRunTester::RunTest18()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp5", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp5a", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -667,7 +649,6 @@ void AppRunTester::RunTest19()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp6") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp6a") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -703,7 +684,6 @@ void AppRunTester::RunTest20()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp6", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp6a", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -740,7 +720,6 @@ void AppRunTester::RunTest21()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp6", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp5", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);
@@ -775,7 +754,6 @@ void AppRunTester::RunTest22()
 	// run the apps
 	AppRunner runner1, runner2;
 	CHK(runner1.Run("AppRunTestApp5", "a b") == B_OK);
-	runner1.Team();
 	CHK(runner2.Run("AppRunTestApp6", "c d e") == B_OK);
 	runner1.WaitFor(true);
 	runner2.WaitFor(true);

@@ -10,9 +10,12 @@
 CommonTestApp::CommonTestApp(const char *signature)
 			 : BApplication(signature),
 			   fQuitOnSecondTry(false),
-			   fQuitter(-1),
-			   fQuittingDelay(0),
-			   fQuittingTries(1)
+			   fEventThread(-1),
+			   fEventDelay(0),
+			   fEventCount(0),
+			   fEventHandler(NULL),
+			   fMessageHandler(NULL),
+			   fReportDestruction(false)
 {
 }
 
@@ -25,10 +28,14 @@ CommonTestApp::CommonTestApp(const char *signature, status_t *result)
 // destructor
 CommonTestApp::~CommonTestApp()
 {
-	if (fQuitter >= 0) {
+	if (fEventThread >= 0) {
 		int32 result;
-		wait_for_thread(fQuitter, &result);
+		wait_for_thread(fEventThread, &result);
 	}
+	if (fReportDestruction)
+		report("BApplication::~BApplication()\n");
+	delete fEventHandler;
+	delete fMessageHandler;
 }
 
 // ArgvReceived
@@ -42,6 +49,15 @@ CommonTestApp::ArgvReceived(int32 argc, char **argv)
 			report(" %s", argv[i]);
 		report("\n");
 	}
+}
+
+// MessageReceived
+void
+CommonTestApp::MessageReceived(BMessage *message)
+{
+	if (fMessageHandler)
+		fMessageHandler->MessageReceived(message);
+	BApplication::MessageReceived(message);
 }
 
 // QuitRequested
@@ -80,51 +96,69 @@ CommonTestApp::SetQuittingPolicy(bool onSecondTry)
 	fQuitOnSecondTry = onSecondTry;
 }
 
-// RunQuitterThread
+// SetReportDestruction
+void
+CommonTestApp::SetReportDestruction(bool reportDestruction)
+{
+	fReportDestruction = reportDestruction;
+}
+
+// RunEventThread
 status_t
-CommonTestApp::RunQuitterThread(bigtime_t delay, int32 tries)
+CommonTestApp::RunEventThread(bigtime_t delay, int32 count,
+							  EventHandler *handler)
 {
 	status_t error = B_OK;
-	fQuittingDelay = delay;
-	fQuittingTries = tries;
+	fEventDelay = delay;
+	fEventCount = count;
+	fEventHandler = handler;
 	// spawn the thread
-	fQuitter = spawn_thread(&_QuitterEntry, "quitter thread",
-							B_NORMAL_PRIORITY, this);
-	if (fQuitter < 0)
-		error = fQuitter;
+	fEventThread = spawn_thread(&_EventThreadEntry, "event thread",
+								B_NORMAL_PRIORITY, this);
+	if (fEventThread < 0)
+		error = fEventThread;
 	if (error == B_OK)
-		error = resume_thread(fQuitter);
+		error = resume_thread(fEventThread);
 	// cleanup on error
-	if (error != B_OK && fQuitter >= 0) {
-		kill_thread(fQuitter);
-		fQuitter = -1;
+	if (error != B_OK && fEventThread >= 0) {
+		kill_thread(fEventThread);
+		fEventThread = -1;
 	}
 	return error;
 }
 
-// _QuitterEntry
+// SetMessageHandler
+void
+CommonTestApp::SetMessageHandler(BHandler *handler)
+{
+	delete fMessageHandler;
+	fMessageHandler = handler;
+}
+
+// _EventThreadEntry
 int32
-CommonTestApp::_QuitterEntry(void *data)
+CommonTestApp::_EventThreadEntry(void *data)
 {
 	int32 result = 0;
 	if (CommonTestApp *app = (CommonTestApp*)data)
-		result = app->_QuitterLoop();
+		result = app->_EventLoop();
 	return result;
 }
 
-// _QuitterLoop
+// _EventLoop
 int32
-CommonTestApp::_QuitterLoop()
+CommonTestApp::_EventLoop()
 {
-	for (; fQuittingTries > 0; fQuittingTries--) {
-		snooze(fQuittingDelay);
-		PostMessage(B_QUIT_REQUESTED, this);
+	for (; fEventCount > 0; fEventCount--) {
+		snooze(fEventDelay);
+		if (fEventHandler)
+			fEventHandler->HandleEvent(this);
 	}
 	return 0;
 }
 
 static const char *kAppRunnerTeamPort = "app runner team port";
-
+static bool connectionEstablished = false;
 static port_id outputPort = -1;
 
 // init_connection
@@ -150,6 +184,7 @@ init_connection()
 		if (written < 0)
 			error = written;
 	}
+	connectionEstablished = (error == B_OK);
 	return error;
 }
 
@@ -159,7 +194,10 @@ report(const char *format,...)
 {
 	va_list args;
 	va_start(args, format);
-	vreport(format, args);
+	if (connectionEstablished)
+		vreport(format, args);
+	else
+		vprintf(format, args);
 	va_end(args);
 }
 
