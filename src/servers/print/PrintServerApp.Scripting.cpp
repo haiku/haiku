@@ -55,6 +55,8 @@ static property_info prop_list[] = {
 		"Delete a specific printer" },
 	{ "Printers", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
 		"Return the number of available printers" },
+	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
+		"Show configuration window" },
 	{ 0 } // terminate list 
 };
 
@@ -74,6 +76,11 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					reply.AddString("result", fDefaultPrinter ? fDefaultPrinter->Name() : "");
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
+				} else if (propName == "UseConfigWindow") {
+					BMessage reply(B_REPLY);
+					reply.AddString("result", fUseConfigWindow ? "true" : "false");
+					reply.AddInt32("error", B_OK);
+					msg->SendReply(&reply);
 				}
 				break;
 	
@@ -84,6 +91,14 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 						BMessage reply(B_REPLY);
 						reply.AddInt32("error", SelectPrinter(newActivePrinter.String()));
 						msg->SendReply(&reply);
+					}
+				} else if (propName == "UseConfigWindow") {
+					bool useConfigWindow;
+					if (msg->FindBool("data", &useConfigWindow) == B_OK) {
+						fUseConfigWindow = useConfigWindow;
+						BMessage reply(B_REPLY);
+						reply.AddInt32("error", fUseConfigWindow);
+						msg->SendReply(&reply);					
 					}
 				}
 				break;
