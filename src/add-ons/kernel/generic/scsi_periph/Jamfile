@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons kernel generic scsi_periph ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon scsi_periph : kernel generic :
+	block.c
+	device_icons.c
+	device.c
+	error_handling.c
+	handle.c
+	io.c
+	removable.c
+	scsi_periph.c
+	;
