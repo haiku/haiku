@@ -176,7 +176,7 @@ status_t delete_buffer(net_buffer *buffer, bool interrupt_safe)
 		return B_BAD_VALUE;
 
 	if (! g_buffers_pool)
-		// Uh? From where come this net_data!?!
+		// Uh? From where come this net_buffer!?!
 		return B_ERROR;
 		
 	printf("delete_buffer(%p)\n", buffer);
@@ -355,135 +355,69 @@ error1:
 // --------------------------------------------------
 status_t remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes)
 {
-#if 0
-	// TODO!!!
-
-	net_buffer_chunk *	ndn;
-	net_buffer_chunk *	start_node;
-	net_buffer_chunk *	end_node;
-	uint32			start_node_offset;
-	uint32			end_node_offset;
-	net_buffer_chunk *	start_split_node;
-	net_buffer_chunk *	end_split_node;
-	uint8 *			data;
+	net_buffer_chunk 	*first_chunk;
+	net_buffer_chunk 	*last_chunk;
+	net_buffer_chunk	*previous_chunk;
+	uint32 offset_in_first_chunk;
+	uint32 offset_in_last_chunk;
 	
+	if (! buffer)
+		return B_BAD_VALUE;
+	
+	if (offset >= buffer->len)
+		return B_BAD_VALUE;
+
 	if (bytes < 1)
 		return B_BAD_VALUE;
 
-	/*
-	Possibles cases:
-	[XXXXXXX|++++++]....	Triming at start of node (start and/or end nodes)
-    [+++|XXXXXX|+++]....    Triming in the middle of *one* node
-	[+++++|XXXXXXXX]....    Triming at the end of start node
-	...[XXXXXXXXXXXXXX].... Triming one or more full node
-	*/
-
-	start_node = find_buffer_chunk(nd, offset, &start_node_offset, NULL);
-	if (! start_node)
+	first_chunk = find_buffer_chunk(buffer, offset, &offset_in_first_chunk, &previous_chunk);
+	if (! first_chunk)
 		return B_BAD_VALUE;
-
-	end_node = find_buffer_chunk(nd, offset + bytes, &end_node_offset, NULL);
-	if (! end_node)
+	
+	last_chunk = find_buffer_chunk(buffer, offset + bytes, &offset_in_last_chunk, NULL);
+	if (! last_chunk)
 		return B_BAD_VALUE;
+	
+	if (offset_in_last_chunk) {
+		// we must split last_chunk data in two parts,
+		// removing beginnin chunk from data lists and adding the ending one :-(
 
-	if ( (start_node == end_node) && 
-		 (start_node_offset > 0) && (end_node_offset != end_node->len) )
-		 // need to split one node into two parts, left & right, to be able to 
-		 // trim data in the middle:
-		 // [++++|XXXXXX|+++++++]
-		 return B_OK;
-	};
-
-	// if the trimmed part is in one node, we know now that it's:
-	// |++++++|XXXXXXXXXXXX|, or:
-	// |XXXXXXXXX|+++++++++|
-
-	if (start_node_offset)
-		start_node->len = start_node_offset;
-
-	if (end_node_offset) {
-		data = (uint8 *) end_node->data;
-		data += end_node_offset;
-		end_node->data = data;
-		end_node->len -= end_node_offset;
-	};
-
-		// start node must be split
-		split = (uint8 *) start_node->data;
-		split += start_node_offset;
-		start_split_node = new_buffer_chunk(split, start_node->len - start_node_offset);
-		if (! start_split_node)
-			goto error1;
-	};
-
-	if (end_node_offset) {
-		// end node must be split
-		split = (uint8 *) end_node->data;
-		split += end_node_offset;
-		end_split_node = new_buffer_chunk(split, end_node->len - end_node_offset);
-		if (! end_split_node)
-			goto error2;
-	};
-
-	if (start_split_node) {
-	};
-
-	ndn = start_node->next_data;
-	while (ndn->next_data != end_node) {
-		if (ndn->next_data == end_node)
-			break;
-
-		ndn = ndn->next_data;
-	};
-	!= end_node
-
-	if (end_split_node) {
-	};
-
-
-		// split start_node data chunk in two parts
-		start_node->len = start_node_offset;
+		net_buffer_chunk *split_chunk;
+		uint8 *split;
 		
-		start_split_node->free_func = NULL;
+		// remove the beginning of last_chunk data
+		
+		split = (uint8 *) last_chunk->data;
+		split += offset_in_last_chunk;
+		split_chunk = new_buffer_chunk(split, last_chunk->len - offset_in_last_chunk);
+		// if (! split_chunk)
+		//	goto error1;
+		// as split_chunk data comes from 'last_chunk', we don't 
+		// ask to free this chunk data, as it would be by previous_chunk
+		split_chunk->free_func = NULL;
+		split_chunk->next_data = last_chunk->next_data;
 
+		// add the split_chunk to buffer's all_chunks list
+		split_chunk->next 	= buffer->all_chunks;
+		buffer->all_chunks	= split_chunk;
+		
+		last_chunk = split_chunk;
 	};
-	
 
+	if (offset_in_first_chunk) {
+		// remove the end of first_chunk data: just forgot about last bytes of data :-)
+		first_chunk->len = offset_in_first_chunk;
+	} else
+		first_chunk = previous_chunk;
 
-	ndn->len = offset_in_node;
+	// fix the data chunks list to remove chunk(s), if any
+	if (first_chunk)
+		first_chunk->next_data = last_chunk;
+	else
+		buffer->data_chunks = last_chunk; 
 	
-	split_node->free_func = NULL;	// as split_node data comes from 'ndn', we don't 
-									// free this node data but only 'ndn' one...
-
-	// create a new node to host inserted data
-	new_node = new_buffer_chunk(data, bytes);
-	if (! new_node)
-		goto error2;
-	
-	new_node->free_func		= freethis; // can be NULL = don't free this chunk
-	new_node->free_cookie	= NULL;	
-	
-	// add these nodes to node_list (nodes order don't matter in this list, so we do it the easy way :-)
-	split_node->next 	= nd->node_list;
-	new_node->next 	= split_node;
-	nd->node_list 		= new_node;
-
-	// Insert this new_node this node to the end of data_list
-	split_node->next_data = ndn->next_data;
-	ndn->next_data = new_node;
-	new_node->next_data = split_node;
-
-	nd->len -= bytes;
-	
+	buffer->len -= bytes;	
 	return B_OK;
-
-error2:
-	g_memory_pool->delete_pool_node(g_buffer_chunks_pool, end_split_node);
-error1:
-	if (start_split_node)
-		g_memory_pool->delete_pool_node(g_buffer_chunks_pool, start_split_node);
-#endif
-	return B_ERROR;
 }
 
 
@@ -558,6 +492,27 @@ uint32 write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 
 		
 	return len;	
 }
+
+
+// --------------------------------------------------
+status_t add_buffer_attribut(net_buffer *buffer, const char *name, int type, ...)
+{
+	return B_ERROR;
+}
+
+
+// --------------------------------------------------
+status_t remove_buffer_attribut(net_buffer *buffer, const char *name)
+{
+	return B_ERROR;
+}
+
+
+status_t find_buffer_attribut(net_buffer *buffer, const char *name, int *type, void **attribut, size_t *size)
+{
+	return B_ERROR;
+}
+
 
 //	#pragma mark [data(s) queues functions]
 
@@ -871,7 +826,7 @@ void dump_memory
       	for ( j = i; j < i+16 ; j++ )
 			{
 			if ( j < len )
-				sprintf(ptr, "%02x ",byte[j]);
+				sprintf(ptr, "%02x ", byte[j]);
 			else
 				sprintf(ptr, "   ");
 			ptr += 3;

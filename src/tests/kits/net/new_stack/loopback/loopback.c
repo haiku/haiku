@@ -12,7 +12,6 @@
 #include <Drivers.h>
 
 #include "net_stack.h"
-#include "net_layer.h"
 
 status_t 	std_ops(int32 op, ...);
 
@@ -22,24 +21,15 @@ static struct net_stack_module_info *g_stack = NULL;
 
 
 // -------------------
-status_t init(void * params)
+status_t init(net_layer *me)
 {
-	net_layer *layer;
-
-	layer = malloc(sizeof(*layer));
-	if (!layer)
-		return B_NO_MEMORY;
-
-	layer->name   = "*/loopback";
-	layer->module = &nlmi;
-			
-	return g_stack->register_layer(layer);
+	printf("%s: initing layer\n", me->name);
+	return B_OK;
 }
 
 status_t uninit(net_layer *me)
 {
-	printf("%s: uniniting layer\n", me->name);
-	free(me);
+	printf("loopback: uniniting layer\n");
 	return B_OK;
 }
 
@@ -63,9 +53,16 @@ status_t output_buffer(net_layer *me, net_buffer *buffer)
 status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
-		case B_MODULE_INIT:
+		case B_MODULE_INIT: {
+			status_t status;
+			
 			printf("loopback: B_MODULE_INIT\n");
-			return get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			status = get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			if (status != B_OK)
+				return status;
+			
+			return g_stack->register_layer("*/loopback", &nlmi, NULL, NULL);
+		}
 			
 		case B_MODULE_UNINIT:
 			printf("loopback: B_MODULE_UNINIT\n");
@@ -80,7 +77,7 @@ status_t std_ops(int32 op, ...)
 
 struct net_layer_module_info nlmi = {
 	{
-		NET_LAYER_MODULE_ROOT "interfaces/loopback",
+		NET_LAYER_MODULES_ROOT "interfaces/loopback",
 		0,
 		std_ops
 	},

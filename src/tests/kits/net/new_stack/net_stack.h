@@ -29,8 +29,40 @@ typedef int benaphore;
 #define lock_benaphore(a)
 #define unlock_benaphore(a)
 
-// Networking layer(s) definition
-#include "net_layer.h"
+// Networking layer(s) definitions
+typedef struct net_layer net_layer;
+#define NET_LAYER_MODULES_ROOT	"network/layers/"
+
+typedef struct net_layer_module_info {
+	module_info	info;
+	
+	status_t (*init)(net_layer *me);
+	status_t (*uninit)(net_layer *me);
+	status_t (*enable)(net_layer *me, bool enable);
+	status_t (*input_buffer)(net_layer *me, struct net_buffer *buffer);
+	status_t (*output_buffer)(net_layer *me, struct net_buffer *buffer);
+} net_layer_module_info;
+
+struct net_layer {
+	struct net_layer 				*next;
+	char 							*name;
+	net_layer_module_info 			*module;
+	void 							*cookie;
+	struct net_layer 				**layers_above;
+	struct net_layer				**layers_below;
+};
+
+// Networking attributs
+enum {
+	NET_ATTRIBUT_BOOL,
+	NET_ATTRIBUT_BYTE,
+	NET_ATTRIBUT_INT16,
+	NET_ATTRIBUT_INT32,
+	NET_ATTRIBUT_INT64,
+	NET_ATTRIBUT_DATA,
+	NET_ATTRIBUT_STRING,
+	NET_ATTRIBUT_POINTER
+};
 
 // Network stack main module definition
 
@@ -48,8 +80,13 @@ struct net_stack_module_info {
 	 * Net layers handling
 	 */
 	
-	status_t (*register_layer)(net_layer *layer);
+	status_t (*register_layer)(const char *name, net_layer_module_info *module, void *cookie, net_layer **me);
 	status_t (*unregister_layer)(net_layer *layer);
+
+	status_t (*add_layer_attribut)(net_layer *layer, const char *name, int type, ...);
+	status_t (*remove_layer_attribut)(net_layer *layer, const char *name);
+	status_t (*find_layer_attribut)(net_layer *layer, const char *name,
+					int *type, void **attribut, size_t *size);
 	
 	status_t  (*push_buffer_up)(net_layer *me, net_buffer *buffer);
 	status_t  (*push_buffer_down)(net_layer *me, net_buffer *buffer);
@@ -76,6 +113,11 @@ struct net_stack_module_info {
 
 	uint32 			(*read_buffer)(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
 	uint32 			(*write_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
+	
+	status_t 		(*add_buffer_attribut)(net_buffer *buffer, const char *name, int type, ...);
+	status_t 		(*remove_buffer_attribut)(net_buffer *buffer, const char *name);
+	status_t 		(*find_buffer_attribut)(net_buffer *buffer, const char *name,
+						int *type, void **attribut, size_t *size);
 	
 	void			(*dump_buffer)(net_buffer *buffer);
 

@@ -68,6 +68,11 @@ int test_buffer()
 
   g_stack->dump_buffer(buffer);
 
+  printf("Removing 61 bytes at offset 4...\n");
+  g_stack->remove_from_buffer(buffer, 4, 61);
+
+  g_stack->dump_buffer(buffer);
+
   len = g_stack->read_buffer(buffer, 2, data, sizeof(data));
   data[len] = 0;
 

@@ -12,7 +12,6 @@
 #include <Drivers.h>
 
 #include "net_stack.h"
-#include "net_layer.h"
 
 status_t 	std_ops(int32 op, ...);
 
@@ -21,44 +20,16 @@ struct net_layer_module_info nlmi;
 static struct net_stack_module_info *g_stack = NULL;
 
 // -------------------
-status_t init(void * params)
+status_t init(net_layer *me)
 {
-	status_t status;
-	net_layer *layer1, *layer2;
+	printf("%s: initing layer\n", me->name);
+	return B_OK;
 
-	layer2 = NULL;
-	status = B_NO_MEMORY;
-
-	layer1 = malloc(sizeof(*layer1));
-	if (!layer1)
-		goto error;
-
-	layer1->name   = "ethernet/arp";
-	layer1->module = &nlmi;
-	
-	layer2 = malloc(sizeof(*layer2));
-	if (!layer2)
-		goto error;
-
-	layer2->name   = "arp/ethernet";
-	layer2->module = &nlmi;
-			
-	status = g_stack->register_layer(layer1);
-	return g_stack->register_layer(layer2);
-
-error:;
-	if (layer1)
-		free(layer1);
-	if (layer2)
-		free(layer2);
-	return status;
 }
 
 status_t uninit(net_layer *me)
 {
 	printf("%s: uniniting layer\n", me->name);
-	
-	free(me);
 	return B_OK;
 }
 
@@ -94,9 +65,30 @@ status_t output_buffer(net_layer *me, net_buffer *buffer)
 status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
-		case B_MODULE_INIT:
+		case B_MODULE_INIT: {
+			status_t status;
+			net_layer *layer1, *layer2;
+			
 			printf("arp: B_MODULE_INIT\n");
-			return get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			status = get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			if (status != B_OK)
+				return status;
+				
+			status = g_stack->register_layer("ethernet/arp", &nlmi, NULL, &layer1);
+			if (status != B_OK)
+				goto error1;
+				
+			status = g_stack->register_layer("arp/ethernet", &nlmi, NULL, &layer2);
+			if (status != B_OK)
+				goto error2;
+
+			return B_OK;
+error2:
+			g_stack->unregister_layer(layer1);
+error1:
+			put_module(NET_STACK_MODULE_NAME);
+			return status;
+			}
 			
 		case B_MODULE_UNINIT:
 			printf("arp: B_MODULE_UNINIT\n");
@@ -111,7 +103,7 @@ status_t std_ops(int32 op, ...)
 
 struct net_layer_module_info nlmi = {
 	{
-		NET_LAYER_MODULE_ROOT "protocols/arp/v0",
+		NET_LAYER_MODULES_ROOT "protocols/arp/v0",
 		0,
 		std_ops
 	},

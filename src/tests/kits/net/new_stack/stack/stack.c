@@ -73,6 +73,9 @@ struct net_stack_module_info nsmi = {
 	// Layers handling
 	register_layer,
 	unregister_layer,
+	add_layer_attribut,
+	remove_layer_attribut,
+	find_layer_attribut,
 	
 	push_buffer_up,
 	push_buffer_down,
@@ -91,6 +94,10 @@ struct net_stack_module_info nsmi = {
 	
 	read_buffer,
 	write_buffer,
+	
+	add_buffer_attribut,
+	remove_buffer_attribut,
+	find_buffer_attribut,
 
 	dump_buffer,
 	

@@ -14,7 +14,6 @@
 #include <Drivers.h>
 
 #include "net_stack.h"
-#include "net_layer.h"
 
 enum {
 	ETHER_GETADDR = B_DEVICE_OP_CODES_END,
@@ -26,12 +25,11 @@ enum {
 	ETHER_GETFRAMESIZE
 };
 
-typedef struct ethernet_device_layer {
-	net_layer			layer;
+typedef struct ethernet_device {
 	int 				fd;
 	int					max_frame_size;
 	volatile thread_id	reader_thread;
-} ethernet_device_layer;
+} ethernet_device;
 
 #define	ETHER_ADDR_LEN	6	/* Ethernet address length		*/
 #define ETHER_TYPE_LEN	2	/* Ethernet type field length		*/
@@ -58,36 +56,35 @@ static struct net_stack_module_info *g_stack = NULL;
 
 
 // -------------------
-status_t init(void * params)
+status_t init(net_layer *me)
 {
-	return lookup_devices("/dev/net", params);
+	printf("%s: initing layer\n", me->name);
+	return B_OK;
 }
 
 status_t uninit(net_layer *me)
 {
-	ethernet_device_layer *edl = (ethernet_device_layer *) me;
+	ethernet_device *ed = me->cookie;
 	
 	printf("%s: uniniting layer\n", me->name);
 	
-	close(edl->fd);
+	close(ed->fd);
+	free(me->cookie);
 
-	free(me->name);
-	free(me);
-	
 	return B_OK;
 }
 
 
 status_t enable(net_layer *me, bool enable)
 {
-	ethernet_device_layer *edl = (ethernet_device_layer *) me;
+	ethernet_device *ed = me->cookie;
 
 	if (enable) {
 		// enable this layer
 		thread_id tid;
 		char name[B_OS_NAME_LENGTH * 2];
 
-		if (edl->reader_thread != -1)
+		if (ed->reader_thread != -1)
 			// already up
 			return B_OK;
 		
@@ -100,7 +97,7 @@ status_t enable(net_layer *me, bool enable)
 			return tid;
 		};
 
-		edl->reader_thread = tid;
+		ed->reader_thread = tid;
 		return resume_thread(tid);
 
 	} else {
@@ -108,14 +105,14 @@ status_t enable(net_layer *me, bool enable)
 		status_t dummy;
 	
 		// disable this layer
-		if (edl->reader_thread == -1)
+		if (ed->reader_thread == -1)
 			// already down
 			return B_OK;
 	
-		send_signal_etc(edl->reader_thread, SIGTERM, 0);
-		wait_for_thread(edl->reader_thread, &dummy);
+		send_signal_etc(ed->reader_thread, SIGTERM, 0);
+		wait_for_thread(ed->reader_thread, &dummy);
 		printf("%s: device reader stopped.\n", me->name);
-		edl->reader_thread = -1;
+		ed->reader_thread = -1;
 		return B_OK;
 	};
 	
@@ -186,7 +183,7 @@ status_t lookup_devices(char *root, void *cookie)
 
 status_t register_device(const char *path, void *cookie)
 {
-	ethernet_device_layer *edl;
+	ethernet_device *ed;
 	int frame_size;
 	ether_addr_t mac_address;
 	int fd;
@@ -232,32 +229,29 @@ status_t register_device(const char *path, void *cookie)
 			mac_address.byte[2], mac_address.byte[3],
 			mac_address.byte[4], mac_address.byte[5], frame_size);
 
-	edl = malloc(sizeof(*edl));
-	if (!edl) {
+	ed = malloc(sizeof(*ed));
+	if (!ed) {
 		close(fd);
 		return B_NO_MEMORY;
 	};
 
-	edl->fd = fd;
-	edl->max_frame_size = frame_size;
-	edl->reader_thread = -1;
+	ed->fd = fd;
+	ed->max_frame_size = frame_size;
+	ed->reader_thread = -1;
 
 	name = malloc(strlen("ethernet/") + strlen(path)); 
 	strcpy(name, "ethernet/");
 	strcat(name, path + strlen("/dev/net/"));
 
-	edl->layer.name   = name;
-	edl->layer.module = &nlmi;
-			
-	return g_stack->register_layer(&edl->layer);
+	return g_stack->register_layer(name, &nlmi, ed, NULL);
 }
 
 // ----------------------------------------------------
 status_t device_reader(void *args)
 {
-	net_layer 	*me = args;
-	ethernet_device_layer *edl = (ethernet_device_layer *) me;
-	net_buffer 	*buffer;
+	net_layer 		*me = args;
+	ethernet_device *ed = (ethernet_device *) me->cookie;
+	net_buffer 		*buffer;
 	status_t status;
 	void *frame;
 	ssize_t sz;
@@ -266,14 +260,14 @@ status_t device_reader(void *args)
 	
 	status = B_OK;
 	while(1) {
-		frame = malloc(edl->max_frame_size);
+		frame = malloc(ed->max_frame_size);
 		if (!frame) {
 			status = B_NO_MEMORY;
 			break;
 		};
 
 		// read on frame at time
-		sz = read(edl->fd, frame, edl->max_frame_size);
+		sz = read(ed->fd, frame, ed->max_frame_size);
 		if (sz >= B_OK) {
 			buffer = g_stack->new_buffer();
 			if (!buffer) {
@@ -293,7 +287,7 @@ status_t device_reader(void *args)
 		};
 	};
 	
-	edl->reader_thread = -1;
+	ed->reader_thread = -1;
 	return status;
 }
 
@@ -302,9 +296,17 @@ status_t device_reader(void *args)
 status_t std_ops(int32 op, ...) 
 {
 	switch(op) {
-		case B_MODULE_INIT:
+		case B_MODULE_INIT: {
+			status_t status;
+			
 			printf("ethernet: B_MODULE_INIT\n");
-			return get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			status = get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
+			if (status != B_OK)
+				return status;
+				
+			lookup_devices("/dev/net", NULL);
+			return B_OK;
+		};
 			
 		case B_MODULE_UNINIT:
 			printf("ethernet: B_MODULE_UNINIT\n");
@@ -319,7 +321,7 @@ status_t std_ops(int32 op, ...)
 
 struct net_layer_module_info nlmi = {
 	{
-		NET_LAYER_MODULE_ROOT "interfaces/ethernet",
+		NET_LAYER_MODULES_ROOT "interfaces/ethernet",
 		0,
 		std_ops
 	},
