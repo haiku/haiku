@@ -8,70 +8,66 @@
 
 #include <Application.h>
 #include <DiskDevice.h>
-#include <DiskDeviceList.h>
+//#include <DiskDeviceList.h>
 #include <DiskDeviceRoster.h>
+#include <DiskDeviceVisitor.h>
+#include <KDiskDeviceManager.h>	// for userland testing only
 #include <Message.h>
 #include <Messenger.h>
 #include <Partition.h>
 #include <Path.h>
-#include <ObjectList.h>
+//#include <ObjectList.h>
 #include <OS.h>
-#include <Session.h>
 
 // DumpVisitor
 class DumpVisitor : public BDiskDeviceVisitor {
 public:
 	virtual bool Visit(BDiskDevice *device)
 	{
-		printf("device `%s'\n", device->Path());
-		BString name;
-		if (device->GetName(&name, false, false) == B_OK)
-			printf("  name(0,0):     `%s'\n", name.String());
-		if (device->GetName(&name, false, true) == B_OK)
-			printf("  name(0,1):     `%s'\n", name.String());
-		if (device->GetName(&name, true, false) == B_OK)
-			printf("  name(1,0):     `%s'\n", name.String());
-		if (device->GetName(&name, true, true) == B_OK)
-			printf("  name(1,1):     `%s'\n", name.String());
-		printf("  size:          %lld\n", device->Size());
-		printf("  block size:    %ld\n", device->BlockSize());
-		printf("  read-only:     %d\n", device->IsReadOnly());
+		BPath path;
+		status_t error = device->GetPath(&path);
+		const char *pathString = NULL;
+		if (error == B_OK)
+			pathString = path.Path();
+		else
+			pathString = strerror(error);
+		printf("device %ld: `%s'\n", device->UniqueID(), pathString);
 		printf("  removable:     %d\n", device->IsRemovable());
 		printf("  has media:     %d\n", device->HasMedia());
-		printf("  type:          0x%x\n", device->Type());
-		return false;
-	}
-	
-	virtual bool Visit(BSession *session)
-	{
-		printf("  session %ld:\n", session->Index());
-		printf("    offset:        %lld\n", session->Offset());
-		printf("    size:          %lld\n", session->Size());
-		printf("    block size:    %ld\n", session->BlockSize());
-		printf("    flags:         %lx\n", session->Flags());
-		printf("    partitioning : `%s'\n", session->PartitioningSystem());
 		return false;
 	}
 	
 	virtual bool Visit(BPartition *partition)
 	{
-		printf("    partition %ld:\n", partition->Index());
+		BPath path;
+		status_t error = partition->GetPath(&path);
+		const char *pathString = NULL;
+		if (error == B_OK)
+			pathString = path.Path();
+		else
+			pathString = strerror(error);
+		printf("    partition %ld: `%s'\n", partition->UniqueID(), pathString);
 		printf("      offset:         %lld\n", partition->Offset());
 		printf("      size:           %lld\n", partition->Size());
-//		printf("      device:         `%s'\n", partition->Size());
+		printf("      block size:     %lu\n", partition->BlockSize());
+		printf("      index:          %ld\n", partition->Index());
+		printf("      status:         %lu\n", partition->Status());
+		printf("      mountable:      %d\n", partition->IsMountable());
+		printf("      partitionable:  %d\n", partition->IsPartitionable());
+		printf("      device:         %d\n", partition->IsDevice());
+		printf("      read only:      %d\n", partition->IsReadOnly());
+		printf("      mounted:        %d\n", partition->IsMounted());
 		printf("      flags:          %lx\n", partition->Flags());
-		printf("      partition name: `%s'\n", partition->Name());
-		printf("      partition type: `%s'\n", partition->Type());
-		printf("      FS short name:  `%s'\n",
-			   partition->FileSystemShortName());
-		printf("      FS long name:   `%s'\n",
-			   partition->FileSystemLongName());
-		printf("      volume name:    `%s'\n", partition->VolumeName());
-		printf("      FS flags:       0x%lx\n", partition->FileSystemFlags());
+		printf("      name:           `%s'\n", partition->Name());
+		printf("      content name:   `%s'\n", partition->ContentName());
+		printf("      type:           `%s'\n", partition->Type());
+		printf("      content type:   `%s'\n", partition->ContentType());
+		// volume, icon,...
 		return false;
 	}
 };
 
+/*
 // print_time
 void
 print_time(const char *format, bigtime_t &time)
@@ -467,6 +463,7 @@ printf("device: `%s'\n", device->Path());
 private:
 	MyDeviceList	fDeviceList;
 };
+*/
 
 // main
 int
@@ -487,8 +484,21 @@ main()
 	if (error != B_OK)
 		printf("stop watching failed: %s\n", strerror(error));
 */
+/*
 	TestApp2 app("application/x-vnd.obos-disk-device-test");
 	app.Run();
 	return 0;
+*/
+
+	// for userland testing only
+	KDiskDeviceManager::CreateDefault();
+	KDiskDeviceManager::Default()->InitialDeviceScan();
+
+	BDiskDeviceRoster roster;
+	DumpVisitor visitor;
+	roster.VisitAll(&visitor);
+
+	// for userland testing only
+	KDiskDeviceManager::DeleteDefault();
 }
 

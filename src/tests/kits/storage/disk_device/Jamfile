@@ -1,13 +1,10 @@
 SubDir OBOS_TOP src tests kits storage disk_device ;
 
 #UsePrivateHeaders $(DOT) ;
-UsePrivateHeaders app ;
-UsePrivateHeaders shared ;
+#UsePrivateHeaders app ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+#UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
-
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ]
-				 [ FDirName $(OBOS_TOP) src kits app ]
-				 [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 SimpleTest DiskDeviceTest
 	: DiskDeviceTest.cpp
@@ -20,7 +17,7 @@ SimpleTest DiskDeviceTest
 #	  RosterPrivate.cpp
 
 	: <boot!home!config!lib>libdiskdevice.so be
+	  <boot!home!config!lib>libdisk_device_manager.so
 ;
 
-Depends DiskDeviceTest : userland_disk_scanner_modules
-						 gui_disk_scanner_add_ons ;
+Depends DiskDeviceTest : userland_disk_system_modules ;
