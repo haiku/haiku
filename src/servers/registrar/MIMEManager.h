@@ -14,6 +14,8 @@ public:
 	virtual void MessageReceived(BMessage *message);
 private:
 	void HandleSetParam(BMessage *message);
+	void HandleDeleteParam(BMessage *message);
+	
 	BPrivate::MimeDatabase fMimeDatabase;
 };
 

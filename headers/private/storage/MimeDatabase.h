@@ -25,15 +25,15 @@ public:
 	status_t Delete(const char *type);
 	bool IsInstalled(const char *type) const;
 	status_t GetIcon(const char *type, BBitmap *icon, icon_size size) const;
-	status_t GetPreferredApp(const char *type, char *signature, app_verb verb = B_OPEN) const;
+	status_t GetPreferredApp(const char *type, char *signature, app_verb verb) const;
 //	status_t GetAttrInfo(BMessage *info) const;
 //	status_t GetFileExtensions(BMessage *extensions) const;
 	status_t GetShortDescription(const char *type, char *description) const;
 	status_t GetLongDescription(const char *type, char *description) const;
 //	status_t GetSupportingApps(BMessage *signatures) const;
 
-	status_t SetIcon(const char *type, const BBitmap *icon, icon_size size);
-	status_t SetIcon(const char *type, icon_size size, const void *data, size_t dataSize);
+//	status_t SetIcon(const char *type, const BBitmap *icon, icon_size which);
+	status_t SetIcon(const char *type, const void *data, size_t dataSize, icon_size which);
 	status_t SetPreferredApp(const char *type, const char *signature, app_verb verb = B_OPEN);
 //	status_t SetAttrInfo(const BMessage *info);
 //	status_t SetFileExtensions(const BMessage *extensions);
@@ -51,10 +51,10 @@ public:
 	status_t SetAppHint(const char *type, const entry_ref *ref);
 
 	/* for application signatures only.*/
-//	status_t GetIconForType(const char *type, BBitmap *icon,
-//							icon_size which) const;
-//	status_t SetIconForType(const char *type, const BBitmap *icon,
-//							icon_size which);
+	status_t GetIconForType(const char *type, const char *fileType, BBitmap *icon,
+							icon_size which) const;
+	status_t SetIconForType(const char *type, const char *fileType, const void *data,
+							size_t dataSize, icon_size which);
 
 	/* sniffer rule manipulation */
 //	status_t GetSnifferRule(BString *result) const;
@@ -73,10 +73,23 @@ public:
 
 	static status_t GetIconData(const BBitmap *icon, icon_size size, void **data, int32 *dataSize);
 
+	status_t DeleteAttribute(const char *type, const char *attr);
+
+	static std::string ToLower(const char *str);
+
 	static const char *kDefaultDatabaseDir;
+	
+	static const char *kMiniIconAttrPrefix;
+	static const char *kLargeIconAttrPrefix; 
+	
+	static const char *kTypeAttr;
+	static const char *kPreferredAppAttr;
+	static const char *kAppHintAttr;
+	static const char *kMiniIconAttr;
+	static const char *kLargeIconAttr;
+	static const char *kShortDescriptionAttr;
+	static const char *kLongDescriptionAttr;	
 private:
-	static const char *kMiniIconAttribute; 
-	static const char *kLargeIconAttribute; 
 
 	ssize_t ReadMimeAttr(const char *type, const char *attr, void *data,
 	                       size_t len, type_code datatype) const;
@@ -92,6 +105,9 @@ private:
 	status_t SendMonitorUpdate(int32 which, const char *type);
 	status_t SendMonitorUpdate(BMessage &msg);
 	
+	// General icon functions used by {Get,Set}Icon() and {Get,Set}IconForType()
+	status_t GetIcon(const char *type, const char *attr, BBitmap *icon, icon_size which) const;
+	status_t SetIcon(const char *type, const char *attr, const void *data, size_t dataSize, icon_size which);
 	
 	std::string fDatabaseDir;
 	status_t fCStatus;

@@ -23,19 +23,6 @@
 #define DBG(x)
 #define OUT printf
 
-// attribute names
-#define ATTR_PREFIX "META:"
-namespace {
-	const char *kTypeAttr				= ATTR_PREFIX "TYPE";
-	const char *kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
-	const char *kAppHintAttr			= ATTR_PREFIX "PPATH";
-	const char *kMiniIconAttr			= ATTR_PREFIX "M:STD_ICON";
-	const char *kLargeIconAttr			= ATTR_PREFIX "L:STD_ICON";
-	const char *kShortDescriptionAttr	= ATTR_PREFIX "S:DESC";
-	const char *kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
-}
-#undef ATTR_PREFIX
-
 // icon types
 enum {
 	B_MINI_ICON_TYPE	= 'MICN',
@@ -47,9 +34,30 @@ namespace BPrivate {
 //const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/beos_mime";
 const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/obos_mime";
 
+// attribute names
+#define ATTR_PREFIX "META:"
+#define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
+#define LARGE_ICON_ATTR_PREFIX ATTR_PREFIX "L:"
+
+const char *MimeDatabase::kMiniIconAttrPrefix	= MINI_ICON_ATTR_PREFIX;
+const char *MimeDatabase::kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX; 
+
+const char *MimeDatabase::kTypeAttr				= ATTR_PREFIX "TYPE";
+const char *MimeDatabase::kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
+const char *MimeDatabase::kAppHintAttr			= ATTR_PREFIX "PPATH";
+const char *MimeDatabase::kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
+const char *MimeDatabase::kLargeIconAttr		= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *MimeDatabase::kShortDescriptionAttr	= ATTR_PREFIX "S:DESC";
+const char *MimeDatabase::kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
+
+#undef ATTR_PREFIX 
+#undef MINI_ICON_ATTR_PREFIX
+#undef LARGE_ICON_ATTR_PREFIX
+
 //! Converts every character in \c str to lowercase and returns the result
 std::string
-to_lower(const char *str) {
+MimeDatabase::ToLower(const char *str)
+{
 	if (str) {
 		std::string result = "";
 		for (int i = 0; i < strlen(str); i++)
@@ -169,77 +177,13 @@ MimeDatabase::IsInstalled(const char *type) const
 	\param size The size icon you're interested in (\c B_LARGE_ICON or \c B_MINI_ICON)
 */
 status_t
-MimeDatabase::GetIcon(const char *type, BBitmap *icon, icon_size size) const
+MimeDatabase::GetIcon(const char *type, BBitmap *icon, icon_size which) const
 {
-	attr_info info;
-	ssize_t err;
-	BNode node;
-	std::string attr;
-	uint32 attrType;
-	size_t attrSize;
-	BRect bounds;
-	char *buffer;
-
-	err = type && icon ? B_OK : B_BAD_VALUE;
-	
-	// Figure out what kind of data we *should* find
-	if (!err) {
-		switch (size) {
-			case B_MINI_ICON:
-				attr = kMiniIconAttr;
-				bounds.Set(0, 0, 15, 15);
-				attrType = B_MINI_ICON_TYPE;
-				attrSize = 16 * 16;
-				break;
-			case B_LARGE_ICON:
-				attr = kLargeIconAttr;
-				bounds.Set(0, 0, 31, 31);
-				attrType = B_LARGE_ICON_TYPE;
-				attrSize = 32 * 32;
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
-	}
-	// Check the icon and attribute to see if they match
-	if (!err)
-		err = (icon->InitCheck() == B_OK && icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
-	if (!err) 
-		err = OpenType(type, &node);
-	if (!err) 
-		err = node.GetAttrInfo(attr.c_str(), &info);
-	if (!err)
-		err = (attrType == info.type && attrSize == info.size) ? B_OK : B_BAD_VALUE;
-	// read the attribute
-	if (!err) {
-		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		char *buffer = NULL;
-		ssize_t read;
-		if (otherColorSpace) {
-			// other color space than stored in attribute
-			buffer = new(nothrow) char[attrSize];
-			if (!buffer)
-				err = B_NO_MEMORY;
-			if (!err) 
-				err = node.ReadAttr(attr.c_str(), attrType, 0, buffer, attrSize);			
-		} else {
-			// same color space, just read direct
-			err = node.ReadAttr(attr.c_str(), attrType, 0, icon->Bits(), attrSize);
-		}
-		if (err >= 0)
-			err = (err == attrSize) ? B_OK : B_FILE_ERROR;
-		if (otherColorSpace) {
-			if (!err) {
-				icon->SetBits(buffer, attrSize, 0, B_CMAP8);
-				err = icon->InitCheck();
-			}
-			delete[] buffer;
-		}
-	}
-
-	return err;		
+	const char *attr = (which == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
+	return GetIcon(type, attr, icon, which);
 }
+
+
 
 // GetPreferredApp
 //!	Fetches signature of the MIME type's preferred application for the given action.
@@ -316,110 +260,6 @@ MimeDatabase::GetLongDescription(const char *type, char *description) const {
 	return err >= 0 ? B_OK : err ;
 }
 
-// GetIconData
-/*! \brief Returns properly formatted raw bitmap data, ready to be shipped off to the hacked
-	up 4-parameter version of MimeDatabase::SetIcon()
-	
-	This function exists as something of a hack until an OBOS::BBitmap implementation is
-	available. It takes the given bitmap, converts it to the B_CMAP8 color space if necessary
-	and able, and returns said bitmap data in a newly allocated array pointed to by the
-	pointer that's pointed to by \c data. The length of the array is stored in the integer
-	pointed to by \c dataSize. The array is allocated with \c new[], and it's your responsibility
-	to \c delete[] it when you're finished.
-	
-*/
-status_t
-MimeDatabase::GetIconData(const BBitmap *icon, icon_size size, void **data, int32 *dataSize)
-{
-	ssize_t err = (icon && data && size && icon->InitCheck() == B_OK) ? B_OK : B_BAD_VALUE;
-
-	BRect bounds;
-	const char *attr = (size == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
-	int32 attrType;
-	int32 attrSize;
-	
-	BBitmap *icon8 = NULL;
-	void *srcData = NULL;
-	bool otherColorSpace = false;
-
-	// Figure out what kind of data we *should* have
-	if (!err) {
-		switch (size) {
-			case B_MINI_ICON:
-				bounds.Set(0, 0, 15, 15);
-				attrType = B_MINI_ICON_TYPE;
-				attrSize = 16 * 16;
-				break;
-			case B_LARGE_ICON:
-				bounds.Set(0, 0, 31, 31);
-				attrType = B_LARGE_ICON_TYPE;
-				attrSize = 32 * 32;
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
-	}
-	// Check the icon
-	if (!err)
-		err = (icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
-	// Convert to B_CMAP8 if necessary
-	if (!err) {
-		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		if (otherColorSpace) {
-			icon8 = new BBitmap(bounds, B_CMAP8);
-			if (!icon8)
-				err = B_NO_MEMORY;
-			if (!err) {
-				switch (icon->ColorSpace()) {
-					case B_RGB32:
-					{
-						// Set each pixel individually, since SetBits() for B_RGB32 takes
-						// 24-bit rgb pixel data...
-						char *bgra = (char*)icon->Bits();
-						for (uint32 i = 0; i*4+3 < icon->BitsLength(); bgra += 4, i++) {
-							char rgb[3];
-							rgb[0] = bgra[2];	// red
-							rgb[1] = bgra[1];	// green
-							rgb[2] = bgra[0];	// blue
-							icon8->SetBits(rgb, 3, i, B_RGB32);
-						}
-						break;
-					}
-					case B_GRAY1:
-					{
-						icon8->SetBits(icon->Bits(), icon->BitsLength(), 0, B_GRAY1);
-						break;
-					}
-					default:
-						err = B_BAD_VALUE;
-				}
-				if (!err)
-					err = icon8->InitCheck();	// I don't think this is actually useful, even if SetBits() fails...
-			}
-			if (!err) {
-				srcData = icon8->Bits();
-				*dataSize = icon8->BitsLength();
-			}
-		} else {
-			srcData = icon->Bits();
-			*dataSize = icon->BitsLength();
-		}		
-	}
-	// Alloc a new data buffer
-	if (!err) {
-		*data = new char[*dataSize];
-		if (!*data)
-			err = B_NO_MEMORY;
-	}
-	// Copy the data into it.
-	if (!err)
-		memcpy(*data, srcData, *dataSize);	
-	if (otherColorSpace)
-		delete icon8;
-	return err;	
-}
-
 //! Sets the icon for the given mime type
 /*! This is the version I would have used if I could have gotten a BBitmap
 	to the registrar somehow. Since R5::BBitmap::Instantiate is causing a
@@ -431,115 +271,12 @@ MimeDatabase::GetIconData(const BBitmap *icon, icon_size size, void **data, int3
 	I'll add some real documentation.
 */
 status_t
-MimeDatabase::SetIcon(const char *type, const BBitmap *icon, icon_size size)
+MimeDatabase::SetIcon(const char *type, const void *data, size_t dataSize, icon_size which)
 {
-	printf("REG_MIME\n");
-	ssize_t err = (type && icon && icon->InitCheck() == B_OK) ? B_OK : B_BAD_VALUE;
-
-	BRect bounds;
-	const char *attr = (size == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
-	int32 attrType;
-	int32 attrSize;
-	
-	BBitmap *icon8 = NULL;
-	void *data = NULL;
-	bool otherColorSpace = false;
-
-	// Figure out what kind of data we *should* have
-	if (!err) {
-		switch (size) {
-			case B_MINI_ICON:
-				bounds.Set(0, 0, 15, 15);
-				attrType = B_MINI_ICON_TYPE;
-				attrSize = 16 * 16;
-				break;
-			case B_LARGE_ICON:
-				bounds.Set(0, 0, 31, 31);
-				attrType = B_LARGE_ICON_TYPE;
-				attrSize = 32 * 32;
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
-	}
-	// Check the icon
-	if (!err)
-		err = (icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
-	// Convert to B_CMAP8 if necessary
-	if (!err) {
-		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
-		if (otherColorSpace) {
-			icon8 = new BBitmap(bounds, B_CMAP8);
-			if (!icon8)
-				err = B_NO_MEMORY;
-			if (!err) {
-				icon8->SetBits(icon->Bits(), icon->BitsLength(), 0, icon->ColorSpace());
-				err = icon8->InitCheck();
-			}
-			if (!err)
-				data = icon8->Bits();
-		} else
-			data = icon->Bits();
-	}
-	// Write the icon data
-	BNode node;
-	if (!err)
-		err = OpenOrCreateType(type, &node);
-	if (!err)
-		err = node.WriteAttr(attr, attrType, 0, data, attrSize);
-	if (err >= 0)
-		err = (err == attrSize) ? B_OK : B_FILE_ERROR;
-	if (otherColorSpace)
-		delete icon8;
-	return err;	
+	const char *attr = (which == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
+	return SetIcon(type, attr, data, dataSize, which);
 }
 
-//! Sets the icon for the given mime type
-/*! This is a hacked up temporary version of this function that we'll use until
-	we have a sufficiently complete OBOS::BBitmap implementation.
-*/
-status_t
-MimeDatabase::SetIcon(const char *type, icon_size size, const void *data, size_t dataSize)
-{
-	ssize_t err = (type && data) ? B_OK : B_BAD_VALUE;
-
-	const char *attr = (size == B_MINI_ICON) ? kMiniIconAttr : kLargeIconAttr;
-	int32 attrType;
-	int32 attrSize;
-	
-	// Figure out what kind of data we *should* have
-	if (!err) {
-		switch (size) {
-			case B_MINI_ICON:
-				attrType = B_MINI_ICON_TYPE;
-				attrSize = 16 * 16;
-				break;
-			case B_LARGE_ICON:
-				attrType = B_LARGE_ICON_TYPE;
-				attrSize = 32 * 32;
-				break;
-			default:
-				err = B_BAD_VALUE;
-				break;
-		}
-	}
-	
-	// Double check the data we've been given
-	if (!err)
-		err = (dataSize == attrSize) ? B_OK : B_BAD_VALUE;
-
-	// Write the icon data
-	BNode node;
-	if (!err)
-		err = OpenOrCreateType(type, &node);
-	if (!err)
-		err = node.WriteAttr(attr, attrType, 0, data, attrSize);
-	if (err >= 0)
-		err = (err == attrSize) ? B_OK : B_FILE_ERROR;
-	return err;	
-		
-}
 
 // SetPreferredApp
 /*!	\brief Sets the signature of the preferred application for the given app verb
@@ -645,6 +382,74 @@ MimeDatabase::SetAppHint(const char *type, const entry_ref *ref)
 	return err;
 }
 
+// GetIconForType
+/*! \brief Fetches the large or mini icon used by an application of this type for files of the
+	given type.
+	
+	The type of the \c BMimeType object is not required to actually be a subtype of
+	\c "application/"; that is the intended use however, and calling \c GetIconForType()
+	on a non-application type will likely return \c B_ENTRY_NOT_FOUND.
+	
+	The icon is copied into the \c BBitmap pointed to by \c icon. The bitmap must
+	be the proper size: \c 32x32 for the large icon, \c 16x16 for the mini icon.	
+	
+	\param type The MIME type
+	\param type Pointer to a pre-allocated string containing the MIME type whose
+	            custom icon you wish to fetch. If NULL, works just like GetIcon().
+	\param icon Pointer to a pre-allocated \c BBitmap of proper size and colorspace into
+				which the icon is copied.
+	\param icon_size Value that specifies which icon to return. Currently \c B_LARGE_ICON
+					 and \c B_MINI_ICON are supported.
+	\return
+	- \c B_OK: Success
+	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
+	- "error code": Failure	
+
+*/
+status_t
+MimeDatabase::GetIconForType(const char *type, const char *fileType, BBitmap *icon,
+	  						   icon_size which) const
+{
+	std::string attr = ((which == B_MINI_ICON)
+	                       ? kMiniIconAttrPrefix
+	                         : kLargeIconAttrPrefix)
+	                       + ToLower(fileType);
+	return GetIcon(type, attr.c_str(), icon, which);
+}
+
+// SetIconForType
+/*! \brief Sets the large or mini icon used by an application of this type for
+	files of the given type.
+
+	The type of the \c BMimeType object is not required to actually be a subtype of
+	\c "application/"; that is the intended use however, and application-specific
+	icons are not expected to be present for non-application types.
+		
+	The bitmap data pointed to by \c data must be of the proper size (\c 32x32
+	for \c B_LARGE_ICON, \c 16x16 for \c B_MINI_ICON) and the proper color
+	space (B_CMAP8).
+	
+	\param type The MIME type
+	\param fileType The MIME type whose custom icon you wish to set.
+	\param data Pointer to an array of bitmap data of proper dimensions and color depth
+	\param dataSize The length of the array pointed to by \c data
+	\param size The size icon you're expecting (\c B_LARGE_ICON or \c B_MINI_ICON)
+	\return
+	- \c B_OK: Success
+	- "error code": Failure	
+
+*/
+status_t
+MimeDatabase::SetIconForType(const char *type, const char *fileType, const void *data,
+							   size_t dataSize, icon_size which)
+{
+	std::string attr = ((which == B_MINI_ICON)
+	                       ? kMiniIconAttrPrefix
+	                         : kLargeIconAttrPrefix)
+	                       + ToLower(fileType);
+	return SetIcon(type, attr.c_str(), data, dataSize, which);
+}
+
 // StartWatching
 //!	Subscribes the given BMessenger to the MIME monitor service
 /*!	Notification messages will be sent with a \c BMessage::what value
@@ -748,6 +553,124 @@ MimeDatabase::StopWatching(BMessenger target)
 	return err;	
 }
 
+// GetIconData
+/*! \brief Returns properly formatted raw bitmap data, ready to be shipped off to the hacked
+	up 4-parameter version of MimeDatabase::SetIcon()
+	
+	This function exists as something of a hack until an OBOS::BBitmap implementation is
+	available. It takes the given bitmap, converts it to the B_CMAP8 color space if necessary
+	and able, and returns said bitmap data in a newly allocated array pointed to by the
+	pointer that's pointed to by \c data. The length of the array is stored in the integer
+	pointed to by \c dataSize. The array is allocated with \c new[], and it's your responsibility
+	to \c delete[] it when you're finished.
+	
+*/
+status_t
+MimeDatabase::GetIconData(const BBitmap *icon, icon_size which, void **data, int32 *dataSize)
+{
+	ssize_t err = (icon && data && dataSize && icon->InitCheck() == B_OK) ? B_OK : B_BAD_VALUE;
+
+	BRect bounds;	
+	BBitmap *icon8 = NULL;
+	void *srcData = NULL;
+	bool otherColorSpace = false;
+
+	// Figure out what kind of data we *should* have
+	if (!err) {
+		switch (which) {
+			case B_MINI_ICON:
+				bounds.Set(0, 0, 15, 15);
+				break;
+			case B_LARGE_ICON:
+				bounds.Set(0, 0, 31, 31);
+				break;
+			default:
+				err = B_BAD_VALUE;
+				break;
+		}
+	}
+	// Check the icon
+	if (!err)
+		err = (icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
+	// Convert to B_CMAP8 if necessary
+	if (!err) {
+		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+		if (otherColorSpace) {
+			icon8 = new BBitmap(bounds, B_CMAP8);
+			if (!icon8)
+				err = B_NO_MEMORY;
+			if (!err) {
+				switch (icon->ColorSpace()) {
+					case B_RGB32:
+					{
+						// Set each pixel individually, since SetBits() for B_RGB32 takes
+						// 24-bit rgb pixel data...
+						char *bgra = (char*)icon->Bits();
+						for (uint32 i = 0; i*4+3 < icon->BitsLength(); bgra += 4, i++) {
+							char rgb[3];
+							rgb[0] = bgra[2];	// red
+							rgb[1] = bgra[1];	// green
+							rgb[2] = bgra[0];	// blue
+							icon8->SetBits(rgb, 3, i, B_RGB32);
+						}
+						break;
+					}
+					case B_GRAY1:
+					{
+						icon8->SetBits(icon->Bits(), icon->BitsLength(), 0, B_GRAY1);
+						break;
+					}
+					default:
+						err = B_BAD_VALUE;
+				}
+				if (!err)
+					err = icon8->InitCheck();	// I don't think this is actually useful, even if SetBits() fails...
+			}
+			if (!err) {
+				srcData = icon8->Bits();
+				*dataSize = icon8->BitsLength();
+			}
+		} else {
+			srcData = icon->Bits();
+			*dataSize = icon->BitsLength();
+		}		
+	}
+	// Alloc a new data buffer
+	if (!err) {
+		*data = new char[*dataSize];
+		if (!*data)
+			err = B_NO_MEMORY;
+	}
+	// Copy the data into it.
+	if (!err)
+		memcpy(*data, srcData, *dataSize);	
+	if (otherColorSpace)
+		delete icon8;
+	return err;	
+}
+
+// DeleteAttribute
+//! Deletes the given attribute for the given type
+/*!
+	\param type The mime type
+	\param attr The attribute name
+	\return
+    - B_OK: success
+    - B_ENTRY_NOT_FOUND: no such type or attribute
+    - "error code": failure
+*/
+status_t
+MimeDatabase::DeleteAttribute(const char *type, const char *attr)
+{
+	status_t err = type ? B_OK : B_BAD_VALUE;
+	BNode node;
+	if (!err)
+		err = OpenType(type, &node);
+	if (!err)
+		err = node.RemoveAttr(attr);
+	return err;
+}
+
 // ReadMimeAttr
 /*! \brief Reads up to \c len bytes of the given data from the given attribute
 	       for the given MIME type.
@@ -836,7 +759,7 @@ status_t
 MimeDatabase::OpenOrCreateType(const char *type, BNode *result)
 {
 	std::string filename;
-	std::string typeLower = to_lower(type);
+	std::string typeLower = ToLower(type);
 	status_t err = (type && result ? B_OK : B_BAD_VALUE);
 	if (!err) {
 		filename = TypeToFilename(type);
@@ -874,7 +797,7 @@ inline
 std::string
 MimeDatabase::TypeToFilename(const char *type) const
 {
-	return fDatabaseDir + "/" + to_lower(type);
+	return fDatabaseDir + "/" + ToLower(type);
 }
 
 // SendMonitorUpdate
@@ -985,5 +908,136 @@ MimeDatabase::SendMonitorUpdate(BMessage &msg) {
 	return B_OK;
 }
 
+// GetIconForAttr
+//! Fetches the icon stored in the given attribute 
+/*! The bitmap pointed to by \c icon must be of the proper size (\c 32x32
+	for \c B_LARGE_ICON, \c 16x16 for \c B_MINI_ICON).
+	
+	\param type The mime type
+	\param attr The attribute in which the icon is stored
+	\param icon Pointer to a pre-allocated bitmap of proper dimensions and color depth
+	\param size The size icon you're expecting (\c B_LARGE_ICON or \c B_MINI_ICON)
+*/
+status_t
+MimeDatabase::GetIcon(const char *type, const char *attr, BBitmap *icon, icon_size which) const
+{
+	attr_info info;
+	ssize_t err;
+	BNode node;
+	uint32 attrType;
+	size_t attrSize;
+	BRect bounds;
+	char *buffer;
+
+	err = type && icon ? B_OK : B_BAD_VALUE;
+	
+	// Figure out what kind of data we *should* find
+	if (!err) {
+		switch (which) {
+			case B_MINI_ICON:
+				bounds.Set(0, 0, 15, 15);
+				attrType = B_MINI_ICON_TYPE;
+				attrSize = 16 * 16;
+				break;
+			case B_LARGE_ICON:
+				bounds.Set(0, 0, 31, 31);
+				attrType = B_LARGE_ICON_TYPE;
+				attrSize = 32 * 32;
+				break;
+			default:
+				err = B_BAD_VALUE;
+				break;
+		}
+	}
+	// Check the icon and attribute to see if they match
+	if (!err)
+		err = (icon->InitCheck() == B_OK && icon->Bounds() == bounds) ? B_OK : B_BAD_VALUE;
+	if (!err) 
+		err = OpenType(type, &node);
+	if (!err) 
+		err = node.GetAttrInfo(attr, &info);
+	if (!err)
+		err = (attrType == info.type && attrSize == info.size) ? B_OK : B_BAD_VALUE;
+	// read the attribute
+	if (!err) {
+		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
+		char *buffer = NULL;
+		ssize_t read;
+		if (otherColorSpace) {
+			// other color space than stored in attribute
+			buffer = new(nothrow) char[attrSize];
+			if (!buffer)
+				err = B_NO_MEMORY;
+			if (!err) 
+				err = node.ReadAttr(attr, attrType, 0, buffer, attrSize);			
+		} else {
+			// same color space, just read direct
+			err = node.ReadAttr(attr, attrType, 0, icon->Bits(), attrSize);
+		}
+		if (err >= 0)
+			err = (err == attrSize) ? B_OK : B_FILE_ERROR;
+		if (otherColorSpace) {
+			if (!err) {
+				icon->SetBits(buffer, attrSize, 0, B_CMAP8);
+				err = icon->InitCheck();
+			}
+			delete[] buffer;
+		}
+	}
+
+	return err;		
+}
+
+//! Sets the icon stored in the given attribute
+/*! The bitmap data pointed to by \c data must be of the proper size (\c 32x32
+	for \c B_LARGE_ICON, \c 16x16 for \c B_MINI_ICON) and the proper color
+	space (B_CMAP8).
+	
+	\param type The mime type
+	\param attr The attribute in which the icon is stored
+	\param data Pointer to an array of bitmap data of proper dimensions and color depth
+	\param dataSize The length of the array pointed to by \c data
+	\param size The size icon you're expecting (\c B_LARGE_ICON or \c B_MINI_ICON)
+*/
+status_t
+MimeDatabase::SetIcon(const char *type, const char *attr, const void *data, size_t dataSize, icon_size which)
+{
+	ssize_t err = (type && data) ? B_OK : B_BAD_VALUE;
+
+	int32 attrType;
+	int32 attrSize;
+	
+	// Figure out what kind of data we *should* have
+	if (!err) {
+		switch (which) {
+			case B_MINI_ICON:
+				attrType = B_MINI_ICON_TYPE;
+				attrSize = 16 * 16;
+				break;
+			case B_LARGE_ICON:
+				attrType = B_LARGE_ICON_TYPE;
+				attrSize = 32 * 32;
+				break;
+			default:
+				err = B_BAD_VALUE;
+				break;
+		}
+	}
+	
+	// Double check the data we've been given
+	if (!err)
+		err = (dataSize == attrSize) ? B_OK : B_BAD_VALUE;
+
+	// Write the icon data
+	BNode node;
+	if (!err)
+		err = OpenOrCreateType(type, &node);
+	if (!err)
+		err = node.WriteAttr(attr, attrType, 0, data, attrSize);
+	if (err >= 0)
+		err = (err == attrSize) ? B_OK : B_FILE_ERROR;
+	return err;			
+}
 
 } // namespace BPrivate
+

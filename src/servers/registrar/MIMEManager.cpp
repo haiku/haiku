@@ -48,7 +48,11 @@ MIMEManager::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case B_REG_MIME_SET_PARAM:
 			HandleSetParam(message);
-			break;		
+			break;
+			
+		case B_REG_MIME_DELETE_PARAM:
+			HandleDeleteParam(message);
+			break;
 		
 		case B_REG_MIME_START_WATCHING:
 		case B_REG_MIME_STOP_WATCHING:
@@ -89,7 +93,7 @@ MIMEManager::MessageReceived(BMessage *message)
 	}
 }
 
-// HandleSetParam
+// HandleSetParam 
 //! Handles all B_REG_MIME_SET_PARAM messages
 void
 MIMEManager::HandleSetParam(BMessage *message)
@@ -139,16 +143,26 @@ MIMEManager::HandleSetParam(BMessage *message)
 			}
 			
 			case B_REG_MIME_ICON:
+			case B_REG_MIME_ICON_FOR_TYPE:
 			{
-				// Begin temporary fix code
 				const void *data;
 				ssize_t dataSize;
 				int32 size;
 				err = message->FindData("icon data", B_RAW_TYPE, &data, &dataSize);
 				if (!err)
 					err = message->FindInt32("icon size", &size);
-				if (!err) 
-					err = fMimeDatabase.SetIcon(type, (icon_size)size, data, dataSize);
+				if (which == B_REG_MIME_ICON_FOR_TYPE) {
+					const char *fileType;
+					if (!err)
+						err = message->FindString("file type", &fileType);
+					if (!err)
+						err = fMimeDatabase.SetIconForType(type, fileType, data,
+								dataSize, (icon_size)size);				
+				} else {
+					if (!err) 
+						err = fMimeDatabase.SetIcon(type, data, dataSize,
+								(icon_size)size);
+				}
 				break;
 				// End temporary fix code
 
@@ -189,3 +203,92 @@ MIMEManager::HandleSetParam(BMessage *message)
 	reply.AddInt32("result", err);
 	message->SendReply(&reply, this);				
 }
+
+// HandleSetParam 
+//! Handles all B_REG_MIME_SET_PARAM messages
+void
+MIMEManager::HandleDeleteParam(BMessage *message)
+{
+//	using BPrivate::MimeDatabase;
+
+	status_t err;
+	int32 which;
+	const char *type;
+	
+	err = message->FindString("type", &type);
+	if (!err)
+		err = message->FindInt32("which", &which);
+	if (!err) {
+		switch (which) {
+			case B_REG_MIME_APP_HINT:
+				err = fMimeDatabase.DeleteAttribute(type, BPrivate::MimeDatabase::kAppHintAttr);
+				break;
+
+			case B_REG_MIME_DESCRIPTION:
+			{
+				bool isLong;
+				const char *description;
+				err = message->FindBool("long", &isLong);
+				if (!err) 
+					err = fMimeDatabase.DeleteAttribute(type,
+						    (isLong
+						       ? BPrivate::MimeDatabase::kLongDescriptionAttr
+						         : BPrivate::MimeDatabase::kShortDescriptionAttr));
+				break;
+			}
+			
+			case B_REG_MIME_PREFERRED_APP:
+			{
+				int32 verb;
+				err = message->FindInt32("app verb", &verb);
+				if (!err) {
+					switch (verb) {
+						case B_OPEN:
+							err = fMimeDatabase.DeleteAttribute(type, BPrivate::MimeDatabase::kPreferredAppAttr);
+							break;
+							
+						default:
+							err = B_BAD_VALUE;
+							break;
+					}
+				}
+				break;
+			}
+			
+			case B_REG_MIME_ICON:
+			case B_REG_MIME_ICON_FOR_TYPE:
+			{
+				int32 size;
+				err = message->FindInt32("icon size", &size);
+				if (which == B_REG_MIME_ICON_FOR_TYPE) {
+					const char *fileType;
+					if (!err)
+						err = message->FindString("file type", &fileType);
+					if (!err) {
+						std::string attr = ((size == B_MINI_ICON)
+										       ? BPrivate::MimeDatabase::kMiniIconAttrPrefix
+										         : BPrivate::MimeDatabase::kLargeIconAttrPrefix)
+								               + BPrivate::MimeDatabase::ToLower(fileType);
+						err = fMimeDatabase.DeleteAttribute(type, attr.c_str());
+					}
+				} else {
+					if (!err) {
+						err = fMimeDatabase.DeleteAttribute(type, (size == B_MINI_ICON
+						                          	                 ? BPrivate::MimeDatabase::kMiniIconAttr
+						                          	                   : BPrivate::MimeDatabase::kLargeIconAttr));
+					}
+				}
+				break;
+			}
+				
+			default:
+				err = B_BAD_VALUE;
+				break;				
+		}		
+	}
+
+	BMessage reply(B_REG_RESULT);
+	reply.AddInt32("result", err);
+	message->SendReply(&reply, this);				
+}
+
