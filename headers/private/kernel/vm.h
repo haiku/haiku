@@ -42,6 +42,7 @@ area_id create_area_etc(struct team *team, const char *name, void **address, uin
 	uint32 size, uint32 lock, uint32 protection);
 status_t delete_area_etc(struct team *team, area_id area);
 
+status_t vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size);
 region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
 region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
