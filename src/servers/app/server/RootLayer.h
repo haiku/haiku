@@ -34,6 +34,7 @@
 #include "Layer.h"
 #include "FMWList.h"
 #include "CursorHandler.h"
+#include "CursorManager.h"
 
 class RGBColor;
 class Workspace;
@@ -105,12 +106,14 @@ public:
 
 	static int32 WorkingThread(void *data);
 
+	CursorManager& GetCursorManager() { return fCursorManager; }
+
 	// Debug methods
 	void PrintToStream(void);
 	
 	// "Private" to app_server :-) - they should not be used
 	void RemoveAppWindow(WinBorder *wb);
-	
+
 	FMWList fMainFMWList;
 	BLocker fMainLock;
 
@@ -118,6 +121,7 @@ private:
 	Desktop *fDesktop;
 	BMessage *fDragMessage;
 	WinBorder *fMouseTarget;
+	CursorManager fCursorManager;
 
 	thread_id fThreadID;
 	port_id fListenPort;
