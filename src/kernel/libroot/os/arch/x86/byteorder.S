@@ -1,0 +1,33 @@
+/* 
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
+#define FUNCTION(x) .global x; .type x,@function; x
+
+
+/* uint16 __swap_int16(uint16 value) */
+FUNCTION(__swap_int16):
+	movl	4(%esp), %eax
+	bswap	%eax
+	shr		$16, %eax
+	ret
+
+/* uint32 __swap_int32(uint32 value) */
+FUNCTION(__swap_int32):
+	movl	4(%esp), %eax
+	bswap	%eax
+	ret
+
+/* uint64 __swap_int64(uint64 value) */
+FUNCTION(__swap_int64):
+	movl	4(%esp), %edx	/* the 32-bits registers are swapped here */
+	movl	8(%esp), %eax
+	bswap	%eax
+	bswap	%edx
+	ret
+
+/* float __swap_float(float value) */
+
+/* double __swap_double(double value) */
