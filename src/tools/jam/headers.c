@@ -81,7 +81,10 @@ headers( TARGET *t )
 #endif
 
 	if( lol_get( &lol, 1 ) )
-	    list_free( evaluate_rule( hdrrule->string, &lol, L0 ) );
+	{
+	    int jmp = JMP_NONE;
+	    list_free( evaluate_rule( hdrrule->string, &lol, L0, &jmp ) );
+	}
 
 	/* Clean up */
 

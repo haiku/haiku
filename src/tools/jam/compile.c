@@ -515,7 +515,15 @@ compile_rule(
 	/* Run rules, appending results from each */
 
 	for( l = ll; l; l = list_next( l ) )
-	    result = evaluate_rule( l->string, nargs, result );
+	{
+	    int localJmp = JMP_NONE;
+	    result = evaluate_rule( l->string, nargs, result, &localJmp );
+	    if (localJmp == JMP_EOF)
+	    {
+			*jmp = JMP_EOF;
+			break;
+	    }
+	}
 
 	list_free( ll );
 	lol_free( nargs );
@@ -531,7 +539,8 @@ LIST *
 evaluate_rule(
 	const char *rulename,
 	LOL	*args, 
-	LIST	*result )
+	LIST	*result,
+	int	*jmp )
 {
 	RULE	*rule = bindrule( rulename );
 
@@ -576,7 +585,6 @@ evaluate_rule(
 	{
 	    PARSE *parse = rule->procedure;
 	    SETTINGS *s = 0;
-	    int jmp = JMP_NONE;
 	    LIST *l;
 	    int i;
 
@@ -593,7 +601,7 @@ evaluate_rule(
 	    parse_refer( parse );
 
 	    pushsettings( s );
-	    result = list_append( result, (*parse->func)( parse, args, &jmp ) );
+	    result = list_append( result, (*parse->func)( parse, args, jmp ) );
 	    popsettings( s );
 	    freesettings( s );
 
