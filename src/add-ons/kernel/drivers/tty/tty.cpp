@@ -80,12 +80,11 @@ WriterLocker::WriterLocker(struct tty *source, struct tty *target, bool echo, bo
 	fTarget(target),
 	fEcho(echo)
 {
-	if (echo) {
-		if (!sourceIsMaster) {
-			// just switch the two, we have to lock both of them anyway
-			fSource = target;
-			fTarget = source;
-		}
+	if (echo && sourceIsMaster) {
+		// just switch the two, we have to lock both of
+		// them anyway - master is always locked first
+		fSource = target;
+		fTarget = source;
 	}
 
 	Lock();
@@ -98,22 +97,22 @@ WriterLocker::~WriterLocker()
 }
 
 
-void 
+void
 WriterLocker::Lock()
 {
-	mutex_lock(&fSource->lock);
+	mutex_lock(&fTarget->lock);
 	if (fEcho)
-		mutex_lock(&fTarget->lock);
+		mutex_lock(&fSource->lock);
 }
 
 
-void 
+void
 WriterLocker::Unlock()
 {
 	if (fEcho)
-		mutex_unlock(&fTarget->lock);
+		mutex_unlock(&fSource->lock);
 
-	mutex_unlock(&fSource->lock);
+	mutex_unlock(&fTarget->lock);
 }
 
 
@@ -125,14 +124,14 @@ WriterLocker::AcquireWriter(bool dontBlock)
 	if (!dontBlock)
 		Unlock();
 
-	status_t status = acquire_sem_etc(fSource->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
+	status_t status = acquire_sem_etc(fTarget->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
 	if (status == B_OK && fEcho) {
 		// We need to hold two write semaphores in order to echo the output to
 		// the local TTY as well. We need to make sure that these semaphores
 		// are always acquired in the same order to prevent deadlocks
-		status = acquire_sem_etc(fTarget->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
+		status = acquire_sem_etc(fSource->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
 		if (status != B_OK)
-			release_sem(fSource->write_sem);
+			release_sem(fTarget->write_sem);
 	}
 
 	// reacquire TTY lock
@@ -140,9 +139,9 @@ WriterLocker::AcquireWriter(bool dontBlock)
 		Lock();
 
 	if (status == B_OK) {
-		fSourceBytes = line_buffer_writable(fSource->input_buffer);
+		fTargetBytes = line_buffer_writable(fTarget->input_buffer);
 		if (fEcho)
-			fTargetBytes = line_buffer_writable(fTarget->input_buffer);
+			fSourceBytes = line_buffer_writable(fSource->input_buffer);
 	}
 	return status;
 }
@@ -151,11 +150,11 @@ WriterLocker::AcquireWriter(bool dontBlock)
 void 
 WriterLocker::ReportWritten(size_t written)
 {
-	if (written < fSourceBytes)
-		release_sem_etc(fSource->write_sem, 1, fTarget ? B_DO_NOT_RESCHEDULE : 0);
+	if (written < fTargetBytes)
+		release_sem_etc(fTarget->write_sem, 1, fEcho ? B_DO_NOT_RESCHEDULE : 0);
 
-	if (fEcho && written < fTargetBytes)
-		release_sem(fTarget->write_sem);
+	if (fEcho && written < fSourceBytes)
+		release_sem(fSource->write_sem);
 
 	// there is now probably something to read, too
 
@@ -521,7 +520,7 @@ tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
 
 		// ToDo: add support for ICANON mode
 
-		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer, length);
+		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer, length);
 		if (bytesRead < B_OK) {
 			*_length = 0;
 			locker.ReportRead(0);
@@ -562,10 +561,8 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 		}
 
 		size_t writable = line_buffer_writable(target->input_buffer);
-		if (writable > length)
-			writable = length;
-
 		if (echo) {
+			// we can only write as much as is available on both ends
 			size_t locallyWritable = line_buffer_writable(source->input_buffer);
 			if (locallyWritable < writable)
 				writable = locallyWritable;
@@ -576,7 +573,7 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 			continue;
 		}
 
-		while (writable > bytesWritten) {
+		while (writable > bytesWritten && bytesWritten < length) {
 			char c = data[0];
 
 			if (c == '\n' && (source->termios.c_oflag & (OPOST | ONLCR)) == OPOST | ONLCR) {
@@ -584,6 +581,9 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 				tty_input_putc_locked(target, '\r');
 			 	if (echo)
 					tty_input_putc_locked(source, '\r');
+
+				if (--writable == 0)
+					continue;
 			}
 
 			tty_input_putc_locked(target, c);
