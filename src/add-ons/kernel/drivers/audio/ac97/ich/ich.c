@@ -461,6 +461,8 @@ ich_clock_calibrate()
 status_t
 init_driver(void)
 {
+	int i;
+	uint32 val;
 	status_t rv;
 	bigtime_t start;
 	bool s0cr, s1cr, s2cr;
@@ -490,32 +492,58 @@ init_driver(void)
 	
 	dump_hardware_regs();
 	
-	/* do a cold reset */
-	LOG(("cold reset\n"));
-	ich_reg_write_32(ICH_REG_GLOB_CNT, 0);
+	/* We don't do a cold reset here, because this would reset general purpose
+	 * IO pins of the controller. These pins can be used by the machine vendor
+	 * to control external amplifiers, and resetting them prevents audio output
+	 * on some notebooks, like "Compaq Presario 2700".
+	 * If a cold reset is still in progress, we need to finish it.
+	 * We perform a warm reset, this should be save to do, as it is required
+	 * to leave some power down modes.
+	 */
+	val = ich_reg_read_32(ICH_REG_GLOB_CNT);
+	if ((val & CNT_COLD) == 0) {
+		LOG(("finishing cold reset\n"));
+		// need to write 1-bit to finish cold reset
+		val |= CNT_COLD;
+	} else {
+		LOG(("performing warm reset\n"));
+		// need to write 1-bit to start warm reset
+		val |= CNT_WARM;
+	}
+	val &= ~CNT_SHUT; // enable AC-link
+	ich_reg_write_32(ICH_REG_GLOB_CNT, val);
 	ich_reg_read_32(ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
-	snooze(50000); // 50 ms
-	ich_reg_write_32(ICH_REG_GLOB_CNT, CNT_COLD | CNT_PRIE);
-	LOG(("cold reset finished\n"));
-	rv = ich_reg_read_32(ICH_REG_GLOB_CNT);
-	if ((rv & CNT_COLD) == 0) {
+	// wait up to 1 second for warm reset to be finished
+	for (i = 0; i < 20; i++) {
+		if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_WARM) == 0)
+			break;
+		snooze(50000);
+	}
+	if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_COLD) == 0) {
 		LOG(("cold reset failed\n"));
+		unmap_io_memory();
+		return B_ERROR;
+	}
+	if ((ich_reg_read_32(ICH_REG_GLOB_CNT) & CNT_WARM) != 0) {
+		LOG(("warm reset failed\n"));
+		unmap_io_memory();
+		return B_ERROR;
 	}
 
 	/* detect which codecs are ready */
 	s0cr = s1cr = s2cr = false;
 	start = system_time();
 	do {
-		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
-		if (!s0cr && (rv & STA_S0CR)) {
+		val = ich_reg_read_32(ICH_REG_GLOB_STA);
+		if (!s0cr && (val & STA_S0CR)) {
 			s0cr = true;
 			LOG(("AC_SDIN0 codec ready after %Ld us\n",(system_time() - start)));
 		}
-		if (!s1cr && (rv & STA_S1CR)) {
+		if (!s1cr && (val & STA_S1CR)) {
 			s1cr = true;
 			LOG(("AC_SDIN1 codec ready after %Ld us\n",(system_time() - start)));
 		}
-		if (!s2cr && (rv & STA_S2CR)) {
+		if (!s2cr && (val & STA_S2CR)) {
 			s2cr = true;
 			LOG(("AC_SDIN2 codec ready after %Ld us\n",(system_time() - start)));
 		}
