@@ -17,6 +17,7 @@ class KDiskDevice;
 class KDiskSystem;
 class KPartitionListener;
 class KPartitionVisitor;
+class KPath;
 class KPhysicalPartition;
 class KShadowPartition;
 
@@ -101,7 +102,7 @@ public:
 	virtual void SetID(partition_id id);
 	partition_id ID() const;
 
-	virtual status_t GetPath(char *path) const;
+	virtual status_t GetPath(KPath *path) const;
 		// no setter (see BDiskDevice) -- built on the fly
 
 	void SetVolumeID(dev_t volumeID);

@@ -19,6 +19,7 @@
 #include <KPartition.h>
 #include <KPartitionListener.h>
 #include <KPartitionVisitor.h>
+#include <KPath.h>
 #include <VectorSet.h>
 
 #include "UserDataWriter.h"
@@ -145,18 +146,7 @@ KPartition::PrepareForDeletion()
 status_t
 KPartition::Open(int flags, int *fd)
 {
-	if (!fd)
-		return B_BAD_VALUE;
-	// get the path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
-	if (error != B_OK)
-		return error;
-	// open the device
-	*fd = open(path, flags);
-	if (*fd < 0)
-		return errno;
-	return B_OK;
+	return B_BAD_VALUE;
 }
 
 // PublishDevice
@@ -477,33 +467,39 @@ KPartition::ID() const
 
 // GetPath
 status_t
-KPartition::GetPath(char *path) const
+KPartition::GetPath(KPath *path) const
 {
 	// For a KDiskDevice this version is never invoked, so the check for
 	// Parent() is correct.
-	if (!path || !Parent() || Index() < 0)
+	if (!path || path->InitCheck() != B_OK || !Parent() || Index() < 0)
 		return B_BAD_VALUE;
 	// get the parent's path
 	status_t error = Parent()->GetPath(path);
 	if (error != B_OK)
 		return error;
 	// check length for safety
-	int32 len = strlen(path);
-	if (len >= B_PATH_NAME_LENGTH - 10)
+	int32 len = path->Length();
+	if (len >= path->BufferSize() - 10)
 		return B_NAME_TOO_LONG;
+	char* buffer = path->LockBuffer();
+	if (!buffer)
+		return B_ERROR;
 	if (Parent()->IsDevice()) {
 		// Our parent is a device, so we replace `raw' by our index.
 		int32 leafLen = strlen("/raw");
-		if (len <= leafLen || strcmp(path + len - leafLen, "/raw"))
-			return B_ERROR;
+		if (len <= leafLen || strcmp(path->Path() + len - leafLen, "/raw")) {
+			error = B_ERROR;
+		} else {
 // TODO: For the time being the name is "obos_*" to not interfere with R5's
 // names.
-//		sprintf(path + len - leafLen + 1, "%ld", Index());
-		sprintf(path + len - leafLen + 1, "obos_%ld", Index());
+//			sprintf(path + len - leafLen + 1, "%ld", Index());
+			sprintf(buffer + len - leafLen + 1, "obos_%ld", Index());
+		}
 	} else {
 		// Our parent is a normal partition, no device: Append our index.
-		sprintf(path + len, "_%ld", Index());
+		sprintf(buffer + len, "_%ld", Index());
 	}
+	path->UnlockBuffer();
 	return error;
 }
 
@@ -1033,10 +1029,10 @@ KPartition::Dump(bool deep, int32 level)
 		return;
 	char prefix[256];
 	sprintf(prefix, "%*s%*s", (int)level, "", (int)level, "");
-	char path[B_PATH_NAME_LENGTH];
-	GetPath(path);
+	KPath path;
+	GetPath(&path);
 	if (level > 0)
-		OUT("%spartition %ld: %s\n", prefix, ID(), path);
+		OUT("%spartition %ld: %s\n", prefix, ID(), path.Path());
 	OUT("%s  offset:            %lld\n", prefix, Offset());
 	OUT("%s  size:              %lld (%.2f MB)\n", prefix, Size(), Size() / (1024.0*1024));
 	OUT("%s  content size:      %lld\n", prefix, ContentSize());
