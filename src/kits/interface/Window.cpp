@@ -163,8 +163,6 @@ BWindow::BWindow(BMessage* data)
 	uint32			type;
 	uint32			workspaces;
 
-	status_t		retval;
-
 	data->FindRect("_frame", &fFrame);
 	data->FindString("_title", &title);
 	data->FindInt32("_wlook", (int32*)&look);
@@ -176,7 +174,7 @@ BWindow::BWindow(BMessage* data)
 	data->FindInt32("_wspace", (int32*)&workspaces);
 
 	if ( data->FindInt32("_type", (int32*)&type) == B_OK ){
-		( (window_type)type, &fLook, &fFeel );
+		decomposeType( (window_type)type, &fLook, &fFeel );
 	}
 
 		// connect to app_server and initialize data
@@ -619,9 +617,9 @@ void BWindow::MessageReceived( BMessage *msg )
 				
 				else if (strcmp(prop, "Title") ==0 )
 				{
-					const char		**newTitle;
-					if (msg->FindString( "data", newTitle ) == B_OK){
-						SetTitle( *newTitle );
+					const char		*newTitle = NULL;
+					if (msg->FindString( "data", &newTitle ) == B_OK){
+						SetTitle( newTitle );
 						
 						replyMsg.what		= B_NO_ERROR;
 						replyMsg.AddInt32( "error", B_OK );
@@ -782,7 +780,6 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		break;}
 
 	case B_KEY_UP:{
-		int32			keyRepeat;
 		const char		*string;
 
 		msg->FindString( "bytes", &string );
@@ -1877,18 +1874,14 @@ void BWindow::InitData(	BRect frame,
 		//debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
 	}
-
-// TODO: what should I do if frame rect is invalid?
-	if ( frame.IsValid() )
-		fFrame			= frame;
-	else
-		frame.Set( frame.left, frame.top, frame.left+320, frame.top+240 );
 	
-	if (title)
+	fFrame		= frame;
+
+/*	if (title)
 		SetTitle( title );
 	else
 		SetTitle( "no_name_window" );
-
+*/
 	fFeel			= feel;
 	fLook			= look;
 	fFlags			= flags;
@@ -1916,7 +1909,7 @@ void BWindow::InitData(	BRect frame,
 	fPulseRunner	= NULL;
 
 // TODO: is this correct??? should the thread loop be started???
-	SetPulseRate( 500000 );
+	//SetPulseRate( 500000 );
 
 // TODO:  see if you can use 'fViewsNeedPulse'
 
@@ -1957,7 +1950,6 @@ void BWindow::InitData(	BRect frame,
 
 		// let app_server to know that a window has been created.
 	session		= new BSession( receive_port, be_app->fServerFrom );
-	int32		rCode;
 
 		// HERE we are in BApplication's thread, so for locking we use be_app variable
 		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
@@ -2006,7 +1998,7 @@ void BWindow::task_looper(){
 	{
 
 		// get BMessages from app_server
-		while ( msg = ReadMessageFromPort(0) ){
+		while ( (msg = ReadMessageFromPort(0)) ){
 			fQueue->Lock();
 			fQueue->AddMessage(msg);
 			fQueue->Unlock();
@@ -2014,7 +2006,7 @@ void BWindow::task_looper(){
 		}
 
 		// get BMessages from BLooper port
-		while ( msg = MessageFromPort(0) ){
+		while ( (msg = MessageFromPort(0)) ){
 			fQueue->Lock();
 			fQueue->AddMessage(msg);
 			fQueue->Unlock();
@@ -2086,7 +2078,7 @@ void BWindow::task_looper(){
 
 BMessage* BWindow::ReadMessageFromPort(bigtime_t tout){
 	int32			msgcode;
-	BMessage*		msg;
+	BMessage*		msg = NULL;
 	uint8*			msgbuffer;
 
 	msgbuffer		= ReadRawFromPort(&msgcode, tout);
@@ -2106,7 +2098,6 @@ uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout){
 
 	uint8*			msgbuffer = NULL;
 	ssize_t			buffersize;
-	ssize_t			bytesread;
 
 		// we NEVER have to use B_INFINITE_TIMEOUT
 	if (tout == B_INFINITE_TIMEOUT)
@@ -2136,7 +2127,7 @@ uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout){
 window_type BWindow::composeType(window_look look,	
 								 window_feel feel) const
 {
-	window_type returnValue;
+	window_type returnValue = B_UNTYPED_WINDOW;
 
 	switch(feel)
 	{
@@ -2169,7 +2160,7 @@ window_type BWindow::composeType(window_look look,
 		if (look == B_FLOATING_WINDOW_LOOK)
 			returnValue = B_FLOATING_WINDOW;
 		break;
-
+		
 	default:
 		returnValue = B_UNTYPED_WINDOW;
 	}
@@ -2347,7 +2338,7 @@ void BWindow::activateView( BView *aView, bool active ){
 	aView->WindowActivated( active );
 
 	BView		*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
 			activateView( child, active );
 			child 		= child->next_sibling; 
@@ -2474,7 +2465,7 @@ BView* BWindow::sendMessageUsingEventMask2( BView* aView, int32 message, BPoint 
 
 		// Code for Event Masks
 	BView *child; 
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) { 
 				// see if a BView registered for mouse events and it's not the current focus view
 			if ( child->fEventMask & B_POINTER_EVENTS &&
@@ -2816,7 +2807,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 							whellChangeY;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			whellChangeY	= *((float*)raw);	raw += sizeof(float);
+			whellChangeX	= *((float*)raw);	raw += sizeof(float);
 			whellChangeY	= *((float*)raw);
 
 			msg->what		= B_MOUSE_WHEEL_CHANGED;
@@ -2992,8 +2983,8 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 		default:{
 			// there is no need for default, but, just in case...
 			printf("There is a message from app_server that I don't undersand: '%c%c%c%c'\n",
-				(code & 0xFF000000) >> 24, (code & 0x00FF0000) >> 16,
-				(code & 0x0000FF00) >> 8, code & 0x000000FF );
+				(char)((code & 0xFF000000) >> 24), (char)((code & 0x00FF0000) >> 16),
+				(char)((code & 0x0000FF00) >> 8), (char)(code & 0x000000FF) );
 			}
 	}
 	
@@ -3004,7 +2995,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 void BWindow::sendPulse( BView* aView ){
 	BView *child; 
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) { 
 			if ( child->Flags() & B_PULSE_NEEDED ) child->Pulse();
 			sendPulse( child );
@@ -3015,14 +3006,14 @@ void BWindow::sendPulse( BView* aView ){
 
 //------------------------------------------------------------------------------
 
-int32 BWindow::findShortcut( uint32 key, int32 modifiers ){
+int32 BWindow::findShortcut( uint32 key, uint32 modifiers ){
 	int32			index,
 					noOfItems;
 
 	index			= -1;
 	noOfItems		= accelList.CountItems();
 
-	for ( int i = 0;  i < noOfItems; i++ ) {
+	for ( int32 i = 0;  i < noOfItems; i++ ) {
 		_BCmdKey*		tempCmdKey;
 
 		tempCmdKey		= (_BCmdKey*)accelList.ItemAt(i);
@@ -3043,10 +3034,10 @@ BView* BWindow::findView(BView* aView, int32 token){
 		return aView;
 
 	BView			*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
 			BView*		view;
-			if ( view = findView( child, token ) )
+			if ( (view = findView( child, token )) )
 				return view;
 			child 		= child->next_sibling; 
 		}
@@ -3063,10 +3054,10 @@ BView* BWindow::findView(BView* aView, const char* viewName) const{
 		return aView;
 
 	BView			*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
 			BView*		view;
-			if ( view = findView( child, viewName ) )
+			if ( (view = findView( child, viewName )) )
 				return view;
 			child 		= child->next_sibling; 
 		}
@@ -3084,10 +3075,10 @@ BView* BWindow::findView(BView* aView, BPoint point) const{
 		return aView;
 
 	BView			*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
 			BView*		view;
-			if ( view = findView( child, point ) )
+			if ( (view = findView( child, point )) )
 				return view;
 			child 		= child->next_sibling; 
 		}
@@ -3260,7 +3251,7 @@ void BWindow::drawView(BView* aView, BRect area){
 	aView->Draw( area );
 
 	BView			*child;
-	if ( child = aView->first_child ){
+	if ( (child = aView->first_child) ){
 		while ( child ) {
 			if ( area.Intersects( child->Frame() ) ){
 				BRect			newArea;
