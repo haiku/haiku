@@ -77,17 +77,6 @@ enum {
 };
 
 
-// keyboard settings info, as kept in settings file
-
-
-typedef struct {
-	bigtime_t       key_repeat_delay;
-	int32           key_repeat_rate;
-} kb_settings;
-
-#define kb_settings_file "Keyboard_settings"
-
-
 // structure passed to KB_READ
 
 typedef struct {                        // USB, ADB keyboards
@@ -111,34 +100,6 @@ typedef struct {
 	bool    scroll_lock;
 } led_info;
 
-
-
-// mouse settings info
-
-typedef enum {
-	MOUSE_1_BUTTON = 1,
-	MOUSE_2_BUTTON,
-	MOUSE_3_BUTTON
-} mouse_type;
-
-typedef struct {
-	int32           left;
-	int32           right;
-	int32           middle;
-} map_mouse;
-
-typedef struct {
-	bool    enabled;        // Acceleration on / off
-	int32   accel_factor;   // accel factor: 256 = step by 1, 128 = step by 1/2
-	int32   speed;          // speed accelerator (1=1X, 2 = 2x)...
-} mouse_accel;
-
-typedef struct {
-	mouse_type      type;
-	map_mouse       map;
-	mouse_accel     accel;
-	bigtime_t       click_speed;
-} mouse_settings;
 
 #define mouse_settings_file "Mouse_settings"
 
