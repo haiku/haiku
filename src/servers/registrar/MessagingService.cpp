@@ -8,9 +8,12 @@
 
 #include <string.h>
 
+#include <Autolock.h>
+
 #include <syscalls.h>
 
 #include "Debug.h"
+#include "MessageDeliverer.h"
 #include "MessagingService.h"
 
 // sService -- the singleton instance
@@ -149,6 +152,37 @@ MessagingArea::NextArea() const
 
 // #pragma mark -
 
+// constructor
+MessagingCommandHandler::MessagingCommandHandler()
+{
+}
+
+// destructor
+MessagingCommandHandler::~MessagingCommandHandler()
+{
+}
+
+
+// #pragma mark -
+
+// DefaultSendCommandHandler
+class MessagingService::DefaultSendCommandHandler
+	: public MessagingCommandHandler {
+
+	virtual void HandleMessagingCommand(uint32 _command, const void *data,
+		int32 dataSize)
+	{
+		const messaging_command_send_message *sendData
+			= (const messaging_command_send_message*)data;
+		const void *messageData = (uint8*)data
+			+ sizeof(messaging_command_send_message)
+			+ sizeof(messaging_target) * sendData->target_count;
+
+		MessageDeliverer::Default()->DeliverMessage(messageData,
+			sendData->message_size, sendData->targets, sendData->target_count);
+	}
+};
+
 // CommandHandlerMap
 struct MessagingService::CommandHandlerMap
 	: map<uint32, MessagingCommandHandler*> {
@@ -156,7 +190,8 @@ struct MessagingService::CommandHandlerMap
 
 // constructor
 MessagingService::MessagingService()
-	: fLockSem(-1),
+	: fLock("messaging service"),
+	  fLockSem(-1),
 	  fCounterSem(-1),
 	  fFirstArea(NULL),
 	  fCommandHandlers(NULL),
@@ -225,6 +260,12 @@ MessagingService::Init()
 	// resume the command processor
 	resume_thread(fCommandProcessor);
 
+	// install the default send message command handler
+	MessagingCommandHandler *handler = new(nothrow) DefaultSendCommandHandler;
+	if (handler)
+		return B_NO_MEMORY;
+	SetCommandHandler(MESSAGING_COMMAND_SEND_MESSAGE, handler);
+
 	return B_OK;
 }
 
@@ -273,6 +314,8 @@ void
 MessagingService::SetCommandHandler(uint32 command,
 	MessagingCommandHandler *handler)
 {
+	BAutolock _(fLock);
+
 	if (handler) {
 		(*fCommandHandlers)[command] = handler;
 	} else {
@@ -287,6 +330,8 @@ MessagingService::SetCommandHandler(uint32 command,
 MessagingCommandHandler *
 MessagingService::_GetCommandHandler(uint32 command) const
 {
+	BAutolock _(fLock);
+
 	CommandHandlerMap::iterator it = fCommandHandlers->find(command);
 	return (it != fCommandHandlers->end() ? it->second : NULL);
 }
@@ -331,6 +376,9 @@ MessagingService::_CommandProcessor()
 			if (handler) {
 				handler->HandleMessagingCommand(command->command, command->data,
 					command->size - sizeof(messaging_command));
+			} else {
+				WARNING(("MessagingService::_CommandProcessor(): No handler "
+					"found for command %lu\n", command->command));
 			}
 		}
 

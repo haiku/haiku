@@ -6,6 +6,7 @@
 #ifndef MESSAGING_SERVICE_H
 #define MESSAGING_SERVICE_H
 
+#include <Locker.h>
 #include <MessagingServiceDefs.h>
 
 // MessagingCommandHandler
@@ -73,10 +74,12 @@ private:
 	static int32 _CommandProcessorEntry(void *data);
 	int32 _CommandProcessor();
 
+	class DefaultSendCommandHandler;
 	struct CommandHandlerMap;
 
 	static MessagingService	*sService;
 
+	mutable BLocker			fLock;
 	sem_id					fLockSem;
 	sem_id					fCounterSem;
 	MessagingArea			*fFirstArea;
