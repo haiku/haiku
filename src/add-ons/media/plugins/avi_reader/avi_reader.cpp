@@ -292,7 +292,7 @@ aviReader::GetNextChunk(void *_cookie,
 		
 		cookie->byte_pos += size;
 	} else {
-		mediaHeader->start_time = cookie->frame_pos * cookie->usec_per_frame;
+		mediaHeader->start_time = cookie->frame_pos * (int64)cookie->usec_per_frame; // 32 bit would wrap around at 71.5 minutes
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
