@@ -1,4 +1,4 @@
-/* pools.h
+	/* pools.h
  * simple fixed size block allocator
  */
 
@@ -21,8 +21,12 @@ struct pool_mem {
 	benaphore        lock;
 };
 
+#define FREE_MAGIC 'BORK'
+
 struct free_blk {
-	char *next;
+	uint32 magic;
+	struct free_blk *next;
+	uint32 magic_check;
 };
 
 #define POOL_USES_BENAPHORES 0
@@ -30,7 +34,7 @@ struct free_blk {
 
 struct pool_ctl {
 	struct pool_mem *list;
-	char            *freelist;
+	struct free_blk *freelist;
 	size_t           alloc_size;
 	size_t           block_size;
 #if POOL_USES_BENAPHORES

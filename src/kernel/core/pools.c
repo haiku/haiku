@@ -35,7 +35,7 @@ void walk_pool_list(struct pool_ctl *p)
 
 void pool_debug_walk(struct pool_ctl *p)
 {
-	char *ptr;
+	struct free_blk *ptr;
 	int i = 1;	
 	
 	dprintf("%ld byte blocks allocated, but now free:\n\n", p->alloc_size);
@@ -47,8 +47,10 @@ void pool_debug_walk(struct pool_ctl *p)
 	#endif
 	ptr = p->freelist;	
 	while (ptr) {
+		ASSERT(ptr->magic == FREE_MAGIC);
+		ASSERT(FREE_MAGIC + (uint32)ptr->next == ptr->magic_check);
 		dprintf("  %02d: %p\n", i++, ptr);
-		ptr = ((struct free_blk*)ptr)->next;
+		ptr = ptr->next;
 	}
 	#if POOL_USES_BENAPHORES
 		RELEASE_BENAPHORE(p->lock);
@@ -96,9 +98,7 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 		#endif
 
 		// insert block at the beginning of the pools
-		if (pool->list)
-			block->next = pool->list;
-
+		block->next = pool->list;
 		pool->list = block;
 
 #ifdef WALK_POOL_LIST
@@ -187,7 +187,7 @@ char *pool_get(struct pool_ctl *p)
 {
 	/* ok, so now we look for a suitable block... */
 	struct pool_mem *mp = p->list;
-	char *rv = NULL;
+	struct free_blk *rv = NULL;
 
 	#if POOL_USES_BENAPHORES
 		ACQUIRE_BENAPHORE(p->lock);
@@ -199,13 +199,14 @@ char *pool_get(struct pool_ctl *p)
 		/* woohoo, just grab a block! */
 
 		rv = p->freelist;
+		ASSERT(rv->magic == FREE_MAGIC);
+		ASSERT(FREE_MAGIC + (uint32)rv->next == rv->magic_check);
 
 		if (p->debug)
 			dprintf("%s: allocating %p, setting freelist to %p\n",
-				p->name, p->freelist, 
-				((struct free_blk*)rv)->next);
+				p->name, p->freelist, rv->next);
 
-		p->freelist = ((struct free_blk*)rv)->next;
+		p->freelist = rv->next;
 
 		#if POOL_USES_BENAPHORES
 			RELEASE_BENAPHORE(p->lock);
@@ -276,7 +277,10 @@ void pool_put(struct pool_ctl *p, void *ptr)
 	#endif
 	
 	memset(ptr, 0, p->alloc_size);
+
 	((struct free_blk*)ptr)->next = p->freelist;
+	((struct free_blk*)ptr)->magic = FREE_MAGIC;
+	((struct free_blk*)ptr)->magic_check = FREE_MAGIC + (uint32)p->freelist;
 
 	if (p->debug) {
 		dprintf("%s: adding %p, setting next = %p\n",
