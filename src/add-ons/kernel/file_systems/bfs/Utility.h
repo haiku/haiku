@@ -114,7 +114,26 @@ template<class Node> struct list {
 //	atomic_set(value, newValue)
 //		sets "value" to "newValue"
 
-#if __INTEL__
+#if _NO_INLINE_ASM
+	// Note that these atomic versions *don't* work as expected!
+	// They are only used for single processor user space tests
+	// (and don't even work correctly there)
+	inline int32
+	atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
+	{
+		int32 oldValue = *value;
+		if (oldValue == testAgainst)
+			*value = newValue;
+
+		return oldValue;
+	}
+
+	inline void
+	atomic_set(volatile int32 *value, int32 newValue)
+	{
+		*value = newValue;
+	}
+#elif __INTEL__
 	inline int32
 	atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
 	{
