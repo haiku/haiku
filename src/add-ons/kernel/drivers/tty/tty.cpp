@@ -8,11 +8,13 @@
 // tailored for pseudo-TTYs. Have a look at Be's TTY includes (drivers/tty/*)
 
 
-#include "tty_private.h"
-
+#include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
 #include <signal.h>
 #include <string.h>
+
+#include "SemaphorePool.h"
+#include "tty_private.h"
 
 
 //#define TTY_TRACE
@@ -23,162 +25,591 @@
 #endif
 
 
-class WriterLocker {
-	public:
-		WriterLocker(struct tty *source, struct tty *target, bool echo, bool sourceIsMaster);
-		~WriterLocker();
+/*
+	Locking
+	-------
 
-		status_t AcquireWriter(bool dontBlock);
-		void ReportWritten(size_t written);
+	There are four locks involved. If more than one needs to be held at a
+	time, they must be acquired in the order they are listed here.
 
-	private:
-		void Lock();
-		void Unlock();
+	gGlobalTTYLock: Guards open/close operations. When held, tty_open(),
+	tty_close(), tty_close_cookie() etc. won't be invoked by other threads,
+	cookies won't be added to/removed from TTYs, and tty::open_count,
+	tty_cookie::closed won't change.
 
-		struct tty	*fSource, *fTarget;
-		size_t		fSourceBytes, fTargetBytes;
-		bool		fEcho;
+	gTTYCookieLock: Guards the access to the fields
+	tty_cookie::{thread_count,closed}, or more precisely makes access to them
+	atomic. thread_count is the number of threads currently using the cookie
+	(i.e. read(), write(), ioctl() operations in progress). Together with
+	blocking_semaphore this serves the purpose to make sure that all pending
+	operations are done at a certain point when closing a cookie
+	(cf. tty_close_cookie() and TTYReference).
+
+	tty::lock: Guards the access to tty::{input_buffer,termios,window_size,
+	pgrp_id}. Moreover when held guarantees that tty::open_count won't drop
+	to zero (both gGlobalTTYLock and tty::lock must be held to decrement
+	it). A tty and the tty connected to it (master and slave) share the same
+	lock. tty::lock is only valid when tty::open_count is > 0. So before
+	accessing tty::lock, it must be made sure that it is still valid. Given
+	a tty_cookie, TTYReference can be used to do that, or otherwise
+	gGlobalTTYLock can be acquired and tty::open_count be checked.
+
+	gTTYRequestLock: Guards access to tty::{reader,writer}_queue (most
+	RequestQueue methods do the locking themselves (the lock is a
+	recursive_lock)), queued Requests and associated RequestOwners.
+
+
+	Reading/Writing
+	---------------
+
+	Most of the dirty work when dealing with reading/writing is done by the
+	{Reader,Writer}Locker classes. Upon construction they lock the tty,
+	(tty::lock) create a RequestOwner and queue Requests in the respective
+	reader/writer queues (tty::{reader,writer}_queue). The
+	Acquire{Reader,Writer}() methods need to be called before being allowed to
+	read/write. They ensure that there is actually something to read/space for
+	writing -- in blocking mode they wait, if necessary. When destroyed the
+	{Reader,Writer}Locker() remove the formerly enqueued Requests and notify
+	waiting reader/writer and/or send out select events, whatever is appropiate.
+
+	Acquire{Reader,Writer}() never return without an actual event being
+	occurred. Either an error has occurred (return value) -- in this case the
+	caller should terminate -- or bytes are available for reading/space for
+	writing (cf. AvailableBytes()).
+*/
+
+
+static void tty_notify_select_event(struct tty *tty, uint8 event);
+static void tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
+				bool notifySelect);
+
+
+class AbstractLocker {
+public:
+	AbstractLocker(tty_cookie *cookie)	: fCookie(cookie), fBytes(0) {}
+
+	size_t AvailableBytes() const	{ return fBytes; }
+
+protected:
+	void Lock()		{ mutex_lock(fCookie->tty->lock); }
+	void Unlock()	{ mutex_unlock(fCookie->tty->lock); }
+
+	tty_cookie	*fCookie;
+	size_t		fBytes;
 };
 
-class ReaderLocker {
+
+class WriterLocker : public AbstractLocker {
 	public:
-		ReaderLocker(struct tty *tty);
+		WriterLocker(tty_cookie *sourceCookie);
+
+		~WriterLocker();
+
+		status_t AcquireWriter(bool dontBlock, int32 bytesNeeded);
+
+	private:
+		size_t _CheckAvailableBytes() const;
+
+		struct tty		*fSource;
+		struct tty		*fTarget;
+		RequestOwner	fRequestOwner;
+		bool			fEcho;
+};
+
+
+class ReaderLocker : public AbstractLocker {
+	public:
+		ReaderLocker(tty_cookie *cookie);
 		~ReaderLocker();
 
 		status_t AcquireReader(bool dontBlock);
-		void ReportRead(size_t bytesRead);
 
 	private:
-		void Lock();
-		void Unlock();
-
-		struct tty	*fTTY;
-		size_t		fBytes;
-};
-
-class MutexLocker {
-	public:
-		MutexLocker(struct mutex *mutex)
-			: fMutex(mutex)
-		{
-			mutex_lock(mutex);
-		}
-
-		~MutexLocker()
-		{
-			mutex_unlock(fMutex);
-		}
-
-	private:
-		struct mutex	*fMutex;
+		struct tty		*fTTY;
+		RequestOwner	fRequestOwner;
 };
 
 
-WriterLocker::WriterLocker(struct tty *source, struct tty *target, bool echo, bool sourceIsMaster)
-	:
-	fSource(source),
-	fTarget(target),
-	fEcho(echo)
-{
-	if (echo && sourceIsMaster) {
-		// just switch the two, we have to lock both of
-		// them anyway - master is always locked first
-		fSource = target;
-		fTarget = source;
+class TTYReferenceLocking {
+public:
+	inline bool Lock(tty_cookie *cookie)
+	{
+		MutexLocker _(gTTYCookieLock);
+
+		if (cookie->closed)
+			return false;
+
+		cookie->thread_count++;
+
+		return true;
 	}
 
+	inline void Unlock(tty_cookie *cookie)
+	{
+		MutexLocker locker(gTTYCookieLock);
+
+		sem_id semaphore = -1;
+		if (--cookie->thread_count == 0 && cookie->closed)
+			semaphore = cookie->blocking_semaphore;
+
+
+		locker.Unlock();
+
+		if (semaphore >= 0) {
+			TRACE(("TTYReference: cookie %p closed, last operation done, "
+				"releasing blocking sem %ld\n", cookie, semaphore));
+
+			release_sem(semaphore);
+		}
+	}
+};
+
+typedef AutoLocker<tty_cookie, TTYReferenceLocking> TTYReference;
+
+
+// #pragma mark -
+
+Request::Request()
+	: fOwner(NULL),
+	  fCookie(NULL),
+	  fBytesNeeded(0),
+	  fNotified(false),
+	  fError(false)
+{
+}
+
+
+void
+Request::Init(RequestOwner *owner, tty_cookie *cookie, int32 bytesNeeded)
+{
+	fOwner = owner;
+	fCookie = cookie;
+	fBytesNeeded = bytesNeeded;
+	fNotified = false;
+	fError = false;
+}
+
+
+void
+Request::Notify(int32 bytesAvailable)
+{
+	if (!fNotified && bytesAvailable >= fBytesNeeded && fOwner) {
+		fOwner->Notify(this);
+		fNotified = true;
+	}
+}
+
+
+void
+Request::NotifyError(status_t error)
+{
+	if (!fError && fOwner) {
+		fOwner->NotifyError(this, error);
+		fError = true;
+		fNotified = true;
+	}
+}
+
+
+// #pragma mark -
+
+RequestQueue::RequestQueue()
+	: fRequests()
+{
+}
+
+
+void
+RequestQueue::Add(Request *request)
+{
+	if (request) {
+		RecursiveLocker _(gTTYRequestLock);
+
+		fRequests.Add(request, true);
+	}
+}
+
+
+void
+RequestQueue::Remove(Request *request)
+{
+	if (request) {
+		RecursiveLocker _(gTTYRequestLock);
+
+		fRequests.Remove(request);
+	}
+}
+
+
+void
+RequestQueue::NotifyFirst(int32 bytesAvailable)
+{
+	RecursiveLocker _(gTTYRequestLock);
+
+	if (Request *first = First())
+		first->Notify(bytesAvailable);
+}
+
+void
+RequestQueue::NotifyError(status_t error)
+{
+	RecursiveLocker _(gTTYRequestLock);
+
+	for (RequestList::Iterator it = fRequests.GetIterator(); it.HasNext();) {
+		Request *request = it.Next();
+		request->NotifyError(error);
+	}
+}
+
+void
+RequestQueue::NotifyError(tty_cookie *cookie, status_t error)
+{
+	RecursiveLocker _(gTTYRequestLock);
+
+	for (RequestList::Iterator it = fRequests.GetIterator(); it.HasNext();) {
+		Request *request = it.Next();
+		if (request->TTYCookie() == cookie)
+			request->NotifyError(error);
+	}
+}
+
+
+// #pragma mark -
+
+RequestOwner::RequestOwner()
+	: fSemaphore(NULL),
+	  fCookie(NULL),
+	  fError(B_OK),
+	  fBytesNeeded(1)
+{
+	fRequestQueues[0] = NULL;
+	fRequestQueues[1] = NULL;
+}
+
+
+/**
+ *	The caller must already hold the request lock.
+ */
+void
+RequestOwner::Enqueue(tty_cookie *cookie, RequestQueue *queue1, 
+	RequestQueue *queue2)
+{
+	TRACE(("%p->RequestOwner::Enqueue(%p, %p, %p)\n", this, cookie, queue1,
+		queue2));
+
+	fCookie = cookie;
+
+	fRequestQueues[0] = queue1;
+	fRequestQueues[1] = queue2;
+
+	fRequests[0].Init(this, cookie, fBytesNeeded);
+	if (queue1)
+		queue1->Add(&fRequests[0]);
+	else
+		fRequests[0].Notify(fBytesNeeded);
+
+	fRequests[1].Init(this, cookie, fBytesNeeded);
+	if (queue2)
+		queue2->Add(&fRequests[1]);
+	else
+		fRequests[1].Notify(fBytesNeeded);
+}
+
+
+/**
+ *	The caller must already hold the request lock.
+ */
+void
+RequestOwner::Dequeue()
+{
+	TRACE(("%p->RequestOwner::Dequeue()\n", this));
+
+	if (fRequestQueues[0])
+		fRequestQueues[0]->Remove(&fRequests[0]);
+	if (fRequestQueues[1])
+		fRequestQueues[1]->Remove(&fRequests[0]);
+}
+
+
+void
+RequestOwner::SetBytesNeeded(int32 bytesNeeded)
+{
+	if (fRequestQueues[0])
+		fRequests[0].Init(this, fCookie, bytesNeeded);
+
+	if (fRequestQueues[1])
+		fRequests[1].Init(this, fCookie, bytesNeeded);
+}
+
+
+/**
+ *	The request lock MUST NOT be held!
+ */
+status_t
+RequestOwner::Wait(bool interruptable, Semaphore *sem)
+{
+	TRACE(("%p->RequestOwner::Wait(%d, %p)\n", this, interruptable, sem));
+
+	// get a semaphore (if not supplied or invalid)
+	status_t error = B_OK;
+	bool ownsSem = false;
+	if (!sem || sem->InitCheck() != B_OK) {
+		error = gSemaphorePool->Get(sem);
+		if (error != B_OK)
+			return error;
+
+		ownsSem = true;
+	}
+
+	RecursiveLocker locker(gTTYRequestLock);
+
+	// check, if already done
+	if (fError == B_OK 
+		&& (!fRequests[0].WasNotified() || !fRequests[0].WasNotified())) {
+		// not yet done
+
+		// set the semaphore
+		fSemaphore = sem;
+
+		locker.Unlock();
+
+		// wait
+		TRACE(("%p->RequestOwner::Wait(): acquiring semaphore...\n", this));
+
+		error = acquire_sem_etc(sem->ID(), 1,
+			(interruptable ? B_CAN_INTERRUPT : 0), 0);
+
+		TRACE(("%p->RequestOwner::Wait(): semaphore acquired: %lx\n", this,
+			error));
+
+		// remove the semaphore
+		locker.SetTo(gTTYRequestLock, false);
+		fSemaphore = NULL;
+	}
+
+	// get the result
+	if (error == B_OK)
+		error = fError;
+
+	locker.Unlock();
+
+	// return the semaphore to the pool
+	if (ownsSem)
+		gSemaphorePool->Put(sem);
+
+	return error;
+}
+
+
+bool
+RequestOwner::IsFirstInQueues()
+{
+	RecursiveLocker locker(gTTYRequestLock);
+
+	for (int i = 0; i < 2; i++) {
+		if (fRequestQueues[i] && fRequestQueues[i]->First() != &fRequests[i])
+			return false;
+	}
+
+	return true;
+}
+
+
+void
+RequestOwner::Notify(Request *request)
+{
+	TRACE(("%p->RequestOwner::Notify(%p)\n", this, request));
+
+	if (fError == B_OK && !request->WasNotified()) {
+		bool releaseSem = false;
+
+		if (&fRequests[0] == request) {
+			releaseSem = fRequests[1].WasNotified();
+		} else if (&fRequests[1] == request) {
+			releaseSem = fRequests[0].WasNotified();
+		} else {
+			// spurious call
+		}
+
+		if (releaseSem && fSemaphore)
+			release_sem(fSemaphore->ID());
+	}
+}
+
+
+void
+RequestOwner::NotifyError(Request *request, status_t error)
+{
+	TRACE(("%p->RequestOwner::NotifyError(%p, %lx)\n", this, request, error));
+
+	if (fError == B_OK) {
+		fError = error;
+
+		if (!fRequests[0].WasNotified() || !fRequests[1].WasNotified()) {
+			if (fSemaphore)
+				release_sem(fSemaphore->ID());
+		}
+	}
+}
+
+
+// #pragma mark -
+
+WriterLocker::WriterLocker(tty_cookie *sourceCookie)
+	:
+	AbstractLocker(sourceCookie),
+	fSource(fCookie->tty),
+	fTarget(fCookie->other_tty),
+	fRequestOwner(),
+	fEcho(false)
+{
 	Lock();
+
+	// Now that the tty pair is locked, we can check, whether the target is
+	// open at all.
+	if (fTarget->open_count > 0) {
+		// The target tty is open. As soon as we have appended a request to
+		// the writer queue of the target, it is guaranteed to remain valid
+		// until we have removed the request (and notified the
+		// tty_close_cookie() pseudo request).
+
+		// get the echo mode
+		fEcho = (fTarget->termios.c_lflag & ECHO) != 0;
+
+		// enqueue ourselves in the respective request queues
+		RecursiveLocker locker(gTTYRequestLock);
+		fRequestOwner.Enqueue(fCookie, &fTarget->writer_queue,
+			(fEcho ? &fSource->writer_queue : NULL));
+	} else {
+		// target is not open: we set it to NULL; all further operations on
+		// this locker will fail
+		fTarget = NULL;
+	}
 }
 
 
 WriterLocker::~WriterLocker()
 {
+	// dequeue from request queues
+	RecursiveLocker locker(gTTYRequestLock);
+	fRequestOwner.Dequeue();
+
+	// check the tty queues and notify the next in line, and send out select
+	// events
+	if (fTarget)
+		tty_notify_if_available(fTarget, fSource, true);
+	if (fEcho)
+		tty_notify_if_available(fSource, fTarget, true);
+
+	locker.Unlock();
+
 	Unlock();
 }
 
 
-void
-WriterLocker::Lock()
+size_t
+WriterLocker::_CheckAvailableBytes() const
 {
-	mutex_lock(&fTarget->lock);
-	if (fEcho)
-		mutex_lock(&fSource->lock);
-}
-
-
-void
-WriterLocker::Unlock()
-{
-	if (fEcho)
-		mutex_unlock(&fSource->lock);
-
-	mutex_unlock(&fTarget->lock);
+	size_t writable = line_buffer_writable(fTarget->input_buffer);
+	if (fEcho) {
+		// we can only write as much as is available on both ends
+		size_t locallyWritable = line_buffer_writable(fSource->input_buffer);
+		if (locallyWritable < writable)
+			writable = locallyWritable;
+	}
+	return writable;
 }
 
 
 status_t 
-WriterLocker::AcquireWriter(bool dontBlock)
+WriterLocker::AcquireWriter(bool dontBlock, int32 bytesNeeded)
 {
-	// Release TTY lock in order not to block. We only need to do this
-	// if we could have to wait for the buffer to become writable.
-	if (!dontBlock)
-		Unlock();
+	if (!fTarget)
+		return B_FILE_ERROR;
+	if (fEcho && fCookie->closed)
+		return B_FILE_ERROR;
 
-	status_t status = acquire_sem_etc(fTarget->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
-	if (status == B_OK && fEcho) {
-		// We need to hold two write semaphores in order to echo the output to
-		// the local TTY as well. We need to make sure that these semaphores
-		// are always acquired in the same order to prevent deadlocks
-		status = acquire_sem_etc(fSource->write_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
-		if (status != B_OK)
-			release_sem(fTarget->write_sem);
+	RecursiveLocker requestLocker(gTTYRequestLock);
+
+	// check, if we're first in queue, and if there is space to write
+	if (fRequestOwner.IsFirstInQueues()) {
+		fBytes = _CheckAvailableBytes();
+		if (fBytes > 0)
+			return B_OK;
 	}
 
-	// reacquire TTY lock
-	if (!dontBlock)
-		Lock();
+	// We are not the first in queue or currently there's nothing to read:
+	// bail out, if we shall not block.
+	if (dontBlock)
+		return B_WOULD_BLOCK;
+
+	// set the number of bytes we need and notify, just in case we're first in
+	// one of the queues (RequestOwner::SetBytesNeeded() resets the notification
+	// state)
+	if (bytesNeeded != fRequestOwner.BytesNeeded()) {
+		fRequestOwner.SetBytesNeeded(bytesNeeded);
+		if (fTarget)
+			tty_notify_if_available(fTarget, fSource, false);
+		if (fEcho)
+			tty_notify_if_available(fSource, fTarget, false);
+	}
+
+	requestLocker.Unlock();
+
+	// block until something happens
+	Unlock();
+	status_t status = fRequestOwner.Wait(true);
+	Lock();
+
+	// RequestOwner::Wait() returns the error, but to avoid a race condition
+	// when closing a tty, we re-get the error with the tty lock being held.
+	if (status == B_OK) {
+		RecursiveLocker _(gTTYRequestLock);
+		status = fRequestOwner.Error();
+	}
 
 	if (status == B_OK) {
-		fTargetBytes = line_buffer_writable(fTarget->input_buffer);
-		if (fEcho)
-			fSourceBytes = line_buffer_writable(fSource->input_buffer);
+		if (fTarget->open_count > 0)
+			fBytes = _CheckAvailableBytes();
+		else
+			status = B_FILE_ERROR;
 	}
+
 	return status;
-}
-
-
-void 
-WriterLocker::ReportWritten(size_t written)
-{
-	if (written < fTargetBytes)
-		release_sem_etc(fTarget->write_sem, 1, fEcho ? B_DO_NOT_RESCHEDULE : 0);
-
-	if (fEcho && written < fSourceBytes)
-		release_sem(fSource->write_sem);
-
-	// there is now probably something to read, too
-
-	if (written > 0) {
-		release_sem(fTarget->read_sem);
-		if (fEcho)
-			release_sem(fSource->read_sem);
-	}
 }
 
 
 //	#pragma mark -
 
 
-ReaderLocker::ReaderLocker(struct tty *tty)
+ReaderLocker::ReaderLocker(tty_cookie *cookie)
 	:
-	fTTY(tty)
+	AbstractLocker(cookie),
+	fTTY(cookie->tty),
+	fRequestOwner()
 {
 	Lock();
+
+	// enqueue ourselves in the reader request queue
+	RecursiveLocker locker(gTTYRequestLock);
+	fRequestOwner.Enqueue(fCookie, &fTTY->reader_queue);
 }
 
 
 ReaderLocker::~ReaderLocker()
 {
+	// dequeue from reader request queue
+	RecursiveLocker locker(gTTYRequestLock);
+	fRequestOwner.Dequeue();
+
+	// check the tty queues and notify the next in line, and send out select
+	// events
+	struct tty *otherTTY = fCookie->other_tty;
+	tty_notify_if_available(fTTY, (otherTTY->open_count > 0 ? otherTTY : NULL),
+		true);
+
+	locker.Unlock();
+
 	Unlock();
 }
 
@@ -186,47 +617,30 @@ ReaderLocker::~ReaderLocker()
 status_t 
 ReaderLocker::AcquireReader(bool dontBlock)
 {
-	// Release TTY lock in order not to block. We only need to do this
-	// if we could have to wait for the buffer to become readable.
-	if (!dontBlock)
-		Unlock();
+	if (fCookie->closed)
+		return B_FILE_ERROR;
 
-	status_t status = acquire_sem_etc(fTTY->read_sem, 1, (dontBlock ? B_TIMEOUT : 0) | B_CAN_INTERRUPT, 0);
+	// check, if we're first in queue, and if there is something to read
+	if (fRequestOwner.IsFirstInQueues()) {
+		fBytes = line_buffer_readable(fTTY->input_buffer);
+		if (fBytes > 0)
+			return B_OK;
+	}
 
-	// reacquire TTY lock
-	if (!dontBlock)
-		Lock();
+	// We are not the first in queue or currently there's nothing to read:
+	// bail out, if we shall not block.
+	if (dontBlock)
+		return B_WOULD_BLOCK;
+
+	// block until something happens
+	Unlock();
+	status_t status = fRequestOwner.Wait(true);
+	Lock();
 
 	if (status == B_OK)
 		fBytes = line_buffer_readable(fTTY->input_buffer);
 
 	return status;
-}
-
-
-void 
-ReaderLocker::ReportRead(size_t bytesRead)
-{
-	if (bytesRead < fBytes && bytesRead != 0)
-		release_sem(fTTY->read_sem);
-
-	// there may be space to write too again
-	if (bytesRead > 0)
-		release_sem(fTTY->write_sem);
-}
-
-
-void 
-ReaderLocker::Lock()
-{
-	mutex_lock(&fTTY->lock);
-}
-
-
-void 
-ReaderLocker::Unlock()
-{
-	mutex_unlock(&fTTY->lock);
 }
 
 
@@ -276,12 +690,10 @@ reset_tty(struct tty *tty, int32 index)
 
 	tty->open_count = 0;
 	tty->index = index;
+	tty->lock = NULL;
 
 	tty->pgrp_id = 0;
 		// this value prevents any signal of being sent
-
-	tty->lock.sem = tty->read_sem = tty->write_sem = -1;
-		// the semaphores are only created when the TTY is actually in use
 
 	// some initial window size - the TTY in question should set these values
 	tty->window_size.ws_col = 80;
@@ -364,6 +776,7 @@ tty_input_putc_locked(struct tty *tty, int c)
 }
 
 
+#if 0
 status_t
 tty_input_putc(struct tty *tty, int c)
 {
@@ -390,6 +803,224 @@ tty_input_putc(struct tty *tty, int c)
 
 	return B_OK;
 }
+#endif // 0
+
+
+/**
+ * The global lock must be held.
+ */
+status_t
+init_tty_cookie(tty_cookie *cookie, struct tty *tty, struct tty *otherTTY,
+	uint32 openMode)
+{
+	cookie->blocking_semaphore = create_sem(0, "wait for tty close");
+	if (cookie->blocking_semaphore < 0)
+		return cookie->blocking_semaphore;
+
+	cookie->tty = tty;
+	cookie->other_tty = otherTTY;
+	cookie->open_mode = openMode;
+	cookie->select_pool = NULL;
+	cookie->thread_count = 0;
+	cookie->closed = false;
+
+	return B_OK;
+}
+
+
+void
+uninit_tty_cookie(tty_cookie *cookie)
+{
+	if (cookie->blocking_semaphore >= 0) {
+		delete_sem(cookie->blocking_semaphore);
+		cookie->blocking_semaphore = -1;
+	}
+
+	cookie->tty = NULL;
+	cookie->thread_count = 0;
+	cookie->closed = false;
+}
+
+
+/**
+ * The global lock must be held.
+ */
+void
+add_tty_cookie(tty_cookie *cookie)
+{
+	MutexLocker locker(cookie->tty->lock);
+
+	// add to the TTY's cookie list
+	cookie->tty->cookies.Add(cookie);
+	cookie->tty->open_count++;
+}
+
+
+/**
+ * The global lock must be held.
+ */
+void
+tty_close_cookie(struct tty_cookie *cookie)
+{
+	MutexLocker locker(gTTYCookieLock);
+
+	// Already closed? This can happen for slaves that have been closed when
+	// the master was closed.
+	if (cookie->closed)
+		return;
+
+	// set the cookie's `closed' flag
+	cookie->closed = true;
+	bool unblock = (cookie->thread_count > 0);
+
+	// unblock blocking threads
+	if (unblock) {
+		cookie->tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
+		cookie->tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
+
+		if (cookie->other_tty->open_count > 0) {
+			cookie->other_tty->reader_queue.NotifyError(cookie, B_FILE_ERROR);
+			cookie->other_tty->writer_queue.NotifyError(cookie, B_FILE_ERROR);
+		}
+	}
+
+	locker.Unlock();
+
+	// wait till all blocking (and now unblocked) threads have left the
+	// critical code
+	if (unblock) {
+		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
+			"operations, acquire blocking sem %ld\n", cookie,
+			cookie->blocking_semaphore));
+
+		acquire_sem(cookie->blocking_semaphore);
+	}
+
+	// For the removal of the cookie acquire the TTY's lock. This ensures, that
+	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
+	// as long as the TTY's lock is being held. This is required for the select
+	// support, since we need to iterate through the cookies of a TTY without
+	// having to acquire the global lock.
+	MutexLocker ttyLocker(cookie->tty->lock);
+
+	// remove the cookie from the TTY's cookie list
+	cookie->tty->cookies.Remove(cookie);
+
+	// close the tty, if no longer used
+	if (--cookie->tty->open_count == 0) {
+		// The last cookie of this tty has been closed. We're going to close
+		// the TTY and need to unblock all write requests before. There should
+		// be no read requests, since only a cookie of this TTY issues those.
+		// We do this by first notifying all queued requests of the error
+		// condition. We then clear the line buffer for the TTY and queue
+		// an own request.
+		RecursiveLocker requestLocker(gTTYRequestLock);
+
+		// we only need to do all this, if the writer queue is not empty
+		if (!cookie->tty->writer_queue.IsEmpty()) {
+
+	 		// notify the blocking writers
+			cookie->tty->writer_queue.NotifyError(B_FILE_ERROR);
+
+			// enqueue our request
+			RequestOwner requestOwner;
+			requestOwner.Enqueue(cookie, &cookie->tty->writer_queue);
+
+			requestLocker.Unlock();
+
+			// clear the line buffer
+			clear_line_buffer(cookie->tty->input_buffer);
+
+			ttyLocker.Unlock();
+
+			// wait for our turn (we reuse the blocking semaphore, so Wait()
+			// can't fail due to not being able to get a semaphore)
+			Semaphore sem(cookie->blocking_semaphore);
+			cookie->blocking_semaphore = -1;
+			requestOwner.Wait(false, &sem);
+
+			// re-lock
+			ttyLocker.SetTo(cookie->tty->lock, false);
+			requestLocker.SetTo(gTTYRequestLock, false);
+
+			// dequeue our request
+			requestOwner.Dequeue();
+		}
+
+		requestLocker.Unlock();
+
+		// finally close the tty
+		tty_close(cookie->tty);
+	}
+
+	// notify all pending selects and clean up the pool
+	if (cookie->select_pool) {
+		notify_select_event_pool(cookie->select_pool, B_SELECT_READ);
+		notify_select_event_pool(cookie->select_pool, B_SELECT_WRITE);
+		notify_select_event_pool(cookie->select_pool, B_SELECT_ERROR);
+
+		delete_select_sync_pool(cookie->select_pool);
+		cookie->select_pool = NULL;
+	}
+
+	// notify a select write event on the other tty, if we've closed this tty
+	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
+		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
+}
+
+
+static void
+tty_notify_select_event(struct tty *tty, uint8 event)
+{
+	TRACE(("tty_notify_select_event(%p, %u)\n", tty, event));
+
+	for (TTYCookieList::Iterator it = tty->cookies.GetIterator();
+		 it.HasNext();) {
+		tty_cookie *cookie = it.Next();
+
+		if (cookie->select_pool)
+			notify_select_event_pool(cookie->select_pool, event);
+	}
+}
+
+
+/** \brief Checks whether bytes can be read from/written to the line buffer of
+ *		   the given TTY and notifies the respective queues.
+ *
+ *	Also sends out \c B_SELECT_READ and \c B_SELECT_WRITE events as needed.
+ *
+ *	The TTY and the request lock must be held.
+ *
+ * \param tty The TTY.
+ * \param otherTTY The connected TTY.
+ */
+static void
+tty_notify_if_available(struct tty *tty, struct tty *otherTTY,
+	bool notifySelect)
+{
+	if (!tty)
+		return;
+
+	int32 readable = line_buffer_readable(tty->input_buffer);
+	if (readable > 0) {
+		// if nobody is waiting send select events, otherwise notify the waiter
+		if (!tty->reader_queue.IsEmpty())
+			tty->reader_queue.NotifyFirst(readable);
+		else if (notifySelect)
+			tty_notify_select_event(tty, B_SELECT_READ);
+	}
+
+	int32 writable = line_buffer_writable(tty->input_buffer);
+	if (writable > 0) {
+		// if nobody is waiting send select events, otherwise notify the waiter
+		if (!tty->writer_queue.IsEmpty()) {
+			tty->writer_queue.NotifyFirst(writable);
+		} else if (notifySelect) {
+			if (otherTTY && otherTTY->open_count > 0) 
+				tty_notify_select_event(otherTTY, B_SELECT_WRITE);
+		}
+	}
+}
 
 
 //	#pragma mark -
@@ -399,9 +1030,10 @@ tty_input_putc(struct tty *tty, int c)
 status_t
 tty_close(struct tty *tty)
 {
-	mutex_destroy(&tty->lock);
-	delete_sem(tty->write_sem);
-	delete_sem(tty->read_sem);
+	// destroy the queues
+	tty->reader_queue.~RequestQueue();
+	tty->writer_queue.~RequestQueue();
+	tty->cookies.~TTYCookieList();
 
 	uninit_line_buffer(tty->input_buffer);
 
@@ -412,47 +1044,44 @@ tty_close(struct tty *tty)
 status_t
 tty_open(struct tty *tty, tty_service_func func)
 {
-	status_t status;
-
 	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK)
 		return B_NO_MEMORY;
 
-	if ((status = mutex_init(&tty->lock, "tty lock")) < B_OK)
-		goto err1;
-
-	tty->write_sem = create_sem(1, "tty write");
-	if (tty->write_sem < B_OK) {
-		status = tty->write_sem;
-		goto err2;
-	}
-
-	tty->read_sem = create_sem(0, "tty read");
-	if (tty->read_sem < B_OK) {
-		status = tty->read_sem;
-		goto err3;
-	}
-
+	tty->lock = NULL;
 	tty->service_func = func;
 
-	return B_OK;
+	// construct the queues
+	new(&tty->reader_queue) RequestQueue;
+	new(&tty->writer_queue) RequestQueue;
+	new(&tty->cookies) TTYCookieList;
 
-err3:
-	delete_sem(tty->write_sem);
-err2:
-	mutex_destroy(&tty->lock);
-err1:
-	uninit_line_buffer(tty->input_buffer);
-	return status;
+	return B_OK;
 }
 
 
 status_t
-tty_ioctl(struct tty *tty, uint32 op, void *buffer, size_t length)
+tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 {
+	struct tty *tty = cookie->tty;
+
+	// bail out, if already closed
+	TTYReference ttyReference(cookie);
+	if (!ttyReference.IsLocked())
+		return B_FILE_ERROR;
+
 	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
-	MutexLocker locker(&tty->lock);
+	MutexLocker locker(tty->lock);
 
 	switch (op) {
+		/* blocking/non-blocking mode */
+
+		case B_SET_BLOCKING_IO:
+			cookie->open_mode &= ~O_NONBLOCK;
+			return B_OK;
+		case B_SET_NONBLOCKING_IO:
+			cookie->open_mode |= O_NONBLOCK;
+			return B_OK;
+
 		/* get and set TTY attributes */
 
 		case TCGETA:
@@ -506,8 +1135,10 @@ tty_ioctl(struct tty *tty, uint32 op, void *buffer, size_t length)
 
 
 status_t
-tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
+tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 {
+	struct tty *tty = cookie->tty;
+	uint32 mode = cookie->open_mode;
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
 	size_t length = *_length;
 	ssize_t bytesRead = 0;
@@ -517,7 +1148,12 @@ tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
 	if (length == 0)
 		return B_OK;
 
-	ReaderLocker locker(tty);
+	// bail out, if the TTY is already closed
+	TTYReference ttyReference(cookie);
+	if (!ttyReference.IsLocked())
+		return B_FILE_ERROR;
+
+	ReaderLocker locker(cookie);
 
 	while (bytesRead == 0) {
 		status_t status = locker.AcquireReader(dontBlock);
@@ -528,30 +1164,44 @@ tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
 
 		// ToDo: add support for ICANON mode
 
-		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer, length);
+		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer,
+			length);
 		if (bytesRead < B_OK) {
 			*_length = 0;
-			locker.ReportRead(0);
-
 			return bytesRead;
 		}
 	}
 
-	locker.ReportRead(bytesRead);
 	*_length = bytesRead;
-
 	return B_OK;
 }
 
 
 status_t
-tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, size_t *_length,
-	uint32 mode, bool sourceIsMaster)
+tty_write_to_tty(tty_cookie *sourceCookie, const void *buffer, size_t *_length,
+	bool sourceIsMaster)
 {
+	struct tty *source = sourceCookie->tty;
+	struct tty *target = sourceCookie->other_tty;
 	const char *data = (const char *)buffer;
 	size_t length = *_length;
 	size_t bytesWritten = 0;
+	uint32 mode = sourceCookie->open_mode;
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
+
+	// bail out, if source is already closed
+	TTYReference sourceTTYReference(sourceCookie);
+	if (!sourceTTYReference.IsLocked())
+		return B_FILE_ERROR;
+
+	if (length == 0)
+		return B_OK;
+
+	WriterLocker locker(sourceCookie);
+
+	// if the target is not open, fail now
+	if (target->open_count <= 0)
+		return B_FILE_ERROR;
 
 	bool echo = (target->termios.c_lflag & ECHO) != 0;
 		// Confusingly enough, we need to echo when the target's ECHO flag is
@@ -563,36 +1213,36 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 
 	// ToDo: "buffer" is not yet copied or accessed in a safe way!
 
-	if (length == 0)
-		return B_OK;
-
-	WriterLocker locker(source, target, echo, sourceIsMaster);
+	int32 bytesNeeded = 1;
 
 	while (bytesWritten < length) {
-		status_t status = locker.AcquireWriter(dontBlock);
+		status_t status = locker.AcquireWriter(dontBlock, bytesNeeded);
 		if (status != B_OK) {
 			*_length = bytesWritten;
 			return status;
 		}
 
-		size_t writable = line_buffer_writable(target->input_buffer);
-		if (echo) {
-			// we can only write as much as is available on both ends
-			size_t locallyWritable = line_buffer_writable(source->input_buffer);
-			if (locallyWritable < writable)
-				writable = locallyWritable;
-		}
+		bytesNeeded = 1;	// reset
 
+		size_t writable = locker.AvailableBytes();
 		if (writable == 0) {
-			locker.ReportWritten(0);
+			// should never happen
 			continue;
 		}
 
-		while (writable > bytesWritten && bytesWritten < length) {
+		while (writable > 0 && bytesWritten < length) {
 			char c = data[0];
 
 			if (c == '\n' && (source->termios.c_oflag & (OPOST | ONLCR)) == OPOST | ONLCR) {
 				// post-process output and transfrom '\n' to '\r\n'
+
+				// If we can't write both '\r' and '\n', we won't write either,
+				// or we would write the '\r' again.
+				if (writable < 2) {
+					bytesNeeded = 2;
+					continue;
+				}
+
 #if 1
 	// ToDo: this doesn't fix the bug that is responsible for the doubled shell prompt
 	//		and it's all wrong, too - but it cures the symptoms, and that's good enough
@@ -616,8 +1266,6 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 			data++;
 			bytesWritten++;
 		}
-
-		locker.ReportWritten(bytesWritten);
 	}
 
 	return B_OK;
@@ -625,17 +1273,114 @@ tty_write_to_tty(struct tty *source, struct tty *target, const void *buffer, siz
 
 
 status_t
-tty_select(struct tty *tty, uint8 event, uint32 ref, selectsync *sync)
+tty_select(tty_cookie *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
-	TRACE(("tty_select(event = %u, ref = %lu, sync = %p\n", event, ref, sync));
+	struct tty *tty = cookie->tty;
+
+	TRACE(("tty_select(cookie = %p, event = %u, ref = %lu, sync = %p)\n",
+		cookie, event, ref, sync));
+
+	// we don't support all kinds of events
+	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
+		return B_BAD_VALUE;
+
+	// if the TTY is already closed, we notify immediately
+	TTYReference ttyReference(cookie);
+	if (!ttyReference.IsLocked()) {
+		TRACE(("tty_select() done: cookie %p already closed\n", cookie));
+
+		notify_select_event(sync, ref, event);
+		return B_OK;
+	}
+
+	// lock the TTY (allows us to freely access the cookie lists of this and
+	// the other TTY)
+	MutexLocker ttyLocker(tty->lock);
+
+	// get the other TTY -- needed for `write' events
+	struct tty *otherTTY = cookie->other_tty;
+	if (otherTTY->open_count <= 0)
+		otherTTY = NULL;
+
+	// add the event to the TTY's pool
+	status_t error = add_select_sync_pool_entry(&cookie->select_pool, sync, ref,
+		event);
+	if (error != B_OK) {
+		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
+			error));
+
+		return error;
+	}
+
+	// finally also acquire the request mutex, for access to the reader/writer
+	// queues
+	RecursiveLocker requestLocker(gTTYRequestLock);
+
+	// check, if the event is already present
+	switch (event) {
+		case B_SELECT_READ:
+			if (tty->reader_queue.IsEmpty()
+				&& line_buffer_readable(tty->input_buffer) > 0) {
+				notify_select_event(sync, ref, event);
+			}
+			break;
+
+		case B_SELECT_WRITE:
+		{
+			// writes go to the other TTY
+			if (!otherTTY) {
+				notify_select_event(sync, ref, event);
+				break;
+			}
+
+			// In case the other TTY echos, we have to check, whether we can
+			// currently can write to our TTY as well.
+			bool echo = (otherTTY->termios.c_lflag & ECHO);
+
+			if (otherTTY->writer_queue.IsEmpty()
+				&& line_buffer_writable(otherTTY->input_buffer) > 0) {
+				if (!echo
+					|| (tty->writer_queue.IsEmpty()
+						&& line_buffer_writable(tty->input_buffer) > 0)) {
+					notify_select_event(sync, ref, event);
+				}
+			}
+
+			break;
+		}
+
+		case B_SELECT_ERROR:
+		default:
+			break;
+	}
+
 	return B_OK;
 }
 
 
 status_t
-tty_deselect(struct tty *tty, uint8 event, selectsync *sync)
+tty_deselect(tty_cookie *cookie, uint8 event, selectsync *sync)
 {
-	TRACE(("tty_deselect(event = %u, sync = %p\n", event, sync));
-	return B_OK;
+	struct tty *tty = cookie->tty;
+
+	TRACE(("tty_deselect(cookie = %p, event = %u, sync = %p)\n", cookie, event,
+		sync));
+
+	// we don't support all kinds of events
+	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
+		return B_BAD_VALUE;
+
+	// If the TTY is already closed, we're done. Note that we don't use a
+	// TTYReference here, but acquire the global lock, since we don't want
+	// return before tty_close_cookie() is done (it sends out the select
+	// events on close and our select() could miss one, if we don't wait).
+	MutexLocker globalLocker(gGlobalTTYLock);
+	if (cookie->closed)
+		return B_OK;
+
+	// lock the TTY (guards the select sync pool, among other things)
+	MutexLocker ttyLocker(tty->lock);
+
+	return remove_select_sync_pool_entry(&cookie->select_pool, sync, event);
 }
 

@@ -7,6 +7,7 @@
 #include "tty_private.h"
 
 #include <stdlib.h>
+#include <util/AutoLock.h>
 
 
 //#define MASTER_TRACE
@@ -17,10 +18,8 @@
 #endif
 
 
-struct master_cookie {
-	struct tty	*tty;
-	struct tty	*slave;
-	uint32		open_mode;
+struct master_cookie : tty_cookie {
+	struct mutex	lock;
 };
 
 
@@ -31,6 +30,31 @@ static status_t
 master_service(struct tty *tty, uint32 op)
 {
 	// nothing here yet
+	return B_OK;
+}
+
+
+static status_t
+create_master_cookie(master_cookie *&cookie, struct tty *master,
+	struct tty *slave, uint32 openMode)
+{
+	cookie = (master_cookie*)malloc(sizeof(struct master_cookie));
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = mutex_init(&cookie->lock, "tty lock");
+	if (error != B_OK) {
+		free(cookie);
+		return error;
+	}
+
+	error = init_tty_cookie(cookie, master, slave, openMode);
+	if (error != B_OK) {
+		mutex_destroy(&cookie->lock);
+		free(cookie);
+		return error;
+	}
+
 	return B_OK;
 }
 
@@ -47,28 +71,32 @@ master_open(const char *name, uint32 flags, void **_cookie)
 
 	TRACE(("master_open: TTY index = %ld (name = %s)\n", index, name));
 
-	if (atomic_or(&gMasterTTYs[index].open_count, 1) != 0) {
+	MutexLocker globalLocker(gGlobalTTYLock);
+
+	if (gMasterTTYs[index].open_count > 0) {
 		// we're already open!
 		return B_BUSY;
 	}
 
 	status_t status = tty_open(&gMasterTTYs[index], &master_service);
 	if (status < B_OK) {
-		// initializing TTY failed, reset open counter
-		atomic_and(&gMasterTTYs[index].open_count, 0);
+		// initializing TTY failed
 		return status;
 	}
 
-	master_cookie *cookie = (master_cookie *)malloc(sizeof(struct master_cookie));
-	if (cookie == NULL) {
-		atomic_and(&gMasterTTYs[index].open_count, 0);
+	master_cookie *cookie;
+	status = create_master_cookie(cookie, &gMasterTTYs[index],
+		&gSlaveTTYs[index], flags);
+	if (status != B_OK) {
 		tty_close(&gMasterTTYs[index]);
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	cookie->tty = &gMasterTTYs[index];
-	cookie->slave = &gSlaveTTYs[index];
-	cookie->open_mode = flags;
+	gMasterTTYs[index].lock = &cookie->lock;
+
+	add_tty_cookie(cookie);
+
+	
 	*_cookie = cookie;
 
 	return B_OK;
@@ -82,7 +110,15 @@ master_close(void *_cookie)
 
 	TRACE(("master_close: cookie %p\n", _cookie));
 
-	atomic_and(&cookie->tty->open_count, 0);
+	MutexLocker globalLocker(gGlobalTTYLock);
+
+	// close all connected slave cookies first
+	while (tty_cookie *slave = cookie->other_tty->cookies.Head())
+		tty_close_cookie(slave);
+
+	// close the client cookie
+	tty_close_cookie(cookie);
+
 	return B_OK;
 }
 
@@ -90,10 +126,13 @@ master_close(void *_cookie)
 static status_t
 master_free_cookie(void *_cookie)
 {
+	// The TTY is already closed. We only have to free the cookie.
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	tty_close(cookie->tty);
+	uninit_tty_cookie(cookie);
+	mutex_destroy(&cookie->lock);
 	free(cookie);
+
 	return B_OK;
 }
 
@@ -105,19 +144,7 @@ master_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	TRACE(("master_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
 
-	switch (op) {
-		case B_SET_BLOCKING_IO:
-			cookie->open_mode &= ~O_NONBLOCK;
-			break;
-		case B_SET_NONBLOCKING_IO:
-			cookie->open_mode |= O_NONBLOCK;
-			break;
-
-		default:
-			return tty_ioctl(cookie->tty, op, buffer, length);		
-	}
-
-	return B_OK;
+	return tty_ioctl(cookie, op, buffer, length);		
 }
 
 
@@ -126,8 +153,15 @@ master_read(void *_cookie, off_t offset, void *buffer, size_t *_length)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	TRACE(("master_read: cookie %p, offset %Ld, buffer %p, length %lu\n", _cookie, offset, buffer, *_length));
-	return tty_input_read(cookie->tty, buffer, _length, cookie->open_mode);
+	TRACE(("master_read: cookie %p, offset %Ld, buffer %p, length %lu\n",
+		_cookie, offset, buffer, *_length));
+
+	status_t result = tty_input_read(cookie, buffer, _length);
+
+	TRACE(("master_read done: cookie %p, result: %lx, length %lu\n", _cookie,
+		result, *_length));
+
+	return result;
 }
 
 
@@ -136,8 +170,15 @@ master_write(void *_cookie, off_t offset, const void *buffer, size_t *_length)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	TRACE(("master_write: cookie %p, offset %Ld, buffer %p, length %lu\n", _cookie, offset, buffer, *_length));
-	return tty_write_to_tty(cookie->tty, cookie->slave, buffer, _length, cookie->open_mode, true);
+	TRACE(("master_write: cookie %p, offset %Ld, buffer %p, length %lu\n",
+		_cookie, offset, buffer, *_length));
+
+	status_t result = tty_write_to_tty(cookie, buffer, _length, true);
+
+	TRACE(("master_write done: cookie %p, result: %lx, length %lu\n", _cookie,
+		result, *_length));
+
+	return result;
 }
 
 
@@ -146,7 +187,7 @@ master_select(void *_cookie, uint8 event, uint32 ref, selectsync *sync)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	return tty_select(cookie->tty, event, ref, sync);
+	return tty_select(cookie, event, ref, sync);
 }
 
 
@@ -155,7 +196,7 @@ master_deselect(void *_cookie, uint8 event, selectsync *sync)
 {
 	master_cookie *cookie = (master_cookie *)_cookie;
 
-	return tty_deselect(cookie->tty, event, sync);
+	return tty_deselect(cookie, event, sync);
 }
 
 

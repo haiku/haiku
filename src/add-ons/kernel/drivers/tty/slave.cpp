@@ -4,9 +4,11 @@
 */
 
 
-#include "tty_private.h"
-
 #include <stdlib.h>
+
+#include <util/AutoLock.h>
+
+#include "tty_private.h"
 
 
 //#define SLAVE_TRACE
@@ -17,10 +19,7 @@
 #endif
 
 
-struct slave_cookie {
-	struct tty	*tty;
-	struct tty	*master;
-	uint32		open_mode;
+struct slave_cookie : tty_cookie {
 };
 
 
@@ -36,32 +35,44 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 
 	TRACE(("slave_open: TTY index = %ld (name = %s)\n", index, name));
 
+	MutexLocker globalLocker(gGlobalTTYLock);
+
 	// we may only be used if our master has already been opened
 	if (gMasterTTYs[index].open_count == 0)
 		return B_IO_ERROR;
 
-	if (atomic_add(&gSlaveTTYs[index].open_count, 1) == 0) {
-		// ToDo: this is broken and must be synchronized with all
-		//	other open calls to that slave
-		// Also, tty_open() should probably be changed and always called in open().
+	if (gSlaveTTYs[index].open_count == 0) {
 		status_t status = tty_open(&gSlaveTTYs[index], NULL);
 		if (status < B_OK) {
-			// initializing TTY failed, reset open counter
-			atomic_add(&gSlaveTTYs[index].open_count, -1);
+			// initializing TTY failed
 			return status;
 		}
 	}
 
  	slave_cookie *cookie = (slave_cookie *)malloc(sizeof(struct slave_cookie));
 	if (cookie == NULL) {
-		atomic_add(&gSlaveTTYs[index].open_count, -1);
-		tty_close(&gSlaveTTYs[index]);
+		if (gSlaveTTYs[index].open_count == 0)
+			tty_close(&gSlaveTTYs[index]);
+
 		return B_NO_MEMORY;
 	}
 
-	cookie->tty = &gSlaveTTYs[index];
-	cookie->master = &gMasterTTYs[index];
-	cookie->open_mode = flags;
+	status_t status = init_tty_cookie(cookie, &gSlaveTTYs[index],
+		&gMasterTTYs[index], flags);
+	if (status != B_OK) {
+		free(cookie);
+
+		if (gSlaveTTYs[index].open_count == 0)
+			tty_close(&gSlaveTTYs[index]);
+
+		return status;
+	}
+
+	if (gSlaveTTYs[index].open_count == 0)
+		gSlaveTTYs[index].lock = gMasterTTYs[index].lock;
+
+	add_tty_cookie(cookie);
+
 	*_cookie = cookie;
 
 	return B_OK;
@@ -71,6 +82,15 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 static status_t
 slave_close(void *_cookie)
 {
+	slave_cookie *cookie = (slave_cookie *)_cookie;
+
+	TRACE(("slave_close: cookie %p\n", _cookie));
+
+	MutexLocker globalLocker(gGlobalTTYLock);
+
+	// unblock and wait for all blocking operations
+	tty_close_cookie(cookie);
+
 	return B_OK;
 }
 
@@ -78,14 +98,14 @@ slave_close(void *_cookie)
 static status_t
 slave_free_cookie(void *_cookie)
 {
+	// The TTY is already closed. We only have to free the cookie.
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_close: cookie %p\n", _cookie));
+	TRACE(("slave_free_cookie: cookie %p\n", _cookie));
 
-	if (atomic_add(&cookie->tty->open_count, -1) == 1)
-		tty_close(cookie->tty);
-
+	uninit_tty_cookie(cookie);
 	free(cookie);
+
 	return B_OK;
 }
 
@@ -97,19 +117,7 @@ slave_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	TRACE(("slave_ioctl: cookie %p, op %lu, buffer %p, length %lu\n", _cookie, op, buffer, length));
 
-	switch (op) {
-		case B_SET_BLOCKING_IO:
-			cookie->open_mode &= ~O_NONBLOCK;
-			break;
-		case B_SET_NONBLOCKING_IO:
-			cookie->open_mode |= O_NONBLOCK;
-			break;
-
-		default:
-			return tty_ioctl(cookie->tty, op, buffer, length);		
-	}
-
-	return B_OK;
+	return tty_ioctl(cookie, op, buffer, length);		
 }
 
 
@@ -118,8 +126,15 @@ slave_read(void *_cookie, off_t offset, void *buffer, size_t *_length)
 {
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_read: cookie %p, offset %Ld, buffer %p, length %lu\n", _cookie, offset, buffer, *_length));
-	return tty_input_read(cookie->tty, buffer, _length, cookie->open_mode);
+	TRACE(("slave_read: cookie %p, offset %Ld, buffer %p, length %lu\n",
+		_cookie, offset, buffer, *_length));
+
+	status_t result = tty_input_read(cookie, buffer, _length);
+
+	TRACE(("slave_read done: cookie %p, result %lx, length %lu\n",
+		_cookie, result, *_length));
+
+	return result;
 }
 
 
@@ -128,22 +143,33 @@ slave_write(void *_cookie, off_t offset, const void *buffer, size_t *_length)
 {
 	slave_cookie *cookie = (slave_cookie *)_cookie;
 
-	TRACE(("slave_write: cookie %p, offset %Ld, buffer %p, length %lu\n", _cookie, offset, buffer, *_length));
-	return tty_write_to_tty(cookie->tty, cookie->master, buffer, _length, cookie->open_mode, false);
+	TRACE(("slave_write: cookie %p, offset %Ld, buffer %p, length %lu\n",
+		_cookie, offset, buffer, *_length));
+
+	status_t result = tty_write_to_tty(cookie, buffer, _length, false);
+
+	TRACE(("slave_write done: cookie %p, result %lx, length %lu\n",
+		_cookie, result, *_length));
+
+	return result;
 }
 
 
 static status_t
 slave_select(void *_cookie, uint8 event, uint32 ref, selectsync *sync)
 {
-	return B_OK;
+	slave_cookie *cookie = (slave_cookie *)_cookie;
+
+	return tty_select(cookie, event, ref, sync);
 }
 
 
 static status_t
 slave_deselect(void *_cookie, uint8 event, selectsync *sync)
 {
-	return B_OK;
+	slave_cookie *cookie = (slave_cookie *)_cookie;
+
+	return tty_deselect(cookie, event, sync);
 }
 
 

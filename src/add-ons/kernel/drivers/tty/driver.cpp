@@ -3,12 +3,16 @@
 ** Distributed under the terms of the Haiku License.
 */
 
+#include <new>
 
-#include "tty_private.h"
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+
+#include <lock.h>
+
+#include "SemaphorePool.h"
+#include "tty_private.h"
 
 
 //#define TTY_TRACE
@@ -20,11 +24,18 @@
 
 #define DRIVER_NAME "tty"
 
+static const int kMaxCachedSemaphores = 8;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 static char *sDeviceNames[kNumTTYs * 2 + 1];
 	// reserve space for "pt/" and "tt/" entries and the terminating NULL
+
+struct mutex gGlobalTTYLock;
+struct mutex gTTYCookieLock;
+struct recursive_lock gTTYRequestLock;
+static char sSemaphorePoolBuffer[sizeof(SemaphorePool)];
+SemaphorePool *gSemaphorePool = 0;
 
 
 status_t
@@ -39,6 +50,37 @@ status_t
 init_driver(void)
 {
 	TRACE((DRIVER_NAME ": init_driver()\n"));
+
+	memset(sDeviceNames, 0, sizeof(sDeviceNames));
+
+	// create the global mutex
+	status_t error = mutex_init(&gGlobalTTYLock, "tty global");
+	if (error != B_OK)
+		return error;
+
+	// create the cookie mutex
+	error = mutex_init(&gTTYCookieLock, "tty cookies");
+	if (error != B_OK) {
+		mutex_destroy(&gGlobalTTYLock);
+		return error;
+	}
+
+	// create the request mutex
+	error = recursive_lock_init(&gTTYRequestLock, "tty requests");
+	if (error != B_OK) {
+		mutex_destroy(&gTTYCookieLock);
+		mutex_destroy(&gGlobalTTYLock);
+		return error;
+	}
+
+	// create the semaphore pool
+	gSemaphorePool
+		= new(sSemaphorePoolBuffer) SemaphorePool(kMaxCachedSemaphores);
+	error = gSemaphorePool->Init();
+	if (error != B_OK) {
+		uninit_driver();
+		return error;
+	}
 
 	// create driver name array and initialize basic TTY structures
 
@@ -62,9 +104,12 @@ init_driver(void)
 
 		reset_tty(&gMasterTTYs[i], i);
 		reset_tty(&gSlaveTTYs[i], i);
-	}
 
-	sDeviceNames[kNumTTYs * 2] = NULL;
+		if (!sDeviceNames[i] || !sDeviceNames[i + kNumTTYs]) {
+			uninit_driver();
+			return B_NO_MEMORY;
+		}
+	}
 
 	return B_OK;
 }
@@ -75,8 +120,17 @@ uninit_driver(void)
 {
 	TRACE((DRIVER_NAME ": uninit_driver()\n"));
 
-	for (int32 i = 0; sDeviceNames[i] != NULL; i++)
+	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
 		free(sDeviceNames[i]);
+
+	if (gSemaphorePool) {
+		gSemaphorePool->~SemaphorePool();
+		gSemaphorePool = NULL;
+	}
+
+	recursive_lock_destroy(&gTTYRequestLock);
+	mutex_destroy(&gTTYCookieLock);
+	mutex_destroy(&gGlobalTTYLock);
 }
 
 
