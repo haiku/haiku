@@ -35,8 +35,7 @@ public:
 			alphaFncMode	= B_ALPHA_OVERLAY;
 			scale			= 1.0;
 			fontAliasing	= true;
-			font			= fontserver->GetSystemPlain();
-			//font			= NULL;
+			font			= *(fontserver->GetSystemPlain());
 			
 			clippReg		= NULL;
 		
@@ -51,10 +50,6 @@ public:
 		}
 	~LayerData(void)
 		{
-			if(font) {
-				delete	font;
-				font	= NULL;
-			}
 			if (image){
 				/* NOTE: I don't know yet how bitmap allocation/deallocation
 					is managed by server. I tend to think it's a reference
@@ -84,7 +79,7 @@ public:
 	alpha_function	alphaFncMode;
 	float			scale;
 	bool			fontAliasing;
-	ServerFont		*font;
+	ServerFont		font;
 	
 	BRegion			*clippReg;
 
@@ -98,3 +93,8 @@ public:
 	escapement_delta	edelta;
 };
 #endif
+
+/*
+ @log
+ 	* modified 'font' member from '*font' to 'font'. '*font' was getting the pointer to system's plain font, and worse, it modified it. Now, it's all OK.
+*/
