@@ -5,6 +5,7 @@
 
 
 #include "loader.h"
+#include "elf.h"
 
 #include <OS.h>
 #include <boot/stage2.h>
@@ -19,6 +20,11 @@
 #endif
 
 #define KERNEL_IMAGE	"kernel_" BOOT_ARCH
+#define KERNEL_PATH		"beos/system/" KERNEL_IMAGE
+
+
+// temp. VFS API
+extern Node *get_node_from(int fd);
 
 
 bool
@@ -28,7 +34,7 @@ is_bootable(Directory *volume)
 		return false;
 
 	// check for the existance of a kernel (for our platform)
-	int fd = open_from(volume, "beos/system/" KERNEL_IMAGE, O_RDONLY);
+	int fd = open_from(volume, KERNEL_PATH, O_RDONLY);
 	if (fd < B_OK)
 		return false;
 
@@ -41,21 +47,29 @@ is_bootable(Directory *volume)
 status_t 
 load_kernel(stage2_args *args, Directory *volume)
 {
-	if (!is_bootable(volume))
-		return B_ENTRY_NOT_FOUND;
+	int fd = open_from(volume, KERNEL_PATH, O_RDONLY);
+	if (fd < B_OK)
+		return fd;
 
 	puts("load kernel...");
 
-	// ToDo: really load that thing :)
+	preloaded_image image;
+	status_t status = elf_load_image(fd, &image);
 
-	void *cookie;
+	close(fd);
+
+	if (status < B_OK)
+		return status;
+
+	puts("kernel loaded successfully");
+/*	void *cookie;
 	if (volume->Open(&cookie, O_RDONLY) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
 		while (volume->GetNextEntry(cookie, name, sizeof(name)) == B_OK)
 			printf("\t%s\n", name);
 
 		volume->Close(cookie);
-	}
+	}*/
 	return B_OK;
 }
 
@@ -63,6 +77,25 @@ load_kernel(stage2_args *args, Directory *volume)
 status_t 
 load_modules(stage2_args *args, Directory *volume)
 {
+	// we don't have readdir() & co. yet...
+
+	int fd = open_from(volume, "beos/system/add-ons/boot", O_RDONLY);
+	if (fd < B_OK)
+		return fd;
+
+	Directory *modules = (Directory *)get_node_from(fd);
+	if (modules == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	void *cookie;
+	if (modules->Open(&cookie, O_RDONLY) == B_OK) {
+		char name[B_FILE_NAME_LENGTH];
+		while (modules->GetNextEntry(cookie, name, sizeof(name)) == B_OK)
+			printf("\t%s\n", name);
+
+		modules->Close(cookie);
+	}
+
 	return B_OK;
 }
 
