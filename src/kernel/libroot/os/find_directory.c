@@ -20,6 +20,11 @@
 /* use pwents to find home */
 #define USE_PWENTS
 
+/* os root dir; just stick to 'beos' for now */
+#define OSDIR "beos"
+//#define OSDIR "haiku" // :)
+//#define OSDIR "os"
+
 #ifdef COMPILE_FOR_R5
 #define USE_R5_SYSCALL_HACK
 #undef USE_PWENTS
@@ -35,26 +40,28 @@ extern status_t _kclosedir_(int dir);
 #endif
 
 /* /bin/strings rox */
-static const char *beos_dirs[] = {
-"beos",
-"beos/system",
-"beos/system/add-ons",
-"beos/system/boot",
-"beos/etc/fonts",
-"beos/system/lib",
-"beos/system/servers",
-"beos/apps",
-"beos/bin",
-"beos/etc",
-"beos/documentation",
-"beos/preferences",
-"beos/system/add-ons/Translators",
-"beos/system/add-ons/media",
-"beos/etc/sounds",
+static const char *os_dirs[] = {
+OSDIR,
+OSDIR"/system",
+OSDIR"/system/add-ons",
+OSDIR"/system/boot",
+OSDIR"/etc/fonts",
+OSDIR"/system/lib",
+OSDIR"/system/servers",
+OSDIR"/apps",
+OSDIR"/bin",
+OSDIR"/etc",
+OSDIR"/documentation",
+OSDIR"/preferences",
+OSDIR"/system/add-ons/Translators",
+OSDIR"/system/add-ons/media",
+OSDIR"/etc/sounds",
 };
 
 /* R5 uses that, but it's *really* wrong, 
- * we don't want "common" directories to depend on user's home ! */
+ * we don't want "common" directories to depend on user's home !
+ * it should actually be something else than /boot/home even...
+ */
 //#define HOME "$h"
 #define HOME "home"
 
@@ -246,7 +253,7 @@ status_t find_directory (directory_which which, dev_t device, bool create_it, ch
 	case B_BEOS_TRANSLATORS_DIRECTORY:
 	case B_BEOS_MEDIA_NODES_DIRECTORY:
 	case B_BEOS_SOUNDS_DIRECTORY:
-		template = beos_dirs[which - B_BEOS_DIRECTORY];
+		template = os_dirs[which - B_BEOS_DIRECTORY];
 		break;
 	case B_COMMON_DIRECTORY:
 	case B_COMMON_SYSTEM_DIRECTORY:
