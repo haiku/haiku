@@ -299,9 +299,9 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	if (released_threads > 0) {
 		GRAB_THREAD_LOCK();
 		while ((t = thread_dequeue(&release_queue)) != NULL) {
-			thread_enqueue_run_q(t);
+			scheduler_enqueue_in_run_queue(t);
 		}
-		resched();
+		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 	}
 
@@ -348,7 +348,7 @@ sem_timeout(timer *data)
 	GRAB_THREAD_LOCK();
 	// put the threads in the run q here to make sure we dont deadlock in sem_interrupt_thread
 	while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
-		thread_enqueue_run_q(t);
+		scheduler_enqueue_in_run_queue(t);
 	}
 	RELEASE_THREAD_LOCK();
 
@@ -456,11 +456,11 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 			}
 			RELEASE_SEM_LOCK(gSems[slot]);
 			while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
-				thread_enqueue_run_q(t);
+				scheduler_enqueue_in_run_queue(t);
 			}
 			// fall through and reschedule since another thread with a higher priority may have been woken up
 		}
-		resched();
+		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 
 		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
@@ -555,12 +555,12 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			// temporarily place thread in a run queue with high priority to boost it up
 			priority = t->priority;
 			t->priority = t->priority >= B_FIRST_REAL_TIME_PRIORITY ? t->priority : B_FIRST_REAL_TIME_PRIORITY;
-			thread_enqueue_run_q(t);
+			scheduler_enqueue_in_run_queue(t);
 			t->priority = priority;
 		}
-		if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
-			resched();
-		}
+		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
+			scheduler_reschedule();
+
 		RELEASE_THREAD_LOCK();
 	}
 	goto outnolock;
@@ -788,7 +788,7 @@ sem_interrupt_thread(struct thread *t)
 	RELEASE_SEM_LOCK(gSems[slot]);
 
 	while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
-		thread_enqueue_run_q(t);
+		scheduler_enqueue_in_run_queue(t);
 	}
 
 	return B_NO_ERROR;
