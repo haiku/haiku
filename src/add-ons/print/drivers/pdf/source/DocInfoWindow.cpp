@@ -273,6 +273,7 @@ DocInfoWindow::DocInfoWindow(BMessage *doc_info)
 	menu->MoveTo(5, fTableScrollView->Frame().bottom+2);
 
 	BMenu* defaultKeys = new BMenu("Default Keys");
+	defaultKeys->AddItem(new BMenuItem("Title",        new BMessage(DEFAULT_KEY_MSG)));
 	defaultKeys->AddItem(new BMenuItem("Author",       new BMessage(DEFAULT_KEY_MSG)));
 	defaultKeys->AddItem(new BMenuItem("Subject",      new BMessage(DEFAULT_KEY_MSG)));
 	defaultKeys->AddItem(new BMenuItem("Keywords",     new BMessage(DEFAULT_KEY_MSG)));
