@@ -21,6 +21,8 @@ status_t get_next_entry (uint32 object_type, const char *base, char *result, siz
 status_t get_device_hid (const char *path, char *hid);
 uint32 get_object_type (const char *path);
 
+status_t evaluate_object (const char *object, void *return_value, size_t buf_len);
+
 struct acpi_module_info acpi_module = {
 	{
 		{
@@ -176,4 +178,15 @@ uint32 get_object_type (const char *path) {
 		
 	AcpiGetType(handle,&type);
 	return type;
+}
+
+status_t evaluate_object (const char *object, void *return_value, size_t buf_len) {
+	ACPI_BUFFER buffer;
+	ACPI_STATUS status;
+	
+	buffer.Pointer = return_value;
+	buffer.Length = buf_len;
+	
+	status = AcpiEvaluateObject(NULL,object,NULL,&buffer);
+	return (status == AE_OK) ? B_OK : B_ERROR;
 }

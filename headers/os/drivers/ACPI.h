@@ -32,6 +32,10 @@ struct acpi_module_info {
 	status_t			(*get_next_entry) (uint32 object_type, const char *base, char *result, size_t len, void **counter);
 	status_t			(*get_device_hid) (const char *path, char *hid);
 	uint32				(*get_object_type) (const char *path);
+	
+	/* Control method execution and data acquisition */
+	
+	status_t			(*evaluate_object) (const char *object, void *return_value, size_t buf_len);
 };
 
 
