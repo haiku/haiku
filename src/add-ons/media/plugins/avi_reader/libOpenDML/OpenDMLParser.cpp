@@ -158,13 +158,13 @@ OpenDMLParser::Parse(BPositionIO *source)
 		maxsize -= 4;
 		size = AVI_UINT32(temp);
 
+		TRACE("OpenDMLParser::Parse: chunk '"FOURCC_FORMAT"', size = %lu, maxsize %Ld\n", FOURCC_PARAM(fourcc), size, maxsize);
+
 		if (size == 0) {
 			ERROR("OpenDMLParser::Parse: Error: chunk of size 0 found\n");
 			return false;
 		}
-
-		TRACE("OpenDMLParser::Parse: chunk '"FOURCC_FORMAT"', size = %lu, maxsize %Ld\n", FOURCC_PARAM(fourcc), size, maxsize);
-		
+	
 		if (size > maxsize) {
 			ERROR("OpenDMLParser::Parse: Warning chunk '"FOURCC_FORMAT"', size = %lu extends beyond end of file\n", FOURCC_PARAM(fourcc), size);
 			ERROR("OpenDMLParser::Parse: Chunk at filepos %Ld truncated to %Ld, filesize %Ld\n", pos - 8, maxsize, fSize);
