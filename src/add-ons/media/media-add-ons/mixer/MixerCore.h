@@ -27,6 +27,7 @@ public:
 	
 	void Lock();
 	bool LockWithTimeout(bigtime_t timeout);
+	bool LockFromMixThread();
 	void Unlock();
 	
 	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
@@ -42,8 +43,6 @@ public:
 	
 	void StartMixThread();
 	void StopMixThread();
-
-//	bool IsStarted();
 	
 	uint32 OutputChannelCount();
 
@@ -95,6 +94,17 @@ inline bool MixerCore::LockWithTimeout(bigtime_t timeout)
 inline void MixerCore::Unlock()
 {
 	fLocker->Unlock();
+}
+
+inline bool MixerCore::LockFromMixThread()
+{
+	for (;;) {
+		if (LockWithTimeout(10000))
+			return true;
+		// XXX accessing fMixThreadWaitSem is still a race condition :(
+		if (B_WOULD_BLOCK != acquire_sem_etc(fMixThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 0))
+			return false;
+	}
 }
 
 #endif

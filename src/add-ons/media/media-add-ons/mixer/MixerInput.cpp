@@ -120,9 +120,9 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	// if (offset < 0)
 	//	offset += fMixBufferFrameCount;
 
-//	printf("MixerInput::BufferReceived:  mix buffer start %14Ld, buffer start %14Ld, offset %6d\n", fMixBufferStartTime, start, offset);
+	PRINT(4, "MixerInput::BufferReceived: buffer start %10Ld, offset %6d\n", start, offset);
 
-	int in_frames = buffer->SizeUsed() / bytes_per_frame(fInput.format.u.raw_audio);
+	int in_frames = size / bytes_per_frame(fInput.format.u.raw_audio);
 	int out_frames = (int)((in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate); // XXX losing fractions
 
 	//printf("data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
@@ -134,10 +134,10 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		int in_frames1 = (out_frames1 * in_frames) / out_frames;
 		int in_frames2 = in_frames - in_frames1;
 
-		printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1, 0, out_frames2);
+		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld and %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames1, 0, out_frames2);
 
-		//printf("  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
-		//	   in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
+		PRINT(5, "  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
+			  in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
 
 		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
 
@@ -159,11 +159,12 @@ MixerInput::BufferReceived(BBuffer *buffer)
 									fInputChannelCount * sizeof(float),
 									out_frames2,
 									fInputChannelInfo[i].gain);
+									
 		}
 	} else {
 
-		printf("at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
-		//printf("  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
+		PRINT(3, "at %10Ld, data arrived for %10Ld to %10Ld, storing at frames %ld to %ld\n", fCore->fTimeSource->Now(), start, start + duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio)), offset, offset + out_frames);
+		PRINT(5, "  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
 
 		offset *= sizeof(float) * fInputChannelCount; // convert offset from frames into bytes
 
@@ -393,7 +394,7 @@ MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffe
 	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
 	int32 offset = framepos % fMixBufferFrameCount;
-	if (channel == 0) printf("GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames);
+	if (channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames);
 	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
 	*sample_offset = sizeof(float) * fInputChannelCount;
 	*type = fMixerChannelInfo[channel].type;

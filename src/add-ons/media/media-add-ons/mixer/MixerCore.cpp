@@ -11,7 +11,7 @@
 #include "MixerUtils.h"
 #include "AudioMixer.h"
 #include "Resampler.h"
-#include "Debug.h"
+#include "debug.h"
 
 #define DOUBLE_RATE_MIXING 	1
 
@@ -340,15 +340,6 @@ MixerCore::StopMixThread()
 	fRunning = false;
 }
 
-/*
-bool
-MixerCore::IsStarted()
-{
-	ASSERT_LOCKED();
-	return fRunning;
-}
-*/
-
 int32
 MixerCore::_mix_thread_(void *arg)
 {
@@ -369,18 +360,21 @@ MixerCore::MixThread()
 	// The broken BeOS R5 multiaudio node starts with time 0,
 	// then publishes negative times for about 50ms, publishes 0
 	// again until it finally reaches time values > 0
-	Lock();
+	if (!LockFromMixThread())
+		return;
 	start = fTimeSource->Now();
 	Unlock();
 	while (start <= 0) {
 		printf("MixerCore: delaying MixThread start, timesource is at %Ld\n", start);
 		snooze(1000);
-		Lock();
+		if (!LockFromMixThread())
+			return;
 		start = fTimeSource->Now();
 		Unlock();
 	}
 
-	Lock();
+	if (!LockFromMixThread())
+		return;
 	latency = bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio));
 	
 	printf("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
@@ -397,9 +391,13 @@ MixerCore::MixThread()
 	event_time = time_base;
 	frame_pos = 0;
 	for (;;) {
+		bigtime_t wait_until;
+		if (!LockFromMixThread())
+			return;
+		wait_until = fTimeSource->RealTimeFor(event_time, 0) - latency - fDownstreamLatency;
+		Unlock();
 		status_t rv;
-//		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, latency + fDownstreamLatency));
-		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, 0) - latency - fDownstreamLatency);
+		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, wait_until);
 		if (rv == B_INTERRUPTED)
 			continue;
 		if (rv != B_TIMED_OUT && rv < B_OK)
@@ -411,13 +409,10 @@ MixerCore::MixThread()
 		// mix all data from all inputs into the mix buffer
 		ASSERT((frame_base + frame_pos) % fMixBufferFrameCount == 0);
 
-//		printf("create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
+		PRINT(4, "create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
 
 		// XXX this is a test, copy the the left and right channel from input 1 or 0
 
-		if (fMixBufferChannelCount > 2)
-			memset(fMixBuffer, 0, fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
-		
 		MixerInput *input = Input(1);
 		if (!input)
 			input = Input(0);
@@ -427,7 +422,7 @@ MixerCore::MixThread()
 
 		if (input) {
 	
-			printf("at %10Ld, data reading for %10Ld to %10Ld, ", fTimeSource->Now(), event_time, event_time + duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount));
+			PRINT(3, "at %10Ld, data reading for %10Ld to %10Ld, ", fTimeSource->Now(), event_time, event_time + duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount));
 
 			int64 cur_framepos = frame_base + frame_pos;
 			
@@ -442,17 +437,7 @@ MixerCore::MixThread()
 				input->GetMixerChannelInfo(chan, cur_framepos, &buffer, &src_sample_offset, &type, &gain);
 				dst_sample_offset = fMixBufferChannelCount * sizeof(float);
 				
-				char *src = (char *)buffer;
-				char *dst = (char *)fMixBuffer;
-				
-				src += chan * sizeof(float);
-				dst += chan * sizeof(float);
-			
-				for (int i = 0; i < fMixBufferFrameCount; i++) {
-					*(float *)dst = *(float *)src;
-					dst += dst_sample_offset;
-					src += src_sample_offset;
-				}
+				CopySamples(&fMixBuffer[chan], dst_sample_offset, buffer, src_sample_offset, fMixBufferFrameCount);
 			}
 		}
 
@@ -471,7 +456,7 @@ MixerCore::MixThread()
 										frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio),
 										1.0);
 			}
-//			printf("send buffer, inframes %ld, outframes %ld\n",fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
+			PRINT(4, "send buffer, inframes %ld, outframes %ld\n",fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 
 			// fill in the buffer header
 			media_header* hdr = buf->Header();
