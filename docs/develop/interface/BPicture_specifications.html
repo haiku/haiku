@@ -1,0 +1,603 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>BPicture specifications</title>
+     
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <meta name="author" content="Marc Flerackers(mflerackers@androme.be)">
+  <meta name="description"
+ content="BPicture specifications for OpenBeOS">
+</head>
+<body>
+<span style="font-weight: bold; text-decoration: underline;">Picture data</span><br>
+<br>
+The data of a BPicture is composed of instructions.<br>
+<br>
+These instructions have a small header, which looks as follows:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left;">
+  <tbody>
+    <tr>
+      <td>int16</td>
+      <td valign="top">id</td>
+      <td valign="top">The instruction id</td>
+    </tr>
+    <tr>
+      <td valign="top">int32</td>
+      <td valign="top">size</td>
+      <td valign="top">The size of the data</td>
+    </tr>
+  
+  </tbody>
+</table>
+<br>
+After this header the data follows. There are two exceptions: EnterStateChange
+and EnterFontState. These are used to enclose state and font changes. For
+ExitStateChange and ExitFontState there are no instructions, this is not needed
+as we know the size of the instruction block in the header of the Enter*
+functions.<br>
+<br>
+These are the known instructions at the moment:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; width: 100%;">
+  <tbody>
+    <tr>
+      <th valign="top">Id<br>
+      </th>
+      <th valign="top">Name<br>
+      </th>
+      <th valign="top">Size<br>
+      </th>
+      <th valign="top">Data<br>
+      </th>
+    </tr>
+    <tr>
+      <td valign="top">0x0010<br>
+      </td>
+      <td valign="top">MovePenBy<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">BPoint where<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0100<br>
+      </td>
+      <td valign="top">StrokeLine<br>
+      </td>
+      <td valign="top">16<br>
+      </td>
+      <td valign="top">BPoint start<br>
+BPoint end<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0101<br>
+      </td>
+      <td valign="top">StrokeRect<br>
+      </td>
+      <td valign="top">16<br>
+      </td>
+      <td valign="top">BRect rect<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0102<br>
+      </td>
+      <td valign="top">FillRect<br>
+      </td>
+      <td valign="top">16<br>
+      </td>
+      <td valign="top">BRect rect<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0103<br>
+      </td>
+      <td valign="top">StrokeRoundRect<br>
+      </td>
+      <td valign="top">24</td>
+      <td valign="top">BRect rect<br>
+BPoint radii<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0104<br>
+      </td>
+      <td valign="top">FillRoundRect</td>
+      <td valign="top">24<br>
+      </td>
+      <td valign="top">BRect rect<br>
+BPoint radii</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0105<br>
+      </td>
+      <td valign="top">StrokeBezier<br>
+      </td>
+      <td valign="top">32<br>
+      </td>
+      <td valign="top">BPoint[4] control</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0106<br>
+      </td>
+      <td valign="top">FillBezier<br>
+      </td>
+      <td valign="top">32<br>
+      </td>
+      <td valign="top">BPoint[4] control</td>
+    </tr>
+    <tr>
+      <td valign="top">0x010B<br>
+      </td>
+      <td valign="top">StrokePolygon<br>
+      </td>
+      <td valign="top">4 + point data size + 1<br>
+      </td>
+      <td valign="top">int32 numPoints<br>
+BPoint *points<br>
+bool isClosed<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x010C<br>
+      </td>
+      <td valign="top">FillPolygon<br>
+      </td>
+      <td valign="top">4 + point data size      </td>
+      <td valign="top">int32 numPoints<br>
+BPoint *points<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x010D<br>
+      </td>
+      <td valign="top">StrokeShape<br>
+      </td>
+      <td valign="top">shape data size<br>
+      </td>
+      <td valign="top">shape data, see below      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x010E      </td>
+      <td valign="top">FillShape      </td>
+      <td valign="top">shape data size      </td>
+      <td valign="top">shape data, see below      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x010F<br>
+      </td>
+      <td valign="top">DrawString<br>
+      </td>
+      <td valign="top">4 + string data size + 8<br>
+      </td>
+      <td valign="top">strlen<br>
+char *string<br>
+float deltax<br>
+float deltay<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0110      </td>
+      <td valign="top">DrawPixels<br>
+      </td>
+      <td valign="top">52 + pixel data size<br>
+      </td>
+      <td valign="top">BRect src<br>
+BRect dest<br>
+int32 width<br>
+int32 height<br>
+int32 bytesPerRow<br>
+int32 pixelFormat<br>
+int32 flags<br>
+pixel data<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0113</td>
+      <td valign="top">StrokeArc<br>
+      </td>
+      <td valign="top">24<br>
+      </td>
+      <td valign="top">BPoint center<br>
+BPoint radii<br>
+float startTheta<br>
+float arcTheta<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0114<br>
+      </td>
+      <td valign="top">FillArc<br>
+      </td>
+      <td valign="top">24<br>
+      </td>
+      <td valign="top">BPoint center<br>
+BPoint radii<br>
+float startTheta<br>
+float arcTheta</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0115<br>
+      </td>
+      <td valign="top">StrokeEllipse<br>
+      </td>
+      <td valign="top">16<br>
+      </td>
+      <td valign="top">BRect rect<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0116</td>
+      <td valign="top">FillEllipse</td>
+      <td valign="top">16<br>
+      </td>
+      <td valign="top">BRect rect</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0200<br>
+      </td>
+      <td valign="top">EnterStateChange<br>
+      </td>
+      <td valign="top">size of state instructions<br>
+      </td>
+      <td valign="top">state instructions</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0201</td>
+      <td valign="top">SetClippingRects</td>
+      <td valign="top">TODO</td>
+      <td valign="top">TODO</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0203<br>
+      </td>
+      <td valign="top">PushState<br>
+      </td>
+      <td valign="top">0<br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0204</td>
+      <td valign="top">PopState</td>
+      <td valign="top">0<br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0205<br>
+      </td>
+      <td valign="top">SetClippingRects<br>
+      </td>
+      <td valign="top">TODO<br>
+      </td>
+      <td valign="top">TODO</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0300<br>
+      </td>
+      <td valign="top">SetOrigin<br>
+      </td>
+      <td valign="top">8<br>
+      </td>
+      <td valign="top">BPoint pt<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0301<br>
+      </td>
+      <td valign="top">SetPenLocation<br>
+      </td>
+      <td valign="top">8<br>
+      </td>
+      <td valign="top">BPoint pt<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0302<br>
+      </td>
+      <td valign="top">SetDrawingMode<br>
+      </td>
+      <td valign="top">2<br>
+      </td>
+      <td valign="top">drawing_mode mode<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0303</td>
+      <td valign="top">SetLineMode<br>
+      </td>
+      <td valign="top">2 + 2 + 4<br>
+      </td>
+      <td valign="top">cap_mode capMode<br>
+join_mode joinMode<br>
+float miterLimit<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0304<br>
+      </td>
+      <td valign="top">SetPenSize</td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">float size<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0305<br>
+      </td>
+      <td valign="top">SetScale<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">float scale</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0306<br>
+      </td>
+      <td valign="top">SetForeColor<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">rgb_color color<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0307<br>
+      </td>
+      <td valign="top">SetBackColor<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">rgb_color color</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0308<br>
+      </td>
+      <td valign="top">SetStipplePattern<br>
+      </td>
+      <td valign="top">8<br>
+      </td>
+      <td valign="top">pattern p<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0309<br>
+      </td>
+      <td valign="top">EnterFontState<br>
+      </td>
+      <td valign="top">size of font instructions</td>
+      <td valign="top">font instructions</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0380<br>
+      </td>
+      <td valign="top">SetFontFamily<br>
+      </td>
+      <td valign="top">4 + string data size</td>
+      <td valign="top">strlen<br>
+char *family<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0381<br>
+      </td>
+      <td valign="top">SetFontStyle<br>
+      </td>
+      <td valign="top">4 + string data size</td>
+      <td valign="top">strlen<br>
+char style</td>
+    </tr>
+    <tr>
+      <td valign="top">0x0382<br>
+      </td>
+      <td valign="top">SetFontSpacing<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">int32 spacing<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0383<br>
+      </td>
+      <td valign="top">SetFontEncoding<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">int32 encoding<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0384<br>
+      </td>
+      <td valign="top">SetFontFlags<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">int32 flags<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0385<br>
+      </td>
+      <td valign="top">SetFontSize<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">float size<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0386<br>
+      </td>
+      <td valign="top">SetFontRotate<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">float rotation<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0387<br>
+      </td>
+      <td valign="top">SetFontShear<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">float shear(is 0 instead of 90?)<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x0389<br>
+      </td>
+      <td valign="top">SetFontFace<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">int32 flags<br>
+      </td>
+    </tr>
+  
+  </tbody>
+</table>
+<br>
+There are a few undocumented instructions:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left;" width="100%">
+  <tbody>
+    <tr>
+      <td valign="top">30A<br>
+      </td>
+      <td valign="top">????<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">some state change</td>
+    </tr>
+    <tr>
+      <td valign="top">388<br>
+      </td>
+      <td valign="top">????<br>
+      </td>
+      <td valign="top">4<br>
+      </td>
+      <td valign="top">some font change<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Also, not all instructions where checked yet. The SetClippingRects and DrawPixels
+data has still to be documented.<br>
+<br>
+<span style="font-weight: bold; text-decoration: underline;">Shape data</span><br>
+<br>
+The shape data contained in a BPicture is stored as follows:<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left;" width="100%">
+  <tbody>
+    <tr>
+      <td valign="top">int32<br>
+      </td>
+      <td valign="top">instruction count<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" rowspan="1" colspan="1">int32 *instructions<br>
+      </td>
+      <td valign="top" rowspan="1" colspan="1">Each instruction looks like:<br>
+First byte is the instruction id, MoveTo is not coded as a seperate instruction,
+but as a bitflag of the next instruction 0x80 see the table below.<br>
+The next three bytes is the amount of points used*<br>
+ </td>
+    </tr>
+    <tr>
+    </tr>
+    <tr>
+      <td valign="top">int32<br>
+      </td>
+      <td valign="top">point count<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">points<br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<table cellpadding="2" cellspacing="2" border="1"
+ style="text-align: left; width: 100%;">
+  <tbody>
+    <tr>
+      <th valign="top">Id<br>
+      </th>
+      <th valign="top">Name<br>
+      </th>
+      <th valign="top">Points*<br>
+      </th>
+      <th valign="top">Notes<br>
+      </th>
+    </tr>
+    <tr>
+      <td valign="top">0x0B</td>
+      <td valign="top">MoveTo</td>
+      <td valign="top">1</td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x10 </td>
+      <td valign="top">LineTo</td>
+      <td valign="top">point count in instruction<br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x90 </td>
+      <td valign="top">MoveTo LineTo</td>
+      <td valign="top">point count in instruction + 1</td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0x20 </td>
+      <td valign="top">BezierTo</td>
+      <td valign="top">point count in instruction</td>
+      <td valign="top">point count is always multiple of 3<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top">0xA0 </td>
+      <td valign="top">MoveTo&nbsp;BezierTo</td>
+      <td valign="top">point count in instruction + 1</td>
+      <td valign="top">point count is always multiple of 3</td>
+    </tr>
+    <tr>
+      <td valign="top">0x70 </td>
+      <td valign="top">Close</td>
+      <td valign="top">0<br>
+      </td>
+      <td valign="top"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+ 
+</body>
+</html>
