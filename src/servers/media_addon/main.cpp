@@ -280,7 +280,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 			continue;
 		}
 		
-		#if DEBUG >= 3
+		#if DEBUG >= 2
 		  DumpFlavorInfo(info);
 		#endif
 		
