@@ -86,29 +86,31 @@ public:
 	virtual void MessageReceived(BMessage*); 
 
 	void HandleSetMethod(BMessage*);
-	void HandleGetMouseType(BMessage*, BMessage*);
-	void HandleSetMouseType(BMessage*, BMessage*);
-	void HandleGetMouseAcceleration(BMessage*, BMessage*);
-	void HandleSetMouseAcceleration(BMessage*, BMessage*);
-	void HandleGetKeyRepeatDelay(BMessage*, BMessage*);
-	void HandleSetKeyRepeatDelay(BMessage*, BMessage*);
+	void HandleGetSetMouseType(BMessage*, BMessage*);
+	void HandleGetSetMouseAcceleration(BMessage*, BMessage*);
+	void HandleGetSetKeyRepeatDelay(BMessage*, BMessage*);
 	void HandleGetKeyInfo(BMessage*, BMessage*);
 	void HandleGetModifiers(BMessage*, BMessage*);
 	void HandleSetModifierKey(BMessage*, BMessage*);
 	void HandleSetKeyboardLocks(BMessage*, BMessage*);
-	void HandleGetMouseSpeed(BMessage*, BMessage*);
-	void HandleSetMouseSpeed(BMessage*, BMessage*);
+	void HandleGetSetMouseSpeed(BMessage*, BMessage*);
 	void HandleSetMousePosition(BMessage*, BMessage*);
-	void HandleGetMouseMap(BMessage*, BMessage*);
-	void HandleSetMouseMap(BMessage*, BMessage*);
+	void HandleGetSetMouseMap(BMessage*, BMessage*);
 	void HandleGetKeyboardID(BMessage*, BMessage*);
 	void HandleGetClickSpeed(BMessage*, BMessage*);
 	void HandleSetClickSpeed(BMessage*, BMessage*);
-	void HandleGetKeyRepeatRate(BMessage*, BMessage*);
-	void HandleSetKeyRepeatRate(BMessage*, BMessage*);
+	void HandleGetSetKeyRepeatRate(BMessage*, BMessage*);
 	void HandleGetSetKeyMap(BMessage*, BMessage*);
 	void HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
 
+	void HandleFindDevices(BMessage*, BMessage*);
+	void HandleWatchDevices(BMessage*, BMessage*);
+	void HandleIsDeviceRunning(BMessage*, BMessage*);
+	void HandleStartStopDevices(BMessage*, BMessage*);
+	void HandleControlDevices(BMessage*, BMessage*);
+	void HandleSystemShuttingDown(BMessage*, BMessage*);
+	void HandleNodeMonitor(BMessage*);
+	
 	status_t EnqueueDeviceMessage(BMessage*);
 	status_t EnqueueMethodMessage(BMessage*);
 	status_t UnlockMethodQueue(void);
