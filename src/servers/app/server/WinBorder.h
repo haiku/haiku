@@ -95,6 +95,9 @@ protected:
 			bool				fIsClosing;
 			bool				fIsMinimizing;
 			bool				fIsZooming;
+
+			// having a hard time doing resizing. It's not nice, but this helps a bit
+			BRect				*fNewTopLayerFrame;
 };
 
 #endif
