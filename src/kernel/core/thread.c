@@ -57,9 +57,9 @@ static sem_id sSnoozeSem = -1;
 
 // death stacks - used temporarily as a thread cleans itself up
 struct death_stack {
-	region_id area;
-	addr_t address;
-	bool in_use;
+	area_id	area;
+	addr_t	address;
+	bool	in_use;
 };
 static struct death_stack *sDeathStacks;
 static unsigned int sNumDeathStacks;
@@ -170,9 +170,9 @@ create_thread_struct(const char *name)
 	t->sem.blocking = -1;
 	t->fault_handler = 0;
 	t->page_faults_allowed = 1;
-	t->kernel_stack_region_id = -1;
+	t->kernel_stack_area = -1;
 	t->kernel_stack_base = 0;
-	t->user_stack_region_id = -1;
+	t->user_stack_area = -1;
 	t->user_stack_base = 0;
 	t->user_local_storage = 0;
 	t->kernel_errno = 0;
@@ -325,14 +325,14 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	t->next_state = B_THREAD_SUSPENDED;
 
 	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, t->id);
-	t->kernel_stack_region_id = create_area(stack_name, (void **)&t->kernel_stack_base,
+	t->kernel_stack_area = create_area(stack_name, (void **)&t->kernel_stack_base,
 		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	if (t->kernel_stack_region_id < 0) {
+	if (t->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
 		dprintf("create_thread: error creating kernel stack!\n");
 
-		status = t->kernel_stack_region_id;
+		status = t->kernel_stack_area;
 		delete_thread_struct(t);
 		return status;
 	}
@@ -360,7 +360,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	}
 	restore_interrupts(state);
 	if (abort) {
-		delete_area(t->kernel_stack_region_id);
+		delete_area(t->kernel_stack_area);
 		delete_thread_struct(t);
 		return B_BAD_TEAM_ID;
 	}
@@ -385,13 +385,13 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		t->user_stack_size = STACK_SIZE;
 
 		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, t->id);
-		t->user_stack_region_id = create_area_etc(team, stack_name,
+		t->user_stack_area = create_area_etc(team, stack_name,
 				(void **)&t->user_stack_base, B_BASE_ADDRESS,
 				t->user_stack_size + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-		if (t->user_stack_region_id < 0) {
+		if (t->user_stack_area < 0) {
 			// great, we have a fully running thread without a stack
 			dprintf("create_thread: unable to create user stack!\n");
-			status = t->user_stack_region_id;
+			status = t->user_stack_area;
 			kill_thread(t->id);
 		} else {
 			// now that the TLS area is allocated, initialize TLS
@@ -467,14 +467,14 @@ _dump_thread_info(struct thread *t)
 	dprintf("entry:        %p\n", (void *)t->entry);
 	dprintf("team:         %p\n", t->team);
 	dprintf("exit.sem:     0x%lx\n", t->exit.sem);
-	dprintf("kernel_stack_region_id: 0x%lx\n", t->kernel_stack_region_id);
-	dprintf("kernel_stack_base: %p\n", (void *)t->kernel_stack_base);
-	dprintf("user_stack_region_id:   0x%lx\n", t->user_stack_region_id);
+	dprintf("kernel_stack_area:  0x%lx\n", t->kernel_stack_area);
+	dprintf("kernel_stack_base:  %p\n", (void *)t->kernel_stack_base);
+	dprintf("user_stack_area:    0x%lx\n", t->user_stack_area);
 	dprintf("user_stack_base:    %p\n", (void *)t->user_stack_base);
 	dprintf("user_local_storage: %p\n", (void *)t->user_local_storage);
-	dprintf("kernel_errno:      %d\n", t->kernel_errno);
-	dprintf("kernel_time:       %Ld\n", t->kernel_time);
-	dprintf("user_time:         %Ld\n", t->user_time);
+	dprintf("kernel_errno:       %d\n", t->kernel_errno);
+	dprintf("kernel_time:        %Ld\n", t->kernel_time);
+	dprintf("user_time:          %Ld\n", t->user_time);
 	dprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&t->arch_info);
 
@@ -700,7 +700,7 @@ thread_exit2(void *_args)
 
 	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
 
-	// delete the old kernel stack region
+	// delete the old kernel stack area
 	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
 		args.old_kernel_stack, args.thread->id));
 
@@ -780,11 +780,11 @@ thread_exit(void)
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&thread->alarm);
 
-	// delete the user stack region first, we won't need it anymore
-	if (team->aspace != NULL && thread->user_stack_region_id >= 0) {
-		region_id rid = thread->user_stack_region_id;
-		thread->user_stack_region_id = -1;
-		delete_area_etc(team, rid);
+	// delete the user stack area first, we won't need it anymore
+	if (team->aspace != NULL && thread->user_stack_area >= 0) {
+		area_id area = thread->user_stack_area;
+		thread->user_stack_area = -1;
+		delete_area_etc(team, area);
 	}
 
 	if (team != team_get_kernel_team()) {
@@ -890,14 +890,14 @@ thread_exit(void)
 			// this disables interrups for us
 
 		args.thread = thread;
-		args.old_kernel_stack = thread->kernel_stack_region_id;
+		args.old_kernel_stack = thread->kernel_stack_area;
 		args.death_stack = death_stack;
 		args.death_sem = cachedDeathSem;
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
 		// happens, or the processor will interrupt to the old stack
-		thread->kernel_stack_region_id = sDeathStacks[death_stack].area;
+		thread->kernel_stack_area = sDeathStacks[death_stack].area;
 		thread->kernel_stack_base = sDeathStacks[death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
@@ -1109,10 +1109,10 @@ thread_init(kernel_args *args)
 		t->state = B_THREAD_RUNNING;
 		t->next_state = B_THREAD_READY;
 		sprintf(temp, "idle thread %d kstack", i);
-		t->kernel_stack_region_id = find_area(temp);
+		t->kernel_stack_area = find_area(temp);
 
-		if (get_area_info(t->kernel_stack_region_id, &info) != B_OK)
-			panic("error finding idle kstack region\n");
+		if (get_area_info(t->kernel_stack_area, &info) != B_OK)
+			panic("error finding idle kstack area\n");
 
 		t->kernel_stack_base = (addr_t)info.address;
 
@@ -1570,7 +1570,7 @@ snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 	if (timebase != B_SYSTEM_TIMEBASE)
 		return B_BAD_VALUE;
 
-	status = acquire_sem_etc(sSnoozeSem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
+	status = acquire_sem_etc(sSnoozeSem, 1, flags, timeout);
 	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 		return B_OK;
 
