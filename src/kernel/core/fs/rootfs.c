@@ -112,12 +112,12 @@ rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete
 	// cant delete it if it's in a directory or is a directory
 	// and has children
 	if (!force_delete && (v->stream.dir.dir_head != NULL || v->dir_next != NULL))
-		return ERR_NOT_ALLOWED;
+		return EPERM;
 
 	// remove it from the global hash table
 	hash_remove(fs->vnode_list_hash, v);
 
-	if(v->name != NULL)
+	if (v->name != NULL)
 		kfree(v->name);
 	kfree(v);
 
@@ -221,10 +221,8 @@ rootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id 
 	TRACE(("rootfs_mount: entry\n"));
 
 	fs = kmalloc(sizeof(struct rootfs));
-	if(fs == NULL) {
-		err = ERR_NO_MEMORY;
-		goto err;
-	}
+	if (fs == NULL)
+		return ENOMEM;
 
 	fs->id = id;
 	fs->next_vnode_id = 0;
@@ -236,23 +234,23 @@ rootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id 
 
 	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr)&v->all_next - (addr)v,
 		&rootfs_vnode_compare_func, &rootfs_vnode_hash_func);
-	if(fs->vnode_list_hash == NULL) {
-		err = ERR_NO_MEMORY;
+	if (fs->vnode_list_hash == NULL) {
+		err = ENOMEM;
 		goto err2;
 	}
 
 	// create a vnode
 	v = rootfs_create_vnode(fs);
-	if(v == NULL) {
-		err = ERR_NO_MEMORY;
+	if (v == NULL) {
+		err = ENOMEM;
 		goto err3;
 	}
 
 	// set it up
 	v->parent = v;
 	v->name = kstrdup("");
-	if(v->name == NULL) {
-		err = ERR_NO_MEMORY;
+	if (v->name == NULL) {
+		err = ENOMEM;
 		goto err4;
 	}
 
@@ -273,7 +271,7 @@ err2:
 	mutex_destroy(&fs->lock);
 err1:
 	kfree(fs);
-err:
+
 	return err;
 }
 
@@ -357,20 +355,20 @@ rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 
 	TRACE(("rootfs_getvnode: asking for vnode 0x%x 0x%x, r %d\n", id, r));
 
-	if(!r)
+	if (!r)
 		mutex_lock(&fs->lock);
 
 	*v = hash_lookup(fs->vnode_list_hash, &id);
 
-	if(!r)
+	if (!r)
 		mutex_unlock(&fs->lock);
 
 	TRACE(("rootfs_getnvnode: looked it up at 0x%x\n", *v));
 
-	if(*v)
-		return 0;
-	else
-		return ERR_NOT_FOUND;
+	if (*v)
+		return B_NO_ERROR;
+
+	return ENOENT;
 }
 
 
@@ -477,41 +475,14 @@ rootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_
 {
 	TRACE(("rootfs_write: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, *len));
 
-	return ERR_NOT_ALLOWED;
+	return EPERM;
 }
 
 
-static int
+static off_t
 rootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 {
-	struct rootfs *fs = _fs;
-	struct rootfs_vnode *v = _v;
-	struct rootfs_cookie *cookie = _cookie;
-	int err = 0;
-
-	TRACE(("rootfs_seek: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, seek_type %d\n", v, cookie, pos, st));
-
-	mutex_lock(&fs->lock);
-
-	switch(st) {
-		// only valid args are seek_type SEEK_SET, pos 0.
-		// this rewinds to beginning of directory
-		case SEEK_SET:
-			if(pos == 0) {
-				cookie->ptr = v->stream.dir.dir_head;
-			} else {
-				err = ESPIPE;
-			}
-			break;
-		case SEEK_CUR:
-		case SEEK_END:
-		default:
-			err = EINVAL;
-	}
-
-	mutex_unlock(&fs->lock);
-
-	return err;
+	return ESPIPE;
 }
 
 

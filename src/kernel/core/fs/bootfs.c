@@ -581,7 +581,7 @@ bootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
 	err = 0;
 
 err:
-	if(!r)
+	if (!r)
 		mutex_unlock(&fs->lock);
 
 	return err;
@@ -714,73 +714,57 @@ bootfs_write(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_
 }
 
 
-static int
-bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
+static off_t
+bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int seekType)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
 	struct bootfs_cookie *cookie = _cookie;
-	int err = 0;
+	int err = B_OK;
 
 	TRACE(("bootfs_seek: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, seek_type %d\n", v, cookie, pos, st));
 
+	if (cookie->s->type != STREAM_TYPE_FILE)
+		return EINVAL;
+
 	mutex_lock(&fs->lock);
 
-	switch(cookie->s->type) {
-		case STREAM_TYPE_DIR:
-			switch(st) {
-				// only valid args are seek_type SEEK_SET, pos 0.
-				// this rewinds to beginning of directory
-				case SEEK_SET:
-					if(pos == 0) {
-						cookie->u.dir.ptr = cookie->s->u.dir.dir_head;
-					} else {
-						err = ESPIPE;
-					}
-					break;
-				case SEEK_CUR:
-				case SEEK_END:
-				default:
-					err = ESPIPE;
-			}
+	switch (seekType) {
+		case SEEK_SET:
+			if (pos < 0)
+				pos = 0;
+			if (pos > cookie->s->u.file.len)
+				pos = cookie->s->u.file.len;
+			cookie->u.file.pos = pos;
 			break;
-		case STREAM_TYPE_FILE:
-			switch(st) {
-				case SEEK_SET:
-					if(pos < 0)
-						pos = 0;
-					if(pos > cookie->s->u.file.len)
-						pos = cookie->s->u.file.len;
-					cookie->u.file.pos = pos;
-					break;
-				case SEEK_CUR:
-					if(pos + cookie->u.file.pos > cookie->s->u.file.len)
-						cookie->u.file.pos = cookie->s->u.file.len;
-					else if(pos + cookie->u.file.pos < 0)
-						cookie->u.file.pos = 0;
-					else
-						cookie->u.file.pos += pos;
-					break;
-				case SEEK_END:
-					if(pos > 0)
-						cookie->u.file.pos = cookie->s->u.file.len;
-					else if(pos + cookie->s->u.file.len < 0)
-						cookie->u.file.pos = 0;
-					else
-						cookie->u.file.pos = pos + cookie->s->u.file.len;
-					break;
-				default:
-					err = EINVAL;
-
-			}
+		case SEEK_CUR:
+			if (pos + cookie->u.file.pos > cookie->s->u.file.len)
+				pos = cookie->s->u.file.len;
+			else if (pos + cookie->u.file.pos < 0)
+				pos = 0;
+			else
+				pos += cookie->u.file.pos;
+			break;
+		case SEEK_END:
+			if (pos > 0)
+				pos = cookie->s->u.file.len;
+			else if (pos + cookie->s->u.file.len < 0)
+				pos = 0;
+			else
+				pos += cookie->s->u.file.len;
 			break;
 		default:
 			err = EINVAL;
 	}
+	if (err == B_OK)
+		cookie->u.file.pos = pos;
 
 	mutex_unlock(&fs->lock);
 
-	return err;
+	if (err < B_OK)
+		return err;
+
+	return pos;
 }
 
 

@@ -23,11 +23,30 @@
 		return EINVAL; 
 
 
-#define PRINT(x) dprintf x
+#define TRACE_FD 0
+#if TRACE_FD
+#	define TRACE(x) dprintf x
+#	define PRINT(x) dprintf x
+#else
+#	define TRACE(x)
+#	define PRINT(x)
+#endif
 
 
 /*** General fd routines ***/
 
+
+#ifdef DEBUG
+void dump_fd(int fd, struct file_descriptor *descriptor);
+
+void
+dump_fd(int fd,struct file_descriptor *descriptor)
+{
+	dprintf("fd[%d] = %p: type = %d, ref_count = %d, ops = %p, vnode = %p, cookie = %p, dummy = %x\n",
+		fd,descriptor,descriptor->type,descriptor->ref_count,descriptor->ops,
+		descriptor->vnode,descriptor->cookie,descriptor->dummy);
+}
+#endif
 
 /** Allocates and initializes a new file_descriptor */
 
@@ -41,6 +60,7 @@ alloc_fd(void)
 		f->vnode = NULL;
 		f->cookie = NULL;
 		f->ref_count = 1;
+		f->dummy = 0xdeadbeef;
 	}
 	return f;
 }
@@ -76,15 +96,18 @@ err:
 
 
 void
-put_fd(struct file_descriptor *f)
+put_fd(struct file_descriptor *descriptor)
 {
 	/* Run a cleanup (fd_free) routine if there is one and free structure, but only
 	 * if we've just removed the final reference to it :)
 	 */
-	if (atomic_add(&f->ref_count, -1) == 1) {
-		if (f->ops->fd_free)
-			f->ops->fd_free(f);
-		kfree(f);
+	if (atomic_add(&descriptor->ref_count, -1) == 1) {
+		if (descriptor->ops->fd_close)
+			descriptor->ops->fd_close(descriptor);
+		if (descriptor->ops->fd_free)
+			descriptor->ops->fd_free(descriptor);
+
+		kfree(descriptor);
 	}
 }
 
@@ -105,6 +128,7 @@ get_fd(struct io_context *ioctx, int fd)
 	}
 
 	mutex_unlock(&ioctx->io_mutex);
+
 	return f;
 }
 
@@ -185,23 +209,24 @@ user_write(int fd, const void *buffer, off_t pos, size_t length)
 }
 
 
-int
-user_seek(int fd, off_t pos, int seek_type)
+off_t
+user_seek(int fd, off_t pos, int seekType)
 {
 	struct file_descriptor *descriptor;
-	int status;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return EBADF;
 
+	TRACE(("user_seek(descriptor = %p)\n",descriptor));
+
 	if (descriptor->ops->fd_seek)
-		status = descriptor->ops->fd_seek(descriptor, pos, seek_type);
+		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
 	else
-		status = EOPNOTSUPP;
+		pos = ESPIPE;
 
 	put_fd(descriptor);
-	return status;
+	return pos;
 }
 
 
@@ -291,6 +316,8 @@ user_fstat(int fd, struct stat *stat)
 	if (descriptor == NULL)
 		return EBADF;
 
+	TRACE(("user_fstat(descriptor = %p)\n",descriptor));
+
 	if (descriptor->ops->fd_stat) {
 		// we're using the stat buffer on the stack to not have to
 		// lock the given stat buffer in memory
@@ -310,20 +337,18 @@ user_fstat(int fd, struct stat *stat)
 int
 user_close(int fd)
 {
-	struct io_context *ioContext = get_current_io_context(false);
-	struct file_descriptor *descriptor = get_fd(ioContext, fd);
-	int retval;
+	struct io_context *io = get_current_io_context(false);
+	struct file_descriptor *descriptor = get_fd(io, fd);
 
 	if (descriptor == NULL)
 		return EBADF;
 
-	if (descriptor->ops->fd_close)
-		retval = descriptor->ops->fd_close(descriptor, fd, ioContext);
-	else
-		retval = EOPNOTSUPP;
+	TRACE(("user_close(descriptor = %p)\n",descriptor));
+
+	remove_fd(io, fd);
 
 	put_fd(descriptor);
-	return retval;
+	return B_OK;
 }
 
 
@@ -364,7 +389,6 @@ sys_write(int fd, const void *buffer, off_t pos, size_t length)
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-//	dprintf("sys_write: fd %d\n", fd);
 //	CHECK_SYS_ADDR(buffer)
 	
 	descriptor = get_fd(get_current_io_context(true), fd);
@@ -385,23 +409,22 @@ sys_write(int fd, const void *buffer, off_t pos, size_t length)
 }
 
 
-int
-sys_seek(int fd, off_t pos, int seek_type)
+off_t
+sys_seek(int fd, off_t pos, int seekType)
 {
 	struct file_descriptor *descriptor;
-	int status;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return EBADF;
 
 	if (descriptor->ops->fd_seek)
-		status = descriptor->ops->fd_seek(descriptor, pos, seek_type);
+		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
 	else
-		status = EOPNOTSUPP;
+		pos = ESPIPE;
 
 	put_fd(descriptor);
-	return status;
+	return pos;
 }
 
 
@@ -460,7 +483,7 @@ sys_rewind_dir(int fd)
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("user_rewind_dir(fd = %d)\n",fd));
+	PRINT(("sys_rewind_dir(fd = %d)\n",fd));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
@@ -479,19 +502,15 @@ sys_rewind_dir(int fd)
 int
 sys_close(int fd)
 {
-	struct io_context *ioContext = get_current_io_context(true);
-	struct file_descriptor *descriptor = get_fd(ioContext, fd);
-	int status;
+	struct io_context *io = get_current_io_context(true);
+	struct file_descriptor *descriptor = get_fd(io, fd);
 
 	if (descriptor == NULL)
 		return EBADF;
 
-	if (descriptor->ops->fd_close)
-		status = descriptor->ops->fd_close(descriptor, fd, ioContext);
-	else
-		status = EOPNOTSUPP;
+	remove_fd(io, fd);
 
 	put_fd(descriptor);
-	return status;
+	return B_OK;
 }
 
