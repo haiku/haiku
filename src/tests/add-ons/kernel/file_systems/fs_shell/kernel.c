@@ -3245,7 +3245,7 @@ int
 notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
 #ifdef DEBUG
-	printf("notify_listener: op = %ld\n", op);
+	printf("notify_listener: op = %d\n", op);
 #endif
 
 	return send_notification(0, 0, FSH_NOTIFY_LISTENER, op, nsid, -1, vnida, vnidb, vnidc, name);
