@@ -300,11 +300,11 @@ _kern_open_parent_dir(int fd, char *name, size_t pathLength)
 // _kern_open_query
 extern "C"
 int
-_kern_open_query(dev_t device, const char *query, uint32 flags, port_id port,
+_kern_open_query(dev_t device, const char *query, size_t queryLength, uint32 flags, port_id port,
 	int32 token)
 {
 	// check params
-	if (!query || device < 0)
+	if (!query || queryLength == 0 || device < 0)
 		return B_BAD_VALUE;
 	if (flags & B_LIVE_QUERY && port < 0)
 		return B_BAD_VALUE;
