@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-12/2003.
+	Rudolf Cornelissen 10/2002-1/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -145,7 +145,6 @@ typedef struct {
   /*more display mode stuff*/
 	display_mode dm;		/* current display mode configuration: head1 */
 	display_mode dm2;		/* current display mode configuration: head2 */
-	bool switched_crtcs;	/* dualhead stretch and switch mode info */
 	bool acc_mode;			/* signals (non)accelerated mode */
 	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 
@@ -255,9 +254,6 @@ typedef struct {
 
 	/* mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb) */
 	uint8 rom_mirror[32768];
-
-	/* CRTC delay -> used in timing for MAVEN, depending on which CRTC is driving it */
-	uint8 crtc_delay;
 
 	/* NV31 (FX5600) tweak to get pixelPLL going (unknown register) */
 	uint16 pixpll_vco_div2;

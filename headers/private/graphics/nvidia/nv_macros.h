@@ -719,6 +719,8 @@
 /* read and write from the dac registers */
 #define DACR(A)   (NV_REG32(NVDAC_##A))
 #define DACW(A,B) (NV_REG32(NVDAC_##A)=B)
+
+/* read and write from the secondary dac registers */
 #define DAC2R(A)   (NV_REG32(NVDAC2_##A))
 #define DAC2W(A,B) (NV_REG32(NVDAC2_##A)=B)
 
