@@ -379,6 +379,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
+	LOG(8,("INFO: ---Executing following command(s):'\n"));
 
 	while (!end)
 	{
@@ -886,6 +887,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
+	LOG(8,("INFO: ---Executing following command(s):'\n"));
 
 	while (!end)
 	{
@@ -984,7 +986,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				exec_cmd_39_type2(rom, offset32, tabs, &double_f);
 				LOG(8,("INFO: (cont. cmd $34) Doubling PLL frequency to be set for cmd $34.\n"));
 				if (double_f) data2 <<= 1;
-				LOG(8,("INFO: Reverting to pre-subcmd ($39) 'execution' mode.\n"));
+				LOG(8,("INFO: ---Reverting to pre-subcmd ($39) 'execution' mode.\n"));
 			}
 			else
 			{
@@ -1192,6 +1194,28 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
 				ISAWB(reg, byte);
+			}
+			break;
+		case 0x6b: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			data2 = *((uint16*)(&(rom[(tabs.InitScriptTablePtr + (data << 1))])));
+			LOG(8,("cmd 'gosub script #$%02x at adress $%04x'\n", data, data2));
+			if (exec && data2)
+			{
+				result = exec_type2_script(rom, data2, size, tabs, ram_tab);
+				LOG(8,("INFO: ---Reverting to pre-gosub 'execution' mode.\n"));
 			}
 			break;
 		case 0x6e: /* identical to type1 */
