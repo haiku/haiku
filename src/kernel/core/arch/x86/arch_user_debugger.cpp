@@ -81,10 +81,10 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 			// For this to be correct the calling function must not use these
 			// registers (not even indirectly).
 
-		frame->gs = cpuState->gs;
-		frame->fs = cpuState->fs;
-		frame->es = cpuState->es;
-		frame->ds = cpuState->ds;
+//		frame->gs = cpuState->gs;
+//		frame->fs = cpuState->fs;
+//		frame->es = cpuState->es;
+//		frame->ds = cpuState->ds;
 		frame->edi = cpuState->edi;
 		frame->esi = cpuState->esi;
 		frame->ebp = cpuState->ebp;
@@ -96,10 +96,10 @@ arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 //		frame->vector = cpuState->vector;
 //		frame->error_code = cpuState->error_code;
 		frame->eip = cpuState->eip;
-		frame->cs = cpuState->cs;
+//		frame->cs = cpuState->cs;
 //		frame->eflags = cpuState->flags;
 		frame->user_esp = cpuState->user_esp;
-		frame->user_ss = cpuState->user_ss;
+//		frame->user_ss = cpuState->user_ss;
 	}
 }
 
