@@ -1,17 +1,17 @@
 /* config driver
-** provides userland access to the device configuration manager
-**
-** Copyright 2002, Axel Doerfler. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * provides userland access to the device configuration manager
+ *
+ * Copyright 2002-2004, Axel Doerfler. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-//#include <Errors.h>
 #include <Drivers.h>
 #include <drivers/config_manager.h>
 #include <string.h>
 
 #include "config_driver.h"
+
 
 #define DEVICE_NAME "misc/config"
 
@@ -54,38 +54,33 @@ config_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 	if (params == NULL || params->magic != op)
 		return B_BAD_VALUE;
 
+	// ToDo: the access of the params is not safe!
+
 	switch (op) {
 		case CM_GET_NEXT_DEVICE_INFO:
-			gConfigManager->get_next_device_info(params->bus, &params->cookie,
+			return gConfigManager->get_next_device_info(params->bus, &params->cookie,
 				(struct device_info *)params->data, params->data_len);
-			break;
 		case CM_GET_DEVICE_INFO_FOR:
-			gConfigManager->get_device_info_for(params->cookie,
+			return gConfigManager->get_device_info_for(params->cookie,
 				(struct device_info *)params->data, params->data_len);
-			break;
 		case CM_GET_SIZE_OF_CURRENT_CONFIGURATION_FOR:
-			gConfigManager->get_size_of_current_configuration_for(params->cookie);
-			break;
+			return gConfigManager->get_size_of_current_configuration_for(params->cookie);
 		case CM_GET_CURRENT_CONFIGURATION_FOR:
-			gConfigManager->get_current_configuration_for(params->cookie,
+			return gConfigManager->get_current_configuration_for(params->cookie,
 				(struct device_configuration *)params->data, params->data_len);
-			break;
 		case CM_GET_SIZE_OF_POSSIBLE_CONFIGURATIONS_FOR:
-			gConfigManager->get_size_of_possible_configurations_for(params->cookie);
-			break;
+			return gConfigManager->get_size_of_possible_configurations_for(params->cookie);
 		case CM_GET_POSSIBLE_CONFIGURATIONS_FOR:
-			gConfigManager->get_possible_configurations_for(params->cookie,
+			return gConfigManager->get_possible_configurations_for(params->cookie,
 				(struct possible_device_configurations *)params->data, params->data_len);
-			break;
 		case CM_COUNT_RESOURCE_DESCRIPTORS_OF_TYPE:
-			gConfigManager->count_resource_descriptors_of_type(params->config, params->type);
-			break;
+			return gConfigManager->count_resource_descriptors_of_type(params->config, params->type);
 		case CM_GET_NTH_RESOURCE_DESCRIPTOR_OF_TYPE:
-			gConfigManager->get_nth_resource_descriptor_of_type(params->config, params->n,
+			return gConfigManager->get_nth_resource_descriptor_of_type(params->config, params->n,
 				params->type, (resource_descriptor *)params->data, params->data_len);
-			break;
 	}
-	return B_NOT_ALLOWED;
+
+	return B_BAD_VALUE;
 }
 
 
