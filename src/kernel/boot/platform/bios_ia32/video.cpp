@@ -7,6 +7,7 @@
 #include "video.h"
 #include "bios.h"
 #include "vesa.h"
+#include "vga.h"
 #include "mmu.h"
 #include "images.h"
 
@@ -37,7 +38,7 @@ struct video_mode {
 };
 
 static vbe_info_block sInfo;
-static video_mode *sMode;
+static video_mode *sMode, *sDefaultMode;
 static bool sVesaCompatible;
 struct list sModeList;
 static addr_t sFrameBuffer;
@@ -48,13 +49,13 @@ static bool sSettingsLoaded;
 static void
 vga_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 {
-	out8(firstIndex, 0x03c8);
+	out8(firstIndex, VGA_COLOR_WRITE_MODE);
 	// write VGA palette
 	for (int32 i = firstIndex; i < numEntries; i++) {
 		// VGA (usually) has only 6 bits per gun
-		out8(palette[i * 3 + 0] >> 2, 0x03c9);
-		out8(palette[i * 3 + 1] >> 2, 0x03c9);
-		out8(palette[i * 3 + 2] >> 2, 0x03c9);
+		out8(palette[i * 3 + 0] >> 2, VGA_COLOR_DATA);
+		out8(palette[i * 3 + 1] >> 2, VGA_COLOR_DATA);
+		out8(palette[i * 3 + 2] >> 2, VGA_COLOR_DATA);
 	}
 }
 
@@ -63,14 +64,14 @@ static void
 vga_enable_bright_background_colors(void)
 {
 	// reset attribute controller
-	in8(0x03da);
+	in8(VGA_INPUT_STATUS_1);
 
 	// select mode control register
-	out8(0x30, 0x03c0);
+	out8(0x30, VGA_ATTRIBUTE_WRITE);
 
 	// read mode control register, change it (we need to clear bit 3), and write it back
-	uint8 mode = in8(0x03c1) & 0xf7;
-	out8(mode, 0x3c0);
+	uint8 mode = in8(VGA_ATTRIBUTE_READ) & 0xf7;
+	out8(mode, VGA_ATTRIBUTE_WRITE);
 }
 
 
@@ -280,8 +281,22 @@ video_mode_hook(Menu *menu, MenuItem *item)
 
 	menu = item->Submenu();
 	item = menu->FindMarked();
-	if (item != NULL)
-		mode = (video_mode *)item->Data();
+	if (item != NULL) {
+		switch (menu->IndexOf(item)) {
+			case 0:
+				// "Default" mode special
+				sMode = sDefaultMode;
+				sModeChosen = false;
+				return true;
+			case 1:
+				// "Standard VGA" mode special
+				// sets sMode to NULL which triggers VGA mode
+				break;
+			default:
+				mode = (video_mode *)item->Data();
+				break;
+		}
+	}
 
 	if (mode != sMode) {
 		// update standard mode
@@ -385,8 +400,19 @@ out:
 
 
 static void
+set_vga_mode(void)
+{
+	// sets 640x480 16 colors graphics mode
+	bios_regs regs;
+	regs.eax = 0x12;
+	call_bios(0x10, &regs);
+}
+
+
+static void
 set_text_mode(void)
 {
+	// sets 80x25 text console
 	bios_regs regs;
 	regs.eax = 3;
 	call_bios(0x10, &regs);
@@ -403,70 +429,119 @@ platform_switch_to_logo(void)
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) != 0)
 		return;
 
-	if (!sVesaCompatible || sMode == NULL)
-		// no logo for now...
-		return;
+	addr_t lastBase = gKernelArgs.frame_buffer.physical_buffer.start;
+	size_t lastSize = gKernelArgs.frame_buffer.physical_buffer.size;
+	int32 bytesPerPixel = 1;
 
-	if (!sModeChosen)
-		get_mode_from_settings();
+	if (sVesaCompatible && sMode != NULL) {
+		if (!sModeChosen)
+			get_mode_from_settings();
 
-	if (vesa_set_mode(sMode->mode) != B_OK)
-		return;
+		if (vesa_set_mode(sMode->mode) != B_OK)
+			goto fallback;
+
+		struct vbe_mode_info modeInfo;
+		if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK)
+			goto fallback;
+
+		bytesPerPixel = (modeInfo.bits_per_pixel + 7) / 8;
+
+		gKernelArgs.frame_buffer.width = modeInfo.width;
+		gKernelArgs.frame_buffer.height = modeInfo.height;
+		gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
+		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+			* gKernelArgs.frame_buffer.height * bytesPerPixel;
+		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
+	} else {
+fallback:
+		// use standard VGA mode 640x480x4
+		set_vga_mode();
+
+		gKernelArgs.frame_buffer.width = 640;
+		gKernelArgs.frame_buffer.height = 480;
+		gKernelArgs.frame_buffer.depth = 4;
+		gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
+			* gKernelArgs.frame_buffer.height / 2;
+		gKernelArgs.frame_buffer.physical_buffer.start = 0xa0000;
+	}
 
 	gKernelArgs.frame_buffer.enabled = 1;
 
-	struct vbe_mode_info modeInfo;
-	if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK) {
-		platform_switch_to_text_mode();
-		return;
+	// If the new frame buffer is either larger than the old one or located at
+	// a different address, we need to remap it, so we first have to throw
+	// away its previous mapping
+	if (lastBase != 0
+		&& (lastBase != gKernelArgs.frame_buffer.physical_buffer.start
+			|| lastSize < gKernelArgs.frame_buffer.physical_buffer.size)) {
+		mmu_free((void *)sFrameBuffer, lastSize);
+		lastBase = 0;
 	}
-
-	addr_t lastBase = gKernelArgs.frame_buffer.physical_buffer.start;
-	int32 bytesPerPixel = (modeInfo.bits_per_pixel + 7) / 8;
-
-	gKernelArgs.frame_buffer.width = modeInfo.width;
-	gKernelArgs.frame_buffer.height = modeInfo.height;
-	gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
-	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
-		* gKernelArgs.frame_buffer.height * bytesPerPixel;
-	gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
-
-	// ToDo: we assume that physical base is constant through the different resolutions
-	// ToDo: this is broken - if the newly chosen video mode is larger than the old one
-	//	the boot loader will crash while trying to access unmapped memory
 	if (lastBase == 0) {
 		// the graphics memory has not been mapped yet!
-		sFrameBuffer = mmu_map_physical_memory(modeInfo.physical_base,
+		sFrameBuffer = mmu_map_physical_memory(gKernelArgs.frame_buffer.physical_buffer.start,
 							gKernelArgs.frame_buffer.physical_buffer.size, 0x03);
 	}
 
 	// clear the video memory
 	// ToDo: this shouldn't be necessary on real hardware (and Bochs), but
 	//	at least booting with Qemu looks ugly when this is missing
-	memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
+	//memset((void *)sFrameBuffer, 0, gKernelArgs.frame_buffer.physical_buffer.size);
 
-	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
-		dprintf("set palette failed!\n");
+	if (sMode != NULL) {
+		if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
+			dprintf("set palette failed!\n");
 
-#if 0
-	uint8 *bits = (uint8 *)gKernelArgs.fb.mapping.start;
-	uint32 bytesPerRow = gKernelArgs.fb.x_size;
-	for (int32 y = 10; y < 30; y++) {
-		for (int32 i = 0; i < 256; i++) {
-			bits[y * bytesPerRow + i * 3] = i;
-			bits[y * bytesPerRow + i * 3 + 1] = i;
-			bits[y * bytesPerRow + i * 3 + 2] = i;
+		// ToDo: this is a temporary hack!
+		addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width
+			* (gKernelArgs.frame_buffer.height - kHeight - 60)
+			* bytesPerPixel + gKernelArgs.frame_buffer.width - kWidth - 40;
+		for (int32 i = 0; i < kHeight; i++) {
+			memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
+				&kImageData[i * kWidth], kWidth);
 		}
-	}
-#endif
+	} else {
+		//	vga_set_palette((const uint8 *)kPalette16, 0, 16);
+		// ToDo: no boot logo yet in VGA mode
+#if 1
+// this draws 16 big rectangles in all the available colors
+		uint8 *bits = (uint8 *)sFrameBuffer;
+		uint32 bytesPerRow = 80;
+		for (int32 i = 0; i < 32; i++) {
+			bits[9 * bytesPerRow + i + 2] = 0x55;
+			bits[30 * bytesPerRow + i + 2] = 0xaa;
+		}
 
-	// ToDo: this is a temporary hack!
-	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width
-		* (gKernelArgs.frame_buffer.height - kHeight - 60)
-		* bytesPerPixel + gKernelArgs.frame_buffer.width - kWidth - 40;
-	for (int32 i = 0; i < kHeight; i++) {
-		memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
-			&kImageData[i * kWidth], kWidth);
+		for (int32 y = 10; y < 30; y++) {
+			for (int32 i = 0; i < 16; i++) {
+				out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+				bits[32 * bytesPerRow + i*2 + 2] = i;
+
+				if (i & 1) {
+					out16((1 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+					bits[y * bytesPerRow + i*2 + 2] = 0xff;
+					bits[y * bytesPerRow + i*2 + 3] = 0xff;
+				}
+				if (i & 2) {
+					out16((2 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+					bits[y * bytesPerRow + i*2 + 2] = 0xff;
+					bits[y * bytesPerRow + i*2 + 3] = 0xff;
+				}
+				if (i & 4) {
+					out16((4 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+					bits[y * bytesPerRow + i*2 + 2] = 0xff;
+					bits[y * bytesPerRow + i*2 + 3] = 0xff;
+				}
+				if (i & 8) {
+					out16((8 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+					bits[y * bytesPerRow + i*2 + 2] = 0xff;
+					bits[y * bytesPerRow + i*2 + 3] = 0xff;
+				}
+			}
+		}
+
+		// enable all planes again
+		out16((15 << 8) | 0x02, VGA_SEQUENCER_INDEX);
+#endif
 	}
 }
 
@@ -497,13 +572,15 @@ platform_init_video(void)
 		// Obviously, some graphics card BIOS implementations don't
 		// report all available modes unless you've done this before
 		// getting the VESA information.
-		// One example of those is the SiS 630 chipset on my laptop.
+		// One example of those is the SiS 630 chipset in my laptop.
 
-	sVesaCompatible = vesa_init(&sInfo, &sMode) == B_OK;
+	sVesaCompatible = vesa_init(&sInfo, &sDefaultMode) == B_OK;
 	if (!sVesaCompatible) {
 		TRACE(("No VESA compatible graphics!\n"));
 		return B_ERROR;
 	}
+
+	sMode = sDefaultMode;
 
 	TRACE(("VESA compatible graphics!\n"));
 

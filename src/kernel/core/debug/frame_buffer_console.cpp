@@ -100,24 +100,55 @@ get_palette_entry(uint8 index)
 static void
 render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 {
-	uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
-		+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
-	uint8 *color = get_palette_entry(foreground_color(attr));
-	uint8 *backgroundColor = get_palette_entry(background_color(attr));
-
-	for (y = 0; y < CHAR_HEIGHT; y++) {
-		uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
-		for (x = 0; x < CHAR_WIDTH; x++) {
-			for (int32 i = 0; i < sConsole.bytes_per_pixel; i++) {
-				if (bits & 1) 
-					base[x * sConsole.bytes_per_pixel + i] = color[i];
-				else
-					base[x * sConsole.bytes_per_pixel + i] = backgroundColor[i];
+	if (sConsole.depth >= 8) {
+		uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
+			+ x * CHAR_WIDTH * sConsole.bytes_per_pixel);
+		uint8 *color = get_palette_entry(foreground_color(attr));
+		uint8 *backgroundColor = get_palette_entry(background_color(attr));
+	
+		for (y = 0; y < CHAR_HEIGHT; y++) {
+			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
+			for (x = 0; x < CHAR_WIDTH; x++) {
+				for (int32 i = 0; i < sConsole.bytes_per_pixel; i++) {
+					if (bits & 1) 
+						base[x * sConsole.bytes_per_pixel + i] = color[i];
+					else
+						base[x * sConsole.bytes_per_pixel + i] = backgroundColor[i];
+				}
+				bits >>= 1;
 			}
-			bits >>= 1;
+	
+			base += sConsole.bytes_per_row;
 		}
+	} else {
+		// monochrome mode
 
-		base += sConsole.bytes_per_row;
+		uint8 *base = (uint8 *)(sConsole.frame_buffer + sConsole.bytes_per_row * y * CHAR_HEIGHT
+			+ x * CHAR_WIDTH / 8);
+		uint8 baseOffset =  (x * CHAR_WIDTH) & 0x7;
+
+		for (y = 0; y < CHAR_HEIGHT; y++) {
+			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
+			uint8 offset = baseOffset;
+			uint8 mask = 1 << (7 - baseOffset);
+
+			for (x = 0; x < CHAR_WIDTH; x++) {
+				if (mask == 0)
+					mask = 128;
+
+				// black on white
+				if (bits & 1)
+					base[offset / 8] &= ~mask;
+				else
+					base[offset / 8] |= mask;
+
+				bits >>= 1;
+				mask >>= 1;
+				offset += 1;
+			}
+
+			base += sConsole.bytes_per_row;
+		}
 	}
 }
 
@@ -133,6 +164,11 @@ draw_cursor(int32 x, int32 y)
 	int32 endX = x + CHAR_WIDTH * sConsole.bytes_per_pixel;
 	int32 endY = y + CHAR_HEIGHT;
 	uint8 *base = (uint8 *)(sConsole.frame_buffer + y * sConsole.bytes_per_row);
+
+	if (sConsole.depth < 8) {
+		x /= 8;
+		endY /= 8;
+	}
 
 	for (; y < endY; y++) {
 		for (int32 x2 = x; x2 < endX; x2++)
@@ -200,11 +236,19 @@ static void
 console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx, int32 desty)
 {
 	height *= CHAR_HEIGHT;
-	width *= CHAR_WIDTH * sConsole.bytes_per_pixel;
-	srcx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
 	srcy *= CHAR_HEIGHT;
-	destx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
 	desty *= CHAR_HEIGHT;
+
+	if (sConsole.depth >= 8) {
+		width *= CHAR_WIDTH * sConsole.bytes_per_pixel;
+		srcx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
+		destx *= CHAR_WIDTH * sConsole.bytes_per_pixel;
+	} else {
+		// monochrome mode
+		width = width * CHAR_WIDTH / 8;
+		srcx = srcx * CHAR_WIDTH / 8;
+		destx = destx * CHAR_WIDTH / 8;
+	}
 
 	for (int32 y = 0; y < height; y++) {
 		memmove((void *)(sConsole.frame_buffer + (desty + y) * sConsole.bytes_per_row + destx),
@@ -218,8 +262,14 @@ console_clear(uint8 attr)
 {
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
-			memset((void *)sConsole.frame_buffer, sPalette8[background_color(attr)],
-				sConsole.height * sConsole.bytes_per_row);
+			if (sConsole.depth >= 8) {
+				memset((void *)sConsole.frame_buffer, sPalette8[background_color(attr)],
+					sConsole.height * sConsole.bytes_per_row);
+			} else {
+				// special case for VGA mode
+				memset((void *)sConsole.frame_buffer, 0xff,
+					sConsole.height * sConsole.bytes_per_row);
+			}
 			break;
 		default:
 		{
@@ -323,6 +373,11 @@ frame_buffer_console_init(kernel_args *args)
 
 	int32 bytesPerRow = args->frame_buffer.width;
 	switch (args->frame_buffer.depth) {
+		case 1:
+		case 4:
+			// special VGA mode (will always be treated as monochrome)
+			bytesPerRow /= 8;
+			break;
 		case 15:
 		case 16:
 			bytesPerRow *= 2;
