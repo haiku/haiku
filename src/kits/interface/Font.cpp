@@ -101,8 +101,18 @@ _font_control_(BFont *font, int32 cmd, void *data)
 int32
 count_font_families(void)
 {
-	// TODO: Implement
-	return 0;
+	int32 code, count;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_COUNT_FONT_FAMILIES);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return -1;
+	
+	link.Read<int32>(&count);
+	return count;
 }
 
 
@@ -114,8 +124,18 @@ count_font_families(void)
 int32
 count_font_styles(font_family name)
 {
-	// TODO: Implement
-	return 0;
+	int32 code, count;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_COUNT_FONT_STYLES);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return -1;
+	
+	link.Read<int32>(&count);
+	return count;
 }
 
 
@@ -134,8 +154,22 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 	if(!name)
 		return B_ERROR;
 
-	// TODO: Implement
-	return B_ERROR;
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_FAMILY_NAME);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_ERROR;
+	
+	link.Read<font_family>(name);
+	
+	if(flags)
+		link.Read<uint32>(flags);
+		
+	return B_OK;
 }
 
 
@@ -151,12 +185,29 @@ status_t
 get_font_style(font_family family, int32 index, font_style *name,
 	uint32 *flags)
 {
-	// Fix over R5, which does not check for NULL font style names - it just crashes
-	if (!name)
+	if(!name)
 		return B_ERROR;
 
-	// TODO: Implement
-	return B_ERROR;
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_STYLE_NAME);
+	link.Attach(family,sizeof(font_family));
+	link.Attach<int32>(index);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_ERROR;
+	
+	link.Read<font_style>(name);
+	if(flags)
+	{
+		uint16 face;
+		link.Read<uint16>(&face);
+		link.Read<uint32>(flags);
+	}
+	return B_OK;
 }
 
 
@@ -176,12 +227,27 @@ status_t
 get_font_style(font_family family, int32 index, font_style *name,
 	uint16 *face, uint32 *flags)
 {
-	// Fix over R5, which does not check for NULL font style names - it just crashes
-	if (!name || !face)
+	if(!name || !face)
 		return B_ERROR;
 
-	// TODO: Implement
-	return B_ERROR;
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_STYLE_NAME);
+	link.Attach(family,sizeof(font_family));
+	link.Attach<int32>(index);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_ERROR;
+	
+	link.Read<font_style>(name);
+	link.Read<uint16>(face);
+	if(flags)
+		link.Read<uint32>(flags);
+	
+	return B_OK;
 }
 
 
@@ -189,18 +255,25 @@ get_font_style(font_family family, int32 index, font_style *name,
 	\brief Updates the font family list
 	\param check_only If true, the function only checks to see if the font list has changed
 	\return true if the font list has changed, false if not.
-
-	Because of the differences in the R5 and OpenBeOS font subsystems, this function operates 
-	slightly differently, resulting in more efficient operation. A global font list for all 
-	applications is maintained, so calling this function will still be quite expensive, 
-	but it should be unnecessary in most applications.
 */
 
 bool
 update_font_families(bool check_only)
 {
-	// TODO: Implement
-	return false;
+	int32 code;
+	bool value;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_QUERY_FONTS_CHANGED);
+	link.Attach<bool>(check_only);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return false;
+	
+	link.Read<bool>(&value);
+	return value;
 }
 
 
@@ -307,12 +380,22 @@ status_t
 BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
 	// R5 version always returns B_OK. That's a problem...
+	int32 code;
+	BPrivate::BAppServerLink link;
 	
-	// TODO: implement
-
-	// Query server for the appropriate family and style IDs and then return the
-	// appropriate value
-	return B_ERROR;
+	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
+	link.Attach(family,sizeof(font_family));
+	link.Attach(style,sizeof(font_style));
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_ERROR;
+	
+	link.Read<uint16>(&fFamilyID);
+	link.Read<uint16>(&fStyleID);
+	
+	return B_OK;
 }
 
 
@@ -324,6 +407,12 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 void
 BFont::SetFamilyAndStyle(uint32 code)
 {
+	// R5 has a bug here: the face is not updated even though the IDs are set. This
+	// is a problem because the face flag includes Regular/Bold/Italic information in
+	// addition to stuff like underlining and strikethrough. As a result, this will
+	// need a trip to the server and, thus, be slower than R5's in order to be correct
+	
+	// TODO: Fix the implementation
 	fStyleID = code & 0xFFFF;
 	fFamilyID = (code & 0xFFFF0000) >> 16;
 }
@@ -347,9 +436,21 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 			| B_STRIKEOUT_FACE | B_BOLD_FACE | B_REGULAR_FACE) != 0)
 		fFace = face;
 
-	// TODO: finish this function by adding the app_server Family query protocol code
-	// Query server for family id for the specified family
-
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_SET_FAMILY_AND_FACE);
+	link.Attach(family,sizeof(font_family));
+	link.Attach<uint16>(face);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_ERROR;
+	
+	link.Read<uint16>(&fFamilyID);
+	link.Read<uint16>(&fStyleID);
+	
 	return B_OK;
 }
 
@@ -406,17 +507,31 @@ BFont::SetFlags(uint32 flags)
 void
 BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 {
-	// TODO: implement
-
-	// Query server for the names of this stuff given the family and style IDs kept internally
+	if(!family || !style)
+		return;
+	
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_FAMILY_AND_STYLE);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Flush();
+	link.GetNextReply(&code);
+		
+	if(code!=SERVER_TRUE)
+		return;
+	
+	link.Read<font_family>(family);
+	link.Read<font_style>(style);
 }
 
 
 uint32
 BFont::FamilyAndStyle(void) const
 {
-	//uint32 token = (fFamilyID << 16) | fStyleID;
-	return 0L;
+	uint32 token = (fFamilyID << 16) | fStyleID;
+	return token;
 }
 
 
@@ -472,18 +587,42 @@ BFont::Flags(void) const
 font_direction
 BFont::Direction(void) const
 {
-	// TODO: Query the server for the value
+	int32 code;
+	BPrivate::BAppServerLink link;
 	
-	return B_FONT_LEFT_TO_RIGHT;
+	link.StartMessage(AS_GET_FONT_DIRECTION);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return B_FONT_LEFT_TO_RIGHT;
+	
+	font_direction fdir;
+	link.Read<font_direction>(&fdir);
+	return fdir;
 }
  
 
 bool
 BFont::IsFixed(void) const
 {
-	// TODO: query server for whether this bad boy is fixed-width
-
-	return false;
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_QUERY_FONT_FIXED);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return false;
+	
+	bool fixed;
+	link.Read<bool>(&fixed);
+	return fixed;
 }
 
 
@@ -504,8 +643,21 @@ BFont::IsFullAndHalfFixed(void) const
 BRect
 BFont::BoundingBox(void) const
 {
-	// TODO: query server for bounding box
-	return BRect(0,0,0,0);
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return BRect(0,0,0,0);
+	
+	BRect box;
+	link.Read<BRect>(&box);
+	return box;
 }
 
 
@@ -528,15 +680,44 @@ BFont::FileFormat(void) const
 int32
 BFont::CountTuned(void) const
 {
-	// TODO: query server for appropriate data
-	return 0;
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_TUNED_COUNT);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return -1;
+	
+	int32 count;
+	link.Read<int32>(&count);
+	return count;
 }
 
 
 void
 BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 {
-	// TODO: implement
+	if(!info)
+		return;
+	
+	int32 code;
+	BPrivate::BAppServerLink link;
+	
+	link.StartMessage(AS_GET_TUNED_INFO);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<uint32>(index);
+	link.Flush();
+	link.GetNextReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return;
+	
+	link.Read<tuned_font_info>(info);
 }
 
 
