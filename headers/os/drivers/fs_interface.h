@@ -81,6 +81,7 @@ typedef struct file_system_info {
 
 	/* common operations */
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
+	status_t (*set_flags)(fs_volume fs, fs_vnode v, fs_cookie cookie, int flags);
 	status_t (*fsync)(fs_volume fs, fs_vnode v);
 
 	ssize_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
