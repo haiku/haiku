@@ -10,7 +10,14 @@
 #endif
 
 #include <stdio.h>
-#define __out printf
+
+#include <OS.h>
+
+#ifdef DEBUG_PRINTF
+	#define __out DEBUG_PRINTF
+#else
+	#define __out printf
+#endif
 
 // Short overview over the debug output macros:
 //	PRINT()
