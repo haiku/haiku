@@ -1,0 +1,123 @@
+<HTML>
+<!-- $Id: BMessageFilterUseCases.html,v 1.1 2002/07/26 03:06:04 jrand Exp $ -->
+<HEAD>
+<TITLE>BMessageFilter Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BMessageFilter Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BMessageFilter interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BMessageFilter Interface</A></LI>
+<LI><A HREF="#usecases">BMessageFilter Use Cases</A></LI>
+<LI><A HREF="#implement">BMessageFilter Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BMessageFilter Interface:</H2>
+
+<P>The BMessageFilter class is a simple class for processing incoming BMessage's before
+they are dispatched to a BLooper.  The best source of information for the BMessageFilter interface
+can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/MessageFilter.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BMessageFilter Use Cases:</H2>
+
+<P>The following use cases cover the BMessageFilter functionality:</P>
+
+<OL>
+
+<LI><P><B>Construction 1:</B> A BMessageFilter can be created by specifying a message_delivery
+option, a message_source option, a command code and an optional filter function.  These
+options are used to determine the messages on which the filter will act and the filter itself
+(see the "Filter" use cases).</P></LI>
+
+<LI><P><B>Construction 2:</B> A BMessageFilter can be created by specifying a message_delivery
+option, a message_source option and an optional filter function.  These options are used to
+determine the messages on which the filter will act and the filter itself (see the "Filter" use
+cases).</P></LI>
+
+<LI><P><B>Construction 3:</B> A BMessageFilter can be created by specifying a command code
+and an optional filter function.  These options are used to determine the messages on which the
+filter will act and the filter itself (see the "Filter" use cases).</P></LI>
+
+<LI><P><B>Construction 4:</B> A BMessageFilter can be constructed by use of a copy constructor
+which can take a reference to or a pointer to another BMessageFilter.  The new BMessageFilter
+will have all the options of the source BMessageFilter when that source filter was constructed.
+Any other state of the source BMessageFilter that it has accumulated after construction is not
+copied to the new filter.</P></LI>
+
+<LI><P><B>Assignment:</B> A BMessageFilter can be assigned the attributes of a source 
+BMessageFilter by the use of the assignment operator.  The target BMessageFilter will have all
+the options of the source BMessageFilter when that source filter was constructed.  Any other
+state of the source BMessageFilter that it has accumulated after construction is not copied
+to the new filter.</P></LI>
+
+<LI><P><B>Destruction:</B> When a BMessageFilter is deconstructed, the BMessageFilter releases
+any shared resources it may have allocated.</P></LI>
+
+<LI><P><B>Command:</B> When Command() is used on a BMessageFilter, the command code specified
+at construction time for this filter is returned.  If a BMessageFilter was not constructed
+with a specific command code, this member function does not return a valid result.</P></LI>
+
+<LI><P><B>FiltersAnyCommand:</B> When FiltersAnyCommand() is called on a BMessageFilter, it
+returns true if a command code was not specified at construction time for this filter.  It
+returns false if a command code was specified at construction time.  The Command() member
+function (see above use case) is only valid when FiltersAnyCommand() returns false.</P></LI>
+
+<LI><P><B>Looper:</B> The Looper() member function returns a pointer to the BLooper (or BHandler)
+to which this filter has been added.  If the filter has not been added to a BLooper, NULL is
+returned.  The member functions BLooper::AddCommonFilter() or BHandler::AddFilter() can be
+used to add the filter to a looper (see use cases for BLooper and BHandler for details about 
+adding a filter).</P></LI>
+
+<LI><P><B>MessageDelivery:</B> The MessageDelivery() member function returns the message delivery
+value that was specified at construction time for this filter.  The possible values are
+B_DROPPED_DELIVERY, B_PROGRAMMED_DELIVERY and B_ANY_DELIVERY.  If no message delivery value
+was specified at construction time, B_ANY_DELIVERY is returned.</P></LI>
+
+<LI><P><B>MessageSource:</B> The MessageSource() member function returns the message source
+value that was specified at construction time for this filter.  The possible values are
+B_LOCAL_SOURCE, B_REMOTE_SOURCE and B_ANY_SOURCE.  If no message source value
+was specified at construction time, B_ANY_SOURCE is returned.</P></LI>
+
+<LI><P><B>Filter 1:</B> The filter can be applied for a message by passing the message and the
+target BHandler which has received that message to the Filter() member function.  This member
+function returns B_DISPATCH_MESSAGE or B_SKIP_MESSAGE to the caller.  The actual impact
+of these filter results is dependent on the BLooper and BHandler behaviour (see the use cases for
+these classes for more details).</P></LI>
+
+
+<LI><P><B>Filter 2:</B> If a filter function was not supplied on construction of the 
+BMessageFilter, then the Filter() member function determines the result of the filter.  If the
+Filter() member has been overridden in a derived class, the result depends on the behaviour of
+this derived class.  If the class has not been overridden and no filter function was provided
+on construction, the B_DISPATCH_MESSAGE is returned.  If a filter function was provided on
+construction, then the filter function will be called and the Filter() member will return what
+this filter function returns.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BMessageFilter Implementation:</H2>
+
+<P>The implementation of the BMessageFilter is pretty simple.  It is mainly a container for 
+properties of the filter itself and a few simple methods for getting and setting these
+properties.</P>
+
+<P>The actual act of dispatching or skipping the message as dictated by the filter is implemented
+in BLooper or BHandler.  The BMessageFilter just provides a mechanism for these classes to 
+determine which to do.  Also the BLooper or BHandler decide whether to pass the message through
+the filter on their own.  The filter does not look at every message to see whether the source
+and delivery of this message is such that it should pass through the filter.  Instead, BLooper or
+BHandler look at the filter, check the source and delivery options of the filter against the
+message itself and call the filter if appropriate.  So, the filter is really just a container for
+these options and doesn't take action based on them.</P>
+
+</BODY>
+</HTML>
