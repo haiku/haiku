@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
+//	Copyright (c) 2001-2005 Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -27,8 +27,6 @@
 //
 //------------------------------------------------------------------------------
 #include <MenuItem.h>
-
-#include <stdio.h>
 
 
 BSeparatorItem::BSeparatorItem()
@@ -91,7 +89,6 @@ BSeparatorItem::Draw()
 		
 	BRect bounds = Frame();
 	
-	// TODO: Calling this on every Draw() doesn't seem nice.
 	menu_info menuInfo;
 	get_menu_info(&menuInfo);
 	switch (menuInfo.separator) {
@@ -121,9 +118,21 @@ BSeparatorItem::Draw()
 			menu->SetHighColor(0, 0, 0);
 			break;
 			
-		case 2: // TODO: Implement "type 2" look
+		case 2:
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_DARKEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
+				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
+			menu->StrokeLine(BPoint(bounds.left + 10.0f, bounds.top + 5.0f),
+				BPoint(bounds.right - 10.0f, bounds.top + 5.0f));
+			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+				B_LIGHTEN_2_TINT));
+			menu->StrokeLine(BPoint(bounds.left + 11.0f, bounds.top + 6.0f),
+				BPoint(bounds.right - 11.0f, bounds.top + 6.0f));
+			menu->SetHighColor(0, 0, 0);
+			break;
+		
 		default:
-			printf("BSeparatorItem::Draw(): Separator item look not supported yet\n");
 			break;
 	}
 }
