@@ -356,6 +356,24 @@ PNGTranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
 	CPPUNIT_ASSERT(filesize == 0);
 	
+	// Translate (unsupported grayscale images)
+	const char *noSupport[] = {
+		"/boot/home/resources/png/basn0g04.png",
+		"/boot/home/resources/png/basi0g02.png",
+		"/boot/home/resources/png/basi0g01.png",
+		"/boot/home/resources/png/basn0g01.png"
+	};
+	BFile nsFile;
+	for (int32 i = 0; i < sizeof(noSupport) / sizeof(const char *); i++) {
+		NextSubTest();
+		CPPUNIT_ASSERT(nsFile.SetTo(noSupport[i], B_READ_ONLY) == B_OK);
+		result = proster->Translate(&nsFile, NULL, NULL, &output,
+			B_TRANSLATOR_ANY_TYPE);
+		CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+		CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
+		CPPUNIT_ASSERT(filesize == 0);		
+	}
+	
 	// Translate PNG images to bits
 	const TranslatePaths aPaths[] = {
 		{ "/boot/home/resources/png/basi0g16.png",
