@@ -47,12 +47,14 @@ public:
 	RecentApps();
 	~RecentApps();
 	
-	status_t Add(const char *appSig, int32 appFlags);
+	status_t Add(const char *appSig, int32 appFlags = kQualifyingAppFlags);
 	status_t Add(const entry_ref *ref, int32 appFlags);
 	status_t Get(int32 maxCount, BMessage *list);
 	status_t Clear();
 	status_t Print();
 	status_t Save(FILE* file);
+	
+	static const int32 kQualifyingAppFlags = 0;
 private:
 	friend class BPrivate::TRoster;
 		// For loading from disk
