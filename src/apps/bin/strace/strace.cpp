@@ -508,11 +508,9 @@ main(int argc, const char *const *argv)
 			exit(1);
 		}
 
-		thread_id concernedThread = -1;
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
-				concernedThread = message.origin.thread;
 				print_syscall(message.post_syscall, memoryReader,
 					printArguments, !fastMode, printReturnValues, colorize);
 
@@ -522,11 +520,11 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_THREAD_STOPPED:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
+			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_CREATED:
 			case B_DEBUGGER_MESSAGE_IMAGE_DELETED:
-				concernedThread = message.origin.thread;
 				break;
 
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
@@ -538,10 +536,10 @@ main(int argc, const char *const *argv)
 				exit(0);
 		}
 
-		// tell the thread to continue
-		if (concernedThread >= 0) {
-			run_thread(nubPort, concernedThread);
-		}
+		// tell the thread to continue (only when there is a thread and the
+		// message was synchronous)
+		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
+			run_thread(message.origin.nub_port, message.origin.thread);
 	}
 	
 	return 0;
