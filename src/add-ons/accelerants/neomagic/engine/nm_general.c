@@ -485,23 +485,8 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* check if we can setup this mode with acceleration: */
 	*acc_mode = true;
 
-	switch (si->ps.card_type)
-	{
-	case NM2070:
-	case NM2097:
-	case NM2160:
-	case NM2200:
-		if (target->space == B_RGB24) *acc_mode = false;
-		break;
-	//fixme: no acc implemented for the cards below yet...
-	case NM2090:
-	case NM2093:
-		*acc_mode = false;
-		break;
-	default:
-		/* NM2230 and later cards do support accelerated 24bit modes */
-		break;
-	}
+	/* NM2230 and later cards only support accelerated 24bit modes */
+	if ((si->ps.card_type < NM2230) && (target->space == B_RGB24)) *acc_mode = false;
 
 	/* virtual_width */
 	if (si->ps.card_type == NM2070)

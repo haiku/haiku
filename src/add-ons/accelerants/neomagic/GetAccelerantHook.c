@@ -215,13 +215,6 @@ status_t check_acc_capability(uint32 feature)
 	 * memory pitch.. */
 	if (si->acc_mode)
 	{
-		//fixme: temporary, until acc for these cards is completely setup...
-/*		if ((si->ps.card_type >= NM2200) && (feature != B_SCREEN_TO_SCREEN_BLIT))
-		{
-			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
-			return B_ERROR;
-		}
-*/
 		LOG(4, ("Acc: Exporting hook %s.\n", msg));
 		return B_OK;
 	}

@@ -14,19 +14,21 @@
 
 #include "nm_std.h"
 
-//static status_t nm_acc_wait_fifo(uint32 n);
+static status_t nm_acc_wait_fifo(uint32 n);
 
-/*acceleration notes*/
+/*
+	acceleration notes:
 
-/*functions Be's app_server uses:
-fill span (horizontal only)
-fill rectangle (these 2 are very similar)
-invert rectangle 
-blit
+	-> functions Be's app_server uses:
+	fill span (horizontal only)
+	fill rectangle (these 2 are very similar)
+	invert rectangle 
+	blit
+
+	-> Splitting up the acc routines for all cards does not have noticable effects
+	on the acceleration speed, although all those switch statements would vanish.
 */
 
-//fixme: still setup for NM2090 and NM2093 cards...
-//fixme: seperate acc routines for different architectures for (marginal) speedup?
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
@@ -39,15 +41,15 @@ status_t nm_acc_wait_idle()
 	return B_OK;
 }
 
-/* wait for enough room in fifo */
-//static status_t nm_acc_wait_fifo(uint32 n)
-//{
-//	while (((ACCR(STATUS) & 0x0000ff00) >> 8) < n)
-//	{
-//		/* snooze a bit so I do not hammer the bus */
-//		snooze (10);
-//	}
-//}
+/* wait for enough room in fifo (apparantly works on NM2090 and NM2093 only!) */
+static status_t nm_acc_wait_fifo(uint32 n)
+{
+	while (((ACCR(STATUS) & 0x0000ff00) >> 8) < n)
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (10);
+	}
+}
 
 /* AFAIK this must be done for every new screenmode.
  * Engine required init. */
@@ -111,7 +113,15 @@ status_t nm_acc_init()
 	/* fixme when/if possible:
 	 * does not work on most cards.. (tried NM2070 and NM2160)
 	 * workaround: always wait until engine completely idle before programming. */
-//	si->engine.control |= (1 << 27);
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		si->engine.control |= (1 << 27);
+		break;
+	default:
+		break;
+	}
 
 	/* setup buffer startadress */
 	/* fixme when/if possible:
@@ -178,10 +188,16 @@ status_t nm_acc_init()
 status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
 	/* make sure the previous command (if any) is completed */
-//	does not work yet:
-//	nm_acc_wait_fifo(4);
-//	so:
-	nm_acc_wait_idle();
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		nm_acc_wait_fifo(4);
+		break;
+	default:
+		nm_acc_wait_idle();
+		break;
+	}
 
     if ((yd < ys) || ((yd == ys) && (xd < xs)))
     {
@@ -196,6 +212,8 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 			ACCW(SRCSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
 			ACCW(2070_DSTSTARTOFF, ((yd * si->fbc.bytes_per_row) + (xd * si->engine.depth)));
 			break;
+		case NM2090:
+		case NM2093:
 		case NM2097:
 		case NM2160:
 			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
@@ -229,6 +247,8 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 			ACCW(SRCSTARTOFF, (((ys + h) * si->fbc.bytes_per_row) + ((xs + w) * si->engine.depth)));
 			ACCW(2070_DSTSTARTOFF, (((yd + h) * si->fbc.bytes_per_row) + ((xd + w) * si->engine.depth)));
 			break;
+		case NM2090:
+		case NM2093:
 		case NM2097:
 		case NM2160:
 			/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
@@ -257,10 +277,17 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 /* span fill - i.e. (selected) menuitem background color (Dano) */
 status_t nm_acc_setup_rectangle(uint32 color)
 {
-//	does not work yet:
-//	nm_acc_wait_fifo(2);
-//	so:
-	nm_acc_wait_idle();
+	/* make sure the previous command (if any) is completed */
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		nm_acc_wait_fifo(2);
+		break;
+	default:
+		nm_acc_wait_idle();
+		break;
+	}
 
 	switch (si->ps.card_type)
 	{
@@ -274,6 +301,8 @@ status_t nm_acc_setup_rectangle(uint32 color)
 			/* swap colorbytes */
 			ACCW(FGCOLOR, (((color & 0xff00) >> 8) | ((color & 0x00ff) << 8)));
 		break;
+	case NM2090:
+	case NM2093:
 	case NM2097:
 	case NM2160:
 		/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
@@ -301,10 +330,16 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	if (xe == xs) return B_OK;
 
 	/* make sure the previous command (if any) is completed */
-//	does not work yet:
-//	nm_acc_wait_fifo(2);
-//	so:
-	nm_acc_wait_idle();
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		nm_acc_wait_fifo(2);
+		break;
+	default:
+		nm_acc_wait_idle();
+		break;
+	}
 
 	/* send command and exexute (warning: order of programming regs is important!) */
 	switch (si->ps.card_type)
@@ -313,7 +348,7 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
 		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
 		break;
-	default: /* NM2097 and later */
+	default: /* NM2090 and later */
 		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
 		break;
@@ -326,10 +361,16 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 status_t nm_acc_setup_rect_invert()
 {
 	/* make sure the previous command (if any) is completed */
-//	does not work yet:
-//	nm_acc_wait_fifo(2);
-//	so:
-	nm_acc_wait_idle();
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		nm_acc_wait_fifo(2);
+		break;
+	default:
+		nm_acc_wait_idle();
+		break;
+	}
 
 	switch (si->ps.card_type)
 	{
@@ -341,6 +382,8 @@ status_t nm_acc_setup_rect_invert()
 		 * over source-select, but in other spaces it's vice-versa (forcing GXcopy!). */
 		ACCW(CONTROL, (si->engine.control | 0x00050000));
 		break;
+	case NM2090:
+	case NM2093:
 	case NM2097:
 	case NM2160:
 		/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
@@ -364,10 +407,16 @@ status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	if (xe == xs) return B_OK;
 
 	/* make sure the previous command (if any) is completed */
-//	does not work yet:
-//	nm_acc_wait_fifo(2);
-//	so:
-	nm_acc_wait_idle();
+	switch (si->ps.card_type)
+	{
+	case NM2090:
+	case NM2093:
+		nm_acc_wait_fifo(2);
+		break;
+	default:
+		nm_acc_wait_idle();
+		break;
+	}
 
 	/* send command and exexute (warning: order of programming regs is important!) */
 	switch (si->ps.card_type)
@@ -376,7 +425,7 @@ status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
 		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
 		break;
-	default: /* NM2097 and later */
+	default: /* NM2090 and later */
 		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
 		break;
