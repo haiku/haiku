@@ -37,7 +37,7 @@ MergeObjectFromObjects kernel_posix_unistd.o :
 	<$(SOURCE_GRIST)>directory.o
 	<$(SOURCE_GRIST)>dup.o
 	<$(SOURCE_GRIST)>dup2.o
-	<$(SOURCE_GRIST)>fcntl.c
+	<$(SOURCE_GRIST)>fcntl.o
 	<$(SOURCE_GRIST)>hostname.o
 	<$(SOURCE_GRIST)>ioctl.o
 	<$(SOURCE_GRIST)>link.o
