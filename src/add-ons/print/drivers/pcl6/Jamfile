@@ -11,6 +11,8 @@ Addon PCL6\ Compatible : Print :
 	jetlib.cpp
 ;
 
+ObjectC++Flags [ FGristFiles jetlib.o ] : -w ;
+
 LinkSharedOSLibs PCL6\ Compatible : be stdc++.r4 libprint.a ;
 
 Package haiku-printingkit-cvs :
