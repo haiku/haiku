@@ -33,11 +33,9 @@ private:
 	int32 InsertTable(const BFont *font);
 	
 	bool GetEscapement(uint32, int32, float *);
-	void HashEscapements(const char *, int32, int32, int32, const BFont *);
+	float HashEscapements(const char *, int32, int32, int32, const BFont *);
 	
-	uint32 Hash(uint32);
-	
-	void CCheck();
+	static uint32 Hash(uint32);
 };
 
 #endif // __WIDTHBUFFER_H

@@ -1670,8 +1670,8 @@ BTextView::LineWidth(int32 lineNum) const
 {
 	if (lineNum < 0)
 		return (*fLines)[0]->width;
-	else if (lineNum > fLines->fItemCount - 2)
-		return (*fLines)[fLines->fItemCount - 2]->width;
+	else if (lineNum > fLines->NumLines() - 1)
+		return (*fLines)[fLines->NumLines() - 1]->width;
 	else
 		return (*fLines)[lineNum]->width;
 }
@@ -1681,8 +1681,8 @@ BTextView::LineHeight(int32 lineNum) const
 {
 	if (lineNum < 0)
 		return (*fLines)[0]->ascent;
-	else if (lineNum > fLines->fItemCount - 2)
-		return (*fLines)[fLines->fItemCount - 2]->ascent;
+	else if (lineNum > fLines->NumLines() - 1)
+		return (*fLines)[fLines->NumLines() - 1]->ascent;
 	else
 		return (*fLines)[lineNum]->ascent;
 }

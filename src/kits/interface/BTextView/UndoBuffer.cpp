@@ -321,7 +321,6 @@ _BTypingUndoBuffer_::InputCharacter(int32 len)
 void
 _BTypingUndoBuffer_::Reset()
 {
-	printf("Reset\n");
 	free(fTextData);
 	fTextView->GetSelection(&fStart, &fEnd);
 	fTextLength = fEnd - fStart;
@@ -345,9 +344,8 @@ _BTypingUndoBuffer_::BackwardErase()
 	fTextView->GetSelection(&start, &end);
 	
 	const char *text = fTextView->Text();
-	int32 charLen = UTF8CharLenBACK(text + start, text);
-	printf("Char Len: %d\n", charLen);
-
+	int32 charLen = UTF8PreviousCharLen(text + start, text);
+	
 	if (start != fTypedEnd || end != fTypedEnd) {
 		Reset();
 		// if we've got a selection, we're already done
@@ -377,7 +375,7 @@ _BTypingUndoBuffer_::ForwardErase()
 
 	fTextView->GetSelection(&start, &end);
 	
-	int32 charLen = UTF8CharLenFWD(fTextView->Text() + start);	
+	int32 charLen = UTF8NextCharLen(fTextView->Text() + start);	
 	printf("Char Len: %d\n", charLen);
 
 	if (start != fTypedEnd || end != fTypedEnd || fUndone > 0) {

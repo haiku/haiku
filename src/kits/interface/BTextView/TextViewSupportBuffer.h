@@ -33,7 +33,7 @@
 #include <cstring>
 
 // System Includes -------------------------------------------------------------
-#include "SupportDefs.h"
+#include <SupportDefs.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -48,8 +48,7 @@ template <class T>
 class _BTextViewSupportBuffer_ {
 
 public:
-				_BTextViewSupportBuffer_(long inExtraCount = 0, 
-									  long inCount = 0);
+				_BTextViewSupportBuffer_(int32 inExtraCount = 0, int32 inCount = 0);
 virtual			~_BTextViewSupportBuffer_();
 
 		void	InsertItemsAt(int32 inNumItems, int32 inAtIndex, const T *inItem);
@@ -57,20 +56,20 @@ virtual			~_BTextViewSupportBuffer_();
 
 		int32	ItemCount() const;
 
-//protected:
+protected:
 		int32	fExtraCount;	
-		int32	fItemCount;		
-		T*		fBuffer;		
+		int32	fItemCount;				
 		int32	fBufferCount;
+		T*		fBuffer;
 };
 //------------------------------------------------------------------------------
 template <class T>
-_BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(long inExtraCount,
-														 long inCount)
+_BTextViewSupportBuffer_<T>::_BTextViewSupportBuffer_(int32 inExtraCount,
+													  int32 inCount)
 	:	fExtraCount(inExtraCount),
 		fItemCount(inCount),
-		fBuffer(NULL),
-		fBufferCount(fExtraCount + fItemCount)
+		fBufferCount(fExtraCount + fItemCount),
+		fBuffer(NULL)
 {
 	fBuffer = (T *)calloc(fExtraCount + fItemCount, sizeof(T));
 }
@@ -92,8 +91,8 @@ void _BTextViewSupportBuffer_<T>::InsertItemsAt(int32 inNumItems,
 	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
 
-	long delta = inNumItems * sizeof(T);
-	long logSize = fItemCount * sizeof(T);
+	int32 delta = inNumItems * sizeof(T);
+	int32 logSize = fItemCount * sizeof(T);
 	if ((logSize + delta) >= fBufferCount) {
 		fBufferCount = logSize + delta + (fExtraCount * sizeof(T));
 		fBuffer = (T *)realloc(fBuffer, fBufferCount);
@@ -121,9 +120,9 @@ _BTextViewSupportBuffer_<T>::RemoveItemsAt(int32 inNumItems,
 	memmove(loc, loc + inNumItems, 
 			(fItemCount - (inNumItems + inAtIndex)) * sizeof(T));
 	
-	long delta = inNumItems * sizeof(T);
-	long logSize = fItemCount * sizeof(T);
-	long extraSize = fBufferCount - (logSize - delta);
+	int32 delta = inNumItems * sizeof(T);
+	int32 logSize = fItemCount * sizeof(T);
+	uint32 extraSize = fBufferCount - (logSize - delta);
 	if (extraSize > (fExtraCount * sizeof(T))) {
 		fBufferCount = (logSize - delta) + (fExtraCount * sizeof(T));
 		fBuffer = (T *)realloc(fBuffer, fBufferCount);
