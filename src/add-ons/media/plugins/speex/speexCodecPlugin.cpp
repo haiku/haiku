@@ -266,12 +266,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 			TRACE("SpeexDecoder::Decode: GetNextChunk failed\n");
 			return status;
 		}
-		if (chunkSize != sizeof(ogg_packet)) {
-			TRACE("SpeexDecoder::Decode: chunk not ogg_packet-sized\n");
-			return B_ERROR;
-		}
-		ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
-		speex_bits_read_from(&fBits, (char*)packet->packet, packet->bytes);
+		speex_bits_read_from(&fBits, (char*)chunkBuffer, chunkSize);
 		for (int frame = 0 ; frame < fHeader->frames_per_packet ; frame++) {
 			int ret = speex_decode(fDecoderState, &fBits, out_buffer);
 			if (ret == -1) {
