@@ -410,6 +410,7 @@
 
 /* Nvidia PCI direct registers */
 #define NV32_PWRUPCTRL		0x00000200
+#define NV32_DUALHEAD_CTRL	0x000010f0//verify!!!
 #define NV8_MISCW 			0x000c03c2
 #define NV8_MISCR 			0x000c03cc
 #define NV8_SEQIND			0x000c03c4
@@ -444,6 +445,7 @@
 #define NV32_RASTER			0x00600808
 #define NV32_NV10CURADD32	0x0060080c
 #define NV32_CURCONF		0x00600810
+#define NV32_PANEL_PWR		0x0060081c
 #define NV32_FUNCSEL		0x00600860
 
 /* secondary head */
@@ -458,6 +460,7 @@
 #define NV32_RASTER2		0x00602808
 #define NV32_NV10CUR2ADD32	0x0060280c
 #define NV32_2CURCONF		0x00602810
+#define NV32_2PANEL_PWR		0x0060281c//verify!!!
 #define NV32_2FUNCSEL		0x00602860
 
 /* Nvidia DAC direct registers (standard VGA palette RAM registers) */
