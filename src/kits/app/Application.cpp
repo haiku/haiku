@@ -637,7 +637,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 	}
 	// check whether be_roster is valid
 	if (fInitError == B_OK && !isRegistrar && !_is_valid_roster_mess_(false)) {
-		printf("FATAL: be_roster is not invalid. Is the registrar running?\n");
+		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
 		fInitError = B_NO_INIT;
 	}
 	// check whether or not we are pre-registered
