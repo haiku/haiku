@@ -116,15 +116,15 @@ SYSCALL1(_kern_kill_team, 39)
 SYSCALL0(_kern_get_current_team, 40)
 
 /* image calls */
-SYSCALL2(sys_register_image, 114)
-SYSCALL1(sys_unregister_image, 115)
-SYSCALL3(sys_get_image_info, 116)
-SYSCALL4(sys_get_next_image_info, 117)
+SYSCALL2(_kern_register_image, 114)
+SYSCALL1(_kern_unregister_image, 115)
+SYSCALL3(_kern_get_image_info, 116)
+SYSCALL4(_kern_get_next_image_info, 117)
 
 /* node monitor calls */
-SYSCALL6(sys_start_watching, 118)
-SYSCALL6(sys_stop_watching, 119)
-SYSCALL2(sys_stop_notifying, 120)
+SYSCALL6(_kern_start_watching, 118)
+SYSCALL6(_kern_stop_watching, 119)
+SYSCALL2(_kern_stop_notifying, 120)
 
 /* time calls */
 SYSCALL1(_kern_set_real_time_clock, 138)

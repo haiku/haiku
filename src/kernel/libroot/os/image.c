@@ -1,6 +1,6 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -48,14 +48,14 @@ get_nth_image_symbol(image_id id, int32 num, char *nameBuffer, int32 *_nameLengt
 status_t
 _get_image_info(image_id id, image_info *info, size_t infoSize)
 {
-	return sys_get_image_info(id, info, infoSize);
+	return _kern_get_image_info(id, info, infoSize);
 }
 
 
 status_t
 _get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t infoSize)
 {
-	return sys_get_next_image_info(team, cookie, info, infoSize);
+	return _kern_get_next_image_info(team, cookie, info, infoSize);
 }
 
 
