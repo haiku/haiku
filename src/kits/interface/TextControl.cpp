@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -23,25 +23,15 @@
 //	Author:			Frans van Nispen (xlr8@tref.nl)
 //	Description:	BTextControl displays text that can act like a control.
 //------------------------------------------------------------------------------
-
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
-// System Includes -------------------------------------------------------------
+#include <Message.h>
 #include <TextControl.h>
 #include <Window.h>
-#include <Message.h>
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
 #include "TextInput.h"
 
-// Local Defines ---------------------------------------------------------------
 
-// Globals ---------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 						   const char *text, BMessage *message, uint32 mask,
 						   uint32 flags)
@@ -64,12 +54,14 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 	fText->ResizeTo(textBounds.Width(), lineHeight + 4);
 	fText->MoveBy(0, (bounds.Height() - height) / 2.0f);
 }
-//------------------------------------------------------------------------------
+
+
 BTextControl::~BTextControl()
 {
 	SetModificationMessage(NULL);
 }
-//------------------------------------------------------------------------------
+
+
 BTextControl::BTextControl(BMessage *data)
 	:	BControl(data)
 {
@@ -89,33 +81,35 @@ BTextControl::BTextControl(BMessage *data)
 	if (data->HasFloat("_divide"))
 		data->FindFloat("_a_text", &fDivider);
 
-	if (data->HasMessage("_mod_msg"))
-	{
+	if (data->HasMessage("_mod_msg")) {
 		BMessage *_mod_msg = new BMessage;
 		data->FindMessage("_mod_msg", _mod_msg);
 		SetModificationMessage(_mod_msg);
 	}
 }
-//------------------------------------------------------------------------------
-BArchivable* BTextControl::Instantiate(BMessage *archive)
+
+
+BArchivable *
+BTextControl::Instantiate(BMessage *archive)
 {
 	if (validate_instantiation(archive, "BTextControl"))
 		return new BTextControl(archive);
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BTextControl::Archive(BMessage *data, bool deep) const
+
+
+status_t
+BTextControl::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
 
-	alignment _a_label, _a_text;
+	alignment labelAlignment, textAlignment;
 
-	GetAlignment(&_a_label, &_a_text);
+	GetAlignment(&labelAlignment, &textAlignment);
 
-	data->AddInt32("_a_label", _a_label);
-	data->AddInt32("_a_text", _a_text);
-
+	data->AddInt32("_a_label", labelAlignment);
+	data->AddInt32("_a_text", textAlignment);
 	data->AddFloat("_divide", Divider());
 
 	if (ModificationMessage())
@@ -123,8 +117,10 @@ status_t BTextControl::Archive(BMessage *data, bool deep) const
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetText(const char *text)
+
+
+void
+BTextControl::SetText(const char *text)
 {
 	if (InvokeKind() != B_CONTROL_INVOKED)
 		return;
@@ -136,80 +132,102 @@ void BTextControl::SetText(const char *text)
 
 	fText->Invalidate();
 }
-//------------------------------------------------------------------------------
-const char *BTextControl::Text() const
+
+
+const char *
+BTextControl::Text() const
 {
 	return fText->Text();
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetValue(int32 value)
+
+
+void
+BTextControl::SetValue(int32 value)
 {
 	BControl::SetValue(value);
 }
-//------------------------------------------------------------------------------
-status_t BTextControl::Invoke(BMessage *msg)
+
+
+status_t
+BTextControl::Invoke(BMessage *message)
 {
-	return BControl::Invoke(msg);
+	return BControl::Invoke(message);
 }
-//------------------------------------------------------------------------------
-BTextView* BTextControl::TextView() const
+
+
+BTextView *
+BTextControl::TextView() const
 {
 	return fText;
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetModificationMessage(BMessage *message)
+
+
+void
+BTextControl::SetModificationMessage(BMessage *message)
 {
 	if (fModificationMessage)
 		delete fModificationMessage;
 
 	fModificationMessage = message;
 }
-//------------------------------------------------------------------------------
-BMessage* BTextControl::ModificationMessage() const
+
+
+BMessage *
+BTextControl::ModificationMessage() const
 {
 	return fModificationMessage;
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetAlignment(alignment label, alignment text)
+
+
+void
+BTextControl::SetAlignment(alignment labelAlignment, alignment textAlignment)
 {
-	fText->SetAlignment(text);
+	fText->SetAlignment(textAlignment);
 	fText->AlignTextRect();
 
-	if (fLabelAlign != label)
-	{
-		fLabelAlign = label;
+	if (fLabelAlign != labelAlignment) {
+		fLabelAlign = labelAlignment;
 		Invalidate();
 	}
 }
-//------------------------------------------------------------------------------
-void BTextControl::GetAlignment(alignment *label, alignment *text) const
-{
-	*label = fLabelAlign;
-	*text = fText->Alignment();
-}
-//------------------------------------------------------------------------------
-void BTextControl::SetDivider(float dividing_line)
-{
-	float dx = fDivider - dividing_line;
 
-	fDivider = dividing_line;
+
+void
+BTextControl::GetAlignment(alignment *label, alignment *text) const
+{
+	if (label)
+		*label = fLabelAlign;
+	if (text)
+		*text = fText->Alignment();
+}
+
+
+void
+BTextControl::SetDivider(float dividingLine)
+{
+	float dx = fDivider - dividingLine;
+
+	fDivider = dividingLine;
 
 	fText->MoveBy(-dx, 0.0f);
 	fText->ResizeBy(dx, 0.0f);
 
-	if (Window())
-	{
+	if (Window()) {
 		fText->Invalidate();
 		Invalidate();
 	}
 }
-//------------------------------------------------------------------------------
-float BTextControl::Divider() const
+
+
+float
+BTextControl::Divider() const
 {
 	return fDivider;
 }
-//------------------------------------------------------------------------------
-void BTextControl::Draw(BRect updateRect)
+
+
+void
+BTextControl::Draw(BRect updateRect)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
@@ -230,13 +248,11 @@ void BTextControl::Draw(BRect updateRect)
 	BRect rect(fText->Frame());
 	rect.InsetBy(-1.0f, -1.0f);
 
-	if (active)
-	{
+	if (active) {
 		SetHighColor(nav);
 		StrokeRect(rect);
-	}
-	else
-	{
+
+	} else {
 		if (enabled)
 			SetHighColor(darken4);
 		else
@@ -268,16 +284,14 @@ void BTextControl::Draw(BRect updateRect)
 	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
 	StrokeLine(BPoint(rect.right, rect.top + 1.0f), rect.RightBottom());
 
-	if (Label())
-	{
+	if (Label()) {
 		font_height fh;
 		GetFontHeight(&fh);
 
 		float y = (float)ceil(fh.ascent + fh.descent + fh.leading) + 2.0f;
 		float x;
 
-		switch (fLabelAlign)
-		{
+		switch (fLabelAlign) {
 			case B_ALIGN_RIGHT:
 				x = fDivider - StringWidth(Label()) - 3.0f;
 				break;
@@ -296,17 +310,20 @@ void BTextControl::Draw(BRect updateRect)
 		DrawString(Label(), BPoint(x, y));
 	}
 }
-//------------------------------------------------------------------------------
-void BTextControl::MouseDown(BPoint where)
+
+
+void
+BTextControl::MouseDown(BPoint where)
 {
-	if (!fText->IsFocus())
-	{
+	if (!fText->IsFocus()) {
 		fText->MakeFocus(true);
 		fText->SelectAll();
 	}
 }
-//------------------------------------------------------------------------------
-void BTextControl::AttachedToWindow()
+
+
+void
+BTextControl::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 
@@ -324,13 +341,11 @@ void BTextControl::AttachedToWindow()
 
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	if (enabled)
-	{
+	if (enabled) {
 		color.red = 255;
 		color.green = 255;
 		color.blue = 255;
-	}
-	else
+	} else
 		color = tint_color(color, B_LIGHTEN_2_TINT);
 
 	fText->SetViewColor(color);
@@ -338,22 +353,25 @@ void BTextControl::AttachedToWindow()
 
 	fText->MakeEditable(enabled);
 }
-//------------------------------------------------------------------------------
-void BTextControl::MakeFocus(bool state)
+
+
+void
+BTextControl::MakeFocus(bool state)
 {
 	fText->MakeFocus(state);
 
 	if (state)
 		fText->SelectAll();
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetEnabled(bool state)
+
+
+void
+BTextControl::SetEnabled(bool state)
 {
 	if (IsEnabled() == state)
 		return;
 
-	if (Window())
-	{
+	if (Window()) {
 		fText->MakeEditable(state);
 
 		rgb_color textColor;
@@ -369,13 +387,11 @@ void BTextControl::SetEnabled(bool state)
 
 		fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-		if (state)
-		{
+		if (state) {
 			color.red = 255;
 			color.green = 255;
 			color.blue = 255;
-		}
-		else
+		} else
 			color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
 				B_LIGHTEN_2_TINT);
 
@@ -388,41 +404,45 @@ void BTextControl::SetEnabled(bool state)
 
 	BControl::SetEnabled(state);
 }
-//------------------------------------------------------------------------------
-void BTextControl::GetPreferredSize(float *width, float *height)
+
+
+void
+BTextControl::GetPreferredSize(float *width, float *height)
 {
 	BFont font;
 	GetFont(&font);
 	font_height fh;
 	font.GetHeight(&fh);
 
-	*height = (float)ceil(fh.ascent + fh.descent + fh.leading) + 7.0f;
+	if (height)
+		*height = (float)ceil(fh.ascent + fh.descent + fh.leading) + 7.0f;
 
 	// TODO: this one I need to find out
-	*width = 4.0f + (float)ceil(font.StringWidth(Label()))*2.0f;
+	if (width)
+		*width = 4.0f + (float)ceil(font.StringWidth(Label()))*2.0f;
 }
-//------------------------------------------------------------------------------
-void BTextControl::ResizeToPreferred()
+
+
+void
+BTextControl::ResizeToPreferred()
 {
-	float w;
-	float h;
-	GetPreferredSize(&w, &h);
-	BView::ResizeTo(w,h);
+	float width, height;
+	GetPreferredSize(&width, &height);
+	BView::ResizeTo(width, height);
 }
-//------------------------------------------------------------------------------
-void BTextControl::SetFlags(uint32 flags)
+
+
+void
+BTextControl::SetFlags(uint32 flags)
 {
-	if (!fSkipSetFlags)
-	{
+	if (!fSkipSetFlags) {
 		// If the textview is navigable, set it to not navigable if needed
 		// Else if it is not navigable, set it to navigable if needed
-		if (fText->Flags() & B_NAVIGABLE)
-		{
+		if (fText->Flags() & B_NAVIGABLE) {
 			if (!(flags & B_NAVIGABLE))
 				fText->SetFlags(fText->Flags() & ~B_NAVIGABLE);
-		}
-		else
-		{
+
+		} else {
 			if (flags & B_NAVIGABLE)
 				fText->SetFlags(fText->Flags() | B_NAVIGABLE);
 		}
@@ -433,11 +453,12 @@ void BTextControl::SetFlags(uint32 flags)
 
 	BView::SetFlags(flags);
 }
-//------------------------------------------------------------------------------
-void BTextControl::MessageReceived(BMessage *msg)
+
+
+void
+BTextControl::MessageReceived(BMessage *msg)
 {
-	switch(msg->what)
-	{
+	switch(msg->what) {
 		case B_SET_PROPERTY:
 		case B_GET_PROPERTY:
 			// TODO
@@ -447,8 +468,10 @@ void BTextControl::MessageReceived(BMessage *msg)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
-BHandler *BTextControl::ResolveSpecifier(BMessage *msg, int32 index,
+
+
+BHandler *
+BTextControl::ResolveSpecifier(BMessage *msg, int32 index,
 										 BMessage *specifier, int32 form,
 										 const char *property)
 {
@@ -464,73 +487,100 @@ BHandler *BTextControl::ResolveSpecifier(BMessage *msg, int32 index,
 	*/
 	return BControl::ResolveSpecifier(msg, index, specifier, form, property);
 }
-//------------------------------------------------------------------------------
-status_t BTextControl::GetSupportedSuites(BMessage *data)
+
+
+status_t
+BTextControl::GetSupportedSuites(BMessage *data)
 {
 	return BControl::GetSupportedSuites(data);
 }
-//------------------------------------------------------------------------------
-void BTextControl::MouseUp(BPoint pt)
+
+
+void
+BTextControl::MouseUp(BPoint pt)
 {
 	BControl::MouseUp(pt);
 }
-//------------------------------------------------------------------------------
-void BTextControl::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
+
+
+void
+BTextControl::MouseMoved(BPoint pt, uint32 code, const BMessage *msg)
 {
 	BControl::MouseMoved(pt, code, msg);
 }
-//------------------------------------------------------------------------------
-void BTextControl::DetachedFromWindow()
+
+
+void
+BTextControl::DetachedFromWindow()
 {
 	BControl::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
-void BTextControl::AllAttached()
+
+
+void
+BTextControl::AllAttached()
 {
 	BControl::AllAttached();
 }
-//------------------------------------------------------------------------------
-void BTextControl::AllDetached()
+
+
+void
+BTextControl::AllDetached()
 {
 	BControl::AllDetached();
 }
-//------------------------------------------------------------------------------
-void BTextControl::FrameMoved(BPoint newPosition)
+
+
+void
+BTextControl::FrameMoved(BPoint newPosition)
 {
 	BControl::FrameMoved(newPosition);
 }
-//------------------------------------------------------------------------------
-void BTextControl::FrameResized(float newWidth, float newHeight)
+
+
+void
+BTextControl::FrameResized(float newWidth, float newHeight)
 {
 	BControl::FrameResized(newWidth, newHeight);
 }
-//------------------------------------------------------------------------------
-void BTextControl::WindowActivated(bool active)
+
+
+void
+BTextControl::WindowActivated(bool active)
 {
 	if (fText->IsFocus())
 		Draw(Bounds());
 }
-//------------------------------------------------------------------------------
-status_t BTextControl::Perform(perform_code d, void *arg)
+
+
+status_t
+BTextControl::Perform(perform_code d, void *arg)
 {
 	return BControl::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
+
+
 void BTextControl::_ReservedTextControl1() {}
 void BTextControl::_ReservedTextControl2() {}
 void BTextControl::_ReservedTextControl3() {}
 void BTextControl::_ReservedTextControl4() {}
-//------------------------------------------------------------------------------
-BTextControl &BTextControl::operator=(const BTextControl&)
+
+
+BTextControl &
+BTextControl::operator=(const BTextControl&)
 {
 	return *this;
 }
-//------------------------------------------------------------------------------
-void BTextControl::CommitValue()
+
+
+void
+BTextControl::CommitValue()
 {
 }
-//------------------------------------------------------------------------------
-void BTextControl::InitData(const char *label, const char *initial_text,
+
+
+void
+BTextControl::InitData(const char *label, const char *initial_text,
 							BMessage *data)
 {
 	BRect bounds(Bounds());
@@ -550,10 +600,10 @@ void BTextControl::InitData(const char *label, const char *initial_text,
 	BFont font(be_bold_font);
 
 	if (!data || !data->HasString("_fname"))
-		flags = 1;
+		flags |= B_FONT_FAMILY_AND_STYLE;
 
 	if (!data || !data->HasFloat("_fflt"))
-		flags |= 2;
+		flags |= B_FONT_SIZE;
 
 	if (flags != 0)
 		SetFont(&font, flags);
@@ -561,17 +611,15 @@ void BTextControl::InitData(const char *label, const char *initial_text,
 	if (label)
 		fDivider = bounds.Width() / 2.0f;
 
-	if (Flags() & B_NAVIGABLE)
-	{
+	if (Flags() & B_NAVIGABLE) {
 		fSkipSetFlags = true;
 		SetFlags(Flags() & ~B_NAVIGABLE);
 		fSkipSetFlags = false;
 	}
 
 	if (data)
-		fText = (_BTextInput_*)FindView("_input_");
-	else
-	{
+		fText = static_cast<_BTextInput_ *>(FindView("_input_"));
+	else {
 		BRect frame(fDivider, bounds.top + 2.0f, bounds.right - 2.0f,
 			bounds.bottom - 2.0f);
 		BRect textRect(frame.OffsetToCopy(0.0f, 0.0f));
@@ -587,12 +635,3 @@ void BTextControl::InitData(const char *label, const char *initial_text,
 		fText->AlignTextRect();
 	}
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
