@@ -770,8 +770,8 @@ static int
 resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 {
 	struct Elf32_Sym *sym2;
-	char             *symname;
-	image_t          *shimg;
+	char *symname;
+	image_t *shimg;
 
 	switch (sym->st_shndx) {
 		case SHN_UNDEF:
@@ -1116,6 +1116,7 @@ init_dependencies(image_t *image, bool initHead)
 	}
 
 	if (initHead) {
+		// this adds the init function of the "calling" image
 		initList[slot] = image;
 		slot += 1;
 	}
@@ -1183,10 +1184,8 @@ load_program(char const *path, void **_entry)
 	}
 
 	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		bool relocate_success;
-
-		relocate_success = relocate_image(iter);
-		FATAL(!relocate_success, "troubles relocating\n");
+		status_t status = relocate_image(iter);
+		FATAL(status < B_OK, "troubles relocating\n");
 	}
 
 	init_dependencies(gLoadedImages.head, true);
@@ -1229,10 +1228,8 @@ load_library(char const *path, uint32 flags)
 	}
 
 	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		bool relocateSuccess;
-
-		relocateSuccess = relocate_image(iter);
-		FATAL(!relocateSuccess, "troubles relocating\n");
+		status_t status = relocate_image(iter);
+		FATAL(status < B_OK, "troubles relocating\n");
 	}
 
 	remap_images();

@@ -9,7 +9,6 @@ static int
 relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 {
 	int i;
-	struct Elf32_Sym *sym;
 	addr_t S;
 	addr_t final_val;
 
@@ -27,12 +26,13 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 			case R_386_JMP_SLOT:
 			case R_386_GOTOFF:
 			{
+				struct Elf32_Sym *sym;
 				status_t status;
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
 				status = resolve_symbol(image, sym, &S);
 				if (status < B_OK) {
-					printf("resolve symbol returned: %ld\n", status);
+					printf("resolve symbol \"%s\" returned: %ld\n", SYMNAME(image, sym), status);
 					return status;
 				}
 			}
@@ -75,7 +75,7 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 				break;
 #endif
 			default:
-				printf("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
+				TRACE(("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info)));
 				return B_NOT_ALLOWED;
 		}
 
@@ -94,38 +94,38 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
  * rldelf.c requires this function to be implemented on a per-cpu basis
  */
 
-static bool
+static status_t
 relocate_image(image_t *image)
 {
-	status_t status = B_NO_ERROR;
+	status_t status;
 
 	if (image->flags & RFLAG_RELOCATED)
-		return true;
+		return B_OK;
 
 	image->flags |= RFLAG_RELOCATED;
 
 	// deal with the rels first
 	if (image->rel) {
 		status = relocate_rel(image, image->rel, image->rel_len);
-		if (status)
-			return false;
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->pltrel) {
 		status = relocate_rel(image, image->pltrel, image->pltrel_len);
-		if (status)
-			return false;
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->rela) {
 		//int i;
-		printf("RELA relocations not supported\n");
-		return false;
+		TRACE(("RELA relocations not supported\n"));
+		return EOPNOTSUPP;
 
 		//for (i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
 		//	printf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		//}
 	}
 
-	return true;
+	return B_OK;
 }

@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 static int
@@ -13,38 +13,38 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
 }
 
 
-static bool
+static status_t
 relocate_image(image_t *image)
 {
 	status_t status = B_NO_ERROR;
 
 	if (image->flags & RFLAG_RELOCATED)
-		return true;
+		return B_OK;
 
 	image->flags |= RFLAG_RELOCATED;
 
 	// deal with the rels first
 	if (image->rel) {
 		status = relocate_rel(image, image->rel, image->rel_len);
-		if (status)
-			return false;
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->pltrel) {
 		status = relocate_rel(image, image->pltrel, image->pltrel_len);
-		if (status)
-			return false;
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->rela) {
 		//int i;
 		printf("RELA relocations not supported\n");
-		return false;
+		return EOPNOTSUPP;
 
 		//for (i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
 		//	printf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		//}
 	}
 
-	return true;
+	return B_OK;
 }
