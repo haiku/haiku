@@ -58,7 +58,7 @@ class Descriptor {
 
 NodeList gBootDevices;
 NodeList gPartitions;
-Directory *gRoot;
+RootFileSystem *gRoot;
 static Descriptor *sDescriptors[MAX_VFS_DESCRIPTORS];
 static Node *sBootDevice;
 
@@ -184,14 +184,6 @@ Directory::Type() const
 }
 
 
-status_t 
-Directory::AddNode(Node */*node*/)
-{
-	// just don't do anything
-	return B_ERROR;
-}
-
-
 //	#pragma mark -
 
 
@@ -291,6 +283,13 @@ vfs_init(stage2_args *args)
 }
 
 
+void
+register_boot_file_system(Directory *volume)
+{
+	gRoot->AddLink("boot", volume);
+}
+
+
 /** Gets the boot device, scans all of its partitions, gets the
  *	boot partition, and mounts its file system.
  *	Returns the file system's root node or NULL for failure.
@@ -378,6 +377,24 @@ mount_file_systems(stage2_args *args)
 	if (gPartitions.IsEmpty())
 		return B_ENTRY_NOT_FOUND;
 
+	void *cookie;
+	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
+		Directory *directory;
+		while (gRoot->GetNextNode(cookie, (Node **)&directory) == B_OK) {
+			char name[256];
+			if (directory->GetName(name, sizeof(name)) == B_OK)
+				printf(":: %s\n", name);
+
+			void *subCookie;
+			if (directory->Open(&subCookie, O_RDONLY) == B_OK) {
+				while (directory->GetNextEntry(subCookie, name, sizeof(name)) == B_OK) {
+					printf("\t%s\n", name);
+				}
+				directory->Close(subCookie);
+			}
+		}
+		gRoot->Close(cookie);
+	}
 	return B_OK;
 }
 
