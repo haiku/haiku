@@ -9,8 +9,12 @@
 
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Alert.h>
 
 #include <stdio.h>
+
+
+static const uint32 kMsgRemoveAttribute = 'rmat';
 
 
 AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribute,
@@ -29,6 +33,10 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 
 	BMenu *menu = new BMenu("Attribute");
 
+	menu->AddItem(new BMenuItem("Save", NULL, 'S', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem("Remove from File", new BMessage(kMsgRemoveAttribute)));
+	menu->AddSeparatorItem();
+
 	// the ProbeView file menu items will be inserted here
 	menu->AddSeparatorItem();
 
@@ -41,7 +49,7 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
 	ProbeView *probeView = new ProbeView(rect, ref, attribute, settings);
-	probeView->AddFileMenuItems(menu, 0);
+	probeView->AddFileMenuItems(menu, menu->CountItems() - 2);
 	AddChild(probeView);
 
 	probeView->UpdateSizeLimits();
@@ -51,6 +59,38 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 AttributeWindow::~AttributeWindow()
 {
 	free(fAttribute);
+}
+
+
+void 
+AttributeWindow::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgRemoveAttribute:
+		{
+			char buffer[1024];
+			snprintf(buffer, sizeof(buffer),
+				"Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\n"
+				"The contents of the attribute will get lost if you click on \"Remove\".",
+				fAttribute, Ref().name);
+
+			int32 chosen = (new BAlert("DiskProbe request",
+				buffer, "Remove", "Cancel", NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+			if (chosen == 0) {
+				BNode node(&Ref());
+				if (node.InitCheck() == B_OK)
+					node.RemoveAttr(fAttribute);
+
+				PostMessage(B_QUIT_REQUESTED);
+			}
+			break;
+		}
+
+		default:
+			ProbeWindow::MessageReceived(message);
+			break;
+	}
 }
 
 
