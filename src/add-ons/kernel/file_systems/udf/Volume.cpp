@@ -263,7 +263,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 
 const char*
 Volume::Name() const {
-	return fName.String();
+	return fName.Utf8();
 }
 
 /*! \brief Maps the given logical block to a physical block.
@@ -298,7 +298,7 @@ Volume::_Unset()
 	fLength = 0;
 	fBlockSize = 0;
 	fBlockShift = 0;
-	fName.SetTo("");
+	fName.SetTo("", 0);
 	// delete our partitions
 	for (int i = 0; i < UDF_MAX_PARTITION_MAPS; i++)
 		_SetPartition(i, NULL);

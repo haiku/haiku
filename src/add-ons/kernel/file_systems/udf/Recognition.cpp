@@ -1,6 +1,6 @@
 #include "Recognition.h"
 
-#include "CS0String.h"
+#include "UdfString.h"
 #include "MemoryChunk.h"
 #include "Utils.h"
 
@@ -80,8 +80,8 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	                               logicalVolumeDescriptor, partitionDescriptors,
 	                               partitionDescriptorCount);
 	if (!error && volumeName) {
-		CS0String name(logicalVolumeDescriptor.logical_volume_identifier());
-		strcpy(volumeName, name.String());
+		String name(logicalVolumeDescriptor.logical_volume_identifier());
+		strcpy(volumeName, name.Utf8());
 	}
 	RETURN(error);
 }

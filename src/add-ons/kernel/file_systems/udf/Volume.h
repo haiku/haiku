@@ -24,7 +24,7 @@ extern "C" {
 #include "kernel_cpp.h"
 #include "UdfDebug.h"
 
-#include "CS0String.h"
+#include "UdfString.h"
 #include "UdfStructures.h"
 #include "Partition.h"
 
@@ -78,7 +78,7 @@ private:
 	uint32 fBlockShift;
 	Partition *fPartitions[UDF_MAX_PARTITION_MAPS];
 	Icb *fRootIcb;	// Destroyed by vfs via callback to release_node()
-	CS0String fName;
+	String fName;
 };
 
 };	// namespace Udf

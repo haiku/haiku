@@ -17,10 +17,10 @@ SimpleTest udf_shell
 	sysdep.c hexdump.c argv.c tracker.cpp
 
 	udf.cpp
-	CS0String.cpp DirectoryIterator.cpp Icb.cpp
+	DirectoryIterator.cpp Icb.cpp
 	MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
-	UdfDebug.cpp UdfStructures.cpp Utils.cpp SparablePartition.cpp
-	VirtualPartition.cpp Volume.cpp 
+	UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp
+	SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
 	:
 	;
 
@@ -29,8 +29,8 @@ SEARCH on [ FGristFiles
 		udf.cpp 
 		CS0String.cpp DirectoryIterator.cpp Icb.cpp
 		MetadataPartition.cpp PhysicalPartition.cpp Recognition.cpp
-		UdfDebug.cpp  UdfStructures.cpp Utils.cpp SparablePartition.cpp
-		VirtualPartition.cpp Volume.cpp 
+		UdfDebug.cpp  UdfString.cpp UdfStructures.cpp Utils.cpp
+		SparablePartition.cpp VirtualPartition.cpp Volume.cpp 
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 SEARCH on [ FGristFiles

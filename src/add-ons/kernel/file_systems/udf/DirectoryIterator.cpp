@@ -15,7 +15,7 @@
 
 #include "Icb.h"
 
-#include "CS0String.h"
+#include "UdfString.h"
 #include "Utils.h"
 
 using namespace Udf;
@@ -59,11 +59,11 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 			sprintf(name, "..");
 			*length = 3;
 		} else {
-			CS0String string(entry->id(), entry->id_length());
-			PRINT(("id == `%s'\n", string.String()));
+			String string(entry->id(), entry->id_length());
+			PRINT(("id == `%s'\n", string.Utf8()));
 			DUMP(entry->icb());
-			sprintf(name, "%s", string.String());
-			*length = string.Length();
+			sprintf(name, "%s", string.Utf8());
+			*length = string.Utf8Length();
 		}		
 		*id = to_vnode_id(entry->icb());
 	}	
