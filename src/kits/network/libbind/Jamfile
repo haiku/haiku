@@ -19,6 +19,9 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) nameser ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
 
 {
+	# Default libs include BeOS R5 libnet.so, something we don't want here!
+	LINKFLAGS on libbind.so = [ on libbind.so return $(LINKFLAGS) ] -nodefaultlibs ;
+ 
 	# we want to have the xxx_r functions, too
 	local defines = _REENTRANT=1 NO_SOCKADDR_UN=1 ;
 	defines = [ FDefines $(defines) ] ;
