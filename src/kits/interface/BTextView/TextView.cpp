@@ -131,7 +131,7 @@ sem_id BTextView::sWidthSem = B_BAD_SEM_ID;
 int32 BTextView::sWidthAtom = 0;
 #endif
 
-const static rgb_color kBlackColor = { 0, 0, 0 };
+const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kBlueInputColor = { 152, 203, 255 };			
 const static rgb_color kRedInputColor = { 255, 152, 152 };	
 															
@@ -393,7 +393,7 @@ BTextView::AttachedToWindow()
 	BView::AttachedToWindow();
 	
 	SetDrawingMode(B_OP_COPY);
-
+	
 	Window()->SetPulseRate(500000);
 	
 	fCaretVisible = false;
@@ -3728,7 +3728,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 			startLeft += fTextRect.left;
 		}
 			
-		view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top);
+		view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
 
 		if (erase && i >= startEraseLine) {
 			eraseRect.top = line->origin + fTextRect.top;
