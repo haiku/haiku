@@ -82,16 +82,15 @@ main(int argc, char **argv)
 				keymap.Save(outputRef);
 				return 0;
 			} else if (operation == 'h') {
-		        	entry_ref ref;
-		        	get_ref_for_path(argv[i], &ref);
-		        	Keymap keymap;
-		        	if (keymap.LoadSourceFromRef(ref)!=B_OK) {
+		        entry_ref ref;
+		        get_ref_for_path(argv[i], &ref);
+		        Keymap keymap;
+		        if (keymap.LoadSourceFromRef(ref)!=B_OK) {
 					printf("error when loading the keymap\n");
 					return 1;
 				}
-				keymap.Dump();
-		       	 	keymap.SaveAsHeader(outputRef);
-		        	return 0;
+				keymap.SaveAsHeader(outputRef);
+				return 0;
 			} else if (operation == 'b') {
 				entry_ref ref;
 				get_ref_for_path(argv[i], &ref);
@@ -103,7 +102,7 @@ main(int argc, char **argv)
 				keymap.SaveAsCurrent();
 				printf("Key map loaded.\n");
 				return 0;
-            		} else 
+			} else 
 				break;
 		}
 	}
