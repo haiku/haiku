@@ -450,14 +450,14 @@ BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 		{
 			// Grab the previous mod and access times so we only overwrite
 			// the specified time and not both
-			Stat *oldStat;
-			result = ::stat(file, oldStat);
+			Stat oldStat;
+			result = ::stat(file, &oldStat);
 			if (result < 0)
 				break;
 				
 			utimbuf buffer;
-			buffer.actime = (what == WSTAT_ATIME) ? s.st_atime : oldStat->st_atime;
-			buffer.modtime = (what == WSTAT_MTIME) ? s.st_mtime : oldStat->st_mtime;
+			buffer.actime = (what == WSTAT_ATIME) ? s.st_atime : oldStat.st_atime;
+			buffer.modtime = (what == WSTAT_MTIME) ? s.st_mtime : oldStat.st_mtime;
 			result = ::utime(file, &buffer);
 		}
 		
