@@ -1,5 +1,5 @@
-#ifndef MESSENGERPRIVAGE_H
-#define MESSENGERPRIVATE_H
+#ifndef MESSENGER_PRIVATE_H
+#define MESSENGER_PRIVATE_H
 
 #include <Messenger.h>
 
@@ -18,8 +18,11 @@ class BMessenger::Private
 		bool	IsPreferredTarget()
 			{ return fMessenger->fPreferredTarget; }
 
+		void SetTo(team_id team, port_id port, int32 token, bool preferred)
+			{ fMessenger->SetTo(team, port, token, preferred); }
+
 	private:
 		BMessenger* fMessenger;
 };
 
-#endif	// MESSENGERPRIVATE_H
+#endif	// MESSENGER_PRIVATE_H
