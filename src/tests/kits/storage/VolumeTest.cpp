@@ -191,6 +191,17 @@ CheckVolume(BVolume &volume, dev_t device, status_t error)
 	}
 }
 
+// AssertNotBootVolume
+static
+void
+AssertNotBootVolume(const BVolume &volume)
+{
+	CHK(volume.InitCheck() == B_OK);
+	dev_t bootDevice = dev_for_path("/boot");
+	CHK(bootDevice >= 0);
+	CHK(volume.Device() != bootDevice);
+}
+
 // InitTest1
 void
 VolumeTest::InitTest1()
@@ -361,6 +372,7 @@ VolumeTest::SetNameTest()
 	dev_t device = dev_for_path(testMountPoint);
 	BVolume volume(device);
 	CheckVolume(volume, device, B_OK);
+	AssertNotBootVolume(volume);
 	// set a new name
 	NextSubTest();
 	const char *newName = "a new name";

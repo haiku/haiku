@@ -136,10 +136,7 @@ StatableTest::GetXYZTest()
 #if !TEST_R5 && !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( atime == st.st_atime );
 #endif
-// OBOS: BVolume::==() is not implemented yet
-#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( volume == BVolume(st.st_dev) );
-#endif
 	}
 	testEntries.delete_all();
 	// test with uninitialized objects
@@ -200,35 +197,27 @@ StatableTest::SetXYZTest()
 		struct stat st;
 		uid_t owner = 0xdad;
 		gid_t group = 0xdee;
-// OBOS: no fchmod(), no FD time setters
-#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 		mode_t perms = 0x0ab;	// -w- r-x -wx	-- unusual enough? ;-)
 		time_t mtime = 1234567;
 		time_t ctime = 654321;
-#endif
 // R5: access time unused
 #if !TEST_R5 && !TEST_OBOS /* !!!POSIX ONLY!!! */
 		time_t atime = 2345678;
 #endif
-// OBOS: no fchmod(), no FD time setters
 		CPPUNIT_ASSERT( statable->SetOwner(owner) == B_OK );
 		CPPUNIT_ASSERT( statable->SetGroup(group) == B_OK );
-#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( statable->SetPermissions(perms) == B_OK );
 		CPPUNIT_ASSERT( statable->SetModificationTime(mtime) == B_OK );
 		CPPUNIT_ASSERT( statable->SetCreationTime(ctime) == B_OK );
-#endif
 #if !TEST_R5 && !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( statable->SetAccessTime(atime) == B_OK );
 #endif
 		CPPUNIT_ASSERT( lstat(entryName.c_str(), &st) == 0 );
 		CPPUNIT_ASSERT( owner == st.st_uid );
 		CPPUNIT_ASSERT( group == st.st_gid );
-#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( perms == (st.st_mode & S_IUMSK) );
 		CPPUNIT_ASSERT( mtime == st.st_mtime );
 		CPPUNIT_ASSERT( ctime == st.st_crtime );
-#endif
 #if !TEST_R5 && !TEST_OBOS /* !!!POSIX ONLY!!! */
 		CPPUNIT_ASSERT( atime == st.st_atime );
 #endif

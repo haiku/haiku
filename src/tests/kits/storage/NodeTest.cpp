@@ -52,9 +52,6 @@ NodeTest::Suite() {
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Equality Test", &NodeTest::EqualityTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Assignment Test", &NodeTest::AssignmentTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Lock Test"
-#if TEST_OBOS /* !!!POSIX ONLY!!! */
-														" (NOTE: test not actually performed with OpenBeOS Posix libraries)"
-#endif
 														, &NodeTest::LockTest) );
 		
 	return suite;
@@ -795,7 +792,7 @@ NodeTest::AttrRenameTest(BNode &node)
 	const int dataLen = 1024;
 	char data[dataLen];
 		
-	node.SetTo("./");
+	CPPUNIT_ASSERT( node.SetTo("./") == B_OK );
 
 	// Test the case of the first attribute not existing
 	node.RemoveAttr(attr1);		
@@ -1172,7 +1169,6 @@ NodeTest::LockTest(BNode &node, const char *entryName)
 void
 NodeTest::LockTest()
 {
-#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	// uninitialized objects
 	NextSubTest();
 	TestNodes testEntries;
@@ -1190,7 +1186,6 @@ NodeTest::LockTest()
 		LockTest(*node, nodeName.c_str());
 	}
 	testEntries.delete_all();
-#endif
 }
 
 // entry names used in tests
