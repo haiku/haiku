@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -267,7 +267,6 @@ BPopUpMenu::ScreenLocation()
 }
 
 
-//------------------------------------------------------------------------------
 //	#pragma mark -
 //	private methods
 
@@ -400,8 +399,12 @@ BPopUpMenu::start_track(BPoint where, bool autoInvoke,
 {
 	BMenuItem *result = NULL;
 	
-	fUseWhere = true;
 	fWhere = where;
+	
+	// I know, this doesn't look senseful, but don't be fooled,
+	// fUseWhere is used in ScreenLocation(), which is a virtual
+	// called by BMenu::Track()
+	fUseWhere = true;
 	
 	// Show the menu's window
 	Show();
