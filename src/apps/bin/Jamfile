@@ -18,7 +18,7 @@ StdBinCommands
 	setversion.cpp
 	shutdown.cpp
 	version.cpp
-	yes.cpp
+#	yes.cpp
 	: be ;
 
 StdBinCommands
