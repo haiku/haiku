@@ -10,8 +10,10 @@ Addon ogg : media plugins :
 	OggStream.cpp
 	OggSeekable.cpp
 	OggSpeexStream.cpp
+	OggSpeexSeekable.cpp
 	OggTheoraStream.cpp
 	OggTobiasStream.cpp
+	OggTobiasSeekable.cpp
 	OggVorbisStream.cpp
 	OggVorbisSeekable.cpp
 	: false : libogg.a

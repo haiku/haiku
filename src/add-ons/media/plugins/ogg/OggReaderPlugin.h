@@ -42,21 +42,17 @@ private:
 	serialno_vector			fCookies;
 
 	BPositionIO *			fSeekable;
+	BLocker					fSeekableLock;
 	BFile *					fFile;
 
 	off_t					fPosition;
 
-	// interfaces for OggTracks
+	// interface for OggStreams
 	ssize_t		ReadPage(bool first_page = false);
-	ssize_t		ReadPageAt(off_t position, int read_size = 4*B_PAGE_SIZE);
 
 	class StreamInterface {
 	public:
 		virtual ssize_t		ReadPage() = 0;
-	};
-	class SeekableInterface {
-	public:
-		virtual ssize_t		ReadPageAt(off_t position, int read_size = 4*B_PAGE_SIZE) = 0;
 	};
 };
 

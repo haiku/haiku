@@ -1,4 +1,6 @@
 #include "OggSeekable.h"
+#include "OggSpeexSeekable.h"
+#include "OggTobiasSeekable.h"
 #include "OggVorbisSeekable.h"
 #include <Autolock.h>
 #include <stdio.h>
@@ -15,23 +17,24 @@
  */
 
 /* static */ OggSeekable *
-OggSeekable::makeOggSeekable(OggReader::SeekableInterface * interface,
-                         long serialno, const ogg_packet & packet)
+OggSeekable::makeOggSeekable(BPositionIO * positionIO, BLocker * positionLock,
+                             long serialno, const ogg_packet & packet)
 {
 	TRACE("OggSeekable::makeOggSeekable\n");
 	OggSeekable * stream;
 	if (OggVorbisSeekable::IsValidHeader(packet)) {
 		stream = new OggVorbisSeekable(serialno);
-//	} else if (OggTobiasSeekable::IsValidHeader(packet)) {
-//		stream = new OggTobiasSeekable(serialno);
-//	} else if (OggSpeexSeekable::IsValidHeader(packet)) {
-//		stream = new OggSpeexSeekable(serialno);
+	} else if (OggTobiasSeekable::IsValidHeader(packet)) {
+		stream = new OggTobiasSeekable(serialno);
+	} else if (OggSpeexSeekable::IsValidHeader(packet)) {
+		stream = new OggSpeexSeekable(serialno);
 //	} else if (OggTheoraSeekable::IsValidHeader(packet)) {
 //		stream = new OggTheoraSeekable(serialno);
 	} else {
 		stream = new OggSeekable(serialno);
 	}
-	stream->fReaderInterface = interface;
+	stream->fPositionIO = positionIO;
+	stream->fPositionLock = positionLock;
 	return stream;
 }
 
@@ -57,11 +60,18 @@ OggSeekable::~OggSeekable()
 }
 
 
+static void 
+insert_position(std::vector<off_t> & positions, off_t position)
+{
+	positions.push_back(position);
+}
+
+
 status_t
 OggSeekable::AddPage(off_t position, const ogg_page & page)
 {
 	TRACE("OggSeekable::AddPage\n");
-	BAutolock autolock(fSyncLock);
+	insert_position(fPagePositions, position);
 	char * buffer;
 	// copy the header to our local sync
 	buffer = ogg_sync_buffer(&fSync, page.header_len);
@@ -71,6 +81,69 @@ OggSeekable::AddPage(off_t position, const ogg_page & page)
 	buffer = ogg_sync_buffer(&fSync, page.body_len);
 	memcpy(buffer, page.body, page.body_len);
 	ogg_sync_wrote(&fSync, page.body_len);
+	fPosition = position + page.header_len + page.body_len;
+	return B_OK;
+}
+
+
+status_t
+OggSeekable::ReadPage(ogg_page * page, int read_size)
+{
+	TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
+	BAutolock autolock(fPositionLock);
+	// align to page boundary
+	int offset;
+	while ((offset = ogg_sync_pageseek(&fSync, page)) <= 0) {
+		if (offset == 0) {
+			char * buffer = ogg_sync_buffer(&fSync, read_size);
+			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
+			if (bytes == 0) {
+				TRACE("OggReader::ReadPageAt: ReadAt: no data\n");
+				return B_LAST_BUFFER_ERROR;
+			}
+			if (bytes < 0) {
+				TRACE("OggReader::ReadPageAt: ReadAt: error\n");
+				return bytes;
+			}
+			fPosition += bytes;
+			if (ogg_sync_wrote(&fSync, bytes) != 0) {
+				TRACE("OggReader::ReadPageAt: ogg_sync_wrote failed?: error\n");
+				return B_ERROR;
+			}
+		}
+	}
+	// repeat until this is one of our pages
+	while (ogg_page_serialno(page) != GetSerial()) {
+		int result;
+		// read the page
+		while ((result = ogg_sync_pageout(&fSync, page)) == 0) {
+			char * buffer = ogg_sync_buffer(&fSync, read_size);
+			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
+			if (bytes == 0) {
+				TRACE("OggReader::ReadPageAt: ReadAt 2: no data\n");
+				return B_LAST_BUFFER_ERROR;
+			}
+			if (bytes < 0) {
+				TRACE("OggReader::ReadPageAt: ReadAt 2: error\n");
+				return bytes;
+			}
+			fPosition += bytes;
+			if (ogg_sync_wrote(&fSync, bytes) != 0) {
+				TRACE("OggReader::ReadPageAt: ogg_sync_wrote 2 failed?: error\n");
+				return B_ERROR;
+			}
+		}
+		if (result == -1) {
+			TRACE("OggReader::ReadPageAt: ogg_sync_pageout: not synced??\n");
+			return B_ERROR;
+		}
+		if (ogg_page_version(page) != 0) {
+			TRACE("OggReader::GetPageAt: ogg_page_version: error in page encoding??\n");
+#ifdef STRICT_OGG
+			return B_ERROR;
+#endif
+		}
+	}
 	return B_OK;
 }
 
@@ -146,21 +219,23 @@ OggSeekable::GetPacket(ogg_packet * packet)
 {
 	// at the end, pull the packet
 	while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
-		BAutolock autolock(fSyncLock);
-		int result;
 		ogg_page page;
-		while ((result = ogg_sync_pageout(&fSync,&page)) == 0) {
-			status_t result = B_ERROR; // fReaderInterface->ReadPage();
-			if (result != B_OK) {
-				TRACE("OggSeekable::GetPacket: GetNextPage = %s\n", strerror(result));
-				return result;
+		do {
+			int result = ogg_sync_pageout(&fSync, &page);
+			if (result == 0) {
+				status_t status = ReadPage(&page);
+				if (status != B_OK) {
+					TRACE("OggSeekable::GetPacket: GetNextPage = %s\n", strerror(status));
+					return status;
+				}
 			}
-		}
-		if (result == -1) {
-			TRACE("OggSeekable::GetPacket: ogg_sync_pageout: not synced??\n");
-			return B_ERROR;
-		}
-		if (ogg_stream_pagein(&fStreamState,&page) != 0) {
+			if (result == -1) {
+				TRACE("OggSeekable::GetPacket: ogg_sync_pageout: not synced??\n");
+				return B_ERROR;
+			}
+		} while (ogg_page_serialno(&page) != GetSerial());
+		if (ogg_stream_pagein(&fStreamState, &page) != 0) {
+			debugger("huh?");
 			TRACE("OggSeekable::GetPacket: ogg_stream_pagein: failed??\n");
 			return B_ERROR;
 		}

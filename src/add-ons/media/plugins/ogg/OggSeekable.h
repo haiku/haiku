@@ -3,13 +3,13 @@
 
 #include "OggTrack.h"
 #include "OggReaderPlugin.h"
-#include <map>
+#include <vector>
 
 namespace BPrivate { namespace media {
 
 class OggSeekable : public OggTrack {
 public:
-	static OggSeekable * makeOggSeekable(OggReader::SeekableInterface * interface,
+	static OggSeekable * makeOggSeekable(BPositionIO * positionIO, BLocker * positionLock,
 						                 long serialno, const ogg_packet & packet);
 
 	// interface for OggReader
@@ -27,15 +27,25 @@ public:
 	status_t	AddPage(off_t position, const ogg_page & page);
 
 protected:
+	status_t	ReadPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE);
+
 	// subclass pull input function
 	status_t	GetPacket(ogg_packet * packet);
+	ogg_packet			fChunkPacket;
+
+protected:
+	int64				fCurrentFrame;
+	bigtime_t			fCurrentTime;
+
+private:
+	off_t				fPosition;
+	std::vector<off_t>	fPagePositions;
 
 private:
 	ogg_sync_state		fSync;
-	BLocker				fSyncLock;
 	ogg_stream_state	fStreamState;
-	OggReader::SeekableInterface * fReaderInterface;
-	ogg_packet			fChunkPacket;
+	BPositionIO *		fPositionIO;
+	BLocker				fPositionLock;
 };
 
 } } // namespace BPrivate::media
