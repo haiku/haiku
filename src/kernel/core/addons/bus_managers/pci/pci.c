@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
@@ -23,8 +24,13 @@
 #include <PCI.h>
 #include <bus.h>
 
-/* Change to 1 to see more debugging :) */
-#define THE_FULL_MONTY 0
+#define TRACE_PCI 0
+#if TRACE_PCI
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 struct pci_device {
 	struct pci_device *next;
@@ -98,12 +104,15 @@ static void write_pci_config (uchar, uchar, uchar, uchar, uchar, uint32);
 	restore_interrupts(cpu_status); \
 }
 
+
 /* decode_class
  * DEBUG DEBUG DEBUG
  * Provide a string that describes the class and sub-class.
  * This could/should (?) be expanded to use the api as well.
  */
-static char *decode_class(uint8 base, uint8 sub_class)
+
+static char *
+decode_class(uint8 base, uint8 sub_class)
 {
 	switch(base) {
 		case PCI_early:
@@ -208,18 +217,20 @@ static char *decode_class(uint8 base, uint8 sub_class)
 	}
 }
 
-static void show_pci_details(struct pci_info *p)
+
+static void
+show_pci_details(struct pci_info *p)
 {
-#if THE_FULL_MONTY
+#if TRACE_PCI
 	uint16 ss_vend, ss_dev;
 #endif
 	uint8 irq = 0;
-	
+
 	if (p->header_type == PCI_header_type_generic)
 		irq = p->u.h0.interrupt_line;
 	else
 		irq = p->u.h1.interrupt_line;
-	
+
 	dprintf("0x%04x:0x%04x : ", p->vendor_id, p->device_id);
 
 	if (irq > 0)
@@ -230,7 +241,7 @@ static void show_pci_details(struct pci_info *p)
 	        p->class_api);
 	dprintf(" => %s\n", decode_class(p->class_base, p->class_sub));
 
-#if THE_FULL_MONTY
+#if TRACE_PCI
 	dprintf("\trevision    : %02x\n", p->revision);
 	dprintf("\tstatus      : %04x\n", 
 	        read_pci_config(p->bus, p->device, p->function, PCI_status, 2));
@@ -297,8 +308,10 @@ static void show_pci_details(struct pci_info *p)
 
 #define CONFIG_ADDR_2(dev, reg) \
 	(uint16)(0xC00 | (dev << 8) | reg)
-	
-static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg, uchar size)
+
+
+static uint32
+read_pci_config(uchar bus, uchar device, uchar function, uchar reg, uchar size)
 {
 	int cpu_status;
 	uint32 val = 0;
@@ -363,8 +376,9 @@ static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg
 	return val;
 }
 
-static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg, 
-                             uchar size, uint32 value)
+
+static void
+write_pci_config(uchar bus, uchar device, uchar function, uchar reg, uchar size, uint32 value)
 {
 	int cpu_status;
 	
@@ -424,13 +438,15 @@ static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg,
 	return;
 }
 
+
 /* pci_get_capability
  * Try to get the offset and value of the specified capability from the
  * devices capability list.
  * returns 0 if unable, 1 if succesful
  */
-static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap, 
-                              uint8 *offs)
+
+static int
+pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap, uint8 *offs)
 {
 	uint16 status;
 	uint8 cap_data;
@@ -489,6 +505,7 @@ static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap,
 	return 0;
 }
 
+
 /* pci_set_power_state
  * This attempts to set the device into one of the 4 power management
  * modes, where PCI_pm_state_d0 is "Full Power" and _d3 is the lowest.
@@ -504,7 +521,9 @@ static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap,
  * EIO if the device doesn't support the power management state requested
  * 
  */
-static int pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
+
+static int
+pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
 {
 	uint8 pm_reg, cur_state;
 	uint16 cur_status;
@@ -545,12 +564,15 @@ static int pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
 	return 0;
 }
 
+
 /* This used to be fixup_host_bridges, but some PCI-PCI bridges need
  * to be adjusted as well so I'll make it more general.
  *
  * Partially borrowed from NetBSD.
  */
-static void fixup_bridge(uint8 bus, uint8 dev, uint8 func)
+
+static void
+fixup_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 vendor, device;
 	
@@ -595,6 +617,7 @@ static void fixup_bridge(uint8 bus, uint8 dev, uint8 func)
 	}
 }
 
+
 /* Given a vendor/device pairing, do we need to scan through
  * the entire set of funtions? normally the return will be 0,
  * implying we don't need to, but for some it will be 1 which
@@ -603,7 +626,9 @@ static void fixup_bridge(uint8 bus, uint8 dev, uint8 func)
  * functions we don't need to and shoudl reduce the possibility of
  * duplicates being detected.
  */
-static int pci_quirk_multifunction(uint16 vendor, uint16 device)
+
+static int
+pci_quirk_multifunction(uint16 vendor, uint16 device)
 {
 	switch (vendor) {
 		case PCI_VENDOR_INTEL:
@@ -617,6 +642,7 @@ static int pci_quirk_multifunction(uint16 vendor, uint16 device)
 	}
 	return 0;
 }
+
 		
 /* set_pci_mechanism()
  * Try to determine which configuration mechanism the PCI Host Bridge
@@ -625,7 +651,9 @@ static int pci_quirk_multifunction(uint16 vendor, uint16 device)
  *       exists, and this code then becomes the fallback. For now we'll
  *       just use this.
  */
-static int set_pci_mechanism(void)
+
+static int
+set_pci_mechanism(void)
 {
 	uint32 ckval = 0x80000000;
 	/* Start by looking for the older and more limited mechanism 2
@@ -668,6 +696,7 @@ static int set_pci_mechanism(void)
 	return -1;
 } 
 		
+
 /* check_pci()
  * Basically PCI bus #0 "should" contain a PCI Host Bridge.
  * This can be identified by the 8 bit pci class base of 0x06.
@@ -683,7 +712,9 @@ static int set_pci_mechanism(void)
  * returns  0 if PCI seems to be OK
  *         -1 if PCI fails the test
  */ 
-static int check_pci(void)
+
+static int
+check_pci(void)
 {
 	int dev = 0;
 
@@ -763,7 +794,9 @@ struct pir_table {
  *
  * Returns NULL if we fail to find a suitable table.
  */
-static struct pir_table *find_pir_table(void)
+
+static struct pir_table *
+find_pir_table(void)
 {
 	uint32 mem_addr = (uint32)pci_bios_ptr;
 	int range = 0x10000;
@@ -786,20 +819,22 @@ static struct pir_table *find_pir_table(void)
 	return NULL;
 }
 
+#if TRACE_PCI
 /* print_pir_table
  * Print out the table to debug output
  */
-#if THE_FULL_MONTY
-static void print_pir_table(struct pir_table *tbl)
+
+static void
+print_pir_table(struct pir_table *tbl)
 {
 	int i, j;
 	int entries = (tbl->hdr.tbl_sz - sizeof(struct pir_header)) / sizeof(struct pir_slot);
 
-	for (i=0; i < entries; i++) {
+	for (i = 0; i < entries; i++) {
 		dprintf("PIR slot %d: bus %d, device %d\n",
 		        tbl->slot[i].slot, tbl->slot[i].bus,
 		        PIR_DEVICE(tbl->slot[i].devfunc));
-		for (j=0; j < 4; j++)
+		for (j = 0; j < 4; j++)
 			dprintf("\tINT%c: pin %d possible_irq's %04x\n",
 			        'A'+j, tbl->slot[i].linkmap[j].pin,
 			        tbl->slot[i].linkmap[j].possible_irq);
@@ -826,36 +861,39 @@ static void print_pir_table(struct pir_table *tbl)
  *    but will need to eventually.
  */
 
-/* pci_bridge()
- * The values passed in specify the "device" on the bus being searched
- * that has been identified as a PCI-PCI bridge. We now setup that bridge
- * and scan the bus it defines.
- * The bus is initially taken off-line, scanned and then put back on-line
+
+/**	The values passed in specify the "device" on the bus being searched
+ *	that has been identified as a PCI-PCI bridge. We now setup that bridge
+ *	and scan the bus it defines.
+ *	The bus is initially taken off-line, scanned and then put back on-line
  *
- * NB We increment the pci_max_bus value before we use mybus in the following
- *    code and pci_max_bus is incremented before we recurse to preserve the
- *    correct relationships with nubering.
+ *	NB We increment the pci_max_bus value before we use mybus in the following
+ *	  code and pci_max_bus is incremented before we recurse to preserve the
+ *	  correct relationships with nubering.
  *
- * We initally set the subordinate_bus to 0xff and then adjust it to the max
- * once we've scanned the bus on the other side of the bridge. See the URL
- * above for information on why this is done.
+ *	We initally set the subordinate_bus to 0xff and then adjust it to the max
+ *	once we've scanned the bus on the other side of the bridge. See the URL
+ *	above for information on why this is done.
  */
-static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
+
+static void
+pci_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 command;
 	uint8 mybus;
 	struct pci_device *pcid;
 	struct pci_bus *pcib;
 	pci_info *pcii;
-	
+
+	TRACE(("pci_bridge()\n"));
+
 	command = read_pci_config(bus, dev, func, PCI_command, 2);
 	command &= ~ 0x03;
 	write_pci_config(bus, dev, func, PCI_command, 2, command);
 
-	/* Keep Marcus happy */
 	pci_max_bus += 1;
 	mybus = pci_max_bus;
-	
+
 	write_pci_config(bus, dev, func, PCI_primary_bus, 1, bus);
 	write_pci_config(bus, dev, func, PCI_secondary_bus, 1, mybus);
 	write_pci_config(bus, dev, func, PCI_subordinate_bus, 1, 0xff);
@@ -879,16 +917,20 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 		kfree(pcid);
 		goto pci_bridge_skip_infolist;
 	}
-	
+
 	pcid->info = pcii;
 	pcid->type = PCI_BRIDGE;
+	pcid->next = NULL;
+
 	pcib->info = pcii;
+	pcib->next = NULL;
+
 	pcii->bus = bus;
 	pcii->device = dev;
 	pcii->function = func;
-	
+
 	fill_basic_pci_structure(pcii);
-	
+
 	pcii->u.h1.rom_base_pci =        read_pci_config(bus, dev, func, PCI_bridge_rom_base, 4);
 	pcii->u.h1.primary_bus =         read_pci_config(bus, dev, func, PCI_primary_bus, 1);
 	pcii->u.h1.secondary_bus =       read_pci_config(bus, dev, func, PCI_secondary_bus, 1);
@@ -929,15 +971,16 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 	show_pci_details(pcii);
 
 pci_bridge_skip_infolist:
-
 	command |= 0x03;
 	write_pci_config(bus, dev, func, PCI_command, 2, command);
 	return;
 }
 
-/* This is a very, very brief 2 liner for a device... */
 
-static void debug_show_device(pci_info *pcii)
+/** This is a very, very brief 2 liner for a device... */
+
+static void
+debug_show_device(pci_info *pcii)
 {
 	uint16 status = read_pci_config(pcii->bus, pcii->device, pcii->function, PCI_status, 2);
 	
@@ -964,20 +1007,24 @@ static void debug_show_device(pci_info *pcii)
 	} else 
 		dprintf("\t(No capabilities exist for this device)\n");
 }
-	
-static void pci_device_probe(uint8 bus, uint8 dev, uint8 func) 
+
+
+static void
+pci_device_probe(uint8 bus, uint8 dev, uint8 func) 
 {
 	uint8 base_class, sub_class;
 	uint8 type;
 	pci_info *pcii;
 	struct pci_device *pcid;
-	
+
+	TRACE(("pci_device_probe()\n"));
+
 	if (func > 0) {
 		uint16 vend = read_pci_config(bus, dev, func, PCI_vendor_id, 2);
 		if (vend == 0xffff)
 			return;
 	}
-	
+
 	type = read_pci_config(bus, dev, func, PCI_header_type, 1);
 	type &= PCI_header_type_mask;
 	base_class = read_pci_config(bus, dev, func, PCI_class_base, 1);
@@ -990,6 +1037,7 @@ static void pci_device_probe(uint8 bus, uint8 dev, uint8 func)
 			return;
 		}
 	}
+
 	/* If we get here then it's not a bridge, so we add it... */
 	pcii = (pci_info*)kmalloc(sizeof(pci_info));
 	if (!pcii)
@@ -999,15 +1047,17 @@ static void pci_device_probe(uint8 bus, uint8 dev, uint8 func)
 		kfree(pcii);
 		return;
 	}
-	
+
 	pcid->info = pcii;
 	pcid->type = PCI_DEVICE;
+	pcid->next = NULL;
+
 	pcii->bus = bus;
 	pcii->device = dev;
 	pcii->function = func;
-	
+
 	fill_basic_pci_structure(pcii);
-	
+
 	if (pcii->class_base == PCI_bridge && pcii->class_sub == PCI_host)
 		pcid->type = PCI_HOST_BUS;
 
@@ -1034,49 +1084,57 @@ static void pci_device_probe(uint8 bus, uint8 dev, uint8 func)
 	debug_show_device(pcii);
 }	
 
-/* pci_bus()
- * Scan a bus for PCI devices. For each device that's a possible
- * we get the vendor_id. If it's 0xffff then it's not a valid
- * device so we move on.
- * Valid devices then have their header_type checked to detrmine how
- * many functions we need to check. However, some devices that support
- * multiple functions have a header_type of 0 (generic) so we also check
- * for these using pci_quirk_multifunction(). 
- * If it's a multifunction device we scan all 8 possible functions, 
- * otherwise we just probe the first one.
+
+/**	Scan a bus for PCI devices. For each device that's a possible
+ *	we get the vendor_id. If it's 0xffff then it's not a valid
+ *	device so we move on.
+ *	Valid devices then have their header_type checked to detrmine how
+ *	many functions we need to check. However, some devices that support
+ *	multiple functions have a header_type of 0 (generic) so we also check
+ *	for these using pci_quirk_multifunction(). 
+ *	If it's a multifunction device we scan all 8 possible functions, 
+ *	otherwise we just probe the first one.
  */
-static void pci_scan_bus(uint8 bus)
+
+static void
+pci_scan_bus(uint8 bus)
 {
 	uint8 dev = 0, func = 0;
 	uint16 vend = 0;
-	
+
+	TRACE(("pci_scan_bus()\n"));
+
 	for (dev = 0; dev < 32; dev++) {
 		vend = read_pci_config(bus, dev, 0, PCI_vendor_id, 2);
 		if (vend != 0xffff) {
 			uint16 device = read_pci_config(bus, dev, func, PCI_device_id, 2);
 			uint8 type = read_pci_config(bus, dev, func, PCI_header_type, 1);
 			uint8 nfunc = 8;
-			
+
 			type &= PCI_header_type_mask;
-			
-			if ((type & PCI_multifunction) == 0 &&
-			    !pci_quirk_multifunction(vend, device))
+
+			if ((type & PCI_multifunction) == 0
+				&& !pci_quirk_multifunction(vend, device))
 				nfunc = 1;
-				
+
 			for (func = 0; func < nfunc; func++)
 				pci_device_probe(bus, dev, func);
 		}
 	}
 }
 
-static void scan_pci(void)
+
+static void
+scan_pci(void)
 {
 	int bus, dev, func; 	
+
+	TRACE(("scan_pci()\n"));
 	
 	/* We can have up to 255 busses */
-	for(bus = 0; bus < 255; bus++) {
+	for (bus = 0; bus < 255; bus++) {
 		/* Each bus can have up to 'bus_max_devices' devices on it */
-		for(dev = 0; dev <= bus_max_devices; dev++) {
+		for (dev = 0; dev <= bus_max_devices; dev++) {
 			/* Each device can have up to 8 functions */
 			uint16 sv_vendor_id = 0, sv_device_id = 0;
 			
@@ -1139,7 +1197,9 @@ static void scan_pci(void)
 	}
 }
 
-static void fill_basic_pci_structure(pci_info *pcii)
+
+static void
+fill_basic_pci_structure(pci_info *pcii)
 {
 	uint8 bus = pcii->bus, dev = pcii->device, func = pcii->function;
 	uint8 int_line = 0, int_pin = 0;
@@ -1164,8 +1224,11 @@ static void fill_basic_pci_structure(pci_info *pcii)
 	int_pin &= PCI_pin_mask;
 }
 
+
 /* XXX - check the return values from this function. */
-static long get_nth_pci_info(long index, pci_info *copyto)
+
+static long
+get_nth_pci_info(long index, pci_info *copyto)
 {
 	/* We copy the index and then decrement it.
 	 * We also set the start found_pci_device pointer to
@@ -1174,6 +1237,8 @@ static long get_nth_pci_info(long index, pci_info *copyto)
 	 */
 	long iter = index;
 	struct pci_device *pd = pci_devices;
+
+	TRACE(("pci_nth_pci_info()\n"));
 
 	/* iterate through the list until we have iter == 0
 	 * NB we go in "reverse" as the devices are inserted into the
@@ -1203,35 +1268,48 @@ static long get_nth_pci_info(long index, pci_info *copyto)
 }
 
 /* I/O routines */
-static uint8 pci_read_io_8(int mapped_io_addr)
+
+static uint8
+pci_read_io_8(int mapped_io_addr)
 {
 	return in8(mapped_io_addr);
 }
 
-static void pci_write_io_8(int mapped_io_addr, uint8 value)
+
+static void
+pci_write_io_8(int mapped_io_addr, uint8 value)
 {
 	out8(value, mapped_io_addr);
 }
 
-static uint16 pci_read_io_16(int mapped_io_addr)
+
+static uint16
+pci_read_io_16(int mapped_io_addr)
 {
 	return in16(mapped_io_addr);
 }
 
-static void pci_write_io_16(int mapped_io_addr, uint16 value)
+
+static void
+pci_write_io_16(int mapped_io_addr, uint16 value)
 {
 	out16(value, mapped_io_addr);
 }
 
-static uint32 pci_read_io_32(int mapped_io_addr )
+
+static uint32
+pci_read_io_32(int mapped_io_addr )
 {
 	return in32(mapped_io_addr);
 }
 
-static void pci_write_io_32(int mapped_io_addr, uint32 value)
+
+static void
+pci_write_io_32(int mapped_io_addr, uint32 value)
 {
 	out32(value, mapped_io_addr);
 }
+
 
 /* pci_module_init
  * This is where we start all the PCI work, or not as the case may be.
@@ -1251,10 +1329,14 @@ static void pci_write_io_32(int mapped_io_addr, uint32 value)
  *
  * Finally we scan for devices starting at bus 0.
  */
-static void pci_module_init(void)
+
+static void
+pci_module_init(void)
 {
 	struct pir_table *pirt = NULL;
-	
+
+	TRACE(("pci_module_init()\n"));
+
 	if (set_pci_mechanism() == -1) {
 		return;
 	}
@@ -1271,7 +1353,7 @@ static void pci_module_init(void)
 	pirt = find_pir_table();
 	if (pirt) {
 		dprintf("PCI IRQ Routing table found\n");
-#if THE_FULL_MONTY
+#if TRACE_PCI
 		print_pir_table(pirt);
 #endif
 	}
@@ -1279,16 +1361,20 @@ static void pci_module_init(void)
 	pci_scan_bus(0);
 }
 
-/* pci_module_uninit
- * Finish the module by releasing the memory we grabbed for 
- * the pci_bios :)
+
+/**	Finish the module by releasing the memory we grabbed for 
+ *	the pci_bios :)
  */
-static void pci_module_uninit(void)
+
+static void
+pci_module_uninit(void)
 {
 	vm_delete_region(vm_get_kernel_aspace_id(), pci_region);
 }
 
-static int std_ops(int32 op, ...)
+
+static int
+std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
@@ -1305,6 +1391,7 @@ static int std_ops(int32 op, ...)
 	return B_OK;
 }
 
+
 struct pci_module_info pci_module = {
 	{
 		{
@@ -1312,9 +1399,9 @@ struct pci_module_info pci_module = {
 			B_KEEP_LOADED,
 			std_ops
 		},
-		NULL//		&pci_rescan
+		NULL	// &pci_rescan
 	},
-	
+
 	&pci_read_io_8,
 	&pci_write_io_8,
 	&pci_read_io_16,
@@ -1324,7 +1411,7 @@ struct pci_module_info pci_module = {
 	&get_nth_pci_info,
 	&read_pci_config,
 	&write_pci_config,
-	NULL,//	&ram_address
+	NULL,	//	&ram_address
 };
 
 module_info *modules[] = {
