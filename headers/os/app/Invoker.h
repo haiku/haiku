@@ -113,7 +113,7 @@ private:
 			BHandler	*fReplyTo;
 			bigtime_t	fTimeout;
 			uint32		fNotifyKind;
-			uint32		_reserved[2];	// to be able to keep binary compatibility
+			uint32		_reserved[1];	// to be able to keep binary compatibility
 };
 //------------------------------------------------------------------------------
 
