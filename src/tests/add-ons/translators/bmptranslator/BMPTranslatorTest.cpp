@@ -14,7 +14,7 @@
 #include <Rect.h>
 #include <File.h>
 #include <DataIO.h>
-#include <BMPTranslator.h>
+#include "../../../../add-ons/translators/bmptranslator/BMPTranslator.h"
 
 // Suite
 CppUnit::Test *
@@ -254,14 +254,575 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 	NextSubTest();
 	BMPFileHeader fheader;
 	fheader.magic = 'MB';
-	fheader.fileSize = 128;
+	fheader.fileSize = 1028;
 	BMallocIO mallabrev;
-	CPPUNIT_ASSERT(mallabrev.Write(&fheader.magic, sizeof(uint16)) == sizeof(uint16));
-	CPPUNIT_ASSERT(mallabrev.Write(&fheader.fileSize, sizeof(uint32)) == sizeof(uint32));
+	CPPUNIT_ASSERT(mallabrev.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallabrev.Write(&fheader.fileSize, 4) == 4);
 	CPPUNIT_ASSERT(ptran->Identify(&mallabrev, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
 	
 	// Write out the MS and OS/2 headers with various fields being corrupt, only one 
-	// corrupt field at a time, also do abrev test for MS header and OS/2 header	
+	// corrupt field at a time, also do abrev test for MS header and OS/2 header
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 53; // bad value, too small to contain all of MS header data
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	MSInfoHeader msheader;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallbadfs;
+	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallbadfs.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallbadfs.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallbadfs, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 7; // bad value, should be zero
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallbadr;
+	CPPUNIT_ASSERT(mallbadr.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallbadr.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallbadr.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallbadr.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallbadr.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallbadr, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 53; // bad value, for MS format, needs to be at least 54
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallbaddo1;
+	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo1.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo1.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo1, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 25; // bad value, for OS/2 format, needs to be at least 26
+	OS2InfoHeader os2header;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallbaddo2;
+	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo2.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 1029; // bad value, larger than the fileSize
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallbaddo3;
+	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo3.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallbaddo3.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallbaddo3, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2abrev;
+	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev.Write(&os2header, 1) == 1); // only 1 byte of the os2 header included
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2abrev, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2abrev2;
+	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2abrev2.Write(&os2header, 5) == 5); // most of the os2 header missing
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2abrev2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmsabrev1;
+	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev1.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev1.Write(&msheader, 1) == 1); // only 1 byte of ms header written
+	CPPUNIT_ASSERT(ptran->Identify(&mallmsabrev1, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmsabrev2;
+	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmsabrev2.Write(&msheader, 15) == 15); // less than half of ms header written
+	CPPUNIT_ASSERT(ptran->Identify(&mallmsabrev2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 39; // size too small for MS format
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmssize;
+	CPPUNIT_ASSERT(mallmssize.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmssize.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmssize, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 41; // size too large for MS format
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmssize2;
+	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmssize2.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmssize2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 11; // os2 header size should be 12
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2size;
+	CPPUNIT_ASSERT(mallos2size.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2size.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2size, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 13; // os2 header size should be 12
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2size2;
+	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2size2.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2size2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 0; // width of zero is ridiculous
+	msheader.height = 5;
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmswidth;
+	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmswidth.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmswidth.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmswidth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 0; // width of zero is ridiculous
+	os2header.height = 5;
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2width;
+	CPPUNIT_ASSERT(mallos2width.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2width.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2width.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2width.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2width.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2width, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 0; // zero is not a good value
+	msheader.planes = 1;
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmsheight;
+	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmsheight.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmsheight.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmsheight, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 0; // bad value
+	os2header.planes = 1;
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2height;
+	CPPUNIT_ASSERT(mallos2height.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2height.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2height.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2height.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2height.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2height, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 0; // should always be 1
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmsplanes;
+	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmsplanes, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 54;
+	msheader.size = 40;
+	msheader.width = 5;
+	msheader.height = 5;
+	msheader.planes = 2; // should always be 1
+	msheader.bitsperpixel = 24;
+	msheader.compression = BMP_NO_COMPRESS;
+	msheader.imagesize = 0;
+	msheader.xpixperm = 23275;
+	msheader.ypixperm = 23275;
+	msheader.colorsused = 0;
+	msheader.colorsimportant = 0;
+	BMallocIO mallmsplanes2;
+	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallmsplanes2.Write(&msheader, 40) == 40);
+	CPPUNIT_ASSERT(ptran->Identify(&mallmsplanes2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 0; // should always be 1
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2planes;
+	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2planes, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	NextSubTest();
+	fheader.magic = 'MB';
+	fheader.fileSize = 1028;
+	fheader.reserved = 0;
+	fheader.dataOffset = 26;
+	os2header.size = 12;
+	os2header.width = 5;
+	os2header.height = 5;
+	os2header.planes = 2; // should always be 1
+	os2header.bitsperpixel = 24;
+	BMallocIO mallos2planes2;
+	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.magic, 2) == 2);
+	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.fileSize, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.reserved, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes2.Write(&fheader.dataOffset, 4) == 4);
+	CPPUNIT_ASSERT(mallos2planes2.Write(&os2header, 12) == 12);
+	CPPUNIT_ASSERT(ptran->Identify(&mallos2planes2, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	// makes sure invalid bit depths aren't recognized
+	const uint16 bitdepths[] = { 0, 2, 3, 5, 6, 7, 9, 23, 25, 31, 33 };
+	const int32 knbitdepths = sizeof(bitdepths) / sizeof(uint16);
+	for (int32 i = 0; i < knbitdepths; i++) {
+		NextSubTest();
+		fheader.magic = 'MB';
+		fheader.fileSize = 1028;
+		fheader.reserved = 0;
+		fheader.dataOffset = 54;
+		msheader.size = 40;
+		msheader.width = 5;
+		msheader.height = 5;
+		msheader.planes = 1;
+		msheader.bitsperpixel = bitdepths[i];
+		msheader.compression = BMP_NO_COMPRESS;
+		msheader.imagesize = 0;
+		msheader.xpixperm = 23275;
+		msheader.ypixperm = 23275;
+		msheader.colorsused = 0;
+		msheader.colorsimportant = 0;
+		BMallocIO mallmsbitdepth;
+		mallmsbitdepth.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.magic, 2) == 2);
+		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.fileSize, 4) == 4);
+		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.reserved, 4) == 4);
+		CPPUNIT_ASSERT(mallmsbitdepth.Write(&fheader.dataOffset, 4) == 4);
+		CPPUNIT_ASSERT(mallmsbitdepth.Write(&msheader, 40) == 40);
+		CPPUNIT_ASSERT(ptran->Identify(&mallmsbitdepth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+		
+		NextSubTest();
+		fheader.magic = 'MB';
+		fheader.fileSize = 1028;
+		fheader.reserved = 0;
+		fheader.dataOffset = 26;
+		os2header.size = 12;
+		os2header.width = 5;
+		os2header.height = 5;
+		os2header.planes = 1;
+		os2header.bitsperpixel = bitdepths[i];
+		BMallocIO mallos2bitdepth;
+		mallos2bitdepth.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.magic, 2) == 2);
+		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.fileSize, 4) == 4);
+		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.reserved, 4) == 4);
+		CPPUNIT_ASSERT(mallos2bitdepth.Write(&fheader.dataOffset, 4) == 4);
+		CPPUNIT_ASSERT(mallos2bitdepth.Write(&os2header, 12) == 12);
+		CPPUNIT_ASSERT(ptran->Identify(&mallos2bitdepth, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	}
+	
+	// makes sure invalid compression values aren't recognized
+	const uint16 cbitdepths[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 23, 24, 25, 31, 32, 33 };
+	const uint32 compvalues[] = { BMP_RLE4_COMPRESS, BMP_RLE8_COMPRESS, 3, 4, 5, 10 };
+	const int32 kncdepths = sizeof(cbitdepths) / sizeof(uint16);
+	const int32 kncomps = sizeof(compvalues) / sizeof(uint32);
+	for (int32 i = 0; i < kncomps; i++)
+		for (int32 n = 0; n < kncdepths; n++) {
+			if (!(compvalues[i] == BMP_RLE4_COMPRESS && cbitdepths[n] == 4) &&
+				!(compvalues[i] == BMP_RLE8_COMPRESS && cbitdepths[n] == 8)) {
+				NextSubTest();
+				fheader.magic = 'MB';
+				fheader.fileSize = 1028;
+				fheader.reserved = 0;
+				fheader.dataOffset = 54;
+				msheader.size = 40;
+				msheader.width = 5;
+				msheader.height = 5;
+				msheader.planes = 1;
+				msheader.bitsperpixel = cbitdepths[n];
+				msheader.compression = compvalues[i];
+				msheader.imagesize = 0;
+				msheader.xpixperm = 23275;
+				msheader.ypixperm = 23275;
+				msheader.colorsused = 0;
+				msheader.colorsimportant = 0;
+				BMallocIO mallmscomp;
+				mallmscomp.Seek(0, SEEK_SET);
+				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.magic, 2) == 2);
+				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.fileSize, 4) == 4);
+				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.reserved, 4) == 4);
+				CPPUNIT_ASSERT(mallmscomp.Write(&fheader.dataOffset, 4) == 4);
+				CPPUNIT_ASSERT(mallmscomp.Write(&msheader, 40) == 40);
+				CPPUNIT_ASSERT(ptran->Identify(&mallmscomp, NULL, NULL, &outinfo, 0)
+					== B_NO_TRANSLATOR);
+			}
+		}
+		
+	// too many colorsused test!
+	const uint16 colordepths[] = { 1, 4, 8, 24, 32 };
+	const int32 kncolordepths = sizeof(colordepths) / sizeof(uint16);
+	for (int32 i = 0; i < kncolordepths; i++) {
+		NextSubTest();
+		fheader.magic = 'BM';
+		fheader.fileSize = 1028;
+		fheader.reserved = 0;
+		fheader.dataOffset = 54;
+		msheader.size = 40;
+		msheader.width = 5;
+		msheader.height = 5;
+		msheader.planes = 1;
+		msheader.bitsperpixel = colordepths[i];
+		msheader.compression = BMP_NO_COMPRESS;
+		msheader.imagesize = 0;
+		msheader.xpixperm = 23275;
+		msheader.ypixperm = 23275;
+		msheader.colorsused = 0; //(1 << colordepths[i])/* + 1*/;
+		msheader.colorsimportant = 0; //(1 << colordepths[i])/* + 1*/;
+		BMallocIO mallmscolors;
+		mallmscolors.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.magic, 2) == 2);
+		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.fileSize, 4) == 4);
+		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.reserved, 4) == 4);
+		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.dataOffset, 4) == 4);
+		CPPUNIT_ASSERT(mallmscolors.Write(&msheader, 40) == 40);
+		CPPUNIT_ASSERT(ptran->Identify(&mallmscolors, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	}
 	
 	// . Release should return NULL because Release has been called
 	// as many times as it has been acquired
@@ -315,8 +876,7 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
 	
 	// . call identify on a BMP with various different options
-	const char *resourcepath =
-		"../src/tests/add-ons/translators/bmptranslator/resources/";
+	const char *resourcepath = "/boot/home/Desktop/resources/";
 	const char *testimages[] = {
 		"blocks.bits", "color_scribbles_8bit_os2.bmp",
 		"blocks_24bit.bmp", "color_scribbles_8bit_rle.bmp",
