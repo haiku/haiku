@@ -806,7 +806,9 @@ BMPTranslatorTest::IdentifyTest()
 		{ "/boot/home/resources/bmp/vsmall_8bit_rle.bmp",
 			"BMP image (MS format, 8 bits, RLE)" },
 		{ "/boot/home/resources/bmp/b_rgb32(32).bmp",
-			"BMP image (MS format, 32 bits)" }
+			"BMP image (MS format, 32 bits)" },
+		{ "/boot/home/resources/bmp/double_click_bmap.bmp",
+			"BMP image (MS format, 24 bits)" }
 	};
 
 	IdentifyTests(this, proster, aBmpPaths,
