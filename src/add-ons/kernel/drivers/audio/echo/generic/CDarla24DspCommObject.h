@@ -59,6 +59,11 @@ public:
 	//	Return rate that was set, -1 if error
 	//
 	virtual DWORD SetSampleRate( DWORD dwNewSampleRate );
+	//
+	//	Send current setting to DSP & return what it is
+	//
+	virtual DWORD SetSampleRate()
+	{ return CGdDspCommObject::SetSampleRate(); }
 
 	//
 	//	Card information
