@@ -6,7 +6,7 @@ UsePosixHeaders ;
 
 # a) Userland stack version:
 
-R5KernelAddon stack : kernel drivers bin :
+R5KernelAddon net_stack_driver : kernel drivers bin :
 	net_userstack_driver.c
 ;
 
@@ -19,7 +19,7 @@ R5KernelAddon stack : kernel drivers bin :
 
 # b) Kernelland stack version:
 #
-#R5KernelAddon stack : kernel drivers bin :
+#R5KernelAddon net_stack_driver : kernel drivers bin :
 #	net_stack_driver.c
 # ;
 #
@@ -36,5 +36,5 @@ R5KernelAddon stack : kernel drivers bin :
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
 	local instDriver = <kernel!drivers!dev!net>stack ;
 	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : stack ;
+	RelSymLink $(instDriver) : net_stack_driver ;
 }
