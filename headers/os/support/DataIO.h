@@ -162,4 +162,4 @@ private:
 	uint32	_reserved[1];
 };
 
-#endif	// _DATA_IO_H
+#endif
