@@ -88,8 +88,6 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
-	fServerHidden	= false;
-	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
 	fTopLayer		= NULL;
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
@@ -107,6 +105,10 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	if (feel!= B_NO_BORDER_WINDOW_LOOK)
 		fDecorator = new_decorator(r, name, look, feel, flags, fDriver);
 
+	RebuildFullRegion();
+
+	desktop->AddWinBorder(this);
+
 	STRACE(("WinBorder %s:\n",GetName()));
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
 	STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
@@ -115,6 +117,9 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 WinBorder::~WinBorder(void)
 {
 	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
+
+	desktop->RemoveWinBorder(this);
+
 	if (fTopLayer){
 		delete fTopLayer;
 		fTopLayer = NULL;
@@ -402,7 +407,14 @@ void WinBorder::Draw(const BRect &r)
 	
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
+	{
+		WinBorder	*wb = GetRootLayer()->FocusWinBorder();
+		if (wb && wb == this)
+			fDecorator->SetFocus(true);
+		else
+			fDecorator->SetFocus(false);
 		fDecorator->Draw(fUpdateReg.Frame());
+	}
 }
 
 //! Moves the winborder with redraw
@@ -425,25 +437,6 @@ void WinBorder::ResizeBy(float x, float y)
 		fDecorator->ResizeBy(x,y);
 
 	resize_layer(x,y);
-}
-
-//! Returns true if hidden
-bool WinBorder::IsHidden() const
-{
-	if (fServerHidden)
-		return true;
-
-	return Layer::IsHidden();
-}
-
-void WinBorder::ServerHide()
-{
-	fServerHidden = true;
-}
-
-void WinBorder::ServerUnhide()
-{
-	fServerHidden = false;
 }
 
 //! Sets the minimum and maximum sizes of the window
@@ -473,186 +466,6 @@ bool WinBorder::HasPoint(const BPoint& pt) const
 	return fFullVisible.Contains(pt);
 }
 
-void WinBorder::SetMainWinBorder(WinBorder *newMain)
-{
-	fMainWinBorder = newMain;
-}
-
-WinBorder* WinBorder::MainWinBorder() const
-{
-	return fMainWinBorder;
-}
-
-void WinBorder::SetLevel(void)
-{
-	switch(fServerWin->Feel())
-	{
-		case B_NORMAL_WINDOW_FEEL:
-			fLevel	= B_NORMAL_FEEL;
-			break;
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-			fLevel	= B_FLOATING_SUBSET_FEEL;
-			break;
-		case B_FLOATING_APP_WINDOW_FEEL:
-			fLevel	= B_FLOATING_APP_FEEL;
-			break;
-		case B_FLOATING_ALL_WINDOW_FEEL:
-			fLevel	= B_FLOATING_ALL_FEEL;
-			break;
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-			fLevel	= B_MODAL_SUBSET_FEEL;
-			break;
-		case B_MODAL_APP_WINDOW_FEEL:
-			fLevel	= B_MODAL_APP_FEEL;
-			break;
-		case B_MODAL_ALL_WINDOW_FEEL:
-			fLevel	= B_MODAL_ALL_FEEL;
-			break;
-		case B_SYSTEM_LAST:
-		case B_SYSTEM_FIRST:
-
-			// TODO: uncomment later when this code makes its way into the real server!
-//			if(_win->ServerTeamID() != _win->ClientTeamID())
-//				_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
-//			else
-				fLevel	= fServerWin->Feel();
-			break;
-		default:
-			fServerWin->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
-			fLevel	= B_NORMAL_FEEL;
-			break;
-	}
-}
-
-// Makes the calling WinBorder a subset window of another
-void WinBorder::AddToSubsetOf(WinBorder* main)
-{
-	STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
-	if (!main || (main && !(main->GetRootLayer())))
-		return;
-
-	if (main->Window()->fWinFMWList.HasItem(this) || !(desktop->HasWinBorder(this)))
-		return;
-
-	if (main->Window()->Feel() == B_NORMAL_WINDOW_FEEL && 
-		(Window()->Feel()==B_FLOATING_SUBSET_WINDOW_FEEL ||	Window()->Feel()==B_MODAL_SUBSET_WINDOW_FEEL) )
-	{
-		// if the main window is hidden also hide this one.
-		if(main->IsHidden())
-			Hide();//fHidden = true;
-
-		// add to main window's subset
-		main->Window()->fWinFMWList.AddItem(this);
-
-		// set this member accordingly
-		fMainWinBorder = main;
-
-		// because this window is in a subset it should appear in the
-		// workspaces its main window appears in.
-		Window()->QuietlySetWorkspaces(main->Window()->Workspaces());
-
-		// this is a modal window, so add it to main window's workspaces.
-		if (Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-		{
-			RootLayer		*rl = main->GetRootLayer();
-			rl->fMainLock.Lock();
-			rl->AddWinBorderToWorkspaces(this, main->Window()->Workspaces());
-			rl->fMainLock.Unlock();
-		}
-
-		// this a *floating* window so if the main window is 'front', and add it to workspace.
-		if ( !(main->IsHidden()) && Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
-		{
-			RootLayer		*rl = main->GetRootLayer();
-
-			desktop->fGeneralLock.Lock();
-			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
-
-			rl->fMainLock.Lock();
-			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
-
-			for(int32 i = 0; i < rl->WorkspaceCount(); i++)
-			{
-				Workspace	*ws = rl->WorkspaceAt(i+1);
-				if(ws->FrontLayer() == main)
-					ws->AddWinBorder(this);
-			}
-
-			rl->fMainLock.Unlock();
-			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
-
-			desktop->fGeneralLock.Unlock();
-			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
-		}
-	}
-}
-
-// Removes the calling WinBorder from the subset window of another
-void WinBorder::RemoveFromSubsetOf(WinBorder* main)
-{
-	STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
-	RootLayer		*rl = main->GetRootLayer();
-
-	desktop->fGeneralLock.Lock();
-	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
-	
-	rl->fMainLock.Lock();
-	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
-
-	// remove from main window's subset list.
-	if(main->Window()->fWinFMWList.RemoveItem(this))
-	{
-		int32	count = main->GetRootLayer()->WorkspaceCount();
-		for(int32 i=0; i < count; i++)
-		{
-			if(main->Window()->Workspaces() & (0x00000001 << i))
-			{
-				Workspace	*ws = main->GetRootLayer()->WorkspaceAt(i+1);
-
-				// if its main window is in 'i' workspaces, remove it from
-				// workspace 'i' if it's in there...
-				ws->RemoveWinBorder(this);
-			}
-		}
-	}
-	fMainWinBorder	= NULL;
-
-	rl->fMainLock.Unlock();
-	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
-
- 	desktop->fGeneralLock.Unlock();
-	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
-}
-
-//! Prints information about the WinBorder's current state
-void WinBorder::PrintToStream()
-{
-	printf("\t%s", GetName());
-
-	if (fLevel == B_FLOATING_SUBSET_FEEL)
-		printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
-
-	if (fLevel == B_FLOATING_APP_FEEL)
-		printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
-
-	if (fLevel == B_FLOATING_ALL_FEEL)
-		printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
-
-	if (fLevel == B_MODAL_SUBSET_FEEL)
-		printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
-
-	if (fLevel == B_MODAL_APP_FEEL)
-		printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
-
-	if (fLevel == B_MODAL_ALL_FEEL)
-		printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
-
-	if (fLevel == B_NORMAL_FEEL)
-		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
-
-	printf("\t%s\n", IsHidden() ? "hidden" : "not hidden");
-}
-
 // Unimplemented. Hook function for handling when system GUI colors change
 void WinBorder::UpdateColors(void)
 {
@@ -675,4 +488,44 @@ void WinBorder::UpdateFont(void)
 void WinBorder::UpdateScreen(void)
 {
 	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
+}
+
+//--------------------- P R I V A T E -------------------
+void WinBorder::SetLevel()
+{
+	switch(fServerWin->Feel())
+	{
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+		case B_FLOATING_APP_WINDOW_FEEL:
+			fLevel	= B_FLOATING_APP;
+			break;
+
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+		case B_MODAL_APP_WINDOW_FEEL:
+			fLevel	= B_MODAL_APP;
+			break;
+
+		case B_NORMAL_WINDOW_FEEL:
+			fLevel	= B_NORMAL;
+			break;
+
+		case B_FLOATING_ALL_WINDOW_FEEL:
+			fLevel	= B_FLOATING_ALL;
+			break;
+
+		case B_MODAL_ALL_WINDOW_FEEL:
+			fLevel	= B_MODAL_ALL;
+			break;
+			
+		case B_SYSTEM_LAST:
+			fLevel	= B_SYSTEM_LAST;
+			break;
+
+		case B_SYSTEM_FIRST:
+			fLevel	= B_SYSTEM_FIRST;
+			break;
+
+		default:
+			fLevel	= B_NORMAL;
+	}
 }

@@ -78,7 +78,7 @@ public:
 	team_id	ClientTeamID();
 	
 	FMWList fAppFMWList;
-	
+const char * Title() const { return fSignature.String(); }
 protected:
 	friend class AppServer;
 	friend class ServerWindow;

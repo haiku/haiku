@@ -31,6 +31,18 @@
 #include <Rect.h>
 #include <String.h>
 #include "Layer.h"
+#include "FMWList.h"
+
+// these are used by window manager to properly place window.
+enum {
+	B_SYSTEM_LAST = -10L,
+	B_FLOATING_APP = 0L,
+	B_MODAL_APP = 1L,
+	B_NORMAL = 2L,
+	B_FLOATING_ALL = 3L,
+	B_MODAL_ALL = 4L,
+	B_SYSTEM_FIRST = 10L,
+};
 
 class ServerWindow;
 class Decorator;
@@ -66,10 +78,6 @@ public:
 
 	virtual	void RebuildFullRegion(void);
 
-	virtual bool IsHidden() const;
-	void ServerHide();
-	void ServerUnhide();
-
 	void SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight);
 
 	void MouseDown(PointerEvent& evt, bool sendMessage);
@@ -84,21 +92,16 @@ public:
 	
 	virtual bool HasClient(void) { return false; }
 	Decorator *GetDecorator(void) const { return fDecorator; }
-	WinBorder *MainWinBorder() const;
 	
-	void SetLevel();
 	void HighlightDecorator(const bool &active);
 	
 	bool HasPoint(const BPoint &pt) const;
 	
-	void AddToSubsetOf(WinBorder* main);
-	void RemoveFromSubsetOf(WinBorder* main);
-	
-	void PrintToStream();
-	
-	// Server "private" :-) - should not be used
-	void SetMainWinBorder(WinBorder *newMain);	
-	
+	FMWList		fFMWList;
+
+private:
+	void SetLevel();
+
 protected:
 	friend class Layer;
 	friend class ServerWindow;
@@ -111,8 +114,6 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
-	bool fServerHidden;
-	WinBorder *fMainWinBorder;
 	bool fIsMoving;
 	bool fIsResizing;
 	bool fIsClosing;

@@ -45,7 +45,6 @@
 #include "ServerApp.h"
 #include "ServerProtocol.h"
 #include "WinBorder.h"
-#include "Desktop.h"
 #include "TokenHandler.h"
 #include "Utils.h"
 #include "DisplayDriver.h"
@@ -53,10 +52,10 @@
 #include "Workspace.h"
 #include "MessagePrivate.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
-#define DEBUG_SERVERWINDOW_GRAPHICS
+//#define DEBUG_SERVERWINDOW_GRAPHICS
 
 
 #ifdef DEBUG_SERVERWINDOW
@@ -150,7 +149,30 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	fClientLooperPort = looperPort;
 	fClientTeamID = winapp->ClientTeamID();
 	fWorkspaces = index;
-	
+
+	// floating and modal windows must appear in every workspace where
+	// their main window is present. Thus their wksIndex will be set to
+	// '0x0' and they will be made visible when needed.
+	switch (fFeel)
+	{
+		case B_MODAL_APP_WINDOW_FEEL:
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+		case B_FLOATING_APP_WINDOW_FEEL:
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			fWorkspaces = 0x0UL;
+			break;
+		case B_MODAL_ALL_WINDOW_FEEL:
+		case B_FLOATING_ALL_WINDOW_FEEL:
+		case B_SYSTEM_LAST:
+		case B_SYSTEM_FIRST:
+			fWorkspaces = 0xffffffffUL;
+			break;
+		case B_NORMAL_WINDOW_FEEL:
+			if (fWorkspaces == 0x0UL)
+				;;
+// TODO: get RootLayer's ActiveWorkspaceIndex 
+	}
+
 	fWinBorder = NULL;
 	cl = NULL;	//current layer
 	
@@ -178,7 +200,6 @@ void ServerWindow::Init(void)
 {
 	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, 0UL,
 			this, desktop->GetDisplayDriver());
-	fWinBorder->RebuildFullRegion();
 
 	// Spawn our message-monitoring thread
 	fMonitorThreadID = spawn_thread(MonitorWin, fTitle.String(), B_NORMAL_PRIORITY, this);
@@ -192,9 +213,14 @@ ServerWindow::~ServerWindow(void)
 {
 	STRACE(("*ServerWindow (%s):~ServerWindow()\n",fTitle.String()));
 	
-	desktop->RemoveWinBorder(fWinBorder);
-	STRACE(("ServerWindow(%s) Successfully removed from the desktop\n", fTitle.String()));
-	
+	if (fWinBorder)
+	{
+		delete fWinBorder;
+		fWinBorder = NULL;
+	}
+
+	cl = NULL;
+
 	if(fMsgSender)
 	{
 		delete fMsgSender;
@@ -206,14 +232,6 @@ ServerWindow::~ServerWindow(void)
 		delete fMsgReader;
 		fMsgReader=NULL;
 	}
-		
-	if (fWinBorder)
-	{
-		delete fWinBorder;
-		fWinBorder = NULL;
-	}
-	
-	cl = NULL;
 	
 	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle.String()));
 }
@@ -245,7 +263,7 @@ void ServerWindow::Quit(void)
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
-
+	STRACE(("ServerWindow %s: Show\n",fTitle.String()));
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::Show()\n");
 
@@ -258,6 +276,7 @@ void ServerWindow::Show(void)
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
+	STRACE(("ServerWindow %s: Hide\n",fTitle.String()));
 	if (!IsLocked())
 		debugger("you must lock a ServerWindow object before calling ::Hide()\n");
 
@@ -565,7 +584,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot, LinkMsgReader &link)
 	link.Read<int32>(&childCount);
 			
 	STRACE(("ServerWindow(%s)::CreateLayerTree()-> layer %s, token %ld\n", fTitle.String(),name,token));
-	
+
 	Layer *newLayer;
 	newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, desktop->GetDisplayDriver());
@@ -719,7 +738,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_CREATE_ROOT:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT\n", fTitle.String()));
-						
+
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
 			if (cl != NULL)
@@ -732,8 +751,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			// connect decorator and top layer.
 			fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
-			desktop->AddWinBorder(fWinBorder);
-
 			break;
 		}
 
@@ -1439,7 +1456,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			WinBorder *wb;
 			int32 mainToken;
 			team_id	teamID;
-			
+
+printf("ServerWindow %s: Message AS_ADD_TO_SUBSET UNIMPLEMENTED\n",fTitle.String());
+
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
 			
@@ -1449,7 +1468,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Flush();
 				
-				fWinBorder->AddToSubsetOf(wb);
+//				fWinBorder->AddToSubsetOf(wb);
 			}
 			else
 			{
@@ -1464,6 +1483,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			WinBorder *wb;
 			int32 mainToken;
 			team_id teamID;
+
+printf("ServerWindow %s: Message AS_REM_FROM_SUBSET UNIMPLEMENTED\n",fTitle.String());
 			
 			link.Read<int32>(&mainToken);
 			link.Read(&teamID, sizeof(team_id));
@@ -1474,7 +1495,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				fMsgSender->StartMessage(SERVER_TRUE);
 				fMsgSender->Flush();
 				
-				fWinBorder->RemoveFromSubsetOf(wb);
+//				fWinBorder->RemoveFromSubsetOf(wb);
 			}
 			else
 			{

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,17 +20,50 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Workspace.cpp
-//	Author:			Adi Oanca <adioanca@mymail.ro>
+//	Author:			Adi Oanca <adioanca@cotty.iren.ro>
 //	Description:	Tracks workspaces
 //  
 //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //  Notes:			IMPORTANT WARNING
 //					This object does not use any locking mechanism. It is designed
-//					to be used only by RootLayer class. DO NOT USE from another class!
+//					to be used by RootLayer class ONLY. DO NOT USE from elsewhere!
+//
+//	Design Spec:
+//			The purpose of this class it to have visible windows appear in the
+// correct order as defined by GUI guidelines. Those define 3 main type of windows:
+// normal windows, modal and floating windows. Aditionaly there must be support
+// for another 2 types of windows which will be used in special cases. We're talking
+// about system front windows which always will be the front-most and have focus, and
+// system last windows which will always be behind all other kind of windows.
+//
+//			Normal windows will always be in Workspace's list, be it they are hidden
+// or not. They are added by hand (AddWinBorder()) only. Same goes for system last
+// windows, system first, modall all and floating all windows. Those remaining
+// are: modal subset, modal app, floating subset and floating app. Those will be
+// added and removed on-the-fly as they are needed.
+//
+//			To keep correct track of modal subset/app and floating subset/app windows
+// we need to have them in a list. Also, we want every normal window to
+// maintain its floating windows order. For that we define a list for every normal
+// window in which we'll add floating subset & app windows alongside with subset
+// modals. Application modals go in a separate list which is hold for every
+// application (ServerApp) object. For normal window's list: when a floating win
+// is need (when normal window becomes front) it is always removed and automaticaly
+// added to workspace's list. When that normal looses front state, it reinserts
+// all floating windows it has used back into its list, thus saving the exact order
+// of floating windows. Modal windows are never removed from normal or application's
+// list, but they are automaticaly added and removed from workspace's list as needed.
+// (ex: a modal app won't appear until a normal window from the same app is visible)
+//
+//			Front status is a bit hard to explain. It's a state which helps keep
+// the wanted order. For example, if a modal window is set to have front status,
+// an automatic search is made to see if another modal was created after this
+// one and thus needs to have front state (read: thus have to be in front this).
+// Another use is to have floating windows pop up in front of a normal window when
+// no modal exist to steal front state.
 //------------------------------------------------------------------------------
-#include <AppDefs.h>
-#include <Message.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <Window.h>
 
 #include "Workspace.h"
@@ -39,7 +72,6 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "RGBColor.h"
-#include "Globals.h"
 #include "FMWList.h"
 
 //#define DEBUG_WORKSPACE
@@ -59,23 +91,25 @@
 #endif
 
 //----------------------------------------------------------------------------------
-
-Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor)
+/*!
+	\brief	Creates a new Workspace object which has its own resolution and background color.
+*/
+Workspace::Workspace(const int32 ID, const uint32 colorspace, const RGBColor& BGColor)
+	: fBGColor(BGColor)
 {
+STRACE(("New Workspace(%ld)\n", fID));
 	fID			= ID;
 	fSpace		= colorspace;
-	fBGColor	= BGColor;
 
 	fBottomItem	= NULL;
 	fTopItem	= NULL;
-	fCurrentItem= NULL;
 	fFocusItem	= NULL;
 	fFrontItem	= NULL;
 	
 	fVirtualWidth=-1;
 	fVirtualHeight=-1;
-	
-	// TODO: find out more about good default values for display timing and init the structure to them
+
+	// TODO: find out more about good default values and init the structure to them
 	fDisplayTiming.pixel_clock=0;
 	fDisplayTiming.h_display=0;
 	fDisplayTiming.h_sync_start=0;
@@ -89,1261 +123,814 @@ Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor)
 }
 
 //----------------------------------------------------------------------------------
-
+/*!
+	\brief	Frees internal data.
+*/
 Workspace::~Workspace(void)
 {
+STRACE(("~Workspace(%ld) - say bye bye\n", fID));
+	fFocusItem		= NULL;
+	fFrontItem		= NULL;
+
 	ListData		*toast;
 	while(fBottomItem)
 	{
 		toast		= fBottomItem;
 		fBottomItem	= fBottomItem->upperItem;
 		
-		delete toast;
+		fPool.ReleaseMemory(toast);
 	}
 	fBottomItem		= NULL;
 	fTopItem		= NULL;
-	fCurrentItem	= NULL;
-	fFocusItem		= NULL;
-	fFrontItem		= NULL;
 }
 
 //----------------------------------------------------------------------------------
-/*
-	Adds layer ptr to workspace's list of WinBorders. After the item is added a
-	*smart* search is performed to set the new front WinBorder. Of course,
-	the first candidate is 'layer', but if it is hidden or it has the
-	B_AVOID_FRONT flag, surely it won't get that status.
-	This method also calls SearchAndSetNewFocus which searches for a WinBorder,
-	to give focus to, having as preferred 'layer'.
-	Remember, some windows having B_AVOID_FOCUS can't have the focus state.
+/*!
+	\brief	Adds layer ptr to workspace's list of WinBorders.
 */
-bool Workspace::AddWinBorder(WinBorder *layer)
+void Workspace::AddWinBorder(WinBorder *winBorder)
 {
-	if (layer == NULL)
-		debugger("NULL pointer in Workspace::AddLayerPtr\n");
+STRACE(("W(%ld)::AddWinBorder(%s)\n", fID, winBorder?winBorder->GetName():"NULL"));
+	if (winBorder->Level() == B_FLOATING_APP)
+	{
+		// floating windows are automaticaly added when needed
+		// you cannot add one by hand.
+		return;
+	}
+
+	if (HasItem(winBorder))
+	{
+		// NOTE: you may remove 'debugger' at Release Candidate time
+		debugger("WinBorder ALREADY in Workspace's list\n");
+		return;
+	}
 
 	// allocate a new item
-	ListData		*item;
-	item			= new ListData;
-	
-	item->layerPtr	= layer;
-	item->upperItem	= NULL;
-	item->lowerItem	= NULL;
+	ListData		*item = fPool.GetCleanMemory(winBorder);
 
-	// insert 'item' at the end. It doesn't matter where we add it,
-	// it will be placed correctly by SearchAndSetNewFront(item->layerPtr);
-	InsertItem(item, NULL);
-
-	STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
-
-	BringToFrontANormalWindow(layer);
-
-	// do a *smart* search and set the new 'front'
-	SearchAndSetNewFront(layer);
-
-	// do a *smart* search and set the new 'focus'
-	SearchAndSetNewFocus(layer);
-	
-	return true;
+	// place this winBorder in what seems the most appropriate location.
+	// Do not change front window
+	placeInFront(item, false);
 }
 
 //----------------------------------------------------------------------------------
 /*
-	Removes a WinBorder from workspace's list. It DOES NOT delete it!
-	If this window was the front/focus one it calls SearchAndSetNew(Front/Focus)
-	to give the respective state to the window below her.
+	\brief	Removes a WinBorder from workspace's list.
 */
-bool Workspace::RemoveWinBorder(WinBorder *layer)
+void Workspace::RemoveWinBorder(WinBorder *winBorder)
 {
-	if (layer == NULL)
-		return false;
-
-	STRACE(("\n*Workspace(%ld)::RemoveLayerPtr(%s)\n", ID(), layer->GetName()));
-	STRACE(("BEFORE ANY opperation:\n"));
-	STRACESTREAM();
-
-	// search to see if this workspace has WinBorder's pointer in its list
-	ListData	*item = NULL;
-
-	if((item = HasItem(layer)))
+STRACE(("W(%ld)::RemoveWinBorder(%s)\n", fID, winBorder?winBorder->GetName():"NULL"));
+	ListData	*item = HasItem(winBorder);
+	if (item)
 	{
-		ListData	*nextItem	= NULL;
-		bool		wasFront	= false;
-		bool		wasFocus	= false;
-		
-		wasFront	= FrontLayer() == layer;
-		wasFocus	= FocusLayer() == layer;
-
-		// prepare to set new front/focus if this layer was front/focus
-		nextItem	= item->upperItem;
-
-		if(wasFront)
-			SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
-
-		// remove some windows.
-		if(item && item->layerPtr->fLevel == B_NORMAL_FEEL)
-		{
-			ListData	*listItem = item->lowerItem;
-			while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
-					|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL
-					|| listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL))
-			{
-				// *carefuly* remove the item from the list
-				ListData	*itemX = listItem;
-				listItem	= listItem->lowerItem;
-				RemoveItem(itemX);
-				delete itemX;
-			}
-		}
-		
 		RemoveItem(item);
-		delete item;
-		STRACESTREAM();		
-
-		// reset some internal variables
-		layer->SetMainWinBorder(NULL);
-
-		STRACE(("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID()));
-
-		SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
-
-		return true;
-	}
-	else
-	{
-		STRACE(("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID()));
-		return false;
+		fPool.ReleaseMemory(item);
 	}
 }
 
 //----------------------------------------------------------------------------------
 
-bool Workspace::HideSubsetWindows(WinBorder *layer)
+bool Workspace::HasWinBorder(const WinBorder* winBorder) const
 {
-	if(!layer)
-		return false;
-
-	// search to see if this workspace has WinBorder's pointer in its list
-	ListData	*item = NULL;
-
-	if((item = HasItem(layer)))
-	{
-		ListData	*nextItem = NULL;
-
-		// prepare to set new front/focus if this layer was front/focus
-		nextItem	= item->upperItem;
-
-		SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
-
-		// we don't care about focus in this method
-		//SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
-
-		// remove some windows.
-		if(item && item->layerPtr->fLevel == B_NORMAL_FEEL)
-		{
-			ListData	*listItem = item->lowerItem;
-			while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
-						|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL
-						|| listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL))
-			{
-				// carefully remove the item from the list
-				ListData	*itemX = listItem;
-				listItem	= listItem->lowerItem;
-				RemoveItem(itemX);
-				delete itemX;
-			}
-		}
-		
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return HasItem(winBorder)? true: false;
 }
 
 //----------------------------------------------------------------------------------
 
-WinBorder *Workspace::FocusLayer() const
+WinBorder *Workspace::Focus() const
 {
 	return fFocusItem ? fFocusItem->layerPtr : NULL;
 }
 
 //----------------------------------------------------------------------------------
 
-WinBorder *Workspace::FrontLayer() const
+WinBorder *Workspace::Front() const
 {
 	return fFrontItem? fFrontItem->layerPtr: NULL;
 }
 
 //----------------------------------------------------------------------------------
-
-WinBorder *Workspace::GoToBottomItem(void)
+/*
+	\brief	This method provides you the list of visible windows in this workspace.
+	\param	list The list of visible WinBorders found in this workspace.
+	\param	itemCount Number of WinBorder pointers found in the list.
+*/
+void Workspace::GetWinBorderList(void **&list, int32 *itemCount ) const
 {
-	fCurrentItem	= fBottomItem;
-	return fCurrentItem ? fCurrentItem->layerPtr : NULL;
-}
+	int32		count = 0;
+	ListData	*cursor;
 
-//----------------------------------------------------------------------------------
-
-WinBorder *Workspace::GoToUpperItem(void)
-{
-	if(fCurrentItem)
+	cursor		= fBottomItem;
+	while(cursor)
 	{
-		fCurrentItem	= fCurrentItem->upperItem;
-		return fCurrentItem ? fCurrentItem->layerPtr : NULL;
+		if (!cursor->layerPtr->IsHidden())
+			count++;
+		cursor = cursor->upperItem;
+	}
+
+	if (count == 0)
+	{
+		*itemCount = 0;
+		list = NULL;
+		return;
+	}
+
+	void		**mylist;
+	mylist		= (void**)malloc(sizeof(void*) * count);
+	if (mylist)
+	{
+		list		= mylist;
+		*itemCount	= count;
+
+		cursor = fBottomItem;
+		while(cursor)
+		{
+			if (!cursor->layerPtr->IsHidden())
+			{
+				*mylist	= cursor->layerPtr;
+				mylist++;
+			}
+			cursor = cursor->upperItem;
+		}
 	}
 	else
-		return NULL;
-}
-
-//----------------------------------------------------------------------------------
-
-WinBorder *Workspace::GoToTopItem(void)
-{
-	fCurrentItem	= fTopItem;
-	return fCurrentItem ? fCurrentItem->layerPtr : NULL;
-}
-
-//----------------------------------------------------------------------------------
-
-WinBorder *Workspace::GoToLowerItem(void)
-{
-	if(fCurrentItem)
 	{
-		fCurrentItem	= fCurrentItem->lowerItem;
-		return fCurrentItem ? fCurrentItem->layerPtr : NULL;
+		list = NULL;
+		itemCount = 0;
 	}
-	else
-		return NULL;
 }
-
+	
 //----------------------------------------------------------------------------------
+/*!
+	\brief	Makes the specified WinBorder the front one.
+	\param	newFront WinBorder which will try to take front state.
+	\param	doNotDisturb In case user is busy typing something, don't bring \a newFront
+			in front stealing front&focus, but place imediately after.
+	\return	True if the list of WinBorders has changed, false otherwise.
 
-bool Workspace::GoToItem(WinBorder *layer)
+	This method tries to make \a newFront the new front WinBorder. "It tries" because
+if this a B_NORMAL window with subset or application modals those will be displayed
+in front and get the front state. If no subset or application modals exist, then this
+B_NORMAL window will get front (and focus) state and subset and application floating
+window will be shown in front.
+	Note that floating windows cannot get/have front state.
+*/
+bool Workspace::MoveToFront(WinBorder *newFront, bool doNotDisturb)
 {
-	if(!layer)
+STRACE(("\nWks(%ld)::MoveToFront ~%s~ \n", fID, newFront?newFront->GetName():"NULL"));
+	if (!newFront)
 		return false;
 
-	if(fCurrentItem && fCurrentItem->layerPtr == layer)
-		return true;
-	
-	for( ListData *item = fBottomItem; item != NULL; item = item->upperItem)
+	if (newFront->IsHidden())
+		return false;
+
+	if (fFrontItem && newFront == fFrontItem->layerPtr)
 	{
-		if(item->layerPtr == layer)
+		// in case this normal window is the front window,
+		// BUT it does not have focus.
+		ListData	*newFocusItem = HasItem(newFront);
+		if (newFocusItem && fFocusItem != newFocusItem
+			&& !(newFront->Window()->Flags() & B_AVOID_FOCUS))
 		{
-			fCurrentItem	= item;
-			return true;
+			fFocusItem = newFocusItem;
 		}
+
+		// we didn't change windows order
+		return false;
 	}
-	return false;
-}
-
-//----------------------------------------------------------------------------------
-
-ListData *Workspace::HasItem(ListData *item)
-{
-	for (ListData *itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem)
-	{
-		if(item == itemX)
-			return itemX;
-	}
-	return NULL;
-}
-
-//----------------------------------------------------------------------------------
-
-ListData *Workspace::HasItem(WinBorder *layer)
-{
-	for (ListData *item = fBottomItem; item != NULL; item = item->upperItem)
-	{
-		if(item->layerPtr == layer)
-			return item;
-	}
-	return NULL;
-}
-
-//----------------------------------------------------------------------------------
-/*
-	This, also is a "smart" method. Firstly this funtionality was in
-	SearchAndSetNewFront, but I've split it for reasons of clarity. Anyway,
-	what is to be noticed is that those 2 methods work hand-in-hand.
-	What FindPlace() litelaly does, isplace* the 'pref' item into its
-	>right< place! If 'pref->layerPtr'(the WinBorder in ListData structure)
-	does not meet some conditions a search for another, valid, WinBorder is
-	being made.
-	
-	NOTE: Do NOT be confussed! This method places the preferred windowONLY*!
-	Other windows that need to be placed before it, *WILL* be placed by almost
-	all code found in SearchAndSetNewFront
-*/
-ListData *Workspace::FindPlace(ListData *pref)
-{
-	// if we received a NULL value, we stil have to give 'front' state to some window...
-	if(!pref)
-		pref	= HasItem(fBottomItem);
 	else
-		pref	= HasItem(pref);
+		return ShowWinBorder(newFront);
+}
 
-	ListData	*item = NULL;
+//----------------------------------------------------------------------------------
+/*!
+	\brief	Moves the specified WinBorder in the back as it is possible.
+	\param	newLast WinBorder which will be placed in the back.
+	\return	True if the list of WinBorders has changed, false otherwise.
 
-	// search a window that is not hidden and does *not* have B_AVOID_FRONT flag.
-	item		= pref;
-	while(pref && item->lowerItem != pref && (pref->upperItem || pref->lowerItem))
+		WinBorder \a newLast will go in the back as much as possible. Note that this
+action is tricky. While normal windows will always go into the back, front modal windows
+won't go into the back if the next front window will be a B_NORMAL or B_MODAL_APP part
+of the same team which was previously created. If it were possible it would
+undermine the role of modal windows in the system. Another example regards B_FLOATING_APP
+windows. These will ge in the back as possible, but never farther than the front
+B_NORMAL window in front of which they appear.
+*/
+bool Workspace::MoveToBack(WinBorder *newLast)
+{
+STRACE(("Wks(%ld)::MoveToBack(%s) \n", fID, newLast? newLast->GetName(): "NULL"));
+	if (newLast->IsHidden())
+		return false;
+
+	ListData		*newLastItem;
+	newLastItem		= HasItem(newLast);
+	if (!newLastItem)
+		return false;
+
+	bool	returnValue	= false;
+	bool	changeFront	= false;
+	int32	level		= newLast->Level();
+	if (level > B_SYSTEM_FIRST)
+		level = B_SYSTEM_FIRST;
+
+	if (fFrontItem && fFrontItem == newLastItem)
+		changeFront = true;
+
+	switch(newLast->Level())
 	{
-		if( !(item->layerPtr->Window()->Flags() & B_AVOID_FRONT) && !(item->layerPtr->IsHidden()) )
-			break;
-
-		STRACE(("item: %s - pref: %s\n", item->layerPtr->GetName(), pref->layerPtr->GetName()));
-
-		if(item == fTopItem)
-			item = fBottomItem;
-		else
-			item = item->upperItem;
-	}
-
-	// if true, it means we have windows with B_AVOID_FRONT flag *only*,
-	// or they are all hidden. Pick one, if you can.
-	if(pref && item->lowerItem == pref)
-	{
-		for (item = fBottomItem; item; item = item->upperItem)
-		{
-			if( !(item->layerPtr->IsHidden()) )
-				break;
-		}
-	}
-
-	// if the search took place or not...
-	pref = item;
-
-	// we have exhausted all possibilities to make pref a vaid pointer... so... exit now.
-	if(!pref)
-		return NULL;
-
-	// temporarily remove 'pref' to reinsert it later in the right place
-	RemoveItem(pref);
-
-	// we start searching its place
-	ListData		*cursor	= fBottomItem;
-	int32			feel	= pref->layerPtr->Window()->Feel();
-	
-	switch(feel)
-	{
-		case B_NORMAL_WINDOW_FEEL:
-		{
-			while(cursor &&	cursor->layerPtr->fLevel > B_MODAL_APP_FEEL)
-				cursor	= cursor->upperItem;
-			
-			InsertItem(pref, cursor? cursor->lowerItem: NULL);
-			break;
-		}
-		
+		case B_MODAL_ALL:
+		case B_SYSTEM_FIRST:
 		case B_SYSTEM_LAST:
 		{
-			while(cursor &&	cursor->layerPtr->fLevel > pref->layerPtr->fLevel)
-				cursor	= cursor->upperItem;
-			
-			InsertItem(pref, cursor? cursor->lowerItem: fTopItem);
-			break;
+			// these kind of windows do not change position
+			return false;
 		}
-		
-		case B_SYSTEM_FIRST:
-		case B_FLOATING_ALL_WINDOW_FEEL:
-		case B_MODAL_ALL_WINDOW_FEEL:
-		case B_MODAL_APP_WINDOW_FEEL:
+		break;
+		case B_NORMAL:
 		{
-			while(cursor &&	cursor->layerPtr->fLevel > pref->layerPtr->fLevel)
-				cursor	= cursor->upperItem;
-			
-			InsertItem(pref, cursor? cursor->lowerItem: NULL);
-			break;
-		}
+			ListData	*cursor = newLastItem->upperItem;
 
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			// we are already the back-most window.
+			if (!cursor || cursor->layerPtr->Level() == B_SYSTEM_LAST )
+				return false;
+
+			if (changeFront)
+				saveFloatingWindows(fFrontItem);
+		}
+		// NOTE: no 'break;' here...
+		case B_FLOATING_APP:
+		case B_FLOATING_ALL:
 		{
-			// place in front of: its main window, other subset windows and in front
-			// of other application's floating windows.
-			// NOTE that this happens only if its main window is the front most one.
-			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem)
+			placeToBack(newLastItem);
+		}
+		break;
+		case B_MODAL_APP:
+		{
+			ListData	*cursor = newLastItem->upperItem;
+
+			// we are already the back-most window.
+			if (!cursor || cursor->layerPtr->Level() == B_SYSTEM_LAST )
+				return false;
+
+			// this is a modal app
+			if (newLast->App()->fAppFMWList.HasItem(newLast))
 			{
-				if(cursor->layerPtr->fLevel <= pref->layerPtr->fLevel
-					&& (cursor->layerPtr == pref->layerPtr->MainWinBorder()
-					|| cursor->layerPtr->MainWinBorder() == pref->layerPtr->MainWinBorder())  )
+				ListData	*before;
+
+				// remove now to properly place later
+				RemoveItem(newLastItem);
+
+				while (cursor)
 				{
-					break;
-				}
-				else
-				if(pref->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL &&
-						cursor->layerPtr->fLevel == B_FLOATING_APP_FEEL)
-				{
-					break;
-				}
-			}
-			if(cursor)
-				InsertItem(pref, cursor? cursor->lowerItem: NULL);
-			break;
-		}
-
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		{
-			// place this SUBSET_MODAL behind APP_MODAL ones if they belong
-			// to the same application OR, in front of all MODAL/NORMAL if
-			// it belongs to another application
-
-			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem)
-			{
-				if(cursor->layerPtr->fLevel <= pref->layerPtr->fLevel)
-					break;
-				else
-				if(pref->layerPtr->fLevel == B_MODAL_SUBSET_FEEL && 
-					cursor->layerPtr->fLevel == B_MODAL_APP_FEEL && 
-					pref->layerPtr->Window()->ClientTeamID() !=  cursor->layerPtr->Window()->ClientTeamID())
-				{
-					break;
-				}
-			}
-
-			if(cursor)
-				InsertItem(pref, cursor? cursor->lowerItem: NULL);
-
-			break;
-		}
-
-		case B_FLOATING_APP_WINDOW_FEEL:
-		{
-			// place in front of: its main window, other floating windows
-			// NOTE that this happens only if its main window is the front most one.
-			for(cursor = fBottomItem; cursor; cursor = cursor->upperItem)
-			{
-				if(cursor->layerPtr->fLevel <= pref->layerPtr->fLevel && 
-					pref->layerPtr->Window()->ClientTeamID() == cursor->layerPtr->Window()->ClientTeamID())
-				{
-					break;
-				}
-			}
-
-			if(cursor)
-				InsertItem(pref, cursor? cursor->lowerItem: NULL);
-
-			break;
-		}
-	}
-	
-	return pref;
-}
-
-//----------------------------------------------------------------------------------
-/*
-	This method is the key to correct window arangement
-	With the help of FindPlace it correctly aranges windows. FindPlace, only
-	inserted the window in the correct place, this method also brings all
-	other windows that are supposed to be in front of her - I'm talking here
-	about floating and modal windows.
-	It also cleverly selects the new FINAL front window.
- */
-void Workspace::SearchAndSetNewFront(WinBorder *preferred)
-{
-	STRACE(("*WS(%ld)::SASNF(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
-	
-	// the new front must not be the same as the previous one.
-	if(fFrontItem && fFrontItem->layerPtr == preferred && !(preferred->IsHidden()))
-	{
-		STRACE(("-WS(%ld)::SASNF(%s) - opperation not needed! Workspace data:",
-				ID(), preferred? preferred->GetName(): "NULL"));
-		STRACESTREAM();
-		STRACE(("#WS(%ld)::SASNF(%s) ENDED 1\n", ID(), preferred? preferred->GetName(): "NULL"));
-		
-		return;
-	}
-
-	// properly place this 'preferred' WinBorder.
-	ListData		*lastInserted;
-	lastInserted	= FindPlace(HasItem(preferred));
-	preferred		= lastInserted? lastInserted->layerPtr: NULL;
-
-	STRACE(("-WS(%ld)::SASNF(%s) - after FindPlace...", ID(), preferred? preferred->GetName(): "NULL"));
-	STRACESTREAM();
-
-	// if the new front layer is the same... there is no point continuing
-	if(fFrontItem == lastInserted)
-	{
-		STRACE(("-WS(%ld)::SASNF(%s) - new front layer is the same as the old one. Stop!", ID(), preferred? preferred->GetName(): "NULL"));
-		STRACESTREAM();
-		STRACE(("#WS(%ld)::SASNF(%s) ENDED 2\n", ID(), preferred? preferred->GetName(): "NULL"));
-
-		return;
-	}
-
-	if(!lastInserted)
-	{
-		STRACE(("PAAAAANIC: Workspace::SASNF(): 'lastInserted' IS NULL\n"));	
-	}
-	else
-	{
-		STRACE(("\n&&&&Processing for: %s\n", lastInserted->layerPtr->GetName()));
-	}
-
-	if(lastInserted && !(lastInserted->layerPtr->IsHidden()))
-	{
-		int32		prefFeel = preferred->Window()->Feel();
-
-		if(prefFeel == B_NORMAL_WINDOW_FEEL)
-		{
-			STRACE((" NORMAL Window '%s' -", preferred? preferred->GetName(): "NULL"));
-			
-			if(fFrontItem)
-			{
-				// if they are in the same team...
-				if(preferred->Window()->ClientTeamID() == fFrontItem->layerPtr->Window()->ClientTeamID())
-				{
-					STRACE((" SAME TeamID\n"));
-						
-					// collect subset windows that are common to application's windows...
-					// NOTE: A subset window *can* be added to more than just one window.
-					FMWList	commonFMW;
-					FMWList	appFMW;
-					FMWList	finalFMWList;
-					int32	count, i;
-					
-					// collect floating and modal windows spread across the workspace only if
-					// they are in our window's subset
-					// * also remove them, for repositioning, later.
-					ListData	*listItem = fTopItem;
-					while(listItem)
+					if (!cursor->layerPtr->IsHidden()
+						&& cursor->layerPtr->Level() > B_SYSTEM_LAST
+						&& cursor->layerPtr->App()->ClientTeamID() == newLast->App()->ClientTeamID())
 					{
-						int32	feel = listItem->layerPtr->Window()->Feel();
-						if(feel == B_FLOATING_SUBSET_WINDOW_FEEL || feel == B_MODAL_SUBSET_WINDOW_FEEL)
+						break;
+					}
+					cursor	= cursor->upperItem;
+				}
+				
+				if (cursor)
+					before	= cursor->lowerItem;
+				else
+					before	= fTopItem;
+
+				InsertItem(newLastItem, before);
+			}
+			// this is a modal subset
+			else
+			{
+				// this subset modal is visible, it means its main window must be visible. search for it.
+				ListData	*mainWindowItem, *before;
+				int32		indexThis = 0, indexCursor;
+
+				// search by going deep
+				while(cursor)
+				{
+					if (cursor->layerPtr->Level() == B_NORMAL && !cursor->layerPtr->IsHidden()
+						&& (indexThis = cursor->layerPtr->fFMWList.IndexOf(newLast)) >= 0)
+						break;
+					cursor	= cursor->upperItem;
+				}
+				
+				if (!cursor)
+					debugger("MoveToBack: SubsetWindow: can't find main Window!\n");
+
+				RemoveItem(newLastItem);
+
+				// good. found our main window. now go up and properly place.
+				mainWindowItem	= cursor;
+				before			= cursor->lowerItem;
+
+				cursor		= cursor->lowerItem;
+				while(cursor)
+				{
+					if (cursor->layerPtr->Level() == B_MODAL_APP && !cursor->layerPtr->IsHidden()
+						&& cursor->layerPtr->App()->ClientTeamID() == newLast->App()->ClientTeamID())
+					{
+						indexCursor	= mainWindowItem->layerPtr->fFMWList.IndexOf(cursor->layerPtr);
+						if (indexCursor >= 0)
 						{
-							if(preferred->Window()->fWinFMWList.HasItem(listItem->layerPtr))
+							if (indexThis < indexCursor)
 							{
-								commonFMW.AddItem(listItem->layerPtr);
-	
-								// *carefully* remove the item from the list
-								ListData	*item = listItem;
-								listItem	= listItem->lowerItem;
-								RemoveItem(item);
-							}
-							else
-							if(feel == B_FLOATING_SUBSET_WINDOW_FEEL)
-							{
-								// also remove floating windows. Those, SURELY belong to
-								// 'fFrontItem' - this being the *old* front window.
-	
-								// *carefully* remove the item from the list
-								ListData	*item = listItem;
-								listItem	= listItem->lowerItem;
-								RemoveItem(item);
+								before = cursor;
+								break;
 							}
 							else
 							{
-								listItem	= listItem->lowerItem;
+								before = cursor->lowerItem;
 							}
 						}
-						else if(feel == B_FLOATING_APP_WINDOW_FEEL || feel == B_MODAL_APP_WINDOW_FEEL)
-						{
-							// ALSO collect application's floating and modal windows,
-							// for reinsertion, later.
-	
-							if(listItem->layerPtr->Window()->ClientTeamID() == 
-									preferred->Window()->ClientTeamID())
-							{
-								appFMW.AddItem(listItem->layerPtr);
-								
-								// *carefully* remove the item from the list
-								ListData	*item = listItem;
-								listItem	= listItem->lowerItem;
-								RemoveItem(item);
-							}
-							else
-								listItem	= listItem->lowerItem;
-						}
-						else
-							listItem	= listItem->lowerItem;
 					}
-	
-					// put in the final list, items that are not found in the common list
-					count	= preferred->Window()->fWinFMWList.CountItems();
-					for (i=0; i<count; i++)
-					{
-						void *item = preferred->Window()->fWinFMWList.ItemAt(i);
-	
-						if(!commonFMW.HasItem(item))
-							finalFMWList.AddItem(item);
-					}
-	
-					// collapse the 2 lists
-					finalFMWList.AddFMWList(&commonFMW);
-					finalFMWList.AddFMWList(&appFMW);
-	
-					// insert windows found in 'finalFMWList' in Workspace's list.
-					// IF *one* modal is found, do not add floating ones!
-					
-					// see if the last WinBorder in the list is a modal window.
-					// OR if the last one in Workspace's list is a modal window...
-					WinBorder	*wb = (WinBorder*)finalFMWList.LastItem();
-					bool		lastIsModal = false;
-					if(	(wb &&
-							(wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL
-								|| wb->Window()->Feel() == B_MODAL_APP_WINDOW_FEEL))
-						||	(fBottomItem &&
-							(fBottomItem->layerPtr->Window()->Feel() == B_MODAL_ALL_WINDOW_FEEL
-								|| fBottomItem->layerPtr->Window()->Feel() == B_SYSTEM_FIRST))
-						)
-						{ lastIsModal = true; }
-	
-						// this variable will help us in deciding the new front WinBorder.
-					WinBorder		*finalPreferred = preferred;
-						// now insert items found in finalFMWList into Workspace
-					count	= finalFMWList.CountItems();
-					for(i=0; i<count; i++)
-					{
-						WinBorder			*wb = (WinBorder*)finalFMWList.ItemAt(i);
-						if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
-								|| wb->Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
-						{
-								// set its new MainWinBorder
-							if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
-								wb->SetMainWinBorder(preferred);
-								// don't add if the last WinBorder is a modal one.
-							if(lastIsModal)
-								continue;
-						}
-						else
-						{
-							if(wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-								wb->SetMainWinBorder(preferred);
-								// if this modal window is not hidden, give it the front status.
-							if(!(wb->IsHidden()))
-								finalPreferred		= wb;
-						}
-	
-							// insert item just after the last inserted one.
-						ListData			*newItem = new ListData();
-						newItem->layerPtr	= wb;
-						newItem->lowerItem	= lastInserted->lowerItem;
-						newItem->upperItem	= lastInserted;
-						if(lastInserted->lowerItem)
-							lastInserted->lowerItem->upperItem	= newItem;
-						lastInserted->lowerItem		= newItem;
-						
-						if(lastInserted == fBottomItem)
-							fBottomItem = newItem;
-	
-						lastInserted		= newItem;
-					}
-					preferred		= finalPreferred;
-				}
-				else
-				{
-					STRACE((" DIFERRENT TeamID\n"));
-					
-					// remove front window's floating(_SUBSET_/_APP_) windows, if any.
-					ListData	*listItem = fFrontItem->lowerItem;
-					
-					while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL
-							|| listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
-					{
-						// *carefully* remove the item from the list
-						ListData	*item = listItem;
-						listItem	= listItem->lowerItem;
-						RemoveItem(item);
-					}
-					
-					// now, jump to et1: to make a 'clean' selecting of
-					// windows to be inserted
-					fFrontItem = NULL;
-					goto et1;
-				} // END: else - if different ClientTeamIDs.
-			
-			} // if(fFrontItem) && NORMAL_WINDOW
-			else
-			{
-				STRACE((" NO previous FRONT Item\n"));
-				et1:
-				FMWList		finalFMWList;
-				int32		count, i;
-				ListData	*listItem = fTopItem;
-					// remove window's subset and application's *modal* windows spread
-					// across Workspace's list, to be insert later, in the corect order.
-				while(listItem)
-				{
-					int32		feel = listItem->layerPtr->Window()->Feel();
-					if((feel == B_MODAL_SUBSET_WINDOW_FEEL
-							&& preferred->Window()->fWinFMWList.HasItem(listItem->layerPtr))
-						|| (feel == B_MODAL_APP_WINDOW_FEEL
-							&& preferred->Window()->ClientTeamID() ==
-								listItem->layerPtr->Window()->ClientTeamID()
-							))
-					{
-							// *carefully* remove the item from the list
-						ListData	*item = listItem;
-						listItem	= listItem->lowerItem;
-						RemoveItem(item);
-					}
-					else
-						listItem	= listItem->lowerItem;
+					cursor	= cursor->lowerItem;
 				}
 
-				// add to the final list window's subset windows. (..._SUBSET_...)
-				finalFMWList.AddFMWList(&(preferred->Window()->fWinFMWList));
-				
-				// also add application's ones. (..._APP_...)
-				finalFMWList.AddFMWList(&(preferred->Window()->App()->fAppFMWList));
-				
-				// insert windows found in 'finalFMWList' in Workspace's list.
-				// IF *one* modal is found, do not add floating ones!
-					
-				// see if the last WinBorder in the list is a modal window.
-				WinBorder	*wb = (WinBorder*)finalFMWList.LastItem();
-				bool		lastIsModal = false;
-
-				if(	(wb && (wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
-						wb->Window()->Feel() == B_MODAL_APP_WINDOW_FEEL)) ||
-						(fBottomItem && (fBottomItem->layerPtr->Window()->Feel() == B_MODAL_ALL_WINDOW_FEEL ||
-						fBottomItem->layerPtr->Window()->Feel() == B_SYSTEM_FIRST))
-					)
-				{
-					lastIsModal = true;
-				}
-
-				// this variable will help us in deciding the new front WinBorder.
-				WinBorder		*finalPreferred = preferred;
-				
-				// now insert items found in finalFMWList into Workspace
-				count	= finalFMWList.CountItems();
-				for(i=0; i<count; i++)
-				{
-					WinBorder *wb = (WinBorder*)finalFMWList.ItemAt(i);
-					
-					// do not insert floating windows if the last is a modal one.
-					if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL ||
-							wb->Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
-					{
-						// set its new MainWinBorder
-						if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
-							wb->SetMainWinBorder(preferred);
-						
-						// don't add if the last WinBorder is a modal one.
-						if(lastIsModal)
-							continue;
-					}
-					else
-					{
-						if(wb->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-							wb->SetMainWinBorder(preferred);
-						
-						// if this modal window is not hidden, give it the front status.
-						if(!(wb->IsHidden()))
-							finalPreferred		= wb;
-					}
-					
-					// insert item just after the last inserted one.
-					ListData			*newItem = new ListData();
-					newItem->layerPtr	= wb;
-					newItem->lowerItem	= lastInserted->lowerItem;
-					newItem->upperItem	= lastInserted;
-					if(lastInserted->lowerItem)
-						lastInserted->lowerItem->upperItem	= newItem;
-					lastInserted->lowerItem		= newItem;
-					
-					if(lastInserted == fBottomItem)
-						fBottomItem = newItem;
-
-					lastInserted		= newItem;
-				}
-				preferred		= finalPreferred;
-			} // else - if(fFrontItem);
-			
-		} // END: if _NORMAL_ window.
-		else
-		if(	prefFeel == B_FLOATING_SUBSET_WINDOW_FEEL || 
-				prefFeel == B_FLOATING_APP_WINDOW_FEEL || 
-				prefFeel == B_FLOATING_ALL_WINDOW_FEEL)
-		{
-			STRACE((" FLOATING Window '%s'\n", preferred? preferred->GetName(): "NULL"));
-			// Do nothing! FindPlace() was called and it has corectly placed our window
-			// We don't have to do noting here.
-		}
-		else
-		if(	prefFeel == B_MODAL_SUBSET_WINDOW_FEEL ||
-				prefFeel == B_MODAL_APP_WINDOW_FEEL)
-		{
-			STRACE((" MODAL_APP/SUBSET Window '%s'\n", preferred? preferred->GetName(): "NULL"));
-			
-			FMWList		finalMWList;
-			int32		count = 0, i;
-			int32		prefIndex = -1;
-			
-			if(fFrontItem && fFrontItem->layerPtr->fLevel == B_NORMAL_FEEL)
-			{
-				// remove front window's floating(_SUBSET_/_APP_) windows, if any.
-				ListData	*listItem = fFrontItem->lowerItem;
-				while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL || 
-						listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
-				{
-					// *carefully* remove the item from the list
-					ListData	*item = listItem;
-					listItem	= listItem->lowerItem;
-					RemoveItem(item);
-				}
+				InsertItem(newLastItem, before);
 			}
-			
-			// If this is a MODAL_SUBSET window, search it's place in its MainWinBorder
-			//	window subset, and then take all modals after it; then continue talking
-			//	modal windoes *only*, from application's set.
-			// If it is a MODAL_APP only search an take windows in/from application's set
-			if(prefFeel == B_MODAL_SUBSET_WINDOW_FEEL)
-			{
-				prefIndex	= preferred->MainWinBorder()->Window()->fWinFMWList.IndexOf(preferred);
-				count		= preferred->MainWinBorder()->Window()->fWinFMWList.CountItems();
-				
-				if(prefIndex >= 0)
-				{
-					WinBorder	*wb = NULL;
-					
-					// add modal windows from its main window subset - windows that are
-					// positioned after 'preferred'.
-					FMWList		*listPtr = &(preferred->MainWinBorder()->Window()->fWinFMWList);
-					for(i = prefIndex+1; i < count; i++)
-					{
-						// they *all* are modal windows.
-						wb		= (WinBorder*)listPtr->ItemAt(i);
-						wb->SetMainWinBorder(preferred);
-						finalMWList.AddItem(wb);
-						
-						// remove those windows(if in there), for correct re-insertion later.
-						ListData	*ld = NULL;
-						if((ld = HasItem(wb)))
-							RemoveItem(ld);
-					}
-					
-					// add modal windows that are found in application's subset
-					count	= preferred->Window()->App()->fAppFMWList.CountItems();
-					listPtr	= &(preferred->Window()->App()->fAppFMWList);
-					for(i = 0; i < count; i++)
-					{
-						wb		= (WinBorder*)listPtr->ItemAt(i);
-						if(wb->Window()->Feel() == B_MODAL_APP_WINDOW_FEEL)
-						{
-							finalMWList.AddItem(wb);
-							
-							// remove those windows(if in there), for correct re-insertion later.
-							ListData	*ld = NULL;
-							if((ld = HasItem(wb)))
-								RemoveItem(ld);
-						}
-					}
-				}
-			}
-			else
-			if(prefFeel == B_MODAL_APP_WINDOW_FEEL)
-			{
-				prefIndex	= preferred->Window()->App()->fAppFMWList.IndexOf(preferred);
-				count		= preferred->Window()->App()->fAppFMWList.CountItems();
-				if(prefIndex >= 0)
-				{
-					WinBorder	*wb = NULL;
-					
-					// add modal windows from application's subset - windows that are
-					// positioned after 'preferred'.
-					FMWList		*listPtr = &(preferred->Window()->App()->fAppFMWList);
-					for(i = prefIndex+1; i < count; i++)
-					{
-						wb		= (WinBorder*)listPtr->ItemAt(i);
-						
-						// they *all* are modal windows.
-						finalMWList.AddItem(wb);
-						
-						// remove those windows(if in there), for correct re-insertion later.
-						ListData	*ld = NULL;
-						if((ld = HasItem(wb)))
-							RemoveItem(ld);
-					}
-				}
-			}
-		
-			// insert windows found in 'finalMWList' in Workspace's list, after "preferred"
-			count		= finalMWList.CountItems();
-			
-			// this varable will help us designate the future front.
-			WinBorder	*finalPreferred = preferred;
-			for(i=0; i<count; i++)
-			{
-				WinBorder *wb = (WinBorder*)finalMWList.ItemAt(i);
-				
-				// wb is surely a modal so... ATM make it the front one.
-				if(!(wb->IsHidden()))
-					finalPreferred	= wb;
-
-				// insert item just after the last inserted one.
-				ListData *newItem = new ListData();
-				newItem->layerPtr	= wb;
-				newItem->lowerItem	= lastInserted->lowerItem;
-				newItem->upperItem	= lastInserted;
-				if(lastInserted->lowerItem)
-					lastInserted->lowerItem->upperItem	= newItem;
-				lastInserted->lowerItem		= newItem;
-				
-				if(lastInserted == fBottomItem)
-					fBottomItem = newItem;
-				
-				lastInserted		= newItem;
-			}
-			preferred = finalPreferred;
+			returnValue = true;
 		}
-		else
-		if(prefFeel == B_MODAL_ALL_WINDOW_FEEL || 
-				prefFeel == B_SYSTEM_FIRST)
-		{
-			STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName(): "NULL"));
-			
-			// remove all application's floating windows.
-			if(fFrontItem && fFrontItem->layerPtr->fLevel == B_NORMAL_FEEL)
-			{
-				ListData	*listItem = fFrontItem->lowerItem;
-				while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL || 
-						listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
-				{
-					// *carefully* remove the item from the list
-					ListData	*item = listItem;
-					listItem		= listItem->lowerItem;
-					RemoveItem(item);
-				}
-			}
-		}
-		else if(prefFeel == B_SYSTEM_LAST)
-		{
-			; // Do Nothing.
-		}
-		else
-		{
-			// We ***should NOT*** reach this point!
-			STRACE(("SERVER: PANIC: \"%s\": What kind of window is this???\n", preferred? preferred->GetName(): "NULL"));
-		}
-	}
-	else
-		STRACE((" The window IS Hidden\n"));
-
-	ListData	*exFrontItem	= fFrontItem;
-	ListData	*newFrontItem	= NULL;
-	if(preferred && fBottomItem)
-	{
-		int32		feel = fBottomItem->layerPtr->Window()->Feel();
-
-		// if preferred is one of these *don't* give front state to it!
-		if(preferred->fLevel == B_FLOATING_SUBSET_FEEL
-			|| preferred->fLevel == B_FLOATING_APP_FEEL
-			|| preferred->fLevel == B_FLOATING_ALL_FEEL)
-		{
-			newFrontItem	= exFrontItem;
-		}
-		else 
-		if((feel == B_SYSTEM_FIRST || feel == B_MODAL_ALL_WINDOW_FEEL)
-				&& !(fBottomItem->layerPtr->IsHidden()) )
-		{
-			// if the last in workspace's list is one of these, GIVE focus to it!
-			
-			newFrontItem	= fBottomItem;
-		}
-		else
-		if(preferred->fLevel == B_SYSTEM_LAST && !(preferred->IsHidden()) )
-		{
-			// the SYSTEM_LAST will get the front status, only if it's the only
-			// WinBorder in this workspace.
-
-			if(fBottomItem->layerPtr == preferred)
-				newFrontItem	= HasItem(preferred);
-		}
-		else
-		if( !(preferred->IsHidden()) )
-		{
-			// this is in case of MODAL[APP/SUBSET] and NORMAL windows
-			newFrontItem	= HasItem(preferred);
-		}
-		else
-		{
-			newFrontItem	= NULL;
-		}
-	}
-	else
-	{
-		newFrontItem	= NULL; 
-	}
-	
-	if(fFrontItem != newFrontItem)
-	{
-		fFrontItem = newFrontItem;
-		
-		// TODO: call a method something like WinBorder::MakeFront(true);
-	}
-
-	STRACE(("#WS(%ld)::SASNF(%s) ENDED! Workspace data...", ID(), preferred? preferred->GetName(): "NULL"));
-	STRACESTREAM();
-}
-
-//----------------------------------------------------------------------------------
-/*
-	This method performs a simple opperation. It searched the new focus window
-	by walking from front to back, cheking for some things, until all variables
-	correspond.
-*/
-void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
-{
-	STRACE(("*WS(%ld)::SASNFocus(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
-	
-	if(!preferred)
-		preferred	= fBottomItem? fBottomItem->layerPtr : NULL;
-	
-	bool		selectOthers = false;
-	ListData	*item=NULL;
-	
-	for(item = fBottomItem; item != NULL; item = item->upperItem)
-	{
-		// if this WinBorder doesn't want to have focus... get to the next one
-		if(item->layerPtr->Window()->Flags() & B_AVOID_FOCUS)
-			continue;
-		
-		if(preferred && item->layerPtr == preferred)
-		{
-			// our preffered one is hidden so... select another one
-			if(preferred && preferred->IsHidden())
-			{
-				selectOthers = true;
-				continue;
-			}
-			else
-			{
-				break;
-			}
-		}
-		
-		if(item->layerPtr->fLevel == B_SYSTEM_FIRST || item->layerPtr->fLevel == B_MODAL_ALL_FEEL)
-		{
-			break;
-		}
-		
-		if(item->layerPtr->fLevel == B_MODAL_APP_FEEL
-			 && (preferred && preferred->Window()->ClientTeamID() == item->layerPtr->Window()->ClientTeamID()))
-		{
-			break;
-		}
-		
-		if(item->layerPtr->fLevel == B_MODAL_SUBSET_FEEL
-			&& (preferred && item->layerPtr->MainWinBorder() == preferred))
-		{
-			break;
-		}
-		
-		// select one window, other than a system_last one!
-		if(selectOthers && item->layerPtr->fLevel != B_SYSTEM_LAST)
-		{
-			break;
-		}
-	}
-	
-	// there are no windows below us to select. take the one from above us.
-	if(selectOthers && !item)
-	{
-		// there HAS to be valid
-		item 	= HasItem(preferred);
-		if(item)
-			item= item->lowerItem;
-	}
-	
-	// there are NO windows in front of us, and no regular window below us
-	// maybe there is a system_last window...
-	if(!item)
-		item = fTopItem;
-	
-	if(item != fFocusItem)
-	{
-		if(fFocusItem)
-		{
-			ListData *oldItem=fFocusItem;
-			
-			oldItem->layerPtr->HighlightDecorator(false);
-			
-			BMessage inactive(B_WINDOW_ACTIVATED);
-			inactive.AddInt64("when",system_time());
-			inactive.AddBool("active",false);
-			oldItem->layerPtr->Window()->SendMessageToClient(&inactive);
-		}
-		
-		fFocusItem=item;
-		
-		if(fFocusItem)
-		{
-			fFocusItem->layerPtr->HighlightDecorator(true);
-			
-			BMessage active(B_WINDOW_ACTIVATED);
-			active.AddInt64("when",system_time());
-			active.AddBool("active",true);
-			
-			fFocusItem->layerPtr->Window()->SendMessageToClient(&active);
-		}
-	}
-}
-
-//----------------------------------------------------------------------------------
-
-void Workspace::BringToFrontANormalWindow(WinBorder *layer)
-{
-	switch (layer->Window()->Feel())
-	{
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		{
-			SearchAndSetNewFront(layer->MainWinBorder());
-			break;
-		}
-		case B_FLOATING_APP_WINDOW_FEEL:
-		case B_MODAL_APP_WINDOW_FEEL:
-		{
-			ListData	*item	= fBottomItem;
-			team_id		tid		= layer->Window()->ClientTeamID();
-			while(item)
-			{
-				if(item->layerPtr->Window()->ClientTeamID() == tid
-					&& item->layerPtr->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
-				{
-					break;
-				}
-				item	= item->upperItem;
-			}
-
-			if(item)
-				SearchAndSetNewFront(item->layerPtr);
-			
-			break;
-		}
+		break;
 		default:
 		{
-			// in case of MODAL/FLOATING_ALL or _NORMAL_ or SYSTEM_FIRST/LAST do nothing!
+			debugger("MoveToBack: unknown window feel\n");
+			return false;
 		}
 	}
+
+	// The following applies ONLY to B_NORMAL and B_MODAL_APP windows.
+
+	if (changeFront)
+	{
+		ListData	*newFront;
+		newFront	= findNextFront();
+		if (newFront)
+			MoveToFront(newFront->layerPtr);
+		else
+			debugger("MoveToBack: can't find new front! We should find one!\n");
+	}
+
+	return returnValue;
 }
 
 //----------------------------------------------------------------------------------
+/*!
+	\brief	Hides a WinBorder.
+	\param	winBorder WinBorder to be hidden.
+	\return	True if the list of WinBorders has changed, false otherwise.
 
-// This method moves a window to the back of its subset.
-void Workspace::MoveToBack(WinBorder *newLast)
+		WinBorder \a winBorder will be hidden. Some, like floating or subset modals
+may also be removed from Workspace's list.
+		If \a winBorder if the front WinBorder, another one (or none) will be automaticaly
+chosen. Same goes for focus.		
+*/
+bool Workspace::HideWinBorder(WinBorder *winBorder)
 {
-	STRACE(("\n!MoveToBack(%s) -", newLast? newLast->GetName(): "NULL"));
-	
-	// does the list have this element?
-	ListData	*item = HasItem(newLast);
-	if(item)
+STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "NULL"));
+	bool	returnValue = false;
+	int32	level = winBorder->Level();
+	bool	changeFront = false;
+	bool	changeFocus = false;
+
+	if (fFrontItem && fFrontItem->layerPtr == winBorder)
+		changeFront = true;
+
+	if (fFocusItem && fFocusItem->layerPtr == winBorder)
+		changeFocus = true;
+
+	if (level > B_SYSTEM_FIRST)
+		level = B_SYSTEM_FIRST;
+
+	switch(level)
 	{
-		ListData	*listItem = NULL;
-		
-		switch(item->layerPtr->fLevel)
+		case B_MODAL_ALL:
+		case B_SYSTEM_FIRST:
+		case B_SYSTEM_LAST:
+		case B_FLOATING_ALL:
 		{
-			case B_FLOATING_ALL_FEEL:
+			// window is just hidden. do nothing. its position is OK as it is now.
+			returnValue = true;
+		}
+		break;
+		case B_FLOATING_APP:
+		{
+			if (fFrontItem && fFrontItem->layerPtr->Level() == B_NORMAL)
 			{
-				STRACE((" B_FLOATING_ALL_FEEL window\n"));
-				
-				// search the place where we should insert it later
-				listItem		= item->upperItem;
-				while(listItem && (listItem->layerPtr->fLevel == item->layerPtr->fLevel))
-					listItem = listItem->upperItem;
-				
-				break;
-			}
-			
-			// those 2 flags form a 'virtual' set, so even if FLOATING_APP
-			// has a greater priority than FLOATING_SUBSET, it is still moved
-			// behind FLOATING_SUBSET.
-			case B_FLOATING_SUBSET_FEEL:
-			case B_FLOATING_APP_FEEL:
-			{
-				STRACE((" B_FLOATING_SUBSET_FEEL/B_FLOATING_APP_FEEL window\n"));
-				
-				// search the place where we should insert it later
-				listItem		= item->upperItem;
-
-				while(listItem && (listItem->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL ||
-						listItem->layerPtr->fLevel == B_FLOATING_APP_FEEL))
+				ListData	*item = HasItem(winBorder);
+				if (item)
 				{
-					listItem = listItem->upperItem;
-				}
+					fFrontItem->layerPtr->fFMWList.AddWinBorder(winBorder);
 
-				break;
-			}
-			
-			// the same like with floating window. Those 2 and NORMAL form a'virtual' set.
-			case B_MODAL_SUBSET_FEEL:
-			case B_MODAL_APP_FEEL:
-			{
-				STRACE((" B_MODAL_SUBSET_FEEL/B_MODAL_APP_FEEL window\n"));
-				
-				// search the place where we should insert it later
-				listItem		= item->upperItem;
-				
-				while(listItem && (listItem->layerPtr->fLevel == B_MODAL_SUBSET_FEEL ||
-						listItem->layerPtr->fLevel == B_MODAL_APP_FEEL || 
-						listItem->layerPtr->fLevel == B_NORMAL_FEEL))
-				{
-					listItem = listItem->upperItem;
-				}
+					RemoveItem(item);
+					fPool.ReleaseMemory(item);
 
-				break;
-			}
-			
-			// here is the simplest, we use the priority levels.
-			case B_NORMAL_FEEL:
-			{
-				STRACE((" B_NORMAL_FEEL window\n"));
-				listItem		= item->upperItem;
-				while(listItem && (listItem->layerPtr->fLevel >= item->layerPtr->fLevel))
-					listItem = listItem->upperItem;
-												
-				break;
+					returnValue = true;
+				}
 			}
 		}
-		
-		if((listItem && item->lowerItem == listItem->lowerItem)
-			|| (listItem == NULL && item == fTopItem))
+		break;
+		case B_NORMAL:
 		{
-			// do nothing! The window will be in the same position it is now.
-		}
-		else
-		{
-			// if it's a normal window, first remove any floating windows,
-			// it or its application has
-			if(newLast->fLevel == B_NORMAL_FEEL && fFrontItem->layerPtr == newLast)
+			if (fFrontItem && fFrontItem->layerPtr == winBorder)
 			{
-				ListData	*iter = item->lowerItem;
-				while(iter && (iter->layerPtr->fLevel == B_FLOATING_SUBSET_FEEL ||
-						iter->layerPtr->fLevel == B_FLOATING_APP_FEEL))
-				{
-					// *carefully* remove the item from the list
-					ListData	*itemX = iter;
-					iter		= iter->lowerItem;
-					RemoveItem(itemX);
-				}
-
+				saveFloatingWindows(fFrontItem);
 			}
 
-			WinBorder	*nextPreferred = item->upperItem? item->upperItem->layerPtr: NULL;
-			bool		wasFront = fFrontItem->layerPtr == newLast;
-			bool		wasFocus = fFocusItem->layerPtr == newLast;
-			
-			// remove item
-			RemoveItem(item);
-			
-			// insert in the new, right' position.
-			InsertItem(item, listItem? listItem->lowerItem: fTopItem);
+			// remove B_MODAL_SUBSET windows present before this window.
+			ListData	*itemThis = HasItem(winBorder);
+			ListData	*toast;
+			ListData	*item = itemThis->lowerItem;
+			while(item)
+			{
+				// if this modal subset is in our list ONLY (not in other visible normal window's one),
+				// then remove from Workspace's list.
+				if (item->layerPtr->Level() == B_MODAL_APP
+					&& winBorder->fFMWList.HasItem(item->layerPtr)
+					&& !searchFirstMainWindow(item->layerPtr))
+				{
+					// if this modal subset has front state, make sure another window will get that status.
+					if (fFrontItem == item)
+						changeFront = true;
 
-			if(wasFront)
-				SearchAndSetNewFront(nextPreferred);
-			if(wasFocus)
-				SearchAndSetNewFocus(nextPreferred);
+					toast	= item;
+					item	= item->lowerItem;
+					RemoveItem(toast);
+					fPool.ReleaseMemory(toast);
+				}
+				else
+					break;
+			}
+
+			returnValue = true;
 		}
-		STRACESTREAM();
+		break;
+		case B_MODAL_APP:
+		{
+			// if a subset modal, then remove from Workspace's list.
+			if (!winBorder->App()->fAppFMWList.HasItem(winBorder))
+			{
+				ListData	*toast = HasItem(winBorder);
+				if (toast)
+				{
+					RemoveItem(toast);
+					fPool.ReleaseMemory(toast);
+
+					returnValue = true;
+				}
+			}
+		}
+		break;
+		default:
+		{
+			debugger("HideWinBorder: what kind of window is this?\n");
+		}
 	}
-	else
-		STRACE((" this operation was not needed\n"));
+
+	// select a new Front if needed
+	if (changeFront)
+	{
+		ListData	*newFront;
+
+		fFrontItem	= NULL;
+		fFocusItem	= NULL;
+		newFront	= findNextFront();
+		if (newFront)
+			MoveToFront(newFront->layerPtr);
+	}
+
+	// floating windows can have focus state. what if this removed window is
+	// the focus window? There will be no focus anymore.
+	// So, start a search to set the new focus
+	if (!fFocusItem || changeFocus)
+	{
+		ListData		*cursor		= fBottomItem;
+
+		while(cursor)
+		{
+			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS))
+				break;
+			else
+				cursor = cursor->upperItem;
+		}
+
+		fFocusItem = cursor;
+	}
+
+	return returnValue;
 }
+
+//----------------------------------------------------------------------------------
+/*!
+	\brief	Shows a WinBorder.
+	\param	winBorder WinBorder to be show.
+	\return	True if the list of WinBorders has changed, false otherwise.
+
+		WinBorder \a winBorder will be shown. Other windows like floating or modal
+ones will be placed in front if needed. Front & Focus state will be given to \a winBorder
+unless a modal windows steals both.
+*/
+bool Workspace::ShowWinBorder(WinBorder *winBorder, bool userBusy)
+{
+STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "NULL"));
+	bool	returnValue = false;
+	int32	level = winBorder->Level();
+	if (level > B_SYSTEM_FIRST)
+		level = B_SYSTEM_FIRST;
+
+	// Before you go understand this method, please note that 'placeInFront' MUST be
+	// called of EVERY window except B_FLOATING_APP when
+	// ADDING a new window to Workspace's list!!!
+
+	switch (level)
+	{
+
+		// B_MODAL_ALL, B_FLOATNG_ALL, B_SYSTEM_FIRST & B_SYSTEM_LAST
+		// will be removed ONLY when are deleted!
+		// ALSO, they will ALWAYS be the first/last windows in hierarchy, no matter
+		// if they are hidden or not - they keep their order.
+
+		case B_MODAL_ALL:
+		case B_SYSTEM_FIRST:
+		case B_SYSTEM_LAST:
+		{
+			// nothing special to be done. just compare indexes to see if front state will change.
+			if (fFrontItem)
+			{
+				int32		reverseIndexThis, reverseIndexFront;
+				ListData	*itemThis;
+
+				itemThis	= HasItem(winBorder, &reverseIndexThis);
+							  HasItem(fFrontItem->layerPtr, &reverseIndexFront);
+				
+				if (reverseIndexThis < reverseIndexFront)
+				{
+					if (fFrontItem->layerPtr->Level() == B_NORMAL)
+						saveFloatingWindows(fFrontItem);
+
+					fFrontItem = itemThis;
+				}
+			}
+			// of course, if no front item, then set this one.
+			else
+			{
+				fFrontItem	= HasItem(winBorder);
+			}
+			returnValue = true;
+		}
+		break;
+		case B_FLOATING_ALL:
+		{
+			// simply relocate. A floating window can't have front state.
+			ListData	*itemThis = HasItem(winBorder);
+			RemoveItem(itemThis);
+			placeInFront(itemThis, userBusy);
+
+			returnValue = true;
+		}
+		break;
+
+		// FLOATING windows are always removed from Workspace's list when changing to a new front window.
+
+		case B_FLOATING_APP:
+		{
+			// see if we have a front window which is a B_NORMAL window and who's list of floating
+			// and modal windows contains our window.
+			if (fFrontItem && fFrontItem->layerPtr->Level() == B_NORMAL)
+			{
+				ListData		*itemThis = NULL;
+				// remove from B_NORMAL's list.
+				if (fFrontItem->layerPtr->fFMWList.RemoveItem(winBorder))
+				{
+					// we need to add this window
+					itemThis	= fPool.GetCleanMemory(winBorder);
+				}
+				else
+				{
+					itemThis	= HasItem(winBorder);
+					// window is already in Workspace's list. Find and temporarly remove.
+					if (itemThis)
+						RemoveItem(itemThis);
+				}
+
+				if (itemThis)
+				{
+					// insert in front of other B_FLOATING_APP windows.
+					ListData		*item = fFrontItem->lowerItem;
+					while(item && item->layerPtr->Level() == B_FLOATING_APP)
+						item = item->lowerItem;
+
+					InsertItem(itemThis, item);
+
+					returnValue = true;
+				}
+			}
+		}
+		break;
+		case B_NORMAL:
+		{
+			ListData	*itemThis = HasItem(winBorder);
+
+			if (!itemThis)
+			{
+				debugger("ShowWinBorder: B_NORMAL window - cannot find specified window in workspace's list\n");
+				return false;
+			}
+
+			// front status will change. if a normal window has front state,
+			// remove and save floating windows order that may be above it.
+			if (fFrontItem && fFrontItem->layerPtr->Level() == B_NORMAL)
+				saveFloatingWindows(fFrontItem);
+
+			RemoveItem(itemThis);
+
+			placeInFront(itemThis, userBusy);
+
+			ListData		*newFront = itemThis;
+
+			if (windowHasVisibleModals(winBorder))
+			{
+				newFront = putModalsInFront(itemThis);
+			}
+
+			if (fFrontItem)
+			{
+				if (!userBusy)
+				{
+					int32		revFrontItemIndex, revNewFrontIndex;
+
+					HasItem(fFrontItem, &revFrontItemIndex);
+					HasItem(newFront, &revNewFrontIndex);
+					if (revNewFrontIndex < revFrontItemIndex)
+						fFrontItem	= newFront;
+				}
+			}
+			else
+			{
+				fFrontItem	= newFront;
+			}
+
+			if (fFrontItem->layerPtr->Level() == B_NORMAL)
+				putFloatingInFront(fFrontItem);
+
+			returnValue = true;
+		}
+		break;
+
+		// MODAL windows usualy stay in Workspace's list, but they are scatered, so we must gather them
+		// when needed.
+
+		case B_MODAL_APP:
+		{
+			// build a list of modal windows to know what windows should be placed before this one.
+			BList		tempList;
+			// APP modal
+			if (winBorder->App()->fAppFMWList.HasItem(winBorder))
+			{
+				// take only application's modals
+				tempList.AddList(&winBorder->App()->fAppFMWList);
+				if (fFrontItem
+					&& fFrontItem->layerPtr->App()->ClientTeamID() == winBorder->App()->ClientTeamID())
+					userBusy = false;
+			}
+			// SUBSET modal
+			else
+			{
+				WinBorder	*mainWindow = searchFirstMainWindow(winBorder);
+				if (mainWindow)
+				{
+					// add both mainWindow's subset modals and application's modals
+					tempList.AddList(&mainWindow->fFMWList);
+					tempList.AddList(&winBorder->App()->fAppFMWList);
+					if (fFrontItem && fFrontItem->layerPtr == mainWindow)
+						userBusy = false;
+				}
+				else
+				{
+					// none of the unhiden normal windows have this window as part of their subset.
+					// as a result this window won't be added to Workspace's list for it to be shown.
+					return false;
+				}
+			}
+
+			// === list ready ===
+
+			// front status will change. if a normal window has front state,
+			// remove and save floating windows order that may be above it.
+			if (fFrontItem && fFrontItem->layerPtr->Level() == B_NORMAL)
+				saveFloatingWindows(fFrontItem);
+
+			// find and remove the Workspace's entry for this WinBorder.
+			ListData	*itemThis;
+			itemThis	= HasItem(winBorder);
+			if (itemThis)
+			{
+				RemoveItem(itemThis);
+			}
+			else
+			{
+				// not found? no problem. create a new entry.
+				itemThis = fPool.GetCleanMemory(winBorder);
+			}
+
+			placeInFront(itemThis, userBusy);
+
+			// now place other modals windows above
+			int32		revIndexThis, revIndexItem;
+			ListData	*newFront	= itemThis;
+
+			// find the index of this window in Workspace's list. It will be used to place higher
+			// indexed windows above, if it's the case.
+			HasItem(itemThis, &revIndexThis);
+
+			{
+				ListData	*before		= itemThis->lowerItem;
+				int32		i, count;
+				WinBorder	**wbList;
+				ListData	*itemX;
+				int32		indexThisInTempList;
+
+				indexThisInTempList	= tempList.IndexOf(winBorder);
+				if (indexThisInTempList < 0)
+					debugger("ShowWinBorder: modal window: design flaw!!!\n");
+
+				count		= tempList.CountItems();
+				wbList		= (WinBorder**)tempList.Items();
+				for(i = indexThisInTempList; i < count; i++)
+				{
+					if (!wbList[i]->IsHidden())
+					{
+						itemX	= HasItem(wbList[i], &revIndexItem);
+						if (itemX && revIndexItem > revIndexThis)
+						{
+							removeAndPlaceBefore(itemX, before);
+							newFront	= itemX;
+						}
+					}
+				}
+			}
+
+			if (fFrontItem)
+			{
+				if (!userBusy)
+				{
+					int32		revFrontItemIndex, revNewFrontIndex;
+
+					HasItem(fFrontItem, &revFrontItemIndex);
+					HasItem(newFront, &revNewFrontIndex);
+					if (revNewFrontIndex < revFrontItemIndex)
+						fFrontItem	= newFront;
+				}
+
+				if (fFrontItem->layerPtr->Level() == B_NORMAL)
+					putFloatingInFront(fFrontItem);
+			}
+			else
+			{
+				fFrontItem	= newFront;
+			}
+
+			returnValue = true;
+		}
+		break;
+		default:
+			debugger("What kind of window is this???\n");
+	}
+
+	// set new Focus if needed
+	if (returnValue)
+	{
+		ListData		*cursor		= fBottomItem;
+
+		fFocusItem		= NULL;
+		while(cursor)
+		{
+			if (!cursor->layerPtr->IsHidden() && !(cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS))
+			{
+				if (cursor->layerPtr->Level() == B_FLOATING_APP || cursor->layerPtr->Level() == B_FLOATING_ALL)
+				{
+					// set focus to floating windows only if directly targeted
+					if (cursor->layerPtr == winBorder)
+					{
+						fFocusItem = cursor;
+						break;
+					}
+					else
+						cursor = cursor->upperItem;
+				}
+				else
+				{
+					fFocusItem = cursor;
+					break;
+				}
+			}
+			else
+				cursor = cursor->upperItem;
+		}
+	}
+
+	return returnValue;
+}
+
 
 //----------------------------------------------------------------------------------
 
@@ -1383,14 +970,14 @@ RGBColor Workspace::BGColor(void) const
 */
 void Workspace::GetSettings(const BMessage &msg)
 {
-	// TODO: Implement GetSettings
+	// TODO: Implement
 }
 
 //----------------------------------------------------------------------------------
 //! Sets workspace settings to defaults
 void Workspace::GetDefaultSettings(void)
 {
-	// TODO: Implement GetDefaultSettings
+	// TODO: Implement
 }
 
 //----------------------------------------------------------------------------------
@@ -1413,7 +1000,7 @@ void Workspace::GetDefaultSettings(void)
 */
 void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 {
-	// TODO: Implement PutSettings
+	// TODO: Implement
 }
 
 //----------------------------------------------------------------------------------
@@ -1424,18 +1011,18 @@ void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 */
 void Workspace::PutDefaultSettings(BMessage *msg, const int32 &index)
 {
-	// TODO: Implement PutDefaultSettings
+	// TODO: Implement
 }
 
 //----------------------------------------------------------------------------------
 // Debug method
 void Workspace::PrintToStream() const
 {
-	printf("\nWorkspace %ld hierarchy shown from back to front:\n", fID);
+	printf("Workspace %ld hierarchy shown from back to front:\n", fID);
 	for (ListData *item = fTopItem; item != NULL; item = item->lowerItem)
 	{
 		WinBorder		*wb = (WinBorder*)item->layerPtr;
-		printf("\tName: %s\t%s", wb->GetName(), wb->IsHidden()?"Hidden\t": "NOT Hidden");
+		printf("\tName: %s\t%s", wb->GetName(), wb->IsHidden()?"Hidden\t": "Visible\t");
 		if(wb->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s\n", "B_FLOATING_SUBSET_WINDOW_FEEL");
 		if(wb->Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
@@ -1452,14 +1039,12 @@ void Workspace::PrintToStream() const
 			printf("\t%s\n", "B_NORMAL_WINDOW_FEEL");
 		if(wb->Window()->Feel() == B_SYSTEM_LAST)
 			printf("\t%s\n", "B_SYSTEM_LAST");
-		if(wb->Window()->Feel() == B_SYSTEM_FIRST)
+		if(wb->Window()->Feel() >= B_SYSTEM_FIRST)
 			printf("\t%s\n", "B_SYSTEM_FIRST");
+			
 	}
 	printf("Focus Layer:\t%s\n", fFocusItem? fFocusItem->layerPtr->GetName(): "NULL");
-	printf("Front Layer:\t%s\n", fFrontItem? fFrontItem->layerPtr->GetName(): "NULL");
-//	printf("Current Layer:\t%s\n", fCurrentItem? fCurrentItem->layerPtr->GetName(): "NULL");
-//	printf("Top Layer:\t%s\n", fTopItem? fTopItem->layerPtr->GetName(): "NULL");
-//	printf("Bottom Layer:\t%s\n", fBottomItem? fBottomItem->layerPtr->GetName(): "NULL");
+	printf("Front Layer:\t%s\n\n", fFrontItem? fFrontItem->layerPtr->GetName(): "NULL");
 }
 
 //----------------------------------------------------------------------------------
@@ -1482,7 +1067,9 @@ void Workspace::PrintItem(ListData *item) const
 //----------------------------------------------------------------------------------
 // PRIVATE
 //----------------------------------------------------------------------------------
-
+/*
+	Insert item in the top-bottom direction.
+*/
 void Workspace::InsertItem(ListData *item, ListData *before)
 {
 	// insert before one other item;
@@ -1491,24 +1078,23 @@ void Workspace::InsertItem(ListData *item, ListData *before)
 		if(before->upperItem)
 			before->upperItem->lowerItem	= item;
 		item->upperItem		= before->upperItem;
-		before->upperItem	= item;
 		item->lowerItem		= before;
+		before->upperItem	= item;
 
-		// if we're inserting at top of the stack, change it accordingly.
 		if(fTopItem == before)
 			fTopItem = item;
 	}
 	else
 	{
-		// insert item at bottom.
-		item->upperItem	= fBottomItem;
+		// insert item at the end.
+		item->upperItem 	= fBottomItem;
 		if(fBottomItem)
-			fBottomItem->lowerItem	= item;
+			fBottomItem->lowerItem = item;
 
-		fBottomItem		= item;
+		fBottomItem			= item;
 
 		if(!fTopItem)
-			fTopItem	= item;
+			fTopItem		= item;
 	}
 }
 
@@ -1535,16 +1121,469 @@ void Workspace::RemoveItem(ListData *item)
 	item->lowerItem	= NULL;
 	
 	if(fFocusItem == item)
-	{
-		fFocusItem->layerPtr->HighlightDecorator(false);
 		fFocusItem = NULL;
-	}
 
 	if(fFrontItem == item)
 		fFrontItem = NULL;
-
-	if(fCurrentItem == item)
-		fCurrentItem = NULL;
 }
 
 //----------------------------------------------------------------------------------
+
+ListData *Workspace::HasItem(const ListData *item, int32 *index) const
+{
+	int32		idx = 0;
+	ListData	*itemX;
+
+	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem)
+	{
+		if(item == itemX)
+			break;
+
+		idx++;
+	}
+
+	if (index && itemX)
+		*index = idx;
+
+	return itemX;
+}
+
+//----------------------------------------------------------------------------------
+
+ListData* Workspace::HasItem(const WinBorder *layer, int32 *index) const
+{
+	int32		idx = 0;
+	ListData	*itemX;
+
+	for (itemX = fBottomItem; itemX != NULL; itemX = itemX->upperItem)
+	{
+		if(layer == itemX->layerPtr)
+			break;
+
+		idx++;
+	}
+
+	if (index && itemX)
+		*index = idx;
+
+	return itemX;
+}
+
+//----------------------------------------------------------------------------------
+/*!
+	\brief Returns the index of the specified item starting from the back-most window.
+*/
+int32 Workspace::IndexOf(const ListData *item) const
+{
+	if (!item)
+		return -1;
+
+	int32	index = 0;
+	for (ListData *itemX = fTopItem; itemX != NULL; itemX = itemX->lowerItem)
+	{
+		if(itemX->layerPtr == item->layerPtr)
+			return index;
+		index++;
+	}
+	return -1;
+}
+
+inline
+bool Workspace::placeToBack(ListData *newLast)
+{
+	int32		level = newLast->layerPtr->Level();
+	ListData	*cursor = newLast->upperItem;
+
+	switch(level)
+	{
+		case B_FLOATING_ALL:
+		case B_FLOATING_APP:
+		{
+			int32	count = 0;
+			while (cursor && cursor->layerPtr->Level() == level)
+			{
+				if (!cursor->layerPtr->IsHidden())
+					count++;
+				cursor	= cursor->upperItem;
+			}
+
+			// we're already the last floating window
+			if (count == 0)
+				return false;
+			else
+			{
+				bool	changeFocus = false;
+
+				if (fFocusItem == newLast)
+					changeFocus = true;
+
+				if (changeFocus)
+				{
+					ListData	*cursor = newLast->upperItem;
+					while ( cursor
+						 	&& ( cursor->layerPtr->IsHidden()
+						 		 || cursor->layerPtr->Window()->Flags() & B_AVOID_FOCUS)
+						 	&& cursor->layerPtr->Level() == level)
+					{
+						cursor	= cursor->upperItem;
+					}
+
+					// give focus only if a unhidden floating window could be selected
+					// otherwise this('newLast') window keeps focus
+					if (cursor->layerPtr->Level() == level)
+						fFocusItem	= cursor;
+				}
+
+				RemoveItem(newLast);
+				InsertItem(newLast, cursor? cursor->lowerItem: fTopItem);
+
+				return true;
+			}
+		}
+		break;
+		case B_NORMAL:
+		{
+			int32	count = 0;
+			int32	cursorLevel;
+			while(cursor)
+			{
+				cursorLevel	= cursor->layerPtr->Level();
+				if (cursorLevel == B_MODAL_APP)
+				 	cursorLevel = B_NORMAL;
+
+				if (cursorLevel < level)
+				{
+					break;
+				}
+				else
+				{
+					count++;
+					cursor	= cursor->upperItem;
+				}
+			}
+
+			// we're already the last normal window
+			if (count == 0)
+				return false;
+			else
+			{
+				RemoveItem(newLast);
+				InsertItem(newLast, cursor? cursor->lowerItem: fTopItem);
+				return true;
+			}
+		}
+		break;
+
+	}
+	return false;
+}
+
+//----------------------------------------------------------------------------------
+/*!
+	\brief Based on it's WinBorder type, places this item in front as it is possible.
+*/
+void Workspace::placeInFront(ListData *item, const bool userBusy)
+{
+	if (!item)
+		return;
+
+	int32		level = item->layerPtr->Level();
+	ListData	*cursor = fBottomItem;
+	int32		cursorLevel;
+
+	// make MODAL windows act just like normal ones.
+	if (level == B_MODAL_APP)
+		level = B_NORMAL;
+
+	// B_SYSTEM_LAST - always place (the most) last
+	if (level == B_SYSTEM_LAST)
+	{
+		InsertItem(item, fTopItem);
+		return;
+	}
+
+	// search for the exact place...
+	while (cursor)
+	{
+		cursorLevel		= cursor->layerPtr->Level();
+
+		// make MODAL windows act just like normal ones.
+		if (cursorLevel == B_MODAL_APP)
+			cursorLevel = B_NORMAL;
+
+		if (level < cursorLevel)
+		{
+			cursor = cursor->upperItem;
+			continue;
+		}
+		else
+		{
+			// that's it, we've found the proper place.
+			break;
+		}
+	}
+
+	if (cursor)
+	{
+		// if user is busy typing something, or has an opened menu...
+		if (userBusy && cursor == fFrontItem)
+			InsertItem(item, cursor);
+		else
+			InsertItem(item, cursor->lowerItem);
+	}
+	else
+		InsertItem(item, fTopItem);
+}
+
+
+inline
+bool Workspace::removeAndPlaceBefore(ListData *item, ListData *beforeItem)
+{
+	if (item && item != beforeItem)
+	{
+		RemoveItem(item);
+		// insert into proper place.
+		InsertItem(item, beforeItem);
+		return true;
+	}
+	return false;
+}
+
+/*!
+	\brief Insert the specified WinBorder before given item. First search the
+			specified WinBorder in Workspace's list an remove it.
+	\resolution: private
+*/
+inline
+bool Workspace::removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem)
+{
+	return removeAndPlaceBefore(HasItem(wb), beforeItem);
+}
+
+inline
+WinBorder* Workspace::searchFirstMainWindow(WinBorder *wb) const
+{
+	ListData	*listItem = fBottomItem;
+	while (listItem)
+	{
+		if (listItem->layerPtr->Level() == B_NORMAL && !listItem->layerPtr->IsHidden()
+			&& listItem->layerPtr->App()->ClientTeamID() == wb->App()->ClientTeamID()
+			&& listItem->layerPtr->fFMWList.HasItem(wb))
+				return listItem->layerPtr;
+
+		listItem	= listItem->upperItem;
+	}
+	return NULL;
+}
+
+//----------------------------------------------------------------------------------
+
+inline
+bool Workspace::windowHasVisibleModals(const WinBorder *winBorder) const
+{
+	int32		i, count;
+	WinBorder	**wbList;
+
+	// check window's list
+	count		= winBorder->fFMWList.CountItems();
+	wbList		= (WinBorder**)winBorder->fFMWList.Items();
+	for(i = 0; i < count; i++)
+	{
+		if (wbList[i]->Level() == B_MODAL_APP && !wbList[i]->IsHidden())
+			return true;
+	}
+
+	// application's list only has modal windows.
+	count		= winBorder->App()->fAppFMWList.CountItems();
+	wbList		= (WinBorder**)winBorder->App()->fAppFMWList.Items();
+	for(i = 0; i < count; i++)
+	{
+		if (!wbList[i]->IsHidden())
+			return true;
+	}
+
+	return false;
+}
+
+//----------------------------------------------------------------------------------
+
+inline
+ListData* Workspace::putModalsInFront(ListData *item)
+{
+	int32		i, count, revIndex, revIndexItem;
+	WinBorder	**wbList;
+	ListData	*itemX;
+	ListData	*lastPlaced = NULL;
+	ListData	*before = item->lowerItem;
+
+	HasItem(item, &revIndex);
+
+	// check window's list
+	count		= item->layerPtr->fFMWList.CountItems();
+	wbList		= (WinBorder**)item->layerPtr->fFMWList.Items();
+	for(i = 0; i < count; i++)
+	{
+		if (wbList[i]->Level() == B_MODAL_APP && !wbList[i]->IsHidden())
+		{
+			itemX	= HasItem(wbList[i], &revIndexItem);
+			if (!itemX)
+			{
+				itemX		= fPool.GetCleanMemory(wbList[i]);
+
+				InsertItem(itemX, before);
+				lastPlaced	= itemX;
+			}
+			else if (revIndexItem > revIndex)
+			{
+				removeAndPlaceBefore(itemX, before);
+				lastPlaced	= itemX;
+			}
+		}
+	}
+
+	// application's list only has modal windows.
+	count		= item->layerPtr->App()->fAppFMWList.CountItems();
+	wbList		= (WinBorder**)item->layerPtr->App()->fAppFMWList.Items();
+	for(i = 0; i < count; i++)
+	{
+		if (!wbList[i]->IsHidden())
+		{
+			itemX	= HasItem(wbList[i], &revIndexItem);
+			if (!itemX)
+			{
+				itemX		= fPool.GetCleanMemory(wbList[i]);
+
+				InsertItem(itemX, before);
+				lastPlaced	= itemX;
+			}
+			else if (revIndexItem > revIndex)
+			{
+				removeAndPlaceBefore(itemX, before);
+				lastPlaced	= itemX;
+			}
+		}
+	}
+
+	return lastPlaced;
+}
+
+//----------------------------------------------------------------------------------
+
+inline
+void Workspace::putFloatingInFront(ListData *item)
+{
+	int32		i;
+	ListData	*newItem;
+	ListData	*before = item->lowerItem;
+	WinBorder	*wb;
+
+	i = 0;
+	while ((wb = (WinBorder*)item->layerPtr->fFMWList.ItemAt(i)))
+	{
+		if (wb->Level() == B_MODAL_APP)
+		{
+			break;
+		}
+		else if (!wb->IsHidden())
+		{
+			newItem				= fPool.GetCleanMemory(wb);
+
+			InsertItem(newItem, before);
+
+			item->layerPtr->fFMWList.RemoveItem(i);
+		}
+		else
+			i++;		
+	}
+}
+
+//----------------------------------------------------------------------------------
+
+inline
+void Workspace::saveFloatingWindows(ListData *itemNormal)
+{
+	ListData		*item = itemNormal->lowerItem;
+	ListData		*toast;
+	while(item)
+	{
+		if (item->layerPtr->Level() == B_FLOATING_APP)
+		{
+			itemNormal->layerPtr->fFMWList.AddWinBorder(item->layerPtr);
+
+			toast	= item;
+			item	= item->lowerItem;
+			RemoveItem(toast);
+			fPool.ReleaseMemory(toast);
+		}
+		else
+			break;
+	}
+}
+
+//----------------------------------------------------------------------------------
+
+inline
+ListData* Workspace::findNextFront() const
+{
+	ListData	*item = fBottomItem;
+
+	while(item)
+	{
+		if (!item->layerPtr->IsHidden()
+			&& item->layerPtr->Level() != B_FLOATING_ALL
+			&& item->layerPtr->Level() != B_FLOATING_APP
+			&& !(item->layerPtr->Window()->Flags() & B_AVOID_FRONT))
+		{
+			return item;
+		}
+		item = item->upperItem;
+	}
+
+	// we cannot ignore anymore B_AVOID_FRONT windows.
+
+	item	= fBottomItem;
+	while(item)
+	{
+		if (!item->layerPtr->IsHidden()
+			&& item->layerPtr->Level() != B_FLOATING_ALL
+			&& item->layerPtr->Level() != B_FLOATING_APP)
+		{
+			return item;
+		}
+		item = item->upperItem;
+	}
+
+	return NULL;
+}
+
+
+
+
+// TODO: BAD, bad memory manager!!! replace!!!
+Workspace::MemoryPool::MemoryPool()
+{
+}
+
+Workspace::MemoryPool::~MemoryPool()
+{
+}
+
+inline
+ListData* Workspace::MemoryPool::GetCleanMemory(WinBorder *winBorder)
+{
+	ListData	*item = (ListData*)malloc(sizeof(ListData));
+	item->layerPtr = winBorder;
+	item->upperItem = NULL;
+	item->lowerItem = NULL;
+	return item;
+}
+
+inline
+void Workspace::MemoryPool::ReleaseMemory(ListData *mem)
+{
+	free(mem);
+}
+
+void Workspace::MemoryPool::expandBuffer(int32 start)
+{
+}

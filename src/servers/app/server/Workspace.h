@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Workspace.h
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Author:			Adi Oanca <adioanca@cotty.iren.com>
 //	Description:	Tracks workspaces
 //  
 //  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -41,6 +41,7 @@ class WinBorder;
 
 struct ListData
 {
+	bool isFree;
 	WinBorder *layerPtr;
 	ListData *upperItem;
 	ListData *lowerItem;
@@ -49,84 +50,101 @@ struct ListData
 class Workspace
 {
 public:
-	Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor);
-	~Workspace(void);
-	
-	bool AddWinBorder(WinBorder *layer);
-	bool RemoveWinBorder(WinBorder *layer);
-	bool HideSubsetWindows(WinBorder *layer);
-	WinBorder *FocusLayer(void) const;
-	WinBorder *FrontLayer(void) const;
-	
-	void MoveToBack(WinBorder *newLast);
-	
-	// The bottom item is the one which is visible
-	WinBorder *GoToBottomItem(void);
-	WinBorder *GoToUpperItem(void);
-	WinBorder *GoToTopItem(void);
-	WinBorder *GoToLowerItem(void);
-	bool GoToItem(WinBorder *layer);
+								Workspace(	const int32 ID,
+											const uint32 colorspace,
+											const RGBColor& BGColor);
+								~Workspace(void);
 
-	void SetLocalSpace(const uint32 colorspace);
-	uint32 LocalSpace(void) const;
+			int32				ID(void) const { return fID; }
 	
-	void SetBGColor(const RGBColor &c);
-	RGBColor BGColor(void) const;
+			void				AddWinBorder(WinBorder *winBorder);
+			void				RemoveWinBorder(WinBorder *winBorder);
+			bool				HasWinBorder(const WinBorder *winBorder) const;
+
+			WinBorder*			Focus(void) const;
+			WinBorder*			Front(void) const;
+			void				GetWinBorderList(void **&list, int32 *itemCount ) const;
 	
-	int32 ID(void) const { return fID; }
+			bool				MoveToBack(WinBorder *newLast);
+			bool				MoveToFront(WinBorder *newFront, bool doNotDisturb = false);
+
+			bool				HideWinBorder(WinBorder *winBorder);
+			bool				ShowWinBorder(WinBorder *winBorder, bool userBusy = false);
+
+			// resolution related methods.
+			void				SetLocalSpace(const uint32 colorspace);
+			uint32				LocalSpace(void) const;
 	
-	void GetSettings(const BMessage &msg);
-	void GetDefaultSettings(void);
-	void PutSettings(BMessage *msg, const int32 &index) const;
-	static void PutDefaultSettings(BMessage *msg, const int32 &index);
+			void				SetBGColor(const RGBColor &c);
+			RGBColor			BGColor(void) const;
+
+			// settings related methods	
+			void				GetSettings(const BMessage &msg);
+			void				GetDefaultSettings(void);
+			void				PutSettings(BMessage *msg, const int32 &index) const;
+	static	void				PutDefaultSettings(BMessage *msg, const int32 &index);
 	
-	// debug methods
-	void PrintToStream(void) const;
-	void PrintItem(ListData *item) const;
-	
-	// TODO: Bad Style. There should be a more elegant way of doing this
-	// .... private :-) - do not use!
-	void SearchAndSetNewFront(WinBorder *preferred);
-	void SearchAndSetNewFocus(WinBorder *preferred);
-	void BringToFrontANormalWindow(WinBorder *layer);
-	
+			// debug methods
+			void				PrintToStream(void) const;
+			void				PrintItem(ListData *item) const;
 	
 private:
+			void				InsertItem(ListData *item, ListData *before);
+			void				RemoveItem(ListData *item);
+			ListData*			HasItem(const ListData *item, int32 *index = NULL) const;
+			ListData*			HasItem(const WinBorder *layer, int32 *index = NULL) const;
+			int32				IndexOf(const ListData *item) const;
+
+			bool				placeToBack(ListData *newLast);
+			void				placeInFront(ListData *item, const bool userBusy);
+
+			bool				removeAndPlaceBefore(const WinBorder *wb, ListData *beforeItem);
+			bool				removeAndPlaceBefore(ListData *item, ListData *beforeItem);
+
+			WinBorder*			searchFirstMainWindow(WinBorder *wb) const;
+
+			bool				windowHasVisibleModals(const WinBorder *winBorder) const;
+			ListData*			putModalsInFront(ListData *item);
+			void				putFloatingInFront(ListData *item);
+			void				saveFloatingWindows(ListData *itemNormal);
+
+			ListData*			findNextFront() const;
+
+	class MemoryPool
+	{
+	public:
+					MemoryPool();
+					~MemoryPool();
+		ListData*	GetCleanMemory(WinBorder* winborder);
+		void		ReleaseMemory(ListData* mem);
+	private:
+		void		expandBuffer(int32 start);
+		ListData	*buffer;
+		int32		count;
+	};
+
+			int32				fID;
+			uint32				fSpace;
+			RGBColor			fBGColor;
+
+			// first visible onscreen
+			ListData			*fBottomItem;
 	
-	void InsertItem(ListData *item, ListData *before);
-	void RemoveItem(ListData *item);
-	ListData *HasItem(ListData *item);
-	ListData *HasItem(WinBorder *layer);
+			// the last visible(or covered by other Layers)
+			ListData			*fTopItem;
 	
-	ListData *FindPlace(ListData *pref);
+			// the focus WinBorder - for keyboard events
+			ListData			*fFocusItem;
 	
-	int32 fID;
-	uint32 fSpace;
-	RGBColor fBGColor;
+			// pointer for which "big" actions are intended
+			ListData			*fFrontItem;
 	
-	// first visible onscreen
-	ListData *fBottomItem;
+			// settings for each workspace -- example taken from R5's app_server_settings file
+			display_timing		fDisplayTiming;
+			int16				fVirtualWidth;
+			int16				fVirtualHeight;
 	
-	 // the last visible(or covered by other Layers)
-	ListData *fTopItem;
-	
-	 // pointer to the current element in the list
-	ListData *fCurrentItem;
-	
-	 // the focus WinBorder - for keyboard events
-	ListData *fFocusItem;
-	
-	 // the item that is the target of mouse operations
-	ListData *fFrontItem;
-	
-	// settings for each workspace -- example taken from R5's app_server_settings file
-	display_timing fDisplayTiming;
-	int16 fVirtualWidth;
-	int16 fVirtualHeight;
-	
-	// TODO: find out what specific values need to be contained in fFlags as per R5's server
-	// not to be confused with display_timing.flags
-	uint32 fFlags;
+			MemoryPool			fPool;
 };
 
 #endif

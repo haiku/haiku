@@ -68,35 +68,32 @@ public:
 	virtual	Layer *VirtualUpperSibling(void) const;
 	virtual	Layer *VirtualBottomChild(void) const;
 
-	void ReadWorkspaceData(const char *path);
-	void SaveWorkspaceData(const char *path);
-	
-	void AddWinBorder(WinBorder *winBorder);
-	void RemoveWinBorder(WinBorder *winBorder);
 	void HideWinBorder(WinBorder* winBorder);
 	void ShowWinBorder(WinBorder* winBorder);
-	WinBorder* WinBorderAt(const BPoint& pt);
-	void ChangeWorkspacesFor(WinBorder *winBorder, uint32 newWorkspaces);
-	bool SetFrontWinBorder(WinBorder *winBorder);
+	void SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex);
+	WinBorder* WinBorderAt(const BPoint& pt) const;
+	WinBorder* FocusWinBorder() const;
+
+	void SetWorkspaceCount(int32 wksCount);
+	int32 WorkspaceCount() const { return fWsCount; }
+	Workspace* WorkspaceAt(int32 index) const { return fWorkspace[index]; }
+	Workspace* ActiveWorkspace() const { return fWorkspace[fActiveWksIndex]; }
+	int32 ActiveWorkspaceIndex() const { return fActiveWksIndex; }
+	void SetActiveWorkspace(int32 index);
+
+	void ReadWorkspaceData(const char *path);
+	void SaveWorkspaceData(const char *path);
 	
 	void SetScreens(Screen *screen[], int32 rows, int32 columns);
 	Screen **Screens(void);
 	bool SetScreenResolution(int32 width, int32 height, uint32 colorspace);
 	int32 ScreenRows(void) const { return fRows; }
 	int32 ScreenColumns(void) const { return fColumns; }
-	
-	void SetWorkspaceCount(const int32 count);
-	int32 WorkspaceCount(void) const;
-	Workspace *WorkspaceAt(const int32 index) const;
-	void SetActiveWorkspaceByIndex(const int32 index);
-	void SetActiveWorkspace(Workspace *ws);
-	int32 ActiveWorkspaceIndex(void) const;
-	Workspace *ActiveWorkspace(void) const;
-	
+
 	void SetBGColor(const RGBColor &col);
 	RGBColor BGColor(void) const;
 	
-	int32 Buttons(void);
+	int32 Buttons(void) { return fButtons; }
 	virtual bool HasClient(void) { return false; }
 	
 	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
@@ -124,18 +121,17 @@ public:
 	// Debug methods
 	void PrintToStream(void);
 	
-	// "Private" to app_server :-) - they should not be used
-	void RemoveAppWindow(WinBorder *wb);
-
-	FMWList			fMainFMWList;
 	BRegion			fRedrawReg;
 	BList			fCopyRegList;
 	BList			fCopyList;
 
-// TODO: remove! Quick!
-	BLocker			fMainLock;
-
 private:
+friend class Desktop;
+	// these are meant for Desktop class only!
+	void AddWinBorder(WinBorder* winBorder);
+	void RemoveWinBorder(WinBorder* winBorder);
+	void AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder);
+	void RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder);
 
 			void			show_winBorder(WinBorder* winBorder);
 			void			hide_winBorder(WinBorder* winBorder);
@@ -160,8 +156,12 @@ private:
 	uint32 fColorSpace;
 	int32 fButtons;
 	
-	BList fWorkspaceList;
-	Workspace *fActiveWorkspace;
+	int32			fActiveWksIndex;
+	int32			fWsCount;
+	Workspace*		fWorkspace[32];
+	mutable WinBorder**		fWinBorderList;
+	mutable int32			fWinBorderCount;
+	mutable int32			fWinBorderIndex;
 
 	int32 fScreenShotIndex;
 	bool fQuiting;

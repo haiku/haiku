@@ -45,7 +45,7 @@ class Desktop
 public:
 	// startup methods
 	Desktop(void);
-	~Desktop(void);
+	virtual ~Desktop(void);
 	void Init(void);
 
 	// 1-BigScreen or n-SmallScreens
@@ -67,7 +67,23 @@ public:
 	// Methods for layer(WinBorder) manipulation.
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
+	void AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder);
+	void RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder);
 	bool HasWinBorder(WinBorder *winBorder);
+
+	WinBorder* FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
+	// get list of registed windows
+	const BList& WindowList() const
+	{
+		if (!IsLocked())
+			debugger("You must lock before getting registered windows list\n");
+		return fWinBorderList;
+	}
+
+	// locking with regards to registered windows list
+	bool Lock() { return fWinLock.Lock(); }
+	void Unlock() { return fWinLock.Unlock(); }
+	bool IsLocked() const { return fWinLock.IsLocked(); }
 
 	// Methods for various desktop stuff handled by the server
 	void SetScrollBarInfo(const scroll_bar_info &info);
@@ -85,27 +101,22 @@ public:
 	void PrintToStream(void);
 	void PrintVisibleInRootLayerNo(int32 no);
 	
-	// "Private" to app_server :-) - means they should not be used very much
-	void RemoveSubsetWindow(WinBorder *wb);
-	WinBorder *FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
-	
-	BLocker fGeneralLock;
-	BLocker fLayerLock;
-	BList fWinBorderList;
-	
 private:
-	void AddDriver(DisplayDriver *driver);
-	
-	BList fRootLayerList;
-	RootLayer *fActiveRootLayer;
+	void		AddDriver(DisplayDriver *driver);
 
-	BList fScreenList;
-	Screen *fActiveScreen;
+	BList		fWinBorderList;
+	BLocker		fWinLock;
+
+	BList		fRootLayerList;
+	RootLayer	*fActiveRootLayer;
+
+	BList		fScreenList;
+	Screen		*fActiveScreen;
 	
 	scroll_bar_info fScrollBarInfo;
-	menu_info fMenuInfo;
-	mode_mouse fMouseMode;
-	bool fFFMouseMode;
+	menu_info	fMenuInfo;
+	mode_mouse	fMouseMode;
+	bool		fFFMouseMode;
 };
 
 extern Desktop *desktop;

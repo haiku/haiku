@@ -22,7 +22,7 @@
 //	File Name:		RootLayer.cpp
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
 //					DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
+//					Adi Oanca <adioanca@cotty.iren.ro>
 //	Description:	Class used for the top layer of each workspace's Layer tree
 //  
 //------------------------------------------------------------------------------
@@ -65,6 +65,15 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 {
 	fDesktop = desktop;
 
+	fWinBorderList	= NULL;
+	fWinBorderCount	= 0;
+	fWinBorderIndex	= 0;
+	fWsCount		= 0;
+	fActiveWksIndex	= 0;
+	memset(&fWorkspace[0], 0, sizeof(Workspace*)*32);
+	SetWorkspaceCount(workspaceCount);
+	SetActiveWorkspace(0L);
+
 	fMouseTarget		= NULL;
 	fDragMessage		= NULL;
 	fScreenShotIndex	= 1;
@@ -73,7 +82,6 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 
 	//NOTE: be careful about this one.
 	fRootLayer = this;
-	fActiveWorkspace = NULL;
 	fRows = 0;
 	fColumns = 0;
 
@@ -111,6 +119,15 @@ RootLayer::~RootLayer()
 
 	if (fDragMessage)
 		delete fDragMessage;
+
+	for (int32 i = 0; i < fWsCount; i++)
+	{
+		if (fWorkspace[i])
+		{
+			delete fWorkspace[i];
+			fWorkspace[i] = NULL;
+		}
+	}
 
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
@@ -257,6 +274,7 @@ void RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
 void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 {
 	// NOTE: our thread (WorkingThread) is locked here.
+	STRACE(("RootLayer::invalidate_layer(%s)\n", layer->GetName()));
 
 	if (layer->fParent)
 		layer = layer->fParent;
@@ -300,22 +318,344 @@ void RootLayer::ResizeBy(float x, float y)
 
 Layer* RootLayer::VirtualTopChild() const
 {
-	return fActiveWorkspace->GoToTopItem();
+	if (fWinBorderList)
+	{
+		free(fWinBorderList);
+		fWinBorderList = NULL;
+	}
+
+	void	**list;
+	ActiveWorkspace()->GetWinBorderList(list, &fWinBorderCount);
+	fWinBorderList	= (WinBorder**)list;
+	fWinBorderIndex	= fWinBorderCount-1;
+
+	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
+		return fWinBorderList[fWinBorderIndex--];
+
+	return NULL;
 }
 
 Layer* RootLayer::VirtualLowerSibling() const
 {
-	return fActiveWorkspace->GoToLowerItem();
+	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
+		return fWinBorderList[fWinBorderIndex--];
+
+	return NULL;
 }
 
 Layer* RootLayer::VirtualUpperSibling() const
 {
-	return fActiveWorkspace->GoToUpperItem();
+	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
+		return fWinBorderList[fWinBorderIndex++];
+
+	return NULL;
 }
 
 Layer* RootLayer::VirtualBottomChild() const
 {
-	return fActiveWorkspace->GoToBottomItem();
+	if (fWinBorderList)
+	{
+		free(fWinBorderList);
+		fWinBorderList = NULL;
+	}
+
+	void	**list;
+	ActiveWorkspace()->GetWinBorderList(list, &fWinBorderCount);
+	fWinBorderList	= (WinBorder**)list;
+	fWinBorderIndex	= 0;
+
+	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
+		return fWinBorderList[fWinBorderIndex++];
+
+	return NULL;
+}
+
+
+void RootLayer::AddWinBorder(WinBorder* winBorder)
+{
+	if (!winBorder->IsHidden())
+	{
+		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		return;
+	}
+
+	uint32		wks = winBorder->Window()->Workspaces();
+
+	// add to current workspace
+	if (wks == 0)
+	{
+		fWorkspace[fActiveWksIndex]->AddWinBorder(winBorder);
+	}
+	// add to desired workspaces
+	else
+	{
+		for (int32 i = 0; i < fWsCount; i++)
+		{
+			if (fWorkspace[i] && (wks & (0x00000001UL << i)))
+				fWorkspace[i]->AddWinBorder(winBorder);
+		}
+	}
+
+	// we _DO_NOT_ need to invalidate here. At this point our WinBorder is hidden!
+
+	// set some internals
+	winBorder->SetRootLayer(this);
+	winBorder->fParent = this;
+}
+
+void RootLayer::RemoveWinBorder(WinBorder* winBorder)
+{
+	// Note: removing a subset window is also permited/performed.
+
+	if (!winBorder->IsHidden())
+	{
+		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
+		return;
+	}
+
+	// security measure: in case of windows whose workspace count is 0(current workspace),
+	// we don't know the exact workspaces to remove it from. And how all modal and floating
+	// windows have 0 as a workspace index, this action is fully justified.
+	for (int32 i = 0; i < fWsCount; i++)
+		if (fWorkspace[i])
+			fWorkspace[i]->RemoveWinBorder(winBorder);
+
+	// we _DO_NOT_ need to invalidate here. At this point our WinBorder is hidden!
+
+	// set some internals
+	winBorder->SetRootLayer(NULL);
+	winBorder->fParent = NULL;
+}
+
+void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
+{
+	// SUBSET windows _must_ have their workspaceIndex set to 0x0
+	if (winBorder->Window()->Workspaces() != 0UL)
+	{
+		debugger("SUBSET windows _must_ have their workspaceIndex set to 0x0\n");
+		return;
+	}
+
+	// there is no point in continuing - this subset window won't be shown,
+	// from 'toWinBorder's point of view
+	if (winBorder->IsHidden() || toWinBorder->IsHidden())
+	{
+		return;
+	}
+
+	bool	invalidate	= false;
+	bool	invalid;
+
+	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
+	// If they are needed, Workspace automaticaly allocates space and inserts them.
+	for (int32 i = 0; i < fWsCount; i++)
+	{
+		invalid		= false;
+
+		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(toWinBorder))
+			invalid = fWorkspace[i]->ShowWinBorder(winBorder, false);
+
+		if (fActiveWksIndex == i)
+			invalidate = invalid;
+	}
+
+	if (invalidate)
+	{
+		// RootLayer::Invalidate(&winborder's full)
+	}
+}
+
+void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBorder)
+{
+	// there is no point in continuing - this subset window is not visible
+	// at least not visible from 'fromWinBorder's point of view.
+	if (winBorder->IsHidden() || fromWinBorder->IsHidden())
+	{
+		return;
+	}
+
+	bool	invalidate	= false;
+	bool	invalid;
+
+	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
+	for (int32 i = 0; i < fWsCount; i++)
+	{
+		invalid		= false;
+
+		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(fromWinBorder))
+			invalid = fWorkspace[i]->HideWinBorder(winBorder);
+
+		if (fActiveWksIndex == i)
+			invalidate = invalid;
+	}
+
+	if (invalidate)
+	{
+		// RootLayer::Invalidate(&winBorder's visible);
+	}
+}
+
+
+// NOTE: This must be called by RootLayer's thread!!!!
+void RootLayer::SetActiveWorkspace(int32 index)
+{
+	STRACE(("RootLayer(%s)::SetActiveWorkspace(%ld)\n", GetName(), index));
+	desktop->Lock();
+
+	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
+	if (!fWorkspace[index])
+	{
+		// TODO: we NEED datas from a file!!!
+		fWorkspace[index] = new Workspace(index, 0xFF00FF00, RGBColor());
+
+		const BList&	windowList = desktop->WindowList();
+
+		int32			ptrCount = windowList.CountItems();
+		WinBorder		**ptrWin = (WinBorder**)windowList.Items();
+
+		for (int32 i = 0; i < ptrCount; i++)
+		{
+			if (ptrWin[i]->Window()->Workspaces() & (0x00000001UL << index))
+			{
+				fWorkspace[index]->AddWinBorder(ptrWin[i]);
+				if (!ptrWin[i]->IsHidden())
+					fWorkspace[index]->ShowWinBorder(ptrWin[i]);
+			}
+		}
+	}
+
+	if (ActiveWorkspace()->Focus())
+	{
+		BMessage	activateMsg(B_WINDOW_ACTIVATED);
+		activateMsg.AddBool("active", false);
+//		ActiveWorkspace()->Focus()->layerPtr->Window()->SendMsgToClient(&msg);
+	}
+
+	{
+		int32		ptrCount;
+		WinBorder	**ptrWin = NULL;
+		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
+		activatedMsg.AddInt32("workspace", fActiveWksIndex);
+		activatedMsg.AddBool("active", false);
+
+		ActiveWorkspace()->GetWinBorderList((void**&)ptrWin, &ptrCount);
+		if (ptrWin)
+		{
+			for (int32 i = 0; i < ptrCount; i++)
+			{
+				//ptrWin[i]->Window()->SendMsgToClient(&activatedMsg);
+			}
+		
+			delete ptrWin;
+		}
+	}
+
+	fActiveWksIndex		= index;
+
+	{
+		int32		ptrCount;
+		WinBorder	**ptrWin = NULL;
+		BMessage	activatedMsg(B_WORKSPACE_ACTIVATED);
+		activatedMsg.AddInt32("workspace", fActiveWksIndex);
+		activatedMsg.AddBool("active", true);
+
+		ActiveWorkspace()->GetWinBorderList((void**&)ptrWin, &ptrCount);
+		if (ptrWin)
+		{
+			for (int32 i = 0; i < ptrCount; i++)
+			{
+				//ptrWin[i]->Window()->SendMsgToClient(&activatedMsg);
+			}
+		
+			delete ptrWin;
+		}
+	}
+
+	if (ActiveWorkspace()->Focus())
+	{
+		BMessage	activateMsg(B_WINDOW_ACTIVATED);
+		activateMsg.AddBool("active", true);
+//		ActiveWorkspace()->Focus()->layerPtr->Window()->SendMsgToClient(&msg);
+	}
+
+// TODO: if the user is holding/moving a window, *IF* the window *is not*
+//       in future active workspace, remove from curent one and place in
+//       future active workspace.
+
+	// RootLayer::Invalidate(&RootLayer's fFullVisible)
+
+	desktop->Unlock();
+}
+
+void RootLayer::SetWinBorderWorskpaces(WinBorder *winBorder, uint32 newWksIndex)
+{
+	// you *cannot* set workspaces index for a window other than a normal one!
+	// Note: See ServerWindow class.
+	if (winBorder->Window()->Feel() != B_NORMAL_WINDOW_FEEL)
+		return;
+
+	bool invalidate = false;
+	bool invalid;
+	uint32		oldWksIndex = winBorder->Window()->Workspaces();
+
+	for (int32 i = 0; i < 32; i++)
+	{
+		if (fWorkspace[i])
+		{
+			invalid = false;
+
+			if (oldWksIndex & (0x00000001UL << i) &&
+				!(newWksIndex & (0x00000001UL << i)))
+			{
+				if (!winBorder->IsHidden())
+				{
+					// a little trick to force Workspace to properly pick the next front.
+					winBorder->Hide();
+					invalid = fWorkspace[i]->HideWinBorder(winBorder);
+					winBorder->Show();
+				}
+				fWorkspace[i]->RemoveWinBorder(winBorder);
+			}
+			else
+			if (newWksIndex & (0x00000001UL << i) &&
+				!(oldWksIndex & (0x00000001UL << i)))
+			{
+				fWorkspace[i]->AddWinBorder(winBorder);
+				if (!winBorder->IsHidden())
+					invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+			}
+			else
+			{
+				// do nothing. winBorder was, and it's still is a member of this workspace
+				// OR, winBorder wasn't and it not be in this workspace
+			}
+
+			if (fActiveWksIndex == i)
+				invalidate = invalid;
+		}
+	}
+
+	if (invalidate)
+		; // RootLayer::Invalidate(winBorder's full visible)
+}
+
+void RootLayer::SetWorkspaceCount(int32 wksCount)
+{
+	if (wksCount < 1)
+		wksCount = 1;
+	if (wksCount > 32)
+		wksCount = 32;
+
+	for (int32 i = wksCount; i < fWsCount; i++)
+	{
+		if (fWorkspace[i])
+		{
+			delete fWorkspace[i];
+			fWorkspace[i] = NULL;
+		}
+	}
+	
+	fWsCount	= wksCount;
 }
 
 void RootLayer::ReadWorkspaceData(const char *path)
@@ -335,7 +675,7 @@ void RootLayer::ReadWorkspaceData(const char *path)
 		
 		for(int32 i=0; i<count; i++)
 		{
-			Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+			Workspace *ws=(Workspace*)fWorkspace[i];
 			if(!ws)
 				continue;
 			
@@ -356,7 +696,7 @@ void RootLayer::ReadWorkspaceData(const char *path)
 		
 		for(int32 i=0; i<9; i++)
 		{
-			Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+			Workspace *ws=(Workspace*)fWorkspace[i];
 			if(!ws)
 				continue;
 			
@@ -377,7 +717,7 @@ void RootLayer::SaveWorkspaceData(const char *path)
 	}
 	
 	char string[20];
-	int32 count=fWorkspaceList.CountItems();
+	int32 count=fWsCount;
 
 	if(msg.Unflatten(&file)==B_OK)
 	{
@@ -395,7 +735,7 @@ void RootLayer::SaveWorkspaceData(const char *path)
 	{
 		sprintf(string,"workspace %ld",i);
 
-		Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+		Workspace *ws=(Workspace*)fWorkspace[i];
 		
 		if(!ws)
 		{
@@ -411,162 +751,6 @@ void RootLayer::SaveWorkspaceData(const char *path)
 	}
 }
 
-void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
-{
-	if (!(fMainLock.IsLocked()))
-		debugger("RootLayer::AddWinBorderToWorkspaces - fMainLock has to be locked!\n");
-
-	for( int32 i=0; i < 32; i++)
-	{
-		if( wks & (0x00000001 << i) && i < WorkspaceCount())
-			WorkspaceAt(i+1)->AddWinBorder(winBorder);
-	}
-}
-
-void RootLayer::AddWinBorder(WinBorder* winBorder)
-{
-	// The main job of this function, besides adding winBorder as a child, is to determine
-	// in which workspaces to add this window.
-
-	STRACE(("*RootLayer::AddWinBorder(%s)\n", winBorder->GetName()));
-	desktop->fGeneralLock.Lock();
-	
-	STRACE(("*RootLayer::AddWinBorder(%s) - General lock acquired\n", winBorder->GetName()));
-	fMainLock.Lock();
-
-	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName()));
-
-	// in case we want to be added to the current workspace
-	if (winBorder->Window()->Workspaces() == B_CURRENT_WORKSPACE)
-		winBorder->Window()->QuietlySetWorkspaces(0x00000001 << (ActiveWorkspaceIndex()-1));
-
-	// add winBorder to the known list of WinBorders so we can keep track of it.
-	AddChild(winBorder, winBorder->Window());
-
-	// add winBorder to the desired workspaces
-	switch(winBorder->Window()->Feel())
-	{
-		case B_MODAL_SUBSET_WINDOW_FEEL:
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-		{
-			// this kind of window isn't added anywhere. It will be added
-			//	to main window's subset when winBorder::AddToSubsetOf(main)
-			//	will be called.
-			break;
-		}
-		case B_MODAL_APP_WINDOW_FEEL:
-		case B_FLOATING_APP_WINDOW_FEEL:
-		{
-			// add to app's list of Floating/Modal windows (as opposed to the system's)
-			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
-
-			// determine in which workspaces to add this winBorder object.
-			uint32		wks = 0;
-			for (int32 i=0; i<WorkspaceCount(); i++)
-			{
-				// if we find a window belonging to winBorder's team, add winBorder to that workspace.
-				Workspace	*ws = WorkspaceAt(i+1);
-				for (WinBorder *wb = ws->GoToBottomItem(); wb!=NULL; wb = ws->GoToUpperItem())
-				{
-					if ( winBorder->Window()->ClientTeamID() == wb->Window()->ClientTeamID())
-					{
-						wks = wks | winBorder->Window()->Workspaces();
-						break;
-					}
-				}
-			}
-
-			AddWinBorderToWorkspaces(winBorder, wks);
-			break;
-		}
-				
-		case B_MODAL_ALL_WINDOW_FEEL:
-		case B_FLOATING_ALL_WINDOW_FEEL:
-		{
-			// add to system's list of Floating/Modal Windows
-			fMainFMWList.AddItem(winBorder);
-			
-			// add this winBorder to all workspaces
-			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
-			break;
-		}
-		
-		case B_NORMAL_WINDOW_FEEL:
-		{
-			// add this winBorder to the specified workspaces
-			AddWinBorderToWorkspaces(winBorder, winBorder->Window()->Workspaces());
-			break;
-		}
-
-		case B_SYSTEM_LAST:
-		case B_SYSTEM_FIRST:
-		{
-			// add this winBorder to all workspaces
-			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
-			break;
-		}
-		default:{
-			debugger("RootLayer::AddWinBorder() - what kind of window is this?");
-			break;
-		}
-	}	// end switch(winborder->Feel())
-
-	fMainLock.Unlock();
-	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName()));
-	
-	desktop->fGeneralLock.Unlock();
-	STRACE(("*RootLayer::AddWinBorder(%s) - General lock released\n", winBorder->GetName()));
-	
-	STRACE(("#RootLayer::AddWinBorder(%s)\n", winBorder->GetName()));
-}
-
-void RootLayer::RemoveWinBorder(WinBorder* winBorder)
-{
-	// This method does 3 things:
-	// 1) Removes MODAL/SUBSET windows from system/app/window subset list.
-	// 2) Removes this window from any workspace it appears in.
-	// 3) Removes this window from RootLayer's list of children.
-
-	desktop->fGeneralLock.Lock();
-	fMainLock.Lock();
-	
-	int32 feel = winBorder->Window()->Feel();
-	if(feel == B_MODAL_SUBSET_WINDOW_FEEL || feel == B_FLOATING_SUBSET_WINDOW_FEEL)
-	{
-		desktop->RemoveSubsetWindow(winBorder);
-	}
-	else
-	if (feel == B_MODAL_APP_WINDOW_FEEL || feel == B_FLOATING_APP_WINDOW_FEEL)
-	{
-		RemoveAppWindow(winBorder);
-	}
-	else
-	if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL
-			|| feel == B_SYSTEM_FIRST || feel == B_SYSTEM_LAST)
-	{
-		if(feel == B_MODAL_ALL_WINDOW_FEEL || feel == B_FLOATING_ALL_WINDOW_FEEL)
-			fMainFMWList.RemoveItem(winBorder);
-
-		int32 count = WorkspaceCount();
-		for(int32 i=0; i < count; i++)
-			WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
-	}
-	else
-	{	// for B_NORMAL_WINDOW_FEEL
-		uint32 workspaces = winBorder->Window()->Workspaces();
-		int32 count = WorkspaceCount();
-		for( int32 i=0; i < 32 && i < count; i++)
-		{
-			if( workspaces & (0x00000001UL << i))
-				WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
-		}
-	}
-	
-	RemoveChild(winBorder);
-	
-	fMainLock.Unlock();
-	desktop->fGeneralLock.Unlock();
-}
 
 void RootLayer::HideWinBorder(WinBorder* winBorder)
 {
@@ -584,101 +768,18 @@ void RootLayer::ShowWinBorder(WinBorder* winBorder)
 	msg.Flush();
 }
 
-WinBorder* RootLayer::WinBorderAt(const BPoint& pt){
-	WinBorder		*target = NULL;
-	WinBorder		*wb = NULL;
-
-	for( wb = fActiveWorkspace->GoToBottomItem(); wb; wb = fActiveWorkspace->GoToUpperItem())
+WinBorder* RootLayer::WinBorderAt(const BPoint& pt) const{
+	for (int32 i = 0; i < fWinBorderCount; i++)
 	{
-		if(!wb->IsHidden() && wb->HasPoint(pt))
-		{
-			target	= wb;
-			break;
-		}
+		if (fWinBorderList[i]->fFullVisible.Contains(pt))
+			return fWinBorderList[i];
 	}
-	return target;
+	return NULL;
 }
 
-void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
+WinBorder* RootLayer::FocusWinBorder() const
 {
-	// only normal windows are affected by this change
-	if(!winBorder->fLevel != B_NORMAL_FEEL)
-		return;
-
-	uint32 oldWorkspaces = winBorder->Window()->Workspaces();
-	for(int32 i=0; i < WorkspaceCount(); i++)
-	{
-		if ((oldWorkspaces & (0x00000001 << i)) && (newWorkspaces & (0x00000001 << i)))
-		{
-			// do nothing.
-		}
-		else
-		if(oldWorkspaces & (0x00000001 << i))
-		{
-			WorkspaceAt(i+1)->RemoveWinBorder(winBorder);
-		}
-		else
-		if (newWorkspaces & (0x00000001 << i))
-		{
-			WorkspaceAt(i+1)->AddWinBorder(winBorder);
-		}
-	}
-}
-
-bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
-{
-	if(!winBorder)
-		return false;
-	
-	STRACE(("*RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
-	
-	fMainLock.Lock();
-	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock acquired\n", winBorder? winBorder->GetName():"NULL"));
-	
-	if (!winBorder)
-	{
-		ActiveWorkspace()->SearchAndSetNewFront(NULL);
-		return true;
-	}
-	
-	uint32 workspaces	= winBorder->Window()->Workspaces();
-	int32 count		= WorkspaceCount();
-	int32 newWorkspace= 0;
-	
-	if (workspaces & (0x00000001UL << (ActiveWorkspaceIndex()-1)) )
-	{
-		newWorkspace = ActiveWorkspaceIndex();
-	}
-	else
-	{
-		int32	i;
-		for( i = 0; i < 32 && i < count; i++)
-		{
-			if( workspaces & (0x00000001UL << i))
-			{
-				newWorkspace	= i+1;
-				break;
-			}
-		}
-		
-		if (i == count || i == 32)
-			newWorkspace = ActiveWorkspaceIndex();
-	}
-
-	if(newWorkspace != ActiveWorkspaceIndex())
-	{
-		WorkspaceAt(newWorkspace)->SearchAndSetNewFront(winBorder);
-		SetActiveWorkspaceByIndex(newWorkspace);
-	}
-	else
-	{
-		ActiveWorkspace()->SearchAndSetNewFront(winBorder);
-	}
-	
-	fMainLock.Unlock();
-	STRACE(("*RootLayer::SetFrontWinBorder(%s) - main lock released\n", winBorder? winBorder->GetName():"NULL"));
-	STRACE(("#RootLayer::SetFrontWinBorder(%s)\n", winBorder? winBorder->GetName():"NULL"));
-	return true;
+	return ActiveWorkspace()->Focus();
 }
 
 void RootLayer::SetScreens(Screen *screen[], int32 rows, int32 columns)
@@ -749,154 +850,9 @@ bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace
 	
 	return false;
 }
-
-void RootLayer::SetWorkspaceCount(const int32 count)
-{
-	STRACE(("*RootLayer::SetWorkspaceCount(%ld)\n", count));
-	
-	if ((count < 1 && count > 32) || count == WorkspaceCount())
-		return;
-	
-	int32 	exActiveWorkspaceIndex = ActiveWorkspaceIndex();
-	
-	BList newWSPtrList;
-	void *workspacePtr;
-	
-	fMainLock.Lock();
-	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock acquired\n", count));
-	
-	for(int i=0; i < count; i++)
-	{
-		workspacePtr	= fWorkspaceList.ItemAt(i);
-		if (workspacePtr)
-			newWSPtrList.AddItem(workspacePtr);
-		else
-		{
-			Workspace	*ws;
-			ws = new Workspace(fColorSpace, i+1, BGColor());
-			newWSPtrList.AddItem(ws);
-		}
-	}
-	
-	// delete other Workspace objects if the count is smaller than current one.
-	for (int j=count; j < fWorkspaceList.CountItems(); j++)
-	{
-		Workspace	*ws = NULL;
-		ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(j));
-		if (ws)
-			delete ws;
-		else
-		{
-			STRACE(("\nSERVER: PANIC: in RootLayer::SetWorkspaceCount()\n\n"));
-			return;
-		}
-	}
-	
-	fWorkspaceList = newWSPtrList;
-
-	fMainLock.Unlock();
-	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock released\n", count));
-	
-	if (exActiveWorkspaceIndex > count)
-		SetActiveWorkspaceByIndex(count); 
-	
-	// if true, this is the first time this method is called.
-	if (exActiveWorkspaceIndex == -1)
-		SetActiveWorkspaceByIndex(1); 		
-	
-	STRACE(("#RootLayer::SetWorkspaceCount(%ld)\n", count));
-}
-
-int32 RootLayer::WorkspaceCount() const
-{
-	return fWorkspaceList.CountItems();
-}
-
-Workspace* RootLayer::WorkspaceAt(const int32 index) const
-{
-	Workspace *ws = NULL;
-	ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(index-1));
-	
-	return ws;
-}
-
-void RootLayer::SetActiveWorkspaceByIndex(const int32 index)
-{
-	Workspace *ws = NULL;
-	ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(index-1));
-	if (ws)
-		SetActiveWorkspace(ws);
-}
-
-void RootLayer::SetActiveWorkspace(Workspace *ws)
-{
-	if (fActiveWorkspace == ws || !ws)
-		return;
-	
-	int32 index;
-	WinBorder *winborder;
-	
-	// Notify windows in current workspace of change
-	if(fActiveWorkspace)
-	{
-		index=fWorkspaceList.IndexOf(fActiveWorkspace);
-		winborder=fActiveWorkspace->GoToTopItem();
-		while(winborder)
-		{
-			winborder->Window()->WorkspaceActivated(index,false);
-			winborder=(WinBorder*)winborder->fLowerSibling;
-		}
-	}
-	
-	fActiveWorkspace	= ws;
-	
-	// Notify windows in new workspace of change
-	index=fWorkspaceList.IndexOf(fActiveWorkspace);
-	winborder=fActiveWorkspace->GoToTopItem();
-	while(winborder)
-	{
-		winborder->Window()->WorkspaceActivated(index,true);
-		winborder=(WinBorder*)winborder->fLowerSibling;
-	}
-}
-
-int32 RootLayer::ActiveWorkspaceIndex() const{
-	if (fActiveWorkspace)
-		return fActiveWorkspace->ID();
-	else
-		return -1;
-}
-
-Workspace* RootLayer::ActiveWorkspace() const
-{
-	return fActiveWorkspace;
-}
-
-void RootLayer::SetBGColor(const RGBColor &col)
-{
-	ActiveWorkspace()->SetBGColor(col);
-	
-	fLayerData->viewcolor	= col;
-}
-
-int32 RootLayer::Buttons(void)
-{
-	return fButtons;
-}
-
-RGBColor RootLayer::BGColor(void) const
-{
-	return fLayerData->viewcolor;
-}
-
-void RootLayer::RemoveAppWindow(WinBorder *wb)
-{
-	wb->Window()->App()->fAppFMWList.RemoveItem(wb);
-
-	int32 count = WorkspaceCount();
-	for(int32 i=0; i < count; i++)
-		WorkspaceAt(i+1)->RemoveWinBorder(wb);
-}
+//---------------------------------------------------------------------------
+//				Workspace related methods
+//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 //				Input related methods
@@ -930,79 +886,13 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			fButtons=evt.buttons;
 			
 			// printf("MOUSE DOWN: at (%f, %f)\n", evt.where.x, evt.where.y);
-			
-			WinBorder	*target=NULL;
-			Workspace	*ws=NULL;
-			ws			= ActiveWorkspace();
-			target		= WinBorderAt(evt.where);
+			WinBorder	*target = WinBorderAt(evt.where);
 			if (target)
 			{
-				desktop->fGeneralLock.Lock();
-				fMainLock.Lock();
-				
-				STRACE(("Target: %s\n", target->GetName()));
-				STRACE(("Front: %s\n", ws->FrontLayer()->GetName()));
-				STRACE(("Focus: %s\n", ws->FocusLayer()->GetName()));
-				
-				WinBorder		*previousFocus=NULL;
-				WinBorder		*activeFocus=NULL;
-				BRegion			invalidRegion;
-				
-				// TODO: Figure out the be:view_where field in B_MOUSE_DOWN for RootLayer
-				// A little sniffing around R5's B_MOUSE_DOWN messages has revealed an
-				// undocumented field: a BPoint entry called "be:view_where" which probably
-				// helps the window determine the target view. Testing so far has revealed
-				// that it has the same value as the "where" field
-				
-				if (target!=ws->FrontLayer())
-				{
-					ws->BringToFrontANormalWindow(target);
-					ws->SearchAndSetNewFront(target);
-					previousFocus	= ws->FocusLayer();
-					ws->SearchAndSetNewFocus(target);
-					activeFocus		= ws->FocusLayer();
-
-					activeFocus->Window()->Lock();
-					previousFocus->Window()->Lock();
-
-					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
-						target->MouseDown(evt, true);
-					else
-						target->MouseDown(evt, false);
-
-					// may or may not be empty.
-					
-					// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
-					invalidRegion.Include(&(activeFocus->fFull));
-					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
-					// allow previous window's decorator to lowlight
-					redraw_layer(previousFocus, previousFocus->fVisible);
-					// highlight the visible part of the new focus window
-					redraw_layer(activeFocus, activeFocus->fVisible);
-					// rebuild regions and redraw the hidden parts of activeFocus
-					invalidate_layer(activeFocus, invalidRegion);
-
-					fMouseTarget = target;
-					
-					STRACE(("2Target: %s\n", target->GetName()));
-					STRACE(("2Front: %s\n", ws->FrontLayer()->GetName()));
-					STRACE(("2Focus: %s\n", ws->FocusLayer()->GetName()));
-
-					previousFocus->Window()->Unlock();
-					activeFocus->Window()->Unlock();
-				}
-				else // target == ws->FrontLayer()
-				{
-					target->Window()->Lock();
-					target->MouseDown(evt, true);
-					target->Window()->Unlock();
-				}
-
-				fMainLock.Unlock();
-				desktop->fGeneralLock.Unlock();
-			}
-			else // target == NULL
-			{
+				target->Window()->Lock();
+				target->MouseDown(evt, true);
+				target->Window()->Unlock();
+				fMouseTarget = target;
 			}
 			break;
 		}
@@ -1021,20 +911,14 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
 
-			if (!fMouseTarget)
+			fMouseTarget = NULL;
+			WinBorder	*target = WinBorderAt(evt.where);
+			if (target)
 			{
-				WinBorder *target = WinBorderAt(BPoint(evt.where.x, evt.where.y));
-				if(!target)
-					break;
-				fMouseTarget=target;
+				target->Window()->Lock();
+				target->MouseUp(evt);
+				target->Window()->Unlock();
 			}
-
-			fMouseTarget->Window()->Lock();
-			fMouseTarget->MouseUp(evt);
-			fMouseTarget->Window()->Unlock();
-
-			fMouseTarget=NULL;
-
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
 
 			break;
@@ -1055,18 +939,14 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&evt.buttons);
 
 			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
-			
-			if (!fMouseTarget)
+
+			WinBorder	*target = WinBorderAt(evt.where);
+			if (target)
 			{
-				WinBorder *target = WinBorderAt(BPoint(evt.where.x, evt.where.y));
-				if(!target)
-					break;
-				fMouseTarget=target;
+				target->Window()->Lock();
+				target->MouseMoved(evt);
+				target->Window()->Unlock();
 			}
-			
-			fMouseTarget->Window()->Lock();
-			fMouseTarget->MouseMoved(evt);
-			fMouseTarget->Window()->Unlock();
 
 			break;
 		}
@@ -1082,11 +962,13 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
 
-			WinBorder	*target;
-			BPoint		cursorPos = GetDisplayDriver()->GetCursorPosition();
-			if ((target = WinBorderAt(cursorPos)))
-				target->MouseWheel(evt, cursorPos);
-			
+			if (FocusWinBorder())
+			{
+				BPoint		cursorPos = GetDisplayDriver()->GetCursorPosition();
+				FocusWinBorder()->Window()->Lock();
+				FocusWinBorder()->MouseWheel(evt, cursorPos);
+				FocusWinBorder()->Window()->Unlock();
+			}
 			break;
 		}
 		default:
@@ -1274,10 +1156,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 
 			Workspace *ws=ActiveWorkspace();
 			
-			desktop->fGeneralLock.Lock();
-			fMainLock.Lock();
+			Lock();
 			
-			WinBorder *target=ws->FocusLayer();
+			WinBorder *target=ws->Focus();
 			if(target)
 			{
 				ServerWindow *win=target->Window();
@@ -1302,8 +1183,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			fMainLock.Unlock();
-			desktop->fGeneralLock.Unlock();
+			Unlock();
+
 			if (string)
 				free(string);
 			break;
@@ -1371,10 +1252,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			desktop->fGeneralLock.Lock();
-			fMainLock.Lock();
+			Lock();
 			
-			WinBorder *target=ws->FocusLayer();
+			WinBorder *target=ws->Focus();
 			if(target)
 			{
 				ServerWindow *win=target->Window();
@@ -1397,8 +1277,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			fMainLock.Unlock();
-			desktop->fGeneralLock.Unlock();
+			Unlock();
+
 			if (string)
 				free(string);
 			break;
@@ -1424,10 +1304,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			desktop->fGeneralLock.Lock();
-			fMainLock.Lock();
+			Lock();
 			
-			WinBorder *target=ws->FocusLayer();
+			WinBorder *target=ws->Focus();
 			if(target)
 			{
 				ServerWindow *win=target->Window();
@@ -1443,8 +1322,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			fMainLock.Unlock();
-			desktop->fGeneralLock.Unlock();
+			Unlock();
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
@@ -1468,10 +1346,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			desktop->fGeneralLock.Lock();
-			fMainLock.Lock();
+			Lock();
 			
-			WinBorder *target=ws->FocusLayer();
+			WinBorder *target=ws->Focus();
 			if(target)
 			{
 				ServerWindow *win=target->Window();
@@ -1487,8 +1364,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			fMainLock.Unlock();
-			desktop->fGeneralLock.Unlock();
+			Unlock();
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -1510,10 +1386,9 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 
 			Workspace *ws=ActiveWorkspace();
 			
-			desktop->fGeneralLock.Lock();
-			fMainLock.Lock();
+			Lock();
 			
-			WinBorder *target=ws->FocusLayer();
+			WinBorder *target=ws->Focus();
 			if(target)
 			{
 				ServerWindow *win=target->Window();
@@ -1528,8 +1403,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					win->SendMessageToClient(&keymsg);
 				}
 			}
-			fMainLock.Unlock();
-			desktop->fGeneralLock.Unlock();
+			Unlock();
 			break;
 		}
 		default:
@@ -1566,103 +1440,64 @@ void RootLayer::PrintToStream()
 	printf("Screen rows: %ld\nScreen columns: %ld\n", fRows, fColumns);
 	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenXResolution, fScreenYResolution, fColorSpace);
 	printf("Workspace list:\n");
-	for(int32 i=0; i<fWorkspaceList.CountItems(); i++)
+	for(int32 i=0; i<fWsCount; i++)
 	{
-		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWorkspaceList.ItemAt(i))->ID());
-		((Workspace*)fWorkspaceList.ItemAt(i))->PrintToStream();
+		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWorkspace[i])->ID());
+		((Workspace*)fWorkspace[i])->PrintToStream();
 		printf("~~~~~~~~\n");
 	}
-	printf("Active Workspace: %ld\n", fActiveWorkspace? fActiveWorkspace->ID(): -1);
 }
 
+// PRIVATE methods
 
 void RootLayer::show_winBorder(WinBorder *winBorder)
 {
-	desktop->fGeneralLock.Lock();
-	fMainLock.Lock();
+	bool	invalidate = false;
+	bool	invalid;
 
-	int32 wksCount;
-	uint32 feel = winBorder->Window()->Feel();
-	// make WinBorder unhidden, but *do not* rebuild and redraw! We'll do that
-	// after we bring it (its modal and floating windows also) in front.
 	winBorder->Show(false);
 
-	if ( (feel == B_FLOATING_SUBSET_WINDOW_FEEL || feel == B_MODAL_SUBSET_WINDOW_FEEL)
-		 && winBorder->MainWinBorder() == NULL)
+	for (int32 i = 0; i < fWsCount; i++)
 	{
-		// This window hasn't been added to a normal window subset,	
-		// so don't call placement or redrawing methods
-	}
-	else
-	{
-		wksCount	= WorkspaceCount();
-		for(int32 i = 0; i < wksCount; i++)
-		{
-			if (winBorder->Window()->Workspaces() & (0x00000001UL << i))
-			{
-				WinBorder		*previousFocus;
-				BRegion			invalidRegion;
-				Workspace		*ws;
-					
-				// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
-					
-				ws				= WorkspaceAt(i+1);
-				ws->BringToFrontANormalWindow(winBorder);
-				ws->SearchAndSetNewFront(winBorder);
-				previousFocus	= ws->FocusLayer();
-				ws->SearchAndSetNewFocus(winBorder);
-					
-				// TODO: only do this in for the active workspace!
-					
-				// first redraw previous window's decorator. It has lost focus state.
-				if (previousFocus)
-					redraw_layer(winBorder, previousFocus->fVisible);
+		invalid		= false;
 
-				// we must build the rebuild region. we have nowhere to take it from.
-				// include decorator's(if any) and fTopLayer's full regions.
-				winBorder->fTopLayer->RebuildFullRegion();
-				winBorder->RebuildFullRegion();
-				invalidRegion.Include(&(winBorder->fTopLayer->fFull));
-				if (winBorder->fDecorator)
-					invalidRegion.Include(&(winBorder->fFull));
+		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
+			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
 
-				invalidate_layer(winBorder, invalidRegion);
-			}
-		}
+		if (fActiveWksIndex == i)
+			invalidate = invalid;
 	}
 
-	fMainLock.Unlock();
-	desktop->fGeneralLock.Unlock();
+	if (invalidate)
+	{
+		BRegion		reg(winBorder->fFull);
+		reg.Include(&winBorder->fTopLayer->fFull);
+		invalidate_layer(this, reg);
+//		invalidate_layer(this, winBorder->fFull);
+	}
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
 {
-	Workspace *ws = NULL;
-		
-	desktop->fGeneralLock.Lock();
-	fMainLock.Lock();
-		
-	winBorder->Hide();
-		
-	int32		wksCount= WorkspaceCount();
-	for(int32 i = 0; i < wksCount; i++)
-	{
-		ws = WorkspaceAt(i+1);
+	bool	invalidate = false;
+	bool	invalid;
 
-		if (ws->FrontLayer() == winBorder)
-		{
-			ws->HideSubsetWindows(winBorder);
-			ws->SearchAndSetNewFocus(ws->FrontLayer());
-		}
-		else
-		{
-			if (ws->FocusLayer() == winBorder)
-				ws->SearchAndSetNewFocus(winBorder);
-			else{
-				// TODO: RootLayer or Desktop class should take care of invalidating
-			}
-		}
+	winBorder->Show(false);
+
+	for (int32 i = 0; i < fWsCount; i++)
+	{
+		invalid		= false;
+
+		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
+			invalid = fWorkspace[i]->HideWinBorder(winBorder);
+
+		if (fActiveWksIndex == i)
+			invalidate = invalid;
 	}
-	fMainLock.Unlock();
-	desktop->fGeneralLock.Unlock();
+
+	if (invalidate)
+	{
+		invalidate_layer(this, winBorder->fFullVisible);
+	}
 }
+

@@ -66,7 +66,7 @@
 #	define STRACE(x) ;
 #endif
 
-#define DEBUG_SERVERAPP_FONT
+//#define DEBUG_SERVERAPP_FONT
 
 #ifdef DEBUG_SERVERAPP_FONT
 #	include <stdio.h>
@@ -317,6 +317,57 @@ int32 ServerApp::MonitorApp(void *data)
 
 		switch(code)
 		{
+			case AS_CREATE_WINDOW:
+			{
+				// Create the ServerWindow to node monitor a new OBWindow
+			
+				// Attached data:
+				// 2) BRect window frame
+				// 3) uint32 window look
+				// 4) uint32 window feel
+				// 5) uint32 window flags
+				// 6) uint32 workspace index
+				// 7) int32 BHandler token of the window
+				// 8) port_id window's message port
+				// 9) const char * title
+
+				BRect frame;
+				uint32 look;
+				uint32 feel;
+				uint32 flags;
+				uint32 wkspaces;
+				int32 token = B_NULL_TOKEN;
+				port_id	sendPort = -1;
+				port_id looperPort = -1;
+				char *title = NULL;
+				port_id replyport = -1;
+			
+				msgqueue.Read<BRect>(&frame);
+				msgqueue.Read<int32>((int32*)&look);
+				msgqueue.Read<int32>((int32*)&feel);
+				msgqueue.Read<int32>((int32*)&flags);
+				msgqueue.Read<int32>((int32*)&wkspaces);
+				msgqueue.Read<int32>(&token);
+				msgqueue.Read<port_id>(&sendPort);
+				msgqueue.Read<port_id>(&looperPort);
+				msgqueue.ReadString(&title);
+
+				STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",app->fSignature.String()));
+
+				// ServerWindow constructor will reply with port_id of a newly created port
+				ServerWindow *sw = NULL;
+				sw = new ServerWindow(frame, title, look, feel, flags, app,
+							sendPort, looperPort, replyport, wkspaces, token);
+				sw->Init();
+
+				STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+						app->fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
+			
+				if (title)
+					free(title);
+
+				break;
+			}
 			case AS_QUIT_APP:
 			{
 				// This message is received only when the app_server is asked to shut down in
@@ -548,57 +599,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			}
 			break;
 		}
-		case AS_CREATE_WINDOW:
-		{
-			// Create the ServerWindow to node monitor a new OBWindow
-			
-			// Attached data:
-			// 2) BRect window frame
-			// 3) uint32 window look
-			// 4) uint32 window feel
-			// 5) uint32 window flags
-			// 6) uint32 workspace index
-			// 7) int32 BHandler token of the window
-			// 8) port_id window's message port
-			// 9) const char * title
-
-			BRect frame;
-			uint32 look;
-			uint32 feel;
-			uint32 flags;
-			uint32 wkspaces;
-			int32 token = B_NULL_TOKEN;
-			port_id	sendPort = -1;
-			port_id looperPort = -1;
-			char *title = NULL;
-			port_id replyport = -1;
-			
-			msg.Read<BRect>(&frame);
-			msg.Read<int32>((int32*)&look);
-			msg.Read<int32>((int32*)&feel);
-			msg.Read<int32>((int32*)&flags);
-			msg.Read<int32>((int32*)&wkspaces);
-			msg.Read<int32>(&token);
-			msg.Read<port_id>(&sendPort);
-			msg.Read<port_id>(&looperPort);
-			msg.ReadString(&title);
-
-			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
-
-			// ServerWindow constructor will reply with port_id of a newly created port
-			ServerWindow *sw = NULL;
-			sw = new ServerWindow(frame, title, look, feel, flags, this,
-						sendPort, looperPort, replyport, wkspaces, token);
-			sw->Init();
-
-			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
-			
-			if (title)
-				free(title);
-
-			break;
-		}
 		case AS_CREATE_BITMAP:
 		{
 			STRACE(("ServerApp %s: Received BBitmap creation request\n",fSignature.String()));
@@ -747,7 +747,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		}
 		case AS_ACTIVATE_WORKSPACE:
 		{
-			STRACE(("ServerApp %s: Activate Workspace\n",fSignature.String()));
+			STRACE(("ServerApp %s: Activate Workspace UNIMPLEMETED\n",fSignature.String()));
 			
 			// Attached data
 			// 1) int32 workspace index
@@ -756,9 +756,6 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			int32 workspace;
 			msg.Read<int32>(&workspace);
 			
-			RootLayer *root=desktop->ActiveRootLayer();
-			if(root)
-				root->SetActiveWorkspaceByIndex(workspace);
 			break;
 		}
 		
@@ -1128,15 +1125,15 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// Returns:
 			// 1) font_family The name of the font family
 			// 2) font_style - name of the style
-			int32 famid, styid;
+			uint16 famid, styid;
 			port_id replyport;
 			font_family fam;
 			font_style sty;
 			
-			msg.Read<int32>(&famid);
-			msg.Read<int32>(&styid);
+			msg.Read<uint16>(&famid);
+			msg.Read<uint16>(&styid);
 			msg.Read<port_id>(&replyport);
-			
+
 			replylink.SetSendPort(replyport);
 			
 			fontserver->Lock();
@@ -1157,6 +1154,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			}
 			
 			fontserver->Unlock();
+
 			break;
 		}
 		case AS_GET_FONT_DIRECTION:

@@ -36,6 +36,7 @@
 #include <String.h>
 #include <OS.h>
 #include <Locker.h>
+#include "ServerWindow.h"
 #include "RGBColor.h"
 
 enum
@@ -60,7 +61,7 @@ enum
 	AS_ROOTLAYER_CLASS	= 3,
 };
 
-class ServerWindow;
+class ServerApp;
 class RootLayer;
 class DisplayDriver;
 class LayerData;
@@ -101,9 +102,9 @@ public:
 	
 	virtual	void Draw(const BRect &r);
 	
-	virtual	void Show(bool invalidate=true);
-	virtual	void Hide(bool invalidate=true);
-	virtual bool IsHidden(void) const;
+	void Show(bool invalidate=true);
+	void Hide(bool invalidate=true);
+	bool IsHidden(void) const;
 	
 	BRect Bounds(void) const;
 	BRect Frame(void) const;
@@ -126,6 +127,7 @@ public:
 	
 	DisplayDriver *GetDisplayDriver(void) const { return fDriver; }
 	ServerWindow *Window(void) const { return fServerWin; }
+	ServerApp *App(void) const { return fServerWin? fServerWin->App(): NULL; }
 	virtual bool HasClient(void) { return true; }
 	bool IsServerLayer() const;
 	int32 Level() const { return fLevel; }

@@ -102,7 +102,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	
 	fInUpdate		= false;
 	fIsTopLayer		= false;
-	fLevel			= 0;
+	fLevel			= -100;
 	
 	fViewToken		= token;
 	fServerWin		= NULL;
@@ -201,7 +201,7 @@ void Layer::AddChild(Layer *layer, ServerWindow *serverWin)
 		c->SetRootLayer(c->fParent->fRootLayer);
 		
 		// 2.2) this Layer must know if it has a ServerWindow object attached.
-		fServerWin=serverWin;
+		c->fServerWin=serverWin;
 		
 		// 2.3) we are attached to the main tree so build our full region.
 		c->RebuildFullRegion();
@@ -298,7 +298,7 @@ void Layer::RemoveChild(Layer *layer)
 			// 2.1) set the RootLayer for this object.
 			c->SetRootLayer(NULL);
 			// 2.2) this Layer must know if it has a ServerWindow object attached.
-			fServerWin=NULL;
+			c->fServerWin=NULL;
 			// 2.3) we were removed from the main tree so clear our full region.
 			c->fFull.MakeEmpty();
 			// 2.4) clear fullVisible region.
@@ -645,7 +645,10 @@ void Layer::Draw(const BRect &r)
 	r.PrintToStream();
 	#endif	
 	
-	fDriver->FillRect(r, fLayerData->viewcolor);
+//	fDriver->FillRect(r, fLayerData->viewcolor);
+	srand(123);
+	RGBColor c(rand()%255,rand()%255,rand()%255);
+	fDriver->FillRect(r, c);
 	
 	// empty HOOK function.
 }
@@ -730,14 +733,14 @@ void Layer::RebuildFullRegion(void)
 	STRACE(("Layer(%s)::RebuildFullRegion()\n", GetName()));
 	
 	if (fParent)
-		fFull.Set( fParent->ConvertToTop( fFrame ) );
+		fFull.Set(fParent->ConvertToTop(fFrame ));
 	else
-		fFull.Set( fFrame );
+		fFull.Set(fFrame);
 	
 	// TODO: restrict to screen coordinates
 	
 	// TODO: Convert to screen coordinates
-	
+
 	LayerData *ld;
 	ld = fLayerData;
 	do
@@ -1086,9 +1089,9 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 	BRegion oldVisible = fVisible;
 	
 	fVisible = fFullVisible;
-	
+
 	// Rebuild regions for children...
-	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	for(Layer *lay = VirtualBottomChild(); lay; lay = VirtualUpperSibling())
 	{
 		if (lay == target)
 			lay->RebuildRegions(reg, action, pt, BPoint(0.0f, 0.0f));
@@ -1404,7 +1407,7 @@ BRegion Layer::ConvertToTop(BRegion *reg)
 //! Converts the passed rectangle to screen coordinates
 BRect Layer::ConvertToTop(BRect rect)
 {
-	if (fParent!=NULL)
+	if (fParent)
 		return(fParent->ConvertToTop(rect.OffsetByCopy(fFrame.LeftTop())) );
 	else
 		return(rect);
@@ -1412,7 +1415,7 @@ BRect Layer::ConvertToTop(BRect rect)
 
 BPoint Layer::ConvertFromTop(BPoint pt)
 {
-	if (fParent!=NULL)
+	if (fParent)
 	{
 		return(fParent->ConvertFromTop(pt-fFrame.LeftTop()));
 	}

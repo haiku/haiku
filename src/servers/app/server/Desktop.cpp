@@ -37,6 +37,7 @@
 #include "RootLayer.h"
 #include "ServerConfig.h"
 #include "ServerScreen.h"
+#include "ServerApp.h"
 #include "ServerWindow.h"
 #include "ViewDriver.h"
 #include "DirectDriver.h"
@@ -158,23 +159,25 @@ void Desktop::InitMode(void)
 //---------------------------------------------------------------------------
 
 
+inline
 Screen* Desktop::ScreenAt(int32 index) const
 {
-	Screen	*sc= static_cast<Screen*>(fScreenList.ItemAt(index));
-
-	return sc;
+	return static_cast<Screen*>(fScreenList.ItemAt(index));
 }
 
+inline
 int32 Desktop::ScreenCount(void) const
 {
 	return fScreenList.CountItems();
 }
 
+inline
 Screen* Desktop::ActiveScreen(void) const
 {
 	return fActiveScreen;
 }
 
+inline
 void Desktop::SetActiveRootLayerByIndex(int32 listIndex)
 {
 	RootLayer	*rl=RootLayerAt(listIndex);
@@ -183,6 +186,7 @@ void Desktop::SetActiveRootLayerByIndex(int32 listIndex)
 		SetActiveRootLayer(rl);
 }
 
+inline
 void Desktop::SetActiveRootLayer(RootLayer* rl)
 {
 	if (fActiveRootLayer == rl)
@@ -196,6 +200,7 @@ RootLayer* Desktop::ActiveRootLayer(void) const
 	return fActiveRootLayer;
 }
 
+inline
 int32 Desktop::ActiveRootLayerIndex(void) const
 {
 	int32		rootLayerCount = CountRootLayers(); 
@@ -207,18 +212,19 @@ int32 Desktop::ActiveRootLayerIndex(void) const
 	return -1;
 }
 
+inline
 RootLayer* Desktop::RootLayerAt(int32 index)
 {
-	RootLayer	*rl=static_cast<RootLayer*>(fRootLayerList.ItemAt(index));
-
-	return rl;
+	return static_cast<RootLayer*>(fRootLayerList.ItemAt(index));
 }
 
+inline
 int32 Desktop::CountRootLayers() const
 {
 	return fRootLayerList.CountItems();
 }
 
+inline
 DisplayDriver* Desktop::GetDisplayDriver() const
 {
 	return ScreenAt(0)->DDriver();
@@ -228,55 +234,215 @@ DisplayDriver* Desktop::GetDisplayDriver() const
 //				Methods for layer(WinBorder) manipulation.
 //---------------------------------------------------------------------------
 
-
-void Desktop::AddWinBorder(WinBorder* winBorder)
+void Desktop::AddWinBorder(WinBorder *winBorder)
 {
-	desktop->fGeneralLock.Lock();
-
-	if(fWinBorderList.HasItem(winBorder))
+	if (!winBorder)
 		return;
 
-	// special case for Tracker background window.
-	if (winBorder->Level() == B_SYSTEM_LAST)
-	{
-		// it's added in all RottLayers
-		for(int32 i=0; i<fRootLayerList.CountItems(); i++)
-			((RootLayer*)fRootLayerList.ItemAt(i))->AddWinBorder(winBorder);
-	}
-	else
-		// other windows are added to the current RootLayer only.
-		ActiveRootLayer()->AddWinBorder(winBorder);
+	int32 feel = winBorder->Window()->Feel();
 
-	// add that pointer to user winboder list so that we can keep track of them.		
-	fLayerLock.Lock();
+	// we're playing with window list. lock first.
+	Lock();
+
+	if (fWinBorderList.HasItem(winBorder))
+	{
+		Unlock();
+		debugger("AddWinBorder: WinBorder already in Desktop list\n");
+		return;
+	}
+
+	// we have a new window. store a record of it.
 	fWinBorderList.AddItem(winBorder);
-	fLayerLock.Unlock();
 
-	desktop->fGeneralLock.Unlock();
+	// add FLOATING_APP windows to the local list of all normal windows.
+	// This is to keep the order all floating windows (app or subset) when we go from
+	// one normal window to another.
+	if (feel == B_FLOATING_APP_WINDOW_FEEL)
+	{
+		WinBorder	*wb = NULL;
+		int32		count = fWinBorderList.CountItems();
+
+		for(int32 i = 0; i < count; i++)
+		{
+			wb		= (WinBorder*)fWinBorderList.ItemAt(i);
+			if (wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
+				&& wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+				// R2: RootLayer comparison is needed.
+			{
+				wb->fFMWList.AddWinBorder(winBorder);
+			}
+		}
+	}
+
+	// add application's list of modal windows.
+	if (feel == B_MODAL_APP_WINDOW_FEEL)
+	{
+		winBorder->App()->fAppFMWList.AddWinBorder(winBorder);
+	}
+
+	// hey, unlock!
+	Unlock();
+
+	// R2: how to determine the RootLayer to which this window should be added???
+	// for now, use ActiveRootLayer() because we only have one instance.
+
+	// these are added to windows's FMWList and Workspaces when
+	// BWindow::AddToSubset() is called. not now.
+	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
+	{
+		// send WinBorder to be added to workspaces
+		ActiveRootLayer()->AddWinBorder(winBorder);
+	}
 }
 
-void Desktop::RemoveWinBorder(WinBorder* winBorder)
+void Desktop::RemoveWinBorder(WinBorder *winBorder)
 {
-	desktop->fGeneralLock.Lock();
+	if (!winBorder)
+		return;
 
-	if(winBorder->Level() == B_SYSTEM_LAST)
+	// we're playing with window list. lock first.
+	Lock();
+
+	// remove from main WinBorder list.
+	if (fWinBorderList.RemoveItem(winBorder))
 	{
-		for(int32 i=0; i<fRootLayerList.CountItems(); i++)
-			((RootLayer*)fRootLayerList.ItemAt(i))->RemoveWinBorder(winBorder);
+		int32		feel = winBorder->Window()->Feel();
+
+		// floating app/subset and modal_subset windows require special atention because
+		// they are/may_be added to the list of a lot normal windows.
+		if (feel == B_FLOATING_SUBSET_WINDOW_FEEL
+			|| feel == B_MODAL_SUBSET_WINDOW_FEEL
+			|| feel == B_FLOATING_APP_WINDOW_FEEL)
+		{
+			WinBorder	*wb = NULL;
+			int32		count = fWinBorderList.CountItems();
+
+			for (int32 i = 0; i < count; i++)
+			{
+				wb		= (WinBorder*)fWinBorderList.ItemAt(i);
+
+				if (wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+					&& wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID())
+					// R2: RootLayer comparison is needed. We'll see.
+				{
+					wb->fFMWList.RemoveItem(winBorder);
+				}
+			}
+		}
+
+		// remove from application's list
+		if (feel == B_MODAL_APP_WINDOW_FEEL)
+		{
+			winBorder->App()->fAppFMWList.RemoveItem(winBorder);
+		}
 	}
 	else
-		winBorder->GetRootLayer()->RemoveWinBorder(winBorder);
+	{
+		Unlock();
+		debugger("RemoveWinBorder: WinBorder not found in Desktop list\n");
+		return;
+	}
 
-	fLayerLock.Lock();
-	fWinBorderList.RemoveItem(winBorder);
-	fLayerLock.Unlock();
+	// unlock!
+	Unlock();
 
-	desktop->fGeneralLock.Unlock();
+	// Tell to winBorder's RootLayer about this.
+	ActiveRootLayer()->RemoveWinBorder(winBorder);
+
 }
 
-bool Desktop::HasWinBorder(WinBorder* winBorder)
+void Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
 {
-	return fWinBorderList.HasItem(winBorder);
+	// we're playing with window list. lock first.
+	Lock();
+
+	if (!winBorder || !toWinBorder
+		|| !fWinBorderList.HasItem(winBorder) || !fWinBorderList.HasItem(toWinBorder))
+	{
+		Unlock();
+		debugger("AddWinBorderToSubset: NULL WinBorder or not found in Desktop list\n");
+		return;
+	}
+
+	if (	(winBorder->Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
+			|| winBorder->Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		&&	toWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL
+		&&  toWinBorder->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
+		&& !toWinBorder->fFMWList.HasItem(winBorder))
+	{
+		// add to normal_window's list
+		toWinBorder->fFMWList.AddWinBorder(winBorder);
+	}
+	else
+	{
+		Unlock();
+		debugger("AddWinBorderToSubset: you must add a subset_window to a normal_window's subset with the same team_id\n");
+		return;
+	}
+
+	// hey, unlock!
+	Unlock();
+
+	// send WinBorder to be added to workspaces, if not already in there.
+	ActiveRootLayer()->AddSubsetWinBorder(winBorder, toWinBorder);
+}
+
+void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder)
+{
+	// we're playing with window list. lock first.
+	Lock();
+
+	if (!winBorder || !fromWinBorder
+		|| !fWinBorderList.HasItem(winBorder) || !fWinBorderList.HasItem(fromWinBorder))
+	{
+		Unlock();
+		debugger("RemoveWinBorderFromSubset: NULL WinBorder or not found in Desktop list\n");
+		return;
+	}
+
+	if (fromWinBorder->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+	{
+		//remove from this normal_window's subset.
+		fromWinBorder->fFMWList.RemoveItem(winBorder);
+	}
+	else
+	{
+		Unlock();
+		debugger("RemoveWinBorderFromSubset: you must remove a subset_window from a normal_window's subset\n");
+		return;
+	}
+
+	// hey, unlock!
+	Unlock();
+
+	// remove WinBorder from workspace, if needed - some other windows may still have it in their subset
+	ActiveRootLayer()->RemoveSubsetWinBorder(winBorder, fromWinBorder);
+}
+
+inline
+bool Desktop::HasWinBorder(WinBorder *winBorder)
+{
+	bool		isIn = false;
+	Lock();
+	isIn		= fWinBorderList.HasItem(winBorder);
+	Unlock();
+	return isIn;
+}
+
+WinBorder* Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
+{
+	WinBorder*		wb;
+
+	Lock();
+	for (int32 i = 0; (wb = (WinBorder*)fWinBorderList.ItemAt(i)); i++)
+	{
+		if (wb->Window()->ClientToken() == token
+			&& wb->Window()->ClientTeamID() == teamID)
+			break;
+	}
+	Unlock();
+	
+	return wb;
 }
 
 //---------------------------------------------------------------------------
@@ -322,33 +488,6 @@ mode_mouse Desktop::FFMouseMode(void) const
 	return fMouseMode;
 }
 
-void Desktop::RemoveSubsetWindow(WinBorder* wb)
-{
-	WinBorder		*winBorder = NULL;
-
-	fLayerLock.Lock();
-	int32			count = fWinBorderList.CountItems();
-	for(int32 i=0; i < count; i++)
-	{
-		winBorder	= static_cast<WinBorder*>(fWinBorderList.ItemAt(i));
-		if (winBorder->Level() == B_NORMAL_FEEL)
-			winBorder->Window()->fWinFMWList.RemoveItem(wb);
-	}
-	fLayerLock.Unlock();
-
-	RootLayer *rl = winBorder->GetRootLayer();
-
-	if (!fGeneralLock.IsLocked())
-		debugger("Desktop::RemoveWinBorder() - fGeneralLock must be locked!\n");
-	if (!(rl->fMainLock.IsLocked()))
-		debugger("Desktop::RemoveWinBorder() - fMainLock must be locked!\n");
-		
-	int32 countWKs = rl->WorkspaceCount();
-	for (int32 i=0; i < countWKs; i++)
-		rl->WorkspaceAt(i+1)->RemoveWinBorder(wb);
-
-}
-
 void Desktop::PrintToStream(void)
 {
 	printf("RootLayer List:\n=======\n");
@@ -366,33 +505,6 @@ void Desktop::PrintToStream(void)
 		printf("\t%ld\n", ((Screen*)fScreenList.ItemAt(i))->ScreenNumber());
 }
 
-WinBorder* Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
-{
-	WinBorder*		wb;
-	fLayerLock.Lock();
-	for (int32 i = 0; (wb = (WinBorder*)fWinBorderList.ItemAt(i)); i++)
-	{
-		if (wb->Window()->ClientToken() == token
-			&& wb->Window()->ClientTeamID() == teamID)
-			break;
-	}
-	fLayerLock.Unlock();
-	
-	return wb;
-}
-
 void Desktop::PrintVisibleInRootLayerNo(int32 no)
 {
-	if (no<0 || no>=fRootLayerList.CountItems())
-		return;
-
-	printf("Visible windows in RootLayer %ld, Workspace %ld\n",
-		ActiveRootLayerIndex(), ActiveRootLayer()->ActiveWorkspaceIndex());
-	WinBorder *wb = NULL;
-	Workspace *ws = ActiveRootLayer()->ActiveWorkspace();
-	for(wb = (WinBorder*)ws->GoToTopItem(); wb != NULL; wb = (WinBorder*)ws->GoToLowerItem())
-	{
-		if (!wb->IsHidden())
-			wb->PrintToStream();
-	}
 }
