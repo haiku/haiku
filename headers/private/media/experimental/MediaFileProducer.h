@@ -2,8 +2,8 @@
 // implements FileInterface and BBufferProducer.
 // it produces one output, a multistream
 
-#if !defined(_MEDIA_FILE_NODE_H)
-#define _MEDIA_FILE_NODE_H
+#if !defined(_MEDIA_FILE_PRODUCER_H)
+#define _MEDIA_FILE_PRODUCER_H
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
@@ -238,4 +238,4 @@ virtual		status_t _Reserved_MediaFileProducer_15(void *);
 
 };
 
-#endif /* _MEDIA_FILE_NODE_H */
+#endif /* _MEDIA_FILE_PRODUCER_H */
