@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-1/2004.
+	Rudolf Cornelissen 3/2002-3/2004.
 */
 
 /* standard kernel driver stuff */
@@ -135,11 +135,12 @@ static uint16 nvidia_device_list[] = {
 	0x0181, /* Nvidia GeForce4 MX 440 AGP8X */
 	0x0182, /* Nvidia GeForce4 MX 440SE AGP8X */
 	0x0183, /* Nvidia GeForce4 MX 420 AGP8X */
+	0x0185, /* Nvidia GeForce4 MX 4000 AGP8X */
 	0x0186, /* Nvidia GeForce4 448 Go */
 	0x0187, /* Nvidia GeForce4 488 Go */
 	0x0188, /* Nvidia Quadro4 580 XGL */
 	0x0189,	/* Nvidia GeForce4 MX AGP8X */
-	0x018a, /* Nvidia Quadro4 280 NVS */
+	0x018a, /* Nvidia Quadro4 280 NVS AGP8X */
 	0x018b, /* Nvidia Quadro4 380 XGL */
 	0x01a0, /* Nvidia GeForce2 Integrated GPU */
 	0x01f0, /* Nvidia GeForce4 MX Integrated GPU */
@@ -169,7 +170,7 @@ static uint16 nvidia_device_list[] = {
 	0x0311, /* Nvidia GeForce FX 5600 Ultra */
 	0x0312, /* Nvidia GeForce FX 5600 */
 	0x0313, /* Nvidia unknown FX */
-	0x0314, /* Nvidia GeForce FX 5600SE */
+	0x0314, /* Nvidia GeForce FX 5600XT */
 	0x0316, /* Nvidia unknown FX Go */
 	0x0317, /* Nvidia unknown FX Go */
 	0x031a, /* Nvidia GeForce FX 5600 Go */
@@ -183,7 +184,7 @@ static uint16 nvidia_device_list[] = {
 	0x0323, /* Nvidia GeForce FX 5200SE */
 	0x0324, /* Nvidia GeForce FX 5200 Go */
 	0x0325, /* Nvidia GeForce FX 5250 Go */
-	0x0326, /* Nvidia unknown FX Go */
+	0x0326, /* Nvidia GeForce FX 5500 */
 	0x0328, /* Nvidia GeForce FX 5200 Go 32M/64M */
 	0x0329, /* Nvidia GeForce FX 5200 (PPC) */
 	0x032a, /* Nvidia Quadro NVS 280 PCI */
@@ -200,13 +201,14 @@ static uint16 nvidia_device_list[] = {
 	0x0338, /* Nvidia Quadro FX 3000 */
 	0x0341, /* Nvidia GeForce FX 5700 Ultra */
 	0x0342, /* Nvidia GeForce FX 5700 */
+	0x0343, /* Nvidia GeForce FX 5700LE */
+	0x0344, /* Nvidia GeForce FX 5700VE */
 	0x034e, /* Nvidia Quadro FX 1100 */
 	0x034f, /* Nvidia unknown FX */
 	0
 };
 /*
 	not yet included nVidia ID's that are unknown, but used apparantly:
-	0x0343
 	0x0347
 	0x0348
 	0x0349

@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-8 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-9 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -221,6 +221,7 @@ status_t nv_general_powerup()
 	case 0x018110de: /* Nvidia GeForce4 MX 440 AGP8X */
 	case 0x018210de: /* Nvidia GeForce4 MX 440SE AGP8X */
 	case 0x018310de: /* Nvidia GeForce4 MX 420 AGP8X */
+	case 0x018510de: /* Nvidia GeForce4 MX 4000 AGP8X */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
@@ -246,7 +247,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x018a10de: /* Nvidia Quadro4 280 NVS */
+	case 0x018a10de: /* Nvidia Quadro4 280 NVS AGP8X */
 	case 0x018b10de: /* Nvidia Quadro4 380 XGL */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
@@ -363,10 +364,10 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x031410de: /* Nvidia GeForce FX 5600SE */
+	case 0x031410de: /* Nvidia GeForce FX 5600XT */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600SE (NV31)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600XT (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x031610de: /* Nvidia unknown FX Go */
@@ -429,11 +430,10 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5250 Go (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x032610de: /* Nvidia unknown FX Go */
+	case 0x032610de: /* Nvidia GeForce FX 5500 */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5500 (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x032810de: /* Nvidia GeForce FX 5200 Go 32M/64M */
@@ -511,6 +511,8 @@ status_t nv_general_powerup()
 		break;
 	case 0x034110de: /* Nvidia GeForce FX 5700 Ultra */
 	case 0x034210de: /* Nvidia GeForce FX 5700 */
+	case 0x034310de: /* Nvidia GeForce FX 5700LE */
+	case 0x034410de: /* Nvidia GeForce FX 5700VE */
 		si->ps.card_type = NV36;
 		si->ps.card_arch = NV30A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 (NV36)\n"));

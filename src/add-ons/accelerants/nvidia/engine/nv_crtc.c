@@ -121,6 +121,9 @@ status_t nv_crtc_set_timing(display_mode target)
 		target.timing.v_total = target.timing.v_display + 6;
 		target.timing.v_sync_start = target.timing.v_total - 3;
 		target.timing.v_sync_end = target.timing.v_total - 2;
+
+		/* disable GPU scaling testmode so automatic scaling will be done */
+		DACW(FP_DEBUG1, 0);
 	}
 
 	/* Modify parameters as required by standard VGA */
@@ -263,6 +266,9 @@ status_t nv_crtc_set_timing(display_mode target)
 	{
 		uint32 iscale_x, iscale_y;
 
+		/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
+		DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
+
 		/* calculate inverse scaling factors used by hardware in 20.12 format */
 		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel1_width);
 		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel1_height);
@@ -270,6 +276,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		/* unblock flatpanel timing programming (or something like that..) */
 		CRTCW(FP_HTIMING, 0);
 		CRTCW(FP_VTIMING, 0);
+		LOG(2,("CRTC: FP_HTIMING reg readback: $%02x\n", CRTCR(FP_HTIMING)));
+		LOG(2,("CRTC: FP_VTIMING reg readback: $%02x\n", CRTCR(FP_VTIMING)));
 
 		/* enable full width visibility on flatpanel */
 		DACW(FP_HVALID_S, 0);
@@ -279,7 +287,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		DACW(FP_VVALID_E, (si->ps.panel1_height - 1));
 
 		/* nVidia cards support upscaling except on NV11 */
-		if (si->ps.card_type == NV11)
+		//fixme? logfiles tell me this is nonsense...
+		if (0)//si->ps.card_type == NV11)
 		{
 			/* disable last fetched line limiting */
 			DACW(FP_DEBUG2, 0x00000000);
@@ -312,9 +321,6 @@ status_t nv_crtc_set_timing(display_mode target)
 
 			/* inform panel not to scale */
 			DACW(FP_TG_CTRL, (DACR(FP_TG_CTRL) & 0xfffffeff));
-
-			/* disable GPU scaling testmode so automatic scaling is done */
-			DACW(FP_DEBUG1, 0);
 
 			/* GPU scaling is automatically setup by hardware, so only modify this
 			 * scalingfactor for non 4:3 (1.33) aspect panels;

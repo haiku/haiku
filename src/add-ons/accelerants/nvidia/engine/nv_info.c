@@ -312,58 +312,82 @@ static void detect_panels()
 		 * relying on the cards BIOS to do it. This adds TVout options where panels
 		 * are used!
 		 * Currently we'd loose the panel setup while not being able to restore it. */
+
 		/* Note:
-		 * NV11 and NV17 cards can't distinquish between head 1 and head 2. */
-		if (slaved_for_dev1 && !tvout1)
+		 * NV11 and NV17 cards can't distinquish between head 1 and head 2 except for
+		 * connected laptop panels via the FP_TG_CTRL register (the DAC and DAC2
+		 * flatpanel registers access the same single set on those cards!);
+		 * furthermore assuming that no DVI exist on non-laptop cards upto and
+		 * including NV17 (for now). */
+		//fixme: how about NV18?
+		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
+			(!(DACR(FP_TG_CTRL) & 0x80000000))) || (si->ps.card_type > NV17))
 		{
-			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
-			uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
-			if ((width >= 640) && (height >= 480))
+			if (slaved_for_dev1 && !tvout1)
 			{
-				si->ps.slaved_tmds1 = true;
-				si->ps.tmds1_active = true;
-				si->ps.panel1_width = width;
-				si->ps.panel1_height = height;
+				uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+				uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+				if ((width >= 640) && (height >= 480))
+				{
+					si->ps.slaved_tmds1 = true;
+					si->ps.tmds1_active = true;
+					si->ps.panel1_width = width;
+					si->ps.panel1_height = height;
+				}
 			}
 		}
-		//fixme?!?: how about NV18??, CRTC2 has panel instead of CRTC1???
-		if ((si->ps.card_type != NV11) && (si->ps.card_type != NV17) &&
-			si->ps.secondary_head && slaved_for_dev2 && !tvout2)
+
+		//fixme: how about NV18?
+		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
+			(DAC2R(FP_TG_CTRL) & 0x80000000)) || (si->ps.card_type > NV17))
 		{
-			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
-			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
-			if ((width >= 640) && (height >= 480))
+			if (si->ps.secondary_head && slaved_for_dev2 && !tvout2)
 			{
-				si->ps.slaved_tmds2 = true;
-				si->ps.tmds2_active = true;
-				si->ps.panel2_width = width;
-				si->ps.panel2_height = height;
+				uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+				uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+				if ((width >= 640) && (height >= 480))
+				{
+					si->ps.slaved_tmds2 = true;
+					si->ps.tmds2_active = true;
+					si->ps.panel2_width = width;
+					si->ps.panel2_height = height;
+				}
 			}
 		}
-		if (!si->ps.slaved_tmds1 && !tvout1)
+
+		//fixme: how about NV18?
+		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
+			(!(DACR(FP_TG_CTRL) & 0x80000000))) || (si->ps.card_type > NV17))
 		{
-			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
-			uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
-			if ((width >= 640) && (height >= 480))
+			if (!si->ps.slaved_tmds1 && !tvout1)
 			{
-				si->ps.master_tmds1 = true;
-				si->ps.tmds1_active = true;
-				si->ps.panel1_width = width;
-				si->ps.panel1_height = height;
+				uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+				uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+				if ((width >= 640) && (height >= 480))
+				{
+					si->ps.master_tmds1 = true;
+					si->ps.tmds1_active = true;
+					si->ps.panel1_width = width;
+					si->ps.panel1_height = height;
+				}
 			}
 		}
-		//fixme?!?: how about NV18??, CRTC2 has panel instead of CRTC1???
-		if ((si->ps.card_type != NV11) && (si->ps.card_type != NV17) &&
-			si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
+
+		//fixme: how about NV18?
+		if (((si->ps.card_type <= NV17) && si->ps.laptop &&
+			(DAC2R(FP_TG_CTRL) & 0x80000000)) || (si->ps.card_type > NV17))
 		{
-			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
-			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
-			if ((width >= 640) && (height >= 480))
+			if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 			{
-				si->ps.master_tmds2 = true;
-				si->ps.tmds2_active = true;
-				si->ps.panel2_width = width;
-				si->ps.panel2_height = height;
+				uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+				uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+				if ((width >= 640) && (height >= 480))
+				{
+					si->ps.master_tmds2 = true;
+					si->ps.tmds2_active = true;
+					si->ps.panel2_width = width;
+					si->ps.panel2_height = height;
+				}
 			}
 		}
 	}
@@ -400,6 +424,8 @@ static void detect_panels()
 	LOG(2,("DAC1: FP_DEBUG2: $%08x = (dec) %d\n", DACR(FP_DEBUG2),DACR(FP_DEBUG2)));
 	LOG(2,("DAC1: FP_DEBUG3: $%08x = (dec) %d\n", DACR(FP_DEBUG3),DACR(FP_DEBUG3)));
 
+	LOG(2,("DAC1: FUNCSEL: $%08x\n", NV_REG32(NV32_FUNCSEL)));
+
 	if(si->ps.secondary_head)
 	{
 		LOG(2,("DAC2: FP_HDISPEND: $%08x = (dec) %d\n", DAC2R(FP_HDISPEND),DAC2R(FP_HDISPEND)));
@@ -425,6 +451,8 @@ static void detect_panels()
 		LOG(2,("DAC2: FP_DEBUG1: $%08x = (dec) %d\n", DAC2R(FP_DEBUG1),DAC2R(FP_DEBUG1)));
 		LOG(2,("DAC2: FP_DEBUG2: $%08x = (dec) %d\n", DAC2R(FP_DEBUG2),DAC2R(FP_DEBUG2)));
 		LOG(2,("DAC2: FP_DEBUG3: $%08x = (dec) %d\n", DAC2R(FP_DEBUG3),DAC2R(FP_DEBUG3)));
+
+		LOG(2,("DAC2: FUNCSEL: $%08x\n", NV_REG32(NV32_2FUNCSEL)));
 	}
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }
