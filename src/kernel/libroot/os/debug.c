@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -7,11 +7,18 @@
 #include <OS.h>
 #include "syscalls.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 
 void
 debugger(const char *message)
 {
-	// ToDo: implement debugger()
+	// ToDo: implement debugger() properly
+	puts("*** debugger call - not yet implemented ***");
+	printf("%s\n", message);
+
+	abort();
 }
 
 
