@@ -131,12 +131,14 @@ BBitmapStream::~BBitmapStream()
 status_t
 BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 {
-	if (!buffer || pos < 0)
-		return B_BAD_VALUE;
-	if (!fBitmap || pos >= fSize)
+	if (!fBitmap)
 		return B_ERROR;
 	if (!size)
 		return B_NO_ERROR;
+	if (pos >= fSize)
+		return B_ERROR;
+	if (!buffer || pos < 0)
+		return B_BAD_VALUE;
 
 	size_t toRead;
 	void *source;
@@ -182,10 +184,10 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 status_t
 BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 {
-	if (!data || pos < 0 || pos > fSize)
-		return B_BAD_VALUE;
 	if (!size)
 		return B_NO_ERROR;
+	if (!data || pos < 0 || pos > fSize)
+		return B_BAD_VALUE;
 
 	ssize_t written = 0;
 	while (size > 0) {
@@ -384,8 +386,10 @@ BBitmapStream::DetachBitmap(BBitmap **outBitmap)
 {
 	if (!outBitmap)
 		return B_BAD_VALUE;
-	if (fDetached || !fBitmap)
+	if (!fBitmap || fDetached) {
+		*outBitmap = NULL;
 		return B_ERROR;
+	}
 		
 	fDetached = true;
 	*outBitmap = fBitmap;
