@@ -52,6 +52,9 @@ class PPPManager {
 			{ return (interface_id) atomic_add((vint32*) &fNextID, 1); }
 
 	private:
+		int32 FindUnit() const;
+
+	private:
 		BLocker fLock;
 		PPPReportManager fReportManager;
 		List<interface_entry*> fEntries;

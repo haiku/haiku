@@ -7,8 +7,33 @@
 
 #include "PPPManager.h"
 
+#include <core_funcs.h>
 #include <kernel_cpp.h>
 #include <LockerHelper.h>
+
+#include <stdlib.h>
+
+
+static int ppp_ifnet_stop(ifnet *ifp)
+{
+	return B_ERROR;
+}
+
+
+int ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
+	struct rtentry *rt0)
+{
+	return B_ERROR;
+}
+
+
+int ppp_ifnet_ioctl(struct ifnet *ifp, ulong cmd, caddr_t data)
+{
+	return B_ERROR;
+}
+
+
+static const char ppp_if_name_base[] = "ppp";
 
 
 PPPManager::PPPManager()
@@ -71,14 +96,48 @@ PPPManager::DeleteInterface(interface_id ID)
 void
 PPPManager::RemoveInterface(interface_id ID)
 {
+	LockerHelper locker(fLock);
 	
+	int32 index = 0;
+	interface_entry *entry = EntryFor(ID, &index);
+	if(!entry)
+		return;
+	
+	UnregisterInterface(ID);
+	
+	delete entry;
+	fEntries.RemoveItem(index);
 }
 
 
 ifnet*
 PPPManager::RegisterInterface(interface_id ID)
 {
-	return NULL;
+	LockerHelper locker(fLock);
+	
+	interface_entry *entry = EntryFor(ID);
+	if(!entry)
+		return NULL;
+	
+	// maybe the interface is already registered
+	if(entry->interface->Ifnet())
+		return entry->interface->Ifnet();
+	
+	ifnet *ifp = (ifnet*) malloc(sizeof(ifnet));
+	memset(ifp, 0, sizeof(ifnet));
+	ifp->devid = -1;
+	ifp->if_type = IFT_PPP;
+	ifp->name = ppp_if_name_base;
+	ifp->if_unit = FindUnit();
+	ifp->if_flags = IFF_POINTOPOINT | IFF_UP;
+	ifp->rx_thread = ifp->tx_thread = -1;
+	ifp->start = NULL;
+	ifp->stop = ppp_ifnet_stop;
+	ifp->output = ppp_ifnet_output;
+	ifp->ioctl = ppp_ifnet_ioctl;
+	
+	if_attach(ifp);
+	return ifp;
 }
 
 
@@ -136,4 +195,41 @@ PPPManager::EntryFor(interface_id ID, int32 *start = NULL) const
 	}
 	
 	return NULL;
+}
+
+
+static
+int
+greater(const void *a, const void *b)
+{
+	return (*(const int*)a - *(const int*)b);
+}
+
+
+int32
+PPPManager::FindUnit() const
+{
+	// Find the smallest unused unit.
+	int32 *units = new int32[fEntries.CountItems()];
+	
+	interface_entry *entry;
+	for(int32 index = 0; index < fEntries.CountItems(); index++) {
+		entry = fEntries.ItemAt(index);
+		if(entry && entry->interface->Ifnet())
+			units[index] = entry->interface->Ifnet()->if_unit;
+		else
+			units[index] = -1;
+	}
+	
+	qsort(units, fEntries.CountItems(), sizeof(int32), greater);
+	
+	int32 unit = 0;
+	for(int32 index = 0; index < fEntries.CountItems() - 1; index++) {
+		if(units[index] > unit)
+			return unit;
+		else if(units[index] == unit)
+			++unit;
+	}
+	
+	return unit;
 }
