@@ -314,7 +314,7 @@ isValidPattern(char *pattern)
  */
 
 status_t
-matchString(char *pattern,char *string)
+matchString(char *pattern, char *string)
 {
 	while (*pattern) {
 		// end of string == valid end of pattern?
@@ -468,7 +468,7 @@ Equation::Equation(char **expr)
 
 	if (*start == '"' || *start == '\'') {
 		// string is quoted (start has to be on the beginning of a string)
-		if (ParseQuotedString(&start,&end) < B_OK)
+		if (ParseQuotedString(&start, &end) < B_OK)
 			return;
 
 		// set string to a valid start of the equation symbol
@@ -488,7 +488,7 @@ Equation::Equation(char **expr)
 		// get the attribute string	(and trim whitespace), in case
 		// the string was not quoted
 		end = string - 1;
-		skipWhitespaceReverse(&end,start);
+		skipWhitespaceReverse(&end, start);
 	}
 
 	// attribute string is empty (which is not allowed)
@@ -529,14 +529,14 @@ Equation::Equation(char **expr)
 
 	// allocate & copy the attribute string
 
-	fAttribute = CopyString(start,end);
+	fAttribute = CopyString(start, end);
 	if (fAttribute == NULL)
 		return;
 
 	start = string;
 	if (*start == '"' || *start == '\'') {
 		// string is quoted (start has to be on the beginning of a string)
-		if (ParseQuotedString(&start,&end) < B_OK)
+		if (ParseQuotedString(&start, &end) < B_OK)
 			return;
 		
 		string = end + 2;
@@ -546,14 +546,14 @@ Equation::Equation(char **expr)
 			string++;
 
 		end = string - 1;
-		skipWhitespaceReverse(&end,start);
+		skipWhitespaceReverse(&end, start);
 	}
 	
 	// at this point, "start" will point to the first character of the value,
 	// "end" will point to its last character, and "start" to the first non-
 	// whitespace character after the value string
 
-	fString = CopyString(start,end);
+	fString = CopyString(start, end);
 	if (fString == NULL)
 		return;
 
@@ -574,7 +574,7 @@ Equation::Equation(char **expr)
 	// later. The only index which needs this is the last_modified
 	// index, but we may want to open that feature for other indices,
 	// too one day.
-	fIsSpecialTime = !strcmp(fAttribute,"last_modified");
+	fIsSpecialTime = !strcmp(fAttribute, "last_modified");
 
 	*expr = string;
 }
@@ -623,7 +623,7 @@ Equation::ParseQuotedString(char **_start, char **_end)
 
 
 char *
-Equation::CopyString(char *start,char *end)
+Equation::CopyString(char *start, char *end)
 {
 	// end points to the last character of the string - and the length
 	// also has to include the null-termination
@@ -660,36 +660,36 @@ Equation::ConvertValue(type_code type)
 			type = B_STRING_TYPE;
 			// supposed to fall through
 		case B_STRING_TYPE:
-			strncpy(fValue.String,string,INODE_FILE_NAME_LENGTH);
+			strncpy(fValue.String, string, INODE_FILE_NAME_LENGTH);
 			fValue.String[INODE_FILE_NAME_LENGTH - 1] = '\0';
 			fSize = strlen(fValue.String);
 			break;
 		case B_INT32_TYPE:
-			fValue.Int32 = strtol(string,&string,0);
+			fValue.Int32 = strtol(string, &string, 0);
 			fSize = sizeof(int32);
 			break;
 		case B_UINT32_TYPE:
-			fValue.Int32 = strtoul(string,&string,0);
+			fValue.Int32 = strtoul(string, &string, 0);
 			fSize = sizeof(uint32);
 			break;
 		case B_INT64_TYPE:
-			fValue.Int64 = strtoll(string,&string,0);
+			fValue.Int64 = strtoll(string, &string, 0);
 			fSize = sizeof(int64);
 			break;
 		case B_UINT64_TYPE:
-			fValue.Uint64 = strtoull(string,&string,0);
+			fValue.Uint64 = strtoull(string, &string, 0);
 			fSize = sizeof(uint64);
 			break;
 		case B_FLOAT_TYPE:
-			fValue.Float = strtod(string,&string);
+			fValue.Float = strtod(string, &string);
 			fSize = sizeof(float);
 			break;
 		case B_DOUBLE_TYPE:
-			fValue.Double = strtod(string,&string);
+			fValue.Double = strtod(string, &string);
 			fSize = sizeof(double);
 			break;
 		default:
-			FATAL(("query value conversion to 0x%lx requested!\n",type));
+			FATAL(("query value conversion to 0x%lx requested!\n", type));
 			// should we fail here or just do a safety int32 conversion?
 			return B_ERROR;
 	}
@@ -707,7 +707,7 @@ Equation::ConvertValue(type_code type)
  */
 
 bool
-Equation::CompareTo(const uint8 *value,uint16 size)
+Equation::CompareTo(const uint8 *value, uint16 size)
 {
 	int32 compare;
 
@@ -772,7 +772,7 @@ Equation::MatchEmptyString()
 
 	status_t status = ConvertValue(B_STRING_TYPE);
 	if (status == B_OK)
-		status = CompareTo((const uint8 *)"",fSize) ? MATCH_OK : NO_MATCH;
+		status = CompareTo((const uint8 *)"", fSize) ? MATCH_OK : NO_MATCH;
 
 	return status;
 }
@@ -783,14 +783,15 @@ Equation::MatchEmptyString()
  */
 
 status_t
-Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *key,size_t size)
+Equation::Match(Inode *inode, const char *attributeName, int32 type, const uint8 *key, size_t size)
 {
 	// get a pointer to the attribute in question
 	union value value;
 	uint8 *buffer;
+	bool locked = false;
 
 	// first, check if we are matching for a live query and use that value
-	if (attributeName != NULL && !strcmp(fAttribute,attributeName)) {
+	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
 		if (key == NULL) {
 			if (type == B_STRING_TYPE)
 				return MatchEmptyString();
@@ -798,7 +799,7 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 			return NO_MATCH;
 		}
 		buffer = const_cast<uint8 *>(key);
-	} else if (!strcmp(fAttribute,"name")) {
+	} else if (!strcmp(fAttribute, "name")) {
 		// if not, check for "fake" attributes, "name", "size", "last_modified",
 		buffer = (uint8 *)inode->Name();
 		if (buffer == NULL)
@@ -823,12 +824,12 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 			buffer = smallData->Data();
 			type = smallData->type;
 			size = smallData->data_size;
-			inode->SmallDataLock().Unlock();
+			locked = true;
 		} else {
 			// needed to unlock the small_data section as fast as possible
 			inode->SmallDataLock().Unlock();
 
-			if (inode->GetAttribute(fAttribute,&attribute) == B_OK) {
+			if (inode->GetAttribute(fAttribute, &attribute) == B_OK) {
 				buffer = (uint8 *)&value;
 				type = attribute->Node()->type;
 				size = attribute->Size();
@@ -836,7 +837,7 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 				if (size > INODE_FILE_NAME_LENGTH)
 					size = INODE_FILE_NAME_LENGTH;
 
-				if (attribute->ReadAt(0,buffer,&size) < B_OK) {
+				if (attribute->ReadAt(0, buffer, &size) < B_OK) {
 					inode->ReleaseAttribute(attribute);
 					return B_IO_ERROR;
 				}
@@ -848,7 +849,10 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 	// prepare own value for use, if it is possible to convert it
 	status_t status = ConvertValue(type);
 	if (status == B_OK)
-		status = CompareTo(buffer,size) ? MATCH_OK : NO_MATCH;
+		status = CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
+
+	if (locked)
+		inode->SmallDataLock().Unlock();
 
 	RETURN_ERROR(status);
 }
@@ -950,14 +954,15 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 		if (fIsSpecialTime) {
 			// we have to find the first matching shifted value
 			off_t value = fValue.Int64 << INODE_TIME_SHIFT;
-			status = (*iterator)->Find((uint8 *)&value,keySize);
+			status = (*iterator)->Find((uint8 *)&value, keySize);
 			if (status == B_ENTRY_NOT_FOUND)
 				return B_OK;
 		} else {
 			status = (*iterator)->Find(Value(),keySize);
 			if (fOp == OP_EQUAL && !fIsPattern)
 				return status;
-			else if (status == B_ENTRY_NOT_FOUND && (fIsPattern || fOp == OP_GREATER_THAN || fOp == OP_GREATER_THAN_OR_EQUAL))
+			else if (status == B_ENTRY_NOT_FOUND
+				&& (fIsPattern || fOp == OP_GREATER_THAN || fOp == OP_GREATER_THAN_OR_EQUAL))
 				return B_OK;
 		}
 
@@ -970,7 +975,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 
 status_t 
 Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
-		struct dirent *dirent, size_t bufferSize)
+	struct dirent *dirent, size_t bufferSize)
 {
 	while (true) {
 		union value indexValue;
@@ -978,13 +983,14 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 		uint16 duplicate;
 		off_t offset;
 
-		status_t status = iterator->GetNextEntry(&indexValue,&keyLength,(uint16)sizeof(indexValue),&offset,&duplicate);
+		status_t status = iterator->GetNextEntry(&indexValue, &keyLength,
+			(uint16)sizeof(indexValue), &offset, &duplicate);
 		if (status < B_OK)
 			return status;
 
 		// only compare against the index entry when this is the correct
 		// index for the equation
-		if (fHasIndex && duplicate < 2 && !CompareTo((uint8 *)&indexValue,keyLength)) {
+		if (fHasIndex && duplicate < 2 && !CompareTo((uint8 *)&indexValue, keyLength)) {
 			// They aren't equal? let the operation decide what to do
 			// Since we always start at the beginning of the index (or the correct
 			// position), only some needs to be stopped if the entry doesn't fit.
@@ -999,9 +1005,9 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 		}
 
 		Inode *inode;
-		if ((status = get_vnode(volume->ID(),offset,(void **)&inode)) != B_OK) {
+		if ((status = get_vnode(volume->ID(), offset, (void **)&inode)) != B_OK) {
 			REPORT_ERROR(status);
-			FATAL(("could not get inode %Ld in index \"%s\"!\n",offset,fAttribute));
+			FATAL(("could not get inode %Ld in index \"%s\"!\n", offset, fAttribute));
 			// try with next
 			continue;
 		}
@@ -1036,7 +1042,7 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 					other = parent->Left();
 
 				if (other == NULL) {
-					FATAL(("&&-operator has only one child... (parent = %p)\n",parent));
+					FATAL(("&&-operator has only one child... (parent = %p)\n", parent));
 					break;
 				}
 				status = other->Match(inode);
@@ -1097,22 +1103,22 @@ Operator::~Operator()
 
 
 status_t
-Operator::Match(Inode *inode,const char *attribute,int32 type,const uint8 *key,size_t size)
+Operator::Match(Inode *inode, const char *attribute, int32 type, const uint8 *key, size_t size)
 {
 	if (fOp == OP_AND) {
-		status_t status = fLeft->Match(inode,attribute,type,key,size);
+		status_t status = fLeft->Match(inode, attribute, type, key, size);
 		if (status != MATCH_OK)
 			return status;
 
-		return fRight->Match(inode,attribute,type,key,size);
+		return fRight->Match(inode, attribute, type, key, size);
 	} else {
 		// choose the term with the better score for OP_OR
 		if (fRight->Score() > fLeft->Score()) {
-			status_t status = fRight->Match(inode,attribute,type,key,size);
+			status_t status = fRight->Match(inode, attribute, type, key, size);
 			if (status != NO_MATCH)
 				return status;
 		}
-		return fLeft->Match(inode,attribute,type,key,size);
+		return fLeft->Match(inode, attribute, type, key, size);
 	}
 }
 
@@ -1242,7 +1248,7 @@ Equation::PrintToStream()
 		case OP_LESS_THAN: symbol = "<"; break;
 		case OP_LESS_THAN_OR_EQUAL: symbol = "<="; break;
 	}
-	D(__out("[\"%s\" %s \"%s\"]",fAttribute,symbol,fString));
+	D(__out("[\"%s\" %s \"%s\"]", fAttribute, symbol, fString));
 }
 
 #endif	/* DEBUG */
@@ -1265,7 +1271,7 @@ Expression::Expression(char *expr)
 		fTerm->PrintToStream();
 		D(__out("\n"));
 		if (*expr != '\0')
-			PRINT(("Unexpected end of string: \"%s\"!\n",expr));
+			PRINT(("Unexpected end of string: \"%s\"!\n", expr));
 	});
 	fPosition = expr;
 }
@@ -1336,7 +1342,7 @@ Expression::ParseAnd(char **expr)
 		Term *right = ParseAnd(expr);
 		Term *newParent = NULL;
 
-		if (right == NULL || (newParent = new Operator(left,OP_AND,right)) == NULL) {
+		if (right == NULL || (newParent = new Operator(left, OP_AND, right)) == NULL) {
 			delete left;
 			delete right;
 
@@ -1360,7 +1366,7 @@ Expression::ParseOr(char **expr)
 		Term *right = ParseAnd(expr);
 		Term *newParent = NULL;
 
-		if (right == NULL || (newParent = new Operator(left,OP_OR,right)) == NULL) {
+		if (right == NULL || (newParent = new Operator(left, OP_OR, right)) == NULL) {
 			delete left;
 			delete right;
 
@@ -1399,7 +1405,7 @@ Expression::InitCheck()
 //	#pragma mark -
 
 
-Query::Query(Volume *volume,Expression *expression)
+Query::Query(Volume *volume, Expression *expression)
 	:
 	fVolume(volume),
 	fExpression(expression),
@@ -1459,13 +1465,13 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 		if (fIterator == NULL) {
 			if (!fStack.Pop(&fCurrent)
 				|| fCurrent == NULL
-				|| fCurrent->PrepareQuery(fVolume,fIndex,&fIterator) < B_OK)
+				|| fCurrent->PrepareQuery(fVolume, fIndex, &fIterator) < B_OK)
 				return B_ENTRY_NOT_FOUND;
 		}
 		if (fCurrent == NULL)
 			RETURN_ERROR(B_ERROR);
 	
-		status_t status = fCurrent->GetNextMatching(fVolume,fIterator,dirent,size);
+		status_t status = fCurrent->GetNextMatching(fVolume, fIterator, dirent, size);
 		if (status < B_OK) {
 			delete fIterator;
 			fIterator = NULL;
@@ -1479,7 +1485,7 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 
 
 void 
-Query::SetLiveMode(port_id port,int32 token)
+Query::SetLiveMode(port_id port, int32 token)
 {
 	fPort = port;
 	fToken = token;
@@ -1487,22 +1493,24 @@ Query::SetLiveMode(port_id port,int32 token)
 
 
 void 
-Query::LiveUpdate(Inode *inode,const char *attribute,int32 type,const uint8 *oldKey,size_t oldLength,const uint8 *newKey,size_t newLength)
+Query::LiveUpdate(Inode *inode, const char *attribute, int32 type, const uint8 *oldKey,
+	size_t oldLength, const uint8 *newKey, size_t newLength)
 {
 	if (fPort < 0 || fExpression == NULL || attribute == NULL)
 		return;
 
 	// ToDo: check if the attribute is part of the query at all...
 
-	status_t oldStatus = fExpression->Root()->Match(inode,attribute,type,oldKey,oldLength);
-	status_t newStatus = fExpression->Root()->Match(inode,attribute,type,newKey,newLength);
+	status_t oldStatus = fExpression->Root()->Match(inode, attribute, type, oldKey, oldLength);
+	status_t newStatus = fExpression->Root()->Match(inode, attribute, type, newKey, newLength);
 	int32 op;
 	if (oldStatus == MATCH_OK && newStatus == MATCH_OK) {
 		// only send out a notification if the name was changed 
 		if (oldKey == NULL || strcmp(attribute,"name"))
 			return;
 
-		send_notification(fPort,fToken,B_QUERY_UPDATE,B_ENTRY_REMOVED,fVolume->ID(),0,fVolume->ToVnode(inode->Parent()),0,inode->ID(),(const char *)oldKey);
+		send_notification(fPort, fToken, B_QUERY_UPDATE, B_ENTRY_REMOVED, fVolume->ID(), 0,
+			fVolume->ToVnode(inode->Parent()), 0, inode->ID(), (const char *)oldKey);
 		op = B_ENTRY_CREATED;
 	} else if (oldStatus != MATCH_OK && newStatus != MATCH_OK) {
 		// nothing has changed
@@ -1517,6 +1525,7 @@ Query::LiveUpdate(Inode *inode,const char *attribute,int32 type,const uint8 *old
 	if (type != B_STRING_TYPE || value == NULL)
 		value = "";
 
-	send_notification(fPort,fToken,B_QUERY_UPDATE,op,fVolume->ID(),0,fVolume->ToVnode(inode->Parent()),0,inode->ID(),value);
+	send_notification(fPort, fToken, B_QUERY_UPDATE, op, fVolume->ID(), 0,
+		fVolume->ToVnode(inode->Parent()), 0, inode->ID(), value);
 }
 
