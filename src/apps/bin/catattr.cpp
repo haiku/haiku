@@ -81,8 +81,10 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
-	if (size > 64 * 1024)
-		size = 64 * 1024;
+//	if (size > 64 * 1024)
+//		size = 64 * 1024;
+	if (size > 64)
+		size = 64;
 
 	char* buffer = new char[size];
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
@@ -105,9 +107,11 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			written = write(STDOUT_FILENO, buffer, bytesRead);
 			// check for write error
 			if (written < bytesRead) {
-				fprintf(stderr, "Could only write %ld bytes to stream!\n", written);
-				if (written > 0)
+				if (written >= 0) {
+					fprintf(stderr, "Could only write %ld bytes to stream!\n", written);
 					written = B_ERROR;
+				} else
+					fprintf(stderr, "Failed to write to stream: %s\n", strerror(written));
 				break;
 			}
 			// read next chunk of data at pos
@@ -115,7 +119,10 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			bytesRead = fs_read_attr(fd, attribute, info.type, pos, buffer, size);
 			// check for read error
 			if (bytesRead < size && pos + bytesRead < info.size) {
-				fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
+				if (bytesRead >= 0)
+					fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
+				else
+					fprintf(stderr, "Failed to read from attribute: %s\n", strerror(bytesRead));
 				written = B_ERROR;
 				break;
 			}
