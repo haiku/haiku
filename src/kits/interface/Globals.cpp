@@ -99,13 +99,13 @@ get_scroll_bar_info(scroll_bar_info *info)
 	if (info == NULL)
 		return B_BAD_VALUE;
 
-	// ToDo: implement get_scroll_bar_info() for real
-	info->proportional = true;
-	info->double_arrows = false;
-	info->knob = 0;
-	info->min_knob_size = (int32)B_V_SCROLL_BAR_WIDTH;
-
-	return B_ERROR;
+	BAppServerLink link;
+	PortMessage msg;
+	link.SetOpCode(AS_GET_SCROLLBAR_INFO);
+	link.FlushWithReply(&msg);
+	msg.Read<scroll_bar_info>(info);
+	
+	return B_OK;
 }
 
 
@@ -417,7 +417,6 @@ _IMPEXP_BE rgb_color
 keyboard_navigation_color()
 {
 	// Queries the app_server
-	// TODO: Implement
 	return ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 }
 
