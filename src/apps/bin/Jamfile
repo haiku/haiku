@@ -55,7 +55,6 @@ SubInclude OBOS_TOP src apps bin listdev ;
 SubInclude OBOS_TOP src apps bin mkdos ;
 SubInclude OBOS_TOP src apps bin pc ;
 SubInclude OBOS_TOP src apps bin sed ;
-SubInclude OBOS_TOP src apps bin mail ;
 
 # RCS commands
 SubInclude OBOS_TOP src apps bin rcs ;

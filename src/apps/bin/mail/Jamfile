@@ -1,8 +1,0 @@
-SubDir OBOS_TOP src apps bin mail ;
-
-BinCommand mail :
-	mail.cpp
-	mailApp.cpp
-;
-
-LinkSharedOSLibs mail : be mail ;
