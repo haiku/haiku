@@ -60,7 +60,7 @@
 struct vnode {
 	struct vnode	*next;
 	struct vm_cache	*cache;
-	mount_id		mount_id;
+	mount_id		device;
 	list_link		mount_link;
 	vnode_id		id;
 	fs_vnode		private_node;
@@ -72,8 +72,8 @@ struct vnode {
 };
 
 struct vnode_hash_key {
-	mount_id	mount_id;
-	vnode_id	vnode_id;
+	mount_id	device;
+	vnode_id	vnode;
 };
 
 typedef struct file_system {
@@ -100,20 +100,20 @@ struct fs_mount {
 	bool			unmounting;
 };
 
-static file_system *gFileSystems;
-static mutex gFileSystemsMutex;
+static file_system *sFileSystems;
+static mutex sFileSystemsMutex;
 
-static mutex gMountMutex;
-static mutex gMountOpMutex;
-static mutex gVnodeMutex;
+static mutex sMountMutex;
+static mutex sMountOpMutex;
+static mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
-static void *gVnodeTable;
-static struct vnode *gRoot;
+static hash_table *sVnodeTable;
+static struct vnode *sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
-static void *gMountsTable;
-static mount_id gNextMountID = 0;
+static hash_table *sMountsTable;
+static mount_id sNextMountID = 0;
 
 
 /* function declarations */
@@ -153,7 +153,7 @@ static void inc_vnode_ref_count(struct vnode *vnode);
 static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
 static inline void put_vnode(struct vnode *vnode);
 
-struct fd_ops gFileOps = {
+static struct fd_ops sFileOps = {
 	file_read,
 	file_write,
 	file_seek,
@@ -168,7 +168,7 @@ struct fd_ops gFileOps = {
 	file_free_fd
 };
 
-struct fd_ops gDirectoryOps = {
+static struct fd_ops sDirectoryOps = {
 	NULL,		// read()
 	NULL,		// write()
 	NULL,		// seek()
@@ -183,7 +183,7 @@ struct fd_ops gDirectoryOps = {
 	dir_free_fd
 };
 
-struct fd_ops gAttributeDirectoryOps = {
+static struct fd_ops sAttributeDirectoryOps = {
 	NULL,		// read()
 	NULL,		// write()
 	NULL,		// seek()
@@ -198,7 +198,7 @@ struct fd_ops gAttributeDirectoryOps = {
 	attr_dir_free_fd
 };
 
-struct fd_ops gAttributeOps = {
+static struct fd_ops sAttributeOps = {
 	attr_read,
 	attr_write,
 	attr_seek,
@@ -213,7 +213,7 @@ struct fd_ops gAttributeOps = {
 	attr_free_fd
 };
 
-struct fd_ops gIndexDirectoryOps = {
+static struct fd_ops sIndexDirectoryOps = {
 	NULL,		// read()
 	NULL,		// write()
 	NULL,		// seek()
@@ -229,7 +229,7 @@ struct fd_ops gIndexDirectoryOps = {
 };
 
 #if 0
-struct fd_ops gIndexOps = {
+static struct fd_ops sIndexOps = {
 	NULL,		// read()
 	NULL,		// write()
 	NULL,		// seek()
@@ -249,8 +249,8 @@ struct fd_ops gIndexOps = {
 static int
 mount_compare(void *_m, const void *_key)
 {
-	struct fs_mount *mount = _m;
-	const mount_id *id = _key;
+	struct fs_mount *mount = (fs_mount *)_m;
+	const mount_id *id = (mount_id *)_key;
 
 	if (mount->id == *id)
 		return 0;
@@ -262,8 +262,8 @@ mount_compare(void *_m, const void *_key)
 static uint32
 mount_hash(void *_m, const void *_key, uint32 range)
 {
-	struct fs_mount *mount = _m;
-	const mount_id *id = _key;
+	struct fs_mount *mount = (fs_mount *)_m;
+	const mount_id *id = (mount_id *)_key;
 
 	if (mount)
 		return mount->id % range;
@@ -279,12 +279,9 @@ mount_hash(void *_m, const void *_key, uint32 range)
 static struct fs_mount *
 find_mount(mount_id id)
 {
-	struct fs_mount *mount;
-	ASSERT_LOCKED_MUTEX(&gMountMutex);
+	ASSERT_LOCKED_MUTEX(&sMountMutex);
 
-	mount = hash_lookup(gMountsTable, &id);
-
-	return mount;
+	return (fs_mount *)hash_lookup(sMountsTable, (void *)&id);
 }
 
 
@@ -293,7 +290,7 @@ get_mount(mount_id id)
 {
 	struct fs_mount *mount;
 
-	mutex_lock(&gMountMutex);
+	mutex_lock(&sMountMutex);
 
 	mount = find_mount(id);
 	if (mount) {
@@ -305,7 +302,7 @@ get_mount(mount_id id)
 			mount = NULL;
 	}
 
-	mutex_unlock(&gMountMutex);
+	mutex_unlock(&sMountMutex);
 
 	return mount;
 }
@@ -320,7 +317,7 @@ put_mount(struct fs_mount *mount)
 
 
 /**	Creates a new file_system structure.
- *	The gFileSystems lock must be hold when you call this function.
+ *	The sFileSystems lock must be hold when you call this function.
  */
 
 static file_system *
@@ -328,7 +325,7 @@ new_file_system(const char *name, struct fs_ops *ops)
 {
 	file_system *fs;
 
-	ASSERT_LOCKED_MUTEX(&gFileSystemsMutex);
+	ASSERT_LOCKED_MUTEX(&sFileSystemsMutex);
 
 	fs = (struct file_system *)malloc(sizeof(struct file_system));
 	if (fs == NULL)
@@ -341,10 +338,10 @@ new_file_system(const char *name, struct fs_ops *ops)
 
 	// add it to the queue
 
-	fs->next = gFileSystems;
-	gFileSystems = fs;
+	fs->next = sFileSystems;
+	sFileSystems = fs;
 
-	return B_OK;
+	return fs;
 }
 
 
@@ -357,7 +354,7 @@ unload_file_system(file_system *fs)
 	if (fs->image < B_OK)
 		return B_OK;
 
-	uninit = (void *)elf_lookup_symbol(fs->image, "uninit_file_system");
+	uninit = (void (*)())elf_lookup_symbol(fs->image, "uninit_file_system");
 	if (uninit != NULL)
 		uninit();
 
@@ -390,7 +387,7 @@ load_file_system(const char *name)
 	if (image < B_OK)
 		return NULL;
 
-	init = (void *)elf_lookup_symbol(image, "init_file_system");
+	init = (void (*)())elf_lookup_symbol(image, "init_file_system");
 	version = (int32 *)elf_lookup_symbol(image, "api_version");
 	ops = (fs_ops **)elf_lookup_symbol(image, "fs_entry");
 	if (init == NULL || version == NULL || ops == NULL) {
@@ -425,14 +422,14 @@ put_file_system(file_system *fs)
 {
 	status_t status;
 
-	mutex_lock(&gFileSystemsMutex);
+	mutex_lock(&sFileSystemsMutex);
 
 	if (--fs->ref_count == 0)
 		status = unload_file_system(fs);
 	else
 		status = B_OK;
 
-	mutex_unlock(&gFileSystemsMutex);
+	mutex_unlock(&sFileSystemsMutex);
 	return status;
 }
 
@@ -442,9 +439,9 @@ get_file_system(const char *name)
 {
 	file_system *fs;
 
-	mutex_lock(&gFileSystemsMutex);
+	mutex_lock(&sFileSystemsMutex);
 
-	for (fs = gFileSystems; fs != NULL; fs = fs->next) {
+	for (fs = sFileSystems; fs != NULL; fs = fs->next) {
 		if (!strcmp(name, fs->name))
 			break;
 	}
@@ -456,7 +453,7 @@ get_file_system(const char *name)
 	if (fs)
 		fs->ref_count++;
 
-	mutex_unlock(&gFileSystemsMutex);
+	mutex_unlock(&sFileSystemsMutex);
 	return fs;
 }
 
@@ -464,10 +461,10 @@ get_file_system(const char *name)
 static int
 vnode_compare(void *_vnode, const void *_key)
 {
-	struct vnode *vnode = _vnode;
-	const struct vnode_hash_key *key = _key;
+	struct vnode *vnode = (struct vnode *)_vnode;
+	const struct vnode_hash_key *key = (vnode_hash_key *)_key;
 
-	if (vnode->mount_id == key->mount_id && vnode->id == key->vnode_id)
+	if (vnode->device == key->device && vnode->id == key->vnode)
 		return 0;
 
 	return -1;
@@ -477,15 +474,15 @@ vnode_compare(void *_vnode, const void *_key)
 static uint32
 vnode_hash(void *_vnode, const void *_key, uint32 range)
 {
-	struct vnode *vnode = _vnode;
-	const struct vnode_hash_key *key = _key;
+	struct vnode *vnode = (struct vnode *)_vnode;
+	const struct vnode_hash_key *key = (vnode_hash_key *)_key;
 
 #define VHASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))
 
 	if (vnode != NULL)
-		return (VHASH(vnode->mount_id, vnode->id) % range);
-	else
-		return (VHASH(key->mount_id, key->vnode_id) % range);
+		return (VHASH(vnode->device, vnode->id) % range);
+
+	return (VHASH(key->device, key->vnode) % range);
 
 #undef VHASH
 }
@@ -534,7 +531,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	int err;
 	int old_ref;
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 
 	if (vnode->busy == true)
 		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", vnode);
@@ -546,7 +543,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 	if (old_ref == 1) {
 		vnode->busy = true;
 
-		mutex_unlock(&gVnodeMutex);
+		mutex_unlock(&sVnodeMutex);
 
 		/* if we have a vm_cache attached, remove it */
 		if (vnode->cache)
@@ -560,15 +557,15 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 		remove_vnode_from_mount_list(vnode, vnode->mount);
 
-		mutex_lock(&gVnodeMutex);
-		hash_remove(gVnodeTable, vnode);
-		mutex_unlock(&gVnodeMutex);
+		mutex_lock(&sVnodeMutex);
+		hash_remove(sVnodeTable, vnode);
+		mutex_unlock(&sVnodeMutex);
 
 		free(vnode);
 
 		err = 1;
 	} else {
-		mutex_unlock(&gVnodeMutex);
+		mutex_unlock(&sVnodeMutex);
 		err = 0;
 	}
 	return err;
@@ -588,10 +585,10 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode_hash_key key;
 
-	key.mount_id = mountID;
-	key.vnode_id = vnodeID;
+	key.device = mountID;
+	key.vnode = vnodeID;
 
-	return hash_lookup(gVnodeTable, &key);
+	return (vnode *)hash_lookup(sVnodeTable, &key);
 }
 
 
@@ -603,16 +600,16 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 	FUNCTION(("get_vnode: mountid %ld vnid 0x%Lx %p\n", mountID, vnodeID, _vnode));
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 
 	while (true) {
 		vnode = lookup_vnode(mountID, vnodeID);
 		if (vnode && vnode->busy) {
 			// ToDo: this is an endless loop if the vnode is not
 			//	becoming unbusy anymore (for whatever reason)
-			mutex_unlock(&gVnodeMutex);
+			mutex_unlock(&sVnodeMutex);
 			snooze(10000); // 10 ms
-			mutex_lock(&gVnodeMutex);
+			mutex_lock(&sVnodeMutex);
 			continue;
 		}
 		break;
@@ -629,23 +626,23 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 			err = B_NO_MEMORY;
 			goto err;
 		}
-		vnode->mount_id = mountID;
+		vnode->device = mountID;
 		vnode->id = vnodeID;
 
-		mutex_lock(&gMountMutex);	
+		mutex_lock(&sMountMutex);	
 
 		vnode->mount = find_mount(mountID);
 		if (!vnode->mount) {
-			mutex_unlock(&gMountMutex);
+			mutex_unlock(&sMountMutex);
 			err = B_ENTRY_NOT_FOUND;
 			goto err;
 		}
 		vnode->busy = true;
-		hash_insert(gVnodeTable, vnode);
-		mutex_unlock(&gVnodeMutex);
+		hash_insert(sVnodeTable, vnode);
+		mutex_unlock(&sVnodeMutex);
 
 		add_vnode_to_mount_list(vnode, vnode->mount);
-		mutex_unlock(&gMountMutex);
+		mutex_unlock(&sMountMutex);
 
 		err = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
 		if (err < 0 || vnode->private_node == NULL) {
@@ -653,7 +650,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 			if (vnode->private_node == NULL)
 				err = B_BAD_VALUE;
 		}
-		mutex_lock(&gVnodeMutex);
+		mutex_lock(&sVnodeMutex);
 		if (err < 0)
 			goto err1;
 
@@ -661,7 +658,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 		vnode->ref_count = 1;
 	}
 
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 
 	PRINT(("get_vnode: returning %p\n", vnode));
 
@@ -669,9 +666,9 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 	return B_OK;
 
 err1:
-	hash_remove(gVnodeTable, vnode);
+	hash_remove(sVnodeTable, vnode);
 err:
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 	if (vnode)
 		free(vnode);
 
@@ -705,9 +702,9 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 	if (status < 0)
 		return status;
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 	vnode = lookup_vnode(mountID, id);
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL) {
 		// fs_lookup() should have left the vnode referenced, so chances
@@ -786,14 +783,14 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		// Lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
 		// from inside the filesystem, thus the vnode would have to be in the list and it's
 		// ref count incremented at this point
-		mutex_lock(&gVnodeMutex);
-		nextVnode = lookup_vnode(vnode->mount_id, vnodeID);
-		mutex_unlock(&gVnodeMutex);
+		mutex_lock(&sVnodeMutex);
+		nextVnode = lookup_vnode(vnode->device, vnodeID);
+		mutex_unlock(&sVnodeMutex);
 
 		if (!nextVnode) {
 			// pretty screwed up here - the file system found the vnode, but the hash
 			// lookup failed, so our internal structures are messed up
-			panic("path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->mount_id, vnodeID);
+			panic("path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, vnodeID);
 			put_vnode(vnode);
 			return B_ENTRY_NOT_FOUND;
 		}
@@ -808,7 +805,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				goto resolve_link_error;
 			}
 
-			buffer = malloc(SYS_MAX_PATH_LEN);
+			buffer = (char *)malloc(SYS_MAX_PATH_LEN);
 			if (buffer == NULL) {
 				status = B_NO_MEMORY;
 				goto resolve_link_error;
@@ -836,7 +833,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 				while (*++path == '/')
 					;
-				vnode = gRoot;
+				vnode = sRoot;
 				inc_vnode_ref_count(vnode);
 			}
 
@@ -887,7 +884,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 	if (*path == '/') {
 		while (*++path == '/')
 			;
-		start = gRoot;
+		start = sRoot;
 		inc_vnode_ref_count(start);
 	} else {
 		struct io_context *context = get_current_io_context(kernel);
@@ -977,16 +974,16 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode, lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentID,&type);
+		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, "..", &parentID, &type);
 		if (status < B_OK)
 			goto out;
 
-		mutex_lock(&gVnodeMutex);
-		parentVnode = lookup_vnode(vnode->mount_id, parentID);
-		mutex_unlock(&gVnodeMutex);
+		mutex_lock(&sVnodeMutex);
+		parentVnode = lookup_vnode(vnode->device, parentID);
+		mutex_unlock(&sVnodeMutex);
 		
 		if (parentVnode == NULL) {
-			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->mount_id, parentID);
+			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, parentID);
 			status = B_ENTRY_NOT_FOUND;
 			goto out;
 		}
@@ -994,7 +991,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
 		if (status == B_OK && FS_CALL(vnode, get_vnode_name))
-			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,vnode->private_node,name,B_FILE_NAME_LENGTH);
+			status = FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie, vnode->private_node, name, B_FILE_NAME_LENGTH);
 
 		// ... if not, find it out later (by iterating through
 		// the parent directory, searching for the id)
@@ -1191,19 +1188,19 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 	descriptor->cookie = cookie;
 	switch (type) {
 		case FDTYPE_FILE:
-			descriptor->ops = &gFileOps;
+			descriptor->ops = &sFileOps;
 			break;
 		case FDTYPE_DIR:
-			descriptor->ops = &gDirectoryOps;
+			descriptor->ops = &sDirectoryOps;
 			break;
 		case FDTYPE_ATTR:
-			descriptor->ops = &gAttributeOps;
+			descriptor->ops = &sAttributeOps;
 			break;
 		case FDTYPE_ATTR_DIR:
-			descriptor->ops = &gAttributeDirectoryOps;
+			descriptor->ops = &sAttributeDirectoryOps;
 			break;
 		case FDTYPE_INDEX_DIR:
-			descriptor->ops = &gIndexDirectoryOps;
+			descriptor->ops = &sIndexDirectoryOps;
 			break;
 		default:
 			panic("get_new_fd() called with unknown type %d\n", type);
@@ -1235,7 +1232,7 @@ vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 
 	// file system integrity check:
 	// test if the vnode already exists and bail out if this is the case!
@@ -1253,27 +1250,27 @@ vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 		goto err;
 	}
 
-	vnode->mount_id = mountID;
+	vnode->device = mountID;
 	vnode->id = vnodeID;
 	vnode->private_node = privateNode;
 
 	// add the vnode to the mount structure
-	mutex_lock(&gMountMutex);	
+	mutex_lock(&sMountMutex);	
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount) {
-		mutex_unlock(&gMountMutex);
+		mutex_unlock(&sMountMutex);
 		status = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
-	hash_insert(gVnodeTable, vnode);
+	hash_insert(sVnodeTable, vnode);
 
 	add_vnode_to_mount_list(vnode, vnode->mount);
-	mutex_unlock(&gMountMutex);
+	mutex_unlock(&sMountMutex);
 
 	vnode->ref_count = 1;
 
 err:	
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 
 	return status;
 }
@@ -1298,9 +1295,9 @@ vfs_put_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 	vnode = lookup_vnode(mountID, vnodeID);
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 
 	if (vnode)
 		dec_vnode_ref_count(vnode, true);
@@ -1330,13 +1327,13 @@ vfs_remove_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 
 	vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode)
 		vnode->delete_me = true;
 
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 	return 0;
 }
 
@@ -1473,20 +1470,19 @@ err:
 
 
 int
-vfs_put_vnode_ptr(void *vnode)
+vfs_put_vnode_ptr(void *_vnode)
 {
-	struct vnode *v = vnode;
+	struct vnode *vnode = (struct vnode *)_vnode;
 
-	put_vnode(v);
-
+	put_vnode(vnode);
 	return 0;
 }
 
 
 ssize_t
-vfs_can_page(void *_v)
+vfs_can_page(void *_vnode)
 {
-	struct vnode *vnode = _v;
+	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
 
@@ -1498,9 +1494,9 @@ vfs_can_page(void *_v)
 
 
 ssize_t
-vfs_read_page(void *_v, iovecs *vecs, off_t pos)
+vfs_read_page(void *_vnode, iovecs *vecs, off_t pos)
 {
-	struct vnode *vnode = _v;
+	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_readpage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
@@ -1509,9 +1505,9 @@ vfs_read_page(void *_v, iovecs *vecs, off_t pos)
 
 
 ssize_t
-vfs_write_page(void *_v, iovecs *vecs, off_t pos)
+vfs_write_page(void *_vnode, iovecs *vecs, off_t pos)
 {
-	struct vnode *vnode = _v;
+	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_writepage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
@@ -1530,7 +1526,7 @@ vfs_new_io_context(void *_parentContext)
 	struct io_context *context;
 	struct io_context *parentContext;
 
-	context = malloc(sizeof(struct io_context));
+	context = (io_context *)malloc(sizeof(struct io_context));
 	if (context == NULL)
 		return NULL;
 
@@ -1542,7 +1538,7 @@ vfs_new_io_context(void *_parentContext)
 	else
 		table_size = DEFAULT_FD_TABLE_SIZE;
 
-	context->fds = malloc(sizeof(struct file_descriptor *) * table_size);
+	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * table_size);
 	if (context->fds == NULL) {
 		free(context);
 		return NULL;
@@ -1576,7 +1572,7 @@ vfs_new_io_context(void *_parentContext)
 
 		mutex_unlock(&parentContext->io_mutex);
 	} else {
-		context->cwd = gRoot;
+		context->cwd = sRoot;
 
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
@@ -1665,7 +1661,7 @@ vfs_resize_fd_table(struct io_context *context, const int newSize)
 	}
 
 	free(context->fds);
-	context->fds = fds;
+	context->fds = (file_descriptor **)fds;
 	context->table_size = newSize;
 
 out:
@@ -1887,13 +1883,13 @@ vfs_register_filesystem(const char *name, struct fs_ops *ops)
 	if (name == NULL || *name == '\0' || ops == NULL)
 		return B_BAD_VALUE;
 
-	mutex_lock(&gFileSystemsMutex);
+	mutex_lock(&sFileSystemsMutex);
 
 	fs = new_file_system(name, ops);
 	if (fs == NULL)
 		status = B_NO_MEMORY;
 
-	mutex_unlock(&gFileSystemsMutex);
+	mutex_unlock(&sFileSystemsMutex);
 	return status;
 }
 
@@ -1903,34 +1899,34 @@ vfs_init(kernel_args *ka)
 {
 	{
 		struct vnode *v;
-		gVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, (addr)&v->next - (addr)v,
+		sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, (addr)&v->next - (addr)v,
 			&vnode_compare, &vnode_hash);
-		if (gVnodeTable == NULL)
+		if (sVnodeTable == NULL)
 			panic("vfs_init: error creating vnode hash table\n");
 	}
 	{
 		struct fs_mount *mount;
-		gMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, (addr)&mount->next - (addr)mount,
+		sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, (addr)&mount->next - (addr)mount,
 			&mount_compare, &mount_hash);
-		if (gMountsTable == NULL)
+		if (sMountsTable == NULL)
 			panic("vfs_init: error creating mounts hash table\n");
 	}
 
 	node_monitor_init();
 
-	gFileSystems = NULL;
-	gRoot = NULL;
+	sFileSystems = NULL;
+	sRoot = NULL;
 
-	if (mutex_init(&gFileSystemsMutex, "vfs_lock") < 0)
+	if (mutex_init(&sFileSystemsMutex, "vfs_lock") < 0)
 		panic("vfs_init: error allocating file systems lock\n");
 
-	if (mutex_init(&gMountOpMutex, "vfs_mount_op_lock") < 0)
+	if (mutex_init(&sMountOpMutex, "vfs_mount_op_lock") < 0)
 		panic("vfs_init: error allocating mount op lock\n");
 
-	if (mutex_init(&gMountMutex, "vfs_mount_lock") < 0)
+	if (mutex_init(&sMountMutex, "vfs_mount_lock") < 0)
 		panic("vfs_init: error allocating mount lock\n");
 
-	if (mutex_init(&gVnodeMutex, "vfs_vnode_lock") < 0)
+	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vnode lock\n");
 
 	return 0;
@@ -1960,9 +1956,9 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 	if (status < B_OK)
 		return status;
 
-	mutex_lock(&gVnodeMutex);
-	vnode = lookup_vnode(directory->mount_id, newID);
-	mutex_unlock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
+	vnode = lookup_vnode(directory->device, newID);
+	mutex_unlock(&sVnodeMutex);
 
 	if (vnode == NULL) {
 		dprintf("vfs: fs_create() returned success but there is no vnode!");
@@ -2624,7 +2620,7 @@ common_rename(char *path, char *newPath, bool kernel)
 	if (status < 0)
 		goto err;
 
-	if (fromVnode->mount_id != toVnode->mount_id) {
+	if (fromVnode->device != toVnode->device) {
 		status = B_CROSS_DEVICE_LINK;
 		goto err1;
 	}
@@ -3025,7 +3021,7 @@ attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool
 	}
 
 	// are the files on the same volume?
-	if (fromVnode->mount_id != toVnode->mount_id) {
+	if (fromVnode->device != toVnode->device) {
 		status = B_CROSS_DEVICE_LINK;
 		goto err1;
 	}
@@ -3067,7 +3063,7 @@ index_dir_open(mount_id mountID, bool kernel)
 		goto out;
 
 	// get fd for the index directory
-	status = get_new_fd(FDTYPE_INDEX_DIR, (void *)mount, cookie, 0, kernel);
+	status = get_new_fd(FDTYPE_INDEX_DIR, (struct vnode *)mount, cookie, 0, kernel);
 	if (status >= 0)
 		goto out;
 
@@ -3256,7 +3252,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (fsName == NULL || fsName[0] == '\0')
 		return B_BAD_VALUE;
 
-	mutex_lock(&gMountOpMutex);
+	mutex_lock(&sMountOpMutex);
 
 	mount = (struct fs_mount *)malloc(sizeof(struct fs_mount));
 	if (mount == NULL) {
@@ -3279,10 +3275,10 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	}
 
 	recursive_lock_init(&mount->rlock, "mount rlock");
-	mount->id = gNextMountID++;
+	mount->id = sNextMountID++;
 	mount->unmounting = false;
 
-	if (!gRoot) {
+	if (!sRoot) {
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
 			err = B_ERROR;
@@ -3309,7 +3305,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
 
-		if (covered_vnode != gRoot
+		if (covered_vnode != sRoot
 			&& covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
 			goto err2;
@@ -3323,12 +3319,12 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 			goto err4;
 	}
 
-	mutex_lock(&gMountMutex);
+	mutex_lock(&sMountMutex);
 
 	// insert mount struct into list
-	hash_insert(gMountsTable, mount);
+	hash_insert(sMountsTable, mount);
 
-	mutex_unlock(&gMountMutex);
+	mutex_unlock(&sMountMutex);
 
 	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
 	if (err < 0)
@@ -3338,10 +3334,10 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
 
-	if (!gRoot)
-		gRoot = mount->root_vnode;
+	if (!sRoot)
+		sRoot = mount->root_vnode;
 
-	mutex_unlock(&gMountOpMutex);
+	mutex_unlock(&sMountOpMutex);
 
 	return 0;
 
@@ -3358,7 +3354,7 @@ err2:
 err1:
 	free(mount);
 err:
-	mutex_unlock(&gMountOpMutex);
+	mutex_unlock(&sMountOpMutex);
 
 	return err;
 }
@@ -3377,9 +3373,9 @@ fs_unmount(char *path, bool kernel)
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
-	mutex_lock(&gMountOpMutex);
+	mutex_lock(&sMountOpMutex);
 
-	mount = find_mount(vnode->mount_id);
+	mount = find_mount(vnode->device);
 	if (!mount)
 		panic("vfs_unmount: find_mount() failed on root vnode @%p of mount\n", vnode);
 
@@ -3392,7 +3388,7 @@ fs_unmount(char *path, bool kernel)
 
 	/* grab the vnode master mutex to keep someone from creating a vnode
 	while we're figuring out if we can continue */
-	mutex_lock(&gVnodeMutex);
+	mutex_lock(&sVnodeMutex);
 
 	/* simulate the root vnode having it's refcount decremented */
 	mount->root_vnode->ref_count -= 2;
@@ -3400,10 +3396,10 @@ fs_unmount(char *path, bool kernel)
 	// cycle through the list of vnodes associated with this mount and
 	// make sure all of them are not busy or have refs on them
 	vnode = NULL;
-	while ((vnode = list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode->busy || vnode->ref_count != 0) {
 			mount->root_vnode->ref_count += 2;
-			mutex_unlock(&gVnodeMutex);
+			mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
 			err = EBUSY;
@@ -3413,13 +3409,13 @@ fs_unmount(char *path, bool kernel)
 
 	/* we can safely continue, mark all of the vnodes busy and this mount
 	structure in unmounting state */
-	while ((vnode = list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode != mount->root_vnode)
 			vnode->busy = true;
 	}
 	mount->unmounting = true;
 
-	mutex_unlock(&gVnodeMutex);
+	mutex_unlock(&sVnodeMutex);
 
 	mount->covers_vnode->covered_by = NULL;
 	put_vnode(mount->covers_vnode);
@@ -3432,11 +3428,11 @@ fs_unmount(char *path, bool kernel)
 	// a putvnode/removevnode here
 
 	/* remove the mount structure from the hash table */
-	mutex_lock(&gMountMutex);
-	hash_remove(gMountsTable, mount);
-	mutex_unlock(&gMountMutex);
+	mutex_lock(&sMountMutex);
+	hash_remove(sMountsTable, mount);
+	mutex_unlock(&sMountMutex);
 
-	mutex_unlock(&gMountOpMutex);
+	mutex_unlock(&sMountOpMutex);
 
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
 
@@ -3449,7 +3445,7 @@ fs_unmount(char *path, bool kernel)
 	return 0;
 
 err:
-	mutex_unlock(&gMountOpMutex);
+	mutex_unlock(&sMountOpMutex);
 	return err;
 }
 
@@ -3463,18 +3459,18 @@ fs_sync(void)
 	FUNCTION(("vfs_sync: entry.\n"));
 
 	/* cycle through and call sync on each mounted fs */
-	mutex_lock(&gMountOpMutex);
-	mutex_lock(&gMountMutex);
+	mutex_lock(&sMountOpMutex);
+	mutex_lock(&sMountMutex);
 
-	hash_open(gMountsTable, &iter);
-	while ((mount = hash_next(gMountsTable, &iter))) {
+	hash_open(sMountsTable, &iter);
+	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iter))) {
 		if (FS_MOUNT_CALL(mount, sync))
 			FS_MOUNT_CALL(mount, sync)(mount->cookie);
 	}
-	hash_close(gMountsTable, &iter, false);
+	hash_close(sMountsTable, &iter, false);
 
-	mutex_unlock(&gMountMutex);
-	mutex_unlock(&gMountOpMutex);
+	mutex_unlock(&sMountMutex);
+	mutex_unlock(&sMountOpMutex);
 
 	return 0;
 }
@@ -3486,7 +3482,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	struct fs_mount *mount;
 	int status;
 
-	mutex_lock(&gMountMutex);	
+	mutex_lock(&sMountMutex);	
 
 	mount = find_mount(device);
 	if (mount == NULL) {
@@ -3504,7 +3500,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	info->root = mount->root_vnode->id;
 
 out:
-	mutex_unlock(&gMountMutex);
+	mutex_unlock(&sMountMutex);
 	return status;
 }
 
@@ -3515,7 +3511,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 	struct fs_mount *mount;
 	int status;
 
-	mutex_lock(&gMountMutex);	
+	mutex_lock(&sMountMutex);	
 
 	mount = find_mount(device);
 	if (mount == NULL) {
@@ -3529,7 +3525,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 		status = EROFS;
 
 out:
-	mutex_unlock(&gMountMutex);
+	mutex_unlock(&sMountMutex);
 	return status;
 }
 
