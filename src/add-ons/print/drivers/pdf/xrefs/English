@@ -1,22 +1,16 @@
 CrossReferences 1.0
 # Table
-# Sample: see table 12
-# Table 12: bla bla bla
 "[sS]ee [tT]able ([0-9]+)", "see [tT]bl. ([0-9]+)"  
   -> 
 "[tT]able ([0-9]+)", "[tT]bl. ([0-9]+)".
 
 # Figure
-# Sample: See figure 2
-# Figure 2: bla bla bla
 "[sS]ee [fF]igure ([0-9]+)", "[sS]ee [fF]ig. ([0-9]+)"
  -> 
 "[fF]igure ([0-9]+)", "[fF]ig. ([0-9]+)".
 
-# Table of contents
-# eg. Chapter 1 ............... 3
-# in footer:  - 3 -
-"\.\.\.\. ([0-9]+)"
+# Page, Table of contents
+"\.\.\.\.\. *([0-9]+)", "[pP]age ([0-9]+)"
  -> 
 "\- ([0-9]+) \-".
 
