@@ -21,7 +21,7 @@ LegacyAudioDevice::LegacyAudioDevice( const char *name, int32 id )
 	}
 
 	input_flavor.name              = const_cast<char *>( name );
-	input_flavor.info              = "legacy audio input";
+	input_flavor.info              = const_cast<char *>( "legacy audio input" ); //XXX might get delete[]ed later
 	input_flavor.kinds             = B_BUFFER_PRODUCER|B_CONTROLLABLE|B_PHYSICAL_INPUT;
 	input_flavor.flavor_flags      = B_FLAVOR_IS_GLOBAL;
 	input_flavor.internal_id       = 2 * id;
@@ -56,7 +56,7 @@ LegacyAudioDevice::LegacyAudioDevice( const char *name, int32 id )
 	ioctl( fd, SOUND_SET_CAPTURE_COMPLETION_SEM, &in_sem, 0 );
 
 	output_flavor.name              = const_cast<char *>( name );
-	output_flavor.info              = "legacy audio output";
+	output_flavor.info              = const_cast<char *>( "legacy audio output" ); //XXX might get delete[]ed later
 	output_flavor.kinds             = B_BUFFER_CONSUMER|B_TIME_SOURCE|B_CONTROLLABLE|B_PHYSICAL_OUTPUT;
 	output_flavor.flavor_flags      = B_FLAVOR_IS_GLOBAL;
 	output_flavor.internal_id       = 2 * id + 1;
