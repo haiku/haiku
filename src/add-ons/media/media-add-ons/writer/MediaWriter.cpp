@@ -23,6 +23,7 @@
 #include <TimeSource.h>
 #include <Buffer.h>
 #include <ParameterWeb.h>
+#include <MediaRoster.h>
 #include <limits.h>
 
 #include "../AbstractFileInterfaceNode.h"
@@ -32,116 +33,7 @@
 #include <string.h>
 
 // -------------------------------------------------------- //
-// ctor/dtor
-// -------------------------------------------------------- //
-
-MediaWriter::~MediaWriter(void)
-{
-	fprintf(stderr,"MediaWriter::~MediaWriter\n");
-	if (fBufferGroup != 0) {
-		BBufferGroup * group = fBufferGroup;
-		fBufferGroup = 0;
-		delete group;
-	}	
-}
-
-MediaWriter::MediaWriter(
-				size_t defaultChunkSize = 8192,
-				float defaultBitRate = 800000,
-				const flavor_info * info = 0,
-				BMessage * config = 0,
-				BMediaAddOn * addOn = 0)
-	: BMediaNode("MediaWriter"),
-	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
-	  BBufferConsumer(B_MEDIA_MULTISTREAM)
-{
-	fprintf(stderr,"MediaWriter::MediaWriter\n");
-	// null some fields
-	fBufferGroup = 0;
-	// start enabled
-	fInputEnabled = true;
-	// don't overwrite available space, and be sure to terminate
-	strncpy(input.name,"MediaWriter Input",B_MEDIA_NAME_LENGTH-1);
-	input.name[B_MEDIA_NAME_LENGTH-1] = '\0';
-	// initialize the input
-	input.node = media_node::null;               // until registration
-	input.source = media_source::null; 
-	input.destination = media_destination::null; // until registration
-	GetFormat(&input.format);
-}
-
-// -------------------------------------------------------- //
-// implementation of BMediaNode
-// -------------------------------------------------------- //
-
-void MediaWriter::Preroll(void)
-{
-	fprintf(stderr,"MediaWriter::Preroll\n");
-	// XXX:Performance opportunity
-	BMediaNode::Preroll();
-}
-
-status_t MediaWriter::HandleMessage(
-				int32 message,
-				const void * data,
-				size_t size)
-{
-	fprintf(stderr,"MediaWriter::HandleMessage\n");
-	status_t status = B_OK;
-	switch (message) {
-		// no special messages for now
-		default:
-			status = BBufferConsumer::HandleMessage(message,data,size);
-			if (status == B_OK) {
-				break;
-			}
-			status = AbstractFileInterfaceNode::HandleMessage(message,data,size);
-			break;
-	}
-	return status;
-}
-
-void MediaWriter::NodeRegistered(void)
-{
-	fprintf(stderr,"MediaWriter::NodeRegistered\n");
-	
-	// now we can do this
-	input.node = Node();
-	input.destination.id = 0;
-	input.destination.port = input.node.port; // same as ControlPort()
-	
-	// creates the parameter web and starts the looper thread
-	AbstractFileInterfaceNode::NodeRegistered();
-}
-
-// -------------------------------------------------------- //
-// implementation of BFileInterface
-// -------------------------------------------------------- //
-
-status_t MediaWriter::SetRef(
-				const entry_ref & file,
-				bool create,
-				bigtime_t * out_time)
-{
-	fprintf(stderr,"MediaWriter::SetRef\n");
-	status_t status = AbstractFileInterfaceNode::SetRef(file,B_WRITE_ONLY,create,out_time);
-	if (status != B_OK) {
-		fprintf(stderr,"AbstractFileInterfaceNode::SetRef returned an error\n");
-		return status;
-	}
-	// reset the format, and set the requirements imposed by this file
-	GetFormat(&input.format);
-	AddRequirements(&input.format);
-	// if we are connected we have to re-negotiate the connection
-	if (input.source != media_source::null) {
-		fprintf(stderr,"  error connection re-negotiation not implemented");
-		// XXX: implement re-negotiation
-	}
-	return B_OK;	
-}
-
-// -------------------------------------------------------- //
-// implemention of BBufferConsumer
+// lib functions
 // -------------------------------------------------------- //
 
 /*
@@ -261,6 +153,174 @@ bool format_is_acceptible(
 	return true;
 }
 
+// -------------------------------------------------------- //
+// ctor/dtor
+// -------------------------------------------------------- //
+
+MediaWriter::~MediaWriter(void)
+{
+	fprintf(stderr,"MediaWriter::~MediaWriter\n");
+	if (fBufferGroup != 0) {
+		BBufferGroup * group = fBufferGroup;
+		fBufferGroup = 0;
+		delete group;
+	}	
+}
+
+MediaWriter::MediaWriter(
+				size_t defaultChunkSize = 8192,
+				float defaultBitRate = 800000,
+				const flavor_info * info = 0,
+				BMessage * config = 0,
+				BMediaAddOn * addOn = 0)
+	: BMediaNode("MediaWriter"),
+	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
+	  BBufferConsumer(B_MEDIA_MULTISTREAM)
+{
+	fprintf(stderr,"MediaWriter::MediaWriter\n");
+	// null some fields
+	fBufferGroup = 0;
+	// start enabled
+	fInputEnabled = true;
+	// don't overwrite available space, and be sure to terminate
+	strncpy(input.name,"MediaWriter Input",B_MEDIA_NAME_LENGTH-1);
+	input.name[B_MEDIA_NAME_LENGTH-1] = '\0';
+	// initialize the input
+	input.node = media_node::null;               // until registration
+	input.source = media_source::null; 
+	input.destination = media_destination::null; // until registration
+	GetFormat(&input.format);
+}
+
+// -------------------------------------------------------- //
+// implementation of BMediaNode
+// -------------------------------------------------------- //
+
+void MediaWriter::Preroll(void)
+{
+	fprintf(stderr,"MediaWriter::Preroll\n");
+	// XXX:Performance opportunity
+	BMediaNode::Preroll();
+}
+
+status_t MediaWriter::HandleMessage(
+				int32 message,
+				const void * data,
+				size_t size)
+{
+	fprintf(stderr,"MediaWriter::HandleMessage\n");
+	status_t status = B_OK;
+	switch (message) {
+		// no special messages for now
+		default:
+			status = BBufferConsumer::HandleMessage(message,data,size);
+			if (status == B_OK) {
+				break;
+			}
+			status = AbstractFileInterfaceNode::HandleMessage(message,data,size);
+			break;
+	}
+	return status;
+}
+
+void MediaWriter::NodeRegistered(void)
+{
+	fprintf(stderr,"MediaWriter::NodeRegistered\n");
+	
+	// now we can do this
+	input.node = Node();
+	input.destination.id = 0;
+	input.destination.port = input.node.port; // same as ControlPort()
+	
+	// creates the parameter web and starts the looper thread
+	AbstractFileInterfaceNode::NodeRegistered();
+}
+
+// -------------------------------------------------------- //
+// implementation of BFileInterface
+// -------------------------------------------------------- //
+
+status_t MediaWriter::SetRef(
+				const entry_ref & file,
+				bool create,
+				bigtime_t * out_time)
+{
+	fprintf(stderr,"MediaWriter::SetRef\n");
+	status_t status;
+	status = AbstractFileInterfaceNode::SetRef(file,B_WRITE_ONLY,create,out_time);
+	if (status != B_OK) {
+		fprintf(stderr,"AbstractFileInterfaceNode::SetRef returned an error\n");
+		return status;
+	}
+	if (input.source == media_source::null) {
+		// reset the format, and set the requirements imposed by this file
+		GetFormat(&input.format);
+		AddRequirements(&input.format);
+		return B_OK;
+	}
+	// if we are connected we may have to re-negotiate the connection
+	media_format format;
+	GetFormat(&format);
+	AddRequirements(&format);
+	if (format_is_acceptible(input.format,format)) {
+		fprintf(stderr,"  compatible format = no re-negotiation necessary\n");
+		return B_OK;
+	}
+	// first try the easy way : SORRY DEPRECATED into private :-(
+//	int32 change_tag = NewChangeTag();
+//	status = this->BBufferConsumer::RequestFormatChange(input.source,input.destination,&format,&change_tag);
+//	if (status == B_OK) {
+//		fprintf(stderr,"  format change successful\n");
+//		return B_OK;
+//	}
+	// okay, the hard way requires we get the MediaRoster
+	BMediaRoster * roster = BMediaRoster::Roster(&status);
+	if (roster == 0) {
+		return B_MEDIA_SYSTEM_FAILURE;
+	}
+	if (status != B_OK) {
+		return status;
+	}
+	// before disconnect one should always stop the nodes (bebook says)
+	// requires run_state cast since the return type on RunState() is
+	// wrong [int32]
+	run_state destinationRunState = run_state(RunState());
+	if (destinationRunState == BMediaEventLooper::B_STARTED) {
+		Stop(0,true); // stop us right now
+	}
+	// should also stop the source if it is running, but how?
+/*	BMediaNode sourceNode = ??
+	run_state sourceRunState = sourceNode->??;
+	status = sourceNode->StopNode(??,0,true);
+	if (status != B_OK) {
+		return status;
+	}  */
+	// we should disconnect right now
+	media_source inputSource = input.source;
+	status = roster->Disconnect(input.source.id,input.source,
+							    input.destination.id,input.destination);
+	if (status != B_OK) {
+		return status;
+	}
+	// if that went okay, we'll try reconnecting	
+	media_output connectOutput;
+	media_input connectInput;
+	status = roster->Connect(inputSource,input.destination,
+							 &format,&connectOutput,&connectInput);
+	if (status != B_OK) {
+		return status;
+	}
+	// now restart if necessary
+	if (destinationRunState == BMediaEventLooper::B_STARTED) {
+		Start(0);
+	}							 
+	return status;
+}
+
+// -------------------------------------------------------- //
+// implemention of BBufferConsumer
+// -------------------------------------------------------- //
+
 // Check to make sure the format is okay, then remove
 // any wildcards corresponding to our requirements.
 status_t MediaWriter::AcceptFormat(
@@ -309,7 +369,7 @@ status_t MediaWriter::GetNextInput(
 	if (cookie != 0) {
 		// it's valid but they already got our 1 input
 		if (*cookie != 0) {
-			fprintf(stderr,"<- B_ERROR\n");
+			fprintf(stderr,"<- B_ERROR (no more inputs)\n");
 			return B_ERROR;
 		}
 		// so next time they won't get the same input again
@@ -435,10 +495,10 @@ status_t MediaWriter::Connected(
 	
 		fInternalLatency = end - start;
 		
-		fprintf(stderr,"  internal latency from disk write = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency from disk write = %lld\n",fInternalLatency);
 	} else {
 		fInternalLatency = 500; // just guess
-		fprintf(stderr,"  internal latency guessed = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency guessed = %lld\n",fInternalLatency);
 	}
 	
 	SetEventLatency(fInternalLatency);
