@@ -1,12 +1,17 @@
 SubDir OBOS_TOP src kernel libroot posix sys ;
 
 KernelMergeObject posix_sys.o :
-	<$(SOURCE_GRIST)>chmod.c
-	<$(SOURCE_GRIST)>stat.c
-	<$(SOURCE_GRIST)>mkdir.c
- 	<$(SOURCE_GRIST)>select.c
- 	<$(SOURCE_GRIST)>sysctl.c
- 	<$(SOURCE_GRIST)>gettimeofday.c
- 	<$(SOURCE_GRIST)>wait.c
+	chmod.c
+	getrusage.c
+ 	gettimeofday.c
+	itimer.c
+	mkdir.c
+	mkfifo.c
+	rlimit.c
+ 	select.c
+	stat.c
+ 	sysctl.c
+ 	umask.c
+ 	wait.c
 	: -fPIC -DPIC
 	;
