@@ -16,7 +16,7 @@ struct preloaded_image {
 	elf_region	text_region;
 	elf_region	data_region;
 	addr_range	dynamic_section;	// pointer to the dynamic section
-	Elf32_Ehdr	elf_header;
+	struct Elf32_Ehdr elf_header;
 };
 
 #endif	/* KERNEL_BOOT_ELF_H */
