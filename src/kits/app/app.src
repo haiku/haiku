@@ -13,6 +13,7 @@ APP_KIT_SOURCE =
 	PropertyInfo.cpp
 	RegistrarDefs.cpp
 	RegistrarThread.cpp
+	RegistrarThreadManager.cpp
 	Roster.cpp
 	TokenSpace.cpp
 ;
