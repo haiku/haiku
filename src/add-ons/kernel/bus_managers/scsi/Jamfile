@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons kernel bus_managers scsi ;
+
+UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+
+KernelAddon scsi : kernel bus_managers :
+	bus_raw.c
+	busses.c
+	ccb.c
+	device_scan.c
+	devices.c
+	dma_buffer.c
+	dpc.c
+	emulation.c
+	queuing.c
+	scsi.c
+	scsi_io.c
+	scatter_gather.c
+	sim_interface.c
+	virtual_memory.c
+	;
+
