@@ -4,6 +4,8 @@
 #include "MessageConstructTest.h"
 #include "MessageOpAssignTest.h"
 #include "MessageBoolItemTest.h"
+#include "MessageFloatItemTest.h"
+#include "MessageDoubleItemTest.h"
 #include "MessageInt8ItemTest.h"
 #include "MessageInt16ItemTest.h"
 #include "MessageInt32ItemTest.h"
@@ -19,6 +21,8 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageConstructTest::Suite());
 	tests->addTest(TMessageOpAssignTest::Suite());
 	tests->addTest(TMessageBoolItemTest::Suite());
+	tests->addTest(TMessageFloatItemTest::Suite());
+	tests->addTest(TMessageDoubleItemTest::Suite());
 	tests->addTest(TMessageInt8ItemTest::Suite());
 	tests->addTest(TMessageInt16ItemTest::Suite());
 	tests->addTest(TMessageInt32ItemTest::Suite());
