@@ -53,6 +53,17 @@ typedef struct {
 	int32		data_size;
 } image_info;
 
+// flags for _kern_load_image()
+enum {
+	B_WAIT_TILL_LOADED	= 0x01,	// Wait till the loader has loaded and relocated
+								// (but not yet initialized) the application
+								// image and all dependencies. If not supplied,
+								// the function returns before the loader
+								// started to do anything at all, i.e. it
+								// returns success, even if the executable
+								// doesn't exist.
+};
+
 extern _IMPEXP_ROOT thread_id	load_image(int32 argc, const char **argv,
 									const char **envp);
 extern _IMPEXP_ROOT image_id	load_add_on(const char *path);
