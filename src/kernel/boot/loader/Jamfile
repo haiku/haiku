@@ -4,6 +4,7 @@ SubDir OBOS_TOP src kernel boot loader ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders [ FDirName shared ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
@@ -51,6 +52,7 @@ KernelStaticLibrary boot_partitions :
 	apple.cpp
 	intel.cpp
 	PartitionMap.cpp
+	PartitionMapParser.cpp
 	: -fno-pic
 	;
 
@@ -64,7 +66,7 @@ SEARCH on [ FGristFiles amiga_rdb.cpp ]
 SEARCH on [ FGristFiles apple.cpp ]
     = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems apple ] ;
 
-SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp ]
+SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp PartitionMapParser.cpp ]
     = [ FDirName $(OBOS_TOP) src add-ons kernel partitioning_systems intel ] ;
 
 SEARCH on [ FGristFiles stage2_crt0.S ]
