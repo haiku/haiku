@@ -1,4 +1,4 @@
-NOTE: the information in this file is severly outdated.
+NOTE: the information in this file is gravely outdated.
 The preferred method to build Haiku (currently only possible on a BeOS machine)
 is this (when you're in the "current" directory):
 	$ configure
