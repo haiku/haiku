@@ -186,6 +186,7 @@ void CursorManager::SetCursor(int32 token)
 		// TODO: enable this when Desktop.h is added to server
 //		DisplayDriver *driver=GetGfxDriver();
 //		driver->SetCursor(c);
+		_current_which=B_CURSOR_OTHER;
 	}
 	release_sem(_lock);
 }
@@ -201,46 +202,55 @@ void CursorManager::SetCursor(cursor_which which)
 		case B_CURSOR_DEFAULT:
 		{
 			driver->SetCursor(_defaultcsr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_TEXT:
 		{
 			driver->SetCursor(_textcsr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_MOVE:
 		{
 			driver->SetCursor(_movecsr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_DRAG:
 		{
 			driver->SetCursor(_dragcsr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_RESIZE:
 		{
 			driver->SetCursor(_resizecsr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
 		{
 			driver->SetCursor(_resize_nwse_csr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
 		{
 			driver->SetCursor(_resize_nesw_csr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
 		{
 			driver->SetCursor(_resize_ns_csr);
+			_current_which=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
 		{
 			driver->SetCursor(_resize_ew_csr);
+			_current_which=which;
 			break;
 		}
 		default:
