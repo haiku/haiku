@@ -1,0 +1,31 @@
+SubDir OBOS_TOP src kernel core disk_device_manager ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
+
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName shared ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+SharedLibrary disk_device_manager :
+	KDiskDevice.cpp
+	KDiskDeviceJob.cpp
+	KDiskDeviceJobFactory.cpp
+	KDiskDeviceJobQueue.cpp
+	KDiskDeviceManager.cpp
+	KDiskSystem.cpp
+	KFileSystem.cpp
+	KPartition.cpp
+	KPartitioningSystem.cpp
+	disk_device_manager.cpp
+
+	# jobs
+	KCreateChildJob.cpp
+	KDefragmentJob.cpp
+	KDeleteChildJob.cpp
+	KInitializeJob.cpp
+	KMoveJob.cpp
+	KRepairJob.cpp
+	KResizeJob.cpp
+	KScanPartitionJob.cpp
+	KSetParametersJob.cpp
+;
