@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -13,9 +16,9 @@
 extern "C" {
 #endif
 
-int arch_vm_init(struct kernel_args *ka);
-int arch_vm_init2(struct kernel_args *ka);
-int arch_vm_init_endvm(struct kernel_args *ka);
+status_t arch_vm_init(struct kernel_args *args);
+status_t arch_vm_init_post_area(struct kernel_args *args);
+status_t arch_vm_init_end(struct kernel_args *args);
 void arch_vm_aspace_swap(vm_address_space *aspace);
 
 #ifdef __cplusplus

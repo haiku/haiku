@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -20,11 +23,12 @@ extern "C" {
 #endif
 
 //void vm_dump_areas(vm_address_space *aspace);
-status_t vm_init(kernel_args *ka);
-status_t vm_init_postsem(struct kernel_args *ka);
-status_t vm_init_postthread(struct kernel_args *ka);
+status_t vm_init(kernel_args *args);
+status_t vm_init_post_sem(struct kernel_args *args);
+status_t vm_init_post_thread(struct kernel_args *args);
 status_t vm_aspace_init(void);
 status_t vm_aspace_init_post_sem(void);
+void vm_free_unused_boot_loader_range(addr_t start, addr_t end);
 
 void vm_delete_aspace(vm_address_space *aspace);
 status_t vm_create_aspace(const char *name, addr base, addr size, bool kernel, vm_address_space **_aspace);

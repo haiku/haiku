@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -13,17 +16,17 @@
 struct kernel_args;
 
 
-typedef struct vm_translation_map_struct {
-	struct vm_translation_map_struct *next;
-	struct vm_translation_map_ops_struct *ops;
-	recursive_lock lock;
-	int map_count;
-	struct vm_translation_map_arch_info_struct *arch_data;
+typedef struct vm_translation_map {
+	struct vm_translation_map		*next;
+	struct vm_translation_map_ops	*ops;
+	recursive_lock					lock;
+	int32							map_count;
+	struct vm_translation_map_arch_info *arch_data;
 } vm_translation_map;
 
 
 // table of operations the vm may want to do to this mapping
-typedef struct vm_translation_map_ops_struct {
+typedef struct vm_translation_map_ops {
 	void (*destroy)(vm_translation_map *);
 	status_t (*lock)(vm_translation_map*);
 	status_t (*unlock)(vm_translation_map*);
@@ -34,14 +37,10 @@ typedef struct vm_translation_map_ops_struct {
 	status_t (*protect)(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes);
 	status_t (*clear_flags)(vm_translation_map *map, addr_t va, uint32 flags);
 	void (*flush)(vm_translation_map *map);
-	status_t (*get_physical_page)(addr_t physical_address, addr_t *out_virtual_address, uint32 flags);
-	status_t (*put_physical_page)(addr_t virtual_address);
+	status_t (*get_physical_page)(addr_t physicalAddress, addr_t *_virtualAddress, uint32 flags);
+	status_t (*put_physical_page)(addr_t virtualAddress);
 } vm_translation_map_ops;
 
-// ToDo: fix this
-// unlike the usual habit, the VM translation map functions are
-// arch-specific but do not have the arch_ prefix.
 #include <arch/vm_translation_map.h>
 
 #endif	/* KERNEL_VM_TRANSLATION_MAP_H */
-
