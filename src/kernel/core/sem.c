@@ -13,6 +13,7 @@
 
 #include <sem.h>
 #include <kernel.h>
+#include <ksignal.h>
 #include <smp.h>
 #include <int.h>
 #include <arch/int.h>
@@ -409,7 +410,6 @@ acquire_sem(sem_id id)
 	return acquire_sem_etc(id, 1, 0, 0);
 }
 
-
 status_t
 acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
@@ -457,7 +457,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
-		if ((flags & B_CAN_INTERRUPT) && thread->sig_pending) {
+		if (((flags & B_CAN_INTERRUPT) && thread->sig_pending)
+			|| ((flags & B_KILL_CAN_INTERRUPT)
+				&& (thread->sig_pending & KILL_SIGNALS))) {
 			sSems[slot].u.used.count += count;
 			status = B_INTERRUPTED;
 			goto err;
@@ -495,7 +497,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		GRAB_THREAD_LOCK();
 		// check again to see if a signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
-		if ((flags & B_CAN_INTERRUPT) && thread->sig_pending) {
+		if (((flags & B_CAN_INTERRUPT) && thread->sig_pending)
+			|| ((flags & B_KILL_CAN_INTERRUPT)
+				&& (thread->sig_pending & KILL_SIGNALS))) {
 			struct thread_queue wakeupQueue;
 			// ok, so a tiny race happened where a signal was delivered to this thread while
 			// it was setting up the sem. We can only be sure a signal wasn't delivered
@@ -842,8 +846,11 @@ sem_interrupt_thread(struct thread *thread)
 
 	if (thread->state != B_THREAD_WAITING || thread->sem.blocking < 0)
 		return B_BAD_VALUE;
-	if ((thread->sem.flags & B_CAN_INTERRUPT) == 0)
+	if ((thread->sem.flags & B_CAN_INTERRUPT) == 0
+		&& ((thread->sem.flags & B_KILL_CAN_INTERRUPT) == 0
+			|| (thread->sig_pending & KILL_SIGNALS) == 0)) {
 		return B_NOT_ALLOWED;
+	}
 
 	slot = thread->sem.blocking % sMaxSems;
 
