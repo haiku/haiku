@@ -53,11 +53,12 @@
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <math.h>
+#include <posix/math.h>
 
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-#define DEBUG_WIN
+//#define DEBUG_WIN
 #ifdef DEBUG_WIN
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -780,7 +781,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		msg->FindInt32( "modifiers", (int32*)&modifiers );
 		msg->FindInt32( "raw_char", &raw_char );
 		msg->FindString( "bytes", &string );
-
+// TODO: it is NOT "bytes" field you should pass to KeyDown(), it is "byte" field.
 		if ( !handleKeyDown( raw_char, (uint32)modifiers) )
 			fFocus->KeyDown( string, strlen(string)-1 );
 		break;}
@@ -857,22 +858,59 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		break;}
 
 	case _UPDATE_:{
-		BView			*view;
-		int32			token;
-		BRect			frame;
+		BRect			updateRect;
+		msg->FindRect("_rect", &updateRect);
 
-		msg->FindInt32("token", &token);
-		msg->FindRect("frame", &frame);
-		view			= findView( top_view, token );
-
-		drawView( view, frame );
+// TODO: ADD this method:
+		//DrawViews( updateRect );
 		break;}
 
+	case B_VIEW_MOVED:{
+			BPoint			where;
+			int32			token = B_NULL_TOKEN;
+			BView			*view;
+
+			msg->FindPoint("where", &where);
+			msg->FindInt32("_token", &token);
+			msg->RemoveName("_token");
+			
+			view			= findView(top_view, token);
+			if (view){
+				STRACE(("Calling BView(%s)::FrameMoved( %f, %f )\n", view->Name(), where.x, where.y));
+				view->FrameMoved( where );
+			}
+			else
+				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+
+		break;}
+	
+	case B_VIEW_RESIZED:{
+			float			newWidth,
+							newHeight;
+			BPoint			where;
+			int32			token = B_NULL_TOKEN;
+			BView			*view;
+
+			msg->FindFloat("width", &newWidth);
+			msg->FindFloat("height", &newHeight);
+			msg->FindPoint("where", &where);
+			msg->FindInt32("_token", &token);
+			msg->RemoveName("_token");
+			
+			view			= findView(top_view, token);
+			if (view){
+				STRACE(("Calling BView(%s)::FrameResized( %f, %f )\n", view->Name(), newWidth, newHeight));
+				view->FrameResized( newWidth, newHeight );
+			}
+			else
+				printf("***PANIC: BW: Can't find view with ID: %ld !***\n", token);
+
+		break;}
+		
 	default:{
 		BLooper::DispatchMessage(msg, target); 
 		break;}
    }
-   Sync();
 }
 
 //------------------------------------------------------------------------------
@@ -1728,30 +1766,24 @@ void BWindow::ResizeTo(float width, float height){
 //------------------------------------------------------------------------------
 
 void BWindow::Show(){
-	bool	isLocked = IsLocked();
+	bool	isLocked = this->IsLocked();
 		
 	fShowLevel--;
 
 	if (fShowLevel == 0){
-		#ifdef DEBUG_WIN
-			printf(">BWindow: sending AS_SHOW_WINDOW message...\n");
-		#endif
+		STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name() ));
 		if ( !isLocked ) Lock();
 		session->WriteInt32( AS_SHOW_WINDOW );
 		session->Sync( );
 		if ( !isLocked) Unlock();
 	}
 
+		// if it's the fist time Show() is called... start the Looper thread.
 	if ( Thread() == B_ERROR )
 	{
-		#ifdef DEBUG_WIN
-			printf(">BWindow: calling Run()...\n");
-		#endif
-		Lock();
+			// normaly this won't happen, but I want to be sure!
+		if ( !isLocked ) Lock();
 		Run();
-		#ifdef DEBUG_WIN
-			printf(">BWindow: Run() called.\n");
-		#endif
 	}
 	
 }
@@ -1871,13 +1903,11 @@ void BWindow::InitData(	BRect frame,
 						uint32 flags,
 						uint32 workspace){
 
-	#ifdef DEBUG_WIN
-		printf("BWindow::InitData(...)\n");
-	#endif
+	STRACE(("BWindow::InitData(...)\n"));
 	
 	fTitle=NULL;
 	if ( be_app == NULL ){
-		//debugger("You need a valid BApplication object before interacting with the app_server");
+		debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
 	}
 	
@@ -1940,26 +1970,25 @@ void BWindow::InitData(	BRect frame,
 // TODO: other initializations!
 
 /*
-	Here, we will contact app_server and let him that a window has been created
+	Here, we will contact app_server and let him know that a window has
+		been created
 */
 	receive_port	= create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,
 						"w_rcv_port");
 	if (receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS){
 		debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
-		return;
+		delete this;
 	}
 
-	#ifdef DEBUG_WIN
-		printf("BWindow::InitData(): contacting app_server\n");
-	#endif
-
+	STRACE(("BWindow::InitData(): contacting app_server...\n"));
 		// let app_server to know that a window has been created.
+
 	session		= new BSession( receive_port, be_app->fServerFrom );
 
 		// HERE we are in BApplication's thread, so for locking we use be_app variable
 		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool	locked = false;
-	if ( !(be_app->IsLocked()) && !locked)
+	if ( !(be_app->IsLocked()) )
 		{ be_app->Lock(); locked = true; }
 		
 	session->WriteInt32( AS_CREATE_WINDOW );
@@ -1970,6 +1999,7 @@ void BWindow::InitData(	BRect frame,
 	session->WriteUInt32( workspace );
 	session->WriteInt32( _get_object_token_(this) );
 	session->WriteData( &receive_port, sizeof(port_id) );
+	session->WriteData( &fMsgPort, sizeof(port_id) );
 	session->WriteString( title );
 	session->Sync();
 		// The port on witch app_server will listen for us	
@@ -1980,10 +2010,9 @@ void BWindow::InitData(	BRect frame,
 		be_app->Unlock();
 
 	session->SetSendPort(send_port);
-	#ifdef DEBUG_WIN
-		printf("BWindow::InitData(): app_server link established - port_id received\n");
-		PrintToStream();
-	#endif
+
+	STRACE(("\tapp_server link established.\n"));
+	STRACE(("Window locked?: %s\n", IsLocked()?"True":"False"));
 
 		// build and register top_view with app_server
 	BuildTopView();
@@ -2006,9 +2035,8 @@ void BWindow::task_looper(){
 	//	loop: As long as we are not terminating.
 	while (!fTerminating)
 	{
-
 		// get BMessages from app_server
-		while ( (msg = ReadMessageFromPort(0)) ){
+		while ( (msg = ReadMessageFromPort(10)) ){
 			fQueue->Lock();
 			fQueue->AddMessage(msg);
 			fQueue->Unlock();
@@ -2022,7 +2050,7 @@ void BWindow::task_looper(){
 			fQueue->Unlock();
 			dispatchNextMessage = true;
 		}
-
+		
 		//	loop: As long as there are messages in the queue and
 		//		  and we are not terminating.
 		while (!fTerminating && dispatchNextMessage)
@@ -2032,6 +2060,7 @@ void BWindow::task_looper(){
 			fQueue->Unlock();
 
 			Lock();
+		// TODO: add code for drag & drop
 			if (!fLastMessage)
 			{
 				// No more messages: Unlock the looper and terminate the
@@ -2065,11 +2094,12 @@ void BWindow::task_looper(){
 				{
 					//	Do filtering
 					handler = top_level_filter(fLastMessage, handler);
-
 					if (handler && handler->Looper() == this)
 						DispatchMessage(fLastMessage, handler);
 				}
 			}
+				// empty our message buffer
+			session->Sync();
 
 			Unlock();
 
@@ -2087,49 +2117,41 @@ void BWindow::task_looper(){
 //------------------------------------------------------------------------------
 
 BMessage* BWindow::ReadMessageFromPort(bigtime_t tout){
-	int32			msgcode;
+	int32			msgCode;
 	BMessage*		msg = NULL;
-	uint8*			msgbuffer;
 
-	msgbuffer		= ReadRawFromPort(&msgcode, tout);
-
-	if (msgcode != B_ERROR)
-		msg			= ConvertToMessage(msgbuffer, msgcode);
-
-	if (msgbuffer)
-		delete msgbuffer;
-
-	return msg;
-}
-
-//------------------------------------------------------------------------------
-
-uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout){
-
-	uint8*			msgbuffer = NULL;
-	ssize_t			buffersize;
+	ssize_t			bufferSize;
 
 		// we NEVER have to use B_INFINITE_TIMEOUT
 	if (tout == B_INFINITE_TIMEOUT)
-		tout		= 0;
+		tout = 0;
 
-	buffersize = port_buffer_size_etc(receive_port, B_TIMEOUT, tout);
-	if (buffersize == B_TIMED_OUT || buffersize == B_BAD_PORT_ID ||
-		buffersize == B_WOULD_BLOCK)
+		/* because BSession does not have support for timeout operations
+			We'll use this trick! :-) */
+	bufferSize = port_buffer_size_etc(receive_port, B_TIMEOUT, tout);
+	if (bufferSize == B_TIMED_OUT || bufferSize == B_BAD_PORT_ID ||
+		bufferSize == B_WOULD_BLOCK || bufferSize == B_INTERRUPTED )
 	{
-		*code = B_ERROR;
-		return NULL;
+		msgCode = B_ERROR;
 	}
 
+		// we have something in our port's queue
+	if (bufferSize > 0){
+		/* A rudimentary synchronize mechanism between BWindow and app_server.
+		 *	Just in case some we do something foolish :-) 
+		 *	It ensures a clean "restart" if I can call it that way.
+		 */
+		if ( session->DropInputBuffer() )
+			printf("***PANIC: BWindow(%s): BSession's input buffer dropped! The buffer WASN'T empty!***\n", Name());
 
-	if (buffersize > 0){
-		msgbuffer = new uint8[buffersize];
-
-		read_port_etc(	receive_port, code, msgbuffer,
-						buffersize, B_TIMEOUT, tout);
+			// read message code
+		session->ReadInt32( &msgCode );
 	}
 
-	return msgbuffer;
+	if ( msgCode != B_ERROR )
+		msg = ConvertToMessage( NULL, msgCode );
+
+	return msg;
 }
 
 //------------------------------------------------------------------------------
@@ -2543,27 +2565,16 @@ void BWindow::sendMessageUsingEventMask( int32 message, BPoint where ){
 BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 	BMessage	*msg;
-
-		// This is in case we receive a BMessage from another thread or application
-	msg			= BLooper::ConvertToMessage( raw1, code );
-	if (msg)
-		return msg;
-
-		// (ALL)This is in case we receive a message from app_server
-	uint8		*raw;
-	raw			= (uint8*)raw1;
-
+	msg			= new BMessage();
 		// time since 01/01/70
 	int64		when;
-
-	msg			= new BMessage();
 
 	switch(code){
 		case B_WINDOW_ACTIVATED:{
 			bool		active;
 
-			when		= *((int64*)raw);	raw += sizeof(int64);
-			active		= *((bool*)raw);
+			session->ReadInt64( &when );
+			session->ReadBool( &active );
 
 			msg->what	= B_WINDOW_ACTIVATED;
 			msg->AddInt64("when", when);
@@ -2571,35 +2582,33 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 			break;}
 
-// TODO: this might be sent by app_server as a BMessage! Anyway, this won't be a problem.
 		case B_QUIT_REQUESTED:{
 
 			msg->what	= B_QUIT_REQUESTED;
 			msg->AddBool("shortcut", false);
 
 			break;}
-
+			
 		case B_KEY_DOWN:{
 			int32			physicalKeyCode,
 							repeat,
 							modifiers,
 							ASCIIcode;
-			char			*bytes;
+			char			*bytes = NULL;
 			uint8			states;
 			int8			UTF8_1, UTF8_2, UTF8_3;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			physicalKeyCode	= *((int32*)raw);	raw += sizeof(int32);
-			repeat			= *((int32*)raw);	raw += sizeof(int32);
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			states			= *((uint8*)raw);	raw += sizeof(uint8);
-			UTF8_1			= *((int8*)raw);	raw += sizeof(int8);
-			UTF8_2			= *((int8*)raw);	raw += sizeof(int8);
-			UTF8_3			= *((int8*)raw);	raw += sizeof(int8);
-			ASCIIcode		= *((int32*)raw);	raw += sizeof(int32);
-
-			bytes			= strdup( (char*)raw );
-
+			session->ReadInt64( &when );
+			session->ReadInt32( &physicalKeyCode );
+			session->ReadInt32( &repeat );
+			session->ReadInt32( &modifiers );
+			session->ReadUInt8( &states );
+			session->ReadInt8( &UTF8_1 );
+			session->ReadInt8( &UTF8_2 );
+			session->ReadInt8( &UTF8_3 );
+			session->ReadInt32( &ASCIIcode );
+			bytes			= session->ReadString();
+			
 			msg->what		= B_KEY_DOWN;
 			msg->AddInt64("when", when);
 			msg->AddInt32("key", physicalKeyCode);
@@ -2611,6 +2620,9 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt8("byte", UTF8_3);
 			msg->AddInt32("raw_char", ASCIIcode);
 			msg->AddString("bytes", bytes);
+			
+			if (bytes)
+				delete bytes;
 
 			break;}
 
@@ -2622,16 +2634,15 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			uint8			states;
 			int8			UTF8_1, UTF8_2, UTF8_3;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			physicalKeyCode	= *((int32*)raw);	raw += sizeof(int32);
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			states			= *((uint8*)raw);	raw += sizeof(uint8);
-			UTF8_1			= *((int8*)raw);	raw += sizeof(int8);
-			UTF8_2			= *((int8*)raw);	raw += sizeof(int8);
-			UTF8_3			= *((int8*)raw);	raw += sizeof(int8);
-			ASCIIcode		= *((int32*)raw);	raw += sizeof(int32);
-
-			bytes			= strdup( (char*)raw );
+			session->ReadInt64( &when );
+			session->ReadInt32( &physicalKeyCode );
+			session->ReadInt32( &modifiers );
+			session->ReadUInt8( &states );
+			session->ReadInt8( &UTF8_1 );
+			session->ReadInt8( &UTF8_2 );
+			session->ReadInt8( &UTF8_3 );
+			session->ReadInt32( &ASCIIcode );
+			bytes			= session->ReadString();
 
 			msg->what		= B_KEY_UP;
 			msg->AddInt64("when", when);
@@ -2644,6 +2655,9 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt32("raw_char", ASCIIcode);
 			msg->AddString("bytes", bytes);
 
+			if (bytes)
+				delete bytes;
+
 			break;}
 
 		case B_UNMAPPED_KEY_DOWN:{
@@ -2651,10 +2665,10 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 							modifiers;
 			uint8			states;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			physicalKeyCode	= *((int32*)raw);	raw += sizeof(int32);
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			states			= *((uint8*)raw);
+			session->ReadInt64( &when );
+			session->ReadInt32( &physicalKeyCode );
+			session->ReadInt32( &modifiers );
+			session->ReadUInt8( &states );
 
 			msg->what		= B_UNMAPPED_KEY_DOWN;
 			msg->AddInt64("when", when);
@@ -2669,10 +2683,10 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 							modifiers;
 			uint8			states;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			physicalKeyCode	= *((int32*)raw);	raw += sizeof(int32);
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			states			= *((uint8*)raw);
+			session->ReadInt64( &when );
+			session->ReadInt32( &physicalKeyCode );
+			session->ReadInt32( &modifiers );
+			session->ReadUInt8( &states );
 
 			msg->what		= B_UNMAPPED_KEY_UP;
 			msg->AddInt64("when", when);
@@ -2687,10 +2701,10 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 							modifiersOld;
 			uint8			states;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			modifiersOld	= *((int32*)raw);	raw += sizeof(int32);
-			states			= *((uint8*)raw);
+			session->ReadInt64( &when );
+			session->ReadInt32( &modifiers );
+			session->ReadInt32( &modifiersOld );
+			session->ReadUInt8( &states );
 
 			msg->what		= B_MODIFIERS_CHANGED;
 			msg->AddInt64("when", when);
@@ -2703,8 +2717,8 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 		case B_MINIMIZE:{
 			bool			minimize;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			minimize		= *((bool*)raw);
+			session->ReadInt64( &when );
+			session->ReadBool( &minimize );
 
 			msg->what		= B_MINIMIZE;
 			msg->AddInt64("when", when);
@@ -2713,21 +2727,16 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			break;}
 
 		case B_MOUSE_DOWN:{
-			float			mouseLocationX,
-							mouseLocationY;
 			int32			modifiers,
 							buttons,
 							noOfClicks;
 			BPoint			where;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
-			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);
-			buttons			= *((int32*)raw);	raw += sizeof(int32);
-			noOfClicks		= *((int32*)raw);
-
-			where.Set( mouseLocationX, mouseLocationY );
+			session->ReadInt64( &when );
+			session->ReadPoint( &where );
+			session->ReadInt32( &modifiers );
+			session->ReadInt32( &buttons );
+			session->ReadInt32( &noOfClicks );
 
 			msg->what		= B_MOUSE_DOWN;
 			msg->AddInt64("when", when);
@@ -2739,43 +2748,32 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			break;}
 
 		case B_MOUSE_MOVED:{
-			float			mouseLocationX,
-							mouseLocationY;
 			int32			buttons;
 			int32			modifiers;		// added by OBOS Team
-
 			BPoint			where;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// windows's coordinate system
-			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// windows's coordinate system
-			modifiers		= *((int32*)raw);	raw += sizeof(int32);	// added by OBOS Team
-			buttons			= *((int32*)raw);
-
-			where.Set( mouseLocationX, mouseLocationY );
+			session->ReadInt64( &when );
+			session->ReadPoint( &where );
+			session->ReadInt32( &buttons );
+			session->ReadInt32( &modifiers );
 
 			msg->what		= B_MOUSE_MOVED;
 			msg->AddInt64("when", when);
 			msg->AddPoint("where", where);
 			msg->AddInt32("buttons", buttons);
-// TODO Add "modifiers" field !
+			msg->AddInt32("modifiers", modifiers);
 
 			break;}
 
 		case B_MOUSE_UP:{
-			float			mouseLocationX,
-							mouseLocationY;
 			int32			modifiers,
 							buttons;
 			BPoint			where;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
-			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
-			buttons			= *((int32*)raw);	raw += sizeof(int32);
-			modifiers		= *((int32*)raw);
-
-			where.Set( mouseLocationX, mouseLocationY );
+			session->ReadInt64( &when );
+			session->ReadPoint( &where );
+			session->ReadInt32( &buttons );
+			session->ReadInt32( &modifiers );
 
 			msg->what		= B_MOUSE_UP;
 			msg->AddInt64("when", when);
@@ -2789,9 +2787,9 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			float			whellChangeX,
 							whellChangeY;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			whellChangeX	= *((float*)raw);	raw += sizeof(float);
-			whellChangeY	= *((float*)raw);
+			session->ReadInt64( &when );
+			session->ReadFloat( &whellChangeX );
+			session->ReadFloat( &whellChangeY );
 
 			msg->what		= B_MOUSE_WHEEL_CHANGED;
 			msg->AddInt64("when", when);
@@ -2801,21 +2799,12 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			break;}
 
 		case B_SCREEN_CHANGED:{
-			float			top,
-							left,
-							right,
-							bottom;
 			int32			colorSpace;
 			BRect			frame;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			left			= *((float*)raw);	raw += sizeof(float);
-			top				= *((float*)raw);	raw += sizeof(float);
-			right			= *((float*)raw);	raw += sizeof(float);
-			bottom			= *((float*)raw);	raw += sizeof(float);
-			colorSpace		= *((int32*)raw);
-
-			frame.Set( left, top, right, bottom );
+			session->ReadInt64( &when );
+			session->ReadRect( &frame );
+			session->ReadInt32( &colorSpace );
 
 			msg->what		= B_SCREEN_CHANGED;
 			msg->AddInt64("when", when);
@@ -2824,84 +2813,11 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 			break;}
 
-		case B_VIEW_MOVED:{
-			float			xAxisNewOrigin,
-							yAxisNewOrigin;
-			BPoint			where;
-			int32			token;
-
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			token			= *((int32*)raw);	raw += sizeof(int32);
-			xAxisNewOrigin	= *((float*)raw);	raw += sizeof(float);
-			yAxisNewOrigin	= *((float*)raw);
-
-			where.Set( xAxisNewOrigin, yAxisNewOrigin );
-
-			msg->what		= B_VIEW_MOVED;
-			msg->AddInt64("when", when);
-			msg->AddPoint("where", where);
-
-			_set_message_target_( msg, token, false);
-			
-			break;}
-
-		case B_VIEW_RESIZED:{
-			int32			newWidth,
-							newHeight;
-			float			xAxisNewOrigin,
-							yAxisNewOrigin;
-			BPoint			where;
-			int32			token;
-
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			token			= *((int32*)raw);	raw += sizeof(int32);
-			newWidth		= *((int32*)raw);	raw += sizeof(int32);
-			newHeight		= *((int32*)raw);	raw += sizeof(int32);
-			xAxisNewOrigin	= *((float*)raw);	raw += sizeof(float);
-			yAxisNewOrigin	= *((float*)raw);
-
-			where.Set( xAxisNewOrigin, yAxisNewOrigin );
-
-			msg->what		= B_VIEW_RESIZED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("width", newWidth);
-			msg->AddInt32("height", newHeight);
-			msg->AddPoint("where", where);
-
-			_set_message_target_( msg, token, false);
-
-			break;}
-
-		case _UPDATE_:{
-			int32			token;
-			float			left, top,
-							right, bottom;
-			BRect			frame;
-
-			token			= *((int32*)raw);	raw += sizeof(int32);
-			left			= *((float*)raw);	raw += sizeof(float);
-			top				= *((float*)raw);	raw += sizeof(float);
-			right			= *((float*)raw);	raw += sizeof(float);
-			bottom			= *((float*)raw);
-
-			frame.Set( left, top, right, bottom );
-
-			msg->what		= _UPDATE_;
-			msg->AddInt32("token", token);
-			msg->AddRect("frame", frame);
-
-			break;}
-
 		case B_WINDOW_MOVED:{
-			float			xAxisNewOrigin,
-							yAxisNewOrigin;
 			BPoint			where;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			xAxisNewOrigin	= *((float*)raw);	raw += sizeof(float);
-			yAxisNewOrigin	= *((float*)raw);
-
-			where.Set( xAxisNewOrigin, yAxisNewOrigin );
+			session->ReadInt64( &when );
+			session->ReadPoint( &where );
 
 			msg->what		= B_WINDOW_MOVED;
 			msg->AddInt64("when", when);
@@ -2913,10 +2829,10 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			int32			newWidth,
 							newHeight;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			newWidth		= *((int32*)raw);	raw += sizeof(int32);
-			newHeight		= *((int32*)raw);
-
+			session->ReadInt64( &when );
+			session->ReadInt32( &newWidth );
+			session->ReadInt32( &newHeight );
+			
 			msg->what		= B_WINDOW_RESIZED;
 			msg->AddInt64("when", when);
 			msg->AddInt32("width", newWidth);
@@ -2928,9 +2844,9 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			int32			newWorkSpace,
 							oldWorkSpace;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			oldWorkSpace	= *((int32*)raw);	raw += sizeof(int32);
-			newWorkSpace	= *((int32*)raw);
+			session->ReadInt64( &when );
+			session->ReadInt32( &newWorkSpace );
+			session->ReadInt32( &oldWorkSpace );
 
 			msg->what		= B_WORKSPACES_CHANGED;
 			msg->AddInt64("when", when);
@@ -2943,9 +2859,9 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			int32			workSpace;
 			bool			active;
 
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			workSpace		= *((int32*)raw);	raw += sizeof(int32);
-			active			= *((bool*)raw);
+			session->ReadInt64( &when );
+			session->ReadInt32( &workSpace );
+			session->ReadBool( &active );
 
 			msg->what		= B_WORKSPACE_ACTIVATED;
 			msg->AddInt64("when", when);
@@ -2956,7 +2872,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 		case B_ZOOM:{
 
-			when			= *((int64*)raw);
+			session->ReadInt64( &when );
 
 			msg->what		= B_ZOOM;
 			msg->AddInt64("when", when);
@@ -2964,10 +2880,13 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			break;}
 		
 		default:{
-			// there is no need for default, but, just in case...
-			printf("There is a message from app_server that I don't undersand: '%c%c%c%c'\n",
-				(char)((code & 0xFF000000) >> 24), (char)((code & 0x00FF0000) >> 16),
-				(char)((code & 0x0000FF00) >> 8), (char)(code & 0x000000FF) );
+			delete msg;
+			
+			msg		= BLooper::ConvertToMessage( raw1, code );
+			if (!msg)
+				printf("***PANIC: app_server message NOT understood: '%c%c%c%c'***\n",
+					(char)((code & 0xFF000000) >> 24), (char)((code & 0x00FF0000) >> 16),
+					(char)((code & 0x0000FF00) >> 8), (char)(code & 0x000000FF) );
 			}
 	}
 	
@@ -3368,15 +3287,15 @@ TODO list:
 
 	*) take care of temporarely events mask!!!
 	*) what's with this flag B_ASYNCHRONOUS_CONTROLS ?
-	*) what should I do if frame rect is invalid?
-	*) AddInt32("ccc", (uint32));
 	*) test arguments for SetWindowAligment
 	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
-
+	
+	* add handlers for B_VIEW_MOVED/RESIZED in DispatchMessage()
+	* modify _UPDATE_ handler in DispatchMessage()
 */
 
 /*
  @log
-	* made fLastViewToken member equal with top_view's token. This avoids an unnecessary message to be sent to app_server.
-	* added some debugging code?
+	*modified ReadRawFromPort() and ConvertToMessage() methods to use BSession class.
+	*modified/added B_VIEW_(MOVED/RESIZED) handlers in ConvertToMessage()/DispatchMessage()
 */
