@@ -21,6 +21,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "additional_commands.h"
 #include "argv.h"
 #include "external_commands.h"
 #include "kprotos.h"
@@ -233,7 +234,7 @@ do_read_test(int argc, char **argv)
     if (argv[1] && isdigit(argv[1][0]))
         len = strtoul(&argv[1][0], NULL, 0);
 
-    buff = malloc(len);
+    buff = (char*)malloc(len);
     if (buff == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
         return ENOMEM;
@@ -273,7 +274,7 @@ do_write_test(int argc, char **argv)
     if (argv[1] && isdigit(argv[1][0]))
         len = strtoul(&argv[1][0], NULL, 0);
 
-    buff = malloc(len);
+    buff = (char*)malloc(len);
     if (buff == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
         return ENOMEM;
@@ -347,7 +348,7 @@ do_read_attr(int argc, char **argv)
 		return EINVAL;
 	}
 
-    buffer = malloc(len);
+    buffer = (char*)malloc(len);
     if (buffer == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
         return ENOMEM;
@@ -393,7 +394,7 @@ do_write_attr(int argc, char **argv)
 		return EINVAL;
 	}
 
-    buffer = malloc(len);
+    buffer = (char*)malloc(len);
     if (buffer == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
         return ENOMEM;
@@ -870,7 +871,9 @@ copydir(char *fromPath,char *toPath)
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	myfs_name = malloc(1024);  from_name = malloc(1024);  buff = malloc(bufferSize);
+	myfs_name = (char*)malloc(1024);
+	from_name = (char*)malloc(1024);
+	buff = (char*)malloc(bufferSize);
 	if (myfs_name == NULL || from_name == NULL || buff == NULL) {
 		printf("out of memory\n");
 		return B_NO_MEMORY;
@@ -1165,7 +1168,7 @@ do_attrtest(int argc, char **argv)
     	return EINVAL;
     }
 
-	buffer = malloc(1024);
+	buffer = (char*)malloc(1024);
 	for (i = 0; i < 1024; i++)
 		buffer[i] = i;
 
@@ -1363,7 +1366,7 @@ static int
 do_query(int argc, char **argv)
 {
 	char buffer[2048];
-	struct dirent *dent = (void *)buffer;
+	struct dirent *dent = (struct dirent *)buffer;
 	void *cookie;
 	char *query;
 	int max_err = 10;
@@ -1479,7 +1482,7 @@ mkfile(char *s, int sz)
         return fd;
     }
 
-	buffer = malloc(16 * 1024);
+	buffer = (char*)malloc(16 * 1024);
 	if (buffer == NULL)
 		return ENOMEM;
 
@@ -1581,19 +1584,10 @@ do_delete(int argc, char **argv)
 }
 
 
-#include "additional_commands.c"
-
-
 static int do_help(int argc, char **argv);
 
 
-typedef struct cmd_entry {
-    char *name;
-    int  (*func)(int argc, char **argv);
-    char *help;
-} cmd_entry;
-
-cmd_entry fsh_cmds[] =
+static cmd_entry builtin_commands[] =
 {
     { "ls",      do_dir, "print a directory listing" },
     { "dir",     do_dir, "print a directory listing (same as ls)" },
@@ -1634,23 +1628,33 @@ cmd_entry fsh_cmds[] =
     { "stattest", do_stattest, "does an \"early\"/\"late\" stat test for files that are created or deleted" },
     { "symlink", do_symlink, "creates the specified symlink on the device" },
 
-// additional commands from the file system will be included here
-#	include "additional_commands.h"
+    { NULL, NULL }
+};
 
+static cmd_entry help_commands[] =
+{
     { "help",    do_help, "print this help message" },
     { "?",       do_help, "print this help message" },
     { NULL, NULL }
 };
 
+static cmd_entry *fsh_commands[] =
+{
+	builtin_commands,
+	additional_commands,
+	help_commands,
+	NULL
+};
 
 static int
 do_help(int argc, char **argv)
 {
-    cmd_entry *cmd;
-
     printf("commands fsh understands:\n");
-    for (cmd = fsh_cmds; cmd->name != NULL; cmd++) {
-        printf("%8s - %s\n", cmd->name, cmd->help);
+    for (cmd_entry **commands = fsh_commands; *commands; commands++) {
+	    cmd_entry *cmd = *commands;
+	    for (; cmd->name != NULL; cmd++) {
+	        printf("%8s - %s\n", cmd->name, cmd->help);
+	    }
     }
 
 	return 0;
@@ -1685,7 +1689,7 @@ do_fsh(void)
     int   argc, len;
     char *prompt = FS_SHELL_PROMPT ">> ";
     char  input[1024], **argv;
-    cmd_entry *cmd;
+    cmd_entry *cmd = NULL;
 
     while(getline(prompt, input, sizeof(input)) != NULL) {
         argc = 0;
@@ -1696,16 +1700,19 @@ do_fsh(void)
 
         len = strlen(&argv[0][0]);
 
-        for(cmd=fsh_cmds; cmd->name != NULL; cmd++) {
-            if (strncmp(cmd->name, &argv[0][0], len) == 0) {
-                int result = cmd->func(argc, argv);
-
-				if (!sInteractiveMode)
-					reply_to_external_command(result);
-
-                break;
-            }
-        }
+	    for (cmd_entry **commands = fsh_commands; *commands; commands++) {
+		    cmd_entry *cmd = *commands;
+		    for (; cmd->name != NULL; cmd++) {
+	            if (strncmp(cmd->name, &argv[0][0], len) == 0) {
+	                int result = cmd->func(argc, argv);
+	
+					if (!sInteractiveMode)
+						reply_to_external_command(result);
+	
+	                break;
+	            }
+	        }
+	    }
         
         if (strncmp(&argv[0][0], "quit", 4) == 0
             || strncmp(&argv[0][0], "exit", 4) == 0) {
