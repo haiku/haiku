@@ -230,8 +230,8 @@ status_t nv_crtc2_set_timing(display_mode target)
 		uint32 iscale_x, iscale_y;
 
 		//fixme: checkout upscaling and aspect!!!
-		iscale_x = ((4096 * target.timing.h_display) / si->ps.panel1_width);
-		iscale_y = ((4096 * target.timing.v_display) / si->ps.panel1_height);
+		iscale_x = ((4096 * target.timing.h_display) / si->ps.panel2_width);
+		iscale_y = ((4096 * target.timing.v_display) / si->ps.panel2_height);
 		DAC2W(FP_DEBUG3, (iscale_x & 0x00001fff) | ((iscale_y & 0x00001fff) << 16));
 
 		/* limit last fetched line if vertical scaling is done */
