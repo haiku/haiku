@@ -1808,14 +1808,18 @@ int vm_init_postthread(kernel_args *ka)
 void
 permit_page_faults(void)
 {
-	// ToDo: implement me when TLS is there
+	struct thread *thread = thread_get_current_thread();
+	if (thread != NULL)
+		atomic_add(&thread->page_faults_allowed, 1);
 }
 
 
 void
 forbid_page_faults(void)
 {
-	// ToDo: implement me when TLS is there
+	struct thread *thread = thread_get_current_thread();
+	if (thread != NULL)
+		atomic_add(&thread->page_faults_allowed, -1);
 }
 
 
