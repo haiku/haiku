@@ -1338,11 +1338,10 @@ BTextView::Copy(BClipboard *clipboard)
 	
 	CancelInputMethod();
 
-	BMessage *clip = NULL;
-
 	if (clipboard->Lock()) {
 		clipboard->Clear(); 
    
+		BMessage *clip = NULL;
 		if ((clip = clipboard->Data()) != NULL) {
 			clip->AddData("text/plain", B_MIME_TYPE, Text() + fSelStart,
 				fSelEnd - fSelStart);
@@ -1370,10 +1369,8 @@ BTextView::Paste(BClipboard *clipboard)
 	CALLED();
 	CancelInputMethod();
 	
-	BMessage *clip = NULL;
-
 	if (clipboard->Lock()) { 
-		clip = clipboard->Data();
+		BMessage *clip = clipboard->Data();
 		if (clip != NULL) {
 			const char *text = NULL;
 			ssize_t len = 0;
@@ -1411,9 +1408,13 @@ BTextView::Clear()
 {
 	CALLED();
 	
-	delete fUndo;
-	fUndo = new _BClearUndoBuffer_(this);
-	
+	// We always check for fUndo != NULL (not only here),
+	// because when fUndo is NULL, undo is deactivated.
+	if (fUndo) {
+		delete fUndo;
+		fUndo = new _BClearUndoBuffer_(this);
+	}
+
 	Delete();
 }
 
@@ -2560,7 +2561,6 @@ BTextView::SetDoesUndo(bool undo)
 {
 	if (undo && fUndo == NULL)
 		fUndo = new _BUndoBuffer_(this, B_UNDO_UNAVAILABLE);
-	
 	else if (!undo && fUndo != NULL) {
 		delete fUndo;
 		fUndo = NULL;
@@ -2808,10 +2808,12 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
 	int32 size = 0;
 	text_run_array *styles = RunArray(fSelStart, fSelEnd, &size);
 	
-	drag->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
-		styles, size);
+	if (styles != NULL) {
+		drag->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
+			styles, size);
 	
-	free(styles);
+		free(styles);
+	}
 
 	if (bitmap != NULL)
 		*bitmap = NULL;
@@ -3943,26 +3945,26 @@ void
 BTextView::InitiateDrag()
 {
 	CALLED();
-	BMessage *drag = new BMessage(B_MIME_DATA);
+	BMessage *message = new BMessage(B_MIME_DATA);
 	BBitmap *dragBitmap = NULL;
 	BPoint bitmapPoint;
 	BHandler *dragHandler = NULL;
 	
-	GetDragParameters(drag, &dragBitmap, &bitmapPoint, &dragHandler);
+	GetDragParameters(message, &dragBitmap, &bitmapPoint, &dragHandler);
 	
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	
 	if (dragBitmap != NULL)
-		DragMessage(drag, dragBitmap, bitmapPoint, dragHandler);
+		DragMessage(message, dragBitmap, bitmapPoint, dragHandler);
 	else {
-		BRegion hiliteRgn;
-		GetTextRegion(fSelStart, fSelEnd, &hiliteRgn);
+		BRegion region;
+		GetTextRegion(fSelStart, fSelEnd, &region);
 		BRect bounds = Bounds();
-		BRect dragRect = hiliteRgn.Frame();
+		BRect dragRect = region.Frame();
 		if (!bounds.Contains(dragRect))
 			dragRect = bounds & dragRect;
 			
-		DragMessage(drag, dragRect, dragHandler);
+		DragMessage(message, dragRect, dragHandler);
 	}
 }
 
@@ -4200,6 +4202,7 @@ BTextView::CharClassification(int32 offset) const
 	// japanese word breakers.
 	// And what about other languages ? Isn't there a better way to check
 	// for separator characters ?
+	// Andrew suggested to have a look at UnicodeBlockObject.h
 	switch (fText->RealCharAt(offset)) {
 		case B_SPACE:
 		case '_':
