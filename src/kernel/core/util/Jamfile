@@ -1,8 +1,11 @@
 SubDir OBOS_TOP src kernel core util ;
 
+UsePrivateHeaders [ FDirName kernel util ] ;
+
 KernelMergeObject kernel_util.o :
 	list.c
 	kernel_cpp.cpp
+	KMessage.cpp
 
 	: -fno-pic -Wno-unused -D_KERNEL_MODE
 	;
