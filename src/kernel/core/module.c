@@ -324,7 +324,7 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 	
 	m = (module*)hash_lookup(modules_list, mod->name);
 	if (m) {
-		dprintf("Duplicate module name detected...ignoring\n");
+		dprintf("Duplicate module name (%s) detected...ignoring\n", mod->name);
 		return -1;
 	}
 		
@@ -343,7 +343,7 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 		kfree(m);
 		return -1;
 	}
-	memcpy(m->name, mod->name, strlen(mod->name));//strdup(mod->name);	
+	memcpy(m->name, mod->name, strlen(mod->name));	
 	m->state = MOD_QUERIED;
 	/* Record where the module_info can be found */
 	m->offset = offset;
@@ -391,10 +391,10 @@ static int recurse_check_file(const char *filepath, const char *srcfile)
 	}
 	
 	for (chk = hdr; *chk; chk++) {
-		if ((res = simple_module_info(*chk, filepath, i++)) != 0)
-			continue;
-		if (srcfile && strcmp((*chk)->name, srcfile) == 0)
-			res = 1;
+		if ((res = simple_module_info(*chk, filepath, i++)) != 0) {
+			if (srcfile && strcmp((*chk)->name, srcfile) == 0)
+				res = 1;
+		}
 	}
 	
 	if (res != 1)
