@@ -392,18 +392,18 @@ pnp_unregister_node_rec(pnp_node_info *node, pnp_node_info **dependency_list)
 
 		if (pnp_get_attr_string_nolock(node, PNP_DRIVER_DRIVER, &driver_name, false) != B_OK) {
 			dprintf("unregister_node: Missing driver filename in node\n");
-			goto err1;
+			goto err;
 		}
 
-		if (pnp_get_attr_string_nolock( node, PNP_DRIVER_TYPE, &type, false) != B_OK) {
+		if (pnp_get_attr_string_nolock(node, PNP_DRIVER_TYPE, &type, false) != B_OK) {
 			dprintf("unregister_node: Missing type in node registered by %s\n", driver_name);
-			goto err1;
+			goto err;
 		}
 
 		TRACE(("driver: %s, type: %s\n", driver_name, type));
-err1:
 	}
 
+err:
 	// especially when we go through children, it can happen that they
 	// got unregistered already, so ignore them silently
 	if (!node->registered)
