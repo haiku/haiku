@@ -162,7 +162,7 @@ Keep this option set to <strong>force_pci false</strong>, unless the graphics ca
 	<li>If you have trouble using AGP mode, you should prefer tweaking the AGP busmanager settings file as it might well enable you to use a 'lesser' AGP mode instead of falling back to PCI mode alltogether. 
 </ul>
 	<li><strong>dma_acc:</strong><br>
-You can select one of two methods for (2D) acceleration here: PIO mode and DMA mode. DMA mode works 2-3 times as fast as PIO mode on modern CPU's (beyond 2Ghz or so), and should still match the PIO mode speed on slower CPU's (below 500Mhz).
+You can select one of two methods for (2D) acceleration here: PIO mode and DMA mode. DMA mode works 4-10 times as fast as PIO mode on modern CPU's (beyond 2Ghz or so), and should still be 2-3 times as fast as PIO mode on slower CPU's (below 500Mhz).
 	<ul>
 		<li><strong>false:</strong><br>
 If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
@@ -190,6 +190,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on February 19, 2005)</p>
+<p>(Page last updated on February 22, 2005)</p>
 </body>
 </html>

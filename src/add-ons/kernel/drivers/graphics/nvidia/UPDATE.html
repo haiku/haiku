@@ -4,18 +4,18 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (cvs 0.41, Rudolf)</h1></p>
+<p><h1>nv_driver 0.41 (Rudolf)</h1></p>
 <ul>
 	<li>Added new acceleration method using DMA command fetching. You can now choose beween (the old) PIO mode and (the new) DMA mode acceleration via a new switch in nv.settings (DMA mode is now the default). DMA acceleration is say 2-3 times as fast as PIO mode acceleration on systems with relative fast CPU's (above 2Ghz or so). On relative slow CPU's (500Mhz or lower) there is no speedgain left and both methods match about up.<br>
 	<strong>Note please:</strong> On NV40 and higher only DMA mode acceleration currently works;
-	<li>Execution of acceleration commands (DMA mode) has been optimized (compared to PIO mode): now the top-level acceleration functions are incorporated in the engine, and the engine's command execution itself is also optimized. This further increases DMA mode acceleration with upto a factor of 2, independant of CPU speed; 
+	<li>Execution of acceleration commands (DMA mode) has been optimized (compared to PIO mode): now the top-level acceleration functions are incorporated in the engine, and the engine's command execution itself is also optimized. This further increases DMA mode acceleration with upto a factor of 2-3, independant of CPU speed; 
 	<li>Execution of acceleration commands (PIO mode) is re-setup. Now it should be possible to use more engine commands than there are FIFO channels for them, by doing on-the-fly reconfiguring (DMA mode can do this also). This should be especially usefull when 3D acceleration is going to be setup later on;
 	<li>Added recognition for 20 new cards: Most GeForce 6200, 6600 and 6800 types are now recognized, and some more other cards as well;
 	<li>Modified cursor to be hardware synchronized to the screen's vertical retrace. This fixes the high CPU load on moving the mouse especially while being on the bottom of the screen (all GeForce series cards);
 	<li>Added DPMS support for digital flatpanels connected via DVI;
 	<li>Updated 'extended PLL' VCO limits: this (could) fix PLL locking trouble (shivering image / too low refreshrate) on NV31 (FX 5600), NV36 (FX/PCX 57xx) and NV40 and up (FX/PCX 6200, 6600 and 6800). Confirmed NV36, on a PCX 5750 for PCIe.
 </ul>
-<p><h1>nv_driver 0.30, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.30 (Rudolf)</h1></p>
 <ul>
 	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver;
 	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the default setting to keep the driver working in the same way it did before;
@@ -23,7 +23,7 @@
 	<li>Card coldstarts should now be operational (if enabled in nv.settings) on most cards, except TNT1, GeForce 6600 and GeForce 6800. Tested successfully on TNT2/TNT2-M64 (NV05), GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForce4 Ti4200 (NV28) and GeForce FX5200 (NV34). Note however that laptop panels and DVI panels will not work via coldstarting yet!
 	<li>The 'bandwidth trouble' existing on older cards, especially on some GeForce2 types, should be fixed now if you enable card coldstarting for these cards. Note that this problem existed because of a fault in these card's BIOSes (they missed some specific register programming). Confirmed a NV15 working OK now.
 </ul>
-<p><h1>nv_driver 0.22, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.22 (Rudolf)</h1></p>
 <ul>
 	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of unaccelerated graphics.
 	<ul>
@@ -46,7 +46,7 @@
  	This is a tweak that you <strong>can</strong> enable, but you do so at your own risk (of course)!
  	<li>Fixed RAM amount detection for GeForce2 and GeForce4 MX Integrated GPU boards.
 </ul>
-<p><h1>nv_driver 0.10, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.10 (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -82,13 +82,13 @@ The features below are shutdown because they are possibly dangerous without feed
 	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters (not finished: needs more feedback).
 
 </ul>
-<p><h1>nv_driver 0.09, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.09 (Rudolf)</h1></p>
 <ul>
 	<li>Fixed NV11 trouble with repeating screen(s) on the right side of the monitor;
 	<li>Updated CRTC memory granularity code to work-around a hardware bug in older cards;
 	<li>Fixed fuzzy modes / no picture on GeForceFX 5700 cards: PLL discriminator restrictions updated.
 </ul>
-<p><h1>nv_driver 0.08, (Rudolf)</h1></p>
+<p><h1>nv_driver 0.08 (Rudolf)</h1></p>
 <ul>
 	<li>Fixed GeForceFX 5600 and FX 5700 monitor 'refresh out of range' / shutoff fault. nVidia changed the pixelPLL for the NV31 and NV36;
 	<li>Fixed acceleration engine restrictions code to adhere to GeForceFX 5600 restrictions: those are still NV20 style for this card;
@@ -160,7 +160,7 @@ The features below are shutdown because they are possibly dangerous without feed
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>TVout support;
-	<li>Improve/extend various stuff when/if possible.
+	<li>Improve/extend various stuff when/if possible (like adding DDC/EDID, GTF).
 </ul>
 </p>
 </body>
