@@ -25,7 +25,10 @@
 //					view on screen and also for window decorators
 //  
 //------------------------------------------------------------------------------
+#include <OS.h>
 #include <View.h>
+#include <Message.h>
+#include <AppDefs.h>
 #include <string.h>
 #include <stdio.h>
 #include "Layer.h"
@@ -38,6 +41,14 @@
 #include "TokenHandler.h"
 #include "RectUtils.h"
 #include "RootLayer.h"
+
+//#define DEBUG_LAYER
+#ifdef DEBUG_LAYER
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 
 /*!
 	\brief Constructor
@@ -124,7 +135,13 @@ void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 {
 	// TODO: Add before support
 //printf("Layer::AddChild lacks before support\n");
-
+/*
+STRACE(("\nIn Layer(%s)::AddChild(%s) START\n", _name->String(), layer->_name->String() ));
+STRACE(("\nVisible region:\n"));
+_visible->PrintToStream();
+STRACE(("Child's visible region:\n"));
+layer->_visible->PrintToStream();
+*/
 	if(layer->_parent!=NULL)
 	{
 		printf("ERROR: AddChild(): Layer already has a _parent\n");
@@ -142,11 +159,24 @@ void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 		else{
 			// Technically, we could safely take the address of ConvertToParent(BRegion)
 			// but we don't just to avoid a compiler nag
-			BRegion 	reg(layer->ConvertToParent(layer->_visible));
-			_visible->Exclude(&reg);
+			
+				/* we don't transformate into parent coords because Layer's
+				 *	_visible member is already in parent coords - because in
+				 *	Layer's constructor there is a line like this:
+				 *		_visible = new BRegion( _frame );
+				 *	and _frame is in parent coords
+				 */
+			//BRegion 	reg(layer->ConvertToParent(layer->_visible));
+			
+			_visible->Exclude( layer->_visible );
 		}
 	}
-
+/*
+STRACE(("\n AFTER exclude: Visible region:\n"));
+_visible->PrintToStream();
+STRACE(("Child's visible region:\n"));
+layer->_visible->PrintToStream();
+*/
 	// we need to change this to a loop for each _lowersibling of the layer
 	if(_bottomchild)
 	{
@@ -165,6 +195,13 @@ void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 
 	if(rebuild)
 		RebuildRegions(true);
+/*
+STRACE(("\n AFTER RebuildRegions: Visible region:\n"));
+_visible->PrintToStream();
+STRACE(("Child's visible region:\n"));
+layer->_visible->PrintToStream();
+STRACE(("\nEND: Layer(%s)::AddChild(%s)\n", _name->String(), layer->_name->String() ));
+*/
 }
 
 /*!
@@ -576,13 +613,14 @@ void Layer::MarkModified(BRect rect)
 */
 void Layer::UpdateRegions(bool force)
 {
+STRACE(("*Layer(%s)::UpdateRegions()\n", _name->String()));
 	if(force)
 	{
 		RebuildRegions(true);
 //		MoveChildren();
 //		InvalidateNewAreas();
 	}
-	
+
 	if( (_regions_invalid && (_parent==NULL) && _invalid) || force)
 	    UpdateIfNeeded(force);
 }
@@ -748,21 +786,33 @@ void Layer::ResizeBy(float x, float y)
 */
 void Layer::RebuildRegions(bool include_children)
 {
+/*
+STRACE(("\n*****Layer(%s)::RebuildRegions() START\n", _name->String()));
+PrintTree();
+_visible->PrintToStream();
+*/
 	// Algorithm:
 	// 1) Reset child visibility regions to completely visible
 	// 2) Clip each child to visible region of this layer
 	// 3) Clip each child to its siblings, going front to back
 	// 4) Remove the visible regions of the children from the current one
-	
+
+	*_visible	= *_full;
 	// Reset children to fully visible and clip to this layer's visible region
 	for(Layer *childlay=_topchild; childlay!=NULL; childlay=childlay->_lowersibling)
 	{
 		childlay->_visible->MakeEmpty();
 		childlay->_visible->Include(childlay->_full);
 
-		if(childlay->_visible && childlay->_hidden==false)
-			childlay->_visible->IntersectWith(_visible);
+		if( childlay->_hidden == false )
+			childlay->_visible->IntersectWith( _visible );
 
+		_visible->Exclude( childlay->_visible );
+/*
+STRACE(("\n\t*****Child Layer(%s) STEP 1\n", childlay->_name->String()));
+childlay->PrintTree();
+childlay->_visible->PrintToStream();
+*/
 	}
 
 	// This region is the common clipping region used when clipping children to their
@@ -772,7 +822,6 @@ void Layer::RebuildRegions(bool include_children)
 	// children have been clipped, then the resulting region will allow for one call
 	// to remove the footprints of all the children from the layer's visible region.
 	BRegion clipregion;
-	clipregion.MakeEmpty();
 
 	// Clip children to siblings which are closer to the front
 	for(Layer *siblay=_bottomchild; siblay!=NULL; siblay=siblay->_uppersibling)
@@ -785,6 +834,11 @@ void Layer::RebuildRegions(bool include_children)
 			siblay->_visible->Exclude(&clipregion);
 		}
 		clipregion.Include(siblay->_visible);
+/*
+STRACE(("\n\t*****Child Layer(%s) STEP 2\n", siblay->_name->String()));
+siblay->PrintTree();
+siblay->_visible->PrintToStream();
+*/
 	}
 	
 	// Rebuild the regions for subchildren if we're supposed to
@@ -797,6 +851,10 @@ void Layer::RebuildRegions(bool include_children)
 		}
 	}
 	_regions_invalid=false;
+/*
+STRACE(("\n*****Layer(%s)::RebuildRegions() END\n", _name->String()));
+_visible->PrintToStream();
+*/
 }
 
 //! Prints all relevant layer data to stdout
@@ -934,9 +992,9 @@ BRect Layer::ConvertToParent(BRect rect)
 BRegion Layer::ConvertToParent(BRegion *reg)
 {
 	BRegion newreg;
-	for(int32 i=0; i<reg->CountRects();i++)
-		newreg.Include(ConvertToParent(reg->RectAt(i)));
-	return BRegion(newreg);
+	for(int32 i=0; i<reg->CountRects(); i++)
+		newreg.Include( (reg->RectAt(i)).OffsetByCopy(_frame.LeftTop()) );
+	return newreg;
 }
 
 /*!
@@ -958,8 +1016,8 @@ BRegion Layer::ConvertFromParent(BRegion *reg)
 {
 	BRegion newreg;
 	for(int32 i=0; i<reg->CountRects();i++)
-		newreg.Include(ConvertFromParent(reg->RectAt(i)));
-	return BRegion(newreg);
+		newreg.Include((reg->RectAt(i)).OffsetByCopy(_frame.left*-1,_frame.top*-1));
+	return newreg;
 }
 
 /*!
@@ -1071,9 +1129,125 @@ void Layer::MakeBottomChild(void)
 	_parent->_bottomchild=this;
 	
 }
+
+void Layer::DoMoveTo(float x, float y){
+printf("Layer(%s)::DoMoveTo()...\n", _name->String());
+	_frame.OffsetTo(x, y);
+			
+	if(_flags & B_FRAME_EVENTS && _serverwin){
+		BMessage		msg;
+		printf("\tLayer(%s)::DoMoveTo()...sending message to client\n", _name->String());
+			// no locking?
+		msg.what		= B_VIEW_MOVED;
+		msg.AddInt64( "when", real_time_clock_usecs() );
+		msg.AddInt32( "_token", _view_token );
+		msg.AddPoint( "where", _frame.LeftTop() );
+		
+		_serverwin->SendMessageToClient( &msg );
+	}
+printf("\t DONE Layer(%s)::DoMoveTo()...\n", _name->String());
+}
+
+
+void Layer::DoResizeTo(float newWidth, float newHeight){
+printf("Layer(%s)::DoResizeTo()...\n", _name->String());
+	_frame.right		= _frame.left + newWidth;
+	_frame.bottom		= _frame.top + newHeight;
+
+		/* Send messages to BViews only if this Layer belongs to a
+		 *	ServerWindow object
+		 */
+	if( _serverwin)
+	{
+		BMessage		msg;
+		printf("\tLayer(%s)::DoResizeTo()...sending message to client\n", _name->String());
+		msg.what		= B_VIEW_RESIZED;
+		msg.AddInt64( "when", real_time_clock_usecs() );
+		msg.AddInt32( "_token", _view_token );
+		msg.AddFloat( "width", _frame.Width() );
+		msg.AddFloat( "height", _frame.Height() );
+			// no need for that... it's here because of backward compatibility
+		msg.AddPoint( "where", _frame.LeftTop() );
+		
+		_serverwin->SendMessageToClient( &msg );
+		msg.MakeEmpty();
+
+	Layer		*c = _topchild; //c = short for: current
+
+	if( c != NULL )
+		while( true ){
+			// action block
+			{
+				bool		sendMovedToMsg		= false;
+				bool		sendResizedToMsg	= false;
+
+				{
+				// TODO: add resizing algorithm HERE.
+					/* NOTES:
+					 *	- use 'c' as the Layer for witch operations are done
+					 *	- IF the position of Layer 'c' was modified, set
+					 *		sendMovedToMsg to TRUE !!!
+					 *	- IF Layer 'c' has been resized, set
+					 *		sendResizedToMsg to TRUE !!!
+					 */
+				}
+
+					/* Note: We do this because of optimization reasons.
+					 *	Calling DoMoveTo() would result in BSession::Sync()
+					 *	being called also; thus a performace loss.
+					 */
+				if ( sendMovedToMsg && (c->_flags & B_FRAME_EVENTS) ) {
+					msg.what		= B_VIEW_MOVED;
+					msg.AddInt64( "when", real_time_clock_usecs() );
+					msg.AddInt32( "_token", c->_view_token );
+					msg.AddPoint( "where", c->_frame.LeftTop() );
+					
+					c->_serverwin->SendMessageToClient( &msg );
+					msg.MakeEmpty();
+				}
+
+				if ( sendResizedToMsg && (c->_flags & B_FRAME_EVENTS) ){
+					msg.what		= B_VIEW_RESIZED;
+					msg.AddInt64( "when", real_time_clock_usecs() );
+					msg.AddInt32( "_token", c->_view_token );
+					msg.AddFloat( "width", c->_frame.Width() );
+					msg.AddFloat( "height", c->_frame.Height() );
+						// no need for that... it's here because of backward compatibility
+					msg.AddPoint( "where", c->_frame.LeftTop() );
+		
+					c->_serverwin->SendMessageToClient( &msg );
+					msg.MakeEmpty();
+				}
+			}
+
+				// go deep
+			if(	c->_topchild ){
+				c = c->_topchild;
+			}
+				// go right or up
+			else
+					// go right
+				if( c->_lowersibling ){
+					c = c->_lowersibling;
+				}
+					// go up
+				else{
+					while( !c->_parent->_lowersibling && c->_parent != this ){
+						c = c->_parent;
+					}
+						// that enough! We've reached this view.
+					if( c->_parent == this )
+						break;
+						
+					c = c->_parent->_lowersibling;
+				}
+		}
+	} // END: if(_serverwin)
+printf("\t DONE Layer(%s)::DoResizeTo()...\n", _name->String());
+}
+
 /*
  @log
- 	* added initialization in contructor to (0.0, 0.0) for _boundsLeftTop member.
- 	* modified Bounds() to use that member.
- 	* some changes into RemoveChild()
+	* added 2 new methods - DoMoveTo and DoResizeTo. They move/resize the frame rectangle of Layer class.
+		In DoResizeTo() I added some code for autoresizing(based on BView's resizeMask parameter) of children. Still, the effective code for resizing need to be written. :-) I could do that, but other things have greater priority. :-)
 */
