@@ -42,10 +42,14 @@ int main(int argc, char **argv)
 				keymap.LoadCurrent();
 				keymap.Dump();
 				return 0;
+			} 
+			if (operation == 'r') {
+				Keymap keymap;
+				keymap.RestoreSystemDefault();
+				return 0;
 			}
 		} else {
 			if (operation == 'o') {
-				//return do_compile(argv[i]);
 				return 0;
 			} else 
 				break;

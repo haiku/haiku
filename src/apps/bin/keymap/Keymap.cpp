@@ -18,6 +18,8 @@
 #include <string.h>
 #include <ByteOrder.h>
 #include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
 void 
 Keymap::GetKey( char *chars, int32 offset, char* string) 
@@ -538,9 +540,17 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 status_t _restore_key_map_();
 
 
-// we make our input server use the map in /boot/home/config/settings/Keymap
-status_t
-Keymap::Use()
+void
+Keymap::RestoreSystemDefault()
 {
-	return _restore_key_map_();
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Key_map");
+
+	BEntry ref(path.Path());
+	ref.Remove();	
+	
+	_restore_key_map_();
 }
