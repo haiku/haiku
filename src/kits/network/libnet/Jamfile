@@ -1,10 +1,19 @@
 SubDir OBOS_TOP src kits network libnet ;
 
 UsePrivateHeaders net ;
+UseHeaders [ FDirName $(SUBDIR) headers ] ;
 
 {
-# Default libs include BeOS R5 libnet.so, something we don't want here!
-LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nodefaultlibs ;
+	# Default libs include BeOS R5 libnet.so, something we don't want here!
+	LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nodefaultlibs ;
+	
+	local defines = BUILDING_R5_LIBNET ;
+	if $(BONE_VERSION) {
+		defines += BONE_VERSION ;
+	}
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 Depends libnet.so : install_network_etc_files ;
@@ -49,8 +58,10 @@ SharedLibrary net :
 	res_random.c
 	res_send.c
 	sethostent.c
-		: root
 ;
+
+LinkSharedOSLibs libnet.so :
+	root ;
 
 OBOSInstall install_network_etc_files : [ FDirName $(OBOS_ETC_DIR) ] :
 	resolv.conf

@@ -8,8 +8,6 @@
 
 #include "net_stack_driver.h"
 
-// uncomment this line if you have BONE
-// #define BONE_VERSION 1
 
 #ifndef BONE_VERSION
 

@@ -63,9 +63,9 @@ _EXPORT int socket(int family, int type, int protocol)
 		g_beos_r5_compatibility = true;	
 		/* we have old be types... convert... */
 		if (type == 1)
-			type = SOCK_DGRAM;
+			type = SOCK_NATIVE_DGRAM;
 		else if (type == 2)
-			type = SOCK_STREAM;
+			type = SOCK_NATIVE_STREAM;
 
 		if (protocol == 1)
 			protocol = IPPROTO_UDP;
@@ -77,8 +77,11 @@ _EXPORT int socket(int family, int type, int protocol)
 		/* also convert AF_INET */
 		if (family == 1)
 			family = AF_INET;
-	}
-
+	} else if(type == SOCK_DGRAM)
+		type = SOCK_NATIVE_DGRAM;
+	else if(type == SOCK_STREAM)
+		type = SOCK_NATIVE_STREAM;
+	
 	args.u.socket.family = family;
 	args.u.socket.type = type;
 	args.u.socket.proto = protocol;
@@ -114,6 +117,9 @@ _EXPORT int bind(int sock, const struct sockaddr *addr, int addrlen)
 _EXPORT int shutdown(int sock, int how)
 {
 	struct stack_driver_args args;
+	
+	// make it compatible to our stack (our values are one below)
+	--how;
 	
 	args.u.integer = how;
 	
