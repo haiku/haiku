@@ -46,6 +46,13 @@ init_fs(char *disk_name)
         printf("could not mount %s on /myfs\n", disk_name);
         exit(0);
     }
+
+	err = sys_chdir(1, -1, "/myfs");
+	if (err != 0) {
+		printf("Failed to cd into /myfs.");
+		sys_unmount(1, -1, "/myfs");
+		exit(0);
+	}
     
     return data;
 }
