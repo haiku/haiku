@@ -61,6 +61,11 @@ struct rigid_disk_block {
 	char	controller_revision[4];
 
 	uint32	__reserved5[10];
+
+	uint32 ID() { return B_BENDIAN_TO_HOST_INT32(id); }
+	uint32 SummedLongs() { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
+	uint32 BlockSize() { return B_BENDIAN_TO_HOST_INT32(block_size); }
+	uint32 FirstPartition() { return B_BENDIAN_TO_HOST_INT32(partition_list); }
 };
 
 #define RDB_DISK_ID			'RDSK'
@@ -92,19 +97,23 @@ struct bad_block_block {
 /************* partition block *************/
 
 struct partition_block {
-		uint32	id;
-		uint32	summed_longs;
-		int32	check_sum;
-		uint32	host_id;
-		uint32	next;
-		uint32	flags;
-		uint32	__reserved1[2];
-		uint32	open_device_flags;
-		uint8	drive_name[32];		// BSTR form (Pascal like string)
+	uint32	id;
+	uint32	summed_longs;
+	int32	check_sum;
+	uint32	host_id;
+	uint32	next;
+	uint32	flags;
+	uint32	__reserved1[2];
+	uint32	open_device_flags;
+	uint8	drive_name[32];		// BSTR form (Pascal like string)
 
-		uint32	__reserved2[15];
-		uint32	environment[17];
-		uint32	__reserved3[15];
+	uint32	__reserved2[15];
+	uint32	environment[17];
+	uint32	__reserved3[15];
+
+	uint32 ID() { return B_BENDIAN_TO_HOST_INT32(id); }
+	uint32 SummedLongs() { return B_BENDIAN_TO_HOST_INT32(summed_longs); }
+	uint32 Next() { return B_BENDIAN_TO_HOST_INT32(next); }
 };
 
 #define RDB_PARTITION_ID	'PART'
