@@ -1,10 +1,5 @@
-/*
-** Copyright 2002, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
-
-#ifndef _DRIVERS_H
-#define _DRIVERS_H
+#ifndef _DRIVERS_DRIVERS_H
+#define _DRIVERS_DRIVERS_H
 
 #include <types.h>
 #include <defines.h>
@@ -86,4 +81,73 @@ typedef struct devfs_partition_info {
 	char raw_device[SYS_MAX_PATH_LEN];
 } devfs_partition_info;
 
-#endif /* _DRIVERS_H */
+enum {
+	B_GET_DEVICE_SIZE = 1,			/* get # bytes */
+									/*   returns size_t in *data */
+
+	B_SET_DEVICE_SIZE,				/* set # bytes */
+									/*   passed size_t in *data */
+
+	B_SET_NONBLOCKING_IO,			/* set to non-blocking i/o */
+
+	B_SET_BLOCKING_IO,				/* set to blocking i/o */
+
+	B_GET_READ_STATUS,				/* check if can read w/o blocking */
+									/*   returns bool in *data */
+
+	B_GET_WRITE_STATUS,				/* check if can write w/o blocking */
+									/*   returns bool in *data */
+
+	B_GET_GEOMETRY,					/* get info about device geometry */
+									/*   returns struct geometry in *data */
+
+	B_GET_DRIVER_FOR_DEVICE,		/* get the path of the executable serving that device */
+
+	B_GET_PARTITION_INFO,			/* get info about a device partition */
+									/*   returns struct partition_info in *data */
+
+	B_SET_PARTITION,				/* create a user-defined partition */
+
+	B_FORMAT_DEVICE,				/* low-level device format */
+
+	B_EJECT_DEVICE,					/* eject the media if supported */
+
+	B_GET_ICON,						/* return device icon (see struct below) */
+
+	B_GET_BIOS_GEOMETRY,			/* get info about device geometry */
+									/* as reported by the bios */
+									/*   returns struct geometry in *data */
+
+	B_GET_MEDIA_STATUS,				/* get status of media. */
+									/* return status_t in *data: */
+									/* B_NO_ERROR: media ready */
+									/* B_DEV_NO_MEDIA: no media */
+									/* B_DEV_NOT_READY: device not ready */
+									/* B_DEV_MEDIA_CHANGED: media changed */
+									/*  since open or last B_GET_MEDIA_STATUS */
+									/* B_DEV_MEDIA_CHANGE_REQUESTED: user */
+									/*  pressed button on drive */
+									/* B_DEV_DOOR_OPEN: door open */
+	
+	B_LOAD_MEDIA,					/* load the media if supported */
+	
+	B_GET_BIOS_DRIVE_ID,			/* get bios id for this device */
+
+	B_SET_UNINTERRUPTABLE_IO,		/* prevent cntl-C from interrupting i/o */
+	B_SET_INTERRUPTABLE_IO,			/* allow cntl-C to interrupt i/o */
+
+	B_FLUSH_DRIVE_CACHE,			/* flush drive cache */
+
+	B_GET_NEXT_OPEN_DEVICE = 1000,	/* iterate through open devices */
+	B_ADD_FIXED_DRIVER,				/* private */
+	B_REMOVE_FIXED_DRIVER,			/* private */
+
+	B_AUDIO_DRIVER_BASE = 8000,		/* base for codes in audio_driver.h */
+	B_MIDI_DRIVER_BASE = 8100,		/* base for codes in midi_driver.h */
+	B_JOYSTICK_DRIVER_BASE = 8200,	/* base for codes in joystick.h */
+	B_GRAPHIC_DRIVER_BASE = 8300,	/* base for codes in graphic_driver.h */
+
+	B_DEVICE_OP_CODES_END = 9999	/* end of Be-defined contol id's */
+};
+
+#endif /* _DRIVERS_DRIVERS_H */
