@@ -331,7 +331,7 @@ strndup(const char *source, size_t maxBufferSize)
 
 
 BParameterWeb::BParameterWeb()
-	:	mNode(media_node::null)
+	:	mNode(media_node::null) // mNode is set in BControllable::SetParameterWeb()
 {
 	CALLED();
 
