@@ -309,12 +309,13 @@ static thread_id
 create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	void *args1, void *args2, int32 priority, bool kernel)
 {
-	struct thread *t;
+	struct thread *t, *currentThread;
 	struct team *team;
 	cpu_status state;
 	char stack_name[B_OS_NAME_LENGTH];
 	status_t status;
 	bool abort = false;
+	bool debugNewThread = false;
 
 	t = create_thread_struct(name);
 	if (t == NULL)
@@ -345,6 +346,26 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
+	// If the new thread belongs to the same team as the current thread,
+	// it may inherit some of the thread debug flags.
+	currentThread = thread_get_current_thread();
+	if (currentThread && currentThread->team->id == teamID) {
+		// inherit all user flags...
+		int32 debugFlags = currentThread->debug_info.flags
+			& B_THREAD_DEBUG_USER_FLAG_MASK;
+
+		// ... save the syscall tracing flags, unless explicitely specified
+		if (!(debugFlags & B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS)) {
+			debugFlags &= ~(B_THREAD_DEBUG_PRE_SYSCALL
+				| B_THREAD_DEBUG_POST_SYSCALL);
+		}
+
+		t->debug_info.flags = debugFlags;
+
+		// stop the new thread, if desired
+		debugNewThread = debugFlags & B_THREAD_DEBUG_STOP_CHILD_THREADS;
+	}
+
 	// insert into global list
 	hash_insert(sThreadHash, t);
 	sUsedThreads++;
@@ -353,9 +374,19 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
 	team = team_get_team_struct_locked(teamID);
-	if (team != NULL && team->state != TEAM_STATE_DEATH)
+	if (team != NULL && team->state != TEAM_STATE_DEATH) {
+		// Debug the new thread, if the parent thread required that (see above),
+		// or the respective global team debug flag is set. But only, if a
+		// debugger is installed for the team.
+		debugNewThread
+			|= (team->debug_info.flags & B_TEAM_DEBUG_STOP_NEW_THREADS);
+		if (debugNewThread
+			&& (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
+			t->debug_info.flags |= B_THREAD_DEBUG_STOP;
+		}
+
 		insert_thread_into_team(team, t);
-	else
+	} else
 		abort = true;
 
 	RELEASE_TEAM_LOCK();
@@ -691,6 +722,7 @@ struct thread_exit_args {
 	cpu_status		int_state;
 	uint32			death_stack;
 	sem_id			death_sem;
+	team_id			teamID;
 };
 
 
@@ -738,6 +770,10 @@ thread_exit2(void *_args)
 	// set the next state to be gone. Will return the thread structure to a ready pool upon reschedule
 	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 
+	// notify the debugger
+	if (args.teamID >= 0 && args.teamID != team_get_kernel_team_id())
+		user_debug_thread_deleted(args.teamID, args.thread->id);
+
 	// return the death stack and reschedule one last time
 	put_death_stack_and_reschedule(args.death_stack);
 
@@ -760,6 +796,7 @@ thread_exit(void)
 	sem_id cachedDeathSem, parentDeadSem = -1, groupDeadSem = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
+	team_id teamID = team->id;
 
 	if (!are_interrupts_enabled())
 		dprintf("thread_exit() called with interrupts disabled!\n");
@@ -924,6 +961,7 @@ thread_exit(void)
 		args.old_kernel_stack = thread->kernel_stack_area;
 		args.death_stack = death_stack;
 		args.death_sem = cachedDeathSem;
+		args.teamID = teamID;
 
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
@@ -1818,13 +1856,19 @@ thread_id
 _user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName, int32 priority, void *data1, void *data2)
 {
 	char name[B_OS_NAME_LENGTH];
+	thread_id threadID;
 
 	if (!IS_USER_ADDRESS(entry) || entry == NULL
 		|| !IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return create_thread(name, thread_get_current_thread()->team->id, entry, data1, data2, priority, false);
+	threadID = create_thread(name, thread_get_current_thread()->team->id, entry,
+		data1, data2, priority, false);
+
+	user_debug_thread_created(threadID);
+
+	return threadID;
 }
 
 
