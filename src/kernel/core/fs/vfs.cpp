@@ -114,6 +114,9 @@ static struct vnode *sRoot;
 static hash_table *sMountsTable;
 static mount_id sNextMountID = 0;
 
+// This can be used by other code to see if there is a boot file system already
+dev_t gBootDevice = -1;
+
 
 /* function declarations */
 
@@ -1660,12 +1663,12 @@ vfs_mount_boot_file_system()
 	} else
 		put_file_system(bootfs);
 
-	dev_t bootDevice = sNextMountID - 1;
+	gBootDevice = sNextMountID - 1;
 
 	// create link for the name of the boot device
 
 	fs_info info;
-	if (_kern_read_fs_info(bootDevice, &info) == B_OK) {
+	if (_kern_read_fs_info(gBootDevice, &info) == B_OK) {
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
