@@ -58,7 +58,11 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	fStart = fEnd = 0;
 	fMouseSelectionStart = -1;
 
-	fDataSize = fEditor.ViewSize();
+	if (fEditor.Lock()) {
+		fDataSize = fEditor.ViewSize();
+		fEditor.Unlock();
+	} else
+		fDataSize = 512;
 	fData = (uint8 *)malloc(fDataSize);
 
 	SetFontSize(12.0);
@@ -95,6 +99,12 @@ DataView::UpdateFromEditor(BMessage */*message*/)
 
 	if (fEditor.Lock()) {
 		fOffset = fEditor.ViewOffset();
+		fFileSize = fEditor.FileSize();
+
+		if (fOffset + fDataSize > fFileSize)
+			fSizeInView = fFileSize - fOffset;
+		else
+			fSizeInView = fDataSize;
 
 		const uint8 *data;
 		if (fEditor.GetViewBuffer(&data) == B_OK)
@@ -166,13 +176,18 @@ DataView::MessageReceived(BMessage *message)
 void
 DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size)
 {
+	if (size == 0) {
+		line[0] = '\0';
+		return;
+	}
+
 	line += sprintf(line, fBase == kHexBase ? "%0*Lx:  " : "%0*Ld:  ",
 				(int)fPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
 		if (i >= size) {
-			strcpy(line, "  ");
-			line += 2;
+			strcpy(line, "   ");
+			line += kHexByteWidth;
 		} else
 			line += sprintf(line, "%02x ", *(unsigned char *)(buffer + i));
 	}
@@ -207,8 +222,8 @@ DataView::Draw(BRect updateRect)
 	char line[255];
 	BPoint location(kHorizontalSpace, kVerticalSpace + fAscent);
 
-	for (uint32 i = 0; i < fDataSize; i += kBlockSize) {
-		ConvertLine(line, /*fOffset + */i, fData + i, fDataSize - i);
+	for (uint32 i = 0; i < fSizeInView; i += kBlockSize) {
+		ConvertLine(line, /*fOffset + */i, fData + i, fSizeInView - i);
 		DrawString(line, location);
 
 		location.y += fFontHeight;
@@ -220,11 +235,12 @@ DataView::Draw(BRect updateRect)
 
 
 BRect 
-DataView::DataBounds() const
+DataView::DataBounds(bool inView) const
 {
 	return BRect(0, 0,
 		fCharWidth * (kBlockSize * 4 + fPositionLength + 6) + 2 * kHorizontalSpace,
-		fFontHeight * ((fDataSize + kBlockSize - 1) / kBlockSize) + 2 * kVerticalSpace);
+		fFontHeight * (((inView ? fSizeInView : fDataSize) + kBlockSize - 1) / kBlockSize)
+			+ 2 * kVerticalSpace);
 }
 
 
@@ -233,7 +249,7 @@ DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 {
 	// clip the point into our data bounds
 
-	BRect bounds = DataBounds();
+	BRect bounds = DataBounds(true);
 	if (point.x < bounds.left)
 		point.x = bounds.left;
 	else if (point.x > bounds.right)
@@ -270,7 +286,7 @@ DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 	int32 row = int32((point.y - kVerticalSpace) / fFontHeight);
 	int32 column = int32((point.x - left) / width);
 	if (column >= (int32)kBlockSize)
-		column = (int32)kBlockSize -1;
+		column = (int32)kBlockSize - 1;
 	else if (column < 0)
 		column = 0;
 
@@ -481,11 +497,11 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 
 	if (start < 0)
 		start = 0;
-	else if (start > (int32)fDataSize - 1)
-		start = (int32)fDataSize - 1;
+	else if (start > (int32)fSizeInView - 1)
+		start = (int32)fSizeInView - 1;
 
-	if (end > (int32)fDataSize - 1)
-		end = (int32)fDataSize - 1;
+	if (end > (int32)fSizeInView - 1)
+		end = (int32)fSizeInView - 1;
 	else if (end < 0)
 		end = 0;
 
@@ -788,9 +804,9 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 		case B_DOWN_ARROW:
 		{
 			int32 end = fEnd + int32(kBlockSize);
-			if (end >= int32(fDataSize)) {
+			if (end >= int32(fSizeInView)) {
 				if (modifiers & B_SHIFT_KEY)
-					end = int32(fDataSize) - 1;
+					end = int32(fSizeInView) - 1;
 				else
 					end = fEnd;
 			}

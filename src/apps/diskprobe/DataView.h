@@ -58,7 +58,7 @@ class DataView : public BView {
 		void SetBase(base_type type);
 
 	private:
-		BRect DataBounds() const;
+		BRect DataBounds(bool inView = false) const;
 		BRect SelectionFrame(view_focus which, int32 start, int32 end);
 		int32 PositionAt(view_focus focus, BPoint point, view_focus *_newFocus = NULL);
 
@@ -75,6 +75,8 @@ class DataView : public BView {
 		int32		fPositionLength;
 		uint8		*fData;
 		size_t		fDataSize;
+		off_t		fFileSize;
+		size_t		fSizeInView;
 		off_t		fOffset;
 		float		fAscent;
 		int32		fFontHeight;
