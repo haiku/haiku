@@ -82,8 +82,8 @@ private:
 	union type_and_timezone_accessor {
 		uint16 type_and_timezone;
 		struct {
-			uint16 timezone:12,
-			       type:4;
+			uint16 type:4,
+			       timezone:12;
 		} bits;
 	};
 
@@ -97,7 +97,7 @@ public:
 		t.type_and_timezone = type_and_timezone();
 		return t.bits.type;
 	}
-	uint16 timezone() const {
+	int16 timezone() const {
 		type_and_timezone_accessor t;
 		t.type_and_timezone = type_and_timezone();
 		return t.bits.timezone;
