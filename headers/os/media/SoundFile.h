@@ -94,7 +94,9 @@ virtual	void		_ReservedSoundFile3();
 	status_t		fCStatus;
 	void _init_raw_stats();
 	status_t _ref_to_file(const entry_ref *ref);	  
-	uint32			_reserved[4];
+	BMediaFile		*fMediaFile;
+	BMediaTrack		*fMediaTrack;
+	uint32			_reserved[2];
 };
 
 
