@@ -18,6 +18,7 @@
 #include <arch/faults.h>
 #include <arch/vm.h>
 #include <arch/smp.h>
+#include <arch/user_debugger.h>
 
 #include <arch/x86/interrupts.h>
 #include <arch/x86/faults.h>
@@ -201,13 +202,21 @@ i386_handle_trap(struct iframe frame)
 	if (thread)
 		i386_push_iframe(thread, &frame);
 
-	if (frame.cs == USER_CODE_SEG)
+	if (frame.cs == USER_CODE_SEG) {
+		i386_exit_user_debug_at_kernel_entry();
 		thread_at_kernel_entry();
+	}
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
 
 	switch (frame.vector) {
+		case 1:
+			ret = i386_handle_debug_exception(&frame);
+			break;
+		case 3:
+			ret = i386_handle_breakpoint_exception(&frame);
+			break;
 		case 8:		// double fault
 			ret = i386_double_fault(frame.error_code);
 			break;
@@ -299,25 +308,15 @@ i386_handle_trap(struct iframe frame)
 		restore_interrupts(state);
 	}
 
-	if (frame.cs == USER_CODE_SEG)
+	if (frame.cs == USER_CODE_SEG) {
 		thread_at_kernel_exit();
+		i386_init_user_debug_at_kernel_exit(&frame);
+	}
 
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
 
 	if (thread)
 		i386_pop_iframe(thread);
-
-// ToDo: Somewhere around here (maybe in int_bottom), we need to update some of
-// the debug registers, if the thread is a userland thread.
-// * (t_to->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP) indicates whether we
-//   shall set the TF flags in EFLAGS. We probably best manipulate the
-//   value on the stack, so that the flag is set by iret and applies to the
-//   next userland instruction first.
-// * Break- and watchpoints are probably best dealt with in
-//   arch_thread_context_switch(). At least DR0-DR3 should be set there.
-//   DR7 (the debug control register) is better updated here.
-// * int_bottom should always disable break- and watchpoints (by setting
-//   DR7 accordingly).
 }
 
 
