@@ -308,7 +308,10 @@ _get_format_for_description(media_format *out_format, const media_format_descrip
 //	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
 //		return B_ERROR;
 
-	reply.format.type = B_MEDIA_ENCODED_AUDIO;
+	if (in_desc.family == B_BEOS_FORMAT_FAMILY && in_desc.u.beos.format == B_BEOS_FORMAT_RAW_AUDIO)
+		reply.format.type = B_MEDIA_RAW_AUDIO;
+	else
+		reply.format.type = B_MEDIA_ENCODED_AUDIO;
 	reply.format.u.encoded_audio.encoding = (enum media_encoded_audio_format::audio_encoding) 1;
 
 	*out_format = reply.format;

@@ -35,8 +35,17 @@ RawDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	// BeBook says: The codec will find and return in ioFormat its best matching format
 	// => This means, we never return an error, and always change the format values
 	//    that we don't support to something more applicable
+	
+	char s[1024];
+
+	string_for_format(*ioDecodedFormat, s, sizeof(s));
+	printf("RawDecoder::NegotiateOutputFormat enter: %s\n", s);
 
 	*ioDecodedFormat = fInputFormat;
+
+	string_for_format(*ioDecodedFormat, s, sizeof(s));
+	printf("RawDecoder::NegotiateOutputFormat leave: %s\n", s);
+
 	return B_OK;
 }
 

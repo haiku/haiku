@@ -10,8 +10,10 @@
 #if TRACE_THIS
   #define TRACE printf
 #else
-  #define TRACE ((void)0)
+  #define TRACE(a...)
 #endif
+
+#define BUFFER_SIZE	16384
 
 #define FOURCC(fcc) (*reinterpret_cast<const uint32 *>(fcc))
 
@@ -123,8 +125,8 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->position = 0;
 	data->datasize = fDataSize;
 	data->framesize = (B_LENDIAN_TO_HOST_INT16(fRawHeader.common.bits_per_sample) / 8) * B_LENDIAN_TO_HOST_INT16(fRawHeader.common.channels);
-	data->fps = B_LENDIAN_TO_HOST_INT32(fRawHeader.common.samples_per_sec) / B_LENDIAN_TO_HOST_INT16(fRawHeader.common.channels);
-	data->buffersize = (65536 / data->framesize) * data->framesize;
+	data->fps = B_LENDIAN_TO_HOST_INT32(fRawHeader.common.samples_per_sec); // WAVE samples_per_sec really means frames per sec
+	data->buffersize = (BUFFER_SIZE / data->framesize) * data->framesize;
 	data->buffer = malloc(data->buffersize);
 	data->framecount = fDataSize / data->framesize;
 	data->duration = (data->framecount * 1000000LL) / data->fps;
@@ -143,7 +145,6 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	
 	_get_format_for_description(&data->format, description);
 
-	//data->format.type = B_MEDIA_RAW_AUDIO;
 	data->format.u.raw_audio.frame_rate = data->fps;
 	data->format.u.raw_audio.channel_count = B_LENDIAN_TO_HOST_INT16(fRawHeader.common.channels);
 	data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT; // XXX fixme
@@ -199,6 +200,7 @@ WavReader::Seek(void *cookie,
 		TRACE("WavReader::Seek newtime %Ld\n", *time);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		pos = (*time * data->fps) / 1000000LL;
+		pos = (pos / data->framesize) * data->framesize; // round down to frame start
 		TRACE("WavReader::Seek to time %Ld, pos %Ld\n", *time, pos);
 		*time = (pos * 1000000LL) / data->fps;
 		*frame = pos / data->framesize;
