@@ -65,15 +65,6 @@ _IMPEXP_TEXTENCODING status_t convert_from_utf8(uint32		dstEncoding,
 												char		substitute = B_SUBSTITUTE);
 
 /*-------------------------------------------------------------*/
-/*------- Utility Functions -----------------------------------*/
-
-// Suggested by BGA
-inline uint32 utf8_char_len(uchar c)
-{
-	return (((0xE5000000 >> (((c) >> 3) & 0x1E)) & 3) + 1);
-}
-
-/*-------------------------------------------------------------*/
 /*-------------------------------------------------------------*/
 
 #endif	/* _UTF8_H */
