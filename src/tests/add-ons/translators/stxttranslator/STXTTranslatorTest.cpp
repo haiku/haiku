@@ -256,9 +256,6 @@ TranslateTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
 		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
 		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
 			B_TRANSLATOR_TEXT) == B_OK);
-		BFile testOut("/tmp/stxt_tran_dmallio.out", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-		proster->Translate(&mallio, NULL, NULL, &testOut, B_TRANSLATOR_TEXT);
-	debugger("foo");
 		CPPUNIT_ASSERT(CompareStreams(dmallio, plain_file) == true);
 		
 		// Convert to B_STYLED_TEXT_FORMAT
