@@ -15,7 +15,7 @@ class KDiskDeviceJob;
 
 class KDiskDeviceJobQueue {
 public:
-	KDiskDeviceJobQueue();
+	KDiskDeviceJobQueue(KDiskDevice *device = NULL);
 	~KDiskDeviceJobQueue();
 
 	status_t InitCheck() const;

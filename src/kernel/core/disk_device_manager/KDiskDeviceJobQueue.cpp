@@ -31,7 +31,7 @@ enum {
 struct KDiskDeviceJobQueue::JobQueue : Vector<KDiskDeviceJob*> {};
 
 // constructor
-KDiskDeviceJobQueue::KDiskDeviceJobQueue()
+KDiskDeviceJobQueue::KDiskDeviceJobQueue(KDiskDevice *device)
 	: fDevice(NULL),
 	  fActiveJob(0),
 	  fJobs(NULL),
@@ -40,6 +40,7 @@ KDiskDeviceJobQueue::KDiskDeviceJobQueue()
 	  fSyncSemaphore(-1)
 {
 	fJobs = new(nothrow) JobQueue;
+	SetDevice(device);
 }
 
 // destructor
