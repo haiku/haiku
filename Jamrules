@@ -183,6 +183,57 @@ rule SetupR5Includes
 # Things Jam needs in order to work :)
 #-------------------------------------------------------------------------------
 
+rule Object
+{
+	# This is basically the original Jambase 2.4 Object rule stripped by
+	# comments. Only the final switch statement has been changed to allow
+	# intermediate C++ files for Yacc and Lex.
+
+	LocalClean clean : $(<) ;
+
+	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	SEARCH on $(>) = $(SEARCH_SOURCE) ;
+
+	HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+
+	HDRRULE on $(>) = HdrRule ;
+	HDRSCAN on $(>) = $(HDRPATTERN) ;
+	HDRSEARCH on $(>) = 
+		$(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
+
+	HDRGRIST on $(>) = $(HDRGRIST) ;
+
+	DEFINES on $(<) += $(DEFINES) ;
+
+	# if source is not .c, generate .c with specific rule
+
+	switch $(>:S)
+	{
+	    case .asm : As $(<) : $(>) ;
+	    case .c :	Cc $(<) : $(>) ;
+	    case .C :	C++ $(<) : $(>) ;
+	    case .cc :	C++ $(<) : $(>) ;
+	    case .cpp : C++ $(<) : $(>) ;
+	    case .f :	Fortran $(<) : $(>) ;
+	    case .l :	if [ on $(2) return $(GENERATE_C++) ] {
+						C++ $(<) : $(<:S=.cpp) ;
+						LexC++ $(<:S=.cpp) : $(>) ;
+					} else {
+						Cc $(<) : $(<:S=.c) ;
+						Lex $(<:S=.c) : $(>) ;
+					}
+	    case .s :	As $(<) : $(>) ;
+	    case .y :	if [ on $(2) return $(GENERATE_C++) ] {
+						C++ $(<) : $(<:S=.cpp) ;
+						Bison $(<:S=.cpp) : $(>) ;
+					} else {
+						Cc $(<) : $(<:S=$(YACCGEN)) ;
+						Yacc $(<:S=$(YACCGEN)) : $(>) ;
+					}
+	    case * :	UserObject $(<) : $(>) ;
+	}
+}
+
 rule UserObject
 {
 	switch $(2)
@@ -665,22 +716,23 @@ rule MergeObject
 
 rule SharedLibraryFromObjects
 {
-	# SharedLibraryFromObjects <name> : <objects> ;
+	# SharedLibraryFromObjects <name> : <objects> : <libraries> ;
 	local _lib = lib$(1).so ;
 	MainFromObjects $(_lib) : $(2) ;
 	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
 						   -nostart -Xlinker -soname=\"$(_lib)\" ;
+	LinkSharedOSLibs $(_lib) : $(3) ;
 }
 
 rule SharedLibrary
 {
-	# SharedLibrary <name> : <sources> ;
+	# SharedLibrary <name> : <sources> : <libraries> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Objects $(2) ;
-	SharedLibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
+	SharedLibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(3) ;
 }
 
 rule LinkSharedOSLibs
@@ -731,8 +783,37 @@ rule AddResources
 {
 	# AddResources <name> : <resourcefiles> ;
 
+	local resfiles = [ FGristFiles $(2) ] ;
+	SEARCH on $(resfiles) += $(SEARCH_SOURCE) ;
+
+	for file in $(resfiles) {
+		if $(file:S) = .rdef {
+			local rdef = $(file) ;
+			file = $(rdef:S=.rsrc) ;
+			ResComp $(file) : $(rdef) ;
+		}
+		RESFILES on $(1) += $(file) ;
+	}
+}
+
+rule ResComp
+{
+	# ResComp <resource file> : <rdef file> ;
+	#
+	# <resource file> and <rdef file> must be gristed.
+
+	SetupObjectsDir ;
+
 	SEARCH on $(2) += $(SEARCH_SOURCE) ;
-	RESFILES on $(1) += $(2) ;
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	Depends $(1) : $(2) rc ;
+	LocalClean clean : $(1) ;
+	ResComp1 $(1) : rc $(2) ;
+}
+
+actions ResComp1
+{
+	$(2[1]) -o $(1:S=) $(2[2-])
 }
 
 rule SourceHdrs
@@ -1034,6 +1115,9 @@ rule SetupObjectsDir
 	# do not want to include that :)
 	rel_objectsdir = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
 	LOCATE_TARGET = [ FDirName $(OBOS_OBJECT_TARGET) $(rel_objectsdir) ] ;
+	LOCATE_SOURCE = $(LOCATE_TARGET) ;
+	SEARCH_SOURCE = [ Filter $(SEARCH_SOURCE) : $(LOCATE_TARGET) ]
+					$(LOCATE_TARGET) ;
 }
 
 #-------------------------------------------------------------------------------
@@ -1054,6 +1138,41 @@ rule Link
 actions Link bind NEEDLIBS
 {
 	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(2)" "$(NEEDLIBS)" $(LINKLIBS) ;
+}
+
+rule LexC++
+{
+	Depends $(1) : $(2) ;
+	MakeLocate $(1) : $(LOCATE_SOURCE) ;
+	LocalClean clean : $(1) ;
+}
+
+actions LexC++
+{
+	$(LEX) -o$(1) $(2)
+}
+
+rule Bison
+{
+	local _h ;
+
+	_h = $(1).h ;
+
+	MakeLocate $(<) $(_h) : $(LOCATE_SOURCE) ;
+
+    Depends $(<) $(_h) : $(>) ;
+    Bison1 $(<) $(_h) : $(>) ;
+    LocalClean clean : $(<) $(_h) ;
+
+	# make sure someone includes $(_h) else it will be
+	# a deadly independent target
+
+	Includes $(<) : $(_h) ;
+}
+
+actions Bison1
+{
+	bison $(YACCFLAGS) -o $(1[1]) $(2)
 }
 
 # BeOS specific rules
