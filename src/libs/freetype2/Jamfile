@@ -37,4 +37,9 @@ SubDir  OBOS_TOP src libs freetype2 ;
 
 FT2_LinkLibrary  $(FT2_LIB) ;
 
+# install libfreetype.so into /boot/home/config/lib
+#
+AbsSymLink <boot!home!config!lib>libfreetype.so : libfreetype.so
+		   : /boot/home/config/lib ;
+
 # end of src Jamfile
