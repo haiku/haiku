@@ -113,12 +113,12 @@ rule UserObject
 # Override the default to give "prettier" command lines.
 actions Cc 
 {
-	$(CC) -c $(2) $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o $(1) ;
+	$(CC) -c "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
 actions C++
 {
-	$(C++) -c $(2) $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o $(1) ;
+	$(C++) -c "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
 
@@ -579,11 +579,35 @@ rule SymLink
 	# <source> is the exact link contents. No binding is done.
 	LINKCONTENTS on $(1) = $(2) ;
 	SymLink1 $(1) ;
+	DEPENDS all : $(target) ;
 }
 
 actions SymLink1
 {
-	$(RM) $(1) && $(LN) -s $(LINKCONTENTS) $(1)
+	$(RM) "$(1)" && $(LN) -s "$(LINKCONTENTS)" "$(1)"
+}
+
+rule RelSymLink
+{
+	# RelSymLink <link> : <link target>
+	# Creates a relative symbolic link from <link> to <link target>.
+	# <link> and <link target> can be usual targets. They may have a grist
+	# and don't need to have any dirname. Their LOCATE variables are used to
+	# find their locations.
+
+	local target = $(1) ;
+	local source = $(2) ;
+	local targetDir = [ on $(target) FDirName $(LOCATE[1]) $(target:D) ] ;
+	local sourceDir = [ on $(source) FDirName $(LOCATE[1]) $(source:D) ] ;
+	local sourcePath = $(source:G=) ;
+	sourcePath = $(sourcePath:D=$(sourceDir)) ;
+	local targetDirComponents = [ SplitPath $(targetDir) ] ;
+	local sourceComponents = [ SplitPath $(sourcePath) ] ;
+
+	SymLink $(target)
+		: [ FRelPath $(targetDirComponents) : $(sourceComponents) ] ;
+	NOUPDATE $(target);
+	DEPENDS $(target) : $(source) ;
 }
 
 #-------------------------------------------------------------------------------
@@ -616,7 +640,7 @@ rule Link
 
 actions Link bind NEEDLIBS
 {
-	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) $(2) $(NEEDLIBS) $(LINKLIBS) ;
+	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) "$(2)" $(NEEDLIBS) $(LINKLIBS) ;
 }
 
 # BeOS specific rules
@@ -654,7 +678,7 @@ if $(OS) = BEOS
 
 actions XRes1
 {
-	xres -o "$(1)" $(2) ;
+	xres -o "$(1)" "$(2)" ;
 }
 
 actions SetVersion
@@ -683,8 +707,15 @@ rule assemble
 
 actions assemble
 {
-$(CC) -c $(2) -O2 $(KERNEL_CCFLAGS) -o $(1) ;
+	$(CC) -c "$(2)" -O2 $(KERNEL_CCFLAGS) -o "$(1)" ;
 }
+
+# Overridden to allow spaces in file names.
+actions Chmod1
+{
+	$(CHMOD) "$(MODE)" "$(1)"
+}
+
 
 ## Kernel stuff!
 
@@ -748,7 +779,7 @@ rule KernelLd
 
 actions KernelLd
 {
-$(LINK) $(LINKFLAGS) -o $(1) $(2) $(LINKLIBS) ;
+	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(LINKLIBS)" ;
 }
 
 rule KernelStaticLibrary
@@ -781,7 +812,7 @@ rule KernelStaticLibraryObjects
 
 actions KernelStaticLibraryObjects
 {
-ar -r $(1) $(2) ;
+	ar -r "$(1)" "$(2)" ;
 }
 
 rule SystemMain
@@ -823,29 +854,29 @@ rule WriteKernelConfig
 
 actions WriteKernelConfig
 {
-	target=$(1)
-	echo "# OpenBeOS Kernel Config File" > $target
-	echo "# Automatically generated - do not edit!" >> $target
+	target="$(1)"
+	echo "# OpenBeOS Kernel Config File" > "$target"
+	echo "# Automatically generated - do not edit!" >> "$target"
 	issection="0"
 	section=
 	for i in "$(SECTIONS)" ; do
 		if [ $issection == 1  ]; then
-			section=$i
+			section="$i"
 			issection=2
-			echo "["$section"]" >> $target
+			echo "["$section"]" >> "$target"
 		elif [ $issection == 2 ]; then
 			type=$i
 			issection=3
-			echo "type="$type >> $target
+			echo "type="$type >> "$target"
 		else
-			if [ $i == ":" ]; then
+			if [ "$i" == ":" ]; then
 				issection=1
-				echo "" >> $target
+				echo "" >> "$target"
 			else
-				file=$i
-				case $file in
+				file="$i"
+				case "$file" in
 					/*) ;;
-					*) file=`pwd`/$file;;
+					*) file=`pwd`/"$file";;
 				esac
 				echo "file="$file >> $target
 			fi
@@ -866,7 +897,7 @@ rule BuildKernel
 
 actions BuildKernel
 {
-	$(BUILD_CMD) --strip-debug --strip-binary strip $(2) -o $(1) ;
+	"$(BUILD_CMD)" --strip-debug --strip-binary strip "$(2)" -o "$(1)" ;
 	echo ""
 	echo "Kernel linked!"
 	echo ""
@@ -890,7 +921,7 @@ rule KernelFloppyImage
 # going on, at least in this early stage of development.
 actions KernelFloppyImage
 {
-	$(BUILD_CMD) $(BOOT_BLOCK) $(2) $(1) ;
+	"$(BUILD_CMD)" "$(BOOT_BLOCK)" "$(2)" "$(1)" ;
 	echo ""
 	echo "*************************************************"
 	echo "*         Kernel build completed!               *"
