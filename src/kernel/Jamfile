@@ -624,32 +624,6 @@ KernelLd rld.so :
 	libexec/rld.so
 	;
 
-KernelLd mount :
-	libglue2.o
-	<$(SOURCE_GRIST)!apps!mount>main.o
-	libc.so
-	libm.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
-	:
-	:
-	bin/mount
-	;
-
-KernelLd unmount :
-	libglue2.o
-	<$(SOURCE_GRIST)!apps!unmount>main.o
-	libc.so
-	libm.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
-	:
-	:
-	bin/unmount
-	;
-
 KernelLd testapp :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!testapp>main.o
@@ -730,20 +704,6 @@ KernelLd loop :
 #		/boot/beos/system/add-ons/kernel/drivers/bin/tulip 
 #		;
 #}
-
-KernelLd testdigit :
-	libglue2.o
-        <$(SOURCE_GRIST)!apps!testdigit>main.o
-        libc.so
-        :
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/testdigit
-        ; 
-
-
 
 KernelLd ps :
 	libglue2.o
