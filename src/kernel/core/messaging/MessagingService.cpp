@@ -1,0 +1,489 @@
+/* 
+ * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+// kernel-side implementation of the messaging service
+
+#include <new>
+
+#include <AutoDeleter.h>
+#include <KMessage.h>
+#include <messaging.h>
+#include <MessagingServiceDefs.h>
+
+#include "MessagingService.h"
+
+static MessagingService *sMessagingService = NULL;
+
+static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
+
+// init_messaging_service
+status_t
+init_messaging_service()
+{
+	static char buffer[sizeof(MessagingService)];
+
+	if (!sMessagingService)
+		sMessagingService = new(buffer) MessagingService;
+
+	return sMessagingService->InitCheck();
+}
+
+// _user_register_messaging_service
+/** \brief Called by the userland server to register itself as a messaging
+		   service for the kernel.
+	\param lockingSem A semaphore used for locking the shared data. Semaphore
+		   counter must be initialized to 0.
+	\param counterSem A semaphore released every time the kernel pushes a
+		   command. Semaphore counter must be initialized to 0.
+	\return
+	- The ID of the kernel area used for communication, if everything went fine,
+	- an error code otherwise.
+*/
+area_id
+_user_register_messaging_service(sem_id lockSem, sem_id counterSem)
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	area_id areaID;
+	status_t error = sMessagingService->RegisterService(lockSem, counterSem,
+		areaID);
+
+	sMessagingService->Unlock();
+
+	return (error != B_OK ? error : areaID);
+}
+
+// send_message
+status_t
+send_message(const void *message, int32 messageSize,
+	const messaging_target *targets, int32 targetCount)
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	status_t error = sMessagingService->SendMessage(message, messageSize,
+		targets, targetCount);
+
+	sMessagingService->Unlock();
+
+	return error;
+}
+
+// send_message
+status_t
+send_message(const KMessage *message, const messaging_target *targets,
+	int32 targetCount)
+{
+	if (!message)
+		return B_BAD_VALUE;
+
+	return send_message(message->Buffer(), message->ContentSize(), targets,
+		targetCount);
+}
+
+
+// #pragma mark -
+
+// constructor
+MessagingArea::MessagingArea()
+{
+}
+
+// destructor
+MessagingArea::~MessagingArea()
+{
+	if (fID >= 0)
+		delete_area(fID);
+}
+
+// Create
+MessagingArea *
+MessagingArea::Create(sem_id lockSem, sem_id counterSem)
+{
+	// allocate the object on the heap
+	MessagingArea *area = new(nothrow) MessagingArea;
+	if (!area)
+		return NULL;
+
+	// create the area
+	area->fID = create_area("messaging", (void**)&area->fHeader,
+		B_ANY_KERNEL_ADDRESS, kMessagingAreaSize, B_FULL_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+	if (area->fID < 0) {
+		delete area;
+		return NULL;
+	}
+
+	// finish the initialization of the object
+	area->fSize = kMessagingAreaSize;
+	area->fLockSem = lockSem;
+	area->fCounterSem = counterSem;
+	area->fNextArea = NULL;
+	area->InitHeader();
+
+	return area;
+}
+
+// InitHeader
+void
+MessagingArea::InitHeader()
+{
+	fHeader->lock_counter = 1;			// create locked
+	fHeader->size = fSize;
+	fHeader->kernel_area = fID;
+	fHeader->next_kernel_area = (fNextArea ? fNextArea->ID() : -1);
+	fHeader->command_count = 0;
+	fHeader->first_command = 0;
+	fHeader->last_command = 0;
+}
+
+// CheckCommandSize
+bool
+MessagingArea::CheckCommandSize(int32 dataSize)
+{
+	int32 size = sizeof(messaging_command) + dataSize;
+
+	return (dataSize >= 0
+		&& size <= kMessagingAreaSize - (int32)sizeof(messaging_area_header));
+}
+
+// Lock
+bool
+MessagingArea::Lock()
+{
+	// benaphore-like locking
+	if (atomic_add(&fHeader->lock_counter, 1) == 0)
+		return true;
+
+	return (acquire_sem(fLockSem) == B_OK);
+}
+
+// Unlock
+void
+MessagingArea::Unlock()
+{
+	if (atomic_add(&fHeader->lock_counter, -1) > 1)
+		release_sem(fLockSem);
+}
+
+// ID
+area_id
+MessagingArea::ID() const
+{
+	return fID;
+}
+
+// Size
+int32
+MessagingArea::Size() const
+{
+	return fSize;
+}
+
+// AllocateCommand
+void *
+MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize)
+{
+	int32 size = sizeof(messaging_command) + dataSize;
+
+	if (dataSize < 0 || size > fSize - (int32)sizeof(messaging_area_header))
+		return NULL;
+
+	// the area is used as a ring buffer
+	int32 startOffset = sizeof(messaging_area_header);
+
+	// the simple case first: the area is empty
+	int32 commandOffset;
+	if (fHeader->command_count == 0) {
+		commandOffset = startOffset;
+
+		// update the header
+		fHeader->command_count++;
+		fHeader->first_command = fHeader->last_command = commandOffset;
+	} else {
+		int32 firstCommandOffset = fHeader->first_command;
+		int32 lastCommandOffset = fHeader->last_command;
+		int32 firstCommandSize;
+		int32 lastCommandSize;
+		messaging_command *firstCommand = _CheckCommand(firstCommandOffset,
+			firstCommandSize);
+		messaging_command *lastCommand = _CheckCommand(lastCommandOffset,
+			lastCommandSize);
+		if (!firstCommand || !lastCommand) {
+			// something has been screwed up
+			return NULL;
+		}
+
+		// find space for the command
+		if (firstCommandOffset < lastCommandOffset) {
+			// not wrapped
+			// try to allocate after the last command
+			if (size <= fSize - (lastCommandOffset + lastCommandSize)) {
+				commandOffset = (lastCommandOffset + lastCommandSize);
+			} else {
+				// is there enough space before the first command?
+				if (size > firstCommandOffset - startOffset)
+					return NULL;
+				commandOffset = startOffset;
+			}
+		} else {
+			// wrapped: we can only allocate between the last and the first
+			// command
+			commandOffset = lastCommandOffset + lastCommandSize;
+			if (size > firstCommandOffset - commandOffset)
+				return NULL;
+		}
+
+		// update the header and the last command
+		fHeader->command_count++;
+		lastCommand->next_command = fHeader->last_command = commandOffset;
+	}
+
+	// init the command
+	messaging_command *command
+		= (messaging_command*)((char*)fHeader + commandOffset);
+	command->next_command = 0;
+	command->command = commandWhat;
+	command->size = size;
+
+	return command->data;
+}
+
+// CommitCommand
+void
+MessagingArea::CommitCommand()
+{
+	// TODO: If invoked while locked, we should supply B_DO_NOT_RESCHEDULE.
+	release_sem(fCounterSem);
+}
+
+// SetNextArea
+void
+MessagingArea::SetNextArea(MessagingArea *area)
+{
+	fNextArea = area;
+	fHeader->next_kernel_area = (fNextArea ? fNextArea->ID() : -1);
+}
+
+// NextArea
+MessagingArea *
+MessagingArea::NextArea() const
+{
+	return fNextArea;
+}
+
+// _CheckCommand
+messaging_command *
+MessagingArea::_CheckCommand(int32 offset, int32 &size)
+{
+	// check offset
+	if (offset < (int32)sizeof(messaging_area_header)
+		|| offset + (int32)sizeof(messaging_command) > fSize
+		|| (offset & 0x3)) {
+		return NULL;
+	}
+
+	// get and check size
+	messaging_command *command = (messaging_command*)((char*)fHeader + offset);
+	size = command->size;
+	if (size < (int32)sizeof(messaging_command))
+		return NULL;
+	size = (size + 3) & 0x3;	// align
+	if (offset + size > fSize)
+		return NULL;
+
+	return command;
+}
+
+
+// #pragma mark -
+
+// constructor
+MessagingService::MessagingService()
+	: fLock("messaging service"),
+	  fFirstArea(NULL),
+	  fLastArea(NULL)
+{
+}
+
+// destructor
+MessagingService::~MessagingService()
+{
+	// Should actually never be called. Once created the service stays till the
+	// bitter end.
+}
+
+// InitCheck
+status_t
+MessagingService::InitCheck() const
+{
+	if (fLock.Sem() < 0)
+		return fLock.Sem();
+	return B_OK;
+}
+
+// Lock
+bool
+MessagingService::Lock()
+{
+	return fLock.Lock();
+}
+
+// Unlock
+void
+MessagingService::Unlock()
+{
+	fLock.Unlock();
+}
+
+// RegisterService
+status_t
+MessagingService::RegisterService(sem_id lockSem, sem_id counterSem,
+	area_id &areaID)
+{
+	// check, if a service is already registered
+	if (fFirstArea)
+		return B_BAD_VALUE;
+
+	status_t error = B_OK;
+
+	// check, if the semaphores are valid and belong to the calling team
+	thread_info threadInfo;
+	error = get_thread_info(find_thread(NULL), &threadInfo);
+
+	sem_info lockSemInfo;
+	if (error == B_OK)
+		error = get_sem_info(lockSem, &lockSemInfo);
+
+	sem_info counterSemInfo;
+	if (error == B_OK)
+		error = get_sem_info(counterSem, &counterSemInfo);
+
+	if (error != B_OK)
+		return error;
+
+	if (threadInfo.team != lockSemInfo.team
+		|| threadInfo.team != counterSemInfo.team) {
+		return B_BAD_VALUE;
+	}
+
+	// create an area
+	fFirstArea = fLastArea = MessagingArea::Create(lockSem, counterSem);
+	if (!fFirstArea)
+		return B_NO_MEMORY;
+
+	areaID = fFirstArea->ID();
+	fFirstArea->Unlock();
+
+	return B_OK;
+}
+
+// SendMessage
+status_t
+MessagingService::SendMessage(const void *message, int32 messageSize,
+	const messaging_target *targets, int32 targetCount)
+{
+	if (!message || messageSize <= 0 || !targets || targetCount <= 0)
+		return B_BAD_VALUE;
+
+	int32 dataSize = sizeof(messaging_command_send_message)
+		+ targetCount * sizeof(messaging_target) + messageSize;
+
+	// allocate space for the command
+	MessagingArea *area;
+	void *data;
+	status_t error = _AllocateCommand(MESSAGING_COMMAND_SEND_MESSAGE, dataSize,
+		area, data);
+	if (error != B_OK)
+		return error;
+
+	// prepare the command
+	messaging_command_send_message *command
+		= (messaging_command_send_message*)data;
+	command->message_size = messageSize;
+	command->target_count = targetCount;
+	memcpy(command->targets, targets, sizeof(messaging_target) * targetCount);
+	memcpy((char*)command + (dataSize - messageSize), message, messageSize);
+
+	// shoot
+	area->Unlock();
+	area->CommitCommand();
+
+	return B_OK;
+}
+
+// _AllocateCommand
+status_t
+MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
+	MessagingArea *&area, void *&data)
+{
+	if (!fFirstArea)
+		return B_NO_INIT;
+
+	if (!MessagingArea::CheckCommandSize(size))
+		return B_BAD_VALUE;
+
+	// delete the discarded areas (save one)
+	ObjectDeleter<MessagingArea> discardedAreaDeleter;
+	MessagingArea *discardedArea = NULL;
+	while (fFirstArea != fLastArea) {
+		area = fFirstArea;
+		area->Lock();
+		if (area->Size() != 0) {
+			area->Unlock();
+			break;
+		}
+
+		fFirstArea = area->NextArea();
+		area->SetNextArea(NULL);
+		discardedArea = area;
+		discardedAreaDeleter.SetTo(area);
+	}
+
+	// allocate space for the command in the last area
+	area = fLastArea;
+	area->Lock();
+	data = area->AllocateCommand(commandWhat, size);
+
+	if (!data) {
+		// not enough space in the last area: create a new area or reuse a
+		// discarded one
+		if (discardedArea) {
+			area = discardedAreaDeleter.Detach();
+			area->InitHeader();
+		} else
+			area = MessagingArea::Create(fLockSem, fCounterSem);
+		if (!area) {
+			fLastArea->Unlock();
+			return B_NO_MEMORY;
+		}
+
+		// add the new area
+		fLastArea->SetNextArea(area);
+		fLastArea->Unlock();
+		fLastArea = area;
+
+		// allocate space for the command
+		data = area->AllocateCommand(commandWhat, size);
+
+		if (!data) {
+			// that should never happen
+			area->Unlock();
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+

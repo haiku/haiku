@@ -60,5 +60,6 @@ SubInclude OBOS_TOP src kernel core cache ;
 SubInclude OBOS_TOP src kernel core device_manager ;
 SubInclude OBOS_TOP src kernel core disk_device_manager ;
 SubInclude OBOS_TOP src kernel core fs ;
-SubInclude OBOS_TOP src kernel core vm ;
+SubInclude OBOS_TOP src kernel core messaging ;
 SubInclude OBOS_TOP src kernel core util ;
+SubInclude OBOS_TOP src kernel core vm ;
