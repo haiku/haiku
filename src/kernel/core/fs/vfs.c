@@ -3,7 +3,7 @@
 */
 
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -28,8 +28,11 @@
 #include <kerrors.h>
 #include <atomic.h>
 #include <fd.h>
+#include <fs/node_monitor.h>
 
 #include <OS.h>
+#include <StorageDefs.h>
+#include <fs_info.h>
 
 #include <devfs.h>
 #include "rootfs.h"
@@ -42,8 +45,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <StorageDefs.h>
-#include <fs_info.h>
+#include <stddef.h>
 
 #ifndef TRACE_VFS
 #	define TRACE_VFS 0
@@ -60,10 +62,9 @@
 
 struct vnode {
 	struct vnode	*next;
-	struct vnode	*mount_prev;
-	struct vnode	*mount_next;
 	struct vm_cache	*cache;
 	mount_id		mount_id;
+	list_link		mount_link;
 	vnode_id		id;
 	fs_vnode		private_node;
 	struct fs_mount	*mount;
@@ -98,8 +99,7 @@ struct fs_mount {
 	recursive_lock	rlock;
 	struct vnode	*root_vnode;
 	struct vnode	*covers_vnode;
-	struct vnode	*vnodes_head;
-	struct vnode	*vnodes_tail;
+	struct list		vnodes;
 	bool			unmounting;
 };
 
@@ -463,14 +463,7 @@ add_vnode_to_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
 	recursive_lock_lock(&mount->rlock);
 
-	vnode->mount_next = mount->vnodes_head;
-	vnode->mount_prev = NULL;
-	if (vnode->mount_next)
-		vnode->mount_next->mount_prev = vnode;
-
-	mount->vnodes_head = vnode;
-	if (mount->vnodes_tail == NULL)
-		mount->vnodes_tail = vnode;
+	list_add_link_to_head(&mount->vnodes, &vnode->mount_link);
 
 	recursive_lock_unlock(&mount->rlock);
 }
@@ -481,16 +474,8 @@ remove_vnode_from_mount_list(struct vnode *vnode, struct fs_mount *mount)
 {
 	recursive_lock_lock(&mount->rlock);
 
-	if (vnode->mount_next)
-		vnode->mount_next->mount_prev = vnode->mount_prev;
-	else
-		mount->vnodes_tail = vnode->mount_prev;
-	if (vnode->mount_prev)
-		vnode->mount_prev->mount_next = vnode->mount_next;
-	else
-		mount->vnodes_head = vnode->mount_next;
-
-	vnode->mount_prev = vnode->mount_next = NULL;
+	list_remove_link(&vnode->mount_link);
+	vnode->mount_link.next = vnode->mount_link.prev = NULL;
 
 	recursive_lock_unlock(&mount->rlock);
 }
@@ -1429,6 +1414,9 @@ vfs_new_io_context(void *_parentContext)
 
 	context->table_size = table_size;
 
+	list_init(&context->node_monitors);
+	context->max_monitors = MAX_NODE_MONITORS;
+
 	return context;
 }
 
@@ -1453,8 +1441,10 @@ vfs_free_io_context(void *_ioContext)
 
 	mutex_destroy(&context->io_mutex);
 
+	remove_node_monitors(context);
 	free(context->fds);
 	free(context);
+
 	return 0;
 }
 
@@ -1554,27 +1544,6 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 		default:
 			return -1;
 	}
-}
-
-
-static int
-notify_listener(int op, mount_id mountID, vnode_id parentVnodeID, vnode_id toParentVnodeID,
-	vnode_id vnodeID, const char *name)
-{
-	// not yet exported or implemented, may change completely
-	// this is currently the BeOS compatible notify_listener() function
-	return 0;
-}
-
-
-static int
-send_notification(port_id port, long token, ulong what, long op, mount_id mountID,
-	mount_id toMountID, vnode_id parentVnodeID, vnode_id toParentVnodeID,
-	vnode_id vnodeID, const char *name)
-{
-	// not yet exported or implemented, may change completely
-	// this is currently the BeOS compatible send_notification() function
-	return 0;
 }
 
 
@@ -1769,6 +1738,9 @@ vfs_init(kernel_args *ka)
 		if (gMountsTable == NULL)
 			panic("vfs_init: error creating mounts hash table\n");
 	}
+
+	node_monitor_init();
+
 	gFileSystems = NULL;
 	gRoot = NULL;
 
@@ -3127,7 +3099,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		goto err;
 	}
 
-	mount->vnodes_head = mount->vnodes_tail = NULL;
+	list_init_etc(&mount->vnodes, offsetof(struct vnode, mount_link));
 
 	mount->mount_point = strdup(path);
 	if (mount->mount_point == NULL) {
@@ -3261,7 +3233,8 @@ fs_unmount(char *path, bool kernel)
 
 	// cycle through the list of vnodes associated with this mount and
 	// make sure all of them are not busy or have refs on them
-	for (vnode = mount->vnodes_head; vnode != NULL; vnode = vnode->mount_next) {
+	vnode = NULL;
+	while ((vnode = list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode->busy || vnode->ref_count != 0) {
 			mount->root_vnode->ref_count += 2;
 			mutex_unlock(&gVnodeMutex);
@@ -3274,7 +3247,7 @@ fs_unmount(char *path, bool kernel)
 
 	/* we can safely continue, mark all of the vnodes busy and this mount
 	structure in unmounting state */
-	for (vnode = mount->vnodes_head; vnode; vnode = vnode->mount_next) {
+	while ((vnode = list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode != mount->root_vnode)
 			vnode->busy = true;
 	}
