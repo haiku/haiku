@@ -70,7 +70,7 @@ typedef struct file_system_info {
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
 	status_t (*fsync)(fs_volume fs, fs_vnode v);
 
-	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
+	ssize_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
 	status_t (*write_link)(fs_volume fs, fs_vnode link, char *toPath);
 	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name, const char *path, int mode);
 
@@ -87,8 +87,8 @@ typedef struct file_system_info {
 	status_t (*open)(fs_volume fs, fs_vnode v, int openMode, fs_cookie *_cookie);
 	status_t (*close)(fs_volume fs, fs_vnode v, fs_cookie cookie);
 	status_t (*free_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
-	ssize_t (*read)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, void *buffer, size_t *length);
-	ssize_t (*write)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buffer, size_t *length);
+	status_t (*read)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, void *buffer, size_t *length);
+	status_t (*write)(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *buffer, size_t *length);
 
 	/* directory operations */
 	status_t (*create_dir)(fs_volume fs, fs_vnode parent, const char *name, int perms, vnode_id *_newVnodeID);
@@ -111,8 +111,8 @@ typedef struct file_system_info {
 	status_t (*open_attr)(fs_volume fs, fs_vnode file, const char *name, int openMode, fs_cookie *_cookie);
 	status_t (*close_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie);
 	status_t (*free_attr_cookie)(fs_volume fs, fs_vnode file, fs_cookie cookie);
-	ssize_t (*read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, void *buffer, size_t *len);
-	ssize_t (*write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, const void *buffer, size_t *len);
+	status_t (*read_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, void *buffer, size_t *length);
+	status_t (*write_attr)(fs_volume fs, fs_vnode file, fs_cookie cookie, off_t pos, const void *buffer, size_t *length);
 
 	status_t (*read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
 	status_t (*write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, const struct stat *stat, int statMask);
