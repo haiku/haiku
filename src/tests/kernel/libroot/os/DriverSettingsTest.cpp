@@ -49,7 +49,8 @@ strnlen(char const *string, size_t count)
  *	as much as "maxLength" bytes to the dest string.
  *	Always null terminates the string as long as maxLength is
  *	larger than the dest string.
- *	Returns the length of the string that 
+ *	Returns the length of the string that it tried to create
+ *	to be able to easily detect string truncation.
  */
 
 size_t
