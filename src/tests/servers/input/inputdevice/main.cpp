@@ -18,7 +18,7 @@ main(int argc, char *argv[])
 	if ((err = get_input_devices(&list))!=B_OK)
 		printf("get_input_devices returned %s\n", strerror(err));
 	
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		if (device == NULL) {
 			printf("device %ld is NULL\n", i);
@@ -70,34 +70,31 @@ main(int argc, char *argv[])
 	
 	printf("\n");
 	BInputDevice::Start(B_POINTING_DEVICE);
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		printf(" %s", device->IsRunning() ? "true" : "false");
 	}
 	BInputDevice::Stop(B_POINTING_DEVICE);
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		printf(" %s", device->IsRunning() ? "true" : "false");
 	}
 	BInputDevice::Start(B_POINTING_DEVICE);
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		printf(" %s", device->IsRunning() ? "true" : "false");
 	}
 	BInputDevice::Stop(B_POINTING_DEVICE);
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		printf(" %s", device->IsRunning() ? "true" : "false");
 	}
 	BInputDevice::Start(B_POINTING_DEVICE);
-	for (uint32 i=0; i<list.CountItems(); i++) {
+	for (uint32 i=0; i<(unsigned)list.CountItems(); i++) {
 		BInputDevice *device = (BInputDevice*)list.ItemAt(i);
 		printf(" %s", device->IsRunning() ? "true" : "false");
 	}
 	printf("\n");
-	return 0;
-err:
-	
 	return 0;
 }
 
