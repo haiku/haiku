@@ -12,6 +12,9 @@ extern "C" {
 #include <thread_types.h>
 #include <arch/thread.h>
 
+// Uncomment the line below to compile the single-queue scheduler
+//#define NEW_SCHEDULER
+
 void resched(void);
 void start_scheduler(void);
 
@@ -19,15 +22,23 @@ void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
 struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
+#ifndef NEW_SCHEDULER
 struct thread *thread_lookat_run_q(int priority);
+#endif /* not NEW_SCHEDULER */
 void thread_enqueue_run_q(struct thread *t);
+#ifndef NEW_SCHEDULER
 struct thread *thread_dequeue_run_q(int priority);
+#endif /* not NEW_SCHEDULER */
 void thread_atkernel_entry(void); // called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);
 
 int thread_suspend_thread(thread_id id);
 int thread_resume_thread(thread_id id);
+#ifndef NEW_SCHEDULER
 int thread_set_priority(thread_id id, int priority);
+#else /* NEW_SCHEDULER */
+status_t thread_set_priority(thread_id id, int32 priority);
+#endif /* NEW_SCHEDULER */
 int thread_init(kernel_args *ka);
 int thread_init_percpu(int cpu_num);
 void thread_exit(int retcode);
@@ -37,6 +48,9 @@ int thread_kill_thread_nowait(thread_id id);
 #define thread_get_current_thread arch_thread_get_current_thread
 
 struct thread *thread_get_thread_struct(thread_id id);
+#ifdef NEW_SCHEDULER
+struct thread *thread_get_thread_struct_locked(thread_id id);
+#endif /* NEW_SCHEDULER */
 thread_id thread_get_current_thread_id(void);
 
 extern inline thread_id thread_get_current_thread_id(void) {

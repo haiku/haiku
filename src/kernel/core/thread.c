@@ -61,17 +61,28 @@ static unsigned int num_death_stacks;
 static unsigned int volatile death_stack_bitmap;
 static sem_id death_stack_sem;
 
+#ifndef NEW_SCHEDULER
 // thread queues
 // Thread priority has a granularity of 2; this means that we have 61 real
 // priority levels: 60 to map BeOS priorities 1-120, plus the idle priority (0).
 static struct thread_queue run_q[(B_MAX_PRIORITY / 2) + 1] = { { NULL, NULL }, };
+#else /* NEW_SCHEDULER */
+// The dead queue is used as a pool from which to retrieve and reuse previously
+// allocated thread structs when creating a new thread. It should be gone once
+// the slab allocator is in.
+#endif /* NEW_SCHEDULER */
 struct thread_queue dead_q;
 
 static void thread_entry(void);
+#ifndef NEW_SCHEDULER
 static struct thread *thread_get_thread_struct_locked(thread_id id);
+#endif /* not NEW_SCHEDULER */
 static void thread_kthread_exit(void);
 static void deliver_signal(struct thread *t, int signal);
 
+#ifdef NEW_SCHEDULER
+
+#endif /* NEW_SCHEDULER */
 // insert a thread onto the tail of a queue
 void thread_enqueue(struct thread *t, struct thread_queue *q)
 {
@@ -126,6 +137,7 @@ struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 	return t;
 }
 
+#ifndef NEW_SCHEDULER
 struct thread *thread_lookat_run_q(int priority)
 {
 	return thread_lookat_queue(&run_q[(priority + 1) >> 1]);
@@ -147,6 +159,7 @@ struct thread *thread_dequeue_run_q(int priority)
 	return thread_dequeue(&run_q[(priority + 1) >> 1]);
 }
 
+#endif /* not NEW_SCHEDULER */
 static void insert_thread_into_team(struct team *p, struct thread *t)
 {
 	t->team_next = p->thread_list;
@@ -483,6 +496,7 @@ int thread_resume_thread(thread_id id)
 	return retval;
 }
 
+#ifndef NEW_SCHEDULER
 int thread_set_priority(thread_id id, int priority)
 {
 	struct thread *t;
@@ -525,6 +539,7 @@ int thread_set_priority(thread_id id, int priority)
 
 	return retval;
 }
+#endif /* not NEW_SCHEDULER */
 
 static const char *state_to_text(int state)
 {
@@ -768,9 +783,11 @@ int thread_init(kernel_args *ka)
 	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
 		&thread_struct_compare, &thread_struct_hash);
 
+#ifndef NEW_SCHEDULER
 	// zero out the run queues
 	memset(run_q, 0, sizeof(run_q));
 
+#endif /* not NEW_SCHEDULER */
 	// zero out the dead thread structure q
 	memset(&dead_q, 0, sizeof(dead_q));
 
@@ -1173,7 +1190,11 @@ struct thread *thread_get_thread_struct(thread_id id)
 	return t;
 }
 
+#ifndef NEW_SCHEDULER
 static struct thread *thread_get_thread_struct_locked(thread_id id)
+#else /* NEW_SCHEDULER */
+struct thread *thread_get_thread_struct_locked(thread_id id)
+#endif /* NEW_SCHEDULER */
 {
 	struct thread_key key;
 

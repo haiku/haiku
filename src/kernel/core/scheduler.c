@@ -18,9 +18,102 @@
 #include <smp.h>
 #include <cpu.h>
 #include <khash.h>
+#ifdef NEW_SCHEDULER
+#include <Errors.h>
+#include <kerrors.h>
+#endif /* NEW_SCHEDULER */
 
 static int _rand(void);
 
+#ifdef NEW_SCHEDULER
+
+// The run queue. Holds the threads ready to run ordered by priority.
+static struct thread_queue run_q = { NULL, NULL };
+
+
+void
+thread_enqueue_run_q(struct thread *t)
+{
+	struct thread *curr, *prev;
+	
+	// these shouldn't exist
+	if(t->priority > B_MAX_PRIORITY)
+		t->priority = B_MAX_PRIORITY;
+	if(t->priority < B_MIN_PRIORITY)
+		t->priority = B_MIN_PRIORITY;
+	
+	if (run_q.head == NULL) {
+		t->q_next = NULL;
+		run_q.head = t;
+	} else {
+		for (curr = run_q.head, prev = NULL; curr && (curr->priority >= t->priority); curr = curr->q_next) {
+			if (prev)
+				prev = prev->q_next;
+			else
+				prev = run_q.head;
+		}
+		t->q_next = curr;
+		if (prev)
+			prev->q_next = t;
+		else
+			run_q.head = t;
+	}
+}
+
+
+status_t
+thread_set_priority(thread_id id, int32 priority)
+{
+	struct thread *t, *curr, *prev;
+	int retval;
+
+	// make sure the passed in priority is within bounds
+	if (priority > B_MAX_PRIORITY)
+		priority = B_MAX_PRIORITY;
+	if (priority < B_MIN_PRIORITY)
+		priority = B_MIN_PRIORITY;
+
+	t = thread_get_current_thread();
+	if (t->id == id) {
+		// it's ourself, so we know we aren't in the run queue, and we can manipulate
+		// our structure directly
+		retval = t->priority;
+		t->priority = priority;
+	} else {
+		int state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		t = thread_get_thread_struct_locked(id);
+		if (t) {
+			retval = t->priority;
+			if ((t->state == B_THREAD_READY) && (t->priority != priority)) {
+				// this thread is in the ready queue right now, so it needs to be reinserted
+				for (curr = run_q.head, prev = NULL; curr && (curr->id != t->id); curr = curr->q_next) {
+					if (prev)
+						prev = prev->q_next;
+					else
+						prev = run_q.head;
+				}
+				if (prev)
+					prev->q_next = curr->q_next;
+				else
+					run_q.head = curr->q_next;
+				t->priority = priority;
+				thread_enqueue_run_q(t);
+			} else
+				t->priority = priority;
+		} else
+			retval = B_BAD_THREAD_ID;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+	}
+
+	return retval;
+}
+
+
+#endif /* NEW_SCHEDULER */
 static int
 _rand(void)
 {
@@ -93,14 +186,24 @@ reschedule_event(timer *unused)
 void
 resched(void)
 {
+#ifndef NEW_SCHEDULER
 	struct thread *next_thread = NULL;
 	int last_thread_pri = -1;
+#else /* NEW_SCHEDULER */
+	struct thread *next_thread, *prev_thread = NULL;
+#endif /* NEW_SCHEDULER */
 	struct thread *old_thread = thread_get_current_thread();
+#ifndef NEW_SCHEDULER
 	int i;
+#endif /* not NEW_SCHEDULER */
 	bigtime_t quantum;
 	timer *quantum_timer;
 
+#ifndef NEW_SCHEDULER
 //	dprintf("top of thread_resched: cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread());
+#else /* NEW_SCHEDULER */
+//	dprintf("resched(): cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread());
+#endif /* NEW_SCHEDULER */
 
 	switch(old_thread->next_state) {
 		case B_THREAD_RUNNING:
@@ -109,7 +212,11 @@ resched(void)
 			thread_enqueue_run_q(old_thread);
 			break;
 		case B_THREAD_SUSPENDED:
+#ifndef NEW_SCHEDULER
 			dprintf("suspending thread 0x%x\n", old_thread->id);
+#else /* NEW_SCHEDULER */
+			dprintf("resched(): suspending thread 0x%x\n", old_thread->id);
+#endif /* NEW_SCHEDULER */
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			// This will hopefully be eliminated once the slab
@@ -122,6 +229,7 @@ resched(void)
 	}
 	old_thread->state = old_thread->next_state;
 
+#ifndef NEW_SCHEDULER
 	// search the real-time queue
 	for(i = B_MAX_PRIORITY; i >= B_FIRST_REAL_TIME_PRIORITY; i-=2) {
 		next_thread = thread_dequeue_run_q(i);
@@ -152,9 +260,37 @@ resched(void)
 			if(next_thread == NULL)
 				panic("next_thread == NULL! no idle priorities!\n");
 		}
+#else /* NEW_SCHEDULER */
+	// select next thread from the run queue
+	next_thread = run_q.head;
+	while ((next_thread) && (next_thread->priority > B_IDLE_PRIORITY)) {
+		// always extract real time threads
+		if (next_thread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+			break;
+		// never skip last non-idle normal thread
+		if (next_thread->q_next && (next_thread->q_next->priority == B_IDLE_PRIORITY))
+			break;
+		// skip normal threads sometimes
+		if (_rand() > 0x3000)
+			break;
+		prev_thread = next_thread;
+		next_thread = next_thread->q_next;
+#endif /* NEW_SCHEDULER */
 	}
+#ifndef NEW_SCHEDULER
 
 found_thread:
+#else /* NEW_SCHEDULER */
+	if (!next_thread)
+		panic("resched(): run queue is empty!\n");
+		
+	// extract selected thread from the run queue
+	if (prev_thread)
+		prev_thread->q_next = next_thread->q_next;
+	else
+		run_q.head = next_thread->q_next;
+	
+#endif /* NEW_SCHEDULER */
 	next_thread->state = B_THREAD_RUNNING;
 	next_thread->next_state = B_THREAD_READY;
 	
@@ -169,6 +305,7 @@ found_thread:
 		if (next_thread != old_thread)
 			context_switch(old_thread, next_thread);
 	}
+#ifndef NEW_SCHEDULER
 
 #if 0
 	// XXX should only reset the quantum timer if we are switching to a new thread,
@@ -191,5 +328,6 @@ found_thread:
 		context_switch(old_thread, next_thread);
 	}
 #endif
+#endif /* not NEW_SCHEDULER */
 }
 

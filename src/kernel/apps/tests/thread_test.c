@@ -31,6 +31,19 @@ static int counter_thread(void *data)
 	return 0;
 }
 
+
+static int priority_test(void *data)
+{
+	int i;
+	
+	for (i=0; i<10; i++) {
+		printf("%s: %d\n", (char *)data, i);
+//		sys_snooze(1000);
+	}
+	return 0;
+}
+
+
 int main(int argc, char **argv)
 {
 	thread_id t[THREADS];
@@ -61,6 +74,13 @@ int main(int argc, char **argv)
 	printf("Test value = %d vs expected of %d\n", current_val, expected);
 	
 	delete_sem(lock);
+	
+	t[0] = spawn_thread(priority_test, "thread0", B_DISPLAY_PRIORITY, "thread0");
+	t[1] = spawn_thread(priority_test, "thread1", B_URGENT_DISPLAY_PRIORITY, "thread1");
+	resume_thread(t[0]);
+	resume_thread(t[1]);
+	sys_wait_on_thread(t[0], NULL);
+	sys_wait_on_thread(t[1], NULL);
 	
 	return 0;
 }
