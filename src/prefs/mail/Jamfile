@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs mail ;
 
-AddResources E-mail : <$(SOURCE_GRIST)>E-mail.rsrc ;
+AddResources E-mail : e-mail.rdef ;
 
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
