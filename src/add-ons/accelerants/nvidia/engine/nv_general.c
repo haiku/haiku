@@ -168,7 +168,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x00c010de: /* Nvidia unknown FX */
 	case 0x00c110de: /* Nvidia unknown FX */
-	case 0x00c210de: /* Nvidia unknown FX */
+	case 0x00c210de: /* Nvidia unknown FX */ //fixme? Xorg says: GeForce 6800 LE
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV41)\n"));
@@ -303,6 +303,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 540 (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
+	//fixme? Xorg says: 0x014f == GeForce 6200
 	case 0x015010de: /* Nvidia GeForce2 GTS/Pro */
 	case 0x015110de: /* Nvidia GeForce2 Ti DDR */
 	case 0x015210de: /* Nvidia GeForce2 Ultra */
