@@ -897,11 +897,11 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
+			if (*ioSize < input->GetInputChannelCount() * sizeof(float))
 				goto err;
-			*ioSize = input->GetMixerChannelCount() * sizeof(float);
-			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetMixerChannelGain(chan));
+			*ioSize = input->GetInputChannelCount() * sizeof(float);
+			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetInputChannelGain(chan));
 		}
 	}
 	*last_change = TimeSource()->Now(); // XXX we could do better
@@ -951,10 +951,10 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (size < input->GetMixerChannelCount() * sizeof(float))
+			if (size < input->GetInputChannelCount() * sizeof(float))
 				goto err;
-			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+				input->SetInputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
 		}
 	}
 	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);
@@ -1005,7 +1005,7 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeNullParameter(PARAM_FORMAT(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(in), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
 		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
-									   ->SetChannelCount(in->GetMixerChannelCount()); 
+									   ->SetChannelCount(in->GetInputChannelCount()); 
 		group->MakeNullParameter(PARAM_OUTPUT(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
 
@@ -1024,9 +1024,9 @@ AudioMixer::UpdateParameterWeb()
 	group = inputchannels->MakeGroup("");
 	group->MakeNullParameter(10003, B_MEDIA_RAW_AUDIO, "Input Channel Sources 1", B_WEB_BUFFER_OUTPUT); 
 
-	SetParameterWeb(web);
-
 	fCore->Unlock();
+
+	SetParameterWeb(web);
 }
 
 #if USE_MEDIA_FORMAT_WORKAROUND
