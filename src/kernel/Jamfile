@@ -61,6 +61,7 @@ KernelLd kernel :
 	linkhack.so
 
 	kernel_os_arch_$(OBOS_ARCH).o
+	kernel_device_manager.o
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
