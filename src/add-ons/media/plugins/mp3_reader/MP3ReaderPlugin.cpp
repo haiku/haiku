@@ -15,13 +15,10 @@
 
 /* see
  * http://www.multiweb.cz/twoinches/MP3inside.htm
- * 
+ * http://www.id3.org/id3v2.3.0.txt
+ * http://www.id3.org/lyrics3.html
+ * http://www.id3.org/lyrics3200.html
  */
-
-/* minimal ID3 stuff
- * see http://www.id3.org/id3v2.3.0.txt
- */
-#define ID3_HEADER_SIZE 10
 
 // bit_rate_table[mpeg_version_index][layer_index][bitrate_index]
 static const int bit_rate_table[4][4][16] =
@@ -106,6 +103,11 @@ mp3Reader::Sniff(int32 *streamCount)
 	}
 
 	TRACE("mp3Reader::Sniff: looks like an mp3 file\n");
+	
+	if (!ParseFile()) {
+		TRACE("mp3Reader::Sniff: parsing file failed\n");
+		return B_ERROR;
+	}
 	
 
 	//fDataSize = Source()->Seek(0, SEEK_END);
@@ -251,11 +253,181 @@ mp3Reader::GetNextChunk(void *cookie,
 	return result;
 }
 
-ssize_t
-mp3Reader::ID3Size(uint8 *buffer, size_t len)
+bool
+mp3Reader::ParseFile()
 {
-	if (len < ID3_HEADER_SIZE)
-		return B_BAD_VALUE;
+	// Since we already know that this is an mp3 file,
+	// detect the real (mp3 audio) data start and end
+	// and find VBR or other headers and tags
+
+	const int32 search_size = 16384;
+	const int32 padding_size = 128; // Get???Length() functions need some bytes to look into
+	int64	offset;
+	int32	size;
+	uint8	buf[search_size];
+
+	fDataStart = -1;
+
+	for (offset = 0; offset < fFileSize; )  {
+		int64 maxsize = fFileSize - offset;
+		size = (search_size < maxsize) ? search_size : maxsize;
+
+		if (size != Source()->ReadAt(offset, buf, size)) {
+			TRACE("mp3ReaderPlugin::ParseFile reading %ld bytes at offset %Ld failed\n", size, offset);
+			return false;
+		}
+
+		int skip_bytes = 0;
+
+		// since the various Get???Length() functions need to check a few bytes
+		// (10 for ID3V2, about 40 for VBR), we stop searching before buffer end
+		int32 end = size - padding_size;
+		for (int32 pos = 0; pos < end; ) {
+			int hdr_length;
+			
+			// A Xing or Fraunhofer VBR header is embedded into a valid
+			// mp3 frame that contains silence. We need to first check
+			// for these headers before we can search for the start of a stream.
+			
+			hdr_length = GetXingVbrLength(&buf[pos]);
+			if (hdr_length > 0) {
+				TRACE("mp3ReaderPlugin::ParseFile found a Xing VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				goto skip_header;
+			}
+
+			hdr_length = GetFraunhoferVbrLength(&buf[pos]);
+			if (hdr_length > 0) {
+				TRACE("mp3ReaderPlugin::ParseFile found a Fraunhofer VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				goto skip_header;
+			}
+			
+			hdr_length = GetLameVbrLength(&buf[pos]);
+			if (hdr_length > 0) {
+				TRACE("mp3ReaderPlugin::ParseFile found a Lame VBR header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				goto skip_header;
+			}
+			
+			hdr_length = GetId3v2Length(&buf[pos]);
+			if (hdr_length > 0) {
+				TRACE("mp3ReaderPlugin::ParseFile found a ID3V2 header of %d bytes at position %Ld\n", hdr_length, offset + pos);
+				goto skip_header;
+			}
+		
+			if (IsValidStream(&buf[pos], size - pos)) {
+				fDataStart = offset + pos;
+				break;
+			}
+			
+			pos++;
+			continue;
+			
+			skip_header:
+				int skip_max = end - pos;
+				skip_bytes = (skip_max < hdr_length) ? skip_max : hdr_length;
+				pos += skip_bytes;
+				skip_bytes = hdr_length - skip_bytes;
+		}
+		if (fDataStart != -1)
+			break;
+
+		if (skip_bytes) {
+			offset += skip_bytes;
+			skip_bytes = 0;
+		} else {
+			offset += (search_size - padding_size);
+		}
+	}
+
+	fDataSize = fFileSize - fDataStart;
+	
+	TRACE("found mp3 audio data at file position %Ld, maximum data length is %Ld\n", fDataStart, fDataSize);
+
+	// search for a ID3 V1 tag
+	offset = fFileSize - 128;
+	size = 128;
+	if (offset > 0) {
+		if (size != Source()->ReadAt(offset, buf, size)) {
+			TRACE("mp3ReaderPlugin::ParseFile reading %ld bytes at offset %Ld failed\n", size, offset);
+			return false;
+		}
+		if (buf[0] == 'T'&& buf[1] == 'A' && buf[2] == 'G') {
+			TRACE("mp3ReaderPlugin::ParseFile found a ID3V1 header of 128 bytes at position %Ld\n", offset);
+			fDataSize -= 128;
+		}
+	}
+
+	// search for a lyrics tag
+	// maximum size is 5100 bytes, and a 128 byte ID3V1 tag is always appended
+	// starts with "LYRICSBEGIN", end with "LYRICS200" or "LYRICSEND"
+	offset = fFileSize - 5300;
+	size = 5300;
+	if (offset < 0) {
+		offset = 0;
+		size = fFileSize;
+	}
+	if (size != Source()->ReadAt(offset, buf, size)) {
+		TRACE("mp3ReaderPlugin::ParseFile reading %ld bytes at offset %Ld failed\n", size, offset);
+		return false;
+	}
+	for (int pos = 0; pos < size; pos++) {
+		if (buf[pos] != 'L')
+			continue;
+		if (0 == memcmp(&buf[pos], "LYRICSBEGIN", 11)) {
+			TRACE("mp3ReaderPlugin::ParseFile found a Lyrics header at position %Ld\n", offset + pos);
+			fDataSize = fDataStart - offset + pos;
+		}
+	}
+	
+	// might search for APE tags, too
+
+	TRACE("found mp3 audio data at file position %Ld, data length is %Ld\n", fDataStart, fDataSize);
+	
+	return true;
+}
+
+int
+mp3Reader::GetXingVbrLength(uint8 *header)
+{
+	int h_id	= (header[1] >> 3) & 1;
+	int h_mode	= (header[3] >> 6) & 3;
+	uint8 *xing_header;
+	
+	// determine offset of header
+	if(h_id) // mpeg1
+		xing_header = (h_mode != 3) ? (header + 36) : (header + 21);
+	else	 // mpeg2
+		xing_header = (h_mode != 3) ? (header + 21) : (header + 13);
+
+	// note: in CBR files, there is an 'Info' tag of the same format
+	if (xing_header[0] != 'X') return -1;
+	if (xing_header[1] != 'i') return -1;
+	if (xing_header[2] != 'n') return -1;
+	if (xing_header[3] != 'g') return -1;
+
+	return GetFrameLength(header);
+}
+
+int
+mp3Reader::GetLameVbrLength(uint8 *header)
+{
+	return -1;
+}
+
+int
+mp3Reader::GetFraunhoferVbrLength(uint8 *header)
+{
+	if (header[0] != 0xff) return -1;
+	if (header[36] != 'V') return -1;
+	if (header[37] != 'B') return -1;
+	if (header[38] != 'R') return -1;
+	if (header[39] != 'I') return -1;
+
+	return GetFrameLength(header);
+}
+
+int
+mp3Reader::GetId3v2Length(uint8 *buffer)
+{
 	if ((buffer[0] == 'I') && /* magic */
 	    (buffer[1] == 'D') &&
 	    (buffer[2] == '3') &&
@@ -271,8 +443,7 @@ mp3Reader::ID3Size(uint8 *buffer, size_t len)
 bool
 mp3Reader::IsMp3File()
 {
-	// //! To detect an mp3 file, we seek into the middle,
-	// To detect an mp3 file, we first check for an ID3,
+	// To detect an mp3 file, we seek into the middle,
 	// and search for a valid sequence of 3 frame headers.
 	// A mp3 frame has a maximum length of 2881 bytes, we
 	// load a block of 16kB and use it to search.
@@ -281,29 +452,7 @@ mp3Reader::IsMp3File()
 	int64	offset;
 	int32	size;
 	uint8	buf[search_size];
-	ssize_t id3size;
 
-	offset = 0;
-	size = (search_size > fFileSize)?fFileSize:search_size;
-	TRACE("searching for mp3 frame headers or ID3 at %Ld in %ld bytes\n", offset, size);
-
-	if (size != Source()->ReadAt(offset, buf, size)) {
-		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
-		return false;
-	}
-	id3size = ID3Size(buf, size);
-	if (id3size > 0) {
-		TRACE("found ID3, size %ld, skipping...\n", id3size);
-		offset += id3size;
-		size = (search_size+offset > fFileSize)?(fFileSize-offset):(search_size);
-		TRACE("searching for mp3 frame headers or ID3 at %Ld in %ld bytes\n", offset, size);
-
-		if (size != Source()->ReadAt(offset, buf, size)) {
-			TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
-			return false;
-		}
-	}
-#if 0
 	size = search_size;
 	offset = fFileSize / 2 - search_size / 2;
 	if (size > fFileSize) {
@@ -317,27 +466,43 @@ mp3Reader::IsMp3File()
 		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
 		return false;
 	}
-#endif
-	
-	for (int32 pos = 0; pos < (size - 8); pos++) {
-		int length1, length2, length3;
-		
-		//TRACE("---- checking for frame at %Ld\n", offset + pos);
-		length1 = GetFrameLength(&buf[pos]);
-		if (length1 < 0 || (pos + length1 + 4) > size)
+
+	int32 end = size - 4;
+	for (int32 pos = 0; pos < end; pos++) {
+		if (buf[pos] != 0xff) // quick check
 			continue;
-		TRACE("    found a valid frame header at file position %Ld\n", offset + pos);
-		length2 = GetFrameLength(&buf[pos + length1]);
-		if (length2 < 0 || (pos + length1 + length2 + 4) > size)
-			continue;
-		TRACE("##  found second valid frame header at file position %Ld\n", offset + pos + length1);
-		length3 = GetFrameLength(&buf[pos + length1 + length2]);
-		if (length3 < 0)
-			continue;
-		TRACE("### found third valid frame header at file position %Ld\n", offset + pos + length1 + length2);
-		return true;	
+		if (IsValidStream(&buf[pos], size - pos))
+			return true;
 	}
 	return false;
+}
+
+bool
+mp3Reader::IsValidStream(uint8 *buffer, int size)
+{
+	// check 3 consecutive frame headers to make sure
+	// that the length encoded in the header is correct,
+	// and also that mpeg version and layer do not change
+	int length1 = GetFrameLength(buffer);
+	if (length1 < 0 || (length1 + 4) > size)
+		return false;
+	int version_index1 = (buffer[1] >> 3) & 0x03;
+	int layer_index1 = (buffer[1] >> 1) & 0x03;
+	int length2 = GetFrameLength(buffer + length1);
+	if (length2 < 0 || (length1 + length2 + 4) > size)
+		return false;
+	int version_index2 = (buffer[length1 + 1] >> 3) & 0x03;
+	int layer_index2 = (buffer[length1 + 1] >> 1) & 0x03;
+	if (version_index1 != version_index2 || layer_index1 != layer_index1)
+		return false;
+	int length3 = GetFrameLength(buffer + length1 + length2);
+	if (length3 < 0)
+		return false;
+	int version_index3 = (buffer[length1 + length2 + 1] >> 3) & 0x03;
+	int layer_index3 = (buffer[length1 + length2 + 1] >> 1) & 0x03;
+	if (version_index2 != version_index3 || layer_index2 != layer_index3)
+		return false;
+	return true;
 }
 
 int
@@ -376,7 +541,7 @@ mp3Reader::GetFrameLength(void *header)
 	TRACE("%s %s, %s crc, bit rate %d, sampling rate %d, padding %d, frame length %d\n",
 		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
 		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
-		no_crc?"no":"has",
+		no_crc ? "no" : "has",
 		bitrate, samplingrate, padding, length);
 	
 	return length;

@@ -32,9 +32,17 @@ public:
 	BPositionIO *Source() { return fSeekableSource; }
 
 private:
-	ssize_t		ID3Size(uint8 *buffer, size_t len);
+	bool		ParseFile();
 	bool 		IsMp3File();
+	
+	// checks if the buffer contains a valid mp3 stream, length should be
+	bool		IsValidStream(uint8 *buffer, int size);
+	
 	int			GetFrameLength(void *header);
+	int			GetXingVbrLength(uint8 *header);
+	int			GetFraunhoferVbrLength(uint8 *header);
+	int			GetLameVbrLength(uint8 *header);
+	int			GetId3v2Length(uint8 *header);
 	
 	bool		FindData();
 	
@@ -42,6 +50,9 @@ private:
 private:
 	BPositionIO *	fSeekableSource;
 	int64			fFileSize;
+	
+	int64			fDataStart;
+	int64			fDataSize;
 };
 
 
