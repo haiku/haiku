@@ -36,7 +36,7 @@ else
 fi
 imageSize=40
 # ufs_mount path
-ufsMount=/boot/home/config/bin/ufs_mount
+ufsMount=ufs_mount
 
 # build everything needed
 previousDir=`pwd`
@@ -54,7 +54,8 @@ RUN_WITHOUT_APP_SERVER=1
 
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	true false ls df mount unmount cp mv ps sh mkdir sleep \
-	grep cat less clockconfig du rm date shutdown safemode"
+	grep cat less clockconfig du rm date find locate xargs isvolume \
+	shutdown safemode"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
@@ -91,7 +92,7 @@ mkdir -p beos/system/lib
 mkdir -p beos/system/boot
 mkdir -p beos/etc
 mkdir -p home/config
-
+mkdir -p home/config/settings
 
 # modules
 
@@ -153,6 +154,8 @@ cd $sourceDir
 cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
 cp data/etc/profile $targetDir/beos/etc/
 cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
+cp -R distro/x86.R1/beos/etc /haiku/beos/
+ln -sf /boot/beos/etc/timezones/Europe/Paris /haiku/home/config/settings/timezone
 
 # boot loader
 cd $targetDir/beos/system
@@ -187,6 +190,15 @@ cd $previousDir
 sync
 
 if [ ! $alreadyMounted ]; then
+	sleep 1
 	unmount $targetDir
+	sleep 1
+	sync
 	rmdir $targetDir
+	sync
 fi
+
+if [ $archive ]; then
+	zip haiku.zip $imagePath
+fi
+
