@@ -2,6 +2,7 @@
  * @file MidiRoster.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"

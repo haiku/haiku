@@ -2,6 +2,7 @@
  * @file MidiLocalProducer.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"
@@ -10,8 +11,9 @@
 //------------------------------------------------------------------------------
 
 BMidiLocalProducer::BMidiLocalProducer(const char* name)
+	: BMidiProducer(name)
 {
-	UNIMPLEMENTED
+	fFlags |= 0x10;
 }
 
 //------------------------------------------------------------------------------

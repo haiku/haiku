@@ -2,6 +2,7 @@
  * @file MidiEndpoint.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"
@@ -11,39 +12,37 @@
 
 const char* BMidiEndpoint::Name() const
 {
-	UNIMPLEMENTED
-	return NULL;
+	return fName.String();
 }
 
 //------------------------------------------------------------------------------
 
 void BMidiEndpoint::SetName(const char* name)
 {
-	UNIMPLEMENTED
+	BMidiRoster *roster = BMidiRoster::MidiRoster();
+	roster->Rename(this, name);
+	fName.SetTo(name);
 }
 
 //------------------------------------------------------------------------------
 
 int32 BMidiEndpoint::ID() const
 {
-	UNIMPLEMENTED
-	return 0;
+	return fID;
 }
 
 //------------------------------------------------------------------------------
 
 bool BMidiEndpoint::IsProducer() const
 {
-	UNIMPLEMENTED
-	return false;
+return (fFlags && 0x01) == 0x01;
 }
 
 //------------------------------------------------------------------------------
 
 bool BMidiEndpoint::IsConsumer() const
 {
-	UNIMPLEMENTED
-	return false;
+return (fFlags && 0x01) == 0x01;
 }
 
 //------------------------------------------------------------------------------
@@ -82,16 +81,24 @@ bool BMidiEndpoint::IsValid() const
 
 status_t BMidiEndpoint::Release()
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	if (1 == atomic_add(&fRefCount, -1))
+	{
+		Unregister();
+		delete this;
+		return B_OK;
+	}
+	else
+	{
+		return B_ERROR;
+	}
 }
 
 //------------------------------------------------------------------------------
 
 status_t BMidiEndpoint::Acquire()
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	atomic_add(&fRefCount, 1);
+	return B_OK;
 }
 
 //------------------------------------------------------------------------------
@@ -130,7 +137,11 @@ status_t BMidiEndpoint::Unregister(void)
 
 BMidiEndpoint::BMidiEndpoint(const char* name)
 {
-	UNIMPLEMENTED
+	fName = BString(name);
+	fStatus = B_OK;
+	fFlags = 0;
+	fRefCount = 0;
+//	fID = MidiRosterApp::GetNextFreeID();
 }
 
 //------------------------------------------------------------------------------

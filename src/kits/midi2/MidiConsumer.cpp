@@ -2,6 +2,7 @@
  * @file MidiConsumer.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"
@@ -12,8 +13,7 @@
 
 bigtime_t BMidiConsumer::Latency() const
 {
-	UNIMPLEMENTED
-	return 0LL;
+	return fLatency;
 }
 
 //------------------------------------------------------------------------------
@@ -21,14 +21,15 @@ bigtime_t BMidiConsumer::Latency() const
 BMidiConsumer::BMidiConsumer(const char* name)
 	: BMidiEndpoint(name)
 {
-	UNIMPLEMENTED
+	fLatency = 0;
 }
 
 //------------------------------------------------------------------------------
 
 BMidiConsumer::~BMidiConsumer()
 {
-	UNIMPLEMENTED
+	if (fEventPort != B_NO_MORE_PORTS)
+		delete_port(fEventPort);
 }
 
 //------------------------------------------------------------------------------

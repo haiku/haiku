@@ -2,6 +2,7 @@
  * @file MidiProducer.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"
@@ -12,32 +13,39 @@
 
 status_t BMidiProducer::Connect(BMidiConsumer* toObject)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	if (toObject != NULL)
+		if (fConnections->Add(toObject) == true)
+			fConnectionCount++;
+	BMidiRoster *roster = BMidiRoster::MidiRoster();
+	return roster->Connect(this, toObject);
 }
 
 //------------------------------------------------------------------------------
 
 status_t BMidiProducer::Disconnect(BMidiConsumer* toObject)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	if (toObject != NULL)
+		if (fConnections->Remove(toObject) == true)
+		{
+			fConnectionCount--;
+			BMidiRoster *roster = BMidiRoster::MidiRoster();
+			return roster->Disconnect(this, toObject);
+		}
+return B_ERROR;
 }
 
 //------------------------------------------------------------------------------
 
 bool BMidiProducer::IsConnected(BMidiConsumer* toObject) const
 {
-	UNIMPLEMENTED
-	return false;
+return fConnections->IsIn(toObject);
 }
 
 //------------------------------------------------------------------------------
 
 BList* BMidiProducer::Connections() const
 {
-	UNIMPLEMENTED
-	return NULL;
+return fConnections;
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +53,9 @@ BList* BMidiProducer::Connections() const
 BMidiProducer::BMidiProducer(const char* name)
 	: BMidiEndpoint(name)
 {
-	UNIMPLEMENTED
+	fConnections = new BMidiList();
+	fConnectionCount = 1;
+	fLock = BLocker("BMidiProducer Lock");
 }
 
 //------------------------------------------------------------------------------

@@ -2,6 +2,7 @@
  * @file MidiLocalConsumer.cpp
  *
  * @author Matthijs Hollemans
+ * @author Jerome Leveque
  */
 
 #include "debug.h"
@@ -10,8 +11,9 @@
 //------------------------------------------------------------------------------
 
 BMidiLocalConsumer::BMidiLocalConsumer(const char* name)
+	: BMidiConsumer(name)
 {
-	UNIMPLEMENTED
+	fFlags |= 0x10;
 }
 
 //------------------------------------------------------------------------------
@@ -25,22 +27,22 @@ BMidiLocalConsumer::~BMidiLocalConsumer()
 
 void BMidiLocalConsumer::SetLatency(bigtime_t latency)
 {
-	UNIMPLEMENTED
+	fLatency = latency;
 }
 
 //------------------------------------------------------------------------------
 
 int32 BMidiLocalConsumer::GetProducerID(void)
 {
-	UNIMPLEMENTED
-	return 0;
+return fCurrentProducer;
 }
 
 //------------------------------------------------------------------------------
 
 void BMidiLocalConsumer::SetTimeout(bigtime_t when, void* data)
 {
-	UNIMPLEMENTED
+	fTimeout = when;
+	fTimeoutData = data;
 }
 
 //------------------------------------------------------------------------------
