@@ -13,22 +13,29 @@ static Voodoo3Accel accel = { 0, 0, 0, 0, 0};
 #define abs(x) (x<0?-x:x)
 
 
-static __inline__ void write_crt_registers(uint8 reg, uint8 val)
+static __inline__ void
+write_crt_registers(uint8 reg, uint8 val)
 {
 	outw(accel.io_base + CRTC_INDEX - 0x300, (val << 8) | reg);
 }
 
-static __inline__ void write_seq_registers(uint8 reg, uint8 val)
+
+static __inline__ void
+write_seq_registers(uint8 reg, uint8 val)
 {
 	outw(accel.io_base + SEQ_INDEX - 0x300, (val << 8) | reg);
 }
 
-static __inline__ void write_graph_registers(uint8 reg, uint8 val)
+
+static __inline__ void
+write_graph_registers(uint8 reg, uint8 val)
 {
 	outw(accel.io_base + GRA_INDEX - 0x300, (val << 8) | reg);
 }
 
-static __inline__ void write_attr_registers(uint8 reg, uint8 val)
+
+static __inline__ void
+write_attr_registers(uint8 reg, uint8 val)
 {
 	uint8 index;
     inb (accel.io_base + IS1_R - 0x300);
@@ -38,25 +45,37 @@ static __inline__ void write_attr_registers(uint8 reg, uint8 val)
     outb(accel.io_base + ATT_IW - 0x300, index);
 }
 
-static inline void vga_outb(unsigned long reg,  unsigned char val)
+
+static inline void
+vga_outb(unsigned long reg,  unsigned char val)
 { 
 	outb(accel.io_base + reg - 0x300, val); 
 }
 
-static inline void voodoo3_write32(unsigned int reg, unsigned long val)
+
+static inline void
+voodoo3_write32(unsigned int reg, unsigned long val)
 {
 	PCI_MEM_WR_32(accel.regs_base + reg, val);
 }
 
-static inline uint32 voodoo3_read32(unsigned int reg) {
+
+static inline uint32
+voodoo3_read32(unsigned int reg)
+{
 	return PCI_MEM_RD_32(accel.regs_base + reg);
 }
 
-static inline void voodoo3_make_room(unsigned int len) {
+
+static inline void
+voodoo3_make_room(unsigned int len)
+{
 	while((voodoo3_read32(STATUS) & 0x1f) < len);
 }
 
-static void voodoo3_initialize()
+
+static void
+voodoo3_initialize(void)
 {
 	unsigned long vgainit0 = 0;
 	unsigned long vidcfg = 0;
@@ -80,7 +99,9 @@ static void voodoo3_initialize()
 	voodoo3_wait_idle();
 }
 
-int voodoo3_init(uint8 *registers_base, uint32 io_base)
+
+int
+voodoo3_init(uint8 *registers_base, uint32 io_base)
 {
 	if(!registers_base) return 0;
 	accel.regs_base = registers_base;
@@ -89,12 +110,16 @@ int voodoo3_init(uint8 *registers_base, uint32 io_base)
 	return 1;
 }
 
-uint32 voodoo3_bits_per_pixel()
+
+uint32
+voodoo3_bits_per_pixel(void)
 {
 	return accel.bpp;
 }
 
-void voodoo3_set_monitor_defaults()
+
+void
+voodoo3_set_monitor_defaults(void)
 {
 	MonitorRegs m; 
 	MonitorRegs *mode;
@@ -137,10 +162,11 @@ void voodoo3_set_monitor_defaults()
     
 	for (i = 0; i < 0x19; i ++)
 		write_crt_registers(i, mode->crtc_regs[i]);
-
 }
 
-void voodoo3_wait_idle()
+
+void
+voodoo3_wait_idle(void)
 {
 	int i = 0;
 
@@ -156,7 +182,8 @@ void voodoo3_wait_idle()
 #define REFFREQ 14318.18
 
 static int
-voodoo3_calc_pll(int freq, int *f_out, int isBanshee) {
+voodoo3_calc_pll(int freq, int *f_out, int isBanshee)
+{
   int m, n, k, best_m, best_n, best_k, f_cur, best_error;
   int minm, maxm;
 
@@ -203,7 +230,9 @@ voodoo3_calc_pll(int freq, int *f_out, int isBanshee) {
   return (n<<8)|(m<<2)|k;
 }
 
-void voodoo3_setup_monitor(display_mode *dm)
+
+void
+voodoo3_setup_monitor(display_mode *dm)
 {
 	MonitorRegs mod; MonitorRegs *mode;
 	int i;
@@ -336,7 +365,9 @@ void voodoo3_setup_monitor(display_mode *dm)
         write_graph_registers(i, mode->graph_regs[i]);
 }
 
-void voodoo_set_desktop_regs(uint32 bits_per_pixel, display_mode *dm)
+
+void
+voodoo_set_desktop_regs(uint32 bits_per_pixel, display_mode *dm)
 {
 	uint32 miscinit0=0;
 	int vidpll, fout;
@@ -401,7 +432,10 @@ void voodoo_set_desktop_regs(uint32 bits_per_pixel, display_mode *dm)
 }
 
 #if __POWERPC__
-static uint32 ppcSwap(uint32 val, uint32 bpp) {
+// ToDo: use the standard ByteOrder.h macros!
+static uint32
+ppcSwap(uint32 val, uint32 bpp)
+{
   switch (bpp) {
 	  default:
 	    return val;
@@ -419,7 +453,9 @@ static uint32 ppcSwap(uint32 val, uint32 bpp) {
 #endif
 
 
-void voodoo3_set_cursor(uint8 *data, uint16 width, uint8 height, uint8 *andMask, uint8 *xorMask)
+void
+voodoo3_set_cursor(uint8 *data, uint16 width, uint8 height, uint8 *andMask,
+	uint8 *xorMask)
 {
 	int i;
 	uint32 fbcurptr=voodoo3_read32(HWCURPATADDR);
@@ -446,48 +482,48 @@ void voodoo3_set_cursor(uint8 *data, uint16 width, uint8 height, uint8 *andMask,
       cursor32[i] = ppcSwap(val,accel.bpp);
     }
 #endif
-
 }
 
-void voodoo3_init_cursor_address()
-{
 
+void
+voodoo3_init_cursor_address(void)
+{
 	voodoo3_make_room(1);
 	voodoo3_write32(HWCURPATADDR, 0);
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_set_cursor_colors(int fg, int bg)
+
+void
+voodoo3_set_cursor_colors(int fg, int bg)
 {
-
-
 	voodoo3_make_room(2);
 	voodoo3_write32(HWCURC0, bg & 0xffffff);
 	voodoo3_write32(HWCURC1, fg  & 0xffffff);
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_show_cursor()
-{
 
+void
+voodoo3_show_cursor(void)
+{
 	voodoo3_make_room(1);
 	voodoo3_write32(VIDPROCCFG, voodoo3_read32(VIDPROCCFG) | (1 << 27));
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_hide_cursor()
-{
 
+void
+voodoo3_hide_cursor(void)
+{
 	voodoo3_make_room(1);
 	voodoo3_write32(VIDPROCCFG, voodoo3_read32(VIDPROCCFG) & ~(1 << 27));
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_move_cursor(int x, int y)
+
+void
+voodoo3_move_cursor(int x, int y)
 {
 	#if __INTEL__
 	#define xoffset 63
@@ -501,7 +537,10 @@ void voodoo3_move_cursor(int x, int y)
 	voodoo3_write32(HWCURLOC, x | (y << 16));
 }
 
-void voodoo3_screen_to_screen_blit(list_packet_blit *list, uint32 bytes_per_row, uint32 bits_per_pixel)
+
+void
+voodoo3_screen_to_screen_blit(list_packet_blit *list, uint32 bytes_per_row,
+	uint32 bits_per_pixel)
 {
 	uint32 fmt = bytes_per_row | ((bits_per_pixel + ((bits_per_pixel == 8) ? 0 : 8)) << 13);
 	uint32 blitcmd = COMMAND_2D_S2S_BITBLT | (ROP_COPY << 24);
@@ -523,10 +562,12 @@ void voodoo3_screen_to_screen_blit(list_packet_blit *list, uint32 bytes_per_row,
 	voodoo3_write32(DSTXY,     list->dest_x | (list->dest_y << 16));
 	voodoo3_write32(LAUNCH_2D, list->src_x | (list->src_y << 16)); 
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_fill_rect(list_packet *list, uint32 color, uint32 bytes_per_row, uint32 bits_per_pixel)
+
+void
+voodoo3_fill_rect(list_packet *list, uint32 color, uint32 bytes_per_row,
+	uint32 bits_per_pixel)
 {
 	uint32 fmt;
 	fmt = bytes_per_row | ((bits_per_pixel + ((bits_per_pixel == 8) ? 0 : 8)) << 13);
@@ -541,7 +582,10 @@ void voodoo3_fill_rect(list_packet *list, uint32 color, uint32 bytes_per_row, ui
 
 }
 
-void voodoo3_invert_rect(list_packet *list, uint32 color, uint32 bytes_per_row, uint32 bits_per_pixel)
+
+void
+voodoo3_invert_rect(list_packet *list, uint32 color, uint32 bytes_per_row,
+	uint32 bits_per_pixel)
 {
 	uint32 fmt;
 	fmt = bytes_per_row | ((bits_per_pixel + ((bits_per_pixel == 8) ? 0 : 8)) << 13);
@@ -553,10 +597,12 @@ void voodoo3_invert_rect(list_packet *list, uint32 color, uint32 bytes_per_row, 
 	voodoo3_write32(DSTSIZE,    list->w | (list->h << 16));
 	voodoo3_write32(LAUNCH_2D,  list->x | (list->y << 16));
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_fill_span(list_packet *list, uint32 color, uint32 bytes_per_row, uint32 bits_per_pixel)
+
+void
+voodoo3_fill_span(list_packet *list, uint32 color, uint32 bytes_per_row,
+	uint32 bits_per_pixel)
 {
 	uint32 fmt;
 	fmt = bytes_per_row | ((bits_per_pixel + ((bits_per_pixel == 8) ? 0 : 8)) << 13);
@@ -568,10 +614,11 @@ void voodoo3_fill_span(list_packet *list, uint32 color, uint32 bytes_per_row, ui
 	voodoo3_write32(DSTSIZE,    list->w | (list->h << 16));
 	voodoo3_write32(LAUNCH_2D,  list->x | (list->y << 16));
 	voodoo3_wait_idle();
-
 }
 
-void voodoo3_set_palette(int index, uint32 color)
+
+void
+voodoo3_set_palette(int index, uint32 color)
 {
 
 	voodoo3_make_room(2);
@@ -580,7 +627,10 @@ void voodoo3_set_palette(int index, uint32 color)
 
 }
 
-uint32 voodoo3_get_memory_size() {
+
+uint32
+voodoo3_get_memory_size(void)
+{
 	uint32 draminit0 = 0;
 	uint32 draminit1 = 0;
 	uint32 miscinit1 = 0;
@@ -603,8 +653,11 @@ uint32 voodoo3_get_memory_size() {
 	return lfbsize;
 }
 
-void voodoo3_display_overlay(const overlay_window *ow, const overlay_buffer *ob, const overlay_view* ov) {
 
+void
+voodoo3_display_overlay(const overlay_window *ow, const overlay_buffer *ob,
+	const overlay_view *ov)
+{
 	uint8 red, green, blue;
 	
 	int32 offset;
@@ -724,8 +777,10 @@ void voodoo3_display_overlay(const overlay_window *ow, const overlay_buffer *ob,
 	voodoo3_write32(VIDINADDR0, offset);
 }
 
-void voodoo3_reset_overlay() {
 
+void
+voodoo3_reset_overlay(void)
+{
     uint32 vidcfg, stride;
 
     vidcfg=voodoo3_read32(VIDPROCCFG);
@@ -738,12 +793,14 @@ void voodoo3_reset_overlay() {
     voodoo3_write32(RGBMAXDELTA, 0x0080808);
     voodoo3_write32(VIDCHROMAMIN, 0);
     voodoo3_write32(VIDCHROMAMAX, 0);
-
 }
 
-// To stop the overlay
-void voodoo3_stop_overlay() {
 
+// To stop the overlay
+
+void
+voodoo3_stop_overlay(void)
+{
     uint32 vidcfg;
 
     vidcfg=voodoo3_read32(VIDPROCCFG);
@@ -751,6 +808,5 @@ void voodoo3_stop_overlay() {
     /* reset the video */
 	vidcfg &= ~VIDPROCCFGMASK;
     voodoo3_write32(VIDPROCCFG, vidcfg);
-
 }
 
