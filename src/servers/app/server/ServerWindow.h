@@ -39,6 +39,7 @@
 class BString;
 class BMessenger;
 class BPoint;
+class BMessage;
 class ServerApp;
 class Decorator;
 class PortLink;
@@ -60,7 +61,8 @@ class ServerWindow
 {
 public:
 	ServerWindow(BRect rect, const char *string, uint32 wlook, uint32 wfeel,
-		uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index, int32 handlerID);
+				 uint32 wflags, ServerApp *winapp,  port_id winport,
+				 port_id looperPort, uint32 index, int32 handlerID);
 	~ServerWindow(void);
 	
 	void ReplaceDecorator(void);
@@ -98,11 +100,16 @@ public:
 	Workspace *GetWorkspace(void);
 	void SetWorkspace(Workspace *wkspc);
 
-	Layer *FindLayer(const Layer* start, int32 token) const;
+	//! Returns the window's title
+	const char *Title(void) { return _title->String(); }
+	
+	Layer* FindLayer(const Layer* start, int32 token) const;
+	void SendMessageToClient( const BMessage* msg ) const;
 protected:	
 	friend class ServerApp;
 	friend class WinBorder;
 	friend class Screen;
+	friend class Layer;
 	
 	BString *_title;
 	int32 _look, _feel, _flags;
@@ -124,6 +131,7 @@ protected:
 	
 // ADI:
 	BSession*	ses;
+	port_id		winLooperPort;
 	Layer*		top_layer;
 	Layer*		cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
 };
@@ -132,3 +140,9 @@ void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);
 
 
 #endif
+/*
+ @log
+	* added Layer as a friend.
+	* added a new member: port_id winLooperPort; We'll use it to send flattened BMessages(like _UPDATE_ / B_VIEW_RESIZED(MOVED)) to our BWindow counterpart.
+	* SendMessageToClient( BMessage ) sends that message BWindow's looper port.
+*/
