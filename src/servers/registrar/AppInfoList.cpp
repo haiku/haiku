@@ -84,6 +84,15 @@ AppInfoList::RemoveInfo(RosterAppInfo *info)
 	return fInfos.RemoveItem(info);
 }
 
+// MakeEmpty
+/*!	\brief Removes all RosterAppInfos from the list.
+*/
+void
+AppInfoList::MakeEmpty()
+{
+	fInfos.MakeEmpty();
+}
+
 // InfoFor
 /*!	\brief Returns the RosterAppInfo with the supplied signature.
 

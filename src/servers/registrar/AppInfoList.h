@@ -45,6 +45,7 @@ public:
 
 	bool AddInfo(RosterAppInfo *info);
 	bool RemoveInfo(RosterAppInfo *info);
+	void MakeEmpty();
 
 	RosterAppInfo *InfoFor(const char *signature) const;
 	RosterAppInfo *InfoFor(team_id team) const;
