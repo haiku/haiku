@@ -62,6 +62,8 @@ public:
 	void HandleGetAppList(BMessage *request);
 	void HandleActivateApp(BMessage *request);
 
+	status_t Init();
+
 	status_t AddApp(RosterAppInfo *info);
 	void RemoveApp(RosterAppInfo *info);
 	void ActivateApp(RosterAppInfo *info);

@@ -28,6 +28,7 @@
 #include <new.h>
 
 #include <Application.h>
+#include <AppMisc.h>
 
 #include "Debug.h"
 #include "RegistrarDefs.h"
@@ -583,6 +584,43 @@ TRoster::HandleActivateApp(BMessage *request)
 	}
 
 	FUNCTION_END();
+}
+
+// Init
+/*!	\brief Initializes the roster.
+
+	Currently only adds the registrar to the roster.
+	The application must already be running, more precisly Run() must have
+	been called.
+
+	\return
+	- \c B_OK: Everything went fine.
+	- an error code
+*/
+status_t
+TRoster::Init()
+{
+	status_t error = B_OK;
+	// create the info
+	RosterAppInfo *info = new(nothrow) RosterAppInfo;
+	if (!info)
+		error = B_NO_MEMORY;
+	// get the app's ref
+	entry_ref ref;
+	if (error == B_OK)
+		error = get_app_ref(&ref);
+	// init and add the info
+	if (error == B_OK) {
+		info->Init(be_app->Thread(), be_app->Team(), be_app_messenger.fPort,
+				   B_EXCLUSIVE_LAUNCH, &ref, kRegistrarSignature);
+		info->state = APP_STATE_REGISTERED;
+		info->registration_time = system_time();
+		error = AddApp(info);
+	}
+	// cleanup on error
+	if (error != B_OK && info)
+		delete info;
+	return error;
 }
 
 // AddApp
