@@ -947,15 +947,24 @@ tzsetwall P((void))
 	settzname();
 }
 
+
+#include <StorageDefs.h>
+void _get_tzfilename(char* filename, size_t length);
+
 void
 tzset P((void))
 {
 	register const char *	name;
+	char tzfilename[B_PATH_NAME_LENGTH];
 
 	name = getenv("TZ");
 	if (name == NULL) {
-		tzsetwall();
-		return;
+		_get_tzfilename(tzfilename, B_PATH_NAME_LENGTH);
+		if (tzfilename[0] == '\0') {
+			tzsetwall();
+			return;
+		}
+		name = tzfilename;
 	}
 
 	if (lcl_is_set > 0 && strcmp(lcl_TZname, name) == 0)
