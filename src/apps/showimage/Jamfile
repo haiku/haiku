@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps showimage ;
 
-AddResources ShowImage : ShowImage.rsrc ;
+AddResources ShowImage : ShowImage.rdef ;
 
 App ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
