@@ -40,10 +40,10 @@ struct net_layer_module_info nlmi;
 
 static struct net_stack_module_info *g_stack = NULL;
 
-net_attribute_id ethernet_header_attr;
-net_attribute_id ethernet_from_attr;
-net_attribute_id ethernet_to_attr;
-net_attribute_id ethernet_protocol_attr;
+string_token ethernet_header_attr;
+string_token ethernet_from_attr;
+string_token ethernet_to_attr;
+string_token ethernet_protocol_attr;
 
 
 static void dump_ethernet(net_buffer *buffer)
@@ -105,7 +105,7 @@ static status_t process_input(net_layer *me, net_buffer *buffer)
 	// strip ethernet header
 	g_stack->remove_from_buffer(buffer, 0, 14);
 
-	return g_stack->send_up(me, buffer);
+	return g_stack->send_layers_up(me, buffer);
 }
 
 

@@ -20,8 +20,8 @@ extern status_t 	unregister_layer(net_layer *layer);
 extern net_layer *	find_layer(const char *name);
 
 extern status_t 	add_layer_attribute(net_layer *layer, const void *id, int type, ...);
-extern status_t 	remove_layer_attribute(net_layer *layer, const void *id);
-extern status_t 	find_layer_attribute(net_layer *layer, const void *id,
+extern status_t 	remove_layer_attribute(net_layer *layer, const void *id, int index);
+extern status_t 	find_layer_attribute(net_layer *layer, const void *id, int index, 
 						int *type, void **attribute, size_t *size);
 
 extern status_t 	send_layers_up(net_layer *me, struct net_buffer *buffer);

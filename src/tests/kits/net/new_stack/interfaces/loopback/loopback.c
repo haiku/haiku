@@ -43,7 +43,7 @@ static status_t process_output(net_layer *me, net_buffer *buffer)
 		return B_ERROR;
 	
 	// Here the magical loopback effect ;-)
-	return g_stack->send_up(me, buffer);
+	return g_stack->send_layers_up(me, buffer);
 }
 
 // #pragma mark -

@@ -18,7 +18,7 @@ typedef struct net_buffer_chunk {
 	struct net_buffer_chunk *next_data;
 	uint32					ref_count;		// this data is referenced by 'ref_count' net_buffer_chunk(s)
 	const void 				*data;			// address of data
-	uint32					len;			// in bytes (could be 0, with *guest* add_buffer_free_element() node
+	size_t					len;			// in bytes (could be 0, with *guest* add_buffer_free_element() node
 	buffer_chunk_free_func	free_func;		// if NULL, don't free it!
 	void *					free_cookie;	// if != NULL, free_func(cookie, data) is called... otherwise, free_func(data)
 } net_buffer_chunk;
@@ -68,11 +68,11 @@ extern memory_pool_module_info *g_memory_pool;
 // Privates prototypes
 // -------------------
 
-static net_buffer_chunk * 	new_buffer_chunk(const void *data, uint32 len);
+static net_buffer_chunk * 	new_buffer_chunk(const void *data, size_t len);
 static net_buffer_chunk * 	find_buffer_chunk(net_buffer *buffer, uint32 offset, uint32 *offset_in_chunk, net_buffer_chunk **previous_chunk);
 
-static status_t	prepend_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
-static status_t append_buffer(net_buffer *buffer, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
+static status_t	prepend_buffer(net_buffer *buffer, const void *data, size_t bytes, buffer_chunk_free_func freethis);
+static status_t append_buffer(net_buffer *buffer, const void *data, size_t bytes, buffer_chunk_free_func freethis);
 
 static int32				buffers_purgatory_thread(void * data);
 
@@ -82,9 +82,6 @@ static status_t	 			buffer_queue_killer(memory_pool * pool, void * node, void * 
 
 // LET'S GO FOR IMPLEMENTATION
 // ------------------------------------
-
-
-//	#pragma mark [Start/Stop Service functions]
 
 
 // --------------------------------------------------
@@ -138,7 +135,7 @@ status_t stop_buffers_service()
 }
 
 
-// #pragma mark [Public functions]
+// #pragma mark -
 
 	
 // --------------------------------------------------
@@ -320,7 +317,7 @@ status_t attach_buffer_free_element(net_buffer *buffer, void *arg1, void *arg2, 
 
 
 // --------------------------------------------------
-status_t add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis)
+status_t add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, size_t bytes, buffer_chunk_free_func freethis)
 {
 	net_buffer_chunk 	*previous_chunk;
 	net_buffer_chunk 	*next_chunk;
@@ -405,7 +402,7 @@ error1:
 
 
 // --------------------------------------------------
-status_t remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes)
+status_t remove_from_buffer(net_buffer *buffer, uint32 offset, size_t bytes)
 {
 	net_buffer_chunk 	*first_chunk;
 	net_buffer_chunk 	*last_chunk;
@@ -474,12 +471,12 @@ status_t remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes)
 
 
 // --------------------------------------------------
-uint32 read_buffer(net_buffer *buffer, uint32 offset, void *data, uint32 bytes)
+size_t read_buffer(net_buffer *buffer, uint32 offset, void *data, size_t bytes)
 {
 	net_buffer_chunk 	*chunk;
 	uint32				offset_in_chunk;
-	uint32				len;
-	uint32				chunk_len;
+	size_t				len;
+	size_t				chunk_len;
 	uint8 				*from;
 	uint8 				*to;
 	
@@ -509,12 +506,12 @@ uint32 read_buffer(net_buffer *buffer, uint32 offset, void *data, uint32 bytes)
 
 
 // --------------------------------------------------
-uint32 write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes)
+size_t write_buffer(net_buffer *buffer, uint32 offset, const void *data, size_t bytes)
 {
 	net_buffer_chunk 	*chunk;
 	uint32			offset_in_chunk;
-	uint32			len;
-	uint32			chunk_len;
+	size_t			len;
+	size_t			chunk_len;
 	uint8 			*from;
 	uint8 			*to;
 	
@@ -545,42 +542,39 @@ uint32 write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 
 	return len;	
 }
 
+// #pragma mark -
 
 // --------------------------------------------------
-status_t add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...)
+status_t add_buffer_attribute(net_buffer *buffer, string_token id, int type, ...)
 {
-	net_attribute *attr;
-	
+	status_t status;
+	va_list args;
+
 	if (! buffer)
 		return B_BAD_VALUE;
 	
-	attr = new_attribute(&buffer->attributes, id);
-	if (! attr)
-		return B_NO_MEMORY;
-
 	if (type & FROM_BUFFER) {
-		va_list args;
+		net_attribute *attr;
 		net_buffer_chunk *chunk;
 		uint32 offset;
 		uint32 offset_in_chunk;
-		uint32 size;
+		size_t size;
 		uint8 *ptr;
 			
-		type = (type & NET_ATTRIBUTE_FLAGS_MASK);
-		
 		va_start(args, type);
-		offset 	= va_arg(args, int);
-		size 	= va_arg(args, int);
+		offset 	= va_arg(args, uint32);
+		size 	= va_arg(args, size_t);
 		va_end(args);
-		
+
 		chunk = find_buffer_chunk(buffer, offset, &offset_in_chunk, NULL);
-		if (chunk == NULL) {
-			delete_attribute(attr, &buffer->attributes);
+		if (chunk == NULL)
 			return B_BAD_VALUE;
-		};
+
+		attr = new_attribute(&buffer->attributes, id);
+		if (! attr)
+			return B_NO_MEMORY;
 
 		attr->size = size;
-		
 		if (size < chunk->len - offset_in_chunk) {
 			ptr  = (uint8 *) chunk->data;
 			ptr += offset_in_chunk;
@@ -614,26 +608,30 @@ status_t add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...)
 			};
 	
 			attr->type = type | NET_ATTRIBUTE_IOVEC;
-		}
+		};
+
+		status = B_OK;
 
 	} else {
-		// Not implemented
-		return B_ERROR;	
-	}
+		// default attribute types
+		va_start(args, type);
+		status = add_attribute(&buffer->attributes, id, type, args);
+		va_end(args);
+	};
 
-	return B_OK;
+	return status;
 }
 
 
 // --------------------------------------------------
-status_t remove_buffer_attribute(net_buffer *buffer, const void *id)
+status_t remove_buffer_attribute(net_buffer *buffer, string_token id, int index)
 {
 	net_attribute *attr;
 
 	if (! buffer)
 		return B_BAD_VALUE;
 	
-	attr = find_attribute(buffer->attributes, id, NULL, NULL, NULL);
+	attr = find_attribute(buffer->attributes, id, index, NULL, NULL, NULL);
 	if (! attr)
 		return B_NAME_NOT_FOUND;
 
@@ -641,14 +639,14 @@ status_t remove_buffer_attribute(net_buffer *buffer, const void *id)
 }
 
 
-status_t find_buffer_attribute(net_buffer *buffer, const void *id, int *type, void **value, size_t *size)
+status_t find_buffer_attribute(net_buffer *buffer, string_token id, int index, int *type, void **value, size_t *size)
 {
 	net_attribute *attr;
 
 	if (! buffer)
 		return B_BAD_VALUE;
 	
-	attr = find_attribute(buffer->attributes, id, type, value, size);
+	attr = find_attribute(buffer->attributes, id, index, type, value, size);
 	if (! attr)
 		return B_NAME_NOT_FOUND;
 
@@ -656,7 +654,7 @@ status_t find_buffer_attribute(net_buffer *buffer, const void *id, int *type, vo
 }
 
 
-//	#pragma mark [buffer(s) queues functions]
+// #pragma mark -
 
 // --------------------------------------------------
 net_buffer_queue * new_buffer_queue(size_t max_bytes)
@@ -807,7 +805,7 @@ size_t  dequeue_buffer(net_buffer_queue *queue, net_buffer **buffer, bigtime_t t
 }	
 
 
-//	#pragma mark [Helper functions]
+// #pragma mark -
 
 // --------------------------------------------------
 static net_buffer_chunk * new_buffer_chunk(const void *data, uint32 len)
@@ -979,7 +977,7 @@ void dump_buffer(net_buffer *buffer)
 
 }
 
-// #pragma mark [Packets Purgatory functions]
+// #pragma mark -
 
 // --------------------------------------------------
 static int32 buffers_purgatory_thread(void *data)

@@ -13,6 +13,7 @@
 #include "memory_pool.h"
 #include "layers_manager.h"
 #include "buffer.h"
+#include "attribute.h"
 #include "stack.h"	// for string_{to|for}_token()
 
 struct layers_list {
@@ -31,10 +32,8 @@ static status_t		delete_layer(net_layer *layer);
 
 extern memory_pool_module_info *g_memory_pool;
 
-string_token  g_joker_token = 0;
-
-//	#pragma mark [Start/Stop functions]
-
+string_token  		g_joker_token = 0;
+string_token		g_layers_trace_attr = 0;
 
 // --------------------------------------------------
 status_t start_layers_manager(void)
@@ -43,6 +42,7 @@ status_t start_layers_manager(void)
 	net_layer 	*layer;
 
 	g_joker_token = string_to_token("*");
+	g_layers_trace_attr = string_to_token("layers_trace");
 
 	g_layers.first = NULL;
 	
@@ -132,7 +132,7 @@ status_t stop_layers_manager(void)
 
 
 
-// #pragma mark [Public functions]
+// #pragma mark -
 
 // --------------------------------------------------
 status_t register_layer(const char *name, const char *type, int priority,
@@ -243,41 +243,53 @@ net_layer * find_layer(const char *name)
 	return layer;	
 }
 
+// #pragma mark -
 
 // --------------------------------------------------
 status_t add_layer_attribute(net_layer *layer, const void *id, int type, ...)
 {
+	status_t status;
 	va_list args;
 	
 	va_start(args, type);
-
-	switch(type) {
-	case NET_ATTRIBUTE_DATA:
-		// hack
-		layer->cookie = va_arg(args, void *);
-		break;
-	}
-
+	status = add_attribute(&layer->attributes, id, type, args);
 	va_end(args);
 	
-	return B_OK;
+	return status;
 }
 
 
 // --------------------------------------------------
-status_t remove_layer_attribute(net_layer *layer, const void *id)
+status_t remove_layer_attribute(net_layer *layer, const void *id, int index)
 {
-	return B_ERROR;
+	net_attribute *attr;
+
+	if (! layer)
+		return B_BAD_VALUE;
+	
+	attr = find_attribute(layer->attributes, id, index, NULL, NULL, NULL);
+	if (! attr)
+		return B_NAME_NOT_FOUND;
+
+	return delete_attribute(attr, &layer->attributes);
 }
 
-
-status_t find_layer_attribute(net_layer *layer, const void *id, int *type,
-	void **attribute, size_t *size)
+status_t find_layer_attribute(net_layer *layer, const void *id, int index, int *type,
+	void **value, size_t *size)
 {
-	*attribute = &layer->cookie;
+	net_attribute *attr;
+
+	if (! layer)
+		return B_BAD_VALUE;
+	
+	attr = find_attribute(layer->attributes, id, index, type, value, size);
+	if (! attr)
+		return B_NAME_NOT_FOUND;
+
 	return B_OK;
 }
 
+// #pragma mark -
 
 // --------------------------------------------------
 status_t send_layers_up(net_layer *layer, net_buffer *buffer)
@@ -288,6 +300,8 @@ status_t send_layers_up(net_layer *layer, net_buffer *buffer)
 
 	if (!layer)
 		return B_ERROR;
+
+	add_buffer_attribute(buffer, g_layers_trace_attr, NET_ATTRIBUTE_STRING, layer->name),
 
 	status = acquire_sem(g_layers.lock);
 	if (status != B_OK)
@@ -344,10 +358,13 @@ status_t send_layers_down(net_layer *layer, net_buffer *buffer)
 	if (!layer)
 		return B_ERROR;
 
+
 	// #### TODO: lock the layer(s) above & below hierarchy
 	if (!layer->layers_below)
 		// no layers below this one
 		return B_ERROR;
+
+	add_buffer_attribute(buffer, g_layers_trace_attr, NET_ATTRIBUTE_STRING, layer->name),
 	
 	status = B_ERROR;
 	i = 0;
@@ -358,15 +375,17 @@ status_t send_layers_down(net_layer *layer, net_buffer *buffer)
 			continue;
 			
 		status = below->module->process_output(below, buffer);
-		if (status == B_OK)
+		if (status == B_OK) {
+			atomic_add(&below->use_count, 1);
+			// TODO: resort this layer with previous one, if required.								
 			return status;
+		};
 	};
 
 	return status;
 }
 
-// #pragma mark [Private functions]
-
+// #pragma mark -
 
 // --------------------------------------------------
 static net_layer * new_layer(const char *name, const char *type, int priority,
@@ -405,6 +424,8 @@ static net_layer * new_layer(const char *name, const char *type, int priority,
 
 	layer->layers_above = NULL;
 	layer->layers_below = NULL;
+	
+	layer->attributes = NULL;
 
 	return layer;
 }
@@ -427,7 +448,21 @@ static status_t delete_layer(net_layer *layer)
 		free(layer->layers_above);
 	if (layer->layers_below)
 		free(layer->layers_below);
-		
+
+	if (layer->attributes) {
+		// Free layer attributes
+
+		net_attribute *attr;
+		net_attribute *next_attr;
+
+		attr = layer->attributes;
+		while (attr) {
+			next_attr = attr->next;
+			delete_attribute(attr, NULL);
+			attr = next_attr;
+		};
+	};
+	
 	return g_memory_pool->delete_pool_node(g_layers_pool, layer);
 }
 

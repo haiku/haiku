@@ -16,7 +16,7 @@
 
 typedef struct ipv4_addr { 
         uint8 byte[4]; 
-} ipv4_addr; 
+} _PACKED ipv4_addr; 
 
 
 typedef struct ipv4_header {
@@ -43,7 +43,7 @@ status_t 	std_ops(int32 op, ...);
 struct net_layer_module_info nlmi;
 
 static struct net_stack_module_info *g_stack = NULL;
-net_attribute_id ethernet_protocol_attr;
+string_token ethernet_protocol_attr;
 static uint32 g_next_ipv4_id = 0;
 
 static void dump_ipv4_header(net_buffer *buffer)
@@ -109,7 +109,7 @@ static status_t process_input(net_layer *me, net_buffer *buffer)
 	if (!buffer)
 		return B_ERROR;
 
-	if (g_stack->find_buffer_attribute(buffer, ethernet_protocol_attr, NULL, (void **) &protocol, NULL) != B_OK)
+	if (g_stack->find_buffer_attribute(buffer, ethernet_protocol_attr, 0, NULL, (void **) &protocol, NULL) != B_OK)
 		return B_ERROR;
 
 	if (*protocol != htons(0x0800))	// IPv4 on Ethernet protocol value

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iovec.h>
+#include <stdarg.h>
 
 #include <KernelExport.h>
 #include <OS.h>
@@ -17,14 +18,80 @@
 static memory_pool *g_attributes_pool = NULL;
 extern memory_pool_module_info *g_memory_pool;
 
-
 // Privates prototypes
 // -------------------
 
 // LET'S GO FOR IMPLEMENTATION
 // ------------------------------------
 
-net_attribute * new_attribute(net_attribute **in_list, const void *id)
+status_t add_attribute(net_attribute **in_list, string_token id, int type, va_list args)
+{
+	net_attribute *attr;
+	
+	attr = new_attribute(in_list, id);
+	if (! attr)
+		return B_NO_MEMORY;
+		
+	attr->type = type;
+	switch(type & NET_ATTRIBUTE_TYPE_MASK) {
+	case NET_ATTRIBUTE_BOOL:
+		attr->u.boolean = va_arg(args, bool);
+		break;
+					
+	case NET_ATTRIBUTE_BYTE:
+		attr->u.byte = va_arg(args, uint8);
+		break;
+					
+	case NET_ATTRIBUTE_INT16:
+		attr->u.word = va_arg(args, uint16);
+		break;
+					
+	case NET_ATTRIBUTE_INT32:
+		attr->u.dword = va_arg(args, uint32);
+		break;
+					
+	case NET_ATTRIBUTE_INT64:
+		attr->u.ddword = va_arg(args, uint64);
+		break;
+				
+	case NET_ATTRIBUTE_DATA:
+		{ 	// void *data, size_t data_len
+		void *data = va_arg(args, void *);
+		size_t sz = va_arg(args, size_t);
+
+		if (sz > MAX_ATTRIBUTE_DATA_LEN)
+			sz = MAX_ATTRIBUTE_DATA_LEN;
+		
+		memcpy(attr->u.data, data, sz);
+		break;
+		}
+
+	case NET_ATTRIBUTE_STRING:
+		strncpy(attr->u.data, va_arg(args, char *), MAX_ATTRIBUTE_DATA_LEN);
+		break;
+					
+	case NET_ATTRIBUTE_POINTER:
+		// NB: data behind pointer ARE NOT copied
+		attr->u.ptr = va_arg(args, void *);
+		break;
+					
+	case NET_ATTRIBUTE_IOVEC:
+		{ 	// int nb, iovec *vec
+		int nb 		= va_arg(args, int);
+		iovec * vec = va_arg(args, iovec *);
+		if (nb > MAX_ATTRIBUTE_IOVECS)
+			nb = MAX_ATTRIBUTE_IOVECS;
+		
+		memcpy(&attr->u.vec, vec, nb * sizeof(iovec));
+		break;
+		}
+	}
+	
+	return B_OK;
+}
+
+
+net_attribute * new_attribute(net_attribute **in_list, string_token id)
 {
 	net_attribute *attr;
 	
@@ -84,8 +151,8 @@ status_t delete_attribute(net_attribute *attr, net_attribute **from_list)
 }
 
 
-net_attribute * find_attribute(net_attribute *list, const void *id, int *type,
-	void **value, size_t *size)
+net_attribute * find_attribute(net_attribute *list, string_token id, int index,
+	int *type, void **value, size_t *size)
 {
 	net_attribute *attr;
 
@@ -95,7 +162,7 @@ net_attribute * find_attribute(net_attribute *list, const void *id, int *type,
 	// dprintf("find_attribute(%p, %p)\n", list, id);
 	attr = list;
 	while (attr) {
-		if (attr->id == id) {
+		if (attr->id == id && index-- == 0) {
 			if (type)	*type = attr->type;
 			if (size) 	*size = attr->size;
 			if (value) {

@@ -10,7 +10,7 @@ void dump_memory
 	(
 	const char *	prefix,
 	const void *	data,
-	uint32			len
+	size_t			len
 	)
 {
 	uint32	i,j;

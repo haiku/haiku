@@ -25,17 +25,17 @@ extern net_buffer *		clone_buffer(net_buffer *from);
 extern net_buffer *		split_buffer(net_buffer *from, uint32 offset);
 extern status_t			merge_buffers(net_buffer *begin, net_buffer *end);
 
-extern	status_t		add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
-extern	status_t		remove_from_buffer(net_buffer *buffer, uint32 offset, uint32 bytes);
+extern	status_t		add_to_buffer(net_buffer *buffer, uint32 offset, const void *data, size_t bytes, buffer_chunk_free_func freethis);
+extern	status_t		remove_from_buffer(net_buffer *buffer, uint32 offset, size_t bytes);
 
 extern	status_t 		attach_buffer_free_element(net_buffer *buffer, void *arg1, void *arg2, buffer_chunk_free_func freethis);
 
-extern uint32 			read_buffer(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
-extern uint32 			write_buffer(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
+extern size_t 			read_buffer(net_buffer *buffer, uint32 offset, void *data, size_t bytes);
+extern size_t 			write_buffer(net_buffer *buffer, uint32 offset, const void *data, size_t bytes);
 
-extern status_t			add_buffer_attribute(net_buffer *buffer, const void *id, int type, ...);
-extern status_t			remove_buffer_attribute(net_buffer *buffer, const void *id);
-extern status_t			find_buffer_attribute(net_buffer *buffer, const void *id, int *type, void **value, size_t *size);
+extern status_t			add_buffer_attribute(net_buffer *buffer, string_token id, int type, ...);
+extern status_t			remove_buffer_attribute(net_buffer *buffer, string_token id, int index);
+extern status_t			find_buffer_attribute(net_buffer *buffer, string_token id, int index, int *type, void **value, size_t *size);
 
 extern void				dump_buffer(net_buffer *buffer);
 

@@ -275,7 +275,7 @@ status_t device_reader(void *args)
 			g_stack->add_to_buffer(buffer, 0, frame, sz, (buffer_chunk_free_func) free);
 			
 			dprintf("%s: input packet %p:\n", me->name, buffer);
-			if (g_stack->send_up(me, buffer) != B_OK) {
+			if (g_stack->send_layers_up(me, buffer) != B_OK) {
 				// nobody above us *eat* this packet, so we drop it ourself :-(
 				dprintf("%s: okay, nobody cares about this input packet %p: deletion!\n", me->name, buffer);
 				g_stack->dump_buffer(buffer);

@@ -16,6 +16,23 @@ extern "C" {
 // String tokens use here and there by stack components
 typedef const void *string_token;
 
+// Networking attribute(s) definition
+typedef struct net_attribute net_attribute;
+
+#define NET_ATTRIBUTE_TYPE_MASK 	0xFF		// Up to 256 basic types
+#define NET_ATTRIBUTE_FLAGS_MASK	0xFFFFFF00
+enum {
+	NET_ATTRIBUTE_BOOL = 1,		// ... = bool value
+	NET_ATTRIBUTE_BYTE,			// ... = uint8 value
+	NET_ATTRIBUTE_INT16,		// ... = uint16 value
+	NET_ATTRIBUTE_INT32,		// ... = uint32 value
+	NET_ATTRIBUTE_INT64,		// ... = uint64 value
+	NET_ATTRIBUTE_DATA,			// ... = void *data, size_t data_len
+	NET_ATTRIBUTE_STRING,		// ... = char *string
+	NET_ATTRIBUTE_POINTER,		// ... = void *ptr
+	NET_ATTRIBUTE_IOVEC			// ... = int nb, iovec *vec
+};
+
 // Networking buffer(s) definition
 typedef struct net_buffer net_buffer;
 typedef struct net_buffer_queue net_buffer_queue;
@@ -63,24 +80,8 @@ struct net_layer {
 	uint32					use_count;	
 	struct net_layer 		**layers_above;
 	struct net_layer		**layers_below;
+	struct net_attribute 	*attributes;  // layer attributes
 };
-
-typedef string_token net_attribute_id;
-
-#define NET_ATTRIBUTE_TYPE_MASK 	0xFF		// Up to 256 basic types
-#define NET_ATTRIBUTE_FLAGS_MASK	0xFFFFFF00
-enum {
-	NET_ATTRIBUTE_BOOL,
-	NET_ATTRIBUTE_BYTE,
-	NET_ATTRIBUTE_INT16,
-	NET_ATTRIBUTE_INT32,
-	NET_ATTRIBUTE_INT64,
-	NET_ATTRIBUTE_DATA,
-	NET_ATTRIBUTE_STRING,
-	NET_ATTRIBUTE_POINTER,
-	NET_ATTRIBUTE_IOVEC
-};
-
 
 // Network stack main module definition
 
@@ -108,13 +109,13 @@ struct net_stack_module_info {
 	status_t 	(*unregister_layer)(net_layer *layer);
 	net_layer *	(*find_layer)(const char *name);
 
-	status_t 	(*add_layer_attribute)(net_layer *layer, net_attribute_id id, int type, ...);
-	status_t 	(*remove_layer_attribute)(net_layer *layer, net_attribute_id id);
-	status_t 	(*find_layer_attribute)(net_layer *layer, net_attribute_id id,
+	status_t 	(*add_layer_attribute)(net_layer *layer, string_token id, int type, ...);
+	status_t 	(*remove_layer_attribute)(net_layer *layer, string_token id, int index);
+	status_t 	(*find_layer_attribute)(net_layer *layer, string_token id, int index,
 					int *type, void **value, size_t *size);
 	
-	status_t  	(*send_up)(net_layer *me, net_buffer *buffer);
-	status_t  	(*send_down)(net_layer *me, net_buffer *buffer);
+	status_t  	(*send_layers_up)(net_layer *me, net_buffer *buffer);
+	status_t  	(*send_layers_down)(net_layer *me, net_buffer *buffer);
 
 	/*
 	 * Buffer(s) support
@@ -132,20 +133,20 @@ struct net_stack_module_info {
 	// specials offsets for add_to_buffer()	
 	#define BUFFER_BEGIN 0
 	#define BUFFER_END 	 0xFFFFFFFF
-	status_t		(*add_to_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
-	status_t		(*remove_from_buffer)(net_buffer *buffer, uint32 offset, uint32 bytes);
+	status_t		(*add_to_buffer)(net_buffer *buffer, uint32 offset, const void *data, size_t bytes, buffer_chunk_free_func freethis);
+	status_t		(*remove_from_buffer)(net_buffer *buffer, uint32 offset, size_t bytes);
 
 	status_t 		(*attach_buffer_free_element)(net_buffer *buffer, void *arg1, void *arg2, buffer_chunk_free_func freethis);
 
-	uint32 			(*read_buffer)(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
-	uint32 			(*write_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
+	size_t 			(*read_buffer)(net_buffer *buffer, uint32 offset, void *data, size_t bytes);
+	size_t 			(*write_buffer)(net_buffer *buffer, uint32 offset, const void *data, size_t bytes);
 
 	// Flags to combine with  
-	#define FROM_BUFFER		0x010000
+	#define FROM_BUFFER		0x010000	// ... = int offset, int size 
 	#define NETWORK_ORDER	0x020000	
-	status_t 		(*add_buffer_attribute)(net_buffer *buffer, net_attribute_id id, int type, ...);
-	status_t 		(*remove_buffer_attribute)(net_buffer *buffer, net_attribute_id id);
-	status_t 		(*find_buffer_attribute)(net_buffer *buffer, net_attribute_id id,
+	status_t 		(*add_buffer_attribute)(net_buffer *buffer, string_token id, int type, ...);
+	status_t 		(*remove_buffer_attribute)(net_buffer *buffer, string_token id, int index);
+	status_t 		(*find_buffer_attribute)(net_buffer *buffer, string_token id, int index, 
 						int *type, void **value, size_t *size);
 	
 	void			(*dump_buffer)(net_buffer *buffer);
@@ -169,7 +170,7 @@ struct net_stack_module_info {
 	// Lockers
 	
 	// Misc.
-	void 	(*dump_memory)(const char *prefix, const void *data, uint32 len);
+	void 	(*dump_memory)(const char *prefix, const void *data, size_t len);
 	
 	// Memory Pools support
 	memory_pool *	(*new_pool)(size_t node_size, uint32 node_count);
