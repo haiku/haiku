@@ -2323,17 +2323,10 @@ void BView::DrawString(const char* aString, int32 length, BPoint location,
 void BView::StrokeEllipse(BPoint center, float xRadius, float yRadius,
 		pattern p)
 {
-	if (owner)
+	if(owner)
 	{
-		check_lock();
-		
-		if ( _is_new_pattern( fState->patt, p ) )
-			SetPattern( p );
-		
-		owner->fLink->StartMessage( AS_STROKE_ELLIPSE );
-		owner->fLink->Attach<BPoint>( center );
-		owner->fLink->Attach<float>( xRadius );
-		owner->fLink->Attach<float>( yRadius );
+		StrokeEllipse( 	BRect(center.x-xRadius, center.y-yRadius, center.x+xRadius,
+			center.y+yRadius), p );
 	}
 }
 
@@ -2343,8 +2336,13 @@ void BView::StrokeEllipse(BRect r, pattern p)
 {
 	if (owner)
 	{
-		StrokeEllipse( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
-					r.Width()/2, r.Height()/2, p );
+		check_lock();
+		
+		if ( _is_new_pattern( fState->patt, p ) )
+			SetPattern( p );
+		
+		owner->fLink->StartMessage( AS_STROKE_ELLIPSE );
+		owner->fLink->Attach<BRect>( r );
 	}
 }
 
@@ -2353,17 +2351,10 @@ void BView::StrokeEllipse(BRect r, pattern p)
 void BView::FillEllipse(BPoint center, float xRadius, float yRadius,
 		pattern p)
 {
-	if (owner)
+	if(owner)
 	{
-		check_lock();
-		
-		if ( _is_new_pattern( fState->patt, p ) )
-			SetPattern( p );
-		
-		owner->fLink->StartMessage( AS_FILL_ELLIPSE );
-		owner->fLink->Attach<BPoint>( center );
-		owner->fLink->Attach<float>( xRadius );
-		owner->fLink->Attach<float>( yRadius );
+		FillEllipse( 	BRect(center.x-xRadius, center.y-yRadius, center.x+xRadius,
+			center.y+yRadius), p );
 	}
 }
 
@@ -2373,8 +2364,13 @@ void BView::FillEllipse(BRect r, pattern p)
 {
 	if (owner)
 	{
-		FillEllipse(r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
-				r.Width()/2, r.Height()/2, p );
+		check_lock();
+		
+		if ( _is_new_pattern( fState->patt, p ) )
+			SetPattern( p );
+		
+		owner->fLink->StartMessage( AS_FILL_ELLIPSE );
+		owner->fLink->Attach<BRect>( r );
 	}
 }
 
@@ -2383,20 +2379,8 @@ void BView::FillEllipse(BRect r, pattern p)
 void BView::StrokeArc(BPoint center, float xRadius, float yRadius,
 		float start_angle, float arc_angle, pattern p)
 {
-	if (owner)
-	{
-		check_lock();
-		
-		if ( _is_new_pattern( fState->patt, p ) )
-			SetPattern( p );
-		
-		owner->fLink->StartMessage( AS_STROKE_ARC );
-		owner->fLink->Attach<BPoint>( center );
-		owner->fLink->Attach<float>( xRadius );
-		owner->fLink->Attach<float>( yRadius );
-		owner->fLink->Attach<float>( start_angle );
-		owner->fLink->Attach<float>( arc_angle );				
-	}
+	StrokeArc( 	BRect(center.x-xRadius, center.y-yRadius, center.x+xRadius,
+		center.y+yRadius), start_angle, arc_angle, p );
 }
 
 //---------------------------------------------------------------------------
@@ -2406,9 +2390,17 @@ void BView::StrokeArc(BRect r, float start_angle, float arc_angle,
 {
 	if (owner)
 	{
-		StrokeArc( 	r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
-				r.Width()/2, r.Height()/2, start_angle, arc_angle, p );
+		check_lock();
+		
+		if ( _is_new_pattern( fState->patt, p ) )
+			SetPattern( p );
+		
+		owner->fLink->StartMessage( AS_STROKE_ARC );
+		owner->fLink->Attach<BRect>(r);
+		owner->fLink->Attach<float>( start_angle );
+		owner->fLink->Attach<float>( arc_angle );				
 	}
+	
 }
 
 //---------------------------------------------------------------------------
@@ -2416,20 +2408,8 @@ void BView::StrokeArc(BRect r, float start_angle, float arc_angle,
 void BView::FillArc(BPoint center,float xRadius, float yRadius,
 		float start_angle, float arc_angle,	pattern p)
 {
-	if (owner)
-	{
-		check_lock();
-		
-		if ( _is_new_pattern( fState->patt, p ) )
-			SetPattern( p );
-		
-		owner->fLink->StartMessage( AS_FILL_ARC );
-		owner->fLink->Attach<BPoint>( center );
-		owner->fLink->Attach<float>( xRadius );
-		owner->fLink->Attach<float>( yRadius );
-		owner->fLink->Attach<float>( start_angle );
-		owner->fLink->Attach<float>( arc_angle );				
-	}
+	FillArc( 	BRect(center.x-xRadius, center.y-yRadius, center.x+xRadius,
+		center.y+yRadius), start_angle, arc_angle, p );
 }
 
 //---------------------------------------------------------------------------
@@ -2439,9 +2419,17 @@ void BView::FillArc(BRect r, float start_angle, float arc_angle,
 {
 	if (owner)
 	{
-		FillArc(r.LeftTop() + BPoint(r.Width()/2, r.Height()/2),
-				r.Width()/2, r.Height()/2,start_angle, arc_angle, p );
+		check_lock();
+		
+		if ( _is_new_pattern( fState->patt, p ) )
+			SetPattern( p );
+		
+		owner->fLink->StartMessage( AS_FILL_ARC );
+		owner->fLink->Attach<BRect>(r);
+		owner->fLink->Attach<float>( start_angle );
+		owner->fLink->Attach<float>( arc_angle );				
 	}
+	
 }
 
 //---------------------------------------------------------------------------
