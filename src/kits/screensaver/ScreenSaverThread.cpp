@@ -99,7 +99,7 @@ ScreenSaverThread::LoadAddOn()
 			printf ("Error = %ld\n",retVal);
 			return NULL;
 		} else
-			saver=instantiate(pref->GetState(),addon_image);
+			saver=instantiate(pref->GetState(pref->ModuleName()),addon_image);
 		if (B_OK!=saver->InitCheck()) {
 			printf ("InitCheck() Failed!\n");
 			unload_add_on(addon_image);
