@@ -1,20 +1,16 @@
-/* This file is included in fs_shell:fsh.c
- * Insert your implementation of additional commands in here
- *
- * Format:
- *
- * static int
- * function(int argc, char **argv)
- * {
- * }
- *
- */
-
 
 #define _FS_INTERFACE_H
 	// don't include that file
 
+#include <stdio.h>
+#include <StorageDefs.h>
+
+#include "compat.h"
+#include "fsproto.h"
+#include "kprotos.h"
 #include "bfs_control.h"
+
+#include "additional_commands.h"
 
 
 static int
@@ -95,3 +91,7 @@ do_chkbfs(int argc, char **argv)
 	return 0;
 }
 
+cmd_entry additional_commands[] = {
+	{ "chkbfs",	 do_chkbfs, "does a chkbfs on the volume" },
+    { NULL, NULL }
+};
