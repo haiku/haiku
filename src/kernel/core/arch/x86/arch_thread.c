@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <stage2.h>
 #include <debug.h>
@@ -12,15 +13,36 @@
 #include <int.h>
 #include <string.h>
 
-int arch_team_init_team_struct(struct team *p, bool kernel)
-{
-	return 0;
-}
 
 // from arch_interrupts.S
 extern void	i386_stack_init( struct farcall *interrupt_stack_offset );
 
-int arch_thread_init_thread_struct(struct thread *t)
+
+void
+i386_push_iframe(struct thread *thread, struct iframe *frame)
+{
+	ASSERT(thread->arch_info.iframe_ptr < IFRAME_TRACE_DEPTH);
+	thread->arch_info.iframes[thread->arch_info.iframe_ptr++] = frame;
+}
+
+
+void
+i386_pop_iframe(struct thread *thread)
+{
+	ASSERT(thread->arch_info.iframe_ptr > 0);
+	thread->arch_info.iframe_ptr--;
+}
+
+
+int
+arch_team_init_team_struct(struct team *p, bool kernel)
+{
+	return 0;
+}
+
+
+int
+arch_thread_init_thread_struct(struct thread *t)
 {
 	// set up an initial state (stack & fpu)
 	memset(&t->arch_info, 0, sizeof(t->arch_info));
@@ -32,7 +54,9 @@ int arch_thread_init_thread_struct(struct thread *t)
 	return 0;
 }
 
-int arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
+
+int
+arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	unsigned int *kstack = (unsigned int *)t->kernel_stack_base;
 	unsigned int kstack_size = KSTACK_SIZE;
@@ -74,12 +98,16 @@ int arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(voi
 	return 0;
 }
 
-void arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
+
+void
+arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
 {
 	i386_switch_stack_and_call(new_kstack, func, arg);
 }
 
-void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
+
+void
+arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
 	addr new_pgdir;
 #if 0
@@ -138,7 +166,9 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	i386_context_switch(&t_from->arch_info, &t_to->arch_info, new_pgdir);
 }
 
-void arch_thread_dump_info(void *info)
+
+void
+arch_thread_dump_info(void *info)
 {
 	struct arch_thread *at = (struct arch_thread *)info;
 
@@ -147,7 +177,9 @@ void arch_thread_dump_info(void *info)
 	dprintf("\tfpu_state at %p\n", at->fpu_state);
 }
 
-void arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
+
+void
+arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 {
 	dprintf("arch_thread_entry_uspace: entry 0x%lx, args %p, ustack_top 0x%lx\n",
 		entry, args, ustack_top);

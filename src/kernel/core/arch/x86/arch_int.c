@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
 #include <debug.h>
@@ -30,31 +31,11 @@
 
 #define MAX_ARGS 16
 
-struct int_frame {
-	unsigned int gs;
-	unsigned int fs;
-	unsigned int es;
-	unsigned int ds;
-	unsigned int edi;
-	unsigned int esi;
-	unsigned int ebp;
-	unsigned int esp;
-	unsigned int ebx;
-	unsigned int edx;
-	unsigned int ecx;
-	unsigned int eax;
-	unsigned int vector;
-	unsigned int error_code;
-	unsigned int eip;
-	unsigned int cs;
-	unsigned int flags;
-	unsigned int user_esp;
-	unsigned int user_ss;
-};
-
 static desc_table *idt = NULL;
 
-static void interrupt_ack(int n)
+
+static void
+interrupt_ack(int n)
 {
 	if(n >= 0x20 && n < 0x30) {
 		// 8239 controlled interrupt
@@ -64,7 +45,9 @@ static void interrupt_ack(int n)
 	}
 }
 
-static void _set_gate(desc_table *gate_addr, unsigned int addr, int type, int dpl)
+
+static void
+_set_gate(desc_table *gate_addr, unsigned int addr, int type, int dpl)
 {
 	unsigned int gate1; // first byte of gate desc
 	unsigned int gate2; // second byte of gate desc
@@ -76,11 +59,14 @@ static void _set_gate(desc_table *gate_addr, unsigned int addr, int type, int dp
 	gate_addr->b = gate2;
 }
 
-void arch_int_enable_io_interrupt(int irq)
+
+void
+arch_int_enable_io_interrupt(int irq)
 {
 	if (irq < 0 || irq >= 0x10)
 		return;
-dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
+
+	dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
 	/* if this is a external interrupt via 8239, enable it here */
 	if (irq < 8)
 		out8(in8(0x21) & ~(1 << irq), 0x21);
@@ -88,7 +74,9 @@ dprintf("arch_int_enable_io_interrupt: irq %d\n", irq);
 		out8(in8(0xa1) & ~(1 << (irq - 8)), 0xa1);
 }
 
-void arch_int_disable_io_interrupt(int irq)
+
+void
+arch_int_disable_io_interrupt(int irq)
 {
 	/* never disable slave pic line IRQ 2 */
 	if (irq < 0 || irq >= 0x10 || irq == 2)
@@ -100,29 +88,39 @@ void arch_int_disable_io_interrupt(int irq)
 		out8(in8(0xa1) | (1 << (irq - 8)), 0xa1);
 }
 
-static void set_intr_gate(int n, void *addr)
+
+static void
+set_intr_gate(int n, void *addr)
 {
 	_set_gate(&idt[n], (unsigned int)addr, 14, 0);
 }
 
+
 /* XXX - currently unused and static...
-static void set_trap_gate(int n, void *addr)
+static void
+set_trap_gate(int n, void *addr)
 {
 	_set_gate(&idt[n], (unsigned int)addr, 15, 0);
 }
 */
 
-static void set_system_gate(int n, void *addr)
+
+static void
+set_system_gate(int n, void *addr)
 {
 	_set_gate(&idt[n], (unsigned int)addr, 15, 3);
 }
 
-void arch_int_enable_interrupts(void)
+
+void
+arch_int_enable_interrupts(void)
 {
 	asm("sti");
 }
 
-int arch_int_disable_interrupts(void)
+
+int
+arch_int_disable_interrupts(void)
 {
 	int flags;
 
@@ -132,7 +130,9 @@ int arch_int_disable_interrupts(void)
 	return flags & 0x200 ? 1 : 0;
 }
 
-void arch_int_restore_interrupts(int oldstate)
+
+void
+arch_int_restore_interrupts(int oldstate)
 {
 	int flags = oldstate ? 0x200 : 0;
 
@@ -146,7 +146,9 @@ void arch_int_restore_interrupts(int oldstate)
 		: : "r" (flags), "r" (0));
 }
 
-bool arch_int_is_interrupts_enabled(void)
+
+bool
+arch_int_is_interrupts_enabled(void)
 {
 	int flags;
 
@@ -155,10 +157,16 @@ bool arch_int_is_interrupts_enabled(void)
 	return flags & 0x200 ? 1 : 0;
 }
 
-void i386_handle_trap(struct int_frame frame); /* keep the compiler happy, this function must be called only from assembly */
-void i386_handle_trap(struct int_frame frame)
+
+void i386_handle_trap(struct iframe frame); /* keep the compiler happy, this function must be called only from assembly */
+void
+i386_handle_trap(struct iframe frame)
 {
 	int ret = B_HANDLED_INTERRUPT;
+	struct thread *thread = thread_get_current_thread();
+
+	if (thread)
+		i386_push_iframe(thread, &frame);
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
@@ -250,13 +258,18 @@ void i386_handle_trap(struct int_frame frame)
 		restore_interrupts(state);
 	}
 
-	if(frame.cs == USER_CODE_SEG || frame.vector == 99) {
+	if (frame.cs == USER_CODE_SEG || frame.vector == 99) {
 		thread_atkernel_exit();
 	}
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
+
+	if (thread)
+		i386_pop_iframe(thread);
 }
 
-int arch_int_init(kernel_args *ka)
+
+int
+arch_int_init(kernel_args *ka)
 {
 	idt = (desc_table *)ka->arch_args.vir_idt;
 
@@ -320,7 +333,9 @@ int arch_int_init(kernel_args *ka)
 	return 0;
 }
 
-int arch_int_init2(kernel_args *ka)
+
+int
+arch_int_init2(kernel_args *ka)
 {
 	idt = (desc_table *)ka->arch_args.vir_idt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "idt", (void *)&idt,

@@ -84,8 +84,8 @@ static image_id next_image_id = 0;
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
-static int
-get_address_symbol_info(addr address, char *text, int maxtextlen)
+int
+elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
 {
 	struct elf_image_info **ptr;
 	struct elf_image_info *image;
@@ -102,7 +102,8 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 	found_sym = 0;
 	found_image = 0;
 	found_delta = 0x7fffffff;
-	for(ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
+
+	for (ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
 		image = *ptr;
 
 		PRINT((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
@@ -112,7 +113,7 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 		PRINT((" searching...\n"));
 		found_image = image;
 		for (i = 0; i < HASHTABSIZE(image); i++) {
-			for(j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
 				long d;
 				sym = &image->syms[j];
 
@@ -131,17 +132,22 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 		}
 		break;
 	}
-	if (found_sym == 0) {
-		PRINT(("symbol not found!\n"));
-		strlcpy(text, "symbol not found", maxtextlen);
-		rv = -1;
-	} else {
+
+	if (found_sym != 0) {
 		PRINT(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
 		PRINT(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
 		PRINT(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
-		// XXX should honor maxtextlen here
-		sprintf(text, "<%#lx:%s + %#lx> %s", (found_sym->st_value + found_image->regions[0].delta), SYMNAME(found_image, found_sym), found_delta, found_image->name);
+
+		strlcpy(text, SYMNAME(found_image, found_sym), length);
+		
+		if (baseAddress)
+			*baseAddress = found_sym->st_value + found_image->regions[0].delta;
+
 		rv = 0;
+	} else {
+		PRINT(("symbol not found!\n"));
+		strlcpy(text, "symbol not found", length);
+		rv = -1;
 	}
 
 	mutex_unlock(&image_lock);
@@ -161,8 +167,8 @@ print_address_info(int argc, char **argv)
 	}
 
 	address = atoul(argv[1]);
-	
-	get_address_symbol_info(address, text, sizeof(text));
+
+	elf_lookup_symbol_address(address, NULL, text, sizeof(text));
 	dprintf("%p = %s\n",(void *)address,text);
 	return 0;
 }

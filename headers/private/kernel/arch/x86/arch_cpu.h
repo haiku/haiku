@@ -82,6 +82,28 @@ typedef struct pdentry {
 	unsigned int addr:20;
 } pdentry;
 
+struct iframe {
+	unsigned int gs;
+	unsigned int fs;
+	unsigned int es;
+	unsigned int ds;
+	unsigned int edi;
+	unsigned int esi;
+	unsigned int ebp;
+	unsigned int esp;
+	unsigned int ebx;
+	unsigned int edx;
+	unsigned int ecx;
+	unsigned int eax;
+	unsigned int vector;
+	unsigned int error_code;
+	unsigned int eip;
+	unsigned int cs;
+	unsigned int flags;
+	unsigned int user_esp;
+	unsigned int user_ss;
+};
+
 #define nop() __asm__ ("nop"::)
 
 void setup_system_time(unsigned int cv_factor);
@@ -92,6 +114,9 @@ void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr new_pgdir);
 void i386_fsave_swap(void *old_fpu_state, void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, void *new_fpu_state);
+
+#define read_ebp(value) \
+	__asm__("movl	%%ebp,%0" : "=r" (value))
 
 #define read_dr3(value) \
 	__asm__("movl	%%dr3,%0" : "=r" (value))

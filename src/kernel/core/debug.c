@@ -4,6 +4,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <debug.h>
 #include <arch/int.h>
@@ -52,7 +53,9 @@ static char *args[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
-static int debug_read_line(char *buf, int max_len)
+
+static int
+debug_read_line(char *buf, int max_len)
 {
 	char c;
 	int ptr = 0;
@@ -160,21 +163,23 @@ static int debug_read_line(char *buf, int max_len)
 	return ptr;
 }
 
-static int debug_parse_line(char *buf, char **argv, int *argc, int max_args)
+
+static int
+debug_parse_line(char *buf, char **argv, int *argc, int max_args)
 {
 	int pos = 0;
 
 	strcpy(parse_line, buf);
 
-	if(!isspace(parse_line[0])) {
+	if (!isspace(parse_line[0])) {
 		argv[0] = parse_line;
 		*argc = 1;
 	} else {
 		*argc = 0;
 	}
 
-	while(parse_line[pos] != '\0') {
-		if(isspace(parse_line[pos])) {
+	while (parse_line[pos] != '\0') {
+		if (isspace(parse_line[pos])) {
 			parse_line[pos] = '\0';
 			// scan all of the whitespace out of this
 			while(isspace(parse_line[++pos]))
@@ -193,7 +198,9 @@ static int debug_parse_line(char *buf, char **argv, int *argc, int max_args)
 	return *argc;
 }
 
-static void kernel_debugger_loop()
+
+static void
+kernel_debugger_loop()
 {
 	int argc;
 	struct debugger_command *cmd;
@@ -226,7 +233,9 @@ static void kernel_debugger_loop()
 	}
 }
 
-void kernel_debugger(const char * message)
+
+void
+kernel_debugger(const char * message)
 {
 	dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
 
@@ -239,7 +248,9 @@ void kernel_debugger(const char * message)
 	kernel_debugger_loop();
 }
 
-int panic(const char *fmt, ...)
+
+int
+panic(const char *fmt, ...)
 {
 	int ret = 0;
 	va_list args;
@@ -270,7 +281,9 @@ int panic(const char *fmt, ...)
 	return ret;
 }
 
-int dprintf(const char *fmt, ...)
+
+int
+dprintf(const char *fmt, ...)
 {
 	va_list args;
 	char temp[512];
@@ -286,7 +299,9 @@ int dprintf(const char *fmt, ...)
 	return ret;
 }
 
-char dbg_putch(char c)
+
+char
+dbg_putch(char c)
 {
 	char ret;
 	int flags = disable_interrupts();
@@ -303,7 +318,9 @@ char dbg_putch(char c)
 	return ret;
 }
 
-void dbg_puts(const char *s)
+
+void
+dbg_puts(const char *s)
 {
 	int flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
@@ -315,7 +332,9 @@ void dbg_puts(const char *s)
 	restore_interrupts(flags);
 }
 
-int add_debugger_command(const char * name, int (*func)(int, char **), const char * desc)
+
+int
+add_debugger_command(const char * name, int (*func)(int, char **), const char * desc)
 {
 	int flags;
 	struct debugger_command *cmd;
@@ -340,7 +359,9 @@ int add_debugger_command(const char * name, int (*func)(int, char **), const cha
 	return B_NO_ERROR;
 }
 
-int remove_debugger_command(const char * name, int (*func)(int, char **))
+
+int
+remove_debugger_command(const char * name, int (*func)(int, char **))
 {
 	int flags;
 	struct debugger_command *cmd;
@@ -378,13 +399,16 @@ int remove_debugger_command(const char * name, int (*func)(int, char **))
 }
 
 
-static int cmd_reboot(int argc, char **argv)
+static int
+cmd_reboot(int argc, char **argv)
 {
 	reboot();
 	return 0;  // I'll be really suprised if this line ever run! ;-)
 }
 
-static int cmd_help(int argc, char **argv)
+
+static int
+cmd_help(int argc, char **argv)
 {
 	struct debugger_command *cmd;
 
@@ -398,30 +422,40 @@ static int cmd_help(int argc, char **argv)
 	return 0;
 }
 
-int dbg_init(kernel_args *ka)
+
+int
+dbg_init(kernel_args *ka)
 {
 	commands = NULL;
 
 	return arch_dbg_con_init(ka);
 }
 
-int dbg_init2(kernel_args *ka)
+
+int
+dbg_init2(kernel_args *ka)
 {
 	add_debugger_command("help", &cmd_help, "List all debugger commands");
 	add_debugger_command("reboot", &cmd_reboot, "Reboot");
 	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
 
+	dbg_init(ka);
+
 	return B_NO_ERROR;
 }
 
-bool dbg_set_serial_debug(bool new_val)
+
+bool
+dbg_set_serial_debug(bool new_val)
 {
 	int temp = serial_debug_on;
 	serial_debug_on = new_val;
 	return temp;
 }
 
-bool dbg_get_serial_debug()
+
+bool
+dbg_get_serial_debug()
 {
 	return serial_debug_on;
 }
