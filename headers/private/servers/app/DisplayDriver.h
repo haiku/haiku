@@ -141,22 +141,22 @@ public:
 	void DrawBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 
 	void FillArc(const BRect &r, const float &angle, const float &span, RGBColor &color);
-	void FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d, const Pattern &pattern);
+	void FillArc(const BRect &r, const float &angle, const float &span, const DrawData *d);
 	void FillBezier(BPoint *pts, RGBColor &color);
-	void FillBezier(BPoint *pts, const DrawData *d, const Pattern &pattern);
+	void FillBezier(BPoint *pts, const DrawData *d);
 	void FillEllipse(const BRect &r, RGBColor &color);
-	void FillEllipse(const BRect &r, const DrawData *d, const Pattern &pattern);
+	void FillEllipse(const BRect &r, const DrawData *d);
 	void FillPolygon(BPoint *ptlist, int32 numpts, RGBColor &color);
-	void FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d, const Pattern &pattern);
+	void FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d);
 	void FillRect(const BRect &r, RGBColor &color);
-	void FillRect(const BRect &r, const DrawData *d, const Pattern &pattern);
+	void FillRect(const BRect &r, const DrawData *d);
 	void FillRegion(BRegion &r, RGBColor &color);
-	void FillRegion(BRegion &r, const DrawData *d, const Pattern &pattern);
+	void FillRegion(BRegion &r, const DrawData *d);
 	void FillRoundRect(const BRect &r, const float &xrad, const float &yrad, RGBColor &color);
-	void FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d, const Pattern &pattern);
+	void FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d);
 //	void FillShape(SShape *sh, const DrawData *d, const Pattern &pat);
 	void FillTriangle(BPoint *pts, RGBColor &color);
-	void FillTriangle(BPoint *pts, const DrawData *d, const Pattern &pattern);
+	void FillTriangle(BPoint *pts, const DrawData *d);
 
 	void HideCursor(void);
 	bool IsCursorHidden(void);
@@ -166,25 +166,25 @@ public:
 	void SetCursor(ServerCursor *cursor);
 
 	void StrokeArc(const BRect &r, const float &angle, const float &span, RGBColor &color);
-	void StrokeArc(const BRect &r, const float &angle, const float &span, const DrawData *d, const Pattern &pattern);
+	void StrokeArc(const BRect &r, const float &angle, const float &span, const DrawData *d);
 	void StrokeBezier(BPoint *pts, RGBColor &color);
-	void StrokeBezier(BPoint *pts, const DrawData *d, const Pattern &pattern);
+	void StrokeBezier(BPoint *pts, const DrawData *d);
 	void StrokeEllipse(const BRect &r, RGBColor &color);
-	void StrokeEllipse(const BRect &r, const DrawData *d, const Pattern &pattern);
+	void StrokeEllipse(const BRect &r, const DrawData *d);
 	void StrokeLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	void StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d, const Pattern &pattern);
+	void StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d);
 	void StrokePoint(BPoint &pt, RGBColor &color);
 	void StrokePolygon(BPoint *ptlist, int32 numpts, RGBColor &color, bool is_closed=true);
-	void StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, const Pattern &pattern, bool is_closed=true);
+	void StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, bool is_closed=true);
 	void StrokeRect(const BRect &r, RGBColor &color);
-	void StrokeRect(const BRect &r, const DrawData *d, const Pattern &pattern);
+	void StrokeRect(const BRect &r, const DrawData *d);
 	void StrokeRegion(BRegion &r, RGBColor &color);
-	void StrokeRegion(BRegion &r, const DrawData *d, const Pattern &pattern);
+	void StrokeRegion(BRegion &r, const DrawData *d);
 	void StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, RGBColor &color);
-	void StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d, const Pattern &pattern);
+	void StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const DrawData *d);
 //	void StrokeShape(SShape *sh, const DrawData *d, const Pattern &pat);
 	void StrokeTriangle(BPoint *pts, RGBColor &color);
-	void StrokeTriangle(BPoint *pts, const DrawData *d, const Pattern &pattern);
+	void StrokeTriangle(BPoint *pts, const DrawData *d);
 
 	void GetMode(display_mode *mode);
 	int32 GetMode(void);
@@ -244,8 +244,8 @@ protected:
 	ServerCursor *_GetCursor(void);
 	virtual void HLinePatternThick(int32 x1, int32 x2, int32 y);
 	virtual void VLinePatternThick(int32 x, int32 y1, int32 y2);
-	virtual void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
-	virtual void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
+//	virtual void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
+//	virtual void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
 	virtual void SetThickPatternPixel(int x, int y);
 	
 	void FillArc(const BRect &r, const float &angle, const float &span, DisplayDriver*, SetHorizontalLineFuncType setLine);
@@ -268,6 +268,7 @@ protected:
 	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
 	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
+	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
 	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
 	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source);
