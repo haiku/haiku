@@ -31,6 +31,8 @@
 #include <Rect.h>
 #include <OS.h>
 
+class BitmapManager;
+
 /*!
 	\class ServerBitmap ServerBitmap.h
 	\brief Bitmap class used inside the server.
@@ -81,7 +83,8 @@ public:
 	bool InitCheck(void) { return _initialized; }
 
 protected:
-
+	friend BitmapManager;
+	
 	//! Internal function used by the BitmapManager.
 	void _SetArea(area_id ID) { _area=ID; }
 	
