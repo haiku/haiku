@@ -9,11 +9,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#if defined(TEST_R5)
-#include <be/app/Handler.h>
-#else
 #include <Handler.h>
-#endif
 
 // Project Includes ------------------------------------------------------------
 

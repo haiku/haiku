@@ -6,12 +6,8 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Looper.h>
-#if defined(TEST_R5)
-#include <be/app/MessageFilter.h>
-#else
+#include <Looper.h>
 #include <MessageFilter.h>
-#endif
 
 // Project Includes ------------------------------------------------------------
 

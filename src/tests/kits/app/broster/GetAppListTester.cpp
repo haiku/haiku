@@ -7,9 +7,8 @@
 #include <stdio.h>
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
-#include <be/kernel/OS.h>
-
+#include <Message.h>
+#include <OS.h>
 #include <Handler.h>
 #include <List.h>
 #include <Looper.h>

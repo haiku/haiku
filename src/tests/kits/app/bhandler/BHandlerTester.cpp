@@ -6,18 +6,11 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
-#include <be/kernel/OS.h>
-
-#ifdef TEST_R5
-#include <be/app/Handler.h>
-#include <be/app/Looper.h>
-#include <be/app/MessageFilter.h>
-#else
+#include <Message.h>
+#include <OS.h>
 #include <Handler.h>
-#include <be/app/Looper.h>
+#include <Looper.h>
 #include <MessageFilter.h>
-#endif
 
 // Project Includes ------------------------------------------------------------
 

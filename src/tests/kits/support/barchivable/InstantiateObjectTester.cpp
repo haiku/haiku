@@ -17,9 +17,9 @@
 #include <stdexcept>
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Roster.h>
-#include <be/storage/Entry.h>
-#include <be/storage/Path.h>
+#include <Roster.h>
+#include <Entry.h>
+#include <Path.h>
 
 // Project Includes ------------------------------------------------------------
 #include <cppunit/Exception.h>

@@ -8,9 +8,8 @@
 #include <utime.h>
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
-#include <be/kernel/OS.h>
-
+#include <Message.h>
+#include <OS.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <File.h>

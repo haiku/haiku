@@ -13,7 +13,7 @@
 #include <errno.h>
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
+#include <Message.h>
 
 // Project Includes ------------------------------------------------------------
 
