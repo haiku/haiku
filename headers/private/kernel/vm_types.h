@@ -6,6 +6,7 @@
 #define _KERNEL_VM_TYPES_H
 
 #include <kernel.h>
+#include <ktypes.h>
 #include <defines.h>
 #include <vfs.h>
 #include <arch/vm_translation_map.h>
