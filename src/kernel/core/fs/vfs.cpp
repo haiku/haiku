@@ -3766,6 +3766,7 @@ common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("common_read_stat: stat %p\n", stat));
+
 	status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
 		vnode->private_node, stat);
 
@@ -5646,10 +5647,10 @@ _kern_setcwd(int fd, const char *path)
 {
 	char pathBuffer[B_PATH_NAME_LENGTH + 1];
 
-	if (fd == -1)
+	if (path != NULL)
 		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
 
-	return set_cwd(fd, pathBuffer, true);
+	return set_cwd(fd, path != NULL ? pathBuffer : NULL, true);
 }
 
 
@@ -6515,13 +6516,13 @@ _user_setcwd(int fd, const char *userPath)
 
 	PRINT(("user_setcwd: path = %p\n", userPath));
 
-	if (fd == -1) {
+	if (userPath != NULL) {
 		if (!IS_USER_ADDRESS(userPath)
 			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
 			return B_BAD_ADDRESS;
 	}
 
-	return set_cwd(fd, path, false);
+	return set_cwd(fd, userPath != NULL ? path : NULL, false);
 }
 
 
