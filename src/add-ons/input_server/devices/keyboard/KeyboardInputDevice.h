@@ -28,12 +28,12 @@
 #define __KEYBOARDINPUTDEVICE_H
 
 #include <InputServerDevice.h>
-#include <InterfaceDefs.h>
+#include <List.h>
 #include <stdio.h>
 
 typedef struct {
-        bigtime_t       key_repeat_delay;
-        int32           key_repeat_rate;
+	bigtime_t       key_repeat_delay;
+	int32           key_repeat_rate;
 } kb_settings;
 
 class KeyboardInputDevice : public BInputServerDevice {
@@ -50,16 +50,18 @@ public:
 							 uint32 command, BMessage *message);
 private:
 	status_t HandleMonitor(BMessage *message);
-	status_t InitFromSettings(uint32 opcode = 0);
+	status_t InitFromSettings(void *cookie, uint32 opcode = 0);
+	void RecursiveScan(const char *directory);
 	
-	thread_id fThread;
-	int fFd;
-	bool fQuit;
-	FILE *fLogFile;
-	
+	status_t AddDevice(const char *path);
+	status_t RemoveDevice(const char *path);
+		
 	static int32 DeviceWatcher(void *arg);
+	static char *GetShortName(const char *longName);
 	
-	kb_settings	fSettings;
+	BList fDevices;
+	
+	static FILE *sLogFile;	
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();
