@@ -44,6 +44,7 @@ SharedLibrary media :
 	# Internal Functionality
 	PortPool.cpp
 	DormantNodeManager.cpp
+	NotificationManager.cpp
 	SystemTimeSource.cpp
 	BufferIdCache.cpp
 	SharedBufferList.cpp

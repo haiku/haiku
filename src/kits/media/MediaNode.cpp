@@ -14,6 +14,7 @@
 #include "SystemTimeSource.h"
 #include "debug.h"
 #include "ServerInterface.h"
+#include "NotificationManager.h"
 
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;
@@ -212,11 +213,10 @@ status_t
 BMediaNode::ReportError(node_error what,
 						const BMessage *info)
 {
-	UNIMPLEMENTED();
-	// XXX Transmits the error code specified by whichError to anyone
-	// XXX that's receiving notifications from this node (see 
-	// XXX BMediaRoster::StartWatching() and BMediaRoster::StopWatching() on).
-	return B_OK;
+	CALLED();
+	// Transmits the error code specified by what to anyone
+	// that's receiving notifications from this node
+	return _NotificationManager->ReportError(Node(), what, info);
 }
 
 
@@ -227,7 +227,8 @@ BMediaNode::NodeStopped(bigtime_t whenPerformance)
 	// called by derived classes when they have
 	// finished handling a stop request.
 	
-	// XXX notify anyone who is listening for stop notifications!
+	// notify anyone who is listening for stop notifications!
+	_NotificationManager->NodeStopped(Node(), whenPerformance);
 	
 	// XXX If your node is a BBufferProducer, downstream consumers 
 	// XXX will be notified that your node stopped (automatically, no less) 

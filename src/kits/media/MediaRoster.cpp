@@ -17,6 +17,7 @@
 #include "PortPool.h"
 #include "ServerInterface.h"
 #include "DormantNodeManager.h"
+#include "NotificationManager.h"
 
 static BMessenger *ServerMessenger = 0;
 static team_id team;
@@ -317,6 +318,19 @@ BMediaRoster::Connect(const media_source & from,
 					  media_output * out_output,
 					  media_input * out_input)
 {
+	return BMediaRoster::Connect(from, to, io_format, out_output, out_input, 0);
+}
+
+
+status_t 
+BMediaRoster::Connect(const media_source & from,
+					  const media_destination & to,
+					  media_format * io_format,
+					  media_output * out_output,
+					  media_input * out_input,
+					  uint32 in_flags,
+					  void * _reserved)
+{
 	CALLED();
 	if (io_format == NULL || out_output == NULL || out_input == NULL)
 		return B_BAD_VALUE;
@@ -441,20 +455,6 @@ BMediaRoster::Connect(const media_source & from,
 failed:
 	_PortPool->PutPort(port);
 	return rv;
-}
-
-
-status_t 
-BMediaRoster::Connect(const media_source & from,
-					  const media_destination & to,
-					  media_format * io_format,
-					  media_output * out_output,
-					  media_input * out_input,
-					  uint32 in_flags,
-					  void * _reserved)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
 }
 
 					  
@@ -832,8 +832,12 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 status_t 
 BMediaRoster::StartWatching(const BMessenger & where)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (!where.IsValid()) {
+		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		return B_BAD_VALUE;
+	}
+	return _NotificationManager->Register(where, media_node::null, B_MEDIA_WILDCARD);
 }
 
 
@@ -841,8 +845,16 @@ status_t
 BMediaRoster::StartWatching(const BMessenger & where,
 							int32 notificationType)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (!where.IsValid()) {
+		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		return B_BAD_VALUE;
+	}
+	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
+		return B_BAD_VALUE;
+	}
+	return _NotificationManager->Register(where, media_node::null, notificationType);
 }
 
 
@@ -851,16 +863,29 @@ BMediaRoster::StartWatching(const BMessenger & where,
 							const media_node & node,
 							int32 notificationType)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (!where.IsValid()) {
+		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
+		return B_BAD_VALUE;
+	}
+	if (node.node == 0) {
+		TRACE("BMediaRoster::StartWatching: node invalid!\n");
+		return B_MEDIA_BAD_NODE;
+	}
+	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
+		return B_BAD_VALUE;
+	}
+	return _NotificationManager->Register(where, node, notificationType);
 }
 
 							
 status_t 
 BMediaRoster::StopWatching(const BMessenger & where)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	// messenger may already be invalid, so we don't check this
+	return _NotificationManager->Unregister(where, media_node::null, B_MEDIA_WILDCARD);
 }
 
 
@@ -868,8 +893,13 @@ status_t
 BMediaRoster::StopWatching(const BMessenger & where,
 						   int32 notificationType)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	// messenger may already be invalid, so we don't check this
+	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
+		return B_BAD_VALUE;
+	}
+	return _NotificationManager->Unregister(where, media_node::null, notificationType);
 }
 
 						   
@@ -878,8 +908,17 @@ BMediaRoster::StopWatching(const BMessenger & where,
 						   const media_node & node,
 						   int32 notificationType)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	// messenger may already be invalid, so we don't check this
+	if (node.node == 0) {
+		TRACE("BMediaRoster::StopWatching: node invalid!\n");
+		return B_MEDIA_BAD_NODE;
+	}
+	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
+		return B_BAD_VALUE;
+	}
+	return _NotificationManager->Unregister(where, node, notificationType);
 }
 
 

@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <Controllable.h>
 #include "debug.h"
+#include "NotificationManager.h"
 
 /*************************************************************
  * protected BControllable
@@ -78,9 +79,8 @@ BControllable::HandleMessage(int32 message,
 status_t
 BControllable::BroadcastChangedParameter(int32 id)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	CALLED();
+	return _NotificationManager->ParameterChanged(Node(), id);
 }
 
 
@@ -90,9 +90,8 @@ BControllable::BroadcastNewParameterValue(bigtime_t when,
 										  void *newValue,
 										  size_t valueSize)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	CALLED();
+	return _NotificationManager->NewParameterValue(Node(), id, when, newValue, valueSize);
 }
 
 
