@@ -27,8 +27,10 @@
 #include <fs_attr.h>
 #include <fs_query.h>
 
+
 static void do_lat_fs(int argc, char **argv);
 static void do_fsh(void);
+
 
 int
 main(int argc, char **argv)
@@ -1529,6 +1531,13 @@ getline(char *prompt, char *input, int len)
 }
 
 
+// This might have been defined by additional_commands.h - so
+// we can't do it earlier.
+#ifndef FS_SHELL_PROMPT
+#	define FS_SHELL_PROMPT	"fsh"
+#endif
+
+
 static void
 do_fsh(void)
 {
@@ -1537,7 +1546,7 @@ do_fsh(void)
 		// actually emulating 12kB stack size (BeOS has 16 MB - ~20kB for the main thread)
 #endif
     int   argc, len;
-    char *prompt = "fsh>> ";
+    char *prompt = FS_SHELL_PROMPT ">> ";
     char  input[512], **argv;
     cmd_entry *cmd;
 
