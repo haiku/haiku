@@ -12,6 +12,7 @@
 #include <new>
 #include <string.h>
 
+#include <MimeTypes.h>
 #include <Bitmap.h>
 #include <Entry.h>
 #include <Node.h>
@@ -19,6 +20,7 @@
 #include <Rect.h>
 
 #include <fs_attr.h>
+#include <fs_info.h>
 
 using namespace std;
 
@@ -570,15 +572,16 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 /*!	\brief Gets the icon which tracker displays.
 
 	This method tries real hard to find an icon for the node:
-	- If the node has no type, return the icon for "application/octet-stream"
-	  from the MIME database. Even, if the node has an own icon!
+	- If the node has no type, return the icon for B_FILE_MIME_TYPE if it's a
+	  regular file, for B_DIRECTORY_MIME_TYPE if it's a directory, etc. from
+	  the MIME database. Even, if the node has an own icon!
 	- Ask GetIcon().
 	- Get the preferred application and ask the MIME database, if that
 	  application has a special icon for the node's file type.
 	- Ask the MIME database whether there is an icon for the node's file type.
 	- Ask the MIME database for the preferred application for the node's
 	  file type and whether this application has a special icon for the type.
-	- Return the icon for "application/octet-stream" from the MIME database.
+	- Return the icon for whatever type of node (file/dir/etc.) from the MIME database.
 	This list is processed in the given order and the icon the first
 	successful attempt provides is returned. In case none of them yields an
 	icon, this method fails. This is very unlikely though.
@@ -586,22 +589,22 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
 		   to store the requested icon (16x16 for the mini and 32x32 for the
 		   large icon).
-	\param k Specifies the size of the icon to be retrieved: \c B_MINI_ICON
+	\param iconSize Specifies the size of the icon to be retrieved: \c B_MINI_ICON
 		   for the mini and \c B_LARGE_ICON for the large icon.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_NO_INIT: The object is not properly initialized.
-	- \c B_BAD_VALUE: \c NULL \a icon, unsupported icon size \a k or bitmap
-		 dimensions (\a icon) and icon size (\a k) do not match.
+	- \c B_BAD_VALUE: \c NULL \a icon, unsupported icon size \a iconSize or bitmap
+		 dimensions (\a icon) and icon size (\a iconSize) do not match.
 	- other error codes
 */
 status_t 
-BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size k) const
+BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size iconSize) const
 {
 	// set some icon size related variables
 	status_t error = B_OK;
 	BRect bounds;
-	switch (k) {
+	switch (iconSize) {
 		case B_MINI_ICON:
 			bounds.Set(0, 0, 15, 15);
 			break;
@@ -612,6 +615,7 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size k) const
 			error = B_BAD_VALUE;
 			break;
 	}
+
 	// check parameters and initialization
 	if (error == B_OK
 		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
@@ -619,49 +623,76 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size k) const
 	}
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+
 	bool success = false;
+
 	// get node MIME type, and, if that fails, the generic icon
 	char mimeString[B_MIME_TYPE_LENGTH];
 	if (error == B_OK) {
 		if (GetType(mimeString) != B_OK) {
-			// no type available -- get the "application/octet-stream" icon
-			BMimeType type("application/octet-stream");
-			error = type.GetIcon(icon, k);
-			success = (error == B_OK);
+			struct stat stat;
+			error = fNode->GetStat(&stat) == B_OK;
+			if (error == B_OK) {
+				// no type available -- get the icon for the appropriate type (file/dir/etc.)
+				BMimeType type;
+				if (S_ISREG(stat.st_mode)) {
+					// is it an application (executable) or just a regular file?
+					if ((stat.st_mode & S_IXUSR) != 0)
+						type.SetTo(B_APP_MIME_TYPE);
+					else
+						type.SetTo(B_FILE_MIME_TYPE);
+				} else if (S_ISDIR(stat.st_mode)) {
+					// it's either a volume or just a standard directory
+					fs_info info;
+					if (fs_stat_dev(stat.st_dev, &info) == 0 && stat.st_ino == info.root)
+						type.SetTo(B_VOLUME_MIME_TYPE);
+					else
+						type.SetTo(B_DIRECTORY_MIME_TYPE);
+				} else if (S_ISLNK(stat.st_mode))
+					type.SetTo(B_SYMLINK_MIME_TYPE);
+
+				error = type.GetIcon(icon, iconSize);
+				success = (error == B_OK);
+			}
 		}
 	}
+
 	// Ask GetIcon().
 	if (error == B_OK && !success)
-		success = (GetIcon(icon, k) == B_OK);
+		success = (GetIcon(icon, iconSize) == B_OK);
+
 	// Get the preferred application and ask the MIME database, if that
 	// application has a special icon for the node's file type.
 	if (error == B_OK && !success) {
 		char signature[B_MIME_TYPE_LENGTH];
 		if (GetPreferredApp(signature) == B_OK) {
 			BMimeType type(signature);
-			success = (type.GetIconForType(mimeString, icon, k) == B_OK);
+			success = (type.GetIconForType(mimeString, icon, iconSize) == B_OK);
 		}
 	}
+
 	// Ask the MIME database whether there is an icon for the node's file type.
 	BMimeType nodeType;
 	if (error == B_OK && !success) {
 		nodeType.SetTo(mimeString);
-		success = (nodeType.GetIcon(icon, k) == B_OK);
+		success = (nodeType.GetIcon(icon, iconSize) == B_OK);
 	}
+
 	// Ask the MIME database for the preferred application for the node's
 	// file type and whether this application has a special icon for the type.
 	if (error == B_OK && !success) {
 		char signature[B_MIME_TYPE_LENGTH];
 		if (nodeType.GetPreferredApp(signature) == B_OK) {
 			BMimeType type(signature);
-			success = (type.GetIconForType(mimeString, icon, k) == B_OK);
+			success = (type.GetIconForType(mimeString, icon, iconSize) == B_OK);
 		}
 	}
+
 	// Return the icon for "application/octet-stream" from the MIME database.
 	if (error == B_OK && !success) {
 		// get the "application/octet-stream" icon
-		BMimeType type("application/octet-stream");
-		error = type.GetIcon(icon, k);
+		BMimeType type(B_FILE_MIME_TYPE);
+		error = type.GetIcon(icon, iconSize);
 		success = (error == B_OK);
 	}
 	return error;
@@ -679,17 +710,17 @@ BNodeInfo::GetTrackerIcon(BBitmap *icon, icon_size k) const
 	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
 		   to store the requested icon (16x16 for the mini and 32x32 for the
 		   large icon).
-	\param k Specifies the size of the icon to be retrieved: \c B_MINI_ICON
+	\param iconSize Specifies the size of the icon to be retrieved: \c B_MINI_ICON
 		   for the mini and \c B_LARGE_ICON for the large icon.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_NO_INIT: The object is not properly initialized.
-	- \c B_BAD_VALUE: \c NULL ref or \a icon, unsupported icon size \a k or
-		 bitmap dimensions (\a icon) and icon size (\a k) do not match.
+	- \c B_BAD_VALUE: \c NULL ref or \a icon, unsupported icon size \a iconSize or
+		 bitmap dimensions (\a icon) and icon size (\a iconSize) do not match.
 	- other error codes
 */
 status_t 
-BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size k)
+BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size iconSize)
 {
 	// check ref param
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
@@ -703,7 +734,7 @@ BNodeInfo::GetTrackerIcon(const entry_ref *ref, BBitmap *icon, icon_size k)
 		error = nodeInfo.SetTo(&node);
 	// let the non-static GetTrackerIcon() do the dirty work
 	if (error == B_OK)
-		error = nodeInfo.GetTrackerIcon(icon, k);
+		error = nodeInfo.GetTrackerIcon(icon, iconSize);
 	return error;
 }
 
