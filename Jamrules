@@ -224,10 +224,7 @@ rule StdBinCommands
 		local target = $(source:S=) ;
 		target = [ FGristFiles $(target) ] ;
 
-		Main $(target) : $(source) ;
-		MakeLocate $(target) : $(OBOS_BIN_DIR) ;
-		LinkSharedOSLibs $(target) : $(libs) ;
-		# BinCommand $(target) : $(source) : $(libs) ;
+		BinCommand $(target) : $(source) : $(libs) ;
 	}
 }
 
