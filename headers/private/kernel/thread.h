@@ -29,16 +29,13 @@ void thread_enqueue_run_q(struct thread *t);
 #ifndef NEW_SCHEDULER
 struct thread *thread_dequeue_run_q(int priority);
 #endif /* not NEW_SCHEDULER */
-void thread_atkernel_entry(void); // called when the thread enters the kernel on behalf of the thread
+void thread_atkernel_entry(void);
+	// called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);
 
 int thread_suspend_thread(thread_id id);
 int thread_resume_thread(thread_id id);
-#ifndef NEW_SCHEDULER
-int thread_set_priority(thread_id id, int priority);
-#else /* NEW_SCHEDULER */
 status_t thread_set_priority(thread_id id, int32 priority);
-#endif /* NEW_SCHEDULER */
 int thread_init(kernel_args *ka);
 int thread_init_percpu(int cpu_num);
 void thread_exit(int retcode);
