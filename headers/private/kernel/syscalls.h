@@ -67,6 +67,9 @@ extern thread_id	_kern_wait_for_child(thread_id child, uint32 flags,
 extern status_t		_kern_exec(const char *path, int32 argc, char * const *argv, int32 envCount,
 						char * const *environment);
 extern thread_id	_kern_fork(void);
+extern pid_t		_kern_process_info(pid_t process, int32 which);
+extern pid_t		_kern_setpgid(pid_t process, pid_t group);
+extern pid_t		_kern_setsid(void);
 
 extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *),
 						const char *name, int32 priority, void *data1, void *data2);
