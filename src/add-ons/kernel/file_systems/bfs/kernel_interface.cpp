@@ -498,14 +498,20 @@ bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, in
 
 
 static status_t
-bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t bufferLength)
+bfs_get_vnode_name(fs_volume _fs, fs_vnode _node, char *buffer, size_t bufferSize)
+{
+	Inode *inode = (Inode *)_node;
+
+	return inode->GetName(buffer, bufferSize);
+}
+
+
+static status_t
+bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer, size_t bufferLength)
 {
 	FUNCTION_START(("node = %p, cmd = %lu, buf = %p, len = %ld\n", _node, cmd, buffer, bufferLength));
 
-	if (_ns == NULL)
-		return B_BAD_VALUE;
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
 
 	switch (cmd) {
@@ -2032,7 +2038,7 @@ static file_system_info sBeFileSystem = {
 
 	/* vnode operations */
 	&bfs_lookup,
-	NULL,						// get_vnode_name
+	&bfs_get_vnode_name,
 	&bfs_read_vnode,
 	&bfs_release_vnode,
 	&bfs_remove_vnode,
