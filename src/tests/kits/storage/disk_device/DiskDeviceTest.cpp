@@ -8,6 +8,7 @@
 
 #include <Application.h>
 #include <DiskDevice.h>
+#include <DiskDeviceJob.h>
 //#include <DiskDeviceList.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
@@ -479,6 +480,33 @@ private:
 };
 */
 
+// wait_for_jobs
+void
+wait_for_jobs()
+{
+	BDiskDeviceRoster roster;
+	bool activeJobs = false;
+	do {
+		if (activeJobs)
+			snooze(50000);
+		activeJobs = false;
+		printf("disk device jobs at time %lld\n", system_time());
+		roster.RewindActiveJobs();
+		BDiskDeviceJob job;
+		while (roster.GetNextActiveJob(&job) == B_OK) {
+			activeJobs = true;
+			printf("  job %ld:\n", job.ID());
+			printf("    type:        %lu\n", job.Type());
+			printf("    description: `%s'\n", job.Description());
+			printf("    partition:   %ld\n", job.PartitionID());
+			printf("    status:      %lu\n", job.Status());
+			printf("    progress:    %f\n", job.Progress());
+		}
+		if (!activeJobs)
+			printf("  none\n");
+	} while (activeJobs);
+}
+
 // main
 int
 main()
@@ -508,11 +536,17 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager::Default()->InitialDeviceScan();
 
+	// wait till all (scan) jobs are done
+	wait_for_jobs();
 	// add a file device
 	BDiskDeviceRoster roster;
 	partition_id id = roster.RegisterFileDevice(kTestFileDevice);
 	if (id < B_OK)
 		printf("registering the file device failed: %s\n", strerror(id));
+	else {
+		// wait till all (scan) jobs are done
+		wait_for_jobs();
+	}
 	// list all disk devices and partitions
 	DumpVisitor visitor;
 	roster.VisitAll(&visitor);
