@@ -29,7 +29,7 @@ write_port(port_id port, int32 code, const void *buffer, size_t bufferSize)
 }
 
 
-status_t
+ssize_t
 read_port(port_id port, int32 *code, void *buffer, size_t bufferSize)
 {
 	return _kern_read_port_etc(port, code, buffer, bufferSize, 0, 0);
@@ -44,7 +44,7 @@ write_port_etc(port_id port, int32 code, const void *buffer, size_t bufferSize,
 }
 
 
-status_t
+ssize_t
 read_port_etc(port_id port, int32 *code, void *buffer, size_t bufferSize,
 	uint32 flags, bigtime_t timeout)
 {
