@@ -22,6 +22,7 @@ protected:
 		memset(mh,0,sizeof(media_header));
 		status_t result = track->ReadChunk((char**)chunkData,(int32*)chunkLen,mh);
 		const void * data = *chunkData;
+		(void)data;
 		return result;
 	}
 };

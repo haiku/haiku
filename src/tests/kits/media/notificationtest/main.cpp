@@ -25,7 +25,7 @@ void InitWatch()
 		status_t rv;
 		rv = roster->StartWatching(be_app_messenger);
 		if (rv != B_OK) {
-			printf("Globalwatch: StartWatching failed. result = %#x\n",rv);
+			printf("Globalwatch: StartWatching failed. result = %#lx\n",rv);
 			return;
 		}
 	}
@@ -36,7 +36,7 @@ void InitWatch()
 
 		rv = roster->GetLiveNodes(out_live_nodes, &io_total_count);
 		if (rv != B_OK) {
-			printf("GetLiveNodes failed. result = %#x\n",rv);
+			printf("GetLiveNodes failed. result = %#lx\n",rv);
 			return;
 		}
 		
@@ -51,7 +51,7 @@ void ExitWatch()
 		status_t rv;
 		rv = roster->StopWatching(be_app_messenger);
 		if (rv != B_OK) {
-			printf("Globalwatch: StopWatching failed. result = %#x\n",rv);
+			printf("Globalwatch: StopWatching failed. result = %#lx\n",rv);
 			return;
 		}
 	}
@@ -68,7 +68,7 @@ void StartWatch(media_node node)
 		status_t rv;
 		rv = roster->StartWatching(be_app_messenger, node, B_MEDIA_WILDCARD);
 		if (rv != B_OK) {
-			printf("Nodewatch: StartWatching failed. result = %#x\n",rv);
+			printf("Nodewatch: StartWatching failed. result = %#lx\n",rv);
 			return;
 		}
 		media_node *mn = new media_node;
@@ -83,7 +83,7 @@ void StopWatch(media_node node)
 		status_t rv;
 		rv = roster->StopWatching(be_app_messenger, node, B_MEDIA_WILDCARD);
 		if (rv != B_OK) {
-			printf("Nodewatch: StopWatching failed. result = %#x\n",rv);
+			printf("Nodewatch: StopWatching failed. result = %#lx\n",rv);
 			return;
 		}
 		media_node *mn;
