@@ -71,6 +71,7 @@ class ConsoleNode : public Node {
 		virtual ssize_t Write(const void *buffer, size_t bufferSize);
 };
 
+/** The root file system */
 extern Directory *gRoot;
 
 extern "C" {
@@ -83,6 +84,7 @@ extern status_t add_partitions_for(int fd);
 #ifdef __cplusplus
 // this function is only available in C++
 extern int open_node(Node *node, int mode);
+extern int open_from(Directory *directory, const char *path, int mode);
 
 }
 #endif
