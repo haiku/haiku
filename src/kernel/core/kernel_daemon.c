@@ -87,7 +87,7 @@ register_kernel_daemon(daemon_hook function, void *arg, int frequency)
 	if (function == NULL || frequency < 1)
 		return B_BAD_VALUE;
 
-	daemon = malloc(sizeof(daemon));
+	daemon = malloc(sizeof(struct daemon));
 	if (daemon == NULL)
 		return B_NO_MEMORY;
 
