@@ -27,7 +27,7 @@ typedef struct partition_data {
 	uint32			status;			// [sys]
 	uint32			flags;
 	dev_t			volume;			// [sys]
-	char			*name;			// max: B_FILE_NAME_LENGTH
+	char			*name;			// max: B_OS_NAME_LENGTH
 	char			*content_name;	//
 	char			*type;			//
 	const char		*content_type;	// [sys]
@@ -50,6 +50,24 @@ typedef struct partitionable_space_data {
 	off_t	offset;
 	off_t	size;
 } partitionable_space_data;
+
+// operations on partitions
+enum {
+	B_PARTITION_DEFRAGMENT,
+	B_PARTITION_REPAIR,
+	B_PARTITION_RESIZE,
+	B_PARTITION_RESIZE_CHILD,
+	B_PARTITION_MOVE,
+	B_PARTITION_MOVE_CHILD,
+	B_PARTITION_SET_NAME,
+	B_PARTITION_SET_CONTENT_NAME,
+	B_PARTITION_SET_TYPE,
+	B_PARTITION_SET_PARAMETERS,
+	B_PARTITION_SET_CONTENT_PARAMETERS,
+	B_PARTITION_INITIALIZE,
+	B_PARTITION_CREATE_CHILD,
+	B_PARTITION_DELETE_CHILD,
+};
 
 // disk device locking
 disk_device_data *write_lock_disk_device(partition_id partitionID);
