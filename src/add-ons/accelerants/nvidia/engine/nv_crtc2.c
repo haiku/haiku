@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-4/2004
+   Rudolf Cornelissen 11/2002-5/2004
 */
 
 #define MODULE_BIT 0x00020000
@@ -99,9 +99,10 @@ status_t nv_crtc2_set_timing(display_mode target)
 		/* horizontal timing */
 		//fixme (?): maybe we need real modeline calculations here...
 		//testing (640x480): total = 135% is too much, 120% to small...
-		target.timing.h_total = target.timing.h_display + 160;//128
-		target.timing.h_sync_start = target.timing.h_total - 144;//112
-		target.timing.h_sync_end = target.timing.h_total - 48;//16
+		//total = display + 160 equals panel modeline: but must be smaller...?
+		target.timing.h_total = target.timing.h_display + 152;//160;//128
+		target.timing.h_sync_start = target.timing.h_total - 136;//144;//112
+		target.timing.h_sync_end = target.timing.h_total - 40;//48;//16
 
 		/* vertical timing */
 		target.timing.v_total = target.timing.v_display + 6;
