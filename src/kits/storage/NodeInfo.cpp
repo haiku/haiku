@@ -19,6 +19,8 @@
 
 #include <fs_attr.h>
 
+using namespace std;
+
 // attribute names
 #define NI_BEOS "BEOS"
 static const char *kNITypeAttribute			= NI_BEOS ":TYPE";

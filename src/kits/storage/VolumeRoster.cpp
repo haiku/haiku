@@ -12,7 +12,7 @@
 */
 
 #include <errno.h>
-#include <new.h>
+#include <new>
 
 #include <Bitmap.h>
 #include <Directory.h>
@@ -23,6 +23,8 @@
 #include <VolumeRoster.h>
 
 static const char kBootVolumePath[] = "/boot";
+
+using namespace std;
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -172,7 +174,7 @@ BVolumeRoster::StartWatching(BMessenger messenger)
 	status_t error = (messenger.IsValid() ? B_OK : B_ERROR);
 	// clone messenger
 	if (error == B_OK) {
-		fTarget = new(std::nothrow) BMessenger(messenger);
+		fTarget = new(nothrow) BMessenger(messenger);
 		if (!fTarget)
 			error = B_NO_MEMORY;
 	}

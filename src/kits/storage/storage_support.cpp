@@ -15,6 +15,8 @@
 #include <SupportDefs.h>
 #include "storage_support.h"
 
+using namespace std;
+
 namespace BPrivate {
 namespace Storage {
 
@@ -232,7 +234,7 @@ parse_first_path_component(const char *path, char *&component,
 	int32 length;
 	status_t error = parse_first_path_component(path, length, nextComponent);
 	if (error == B_OK) {
-		component = new(std::nothrow) char[length + 1];
+		component = new(nothrow) char[length + 1];
 		if (component) {
 			strncpy(component, path, length);
 			component[length] = '\0';
@@ -376,7 +378,7 @@ void escape_path(const char *str, char *result)
 void escape_path(char *str)
 {
 	if (str) {
-		char *copy = new(std::nothrow) char[strlen(str)+1];
+		char *copy = new(nothrow) char[strlen(str)+1];
 		if (copy) {
 			strcpy(copy, str);
 			escape_path(copy, str);

@@ -22,6 +22,8 @@
 using namespace OpenBeOS;
 #endif
 
+using namespace std;
+
 // SYMLINK_MAX is needed by B_SYMLINK_MAX
 // I don't know, why it isn't defined.
 #ifndef SYMLINK_MAX
@@ -114,7 +116,7 @@ status_t entry_ref::set_name(const char *name)
 	if (name == NULL) {
 		this->name = NULL;
 	} else {
-		this->name = new(std::nothrow) char[strlen(name)+1];
+		this->name = new(nothrow) char[strlen(name)+1];
 		if (this->name == NULL)
 			return B_NO_MEMORY;
 		strcpy(this->name, name);
@@ -1047,7 +1049,7 @@ BEntry::set_name(const char *name)
 		delete [] fName;
 	}
 	
-	fName = new(std::nothrow) char[strlen(name)+1];
+	fName = new(nothrow) char[strlen(name)+1];
 	if (fName == NULL)
 		return B_NO_MEMORY;
 		

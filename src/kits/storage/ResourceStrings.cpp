@@ -19,6 +19,9 @@
 
 #include "kernel_interface.h"
 
+using namespace std;
+
+
 // constructor
 /*! \brief Creates an object initialized to the application's string resources.
 */

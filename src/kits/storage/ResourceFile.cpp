@@ -7,9 +7,9 @@
 	ResourceFile implementation.
 */
 
-#include "ResourceFile.h"
+#include <ResourceFile.h>
 
-#include <algobase.h>
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 
@@ -20,6 +20,8 @@
 #include "ResourcesContainer.h"
 #include "ResourcesDefs.h"
 //#include "Warnings.h"
+
+using namespace std;
 
 namespace BPrivate {
 namespace Storage {
@@ -822,7 +824,7 @@ ResourceFile::_ReadIndexEntry(resource_parse_info &parseInfo, int32 index,
 	}
 	// add the entry
 	if (result) {
-		ResourceItem *item = new(std::nothrow) ResourceItem;
+		ResourceItem *item = new(nothrow) ResourceItem;
 		if (!item)
 			throw Exception(B_NO_MEMORY);
 		item->SetLocation(offset, size);
@@ -841,7 +843,7 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	int32 &resourceCount = parseInfo.resource_count;
 	// read the info table
 	// alloc memory for the table
-	char *tableData = new(std::nothrow) char[parseInfo.info_table_size];
+	char *tableData = new(nothrow) char[parseInfo.info_table_size];
 	if (!tableData)
 		throw Exception(B_NO_MEMORY);
 	int32 dataSize = parseInfo.info_table_size;
@@ -849,7 +851,7 @@ ResourceFile::_ReadInfoTable(resource_parse_info &parseInfo)
 	read_exactly(fFile, parseInfo.info_table_offset, tableData, dataSize,
 				 "Failed to read resource info table.");
 	//
-	bool *readIndices = new(std::nothrow) bool[resourceCount + 1];
+	bool *readIndices = new(nothrow) bool[resourceCount + 1];
 		// + 1 => always > 0
 	if (!readIndices)
 		throw Exception(B_NO_MEMORY);
@@ -1074,7 +1076,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		// write...
 		// set the file size
 		fFile.SetSize(size);
-		buffer = new(std::nothrow) char[bufferSize];
+		buffer = new(nothrow) char[bufferSize];
 		if (!buffer)
 			throw Exception(B_NO_MEMORY);
 		void *data = buffer;

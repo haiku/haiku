@@ -17,6 +17,8 @@
 #include "kernel_interface.h"
 #include "storage_support.h"
 
+using namespace std;
+
 #ifdef USE_OPENBEOS_NAMESPACE
 using namespace OpenBeOS;
 #endif
@@ -600,7 +602,7 @@ BPath::set_path(const char *path)
 	const char *oldPath = fName;
 	// set the new path
 	if (path) {
-		fName = new(std::nothrow) char[strlen(path) + 1];
+		fName = new(nothrow) char[strlen(path) + 1];
 		if (fName)
 			strcpy(fName, path);
 		else

@@ -14,7 +14,7 @@
 #include <sniffer/Parser.h>
 
 #include <ctype.h>			// For tolower()
-#include <new.h>			// For new(nothrow)
+#include <new>			// For new(nothrow)
 #include <stdio.h>			// For printf()
 #include <string.h>			// For strncpy()
 #include <RegistrarDefs.h>
@@ -29,6 +29,7 @@ enum {
 };
 
 using namespace BPrivate::Storage::Mime;
+using namespace std;
 
 const char *B_PEF_APP_MIME_TYPE		= "application/x-be-executable";
 const char *B_PE_APP_MIME_TYPE		= "application/x-vnd.be-peexecutable";

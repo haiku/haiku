@@ -25,6 +25,7 @@
 #include "ResourcesContainer.h"
 
 using namespace BPrivate::Storage;
+using namespace std;
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -39,7 +40,7 @@ BResources::BResources()
 			fResourceFile(NULL),
 			fReadOnly(false)
 {
-	fContainer = new(std::nothrow) ResourcesContainer;
+	fContainer = new(nothrow) ResourcesContainer;
 }
 
 // constructor
@@ -61,7 +62,7 @@ BResources::BResources(const BFile *file, bool clobber)
 			fResourceFile(NULL),
 			fReadOnly(false)
 {
-	fContainer = new(std::nothrow) ResourcesContainer;
+	fContainer = new(nothrow) ResourcesContainer;
 	SetTo(file, clobber);
 }
 
@@ -109,7 +110,7 @@ BResources::SetTo(const BFile *file, bool clobber)
 		}
 		if (error == B_OK) {
 			fReadOnly = !fFile.IsWritable();
-			fResourceFile = new(std::nothrow) ResourceFile;
+			fResourceFile = new(nothrow) ResourceFile;
 			if (fResourceFile)
 				error = fResourceFile->SetTo(&fFile, clobber);
 			else
@@ -148,7 +149,7 @@ BResources::Unset()
 	if (fContainer)
 		fContainer->MakeEmpty();
 	else
-		fContainer = new(std::nothrow) ResourcesContainer;
+		fContainer = new(nothrow) ResourcesContainer;
 	fReadOnly = false;
 }
 
@@ -383,7 +384,7 @@ BResources::WriteTo(BFile *file)
 	// set the new file, but keep the old container
 	if (error == B_OK) {
 		ResourcesContainer *container = fContainer;
-		fContainer = new(std::nothrow) ResourcesContainer;
+		fContainer = new(nothrow) ResourcesContainer;
 		if (fContainer) {
 			error = SetTo(file, false);
 			delete fContainer;
@@ -425,7 +426,7 @@ BResources::AddResource(type_code type, int32 id, const void *data,
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
 	if (error == B_OK) {
-		ResourceItem *item = new(std::nothrow) ResourceItem;
+		ResourceItem *item = new(nothrow) ResourceItem;
 		if (!item)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {
