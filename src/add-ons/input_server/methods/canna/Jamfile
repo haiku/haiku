@@ -7,7 +7,11 @@ Addon canna : input_server/methods :
 	KouhoWindow.cpp
 	PaletteWindow.cpp
 	: false
-	: be textencoding input_server libcanna.a librk.a ;
+	: be textencoding <nogrist>input_server libcanna.a librk.a ;
+
+Package haiku-cannaIM-cvs :
+	canna :
+	boot home config add-ons input_server methods ;
 
 SubInclude OBOS_TOP src add-ons input_server methods canna lib ;
 SubInclude OBOS_TOP src add-ons input_server methods canna rk ;
