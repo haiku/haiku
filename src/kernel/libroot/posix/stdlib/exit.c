@@ -33,9 +33,6 @@ static int    _Exit_SP = 0;
 void
 abort()
 {
-	// ToDo: uncomment the raise() call once it is implemented
-	
-	//raise(SIGABRT);
 	exit(EXIT_FAILURE);
 }
 
