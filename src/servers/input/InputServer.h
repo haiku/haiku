@@ -165,7 +165,8 @@ public:
 	static BLocker gInputMethodListLocker;
 	
 	static DeviceManager	gDeviceManager;
-	
+
+	BRect& ScreenFrame() { return fFrame;};
 private:
 	status_t 	LoadKeymap();
 	status_t 	LoadSystemKeymap();

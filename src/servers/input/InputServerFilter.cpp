@@ -30,6 +30,7 @@
 /*****************************************************************************/
 
 
+#include <Region.h>
 #include <InputServerFilter.h>
 #include "InputServer.h"
 
@@ -61,7 +62,7 @@ status_t
 BInputServerFilter::InitCheck()
 {
 	CALLED();
-    return B_OK;
+	return B_OK;
 }
 
 
@@ -74,7 +75,7 @@ BInputServerFilter::Filter(BMessage *message,
                            BList *outList)
 {	
 	CALLED();
-    return B_DISPATCH_MESSAGE;
+	return B_DISPATCH_MESSAGE;
 }
 
 
@@ -85,9 +86,11 @@ BInputServerFilter::Filter(BMessage *message,
 status_t
 BInputServerFilter::GetScreenRegion(BRegion *region) const
 {
-    status_t dummy;
+	if (!region)
+		return B_BAD_VALUE;
 
-    return dummy;
+	*region = BRegion(((InputServer*)be_app)->ScreenFrame());
+	return B_OK;
 }
 
 
