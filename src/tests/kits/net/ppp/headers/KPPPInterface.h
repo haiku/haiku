@@ -141,6 +141,21 @@ class PPPInterface {
 		ppp_phase Phase() const
 			{ return fStateMachine.Phase(); }
 		
+		// Protocol-Field-Compression
+		bool SetPFCOptions(uint8 pfcOptions);
+		uint8 PFCOptions() const
+			{ return fPFCOptions; }
+		ppp_pfc_state LocalPFCState() const
+			{ return fLocalPFCState; }
+				// the local PFC state says if we accepted a request from the peer
+				// i.e.: we may use PFC in outgoing packets
+		ppp_pfc_state PeerPFCState() const
+			{ return fPeerPFCState; }
+				// the peer PFC state says if the peer accepted a request us
+				// i.e.: the peer might send PFC-compressed packets to us
+		bool UseLocalPFC() const
+			{ return LocalPFCState() & PPP_PFC_ACCEPTED; }
+		
 		bool Up();
 			// in server mode Up() listens for an incoming connection
 		bool Down();
@@ -174,6 +189,11 @@ class PPPInterface {
 			// adds us to the manager module and
 			// saves the returned ifnet structure
 		bool UnregisterInterface();
+		
+		status_t StackControl(uint32 op, void *data);
+			// stack routes ioctls to interface
+		status_t ControlEachHandler(uint32 op, void *data, size_t length);
+			// this calls Control() with the given parameters for each handler
 		
 		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
@@ -213,9 +233,9 @@ class PPPInterface {
 		
 		bool fAutoRedial, fDialOnDemand;
 		
-		vint32 fAccesing;
-		
 		ppp_mode fMode;
+		ppp_pfc_state fLocalPFCState, fPeerPFCState;
+		uint8 fPFCOptions;
 		
 		PPPDevice *fDevice;
 		PPPEncapsulator *fFirstEncapsulator;

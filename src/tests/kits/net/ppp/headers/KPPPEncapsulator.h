@@ -99,6 +99,8 @@ class PPPEncapsulator {
 
 	protected:
 		uint32 fOverhead;
+		
+		status_t fInitStatus;
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
@@ -115,7 +117,6 @@ class PPPEncapsulator {
 		bool fEnabled;
 		bool fUpRequested;
 		ppp_phase fConnectionStatus;
-		status_t fInitStatus;
 };
 
 

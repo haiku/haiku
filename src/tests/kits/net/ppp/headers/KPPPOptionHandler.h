@@ -43,25 +43,28 @@ class PPPOptionHandler {
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
-		virtual void Reset() = 0;
-			// e.g.: remove list of rejected values
-		
 		// we want to send a configure request or we received a reply
-		virtual status_t AddToRequest(PPPConfigurePacket *request) = 0;
-		virtual void ParseNak(const PPPConfigurePacket *nak) = 0;
+		virtual status_t AddToRequest(PPPConfigurePacket& request) = 0;
+		virtual status_t ParseNak(const PPPConfigurePacket& nak) = 0;
 			// create next request based on these and previous values
-		virtual void ParseReject(const PPPConfigurePacket *reject) = 0;
+		virtual status_t ParseReject(const PPPConfigurePacket& reject) = 0;
 			// create next request based on these and previous values
-		virtual void ParseAck(const PPPConfigurePacket *ack) = 0;
+		virtual status_t ParseAck(const PPPConfigurePacket& ack) = 0;
 			// this is called for all handlers
 		
 		// peer sent configure request
-		virtual status_t ParseRequest(const PPPConfigurePacket *request,
-			int32 item, PPPConfigurePacket *nak, PPPConfigurePacket *reject) = 0;
-			// item may be behind the last item which means we can add
-			// additional values
-		virtual void SendingAck(const PPPConfigurePacket *ack) = 0;
+		virtual status_t ParseRequest(const PPPConfigurePacket& request,
+			int32 index, PPPConfigurePacket& nak, PPPConfigurePacket& reject) = 0;
+			// index may be behind the last item which means additional values can be
+			// appended
+		virtual status_t SendingAck(const PPPConfigurePacket& ack) = 0;
 			// notification that we ack these values
+		
+		virtual void Reset() = 0;
+			// e.g.: remove list of rejected values
+
+	protected:
+		status_t fInitStatus;
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
@@ -70,7 +73,6 @@ class PPPOptionHandler {
 		driver_parameter *fSettings;
 		
 		bool fEnabled;
-		status_t fInitStatus;
 };
 
 

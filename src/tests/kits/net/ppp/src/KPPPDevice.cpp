@@ -15,7 +15,10 @@
 
 PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 		driver_parameter *settings)
-	: fMTU(1500), fIsUp(false), fInterface(interface), fSettings(settings)
+	: fMTU(1500),
+	fIsUp(false),
+	fInterface(interface),
+	fSettings(settings)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -36,9 +39,6 @@ PPPDevice::~PPPDevice()
 status_t
 PPPDevice::InitCheck() const
 {
-	if(!Settings())
-		return B_ERROR;
-	
 	return fInitStatus;
 }
 
@@ -63,7 +63,7 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 		} break;
 		
 		default:
-			return PPP_UNHANDLED;
+			return B_BAD_VALUE;
 	}
 	
 	return B_OK;

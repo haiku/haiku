@@ -41,11 +41,13 @@ class PPPLCPExtension {
 		
 		virtual status_t Control(uint32 op, void *data, size_t length);
 		
-		virtual void Reset();
-		
 		virtual status_t Receive(struct mbuf *packet, uint8 code) = 0;
 		
+		virtual void Reset();
 		virtual void Pulse();
+
+	protected:
+		status_t fInitStatus;
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
@@ -54,7 +56,6 @@ class PPPLCPExtension {
 		uint8 fCode;
 		
 		bool fEnabled;
-		status_t fInitStatus;
 };
 
 

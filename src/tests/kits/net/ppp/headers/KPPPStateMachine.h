@@ -58,13 +58,13 @@ class PPPStateMachine {
 		bool SendDiscardRequest();
 		
 		// public events
-		void AuthenticationRequested();
-		void AuthenticationAccepted(const char *name);
-		void AuthenticationDenied(const char *name);
-		const char *AuthenticationName() const
-			{ return fAuthenticationName; }
-		ppp_authentication_status AuthenticationStatus() const
-			{ return fAuthenticationStatus; }
+		void LocalAuthenticationRequested();
+		void LocalAuthenticationAccepted(const char *name);
+		void LocalAuthenticationDenied(const char *name);
+		const char *LocalAuthenticationName() const
+			{ return fLocalAuthenticationName; }
+		ppp_authentication_status LocalAuthenticationStatus() const
+			{ return fLocalAuthenticationStatus; }
 		
 		void PeerAuthenticationRequested();
 		void PeerAuthenticationAccepted(const char *name);
@@ -159,9 +159,9 @@ class PPPStateMachine {
 		vint32 fID;
 		uint32 fMagicNumber;
 		
-		ppp_authentication_status fAuthenticationStatus,
+		ppp_authentication_status fLocalAuthenticationStatus,
 			fPeerAuthenticationStatus;
-		char *fAuthenticationName, *fPeerAuthenticationName;
+		char *fLocalAuthenticationName, *fPeerAuthenticationName;
 		
 		BLocker fLock;
 		

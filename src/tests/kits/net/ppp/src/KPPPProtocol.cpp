@@ -16,10 +16,16 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 		int32 addressFamily, PPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
 		ppp_authenticator_type authenticatorType = PPP_NO_AUTHENTICATOR)
-	: fPhase(phase), fProtocol(protocol), fAddressFamily(addressFamily),
-	fInterface(interface), fSettings(settings), fFlags(flags),
-	fAuthenticatorType(authenticatorType), fEnabled(true),
-	fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
+	: fPhase(phase),
+	fProtocol(protocol),
+	fAddressFamily(addressFamily),
+	fInterface(interface),
+	fSettings(settings),
+	fFlags(flags),
+	fAuthenticatorType(authenticatorType),
+	fEnabled(true),
+	fUpRequested(true),
+	fConnectionStatus(PPP_DOWN_PHASE)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -44,9 +50,6 @@ PPPProtocol::~PPPProtocol()
 status_t
 PPPProtocol::InitCheck() const
 {
-	if(!Settings())
-		return B_ERROR;
-	
 	return fInitStatus;
 }
 
@@ -94,7 +97,7 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 		break;
 		
 		default:
-			return PPP_UNHANDLED;
+			return B_BAD_VALUE;
 	}
 	
 	return B_OK;

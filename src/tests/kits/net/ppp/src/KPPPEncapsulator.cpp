@@ -16,10 +16,17 @@ PPPEncapsulator::PPPEncapsulator(const char *name, ppp_phase phase,
 		int32 addressFamily, uint32 overhead,
 		PPPInterface& interface, driver_parameter *settings,
 		int32 flags = PPP_NO_FLAGS)
-	: fOverhead(overhead), fPhase(phase), fLevel(level), fProtocol(protocol),
-	fAddressFamily(addressFamily), fInterface(interface),
-	fSettings(settings), fFlags(flags), fEnabled(true),
-	fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
+	: fOverhead(overhead),
+	fPhase(phase),
+	fLevel(level),
+	fProtocol(protocol),
+	fAddressFamily(addressFamily),
+	fInterface(interface),
+	fSettings(settings),
+	fFlags(flags),
+	fEnabled(true),
+	fUpRequested(true),
+	fConnectionStatus(PPP_DOWN_PHASE)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -40,9 +47,6 @@ PPPEncapsulator::~PPPEncapsulator()
 status_t
 PPPEncapsulator::InitCheck() const
 {
-	if(!Settings())
-		return B_ERROR;
-	
 	return fInitStatus;
 }
 
@@ -91,7 +95,7 @@ PPPEncapsulator::Control(uint32 op, void *data, size_t length)
 		break;
 		
 		default:
-			return PPP_UNHANDLED;
+			return B_BAD_VALUE;
 	}
 	
 	return B_OK;

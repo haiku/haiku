@@ -23,5 +23,8 @@ R5KernelStaticLibrary kernelppp :
 	Locker.cpp
 	settings_tools.cpp
 	cpp.cpp
+	
+	# integrated modules
+	_KPPPPFCHandler.cpp
 ;
 

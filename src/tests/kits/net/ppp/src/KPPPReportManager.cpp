@@ -93,7 +93,7 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 	LockerHelper locker(fLock);
 	
 	status_t result;
-	thread_id sender;
+	thread_id sender, me = find_thread(NULL);
 	bool acceptable = true;
 	
 	ppp_report_packet report;
@@ -106,6 +106,10 @@ PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 len
 	
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
 		request = fReportRequests.ItemAt(index);
+		
+		// do not send to yourself
+		if(request->thread == me)
+			continue;
 		
 		result = send_data_with_timeout(request->thread, PPP_REPORT_CODE, &report,
 			sizeof(report), PPP_REPORT_TIMEOUT);

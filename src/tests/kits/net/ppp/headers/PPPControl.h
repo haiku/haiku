@@ -59,6 +59,10 @@ enum ppp_control_ops {
 	PPPC_SET_ENABLED,
 	PPPC_GET_SIMPLE_HANDLER_INFO,
 		// PPPOptionHandler and PPPLCPExtension
+	PPPC_STACK_IOCTL,
+		// Ioctls from the stack are passed to all handlers and the interface
+		// using a ppp_control_info (only op and data are defined!).
+		// You should return B_BAD_VALUE if you did not handle this ioctl.
 	// -----------------------------------------------------
 	
 	PPP_CONTROL_OPS_END = B_DEVICE_OP_CODES_END + 0xFFFF
@@ -89,13 +93,17 @@ typedef struct ppp_interface_info {
 	ppp_mode mode;
 	ppp_state state;
 	ppp_phase phase;
-	ppp_authentication_status authenticationStatus, peerAuthenticationStatus;
+	ppp_authentication_status localAuthenticationStatus, peerAuthenticationStatus;
+	ppp_pfc_state localPFCState, peerPFCState;
+	uint8 pfcOptions;
 	
 	uint32 protocolsCount, encapsulatorsCount, optionHandlersCount,
 		LCPExtensionsCount, childrenCount;
 	uint32 MRU, interfaceMTU;
 	
-	bigtime_t idleSince, disconnectAfterIdleSince;
+	uint32 dialRetry, dialRetriesLimit;
+	uint32 dialRetryDelay, redialDelay;
+	uint32 idleSince, disconnectAfterIdleSince;
 	
 	bool doesDialOnDemand, doesAutoRedial, hasDevice, isMultilink, hasParent;
 } ppp_interface_info;

@@ -78,12 +78,13 @@ class PPPDevice {
 	protected:
 		uint32 fMTU;
 		bool fIsUp;
+		
+		status_t fInitStatus;
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
-		status_t fInitStatus;
 };
 
 

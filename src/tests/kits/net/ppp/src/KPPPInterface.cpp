@@ -19,6 +19,7 @@
 #include <PPPControl.h>
 #include <KPPPDevice.h>
 #include <KPPPEncapsulator.h>
+#include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 #include <KPPPModule.h>
 #include <KPPPManager.h>
@@ -29,6 +30,9 @@
 
 // tools only for us :)
 #include "settings_tools.h"
+
+// internal modules
+#include "_KPPPPFCHandler.h"
 
 
 // TODO:
@@ -52,13 +56,36 @@ status_t interface_deleter_thread(void *data);
 
 PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		PPPInterface *parent = NULL)
-	: fID(ID), fSettings(dup_driver_settings(settings)),
-	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
-	fIfnet(NULL), fUpThread(-1), fRedialThread(-1), fDialRetry(0),
-	fDialRetriesLimit(0), fIdleSince(0), fMRU(1500), fInterfaceMTU(1498),
-	fHeaderLength(2), fAutoRedial(false), fDialOnDemand(false), fDevice(NULL),
-	fFirstEncapsulator(NULL), fLock(StateMachine().Locker()), fDeleteCounter(0)
+	: fID(ID),
+	fSettings(dup_driver_settings(settings)),
+	fStateMachine(*this),
+	fLCP(*this),
+	fReportManager(StateMachine().Locker()),
+	fIfnet(NULL),
+	fUpThread(-1),
+	fRedialThread(-1),
+	fDialRetry(0),
+	fDialRetriesLimit(0),
+	fIdleSince(0),
+	fMRU(1500),
+	fInterfaceMTU(1498),
+	fHeaderLength(2),
+	fAutoRedial(false),
+	fDialOnDemand(false),
+	fLocalPFCState(PPP_PFC_DISABLED),
+	fPeerPFCState(PPP_PFC_DISABLED),
+	fPFCOptions(0),
+	fDevice(NULL),
+	fFirstEncapsulator(NULL),
+	fLock(StateMachine().Locker()),
+	fDeleteCounter(0)
 {
+	// add internal modules
+	_PPPPFCHandler *pfcHandler =
+		new _PPPPFCHandler(fLocalPFCState, fPeerPFCState, *this);
+	if(pfcHandler->InitCheck() != B_OK)
+		delete pfcHandler;
+	
 	// set up dial delays
 	fDialRetryDelay = 3000;
 		// 3s delay between each new attempt to redial
@@ -253,9 +280,13 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			info->mode = Mode();
 			info->state = State();
 			info->phase = Phase();
-			info->authenticationStatus = StateMachine().AuthenticationStatus();
+			info->localAuthenticationStatus =
+				StateMachine().LocalAuthenticationStatus();
 			info->peerAuthenticationStatus =
 				StateMachine().PeerAuthenticationStatus();
+			info->localPFCState = LocalPFCState();
+			info->peerPFCState = PeerPFCState();
+			info->pfcOptions = PFCOptions();
 			info->protocolsCount = CountProtocols();
 			info->encapsulatorsCount = CountEncapsulators();
 			info->optionHandlersCount = LCP().CountOptionHandlers();
@@ -263,6 +294,10 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			info->childrenCount = CountChildren();
 			info->MRU = MRU();
 			info->interfaceMTU = InterfaceMTU();
+			info->dialRetry = fDialRetry;
+			info->dialRetriesLimit = fDialRetriesLimit;
+			info->dialRetryDelay = DialRetryDelay();
+			info->redialDelay = RedialDelay();
 			info->idleSince = IdleSince();
 			info->disconnectAfterIdleSince = DisconnectAfterIdleSince();
 			info->doesDialOnDemand = DoesDialOnDemand();
@@ -361,7 +396,16 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 		} break;
 		
 		case PPPC_CONTROL_LCP_EXTENSION: {
-			return PPP_UNHANDLED;
+			if(length < sizeof(ppp_control_info) || !data)
+				return B_ERROR;
+			
+			ppp_control_info *control = (ppp_control_info*) data;
+			PPPLCPExtension *extension_handler = LCP().LCPExtensionAt(control->index);
+			if(!extension_handler)
+				return B_BAD_INDEX;
+			
+			return extension_handler->Control(control->op, control->data,
+				control->length);
 		} break;
 		
 		case PPPC_CONTROL_CHILD: {
@@ -376,8 +420,19 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			return child->Control(control->op, control->data, control->length);
 		} break;
 		
+		case PPPC_STACK_IOCTL: {
+			if(length < sizeof(ppp_control_info) || !data)
+				return B_ERROR;
+			
+			ppp_control_info *control = (ppp_control_info*) data;
+			if(StackControl(control->op, control->data) == B_BAD_VALUE)
+				return ControlEachHandler(op, data, length);
+			
+			return B_OK;
+		} break;
+		
 		default:
-			return PPP_UNHANDLED;
+			return B_BAD_VALUE;
 	}
 	
 	return B_OK;
@@ -719,6 +774,17 @@ PPPInterface::SetDialOnDemand(bool dialondemand = true)
 
 
 bool
+PPPInterface::SetPFCOptions(uint8 pfcOptions)
+{
+	if(PFCOptions() & PPP_FREEZE_PFC_OPTIONS)
+		return false;
+	
+	fPFCOptions = pfcOptions;
+	return true;
+}
+
+
+bool
 PPPInterface::Up()
 {
 	if(InitCheck() != B_OK || Phase() == PPP_TERMINATION_PHASE)
@@ -742,8 +808,12 @@ PPPInterface::Up()
 	fLock.Unlock();
 	
 	// fUpThread tells the state machine to go up
-	if(me == fUpThread)
+	if(me == fUpThread || me == fRedialThread)
 		StateMachine().OpenEvent();
+	
+	if(me == fRedialThread && me != fUpThread)
+		return true;
+			// the redial thread is doing a DialRetry in this case
 	
 	while(true) {
 		if(IsUp()) {
@@ -763,6 +833,9 @@ PPPInterface::Up()
 			return true;
 		}
 		
+		// A wrong code usually happens when the redial thread gets notified
+		// of a Down() request. In that case a report will follow soon, so
+		// this can be ignored.
 		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
 			continue;
 		
@@ -798,6 +871,8 @@ PPPInterface::Up()
 			if(me == fUpThread) {
 				fDialRetry = 0;
 				fUpThread = -1;
+				send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
+					// notify redial thread that we do not need it anymore
 			}
 			
 			PPP_REPLY(sender, B_OK);
@@ -805,7 +880,8 @@ PPPInterface::Up()
 			return true;
 		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
 				|| report.code == PPP_REPORT_UP_ABORTED
-				|| report.code == PPP_REPORT_AUTHENTICATION_FAILED) {
+				|| report.code == PPP_REPORT_LOCAL_AUTHENTICATION_FAILED
+				|| report.code == PPP_REPORT_PEER_AUTHENTICATION_FAILED) {
 			if(me == fUpThread) {
 				fDialRetry = 0;
 				fUpThread = -1;
@@ -857,7 +933,7 @@ PPPInterface::Up()
 				} else {
 					++fDialRetry;
 					PPP_REPLY(sender, B_OK);
-					StateMachine().OpenEvent();
+					Redial(DialRetryDelay());
 					continue;
 				}
 			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
@@ -866,7 +942,7 @@ PPPInterface::Up()
 				if(DoesAutoRedial() && fDialRetry < fDialRetriesLimit) {
 					++fDialRetry;
 					PPP_REPLY(sender, B_OK);
-					StateMachine().OpenEvent();
+					Redial(DialRetryDelay());
 					continue;
 				} else {
 					fDialRetry = 0;
@@ -896,6 +972,9 @@ PPPInterface::Down()
 {
 	if(InitCheck() != B_OK)
 		return false;
+	
+	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
+		// the redial thread should be notified that the user wants to disconnect
 	
 	// this locked section guarantees that there are no state changes before we
 	// enable the connection reports
@@ -1218,16 +1297,26 @@ PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 		return B_ERROR;
 	}
 	
-	// encode in ppp frame
-	M_PREPEND(packet, 2);
-	
-	if(packet == NULL)
-		return B_ERROR;
-	
-	// set protocol (the only header field)
-	protocol = htons(protocol);
-	uint16 *header = mtod(packet, uint16*);
-	*header = protocol;
+	// encode in ppp frame and consider using PFC
+	if(UseLocalPFC() && protocol & 0xFF00 == 0) {
+		M_PREPEND(packet, 1);
+		
+		if(packet == NULL)
+			return B_ERROR;
+		
+		uint8 *header = mtod(packet, uint8*);
+		*header = protocol & 0xFF;
+	} else {
+		M_PREPEND(packet, 2);
+		
+		if(packet == NULL)
+			return B_ERROR;
+		
+		// set protocol (the only header field)
+		protocol = htons(protocol);
+		uint16 *header = mtod(packet, uint16*);
+		*header = protocol;
+	}
 	
 	fIdleSince = real_time_clock();
 	
@@ -1260,13 +1349,16 @@ PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 		return B_ERROR;
 	}
 	
-	// decode ppp frame
-	uint16 *protocol = mtod(packet, uint16*);
-	*protocol = ntohs(*protocol);
+	// decode ppp frame and recognize PFC
+	uint16 protocol = *mtod(packet, uint8*);
+	if(protocol == 0)
+		m_adj(packet, 1);
+	else {
+		protocol = ntohs(*mtod(packet, uint16*));
+		m_adj(packet, 2);
+	}
 	
-	m_adj(packet, 2);
-	
-	return Receive(packet, *protocol);
+	return Receive(packet, protocol);
 }
 
 
@@ -1348,6 +1440,89 @@ PPPInterface::UnregisterInterface()
 	fIfnet = NULL;
 	
 	return true;
+}
+
+
+// stack routes ioctls to interface
+status_t
+PPPInterface::StackControl(uint32 op, void *data)
+{
+	// TODO:
+	// implement when writing ppp_manager module
+	
+	switch(op) {
+		default:
+			return B_BAD_VALUE;
+	}
+	
+	return B_OK;
+}
+
+
+// This calls Control() with the given parameters for each handler.
+// Return values:
+//  B_OK: all handlers returned B_OK
+//  B_BAD_VALUE: no handler was found
+//  any other value: the error value that was returned by the last handler that failed
+status_t
+PPPInterface::ControlEachHandler(uint32 op, void *data, size_t length)
+{
+	int32 index;
+	status_t result = B_BAD_VALUE, tmp;
+	
+	// protocols
+	PPPProtocol *protocol;
+	for(index = 0; index < CountProtocols(); index++) {
+		protocol = ProtocolAt(index);
+		if(!protocol)
+			break;
+		
+		tmp = protocol->Control(op, data, length);
+		if(tmp == B_OK && result == B_BAD_VALUE)
+			result = B_OK;
+		else if(tmp != B_BAD_VALUE)
+			result = tmp;
+	}
+	
+	// encapsulators
+	PPPEncapsulator *encapsulator = FirstEncapsulator();
+	for(; encapsulator; encapsulator = encapsulator->Next()) {
+		tmp = encapsulator->Control(op, data, length);
+		if(tmp == B_OK && result == B_BAD_VALUE)
+			result = B_OK;
+		else if(tmp != B_BAD_VALUE)
+			result = tmp;
+	}
+	
+	// option handlers
+	PPPOptionHandler *optionHandler;
+	for(index = 0; index < LCP().CountOptionHandlers(); index++) {
+		optionHandler = LCP().OptionHandlerAt(index);
+		if(!optionHandler)
+			break;
+		
+		tmp = optionHandler->Control(op, data, length);
+		if(tmp == B_OK && result == B_BAD_VALUE)
+			result = B_OK;
+		else if(tmp != B_BAD_VALUE)
+			result = tmp;
+	}
+	
+	// LCP extensions
+	PPPLCPExtension *lcpExtension;
+	for(index = 0; index < LCP().CountLCPExtensions(); index++) {
+		lcpExtension = LCP().LCPExtensionAt(index);
+		if(!lcpExtension)
+			break;
+		
+		tmp = lcpExtension->Control(op, data, length);
+		if(tmp == B_OK && result == B_BAD_VALUE)
+			result = B_OK;
+		else if(tmp != B_BAD_VALUE)
+			result = tmp;
+	}
+	
+	return result;
 }
 
 
@@ -1446,8 +1621,11 @@ redial_thread(void *data)
 	receive_data(&sender, &info, sizeof(redial_info));
 	
 	// we try to receive data instead of snooze, so we can quit on destruction
-	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK)
+	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
+		*info.thread = -1;
+		info.interface->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_ABORTED, NULL, 0);
 		return B_OK;
+	}
 	
 	info.interface->Up();
 	*info.thread = -1;

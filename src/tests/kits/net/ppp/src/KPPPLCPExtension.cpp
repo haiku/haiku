@@ -12,7 +12,10 @@
 
 PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& interface,
 		driver_parameter *settings)
-	: fInterface(interface), fSettings(settings), fCode(code), fEnabled(true)
+	: fInterface(interface),
+	fSettings(settings),
+	fCode(code),
+	fEnabled(true)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -33,9 +36,6 @@ PPPLCPExtension::~PPPLCPExtension()
 status_t
 PPPLCPExtension::InitCheck() const
 {
-	if(!Settings())
-		return B_ERROR;
-	
 	return fInitStatus;
 }
 
@@ -63,7 +63,7 @@ PPPLCPExtension::Control(uint32 op, void *data, size_t length)
 		break;
 		
 		default:
-			return PPP_UNHANDLED;
+			return B_BAD_VALUE;
 	}
 	
 	return B_OK;

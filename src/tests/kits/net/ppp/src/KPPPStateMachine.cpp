@@ -22,20 +22,30 @@
 
 
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
-	: fInterface(interface), fLCP(interface.LCP()), fPhase(PPP_DOWN_PHASE),
-	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF), fMagicNumber(0),
-	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
+	: fInterface(interface),
+	fLCP(interface.LCP()),
+	fPhase(PPP_DOWN_PHASE),
+	fState(PPP_INITIAL_STATE),
+	fID(system_time() & 0xFF),
+	fMagicNumber(0),
+	fLocalAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
-	fAuthenticationName(NULL), fPeerAuthenticationName(NULL),
-	fMaxRequest(10), fMaxTerminate(2), fMaxNak(5),
-	fRequestID(0), fTerminateID(0), fEchoID(0), fNextTimeout(0)
+	fLocalAuthenticationName(NULL),
+	fPeerAuthenticationName(NULL),
+	fMaxRequest(10),
+	fMaxTerminate(2),
+	fMaxNak(5),
+	fRequestID(0),
+	fTerminateID(0),
+	fEchoID(0),
+	fNextTimeout(0)
 {
 }
 
 
 PPPStateMachine::~PPPStateMachine()
 {
-	free(fAuthenticationName);
+	free(fLocalAuthenticationName);
 	free(fPeerAuthenticationName);
 }
 
@@ -169,38 +179,38 @@ PPPStateMachine::SendDiscardRequest()
 
 // authentication events
 void
-PPPStateMachine::AuthenticationRequested()
+PPPStateMachine::LocalAuthenticationRequested()
 {
 	LockerHelper locker(fLock);
 	
-	fAuthenticationStatus = PPP_AUTHENTICATING;
-	free(fAuthenticationName);
-	fAuthenticationName = NULL;
+	fLocalAuthenticationStatus = PPP_AUTHENTICATING;
+	free(fLocalAuthenticationName);
+	fLocalAuthenticationName = NULL;
 }
 
 
 void
-PPPStateMachine::AuthenticationAccepted(const char *name)
+PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 {
 	LockerHelper locker(fLock);
 	
-	fAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
-	free(fAuthenticationName);
-	fAuthenticationName = strdup(name);
+	fLocalAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
+	free(fLocalAuthenticationName);
+	fLocalAuthenticationName = strdup(name);
 	
-	Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_AUTHENTICATION_SUCCESSFUL,
-		NULL, 0);
+	Interface().Report(PPP_CONNECTION_REPORT,
+		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, NULL, 0);
 }
 
 
 void
-PPPStateMachine::AuthenticationDenied(const char *name)
+PPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
 	LockerHelper locker(fLock);
 	
-	fAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
-	free(fAuthenticationName);
-	fAuthenticationName = strdup(name);
+	fLocalAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
+	free(fLocalAuthenticationName);
+	fLocalAuthenticationName = strdup(name);
 }
 
 
@@ -469,7 +479,7 @@ PPPStateMachine::UpEvent()
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			if(Interface().Mode() != PPP_SERVER_MODE
-				|| Phase() != PPP_ESTABLISHMENT_PHASE) {
+					|| Phase() != PPP_ESTABLISHMENT_PHASE) {
 				// we are a client or we do not listen for an incoming
 				// connection, so this is an illegal event
 				IllegalEvent(PPP_UP_EVENT);
@@ -550,24 +560,26 @@ PPPStateMachine::DownEvent()
 			IllegalEvent(PPP_DOWN_EVENT);
 	}
 	
+	NewPhase(PPP_DOWN_PHASE);
+	
 	DownProtocols();
 	DownEncapsulators();
 	
-	fAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
-	
-	NewPhase(PPP_DOWN_PHASE);
 	
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
 		bool needsRedial = false;
 		
-		if(fAuthenticationStatus == PPP_AUTHENTICATION_FAILED
-				|| fAuthenticationStatus == PPP_AUTHENTICATING
-				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
+		if(fLocalAuthenticationStatus == PPP_AUTHENTICATION_FAILED
+				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
+			Interface().Report(PPP_CONNECTION_REPORT,
+				PPP_REPORT_LOCAL_AUTHENTICATION_FAILED, NULL, 0);
+		else if(fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
-			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_AUTHENTICATION_FAILED,
-				NULL, 0);
+			Interface().Report(PPP_CONNECTION_REPORT,
+				PPP_REPORT_PEER_AUTHENTICATION_FAILED, NULL, 0);
 		else {
 			// if we are going up and lost connection the redial attempt becomes
 			// a dial retry which is managed by the main thread in Interface::Up()
@@ -671,15 +683,16 @@ PPPStateMachine::CloseEvent()
 	
 	switch(State()) {
 		case PPP_OPENED_STATE:
-			ThisLayerDown();
-		
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_CLOSING_STATE);
 			NewPhase(PPP_TERMINATION_PHASE);
+				// indicates to handlers that we are terminating
 			InitializeRestartCount();
 			locker.UnlockNow();
+			if(State() == PPP_OPENED_STATE)
+				ThisLayerDown();
 			SendTerminateRequest();
 		break;
 		
@@ -688,7 +701,7 @@ PPPStateMachine::CloseEvent()
 			
 			// TLSNotify() will know that we were faster because we
 			// are in PPP_INITIAL_STATE now
-			if(Phase() == PPP_ESTABLISHMENT_PHASE && Interface().Parent()) {
+			if(Phase() == PPP_ESTABLISHMENT_PHASE) {
 				// the device is already up
 				NewPhase(PPP_DOWN_PHASE);
 					// this says the following DownEvent() was not caused by
@@ -903,7 +916,12 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 	PPPOptionHandler *handler;
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		handler = LCP().OptionHandlerAt(index);
-		handler->ParseAck(&ack);
+		if(handler->ParseAck(ack) != B_OK) {
+			m_freem(packet);
+			locker.UnlockNow();
+			CloseEvent();
+			return;
+		}
 	}
 	
 	switch(State()) {
@@ -974,10 +992,21 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		handler = LCP().OptionHandlerAt(index);
 		
-		if(nak_reject.Code() == PPP_CONFIGURE_NAK)
-			handler->ParseNak(&nak_reject);
-		else if(nak_reject.Code() == PPP_CONFIGURE_REJECT)
-			handler->ParseReject(&nak_reject);
+		if(nak_reject.Code() == PPP_CONFIGURE_NAK) {
+			if(handler->ParseNak(nak_reject) != B_OK) {
+				m_freem(packet);
+				locker.UnlockNow();
+				CloseEvent();
+				return;
+			}
+		} else if(nak_reject.Code() == PPP_CONFIGURE_REJECT) {
+			if(handler->ParseReject(nak_reject) != B_OK) {
+				m_freem(packet);
+				locker.UnlockNow();
+				CloseEvent();
+				return;
+			}
+		}
 	}
 	
 	switch(State()) {
@@ -1030,7 +1059,7 @@ PPPStateMachine::RTREvent(struct mbuf *packet)
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
 		fID -= 128;
 	
-	fAuthenticationStatus = PPP_NOT_AUTHENTICATED;
+	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 	
 	switch(State()) {
@@ -1107,6 +1136,8 @@ PPPStateMachine::RTAEvent(struct mbuf *packet)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_REQ_SENT_STATE);
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
+				// indicates to handlers that we are reconfiguring
 			locker.UnlockNow();
 			ThisLayerDown();
 			SendConfigureRequest();
@@ -1185,11 +1216,13 @@ PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 			ThisLayerFinished();
 		break;
 		
-		case PPP_STOPPING_STATE:
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_STOPPED_STATE);
+		
+		case PPP_STOPPING_STATE:
+			NewPhase(PPP_TERMINATION_PHASE);
 		
 		case PPP_STOPPED_STATE:
 			locker.UnlockNow();
@@ -1198,6 +1231,8 @@ PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 		
 		case PPP_OPENED_STATE:
 			NewState(PPP_STOPPING_STATE);
+			NewPhase(PPP_TERMINATION_PHASE);
+				// indicates to handlers that we are terminating
 			InitializeRestartCount();
 			locker.UnlockNow();
 			ThisLayerDown();
@@ -1283,7 +1318,6 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 {
 	PPPConfigurePacket request(packet), nak(PPP_CONFIGURE_NAK),
 		reject(PPP_CONFIGURE_REJECT);
-	PPPOptionHandler *handler;
 	
 	// we should not use the same id as the peer
 	if(fID == mtod(packet, ppp_lcp_packet*)->id)
@@ -1293,34 +1327,46 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 	reject.SetID(request.ID());
 	
 	// each handler should add unacceptable values for each item
-	bool handled;
-	int32 error;
-	for(int32 item = 0; item <= request.CountItems(); item++) {
-		// if we sent too many naks we should not append additional values
-		if(fNakCounter == 0 && item == request.CountItems())
-			break;
+	status_t result;
+		// the return value of ParseRequest()
+	PPPOptionHandler *handler;
+	for(int32 index = 0; index < request.CountItems(); index++) {
+		handler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
-		handled = false;
-		
-		for(int32 index = 0; index < LCP().CountOptionHandlers();
-				index++) {
-			handler = LCP().OptionHandlerAt(index);
-			error = handler->ParseRequest(&request, item, &nak, &reject);
-			if(error == PPP_UNHANDLED)
-				continue;
-			else if(error == B_ERROR) {
-				// the request contains a value that has been sent more than
-				// once or the value is corrupted
-				m_freem(packet);
-				CloseEvent();
-				return;
-			} else if(error == B_OK)
-				handled = true;
+		if(!handler || !handler->IsEnabled()) {
+			// unhandled items should be added to reject
+			reject.AddItem(request.ItemAt(index));
+			continue;
 		}
 		
-		if(!handled && item < request.CountItems()) {
-			// unhandled items should be added to reject
-			reject.AddItem(request.ItemAt(item));
+		result = handler->ParseRequest(request, index, nak, reject);
+		
+		if(result != B_OK && result != PPP_UNHANDLED) {
+			// the request contains a value that has been sent more than
+			// once or the value is corrupted
+			m_freem(packet);
+			CloseEvent();
+			return;
+		}
+	}
+	
+	// Additional values may be appended.
+	// If we sent too many naks we should not append additional values.
+	if(fNakCounter > 0) {
+		for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
+			handler = LCP().OptionHandlerAt(index);
+			if(handler && handler->IsEnabled()) {
+				result = handler->ParseRequest(request, request.CountItems(),
+					nak, reject);
+				
+				if(result != B_OK && result != PPP_UNHANDLED) {
+					// the request contains a value that has been sent more than
+					// once or the value is corrupted
+					m_freem(packet);
+					CloseEvent();
+					return;
+				}
+			}
 		}
 	}
 	
@@ -1498,7 +1544,7 @@ PPPStateMachine::SendConfigureRequest()
 	
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		// add all items
-		if(!LCP().OptionHandlerAt(index)->AddToRequest(&request)) {
+		if(LCP().OptionHandlerAt(index)->AddToRequest(request) != B_OK) {
 			CloseEvent();
 			return false;
 		}
@@ -1518,8 +1564,13 @@ PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 	PPPConfigurePacket ack(packet);
 	
 	// notify all option handlers that we are sending an ack for each value
-	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++)
-		LCP().OptionHandlerAt(index)->SendingAck(&ack);
+	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
+		if(LCP().OptionHandlerAt(index)->SendingAck(ack) != B_OK) {
+			m_freem(packet);
+			CloseEvent();
+			return false;
+		}
+	}
 	
 	return LCP().Send(packet) == B_OK;
 }

@@ -24,7 +24,8 @@
 PPPLCP::PPPLCP(PPPInterface& interface)
 	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
 		AF_UNSPEC, interface, NULL, PPP_ALWAYS_ALLOWED),
-	fStateMachine(interface.StateMachine()), fTarget(NULL)
+	fStateMachine(interface.StateMachine()),
+	fTarget(NULL)
 {
 	SetUpRequested(false);
 		// the state machine does everything for us

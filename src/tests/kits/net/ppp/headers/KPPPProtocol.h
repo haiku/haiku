@@ -90,6 +90,9 @@ class PPPProtocol {
 		void DownEvent();
 			// report up/down events
 
+	protected:
+		status_t fInitStatus;
+
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		ppp_phase fPhase;
@@ -103,7 +106,6 @@ class PPPProtocol {
 		bool fEnabled;
 		bool fUpRequested;
 		ppp_phase fConnectionStatus;
-		status_t fInitStatus;
 };
 
 

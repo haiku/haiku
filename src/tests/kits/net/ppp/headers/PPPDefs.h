@@ -62,6 +62,25 @@ enum {
 		// could not send a packet because device is not connected
 };
 
+// PFC options
+enum {
+	PPP_REQUEST_PFC = 0x01,
+		// try to request PFC (does not fail if not successful)
+	PPP_ALLOW_PFC = 0x02,
+		// allow PFC if other side requests it
+	PPP_FORCE_PFC_REQUEST = 0x04,
+		// if PFC request fails the connection attempt will terminate
+	PPP_FREEZE_PFC_OPTIONS = 0x80
+		// the options cannot be changed if this flag is set (mainly used by PPPDevice)
+};
+
+enum ppp_pfc_state {
+	PPP_PFC_DISABLED,
+	PPP_PFC_ACCEPTED,
+	PPP_PFC_REJECTED
+		// not used for peer state
+};
+
 // protocol and encapsulator flags
 enum {
 	PPP_NO_FLAGS = 0x00,
@@ -100,7 +119,8 @@ enum ppp_phase {
 
 // this defines the order in which the packets get encapsulated
 enum ppp_encapsulation_level {
-	PPP_MULTILINK_LEVEL = 0,
+	PPP_DEVICE_LEVEL = 0,
+	PPP_MULTILINK_LEVEL = 2,
 	PPP_ENCRYPTION_LEVEL = 5,
 	PPP_COMPRESSION_LEVEL = 10
 };
