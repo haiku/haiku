@@ -72,16 +72,29 @@ BMediaRosterEx::LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BM
 }
 
 status_t
-BMediaRosterEx::IncrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid)
+BMediaRosterEx::IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid)
 {
-	//perhaps rename all this from dormantnode into addon-flavor or instance
-	return B_OK;
+	server_change_addon_flavor_instances_count_request request;
+	server_change_addon_flavor_instances_count_reply reply;
+	
+	request.addonid = addonid;
+	request.flavorid = flavorid;
+	request.delta = 1;
+	request.team = team;
+	return QueryServer(SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT, &request, sizeof(request), &reply, sizeof(reply));
 }
 
 status_t
-BMediaRosterEx::DecrementDormantNodeUseCount(media_addon_id addonid, int32 flavorid)
+BMediaRosterEx::DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 flavorid)
 {
-	return B_OK;
+	server_change_addon_flavor_instances_count_request request;
+	server_change_addon_flavor_instances_count_reply reply;
+	
+	request.addonid = addonid;
+	request.flavorid = flavorid;
+	request.delta = -1;
+	request.team = team;
+	return QueryServer(SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT, &request, sizeof(request), &reply, sizeof(reply));
 }
 	
 status_t
@@ -1547,9 +1560,9 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		// DormantNodeManager::PutAddonDelayed() will delay unloading.
 		_DormantNodeManager->PutAddonDelayed(reply.addonid);
 
-		rv = MediaRosterEx(this)->DecrementDormantNodeUseCount(reply.addonid, reply.flavorid);
+		rv = MediaRosterEx(this)->DecrementAddonFlavorInstancesCount(reply.addonid, reply.flavorid);
 		if (rv != B_OK) {
-			FATAL("BMediaRoster::UnregisterNode: DecrementDormantNodeUseCount failed\n");
+			FATAL("BMediaRoster::UnregisterNode: DecrementAddonFlavorInstancesCount failed\n");
 			// this is really a problem, but we can't fail now
 		}
 	}
@@ -1769,7 +1782,7 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 	// Now we need to try to increment the use count of this addon flavor
 	// in the server. This can fail if the total number instances of this
 	// flavor is limited.
-	rv = IncrementDormantNodeUseCount(addonid, flavorid);
+	rv = IncrementAddonFlavorInstancesCount(addonid, flavorid);
 	if (rv != B_OK) {
 		FATAL("BMediaRosterEx::InstantiateDormantNode error: can't create more nodes for addon-id %ld, flavour-id %ld\n", addonid, flavorid);
 		// Put the addon back into the pool
@@ -1795,9 +1808,9 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 		_DormantNodeManager->PutAddon(addonid);
 		// We must decrement the use count of this addon flavor in the
 		// server to compensate the increment done in the beginning.
-		rv = DecrementDormantNodeUseCount(addonid, flavorid);
+		rv = DecrementAddonFlavorInstancesCount(addonid, flavorid);
 		if (rv != B_OK) {
-			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementDormantNodeUseCount failed\n");
+			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementAddonFlavorInstancesCount failed\n");
 		}
 		return (out_error != B_OK) ? out_error : B_ERROR;
 	}
@@ -1810,9 +1823,9 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 		_DormantNodeManager->PutAddon(addonid);
 		// We must decrement the use count of this addon flavor in the
 		// server to compensate the increment done in the beginning.
-		rv = DecrementDormantNodeUseCount(addonid, flavorid);
+		rv = DecrementAddonFlavorInstancesCount(addonid, flavorid);
 		if (rv != B_OK) {
-			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementDormantNodeUseCount failed\n");
+			FATAL("BMediaRosterEx::InstantiateDormantNode: DecrementAddonFlavorInstancesCount failed\n");
 		}
 		return B_ERROR;
 	}
