@@ -83,13 +83,16 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 	if (!keepRaw && size > 64 * 1024)
 		size = 64 * 1024;
 
-	char buffer[size];
+	char* buffer = new char[size];
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
-	if (bytesRead < 0)
+	if (bytesRead < 0) {
+		delete[] buffer;
 		return errno;
+	}
 
 	if (bytesRead != size) {
 		fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
+		delete[] buffer;
 		return B_ERROR;
 	}
 
@@ -99,6 +102,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 		for (int32 i = 0; i < info.size; i++) {
 			putchar(buffer[i]);
 		}
+		delete[] buffer;
 		return B_OK;
 	}
 
@@ -148,6 +152,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 			break;
 	}
 
+	delete[] buffer;
 	return B_OK;
 }
 
