@@ -20,22 +20,11 @@ CommonTestLib libstoragetest.so
 		ResourceStringsTest.cpp
 		StatableTest.cpp
 		SymLinkTest.cpp
-	: <$(SOURCE_GRIST)>libstorage.so be stdc++.r4
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4
 	:
 	: storage
 ;
-
-# To run the tests the libraries must be around.
-{
-	local libdir = [ on UnitTesterHelper FDirName $(LOCATE[1]) lib ] ;
-	MakeLocate <$(SOURCE_GRIST)>libstorage.so : $(libdir) ;
-	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
-	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
-	RelSymLink <$(SOURCE_GRIST)>libbeadapter.so : libbeadapter.so ;
-	Includes <$(SOURCE_GRIST)>libstorage.so
-		: <$(SOURCE_GRIST)>libbeadapter.so ;
-}
 
 # To run the tests some test files must be around.
 {
@@ -44,4 +33,3 @@ CommonTestLib libstoragetest.so
 	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
 	DEPENDS libstoragetest.so : $(resdir) ;
 }
-
