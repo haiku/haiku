@@ -189,6 +189,25 @@ public:
 	}
 };
 
+// DoublyLinkedListMemberGetLink
+template<typename Element,
+	DoublyLinkedListLink<Element> Element::* LinkMember = &Element::fLink>
+class DoublyLinkedListMemberGetLink {
+private:
+	typedef DoublyLinkedListLink<Element> Link;
+
+public:
+	inline Link *operator()(Element *element) const
+	{
+		return &(element->*LinkMember);
+	}
+
+	inline const Link *operator()(const Element *element) const
+	{
+		return &(element->*LinkMember);
+	}
+};
+
 // for convenience
 #define DOUBLY_LINKED_LIST_TEMPLATE_LIST \
 	template<typename Element, typename GetLink>
@@ -294,13 +313,12 @@ public:
 
 public:
 	DoublyLinkedList() : fFirst(NULL), fLast(NULL) {}
-	DoublyLinkedList(const GetLink &getLink)
-		: fFirst(NULL), fLast(NULL), fGetLink(getLink) {}
 	~DoublyLinkedList() {}
 
 	inline bool IsEmpty() const			{ return (fFirst == NULL); }
 
 	inline void Insert(Element *element, bool back = true);
+	inline void Add(Element *element, bool back = true);
 	inline void Remove(Element *element);
 
 	inline void Swap(Element *a, Element *b);
@@ -328,7 +346,8 @@ public:
 private:
 	Element	*fFirst;
 	Element	*fLast;
-	GetLink	fGetLink;
+
+	static GetLink	sGetLink;
 };
 
 
@@ -342,26 +361,34 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *element, bool back)
 	if (element) {
 		if (back) {
 			// append
-			Link *elLink = fGetLink(element);
+			Link *elLink = sGetLink(element);
 			elLink->previous = fLast;
 			elLink->next = NULL;
 			if (fLast)
-				fGetLink(fLast)->next = element;
+				sGetLink(fLast)->next = element;
 			else
 				fFirst = element;
 			fLast = element;
 		} else {
 			// prepend
-			Link *elLink = fGetLink(element);
+			Link *elLink = sGetLink(element);
 			elLink->previous = NULL;
 			elLink->next = fFirst;
 			if (fFirst)
-				fGetLink(fFirst)->previous = element;
+				sGetLink(fFirst)->previous = element;
 			else
 				fLast = element;
 			fFirst = element;
 		}
 	}
+}
+
+// Add
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::Add(Element *element, bool back)
+{
+	Insert(element, back);
 }
 
 // Remove
@@ -370,13 +397,13 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element *element)
 {
 	if (element) {
-		Link *elLink = fGetLink(element);
+		Link *elLink = sGetLink(element);
 		if (elLink->previous)
-			fGetLink(elLink->previous)->next = elLink->next;
+			sGetLink(elLink->previous)->next = elLink->next;
 		else
 			fFirst = elLink->next;
 		if (elLink->next)
-			fGetLink(elLink->next)->previous = elLink->previous;
+			sGetLink(elLink->next)->previous = elLink->previous;
 		else
 			fLast = elLink->previous;
 		elLink->previous = NULL;
@@ -390,30 +417,30 @@ void
 DOUBLY_LINKED_LIST_CLASS_NAME::Swap(Element *a, Element *b)
 {
 	if (a && b && a != b) {
-		Link *aLink = fGetLink(a);
-		Link *bLink = fGetLink(b);
+		Link *aLink = sGetLink(a);
+		Link *bLink = sGetLink(b);
 		Element *aPrev = aLink->previous;
 		Element *bPrev = bLink->previous;
 		Element *aNext = aLink->next;
 		Element *bNext = bLink->next;
 		// place a
 		if (bPrev)
-			fGetLink(bPrev)->next = a;
+			sGetLink(bPrev)->next = a;
 		else
 			fFirst = a;
 		if (bNext)
-			fGetLink(bNext)->previous = a;
+			sGetLink(bNext)->previous = a;
 		else
 			fLast = a;
 		aLink->previous = bPrev;
 		aLink->next = bNext;
 		// place b
 		if (aPrev)
-			fGetLink(aPrev)->next = b;
+			sGetLink(aPrev)->next = b;
 		else
 			fFirst = b;
 		if (aNext)
-			fGetLink(aNext)->previous = b;
+			sGetLink(aNext)->previous = b;
 		else
 			fLast = b;
 		bLink->previous = aPrev;
@@ -428,8 +455,8 @@ DOUBLY_LINKED_LIST_CLASS_NAME::MoveFrom(DOUBLY_LINKED_LIST_CLASS_NAME *fromList)
 {
 	if (fromList && fromList->fFirst) {
 		if (fFirst) {
-			fGetLink(fLast)->next = fromList->fFirst;
-			fGetLink(fFirst)->previous = fLast;
+			sGetLink(fLast)->next = fromList->fFirst;
+			sGetLink(fFirst)->previous = fLast;
 			fLast = fromList->fLast;
 		} else {
 			fFirst = fromList->fFirst;
@@ -447,7 +474,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAll()
 {
 	Element *element = fFirst;
 	while (element) {
-		Link *elLink = fGetLink(element);
+		Link *elLink = sGetLink(element);
 		element = elLink->next;
 		elLink->previous = NULL;
 		elLink->next = NULL;
@@ -463,7 +490,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element *element) const
 {
 	Element *result = NULL;
 	if (element)
-		result = fGetLink(element)->previous;
+		result = sGetLink(element)->previous;
 	return result;
 }
 
@@ -474,7 +501,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::GetNext(Element *element) const
 {
 	Element *result = NULL;
 	if (element)
-		result = fGetLink(element)->next;
+		result = sGetLink(element)->next;
 	return result;
 }
 
@@ -488,6 +515,10 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Size() const
 		count++;
 	return count;
 }
+
+// sGetLink
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+GetLink DOUBLY_LINKED_LIST_CLASS_NAME::sGetLink;
 
 #endif	/* __cplusplus */
 
