@@ -33,7 +33,6 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	DiskStructures.cpp
 	Volume.cpp
 ;
-LinkSharedOSLibs udf : /boot/beos/system/lib/libroot.so ;
 
 rule InstallUDF
 {
