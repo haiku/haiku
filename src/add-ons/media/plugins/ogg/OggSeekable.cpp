@@ -141,7 +141,7 @@ OggSeekable::GetSize(off_t * size)
 status_t
 OggSeekable::ReadPage(ogg_page * page, int read_size)
 {
-	TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
+//	TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 	BAutolock autolock(fPositionLock);
 	// align to page boundary
 	int offset;
@@ -150,15 +150,18 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 			char * buffer = ogg_sync_buffer(&fSync, read_size);
 			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
 			if (bytes == 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ReadAt: no data\n");
 				return B_LAST_BUFFER_ERROR;
 			}
 			if (bytes < 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ReadAt: error\n");
 				return bytes;
 			}
 			fPosition += bytes;
 			if (ogg_sync_wrote(&fSync, bytes) != 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ogg_sync_wrote failed?: error\n");
 				return B_ERROR;
 			}
@@ -172,24 +175,30 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 			char * buffer = ogg_sync_buffer(&fSync, read_size);
 			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
 			if (bytes == 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ReadAt 2: no data\n");
 				return B_LAST_BUFFER_ERROR;
 			}
 			if (bytes < 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ReadAt 2: error\n");
 				return bytes;
 			}
 			fPosition += bytes;
 			if (ogg_sync_wrote(&fSync, bytes) != 0) {
+				TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 				TRACE("OggSeekable::ReadPage: ogg_sync_wrote 2 failed?: error\n");
 				return B_ERROR;
 			}
 		}
 		if (result == -1) {
-			TRACE("OggSeekable::ReadPage: ogg_sync_pageout: not synced??\n");
+			TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
+			TRACE("OggSeekable::ReadPage: ogg_sync_pageout: not synced!\n");
+			debugger("lost sync");
 			return B_ERROR;
 		}
 		if (ogg_page_version(page) != 0) {
+			TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
 			TRACE("OggSeekable::ReadPage: ogg_page_version: error in page encoding??\n");
 #ifdef STRICT_OGG
 			return B_ERROR;
