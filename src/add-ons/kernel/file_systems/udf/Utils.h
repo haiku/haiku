@@ -20,7 +20,7 @@ extern "C" {
 	#include <fsproto.h>
 }
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 
 namespace Udf {
 
@@ -29,6 +29,8 @@ long_address to_long_address(vnode_id id, uint32 length = 0);
 vnode_id to_vnode_id(long_address address);
 
 time_t make_time(timestamp &timestamp);
+
+status_t get_block_shift(uint32 blockSize, uint32 &blockShift);
 
 } // namespace Udf
 

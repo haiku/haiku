@@ -103,4 +103,29 @@ make_time(timestamp &timestamp)
 	return result;
 }
 
+/*! \brief Calculates the block shift amount for the given
+ 	block size, which must be a positive power of 2.
+*/
+status_t
+Udf::get_block_shift(uint32 blockSize, uint32 &blockShift)
+{
+	if (blockSize == 0)
+		return B_BAD_VALUE;		
+	uint32 bitCount = 0;
+	uint32 result = 0;
+	for (int i = 0; i < 32; i++) {
+		// Zero out all bits except bit i
+		uint32 block = blockSize & (uint32(1) << i);
+		if (block) {
+			if (++bitCount > 1) {
+				return B_BAD_VALUE;
+			} else {
+				result = i;
+			}			
+		}
+	}
+	blockShift = result;
+	return B_OK;
+}	
+
 } // namespace Udf
