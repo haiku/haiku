@@ -190,7 +190,7 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			*call_ret = system_time();
 			break;
 		case SYSCALL_SNOOZE_ETC:
-			*call_ret = user_snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, (int32)arg3);
+			*call_ret = _user_snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, (int32)arg3);
 			break;
 
 		/* semaphore syscalls */
@@ -251,51 +251,63 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 
 		/* Thread/team syscalls */
 
-		case SYSCALL_GET_CURRENT_THREAD_ID:
-			*call_ret = thread_get_current_thread_id();
+		case SYSCALL_FIND_THREAD:
+			*call_ret = _user_find_thread((const char *)arg0);
 			break;
 		case SYSCALL_EXIT_THREAD:
-			user_exit_thread((status_t)arg0);
+			_user_exit_thread((status_t)arg0);
 			*call_ret = 0;
 			break;
 		case SYSCALL_CREATE_TEAM:
-			*call_ret = user_team_create_team((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
+			*call_ret = _user_create_team((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
 			break;
-		case SYSCALL_WAIT_ON_THREAD:
-			*call_ret = user_wait_for_thread((thread_id)arg0, (status_t *)arg1);
+		case SYSCALL_WAIT_FOR_THREAD:
+			*call_ret = _user_wait_for_thread((thread_id)arg0, (status_t *)arg1);
 			break;
-		case SYSCALL_WAIT_ON_TEAM:
-			*call_ret = user_wait_for_team((team_id)arg0, (status_t *)arg1);
+		case SYSCALL_WAIT_FOR_TEAM:
+			*call_ret = _user_wait_for_team((team_id)arg0, (status_t *)arg1);
 			break;
 		case SYSCALL_SPAWN_THREAD:
-			*call_ret = user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3, (void *)arg4);
+			*call_ret = _user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3, (void *)arg4);
 			break;
 		case SYSCALL_SET_THREAD_PRIORITY:
-			*call_ret = user_set_thread_priority((thread_id)arg0, (int32)arg1);
+			*call_ret = _user_set_thread_priority((thread_id)arg0, (int32)arg1);
 			break;
 		case SYSCALL_KILL_THREAD:
-			*call_ret = thread_kill_thread((thread_id)arg0);
+			*call_ret = _user_kill_thread((thread_id)arg0);
+			break;
+		case SYSCALL_GET_THREAD_INFO:
+			*call_ret = _user_get_thread_info((thread_id)arg0, (thread_info *)arg1);
+			break;
+		case SYSCALL_GET_NEXT_THREAD_INFO:
+			*call_ret = _user_get_next_thread_info((team_id)arg0, (int32 *)arg1, (thread_info *)arg2);
+			break;
+		case SYSCALL_GET_TEAM_INFO:
+			*call_ret = _user_get_team_info((team_id)arg0, (team_info *)arg1);
+			break;
+		case SYSCALL_GET_NEXT_TEAM_INFO:
+			*call_ret = _user_get_next_team_info((int32 *)arg0, (team_info *)arg1);
 			break;
 		case SYSCALL_SUSPEND_THREAD:
-			*call_ret = user_suspend_thread((thread_id)arg0);
+			*call_ret = _user_suspend_thread((thread_id)arg0);
 			break;
 		case SYSCALL_RESUME_THREAD:
-			*call_ret = user_resume_thread((thread_id)arg0);
+			*call_ret = _user_resume_thread((thread_id)arg0);
 			break;
 		case SYSCALL_SEND_DATA:
-			*call_ret = user_send_data((thread_id)arg0, (int32)arg1, (const void *)arg2, (size_t)arg3);
+			*call_ret = _user_send_data((thread_id)arg0, (int32)arg1, (const void *)arg2, (size_t)arg3);
 			break;
 		case SYSCALL_RECEIVE_DATA:
-			*call_ret = user_receive_data((thread_id *)arg0, (void *)arg1, (size_t)arg2);
+			*call_ret = _user_receive_data((thread_id *)arg0, (void *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_HAS_DATA:
-			*call_ret = user_has_data((thread_id)arg0);
+			*call_ret = _user_has_data((thread_id)arg0);
 			break;
 		case SYSCALL_KILL_TEAM:
-			*call_ret = team_kill_team((team_id)arg0);
+			*call_ret = _user_kill_team((team_id)arg0);
 			break;
 		case SYSCALL_GET_CURRENT_TEAM_ID:
-			*call_ret = team_get_current_team_id();
+			*call_ret = _user_get_current_team();
 			break;
 		case SYSCALL_GETCWD:
 			*call_ret = user_getcwd((char*)arg0, (size_t)arg1);
@@ -370,10 +382,10 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			break;
 */
 		case SYSCALL_GETRLIMIT:
-			*call_ret = user_getrlimit((int)arg0, (struct rlimit *)arg1);
+			*call_ret = _user_getrlimit((int)arg0, (struct rlimit *)arg1);
 			break;
 		case SYSCALL_SETRLIMIT:
-			*call_ret = user_setrlimit((int)arg0, (const struct rlimit *)arg1);
+			*call_ret = _user_setrlimit((int)arg0, (const struct rlimit *)arg1);
 			break;
 
 		// image calls
@@ -427,18 +439,6 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			_user_debug_output((const char *)arg0);
 			break;
 
-		case SYSCALL_GET_THREAD_INFO:
-			*call_ret = user_get_thread_info((thread_id)arg0, (thread_info *)arg1);
-			break;
-		case SYSCALL_GET_NEXT_THREAD_INFO:
-			*call_ret = user_get_next_thread_info((team_id)arg0, (int32 *)arg1, (thread_info *)arg2);
-			break;
-		case SYSCALL_GET_TEAM_INFO:
-			*call_ret = user_get_team_info((team_id)arg0, (team_info *)arg1);
-			break;
-		case SYSCALL_GET_NEXT_TEAM_INFO:
-			*call_ret = user_get_next_team_info((int32 *)arg0, (team_info *)arg1);
-			break;
 		case SYSCALL_RETURN_FROM_SIGNAL:
 			*call_ret = arch_restore_signal_frame();
 			break;
