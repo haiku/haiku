@@ -107,6 +107,16 @@ fix_multiaudio_format(media_multi_audio_format *format)
 		default:
 			break;
 	}
+
+	// XXX Workaround for broken BeOS R5 quicktime extractor media node
+	if (format->channel_count == 1
+			&& format->format == media_multi_audio_format::B_AUDIO_UCHAR
+			&& int(format->frame_rate + 0.5) == 11025
+			&& format->byte_order == B_MEDIA_BIG_ENDIAN
+			&& format->buffer_size == 548) {
+		printf("### quicktime extractor bug workaround activated, changing buffer size from 548 into 4096\n");
+		format->buffer_size = 4096;
+	}
 }
 
 uint32
