@@ -43,7 +43,7 @@ _rand(void)
 		next = system_time();
 
 	next = next * 1103515245 + 12345;
-	return((next >> 16) & 0x7FFF);
+	return (next >> 16) & 0x7FFF;
 }
 
 
@@ -128,7 +128,7 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 
 	// track kernel & user time
 	now = system_time();
-	if(fromThread->last_time_type == KERNEL_TIME)
+	if (fromThread->last_time_type == KERNEL_TIME)
 		fromThread->kernel_time += now - fromThread->last_time;
 	else
 		fromThread->user_time += now - fromThread->last_time;
@@ -147,7 +147,7 @@ reschedule_event(timer *unused)
 {
 	// this function is called as a result of the timer event set by the scheduler
 	// returning this causes a reschedule on the timer event
-	thread_get_current_thread()->cpu->info.preempted= 1;
+	thread_get_current_thread()->cpu->info.preempted = 1;
 	return B_INVOKE_SCHEDULER;
 }
 
