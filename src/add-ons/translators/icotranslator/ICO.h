@@ -68,7 +68,7 @@ struct ico_color {
 	inline bool
 	operator==(const ico_color& other) const
 	{
-		return *(const uint32 *)this == *(const uint32 *)&other;
+		return red == other.red && green == other.green && blue == other.blue;
 	}
 };
 

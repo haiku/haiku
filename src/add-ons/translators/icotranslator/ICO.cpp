@@ -13,7 +13,7 @@
 #include <string.h>
 
 
-#define TRACE_ICO
+//#define TRACE_ICO
 #ifdef TRACE_ICO
 #	define TRACE(x) printf x
 #else
@@ -190,9 +190,16 @@ get_ico_color_from_bits(TranslatorBitmap &bitsHeader, uint8 *data, int32 x, int3
 
 	switch (bitsHeader.colors) {
 		case B_RGBA32:
+			return *(ico_color *)(data + 4 * x);
 		case B_RGB32:
 		default:
-			return *(ico_color *)(data + 4 * x);
+			// stupid applications like ArtPaint use the alpha channel in B_RGB32 images...
+			ico_color color = *(ico_color *)(data + 4 * x);
+			if (color.alpha >= 128)
+				color.alpha = 255;
+			else
+				color.alpha = 0;
+			return color;
 		// ToDo: support some more color spaces...
 	}
 }
@@ -213,6 +220,8 @@ fill_palette(TranslatorBitmap &bitsHeader, uint8 *data, ico_color *palette)
 				if (numColors == 256)
 					return -1;
 
+				color.alpha = 0;
+					// the alpha channel is actually unused
 				palette[numColors++] = color;
 			}
 		}
@@ -309,6 +318,8 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 				// set alpha channel
 				if (get_1_bit_per_pixel(get_data_row(andData, andDataSize, andRowBytes, row), x))
 					outRowData[x] = B_TRANSPARENT_MAGIC_RGBA32;
+				else
+					((ico_color *)&outRowData[x])->alpha = 255;
 			}
 		}
 
@@ -389,7 +400,7 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 	for (uint32 row = entry.height; row-- > 0;) {
 		for (uint32 x = 0; x < entry.width; x++) {
 			ico_color color = get_ico_color_from_bits(bitsHeader, bitsData, x, row);
-			bool transparent = *(uint32 *)&color == B_TRANSPARENT_MAGIC_RGBA32;
+			bool transparent = *(uint32 *)&color == B_TRANSPARENT_MAGIC_RGBA32 || color.alpha == 0;
 
 			set_1_bit_per_pixel(andRowData, x, transparent ? 1 : 0);
 		}
@@ -572,6 +583,8 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 		if (bitsHeader.colors != B_RGBA32
 			|| !has_true_alpha_channel(bitsHeader.colors, bitsData,
 					width, height, bitsHeader.rowBytes)) {
+			memset(palette, 0, sizeof(palette));
+
 			// count colors
 			int32 colors = fill_palette(bitsHeader, bitsData, palette);
 			if (colors != -1) {
@@ -585,6 +598,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 			}
 		}
 	}
+	int32 numColors = 1 << bitsPerPixel;
 
 	ico_header header;
 	header.type = B_HOST_TO_LENDIAN_INT16(1);
@@ -602,7 +616,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 	entry.bits_per_pixel = bitsPerPixel;
 	entry.color_count = 0;
 	if (bitsPerPixel <= 8)
-		entry.color_count = 1 << bitsPerPixel;
+		entry.color_count = numColors;
 
 	// When bits_per_pixel == 32, the data already contains the alpha channel
 
@@ -612,6 +626,8 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 		andRowBytes = get_bytes_per_row(width, 1);
 
 	entry.size = sizeof(ico_bitmap_header) + width * (xorRowBytes + andRowBytes);
+	if (bitsPerPixel <= 8)
+		entry.size += numColors * sizeof(ico_color);
 	entry.offset = sizeof(ico_header) + sizeof(ico_dir_entry);
 	entry.reserved = 0;
 
@@ -623,6 +639,8 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 	bitmapHeader.bits_per_pixel = bitsPerPixel;
 	bitmapHeader.planes = 1;
 	bitmapHeader.image_size = 0;
+	if (bitsPerPixel <= 8)
+		bitmapHeader.colors_used = numColors;
 
 	entry.SwapFromHost();
 	bitmapHeader.SwapFromHost();
@@ -640,7 +658,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 	bitmapHeader.SwapToHost();
 
 	if (bitsPerPixel <= 8) {
-		bytesWritten = target.Write(palette, (1L << bitsPerPixel) * sizeof(ico_color));
+		bytesWritten = target.Write(palette, numColors * sizeof(ico_color));
 		if (bytesWritten < B_OK)
 			return bytesWritten;
 	}
