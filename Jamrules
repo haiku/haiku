@@ -561,9 +561,9 @@ rule Translator
 
 rule MakeLocateObjects
 {
-	# MakeLocateObjects <gristed_sources_or_objects> ;
+	# MakeLocateObjects <sources_or_objects> ;
 	
-	local _objs = $(1:S=$(SUFOBJ)) ;
+	local _objs = [ FGristFiles $(1:S=$(SUFOBJ)) ] ;
 	
 	for o in $(_objs)
 	{
@@ -587,18 +587,24 @@ rule StaticLibrary
 	MakeLocate lib$(<).a : $(OBOS_STLIB_DIR) ;
 }
 
-rule SharedLibrary
+rule SharedLibraryFromObjects
 {
-	# SharedLibrary <name> : <sources> ;
+	# SharedLibraryFromObjects <name> : <objects> ;
 	local _lib = lib$(1).so ;
-	
-#	SetupIncludes ;
-	SetupObjectsDir ;
-	MakeLocateObjects $(2) ;
-	Main $(_lib) : $(2) ;
+	MainFromObjects $(_lib) : $(2) ;
 	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
 						   -nostart -Xlinker -soname=\"$(_lib)\" ;
+}
+
+rule SharedLibrary
+{
+	# SharedLibrary <name> : <sources> ;
+#	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(2) ;
+	Objects $(2) ;
+	SharedLibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
 }
 
 rule LinkSharedOSLibs
@@ -1012,7 +1018,7 @@ rule ObjectReference
 	local source = $(2) ;
 	if $(ref) != $(source) {
 		Depends $(ref) : $(source) ;
-		on $(ref) LOCATE = [ on $(source) return $(LOCATE) ] ;
+		LOCATE on $(ref) = [ on $(source) return $(LOCATE) ] ;
 	}
 }
 
@@ -1302,5 +1308,68 @@ actions InstallFloppy
 		exit 0
 	fi
 	dd if=$(2) of=$(FLOPPY_PATH) bs=18k
+}
+
+
+#-------------------------------------------------------------------------------
+# FreeType 2 specific rules and variables
+#-------------------------------------------------------------------------------
+
+FT2_INCLUDE = [ FDirName $(OBOS_TOP) headers libs freetype2 ] ;
+FT2_SRC     = [ FDirName $(OBOS_TOP) src libs freetype2 ] ;
+
+FT2_LIB     = freetype ;
+
+rule UseFreeTypeHeaders
+{
+	SubDirHdrs $(FT2_INCLUDE) ;
+}
+
+rule UseFreeTypeObjectHeaders
+{
+	ObjectHdrs $(1) : $(FT2_INCLUDE) ;
+}
+
+rule FT2_SubDir
+{
+	# FT2_SubDir <dir>
+	# <dir>: Components of a directory in the original hierarchy.
+	local dir = $(1) ;
+	local topDir ;
+	switch $(dir[1])
+	{
+		case "include"	: topDir = $(FT2_INCLUDE) ;
+		case src		: topDir = $(FT2_SRC) ;
+		case *			: ECHO "Unknown FreeType2 directory: " $(dir) ;
+	}
+	return [ FDirName $(topDir) $(dir[2-]) ] ;
+}
+
+rule FT2_Library
+{
+	# FT2_Library <libname> : <sources>
+	# Builds objects from sources and adds the objects to the list of objects
+	# to be linked into the library.
+	# <libname> The name of the library.
+	# <sources> The sources.
+
+	local library = lib$(1).so ;
+	local sources = $(2) ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(sources) ;
+	Objects $(sources) ;
+	LIBRARY_OBJECTS on $(library) += [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+}
+
+rule FT2_LinkLibrary
+{
+	# FT2_LinkLibrary <libname>
+	# Links the library from the objects build with FT2_LIBRARY before.
+
+	local library = lib$(1).so ;
+	local objects = [ on $(library) return $(LIBRARY_OBJECTS) ] ;
+	ObjectReferences $(objects) ;
+	objects = [ FGristFiles $(objects) ] ;
+	SharedLibraryFromObjects $(1) : $(objects) ;
 }
 
