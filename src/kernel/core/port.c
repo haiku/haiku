@@ -470,6 +470,8 @@ create_port(int32 queueLength, const char *name)
 			RELEASE_PORT_LOCK(sPorts[i]);
 			restore_interrupts(state);
 
+			TRACE(("create_port() done: port created %ld\n", id));
+
 			return id;
 		}
 	}
@@ -1071,6 +1073,7 @@ set_port_owner(port_id id, team_id team)
 {
 	cpu_status state;
 	int slot;
+// ToDo: Shouldn't we at least check, whether the team exists?
 
 	TRACE(("set_port_owner(id = %ld, team = %ld)\n", id, team));
 
