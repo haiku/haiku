@@ -139,11 +139,11 @@ struct small_data {
 	uint16 NameSize() const { return BFS_ENDIAN_TO_HOST_INT16(name_size); }
 	uint16 DataSize() const { return BFS_ENDIAN_TO_HOST_INT16(data_size); }
 
-	inline char		*Name();
-	inline uint8	*Data();
-	inline uint32	Size();
-	inline small_data *Next();
-	inline bool		IsLast(bfs_inode *inode);
+	inline char		*Name() const;
+	inline uint8	*Data() const;
+	inline uint32	Size() const;
+	inline small_data *Next() const;
+	inline bool		IsLast(const bfs_inode *inode) const;
 };
 
 // the file name is part of the small_data structure
@@ -325,35 +325,35 @@ block_run::Run(int32 group, uint16 start, uint16 length)
 
 
 inline char *
-small_data::Name()
+small_data::Name() const
 {
-	return name;
+	return const_cast<char *>(name);
 }
 
 
 inline uint8 *
-small_data::Data()
+small_data::Data() const
 {
 	return (uint8 *)name + NameSize() + 3;
 }
 
 
 inline uint32 
-small_data::Size()
+small_data::Size() const
 {
 	return sizeof(small_data) + NameSize() + 3 + DataSize() + 1;
 }
 
 
 inline small_data *
-small_data::Next()
+small_data::Next() const
 {
 	return (small_data *)((uint8 *)this + Size());
 }
 
 
 inline bool
-small_data::IsLast(bfs_inode *inode)
+small_data::IsLast(const bfs_inode *inode) const
 {
 	// we need to check the location first, because if name_size is already beyond
 	// the block, we would touch invalid memory (although that can't cause wrong
