@@ -1,5 +1,5 @@
-#ifndef OBFONT_H_
-#define OBFONT_H_
+#ifndef _FONT_H_
+#define _FONT_H_
 
 #include <BeBuild.h>
 #include <SupportDefs.h>
