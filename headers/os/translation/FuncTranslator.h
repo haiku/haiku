@@ -1,16 +1,17 @@
 /*****************************************************************************/
-//               File: R4xTranslator.h
-//              Class: BR4xTranslator
+//               File: FuncTranslator.h
+//              Class: BFuncTranslator
 //             Author: Michael Wilber, Translation Kit Team
 // Originally Created: 2002-06-11
 //
 // Description: This header file contains the BTranslator based object for
-//              BeOS R4.0 and R4.5 type translators, aka, the translators
+//              function based translators, aka, the translators
 //              that don't use the make_nth_translator() mechanism.
 //
 //              This class is used by the OpenBeOS BTranslatorRoster
-//              so that R4x translators, post R4.5 translators and private
-//              BTranslator objects could be accessed in the same way. 
+//              so that function based translators, make_nth_translator()
+//              translators and private BTranslator objects could be
+//              accessed in the same way. 
 //
 //
 // Copyright (c) 2002 OpenBeOS Project
@@ -34,16 +35,16 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef _R4X_TRANSLATOR_H
-#define _R4X_TRANSLATOR_H
+#ifndef _FUNC_TRANSLATOR_H
+#define _FUNC_TRANSLATOR_H
 
 #include <Translator.h>
 #include <image.h>
 #include <TranslationDefs.h>
 
-class BR4xTranslator : public BTranslator {
+class BFuncTranslator : public BTranslator {
 public:
-	BR4xTranslator(const translator_data *kpData);
+	BFuncTranslator(const translator_data *kpData);
 		// assigns the translator to the object
 
 	virtual const char *TranslatorName() const;
@@ -84,7 +85,7 @@ public:
 		// (not required to be in all translators)
 
 protected:
-	virtual ~BR4xTranslator();
+	virtual ~BFuncTranslator();
 		// This object is deleted by calling Release(),
 		// it can not be deleted directly. See BTranslator in the Be Book
 		
@@ -95,4 +96,4 @@ private:
 		// use to do all of the actual work for this class.
 };
 
-#endif // _R4X_TRANSLATOR_H
+#endif // _FUNC_TRANSLATOR_H
