@@ -590,8 +590,7 @@ uint32 Layer::CountChildren(void) const
 }
 
 void Layer::RebuildFullRegion( ){
-
-	if (_parent && !IsTopLayer())
+	if (_parent)
 		_full.Set( _parent->ConvertToTop( _frame ) );
 	else
 		_full.Set( _frame );
@@ -614,8 +613,11 @@ void Layer::RebuildFullRegion( ){
 			_full.IntersectWith( clipToPicture );
 		}
 
-	if(IsTopLayer()){
-		_full.Exclude( _serverwin->fWinBorder->fDecFull );		
+	if(IsTopLayer() && _serverwin){
+		if (_serverwin->fWinBorder->fDecorator){
+			// decorator overlaping topLayer? make decorator be in front.
+			_full.Exclude( _serverwin->fWinBorder->fDecFull );
+		}
 	}
 }
 
