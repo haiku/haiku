@@ -365,7 +365,7 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 		if (bytesWritten < B_OK)
 			return bytesWritten;
 		if (bytesWritten != outRowBytes)
-			return B_BAD_DATA;
+			return B_IO_ERROR;
 	}
 
 	return B_OK;
@@ -567,6 +567,16 @@ ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 	if (bitmapHeader.compression != 0)
 		return EOPNOTSUPP;
 
+	int32 numColors = 0;
+	if (bitmapHeader.bits_per_pixel <= 8)
+		numColors = 1L << bitmapHeader.bits_per_pixel;
+
+	// This is a work-around for a broken ICO file writer that publishes
+	// a wrong image height in the ico_dir_entry structure
+	if (entry.size != 0 && 2 * entry.width == entry.height && numColors != 0
+		&& sizeof(rgba32_color) * numColors + entry.width * entry.height > entry.size)
+		entry.height = entry.width;
+
 	TranslatorBitmap bitsHeader;
 	bitsHeader.magic = B_TRANSLATOR_BITMAP;
 	bitsHeader.bounds.left = 0;
@@ -579,9 +589,6 @@ ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 	bitsHeader.dataSize = bitsHeader.rowBytes * entry.height;
 
 	// read in palette
-	int32 numColors = 0;
-	if (bitmapHeader.bits_per_pixel <= 8)
-		numColors = 1L << bitmapHeader.bits_per_pixel;
 
 	rgba32_color palette[256];
 	if (numColors > 0) {
