@@ -1,7 +1,9 @@
 SubDir OBOS_TOP src add-ons print drivers pdf source ;
 
+AddResources PDF\ Writer : PDFWriter.rsrc ;
+
 Addon 
-	PDFWriter
+	PDF\ Writer
 	:
 	Print
 	:
@@ -36,17 +38,11 @@ Addon
 	;
 
 LinkSharedOSLibs   
-	PDFWriter
+	PDF\ Writer
 	: 
 	be 
 	textencoding 
 	translation 
 	/boot/home/config/lib/libpdf.so  
-	;
-
-XRes
-	PDFWriter
-	:
-	PDFWriter.rsrc
 	;
 
