@@ -395,10 +395,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		// will not be thrown when GetUint is called.
 		// (If they are not present, that is fine, but if
 		// they are present and have a non-default value,
-		// that is a problem)	
-		if (ifd.HasField(TAG_FILL_ORDER) &&
-			ifd.GetUint(TAG_FILL_ORDER) != 1)
-			return B_NO_TRANSLATOR;
+		// that is a problem)
 		if (ifd.HasField(TAG_ORIENTATION) &&
 			ifd.GetUint(TAG_ORIENTATION) != 1)
 			return B_NO_TRANSLATOR;
@@ -420,7 +417,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		else
 			compression = ifd.GetUint(TAG_COMPRESSION);
 		
-		uint16 imageType = 0, bitsPerPixel = 0;
+		uint16 imageType = 0, bitsPerPixel = 0, fillOrder = 1;
 		switch (interpretation) {
 			// black and white or grayscale images
 			case PHOTO_WHITEZERO:
@@ -428,6 +425,12 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 				// default value for samples per pixel is 1
 				if (ifd.HasField(TAG_SAMPLES_PER_PIXEL) &&
 					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
+					return B_NO_TRANSLATOR;
+				
+				// Only the default value for T4 Options
+				// is supported
+				if (ifd.HasField(TAG_T4_OPTIONS) &&
+					ifd.GetUint(TAG_T4_OPTIONS) != 0)
 					return B_NO_TRANSLATOR;
 					
 				// default value for bits per sample is 1
@@ -437,13 +440,23 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 					
 					if (compression != COMPRESSION_NONE &&
 						compression != COMPRESSION_HUFFMAN &&
+						compression != COMPRESSION_T4 &&
 						compression != COMPRESSION_PACKBITS)
 						return B_NO_TRANSLATOR;
+						
+					if (ifd.HasField(TAG_FILL_ORDER)) {
+						fillOrder = ifd.GetUint(TAG_FILL_ORDER);
+						if (fillOrder != 1 && fillOrder != 2)
+							return B_NO_TRANSLATOR;
+					}
 			
 				} else if (ifd.GetUint(TAG_BITS_PER_SAMPLE) == 4 ||
 					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 8) {
 					bitsPerPixel = ifd.GetUint(TAG_BITS_PER_SAMPLE);
 					
+					if (ifd.HasField(TAG_FILL_ORDER) &&
+						ifd.GetUint(TAG_FILL_ORDER) != 1)
+						return B_NO_TRANSLATOR;
 					if (compression != COMPRESSION_NONE &&
 						compression != COMPRESSION_PACKBITS)
 						return B_NO_TRANSLATOR;
@@ -456,6 +469,9 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 				
 			// Palette color images
 			case PHOTO_PALETTE:
+				if (ifd.HasField(TAG_FILL_ORDER) &&
+					ifd.GetUint(TAG_FILL_ORDER) != 1)
+					return B_NO_TRANSLATOR;
 				if (compression != COMPRESSION_NONE &&
 					compression != COMPRESSION_PACKBITS)
 					return B_NO_TRANSLATOR;
@@ -478,6 +494,9 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 				break;
 				
 			case PHOTO_RGB:
+				if (ifd.HasField(TAG_FILL_ORDER) &&
+					ifd.GetUint(TAG_FILL_ORDER) != 1)
+					return B_NO_TRANSLATOR;
 				if (compression != COMPRESSION_NONE &&
 					compression != COMPRESSION_PACKBITS)
 					return B_NO_TRANSLATOR;
@@ -494,6 +513,9 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 				break;
 				
 			case PHOTO_SEPARATED:
+				if (ifd.HasField(TAG_FILL_ORDER) &&
+					ifd.GetUint(TAG_FILL_ORDER) != 1)
+					return B_NO_TRANSLATOR;
 				if (compression != COMPRESSION_NONE &&
 					compression != COMPRESSION_PACKBITS)
 					return B_NO_TRANSLATOR;
@@ -525,13 +547,16 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 			rowsPerStrip = DEFAULT_ROWS_PER_STRIP;
 		else
 			rowsPerStrip = ifd.GetUint(TAG_ROWS_PER_STRIP);
-		stripsPerImage = (height + rowsPerStrip - 1) / rowsPerStrip;
+		if (rowsPerStrip == DEFAULT_ROWS_PER_STRIP)
+			stripsPerImage = 1;
+		else
+			stripsPerImage = (height + rowsPerStrip - 1) / rowsPerStrip;
 			
 		if (ifd.GetCount(TAG_STRIP_OFFSETS) != stripsPerImage ||
 			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != stripsPerImage)
 			return B_NO_TRANSLATOR;
 		
-		// return read in details if output pointer is supplied
+		// return read in details
 		pdetails->width				= width;
 		pdetails->height			= height;
 		pdetails->compression		= compression;
@@ -540,6 +565,7 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails, bool bAllocArrays)
 		pdetails->interpretation	= interpretation;
 		pdetails->bitsPerPixel		= bitsPerPixel;
 		pdetails->imageType			= imageType;
+		pdetails->fillOrder			= fillOrder;
 			
 		if (bAllocArrays) {
 			ifd.GetUint32Array(TAG_STRIP_OFFSETS,
@@ -823,22 +849,34 @@ tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, TiffDetails &details)
 				}
 			} else {
 				// grayscale
-				uint8 invert = 0;
-				if (details.interpretation == PHOTO_WHITEZERO)
-					invert = 0xff;
-
 				if (details.bitsPerPixel == 8) {
-					for (uint32 i = 0; i < details.width; i++) {
-						memset(pbits, invert + ptiff[i], 3);
-						pbits += 4;
+					if (details.interpretation == PHOTO_WHITEZERO) {
+						for (uint32 i = 0; i < details.width; i++) {
+							memset(pbits, 255 - ptiff[i], 3);
+							pbits += 4;
+						}
+					} else {
+						for (uint32 i = 0; i < details.width; i++) {
+							memset(pbits, ptiff[i], 3);
+							pbits += 4;
+						}
 					}
 				} else if (details.bitsPerPixel == 4) {
-					const uint8 mask = 0x0f;				
-					for (uint32 i = 0; i < details.width; i++) {
-						uint8 values = (ptiff + (i / 2))[0];
-						uint8 value = (values >> (4 * (1 - (i % 2)))) & mask;
-						memset(pbits, invert + (value * 16), 3);
-						pbits += 4;
+					const uint8 mask = 0x0f;
+					if (details.interpretation == PHOTO_WHITEZERO) {
+						for (uint32 i = 0; i < details.width; i++) {
+							uint8 values = (ptiff + (i / 2))[0];
+							uint8 value = (values >> (4 * (1 - (i % 2)))) & mask;
+							memset(pbits, 255 - (value * 16), 3);
+							pbits += 4;
+						}
+					} else {
+						for (uint32 i = 0; i < details.width; i++) {
+							uint8 values = (ptiff + (i / 2))[0];
+							uint8 value = (values >> (4 * (1 - (i % 2)))) & mask;
+							memset(pbits, (value * 16), 3);
+							pbits += 4;
+						}
 					}
 				}
 			}
@@ -959,10 +997,80 @@ unpack(StreamBuffer *pstreambuf, uint8 *tiffbuffer, uint32 tiffbufferlen)
 }
 
 ssize_t
+TIFFTranslator::decode_t4(BitReader &stream, TiffDetails &details, 
+	uint8 *pbits, bool bfirstLine)
+{
+	if (bfirstLine) {
+		// read in and verify end-of-line sequence
+		uint32 nzeros = 11;
+		while (nzeros--)
+		{
+			if (stream.NextBit() != 0) {
+				debugger("xxx");
+				return B_ERROR;
+			}
+		}
+		if (stream.NextBit() != 1) {
+			debugger("xxx");
+			return B_ERROR;
+		}
+	}
+		
+	const uint8 kblack = 0x00, kwhite = 0xff;
+	uint8 colors[2];
+	if (details.interpretation == PHOTO_WHITEZERO) {
+		colors[0] = kwhite;
+		colors[1] = kblack;
+	} else {
+		colors[0] = kblack;
+		colors[1] = kwhite;
+	}
+
+	uint32 pixelswrit = 0;	
+	DecodeTree *ptrees[2] = {fpwhiteTree, fpblackTree};
+	uint8 currentcolor = 0;
+	uint8 *pcurrentpixel = pbits;
+	status_t value = 0;
+	while (pixelswrit < details.width || value >= 64) {
+		value = ptrees[currentcolor]->GetValue(stream);
+		if (value < 0) {
+			debugger("value < 0");
+			return B_ERROR;
+		}
+			
+		if (pixelswrit + value > details.width) {
+			debugger("gone past end of line");
+			return B_ERROR;
+		}
+		pixelswrit += value;
+		
+		// covert run length to B_RGB32 pixels
+		uint32 pixelsleft = value;
+		while (pixelsleft--) {
+			memset(pcurrentpixel, colors[currentcolor], 3);
+			pcurrentpixel += 4;
+		}
+		
+		if (value < 64)
+			currentcolor = 1 - currentcolor;
+	}
+	
+	// read in end-of-line sequence
+	uint32 nzeros = 11;
+	while (nzeros--)
+	{
+		stream.NextBit();
+	}
+	stream.NextBit();
+	
+	return stream.BytesRead();
+}
+
+ssize_t
 TIFFTranslator::decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details, 
 	uint8 *pbits)
 {
-	BitReader stream(pstreambuf);
+	BitReader stream(details.fillOrder, pstreambuf);
 	if (stream.InitCheck() != B_OK) {
 		debugger("stream init error");
 		return B_ERROR;
@@ -1028,7 +1136,8 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		
 		// If TIFF uses Huffman compression, load
 		// trees for decoding Huffman compression
-		if (details.compression == COMPRESSION_HUFFMAN) {
+		if (details.compression == COMPRESSION_HUFFMAN ||
+			details.compression == COMPRESSION_T4) {
 			result = LoadHuffmanTrees();
 			if (result != B_OK)
 				return result;
@@ -1085,12 +1194,16 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		// buffer for making reading compressed data
 		// fast and convenient
 		StreamBuffer *pstreambuf = NULL;
+		BitReader bitreader(details.fillOrder, pstreambuf, false);
+			// this creates an invalid bitreader, but it is
+			// initialized properly with the SetTo() call
 		if (details.compression != COMPRESSION_NONE) {
 			pstreambuf = new StreamBuffer(inSource, 2048, false);
 			if (pstreambuf->InitCheck() != B_OK)
 				return B_NO_MEMORY; 
 		}
-			
+		
+		bool bfirstLine = true;	
 		for (uint32 i = 0; i < details.stripsPerImage; i++) {
 			uint32 read = 0;
 			
@@ -1098,6 +1211,10 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 			// for reading
 			if (details.compression != COMPRESSION_NONE &&
 				!pstreambuf->Seek(details.pstripOffsets[i]))
+				return B_NO_TRANSLATOR;
+				
+			if (details.compression == COMPRESSION_T4 &&
+				bitreader.SetTo(details.fillOrder, pstreambuf) != B_OK)
 				return B_NO_TRANSLATOR;
 				
 			// Read / Write one line at a time for each
@@ -1121,6 +1238,19 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 							ret = -1;
 						break;
 						
+					case COMPRESSION_T4:
+						ret = decode_t4(bitreader, details, outbuffer,
+							bfirstLine);
+						if (ret < 1)
+							// break out of while loop
+							ret = -1;
+						else
+							ret -= read;
+								// unlike other decoders, decode_t4 retruns
+								// the total bytes read from the current
+								// strip
+						break;
+						
 					case COMPRESSION_PACKBITS:
 						ret = unpack(pstreambuf, inbuffer, inbufferlen);
 						if (ret < 1)
@@ -1132,9 +1262,11 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 					break;
 					
 				read += ret;
-				if (details.compression != COMPRESSION_HUFFMAN)
+				if (details.compression != COMPRESSION_HUFFMAN &&
+					details.compression != COMPRESSION_T4)
 					tiff_to_bits(inbuffer, inbufferlen, outbuffer, details);
 				outDestination->Write(outbuffer, outbufferlen);
+				bfirstLine = false;
 			}
 			// If while loop was broken...
 			if (read < details.pstripByteCounts[i]) {

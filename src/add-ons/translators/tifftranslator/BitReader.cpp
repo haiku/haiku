@@ -31,15 +31,9 @@
 
 #include "BitReader.h"
 
-BitReader::BitReader(StreamBuffer *pstreambuf)
+BitReader::BitReader(uint16 fillOrder, StreamBuffer *pstreambuf, bool binitialRead)
 {
-	finitStatus = B_BAD_VALUE;
-	fnbytesRead = 0;
-	fbitbuf = 0;
-	fcurrentbit = 0;
-	fpstreambuf = pstreambuf;
-	if (fpstreambuf)
-		finitStatus = ReadByte();
+	SetTo(fillOrder, pstreambuf, binitialRead);
 }
 
 BitReader::~BitReader()
@@ -48,6 +42,25 @@ BitReader::~BitReader()
 	fpstreambuf = NULL;
 	fbitbuf = 0;
 	fcurrentbit = 0;
+}
+
+status_t
+BitReader::SetTo(uint16 fillOrder, StreamBuffer *pstreambuf, bool binitialRead)
+{
+	finitStatus = B_OK;
+	fnbytesRead = 0;
+	fbitbuf = 0;
+	fcurrentbit = 0;
+	fpstreambuf = pstreambuf;
+	ffillOrder = fillOrder;
+	if (ffillOrder != 1 && ffillOrder != 2)
+		finitStatus = B_BAD_VALUE;
+	else if (!fpstreambuf)
+		finitStatus = B_BAD_VALUE;
+	else if (binitialRead)
+		finitStatus = ReadByte();
+		
+	return finitStatus;
 }
 
 status_t
@@ -68,7 +81,10 @@ BitReader::PeekBit()
 	if (!fcurrentbit && ReadByte() != B_OK)
 		return B_ERROR;
 		
-	return (fbitbuf >> (fcurrentbit - 1)) & 1;
+	if (ffillOrder == 1)
+		return (fbitbuf >> (fcurrentbit - 1)) & 1;
+	else
+		return (fbitbuf >> (8 - fcurrentbit)) & 1;
 }
 
 status_t

@@ -37,8 +37,12 @@
 
 class BitReader {
 public:
-	BitReader(StreamBuffer *pstreambuf);
+	// Setup the BitReader to read from the given stream with the given fill order
+	BitReader(uint16 fillOrder, StreamBuffer *pstreambuf, bool binitialRead = true);
 	~BitReader();
+	
+	// Change the BitReader to read from given stream with the given fill order
+	status_t SetTo(uint16 fillOrder, StreamBuffer *pstreambuf, bool binitialRead = true);
 	
 	status_t InitCheck() const { return finitStatus; };
 	
@@ -59,6 +63,7 @@ private:
 	StreamBuffer *fpstreambuf;
 	status_t finitStatus;
 	uint32 fnbytesRead;
+	uint16 ffillOrder;
 	uint8 fbitbuf;
 	uint8 fcurrentbit;
 };

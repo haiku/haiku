@@ -53,6 +53,7 @@
 	#define COMPRESSION_T4				3
 	#define COMPRESSION_T6				4
 	#define COMPRESSION_LZW				5
+	#define COMPRESSION_JPEG			6
 	#define COMPRESSION_PACKBITS		32773
 #define TAG_PHOTO_INTERPRETATION			262
 	#define PHOTO_WHITEZERO				0
@@ -69,6 +70,13 @@
 	#define DEFAULT_ROWS_PER_STRIP		4294967295UL
 #define TAG_STRIP_BYTE_COUNTS				279
 #define TAG_PLANAR_CONFIGURATION			284
+#define TAG_T4_OPTIONS						292
+	// (Also called Group3Options)
+	#define T4_2D						1
+	#define T4_UNCOMPRESSED				2
+	#define T4_FILL_BYTE_BOUNDARY		4
+#define TAG_T6_OPTIONS						293
+	// (Also called Group4Options)
 #define TAG_RESOLUTION_UNIT					296
 #define TAG_COLOR_MAP						320
 #define TAG_INK_SET							332

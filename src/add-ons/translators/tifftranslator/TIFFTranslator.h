@@ -83,6 +83,7 @@ public:
 	uint16 interpretation;
 	uint16 bitsPerPixel;
 	uint16 imageType;
+	uint16 fillOrder;
 };
 
 class TIFFTranslator : public BTranslator {
@@ -137,6 +138,8 @@ private:
 	
 	ssize_t decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details, 
 		uint8 *pbits);
+	ssize_t decode_t4(BitReader &stream, TiffDetails &details, 
+		uint8 *pbits, bool bfirstLine);
 	
 	status_t translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		uint8 *read, swap_action swp, uint32 outType,
