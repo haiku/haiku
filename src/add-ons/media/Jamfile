@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src add-ons media ;
+
+SubInclude OBOS_TOP src add-ons media media-add-ons ;
