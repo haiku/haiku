@@ -883,8 +883,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 		switch (rom[adress])
 		{
 		case 0x32: /* new */
-//fixme:
-			*size -= 11;
+			*size -= (11 + ((*((uint8*)(&(rom[(adress + 6)])))) << 2));
 			if (*size < 0)
 			{
 				LOG(8,("script size error, aborting!\n\n"));
