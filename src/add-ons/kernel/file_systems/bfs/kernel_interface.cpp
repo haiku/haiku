@@ -369,6 +369,7 @@ bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 
 	while (true) {
 		if ((status = inode->InitCheck()) == B_OK) {
+			// the inode is okay and ready to be used
 			*_node = (void *)inode;
 			return B_OK;
 		}
@@ -376,8 +377,8 @@ bfs_read_vnode(void *_ns, vnode_id id, char reenter, void **_node)
 		// if "status" is B_BUSY, we wait a bit and try again
 
 		if (status == B_BUSY) {
-			// wait for half a second at maximum
-			if (tries++ < 100) {
+			// wait for one second at maximum
+			if (tries++ < 200) {
 				snooze(5000);
 				continue;
 			}
