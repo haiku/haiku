@@ -1,7 +1,6 @@
 /*
-	Authors:
-	Mark Watson - 21/6/00,
-	Apsed
+	Author:
+	Rudolf Cornelissen 7/2004
 */
 
 #define MODULE_BIT 0x04000000
@@ -9,43 +8,80 @@
 #include "acc_std.h"
 
 /* Get some info about the device */
-status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi) 
+status_t GET_ACCELERANT_DEVICE_INFO(accelerant_device_info * adi)
 {
-	/*no info on version is provided, so presumably this is for my info*/
-	LOG(4,("DEVICE_INFO: version 0x%08x\n", adi->version));
-	
-	switch ((si->ps.secondary_head << 4)|si->ps.card_type)
+	LOG(4,("GET_ACCELERANT_DEVICE_INFO: returning info\n"));
+
+	/* no info on version is provided, so presumably this is for my info */
+	adi->version = 1;
+
+	sprintf(adi->name, "nVidia chipset");
+	switch (si->ps.card_type)
 	{
-	case 0x01:
-		sprintf(adi->name,"Matrox G400 Plain");
+	case NV04:
+		sprintf(adi->chipset, "NV04");
 		break;
-	case 0x02:
-		sprintf(adi->name,"Matrox G400 MAX");
+	case NV05:
+		sprintf(adi->chipset, "NV05");
 		break;
-	case 0x11:
-		sprintf(adi->name,"Matrox Dualhead G400 Plain");
+	case NV05M64:
+		sprintf(adi->chipset, "NV05 model 64");
 		break;
-	case 0x12:
-		sprintf(adi->name,"Matrox Dualhead G400 MAX");
+	case NV06:
+		sprintf(adi->chipset, "NV06");
+		break;
+	case NV10:
+		sprintf(adi->chipset, "NV10");
+		break;
+	case NV11:
+	case NV11M:
+		sprintf(adi->chipset, "NV11");
+		break;
+	case NV15:
+		sprintf(adi->chipset, "NV15");
+		break;
+	case NV17:
+	case NV17M:
+		sprintf(adi->chipset, "NV17");
+		break;
+	case NV18:
+	case NV18M:
+		sprintf(adi->chipset, "NV18");
+		break;
+	case NV20:
+		sprintf(adi->chipset, "NV20");
+		break;
+	case NV25:
+		sprintf(adi->chipset, "NV25");
+		break;
+	case NV28:
+		sprintf(adi->chipset, "NV28");
+		break;
+	case NV30:
+		sprintf(adi->chipset, "NV30");
+		break;
+	case NV31:
+		sprintf(adi->chipset, "NV31");
+		break;
+	case NV34:
+		sprintf(adi->chipset, "NV34");
+		break;
+	case NV35:
+		sprintf(adi->chipset, "NV35");
+		break;
+	case NV36:
+		sprintf(adi->chipset, "NV36");
+		break;
+	case NV38:
+		sprintf(adi->chipset, "NV38");
+		break;
+	default:
+		sprintf(adi->chipset, "unknown");
 		break;
 	}
-	
-	sprintf(adi->chipset,"NVG400");
-
-	sprintf(adi->serial_no,"01134"); /*FIXME*/
-
-	adi->memory=si->ps.memory_size * 1024 * 1024;
-	
-	adi->dac_speed=si->ps.max_dac1_clock;
-
-	// apsed, TODO ?? GET_ACCELERANT_DEVICE_INFO never called and kind of cards
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s 0x%08x %d\n", "version", adi->version, adi->version));
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s %s\n", "name", adi->name));
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s %s\n", "chipset", adi->chipset));
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s %s\n", "serial_no", adi->serial_no));
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s 0x%08x %d\n", "memory", adi->memory, adi->memory));
-	LOG(2,("GET_ACCELERANT_DEVICE_INFO %20s %d\n", "dac_speed", adi->dac_speed));
-
+	sprintf(adi->serial_no, "unknown");
+	adi->memory = si->ps.memory_size * 1024 * 1024;
+	adi->dac_speed = si->ps.max_dac1_clock;
 
 	return B_OK;
 }
