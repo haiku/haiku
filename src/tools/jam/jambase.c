@@ -185,7 +185,7 @@ char *jambase[] = {
 "SUFLIB		?= .lib ;\n",
 "SUFOBJ		?= .o ;\n",
 "}\n",
-"else if $(OS) = BEOS && $(METROWERKS)\n",
+"else if $(OS) = BEOS && $(OSPLAT) = PPC\n",
 "{\n",
 "AR		?= mwld -xml -o ;\n",
 "BINDIR		?= /boot/home/config/bin ;\n",

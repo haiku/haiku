@@ -393,6 +393,7 @@
      defined( PPC ) || \
      defined( ppc ) || \
      defined( __powerpc__ ) || \
+     defined( __POWERPC__ ) || \
      defined( __ppc__ )
 # define OSPLAT "OSPLAT=PPC"
 # endif

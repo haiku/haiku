@@ -366,7 +366,7 @@ else if $(MAC)
 	SUFLIB		?= .lib ;
 	SUFOBJ		?= .o ;
 }
-else if $(OS) = BEOS && $(METROWERKS)
+else if $(OS) = BEOS && $(OSPLAT) = PPC
 {
 	AR		?= mwld -xml -o ;
 	BINDIR		?= /boot/home/config/bin ;

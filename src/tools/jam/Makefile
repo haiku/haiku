@@ -29,15 +29,6 @@ CFLAGS =
 #CFLAGS = -DNT 
 #TARGET = /Fejam0
 
-# BeOS - Metroworks CodeWarrior
-#CC = mwcc
-#Include = /NewDisk/develop/headers/posix
-#CFLAGS = -I $(Include)
-
-# BeOS - gcc
-#CC = gcc
-#LINKLIBS = -lnet
-
 # Interix - gcc
 #CC = gcc
 
