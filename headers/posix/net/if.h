@@ -5,8 +5,16 @@
 #ifndef _NET_IF_H
 #define _NET_IF_H
 
-#include <Drivers.h>
-#include <sys/socketvar.h>
+/* FIXME: this file is NOT POSIX compliant, and rely on way too much OS-dependent
+   definition.
+   Moving private parts to private headers should help clean up this file
+   
+   POSIX net/if.h spec:
+   http://www.opengroup.org/onlinepubs/007904975/basedefs/net/if.h.html
+*/
+
+#include <Drivers.h>	/* FIXME */
+#include <OS.h>			/* FIXME */
 #include <net/if_types.h>
 #include <netinet/in.h>
 #include <net/route.h>
@@ -14,6 +22,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Forward reference... */
+struct socket;
 
 enum {
 	IF_GETADDR = B_DEVICE_OP_CODES_END,
