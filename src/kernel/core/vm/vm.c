@@ -904,15 +904,12 @@ region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_ty
 static int
 __vm_delete_region(vm_address_space *aspace, vm_region *region)
 {
-	// ToDo: allowing a NULL aspace parameter reduces security
-	//	but is needed for BeOS compatibility - we should consider
-	//	introducing team privileges for those things, though.
-	//	Also, I am really not sure if it's a good idea not to
+	// ToDo: I am really not sure if it's a good idea not to
 	//	wait until the area has really been freed - code following
 	//	might rely on the address space to available again, and
 	//	there is no other way to wait for the completion of the
 	//	deletion.
-	if (aspace == NULL || region->aspace == aspace)
+	if (region->aspace == aspace)
 		vm_put_region(region);
 
 	return B_NO_ERROR;
@@ -922,10 +919,9 @@ __vm_delete_region(vm_address_space *aspace, vm_region *region)
 static int
 _vm_delete_region(vm_address_space *aspace, region_id rid)
 {
-//	vm_region *temp, *last = NULL;
 	vm_region *region;
 
-	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace ? aspace->id : -1, rid);
+	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid);
 
 	region = vm_get_region_by_id(rid);
 	if (region == NULL)
@@ -945,7 +941,7 @@ vm_delete_region(aspace_id aid, region_id rid)
 	int err;
 
 	aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
+	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
 	err = _vm_delete_region(aspace, rid);
@@ -2359,9 +2355,16 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 
 
 status_t
+delete_area_etc(struct team *team, area_id area)
+{
+	return vm_delete_region(team->_aspace_id, area);
+}
+
+
+status_t
 delete_area(area_id area)
 {
-	return vm_delete_region(NULL, area);
+	return vm_delete_region(vm_get_kernel_aspace_id(), area);
 }
 
 
