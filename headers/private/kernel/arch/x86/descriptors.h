@@ -86,15 +86,24 @@ set_segment_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limi
 {
 	set_segment_descriptor_base(desc, base);
 
-	desc->limit_00_15 = (addr_t)limit & 0x0ffff;	// limit is 20 bits long
-	desc->limit_19_16 = ((addr_t)limit >> 16) & 0xf;
+	// limit is 20 bits long
+	if (limit & 0xfff00000) {
+		desc->limit_00_15 = ((addr_t)limit >> 12) & 0x0ffff;
+		desc->limit_19_16 = ((addr_t)limit >> 28) & 0xf;
+		desc->granularity = 1;	// 4 KB granularity
+	} else {
+		desc->limit_00_15 = (addr_t)limit & 0x0ffff;
+		desc->limit_19_16 = ((addr_t)limit >> 16) & 0xf;
+		desc->granularity = 0;	// 1 byte granularity
+	}
+		limit >>= 12;
+
 
 	desc->type = type;
 	desc->desc_type = DT_CODE_DATA_SEGMENT;
 	desc->privilege_level = privilegeLevel;
 
 	desc->present = 1;
-	desc->granularity = 1;	// 4 GB size (in page size steps)
 	desc->available = 0;	// system available bit is currently not used
 	desc->d_b = 1;			// 32-bit code
 

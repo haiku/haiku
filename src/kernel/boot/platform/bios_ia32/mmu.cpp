@@ -379,14 +379,14 @@ mmu_init_for_kernel(void)
 
 		// put standard segment descriptors in it
 		clear_segment_descriptor(&gdt[0]);
-		set_segment_descriptor(&gdt[1], 0, 0xfffff, DT_CODE_READABLE, DPL_KERNEL);
+		set_segment_descriptor(&gdt[1], 0, 0xffffffff, DT_CODE_READABLE, DPL_KERNEL);
 			// seg 0x08 - kernel 4GB code
-		set_segment_descriptor(&gdt[2], 0, 0xfffff, DT_DATA_WRITEABLE, DPL_KERNEL);
+		set_segment_descriptor(&gdt[2], 0, 0xffffffff, DT_DATA_WRITEABLE, DPL_KERNEL);
 			// seg 0x10 - kernel 4GB data
 
-		set_segment_descriptor(&gdt[3], 0, 0xfffff, DT_CODE_READABLE, DPL_USER);
+		set_segment_descriptor(&gdt[3], 0, 0xffffffff, DT_CODE_READABLE, DPL_USER);
 			// seg 0x1b - ring 3 user 4GB code
-		set_segment_descriptor(&gdt[4], 0, 0xfffff, DT_DATA_WRITEABLE, DPL_USER);
+		set_segment_descriptor(&gdt[4], 0, 0xffffffff, DT_DATA_WRITEABLE, DPL_USER);
 			// seg 0x23 - ring 3 user 4GB data
 
 		// gdt[5] and above will be filled later by the kernel
