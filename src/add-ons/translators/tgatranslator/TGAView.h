@@ -30,20 +30,29 @@
 #define TGAVIEW_H
 
 #include <View.h>
-#include <MenuField.h>
-#include <MenuItem.h>
+#include <CheckBox.h>
+#include "TGATranslatorSettings.h"
 
 class TGAView : public BView {
 public:
 	TGAView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags);
+		uint32 flags, TGATranslatorSettings *psettings);
 		// sets up the view
 		
 	~TGAView();
-		// does nothing
+		// releases the TGATranslator settings
+		
+	virtual void AllAttached();
+	virtual void MessageReceived(BMessage *message);
 
 	virtual	void Draw(BRect area);
 		// draws information about the TGATranslator
+		
+	enum { CHANGE_RLE };
+private:
+	BCheckBox *fpchkRLE;
+	
+	TGATranslatorSettings *fpsettings;
 };
 
 #endif // #ifndef TGAVIEW_H
