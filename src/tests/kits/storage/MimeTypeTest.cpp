@@ -451,6 +451,15 @@ public:
 		return mime.SetIcon(icon, size);
 	}
 	
+	// Used to call the appropriate DeleteIcon[ForType] function
+	virtual status_t DeleteIcon(BMimeType &mime) {
+#if TEST_R5
+		return B_BAD_VALUE;
+#else
+		return mime.DeleteIcon(size);
+#endif
+	}
+	
 	BBitmap* TempBitmap() {
 		return &bmpTemp;
 	}
@@ -484,6 +493,13 @@ public:
 	}
 	virtual status_t SetIcon(BMimeType &mime, BBitmap *icon) {
 		return mime.SetIconForType(fileType.c_str(), icon, size);
+	}
+	virtual status_t DeleteIcon(BMimeType &mime) {
+#if TEST_R5
+		return B_BAD_VALUE;
+#else
+		return mime.DeleteIconForType(fileType.c_str(), size);
+#endif
 	}
 protected:
 	std::string fileType;
@@ -620,18 +636,50 @@ MimeTypeTest::AppHintTest() {
 		// Make sure the type isn't installed
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
+#if TEST_R5
 		CHK(!mime.IsInstalled());
 		CHK(mime.GetAppHint(NULL) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetAppHint(NULL) != B_OK);		// Installs, R5 == B_ENTRY_NOT_FOUND
-												// OBOS == B_BAD_VALUE, doesn't install
-#if TEST_R5
 		CHK(mime.IsInstalled());
-#else
-		CHK(!mime.IsInstalled());
-#endif
 		CHK(mime.GetAppHint(NULL) != B_OK);		// R5 == B_BAD_VALUE
 		CHK(mime.SetAppHint(NULL) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
+#else
+		CHK(!mime.IsInstalled());
+		CHK(mime.GetAppHint(NULL) != B_OK);		// B_BAD_VALUE
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetAppHint(NULL) != B_OK);		// B_ENTRY_NOT_FOUND
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetAppHint(&appRef) == B_OK);
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAppHint(&ref) == B_OK);	
+		CHK(ref == appRef);
+		CHK(mime.SetAppHint(NULL) == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAppHint(&ref) != B_OK);		// B_ENTRY_NOT_FOUND
+#endif
+	}
+	// Delete test
+	NextSubTest();
+	{
+#if !TEST_R5
+		entry_ref ref;
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK(mime.DeleteAppHint() != B_OK);		
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetAppHint(&appRef) == B_OK);
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAppHint(&ref) == B_OK);	
+		CHK(ref == appRef);
+		CHK(mime.DeleteAppHint() == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAppHint(&ref) != B_OK);	
+#endif
 	}
 	// Non-installed type
 	NextSubTest();
@@ -1258,30 +1306,46 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
 		// Uninstalled
-		CHK(helper.GetIcon(mime, NULL) != B_OK);	// R5 == B_BAD_VALUE
+		CHK(helper.GetIcon(mime, NULL) != B_OK);	// B_BAD_VALUE
 		CHK(!mime.IsInstalled());
 		CHK(helper.SetIcon(mime, NULL) != B_OK);	// R5 == Installs, B_ENTRY_NOT_FOUND
-												// OBOS == B_BAD_VALUE, doesn't install
+													// OBOS == Doesn't install, B_ENTRY_NOT_FOUND
 #if TEST_R5
 		CHK(mime.IsInstalled());
 #else
 		CHK(!mime.IsInstalled());
+		CHK(mime.Install() == B_OK);
 #endif
-		CHK(helper.GetIcon(mime, bmp) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
+		CHK(helper.GetIcon(mime, bmp) != B_OK);	// B_ENTRY_NOT_FOUND
 		// Installed
-		CHK(helper.GetIcon(mime, NULL) != B_OK);	// R5 == B_BAD_VALUE
+		CHK(helper.GetIcon(mime, NULL) != B_OK);	// B_BAD_VALUE
 		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
 		CHK(helper.GetIcon(mime, bmp) == B_OK);
 		CHK(*bmp == *helper.Bitmap1());
-#if TEST_R5
 		CHK(helper.SetIcon(mime, NULL) == B_OK);
-#else
-		CHK(helper.SetIcon(mime, NULL) == B_BAD_VALUE);
-#endif
-#if TEST_R5
-		CHK(helper.GetIcon(mime, bmp) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
-#else
-		CHK(helper.GetIcon(mime, bmp) == B_OK);	// OBOS == Still installed from above
+		CHK(helper.GetIcon(mime, bmp) != B_OK);	// B_ENTRY_NOT_FOUND
+	}
+	// Delete test
+	NextSubTest();
+	{
+#if !TEST_R5
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK(helper.DeleteIcon(mime) != B_OK);		
+		CHK(!mime.IsInstalled());
+		CHK(helper.SetIcon(mime, helper.Bitmap2()) == B_OK);
+		CHK(mime.IsInstalled());
+		fill_bitmap(*bmp, 100);
+		CHK(*bmp != *helper.Bitmap2());
+		CHK(helper.GetIcon(mime, bmp) == B_OK);	
+		CHK(*bmp == *helper.Bitmap2());
+		CHK(helper.DeleteIcon(mime) == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(helper.GetIcon(mime, bmp) != B_OK);	
 #endif
 	}
 	// Invalid Bitmap Size (small -- 10x10)
@@ -1340,9 +1404,10 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
 		CHK(helper.GetIcon(mime, &testBmp) != B_OK);	// R5 == B_BAD_VALUE
 	}	
-	// Invalid Bitmap Color Depth
+	// Non-B_CMAP8 Color Depth (not really supported under R5)
 	NextSubTest();
 	{
+#if !TEST_R5
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
 		// Uninstall then reinstall to clear attributes
@@ -1354,7 +1419,6 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		// Init Test Bitmap
 		BBitmap testBmp(helper.BitmapBounds(), B_RGB32);
 		// Test Set()
-#if !TEST_R5
 //		fill_bitmap(testBmp, 4);
 		fill_bitmap32(testBmp, 10, 20, 30, 40);				// Fill our 32-bit bitmap
 		BBitmap testBmp8(helper.BitmapBounds(), B_CMAP8);	// Create an 8-bit bitmap the same size
@@ -1372,13 +1436,6 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(*bmp != *helper.Bitmap1());
 		CHK(*bmp != testBmp);				// Shouldn't match, since SetIcon() reduces to B_CMAP8
 		CHK(*bmp == testBmp8);				// *Should* match, since it's the result of a similar reduction
-#endif
-		// Test Get()
-#if TEST_R5
-		fill_bitmap(testBmp, 3);
-		CHK(helper.SetIcon(mime, helper.Bitmap1()) == B_OK);
-		CHK(helper.GetIcon(mime, &testBmp) == B_OK);	// R5 == B_OK, but testBmp is not actually modified
-		CHK(testBmp != *helper.Bitmap1());
 #endif
 	}	
 	// Normal Function
@@ -1456,6 +1513,10 @@ MimeTypeTest::IconForTypeTest(IconForTypeHelper &helper) {
 		CHK(*bmp != *helper.Bitmap1());
 		CHK(mime.GetIcon(bmp, helper.Size()) == B_OK);
 		CHK(*bmp == *helper.Bitmap1());
+		// Delete with dual NULL calls
+		CHK(mime.SetIconForType(NULL, NULL, helper.Size()) == B_OK);
+		CHK(mime.GetIconForType(NULL, bmp, helper.Size()) != B_OK);	// B_ENTRY_NOT_FOUND
+		CHK(mime.GetIcon(bmp, helper.Size()) != B_OK);				// B_ENTRY_NOT_FOUND
 	}	
 }
 
@@ -1709,24 +1770,39 @@ MimeTypeTest::InstalledTypesTest() {
 
 void
 MimeTypeTest::ShortDescriptionTest() {
-	DescriptionTest(&BMimeType::GetShortDescription, &BMimeType::SetShortDescription);
+	DescriptionTest(&BMimeType::GetShortDescription, &BMimeType::SetShortDescription,
+#if TEST_R5
+					   NULL
+#else						
+					   &BMimeType::DeleteShortDescription
+#endif					   
+	);
 }
 
 // Long Description
 
 void
 MimeTypeTest::LongDescriptionTest() {
-	DescriptionTest(&BMimeType::GetLongDescription, &BMimeType::SetLongDescription);
+	DescriptionTest(&BMimeType::GetLongDescription, &BMimeType::SetLongDescription,
+#if TEST_R5
+					   NULL
+#else						
+					   &BMimeType::DeleteLongDescription
+#endif					   
+	);
 }
 
 // DescriptionTest Helper Function
 void
-MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc setDescr) {
+MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc setDescr,
+							    DeleteDescriptionFunc deleteDescr)
+{
 	char str[B_MIME_TYPE_LENGTH+1];
 
 	// Uninitialized
 	NextSubTest();
 	{
+		sprintf(str, "");
 		BMimeType mime;
 		CPPUNIT_ASSERT(mime.InitCheck() == B_NO_INIT);
 		CPPUNIT_ASSERT((mime.*getDescr)(str) != B_OK);	// R5 == B_BAD_VALUE
@@ -1735,6 +1811,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 	// Non-installed type
 	NextSubTest();
 	{
+		sprintf(str, "");
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
 		// Make sure the type isn't installed
@@ -1762,13 +1839,45 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		CHK(!mime.IsInstalled());
 		CHK((mime.*getDescr)(NULL) == B_BAD_VALUE);	
 		CHK(!mime.IsInstalled());
-		CHK((mime.*setDescr)(NULL) == B_BAD_VALUE);
+		CHK((mime.*setDescr)(NULL) == B_ENTRY_NOT_FOUND);	// Trying to delete non-existent attribute
 		CHK(!mime.IsInstalled());
+		CHK((mime.*setDescr)(testDescr) == B_OK);
+		CHK(mime.IsInstalled());
+		sprintf(str, "");
+		CHK((mime.*getDescr)(str) == B_OK);
+		CHK(strcmp(str, testDescr) == 0);
+		CHK((mime.*setDescr)(NULL) == B_OK);	// Delete the attribute
+		CHK(mime.IsInstalled());
+		CHK((mime.*getDescr)(str) == B_ENTRY_NOT_FOUND);
+#endif
+	}
+	// Delete test
+	NextSubTest();
+	{
+#if !TEST_R5
+		entry_ref ref;
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK((mime.*deleteDescr)() != B_OK);		
+		CHK(!mime.IsInstalled());
+		CHK((mime.*setDescr)(testDescr) == B_OK);
+		CHK(mime.IsInstalled());
+		sprintf(str, "");
+		CHK((mime.*getDescr)(str) == B_OK);	
+		CHK(strcmp(str, testDescr) == 0);
+		CHK((mime.*deleteDescr)() == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK((mime.*getDescr)(str) != B_OK);	
 #endif
 	}
 	// Installed type
 	NextSubTest();
 	{
+		sprintf(str, "");
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
 		// Uninstall then reinstall to clear attributes
@@ -1791,6 +1900,7 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 	// Installed Type, Description Too Long
 	NextSubTest();
 	{
+		sprintf(str, "");
 		CHK(strlen(longDescr) > (B_MIME_TYPE_LENGTH+1));
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
@@ -1851,17 +1961,29 @@ MimeTypeTest::PreferredAppTest() {
 		// Make sure the type isn't installed
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
+#if TEST_R5
 		CHK(!mime.IsInstalled());
 		CHK(mime.GetPreferredApp(NULL) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetPreferredApp(NULL) != B_OK);		// R5 == Installs (but doesn't set), B_ENTRY_NOT_FOUND
-														// OBOS == B_BAD_VALUE, doesn't install
-#if TEST_R5
 		CHK(mime.IsInstalled());
+		CHK(mime.GetPreferredApp(str) == B_ENTRY_NOT_FOUND);
 #else
 		CHK(!mime.IsInstalled());
-#endif
-		CHK(mime.GetPreferredApp(str) == B_ENTRY_NOT_FOUND);
+		CHK(mime.GetPreferredApp(NULL) != B_OK);		// OBOS == B_BAD_VALUE
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetPreferredApp(NULL) != B_OK);		// OBOS == B_ENTRY_NOT_FOUND
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetPreferredApp(testSig) == B_OK);		
+		CHK(mime.IsInstalled());
+		sprintf(str, "");
+		CHK(mime.GetPreferredApp(str) == B_OK);
+		CHK(strcmp(str, testSig) == 0);
+		CHK(mime.SetPreferredApp(NULL) == B_OK);		
+		CHK(mime.IsInstalled());
+		sprintf(str, "");
+		CHK(mime.GetPreferredApp(str) != B_OK);			// OBOS == B_ENTRY_NOT_FOUND
+#endif // !TEST_R5
 	}
 	// Installed type, NULL params
 	NextSubTest();
@@ -1877,6 +1999,29 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(mime.GetPreferredApp(NULL) != B_OK);		// R5 == B_BAD_ADDRESS
 		CHK(mime.SetPreferredApp(NULL) != B_OK);		// R5 == B_ENTRY_NOT_FOUND
 		CHK(mime.GetPreferredApp(NULL) != B_OK);		// R5 == B_BAD_ADDRESS
+	}
+	// Delete test
+	NextSubTest();
+	{
+#if !TEST_R5
+		entry_ref ref;
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK(mime.DeletePreferredApp() != B_OK);		
+		CHK(!mime.IsInstalled());
+		CHK(mime.SetPreferredApp(testSig) == B_OK);
+		CHK(mime.IsInstalled());
+		sprintf(str, "");
+		CHK(mime.GetPreferredApp(str) == B_OK);	
+		CHK(strcmp(str, testSig) == 0);
+		CHK(mime.DeletePreferredApp() == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetPreferredApp(str) != B_OK);	
+#endif
 	}
 	// Installed type
 	NextSubTest();

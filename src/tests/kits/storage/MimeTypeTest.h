@@ -14,6 +14,7 @@ class BTestApp;
 // Function pointer types for test sharing between {Get,Set}{Short,Long}Description()
 typedef status_t (BMimeType::*GetDescriptionFunc)(char* description) const;
 typedef status_t (BMimeType::*SetDescriptionFunc)(const char* description);
+typedef status_t (BMimeType::*DeleteDescriptionFunc)();
 
 class IconHelper;
 class IconForTypeHelper;
@@ -59,7 +60,8 @@ public:
 	//------------------------------------------------------------
 	// Helper functions
 	//------------------------------------------------------------
-	void DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc setDescr);
+	void DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc setDescr,
+	                       DeleteDescriptionFunc deleteDescr);
 	void IconTest(IconHelper &helper);
 	void IconForTypeTest(IconForTypeHelper &helper);
 
