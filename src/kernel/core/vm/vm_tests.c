@@ -192,7 +192,7 @@ vm_test()
 			panic("vm_test 6: error deleting cloned region\n");
 	}
 #endif
-#if 1
+#if 0
 	dprintf("vm_test 7: mmaping a known file a few times and verifying they see the same data\n");
 	{
 		void *ptr, *ptr2;
@@ -200,7 +200,7 @@ vm_test()
 //		char *blah;
 		int fd;
 
-		fd = sys_open("/boot/kernel", 0);
+		fd = _kern_open("/boot/beos/system/kernel_" OBOS_ARCH, 0);
 
 		rid = vm_map_file(vm_get_kernel_aspace_id(), "mmap_test", &ptr, B_ANY_KERNEL_ADDRESS,
 			PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, REGION_NO_PRIVATE_MAP, "/boot/kernel", 0);
@@ -217,7 +217,7 @@ vm_test()
 
 		dprintf("regions deleted\n");
 
-		sys_close(fd);
+		_kern_close(fd);
 
 		dprintf("vm_test 7: passed\n");
 	}

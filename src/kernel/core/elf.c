@@ -1012,13 +1012,13 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 
 	dprintf("elf_load: entry path '%s', team %p\n", path, p);
 
-	fd = sys_open(path, 0);
+	fd = _kern_open(path, 0);
 	if (fd < 0)
 		return fd;
 
 	// read and verify the ELF header
 
-	len = sys_read(fd, 0, &eheader, sizeof(eheader));
+	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
 	if (len < 0) {
 		err = len;
 		goto error;
@@ -1043,7 +1043,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 	}
 
 	dprintf("reading in program headers at 0x%lx, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
-	len = sys_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
+	len = _kern_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
 	if (len < 0) {
 		err = len;
 		dprintf("error reading in program headers\n");
@@ -1154,7 +1154,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 error:
 	if (pheaders)
 		free(pheaders);
-	sys_close(fd);
+	_kern_close(fd);
 
 	return err;
 }
@@ -1179,7 +1179,7 @@ load_kernel_add_on(const char *path)
 
 	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
-	fd = sys_open(path, 0);
+	fd = _kern_open(path, 0);
 	if (fd < 0)
 		return fd;
 
@@ -1205,7 +1205,7 @@ load_kernel_add_on(const char *path)
 		goto error;
 	}
 
-	len = sys_read(fd, 0, eheader, sizeof(*eheader));
+	len = _kern_read(fd, 0, eheader, sizeof(*eheader));
 	if (len < 0) {
 		err = len;
 		goto error1;
@@ -1236,7 +1236,7 @@ load_kernel_add_on(const char *path)
 	}
 
 	TRACE(("reading in program headers at 0x%lx, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
-	len = sys_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
+	len = _kern_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
 		TRACE(("error reading in program headers\n"));
@@ -1325,7 +1325,7 @@ load_kernel_add_on(const char *path)
 
 		TRACE(("elf_load_kspace: created a region at %p\n", (void *)region->start));
 
-		len = sys_read(fd, pheaders[i].p_offset,
+		len = _kern_read(fd, pheaders[i].p_offset,
 			(void *)(region->start + (pheaders[i].p_vaddr % PAGE_SIZE)),
 			pheaders[i].p_filesz);
 		if (len < 0) {
@@ -1363,7 +1363,7 @@ load_kernel_add_on(const char *path)
 		load_elf_symbol_table(fd, image);
 
 	free(pheaders);
-	sys_close(fd);
+	_kern_close(fd);
 
 	register_elf_image(image);
 
@@ -1388,7 +1388,7 @@ error:
 error0:
 	if (vnode)
 		vfs_put_vnode_ptr(vnode);
-	sys_close(fd);
+	_kern_close(fd);
 
 	return err;
 }

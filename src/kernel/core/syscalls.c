@@ -62,82 +62,82 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			*call_ret = 0;
 			break;
 		case SYSCALL_MOUNT:
-			*call_ret = user_mount((const char *)arg0, (const char *)arg1, (const char *)arg2, (void *)arg3);
+			*call_ret = _user_mount((const char *)arg0, (const char *)arg1, (const char *)arg2, (void *)arg3);
 			break;
 		case SYSCALL_UNMOUNT:
-			*call_ret = user_unmount((const char *)arg0);
+			*call_ret = _user_unmount((const char *)arg0);
 			break;
 		case SYSCALL_SYNC:
-			*call_ret = user_sync();
+			*call_ret = _user_sync();
 			break;
 		case SYSCALL_OPEN_ENTRY_REF:
-			*call_ret = user_open_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (const char *)arg3, (int)arg4);
+			*call_ret = _user_open_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (const char *)arg3, (int)arg4);
 			break;
 		case SYSCALL_OPEN:
-			*call_ret = user_open((const char *)arg0, (int)arg1);
+			*call_ret = _user_open((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_CLOSE:
-			*call_ret = user_close((int)arg0);
+			*call_ret = _user_close((int)arg0);
 			break;
 		case SYSCALL_FSYNC:
-			*call_ret = user_fsync((int)arg0);
+			*call_ret = _user_fsync((int)arg0);
 			break;
 		case SYSCALL_READ:
-			*call_ret = user_read((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (void *)arg3, (ssize_t)arg4);
+			*call_ret = _user_read((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (void *)arg3, (ssize_t)arg4);
 			break;
 		case SYSCALL_WRITE:
-			*call_ret = user_write((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (const void *)arg3, (ssize_t)arg4);
+			*call_ret = _user_write((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (const void *)arg3, (ssize_t)arg4);
 			break;
 		case SYSCALL_SEEK:
-			*call_ret = user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
+			*call_ret = _user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
 			break;
 		case SYSCALL_OPEN_DIR_ENTRY_REF:
-			*call_ret = user_open_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3);
+			*call_ret = _user_open_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3);
 			break;
 		case SYSCALL_OPEN_DIR_NODE_REF:
-			*call_ret = user_open_dir_node_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2));
+			*call_ret = _user_open_dir_node_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2));
 			break;
 		case SYSCALL_OPEN_DIR:
-			*call_ret = user_open_dir((const char *)arg0);
+			*call_ret = _user_open_dir((const char *)arg0);
 			break;
 		case SYSCALL_READ_DIR:
-			*call_ret = user_read_dir((int)arg0, (struct dirent *)arg1, (size_t)arg2, (uint32)arg3);
+			*call_ret = _user_read_dir((int)arg0, (struct dirent *)arg1, (size_t)arg2, (uint32)arg3);
 			break;
 		case SYSCALL_REWIND_DIR:
-			*call_ret = user_rewind_dir((int)arg0);
+			*call_ret = _user_rewind_dir((int)arg0);
 			break;
 		case SYSCALL_IOCTL:
-			*call_ret = user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)arg3);
+			*call_ret = _user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)arg3);
 			break;
 		case SYSCALL_CREATE_ENTRY_REF:
-			*call_ret = user_create_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4, (int)arg5);
+			*call_ret = _user_create_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4, (int)arg5);
 			break;
 		case SYSCALL_CREATE:
-			*call_ret = user_create((const char *)arg0, (int)arg1, (int)arg2);
+			*call_ret = _user_create((const char *)arg0, (int)arg1, (int)arg2);
 			break;
 		case SYSCALL_CREATE_DIR_ENTRY_REF:
-			*call_ret = user_create_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4);
+			*call_ret = _user_create_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3, (int)arg4);
 			break;
 		case SYSCALL_CREATE_DIR:
-			*call_ret = user_create_dir((const char *)arg0, (int)arg1);
+			*call_ret = _user_create_dir((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_CREATE_SYMLINK:
-			*call_ret = user_create_symlink((const char *)arg0, (const char *)arg1, (int)arg2);
+			*call_ret = _user_create_symlink((const char *)arg0, (const char *)arg1, (int)arg2);
 			break;
 		case SYSCALL_CREATE_LINK:
-			*call_ret = user_create_link((const char *)arg0, (const char *)arg1);
+			*call_ret = _user_create_link((const char *)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_READ_LINK:
-			*call_ret = user_read_link((const char *)arg0, (char *)arg1, (size_t)arg2);
+			*call_ret = _user_read_link((const char *)arg0, (char *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_REMOVE_DIR:
-			*call_ret = user_remove_dir((const char *)arg0);
+			*call_ret = _user_remove_dir((const char *)arg0);
 			break;
 		case SYSCALL_UNLINK:
-			*call_ret = user_unlink((const char *)arg0);
+			*call_ret = _user_unlink((const char *)arg0);
 			break;
 		case SYSCALL_RENAME:
-			*call_ret = user_rename((const char *)arg0, (const char *)arg1);
+			*call_ret = _user_rename((const char *)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_READ_PATH_STAT:
 			*call_ret = _user_read_path_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2, (size_t)arg3);
@@ -152,41 +152,54 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			*call_ret = _user_write_stat((int)arg0, (const struct stat *)arg1, (size_t)arg2, (int)arg3);
 			break;
 		case SYSCALL_ACCESS:
-			*call_ret = user_access((const char *)arg0, (int)arg1);
+			*call_ret = _user_access((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_SELECT:
-			*call_ret = user_select((int)arg0, (fd_set *)arg1, (fd_set *)arg2, (fd_set *)arg3, (bigtime_t)INT32TOINT64(arg4, arg5), (sigset_t *)arg6);
+			*call_ret = _user_select((int)arg0, (fd_set *)arg1, (fd_set *)arg2, (fd_set *)arg3, (bigtime_t)INT32TOINT64(arg4, arg5), (sigset_t *)arg6);
 			break;
 		case SYSCALL_POLL:
-			*call_ret = user_poll((struct pollfd *)arg0, (int)arg1, (bigtime_t)INT32TOINT64(arg2, arg3));
+			*call_ret = _user_poll((struct pollfd *)arg0, (int)arg1, (bigtime_t)INT32TOINT64(arg2, arg3));
 			break;
 		case SYSCALL_OPEN_ATTR_DIR:
-			*call_ret = user_open_attr_dir((int)arg0, (const char *)arg1);
+			*call_ret = _user_open_attr_dir((int)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_CREATE_ATTR:
-			*call_ret = user_create_attr((int)arg0, (const char *)arg1, (uint32)arg2, (int)arg3);
+			*call_ret = _user_create_attr((int)arg0, (const char *)arg1, (uint32)arg2, (int)arg3);
 			break;
 		case SYSCALL_OPEN_ATTR:
-			*call_ret = user_open_attr((int)arg0, (const char *)arg1, (int)arg2);
+			*call_ret = _user_open_attr((int)arg0, (const char *)arg1, (int)arg2);
 			break;
 		case SYSCALL_REMOVE_ATTR:
-			*call_ret = user_remove_attr((int)arg0, (const char *)arg1);
+			*call_ret = _user_remove_attr((int)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_RENAME_ATTR:
-			*call_ret = user_rename_attr((int)arg0, (const char *)arg1, (int)arg2, (const char *)arg3);
+			*call_ret = _user_rename_attr((int)arg0, (const char *)arg1, (int)arg2, (const char *)arg3);
 			break;
 		case SYSCALL_OPEN_INDEX_DIR:
-			*call_ret = user_open_index_dir((dev_t)arg0);
+			*call_ret = _user_open_index_dir((dev_t)arg0);
 			break;
 		case SYSCALL_CREATE_INDEX:
-			*call_ret = user_create_index((dev_t)arg0, (const char *)arg1, (uint32)arg2, (uint32)arg3);
+			*call_ret = _user_create_index((dev_t)arg0, (const char *)arg1, (uint32)arg2, (uint32)arg3);
 			break;
 		case SYSCALL_READ_INDEX_STAT:
-			*call_ret = user_read_index_stat((dev_t)arg0, (const char *)arg1, (struct stat *)arg2);
+			*call_ret = _user_read_index_stat((dev_t)arg0, (const char *)arg1, (struct stat *)arg2);
 			break;
 		case SYSCALL_REMOVE_INDEX:
-			*call_ret = user_remove_index((dev_t)arg0, (const char *)arg1);
+			*call_ret = _user_remove_index((dev_t)arg0, (const char *)arg1);
 			break;
+		case SYSCALL_FDDUP:
+			*call_ret = _user_dup(arg0);
+			break;
+		case SYSCALL_FDDUP2:
+			*call_ret = _user_dup2(arg0, arg1);
+			break;
+		case SYSCALL_GETCWD:
+			*call_ret = _user_getcwd((char*)arg0, (size_t)arg1);
+			break;
+		case SYSCALL_SETCWD:
+			*call_ret = _user_setcwd((int)arg0, (const char *)arg1);
+			break;
+
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
 			break;
@@ -313,12 +326,6 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_GET_CURRENT_TEAM_ID:
 			*call_ret = _user_get_current_team();
 			break;
-		case SYSCALL_GETCWD:
-			*call_ret = user_getcwd((char*)arg0, (size_t)arg1);
-			break;
-		case SYSCALL_SETCWD:
-			*call_ret = user_setcwd((int)arg0, (const char *)arg1);
-			break;
 		case SYSCALL_PORT_CREATE:
 			*call_ret = user_create_port((int32)arg0, (const char *)arg1);
 			break;
@@ -373,12 +380,6 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			break;
 		case SYSCALL_SEM_SET_SEM_OWNER:
 			*call_ret = user_set_sem_owner((sem_id)arg0, (team_id)arg1);
-			break;
-		case SYSCALL_FDDUP:
-			*call_ret = user_dup(arg0);
-			break;
-		case SYSCALL_FDDUP2:
-			*call_ret = user_dup2(arg0, arg1);
 			break;
 /* obsolete; replaced by get_next_team_info
 		case SYSCALL_GET_PROC_TABLE:

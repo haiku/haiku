@@ -43,7 +43,7 @@ kprintf(const char *fmt, ...)
 		ret = vsprintf(temp,fmt,args);
 		va_end(args);
 	
-		sys_write(console_fd, 0, temp, ret);
+		_kern_write(console_fd, 0, temp, ret);
 	}
 }
 
@@ -62,7 +62,7 @@ kprintf_xy(int x, int y, const char *fmt, ...)
 	
 		buf.x = x;
 		buf.y = y;
-		sys_ioctl(console_fd, CONSOLE_OP_WRITEXY, &buf, ret + sizeof(buf.x) + sizeof(buf.y));
+		_kern_ioctl(console_fd, CONSOLE_OP_WRITEXY, &buf, ret + sizeof(buf.x) + sizeof(buf.y));
 	}
 }
 
@@ -72,7 +72,7 @@ con_init(kernel_args *ka)
 {
 	dprintf("con_init: entry\n");
 
-	console_fd = sys_open("/dev/console", 0);
+	console_fd = _kern_open("/dev/console", 0);
 	dprintf("console_fd = %d\n", console_fd);
 
 	return 0;
