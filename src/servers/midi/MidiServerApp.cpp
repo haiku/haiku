@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -59,7 +59,10 @@ MidiServerApp::~MidiServerApp()
 void MidiServerApp::AboutRequested()
 {
 	(new BAlert(0,
-		"-write something funny here-",
+		"OpenBeOS midi_server\n\n"
+		"notes disguised as bytes\n"
+		"propagating to endpoints,\n"
+		"an aural delight",
 		"Okay", 0, 0, B_WIDTH_AS_USUAL, 
 		B_INFO_ALERT))->Go();
 }
