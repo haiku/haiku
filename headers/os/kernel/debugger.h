@@ -148,6 +148,8 @@ typedef struct {
 
 typedef struct {
 	status_t	error;			// B_OK, if reading went fine
+	int32		size;			// the number of bytes actually read
+								// > 0, iff error == B_OK
 	char		data[B_MAX_READ_WRITE_MEMORY_SIZE];
 								// the read data
 } debug_nub_read_memory_reply;
