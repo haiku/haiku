@@ -70,11 +70,9 @@ blkman_map_iovecs(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
 		// restrict size per sg item
 		max_len = min(max_len, max_sg_block_size);
 
-		SHOW_FLOW( 4, "addr=%p, size=%x, max_len=%x, idx=%d, num=%d", 
+		SHOW_FLOW(4, "addr=%p, size=%x, max_len=%x, idx=%d, num=%d", 
 			map->vec[cur_idx].address, (int)map->vec[cur_idx].size,
-			(int)max_len, (int)cur_idx, (int)map->num );
-
-		//snooze(100000);
+			(int)max_len, (int)cur_idx, (int)map->num);
 
 		if (max_len < map->vec[cur_idx].size) {
 			// split sg block
@@ -152,11 +150,10 @@ blkman_lock_iovecs(struct iovec *vecs, uint num_vecs,
 
 		lock_len = min(vecs->iov_len - vec_offset, len);
 
-		SHOW_FLOW( 3, "pos = %p, len = %lu", vecs->iov_base, vecs->iov_len);
+		SHOW_FLOW(3, "pos = %p, len = %lu", vecs->iov_base, vecs->iov_len);
 
 		res = lock_memory((void *)((addr_t)vecs->iov_base + vec_offset), lock_len, flags);
 		if (res != B_OK) {
-			//snooze( 1000000 );
 			SHOW_FLOW(3, "cannot lock: %s", strerror(res));
 			break;
 		}
@@ -183,7 +180,7 @@ blkman_unlock_iovecs(struct iovec *vecs, uint num_vecs,
 		size_t lock_len;
 
 		lock_len = min(vecs->iov_len - vec_offset, len);
-		
+
 		if (unlock_memory((void *)((addr_t)vecs->iov_base + vec_offset), lock_len, 
 				flags) != B_OK)
 			panic( "Cannot unlock previously locked memory!" );
@@ -256,8 +253,6 @@ blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 	size_t vec_offset;
 
 	phys_vecs *phys_vecs;
-
-	//snooze( 1000000 );
 
 	SHOW_FLOW(3, "pos = %Ld, len = %lu, need_locking = %d, write = %d, vec_count = %d",
 		pos, len, need_locking, write, vec_count);
@@ -338,9 +333,9 @@ blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 			block_ofs = pos - block_pos * block_size;
 		}
 
-		// read requests byond end of volume must be ignored without notice
+		// read requests beyond end of volume must be ignored without notice
 		if (block_pos >= capacity) {
-			SHOW_FLOW0(1, "transfer starts byond end of device");
+			SHOW_FLOW0(1, "transfer starts beyond end of device");
 			goto err2;
 		}
 
