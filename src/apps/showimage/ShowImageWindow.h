@@ -1,6 +1,30 @@
-/*
-    OBOS ShowImage 0.1 - 17/02/2002 - 22:22 - Fernando Francisco de Oliveira
-*/
+/*****************************************************************************/
+// ShowImageWindow
+// Written by Fernando Francisco de Oliveira, Michael Wilber
+//
+// ShowImageWindow.h
+//
+//
+// Copyright (c) 2003 OpenBeOS Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
 
 #ifndef _ShowImageWindow_h
 #define _ShowImageWindow_h
@@ -12,46 +36,46 @@
 
 class ShowImageView;
 
-class ShowImageWindow : public BWindow
-{
-public:
-	static status_t NewWindow(const entry_ref* ref);
+// BMessage field names used in Save messages
+#define TRANSLATOR_FLD "be:translator"
+#define TYPE_FLD "be:type"
 
-	ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap, BString &strId);
+class ShowImageWindow : public BWindow {
+public:
+	static status_t NewWindow(const entry_ref *pref);
+
+	ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap, BString &strId);
 	virtual ~ShowImageWindow();
-	
-	virtual void WindowActivated(bool active);
-	virtual void FrameResized( float new_width, float new_height );
-	virtual void MessageReceived(BMessage* message);
+
+	virtual void FrameResized(float width, float height);
+	virtual void MessageReceived(BMessage *pmsg);
+	virtual bool QuitRequested();
 	virtual void Quit();
 	
 	status_t InitCheck();
-	ShowImageView* GetShowImageView() const { return m_PrivateView; }
+	ShowImageView *GetShowImageView() const { return fpimageView; }
 	
-	void SetRef(const entry_ref* ref);
+	void SetRef(const entry_ref *pref);
 	void UpdateTitle();
-	void LoadMenus(BMenuBar* pBar);
-	void WindowRedimension( BBitmap *pBitmap );
+	void LoadMenus(BMenuBar *pbar);
+	void WindowRedimension(BBitmap *pbitmap);
 
-	BMenuBar* pBar;	
 private:
-	BMenuItem * AddItemMenu( BMenu *pMenu, char *Caption, long unsigned int msg, 
-			char shortcut, uint32 modifier, char target, bool enabled );
+	BMenuItem *AddItemMenu(BMenu *pmenu, char *caption,
+		long unsigned int msg, char shortcut, uint32 modifier,
+		char target, bool enabled);
 			
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
 	void SaveToFile(BMessage *pmsg);
-		// Handle save file panel message
+		// Handle save file panel message		
+	bool CanQuit();
+		// returns true if the window can be closed safely, false if not
 
 	BFilePanel *fpsavePanel;
-	translator_id foutTranslator;
-	uint32 foutType;
-			
-	entry_ref* m_pReferences;
-	ShowImageView* m_PrivateView;
-	
-	static BLocker s_winListLocker;
-	static BList s_winList;
+	BMenuBar *fpbar;
+	entry_ref *fpref;
+	ShowImageView *fpimageView;
 };
 
 #endif /* _ShowImageWindow_h */

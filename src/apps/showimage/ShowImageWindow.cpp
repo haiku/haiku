@@ -1,6 +1,30 @@
-/*
-    OBOS ShowImage 0.1 - 17/02/2002 - 22:22 - Fernando Francisco de Oliveira
-*/
+/*****************************************************************************/
+// ShowImageWindow
+// Written by Fernando Francisco de Oliveira, Michael Wilber
+//
+// ShowImageWindow.cpp
+//
+//
+// Copyright (c) 2003 OpenBeOS Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
 
 #include <algobase.h>
 #include <stdio.h>
@@ -24,314 +48,290 @@
 #include "ShowImageView.h"
 #include "ShowImageStatusView.h"
 
-status_t ShowImageWindow::NewWindow(const entry_ref* ref)
+status_t
+ShowImageWindow::NewWindow(const entry_ref *pref)
 {
 	// Get identify string (image type)
-	BString strId = "Unknown";
+	BString strId = "Unknown image type";
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
 		return B_ERROR;
-	BFile file(ref, B_READ_ONLY);
+	BFile file(pref, B_READ_ONLY);
 	translator_info info;
 	if (proster->Identify(&file, NULL, &info) == B_OK)
 		strId = info.name;
 	
 	// Translate image data and create a new ShowImage window
 	file.Seek(0, SEEK_SET);
-	BBitmap* pBitmap = BTranslationUtils::GetBitmap(&file);
-	if (pBitmap) {
-		ShowImageWindow* pWin = new ShowImageWindow(ref, pBitmap, strId);
-		return pWin->InitCheck();			
+	BBitmap* pbitmap = BTranslationUtils::GetBitmap(&file);
+	if (pbitmap) {
+		ShowImageWindow* pwin = new ShowImageWindow(pref, pbitmap, strId);
+		return pwin->InitCheck();			
 	}
 
 	return B_ERROR;		
 }
 
-ShowImageWindow::ShowImageWindow(const entry_ref* ref, BBitmap* pBitmap, BString &strId)
-	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0),
-	m_pReferences(0)
+ShowImageWindow::ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap,
+	BString &strId)
+	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
 	fpsavePanel = NULL;
+	fpref = NULL;
 	
 	// create menu bar	
-	pBar = new BMenuBar( BRect(0,0, Bounds().right, 20), "menu_bar");
-	LoadMenus(pBar);
-	AddChild(pBar);
+	fpbar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
+	LoadMenus(fpbar);
+	AddChild(fpbar);
 
 	BRect viewFrame = Bounds();
-	viewFrame.top		= pBar->Bounds().bottom+1;
+	viewFrame.top		= fpbar->Bounds().bottom + 1;
 	viewFrame.right		-= B_V_SCROLL_BAR_WIDTH;
 	viewFrame.bottom	-= B_H_SCROLL_BAR_HEIGHT;
 	
 	// create the image view	
-	m_PrivateView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
-										B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED);
-	m_PrivateView->SetBitmap(pBitmap);
+	fpimageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
+		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED);
+	fpimageView->SetBitmap(pbitmap);
 	
 	// wrap a scroll view around the view
-	BScrollView* pScrollView = new BScrollView("image_scroller", m_PrivateView, B_FOLLOW_ALL, 
-		0, false, false, B_PLAIN_BORDER);
-			
-	AddChild(pScrollView);
-	
-	BScrollBar *hor_scroll;
-
-	BRect rect;
+	BScrollView *pscrollView = new BScrollView("image_scroller", fpimageView,
+		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
+	AddChild(pscrollView);
 	
 	const int32 kstatusWidth = 190;
+	BRect rect;
 	rect = Bounds();
 	rect.top	= viewFrame.bottom + 1;
-	rect.left 	= viewFrame.left   + kstatusWidth;
-	rect.right	= viewFrame.right;
-	
-	hor_scroll = new BScrollBar( rect, "hor_scroll", m_PrivateView, 0,150, B_HORIZONTAL );
-	AddChild( hor_scroll );
-
-	ShowImageStatusView * status_bar;
+	rect.left 	= viewFrame.left + kstatusWidth;
+	rect.right	= viewFrame.right;	
+	BScrollBar *phscroll;
+	phscroll = new BScrollBar(rect, "hscroll", fpimageView, 0, 150,
+		B_HORIZONTAL);
+	AddChild(phscroll);
 
 	rect.left = 0;
-	rect.right = kstatusWidth - 1;
-
-	status_bar = new ShowImageStatusView( rect, "status_bar", B_FOLLOW_BOTTOM, B_WILL_DRAW );
-	status_bar->SetViewColor( ui_color( B_MENU_BACKGROUND_COLOR ) );
-	status_bar->SetText(strId);
-		
-	AddChild( status_bar );
-	
-	BScrollBar *vert_scroll;
+	rect.right = kstatusWidth - 1;	
+	ShowImageStatusView *pstatusView;
+	pstatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
+		B_WILL_DRAW);
+	pstatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	pstatusView->SetText(strId);
+	AddChild(pstatusView);
 	
 	rect = Bounds();
 	rect.top    = viewFrame.top;
 	rect.left 	= viewFrame.right + 1;
 	rect.bottom	= viewFrame.bottom;
+	BScrollBar *pvscroll;
+	pvscroll = new BScrollBar(rect, "vscroll", fpimageView, 0, 150, B_VERTICAL);
+	AddChild(pvscroll);
 	
-	vert_scroll = new BScrollBar( rect, "vert_scroll", m_PrivateView, 0,150, B_VERTICAL );
-	AddChild( vert_scroll );
-	
-	WindowRedimension( pBitmap );
+	WindowRedimension(pbitmap);
 	
 	// finish creating window
-	SetRef(ref);
+	SetRef(pref);
 	UpdateTitle();
-	
-	m_PrivateView->pBar = pBar;	
 
 	Show();
 }
 
 ShowImageWindow::~ShowImageWindow()
 {
-	delete m_pReferences;
+	delete fpref;
 }
 
-void ShowImageWindow::WindowActivated(bool active)
+status_t
+ShowImageWindow::InitCheck()
 {
-//	WindowRedimension( pBitmap );
-}
-
-status_t ShowImageWindow::InitCheck()
-{
-	if (! m_pReferences) {
+	if (!fpref || !fpimageView)
 		return B_ERROR;
-	} else {
+	else
 		return B_OK;
-	}
 }
 
-void ShowImageWindow::SetRef(const entry_ref* ref)
+void
+ShowImageWindow::SetRef(const entry_ref *pref)
 {
-	if (! m_pReferences) {
-		m_pReferences = new entry_ref(*ref);
-	} else {
-		*m_pReferences = *ref;
-	}
+	if (!fpref)
+		fpref = new entry_ref(*pref);
+	else
+		*fpref = *pref;
 }
 
-void ShowImageWindow::UpdateTitle()
+void
+ShowImageWindow::UpdateTitle()
 {
-	BEntry entry(m_pReferences);
+	BEntry entry(fpref);
 	if (entry.InitCheck() == B_OK) {
 		BPath path;
 		entry.GetPath(&path);
-		if (path.InitCheck() == B_OK) {
+		if (path.InitCheck() == B_OK)
 			SetTitle(path.Path());
-		}
 	}		
 }
 
-void ShowImageWindow::LoadMenus(BMenuBar* pBar)
+void
+ShowImageWindow::LoadMenus(BMenuBar *pbar)
 {
-	BMenu* pMenu = new BMenu("File");
-	
-	AddItemMenu( pMenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true );
-	pMenu->AddSeparatorItem();
-	
-	BMenu* pMenuSaveAs = new BMenu( "Save As...", B_ITEMS_IN_COLUMN );
-	BTranslationUtils::AddTranslationItems(pMenuSaveAs, B_TRANSLATOR_BITMAP);
+	BMenu *pmenu = new BMenu("File");
+	AddItemMenu(pmenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true);
+	pmenu->AddSeparatorItem();
+	BMenu *pmenuSaveAs = new BMenu("Save As...", B_ITEMS_IN_COLUMN);
+	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
-	pMenu->AddItem( pMenuSaveAs );
+	pmenu->AddItem(pmenuSaveAs);
+	AddItemMenu(pmenu, "Close", MSG_CLOSE, 'W', 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "About ShowImage...", B_ABOUT_REQUESTED, 0, 0, 'A', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Quit", B_QUIT_REQUESTED, 'Q', 0, 'A', true);
+	pbar->AddItem(pmenu);
 	
-	AddItemMenu( pMenu, "Close", MSG_CLOSE, 'W', 0, 'W', true);
-	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "About ShowImage...", B_ABOUT_REQUESTED, 0, 0, 'A', true);
-	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "Quit", B_QUIT_REQUESTED, 'Q', 0, 'A', true);
+	pmenu = new BMenu("Edit");
+	AddItemMenu(pmenu, "Undo", B_UNDO, 'Z', 0, 'W', false);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Cut", B_CUT, 'X', 0, 'W', false);
+	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', false);
+	AddItemMenu(pmenu, "Paste", B_PASTE, 'V', 0, 'W', false);
+	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', false);
+	pbar->AddItem(pmenu);
 
-	pBar->AddItem(pMenu);
-	
-	pMenu = new BMenu("Edit");
-	
-	AddItemMenu( pMenu, "Undo", B_UNDO, 'Z', 0, 'W', false);
-	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "Cut", B_CUT, 'X', 0, 'W', false);
-	AddItemMenu( pMenu, "Copy", B_COPY, 'C', 0, 'W', false);
-	AddItemMenu( pMenu, "Paste", B_PASTE, 'V', 0, 'W', false);
-	AddItemMenu( pMenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
-	pMenu->AddSeparatorItem();
-	AddItemMenu( pMenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', true);
-
-	pBar->AddItem(pMenu);
-
-	pMenu = new BMenu("Image");
-	AddItemMenu( pMenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
-	pBar->AddItem(pMenu);
+	pmenu = new BMenu("Image");
+	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
+	pbar->AddItem(pmenu);
 }
 
-BMenuItem * ShowImageWindow::AddItemMenu( BMenu *pMenu, char *Caption, long unsigned int msg, 
-		char shortcut, uint32 modifier, char target, bool enabled ) {
-
-	BMenuItem* pItem;
+BMenuItem *
+ShowImageWindow::AddItemMenu(BMenu *pmenu, char *caption, long unsigned int msg, 
+	char shortcut, uint32 modifier, char target, bool benabled)
+{
+	BMenuItem* pitem;
+	pitem = new BMenuItem(caption, new BMessage(msg), shortcut);
 	
-	pItem = new BMenuItem( Caption, new BMessage(msg), shortcut );
-	
-	if ( target == 'A' )
-	   pItem->SetTarget(be_app);
+	if (target == 'A')
+	   pitem->SetTarget(be_app);
 	   
-	pItem->SetEnabled( enabled );	   
-	pMenu->AddItem(pItem);
+	pitem->SetEnabled(benabled);	   
+	pmenu->AddItem(pitem);
 	
-	return( pItem );
+	return pitem;
 }
 
-void ShowImageWindow::WindowRedimension( BBitmap *pBitmap )
+void
+ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 {
 	// set the window's min & max size limits
 	// based on document's data bounds
-	float maxWidth = pBitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH;
-	float maxHeight = pBitmap->Bounds().Height()
-		+ pBar->Frame().Height()
-		+ B_H_SCROLL_BAR_HEIGHT + 1;
+	float maxWidth = pbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH;
+	float maxHeight = pbitmap->Bounds().Height() + fpbar->Frame().Height() +
+		B_H_SCROLL_BAR_HEIGHT + 1;
 	float minWidth = min(maxWidth, 100.0f);
 	float minHeight = min(maxHeight, 100.0f);
 
 	// adjust the window's current size based on new min/max values	
 	float curWidth = Bounds().Width();
 	float curHeight = Bounds().Height();	
-	if (curWidth < minWidth) {
+	if (curWidth < minWidth)
 		curWidth = minWidth;
-	} else if (curWidth > maxWidth) {
+	else if (curWidth > maxWidth)
 		curWidth = maxWidth;
-	}
-	if (curHeight < minHeight) {
+
+	if (curHeight < minHeight)
 		curHeight = minHeight;
-	} else if (curHeight > maxHeight) {
+	else if (curHeight > maxHeight)
 		curHeight = maxHeight;
-	}
-	if ( minWidth < 250 ) {
+
+	if (minWidth < 250)
 		minWidth = 250;
-	}
+
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 	ResizeTo(curWidth, curHeight);
 }
 
-void ShowImageWindow::FrameResized( float new_width, float new_height )
+void
+ShowImageWindow::FrameResized(float width, float height)
 {
 }
 
-void ShowImageWindow::MessageReceived(BMessage* message)
+void
+ShowImageWindow::MessageReceived(BMessage *pmsg)
 {
-	BAlert* pAlert;
-	
-	switch (message->what) {
+	switch (pmsg->what) {
 		case MSG_OUTPUT_TYPE:
 			// User clicked Save As then choose an output format
-			SaveAs(message);			
+			if (!fpsavePanel)
+				// If user doesn't already have a save panel open
+				SaveAs(pmsg);
 			break;
 			
 		case MSG_SAVE_PANEL:
 			// User specified where to save the output image
-			SaveToFile(message);
+			SaveToFile(pmsg);
 			break;
 			
 		case MSG_CLOSE:
-			Quit();
+			if (CanQuit())
+				Quit();
+			break;
+			
+		case B_CANCEL:
+			delete fpsavePanel;
+			fpsavePanel = NULL;
 			break;
 
-	case B_UNDO :
-	     pAlert = new BAlert( "Edit/Undo", 
-				  			  "Edit/Undo not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case B_CUT :
-	     pAlert = new BAlert( "Edit/Cut", 
-				  			  "Edit/Cut not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case B_COPY :
-	     pAlert = new BAlert( "Edit/Copy", 
-				  			  "Edit/Copy not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case B_PASTE :
-	     pAlert = new BAlert( "Edit/Paste", 
-				  			  "Edit/Paste not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case MSG_CLEAR_SELECT :
-	     pAlert = new BAlert( "Edit/Clear Select", 
-				  			  "Edit/Clear Select not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case MSG_SELECT_ALL :
-	     pAlert = new BAlert( "Edit/Select All", 
-				  			  "Edit/Select All not implemented yet", "OK");
-  		 pAlert->Go();
-		break;
-	case MSG_DITHER_IMAGE :
-	     BMenuItem   * pMenuDither;
-	     pMenuDither = pBar->FindItem( message->what );
-	     pMenuDither->SetMarked( ! pMenuDither->IsMarked() );
-	     
-		 break;
+		case B_UNDO:
+			break;
+		case B_CUT:
+			break;
+		case B_COPY:
+			break;
+		case B_PASTE:
+			break;
+		case MSG_CLEAR_SELECT:
+			break;
+		case MSG_SELECT_ALL:
+			break;
+
+		case MSG_DITHER_IMAGE:
+		     BMenuItem *pmenuDither;
+	    	 pmenuDither = fpbar->FindItem(pmsg->what);
+		     pmenuDither->SetMarked(!pmenuDither->IsMarked());
+		     break;
 		 
-	default:
-		BWindow::MessageReceived(message);
-		break;
+		default:
+			BWindow::MessageReceived(pmsg);
+			break;
 	}
 }
 
 void
 ShowImageWindow::SaveAs(BMessage *pmsg)
 {
-	// Handle SaveAs menu choice by setting the
-	// translator and desired output format
-	// and giving the user a save panel
-
-	if (pmsg->FindInt32("be:translator",
-		reinterpret_cast<int32 *>(&foutTranslator)) != B_OK)
+	// Read the translator and output type the user chose
+	translator_id outTranslator;
+	uint32 outType;
+	if (pmsg->FindInt32(TRANSLATOR_FLD,
+		reinterpret_cast<int32 *>(&outTranslator)) != B_OK)
 		return;	
-	if (pmsg->FindInt32("be:type",
-		reinterpret_cast<int32 *>(&foutType)) != B_OK)
+	if (pmsg->FindInt32(TYPE_FLD,
+		reinterpret_cast<int32 *>(&outType)) != B_OK)
 		return;
+		
+	// Add the chosen translator and output type to the
+	// message that the save panel will send back
+	BMessage *ppanelMsg = new BMessage(MSG_SAVE_PANEL);
+	ppanelMsg->AddInt32(TRANSLATOR_FLD, outTranslator);
+	ppanelMsg->AddInt32(TYPE_FLD, outType);
 
-	if (!fpsavePanel) {
-		fpsavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
-			false, new BMessage(MSG_SAVE_PANEL));
-		if (!fpsavePanel)
-			return;
-	}
-	
+	// Create save panel and show it
+	fpsavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, 0,
+		false, ppanelMsg);
+	if (!fpsavePanel)
+		return;
 	fpsavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 	fpsavePanel->Show();
 }
@@ -339,11 +339,7 @@ ShowImageWindow::SaveAs(BMessage *pmsg)
 void
 ShowImageWindow::SaveToFile(BMessage *pmsg)
 {
-	// After the user has chosen which format
-	// to output to and where to save the file,
-	// this function is called to save the currently
-	// open image to a file in the desired format.
-	
+	// Read in where the file should be saved	
 	entry_ref dirref;
 	if (pmsg->FindRef("directory", &dirref) != B_OK)
 		return;
@@ -351,15 +347,28 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 	if (pmsg->FindString("name", &filename) != B_OK)
 		return;
 		
+	// Read in the translator and type to be used
+	// to save the output image
+	translator_id outTranslator;
+	uint32 outType;
+	if (pmsg->FindInt32(TRANSLATOR_FLD,
+		reinterpret_cast<int32 *>(&outTranslator)) != B_OK)
+		return;	
+	if (pmsg->FindInt32(TYPE_FLD,
+		reinterpret_cast<int32 *>(&outType)) != B_OK)
+		return;
+	
+	// Create the output file
 	BDirectory dir(&dirref);
 	BFile file(&dir, filename, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	if (file.InitCheck() != B_OK)
 		return;
 	
-	BBitmapStream stream(m_PrivateView->GetBitmap());	
+	// Translate the image and write it out to the output file
+	BBitmapStream stream(fpimageView->GetBitmap());	
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	if (proster->Translate(foutTranslator, &stream, NULL,
-		&file, foutType) != B_OK) {
+	if (proster->Translate(outTranslator, &stream, NULL,
+		&file, outType) != B_OK) {
 		BAlert *palert = new BAlert(NULL, "Error writing image file.", "Ok");
 		palert->Go();
 	}
@@ -370,6 +379,22 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 		// detach so it doesn't get deleted
 }
 
+bool
+ShowImageWindow::CanQuit()
+{
+	if (fpsavePanel)
+		// Don't allow this window to be closed if a save panel is open
+		return false;
+	else
+		return true;	
+}
+
+bool
+ShowImageWindow::QuitRequested()
+{
+	return CanQuit();
+}
+
 void
 ShowImageWindow::Quit()
 {
@@ -378,4 +403,3 @@ ShowImageWindow::Quit()
 	BWindow::Quit();
 }
 
-// 		BMenu* pMenuDither = ;

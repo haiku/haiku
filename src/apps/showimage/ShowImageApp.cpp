@@ -1,6 +1,30 @@
-/*
-    OBOS ShowImage 0.1 - 17/02/2002 - 22:22 - Fernando Francisco de Oliveira
-*/
+/*****************************************************************************/
+// ShowImageApp
+// Written by Fernando Francisco de Oliveira, Michael Wilber
+//
+// ShowImageApp.cpp
+//
+//
+// Copyright (c) 2003 OpenBeOS Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
 
 #include <stdio.h>
 #include <Alert.h>
@@ -10,7 +34,7 @@
 #include "ShowImageApp.h"
 #include "ShowImageWindow.h"
 
-int main(int, char**)
+int main(int, char **)
 {
 	ShowImageApp theApp;
 	theApp.Run();
@@ -23,20 +47,22 @@ ShowImageApp::ShowImageApp()
 	: BApplication(APP_SIG)
 {
 	fbpulseStarted = false;
-	m_pOpenPanel = new BFilePanel(B_OPEN_PANEL);
+	fpopenPanel = new BFilePanel(B_OPEN_PANEL);
 }
 
-void ShowImageApp::AboutRequested()
+void
+ShowImageApp::AboutRequested()
 {
 	BAlert* pAlert = new BAlert("About ShowImage",
 		"OBOS ShowImage\n\nby Fernando F. Oliveira and Michael Wilber", "OK");
 	pAlert->Go();
 }
 
-void ShowImageApp::ReadyToRun()
+void
+ShowImageApp::ReadyToRun()
 {
 	if (CountWindows() == WINDOWS_TO_IGNORE)
-		m_pOpenPanel->Show();
+		fpopenPanel->Show();
 	else
 		// If image windows are already open
 		// (paths supplied on the command line)
@@ -66,30 +92,33 @@ ShowImageApp::Pulse()
 		PostMessage(B_QUIT_REQUESTED);
 }
 
-void ShowImageApp::ArgvReceived(int32 argc, char** argv)
+void
+ShowImageApp::ArgvReceived(int32 argc, char **argv)
 {
-	BMessage* message = 0;
-	for (int32 i=1; i<argc; i++) {
+	BMessage *pmsg = NULL;
+	for (int32 i = 1; i < argc; i++) {
 		entry_ref ref;
 		status_t err = get_ref_for_path(argv[i], &ref);
 		if (err == B_OK) {
-			if (! message) {
-				message = new BMessage;
-				message->what = B_REFS_RECEIVED;
+			if (!pmsg) {
+				pmsg = new BMessage;
+				pmsg->what = B_REFS_RECEIVED;
 			}
-			message->AddRef("refs", &ref);
+			pmsg->AddRef("refs", &ref);
 		}
 	}
-	if (message)
-		RefsReceived(message);
+	if (pmsg)
+		RefsReceived(pmsg);
 }
 
-void ShowImageApp::MessageReceived(BMessage* message)
+void
+ShowImageApp::MessageReceived(BMessage *pmsg)
 {
-	switch (message->what) {
+	switch (pmsg->what) {
 		case MSG_FILE_OPEN:
-			m_pOpenPanel->Show();
+			fpopenPanel->Show();
 			break;
+			
 		case MSG_WINDOW_QUIT:
 			break;
 			
@@ -100,34 +129,35 @@ void ShowImageApp::MessageReceived(BMessage* message)
 			break;
 
 		default:
-			BApplication::MessageReceived(message);
+			BApplication::MessageReceived(pmsg);
 			break;
 	}
 }
 
-void ShowImageApp::RefsReceived(BMessage* message)
+void
+ShowImageApp::RefsReceived(BMessage *pmsg)
 {
 	uint32 type;
 	int32 count;
-	entry_ref ref;
-	
-	message->GetInfo("refs", &type, &count);
-	if (type != B_REF_TYPE)
+	status_t ret = pmsg->GetInfo("refs", &type, &count);
+	if (ret != B_OK || type != B_REF_TYPE)
 		return;
-	
-	for (int32 i = --count; i >= 0; --i) {
-   		if (message->FindRef("refs", i, &ref) == B_OK) {
+
+	entry_ref ref;
+	for (int32 i = 0; i < count; i++) {
+   		if (pmsg->FindRef("refs", i, &ref) == B_OK)
    			Open(&ref);
-   		}
    	}
 }
 
-void ShowImageApp::Open(const entry_ref* ref)
+void
+ShowImageApp::Open(const entry_ref *pref)
 {
-	if (ShowImageWindow::NewWindow(ref) != B_OK) {
+	if (ShowImageWindow::NewWindow(pref) != B_OK) {
 		char errStr[B_FILE_NAME_LENGTH + 50];
 		sprintf(errStr, "Couldn't open file: %s",
-			(ref && ref->name) ? ref->name : "???");
+			(pref && pref->name) ? pref->name : "???");
+
 		BAlert* pAlert = new BAlert("file i/o error", errStr, "OK");
 		pAlert->Go();
 	}
