@@ -1452,8 +1452,9 @@ status_t BWindow::AddToSubset(BWindow* window){
 	
 	int32		rCode;
 
-	if (window->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
-		window->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
+	if (window->Feel() == B_NORMAL_WINDOW_FEEL &&
+			(fFeel == B_MODAL_SUBSET_WINDOW_FEEL ||
+				fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)){
 		
 		Lock();
 		session->WriteInt32( AS_ADD_TO_SUBSET );
