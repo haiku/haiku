@@ -59,8 +59,6 @@ private:
 	void SaveImageAtDropLocation(BMessage *pmsg);
 	
 	BBitmap *fpbitmap;
-	const BMessage *fpmsgFromTracker;
-	bool fbdragFromTracker;
 };
 
 #endif // #ifndef IMAGEVIEW_H

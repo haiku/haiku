@@ -41,13 +41,10 @@
 #include <Path.h>
 #include <Directory.h>
 #include <File.h>
-#include <Node.h>
-#include <NodeInfo.h>
 #include <MenuBar.h>
 #include <Screen.h>
 #include <ScrollBar.h>
 #include <Alert.h>
-#include <Font.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -56,11 +53,8 @@ ImageView::ImageView(BRect rect, const char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	fpbitmap = NULL;
-	fpmsgFromTracker = NULL;
-	fbdragFromTracker = false;
 	
 	SetViewColor(255, 255, 255);
-	SetHighColor(255, 255, 255);
 }
 
 ImageView::~ImageView()
@@ -78,30 +72,8 @@ ImageView::AttachedToWindow()
 void
 ImageView::Draw(BRect rect)
 {
-	// Force view setting changes to be local
-	// to this function
-	PushState();
-	
-	// calculate highlight rectangle
-	BRect bounds = Bounds();
-	bounds.right--;
-	bounds.bottom--;
-	
 	if (HasImage())
 		DrawBitmap(fpbitmap, BPoint(0, 0));
-	else if (!fbdragFromTracker) {
-		SetHighColor(255, 255, 255);
-		SetPenSize(2.0);
-		StrokeRect(bounds);
-	}
-	
-	if (fbdragFromTracker) {
-		SetHighColor(0, 0, 229);
-		SetPenSize(2.0);
-		StrokeRect(bounds);
-	}
-	
-	PopState();
 }
 
 void
@@ -123,8 +95,18 @@ ImageView::MouseDown(BPoint point)
 {
 	if (!HasImage())
 		return;
+	
+	// Only accept left button clicks
+	BMessage *pmsg = Window()->CurrentMessage();
+	int32 button = pmsg->FindInt32("buttons");
+	if (button != B_PRIMARY_MOUSE_BUTTON)
+		return;
 
 	// Tell BeOS to setup a Drag/Drop operation
+	//
+	// (When the image is dropped, BeOS sends
+	// the following message to ImageWindow,
+	// which causes it to call ImageView::SetImage())
 	BMessage msg(B_SIMPLE_DATA);
 	msg.AddInt32("be:actions", B_COPY_TARGET);
 	msg.AddString("be:filetypes", "application/octet-stream");
@@ -137,46 +119,6 @@ ImageView::MouseDown(BPoint point)
 void
 ImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
 {
-	if (state == B_EXITED_VIEW) {
-		// If the cursor was dragged over,
-		// then off of this view, turn off
-		// drag/drop border highlighting and
-		// forget the last drag/drop BMessage
-		// from the tracker
-		fbdragFromTracker = false;
-		fpmsgFromTracker = NULL;
-		ReDraw();
-		return;
-	}
-	
-	if (!pmsg || pmsg->what != B_SIMPLE_DATA)
-		// if there is no message (nothing being dragged)
-		// or the message contains uninteresting data,
-		// exit this function
-		return;
-		
-	if (pmsg != fpmsgFromTracker) {
-		fpmsgFromTracker = pmsg;
-		
-		entry_ref ref;
-		if (pmsg->FindRef("refs", 0, &ref) != B_OK)
-			return;
-			
-		BNode node(&ref);
-		if (node.InitCheck() != B_OK)
-			return;
-		BNodeInfo nodeinfo(&node);
-		if (nodeinfo.InitCheck() != B_OK)
-			return;
-		char mime[B_MIME_TYPE_LENGTH];
-		if (nodeinfo.GetType(mime) != B_OK)
-			return;
-
-		if (strstr(mime, "image/") != NULL) {
-			fbdragFromTracker = true;
-			ReDraw();
-		}
-	}
 }
 
 void
@@ -249,6 +191,7 @@ ImageView::AdjustScrollBars()
 		psb->SetProportion(prop);
 		psb->SetSteps(10, 100);
 	}
+	
 	psb = ScrollBar(B_VERTICAL);
 	if (psb) {
 		range = rctbitmap.Height() - rctview.Height();
@@ -266,8 +209,6 @@ ImageView::SetImage(BMessage *pmsg)
 {
 	// Replace current image with the image
 	// specified in the given BMessage
-	
-	fbdragFromTracker = false;
 	entry_ref ref;
 	if (pmsg->FindRef("refs", &ref) != B_OK)
 		return;

@@ -29,7 +29,6 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-
 #include "ImageWindow.h"
 #include "Constants.h"
 #include <Application.h>
@@ -47,9 +46,14 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	BMenuBar *pbar = new BMenuBar(rctbar, "MenuBar");
 	BMenu *pmnufile = new BMenu("File");
 	
-	BMenuItem *pitmopen = new BMenuItem("Open...", new BMessage(M_OPEN_IMAGE), 'O', 0);
-	BMenuItem *pitmsave = new BMenuItem("Save...", new BMessage(M_SAVE_IMAGE), 'S', 0);
-	BMenuItem *pitmquit = new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q', 0);
+	BMenuItem *pitmopen = new BMenuItem("Open...",
+		new BMessage(M_OPEN_IMAGE), 'O', 0);
+		
+	BMenuItem *pitmsave = new BMenuItem("Save...",
+		new BMessage(M_SAVE_IMAGE), 'S', 0);
+		
+	BMenuItem *pitmquit = new BMenuItem("Quit",
+		new BMessage(B_QUIT_REQUESTED), 'Q', 0);
 	
 	pmnufile->AddItem(pitmopen);
 	pmnufile->AddItem(pitmsave);
@@ -65,11 +69,12 @@ ImageWindow::ImageWindow(BRect rect, const char *name)
 	rctview.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	
 	fpimageView = new ImageView(rctview, "ImageView");
-	AddChild(new BScrollView("ImageScroll", fpimageView, B_FOLLOW_ALL_SIDES, 0, true, true));
+	AddChild(new BScrollView("ImageScroll", fpimageView,
+		B_FOLLOW_ALL_SIDES, 0, true, true));
 	
 	// Setup file open panel
-	fpopenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL, 0, false,
-		new BMessage(M_OPEN_FILE_PANEL), NULL, false, true);
+	fpopenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this),
+		NULL, 0, false, new BMessage(M_OPEN_FILE_PANEL), NULL, false, true);
 		
 	SetSizeLimits(200, 10000, 150, 10000);
 }
@@ -91,10 +96,12 @@ ImageWindow::MessageReceived(BMessage *pmsg)
 			
 		case M_SAVE_IMAGE:
 			if (fpimageView->HasImage()) {
-				BAlert *palert = new BAlert(NULL, "Save feature not implemented yet.", "Bummer");
+				BAlert *palert = new BAlert(NULL,
+					"Save feature not implemented yet.", "Bummer");
 				palert->Go();
 			} else {
-				BAlert *palert = new BAlert(NULL, "No image available to save.", "OK");
+				BAlert *palert = new BAlert(NULL,
+					"No image available to save.", "OK");
 				palert->Go();
 			}
 			break;
