@@ -1,7 +1,6 @@
 #include "StringInsertTest.h"
 #include "cppunit/TestCaller.h"
 #include <String.h>
-#include <iostream>
 
 StringInsertTest::StringInsertTest(std::string name) :
 		BTestCase(name)
@@ -67,12 +66,14 @@ StringInsertTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "stRTEDring") == 0);
 	delete str1;
 	
+	//Insert(char c, int32 count, int32 pos)
 	NextSubTest();
 	str1 = new BString("string");
 	str1->Insert('P', 5, 3);
-	cerr << str1->String() << endl;
 	CPPUNIT_ASSERT(strcmp(str1->String(), "strPPPPPing") == 0);
 	delete str1;
+	
+	
 }
 
 

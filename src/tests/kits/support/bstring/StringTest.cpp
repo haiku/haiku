@@ -10,6 +10,7 @@
 #include "StringCaseTest.h"
 #include "StringInsertTest.h"
 #include "StringEscapeTest.h"
+#include "StringRemoveTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -24,6 +25,7 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringCaseTest::suite());
 	testSuite->addTest(StringInsertTest::suite());
 	testSuite->addTest(StringEscapeTest::suite());
+	testSuite->addTest(StringRemoveTest::suite());
 	
 	return(testSuite);
 }

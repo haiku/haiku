@@ -60,6 +60,7 @@ CommonTestLib libsupporttest.so
 		StringCaseTest.cpp
 		StringInsertTest.cpp
 		StringEscapeTest.cpp
+		StringRemoveTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
