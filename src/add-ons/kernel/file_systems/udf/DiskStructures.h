@@ -15,6 +15,8 @@
 #include "cpp.h"
 #include "UdfDebug.h"
 
+#include "Array.h"
+
 /*! \file DiskStructures.h
 
 	\brief UDF on-disk data structure declarations
@@ -44,7 +46,7 @@ namespace UDF {
 	
 	See also: ECMA 167 1/7.2.1, UDF-2.01 2.1.2
 */
-class charspec {
+struct udf_charspec {
 public:
 	void dump();
 
@@ -59,16 +61,14 @@ private:
 } __attribute__((packed));
 
 
-extern const charspec kCS0Charspec;
+extern const udf_charspec kCS0Charspec;
 
 
 /*! \brief Date and time stamp 
 
 	See also: ECMA 167 1/7.3, UDF-2.01 2.1.4
-	
-	\todo Check neat-o bitmasking trick endianness
 */
-class timestamp {
+class udf_timestamp {
 private:
 	union type_and_timezone_accessor {
 		uint16 type_and_timezone;
@@ -146,7 +146,7 @@ private:
 	
 	See also: ECMA 167 1/7.4, UDF 2.01 2.1.5
 */
-struct entity_id {
+struct udf_entity_id {
 public:
 	void dump();
 
@@ -196,7 +196,7 @@ private:
 
 	See also: ECMA 167 2/9.1
 */	
-struct volume_structure_descriptor_header {
+struct udf_volume_structure_descriptor_header {
 	uint8 type;
 	char id[5];
 	uint8 version;
@@ -224,7 +224,7 @@ extern const char* kVSDID_ECMA168;
 
 	See also: ECMA 167 3/7.1
 */
-struct extent_address {
+struct udf_extent_address {
 public:
 	void dump();
 
@@ -239,16 +239,60 @@ private:
 } __attribute__((packed));
 
 
+/*! \brief Location of a logical block within a logical volume.
+
+	See also: ECMA 167 4/7.1
+*/
+struct udf_logical_block_address {
+	uint32 location;	//!< Block location relative to start of corresponding partition
+	uint16 partition;	//!< Numeric partition id within logical volume
+} __attribute__((packed));
+
+
+/*! \brief Allocation descriptor.
+
+	See also: ECMA 167 4/14.14.1
+*/
+struct udf_short_address {
+	uint32 length;
+	udf_logical_block_address location;
+} __attribute__((packed));
+
+
+/*! \brief Allocation descriptor w/ 6 byte implementation use field.
+
+	See also: ECMA 167 4/14.14.2
+*/
+struct udf_long_address {
+public:
+	void dump();
+
+	uint32 length() const { return B_LENDIAN_TO_HOST_INT32(_length); }
+	
+	const udf_logical_block_address& location() const { return _location; }
+	udf_logical_block_address& location() { return _location; }
+	
+	const array<uint8, 6>& implementation_use() const { return _implementation_use; }
+	array<uint8, 6>& implementation_use() { return _implementation_use; }
+
+	void set_length(uint32 length) { _length = B_HOST_TO_LENDIAN_INT32(length); }
+
+private:
+	uint32 _length;
+	udf_logical_block_address _location;
+	array<uint8, 6> _implementation_use;
+} __attribute__((packed));
+
 /*! \brief Common tag found at the beginning of most udf descriptor structures.
 
-	For error checking, \c descriptor_tag structures have:
+	For error checking, \c udf_tag structures have:
 	- The disk location of the tag redundantly stored in the tag itself
 	- A checksum value for the tag
 	- A CRC value and length
 
 	See also: ECMA 167 1/7.2, UDF 2.01 2.2.1, UDF 2.01 2.3.1
 */
-struct descriptor_tag {
+struct udf_tag {
 public:
 	void dump();	
 
@@ -297,9 +341,9 @@ private:
 } __attribute__((packed));
 
 
-/*! \c descriptor_tag::id values
+/*! \c udf_tag::id values
 */
-enum tag_id {
+enum udf_tag_id {
 	TAGID_UNDEFINED	= 0,
 
 	// ECMA 167, PART 3
@@ -330,18 +374,17 @@ enum tag_id {
 	TAGID_EXTENDED_FILE_ENTRY,
 };
 
-
 /*! \brief Primary volume descriptor
 */
-struct primary_vd {
+struct udf_primary_descriptor {
 public:
 	void dump();	
 
 	// Get functions
-	const descriptor_tag& tag() const { return _tag; }
-	descriptor_tag& tag() { return _tag; }
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
 
-	uint32 volume_descriptor_sequence_number() const { return B_LENDIAN_TO_HOST_INT32(_volume_descriptor_sequence_number); }
+	uint32 vds_number() const { return B_LENDIAN_TO_HOST_INT32(_vds_number); }
 	uint32 primary_volume_descriptor_number() const { return B_LENDIAN_TO_HOST_INT32(_primary_volume_descriptor_number); }
 
 	const char* volume_identifier() const { return _volume_identifier; }
@@ -357,36 +400,36 @@ public:
 	const char* volume_set_identifier() const { return _volume_set_identifier; }
 	char* volume_set_identifier() { return _volume_set_identifier; }
 	
-	const charspec& descriptor_character_set() const { return _descriptor_character_set; }
-	charspec& descriptor_character_set() { return _descriptor_character_set; }
+	const udf_charspec& descriptor_character_set() const { return _descriptor_character_set; }
+	udf_charspec& descriptor_character_set() { return _descriptor_character_set; }
 
-	const charspec& explanatory_character_set() const { return _explanatory_character_set; }
-	charspec& explanatory_character_set() { return _explanatory_character_set; }
+	const udf_charspec& explanatory_character_set() const { return _explanatory_character_set; }
+	udf_charspec& explanatory_character_set() { return _explanatory_character_set; }
 
-	const extent_address& volume_abstract() const { return _volume_abstract; }
-	extent_address& volume_abstract() { return _volume_abstract; }
-	const extent_address& volume_copyright_notice() const { return _volume_copyright_notice; }
-	extent_address& volume_copyright_notice() { return _volume_copyright_notice; }
+	const udf_extent_address& volume_abstract() const { return _volume_abstract; }
+	udf_extent_address& volume_abstract() { return _volume_abstract; }
+	const udf_extent_address& volume_copyright_notice() const { return _volume_copyright_notice; }
+	udf_extent_address& volume_copyright_notice() { return _volume_copyright_notice; }
 
-	const entity_id& application_id() const { return _application_id; }
-	entity_id& application_id() { return _application_id; }
+	const udf_entity_id& application_id() const { return _application_id; }
+	udf_entity_id& application_id() { return _application_id; }
 	
-	const timestamp& recording_date_and_time() const { return _recording_date_and_time; }
-	timestamp& recording_date_and_time() { return _recording_date_and_time; }
+	const udf_timestamp& recording_date_and_time() const { return _recording_date_and_time; }
+	udf_timestamp& recording_date_and_time() { return _recording_date_and_time; }
 
-	const entity_id& implementation_id() const { return _implementation_id; }
-	entity_id& implementation_id() { return _implementation_id; }
+	const udf_entity_id& implementation_id() const { return _implementation_id; }
+	udf_entity_id& implementation_id() { return _implementation_id; }
 
-	const uint8* implementation_use() const { return _implementation_use; }
-	uint8* implementation_use() { return _implementation_use; }
+	const array<uint8, 64>& implementation_use() const { return _implementation_use; }
+	array<uint8, 64>& implementation_use() { return _implementation_use; }
 
 	uint32 predecessor_volume_descriptor_sequence_location() const
 	  { return B_LENDIAN_TO_HOST_INT32(_predecessor_volume_descriptor_sequence_location); }
 	uint16 flags() const { return B_LENDIAN_TO_HOST_INT16(_flags); }
 
 	// Set functions
-	void set_volume_descriptor_sequence_number(uint32 number)
-	  { _volume_descriptor_sequence_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_vds_number(uint32 number)
+	  { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
 	void set_primary_volume_descriptor_number(uint32 number)
 	  { _primary_volume_descriptor_number = B_HOST_TO_LENDIAN_INT32(number); }
 	void set_volume_sequence_number(uint16 number)
@@ -407,8 +450,8 @@ public:
 	  { _flags = B_HOST_TO_LENDIAN_INT16(flags); }
 
 private:
-	descriptor_tag _tag;
-	uint32 _volume_descriptor_sequence_number;
+	udf_tag _tag;
+	uint32 _vds_number;
 	uint32 _primary_volume_descriptor_number;
 	char _volume_identifier[32];
 	uint16 _volume_sequence_number;
@@ -424,22 +467,22 @@ private:
 		
 		To be set to CS0.
 	*/
-	charspec _descriptor_character_set;	
+	udf_charspec _descriptor_character_set;	
 
 	/*! \brief Identifies the character set used in the \c volume_abstract
 		and \c volume_copyright_notice extents.
 		
 		To be set to CS0.
 	*/
-	charspec _explanatory_character_set;
+	udf_charspec _explanatory_character_set;
 	
-	extent_address _volume_abstract;
-	extent_address _volume_copyright_notice;
+	udf_extent_address _volume_abstract;
+	udf_extent_address _volume_copyright_notice;
 	
-	entity_id _application_id;
-	timestamp _recording_date_and_time;
-	entity_id _implementation_id;
-	uint8 _implementation_use[64];
+	udf_entity_id _application_id;
+	udf_timestamp _recording_date_and_time;
+	udf_entity_id _implementation_id;
+	array<uint8, 64> _implementation_use;
 	uint32 _predecessor_volume_descriptor_sequence_location;
 	uint16 _flags;
 	char _reserved[22];
@@ -461,15 +504,17 @@ private:
 	
 	See also: ECMA 167 3/10.2, UDF-2.01 2.2.3
 */
-struct anchor_volume_descriptor_pointer {
+struct udf_anchor_descriptor {
 public:
-	descriptor_tag& tag() { return _tag; }
-	extent_address& main_vds() { return _main_vds; }
-	extent_address& reserve_vds() { return _reserve_vds; }
+	void dump();
+	
+	udf_tag& tag() { return _tag; }
+	udf_extent_address& main_vds() { return _main_vds; }
+	udf_extent_address& reserve_vds() { return _reserve_vds; }
 private:
-	descriptor_tag _tag;
-	extent_address _main_vds;	//!< min length of 16 sectors
-	extent_address _reserve_vds;	//!< min length of 16 sectors
+	udf_tag _tag;
+	udf_extent_address _main_vds;	//!< min length of 16 sectors
+	udf_extent_address _reserve_vds;	//!< min length of 16 sectors
 	char _reserved[480];	
 } __attribute__((packed));
 
@@ -480,10 +525,10 @@ private:
 	
 	See also: ECMA 167 3/10.3
 */
-struct vd_pointer {
-	descriptor_tag tag;
+struct udf_descriptor_pointer {
+	udf_tag tag;
 	uint32 vds_number;
-	extent_address next;
+	udf_extent_address next;
 } __attribute__((packed));
 
 
@@ -491,11 +536,29 @@ struct vd_pointer {
 
 	See also: ECMA 167 3/10.4
 */
-struct implementation_use_vd {
-	descriptor_tag tag;
-	uint32 vds_number;
-	entity_id implementation_id;
-	uint8 implementation_use[460];
+struct udf_implementation_use_descriptor {
+public:
+	void dump();
+
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+	
+	uint32 vds_number() const { return B_LENDIAN_TO_HOST_INT32(_vds_number); }
+
+	const udf_entity_id& implementation_id() const { return _implementation_id; }
+	udf_entity_id& implementation_id() { return _implementation_id; }
+
+	const array<uint8, 460>& implementation_use() const { return _implementation_use; }
+	array<uint8, 460>& implementation_use() { return _implementation_use; }
+	
+	// Set functions
+	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
+private:
+	udf_tag _tag;
+	uint32 _vds_number;
+	udf_entity_id _implementation_id;
+	array<uint8, 460> _implementation_use;
 } __attribute__((packed));
 
 
@@ -503,37 +566,87 @@ struct implementation_use_vd {
 
 	See also: ECMA 167 3/10.5
 */
-struct partition_descriptor {
-	descriptor_tag tag;
-	uint32 vds_number;
-	/*! Bit 0: If 0, shall mean volume space has not been allocated. If 1,
-	    shall mean volume space has been allocated.
-	*/
-	union {
+struct udf_partition_descriptor {
+private:
+	union partition_flags_accessor {
 		uint16 partition_flags;
 		struct {
 			uint16 allocated:1,
 			       reserved:15;
-		} flags;
+		} bits;
 	};
-	uint16 partition_number;
 
+public:
+	void dump();
+	
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+	
+	uint32 vds_number() const { return B_LENDIAN_TO_HOST_INT32(_vds_number); }
+	uint16 partition_flags() const { return B_LENDIAN_TO_HOST_INT16(_partition_flags); }
+	bool allocated() const {
+		partition_flags_accessor f;
+		f.partition_flags = partition_flags();
+		return f.bits.allocated;
+	}
+	uint16 partition_number() const { return B_LENDIAN_TO_HOST_INT16(_partition_number); }
+		
+	const udf_entity_id& partition_contents() const { return _partition_contents; }
+	udf_entity_id& partition_contents() { return _partition_contents; }
+	
+	const array<uint8, 128>& partition_contents_use() const { return _partition_contents_use; }
+	array<uint8, 128>& partition_contents_use() { return _partition_contents_use; }
+	
+	uint32 access_type() const { return B_LENDIAN_TO_HOST_INT32(_access_type); }
+	uint32 start() const { return B_LENDIAN_TO_HOST_INT32(_start); }
+	uint32 length() const { return B_LENDIAN_TO_HOST_INT32(_length); }
+
+	const udf_entity_id& implementation_id() const { return _implementation_id; }
+	udf_entity_id& implementation_id() { return _implementation_id; }
+
+	const array<uint8, 128>& implementation_use() const { return _implementation_use; }
+	array<uint8, 128>& implementation_use() { return _implementation_use; }
+	
+	// Set functions
+	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_partition_flags(uint16 flags) { _partition_flags = B_HOST_TO_LENDIAN_INT16(flags); }
+	void set_allocated(bool allocated) {
+		partition_flags_accessor f;
+		f.partition_flags = partition_flags();
+		f.bits.allocated = allocated;
+		set_partition_flags(f.partition_flags);
+	}
+
+	void set_access_type(uint32 type) { _access_type = B_HOST_TO_LENDIAN_INT32(type); }
+	void set_start(uint32 start) { _start = B_HOST_TO_LENDIAN_INT32(start); }
+	void set_length(uint32 length) { _length = B_HOST_TO_LENDIAN_INT32(length); }
+
+private:
+	udf_tag _tag;
+	uint32 _vds_number;
+	/*! Bit 0: If 0, shall mean volume space has not been allocated. If 1,
+	    shall mean volume space has been allocated.
+	*/
+	uint16 _partition_flags;
+	uint16 _partition_number;
+	
 	/*! - "+NSR03" Volume recorded according to ECMA-167, i.e. UDF
 		- "+CD001" Volume recorded according to ECMA-119, i.e. iso9660
 		- "+FDC01" Volume recorded according to ECMA-107
 		- "+CDW02" Volume recorded according to ECMA-168
 	*/		
-	entity_id partition_contents;
-	uint8 partition_contents_use[128];
+	udf_entity_id _partition_contents;
+	array<uint8, 128> _partition_contents_use;
 
 	/*! See \c partition_access_type enum
 	*/
-	uint32 access_type;
-	uint32 start;
-	uint32 length;
-	entity_id implementation_id;
-	uint8 implementation_use[128];
-	uint8 reserved[156];
+	uint32 _access_type;
+	uint32 _start;
+	uint32 _length;
+	udf_entity_id _implementation_id;
+	array<uint8, 128> _implementation_use;
+	uint8 _reserved[156];
 } __attribute__((packed));
 
 
@@ -550,35 +663,83 @@ enum partition_access_type {
 
 	See also: ECMA 167 3/10.6, UDF-2.01 2.2.4
 */
-struct logical_vd {
-	descriptor_tag tag;
-	uint32 vds_number;
+struct udf_logical_descriptor {
+	void dump();
+	
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+
+	uint32 vds_number() const { return B_LENDIAN_TO_HOST_INT32(_vds_number); }
+
+	const udf_charspec& character_set() const { return _character_set; }
+	udf_charspec& character_set() { return _character_set; }
+	
+	const char* logical_volume_identifier() const { return _logical_volume_identifier; }
+	char* logical_volume_identifier() { return _logical_volume_identifier; }
+	
+	uint32 logical_block_size() const { return B_LENDIAN_TO_HOST_INT32(_logical_block_size); }
+
+	const udf_entity_id& domain_id() const { return _domain_id; }
+	udf_entity_id& domain_id() { return _domain_id; }
+
+	const array<uint8, 16>& logical_volume_contents_use() const { return _logical_volume_contents_use; }
+	array<uint8, 16>& logical_volume_contents_use() { return _logical_volume_contents_use; }
+
+	const udf_long_address& file_set_address() const { return _file_set_address; }
+	udf_long_address& file_set_address() { return _file_set_address; }
+
+	uint32 map_table_length() const { return B_LENDIAN_TO_HOST_INT32(_map_table_length); }
+	uint32 partition_map_count() const { return B_LENDIAN_TO_HOST_INT32(_partition_map_count); }
+
+	const udf_entity_id& implementation_id() const { return _implementation_id; }
+	udf_entity_id& implementation_id() { return _implementation_id; }
+
+	const array<uint8, 128>& implementation_use() const { return _implementation_use; }
+	array<uint8, 128>& implementation_use() { return _implementation_use; }
+
+	const udf_extent_address& integrity_sequence_extent() const { return _integrity_sequence_extent; }
+	udf_extent_address& integrity_sequence_extent() { return _integrity_sequence_extent; }
+
+	const uint8* partition_maps() const { return _partition_maps; }
+	uint8* partition_maps() { return _partition_maps; }
+
+	// Set functions
+	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_logical_block_size(uint32 size) { _logical_block_size = B_HOST_TO_LENDIAN_INT32(size); }
+		
+	void set_map_table_length(uint32 length) { _map_table_length = B_HOST_TO_LENDIAN_INT32(length); }
+	void set_partition_map_count(uint32 count) { _partition_map_count = B_HOST_TO_LENDIAN_INT32(count); }
+
+private:
+	udf_tag _tag;
+	uint32 _vds_number;
 	
 	/*! \brief Identifies the character set for the
 		\c logical_volume_identifier field.
 		
 		To be set to CS0.
 	*/
-	charspec character_set;
-	char logical_volume_identifier[128];
-	uint32 logical_block_size;
+	udf_charspec _character_set;
+	char _logical_volume_identifier[128];
+	uint32 _logical_block_size;
 	
 	/*! \brief To be set to 0 or "*OSTA UDF Compliant". See UDF specs.
 	*/
-	entity_id domain_id;
+	udf_entity_id _domain_id;
 	
 	union {
-		/*! \brief For UDF, shall contain a \c long_allocation_descriptor which identifies
+		/*! \brief For UDF, shall contain a \c udf_long_address which identifies
 			the location of the logical volume's first file set.
 		*/
-		uint8 logical_volume_contents_use[16];
-		extent_address file_set_address;
+		array<uint8, 16> _logical_volume_contents_use;
+		udf_long_address _file_set_address;
 	};
 
-	uint32 map_table_length;
-	uint32 partition_map_count;
-	entity_id implementation_id;
-	uint8 implementation_use[128];
+	uint32 _map_table_length;
+	uint32 _partition_map_count;
+	udf_entity_id _implementation_id;
+	array<uint8, 128> _implementation_use;
 	
 	/*! \brief Logical volume integrity sequence location.
 	
@@ -587,7 +748,7 @@ struct logical_vd {
 		must be added to the set if the extent fills up (since you
 		can't chain lvis's I guess).
 	*/
-	extent_address integrity_sequence_extent;
+	udf_extent_address _integrity_sequence_extent;
 	
 	/*! \brief Restricted to maps of type 1 for normal maps and
 		UDF type 2 for virtual maps or maps on systems not supporting
@@ -595,7 +756,7 @@ struct logical_vd {
 		
 		See UDF-2.01 2.2.8, 2.2.9
 	*/
-	uint8 partition_maps[0];
+	uint8 _partition_maps[0];
 } __attribute__((packed));
 
 
@@ -603,7 +764,7 @@ struct logical_vd {
 
 	See also: ECMA-167 3/10.7.1
 */
-struct generic_partition_map {
+struct udf_generic_partition_map {
 	uint8 type;
 	uint8 length;
 	uint8 map_data[0];
@@ -614,7 +775,7 @@ struct generic_partition_map {
 
 	See also: ECMA-167 3/10.7.2
 */
-struct physical_partition_map {
+struct udf_physical_partition_map {
 	uint8 type;
 	uint8 length;
 	uint16 volume_sequence_number;
@@ -632,7 +793,7 @@ struct physical_partition_map {
 	
 	\todo Handle UDF sparable partition maps as well (UDF-2.01 2.2.9)
 */
-struct virtual_partition_map {
+struct udf_virtual_partition_map {
 	uint8 type;
 	uint8 length;
 	uint8 reserved1[2];
@@ -641,7 +802,7 @@ struct virtual_partition_map {
 	    - identifier: "*UDF Virtual Partition"
 	    - identifier_suffix: per UDF-2.01 2.1.5.3
 	*/
-	entity_id partition_type_id;
+	udf_entity_id partition_type_id;
 	uint16 volume_sequence_number;
 	
 	/*! corresponding type 1 partition map in same logical volume
@@ -655,11 +816,24 @@ struct virtual_partition_map {
 
 	See also: ECMA-167 3/10.8
 */
-struct unallocated_space_descriptor {
-	descriptor_tag tag;
-	uint32 vds_number;
-	uint32 allocation_descriptor_count;
-	extent_address allocation_descriptors[0];
+struct udf_unallocated_space_descriptor {
+	void dump();
+
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+	uint32 vds_number() const { return B_LENDIAN_TO_HOST_INT32(_vds_number); }
+	uint32 allocation_descriptor_count() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptor_count); }
+	udf_extent_address* allocation_descriptors() { return _allocation_descriptors; }
+
+	// Set functions
+	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_allocation_descriptor_count(uint32 count) { _allocation_descriptor_count = B_HOST_TO_LENDIAN_INT32(count); }
+private:
+	udf_tag _tag;
+	uint32 _vds_number;
+	uint32 _allocation_descriptor_count;
+	udf_extent_address _allocation_descriptors[0];
 } __attribute__((packed));
 
 
@@ -667,9 +841,16 @@ struct unallocated_space_descriptor {
 
 	See also: ECMA-167 3/10.9
 */
-struct terminating_descriptor {
-	descriptor_tag tag;
-	uint8 reserved[496];
+struct udf_terminating_descriptor {
+	void dump();
+
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+
+private:
+	udf_tag _tag;
+	uint8 _reserved[496];
 } __attribute__((packed));
 
 
@@ -677,12 +858,12 @@ struct terminating_descriptor {
 
 	See also: ECMA-167 3/10.10
 */
-struct logical_volume_integrity_descriptor {
-	descriptor_tag tag;
-	timestamp recording_time;
+struct udf_logical_volume_integrity_descriptor {
+	udf_tag tag;
+	udf_timestamp recording_time;
 	uint32 integrity_type;
-	extent_address next_integrity_extent;
-	uint8 logical_volume_contents_use[32];
+	udf_extent_address next_integrity_extent;
+	array<uint8, 32> logical_volume_contents_use;
 	uint32 partition_count;
 	uint32 implementation_use_length;
 
@@ -705,36 +886,6 @@ enum {
 //----------------------------------------------------------------------
 
 
-/*! \brief Location of a logical block within a logical volume.
-
-	See also: ECMA 167 4/7.1
-*/
-struct logical_block_address {
-	uint32 location;	//!< Block location relative to start of corresponding partition
-	uint16 partition;	//!< Numeric partition id within logical volume
-} __attribute__((packed));
-
-
-/*! \brief Allocation descriptor.
-
-	See also: ECMA 167 4/14.14.1
-*/
-struct short_allocation_descriptor {
-	uint32 length;
-	logical_block_address location;
-} __attribute__((packed));
-
-
-/*! \brief Allocation descriptor w/ 6 byte implementation use field.
-
-	See also: ECMA 167 4/14.14.2
-*/
-struct long_allocation_descriptor {
-	uint32 length;
-	logical_block_address location;
-	uchar implementation_use[6];
-} __attribute__((packed));
-
 
 /*! \brief File set descriptor
 
@@ -750,26 +901,80 @@ struct long_allocation_descriptor {
 	  (directly or indirectly) by any other file set. Writeable file sets may, however,
 	  reference actual file data extents that are also referenced by other file sets.
 */
-struct file_set_descriptor {
-	descriptor_tag tag;
-	timestamp recording_date_and_time;
-	uint16 interchange_level;			//!< To be set to 3 (see UDF-2.01 2.3.2.1)
-	uint16 max_interchange_level;		//!< To be set to 3 (see UDF-2.01 2.3.2.2)
-	uint32 character_set_list;
-	uint32 max_character_set_list;
-	uint32 file_set_number;
-	uint32 file_set_descriptor_number;
-	charspec logical_volume_id_character_set;	//!< To be set to kCSOCharspec
-	char logical_volume_id[128];
-	charspec file_set_charspec;
-	char file_set_id[32];
-	char copyright_file_id[32];
-	char abstract_file_id[32];
-	long_allocation_descriptor root_directory_icb;
-	entity_id domain_id;	
-	long_allocation_descriptor next_extent;
-	long_allocation_descriptor system_stream_directory_icb;
-	uint8 reserved[32];
+struct udf_file_set_descriptor {
+	void dump();
+
+	// Get functions
+	const udf_tag& tag() const { return _tag; }
+	udf_tag& tag() { return _tag; }
+
+	const udf_timestamp& recording_date_and_time() const { return _recording_date_and_time; }
+	udf_timestamp& recording_date_and_time() { return _recording_date_and_time; }
+
+	uint16 interchange_level() const { return B_LENDIAN_TO_HOST_INT16(_interchange_level); }
+	uint16 max_interchange_level() const { return B_LENDIAN_TO_HOST_INT16(_max_interchange_level); }
+	uint32 character_set_list() const { return B_LENDIAN_TO_HOST_INT32(_character_set_list); }
+	uint32 max_character_set_list() const { return B_LENDIAN_TO_HOST_INT32(_max_character_set_list); }
+	uint32 file_set_number() const { return B_LENDIAN_TO_HOST_INT32(_file_set_number); }
+	uint32 file_set_descriptor_number() const { return B_LENDIAN_TO_HOST_INT32(_file_set_descriptor_number); }
+
+	const udf_charspec& logical_volume_id_character_set() const { return _logical_volume_id_character_set; }
+	udf_charspec& logical_volume_id_character_set() { return _logical_volume_id_character_set; }
+
+	const array<char, 128>& logical_volume_id() const { return _logical_volume_id; }
+	array<char, 128>& logical_volume_id() { return _logical_volume_id; }
+
+	const array<char, 32>& file_set_id() const { return _file_set_id; }
+	array<char, 32>& file_set_id() { return _file_set_id; }
+
+	const array<char, 32>& copyright_file_id() const { return _copyright_file_id; }
+	array<char, 32>& copyright_file_id() { return _copyright_file_id; }
+
+	const array<char, 32>& abstract_file_id() const { return _abstract_file_id; }
+	array<char, 32>& abstract_file_id() { return _abstract_file_id; }
+
+	const udf_charspec& file_set_charspec() const { return _file_set_charspec; }
+	udf_charspec& file_set_charspec() { return _file_set_charspec; }
+
+	const udf_long_address& root_directory_icb() const { return _root_directory_icb; }
+	udf_long_address& root_directory_icb() { return _root_directory_icb; }
+
+	const udf_entity_id& domain_id() const { return _domain_id; }
+	udf_entity_id& domain_id() { return _domain_id; }
+
+	const udf_long_address& next_extent() const { return _next_extent; }
+	udf_long_address& next_extent() { return _next_extent; }
+
+	const udf_long_address& system_stream_directory_icb() const { return _system_stream_directory_icb; }
+	udf_long_address& system_stream_directory_icb() { return _system_stream_directory_icb; }
+
+	// Set functions
+	void set_interchange_level(uint16 level) { _interchange_level = B_HOST_TO_LENDIAN_INT16(level); }
+	void set_max_interchange_level(uint16 level) { _max_interchange_level = B_HOST_TO_LENDIAN_INT16(level); }
+	void set_character_set_list(uint32 list) { _character_set_list = B_HOST_TO_LENDIAN_INT32(list); }
+	void set_max_character_set_list(uint32 list) { _max_character_set_list = B_HOST_TO_LENDIAN_INT32(list); }
+	void set_file_set_number(uint32 number) { _file_set_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_file_set_descriptor_number(uint32 number) { _file_set_descriptor_number = B_HOST_TO_LENDIAN_INT32(number); }
+private:
+	udf_tag _tag;
+	udf_timestamp _recording_date_and_time;
+	uint16 _interchange_level;			//!< To be set to 3 (see UDF-2.01 2.3.2.1)
+	uint16 _max_interchange_level;		//!< To be set to 3 (see UDF-2.01 2.3.2.2)
+	uint32 _character_set_list;
+	uint32 _max_character_set_list;
+	uint32 _file_set_number;
+	uint32 _file_set_descriptor_number;
+	udf_charspec _logical_volume_id_character_set;	//!< To be set to kCSOCharspec
+	array<char, 128> _logical_volume_id;
+	udf_charspec _file_set_charspec;
+	array<char, 32> _file_set_id;
+	array<char, 32> _copyright_file_id;
+	array<char, 32> _abstract_file_id;
+	udf_long_address _root_directory_icb;
+	udf_entity_id _domain_id;	
+	udf_long_address _next_extent;
+	udf_long_address _system_stream_directory_icb;
+	uint8 _reserved[32];
 } __attribute__((packed));
 
 
@@ -789,13 +994,13 @@ struct file_set_descriptor {
 	
 	See also: ECMA-167 4/14.3, UDF-2.01 2.2.3
 */
-struct partition_header_descriptor {
-	short_allocation_descriptor unallocated_space_table;
-	short_allocation_descriptor unallocated_space_bitmap;
+struct udf_partition_header_descriptor {
+	udf_long_address unallocated_space_table;
+	udf_long_address unallocated_space_bitmap;
 	/*! Unused, per UDF-2.01 2.2.3 */
-	short_allocation_descriptor partition_integrity_table;
-	short_allocation_descriptor freed_space_table;
-	short_allocation_descriptor freed_space_bitmap;
+	udf_long_address partition_integrity_table;
+	udf_long_address freed_space_table;
+	udf_long_address freed_space_bitmap;
 	uint8 reserved[88];
 } __attribute__((packed));
 
@@ -809,8 +1014,8 @@ struct partition_header_descriptor {
 	
 	\todo Check pointer arithmetic
 */
-struct file_id_descriptor {
-	descriptor_tag tag;
+struct udf_file_id_descriptor {
+	udf_tag tag;
 	/*! According to ECMA-167: 1 <= valid version_number <= 32767, 32768 <= reserved <= 65535.
 		
 		However, according to UDF-2.01, there shall be exactly one version of
@@ -830,11 +1035,11 @@ struct file_id_descriptor {
 		} characteristics;
 	};	
 	uint8 id_length;
-	long_allocation_descriptor icb;
+	udf_long_address icb;
 	uint8 implementation_use_length;
 	
 	/*! If implementation_use_length is greater than 0, the first 32
-		bytes of implementation_use() shall be an entity_id identifying
+		bytes of implementation_use() shall be an udf_entity_id identifying
 		the implementation that generated the rest of the data in the
 		implementation_use() field.
 	*/
@@ -848,13 +1053,13 @@ struct file_id_descriptor {
 
 	See also: ECMA-167 4/14.5
 */
-struct allocation_extent_descriptor {
-	descriptor_tag tag;
+struct udf_allocation_extent_descriptor {
+	udf_tag tag;
 	uint32 previous_allocation_extent_location;
 	uint32 length_of_allocation_descriptors;
 	
 	/*! \todo Check that this is really how things work: */
-	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(allocation_extent_descriptor)); }
+	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(udf_allocation_extent_descriptor)); }
 } __attribute__((packed));
 
 
@@ -862,7 +1067,7 @@ struct allocation_extent_descriptor {
 
 	See also ECMA-167 4/14.6.6
 */
-enum icb_file_types {
+enum udf_icb_file_types {
 	ICB_TYPE_UNSPECIFIED = 0,
 	ICB_TYPE_UNALLOCATED_SPACE_ENTRY,
 	ICB_TYPE_PARTITION_INTEGRITY_ENTRY,
@@ -893,19 +1098,19 @@ enum icb_file_types {
 
 	See also: ECMA-167 4/14.6, UDF-2.01 2.3.5
 */
-struct icb_entry_tag {
+struct udf_icb_entry_tag {
 	uint32 prior_recorded_number_of_direct_entries;
 	/*! Per UDF-2.01 2.3.5.1, only strategy types 4 and 4096 shall be supported.
 	
 		\todo Describe strategy types here.
 	*/
 	uint16 strategy_type;
-	uint8 strategy_parameters[2];
+	array<uint8, 2> strategy_parameters;
 	uint16 entry_count;
 	uint8 reserved;
 	/*! \brief icb_file_type value identifying the type of this icb entry */
 	uint8 file_type;
-	logical_block_address parent_icb_location;
+	udf_logical_block_address parent_icb_location;
 	union {
 		uint16 all_flags;
 		struct {
@@ -929,18 +1134,18 @@ struct icb_entry_tag {
 
 /*! \brief Indirect ICB entry
 */
-struct indirect_icb_entry {
-	descriptor_tag tag;
-	icb_entry_tag icb_tag;
-	long_allocation_descriptor indirect_icb;
+struct udf_indirect_icb_entry {
+	udf_tag tag;
+	udf_icb_entry_tag icb_tag;
+	udf_long_address indirect_icb;
 } __attribute__((packed));
 
 
 /*! \brief Terminal ICB entry
 */
-struct terminal_icb_entry {
-	descriptor_tag tag;
-	icb_entry_tag icb_tag;
+struct udf_terminal_icb_entry {
+	udf_tag tag;
+	udf_icb_entry_tag icb_tag;
 } __attribute__((packed));
 
 
@@ -950,9 +1155,9 @@ struct terminal_icb_entry {
 
 	\todo Check pointer math.
 */
-struct file_icb_entry {
-	descriptor_tag tag;
-	icb_entry_tag icb_tag;
+struct udf_file_icb_entry {
+	udf_tag tag;
+	udf_icb_entry_tag icb_tag;
 	uint32 uid;
 	uint32 gid;
 	/*! \todo List perms in comment and add handy union thingy */
@@ -966,13 +1171,13 @@ struct file_icb_entry {
 	uint8 record_length;				//!< To be set to 0 per UDF-2.01 2.3.6.3
 	uint64 information_length;
 	uint64 logical_blocks_recorded;		//!< To be 0 for files and dirs with embedded data
-	timestamp access_date_and_time;
-	timestamp modification_date_and_time;
-	timestamp attribute_date_and_time;
+	udf_timestamp access_date_and_time;
+	udf_timestamp modification_date_and_time;
+	udf_timestamp attribute_date_and_time;
 	/*! \brief Initially 1, may be incremented upon user request. */
 	uint32 checkpoint;
-	long_allocation_descriptor extended_attribute_icb;
-	entity_id implementation_id;
+	udf_long_address extended_attribute_icb;
+	udf_entity_id implementation_id;
 	/*! \brief The unique id identifying this file entry
 	
 		The id of the root directory of a file set shall be 0.
@@ -983,8 +1188,8 @@ struct file_icb_entry {
 	uint32 extended_attributes_length;
 	uint32 allocation_descriptors_length;
 	
-	uint8* extended_attributes() { return (uint8*)(this+sizeof(file_icb_entry)); }
-	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(file_icb_entry)+extended_attributes_length); }
+	uint8* extended_attributes() { return (uint8*)(this+sizeof(udf_file_icb_entry)); }
+	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(udf_file_icb_entry)+extended_attributes_length); }
 
 } __attribute__((packed));
 		
@@ -995,9 +1200,9 @@ struct file_icb_entry {
 	
 	\todo Check pointer math.
 */
-struct extended_file_icb_entry {
-	descriptor_tag tag;
-	icb_entry_tag icb_tag;
+struct udf_extended_file_icb_entry {
+	udf_tag tag;
+	udf_icb_entry_tag icb_tag;
 	uint32 uid;
 	uint32 gid;
 	/*! \todo List perms in comment and add handy union thingy */
@@ -1011,16 +1216,16 @@ struct extended_file_icb_entry {
 	uint8 record_length;				//!< To be set to 0 per UDF-2.01 2.3.6.3
 	uint64 information_length;
 	uint64 logical_blocks_recorded;		//!< To be 0 for files and dirs with embedded data
-	timestamp access_date_and_time;
-	timestamp modification_date_and_time;
-	timestamp creation_date_and_time;
-	timestamp attribute_date_and_time;
+	udf_timestamp access_date_and_time;
+	udf_timestamp modification_date_and_time;
+	udf_timestamp creation_date_and_time;
+	udf_timestamp attribute_date_and_time;
 	/*! \brief Initially 1, may be incremented upon user request. */
 	uint32 checkpoint;
 	uint32 reserved;
-	long_allocation_descriptor extended_attribute_icb;
-	long_allocation_descriptor stream_directory_icb;
-	entity_id implementation_id;
+	udf_long_address extended_attribute_icb;
+	udf_long_address stream_directory_icb;
+	udf_entity_id implementation_id;
 	/*! \brief The unique id identifying this file entry
 	
 		The id of the root directory of a file set shall be 0.
@@ -1031,8 +1236,8 @@ struct extended_file_icb_entry {
 	uint32 extended_attributes_length;
 	uint32 allocation_descriptors_length;
 	
-	uint8* extended_attributes() { return (uint8*)(this+sizeof(file_icb_entry)); }
-	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(file_icb_entry)+extended_attributes_length); }
+	uint8* extended_attributes() { return (uint8*)(this+sizeof(udf_file_icb_entry)); }
+	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(udf_file_icb_entry)+extended_attributes_length); }
 
 } __attribute__((packed));
 		

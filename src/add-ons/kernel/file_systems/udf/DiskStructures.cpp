@@ -20,55 +20,55 @@ using namespace UDF;
 // Constants
 //----------------------------------------------------------------------
 
-//const charspec kCS0Charspec = { fCharacterSetType: 0,
-//                                fCharacterSetInfo: "OSTA Compressed Unicode"
+//const charspec kCS0Charspec = { _character_set_type: 0,
+//                                _character_set_info: "OSTA Compressed Unicode"
 //                                                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 //                                                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 //                              };
                               
 // Volume structure descriptor ids 
-const char* UDF::kVSDID_BEA 			= "BEA01";
-const char* UDF::kVSDID_TEA 			= "TEA01";
+const char* UDF::kVSDID_BEA 		= "BEA01";
+const char* UDF::kVSDID_TEA 		= "TEA01";
 const char* UDF::kVSDID_BOOT 		= "BOOT2";
-const char* UDF::kVSDID_ISO 			= "CD001";
+const char* UDF::kVSDID_ISO 		= "CD001";
 const char* UDF::kVSDID_ECMA167_2 	= "NSR02";
 const char* UDF::kVSDID_ECMA167_3 	= "NSR03";
 const char* UDF::kVSDID_ECMA168		= "CDW02";
 
 //----------------------------------------------------------------------
-// volume_structure_descriptor_header
+// udf_volume_structure_descriptor_header
 //----------------------------------------------------------------------
 
 /*! \brief Returns true if the given \a id matches the header's id.
 */
 bool
-volume_structure_descriptor_header::id_matches(const char *id)
+udf_volume_structure_descriptor_header::id_matches(const char *id)
 {
 	return strncmp(this->id, id, 5) == 0;
 }
 
 
 //----------------------------------------------------------------------
-// charspec
+// udf_charspec
 //----------------------------------------------------------------------
 
 void
-charspec::dump()
+udf_charspec::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "extent_address");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_charspec");
 	PRINT(("character_set_type: %d\n", character_set_type()));
 	PRINT(("character_set_info: `%s'\n", character_set_info()));
 }
 
 
 //----------------------------------------------------------------------
-// timestamp
+// udf_timestamp
 //----------------------------------------------------------------------
 
 void
-timestamp::dump()
+udf_timestamp::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "timestamp");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_timestamp");
 	PRINT(("type:                %d\n", type()));
 	PRINT(("timezone:            %d\n", timezone()));
 	PRINT(("year:                %d\n", year()));
@@ -83,13 +83,13 @@ timestamp::dump()
 }
 
 //----------------------------------------------------------------------
-// entity_id
+// udf_entity_id
 //----------------------------------------------------------------------
 
 void
-entity_id::dump()
+udf_entity_id::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "entity_id");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_entity_id");
 	PRINT(("flags:             %d\n", flags()));
 	PRINT(("identifier:        `%s'\n", identifier()));
 	PRINT(("identifier_suffix: `%s'\n", identifier_suffix()));
@@ -97,15 +97,26 @@ entity_id::dump()
 
 
 //----------------------------------------------------------------------
-// extent_address
+// udf_extent_address
 //----------------------------------------------------------------------
 
 void
-extent_address::dump()
+udf_extent_address::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "extent_address");
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_extent_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("location: %ld\n", location()));
+}
+
+void
+udf_long_address::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_long_address");
+	PRINT(("length:   %ld\n", length()));
+	PRINT(("location: %ld\n", location().location));
+	PRINT(("partiton: %d\n", location().partition));
+	PRINT(("implementation_use:\n"));
+	DUMP(implementation_use());
 }
 
 
@@ -114,9 +125,9 @@ extent_address::dump()
 //----------------------------------------------------------------------
 
 void
-descriptor_tag::dump()
+udf_tag::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "descriptor_tag");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_descriptor_tag");
 	PRINT(("id:            %d\n", id()));
 	PRINT(("version:       %d\n", version()));
 	PRINT(("checksum:      %d\n", checksum()));
@@ -133,9 +144,9 @@ descriptor_tag::dump()
 	\todo Calc the CRC.
 */
 status_t 
-descriptor_tag::init_check(uint32 diskBlock)
+udf_tag::init_check(uint32 diskBlock)
 {
-	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS, "descriptor_tag");
+	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS, "udf_descriptor_tag");
 	PRINT(("diskLocation == %ld\n", diskBlock));
 	PRINT(("location() == %ld\n", location()));
 	status_t err = (diskBlock == location()) ? B_OK : B_NO_INIT;
@@ -153,44 +164,206 @@ descriptor_tag::init_check(uint32 diskBlock)
 	
 }
 
+
 //----------------------------------------------------------------------
-// primary_vd
+// udf_primary_descriptor
 //----------------------------------------------------------------------
 
 void
-primary_vd::dump()
+udf_primary_descriptor::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "primary_vd");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_primary_descriptor");
 	PRINT(("tag:\n"));
-	tag().dump();
-	PRINT(("volume_descriptor_sequence_number: %ld\n", volume_descriptor_sequence_number()));
-	PRINT(("primary_volume_descriptor_number:  %ld\n", primary_volume_descriptor_number()));
-	PRINT(("volume_identifier:                 `%s'\n", volume_identifier()));
-	PRINT(("volume_sequence_number:            %d\n", volume_sequence_number()));
-	PRINT(("max_volume_sequence_number:        %d\n", max_volume_sequence_number()));
-	PRINT(("interchange_level:                 %d\n", interchange_level()));
-	PRINT(("max_interchange_level:             %d\n", max_interchange_level()));
-	PRINT(("character_set_list:                %ld\n", character_set_list()));
-	PRINT(("max_character_set_list:            %ld\n", max_character_set_list()));
-	PRINT(("volume_set_identifier:             `%s'\n", volume_set_identifier()));
+	DUMP(tag());
+	PRINT(("vds_number:                       %ld\n", vds_number()));
+	PRINT(("primary_volume_descriptor_number: %ld\n", primary_volume_descriptor_number()));
+	PRINT(("volume_identifier:                `%s'\n", volume_identifier()));
+	PRINT(("volume_sequence_number:           %d\n", volume_sequence_number()));
+	PRINT(("max_volume_sequence_number:       %d\n", max_volume_sequence_number()));
+	PRINT(("interchange_level:                %d\n", interchange_level()));
+	PRINT(("max_interchange_level:            %d\n", max_interchange_level()));
+	PRINT(("character_set_list:               %ld\n", character_set_list()));
+	PRINT(("max_character_set_list:           %ld\n", max_character_set_list()));
+	PRINT(("volume_set_identifier:            `%s'\n", volume_set_identifier()));
 	PRINT(("descriptor_character_set:\n"));
-	descriptor_character_set().dump();
+	DUMP(descriptor_character_set());
 	PRINT(("explanatory_character_set:\n"));
-	explanatory_character_set().dump();
+	DUMP(explanatory_character_set());
 	PRINT(("volume_abstract:\n"));
-	volume_abstract().dump();
+	DUMP(volume_abstract());
 	PRINT(("volume_copyright_notice:\n"));
-	volume_copyright_notice().dump();
+	DUMP(volume_copyright_notice());
 	PRINT(("application_id:\n"));
-	application_id().dump();
+	DUMP(application_id());
 	PRINT(("recording_date_and_time:\n"));
-	recording_date_and_time().dump();
+	DUMP(recording_date_and_time());
 	PRINT(("implementation_id:\n"));
-	implementation_id().dump();
+	DUMP(implementation_id());
 	PRINT(("implementation_use:\n"));
-//	for (int i = 0; i < 64/4; i++) {
-//		SIMPLE_PRINT(("%.2x,", implementation_use()[i]));
-//		if (i % 16 == 0)
-//			SIMPLE_PRINT(("\n"));
-//	}
+	DUMP(implementation_use());
 }
+
+
+//----------------------------------------------------------------------
+// udf_anchor_volume_descriptor_pointer
+//----------------------------------------------------------------------
+
+void
+udf_anchor_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_anchor_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("main_vds:\n"));
+	DUMP(main_vds());
+	PRINT(("reserve_vds:\n"));
+	DUMP(reserve_vds());
+}
+
+
+//----------------------------------------------------------------------
+// udf_implementation_use_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_implementation_use_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_implementation_use_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("vds_number: %ld\n", vds_number()));
+	PRINT(("implementation_id:\n"));
+	DUMP(implementation_id());
+	PRINT(("implementation_use: XXX\n"));
+	DUMP(implementation_use());
+}
+
+
+//----------------------------------------------------------------------
+// udf_partition_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_partition_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_partition_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("vds_number:                %ld\n", vds_number()));
+	PRINT(("partition_flags:           %d\n", partition_flags()));
+	PRINT(("partition_flags.allocated: %s\n", allocated() ? "true" : "false"));
+	PRINT(("partition_number:          %d\n", partition_number()));
+	PRINT(("partition_contents:\n"));
+	DUMP(partition_contents());
+	PRINT(("partition_contents_use:    XXX\n"));
+	DUMP(partition_contents_use());
+	PRINT(("access_type:               %ld\n", access_type()));
+	PRINT(("start:                     %ld\n", start()));
+	PRINT(("length:                    %ld\n", length()));
+	PRINT(("implementation_id:\n"));
+	DUMP(implementation_id());
+	PRINT(("implementation_use:        XXX\n"));
+	DUMP(implementation_use());
+}
+
+//----------------------------------------------------------------------
+// udf_logical_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_logical_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_logical_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("vds_number:                %ld\n", vds_number()));
+	PRINT(("character_set:\n"));
+	DUMP(character_set());
+	PRINT(("logical_volume_identifier: `%s'\n", logical_volume_identifier()));
+	PRINT(("logical_block_size:        %ld\n", logical_block_size()));
+	PRINT(("domain_id:\n"));
+	DUMP(domain_id());
+	PRINT(("logical_volume_contents_use:\n"));
+	DUMP(logical_volume_contents_use());
+	PRINT(("file_set_address:\n"));
+	DUMP(file_set_address());
+	PRINT(("map_table_length:          %ld\n", map_table_length()));
+	PRINT(("partition_map_count:       %ld\n", partition_map_count()));
+	PRINT(("implementation_id:\n"));
+	DUMP(implementation_id());
+	PRINT(("implementation_use:\n"));
+	DUMP(implementation_use());
+	PRINT(("integrity_sequence_extent:\n"));
+	DUMP(integrity_sequence_extent());
+	// \todo dump partition_maps
+}
+
+
+//----------------------------------------------------------------------
+// udf_unallocated_space_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_unallocated_space_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_unallocated_space_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("vds_number:                  %ld\n", vds_number()));
+	PRINT(("allocation_descriptor_count: %ld\n", allocation_descriptor_count()));
+	// \todo dump alloc_descriptors
+}
+
+
+//----------------------------------------------------------------------
+// udf_terminating_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_terminating_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_terminating_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+}
+
+//----------------------------------------------------------------------
+// udf_file_set_descriptor
+//----------------------------------------------------------------------
+
+void
+udf_file_set_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_file_set_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("recording_date_and_time:\n"));
+	DUMP(recording_date_and_time());
+	PRINT(("interchange_level: %d\n", interchange_level()));
+	PRINT(("max_interchange_level: %d\n", max_interchange_level()));
+	PRINT(("character_set_list: %ld\n", character_set_list()));
+	PRINT(("max_character_set_list: %ld\n", max_character_set_list()));
+	PRINT(("file_set_number: %ld\n", file_set_number()));
+	PRINT(("file_set_descriptor_number: %ld\n", file_set_descriptor_number()));
+	PRINT(("logical_volume_id_character_set:\n"));
+	DUMP(logical_volume_id_character_set());
+	PRINT(("logical_volume_id:\n"));
+	DUMP(logical_volume_id());
+	PRINT(("file_set_charspec:\n"));
+	DUMP(file_set_charspec());
+	PRINT(("file_set_id:\n"));
+	DUMP(file_set_id());
+	PRINT(("copyright_file_id:\n"));
+	DUMP(copyright_file_id());
+	PRINT(("abstract_file_id:\n"));
+	DUMP(abstract_file_id());
+	PRINT(("root_directory_icb:\n"));
+	DUMP(root_directory_icb());
+	PRINT(("domain_id:\n"));
+	DUMP(domain_id());
+	PRINT(("next_extent:\n"));
+	DUMP(next_extent());
+	PRINT(("system_stream_directory_icb:\n"));
+	DUMP(system_stream_directory_icb());
+}
+
