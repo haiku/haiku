@@ -17,6 +17,8 @@ extern "C" {
 #endif
 
 extern void panic(const char *format, ...);
+extern void dprintf(const char *format, ...);
+
 extern status_t platform_get_boot_devices(struct stage2_args *args, struct list *devicesList);
 extern void platform_release_heap(void *base);
 extern status_t platform_init_heap(struct stage2_args *args, void **_base, void **_top);
