@@ -24,11 +24,12 @@
 /** The (physical) memory layout of the boot loader is currently as follows:
  *	  0x0500 - 0x10000	protected mode stack
  *	  0x0500 - 0x09000	real mode stack
- *	 0x10000 - ?		code
- *	0x101000			1st temporary page table (identity maps 0-4 MB)
- *	0x102000			2nd (4-8 MB)
- *	0x110000			boot loader heap (32 kB)
- *	0x118000 -			free physical memory
+ *	 0x10000 - ?		code (up to ~500 kB)
+ *	 0x91000			1st temporary page table (identity maps 0-4 MB)
+ *	 0x92000			2nd (4-8 MB)
+ *	0x100000			page directory
+ *	     ...			boot loader heap (32 kB)
+ *	     ...			free physical memory
  *
  *	The first 8 MB are identity mapped (0x0 - 0x0800000); paging is turned
  *	on. The kernel is mapped at 0x80000000, all other stuff mapped by the
@@ -64,7 +65,7 @@ static uint32 *sPageDirectory = 0;
 static uint32 *sPageTable = 0;
 	// this points to the most recently added kernel page table
 
-static addr_t sNextPhysicalAddress = 0x110000;
+static addr_t sNextPhysicalAddress = 0x100000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
@@ -218,7 +219,7 @@ get_memory_map(extended_memory **_extendedMemory)
 
 
 static void
-init_page_directory()
+init_page_directory(void)
 {
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
@@ -233,7 +234,7 @@ init_page_directory()
 	// These page tables won't be taken over into the kernel.
 
 	// make a pagetable at this random spot
-	uint32 *pgtable = (uint32 *)0x101000;
+	uint32 *pgtable = (uint32 *)0x91000;
 
 	for (int32 i = 0; i < 1024; i++) {
 		pgtable[i] = (i * 0x1000) | kDefaultPageFlags;
@@ -242,7 +243,7 @@ init_page_directory()
 	sPageDirectory[0] = (uint32)pgtable | kDefaultPageFlags;
 
 	// make another pagetable at this random spot
-	pgtable = (uint32 *)0x102000;
+	pgtable = (uint32 *)0x92000;
 
 	for (int32 i = 0; i < 1024; i++) {
 		pgtable[i] = (i * 0x1000 + 0x400000) | kDefaultPageFlags;
