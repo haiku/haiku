@@ -58,3 +58,8 @@ BinCommand unzipsfx :
 ;
 
 LinkSharedOSLibs unzipsfx : be ;
+
+{
+	MakeLocate <bin>zipgrep : $(OBOS_BIN_DIR) ;
+	Shell <bin>zipgrep : zipgrep ;
+}
