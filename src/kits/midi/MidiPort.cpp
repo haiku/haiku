@@ -29,6 +29,8 @@
 #include "MidiPort.h"
 #include "MidiGlue.h"
 
+using namespace BPrivate;
+
 //------------------------------------------------------------------------------
 
 BMidiPort::BMidiPort(const char* name)

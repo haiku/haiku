@@ -25,6 +25,8 @@
 #include "MidiGlue.h"
 #include "MidiPort.h"
 
+using namespace BPrivate;
+
 //------------------------------------------------------------------------------
 
 BMidiGlue::BMidiGlue(BMidi* midiObject_, const char* name)

@@ -29,6 +29,8 @@
 #define MAKE_TIME(t)    (t / (bigtime_t)1000)
 #define MAKE_BIGTIME(t) (t * (bigtime_t)1000)
 
+namespace BPrivate {
+
 class BMidiGlue: public BMidiLocalConsumer
 {
 public:
@@ -114,5 +116,7 @@ private:
 
 	BMidiPort* midiObject;
 };
+
+} // namespace BPrivate
 
 #endif // _MIDI_GLUE_H

@@ -4,6 +4,8 @@
 
 #include <Midi.h>
 
+namespace BPrivate { class BMidiPortGlue; }
+
 class BMidiPort : public BMidi 
 {
 public:
@@ -59,7 +61,7 @@ private:
 
 	typedef BMidi super;
 
-	friend class BMidiPortGlue;
+	friend class BPrivate::BMidiPortGlue;
 
 	virtual void _ReservedMidiPort1();
 	virtual void _ReservedMidiPort2();

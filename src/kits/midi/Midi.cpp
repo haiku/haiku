@@ -30,6 +30,8 @@
 #include "MidiGlue.h"
 #include "debug.h"
 
+using namespace BPrivate;
+
 //------------------------------------------------------------------------------
 
 status_t _run_thread(void* data)
