@@ -10,7 +10,6 @@
 #endif
 
 // OpenBeOS does not have these error codes
-#define EDESTADDRREQ B_ERROR
 #define ETOOMANYREFS B_ERROR
 
 // OpenBeOS fd_set has 'bits' instead of 'fds_bits'
