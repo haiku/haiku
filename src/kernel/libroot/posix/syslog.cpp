@@ -137,6 +137,8 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 
 	while (write_port(port, SYSLOG_MESSAGE, &message, sizeof(syslog_message) + length) == B_INTERRUPTED);
 		// make sure the message gets send (if there is a valid port)
+
+	// ToDo: if write_port() returns an error, LOG_CONS is not respected
 }
 
 
