@@ -11,7 +11,7 @@
 
 struct kernel_args;
 
-extern status_t module_init(struct kernel_args *ka, module_info **sys_module_headers);
+extern status_t module_init(struct kernel_args *args);
 extern void module_test(void);
 
 #endif	/* _KRENEL_MODULE_H */

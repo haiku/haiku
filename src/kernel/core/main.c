@@ -152,7 +152,7 @@ main2(void *unused)
 	vfs_bootstrap_all_filesystems();
 
 	TRACE(("Init modules\n"));
-	module_init(&ka, NULL);
+	module_init(&ka);
 
 	TRACE(("Init busses\n"));
 	bus_init(&ka);
