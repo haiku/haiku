@@ -333,7 +333,7 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 	offset.y = 0.0f;
 
 	if (pages == NULL) {
-		return nextBand(NULL, &offset);
+		return true;
 	}
 
 	do {
