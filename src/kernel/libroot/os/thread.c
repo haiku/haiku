@@ -41,40 +41,35 @@ thread_entry(thread_func entry, void *data)
 thread_id
 spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 {
-	return sys_spawn_thread(thread_entry, name, priority, entry, data);
+	return _kern_spawn_thread(thread_entry, name, priority, entry, data);
 }
 
 
 status_t
 kill_thread(thread_id thread)
 {
-	return sys_kill_thread(thread);
+	return _kern_kill_thread(thread);
 }
 
 
 status_t
 resume_thread(thread_id thread)
 {
-	return sys_resume_thread(thread);
+	return _kern_resume_thread(thread);
 }
 
 
 status_t
 suspend_thread(thread_id thread)
 {
-	return sys_suspend_thread(thread);
+	return _kern_suspend_thread(thread);
 }
 
 
 thread_id
 find_thread(const char *name)
 {
-	// ToDo: fix find_thread()!
-	if (!name)
-		return sys_get_current_thread_id();
-
-	printf("find_thread(): Not yet implemented!!\n");
-	return B_ERROR;
+	return _kern_find_thread(name);
 }
 
 
@@ -89,8 +84,7 @@ rename_thread(thread_id thread, const char *name)
 status_t
 set_thread_priority(thread_id thread, int32 priority)
 {
-	// ToDo: set_thread_priority not implemented
-	return B_ERROR;
+	return _kern_set_thread_priority(thread, priority);
 }
 
 
@@ -99,14 +93,14 @@ exit_thread(status_t status)
 {
 	_thread_do_exit_notification();
 
-	sys_exit(status);
+	_kern_exit(status);
 }
 
 
 status_t
-wait_for_thread(thread_id thread, status_t *thread_return_value)
+wait_for_thread(thread_id thread, status_t *_returnCode)
 {
-	return sys_wait_on_thread(thread, thread_return_value);
+	return _kern_wait_for_thread(thread, _returnCode);
 }
 
 
@@ -150,59 +144,55 @@ on_exit_thread(void (*callback)(void *), void *data)
 status_t
 _get_thread_info(thread_id thread, thread_info *info, size_t size)
 {
-	// size parameter is not yet used (but may, if the thread_info structure ever changes)
-	(void)size;
-	return sys_get_thread_info(thread, info);
+	if (info == NULL || size != sizeof(thread_info))
+		return B_BAD_VALUE;
+
+	return _kern_get_thread_info(thread, info);
 }
 
 
 status_t
 _get_next_thread_info(team_id team, int32 *cookie, thread_info *info, size_t size)
 {
-	// size parameter is not yet used (but may, if the thread_info structure ever changes)
-	(void)size;
-	return sys_get_next_thread_info(team, cookie, info);
+	if (info == NULL || size != sizeof(thread_info))
+		return B_BAD_VALUE;
+
+	return _kern_get_next_thread_info(team, cookie, info);
 }
 
-/* ToDo: Those are currently defined in syscalls.S - we need some
- * 		consistency here...
- *		send_data(), receive_data(), has_data()
 
 status_t
 send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
-	// ToDo: send_data()
-	return B_ERROR;
+	return _kern_send_data(thread, code, buffer, bufferSize);
 }
 
 
 status_t
-receive_data(thread_id *sender, void *buffer, size_t bufferSize)
+receive_data(thread_id *_sender, void *buffer, size_t bufferSize)
 {
-	// ToDo: receive_data()
-	return B_ERROR;
+	return _kern_receive_data(_sender, buffer, bufferSize);
 }
 
 
 bool
 has_data(thread_id thread)
 {
-	// ToDo: has_data()
-	return false;
+	return _kern_has_data(thread);
 }
-*/
+
 
 status_t
 snooze_etc(bigtime_t timeout, int timeBase, uint32 flags)
 {
-	return sys_snooze_etc(timeout, timeBase, flags);
+	return _kern_snooze_etc(timeout, timeBase, flags);
 }
 
 
 status_t
 snooze(bigtime_t timeout)
 {
-	return snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+	return _kern_snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
 }
 
 
