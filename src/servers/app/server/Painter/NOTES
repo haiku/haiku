@@ -1,0 +1,12 @@
+Some weirdness encountered so far:
+
+B_OP_INVERT seems to invert the dest alpha as well,
+some other modes act weird on the dest alpha channel, I guess we should not copy that behaviour
+
+B_OP_SELECT is originally behaving very strange. For BBitmp drawing, it doesn't seem to do anything, and if it does something for Stroke* and Fill* methods, it doesn't do what the BeBook says it would do. My implementation is more according to the BeBook, though for images, it is worth investigating.
+
+B_OP_ALPHA (with B_ALPHA_OVERLAY) seems to *assign* the source alpha to the dest alpha, which makes absolutely no sense at all
+
+The BView pen location appears to be integer coords, which spoils the pen location version of BView::DrawString() for rotated text.
+
+Dest alpha is actually only interesting when drawing into a BBitmap. When drawing into the frame buffer, dest alpha is logically 255, it wouldn't even need to be assigned. Maybe we could save a few CPU cycles if we adjust the DrawingMode classes accordingly. For now, the modes work as expected when drawing into a BBitmap.

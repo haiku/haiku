@@ -1,0 +1,31 @@
+Test:
+
+* "composite" alpha blending modes
+
+* BShape conversion and rendering
+
+* Bezier curve rendering
+
+
+
+Implement:
+
+* "escapment_delta" text rendering
+
+* font shearing
+
+* handling of other BBitmap colorspaces
+
+
+
+Improve:
+
+* make special case versions of some functions:
+
+- horizontal/vertical lines
+- horizonzal text rendering, using scanline cache
+
+* make special verions of DrawingModes for B_SOLID_* patterns
+
+* get rid of virtual function use in DrawingMode framework
+
