@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin sed-4.0.9 lib ;
 
-SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirCcFlags -DHAVE_CONFIG_H -w ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary sed : 
