@@ -27,7 +27,7 @@ resource(1, "BEOS:APP_VERSION") #'APPV' array
 	$"2108000023080000"
 };
 
-resource(101, "BEOS:L:STD_ICON") #'ICON' array
+resource large_icon
 {
 	$"FFFFFFFFFFFF000000000000000000000EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFF00000E0F0F0F0F0F0F0F0E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
@@ -63,7 +63,7 @@ resource(101, "BEOS:L:STD_ICON") #'ICON' array
 	$"FFFFFFFFFF0000000E0F0F0F0F0F0F0F0F0F0FFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(101, "BEOS:M:STD_ICON") #'MICN' array
+resource mini_icon
 {
 	$"FF00000000000E0F0FFFFFFFFFFFFFFF"
 	$"000F0F0F000000FFFFFFFFFFFFFFFFFF"
@@ -83,9 +83,9 @@ resource(101, "BEOS:M:STD_ICON") #'MICN' array
 	$"FFFF00000E0F0F0F0FFFFFFFFFFFFFFF"
 };
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.OpenBeOS-MOUS";
+resource app_signature "application/x-vnd.OpenBeOS-MOUS";
 
-resource(1, "BEOS:FILE_TYPES") message;
+resource file_types message;
 
 resource(601, "double_click_bmap") #'bits' array
 {
