@@ -17,6 +17,7 @@ BinCommand makeudfimage
 	  OutputFile.cpp
 	  PhysicalPartitionAllocator.cpp
 	  Shell.cpp
+	  Statistics.cpp
 	  UdfBuilder.cpp
 
 	  # Common Udf source files
