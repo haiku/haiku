@@ -79,6 +79,7 @@ Node::~Node()
 status_t
 Node::Open(void **_cookie, int mode)
 {
+	TRACE(("%p::Open()\n", this));
 	return Acquire();
 }
 
@@ -86,6 +87,7 @@ Node::Open(void **_cookie, int mode)
 status_t
 Node::Close(void *cookie)
 {
+	TRACE(("%p::Close()\n", this));
 	return Release();
 }
 
@@ -115,12 +117,14 @@ status_t
 Node::Acquire()
 {
 	fRefCount++;
+	TRACE(("%p::Acquire(), fRefCount = %ld\n", this, fRefCount));
 	return B_OK;
 }
 
 status_t 
 Node::Release()
 {
+	TRACE(("%p::Release(), fRefCount = %ld\n", this, fRefCount));
 	if (--fRefCount == 0) {
 		TRACE(("delete node: %p\n", this));
 		delete this;
@@ -383,7 +387,7 @@ mount_file_systems(stage2_args *args)
 		while (gRoot->GetNextNode(cookie, (Node **)&directory) == B_OK) {
 			char name[256];
 			if (directory->GetName(name, sizeof(name)) == B_OK)
-				printf(":: %s\n", name);
+				printf(":: %s (%p)\n", name, directory);
 
 			void *subCookie;
 			if (directory->Open(&subCookie, O_RDONLY) == B_OK) {
