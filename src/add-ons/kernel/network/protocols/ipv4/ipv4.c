@@ -38,8 +38,7 @@ static struct core_module_info *core = NULL;
 static struct protosw *proto[IPPROTO_MAX];
 static int ipforwarding = 0;
 static int ipsendredirects = 1;
-static uint16 ip_id = 0;
-static sem_id id_lock = -1;
+static uint32 ip_id = 0;
 static struct in_ifaddr *ip_ifaddr = NULL;
 static struct icmp_module_info *icmp = NULL;
 static struct ipq ipq;
@@ -1031,14 +1030,9 @@ bad:
 	goto done;
 }
 
-/* ??? - can we just use atomic_add() here? */
 uint16 get_ip_id(void)
 {
-	uint16 rv = 0;
-	acquire_sem_etc(id_lock, 1, B_CAN_INTERRUPT, 0);
-	rv = ip_id++;
-	release_sem_etc(id_lock, 1, B_CAN_INTERRUPT);
-	return rv;
+	return (uint16) atomic_add(&ip_id, 1);
 }
 
 static int ipv4_ctloutput(int op, struct socket *so, int level,
