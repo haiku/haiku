@@ -6,6 +6,7 @@ SEARCH_SOURCE += [ FDirName $(TOP) src kits storage ] ;	# DiskDeviceTypes.cpp
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName shared ] ;
 UsePrivateHeaders [ FDirName storage ] ;
+UseHeaders [ FDirName $(TOP) src tests kits storage virtualdrive ] ;
 
 SharedLibrary disk_device_manager :
 	KDiskDevice.cpp
