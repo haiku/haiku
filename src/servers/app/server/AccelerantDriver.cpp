@@ -345,7 +345,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 */
 void AccelerantDriver::HideCursor(void)
 {
-	_SetCursorHidden(true);
+//	_SetCursorHidden(true);
 }
 
 /*!
@@ -377,7 +377,7 @@ void AccelerantDriver::InvertRect(BRect r)
 */
 void AccelerantDriver::ShowCursor(void)
 {
-	_SetCursorHidden(false);
+	//_SetCursorHidden(false);
 }
 
 /*!
@@ -389,7 +389,7 @@ void AccelerantDriver::ShowCursor(void)
 */
 void AccelerantDriver::ObscureCursor(void)
 {
-	_SetCursorObscured(true);
+	//_SetCursorObscured(true);
 }
 
 /*!

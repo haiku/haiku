@@ -1,0 +1,35 @@
+SubDir OBOS_TOP src servers app server ;
+
+AddResources app_server : app_server.rsrc ;
+
+UseFreeTypeHeaders ;
+
+Server app_server :
+	# Misc. Sources
+	Angle.cpp
+	# ColorUtils will disappear as soon as I can figure out how to link the server
+	# against libopenbeos
+	ColorUtils.cc
+	ColorSet.cpp
+	Decorator.cpp
+	SystemPalette.cpp
+	RGBColor.cpp
+	RectUtils.cpp
+
+	# Operating Classes
+	AppServer.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+
+	# Font Classes
+	FontFamily.cpp
+	FontServer.cpp
+	ServerFont.cpp
+
+	# Display Modules
+	DisplayDriver.cpp
+	AccelerantDriver.cpp
+;
+LinkSharedOSLibs app_server : be root game translation 
+							   <boot!home!config!lib>libfreetype.so ;
+
