@@ -4,26 +4,17 @@
 */
 
 
-#include <boot/platform.h>
-#include <stdlib.h>
-
-#define HEAP_SIZE 32768
-
-
-extern "C" void
-platform_release_heap(void *base)
-{
-	free(base);
-}
+#include <boot/heap.h>
 
 
 extern "C" status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+heap_init(struct stage2_args *args)
 {
-	*_base = malloc(HEAP_SIZE);
-	*_top = (void *)((uint8 *)*_base + HEAP_SIZE);
-
 	return B_OK;
 }
 
 
+extern "C" void
+heap_release(void)
+{
+}
