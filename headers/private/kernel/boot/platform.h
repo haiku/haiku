@@ -30,6 +30,7 @@ extern status_t platform_free_region(void *address, size_t size);
 
 /* misc functions */
 extern bool platform_user_menu_requested(void);
+extern void platform_start_kernel(void);
 
 #ifdef __cplusplus
 }
