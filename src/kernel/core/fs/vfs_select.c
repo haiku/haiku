@@ -288,23 +288,23 @@ notify_select_event(struct selectsync *_sync, uint32 ref, uint8 event)
 //	Functions called from the POSIX layer
 
 
-int
-sys_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+ssize_t
+_kern_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask)
 {
 	return common_select(numfds, readSet, writeSet, errorSet, timeout, sigMask, true);
 }
 
 
-int
-sys_poll(struct pollfd *fds, int numfds, bigtime_t timeout)
+ssize_t
+_kern_poll(struct pollfd *fds, int numfds, bigtime_t timeout)
 {
 	return common_poll(fds, numfds, timeout, true);
 }
 
 
-int
-user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userErrorSet,
+ssize_t
+_user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userErrorSet,
 	bigtime_t timeout, const sigset_t *userSigMask)
 {
 	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
@@ -380,8 +380,8 @@ err:
 }
 
 
-int
-user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
+ssize_t
+_user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
 {
 	struct pollfd *fds;
 	size_t bytes;
