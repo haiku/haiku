@@ -615,39 +615,36 @@ port_count(port_id id)
 
 
 status_t
-read_port(port_id port, int32 *msg_code, void *msg_buffer, size_t buffer_size)
+read_port(port_id port, int32 *msgCode, void *msgBuffer, size_t bufferSize)
 {
-	return read_port_etc(port, msg_code, msg_buffer, buffer_size, 0, 0);
+	return read_port_etc(port, msgCode, msgBuffer, bufferSize, 0, 0);
 }
 
 
 status_t
-read_port_etc(port_id id, int32 *msg_code, void *msg_buffer, size_t buffer_size,
+read_port_etc(port_id id, int32 *msgCode, void *msgBuffer, size_t bufferSize,
 	uint32 flags, bigtime_t timeout)
 {
-	int		slot;
-	int 	state;
-	sem_id	cached_semid;
-	size_t 	siz;
-	int		res;
-	int		t;
-	cbuf*	msg_store;
-	int32	code;
-	int		err;
+	int slot;
+	int state;
+	sem_id cached_semid;
+	size_t size;
+	status_t status;
+	int t;
+	cbuf *msgStore;
+	int32 code;
+	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
 
-	if (ports_active == false)
+	if (ports_active == false
+		|| id < 0)
 		return B_BAD_PORT_ID;
-	if (id < 0)
-		return B_BAD_PORT_ID;
-	if (msg_code == NULL)
-		return EINVAL;
-	if ((msg_buffer == NULL) && (buffer_size > 0))
-		return EINVAL;
-	if (timeout < 0)
-		return EINVAL;
 
-	flags = flags & (PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT | B_TIMEOUT);
+	if (msgCode == NULL
+		|| (msgBuffer == NULL && bufferSize > 0)
+		|| timeout < 0)
+		return B_BAD_VALUE;
 
+	flags = flags & (B_CAN_INTERRUPT | B_TIMEOUT);
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
@@ -669,26 +666,26 @@ read_port_etc(port_id id, int32 *msg_code, void *msg_buffer, size_t buffer_size,
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), therefore
 	// sem_id is cached in local variable up here
 	
-	// get 1 entry from the queue, block if needed
-	res = acquire_sem_etc(cached_semid, 1, flags, timeout);
+	status = acquire_sem_etc(cached_semid, 1, flags, timeout);
+		// get 1 entry from the queue, block if needed
 
 	// XXX: possible race condition if port read by two threads...
 	//      both threads will read in 2 different slots allocated above, simultaneously
 	// 		slot is a thread-local variable
 
-	if (res == B_BAD_SEM_ID || res == EINTR) {
+	if (status == B_BAD_SEM_ID || status == EINTR) {
 		/* somebody deleted the port or the sem went away */
 		return B_BAD_PORT_ID;
 	}
 
-	if (res == B_TIMED_OUT) {
+	if (status == B_TIMED_OUT) {
 		// timed out, or, if timeout=0, 'would block'
 		return B_BAD_PORT_ID;
 	}
 
-	if (res != B_NO_ERROR) {
-		dprintf("write_port_etc: res unknown error %d\n", res);
-		return res;
+	if (status != B_NO_ERROR) {
+		dprintf("write_port_etc: unknown error %ld\n", status);
+		return status;
 	}
 
 	state = disable_interrupts();
@@ -702,40 +699,40 @@ read_port_etc(port_id id, int32 *msg_code, void *msg_buffer, size_t buffer_size,
 
 	ports[slot].tail = (ports[slot].tail + 1) % ports[slot].capacity;
 
-	msg_store	= ports[slot].msg_queue[t].data_cbuf;
-	code 		= ports[slot].msg_queue[t].msg_code;
-	
+	msgStore = ports[slot].msg_queue[t].data_cbuf;
+	code = ports[slot].msg_queue[t].msg_code;
+
 	// mark queue entry unused
-	ports[slot].msg_queue[t].data_cbuf	= NULL;
+	ports[slot].msg_queue[t].data_cbuf = NULL;
 
 	// check output buffer size
-	siz	= min(buffer_size, ports[slot].msg_queue[t].data_len);
-	
+	size = min(bufferSize, ports[slot].msg_queue[t].data_len);
+
 	cached_semid = ports[slot].write_sem;
 
 	RELEASE_PORT_LOCK(ports[slot]);
 	restore_interrupts(state);
 
 	// copy message
-	*msg_code = code;
-	if (siz > 0) {
-		if (flags & PORT_FLAG_USE_USER_MEMCPY) {
-			if ((err = cbuf_user_memcpy_from_chain(msg_buffer, msg_store, 0, siz) < 0))	{
+	*msgCode = code;
+	if (size > 0) {
+		if (userCopy) {
+			if ((status = cbuf_user_memcpy_from_chain(msgBuffer, msgStore, 0, size) < B_OK)) {
 				// leave the port intact, for other threads that might not crash
-				cbuf_free_chain(msg_store);
+				cbuf_free_chain(msgStore);
 				release_sem(cached_semid); 
-				return err;
+				return status;
 			}
 		} else
-			cbuf_memcpy_from_chain(msg_buffer, msg_store, 0, siz);
+			cbuf_memcpy_from_chain(msgBuffer, msgStore, 0, size);
 	}
 	// free the cbuf
-	cbuf_free_chain(msg_store);
+	cbuf_free_chain(msgStore);
 
 	// make one spot in queue available again for write
 	release_sem(cached_semid);
 
-	return siz;
+	return size;
 }
 
 
@@ -744,10 +741,9 @@ set_port_owner(port_id id, team_id team)
 {
 	int slot;
 	int state;
-	
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-	if (id < 0)
+
+	if (ports_active == false
+		|| id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -774,37 +770,34 @@ set_port_owner(port_id id, team_id team)
 
 
 status_t
-write_port(port_id id, int32 msg_code, const void *msg_buffer, size_t buffer_size)
+write_port(port_id id, int32 msgCode, const void *msgBuffer, size_t bufferSize)
 {
-	return write_port_etc(id, msg_code, msg_buffer, buffer_size, 0, 0);
+	return write_port_etc(id, msgCode, msgBuffer, bufferSize, 0, 0);
 }
 
 
 status_t
-write_port_etc(port_id id, int32 msg_code, const void *msg_buffer,
-	size_t buffer_size, uint32 flags, bigtime_t timeout)
+write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
+	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
 	int slot;
 	int state;
-	int res;
+	status_t status;
 	sem_id cached_semid;
 	int h;
-	cbuf* msg_store;
+	cbuf *msgStore;
 	int32 c1, c2;
-	int err;
-	
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-	if (id < 0)
+	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
+
+	if (ports_active == false
+		|| id < 0)
 		return B_BAD_PORT_ID;
 
-	// mask irrelevant flags
-	flags = flags & (PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT | B_TIMEOUT);
-
+	// mask irrelevant flags (for acquire_sem() usage)
+	flags = flags & (B_CAN_INTERRUPT | B_TIMEOUT);
 	slot = id % MAX_PORTS;
-	
-	// check buffer_size
-	if (buffer_size > PORT_MAX_MESSAGE_SIZE)
+
+	if (bufferSize > PORT_MAX_MESSAGE_SIZE)
 		return EINVAL;
 
 	state = disable_interrupts();
@@ -833,45 +826,44 @@ write_port_etc(port_id id, int32 msg_code, const void *msg_buffer,
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), 
 	// and queue is full therefore sem_id is cached in local variable up here
 	
-	// get 1 entry from the queue, block if needed
-	// assumes flags
-	res = acquire_sem_etc(cached_semid, 1,
-						flags & (B_TIMEOUT | B_CAN_INTERRUPT), timeout);
+	status = acquire_sem_etc(cached_semid, 1, flags, timeout);
+		// get 1 entry from the queue, block if needed
 
 	// XXX: possible race condition if port written by two threads...
 	//      both threads will write in 2 different slots allocated above, simultaneously
 	// 		slot is a thread-local variable
 
-	if (res == B_BAD_PORT_ID || res == EINTR) {
+	if (status == B_BAD_PORT_ID || status == B_INTERRUPTED) {
 		/* somebody deleted the port or the sem while we were waiting */
 		return B_BAD_PORT_ID;
 	}
 
-	if (res == B_TIMED_OUT) {
-		// timed out, or, if timeout=0, 'would block'
+	if (status == B_TIMED_OUT) {
+		// timed out, or, if timeout = 0, 'would block'
 		return B_TIMED_OUT;
 	}
 
-	if (res != B_NO_ERROR) {
-		dprintf("write_port_etc: res unknown error %d\n", res);
-		return res;
+	if (status != B_NO_ERROR) {
+		dprintf("write_port_etc: unknown error %ld\n", status);
+		return status;
 	}
 
-	if (buffer_size > 0) {
-		msg_store = cbuf_get_chain(buffer_size);
-		if (msg_store == NULL)
-			return ENOMEM;
-		if (flags & PORT_FLAG_USE_USER_MEMCPY) {
+	if (bufferSize > 0) {
+		msgStore = cbuf_get_chain(bufferSize);
+		if (msgStore == NULL)
+			return B_NO_MEMORY;
+
+		if (userCopy) {
 			// copy from user memory
-			if ((err = cbuf_user_memcpy_to_chain(msg_store, 0, msg_buffer, buffer_size)) < 0)
-				return err; // memory exception
-		} else
+			if ((status = cbuf_user_memcpy_to_chain(msgStore, 0, msgBuffer, bufferSize)) < B_OK)
+				return status;
+		} else {
 			// copy from kernel memory
-			if ((err = cbuf_memcpy_to_chain(msg_store, 0, msg_buffer, buffer_size)) < 0)
-				return err; // memory exception
-	} else {
-		msg_store = NULL;
-	}
+			if ((status = cbuf_memcpy_to_chain(msgStore, 0, msgBuffer, bufferSize)) < 0)
+				return status;
+		}
+	} else
+		msgStore = NULL;
 
 	// attach copied message to queue
 	state = disable_interrupts();
@@ -882,9 +874,10 @@ write_port_etc(port_id id, int32 msg_code, const void *msg_buffer,
 		panic("port %ld: head < 0", ports[slot].id);
 	if (h >= ports[slot].capacity)
 		panic("port %ld: head > cap %ld", ports[slot].id, ports[slot].capacity);
-	ports[slot].msg_queue[h].msg_code	= msg_code;
-	ports[slot].msg_queue[h].data_cbuf	= msg_store;
-	ports[slot].msg_queue[h].data_len	= buffer_size;
+
+	ports[slot].msg_queue[h].msg_code	= msgCode;
+	ports[slot].msg_queue[h].data_cbuf	= msgStore;
+	ports[slot].msg_queue[h].data_len	= bufferSize;
 	ports[slot].head = (ports[slot].head + 1) % ports[slot].capacity;
 	ports[slot].total_count++;
 
@@ -894,6 +887,7 @@ write_port_etc(port_id id, int32 msg_code, const void *msg_buffer,
 	RELEASE_PORT_LOCK(ports[slot]);
 	restore_interrupts(state);
 
+	// ToDo: what is this needed for?
 	get_sem_count(ports[slot].read_sem, &c1);
 	get_sem_count(ports[slot].write_sem, &c2);
 
