@@ -11,6 +11,7 @@ struct stream_info
 {
 	status_t		status;
 	void *			cookie;
+	bool			hasCookie;
 	void *			infoBuffer;
 	int32			infoBufferSize;
 	media_format	encodedFormat;
