@@ -36,5 +36,16 @@ int main()
 	printf("BSoundPlayer sizeof = %ld\n",sizeof(BSoundPlayer ));
 	printf("BTimedEventQueue sizeof = %ld\n",sizeof(BTimedEventQueue));
 	printf("BTimeSource sizeof = %ld\n",sizeof(BTimeSource));
+	printf("media_node sizeof = %ld\n",sizeof(media_node));
+	printf("media_input sizeof = %ld\n",sizeof(media_input));
+	printf("media_output sizeof = %ld\n",sizeof(media_output));
+	printf("live_node_info sizeof = %ld\n",sizeof(live_node_info));
+	printf("media_request_info sizeof = %ld\n",sizeof(media_request_info));
+	printf("media_destination sizeof = %ld\n",sizeof(media_destination));
+	printf("media_source sizeof = %ld\n",sizeof(media_source));
+	printf("dormant_node_info sizeof = %ld\n",sizeof(dormant_node_info));
+	printf("flavor_info sizeof = %ld\n",sizeof(flavor_info));
+	printf("dormant_flavor_info sizeof = %ld\n",sizeof(dormant_flavor_info));
+	printf("media_format sizeof = %ld\n",sizeof(media_format));
 	return 0;
 }
