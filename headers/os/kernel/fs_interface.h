@@ -70,7 +70,7 @@ struct fs_calls {
 
 	status_t (*link)(fs_volume fs, fs_vnode dir, const char *name, fs_vnode vnode);
 	status_t (*unlink)(fs_volume fs, fs_vnode dir, const char *name);
-	status_t (*rename)(fs_volume fs, fs_vnode oldDir, const char *oldName, fs_vnode newDir, const char *newName);
+	status_t (*rename)(fs_volume fs, fs_vnode fromDir, const char *fromName, fs_vnode toDir, const char *toName);
 
 	status_t (*access)(fs_volume fs, fs_vnode vnode, int mode);
 	status_t (*read_stat)(fs_volume fs, fs_vnode vnode, struct stat *stat);
@@ -112,7 +112,7 @@ struct fs_calls {
 
 	status_t (*read_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, struct stat *stat);
 	status_t (*write_attr_stat)(fs_volume fs, fs_vnode file, fs_cookie cookie, const struct stat *stat, int statMask);
-	status_t (*rename_attr)(fs_volume fs, fs_vnode file, const char *oldName, const char *newName);
+	status_t (*rename_attr)(fs_volume fs, fs_vnode fromFile, const char *fromName, fs_vnode toFile, const char *toName);
 	status_t (*remove_attr)(fs_volume fs, fs_vnode file, const char *name);
 
 	/* index directory & index operations */
