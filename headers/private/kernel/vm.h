@@ -1,17 +1,15 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_VM_H
 #define _KERNEL_VM_H
 
 
 #include <kernel.h>
-#include <defines.h>
-#include <vfs.h>
 #include <vm_types.h>
 #include <arch/vm_translation_map.h>
 
@@ -62,7 +60,7 @@ area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address
 area_id vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	uint32 protection, uint32 mapping, area_id sourceArea);
 status_t vm_delete_area(aspace_id aid, area_id id);
-status_t vm_create_vnode_cache(void *vnode, void **_cache);
+status_t vm_create_vnode_cache(void *vnode, vm_cache_ref **_cacheRef);
 
 status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
 status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags);
