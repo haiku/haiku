@@ -2,7 +2,7 @@
 	#include "MenuApp.h"
 	
 	ColorWindow::ColorWindow()
-		: BWindow(BRect(150,150,350,200), "Menu Color Schene", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+		: BWindow(BRect(150,150,350,200), "Menu Color Scheme", B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 	{
 		// Set and collect the variables for revert
 		get_menu_info(&info);

@@ -90,7 +90,7 @@
 		alwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
 
 		clickToOpenItem->SetMarked(info.click_to_open);
-		alwaysShowTriggersItem->SetEnabled(!info.click_to_open);
+		alwaysShowTriggersItem->SetEnabled(info.click_to_open);
 		
 		get_key_map(&keys, &chars); 
         

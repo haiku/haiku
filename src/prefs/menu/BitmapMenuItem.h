@@ -16,7 +16,7 @@ class BitmapMenuItem : public BMenuItem
 public:
 					BitmapMenuItem(const char* name, BMessage* message, BBitmap* bmp,
 								   char shortcut = 0, uint32 modifiers = 0);
-virtual void		Draw(void);
+virtual void		DrawContent(void);
 	
 private:
 	BBitmap 			*fBmp;
