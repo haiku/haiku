@@ -1,8 +1,9 @@
 /* 
- * Copyright 2003-2004,
- * Stefano Ceccherini (burton666@libero.it).
- * Carwyn Jones (turok2@currantbun.com)
- * All rights reserved.
+ * Copyright 2003-2004, Haiku Inc.
+ * Authors:
+ *		Stefano Ceccherini (burton666@libero.it).
+ *		Carwyn Jones (turok2@currantbun.com)
+ * 
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,10 +24,10 @@ struct dw_sync_data
 };
 
 
-// TODO: This commands are used by the BeOS R5 app_server.
+// TODO: These commands are used by the BeOS R5 app_server.
 // Change this when our app_server supports BDirectWindow
-#define DW_GET_SYNC_DATA 0x880
-#define DW_SET_FULLSCREEN 0x881
+#define DW_GET_SYNC_DATA		0x880
+#define DW_SET_FULLSCREEN		0x881
 #define DW_SUPPORTS_WINDOW_MODE 0xF2C
 
 
@@ -35,9 +36,9 @@ struct dw_sync_data
 #define DW_NEEDS_LOCKING 0
 
 enum dw_status_bits {
-	DW_STATUS_AREA_CLONED = 0x01,
-	DW_STATUS_THREAD_STARTED = 0x02,
-	DW_STATUS_SEM_CREATED =0x04
+	DW_STATUS_AREA_CLONED	 = 0x1,
+	DW_STATUS_THREAD_STARTED = 0x2,
+	DW_STATUS_SEM_CREATED	 = 0x4
 };
 
 
@@ -284,7 +285,7 @@ BDirectWindow::SetFullScreen(bool enable)
 	if (Lock()) {
 		a_session->swrite_l(DW_SET_FULLSCREEN);
 		a_session->swrite_l(server_token);
-		a_session->swrite_l(enable);
+		a_session->swrite_l((int32)enable);
 		Flush();
 
 		status_t fullScreen;
@@ -360,6 +361,14 @@ BDirectWindow::DirectDeamonFunc(void *arg)
 }
 
 
+// LockDirect() and UnlockDirect() are no-op on R5. I tried to call (R5's) LockDirect()
+// repeatedly, from the same thread and from different threads, nothing happened.
+// I implemented them anyway, as they were the first methods I wrote
+// in this class (As you can see, I even needed to cast away their constness
+// to make them do something useful). 
+// They're not needed though, as the direct_deamon_thread doesn't change
+// any shared data. They are probably here for future enhancements (see also the 
+// comment in DriverSetup()
 bool
 BDirectWindow::LockDirect() const
 {
@@ -494,11 +503,11 @@ BDirectWindow::DisposeData()
 status_t
 BDirectWindow::DriverSetup() const
 {
-	// XXX :Unimplemented in R5.
+	// Unimplemented in R5.
 	// This function is probably here because they wanted, in a future time,
 	// to implement graphic acceleration within BDirectWindow
 	// (in fact, there is also a BDirectDriver member in BDirectWindow,
-	// though it's not used, and the Lock/UnlockDirect functions are not used either).
+	// though it's not used).
 
 	return B_OK;
 }
