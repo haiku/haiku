@@ -334,9 +334,9 @@ ConfigurationWindow::InitWindow(void)
 					char value[50];
 					sprintf(value, "%d", j);
 					BMenuItem *item = new BMenuItem(value, new BMessage(DMA_CHANGED));
-					fDMAMenu[k++]->AddItem(item);
+					fDMAMenu[k]->AddItem(item);
 					item->SetMarked(true);
-					fDMAField[k]->SetEnabled(true);
+					fDMAField[k++]->SetEnabled(true);
 				}
 		}
 	}

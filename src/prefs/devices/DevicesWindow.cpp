@@ -422,7 +422,7 @@ DevicesWindow::UpdateDeviceInfo()
 					for (;mask;mask>>=1,i++)
 						if (mask & 1) {
 							char value[50];
-							sprintf(value, "%s%d", first ? "" : ",", i);
+							sprintf(value, "%s%d", first ? "" : ", ", i);
 							text += value;
 							first = false;
 						}
@@ -446,7 +446,7 @@ DevicesWindow::UpdateDeviceInfo()
 					for (;mask;mask>>=1,i++)
 						if (mask & 1) {
 							char value[50];
-							sprintf(value, "%s%d", first ? "" : ",", i);
+							sprintf(value, "%s%d", first ? "" : ", ", i);
 							text += value;
 							first = false;
 						}
