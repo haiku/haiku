@@ -1,8 +1,15 @@
 SubDir OBOS_TOP src apps bin grep-2.5 src ;
 
-SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
-BinCommand grep : dfa.c grep.c grepmat.c kwset.c search.c : libgreputils.a ;
+BinCommand grep : 
+	dfa.c 
+	grep.c 
+	grepmat.c 
+	kwset.c 
+	search.c 
+	: libgreputils.a 
+	: grep.rdef ;
 
