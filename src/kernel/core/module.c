@@ -206,8 +206,12 @@ load_module_image(const char *path, module_image **_moduleImage)
 {
 	module_image *moduleImage;
 	status_t status;
+	image_id image;
 
-	image_id image = elf_load_kspace(path, "");
+	TRACE(("load_module_image(path = \"%s\", _image = %p)\n", path, _moduleImage));
+	ASSERT(_moduleImage != NULL);
+
+	image = elf_load_kspace(path, "");
 	if (image < 0) {
 		dprintf("load_module_image failed: %s\n", strerror(image));
 		return image;
@@ -295,7 +299,11 @@ put_module_image(module_image *image)
 static status_t
 get_module_image(const char *path, module_image **_image)
 {
-	struct module_image *image = (module_image *)hash_lookup(gModuleImagesHash, path);
+	struct module_image *image;
+
+	TRACE(("get_module_image(path = \"%s\", _image = %p)\n", path, _image));
+
+	image = (module_image *)hash_lookup(gModuleImagesHash, path);
 	if (image == NULL) {
 		status_t status = load_module_image(path, &image);
 		if (status < B_OK)
@@ -318,6 +326,9 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 {
 	module *module;
 
+	TRACE(("create_module(info = %p, file = \"%s\", offset = %d, _module = %p)\n",
+		info, file, offset, _module));
+
 	if (!info->name)
 		return B_BAD_VALUE;
 
@@ -327,10 +338,10 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 		return B_FILE_EXISTS;
 	}
 
-	if ((module = (struct module *)malloc(sizeof(module))) == NULL)
+	if ((module = (struct module *)malloc(sizeof(struct module))) == NULL)
 		return B_NO_MEMORY;
 
-	TRACE(("create_module(%s, %s)\n", info->name, file));
+	TRACE(("create_module: name = \"%s\", file = \"%s\"\n", info->name, file));
 
 	module->module_image = NULL;
 	module->name = strdup(info->name);
@@ -381,6 +392,7 @@ check_module_image(const char *path, const char *searchedName)
 	module_info **info;
 	int index = 0, match = B_ENTRY_NOT_FOUND;
 
+	TRACE(("check_module_image(path = \"%s\", searchedName = \"%s\")\n", path, searchedName));
 	ASSERT(hash_lookup(gModuleImagesHash, path) == NULL);
 
 	if (load_module_image(path, &image) < B_OK)
@@ -398,7 +410,7 @@ check_module_image(const char *path, const char *searchedName)
 	// The module we looked for couldn't be found, so we can unload the
 	// loaded module at this point
 	if (match != B_OK) {
-		TRACE(("check_module_file: unloading module file %s\n", path));
+		TRACE(("check_module_file: unloading module file \"%s\" (not used yet)\n", path));
 		unload_module_image(image, path);
 	}
 
@@ -417,8 +429,9 @@ static status_t
 recurse_directory(const char *path, const char *searchedName)
 {
 	status_t status;
+
 	DIR *dir = opendir(path);
-	if (dir == NULL);
+	if (dir == NULL)
 		return errno;
 
 	errno = 0;
@@ -518,7 +531,6 @@ search_module(const char *name)
 static inline status_t
 init_module(module *module)
 {
-		
 	switch (module->state) {
 		case MODULE_QUERIED:
 		case MODULE_LOADED:
@@ -751,6 +763,33 @@ nextModuleImage:
 }
 
 
+static int
+dump_modules(int argc, char **argv)
+{
+	hash_iterator iterator;
+	struct module_image *image;
+	struct module *module;
+
+	hash_rewind(gModulesHash, &iterator);
+	dprintf("-- known modules:\n");
+
+	while ((module = (struct module *)hash_next(gModulesHash, &iterator)) != NULL) {
+		dprintf("%p: \"%s\", \"%s\" (%d), refcount = %ld, state = %d, mimage = %p\n",
+			module, module->name, module->file, module->offset, module->ref_count,
+			module->state, module->module_image);
+	}
+
+	hash_rewind(gModuleImagesHash, &iterator);
+	dprintf("\n-- loaded modules:\n");
+	
+	while ((image = (struct module_image *)hash_next(gModuleImagesHash, &iterator)) != NULL) {
+		dprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
+			image->path, image->image, image->info, image->ref_count,
+			image->keep_loaded ? "keep loaded" : "can be unloaded");
+	}
+}
+
+
 //	#pragma mark -
 //	Exported Kernel API (private part)
 
@@ -778,7 +817,9 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 		if (register_module_image("", "(built-in)", 0, sys_module_headers) == NULL)
 			return ENOMEM;
 	}
-*/	
+*/
+
+	add_debugger_command("modules", &dump_modules, "list all known & loaded modules");
 
 	return B_OK;
 }
@@ -991,6 +1032,7 @@ get_module(const char *path, module_info **_info)
 	status_t status;
 
 	TRACE(("get_module(%s)\n", path));
+
 	if (path == NULL)
 		return B_BAD_VALUE;
 
@@ -1009,7 +1051,7 @@ get_module(const char *path, module_info **_info)
 
 	/* We now need to find the module_image for the module. This should
 	 * be in memory if we have just run search_modules, but may not be
-	 * if we are used cached information.
+	 * if we are using cached information.
 	 * We can't use the module->module_image pointer, because it is not
 	 * reliable at this point (it won't be set to NULL when the module_image
 	 * is unloaded).
