@@ -971,24 +971,24 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			data = (byte >> shift);
 			data <<= 1;
 			data2 = *((uint16*)(&(rom[(adress + data)])));
-			LOG(8,("checking if cmd $39 should first be executed... "));
+			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
+				index, reg, and_out, shift));
+			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
+				size32));
+			LOG(8,("INFO: (cont.) RD table-index ($%02x) for cmd $39'\n",
+				offset32));
 			if (offset32 < 0x80)
 			{
-				LOG(8,("table index is positive: YES\n"));
 				LOG(8,("INFO: Do subcmd ($39); "));
 				exec_cmd_39_type2(rom, offset32, tabs, &exec);
 				LOG(8,("INFO: ---Doubling PLL frequency to be set for cmd $34.\n"));
 				data2 <<= 1;
 			}
 			else
-				LOG(8,("table index is negative: NO\n"));
-			LOG(8,("INFO: (exec $34) cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
-				index, reg, and_out, shift));
-			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
-				size32));
-			LOG(8,("INFO: (cont.) RD table-index ($%02x) to use for cmd $39 NOW if appropriate (see above),\n",
-				offset32));
-			LOG(8,("INFO: (cont.) then calc and set PLL 32bit reg $%08x for %.3fMHz if exec still on'\n",
+			{
+				LOG(8,("INFO: table index is negative, not executing subcmd ($39).\n"));
+			}
+			LOG(8,("INFO: (cont. cmd $34) 'calc and set PLL 32bit reg $%08x for %.3fMHz'\n",
 				reg2, (data2 / 100.0)));
 			if (exec && reg2)
 			{
