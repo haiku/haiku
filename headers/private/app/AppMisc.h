@@ -27,6 +27,7 @@
 #ifndef _APP_MISC_H
 #define _APP_MISC_H
 
+#include <Handler.h>
 #include <OS.h>
 #include <SupportDefs.h>
 
@@ -41,5 +42,15 @@ team_id current_team();
 thread_id main_thread_for(team_id team);
 
 } // namespace BPrivate
+
+// _get_object_token_
+/*!	Return the token of a BHandler.
+
+	\param handler The BHandler.
+	\return the token.
+
+*/
+inline int32 _get_object_token_(const BHandler* object)
+	{ return object->fToken; }
 
 #endif	// _APP_MISC_H

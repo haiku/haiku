@@ -45,6 +45,8 @@
 #include <Roster.h>
 
 // Project Includes ------------------------------------------------------------
+#include <AppMisc.h>
+#include <MessageUtils.h>
 #include "TokenSpace.h"
 
 // Local Includes --------------------------------------------------------------
@@ -59,51 +61,6 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
-// _get_object_token_
-/*!	Return the token of a BHandler.
-
-	\param handler The BHandler.
-	\return the token.
-
-	\todo Think about a better place for this function.
-*/
-inline
-int32
-_get_object_token_(const BHandler* handler)
-{
-	return handler->fToken;
-}
-
-// _set_message_target_
-/*!	\brief Sets the target of a message.
-
-	\param message The message.
-	\param token The target handler token.
-	\param preferred Indicates whether to use the looper's preferred handler.
-*/
-inline
-void
-_set_message_target_(BMessage *message, int32 token, bool preferred)
-{
-	message->fTarget = token;
-	message->fPreferred = preferred;
-}
-
-// _set_message_reply_
-/*!	\brief Sets a message's reply target.
-
-	\param message The message.
-	\param messenger The reply messenger.
-*/
-inline
-void
-_set_message_reply_(BMessage *message, BMessenger messenger)
-{
-	message->fReplyTo.port = messenger.fPort;
-	message->fReplyTo.target = messenger.fHandlerToken;
-	message->fReplyTo.team = messenger.fTeam;
-	message->fReplyTo.preferred = messenger.fPreferredTarget;
-}
 
 // constructor
 /*!	\brief Creates an unitialized BMessenger.

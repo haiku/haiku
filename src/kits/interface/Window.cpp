@@ -31,6 +31,7 @@
 #include <BeBuild.h>
 
 // Project Includes ------------------------------------------------------------
+#include <AppMisc.h>
 #include <InterfaceDefs.h>
 #include <Application.h>
 #include <Looper.h>
