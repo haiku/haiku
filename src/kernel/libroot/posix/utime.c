@@ -5,6 +5,7 @@
 
 
 #include <utime.h>
+#include <time.h>
 #include <errno.h>
 #include <syscalls.h>
 
@@ -18,13 +19,17 @@
 
 
 int
-utime(const char *path, const struct utimbuf *buffer)
+utime(const char *path, const struct utimbuf *times)
 {
 	struct stat stat;
 	status_t status;
 
-	stat.st_atime = buffer->actime;
-	stat.st_mtime = buffer->modtime;
+	if (times != NULL) {
+		stat.st_atime = times->actime;
+		stat.st_mtime = times->modtime;
+	} else
+		stat.st_atime = stat.st_mtime = time(NULL);
+
 	status = sys_write_path_stat(path, false, &stat, FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
 
 	RETURN_AND_SET_ERRNO(status);
