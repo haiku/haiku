@@ -387,6 +387,12 @@ OpenDMLFile::IsAudio(int stream_index)
 	return fStreamData[stream_index].info->is_audio;
 }
 
+const avi_main_header *
+OpenDMLFile::AviMainHeader()
+{
+	return fParser->AviMainHeader();
+}
+
 const wave_format_ex *
 OpenDMLFile::AudioFormat(int stream_index)
 {

@@ -25,11 +25,17 @@ struct avi_cookie
 
 	bool	audio;
 	
+	int64	frame_count;
+	bigtime_t duration;
+	media_format format;
+	
 	int64	byte_pos;
 	uint32	bytes_per_sec_rate;
 	uint32	bytes_per_sec_scale;
 
 	uint32	frame_pos;
+	uint32	usec_per_frame;
+	uint32	line_count;
 };
 
 
@@ -108,38 +114,15 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	cookie->buffer = 0;
 	cookie->buffer_size = 0;
 
-	return B_OK;
-}
-
-status_t
-aviReader::FreeCookie(void *_cookie)
-{
-	avi_cookie *cookie = (avi_cookie *)_cookie;
-
-	delete [] cookie->buffer;
-
-	delete cookie;
-	return B_OK;
-}
-
-
-status_t
-aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, void **infoBuffer, int32 *infoSize)
-{
-	avi_cookie *cookie = (avi_cookie *)_cookie;
-
-	*duration = fFile->Duration();
-	*infoBuffer = 0;
-	*infoSize = 0;
-
 	BMediaFormats formats;
+	media_format *format = &cookie->format;
 	media_format_description description;
 	
 	const avi_stream_header *stream_header;
 	stream_header = fFile->StreamFormat(cookie->stream);
 	if (!stream_header) {
 		TRACE("aviReader::GetStreamInfo: stream %d has no header\n", cookie->stream);
+		delete cookie;
 		return B_ERROR;
 	}
 
@@ -147,13 +130,16 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 		const wave_format_ex *audio_format = fFile->AudioFormat(cookie->stream);
 		if (!audio_format) {
 			TRACE("aviReader::GetStreamInfo: audio stream %d has no format\n", cookie->stream);
+			delete cookie;
 			return B_ERROR;
 		}
 		
 		if (audio_format->format_tag == 0x0001) // PCM
-			*frameCount = stream_header->length / ((stream_header->sample_size + 7) / 8);
+			cookie->frame_count = stream_header->length / ((stream_header->sample_size + 7) / 8);
 		else // not PCM
-			*frameCount = (stream_header->length * audio_format->frames_per_sec) / (stream_header->sample_size * audio_format->avg_bytes_per_sec);
+			cookie->frame_count = (stream_header->length * audio_format->frames_per_sec) / (stream_header->sample_size * audio_format->avg_bytes_per_sec);
+
+		cookie->duration = fFile->Duration();
 		
 		cookie->audio = true;
 		cookie->byte_pos = 0;
@@ -200,26 +186,72 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 		const bitmap_info_header *video_format = fFile->VideoFormat(cookie->stream);
 		if (!video_format) {
 			TRACE("aviReader::GetStreamInfo: video stream %d has no format\n", cookie->stream);
+			delete cookie;
 			return B_ERROR;
 		}
 		
-		*frameCount = fFile->FrameCount();
-		*duration = fFile->Duration();
+		cookie->frame_count = fFile->FrameCount();
+		cookie->duration = fFile->Duration();
 
 		cookie->audio = false;
 		cookie->frame_pos = 0;
+		cookie->usec_per_frame = fFile->AviMainHeader()->micro_sec_per_frame;
+		cookie->line_count = fFile->AviMainHeader()->height;
 
 		description.family = B_AVI_FORMAT_FAMILY;
-		description.u.avi.codec = 0;
+		description.u.avi.codec = stream_header->fourcc_handler;
 		if (B_OK != formats.GetFormatFor(description, format)) 
 			format->type = B_MEDIA_ENCODED_VIDEO;
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		strncpy((char*)format->user_data, "DivX", 4);
+		*(uint32 *)format->user_data = stream_header->fourcc_handler; format->user_data[4] = 0;
+		
+		format->u.encoded_video.output.field_rate = 1000000.0 / cookie->usec_per_frame;
+		format->u.encoded_video.output.interlace = 1; // 1: progressive
+		format->u.encoded_video.output.first_active = 0;
+		format->u.encoded_video.output.last_active = cookie->line_count - 1;
+		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+		format->u.encoded_video.output.pixel_width_aspect = 1;
+		format->u.encoded_video.output.pixel_height_aspect = 1;
+		// format->u.encoded_video.output.display.format = 0;
+		format->u.encoded_video.output.display.line_width = fFile->AviMainHeader()->width;
+		format->u.encoded_video.output.display.line_count = cookie->line_count;
+		format->u.encoded_video.output.display.bytes_per_row = 0; // format->u.encoded_video.output.display.line_width * 4;
+		format->u.encoded_video.output.display.pixel_offset = 0;
+		format->u.encoded_video.output.display.line_offset = 0;
+		format->u.encoded_video.output.display.flags = 0;
 
 		return B_OK;
 	}
 
+	delete cookie;
 	return B_ERROR;
+}
+
+
+status_t
+aviReader::FreeCookie(void *_cookie)
+{
+	avi_cookie *cookie = (avi_cookie *)_cookie;
+
+	delete [] cookie->buffer;
+
+	delete cookie;
+	return B_OK;
+}
+
+
+status_t
+aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
+						 media_format *format, void **infoBuffer, int32 *infoSize)
+{
+	avi_cookie *cookie = (avi_cookie *)_cookie;
+
+	*frameCount = cookie->frame_count;
+	*duration = cookie->duration;
+	*format = cookie->format;
+	*infoBuffer = 0;
+	*infoSize = 0;
+	return B_OK;
 }
 
 
@@ -252,9 +284,17 @@ aviReader::GetNextChunk(void *_cookie,
 	
 	if (cookie->audio) {
 		mediaHeader->start_time = (cookie->byte_pos * 1000000ULL * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
+		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
+		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		
 		cookie->byte_pos += size;
 	} else {
+		mediaHeader->start_time = cookie->frame_pos * cookie->usec_per_frame;
+		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
+		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+		mediaHeader->u.encoded_video.first_active_line = 0;
+		mediaHeader->u.encoded_video.line_count = cookie->line_count;
+	
 		cookie->frame_pos += 1;
 	}
 	

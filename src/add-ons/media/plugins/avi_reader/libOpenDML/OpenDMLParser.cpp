@@ -481,7 +481,7 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 
 		fCurrentStream->video_format_valid = true;
 
-		TRACE("audio_format:\n");
+		TRACE("video_format:\n");
 		TRACE("size             = %lu\n", fCurrentStream->video_format.size);
 		TRACE("width            = %lu\n", fCurrentStream->video_format.width);
 		TRACE("height           = %lu\n", fCurrentStream->video_format.height);

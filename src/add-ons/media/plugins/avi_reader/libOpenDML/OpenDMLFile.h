@@ -19,6 +19,8 @@ public:
 	bool		IsVideo(int stream_index);
 	bool		IsAudio(int stream_index);
 
+	const avi_main_header *AviMainHeader();
+
 	const wave_format_ex *		AudioFormat(int stream_index);
 	const bitmap_info_header *	VideoFormat(int stream_index);
 	const avi_stream_header *	StreamFormat(int stream_index);
