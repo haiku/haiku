@@ -30,6 +30,7 @@ INTERFACE_KIT_SOURCE =
 	Point.cpp
 	Polygon.cpp
 	PopUpMenu.cpp
+	#PrintJob.cpp
 	PrivateScreen.cpp
 	RadioButton.cpp
 	Rect.cpp
