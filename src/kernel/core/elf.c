@@ -55,6 +55,7 @@ static hash_table *sImagesHash;
 static struct elf_image_info *sKernelImage = NULL;
 static mutex sImageMutex;
 static mutex sImageLoadMutex;
+static bool sInitialized = false;
 
 
 /** calculates hash for an image using its ID */
@@ -893,6 +894,9 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 
 	TRACE(("looking up %p\n", (void *)address));
 
+	if (!sInitialized)
+		return B_ERROR;
+
 	mutex_lock(&sImageMutex);
 
 	image = find_image_at_address(address);
@@ -1457,6 +1461,8 @@ elf_init(kernel_args *ka)
 	add_debugger_command("ls", &dump_address_info, "lookup symbol for a particular address");
 	add_debugger_command("symbols", &dump_symbols, "dump symbols for image");
 	add_debugger_command("image", &dump_image, "dump image info");
+
+	sInitialized = true;
 	return B_OK;
 }
 
