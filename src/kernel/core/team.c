@@ -12,7 +12,7 @@
 
 #include <team.h>
 #include <int.h>
-#include <khash.h>
+#include <util/khash.h>
 #include <port.h>
 #include <sem.h>
 #include <user_runtime.h>

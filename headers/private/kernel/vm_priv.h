@@ -1,15 +1,15 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, The Haiku Team. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_VM_PRIV_H
 #define _KERNEL_VM_PRIV_H
 
 #include <vm.h>
-#include <khash.h>
+#include <util/khash.h>
 
 /* should make these scale with the system */
 #define DEFAULT_KERNEL_WORKING_SET  1024

@@ -12,18 +12,18 @@
 
 #include <thread.h>
 #include <team.h>
-#include <khash.h>
 #include <int.h>
 #include <smp.h>
 #include <cpu.h>
 #include <arch/vm.h>
-#include <user_runtime.h>
-#include <boot/kernel_args.h>
 #include <kimage.h>
 #include <ksignal.h>
 #include <syscalls.h>
 #include <tls.h>
 #include <vfs.h>
+#include <user_runtime.h>
+#include <boot/kernel_args.h>
+#include <util/khash.h>
 
 #include <sys/resource.h>
 #include <string.h>

@@ -20,9 +20,9 @@
 #include <elf.h>
 #include <kmodule.h>
 #include <fs/KPath.h>
+#include <fs/devfs.h>
 #include <util/Stack.h>
 #include <util/kernel_cpp.h>
-#include <devfs.h>
 
 #include <stdlib.h>
 #include <dirent.h>

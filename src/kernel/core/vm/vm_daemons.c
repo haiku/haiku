@@ -1,21 +1,22 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <kernel.h>
 #include <thread.h>
 #include <debug.h>
-#include <khash.h>
 #include <OS.h>
 #include <arch/cpu.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
+
 
 bool trimming_cycle;
 static addr_t free_memory_low_water;

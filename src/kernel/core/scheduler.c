@@ -17,8 +17,8 @@
 #include <int.h>
 #include <smp.h>
 #include <cpu.h>
-#include <khash.h>
 #include <debug.h>
+#include <util/khash.h>
 
 
 //#define TRACE_SCHEDULER

@@ -7,11 +7,11 @@
 #include <KernelExport.h>
 #include <fs_cache.h>
 
+#include <cache.h>
+#include <lock.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
-#include <cache.h>
-#include <khash.h>
-#include <lock.h>
+#include <util/khash.h>
 
 #include <unistd.h>
 #include <stdlib.h>

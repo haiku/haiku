@@ -1,19 +1,22 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
-#include <kernel.h>
+
 #include <int.h>
-#include <debug.h>
-#include <malloc.h>
 #include <smp.h>
-#include <arch/int.h>
-#include <errno.h>
+#include <util/kqueue.h>
 #include <boot/kernel_args.h>
+#include <arch/int.h>
+
 #include <string.h>
 #include <stdio.h>
-#include <kqueue.h>
+#include <malloc.h>
+
 
 #define NUM_IO_VECTORS 256
 

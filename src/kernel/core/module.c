@@ -13,9 +13,9 @@
 
 #include <kmodule.h>
 #include <lock.h>
-#include <khash.h>
 #include <elf.h>
 #include <vfs.h>
+#include <util/khash.h>
 #include <boot/elf.h>
 
 #include <sys/stat.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc. All rights reserved.
+ * Copyright 2004-2005, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,7 +20,7 @@
 #include <arch_config.h>
 #include <disk_device_manager/ddm_userland_interface.h>
 #include <sys/resource.h>
-#include <fd.h>
+#include <fs/fd.h>
 #include <fs/node_monitor.h>
 #include <sysctl.h>
 #include <ksocket.h>

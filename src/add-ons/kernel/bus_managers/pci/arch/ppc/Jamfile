@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci arch ppc ;
 
+SubDirHdrs [ FDirName $(DOTDOT) $(DOTDOT) ] ;
+
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_config.c
 	pci_io.c

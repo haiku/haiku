@@ -16,7 +16,7 @@
 #include <team.h>
 #include <debug.h>
 #include <kimage.h>
-#include <khash.h>
+#include <util/khash.h>
 #include <syscalls.h>
 
 #include <arch/cpu.h>

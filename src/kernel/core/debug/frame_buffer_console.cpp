@@ -5,7 +5,7 @@
 
 #include <KernelExport.h>
 #include <lock.h>
-#include <devfs.h>
+#include <fs/devfs.h>
 
 #include <boot/kernel_args.h>
 #include <frame_buffer_console.h>

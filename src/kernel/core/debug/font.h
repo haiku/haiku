@@ -1,5 +1,4 @@
-/* $Id: font.h,v 1.2 2004/06/16 02:10:27 axeld Exp $
-**
+/*
 ** Copyright 2001 Brian J. Swetland
 ** All rights reserved.
 **

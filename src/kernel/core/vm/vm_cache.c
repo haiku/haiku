@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -12,15 +12,15 @@
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
-#include <malloc.h>
 #include <int.h>
-#include <khash.h>
+#include <util/khash.h>
 #include <lock.h>
 #include <debug.h>
 #include <lock.h>
 #include <smp.h>
 #include <arch/cpu.h>
-#include <Errors.h>
+
+#include <malloc.h>
 
 //#define TRACE_VM_CACHE
 #ifdef TRACE_VM_CACHE

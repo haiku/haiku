@@ -25,7 +25,6 @@
 #include <int.h>
 #include <smp.h>
 #include <lock.h>
-#include <khash.h>
 #include <thread.h>
 #include <team.h>
 
