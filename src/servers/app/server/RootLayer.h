@@ -39,6 +39,7 @@ class Workspace;
 class Screen;
 class WinBorder;
 class Desktop;
+class DisplayDriver;
 
 /*!
 	\class RootLayer RootLayer.h
@@ -51,8 +52,8 @@ class Desktop;
 class RootLayer : public Layer
 {
 public:
-								RootLayer(const char *layername,
-									int32 workspaceCount, Desktop *desktop);
+								RootLayer(const char *name,
+									int32 workspaceCount, Desktop *desktop, DisplayDriver *driver);
 	virtual						~RootLayer();
 
 	virtual	void				Draw(const BRect &r);

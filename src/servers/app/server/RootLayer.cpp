@@ -54,10 +54,13 @@
 //#define DISPLAYDRIVER_TEST_HACK
 
 //---------------------------------------------------------------------------
-RootLayer::RootLayer(const char *layername, int32 workspaceCount, Desktop *desktop)
-	: Layer(BRect(0,0,0,0), layername, 0, B_NORMAL_WINDOW_FEEL, 0, NULL)
+RootLayer::RootLayer(const char *name, int32 workspaceCount,
+					Desktop *desktop, DisplayDriver *driver)
+	: Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
 {
 	fDesktop			= desktop;
+//NOTE: be careful about this one.
+	fRootLayer			= this;
 	fActiveWorkspace	= NULL;
 	fRows				= 0;
 	fColumns			= 0;
