@@ -16,11 +16,12 @@
 #include <Directory.h>
 #include <File.h>
 #include <stdio.h>
+#include "RGBColor.h"
 #include "defs.h"
 #include "PreviewDriver.h"
 #include "Decorator.h"
 
-//#define DEBUG_DECORATOR
+#define DEBUG_DECORATOR
 
 DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags)
@@ -59,10 +60,9 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 		preview->MoveTo(scrollview->Frame().right+20,scrollview->Frame().top);
 	}
 
-	LayerData ldata;
 	ldata.highcolor.SetColor(51,102,160);
-	uint64 pat=0xFFFFFFFFFFFFFFFFLL;
-	driver->FillRect(preview_bounds,&ldata,(int8*)&pat);
+	pat_solid_high=0xFFFFFFFFFFFFFFFFLL;
+	driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
 
 	decorator=NULL;
 	decorator_id=-1;
@@ -78,7 +78,7 @@ DecView::~DecView(void)
 		delete decorator;
 }
 
-void DecView::AttachedToWindow(void)
+void DecView::AllAttached(void)
 {
 	declist->SetTarget(this);
 	apply->SetTarget(this);
@@ -117,12 +117,13 @@ printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
 				break;
 			}
 			
-			LayerData ldata;
-			ldata.highcolor.SetColor(ui_color(B_DESKTOP_COLOR));
-			uint64 pat=0xFFFFFFFFFFFFFFFFLL;
-			driver->FillRect(preview_bounds,&ldata,(int8*)&pat);
+			ldata.highcolor.SetColor(colorset.desktop);
+			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
 			if(decorator)
+			{
+				decorator->SetColors(colorset);
 				decorator->Draw();
+			}
 			break;
 		}
 		default:
@@ -313,7 +314,13 @@ printf("LoadDecorator(%s): Couldn't get allocation symbol\n",path);
 printf("LoadDecorator(): Deleting old decorator\n");
 #endif
 		delete decorator;
-		unload_add_on(decorator_id);
+		decorator=NULL;
+
+		// NEVER, *EVER*, call unload_add_on() if there is _any_ possibility,
+		// no matter remote, that memory might still be in use when it is called.
+		// It wll lead to unpredictable crashes which have almost nothing to
+		// do with the *real* cause.
+//		unload_add_on(decorator_id);
 	}
 	decorator_id=addon;
 	decorator=pcreatefunc(SRect(50,50,150,150),WLOOK_TITLED,WFEEL_NORMAL,0);
@@ -339,4 +346,67 @@ printf("ConvertIndexToPath(): Couldn't get item for index %ld\n",index);
 printf("ConvertIndexToPath(): returned %s\n",path.String());
 #endif
 	return BString(path.String());
+}
+
+void DecView::SetColors(const BMessage &message)
+{
+#ifdef DEBUG_DECORATOR
+printf("DecView::SetColors\n");
+#endif
+	if(UnpackSettings(&colorset,&message))
+	{
+		if(decorator)
+		{
+			ldata.highcolor.SetColor(colorset.desktop);
+			driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);
+			decorator->SetColors(colorset);
+			decorator->Draw();
+		}
+		else
+		{
+#ifdef DEBUG_DECORATOR
+printf("DecView::SetColors: NULL decorator\n");
+#endif
+		}
+	}
+	else
+	{
+#ifdef DEBUG_DECORATOR
+printf("DecView::SetColors: UnpackSetting returned false\n");
+#endif
+	}
+}
+
+bool DecView::UnpackSettings(ColorSet *set, const BMessage *msg)
+{
+	if(!set || !msg)
+	{
+#ifdef DEBUG_DECORATOR
+printf("UnpackSettings(): NULL parameter\n");
+#endif
+		return false;
+	}
+	
+	rgb_color *col;
+	ssize_t size;
+
+	// Once the OBOS app_server is in place, there will be more attributes
+
+	if(msg->FindData("PANEL_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->panel_background.SetColor(*col);
+	if(msg->FindData("MENU_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_background.SetColor(*col);
+	if(msg->FindData("MENU_SELECTION_BACKGROUND",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_selected_background.SetColor(*col);
+	if(msg->FindData("MENU_ITEM_TEXT",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_text.SetColor(*col);
+	if(msg->FindData("MENU_SELECTED_ITEM_TEXT",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->menu_selected_text.SetColor(*col);
+	if(msg->FindData("WINDOW_TAB",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->window_tab.SetColor(*col);
+	if(msg->FindData("KEYBOARD_NAVIGATION",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->keyboard_navigation.SetColor(*col);
+	if(msg->FindData("DESKTOP",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+		set->desktop.SetColor(*col);
+	return true;
 }

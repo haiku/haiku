@@ -76,6 +76,7 @@ public:
 	const char *GetTitle(void);
 //	void SetFont(SFont *sf);
 	void _ClipTitle(void);
+	ColorSet GetColors(void) { if(colors) return *colors; else return ColorSet(); }
 	
 	virtual void MoveBy(float x, float y);
 	virtual void MoveBy(SPoint pt);

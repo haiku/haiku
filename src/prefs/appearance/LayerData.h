@@ -1,6 +1,7 @@
 #ifndef LAYERDATA_H_
 #define LAYERDATA_H_
 
+#include "SPoint.h"
 class ServerBitmap;
 
 class LayerData

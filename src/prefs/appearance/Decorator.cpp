@@ -25,14 +25,18 @@ Decorator::Decorator(SRect rect, int32 wlook, int32 wfeel, int32 wflags)
 
 Decorator::~Decorator(void)
 {
-	delete colors;
+	if(colors!=NULL)
+	{
+		delete colors;
+		colors=NULL;
+	}
 	if(title_string)
 		delete title_string;
 }
 
 void Decorator::SetColors(ColorSet cset)
 {
-	*colors=cset;
+	colors->SetColors(cset);
 }
 
 void Decorator::SetDriver(DisplayDriver *d)

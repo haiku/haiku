@@ -2,6 +2,7 @@
 #include "APRWindow.h"
 #include "APRView.h"
 #include "DecView.h"
+#include "defs.h"
 
 APRWindow::APRWindow(BRect frame)
 	: BWindow(frame, "Appearance", B_TITLED_WINDOW,
@@ -20,6 +21,7 @@ APRWindow::APRWindow(BRect frame)
 	tabview->AddTab(decorators,tab);
 
 	AddChild(tabview);
+	decorators->SetColors(colors->settings);
 }
 
 bool APRWindow::QuitRequested()
@@ -35,4 +37,15 @@ void APRWindow::WorkspaceActivated(int32 wkspc, bool is_active)
 		BMessenger notifier(colors);
 		notifier.SendMessage(new BMessage(B_WORKSPACE_ACTIVATED));
 	}
+}
+
+#include <stdio.h>
+void APRWindow::MessageReceived(BMessage *msg)
+{
+	if(msg->what==SET_UI_COLORS)
+	{
+		decorators->SetColors(colors->settings);
+	}
+	else
+		BWindow::MessageReceived(msg);
 }

@@ -3,8 +3,15 @@
 
 #include "RGBColor.h"
 
-typedef struct
+class ColorSet
 {
+public:
+	ColorSet(void);
+	ColorSet(const ColorSet &cs);
+	ColorSet & operator=(const ColorSet &cs);
+	void SetColors(const ColorSet &cs);
+	void PrintToStream(void);
+	
 	RGBColor panel_background,
 	panel_text,
 	document_background,
@@ -21,7 +28,11 @@ typedef struct
 	menu_selected_text,
 	menu_separator_high,
 	menu_separator_low,
-	menu_triggers;
-} ColorSet;
+	menu_triggers,
+	window_tab,
+	window_tab_text,
+	keyboard_navigation,
+	desktop;
+};
 
 #endif

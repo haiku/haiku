@@ -18,13 +18,14 @@
 #include <Invoker.h>
 
 class ColorWell;
+class APRWindow;
 
 class APRView : public BView
 {
 public:
 	APRView(const BRect &frame, const char *name, int32 resize, int32 flags);
 	~APRView(void);
-	void AttachedToWindow(void);
+	void AllAttached(void);
 	void MessageReceived(BMessage *msg);
 	color_which SelectionToAttribute(int32 index);
 	const char *AttributeToString(const color_which &attr);
@@ -35,10 +36,10 @@ public:
 	void NotifyServer(void);
 	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
 protected:
+	friend APRWindow;
 	BMenu *LoadColorSets(void);
 	void SaveColorSet(const BString &name);
 	void LoadColorSet(const BString &name);
-	void DeleteColorSet(const BString &name);
 	void SetColorSetName(const char *name);
 	BColorControl *picker;
 	BButton *apply,*revert,*defaults,*try_settings;

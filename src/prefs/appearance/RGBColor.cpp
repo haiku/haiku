@@ -159,5 +159,5 @@ printf("MakeBlendColor( {%u,%u,%u,%u}, {%u,%u,%u,%u}, %f) : {%u,%u,%u,%u}\n",
 
 void RGBColor::PrintToStream(void)
 {
-	printf("RGBColor (%u,%u,%u,%u)\n", color.red,color.green,color.blue,color.alpha);
+	printf("RGBColor (%u,%u,%u,%u)\n", color32.red,color32.green,color32.blue,color32.alpha);
 }

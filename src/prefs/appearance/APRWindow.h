@@ -15,6 +15,7 @@ public:
 	APRWindow(BRect frame); 
 	virtual	bool QuitRequested();
 	virtual void WorkspaceActivated(int32 wkspc, bool is_active);
+	virtual void MessageReceived(BMessage *msg);
 	BTabView *tabview;
 	APRView *colors;
 	DecView *decorators;
