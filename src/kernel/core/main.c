@@ -58,6 +58,11 @@ _start(kernel_args *oldka, int cpu_num)
 {
 	kernel_startup = true;
 
+	if (oldka->kernel_args_size != sizeof(kernel_args)
+		|| oldka->version != CURRENT_KERNEL_ARGS_VERSION)
+		// ToDo: there is no debug output yet...
+		return -1;
+
 	memcpy(&ka, oldka, sizeof(kernel_args));
 		// the passed in kernel args are in a non-allocated range of memory
 
