@@ -513,6 +513,7 @@ static void detect_panels()
 
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
+	LOG(2,("DUALHEAD_CTRL: $%08x\n", NV_REG32(NV32_DUALHEAD_CTRL)));
 	LOG(2,("DAC1: FP_HDISPEND: %d\n", DACR(FP_HDISPEND)));
 	LOG(2,("DAC1: FP_HTOTAL: %d\n", DACR(FP_HTOTAL)));
 	LOG(2,("DAC1: FP_HCRTC: %d\n", DACR(FP_HCRTC)));
@@ -538,6 +539,7 @@ static void detect_panels()
 	LOG(2,("DAC1: FP_DEBUG3: $%08x\n", DACR(FP_DEBUG3)));
 
 	LOG(2,("DAC1: FUNCSEL: $%08x\n", NV_REG32(NV32_FUNCSEL)));
+	LOG(2,("DAC1: PANEL_PWR: $%08x\n", NV_REG32(NV32_PANEL_PWR)));
 
 	if(si->ps.secondary_head)
 	{
@@ -566,6 +568,7 @@ static void detect_panels()
 		LOG(2,("DAC2: FP_DEBUG3: $%08x\n", DAC2R(FP_DEBUG3)));
 
 		LOG(2,("DAC2: FUNCSEL: $%08x\n", NV_REG32(NV32_2FUNCSEL)));
+		LOG(2,("DAC2: PANEL_PWR: $%08x\n", NV_REG32(NV32_2PANEL_PWR)));
 	}
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
 }

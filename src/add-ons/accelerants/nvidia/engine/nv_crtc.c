@@ -106,17 +106,18 @@ status_t nv_crtc_set_timing(display_mode target)
 	LOG(4,("CRTC: setting timing\n"));
 
 	/* setup tuned internal modeline for flatpanel if connected and active */
+	/* notes:
+	 * - the CRTC modeline must end earlier than the panel modeline to keep correct
+	 *   sync going;
+	 * - if the CRTC modeline ends too soon, pixelnoise will occur in 8 (or so) pixel
+	 *   wide horizontal stripes. This can be observed earliest on fullscreen overlay,
+	 *   and if it gets worse, also normal desktop output will suffer. The stripes
+	 *   are mainly visible at the left of the screen, over the entire screen height. */
 	if (si->ps.tmds1_active)
 	{
 		LOG(2,("CRTC: DFP active: tuning modeline\n"));
 
 		/* horizontal timing */
-		//testing (640x480): total = 135% is too much, 120% to small...
-		//total = display + 160 equals panel modeline: but must be smaller...?
-//		target.timing.h_total = target.timing.h_display + 152;//160;//128
-//		target.timing.h_sync_start = target.timing.h_total - 136;//144;//112
-//		target.timing.h_sync_end = target.timing.h_total - 40;//48;//16
-		//adaptive to panel: fixme: test on 4:3 and 16:10 panels!
 		target.timing.h_sync_start =
 			((uint16)((si->ps.p1_timing.h_sync_start / ((float)si->ps.p1_timing.h_display)) *
 			target.timing.h_display)) & 0xfff8;
@@ -129,11 +130,11 @@ status_t nv_crtc_set_timing(display_mode target)
 			(((uint16)((si->ps.p1_timing.h_total / ((float)si->ps.p1_timing.h_display)) *
 			target.timing.h_display)) & 0xfff8) - 8;
 
-		/* apparantly NV11 timing is a bit more critical */
+		/* NV11 timing has tighter constraints than later cards */
 		if ((si->ps.card_type == NV11) &&
 			(target.timing.h_display == si->ps.p1_timing.h_display))
 		{
-			target.timing.h_total -= 32;
+			target.timing.h_total -= 56;
 		}
 
 		if (target.timing.h_sync_start == target.timing.h_display)
@@ -142,9 +143,6 @@ status_t nv_crtc_set_timing(display_mode target)
 			target.timing.h_sync_end -= 8;
 
 		/* vertical timing */
-//		target.timing.v_total = target.timing.v_display + 6;
-//		target.timing.v_sync_start = target.timing.v_total - 3;
-//		target.timing.v_sync_end = target.timing.v_total - 2;
 		target.timing.v_sync_start =
 			((uint16)((si->ps.p1_timing.v_sync_start / ((float)si->ps.p1_timing.v_display)) *
 			target.timing.v_display));
