@@ -30,7 +30,7 @@
 #include <Roster.h>
 
 enum application_state {
-	APP_STATE_INVALID,
+	APP_STATE_UNREGISTERED,
 	APP_STATE_PRE_REGISTERED,
 	APP_STATE_REGISTERED,
 };

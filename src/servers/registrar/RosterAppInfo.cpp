@@ -31,7 +31,7 @@
 // constructor
 RosterAppInfo::RosterAppInfo()
 			 : app_info(),
-			   state(APP_STATE_INVALID),
+			   state(APP_STATE_UNREGISTERED),
 			   token(0),
 			   registration_time(0)
 {
