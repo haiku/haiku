@@ -36,6 +36,7 @@
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <AppMisc.h>
+#include <MessageRunner.h>
 #include <Cursor.h>
 #include <Debug.h>
 #include <Entry.h>
@@ -62,8 +63,8 @@
 // Local Defines ---------------------------------------------------------------
 
 // Globals ---------------------------------------------------------------------
-BApplication	*be_app = NULL;
-BMessenger		be_app_messenger;
+BApplication *be_app = NULL;
+BMessenger be_app_messenger;
 
 BResources *BApplication::_app_resources = NULL;
 BLocker BApplication::_app_resources_lock("_app_resources_lock");
@@ -191,36 +192,16 @@ static void fill_argv_message(BMessage *message);
 
 
 BApplication::BApplication(const char *signature)
-	: BLooper(looper_name_for(signature)),
-	fAppName(NULL),
-	fServerFrom(-1),
-	fServerTo(-1),
-	fServerHeap(NULL),
-	fPulseRate(500000),
-	fInitialWorkspace(0),
-	fDraggedMessage(NULL),
-	fPulseRunner(NULL),
-	fInitError(B_NO_INIT),
-	fReadyToRunCalled(false)
+	: BLooper(looper_name_for(signature))
 {
 	InitData(signature, NULL);
 }
 
 
-BApplication::BApplication(const char* signature, status_t* error)
-	: BLooper(looper_name_for(signature)),
-	fAppName(NULL),
-	fServerFrom(-1),
-	fServerTo(-1),
-	fServerHeap(NULL),
-	fPulseRate(500000),
-	fInitialWorkspace(0),
-	fDraggedMessage(NULL),
-	fPulseRunner(NULL),
-	fInitError(B_NO_INIT),
-	fReadyToRunCalled(false)
+BApplication::BApplication(const char *signature, status_t *_error)
+	: BLooper(looper_name_for(signature))
 {
-	InitData(signature, error);
+	InitData(signature, _error);
 }
 
 
@@ -232,8 +213,8 @@ BApplication::~BApplication()
 	// to quit_all_windows(), and that function should be called from both 
 	// here and QuitRequested().
 
-	BWindow*	window = NULL;
-	BList		looperList;
+	BWindow *window = NULL;
+	BList looperList;
 	{
 		using namespace BPrivate;
 		BObjectLocker<BLooperList> ListLock(gLooperList);
@@ -241,11 +222,9 @@ BApplication::~BApplication()
 			gLooperList.GetLooperList(&looperList);
 	}
 
-	for (int32 i = 0; i < looperList.CountItems(); i++)
-	{
+	for (int32 i = 0; i < looperList.CountItems(); i++) {
 		window	= dynamic_cast<BWindow*>((BLooper*)looperList.ItemAt(i));
-		if (window)
-		{
+		if (window) {
 			window->Lock();
 			window->Quit();
 		}
@@ -272,17 +251,7 @@ BApplication::~BApplication()
 BApplication::BApplication(BMessage *data)
 	// Note: BeOS calls the private BLooper(int32, port_id, const char *)
 	// constructor here, test if it's needed
-	: BLooper(looper_name_for(NULL)),
-	fAppName(NULL),
-	fServerFrom(-1),
-	fServerTo(-1),
-	fServerHeap(NULL),
-	fPulseRate(500000),
-	fInitialWorkspace(0),
-	fDraggedMessage(NULL),
-	fPulseRunner(NULL),
-	fInitError(B_NO_INIT),
-	fReadyToRunCalled(false)
+	: BLooper(looper_name_for(NULL))
 {
 	const char *signature = NULL;	
 	data->FindString("mime_sig", &signature);
@@ -754,8 +723,30 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 void
 BApplication::SetPulseRate(bigtime_t rate)
 {
-	// ToDo: implement pulse runner!
+	if (rate < 0)
+		rate = 0;
+
+	// BeBook states that we have only 100,000 microseconds granularity
+	rate -= rate % 100000;
+
+	if (!Lock())
+		return;
+
+	if (rate != 0) {
+		// reset existing pulse runner, or create new one
+		if (fPulseRunner == NULL) {
+			BMessage pulse(B_PULSE);
+			fPulseRunner = new BMessageRunner(be_app_messenger, &pulse, rate);
+		} else
+			fPulseRunner->SetInterval(rate);
+	} else {
+		// turn off pulse messages
+		delete fPulseRunner;
+		fPulseRunner = NULL;
+	}
+
 	fPulseRate = rate;
+	Unlock();
 }
 
 
@@ -789,12 +780,13 @@ BApplication::BApplication(uint32 signature)
 }
 
 
-BApplication::BApplication(const BApplication& rhs)
+BApplication::BApplication(const BApplication &rhs)
 {
 }
 
 
-BApplication& BApplication::operator=(const BApplication& rhs)
+BApplication &
+BApplication::operator=(const BApplication &rhs)
 {
 	return *this;
 }
@@ -840,21 +832,34 @@ BApplication::InitData(const char *signature, status_t *error)
 	// check whether there exists already an application
 	if (be_app)
 		debugger("2 BApplication objects were created. Only one is allowed.");
+
+	fServerFrom = fServerTo = -1;
+	fServerHeap = NULL;
+	fInitialWorkspace = 0;
+	fDraggedMessage = NULL;
+	fReadyToRunCalled = false;
+
+	// initially, there is no pulse
+	fPulseRunner = NULL;
+	fPulseRate = 0;
+
 	// check signature
 	fInitError = check_app_signature(signature);
 	fAppName = signature;
 
 #ifndef RUN_WITHOUT_REGISTRAR
-	bool isRegistrar
-		= (signature && !strcasecmp(signature, kRegistrarSignature));
+	bool isRegistrar = signature
+		&& !strcasecmp(signature, kRegistrarSignature);
 	// get team and thread
 	team_id team = Team();
 	thread_id thread = BPrivate::main_thread_for(team);
 #endif
+
 	// get app executable ref
 	entry_ref ref;
 	if (fInitError == B_OK)
 		fInitError = BPrivate::get_app_ref(&ref);
+
 	// get the BAppFileInfo and extract the information we need
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
 	if (fInitError == B_OK) {
@@ -865,14 +870,14 @@ BApplication::InitData(const char *signature, status_t *error)
 			fileInfo.GetAppFlags(&appFlags);
 			char appFileSignature[B_MIME_TYPE_LENGTH + 1];
 			// compare the file signature and the supplied signature
-			if (fileInfo.GetSignature(appFileSignature) == B_OK) {
-				if (strcasecmp(appFileSignature, signature) != 0) {
-					printf("Signature in rsrc doesn't match constructor arg. "
-						   "(%s,%s)\n", signature, appFileSignature);
-				}
+			if (fileInfo.GetSignature(appFileSignature) == B_OK
+				&& strcasecmp(appFileSignature, signature) != 0) {
+				printf("Signature in rsrc doesn't match constructor arg. (%s, %s)\n",
+					signature, appFileSignature);
 			}
 		}
 	}
+
 #ifndef RUN_WITHOUT_REGISTRAR
 	// check whether be_roster is valid
 	if (fInitError == B_OK && !isRegistrar
@@ -980,6 +985,7 @@ BApplication::InitData(const char *signature, status_t *error)
 	if (fInitError == B_OK)
 		fInitError = _init_interface_kit_();
 #endif	// RUN_WITHOUT_APP_SERVER
+
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
