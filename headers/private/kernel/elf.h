@@ -1,13 +1,18 @@
 /*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ * 
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ELF_H
 #define _KERNEL_ELF_H
 
 
 #include <thread.h>
 #include <image.h>
+
+struct kernel_args;
 
 
 #ifdef __cplusplus
@@ -22,7 +27,7 @@ status_t unload_kernel_add_on(image_id id);
 
 status_t elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
 				const char **_symbolName, const char **_imageName, bool *_exactMatch);
-status_t elf_init(kernel_args *args);
+status_t elf_init(struct kernel_args *args);
 
 #ifdef __cplusplus
 }
