@@ -140,7 +140,7 @@
  */
 
 #include <math.h>
-#include "mathimpl.h"
+#include <mathimpl.h>
 
 #if defined(vax) || defined(tahoe)
 #define _IEEE	0

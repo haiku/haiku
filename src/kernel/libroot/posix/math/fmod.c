@@ -31,7 +31,7 @@
  * SUCH DAMAGE.
  */
 
-#include <math.h>
+#include <mathimpl.h>
 
 /* fmod.c
  *

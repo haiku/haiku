@@ -100,10 +100,10 @@
  * shown.
  */
 
-#include <errno.h>
 #include <math.h>
+#include <mathimpl.h>
+#include <errno.h>
 
-#include "mathimpl.h"
 
 #if (defined(vax) || defined(tahoe))
 #define TRUNC(x)	x = (double) (float) x

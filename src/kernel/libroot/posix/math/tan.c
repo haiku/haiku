@@ -31,7 +31,8 @@
  * SUCH DAMAGE.
  */
 
-#include "trig.h"
+#include <trig.h>
+
 double
 tan(double x)
 {

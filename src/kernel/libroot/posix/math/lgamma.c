@@ -39,9 +39,9 @@
  */
 
 #include <math.h>
+#include <mathimpl.h>
 #include <errno.h>
 
-#include "mathimpl.h"
 
 /* Log gamma function.
  * Error:  x > 0 error < 1.3ulp.

@@ -27,6 +27,7 @@ KernelObjects
 	<$(SOURCE_GRIST)>log1p.c
 	<$(SOURCE_GRIST)>log__L.c
 	<$(SOURCE_GRIST)>pow.c
+	<$(SOURCE_GRIST)>math_globals.c	
 	<$(SOURCE_GRIST)>sincos.c
 	<$(SOURCE_GRIST)>sinh.c
 	<$(SOURCE_GRIST)>tan.c 

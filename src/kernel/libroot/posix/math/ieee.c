@@ -69,7 +69,7 @@
  * REVISED BY K.C. NG on 1/22/85, 2/13/85, 3/24/85.
  */
 
-#include "mathimpl.h"
+#include <mathimpl.h>
 
 #if defined(vax)||defined(tahoe)      /* VAX D format */
 #include <errno.h>

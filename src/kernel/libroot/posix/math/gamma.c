@@ -39,7 +39,7 @@
  */
 
 #include <math.h>
-#include "mathimpl.h"
+#include <mathimpl.h>
 #include <errno.h>
 
 /* METHOD:

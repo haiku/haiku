@@ -57,7 +57,8 @@
  *	observed error was 1.87 ulps (units in the last place) at
  *	x= -3.8962076028810414000e-03.
  */
-#include "mathimpl.h"
+ 
+#include <mathimpl.h>
 
 #if defined(vax)||defined(tahoe)
 #include <errno.h>

@@ -73,7 +73,8 @@
  * shown.
  */
 
-#include "mathimpl.h"
+#include <mathimpl.h>
+
 
 vc(ln2hi,  6.9314718055829871446E-1  ,7217,4031,0000,f7d0,   0, .B17217F7D00000)
 vc(ln2lo,  1.6465949582897081279E-12 ,bcd5,2ce7,d9cc,e4f1, -39, .E7BCD5E4F1D9CC)
