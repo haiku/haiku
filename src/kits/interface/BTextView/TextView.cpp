@@ -854,6 +854,7 @@ BTextView::MessageReceived(BMessage *message)
 			}
 			break;
 		}
+
 		case B_SET_PROPERTY:
 		case B_GET_PROPERTY:
 		case B_COUNT_PROPERTIES:
@@ -944,8 +945,7 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 		target = this;
 
 	if (!target)
-		target = BView::ResolveSpecifier(message, index, specifier, what,
-			property);
+		target = BView::ResolveSpecifier(message, index, specifier, what, property);
 
 	return target;
 }
@@ -1224,17 +1224,24 @@ BTextView::Delete(int32 startOffset, int32 endOffset)
 		
 	// hide the caret/unhilite the selection
 	if (fActive) {
-		if (startOffset != endOffset)
-			Highlight(startOffset, endOffset);
+		if (fSelStart != fSelEnd)
+			Highlight(fSelStart, fSelEnd);
 		else {
 			if (fCaretVisible)
 				InvertCaret();
 		}
 	}
-	
 	// remove data from buffer
 	DeleteText(startOffset, endOffset);
 	
+	// Check if the caret needs to be moved
+	if (fClickOffset >= endOffset)
+		fClickOffset -= (endOffset - startOffset);
+	else if (fClickOffset >= startOffset && fClickOffset < endOffset)
+		fClickOffset = startOffset;
+
+	fSelEnd = fSelStart = fClickOffset;
+
 	// recalc line breaks and draw what's left
 	Refresh(startOffset, endOffset, true, true);
 	
@@ -1298,6 +1305,9 @@ BTextView::ByteAt(int32 offset) const
 }
 
 
+/*! \brief Returns the number of lines that the object contains.
+	\return The number of lines contained in the BTextView object.
+*/
 int32
 BTextView::CountLines() const
 {
@@ -1551,13 +1561,17 @@ void
 BTextView::GetSelection(int32 *outStart, int32 *outEnd) const
 {
 	CALLED();
+	int32 start = 0, end = 0;
+	
 	if (fSelectable) {
-		*outStart = fSelStart;
-		*outEnd = fSelEnd;
-	} else {
-		*outStart = 0;
-		*outEnd = 0;
+		start = fSelStart;
+		end = fSelEnd;
 	}
+
+	if (outStart)
+		*outStart = start;
+	if (outEnd)	
+		*outEnd = end;
 }
 
 
@@ -1725,6 +1739,12 @@ BTextView::RunArray(int32 startOffset, int32 endOffset,
 
 	text_run_array *res = (text_run_array *)malloc(sizeof(int32) +
 		(sizeof(text_run) * styleRange->count));
+	
+	if (!res) {
+		if (outSize)
+			*outSize = 0;
+		return NULL;
+	}
 
 	res->count = styleRange->count;
 
@@ -1998,7 +2018,8 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
 			break;
 	}
 
-	*outFromOffset = offset;
+	if (outFromOffset)
+		*outFromOffset = offset;
 
 	// check to the right
 	int32 textLen = TextLength();
@@ -2007,7 +2028,8 @@ BTextView::FindWord(int32 inOffset, int32 *outFromOffset,
 			break;
 	}
 	
-	*outToOffset = offset;
+	if (outToOffset)
+		*outToOffset = offset;
 }
 
 
@@ -2049,8 +2071,7 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 		endLine = numLines - 1;
 	
 	// TODO: This looks broken as well. What do we do if there's only one line ?
-	float height = (*fLines)[endLine + 1]->origin - 
-				   (*fLines)[startLine]->origin;
+	float height = (*fLines)[endLine + 1]->origin - (*fLines)[startLine]->origin;
 				
 	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
 		height += (*fLines)[endLine + 1]->origin - (*fLines)[endLine]->origin;
@@ -2065,6 +2086,9 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset,
 							  BRegion *outRegion) const
 {
 	CALLED();
+	if (!outRegion)
+		return;
+
 	outRegion->MakeEmpty();
 
 	// return an empty region if the range is invalid
@@ -2355,10 +2379,11 @@ void
 BTextView::SetMaxBytes(int32 max)
 {
 	CALLED();
-	// TODO: Finish this:
-	// We probably have to check if the existing text is longer than the new
-	// fMaxBytes, and truncate if it's the case
+	int32 textLength = fText->Length();
 	fMaxBytes = max;
+
+	if (fMaxBytes < textLength)
+		Delete(fMaxBytes, textLength);
 }
 
 
@@ -3077,7 +3102,7 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			if (ScrollBar(B_VERTICAL) != NULL)
 				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() + delta);
 			
-			fClickOffset = OffsetAt(LineAt(PointAt(currentOffset + delta)));
+			fClickOffset = OffsetAt(LineAt(PointAt(currentOffset + delta)) + 1);
 			
 			if (shiftDown) {
 				if (fClickOffset >= fSelEnd)
@@ -3647,10 +3672,9 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 							PushState();
 							
 							rgb_color blue = {152, 203, 255};
-							//rgb_color red = {255, 152, 152};
-							SetHighColor(blue);						
+							//rgb_color red = {255, 152, 152};				
 							SetLowColor(blue);
-							FillRect(rect);
+							FillRect(rect, B_SOLID_LOW);
 							
 							PopState();
 						}
