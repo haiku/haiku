@@ -829,16 +829,36 @@ register_image(image_t *image, int fd, const char *path)
 static const char *
 search_path_for_type(image_type type)
 {
+	const char *path = NULL;
+
 	switch (type) {
+		case B_APP_IMAGE:
+			path = getenv("PATH");
+			break;
+		case B_LIBRARY_IMAGE:
+			path = getenv("LIBRARY_PATH");
+			break;
+		case B_ADD_ON_IMAGE:
+			path = getenv("ADDON_PATH");
+			break;
+
+		default:
+			return NULL;
 #if 0
-		// ToDo: note, the getenv() call is not yet part of rld.so
 		case B_APP_IMAGE:
 			return getenv("PATH");
 		case B_LIBRARY_IMAGE:
 			return getenv("LIBRARY_PATH");
 		case B_ADD_ON_IMAGE:
 			return getenv("ADDON_PATH");
-#else
+#endif
+	}
+
+	// ToDo: for now, if the variable was not set, return default paths
+	if (path != NULL)
+		return path;
+
+	switch(type) {
 		case B_APP_IMAGE:
 			return "/boot/home/config/bin:"
 					"/bin:"
@@ -853,7 +873,7 @@ search_path_for_type(image_type type)
 
 		case B_ADD_ON_IMAGE:
 			return "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
-#endif
+
 		default:
 			return NULL;
 	}
