@@ -1,24 +1,40 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 floppy ;
 
-KernelObjects
+R5KernelAddon floppy : kernel drivers bin :
 	floppy.c
-	floppy_ctrl.c 
+	floppy_ctrl.c
 	device_icons.c
-	:
-	-fno-pic -D_KERNEL_MODE
-	;
+;
 
-KernelLd floppy :
-	<$(SOURCE_GRIST)>floppy.o
-	<$(SOURCE_GRIST)>floppy_ctrl.o
-	<$(SOURCE_GRIST)>device_icons.o
-	kernel.so
-	:
-	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	drivers/dev/floppy
-; 
+# Link to kernel/drivers/dev/disk
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev disk ] ;
+	local instDriver = <kernel!drivers!dev!disk>floppy ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : floppy ;
+}
+
+# Not ready for prime-time yet: R5 floppy driver replacement at the moment.
+
+# KernelObjects
+#	floppy.c
+#	floppy_ctrl.c 
+#	device_icons.c
+#	:
+#	-fno-pic -D_KERNEL_MODE
+#	;
+#
+# KernelLd floppy :
+#	<$(SOURCE_GRIST)>floppy.o
+#	<$(SOURCE_GRIST)>floppy_ctrl.o
+#	<$(SOURCE_GRIST)>device_icons.o
+#	kernel.so
+#	:
+#	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+#	:
+#	-Bdynamic -shared
+#	:
+#	:
+#	drivers/dev/floppy
+# ; 
 
