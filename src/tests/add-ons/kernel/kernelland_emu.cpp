@@ -520,7 +520,7 @@ ModuleManager::_GetAddOn(const char *name, ModuleAddOn **_addon)
 		BString addonName(addon->Name());
 		addonName << "/";
 		if (!strcmp(name, addon->Name())
-			|| strncmp(addonName.String(), name, addonName.Length())) {
+			|| !strncmp(addonName.String(), name, addonName.Length())) {
 			addon->Get();
 			*_addon = addon;
 			return B_OK;
