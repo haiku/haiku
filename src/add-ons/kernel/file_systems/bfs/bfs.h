@@ -1,13 +1,12 @@
+/* bfs - BFS definitions and helper functions
+ *
+ * Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Parts of this code is based on work previously done by Marcus Overhagen.
+ *
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef BFS_H
 #define BFS_H
-/* bfs - BFS definitions and helper functions
-**
-** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
-** Parts of this code is based on work previously done by Marcus Overhagen
-**
-** Copyright 2001, pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <SupportDefs.h>
@@ -33,7 +32,7 @@ struct block_run {
 
 	inline bool operator==(const block_run &run) const;
 	inline bool operator!=(const block_run &run) const;
-	inline bool IsZero();
+	inline bool IsZero() const;
 	inline bool MergeableWith(block_run run) const;
 	inline void SetTo(int32 group, uint16 start, uint16 length = 1);
 
@@ -139,10 +138,7 @@ struct small_data {
 	uint32		type;
 	uint16		name_size;
 	uint16		data_size;
-
-#if !__MWERKS__ //-- mwcc doesn't support thingy[0], so we patch Name() instead
 	char		name[0];	// name_size long, followed by data
-#endif
 
 	uint32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
 	uint16 NameSize() const { return BFS_ENDIAN_TO_HOST_INT16(name_size); }
@@ -179,7 +175,7 @@ struct bfs_inode {
 	inode_addr	parent;
 	inode_addr	attributes;
 	uint32		type;				// attribute type
-	
+
 	int32		inode_size;
 	uint32		etc;				// a pointer to the Inode object during construction
 
@@ -189,9 +185,7 @@ struct bfs_inode {
 	};
 	int32		pad[4];
 
-#if !__MWERKS__
 	small_data	small_data_start[0];
-#endif
 	
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }
@@ -202,8 +196,7 @@ struct bfs_inode {
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
 	bigtime_t LastModifiedTime() const { return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
 	bigtime_t CreateTime() const { return BFS_ENDIAN_TO_HOST_INT64(create_time); }
-
-	inline small_data *SmallDataStart();
+	small_data *SmallDataStart() { return small_data_start; }
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
@@ -300,7 +293,7 @@ block_run::operator!=(const block_run &run) const
 
 
 inline bool
-block_run::IsZero()
+block_run::IsZero() const
 {
 	return allocation_group == 0 && start == 0 && length == 0;
 }
@@ -343,11 +336,7 @@ block_run::Run(int32 group, uint16 start, uint16 length)
 inline char *
 small_data::Name() const
 {
-#if __MWERKS__
-	return (char *)(uint32(&data_size)+uint32(sizeof(data_size)));
-#else
 	return const_cast<char *>(name);
-#endif
 }
 
 
@@ -379,21 +368,6 @@ small_data::IsLast(const bfs_inode *inode) const
 	// the block, we would touch invalid memory (although that can't cause wrong
 	// results)
 	return (uint32)this > (uint32)inode + inode->InodeSize() - sizeof(small_data) || name_size == 0;
-}
-
-
-/************************ bfs_inode inline functions ************************/
-//	#pragma mark -
-
-
-inline small_data *
-bfs_inode::SmallDataStart()
-{
-#if __MWERKS__
-	return (small_data *)(&pad[4] /* last item in pad + sizeof(int32) */);
-#else
-	return small_data_start;
-#endif
 }
 
 
