@@ -13,6 +13,9 @@
 
 #include <View.h>
 #include <Bitmap.h>
+#include <Path.h>
+#include <Entry.h>
+#include <Node.h>
 #include <NodeInfo.h>
 
 class IconView : public BView {
@@ -23,7 +26,7 @@ public:
 	
 	bool DrawIcon(bool draw);
 	
-	bool SetIconFromNodeInfo(BNodeInfo &info);
+	bool SetIcon(const BPath &path);
 
 	virtual	void Draw(BRect area);
 		// draws the icon

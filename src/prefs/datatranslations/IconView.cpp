@@ -35,9 +35,14 @@ IconView::~IconView()
 }
 
 bool
-IconView::SetIconFromNodeInfo(BNodeInfo &info)
+IconView::SetIcon(const BPath &path)
 {
 	fDrawIcon = false;
+	
+	BEntry entry(path.Path());
+	BNode node(&entry);
+	BNodeInfo info(&node);
+	
 	if (info.GetTrackerIcon(fIconBitmap) != B_OK)
 		return false;
 	

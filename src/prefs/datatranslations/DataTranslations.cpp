@@ -56,7 +56,7 @@ DataTranslationsApplication::~DataTranslationsApplication()
 void DataTranslationsApplication::Install_Done()
 {
 	(new BAlert("",
-		"You have to quit and restart running applications\n" \
+		"You have to quit and restart running applications\n"
 		"for the installed Translators to be available in them.",
 		"OK"))->Go();
 }

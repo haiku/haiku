@@ -16,7 +16,6 @@
 #include <String.h>
 #include <StringView.h>
 #include <Bitmap.h>
-#include <NodeInfo.h> 
 #include <storage/Path.h>
 #include <storage/Directory.h>
 #include <storage/Entry.h>
@@ -35,34 +34,20 @@ virtual	bool	QuitRequested();
 virtual void    MessageReceived(BMessage* message);
 	
 private:
-		const char 		*translator_name, *translator_info;
-		int32 			translator_version;
-		const char* 	pfad;
-		BString 		tex;
-		bool fTranSelected;
-			// Indicates whether or not a translator is selected
-			// in the fTranListView
-				
-		BButton*		dButton;     // Default-Button    
-		BBox*           fBox;        // Full-Window Box 
-		BBox*			rBox;		 // Box hosting Config View
+		BBox *fConfigBox;
+			// Box hosting Config View
 				
 		DataTranslationsView *fTranListView;
 			// List of Translators (left pane of window)
 		
-		BStringView*	DTN; 		 // Display the DataTranslatorName
-		BMessage fRosterArchive;
-			// Archive of the current BTranslatorRoster
+		BStringView *fTranNameView;
+			// Display the DataTranslatorName
 
 		IconView *fIconView;
 		
-		BView*			Konf;	
+		BView*			Konf;
 		
-		BEntry     		entry; 
-		BNode      		node; 
-		BNodeInfo  		info;  
-		
-		void 			Trans_by_ID(int32 id);
+	void GetTranInfo(int32 id, const char *&tranName, const char *&tranInfo, int32 &tranVersion, BPath &tranPath);
 		int				WriteTrans();	
 		void			BuildView();
 	
