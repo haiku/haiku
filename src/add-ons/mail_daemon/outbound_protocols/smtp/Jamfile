@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+SubDirC++Flags -DBONE ;
+
+Addon SMTP : mail_daemon outbound_protocols :
+	smtp.cpp
+	md5c.c ;
+
+LinkSharedOSLibs SMTP :
+	 be mail socket bind ;

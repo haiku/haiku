@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src servers mail ;
+
+UsePrivateHeaders mail ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+AddResources E-mail : <$(SOURCE_GRIST)>mail_daemon.rsrc ;
+
+Server mail_daemon :
+	deskbarview.cpp
+	LEDAnimation.cpp
+	main.cpp
+;
+
+LinkSharedOSLibs mail_daemon : 
+	be 
+	mail
+	tracker
+	stdc++.r4
+;

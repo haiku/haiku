@@ -89,6 +89,7 @@ SEARCH on [ FGristFiles
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
+SubInclude OBOS_TOP src kits mail ;
 SubInclude OBOS_TOP src kits media ;
 SubInclude OBOS_TOP src kits midi ;
 SubInclude OBOS_TOP src kits midi2 ;

@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols pop3 ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+SubDirC++Flags -DBONE ;
+
+Addon POP3 : mail_daemon inbound_protocols :
+	MessageIO.cpp
+	pop3.cpp
+	SimpleMailProtocol.cpp
+	md5c.c ;
+
+LinkSharedOSLibs POP3 :
+	 be mail socket bind ;

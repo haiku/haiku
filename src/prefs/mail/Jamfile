@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src prefs mail ;
+
+AddResources E-mail : <$(SOURCE_GRIST)>E-mail.rsrc ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+Preference E-mail :
+	Account.cpp
+	CenterContainer.cpp
+	ConfigViews.cpp
+	ConfigWindow.cpp
+	main.cpp ;
+
+LinkSharedOSLibs E-mail : be mail ;

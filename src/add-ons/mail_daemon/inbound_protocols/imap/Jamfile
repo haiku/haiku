@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols imap ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+SubDirC++Flags -DBONE ;
+
+Addon IMAP : mail_daemon inbound_protocols :
+	imap_client.cpp
+	imap_config.cpp
+	NestedString.cpp ;
+
+LinkSharedOSLibs IMAP :
+	 be mail socket bind ;

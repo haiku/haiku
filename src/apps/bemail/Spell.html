@@ -1,0 +1,574 @@
+<!-- This HTML file has been created by texi2html 1.29 
+     from ispell.texi on 23 April 1994 --> 
+
+<TITLE>GNU ISPELL V4.0 - GNU ISPELL</TITLE> 
+<P>Go to the <A HREF="ispell_1.html">previous</A> section.<P> 
+<H1><A NAME="SEC2" HREF="ispell_toc.html#SEC2">GNU ISPELL</A></H1> 
+<CODE>Ispell</CODE> is a program that helps you to correct typos in a file, 
+and to find the correct spelling of words.  When presented with a 
+word that is not in the dictionary, <CODE>ispell</CODE> attempts to find 
+<DFN>near misses</DFN> that might include the word you meant. 
+<P> 
+This manual describes how to use ispell, as well as a little about 
+its implementation. 
+<P> 
+<H2><A NAME="SEC3" HREF="ispell_toc.html#SEC3">Using ispell from emacs</A></H2> 
+<P> 
+<H3><A NAME="SEC4" HREF="ispell_toc.html#SEC4">Checking a single word</A></H3> 
+<P> 
+The simplest emacs command for calling ispell is 'M-$' (meta-dollar. 
+On some terminals, you must type ESC-$.) This checks the spelling of 
+the word under the cursor.  If the word is found in the dictionary, 
+then a message is printed in the echo area.  Otherwise, ISPELL 
+attempts to generate near misses.  
+<P> 
+If any near misses are found, they are displayed in a separate window, 
+each preceded by a digit.  If one of these is the word you wanted, 
+just type its digit, and it will replace the original word in your 
+buffer. 
+<P> 
+If no near miss is right, or if none are displayed, you 
+have four choices: 
+<P> 
+<DL COMPACT> 
+<DT><KBD>I</KBD> 
+<DD><P> 
+Insert the word in your private dictionary.  Use this if you 
+know that the word is spelled correctly. 
+<P> 
+<DT><KBD>A</KBD> 
+<DD><P> 
+Accept the word for the duration of this editing session, but do not 
+put it in your private dictionary.  Use this if you are not sure about 
+the spelling of the word, but you do not want to look it up 
+immediately.  The next time you start ispell, it will have forgotten 
+any accepted words.  You can make it forget accepted words at any time 
+by typing <KBD>M-x reload-ispell</KBD>. 
+<P> 
+<DT><KBD>SPC</KBD> 
+<DD><P> 
+Leave the word alone, and consider it misspelled if it is checked again. 
+<P> 
+<DT><KBD>R</KBD> 
+<DD><P> 
+Replace the word.  This command prompts you for a string in the 
+minibuffer.  You may type more than one word, and each word you type 
+is checked again, possibly finding other near misses.  This command 
+provides a handy way to close in on a word that you have no idea how 
+to spell.  You can keep trying different spellings until you find one 
+that is close enough to get a near miss. 
+<P> 
+<DT><KBD>L</KBD> 
+<DD><P> 
+Lookup.  Display words from the dictionary that contain a 
+specified substring.  The substring is a regular expression, 
+which means it can contain special characters to be more 
+selective about which words get displayed. 
+See section `Regexps' in <CITE>emacs</CITE>. <P> 
+If the only special character in the regular express is a leading 
+<CODE>^</CODE>, then a very fast binary search will be used, instead of 
+scanning the whole file. 
+<P> 
+Only a few matching words can be displayed in the ISPELL window. 
+If you want to see more, use the <CODE>look</CODE> program directly from 
+the shell. 
+</DL> 
+<P> 
+Of course, you can also type ^G to stop the command without 
+changing anything. 
+<P> 
+If you make a change that you don't like, just use emacs' normal undo 
+feature See section `undo' in <CITE>emacs</CITE>. 
+<P> 
+<H3><A NAME="SEC5" HREF="ispell_toc.html#SEC5">Checking a whole buffer</A></H3> 
+<P> 
+If you want to check the spelling of all the words in a buffer, type 
+the command <KBD>M-x ispell</KBD>.  This command scans the file, and makes 
+a list of all the misspelled words.  When it is done, it moves the 
+cursor to the first word on the list, and acts like you just typed M-$ 
+See section <A HREF="ispell_2.html#SEC4">Checking a single word</A>. 
+<P> 
+When you finish with one word, the cursor is automatically moved to the 
+next.  If you want to stop in the middle of the list type <KBD>Q</KBD> or 
+<KBD>^G</KBD>.  Later, you can pick up where you left off by typing 
+<KBD>C-X $</KBD>. 
+<P> 
+<H3><A NAME="SEC6" HREF="ispell_toc.html#SEC6">Checking a region</A></H3> 
+<P> 
+You may check the words in the region with the command M-x ispell-region. 
+See See section `mark' in <CITE>emacs</CITE>. 
+<P> 
+The commands available are the same as for checking a whole buffer. 
+<P> 
+<H2><A NAME="SEC7" HREF="ispell_toc.html#SEC7">Old Emacs</A></H2> 
+<P> 
+Until ispell becomes part of the standard emacs distribution, you will 
+have to explicitly request that it be loaded.  Put the following lines 
+in your emacs init file See section `init file' in <CITE>emacs</CITE>. 
+<P> 
+<PRE> 
+(autoload 'ispell "ispell" "Run ispell over buffer" t) 
+(autoload 'ispell-region "ispell" "Run ispell over region" t) 
+(autoload 'ispell-word "ispell" "Check word under cursor" t) 
+(define-key esc-map "$" 'ispell-word) 
+</PRE> 
+<P> 
+(It will do no harm to have these lines in your init file even after 
+ispell is installed by default.) 
+<P> 
+<H2><A NAME="SEC8" HREF="ispell_toc.html#SEC8">Using ispell by itself</A></H2> 
+<P> 
+To check the words in a file, give the command <CODE>ispell FILE</CODE>.  This 
+will present a screen of information, and accept commands for every word 
+that is not found in the dictionary. 
+<P> 
+The screen shows the offending word at the top, as well as two lines of 
+context at the bottom.  If any near misses are found, they are shown in the 
+middle of the screen, each preceded by a digit. 
+<P> 
+You may use the same commands as inside of emacs to accept the word, 
+place it in your private dictionary, select a near miss, or type a 
+replacement See section <A HREF="ispell_2.html#SEC4">Checking a single word</A>.  You may also choose from the following 
+commands: 
+<P> 
+<DL COMPACT> 
+<DT><KBD>?</KBD> 
+<DD><P> 
+Print a help message. 
+<P> 
+<DT><KBD>Q</KBD> 
+<DD>Quit.  Accept the rest of the words in the file and exit. 
+<P> 
+<DT><KBD>X</KBD> 
+<DD>Exit.  Abandon any changes made to this file and exit immediately.  You 
+are asked if you are sure you want to do this. 
+<P> 
+<DT><KBD>!</KBD> 
+<DD>Shell escape.  The shell command that you type is executed as 
+a subprocess. 
+<P> 
+<DT><KBD>^Z</KBD> 
+<DD>Suspend.  On systems that support job control, this suspends ISPELL. 
+On other systems it executes a subshell. 
+<P> 
+<DT><KBD>^L</KBD> 
+<DD>Redraw the screen. 
+</DL> 
+<P> 
+If you type your interrupt character (usually ^C or <KBD>DEL</KBD>), then 
+ispell will immediately enter its command loop.  If ispell was generating 
+near misses at the time, then all that it had found so far will be 
+displayed, along with a message stating that there might be more, and that 
+you can type <KBD>RET</KBD> to generate them.  If it was scanning the file, it 
+will display <SAMP>`(INTERRUPT)'</SAMP> where it would normally display a bad word, 
+and the commands that change the file will be disabled. 
+<P> 
+The feature is handy if you have left out a space between words, and 
+ispell is futilely looking up the 1000 potential near misses for a 
+string that has twenty letters. 
+<P> 
+<H2><A NAME="SEC9" HREF="ispell_toc.html#SEC9">Using ispell to look up individual words
+</A></H2> 
+<P> 
+When ispell is run with no arguments, it reads words from the standard 
+input.  For each one, it prints a message telling whether it is in the 
+dictionary.  For any words not in the dictionary, near misses are 
+computed, and any that are found are printed. 
+<P> 
+<PRE> 
+% ispell 
+word: independant 
+how about: independent 
+word: xyzzy 
+not found 
+word: ^D 
+</PRE> 
+<P> 
+<H2><A NAME="SEC10" HREF="ispell_toc.html#SEC10">Your private dictionary</A></H2> 
+<P> 
+Whenever ispell is started the file <TT>`ispell.words'</TT> is read from your 
+home directory (if it exists).  This file contains a list of words, one per 
+line, and neither the order nor the case of the words is important.  Ispell 
+will consider all of the words good, and will use them as possible near 
+misses. 
+<P> 
+The <KBD>I</KBD> command adds words to <TT>`ispell.words'</TT>, so normally you 
+don't have to worry about the file.  You may want to check it from 
+time to time to make sure you have not accidentally inserted a 
+misspelled word. 
+<P> 
+<H2><A NAME="SEC11" HREF="ispell_toc.html#SEC11">Compatibility with the traditional spell program
+</A></H2> 
+<P> 
+The <SAMP>`-u'</SAMP> flag tells ispell to be compatible with the traditional 
+<SAMP>`spell'</SAMP> program.  This flag is automatically turned on if the 
+program is invoked by the name <SAMP>`spell'</SAMP>. 
+<P> 
+This flag causes the following behavior: 
+<P> 
+All of the files listed as arguments (or the standard input if none) 
+are checked, and misspellings are printed on the standard output.  The 
+output is sorted, only one instance of each word appears (however, 
+a word may appear more than once with different capitalizations.) 
+<P> 
+You may specify a file containing good words with <SAMP>`+filename'</SAMP>. 
+<P> 
+The troff commands <SAMP>`.so'</SAMP> and <SAMP>`.nx'</SAMP> (to include a file, or 
+switch to a file, respectively) are obeyed, unless you give the flag 
+<SAMP>`-i'</SAMP>. 
+<P> 
+The other <SAMP>`spell'</SAMP> flags <SAMP>`-v'</SAMP>, <SAMP>`-b'</SAMP>, <SAMP>`-x'</SAMP> and 
+<SAMP>`-l'</SAMP> are ignored. 
+<P> 
+By the way, ispell seems to be about three times faster 
+than traditional spell. 
+<P> 
+<H2><A NAME="SEC12" HREF="ispell_toc.html#SEC12">All commands in emacs and standalone modes
+</A></H2> 
+<P> 
+Commands valid in both modes: 
+<P> 
+DIGIT   Select a near miss 
+I       Insert into private dictionary 
+A       Accept for this session 
+SPACE   Skip this time 
+R       Replace with one or more words 
+L       Lookup: search the dictionary using a regular expression 
+<P> 
+Standalone only: 
+<P> 
+Q       Accept rest of file 
+X       Abandon changes 
+!       Shell escape 
+?       Help 
+^Z      Suspend 
+^L      Redraw screen 
+^C      Give up generating near misses, or show position in file 
+<P> 
+Emacs only: 
+<P> 
+M-$                     Check word 
+M-x ispell              Check buffer 
+M-x ispell-region       Check region 
+M-x reload-ispell       Reread private dictionary 
+M-x kill-ispell         Kill current subprocess, and start a new one 
+                        next time 
+^G                      When in M-x ispell, stop working on current 
+                        bad word list 
+^X $                    Resume working on bad word list. 
+<P> 
+<H2><A NAME="SEC13" HREF="ispell_toc.html#SEC13">Definition of a near miss</A></H2> 
+<P> 
+Two words are near each other if they can be made identical with one 
+of the following changes to one of the words: 
+<P> 
+<PRE> 
+Interchange two adjacent letters. 
+Change one letter. 
+Delete one letter. 
+Add one letter. 
+</PRE> 
+<P> 
+Someday, perhaps ispell will be extended so that words that sound 
+alike would also be considered near misses.  If you would like to 
+implement this, see Knuth, Volume 3, page 392 for a description of the 
+Soundex algorithm which might apply. 
+<P> 
+<H2><A NAME="SEC14" HREF="ispell_toc.html#SEC14">Flags to the ispell command</A></H2> 
+<P> 
+Ispell's arguments are parsed by getopt(3).  Therefore, there is 
+considerable flexibility about where to put spaces between arguments. 
+The way to be safe is to give only one flag per dash, and put a space 
+between a flag and its argument. 
+<P> 
+If ispell is run with no arguments, it enters <SAMP>`ask'</SAMP> mode See section <A HREF="ispell_2.html#SEC9">Using ispell to look up individual words
+</A>. 
+With one or more file name arguments, it interactively checks each one. 
+<P> 
+<DL COMPACT> 
+<DT><CODE>-p privname</CODE> 
+<DD>Use privname as the private dictionary. 
+<P> 
+<DT><CODE>-d dictname</CODE> 
+<DD>Use dictname as the system dictionary.  You may also specify a system 
+dictionary with the environment variable ISPELL_DICTIONARY. 
+<P> 
+<DT><CODE>-l</CODE> 
+<DD>List mode.  Scan the file, and print any misspellings on the standard 
+output.  This mode is compatible with the traditional spell program, 
+except that the output is not sorted.  See section <A HREF="ispell_2.html#SEC11">Compatibility with the traditional spell program
+</A>. 
+<P> 
+<DT><CODE>-u</CODE> 
+<DD>Compatibility mode. See section <A HREF="ispell_2.html#SEC11">Compatibility with the traditional spell program
+</A>. 
+<P> 
+<DT><CODE>-a</CODE> 
+<DD>Old style program interface, See section <A HREF="ispell_2.html#SEC15">How other programs can use ispell
+</A>. 
+<P> 
+<DT><CODE>-S</CODE> 
+<DD>New program interface, See section <A HREF="ispell_2.html#SEC15">How other programs can use ispell
+</A>. 
+<P> 
+<DT><CODE>-D</CODE> 
+<DD>Print the dictionary on the standard output with flags. 
+<P> 
+<DT><CODE>-E</CODE> 
+<DD>Print the dictionary on the standard output with all flags expanded. 
+<P> 
+</DL> 
+<P> 
+<H2><A NAME="SEC15" HREF="ispell_toc.html#SEC15">How other programs can use ispell</A></H2> 
+<P> 
+Ispell can be used as a subprocess communicating through a pipe.  Two 
+interfaces are available: 
+<P> 
+<H2><A NAME="SEC16" HREF="ispell_toc.html#SEC16">New style, for EMACS</A></H2> 
+<P> 
+To use this interface, start ispell with the '-S' flag.  Ispell will 
+print a version number and greeting message that looks like: 
+<P> 
+<PRE> 
+(1 "ISPELL V4.0")= 
+</PRE> 
+<P> 
+The number is the version number of the protocol to be spoken over 
+the pipe.  The string is a message possibly of interest to the user. 
+<P> 
+All messages from ispell end in an equal sign, and ispell guarantees not to 
+print an equal sign except to end a message.  Therefore, if you do not want 
+to deal with the greeting, just throw away characters until you get to an 
+equals. 
+<P> 
+Ispell then reads one line commands from the standard input, and 
+writes responses on the standard output. 
+<P> 
+If a command does not start with a colon, then it is considered a 
+single word.  The word is looked up in the dictionary, and if it is 
+found, the response is <CODE>t</CODE>.  If the word is not in the 
+dictionary, and no near misses can be found, then the response is 
+<CODE>nil</CODE>.  If there are near misses, the response is a line containing 
+a list of strings in lisp form.  For example: 
+<P> 
+        INPUT           OUTPUT 
+        the             t 
+        xxx             nil 
+        teh             ("tea" "ten" "the") 
+<P> 
+The near miss response is suitable for passing directly to the lisp 
+<CODE>read</CODE> function, but it can also be parsed simply in C.  In 
+particular, ispell promises that the list will appear all on one line, 
+and that the structure will not change.  A parser that reads the whole 
+line, then treats the parentheses and quotes as whitespace will work fine. 
+<P> 
+The list will contain a maximum of ten strings, and each string will be 
+no longer than 40 characters.  Also, the capitalization of the near 
+misses is the same as the input word. 
+<P> 
+<H3><A NAME="SEC17" HREF="ispell_toc.html#SEC17">Colon commands</A></H3> 
+<P> 
+If the input line starts with a colon, then it is one of the following 
+commands: 
+<P> 
+<CODE>:file <VAR>filename</VAR></CODE> 
+Run the word checker over the named <VAR>filename</VAR>.  The response is zero or 
+more lines each containing a number.  The numbers are file offsets of 
+words that do not appear in the dictionary.  Since the near miss 
+checker is not run, this is fairly fast.  
+<P> 
+After the last number, there will be a line containing either <CODE>t</CODE> if 
+the checker got to the end of the file, or <CODE>nil</CODE> if it received an 
+interrupt.  If ispell ignores any interrupts received except while 
+scanning a file. 
+<P> 
+<CODE>:insert <VAR>word</VAR></CODE> 
+Place <VAR>word</VAR> in the private dictionary. 
+<P> 
+<CODE>:accept <VAR>word</VAR></CODE> 
+Do not complain about <VAR>word</VAR> for the rest of the session. 
+<P> 
+<CODE>:dump</CODE> 
+Write the private dictionary. 
+<P> 
+<CODE>:reload</CODE> 
+Reread the private dictionary. 
+<P> 
+<CODE>:tex</CODE> 
+Enable the tex parser for future <CODE>:file</CODE> commands. 
+<P> 
+<CODE>:troff</CODE> 
+Enable the tex parser for future <CODE>:file</CODE> commands. 
+<P> 
+<CODE>:generic</CODE> 
+Disable any text formatter parsers for future <CODE>:file</CODE> commands. 
+<P> 
+<H2><A NAME="SEC18" HREF="ispell_toc.html#SEC18">Old style, like ITS</A></H2> 
+<P> 
+To use this interface, start ispell with the '-a' flag.  Ispell 
+will read words from its standard input (one per line), and write 
+a one line of output for each one. 
+<P> 
+If the first character of the line is <CODE>*</CODE>, then word was found in the 
+dictionary.  (Other versions of ispell made a distinction between words 
+that were found directly, and words that were found after suffix 
+removal.  These lines began with <CODE>+</CODE>, followed by a space, then 
+followed by the root word.  To remain compatible with these version, 
+treat <CODE>+</CODE> and <CODE>*</CODE> the same.) 
+<P> 
+If the line starts with <CODE>&#38;</CODE>, then the input word was not found, but 
+some near misses were found.  They are listed on the output line 
+separated by spaces.  Also, the output words will have the same 
+capitalization as the input. 
+<P> 
+Finally, if the line starts with <CODE>#</CODE>, then the word was not in the 
+dictionaries, and no near misses were found. 
+<P> 
+        INPUT           OUTPUT 
+        the             * 
+        xxx             # 
+        teh             &#38; tea ten the 
+<P> 
+<H2><A NAME="SEC19" HREF="ispell_toc.html#SEC19">How the suffix stripper works</A></H2> 
+<P> 
+This section is excerpted from the ITS spell.info file. 
+<P> 
+     Words  in SPELL's main dictionary (but not the private dictionary) may 
+have flags associated with  them  to  indicate  the  legality  of  suffixes 
+without  the  need  to keep the full suffixed words in the dictionary.  The 
+flags have "names" consisting of single  letters.    Their  meaning  is  as 
+follows: 
+<P> 
+Let  #  and  @  be  "variables"  that can stand for any letter.  Upper case 
+letters are constants.  "..."  stands  for  any  string  of  zero  or  more 
+letters,  but note that no word may exist in the dictionary which is not at 
+least 2 letters long, so, for example, FLY may not be produced  by  placing 
+the  "Y"  flag  on "F".  Also, no flag is effective unless the word that it 
+creates is at least 4 letters  long,  so,  for  example,  WED  may  not  be 
+produced by placing the "D" flag on "WE". 
+<P> 
+"V" flag: 
+        ...E --&#62; ...IVE  as in CREATE --&#62; CREATIVE 
+        if # .ne. E, ...# --&#62; ...#IVE  as in PREVENT --&#62; PREVENTIVE 
+<P> 
+"N" flag: 
+        ...E --&#62; ...ION  as in CREATE --&#62; CREATION 
+        ...Y --&#62; ...ICATION  as in MULTIPLY --&#62; MULTIPLICATION 
+        if # .ne. E or Y, ...# --&#62; ...#EN  as in FALL --&#62; FALLEN 
+<P> 
+"X" flag: 
+        ...E --&#62; ...IONS  as in CREATE --&#62; CREATIONS 
+        ...Y --&#62; ...ICATIONS  as in MULTIPLY --&#62; MULTIPLICATIONS 
+        if # .ne. E or Y, ...# --&#62; ...#ENS  as in WEAK --&#62; WEAKENS 
+<P> 
+"H" flag: 
+        ...Y --&#62; ...IETH  as in TWENTY --&#62; TWENTIETH 
+        if # .ne. Y, ...# --&#62; ...#TH  as in HUNDRED --&#62; HUNDREDTH 
+<P> 
+"Y" FLAG: 
+        ... --&#62; ...LY  as in QUICK --&#62; QUICKLY 
+<P> 
+"G" FLAG: 
+        ...E --&#62; ...ING  as in FILE --&#62; FILING 
+        if # .ne. E, ...# --&#62; ...#ING  as in CROSS --&#62; CROSSING 
+<P> 
+"J" FLAG" 
+        ...E --&#62; ...INGS  as in FILE --&#62; FILINGS 
+        if # .ne. E, ...# --&#62; ...#INGS  as in CROSS --&#62; CROSSINGS 
+<P> 
+"D" FLAG: 
+        ...E --&#62; ...ED  as in CREATE --&#62; CREATED 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@IED  as in IMPLY --&#62; IMPLIED 
+        if # .ne. E or Y, or (# = Y and @ = A, E, I, O, or U) 
+                ...@# --&#62; ...@#ED  as in CROSS --&#62; CROSSED 
+                                or CONVEY --&#62; CONVEYED 
+<P> 
+"T" FLAG: 
+        ...E --&#62; ...EST  as in LATE --&#62; LATEST 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@IEST  as in DIRTY --&#62; DIRTIEST 
+        if # .ne. E or Y, or (# = Y and @ = A, E, I, O, or U) 
+                ...@# --&#62; ...@#EST  as in SMALL --&#62; SMALLEST 
+                                or GRAY --&#62; GRAYEST 
+<P> 
+"R" FLAG: 
+        ...E --&#62; ...ER  as in SKATE --&#62; SKATER 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@IER  as in MULTIPLY --&#62; MULTIPLIER 
+        if # .ne. E or Y, or (# = Y and @ = A, E, I, O, or U) 
+                ...@# --&#62; ...@#ER  as in BUILD --&#62; BUILDER 
+                                or CONVEY --&#62; CONVEYER 
+<P> 
+"Z FLAG: 
+        ...E --&#62; ...ERS  as in SKATE --&#62; SKATERS 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@IERS  as in MULTIPLY --&#62; MULTIPLIERS 
+        if # .ne. E or Y, or (# = Y and @ = A, E, I, O, or U) 
+                ...@# --&#62; ...@#ERS  as in BUILD --&#62; BUILDERS 
+                                or SLAY --&#62; SLAYERS 
+<P> 
+"S" FLAG: 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@IES  as in IMPLY --&#62; IMPLIES 
+        if # .eq. S, X, Z, or H, 
+                ...# --&#62; ...#ES  as in FIX --&#62; FIXES 
+        if # .ne. S, X, Z, H, or Y, or (# = Y and @ = A, E, I, O, or U) 
+                ...# --&#62; ...#S  as in BAT --&#62; BATS 
+                                or CONVEY --&#62; CONVEYS 
+<P> 
+"P" FLAG: 
+        if @ .ne. A, E, I, O, or U, 
+                ...@Y --&#62; ...@INESS  as in CLOUDY --&#62; CLOUDINESS 
+        if # .ne. Y, or @ = A, E, I, O, or U, 
+                ...@# --&#62; ...@#NESS  as in LATE --&#62; LATENESS 
+                                or GRAY --&#62; GRAYNESS 
+<P> 
+"M" FLAG: 
+        ... --&#62; ...'S  as in DOG --&#62; DOG'S 
+<P> 
+Note:    The  existence of a flag on a root word in the directory is not by 
+itself sufficient to cause SPELL to recognize the  indicated  word  ending. 
+If there is more than one root for which a flag will indicate a given word, 
+only  one  of the roots is the correct one for which the flag is effective; 
+generally it is the longest root.  For example, the "D" rule  implies  that 
+either PASS or PASSE, with a "D" flag, will yield PASSED.  The flag must be 
+on  PASSE;  it  will  be  ineffective on PASS.  This is because, when SPELL 
+encounters the word PASSED and fails to  find  it  in  its  dictionary,  it 
+strips off the "D" and looks up PASSE.  Upon finding PASSE, it then accepts 
+PASSED  if  and  only if PASSE has the "D" flag.  Only if the word PASSE is 
+not in the main dictionary at all does the program strip off  the  "E"  and 
+search  for PASS. 
+<P> 
+Therefore, never install a flag by hand.  Instead, just add complete 
+new words to the dictionary file, then use the build program with the 
+options '-a -r' to replace as many roots with flags as possible. 
+<P> 
+<H2><A NAME="SEC20" HREF="ispell_toc.html#SEC20">Where it came from</A></H2> 
+<P> 
+I first came across ispell on TOPS-20 systems at MIT.  I tracked it 
+down to ITS where I found the PDP-10 assembly program.  It appeared 
+that it had been in use at the MIT-AI lab since at least the late 
+1970's.  I think it case from California before then. 
+<P> 
+I wrote the first C implementation in the spring of 1983, mostly 
+working from the ITS INFO file. 
+<P> 
+The present version was created in early 1988, and was motivated by 
+the desire to make it run on 80286's, and to provide a better interface 
+for GNU EMACS. 
+<P> 
+There is another widely distributed version of ispell, which was forked 
+from my 1983 version and has a different set of features and clever 
+extensions.  It is available from the directory /u/public/ispell at 
+celray.cs.yale.edu. 
+<P> 
+People who have contributed to various versions of ispell include: Walt 
+Buehring, Mark Davies, Geoff Kuenning, Rober McQueer, Ashwin Ram, Greg 
+Schaffer, Perry Smith, Ken Stevens, and Andrew Vignaux. 
+<P> 
+Pace Willisson <BR> 
+pace@ai.mit.edu  pace@hx.lcs.mit.edu <BR> 
+(617) 625--3452 
+<P> 
+<P>Go to the <A HREF="ispell_1.html">previous</A> section.<P>

@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src apps bemail ;
+
+UsePrivateHeaders mail ;
+
+AddResources BeMail : BeMail.rsrc ;
+App BeMail : 
+	BmapButton.cpp
+	ButtonBar.cpp
+	ComboBox.cpp
+	Content.cpp
+	Enclosures.cpp
+	FindWindow.cpp
+	Header.cpp
+	Mail.cpp
+	Prefs.cpp
+	QueryMenu.cpp
+	Signature.cpp
+	Status.cpp
+	Utilities.cpp
+	WIndex.cpp
+	Words.cpp
+	KUndoBuffer.cpp ;
+
+LinkSharedOSLibs BeMail : be mail tracker stdc++.r4 ;

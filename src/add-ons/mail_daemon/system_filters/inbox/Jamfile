@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src add-ons mail_daemon system_filters inbox ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+Addon Inbox : mail_daemon inbound_filters :
+	filter.cpp ;
+
+LinkSharedOSLibs Inbox :
+	 be mail ;

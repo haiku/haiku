@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps ;
 
 SubInclude OBOS_TOP src apps bin ;
+SubInclude OBOS_TOP src apps bemail ;
 SubInclude OBOS_TOP src apps cdplayer ;
 SubInclude OBOS_TOP src apps clock ;
 SubInclude OBOS_TOP src apps codycam ;

@@ -10,6 +10,7 @@ SubInclude OBOS_TOP src prefs filetypes ;
 SubInclude OBOS_TOP src prefs fonts ;
 SubInclude OBOS_TOP src prefs keyboard ;
 SubInclude OBOS_TOP src prefs keymap ;
+SubInclude OBOS_TOP src prefs mail ;
 SubInclude OBOS_TOP src prefs media ;
 SubInclude OBOS_TOP src prefs menu ;
 SubInclude OBOS_TOP src prefs mouse ;

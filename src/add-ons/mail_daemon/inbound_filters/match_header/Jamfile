@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons mail_daemon inbound_filters match_header ;
+
+UsePrivateHeaders mail ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+Addon Match\ Header : mail_daemon inbound_filters :
+	ConfigView.cpp
+	RuleFilter.cpp
+	StringMatcher.cpp ;
+
+LinkSharedOSLibs Match\ Header :
+	 be mail ;

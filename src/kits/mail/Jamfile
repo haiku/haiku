@@ -1,0 +1,49 @@
+SubDir OBOS_TOP src kits mail ;
+
+UsePrivateHeaders mail ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
+
+if $(CHECK_MALLOC) {
+	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
+}
+
+SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
+
+SharedLibrary mail :
+	b_mail_message.cpp
+	c_mail_api.cpp
+	ChainRunner.cpp
+	cpp_abi_base64.c
+	crypt.cpp
+	des.c
+	ErrorLogWindow.cpp
+	FileConfigView.cpp
+	mail_encoding.c
+	mail_util.cpp
+	MailAddon.cpp
+	MailAttachment.cpp
+	MailChain.cpp
+	MailComponent.cpp
+	MailContainer.cpp
+	MailDaemon.cpp
+	MailMessage.cpp
+	MailProtocol.cpp
+	MailSettings.cpp
+	NodeMessage.cpp
+	numailkit.cpp
+	ProtocolConfigView.cpp
+	RemoteStorageProtocol.cpp
+	StatusWindow.cpp
+	StringList.cpp
+;
+
+LinkSharedOSLibs libmail.so :
+	be
+	textencoding
+	tracker
+	stdc++.r4
+;
+
+MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libmail.so : libmail.so ;

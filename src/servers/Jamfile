@@ -2,6 +2,7 @@ SubDir OBOS_TOP src servers ;
 
 SubInclude OBOS_TOP src servers app ;
 SubInclude OBOS_TOP src servers input ;
+SubInclude OBOS_TOP src servers mail ;
 SubInclude OBOS_TOP src servers media ;
 SubInclude OBOS_TOP src servers media_addon ;
 SubInclude OBOS_TOP src servers midi ;
