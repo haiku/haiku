@@ -58,6 +58,74 @@ STXTTranslatorTest::tearDown()
 }
 
 void
+CheckStyled(translator_info *pti)
+{
+	CPPUNIT_ASSERT(pti->type == B_STYLED_TEXT_FORMAT);
+	CPPUNIT_ASSERT(pti->translator != 0);
+	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_TEXT);
+	CPPUNIT_ASSERT(pti->quality == 0.5);
+	CPPUNIT_ASSERT(pti->capability == 0.5);
+	CPPUNIT_ASSERT(strcmp(pti->name, "Be styled text file") == 0);
+	CPPUNIT_ASSERT(strcmp(pti->MIME, "text/x-vnd.Be-stxt") == 0);
+}
+
+void
+CheckPlain(translator_info *pti)
+{
+	CPPUNIT_ASSERT(pti->type == B_TRANSLATOR_TEXT);
+	CPPUNIT_ASSERT(pti->translator != 0);
+	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_TEXT);
+	CPPUNIT_ASSERT(pti->quality > 0.39 && pti->quality < 0.41);
+	CPPUNIT_ASSERT(pti->capability > 0.59 && pti->capability < 0.61);
+	CPPUNIT_ASSERT(strcmp(pti->name, "Plain text file") == 0);
+	CPPUNIT_ASSERT(strcmp(pti->MIME, "text/plain") == 0);
+}
+
+void
+IdentifyTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
+	const char **paths, bool bplain)
+{
+	translator_info ti;
+	printf(" [%d] ", (int) bplain);
+	
+	for (int32 i = 0; i < sizeof(paths) / sizeof(const char *); i++) {
+		ptest->NextSubTest();
+		BFile file;
+		printf(" [%s] ", paths[i]);
+		CPPUNIT_ASSERT(file.SetTo(paths[i], B_READ_ONLY) == B_OK);
+
+		// Identify (output: B_TRANSLATOR_ANY_TYPE)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti) == B_OK);
+		if (bplain)
+			CheckPlain(&ti);
+		else
+			CheckStyled(&ti);
+	
+		// Identify (output: B_TRANSLATOR_TEXT)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_TRANSLATOR_TEXT) == B_OK);
+		if (bplain)
+			CheckPlain(&ti);
+		else
+			CheckStyled(&ti);
+	
+		// Identify (output: B_STYLED_TEXT_FORMAT)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_STYLED_TEXT_FORMAT) == B_OK);
+		if (bplain)
+			CheckPlain(&ti);
+		else
+			CheckStyled(&ti);
+	}
+}
+
+void
 STXTTranslatorTest::IdentifyTest()
 {
 	// Init
@@ -70,12 +138,6 @@ STXTTranslatorTest::IdentifyTest()
 	BFile wronginput("../src/tests/kits/translation/data/images/image.jpg",
 		B_READ_ONLY);
 	CPPUNIT_ASSERT(wronginput.InitCheck() == B_OK);
-	BFile sinput("../src/tests/kits/translation/data/styled_text.stxt",
-		B_READ_ONLY);
-	CPPUNIT_ASSERT(sinput.InitCheck() == B_OK);
-	BFile tinput("../src/tests/kits/translation/data/plain_text.txt",
-		B_READ_ONLY);
-	CPPUNIT_ASSERT(tinput.InitCheck() == B_OK);
 		
 	// Identify (bad input, output types)
 	NextSubTest();
@@ -92,88 +154,47 @@ STXTTranslatorTest::IdentifyTest()
 	result = proster->Identify(&wronginput, NULL, &ti);
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
 	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
-
-	// Identify (input: styled output: B_TRANSLATOR_ANY_TYPE)
-	NextSubTest();
-	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&sinput, NULL, &ti);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_STYLED_TEXT_FORMAT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality == 0.5);
-	CPPUNIT_ASSERT(ti.capability == 0.5);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Be styled text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/x-vnd.Be-stxt") == 0);
 	
-	// Identify (input: styled output: B_TRANSLATOR_TEXT)
+	// Identify (wrong magic)
 	NextSubTest();
 	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&sinput, NULL, &ti, 0, NULL,
-		B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_STYLED_TEXT_FORMAT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality == 0.5);
-	CPPUNIT_ASSERT(ti.capability == 0.5);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Be styled text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/x-vnd.Be-stxt") == 0);
+	BFile wrongmagic("../src/tests/kits/translation/data/text/wrong_magic.stxt",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wrongmagic.InitCheck() == B_OK);
+	result = proster->Identify(&wrongmagic, NULL, &ti);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
 	
-	// Identify (input: styled output: B_STYLED_TEXT_FORMAT)
+	// Identify (wrong version)
 	NextSubTest();
 	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&sinput, NULL, &ti, 0, NULL,
-		B_STYLED_TEXT_FORMAT);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_STYLED_TEXT_FORMAT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality == 0.5);
-	CPPUNIT_ASSERT(ti.capability == 0.5);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Be styled text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/x-vnd.Be-stxt") == 0);
+	BFile wrongversion("../src/tests/kits/translation/data/text/wrong_version.stxt",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(wrongversion.InitCheck() == B_OK);
+	result = proster->Identify(&wrongversion, NULL, &ti);
+	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
 	
-	// Identify (input: plain output: B_TRANSLATOR_ANY_TYPE)
-	NextSubTest();
-	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&tinput, NULL, &ti);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality > 0.39 && ti.quality < 0.41);
-	CPPUNIT_ASSERT(ti.capability > 0.59 && ti.capability < 0.61);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Plain text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/plain") == 0);
-	
-	// Identify (input: plain output: B_TRANSLATOR_TEXT)
-	NextSubTest();
-	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&tinput, NULL, &ti, 0, NULL,
-		B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality > 0.39 && ti.quality < 0.41);
-	CPPUNIT_ASSERT(ti.capability > 0.59 && ti.capability < 0.61);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Plain text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/plain") == 0);
-	
-	// Identify (input: plain output: B_STYLED_TEXT_FORMAT)
-	NextSubTest();
-	memset(&ti, 0, sizeof(translator_info));
-	result = proster->Identify(&tinput, NULL, &ti, 0, NULL,
-		B_STYLED_TEXT_FORMAT);
-	CPPUNIT_ASSERT(result == B_OK);
-	CPPUNIT_ASSERT(ti.type == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.translator != 0);
-	CPPUNIT_ASSERT(ti.group == B_TRANSLATOR_TEXT);
-	CPPUNIT_ASSERT(ti.quality > 0.39 && ti.quality < 0.41);
-	CPPUNIT_ASSERT(ti.capability > 0.59 && ti.capability < 0.61);
-	CPPUNIT_ASSERT(strcmp(ti.name, "Plain text file") == 0);
-	CPPUNIT_ASSERT(strcmp(ti.MIME, "text/plain") == 0);
+	const char *aPlainFiles[] = {
+		"../src/tests/kits/translation/data/text/ascii.txt",
+		"../src/tests/kits/translation/data/text/japanese.txt",
+		"../src/tests/kits/translation/data/text/multi_byte.txt",
+		"../src/tests/kits/translation/data/text/one_length.txt",
+		"../src/tests/kits/translation/data/text/sentence.txt",
+		"../src/tests/kits/translation/data/text/symbols.txt",
+		"../src/tests/kits/translation/data/text/zero_length.txt",
+	};
+	const char *aStyledFiles[] = {
+		"../src/tests/kits/translation/data/text/ascii.stxt",
+		"../src/tests/kits/translation/data/text/japanese.stxt",
+		"../src/tests/kits/translation/data/text/multi_byte.stxt",
+		"../src/tests/kits/translation/data/text/one_length.stxt",
+		"../src/tests/kits/translation/data/text/sentence.stxt",
+		"../src/tests/kits/translation/data/text/symbols.stxt",
+		"../src/tests/kits/translation/data/text/zero_length.stxt",
+	};
+	IdentifyTests(this, proster, aPlainFiles, true);
+	IdentifyTests(this, proster, aStyledFiles, false);
 }
 
 void
