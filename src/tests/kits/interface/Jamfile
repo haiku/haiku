@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tests kits interface ;
+
+SubInclude OBOS_TOP src tests kits interface bprintjob ;
+

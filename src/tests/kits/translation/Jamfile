@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src tests kits translation ;
+
+SimpleTest BitmapStreamTest : BitmapStreamTest.cpp
+	: libtranslation.so be ;
+
+SimpleTest TranslatorRosterTest : TranslatorRosterTest.cpp
+	: libtranslation.so be ;
+
+SubInclude OBOS_TOP src tests kits translation multitest ;
+

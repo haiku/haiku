@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src tests kits support barchivable remoteobjectdef ;
+
+CommonUnitTest RemoteTestObject
+	: RemoteTestObject.cpp
+	: kits support
+	: libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: support
+;
+

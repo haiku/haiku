@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src tests kits support blocker ;
+
+# Fails to compile. Remove the "if" when it does.
+if "" {
+
+CommonUnitTest BLockerTester
+	: BenaphoreLockCountTest1.cpp
+	  ConcurrencyTest1.cpp
+	  ConcurrencyTest2.cpp
+	  ConstructionTest1.cpp
+	  DestructionTest1.cpp
+	  DestructionTest2.cpp
+	  LockerTestAddon.cpp
+	  LockerTestCase.cpp
+	  SemaphoreLockCountTest1.cpp
+	: kits support
+	: libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: support
+;
+
+} # if ""
+

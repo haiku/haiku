@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src tests kits translation multitest ;
+
+SimpleTest MultiTest
+	: MainControlWindow.cpp
+	  MultiTest.cpp
+	  WorkView.cpp
+	  WorkWindow.cpp
+	: libtranslation.so be
+;
+

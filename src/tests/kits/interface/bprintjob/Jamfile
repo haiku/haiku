@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src tests kits interface bprintjob ;
+
+SimpleTest print_test
+	: PrintTestApp.cpp
+	  PrintTestWindow.cpp
+	  PrintTestView.cpp
+	  PrintJob.cpp		# Link against the library later.
+	: root be
+;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles PrintJob.cpp ]
+	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+
