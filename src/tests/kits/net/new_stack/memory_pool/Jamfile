@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src tests kits net new_stack memory_pool ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel generic memory_pool ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src tests kits net new_stack headers ] ;
 
 Addon <userland>memory_pool : userland generic :
 	memory_pool.c
