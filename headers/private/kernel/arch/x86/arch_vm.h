@@ -1,0 +1,13 @@
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef ARCH_x86_VM_H
+#define ARCH_x86_VM_H
+
+/* This many pages will be read/written on I/O if possible */
+
+#define NUM_IO_PAGES	4
+	/* 16 kB */
+
+#endif	/* ARCH_x86_VM_H */
