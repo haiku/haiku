@@ -81,8 +81,27 @@ C++FLAGS += -nostdinc ;
 # issues, they deprecated that nice function. This will enable it again:
 C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
 
-if $(TARGET_PLATFORM) = r5 {
-	C++FLAGS += -DCOMPILE_FOR_R5 ;
+switch $(TARGET_PLATFORM)
+{
+	case r5 :
+	{
+		C++FLAGS += -DCOMPILE_FOR_R5 ;
+	}
+	case bone : 
+	{
+		BONE_COMPATIBLE = true ;
+	}
+	case dano :
+	{
+		BONE_COMPATIBLE = true ;
+		DANO_COMPATIBLE = true ;
+	}
+	case haiku :
+	{
+		BONE_COMPATIBLE = true ;
+		DANO_COMPATIBLE = true ;
+		HAIKU_COMPATIBLE = true ;
+	}
 }
 
 # Determine if we're building on PPC or x86

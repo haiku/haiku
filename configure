@@ -18,6 +18,7 @@ options:
                               (device or image).
   --bochs-debug               Activates bochs serial debug emulation.
   --target=TARGET             Select build target platform. [default=${target}]
+                              valid targets=r5,bone,dano,haiku
   --include-gpl-addons        Include GPL licensed add-ons.
   --help                      Prints out this help.
 EOF
@@ -66,11 +67,13 @@ gcc_version=
 floppy=
 bochs_debug=0
 include_gpl_addons=0
-if (echo $BEINCLUDES | grep 'headers/be/bone' > /dev/null); then
-  target=bone
-else
-  target=r5
-fi
+revision=`uname -r`
+case "$revision" in
+  5.1)   target=dano ;;
+  5.0.4) target=bone ;;
+  5.0*)  target=r5 ;;
+  *)     target="$platform" ;;
+esac
 
 # parse parameters
 #
