@@ -263,15 +263,20 @@ status_t map_io_memory(void)
 	config->area_mmbar = map_physical_memory("ich_ac97 mmbar io",(void *)config->mmbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mmbar);
 	if (config->area_mmbar <= B_OK) {
 		TRACE(("mapping of mmbar io failed\n"));
+		LOG(("mapping of mmbar io failed, error = %#x\n",config->area_mmbar));
 		return B_ERROR;
 	}
+	LOG(("mapping of mmbar: area %#x, phys %#x, log %#x\n", config->area_mmbar, config->mmbar, config->log_mmbar));
 	config->area_mbbar = map_physical_memory("ich_ac97 mbbar io",(void *)config->mbbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mbbar);
 	if (config->area_mbbar <= B_OK) {
 		TRACE(("mapping of mbbar io failed\n"));
+		LOG(("mapping of mbbar io failed, error = %#x\n",config->area_mbbar));
 		delete_area(config->area_mmbar);
 		config->area_mmbar = -1;
 		return B_ERROR;
 	}
+	LOG(("mapping of mbbar: area %#x, phys %#x, log %#x\n", config->area_mbbar, config->mbbar, config->log_mbbar));
+	return B_OK;
 }
 
 status_t unmap_io_memory(void)
