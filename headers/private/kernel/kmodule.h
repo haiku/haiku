@@ -11,5 +11,6 @@
 #include <stage2.h>
 
 extern status_t module_init(kernel_args *ka, module_info **sys_module_headers);
+extern void module_test(void);
 
 #endif	/* _KRENEL_MODULE_H */
