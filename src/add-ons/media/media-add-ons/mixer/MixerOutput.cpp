@@ -223,11 +223,11 @@ MixerOutput::AssignDefaultSources()
 }
 
 uint32
-MixerOutput::GetOutputChannelDesignation(int channel)
+MixerOutput::GetOutputChannelType(int channel)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return 0;
-	return fOutputChannelInfo[channel].designation;
+	return ChannelMaskToChannelType(fOutputChannelInfo[channel].designation);
 }
 
 void

@@ -8,6 +8,10 @@ class MixerInput;
 class MixerOutput;
 class Resampler;
 
+// The number of "enum media_multi_channels" types from MediaDefs.h
+// XXX should be 18, currently limited to 9
+#define MAX_CHANNEL_TYPES	9
+
 class MixerCore
 {
 public:

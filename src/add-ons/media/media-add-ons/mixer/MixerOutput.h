@@ -20,7 +20,7 @@ public:
 	void ChangeFormat(const media_multi_audio_format &format);
 	
 	uint32 GetOutputChannelCount();
-	uint32 GetOutputChannelDesignation(int channel);
+	uint32 GetOutputChannelType(int channel);
 	void SetOutputChannelGain(int channel, float gain);
 	float GetOutputChannelGain(int channel);
 	

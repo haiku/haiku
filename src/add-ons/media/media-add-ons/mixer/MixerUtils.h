@@ -2,7 +2,7 @@
 #define _MIXER_UTILS_H
 
 #if DEBUG > 0
-	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; string_for_channel_mask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08X %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
+	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; StringForChannelMask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08X %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
 #else
 	#define PRINT_CHANNEL_MASK(fmt) ((void)0)
 #endif
@@ -10,7 +10,6 @@
 template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 template<class t> const t & min(const t &t1, const t &t2) { return (t1 < t2) ?  t1 : t2; }
 
-void string_for_channel_mask(char *str, uint32 mask);
 void fix_multiaudio_format(media_multi_audio_format *format);
 
 int count_nonzero_bits(uint32 value);
@@ -40,7 +39,9 @@ bigtime_t s_to_us(double secs);
 class MixerInput;
 class MixerOutput;
 
-const char *StringForFormat(MixerOutput *output);	// not thread save
-const char *StringForFormat(MixerInput *input);		// not thread save
+const char *StringForFormat(char *buf, MixerOutput *output);
+const char *StringForFormat(char *buf, MixerInput *input);
+const char *StringForChannelMask(char *buf, uint32 mask);
+const char *StringForChannelType(char *buf, int type);
 
 #endif //_MIXER_UTILS_H

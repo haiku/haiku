@@ -414,10 +414,11 @@ MixerCore::MixThread()
 	Unlock();
 	
 	TRACE("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
+	
+	ASSERT(fMixBufferFrameCount > 0);
 
-	#define MAX_TYPES	18
-	RtList<chan_info> InputChanInfos[MAX_TYPES];
-	RtList<chan_info> MixChanInfos[fOutput->GetOutputChannelCount()]; // XXX this does not support changing output channel count
+	RtList<chan_info> InputChanInfos[MAX_CHANNEL_TYPES];
+	RtList<chan_info> MixChanInfos[fMixBufferChannelCount]; // XXX this does not support changing output channel count
 	
 	event_time = time_base;
 	frame_pos = 0;
@@ -477,7 +478,7 @@ MixerCore::MixThread()
 				float gain;
 				if (!input->GetMixerChannelInfo(chan, cur_framepos, event_time, &base, &sample_offset, &type, &gain))
 					continue;
-				if (type < 0 || type >= MAX_TYPES)
+				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
 				chan_info *info = InputChanInfos[type].Create();
 				info->base = (const char *)base;
@@ -492,7 +493,7 @@ MixerCore::MixThread()
 				int type;
 				float gain;
 				fOutput->GetMixerChannelInfo(chan, i, &type, &gain);
-				if (type < 0 || type >= MAX_TYPES)
+				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
 				int count = InputChanInfos[type].CountItems();
 				for (int j = 0; j < count; j++) {
@@ -505,22 +506,26 @@ MixerCore::MixThread()
 			}
 		}
 
-		uint32 dst_sample_offset;
-		dst_sample_offset = fMixBufferChannelCount * sizeof(float);
-		
 		memset(fMixBuffer, 0, fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
 		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
 			PRINT(5, "MixThread: chan %d has %d sources\n", chan, MixChanInfos[chan].CountItems());
 			int count = MixChanInfos[chan].CountItems();
 			for (int i = 0; i < count; i++) {
 				chan_info *info = MixChanInfos[chan].ItemAt(i);
-				char *dst = (char *)&fMixBuffer[chan];
 				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n", info->base, info->sample_offset, info->gain);
-				for (int j = 0; j < fMixBufferFrameCount; j++) {
-					*(float *)dst += *(const float *)info->base * info->gain;
+				// This looks slightly ugly, but the current GCC will generate the fastest
+				// code this way. fMixBufferFrameCount is always > 0.
+				uint32 dst_sample_offset = fMixBufferChannelCount * sizeof(float);
+				uint32 src_sample_offset = info->sample_offset;
+				register char *dst = (char *)&fMixBuffer[chan];
+				register char *src = (char *)info->base;
+				register float gain = info->gain;
+				register int j = fMixBufferFrameCount;
+				do {
+					*(float *)dst += *(const float *)src * gain;
 					dst += dst_sample_offset;
-					info->base += info->sample_offset;
-				}
+					src += src_sample_offset;
+				 } while (--j);
 			}
 		}
 
@@ -561,7 +566,7 @@ MixerCore::MixThread()
 		}
 
 		// make all lists empty
-		for (int i = 0; i < MAX_TYPES; i++)
+		for (int i = 0; i < MAX_CHANNEL_TYPES; i++)
 			InputChanInfos[i].MakeEmpty();
 		for (int i = 0; i < fOutput->GetOutputChannelCount(); i++)
 			MixChanInfos[i].MakeEmpty();

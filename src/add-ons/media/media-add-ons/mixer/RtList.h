@@ -5,7 +5,7 @@
  *
  * A simple list template that uses realtime
  * memory and does no error checking. Since
- * it doesn't call constructors ot destructors,
+ * it doesn't call constructors or destructors,
  * don't use it to store objects.
  */
  

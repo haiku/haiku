@@ -8,16 +8,16 @@
 #include "MixerOutput.h"
 #include "debug.h"
 
-const char *StringForFormat(const media_format & format, int index);
+const char *StringForFormat(char *str, const media_format & format);
 
-void
-string_for_channel_mask(char *str, uint32 mask)
+const char *
+StringForChannelMask(char *str, uint32 mask)
 {
-	str[0] = 0;
 	if (mask == 0) {
 		strcpy(str, "<none>");
-		return;
+		return str;
 	}
+	str[0] = 0;
 	#define DECODE(type, text)	if (mask & (type)) \
 		 do { strcat(str, text); mask &= ~(type); if (mask != 0) strcat(str, ", "); } while (0)
 	DECODE(B_CHANNEL_LEFT, "Left");
@@ -41,6 +41,7 @@ string_for_channel_mask(char *str, uint32 mask)
 	#undef DECODE
 	if (mask)
 		sprintf(str + strlen(str), "0x%08X", mask);
+	return str;
 }
 
 int
@@ -240,10 +241,9 @@ s_to_us(double secs)
 	return (bigtime_t) (secs * 1000000.0);
 }
 
-const char *StringForFormat(const media_format & format, int index)
+const char *StringForFormat(char *str, const media_format & format)
 {
-	static char str[2][50];
-	static char fmtstr[2][40];
+	char fmtstr[20];
 	const char *fmt;
 	switch (format.u.raw_audio.format) {
 		case media_raw_audio_format::B_AUDIO_FLOAT:
@@ -251,8 +251,8 @@ const char *StringForFormat(const media_format & format, int index)
 			break;
 		case media_raw_audio_format::B_AUDIO_INT:
 			if (format.u.raw_audio.valid_bits != 0) {
-				sprintf(fmtstr[index & 1], "%d bit", format.u.raw_audio.valid_bits);
-				fmt = fmtstr[index & 1];
+				sprintf(fmtstr, "%d bit", format.u.raw_audio.valid_bits);
+				fmt = fmtstr;
 			} else {
 				fmt = "32 bit";
 			}
@@ -274,18 +274,26 @@ const char *StringForFormat(const media_format & format, int index)
 	a = int(format.u.raw_audio.frame_rate + 0.05) / 1000;
 	b = int(format.u.raw_audio.frame_rate + 0.05) % 1000;
 	if (b)
-		sprintf(str[index & 1], "%d.%d kHz %s", a, b / 100, fmt);
+		sprintf(str, "%d.%d kHz %s", a, b / 100, fmt);
 	else
-		sprintf(str[index & 1], "%d kHz %s", a, fmt);
-	return str[index & 1];
+		sprintf(str, "%d kHz %s", a, fmt);
+	return str;
 }
 
-const char *StringForFormat(MixerOutput *output)
+const char *
+StringForFormat(char *buf, MixerOutput *output)
 {
-	return StringForFormat(output->MediaOutput().format, 0);
+	return StringForFormat(buf, output->MediaOutput().format);
 }
 
-const char *StringForFormat(MixerInput *input)
+const char *
+StringForFormat(char *buf, MixerInput *input)
 {
-	return StringForFormat(input->MediaInput().format, 1);
+	return StringForFormat(buf, input->MediaInput().format);
+}
+
+const char *
+StringForChannelType(char *buf, int type)
+{
+	return StringForChannelMask(buf, 1 << type);
 }
