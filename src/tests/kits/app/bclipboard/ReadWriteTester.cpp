@@ -358,4 +358,10 @@ RWHandler::MessageReceived(BMessage *message)
 	}
 }
 
+// ClipboardModified
+bool 
+RWHandler::ClipboardModified()
+{
+	return fClipboardModified;
+}
 
