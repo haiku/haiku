@@ -40,7 +40,7 @@ StdBinCommands
 
 StdBinCommands
 	chop.c
-	clear.c
+#	clear.c
 	driveinfo.c
 	echo.c
 	eject.c
@@ -56,7 +56,7 @@ StdBinCommands
 	rescan.c
 	rmattr.cpp
 	sysinfo.c
-	tput.c	
+#	tput.c	
 	unchop.c
 	unmount.c
 	waitfor.c
