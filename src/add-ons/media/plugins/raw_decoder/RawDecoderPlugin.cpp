@@ -63,12 +63,8 @@ RawDecoderPlugin::NewDecoder()
 status_t
 RawDecoderPlugin::RegisterPlugin()
 {
-	media_format fmt;
-	memset(&fmt, 0, sizeof(fmt));
-	fmt.type = B_MEDIA_RAW_AUDIO;
-	PublishDecoder("raw audio", "RAW audio decoder", fmt);
-	fmt.type = B_MEDIA_RAW_VIDEO;
-	PublishDecoder("raw video", "RAW video decoder", fmt);
+	PublishDecoder("audiocodec/raw", "raw", "RAW audio decoder", "{ WAV : 0x1 }, { QT : 0x20776172, 0x736f7774, 0x74776f73 }");
+	PublishDecoder("videocodec/raw", "raw", "RAW video decoder");
 	return B_OK;
 }
 

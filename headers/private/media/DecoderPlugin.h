@@ -44,8 +44,7 @@ public:
 
 	virtual Decoder *NewDecoder() = 0;
 	
-	status_t PublishDecoder(const char *short_name, const char *pretty_name, const media_format_description &fmt_desc, media_type fmt_type);
-	status_t PublishDecoder(const char *short_name, const char *pretty_name, const media_format &fmt);
+	status_t PublishDecoder(const char *meta_description, const char *short_name, const char *pretty_name, const char *default_mapping = 0);
 };
 
 } } // namespace BPrivate::media

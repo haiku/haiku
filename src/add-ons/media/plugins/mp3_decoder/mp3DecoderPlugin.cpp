@@ -105,27 +105,15 @@ mp3DecoderPlugin::NewDecoder()
 status_t
 mp3DecoderPlugin::RegisterPlugin()
 {
-	struct {
-		const char *short_name;
-		const char *pretty_name;
-		uint32 id;
-	} descs[] = {
-		{ "mpeg1 audio layer1", "MPEG 1 audio layer 1 decoder, based on mpeg123 mpglib", B_MPEG_1_AUDIO_LAYER_1 },
-		{ "mpeg1 audio layer2", "MPEG 1 audio layer 2 decoder, based on mpeg123 mpglib", B_MPEG_1_AUDIO_LAYER_2 },
-		{ "mpeg1 audio layer3", "MPEG 1 audio layer 3 decoder, based on mpeg123 mpglib", B_MPEG_1_AUDIO_LAYER_3 },
-		{ "mpeg2 audio layer1", "MPEG 2 audio layer 1 decoder, based on mpeg123 mpglib", B_MPEG_2_AUDIO_LAYER_1 },
-		{ "mpeg2 audio layer2", "MPEG 2 audio layer 2 decoder, based on mpeg123 mpglib", B_MPEG_2_AUDIO_LAYER_2 },
-		{ "mpeg2 audio layer3", "MPEG 2 audio layer 3 decoder, based on mpeg123 mpglib", B_MPEG_2_AUDIO_LAYER_3 },
-		{ "mpeg2.5 audio layer1", "MPEG 2.5 audio layer 1 decoder, based on mpeg123 mpglib", B_MPEG_2_5_AUDIO_LAYER_1 },
-		{ "mpeg2.5 audio layer2", "MPEG 2.5 audio layer 2 decoder, based on mpeg123 mpglib", B_MPEG_2_5_AUDIO_LAYER_2 },
-		{ "mpeg2.5 audio layer3", "MPEG 2.5 audio layer 3 decoder, based on mpeg123 mpglib", B_MPEG_2_5_AUDIO_LAYER_3 }
-	};
-	for (int i = 0; i < (int)(sizeof(descs) / sizeof(descs[i])); i++) {
-		media_format_description fmt_desc;
-		fmt_desc.family = B_MPEG_FORMAT_FAMILY;
-		fmt_desc.u.mpeg.id = descs[i].id;
-		PublishDecoder(descs[i].short_name, descs[i].pretty_name, fmt_desc, B_MEDIA_ENCODED_AUDIO);
-	}
+	PublishDecoder("audiocodec/mpeg1layer1", "mp3", "MPEG 1 audio layer 1 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg1layer2", "mp3", "MPEG 1 audio layer 2 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg1layer3", "mp3", "MPEG 1 audio layer 3 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2layer1", "mp3", "MPEG 2 audio layer 1 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2layer2", "mp3", "MPEG 2 audio layer 2 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2layer3", "mp3", "MPEG 2 audio layer 3 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2.5layer1", "mp3", "MPEG 2.5 audio layer 1 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2.5layer2", "mp3", "MPEG 2.5 audio layer 2 decoder, based on mpeg123 mpglib");
+	PublishDecoder("audiocodec/mpeg2.5layer3", "mp3", "MPEG 2.5 audio layer 3 decoder, based on mpeg123 mpglib");
 }
 
 

@@ -148,7 +148,9 @@ MediaExtractor::GetNextChunk(int32 stream,
 							 media_header *mediaHeader)
 {
 	// get buffered chunk
-	return B_OK;
+	
+	// XXX this should be done in a different thread, and double buffered for each stream
+	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer, chunkSize, mediaHeader);
 }
 
 status_t
