@@ -1,6 +1,7 @@
 #include <stdio.h>
 // for O_WRONLY
 #include <fcntl.h>
+#include <unistd.h>
 
 // 2002, François Revol
 // technical reference:

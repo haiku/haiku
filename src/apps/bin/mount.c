@@ -17,7 +17,7 @@
 #include <errno.h>
 
 
-void
+static void
 usage(const char *programName)
 {
 	

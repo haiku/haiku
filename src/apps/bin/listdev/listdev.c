@@ -8,6 +8,7 @@
 #include <drivers/module.h>
 #include <drivers/PCI.h>
 
+#include "cm_wrapper.h"
 #include "config_driver.h"
 
 #define NEXT_POSSIBLE(c) \
@@ -64,7 +65,7 @@ dump_device_configuration(struct device_configuration *c)
 		for (i=0;i<num;i++) {
 			get_nth_resource_descriptor_of_type(c, i, B_IO_PORT_RESOURCE,
 					&r, sizeof(resource_descriptor));
-			printf("\n  io range:  min %x max %x align %x len %x",
+			printf("\n  io range:  min %lx max %lx align %lx len %lx",
 					r.d.r.minbase, r.d.r.maxbase,
 					r.d.r.basealign, r.d.r.len);
 		}
@@ -75,7 +76,7 @@ dump_device_configuration(struct device_configuration *c)
 		for (i=0;i<num;i++) {
 			get_nth_resource_descriptor_of_type(c, i, B_MEMORY_RESOURCE,
 					&r, sizeof(resource_descriptor));
-			printf("\n  mem range: min %x max %x align %x len %x",
+			printf("\n  mem range: min %lx max %lx align %lx len %lx",
 					r.d.r.minbase, r.d.r.maxbase,
 					r.d.r.basealign, r.d.r.len);
 		}
@@ -156,7 +157,7 @@ static void
 dump_device_info(struct device_info *info, struct device_configuration *current,
 		struct possible_device_configurations *possible)
 {
-	int i;
+	unsigned int i;
 	struct device_configuration *config;
 
 	printf((info->devtype.base < 13) ? base_desc[info->devtype.base] : "Unknown");
@@ -183,7 +184,7 @@ dump_device_info(struct device_info *info, struct device_configuration *current,
 		printf("Currently unconfigured.\n");
 	}
 
-	printf("%x configurations\n", possible->num_possible);
+	printf("%lx configurations\n", possible->num_possible);
 	config = possible->possible + 0;
 	for (i=0;i<possible->num_possible;i++) {
 		printf("\nPossible configuration #%d: ", i);

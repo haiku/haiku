@@ -32,20 +32,21 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <OS.h>
 
-void list_sems(team_info *tinfo)
+static void list_sems(team_info *tinfo)
 {
 	sem_info info;
 	int32 cookie = 0;
 
-	printf("TEAM  %d (%s):\n", tinfo->team, tinfo->args );
+	printf("TEAM  %ld (%s):\n", tinfo->team, tinfo->args );
 	printf("     ID                           name  count\n");
 	printf("---------------------------------------------\n");
 	
 	while (get_next_sem_info(tinfo->team, &cookie, &info) == B_OK)
 	{
-		printf("%7d%31s%7d\n", info.sem ,info.name , info.count );
+		printf("%7ld%31s%7ld\n", info.sem ,info.name , info.count );
 	}
 	printf("\n");
 }
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
 
 	// show up some stats first...
 	get_system_info(&sysinfo);
-	printf("sem: total: %5i, used: %5i, left: %5i\n\n", sysinfo.max_sems, sysinfo.used_sems, sysinfo.max_sems - sysinfo.used_sems);
+	printf("sem: total: %5li, used: %5li, left: %5li\n\n", sysinfo.max_sems, sysinfo.used_sems, sysinfo.max_sems - sysinfo.used_sems);
 
 	if (argc == 1) {
 		while (get_next_team_info( &cook, &tinfo) == B_OK)

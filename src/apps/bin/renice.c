@@ -15,6 +15,7 @@
 
 #include <OS.h>
 #include <stdio.h>
+#include <string.h>
 
 /*
    Notes:
@@ -49,18 +50,18 @@ prio is locked into one pid, then the priority.
 */
 
 // returns an equivalent UNIX priority for a given BeOS priority.
-int32 prio_be_to_unix(int32 prio)
+static int32 prio_be_to_unix(int32 prio)
 {
 	return (prio > 10)?(- (20 * (prio - 10)) / 110):(2 * (10 - prio));
 }
 
 // returns an equivalent BeOS priority for a given UNIX priority.
-int32 prio_unix_to_be(int32 prio)
+static int32 prio_unix_to_be(int32 prio)
 {
 	return (prio > 0)?(10 - (prio/2)):(10 + 110 * (-prio) / 20);
 }
 
-status_t renice_thread(int32 prio, int32 increment, bool use_be_prio, thread_id th)
+static status_t renice_thread(int32 prio, int32 increment, bool use_be_prio, thread_id th)
 {
 	thread_info thinfo;
 

@@ -5,6 +5,7 @@
 
 #include <drivers/config_manager.h>
 
+#include "cm_wrapper.h"
 #include "config_driver.h"
 
 static int fd;

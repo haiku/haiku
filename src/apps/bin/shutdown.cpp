@@ -409,7 +409,7 @@ int main(int argc, char **argv)
 
 	if (time_to_sleep > 0) {
 		unsigned int left;
-		thread_id BApp_thread;
+		thread_id BApp_thread = -1;
 
 		signal(SIGUSR1, handle_usr1);
 

@@ -25,7 +25,6 @@ bool OutputTeam( void * item_p )
 	static uint32 i = 0u; // counter
 
 	app_info info;
-	app_info *pinfo = &info;
 
 	// Roster stores team_id not team_id * 
 	team_id id = reinterpret_cast<team_id>( item_p );

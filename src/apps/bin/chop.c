@@ -40,6 +40,8 @@
 
 #include <OS.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -180,13 +182,13 @@ chop_file(int fdin, char *fname, off_t fsize)
 	bool open_next_file = true;  // when to open a new output file
 	char fnameN[256];            // name of the current output file (file01, file02, etc.)
 	int  index = 0;              // used to generate the next output file name
-	int  fdout;                  // output file descriptor
+	int  fdout = -1;             // output file descriptor
 
 	ssize_t got;                 // size of the current data block -- i.e. from the last read()
 	ssize_t put;                 // number of bytes just written   -- i.e. from the last write()
 	ssize_t needed;              // how many bytes we can safely write to the current output file
 	ssize_t avail;               // how many bytes we can safely grab from the current data block
-	off_t   curr_written;        // number of bytes written to the current output file
+	off_t   curr_written = 0;    // number of bytes written to the current output file
 	off_t   total_written = 0;   // total bytes written out to all output files
 		
 	char *beg = Block;  // pointer to the beginning of the block data to be written out

@@ -14,6 +14,8 @@
 
 #include <OS.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -136,7 +138,7 @@ dump_file(FILE *fp)
 void
 display(uint32 offset, uint8 *data)
 {
-	printf("%08x ", offset);
+	printf("%08lx ", offset);
 	printf("  %s ", hexbytes(data));
 	printf("%16s ", printable(data));
 	

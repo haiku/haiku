@@ -173,7 +173,7 @@ int (*set_var_lookup_hook(int (*func)(char *name, ULONG *val)))
 ULONG last_result = 0;
 
 
-int
+static int
 special_vars(char *name, ULONG *val)
 {
   if (strcmp(name, "time") == 0)
@@ -213,7 +213,7 @@ main(int argc, char *argv[])
    casting and comparisons we can determine if a value
    will fit in a 32 bit quantity and only print that.
 */
-void
+static void
 print_result(ULONG value)
 {
   int i;
@@ -253,7 +253,7 @@ void
 parse_args(int argc, char *argv[])
 {
   int i, len;
-  char *buff, *fmt_str;
+  char *buff;
   ULONG value;
 
   for(i=1, len=0; i < argc; i++)
@@ -279,7 +279,6 @@ parse_args(int argc, char *argv[])
 void
 do_input(void)
 {
-  int ret;
   ULONG value;
   char buff[256], *ptr;
   
@@ -331,8 +330,8 @@ parse_expression(char *str)
 ULONG
 assignment_expr(char **str)
 {
-  ULONG val, sum = 0; 
-  char op, *orig_str;
+  ULONG val; 
+  char *orig_str;
   char *var_name;
   variable *v;
   
@@ -838,7 +837,7 @@ get_value(char **str)
   
   if (**str == SINGLE_QUOTE)         /* a character constant */
    {
-     int i;
+     unsigned int i;
      
      *str = *str + 1;                /* advance over the leading quote */
      val = 0;
@@ -854,7 +853,7 @@ get_value(char **str)
      if (**str != SINGLE_QUOTE)       /* constant must have been too long */
       {
 	fprintf(stderr, "Warning: character constant not terminated or too "
-		"long (max len == %d bytes)\n", sizeof(LONG));
+		"long (max len == %ld bytes)\n", sizeof(LONG));
 	while(**str && **str != SINGLE_QUOTE)
 	  *str += 1;
       }

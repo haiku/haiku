@@ -51,16 +51,16 @@ list_image_info(team_id id)
 
 	status = get_team_info(id, &teamInfo);
 	if (status < B_OK) {
-		printf("\nCould not retrieve information about team %ld: \n", id, strerror(status));
+		printf("\nCould not retrieve information about team %ld: %s\n", id, strerror(status));
 		return;
 	}
 
-	printf("\nTEAM %4d (%s):\n", id, teamInfo.args);
+	printf("\nTEAM %4ld (%s):\n", id, teamInfo.args);
 	printf("   ID                                                             name     text     data seq#      init#\n");
 	printf("--------------------------------------------------------------------------------------------------------\n");
 
 	while ((status = get_next_image_info(id, &cookie, &imageInfo)) == B_OK) {
-		printf("%5d %64s %.8x %.8x %4d %10u\n",
+		printf("%5ld %64s %p %p %4ld %10lu\n",
 			imageInfo.id,
 			imageInfo.name,
 			imageInfo.text,

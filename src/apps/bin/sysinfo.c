@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <kernel/OS.h>
 
 static const int cache_desc_values[] = {
@@ -241,7 +242,7 @@ static void dump_cpu(system_info *info)
 
 		ret = get_cpuid(&cpuii[0], 0, i);
 		if (ret != B_OK) {
-			fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0, i, ret);
+			fprintf(stderr, "cpuid_info(, %d, %d): error 0x%08lx\n", 0, i, ret);
 			break;
 		}
 		max_eax = cpuii[0].eax_0.max_eax;
@@ -250,7 +251,7 @@ static void dump_cpu(system_info *info)
 		for (j = 1; j <= max_eax && j < 5; j++) {
 			ret = get_cpuid(&cpuii[j], j, i);
 			if (ret != B_OK) {
-				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", j, i, ret);
+				fprintf(stderr, "cpuid_info(, %d, %d): error 0x%08lx\n", j, i, ret);
 				break;
 			}
 		}
@@ -266,7 +267,7 @@ static void dump_cpu(system_info *info)
 		if (check_extended) {
 			ret = get_cpuid(&cpuiie[0], 0x80000000, i);
 			if (ret != B_OK) {
-				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0x80000000, i, ret);
+				fprintf(stderr, "cpuid_info(, %d, %d): error 0x%08lx\n", 0x80000000, i, ret);
 				break;
 			}
 			max_eeax = cpuiie[0].eax_0.max_eax & 0x0ff;
@@ -274,7 +275,7 @@ static void dump_cpu(system_info *info)
 		for (j = 1; j <= max_eeax && j < 9; j++) {
 			ret = get_cpuid(&cpuiie[j], 0x80000000+j, i);
 			if (ret != B_OK) {
-				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0x80000000+j, i, ret);
+				fprintf(stderr, "cpuid_info(, %d, %d): error 0x%08lx\n", 0x80000000+j, i, ret);
 				break;
 			}
 		}
@@ -284,7 +285,7 @@ static void dump_cpu(system_info *info)
 		printf("CPU #%d: %.12s\n", i, cpuii[0].eax_0.vendorid);
 		if (max_eax == 0)
 			continue;
-		printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08x\n", 
+		printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08lx\n", 
 				cpuii[1].eax_1.type, 
 				cpuii[1].eax_1.family, 
 				cpuii[1].eax_1.model, 
@@ -293,7 +294,7 @@ static void dump_cpu(system_info *info)
 		/* Extended CPUID */
 		if (max_eeax > 0) {
 			printf("\tExtended information:\n");
-			printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08x\n",
+			printf("\ttype %u, family %u, model %u, stepping %u, features 0x%08lx\n",
 				cpuiie[1].eax_1.type, 
 				cpuiie[1].eax_1.family, 
 				cpuiie[1].eax_1.model, 
@@ -336,7 +337,7 @@ static void dump_cpu(system_info *info)
 				break;
 			ret = get_cpuid(&cpuii[2], 2, i);
 			if (ret != B_OK) {
-				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 2, i, ret);
+				fprintf(stderr, "cpuid_info(, %d, %d): error 0x%08lx\n", 2, i, ret);
 				break;
 			}
 			

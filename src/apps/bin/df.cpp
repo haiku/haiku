@@ -205,14 +205,14 @@ void PrintBlocks (int64 blocks, int64 blocksize, bool human)
 		} else {
 			double fblocks = ((double)blocks) * (blocksize / 1024);
 			if (fblocks < 1024) {
-				sprintf(temp, "%.1LfK", fblocks);
+				sprintf(temp, "%.1fK", fblocks);
 			} else {
 				fblocks = (((double)blocks) / 1024) * (blocksize / 1024);;
 				if (fblocks < 1024) {
-					sprintf(temp, "%.1LfM", fblocks);
+					sprintf(temp, "%.1fM", fblocks);
 				} else {
 					fblocks = (((double)blocks) / (1024*1024)) * (blocksize / 1024);
-					sprintf(temp, "%.1LfG", fblocks);
+					sprintf(temp, "%.1fG", fblocks);
 				}
 			}
 		}

@@ -158,6 +158,9 @@ int main( int argc, char **argv )
 				case Arguments::READ:
 					Clipboard::Read( argv[2] );
 					break;
+				default:	//Shouldn't happen
+					Status::Code = B_BAD_VALUE;
+					break;
 			}
 		}
 	}

@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include <Drivers.h>
 
-int usage(char *prog)
+static int usage(char *prog)
 {
 	printf("usage: eject [-q|-l|-s] /dev/disk/.../raw\n");
 	printf("	eject the device, or:\n");

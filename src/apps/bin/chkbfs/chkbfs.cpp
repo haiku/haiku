@@ -27,7 +27,7 @@ openDevice(const char *name)
 
 	fs_info info;
 	if (fs_stat_dev(volume, &info) < B_OK) {
-		fprintf(stderr, "%s: could not stat device: %s\n", gProgramName, name, errno);
+		fprintf(stderr, "%s: could not stat device: %s: %s\n", gProgramName, name, strerror(errno));
 		return errno;
 	}
 
@@ -212,7 +212,7 @@ main(int argc, char **argv)
 	}
 
 	// print stats
-	printf("checked %ld nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
+	printf("checked %Ld nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
 		nodes, control.stats.missing, control.stats.already_set, control.stats.freed);
 	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. dirs\t%Ld\n\tindices\t\t%Ld\n",
 		files, directories, attributes, attributeDirectories, indices);

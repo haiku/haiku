@@ -14,6 +14,7 @@
 
 #include <OS.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -23,7 +24,7 @@
 void  append_file (int, int);
 void  do_unchop   (char *, char *);
 void  replace     (char *, char *);
-char *temp_file   ();
+char *temp_file   (void);
 void  usage       (void);
 bool  valid_file  (char *);
 
@@ -166,7 +167,7 @@ replace(char *origfile, char *newfile)
 
 
 char *
-temp_file()
+temp_file(void)
 {
 	// creates a new, temporary file and returns its name
 	
