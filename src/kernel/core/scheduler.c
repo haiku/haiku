@@ -1,13 +1,13 @@
-/* The thread scheduler */
-
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
  
+/* The thread scheduler */
+
 #include <OS.h>
 
 #include <thread.h>
@@ -57,7 +57,7 @@ dump_run_queue(int argc, char **argv)
 		dprintf("Run queue is empty!\n");
 	else {
 		while (thread) {
-			dprintf("Thread id: %ld - priority: %d\n", thread->id, thread->priority);
+			dprintf("Thread id: %ld - priority: %ld\n", thread->id, thread->priority);
 			thread = thread->queue_next;
 		}
 	}
