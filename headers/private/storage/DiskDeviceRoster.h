@@ -26,13 +26,19 @@ namespace BPrivate {
 
 // watchable events
 enum {
-	B_DEVICE_REQUEST_MOUNT_POINT	= 0x01,	// mount point changes
-	B_DEVICE_REQUEST_MOUNTING		= 0x02,	// mounting/unmounting
-	B_DEVICE_REQUEST_PARTITION		= 0x04,	// partition changes 
-	B_DEVICE_REQUEST_DEVICE			= 0x10,	// device changes (media changes)
-	B_DEVICE_REQUEST_DEVICE_LIST	= 0x20,	// device additions/removals
-	B_DEVICE_REQUEST_JOBS			= 0x40, // job addition/initiation/completion
-	B_DEVICE_REQUEST_ALL			= 0xff,	// all events
+	// Basic masks
+	B_DEVICE_REQUEST_MOUNT_POINT			= 0x0001,	// mount point changes
+	B_DEVICE_REQUEST_MOUNTING				= 0x0002,	// mounting/unmounting
+	B_DEVICE_REQUEST_PARTITION				= 0x0004,	// partition changes 
+	B_DEVICE_REQUEST_DEVICE					= 0x0008,	// device changes (media changes)
+	B_DEVICE_REQUEST_DEVICE_LIST			= 0x0010,	// device additions/removals
+	B_DEVICE_REQUEST_JOB_LIST				= 0x0020, 	// job addition/initiation/cancellation/completion
+	B_DEVICE_REQUEST_JOB_SIMPLE_PROGRESS	= 0x0040, 	// simple job progress (i.e. "% complete" only)
+	B_DEVICE_REQUEST_JOB_EXTRA_PROGRESS		= 0x0080, 	// extra info on job progress (no "% complete" info)
+
+	// Combination masks
+	B_DEVICE_REQUEST_JOB_COMPLETE_PROGRESS	= 0x00C0, 	// complete job progress info
+	B_DEVICE_REQUEST_ALL					= 0xffff,	// all events
 };
 
 // notification message "what" field
@@ -56,9 +62,12 @@ enum {
 	B_DEVICE_MEDIA_CHANGED,				// media changed
 	B_DEVICE_ADDED,						// device added
 	B_DEVICE_REMOVED,					// device removed
-	B_DEVICE_JOB_ADDED,					// job added
+	B_DEVICE_JOB_SCHEDULED,				// job added
 	B_DEVICE_JOB_INITIATED,				// job initiated
+	B_DEVICE_JOB_CANCELED,				// job canceled
 	B_DEVICE_JOB_FINISHED,				// job finished
+	B_DEVICE_JOB_SIMPLE_PROGRESS,		// job percent complete progress
+	B_DEVICE_JOB_EXTRA_PROGRESS,		// extended job progress info
 };
 
 // notification message "cause" field values
@@ -85,6 +94,7 @@ public:
 	status_t GetNextDiskSystem(BDiskSystem *system);
 	status_t RewindDiskSystems();
 
+	// Active jobs are those that are scheduled or in-progress
 	status_t GetNextActiveJob(BDiskDeviceJob *job);
 	status_t RewindActiveJobs();
 
@@ -108,14 +118,14 @@ public:
 									 BDiskDevice *device = NULL,
 									 BPartition **partition = NULL);
 									 
-	// Do we want visit functions for disk systems and/or jobs?
-	
 	status_t GetDeviceWithID(int32 id, BDiskDevice *device) const;
 	status_t GetPartitionWithID(int32 id, BDiskDevice *device,
 								BPartition **partition) const;
 
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
+	status_t StartWatchingJob(BDiskDeviceJob *job, BMessenger target,
+	                          uint32 eventMask = B_DEVICE_REQUEST_JOB_COMPLETE_PROGRESS);
 	status_t StopWatching(BMessenger target);
 
 private:

@@ -15,14 +15,24 @@ enum {
 	B_DISK_DEVICE_JOB_MOVE,
 	B_DISK_DEVICE_JOB_DEFRAGMENT,
 	B_DISK_DEVICE_JOB_REPAIR,
-}
+};
+
+// disk device job statuses
+enum {
+	B_DISK_DEVICE_JOB_UNINITIALIZED,
+	B_DISK_DEVICE_JOB_SCHEDULED,
+	B_DISK_DEVICE_JOB_IN_PROGRESS,
+	B_DISK_DEVICE_JOB_SUCCEEDED,
+	B_DISK_DEVICE_JOB_FAILED,
+	B_DISK_DEVICE_JOB_CANCELED,
+};
 
 class BDiskDeviceJob {
 public:
 	int32 ID() const;
 	uint32 Type() const;	
 	uint8 Progress() const;		// 0 to 100
-	bool Finished() const;	
+	uint32 Status() const;	
 	const char *Description() const;
 	
 	BPartition* Partition() const;

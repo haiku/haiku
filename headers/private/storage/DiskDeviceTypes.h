@@ -23,7 +23,10 @@ const char *kPartitionTypeCDDA			= "Compact Disc Audio Session";
 const char *kPartitionTypeAmiga			= "Amiga Partition Map";
 const char *kPartitionTypeApple			= "Apple Partition Map";
 const char *kPartitionTypeIntel			= "Intel Partition Map";
+
+const char *kPartitionTypeIntelPrimary	= "Intel Primary Partition";
 const char *kPartitionTypeIntelExtended	= "Intel Extended Partition";
+const char *kPartitionTypeIntelLogical	= "Intel Logical Partition";
 
 const char *kPartitionTypeAmigaFFS		= "AmigaFFS Filesystem";
 const char *kPartitionTypeBFS			= "BFS Filesystem";

@@ -35,7 +35,8 @@ public:
 	bool IsMounted() const;
 	
 	const char* Name() const;
-	const char* Type() const;   // See DiskDeviceTypes.h
+	const char* Type() const;   		// See DiskDeviceTypes.h
+	const char* ContentType() const;	// See DiskDeviceTypes.h
 	int32 UniqueID() const;
 	uint32 Flags() const;		
 	
@@ -57,7 +58,7 @@ public:
 	int32 CountPartitionableSpaces() const;
 	
 	BPartition* VisitEachChild(BDiskDeviceVisitor *visitor);
-	BPartition* VisitSubtree(BDiskDeviceVisitor *visitor);
+	BPartition* VisitEachDescendent(BDiskDeviceVisitor *visitor);
 
 	// Self Modification
 
@@ -65,45 +66,44 @@ public:
 	status_t Lock();	// to be non-blocking
 	status_t Unlock();
 	
-	bool CanDefragment() const;
+	bool CanDefragment(bool *whileMounted = NULL) const;
 	status_t Defragment() const;
 	
-	bool CanRepair(bool checkOnly) const;
+	bool CanRepair(bool *checkOnly, bool *whileMounted = NULL) const;
 	status_t Repair(bool checkOnly) const;
 
-	bool CanResize() const;
-	bool CanResizeWhileMounted() const;
+	bool CanResize(bool *whileMounted = NULL) const;
 	status_t ValidateResize(off_t*) const;
 	status_t Resize(off_t);
 
-	bool CanMove() const;
+	bool CanMove(bool *whileMounted = NULL) const;
 	status_t ValidateMove(off_t*) const;
 	status_t Move(off_t);
 
-	bool CanEditParameters() const;
+	bool CanEditParameters(bool *whileMounted = NULL) const;
 	status_t GetParameterEditor(
-           BDiskScannerParameterEditor **editor,
-           BDiskScannerParameterEditor **parentEditor);
-    status_t ValidateSetParameters(const char **parameters) const;
-    status_t SetParameters(const char *parameters);
+               BDiskScannerParameterEditor **editor,
+               BDiskScannerParameterEditor **contentEditor);
+    status_t SetParameters(const char *parameters, const char **contentParameters);
 
-	bool CanInitialize() const;
+	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
                BDiskScannerParameterEditor **editor) const;
-    status_t ValidateInitialize(const char *diskSystem, const char **parameters) const;
 	status_t Initialize(const char *diskSystem,
 	                 const char *parameters);
 	
 	// Modification of child partitions
 
 	bool CanCreateChild() const;
-	status_t ValidateCreateChild(
-	           off_t *start, 
-	           off_t *size) const;
-	status_t CreateChild(off_t start, off_t size);
+	status_t GetChildCreationParameterEditor(const char *system,       
+               BDiskScannerParameterEditor **editor) const;
+	status_t ValidateCreateChild(off_t *start, off_t *size,
+	           const char *parameters) const;
+	status_t CreateChild(off_t start, off_t size, const char *parameters,
+	           **BPartition child = NULL);
 	
 	bool CanDeleteChild(int32 index) const;
-	status_t DeleteChild();
+	status_t DeleteChild(int32 index);
 	
 protected:
 	BObjectList<BPartition>	fChildren;

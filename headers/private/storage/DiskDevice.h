@@ -8,7 +8,6 @@
 
 class BDiskDevice : public BPartition {
 public:
-	char* DeviceType() const;
 	bool IsRemovable() const;
 	bool HasMedia() const;
 
@@ -20,6 +19,7 @@ public:
 	bool IsModified() const;
 	int32 CommitModifications(bool synchronously = true,
 		BMessenger progressMessenger = BMessenger(),
+		bool receiveCompleteProgressUpdates = true,
 		BMessage *template = NULL);
 private:
 	friend class BDiskDeviceList;
