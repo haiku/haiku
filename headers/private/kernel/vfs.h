@@ -87,7 +87,7 @@ status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 
 /* calls the syscall dispatcher should use for user file I/O */
 status_t _user_mount(const char *path, const char *device, const char *fs_name,
-			uint32 flags, void *args);
+			uint32 flags, const char *args);
 status_t _user_unmount(const char *path);
 status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
