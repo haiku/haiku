@@ -8,27 +8,29 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 	SubDirCcFlags -DHAVE_CONFIG_H -DLOCATE_DB='\"/var/locatedb\"' ;
 }
 
+local findutils_rsrc = [ FGristFiles findutils.rsrc ] ;
+ResComp $(findutils_rsrc) : [ FGristFiles findutils.rdef ] ;
+SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
 BinCommand locate :
 	locate.c
-	: libfindutils.a : findutils.rdef ;
-
-SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+	: libfindutils.a : $(findutils_rsrc) ;
 
 BinCommand bigram :
 	bigram.c
-	: libfindutils.a : findutils.rdef ;
+	: libfindutils.a : $(findutils_rsrc) ;
 
 MakeLocate bigram : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
 
 BinCommand frcode :
 	frcode.c
-	: libfindutils.a : findutils.rdef ;
+	: libfindutils.a : $(findutils_rsrc) ;
 
 MakeLocate frcode : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
 
 BinCommand code :
 	code.c
-	: libfindutils.a : findutils.rdef ;
+	: libfindutils.a : $(findutils_rsrc) ;
 
 MakeLocate code : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
 
