@@ -726,10 +726,6 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 	if (!directory->IsDirectory())
 		RETURN_ERROR(B_BAD_TYPE);
 
-	status_t status = directory->CheckPermissions(W_OK);
-	if (status < B_OK)
-		RETURN_ERROR(status);
-
 	// We are creating the cookie at this point, so that we don't have
 	// to remove the inode if we don't have enough free memory later...
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));

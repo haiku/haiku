@@ -2109,6 +2109,11 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 				return B_NOT_ALLOWED;
 
 			if (openMode & O_TRUNC) {
+				// we need write access in order to truncate the file
+				status = inode->CheckPermission(W_OK);
+				if (status != B_OK)
+					return status;
+
 				// truncate the existing file
 				WriteLocked locked(inode->Lock());
 
@@ -2130,6 +2135,10 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 		}
 	} else if (parent && (mode & S_ATTR_DIR) == 0)
 		return B_BAD_VALUE;
+
+	// do we have the power to create new files at all?
+	if (parent != NULL && (status = parent->CheckPermissions(W_OK)) != B_OK)
+		RETURN_ERROR(status);
 
 	// allocate space for the new inode
 	InodeAllocator allocator(transaction);
