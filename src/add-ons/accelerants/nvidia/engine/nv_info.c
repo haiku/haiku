@@ -1905,14 +1905,52 @@ static void	setup_ram_config_nv28(uint8* rom)
 
 static status_t translate_ISA_PCI(uint32* reg)
 {
-//fixme: add more registers...
 	switch (*reg)
 	{
+	case 0x03c0:
+		*reg = NV8_ATTRDATW;
+		break;
+	case 0x03c1:
+		*reg = NV8_ATTRDATR;
+		break;
+	case 0x03c2:
+		*reg = NV8_MISCW;
+		break;
 	case 0x03c4:
 		*reg = NV8_SEQIND;
 		break;
+	case 0x03c5:
+		*reg = NV8_SEQDAT;
+		break;
+	case 0x03c6:
+		*reg = NV8_PALMASK;
+		break;
+	case 0x03c7:
+		*reg = NV8_PALINDR;
+		break;
+	case 0x03c8:
+		*reg = NV8_PALINDW;
+		break;
+	case 0x03c9:
+		*reg = NV8_PALDATA;
+		break;
+	case 0x03cc:
+		*reg = NV8_MISCR;
+		break;
+	case 0x03ce:
+		*reg = NV8_GRPHIND;
+		break;
+	case 0x03cf:
+		*reg = NV8_GRPHDAT;
+		break;
 	case 0x03d4:
 		*reg = NV8_CRTCIND;
+		break;
+	case 0x03d5:
+		*reg = NV8_CRTCDAT;
+		break;
+	case 0x03da:
+		*reg = NV8_INSTAT1;
 		break;
 	default:
 		LOG(8,("\n\nINFO: WARNING: ISA->PCI register adress translation failed!\n\n"));
