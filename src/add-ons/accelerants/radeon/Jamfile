@@ -1,0 +1,40 @@
+SubDir OBOS_TOP src add-ons accelerants radeon ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+
+
+Addon radeon.accelerant : accelerants :
+	Acceleration.c
+	CP.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetModeInfo.c
+	GlobalData.c
+	InitAccelerant.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	crtc.c
+	dpms.c
+	engine_sync.c
+	flat_panel.c
+	multimon.c
+	overlay.c
+	overlay_management.c
+	pll.c
+	settings.cpp
+	utils.c
+	log_coll.c
+	log_dump.c
+	ddc.c
+	dump_edid.c
+	edid.c
+	i2c.c
+;
+
+Package openbeos-radeon-cvs :
+	radeon.accelerant : 
+	boot home config add-ons accelerants ;
+
+Depends radeon.accelerant : radeon.driver ;
