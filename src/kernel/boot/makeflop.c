@@ -91,7 +91,9 @@ main(int argc, char *argv[])
 
 	// patch the size of the output into bytes 3 & 4 of the bootblock
 	blocks = st.st_size / 512;
-	blocks++;
+	if ((st.st_size % 512) != 0)
+		blocks++;
+	printf("size %d, blocks %d (size %d)\n", (unsigned long)st.st_size, blocks, blocks * 512);
 	bootsector[2] = (blocks & 0x00ff);
 	bootsector[3] = (blocks & 0xff00) >> 8;
 
