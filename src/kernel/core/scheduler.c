@@ -1,28 +1,25 @@
-/* scheduler.c
- *
- * The scheduler code
- *
- */
+/* The thread scheduler */
 
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
  
 #include <OS.h>
-#include <kernel.h>
+
 #include <thread.h>
-#include <thread_types.h>
 #include <timer.h>
 #include <int.h>
 #include <smp.h>
 #include <cpu.h>
 #include <khash.h>
-#include <Errors.h>
-#include <kerrors.h>
 
-#define TRACE_SCHEDULER 0
-#if TRACE_SCHEDULER
+
+//#define TRACE_SCHEDULER
+#ifdef TRACE_SCHEDULER
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -34,7 +31,7 @@ static int dump_run_queue(int argc, char **argv);
 static int _rand(void);
 
 // The run queue. Holds the threads ready to run ordered by priority.
-static struct thread_queue gRunQueue = {NULL, NULL};
+static struct thread_queue sRunQueue = {NULL, NULL};
 
 
 static int
@@ -55,7 +52,7 @@ dump_run_queue(int argc, char **argv)
 {
 	struct thread *thread;
 
-	thread = gRunQueue.head;
+	thread = sRunQueue.head;
 	if (!thread)
 		dprintf("Run queue is empty!\n");
 	else {
@@ -84,17 +81,17 @@ scheduler_enqueue_in_run_queue(struct thread *thread)
 	if (thread->priority < B_MIN_PRIORITY)
 		thread->priority = B_MIN_PRIORITY;
 
-	for (curr = gRunQueue.head, prev = NULL; curr && (curr->priority >= thread->priority); curr = curr->queue_next) {
+	for (curr = sRunQueue.head, prev = NULL; curr && (curr->priority >= thread->priority); curr = curr->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
-			prev = gRunQueue.head;
+			prev = sRunQueue.head;
 	}
 	thread->queue_next = curr;
 	if (prev)
 		prev->queue_next = thread;
 	else
-		gRunQueue.head = thread;
+		sRunQueue.head = thread;
 }
 
 
@@ -108,11 +105,11 @@ scheduler_remove_from_run_queue(struct thread *thread)
 	struct thread *item, *prev;
 
 	// find thread in run queue
-	for (item = gRunQueue.head, prev = NULL; item && item != thread; item = item->queue_next) {
+	for (item = sRunQueue.head, prev = NULL; item && item != thread; item = item->queue_next) {
 		if (prev)
 			prev = prev->queue_next;
 		else
-			prev = gRunQueue.head;
+			prev = sRunQueue.head;
 	}
 
 	ASSERT(item == thread);
@@ -120,7 +117,7 @@ scheduler_remove_from_run_queue(struct thread *thread)
 	if (prev)
 		prev->queue_next = item->queue_next;
 	else
-		gRunQueue.head = item->queue_next;
+		sRunQueue.head = item->queue_next;
 }
 
 
@@ -188,7 +185,7 @@ scheduler_reschedule(void)
 	oldThread->state = oldThread->next_state;
 
 	// select next thread from the run queue
-	nextThread = gRunQueue.head;
+	nextThread = sRunQueue.head;
 	prevThread = NULL;
 	while (nextThread && (nextThread->priority > B_IDLE_PRIORITY)) {
 		// always extract real time threads
@@ -214,7 +211,7 @@ scheduler_reschedule(void)
 	if (prevThread)
 		prevThread->queue_next = nextThread->queue_next;
 	else
-		gRunQueue.head = nextThread->queue_next;
+		sRunQueue.head = nextThread->queue_next;
 
 	nextThread->state = B_THREAD_RUNNING;
 	nextThread->next_state = B_THREAD_READY;
