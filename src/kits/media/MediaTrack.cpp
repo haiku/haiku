@@ -41,6 +41,7 @@ BMediaTrack::GetCodecInfo(media_codec_info *mci) const
 		return B_NO_INIT;
 
 	*mci = fMCI;
+	snprintf(mci->pretty_name, sizeof(mci->pretty_name), "OpenBeOS Media Kit:\n%s", fMCI.pretty_name);
 
 	return B_OK;
 }
@@ -126,21 +127,20 @@ BMediaTrack::ReadFrames(void *out_buffer,
 		return B_BAD_VALUE;
 	
 	status_t result;	
+	media_header header;
 
-	media_header temp_header;
-	if (!mh)
-		mh = &temp_header;
-	else
-		memset(mh, 0, sizeof(*mh)); // clear it first, as the decoder doesn't set all fields
+	memset(&header, 0, sizeof(header)); // always clear it first, as the decoder doesn't set all fields
 	
-	result = fDecoder->Decode(out_buffer, out_frameCount, mh, info);
+	result = fDecoder->Decode(out_buffer, out_frameCount, &header, info);
 	if (result == B_OK) {
 		fCurFrame += *out_frameCount;
-		fCurTime = mh->start_time;
+		fCurTime = header.start_time;
 	} else {
 		printf("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n", result, strerror(result));
 		*out_frameCount = 0;
 	}
+	if (mh)
+		*mh = header;
 	return result;
 }
 
@@ -274,13 +274,15 @@ BMediaTrack::ReadChunk(char **out_buffer,
 		return B_BAD_VALUE;
 
 	status_t result;
-	media_header temp_header;
-	if (!mh)
-		mh = &temp_header;
+	media_header header;
 
-	result = fExtractor->GetNextChunk(fStream, (void **)out_buffer, out_size, mh);
+	memset(&header, 0, sizeof(header)); // always clear it first, as the reader doesn't set all fields
 
-	fCurTime = mh->start_time;
+	result = fExtractor->GetNextChunk(fStream, (void **)out_buffer, out_size, &header);
+
+	fCurTime = header.start_time;
+	if (mh)
+		*mh = header;
 
 	return result;
 }
