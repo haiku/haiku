@@ -49,6 +49,10 @@ private:
 	void ReadPciBasicInfo(PCIDev *dev);
 	void ReadPciHeaderInfo(PCIDev *dev);
 	
+	uint32 BarSize(uint32 bits, uint32 mask);
+	void GetBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size = 0, uint8 *flags = 0);
+	void GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size = 0, uint8 *flags = 0);
+	
 private:
 	PCIBus fRootBus;
 };

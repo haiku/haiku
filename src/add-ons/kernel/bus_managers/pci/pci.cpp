@@ -153,6 +153,51 @@ PCI::CreateDevice(PCIBus *parent, uint8 dev, uint8 func)
 }
 
 
+uint32
+PCI::BarSize(uint32 bits, uint32 mask)
+{
+	bits &= mask;
+	if (!bits)
+		return 0;
+	uint32 size = 1;
+	while (!(bits & size))
+		size <<= 1;
+	return size;
+}
+
+
+void
+PCI::GetBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size, uint8 *flags)
+{
+	uint32 oldvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
+	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, 0xffffffff);
+	uint32 newvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
+	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, oldvalue);
+	
+	*address = oldvalue & PCI_address_memory_32_mask;
+	if (size)
+		*size = BarSize(newvalue, PCI_address_memory_32_mask);
+	if (flags)
+		*flags = newvalue & 0xf;
+}
+
+
+void
+PCI::GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size, uint8 *flags)
+{
+	uint32 oldvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
+	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, 0xffffffff);
+	uint32 newvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
+	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, oldvalue);
+	
+	*address = oldvalue & PCI_rom_address_mask;
+	if (size)
+		*size = BarSize(newvalue, PCI_rom_address_mask);
+	if (flags)
+		*flags = newvalue & 0xf;
+}
+
+
 void
 PCI::ReadPciBasicInfo(PCIDev *dev)
 {
@@ -179,8 +224,51 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 {
 	switch (dev->info.header_type) {
 		case 0:
+			dev->info.u.h0.cardbus_cis = pci_read_config(dev->bus, dev->dev, dev->func, PCI_cardbus_cis, 4);
+			dev->info.u.h0.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_id, 2);
+			dev->info.u.h0.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_vendor_id, 2);
+			GetRomBarInfo(dev, PCI_bridge_rom_base, &dev->info.u.h0.rom_base_pci, &dev->info.u.h0.rom_size);
+			dev->info.u.h0.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h0.rom_base_pci);
+			for (int i = 0; i < 6; i++) {
+				GetBarInfo(dev, PCI_base_registers + 4*i,
+					&dev->info.u.h0.base_registers_pci[i],
+					&dev->info.u.h0.base_register_sizes[i],
+					&dev->info.u.h0.base_register_flags[i]);
+				dev->info.u.h0.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h0.base_registers_pci[i]);
+			}
+			dev->info.u.h0.interrupt_line = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_line, 1);
+			dev->info.u.h0.interrupt_pin = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_pin, 1);
+			dev->info.u.h0.min_grant = pci_read_config(dev->bus, dev->dev, dev->func, PCI_min_grant, 1);
+			dev->info.u.h0.max_latency = pci_read_config(dev->bus, dev->dev, dev->func, PCI_max_latency, 1);
 			break;
 		case 1:
+			for (int i = 0; i < 2; i++) {
+				GetBarInfo(dev, PCI_base_registers + 4*i,
+					&dev->info.u.h1.base_registers_pci[i],
+					&dev->info.u.h1.base_register_sizes[i],
+					&dev->info.u.h1.base_register_flags[i]);
+				dev->info.u.h1.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h0.base_registers_pci[i]);
+			}
+			dev->info.u.h1.primary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_primary_bus, 1);
+			dev->info.u.h1.secondary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_bus, 1);
+			dev->info.u.h1.subordinate_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subordinate_bus, 1);
+			dev->info.u.h1.secondary_latency = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_latency, 1);
+			dev->info.u.h1.io_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_base, 1);
+			dev->info.u.h1.io_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit, 1);
+			dev->info.u.h1.secondary_status = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_status, 2);
+			dev->info.u.h1.memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_base, 2);
+			dev->info.u.h1.memory_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_memory_limit, 2);
+			dev->info.u.h1.prefetchable_memory_base = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit, 2);
+			dev->info.u.h1.prefetchable_memory_limit = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit, 2);
+			dev->info.u.h1.prefetchable_memory_base_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_base_upper32, 4);
+			dev->info.u.h1.prefetchable_memory_limit_upper32 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_prefetchable_memory_limit_upper32, 4);
+			dev->info.u.h1.io_base_upper16 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_base_upper16, 2);
+			dev->info.u.h1.io_limit_upper16 = pci_read_config(dev->bus, dev->dev, dev->func, PCI_io_limit_upper16, 2);
+			GetRomBarInfo(dev, PCI_bridge_rom_base, &dev->info.u.h1.rom_base_pci);
+			dev->info.u.h1.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h1.rom_base_pci);
+			dev->info.u.h1.interrupt_line = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_line, 1);
+			dev->info.u.h1.interrupt_pin = pci_read_config(dev->bus, dev->dev, dev->func, PCI_interrupt_pin, 1);
+			dev->info.u.h1.bridge_control = pci_read_config(dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);		
 			break;
 		default:
 			dprintf("PCI: Header type unknown (%d)\n", dev->info.header_type);
