@@ -2594,10 +2594,75 @@ common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t 
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
-	if (FS_CALL(vnode, ioctl))
-		return FS_CALL(vnode, ioctl)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,op,buffer,length);
+	if (FS_CALL(vnode, ioctl)) {
+		return FS_CALL(vnode, ioctl)(vnode->mount->cookie, vnode->private_node,
+			descriptor->cookie, op, buffer, length);
+	}
 
 	return EOPNOTSUPP;
+}
+
+
+static status_t 
+common_fcntl(int fd, int op, uint32 argument, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+	status_t status;
+
+	FUNCTION(("common_fcntl(fd = %d, op = %d, argument = %lx, %s)\n",
+		fd, op, argument, kernel ? "kernel" : "user"));
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	switch (op) {
+		case F_SETFD:
+			// Set file descriptor flags
+
+			// O_CLOEXEC is the only flag available at this time
+			if (argument == FD_CLOEXEC)
+				descriptor->open_mode |= O_CLOEXEC;
+			else
+				descriptor->open_mode &= O_CLOEXEC;
+
+			status = B_OK;
+			break;
+
+		case F_GETFD:
+			// Get file descriptor flags
+			status = (descriptor->open_mode & O_CLOEXEC) ? FD_CLOEXEC : 0;
+			break;
+
+		case F_SETFL:
+			// Set file descriptor open mode
+			if (FS_CALL(vnode, set_flags)) {
+				// we only accept changes to O_APPEND and O_NONBLOCK
+				argument &= O_APPEND | O_NONBLOCK;
+
+				status = FS_CALL(vnode, set_flags)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, (int)argument);
+				if (status == B_OK) {
+					// update this descriptor's open_mode field
+					descriptor->open_mode = (descriptor->open_mode & ~(O_APPEND | O_NONBLOCK)) | argument;
+				}
+			} else
+				status = EOPNOTSUPP;
+			break;
+
+		case F_GETFL:
+			// Get file descriptor open mode
+			status = descriptor->open_mode;
+			break;
+
+		// ToDo: add support for more ops
+
+		default:
+			status = B_BAD_VALUE;
+	}
+
+	put_fd(descriptor);
+	return status;
 }
 
 
@@ -2606,9 +2671,9 @@ common_sync(int fd, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
-	int status;
+	status_t status;
 
-	FUNCTION(("vfs_fsync: entry. fd %d kernel %d\n", fd, kernel));
+	FUNCTION(("common_fsync: entry. fd %d kernel %d\n", fd, kernel));
 
 	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
 	if (descriptor == NULL)
@@ -4026,6 +4091,13 @@ _kern_open_dir(int fd, const char *path)
 }
 
 
+status_t 
+_kern_fcntl(int fd, int op, uint32 argument)
+{
+	return common_fcntl(fd, op, argument, true);
+}
+
+
 status_t
 _kern_fsync(int fd)
 {
@@ -4802,6 +4874,13 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 	}
 
 	return fdCloser.Detach();
+}
+
+
+status_t 
+_user_fcntl(int fd, int op, uint32 argument)
+{
+	return common_fcntl(fd, op, argument, false);
 }
 
 
