@@ -50,7 +50,7 @@ SupportingApps::~SupportingApps()
 /*! \brief Returns a list of signatures of supporting applications for the
 	given type in the pre-allocated \c BMessage pointed to by \c apps.
 	
-	See \c BMimeType::GetSupportingApps(BMessage*) for more information.
+	See \c BMimeType::GetSupportingApps() for more information.
 */
 status_t 
 SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
@@ -248,7 +248,7 @@ SupportingApps::AddSupportingApp(const char *type, const char *app)
 status_t
 SupportingApps::RemoveSupportingApp(const char *type, const char *app)
 {
-	status_t err = app ? B_OK : B_BAD_VALUE;
+	status_t err = type && app ? B_OK : B_BAD_VALUE;
 	if (!err) 
 		fSupportingApps[type].erase(app);
 	return err;
