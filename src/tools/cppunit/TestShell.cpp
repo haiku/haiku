@@ -42,11 +42,15 @@ BTestShell::AddSuite(BTestSuite *suite) {
 		fSuites[suite->getName()] = suite;
 		
 		// Add its tests
+		bool first = true;
 		const TestMap &map = suite->getTests();
 		for (TestMap::const_iterator i = map.begin();
 			   i != map.end();
-			      i++)
+			      i++) {
 			AddTest(i->first, i->second);
+			if (Verbosity() >= v4 && i->second) 
+				cout << "  " << i->first << endl;
+		}
 			
 		return B_OK;
 	} else
@@ -213,8 +217,10 @@ BTestShell::PrintValidArguments() {
 	cout << indent << "-v1          Sets verbosity level to 1 (complete summary only)" << endl;
 	cout << indent << "-v2          Sets verbosity level to 2 (*default* -- per-test results plus" << endl;
 	cout << indent << "             complete summary)" << endl;
-	cout << indent << "-v3          Sets verbosity level to 3 (dynamic loading information, per-test " << endl;
-	cout << indent << "             results and timing info, plus complete summary)" << endl;
+	cout << indent << "-v3          Sets verbosity level to 3 (partial dynamic loading information, " << endl;
+	cout << indent << "             per-test results and timing info, plus complete summary)" << endl;
+	cout << indent << "-v4          Sets verbosity level to 4 (complete dynamic loading information, " << endl;
+	cout << indent << "             per-test results and timing info, plus complete summary)" << endl;
 	cout << indent << "NAME         Instructs the program to run the test for the given class or all" << endl;
 	cout << indent << "             the tests for the given suite. If some bonehead adds both a class" << endl;
 	cout << indent << "             and a suite with the same name, the suite will be run, not the class" << endl;
@@ -270,21 +276,18 @@ BTestShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
 		PrintDescription(argc, argv);
 		PrintHelp();
 		return false;
-	}
-	else if (arg == "--list") {
+	} else if (arg == "--list") {
 		fListTestsAndExit = true;
-	}
-	else if (arg == "-v0") {
+	} else if (arg == "-v0") {
 		fVerbosityLevel = v0;
-	}
-	else if (arg == "-v1") {
+	} else if (arg == "-v1") {
 		fVerbosityLevel = v1;
-	}
-	else if (arg == "-v2") {
+	} else if (arg == "-v2") {
 		fVerbosityLevel = v2;
-	}
-	else if (arg == "-v3") {
+	} else if (arg == "-v3") {
 		fVerbosityLevel = v3;
+	} else if (arg == "-v4") {
+		fVerbosityLevel = v4;
 	} else if (arg.length() >= 2 && arg[0] == '-' && arg[1] == 'l') {
 		fLibDirs.insert(arg.substr(2, arg.size()-2));		
 	} else {

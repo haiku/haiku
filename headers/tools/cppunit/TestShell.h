@@ -59,7 +59,7 @@ public:
 	int Run(int argc, char *argv[]);
 	
 	// Verbosity Level enumeration and accessor function
-	enum VerbosityLevel { v0, v1, v2, v3 };
+	enum VerbosityLevel { v0, v1, v2, v3, v4 };
 	VerbosityLevel Verbosity() const;
 
 	// Returns true if verbosity is high enough that individual tests are
