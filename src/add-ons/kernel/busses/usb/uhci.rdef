@@ -3,11 +3,7 @@
 **
 */
 
-/* BEOS:APP_SIG :
-   application:/x-vnd.obos.app-name
-*/
-
-resource app_signature "application/x-vnd.Be-elfexecutable";
+resource app_signature "application/x-vnd.haiku-uhci";
 
 resource app_version {
 	major  = 0,

@@ -1,13 +1,9 @@
 /*
-** uhci.rdef
+** usb.rdef
 **
 */
 
-/* BEOS:APP_SIG :
-   application:/x-vnd.obos.app-name
-*/
-
-resource app_signature "application/x-vnd.Be-elfexecutable";
+resource app_signature "application/x-vnd.haiku-usb";
 
 resource app_version {
 	major  = 0,
@@ -15,6 +11,6 @@ resource app_version {
 	minor  = 1,
 	variety = 0,
 	internal = 1,
-	short_info = "USB system software",
+	short_info = "USB bus manager",
 	long_info = "Haiku - This driver is (c) 2003-2004 Niels Sascha Reedijk"
 };
