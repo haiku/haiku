@@ -1088,7 +1088,8 @@ status_t
 get_nth_symbol(image_id imageID, int32 num, char *nameBuffer, int32 *_nameLength,
 	int32 *_type, void **_location)
 {
-	int32 count = 0, i, j;
+	int32 count = 0, j;
+	uint32 i;
 	image_t *image;
 
 	rld_lock();
