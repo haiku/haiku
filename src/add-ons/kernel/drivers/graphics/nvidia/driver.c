@@ -151,6 +151,16 @@ static uint16 nvidia_device_list[] = {
 	0x0151, /* Nvidia GeForce2 Ti DDR */
 	0x0152, /* Nvidia GeForce2 Ultra */
 	0x0153, /* Nvidia Quadro2 Pro */
+	0x0160, /* Nvidia unknown FX Go */
+	0x0161, /* Nvidia GeForce 6200 TurboCache */
+	0x0162, /* Nvidia unknown FX */
+	0x0163, /* Nvidia unknown FX */
+	0x0164, /* Nvidia unknown FX */
+	0x0165, /* Nvidia unknown FX */
+	0x0166, /* Nvidia unknown FX Go */
+	0x0167, /* Nvidia GeForce 6200 Go */
+	0x0168, /* Nvidia GeForce 6250 Go */
+	0x016e, /* Nvidia unknown FX */
 	0x0170, /* Nvidia GeForce4 MX 460 */
 	0x0171, /* Nvidia GeForce4 MX 440 */
 	0x0172, /* Nvidia GeForce4 MX 420 */ 
@@ -261,8 +271,6 @@ static uint16 nvidia_device_list[] = {
 	0x014c //nv43
 	0x014d //nv43
 	0x014f //nv43
-	0x0160 //nv??
-	0x0166 //nv??
 	0x0345
 	0x0349
 	0x034b.
