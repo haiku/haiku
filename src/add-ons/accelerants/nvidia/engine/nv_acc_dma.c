@@ -31,7 +31,12 @@ blit
 status_t nv_acc_wait_idle_dma()
 {
 	/* wait until engine completely idle */
-	//fixme: implement.
+	//fixme: add dma buffer state checking stuff here..
+	while (ACCR(STATUS))
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100);
+	}
 
 	return B_OK;
 }
