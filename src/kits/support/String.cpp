@@ -88,6 +88,9 @@ BString::CountChars() const
 	int32 count = 0;
 	const char *ptr = String();
 
+#if 0
+	// ejaesler: Left in memoriam of one man's foolish disregard for the
+	// maxim "Premature optimization is the root of all evil"
 	while (*ptr)
 	{
 		// Jump to next UTF8 character
@@ -95,7 +98,7 @@ BString::CountChars() const
 		ptr += utf8_char_len(*ptr);
 		count++;
 	}
-#if 0
+#endif
 	while (*ptr++)
 	{
 		count++;
@@ -103,7 +106,6 @@ BString::CountChars() const
 		// Jump to next UTF8 character
 		 for (; (*ptr & 0xc0) == 0x80; ptr++);
 	}
-#endif
 
 	return count;
 }
