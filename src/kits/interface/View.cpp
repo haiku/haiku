@@ -407,7 +407,7 @@ BRect BView::Bounds() const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertToParent(BPoint* pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	check_lock_no_pick();
@@ -419,7 +419,7 @@ void BView::ConvertToParent(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertToParent(BPoint pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return pt;
 
 	check_lock_no_pick();
@@ -434,7 +434,7 @@ BPoint BView::ConvertToParent(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromParent(BPoint* pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	check_lock_no_pick();
@@ -446,7 +446,7 @@ void BView::ConvertFromParent(BPoint* pt) const{
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertFromParent(BPoint pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return pt;
 
 	check_lock_no_pick();
@@ -461,7 +461,7 @@ BPoint BView::ConvertFromParent(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertToParent(BRect* r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	check_lock_no_pick();
@@ -472,7 +472,7 @@ void BView::ConvertToParent(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertToParent(BRect r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return r;
 
 	check_lock_no_pick();
@@ -483,7 +483,7 @@ BRect BView::ConvertToParent(BRect r) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromParent(BRect* r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	check_lock_no_pick();
@@ -494,7 +494,7 @@ void BView::ConvertFromParent(BRect* r) const{
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertFromParent(BRect r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return r;
 
 	check_lock_no_pick();
@@ -507,35 +507,27 @@ BRect BView::ConvertFromParent(BRect r) const{
 
 
 void BView::ConvertToScreen(BPoint* pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	do_owner_check_no_pick();
 
-	if (top_level_view)
-		Window()->ConvertToScreen( pt );
-	else {
-		ConvertToParent( pt );
-		parent->ConvertToScreen( pt );
-	}
+	ConvertToParent( pt );
+	parent->ConvertToScreen( pt );
 }
 
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertToScreen(BPoint pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return pt;
 
 	do_owner_check_no_pick();
 
-	BPoint			p;
+	BPoint	p;
 
-	if (top_level_view)
-		p			= Window()->ConvertToScreen( pt );
-	else {
-		p			= ConvertToParent( pt );
-		p			= parent->ConvertToScreen( p );
-	}
+	p		= ConvertToParent( pt );
+	p		= parent->ConvertToScreen( p );
 
 	return p;
 }
@@ -543,35 +535,27 @@ BPoint BView::ConvertToScreen(BPoint pt) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromScreen(BPoint* pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	do_owner_check_no_pick();
 
-	if (top_level_view)
-		Window()->ConvertFromScreen( pt );
-	else {
-		ConvertFromParent( pt );
-		parent->ConvertFromScreen( pt );
-	}
+	ConvertFromParent( pt );
+	parent->ConvertFromScreen( pt );
 }
 
 //---------------------------------------------------------------------------
 
 BPoint BView::ConvertFromScreen(BPoint pt) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return pt;
 
 	do_owner_check_no_pick();
 
-	BPoint			p;
+	BPoint	p;
 
-	if (top_level_view)
-		p			= Window()->ConvertFromScreen( pt );
-	else {
-		p			= ConvertFromParent( pt );
-		p			= parent->ConvertFromScreen( p );
-	}
+	p		= ConvertFromParent( pt );
+	p		= parent->ConvertFromScreen( p );
 
 	return p;
 }
@@ -580,35 +564,27 @@ BPoint BView::ConvertFromScreen(BPoint pt) const{
 
 
 void BView::ConvertToScreen(BRect* r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	do_owner_check_no_pick();
 
-	if (top_level_view)
-		Window()->ConvertToScreen( r );
-	else {
-		ConvertToParent( r );
-		parent->ConvertToScreen( r );
-	}
+	ConvertToParent( r );
+	parent->ConvertToScreen( r );
 }
 
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertToScreen(BRect r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return r;
 
 	do_owner_check_no_pick();
 
-	BRect			rect;
+	BRect	rect;
 
-	if (top_level_view)
-		rect		= Window()->ConvertToScreen( r );
-	else {
-		rect		= ConvertToParent( r );
-		rect		= parent->ConvertToScreen( rect );
-	}
+	rect	= ConvertToParent( r );
+	rect	= parent->ConvertToScreen( rect );
 
 	return rect;
 }
@@ -616,35 +592,27 @@ BRect BView::ConvertToScreen(BRect r) const{
 //---------------------------------------------------------------------------
 
 void BView::ConvertFromScreen(BRect* r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return;
 
 	do_owner_check_no_pick();
 
-	if (top_level_view)
-		Window()->ConvertFromScreen( r );
-	else {
-		ConvertFromParent( r );
-		parent->ConvertFromScreen( r );
-	}
+	ConvertFromParent( r );
+	parent->ConvertFromScreen( r );
 }
 
 //---------------------------------------------------------------------------
 
 BRect BView::ConvertFromScreen(BRect r) const{
-	if (!parent && !top_level_view)
+	if (!parent)
 		return r;
 
 	do_owner_check_no_pick();
 
-	BRect			rect;
+	BRect	rect;
 
-	if (top_level_view)
-		rect		= Window()->ConvertFromScreen( r );
-	else {
-		rect		= ConvertFromParent( r );
-		rect		= parent->ConvertFromScreen( rect );
-	}
+	rect	= ConvertFromParent( r );
+	rect	= parent->ConvertFromScreen( rect );
 
 	return rect;
 }
@@ -706,25 +674,19 @@ BRect BView::Frame() const {
 //---------------------------------------------------------------------------
 
 void BView::Hide(){
-// TODO: You may hide it by relocating with -17000 coord units to the left???
 	if ( owner && fShowLevel == 0){
 		check_lock();
-			
 		owner->session->WriteInt32( AS_LAYER_HIDE );
 	}
-
 	fShowLevel++;
 }
 
 //---------------------------------------------------------------------------
 
 void BView::Show(){
-
 	fShowLevel--;
-
 	if (owner && fShowLevel == 0){
 		check_lock();
-			
 		owner->session->WriteInt32( AS_LAYER_SHOW );
 	}
 }
@@ -3662,6 +3624,7 @@ bool BView::addToList(BView *aView, BView *before){
 //---------------------------------------------------------------------------
 
 bool BView::attachView(BView *aView){
+// LEAVE the following line commented!!!
 //	check_lock();
 
 /* INFO:
@@ -3688,7 +3651,7 @@ bool BView::attachView(BView *aView){
 	owner->session->WriteBool( aView->IsHidden() );
 	owner->session->WriteInt32( aView->CountChildren() );
 	
-	setCachedState();
+	aView->setCachedState();
 
 		// call the hook function:
 	aView->AttachedToWindow();
