@@ -395,57 +395,67 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			target		= ws->SearchWinBorder(pt);
 			if (target)
 			{
-				WinBorder		*previousFocus;
-				WinBorder		*activeFocus;
-				BRegion			invalidRegion;
-
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
+// TODO: it's not that good to use fMouseTarget.
+// (you have problems with B_MOUSE_UP, you know... :-)))
+// Yes, I know. But it's too late tonight. :-)))
+				if (target != fMouseTarget)
+				{
+					WinBorder		*previousFocus;
+					WinBorder		*activeFocus;
+					BRegion			invalidRegion;
 
-				ws->BringToFrontANormalWindow(target);
-				ws->SearchAndSetNewFront(target);
-				previousFocus	= ws->FocusLayer();
-				activeFocus		= ws->SetFocusLayer(target);
-printf("target: %s\n", target? target->GetName(): "NULL");
-printf("previousFocus: %s\n", previousFocus? previousFocus->GetName(): "NULL");
-printf("activeFocus: %s\n", activeFocus? activeFocus->GetName(): "NULL");
-				activeFocus->Window()->Lock();
+					ws->BringToFrontANormalWindow(target);
+					ws->SearchAndSetNewFront(target);
+					previousFocus	= ws->FocusLayer();
+					activeFocus		= ws->SetFocusLayer(target);
 
-// TODO: more work needs to be done. Think! Think! Think again!
-// remember - front != focus. Also put modal windows into equation!
+					activeFocus->Window()->Lock();
 
-// a HINT: inside Decorator 'highlight' flag is not set before a redraw with
-// activeFocus->fParent->FullInvalidate(invalidRegion);
-				if (activeFocus != previousFocus){
-					// redraw decorator in its active mode.
-					if (activeFocus){
-						if (activeFocus->fDecorator){
-							invalidRegion.Include(&(activeFocus->fVisible));
-							activeFocus->fParent->FullInvalidate(invalidRegion);
+					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
+						target->MouseDown(msg, true);
+
+					// may be or may be empty.
+					invalidRegion.Include(&(activeFocus->fFull));
+					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
+					activeFocus->fParent->FullInvalidate(invalidRegion);
+// TODO: this is a hack!!! Should be something like this:
+// void Layer::RebuildAndForceRedraw(invalidReg, target){
+// 	BPoint pt(0,0);
+//	StartRebuildRegions(invalidRegion, NULL, B_LAYER_NONE, pt);
+//	if (target) gRedrawReg.Include(target->fFullVisible);
+//	Redraw(gRedrawReg);
+// }
+//	called like: target->fParent->RebuildAndForceRedraw(reg, target);
+					activeFocus->fParent->Invalidate(invalidRegion);
+
+					if (previousFocus != activeFocus && previousFocus)
+					{
+						if (previousFocus->fVisible.CountRects() > 0)
+						{
+							invalidRegion.MakeEmpty();
+							invalidRegion.Include(&(previousFocus->fVisible));
+							activeFocus->fParent->Invalidate(invalidRegion);
 						}
-						// let WinBorder know we have the mouse down.
-						if (activeFocus->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
-							activeFocus->MouseDown(msg, false);
-						else
-							activeFocus->MouseDown(msg, true);
 					}
 
-					// redraw previous window's decorator. It has lost focus state.
-					if (previousFocus)
-						if (previousFocus->fDecorator)
-							previousFocus->fParent->Invalidate(previousFocus->fVisible);
-				}
-				else{
-					// let WinBorder know we have the mouse down. This is the same window as before.
-					if (activeFocus)
-						activeFocus->MouseDown(msg, true);
-				}
-				
-				fMouseTarget = activeFocus;
+					fMouseTarget = activeFocus;
 
-				target->Window()->Unlock();
+					activeFocus->Window()->Unlock();
+				}
+				else // target == fMouseTarget
+				{
+					target->Window()->Lock();
+					target->MouseDown(msg, true);
+					target->Window()->Unlock();
+				}
+
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();
+			}
+			else // target == NULL
+			{
 			}
 			break;
 		}
@@ -463,7 +473,7 @@ printf("activeFocus: %s\n", activeFocus? activeFocus->GetName(): "NULL");
 				fMouseTarget->MouseUp(msg);
 				fMouseTarget->Window()->Unlock();
 
-				fMouseTarget = NULL;				
+//				fMouseTarget = NULL;				
 			}
 			else
 			{

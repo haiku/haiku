@@ -465,7 +465,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 void Layer::Draw(const BRect &r)
 {
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
-	
+printf("Layer::Draw\n");
+r.PrintToStream();	
 	STRACE(("Layer::Draw() Called\n"));
 /*
 	RGBColor	col(152,102,51);

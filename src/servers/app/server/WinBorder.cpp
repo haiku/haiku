@@ -350,13 +350,15 @@ void WinBorder::MouseUp(PortMessage *msg)
 
 void WinBorder::HighlightDecorator(const bool &active)
 {
+printf("Decorator->Highlight\n");
 	fDecorator->SetFocus(active);
 }
 
 void WinBorder::Draw(const BRect &r)
 {
 	STRACE(("WinBorder(%s)::Draw()\n", GetName()));
-
+printf("WinBorder::DRAW\n");
+r.PrintToStream();
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
 	{
