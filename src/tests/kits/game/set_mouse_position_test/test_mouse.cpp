@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define DELAY 2000
+
 class TestMouse: public BApplication
 {
 	public:
@@ -22,25 +24,37 @@ int32 height, width;
 void mouse_move_up(int32 x)
 {
 	for (int32 t = (height); t > 0; t--)
+	{
 		 set_mouse_position(x, t);
+		 snooze(DELAY);
+	}
 }
 
 void mouse_move_down(int32 x)
 {
 	for (int32 t = 0; t < (height); t++)
+	{
 		 set_mouse_position(x,t);		
+		 snooze(DELAY);
+	}
 }
 
 void mouse_move_left(int32 y)
 {
 	for (int32 t = (width); t > 0; t--)
+	{
 		 set_mouse_position(t,y);
+		 snooze(DELAY);
+	}
 }
 
 void mouse_move_right(int32 y)
 {
 	for (int32 t = 0; t < (width); t++)
+	{
 		 set_mouse_position(t,y);
+		 snooze(DELAY);
+	}
 }
 
 void mouse_move_diagonal1(int32 x, int32 y)
@@ -51,6 +65,7 @@ void mouse_move_diagonal1(int32 x, int32 y)
 	{	
 		t1 = int32(t1 - xmin);
 		set_mouse_position(t1,t2);
+		snooze(DELAY);
 	}
 }
 
@@ -62,26 +77,32 @@ void mouse_move_diagonal2(int32 x, int32 y)
 	{		 
 		t1 = int32(t1 + xplus);
 		set_mouse_position(t1,t2);
+		snooze(DELAY);
 	}
 }
 
 int main(int argc, char *argv[])
 { 
+	int times;
+
 	if (argc != 2)
 	{
 		printf("\n Usage: %s param: times, where times is the number of loops \n", argv[0]);
+		times = 1;
 	} 
 	else
 	{
-		int times = atoi(argv[1]);
-		if (times > 0)
-		{
-			printf("\n times = %d \n", times);
-			TestMouse test(times);
-			test.Run();
-		}
-		else printf("\n Error! times must be an integer greater than 0 \n");
+		times = atoi(argv[1]);
 	}
+
+	if (times > 0)
+	{
+		printf("\n times = %d \n", times);
+		TestMouse test(times);
+		test.Run();
+	}
+	else 
+		printf("\n Error! times must be an integer greater than 0 \n");
 	return 0;
 }
 
