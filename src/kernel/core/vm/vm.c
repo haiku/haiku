@@ -1029,6 +1029,13 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 	void *vnode;
 	status_t status;
 
+	// ToDo: maybe attach to an FD, not a path (or both, like VFS calls)
+	// ToDo: check file access permissions (would be already done if the above were true)
+	// ToDo: for binary files, we want to make sure that they get the
+	//	copy of a file at a given time, ie. later changes should not
+	//	make it into the mapped copy -- this will need quite some changes
+	//	to be done in a nice way
+
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
@@ -1403,6 +1410,22 @@ err:
 }
 
 
+static int32
+count_writable_areas(vm_cache_ref *ref, vm_area *ignoreArea)
+{
+	struct vm_area *area = ref->areas;
+	uint32 count = 0;
+
+	for (; area != NULL; area = area->cache_next) {
+		if (area != ignoreArea
+			&& (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
+			count++;
+	}
+
+	return count;
+}
+
+
 static status_t
 vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 {
@@ -1441,15 +1464,7 @@ vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 		// change from read/write to read-only
 
 		if (cache->source != NULL && cache->temporary) {
-			uint32 writableAreas = 0;
-			struct vm_area *cacheArea = cacheRef->areas;
-			for (; cacheArea != NULL; cacheArea = cacheArea->cache_next) {
-				if (cacheArea != area
-					&& (cacheArea->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
-					writableAreas++;
-			}
-
-			if (writableAreas == 0) {
+			if (count_writable_areas(cacheRef, area) == 0) {
 				// Since this cache now lives from the pages in its source cache,
 				// we can change the cache's commitment to take only those pages
 				// into account that really are in this cache.
@@ -1464,16 +1479,30 @@ vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 
 				status = cache->store->ops->commit(cache->store, count * B_PAGE_SIZE);
 
-				// ToDo: we may be able to join with our source cache, if any
+				// ToDo: we may be able to join with our source cache, if count == 0
 			}
 		}
 	} else if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0
 		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
 		// change from read-only to read/write
 
-		// ToDo: if this is a shared cache, insert new cache
-		// ToDo: eventually change commitment
-		status = B_ERROR;
+		// ToDo: if this is a shared cache, insert new cache (we only know about other
+		//	areas in this cache yet, though, not about child areas)
+		//	-> use this call with care, it might currently have unwanted consequences
+		//	   because of this. It should always be safe though, if there are no other
+		//	   (child) areas referencing this area's cache (you just might not know).
+		if (count_writable_areas(cacheRef, area) == 0
+			&& (cacheRef->areas != area || area->cache_next)) {
+			// ToDo: child areas are not tested for yet
+			dprintf("set_area_protection(): warning, would need to insert a new cache_ref (not yet implemented)!\n");
+			status = B_NOT_ALLOWED;
+		} else
+			dprintf("set_area_protection() may not work correctly yet in this direction!\n");
+
+		if (status == B_OK && cache->source != NULL && cache->temporary) {
+			// the cache's commitment must contain all possible pages
+			status = cache->store->ops->commit(cache->store, cache->virtual_size);
+		}
 	} else {
 		// we don't have anything special to do in all other cases
 	}
