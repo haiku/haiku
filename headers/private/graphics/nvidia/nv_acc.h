@@ -132,10 +132,22 @@ typedef struct {
 	uint32 TLVDrawPrim[0x40];	/* b20-31 is I5, b16-19 is I4, b12-15 is I3,
 								 * b8-11 is I2, 4-7 is I1, b0-3 is I0:
 								 * Ix is a TLVertex[Ix].
-								 * So: define your vertexes, and then program
-								 * TLVDrawPrim with the order to draw them.
-								 * You can draw primitives consisting of upto 6 out of
-								 * 16 defined vertexes this way. */
-} cmd_nv_dx5_texture_triangle;
+								 * So: define your (single) texture, define your
+								 * vertexes, and then program TLVDrawPrim with the
+								 * order to draw them.
+								 * You can draw primitives consisting of sets of upto
+								 * 6 out of 16 defined vertexes this way; and you can
+								 * draw 64 sets maximum. */
+} cmd_nv4_dx5_texture_triangle;	/* nv10_dx5_texture_triangle is identical */
+
+typedef struct {
+	uint32 reserved00[0x0004];
+	uint16 FifoFree;			/* little endian (FIFO internal register) */
+	uint16 Nop;					/* little endian (FIFO internal register) */
+	uint32 reserved01[0x00bd];	/* fixme? there's more here that's not used apparantly */
+	uint32 Pitch;				/* b16-31 is Z-buffer, b0-15 is colorbuffer pitch */
+	uint32 SetOffsetColor;		/* b0-31 is colorbuffer (renderbuffer) offset */
+	uint32 SetOffsetZeta;		/* b0-31 is Z-buffer (zeta buffer) offset */
+} cmd_nv4_context_surfaces_argb_zs; /* nv10_context_surfaces_argb_zs is identical */
 
 #endif
