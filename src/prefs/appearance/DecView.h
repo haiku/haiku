@@ -49,7 +49,6 @@ public:
 	void MessageReceived(BMessage *msg);
 	void SaveSettings(void);
 	void LoadSettings(void);
-	void SetDefaults(void);
 	void NotifyServer(void);
 	void GetDecorators(void);
 	void SetColors(const BMessage &message);

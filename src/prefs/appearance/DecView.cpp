@@ -35,6 +35,7 @@
 #include "DecView.h"
 #include <PortLink.h>
 #include <Directory.h>
+#include <ServerProtocol.h>
 #include <File.h>
 #include <stdio.h>
 #include "RGBColor.h"
@@ -118,7 +119,7 @@ void DecView::AllAttached(void)
 {
 	declist->SetTarget(this);
 	apply->SetTarget(this);
-	declist->Select(0);
+	LoadSettings();
 }
 
 void DecView::MessageReceived(BMessage *msg)
@@ -173,11 +174,17 @@ printf("MSG: Decorator NOT Chosen - couldn't load decorator\n");
 
 void DecView::SaveSettings(void)
 {
+	BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
+	if(!item)
+		return;
+	
 	BString path(SETTINGS_DIR);
 	path+="DecoratorSettings";
 	printf("%s\n",path.String());
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
+	settings.MakeEmpty();
+	settings.AddString("decorator",item->Text());
 	settings.Flatten(&file);
 }
 
@@ -197,45 +204,46 @@ void DecView::LoadSettings(void)
 	{
 		if(settings.Unflatten(&file)==B_OK)
 		{
-			// Get the color for the current attribute here
+			BString itemtext;
+			if(settings.FindString("decorator",&itemtext)==B_OK)
+			{
+				for(int32 i=0;i<declist->CountItems();i++)
+				{
+					BStringItem *item=(BStringItem*)declist->ItemAt(i);
+					if(item && itemtext.Compare(item->Text())==0)
+					{
+						declist->Select(i);
+						return;
+					}
+				}
+			}
+			
+			// We got this far, so something must have gone wrong. Select the first item
+			declist->Select(0L);
+			
 			return;
 		}
 		printf("Error unflattening settings file %s\n",path.String());
 	}
-	
-	// If we get this far, we have encountered an error, so reset the settings
-	// to the defaults
-	SetDefaults();
-}
-
-void DecView::SetDefaults(void)
-{
-	settings.MakeEmpty();
-
-	// Add default settings here
 }
 
 void DecView::NotifyServer(void)
 {
-	// Send a message to the app_server with the settings which we have.
-	// While it might be worthwhile to someday have a separate protocol for
-	// updating just one color, for now, we just need something to get things
-	// done. Extract all the colors from the settings BMessage, attach them
-	// to a PortLink message and fire it off to the server.
+	// Send a message to the app_server to tell it which decorator we have selected.
 	
-	// Name taken from ServerProtocol.h
-	port_id serverport=find_port("OBappserver");
+	port_id serverport=find_port(SERVER_PORT_NAME);
 
 	if(serverport==B_NAME_NOT_FOUND)
 		return;
 	
-	PortLink *pl=new PortLink(serverport);
-
-//	pl->SetOpCode(SET_UI_COLORS);
+	BStringItem *item=(BStringItem*)declist->ItemAt(declist->CurrentSelection());
+	if(!item)
+		return;
 	
-	// extract settings from settings object and attach to portlink object
-
-//	pl->Flush();
+	PortLink *pl=new PortLink(serverport);
+	pl->SetOpCode(SET_DECORATOR);
+	pl->Attach(item->Text(),strlen(item->Text())+1);
+	pl->Flush();
 	delete pl;
 }
 
