@@ -18,7 +18,7 @@
 #include <string.h>
 #include <ByteOrder.h>
 #include <File.h>
-#include "input_globals.h"
+#include <input_globals.h>
 
 static void 
 print_key( char *chars, int32 offset ) 
