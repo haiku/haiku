@@ -12,6 +12,8 @@ void CopySamples(float *_dst, int32 _dst_sample_offset,
 				 const float *_src, int32 _src_sample_offset,
 				 int32 _sample_count);
 
+void ZeroFill(float *_dst, int32 _dst_sample_offset, int32 _sample_count);
+
 bigtime_t buffer_duration(const media_multi_audio_format & format);
 
 int bytes_per_sample(const media_multi_audio_format & format);

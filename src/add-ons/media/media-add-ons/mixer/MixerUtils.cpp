@@ -171,6 +171,18 @@ CopySamples(float *_dst, int32 _dst_sample_offset,
 	}
 }
 
+void
+ZeroFill(float *_dst, int32 _dst_sample_offset, int32 _sample_count)
+{
+	register char * dst = (char *) _dst;
+	register int32 sample_count = _sample_count;
+	register int32 dst_sample_offset = _dst_sample_offset;
+	while (sample_count--) {
+		*(float *)dst = 0.0f;
+		dst += dst_sample_offset;
+	}
+}
+
 int64
 frames_for_duration(double framerate, bigtime_t duration)
 {

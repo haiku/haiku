@@ -763,8 +763,11 @@ void
 AudioMixer::NodeRegistered()
 {
 		Run();
-//		SetPriority(120);
+#if DEBUG > 1
 		SetPriority(12);
+#else
+		SetPriority(120);
+#endif
 }
 
 void
