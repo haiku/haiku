@@ -21,8 +21,9 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ; # PPPoE
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ; # IPCP
 
-SimpleTest DialUpPreflet :
-	DialUpApplication.cpp
+AddResources DialUpPreflet : DialUpPreflet.rdef ;
+
+StaticLibrary dunview :
 	DialUpView.cpp
 	
 	# utils
@@ -37,4 +38,8 @@ SimpleTest DialUpPreflet :
 	PPPoEAddon.cpp
 ;
 
-LinkSharedOSLibs DialUpPreflet : libppp.a be ;
+SimpleTest DialUpPreflet :
+	DialUpApplication.cpp
+;
+
+LinkSharedOSLibs DialUpPreflet : libdunview.a libppp.a be ;
