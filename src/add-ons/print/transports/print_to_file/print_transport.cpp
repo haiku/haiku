@@ -118,7 +118,7 @@ status_t RemoveFile()
 	printf("RemoveFile: deleting files list...\n");
 
 	for (i = 0; (file = g_files_list->ItemAt(i)); i++)
-		delete file;		
+		delete (BFile*)file;		
 	
 	delete g_files_list;
 	return B_OK;

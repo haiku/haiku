@@ -74,7 +74,7 @@ class avCodec : public Decoder
 
 		gfx_convert_func conv_func; // colorspace convert func
 
-		void *		fExtraData;
+		char *		fExtraData;
 		int			fExtraDataSize;
 		int			fBlockAlign;
 		
