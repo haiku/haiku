@@ -54,7 +54,8 @@ typedef enum
 	B_CURSOR_RESIZE_NWSE,
 	B_CURSOR_RESIZE_NESW,
 	B_CURSOR_RESIZE_NS,
-	B_CURSOR_RESIZE_EW
+	B_CURSOR_RESIZE_EW,
+	B_CURSOR_OTHER
 } cursor_which;
 
 // BCursor class ---------------------------------------------------------------
