@@ -21,7 +21,7 @@
 
 #include "MouseSettings.h"
 
-class MouseView;
+class SettingsView;
 
 
 class MouseWindow : public BWindow {
@@ -36,7 +36,7 @@ class MouseWindow : public BWindow {
 	private:
 		MouseSettings	fSettings;
 		BButton			*fRevertButton;
-		MouseView		*fView;
+		SettingsView	*fSettingsView;
 };
 
 #define kBorderSpace	10

@@ -6,13 +6,13 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:			MouseView.cpp
+//  File:			SettingsView.cpp
 //  Authors:		Jérôme Duval,
 //					Andrew McCall (mccall@digitalparadise.co.uk)
 //					Axel Dörfler (axeld@pinc-software.de)
 //  Description:	Mouse Preferences
 //  Created:		December 10, 2003
-//
+// 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <InterfaceDefs.h>
@@ -28,13 +28,13 @@
 #include <Debug.h>
 #include <Window.h>
 
-#include "MouseView.h"
+#include "SettingsView.h"
 #include "MouseMessages.h"
 #include "MouseBitmap.h"
 #include "MouseSettings.h"
 
 
-MouseView::MouseView(BRect rect, MouseSettings &settings)
+SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	: BBox(rect, "main_view"),
 	fCurrentButton(-1),
 	fSettings(settings),
@@ -130,7 +130,7 @@ MouseView::MouseView(BRect rect, MouseSettings &settings)
 
 
 void
-MouseView::MouseDown(BPoint where)
+SettingsView::MouseDown(BPoint where)
 {
 	int32 index = mouseTypeMenu->IndexOf(mouseTypeMenu->FindMarked());
 
@@ -166,7 +166,7 @@ MouseView::MouseDown(BPoint where)
 
 
 void
-MouseView::AttachedToWindow()
+SettingsView::AttachedToWindow()
 {
 	get_click_speed(&fClickSpeed);
 	get_mouse_speed(&fMouseSpeed);
@@ -182,7 +182,7 @@ MouseView::AttachedToWindow()
 
 
 void
-MouseView::Pulse()
+SettingsView::Pulse()
 {
 	BPoint point;
 	GetMouse(&point, &fButtons, true);
@@ -196,7 +196,7 @@ MouseView::Pulse()
 
 
 void 
-MouseView::Draw(BRect updateFrame)
+SettingsView::Draw(BRect updateFrame)
 {
 	inherited::Draw(updateFrame);
 
@@ -315,15 +315,15 @@ MouseView::Draw(BRect updateFrame)
 			DrawString(number);
 		}
 	}
-	
+
 	Sync();
-	
+
 	SetDrawingMode(B_OP_COPY);
 }
 
 
 void 
-MouseView::Init()
+SettingsView::Init()
 {
 	int32 value;
 	// slow = 1000000, fast = 0

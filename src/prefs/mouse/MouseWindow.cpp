@@ -6,11 +6,13 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        MouseWindow.cpp
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :   December 10, 2003
-// 
+//  File:			MouseWindow.cpp
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <Alert.h>
@@ -25,9 +27,9 @@
 #include <Debug.h>
 #include <string.h>
 
-#include "MouseMessages.h"
 #include "MouseWindow.h"
-#include "MouseView.h"
+#include "MouseMessages.h"
+#include "SettingsView.h"
 
 
 MouseWindow::MouseWindow(BRect rect)
@@ -39,12 +41,13 @@ MouseWindow::MouseWindow(BRect rect)
 	AddChild(view);
 
 	// Add the main settings view
-	fView = new MouseView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1), fSettings);
-	view->AddChild(fView);
+	fSettingsView = new SettingsView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1),
+		fSettings);
+	view->AddChild(fSettingsView);
 
 	// Add the "Default" button
-	BRect rect(kBorderSpace, fView->Frame().bottom + kItemSpace + 2,
-		kBorderSpace + 75, fView->Frame().bottom + 20);
+	BRect rect(kBorderSpace, fSettingsView->Frame().bottom + kItemSpace + 2,
+		kBorderSpace + 75, fSettingsView->Frame().bottom + 20);
 	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(BUTTON_DEFAULTS));
 	button->ResizeToPreferred();
 	view->AddChild(button);
@@ -59,7 +62,7 @@ MouseWindow::MouseWindow(BRect rect)
 		// we are using the pulse rate to scan pressed mouse
 		// buttons and draw the selected imagery
 
-	ResizeTo(fView->Frame().right + kBorderSpace, button->Frame().bottom + kBorderSpace - 1);
+	ResizeTo(fSettingsView->Frame().right + kBorderSpace, button->Frame().bottom + kBorderSpace - 1);
 	MoveTo(fSettings.WindowPosition());
 }
 
@@ -80,20 +83,20 @@ MouseWindow::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case BUTTON_DEFAULTS: {
 			// reverts to default settings
-			fView->dcSpeedSlider->SetValue(500);
-			fView->dcSpeedSlider->Invoke();
-			fView->mouseSpeedSlider->SetValue(500);
-			fView->mouseSpeedSlider->Invoke();
-			fView->mouseAccSlider->SetValue(500);
-			fView->mouseAccSlider->Invoke();
-			fView->focusMenu->ItemAt(0)->SetMarked(true);
+			fSettingsView->dcSpeedSlider->SetValue(500);
+			fSettingsView->dcSpeedSlider->Invoke();
+			fSettingsView->mouseSpeedSlider->SetValue(500);
+			fSettingsView->mouseSpeedSlider->Invoke();
+			fSettingsView->mouseAccSlider->SetValue(500);
+			fSettingsView->mouseAccSlider->Invoke();
+			fSettingsView->focusMenu->ItemAt(0)->SetMarked(true);
 			set_mouse_type(3);
-			fView->mouseTypeMenu->ItemAt(2)->SetMarked(true);
+			fSettingsView->mouseTypeMenu->ItemAt(2)->SetMarked(true);
 			set_mouse_mode(B_NORMAL_MOUSE);
-			fView->fCurrentMouseMap.button[0] = B_PRIMARY_MOUSE_BUTTON;
-			fView->fCurrentMouseMap.button[1] = B_SECONDARY_MOUSE_BUTTON;
-			fView->fCurrentMouseMap.button[2] = B_TERTIARY_MOUSE_BUTTON;
-			set_mouse_map(&fView->fCurrentMouseMap);
+			fSettingsView->fCurrentMouseMap.button[0] = B_PRIMARY_MOUSE_BUTTON;
+			fSettingsView->fCurrentMouseMap.button[1] = B_SECONDARY_MOUSE_BUTTON;
+			fSettingsView->fCurrentMouseMap.button[2] = B_TERTIARY_MOUSE_BUTTON;
+			set_mouse_map(&fSettingsView->fCurrentMouseMap);
 
 			SetRevertable(true);
 			break;
@@ -101,16 +104,16 @@ MouseWindow::MessageReceived(BMessage *message)
 
 		case BUTTON_REVERT: {
 			// revert to last settings
-			fView->Init();
+			fSettingsView->Init();
 			fSettings.Revert();
-			//fView->Update();
+			//fSettingsView->Update();
 
 			SetRevertable(false);
 			break;
 		}
 
 		case POPUP_MOUSE_TYPE: {
-			status_t err = set_mouse_type(fView->mouseTypeMenu->IndexOf(fView->mouseTypeMenu->FindMarked())+1);
+			status_t err = set_mouse_type(fSettingsView->mouseTypeMenu->IndexOf(fSettingsView->mouseTypeMenu->FindMarked())+1);
 			if (err < B_OK)
 				printf("error while setting mouse type : %s\n", strerror(err));
 
@@ -120,7 +123,7 @@ MouseWindow::MessageReceived(BMessage *message)
 
 		case POPUP_MOUSE_FOCUS: {
 			mode_mouse mouse_mode = B_NORMAL_MOUSE;
-			switch (fView->focusMenu->IndexOf(fView->focusMenu->FindMarked())) {
+			switch (fSettingsView->focusMenu->IndexOf(fSettingsView->focusMenu->FindMarked())) {
 				case 0: mouse_mode = B_NORMAL_MOUSE; break;
 				case 1: mouse_mode = B_FOCUS_FOLLOWS_MOUSE; break;
 				case 2: mouse_mode = B_WARP_MOUSE; break;
@@ -133,7 +136,7 @@ MouseWindow::MessageReceived(BMessage *message)
 		}
 
 		case SLIDER_DOUBLE_CLICK_SPEED: {
-			int32 value = fView->dcSpeedSlider->Value();
+			int32 value = fSettingsView->dcSpeedSlider->Value();
 			int32 click_speed;	// slow = 1000000, fast = 0
 			click_speed = (int32) (1000000 - value * 1000); 
 			status_t err = set_click_speed(click_speed);
@@ -145,7 +148,7 @@ MouseWindow::MessageReceived(BMessage *message)
 		}
 
 		case SLIDER_MOUSE_SPEED: {
-			int32 value = fView->mouseSpeedSlider->Value();
+			int32 value = fSettingsView->mouseSpeedSlider->Value();
 			int32 mouse_speed;	// slow = 8192, fast = 524287
 			mouse_speed = (int32) pow(2, value * 6 / 1000) * 8192; 
 			status_t err = set_mouse_speed(mouse_speed);
@@ -157,7 +160,7 @@ MouseWindow::MessageReceived(BMessage *message)
 		}
 
 		case SLIDER_MOUSE_ACC: {
-			int32 value = fView->mouseAccSlider->Value();
+			int32 value = fSettingsView->mouseAccSlider->Value();
 			int32 mouse_acc;	// slow = 0, fast = 262144
 			mouse_acc = (int32) pow(value * 4 / 1000, 2) * 16384;
 			status_t err = set_mouse_acceleration(mouse_acc);
@@ -169,16 +172,16 @@ MouseWindow::MessageReceived(BMessage *message)
 		}
 
 		case POPUP_MOUSE_MAP: {
-			int32 index = fView->mouseMapMenu->IndexOf(fView->mouseMapMenu->FindMarked());
+			int32 index = fSettingsView->mouseMapMenu->IndexOf(fSettingsView->mouseMapMenu->FindMarked());
 			int32 number = B_PRIMARY_MOUSE_BUTTON;
 			switch (index) {
 				case 0: number = B_PRIMARY_MOUSE_BUTTON; break;
 				case 1: number = B_SECONDARY_MOUSE_BUTTON; break;
 				case 2: number = B_TERTIARY_MOUSE_BUTTON; break;
 			}
-			fView->fCurrentMouseMap.button[fView->fCurrentButton] = number;
-			status_t err = set_mouse_map(&fView->fCurrentMouseMap);
-			fView->fCurrentButton = -1;
+			fSettingsView->fCurrentMouseMap.button[fSettingsView->fCurrentButton] = number;
+			status_t err = set_mouse_map(&fSettingsView->fCurrentMouseMap);
+			fSettingsView->fCurrentButton = -1;
 			if (err < B_OK)
 				printf("error while setting mouse map : %s\n", strerror(err));
 

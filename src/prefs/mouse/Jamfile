@@ -5,7 +5,9 @@ AddResources Mouse : Mouse.rsrc ;
 Preference Mouse : 
 	Mouse.cpp 
 	MouseSettings.cpp 
+	MouseWindow.cpp
 	MouseView.cpp 
-	MouseWindow.cpp ;
+	SettingsView.cpp
+	;
 
-LinkSharedOSLibs Mouse : translation be root ;
+LinkSharedOSLibs Mouse : translation be ;

@@ -6,12 +6,13 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        Mouse.h
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :    
-//	Modified : December 10, 2003
-// 
+//  File:			Mouse.h
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 #ifndef MOUSE_H
 #define MOUSE_H

@@ -6,12 +6,13 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        Mouse.cpp
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :    
-//	Modified : December 10, 2003
-// 
+//  File:			Mouse.cpp
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
+//
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <Alert.h>

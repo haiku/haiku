@@ -6,10 +6,12 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:        MouseSettings.h
-//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
-//  Description: Media Preferences
-//  Created :   December 10, 2003
+//  File:			MouseSettings.h
+//  Authors:		Jérôme Duval,
+//					Andrew McCall (mccall@digitalparadise.co.uk)
+//					Axel Dörfler (axeld@pinc-software.de)
+//  Description:	Mouse Preferences
+//  Created:		December 10, 2003
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

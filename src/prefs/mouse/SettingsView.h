@@ -6,7 +6,7 @@
 //  by the OpenBeOS license.
 //
 //
-//  File:			MouseView.h
+//  File:			SettingsView.h
 //  Authors:		Jérôme Duval,
 //					Andrew McCall (mccall@digitalparadise.co.uk)
 //					Axel Dörfler (axeld@pinc-software.de)
@@ -14,8 +14,8 @@
 //  Created:		December 10, 2003
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-#ifndef MOUSE_VIEW_H
-#define MOUSE_VIEW_H
+#ifndef SETTINGS_VIEW_H
+#define SETTINGS_VIEW_H
 
 
 #include <Box.h>
@@ -27,9 +27,9 @@
 
 class MouseSettings;
 
-class MouseView : public BBox {
+class SettingsView : public BBox {
 	public:
-		MouseView(BRect frame, MouseSettings &settings);
+		SettingsView(BRect frame, MouseSettings &settings);
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
@@ -61,4 +61,4 @@ class MouseView : public BBox {
 		BBitmap			*fMouseBitmap, *fMouseDownBitmap;
 };
 
-#endif	/* MOUSE_VIEW_H */
+#endif	/* SETTINGS_VIEW_H */
