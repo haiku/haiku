@@ -93,7 +93,7 @@ ChunkCache::PutNextChunk(void *chunkBuffer, int32 chunkSize, const media_header 
 
 	if (err == B_OK) {
 		if (fNextPut->sizeMax < chunkSize) {
-//			printf("ChunkCache::PutNextChunk: %p resizing from %ld to %ld\n", fNextPut, fNextPut->sizeMax, chunkSize);
+			printf("ChunkCache::PutNextChunk: %p resizing from %ld to %ld\n", fNextPut, fNextPut->sizeMax, chunkSize);
 			free(fNextPut->buffer);
 			fNextPut->buffer = malloc((chunkSize + 1024) & ~1023);
 			fNextPut->sizeMax = chunkSize;

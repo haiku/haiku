@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
+// should be 0, to disable the chunk cache set it to 1
+#define DISABLE_CHUNK_CACHE 0
 
 MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 {
@@ -62,10 +64,12 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 		}
 	}
 	
+#if DISABLE_CHUNK_CACHE == 0
 	// start extractor thread
 	fExtractorWaitSem = create_sem(1, "media extractor thread sem");
 	fExtractorThread = spawn_thread(extractor_thread, "media extractor thread", 10, this);
-	resume_thread(fExtractorThread);  
+	resume_thread(fExtractorThread);
+#endif
 }
 
 
@@ -182,6 +186,12 @@ MediaExtractor::GetNextChunk(int32 stream,
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader)
 {
+#if DISABLE_CHUNK_CACHE > 0
+	static BLocker locker;
+	BAutolock lock(locker);
+	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer, chunkSize, mediaHeader); 
+#endif
+
 	status_t err;
 	err = fStreamInfo[stream].chunkCache->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 	release_sem(fExtractorWaitSem);
