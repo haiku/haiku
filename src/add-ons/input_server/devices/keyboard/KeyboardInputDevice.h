@@ -27,6 +27,7 @@
 #ifndef __KEYBOARDINPUTDEVICE_H
 #define __KEYBOARDINPUTDEVICE_H
 
+#include "Keymap.h"
 #include <InputServerDevice.h>
 #include <List.h>
 #include <stdio.h>
@@ -61,7 +62,8 @@ private:
 	static int32 DeviceWatcher(void *arg);
 	static char *GetShortName(const char *longName);
 	
-	BList fDevices;	
+	BList fDevices;
+	Keymap	fKeymap;
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();

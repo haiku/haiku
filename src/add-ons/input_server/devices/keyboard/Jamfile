@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src add-ons input_server devices keyboard ;
 
 Addon <input>keyboard : input_server/devices : 
-	KeyboardInputDevice.cpp 
+	KeyboardInputDevice.cpp
+	Keymap.cpp
 	: false 
 	: be <nogrist>input_server ;
 
