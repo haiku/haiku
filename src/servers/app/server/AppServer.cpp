@@ -747,6 +747,12 @@ ServerApp *AppServer::FindApp(const char *sig)
 	return NULL;
 }
 
+Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+	int32 wflags, DisplayDriver *ddriver)
+{
+	return NULL;
+}
+
 /*!
 	\brief Entry function to run the entire server
 	\param argc Number of command-line arguments present
@@ -764,3 +770,4 @@ int main( int argc, char** argv )
 	delete app_server;
 	return 0;
 }
+

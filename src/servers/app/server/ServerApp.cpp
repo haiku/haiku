@@ -326,7 +326,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 
 			// Create the ServerWindow object for this window
 			ServerWindow *newwin=new ServerWindow(rect,(const char *)index,
-				winlook, winfeel, winflags,workspace,this,win_port);
+				winlook, winfeel, winflags,this,win_port,workspace);
 			_winlist->AddItem(newwin);
 
 			// Window looper is waiting for our reply. Send back the

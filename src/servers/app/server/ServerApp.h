@@ -70,6 +70,7 @@ public:
 	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
 protected:
 	friend AppServer;
+	friend ServerWindow;
 	void DispatchMessage(int32 code, int8 *buffer);
 
 	port_id _sender,_receiver;

@@ -1,3 +1,29 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		ServerWindow.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	Shadow BWindow class
+//  
+//------------------------------------------------------------------------------
 #include <AppDefs.h>
 #include <Rect.h>
 #include <string.h>
@@ -10,152 +36,195 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "ServerProtocol.h"
-
-// TODO: include when we have WindowBorder.h
+// TODO: uncomment this when we have WindowBorder.h
 //#include "WindowBorder.h"
 #include "Desktop.h"
+#include "TokenHandler.h"
 
-// defined in WindowBorder.cpp locking not necessary - the only
-// thread which accesses them is the Poller thread
-extern bool is_moving_window,is_resizing_window,is_sliding_tab;
+//! Handler to get BWindow tokens from
+TokenHandler win_token_handler;
 
-// Used in window focus management
+// defined in WindowBorder.cpp. Locking is not necessary - the only
+// _monitorthread which accesses them is the Poller _monitorthread
+
+// TODO: Uncomment the extern keyword when we have WindowBorder.h
+/* extern */bool is_moving_window,is_resizing_window,is_sliding_tab;
+
+//! Used in window focus management
 ServerWindow *active_serverwindow=NULL;
 
-ServerWindow::ServerWindow(BRect rect, const char *title, uint32 wlook, uint32 wfeel,
-	uint32 wflags, int32 workspace, ServerApp *winapp,  port_id winport)
-{
-/*	title=new BString;
-	if(string)
-		title->SetTo(string);
-	else
-		title->SetTo("Window");
-
-	// This must happen before the WindowBorder object - it needs this object's frame
-	// to be valid
-	frame=rect;
-
-	// set these early also - the decorator will also need them
-	winflags=wflags;
-	winlook=wlook;
-	winfeel=wfeel;
+/*!
+	\brief Contructor
 	
-
-	winborder=new WindowBorder(this, title->String());
-
-	// hard code this for now - window look also needs to be attached and sent to
-	// server by BWindow constructor
-	decorator=instantiate_decorator(frame,title->String(),winlook,winfeel,winflags,get_gfxdriver());
-
-	winborder->SetDecorator(decorator);
-
-	// sender is the monitored app's event port
-	sender=winport;
-	winlink=new PortLink(sender);
-
-	if(winapp!=NULL)
-		applink=new PortLink(winapp->receiver);
-	else
-		applink=NULL;
-	
-	// receiver is the port to which the app sends messages for the server
-	receiver=create_port(30,title->String());
-	
-	active=false;
-	hidecount=0;
-
-	// Spawn our message monitoring thread
-	thread=spawn_thread(MonitorWin,title->String(),B_NORMAL_PRIORITY,this);
-	if(thread!=B_NO_MORE_THREADS && thread!=B_NO_MEMORY)
-		resume_thread(thread);
-
-	workspace=index;
-	AddWindowToDesktop(this,index);
+	Sets up a lot of the stuff
 */
+ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
+	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index)
+{
+	_title=new BString;
+	_title->SetTo( (string)?string:"Window" );
+
+	// This must happen before the WindowBorder object - it needs this object's _frame
+	// to be valid
+	_frame=rect;
+
+	// set these early also - the _decorator will also need them
+	_flags=wflags;
+	_look=wlook;
+	_feel=wfeel;
+
+//	TODO: uncomment this when we have WindowBorder.h	
+//	_winborder=new WindowBorder(this, _title->String());
+
+	_decorator=new_decorator(_frame,_title->String(),_look,_feel,_flags,GetGfxDriver());
+//	TODO: uncomment this when we have WindowBorder.h	
+//	_winborder->SetDecorator(_decorator);
+
+	// _sender is the monitored _app's event port
+	_sender=winport;
+	_winlink=new PortLink(_sender);
+
+	_applink= (winapp)? new PortLink(winapp->_receiver) : NULL;
+	
+	// _receiver is the port to which the _app sends messages for the server
+	_receiver=create_port(30,_title->String());
+	
+	_active=false;
+	_hidecount=0;
+
+	// Spawn our message monitoring _monitorthread
+	_monitorthread=spawn_thread(MonitorWin,_title->String(),B_NORMAL_PRIORITY,this);
+	if(_monitorthread!=B_NO_MORE_THREADS && _monitorthread!=B_NO_MEMORY)
+		resume_thread(_monitorthread);
+
+	_workspace=index;
+
+	AddWindowToDesktop(this,index);
 }
 
 ServerWindow::~ServerWindow(void)
 {
-/*	RemoveWindowFromDesktop(this);
-	if(applink)
+	RemoveWindowFromDesktop(this);
+	if(_applink)
 	{
-		delete applink;
-		applink=NULL;
-
-		delete title;
-		delete winlink;
-		delete decorator;
-		delete winborder;
+		delete _applink;
+		_applink=NULL;
+		delete _title;
+		delete _winlink;
+		delete _decorator;
+//	TODO: uncomment this when we have WindowBorder.h	
+//		delete _winborder;
 	}
-	kill_thread(thread);
-*/
+	kill_thread(_monitorthread);
 }
 
 void ServerWindow::RequestDraw(BRect rect)
 {
-/*	winlink->SetOpCode(LAYER_DRAW);
-	winlink->Attach(&rect,sizeof(BRect));
-	winlink->Flush();
-*/
+	_winlink->SetOpCode(LAYER_DRAW);
+	_winlink->Attach(&rect,sizeof(BRect));
+	_winlink->Flush();
+}
+
+void ServerWindow::ReplaceDecorator(void)
+{
 }
 
 void ServerWindow::Quit(void)
 {
 }
 
+const char *ServerWindow::GetTitle(void)
+{
+	return _title->String();
+}
+
+ServerApp *ServerWindow::GetApp(void)
+{
+	return _app;
+}
+
 void ServerWindow::Show(void)
 {
-/*	if(winborder)
+	if(_winborder)
 	{
-		winborder->ShowLayer();
+//	TODO: uncomment this when we have WindowBorder.h	
+//		_winborder->ShowLayer();
 		ActivateWindow(this);
 	}
-*/
 }
 
 void ServerWindow::Hide(void)
 {
-//	if(winborder)
-//		winborder->HideLayer();
+//	TODO: uncomment this when we have WindowBorder.h	
+//	if(_winborder)
+//		_winborder->HideLayer();
+}
+
+bool ServerWindow::IsHidden(void)
+{
+	return (_hidecount==0)?true:false;
 }
 
 void ServerWindow::SetFocus(bool value)
 {
-/*	if(active!=value)
+	if(_active!=value)
 	{
-		active=value;
-		decorator->SetFocus(value);
-		decorator->Draw();
-	}
-*/
-}
-
-void ServerWindow::WorkspaceActivated(int32 NewWorkspace, const BPoint Resolution, color_space CSpace)
-{
-}
-
-void ServerWindow::WindowActivated(bool Active)
-{
-}
-
-void ServerWindow::ScreenModeChanged(const BPoint Resolustion, color_space CSpace)
-{
-}
-
-void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
-{
-	switch(code)
-	{
-		default:
-		{
-			break;
-		}
+		_active=value;
+		_decorator->SetFocus(value);
+		_decorator->Draw();
 	}
 }
 
-int32 ServerWindow::MonitorWin(void *data)
+bool ServerWindow::HasFocus(void)
 {
-/*	ServerWindow *win=(ServerWindow *)data;
+	return _active;
+}
+
+void ServerWindow::WorkspaceActivated(int32 newworkspace, const BPoint reso, color_space cspace)
+{
+}
+
+void ServerWindow::WindowActivated(bool active)
+{
+}
+
+void ServerWindow::ScreenModeChanged(const BPoint res, color_space cspace)
+{
+}
+
+void ServerWindow::SetFrame(const BRect &rect)
+{
+	_frame=rect;
+}
+
+BRect ServerWindow::Frame(void)
+{
+	return _frame;
+}
+
+status_t ServerWindow::Lock(void)
+{
+#ifdef DEBUG_SERVERWIN
+printf("%s::Lock()\n",_title->String());
+#endif
+	return _locker.Lock();
+}
+
+void ServerWindow::Unlock(void)
+{
+#ifdef DEBUG_SERVERWIN
+printf("%s::Unlock()\n",_title->String());
+#endif
+	_locker.Unlock();
+}
+
+bool ServerWindow::IsLocked(void)
+{
+	return _locker.IsLocked();
+}
+
+void ServerWindow::Loop(void)
+{
 	// Message-dispatching loop for the ServerWindow
 	int32 msgcode;
 	int8 *msgbuffer=NULL;
@@ -163,15 +232,15 @@ int32 ServerWindow::MonitorWin(void *data)
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(receiver);
+		buffersize=port_buffer_size(_receiver);
 		
 		if(buffersize>0)
 		{
 			msgbuffer=new int8[buffersize];
-			bytesread=read_port(receiver,&msgcode,msgbuffer,buffersize);
+			bytesread=read_port(_receiver,&msgcode,msgbuffer,buffersize);
 		}
 		else
-			bytesread=read_port(receiver,&msgcode,NULL,0);
+			bytesread=read_port(_receiver,&msgcode,NULL,0);
 
 		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
 		{
@@ -182,15 +251,17 @@ int32 ServerWindow::MonitorWin(void *data)
 					// Received when a view is attached to a window. This will require
 					// us to attach a layer in the tree in the same manner and invalidate
 					// the area in which the new layer resides assuming that it is
-					// visible
+					// visible.
 				
 					// Attached Data:
 					// 1) (int32) id of the parent view
-					// 2) (int32) id of the child view
-					// 3) (BRect) frame in parent's coordinates
-					// 4) (int32) resize flags
-					// 5) (int32) view flags
-					// 6) (uint16) view's hide level
+					// 2) (BRect) frame in parent's coordinates
+					// 3) (int32) resize flags
+					// 4) (int32) view flags
+					// 5) (uint16) view's hide level
+					
+					// This is a synchronous call, so reply immediately with the ID of the layer
+					// so the BView can identify itself
 
 					break;
 				}
@@ -219,22 +290,9 @@ int32 ServerWindow::MonitorWin(void *data)
 				{
 					// Received from our window when it is told to quit, so tell our
 					// application to delete this object
-					applink->SetOpCode(DELETE_WINDOW);
-					applink->Attach((int32)thread);
-					applink->Flush();
-					break;
-				}
-				case VIEW_GET_TOKEN:
-				{
-					// Request to get a view identifier - this is synchronous, so reply
-					// immediately
-					
-					// Attached data:
-					// 1) port_id reply port
-					port_id reply_port=*((port_id*)msgbuffer);
-					PortLink *link=new PortLink(reply_port);
-					link->Attach(view_counter++);
-					link->Flush();
+					_applink->SetOpCode(DELETE_WINDOW);
+					_applink->Attach((int32)_monitorthread);
+					_applink->Flush();
 					break;
 				}
 				default:
@@ -250,18 +308,39 @@ int32 ServerWindow::MonitorWin(void *data)
 		if(msgcode==B_QUIT_REQUESTED)
 			break;
 	}
-*/
+}
+
+void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
+{
+	switch(code)
+	{
+		default:
+		{
+#ifdef DEBUG_SERVERWIN
+printf("%s::ServerWindow(): Received unexpected code: ",_title->String());
+PrintMessageCode(code);
+#endif
+			break;
+		}
+	}
+}
+
+int32 ServerWindow::MonitorWin(void *data)
+{
+	ServerWindow *win=(ServerWindow *)data;
+	win->Loop();
+	exit_thread(0);
 	return 0;
 }
 
 void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 {
-/*	ServerWindow *mousewin=NULL;
+	ServerWindow *mousewin=NULL;
 	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
 	Layer *root=GetRootLayer();
-	WindowBorder *winborder;
+	WindowBorder *_winborder;
 	
 	// activeborder is used to remember windows when resizing/moving windows
 	// or sliding a tab
@@ -294,12 +373,12 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			BPoint pt(x,y);
 
 			// If we have clicked on a window, 			
-			winborder=(WindowBorder*)root->GetChildAt(pt);
-			if(winborder)
+			_winborder=(WindowBorder*)root->GetChildAt(pt);
+			if(_winborder)
 			{
-				mousewin=winborder->Window();
-				ASSERT(mousewin!=NULL);
-				winborder->MouseDown(pt,buttons,modifiers);
+// TODO: Uncomment when we have WindowBorder.h
+//				mousewin=_winborder->Window();
+//				_winborder->MouseDown(pt,buttons,modifiers);
 			}
 			break;
 		}
@@ -321,17 +400,16 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			BPoint pt(x,y);
 			
 			is_moving_window=false;
-			winborder=(WindowBorder*)root->GetChildAt(pt);
-			if(winborder)
+			_winborder=(WindowBorder*)root->GetChildAt(pt);
+			if(_winborder)
 			{
-				mousewin=winborder->Window();
-				ASSERT(mousewin!=NULL);
+// TODO: Uncomment when we have WindowBorder.h
+//				mousewin=_winborder->Window();
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
-				winborder->MouseUp(pt,0,0);
+//				_winborder->MouseUp(pt,0,0);
 				
-				// Do cool mouse stuff here
 			}
 			break;
 		}
@@ -354,19 +432,17 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			if(is_moving_window || is_resizing_window || is_sliding_tab)
 			{
 				mousewin=active_serverwindow;
-				ASSERT(mousewin!=NULL);
-
-				mousewin->winborder->MouseMoved(pt,buttons,0);
+// TODO: Uncomment when we have WindowBorder.h
+//				mousewin->_winborder->MouseMoved(pt,buttons,0);
 			}
 			else
 			{
-				winborder=(WindowBorder*)root->GetChildAt(pt);
-				if(winborder)
+				_winborder=(WindowBorder*)root->GetChildAt(pt);
+				if(_winborder)
 				{
-					mousewin=winborder->Window();
-					ASSERT(mousewin!=NULL);
-	
-					winborder->MouseMoved(pt,buttons,0);
+// TODO: Uncomment when we have WindowBorder.h
+//					mousewin=_winborder->Window();
+//					_winborder->MouseMoved(pt,buttons,0);
 				}
 			}				
 			break;
@@ -376,17 +452,15 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			break;
 		}
 	}
-*/
 }
 
 void ActivateWindow(ServerWindow *win)
 {
-/*	if(active_serverwindow==win)
+	if(active_serverwindow==win)
 		return;
 	if(active_serverwindow)
 		active_serverwindow->SetFocus(false);
 	active_serverwindow=win;
 	if(win)
 		win->SetFocus(true);
-*/
 }

@@ -35,9 +35,11 @@ public:
 	void HandleKeyMessage(int32 code, int8 *buffer);
 	ServerApp *FindApp(const char *sig);
 	
-	create_decorator *make_decorator;	// global function pointer
 private:
-	friend Decorator *instantiate_decorator(Layer *lay, const char *title, uint32 dflags, uint32 wlook);
+	friend Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+			int32 wflags, DisplayDriver *ddriver);
+
+	create_decorator *make_decorator;	// global function pointer
 
 	port_id	_messageport,_mouseport;
 	image_id _decorator_id;
@@ -52,6 +54,6 @@ private:
 	DisplayDriver *_driver;
 };
 
-Decorator *instantiate_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
+Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver);
 #endif
