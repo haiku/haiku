@@ -121,3 +121,31 @@ SMInvoker4::Invoke(BMessenger &target, BHandler *replyHandler,
 	return result;
 }
 
+
+// SMInvoker5
+
+// constructor
+SMInvoker5::SMInvoker5(bool useMessage, bool useReply,
+					   bigtime_t deliveryTimeout, bigtime_t replyTimeout)
+		  : SMInvoker(),
+			fUseMessage(useMessage),
+			fUseReply(useReply),
+			fDeliveryTimeout(deliveryTimeout),
+			fReplyTimeout(replyTimeout)
+{
+}
+
+// Invoke
+status_t
+SMInvoker5::Invoke(BMessenger &target, BHandler *replyHandler,
+				   BMessenger &replyMessenger)
+{
+	if (fUseReply)
+		fReplyMessage = new BMessage(0UL);
+	BMessage _message(MSG_TEST);
+	BMessage *message = (fUseMessage ? &_message : NULL);
+	status_t result = target.SendMessage(message, fReplyMessage,
+										 fDeliveryTimeout, fReplyTimeout);
+	return result;
+}
+

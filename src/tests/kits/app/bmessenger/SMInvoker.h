@@ -72,4 +72,20 @@ private:
 	bool		fUseReply;
 };
 
+// Invoker for SendMessage(BMessage *, BMessage *, bigtime_t, bigtime_t)
+class SMInvoker5 : public SMInvoker {
+public:
+	SMInvoker5(bool useMessage, bool useReply, bigtime_t deliveryTimeout,
+			   bigtime_t replyTimeout);
+
+	virtual status_t Invoke(BMessenger &target, BHandler *replyHandler,
+							BMessenger &replyMessenger);
+
+private:
+	bool		fUseMessage;
+	bool		fUseReply;
+	bigtime_t	fDeliveryTimeout;
+	bigtime_t	fReplyTimeout;
+};
+
 #endif	// SM_INVOKER_H
