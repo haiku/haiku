@@ -1,19 +1,18 @@
 #include "vpage.h"
 #include "vnodePool.h"
+#include "vmHeaderBlock.h"
 
-	extern swapFileManager  swapMan;
-	extern pageManager pageMan;  
-	extern poolvnode vnodePool;
+	extern vmHeaderBlock *vmBlock;
 
 void vpage::flush(void)
 	{
 	if (protection==writable && dirty)
-		swapMan.write_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
+		vmBlock->swapMan->write_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
 	}
 
 void vpage::refresh(void)
 	{
-		swapMan.read_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
+		vmBlock->swapMan->read_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
 	}
 
 vpage::vpage(void)
@@ -42,9 +41,9 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 		backing->count++;
 		}
 	else
-		backingNode=&(swapMan.findNode());
+		backingNode=&(vmBlock->swapMan->findNode());
 	if (!physMem && (state!=LAZY) && (state!=NO_LOCK))
-		physPage=pageMan.getPage();
+		physPage=vmBlock->pageMan->getPage();
 	else
 		{
 		if (physMem)
@@ -57,12 +56,12 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 void vpage::cleanup(void)
 	{
 	if (physPage) //  Note that free means release one reference
-		pageMan.freePage(physPage);
+		vmBlock->pageMan->freePage(physPage);
 	if (backingNode)
 		{
 		if (backingNode->fd)
-			swapMan.freeVNode(*backingNode);
-		vnodePool.put(backingNode);
+			vmBlock->swapMan->freeVNode(*backingNode);
+		vmBlock->vnodePool->put(backingNode);
 		}
 	}
 
@@ -82,19 +81,19 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			{
 			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
 				{
-				page *newPhysPage=pageMan.getPage();
+				page *newPhysPage=vmBlock->pageMan->getPage();
 				if (!newPhysPage) // No room at the inn
 					return false;
 				memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 				physPage=newPhysPage;
 				protection=writable;
-				backingNode=&(swapMan.findNode()); // Need new backing store for this node, since it was copied, the original is no good...
+				backingNode=&(vmBlock->swapMan->findNode()); // Need new backing store for this node, since it was copied, the original is no good...
 				// Update the architecture specific stuff here...
 				}
 			return true; 
 			}
 		}
-	physPage=pageMan.getPage();
+	physPage=vmBlock->pageMan->getPage();
 	if (!physPage) // No room at the inn
 		return false;
 //	printf ("vpage::fault: New page allocated! new physical address = %x vnode.fd=%d, vnode.offset=%d, \n",physPage->getAddress(),((backingNode)?backingNode->fd:0),((backingNode)?backingNode->offset:0));
@@ -162,7 +161,7 @@ void vpage::pager(int desperation)
 	printf ("vpage::pager flushing\n");
 	flush();
 	printf ("vpage::pager freeing\n");
-	pageMan.freePage(physPage);
+	vmBlock->pageMan->freePage(physPage);
 	printf ("vpage::pager going to NULL\n");
 	physPage=NULL;
 	}

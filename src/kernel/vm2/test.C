@@ -16,6 +16,7 @@ int createFillAndTest(int pages)
 	try{
 	unsigned long addr;
 	int area1;
+	printf ("createFillAndTest: about to create \n");
 	area1=vm.createArea("Mine",pages,(void **)(&addr));
 	printf ("createFillAndTest: create done\n");
 	for (int i=0;i<pages*PAGE_SIZE;i++)

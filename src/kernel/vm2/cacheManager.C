@@ -1,8 +1,9 @@
 #include <new.h>
 #include <cacheManager.h>
 #include <vpagePool.h>
+#include "vmHeaderBlock.h"
 
-extern poolvpage vpagePool;
+extern vmHeaderBlock *vmBlock;
 // TODO - we need to (somehow) make sure that the same vnodes here are shared with mmap.
 // Maybe a vnode manager...
 cacheManager::cacheManager(void) : area ()
@@ -38,7 +39,7 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 				}
 	lock();
 	// Create a vnode here
-	vpage *newPage = new (vpagePool.get()) vpage;
+	vpage *newPage = new (vmBlock->vpagePool->get()) vpage;
 	newPage->setup(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
 	vpages.add(newPage); 
 	cacheMembers.add(newPage);

@@ -6,7 +6,8 @@
 
 class pageManager {
 	public:
-		pageManager(int);
+		pageManager(void);
+		void setup(void *memory,int pages);
 		page *getPage(void);
 		void freePage(page *);
 		void cleaner(void);

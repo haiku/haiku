@@ -4,8 +4,9 @@
 #include <errno.h>
 #include <new.h>
 #include <vnodePool.h>
+#include "vmHeaderBlock.h"
 
-extern poolvnode vnodePool;
+extern vmHeaderBlock *vmBlock;
 
 swapFileManager::swapFileManager(void)
 {
@@ -48,7 +49,7 @@ vnode &swapFileManager::findNode(void)
 	Unlock();
 	if (!newNode)
 		{
-		newNode=new (vnodePool.get()) vnode;
+		newNode=new (vmBlock->vnodePool->get()) vnode;
 		newNode->fd=swapFile;
 		newNode->offset=maxNode+=PAGE_SIZE; 
 		//printf (" New One: %d\n",newNode->offset);

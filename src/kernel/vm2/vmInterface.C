@@ -1,35 +1,46 @@
-#include "vmInterface.h"
-//#include "areaManager.h"
 #include <new.h>
 #include "mman.h"
 #include "area.h"
 #include "areaPool.h"
 #include "vpagePool.h"
 #include "vnodePool.h"
+#include "pageManager.h"
+#include "swapFileManager.h"
+#include "cacheManager.h"
+#define I_AM_VM_INTERFACE
+#include "vmHeaderBlock.h"
+#include "vmInterface.h"
 		
-areaManager am;
-swapFileManager swapMan;
-poolarea areaPool;
-poolvpage vpagePool;
-poolvnode vnodePool;
-pageManager pageMan(30); // Obviously this hard coded number is a hack...
+vmHeaderBlock *vmBlock;
+static areaManager am;
 	
+areaManager *getAM(void)
+{
+	return &am;
+}
+
+void *addToPointer(void *ptr,uint32 offset)
+{
+	return ((void *)(((unsigned long)ptr)+offset));
+}
+
 areaManager *vmInterface::getAM(void)
 	{
 	// Normally, we would go to the current user process to get this. Since there no such thing exists here...
+	
 	return &am;
 	}
 
 int32 cleanerThread(void *pageMan)
 	{
-	pageManager *pm=(pageManager *)pageMan;
+	pageManager *pm=(vmBlock->pageMan);
 	pm->cleaner();
 	return 0;
 	}
 
 int32 saverThread(void *areaMan)
 	{
-	areaManager *am=(areaManager *)areaMan;
+	areaManager *am=getAM();
 	// This should iterate over all processes...
 	while (1)
 		{
@@ -40,18 +51,55 @@ int32 saverThread(void *areaMan)
 
 int32 pagerThread(void *areaMan)
 	{
-	areaManager *am=(areaManager *)areaMan;
+	areaManager *am=getAM();
 	while (1)
 		{
 		snooze(1000000);	
-		am->pager(pageMan.desperation());	
+		am->pager(vmBlock->pageMan->desperation());	
 		}
 	}
 
 vmInterface::vmInterface(int pages) 
 	{
+	char temp[1000];
+	sprintf (temp,"vm_test_clone_%d",getpid());
+	if (clone_area(temp,(void **)(&vmBlock),B_ANY_ADDRESS,B_WRITE_AREA,find_area("vm_test"))<0)
+		{
+		// This is compatability for in BeOS usage only...
+		if (0>=create_area("vm_test",(void **)(&vmBlock),B_ANY_ADDRESS,B_PAGE_SIZE*pages,B_NO_LOCK,B_READ_AREA|B_WRITE_AREA))
+			{
+			printf ("pageManager::pageManager: No memory!\n");
+			exit(1);
+			}
+		//printf ("Allocated an area. Address = %x\n",vmBlock);
+		// Figure out how many pages we need
+		int pageCount = (sizeof(poolarea)+sizeof(poolvpage)+sizeof(poolvnode)+sizeof(pageManager)+sizeof(swapFileManager)+sizeof(cacheManager)+sizeof(vmHeaderBlock)+PAGE_SIZE-1)/PAGE_SIZE;
+		if (pageCount >=pages)
+			{
+			printf ("Hey! Go buy some ram! Trying to create a VM with fewer pages than the setup will take!\n");
+			exit(1);
+			}
+		//printf ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		void *currentAddress = addToPointer(vmBlock,sizeof(struct vmHeaderBlock));
+		vmBlock->areaPool = new (currentAddress) poolarea;
+		currentAddress=addToPointer(currentAddress,sizeof(poolarea));
+		vmBlock->vpagePool = new (currentAddress) poolvpage;
+		currentAddress=addToPointer(currentAddress,sizeof(poolvpage));
+		vmBlock->vnodePool = new (currentAddress) poolvnode;
+		currentAddress=addToPointer(currentAddress,sizeof(poolvnode));
+		vmBlock->pageMan = new (currentAddress) pageManager;
+		currentAddress=addToPointer(currentAddress,sizeof(pageManager));
+		vmBlock->swapMan = new (currentAddress) swapFileManager;
+		currentAddress=addToPointer(currentAddress,sizeof(swapFileManager));
+		vmBlock->cacheMan = new (currentAddress) cacheManager;
+		currentAddress=addToPointer(currentAddress,sizeof(cacheManager));
+		//printf ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		//printf ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
+		vmBlock->pageMan->setup(addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
+	    }
 	nextAreaID=0;
-	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,&pageMan));
+
+	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
 	resume_thread(spawn_thread(saverThread,"saverThread",0,getAM()));
 	resume_thread(spawn_thread(pagerThread,"pagerThread",0,getAM()));
 	}
@@ -86,7 +134,10 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
-	area *newArea = new (areaPool.get()) area;
+	area *newArea = new (vmBlock->areaPool->get()) area;
+	areaManager *foo;
+	printf ("vmInterface::createArea - got a new area (%x) from the areaPool\n",newArea);
+	foo=getAM();
 	newArea->setup(getAM());
 	newArea->createArea(AreaName,pageCount,address,addType,state,protect);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
@@ -108,7 +159,7 @@ void vmInterface::freeArea(int Area)
 //		printf ("vmInterface::freeArea: deleting area %x \n",oldArea);
 		oldArea->freeArea();
 //		printf ("vmInterface::freeArea: freeArea complete \n");
-		areaPool.put(oldArea);
+		vmBlock->areaPool->put(oldArea);
 		}
 	else
 		printf ("vmInterface::freeArea: unable to find requested area\n");
@@ -140,7 +191,7 @@ int vmInterface::getAreaByName(char *name)
 
 int vmInterface::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
 	{
-	area *newArea = new (areaPool.get()) area;
+	area *newArea = new (vmBlock->areaPool->get()) area;
 	newArea->setup(getAM());
 	area *oldArea=getAM()->findArea(newAreaID);
 	newArea->cloneArea(oldArea,AreaName,address,addType,state,prot);
@@ -155,7 +206,7 @@ void vmInterface::pager(void)
 	while (1)
 		{
 		snooze(250000);	
-		am.pager(pageMan.desperation());	
+		getAM()->pager(vmBlock->pageMan->desperation());	
 		}
 	}
 
@@ -165,14 +216,14 @@ void vmInterface::saver(void)
 	while (1)
 		{
 		snooze(250000);	
-		am.saver();	
+		getAM()->saver();	
 		}
 	}
 
 void vmInterface::cleaner(void)
 	{
 	// This loops on its own
-	pageMan.cleaner();
+	vmBlock->pageMan->cleaner();
 	}
 
 void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
@@ -191,7 +242,7 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 		return addr;
 		}
 
-	area *newArea = new (areaPool.get()) area;
+	area *newArea = new (vmBlock->areaPool->get()) area;
 	newArea->setup(getAM());
 	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);

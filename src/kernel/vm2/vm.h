@@ -26,14 +26,4 @@ enum addressSpec {EXACT,BASE,ANY,ANY_KERNEL,CLONE};
 #define CACHE_BEGIN 0x90000000
 #define CACHE_END 0xe0000000
 
-struct vmHeaderBlock
-{
-	poolarea areaPool;
-	poolvpage vpagePool;
-	poolvnode vnodePool;
-	pageManager pageMan(30); // Obviously this hard coded number is a hack...
-	swapFileManager swapMan;
-	cacheManager cacheMan;
-};
-
 #endif

@@ -1,6 +1,9 @@
 1) Need to make the paging daemon load the pages in, using semaphores.
+	-- Looks like we *don't* have to do this, based on what is done in NewOS. Need to consult...
 2) Make the caching and the VM (mmap) work together so that an mmap'ed file and a cached file will not race.
-3) Change the architecture so that instead of multiple static globals, everything is stored in pages.
+	-- Maybe a vnodeManager or a lookup in a hash table or something so that we can tell if someone is already caching this vnode.
+		This could get a little tricky wrt permissions and all...
+3) Change the architecture so that instead of multiple threads of tests, we have multiple apps of tests...
 4) Tests are not done. 
 	Test:
 		getNextAreaInfo

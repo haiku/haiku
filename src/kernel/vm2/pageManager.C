@@ -7,25 +7,21 @@ void *addOffset(void *base,unsigned long offset)
 	return (void *)(((unsigned long)base+offset));
 }
 
-pageManager::pageManager(int pages)
+pageManager::pageManager(void)
+{
+}
+
+void pageManager::setup(void *area,int pages)
 	{
-// This is compatability for in BeOS usage only...
-	void *area;
-	if (0>=create_area("vm_test",&area,B_ANY_ADDRESS,B_PAGE_SIZE*pages,B_NO_LOCK,B_READ_AREA|B_WRITE_AREA))
-		{
-		printf ("pageManager::pageManager: No memory!\n");
-		exit(1);
-		}
-	printf ("Allocated an area. Address = %x\n",area);
 	// Calculate the number of pages that we will need to hold the page structures
 	int pageOverhead=((pages*sizeof(page))+(PAGE_SIZE-1))/PAGE_SIZE;
 	for (int i=0;i<pages-pageOverhead;i++)
 		{
 		page *newPage=(page *)(addOffset(area,i*sizeof(page)));
 		newPage->setup(addOffset(area,(i+pageOverhead)*PAGE_SIZE));
-		printf ("newPage = %x, setup = %x\n",newPage,addOffset(area,(i+pageOverhead)*PAGE_SIZE));
-		printf ("i = %d, sizeof(page) = %x, pageOverhead = %d\n",i,sizeof(page),pageOverhead);
-		newPage->dump();
+		//printf ("newPage = %x, setup = %x\n",newPage,addOffset(area,(i+pageOverhead)*PAGE_SIZE));
+		//printf ("i = %d, sizeof(page) = %x, pageOverhead = %d\n",i,sizeof(page),pageOverhead);
+		//newPage->dump();
 		unused.add(addOffset(area,i*sizeof(page)));
 		}
 

@@ -1,6 +1,8 @@
 #include "pageManager.h"
 
-extern pageManager pageMan;
+#include "vmHeaderBlock.h"
+
+extern vmHeaderBlock *vmBlock;
 /* This is the template
  * replace TYPE with the type you need a pool for
  *
@@ -32,7 +34,7 @@ class poolTYPE
 			else
 				{
 				printf ("poolTYPE::get: Getting a new page!\n");
-				page *newPage=pageMan.getPage();
+				page *newPage=vmBlock->pageMan->getPage();
 				if (!newPage)
 					throw ("Out of pages to allocate a pool!");
 				int newCount=PAGE_SIZE/sizeof(TYPE);

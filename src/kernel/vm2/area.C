@@ -2,11 +2,12 @@
 #include "area.h"
 #include "areaManager.h"
 #include "vpage.h"
-#include "vpagePool.h"
 #include "vnodePool.h"
+#include "vpagePool.h"
 
-extern poolvpage vpagePool;
-extern poolvnode vnodePool;
+#include "vmHeaderBlock.h"
+
+extern vmHeaderBlock *vmBlock;
 
 area::area(void)
 	{
@@ -14,6 +15,7 @@ area::area(void)
 
 void area::setup (areaManager *myManager)
 	{
+	printf ("area::setup setting up new area\n");
 	manager=myManager;
 	}
 
@@ -53,11 +55,11 @@ status_t area::createAreaMappingFile(char *inName, int pageCount,void **address,
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	for (int i=0;i<pageCount;i++)
 		{
-		vnode *newVnode=new (vnodePool.get()) vnode;
+		vnode *newVnode=new (vmBlock->vnodePool->get()) vnode;
 		newVnode->fd=fd;
 		newVnode->offset=offset+PAGE_SIZE*i;
 		newVnode->valid=true;
-		newPage=new (vpagePool.get()) vpage;
+		newPage=new (vmBlock->vpagePool->get()) vpage;
 		newPage->setup(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
 //		printf ("New vnode with fd %d, offset = %d\n",fd,newVnode->offset);
@@ -81,13 +83,13 @@ status_t area::createArea(char *inName, int pageCount,void **address, addressSpe
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 
 	manager->lock();
-	//printf ("area::createArea: Locked in createArea\n");
+	printf ("area::createArea: Locked in createArea\n");
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
-	//printf ("area::createArea: base address = %d\n",base);
+	printf ("area::createArea: base address = %d\n",base);
 	for (int i=0;i<pageCount;i++)
 		{
-		//printf ("in area::createArea: creating page = %d\n",i);
-		newPage=new (vpagePool.get()) vpage;
+		printf ("in area::createArea: creating page = %d\n",i);
+		newPage=new (vmBlock->vpagePool->get()) vpage;
 		newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 		vpages.add(newPage);
 		}
@@ -95,7 +97,7 @@ status_t area::createArea(char *inName, int pageCount,void **address, addressSpe
 	start_address=base;
 	end_address=base+pageCount*PAGE_SIZE;
 	*address=(void *)base;
-	//printf ("area::createArea: unlocked in createArea\n");
+	printf ("area::createArea: unlocked in createArea\n");
 	}
 
 status_t area::cloneArea(area *origArea, char *inName, void **address, addressSpec type,pageState inState,protectType protect)
@@ -119,7 +121,7 @@ status_t area::cloneArea(area *origArea, char *inName, void **address, addressSp
 		{
 		vpage *newPage,*page=(vpage *)cur;
 		// Cloned area has the same physical page and backing store...
-		newPage=new (vpagePool.get()) vpage;	
+		newPage=new (vmBlock->vpagePool->get()) vpage;	
 		newPage->setup(base,page->getBacking(),page->getPhysPage(),protect,inState);
 		vpages.add(newPage);
 		base+=PAGE_SIZE;
@@ -151,7 +153,7 @@ void area::freeArea(void)
 //printf ("area::freeArea: flushed a page \n");
 		page->cleanup();
 		//page->next=NULL;
-		vpagePool.put(page);
+		vmBlock->vpagePool->put(page);
 		}
 //printf ("area::freeArea: unlocking \n");
 	manager->unlock();
@@ -203,7 +205,7 @@ status_t area::resize(size_t newSize)
 		vpage *newPage;
 		for (int i=0;i<pageCount;i++)
 			{
-			newPage=new (vpagePool.get()) vpage;
+			newPage=new (vmBlock->vpagePool->get()) vpage;
 			newPage->setup(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
 			vpages.add(newPage);
 			}
@@ -220,7 +222,7 @@ status_t area::resize(size_t newSize)
 			for (cur=vpages.rock;cur->next;cur=cur->next); // INTENTIONAL - find the last one;
 			vpage *oldPage=(vpage *)cur;
 			oldPage->cleanup();
-			vpagePool.put(oldPage);
+			vmBlock->vpagePool->put(oldPage);
 			}
 		}
 	manager->unlock();
