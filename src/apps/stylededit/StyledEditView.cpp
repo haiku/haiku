@@ -1,6 +1,7 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <Rect.h>
+#include <Region.h>
 #include <TranslationUtils.h>
 #include <Node.h>
 
@@ -25,13 +26,29 @@ StyledEditView::FrameResized(float width, float height)
 {
 	BTextView::FrameResized(width, height);
 	
-	BRect textRect;
-	textRect = Bounds();
-	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(TEXT_INSET,TEXT_INSET);
-	if (DoesWordWrap() || (textRect.Width() > TextRect().Width())) {
+	if (DoesWordWrap()) {
+		BRect textRect;
+		textRect = Bounds();
+		textRect.OffsetTo(B_ORIGIN);
+		textRect.InsetBy(TEXT_INSET,TEXT_INSET);
 		SetTextRect(textRect);
 	}
+/*	// I tried to do some sort of intelligent resize thing but it just doesn't work
+	// so we revert to the R5 stylededit yucky practice of setting the text rect to
+	// some crazy large number when word wrap is turned off :-(
+	 else if (textRect.Width() > TextRect().Width()) {
+		SetTextRect(textRect);
+	}
+
+	BRegion region;
+	GetTextRegion(0,TextLength(),&region);
+	float textWidth = region.Frame().Width();
+	if (textWidth < textRect.Width()) {
+		BRect textRect(B_ORIGIN,BPoint(textWidth+TEXT_INSET*2,Bounds().Height()));
+		textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+		SetTextRect(textRect);
+	}
+	*/
 }				
 
 status_t
@@ -56,8 +73,16 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		if (bytesRead > 0) {
 			SetWordWrap(wrap);
 		}
+		if (wrap == false) {
+			BRect textRect;
+			textRect = Bounds();
+			textRect.OffsetTo(B_ORIGIN);
+			textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+				// the width comes from stylededit R5. TODO: find a better way
+			textRect.SetRightBottom(BPoint(1500.0,textRect.RightBottom().y));
+			SetTextRect(textRect);
+		}
 	}
-	
 	fSuppressChanges = false;
 	return result;
 }

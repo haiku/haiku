@@ -42,6 +42,7 @@ const uint32 MSG_REPLACE				='msre';
 const uint32 MSG_REPLACE_ALL			='mrea';
 //"Font"-menu
 const uint32 FONT_SIZE					='FMsi';
+const uint32 FONT_FAMILY				='FFch';
 const uint32 FONT_STYLE					='FSch';
 const uint32 FONT_COLOR					='Fcol';
 

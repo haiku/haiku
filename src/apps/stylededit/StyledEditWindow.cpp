@@ -235,6 +235,9 @@ StyledEditWindow::InitWindow()
 	menu->AddSeparatorItem();
 
 	//Available fonts
+	font_family plain_family;
+	font_style plain_style;
+	be_plain_font->GetFamilyAndStyle(&plain_family,&plain_style);
 
 	int32 numFamilies = count_font_families();
 	for ( int32 i = 0; i < numFamilies; i++ ) {
@@ -242,16 +245,19 @@ StyledEditWindow::InitWindow()
 		if ( get_font_family ( i, &localfamily ) == B_OK ) {
 			subMenu=new BMenu(localfamily);
 			subMenu->SetRadioMode(true);
-			menu->AddItem(subMenu);
-			menu->SetRadioMode(true);
+			menu->AddItem(menuItem = new BMenuItem(subMenu, new BMessage(FONT_FAMILY)));
+			if (!strcmp(plain_family,localfamily)) {
+				menuItem->SetMarked(true);
+			}
 			int32 numStyles=count_font_styles(localfamily);
 			for(int32 j = 0;j<numStyles;j++){
 				font_style style;
 				uint32 flags;
 				if( get_font_style(localfamily,j,&style,&flags)==B_OK){
-					subMenu->AddItem(menuItem= new BMenuItem(style, fontMessage= new BMessage(FONT_STYLE)));
-					fontMessage->AddString("FontFamily", localfamily);
-					fontMessage->AddString("FontStyle", style);
+					subMenu->AddItem(menuItem = new BMenuItem(style, new BMessage(FONT_STYLE)));
+					if (!strcmp(plain_style,style)) {
+						menuItem->SetMarked(true);
+					}
 				}
 			}
 		}
@@ -277,7 +283,7 @@ StyledEditWindow::InitWindow()
 	
 	fSavePanel = 0; // build lazily
 }  /***StyledEditWindow::Initwindow()***/
-	
+
 void
 StyledEditWindow::MessageReceived(BMessage *message)
 {
@@ -424,11 +430,31 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			SetFontSize(fontSize);
 		}
 		break;
+		case FONT_FAMILY:
+			{
+			const char * fontFamily = 0, * fontStyle = 0;
+			void * ptr;
+			if (message->FindPointer("source",&ptr) == B_OK) {
+				fontFamily = static_cast<BMenuItem*>(ptr)->Label();
+			}
+			SetFontStyle(fontFamily, fontStyle);
+			}
+		break;
 		case FONT_STYLE:
 			{
-			const char *fontFamily,*fontStyle;
-			message->FindString("FontFamily",&fontFamily);
-			message->FindString("FontStyle",&fontStyle);
+			const char * fontFamily = 0, * fontStyle = 0;
+			void * ptr;
+			if (message->FindPointer("source",&ptr) == B_OK) {
+				BMenuItem * item = static_cast<BMenuItem*>(ptr);
+				fontStyle = item->Label();
+				BMenu * menu = item->Menu();
+				if (menu != 0) {
+					BMenuItem * superitem = menu->Superitem();
+					if (superitem != 0) {
+						fontFamily = superitem->Label();
+					}
+				}
+			}
 			SetFontStyle(fontFamily, fontStyle);
 			}
 		break;
@@ -446,25 +472,50 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		case ALIGN_LEFT:
 			fTextView->SetAlignment(B_ALIGN_LEFT);
 			fClean = false;
+			fUndoCleans = false;
+			fRedoCleans = false;	
 			fRevertItem->SetEnabled(fSaveMessage != NULL);
 			fSaveItem->SetEnabled(true);
+			fUndoItem->SetLabel("Can't Undo");	
+			fUndoItem->SetEnabled(false);
+			fCanUndo = false;
+			fCanRedo = false;
 		break;
 		case ALIGN_CENTER:
 			fTextView->SetAlignment(B_ALIGN_CENTER);
 			fClean = false;
+			fUndoCleans = false;
+			fRedoCleans = false;	
 			fRevertItem->SetEnabled(fSaveMessage != NULL);
 			fSaveItem->SetEnabled(true);
+			fUndoItem->SetLabel("Can't Undo");	
+			fUndoItem->SetEnabled(false);
+			fCanUndo = false;
+			fCanRedo = false;
 		break;
 		case ALIGN_RIGHT:
 			fTextView->SetAlignment(B_ALIGN_RIGHT);
 			fClean = false;
+			fUndoCleans = false;
+			fRedoCleans = false;	
 			fRevertItem->SetEnabled(fSaveMessage != NULL);
 			fSaveItem->SetEnabled(true);
+			fUndoItem->SetLabel("Can't Undo");	
+			fUndoItem->SetEnabled(false);
+			fCanUndo = false;
+			fCanRedo = false;
 		break;
 		case WRAP_LINES:
 			if (fTextView->DoesWordWrap()) {
 				fTextView->SetWordWrap(false);
 				fWrapItem->SetMarked(false);
+				BRect textRect;
+				textRect = fTextView->Bounds();
+				textRect.OffsetTo(B_ORIGIN);
+				textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+				// the width comes from stylededit R5. TODO: find a better way
+				textRect.SetRightBottom(BPoint(1500.0,textRect.RightBottom().y));
+				fTextView->SetTextRect(textRect);
 			} else {
 				fTextView->SetWordWrap(true);
 				fWrapItem->SetMarked(true);
@@ -475,8 +526,14 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				fTextView->SetTextRect(textRect);
 			}	
 			fClean = false;
+			fUndoCleans = false;
+			fRedoCleans = false;	
 			fRevertItem->SetEnabled(fSaveMessage != NULL);
 			fSaveItem->SetEnabled(true);
+			fUndoItem->SetLabel("Can't Undo");	
+			fUndoItem->SetEnabled(false);
+			fCanUndo = false;
+			fCanRedo = false;
 		break;
 		case ENABLE_ITEMS: {
 			fCutItem->SetEnabled(true);
@@ -1088,13 +1145,29 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	BFont font;
 	uint32 sameProperties;
 	
+	// find out what the old font was
+	font_family oldFamily;
+	font_style oldStyle;
 	fTextView->GetFontAndColor(&font,&sameProperties);
+	font.GetFamilyAndStyle(&oldFamily,&oldStyle);
+	
+	// clear that family's bit on the menu, if necessary
+	if (strcmp(oldFamily,fontFamily)) {
+		BMenuItem * oldItem = fMenuBar->FindItem(oldFamily);
+		if (oldItem != 0) {
+			oldItem->SetMarked(false);
+		}
+	}
+	
 	font.SetFamilyAndStyle(fontFamily,fontStyle);
 	fTextView->SetFontAndColor(&font);
 	
-	BMenuItem *superItem;
-	superItem= fMenuBar->FindItem(fontFamily);
-	superItem->SetMarked(true);
+	BMenuItem * superItem;
+	superItem = fMenuBar->FindItem(fontFamily);
+	if (superItem != 0) {
+		superItem->SetMarked(true);
+	}
+	
 	fClean = false;
 	fUndoCleans = false;
 	fRedoCleans = false;	
