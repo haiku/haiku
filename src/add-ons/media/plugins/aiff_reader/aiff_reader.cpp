@@ -4,6 +4,7 @@
 #include <DataIO.h>
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
+#include "RawFormats.h"
 #include "aiff_reader.h"
 
 #define TRACE_THIS 1
@@ -36,7 +37,7 @@ aiffReader::~aiffReader()
 const char *
 aiffReader::Copyright()
 {
-	return ".au & .snd reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen";
+	return "AIFF & AIFF-C reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen";
 }
 
 	
@@ -222,8 +223,7 @@ aiffReader::Sniff(int32 *streamCount)
 						fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 						break;
 					case 3:
-						// XXX broken
-						fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
+						fFormat.u.raw_audio.format = B_AUDIO_FORMAT_INT24;
 						break;
 					case 4:
 						fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
@@ -240,8 +240,7 @@ aiffReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 				break;
 			case FOURCC('f','l','6','4'):
-				// XXX broken
-				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
+				fFormat.u.raw_audio.format = B_AUDIO_FORMAT_FLOAT64;
 				break;
 			default:
 				TRACE("aiffReader::Sniff: unknown raw format\n");

@@ -14,8 +14,27 @@ public:
 							 
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
+
 private:
-	int32			fFrameSize;
+	status_t	NegotiateVideoOutputFormat(media_format *ioDecodedFormat);
+	status_t	NegotiateAudioOutputFormat(media_format *ioDecodedFormat);
+
+private:
+	int32			fFrameRate;
+	int32			fInputFrameSize;
+	int32			fOutputFrameSize;
+	int32			fInputSampleSize;
+	int32			fOutputSampleSize;
+	int32			fOutputBufferFrameCount;
+	void 			(*fSwapInput)(void *data, int32 count);
+	void 			(*fConvert)(void *dst, void *src, int32 count);
+	void 			(*fSwapOutput)(void *data, int32 count);
+	
+	char *			fChunkBuffer;
+	int32			fChunkSize;
+	
+	bigtime_t		fStartTime;
+	
 	media_format	fInputFormat;
 };
 

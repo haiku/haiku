@@ -2696,7 +2696,10 @@ BMediaRoster::AudioBufferSizeFor(int32 channel_count,
 								 bus_type bus_kind)
 {
 	UNIMPLEMENTED();
-	return 4096;
+	int size = 4096;
+	int framesize = (sample_format & 0xf) * channel_count;
+	size = (size / framesize) * framesize;
+	return size;
 }
 
 								 

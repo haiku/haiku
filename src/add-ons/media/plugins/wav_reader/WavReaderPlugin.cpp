@@ -5,6 +5,7 @@
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
 #include "WavReaderPlugin.h"
+#include "RawFormats.h"
 
 #define TRACE_THIS 1
 #if TRACE_THIS
@@ -258,21 +259,22 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 		data->format.u.raw_audio.channel_count = fChannelCount;
 		switch (fBitsPerSample) {
 			case 8:
-				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_UCHAR;
+				data->format.u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
 				break;
 			case 16:
-				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
+				data->format.u.raw_audio.format = B_AUDIO_FORMAT_INT16;
 				break;
 			case 24:
-				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
+				data->format.u.raw_audio.format = B_AUDIO_FORMAT_INT24;
 				break;
 			case 32:
-				data->format.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
+				data->format.u.raw_audio.format = B_AUDIO_FORMAT_INT32;
 				break;
 			default:
 				TRACE("WavReader::AllocateCookie: unhandled bits per sample %d\n", fBitsPerSample);
 				return B_ERROR;
 		}
+		data->format.u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
 		data->format.u.raw_audio.byte_order = B_MEDIA_LITTLE_ENDIAN;
 		data->format.u.raw_audio.buffer_size = data->buffersize;
 	} else {

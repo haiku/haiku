@@ -4,6 +4,7 @@
 #include <DataIO.h>
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
+#include "RawFormats.h"
 #include "au_reader.h"
 
 #define TRACE_THIS 1
@@ -204,8 +205,7 @@ auReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_SHORT;
 				break;
 			case SND_FORMAT_LINEAR_24:
-				// XXX broken
-				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
+				fFormat.u.raw_audio.format = B_AUDIO_FORMAT_INT24;
 				break;
 			case SND_FORMAT_LINEAR_32:
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_INT;
@@ -214,8 +214,7 @@ auReader::Sniff(int32 *streamCount)
 				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 				break;
 			case SND_FORMAT_DOUBLE:
-				// XXX broken
-				fFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
+				fFormat.u.raw_audio.format = B_AUDIO_FORMAT_FLOAT64;
 				break;
 			default:
 				TRACE("WavReader::Sniff: unhandled raw format\n");

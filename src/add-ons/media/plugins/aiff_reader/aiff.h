@@ -70,6 +70,10 @@ inline const char * string_for_compression(uint32 compression)
 		case 'Qclp': return "Qualcomm PureVoice";
 		case 'rt24': return "RT24 50:1";
 		case 'rt29': return "RT29 50:1";
+		case 'G722': return "G722";
+		case 'G726': return "G726";
+		case 'G728': return "G728";
+		case 'GSM ': return "GSM";
 		default:
 			sprintf(s, "unknown compression %c%c%c%c",
 				(int)((compression >> 24) & 0xff),
