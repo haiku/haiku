@@ -32,24 +32,24 @@ typedef unsigned long translator_id;
 extern const char * B_TRANSLATOR_MIME_TYPE;
 
 struct translation_format {
-	uint32		type;				/* B_ASCII_TYPE, ...*/
-	uint32		group;				/* B_TRANSLATOR_BITMAP, B_TRANSLATOR_TEXT, ...*/
-	float		quality;			/* format quality 0.0-1.0*/
-	float		capability;			/* translator capability 0.0-1.0*/
-	char		MIME[251];			/* MIME string*/
-	char		name[251];			/* only descriptive	*/
+	uint32		type;			/* B_ASCII_TYPE, ...*/
+	uint32		group;			/* B_TRANSLATOR_BITMAP, B_TRANSLATOR_TEXT, ...*/
+	float		quality;		/* ability of the format to retain the data of its group (0.0-1.0) */
+	float		capability;		/* ability of the translator to decode the format (0.0-1.0) */
+	char		MIME[251];		/* MIME string*/
+	char		name[251];		/* only descriptive	*/
 };
 
 
 /*	This struct is different from the format struct for a reason:	*/
 /*	to separate the notion of formats from the notion of translations	*/
 
-struct translator_info {			/* Info about a specific translation*/
-	uint32			type;			/* B_ASCII_TYPE, ...*/
-	translator_id	translator;		/* Filled in by BTranslationRoster*/
-	uint32			group;			/* B_TRANSLATOR_BITMAP, B_TRANSLATOR_TEXT, ...*/
-	float			quality;		/* Quality of format in group 0.0-1.0*/
-	float			capability;		/* How much of the format do we do? 0.0-1.0*/
+struct translator_info {		/* Info about a specific translation*/
+	uint32			type;		/* B_ASCII_TYPE, ...*/
+	translator_id	translator;	/* Filled in by BTranslationRoster*/
+	uint32			group;		/* B_TRANSLATOR_BITMAP, B_TRANSLATOR_TEXT, ...*/
+	float			quality;	/* ability of the format to retain the data of its group (0.0-1.0) */
+	float			capability;	/* ability of the translator to decode the format (0.0-1.0) */
 	char			name[251];
 	char			MIME[251];
 };
