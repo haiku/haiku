@@ -3,3 +3,4 @@ SubDir OBOS_TOP src libs ;
 SubInclude OBOS_TOP src libs freetype2 ;
 SubInclude OBOS_TOP src libs zlib ;
 SubInclude OBOS_TOP src libs png ;
+SubInclude OBOS_TOP src libs termcap ;

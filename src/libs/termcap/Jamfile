@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src libs termcap ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1  -DTERMCAP_FILE=\'\"/etc/termcap\"\' ;
+}
+
+StaticLibrary termcap : 
+	termcap.c tparam.c version.c
+	: STATIC_LIBRARY_DIR
+;
+
+MakeLocate termcap : $(OBOS_ETC_DIR) ;
+File termcap : termcap.src ;
