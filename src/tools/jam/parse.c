@@ -21,6 +21,8 @@
 
 static PARSE *yypsave;
 
+static int jumptoeof = 0;
+
 void
 parse_file( char *f )
 {
@@ -33,7 +35,7 @@ parse_file( char *f )
 	/* Execute it outside of the parser so that recursive */
 	/* calls to yyrun() work (no recursive yyparse's). */
 
-	for(;;)
+	while (!parse_shall_skip())
 	{
 	    LOL l;
 	    PARSE *p;
@@ -57,12 +59,25 @@ parse_file( char *f )
 
 	    parse_free( p );
 	}
+	jumptoeof = 0;
 }
 
 void
 parse_save( PARSE *p )
 {
 	yypsave = p;
+}
+
+void
+parse_jumptoeof()
+{
+	jumptoeof = 1;
+}
+
+int
+parse_shall_skip()
+{
+	return jumptoeof;
 }
 
 PARSE *

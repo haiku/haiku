@@ -27,6 +27,8 @@ struct _PARSE {
 
 void 	parse_file( char *f );
 void 	parse_save( PARSE *p );
+void 	parse_jumptoeof();
+int 	parse_shall_skip();
 
 PARSE * parse_make( 
 	LIST 	*(*func)( PARSE *p, LOL *args ),
