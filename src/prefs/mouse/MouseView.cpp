@@ -30,10 +30,10 @@
 #include "MouseMessages.h"
 #include "MouseBitmap.h"
 
+
 BoxView::BoxView(BRect rect, MouseView *mouseView)
-	   	   : BBox(rect, "mouse_box",
-					B_FOLLOW_LEFT, B_WILL_DRAW,B_FANCY_BORDER),
-				fMouseView(mouseView)
+	: BBox(rect, "mouse_box"),
+	fMouseView(mouseView)
 {
 }
 
@@ -41,9 +41,8 @@ BoxView::BoxView(BRect rect, MouseView *mouseView)
 void
 BoxView::MouseDown(BPoint where)
 {
-	
 	int32 index = fMouseView->mouseTypeMenu->IndexOf(fMouseView->mouseTypeMenu->FindMarked());
-	
+
 	fMouseView->fCurrentButton = -1;
 	if ((index == 0) && BRect(50,41,105,73).Contains(where))
 		fMouseView->fCurrentButton = 0;
@@ -60,7 +59,7 @@ BoxView::MouseDown(BPoint where)
 		else if (BRect(68,41,86,73).Contains(where))
 			fMouseView->fCurrentButton = 2;
 	}
-	
+
 	if (fMouseView->fCurrentButton >= 0) {
 		int32 number = 0;
 		switch (fMouseView->fCurrentMouseMap.button[fMouseView->fCurrentButton]) {
@@ -76,77 +75,75 @@ BoxView::MouseDown(BPoint where)
 
 
 MouseView::MouseView(BRect rect)
-	   	   : BBox(rect, "mouse_view",
-					B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP | B_PULSE_NEEDED,
-					B_PLAIN_BORDER),
-				fCurrentButton(-1),
-				fButtons(0),
-				fOldButtons(0)
+	: BView(rect, "mouse_view", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
+	fCurrentButton(-1),
+	fButtons(0),
+	fOldButtons(0)
 {
-	BRect			frame;
-	BTextControl 	*textcontrol;
-	BMenuField		*menufield;
-	
+	BTextControl *textcontrol;
+	BMenuField *menufield;
+	BRect frame;
+
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	
+
 	fDoubleClickBitmap = BTranslationUtils::GetBitmap("double_click_bmap");
-	if(!fDoubleClickBitmap) {
+	if (!fDoubleClickBitmap) {
 		printf("can't load double_click_bmap with BTranslationUtils::GetBitmap\n");
 		exit(1);
 	}
-	
+
 	fSpeedBitmap = BTranslationUtils::GetBitmap("speed_bmap");
-	if(!fSpeedBitmap) {
+	if (!fSpeedBitmap) {
 		printf("can't load speed_bmap with BTranslationUtils::GetBitmap\n");
 		exit(1);
 	}
-	
+
 	fAccelerationBitmap = BTranslationUtils::GetBitmap("acceleration_bmap");
-	if(!fAccelerationBitmap) {
+	if (!fAccelerationBitmap) {
 		printf("can't load acceleration_bmap with BTranslationUtils::GetBitmap\n");
 		exit(1);
-	}	
-	
+	}
+
 	// i don't really understand this bitmap SetBits : i have to substract 4 lines and add 15 pixels
 	BRect mouseRect(0,0,kMouseWidth-1,kMouseHeight-5); 
   	fMouseBitmap = new BBitmap(mouseRect, B_CMAP8);
   	fMouseBitmap->SetBits(kMouseBits, kMouseWidth*kMouseHeight + 15, 0, kMouseColorSpace);
-	
+
 	BRect mouseDownRect(0,0,kMouseDownWidth-1,kMouseDownHeight-1);
   	fMouseDownBitmap = new BBitmap(mouseDownRect, B_CMAP8);
   	fMouseDownBitmap->SetBits(kMouseDownBits, kMouseDownWidth*kMouseDownHeight + 30, 0, kMouseDownColorSpace);
-	
+
 	// Add the "Default" button..	
 	frame.Set(10,259,85,279);
 	defaultButton = new BButton(frame,"mouse_defaults","Defaults", new BMessage(BUTTON_DEFAULTS));
 	AddChild(defaultButton);
-	
+
 	// Add the "Revert" button...
 	frame.Set(92,259,167,279);
 	revertButton = new BButton(frame,"mouse_revert","Revert", new BMessage(BUTTON_REVERT));
 	revertButton->SetEnabled(false);
 	AddChild(revertButton);
-	
+
 	// Create the main box for the controls...
-	frame=Bounds();
-	frame.left=frame.left+11;
-	frame.top=frame.top+11;
-	frame.right=frame.right-11;
-	frame.bottom=frame.bottom-44;
+	frame = Bounds();
+	frame.left = frame.left+11;
+	frame.top = frame.top+11;
+	frame.right = frame.right-11;
+	frame.bottom = frame.bottom-44;
 	fBox = new BoxView(frame, this);	
-	
+
 	// Add the "Mouse Type" pop up menu
 	mouseTypeMenu = new BPopUpMenu("Mouse Type Menu");
-	mouseTypeMenu->AddItem(new BMenuItem("1-Button",new BMessage(POPUP_MOUSE_TYPE)));
-	mouseTypeMenu->AddItem(new BMenuItem("2-Button",new BMessage(POPUP_MOUSE_TYPE)));
-	mouseTypeMenu->AddItem(new BMenuItem("3-Button",new BMessage(POPUP_MOUSE_TYPE)));
+	mouseTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(POPUP_MOUSE_TYPE)));
+	mouseTypeMenu->AddItem(new BMenuItem("2-Button", new BMessage(POPUP_MOUSE_TYPE)));
+	mouseTypeMenu->AddItem(new BMenuItem("3-Button", new BMessage(POPUP_MOUSE_TYPE)));
 
 	frame.Set(7,8,208,20);
 	menufield = new BMenuField(frame, "mouse_type", "Mouse type", mouseTypeMenu);
 	menufield->SetDivider(menufield->Divider() - 29);
 	menufield->SetAlignment(B_ALIGN_RIGHT);
 	fBox->AddChild(menufield);
-	
+
 	// Add the "Focus follows mouse" pop up menu
 	focusMenu = new BPopUpMenu("Focus Follows Mouse Menu");
 	focusMenu->AddItem(new BMenuItem("Disabled",new BMessage(POPUP_MOUSE_FOCUS)));
@@ -154,21 +151,21 @@ MouseView::MouseView(BRect rect)
 	focusMenu->AddItem(new BMenuItem("Warping",new BMessage(POPUP_MOUSE_FOCUS)));
 	focusMenu->AddItem(new BMenuItem("Instant-Warping",new BMessage(POPUP_MOUSE_FOCUS)));
 
-	frame.Set(165,208,440,200);
+	frame.Set(165, 208, 440, 200);
 	menufield = new BMenuField(frame, "Focus follows mouse", "Focus follows mouse", focusMenu);
 	menufield->SetDivider(menufield->Divider() - 18);
 	menufield->SetAlignment(B_ALIGN_RIGHT);
 	fBox->AddChild(menufield);
-		
+
 	// Create the "Double-click speed slider...
-	frame.Set(166,11,328,50);
+	frame.Set(166, 11, 328, 50);
 	dcSpeedSlider = new BSlider(frame,"double_click_speed","Double-click speed", 
-		new BMessage(SLIDER_DOUBLE_CLICK_SPEED),0,1000,B_BLOCK_THUMB,B_FOLLOW_LEFT,B_WILL_DRAW);
+		new BMessage(SLIDER_DOUBLE_CLICK_SPEED), 0, 1000, B_BLOCK_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW);
 	dcSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	dcSpeedSlider->SetHashMarkCount(5);
 	dcSpeedSlider->SetLimitLabels("Slow","Fast");
 	fBox->AddChild(dcSpeedSlider);
-	
+
 	// Create the "Mouse Speed" slider...
 	frame.Set(166,76,328,125);
 	mouseSpeedSlider = new BSlider(frame,"mouse_speed","Mouse Speed", 
@@ -186,7 +183,7 @@ MouseView::MouseView(BRect rect)
 	mouseAccSlider->SetHashMarkCount(5);
 	mouseAccSlider->SetLimitLabels("Slow","Fast");
 	fBox->AddChild(mouseAccSlider);
-	
+
 	// Create the "Double-click test area" text box...
 	frame=fBox->Bounds();
 	frame.left=frame.left+9;
@@ -195,13 +192,13 @@ MouseView::MouseView(BRect rect)
 	textcontrol = new BTextControl(frame,"double_click_test_area",NULL,"Double-click test area", new BMessage(DOUBLE_CLICK_TEST_AREA),B_FOLLOW_LEFT,B_WILL_DRAW);
 	textcontrol->SetAlignment(B_ALIGN_LEFT,B_ALIGN_CENTER);
 	fBox->AddChild(textcontrol);
-	
+
 	AddChild(fBox);
-	
+
 	mouseMapMenu = new BPopUpMenu("Mouse Map Menu", true, true);
-	mouseMapMenu->AddItem(new BMenuItem("1",new BMessage(POPUP_MOUSE_MAP)));
-	mouseMapMenu->AddItem(new BMenuItem("2",new BMessage(POPUP_MOUSE_MAP)));
-	mouseMapMenu->AddItem(new BMenuItem("3",new BMessage(POPUP_MOUSE_MAP)));
+	mouseMapMenu->AddItem(new BMenuItem("1", new BMessage(POPUP_MOUSE_MAP)));
+	mouseMapMenu->AddItem(new BMenuItem("2", new BMessage(POPUP_MOUSE_MAP)));
+	mouseMapMenu->AddItem(new BMenuItem("3", new BMessage(POPUP_MOUSE_MAP)));
 	
 }
 
@@ -217,8 +214,8 @@ MouseView::AttachedToWindow()
 	get_mouse_map(&fMouseMap);
 	get_mouse_map(&fCurrentMouseMap);
 	Init();
-	
-	mouseMapMenu->SetTargetForItems( this->Window() );
+
+	mouseMapMenu->SetTargetForItems(Window());
 }
 
 
@@ -227,8 +224,9 @@ MouseView::Pulse()
 {
 	BPoint point;
 	GetMouse(&point, &fButtons, true);
-	
+
 	if (fOldButtons != fButtons) {
+		printf("buttons: old = %ld, new = %ld\n", fOldButtons, fButtons);
 		Invalidate();
 		fOldButtons = fButtons;
 	}
@@ -239,6 +237,7 @@ void
 MouseView::Draw(BRect updateFrame)
 {
 	inherited::Draw(updateFrame);
+
 	fBox->SetHighColor(120,120,120);
 	fBox->SetLowColor(255,255,255);
 	// Line above the test area
@@ -390,7 +389,7 @@ MouseView::Init()
 		item->SetMarked(true);
 	
 	int32 mode;
-	switch(fMouseMode) {
+	switch (fMouseMode) {
 		case B_NORMAL_MOUSE: mode = 0; break;
 		case B_FOCUS_FOLLOWS_MOUSE: mode = 1; break;
 		case B_WARP_MOUSE: mode = 2; break;
@@ -404,3 +403,11 @@ MouseView::Init()
 	printf("click_speed : %lli, mouse_speed : %li, mouse_acc : %li, mouse_type : %li\n", 
 		fClickSpeed, fMouseSpeed, fMouseAcc, fMouseType);
 }
+
+
+void 
+MouseView::SetRevertable(bool revertable)
+{
+	revertButton->SetEnabled(revertable);
+}
+
