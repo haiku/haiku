@@ -84,23 +84,14 @@ int
 main()
 {
 	status_t rc = B_OK;
-
-	if (!be_roster->IsRunning(PSRV_SIGNATURE_TYPE)) {
-		gLock = new BLocker();
-			// Create our application object
-		PrintServerApp print_server(&rc);
-		
-			// If all went fine, let's start it
-		if (rc == B_OK) {
-			print_server.Run();
-		}
-		
-		delete gLock;
-	} else {
-		// restart print server
-		// As we load the printer addon everytime we need it
-		// and unload it afterwards, we have nothing to do here! 
+	gLock = new BLocker();
+		// Create our application object
+	PrintServerApp print_server(&rc);
+		// If all went fine, let's start it
+	if (rc == B_OK) {
+		print_server.Run();
 	}
+	delete gLock;
 	return rc;
 }
 
