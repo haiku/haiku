@@ -324,6 +324,8 @@ KDiskDeviceJobQueue::_ThreadLoop()
 			manager->UpdateJobStatus(activeJob, B_DISK_DEVICE_JOB_SUCCEEDED,
 									 true);
 		} else {
+			DBG(OUT("job failed: %s\n", strerror(error)));
+			DBG(OUT("   message: %s\n", activeJob->ErrorMessage()));
 			// job failed: this and all succeeding jobs will be marked failed
 			failed = true;
 			break;
