@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src add-ons media media-add-ons demultiplexer ;
+
+UsePrivateHeaders demultiplexer ;
+
+Addon demultiplexer.media_addon : media :
+	MediaDemultiplexerNode.cpp
+	MediaDemultiplexerAddOn.cpp
+	misc.cpp
+;
+
+LinkSharedOSLibs demultiplexer.media_addon : be media ;
