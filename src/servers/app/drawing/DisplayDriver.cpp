@@ -55,6 +55,34 @@ DisplayDriver::~DisplayDriver()
 }
 
 /*!
+	\brief Initializes the driver object.
+	\return true if successful, false if not
+	
+	Initializes the CursorHandler with the default system cursor.
+
+	Derived versions should set up the driver for display,
+	including the initial clearing of the screen. If things
+	do not go as they should, false should be returned.
+*/
+bool
+DisplayDriver::Initialize()
+{
+	fCursorHandler.SetCursor(new ServerCursor(default_cursor_data));
+	return true;
+}
+
+/*!
+	\brief Shuts down the driver's video subsystem
+	
+	Any work done by Initialize() should be undone here. Note that Shutdown() is
+	called even if Initialize() was unsuccessful.
+*/
+void
+DisplayDriver::Shutdown()
+{
+}
+
+/*!
 	\brief Hides the cursor.
 	
 	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
@@ -173,31 +201,6 @@ DisplayDriver::IsCursorObscured(bool state)
 	Unlock();
 	
 	return obscured;
-}
-
-/*!
-	\brief Initializes the driver object.
-	\return true if successful, false if not
-	
-	Initialize sets up the driver for display, including the initial clearing
-	of the screen. If things do not go as they should, false should be returned.
-*/
-bool
-DisplayDriver::Initialize()
-{
-	fCursorHandler.SetCursor(new ServerCursor(default_cursor_data));
-	return true;
-}
-
-/*!
-	\brief Shuts down the driver's video subsystem
-	
-	Any work done by Initialize() should be undone here. Note that Shutdown() is
-	called even if Initialize() was unsuccessful.
-*/
-void
-DisplayDriver::Shutdown()
-{
 }
 
 /*!

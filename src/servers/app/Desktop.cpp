@@ -41,9 +41,9 @@
 #include "WinBorder.h"
 #include "Workspace.h"
 
-#include "drawing/AccelerantDriver.h"
-#include "drawing/ViewDriver.h"
-#include "drawing/DirectDriver.h"
+#include "AccelerantDriver.h"
+#include "ViewDriver.h"
+#include "DirectDriver.h"
 
 //#define DEBUG_DESKTOP
 

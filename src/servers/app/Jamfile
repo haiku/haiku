@@ -6,6 +6,8 @@ AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders png zlib ;
 UsePrivateHeaders app interface [ FDirName servers app ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
 UseFreeTypeHeaders ;
 
 SharedLibrary appserver :
@@ -78,7 +80,8 @@ LINKFLAGS on app_server ?= $(LINKFLAGS) ;
 LINKFLAGS on app_server += -lbe ;
 
 LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
-							   <boot!home!config!lib>libopenbeos.so 
-							   libfreetype.so ;
+							  libpainter.a <boot!home!config!lib>libopenbeos.so 
+							  libagg.so libfreetype.so ;
 
 SubInclude OBOS_TOP src servers app fonts ;
+SubInclude OBOS_TOP src servers app drawing Painter ;
