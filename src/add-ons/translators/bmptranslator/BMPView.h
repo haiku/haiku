@@ -14,9 +14,6 @@ public:
 	~BMPView();
 
 	virtual	void Draw(BRect area);
-
-private:
-	void SelectColorSpace(color_space space);
 };
 
 #endif // #ifndef BMPVIEW_H
