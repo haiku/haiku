@@ -263,13 +263,20 @@ status_t nv_crtc_set_timing(display_mode target)
 	{
 		uint32 iscale_x, iscale_y;
 
-		/* calculate needed inverse scaling factors in 20.12 format */
+		/* calculate inverse scaling factors used by hardware in 20.12 format */
 		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel1_width);
 		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel1_height);
 
 		/* unblock flatpanel timing programming (or something like that..) */
 		CRTCW(FP_HTIMING, 0);
 		CRTCW(FP_VTIMING, 0);
+
+		/* enable full width visibility on flatpanel */
+		DACW(FP_HVALID_S, 0);
+		DACW(FP_HVALID_E, (si->ps.panel1_width - 1));
+		/* enable full height visibility on flatpanel */
+		DACW(FP_VVALID_S, 0);
+		DACW(FP_VVALID_E, (si->ps.panel1_height - 1));
 
 		/* nVidia cards support upscaling except on NV11 */
 		if (si->ps.card_type == NV11)
@@ -290,7 +297,12 @@ status_t nv_crtc_set_timing(display_mode target)
 		}
 		else
 		{
+			float dm_aspect;
+
 			LOG(2,("CRTC: GPU scales for DFP if needed\n"));
+
+			/* calculate display mode aspect */
+			dm_aspect = (target.timing.h_display / ((float)target.timing.v_display));
 
 			/* limit last fetched line if vertical scaling is done */
 			if (iscale_y != (1 << 12))
@@ -308,31 +320,48 @@ status_t nv_crtc_set_timing(display_mode target)
 			 * scalingfactor for non 4:3 (1.33) aspect panels;
 			 * let's consider 1280x1024 1:33 aspect (it's 1.25 aspect actually!) */
 
-			/* correct for landscape non 4:3 aspect panels... */
-			/* known non 4:3 aspect panels:
+			/* correct for widescreen panels relative to mode...
+			 * (so if panel is more widescreen than mode being set) */
+			/* BTW: known widescreen panels:
 			 * 1280 x  800 (1.60),
 			 * 1440 x  900 (1.60),
 			 * 1680 x 1050 (1.60). */
 			/* known 4:3 aspect non-standard resolution panels:
 			 * 1400 x 1050 (1.33). */
-			if ((iscale_x != (1 << 12)) && (si->ps.panel1_aspect > 1.34))
+			/* NOTE:
+			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
+			if ((iscale_x != (1 << 12)) && (si->ps.panel1_aspect > (dm_aspect + 0.10)))
 			{
-				LOG(2,("CRTC: non 4:3 aspect landscape panel: tuning horizontal scaling\n"));
-				/* X-scaling should be the same as Y-scaling,
-				 * except for 1280 x 1024 panels(!) */
-				iscale_x = iscale_y * (1.33333333 / si->ps.panel1_aspect);
-				/* enable testmode (b12) and program new X-scaling factor */
+				uint16 diff;
+
+				LOG(2,("CRTC: (relative) widescreen panel: tuning horizontal scaling\n"));
+
+				/* X-scaling should be the same as Y-scaling */
+				iscale_x = iscale_y;
+				/* enable testmode (b12) and program modified X-scaling factor */
 				DACW(FP_DEBUG1, (((iscale_x >> 1) & 0x00000fff) | (1 << 12)));
+				/* center/cut-off left and right side of screen */
+				diff = ((si->ps.panel1_width -
+						(target.timing.h_display * ((1 << 12) / ((float)iscale_x))))
+						/ 2);
+				DACW(FP_HVALID_S, diff);
+				DACW(FP_HVALID_E, ((si->ps.panel1_width - diff) - 1));
 			}
 			/* correct for portrait panels... */
-			if ((iscale_y != (1 << 12)) && (si->ps.panel1_aspect < 1.25))
+			/* NOTE:
+			 * allow 0.10 difference so 1280x1024 panels will be used fullscreen! */
+			if ((iscale_y != (1 << 12)) && (si->ps.panel1_aspect < (dm_aspect - 0.10)))
 			{
-				LOG(2,("CRTC: portrait aspect panel: should tune vertical scaling\n"));
-				/* fixme?: implement... */
+				LOG(2,("CRTC: (relative) portrait panel: should tune vertical scaling\n"));
+				/* fixme: implement if this kind of portrait panels exist on nVidia... */
 			}
 		}
 
 		/* do some logging.. */
+		LOG(2,("CRTC: FP_HVALID_S reg readback: $%08x\n", DACR(FP_HVALID_S)));
+		LOG(2,("CRTC: FP_HVALID_E reg readback: $%08x\n", DACR(FP_HVALID_E)));
+		LOG(2,("CRTC: FP_VVALID_S reg readback: $%08x\n", DACR(FP_VVALID_S)));
+		LOG(2,("CRTC: FP_VVALID_E reg readback: $%08x\n", DACR(FP_VVALID_E)));
 		LOG(2,("CRTC: FP_DEBUG0 reg readback: $%08x\n", DACR(FP_DEBUG0)));
 		LOG(2,("CRTC: FP_DEBUG1 reg readback: $%08x\n", DACR(FP_DEBUG1)));
 		LOG(2,("CRTC: FP_DEBUG2 reg readback: $%08x\n", DACR(FP_DEBUG2)));
