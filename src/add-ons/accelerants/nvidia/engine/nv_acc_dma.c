@@ -346,6 +346,7 @@ if(TNT1)
 
 		/* do a explicit engine reset */
 		ACCW(DEBUG0, 0x000001ff);
+
 		/* init some function blocks */
 		ACCW(DEBUG0, 0x1230c000);
 		ACCW(DEBUG1, 0x72111101);
@@ -353,6 +354,7 @@ if(TNT1)
 		ACCW(DEBUG3, 0x0004ff31);
 		/* init OP methods */
 		ACCW(DEBUG3, 0x4004ff31);
+
 		/* disable all acceleration engine INT reguests */
 		ACCW(ACC_INTE, 0x00000000);
 		/* reset all acceration engine INT status bits */
@@ -364,7 +366,12 @@ if(TNT1)
 		/* enable acceleration engine command FIFO */
 		ACCW(FIFO_EN, 0x00000001);
 
-//fixme: offset and blimit registers are lacking!
+		/* setup location of active screen in framebuffer */
+		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* setup accesible card memory range */
+		ACCW(BLIMIT0, (si->ps.memory_size - 1));
+		ACCW(BLIMIT1, (si->ps.memory_size - 1));
 
 		/* pattern shape value = 8x8, 2 color */
 		//fixme: setting this here means that we don't need to provide the acc
