@@ -181,7 +181,30 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
+
+	// compute duration/frameCount
+
+#ifdef STREAMING_COMPATIBLE_HARDCODED_DURATION
 	*duration = 100000000;
 	*frameCount = 60000;
+#else
+	int64 frame = 0;
+	bigtime_t time = 0;
+	void *chunkBuffer = 0;
+	int32 chunkSize = 0;
+	media_header mediaHeader;
+	off_t bytes = 0;
+	while (GetNextChunk(&chunkBuffer, &chunkSize, &mediaHeader) == B_OK) {
+		ogg_packet * packet = static_cast<ogg_packet *>(chunkBuffer);
+		bytes += packet->bytes;
+		frame++;
+	}
+	time += (8000000 * bytes) / format->u.encoded_audio.bit_rate;
+	*frameCount = frame;
+	*duration = time;
+	int64 start_frame = 0;
+	bigtime_t start_time = 0;
+	Seek(B_MEDIA_SEEK_TO_FRAME, &start_frame, &start_time);
+#endif
 	return B_OK;
 }
