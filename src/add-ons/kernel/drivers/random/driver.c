@@ -271,7 +271,7 @@ int32	api_version = B_CUR_DRIVER_API_VERSION;
 
 status_t init_hardware (void)
 {
-	dprintf (DRIVER_NAME ": init_hardware()\n");
+//	dprintf (DRIVER_NAME ": init_hardware()\n");
 	return B_OK;
 }
 
@@ -286,7 +286,7 @@ status_t init_driver (void)
 {
 	rng = new_chrand(8);
 	rand_mutex = create_sem(1, "RNG semaphore");
-	dprintf (DRIVER_NAME ": init_driver()\n");
+//	dprintf (DRIVER_NAME ": init_driver()\n");
 	return B_OK;
 }
 
@@ -300,7 +300,7 @@ void uninit_driver (void)
 {
 	kill_chrand(rng);
 	delete_sem(rand_mutex);
-	dprintf (DRIVER_NAME ": uninit_driver()\n");
+//	dprintf (DRIVER_NAME ": uninit_driver()\n");
 }
 
 
@@ -310,7 +310,7 @@ void uninit_driver (void)
 
 static status_t my_device_open (const char *name, uint32 flags, void** cookie)
 {
-	dprintf (DRIVER_NAME ": open(\"%s\")\n", name);
+//	dprintf (DRIVER_NAME ": open(\"%s\")\n", name);
 	return B_OK;
 }
 
@@ -373,7 +373,7 @@ static status_t my_device_control (void* cookie, uint32 op, void* arg, size_t le
 
 static status_t my_device_close (void* cookie)
 {
-	dprintf (DRIVER_NAME ": close()\n");
+//	dprintf (DRIVER_NAME ": close()\n");
 	return B_OK;
 }
 
@@ -386,7 +386,7 @@ static status_t my_device_close (void* cookie)
 	
 static status_t my_device_free (void* cookie)
 {
-	dprintf (DRIVER_NAME ": free()\n");
+//	dprintf (DRIVER_NAME ": free()\n");
 	return B_OK;
 }
 
@@ -426,7 +426,7 @@ static device_hooks my_device_hooks = {
 
 const char **publish_devices()
 {
-	dprintf (DRIVER_NAME ": publish_devices()\n");
+//	dprintf (DRIVER_NAME ": publish_devices()\n");
 	return my_device_name;
 }
 
@@ -437,7 +437,7 @@ const char **publish_devices()
 device_hooks *find_device(const char* name)
 {
 	int	i;
-	dprintf (DRIVER_NAME ": find_device(\"%s\")\n", name);
+//	dprintf (DRIVER_NAME ": find_device(\"%s\")\n", name);
 	for (i = 0; my_device_name[i] != NULL; i++)
 		if (strcmp (name, my_device_name [i]) == 0)
 			return &my_device_hooks;

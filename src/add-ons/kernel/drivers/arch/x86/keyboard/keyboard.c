@@ -36,6 +36,7 @@ static sem_id keyboard_sem;
 static mutex keyboard_read_mutex;
 static char keyboard_buf[1024];
 static unsigned int head, tail;
+int32	api_version = B_CUR_DRIVER_API_VERSION;
 
 // stolen from nujeffos
 const char unshifted_keymap[128] = {
@@ -277,8 +278,8 @@ device_hooks keyboard_hooks = {
 	&keyboard_write,
 	NULL,
 	NULL,
-//	NULL,
-//	NULL
+	NULL,
+	NULL
 };
 
 static int setup_keyboard(void)
@@ -306,8 +307,6 @@ status_t init_hardware()
 {
 	setup_keyboard();
 	int_set_io_interrupt_handler(0x21,&handle_keyboard_interrupt, NULL);
-
-//	devfs_publish_device(DEVICE_NAME, NULL, &keyboard_hooks);
 
 	return 0;
 }

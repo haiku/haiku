@@ -58,6 +58,7 @@
 #include <arch/x86/ps2mouse.h>
 
 #define DEVICE_NAME "ps2mouse"
+int32	api_version = B_CUR_DRIVER_API_VERSION;
 
 /////////////////////////////////////////////////////////////////////////
 // interrupt
@@ -207,8 +208,8 @@ device_hooks ps2_mouse_hooks = {
 	&mouse_write,
 	NULL,
 	NULL,
-//	NULL,
-//	NULL
+	NULL,
+	NULL
 }; // ps2_mouse_hooks
 
 /////////////////////////////////////////////////////////////////////////
@@ -326,9 +327,6 @@ status_t init_hardware()
 	mouse_sem = create_sem(0, "ps2_mouse_sem");
 	if(mouse_sem < 0)
 	   panic("failed to create PS/2 mouse semaphore!\n");
-
-	// register device file-system like operations
-//	devfs_publish_device("ps2mouse", NULL, &ps2_mouse_hooks);
 
 	return 0;
 } // mouse_dev_init
