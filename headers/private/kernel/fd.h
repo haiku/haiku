@@ -34,7 +34,8 @@ struct fd_ops {
 //	int			(*fd_poll)(struct file_descriptor *, int);
 	status_t	(*fd_read_dir)(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 	status_t	(*fd_rewind_dir)(struct file_descriptor *);
-	status_t	(*fd_stat)(struct file_descriptor *, struct stat *);
+	status_t	(*fd_read_stat)(struct file_descriptor *, struct stat *);
+	status_t	(*fd_write_stat)(struct file_descriptor *, const struct stat *, int statMask);
 	status_t	(*fd_close)(struct file_descriptor *);
 	void		(*fd_free)(struct file_descriptor *);
 };
