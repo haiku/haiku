@@ -17,10 +17,12 @@ INTERFACE_KIT_SOURCE =
 	PictureButton.cpp
 	Point.cpp
 	Polygon.cpp
+	PrivateScreen.cpp
 	RadioButton.cpp
 	Rect.cpp
 	Region.cpp
 	RegionSupport.cpp
+	Screen.cpp
 	ScrollBar.cpp
 	ScrollView.cpp
 	StatusBar.cpp
