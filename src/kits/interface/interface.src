@@ -4,6 +4,7 @@ INTERFACE_KIT_SOURCE =
 	Button.cpp
 	CheckBox.cpp
 	Control.cpp
+	PictureButton.cpp
 	Point.cpp
 	RadioButton.cpp
 	Rect.cpp
