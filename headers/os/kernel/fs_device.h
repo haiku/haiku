@@ -1,4 +1,10 @@
-// fs_devices.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file fs_devices.h
+*/
 
 #ifndef _FS_DEVICE_H
 #define _FS_DEVICE_H
