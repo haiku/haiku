@@ -1,4 +1,5 @@
 #include <MediaDefs.h>
+#include <OS.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -111,8 +112,19 @@ fix_multiaudio_format(media_multi_audio_format *format)
 				format->matrix_mask = 0;
 			}
 			break;
+		case 8:
+			if (count_nonzero_bits(format->channel_mask) != 8) {
+				// XXX not sure if 7.1 is like that:
+				format->channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT | B_CHANNEL_CENTER | B_CHANNEL_SUB | B_CHANNEL_SIDE_LEFT | B_CHANNEL_SIDE_RIGHT;
+				format->matrix_mask = 0;
+			}
+			break;
 		
 		default:
+			if (count_nonzero_bits(format->channel_mask) != (int)format->channel_count) {
+				format->channel_mask = 0xffffffff;
+				format->matrix_mask = 0;
+			}
 			break;
 	}
 
@@ -130,7 +142,14 @@ fix_multiaudio_format(media_multi_audio_format *format)
 uint32
 GetChannelMask(int channel, uint32 all_channel_masks)
 {
-	ASSERT(channel <= count_nonzero_bits(all_channel_masks));
+	if (all_channel_masks == 0) {
+		debugger("Mixer: GetChannelMask: all_channel_masks == 0\n");
+		return 0;
+	}
+	if (channel > count_nonzero_bits(all_channel_masks)) {
+		debugger("Mixer: GetChannelMask: channel > count_nonzero_bits(all_channel_masks)\n");
+		return 0;
+	}
 
 	uint32 mask = 1;
 	int pos = 0;
