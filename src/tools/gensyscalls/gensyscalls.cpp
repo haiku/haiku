@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 
+#include "arch_cpu.h"
+
 #include "gensyscalls.h"
 #include "gensyscalls_common.h"
 
@@ -31,6 +33,10 @@ print_usage(bool error)
 {
 	fprintf((error ? stderr : stdout), kUsage);
 }
+
+enum {
+	PARAMETER_ALIGNMENT	= sizeof(FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE)
+};
 
 // Main
 class Main {
@@ -64,6 +70,7 @@ public:
 			}
 		}
 		fSyscallInfos = gensyscall_get_infos(&fSyscallCount);
+		_UpdateSyscallInfos();
 		if (!syscallsFile && !dispatcherFile) {
 			printf("Found %d syscalls.\n", fSyscallCount);
 			return 0;
@@ -88,6 +95,8 @@ public:
 			int paramCount = syscall.parameter_count;
 			int paramSize = 0;
 			gensyscall_parameter_info* parameters = syscall.parameters;
+			// XXX: Currently the SYSCALL macros support 4 byte aligned
+			// parameters only. This has to change, of course.
 			for (int k = 0; k < paramCount; k++) {
 				int size = parameters[k].actual_size;
 				paramSize += (size + 3) / 4 * 4;
@@ -114,10 +123,25 @@ public:
 			int paramCount = syscall.parameter_count;
 			if (paramCount > 0) {
 				gensyscall_parameter_info* parameters = syscall.parameters;
-				file << "*(" << _GetPointerType(parameters[0].type) << ")args";
+				if (parameters[0].size < PARAMETER_ALIGNMENT) {
+					file << "(" << parameters[0].type << ")*("
+						 << "FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE"
+						 << "*)args";
+				} else {
+					file << "*(" << _GetPointerType(parameters[0].type)
+						<< ")args";
+				}
 				for (int k = 1; k < paramCount; k++) {
-					file << ", *(" << _GetPointerType(parameters[k].type)
-						<< ")((char*)args + " << parameters[k].offset << ")";
+					if (parameters[k].size < PARAMETER_ALIGNMENT) {
+						file << ", (" << parameters[k].type << ")*("
+							<< "FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE"
+							<< "*)((char*)args + " << parameters[k].offset
+							<< ")";
+					} else {
+						file << ", *(" << _GetPointerType(parameters[k].type)
+							<< ")((char*)args + " << parameters[k].offset
+							<< ")";
+					}
 				}
 			}
 			file << ");" << endl;
@@ -134,9 +158,30 @@ public:
 		return string(type, parenthesis - type) + "*" + parenthesis;
 	}
 
+	void _UpdateSyscallInfos()
+	{
+		// Since getting the parameter offsets and actual sizes doesn't work
+		// as it is now, we overwrite them with values computed using the
+		// parameter alignment type.
+		for (int i = 0; i < fSyscallCount; i++) {
+			gensyscall_syscall_info &syscall = fSyscallInfos[i];
+			int paramCount = syscall.parameter_count;
+			gensyscall_parameter_info* parameters = syscall.parameters;
+			int offset = 0;
+			for (int k = 0; k < paramCount; k++) {
+				if (parameters[k].size < PARAMETER_ALIGNMENT)
+					parameters[k].actual_size = PARAMETER_ALIGNMENT;
+				else
+					parameters[k].actual_size = parameters[k].size;
+				parameters[k].offset = offset;
+				offset += parameters[k].actual_size;
+			}
+		}
+	}
+
 private:
-	const gensyscall_syscall_info	*fSyscallInfos;
-	int								fSyscallCount;
+	gensyscall_syscall_info	*fSyscallInfos;
+	int						fSyscallCount;
 };
 
 // main

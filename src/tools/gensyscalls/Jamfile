@@ -35,16 +35,15 @@ GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
 
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
 LinkSharedOSLibs gensyscalls : stdc++.r4 ;
+UsePrivateObjectHeaders gensyscalls.cpp : kernel ;
+UseArchObjectHeaders gensyscalls.cpp : $(OBOS_ARCH) ;
 
 
 # generate the output files
 
 # place them where there are needed
-local syscallFiles = <syscalls>syscalls.S.inc <syscalls>syscall_dispatcher.h ;
 MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src kernel libroot os ] ;
 MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src kernel core ] ;
-#Depends <syscalls>generatedFiles : $(syscallFiles) ;
-#NotFile <syscalls>generatedFiles ;
 
 Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;
 
@@ -66,7 +65,6 @@ actions GenSyscallsDispatcher1 {
 	$(2[1]) -d $(1)
 }
 
-#GenSyscalls $(syscallFiles) ;
 GenSyscallsFile <syscalls>syscalls.S.inc ;
 GenSyscallsDispatcher <syscalls>syscall_dispatcher.h ;
 
