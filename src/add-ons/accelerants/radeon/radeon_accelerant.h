@@ -18,10 +18,12 @@
 extern "C" {
 #endif
 
+#ifndef __HAIKU__
 void    _kdprintf_(const char *format, ...);
-//bool    set_dprintf_enabled(bool);	/* returns old enable flag */
-
 #define dprintf _kdprintf_
+#else
+#define dprintf		debug_printf
+#endif
 
 extern int debug_level_flow;
 extern int debug_level_info;
@@ -30,7 +32,7 @@ extern int debug_level_error;
 /*#define DEBUG_WAIT_ON_MSG 1000000
 #define DEBUG_WAIT_ON_ERROR 1000000*/
 
-#define DEBUG_MSG_PREFIX "Radeon - "
+#define DEBUG_MSG_PREFIX "Radeon Acc - "
 
 #define DEBUG_MAX_LEVEL_FLOW 2
 
