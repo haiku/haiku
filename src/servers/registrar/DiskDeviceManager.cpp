@@ -16,15 +16,6 @@
 #include "RPartition.h"
 #include "RSession.h"
 
-// print_time
-void
-print_time(const char *format, bigtime_t &time)
-{
-	bigtime_t lastTime = time;
-	time = system_time();
-	printf("%lld: %s took: %lld us\n", time, format, time - lastTime);
-}
-
 // priorities of the different message kinds
 enum {
 	REQUEST_PRIORITY			= 0,
@@ -90,15 +81,10 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 		case B_REG_NEXT_DISK_DEVICE:
 		case B_REG_GET_DISK_DEVICE:
 		case B_REG_UPDATE_DISK_DEVICE:
-{
-bigtime_t time = system_time();
-print_time("getting message", time);
 			DetachCurrentMessage();
 			if (!_PushMessage(message, REQUEST_PRIORITY))
 				delete message;
-print_time("pushing message into priority queue", time);
 			break;
-}
 		case B_REG_DEVICE_START_WATCHING:
 		case B_REG_DEVICE_STOP_WATCHING:
 			DetachCurrentMessage();
@@ -155,9 +141,7 @@ DiskDeviceManager::_NextDiskDeviceRequest(BMessage *request)
 void
 DiskDeviceManager::_GetDiskDeviceRequest(BMessage *request)
 {
-bigtime_t time = system_time();
 	Lock();
-print_time("locking", time);
 	status_t error = B_OK;
 	// get the device
 	RDiskDevice *device = NULL;
@@ -172,7 +156,6 @@ print_time("locking", time);
 			device = partition->Device();
 	} else
 		error = B_BAD_VALUE;
-print_time("finding device", time);
 	// archive device and add it to the reply message
 	BMessage reply(B_REG_RESULT);
 	if (device) {
@@ -182,13 +165,10 @@ print_time("finding device", time);
 			error = reply.AddMessage("device", &deviceArchive);
 	} else	// requested object not found
 		error = B_ENTRY_NOT_FOUND;
-print_time("archiving device", time);
 	// add result and send reply
 	reply.AddInt32("result", error);
 	request->SendReply(&reply);
-print_time("sending reply", time);
 	Unlock();
-print_time("unlocking", time);
 }
 
 // _UpdateDiskDeviceRequest
