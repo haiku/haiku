@@ -1330,7 +1330,7 @@ MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 			}
 		}
 	}
-	BControl::MouseMoved(point, transit, message);
+	BControl::MouseMoved(point, transit, msg);
 }
 
 void 
