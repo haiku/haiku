@@ -232,6 +232,8 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	return result;
 }
 
+/* This routine is complete for pre-NV10. It's tested on a Elsa Erazor III with TNT2
+ * (NV05), which coldstarts perfectly. */
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 {
 	status_t result = B_OK;
@@ -246,7 +248,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 	{
 		LOG(8,("INFO: $%04x ($%02x); ", adress, rom[adress]));
 
-		//fixme: complete...
+		//fixme: complete for NV10 and later (if possible) ...
 		switch (rom[adress])
 		{
 		case 0x59:
@@ -340,7 +342,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 4;
 			data2 = *((uint32*)(&(rom[adress])));
 			adress += 4;
-			LOG(8,("cmd 'WR 32bit REG $%08x with $%08x, then with $%08x' (always done)\n",
+			LOG(8,("cmd 'WR 32bit REG $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
 			/* (alternate NV-specific access to PCI config space registers:) */
@@ -432,8 +434,8 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			}
 
 			/* execute */
-			//fixme: setup_ram_config is also used on NV11 (at least), which means the
-			//       routine should function differently there?!?
+			//fixme: NV32_NV4STRAPINFO is a pre-NV10 specific register. How about NV11?
+			//       should this cmd 'exist' there?!? if, so: with different exec?
 			adress += 1;
 			data = NV_REG32(NV32_NV4STRAPINFO);
 			and_out = *((uint8*)(&(rom[adress])));
@@ -445,7 +447,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				and_out, byte));
 			if (((uint8)data) != byte)
 			{
-				LOG(8,("INFO: ---No match: not executing following commands:\n"));
+				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
 				exec = false;
 			}
 			else
@@ -490,6 +492,50 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			{
 				LOG(8,("script size error!\n\n"));
 				result = B_ERROR;
+			}
+			break;
+		case 0x72:
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+
+			/* execute */
+			adress += 1;
+			LOG(8,("cmd 'PGM commands'\n"));
+			LOG(8,("INFO: ---Executing following command(s):'\n"));
+			exec = true;
+			break;
+		case 0x73:
+			*size -= 9;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = NV_REG32(NV32_NVSTRAPINFO2);
+			and_out = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data2 = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data &= and_out;
+			LOG(8,("cmd 'CHK bits AND-out $%08x STRAPCFG2 for $%08x, stop PGM on no match'\n",
+				and_out, data2));
+			if (data != data2)
+			{
+				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
+				exec = false;
+			}
+			else
+			{
+				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
 			}
 			break;
 		case 0x74:
