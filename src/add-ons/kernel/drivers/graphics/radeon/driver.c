@@ -8,21 +8,17 @@
 */
 
 #include "radeon_driver.h"
-#ifdef ENABLE_LOGGING
-#include "log_coll.h"
-#endif
 
 #include <OS.h>
 #include <malloc.h>
 #include <graphic_driver.h>
 #include <stdio.h>
 #include <string.h>
-#include <mmio.h>
-#include <version.h>
+#include "mmio.h"
+#include "version.h"
 
 // tell the kernel what revision of the driver API we support
-//int32	api_version = 2;
-int32	api_version = B_CUR_DRIVER_API_VERSION; // apsed, was 2, is 2 in R5
+int32	api_version = 2;
 
 
 static status_t open_hook( const char *name, uint32 flags, void **cookie );
@@ -61,6 +57,8 @@ status_t init_hardware( void )
 // public function: init driver
 status_t init_driver( void )
 {
+	SHOW_FLOW0( 3, "" );
+		
 	if( get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK )
 		return B_ERROR;
 
@@ -71,7 +69,7 @@ status_t init_driver( void )
 		return B_ERROR;
 	}
 	
-	INIT_BEN( "Radeon Kernel", devices->kernel);
+	(void)INIT_BEN( devices->kernel, "Radeon Kernel" );
 	
 	Radeon_ProbeDevices();
 	return B_OK;
@@ -81,6 +79,7 @@ status_t init_driver( void )
 // public function: uninit driver
 void uninit_driver( void )
 {
+	SHOW_FLOW0( 3, "" );
 	DELETE_BEN( devices->kernel );
 	
 	free( devices );
@@ -126,7 +125,7 @@ static status_t open_hook( const char *name, uint32 flags, void **cookie )
 		strcmp(name, devices->device_names[index] ) != 0 ) 
 		index++;
 
-	di = &(devices->di[index]);
+	di = &(devices->di[index/2]);
 
 	ACQUIRE_BEN( devices->kernel );
 
@@ -173,11 +172,17 @@ static status_t free_hook( void *dev )
 {
 	device_info *di = (device_info *)dev;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0( 0, "" );
 
 	ACQUIRE_BEN( devices->kernel );
 
-	mem_freetag( di->local_memmgr, dev );
+	mem_freetag( di->memmgr[mt_local], dev );
+	
+	if( di->memmgr[mt_PCI] )
+		mem_freetag( di->memmgr[mt_PCI], dev );
+
+	if( di->memmgr[mt_AGP] )
+		mem_freetag( di->memmgr[mt_AGP], dev );
 	
 	if( di->is_open == 1 )
 		Radeon_LastClose( di );
@@ -199,8 +204,7 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 		// needed by app_server to load accelerant
 		case B_GET_ACCELERANT_SIGNATURE: {
 			char *sig = (char *)buf;
-			//strcpy(sig, "radeon2.accelerant");
-			strcpy(sig, "radeon.accelerant");
+			strcpy(sig, "radeon2.accelerant");
 			result = B_OK;
 		} break;
 
@@ -226,22 +230,124 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 		} break;
 		
 		// graphics mem manager
-		case RADEON_ALLOC_LOCAL_MEM: {
-			radeon_alloc_local_mem *am = (radeon_alloc_local_mem *)buf;
+		case RADEON_ALLOC_MEM: {
+			radeon_alloc_mem *am = (radeon_alloc_mem *)buf;
+			memory_type_e memory_type;
 			
-			if( am->magic == RADEON_PRIVATE_DATA_MAGIC )
-				result = mem_alloc( di->local_memmgr, am->size, dev, &am->handle, &am->fb_offset );
+			if( am->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			if( am->memory_type > mt_last )
+				break;
+
+			memory_type = am->memory_type == mt_nonlocal ? di->si->nonlocal_type : am->memory_type;
+			
+			result = mem_alloc( di->memmgr[memory_type], am->size, am->global ? 0 : dev, &am->handle, &am->offset );
 		} break;
 		
-		case RADEON_FREE_LOCAL_MEM: {
-			radeon_free_local_mem *fm = (radeon_free_local_mem *)buf;
-			
-			if( fm->magic == RADEON_PRIVATE_DATA_MAGIC )
-				result = mem_free( di->local_memmgr, fm->handle, dev );
+		case RADEON_FREE_MEM: {
+			radeon_free_mem *fm = (radeon_free_mem *)buf;
+			memory_type_e memory_type;
+		
+			if( fm->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			if( fm->memory_type > mt_last )
+				break;	
+				
+			memory_type = fm->memory_type == mt_nonlocal ? di->si->nonlocal_type : fm->memory_type;
+				
+			result = mem_free( di->memmgr[memory_type], fm->handle, fm->global ? 0 : dev );
 		} break;
+		
+		case RADEON_WAITFORIDLE: {
+			radeon_wait_for_idle *wfi = (radeon_wait_for_idle *)buf;
 			
-		// interface to log data
+			if( wfi->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			Radeon_WaitForIdle( di, true, wfi->keep_lock );
+			result = B_OK;
+		} break;
+		
+		case RADEON_RESETENGINE: {
+			radeon_no_arg *na = (radeon_no_arg *)buf;
+			
+			if( na->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			ACQUIRE_BEN( di->si->cp.lock );
+			Radeon_ResetEngine( di );
+			RELEASE_BEN( di->si->cp.lock );
+			
+			result = B_OK;
+		} break;
+		
+		case RADEON_VIPREAD: {
+			radeon_vip_read *vr = (radeon_vip_read *)buf;
+			
+			if( vr->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			result = Radeon_VIPRead( di, vr->channel, vr->address, &vr->data ) ?
+				B_OK : B_ERROR;
+		} break;
+		
+		case RADEON_VIPWRITE: {
+			radeon_vip_write *vw = (radeon_vip_write *)buf;
+			
+			if( vw->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			result = Radeon_VIPWrite( di, vw->channel, vw->address, vw->data ) ?
+				B_OK : B_ERROR;
+		} break;
+		
+		case RADEON_FINDVIPDEVICE: {
+			radeon_find_vip_device *fvd = (radeon_find_vip_device *)buf;
+			
+			if( fvd->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+
+			fvd->channel = Radeon_FindVIPDevice( di, fvd->device_id );
+			result = B_OK;
+		} break;
+
+		case RADEON_WAIT_FOR_CAP_IRQ: {
+			radeon_wait_for_cap_irq *wvc = (radeon_wait_for_cap_irq *)buf;
+			
+			if( wvc->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			// restrict wait time to 1 sec to get not stuck here in kernel
+			result = acquire_sem_etc( di->cap_sem, 1, B_RELATIVE_TIMEOUT, 
+				min( wvc->timeout, 1000000 ));
+	
+			if( result == B_OK ) {
+				cpu_status prev_irq_state = disable_interrupts();
+				acquire_spinlock( &di->cap_spinlock );
+				
+				wvc->timestamp = di->cap_timestamp;
+				wvc->int_status = di->cap_int_status;
+				wvc->counter = di->cap_counter;
+				
+				release_spinlock( &di->cap_spinlock );
+				restore_interrupts( prev_irq_state );
+			}
+		} break;
+		
+		case RADEON_DMACOPY: {
+			radeon_dma_copy *dc = (radeon_dma_copy *)buf;
+			
+			if( dc->magic != RADEON_PRIVATE_DATA_MAGIC )
+				break;
+				
+			result = Radeon_DMACopy( di, dc->src, dc->target, dc->size, dc->lock_mem, dc->contiguous );
+		} break;
+					
 #ifdef ENABLE_LOGGING
+#ifdef LOG_INCLUDE_STARTUP
+		// interface to log data
 		case RADEON_GET_LOG_SIZE:
 			*(uint32 *)buf = log_getsize( di->si->log );
 			result = B_OK;
@@ -250,26 +356,13 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 		case RADEON_GET_LOG_DATA:
 			log_getcopy( di->si->log, buf, ((uint32 *)buf)[0] );
 			result = B_OK;
-			break;	
+			break;
 #endif
-			
-		// interface to i2c-bus
-		case RADEON_SET_I2C_SIGNALS: {
-			radeon_getset_i2c *data = (radeon_getset_i2c *)buf;
-			
-			if( data->magic == RADEON_PRIVATE_DATA_MAGIC ) {
-				result = B_OK;
-				OUTREG( di->regs, data->port, data->value );
-			}
-			break; }	
-		case RADEON_GET_I2C_SIGNALS: {
-			radeon_getset_i2c *data = (radeon_getset_i2c *)buf;
-			
-			if( data->magic == RADEON_PRIVATE_DATA_MAGIC ) {
-				result = B_OK;
-				data->value = INREG( di->regs, data->port );
-			}
-			break; }	
+#endif
 	}
+	
+	if( result == B_DEV_INVALID_IOCTL )
+		SHOW_ERROR( 3, "Invalid ioctl call: code=0x%lx", msg );
+		
 	return result;
 }

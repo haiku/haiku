@@ -18,7 +18,7 @@
 
 #define  PCI_header_type_normal		0
 #define  PCI_header_type_bridge 	1
-//#define  PCI_header_type_cardbus 	2
+#define  PCI_header_type_cardbus 	2
 
 #define PCI_capability_list		0x34	/* Offset of first capability list entry */
 #define PCI_cb_capability_list	0x14
@@ -59,9 +59,6 @@
 // helper macros for easier PCI access
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
-
-int find_capability( pci_info *pcii, uint8 capability );
-void Radeon_Fix_AGP( void );
 
 
 // show AGP capabilities

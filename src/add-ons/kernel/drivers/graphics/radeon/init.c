@@ -16,8 +16,8 @@
 
 #include <PCI.h>
 #include <stdio.h>
-#include <dac_regs.h>
-#include <mmio.h>
+#include "dac_regs.h"
+#include "mmio.h"
 
 // helper macros for easier PCI access
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
@@ -32,7 +32,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 	// register map in PCI range 2
 	int regs = 2;
 	int fb   = 0;
-	char buffer[B_OS_NAME_LENGTH];
+	char buffer[100];
 	shared_info *si = di->si;
 	uint32	tmp;
 	pci_info *pcii = &(di->pcii);
@@ -41,7 +41,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 	SHOW_FLOW( 3, "device: %02X%02X%02X",
 		di->pcii.bus, di->pcii.device, di->pcii.function );
 	
-	si->regs_area = si->fb_area = 0;
+	si->ROM_area = si->regs_area = si->memory[mt_local].area = 0;
 
 	// enable memory mapped IO and frame buffer
 	// also, enable bus mastering (some BIOSes seem to 
@@ -66,13 +66,33 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 		(void *) di->pcii.u.h0.base_registers[regs],
 		di->pcii.u.h0.base_register_sizes[regs],
 		B_ANY_KERNEL_ADDRESS,
-		0,
+		/*// for "poke" debugging
+		B_READ_AREA + B_WRITE_AREA*/0,
 		(void **)&(di->regs));
 	if( si->regs_area < 0 ) 
 		return si->regs_area;
 
+	// that's all during detection as we have no clue about ROM or
+	// frame buffer at this point
 	if( mmio_only ) 
 		return B_OK;
+
+	// ROM must be explicetely mapped by applications too
+	sprintf( buffer, "%04X_%04X_%02X%02X%02X ROM",
+		di->pcii.vendor_id, di->pcii.device_id,
+		di->pcii.bus, di->pcii.device, di->pcii.function );
+
+	si->ROM_area = map_physical_memory(
+		buffer,
+		(void *) di->rom.phys_address,
+		di->rom.size,
+		B_ANY_KERNEL_ADDRESS,
+		0,
+		(void **)&(di->rom.rom_ptr));
+	if( si->ROM_area < 0 ) {
+		result = si->ROM_area;
+		goto err2;
+	}
 				
 	if( di->pcii.u.h0.base_register_sizes[fb] > di->local_mem_size ) {
 		// Radeons allocate more address range then really needed ->
@@ -88,6 +108,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 	// this is not a perfect solution; preferably, only
 	// those areas owned by an application are mapped into
 	// its address space
+	// (this hack is needed by BeOS to write something onto screen in KDL)
 	SHOW_INFO( 1, "physical address of framebuffer: 0x%8lx-0x%8lx", 
 		di->pcii.u.h0.base_registers[fb], 
 		di->pcii.u.h0.base_registers[fb] + di->pcii.u.h0.base_register_sizes[fb] - 1 );
@@ -96,29 +117,29 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	si->fb_area = map_physical_memory(
+	si->memory[mt_local].area = map_physical_memory(
 		buffer,
 		(void *) di->pcii.u.h0.base_registers[fb],
 		di->pcii.u.h0.base_register_sizes[fb],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
-		(void **)&(si->framebuffer));
+		(void **)&(si->local_mem));
 
-	if (si->fb_area < 0) {
+	if( si->memory[mt_local].area < 0 ) {
 		SHOW_FLOW0( 3, "couldn't enable WC for frame buffer" );
-		si->fb_area = map_physical_memory(
+		si->memory[mt_local].area = map_physical_memory(
 			buffer,
 			(void *) di->pcii.u.h0.base_registers[fb],
 			di->pcii.u.h0.base_register_sizes[fb],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,
-			(void **)&(si->framebuffer));
+			(void **)&(si->local_mem));
 	}
 
-	SHOW_FLOW( 3, "mapped frame buffer @%p", si->framebuffer );
+	SHOW_FLOW( 3, "mapped frame buffer @%p", si->local_mem );
 
-	if (si->fb_area < 0) {
-		result = si->fb_area;
+	if( si->memory[mt_local].area < 0 ) {
+		result = si->memory[mt_local].area;
 		goto err;
 	}
 	
@@ -128,8 +149,10 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 	
 	return B_OK;
 
-err:	
-	delete_area(si->regs_area);
+err:
+	delete_area( si->ROM_area );
+err2:
+	delete_area( si->regs_area );
 	return result;
 }
 
@@ -152,10 +175,13 @@ void Radeon_UnmapDevice(device_info *di)
 	if( si->regs_area > 0 )
 		delete_area( si->regs_area );
 		
-	if( si->fb_area > 0 )
-		delete_area( si->fb_area );
+	if( si->ROM_area > 0 )
+		delete_area( si->ROM_area );
 		
-	si->regs_area = si->fb_area = 0;
+	if( si->memory[mt_local].area > 0 )
+		delete_area( si->memory[mt_local].area );
+		
+	si->regs_area = si->ROM_area = si->memory[mt_local].area = 0;
 }
 
 
@@ -163,7 +189,7 @@ void Radeon_UnmapDevice(device_info *di)
 status_t Radeon_FirstOpen( device_info *di )
 {
 	status_t result;
-	char buffer[B_OS_NAME_LENGTH];
+	char buffer[100];	// B_OS_NAME_LENGTH is too short
 	shared_info *si;
 	//uint32 /*dma_block, */dma_offset;
 
@@ -189,7 +215,9 @@ status_t Radeon_FirstOpen( device_info *di )
 	si = di->si;
 	
 #ifdef ENABLE_LOGGING
+#ifdef LOG_INCLUDE_STARTUP
 	si->log = log_init( 1000000 );
+#endif
 #endif
 
 	// copy all info into shared info
@@ -197,17 +225,28 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->device_id = di->pcii.device_id;
 	si->revision = di->pcii.revision;
 	
-	si->has_crtc2 = di->has_crtc2;
 	si->asic = di->asic;
+	si->is_mobility = di->is_mobility;
+	si->tv_chip = di->tv_chip;
 	
-	si->ports[0].disp_type = di->disp_type[0];
-	si->ports[1].disp_type = di->disp_type[1];
-	si->fp_port = di->fp_info;
+	// detecting theatre channel in kernel would lead to code duplication,
+	// so we let the first accelerant take care of it
+	si->theatre_channel = -1;
+	
+/*	si->ports[0].disp_type = di->disp_type[0];
+	si->ports[1].disp_type = di->disp_type[1];*/
+	si->heads[0].is_crtc2 = false;
+	si->heads[0].flatpanel_port = 0;
+	si->heads[1].is_crtc2 = true;
+	si->heads[1].flatpanel_port = 1;
+	si->num_heads = di->num_heads;
+	
+	si->flatpanels[0] = di->fp_info;
 	si->pll = di->pll;
 /*	si->ram = di->ram;
 	strcpy( si->ram_type, di->ram_type );*/
-	si->local_mem_size = di->local_mem_size;
-	
+	//si->local_mem_size = di->local_mem_size;
+		
 	// create virtual card info; don't allow access by apps -
 	// they'll clone it 
 	sprintf( buffer, "%04X_%04X_%02X%02X%02X virtual card 0",
@@ -221,15 +260,13 @@ status_t Radeon_FirstOpen( device_info *di )
 		B_FULL_LOCK, 0);
 	if (di->virtual_card_area < 0) {
 		result = di->virtual_card_area;
-		goto err5;
+		goto err7;
 	}
 
 	// currently, we assign fixed ports to this virtual card
-	di->vc->num_ports = si->has_crtc2 ? 2 : 1;
-	di->vc->ports[0].is_crtc2 = false;	
-	di->vc->ports[0].physical_port = 0;
-	di->vc->ports[1].is_crtc2 = true;
-	di->vc->ports[1].physical_port = 1;
+	di->vc->num_heads = si->num_heads;
+	di->vc->heads[0].physical_head = 0;	
+	di->vc->heads[1].physical_head = 1;
 		
 	di->vc->fb_mem_handle = 0;
 	di->vc->cursor.mem_handle = 0;
@@ -239,30 +276,63 @@ status_t Radeon_FirstOpen( device_info *di )
 	
 	result = Radeon_MapDevice( di, false );
 	if (result < 0) 
-		goto err4;
+		goto err6;
 		
 	// save dac2_cntl register
-	// we need to restore that during uninit, else you only get
-	// garbage on screen on reboot
-	if( di->has_crtc2 )
+	// on M6, we need to restore that during uninit, else you only get
+	// garbage on screen on reboot if both CRTCs are used
+	if( di->asic == rt_m6 )
 		di->dac2_cntl = INREG( di->regs, RADEON_DAC_CNTL2 );
 	
-	result = Radeon_InitDMA( di );
+	result = Radeon_InitPCIGART( di );
 	if( result < 0 )
-		goto err3;
+		goto err5;
+	
+	si->memory[mt_local].size = di->local_mem_size;
 		
-	// currently, we don't support VLI - something is broken there
+	si->memory[mt_PCI].area = di->pci_gart.buffer.area;
+	si->memory[mt_PCI].size = di->pci_gart.buffer.size;
+
+	// currently, defaultnon-local memory is PCI memory
+	si->nonlocal_type = mt_PCI;
+
+	Radeon_InitMemController( di );
+		
+	// currently, we don't support VBI - something is broken there
 	// (it doesn't change a thing apart from crashing)
-/*	result = Radeon_SetupIRQ( di, buffer );
+	result = Radeon_SetupIRQ( di, buffer );
 	if( result < 0 )
-		goto err2;*/
-		
-	di->local_memmgr = mem_init( 0, di->local_mem_size, 1024, 
+		goto err4;
+
+	// resolution of 2D register is 1K, resolution of CRTC etc. is higher,
+	// so 1K is the minimum block size;
+	// (CP cannot use local mem)
+	di->memmgr[mt_local] = mem_init( 0, di->local_mem_size, 1024, 
 		di->local_mem_size / 1024 );
-	if( di->local_memmgr == NULL ) {
+	if( di->memmgr[mt_local] == NULL ) {
 		result = B_NO_MEMORY;
-		goto err1;
+		goto err3;
 	}
+
+	// CP requires 4K alignment, which is the most restrictive I found
+	di->memmgr[mt_PCI] = mem_init( 0, di->pci_gart.buffer.size, 4096, 
+		di->pci_gart.buffer.size / 4096 );
+	if( di->memmgr[mt_PCI] == NULL ) {
+		result = B_NO_MEMORY;
+		goto err2;
+	}
+
+	// no AGP support	
+	di->memmgr[mt_AGP] = NULL;
+
+	// time to init Command Processor
+	result = Radeon_InitCP( di );
+	if( result != B_OK )
+		goto err;
+		
+	result = Radeon_InitDMA( di );
+	if( result != B_OK )
+		goto err0;
 	
 	//Radeon_Fix_AGP();
 
@@ -273,16 +343,22 @@ status_t Radeon_FirstOpen( device_info *di )
 	si->nonlocal_vm_start = (uint32)si->framebuffer_pci + dma_offset;*/
 	
 	return B_OK;
-	
-err1:
-	/*Radeon_CleanupIRQ( di );
-err2:*/
-	Radeon_CleanupDMA( di );
+
+err0:
+	Radeon_UninitCP( di );
+err:
+	mem_destroy( di->memmgr[mt_PCI] );
+err2:
+	mem_destroy( di->memmgr[mt_local] );	
 err3:
-	Radeon_UnmapDevice( di );
+	Radeon_CleanupIRQ( di );
 err4:
-	delete_area( di->virtual_card_area );
+	Radeon_CleanupPCIGART( di );
 err5:
+	Radeon_UnmapDevice( di );
+err6:
+	delete_area( di->virtual_card_area );
+err7:
 	delete_area( di->shared_area );
 err8:
 	return result;
@@ -294,17 +370,30 @@ err8:
 // during tests)
 void Radeon_LastClose( device_info *di )
 {
-	if( di->has_crtc2 )
-		OUTREG( di->regs, RADEON_DAC_CNTL2, di->dac2_cntl );
+	Radeon_UninitCP( di );
 
-	mem_destroy( di->local_memmgr );
+	// M6 fix - unfortunately, the device is never closed by app_server,
+	// not even before reboot
+	if( di->asic == rt_m6 )
+		OUTREG( di->regs, RADEON_DAC_CNTL2, di->dac2_cntl );
+		
+
+	mem_destroy( di->memmgr[mt_local] );
 	
-//	Radeon_CleanupIRQ( di );
-	Radeon_CleanupDMA( di );
+	if( di->memmgr[mt_PCI] )
+		mem_destroy( di->memmgr[mt_PCI] );
+		
+	if( di->memmgr[mt_AGP] )
+		mem_destroy( di->memmgr[mt_AGP] );
+	
+	Radeon_CleanupIRQ( di );
+	Radeon_CleanupPCIGART( di );
 	Radeon_UnmapDevice(di);
 	
 #ifdef ENABLE_LOGGING
+#ifdef LOG_INCLUDE_STARTUP
 	log_exit( di->si->log );
+#endif
 #endif
 
 	delete_area( di->virtual_card_area );

@@ -13,30 +13,35 @@
 */
 
 #include "radeon_driver.h"
-#include <mmio.h>
-#include <bios_regs.h>
-#include <config_regs.h>
-#include <memcntrl_regs.h>
-#include <fp_regs.h>
-#include <crtc_regs.h>
-#include <radeon_bios.h>
-//#include "../common/utils.h"
+#include "mmio.h"
+#include "bios_regs.h"
+#include "config_regs.h"
+#include "memcntrl_regs.h"
+#include "fp_regs.h"
+#include "crtc_regs.h"
+#include "radeon_bios.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
 
 static const char ati_rom_sig[] = "761295520";
 static const char *radeon_sig[] = {
-	"RG6",			// r200
 	"RADEON",		// r100
+	"RV100",		// rv100
+	"U1",			// rs100 (IGP320M)
 	"M6",			// mobile version of r100
 	// probably an M6P; 
 	// anyway - this is the card I wrote this driver for!
 	// (perhaps ATI tries to make the card incompatible to standard drivers)
 	"P6",
 	"RV200",		// rv200
-	"RV100",		// rv100
 	"M7",			// m7
+	"RG6",			// r200 (according to spec)
+	"RS200",		// rs200
+	"R200",			// r200 (8500 LE)
+	"R200AGP",		// Fire GL E1
+	"M9"			// guess: m9
 	"RV250",		// rv250 R9100
 	"V280",			// RV280 R9200
 	"R300",			// R300 R9500 / R9700
@@ -44,64 +49,69 @@ static const char *radeon_sig[] = {
 	"R360",			// R360 R9800 XT
 	"V350",			// RV350 R9600
 	"V360",			// RV350 R9600 XT :guess
-	"M9"			// guess: m9
 };
 
-void Radeon_DetectRAM( device_info *di );
 
-
-// find address of ROM
+// find address of ROM;
+// this code is really nasty as maintaining the radeon signatures
+// is almost impossible (the signatures provided by ATI are always out-dated);
+// further, if there is more then one card built into the computer, we
+// may detect the wrong BIOS! 
+// we have two possible solutions:
+// 1. use the PCI location as stored in BIOS
+// 2. verify the IO-base address as stored in BIOS
+// I have no clue how these values are _written_ into the BIOS, and
+// unfortunately, every BIOS does the detection in a different way,
+// so I'm not sure which is the _right_ way of doing it
 static char *Radeon_FindRom( rom_info *ri )
 {       
 	uint32 segstart;
-	char *rom_base;
+	uint8 *rom_base;
 	char *rom;
-	int stage;
 	int i,j;
 	
 	for( segstart = 0x000c0000; segstart < 0x000f0000; segstart += 0x00001000 ) {
-		stage = 1;
+		bool found = false;
 		
 		// find ROM		
 		rom_base = ri->bios_ptr + segstart - 0xc0000;
 		
-		if( *rom_base == 0x55 && ((*(rom_base + 1)) & 0xff) == 0xaa )
-			stage = 2;
-		
-		if (stage != 2)
+		if( rom_base[0] != 0x55 || rom_base[1] != 0xaa )
 			continue;
 	
 		// find signature of ATI                              
 		rom = rom_base;
-		
-		for( i = 0; i < 128 - (int)strlen( ati_rom_sig ) && stage != 3; i++ ) {
-			if( ati_rom_sig[0] == *rom ) {
-				if( strncmp(ati_rom_sig, rom, strlen( ati_rom_sig )) == 0 )
-					stage = 3;
+
+		found = false;
+				
+		for( i = 0; i < 128 - strlen( ati_rom_sig ); i++ ) {
+			if( ati_rom_sig[0] == rom_base[i] ) {
+				if( strncmp(ati_rom_sig, rom_base + i, strlen( ati_rom_sig )) == 0 ) {
+					found = true;
+					break;
+				}
 			}
-			rom++;
 		}
 		
-		if( stage != 3 )
+		if( !found )
 			continue;
 
 		// find signature of card
-		rom = rom_base;
+		found = false;
 		
-		for( i = 0; (i < 512) && (stage != 4); i++ ) {
-			for( j = 0; j < (int)sizeof( radeon_sig ) / (int)sizeof( radeon_sig[0] ); j++ ) {
-				if( radeon_sig[j][0] == *rom ) {
-					if( strncmp( radeon_sig[j], rom, strlen( radeon_sig[j] )) == 0 ) {
+		for( i = 0; i < 512; i++ ) {
+			for( j = 0; j < sizeof( radeon_sig ) / sizeof( radeon_sig[0] ); j++ ) {
+				if( radeon_sig[j][0] == rom_base[i] ) {
+					if( strncmp( radeon_sig[j], rom_base + i, strlen( radeon_sig[j] )) == 0 ) {
 						SHOW_INFO( 2, "Signature: %s", radeon_sig[j] );
-						stage = 4;
+						found = true;
 						break;
 					}
 				}
 			}
-			rom++;
 		}
 		
-		if( stage != 4 )
+		if( !found )
 			continue;
 		
 		SHOW_INFO( 2, "found ROM @0x%lx", segstart );
@@ -113,8 +123,8 @@ static char *Radeon_FindRom( rom_info *ri )
 }
 
 
-// PLL info is stored in ROM, probably to easily replace it
-// and thus produce cards with different timings
+// PLL info is stored in ROM, probably it's too easy to replace it
+// and thus they produce cards with different timings
 static void Radeon_GetPLLInfo( device_info *di )
 {
 	uint8 *bios_header;
@@ -136,6 +146,7 @@ static void Radeon_GetPLLInfo( device_info *di )
 		di->pll.min_pll_freq, di->pll.max_pll_freq );
 }
 
+/*
 const char *Mon2Str[] = {
 	"N/C",
 	"CRT",
@@ -143,10 +154,11 @@ const char *Mon2Str[] = {
 	"Laptop flatpanel",
 	"DVI (flatpanel)",
 	"secondary DVI (flatpanel) - unsupported",
-	"Composite TV - unsupported",
-	"S-Video out - unsupported"
-};
+	"Composite TV",
+	"S-Video out"
+};*/
 
+/*
 // ask BIOS what kind of monitor is connected to each port
 static void Radeon_GetMonType( device_info *di )
 {
@@ -159,53 +171,57 @@ static void Radeon_GetMonType( device_info *di )
 	if (di->has_crtc2) {
 		tmp = INREG( di->regs, RADEON_BIOS_4_SCRATCH );
 		
-		// ordering of "if"s is important are multiple
+		// ordering of "if"s is important as multiple
 		// devices can be concurrently connected to one port
 		// (like both a CRT and a TV)
 		
 		// primary port
+		// having flat-panel support is most important
 		if (tmp & 0x08)
-			di->disp_type[0] = dt_dvi_1;
+			di->disp_type[0] = dt_dvi;
 		else if (tmp & 0x4)
 			di->disp_type[0] = dt_lvds;
 		else if (tmp & 0x200)
-			di->disp_type[0] = dt_crt_1;
+			di->disp_type[0] = dt_tv_crt;
 		else if (tmp & 0x10)
 			di->disp_type[0] = dt_ctv;
 		else if (tmp & 0x20)
 			di->disp_type[0] = dt_stv;
 
 		// secondary port
-		if (tmp & 0x2)
-			di->disp_type[1] = dt_crt_2;
-		else if (tmp & 0x800)
-			di->disp_type[1] = dt_dvi_2;
-		else if (tmp & 0x400)
-			// this is unlikely - I only know about one LVDS unit
-			di->disp_type[1] = dt_lvds;
-		else if (tmp & 0x1000)
+		// having TV-Out support is more important then CRT support
+		// (CRT gets signal anyway)
+		if (tmp & 0x1000)
 			di->disp_type[1] = dt_ctv;
 		else if (tmp & 0x2000)
 			di->disp_type[1] = dt_stv;
+		else if (tmp & 0x2)
+			di->disp_type[1] = dt_crt;
+		else if (tmp & 0x800)
+			di->disp_type[1] = dt_dvi_ext;
+		else if (tmp & 0x400)
+			// this is unlikely - I only know about one LVDS unit
+			di->disp_type[1] = dt_lvds;
 	} else {
 		// regular Radeon
+		// TBD: no TV-Out detection
 		di->disp_type[0] = dt_none;
 
 		tmp = INREG( di->regs, RADEON_FP_GEN_CNTL);
 
 		if( tmp & RADEON_FP_EN_TMDS )
-			di->disp_type[0] = dt_dvi_1;
+			di->disp_type[0] = dt_dvi;
 		else
-			di->disp_type[0] = dt_crt_1;
+			di->disp_type[0] = dt_crt;
 	}
 	
 	SHOW_INFO( 1, "BIOS reports %s on primary and %s on secondary port", 
 		Mon2Str[di->disp_type[0]], Mon2Str[di->disp_type[1]]);
 		
 	// remove unsupported devices
-	if( di->disp_type[0] >= dt_dvi_2 )
+	if( di->disp_type[0] >= dt_dvi_ext )
 		di->disp_type[0] = dt_none;
-	if( di->disp_type[1] >= dt_dvi_2 )
+	if( di->disp_type[1] >= dt_dvi_ext )
 		di->disp_type[1] = dt_none;
 
 	// HACK: overlays can only be shown on first CRTC;
@@ -213,8 +229,8 @@ static void Radeon_GetMonType( device_info *di )
 	// second port to first CRTC (proper signal routing
 	// is hopefully done by BIOS)
 	if( di->has_crtc2 ) {
-		if( di->disp_type[0] == dt_none && di->disp_type[1] == dt_crt_2 ) {
-			di->disp_type[0] = dt_crt_1;
+		if( di->disp_type[0] == dt_none && di->disp_type[1] == dt_crt ) {
+			di->disp_type[0] = dt_crt;
 			di->disp_type[1] = dt_none;
 		}
 	}
@@ -222,7 +238,7 @@ static void Radeon_GetMonType( device_info *di )
 	SHOW_INFO( 1, "Effective routing: %s on primary and %s on secondary port", 
 		Mon2Str[di->disp_type[0]], Mon2Str[di->disp_type[1]]);
 }
-
+*/
 
 // get flat panel info (does only make sense for Laptops
 // with integrated display, but looking for it doesn't hurt,
@@ -302,46 +318,14 @@ static bool Radeon_GetBIOSDFPInfo( device_info *di )
 static void Radeon_RevEnvDFPSize( device_info *di )
 {
 	vuint8 *regs = di->regs;
-/*	uint32 r;
-
-	// take a look at flat_panel.c of the accelerant how register values
-	// are calculated - this is the inverse function
-	r = INREG( regs, RADEON_FP_VERT_STRETCH );
-	if( (r & RADEON_VERT_STRETCH_BLEND) == 0 ) {
-		di->fp_info.panel_yres = 
-			((r & RADEON_VERT_PANEL_SIZE) >> RADEON_VERT_PANEL_SHIFT) + 1;
-	} else {
-		uint32 v_total = (INREG( regs, RADEON_FP_CRTC_V_TOTAL_DISP ) 
-			>> RADEON_FP_CRTC_V_DISP_SHIFT) + 1;
-		SHOW_INFO( 2, "stretched mode: v_total=%d", v_total );
-		di->fp_info.panel_yres = 
-			(v_total * FIX_SCALE * RADEON_VERT_STRETCH_RATIO_MAX / 
-			 (r & RADEON_VERT_STRETCH_RATIO_MASK) + FIX_SCALE / 2) >> FIX_SHIFT;
-		// seems to be a BIOS bug - vertical size is 1 point too small
-		// (checked by re-calculating stretch factor)
-		++di->fp_info.panel_yres;
-	}
-	
-	r = INREG( regs, RADEON_FP_HORZ_STRETCH );
-	if( (r & RADEON_HORZ_STRETCH_BLEND) == 0 ) {
-		di->fp_info.panel_xres = 
-			(((r & RADEON_HORZ_PANEL_SIZE) >> RADEON_HORZ_PANEL_SHIFT) + 1) * 8;
-	} else {
-		uint32 h_total = ((INREG( regs, RADEON_FP_CRTC_H_TOTAL_DISP ) 
-			>> RADEON_FP_CRTC_H_DISP_SHIFT) + 1) * 8;
-		SHOW_INFO( 2, "stretched mode: h_total=%d", h_total );
-		di->fp_info.panel_xres = 
-			(h_total * FIX_SCALE * RADEON_HORZ_STRETCH_RATIO_MAX / 
-			 (r & RADEON_HORZ_STRETCH_RATIO_MASK) + FIX_SCALE / 2) >> FIX_SHIFT;
-	}*/
-	
+		
 	di->fp_info.panel_yres = 
 		((INREG( regs, RADEON_FP_VERT_STRETCH ) & RADEON_VERT_PANEL_SIZE) 
-		>> RADEON_VERT_PANEL_SHIFT) + 1;
+		>> RADEON_VERT_PANEL_SIZE_SHIFT) + 1;
 
 	di->fp_info.panel_xres = 
 		(((INREG( regs, RADEON_FP_HORZ_STRETCH ) & RADEON_HORZ_PANEL_SIZE) 
-		>> RADEON_HORZ_PANEL_SHIFT) + 1) * 8;
+		>> RADEON_HORZ_PANEL_SIZE_SHIFT) + 1) * 8;
 	
 	SHOW_INFO( 2, "detected panel size from registers: %dx%d", 
 		di->fp_info.panel_xres, di->fp_info.panel_yres);
@@ -373,7 +357,7 @@ static void Radeon_RevEnvDFPTiming( device_info *di )
 		((r & RADEON_FP_H_SYNC_WID_MASK)
 				>> RADEON_FP_H_SYNC_WID_SHIFT);
 	// TBD: this seems to be wrong
-	// (BIOS tells 112, this calculation leads to 24!)
+	// (my BIOS tells 112, this calculation leads to 24!)
 	di->fp_info.h_sync_width *= 8;
 	
 	r = INREG( regs, RADEON_FP_CRTC_V_TOTAL_DISP );
@@ -389,7 +373,6 @@ static void Radeon_RevEnvDFPTiming( device_info *di )
 		>> RADEON_FP_V_SYNC_WID_SHIFT)/* + 1*/;
 	
 	// standard CRTC
-	
 	r = INREG( regs, RADEON_CRTC_H_TOTAL_DISP );
 	a = (r & RADEON_CRTC_H_TOTAL);
 	b = (r & RADEON_CRTC_H_DISP) >> RADEON_CRTC_H_DISP_SHIFT;
@@ -421,6 +404,7 @@ static void Radeon_RevEnvDFPTiming( device_info *di )
 }
 
 
+/*
 // get everything in terms of monitors connected to the card
 static void Radeon_GetBIOSMon( device_info *di )
 {
@@ -433,8 +417,7 @@ static void Radeon_GetBIOSMon( device_info *di )
     // we assume that the only fp port is combined with standard port 0
 	di->fp_info.disp_type = di->disp_type[0];
 
-	if( di->disp_type[0] == dt_dvi_1 || di->disp_type[0] == dt_lvds ) 
-	{
+	if( di->is_mobility ) {
 		// there is a flat panel - get info about it
 		Radeon_GetBIOSDFPInfo( di );
 		
@@ -452,14 +435,49 @@ static void Radeon_GetBIOSMon( device_info *di )
 		SHOW_INFO( 2, "pixel_clock=%d", di->fp_info.dot_clock );
 	}
 }
+*/
 
+// get info about Laptop flat panel
+static void Radeon_GetFPData( device_info *di )
+{
+    // reset all Flat Panel Info; 
+    // it gets filled out step by step, and this way we know what's still missing
+    memset( &di->fp_info, 0, sizeof( di->fp_info ));
+
+	// we only use BIOS for Laptop flat panels
+	if( !di->is_mobility )
+		return;
+		    
+	// ask BIOS about flat panel spec
+	Radeon_GetBIOSDFPInfo( di );
+	
+	// if BIOS doesn't know, ask the registers
+	if( di->fp_info.panel_xres == 0 || di->fp_info.panel_yres == 0)
+		Radeon_RevEnvDFPSize( di );
+		
+	if( di->fp_info.h_blank == 0 || di->fp_info.v_blank == 0)
+		Radeon_RevEnvDFPTiming( di );
+		
+	SHOW_INFO( 2, "h_disp=%d, h_blank=%d, h_over_plus=%d, h_sync_width=%d", 
+		di->fp_info.panel_xres, di->fp_info.h_blank, di->fp_info.h_over_plus, di->fp_info.h_sync_width );
+	SHOW_INFO( 2, "v_disp=%d, v_blank=%d, v_over_plus=%d, v_sync_width=%d", 
+		di->fp_info.panel_yres, di->fp_info.v_blank, di->fp_info.v_over_plus, di->fp_info.v_sync_width );			
+	SHOW_INFO( 2, "pixel_clock=%d", di->fp_info.dot_clock );
+}
 
 // detect amount of graphics memory
 void Radeon_DetectRAM( device_info *di )
 {
 	vuint8 *regs = di->regs;
-	
-	di->local_mem_size = INREG( regs, RADEON_CONFIG_MEMSIZE ) & RADEON_CONFIG_MEMSIZE_MASK;
+
+	if( !di->is_igp	)
+		di->local_mem_size = INREG( regs, RADEON_CONFIG_MEMSIZE ) & RADEON_CONFIG_MEMSIZE_MASK;
+	else {
+		uint32 tom;
+		
+		tom = INREG( regs, RADEON_GC_NB_TOM );
+		di->local_mem_size = ((tom >> 16) + 1 - (tom & 0xffff)) << 16;
+	}
 
 	// some production boards of m6 will return 0 if it's 8 MB
 	if( di->local_mem_size == 0 )
@@ -500,11 +518,11 @@ void Radeon_DetectRAM( device_info *di )
 	SHOW_INFO( 1, "%ld MB %s found", di->local_mem_size / 1024 / 1024, 
 		di->ram_type );
 		
-	if( di->local_mem_size > 64 * 1024 * 1024 ) {
+/*	if( di->local_mem_size > 64 * 1024 * 1024 ) {
 		di->local_mem_size = 64 * 1024 * 1024;
 		
 		SHOW_INFO0( 1, "restricted to 64 MB" );
-	}
+	}*/
 }
 
 
@@ -512,7 +530,7 @@ void Radeon_DetectRAM( device_info *di )
 // (as we need BIOS for further info we have to make sure we use the right one)
 status_t Radeon_MapBIOS( pci_info *pcii, rom_info *ri )
 {
-	char buffer[B_OS_NAME_LENGTH];
+	char buffer[100];
 	
 	sprintf(buffer, "%04X_%04X_%02X%02X%02X bios",
 		pcii->vendor_id, pcii->device_id,
@@ -525,12 +543,19 @@ status_t Radeon_MapBIOS( pci_info *pcii, rom_info *ri )
 	// device name), thus you couldn't choose in BIOS which card 
 	// to use; checking the legacy location ensures that the card is
 	// only detected if it's the primary card
-	ri->bios_area = map_physical_memory( buffer, (void *)0xc0000, 
-		0x40000, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&ri->bios_ptr );
+	ri->phys_address = 0xc0000;
+	ri->size = 0x40000;
+	
+	ri->bios_area = map_physical_memory( buffer, (void *)ri->phys_address, 
+		ri->size, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&ri->bios_ptr );
 	if( ri->bios_area < 0 )
 		return ri->bios_area;
 	
 	ri->rom_ptr = Radeon_FindRom( ri );
+	
+	// on success, adjust physical address to found ROM
+	if( ri->rom_ptr != NULL )
+		ri->phys_address += ri->rom_ptr - ri->bios_ptr;
 	
 	return ri->rom_ptr != NULL ? B_OK : B_ERROR;
 }
@@ -560,7 +585,7 @@ status_t Radeon_ReadBIOSData( device_info *di )
 		goto err1;
 
 	Radeon_GetPLLInfo( di );
-	Radeon_GetBIOSMon( di );
+	Radeon_GetFPData( di );
 	Radeon_DetectRAM( di );
 	
 	Radeon_UnmapDevice( di );

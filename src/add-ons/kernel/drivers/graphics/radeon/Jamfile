@@ -2,17 +2,27 @@ SubDir OBOS_TOP src add-ons kernel drivers graphics radeon ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+StaticLibrary radeon :
+	pll_access.c
+	utils.c
+;
 
 R5KernelAddon radeon.driver : kernel drivers bin :
 	driver.c
 	agp.c
 	bios.c
 	detect.c
-	dma.c
+	DMA.c
 	global_data.c
 	init.c
 	irq.c
-	memmgr.c
+	mem_controller.c
+	CP_setup.c
+	PCI_GART.c
+	vip.c
+	: libgraphicscommon.a libradeon.a
 ;
 
 #Package openbeos-radeon-cvs :

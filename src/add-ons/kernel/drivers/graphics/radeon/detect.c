@@ -68,8 +68,8 @@
 
 // RV280
 #define DEVICE_ID_RADEON_Ya_	0x5960
-#define DEVICE_ID_RADEON_Ya	0x5961
-#define DEVICE_ID_RADEON_Yd	0x5964
+#define DEVICE_ID_RADEON_Ya		0x5961
+#define DEVICE_ID_RADEON_Yd		0x5964
 
 // r300
 #define DEVICE_ID_RADEON_ND     0x4e44
@@ -97,10 +97,18 @@
 #define DEVICE_ID_RADEON_NH		0x4e48
 #define DEVICE_ID_RADEON_NI		0x4e49
 
+// Mobility Fire GL T2 - any idea about the chip?
+#define DEVICE_ID_RADEON_NT		0x4e54
+
 // r360
 #define DEVICE_ID_RADEON_NJ		0x4e4a
 
+// rs100
 #define DEVICE_ID_IGP320M		0x4336
+
+// rs200
+#define DEVICE_ID_RADEON_C7		0x4337
+#define DEVICE_ID_RADEON_A7		0x4137
 
 typedef struct {
 	uint16 device_id;
@@ -123,17 +131,22 @@ RadeonDevice radeon_device_list[] = {
 	// mobility version of original Radeon (based on VE), now called M6
 	{ DEVICE_ID_RADEON_LY,	rt_m6,		"Radeon Mobility" },
 	{ DEVICE_ID_RADEON_LZ,	rt_m6, 		"Radeon Mobility M6 LZ" },
+	// not sure about that: ROM signature is "RADEON" which means r100
+	{ DEVICE_ID_RADEON_NT,	rt_m6,		"Radeon Mobility FireGL T2" },
+	
+	// rs100 (integrated Radeon, seems to be a Radeon VE)
+	{ DEVICE_ID_IGP320M,	rt_rs100,	"IGP320M" },
 	
 	// RV200 (dual CRT)
 	{ DEVICE_ID_RADEON_QW,	rt_rv200,	"Radeon 7500 / ALL-IN-WONDER Radeon 7500" },
 	{ DEVICE_ID_RADEON_QX,	rt_rv200,	"Radeon 7500 QX" },
 	
-	// R200 mobility (based on RV200)
+	// M7 (based on RV200)
 	{ DEVICE_ID_RADEON_LW,	rt_m7,		"Radeon Mobility 7500" },
 	{ DEVICE_ID_RADEON_LX,	rt_m7,		"Radeon Mobility 7500 GL" },
 	
 	// R200
-	{ DEVICE_ID_RADEON_QH,	rt_r200,	"Radeon 8500 QH" },
+	{ DEVICE_ID_RADEON_QH,	rt_r200,	"ATI Fire GL E1" },	// chip type: fgl8800
 	{ DEVICE_ID_RADEON_QI,	rt_r200,	"Radeon 8500 QI" },
 	{ DEVICE_ID_RADEON_QJ,	rt_r200,	"Radeon 8500 QJ" },
 	{ DEVICE_ID_RADEON_QK,	rt_r200,	"Radeon 8500 QK" },
@@ -160,9 +173,9 @@ RadeonDevice radeon_device_list[] = {
 	
 	// RV280
 	// the naming scheme can't properly handle this id
-	{ DEVICE_ID_RADEON_Ya_, rt_rv250,	"Radeon 9200" },
-	{ DEVICE_ID_RADEON_Ya,	rt_rv250,	"Radeon 9200" },
-	{ DEVICE_ID_RADEON_Yd,	rt_rv250,	"Radeon 9200 SE" },
+	{ DEVICE_ID_RADEON_Ya_, rt_rv280,	"Radeon 9200" },
+	{ DEVICE_ID_RADEON_Ya,	rt_rv280,	"Radeon 9200" },
+	{ DEVICE_ID_RADEON_Yd,	rt_rv280,	"Radeon 9200 SE" },
 
 	// R300
 	{ DEVICE_ID_RADEON_ND,	rt_r300,	"Radeon 9700 ND" },
@@ -178,8 +191,8 @@ RadeonDevice radeon_device_list[] = {
 	// RV350
 	{ DEVICE_ID_RADEON_AP, 	rt_rv350,	"Radeon 9600 AP" },
 	{ DEVICE_ID_RADEON_AQ, 	rt_rv350,	"Radeon 9600 AQ" },
-	{ DEVICE_ID_RADEON_NO, 	rt_rv350,	"Radeon Mobility 9600 Pro Turbo" },
-	{ DEVICE_ID_RADEON_NS, 	rt_rv350,	"Mobility FireGL T2" },
+	{ DEVICE_ID_RADEON_NO,	rt_rv350,	"Radeon 9600 Pro" },
+	{ DEVICE_ID_RADEON_NS,	rt_rv350,	"Mobility FireGL T2" },
 	
 	// RV360 (probably minor revision of rv350)
 	{ DEVICE_ID_RADEON_AR, 	rt_rv360,	"Radeon 9600 AR" },
@@ -192,7 +205,12 @@ RadeonDevice radeon_device_list[] = {
 	// R360 (probably minor revision of r350)
 	{ DEVICE_ID_RADEON_NJ, 	rt_r360,	"Radeon 9800 XT" },
 
-	{ DEVICE_ID_IGP320M, 	rt_ve,		"Radeon IGP 320M" },
+	// rs100 (aka IGP)
+	{ DEVICE_ID_IGP320M, 	rt_rs100,	"Radeon IGP 320M" },
+	
+	// rs200 (aka IGP)
+	{ DEVICE_ID_RADEON_C7,	rt_rs200,	"IGP330M/340M/350M (U2) 4337" },
+	{ DEVICE_ID_RADEON_A7,	rt_rs200,	"IGP 340" },
 	
 	{ 0, 0, NULL }
 };
@@ -254,43 +272,34 @@ done:
 }
 
 // !extend this array whenever a new ASIC is a added!
-static bool has_crtc2[] =
+static struct {
+	const char 		*name;			// name of ASIC
+	tv_chip_type	tv_chip;		// TV-Out chip (if any)
+	bool 			has_crtc2;		// has second CRTC
+	bool			is_mobility;	// mobility chip
+	bool			has_vip;		// has VIP/I2C
+	bool			is_igp;			// integrated graphics
+} asic_properties[] =
 {
-	false,	// only original Radeons have one crtc only
-	false,
-	true,
-	true,	
-	true,
-	true,
-	true,
-	true,
-	true,
-	true,
-	true,
-	true,
-	true,
-	true,
-	true
+	{ "r100",	tc_external_rt1,	false,	false,	true,	false },	// only original Radeons have one crtc only
+	{ "ve",		tc_internal_rt1, 	true,	false,	true,	false },
+	{ "m6",		tc_internal_rt1, 	true,	true,	false,	false },
+	{ "rs100",	tc_internal_rt1,	true,	true,	false,	true },
+	{ "rv200",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "m7",		tc_internal_rt1, 	true,	true,	false,	false },
+	{ "rs200",	tc_internal_rt1, 	true,	true,	false,	true },
+	{ "r200",	tc_external_rt1, 	true,	false,	true,	false },	// r200 has external TV-Out encoder
+	{ "rv250",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "rv280",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "m9",		tc_internal_rt2, 	true,	true,	true,	false },
+	{ "r300",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "r300_4p",tc_internal_rt2, 	true,	false,	true,	false },
+	{ "rv350",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "rv360",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "r350",	tc_internal_rt2, 	true,	false,	true,	false },
+	{ "r360",	tc_internal_rt2, 	true,	false,	true,	false }
 };
 
-static const char *asic_name[] = 
-{
-	"r100",
-	"ve",
-	"m6",
-	"rv200",
-	"m7",
-	"r200",
-	"rv250",
-	"rv280",
-	"m9",
-	"r300",
-	"r300_4p",
-	"rv350",
-	"rv360",
-	"r350",
-	"r360",
-};
 
 // get next supported device
 static bool probeDevice( device_info *di )
@@ -309,8 +318,12 @@ static bool probeDevice( device_info *di )
 			if (device->device_id != di->pcii.device_id ) 
 				continue;
 			
-			di->has_crtc2 = has_crtc2[device->asic];
+			di->num_heads = asic_properties[device->asic].has_crtc2 ? 2 : 1;
+			di->tv_chip = asic_properties[device->asic].tv_chip;
 			di->asic = device->asic;
+			di->is_mobility = asic_properties[device->asic].is_mobility;
+			di->has_vip = asic_properties[device->asic].has_vip;
+			di->is_igp = asic_properties[device->asic].is_igp;
 			
 			if( Radeon_MapBIOS( &di->pcii, &di->rom ) != B_OK )
 				// give up checking this device - no BIOS, no fun
@@ -324,13 +337,21 @@ static bool probeDevice( device_info *di )
 			// we don't need BIOS any more
 			Radeon_UnmapBIOS( &di->rom );
 			
-			SHOW_INFO( 0, "found %s; ASIC: %s", device->name, asic_name[device->asic] );
+			SHOW_INFO( 0, "found %s; ASIC: %s", device->name, asic_properties[device->asic].name );
 			
 			sprintf(di->name, "graphics/%04X_%04X_%02X%02X%02X",
 				di->pcii.vendor_id, di->pcii.device_id,
 				di->pcii.bus, di->pcii.device, di->pcii.function);
 			SHOW_FLOW( 3, "making /dev/%s", di->name );
-	
+
+			// we always publish it as a video grabber; we should check for Rage
+			// Theater, but the corresponding code (vip.c) needs a fully initialized
+			// driver, and this is too much hazzly, so we leave it to the media add-on
+			// to verify that the card really supports video-in
+			sprintf(di->video_name, "video/radeon/%04X_%04X_%02X%02X%02X",
+				di->pcii.vendor_id, di->pcii.device_id,
+				di->pcii.bus, di->pcii.device, di->pcii.function);
+
 			di->is_open = 0;
 			di->shared_area = -1;
 			di->si = NULL;
@@ -360,7 +381,8 @@ void Radeon_ProbeDevices( void )
 			break;
 			
 		if( probeDevice( di )) {
-			devices->device_names[count] = di->name;
+			devices->device_names[2*count] = di->name;
+			devices->device_names[2*count+1] = di->video_name;
 			di++;
 			count++;
 		}
@@ -369,7 +391,7 @@ void Radeon_ProbeDevices( void )
 	}
 	
 	devices->count = count;
-	devices->device_names[count] = NULL;
+	devices->device_names[2*count] = NULL;
 	
 	SHOW_INFO( 0, "%ld supported devices", count );
 }
