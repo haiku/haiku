@@ -99,7 +99,7 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 
 SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
+	= [ FDirName $(OBOS_TOP) src kernel core messaging ] ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
