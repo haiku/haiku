@@ -28,12 +28,7 @@
 #include <List.h>
 #include <String.h>
 #include <PortLink.h>
-#include <PortMessage.h>
-#include <PortQueue.h>
 #include <SysCursor.h>
-
-#include <Session.h>
-
 #include <ColorSet.h>
 #include <RGBColor.h>
 #include <stdio.h>
@@ -91,10 +86,11 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 
 	// fClientAppPort is the our BApplication's event port
 	fClientAppPort=sendport;
-	fAppLink=new PortLink(fClientAppPort);
 
 	// fMessagePort is the port we receive messages from our BApplication
 	fMessagePort=rcvport;
+
+	fAppLink = new BPortLink(fClientAppPort, fMessagePort);
 
 	fSWindowList=new BList(0);
 	fBitmapList=new BList(0);
@@ -246,8 +242,8 @@ bool ServerApp::PingTarget(void)
 			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",fSignature.String());
 			return false;
 		}
-		fAppLink->SetPort(serverport);
-		fAppLink->SetOpCode(AS_DELETE_APP);
+		fAppLink->SetSendPort(serverport);
+		fAppLink->StartMessage(AS_DELETE_APP);
 		fAppLink->Attach(&fMonitorThreadID,sizeof(thread_id));
 		fAppLink->Flush();
 		return false;
@@ -336,22 +332,19 @@ int32 ServerApp::MonitorApp(void *data)
 	// Message-dispatching loop for the ServerApp
 
 	ServerApp *app = (ServerApp *)data;
-	PortQueue msgqueue(app->fMessagePort);
-	PortMessage *msg;
+	BPortLink msgqueue(-1, app->fMessagePort);
 	bool quitting = false;
+	int32 code;
+	status_t err = B_OK;
 	
-	for( ; !quitting; )
+	while(!quitting)
 	{
-		if(!msgqueue.MessagesWaiting())
-			msgqueue.GetMessagesFromPort(true);
-		else
-			msgqueue.GetMessagesFromPort(false);
+		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
+		err = msgqueue.GetNextReply(&code);
+		if (err < B_OK)
+			break;
 
-		msg	= msgqueue.GetMessageFromQueue();
-		if(!msg)
-			continue;
-					
-		switch(msg->Code())
+		switch(code)
 		{
 			case AS_QUIT_APP:
 			{
@@ -400,8 +393,8 @@ int32 ServerApp::MonitorApp(void *data)
 					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
 					break;
 				}
-				app->fAppLink->SetPort(serverport);
-				app->fAppLink->SetOpCode(AS_DELETE_APP);
+				app->fAppLink->SetSendPort(serverport);
+				app->fAppLink->StartMessage(AS_DELETE_APP);
 				app->fAppLink->Attach(&app->fMonitorThreadID, sizeof(thread_id));
 				app->fAppLink->Flush();
 				break;
@@ -409,12 +402,11 @@ int32 ServerApp::MonitorApp(void *data)
 			default:
 			{
 				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->fSignature.String()));
-				app->_DispatchMessage(msg);
+				app->_DispatchMessage(code, msgqueue);
 				break;
 			}
 		}
 
-		delete msg;
 	} // end for 
 
 	// clean exit.
@@ -430,10 +422,10 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::_DispatchMessage(PortMessage *msg)
+void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 {
 	LayerData ld;
-	switch(msg->Code())
+	switch(code)
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
@@ -460,7 +452,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
 				win->fWinBorder->UpdateColors();
-				win->SendMessageToClient(&msg);
+				win->SendMessageToClient(AS_UPDATE_COLORS, msg);
 				win->Unlock();
 			}
 */			break;
@@ -479,7 +471,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win=(ServerWindow*)fSWindowList->ItemAt(i);
 				win->Lock();
 				win->fWinBorder->UpdateFont();
-				win->SendMessageToClient(&msg);
+				win->SendMessageToClient(AS_UPDATE_FONTS, msg);
 				win->Unlock();
 			}
 */			break;
@@ -518,22 +510,24 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			uint32 feel;
 			uint32 flags;
 			uint32 wkspaces;
-			int32 token;
-			port_id	sendPort;
-			port_id looperPort;
-			port_id replyport;
-			char *title;
+			int32 token = B_NULL_TOKEN;
+			port_id	sendPort = -1;
+			port_id looperPort = -1;
+			char *title = NULL;
+			port_id replyport = -1;
 
-			msg->Read<BRect>(&frame);
-			msg->Read<int32>((int32*)&look);
-			msg->Read<int32>((int32*)&feel);
-			msg->Read<int32>((int32*)&flags);
-			msg->Read<int32>((int32*)&wkspaces);
-			msg->Read<int32>(&token);
-			msg->Read<port_id>(&sendPort);
-			msg->Read<port_id>(&looperPort);
-			msg->ReadString(&title);
-			msg->Read<port_id>(&replyport);
+			msg.Read<BRect>(&frame);
+			msg.Read<int32>((int32*)&look);
+			msg.Read<int32>((int32*)&feel);
+			msg.Read<int32>((int32*)&flags);
+			msg.Read<int32>((int32*)&wkspaces);
+			msg.Read<int32>(&token);
+			msg.Read<port_id>(&sendPort);
+			msg.Read<port_id>(&looperPort);
+			msg.ReadString(&title);
+
+			//TODO: deprecate - just use sendPort
+			msg.Read<port_id>(&replyport); 
 
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
@@ -546,7 +540,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
-			delete [] title;
+			if (title)
+				free(title);
 
 			break;
 		}
@@ -570,40 +565,39 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			//	3) int32 area pointer offset used to calculate fBasePtr
 			
 			// First, let's attempt to allocate the bitmap
-			port_id replyport;
+			port_id replyport = -1;
 			BRect r;
 			color_space cs;
 			int32 f,bpr;
 			screen_id s;
 
-			msg->Read<BRect>(&r);
-			msg->Read<color_space>(&cs);
-			msg->Read<int32>(&f);
-			msg->Read<int32>(&bpr);
-			msg->Read<screen_id>(&s);
-			msg->Read<int32>(&replyport);
+			msg.Read<BRect>(&r);
+			msg.Read<color_space>(&cs);
+			msg.Read<int32>(&f);
+			msg.Read<int32>(&bpr);
+			msg.Read<screen_id>(&s);
+			msg.Read<int32>(&replyport);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
 
 			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
 						fSignature.String(),r.left,r.top,r.right,r.bottom));
 
+			BPortLink replylink(replyport);
 			if(sbmp)
 			{
 				fBitmapList->AddItem(sbmp);
-				PortLink replylink(replyport);
-				replylink.SetOpCode(SERVER_TRUE);
+				replylink.StartMessage(SERVER_TRUE);
 				replylink.Attach<int32>(sbmp->Token());
 				replylink.Attach<int32>(sbmp->Area());
 				replylink.Attach<int32>(sbmp->AreaOffset());
-				replylink.Flush();
 			}
 			else
 			{
 				// alternatively, if something went wrong, we reply with SERVER_FALSE
-				int32 code=SERVER_FALSE;
-				write_port(replyport,SERVER_FALSE,&code,sizeof(int32));
+				replylink.StartMessage(SERVER_FALSE);
 			}
+			replylink.Flush();
 			
 			break;
 		}
@@ -618,24 +612,25 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		
 			// Reply Code: SERVER_TRUE if successful, 
 			//				SERVER_FALSE if the buffer was already deleted or was not found
-			port_id replyport;
+			port_id replyport = -1;
 			int32 bmp_id;
 			
-			msg->Read<int32>(&bmp_id);
-			msg->Read<int32>(&replyport);
+			msg.Read<int32>(&bmp_id);
+			msg.Read<int32>(&replyport);
 			
 			ServerBitmap *sbmp=FindBitmap(bmp_id);
+			BPortLink replylink(replyport);
 			if(sbmp)
 			{
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
 
 				fBitmapList->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
-				write_port(replyport,SERVER_TRUE,NULL,0);
+				replylink.StartMessage(SERVER_TRUE);
 			}
 			else
-				write_port(replyport,SERVER_FALSE,NULL,0);
-			
+				replylink.StartMessage(SERVER_TRUE);
+			replylink.Flush();	
 			break;
 		}
 		case AS_CREATE_PICTURE:
@@ -677,9 +672,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			int32 workspace;
 			uint32 mode;
 			bool stick;
-			msg->Read<int32>(&workspace);
-			msg->Read<uint32>(&mode);
-			msg->Read<bool>(&stick);
+			msg.Read<int32>(&workspace);
+			msg.Read<uint32>(&mode);
+			msg.Read<bool>(&stick);
 
 			//TODO: Resolve			
 			//SetSpace(workspace,mode,ActiveScreen(),stick);
@@ -694,7 +689,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
-			msg->Read<int32>(&workspace);
+			msg.Read<int32>(&workspace);
 
 			//TODO: Resolve
 			//SetWorkspace(workspace);
@@ -729,9 +724,11 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Attached data
 			// 1) int32 port to reply to
 			int32 replyport;
-			msg->Read<int32>(&replyport);
+			msg.Read<int32>(&replyport);
 			
-			write_port(replyport,(fCursorHidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
+			BPortLink replylink(replyport);
+			replylink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
+			replylink.Flush();
 			break;
 		}
 		case AS_SET_CURSOR_DATA:
@@ -740,7 +737,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Attached data: 68 bytes of fAppCursor data
 			
 			int8 cdata[68];
-			msg->Read(cdata,68);
+			msg.Read(cdata,68);
 			
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
@@ -763,13 +760,13 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 2) int32 token ID of the cursor to set
 			// 3) port_id port to receive a reply. Only exists if the sync flag is true.
 			bool sync;
-			int32 ctoken;
-			port_id replyport;
+			int32 ctoken = B_NULL_TOKEN;
+			port_id replyport = -1;
 			
-			msg->Read<bool>(&sync);
-			msg->Read<int32>(&ctoken);
+			msg.Read<bool>(&sync);
+			msg.Read<int32>(&ctoken);
 			if(sync)
-				msg->Read<int32>(&replyport);
+				msg.Read<int32>(&replyport);
 			
 			cursormanager->SetCursor(ctoken);
 			
@@ -777,8 +774,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			{
 				// the application is expecting a reply, but plans to do literally nothing
 				// with the data, so we'll just reuse the cursor token variable
-				ctoken=AS_SET_CURSOR_BCURSOR;
-				write_port(replyport,ctoken, &ctoken, sizeof(int32));
+				BPortLink replylink(replyport);
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Flush();
 			}
 			break;
 		}
@@ -789,20 +787,21 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) 68 bytes of fAppCursor data
 			// 2) port_id reply port
 			
-			port_id replyport;
+			port_id replyport = -1;
 			int8 cdata[68];
 
-			msg->Read(cdata,68);
-			msg->Read<int32>(&replyport);
+			msg.Read(cdata,68);
+			msg.Read<int32>(&replyport);
 
 			fAppCursor=new ServerCursor(cdata);
 			fAppCursor->SetAppSignature(fSignature.String());
 			cursormanager->AddCursor(fAppCursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			PortLink link(replyport);
-			link.Attach<int32>(fAppCursor->ID());
-			link.Flush();
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<int32>(fAppCursor->ID());
+			replylink.Flush();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
@@ -810,8 +809,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			STRACE(("ServerApp %s: Delete BCursor\n",fSignature.String()));
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
-			int32 ctoken;
-			msg->Read<int32>(&ctoken);
+			int32 ctoken = B_NULL_TOKEN;
+			msg.Read<int32>(&ctoken);
 			
 			if(fAppCursor && fAppCursor->ID()==ctoken)
 				fAppCursor=NULL;
@@ -828,12 +827,12 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			scroll_bar_info sbi=desktop->ScrollBarInfo();
 
 			port_id replyport;
-			msg->Read<int32>(&replyport);
+			msg.Read<int32>(&replyport);
 			
-			PortLink link(replyport);
-
-			link.Attach<scroll_bar_info>(sbi);
-			link.Flush();
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<scroll_bar_info>(sbi);
+			replylink.Flush();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
@@ -842,7 +841,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
-			msg->Read<scroll_bar_info>(&sbi);
+			msg.Read<scroll_bar_info>(&sbi);
 
 			desktop->SetScrollBarInfo(sbi);
 			break;
@@ -854,23 +853,23 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) port_id reply port - synchronous message
 
 			port_id replyport;
-			msg->Read<int32>(&replyport);
+			msg.Read<int32>(&replyport);
 
-			PortLink link(replyport);
-
-			link.Attach<bool>(desktop->FFMouseInUse());
-			link.Flush();
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<bool>(desktop->FFMouseInUse());
+			replylink.Flush();
 			break;
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
 			STRACE(("ServerApp %s: Set Focus Follows Mouse in use\n",fSignature.String()));
-			// Attached Data:
+/*			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
-			msg->Read<scroll_bar_info>(&sbi);
+			msg.Read<scroll_bar_info>(&sbi);
 
-			desktop->SetScrollBarInfo(sbi);
+			desktop->SetScrollBarInfo(sbi);*/
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
@@ -879,7 +878,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
-			msg->Read<mode_mouse>(&mmode);
+			msg.Read<mode_mouse>(&mmode);
 
 			desktop->SetFFMouseMode(mmode);
 			break;
@@ -892,13 +891,13 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 
 			mode_mouse mmode=desktop->FFMouseMode();
 			
-			port_id replyport;
-			msg->Read<int32>(&replyport);
+			port_id replyport = -1;
+			msg.Read<int32>(&replyport);
 			
-			PortLink link(replyport);
-
-			link.Attach<mode_mouse>(mmode);
-			link.Flush();
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<mode_mouse>(mmode);
+			replylink.Flush();
 			break;
 		}
 		case AS_GET_UI_COLOR:
@@ -907,17 +906,17 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 
 			RGBColor color;
 			int32 whichcolor;
-			port_id replyport;
+			port_id replyport = -1;
 			
-			msg->Read<int32>(&whichcolor);
-			msg->Read<port_id>(&replyport);
+			msg.Read<int32>(&whichcolor);
+			msg.Read<port_id>(&replyport);
 			
 			gui_colorset.Lock();
 			color=gui_colorset.AttributeToColor(whichcolor);
 			gui_colorset.Unlock();
 			
-			PortLink replylink(replyport);
-			replylink.SetOpCode(SERVER_TRUE);
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<rgb_color>(color.GetColor32());
 			replylink.Flush();
 			break;
@@ -925,7 +924,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		default:
 		{
 			STRACE(("ServerApp %s received unhandled message code offset %s\n",fSignature.String(),
-				MsgCodeToBString(msg->Code()).String()));
+				MsgCodeToBString(code).String()));
 
 			break;
 		}
@@ -953,3 +952,4 @@ team_id ServerApp::ClientTeamID()
 {
 	return fClientTeamID;
 }
+

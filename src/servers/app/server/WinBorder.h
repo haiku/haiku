@@ -35,8 +35,22 @@
 class ServerWindow;
 class Decorator;
 class DisplayDriver;
-class PortMessage;
 class Desktop;
+
+class PointerEvent
+{
+	public:
+	int32 code;	//B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
+			//B_MOUSE_WHEEL_CHANGED
+	bigtime_t when;
+	BPoint where;
+	float wheel_delta_x;
+	float wheel_delta_y;
+	int32 modifiers;
+	int32 buttons;	//B_PRIMARY_MOUSE_BUTTON, B_SECONDARY_MOUSE_BUTTON
+			//B_TERTIARY_MOUSE_BUTTON
+	int32 clicks;
+};
 
 class WinBorder : public Layer
 {
@@ -52,13 +66,9 @@ public:
 
 	virtual	void RebuildFullRegion(void);
 
-	virtual bool IsHidden() const;
-	void ServerHide();
-	void ServerUnhide();
-
-	void MouseDown(PortMessage *msg, bool sendMessage);
-	void MouseMoved(PortMessage *msg);
-	void MouseUp(PortMessage *msg);
+	void MouseDown(PointerEvent& evt, bool sendMessage);
+	void MouseMoved(PointerEvent& evt);
+	void MouseUp(PointerEvent& evt);
 	
 	void UpdateColors(void);
 	void UpdateDecorator(void);
@@ -71,7 +81,7 @@ public:
 	void SetLevel();
 	void HighlightDecorator(const bool &active);
 	
-	bool HasPoint(const BPoint &pt) const;
+	bool HasPoint(BPoint pt) const;
 	
 	void AddToSubsetOf(WinBorder* main);
 	void RemoveFromSubsetOf(WinBorder* main);
@@ -93,7 +103,6 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
-	bool fServerHidden;
 	WinBorder *fMainWinBorder;
 	bool fIsMoving;
 	bool fIsResizing;

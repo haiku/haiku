@@ -44,7 +44,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 
 	fBoundsLeftTop.Set( 0.0f, 0.0f );
 
-	fName			= new BString(name);
+	fName			= new BString(name ? name : B_EMPTY_STRING);
 	fLayerData		= new LayerData();
 
 	// driver init
@@ -65,7 +65,6 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fFlags			= flags;
 	fAdFlags		= 0;
 	fClassID		= AS_LAYER_CLASS;
-	fFrameAction	= B_LAYER_NONE;
 	fResizeMode		= resize;
 	fHidden			= false;
 	
@@ -446,15 +445,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	int redraw = false;
 	if (startFrom == NULL)
 		redraw = true;
-/*
-srand(real_time_clock_usecs());
-RGBColor c(rand()/256,34,56);
-BRegion	reg1 = reg;
-fDriver->ConstrainClippingRegion(&reg1);
-fDriver->FillRect(reg.Frame(), c);
-fDriver->ConstrainClippingRegion(NULL);
-snooze(1000000);
-*/
+
 	if (fVisible.CountRects() > 0)
 	{
 		// client side drawing. Send only one UPDATE message!
@@ -465,7 +456,7 @@ snooze(1000000);
 				// calculate the minimum region/rectangle to be updated with
 				// a single message to the client.
 				fUpdateReg = fFullVisible;
-				if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
+				if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
 				else { fUpdateReg.IntersectWith(&reg); }
 
 				if (fUpdateReg.CountRects() > 0)
@@ -479,7 +470,7 @@ snooze(1000000);
 
 			// calculate the update region, then...
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
 			else { fUpdateReg.IntersectWith(&reg); }
 
 			if (fUpdateReg.CountRects() > 0)
@@ -495,7 +486,7 @@ snooze(1000000);
 		else
 		{
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
 			else { fUpdateReg.IntersectWith(&reg); }
 
 			if (fUpdateReg.CountRects() > 0)
@@ -534,6 +525,7 @@ snooze(1000000);
 void Layer::Draw(const BRect &r)
 {
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
+
 #ifdef DEBUG_LAYER
 printf("Layer::Draw: ");
 r.PrintToStream();
@@ -1022,9 +1014,7 @@ void Layer::MoveBy(float x, float y)
 		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-
-	fFrameAction = B_LAYER_MOVE;
-
+	
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
@@ -1033,8 +1023,6 @@ void Layer::MoveBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
-	
-	fFrameAction = B_LAYER_NONE;
 	
 	STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
 }
@@ -1127,9 +1115,7 @@ void Layer::ResizeBy(float x, float y)
 		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-
-	fFrameAction = B_LAYER_RESIZE;
-
+	
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame());
 	rect.right += x;
@@ -1141,9 +1127,7 @@ void Layer::ResizeBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
-
-	fFrameAction = B_LAYER_NONE;
-
+	
 	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
@@ -1174,7 +1158,7 @@ void Layer::PrintToStream(void)
 	
 	printf("Frame: (%f, %f, %f, %f)", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
 	printf("Token: %ld\n",fViewToken);
-	printf("Hidden - direct: %s\n", IsHidden()?"true":"false");
+	printf("Hidden - direct: %s\n", fHidden?"true":"false");
 	printf("Hidden - indirect: %s\n", IsHidden()?"true":"false");
 	printf("ResizingMode: %lx\n", fResizeMode);
 	printf("Flags: %lx\n", fFlags);

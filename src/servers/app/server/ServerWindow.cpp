@@ -124,6 +124,8 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 
 	if(string)
 		fTitle.SetTo(string);
+	else
+		fTitle.SetTo(B_EMPTY_STRING);
 		
 	fFrame = rect;
 	fFlags = wflags;
@@ -136,6 +138,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	fWorkspaces = index;
 	
 	fWinBorder = NULL;
+	cl = NULL;	//current layer
 	
 	// fClientWinPort is the port to which the app awaits messages from the server
 	fClientWinPort = winport;
@@ -143,24 +146,12 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	// fMessagePort is the port to which the app sends messages for the server
 	fMessagePort = create_port(30,fTitle.String());
 
-	fSession = new BSession(fMessagePort, fClientWinPort);
+	fSession = new BPortLink(fClientWinPort, fMessagePort);
 	
 	// Send a reply to our window - it is expecting fMessagePort port.
-	// Temporarily use winlink to save time and memory
-	PortLink winLink(replyport);
-	winLink.SetOpCode(AS_CREATE_WINDOW);
-	winLink.Attach<port_id>(fMessagePort);
-	winLink.Flush();
-	
-	// check the next 2 messages to make sure we receive top_view's attributes.
-	int32 vCode;
-	fSession->ReadInt32(&vCode);
-	if(vCode != AS_LAYER_CREATE_ROOT)
-		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received! - 1\n");
-
-	fSession->ReadInt32(&vCode);
-	if(vCode != AS_LAYER_CREATE)
-		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received! - 2\n");
+	fSession->StartMessage(SERVER_TRUE);
+	fSession->Attach<port_id>(fMessagePort);
+	fSession->Flush();
 
 	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
@@ -173,18 +164,6 @@ void ServerWindow::Init(void)
 	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, 0UL,
 			this, desktop->GetDisplayDriver());
 	fWinBorder->RebuildFullRegion();
-
-	// Start receiving top_view data -- pass NULL as the parent view.
-	// This should be the *only* place where this happens.
-	fWinBorder->fTopLayer = CreateLayerTree(NULL);
-	fWinBorder->fTopLayer->SetAsTopLayer(true);
-	cl = fWinBorder->fTopLayer;
-
-	// connect decorator and top layer.
-	fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
-
-	// NOTE: this MUST be before the monitor thread is spawned!
-	desktop->AddWinBorder(fWinBorder);
 
 	// Spawn our message-monitoring thread
 	fMonitorThreadID = spawn_thread(MonitorWin, fTitle.String(), B_NORMAL_PRIORITY, this);
@@ -283,13 +262,17 @@ void ServerWindow::Show(void)
 					WinBorder		*previousFocus;
 					BRegion			invalidRegion;
 					Workspace		*ws;
-// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
+					
+					// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
+					
 					ws				= rl->WorkspaceAt(i+1);
 					ws->BringToFrontANormalWindow(fWinBorder);
 					ws->SearchAndSetNewFront(fWinBorder);
 					previousFocus	= ws->FocusLayer();
 					ws->SearchAndSetNewFocus(fWinBorder);
-// TODO: only do this in for the active workspace!
+					
+					// TODO: only do this in for the active workspace!
+					
 					// first redraw previous window's decorator. It has lost focus state.
 					if (previousFocus)
 						if (previousFocus->fDecorator)
@@ -358,7 +341,7 @@ void ServerWindow::Hide(void)
 				if (ws->FocusLayer() == fWinBorder)
 					ws->SearchAndSetNewFocus(fWinBorder);
 				else{
-// TODO: RootLayer class should take care of this. (or Desktop)
+					// TODO: RootLayer class should take care of this. (or Desktop)
 //					ws->Invalidate();
 				}
 			}
@@ -531,13 +514,12 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 	// NOTE: no need to check for a lock. This is a private method.
 	uint16 mask;
 
-	fSession->ReadUInt16(&mask);
+	fSession->Read<uint16>(&mask);
 			
 	if (mask & B_FONT_FAMILY_AND_STYLE)
 	{
 		uint32		fontID;
-		fSession->ReadInt32((int32*)&fontID);
-	
+		fSession->Read<int32>((int32*)&fontID);
 		// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
 		//   in ServerFont class. DW, could you add one?
 		//layer->fLayerData->font->
@@ -546,49 +528,49 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 	if (mask & B_FONT_SIZE)
 	{
 		float size;
-		fSession->ReadFloat(&size);
+		fSession->Read<float>(&size);
 		layer->fLayerData->font.SetSize(size);
 	}
 	
 	if (mask & B_FONT_SHEAR)
 	{
 		float shear;
-		fSession->ReadFloat(&shear);
+		fSession->Read<float>(&shear);
 		layer->fLayerData->font.SetShear(shear);
 	}
 
 	if (mask & B_FONT_ROTATION)
 	{
 		float rotation;
-		fSession->ReadFloat(&rotation);
+		fSession->Read<float>(&rotation);
 		layer->fLayerData->font.SetRotation(rotation);
 	}
 
 	if (mask & B_FONT_SPACING)
 	{
 		uint8 spacing;
-		fSession->ReadUInt8(&spacing);
+		fSession->Read<uint8>(&spacing);
 		layer->fLayerData->font.SetSpacing(spacing);
 	}
 
 	if (mask & B_FONT_ENCODING)
 	{
 		uint8 encoding;
-		fSession->ReadUInt8((uint8*)&encoding);
+		fSession->Read<uint8>((uint8*)&encoding);
 		layer->fLayerData->font.SetEncoding(encoding);
 	}
 
 	if (mask & B_FONT_FACE)
 	{
 		uint16 face;
-		fSession->ReadUInt16(&face);
+		fSession->Read<uint16>(&face);
 		layer->fLayerData->font.SetFace(face);
 	}
 
 	if (mask & B_FONT_FLAGS)
 	{
 		uint32 flags;
-		fSession->ReadUInt32(&flags);
+		fSession->Read<uint32>(&flags);
 		layer->fLayerData->font.SetFlags(flags);
 	}
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",
@@ -599,25 +581,25 @@ void ServerWindow::SetLayerState(Layer *layer)
 {
 	// NOTE: no need to check for a lock. This is a private method.
 	rgb_color highColor, lowColor, viewColor;
-	pattern	patt;
+	pattern patt;
 	int32 clipRegRects;
 
-	fSession->ReadPoint(		&(layer->fLayerData->penlocation));
-	fSession->ReadFloat(		&(layer->fLayerData->pensize));
-	fSession->ReadData(			&highColor, sizeof(rgb_color));
-	fSession->ReadData(			&lowColor, sizeof(rgb_color));
-	fSession->ReadData(			&viewColor, sizeof(rgb_color));
-	fSession->ReadData(			&patt, sizeof(pattern));
-	fSession->ReadInt8((int8*)	&(layer->fLayerData->draw_mode));
-	fSession->ReadPoint(		&(layer->fLayerData->coordOrigin));
-	fSession->ReadInt8((int8*)	&(layer->fLayerData->lineJoin));
-	fSession->ReadInt8((int8*)	&(layer->fLayerData->lineCap));
-	fSession->ReadFloat(		&(layer->fLayerData->miterLimit));
-	fSession->ReadInt8((int8*)	&(layer->fLayerData->alphaSrcMode));
-	fSession->ReadInt8((int8*)	&(layer->fLayerData->alphaFncMode));
-	fSession->ReadFloat(		&(layer->fLayerData->scale));
-	fSession->ReadBool(			&(layer->fLayerData->fontAliasing));
-	fSession->ReadInt32(		&clipRegRects);
+	fSession->Read<BPoint>(		&(layer->fLayerData->penlocation));
+	fSession->Read<float>(		&(layer->fLayerData->pensize));
+	fSession->Read(			&highColor, sizeof(rgb_color));
+	fSession->Read(			&lowColor, sizeof(rgb_color));
+	fSession->Read(			&viewColor, sizeof(rgb_color));
+	fSession->Read(			&patt, sizeof(pattern));
+	fSession->Read<int8>((int8*)	&(layer->fLayerData->draw_mode));
+	fSession->Read<BPoint>(		&(layer->fLayerData->coordOrigin));
+	fSession->Read<int8>((int8*)	&(layer->fLayerData->lineJoin));
+	fSession->Read<int8>((int8*)	&(layer->fLayerData->lineCap));
+	fSession->Read<float>(		&(layer->fLayerData->miterLimit));
+	fSession->Read<int8>((int8*)	&(layer->fLayerData->alphaSrcMode));
+	fSession->Read<int8>((int8*)	&(layer->fLayerData->alphaFncMode));
+	fSession->Read<float>(		&(layer->fLayerData->scale));
+	fSession->Read<bool>(			&(layer->fLayerData->fontAliasing));
+	fSession->Read<int32>(		&clipRegRects);
 
 	layer->fLayerData->patt.Set(*((uint64*)&patt));
 	layer->fLayerData->highcolor.SetColor(highColor);
@@ -635,7 +617,7 @@ void ServerWindow::SetLayerState(Layer *layer)
 				
 		for(int32 i = 0; i < clipRegRects; i++)
 		{
-			fSession->ReadRect(&rect);
+			fSession->Read<BRect>(&rect);
 			layer->fLayerData->clipReg->Include(rect);
 		}
 	}
@@ -662,61 +644,43 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	uint32 flags;
 	bool hidden;
 	int32 childCount;
-	char *name;
+	char *name = NULL;
 		
-	fSession->ReadInt32(&token);
-	name = fSession->ReadString();
-	fSession->ReadRect(&frame);
-	fSession->ReadUInt32(&resizeMask);
-	fSession->ReadUInt32(&flags);
-	fSession->ReadBool(&hidden);
-	fSession->ReadInt32(&childCount);
+	fSession->Read<int32>(&token);
+	fSession->ReadString(&name);
+	fSession->Read<BRect>(&frame);
+	fSession->Read<uint32>(&resizeMask);
+	fSession->Read<uint32>(&flags);
+	fSession->Read<bool>(&hidden);
+	fSession->Read<int32>(&childCount);
 			
 	Layer *newLayer;
-	newLayer = new Layer(frame.OffsetToCopy(0.0, 0.0), name, token, resizeMask, 
+	newLayer = new Layer(frame, name, token, resizeMask, 
 			flags, desktop->GetDisplayDriver());
-	delete name;
+	if (name)
+		free(name);
 
 	// there is no way of setting this, other than manually :-)
 	newLayer->fHidden = hidden;
 
-	int32 dummyMsg;
-			
-	// next comes BView's font state
-	fSession->ReadInt32(&dummyMsg);
-	if (dummyMsg == AS_LAYER_SET_FONT_STATE)
-		SetLayerFontState(newLayer);
-	else
-		debugger("ServerWindow(%s) - AS_LAYER_SET_FONT_STATE Expected!\n");
-
-	// lastly, the BView's graphic state
-	fSession->ReadInt32(&dummyMsg);
-	if (dummyMsg == AS_LAYER_SET_STATE)
-		SetLayerState(newLayer);
-	else
-		debugger("ServerWindow(%s) - AS_LAYER_SET_STATE Expected!\n");
-
 	// add the new Layer to the tree structure.
 	if(localRoot)
 		localRoot->AddChild(newLayer, NULL);
-			
-	// attach newLayer's children...
-	for(int i = 0; i < childCount; i++)
-	{
-		fSession->ReadInt32(&dummyMsg);
-		if (dummyMsg == AS_LAYER_CREATE)
-			CreateLayerTree(newLayer);
-		else
-			debugger("ServerWindow(%s) - AS_LAYER_CREATE Expected!\n");
-	}
-	STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), 
+
+	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_CREATE: Parent: %s, Child: %s\n", fTitle.String(), 
 			localRoot? localRoot->fName->String(): "NULL", newLayer->fName->String()));
-	
+
 	return newLayer;
 }
 //------------------------------------------------------------------------------
 void ServerWindow::DispatchMessage(int32 code)
 {
+	if (cl == NULL && code != AS_LAYER_CREATE_ROOT)
+	{
+		printf("ServerWindow %s received unexpected code - message offset %lx before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
+		return;
+	}
+
 	switch(code)
 	{
 		//--------- BView Messages -----------------
@@ -725,8 +689,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32		bitmapToken;
 			BPoint 		point;
 			
-			fSession->ReadInt32(&bitmapToken);
-			fSession->ReadPoint(&point);
+			fSession->Read<int32>(&bitmapToken);
+			fSession->Read<BPoint>(&point);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -750,8 +714,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32		bitmapToken;
 			BPoint 		point;
 			
-			fSession->ReadInt32(&bitmapToken);
-			fSession->ReadPoint(&point);
+			fSession->Read<int32>(&bitmapToken);
+			fSession->Read<BPoint>(&point);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -773,9 +737,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
-			fSession->ReadInt32(&bitmapToken);
-			fSession->ReadRect(&dstRect);
-			fSession->ReadRect(&srcRect);
+			fSession->Read<int32>(&bitmapToken);
+			fSession->Read<BRect>(&dstRect);
+			fSession->Read<BRect>(&srcRect);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -797,9 +761,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
-			fSession->ReadInt32(&bitmapToken);
-			fSession->ReadRect(&dstRect);
-			fSession->ReadRect(&srcRect);
+			fSession->Read<int32>(&bitmapToken);
+			fSession->Read<BRect>(&dstRect);
+			fSession->Read<BRect>(&srcRect);
 			
 			ServerBitmap *sbmp = fServerApp->FindBitmap(bitmapToken);
 			if(sbmp)
@@ -819,20 +783,42 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 token;
 			
-			fSession->ReadInt32(&token);
+			fSession->Read<int32>(&token);
 			
 			Layer *current = FindLayer(fWinBorder->fTopLayer, token);
-			
+
 			if (current)
 				cl=current;
 			else // hope this NEVER happens! :-)
 				debugger("Server PANIC: window cannot find Layer with ID\n");
 			break;
 		}
+
+		case AS_LAYER_CREATE_ROOT:
+		{
+			// Start receiving top_view data -- pass NULL as the parent view.
+			// This should be the *only* place where this happens.
+			if (cl != NULL)
+				break;
+			
+			fWinBorder->fTopLayer = CreateLayerTree(NULL);
+			fWinBorder->fTopLayer->SetAsTopLayer(true);
+			cl = fWinBorder->fTopLayer;
+
+			// connect decorator and top layer.
+			fWinBorder->AddChild(fWinBorder->fTopLayer, NULL);
+			desktop->AddWinBorder(fWinBorder);
+
+			break;
+		}
+
 		case AS_LAYER_CREATE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			Layer		*newLayer;
+			
+			if (cl == NULL)
+				break;
 
 			newLayer	= CreateLayerTree(NULL);
 			cl->AddChild(newLayer, this);
@@ -898,46 +884,49 @@ void ServerWindow::DispatchMessage(int32 code)
 			vc			= ld->viewcolor.GetColor32();
 			patt		= ld->patt.GetInt64();
 			
-			// TODO: DW implement such a method in ServerFont class
-			// fSession->WriteUInt32(ld->font.GetFamAndStyle());
-			fSession->WriteUInt32(0UL);
-			fSession->WriteFloat(ld->font.Size());
-			fSession->WriteFloat(ld->font.Shear());
-			fSession->WriteFloat(ld->font.Rotation());
-			fSession->WriteUInt8(ld->font.Spacing());
-			fSession->WriteUInt8(ld->font.Encoding());
-			fSession->WriteUInt16(ld->font.Face());
-			fSession->WriteUInt32(ld->font.Flags());
+			// TODO: DW implement such a method in ServerFont class!
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<uint32>(0UL /*uint32 ld->font.GetFamAndStyle()*/);
+			fSession->Attach<float>(ld->font.Size());
+			fSession->Attach<float>(ld->font.Shear());
+			fSession->Attach<float>(ld->font.Rotation());
+			fSession->Attach<uint8>(ld->font.Spacing());
+			fSession->Attach<uint8>(ld->font.Encoding());
+			fSession->Attach<uint16>(ld->font.Face());
+			fSession->Attach<uint32>(ld->font.Flags());
 			
-			fSession->WritePoint(ld->penlocation);
-			fSession->WriteFloat(ld->pensize);
-			fSession->WriteData(&hc, sizeof(rgb_color));
-			fSession->WriteData(&lc, sizeof(rgb_color));
-			fSession->WriteData(&vc, sizeof(rgb_color));
-			fSession->WriteData(&patt,sizeof(pattern));
-			fSession->WritePoint(ld->coordOrigin);
-			fSession->WriteUInt8((uint8)(ld->draw_mode));
-			fSession->WriteUInt8((uint8)(ld->lineCap));
-			fSession->WriteUInt8((uint8)(ld->lineJoin));
-			fSession->WriteFloat(ld->miterLimit);
-			fSession->WriteUInt8((uint8)(ld->alphaSrcMode));
-			fSession->WriteUInt8((uint8)(ld->alphaFncMode));
-			fSession->WriteFloat(ld->scale);
-			fSession->WriteFloat(ld->fontAliasing);
+			fSession->Attach<BPoint>(ld->penlocation);
+			fSession->Attach<float>(ld->pensize);
+			fSession->Attach(&hc, sizeof(rgb_color));
+			fSession->Attach(&lc, sizeof(rgb_color));
+			fSession->Attach(&vc, sizeof(rgb_color));
+			
+			// TODO: fix this to use the templatized version
+			fSession->Attach(&patt,sizeof(pattern));
+			fSession->Attach<BPoint>(ld->coordOrigin);
+			fSession->Attach<uint8>((uint8)(ld->draw_mode));
+			fSession->Attach<uint8>((uint8)(ld->lineCap));
+			fSession->Attach<uint8>((uint8)(ld->lineJoin));
+			fSession->Attach<float>(ld->miterLimit);
+			fSession->Attach<uint8>((uint8)(ld->alphaSrcMode));
+			fSession->Attach<uint8>((uint8)(ld->alphaFncMode));
+			fSession->Attach<float>(ld->scale);
+			fSession->Attach<float>(ld->fontAliasing);
 			
 			int32 noOfRects = 0;
 			if (ld->clipReg)
 				noOfRects = ld->clipReg->CountRects();
 			
-			fSession->WriteInt32(noOfRects);
+			fSession->Attach<int32>(noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
-				fSession->WriteRect(ld->clipReg->RectAt(i));
+				fSession->Attach<BRect>(ld->clipReg->RectAt(i));
 			
-			fSession->WriteFloat(cl->fFrame.left);
-			fSession->WriteFloat(cl->fFrame.top);
-			fSession->WriteRect(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
-			fSession->Sync();
+			fSession->Attach<float>(cl->fFrame.left);
+			fSession->Attach<float>(cl->fFrame.top);
+			fSession->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fSession->Flush();
+
 			break;
 		}
 		case AS_LAYER_MOVETO:
@@ -945,8 +934,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float x, y;
 			
-			fSession->ReadFloat(&x);
-			fSession->ReadFloat(&y);
+			fSession->Read<float>(&x);
+			fSession->Read<float>(&y);
 			
 			cl->MoveBy(x, y);
 			
@@ -957,8 +946,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float newWidth, newHeight;
 			
-			fSession->ReadFloat(&newWidth);
-			fSession->ReadFloat(&newHeight);
+			fSession->Read<float>(&newWidth);
+			fSession->Read<float>(&newHeight);
 			
 			// TODO: check for minimum alowed. WinBorder should provide such
 			// a method, based on its decorator.
@@ -970,10 +959,12 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WriteFloat(cl->fFrame.left);
-			fSession->WriteFloat(cl->fFrame.top);
-			fSession->WriteRect(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
-			fSession->Sync();
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<float>(cl->fFrame.left);
+			fSession->Attach<float>(cl->fFrame.top);
+			fSession->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+			fSession->Flush();
+
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -981,8 +972,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float x, y;
 			
-			fSession->ReadFloat(&x);
-			fSession->ReadFloat(&y);
+			fSession->Read<float>(&x);
+			fSession->Read<float>(&y);
 			
 			cl->fLayerData->coordOrigin.Set(x, y);
 
@@ -991,15 +982,16 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_ORIGIN:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WritePoint(cl->fLayerData->coordOrigin);
-			fSession->Sync();
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<BPoint>(cl->fLayerData->coordOrigin);
+			fSession->Flush();
 
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->ReadUInt32(&(cl->fResizeMode));
+			fSession->Read<uint32>(&(cl->fResizeMode));
 			
 			break;
 		}
@@ -1008,7 +1000,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int32 token;
 
-			fSession->ReadInt32(&token);
+			fSession->Read<int32>(&token);
 			
 			cursormanager->SetCursor(token);
 
@@ -1016,7 +1008,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			fSession->ReadUInt32(&(cl->fFlags));
+			fSession->Read<uint32>(&(cl->fFlags));
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			break;
@@ -1043,9 +1035,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			// it was called. e.g.: different lineCap or lineJoin. Strange results
 			// would appear.
 
-			fSession->ReadInt8(&lineCap);
-			fSession->ReadInt8(&lineJoin);
-			fSession->ReadFloat(&(cl->fLayerData->miterLimit));
+			fSession->Read<int8>(&lineCap);
+			fSession->Read<int8>(&lineJoin);
+			fSession->Read<float>(&(cl->fLayerData->miterLimit));
 			
 			cl->fLayerData->lineCap	= (cap_mode)lineCap;
 			cl->fLayerData->lineJoin = (join_mode)lineJoin;
@@ -1055,10 +1047,11 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_LINE_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WriteInt8((int8)(cl->fLayerData->lineCap));
-			fSession->WriteInt8((int8)(cl->fLayerData->lineJoin));
-			fSession->WriteFloat(cl->fLayerData->miterLimit);
-			fSession->Sync();
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<int8>((int8)(cl->fLayerData->lineCap));
+			fSession->Attach<int8>((int8)(cl->fLayerData->lineJoin));
+			fSession->Attach<float>(cl->fLayerData->miterLimit);
+			fSession->Flush();
 		
 			break;
 		}
@@ -1092,9 +1085,8 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
-			fSession->ReadFloat(&(cl->fLayerData->scale));
-			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
+			fSession->Read<float>(&(cl->fLayerData->scale));
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
@@ -1107,9 +1099,10 @@ void ServerWindow::DispatchMessage(int32 code)
 			while((ld = ld->prevState))
 				scale		*= ld->scale;
 			
-			fSession->WriteFloat(scale);
-			fSession->Sync();
-
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<float>(scale);
+			fSession->Flush();
+		
 			break;
 		}
 		case AS_LAYER_SET_PEN_LOC:
@@ -1117,34 +1110,36 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float		x, y;
 			
-			fSession->ReadFloat(&x);
-			fSession->ReadFloat(&y);
-			
+			fSession->Read<float>(&x);
+			fSession->Read<float>(&y);
+
 			cl->fLayerData->penlocation.Set(x, y);
-			
+
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WritePoint(cl->fLayerData->penlocation);
-
-			fSession->Sync();
-
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<BPoint>(cl->fLayerData->penlocation);
+			fSession->Flush();
+		
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->ReadFloat(&(cl->fLayerData->pensize));
-			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			fSession->Read<float>(&(cl->fLayerData->pensize));
+		
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WriteFloat(cl->fLayerData->pensize);
-			fSession->Sync();
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<float>(cl->fLayerData->pensize);
+			fSession->Flush();
+		
 			break;
 		}
 		case AS_LAYER_SET_HIGH_COLOR:
@@ -1152,10 +1147,10 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->ReadData(&c, sizeof(rgb_color));
+			fSession->Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->highcolor.SetColor(c);
-			
+
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
@@ -1163,7 +1158,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->ReadData(&c, sizeof(rgb_color));
+			fSession->Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->lowcolor.SetColor(c);
 			
@@ -1174,7 +1169,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
-			fSession->ReadData(&c, sizeof(rgb_color));
+			fSession->Read(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->viewcolor.SetColor(c);
 			
@@ -1191,10 +1186,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			lowColor = cl->fLayerData->lowcolor.GetColor32();
 			viewColor = cl->fLayerData->viewcolor.GetColor32();
 			
-			fSession->WriteData(&highColor, sizeof(rgb_color));
-			fSession->WriteData(&lowColor, sizeof(rgb_color));
-			fSession->WriteData(&viewColor, sizeof(rgb_color));
-			fSession->Sync();
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach(&highColor, sizeof(rgb_color));
+			fSession->Attach(&lowColor, sizeof(rgb_color));
+			fSession->Attach(&viewColor, sizeof(rgb_color));
+			fSession->Flush();
 
 			break;
 		}
@@ -1203,21 +1199,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 srcAlpha, alphaFunc;
 			
-			fSession->ReadInt8(&srcAlpha);
-			fSession->ReadInt8(&alphaFunc);
+			fSession->Read<int8>(&srcAlpha);
+			fSession->Read<int8>(&alphaFunc);
 			
 			cl->fLayerData->alphaSrcMode = (source_alpha)srcAlpha;
 			cl->fLayerData->alphaFncMode = (alpha_function)alphaFunc;
-			
+
 			break;
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WriteInt8((int8)(cl->fLayerData->alphaSrcMode));
-			fSession->WriteInt8((int8)(cl->fLayerData->alphaFncMode));
-
-			fSession->Sync();
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<int8>((int8)(cl->fLayerData->alphaSrcMode));
+			fSession->Attach<int8>((int8)(cl->fLayerData->alphaFncMode));
+			fSession->Flush();
 
 			break;
 		}
@@ -1226,7 +1222,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 drawingMode;
 			
-			fSession->ReadInt8(&drawingMode);
+			fSession->Read<int8>(&drawingMode);
 			
 			cl->fLayerData->draw_mode = (drawing_mode)drawingMode;
 			
@@ -1235,27 +1231,29 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_GET_DRAW_MODE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->WriteInt8((int8)(cl->fLayerData->draw_mode));
-			fSession->Sync();
-
+			fSession->StartMessage(SERVER_TRUE);
+			fSession->Attach<int8>((int8)(cl->fLayerData->draw_mode));
+			fSession->Flush();
+		
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			fSession->ReadBool(&(cl->fLayerData->fontAliasing));
+			fSession->Read<bool>(&(cl->fLayerData->fontAliasing));
 			
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			
 			// TODO: watch out for the coordinate system
 			int32 pictureToken;
 			BPoint where;
 			
-			fSession->ReadInt32(&pictureToken);
-			fSession->ReadPoint(&where);
+			fSession->Read<int32>(&pictureToken);
+			fSession->Read<BPoint>(&where);
 			
 			
 			BRegion reg;
@@ -1324,12 +1322,13 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			
 			// TODO: watch out for the coordinate system
 			int32 pictureToken;
 			BPoint where;
 			
-			fSession->ReadInt32(&pictureToken);
-			fSession->ReadPoint(&where);
+			fSession->Read<int32>(&pictureToken);
+			fSession->Read<BPoint>(&where);
 			
 			ServerPicture *sp = NULL;
 			int32 i = 0;
@@ -1365,8 +1364,9 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (cl->IsHidden()){
-				fSession->WriteInt32(0L);
-				fSession->Sync();
+				fSession->StartMessage(SERVER_TRUE);
+				fSession->Attach<int32>(0L);
+				fSession->Flush();
 			}
 			else{
 				// TODO: watch out for the coordinate system
@@ -1387,10 +1387,11 @@ void ServerWindow::DispatchMessage(int32 code)
 				}
 			
 				noOfRects = reg.CountRects();
-				fSession->WriteInt32(noOfRects);
+				fSession->StartMessage(SERVER_TRUE);
+				fSession->Attach<int32>(noOfRects);
 
 				for(int i = 0; i < noOfRects; i++)
-					fSession->WriteRect(reg.RectAt(i));
+					fSession->Attach<BRect>(reg.RectAt(i));
 			}
 			break;
 		}
@@ -1406,11 +1407,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			else
 				cl->fLayerData->clipReg = new BRegion();
 			
-			fSession->ReadInt32(&noOfRects);
+			fSession->Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
 			{
-				fSession->ReadRect(&r);
+				fSession->Read<BRect>(&r);
 				cl->fLayerData->clipReg->Include(r);
 			}
 
@@ -1431,7 +1432,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: watch out for the coordinate system
 			BRect		invalRect;
 			
-			fSession->ReadRect(&invalRect);
+			fSession->Read<BRect>(&invalRect);
 			
 			cl->Invalidate(invalRect);
 			
@@ -1445,11 +1446,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 noOfRects;
 			BRect rect;
 			
-			fSession->ReadInt32(&noOfRects);
+			fSession->Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++)
 			{
-				fSession->ReadRect(&rect);
+				fSession->Read<BRect>(&rect);
 				invalReg.Include(rect);
 			}
 			
@@ -1527,21 +1528,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 mainToken;
 			team_id	teamID;
 			
-			fSession->ReadInt32(&mainToken);
-			fSession->ReadData(&teamID, sizeof(team_id));
+			fSession->Read<int32>(&mainToken);
+			fSession->Read(&teamID, sizeof(team_id));
 			
 			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
-				fSession->WriteInt32(SERVER_TRUE);
-				fSession->Sync();
+				fSession->StartMessage(SERVER_TRUE);
+				fSession->Flush();
 				
 				fWinBorder->AddToSubsetOf(wb);
 			}
 			else
 			{
-				fSession->WriteInt32(SERVER_FALSE);
-				fSession->Sync();
+				fSession->StartMessage(SERVER_FALSE);
+				fSession->Flush();
 			}
 			break;
 		}
@@ -1551,21 +1552,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32 mainToken;
 			team_id teamID;
 			
-			fSession->ReadInt32(&mainToken);
-			fSession->ReadData(&teamID, sizeof(team_id));
+			fSession->Read<int32>(&mainToken);
+			fSession->Read(&teamID, sizeof(team_id));
 			
 			wb = desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
 			if(wb)
 			{
-				fSession->WriteInt32(SERVER_TRUE);
-				fSession->Sync();
+				fSession->StartMessage(SERVER_TRUE);
+				fSession->Flush();
 				
 				fWinBorder->RemoveFromSubsetOf(wb);
 			}
 			else
 			{
-				fSession->WriteInt32(SERVER_FALSE);
-				fSession->Sync();
+				fSession->StartMessage(SERVER_FALSE);
+				fSession->Flush();
 			}
 			break;
 		}
@@ -1616,8 +1617,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			float xResizeBy;
 			float yResizeBy;
 			
-			fSession->ReadFloat(&xResizeBy);
-			fSession->ReadFloat(&yResizeBy);
+			fSession->Read<float>(&xResizeBy);
+			fSession->Read<float>(&yResizeBy);
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
 			
@@ -1628,8 +1629,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			float xMoveBy;
 			float yMoveBy;
 			
-			fSession->ReadFloat(&xMoveBy);
-			fSession->ReadFloat(&yMoveBy);
+			fSession->Read<float>(&xMoveBy);
+			fSession->Read<float>(&yMoveBy);
 
 			fWinBorder->MoveBy(xMoveBy, yMoveBy);
 
@@ -2216,14 +2217,18 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	BSession		*ses = win->fSession;
+	BPortLink	*ses = win->fSession;
 	bool			quitting = false;
 	int32			code;
+	status_t		err = B_OK;
 	
 	while(!quitting)
 	{
+		printf("info: ServerWindow::MonitorWin listening on port %ld.\n", win->fMessagePort);
 		code = AS_CLIENT_DEAD;
-		ses->ReadInt32(&code);
+		err = ses->GetNextReply(&code);
+		if (err < B_OK)
+			return err;
 
 		win->Lock();
 
@@ -2255,7 +2260,7 @@ int32 ServerWindow::MonitorWin(void *data)
 
 		win->Unlock();
 	}
-	return 0;
+	return err;
 }
 //------------------------------------------------------------------------------
 Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const

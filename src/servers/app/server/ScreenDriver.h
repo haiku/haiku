@@ -43,7 +43,7 @@
 #include "PatternHandler.h"
 
 class BBitmap;
-class PortLink;
+class BPortLink;
 class SDWindow;
 class LayerData;
 class ScreenDriver;
@@ -65,7 +65,7 @@ protected:
 	friend class ScreenDriver;
 	
 	bool is_connected;
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	BPoint mousepos;
 	uint32 buttons;
 	thread_id monitor_thread,copy_thread;
@@ -89,7 +89,7 @@ public:
 	void MessageReceived(BMessage *msg);
 		
 	BBitmap *viewbmp;
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	
 	int hide_cursor;
 	BBitmap *cursor;
@@ -192,7 +192,7 @@ protected:
 	BBitmap *framebuffer;
 	BView *drawview;
 	BRegion laregion;
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	
 	rgb_color highcolor,lowcolor;
 	bool is_initialized;

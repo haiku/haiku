@@ -26,14 +26,10 @@
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
 #include <Accelerant.h>
-#include <PortMessage.h>
 #include <Entry.h>
 #include <Path.h>
 #include <Directory.h>
-#include <PortMessage.h>
 #include <PortLink.h>
-
-#include <Session.h>
 
 #include <File.h>
 #include <Message.h>
@@ -53,7 +49,16 @@
 #include "Desktop.h"
 
 //#define DEBUG_KEYHANDLING
+//#define DEBUG_SERVER
+
 #ifdef DEBUG_KEYHANDLING
+#	include <stdio.h>
+#	define KBTRACE(x) printf x
+#else
+#	define KBTRACE(x) ;
+#endif
+
+#ifdef DEBUG_SERVER
 #	include <stdio.h>
 #	define STRACE(x) printf x
 #else
@@ -86,7 +91,7 @@ AppServer::AppServer(void)
 #endif
 {
 	fMousePort= create_port(200,SERVER_INPUT_PORT);
-	_fMessagePort= create_port(200,SERVER_PORT_NAME);
+	fMessagePort= create_port(200,SERVER_PORT_NAME);
 
 	fAppList= new BList(0);
 	fQuittingServer= false;
@@ -206,22 +211,23 @@ AppServer::~AppServer(void)
 int32 AppServer::PollerThread(void *data)
 {
 	// This thread handles nothing but input messages for mouse and keyboard
-	AppServer		*appserver=(AppServer*)data;
-	PortQueue		mousequeue(appserver->fMousePort);
-	PortMessage		*msg;
-
+	AppServer *appserver=(AppServer*)data;
+	BPortLink mousequeue(-1,appserver->fMousePort);
+	int32 code=0;
+	status_t err=B_OK;
+	
 	for(;;)
 	{
-		if(!mousequeue.MessagesWaiting())
-			mousequeue.GetMessagesFromPort(true);
-		else
-			mousequeue.GetMessagesFromPort(false);
-
-		msg= mousequeue.GetMessageFromQueue();
-		if(!msg)
+		STRACE(("info: AppServer::PollerThread listening on port %ld.\n", appserver->fMousePort));
+		err=mousequeue.GetNextReply(&code);
+		
+		if(err<B_OK)
+		{
+			STRACE(("PollerThread:mousequeue.GetNextReply failed\n"));
 			continue;
-
-		switch(msg->Code())
+		}
+		
+		switch(code)
 		{
 			// We don't need to do anything with these two, so just pass them
 			// onto the active application. Eventually, we will end up passing 
@@ -230,7 +236,7 @@ int32 AppServer::PollerThread(void *data)
 			case B_MOUSE_UP:
 			case B_MOUSE_WHEEL_CHANGED:
 			case B_MOUSE_MOVED:
-				desktop->MouseEventHandler(msg);
+				desktop->MouseEventHandler(code,mousequeue);
 				break;
 
 			case B_KEY_DOWN:
@@ -238,20 +244,18 @@ int32 AppServer::PollerThread(void *data)
 			case B_UNMAPPED_KEY_DOWN:
 			case B_UNMAPPED_KEY_UP:
 			case B_MODIFIERS_CHANGED:
-				desktop->KeyboardEventHandler(msg);
+				desktop->KeyboardEventHandler(code,mousequeue);
 				break;
 
 			default:
-				printf("Server::Poller received unexpected code %lx\n",msg->Code());
+				STRACE(("AppServer::Poller received unexpected code %lx\n",code));
 				break;
 		}
-		
-		delete msg;
 		
 		if(appserver->fExitPoller)
 			break;
 	}
-	return 0;
+	return err;
 }
 
 /*!
@@ -304,41 +308,45 @@ thread_id AppServer::Run(void)
 //! Main message-monitoring loop for the regular message port - no input messages!
 void AppServer::MainLoop(void)
 {
-	PortMessage pmsg;
+	BPortLink pmsg(-1,fMessagePort);
+	int32 code=0;
+	status_t err=B_OK;
 	
 	while(1)
 	{
-		if(pmsg.ReadFromPort(_fMessagePort)== B_OK)
-		{
-			if(pmsg.Protocol()== B_QUIT_REQUESTED)
-				pmsg.SetCode(B_QUIT_REQUESTED);
-			
-			switch(pmsg.Code())
-			{
-				case B_QUIT_REQUESTED:
-				case AS_CREATE_APP:
-				case AS_DELETE_APP:
-				case AS_GET_SCREEN_MODE:
-				case AS_UPDATED_CLIENT_FONTLIST:
-				case AS_QUERY_FONTS_CHANGED:
-				case AS_SET_UI_COLORS:
-				case AS_GET_UI_COLOR:
-				case AS_SET_DECORATOR:
-				case AS_GET_DECORATOR:
-				case AS_R5_SET_DECORATOR:
-					DispatchMessage(&pmsg);
-					break;
-				default:
-				{
-					printf("Server::MainLoop received unexpected code %ld(offset %ld)\n",
-							pmsg.Code(),pmsg.Code()-SERVER_TRUE);
-					break;
-				}
-			}
+		STRACE(("info: AppServer::MainLoop listening on port %ld.\n", fMessagePort));
+		err=pmsg.GetNextReply(&code);
 
+		if(err<B_OK)
+		{
+			STRACE(("MainLoop:pmsg.GetNextReply failed\n"));
+			continue;
+		}
+		
+		switch(code)
+		{
+			case B_QUIT_REQUESTED:
+			case AS_CREATE_APP:
+			case AS_DELETE_APP:
+			case AS_GET_SCREEN_MODE:
+			case AS_UPDATED_CLIENT_FONTLIST:
+			case AS_QUERY_FONTS_CHANGED:
+			case AS_SET_UI_COLORS:
+			case AS_GET_UI_COLOR:
+			case AS_SET_DECORATOR:
+			case AS_GET_DECORATOR:
+			case AS_R5_SET_DECORATOR:
+				DispatchMessage(code,pmsg);
+				break;
+			default:
+			{
+				STRACE(("Server::MainLoop received unexpected code %ld(offset %ld)\n",
+						code,code-SERVER_TRUE));
+				break;
+			}
 		}
 
-		if(pmsg.Code()==AS_DELETE_APP || (pmsg.Protocol()==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
+		if(code==AS_DELETE_APP || (code==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
 		{
 			if(fQuittingServer== true && fAppList->CountItems()== 0)
 				break;
@@ -384,13 +392,14 @@ bool AppServer::LoadDecorator(const char *path)
 		
 	// Get the instantiation function
 	stat= get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pcreatefunc);
-	if(stat != B_OK){
+	if(stat != B_OK)
+	{
 		unload_add_on(addon);
 		return false;
 	}
 	
-	BPath			temppath(path);
-	fDecoratorName= temppath.Leaf();
+	BPath temppath(path);
+	fDecoratorName=temppath.Leaf();
 	
 	acquire_sem(fDecoratorLock);
 	make_decorator=pcreatefunc;
@@ -436,12 +445,12 @@ void AppServer::InitDecorators(void)
 /*!
 	\brief Message handling function for all messages sent to the app_server
 	\param code ID of the message sent
-	\param buffer Attachement buffer for the message.
+	\param buffer Attachment buffer for the message.
 	
 */
-void AppServer::DispatchMessage(PortMessage *msg)
+void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 {
-	switch(msg->Code())
+	switch(code)
 	{
 		case AS_CREATE_APP:
 		{
@@ -456,45 +465,47 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// 5) port_id - port to reply to
 
 			// Find the necessary data
-			team_id		clientTeamID;
-			port_id		clientLooperPort;
-			port_id		reply_port;
-			port_id		app_port;
-			int32		htoken;
-			char*		app_signature;
+			team_id	clientTeamID=-1;
+			port_id	clientLooperPort=-1;
+			port_id reply_port=-1;		// TODO: deprecated
+			port_id app_port=-1;
+			int32 htoken=B_NULL_TOKEN;
+			char *app_signature=NULL;
 
-			msg->Read<port_id>(&app_port);
-			msg->Read<port_id>(&clientLooperPort);
-			msg->Read<team_id>(&clientTeamID);
-			msg->Read<int32>(&htoken);
-			msg->ReadString(&app_signature);
-			msg->Read<int32>(&reply_port);
+			msg.Read<port_id>(&app_port);
+			msg.Read<port_id>(&clientLooperPort);
+			msg.Read<team_id>(&clientTeamID);
+			msg.Read<int32>(&htoken);
+			msg.ReadString(&app_signature);
+			msg.Read<int32>(&reply_port);
 			
 			// Create the ServerApp subthread for this app
 			acquire_sem(fAppListLock);
 			
-			port_id		r= create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
-			if(r== B_NO_MORE_PORTS || r== B_BAD_VALUE)
+			port_id server_listen=create_port(DEFAULT_MONITOR_PORT_SIZE, app_signature);
+			if(server_listen<B_OK)
 			{
 				release_sem(fAppListLock);
 				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
-			ServerApp	*newapp;
-			newapp= new ServerApp(app_port, r, clientLooperPort, clientTeamID, htoken, app_signature);
+			ServerApp *newapp=NULL;
+			newapp= new ServerApp(app_port,server_listen, clientLooperPort, clientTeamID, 
+					htoken, app_signature);
 
-				// add the new ServerApp to the known list of ServerApps
+			// add the new ServerApp to the known list of ServerApps
 			fAppList->AddItem(newapp);
 			
 			release_sem(fAppListLock);
 
-			PortLink replylink(reply_port);
-			replylink.SetOpCode(AS_SET_SERVER_PORT);
+			BPortLink replylink(reply_port);
+			replylink.StartMessage(AS_SET_SERVER_PORT);
 			replylink.Attach<int32>(newapp->fMessagePort);
 			replylink.Flush();
 
-			// This is necessary because PortLink::ReadString allocates memory
-			delete app_signature;
+			// This is necessary because BPortLink::ReadString allocates memory
+			if(app_signature)
+				free(app_signature);
 
 			break;
 		}
@@ -506,12 +517,14 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// 1) thread_id - thread ID of the ServerApp to be deleted
 			
-			int32		i,
-						appnum= fAppList->CountItems();
-			ServerApp	*srvapp;
+			int32 	i=0,
+					appnum=fAppList->CountItems();
+			
+			ServerApp *srvapp=NULL;
+			thread_id srvapp_id=-1;
 
-			thread_id	srvapp_id;
-			msg->Read<thread_id>(&srvapp_id);
+			if(msg.Read<thread_id>(&srvapp_id)<B_OK)
+				break;
 
 			acquire_sem(fAppListLock);
 
@@ -523,7 +536,8 @@ void AppServer::DispatchMessage(PortMessage *msg)
 				if(srvapp != NULL && srvapp->fMonitorThreadID== srvapp_id)
 				{
 					srvapp=(ServerApp *)fAppList->RemoveItem(i);
-					if(srvapp){
+					if(srvapp)
+					{
 						status_t		temp;
 						wait_for_thread(srvapp_id, &temp);
 						delete srvapp;
@@ -557,12 +571,15 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			bool needs_update=fontserver->FontsNeedUpdated();
 			fontserver->Unlock();
 			
-			// Seeing how the client merely wants an answer, we'll skip the PortLink
+			// Seeing how the client merely wants an answer, we'll skip the BPortLink
 			// and all its overhead and just write the code to port.
 			port_id replyport;
-			msg->Read<port_id>(&replyport);
+			if (msg.Read<port_id>(&replyport) < B_OK)
+				break;
+			BPortLink replylink(replyport);
+			replylink.StartMessage(needs_update ? SERVER_TRUE : SERVER_FALSE);
+			replylink.Flush();
 			
-			write_port(replyport, (needs_update)?SERVER_TRUE:SERVER_FALSE, NULL,0);
 			break;
 		}
 		case AS_SET_UI_COLORS:
@@ -574,7 +591,7 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// 1) ColorSet new colors to use
 			
 			gui_colorset.Lock();
-			msg->Read<ColorSet>(&gui_colorset);
+			msg.Read<ColorSet>(&gui_colorset);
 			gui_colorset.Unlock();
 			Broadcast(AS_UPDATE_COLORS);
 			break;
@@ -587,8 +604,8 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// char * name of the decorator in the decorators path to use
 			
-			char *decname;
-			msg->ReadString(&decname);
+			char *decname=NULL;
+			msg.ReadString(&decname);
 			if(decname)
 			{
 				if(strcmp(decname,"Default")!=0)
@@ -605,7 +622,7 @@ void AppServer::DispatchMessage(PortMessage *msg)
 					Broadcast(AS_UPDATE_DECORATOR);
 				}
 			}
-			delete decname;
+			free(decname);
 			
 			break;
 		}
@@ -614,10 +631,12 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// 1) port_id reply port
 			
-			port_id replyport;
-			msg->Read<port_id>(&replyport);
-			PortLink replylink(replyport);
-			replylink.SetOpCode(AS_GET_DECORATOR);
+			port_id replyport=-1;
+			if(msg.Read<port_id>(&replyport)<B_OK)
+				return;
+			
+			BPortLink replylink(replyport);
+			replylink.StartMessage(AS_GET_DECORATOR);
 			replylink.AttachString(fDecoratorName.String());
 			replylink.Flush();
 			break;
@@ -630,8 +649,9 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// Attached Data:
 			// char * name of the decorator in the decorators path to use
 			
-			int32 decindex;
-			msg->Read<int32>(&decindex);
+			int32 decindex=0;
+			if(msg.Read<int32>(&decindex)<B_OK)
+				break;
 			
 			BString decpath;
 			decpath.SetTo(DECORATORS_DIR);
@@ -666,11 +686,12 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			display_mode dmode;
 			fDriver->GetMode(&dmode);
 			
-			port_id replyport;
-			msg->Read<port_id>(&replyport);
+			port_id replyport=-1;
+			if(msg.Read<port_id>(&replyport)<B_OK)
+				break;
 			
-			PortLink replylink(replyport);
-			replylink.SetOpCode(AS_GET_SCREEN_MODE);
+			BPortLink replylink(replyport);
+			replylink.StartMessage(AS_GET_SCREEN_MODE);
 			replylink.Attach<display_mode>(dmode);
 			replylink.Flush();
 			break;

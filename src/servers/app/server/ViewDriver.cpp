@@ -83,7 +83,7 @@ VDView::VDView(BRect bounds)
 
 	// This link for sending mouse messages to the OBAppServer.
 	// This is only to take the place of the Input Server. 
-	serverlink=new PortLink(find_port(SERVER_INPUT_PORT));
+	serverlink = new BPortLink(find_port(SERVER_INPUT_PORT));
 
 	// Create a cursor which isn't just a box
 	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);
@@ -159,7 +159,7 @@ void VDView::MouseDown(BPoint pt)
 
 	GetMouse(&p,&buttons);
 
-	serverlink->SetOpCode(B_MOUSE_DOWN);
+	serverlink->StartMessage(B_MOUSE_DOWN);
 	serverlink->Attach(&time, sizeof(int64));
 	serverlink->Attach(&pt.x,sizeof(float));
 	serverlink->Attach(&pt.y,sizeof(float));
@@ -182,7 +182,7 @@ void VDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 	uint32 buttons;
 	int64 time=(int64)real_time_clock();
 
-	serverlink->SetOpCode(B_MOUSE_MOVED);
+	serverlink->StartMessage(B_MOUSE_MOVED);
 	serverlink->Attach(&time,sizeof(int64));
 	serverlink->Attach(&pt.x,sizeof(float));
 	serverlink->Attach(&pt.y,sizeof(float));
@@ -209,7 +209,7 @@ void VDView::MouseUp(BPoint pt)
 
 	GetMouse(&p,&buttons);
 
-	serverlink->SetOpCode(B_MOUSE_UP);
+	serverlink->StartMessage(B_MOUSE_UP);
 	serverlink->Attach(&time, sizeof(int64));
 	serverlink->Attach(&pt.x,sizeof(float));
 	serverlink->Attach(&pt.y,sizeof(float));
@@ -229,7 +229,7 @@ void VDView::MessageReceived(BMessage *msg)
 			msg->FindFloat("be:wheel_delta_x",&x);
 			msg->FindFloat("be:wheel_delta_y",&y);
 			int64 time=real_time_clock();
-			serverlink->SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			serverlink->StartMessage(B_MOUSE_WHEEL_CHANGED);
 			serverlink->Attach(&time,sizeof(int64));
 			serverlink->Attach(x);
 			serverlink->Attach(y);
@@ -289,7 +289,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			msg->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
-			view->serverlink->SetOpCode(B_KEY_DOWN);
+			view->serverlink->StartMessage(B_KEY_DOWN);
 			view->serverlink->Attach(&systime,sizeof(bigtime_t));
 			view->serverlink->Attach(scancode);
 			view->serverlink->Attach(asciicode);
@@ -330,7 +330,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			msg->FindString("bytes",&string);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
-			view->serverlink->SetOpCode(B_KEY_UP);
+			view->serverlink->StartMessage(B_KEY_UP);
 			view->serverlink->Attach(&systime,sizeof(bigtime_t));
 			view->serverlink->Attach(scancode);
 			view->serverlink->Attach(asciicode);
@@ -358,7 +358,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			msg->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
-			view->serverlink->SetOpCode(B_UNMAPPED_KEY_DOWN);
+			view->serverlink->StartMessage(B_UNMAPPED_KEY_DOWN);
 			view->serverlink->Attach(&systime,sizeof(bigtime_t));
 			view->serverlink->Attach(scancode);
 			view->serverlink->Attach(modifiers);
@@ -382,7 +382,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			msg->FindInt32("modifiers",&modifiers);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
-			view->serverlink->SetOpCode(B_UNMAPPED_KEY_UP);
+			view->serverlink->StartMessage(B_UNMAPPED_KEY_UP);
 			view->serverlink->Attach(&systime,sizeof(bigtime_t));
 			view->serverlink->Attach(scancode);
 			view->serverlink->Attach(modifiers);
@@ -407,7 +407,7 @@ void VDWindow::MessageReceived(BMessage *msg)
 			msg->FindInt32("be:old_modifiers",&oldmodifiers);
 			for(int8 i=0;i<15;i++)
 				msg->FindInt8("states",i,&keyarray[i]);
-			view->serverlink->SetOpCode(B_MODIFIERS_CHANGED);
+			view->serverlink->StartMessage(B_MODIFIERS_CHANGED);
 			view->serverlink->Attach(&systime,sizeof(bigtime_t));
 			view->serverlink->Attach(scancode);
 			view->serverlink->Attach(modifiers);

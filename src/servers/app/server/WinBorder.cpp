@@ -30,7 +30,7 @@
 #include <Locker.h>
 #include <Debug.h>
 #include <TokenSpace.h>
-#include "PortMessage.h"
+#include "PortLink.h"
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"
 #include "Decorator.h"
@@ -90,7 +90,6 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
-	fServerHidden	= false;
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
 	fTopLayer		= NULL;
@@ -140,7 +139,7 @@ void WinBorder::RebuildFullRegion(void)
 		fDecorator->GetFootprint(&fFull);
 }
 
-void WinBorder::MouseDown(PortMessage *msg, bool sendMessage)
+void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 {
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseDown()\n");
@@ -150,34 +149,13 @@ void WinBorder::MouseDown(PortMessage *msg, bool sendMessage)
 	// user clicked on WinBorder's visible region, which is in fact decorator's.
 	// so, if true, we find out if the user clicked the decorator.
 
-	// Attached data:
-	// 1) int64 - time of mouse click
-	// 2) float - x coordinate of mouse click
-	// 3) float - y coordinate of mouse click
-	// 4) int32 - modifier keys down
-	// 5) int32 - buttons down
-	// 6) int32 - clicks
-
-	int64 time;
-	BPoint pt;
-	int32 modifierkeys;
-	int32 buttons;
-	int32 clicks;
-	
-	msg->Read<int64>(&time);
-	msg->Read<float>(&pt.x);
-	msg->Read<float>(&pt.y);
-	msg->Read<int32>(&modifierkeys);
-	msg->Read<int32>(&buttons);
-	msg->Read<int32>(&clicks);
-
-	Layer	*target = LayerAt(pt);
+	Layer	*target = LayerAt(evt.where);
 	if (target == this)
 	{
 		click_type action;
 
 		// find out where user clicked in Decorator
-		action = fDecorator->Clicked(pt, buttons, modifierkeys);
+		action = fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
 		switch(action)
 		{
 			case DEC_CLOSE:
@@ -236,42 +214,29 @@ void WinBorder::MouseDown(PortMessage *msg, bool sendMessage)
 	else if (sendMessage){
 		BMessage msg;
 		msg.what= B_MOUSE_DOWN;
-		msg.AddInt64("when", time);
-		msg.AddPoint("where", pt);
-		msg.AddInt32("modifiers", modifierkeys);
-		msg.AddInt32("buttons", buttons);
-		msg.AddInt32("clicks", clicks);
+		msg.AddInt64("when", evt.when);
+		msg.AddPoint("where", evt.where);
+		msg.AddInt32("modifiers", evt.modifiers);
+		msg.AddInt32("buttons", evt.buttons);
+		msg.AddInt32("clicks", evt.clicks);
 		
 		// TODO: figure out how to specify the target
 		// msg.AddInt32("token", token);
 		Window()->SendMessageToClient(&msg);
 	}
 	
-	// Just to clean up any mess we've made. :)
-	msg->Rewind();
-	
-	fLastMousePosition = pt;
+	fLastMousePosition = evt.where;
 }
 
-void WinBorder::MouseMoved(PortMessage *msg)
+void WinBorder::MouseMoved(PointerEvent& evt)
 {
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseMoved()\n");
 
-	BPoint pt;
-	int64 dummy;
-	int32 buttons;
-	
-	msg->Read<int64>(&dummy);
-	msg->Read<float>(&pt.x);
-	msg->Read<float>(&pt.y);
-	msg->Read<int32>(&buttons);
-	msg->Rewind();
-	
 	if (fIsMoving)
 	{
 		STRACE_CLICK(("===> Moving...\n"));
-		BPoint		offset = pt;
+		BPoint		offset = evt.where;
 		offset		-= fLastMousePosition;
 		MoveBy(offset.x, offset.y);
 	}
@@ -279,14 +244,14 @@ void WinBorder::MouseMoved(PortMessage *msg)
 	if (fIsResizing)
 	{
 		STRACE_CLICK(("===> Resizing...\n"));
-		BPoint		offset = pt;
+		BPoint		offset = evt.where;
 		offset		-= fLastMousePosition;
 		ResizeBy(offset.x, offset.y);
 	}
 	else
 	{
 		// Do a click test only if we have to, which would be now. :)
-		click_type location=fDecorator->Clicked(pt,buttons,fKeyModifiers);
+		click_type location=fDecorator->Clicked(evt.where, evt.buttons,fKeyModifiers);
 		
 		if (fIsZooming && location!=DEC_ZOOM)
 		{
@@ -306,10 +271,10 @@ void WinBorder::MouseMoved(PortMessage *msg)
 			fDecorator->DrawMinimize();
 		}
 	}
-	fLastMousePosition = pt;
+	fLastMousePosition = evt.where;
 }
 
-void WinBorder::MouseUp(PortMessage *msg)
+void WinBorder::MouseUp(PointerEvent& evt)
 {
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseUp()\n");
@@ -411,22 +376,7 @@ void WinBorder::ResizeBy(float x, float y)
 	Layer::ResizeBy(x,y);
 }
 
-bool WinBorder::IsHidden() const{
-	if (fServerHidden)
-		return true;
-
-	return Layer::IsHidden();
-}
-
-void WinBorder::ServerHide(){
-	fServerHidden = true;
-}
-
-void WinBorder::ServerUnhide(){
-	fServerHidden = false;
-}
-
-bool WinBorder::HasPoint(const BPoint& pt) const
+bool WinBorder::HasPoint(BPoint pt) const
 {
 	return fFullVisible.Contains(pt);
 }
@@ -495,7 +445,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main)
 	{
 		// if the main window is hidden also hide this one.
 		if(main->IsHidden())
-			Hide();//fHidden = true;
+			fHidden = true;
 
 		// add to main window's subset
 		main->Window()->fWinFMWList.AddItem(this);
@@ -603,7 +553,7 @@ void WinBorder::PrintToStream()
 	if (fLevel == B_NORMAL_FEEL)
 		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
-	printf("\t%s\n", IsHidden()?"hidden" : "not hidden");
+	printf("\t%s\n", fHidden?"hidden" : "not hidden");
 }
 
 void WinBorder::UpdateColors(void)

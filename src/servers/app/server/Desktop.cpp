@@ -35,7 +35,6 @@
 #include "DisplayDriver.h"
 #include "Globals.h"
 #include "Layer.h"
-#include "PortMessage.h"
 #include "RootLayer.h"
 #include "ServerConfig.h"
 #include "ServerScreen.h"
@@ -259,14 +258,6 @@ void Desktop::AddWinBorder(WinBorder* winBorder)
 		// other windows are added to the current RootLayer only.
 		ActiveRootLayer()->AddWinBorder(winBorder);
 
-	// TODO: try to unify this code with that for B_MOUSE_DOWN
-	winBorder->Window()->Lock();
-	BRegion invalidRegion;
-	invalidRegion.Include(&(winBorder->fFull));
-	invalidRegion.Include(&(winBorder->fTopLayer->fFull));
-	winBorder->fParent->RebuildAndForceRedraw(invalidRegion, winBorder);
-	winBorder->Window()->Unlock();
-
 	// add that pointer to user winboder list so that we can keep track of them.		
 	fLayerLock.Lock();
 	fWinBorderList.AddItem(winBorder);
@@ -302,10 +293,10 @@ bool Desktop::HasWinBorder(WinBorder* winBorder)
 //---------------------------------------------------------------------------
 //				Input related methods
 //---------------------------------------------------------------------------
-void Desktop::MouseEventHandler(PortMessage *msg)
+void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 {
 	// TODO: locking mechanism needs SERIOUS rethought
-	switch(msg->Code())
+	switch(code)
 	{
 		case B_MOUSE_DOWN:
 		{
@@ -317,24 +308,24 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			// 5) int32 - buttons down
 			// 6) int32 - clicks
 
-			BPoint pt;
-			int64 dummy;
+			PointerEvent evt;	
+			evt.code = B_MOUSE_DOWN;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.modifiers);
+			msg.Read<int32>(&evt.buttons);
+			msg.Read<int32>(&evt.clicks);
 			
-			msg->Read<int64>(&dummy);
-			msg->Read<float>(&pt.x);
-			msg->Read<float>(&pt.y);
+			// printf("MOUSE DOWN: at (%f, %f)\n", evt.where.x, evt.where.y);
 			
-			// After we read the data, we need to reset it for MouseDown()
-			msg->Rewind();
-
-			// printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
-			
-			WinBorder	*target;
-			RootLayer	*rl;
-			Workspace	*ws;
+			WinBorder	*target=NULL;
+			RootLayer	*rl=NULL;
+			Workspace	*ws=NULL
+			;
 			rl			= ActiveRootLayer();
 			ws			= rl->ActiveWorkspace();
-			target		= rl->WinBorderAt(pt);
+			target		= rl->WinBorderAt(evt.where);
 			if (target)
 			{
 				fGeneralLock.Lock();
@@ -346,8 +337,8 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 #endif
 				if (target != ws->FrontLayer())
 				{
-					WinBorder		*previousFocus;
-					WinBorder		*activeFocus;
+					WinBorder		*previousFocus=NULL;
+					WinBorder		*activeFocus=NULL;
 					BRegion			invalidRegion;
 
 					ws->BringToFrontANormalWindow(target);
@@ -359,12 +350,13 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 					activeFocus->Window()->Lock();
 
 					if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
-						target->MouseDown(msg, true);
+						target->MouseDown(evt, true);
 					else
-						target->MouseDown(msg, false);
+						target->MouseDown(evt, false);
 
 					// may be or may be empty.
-// TODO: what if modal of floating windows are in front of us?
+					
+					// TODO: what if modal of floating windows are in front of us?
 					invalidRegion.Include(&(activeFocus->fFull));
 					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
 					activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
@@ -394,7 +386,7 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 					if (target == ws->FocusLayer())
 					{
 						target->Window()->Lock();
-						target->MouseDown(msg, true);
+						target->MouseDown(evt, true);
 						target->Window()->Unlock();
 					}
 				}
@@ -415,37 +407,32 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - modifier keys down
 
+			PointerEvent evt;	
+			evt.code = B_MOUSE_UP;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.modifiers);
+
 			if (fMouseTarget)
 			{
 				fMouseTarget->Window()->Lock();
-				fMouseTarget->MouseUp(msg);
+				fMouseTarget->MouseUp(evt);
 				fMouseTarget->Window()->Unlock();
 
 				fMouseTarget = NULL;				
 			}
 			else
 			{
-				BPoint pt;
-				int64 dummy;
-				int32 mod;
-
-				msg->Read<int64>(&dummy);
-				msg->Read<float>(&pt.x);
-				msg->Read<float>(&pt.y);
-				msg->Read<int32>(&mod);
-
-				// After we read the data, we need to reset it for MouseUp()
-				msg->Rewind();
-
-				WinBorder *target = ActiveRootLayer()->WinBorderAt(pt);
+				WinBorder *target = ActiveRootLayer()->WinBorderAt(evt.where);
 				if(target){
 					target->Window()->Lock();
-					target->MouseUp(msg);
+					target->MouseUp(evt);
 					target->Window()->Unlock();
 				}
 			}
 			
-			// printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
+			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
 
 			break;
 		}
@@ -456,45 +443,50 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 			// 2) float - x coordinate of mouse click
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - buttons down
-			int64 dummy;
-			float x,y;
-			int32 buttons;
 			
-			msg->Read<int64>(&dummy);
-			msg->Read<float>(&x);
-			msg->Read<float>(&y);
-			msg->Read<int32>(&buttons);
-
-			// After we read the data, we need to reset it for MouseDown()
-			msg->Rewind();
+			PointerEvent evt;	
+			evt.code = B_MOUSE_MOVED;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<int32>(&evt.buttons);
 
 			if (fMouseTarget)
 			{
 				fActiveScreen->DDriver()->HideCursor();
-				fActiveScreen->DDriver()->MoveCursorTo(x,y);
+				fActiveScreen->DDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 
 				fMouseTarget->Window()->Lock();
-				fMouseTarget->MouseMoved(msg);
+				fMouseTarget->MouseMoved(evt);
 				fMouseTarget->Window()->Unlock();
 
 				fActiveScreen->DDriver()->ShowCursor();
 			}
 			else
 			{
-				WinBorder *target = ActiveRootLayer()->WinBorderAt(BPoint(x,y));
+				WinBorder *target = ActiveRootLayer()->WinBorderAt(BPoint(evt.where.x, evt.where.y));
 				if(target){
 					target->Window()->Lock();
-					target->MouseMoved(msg);
+					target->MouseMoved(evt);
 					target->Window()->Unlock();
 				}
 
-				fActiveScreen->DDriver()->MoveCursorTo(x,y);
+				fActiveScreen->DDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 			}
 
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
+			PointerEvent evt;	
+			evt.code = B_MOUSE_WHEEL_CHANGED;
+			msg.Read<int64>(&evt.when);
+			msg.Read<float>(&evt.where.x);
+			msg.Read<float>(&evt.where.y);
+			msg.Read<float>(&evt.wheel_delta_x);
+			msg.Read<float>(&evt.wheel_delta_y);
+			msg.Read<int32>(&evt.modifiers);
+
 			// TODO: Pass this on to the client ServerWindow
 			break;
 		}
@@ -506,11 +498,10 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 	}
 }
 
-void Desktop::KeyboardEventHandler(PortMessage *msg)
+void Desktop::KeyboardEventHandler(int32 code, BPortLink& msg)
 {
-	int8 *index=(int8*)msg->Buffer();
-	
-	switch(msg->Code())
+
+	switch(code)
 	{
 		case B_KEY_DOWN:
 		{
@@ -525,13 +516,22 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			//		generated string
 			// 8) Character string generated by the keystroke
 			// 9) int8[16] state of all keys
-			
-			// Obtain only what data which we'll need
-			STRACE(("Key Down: 0x%lx\n",scancode));
-			index+=sizeof(int64);
-			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
-			int32 modifiers=*((int32*)index); index+=sizeof(int32) + (sizeof(int8) * 3);
-			int8 stringlength=*index; index+=stringlength;
+	
+			bigtime_t time;
+			int32 scancode, modifiers;
+			int8 utf[3];
+			char *string = NULL;
+			int32 keystate;
+	
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read(utf, sizeof(utf));
+			msg.ReadString(&string);
+			msg.Read<int32>(&keystate);
+			if (string)
+				free(string);
+	
 			if(DISPLAYDRIVER==HWDRIVER)
 			{
 				// Check for workspace change or safe video mode
@@ -669,11 +669,26 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// 7) Character string generated by the keystroke
 			// 8) int8[16] state of all keys
 			
-			// Obtain only what data which we'll need
-			index+=sizeof(int64);
-			int32 scancode=*((int32*)index); index+=sizeof(int32) * 3;
-			int32 modifiers=*((int32*)index); index+=sizeof(int8) * 3;
-			int8 stringlength=*index; index+=stringlength + sizeof(int8);
+			bigtime_t time;
+			int32 scancode;
+			int32 ascii;
+			int32 modifiers;
+			int8 utf[3];
+			int8 bytes;
+			char *string;
+			int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&ascii);
+			msg.Read<int32>(&modifiers);
+			msg.Read(utf, sizeof(utf));
+			msg.Read<int8>(&bytes);
+			msg.ReadString(&string);
+			msg.Read(keystate, sizeof(keystate));
+			if (string)
+				free(string);
+	
 			STRACE(("Key Up: 0x%lx\n",scancode));
 			
 			if(DISPLAYDRIVER==HWDRIVER)
@@ -717,9 +732,20 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// 4) int32 number of elements in the key state array to follow
 			// 5) int8 state of all keys
 
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
 			#ifdef DEBUG_KEYHANDLING
-			index+=sizeof(bigtime_t);
-			printf("Unmapped Key Down: 0x%lx\n",*((int32*)index));
+			printf("Unmapped Key Down: 0x%lx\n", scancode);
 			#endif
 			// TODO: Pass on to client window with the focus
 			break;
@@ -733,9 +759,20 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// 4) int32 number of elements in the key state array to follow
 			// 5) int8 state of all keys
 
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
 			#ifdef DEBUG_KEYHANDLING
-			index+=sizeof(bigtime_t);
-			printf("Unmapped Key Up: 0x%lx\n",*((int32*)index));
+			printf("Unmapped Key Up: 0x%lx\n", scancode);
 			#endif
 
 			// TODO: Pass on to client window with the focus
@@ -750,8 +787,19 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// 4) int32 number of elements in the key state array to follow
 			// 5) int8 state of all keys
 			
+			bigtime_t time;
+			int32 scancode;
+			int32 modifiers;
+			int32 elements;
+			//int8 keystate[16];
+			
+			msg.Read<bigtime_t>(&time);
+			msg.Read<int32>(&scancode);
+			msg.Read<int32>(&modifiers);
+			msg.Read<int32>(&elements);
+			//msg.Read(keystate, elements);
+
 			#ifdef DEBUG_KEYHANDLING
-			index+=sizeof(bigtime_t);
 			printf("Modifiers Changed\n");
 			#endif
 

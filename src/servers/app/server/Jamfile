@@ -40,7 +40,6 @@ Server app_server :
 	FMWList.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
-	SessionStreamReader.cpp
 	Utils.cpp
 
 	# Manager Classes

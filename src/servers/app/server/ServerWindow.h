@@ -34,7 +34,6 @@
 #include <Rect.h>
 #include <String.h>
 #include <Window.h>
-#include <PortMessage.h>
 #include "FMWList.h"
 
 class BString;
@@ -43,10 +42,9 @@ class BPoint;
 class BMessage;
 class ServerApp;
 class Decorator;
-class PortLink;
+class BPortLink;
 class WinBorder;
 class Workspace;
-class BSession;
 class Layer;
 
 #define AS_UPDATE_DECORATOR 'asud'
@@ -159,7 +157,7 @@ protected:
 	uint32 fToken;
 	int32 fHandlerToken;
 	
-	BSession *fSession;
+	BPortLink *fSession;
 
 	// cl is short for currentLayer. We'll use it a lot, that's why it's short :-)
 	Layer *cl;

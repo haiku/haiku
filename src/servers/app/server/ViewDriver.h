@@ -40,7 +40,7 @@
 #include "FontServer.h"
 
 class BBitmap;
-class PortLink;
+class BPortLink;
 class VDWindow;
 class DrawData;
 
@@ -57,7 +57,7 @@ public:
 	void MessageReceived(BMessage *msg);
 		
 	BBitmap *viewbmp;
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	
 	int hide_cursor;
 	BBitmap *cursor;
@@ -160,7 +160,7 @@ protected:
 	BView *drawview;
 	BRegion laregion;
 
-	PortLink *serverlink;
+	BPortLink *serverlink;
 //	drawing_mode drawmode;
 	
 	rgb_color highcolor,lowcolor;

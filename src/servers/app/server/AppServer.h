@@ -6,7 +6,6 @@
 #include <List.h>
 #include <Application.h>
 #include <Window.h>
-#include <PortQueue.h>
 #include <String.h>
 #include "Decorator.h"
 #include "ServerConfig.h"
@@ -17,7 +16,6 @@ class ServerApp;
 class DisplayDriver;
 class CursorManager;
 class BitmapManager;
-class PortMessage;
 
 /*!
 	\class AppServer AppServer.h
@@ -45,7 +43,7 @@ public:
 	bool LoadDecorator(const char *path);
 	void InitDecorators(void);
 	
-	void DispatchMessage(PortMessage *msg);
+	void DispatchMessage(int32 code, BPortLink &link);
 	void Broadcast(int32 code);
 
 	ServerApp* FindApp(const char *sig);
@@ -57,7 +55,7 @@ private:
 	// global function pointer
 	create_decorator	*make_decorator;
 	
-	port_id	_fMessagePort,
+	port_id	fMessagePort,
 			fMousePort;
 	
 	image_id fDecoratorID;

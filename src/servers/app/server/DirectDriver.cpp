@@ -798,7 +798,7 @@ DDView::DDView(BRect bounds)
 	SetViewColor(B_TRANSPARENT_32_BIT);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
-	serverlink.SetPort(find_port(SERVER_INPUT_PORT));
+	serverlink.SetSendPort(find_port(SERVER_INPUT_PORT));
 #endif
 
 }
@@ -827,7 +827,7 @@ void DDView::MouseDown(BPoint pt)
 
 	GetMouse(&p,&buttons);
 
-	serverlink.SetOpCode(B_MOUSE_DOWN);
+	serverlink.StartMessage(B_MOUSE_DOWN);
 	serverlink.Attach(&time, sizeof(int64));
 	serverlink.Attach(&pt.x,sizeof(float));
 	serverlink.Attach(&pt.y,sizeof(float));
@@ -850,7 +850,7 @@ void DDView::MouseMoved(BPoint pt, uint32 transit, const BMessage *msg)
 	uint32 buttons;
 	int64 time=(int64)real_time_clock();
 
-	serverlink.SetOpCode(B_MOUSE_MOVED);
+	serverlink.StartMessage(B_MOUSE_MOVED);
 	serverlink.Attach(&time,sizeof(int64));
 	serverlink.Attach(&pt.x,sizeof(float));
 	serverlink.Attach(&pt.y,sizeof(float));
@@ -877,7 +877,7 @@ void DDView::MouseUp(BPoint pt)
 
 	GetMouse(&p,&buttons);
 
-	serverlink.SetOpCode(B_MOUSE_UP);
+	serverlink.StartMessage(B_MOUSE_UP);
 	serverlink.Attach(&time, sizeof(int64));
 	serverlink.Attach(&pt.x,sizeof(float));
 	serverlink.Attach(&pt.y,sizeof(float));
@@ -897,7 +897,7 @@ void DDView::MessageReceived(BMessage *msg)
 			msg->FindFloat("be:wheel_delta_x",&x);
 			msg->FindFloat("be:wheel_delta_y",&y);
 			int64 time=real_time_clock();
-			serverlink.SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			serverlink.StartMessage(B_MOUSE_WHEEL_CHANGED);
 			serverlink.Attach(&time,sizeof(int64));
 			serverlink.Attach(x);
 			serverlink.Attach(y);

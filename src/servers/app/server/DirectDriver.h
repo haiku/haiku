@@ -73,7 +73,7 @@ public:
 	void MouseUp(BPoint pt);
 	void MessageReceived(BMessage *msg);
 		
-	PortLink serverlink;
+	BPortLink serverlink;
 };
 
 class DDWindow : public BDirectWindow
@@ -162,7 +162,7 @@ protected:
 
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest,DrawData *d, bool use_high=true);
 
-	PortLink *serverlink;
+	BPortLink *serverlink;
 	DDWindow *screenwin;
 	BView *drawview;
 };

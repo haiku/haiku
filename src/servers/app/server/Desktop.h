@@ -36,9 +36,9 @@ class RootLayer;
 class Screen;
 class Layer;
 class BMessage;
-class PortMessage;
 class WinBorder;
 class DisplayDriver;
+class BPortLink;
 
 class Desktop
 {
@@ -70,8 +70,8 @@ public:
 	bool HasWinBorder(WinBorder *winBorder);
 
 	// Input related methods
-	void MouseEventHandler(PortMessage *msg);
-	void KeyboardEventHandler(PortMessage *msg);
+	void MouseEventHandler(int32 code, BPortLink& link);
+	void KeyboardEventHandler(int32 code, BPortLink& link);
 	
 	void SetDragMessage(BMessage *msg);
 	BMessage *DragMessage(void) const;

@@ -25,7 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <PortLink.h>
-#include <PortMessage.h>
+#include <AppServerLink.h>
 #include <ServerProtocol.h>
 #include <OS.h>
 #include <String.h>
@@ -43,8 +43,8 @@ void set_syscursor(cursor_which which, const BCursor *cursor)
 	port_id server=find_port(SERVER_PORT_NAME);
 	if(server!=B_NAME_NOT_FOUND)
 	{
-		PortLink link(server);
-		link.SetOpCode(AS_SET_SYSCURSOR_BCURSOR);
+		BPortLink link(server);
+		link.StartMessage(AS_SET_SYSCURSOR_BCURSOR);
 		link.Attach<cursor_which>(which);
 		
 		// The easy (and clean) way for us to access the cursor's token
@@ -69,8 +69,8 @@ void set_syscursor(cursor_which which, const BBitmap *bitmap)
 	port_id server=find_port(SERVER_PORT_NAME);
 	if(server!=B_NAME_NOT_FOUND)
 	{
-		PortLink link(server);
-		link.SetOpCode(AS_SET_SYSCURSOR_BBITMAP);
+		BPortLink link(server);
+		link.StartMessage(AS_SET_SYSCURSOR_BBITMAP);
 		link.Attach<cursor_which>(which);
 		
 		// Just like the BCursor version, we will use a hack until R1.
@@ -89,17 +89,19 @@ void set_syscursor(cursor_which which, const BBitmap *bitmap)
 cursor_which get_syscursor(void)
 {
 	port_id server=find_port(SERVER_PORT_NAME);
-	if(server!=B_NAME_NOT_FOUND)
+	if(server >= 0)
 	{
-		PortMessage pmsg;
-		
-		PortLink link(server);
-		link.SetOpCode(AS_GET_SYSCURSOR);
-		link.FlushWithReply(&pmsg);
-		
+		int32 code = SERVER_FALSE;
+		BPrivate::BAppServerLink link;
 		cursor_which which;
-		pmsg.Read<cursor_which>(&which);
-		return which;
+
+		link.SetSendPort(server);
+		link.StartMessage(AS_GET_SYSCURSOR);
+		link.FlushWithReply(&code);
+		
+		if (code == SERVER_TRUE)
+			if (link.Read<cursor_which>(&which) == B_OK)
+				return which;
 	}
 	return B_CURSOR_INVALID;
 }
@@ -111,10 +113,10 @@ cursor_which get_syscursor(void)
 void setcursor(cursor_which which)
 {
 	port_id server=find_port(SERVER_PORT_NAME);
-	if(server!=B_NAME_NOT_FOUND)
+	if(server >= 0)
 	{
-		PortLink link(server);
-		link.SetOpCode(AS_SET_CURSOR_SYSTEM);
+		BPortLink link(server);
+		link.StartMessage(AS_SET_CURSOR_SYSTEM);
 		link.Flush();
 	}
 }
@@ -270,7 +272,7 @@ status_t CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hot
 		return B_NAME_NOT_FOUND;
 	
 	const void *buffer;
-	BString tempstr;
+	const char *tempstr;
 	int32 bufferLength;
 	BBitmap *bmp;
 	BPoint hotpt;
@@ -282,7 +284,7 @@ status_t CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hot
 		return B_ERROR;
 	
 		
-	if(tempstr.Compare("cursor")==0)
+	if(strcmp(tempstr, "cursor")==0)
 	{
 		bmp=new BBitmap( msg.FindRect("_frame"),
 					(color_space) msg.FindInt32("_cspace"),true );
@@ -316,7 +318,7 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 		return B_NAME_NOT_FOUND;
 	
 	const void *buffer;
-	BString tempstr;
+	const char *tempstr;
 	int32 bufferLength;
 	ServerCursor *csr;
 	BPoint hotpt;
@@ -327,7 +329,7 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 	if(msg.FindPoint("hotspot",&hotpt)!=B_OK)
 		return B_ERROR;
 
-	if(tempstr.Compare("cursor")==0)
+	if(strcmp(tempstr, "cursor")==0)
 	{
 		csr=new ServerCursor(msg.FindRect("_frame"),(color_space) msg.FindInt32("_cspace"),0, hotpt);
 		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, (ssize_t*)&bufferLength);
@@ -345,8 +347,8 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 */
 const char *CursorSet::GetName(void)
 {
-	const char *name = NULL;
-	if (FindString("name", &name) == B_OK)
+	const char *name;
+	if(FindString("name",&name)==B_OK)
 		return name;
 	return NULL;
 }

@@ -34,8 +34,7 @@
 
 class AppServer;
 class BMessage;
-class PortLink;
-class PortMessage;
+class BPortLink;
 class BList;
 class DisplayDriver;
 class ServerCursor;
@@ -82,7 +81,7 @@ protected:
 	friend class AppServer;
 	friend class ServerWindow;
 	
-	void _DispatchMessage(PortMessage *msg);
+	void _DispatchMessage(int32 code, BPortLink& link);
 	ServerBitmap* _FindBitmap(int32 token);
 	
 	port_id	fClientAppPort,
@@ -94,7 +93,7 @@ protected:
 	
 	team_id fClientTeamID;
 	
-	PortLink *fAppLink;
+	BPortLink *fAppLink;
 	BList *fSWindowList,
 		  *fBitmapList,
 		  *fPictureList;
