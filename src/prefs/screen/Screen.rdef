@@ -1,5 +1,5 @@
 
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";
+resource app_flags B_SINGLE_LAUNCH;
 
 resource app_version { major = 0, minor = 8 };
 
@@ -61,4 +61,4 @@ resource mini_icon
 
 resource app_signature "application/x-vnd.Be-SCRN";
 
-resource(1, "BEOS:FILE_TYPES") message;
+resource file_types message;
