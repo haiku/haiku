@@ -10,6 +10,7 @@ StdBinCommands
 		isvolume.cpp
 		lsindex.cpp
 		yes.cpp
+		version.cpp
 	: be ;
 
 StdBinCommands
