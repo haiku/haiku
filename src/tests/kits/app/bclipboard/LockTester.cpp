@@ -48,6 +48,7 @@ static int32 LockTest2(void *data)
  */
 void LockTester::Lock2()
 {
+  CHK(false); // fail until I figure out why it is hanging
   BClipboard *clip = new BClipboard("Lock2");
 
   /* This method isn't guaranteed to work, but *should* work.

@@ -29,6 +29,9 @@
  */
 void BClipboardTester::BClipboard1()
 {
+#ifdef TEST_R5
+  CHK(false);
+#endif
   BClipboard clip(NULL);
   CHK(strcmp(clip.Name(),"system") == 0);
 }

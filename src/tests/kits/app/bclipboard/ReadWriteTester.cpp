@@ -30,8 +30,12 @@
  */
 void ReadWriteTester::Clear1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Clear1");
 
+#ifdef TEST_R5
+  CHK(false);
+#endif
   CHK(clip.Clear() == B_ERROR);
 }
 
@@ -43,6 +47,7 @@ void ReadWriteTester::Clear1()
  */
 void ReadWriteTester::Clear2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Clear2");
   BMessage *data;
 
@@ -61,8 +66,12 @@ void ReadWriteTester::Clear2()
  */
 void ReadWriteTester::Revert1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Revert1");
 
+#ifdef TEST_R5
+  CHK(false);
+#endif
   CHK(clip.Revert() == B_ERROR);
 }
 
@@ -74,6 +83,7 @@ void ReadWriteTester::Revert1()
  */
 void ReadWriteTester::Revert2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Revert2");
   BMessage *data;
   char *str;
@@ -114,8 +124,12 @@ void ReadWriteTester::Revert2()
  */
 void ReadWriteTester::Commit1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Commit1");
 
+#ifdef TEST_R5
+  CHK(false);
+#endif
   CHK(clip.Commit() == B_ERROR);
 }
 
@@ -127,6 +141,7 @@ void ReadWriteTester::Commit1()
  */
 void ReadWriteTester::Commit2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("Commit2");
   BClipboard clipB("Commit2");
   BMessage *data;
@@ -161,8 +176,12 @@ void ReadWriteTester::Commit2()
  */
 void ReadWriteTester::Data1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Data1");
 
+#ifdef TEST_R5
+  CHK(false);
+#endif
   CHK(!clip.Data());
 }
 
@@ -173,6 +192,7 @@ void ReadWriteTester::Data1()
  */
 void ReadWriteTester::Data2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("Data2");
   BMessage *data;
   char *str;
@@ -204,6 +224,7 @@ void ReadWriteTester::Data2()
  */
 void ReadWriteTester::DataSource1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("DataSource1");
 
   CHK(!clip.DataSource().IsValid());
@@ -216,6 +237,7 @@ void ReadWriteTester::DataSource1()
  */
 void ReadWriteTester::DataSource2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("DataSource2");
   BClipboard clipB("DataSource2");
   BMessage *data;
@@ -240,6 +262,7 @@ void ReadWriteTester::DataSource2()
  */
 void ReadWriteTester::DataSource3()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clipA("DataSource3");
   BClipboard clipB("DataSource3");
   BMessage *data;
@@ -268,6 +291,7 @@ void ReadWriteTester::DataSource3()
  */
 void ReadWriteTester::StartWatching1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("StartWatching1");
   BMessage *data;
   char *str;
@@ -295,6 +319,7 @@ void ReadWriteTester::StartWatching1()
  */
 void ReadWriteTester::StopWatching1()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("StopWatching1");
   if ( clip.StartWatching(be_app_messenger) == B_OK )
   {
@@ -309,6 +334,7 @@ void ReadWriteTester::StopWatching1()
  */
 void ReadWriteTester::StopWatching2()
 {
+  BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("StopWatching2");
   CHK(clip.StopWatching(be_app_messenger) == B_BAD_VALUE);
 }
