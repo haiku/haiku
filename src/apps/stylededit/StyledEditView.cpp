@@ -9,8 +9,8 @@
 #include <CharacterSetRoster.h>
 #include <UTF8.h>
 
-#include "StyledEditView.h"
-#include "Constants.h"
+#include <StyledEditView.h>
+#include <Constants.h>
 
 using namespace BPrivate;
 
@@ -22,11 +22,12 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *hand
 	fMessenger= new BMessenger(handler);
 	fSuppressChanges = false;
 	fEncoding = 0;
-}/***StyledEditView()***/
+}
 
-StyledEditView::~StyledEditView(){
-
-}/***~StyledEditView***/
+StyledEditView::~StyledEditView()
+{
+	delete fMessenger;
+}
 	
 void
 StyledEditView::FrameResized(float width, float height)
