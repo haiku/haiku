@@ -373,7 +373,11 @@ mkvReader::Seek(void *_cookie,
 
 	int64 timecode;
 	timecode = mkv_GetLowestQTimecode(cookie->file);
-	TRACE("timecode %Ld\n", timecode);
+	if (timecode < 0)
+		return B_ERROR;
+
+	*time = timecode / 1000;
+	*frame = get_frame_count_by_frame_rate(timecode, cookie->frame_rate);
 
 	return B_OK;
 }
