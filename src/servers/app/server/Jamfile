@@ -16,6 +16,7 @@ SharedLibrary appserver :
 	Decorator.cpp
 	DisplayDriver.cpp
 	FontFamily.cpp
+	LayerData.cpp
 	PatternHandler.cpp
 	RectUtils.cpp
 	RGBColor.cpp
@@ -51,9 +52,11 @@ Server app_server :
 	ServerWindow.cpp
 
 	# Display Classes
-	Clipper.cpp
+	# Clipper.cpp
 	AccelerantDriver.cpp
-	ScreenDriver.cpp
+
+	# We'll just remove this from the build for a little while...
+	#ScreenDriver.cpp
 	ViewDriver.cpp
 	DefaultDecorator.cpp
 	Layer.cpp

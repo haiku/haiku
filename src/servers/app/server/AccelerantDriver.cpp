@@ -82,7 +82,7 @@ AccelerantDriver::~AccelerantDriver(void)
 */
 bool AccelerantDriver::Initialize(void)
 {
-	int i;
+/*	int i;
 	char signature[1024];
 	char path[PATH_MAX];
 	struct stat accelerant_stat;
@@ -186,6 +186,8 @@ bool AccelerantDriver::Initialize(void)
 	RGBColor blue(0,0,255,0);
 	FillRect(BRect(0,0,1024,768),blue);
 #endif
+
+*/
 	return true;
 }
 
@@ -197,6 +199,7 @@ bool AccelerantDriver::Initialize(void)
 */
 void AccelerantDriver::Shutdown(void)
 {
+/*
 #ifdef RUN_UNDER_R5
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	if ( SetDisplayMode )
@@ -209,491 +212,7 @@ void AccelerantDriver::Shutdown(void)
 		unload_add_on(accelerant_image);
 	if (card_fd >= 0)
 		close(card_fd);
-}
-
-/*!
-	\brief Called for all BView::CopyBits calls
-	\param src Source rectangle.
-	\param rect Destination rectangle.
-	
-	Bounds checking must be done in this call. If the destination is not the same size 
-	as the source, the source should be scaled to fit.
 */
-void AccelerantDriver::CopyBits(BRect src, BRect dest)
-{
-  /* TODO: implement */
-}
-
-/*!
-	\brief Called for all BView::DrawBitmap calls
-	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
-	space is not guaranteed to match.
-	\param src Source rectangle
-	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	
-	Bounds checking must be done in this call.
-*/
-void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d)
-{
-  /* TODO: implement */
-}
-
-/*!
-	\brief Utilizes the font engine to draw a string to the frame buffer
-	\param string String to be drawn. Always non-NULL.
-	\param length Number of characters in the string to draw. Always greater than 0. If greater
-	than the number of characters in the string, draw the entire string.
-	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
-	this for backwards compatibility. While the point itself is guaranteed to be inside
-	the frame buffers coordinate range, the clipping of each individual glyph must be
-	performed by the driver itself.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\param delta Extra character padding
-*/
-void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
-{
-	if(!string || !d)
-		return;
-
-	Lock();
-
-	pt.y--;	// because of Be's backward compatibility hack
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return;
-	}
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_Matrix rmatrix,smatrix;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta,space,nonspace;
-	int16 error=0;
-	int32 strlength,i;
-	Angle rotation(font->Rotation()), shear(font->Shear());
-
-	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
-		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
-
-	// Originally, I thought to do this shear checking here, but it really should be
-	// done in BFont::SetShear()
-	float shearangle=shear.Value();
-	if(shearangle>135)
-		shearangle=135;
-	if(shearangle<45)
-		shearangle=45;
-
-	if(shearangle>90)
-		shear=90+((180-shearangle)*2);
-	else
-		shear=90-(90-shearangle)*2;
-	
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-	{
-		printf("Couldn't create face object\n");
-		Unlock();
-		return;
-	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		Unlock();
-		return;
-	}
-
-	// if we do any transformation, we do a call to FT_Set_Transform() here
-	
-	// First, rotate
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	rmatrix.xy = (FT_Fixed)( rotation.Sine()*0x10000); 
-	rmatrix.yx = (FT_Fixed)(-rotation.Sine()*0x10000); 
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	
-	// Next, shear
-	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
-	smatrix.yx = (FT_Fixed)(0); 
-	smatrix.yy = (FT_Fixed)(0x10000); 
-
-	//FT_Matrix_Multiply(&rmatrix,&smatrix);
-	FT_Matrix_Multiply(&smatrix,&rmatrix);
-	
-	// Set up the increment value for escapement padding
-	space.x=int32(d->edelta.space * rotation.Cosine()*64);
-	space.y=int32(d->edelta.space * rotation.Sine()*64);
-	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
-	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
-	
-	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=(int32)pt.x * 64;
-	pen.y=(int32)pt.y * 64;
-	
-	slot=face->glyph;
-
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		//FT_Set_Transform(face,&smatrix,&pen);
-		FT_Set_Transform(face,&rmatrix,&pen);
-
-		// Handle escapement padding option
-		if((uint8)string[i]<=0x20)
-		{
-			pen.x+=space.x;
-			pen.y+=space.y;
-		}
-		else
-		{
-			pen.x+=nonspace.x;
-			pen.y+=nonspace.y;
-		}
-
-	
-		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-			pen.y+=delta.y;
-		}
-
-		error=FT_Load_Char(face,string[i],
-			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
-
-		if(!error)
-		{
-		  //TODO: Replace BlitGray2RGB32 and BlitMono2RGB32
-		  /*
-			if(antialias)
-				BlitGray2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
-			else
-				BlitMono2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
-					*/
-		}
-		else
-			printf("Couldn't load character %c\n", string[i]);
-
-		// increment pen position
-		pen.x+=slot->advance.x;
-		pen.y+=slot->advance.y;
-		previous=glyph_index;
-	}
-	FT_Done_Face(face);
-	Unlock();
-}
-
-
-void AccelerantDriver::FillArc(const BRect r, float angle, float span, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillArc(r,angle,span,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillBezier(BPoint *pts, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillBezier(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillEllipse(BRect r, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillEllipse(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillPolygon(ptlist,numpts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillRect(const BRect r, RGBColor& color)
-{
-	Lock();
-	fDrawColor = color;
-	FillSolidRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
-	Unlock();
-}
-
-/*!
-	\brief Called for all BView::FillRect calls
-	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param pattern The pattern to be used when filling the rectangle
-	\param high_color The high color of the pattern to fill
-	\param low_color  The low color of the pattern to fill
-*/
-void AccelerantDriver::FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	FillPatternRect((int32)r.left,(int32)r.top,(int32)r.right,(int32)r.bottom);
-	Unlock();
-}
-
-void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	fDrawColor = color;
-	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&AccelerantDriver::FillSolidRect,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillRoundRect(r,xrad,yrad,this,(SetRectangleFuncType)&AccelerantDriver::FillPatternRect,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillTriangle(BPoint *pts, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::FillTriangle(pts,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeArc(r,angle,span,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeBezier(pts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeEllipse(BRect r, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeEllipse(r,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeLine(start,end,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokePoint(BPoint& pt, RGBColor& color)
-{
-	Lock();
-	fLineThickness = 1;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	SetThickPatternPixel((int)pt.x,(int)pt.y);
-	Unlock();
-}
-
-void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel,is_closed);
-	Unlock();
-}
-
-void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokePolygon(ptlist,numpts,this,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeRect(BRect r, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeRect(r,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
-	fDrawPattern.SetColors(color,color);
-	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
-}
-
-void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color)
-{
-	Lock();
-	fLineThickness = (int)pensize;
-	fDrawPattern.SetTarget(pattern);
-	fDrawPattern.SetColors(high_color,low_color);
-	DisplayDriver::StrokeRoundRect(r,xrad,yrad,this,(SetHorizontalLineFuncType)&AccelerantDriver::HLinePatternThick,(SetVerticalLineFuncType)&AccelerantDriver::VLinePatternThick,(SetPixelFuncType)&AccelerantDriver::SetThickPatternPixel);
-	Unlock();
 }
 
 /*!
@@ -703,8 +222,11 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pe
 	\param pensize The thickness of the lines
 	\param colors Array of colors for each respective line
 */
-void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors)
+void AccelerantDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors)
 {
+	if(!d)
+		return;
+	
 	int x1, y1, x2, y2, dx, dy;
 	int steps, k;
 	double xInc, yInc;
@@ -712,7 +234,7 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensiz
 	int i;
 
 	Lock();
-	fLineThickness = (int)pensize;
+	fLineThickness = (int)d->pensize;
 	fDrawPattern.SetTarget((int8*)&B_SOLID_HIGH);
 	for (i=0; i<numlines; i++)
 	{
@@ -745,66 +267,11 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensiz
 }
 
 
-
-/*!
-	\brief Hides the cursor.
-	
-	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(true) somewhere within this function to ensure that data is
-	maintained accurately.
-*/
-void AccelerantDriver::HideCursor(void)
-{
-	Lock();
-	if(!IsCursorHidden())
-	{
-		if ( accShowCursor )
-			accShowCursor(false);
-		else
-			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
-	}
-	DisplayDriver::HideCursor();
-	Unlock();
-}
-
-/*!
-	\brief Moves the cursor to the given point.
-	\param x Cursor's new x coordinate
-	\param y Cursor's new y coordinate
-
-	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
-	range, but the cursor data itself will need to be clipped. A check to see if the 
-	cursor is obscured should be made and if so, a call to _SetCursorObscured(false) 
-	should be made the cursor in addition to displaying at the passed coordinates.
-*/
-void AccelerantDriver::MoveCursorTo(float x, float y)
-{
-	/* TODO: Add correct handling of obscured cursors */
-	Lock();
-	if ( accMoveCursor )
-	{
-		accMoveCursor((uint16)x,(uint16)y);
-	}
-	else
-	{
-		if(!IsCursorHidden())
-			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
-
-		cursorframe.OffsetTo(x,y);
-		ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
-	
-		if(!IsCursorHidden())
-			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
-	}
-	
-	Unlock();
-}
-
 /*!
 	\brief Inverts the colors in the rectangle.
 	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
 */
-void AccelerantDriver::InvertRect(BRect r)
+void AccelerantDriver::InvertRect(const BRect &r)
 {
 	Lock();
 	if ( accInvertRect && AcquireEngine && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
@@ -911,106 +378,6 @@ void AccelerantDriver::InvertRect(BRect r)
 	Unlock();
 }
 
-/*!
-	\brief Shows the cursor.
-	
-	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(false) somewhere within this function to ensure that data is
-	maintained accurately.
-*/
-void AccelerantDriver::ShowCursor(void)
-{
-	Lock();
-	if(IsCursorHidden())
-	{
-		if ( accShowCursor )
-			accShowCursor(true);
-		else
-			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
-	}
-	DisplayDriver::ShowCursor();
-	Unlock();
-}
-
-/*!
-	\brief Obscures the cursor.
-	
-	Obscure calls are not nestable. Subclasses should call _SetCursorObscured(true) 
-	somewhere within this function to ensure that data is maintained accurately. When the
-	next call to MoveCursorTo() is made, the cursor will be shown again.
-*/
-void AccelerantDriver::ObscureCursor(void)
-{
-	Lock();
-	if (!IsCursorHidden() )
-	{
-		if ( accShowCursor )
-			accShowCursor(false);
-		else
-			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
-	}
-	DisplayDriver::ObscureCursor();
-	Unlock();
-}
-
-/*!
-	\brief Changes the cursor.
-	\param cursor The new cursor. Guaranteed to be non-NULL.
-	
-	The driver does not take ownership of the given cursor. Subclasses should make
-	a copy of the cursor passed to it. The default version of this function hides the
-	cursor, replaces it, and shows the cursor if previously visible.
-*/
-void AccelerantDriver::SetCursor(ServerCursor *csr)
-{
-	if(!csr)
-		return;
-		
-	Lock();
-	if ( accSetCursorShape && (csr->BitsPerPixel() == 1) )
-	{
-		/* TODO: Need to fix transparency */
-		if(cursor)
-			delete cursor;
-		cursor=new ServerCursor(csr);
-		cursorframe.right=cursorframe.left+csr->Bounds().Width();
-		cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
-		uint16 width = (uint16)cursor->Bounds().Width();
-		uint16 height = (uint16)cursor->Bounds().Height();
-		uint16 hot_x = (uint16)cursor->GetHotSpot().x;
-		uint16 hot_y = (uint16)cursor->GetHotSpot().y;
-		uint8 *andMask = new uint8[width*height/8];
-		//uint8 *xorMask = new uint8[width*height/8];
-		memset(andMask,(uint8)255,width*height/8);
-		accSetCursorShape(width,height,hot_x,hot_y,andMask,cursor->Bits());
-
-		delete[] andMask;
-		//delete[] xorMask;
-	}
-	else
-	{
-		// erase old if visible
-		if(!IsCursorHidden() && under_cursor)
-			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
-
-		if(cursor)
-			delete cursor;
-		if(under_cursor)
-			delete under_cursor;
-	
-		cursor=new ServerCursor(csr);
-		under_cursor=new ServerCursor(csr);
-	
-		cursorframe.right=cursorframe.left+csr->Bounds().Width();
-		cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
-	
-		ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
-	
-		if(!IsCursorHidden())
-			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
-	}
-	Unlock();
-}
 
 /*!
 	\brief Sets the screen mode to specified resolution and color depth.
@@ -1019,10 +386,10 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
 	to update the state variables kept internally by the DisplayDriver class.
 */
-void AccelerantDriver::SetMode(int32 mode)
+void AccelerantDriver::SetMode(const int32 &mode)
 {
   /* TODO: Still needs some work to fine tune color hassles in picking the mode */
-	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
+/*	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	int proposed_width, proposed_height, proposed_depth;
 	int i;
 
@@ -1054,6 +421,7 @@ void AccelerantDriver::SetMode(int32 mode)
 	}
 
 	Unlock();
+*/
 }
 
 void AccelerantDriver::SetMode(const display_mode &mode)
@@ -1073,235 +441,6 @@ bool AccelerantDriver::DumpToFile(const char *path)
 {
         /* TODO: impelement */
 	return false;
-}
-
-/*!
-	\brief Gets the width of a string in pixels
-	\param string Source null-terminated string
-	\param length Number of characters in the string
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\return Width of the string in pixels
-	
-	This corresponds to BView::StringWidth.
-*/
-float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData *d)
-{
-	if(!string || !d)
-		return 0.0;
-	Lock();
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval;
-
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=0;
-	
-	slot=face->glyph;
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-		}
-
-		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
-
-		// increment pen position
-		pen.x+=slot->advance.x;
-		previous=glyph_index;
-	}
-
-	FT_Done_Face(face);
-
-	returnval=pen.x>>6;
-	Unlock();
-	return returnval;
-}
-
-/*!
-	\brief Gets the height of a string in pixels
-	\param string Source null-terminated string
-	\param length Number of characters in the string
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	\return Height of the string in pixels
-	
-	The height calculated in this function does not include any padding - just the
-	precise maximum height of the characters within and does not necessarily equate
-	with a font's height, i.e. the strings 'case' and 'alps' will have different values
-	even when called with all other values equal.
-*/
-float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData *d)
-{
-	if(!string || !d)
-		return 0.0;
-	Lock();
-
-	ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	FT_Face face;
-	FT_GlyphSlot slot;
-	int16 error=0;
-	int32 strlength,i;
-	float returnval=0.0,ascent=0.0,descent=0.0;
-
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
-	if(error)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		Unlock();
-		return 0.0;
-	}
-
-	slot=face->glyph;
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
-		if(slot->metrics.horiBearingY<slot->metrics.height)
-			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
-		else
-			ascent=MAX(slot->bitmap.rows,ascent);
-	}
-	Unlock();
-
-	FT_Done_Face(face);
-
-	returnval=ascent+descent;
-	Unlock();
-	return returnval;
-}
-
-/*!
-	\brief Retrieves the bounding box each character in the string
-	\param string Source null-terminated string
-	\param count Number of characters in the string
-	\param mode Metrics mode for either screen or printing
-	\param delta Optional glyph padding. This value may be NULL.
-	\param rectarray Array of BRect objects which will have at least count elements
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-
-	See BFont::GetBoundingBoxes for more details on this function.
-*/
-void AccelerantDriver::GetBoundingBoxes(const char *string, int32 count, 
-		font_metric_mode mode, escapement_delta *delta, BRect *rectarray, LayerData *d)
-{
-}
-
-/*!
-	\brief Retrieves the escapements for each character in the string
-	\param string Source null-terminated string
-	\param charcount Number of characters in the string
-	\param delta Optional glyph padding. This value may be NULL.
-	\param escapements Array of escapement_delta objects which will have at least charcount elements
-	\param offsets Actual offset values when iterating over the string. This array will also 
-		have at least charcount elements and the values placed therein will reflect 
-		the current kerning/spacing mode.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-	
-	See BFont::GetEscapements for more details on this function.
-*/
-void AccelerantDriver::GetEscapements(const char *string, int32 charcount, 
-		escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets, LayerData *d)
-{
-}
-
-/*!
-	\brief Retrieves the inset values of each glyph from its escapement values
-	\param string Source null-terminated string
-	\param charcount Number of characters in the string
-	\param edgearray Array of edge_info objects which will have at least charcount elements
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-
-	See BFont::GetEdges for more details on this function.
-*/
-void AccelerantDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray, LayerData *d)
-{
-}
-
-/*!
-	\brief Determines whether a font contains a certain string of characters
-	\param string Source null-terminated string
-	\param charcount Number of characters in the string
-	\param hasarray Array of booleans which will have at least charcount elements
-
-	See BFont::GetHasGlyphs for more details on this function.
-*/
-void AccelerantDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasarray)
-{
-}
-
-/*!
-	\brief Truncates an array of strings to a certain width
-	\param instrings Array of null-terminated strings
-	\param stringcount Number of strings passed to the function
-	\param mode Truncation mode
-	\param maxwidth Maximum width for all strings
-	\param outstrings String array provided by the caller into which the truncated strings are
-		to be placed.
-
-	See BFont::GetTruncatedStrings for more details on this function.
-*/
-void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, 
-	uint32 mode, float maxwidth, char **outstrings)
-{
 }
 
 /*!

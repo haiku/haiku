@@ -106,67 +106,18 @@ public:
 	void Shutdown(void);		// You never know when you'll need this
 	
 	// Drawing functions
-	void CopyBits(BRect src, BRect dest);
-	void CopyRegion(BRegion *src, const BPoint &lefttop);
-	void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
-	void DrawChar(char c, BPoint pt, LayerData *d);
-//	virtual void DrawPicture(SPicture *pic, BPoint pt);
-	void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
+	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
-	void HideCursor(void);
-	void InvertRect(BRect r);
-	bool IsCursorHidden(void);
-	void MoveCursorTo(float x, float y);
-//	void MovePenTo(BPoint pt);
-	void ObscureCursor(void);
-//	BPoint PenPosition(void);
-//	float PenSize(void);
-	void SetCursor(ServerCursor *cursor);
-//	drawing_mode GetDrawingMode(void);
-//	void SetDrawingMode(drawing_mode mode);
-	void ShowCursor(void);
+	void InvertRect(const BRect &r);
 
-	virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
-	virtual void FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void FillBezier(BPoint *pts, RGBColor& color);
-	virtual void FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void FillEllipse(BRect r, RGBColor& color);
-	virtual void FillEllipse(BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void FillPolygon(BPoint *ptlist, int32 numpts, RGBColor& color);
-	virtual void FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void FillRect(const BRect r, RGBColor& color);
-	virtual void FillRect(const BRect r, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void FillRoundRect(BRect r, float xrad, float yrad, RGBColor& color);
-	virtual void FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-//	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void FillTriangle(BPoint *pts, RGBColor& color);
-	virtual void FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	
-	virtual void StrokeArc(BRect r, float angle, float span, float pensize, RGBColor& color);
-	virtual void StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void StrokeBezier(BPoint *pts, float pensize, RGBColor& color);
-	virtual void StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void StrokeEllipse(BRect r, float pensize, RGBColor& color);
-	virtual void StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void StrokeLine(BPoint start, BPoint end, float pensize, RGBColor& color);
-	virtual void StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void StrokePoint(BPoint& pt, RGBColor& color);
-	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor& color, bool is_closed=true);
-	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color, bool is_closed=true);
-	virtual void StrokeRect(BRect r, float pensize, RGBColor& color);
-	virtual void StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor& color);
-	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
-//	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
 
-	virtual void StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors);
+	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
 
-	void SetMode(int32 mode);
+	void SetMode(const int32 &mode);
 	void SetMode(const display_mode &mode);
 	
-	float StringWidth(const char *string, int32 length, LayerData *d);
-	float StringHeight(const char *string, int32 length, LayerData *d);
 	bool DumpToFile(const char *path);
+
 	VDWindow *screenwin;
 
 	virtual status_t SetDPMSMode(const uint32 &state);

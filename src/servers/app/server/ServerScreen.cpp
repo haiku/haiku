@@ -89,10 +89,7 @@ bool Screen::SetResolution(BPoint res, uint32 colorspace){
 BPoint Screen::Resolution() const{
 	display_mode		mode;
 
-//	fDDriver->GetMode(&mode);
-//TODO: remove!
-	return BPoint(fDDriver->GetWidth(), fDDriver->GetHeight());
-//------------
+	fDDriver->GetMode(&mode);
 
 	return BPoint(mode.virtual_width, mode.virtual_height);
 }

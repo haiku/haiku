@@ -510,7 +510,7 @@ void Layer::RequestClientUpdate(const BRect &rect){
 		RGBColor tempColor(B_TRANSPARENT_COLOR);
 		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
 
-		fDriver->StrokeRect(rect, _layerdata->pensize, tempColor);
+		fDriver->StrokeRect(rect, tempColor);
 	}
 
 	BMessage		msg;
@@ -535,7 +535,7 @@ void Layer::RequestDraw(const BRect &r)
 		RGBColor tempColor(B_TRANSPARENT_COLOR);
 		//_layerdata->lowcolor.SetColor( B_TRANSPARENT_COLOR );
 
-		fDriver->StrokeRect(r, _layerdata->pensize, tempColor);
+		fDriver->StrokeRect(r, tempColor);
 
 			// draw itself.
 		Draw(r);

@@ -25,6 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
+#include <Accelerant.h>
 #include <PortMessage.h>
 #include <Entry.h>
 #include <Path.h>
@@ -664,13 +665,18 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			// 2) int32 height
 			// 3) int depth
 			
+			display_mode dmode;
+			fDriver->GetMode(&dmode);
+			
 			port_id replyport;
 			msg->Read<port_id>(&replyport);
 			
 			PortLink replylink(replyport);
 			replylink.SetOpCode(AS_GET_SCREEN_MODE);
-			replylink.Attach<int16>(fDriver->GetWidth());
-			replylink.Attach<int16>(fDriver->GetHeight());
+			replylink.Attach<int16>(dmode.virtual_width);
+			replylink.Attach<int16>(dmode.virtual_height);
+			
+			// Eventually, GetDepth() will get replaced
 			replylink.Attach<int16>(fDriver->GetDepth());
 			replylink.Flush();
 			break;
