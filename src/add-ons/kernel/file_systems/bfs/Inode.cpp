@@ -90,7 +90,7 @@ Inode::Inode(Volume *volume,vnode_id id,bool empty,uint8 reenter)
 
 	// these two will help to maintain the indices
 	fOldSize = Size();
-	fOldLastModified = Node()->last_modified_time;
+	fOldLastModified = LastModified();
 }
 
 
@@ -884,6 +884,10 @@ Inode::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_l
 {
 	// call the right WriteAt() method, depending on the inode flags
 
+	// update the last modification time in memory, it will be written
+	// back to the inode, and the index when the file is closed
+	Node()->last_modified_time = (bigtime_t)time(NULL) << INODE_TIME_SHIFT;
+
 	if (Flags() & INODE_NO_CACHE)
 		return ((Stream<Access::Uncached> *)this)->WriteAt(transaction, pos, buffer, _length);
 
@@ -1320,14 +1324,18 @@ Inode::SetFileSize(Transaction *transaction, off_t size)
 status_t 
 Inode::Append(Transaction *transaction,off_t bytes)
 {
-	return SetFileSize(transaction,Size() + bytes);
+	return SetFileSize(transaction, Size() + bytes);
 }
 
 
 status_t 
 Inode::Trim(Transaction *transaction)
 {
-	return ShrinkStream(transaction,Size());
+	status_t status = ShrinkStream(transaction, Size());
+	if (status < B_OK)
+		return status;
+
+	return WriteBack(transaction);
 }
 
 

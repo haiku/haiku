@@ -138,6 +138,7 @@ class Inode : public CachedBlock {
 			// currently only files can be accessed with bfs_read()/bfs_write()
 
 		off_t Size() const { return Node()->data.size; }
+		off_t LastModified() const { return Node()->last_modified_time; }
 
 		block_run &BlockRun() const { return Node()->inode_num; }
 		block_run &Parent() const { return Node()->parent; }

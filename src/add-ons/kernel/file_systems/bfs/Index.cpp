@@ -284,7 +284,7 @@ Index::RemoveSize(Transaction *transaction, Inode *inode)
 
 
 status_t
-Index::UpdateSize(Transaction *transaction,Inode *inode)
+Index::UpdateSize(Transaction *transaction, Inode *inode)
 {
 	off_t oldSize = inode->OldSize();
 	off_t newSize = inode->Size();
@@ -301,7 +301,7 @@ Index::UpdateSize(Transaction *transaction,Inode *inode)
 status_t 
 Index::InsertLastModified(Transaction *transaction, Inode *inode)
 {
-	off_t modified = inode->Node()->last_modified_time;
+	off_t modified = inode->LastModified();
 	return Update(transaction,"last_modified",B_INT64_TYPE,NULL,0,(uint8 *)&modified,sizeof(int64),inode);
 }
 

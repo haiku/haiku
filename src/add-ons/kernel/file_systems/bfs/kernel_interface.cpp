@@ -1146,6 +1146,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 		transaction.Done();
 
 	// periodically notify if the file size has changed
+	// ToDo: should we better test for a change in the last_modified time only?
 	if (cookie->last_size != inode->Size()
 		&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
 		notify_listener(B_STAT_CHANGED,volume->ID(),0,0,inode->ID(),NULL);
@@ -1183,20 +1184,32 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
 
-		Transaction transaction(volume,inode->BlockNumber());
-
-		status_t status = inode->Trim(&transaction);
-		if (status < B_OK)
-			FATAL(("Could not trim preallocated blocks!"));
-
+		Transaction transaction(volume, inode->BlockNumber());
+		status_t status = B_OK;
+		bool changed = false;
 		Index index(volume);
-		index.UpdateSize(&transaction,inode);
-		index.UpdateLastModified(&transaction,inode);
+
+		if (inode->OldSize() != inode->Size()) {
+			status = inode->Trim(&transaction);
+			if (status < B_OK)
+				FATAL(("Could not trim preallocated blocks!"));
+	
+			index.UpdateSize(&transaction, inode);
+			changed = true;
+		}
+		if (inode->OldLastModified() != inode->LastModified()) {
+			index.UpdateLastModified(&transaction, inode, inode->LastModified());
+			changed = true;
+			
+			// updating the index doesn't write back the inode
+			inode->WriteBack(&transaction);
+		}
 
 		if (status == B_OK)
 			transaction.Done();
 
-		notify_listener(B_STAT_CHANGED,volume->ID(),0,0,inode->ID(),NULL);
+		if (changed)
+			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
 	}
 
 	if (inode->Flags() & INODE_NO_CACHE) {

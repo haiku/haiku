@@ -1,4 +1,4 @@
-BFS - ToDo, June 23th, 2002
+BFS - ToDo, August 12th, 2002
 -----
 
 BlockAllocator
@@ -43,12 +43,14 @@ BPlusTree
 
 Inode
 
- - sometimes the inode's last modified time seems to be wrong, and is therefore not found in the b+tree (assuming that the b+tree is working correctly, what I do)
+ - exchange Inode::OldLastModified() with Inode::NewLastModified(), and don't change the last_modified field directly in Inode::WriteAt() for consistency in case of a crash
+ - the size is only updated in bfs_close() - but if the system crashes before, the entry in the size index doesn't match the one in the inode anymore - it would be better to let the data.size not reflect the real file size in this case (since the max_xxx_range entries are always correct)
  - Inode::FillGapWithZeros() currently disabled; apart from being slow, it really shouldn't be executed while a transaction is running, because that stops all other threads from doing anything (which can be a long time for a 100 MB file)
 
 
 Indices
 
+ - consider Index::UpdateLastModified() writing back the updated inode
 
 
 Attributes
@@ -61,7 +63,7 @@ Volume
 
 kernel_interface
 
- - missing functions, maybe they are not all needed (but most of them are): bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_setflags(), bfs_link()
+ - missing functions, maybe they are not really needed: bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_setflags(), bfs_link()
  - bfs_rename() currently doesn't respect any permissions
 
 
