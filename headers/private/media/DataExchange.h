@@ -152,6 +152,7 @@ enum {
 	FILEINTERFACE_MESSAGE_START = 0x500,
 	FILEINTERFACE_MESSAGE_END,
 	CONTROLLABLE_MESSAGE_START = 0x600,
+	CONTROLLABLE_GET_PARAMETER_WEB,
 	CONTROLLABLE_MESSAGE_END,
 	TIMESOURCE_MESSAGE_START = 0x700,
 	
@@ -851,6 +852,18 @@ struct timesource_add_slave_node_command : public command_data
 struct timesource_remove_slave_node_command : public command_data
 {
 	media_node node;
+};
+
+struct controllable_get_parameter_web_request : public request_data
+{
+	area_id area;
+	int32 maxsize;
+};
+
+struct controllable_get_parameter_web_reply : public reply_data
+{
+	type_code code;
+	int32 size; // = -1: parameter web data too large, = 0: no p.w., > 0: flattened p.w. data
 };
 
 #endif // _DATA_EXCHANGE_H
