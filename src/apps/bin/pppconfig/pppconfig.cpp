@@ -88,7 +88,7 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 	if(!interfaces)
 		return -1;
 	
-	ppp_interface_info info;
+	ppp_interface_info_t info;
 	PPPInterface interface;
 	
 	printf("Listing PPP interfaces:\n");
@@ -101,9 +101,9 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 			printf("\n");
 			
 			// type and name (if it has one)
-			if(info.if_unit >= 0) {
+			if(info.info.if_unit >= 0) {
 				printf("Type: Visible\n");
-				printf("\tName: ppp%ld\n", info.if_unit);
+				printf("\tName: ppp%ld\n", info.info.if_unit);
 			} else
 				printf("Type: Hidden\n");
 			
@@ -112,16 +112,16 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 			
 			// mode
 			printf("\tMode: ");
-			if(info.mode == PPP_CLIENT_MODE)
+			if(info.info.mode == PPP_CLIENT_MODE)
 				printf("Client\n");
-			else if(info.mode == PPP_SERVER_MODE)
+			else if(info.info.mode == PPP_SERVER_MODE)
 				printf("Server\n");
 			else
 				printf("Unknown\n");
 			
 			// status
 			printf("\tStatus: %s\n",
-				info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
+				info.info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
 		}
 	}
 	
@@ -166,13 +166,16 @@ create(const char *pppidf, bool bringUp = true)
 	
 	printf("Created interface with ID: %ld\n", interface.ID());
 	
-	ppp_interface_info info;
+	ppp_interface_info_t info;
 	interface.GetInterfaceInfo(&info);
 	
-	if(info.if_unit >= 0)
-		printf("Name: ppp%ld\n", info.if_unit);
+	if(info.info.if_unit >= 0)
+		printf("Name: ppp%ld\n", info.info.if_unit);
+	else
+		printf("This interface is hidden! You can delete it by typing:\n"
+			"pppconfig delete %ld\n", interface.ID());
 	
-	if(bringUp && !info.doesDialOnDemand) {
+	if(bringUp && !info.info.doesDialOnDemand) {
 		interface.Up();
 		printf("Connecting in background...\n");
 	}
@@ -323,13 +326,13 @@ show_details(const char *name)
 		return -1;
 	}
 	
-	ppp_interface_info info;
+	ppp_interface_info_t info;
 	interface.GetInterfaceInfo(&info);
 	
 	// type and name (if it has one)
-	if(info.if_unit >= 0) {
+	if(info.info.if_unit >= 0) {
 		printf("Type: Visible\n");
-		printf("Name: ppp%ld\n", info.if_unit);
+		printf("Name: ppp%ld\n", info.info.if_unit);
 	} else
 		printf("Type: Hidden\n");
 	
@@ -337,27 +340,27 @@ show_details(const char *name)
 	printf("ID: %ld\n", interface.ID());
 	
 	// DialOnDemand
-	printf("DialOnDemand: %s\n", info.doesDialOnDemand ? "Enabled" : "Disabled");
+	printf("DialOnDemand: %s\n", info.info.doesDialOnDemand ? "Enabled" : "Disabled");
 	
 	// AutoRedial
-	printf("AutoRedial: %s\n", info.doesAutoRedial ? "Enabled" : "Disabled");
+	printf("AutoRedial: %s\n", info.info.doesAutoRedial ? "Enabled" : "Disabled");
 	
 	// MRU and interfaceMTU
-	printf("MRU: %ld\n", info.MRU);
-	printf("Interface MTU: %ld\n", info.interfaceMTU);
+	printf("MRU: %ld\n", info.info.MRU);
+	printf("Interface MTU: %ld\n", info.info.interfaceMTU);
 	
 	// mode
 	printf("Mode: ");
-	if(info.mode == PPP_CLIENT_MODE)
+	if(info.info.mode == PPP_CLIENT_MODE)
 		printf("Client\n");
-	else if(info.mode == PPP_SERVER_MODE)
+	else if(info.info.mode == PPP_SERVER_MODE)
 		printf("Server\n");
 	else
 		printf("Unknown\n");
 	
 	// status
 	printf("Status: %s\n",
-		info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
+		info.info.phase == PPP_ESTABLISHED_PHASE ? "Connected" : "Disconnected");
 	
 	return 0;
 }
