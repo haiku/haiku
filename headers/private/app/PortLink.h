@@ -14,29 +14,40 @@ class PortLinkData;
 
 class PortLink
 {
+	typedef struct
+	{
+		int32 code;
+		ssize_t buffersize;
+		int8 *buffer;
+		
+	} ReplyData;
 public:
 	PortLink(port_id port);
+	PortLink(const PortLink &link);
 	~PortLink(void);
 	void SetOpCode(int32 code);
 	void SetPort(port_id port);
 	port_id GetPort(void);
-	void Flush(bigtime_t timeout=B_INFINITE_TIMEOUT);
+	status_t Flush(bigtime_t timeout=B_INFINITE_TIMEOUT);
 	int8* FlushWithReply(int32 *code, status_t *status, ssize_t *buffersize,
 		bigtime_t timeout=B_INFINITE_TIMEOUT);
-	void Attach(void *data, size_t size);
-	void Attach(int32 data);
-	void Attach(int16 data);
-	void Attach(int8 data);
-	void Attach(float data);
-	void Attach(bool data);
-	void Attach(BRect data);
-	void Attach(BPoint data);
+	status_t FlushWithReply(PortLink::ReplyData *data,bigtime_t timeout=B_INFINITE_TIMEOUT);
+	status_t Attach(void *data, size_t size);
+	status_t Attach(int32 data);
+	status_t Attach(int16 data);
+	status_t Attach(int8 data);
+	status_t Attach(float data);
+	status_t Attach(bool data);
+	status_t Attach(BRect data);
+	status_t Attach(BPoint data);
 	void MakeEmpty(void);
 protected:	
 	void FlattenData(int8 **buffer,int32 *size);
 	port_id target, replyport;
-	int32 	opcode, bufferlength;
+	int32 opcode;
+	uint32 bufferlength,capacity;
 	int		num_attachments;
+	bool port_ok;
 	PortLinkData *attachments[_PORTLINK_MAX_ATTACHMENTS];
 };
 

@@ -34,11 +34,11 @@ The document has the following sections:</P>
 
 <LI><P><B>Creating a message:</B> Creating a message can be as simple as setting the message code (similar to BMessage's <i>what</i> member). Extra data is not required.</P></LI>
 
-<LI><P><B>Attaching Data:</B> Adding extra data is as simple as calling the member function Attach(), which makes a copy of the parameter passed to it.</P></LI>
+<LI><P><B>Attaching Data:</B> Adding extra data is as simple as calling the member function Attach(), which makes a copy of the parameter passed to it. B_ERROR is returned if the no more data can be attached before the message is sent or if the size is invalid. B_NO_MEMORY is returned when the attachments are larger than the target port's capacity.</P></LI>
 
-<LI><P><B>Sending a message:</B> Call Flush(). Whatever opcode has been set will be sent to the target. Optionally, a timeout (in microseconds) of type bigtime_t can be specified. This can be useful in preventing deadlocks if the target has crashed and its port fills up.</P></LI>
+<LI><P><B>Sending a message:</B> Call Flush(). Whatever opcode has been set will be sent to the target. Optionally, a timeout (in microseconds) of type bigtime_t can be specified. This can be useful in preventing deadlocks if the target has crashed and its port fills up. The function returns B_BAD_VALUE if the target port is invalid.</P></LI>
 
-<LI><P><B>Synchronous Messaging:</B> This one requires a little more care in order to prevent deadlocks. Attachments may be used as with Flush(), but FlushWithReply() will wait until the target replies unless a timeout value is specified in microseconds of type bigtime_t. A return code of B_ERROR indicates an internal data error and your message is intact. If a reply times out, it will return B_TIMED_OUT. Otherwise, it returns B_OK.
+<LI><P><B>Synchronous Messaging:</B> This one requires a little more care in order to prevent deadlocks. Attachments may be used as with Flush(), but FlushWithReply() will wait until the target replies unless a timeout value is specified in microseconds of type bigtime_t. A return code of B_ERROR indicates an internal data error and your message is intact. If a reply times out, it will return B_TIMED_OUT. If the target port is invalid, B_BAD_VALUE is returned. Otherwise, it returns B_OK.
 <P>
 <i>Reply Protocol:</i> The target will receive the message with all attached data with one slight modification to the otherwise chosen message protocol - the first item will be a port_id which is the port to which the sender is to reply. All other attached data (if any) immediately follows this port id.
 </li>
