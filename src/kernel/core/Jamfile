@@ -5,7 +5,6 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>console.c
 	<$(SOURCE_GRIST)>cpu.c
 	<$(SOURCE_GRIST)>debug.c
-	<$(SOURCE_GRIST)>driver_settings.c
 	<$(SOURCE_GRIST)>elf.c 
 	<$(SOURCE_GRIST)>faults.c
 	<$(SOURCE_GRIST)>gdb.c 
