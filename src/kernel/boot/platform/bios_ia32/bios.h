@@ -23,6 +23,8 @@ struct bios_regs {
 	uint16	flags;
 };
 
+#define CARRY_FLAG	0x01
+
 extern
 #ifdef __cplusplus
 "C"
