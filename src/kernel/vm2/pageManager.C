@@ -15,9 +15,11 @@ pageManager::pageManager(int pages)
 		printf ("pageManager::pageManager: No memory!\n");
 		exit(1);
 		}
+	printf ("Allocated an area. Address = %x\n",area);
 	for (int i=0;i<pages;i++)
 		unused.add(new page(addOffset(area,i*PAGE_SIZE)));
 //		unused.add(new page((void *)(i*PAGE_SIZE)));
+
 	cleanLock=create_sem (1,"clean_lock");
 	unusedLock=create_sem (1,"unused_lock");
 	inUseLock=create_sem (1,"inuse_lock");
@@ -33,7 +35,7 @@ pageManager::pageManager(int pages)
 page *pageManager::getPage(void)
 	{
 	page *ret=NULL;
-	//printf ("pageManager::getPage: Checking clean\n");
+//	printf ("pageManager::getPage: Checking clean\n");
 	//printf ("pageManager::getPage:cleanCount = %d\n", clean.nodeCount);
 	if (clean.count())
 		{
@@ -44,8 +46,8 @@ page *pageManager::getPage(void)
 		//printf ("pageManager::getPage:got next clean\n");
 		release_sem(cleanLock);
 		//printf ("pageManager::getPage:unlocked clean\n");
-		} // This could fail if someone swoops in and steal our page.
-	if (!ret && unused.count())
+		} // This could fail if someone swooped in and stole our page.
+	else if (unused.count())
 		{
 		//printf ("pageManager::getPage:Checking unused\n");
 		acquire_sem(unusedLock);
@@ -55,25 +57,32 @@ page *pageManager::getPage(void)
 		//printf ("pageManager::getPage:next unused = %x\n",ret);
 		if (ret)
 			ret->zero();
-		} // This could fail if someone swoops in and steal our page.
+		} // This could fail if someone swooped in and stole our page.
 	if (ret)
 		{
 		acquire_sem(inUseLock);
 		inUse.add(ret);
 		release_sem(inUseLock);
+		ret->count++;
 		}
-	//printf ("pageManager::getPage:leaving with page = %x\n", ret);
+//	printf ("pageManager::getPage:leaving with page = %x\n", ret->getAddress());
 	return ret;
 	}
 
 void pageManager::freePage(page *toFree)
 	{
-	acquire_sem(inUseLock);
-	inUse.remove(toFree);
-	release_sem(inUseLock);
-	acquire_sem(unusedLock);
-	unused.add(toFree);
-	release_sem(unusedLock);
+//	printf ("Inside freePage; old value = %d",toFree->count);
+	toFree->count--;
+//	printf (" new value = %d, page = %x\n",toFree->count,toFree->getAddress());
+	if (toFree->count==0)
+		{
+		acquire_sem(inUseLock);
+		inUse.remove(toFree);
+		release_sem(inUseLock);
+		acquire_sem(unusedLock);
+		unused.add(toFree);
+		release_sem(unusedLock);
+		}
 	}
 
 void pageManager::cleaner(void)
@@ -98,7 +107,32 @@ void pageManager::cleaner(void)
 
 int pageManager::desperation(void)
 	{ // Formula to determine how desperate system is to get pages back...
-	int percentClean=(unused.count()+clean.count())/totalPages;
+	int percentClean=(unused.count()+clean.count())*100/totalPages;
 	if (percentClean>30) return 1;
-	return (35-percentClean)/5;
+	return (35-percentClean)/7;
 	}
+
+void pageManager::dump(void)
+{
+	printf ("Dumping the unused list\n");
+	for (struct node *cur=unused.rock;cur;)
+		{
+		page *thisPage=(page *)cur;
+		thisPage->dump();
+		cur=cur->next;
+		}
+	printf ("Dumping the clean list\n");
+	for (struct node *cur=clean.rock;cur;)
+		{
+		page *thisPage=(page *)cur;
+		thisPage->dump();
+		cur=cur->next;
+		}
+	printf ("Dumping the inuse list\n");
+	for (struct node *cur=inUse.rock;cur;)
+		{
+		page *thisPage=(page *)cur;
+		thisPage->dump();
+		cur=cur->next;
+		}
+}

@@ -24,6 +24,7 @@ class vmInterface // This is the class that "owns" all of the managers.
 		status_t resizeArea(int area,size_t size);
 		status_t setAreaProtection(int area,protectType prot);
 		void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
+		status_t munmap(void *addr, size_t len);
 		void pager(void);
 		void saver(void);
 		void cleaner(void);

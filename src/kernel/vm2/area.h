@@ -14,6 +14,7 @@ class area : public node
 		char name[B_OS_NAME_LENGTH];
 		pageState state;
 		protectType protection;
+		bool finalWrite;
 		int areaID;
 		int in_count;
 		int out_count;
@@ -28,6 +29,7 @@ class area : public node
 		unsigned long mapAddressSpecToAddress(addressSpec type,unsigned long requested,int pageCount);
 		status_t createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect,int fd,size_t offset);
 		status_t createArea (char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect);
+		status_t cloneArea(area *area, char *inName, void **address, addressSpec type,pageState inState,protectType protect);
 		int getAreaID(void) {return areaID;}
 		void setAreaID(int id) {areaID=id;}
 		void freeArea(void);
@@ -40,7 +42,11 @@ class area : public node
 		unsigned long getStartAddress(void) {return start_address;}
 		void pager(int desperation);
 		void saver(void);
+		unsigned long getSize(void) {return getEndAddress()-getStartAddress();}
+		unsigned long getPageCount(void) {return (getEndAddress()-getStartAddress())/PAGE_SIZE;}
+		areaManager *getAreaManager(void) {return manager;}
 
+		void dump(void);
 		bool fault(void *fault_address, bool writeError); // true = OK, false = panic.
 
 		char getByte(unsigned long ); // This is for testing only

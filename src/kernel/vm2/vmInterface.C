@@ -1,6 +1,7 @@
 #include "vmInterface.h"
 //#include "areaManager.h"
 #include "mman.h"
+#include "area.h"
 		
 areaManager am;
 swapFileManager swapMan;
@@ -30,11 +31,22 @@ int32 saverThread(void *areaMan)
 		}
 	}
 
+int32 pagerThread(void *areaMan)
+	{
+	areaManager *am=(areaManager *)areaMan;
+	while (1)
+		{
+		snooze(1000000);	
+		am->pager(pageMan.desperation());	
+		}
+	}
+
 vmInterface::vmInterface(int pages) 
 	{
 	nextAreaID=0;
 	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,&pageMan));
 	resume_thread(spawn_thread(saverThread,"saverThread",0,getAM()));
+	resume_thread(spawn_thread(pagerThread,"pagerThread",0,getAM()));
 	}
 
 int vmInterface::getAreaByAddress(void *address)
@@ -104,9 +116,13 @@ status_t vmInterface::getAreaInfo(int Area,area_info *dest)
 	}
 
 status_t vmInterface::getNextAreaInfo(int  process,int32 *cookie,area_info *dest)
-	// Left for later..
 	{
-	;
+	area *oldArea=getAM()->findArea(*cookie);	
+	area *newArea=(area *)(oldArea->next);
+	if (newArea)
+		return newArea->getInfo(dest);
+	else
+		return B_BAD_VALUE;
 	}
 
 int vmInterface::getAreaByName(char *name)
@@ -114,9 +130,14 @@ int vmInterface::getAreaByName(char *name)
 	return getAM()->findArea(name)->getAreaID();
 	}
 
-int vmInterface::cloneArea(int area,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
+int vmInterface::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
 	{
-	;
+	area *newArea = new area(getAM());
+	area *oldArea=getAM()->findArea(newAreaID);	
+	newArea->cloneArea(oldArea,AreaName,address,addType,state,prot);
+	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
+	getAM()->addArea(newArea);
+	return newArea->getAreaID();
 	}
 
 void vmInterface::pager(void)
@@ -154,7 +175,7 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
 	protectType protType=(prot&PROT_WRITE)?writable:(prot&PROT_READ)?readable:none;
 	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
-	printf ("flags = %x, anon = %x\n",flags,MAP_ANON);
+	//printf ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	if (flags & MAP_ANON) 
 		{
 		createArea(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr, addType ,LAZY,protType);
@@ -162,11 +183,20 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 		}
 
 	area *newArea = new area(getAM());
-	printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
+	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
 	getAM()->addArea(newArea);
 	newArea->getAreaID();
+	//pageMan.dump();
+	//newArea->dump();
 	return addr;
-	
 	}
+
+status_t vmInterface::munmap(void *addr, size_t len)
+{
+	// Note that this is broken for any and all munmaps that are not full area in size. This is an all or nothing game...
+	int area=getAreaByAddress(addr);
+	freeArea(area);	
+	//pageMan.dump();
+}

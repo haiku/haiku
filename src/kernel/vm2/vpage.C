@@ -11,36 +11,42 @@ void vpage::flush(void)
 
 void vpage::refresh(void)
 	{
-		swapMan.read_block(*backingNode,physPage, PAGE_SIZE);
-	}
-
-vpage *vpage::clone(unsigned long address) // The calling method will have to create this...
-	{
-	return  new vpage(address,NULL,physPage,(protection==readable)?protection:copyOnWrite,LAZY); // Not sure if LAZY is right or not
+		swapMan.read_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
 	}
 
 // backing and/or physMem can be NULL/0.
 vpage::vpage(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state) 
 	{ 
+	//printf ("vpage::vpage: start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	start_address=start;
 	end_address=start+PAGE_SIZE-1;
 	protection=prot;
 	swappable=(state==NO_LOCK);
+	dirty=true;
+
 	if (backing)
+		{
 		backingNode=backing; 
+		backing->count++;
+		}
 	else
 		backingNode=&(swapMan.findNode());
-	if (!physPage && (state!=LAZY) && (state!=NO_LOCK))
+	if (!physMem && (state!=LAZY) && (state!=NO_LOCK))
 		physPage=pageMan.getPage();
 	else
+		{
+		if (physMem)
+			physMem->count++;
 		physPage=physMem;
+		}
+	//printf ("vpage::vpage: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 
 vpage::~vpage(void)
 	{
-	if (physPage) // I doubt that this is always true. Probably need to check for sharing...
+	if (physPage) //  Note that free means release one reference
 		pageMan.freePage(physPage);
-	if (backingNode->fd) 
+	if (backingNode->fd)
 		swapMan.freeVNode(*backingNode);
 	}
 
@@ -52,7 +58,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
-	printf ("vpage::fault: virtual address = %x, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
+//	printf ("vpage::fault: virtual address = %x, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -61,6 +67,8 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
 				{
 				page *newPhysPage=pageMan.getPage();
+				if (!newPhysPage) // No room at the inn
+					return false;
 				memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 				physPage=newPhysPage;
 				protection=writable;
@@ -71,12 +79,17 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			}
 		}
 	physPage=pageMan.getPage();
-	printf ("vpage::fault: New page allocated! new physical address = %x\n",physPage->getAddress());
+	if (!physPage) // No room at the inn
+		return false;
+//	printf ("vpage::fault: New page allocated! new physical address = %x vnode.fd=%d, vnode.offset=%d, \n",physPage->getAddress(),((backingNode)?backingNode->fd:0),((backingNode)?backingNode->offset:0));
 	// Update the architecture specific stuff here...
 	// This refresh is unneeded if the data was never written out... 
+//	dump();
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	printf ("vpage::fault: Refreshed\n");
-
+//	printf ("vpage::fault: Refreshed\n");
+//	dump();
+//	printf ("vpage::fault: exiting\n");
+	return true;
 	}
 
 char vpage::getByte(unsigned long address)
@@ -117,8 +130,10 @@ void  vpage::setInt(unsigned long address,int value)
 
 void vpage::pager(int desperation)
 	{
+	printf ("vpage::pager start desperation = %d\n",desperation);
 	if (!swappable)
 			return;
+	printf ("vpage::pager swappable\n");
 	switch (desperation)
 		{
 		case 1: return; break;
@@ -128,8 +143,11 @@ void vpage::pager(int desperation)
 		case 5: if (!physPage)  return;break;
 		default: return;break;
 		}
+	printf ("vpage::pager flushing\n");
 	flush();
+	printf ("vpage::pager freeing\n");
 	pageMan.freePage(physPage);
+	printf ("vpage::pager going to NULL\n");
 	physPage=NULL;
 	}
 

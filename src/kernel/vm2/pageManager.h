@@ -11,6 +11,7 @@ class pageManager {
 		void freePage(page *);
 		void cleaner(void);
 		int desperation(void);
+		void dump(void);
 	private:
 		list clean,unused,inUse;
 		sem_id cleanLock,unusedLock,inUseLock;

@@ -8,6 +8,13 @@ struct vnode : public node
 	int fd;
 	unsigned long offset;
 	bool valid;
+	int count;
+
+	vnode (void)
+	{
+	valid=false;
+	count=0;
+	}
 };
 typedef unsigned long owningProcess;
 #define B_OS_NAME_LENGTH 32

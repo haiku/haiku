@@ -7,8 +7,10 @@ class page : public node {
 		void *cpuSpecific;
 		void *physicalAddress;
 		public:
-		page(void *address) : physicalAddress(address) {} ;
+		int count;
+		page(void *address) : physicalAddress(address) {count=0;} ;
 		void zero(void);
 		unsigned long getAddress(void) {return (unsigned long)physicalAddress;}
+		void dump(void) { printf ("Page %x, physicalAddress = %x\n",this,getAddress()); }
 };
 #endif

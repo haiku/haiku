@@ -13,12 +13,13 @@ swapFileManager::swapFileManager(void)
 
 void swapFileManager::write_block(vnode &node,void *loc,unsigned long size)
 	{
-	printf ("swapFileManager::write_block: writing, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
+	//printf ("swapFileManager::write_block: writing, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
 	if (-1==lseek(node.fd,node.offset,SEEK_SET))
 		printf ("seek failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
 	if (-1==write(node.fd,loc,size))
 		printf ("Write failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
 	node.valid=true;
+	//printf ("swapFileManager::write_block: done, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
 	}
 
 void swapFileManager::read_block(vnode &node,void *loc,unsigned long size)
@@ -26,7 +27,7 @@ void swapFileManager::read_block(vnode &node,void *loc,unsigned long size)
 	lseek(node.fd,node.offset,SEEK_SET);
 	if (node.valid==false)
 		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
-	//printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
+	//printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d into %x\n",node.fd, node.offset,loc);
 	read(node.fd,loc,size);
 	}
 
@@ -36,30 +37,37 @@ vnode &swapFileManager::findNode(void)
 	//swapFileFreeList.dump();
 	//printf ("swapFileManager::findNode: Finding a new node for you, Master: ");
 	vnode *newNode;
+	//printf ("locking in sfm\n");
 	Lock();
-	if (newNode=reinterpret_cast<vnode *>(swapFileFreeList.next()))
-		{
-		//printf (" Reused: %d\n",newNode->offset);
-		}
-	else
+	newNode=reinterpret_cast<vnode *>(swapFileFreeList.next());
+	//printf ("unlocking in sfm\n");
+	Unlock();
+	if (!newNode)
 		{
 		newNode=new vnode;
 		newNode->fd=swapFile;
 		newNode->offset=maxNode+=PAGE_SIZE; 
-		newNode->valid=false;
 		//printf (" New One: %d\n",newNode->offset);
 		}
-	Unlock();
+	newNode->valid=false;
+	newNode->count=0;
 	//printf ("swapFileManager::findNode: swapFileFreeList is now: ");
 	//swapFileFreeList.dump();
+	newNode->count++;
 	return *newNode;
 	}
 
 void swapFileManager::freeVNode(vnode &v)
 	{
-	Lock();
-	//printf ("swapFileManager::freeNode: Starting Freeing a new node for you, Master: offset:%d\n",v.offset);
-	v.valid=false;
-	swapFileFreeList.add(&v);
-	Unlock();
+	v.count--;
+	if (v.count==0)
+		{
+	//printf ("locking in sfm\n");
+		Lock();
+		//printf ("swapFileManager::freeNode: Starting Freeing a new node for you, Master: offset:%d\n",v.offset);
+		v.valid=false;
+		swapFileFreeList.add(&v);
+	//printf ("unlocking in sfm\n");
+		Unlock();
+		}
 	}

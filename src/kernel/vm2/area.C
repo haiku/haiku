@@ -29,9 +29,7 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,unsigned long reque
 			break;
 		case CLONE: base=0;break; // Not sure what to do...
 		}
-	printf ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n",
-		((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"),
-		requested,pageCount);
+//	printf ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n", ((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"), requested,pageCount);
 	return base;
 }
 
@@ -48,9 +46,10 @@ status_t area::createAreaMappingFile(char *inName, int pageCount,void **address,
 		vnode *newVnode=new vnode;
 		newVnode->fd=fd;
 		newVnode->offset=offset+PAGE_SIZE*i;
+		newVnode->valid=true;
 		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
-		printf ("New vnode with fd %d, offset = %d\n",fd,newVnode->offset);
+//		printf ("New vnode with fd %d, offset = %d\n",fd,newVnode->offset);
 		}
 	manager->unlock();
 
@@ -58,29 +57,69 @@ status_t area::createAreaMappingFile(char *inName, int pageCount,void **address,
 	start_address=base;
 	end_address=base+pageCount*PAGE_SIZE;
 	*address=(void *)base;
+	finalWrite=true;
 	}
 
 status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
 	{
+	vpage *newPage;
+
 	strcpy(name,inName);
+	state=inState;
+	finalWrite=false;
+	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
+
 	manager->lock();
 	//printf ("area::createArea: Locked in createArea\n");
-	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	//printf ("area::createArea: base address = %d\n",base);
-	vpage *newPage;
 	for (int i=0;i<pageCount;i++)
 		{
 		//printf ("in area::createArea: creating page = %d\n",i);
 		newPage = new vpage(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 		vpages.add(newPage);
 		}
-	state=inState;
+	manager->unlock();
 	start_address=base;
 	end_address=base+pageCount*PAGE_SIZE;
-	manager->unlock();
 	*address=(void *)base;
 	//printf ("area::createArea: unlocked in createArea\n");
+	}
+
+status_t area::cloneArea(area *origArea, char *inName, void **address, addressSpec type,pageState inState,protectType protect)
+	{
+//  printf ("area::cloneArea: entered\n");
+	strcpy(name,inName);
+	int pageCount = origArea->getPageCount();
+	manager->lock();
+//	printf ("area::cloneArea: locked\n");
+	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
+	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
+	start_address=base;
+//  printf ("area::cloneArea: base address = %x\n",base);
+	
+	if (origArea->getAreaManager()!=manager) // Else, already locked;
+		{
+		printf ("Holding dual locks! \n");
+		origArea->getAreaManager()->lock();
+		}
+	for (struct node *cur=origArea->vpages.rock;cur;)
+		{
+		vpage *newPage,*page=(vpage *)cur;
+		// Cloned area has the same physical page and backing store...
+		newPage = new vpage(base,page->getBacking(),page->getPhysPage(),protect,inState);
+		vpages.add(newPage);
+		base+=PAGE_SIZE;
+		cur=cur->next;
+		}
+	if (origArea->getAreaManager()!=manager) // Else, already locked;
+		origArea->getAreaManager()->unlock();
+	state=inState;
+	end_address=base+pageCount*PAGE_SIZE;
+	manager->unlock();
+	*address=(void *)start_address;
+	finalWrite=false;
+//	printf ("area::cloneArea: unlocked\n");
 	}
 
 void area::freeArea(void)
@@ -93,7 +132,8 @@ void area::freeArea(void)
 		{
 		//printf ("area::freeArea: wasting a page: %x\n",cur);
 		vpage *page=(vpage *)cur;
-		page->flush();
+		if (finalWrite) 
+			page->flush(); 
 		//printf ("area::freeArea: flushed a page \n");
 		cur=cur->next;
 		delete page; // Probably need to add a destructor
@@ -254,6 +294,17 @@ void area::saver(void)
 		{
 		vpage *page=(vpage *)cur;
 		page->saver();
+		}
+	}
+
+void area::dump(void) 
+	{ 
+	printf ("area::dump: size = %d, lock = %d, address = %x\n",end_address-start_address,state,start_address); 
+	for (struct node *cur=vpages.rock;cur;)
+		{
+		vpage *page=(vpage *)cur;
+		page->dump();
+		cur=cur->next;
 		}
 	}
 

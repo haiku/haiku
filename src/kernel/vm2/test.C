@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-vmInterface vm(20);
+vmInterface vm(30);
 
 void writeByte(unsigned long addr,unsigned int offset, char value) { vm.setByte(addr+offset,value); }
 
@@ -13,15 +13,24 @@ unsigned char readByte(unsigned long addr,unsigned int offset ) { char value=vm.
 
 int createFillAndTest(int pages)
 {
+	try{
 	unsigned long addr;
 	int area1;
 	area1=vm.createArea("Mine",pages,(void **)(&addr));
+	printf ("createFillAndTest: create done\n");
 	for (int i=0;i<pages*PAGE_SIZE;i++)
 		writeByte(addr,i,i%256);
+	printf ("createFillAndTest: writing done\n");
 	for (int i=0;i<pages*PAGE_SIZE;i++)
 		if (i%256!=readByte(addr,i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(addr,i));
+	printf ("createFillAndTest: reading done\n");
 	return area1;
+	}
+	catch (...)
+	{
+		printf ("Exception thrown!\n");
+	}
 }
 
 struct loopTestParameters
@@ -35,16 +44,17 @@ struct loopTestParameters
 
 int32 loopTest(void *parameters)
 	{
+	printf ("Starting Loop Test!\n");
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int area1;
 
 	while (1)
 		{
 		snooze(params->initialSnooze);
-		//printf ("Creating %s area\n",params->name);
+		printf ("Creating %s area\n",params->name);
 		area1=createFillAndTest(params->areaSize);
 		snooze(params->holdSnooze);
-		//printf ("Freeing %s area\n",params->name);
+		printf ("Freeing %s area\n",params->name);
 		vm.freeArea(area1);
 		snooze(params->loopSnooze);
 		}
@@ -85,13 +95,13 @@ int32 mmapTest (void *parameters)
 	{
 	void *map;
 
-	int fd = open ("OBOS_mmap",O_RDWR|O_CREAT,0x777);
-	printf ("Opened file, fd = %d\n",fd);
 
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int size=params->areaSize; // Note that this is in bytes, not in pages
-//	while (1)
+	while (1)
 		{
+		int fd = open ("OBOS_mmap",O_RDWR|O_CREAT,0x777);
+		printf ("Opened file, fd = %d\n",fd);
 		snooze(params->initialSnooze);
 		printf ("Creating %s mmap\n",params->name);
 		snooze(params->holdSnooze);
@@ -102,12 +112,37 @@ int32 mmapTest (void *parameters)
 		for (int i=0;i<size;i++)
 			if (i%256!=readByte((int32)map,i))
 				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte((int32)map,i));
-		snooze(params->loopSnooze);
-		}
+		snooze(params->loopSnooze); 
+		vm.munmap(map,size);
 		close(fd);
-	printf ("Closed file, fd = %d\n",fd);
+		printf ("Closed file, fd = %d\n",fd);
+		}
 	}
 
+int32 cloneTest (void *parameters)
+	{
+	loopTestParameters *params=((loopTestParameters *)parameters);
+	int area1,area2;
+	void *cloneAddr=NULL;
+
+	while (1)
+		{
+		snooze(params->initialSnooze);
+	//	printf ("Creating %s area, size = %d\n",params->name,params->areaSize);
+		area1=createFillAndTest(params->areaSize);
+	//	printf ("cloning, create done \n");
+		area2=vm.cloneArea(area1,"Clone1",&cloneAddr);
+		for (int i=0;i<params->areaSize*PAGE_SIZE;i++)
+			if (i%256!=readByte((int32)cloneAddr,i))
+				printf ("ERROR! Clone Byte at offset %d of %x does not match: expected: %d, found: %d\n",i,cloneAddr,i%256,readByte((int32)cloneAddr,i));
+	//	printf ("Snoozing, compare done \n");
+		snooze(params->holdSnooze);
+	//	printf ("Freeing %s area\n",params->name);
+		vm.freeArea(area2);
+		vm.freeArea(area1);
+		snooze(params->loopSnooze);
+		}
+	}
 
 int main(int argc,char **argv)
 {
@@ -116,14 +151,16 @@ int main(int argc,char **argv)
 	loopTestParameters area3Params={"area3",1000000,2,300000,200000};
 	loopTestParameters info1Params={"info1",500000,2,400000,30000};
 	loopTestParameters mmap1Params={"mmap",500000,8192,400000,1000000};
+	loopTestParameters clone1Params={"clone1",200000,2,300000,400000};
 
 	//resume_thread(spawn_thread(loopTest,"area test 1",0,&area1Params));
 	//resume_thread(spawn_thread(loopTest,"area test 2",0,&area2Params));
 	//resume_thread(spawn_thread(loopTest,"area test 3",0,&area3Params));
 	//resume_thread(spawn_thread(getInfoTest,"info test 1",0,&info1Params));
 	resume_thread(spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
+	//resume_thread(spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
 
-	snooze(10000000);
+	snooze(1000000000);
 
 	return 0;
 }

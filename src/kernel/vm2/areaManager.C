@@ -43,6 +43,7 @@ area *areaManager::findArea(void *address)
 		{
 		area *myArea=(area *)cur;
 //		printf ("areaManager::findArea: Looking for %x between %x and %x\n",address,myArea->getStartAddress(),myArea->getEndAddress());
+		fflush(NULL);
 		if (myArea->contains(address))
 				return myArea;
 		}
