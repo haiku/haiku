@@ -258,6 +258,17 @@ AttributeWindow::MessageReceived(BMessage *message)
 }
 
 
+bool 
+AttributeWindow::QuitRequested()
+{
+	bool quit = fProbeView->QuitRequested();
+	if (!quit)
+		return false;
+
+	return ProbeWindow::QuitRequested();
+}
+
+
 bool
 AttributeWindow::Contains(const entry_ref &ref, const char *attribute)
 {

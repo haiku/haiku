@@ -18,6 +18,7 @@ class AttributeWindow : public ProbeWindow {
 		virtual ~AttributeWindow();
 
 		virtual void MessageReceived(BMessage *message);
+		virtual bool QuitRequested();
 		virtual bool Contains(const entry_ref &ref, const char *attribute);
 
 	private:

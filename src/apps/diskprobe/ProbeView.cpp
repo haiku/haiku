@@ -24,6 +24,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <ScrollView.h>
+#include <Alert.h>
 #include <String.h>
 #include <Entry.h>
 #include <Path.h>
@@ -46,6 +47,8 @@ static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
 static const uint32 kMsgLastPosition = 'lpos';
 static const uint32 kMsgFontSize = 'fnts';
+static const uint32 kMsgPrint = 'prnt';
+static const uint32 kMsgPageSetup = 'pgsp';
 
 
 class IconView : public BView {
@@ -989,12 +992,12 @@ void
 ProbeView::AddPrintMenuItems(BMenu *menu, int32 index)
 {
 	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, NULL), index++);
+	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
+								new BMessage(kMsgPageSetup)), index++);
 	item->SetTarget(this);
-	item->SetEnabled(false);
-	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS, NULL, 'P', B_COMMAND_KEY), index++);
+	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS,
+								new BMessage(kMsgPrint), 'P', B_COMMAND_KEY), index++);
 	item->SetTarget(this);
-	item->SetEnabled(false);
 }
 
 
@@ -1237,16 +1240,52 @@ ProbeView::CheckClipboard()
 }
 
 
-void 
+status_t
+ProbeView::Save()
+{
+	status_t status = fEditor.Save();
+
+	char buffer[1024];
+	snprintf(buffer, sizeof(buffer),
+		"Writing to the file failed:\n"
+		"%s\n\n"
+		"All changes will be lost when you quit.",
+		strerror(status));
+
+	(new BAlert("DiskProbe request",
+		buffer, "Ok", NULL, NULL,
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+
+	return status;
+}
+
+
+bool
+ProbeView::QuitRequested()
+{
+	if (!fEditor.IsModified())
+		return true;
+
+	int32 chosen = (new BAlert("DiskProbe request",
+		"Save changes before closing?", "Don't Save", "Cancel", "Save",
+		B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
+
+	if (chosen == 0)
+		return true;
+	if (chosen == 1)
+		return false;
+
+	return Save() == B_OK;
+}
+
+
+void
 ProbeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_SAVE_REQUESTED:
-		{
-			status_t status = fEditor.Save();
-			printf("save returned: %s\n", strerror(status));
+			Save();
 			break;
-		}
 
 		case B_OBSERVER_NOTICE_CHANGE: {
 			int32 what;
@@ -1301,6 +1340,14 @@ ProbeView::MessageReceived(BMessage *message)
 			be_app_messenger.SendMessage(&update);
 			break;
 		}
+
+		case kMsgPrint:
+			puts("print...");
+			break;
+
+		case kMsgPageSetup:
+			puts("page setup...");
+			break;
 
 		case B_NODE_MONITOR:
 		{

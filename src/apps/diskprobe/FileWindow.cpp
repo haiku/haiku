@@ -65,13 +65,24 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
-	ProbeView *probeView = new ProbeView(rect, ref, NULL, settings);
-	AddChild(probeView);
+	fProbeView = new ProbeView(rect, ref, NULL, settings);
+	AddChild(fProbeView);
 
-	probeView->AddSaveMenuItems(menu, 4);
-	probeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
+	fProbeView->AddSaveMenuItems(menu, 4);
+	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
 
-	probeView->UpdateSizeLimits();
+	fProbeView->UpdateSizeLimits();
+}
+
+
+bool 
+FileWindow::QuitRequested()
+{
+	bool quit = fProbeView->QuitRequested();
+	if (!quit)
+		return false;
+
+	return ProbeWindow::QuitRequested();
 }
 
 

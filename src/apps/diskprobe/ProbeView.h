@@ -37,6 +37,7 @@ class ProbeView : public BView {
 		void AddPrintMenuItems(BMenu *menu, int32 index);
 
 		void UpdateSizeLimits();
+		bool QuitRequested();
 
 		DataEditor &Editor() { return fEditor; }
 
@@ -44,6 +45,7 @@ class ProbeView : public BView {
 		void UpdateAttributesMenu(BMenu *menu);
 		void UpdateSelectionMenuItems(int64 start, int64 end);
 		void CheckClipboard();
+		status_t Save();
 
 		DataEditor		fEditor;
 		UpdateLooper	*fUpdateLooper;
