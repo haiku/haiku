@@ -63,7 +63,7 @@ resource app_version
     long_info  = "OpenBeOS version of Expander"
 };
 
-resource app_flags B_SINGLE_LAUNCH;
+resource app_flags B_MULTIPLE_LAUNCH;
 
 resource(0, "BEOS:L:application/x-gzip") #'ICON' array
 {
