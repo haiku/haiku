@@ -5,6 +5,7 @@ KernelMergeObject posix_signal.o :
 	<$(SOURCE_GRIST)>send_signal.c
 	<$(SOURCE_GRIST)>sigaction.c
 	<$(SOURCE_GRIST)>signal.c
+	<$(SOURCE_GRIST)>sigset.c
 	<$(SOURCE_GRIST)>strsignal.c
 	:
 	-fPIC -DPIC
@@ -15,6 +16,7 @@ MergeObjectFromObjects kernel_posix_signal.o :
 	<$(SOURCE_GRIST)>send_signal.o
 	<$(SOURCE_GRIST)>sigaction.o
 	<$(SOURCE_GRIST)>signal.o
+	<$(SOURCE_GRIST)>sigset.o
 	<$(SOURCE_GRIST)>strsignal.o
 	:
 	-fPIC -DPIC
