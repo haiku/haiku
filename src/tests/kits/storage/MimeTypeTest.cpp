@@ -3537,6 +3537,13 @@ public:
 void
 MimeTypeTest::UpdateMimeInfoTest()
 {
+// Uncomment the following lines to enjoy the quiet time provided
+// by a nice, full mime update. :-)
+
+//	cout << "begin..." << endl;
+//	CHK(update_mime_info(NULL, true, true, false) == B_OK);
+//	cout << "end..." << endl;
+	
 	// tests:
 	// * update_mime_info()
 
@@ -3645,10 +3652,6 @@ MimeTypeTest::UpdateMimeInfoTest()
 	}
 #endif	// TEST_OBOS
 
-//	cout << "begin..." << endl;
-//	CHK(RES(update_mime_info(NULL, true, true, false)) == B_OK);
-//	cout << "end..." << endl;
-	
 	// directory
 	NextSubTest();
 	// create
@@ -3907,6 +3910,14 @@ CheckAppMetaMime(AppMimeTestFile &file)
 void
 MimeTypeTest::CreateAppMetaMimeTest()
 {
+
+// Uncomment the following lines to enjoy the quiet time provided by
+// a nice, full create_app_meta_mime() update. :-)
+
+//	cout << "begin..." << endl;
+//	CHK(create_app_meta_mime(NULL, true, true, false) == B_OK);
+//	cout << "end" << endl;
+
 	// tests:
 	// * create_app_meta_mime()
 
@@ -3936,6 +3947,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 				+ testDir + "/subdir2 "
 				+ testDir + "/subdir2/subsubdir1");
 	AppMimeTestFile files[] = {
+		// AppMimeTestFile(name, type, sig, rule, miniIcon, largeIcon)
 		AppMimeTestFile(string(testDir) + "/file1",
 						"",
 						"application/x-vnd.obos.mime.test.test1",
@@ -3960,21 +3972,22 @@ MimeTypeTest::CreateAppMetaMimeTest()
 // Synchronous calls
 //------------------------------------------------------------------------------
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(true, true) == B_OK);
-		CHK(RES(create_app_meta_mime(file.name.c_str(), false, true, false))
+		CHK(create_app_meta_mime(file.name.c_str(), false, true, false)
 			== B_OK);
 		// check the MIME type
 		CheckAppMetaMime(file);
 		// clean up
-//		CHK(file.Delete(true) == B_OK);
+		CHK(file.Delete(true) == B_OK);
 	}
 //	snooze(999000000);
 
 	// attributes only
-	NextSubTest();
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(true, false) == B_OK);
@@ -3987,8 +4000,8 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	}
 
 	// resources only
-	NextSubTest();
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(false, true) == B_OK);
@@ -4007,6 +4020,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 //------------------------------------------------------------------------------
 	const bigtime_t kSnoozeTime = 500000;
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(true, true) == B_OK);
@@ -4021,8 +4035,8 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	}
 
 	// attributes only
-	NextSubTest();
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(true, false) == B_OK);
@@ -4037,8 +4051,8 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	}
 
 	// resources only
-	NextSubTest();
 	for (int32 i = 0; i < fileCount; i++) {
+		NextSubTest();
 		// create file, create_app_meta_mime()
 		AppMimeTestFile &file = files[i];
 		CHK(file.Create(false, true) == B_OK);
@@ -4053,6 +4067,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 		CHK(file.Delete(false) == B_OK);
 	}
 
+
 	// test the force flag
 // TODO: The BeBook says: "If force is true, entries are created even if they
 // already exist."
@@ -4061,7 +4076,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 // calling it on another file with the same signature, should update the
 // database entry. But the following tests show, that this doesn't happen.
 // They fail in the third CheckAppMetaMime().
-#if 0
+#if !TEST_R5
 	// same file, same signature, other parameters
 	{
 		char icon1[256];
@@ -4131,7 +4146,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 		CHK(file1.Delete(true) == B_OK);
 		CHK(file2.Delete(true) == B_OK);
 	}
-#endif	// 0
+#endif	// !TEST_R5
 
 	// bad args
 	NextSubTest();
@@ -4143,6 +4158,7 @@ MimeTypeTest::CreateAppMetaMimeTest()
 	// non-existing file
 	CHK(create_app_meta_mime(files[0].name.c_str(), false, true, false)
 		== B_OK);
+		
 }
 
 // CheckIconData
@@ -4585,12 +4601,13 @@ printf("\nerror:\n%s\n", parseError.String());
 class SniffingTestFile {
 public:
 	SniffingTestFile(string name, string extensionType, string contentType,
-					 const void *data = NULL, int32 size = -1)
-		: name(name),
-		  extensionType(extensionType),
-		  contentType(contentType),
-		  data(NULL),
-		  size(0)
+					 const void *data = NULL, int32 size = -1, string metaType = "")
+		: name(name)
+		, extensionType(extensionType)
+		, contentType(contentType)
+		, data(NULL)
+		, size(0)
+		, metaType(metaType)
 	{
 		// replace wildcard types
 		if (this->extensionType == "")
@@ -4616,13 +4633,18 @@ public:
 	status_t Create()
 	{
 		BFile file(name.c_str(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-		status_t error = file.InitCheck();
+		ssize_t error = file.InitCheck();
 		if (error == B_OK && data) {
 			ssize_t written = file.Write(data, size);
 			if (written < 0)
 				error = written;
 			else if (written != size)
 				error = B_ERROR;
+		}
+		if (!error && metaType.length() > 0) {
+			error = file.WriteAttr("META:TYPE", B_STRING_TYPE, 0, metaType.c_str(),
+				metaType.length()+1);
+			error = error == (ssize_t)(metaType.length()+1) ? B_OK : error;		
 		}
 		return error;
 	}
@@ -4637,6 +4659,7 @@ public:
 	string	contentType;
 	char	*data;
 	int32	size;
+	string metaType;
 };
 
 // SniffingTest
@@ -4702,6 +4725,13 @@ MimeTypeTest::SniffingTest()
 						 "LLNO"),
 		SniffingTestFile(string(testDir) + "/file13", "", "",
 						 "LNNO"),
+		// meta mime test
+#if !TEST_R5
+		SniffingTestFile(string(testDir) + "/file14.html",
+						 "text/html", "application/x-vnd.be-meta-mime",
+						 "<html>\n<body>\n</body></html>\n", -1,
+						 "fake-meta-mime-string"),
+#endif	// !TEST_R5
 	};
 	int fileCount = sizeof(files) / sizeof(SniffingTestFile);
 	for (int32 i = 0; i < fileCount; i++) {
