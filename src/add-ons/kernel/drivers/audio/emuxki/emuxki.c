@@ -2057,7 +2057,7 @@ emuxki_setup(emuxki_dev * card)
 	dump_hardware_regs(&card->config);
 	
 #if MIDI
-	if ((err = (*mpu401->create_device)(card->config.nabmbar + IS_AUDIGY(&card->config) ? EMU_A_MUDATA1 : EMU_MUDATA, 
+	if ((err = (*mpu401->create_device)(card->config.nabmbar + (IS_AUDIGY(&card->config) ? EMU_A_MUDATA1 : EMU_MUDATA), 
 		&card->midi.driver, 0, midi_interrupt_op, &card->midi)) < B_OK)
 		return (err);
 		
