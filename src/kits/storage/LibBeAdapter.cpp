@@ -28,21 +28,3 @@ entry_ref_to_path_adapter(dev_t device, ino_t directory, const char *name,
 	return error;
 }
 
-// swap_data_adapter
-status_t
-swap_data_adapter(type_code type, void *data, size_t length,
-				  swap_action action)
-{
-	return swap_data(type, data, length, action);
-}
-
-// is_type_swapped_adapter
-bool
-is_type_swapped_adapter(type_code type)
-{
-	return is_type_swapped(type);
-}
- 
-
-
-
