@@ -2705,6 +2705,8 @@ user_memset(void *s, char c, size_t count)
 long
 lock_memory(void *address, ulong numBytes, ulong flags)
 {
+	vm_address_space *aspace = NULL;
+	struct vm_translation_map *map;
 	addr_t base = (addr_t)address;
 	addr_t end = base + numBytes;
 	bool isUser = IS_USER_ADDRESS(address);
@@ -2722,15 +2724,43 @@ lock_memory(void *address, ulong numBytes, ulong flags)
 	if (base >= KERNEL_BASE + IOSPACE_SIZE && base + numBytes < KERNEL_BASE + 2 * IOSPACE_SIZE)
 		return B_OK;
 
+	if (isUser)
+		aspace = vm_get_current_user_aspace();
+	else
+		aspace = vm_get_kernel_aspace();
+	if (aspace == NULL)
+		return B_ERROR;
+
+	map = &aspace->translation_map;
+
 	for (; base < end; base += B_PAGE_SIZE) {
-		status_t status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
+		addr_t physicalAddress;
+		uint32 protection;
+		status_t status;
+
+		map->ops->lock(map);
+		map->ops->query(map, base, &physicalAddress, &protection);
+		map->ops->unlock(map);
+
+		if ((protection & PAGE_PRESENT) != 0) {
+			// if B_READ_DEVICE is set, the caller intents to write to the locked
+			// memory, so if it hasn't been mapped writable, we'll try the soft
+			// fault anyway
+			if ((flags & B_READ_DEVICE) == 0
+				|| (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
+			continue;
+		}
+
+		status = vm_soft_fault(base, (flags & B_READ_DEVICE) != 0, isUser);
 		if (status != B_OK)	{
 			dprintf("lock_memory(address = %p, numBytes = %lu, flags = %lu) failed: %s\n",
 				address, numBytes, flags, strerror(status));
+			vm_put_aspace(aspace);
 			return status;
 		}
 	}
 
+	vm_put_aspace(aspace);
 	return B_OK;
 }
 
