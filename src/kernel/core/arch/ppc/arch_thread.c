@@ -73,12 +73,6 @@ arch_thread_init_tls(struct thread *thread)
 
 
 void
-arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
-{
-}
-
-
-void
 arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
     // set the new kernel stack in the EAR register.
