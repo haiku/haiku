@@ -12,7 +12,7 @@
 
 
 // kernel args
-typedef struct ka {
+typedef struct kernel_args {
 	uint32		cons_line;
 	char		*str;
 	addr_range	bootdir_addr;
