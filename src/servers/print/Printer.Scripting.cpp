@@ -72,15 +72,15 @@ void Printer::HandleScriptingCommand(BMessage* msg)
 		switch(msg->what) {
 			case B_GET_PROPERTY:
 				if (propName == "Name")
-					rc = fNode.ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &result);
+					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &result);
 				else if (propName == "TransportAddon")
-					rc = fNode.ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &result);
+					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &result);
 				else if (propName == "TransportConfig")
-					rc = fNode.ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &result);
+					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &result);
 				else if (propName == "PrinterAddon")
-					rc = fNode.ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &result);
+					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &result);
 				else if (propName == "Comments")
-					rc = fNode.ReadAttrString(PSRV_PRINTER_ATTR_COMMENTS, &result);
+					rc = SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_COMMENTS, &result);
 				else { // If unknown scripting request, let superclas handle it
 					Inherited::MessageReceived(msg);
 					break;

@@ -95,7 +95,7 @@ Printer* Printer::Find(dev_t dev, ino_t node)
 	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
 		Printer* printer = sPrinters.ItemAt(idx);
 		node_ref ref;
-		printer->fNode.GetNodeRef(&ref);
+		printer->SpoolDir()->GetNodeRef(&ref);
 		if (ref.device == dev && ref.node == node) return printer;
 	}
 	
@@ -131,39 +131,37 @@ int32 Printer::CountPrinters()
 // ---------------------------------------------------------------
 Printer::Printer(const BDirectory* node, Resource* res)
 	: Inherited(B_EMPTY_STRING),
-	fFolder(*node),
+	fPrinter(*node),
 	fResource(res),
-	fNode(*node),
 	fSinglePrintThread(true),
 	fJob(NULL),
 	fProcessing(0),
 	fAbort(false)
 {
-		// Set our name to the name of the passed node
 	BString name;
-	fNode.ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name);
-	SetName(name.String());
+		// Set our name to the name of the passed node
+	if (SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name) == B_OK)
+		SetName(name.String());
 
 	if (name == "Preview") fSinglePrintThread = false;
 	
 		// Add us to the global list of known printer definitions
 	sPrinters.AddItem(this);
-	be_app->AddHandler(this);
 }
 
 Printer::~Printer()
 {
-	((PrintServerApp*)be_app)->NotifyPrinterDeletion(fResource);
+	((PrintServerApp*)be_app)->NotifyPrinterDeletion(this);
 }
 
+
+// Remove printer spooler directory
 status_t Printer::Remove()
 {
 	status_t rc = B_OK;
 	BPath path;
 
 	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
-		sPrinters.RemoveItem(this);
-		be_app->RemoveHandler(this);
 		path.Append(Name());
 		rc = rmdir(path.Path());
 	}
@@ -226,7 +224,7 @@ status_t Printer::ConfigurePage(BMessage& settings)
 
 		if ((rc=get_image_symbol(id, "config_page", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
 				// call the function and check its result
-			BMessage* new_settings = (*func)(&fNode, &settings);
+			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if (new_settings != NULL && new_settings->what != 'baad')
 				settings = *new_settings;
 		}
@@ -261,7 +259,7 @@ status_t Printer::ConfigureJob(BMessage& settings)
 
 		if ((rc=get_image_symbol(id, "config_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
 				// call the function and check its result
-			BMessage* new_settings = (*func)(&fNode, &settings);
+			BMessage* new_settings = (*func)(SpoolDir(), &settings);
 			if ((new_settings != NULL) && (new_settings->what != 'baad'))
 				settings = *new_settings;
 			else
@@ -309,7 +307,7 @@ status_t Printer::LoadPrinterAddon(image_id& id)
 	status_t rc;
 	BPath path;
 
-	if ((rc=fNode.ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &drName)) == B_OK) {
+	if ((rc=SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_DRV_NAME, &drName)) == B_OK) {
 			// try to locate the driver
 		if ((rc=::TestForAddonExistence(drName.String(), B_USER_ADDONS_DIRECTORY, "Print", path)) != B_OK) {
 			if ((rc=::TestForAddonExistence(drName.String(), B_COMMON_ADDONS_DIRECTORY, "Print", path)) != B_OK) {
@@ -349,13 +347,9 @@ void Printer::MessageReceived(BMessage* msg)
 }
 
 bool Printer::FindSpooledJob() {
-	fJob = fFolder.GetNextJob();
+	fJob = fPrinter.GetNextJob();
 	if (fJob) fJob->SetPrinter(this);
 	return fJob;
-}
-
-void Printer::CloseJob() {
-	fJob->Release();
 }
 
 status_t Printer::PrintSpooledJob(BFile* spoolFile)
@@ -371,11 +365,14 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 				// HP PCL3 add-on crashes without it!
 			BMessage params('_RRC');
 			params.AddInt32("file", (int32)spoolFile);
-			params.AddInt32("printer", (int32)&fNode);
+			params.AddInt32("printer", (int32)SpoolDir());
 				// call the function and check its result
-			BMessage* result = (*func)(spoolFile, &fNode, &params);
-			if (result == NULL || result->what == 'baad')
+			BMessage* result = (*func)(spoolFile, SpoolDir(), &params);
+			
+			if (result == NULL || result->what != 'okok')
 				rc = B_ERROR;
+
+			delete result;
 		}
 		
 		::unload_add_on(id);
@@ -384,25 +381,27 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 	return rc;
 }
 
+
 void Printer::PrintThread(Job* job) {
+		// Wait until resource is available
 	fResource->Lock();
+	bool failed = true;
+		// Can we continue?
 	if (!fAbort) {				
 		BFile jobFile(&job->EntryRef(), B_READ_WRITE);
-		print_file_header header;
 				// Tell the printer to print the spooled job
-		if (PrintSpooledJob(&jobFile) == B_OK) {
+		if (jobFile.InitCheck() == B_OK && PrintSpooledJob(&jobFile) == B_OK) {
 				// Remove spool file if printing was successfull.
-			job->Remove();
-		} else {
-			job->SetStatus(kFailed);
+			job->Remove(); failed = false;
 		}
-	} else {
-		job->SetStatus(kFailed);
 	}
-	fResource->Unlock();	
+		// Set status of spooled job on error
+	if (failed) job->SetStatus(kFailed);
+	fResource->Unlock();
 	job->Release();
 	atomic_add(&fProcessing, -1);
 	Release();
+		// Notify print_server to process next spooled job
 	be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);	
 }
 
@@ -412,7 +411,7 @@ status_t Printer::print_thread(void* data) {
 	return 0;
 }
 
-status_t Printer::StartPrintThread() {
+void Printer::StartPrintThread() {
 	Acquire();
 	thread_id tid = spawn_thread(print_thread, "print", B_NORMAL_PRIORITY, (void*)fJob);
 	if (tid > 0) {
@@ -420,7 +419,7 @@ status_t Printer::StartPrintThread() {
 		atomic_add(&fProcessing, 1);
 		resume_thread(tid);	
 	} else {
-		CloseJob(); Release();
+		fJob->Release(); Release();
 	}
 }
 

@@ -75,12 +75,15 @@ public:
 	static Printer* At(int32 idx);
 	static void Remove(Printer* printer);
 	static int32 CountPrinters();
-	
+
 	status_t Remove();
 	status_t ConfigurePrinter();
 	status_t ConfigureJob(BMessage& ioSettings);
 	status_t ConfigurePage(BMessage& ioSettings);
+
+		// Try to start processing of next spooled job
 	void HandleSpooledJob();
+		// Abort print_thread without processing spooled job
 	void AbortPrintThread();
 
 	void MessageReceived(BMessage* msg);
@@ -90,25 +93,30 @@ public:
 	void HandleScriptingCommand(BMessage* msg);
 	BHandler* ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 								int32 form, const char* prop);
+								
+	Resource* GetResource() { return fResource; }
+	
 private:
 	status_t LoadPrinterAddon(image_id& id);
 
-	Folder fFolder;
-	Resource* fResource;
-	BDirectory fNode;
-	bool fSinglePrintThread;
-	Job* fJob;
-	volatile vint32 fProcessing;
-	bool fAbort;	
+	Folder fPrinter;           // the printer spooling directory
+	Resource* fResource;       // the resource required for processing a print job
+	bool fSinglePrintThread;   // is printer add-on allowed to process multiple print job at once
+	Job* fJob;                 // the next job to process
+	vint32 fProcessing;        // the current number of processing threads
+	bool fAbort;	           // stop processing
 	
 	static BObjectList<Printer> sPrinters;
 
+		// Accessor
+	BDirectory* SpoolDir() { return fPrinter.GetSpoolDir(); }
+
+		// Get next spooled job if any
 	bool FindSpooledJob();
-	void CloseJob();
 	status_t PrintSpooledJob(BFile* spoolFile);
 	void PrintThread(Job* job);
 	static status_t print_thread(void* data);
-	status_t StartPrintThread();
+	void StartPrintThread();
 };
 
 #endif
