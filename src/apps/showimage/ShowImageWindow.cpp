@@ -105,16 +105,17 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, const BMessenger& tracke
 	fSlideShowDelay = NULL;
 
 	LoadSettings();	
-		
+
 	// create menu bar	
-	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
+	fBar = new BMenuBar(BRect(0, 0, Bounds().right, 1), "menu_bar");
 	LoadMenus(fBar);
+	AddChild(fBar);
 
 	BRect viewFrame = Bounds();
-	viewFrame.top		= fBar->Bounds().bottom;
-	viewFrame.right		-= B_V_SCROLL_BAR_WIDTH;
-	viewFrame.bottom	-= B_H_SCROLL_BAR_HEIGHT;
-	
+	viewFrame.top = fBar->Bounds().Height() + 1;
+	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
+	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
 	// create the image view	
 	fImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED);	
@@ -122,7 +123,6 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, const BMessenger& tracke
 	BScrollView *pscrollView = new BScrollView("image_scroller", fImageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
 	AddChild(pscrollView);
-	AddChild(fBar);
 	
 	const int32 kstatusWidth = 190;
 	BRect rect;
