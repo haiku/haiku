@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src prefs devices ;
+
+AddResources Devices : Devices.rsrc ;
+
+UsePrivateHeaders Devices ;
+
+Preference Devices :
+	Devices.cpp
+	DevicesWindow.cpp
+	DevicesViews.cpp
+;
+
+LinkSharedOSLibs Devices : be ;
