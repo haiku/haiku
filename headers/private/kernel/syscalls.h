@@ -78,13 +78,13 @@ status_t sys_stop_watching(dev_t device, ino_t node, uint32 flags,
 			port_id port, uint32 token);
 
 // area functions
-region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
-	addr size, int wiring, int lock);
+area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
+	size_t size, uint32 lock, uint32 protection);
 region_id sys_vm_clone_region(const char *name, void **address, int addr_type,
 	region_id source_region, int mapping, int lock);
 region_id sys_vm_map_file(const char *name, void **address, int addr_type,
 	addr size, int lock, int mapping, const char *path, off_t offset);
-int sys_vm_delete_region(region_id id);
+status_t _kern_delete_area(area_id area);
 int sys_vm_get_region_info(region_id id, vm_region_info *info);
 
 /* kernel port functions */

@@ -221,10 +221,9 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_WAIT_ON_TEAM:
 			*call_ret = user_wait_for_team((team_id)arg0, (status_t *)arg1);
 			break;
-		case SYSCALL_VM_CREATE_ANONYMOUS_REGION:
-			*call_ret = user_vm_create_anonymous_region(
-				(char *)arg0, (void **)arg1, (int)arg2,
-				(addr)arg3, (int)arg4, (int)arg5);
+		case SYSCALL_CREATE_AREA:
+			*call_ret = _user_create_area((char *)arg0, (void **)arg1, (uint32)arg2,
+				(size_t)arg3, (uint32)arg4, (uint32)arg5);
 			break;
 		case SYSCALL_VM_CLONE_REGION:
 			*call_ret = user_vm_clone_region(
@@ -240,8 +239,8 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_VM_FIND_REGION_BY_NAME:
 			*call_ret = find_region_by_name((const char *)arg0);
 			break;
-		case SYSCALL_VM_DELETE_REGION:
-			*call_ret = vm_delete_region(vm_get_current_user_aspace_id(), (region_id)arg0);
+		case SYSCALL_DELETE_AREA:
+			*call_ret = _user_delete_area((area_id)arg0);
 			break;
 		case SYSCALL_VM_GET_REGION_INFO:
 			*call_ret = user_vm_get_region_info((region_id)arg0, (vm_region_info *)arg1);
