@@ -9,6 +9,8 @@
 #include <arch/real_time_clock.h>
 #include <arch/cpu.h>
 
+#include <real_time_data.h>
+
 
 #define CMOS_ADDR_PORT 0x70
 #define CMOS_DATA_PORT 0x71
