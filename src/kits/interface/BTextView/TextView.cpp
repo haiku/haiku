@@ -3582,7 +3582,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 		// Use _BWidthBuffer_ if possible
 		if (sWidths != NULL) {
 			LockWidthBuffer();
-			result += sWidths->StringWidth(fText->Text(), fromOffset, numChars, font);
+			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
 			UnlockWidthBuffer();
 		} else
 			result += font->StringWidth(fText->Text() + fromOffset, numChars);

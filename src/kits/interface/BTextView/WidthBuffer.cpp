@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003 Stefano Ceccherini
+ * Copyright (c) 2003-2004 Haiku, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -18,8 +18,12 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
  * DEALINGS IN THE SOFTWARE.
+ *
+ * File:			WidthBuffer.cpp
+ * Author:			Stefano Ceccherini (burton666@libero.it)
+ * Description:		Caches string widths in a hash table, to avoid a trip to
+ *					the app server.
  */
-
 #include <Debug.h>
 #include <Font.h>
 
@@ -28,7 +32,6 @@
 #include "WidthBuffer.h"
 
 #include <cstdio>
-
 
 const uint32 kTableCount = 128;
 
@@ -90,7 +93,7 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 {
 	if (inText == NULL)
 		return 0;
-		
+	
 	int32 index = 0;
 	if (!FindTable(inStyle, &index))
 		index = InsertTable(inStyle);
@@ -98,23 +101,26 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 	char *text = NULL;	
 	int32 numChars = 0;
 	int32 textLen = 0;
-	float fontSize = inStyle->Size();
 	
+	float fontSize = inStyle->Size();
 	float stringWidth = 0;
 	if (length > 0) {		
-		do {
-			int32 charLen = UTF8NextCharLen(inText + fromOffset);
+		for (int32 charLen = 0, currentOffset = fromOffset;
+								currentOffset < fromOffset + length;
+								currentOffset += charLen) {
+			
+			charLen = UTF8NextCharLen(inText + fromOffset);
 			// End of string, bail out
 			if (charLen == 0)
 				break;
 			
 			// Some magic, to uniquely identify this charachter	
-			uint32 value = CharToCode(inText + fromOffset, charLen);
+			uint32 value = CharToCode(inText + currentOffset, charLen);
 			
 			float escapement;
 			if (GetEscapement(value, index, &escapement)) {
 				// Well, we've got a match for this charachter
-				stringWidth += escapement * fontSize;
+				stringWidth += escapement;
 			} else {
 				// Store this charachter into an array, which we'll
 				// pass to HashEscapements() later
@@ -123,20 +129,19 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 				numChars++;
 				text = (char *)realloc(text, textLen);
 				for (int32 x = 0; x < charLen; x++)
-					text[offset + x] = inText[fromOffset + x];
-			}		
-			fromOffset += charLen;			
-		} while (fromOffset < length);		
+					text[offset + x] = inText[currentOffset + x];
+			}			
+		}		
 	}
 	
 	if (text != NULL) {
 		// We've found some charachters which aren't yet in the hash table.
 		// Get their width via HashEscapements()
-		stringWidth += HashEscapements(text, numChars, textLen, index, inStyle) * fontSize;	
+		stringWidth += HashEscapements(text, numChars, textLen, index, inStyle);	
 		free(text);
 	}
 
-	return stringWidth;
+	return stringWidth * fontSize;
 }
 
 
