@@ -277,7 +277,17 @@ void BMidiLocalProducer::SpraySystemRealTime(
 void BMidiLocalProducer::SprayTempoChange(
 	int32 beatsPerMinute, bigtime_t time) const
 {
-	// This method does nothing, just like the BeOS R5 Midi Kit.
+	int32 tempo = 60000000 / beatsPerMinute;
+
+	uchar data[6];
+	data[0] = 0xFF;
+	data[1] = 0x51;
+	data[2] = 0x03;
+	data[3] = tempo >> 16;
+	data[4] = tempo >> 8;
+	data[5] = tempo;
+
+	SprayEvent(&data, 6, true, time);
 }
 
 //------------------------------------------------------------------------------

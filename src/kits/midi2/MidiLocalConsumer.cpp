@@ -243,13 +243,28 @@ void BMidiLocalConsumer::Data(
 					case B_CONTINUE:
 					case B_STOP:
 					case B_ACTIVE_SENSING:
-					case B_SYSTEM_RESET:
 					{
 						if (length == 1)
 						{
 							SystemRealTime(data[0], time);
 						}
 						break;
+					}
+
+					case B_SYSTEM_RESET:
+					{
+						if (length == 1)
+						{
+							SystemRealTime(data[0], time);
+						}
+						else if ((length == 6) && (data[1] == 0x51) 
+											   && (data[2] == 0x03))
+						{
+							int32 tempo = 
+								(data[3] << 16) | (data[4] << 8) | data[5];
+
+							TempoChange(60000000/tempo, time);
+						}
 					}
 				}
 				break;
