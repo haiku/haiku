@@ -217,6 +217,10 @@ wait until the consumer has dealt with the sysex.
 /*!
 \fn void BMidiLocalProducer::SprayTempoChange(
     int32 bpm, bigtime_t time = 0) const
-\brief Not used
+\brief Sends a Tempo Change event to the connected consumers.
+
+This kind of Tempo Change event is not really part of the MIDI spec, rather
+it is an extension from the SMF (Standard MIDI File) format.
+
 \sa BMidiLocalConsumer::TempoChange()
 */

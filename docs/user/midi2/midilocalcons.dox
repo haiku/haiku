@@ -217,7 +217,7 @@ Not all data bytes are used for all common events. Unused bytes are set to 0.
 
 /*!
 \fn void BMidiLocalConsumer::TempoChange(int32 beatsPerMinute, bigtime_t time)
-\brief Never invoked, just like in the BeOS R5 implementation
+\brief Invoked when a Tempo Change event is received
 \sa BMidiLocalProducer::SprayTempoChange()
 */
 
