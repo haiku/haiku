@@ -9,7 +9,7 @@ public:
 	ExampleTest(std::string name = "");
 	virtual ~ExampleTest() { delete fLocker; }
 
-	static Test* Suite();
+	static CppUnit::Test* Suite();
 	
 	void TestFunc1();	// num += 10
 	void TestFunc2();	// num *= 2

@@ -10,7 +10,7 @@ class CppUnit::TestResult;
 //! Groups together a set of tests for a given kit.
 class BTestSuite : public CppUnit::Test {
 public:
-	BTestSuite( std::string name );
+	BTestSuite( std::string name = "" );
 	virtual ~BTestSuite();
 
 	virtual void run( CppUnit::TestResult *result );

@@ -2,6 +2,7 @@
 #include <TestShell.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdarg.h>
 
 BTestCase::BTestCase(std::string name)
 	: CppUnit::TestCase(name)
@@ -17,8 +18,7 @@ BTestCase::tearDown() {
 
 void
 BTestCase::NextSubTest() {
-	BTestShell *shell = BTestShell::Shell();
-	if (shell && shell->BeVerbose()) {
+	if (BeVerbose()) {
 		printf("[%ld]", fSubTestNum++);
 		fflush(stdout);
 	}
@@ -26,9 +26,19 @@ BTestCase::NextSubTest() {
 
 void
 BTestCase::NextSubTestBlock() {
-	BTestShell *shell = BTestShell::Shell();
-	if (shell && shell->BeVerbose()) 
+	if (BeVerbose()) 
 		printf("\n");
+}
+
+void
+BTestCase::Outputf(const char *str, ...) {
+	if (BeVerbose()) {
+		va_list args;
+		va_start(args, str);
+		vprintf(str, args);
+		va_end(args);
+		fflush(stdout);
+	}
 }
 
 /*! To return to the last saved working directory, call RestoreCWD(). */
@@ -48,4 +58,10 @@ BTestCase::RestoreCWD(const char *alternate) {
 		chdir(fCurrentWorkingDir);
 	else if (alternate != NULL)
 		chdir(alternate);
+}
+
+bool
+BTestCase::BeVerbose() {
+	BTestShell *shell = BTestShell::Shell();
+	return ((shell && shell->BeVerbose()) || !shell);
 }

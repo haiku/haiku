@@ -1,10 +1,10 @@
 // TestUtils.cpp
 
 #include "TestUtils.h"
-#include "StorageKitTester.h"
+#include <TestShell.h>
 
 status_t DecodeResult(status_t result) {
-	if (!shell.BeVerbose())
+	if (!BTestShell::GlobalBeVerbose())
 		return result;
 
 	std::string str;

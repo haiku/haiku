@@ -1,4 +1,20 @@
 SubDir OBOS_TOP src tests ;
 
+CommonTestLib libexampletest.so
+	: ExampleTestAddon.cpp
+		ExampleTest.cpp
+	: be stdc++.r4
+	: be stdc++.r4
+	:
+;
+
+UnitTest UnitTester 
+	: UnitTester.cpp
+	: 
+	: be stdc++.r4
+#	: be stdc++.r4
+	:
+;
+
 SubInclude OBOS_TOP src tests add-ons ;
 SubInclude OBOS_TOP src tests kits ;

@@ -15,17 +15,22 @@
 #include <string>
 #include <vector>
 
+BTestShell *BTestShell::fGlobalShell = NULL;
+const char BTestShell::indent[] = "  ";
+
 BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
 	: fVerbosityLevel(v2)
 	, fDescription(description)
 	, fTestResults(syncObject)
+	, fListTestsAndExit(false)
 {
 };
 
 status_t
 BTestShell::AddSuite(BTestSuite *suite) {
 	if (suite) {
-		cout << "Adding suite '" << suite->getName() << "'" << endl;
+		if (Verbosity() >= v3)
+			cout << "Adding suite '" << suite->getName() << "'" << endl;
 	
 		// Add the suite
 		fSuites[suite->getName()] = suite;
@@ -67,14 +72,18 @@ BTestShell::LoadSuitesFrom(BDirectory *libDir) {
 		status_t err;
 		err = addonEntry.GetPath(&addonPath);
 		if (!err) {
+//			cout << "Checking " << addonPath.Path() << "..." << flush;
 			addonImage = load_add_on(addonPath.Path());
 			err = (addonImage > 0 ? B_OK : B_ERROR);
 		}
 		if (!err) {
+//			cout << "..." << endl;
 			err = get_image_symbol(addonImage,
 				    "getTestSuite",
 				      B_SYMBOL_TYPE_TEXT,
 				        reinterpret_cast<void **>(&func));
+		} else {
+//			cout << " !!! err == " << err << endl;
 		}
 		if (!err) 
 			err = AddSuite(func());
@@ -89,6 +98,16 @@ BTestShell::Run(int argc, char *argv[]) {
 	// Parse the command line args
 	if (!ProcessArguments(argc, argv))
 		return 0;		
+
+	// Load any dynamically loadable tests we can find
+	LoadDynamicSuites();
+
+	// See if the user requested a list of tests. If so,
+	// print and bail.
+	if (fListTestsAndExit) {
+		PrintInstalledTests();
+		return 0;
+	}		
 
 	// Add the proper tests to our suite (or exit if there
 	// are no tests installed).
@@ -106,12 +125,19 @@ BTestShell::Run(int argc, char *argv[]) {
 		for (i = fTests.begin(); i != fTests.end(); ++i)
 			suite.addTest( i->second );
 			
-	} else {
-	
+	} else {	
 		// One or more specified, so only run those
 		std::set<std::string>::const_iterator i;
-		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) 
-			suite.addTest( fTests[*i] );
+		for (i = fTestsToRun.begin(); i != fTestsToRun.end(); ++i) {
+			// Make sure it's a valid test
+			if (fTests.find(*i) != fTests.end()) {
+				suite.addTest( fTests[*i] );
+			} else {
+				cout << endl << "ERROR: Invalid argument \"" << *i << "\"" << endl;
+				PrintHelp();
+				return 0;
+			}
+		}
 			
 	}
 	
@@ -122,8 +148,6 @@ BTestShell::Run(int argc, char *argv[]) {
 
 	return 0;
 }
-
-BTestShell *BTestShell::fGlobalShell = NULL;
 
 BTestShell::VerbosityLevel
 BTestShell::Verbosity() const {
@@ -137,9 +161,15 @@ BTestShell::PrintDescription(int argc, char *argv[]) {
 
 void
 BTestShell::PrintHelp() {
-	const char indent[] = "  ";
 	cout << endl;
 	cout << "VALID ARGUMENTS:     " << endl;
+	PrintValidArguments();
+	cout << endl;
+	
+}
+
+void
+BTestShell::PrintValidArguments() {
 	cout << indent << "--help     Displays this help text plus some other garbage" << endl;
 	cout << indent << "--list     Lists the names of classes with installed tests" << endl;
 	cout << indent << "-v0        Sets verbosity level to 0 (concise summary only)" << endl;
@@ -150,8 +180,20 @@ BTestShell::PrintHelp() {
 	cout << indent << "           plus complete summary)" << endl;
 	cout << indent << "CLASSNAME  Instructs the program to run the test for the given class; if" << endl;
 	cout << indent << "           no classes are specified, all tests are run" << endl;
+	cout << indent << "-lPATH     Adds PATH to the search path for dynamically loadable test" << endl;
+	cout << indent << "           libraries." << endl;
+}
+
+void
+BTestShell::PrintInstalledTests() {
+	// Print out the list of installed tests
+	cout << "------------------------------------------------------------------------------" << endl;
+	cout << "Available Tests:" << endl;
+	cout << "------------------------------------------------------------------------------" << endl;
+	std::map<std::string, CppUnit::Test*>::const_iterator i;			
+	for (i = fTests.begin(); i != fTests.end(); ++i)
+		cout << i->first << endl;
 	cout << endl;
-	
 }
 
 bool
@@ -166,51 +208,47 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 	for (int i = 1; i < argc; i++) {
 		std::string str(argv[i]);
 		
-		if (str == "--help") {
-			PrintDescription(argc, argv);
-			PrintHelp();
-			return false;
-		}
-		else if (str == "--list") {
-			// Print out the list of installed tests
-			cout << "------------------------------------------------------------------------------" << endl;
-			cout << "Available Tests:" << endl;
-			cout << "------------------------------------------------------------------------------" << endl;
-			std::map<std::string, CppUnit::Test*>::const_iterator i;			
-			for (i = fTests.begin(); i != fTests.end(); ++i)
-				cout << i->first << endl;
-			cout << endl;
-			return false;
-		}
-		else if (str == "-v0") {
-			fVerbosityLevel = v0;
-		}
-		else if (str == "-v1") {
-			fVerbosityLevel = v1;
-		}
-		else if (str == "-v2") {
-			fVerbosityLevel = v2;
-		}
-		else if	(fTests.find(str) != fTests.end()) {
-			fTestsToRun.insert(str);
-		}
-		else {
-			cout << endl << "ERROR: Invalid argument \"" << str << "\"" << endl;
-			PrintHelp();
-			return false;
-		}
-			
+		if (!ProcessArgument(str, argc, argv))
+			return false;		
 	}
 	
 	return true;
 }
+
+bool
+BTestShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
+	if (arg == "--help") {
+		PrintDescription(argc, argv);
+		PrintHelp();
+		return false;
+	}
+	else if (arg == "--list") {
+		fListTestsAndExit = true;
+	}
+	else if (arg == "-v0") {
+		fVerbosityLevel = v0;
+	}
+	else if (arg == "-v1") {
+		fVerbosityLevel = v1;
+	}
+	else if (arg == "-v2") {
+		fVerbosityLevel = v2;
+	}
+	else if (arg == "-v3") {
+		fVerbosityLevel = v3;
+	}
+	else {
+		fTestsToRun.insert(arg);
+	}
+	return true;
+}			
 
 void
 BTestShell::InitOutput() {
 	// For vebosity level 2, we output info about each test
 	// as we go. This involves a custom CppUnit::TestListener
 	// class.
-	if (fVerbosityLevel == v2) {
+	if (fVerbosityLevel >= v2) {
 		cout << "------------------------------------------------------------------------------" << endl;
 		cout << "Tests" << endl;
 		cout << "------------------------------------------------------------------------------" << endl;
@@ -269,3 +307,15 @@ BTestShell::PrintResults() {
 	
 }
 
+void
+BTestShell::LoadDynamicSuites() {
+	std::set<std::string>::iterator i;
+	for (i = fLibDirs.begin(); i != fLibDirs.end(); i++) {
+		BDirectory libDir((*i).c_str());
+		int count = LoadSuitesFrom(&libDir);
+		if (Verbosity() >= v3) {
+			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
+			cout << " from " << *i << endl;
+		}
+	}
+}

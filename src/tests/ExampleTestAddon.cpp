@@ -3,7 +3,7 @@
 #include <ExampleTest.h>
 
 BTestSuite* getTestSuite() {
-	BTestSuite *suite = new BTestSuite("Example");
-	suite->addTest("BExample", ExampleTest::Suite());
+	BTestSuite *suite = new BTestSuite("ExampleSuite");
+	suite->addTest("ExampleTests", ExampleTest::Suite());
 	return suite;
 }

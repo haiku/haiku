@@ -3,6 +3,9 @@
 #ifndef __sk_statable_test_h__
 #define __sk_statable_test_h__
 
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+
 #include <list>
 #include <string>
 

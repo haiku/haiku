@@ -1,6 +1,5 @@
 #include "UnitTester.h"
 #include <SemaphoreSyncObject.h>
-#include <string>
 #include <Directory.h>
 
 // ##### Include headers for statically linked tests here #####
@@ -15,15 +14,15 @@ int main(int argc, char *argv[]) {
 	BTestShell::SetShell(&shell);
 
 	// Load our dynamically linked tests
-	BDirectory libDir("./lib");
-	int count = shell.LoadSuitesFrom(&libDir);
-	cout << "Loaded " << count << " suites" << endl;
 
 	return shell.Run(argc, argv);
 }
 
+const std::string UnitTesterShell::defaultLibDir = "./lib";
+
 UnitTesterShell::UnitTesterShell(const std::string &description, SyncObject *syncObject)
 	: BTestShell(description, syncObject)
+	, doR5Tests(false)
 {
 }
 
@@ -35,6 +34,7 @@ UnitTesterShell::PrintDescription(int argc, char *argv[]) {
 	cout << "of testing and verifying the various kits, classes, functions," << endl;
 	cout << "and the like that comprise OpenBeOS." << endl;
 		
+/*
 	if (AppName.rfind("UnitTester_r5") != std::string::npos) {
 		cout << endl;
 		cout << "Judging by its name (UnitTester_r5), this copy was" << endl;
@@ -45,5 +45,34 @@ UnitTesterShell::PrintDescription(int argc, char *argv[]) {
 		cout << "Judging by its name (UnitTester), this copy was probably" << endl;
 		cout << "linked against our own OpenBeOS implementations." << endl;
 	}
+*/
 }
 
+void
+UnitTesterShell::PrintValidArguments() {
+	BTestShell::PrintValidArguments();
+	cout << indent << "-obos      Runs tests linked against our OpenBeOS libraries (*default*)" << endl;
+	cout << indent << "-r5        Runs tests linked against Be Inc.'s R5 libraries (instead" << endl;
+	cout << indent << "           of our libraries) for the sake of comparison." << endl;
+}
+
+bool
+UnitTesterShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
+	if (arg == "-r5") {
+		doR5Tests = true;
+	} else if (arg == "-obos") {
+		doR5Tests = false;
+	} else
+		return BTestShell::ProcessArgument(arg, argc, argv);
+		
+	return true;
+}
+
+void
+UnitTesterShell::LoadDynamicSuites() {
+	// Add the appropriate test lib path 
+	fLibDirs.insert(defaultLibDir + (doR5Tests ? "_r5" : ""));
+
+	// Load away
+	BTestShell::LoadDynamicSuites();
+}

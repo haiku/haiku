@@ -18,6 +18,16 @@ public:
 		thread in which it's called (i.e. [A.0][B.0][A.1][A.2][B.1]...). */
 	virtual void NextSubTest();
 	
+	/*! \brief Prints to standard out just like printf, except shell verbosity
+		settings are honored, and output from threads other than the main thread
+		happens before the test is over.
+		
+		\note Currently your output is limited to a length of 1024 characters. If
+		you really need to print a single string that's long than that, fix the
+		function yourself :-).
+	*/
+	virtual void Outputf(const char *str, ...);
+	
 	//! Saves the location of the current working directory. 
 	void SaveCWD();
 	

@@ -64,40 +64,68 @@ public:
 	// Returns true if verbosity is high enough that individual tests are
 	// allowed to make noise.
 	bool BeVerbose() const { return Verbosity() >= v2; };
-	
+
+	static bool GlobalBeVerbose() { return (fGlobalShell ? fGlobalShell->BeVerbose() : true); };
+
+	// Returns a pointer to a global BTestShell object. This function is
+	// something of a hack, used to give BTestCase and its subclasses
+	// access to verbosity information. Don't rely on it if you don't
+	// have to (and always make sure the pointer it returns isn't NULL
+	// before you try to use it :-).
 	static BTestShell* Shell() { return fGlobalShell; };
-	static void SetShell(BTestShell *shell) { fGlobalShell = shell; };
 	
+	// Sets the global BTestShell pointer. The BTestShell class does
+	// not assume ownership of the object. 
+	static void SetShell(BTestShell *shell) { fGlobalShell = shell; };
 
 protected:	
 	VerbosityLevel fVerbosityLevel;
 	std::set<std::string> fTestsToRun;
 	std::map<std::string, CppUnit::Test*> fTests;
-	std::map<std::string, BTestSuite*> fSuites;	
+	std::map<std::string, BTestSuite*> fSuites;
+	std::set<std::string> fLibDirs;
 	CppUnit::TestResult fTestResults;
 	CppUnit::TestResultCollector fResultsCollector;
 	std::string fDescription;
 	static BTestShell* fGlobalShell;
+	static const char indent[];
+	bool fListTestsAndExit;
 
-	// Prints a brief description of the program and a guess as to
-	// which Storage Kit library the app was linked with based on
-	// the filename of the app
+	//! Prints a brief description of the program.
 	virtual void PrintDescription(int argc, char *argv[]);
 
-	// Prints out command line argument instructions
+	//! Prints out command line argument instructions
 	void PrintHelp();
+	
+	/*! \brief Prints out the list of valid command line arguments.
+		Called by PrintHelp().
+	*/
+	virtual void PrintValidArguments();
 
-	// Handles command line arguments; returns true if everything goes
-	// okay, false if not (or if the program just needs to terminate without
-	// running any tests). Modifies settings in "settings" as necessary.
+	//! Prints out a list of all the currently available tests
+	void PrintInstalledTests();
+	
+	/*! \brief Handles command line arguments; returns true if everything goes
+		okay, false if not (or if the program just needs to terminate without
+		running any tests). Modifies settings in "settings" as necessary.
+	*/
 	bool ProcessArguments(int argc, char *argv[]);
+	
+	//! Processes a single argument, given by the \c arg parameter.
+	virtual bool ProcessArgument(std::string arg, int argc, char *argv[]);
 
-	// Makes any necessary pre-test preparations
+	//! Makes any necessary pre-test preparations
 	void InitOutput();
 
-	// Prints out the test results in the proper format per
-	// the specified verbosity level.
+	/*! \brief Prints out the test results in the proper format per
+		the specified verbosity level.
+	*/
 	void PrintResults();
+	
+	/*! \brief Searches all the paths in \c fLibDirs, loading any dynamically
+		loadable suites it finds.
+	*/
+	virtual void LoadDynamicSuites();
 	
 private:
   //! Prevents the use of the copy constructor.

@@ -3,14 +3,13 @@
 #ifndef __sk_basic_test_h__
 #define __sk_basic_test_h__
 
+#include <SupportDefs.h>
+#include <TestCase.h>
+#include <TestShell.h>
 #include <set>
 #include <stdio.h>
 
-#include <SupportDefs.h>
-
-#include "StorageKitTester.h"
-
-class BasicTest : public StorageKit::TestCase
+class BasicTest : public BTestCase
 {
 public:
 	BasicTest();
@@ -23,8 +22,8 @@ public:
 
 	// helper functions
 
-	void nextSubTest();
-	void nextSubTestBlock();
+//	void nextSubTest();
+//	void nextSubTestBlock();
 
 	static void execCommand(const string &command);
 
@@ -110,7 +109,7 @@ public:
 		fTestedNames.clear();
 	}
 
-	bool test(string name, bool dump = shell.BeVerbose())
+	bool test(string name, bool dump = BTestShell::GlobalBeVerbose())
 	{
 		bool result = (fUntestedNames.find(name) != fUntestedNames.end());
 		if (result) {

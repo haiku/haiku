@@ -1,27 +1,25 @@
 SubDir OBOS_TOP src tests kits storage ;
 
-# Exclude the whole thing until it compiles again.
-if ""
-{
+#		EntryTest.cpp
+#		FileTest.cpp
+#		FindDirectoryTest.cpp
+#		MimeTypeTest.cpp
+#		PathTest.cpp
+#		QueryTest.cpp
+#		ResourcesTest.cpp
+#		ResourceStringsTest.cpp
+#		StatableTest.cpp
+#		SymLinkTest.cpp
+#		TestApp.cpp
 
-CommonUnitTest StorageKitTester
-	: StorageKitTester.cpp
+CommonTestLib libstoragetest.so
+	: StorageKitTestAddon.cpp
 		BasicTest.cpp
 		DirectoryTest.cpp
-		EntryTest.cpp
-		FileTest.cpp
-		FindDirectoryTest.cpp
-		MimeTypeTest.cpp
 		NodeTest.cpp
 		PathTest.cpp
-		QueryTest.cpp
-		ResourcesTest.cpp
-		ResourceStringsTest.cpp
 		StatableTest.cpp
-		SymLinkTest.cpp
-		TestApp.cpp
 		TestUtils.cpp
-	: kits storage
 	: libstorage.so be stdc++.r4
 	: be stdc++.r4
 	: storage
@@ -29,21 +27,20 @@ CommonUnitTest StorageKitTester
 
 # To run the tests the libraries must be around.
 {
-	local libdir = [ on StorageKitTester FDirName $(LOCATE[1]) lib ] ;
+	local libdir = [ on UnitTester FDirName $(LOCATE[1]) lib ] ;
 	MakeLocate <$(SOURCE_GRIST)>libstorage.so : $(libdir) ;
 	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
 	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
 	RelSymLink <$(SOURCE_GRIST)>libbeadapter.so : libbeadapter.so ;
-	DEPENDS StorageKitTester StorageKitTester_r5
+	DEPENDS libstoragetest.so 
 		: <$(SOURCE_GRIST)>libstorage.so <$(SOURCE_GRIST)>libbeadapter.so ;
 }
 
 # To run the tests some test files must be around.
 {
 	local resdir = <storage!kit!test!files>resources ;
-	MakeLocate $(resdir) : [ on StorageKitTester return $(LOCATE[1]) ] ;
+	MakeLocate $(resdir) : [ on libstoragetest.so return $(LOCATE[1]) ] ;
 	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
-	DEPENDS StorageKitTester StorageKitTester_r5 : $(resdir) ;
+	DEPENDS libstoragetest.so : $(resdir) ;
 }
 
-} # if ""

@@ -16,6 +16,11 @@ public:
 	//! Starts a new sub test block (i.e. prints a newline :-)
 	virtual void NextSubTestBlock();
 	
+	/*! \brief Prints to standard out just like printf, except shell verbosity
+		settings are honored.
+	*/
+	virtual void Outputf(const char *str, ...);
+	
 	//! Saves the location of the current working directory. 
 	void SaveCWD();
 	
@@ -24,6 +29,9 @@ public:
 	//! Restores the current working directory to last directory saved by a	call to SaveCWD().	
 	void RestoreCWD(const char *alternate = NULL);
 protected:
+	//! Returns true if the current shell settings allow us to print to standard output.
+	bool BeVerbose();
+
 	bool fValidCWD;
 	char fCurrentWorkingDir[B_PATH_NAME_LENGTH+1];	
 	int32 fSubTestNum;	

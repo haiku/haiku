@@ -23,7 +23,7 @@ count_available_fds()
 
 // constructor
 BasicTest::BasicTest()
-		 : StorageKit::TestCase(),
+		 : BTestCase(),
 		   fSubTestNumber(0),
 		   fAvailableFDs(0)
 {
@@ -33,6 +33,7 @@ BasicTest::BasicTest()
 void
 BasicTest::setUp()
 {
+	BTestCase::setUp();
 	fAvailableFDs = count_available_fds();
 	SaveCWD();
 	fSubTestNumber = 0;
@@ -43,32 +44,13 @@ void
 BasicTest::tearDown()
 {
 	RestoreCWD();
-	nextSubTestBlock();
 	int32 availableFDs = count_available_fds();
 	if (availableFDs != fAvailableFDs) {
 		printf("WARNING: Number of available file descriptors has changed "
 			   "during test: %ld -> %ld\n", fAvailableFDs, availableFDs);
 		fAvailableFDs = availableFDs;
 	}
-}
-
-// nextSubTest
-void
-BasicTest::nextSubTest()
-{
-	if (shell.BeVerbose()) {
-		printf("[%ld]", fSubTestNumber++);
-		fflush(stdout);
-	}
-}
-
-// nextSubTestBlock
-void
-BasicTest::nextSubTestBlock()
-{
-	if (shell.BeVerbose())
-		printf("\n");
-	fSubTestNumber = 0;
+	BTestCase::tearDown();
 }
 
 // execCommand

@@ -20,22 +20,22 @@ ExampleTest::Suite() {
 	
 	// Add a multithreaded test
 	ExampleTest *test = new ExampleTest("This name is never used, just so you know :-)");
-	caller = new BThreadedTestCaller<ExampleTest>("MultiThreaded Test #1", test);
+	caller = new BThreadedTestCaller<ExampleTest>("ExampleTests::MultiThreaded Test #1", test);
 	caller->addThread("A", &ExampleTest::TestFunc1);
 	caller->addThread("B", &ExampleTest::TestFunc2);
 	caller->addThread("C", &ExampleTest::TestFunc3);
 	suite->addTest(caller);
 	
 	// And another
-	caller = new BThreadedTestCaller<ExampleTest>("MultiThreaded Test #2");
+	caller = new BThreadedTestCaller<ExampleTest>("ExampleTests::MultiThreaded Test #2");
 	caller->addThread("Thread1", &ExampleTest::TestFunc1);
 	caller->addThread("Thread2", &ExampleTest::TestFunc1);
 	caller->addThread("Thread3", &ExampleTest::TestFunc1);
 	suite->addTest(caller);
 	
 	// And some single threaded ones
-	suite->addTest(new CppUnit::TestCaller<ExampleTest>("SingleThreaded Test #1", &ExampleTest::TestFunc1));
-	suite->addTest(new CppUnit::TestCaller<ExampleTest>("SingleThreaded Test #2", &ExampleTest::TestFunc2));
+	suite->addTest(new CppUnit::TestCaller<ExampleTest>("ExampleTests::SingleThreaded Test #1", &ExampleTest::TestFunc1));
+	suite->addTest(new CppUnit::TestCaller<ExampleTest>("ExampleTests::SingleThreaded Test #2", &ExampleTest::TestFunc2));
 	
 	return suite;
 }
@@ -48,10 +48,10 @@ ExampleTest::TestFunc1() {
 		// Get the lock and do our business
 		NextSubTest();
 		fLocker->Lock();
-//		printf("TestFunc1() -- %d + 10 = %d\n", fNum, fNum+10);
 		fNum += 10;
 		fLocker->Unlock();
 		snooze(sleeptime);
+//		Outputf("(1:%d)", i);
 	}
 }
 
@@ -61,10 +61,10 @@ ExampleTest::TestFunc2() {
 		// Get the lock and do our business
 		NextSubTest();
 		fLocker->Lock();
-//		printf("TestFunc2() -- %d * 2 = %d\n", fNum, fNum*2);
 		fNum *= 2;
 		fLocker->Unlock();
 		snooze(sleeptime);
+//		Outputf("(2:%d)", i);
 	}
 }
 
@@ -74,10 +74,10 @@ ExampleTest::TestFunc3() {
 		// Get the lock and do our business
 		NextSubTest();
 		fLocker->Lock();
-//		printf("TestFunc3() -- %d - 5 = %d\n", fNum, fNum-5);
 		fNum += 10;
 		fLocker->Unlock();
 		snooze(sleeptime);
+//		Outputf("(3:%d)", i);
 	}
 }
 

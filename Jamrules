@@ -220,6 +220,117 @@ rule Server
 NOTFILE obostests ;
 NOTFILE r5tests ;
 
+rule CommonTestLib
+{
+	# CommonUnitTest <target> : <sources> : <obos libraries> 
+	#	: <r5 libraries> : <public headers>;
+	# Builds a unit test for both OBOS and R5 modules.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <obos libraries> A list of link libraries for the OBOS tests (as passed
+	# to LinkSharedOSLibs).
+	# <r5 libraries> A list of link libraries for the R5 tests (as passed
+	# to LinkSharedOSLibs).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local testlibdir = [ FDirName $(OBOS_TEST_DIR) lib ] ; #/boot/home/config/lib/obos_tests ;
+
+	TestLib $(1) : $(2) : $(testlibdir) : $(3) : $(5) ;
+	R5TestLib $(1) : $(2) : $(testlibdir) : $(4) ;
+}
+
+rule TestLib
+{
+	# TestLib <target> : <sources> : <dest> : <libraries> : <public headers>
+	# Builds a unit test library for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkSharedOSLibs).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local headerDirs = $(5) ;
+
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
+
+#	SetupIncludes ;
+	UseCppUnitHeaders ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(sources) ;
+	Main $(target) : $(sources) ;
+	MakeLocate $(target) : $(dest) ;
+	DEPENDS $(target) : libcppunit.so ;
+	DEPENDS obostests : $(target) ;
+	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
+	ObjectDefines $(sources) : TEST_OBOS ;
+	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(sources) : "-g" ;
+	ObjectC++Flags $(sources) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
+}
+
+rule R5TestLib
+{
+	# R5UnitTest <target> : <sources> : <dest> : <libraries>
+	# Builds a unit test for an R5 module. "_r5" is appended to the object
+	# and the target name.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkSharedOSLibs).
+
+	local target = $(1:B)_r5$(1:S) ;
+	local sources = $(2) ;
+	local dest = $(3)_r5 ;
+	local libraries = $(4) ;
+	local objects = [ R5ObjectNames $(sources) ] ;
+
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
+
+	UseCppUnitHeaders ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(objects) ;
+
+	# Our Main replacement.
+	MainFromObjects $(target) : $(objects) ;
+	local source ;
+	for source in [ FGristFiles $(sources) ]
+	{
+		local object = [ R5ObjectNames $(source) ] ;
+		Object $(object) : $(source) ;
+		Depends obj : $(object) ;
+	}
+
+	MakeLocate $(target) : $(dest) ;
+	DEPENDS $(target) : libcppunit.so ;
+	DEPENDS r5tests : $(target) ;
+	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	ObjectDefines $(objects) : TEST_R5 ;
+	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(objects) : "-g" ;
+	ObjectC++Flags $(objects) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
+}
+
 rule CommonUnitTest
 {
 	# CommonUnitTest <target> : <sources> : <dest> : <obos libraries> 

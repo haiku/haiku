@@ -41,7 +41,7 @@ NodeTest::Suite() {
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute Directory Test", &NodeTest::AttrDirTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute Read/Write/Remove Test", &NodeTest::AttrTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Attribute Rename Test"
-#if SK_TEST_R5
+#if TEST_R5
 														" (NOTE: test not actually performed with R5 libraries)"
 #endif
 														, &NodeTest::AttrRenameTest) );
@@ -52,7 +52,7 @@ NodeTest::Suite() {
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Equality Test", &NodeTest::EqualityTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Assignment Test", &NodeTest::AssignmentTest) );
 	suite->addTest( new CppUnit::TestCaller<NodeTest>("BNode::Lock Test"
-#if SK_TEST_OBOS_POSIX
+#if TEST_OBOS /* !!!POSIX ONLY!!! */
 														" (NOTE: test not actually performed with OpenBeOS Posix libraries)"
 #endif
 														, &NodeTest::LockTest) );
@@ -202,76 +202,76 @@ NodeTest::InitTest1()
 	const char *nonExistingSuper = nonExistingSuperDirname;
 	const char *nonExistingRel = nonExistingRelDirname;
 	// 1. default constructor
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node;
 		CPPUNIT_ASSERT( node.InitCheck() == B_NO_INIT );
 	}
 
 	// 2. BNode(const char*)
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node(fileLink);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node(nonExisting);
 		CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node((const char *)NULL);
 		CPPUNIT_ASSERT( equals(node.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node("");
 		CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node(existingFile);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node(existingDir);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node(tooLongEntryname);
 		CPPUNIT_ASSERT( node.InitCheck() == B_NAME_TOO_LONG );
 	}
 
 	// 3. BNode(const BEntry*)
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(dirLink);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 		BNode node(&entry);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(nonExisting);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 		BNode node(&entry);
 		CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node((BEntry *)NULL);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry;
 		BNode node(&entry);
 		CPPUNIT_ASSERT( equals(node.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(existingFile);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -279,7 +279,7 @@ NodeTest::InitTest1()
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(existingDir);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -287,7 +287,7 @@ NodeTest::InitTest1()
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(tooLongEntryname);
 		// R5 returns E2BIG instead of B_NAME_TOO_LONG
@@ -297,7 +297,7 @@ NodeTest::InitTest1()
 	}
 
 	// 4. BNode(const entry_ref*)
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(dirLink);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -306,7 +306,7 @@ NodeTest::InitTest1()
 		BNode node(&ref);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(nonExisting);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -315,12 +315,12 @@ NodeTest::InitTest1()
 		BNode node(&ref);
 		CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node((entry_ref *)NULL);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(existingFile);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -329,7 +329,7 @@ NodeTest::InitTest1()
 		BNode node(&ref);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BEntry entry(existingDir);
 		CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
@@ -340,73 +340,73 @@ NodeTest::InitTest1()
 	}
 
 	// 5. BNode(const BDirectory*, const char*)
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, dirRelLink);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, dirLink);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(nonExistingSuper);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, nonExistingRel);
 		CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node((BDirectory *)NULL, (const char *)NULL);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BNode node((BDirectory *)NULL, dirLink);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, (const char *)NULL);
 		CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(dirSuperLink);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, "");
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(existingSuperFile);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, existingRelFile);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(existingSuperDir);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, existingRelDir);
 		CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(tooLongSuperEntryname);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 		BNode node(&pathDir, tooLongRelEntryname);
 		CPPUNIT_ASSERT( node.InitCheck() == B_NAME_TOO_LONG );
 	}
-	nextSubTest();
+	NextSubTest();
 	{
 		BDirectory pathDir(fileSuperDirname);
 		CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
@@ -434,155 +434,155 @@ NodeTest::InitTest2()
 	const char *nonExistingRel = nonExistingRelDirname;
 	BNode node;
 	// 2. BNode(const char*)
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo(fileLink) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo(nonExisting) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( equals(node.SetTo((const char *)NULL), B_BAD_VALUE,
 						   B_NO_INIT) );
 	CPPUNIT_ASSERT( equals(node.InitCheck(), B_BAD_VALUE, B_NO_INIT) );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo("") == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo(existingFile) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo(existingDir) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo(tooLongEntryname) == B_NAME_TOO_LONG );
 	CPPUNIT_ASSERT( node.InitCheck() == B_NAME_TOO_LONG );
 
 	// 3. BNode(const BEntry*)
-	nextSubTest();
+	NextSubTest();
 	BEntry entry(dirLink);
 	CPPUNIT_ASSERT( entry.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&entry) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(nonExisting) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&entry) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo((BEntry *)NULL) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	entry.Unset();
 	CPPUNIT_ASSERT( entry.InitCheck() == B_NO_INIT );
 	CPPUNIT_ASSERT( equals(node.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE) );
 	CPPUNIT_ASSERT( equals(node.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&entry) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&entry) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	// R5 returns E2BIG instead of B_NAME_TOO_LONG
 	CPPUNIT_ASSERT( equals(entry.SetTo(tooLongEntryname), E2BIG, B_NAME_TOO_LONG) );
 	CPPUNIT_ASSERT( equals(node.SetTo(&entry), B_BAD_ADDRESS, B_BAD_VALUE) );
 	CPPUNIT_ASSERT( equals(node.InitCheck(), B_BAD_ADDRESS, B_BAD_VALUE) );
 
 	// 4. BNode(const entry_ref*)
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(dirLink) == B_OK );
 	entry_ref ref;
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(nonExisting) == B_OK );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&ref) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo((entry_ref *)NULL) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(existingFile) == B_OK );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( entry.SetTo(existingDir) == B_OK );
 	CPPUNIT_ASSERT( entry.GetRef(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&ref) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 
 	// 5. BNode(const BDirectory*, const char*)
-	nextSubTest();
+	NextSubTest();
 	BDirectory pathDir(dirSuperLink);
 	CPPUNIT_ASSERT( pathDir.InitCheck() == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, dirRelLink) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, dirLink) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(nonExistingSuper) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, nonExistingRel) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo((BDirectory *)NULL, (const char *)NULL)
 					== B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( node.SetTo((BDirectory *)NULL, dirLink) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, (const char *)NULL) == B_BAD_VALUE );
 	CPPUNIT_ASSERT( node.InitCheck() == B_BAD_VALUE );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(dirSuperLink) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, "") == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperFile) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, existingRelFile) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(existingSuperDir) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, existingRelDir) == B_OK );
 	CPPUNIT_ASSERT( node.InitCheck() == B_OK );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(tooLongSuperEntryname) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, tooLongRelEntryname) == B_NAME_TOO_LONG );
 	CPPUNIT_ASSERT( node.InitCheck() == B_NAME_TOO_LONG );
 	//
-	nextSubTest();
+	NextSubTest();
 	CPPUNIT_ASSERT( pathDir.SetTo(fileSuperDirname) == B_OK );
 	CPPUNIT_ASSERT( node.SetTo(&pathDir, fileRelDirname) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( node.InitCheck() == B_ENTRY_NOT_FOUND );
@@ -645,7 +645,7 @@ NodeTest::AttrDirTest(BNode &node)
 	CPPUNIT_ASSERT( node.RewindAttrs() == B_OK );
 	testSet.rewind();
 // R5: crashs, if passing a NULL buffer
-#if !SK_TEST_R5
+#if !TEST_R5
 	CPPUNIT_ASSERT( node.GetNextAttrName(NULL) == B_BAD_VALUE );
 #endif
 }
@@ -655,7 +655,7 @@ void
 NodeTest::AttrDirTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -667,7 +667,7 @@ NodeTest::AttrDirTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		AttrDirTest(*node);
@@ -760,7 +760,7 @@ void
 NodeTest::AttrTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -775,7 +775,7 @@ NodeTest::AttrTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		AttrTest(*node);
@@ -787,7 +787,7 @@ NodeTest::AttrTest()
 void
 NodeTest::AttrRenameTest(BNode &node)
 {
-#if !SK_TEST_R5
+#if !TEST_R5
 	const char attr1[] = "StorageKit::SomeAttribute";
 	const char attr2[] = "StorageKit::AnotherAttribute";
 	const char str[] = "This is my testing string and it rules your world.";
@@ -837,7 +837,7 @@ void
 NodeTest::AttrRenameTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -847,7 +847,7 @@ NodeTest::AttrRenameTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		AttrRenameTest(*node);
@@ -920,7 +920,7 @@ void
 NodeTest::AttrInfoTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -931,7 +931,7 @@ NodeTest::AttrInfoTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		AttrInfoTest(*node);
@@ -985,7 +985,7 @@ NodeTest::AttrBStringTest(BNode &node)
 	BString readValue;
 	BString writeValue("test");
 // R5: crashes, if supplying a NULL BString
-#if !SK_TEST_R5
+#if !TEST_R5
 	CPPUNIT_ASSERT( node.WriteAttrString(attrNames[0], NULL) == B_BAD_VALUE );		
 	CPPUNIT_ASSERT( node.ReadAttrString(attrNames[0], NULL) == B_BAD_VALUE );
 #endif
@@ -993,7 +993,7 @@ NodeTest::AttrBStringTest(BNode &node)
 						   B_BAD_ADDRESS, B_BAD_VALUE) );
 	CPPUNIT_ASSERT( equals(node.ReadAttrString(NULL, &readValue),
 						   B_BAD_ADDRESS, B_BAD_VALUE) );
-#if !SK_TEST_R5
+#if !TEST_R5
 	CPPUNIT_ASSERT( node.WriteAttrString(NULL, NULL) == B_BAD_VALUE );
 #endif
 	CPPUNIT_ASSERT( equals(node.ReadAttrString(NULL, NULL),
@@ -1021,7 +1021,7 @@ void
 NodeTest::AttrBStringTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -1035,7 +1035,7 @@ NodeTest::AttrBStringTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		AttrBStringTest(*node);
@@ -1051,7 +1051,7 @@ NodeTest::SyncTest() {
 	const char str[] = "This string rules your world.";
 	const int len = strlen(str) + 1;
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -1061,7 +1061,7 @@ NodeTest::SyncTest() {
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		CPPUNIT_ASSERT( node->WriteAttr(attr, B_STRING_TYPE, 0, str, len)
@@ -1085,7 +1085,7 @@ void
 NodeTest::DupTest()
 {
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -1095,7 +1095,7 @@ NodeTest::DupTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		DupTest(*node);
@@ -1172,9 +1172,9 @@ NodeTest::LockTest(BNode &node, const char *entryName)
 void
 NodeTest::LockTest()
 {
-#if !SK_TEST_OBOS_POSIX
+#if !TEST_OBOS /* !!!POSIX ONLY!!! */
 	// uninitialized objects
-	nextSubTest();
+	NextSubTest();
 	TestNodes testEntries;
 	CreateUninitializedNodes(testEntries);
 	BNode *node;
@@ -1184,7 +1184,7 @@ NodeTest::LockTest()
 	}
 	testEntries.delete_all();
 	// existing entries
-	nextSubTest();
+	NextSubTest();
 	CreateRWNodes(testEntries);
 	for (testEntries.rewind(); testEntries.getNext(node, nodeName); ) {
 		LockTest(*node, nodeName.c_str());

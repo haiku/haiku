@@ -3,13 +3,11 @@
 #ifndef __sk_path_test_h__
 #define __sk_path_test_h__
 
-#include <cppunit/TestCaller.h>
-#include <cppunit/TestSuite.h>
-
 #include <StorageDefs.h>
 #include <SupportDefs.h>
+#include <BasicTest.h>
 
-#include "BasicTest.h"
+class CppUnit::Test;
 
 class PathTest : public BasicTest
 {

@@ -47,6 +47,37 @@ BThreadedTestCase::NextSubTest() {
 }
 
 void
+BThreadedTestCase::Outputf(const char *str, ...) {
+	if (BeVerbose()) {
+		// Figure out if this is a multithreaded test or not
+		thread_id id = find_thread(NULL);
+		bool isSingleThreaded;
+		{
+			BAutolock lock(fUpdateLock);
+			isSingleThreaded = fNumberMap.find(id) == fNumberMap.end();
+		}			
+		if (isSingleThreaded) {
+			va_list args;
+			va_start(args, str);
+			vprintf(str, args);
+			va_end(args);
+			fflush(stdout);
+		} else {
+			va_list args;
+			va_start(args, str);
+			char msg[1024];	// Need a longer string? Change the constant or change the function. :-)
+			vsprintf(msg, str, args);
+			va_end(args);
+			{
+				// Acquire the update lock and post our update
+				BAutolock lock(fUpdateLock);
+				fUpdateList.push_back(std::string(msg));
+			}
+		}
+	}
+}
+
+void
 BThreadedTestCase::InitThreadInfo(thread_id id, std::string threadName) {
 	BAutolock lock(fUpdateLock);	// Lock the number map
 	std::map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.find(id);
