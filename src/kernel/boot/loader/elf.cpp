@@ -189,7 +189,7 @@ elf_load_image(Directory *directory, const char *path)
 
 	status_t status = elf_load_image(fd, image);
 	if (status == B_OK) {
-		image->name = strdup(path);
+		image->name = kernel_args_strdup(path);
 
 		// insert to kernel args
 		image->next = gKernelArgs.preloaded_images;
