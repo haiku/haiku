@@ -220,7 +220,6 @@ media_format::MetaDataSize() const
 // final
 media_format::media_format()
 {
-	CALLED();
 	memset(this, 0x00, sizeof(*this));
 	//meta_data, meta_data_size, meta_data_area, use_area, 
 	//team, and thisPtr are currently only used by decoders
