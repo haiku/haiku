@@ -365,8 +365,8 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 	// set/check boundaries for pos/length
 
 	if (pos < 0)
-		pos = 0;
-	else if (pos >= Node()->data.size) {
+		return B_BAD_VALUE;
+	if (pos >= Node()->data.size) {
 		*_length = 0;
 		return B_NO_ERROR;
 	}
@@ -489,8 +489,8 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 
 	// set/check boundaries for pos/length
 	if (pos < 0)
-		pos = 0;
-	else if (pos + length > Node()->data.size) {
+		return B_BAD_VALUE;
+	if (pos + length > Node()->data.size) {
 		off_t oldSize = Size();
 
 		// uncached files can't be resized (Inode::SetFileSize() also
