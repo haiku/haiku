@@ -217,13 +217,19 @@ void BClipboard::_ReservedClipboard3()
 //------------------------------------------------------------------------------
 bool BClipboard::AssertLocked() const
 {
-  /* How should this be different from IsLocked() */
-  return fLock.IsLocked();
+	// This function is for jumping to the debugger if not locked
+	if(!fLock.IsLocked())
+	{
+		debugger("The clipboard must be locked before proceeding.");
+		return false;
+	}
+	return true;
 }
 //------------------------------------------------------------------------------
 status_t BClipboard::DownloadFromSystem(bool force)
 {
-  /* What does force mean? */
+	// Apparently, the force paramater was used in some sort of
+	// optimization in R5. Currently, we ignore it.
   BMessage message(B_REG_DOWNLOAD_CLIPBOARD), reply;
   if ( (message.AddString("name",fName) == B_OK) &&
        (fClipHandler.SendMessage(&message, &reply) == B_OK) &&
