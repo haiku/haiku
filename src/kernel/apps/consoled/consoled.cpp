@@ -241,6 +241,14 @@ start_console(struct console *con)
 	resume_thread(con->console_writer);
 	setenv("TERM", "beterm", true);
 
+#ifdef USE_INPUT_SERVER
+	// wait for the input_server loop so that keyboard input is available
+	while (find_thread("_input_server_event_loop_") == NULL) {
+		snooze(100000);
+			// a tenth of a second
+	}
+#endif
+
 	return 0;
 }
 
