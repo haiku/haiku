@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src tests kernel libroot ;
 
 SubInclude OBOS_TOP src tests kernel libroot os ;
+SubInclude OBOS_TOP src tests kernel libroot posix ;
