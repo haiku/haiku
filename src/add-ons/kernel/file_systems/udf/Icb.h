@@ -77,6 +77,8 @@ public:
 	uint16 FileLinkCount() { return FileEntry()->file_link_count(); }
 	uint64 Length() { return FileEntry()->information_length(); }
 	mode_t Mode() { return (IsDirectory() ? S_IFDIR : S_IFREG) | S_IRUSR | S_IRGRP | S_IROTH; }
+	time_t AccessTime();
+	time_t ModificationTime();
 	
 	uint8 *AllocationDescriptors() { return AbstractEntry()->AllocationDescriptors(); }
 	uint32 AllocationDescriptorsSize() { return AbstractEntry()->AllocationDescriptorsLength(); }

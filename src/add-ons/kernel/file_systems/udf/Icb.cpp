@@ -1,5 +1,7 @@
 #include "Icb.h"
 
+#include "time.h"
+
 #include "AllocationDescriptorList.h"
 #include "DirectoryIterator.h"
 #include "Utils.h"
@@ -35,6 +37,18 @@ status_t
 Icb::InitCheck()
 {
 	return fInitStatus;
+}
+
+time_t
+Icb::AccessTime()
+{
+	return make_time(FileEntry()->access_date_and_time());
+}
+
+time_t
+Icb::ModificationTime()
+{
+	return make_time(FileEntry()->modification_date_and_time());
 }
 
 status_t
