@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Desktop.cpp
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Author:			Adi Oanca <adioanca@mymail.ro>
 //	Description:	Class used to encapsulate desktop management
 //
 //------------------------------------------------------------------------------
@@ -417,18 +417,10 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 						target->MouseDown(msg, true);
 
 					// may be or may be empty.
+// TODO: what if modal of floating windows are in front of us?
 					invalidRegion.Include(&(activeFocus->fFull));
 					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
-					activeFocus->fParent->FullInvalidate(invalidRegion);
-// TODO: this is a hack! Should be something like this:
-// void Layer::RebuildAndForceRedraw(invalidReg, target){
-// 	BPoint pt(0,0);
-//	StartRebuildRegions(invalidRegion, NULL, B_LAYER_NONE, pt);
-//	if (target) gRedrawReg.Include(target->fFullVisible);
-//	Redraw(gRedrawReg);
-// }
-//	called like: target->fParent->RebuildAndForceRedraw(reg, target);
-					activeFocus->fParent->Invalidate(invalidRegion);
+					activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
 
 					if (previousFocus != activeFocus && previousFocus)
 					{
@@ -446,9 +438,13 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 				}
 				else // target == fMouseTarget
 				{
-					target->Window()->Lock();
-					target->MouseDown(msg, true);
-					target->Window()->Unlock();
+					// only if target has the focus!
+					if (target == ws->FocusLayer())
+					{
+						target->Window()->Lock();
+						target->MouseDown(msg, true);
+						target->Window()->Unlock();
+					}
 				}
 
 				rl->fMainLock.Unlock();
@@ -473,7 +469,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 				fMouseTarget->MouseUp(msg);
 				fMouseTarget->Window()->Unlock();
 
-//				fMouseTarget = NULL;				
+				fMouseTarget = NULL;				
 			}
 			else
 			{
