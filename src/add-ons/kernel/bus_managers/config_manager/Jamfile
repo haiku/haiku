@@ -17,6 +17,6 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
+#	add-ons/kernel/bus_managers/config_manager
 	addons/kernel/config_manager
 	;
-
