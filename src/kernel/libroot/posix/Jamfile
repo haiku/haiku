@@ -14,6 +14,7 @@ KernelMergeObject posix_main.o :
  	poll.c
  	pwd.c
  	syslog.cpp
+ 	termios.c
  	utime.c
  	: -fPIC -DPIC
 	;
