@@ -23,7 +23,7 @@
 
 //#define TRACE_VIDEO
 #ifdef TRACE_VIDEO
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -227,7 +227,7 @@ vesa_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 	if (gKernelArgs.fb.bit_depth = modeInfo.bits_per_pixel != 8)
 		return B_BAD_TYPE;
 #endif
-
+#if 0
 	struct bios_regs regs;
 	regs.eax = 0x4f09;
 	regs.ebx = 0;
@@ -238,11 +238,13 @@ vesa_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 	call_bios(0x10, &regs);
 
 	if ((regs.eax & 0xffff) != 0x4f) {
+#endif
 		// the VESA call does not work, just try good old VGA mechanism
 		vga_set_palette(palette, firstIndex, numEntries);
+#if 0
 		return B_ERROR;
 	}
-
+#endif
 	return B_OK;
 }
 
