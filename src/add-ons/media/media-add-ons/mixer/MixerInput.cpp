@@ -25,6 +25,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	fMixBufferFrameRate(0),
 	fMixBufferFrameCount(0),
 	fResampler(0),
+	fRtmPool(0),
 	fUserOverridesChannelDesignations(false)
 {
 	fix_multiaudio_format(&fInput.format.u.raw_audio);
@@ -76,6 +77,8 @@ MixerInput::~MixerInput()
 {
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
+	if (fRtmPool)
+		rtm_delete_pool(fRtmPool);
 	delete [] fInputChannelInfo;
 	delete [] fMixerChannelInfo;
 
@@ -456,8 +459,12 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
+	if (fRtmPool)
+		rtm_delete_pool(fRtmPool);
 	int size = sizeof(float) * fInputChannelCount * fMixBufferFrameCount;
-	fMixBuffer = (float *)rtm_alloc(NULL, size);
+	if (B_OK != rtm_create_pool(&fRtmPool, size))
+		fRtmPool = 0;
+	fMixBuffer = (float *)rtm_alloc(fRtmPool, size);
 	ASSERT(fMixBuffer);
 	
 	memset(fMixBuffer, 0, size); 

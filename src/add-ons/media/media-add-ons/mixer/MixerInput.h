@@ -67,6 +67,7 @@ private:
 	uint32			fMixBufferFrameCount;
 	
 	Resampler		**fResampler; // array
+	rtm_pool		*fRtmPool;
 
 	bool			fUserOverridesChannelDesignations;
 	
