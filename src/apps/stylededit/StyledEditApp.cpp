@@ -36,6 +36,9 @@ StyledEditApp::MessageReceived(BMessage *message)
 		case MENU_OPEN:
 			fOpenPanel->Show(); //
 		break;
+		case B_SILENT_RELAUNCH:
+			OpenDocument();
+		break;
 		default:
 			BApplication::MessageReceived(message);
 		break;
