@@ -102,13 +102,13 @@ switch $(TARGET_CPU) {
 		} else {
 			OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 		}
-		DEFINES += __POWERPC__ ;
+		DEFINES += __POWERPC__ ARCH_ppc ;
 		OBOS_BOOT_PLATFORM = openfirmware ;
 	}
 	case x86 :
 	{
 		# nothing special to do here...
-		DEFINES += __INTEL__ ;
+		DEFINES += __INTEL__ ARCH_x86 ;
 		OBOS_BOOT_PLATFORM = bios_ia32 ;
 	}
 	case * :
