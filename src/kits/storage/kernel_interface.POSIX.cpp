@@ -997,16 +997,31 @@ BPrivate::Storage::entry_ref_to_path( const struct entry_ref *ref, char *result,
 
 
 status_t
-BPrivate::Storage::entry_ref_to_path(dev_t device, ino_t directory, const char *name,
-	char *path, size_t size)
+BPrivate::Storage::entry_ref_to_path(dev_t device, ino_t directory,
+	const char *name, char *path, size_t size)
 {
-	status_t status = _kern_dir_node_ref_to_path(device, directory, path, size);
-	if (status < B_OK)
-		return status;
-
-	strlcat(path, "/", size);
-	strlcat(path, name, size);
-	return B_OK;
+	status_t error;
+	if (strcmp(name, ".") == 0) {
+		error = _kern_dir_node_ref_to_path(device, directory, path, size);
+	} else if (strcmp(name, "..") == 0) {
+		char tmpPath[B_PATH_NAME_LENGTH];
+		error = _kern_dir_node_ref_to_path(device, directory, tmpPath,
+			B_PATH_NAME_LENGTH);
+		if (error != B_OK)
+			return error;
+		strlcat(tmpPath, "/", B_PATH_NAME_LENGTH);
+		strlcat(tmpPath, name, B_PATH_NAME_LENGTH);
+		error = get_canonical_path(tmpPath, path, size);
+	} else {
+		error = _kern_dir_node_ref_to_path(device, directory, path, size);
+		if (error != B_OK)
+			return error;
+		int32 len = strlen(path);
+		if (path[len - 1] != '/')
+			strlcat(path, "/", B_PATH_NAME_LENGTH);
+		strlcat(path, name, B_PATH_NAME_LENGTH);
+	}
+	return error;
 }
 
 
@@ -1023,15 +1038,13 @@ BPrivate::Storage::dir_to_path( FileDescriptor dir, char *result, size_t size )
 {
 	if (dir < 0 || result == NULL)
 		return B_BAD_VALUE;
-
-	entry_ref entry;
-	status_t status;
-	
-	status = dir_to_self_entry_ref(dir, &entry);
-	if (status != B_OK)
-		return status;
-		
-	return entry_ref_to_path(&entry, result, size);
+	// get stat
+	Stat st;
+	status_t error = get_stat(dir, &st);
+	if (error != B_OK)
+		return error;
+	// get path for the node ref
+	return _kern_dir_node_ref_to_path(st.st_dev, st.st_ino, result, size);
 }
 
 /*!	\param path the path name.
@@ -1104,7 +1117,7 @@ BPrivate::Storage::get_canonical_path(const char *path, char *&result)
 	\param result a pointer to a buffer the resulting path name shall be
 		   written into.
 	\param size the size of the buffer
-	\return \c B_OK if everything went fine, an error code otherwise
+	\return \c B_OK if everything  went fine, an error code otherwise
 */
 status_t
 BPrivate::Storage::get_canonical_dir_path(const char *path, char *result, size_t size)
