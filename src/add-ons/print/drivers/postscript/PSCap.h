@@ -11,9 +11,9 @@
 class PSCap : public PrinterCap {
 public:
 	PSCap(const PrinterData *printer_data);
-	virtual int countCap(CAPID) const;
-	virtual bool isSupport(CAPID) const;
-	virtual const BaseCap **enumCap(CAPID) const;
+	virtual int countCap(CapID) const;
+	virtual bool isSupport(CapID) const;
+	virtual const BaseCap **enumCap(CapID) const;
 };
 
 #endif	/* __PSCAP_H */

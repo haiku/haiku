@@ -1,6 +1,7 @@
 /*
- * PCL5.h
+ * PCL6.h
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
+ * Copyright 2003 Michael Pfeiffer.
  */
 
 #ifndef __PCL6_H
@@ -28,7 +29,7 @@ protected:
 	virtual bool endDoc(bool success);
 
 private:
-	HP_UByte mediaSize(JobData::PAPER paper);
+	HP_UByte mediaSize(JobData::Paper paper);
 	void move(int x, int y);
 	void jobStart();
 	void startRasterGraphics(int x, int y, int width, int height);
@@ -39,9 +40,9 @@ private:
 		int size);
 	void jobEnd();
 
-	HP_StreamHandleType __stream;
-	int __compression_method;
-	Halftone *__halftone;
+	HP_StreamHandleType fStream;
+	int fCompressionMethod;
+	Halftone *fHalftone;
 };
 
-#endif	/* __PCL5_H */
+#endif	/* __PCL6_H */

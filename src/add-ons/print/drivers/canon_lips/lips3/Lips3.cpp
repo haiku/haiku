@@ -26,7 +26,7 @@ using namespace std;
 LIPS3Driver::LIPS3Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
 {
-	__halftone = NULL;
+	fHalftone = NULL;
 }
 
 bool LIPS3Driver::startDoc()
@@ -41,7 +41,7 @@ bool LIPS3Driver::startDoc()
 		paperFeedMode();
 		disableAutoFF();
 		setNumberOfCopies();
-		__halftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -52,8 +52,8 @@ bool LIPS3Driver::startDoc()
 bool LIPS3Driver::startPage(int)
 {
 	try {
-		__current_x = 0;
-		__current_y = 0;
+		fCurrentX = 0;
+		fCurrentY = 0;
 		memorizedPosition();
 		return true;
 	}
@@ -76,8 +76,8 @@ bool LIPS3Driver::endPage(int)
 bool LIPS3Driver::endDoc(bool)
 {
 	try {
-		if (__halftone) {
-			delete __halftone;
+		if (fHalftone) {
+			delete fHalftone;
 		}
 		jobEnd();
 		return true;
@@ -117,7 +117,7 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		DBGMSG(("x = %d\n", x));
 		DBGMSG(("y = %d\n", y));
 
-		if (get_valid_rect(bitmap, __halftone->getPalette(), &rc)) {
+		if (get_valid_rect(bitmap, &rc)) {
 
 			DBGMSG(("validate rect = %d, %d, %d, %d\n",
 				rc.left, rc.top, rc.right, rc.bottom));
@@ -138,11 +138,11 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", __halftone->getPixelDepth()));
+			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
 
 			uchar *ptr = (uchar *)bitmap->Bits()
 						+ rc.top * delta
-						+ (rc.left * __halftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -161,7 +161,7 @@ bool LIPS3Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			move(x, y);
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
-				__halftone->dither(ptr2, ptr, x, y, width);
+				fHalftone->dither(ptr2, ptr, x, y, width);
 				ptr  += delta;
 				ptr2 += widthByte;
 				y++;
@@ -247,47 +247,47 @@ void LIPS3Driver::selectPageFormat()
 	int height = 0;
 
 	switch (getJobData()->getPaper()) {
-	case JobData::A3:
+	case JobData::kA3:
 		i = 12;
 		break;
 
-	case JobData::A4:
+	case JobData::kA4:
 		i = 14;
 		break;
 
-	case JobData::A5:
+	case JobData::kA5:
 		i = 16;
 		break;
 
-	case JobData::JAPANESE_POSTCARD:
+	case JobData::kJapanesePostcard:
 		i = 18;
 		break;
 
-	case JobData::B4:
+	case JobData::kB4:
 		i = 24;
 		break;
 
-	case JobData::B5:
+	case JobData::kB5:
 		i = 26;
 		break;
 
-	case JobData::LETTER:
+	case JobData::kLetter:
 		i = 30;
 		break;
 
-	case JobData::LEGAL:
+	case JobData::kLegal:
 		i = 32;
 		break;
 
-//	case JobData::EXECUTIVE:
+//	case JobData::kExecutive:
 //		i = 40;
 //		break;
 //
-//	case JobData::JENV_YOU4:
+//	case JobData::kJEnvYou4:
 //		i = 50;
 //		break;
 //
-//	case JobData::USER:
+//	case JobData::kUser:
 //		i = 90;
 //		break;
 //
@@ -298,7 +298,7 @@ void LIPS3Driver::selectPageFormat()
 		break;
 	}
 
-	if (JobData::LANDSCAPE == getJobData()->getOrientation())
+	if (JobData::kLandscape == getJobData()->getOrientation())
 		i++;
 
 	if (i < 80) {
@@ -328,16 +328,16 @@ void LIPS3Driver::paperFeedMode()
 	int i;
 
 	switch (getJobData()->getPaperSource()) {
-	case JobData::MANUAL:
+	case JobData::kManual:
 		i = 1;
 		break;
-	case JobData::LOWER:
+	case JobData::kLower:
 		i = 2;
 		break;
-	case JobData::UPPER:
+	case JobData::kUpper:
 		i = 3;
 		break;
-	case JobData::AUTO:
+	case JobData::kAuto:
 	default:
 		i = 0;
 		break;
@@ -408,17 +408,17 @@ void LIPS3Driver::jobEnd()
 
 void LIPS3Driver::move(int x, int y)
 {
-	if (__current_x != x) {
+	if (fCurrentX != x) {
 		if (x) {
 			moveAbsoluteHorizontal(x);
 		} else {
 			carriageReturn();
 		}
-		__current_x = x;
+		fCurrentX = x;
 	}
-	if (__current_y != y) {
-		int dy = y - __current_y;
+	if (fCurrentY != y) {
+		int dy = y - fCurrentY;
 		moveDown(dy);
-		__current_y = y;
+		fCurrentY = y;
 	}
 }

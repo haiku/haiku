@@ -45,9 +45,9 @@ private:
 	void formFeed();
 	void jobEnd();
 
-	int __current_x;
-	int __current_y;
-	Halftone *__halftone;
+	int fCurrentX;
+	int fCurrentY;
+	Halftone *fHalftone;
 };
 
 #endif	/* __LIPS3_H */

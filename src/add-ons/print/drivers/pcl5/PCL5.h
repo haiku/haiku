@@ -34,8 +34,8 @@ private:
 	void jobEnd();
 	int bytesToEnterCompressionMethod(int compression_method);
 
-	int __compression_method;
-	Halftone *__halftone;
+	int fCompressionMethod;
+	Halftone *fHalftone;
 };
 
 #endif	/* __PCL5_H */

@@ -44,6 +44,16 @@ Job Separation Command
 
 Image Transfer
 
+Simple Color Command
+	Esc*r<mode>U
+	mode:
+		-3 ... 3 planes, device CMY palette 
+		(0 = white, 1 = cyan, 2 = magenta, 3 = blue, 4 = yellow, 5 = green, 6 = red, 7 = black)
+		1 ... single plane K (black) palette (default) 
+		(0 = white, 1 = black)
+		3 ... 3 planes, device RGB palette 
+		(0 = black, 1 = red, 2 = green, 3 = yellow, 4 = blue, 5 = magenta, 6 = cyan, 7 = white)
+
 Raster Presentation
 	Esc*r<mode>F
 	mode ... 0 in orientation of logical page
@@ -67,14 +77,16 @@ Start Raster Graphics
 		lines ... number of raster lines of vertical movement
 	Raster Compression
 		Esc*b<mode>M
-		mode ... 0 unencoded
+		mode
+		     ... 0 unencoded (default)
 		     ... 1 run length encoding
 		     ... 2 tagged image file format (TIFF) rev. 4.0
 		     ... 3 delta row compression
 		     ... 4 reserved
 		     ... 5 adaptie compression
 	{Transfer Raster Data
-		Esc*b<length>W<data>
+		[Esc*b<length>V<data> # ]
+		Esc*b<length>W<data> # for last plane moves cursor X pos to 0
 		length ... 0 to 32767
 	}
 }

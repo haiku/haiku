@@ -10,105 +10,105 @@
 const PaperCap a3(
 	"A3",
 	false,
-	JobData::A3,
+	JobData::kA3,
 	BRect(0.0f,            0.0f,            TO72DPI(7014.0f), TO72DPI(9920.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(6894.0f), TO72DPI(9800.0f)));
 
 const PaperCap a4(
 	"A4",
 	true,
-	JobData::A4,
+	JobData::kA4,
 	BRect(0.0f,            0.0f,            TO72DPI(4960.0f), TO72DPI(7014.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4840.0f), TO72DPI(6894.0f)));
 
 const PaperCap a5(
 	"A5",
 	false,
-	JobData::A5,
+	JobData::kA5,
 	BRect(0.0f,            0.0f,            TO72DPI(3506.0f), TO72DPI(4960.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(3386.0f), TO72DPI(4840.0f)));
 
 const PaperCap japanese_postcard(
 	"Japanese Postcard",
 	false,
-	JobData::JAPANESE_POSTCARD,
+	JobData::kJapanesePostcard,
 	BRect(0.0f,           0.0f,             TO72DPI(2362.0f), TO72DPI(3506.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(2242.0f), TO72DPI(3386.0f)));
 
 const PaperCap b4(
 	"B4",
 	false,
-	JobData::B4,
+	JobData::kB4,
 	BRect(0.0f,            0.0f,            TO72DPI(6070.0f), TO72DPI(8598.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(5950.0f), TO72DPI(8478.0f)));
 
 const PaperCap b5(
 	"B5",
 	false,
-	JobData::B5,
+	JobData::kB5,
 	BRect(0.0f,            0.0f,            TO72DPI(4298.0f), TO72DPI(6070.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4178.0f), TO72DPI(5950.0f)));
 
 const PaperCap letter(
 	"Letter",
 	false,
-	JobData::LETTER,
+	JobData::kLetter,
 	BRect(0.0f,            0.0f,            TO72DPI(5100.0f), TO72DPI(6600.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4980.0f), TO72DPI(6480.0f)));
 
 const PaperCap legal(
 	"Legal",
 	false,
-	JobData::LEGAL,
+	JobData::kLegal,
 	BRect(0.0f,            0.0f,            TO72DPI(5100.0f), TO72DPI(8400.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4980.0f), TO72DPI(8280.0f)));
 
 const PaperCap tabloid(
 	"Tabloid",
 	false,
-	JobData::TABLOID,
+	JobData::kTabloid,
 	BRect(0.0f,            0.0f,            TO72DPI(6600.0), TO72DPI(10200.0)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(6480.0), TO72DPI(10080.0)));
 
 const PaperCap executive(
 	"Executive",
 	false,
-	JobData::EXECUTIVE,
+	JobData::kExecutive,
 	BRect(0.0f,            0.0f,            TO72DPI(4350.0f), TO72DPI(6300.0f)),
 	BRect(TO72DPI(120.0f), TO72DPI(120.0f), TO72DPI(4230.0f), TO72DPI(6180.0f)));
 
 const PaperCap japanese_envelope_you4(
 	"Japanese Envelope You#4",
 	false,
-	JobData::JENV_YOU4,
+	JobData::kJEnvYou4,
 	BRect(0.0f,            0.0f,            TO72DPI(2480.0f), TO72DPI(5550.0f)),
 	BRect(TO72DPI(236.0f), TO72DPI(236.0f), TO72DPI(2244.0f), TO72DPI(5314.0f)));
 /*
 const PaperCap japanese_envelope_kaku2(
 	"Japanese Envelope Kaku#2",
 	false,
-	JobData::JENV_KAKU2,
+	JobData::kJEnvKaku2,
 	BRect(0.0f,            0.0f,            TO72DPI(5568.0f), TO72DPI(7842.0f)),
 	BRect(TO72DPI(236.0f), TO72DPI(236.0f), TO72DPI(5432.0f), TO72DPI(7606.0f)));
 */
-const PaperSourceCap autobin("Auto",  true,  JobData::AUTO);
-const PaperSourceCap manual("Manual", false, JobData::MANUAL);
-const PaperSourceCap upper("Upper",   false, JobData::UPPER);
-const PaperSourceCap middle("Middle", false, JobData::MIDDLE);
-const PaperSourceCap lower("Lower",   false, JobData::LOWER);
+const PaperSourceCap autobin("Auto",  true,  JobData::kAuto);
+const PaperSourceCap manual("Manual", false, JobData::kManual);
+const PaperSourceCap upper("Upper",   false, JobData::kUpper);
+const PaperSourceCap middle("Middle", false, JobData::kMiddle);
+const PaperSourceCap lower("Lower",   false, JobData::kLower);
 
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
 const ResolutionCap dpi600("600dpi",   true,  600,  600);
 const ResolutionCap dpi300("300dpi",   false, 300,  300);
 
-const PrintStyleCap simplex("Simplex", true,  JobData::SIMPLEX);
-const PrintStyleCap duplex("Duplex",   false, JobData::DUPLEX);
-const PrintStyleCap booklet("Booklet", false, JobData::BOOKLET);
+const PrintStyleCap simplex("Simplex", true,  JobData::kSimplex);
+const PrintStyleCap duplex("Duplex",   false, JobData::kDuplex);
+const PrintStyleCap booklet("Booklet", false, JobData::kBooklet);
 
-const BindingLocationCap longedge1("Long Edge (left)",     true,  JobData::LONG_EDGE_LEFT);
-const BindingLocationCap longedge2("Long Edge (right)",    false, JobData::LONG_EDGE_RIGHT);
-const BindingLocationCap shortedge1("Short Edge (top)",    false, JobData::SHORT_EDGE_TOP);
-const BindingLocationCap shortedge2("Short Edge (bottom)", false, JobData::SHORT_EDGE_BOTTOM);
+const BindingLocationCap longedge1("Long Edge (left)",     true,  JobData::kLongEdgeLeft);
+const BindingLocationCap longedge2("Long Edge (right)",    false, JobData::kLongEdgeRight);
+const BindingLocationCap shortedge1("Short Edge (top)",    false, JobData::kShortEdgeTop);
+const BindingLocationCap shortedge2("Short Edge (bottom)", false, JobData::kShortEdgeBottom);
 
 const PaperCap *papers[] = {
 	&a4,
@@ -151,8 +151,8 @@ const BindingLocationCap *bindinglocations[] = {
 	&shortedge2
 };
 
-const ColorCap color("Color", false, JobData::kCOLOR);
-const ColorCap monochrome("Monochrome", true, JobData::kMONOCHROME);
+const ColorCap color("Color", false, JobData::kColor);
+const ColorCap monochrome("Monochrome", true, JobData::kMonochrome);
 
 const ColorCap *colors[] = {
 	&color,
@@ -160,55 +160,55 @@ const ColorCap *colors[] = {
 };
 
 
-int Lips4Cap::countCap(CAPID capid) const
+int Lips4Cap::countCap(CapID capid) const
 {
 	switch (capid) {
-	case PAPER:
+	case kPaper:
 		return sizeof(papers) / sizeof(papers[0]);
-	case PAPERSOURCE:
+	case kPaperSource:
 		return sizeof(papersources) / sizeof(papersources[0]);
-	case RESOLUTION:
+	case kResolution:
 		return sizeof(resolutions) / sizeof(resolutions[0]);
-	case PRINTSTYLE:
+	case kPrintStyle:
 		return sizeof(printstyles) / sizeof(printstyles[0]);
-	case BINDINGLOCATION:
+	case kBindingLocation:
 		return sizeof(bindinglocations) / sizeof(bindinglocations[0]);
-	case COLOR:
+	case kColor:
 		return sizeof(colors) / sizeof(colors[0]);
 	default:
 		return 0;
 	}
 }
 
-const BaseCap **Lips4Cap::enumCap(CAPID capid) const
+const BaseCap **Lips4Cap::enumCap(CapID capid) const
 {
 	switch (capid) {
-	case PAPER:
+	case kPaper:
 		return (const BaseCap **)papers;
-	case PAPERSOURCE:
+	case kPaperSource:
 		return (const BaseCap **)papersources;
-	case RESOLUTION:
+	case kResolution:
 		return (const BaseCap **)resolutions;
-	case PRINTSTYLE:
+	case kPrintStyle:
 		return (const BaseCap **)printstyles;
-	case BINDINGLOCATION:
+	case kBindingLocation:
 		return (const BaseCap **)bindinglocations;
-	case COLOR:
+	case kColor:
 		return (const BaseCap **)colors;
 	default:
 		return NULL;
 	}
 }
 
-bool Lips4Cap::isSupport(CAPID capid) const
+bool Lips4Cap::isSupport(CapID capid) const
 {
 	switch (capid) {
-	case PAPER:
-	case PAPERSOURCE:
-	case RESOLUTION:
-	case PRINTSTYLE:
-	case BINDINGLOCATION:
-	case COLOR:
+	case kPaper:
+	case kPaperSource:
+	case kResolution:
+	case kPrintStyle:
+	case kBindingLocation:
+	case kColor:
 		return true;
 	default:
 		return false;

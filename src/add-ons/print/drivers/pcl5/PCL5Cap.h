@@ -11,9 +11,9 @@
 class PCL5Cap : public PrinterCap {
 public:
 	PCL5Cap(const PrinterData *printer_data);
-	virtual int countCap(CAPID) const;
-	virtual bool isSupport(CAPID) const;
-	virtual const BaseCap **enumCap(CAPID) const;
+	virtual int countCap(CapID) const;
+	virtual bool isSupport(CapID) const;
+	virtual const BaseCap **enumCap(CapID) const;
 };
 
 #endif	/* __PCL5CAP_H */

@@ -28,15 +28,15 @@ using namespace std;
 PSDriver::PSDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
 {
-	__printed_pages = 0;
-	__halftone = NULL;
+	fPrintedPages = 0;
+	fHalftone = NULL;
 }
 
 bool PSDriver::startDoc()
 {
 	try {
 		jobStart();
-		__halftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -54,7 +54,7 @@ bool PSDriver::startPage(int page)
 bool PSDriver::endPage(int)
 {
 	try {
-		__printed_pages ++;
+		fPrintedPages ++;
 		writeSpoolString("showpage\n");
 		return true;
 	}
@@ -66,8 +66,8 @@ bool PSDriver::endPage(int)
 bool PSDriver::endDoc(bool)
 {
 	try {
-		if (__halftone) {
-			delete __halftone;
+		if (fHalftone) {
+			delete fHalftone;
 		}
 		jobEnd();
 		return true;
@@ -113,7 +113,7 @@ bool PSDriver::nextBand(BBitmap *bitmap, BPoint *offset)
 		DBGMSG(("x = %d\n", x));
 		DBGMSG(("y = %d\n", y));
 
-		if (get_valid_rect(bitmap, __halftone->getPalette(), &rc)) {
+		if (get_valid_rect(bitmap, &rc)) {
 
 			DBGMSG(("validate rect = %d, %d, %d, %d\n",
 				rc.left, rc.top, rc.right, rc.bottom));
@@ -121,7 +121,7 @@ bool PSDriver::nextBand(BBitmap *bitmap, BPoint *offset)
 			x = rc.left;
 			y += rc.top;
 
-			bool color = getJobData()->getColor() == JobData::kCOLOR;
+			bool color = getJobData()->getColor() == JobData::kColor;
 			int width = rc.right - rc.left + 1;
 			int widthByte = (width + 7) / 8;	/* byte boundary */
 			int height    = rc.bottom - rc.top + 1;
@@ -134,11 +134,11 @@ bool PSDriver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("height = %d\n", height));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", __halftone->getPixelDepth()));
+			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
 
 			uchar *ptr = (uchar *)bitmap->Bits()
 						+ rc.top * delta
-						+ (rc.left * __halftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -169,7 +169,7 @@ bool PSDriver::nextBand(BBitmap *bitmap, BPoint *offset)
 						in += 4;
 					}
 				} else {
-					__halftone->dither(in_buffer, ptr, x, y, width);
+					fHalftone->dither(in_buffer, ptr, x, y, width);
 
 					uchar* in = in_buffer;
 					uchar* out = out_buffer;
@@ -248,8 +248,8 @@ void PSDriver::jobStart()
 
 void PSDriver::startRasterGraphics(int x, int y, int width, int height, int widthByte)
 {
-	bool color = getJobData()->getColor() == JobData::kCOLOR;
-	__compression_method = -1;
+	bool color = getJobData()->getColor() == JobData::kColor;
+	fCompressionMethod = -1;
 	writeSpoolString("gsave\n");
 	writeSpoolString("/s %d string def\n", widthByte);
 	writeSpoolString("%d %d translate\n", x, y);
@@ -279,8 +279,8 @@ void PSDriver::rasterGraphics(
 	const uchar *buffer,
 	int size)
 {
-	if (__compression_method != compression_method) {
-		__compression_method = compression_method;
+	if (fCompressionMethod != compression_method) {
+		fCompressionMethod = compression_method;
 	}
 	writeSpoolData(buffer, size);
 	writeSpoolString("\n");
@@ -288,6 +288,6 @@ void PSDriver::rasterGraphics(
 
 void PSDriver::jobEnd()
 {
-	writeSpoolString("%%%%Pages: %d\n", __printed_pages);
+	writeSpoolString("%%%%Pages: %d\n", fPrintedPages);
 	writeSpoolString("%%%%EOF\n");
 }

@@ -27,14 +27,14 @@ using namespace std;
 PCL5Driver::PCL5Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
 {
-	__halftone = NULL;
+	fHalftone = NULL;
 }
 
 bool PCL5Driver::startDoc()
 {
 	try {
 		jobStart();
-		__halftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -61,8 +61,8 @@ bool PCL5Driver::endPage(int)
 bool PCL5Driver::endDoc(bool)
 {
 	try {
-		if (__halftone) {
-			delete __halftone;
+		if (fHalftone) {
+			delete fHalftone;
 		}
 		jobEnd();
 		return true;
@@ -102,7 +102,7 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		DBGMSG(("x = %d\n", x));
 		DBGMSG(("y = %d\n", y));
 
-		if (get_valid_rect(bitmap, __halftone->getPalette(), &rc)) {
+		if (get_valid_rect(bitmap, &rc)) {
 
 			DBGMSG(("validate rect = %d, %d, %d, %d\n",
 				rc.left, rc.top, rc.right, rc.bottom));
@@ -123,11 +123,11 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("in_size = %d\n", in_size));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", __halftone->getPixelDepth()));
+			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
 
 			uchar *ptr = (uchar *)bitmap->Bits()
 						+ rc.top * delta
-						+ (rc.left * __halftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -144,31 +144,21 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			move(x, y);
 			startRasterGraphics(width, height);
 
-			const bool color = getJobData()->getColor() == JobData::kCOLOR;
+			const bool color = getJobData()->getColor() == JobData::kColor;
 			const int num_planes = color ? 3 : 1;
 			const int fill_bits = in_size * 8 - width;
 			const uchar fill_mask = 0xff >> (8 - fill_bits);
 			// ASSERT(0 <= fill_bits && fill_bits < 8);
 			
+			if (color) {
+				fHalftone->setPlanes(Halftone::kPlaneRGB1);
+			}
+			
 			for (int i = rc.top; i <= rc.bottom; i++) {
 			
 				for (int plane = 0; plane < num_planes; plane ++) {
-					
-					if (color) {
-						switch (plane) {
-							// XXX maybe order should be red, green, blue. This could be
-							// a bug in __halftone dither where it passes rgb_color to
-							// a gray function in wrong order!
-							case 0: __halftone->setGrayFunction(Halftone::kBlueChannel);
-								break;
-							case 1: __halftone->setGrayFunction(Halftone::kGreenChannel);
-								break;
-							case 2: __halftone->setGrayFunction(Halftone::kRedChannel);
-								break;
-						}
-					}
-					
-					__halftone->dither(in_buffer, ptr, x, y, width);
+										
+					fHalftone->dither(in_buffer, ptr, x, y, width);
 					
 					if (color) {
 						// in color mode a value of 1 in all three planes means white
@@ -224,7 +214,7 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 void PCL5Driver::jobStart()
 {
-	const bool color = getJobData()->getColor() == JobData::kCOLOR;
+	const bool color = getJobData()->getColor() == JobData::kColor;
 	// enter PCL5
 	writeSpoolString("\033%%-12345X@PJL ENTER LANGUAGE=PCL\n");
 	// reset
@@ -259,7 +249,7 @@ void PCL5Driver::startRasterGraphics(int width, int height)
 	writeSpoolString("\033*r%dT", height);
 	// start raster graphics
 	writeSpoolString("\033*r1A");
-	__compression_method = -1;
+	fCompressionMethod = -1;
 }
 
 void PCL5Driver::endRasterGraphics()
@@ -273,9 +263,9 @@ void PCL5Driver::rasterGraphics(
 	int size,
 	bool lastPlane)
 {
-	if (__compression_method != compression_method) {
+	if (fCompressionMethod != compression_method) {
 		writeSpoolString("\033*b%dM", compression_method);
-		__compression_method = compression_method;
+		fCompressionMethod = compression_method;
 	}
 	writeSpoolString("\033*b%d", size);
 	if (lastPlane) {
@@ -299,7 +289,7 @@ void PCL5Driver::move(int x, int y)
 
 int PCL5Driver::bytesToEnterCompressionMethod(int compression_method)
 {
-	if (__compression_method == compression_method) {
+	if (fCompressionMethod == compression_method) {
 		return 0;
 	} else {
 		return 5;

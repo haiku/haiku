@@ -27,8 +27,8 @@ using namespace std;
 PCL6Driver::PCL6Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
 {
-	__halftone = NULL;
-	__stream = NULL;
+	fHalftone = NULL;
+	fStream = NULL;
 }
 
 void PCL6Driver::FlushOutBuffer(HP_StreamHandleType pStream, unsigned long cookie, HP_pUByte pOutBuffer, HP_SInt32 currentBufferLen) 
@@ -41,7 +41,7 @@ bool PCL6Driver::startDoc()
 {
 	try {
 		jobStart();
-		__halftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
+		fHalftone = new Halftone(getJobData()->getSurfaceType(), getJobData()->getGamma());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -52,8 +52,8 @@ bool PCL6Driver::startDoc()
 bool PCL6Driver::endDoc(bool)
 {
 	try {
-		if (__halftone) {
-			delete __halftone;
+		if (fHalftone) {
+			delete fHalftone;
 		}
 		jobEnd();
 		return true;
@@ -93,7 +93,7 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 		DBGMSG(("x = %d\n", x));
 		DBGMSG(("y = %d\n", y));
 
-		if (get_valid_rect(bitmap, __halftone->getPalette(), &rc)) {
+		if (get_valid_rect(bitmap, &rc)) {
 
 			DBGMSG(("validate rect = %d, %d, %d, %d\n",
 				rc.left, rc.top, rc.right, rc.bottom));
@@ -110,7 +110,7 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			int out_size;
 			int delta;
 
-			color = getJobData()->getColor() == JobData::kCOLOR;
+			color = getJobData()->getColor() == JobData::kColor;
 
 			width = rc.right - rc.left + 1;
 			height = rc.bottom - rc.top + 1;
@@ -132,11 +132,11 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("height = %d\n", height));
 			DBGMSG(("out_size = %d\n", out_size));
 			DBGMSG(("delta = %d\n", delta));
-			DBGMSG(("renderobj->get_pixel_depth() = %d\n", __halftone->getPixelDepth()));
+			DBGMSG(("renderobj->get_pixel_depth() = %d\n", fHalftone->getPixelDepth()));
 
 			uchar *ptr = (uchar *)bitmap->Bits()
 						+ rc.top * delta
-						+ (rc.left * __halftone->getPixelDepth()) / 8;
+						+ (rc.left * fHalftone->getPixelDepth()) / 8;
 
 			int compression_method;
 			int compressed_size;
@@ -169,7 +169,7 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 						in += 4;
 					}
 				} else {
-					__halftone->dither(out_ptr, ptr, x, y, width);
+					fHalftone->dither(out_ptr, ptr, x, y, width);
 					// invert pixels
 					for (int w = widthByte; w > 0; w --, out ++) {
 						*out = ~*out;
@@ -223,38 +223,38 @@ void PCL6Driver::jobStart()
 	                 "Comment Copyright (c) 2003 OBOS\n",
 	                 getJobData()->getXres());
 	// PCL6 begin
-	__stream = HP_NewStream(16 * 1024, this);
-	HP_BeginSession_2(__stream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch, HP_eBackChAndErrPage);
-	HP_OpenDataSource_1(__stream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);	
+	fStream = HP_NewStream(16 * 1024, this);
+	HP_BeginSession_2(fStream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch, HP_eBackChAndErrPage);
+	HP_OpenDataSource_1(fStream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);	
 }
 
 bool PCL6Driver::startPage(int)
 {
 	// XXX orientation
-	HP_BeginPage_3(__stream, HP_ePortraitOrientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
+	HP_BeginPage_3(fStream, HP_ePortraitOrientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
-	bool color = getJobData()->getColor() == JobData::kCOLOR;
-	HP_SetPageOrigin_1(__stream, x, y);
-	HP_SetColorSpace_1(__stream, color ? HP_eRGB : HP_eGray);
-	HP_SetPaintTxMode_1(__stream, HP_eOpaque);
-	HP_SetSourceTxMode_1(__stream, HP_eOpaque);
-	HP_SetROP_1(__stream, 204);
+	bool color = getJobData()->getColor() == JobData::kColor;
+	HP_SetPageOrigin_1(fStream, x, y);
+	HP_SetColorSpace_1(fStream, color ? HP_eRGB : HP_eGray);
+	HP_SetPaintTxMode_1(fStream, HP_eOpaque);
+	HP_SetSourceTxMode_1(fStream, HP_eOpaque);
+	HP_SetROP_1(fStream, 204);
 	return true;
 }
 
 void PCL6Driver::startRasterGraphics(int x, int y, int width, int height)
 {
-	bool color = getJobData()->getColor() == JobData::kCOLOR;
-	__compression_method = -1;
-	HP_BeginImage_1(__stream, HP_eDirectPixel, color ? HP_e8Bit : HP_e1Bit, width, height, width, height);
-	HP_ReadImage_1(__stream, 0, height, HP_eNoCompression);
+	bool color = getJobData()->getColor() == JobData::kColor;
+	fCompressionMethod = -1;
+	HP_BeginImage_1(fStream, HP_eDirectPixel, color ? HP_e8Bit : HP_e1Bit, width, height, width, height);
+	HP_ReadImage_1(fStream, 0, height, HP_eNoCompression);
 }
 
 void PCL6Driver::endRasterGraphics()
 {
-	HP_EndImage_1(__stream);
+	HP_EndImage_1(fStream);
 }
 
 void PCL6Driver::rasterGraphics(
@@ -262,17 +262,17 @@ void PCL6Driver::rasterGraphics(
 	const uchar *buffer,
 	int size)
 {
-	if (__compression_method != compression_method) {
-		__compression_method = compression_method;
+	if (fCompressionMethod != compression_method) {
+		fCompressionMethod = compression_method;
 	}
-	HP_EmbeddedDataPrefix32(__stream, size);
-	HP_RawUByteArray(__stream, (uchar*)buffer, size);
+	HP_EmbeddedDataPrefix32(fStream, size);
+	HP_RawUByteArray(fStream, (uchar*)buffer, size);
 }
 
 bool PCL6Driver::endPage(int)
 {
 	try {
-		HP_EndPage_2(__stream, getJobData()->getCopies());
+		HP_EndPage_2(fStream, getJobData()->getCopies());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -282,9 +282,9 @@ bool PCL6Driver::endPage(int)
 
 void PCL6Driver::jobEnd()
 {
-	HP_CloseDataSource_1(__stream);
-	HP_EndSession_1(__stream);
-	HP_FinishStream(__stream);
+	HP_CloseDataSource_1(fStream);
+	HP_EndSession_1(fStream);
+	HP_FinishStream(fStream);
 	// PJL footer
 	writeSpoolString("\033%%-12345X@PJL EOJ\n"
 	                 "\033%%-12345X");
@@ -292,18 +292,18 @@ void PCL6Driver::jobEnd()
 
 void PCL6Driver::move(int x, int y)
 {
-	HP_SetCursor_1(__stream, x, y);
+	HP_SetCursor_1(fStream, x, y);
 }
 
-HP_UByte PCL6Driver::mediaSize(JobData::PAPER paper)
+HP_UByte PCL6Driver::mediaSize(JobData::Paper paper)
 {
 	switch (paper) {
-		case JobData::LETTER: return HP_eLetterPaper;
-		case JobData::LEGAL: return HP_eLegalPaper;
-		case JobData::A4: return HP_eA4Paper;
-		case JobData::EXECUTIVE: return HP_eExecPaper;
-		case JobData::LEDGER: return HP_eLedgerPaper;
-		case JobData::A3: return HP_eA3Paper;
+		case JobData::kLetter: return HP_eLetterPaper;
+		case JobData::kLegal: return HP_eLegalPaper;
+		case JobData::kA4: return HP_eA4Paper;
+		case JobData::kExecutive: return HP_eExecPaper;
+		case JobData::kLedger: return HP_eLedgerPaper;
+		case JobData::kA3: return HP_eA3Paper;
 /*
 		case : return HP_eCOM10Envelope;
 		case : return HP_eMonarchEnvelope;
@@ -322,7 +322,8 @@ HP_UByte PCL6Driver::mediaSize(JobData::PAPER paper)
 		case : return HP_eJIS16KPaper;
 		case : return HP_eJISExecPaper;
 */
-		default: HP_eLegalPaper;
+		default:
+			return HP_eLegalPaper;
 	}
 }
 

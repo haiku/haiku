@@ -32,9 +32,9 @@ private:
 		int size);
 	void jobEnd();
 
-	int __printed_pages;
-	int __compression_method;
-	Halftone *__halftone;
+	int fPrintedPages;
+	int fCompressionMethod;
+	Halftone *fHalftone;
 };
 
 #endif	/* __PS_H */
