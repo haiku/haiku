@@ -22,20 +22,21 @@
 
 #include "config.h"
 
+#include <new.h>
+
 #include <OS.h>
 #include <assert.h>
 
+#include <util/DoublyLinkedList.h>
 
-typedef struct {
+
+// Note: Since we're currently locks are never uninitialized, a singly linked
+// list would suffice. But we may change that some day, and the singly linked
+// list interface is ugly, anyway. ;-)
+struct hoardLockType : DoublyLinkedListLinkImpl<hoardLockType> {
 	int32	ben;
 	sem_id	sem;
-} hoardLockType;
-
-inline void *
-operator new(size_t, void *_P)
-{
-	return _P;
-}
+};
 
 namespace BPrivate {
 
