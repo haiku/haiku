@@ -27,12 +27,14 @@
 #include <SupportDefs.h>
 #include "TextViewSupportBuffer.h"
 
+// It's important that this struct remains as is,
+// as it's the way it is in BeOS, and if we change it,
+// it would lead to some issues as long as we use "mixed" libraries.
 typedef struct STELine {
 	long			offset;		// offset of first character of line
 	float			origin;		// pixel position of top of line
 	float			ascent;		// maximum ascent for line
-	float			padding;	// TODO: Don't remove this, as something in
-								// TextView.cpp is broken and will crash
+	float			width;		// not used for now, but could be
 } STELine, *STELinePtr;
 
 
@@ -70,11 +72,3 @@ _BLineBuffer_::operator[](int32 index) const
 {
 	return &fBuffer[index];
 }
-
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
