@@ -26,6 +26,10 @@ class TBApplicationTester : public TestCase
 		TBApplicationTester(std::string name) : TestCase(name) {;}
 
 		void BApplication1();
+		void BApplication2();
+		void BApplication3();
+		void BApplication4();
+		void BApplication5();
 
 		static Test* Suite();
 };

@@ -7,3 +7,39 @@ CommonUnitTest BApplicationTestApp1
 	: be stdc++.r4
 	: app support
 ;
+
+CommonUnitTest BApplicationTestApp2
+	: BApplicationTestApp2.cpp
+	: kits app
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;
+
+CommonUnitTest BApplicationTestApp3
+	: BApplicationTestApp3.cpp
+	: kits app
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;
+
+AddResources BApplicationTestApp4 : BApplicationTestApp4.rsrc ;
+AddResources BApplicationTestApp4_r5 : BApplicationTestApp4.rsrc ;
+CommonUnitTest BApplicationTestApp4
+	: BApplicationTestApp4.cpp
+	: kits app
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;
+
+AddResources BApplicationTestApp5 : BApplicationTestApp5.rsrc ;
+AddResources BApplicationTestApp5_r5 : BApplicationTestApp5.rsrc ;
+CommonUnitTest BApplicationTestApp5
+	: BApplicationTestApp5.cpp
+	: kits app
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;
