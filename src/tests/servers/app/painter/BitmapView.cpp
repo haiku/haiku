@@ -13,6 +13,7 @@ BitmapView::BitmapView(BRect frame, const char* name,
 	  fBitmap(bitmap)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
+	SetHighColor(255, 0, 0, 255);
 }
 
 // destructor
@@ -25,8 +26,16 @@ BitmapView::~BitmapView()
 void
 BitmapView::Draw(BRect updateRect)
 {
-	if (fBitmap)
+	if (fBitmap) {
+		if (fBitmap->ColorSpace() == B_RGBA32) {
+			// draw the bitmap with pixel alpha
+			// against a red background
+			FillRect(updateRect);
+			SetDrawingMode(B_OP_ALPHA);
+			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		}
 		DrawBitmap(fBitmap, Bounds().LeftTop());
+	}
 }
 
 // MouseDown
