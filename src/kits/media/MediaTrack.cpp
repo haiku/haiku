@@ -40,6 +40,7 @@ BMediaTrack::GetCodecInfo(media_codec_info *mci) const
 		return B_NO_INIT;
 
 	*mci = fMCI;
+
 	return B_OK;
 }
 
@@ -53,8 +54,8 @@ BMediaTrack::EncodedFormat(media_format *out_format) const
 	if (!fExtractor)
 		return B_NO_INIT;
 
-	out_format = fExtractor->EncodedFormat(fStream);
-printf("encoded format\n");
+	*out_format = *fExtractor->EncodedFormat(fStream);
+
 	return B_OK;
 }
 
