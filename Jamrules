@@ -140,7 +140,7 @@ if $(DEBUG) != 0 {
 # variable NO_TEST_DEBUG.
 
 # Instructs the Library rule to not make its object files temporary.
-# This is need as some objects are used in a static library and for an
+# This is needed as some objects are used in a static library and for an
 # executable.
 KEEPOBJS = true ;
 
@@ -745,19 +745,26 @@ rule MakeLocateObjects
 rule StaticLibrary
 {
 	# StaticLibrary <name> : <sources> ;
-	
+
+	local lib = lib$(<)$(SUFLIB) ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
-	Library lib$(<).a : $(>) ;
-	MakeLocate lib$(<).a : $(OBOS_STLIB_DIR) ;
+	Library $(lib) : $(>) ;
+	MakeLocate $(lib) : $(OBOS_STLIB_DIR) ;
+
+	# If KEEPOBJS is set, Library doesn't make the library depend on
+	# `lib'.
+	if $(KEEPOBJS) {
+		LocalDepends lib : $(lib) ;
+	}
 }
 
 rule R5KernelStaticLibrary
 {
 	# R5KernelStaticLibrary <name> : <sources> ;
 	
-	local lib = lib$(1).a ;
+	local lib = lib$(1)$(SUFLIB) ;
 	local sources = $(2) ;
 
 	SetupIncludes ;
