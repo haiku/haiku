@@ -386,6 +386,7 @@ typedef enum cpu_types {
 	B_CPU_AMD_K6_III					= 0x1159,
 
 	B_CPU_AMD_ATHLON_MODEL1				= 0x1161,
+	B_CPU_AMD_ATHLON_THUNDERBIRD			= 0x1164,
 
 	/* VIA */
 	B_CPU_CYRIX_X86						= 0x1200,
@@ -399,6 +400,9 @@ typedef enum cpu_types {
 
 	B_CPU_RISE_X86						= 0x1400,
 	B_CPU_RISE_mP6						= 0x1450,
+
+	B_CPU_NATIONAL_X86					= 0x1500,
+	B_CPU_NATIONAL_GEODE_GX1				= 0x1554,
 
 	/* For compatibility */
 	B_CPU_AMD_29K						= 14,
