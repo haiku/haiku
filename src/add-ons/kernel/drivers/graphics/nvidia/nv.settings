@@ -17,7 +17,7 @@ hardcursor true			# if true use on-chip cursor capabilities
 dumprom    false        		# dump bios rom in ~/nv.rom
 switchhead false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
-dma_acc	false			# if true enable DMA cmd fetching for 2D acc (instead of using PIO)
+dma_acc	true			# if true enable DMA cmd fetching for 2D acc (instead of using PIO)
 
 # WARNING: tweak alert! modify stuff below on your own risk...
 unhide_fw	false			# if true 'unhide' cards AGP fastwrite support on cards that hide it
@@ -44,7 +44,7 @@ pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refr
 #logmask   0x00010000	# engine: dac1
 #logmask   0x00020000	# engine: crtc2
 #logmask   0x00040000	# engine: crtc1
-#logmask   0x00080000	# engine: acc
+#logmask   0x00080000	# engine: acc (both PIO and DMA)
 #logmask   0x00100000	# engine: brooktree tv
 #logmask   0x00200000	# set displaymode
 #logmask   0x00400000	# propose displaymode
