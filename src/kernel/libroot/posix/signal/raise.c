@@ -1,24 +1,19 @@
-#include <syscalls.h>
-#include <signal.h>
-
 /*
- *  Copyright (c) 2002, OpenBeOS Project. All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
- *
- *
- *  raise.c:
- *  implements the signal function raise()
- *
+ *  Copyright (c) 2002-2004, Haiku Project. All rights reserved.
+ *  Distributed under the terms of the Haiku license.
  *
  *  Author(s):
  *  Daniel Reinhold (danielre@users.sf.net)
- *
  */
+
+
+#include <OS.h>
+#include <signal.h>
 
 
 int
 raise(int sig)
-{	
-	return sys_send_signal(find_thread(NULL), sig);
+{
+	return send_signal(find_thread(NULL), sig);
 }
 

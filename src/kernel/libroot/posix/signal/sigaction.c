@@ -1,25 +1,19 @@
-#include <syscalls.h>
-#include <signal.h>
-
 /*
- *  Copyright (c) 2002, OpenBeOS Project. All rights reserved.
- *  Distributed under the terms of the OpenBeOS license.
- *
- *
- *  sigaction.c:
- *  implements the signal function sigaction()
- *  this is merely a wrapper for a syscall
- *
+ *  Copyright (c) 2002-2004, Haiku Project. All rights reserved.
+ *  Distributed under the terms of the Haiku license.
  *
  *  Author(s):
  *  Daniel Reinhold (danielre@users.sf.net)
- *
  */
 
 
+#include <syscalls.h>
+#include <signal.h>
+
+
 int
-sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
+sigaction(int sig, const struct sigaction *action, struct sigaction *oldAction)
 {
-	return sys_sigaction(sig, act, oact);
+	return _kern_sigaction(sig, action, oldAction);
 }
 

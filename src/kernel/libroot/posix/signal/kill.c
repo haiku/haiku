@@ -4,21 +4,20 @@
 */
 
 
-#include <syscalls.h>
+#include <OS.h>
 
 #include <signal.h>
 #include <errno.h>
 
 
 int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
+kill(pid_t pid, int sig)
 {
-/*	int status = sigprocmask(how, set, oldSet);
+	status_t status = send_signal(pid, (uint)sig);
 	if (status < B_OK) {
 		errno = status;
 		return -1;
 	}
-*/
+
 	return 0;
 }
-
