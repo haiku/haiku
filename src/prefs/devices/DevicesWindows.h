@@ -34,4 +34,17 @@ class DevicesWindow : public BWindow
 	    DevicesView*	 ptrDevicesView;
 };
 
+
+class ResourceUsageWindow : public BWindow
+{
+	public:
+    	ResourceUsageWindow(BRect frame);
+	    ~ResourceUsageWindow();
+	    virtual void MessageReceived(BMessage *message);
+	private:
+		void InitWindow(void);
+	    ResourceUsageView*	 ptrResourceUsageView;
+};
+
 #endif
+

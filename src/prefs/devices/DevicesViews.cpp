@@ -34,3 +34,10 @@ void DevicesView::Draw(BRect updateRect)
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+
+// ResourceUsageView - Constructor
+ResourceUsageView::ResourceUsageView (BRect frame) : BView (frame, "ResourceUsageView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //

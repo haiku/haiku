@@ -19,4 +19,11 @@ class DevicesView : public BView
     	virtual	void	Draw(BRect updateRect);	
 };
 
+
+class ResourceUsageView : public BView
+{
+	public:
+    	ResourceUsageView(BRect frame);
+};
+
 #endif

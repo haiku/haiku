@@ -13,3 +13,4 @@ Devices Constants by Sikosis
 const char *APP_SIGNATURE = "application/x-vnd.OBOS.Devices";  // Application Signature and Title
 
 #endif
+
