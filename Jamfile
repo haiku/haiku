@@ -2,5 +2,8 @@ SubDir OBOS_TOP ;
 
 InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
 
+NotFile alltests ;
+Depends alltests : r5tests obostests ;
+
 SubInclude OBOS_TOP src ;
 
