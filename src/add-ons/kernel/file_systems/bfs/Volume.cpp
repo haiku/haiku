@@ -65,12 +65,14 @@ Volume::Panic()
 	fFlags |= VOLUME_READ_ONLY;
 #ifdef USER
 	debugger("BFS panics!");
+#elif defined(DEBUG)
+	kernel_debugger("BFS panics!");
 #endif
 }
 
 
 status_t
-Volume::Mount(const char *deviceName,uint32 flags)
+Volume::Mount(const char *deviceName, uint32 flags)
 {
 	if (flags & B_MOUNT_READ_ONLY)
 		fFlags |= VOLUME_READ_ONLY;
@@ -79,7 +81,7 @@ Volume::Mount(const char *deviceName,uint32 flags)
 	
 	// if we couldn't open the device, try read-only (don't rely on a specific error code)
 	if (fDevice < B_OK && (flags & B_MOUNT_READ_ONLY) == 0) {
-		fDevice = open(deviceName,O_RDONLY);
+		fDevice = open(deviceName, O_RDONLY);
 		fFlags |= VOLUME_READ_ONLY;
 	}
 
@@ -89,11 +91,11 @@ Volume::Mount(const char *deviceName,uint32 flags)
 	// check if it's a regular file, and if so, disable the cache for the
 	// underlaying file system
 	struct stat stat;
-	if (fstat(fDevice,&stat) < 0)
+	if (fstat(fDevice, &stat) < 0)
 		RETURN_ERROR(B_ERROR);
 
 //#ifndef USER
-	if (stat.st_mode & S_FILE && ioctl(fDevice,IOCTL_FILE_UNCACHED_IO,NULL) < 0) {
+	if (stat.st_mode & S_FILE && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
 		// mount read-only if the cache couldn't be disabled
 #	ifdef DEBUG
 		FATAL(("couldn't disable cache for image file - system may dead-lock!\n"));
@@ -106,14 +108,14 @@ Volume::Mount(const char *deviceName,uint32 flags)
 
 	// read the super block
 	char buffer[1024];
-	if (read_pos(fDevice,0,buffer,sizeof(buffer)) != sizeof(buffer))
+	if (read_pos(fDevice, 0, buffer, sizeof(buffer)) != sizeof(buffer))
 		return B_IO_ERROR;
 
 	status_t status = B_OK;
 
 	// Note: that does work only for x86, for PowerPC, the super block
 	// is located at offset 0!
-	memcpy(&fSuperBlock,buffer + 512,sizeof(disk_super_block));
+	memcpy(&fSuperBlock, buffer + 512, sizeof(disk_super_block));
 
 	if (IsValidSuperBlock()) {
 		// set the current log pointers, so that journaling will work correctly
@@ -125,10 +127,10 @@ Volume::Mount(const char *deviceName,uint32 flags)
 			// replaying the log is the first thing we will do on this disk
 			if (fJournal && fJournal->InitCheck() == B_OK
 				&& fBlockAllocator.Initialize() == B_OK) {
-				fRootNode = new Inode(this,ToVnode(Root()));
+				fRootNode = new Inode(this, ToVnode(Root()));
 
 				if (fRootNode && fRootNode->InitCheck() == B_OK) {
-					if (new_vnode(fID,ToVnode(Root()),(void *)fRootNode) == B_OK) {
+					if (new_vnode(fID, ToVnode(Root()),(void *)fRootNode) == B_OK) {
 						// try to get indices root dir
 
 						// question: why doesn't get_vnode() work here??
@@ -136,7 +138,7 @@ Volume::Mount(const char *deviceName,uint32 flags)
 						// volume in bfs_mount(), so bfs_read_vnode() can't get it.
 						// But it's not needed to do that anyway.
 
-						fIndicesNode = new Inode(this,ToVnode(Indices()));
+						fIndicesNode = new Inode(this, ToVnode(Indices()));
 						if (fIndicesNode == NULL
 							|| fIndicesNode->InitCheck() < B_OK
 							|| !fIndicesNode->IsDirectory()) {
@@ -164,7 +166,7 @@ Volume::Mount(const char *deviceName,uint32 flags)
 				FATAL(("could not initialize journal/block bitmap allocator!\n"));
 			}
 
-			remove_cached_device_blocks(fDevice,NO_WRITES);
+			remove_cached_device_blocks(fDevice, NO_WRITES);
 		} else {
 			FATAL(("could not initialize cache!\n"));
 			status = B_IO_ERROR;
@@ -189,7 +191,7 @@ Volume::Unmount()
 
 	delete fIndicesNode;
 
-	remove_cached_device_blocks(fDevice,ALLOW_WRITES);
+	remove_cached_device_blocks(fDevice, IsReadOnly() ? NO_WRITES : ALLOW_WRITES);
 	close(fDevice);
 
 	return B_OK;
@@ -211,7 +213,7 @@ Volume::IsValidBlockRun(block_run run)
 		|| run.length == 0
 		|| (uint32)run.length + run.start > (1LL << AllocationGroupShift())) {
 		Panic();
-		FATAL(("*** invalid run(%ld,%d,%d)\n",run.allocation_group,run.start,run.length));
+		FATAL(("*** invalid run(%ld,%d,%d)\n", run.allocation_group, run.start, run.length));
 		return B_BAD_DATA;
 	}
 	return B_OK;
@@ -233,8 +235,8 @@ status_t
 Volume::CreateIndicesRoot(Transaction *transaction)
 {
 	off_t id;
-	status_t status = Inode::Create(transaction,NULL,NULL,
-							S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700,0,0,&id);
+	status_t status = Inode::Create(transaction, NULL, NULL,
+							S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, &id);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -251,14 +253,14 @@ Volume::CreateIndicesRoot(Transaction *transaction)
 status_t 
 Volume::AllocateForInode(Transaction *transaction, const Inode *parent, mode_t type, block_run &run)
 {
-	return fBlockAllocator.AllocateForInode(transaction,&parent->BlockRun(),type,run);
+	return fBlockAllocator.AllocateForInode(transaction, &parent->BlockRun(), type, run);
 }
 
 
 status_t 
 Volume::WriteSuperBlock()
 {
-	if (write_pos(fDevice,512,&fSuperBlock,sizeof(disk_super_block)) != sizeof(disk_super_block))
+	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block)) != sizeof(disk_super_block))
 		return B_IO_ERROR;
 
 	return B_OK;
@@ -266,14 +268,15 @@ Volume::WriteSuperBlock()
 
 
 void
-Volume::UpdateLiveQueries(Inode *inode,const char *attribute,int32 type,const uint8 *oldKey,size_t oldLength,const uint8 *newKey,size_t newLength)
+Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const uint8 *oldKey,
+	size_t oldLength, const uint8 *newKey, size_t newLength)
 {
 	if (fQueryLock.Lock() < B_OK)
 		return;
 
 	Query *query = NULL;
 	while ((query = fQueries.Next(query)) != NULL)
-		query->LiveUpdate(inode,attribute,type,oldKey,oldLength,newKey,newLength);
+		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey, newLength);
 
 	fQueryLock.Unlock();
 }

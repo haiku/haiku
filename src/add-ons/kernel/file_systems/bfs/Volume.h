@@ -37,13 +37,13 @@ class Volume {
 		Volume(nspace_id id);
 		~Volume();
 
-		status_t			Mount(const char *device,uint32 flags);
+		status_t			Mount(const char *device, uint32 flags);
 		status_t			Unmount();
 
 		bool				IsValidSuperBlock();
-		bool				IsReadOnly() const { return fFlags & VOLUME_READ_ONLY; }
+		bool				IsReadOnly() const;
 		void				Panic();
-		Benaphore			&Lock() { return fLock; }
+		Benaphore			&Lock();
 
 		block_run			Root() const { return fSuperBlock.root_dir; }
 		Inode				*RootNode() const { return fRootNode; }
@@ -79,30 +79,35 @@ class Volume {
 
 		status_t			CreateIndicesRoot(Transaction *transaction);
 
-		status_t			AllocateForInode(Transaction *transaction,const Inode *parent,mode_t type,block_run &run);
-		status_t			AllocateForInode(Transaction *transaction,const block_run *parent,mode_t type,block_run &run);
-		status_t			Allocate(Transaction *transaction,const Inode *inode,off_t numBlocks,block_run &run,uint16 minimum = 1);
+		// block bitmap
+		BlockAllocator		&Allocator();
+		status_t			AllocateForInode(Transaction *transaction, const Inode *parent,
+								mode_t type, block_run &run);
+		status_t			AllocateForInode(Transaction *transaction, const block_run *parent,
+								mode_t type, block_run &run);
+		status_t			Allocate(Transaction *transaction,const Inode *inode,
+								off_t numBlocks, block_run &run, uint16 minimum = 1);
 		status_t			Free(Transaction *transaction, block_run run);
 
-#ifdef DEBUG
-		BlockAllocator		&Allocator() { return fBlockAllocator; }
-#endif
-		BufferPool			&Pool() { return fBufferPool; }
-
-		status_t			Sync();
-		Journal				*GetJournal(off_t /*refBlock*/) const { return fJournal; }
-
+		// cache access
 		status_t			WriteSuperBlock();
-		status_t			WriteBlocks(off_t blockNumber,const uint8 *block,uint32 numBlocks);
+		status_t			WriteBlocks(off_t blockNumber, const uint8 *block, uint32 numBlocks);
 		void				WriteCachedBlocksIfNecessary();
 		status_t			FlushDevice();
 
-		void				UpdateLiveQueries(Inode *inode,const char *attribute,int32 type,const uint8 *oldKey,size_t oldLength,const uint8 *newKey,size_t newLength);
+		// queries
+		void				UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
+								const uint8 *oldKey, size_t oldLength,
+								const uint8 *newKey, size_t newLength);
 		void				AddQuery(Query *query);
 		void				RemoveQuery(Query *query);
 
-		uint32				GetUniqueID() { return atomic_add(&fUniqueID,1); }
+		status_t			Sync();
+		Journal				*GetJournal(off_t refBlock) const;
 
+		BufferPool			&Pool();
+
+		uint32				GetUniqueID();
 
 	protected:
 		nspace_id			fID;
@@ -111,7 +116,7 @@ class Volume {
 		BlockAllocator		fBlockAllocator;
 		Benaphore			fLock;
 		Journal				*fJournal;
-		vint32				fLogStart,fLogEnd;
+		vint32				fLogStart, fLogEnd;
 
 		Inode				*fRootNode;
 		Inode				*fIndicesNode;
@@ -127,19 +132,41 @@ class Volume {
 		BufferPool			fBufferPool;
 };
 
+
 // inline functions
+
+inline bool 
+Volume::IsReadOnly() const
+{
+	 return fFlags & VOLUME_READ_ONLY;
+}
+
+
+inline Benaphore &
+Volume::Lock()
+{
+	 return fLock;
+}
+
+
+inline BlockAllocator &
+Volume::Allocator()
+{
+	 return fBlockAllocator;
+}
+
 
 inline status_t 
 Volume::AllocateForInode(Transaction *transaction, const block_run *parent, mode_t type, block_run &run)
 {
-	return fBlockAllocator.AllocateForInode(transaction,parent,type,run);
+	return fBlockAllocator.AllocateForInode(transaction, parent, type, run);
 }
 
 
 inline status_t 
 Volume::Allocate(Transaction *transaction, const Inode *inode, off_t numBlocks, block_run &run, uint16 minimum)
 {
-	return fBlockAllocator.Allocate(transaction,inode,numBlocks,run,minimum);
+	return fBlockAllocator.Allocate(transaction, inode, numBlocks, run, minimum);
 }
 
 
@@ -153,8 +180,8 @@ Volume::Free(Transaction *transaction, block_run run)
 inline status_t 
 Volume::WriteBlocks(off_t blockNumber, const uint8 *block, uint32 numBlocks)
 {
-	atomic_add(&fDirtyCachedBlocks,numBlocks);
-	return cached_write(fDevice,blockNumber,block,numBlocks,fSuperBlock.block_size);
+	atomic_add(&fDirtyCachedBlocks, numBlocks);
+	return cached_write(fDevice, blockNumber, block, numBlocks, fSuperBlock.block_size);
 }
 
 
@@ -163,8 +190,8 @@ Volume::WriteCachedBlocksIfNecessary()
 {
 	// the specific values are only valid for the current BeOS cache
 	if (fDirtyCachedBlocks > 128) {
-		force_cache_flush(fDevice,false);
-		atomic_add(&fDirtyCachedBlocks,-64);
+		force_cache_flush(fDevice, false);
+		atomic_add(&fDirtyCachedBlocks, -64);
 	}
 }
 
@@ -173,8 +200,28 @@ inline status_t
 Volume::FlushDevice()
 {
 	fDirtyCachedBlocks = 0;
-	return flush_device(fDevice,0);
+	return flush_device(fDevice, 0);
 }
 
+
+inline Journal *
+Volume::GetJournal(off_t /*refBlock*/) const
+{
+	 return fJournal;
+}
+
+
+inline BufferPool &
+Volume::Pool()
+{
+	 return fBufferPool;
+}
+
+
+inline uint32 
+Volume::GetUniqueID()
+{
+	 return atomic_add(&fUniqueID, 1);
+}
 
 #endif	/* VOLUME_H */
