@@ -55,11 +55,13 @@ main(int argc, char **argv)
 				break;
 
 			ag_shift++;
-			blocks_per_ag++;
+			blocks_per_ag *= 2;
 		} else
 			break;
 	}
 
+	printf("blocks = %Ld\n", numBlocks);
+	printf("bits per block = %lu\n", bitsPerBlock);
 	printf("bitmap blocks = %Ld\n", bitmapBlocks);
 	printf("allocation groups = %lu\n", num_ags);
 	printf("shift = %lu (%lu)\n", ag_shift, 1UL << ag_shift);
