@@ -41,31 +41,32 @@ static int do_lat_fs(int argc, char **argv);
 static void do_fsh(void);
 static int remove_entry(int dir, const char *entry, bool recursive, bool force);
 
+
 static void
 print_usage(const char *program)
 {
-   	printf("----------------------------------------------------------------------\n");
-   	printf("Ultra neat-o userland filesystem testing shell thingy\n");
-   	printf("----------------------------------------------------------------------\n");
-   	printf("usage: %s [-n] [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n",
-   		program);
-   	printf("\n");
+	printf("----------------------------------------------------------------------\n");
+	printf("Ultra neat-o userland filesystem testing shell thingy\n");
+	printf("----------------------------------------------------------------------\n");
+	printf("usage: %s [-n] [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n",
+		program);
+	printf("\n");
 }
 
 
 int
 main(int argc, char **argv)
 {
-    int        seed;
-    char      *disk_name = "big_file";
-    myfs_info  *myfs;
-    char *arg;
-    int argi = 1;
-    
-    if (argv[1] && strcmp(argv[1], "--help") == 0) {
-    	print_usage(argv[0]);
-    	exit(0);
-    }
+	int seed = 0;
+	char *disk_name = "big_file";
+	myfs_info  *myfs;
+	char *arg;
+	int argi = 1;
+
+	if (argv[1] && strcmp(argv[1], "--help") == 0) {
+		print_usage(argv[0]);
+		exit(0);
+	}
 
 	// eat options
 	while (argi < argc && argv[argi][0] == '-') {
@@ -401,7 +402,7 @@ do_write_stream(int argc, char **argv)
     size_t amount = 100000;
 	char buffer[4096];
 	int length = sizeof(buffer);
-    int i, err;
+    int i, err = FS_OK;
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
