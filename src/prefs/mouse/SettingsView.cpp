@@ -60,9 +60,6 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 {
 	ResizeToPreferred();
 
-	BTextControl *textcontrol;
-	BRect frame;
-
 	fDoubleClickBitmap = BTranslationUtils::GetBitmap("double_click_bmap");
 	fSpeedBitmap = BTranslationUtils::GetBitmap("speed_bmap");
 	fAccelerationBitmap = BTranslationUtils::GetBitmap("acceleration_bmap");
@@ -98,7 +95,7 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 		fFocusMenu->AddItem(new BMenuItem(focusLabels[i], message));
 	}
 
-	frame.Set(165, 208, 440, 200);
+	BRect frame(165, 208, 440, 200);
 	field = new BMenuField(frame, "ffm", "Focus follows mouse:", fFocusMenu);
 	field->SetDivider(field->StringWidth(field->Label()) + kItemSpace);
 	field->SetAlignment(B_ALIGN_RIGHT);
@@ -107,38 +104,39 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 	// Create the "Double-click speed slider...
 	frame.Set(166, 11, 328, 50);
 	dcSpeedSlider = new BSlider(frame, "double_click_speed", "Double-click speed", 
-		new BMessage(SLIDER_DOUBLE_CLICK_SPEED), 0, 1000, B_BLOCK_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW);
+		new BMessage(SLIDER_DOUBLE_CLICK_SPEED), 0, 1000);
 	dcSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	dcSpeedSlider->SetHashMarkCount(5);
-	dcSpeedSlider->SetLimitLabels("Slow","Fast");
+	dcSpeedSlider->SetLimitLabels("Slow", "Fast");
 	AddChild(dcSpeedSlider);
 
 	// Create the "Mouse Speed" slider...
 	frame.Set(166,76,328,125);
-	mouseSpeedSlider = new BSlider(frame,"mouse_speed","Mouse Speed", 
-		new BMessage(SLIDER_MOUSE_SPEED),0,1000,B_BLOCK_THUMB,B_FOLLOW_LEFT,B_WILL_DRAW);
+	mouseSpeedSlider = new BSlider(frame, "mouse_speed", "Mouse Speed", 
+		new BMessage(SLIDER_MOUSE_SPEED), 0, 1000);
 	mouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	mouseSpeedSlider->SetHashMarkCount(7);
-	mouseSpeedSlider->SetLimitLabels("Slow","Fast");
+	mouseSpeedSlider->SetLimitLabels("Slow", "Fast");
 	AddChild(mouseSpeedSlider);
 
 	// Create the "Mouse Acceleration" slider...
-	frame.Set(166,141,328,190);
-	mouseAccSlider = new BSlider(frame,"mouse_acceleration","Mouse Acceleration", 
-		new BMessage(SLIDER_MOUSE_ACC),0,1000,B_BLOCK_THUMB,B_FOLLOW_LEFT,B_WILL_DRAW);
+	frame.Set(166, 141, 328, 190);
+	mouseAccSlider = new BSlider(frame, "mouse_acceleration", "Mouse Acceleration", 
+		new BMessage(SLIDER_MOUSE_ACC), 0, 1000);
 	mouseAccSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	mouseAccSlider->SetHashMarkCount(5);
-	mouseAccSlider->SetLimitLabels("Slow","Fast");
+	mouseAccSlider->SetLimitLabels("Slow", "Fast");
 	AddChild(mouseAccSlider);
 
 	// Create the "Double-click test area" text box...
-	frame=Bounds();
-	frame.left=frame.left+9;
-	frame.right=frame.right-230;
-	frame.top=frame.bottom-30;
-	textcontrol = new BTextControl(frame,"double_click_test_area",NULL,"Double-click test area", new BMessage(DOUBLE_CLICK_TEST_AREA),B_FOLLOW_LEFT,B_WILL_DRAW);
-	textcontrol->SetAlignment(B_ALIGN_LEFT,B_ALIGN_CENTER);
-	AddChild(textcontrol);
+	frame = Bounds();
+	frame.left = frame.left + 9;
+	frame.right = frame.right - 230;
+	frame.top = frame.bottom - 30;
+	BTextControl *textControl = new BTextControl(frame, "double_click_test_area", NULL,
+		"Double-click test area", NULL);
+	textControl->SetAlignment(B_ALIGN_LEFT, B_ALIGN_CENTER);
+	AddChild(textControl);
 }
 
 
@@ -189,8 +187,8 @@ SettingsView::Draw(BRect updateFrame)
 
 	// Draw the icons
 	if (updateFrame.Intersects(	// i have to add 10 pixels width and height, so weird
-			BRect(333,16,354+fDoubleClickBitmap->Bounds().Width(),
-			165+fAccelerationBitmap->Bounds().Height()))) {
+		BRect(333, 16, 354 + fDoubleClickBitmap->Bounds().Width(),
+			165 + fAccelerationBitmap->Bounds().Height()))) {
 		if (fDoubleClickBitmap != NULL)
 			DrawBitmapAsync(fDoubleClickBitmap, BPoint(344, 16));
 		if (fSpeedBitmap != NULL)
