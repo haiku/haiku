@@ -40,7 +40,7 @@ const uint32 ML_INIT_MEDIA = 'MlIM';
 
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame) 
-: BWindow (frame, "Media", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , B_ASYNCHRONOUS_CONTROLS),
+: BWindow (frame, "Media", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	mCurrentNode(NULL),
 	mParamWeb(NULL),
 	mAlert(NULL)
@@ -201,18 +201,45 @@ void MediaWindow::InitWindow(void)
 	mBar = new BarView(barRect);
 	mBox->AddChild(mBar);
 		
-	InitMedia(true);
+	if(InitMedia(true)!=B_OK)
+		PostMessage(B_QUIT_REQUESTED);
+	else {
+		if(IsHidden())
+			Show();
+	}
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
-void
+status_t
 MediaWindow::InitMedia(bool first)
 {
+	status_t err = B_OK;
+	BMediaRoster *roster = BMediaRoster::Roster(&err);
+	
+	if(first && err != B_OK) {
+		BAlert *alert = new BAlert("start_media_server", 
+			"Could not connect to the Media Server.\n"
+			"Would you like to start it ?", "Quit", "Start Media Server", NULL,
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		if(alert->Go()==0)
+			return B_ERROR;
+		
+		mAlert = new MediaAlert(BRect(0,0,300,60), 
+			"restart_alert", "Restarting Media Services\nStarting Media Server...\n");
+		mAlert->Show();
+		
+		Show();
+				
+		launch_media_server();
+	}
+	
+	Lock();
+	
 	bool isVideoSelected = true;
 	if(!first && mListView->ItemAt(0) && mListView->ItemAt(0)->IsSelected())
 		isVideoSelected = false;
 		
-	if(!first && mAlert) {
+	if((!first || (first && err) ) && mAlert) {
 		BAutolock locker(mAlert);
 		if(locker.IsLocked())
 			mAlert->TextView()->SetText("Ready For Use...");
@@ -262,7 +289,6 @@ MediaWindow::InitMedia(bool first)
 	dormant_node_info node_info;
 	int32 outputID;
 	BString outputName;
-	BMediaRoster* roster = BMediaRoster::Roster();
 		
 	roster->GetAudioInput(&default_node);
 	roster->GetDormantNodeFor(default_node, &node_info);
@@ -304,22 +330,30 @@ MediaWindow::InitMedia(bool first)
 			mListView->Select(mListView->IndexOf(video));
 		else
 			mListView->Select(mListView->IndexOf(audio));
-	
-		if(mAlert) {
-			snooze(800000);
-			mAlert->PostMessage(B_QUIT_REQUESTED);
-		}
-		mAlert = NULL;
 	}
-		
+	
+	if(mAlert) {
+		snooze(800000);
+		mAlert->PostMessage(B_QUIT_REQUESTED);
+	}
+	mAlert = NULL;
+	
+	Unlock();
+	
+	return B_OK;
 }
 
 // MediaWindow::QuitRequested -- Post a message to the app to quit
 bool
 MediaWindow::QuitRequested()
 {
-   be_app->PostMessage(B_QUIT_REQUESTED);
-   return true;
+	// stop watching the MediaRoster
+	BMediaRoster *roster = BMediaRoster::CurrentRoster();
+	if (roster && mCurrentNode)	{
+		roster->StopWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);
+	}
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -453,6 +487,7 @@ MediaWindow::MessageReceived (BMessage *message)
 				roster->SetRealtimeFlags(flags);
 			}
 			break;
+		case B_MEDIA_WEB_CHANGED: 
 		case ML_SELECTED_NODE:
 			{
 				PRINT_OBJECT(*message);
@@ -461,8 +496,11 @@ MediaWindow::MessageReceived (BMessage *message)
 				if(!item)
 					break;
 				BMediaRoster* roster = BMediaRoster::Roster();
-				if(mCurrentNode)
+				if(mCurrentNode) {
+					// stop watching the MediaRoster
+					roster->StopWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);
 					roster->ReleaseNode(*mCurrentNode);
+				}
 				mCurrentNode = NULL;
 				BView *paramView = mContentView->ChildAt(0);
 				if(paramView!=NULL) {
@@ -499,6 +537,7 @@ MediaWindow::MessageReceived (BMessage *message)
 						mContentView->AddChild(paramView);
 						paramView->ResizeTo(mContentView->Bounds().Width(), mContentView->Bounds().Height());
 						
+						roster->StartWatching(this, *mCurrentNode, B_MEDIA_WILDCARD);				
 					} else {
 						mParamWeb = NULL;
 						BRect bounds = mContentView->Bounds();
@@ -511,13 +550,11 @@ MediaWindow::MessageReceived (BMessage *message)
 					}
 				}
 				
-				if(item->OutlineLevel() == 0 || mParamWeb == NULL || mParamWeb->CountGroups()<2) {
-					// Display the 3D Look Divider Bar
-					if(mBar->IsHidden())
-						mBar->Show();
-				} else if(!mBar->IsHidden())
-					mBar->Hide();
-	
+				bool barChanged = (item->OutlineLevel() == 0 || mParamWeb == NULL || mParamWeb->CountGroups()<2);
+				if(barChanged != mBar->mDisplay) {
+					mBar->mDisplay = barChanged;
+					mBar->Invalidate();
+				}
 			}
 			break;
 		case B_SOME_APP_LAUNCHED:

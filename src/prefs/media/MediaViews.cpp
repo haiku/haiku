@@ -29,7 +29,8 @@
 #include "MediaViews.h"
 
 BarView::BarView(BRect frame) 
- : BView (frame, "barView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW )
+ : BView (frame, "barView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW ),
+ 	mDisplay(true)
 {
 }
 
@@ -38,11 +39,17 @@ BarView::Draw(BRect updateRect)
 {
 	BRect r = Bounds();
 	
-	// Display the 3D Look Divider Bar
-	SetHighColor(140,140,140,0);
-	StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
-	SetHighColor(255,255,255,0);
-	StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
+	if(mDisplay) {
+		// Display the 3D Look Divider Bar
+		SetHighColor(140,140,140,0);
+		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
+		SetHighColor(255,255,255,0);
+		StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
+	} else {
+		SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
+		StrokeLine(BPoint(r.left,r.bottom),BPoint(r.right,r.bottom));
+	}
 }
 
 

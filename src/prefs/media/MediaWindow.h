@@ -38,7 +38,7 @@ class MediaWindow : public BWindow
 	    virtual void MessageReceived(BMessage *message);
 	    virtual void FrameResized(float width, float height); 
 	private:
-		void InitMedia(bool first);
+		status_t InitMedia(bool first);
 		void FindNodes(media_type type, uint64 kind, BList &list);
 		void AddNodes(BList &list, bool isVideo);
 		MediaListItem *FindMediaListItem(dormant_node_info *info);

@@ -30,7 +30,8 @@ class BarView : public BView
 {
 	public:
     	BarView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
+    	virtual	void	Draw(BRect updateRect);
+    	bool	mDisplay;
 };
 
 class SettingsItem : public BMenuItem

@@ -58,7 +58,6 @@ Media::Media()
 
 	mWindow = new MediaWindow(rect);
 	mWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
-	mWindow->Show();
 	
 	be_roster->StartWatching(BMessenger(this)); 
 }
