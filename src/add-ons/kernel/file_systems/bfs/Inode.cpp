@@ -689,6 +689,10 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
 	size_t oldLength = 0;
 
+	// ToDo: we actually depend on that the contents of "buffer" are constant
+	// if they get changed during the write (hey, user programs), we may mess
+	// up our index trees!
+
 	Index index(fVolume);
 	bool hasIndex = index.SetTo(name) == B_OK;
 
@@ -729,8 +733,9 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
 			}
+			// ToDo: check if the data fits in the inode now and delete the file if so
 			status = attribute->WriteAt(transaction, pos, buffer, _length);
-	
+
 			attribute->Lock().UnlockWrite();
 		} else
 			status = B_ERROR;
