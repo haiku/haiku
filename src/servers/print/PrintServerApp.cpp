@@ -153,9 +153,8 @@ bool PrintServerApp::QuitRequested()
 			// Release all printers
 		Printer* printer;
 		while ((printer = Printer::At(0)) != NULL) {
-			Printer::Remove(printer);
 			printer->AbortPrintThread();
-			printer->Release();
+			UnregisterPrinter(printer);
 		}
 
 			// Wait for printers
@@ -180,18 +179,24 @@ void PrintServerApp::RegisterPrinter(BDirectory* printer) {
  	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
-	 	new Printer(printer, r);
+	 	Printer* p = new Printer(printer, r);
+	 	AddHandler(p);
 		if (fNumberOfPrinters == 0) acquire_sem(fNoPrinterAvailable);
 		fNumberOfPrinters ++;
 	}
 }
 
+void PrintServerApp::UnregisterPrinter(Printer* printer) {
+	RemoveHandler(printer);
+	Printer::Remove(printer);	
+	printer->Release();
+}
 
-void PrintServerApp::NotifyPrinterDeletion(Resource* res) {
+void PrintServerApp::NotifyPrinterDeletion(Printer* printer) {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		fNumberOfPrinters --;
-		fResourceManager.Free(res);
+		fResourceManager.Free(printer->GetResource());
 		if (fNumberOfPrinters == 0) release_sem(fNoPrinterAvailable);
 	}
 }
@@ -206,8 +211,7 @@ void PrintServerApp::HandleRemovedPrinter(BMessage* msg) {
 		msg->FindInt64("node", &node) == B_OK &&
 		(printer = Printer::Find(device, node)) != NULL) {
 		if (printer == fDefaultPrinter) fDefaultPrinter = NULL;
-		Printer::Remove(printer);
-		printer->Release();
+		UnregisterPrinter(printer);
 	}
 }
 
@@ -281,9 +285,9 @@ status_t PrintServerApp::SetupPrinterList()
 void
 PrintServerApp::MessageReceived(BMessage* msg)
 {
-	fprintf(stdout, "PrintServerApp\n");
-	msg->PrintToStream();
-	fflush(stdout);
+//	fprintf(stdout, "PrintServerApp\n");
+//	msg->PrintToStream(); printf("\n\n");
+//	fflush(stdout);
 	switch(msg->what) {
 		case PSRV_GET_ACTIVE_PRINTER:
 		case PSRV_MAKE_PRINTER_ACTIVE_QUIETLY:

@@ -129,9 +129,24 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 	}
 }
 
+#include <be/app/Roster.h>
+
+void PrintSender(BMessage* msg) {
+	BMessenger msgr = msg->ReturnAddress();
+//	if (msgr.InitCheck() == B_OK) {
+		team_id team = msgr.Team();
+		app_info info;
+		if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
+			fprintf(stderr, "PrintSender signature = %s\n", info.signature);
+		} else
+			fprintf(stderr, "PrintSender could not get app_info\n");
+//	} else 
+//		fprintf(stderr, "PrintSender invalid BMessenger\n");
+}
 
 void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 {
+	PrintSender(msg);
 	switch(msg->what) {
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {

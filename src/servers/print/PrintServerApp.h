@@ -64,7 +64,7 @@ public:
 	
 	bool QuitRequested();
 	void MessageReceived(BMessage* msg);
-	void NotifyPrinterDeletion(Resource* res);
+	void NotifyPrinterDeletion(Printer* printer);
 	
 		// Scripting support, see PrintServerApp.Scripting.cpp
 	status_t GetSupportedSuites(BMessage* msg);
@@ -83,6 +83,7 @@ private:
 							const char* transportPath);
 
 	void     RegisterPrinter(BDirectory* node);
+	void     UnregisterPrinter(Printer* printer);
 	void     HandleRemovedPrinter(BMessage* msg);
 	
 	status_t StoreDefaultPrinter();
@@ -95,8 +96,8 @@ private:
 	Printer* fDefaultPrinter;
 	BBitmap fSelectedIconMini;
 	BBitmap fSelectedIconLarge;
-	int     fNumberOfPrinters;
-	sem_id  fNoPrinterAvailable;
+	int     fNumberOfPrinters;    // number of existing Printer objects
+	sem_id  fNoPrinterAvailable;  // can be acquired if number of printers == 0
 
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 	static status_t async_thread(void* data);
