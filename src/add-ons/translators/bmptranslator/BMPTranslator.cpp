@@ -1585,6 +1585,39 @@ translate_from_bmppal_to_bits(BPositionIO *inSource,
 	return B_OK;
 }
 
+
+// ---------------------------------------------------------------
+// bmp_memset
+//
+// Copies data from setto into dest for len bytes. If len <= 4,
+// memcpy is used because memset doesn't seem to do anything if
+// len is less than or equal to 4. When len > 4, memset is used
+// to copy setto over and over into dest.
+//
+// Preconditions:
+//
+// Parameters:	dest,	where data will be written
+//
+//				setto,	the data to copy to dest
+//
+//				len,	the amount of bytes to copy to
+//						dest, if more than 4,
+//						the 4 bytes that is setto is 
+//						copied to dest over and over
+//
+// Postconditions:
+//
+// Returns: whatever memcpy and memset return
+// ---------------------------------------------------------------
+void *
+bmp_memset(void *dest, int setto, size_t len)
+{
+	if (len <= 4)
+		return memcpy(dest, &setto, len);
+	else
+		return memset(dest, setto, len);
+}
+
 // ---------------------------------------------------------------
 // translate_from_bmppalr_to_bits
 //
@@ -1645,12 +1678,18 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 	while (rd > 0) {
 		// repeated color
 		if (count) {
-			// abort if count is greater than the number of
-			// pixels remaining in the current row
-			if (count + bmppixcol > msheader.width) {
+			// abort if all of the pixels in the row
+			// have already been drawn to
+			if (bmppixcol == msheader.width) {
 				rd = -1;
 				break;
 			}
+			// if count is greater than the number of
+			// pixels remaining in the current row, 
+			// only process the correct number of pixels
+			// remaining in the row
+			if (count + bmppixcol > msheader.width)
+				count = msheader.width - bmppixcol;
 			
 			rd = inSource->Read(&indices, 1);
 			if (rd != 1) {
@@ -1676,8 +1715,8 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 				case 0:
 					// if there are columns remaing on this
 					// line, set them to the color at index zero
-					if (bmppixcol != msheader.width)
-						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+					if (bmppixcol < msheader.width)
+						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
 							(msheader.width - bmppixcol) * 4);
 					outDestination->Write(bitsRowData, bitsRowBytes);
 					bmppixcol = 0;
@@ -1699,7 +1738,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					}
 					
 					while (bmppixrow < msheader.height) {
-						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
 							(msheader.width - bmppixcol) * 4);
 						outDestination->Write(bitsRowData, bitsRowBytes);
 						bmppixcol = 0;
@@ -1737,7 +1776,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					// set all pixels to the first entry in
 					// the palette, for the number of rows skipped
 					while (dy > 0) {
-						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
 							(msheader.width - bmppixcol) * 4);
 						outDestination->Write(bitsRowData, bitsRowBytes);
 						bmppixcol = 0;
@@ -1747,7 +1786,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 					}
 								
 					if (bmppixcol < (uint32) lastcol + dx) {
-						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+						bmp_memset(bitsRowData + (bmppixcol * 4), defaultcolor,
 							(dx + lastcol - bmppixcol) * 4);
 						bmppixcol = dx + lastcol;
 					}
@@ -1758,13 +1797,18 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 				// code >= 3
 				// read code uncompressed indices
 				default:
-					// abort if number of uncompressed pixels
-					// is larger than the number of pixels remaining
-					// in the current row
-					if (code + bmppixcol > msheader.width) {
+					// abort if all of the pixels in the row
+					// have already been drawn to
+					if (bmppixcol == msheader.width) {
 						rd = -1;
 						break;
 					}
+					// if code is greater than the number of
+					// pixels remaining in the current row, 
+					// only process the correct number of pixels
+					// remaining in the row
+					if (code + bmppixcol > msheader.width)
+						code = msheader.width - bmppixcol;
 					
 					uint8 uncomp[256];
 					int32 padding;
