@@ -36,6 +36,7 @@
 #ifndef NETINET_IN_SYSTM_H
 #define NETINET_IN_SYSTM_H  
 
+#include <stdint.h>
 /*
  * Miscellaneous internetwork
  * definitions for kernel.
@@ -49,12 +50,12 @@
  * the bytes before transmission at each protocol level.  The n_ types
  * represent the types with the bytes in ``high-ender'' order.
  */
-typedef uint16 n_short; /* short as received from the net */
-typedef uint32 n_long;  /* long as received from the net */
+typedef uint16_t n_short; /* short as received from the net */
+typedef uint32_t n_long;  /* long as received from the net */
 
-typedef uint32 n_time;  /* ms since 00:00 GMT, byte rev */
+typedef uint32_t n_time;  /* ms since 00:00 GMT, byte rev */
 
-#define iptime()   (htonl((uint32)real_time_clock_usecs()))
+#define iptime()   (htonl((uint32_t)real_time_clock_usecs()))
 
 #endif /* NETINET_IN_SYSTM_H */
  
