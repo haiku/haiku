@@ -274,6 +274,8 @@ BHandler::MessageReceived(BMessage *message)
 	BMessage reply(B_REPLY);
 
 	switch (message->what) {
+		// ToDo: am I missing something or is the "observed" stuff handshake completely missing?
+
 		case B_GET_PROPERTY:
 		{
 			int32 cur;
@@ -283,22 +285,24 @@ BHandler::MessageReceived(BMessage *message)
 
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
 			if (err == B_OK) {
+				bool known = false;
 				if (strcmp(prop, "Suites") == 0) {
-					if (GetSupportedSuites(&reply) == B_OK
-							&& reply.AddInt32("error", B_OK) == B_OK)
-						message->SendReply(&reply);
+					err = GetSupportedSuites(&reply);
+					known = true;
 				} else if (strcmp(prop, "Messenger") == 0) {
-					if (reply.AddMessenger("result", this) == B_OK
-							&& reply.AddInt32("error", B_OK) == B_OK)
-						message->SendReply(&reply);
+					err = reply.AddMessenger("result", this);
+					known = true;
 				} else if (strcmp(prop, "InternalName") == 0) {
-					if (reply.AddString("result", Name()) == B_OK
-							&& reply.AddInt32("error", B_OK) == B_OK)
-					message->SendReply(&reply);
-				} else {
-					// Should never be here
-					debugger("BHandler::MessageReceived(): We are *not* supposed to be here");
+					err = reply.AddString("result", Name());
+					known = true;
 				}
+
+				if (known) {
+					reply.AddInt32("error", B_OK);
+					message->SendReply(&reply);
+					return;
+				}
+				// let's try next handler
 			}
 			break;
 		}
@@ -307,18 +311,19 @@ BHandler::MessageReceived(BMessage *message)
 		{
 			reply.AddInt32("error", GetSupportedSuites(&reply));
 			message->SendReply(&reply);
-			break;
+			return;
 		}
+	}
 
-		default:
-			if (fNextHandler)
-				fNextHandler->MessageReceived(message);
-			else {
-				printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
-				message->PrintToStream();
-				message->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
-			}
-			break;
+	// ToDo: there is some more work need here (someone in the know should fill in)!
+
+	if (fNextHandler) {
+		// aren't filters done per handler?
+		fNextHandler->MessageReceived(message);
+	} else if (message->what != B_MESSAGE_NOT_UNDERSTOOD) {
+		printf("BHandler::MessageReceived(): B_MESSAGE_NOT_UNDERSTOOD");
+		message->PrintToStream();
+		message->SendReply(B_MESSAGE_NOT_UNDERSTOOD);
 	}
 }
 
