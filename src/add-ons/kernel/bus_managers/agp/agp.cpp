@@ -347,11 +347,9 @@ void enable_agp (uint32 *command)
 		if (pd->di[count].agpi.class_base == PCI_bridge)
 		{
 			pcii = &(pd->di[count].pcii);
-			/* program bridge */
-			set_pci(pd->di[count].agp_adress + 8, 4, *command);
+			/* program bridge, making sure not-implemented bits are written as zeros */
+			set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
 			/* update our agp_cmd info with read back setting from register just programmed */
-			/* note:
-			 * this 'sequence' resets the non-writable register bit AGP_rate_rev in our info */
 			pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
 		}
 	}
