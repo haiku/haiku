@@ -2402,7 +2402,10 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec, 
 status_t
 _user_delete_area(area_id area)
 {
-	// ToDo: works only correctly if the area belongs to the caller!
-	return _vm_delete_region(NULL, area);
+	// Unlike the BeOS implementation, you can now only delete areas
+	// that you have created yourself from userland.
+	// The documentation to delete_area() explicetly states that this
+	// will be restricted in the future, and so it will.
+	return vm_delete_region(vm_get_current_user_aspace_id(), area);
 }
 
