@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -35,13 +35,7 @@
 // 	 to refresh only changed parts of text (currently we often redraw the whole text)
 
 // Known Bugs:
-// - Andrew reported some issue with beshare in _BWidthBuffer_::HashEscapements() 
-//   (that's why its use is disabled by default), though I couldn't reproduce it.
-//	 Could be a different handling of Lock/UnlockWidthBuffer() between R5 and us; if it's
-//	 the case, it should disappear as soon as we use our libraries for everything.	
-// - Double buffering doesn't work well (disabled by default too)
-// - Text inputted using the inline input method isn't highlighted correctly
-// 	if it spans over multiple lines
+// - Double buffering doesn't work well (disabled by default)
 
 #include <cstdlib>
 #include <cstdio>
@@ -74,7 +68,7 @@
 #endif
 
 
-#define USE_WIDTHBUFFER 0
+#define USE_WIDTHBUFFER 1
 #define USE_DOUBLEBUFFERING 0
 
 
@@ -132,8 +126,8 @@ int32 BTextView::sWidthAtom = 0;
 #endif
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
-const static rgb_color kBlueInputColor = { 152, 203, 255 };			
-const static rgb_color kRedInputColor = { 255, 152, 152 };	
+const static rgb_color kBlueInputColor = { 152, 203, 255, 255 };			
+const static rgb_color kRedInputColor = { 255, 152, 152, 255 };	
 															
 static property_info
 sPropertyList[] = {
@@ -3665,7 +3659,11 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		eraseRect = clipRect;
 	}
 	
-	float startLeft = fTextRect.left;
+	BRegion inputRegion;
+	if (fInline != NULL && fInline->IsActive())
+		GetTextRegion(fInline->Offset(), fInline->Offset() + fInline->Length(), &inputRegion);
+	
+	float startLeft = fTextRect.left;	
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset - line->offset;
 		// DrawString() chokes if you draw a newline
@@ -3714,44 +3712,33 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						} while ((tabChars + numTabs) < numChars);
 					}
 					
-					// TODO: Revisit this as it looks ugly, and it's not even efficient,
-					// as the red highlight is drawn over the blue one.
-					if (fInline && fInline->IsActive()) {
-						int32 inlineOffset = fInline->Offset();
-						int32 inlineLength = fInline->Length();
-						if (offset <= inlineOffset + inlineLength &&
-								offset + length >= inlineOffset + inlineLength) {		
-							BPoint leftTop;
-							if (offset > inlineOffset)
-								leftTop = PointAt(offset);
-							else
-								leftTop = PointAt(inlineOffset);
+					if (inputRegion.CountRects() > 0) {
+						BRegion textRegion;
+						GetTextRegion(offset, offset + length, &textRegion);
+						
+						textRegion.IntersectWith(&inputRegion);
+						view->PushState();	
 							
-							float height;
-							BPoint rightBottom = PointAt(inlineOffset + inlineLength, &height);
-							rightBottom.y += height;
-							BRect rect(leftTop, rightBottom);
+						// Highlight in blue the inputted text
+						view->SetHighColor(kBlueInputColor);
+						view->FillRect(textRegion.Frame());
+						
+						// Highlight in red the selected part
+						if (fInline->SelectionLength() > 0) {
+							BRegion selectedRegion;
+							GetTextRegion(fInline->Offset() + fInline->SelectionOffset(),
+										fInline->Offset() + fInline->SelectionOffset() + fInline->SelectionLength(),
+										&selectedRegion);
 							
-							view->PushState();	
+							textRegion.IntersectWith(&selectedRegion);
 							
-							// Highlight in blue the inputted text
-							view->SetLowColor(kBlueInputColor);
-							view->FillRect(rect, B_SOLID_LOW);
-							
-							// Highlight in red the selected part
-							if (fInline->SelectionLength() > 0) {
-								rightBottom = PointAt(inlineOffset + fInline->SelectionOffset() +
-													fInline->SelectionLength(), &height);
-								rightBottom.y += height;
-								rect.SetLeftTop(PointAt(inlineOffset + fInline->SelectionOffset()));
-								rect.SetRightBottom(rightBottom);
-								view->SetLowColor(kRedInputColor);
-								view->FillRect(rect, B_SOLID_LOW);				
-							}
-							view->PopState();
+							view->SetHighColor(kRedInputColor);
+							view->FillRect(textRegion.Frame());										
 						}
+						
+						view->PopState();
 					}
-					
+							
 					view->DrawString(fText->GetString(offset, tabChars), tabChars);
 					
 					if (foundTab) {
@@ -3776,7 +3763,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 		line++;
 	}
 
-	// TODO: Maybe this fits better into "BTextView::Refresh()"
 	// draw the caret/hilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd && fSelectable)
@@ -4017,11 +4003,11 @@ void
 BTextView::UpdateScrollbars()
 {
 	BRect bounds(Bounds());
-	BScrollBar *hsb = ScrollBar(B_HORIZONTAL);
- 	BScrollBar *vsb = ScrollBar(B_VERTICAL);
+	BScrollBar *horizontalScrollBar = ScrollBar(B_HORIZONTAL);
+ 	BScrollBar *verticalScrollBar = ScrollBar(B_VERTICAL);
 
 	// do we have a horizontal scroll bar?
-	if (hsb != NULL) {
+	if (horizontalScrollBar != NULL) {
 		long viewWidth = bounds.IntegerWidth();
 		long dataWidth = fTextRect.IntegerWidth();
 		dataWidth += (long)ceil(fTextRect.left) + 1;
@@ -4029,13 +4015,13 @@ BTextView::UpdateScrollbars()
 		long maxRange = dataWidth - viewWidth;
 		maxRange = max_c(maxRange, 0);
 		
-		hsb->SetRange(0, (float)maxRange);
-		hsb->SetProportion((float)viewWidth / (float)dataWidth);
-		hsb->SetSteps(10, dataWidth / 10);
+		horizontalScrollBar->SetRange(0, (float)maxRange);
+		horizontalScrollBar->SetProportion((float)viewWidth / (float)dataWidth);
+		horizontalScrollBar->SetSteps(10, dataWidth / 10);
 	}
 	
 	// how about a vertical scroll bar?
-	if (vsb != NULL) {
+	if (verticalScrollBar != NULL) {
 		long viewHeight = bounds.IntegerHeight();
 		long dataHeight = fTextRect.IntegerHeight();
 		dataHeight += (long)ceil(fTextRect.top) + 1;
@@ -4043,9 +4029,9 @@ BTextView::UpdateScrollbars()
 		long maxRange = dataHeight - viewHeight;
 		maxRange = max_c(maxRange, 0);
 		
-		vsb->SetRange(0, maxRange);
-		vsb->SetProportion((float)viewHeight / (float)dataHeight);
-		vsb->SetSteps(12, viewHeight);
+		verticalScrollBar->SetRange(0, maxRange);
+		verticalScrollBar->SetProportion((float)viewHeight / (float)dataHeight);
+		verticalScrollBar->SetSteps(12, viewHeight);
 	}
 }
 

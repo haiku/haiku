@@ -24,7 +24,9 @@
 //	Description:	Helper class to handle input method requests
 //------------------------------------------------------------------------------
 
-// TODO: he bebook says we should highlight in blue/red different "clauses".
+// For a deeper understanding of this class, see the BeBook, sez.
+// "The Input Server".
+// TODO: the bebook says we should highlight in blue/red different "clauses".
 // Though it looks like what really matters is the "selection" field in
 // the BMessage sent by the input method addon. Have I missed something ?
 
@@ -127,6 +129,8 @@ _BInlineInput_::SetOffset(int32 offset)
 }
 
 
+/*! \brief Returns the length of the selection, if any.
+*/
 int32
 _BInlineInput_::SelectionLength() const
 {
@@ -134,6 +138,9 @@ _BInlineInput_::SelectionLength() const
 }
 
 
+/*! \brief Sets the length of the selection.
+	\param length The length of the selection.
+*/
 void
 _BInlineInput_::SetSelectionLength(int32 length)
 {
@@ -141,6 +148,8 @@ _BInlineInput_::SetSelectionLength(int32 length)
 }
 
 
+/*! \brief Returns the offset into the method string of the selection.
+*/
 int32
 _BInlineInput_::SelectionOffset() const
 {
@@ -148,6 +157,9 @@ _BInlineInput_::SelectionOffset() const
 }
 
 
+/*! \brief Sets the offset into the method string of the selection.
+	\param offset The offset where the selection starts.
+*/
 void
 _BInlineInput_::SetSelectionOffset(int32 offset)
 {
