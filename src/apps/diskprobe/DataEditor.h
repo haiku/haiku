@@ -96,7 +96,7 @@ class DataEditor : public BLocker {
 		size_t		fBlockSize;
 };
 
-static const uint32 kMsgDataEditorStateChange = 'deSC';
-static const uint32 kMsgDataEditorUpdate = 'deUp';
+static const uint32 kDataEditorStateChange = 'deSC';
+static const uint32 kDataEditorUpdate = 'deUp';
 
 #endif	/* DATA_EDITOR_H */

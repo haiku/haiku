@@ -41,7 +41,10 @@ class DataView : public BView {
 		virtual void MouseMoved(BPoint where, uint32 transit, const BMessage *message);
 		virtual void MouseUp(BPoint where);
 
+		virtual void KeyDown(const char *bytes, int32 numBytes);
+
 		virtual void WindowActivated(bool active);
+		virtual void MakeFocus(bool focus);
 		virtual void FrameResized(float width, float height);
 		virtual void SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 		virtual void GetPreferredSize(float *_width, float *_height);
@@ -49,6 +52,7 @@ class DataView : public BView {
 		void SetFontSize(float point);
 		void UpdateScroller();
 
+		void MakeVisible(int32 position);
 		void SetSelection(int32 start, int32 end, view_focus focus = kNoFocus);
 		void GetSelection(int32 &start, int32 &end);
 		void InvalidateRange(int32 start, int32 end);
@@ -63,6 +67,7 @@ class DataView : public BView {
 		void DrawSelectionFrame(view_focus which);
 		void DrawSelectionBlock(view_focus which);
 		void DrawSelection();
+		void SetActive(bool active);
 		void SetFocus(view_focus which);
 
 		void UpdateFromEditor(BMessage *message = NULL);

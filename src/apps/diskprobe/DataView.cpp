@@ -7,7 +7,7 @@
 #include "DataView.h"
 #include "DataEditor.h"
 
-#include <Looper.h>
+#include <Window.h>
 #include <ScrollBar.h>
 
 
@@ -88,7 +88,7 @@ DataView::MessageReceived(BMessage *message)
 				break;
 
 			switch (what) {
-				case kMsgDataEditorUpdate:
+				case kDataEditorUpdate:
 					UpdateFromEditor(message);
 					break;
 			}
@@ -387,7 +387,7 @@ DataView::DrawSelectionBlock(view_focus which)
 void
 DataView::DrawSelection()
 {
-	if (fIsActive) {
+	if (IsFocus() && fIsActive) {
 		DrawSelectionBlock(fFocus);
 		DrawSelectionFrame(fFocus == kHexFocus ? kAsciiFocus : kHexFocus);
 	} else {
@@ -400,6 +400,8 @@ DataView::DrawSelection()
 void
 DataView::SetSelection(int32 start, int32 end, view_focus focus)
 {
+	// correct the values if necessary
+
 	if (start > end) {
 		int32 temp = start;
 		start = end;
@@ -408,8 +410,13 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 
 	if (start < 0)
 		start = 0;
+	else if (start > (int32)fDataSize - 1)
+		start = (int32)fDataSize - 1;
+
 	if (end > (int32)fDataSize - 1)
 		end = (int32)fDataSize - 1;
+	else if (end < 0)
+		end = 0;
 
 	if (fStart == start && fEnd == end) {
 		// nothing has changed, no need to update
@@ -472,6 +479,47 @@ DataView::InvalidateRange(int32 start, int32 end)
 
 
 void 
+DataView::MakeVisible(int32 position)
+{
+	if (position < 0 || position > int32(fDataSize) - 1)
+		return;
+
+	BRect frame = SelectionFrame(fFocus, position, position);
+	BRect bounds = Bounds();
+	if (bounds.Contains(frame))
+		return;
+
+	// special case the first and the last line and column, so that
+	// we can take kHorizontalSpace & kVerticalSpace into account
+
+	if ((position % kBlockSize) == 0)
+		frame.left -= kHorizontalSpace;
+	else if ((position % kBlockSize) == kBlockSize - 1)
+		frame.right += kHorizontalSpace;
+
+	if (position < int32(kBlockSize))
+		frame.top -= kVerticalSpace;
+	else if (position > int32(fDataSize - kBlockSize))
+		frame.bottom += kVerticalSpace;
+
+	// compute the scroll point
+
+	BPoint point = bounds.LeftTop();
+	if (bounds.left > frame.left)
+		point.x = frame.left;
+	else if (bounds.right < frame.right)
+		point.x = frame.right - bounds.Width();
+
+	if (bounds.top > frame.top)
+		point.y = frame.top;
+	else if (bounds.bottom < frame.bottom)
+		point.y = frame.bottom - bounds.Height();
+
+	ScrollTo(point);
+}
+
+
+void 
 DataView::SetBase(base_type type)
 {
 	if (fBase == type)
@@ -494,20 +542,47 @@ DataView::SetFocus(view_focus which)
 }
 
 
-void
-DataView::WindowActivated(bool active)
+void 
+DataView::SetActive(bool active)
 {
+	if (active == fIsActive)
+		return;
+
 	fIsActive = active;
 
 	// only redraw the focussed part
 
-	if (fIsActive) {
+	if (IsFocus() && active) {
 		DrawSelectionFrame(fFocus);
 		DrawSelectionBlock(fFocus);
 	} else {
 		DrawSelectionBlock(fFocus);
 		DrawSelectionFrame(fFocus);
 	}
+}
+
+
+void 
+DataView::WindowActivated(bool active)
+{
+	BView::WindowActivated(active);
+	SetActive(active);
+}
+
+
+void 
+DataView::MakeFocus(bool focus)
+{
+	bool previous = IsFocus();
+	BView::MakeFocus(focus);
+
+	if (focus == previous)
+		return;
+
+	if (Window()->IsActive() && focus)
+		SetActive(true);
+	else if (!Window()->IsActive() || !focus)
+		SetActive(false);
 }
 
 
@@ -549,6 +624,8 @@ DataView::FrameResized(float width, float height)
 void 
 DataView::MouseDown(BPoint where)
 {
+	MakeFocus(true);
+
 	BMessage *message = Looper()->CurrentMessage();
 	int32 buttons;
 	if (message == NULL || message->FindInt32("buttons", &buttons) != B_OK
@@ -593,6 +670,98 @@ void
 DataView::MouseUp(BPoint where)
 {
 	fMouseSelectionStart = -1;
+}
+
+
+void 
+DataView::KeyDown(const char *bytes, int32 numBytes)
+{
+	int32 modifiers;
+	if (Looper()->CurrentMessage() == NULL
+		|| Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
+		modifiers = ::modifiers();
+
+	switch (bytes[0]) {
+		case B_LEFT_ARROW:
+			SetSelection(fStart - 1, modifiers & B_SHIFT_KEY ? fEnd : fStart - 1);
+			MakeVisible(fStart);
+			break;
+		case B_RIGHT_ARROW:
+			SetSelection(modifiers & B_SHIFT_KEY ? fStart : fEnd + 1, fEnd + 1);
+			MakeVisible(fEnd);
+			break;
+		case B_UP_ARROW:
+		{
+			int32 start = fStart - int32(kBlockSize);
+			if (start < 0) {
+				if (modifiers & B_SHIFT_KEY)
+					start = 0;
+				else
+					start = fStart;
+			}
+
+			SetSelection(start, modifiers & B_SHIFT_KEY ? fEnd : start);
+			MakeVisible(fStart);
+			break;
+		}
+		case B_DOWN_ARROW:
+		{
+			int32 end = fEnd + int32(kBlockSize);
+			if (end >= int32(fDataSize)) {
+				if (modifiers & B_SHIFT_KEY)
+					end = int32(fDataSize) - 1;
+				else
+					end = fEnd;
+			}
+
+			SetSelection(modifiers & B_SHIFT_KEY ? fStart : end, end);
+			MakeVisible(fEnd);
+			break;
+		}
+
+		case B_PAGE_UP:
+		{
+			// scroll one page up, but keep the same cursor column
+
+			BRect frame = SelectionFrame(fFocus, fStart, fStart);
+			frame.OffsetBy(0, -Bounds().Height());
+			if (frame.top <= kVerticalSpace)
+				frame.top = kVerticalSpace + 1;
+			ScrollBy(0, -Bounds().Height());
+
+			int32 position = PositionAt(fFocus, frame.LeftTop());
+			SetSelection(position, position);
+			break;
+		}
+		case B_PAGE_DOWN:
+		{
+			// scroll one page down, but keep the same cursor column
+
+			BRect frame = SelectionFrame(fFocus, fStart, fStart);
+			frame.OffsetBy(0, Bounds().Height());
+
+			float lastLine = fFontHeight * ((fDataSize - 1) / kBlockSize) + kVerticalSpace;
+			if (frame.top > lastLine)
+				frame.top = lastLine;
+			ScrollBy(0, Bounds().Height());
+
+			int32 position = PositionAt(fFocus, frame.LeftTop());
+			SetSelection(position, position);
+			break;
+		}
+		case B_HOME:
+			SetSelection(0, 0);
+			MakeVisible(fStart);
+			break;
+		case B_END:
+			SetSelection(fDataSize - 1, fDataSize - 1);
+			MakeVisible(fStart);
+			break;
+		case B_TAB:
+			SetFocus(fFocus == kHexFocus ? kAsciiFocus : kHexFocus);
+			MakeVisible(fStart);
+			break;
+	}
 }
 
 
