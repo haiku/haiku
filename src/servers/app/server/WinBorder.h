@@ -81,6 +81,7 @@ public:
 	void UpdateFont(void);
 	void UpdateScreen(void);
 	
+	virtual bool HasClient(void) { return false; }
 	Decorator *GetDecorator(void) const { return fDecorator; }
 	WinBorder *MainWinBorder() const;
 	

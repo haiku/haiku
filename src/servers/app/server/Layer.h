@@ -127,7 +127,7 @@ public:
 	
 	DisplayDriver *GetDisplayDriver(void) const { return fDriver; }
 	ServerWindow *Window(void) const { return fServerWin; }
-	bool IsClientLayer() const;
+	virtual bool HasClient(void) { return true; }
 	bool IsServerLayer() const;
 
 	void PruneTree(void);
@@ -138,7 +138,6 @@ public:
 	
 	// server "private" - should not be used
 	void SetRootLayer(RootLayer *rl){ fRootLayer = rl; }
-	void SetServerWindow(ServerWindow *win);
 	void SetAsTopLayer(bool option) { fIsTopLayer = option; }
 	bool IsTopLayer() const { return fIsTopLayer; }
 
@@ -195,7 +194,7 @@ protected:
 
 private:
 	void RequestDraw(const BRegion &reg, Layer *startFrom);
-	ServerWindow *SearchForServerWindow(void) const;
+	ServerWindow *SearchForServerWindow(void);
 
 	void Layer::SendUpdateMsg();
 	void SendViewMovedMsg(void);

@@ -91,6 +91,8 @@ public:
 	void SetBGColor(const RGBColor &col);
 	RGBColor BGColor(void) const;
 	
+	virtual bool HasClient(void) { return false; }
+	
 	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
 	
 	void PrintToStream(void);

@@ -43,8 +43,6 @@
 #include "RootLayer.h"
 #include "Workspace.h"
 
-// TODO: Document this file completely
-
 // Toggle general function call output
 //#define DEBUG_WINBORDER
 
@@ -129,6 +127,7 @@ WinBorder::~WinBorder(void)
 	}
 }
 
+//! Rebuilds the WinBorder's "fully-visible" region based on info from the decorator
 void WinBorder::RebuildFullRegion(void)
 {
 	STRACE(("WinBorder(%s)::RebuildFullRegion()\n",GetName()));
@@ -140,6 +139,15 @@ void WinBorder::RebuildFullRegion(void)
 		fDecorator->GetFootprint(&fFull);
 }
 
+/*!
+	\brief Handles B_MOUSE_DOWN events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_DOWN message
+	\param sendMessage flag to send a B_MOUSE_DOWN message to the client
+	
+	This function searches to see if the B_MOUSE_DOWN message is being sent to the window tab
+	or frame. If it is not, the message is passed on to the appropriate view in the client
+	BWindow. If the WinBorder is the target, then the proper action flag is set.
+*/
 void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 {
 	if (!(Window()->IsLocked()))
@@ -229,6 +237,14 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 	fLastMousePosition = evt.where;
 }
 
+/*!
+	\brief Handles B_MOUSE_MOVED events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_MOVED message
+	
+	This function doesn't do much except test continue any move/resize operations in progress 
+	or check to see if the user clicked on a tab button (close, zoom, etc.) and then moused
+	away to prevent the operation from occurring
+*/
 void WinBorder::MouseMoved(PointerEvent& evt)
 {
 	if (!(Window()->IsLocked()))
@@ -272,9 +288,18 @@ void WinBorder::MouseMoved(PointerEvent& evt)
 			fDecorator->DrawMinimize();
 		}
 	}
+	
 	fLastMousePosition = evt.where;
 }
 
+/*!
+	\brief Handles B_MOUSE_UP events and takes appropriate actions
+	\param evt PointerEvent object containing the info from the last B_MOUSE_UP message
+	
+	This function resets any state objects (is_resizing flag and such) and if resetting a 
+	button click flag, takes the appropriate action (i.e. clearing the close button flag also
+	takes steps to close the window).
+*/
 void WinBorder::MouseUp(PointerEvent& evt)
 {
 	if (!(Window()->IsLocked()))
@@ -316,12 +341,14 @@ void WinBorder::MouseUp(PointerEvent& evt)
 	}
 }
 
+//! Sets the decorator focus to active or inactive colors
 void WinBorder::HighlightDecorator(const bool &active)
 {
 	STRACE(("Decorator->Highlight\n"));
 	fDecorator->SetFocus(active);
 }
 
+//! redraws a certain section of the window border
 void WinBorder::Draw(const BRect &r)
 {
 	#ifdef DEBUG_WINBORDER
@@ -331,34 +358,10 @@ void WinBorder::Draw(const BRect &r)
 	
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
-	{
-/*
-		//fUpdateReg.PrintToStream();
-		RGBColor		c(128, 56, 98);
-		//fDriver->FillRect(r, c);
-		fDriver->FillRect(fUpdateReg.Frame(), c);
-		snooze(1000000);
-*/		
 		fDecorator->Draw(fUpdateReg.Frame());
-	}
-
-	// clear background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
-	// TODO: DO That!
-	// TODO: UNcomment
-	// TODO: UPDATE  code 
-	/*
-	BMessage msg;
-	msg.what = _UPDATE_;
-	msg.AddInt32("_token", fViewToken);
-	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
-
-	// for test purposes only!
-	msg.AddRect("_rect2", reg.Frame());
-
-	fServerWin->SendMessageToClient( &msg );
-*/
 }
 
+//! Moves the winborder with redraw
 void WinBorder::MoveBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
@@ -368,8 +371,11 @@ void WinBorder::MoveBy(float x, float y)
 	Layer::MoveBy(x,y);
 }
 
+//! Resizes the winborder with redraw
 void WinBorder::ResizeBy(float x, float y)
 {
+	// TODO: account for size limits
+	
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
@@ -377,6 +383,7 @@ void WinBorder::ResizeBy(float x, float y)
 	Layer::ResizeBy(x,y);
 }
 
+//! Returns true if hidden
 bool WinBorder::IsHidden() const
 {
 	if (fServerHidden)
@@ -395,6 +402,7 @@ void WinBorder::ServerUnhide()
 	fServerHidden = false;
 }
 
+//! Sets the minimum and maximum sizes of the window
 void WinBorder::SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight)
 {
 	if(minwidth<0)
@@ -415,6 +423,7 @@ void WinBorder::SetSizeLimits(float minwidth, float maxwidth, float minheight, f
 	fMaxHeight=maxheight;
 }
 
+//! Returns true if the point is in the WinBorder's screen area
 bool WinBorder::HasPoint(const BPoint& pt) const
 {
 	return fFullVisible.Contains(pt);
@@ -425,11 +434,12 @@ void WinBorder::SetMainWinBorder(WinBorder *newMain)
 	fMainWinBorder = newMain;
 }
 
-WinBorder* WinBorder::MainWinBorder() const{
+WinBorder* WinBorder::MainWinBorder() const
+{
 	return fMainWinBorder;
 }
 
-void WinBorder::SetLevel()
+void WinBorder::SetLevel(void)
 {
 	switch(fServerWin->Feel())
 	{
@@ -470,6 +480,7 @@ void WinBorder::SetLevel()
 	}
 }
 
+// Makes the calling WinBorder a subset window of another
 void WinBorder::AddToSubsetOf(WinBorder* main)
 {
 	STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
@@ -532,6 +543,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main)
 	}
 }
 
+// Removes the calling WinBorder from the subset window of another
 void WinBorder::RemoveFromSubsetOf(WinBorder* main)
 {
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
@@ -539,6 +551,7 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main)
 
 	desktop->fGeneralLock.Lock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
+	
 	rl->fMainLock.Lock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
 
@@ -563,10 +576,11 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main)
 	rl->fMainLock.Unlock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
 
-	desktop->fGeneralLock.Unlock();
+ 	desktop->fGeneralLock.Unlock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
 }
 
+//! Prints information about the WinBorder's current state
 void WinBorder::PrintToStream()
 {
 	printf("\t%s", GetName());
@@ -595,21 +609,25 @@ void WinBorder::PrintToStream()
 	printf("\t%s\n", IsHidden() ? "hidden" : "not hidden");
 }
 
+// Unimplemented. Hook function for handling when system GUI colors change
 void WinBorder::UpdateColors(void)
 {
 	STRACE(("WinBorder %s: UpdateColors unimplemented\n",GetName()));
 }
 
+// Unimplemented. Hook function for handling when the system decorator changes
 void WinBorder::UpdateDecorator(void)
 {
 	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",GetName()));
 }
 
+// Unimplemented. Hook function for handling when a system font changes
 void WinBorder::UpdateFont(void)
 {
 	STRACE(("WinBorder %s: UpdateFont unimplemented\n",GetName()));
 }
 
+// Unimplemented. Hook function for handling when the screen resolution changes
 void WinBorder::UpdateScreen(void)
 {
 	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
