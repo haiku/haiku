@@ -22,7 +22,7 @@
 #include "MouseWindow.h"
 
 
-const char kMouseApplicationSig[] = "application/x-vnd.OpenBeOS-MOUS";
+const char kMouseApplicationSig[] = "application/x-vnd.haiku.Mouse";
 
 
 MouseApplication::MouseApplication()
