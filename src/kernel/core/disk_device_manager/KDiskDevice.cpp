@@ -12,6 +12,7 @@
 #include "KDiskDevice.h"
 #include "KDiskDeviceUtils.h"
 #include "KShadowPartition.h"
+#include "KPath.h"
 #include "UserDataWriter.h"
 
 // debugging
@@ -256,14 +257,13 @@ KDiskDevice::Path() const
 
 // GetPath
 status_t
-KDiskDevice::GetPath(char *path) const
+KDiskDevice::GetPath(KPath *path) const
 {
-	if (!path)
+	if (!path || path->InitCheck() != B_OK)
 		return B_BAD_VALUE;
 	if (!fDeviceData.path)
 		return B_NO_INIT;
-	strcpy(path, fDeviceData.path);
-	return B_OK;
+	return path->SetPath(fDeviceData.path);
 }
 
 // SetFD
@@ -366,9 +366,23 @@ KDiskDevice::Dump(bool deep, int32 level)
 status_t
 KDiskDevice::GetMediaStatus(status_t *mediaStatus)
 {
+	status_t error = B_OK;
 	if (ioctl(fFD, B_GET_MEDIA_STATUS, mediaStatus) != 0)
-		return errno;
-	return B_OK;
+		error = errno;
+	// maybe the device driver doesn't implement this ioctl -- see, if getting
+	// the device geometry succeeds
+	if (error != B_OK) {
+		device_geometry geometry;
+		if (GetGeometry(&geometry) == B_OK) {
+			// if the device is not removable, we can ignore the failed ioctl
+			// and return a media status of B_OK
+			if (!geometry.removable) {
+				error = B_OK;
+				*mediaStatus = B_OK;
+			}
+		}
+	}
+	return error;
 }
 
 // GetGeometry

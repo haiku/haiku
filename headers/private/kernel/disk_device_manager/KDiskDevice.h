@@ -54,7 +54,7 @@ public:
 		// TODO: Remove this method or make it private. Once initialized the
 		// path must not be changed.
 	const char *Path() const;
-	virtual status_t GetPath(char *path) const;
+	virtual status_t GetPath(KPath *path) const;
 
 	// File descriptor: Set only from a kernel thread, valid only for
 	// kernel threads.
