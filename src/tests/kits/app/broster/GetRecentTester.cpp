@@ -84,10 +84,8 @@ const int32 kNonQualifyingFlags[] = {
 const char *kTempDirRoot = "/tmp";
 const char *kTempDir = "/tmp/obos-recent-tests";
 
-//const char *kTestType1 = "text/x-vnd.obos-recent-docs-test-type-1";
-//const char *kTestType2 = "text/x-vnd.obos-recent-docs-test-type-2";
-const char *kTestType1 = "text/x-vnd.obos-recent-docs-teste-1-thsdfkj";
-const char *kTestType2 = "text/x-vnd.obos-recent-doce-2-sdlkfjls";
+const char *kTestType1 = "text/x-vnd.obos-recent-docs-test-type-1";
+const char *kTestType2 = "text/x-vnd.obos-recent-docs-test-type-2";
 
 const char *test_types[] = {
 	kTestType1,
@@ -121,10 +119,10 @@ const char *test_folders[] = {
 };
 
 const char *test_sigs[] = {
-	"application/x-vnd.obos-recent-tests-1-tdfhingo",
-	"imposter/this-is-not-an-app-sig-now?",
-	"application/x-vnd.obos-recent-tests-a3sdfs-thingo",
-	"application/x-vnd.obos-recent-tests-app-sig-4a",
+	"application/x-vnd.obos-recent-tests-1",
+	"imposter/this-is-not-an-app-sig-now-is-it?",
+	"application/x-vnd.obos-recent-tests-3",
+	"application/x-vnd.obos-recent-tests-app-sig-4",
 };
 
 //------------------------------------------------------------------------------
@@ -237,18 +235,13 @@ launch_test_app(RecentAppsTestAppId id, const int32 *flags)
 	std::string sig;
 	// Set the attributes
 	if (!err) {
-#ifdef TEST_R5
-		sig = std::string(kRecentAppsTestAppSigs[id]) + "-r5";
-#else
-		sig = kRecentAppsTestAppSigs[id];
-#endif
-		err = set_test_app_attributes(&ref, sig.c_str(), flags);	
+		err = set_test_app_attributes(&ref, kRecentAppsTestAppSigs[id], flags);	
 	}
 	// Launch the app
 	if (!err) {
 		BRoster roster;
 		err = roster.Launch(&ref);
-//		err = roster.Launch(sig.c_str());
+//		err = roster.Launch(kRecentAppsTestAppSigs[id]);
 	}
 	// Give it time to do its thing
 	if (!err)
