@@ -3,7 +3,7 @@ SubDir OBOS_TOP src tools copy_to_bfs_image ;
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 {
 	# set CHECK_MALLOC to something when doing tests against memory corruption
