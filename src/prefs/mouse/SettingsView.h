@@ -26,39 +26,31 @@
 
 
 class MouseSettings;
+class MouseView;
+
 
 class SettingsView : public BBox {
 	public:
 		SettingsView(BRect frame, MouseSettings &settings);
+		virtual ~SettingsView();
 
 		virtual void AttachedToWindow();
-		virtual void MouseDown(BPoint where);
+		virtual void GetPreferredSize(float *_width, float *_height);
 		virtual void Draw(BRect frame);
-		virtual void Pulse();
 
-		void Init();
-
-		BSlider		*dcSpeedSlider, *mouseSpeedSlider, *mouseAccSlider;
-		BPopUpMenu	*mouseTypeMenu, *focusMenu, *mouseMapMenu;
-
-		bigtime_t 	fClickSpeed;
-		int32 		fMouseSpeed;
-		int32 		fMouseAcc;
-		int32 		fMouseType;
-		mode_mouse 	fMouseMode;
-		mouse_map 	fMouseMap, fCurrentMouseMap;
-		int32		fCurrentButton;
+		void SetMouseType(int32 type);
+		void UpdateFromSettings();
 
 	private:
 		typedef BBox inherited;
 
-		MouseSettings	&fSettings;
+		const MouseSettings &fSettings;
 
-		uint32		fButtons;
-		uint32		fOldButtons;
+		BPopUpMenu	*fTypeMenu, *fFocusMenu;
+		MouseView	*fMouseView;
+		BSlider		*dcSpeedSlider, *mouseSpeedSlider, *mouseAccSlider;
 
-		BBitmap 		*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
-		BBitmap			*fMouseBitmap, *fMouseDownBitmap;
+		BBitmap 	*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
 };
 
 #endif	/* SETTINGS_VIEW_H */
