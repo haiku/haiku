@@ -135,7 +135,7 @@ type_code BPropertyInfo::TypeCode() const
 //------------------------------------------------------------------------------
 ssize_t BPropertyInfo::FlattenedSize() const
 {
-	size_t size = 2 * sizeof(int32);
+	size_t size = (2 * sizeof(int32)) + 1;
 
 	if (fPropInfo)
 	{
@@ -182,12 +182,12 @@ ssize_t BPropertyInfo::FlattenedSize() const
 
 	if (fValueInfo)
 	{
-		size_t size = sizeof(int32);
+		size += sizeof(int16);
 
 		// Chunks
 		for (int32 vi = 0; fValueInfo[vi].name != NULL; vi++)
 		{
-			size += sizeof(int16);
+			size += sizeof(int32);
 			size += sizeof(int32);
 
 			size += strlen(fValueInfo[vi].name) + 1;
@@ -221,8 +221,9 @@ status_t BPropertyInfo::Flatten(void *buffer, ssize_t numBytes) const
 
 	charPtr = (char*)buffer;
 
+	*(charPtr++) = 0;
 	*(intPtr++) = CountProperties();
-	*(intPtr++) = (fPropInfo ? 0x1 : 0x0) | (fValueInfo ? 0x2 : 0x0);
+	*(intPtr++) = 0x01 | (fValueInfo ? 0x2 : 0x0);
 
 	if (fPropInfo)
 	{
@@ -275,9 +276,10 @@ status_t BPropertyInfo::Flatten(void *buffer, ssize_t numBytes) const
 	if (fValueInfo)
 	{
 		// Chunks
+	    *(wrdPtr++) = CountValues();
 		for (int32 vi = 0; fValueInfo[vi].name != NULL; vi++)
 		{
-			*(wrdPtr++) = fValueInfo[vi].kind;
+			*(intPtr++) = fValueInfo[vi].kind;
 			*(intPtr++) = fValueInfo[vi].value;
 
 			strcpy(charPtr, fValueInfo[vi].name);
