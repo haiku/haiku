@@ -160,6 +160,28 @@ private:
 } __attribute__((packed));
 
 
+/*! \brief UDF ID Identify Suffix
+
+	See also: UDF 2.50 2.1.5.3
+*/
+struct udf_id_suffix {
+public:
+	udf_id_suffix(uint16 udfRevision, uint8 os_class, uint8 os_identifier);
+
+	//! Note that revision 2.50 is denoted by 0x0250.
+	uint16 udf_revision() const { return _udf_revision; }
+	uint8 os_class() const { return _os_class; }
+	uint8 os_identifier() const { return _os_identifier; }
+
+	void set_os_class(uint8 os_class) { _os_class = os_class; }
+	void set_os_identifier(uint8 identifier) { _os_identifier = identifier; }
+private:
+	uint16 _udf_revision;
+	uint8 _os_class;
+	uint8 _os_identifier;
+	array<uint8, 4> _reserved;
+};
+
 /*! \brief Implementation ID Identify Suffix
 
 	See also: UDF 2.50 2.1.5.3
@@ -247,6 +269,8 @@ public:
 	entity_id(uint8 flags = 0, char *identifier = NULL,
 	          uint8 *identifier_suffix = NULL);
 	entity_id(uint8 flags, char *identifier,
+	          const udf_id_suffix &suffix);
+	entity_id(uint8 flags, char *identifier,
 	          const implementation_id_suffix &suffix);
 	entity_id(uint8 flags, char *identifier,
 	          const domain_id_suffix &suffix);
@@ -275,6 +299,7 @@ extern const entity_id kVirtualPartitionMapId;
 extern const entity_id kImplementationId;
 extern const entity_id kPartitionContentsId;
 extern const entity_id kUdfId;
+extern const entity_id kLogicalVolumeInfoId;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -829,6 +854,44 @@ struct descriptor_pointer {
 } __attribute__((packed));
 
 
+/*! \brief UDF Implementation Use Volume Descriptor struct found in
+	implementation_use() field of implementation_use_descriptor when
+	said descriptor's implementation_id() field specifies "*UDF LV Info"
+	
+	See also: UDF 2.50 2.2.7
+*/
+struct logical_volume_info {
+public:
+	void dump() const;
+
+	charspec& character_set() { return _character_set; }
+	const charspec& character_set() const { return _character_set; }
+
+	array<char, 128>& logical_volume_id() { return _logical_volume_id; }
+	const array<char, 128>& logical_volume_id() const { return _logical_volume_id; }
+
+	array<char, 36>& logical_volume_info_1() { return _logical_volume_info.data[0]; }
+	const array<char, 36>& logical_volume_info_1() const { return _logical_volume_info.data[0]; }
+
+	array<char, 36>& logical_volume_info_2() { return _logical_volume_info.data[1]; }
+	const array<char, 36>& logical_volume_info_2() const { return _logical_volume_info.data[1]; }
+
+	array<char, 36>& logical_volume_info_3() { return _logical_volume_info.data[2]; }
+	const array<char, 36>& logical_volume_info_3() const { return _logical_volume_info.data[2]; }
+
+	entity_id& implementation_id() { return _implementation_id; }
+	const entity_id& implementation_id() const { return _implementation_id; }
+
+	array<uint8, 128>& implementation_use() { return _implementation_use; }
+	const array<uint8, 128>& implementation_use() const { return _implementation_use; }
+private:
+	charspec _character_set;
+	array<char, 128> _logical_volume_id;				// d-string
+	array<array<char, 36>, 3> _logical_volume_info;	// d-strings
+	entity_id _implementation_id;
+	array<uint8, 128> _implementation_use;	
+} __attribute__((packed));
+
 /*! \brief Implementation Use Volume Descriptor
 
 	See also: ECMA 167 3/10.4
@@ -848,6 +911,10 @@ public:
 
 	const array<uint8, 460>& implementation_use() const { return _implementation_use; }
 	array<uint8, 460>& implementation_use() { return _implementation_use; }
+	
+	// Only valid if implementation_id() returns Udf::kLogicalVolumeInfoId.
+	logical_volume_info& info() { return *reinterpret_cast<logical_volume_info*>(_implementation_use.data); }
+	const logical_volume_info& info() const { return *reinterpret_cast<const logical_volume_info*>(_implementation_use.data); }
 	
 	// Set functions
 	void set_vds_number(uint32 number) { _vds_number = B_HOST_TO_LENDIAN_INT32(number); }
