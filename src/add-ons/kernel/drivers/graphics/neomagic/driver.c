@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-7/2004.
+	Rudolf Cornelissen 5/2002-8/2004.
 */
 
 /* standard kernel driver stuff */
@@ -926,13 +926,13 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
 	snooze(10);
 	KISAGRPHW(GENLOCK, temp);
-	/* destination rectangle */
-	KISAGRPHW(HDCOORD1L, ((bes->hcoordv >> 16) & 0xff));
-	KISAGRPHW(HDCOORD2L, (bes->hcoordv & 0xff));
-	KISAGRPHW(HDCOORD21H, (((bes->hcoordv >> 4) & 0xf0) | ((bes->hcoordv >> 24) & 0x0f)));
-	KISAGRPHW(VDCOORD1L, ((bes->vcoordv >> 16) & 0xff));
-	KISAGRPHW(VDCOORD2L, (bes->vcoordv & 0xff));
-	KISAGRPHW(VDCOORD21H, (((bes->vcoordv >> 4) & 0xf0) | ((bes->vcoordv >> 24) & 0x0f)));
+	/* destination rectangle #1 (output window position and size) */
+	KISAGRPHW(HD1COORD1L, ((bes->hcoordv >> 16) & 0xff));
+	KISAGRPHW(HD1COORD2L, (bes->hcoordv & 0xff));
+	KISAGRPHW(HD1COORD21H, (((bes->hcoordv >> 4) & 0xf0) | ((bes->hcoordv >> 24) & 0x0f)));
+	KISAGRPHW(VD1COORD1L, ((bes->vcoordv >> 16) & 0xff));
+	KISAGRPHW(VD1COORD2L, (bes->vcoordv & 0xff));
+	KISAGRPHW(VD1COORD21H, (((bes->vcoordv >> 4) & 0xf0) | ((bes->vcoordv >> 24) & 0x0f)));
 	/* scaling */
 	KISAGRPHW(XSCALEL, (bes->hiscalv & 0xff));
 	KISAGRPHW(XSCALEH, ((bes->hiscalv >> 8) & 0xff));
@@ -940,16 +940,11 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	KISAGRPHW(YSCALEH, ((bes->viscalv >> 8) & 0xff));
 	/* inputbuffer #1 origin */
 	/* (we don't program buffer #2 as it's unused.) */
-	/* first include 'pixel precise' left clipping...
-	 * (subpixel precision is not supported by NeoMagic cards) */
-	bes->a1orgv += ((bes->hsrcstv >> 16) * 2);
-	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-	bes->a1orgv &= ~0x03;
-	/* now setup buffer startadress and horizontal source end (minimizes used bandwidth) */
 	if (bes->card_type < NM2200)
 	{
 		bes->a1orgv >>= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		/* (horizontal source end minimizes used bandwidth) */
 		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 7) & ~8) / 8) - 1));
 	}
 	else
@@ -957,6 +952,7 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 		/* NM2200 and later cards use bytes to define buffer pitch */
 		buf_pitch <<= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
+		/* (horizontal source end minimizes used bandwidth) */
 		//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
 		//fixme? check if overlaybuffer width should also have granularity of 16 now!
 		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 15) & ~16) / 16) - 1));
@@ -970,11 +966,8 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	/* b2 = 0: don't use horizontal mirroring (NM2160) */
 	/* other bits do ??? */
 	KISAGRPHW(0xbf, 0x02);
-	/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
-	 * so we do 'pixel precise' left clipping via modification of buffer
-	 * startadress above instead.
-	 * (pixel precise top clipping is also done this way..) */
-	//fixme: checkout real pixel precise clipping on NM2200 and later cards!!!
+
+	/* destination rectangle #2 (output window position and size) */
 /*
 	{
 		uint16 left = 0;
@@ -982,17 +975,12 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 		uint16 top = 0;
 		uint16 bottom = 128;
 
-		left = (bes->hsrcstv >> 16);
-		right = (bes->hsrclstv >> 16);
-		top = (bes->weight >> 16);
-		bottom = (bes->v1srclstv >> 16);
-
-		KISASEQW(HSCOORD1L, (left & 0xff));
-		KISASEQW(HSCOORD2L, (right & 0xff));
-		KISASEQW(HSCOORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
-		KISASEQW(VSCOORD1L, (top & 0xff));
-		KISASEQW(VSCOORD2L, (bottom & 0xff));
-		KISASEQW(VSCOORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
+		KISASEQW(HD2COORD1L, (left & 0xff));
+		KISASEQW(HD2COORD2L, (right & 0xff));
+		KISASEQW(HD2COORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
+		KISASEQW(VD2COORD1L, (top & 0xff));
+		KISASEQW(VD2COORD2L, (bottom & 0xff));
+		KISASEQW(VD2COORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
 	}
 */
 	/* ??? */
@@ -1003,8 +991,10 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	/* b1 = 0: disable alternating hardware buffers (NM2160) */
 	/* other bits do ??? */
 	KISASEQW(0x09, 0x11);
-	/* ??? */
-	KISASEQW(0x0a, 0x00);
+	/* we don't use PCMCIA Zoomed Video port capturing, set 1:1 scale just in case */
+	/* (b6-4 = Y downscale = 100%, b2-0 = X downscale = 100%;
+	 *  downscaling selectable in 12.5% steps on increasing setting by 1) */
+	KISASEQW(ZVCAP_DSCAL, 0x00);
 	/* global BES control */
 	KISAGRPHW(BESCTRL1, (bes->globctlv & 0xff));
 	KISASEQW(BESCTRL2, ((bes->globctlv >> 8) & 0xff));

@@ -130,16 +130,16 @@
 /* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
 #define NMSEQX_BESCTRL2		0x08
 #define NMSEQX_0x09			0x09 //??
-#define NMSEQX_0x0a			0x0a //??
+#define NMSEQX_ZVCAP_DSCAL	0x0a
 #define NMSEQX_BUF2ORGL		0x0c
 #define NMSEQX_BUF2ORGM		0x0d
 #define NMSEQX_BUF2ORGH		0x0e
-#define NMSEQX_VSCOORD1L	0x14 /* >= NM2200(?), so clipping done via buffer startadress instead */
-#define NMSEQX_VSCOORD2L	0x15 /* >= NM2200(?), so clipping done via buffer startadress instead */
-#define NMSEQX_VSCOORD21H	0x16 /* >= NM2200(?), so clipping done via buffer startadress instead */
-#define NMSEQX_HSCOORD1L	0x17 /* >= NM2200(?), so clipping done via buffer startadress instead */
-#define NMSEQX_HSCOORD2L	0x18 /* >= NM2200(?), so clipping done via buffer startadress instead */
-#define NMSEQX_HSCOORD21H	0x19 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_VD2COORD1L	0x14 /* >= NM2200(?) */
+#define NMSEQX_VD2COORD2L	0x15 /* >= NM2200(?) */
+#define NMSEQX_VD2COORD21H	0x16 /* >= NM2200(?) */
+#define NMSEQX_HD2COORD1L	0x17 /* >= NM2200(?) */
+#define NMSEQX_HD2COORD2L	0x18 /* >= NM2200(?) */
+#define NMSEQX_HD2COORD21H	0x19 /* >= NM2200(?) */
 #define NMSEQX_BUF2PITCHL	0x1a
 #define NMSEQX_BUF2PITCHH	0x1b
 #define NMSEQX_0x1c			0x1c //??
@@ -196,12 +196,12 @@
 #define NMGRPHX_PLLC_M		0x9f
 /* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
 #define NMGRPHX_BESCTRL1	0xb0
-#define NMGRPHX_HDCOORD21H	0xb1
-#define NMGRPHX_HDCOORD1L	0xb2
-#define NMGRPHX_HDCOORD2L	0xb3
-#define NMGRPHX_VDCOORD21H	0xb4
-#define NMGRPHX_VDCOORD1L	0xb5
-#define NMGRPHX_VDCOORD2L	0xb6
+#define NMGRPHX_HD1COORD21H	0xb1
+#define NMGRPHX_HD1COORD1L	0xb2
+#define NMGRPHX_HD1COORD2L	0xb3
+#define NMGRPHX_VD1COORD21H	0xb4
+#define NMGRPHX_VD1COORD1L	0xb5
+#define NMGRPHX_VD1COORD2L	0xb6
 #define NMGRPHX_BUF1ORGH	0xb7
 #define NMGRPHX_BUF1ORGM	0xb8
 #define NMGRPHX_BUF1ORGL	0xb9
@@ -240,7 +240,7 @@
 #define NMACC_STATUS			0x0000
 #define NMACC_CONTROL			0x0004
 #define NMACC_FGCOLOR			0x000c
-#define NMACC_2200_PITCH		0x0014
+#define NMACC_2200_SRC_PITCH	0x0014
 #define NMACC_2090_CLIPLT		0x0018
 #define NMACC_2090_CLIPRB		0x001c
 #define NMACC_SRCSTARTOFF		0x0024

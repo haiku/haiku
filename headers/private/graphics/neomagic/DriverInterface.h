@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-4/2004
+	Rudolf Cornelissen 4/2003-8/2004
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -245,12 +245,9 @@ typedef struct {
 	uint32  viscalv;
 	uint32	hsrcstv;
 	uint32  hsrcendv;
-	uint32  hsrclstv;
 	uint32	a1orgv;
 	uint32  globctlv;
-	uint32  v1wghtv;
 	uint32  weight;
-	uint32  v1srclstv; 
 	uint8	colkey_r;
 	uint8	colkey_g;
 	uint8	colkey_b;

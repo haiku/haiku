@@ -8,6 +8,8 @@
 <ul>
 	<li>Added full 2D acceleration for all remaining cards that did not have that yet with this driver (still largely untested);
 	<li>Fixed a long standing problem with MagicMedia (all NM2200 and later) cards with overlay: buffer width is programmed correctly now. Can't believe I didn't see that before!
+	<li>Updated NM2200 and later cards workspace virtualsize restrictions for accelerated modes: it turns out these cards engines have the same restrictions as most older ones, being 1600x1024 resolution;
+	<li>Updated overlay scaling restrictions: officially the cards support upto and including 8x upscaling.
 </ul>
 <p><h1>nm_driver 0.06 (Rudolf)</h1></p>
 <ul>
