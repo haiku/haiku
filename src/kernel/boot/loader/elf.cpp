@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -206,7 +206,7 @@ elf_load_image(int fd, preloaded_image *image)
 			continue;
 
 		region->start = ROUNDOWN(header.p_vaddr, B_PAGE_SIZE);
-		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE), PAGE_SIZE);
+		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 		region->delta = -region->start;
 
 		TRACE(("segment %d: start = %p, size = %lu, delta = %lx\n", i,
