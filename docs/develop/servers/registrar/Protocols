@@ -117,7 +117,8 @@ error reply fields:
 - "error":
   - B_BAD_VALUE: A request message field is missing or contains an
     invalid value.
-  - B_REG_APP_NOT_REGISTERED: The team is unknown to the roster.
+  - B_REG_APP_NOT_PRE_REGISTERED: The team is unknown to the roster or the
+    application is already fully registered.
   - ...
 
 -----------------------------------------------------------------------
