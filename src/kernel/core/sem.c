@@ -535,10 +535,9 @@ release_sem(sem_id id)
 status_t
 release_sem_etc(sem_id id, int32 count, uint32 flags)
 {
-	int slot = id % sMaxSems;
-	int state;
-	int released_threads = 0;
-	struct thread_queue release_queue;
+	struct thread_queue releaseQueue;
+	int32 slot = id % sMaxSems;
+	cpu_status state;
 	status_t status = B_OK;
 
 	if (gSemsActive == false)
@@ -561,24 +560,27 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	// put back into the run list. This is done so the thread lock wont be held
 	// while this sems lock is held since the two locks are grabbed in the other
 	// order in sem_interrupt_thread.
-	release_queue.head = release_queue.tail = NULL;
+	releaseQueue.head = releaseQueue.tail = NULL;
+
+	if (flags & B_RELEASE_ALL)
+		count = -gSems[slot].u.used.count;
 
 	while (count > 0) {
 		int delta = count;
 		if (gSems[slot].u.used.count < 0) {
-			struct thread *t = thread_lookat_queue(&gSems[slot].u.used.q);
+			struct thread *thread = thread_lookat_queue(&gSems[slot].u.used.q);
 
-			delta = min(count, t->sem.count);
-			t->sem.count -= delta;
-			if (t->sem.count <= 0) {
+			delta = min(count, thread->sem.count);
+			thread->sem.count -= delta;
+			if (thread->sem.count <= 0) {
 				// release this thread
-				t = thread_dequeue(&gSems[slot].u.used.q);
-				thread_enqueue(t, &release_queue);
-				t->state = B_THREAD_READY;
-				released_threads++;
-				t->sem.count = 0;
+				thread = thread_dequeue(&gSems[slot].u.used.q);
+				thread_enqueue(thread, &releaseQueue);
+				thread->state = B_THREAD_READY;
+				thread->sem.count = 0;
 			}
-		}
+		} else if (flags & B_RELEASE_IF_WAITING_ONLY)
+			break;
 
 		gSems[slot].u.used.count += delta;
 		count -= delta;
@@ -586,16 +588,18 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	RELEASE_SEM_LOCK(gSems[slot]);
 
 	// pull off any items in the release queue and put them in the run queue
-	if (released_threads > 0) {
-		struct thread *t;
-		int priority;
+	if (releaseQueue.head != NULL) {
+		struct thread *thread;
+		int32 priority;
+
 		GRAB_THREAD_LOCK();
-		while ((t = thread_dequeue(&release_queue)) != NULL) {
+		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
 			// temporarily place thread in a run queue with high priority to boost it up
-			priority = t->priority;
-			t->priority = t->priority >= B_FIRST_REAL_TIME_PRIORITY ? t->priority : B_FIRST_REAL_TIME_PRIORITY;
-			scheduler_enqueue_in_run_queue(t);
-			t->priority = priority;
+			priority = thread->priority;
+			thread->priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
+				thread->priority : B_FIRST_REAL_TIME_PRIORITY;
+			scheduler_enqueue_in_run_queue(thread);
+			thread->priority = priority;
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 			scheduler_reschedule();
