@@ -952,6 +952,8 @@ entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, str
 
 /**	Returns the vnode for the relative path starting at the specified \a vnode.
  *	\a path must not be NULL.
+ *	If it returns successfully, \a path contains the name of the last path
+ *	component.
  */
 
 static status_t
@@ -1812,6 +1814,14 @@ vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void 
 }
 
 
+/**	Finds the full path to the file that contains the module \a moduleName,
+ *	puts it into \a pathBuffer, and returns B_OK for success.
+ *	If \a pathBuffer was too small, it returns \c B_BUFFER_OVERFLOW,
+ *	\c B_ENTRY_NOT_FOUNT if no file could be found.
+ *	\a pathBuffer is clobbered in any case and must not be relied on if this
+ *	functions returns unsuccessfully.
+ */
+
 status_t
 vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer,
 	size_t bufferSize)
@@ -1828,11 +1838,10 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 	if (status < B_OK)
 		return status;
 
-	length = strlen(pathBuffer);
-	if (pathBuffer[length - 1] != '/') {
-		pathBuffer[length] = '/';
-		length++;
-	}
+	// the path buffer had been clobbered by the above call
+	length = strlcpy(pathBuffer, basePath, bufferSize);
+	if (pathBuffer[length - 1] != '/')
+		pathBuffer[length++] = '/';
 
 	path = pathBuffer + length;
 	bufferSize -= length;
@@ -1843,8 +1852,10 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		char *nextPath = strchr(moduleName, '/');
 		if (nextPath == NULL)
 			length = strlen(moduleName);
-		else
+		else {
 			length = nextPath - moduleName;
+			nextPath++;
+		}
 
 		if (length + 1 >= bufferSize) {
 			status = B_BUFFER_OVERFLOW;
@@ -1866,6 +1877,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 			path[length] = '/';
 			path[length + 1] = '\0';
 			path += length + 1;
+			bufferSize -= length + 1;
 
 			dir = file;
 		} else if (S_ISREG(type)) {
