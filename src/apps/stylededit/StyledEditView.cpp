@@ -58,9 +58,6 @@ StyledEditView::FrameResized(float width, float height)
 	*/
 }				
 
-
-#include <stdio.h>
-
 status_t
 StyledEditView::GetStyledText(BPositionIO * stream)
 {
