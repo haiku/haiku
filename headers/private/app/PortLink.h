@@ -5,10 +5,7 @@
 #include <OS.h>
 #include <SupportDefs.h>
 #include <Rect.h>
-
-#ifndef _PORTLINK_BUFFERSIZE
-#define _PORTLINK_MAX_ATTACHMENTS 50
-#endif
+#include <List.h>
 
 class PortLinkData;
 
@@ -47,9 +44,8 @@ protected:
 	port_id target, replyport;
 	int32 opcode;
 	uint32 bufferlength,capacity;
-	int		num_attachments;
 	bool port_ok;
-	PortLinkData *attachments[_PORTLINK_MAX_ATTACHMENTS];
+	BList *attachlist;
 };
 
 #endif

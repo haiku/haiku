@@ -27,7 +27,7 @@ capacity - contains the storage capacity of the target port.
 #include <stdio.h>
 #include <malloc.h>
 
-#define PLDEBUG
+//#define PLDEBUG
 //#define PLD_DEBUG
 
 //#define CAPACITY_CHECKING
@@ -66,10 +66,10 @@ printf("PortLink(%lu)\n",port);
 	capacity=pi.capacity;
 	
 	// We start out without any data attached to the port message
-	num_attachments=0;
 	opcode=0;
 	bufferlength=0;
 	replyport=create_port(30,"PortLink reply port");
+	attachlist=new BList(0);
 #ifdef PLDEBUG
 printf("\tPort valid: %s\n",(port_ok)?"true":"false");
 printf("\tReply port: %lu\n",replyport);
@@ -91,9 +91,8 @@ printf("PortLink(PortLink*)\n");
 	port_ok=link.port_ok;
 	capacity=link.capacity;
 	bufferlength=0;
-	num_attachments=0;
 	replyport=create_port(30,"PortLink reply port");
-
+	attachlist=new BList(0);
 #ifdef PLDEBUG
 printf("\tOpcode: %lu\n",opcode);
 printf("\tTarget port: %lu\n",target);
@@ -113,11 +112,10 @@ printf("~PortLink()\n");
 	// free the memory used by the attachments. We do not flush the queue
 	// because the port may no longer be valid in cases such as the app
 	// is in the process of quitting
-	if(num_attachments || bufferlength)
+	if(attachlist->CountItems()>0)
 		MakeEmpty();
-	
-	//TODO: Inline the MakeEmpty call in a way such that it ignores num_attachments
-	// and deletes all non-NULL pointers, setting them to NULL afterward.
+
+	delete attachlist;
 }
 
 void PortLink::SetOpCode(int32 code)
@@ -174,7 +172,7 @@ printf("\tFlush(): invalid port\n");
 		return B_BAD_VALUE;
 	}
 
-	if(num_attachments>0)
+	if(attachlist->CountItems()>0)
 	{
 #ifdef PLDEBUG
 printf("\tFlush(): flushing %d attachments\n",num_attachments);
@@ -208,14 +206,6 @@ int8* PortLink::FlushWithReply(int32 *code, status_t *status, ssize_t *buffersiz
 #ifdef PLDEBUG
 printf("PortLink::FlushWithReply(int32*,status_t*,ssize_t*,bigtime_t)\n");
 #endif
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-	{
-#ifdef PLDEBUG
-printf("PortLink::FlushWithReply(): too many attachments\n");
-#endif
-		*status=B_ERROR;
-		return NULL;
-	}
 
 	if(!port_ok)
 	{
@@ -250,9 +240,9 @@ printf("PortLink::FlushWithReply(): bad port\n");
 	size+=pld->buffersize;
 
 	// attach everything else
-	for(int i=0;i<num_attachments;i++)
+	for(int i=0;i<attachlist->CountItems();i++)
 	{
-		pld=attachments[i];
+		pld=(PortLinkData*)attachlist->ItemAt(i);
 		memcpy(bufferindex, pld->buffer, pld->buffersize);
 		bufferindex += pld->buffersize;
 		size+=pld->buffersize;
@@ -302,14 +292,6 @@ printf("PortLink::FlushWithReply(ReplyData*,bigtime_t)\n");
 
 	// Effectively, an Attach() call inlined for changes
 
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-	{
-#ifdef PLDEBUG
-printf("\tFlushWithReply(): too many attachments\n");
-#endif
-		return B_ERROR;
-	}
-
 	if(!port_ok)
 	{
 #ifdef PLDEBUG
@@ -344,9 +326,9 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 	size+=pld->buffersize;
 
 	// attach everything else
-	for(int i=0;i<num_attachments;i++)
+	for(int i=0;i<attachlist->CountItems();i++)
 	{
-		pld=attachments[i];
+		pld=(PortLinkData*)attachlist->ItemAt(i);
 		memcpy(bufferindex, pld->buffer, pld->buffersize);
 		bufferindex += pld->buffersize;
 		size+=pld->buffersize;
@@ -390,14 +372,6 @@ printf("Attach(%p,%ld)\n",data,size);
 	// to the end of the list.
 	
 	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-	{
-#ifdef PLDEBUG
-printf("\tAttach(): too many attachments\n");
-#endif
-		return B_ERROR;
-	}
-
 	if(size==0)
 	{
 #ifdef PLDEBUG
@@ -420,8 +394,7 @@ printf("\tAttach(): bufferlength+size > port capacity\n");
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 #ifdef PLDEBUG
 printf("\tAttach(): successful\n");
@@ -435,6 +408,7 @@ printf("\t\tAttach(): buffer length is %lu\n", bufferlength);
 printf("\tAttach(): Couldn't assign data to PortLinkData object\n");
 #endif
 		delete pld;
+		return B_ERROR;
 	}
 
 	return B_OK;
@@ -448,10 +422,6 @@ status_t PortLink::Attach(int32 data)
 #ifdef PLDEBUG
 printf("Attach(%ld)\n",data);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(int32);
 
 #ifdef CAPACITY_CHECKING
@@ -463,13 +433,13 @@ printf("Attach(%ld)\n",data);
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -479,10 +449,6 @@ status_t PortLink::Attach(int16 data)
 #ifdef PLDEBUG
 printf("Attach(%d)\n",data);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(int16);
 
 #ifdef CAPACITY_CHECKING
@@ -494,13 +460,13 @@ printf("Attach(%d)\n",data);
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -510,10 +476,6 @@ status_t PortLink::Attach(int8 data)
 #ifdef PLDEBUG
 printf("Attach(%d)\n",data);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(int8);
 
 #ifdef CAPACITY_CHECKING
@@ -525,13 +487,13 @@ printf("Attach(%d)\n",data);
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -541,10 +503,6 @@ status_t PortLink::Attach(float data)
 #ifdef PLDEBUG
 printf("Attach(%f)\n",data);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(float);
 
 #ifdef CAPACITY_CHECKING
@@ -556,13 +514,13 @@ printf("Attach(%f)\n",data);
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -572,9 +530,6 @@ status_t PortLink::Attach(bool data)
 #ifdef PLDEBUG
 printf("Attach(%s)\n",(data)?"true":"false");
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
 
 	int32 size=sizeof(bool);
 
@@ -587,13 +542,13 @@ printf("Attach(%s)\n",(data)?"true":"false");
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -603,10 +558,6 @@ status_t PortLink::Attach(BRect data)
 #ifdef PLDEBUG
 printf("Attach(BRect(%f,%f,%f,%f))\n",data.left,data.top,data.right,data.bottom);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(BRect);
 
 #ifdef CAPACITY_CHECKING
@@ -618,13 +569,13 @@ printf("Attach(BRect(%f,%f,%f,%f))\n",data.left,data.top,data.right,data.bottom)
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -634,10 +585,6 @@ status_t PortLink::Attach(BPoint data)
 #ifdef PLDEBUG
 printf("Attach(BPoint(%f,%f))\n",data.x,data.y);
 #endif
-	// Prevent parameter problems
-	if(num_attachments>=_PORTLINK_MAX_ATTACHMENTS)
-		return B_ERROR;
-
 	int32 size=sizeof(BPoint);
 
 #ifdef CAPACITY_CHECKING
@@ -649,13 +596,13 @@ printf("Attach(BPoint(%f,%f))\n",data.x,data.y);
 	PortLinkData *pld=new PortLinkData;
 	if(pld->Set(&data,size)==B_OK)
 	{
-		num_attachments++;
-		attachments[num_attachments-1]=pld;
+		attachlist->AddItem(pld);
 		bufferlength+=size;
 	}
 	else
 	{
 		delete pld;
+		return B_ERROR;
 	}
 	return B_OK;
 }
@@ -680,9 +627,10 @@ printf("PortLink::FlattenData: bufferlength<1\n");
 	PortLinkData *pld;
 	*size=0;
 	
-	for(int i=0;i<num_attachments;i++)
+	int32 count=attachlist->CountItems();
+	for(int i=0;i<count;i++)
 	{
-		pld=attachments[i];
+		pld=(PortLinkData*)attachlist->ItemAt(i);
 		memcpy(bufferindex, pld->buffer, pld->buffersize);
 		bufferindex += pld->buffersize;
 		*size+=pld->buffersize;
@@ -695,14 +643,15 @@ void PortLink::MakeEmpty(void)
 printf("PortLink::MakeEmpty\n");
 #endif
 	// Nukes all the attachments currently held by the PortLink class
-	if(num_attachments!=0)
+	PortLinkData *pld;
+	int32 count=attachlist->CountItems();
+	for(int32 i=0; i<count; i++)
 	{
-		for(int i=0; i<num_attachments; i++)
-		{
-			delete attachments[i];
-		}
+		pld=(PortLinkData*)attachlist->ItemAt(i);
+		if(pld)
+			delete pld;
 	}
-	num_attachments=0;
+	attachlist->MakeEmpty();
 	bufferlength=0;
 }
 
