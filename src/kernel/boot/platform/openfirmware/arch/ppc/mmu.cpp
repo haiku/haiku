@@ -505,6 +505,165 @@ invalidate_tlb(void)
 }
 
 
+//	#pragma mark -
+//	OpenFirmware callbacks and public API
+
+
+static int
+map_callback(struct of_arguments *args)
+{
+	void *physicalAddress = (void *)args->Argument(0);
+	void *virtualAddress = (void *)args->Argument(1);
+	int length = args->Argument(2);
+	int mode = args->Argument(3);
+	int &error = args->ReturnValue(0);
+
+	// insert range in physical allocated if needed
+
+	if (is_physical_memory(physicalAddress)
+		&& insert_physical_allocated_range(physicalAddress, length) < B_OK) {
+		error = -1;
+		return OF_FAILED;
+	}
+
+	// insert range in virtual allocated
+
+	if (insert_virtual_allocated_range(virtualAddress, length) < B_OK) {
+		error = -2;
+		return OF_FAILED;
+	}
+
+	// map range into the page table
+
+	map_range(virtualAddress, physicalAddress, length, mode);
+
+	return B_OK;
+}
+
+
+static int
+unmap_callback(struct of_arguments *args)
+{
+/*	void *address = (void *)args->Argument(0);
+	int length = args->Argument(1);
+	int &error = args->ReturnValue(0);
+*/
+	// ToDo: to be implemented
+
+	return OF_FAILED;
+}
+
+
+static int
+translate_callback(struct of_arguments *args)
+{
+	addr_t virtualAddress = (addr_t)args->Argument(0);
+	int &error = args->ReturnValue(0);
+	int &physicalAddress = args->ReturnValue(1);
+	int &mode = args->ReturnValue(2);
+
+	// Find page table entry for this address
+	
+	uint32 virtualSegmentID = sSegments[addr_t(virtualAddress) >> 28].virtual_segment_id;
+
+	uint32 hash = page_table_entry::PrimaryHash(virtualSegmentID, (uint32)virtualAddress);
+	page_table_entry_group *group = &sPageTable[hash & sPageTableHashMask];
+	page_table_entry *entry = NULL;
+
+	for (int32 i = 0; i < 8; i++) {
+		entry = &group->entry[i];
+
+		if (entry->valid
+			&& entry->virtual_segment_id == virtualSegmentID
+			&& entry->secondary_hash == false
+			&& entry->abbr_page_index == ((virtualAddress >> 22) & 0x3f))
+			goto success;
+	}
+
+	hash = page_table_entry::SecondaryHash(hash);
+	group = &sPageTable[hash & sPageTableHashMask];
+
+	for (int32 i = 0; i < 8; i++) {
+		entry = &group->entry[i];
+
+		if (entry->valid
+			&& entry->virtual_segment_id == virtualSegmentID
+			&& entry->secondary_hash == true
+			&& entry->abbr_page_index == ((virtualAddress >> 22) & 0x3f))
+			goto success;
+	}
+
+	// could not find the translation
+	error = B_ENTRY_NOT_FOUND;
+	return OF_FAILED;
+
+success:
+	// we found the entry in question
+	physicalAddress = (int)(entry->physical_page_number * B_PAGE_SIZE);
+	mode = (entry->write_through << 6)		// WIMGxPP
+			| (entry->caching_inhibited << 5)
+			| (entry->memory_coherent << 4)
+			| (entry->guarded << 3)
+			| entry->page_protection;
+	error = B_OK;
+
+	return B_OK;
+}
+
+
+static int
+alloc_real_mem_callback(struct of_arguments *args)
+{
+/*	addr_t minAddress = (addr_t)args->Argument(0);
+	addr_t maxAddress = (addr_t)args->Argument(1);
+	int length = args->Argument(2);
+	int mode = args->Argument(3);
+	int &error = args->ReturnValue(0);
+	int &physicalAddress = args->ReturnValue(1);
+*/
+	// ToDo: to be implemented
+
+	return OF_FAILED;
+}
+
+
+/** Dispatches the callback to the responsible function */
+
+static int
+callback(struct of_arguments *args)
+{
+	const char *name = args->name;
+
+	if (!strcmp(name, "map"))
+		return map_callback(args);
+	else if (!strcmp(name, "unmap"))
+		return unmap_callback(args);
+	else if (!strcmp(name, "translate"))
+		return translate_callback(args);
+	else if (!strcmp(name, "alloc-real-mem"))
+		return alloc_real_mem_callback(args);
+
+	return OF_FAILED;
+}
+
+
+extern "C" status_t
+arch_set_callback(void)
+{
+	// set OpenFirmware callbacks - it will ask us for memory after that
+	// instead of maintaining it itself
+
+	void *oldCallback = NULL;
+	if (of_call_method("set-callback", 1, 1, &callback, &oldCallback) == OF_FAILED) {
+		puts("set-callback failed!");
+		return B_ERROR;
+	}
+	//printf("old callback = %p\n", old);
+
+	return B_OK;
+}
+
+
 extern "C" status_t
 arch_mmu_init(void)
 {
@@ -552,11 +711,6 @@ arch_mmu_init(void)
 	}
 	sPageTableHashMask = tableSize / sizeof(page_table_entry_group) - 1;
 	memset(sPageTable, 0, tableSize);
-
-	// set OpenFirmware callbacks - it will ask us for memory after that
-	// instead of maintaining it itself
-
-	// ToDo: !
 
 	// turn off address translation via the page table/segment mechanism,
 	// identity map the first 256 MB (where our code/data reside)
