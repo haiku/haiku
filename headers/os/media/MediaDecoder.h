@@ -45,7 +45,7 @@ class BMediaDecoder {
 		BMediaDecoder(const BMediaDecoder &);
 		BMediaDecoder & operator=(const BMediaDecoder &);
 
-		void DoLateInit();
+		status_t AttachToDecoder();
 
 		BPrivate::media::Decoder	*fDecoder;
 		int32				fDecoderID;
@@ -57,11 +57,10 @@ class BMediaDecoder {
 		media_format *		fInitFormat;
 		char *				fInitInfo;
 		size_t				fInitInfoSize;
-		media_codec_info *	fInitMCI;
 
 		/* fbc data and virtuals */
 
-		uint32 _reserved_BMediaDecoder_[25];
+		uint32 _reserved_BMediaDecoder_[26];
 
 		virtual	status_t _Reserved_BMediaDecoder_0(int32 arg, ...);
 		virtual	status_t _Reserved_BMediaDecoder_1(int32 arg, ...);
