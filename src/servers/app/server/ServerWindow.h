@@ -36,6 +36,7 @@
 #include <Window.h>
 #include <LinkMsgReader.h>
 #include <LinkMsgSender.h>
+#include "TokenSpace.h"
 #include "FMWList.h"
 
 class BString;
@@ -96,7 +97,9 @@ public:
 
 	// util methods.	
 	Layer *FindLayer(const Layer *start, int32 token) const;
-	void SendMessageToClient( const BMessage *msg ) const;
+	void SendMessageToClient(const BMessage* msg,
+							 int32 target = B_NULL_TOKEN,
+							 bool usePreferred = false) const;
 
 	// a few, not that important methods returning some internal settings.	
 	int32 Look(void) const { return fLook; }

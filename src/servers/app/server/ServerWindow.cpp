@@ -51,6 +51,7 @@
 #include "DisplayDriver.h"
 #include "ServerPicture.h"
 #include "Workspace.h"
+#include "MessagePrivate.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
@@ -2285,16 +2286,17 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 	return NULL;
 }
 //------------------------------------------------------------------------------
-void ServerWindow::SendMessageToClient(const BMessage* msg) const
+void ServerWindow::SendMessageToClient(const BMessage* msg, int32 target, bool usePreferred) const
 {
 	ssize_t		size;
 	char		*buffer;
-	
+
 	size		= msg->FlattenedSize();
 	buffer		= new char[size];
 
 	if (msg->Flatten(buffer, size) == B_OK)
-		write_port(fClientLooperPort, msg->what, buffer, size);
+		BMessage::Private::SendFlattenedMessage(buffer, size,
+			fClientLooperPort, target, usePreferred, B_INFINITE_TIMEOUT);
 	else
 		printf("PANIC: ServerWindow %s: can't flatten message in 'SendMessageToClient()'\n", fTitle.String());
 

@@ -31,6 +31,7 @@
 #include <Debug.h>
 #include "PortLink.h"
 #include "View.h"	// for mouse button defines
+#include "MessagePrivate.h"
 #include "ServerWindow.h"
 #include "Decorator.h"
 #include "DisplayDriver.h"
@@ -41,7 +42,6 @@
 #include "Globals.h"
 #include "RootLayer.h"
 #include "Workspace.h"
-#include "TokenSpace.h"
 
 // Toggle general function call output
 //#define DEBUG_WINBORDER
@@ -229,9 +229,8 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 		msg.AddInt32("modifiers", evt.modifiers);
 		msg.AddInt32("buttons", evt.buttons);
 		msg.AddInt32("clicks", evt.clicks);
-		msg.AddInt32("haiku:token", target? target->fViewToken: B_NULL_TOKEN);
 
-		Window()->SendMessageToClient(&msg);
+		Window()->SendMessageToClient(&msg, target->fViewToken, false);
 	}
 	
 	fLastMousePosition = evt.where;
@@ -368,9 +367,8 @@ void WinBorder::MouseUp(PointerEvent& evt)
 		upmsg.AddInt64("when",evt.when);
 		upmsg.AddPoint("where",evt.where);
 		upmsg.AddInt32("modifiers",evt.modifiers);
-		upmsg.AddInt32("haiku:token", target? target->fViewToken: B_NULL_TOKEN);
 
-		Window()->SendMessageToClient(&upmsg);
+		Window()->SendMessageToClient(&upmsg, target->fViewToken, false);
 	}
 }
 
