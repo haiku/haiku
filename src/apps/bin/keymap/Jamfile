@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src apps bin keymap ;
 
+NotFile keymap_files ;
+Depends files : keymap_files ;
+
 BinCommand keymap :
 	key_map.cpp
 	Keymap.cpp
@@ -17,7 +20,7 @@ rule MkKeymapComp
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 	MakeLocate $(binary) : [ FDirName $(OBOS_ETC_DIR) Keymap ] ;
 
-	LocalDepends files : $(binary) ;
+	LocalDepends keymap_files : $(binary) ;
 	Depends $(binary) : $(source) keymap ;
 	MkKeymapComp1 $(binary) : keymap $(source) ;
 	LocalClean clean : $(binary) ;
