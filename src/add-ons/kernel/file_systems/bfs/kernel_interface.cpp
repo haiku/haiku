@@ -765,9 +765,10 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 
 
 int 
-bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode, vnode_id *vnid, void **_cookie)
+bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
+	vnode_id *vnodeID, void **_cookie)
 {
-	FUNCTION_START(("name = \"%s\", perms = %ld, omode = %ld\n",name,mode,omode));
+	FUNCTION_START(("name = \"%s\", perms = %ld, omode = %ld\n", name, mode, omode));
 
 	if (_ns == NULL || _directory == NULL || _cookie == NULL
 		|| name == NULL || *name == '\0')
@@ -783,6 +784,8 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode, v
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
+	// We are creating the cookie at this point, so that we don't have
+	// to remove the inode if we don't have enough free memory later...
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY); 
@@ -792,18 +795,20 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode, v
 	cookie->last_size = 0;
 	cookie->last_notification = system_time();
 
-	Transaction transaction(volume,directory->BlockNumber());
+	Transaction transaction(volume, directory->BlockNumber());
 
-	status = Inode::Create(&transaction,directory,name,S_FILE | (mode & S_IUMSK),omode,0,vnid);
-	if (status == B_OK) {
+	status = Inode::Create(&transaction, directory, name, S_FILE | (mode & S_IUMSK),
+		omode, 0, vnodeID);
+
+	if (status >= B_OK) {
 		transaction.Done();
 
-		notify_listener(B_ENTRY_CREATED,volume->ID(),directory->ID(),0,*vnid,name);
-	}
-	if (status < B_OK)
-		free(cookie);
-	else
+		// register the cookie
 		*_cookie = cookie;
+
+		notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, *vnodeID, name);
+	} else
+		free(cookie);
 
 	return status;
 }
@@ -1134,7 +1139,7 @@ bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer, size_t 
 {
 	//FUNCTION();
 	Inode *inode = (Inode *)_node;
-	
+
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
 		RETURN_ERROR(B_BAD_VALUE);
@@ -1254,6 +1259,9 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 	if (inode->Flags() & INODE_NO_CACHE) {
 		volume->Pool().ReleaseBuffers();
 		inode->Node()->flags &= ~INODE_NO_CACHE;
+			// We don't need to save the inode, because INODE_NO_CACHE is a
+			// non-permanent flag which will be removed when the inode is loaded
+			// into memory.
 	}
 
 	return B_OK;
