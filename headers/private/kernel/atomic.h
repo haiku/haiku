@@ -2,7 +2,6 @@
 #define _KERNEL_ATOMIC_H
 
 #include <ktypes.h>
-typedef volatile int vint32; //XXX misplaced here
 
 /**
  * @file kernel/atomic.h

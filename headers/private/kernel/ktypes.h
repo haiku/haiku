@@ -9,17 +9,18 @@
 extern "C" {
 #endif
 
-#include <types.h>
+//#include <types.h>
+#include <SupportDefs.h>
 
 typedef uint16 mode_t;
 typedef int    pid_t;
-typedef int    thread_id;
-typedef int    region_id;
-typedef int    aspace_id;
-typedef int    team_id;
-typedef int    sem_id;
-typedef int    port_id;
-typedef int    image_id;
+typedef int32  thread_id;
+typedef int32  region_id;
+typedef int32  aspace_id;
+typedef int32  team_id;
+typedef int32  sem_id;
+typedef int32  port_id;
+typedef int32  image_id;
 typedef uint32 dev_t;
 typedef uint64 ino_t;
 typedef uint64 vnode_id;
@@ -27,27 +28,11 @@ typedef uint32 fs_id;
 typedef uint16 nlink_t;
 typedef uint32 uid_t;
 typedef uint32 gid_t;
-typedef int32 status_t;
+//typedef int32 status_t;
 
-
-#ifdef  _OBOS_TIME_T_
-typedef _OBOS_TIME_T_     time_t;
-#undef  _OBOS_TIME_T_
-#endif /* _OBOS_TIME_T_ */
-
-typedef int64 bigtime_t;
 
 #ifndef NULL
 #define NULL 0
-#endif
-
-#ifndef __cplusplus
-
-#define false 0
-#define true 1
-
-typedef int bool;
-
 #endif
 
 /*
@@ -72,10 +57,12 @@ typedef unsigned short          u_short;
 typedef unsigned int            u_int;
 typedef unsigned long           u_long;
 
-typedef unsigned char           uchar;
-typedef unsigned short          ushort; 
-typedef unsigned int            uint;
-typedef unsigned long           ulong;
+//typedef unsigned char           uchar;
+//typedef unsigned short          ushort; 
+//typedef unsigned int            uint;
+//typedef unsigned long           ulong;
+
+typedef unsigned long			addr;
 
 // Handled in arch_ktypes.h
 

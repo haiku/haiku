@@ -13,8 +13,8 @@
   typedef __int64             int64;
 #endif
 
-typedef unsigned int      uint32;
-typedef int                int32;
+typedef unsigned long     uint32;
+typedef long               int32;
 typedef unsigned short    uint16;
 typedef short              int16;
 typedef unsigned char      uint8;

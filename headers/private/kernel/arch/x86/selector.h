@@ -5,8 +5,6 @@
 #ifndef _KERNEL_ARCH_x86_SELECTOR_H
 #define _KERNEL_ARCH_x86_SELECTOR_H
 
-#include <arch/x86/types.h>
-
 typedef uint32 selector_id;
 typedef uint64 selector_type;
 

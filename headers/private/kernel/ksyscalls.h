@@ -3,7 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <types.h>
+#include <sys/types.h>
 #ifndef _KERNEL_SYSCALLS_H
 #define _KERNEL_SYSCALLS_H
 

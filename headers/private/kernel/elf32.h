@@ -5,7 +5,7 @@
 #ifndef _ELF32_H
 #define _ELF32_H
 
-#include <types.h>
+#include <ktypes.h>
 
 typedef uint32 Elf32_Addr;
 typedef uint16 Elf32_Half;
