@@ -666,6 +666,7 @@ create_team_struct(const char *name, bool kernel)
 	vm_put_aspace(team->kaspace);
 	team->thread_list = NULL;
 	team->main_thread = NULL;
+	team->loading_info = NULL;
 	team->state = TEAM_STATE_BIRTH;
 	team->pending_signals = 0;
 	team->death_sem = -1;
@@ -782,6 +783,30 @@ team_delete_team(struct team *team)
 			send_signal_etc(temp_thread->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 			temp_thread = next;
 		}
+
+		// If someone is waiting for this team to be loaded, but it dies
+		// unexpectedly before being done, we need to notify the waiting
+		// thread now.
+		if (team->loading_info) {
+			// there's indeed someone waiting
+			struct team_loading_info *loadingInfo = team->loading_info;
+			team->loading_info = NULL;
+
+			loadingInfo->result = B_ERROR;
+			loadingInfo->done = true;
+
+			GRAB_THREAD_LOCK();
+
+			// wake up the waiting thread
+			if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
+				loadingInfo->thread->state = B_THREAD_READY;
+				loadingInfo->thread->next_state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(loadingInfo->thread);
+			}
+
+			RELEASE_THREAD_LOCK();
+		}
+
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 
@@ -978,7 +1003,8 @@ team_create_thread_start(void *args)
  */
 
 static thread_id
-load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 priority)
+load_image_etc(int32 argCount, char **args, int32 envCount, char **env,
+	int32 priority, uint32 flags)
 {
 	struct process_group *group;
 	struct team *team, *parent;
@@ -987,6 +1013,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 	int err;
 	cpu_status state;
 	struct team_arg *teamArgs;
+	struct team_loading_info loadingInfo;
 
 	if (args == NULL || argCount == 0)
 		return B_BAD_VALUE;
@@ -999,6 +1026,13 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 		return B_NO_MEMORY;
 
 	parent = thread_get_current_thread()->team;
+
+	if (flags & B_WAIT_TILL_LOADED) {
+		loadingInfo.thread = thread_get_current_thread();
+		loadingInfo.result = B_ERROR;
+		loadingInfo.done = false;
+		team->loading_info = &loadingInfo;
+	}
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -1046,6 +1080,42 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 		err = thread;
 		goto err4;
 	}
+
+	// wait for the loader of the new team to finish its work
+	if (flags & B_WAIT_TILL_LOADED) {
+		struct thread *mainThread;
+
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		mainThread = thread_get_thread_struct_locked(thread);
+		if (mainThread) {
+			// resume the team's main thread
+			if (mainThread->state == B_THREAD_SUSPENDED) {
+				mainThread->state = mainThread->next_state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(mainThread);
+			}
+
+			// Now suspend ourselves until loading is finished.
+			// We will be woken either be the thread, when it finished or
+			// aborted loading, or when the team is going to die (e.g. is
+			// killed). In either case the one setting `loadingInfo.done' is
+			// responsible for removing the info from the team structure.
+			while (!loadingInfo.done) {
+				thread_get_current_thread()->next_state = B_THREAD_SUSPENDED;
+				scheduler_reschedule();
+			}
+		} else {
+			// Impressive! Someone managed to kill the thread in this short
+			// time.
+		}
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		if (loadingInfo.result < B_OK)
+			return loadingInfo.result;
+	}	
 
 	// notify the debugger
 	user_debug_team_created(team->id);
@@ -1549,7 +1619,8 @@ load_image(int32 argCount, const char **args, const char **env)
 		return B_NO_MEMORY;
 	}
 
-	return load_image_etc(argCount, argsCopy, envCount, envCopy, B_NORMAL_PRIORITY);
+	return load_image_etc(argCount, argsCopy, envCount, envCopy,
+		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED);
 }
 
 
@@ -2125,7 +2196,7 @@ _user_wait_for_team(team_id id, status_t *_userReturnCode)
 
 team_id
 _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
-	const char **userEnv, int32 priority)
+	const char **userEnv, int32 priority, uint32 flags)
 {
 	char **args = NULL;
 	char **env = NULL;
@@ -2144,7 +2215,7 @@ _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 		return B_BAD_ADDRESS;
 	}
 
-	return load_image_etc(argCount, args, envCount, env, priority);
+	return load_image_etc(argCount, args, envCount, env, priority, flags);
 }
 
 
