@@ -12,3 +12,6 @@ if $(COMPILE_FOR_R5) {
         LinkSharedOSLibs <input>mouse : <boot!home!config!lib>libopenbeos.so ;
 }
 
+Package haiku-inputkit-cvs :
+        <input>mouse :
+        boot home config add-ons input_server devices ;

@@ -68,3 +68,7 @@ if $(COMPILE_FOR_R5) {
 SEARCH on [ FGristFiles AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;
+
+Package haiku-inputkit-cvs :
+        input_server :
+        boot beos system servers ;

@@ -15,3 +15,12 @@ R5KernelAddon hid : kernel drivers bin :
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : hid ;
 }
+
+Package haiku-inputkit-cvs :
+        hid :
+        boot home config add-ons kernel drivers bin ;
+
+Package haiku-inputkit-cvs :
+        <kernel!drivers!dev!input>hid :
+        boot home config add-ons kernel drivers dev input ;
+
