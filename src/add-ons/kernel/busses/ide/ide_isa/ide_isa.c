@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	IDE ISA controller driver
@@ -10,6 +10,7 @@
 	the IDE PCI controller driver, but at least under Bochs, there's not
 	much choice as PCI support is very limited there.
 */
+
 
 #include <KernelExport.h>
 #include <stdlib.h>
@@ -20,13 +21,14 @@
 #include <device_manager.h>
 #include <blkman.h>
 
-#define debug_level_flow 4
-#define debug_level_error 4
-#define debug_level_info 4
+#define debug_level_flow 0
+#define debug_level_error 1
+#define debug_level_info 2
 
 #define DEBUG_MSG_PREFIX "IDE ISA -- "
 
 #include "wrapper.h"
+
 
 #define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/"ISA_DEVICE_TYPE_NAME
 
@@ -64,18 +66,18 @@ write_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask 
 	int i;
 	uint16 ioaddr = channel->command_block_base;
 	
-	if( channel->lost )
+	if (channel->lost)
 		return B_ERROR;
 
-	for( i = 0; i < 7; i++ ) {
-		if( ((1 << (i-7)) & mask) != 0 ) {
-			SHOW_FLOW( 3, "%x->HI(%x)", tf->raw.r[i + 7], i );
-			channel->isa->write_io_8( ioaddr + 1 + i, tf->raw.r[i + 7] );
+	for (i = 0; i < 7; i++) {
+		if (((1 << (i-7)) & mask) != 0) {
+			SHOW_FLOW(3, "%x->HI(%x)", tf->raw.r[i + 7], i);
+			channel->isa->write_io_8(ioaddr + 1 + i, tf->raw.r[i + 7]);
 		}
-		
-		if( ((1 << i) & mask) != 0 ) {
-			SHOW_FLOW( 3, "%x->LO(%x)", tf->raw.r[i], i );
-			channel->isa->write_io_8( ioaddr + 1 + i, tf->raw.r[i] );
+
+		if (((1 << i) & mask) != 0 ) {
+			SHOW_FLOW(3, "%x->LO(%x)", tf->raw.r[i], i);
+			channel->isa->write_io_8(ioaddr + 1 + i, tf->raw.r[i]);
 		}
 	}
 	
@@ -89,13 +91,13 @@ read_command_block_regs(channel_info *channel, ide_task_file *tf, ide_reg_mask m
 	int i;
 	uint16 ioaddr = channel->command_block_base;
 
-	if( channel->lost )
+	if (channel->lost)
 		return B_ERROR;
 
-	for( i = 0; i < 7; i++ ) {
-		if( ((1 << i) & mask) != 0 ) {
-			tf->raw.r[i] = channel->isa->read_io_8( ioaddr + 1 + i );
-			SHOW_FLOW( 3, "%x: %x", i, (int)tf->raw.r[i] );
+	for (i = 0; i < 7; i++) {
+		if (((1 << i) & mask) != 0) {
+			tf->raw.r[i] = channel->isa->read_io_8(ioaddr + 1 + i);
+			SHOW_FLOW(3, "%x: %x", i, (int)tf->raw.r[i]);
 		}
 	}
 	
@@ -120,7 +122,7 @@ write_device_control(channel_info *channel, uint8 val)
 {
 	uint16 device_control_addr = channel->control_block_base;
 
-	SHOW_FLOW( 3, "%x", (int)val );
+	SHOW_FLOW(3, "%x", (int)val);
 
 	if (channel->lost)
 		return B_ERROR;
@@ -135,25 +137,24 @@ static status_t
 write_pio_16(channel_info *channel, uint16 *data, int count, bool force_16bit)
 {
 	uint16 ioaddr = channel->command_block_base;
-	
-	if( channel->lost )
+
+	if (channel->lost)
 		return B_ERROR;
 
 	// Bochs doesn't support 32 bit accesses; 
 	// no real performance impact as this driver is for Bochs only anyway
 	force_16bit = true;
 
-	if( (count & 1) != 0 || force_16bit ) {
-		for( ; count > 0; --count )
-			channel->isa->write_io_16( ioaddr, *(data++) );
-			
+	if ((count & 1) != 0 || force_16bit) {
+		for (; count > 0; --count)
+			channel->isa->write_io_16(ioaddr, *(data++));
 	} else {
 		uint32 *cur_data = (uint32 *)data;
-		
-		for( ; count > 0; count -= 2 )
-			channel->isa->write_io_32( ioaddr, *(cur_data++) );
+
+		for (; count > 0; count -= 2)
+			channel->isa->write_io_32(ioaddr, *(cur_data++));
 	}
-	
+
 	return B_OK;
 }
 
@@ -162,23 +163,22 @@ static status_t
 read_pio_16(channel_info *channel, uint16 *data, int count, bool force_16bit)
 {
 	uint16 ioaddr = channel->command_block_base;
-	
-	if( channel->lost )
+
+	if (channel->lost)
 		return B_ERROR;
 
 	force_16bit = true;
 
-	if( (count & 1) != 0 || force_16bit ) {
-		for( ; count > 0; --count )
-			*(data++) = channel->isa->read_io_16( ioaddr  );
-			
+	if ((count & 1) != 0 || force_16bit) {
+		for (; count > 0; --count)
+			*(data++) = channel->isa->read_io_16(ioaddr);
 	} else {
 		uint32 *cur_data = (uint32 *)data;
-		
-		for( ; count > 0; count -= 2 )
-			*(cur_data++) = channel->isa->read_io_32( ioaddr );
+
+		for (; count > 0; count -= 2)
+			*(cur_data++) = channel->isa->read_io_32(ioaddr);
 	}
-	
+
 	return B_OK;
 }
 
@@ -189,7 +189,7 @@ inthand(void *arg)
 	channel_info *channel = (channel_info *)arg;
 	uint8 status;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	if (channel->lost)
 		return B_UNHANDLED_INTERRUPT;
@@ -335,7 +335,7 @@ publish_channel(pnp_node_handle parent, io_resource_handle *resources, uint16 co
 	};
 	pnp_node_handle node;
 
-	SHOW_FLOW0( 2, "" );
+	SHOW_FLOW0(2, "");
 
 	return pnp->register_device(parent, attrs, resources, &node);
 }
@@ -425,27 +425,27 @@ ide_controller_interface isa_controller_interface = {
 			std_ops
 		},
 
-		(status_t (*)( pnp_node_handle, void *, void ** ))	init_channel,
-		(status_t (*)( void * ))						uninit_channel,
+		(status_t (*)(pnp_node_handle, void *, void **))	init_channel,
+		(status_t (*)(void *))								uninit_channel,
 		scan_parent,
-		(void (*)( pnp_node_handle, void * ))			channel_removed
+		(void (*)(pnp_node_handle, void *))					channel_removed
 	},
 
 	(status_t (*)(ide_channel_cookie,
-		ide_task_file*,ide_reg_mask))					&write_command_block_regs,
+		ide_task_file*, ide_reg_mask))						&write_command_block_regs,
 	(status_t (*)(ide_channel_cookie,
-		ide_task_file*,ide_reg_mask))					&read_command_block_regs,
+		ide_task_file*, ide_reg_mask))						&read_command_block_regs,
 	
-	(uint8 (*)(ide_channel_cookie))						&get_altstatus,
-	(status_t (*)(ide_channel_cookie,uint8))			&write_device_control,
+	(uint8 (*)(ide_channel_cookie))							&get_altstatus,
+	(status_t (*)(ide_channel_cookie, uint8))				&write_device_control,
 
-	(status_t (*)(ide_channel_cookie,uint16*,int,bool))	&write_pio_16,
-	(status_t (*)(ide_channel_cookie,uint16*,int,bool))	&read_pio_16,
+	(status_t (*)(ide_channel_cookie, uint16*, int, bool))	&write_pio_16,
+	(status_t (*)(ide_channel_cookie, uint16*, int, bool))	&read_pio_16,
 
 	(status_t (*)(ide_channel_cookie,
-		const physical_entry *,size_t,bool))			&prepare_dma,
-	(status_t (*)(ide_channel_cookie))					&start_dma,
-	(status_t (*)(ide_channel_cookie))					&finish_dma,
+		const physical_entry *, size_t, bool))				&prepare_dma,
+	(status_t (*)(ide_channel_cookie))						&start_dma,
+	(status_t (*)(ide_channel_cookie))						&finish_dma,
 };
 
 #if !_BUILDING_kernel && !BOOT
