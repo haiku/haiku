@@ -120,7 +120,14 @@ WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 	TRACE(" framecount %Ld\n", data->framecount);
 	TRACE(" duration %Ld\n", data->duration);
 
-	memset(&data->format, 0, sizeof(data->format));
+//	BMediaFormats formats;
+	media_format_description description;
+	description.family = B_BEOS_FORMAT_FAMILY;
+	description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
+//	formats.GetFormatFor(description, &data->format);
+	
+	_get_format_for_description(&data->format, description);
+
 	data->format.type = B_MEDIA_RAW_AUDIO;
 	data->format.u.raw_audio.frame_rate = data->fps;
 	data->format.u.raw_audio.channel_count = B_LENDIAN_TO_HOST_INT16(fRawHeader.common.channels);

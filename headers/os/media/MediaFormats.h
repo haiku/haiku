@@ -66,6 +66,10 @@ typedef struct {
 	uint8 data[16];
 } GUID;
 
+enum beos_format {
+	B_BEOS_FORMAT_RAW_AUDIO = 'rawa',
+	B_BEOS_FORMAT_RAW_VIDEO = 'rawv'
+};
 typedef struct {
 	int32 format;
 } media_beos_description;
@@ -146,19 +150,15 @@ typedef struct _media_format_description {
 	} u;
 } media_format_description;
 
-
 #if defined(__cplusplus)
 
-namespace BPrivate {
-	class addon_list;
-	void dec_load_hook(void *arg, image_id imgid);
-	void extractor_load_hook(void *arg, image_id imgid);
-	class Extractor;
-}
+// temporary functionality, will go away...
+status_t _get_format_for_description(media_format *out_format, const media_format_description &in_desc);
+status_t _get_meta_description_for_format(media_format_description *out_desc, const media_format &in_format);
 
 class BMediaFormats {
 public:
-		BMediaFormats();
+			BMediaFormats();
 virtual		~BMediaFormats();
 
 		status_t InitCheck();
@@ -213,41 +213,9 @@ virtual		~BMediaFormats();
 				const media_format & in_format,
 				media_format * out_format);
 private:
-		friend class BPrivate::addon_list;
-		friend void BPrivate::dec_load_hook(void *arg, image_id imgid);
-		friend void BPrivate::extractor_load_hook(void * arg, image_id imgid);
-		friend class BMediaDecoder;
-		friend class BMediaTrack;
-		friend class BPrivate::Extractor;
-
-		char _reserved_messenger[24];	//	sizeof(BMessenger) 24
-		char _reserved_list[28];		//	sizeof(BList) 28
-		char _reserved_locker[32];		//	sizeof(BLocker) 36
-		int32 m_lock_count;
-static	int32 s_cleared;
-static	BMessenger s_server;
-static	BList s_formats;
-static	BLocker s_lock;
-		int32 m_index;
-
-		void clear_formats();
-static	void ex_clear_formats_imp();
-static	void clear_formats_imp();
-		status_t get_formats();
-static	status_t get_formats_imp();
-static	BMessenger & get_server();
-
-static	status_t bind_addon(
-				const char * addon,
-				const media_format * formats,
-				int32 count);
-static	bool is_bound(
-				const char * addon,
-				const media_format * formats,
-				int32 count);
-static	status_t find_addons(
-				const media_format * format,
-				BPrivate::addon_list & addons);
+		BLocker *	fLocker;
+		int32		fIndex;
+		uint32		_reserved[21];
 };
 
 _IMPEXP_MEDIA bool operator==(const media_format_description & a, const media_format_description & b);

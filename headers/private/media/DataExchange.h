@@ -6,7 +6,7 @@
 #ifndef _DATA_EXCHANGE_H
 #define _DATA_EXCHANGE_H
 
-#include <MediaDefs.h>
+#include <MediaFormats.h>
 #include <MediaNode.h>
 #include <MediaAddOn.h>
 #include <Messenger.h>
@@ -105,6 +105,8 @@ enum {
 	SERVER_SETREFFOR,
 	SERVER_REMOVEREFFOR,
 	SERVER_REMOVEITEM,
+	SERVER_GET_FORMAT_FOR_DESCRIPTION,
+	SERVER_GET_META_DESCRIPTION_FOR_FORMAT,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -874,6 +876,26 @@ struct server_removeitem_request : public request_data
 
 struct server_removeitem_reply : public reply_data
 {
+};
+
+struct server_get_format_for_description_request : public request_data
+{
+	media_format_description description;
+};
+
+struct server_get_format_for_description_reply : public reply_data
+{
+	media_format format;
+};
+
+struct server_get_meta_description_for_format_request : public request_data
+{
+	media_format format;
+};
+
+struct server_get_meta_description_for_format_reply : public reply_data
+{
+	media_format_description description;
 };
 
 struct node_request_completed_command : public command_data

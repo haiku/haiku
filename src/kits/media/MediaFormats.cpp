@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <MediaFormats.h>
 #include <string.h>
+#include "DataExchange.h"
 #include "debug.h"
 
 /*************************************************************
@@ -75,53 +76,24 @@ _media_format_description::operator=(const _media_format_description & other)
 }
 
 /*************************************************************
- * 
- *************************************************************/
-
-
-namespace BPrivate {
-
-class addon_list
-{
-};
-
-	
-void dec_load_hook(void *arg, image_id imgid)
-{
-	UNIMPLEMENTED();
-};
-
-void extractor_load_hook(void *arg, image_id imgid)
-{
-	UNIMPLEMENTED();
-};
-
-class Extractor
-{
-};
-
-}
-
-/*************************************************************
  * public BMediaFormats
  *************************************************************/
 
 BMediaFormats::BMediaFormats()
+ :	fLocker(new BLocker("some BMediaFormats locker")),
+	fIndex(0)	
 {
-	UNIMPLEMENTED();
 }
 
 /* virtual */
 BMediaFormats::~BMediaFormats()
 {
-	UNIMPLEMENTED();
+	delete fLocker;
 }
 
 status_t 
 BMediaFormats::InitCheck()
 {
-	UNIMPLEMENTED();
-
 	return B_OK;
 }
 
@@ -132,7 +104,10 @@ BMediaFormats::MakeFormatFor(const media_format_description * descs,
 							 uint32 flags,
 							 void * _reserved)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (descs == 0 || desc_count < 1 || io_format == 0)
+		return B_BAD_VALUE;
+		
 	return B_ERROR;
 }
 
@@ -141,8 +116,9 @@ status_t
 BMediaFormats::GetFormatFor(const media_format_description & desc,
 							media_format * out_format)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	// set to wildcard, as MakeFormatFor wants an in/out format...
+	memset(out_format, 0, sizeof(*out_format));
+	return MakeFormatFor(&desc, 1, out_format);
 }
 
 
@@ -151,7 +127,12 @@ BMediaFormats::GetBeOSFormatFor(uint32 fourcc,
 								media_format * out_format,
 								media_type type)
 {
-	UNIMPLEMENTED();
+	media_format_description mfd;
+	mfd.family = B_BEOS_FORMAT_FAMILY;
+	mfd.u.beos.format = fourcc;
+	memset(out_format, 0, sizeof(*out_format));
+	out_format->type = type;
+//	return MakeFormatFor(&mfd, 1, out_format);
 	return B_ERROR;
 }
 
@@ -161,7 +142,12 @@ BMediaFormats::GetAVIFormatFor(uint32 fourcc,
 							   media_format * out_format,
 							   media_type type)
 {
-	UNIMPLEMENTED();
+	media_format_description mfd;
+	mfd.family = B_AVI_FORMAT_FAMILY;
+	mfd.u.avi.codec = fourcc;
+	memset(out_format, 0, sizeof(*out_format));
+	out_format->type = type;
+//	return MakeFormatFor(&mfd, 1, out_format);
 	return B_ERROR;
 }
 
@@ -172,7 +158,13 @@ BMediaFormats::GetQuicktimeFormatFor(uint32 vendor,
 									 media_format * out_format,
 									 media_type type)
 {
-	UNIMPLEMENTED();
+	media_format_description mfd;
+	mfd.family = B_QUICKTIME_FORMAT_FAMILY;
+	mfd.u.quicktime.codec = fourcc;
+	mfd.u.quicktime.vendor = vendor;
+	memset(out_format, 0, sizeof(*out_format));
+	out_format->type = type;
+//	return MakeFormatFor(&mfd, 1, out_format);
 	return B_ERROR;
 }
 
@@ -190,8 +182,10 @@ BMediaFormats::GetCodeFor(const media_format & format,
 status_t 
 BMediaFormats::RewindFormats()
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	if (!fLocker->IsLocked())
+		return B_NOT_ALLOWED;
+	fIndex = 0;
+	return B_OK;
 }
 
 
@@ -199,6 +193,9 @@ status_t
 BMediaFormats::GetNextFormat(media_format * out_format,
 							 media_format_description * out_description)
 {
+	if (!fLocker->IsLocked())
+		return B_NOT_ALLOWED;
+		
 	UNIMPLEMENTED();
 	return B_ERROR;
 }
@@ -207,14 +204,13 @@ BMediaFormats::GetNextFormat(media_format * out_format,
 bool
 BMediaFormats::Lock()
 {
-	UNIMPLEMENTED();
-	return true;
+	return fLocker->Lock();
 }
 
 void 
 BMediaFormats::Unlock()
 {
-	UNIMPLEMENTED();
+	fLocker->Unlock();
 }
 
 /* --- begin deprecated API --- */
@@ -223,92 +219,9 @@ BMediaFormats::MakeFormatFor(const media_format_description & desc,
 							 const media_format & in_format,
 							  media_format * out_format)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	*out_format = in_format;
+	return MakeFormatFor(&desc, 1, out_format);
 }
-
-/*************************************************************
- * private BMediaFormats
- *************************************************************/
-
-void 
-BMediaFormats::clear_formats()
-{
-	UNIMPLEMENTED();
-}
-
-/* static */ void 
-BMediaFormats::ex_clear_formats_imp()
-{
-	UNIMPLEMENTED();
-}
-
-/* static */ void 
-BMediaFormats::clear_formats_imp()
-{
-	UNIMPLEMENTED();
-}
-
-status_t 
-BMediaFormats::get_formats()
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-/* static */ status_t 
-BMediaFormats::get_formats_imp()
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-/* static */ BMessenger & 
-BMediaFormats::get_server()
-{
-	UNIMPLEMENTED();
-	static BMessenger dummy;
-	return dummy;
-}
-
-/* static */ status_t 
-BMediaFormats::bind_addon(
-				const char * addon,
-				const media_format * formats,
-				int32 count)
-{
-	UNIMPLEMENTED();
-	return B_OK;
-}
-				
-/* static */ bool 
-BMediaFormats::is_bound(
-				const char * addon,
-				const media_format * formats,
-				int32 count)
-{
-	UNIMPLEMENTED();
-	return false;
-}
-				
-
-/* static */ status_t 
-BMediaFormats::find_addons(
-				const media_format * format,
-				BPrivate::addon_list & addons)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-/*************************************************************
- * static BMediaFormats variables
- *************************************************************/
-
-int32 BMediaFormats::s_cleared;
-BMessenger BMediaFormats::s_server;
-BList BMediaFormats::s_formats;
-BLocker BMediaFormats::s_lock("BMediaFormats locker");
 
 /*************************************************************
  * 
@@ -384,3 +297,32 @@ bool operator<(const GUID & a, const GUID & b)
 	return memcmp(&a, &b, sizeof(a)) < 0;
 }
 
+status_t
+_get_format_for_description(media_format *out_format, const media_format_description &in_desc)
+{
+	server_get_format_for_description_request request;
+	server_get_format_for_description_reply reply;
+	
+	request.description = in_desc;
+	
+	if (B_OK != QueryServer(SERVER_GET_FORMAT_FOR_DESCRIPTION, &request, sizeof(request), &reply, sizeof(reply)))
+		return B_ERROR;
+		
+	*out_format = reply.format;
+	return B_OK;
+}
+
+status_t
+_get_meta_description_for_format(media_format_description *out_desc, const media_format &in_format)
+{
+	server_get_meta_description_for_format_request request;
+	server_get_meta_description_for_format_reply reply;
+	
+	request.format = in_format;
+	
+	if (B_OK != QueryServer(SERVER_GET_META_DESCRIPTION_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply)))
+		return B_ERROR;
+		
+	*out_desc = reply.description;
+	return B_OK;
+}
