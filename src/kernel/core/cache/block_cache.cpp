@@ -126,6 +126,9 @@ class BenaphoreLocker {
 };
 
 
+static status_t write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true);
+
+
 //	private transaction functions
 
 
@@ -199,6 +202,9 @@ free_cached_block(cached_block *block)
 {
 	free(block->data);
 	free(block->original);
+#ifdef DEBUG_CHANGED
+	free(block->compare);
+#endif
 	free(block);
 }
 
@@ -224,6 +230,7 @@ new_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 	block->transaction_next = NULL;
 	block->transaction = block->previous_transaction = NULL;
 	block->original = NULL;
+	block->is_dirty = false;
 #ifdef DEBUG_CHANGED
 	block->compare = NULL;
 #endif
@@ -234,12 +241,62 @@ new_cached_block(block_cache *cache, off_t blockNumber, bool cleared = false)
 }
 
 
+#ifdef DEBUG_CHANGED
+
+#define DUMPED_BLOCK_SIZE 16
+
+void
+dumpBlock(const char *buffer, int size, const char *prefix)
+{
+	int i;
+	
+	for (i = 0; i < size;) {
+		int start = i;
+
+		dprintf(prefix);
+		for (; i < start+DUMPED_BLOCK_SIZE; i++) {
+			if (!(i % 4))
+				dprintf(" ");
+
+			if (i >= size)
+				dprintf("  ");
+			else
+				dprintf("%02x", *(unsigned char *)(buffer + i));
+		}
+		dprintf("  ");
+
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
+			if (i < size) {
+				char c = buffer[i];
+
+				if (c < 30)
+					dprintf(".");
+				else
+					dprintf("%c", c);
+			} else
+				break;
+		}
+		dprintf("\n");
+	}
+}
+#endif
+
+
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
 #ifdef DEBUG_CHANGED
-	if (!block->is_dirty && block->compare != NULL && memcmp(block->data, block->compare, cache->block_size))
+	if (!block->is_dirty && block->compare != NULL && memcmp(block->data, block->compare, cache->block_size)) {
+		dprintf("new block:\n");
+		dumpBlock((const char *)block->data, 256, "  ");
+		dprintf("unchanged block:\n");
+		dumpBlock((const char *)block->compare, 256, "  ");
+		write_cached_block(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
+
+		free(block->compare);
+		block->compare = NULL;
+	}
 #endif
 
 	block->lock--;
@@ -298,6 +355,8 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 	int32 transactionID, bool cleared)
 {
 	BenaphoreLocker locker(cache);
+
+	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n", blockNumber, transactionID));
 
 	cached_block *block = get_cached_block(cache, blockNumber, cleared);
 	if (block == NULL)
@@ -376,7 +435,7 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base, off
 }
 
 
-status_t
+static status_t
 write_cached_block(block_cache *cache, cached_block *block, bool deleteTransaction = true)
 {
 	cache_transaction *previous = block->previous_transaction;
@@ -415,7 +474,7 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 
 
 extern "C" int32
-cache_transaction_start(void *_cache, transaction_notification_hook hook, void *data)
+cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
 
@@ -426,8 +485,8 @@ cache_transaction_start(void *_cache, transaction_notification_hook hook, void *
 	transaction->id = atomic_add(&cache->next_transaction_id, 1);
 	transaction->num_blocks = 0;
 	transaction->first_block = NULL;
-	transaction->notification_hook = hook;
-	transaction->notification_data = data;
+	transaction->notification_hook = NULL;
+	transaction->notification_data = NULL;
 	transaction->open = true;
 
 	TRACE(("cache_transaction_start(): id %ld started\n", transaction->id));
@@ -440,7 +499,7 @@ cache_transaction_start(void *_cache, transaction_notification_hook hook, void *
 
 
 extern "C" status_t
-cache_transaction_sync(void *_cache, int32 id)
+cache_sync_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(cache);
@@ -470,7 +529,7 @@ cache_transaction_sync(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_transaction_end(void *_cache, int32 id)
+cache_end_transaction(void *_cache, int32 id, transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(cache);
@@ -482,6 +541,9 @@ cache_transaction_end(void *_cache, int32 id)
 		panic("cache_transaction_end(): invalid transaction ID\n");
 		return B_BAD_VALUE;
 	}
+
+	transaction->notification_hook = hook;
+	transaction->notification_data = data;
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -514,7 +576,7 @@ cache_transaction_end(void *_cache, int32 id)
 
 
 extern "C" status_t
-cache_transaction_abort(void *_cache, int32 id)
+cache_abort_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(cache);
@@ -523,8 +585,29 @@ cache_transaction_abort(void *_cache, int32 id)
 }
 
 
+extern "C" int32
+cache_detach_sub_transaction(void *_cache, int32 id)
+{
+	return B_ERROR;
+}
+
+
 extern "C" status_t
-cache_transaction_next_block(void *_cache, int32 id, uint32 *_cookie, off_t *_blockNumber,
+cache_abort_sub_transaction(void *_cache, int32 id)
+{
+	return B_ERROR;
+}
+
+
+extern "C" status_t
+cache_start_sub_transaction(void *_cache, int32 id)
+{
+	return B_ERROR;
+}
+
+
+extern "C" status_t
+cache_next_block_in_transaction(void *_cache, int32 id, uint32 *_cookie, off_t *_blockNumber,
 	void **_data, void **_unchangedData)
 {
 	cached_block *block = (cached_block *)*_cookie;
@@ -707,11 +790,10 @@ block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 		return NULL;
 
 #ifdef DEBUG_CHANGED
-	if (block->compare == NULL) {
+	if (block->compare == NULL)
 		block->compare = malloc(cache->block_size);
-		if (block->compare != NULL)
-			memcpy(block->compare, block->data, cache->block_size);
-	}
+	if (block->compare != NULL)
+		memcpy(block->compare, block->data, cache->block_size);
 #endif
 	return block->data;
 }
@@ -743,231 +825,5 @@ block_cache_put(void *_cache, off_t blockNumber)
 	BenaphoreLocker locker(cache);
 
 	put_cached_block(cache, blockNumber);
-}
-
-
-//	#pragma mark -
-//	private BeOS compatible interface (to be removed)
-
-
-void
-put_cache_entry(int fd, cached_block *entry)
-{
-	if (entry == NULL)
-		return;
-
-	if (--entry->ref_count > 0)
-		return;
-
-	hash_remove(sCaches[fd].hash, entry);
-	free(entry->data);
-	free(entry);
-}
-
-
-cached_block *
-new_cache_entry(int fd, off_t blockNumber, size_t blockSize)
-{
-	cached_block *entry = (cached_block *)malloc(sizeof(cached_block));
-	if (entry == NULL)
-		return NULL;
-
-	entry->data = malloc(blockSize);
-	if (entry->data == NULL) {
-		free(entry);
-		return NULL;
-	}
-
-	sCaches[fd].block_size = blockSize;
-		// store block size (once would be sufficient, though)
-
-	entry->block_number = blockNumber;
-	entry->ref_count = 1;
-	entry->lock = 0;
-
-	hash_insert(sCaches[fd].hash, entry);
-
-	return entry;
-}
-
-
-static cached_block *
-lookup_cache_entry(int fd, off_t blockNumber)
-{
-	cached_block *entry = (cached_block *)hash_lookup(sCaches[fd].hash, &blockNumber);
-	if (entry == NULL)
-		return NULL;
-
-	entry->ref_count++;
-	return entry;
-}
-
-
-//	#pragma mark -
-//	public BeOS compatible read-only interface (to be removed)
-
-
-extern "C" void
-force_cache_flush(int dev, int prefer_log_blocks)
-{
-}
-
-
-extern "C" int
-flush_blocks(int dev, off_t bnum, int nblocks)
-{
-	return 0;
-}
-
-
-extern "C" int
-flush_device(int dev, int warn_locked)
-{
-	return 0;
-}
-
-
-extern "C" int
-init_cache_for_device(int fd, off_t max_blocks)
-{
-	if (fd < 0 || fd >= kNumCaches)
-		return B_ERROR;
-	if (sCaches[fd].hash != NULL)
-		return B_BUSY;
-
-	sCaches[fd].hash = hash_init(32, 0, &cached_block_compare, &cached_block_hash);
-	return benaphore_init(&sCaches[fd].lock, "block cache");
-}
-
-
-extern "C" int
-remove_cached_device_blocks(int fd, int allowWrite)
-{
-	if (fd < 0 || fd >= kNumCaches || sCaches[fd].hash == NULL)
-		return B_ERROR;
-
-	hash_table *hash = sCaches[fd].hash;
-
-	uint32 cookie = 0;
-	cached_block *block;
-	while ((block = (cached_block *)hash_remove_first(hash, &cookie)) != NULL) {
-		free_cached_block(block);
-	}
-
-	hash_uninit(hash);
-	benaphore_destroy(&sCaches[fd].lock);
-
-	return B_OK;
-}
-
-
-extern "C" void *
-get_block(int fd, off_t blockNumber, int blockSize)
-{
-	BenaphoreLocker locker(fd);
-	if (locker.InitCheck() != B_OK)
-		return NULL;
-
-	cached_block *entry = lookup_cache_entry(fd, blockNumber);
-	if (entry == NULL) {
-		// read entry into cache
-		entry = new_cache_entry(fd, blockNumber, blockSize);
-		if (entry == NULL)
-			return NULL;
-
-		if (read_pos(fd, blockNumber * blockSize, entry->data, blockSize) < blockSize) {
-			free(entry->data);
-			free(entry);
-			return NULL;
-		}
-	}
-
-	entry->lock++;
-
-	return entry->data;
-}
-
-
-extern "C" void *
-get_empty_block(int fd, off_t blockNumber, int blockSize)
-{
-	BenaphoreLocker locker(fd);
-	if (locker.InitCheck() != B_OK)
-		return NULL;
-
-	cached_block *entry = lookup_cache_entry(fd, blockNumber);
-	if (entry == NULL) {
-		// create new cache entry
-		entry = new_cache_entry(fd, blockNumber, blockSize);
-		if (entry == NULL)
-			return NULL;
-	}
-	memset(entry->data, 0, blockSize);
-
-	entry->lock++;
-
-	return entry->data;
-}
-
-
-extern "C" int
-release_block(int fd, off_t blockNumber)
-{
-	BenaphoreLocker locker(fd);
-	if (locker.InitCheck() != B_OK)
-		return B_ERROR;
-
-	cached_block *entry = lookup_cache_entry(fd, blockNumber);
-	if (entry == NULL)
-		panic("release_block() called on block %Ld that was not cached\n", blockNumber);
-
-	entry->lock--;
-	put_cache_entry(fd, entry);
-	return 0;
-}
-
-
-extern "C" int
-mark_blocks_dirty(int fd, off_t blockNumber, int numBlocks)
-{
-	return -1;
-}
-
-
-extern "C" int
-cached_read(int fd, off_t blockNumber, void *data, off_t numBlocks, int blockSize)
-{
-	BenaphoreLocker locker(fd);
-	if (locker.InitCheck() != B_OK)
-		return B_ERROR;
-
-	ssize_t bytes = numBlocks * blockSize;
-	if (read_pos(fd, blockNumber * blockSize, data, bytes) < bytes)
-		return -1;
-
-	return 0;
-}
-
-
-extern "C" int
-cached_write(int fd, off_t blockNumber, const void *data, off_t numBlocks, int blockSize)
-{
-	return -1;
-}
-
-
-extern "C" int
-cached_write_locked(int fd, off_t blockNumber, const void *data, off_t numBlocks, int blockSize)
-{
-	return -1;
-}
-
-
-extern "C" int
-set_blocks_info(int fd, off_t *blocks, int numBlocks,
-	void (*func)(off_t bnum, size_t nblocks, void *arg),
-	void *arg)
-{
-	return -1;
 }
 
