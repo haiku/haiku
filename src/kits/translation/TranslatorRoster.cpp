@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: TranslatorRoster.cpp
 //              Class: BTranslatorRoster
-//   Reimplimented by: Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-06-11
+//   Reimplemented by: Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-06-11
 //
 // Description: This class is the guts of the translation kit, it makes the
 //              whole thing happen. It bridges the applications using this
@@ -652,9 +652,13 @@ BTranslatorRoster::Identify(BPositionIO *inSource,
 static int
 compare_data(const void *a, const void *b)
 {
-	register translator_info *ai = (translator_info *)a;
-	register translator_info *bi = (translator_info *)b;
-	return (int) (- ai->quality * ai->capability +
+	register const translator_info *ai = 
+		reinterpret_cast<const translator_info *> (a);
+		
+	register const translator_info *bi = 
+		reinterpret_cast<const translator_info *> (b);
+	
+	return static_cast<int> (- ai->quality * ai->capability +
 		bi->quality * bi->capability);
 }
 
@@ -1316,7 +1320,7 @@ BTranslatorRoster::LoadTranslator(const char *path)
 		name++;
 	else
 		name = path;
-	for (translator_node *i = fpTranslators; i; i=i->next)
+	for (translator_node *i = fpTranslators; i; i = i->next)
 		if (!strcmp(name, i->translator->TranslatorName()))
 			return B_NO_ERROR;
 			//	we use name for determining whether it's loaded
@@ -1329,10 +1333,10 @@ BTranslatorRoster::LoadTranslator(const char *path)
 		return image;
 	
 	// Function pointer used to create post R4.5 style translators
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
+	BTranslator *(*pMakeNthTranslator)(int32 n, image_id you, uint32 flags, ...);
 	
 	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
+		B_SYMBOL_TYPE_TEXT, reinterpret_cast<void **> (&pMakeNthTranslator));
 	if (!err) {
 		// If the translator add-on supports the post R4.5
 		// translator creation mechanism
@@ -1349,54 +1353,78 @@ BTranslatorRoster::LoadTranslator(const char *path)
 		
 	} else {
 		// If the translator add-on is in the R4.0 / R4.5 format		
-		translator_data trandata;
-		trandata.translatorName = NULL;
-		trandata.translatorInfo = NULL;
-		trandata.translatorVersion = 0;
-		trandata.inputFormats = NULL;
-		trandata.outputFormats = NULL;
-		trandata.Identify = NULL;
-		trandata.Translate = NULL;
-		trandata.MakeConfig = NULL;
-		trandata.GetConfigMessage = NULL;
+		translator_data trand;
+		trand.translatorName = NULL;
+		trand.translatorInfo = NULL;
+		trand.translatorVersion = 0;
+		trand.inputFormats = NULL;
+		trand.outputFormats = NULL;
+		trand.Identify = NULL;
+		trand.Translate = NULL;
+		trand.MakeConfig = NULL;
+		trand.GetConfigMessage = NULL;
+		
+		char *name = NULL, *info = NULL;
+		translation_format *ins = NULL, *outs = NULL;
 		
 		//	find all the symbols
 		err = get_image_symbol(image, "translatorName", B_SYMBOL_TYPE_DATA,
-				(void **)&trandata.translatorName);
-		if (!err && get_image_symbol(image, "translatorInfo",
-				B_SYMBOL_TYPE_DATA, (void **)&trandata.translatorInfo))
-			trandata.translatorInfo = NULL;
-		long * vptr = NULL;
-		if (!err)
+			reinterpret_cast<void **> (&name));
+		if (err)
+			name = NULL;
+		else if (!err && get_image_symbol(image, "translatorInfo",
+			B_SYMBOL_TYPE_DATA, reinterpret_cast<void **> (&info)))
+			info = NULL;
+			
+		int32 *pn = NULL;
+		if (!err) {
 			err = get_image_symbol(image, "translatorVersion",
-					B_SYMBOL_TYPE_DATA, (void **)&vptr);
-		if (!err && (vptr != NULL))
-			trandata.translatorVersion = *vptr;
+				B_SYMBOL_TYPE_DATA, reinterpret_cast<void **> (&pn));
+			if (!err && (pn != NULL))
+				trand.translatorVersion = *pn;
+		}
+		
 		if (!err && get_image_symbol(image, "inputFormats",
-				B_SYMBOL_TYPE_DATA, (void **)&trandata.inputFormats))
-			trandata.inputFormats = NULL;
+			B_SYMBOL_TYPE_DATA,
+			reinterpret_cast<void **> (&ins)))
+			ins = NULL;
+			
 		if (!err && get_image_symbol(image, "outputFormats",
-				B_SYMBOL_TYPE_DATA, (void **)&trandata.outputFormats))
-			trandata.outputFormats = NULL;
+			B_SYMBOL_TYPE_DATA,
+			reinterpret_cast<void **> (&outs)))
+			outs = NULL;
+			
 		if (!err)
-			err = get_image_symbol(image, "Identify", B_SYMBOL_TYPE_TEXT,
-					(void **)&trandata.Identify);
+			err = get_image_symbol(image, "Identify",
+				B_SYMBOL_TYPE_TEXT,
+				reinterpret_cast<void **> (&trand.Identify));
+				
 		if (!err)
 			err = get_image_symbol(image, "Translate",
-					B_SYMBOL_TYPE_TEXT, (void **)&trandata.Translate);
+				B_SYMBOL_TYPE_TEXT,
+				reinterpret_cast<void **> (&trand.Translate));
+				
 		if (!err && get_image_symbol(image, "MakeConfig",
-				B_SYMBOL_TYPE_TEXT, (void **)&trandata.MakeConfig))
-			trandata.MakeConfig = NULL;
+			B_SYMBOL_TYPE_TEXT,
+			reinterpret_cast<void **> (&trand.MakeConfig)))
+			trand.MakeConfig = NULL;
+			
 		if (!err && get_image_symbol(image, "GetConfigMessage",
-				B_SYMBOL_TYPE_TEXT, (void **)&trandata.GetConfigMessage))
-			trandata.GetConfigMessage = NULL;
+			B_SYMBOL_TYPE_TEXT,
+			reinterpret_cast<void **> (&trand.GetConfigMessage)))
+			trand.GetConfigMessage = NULL;
+			
+		trand.translatorName = name;
+		trand.translatorInfo = info;
+		trand.inputFormats = ins;
+		trand.outputFormats = outs;		
 
 		// if add-on is not in the correct format, return with error
 		if (err)
 			return err;
 
 		// add this translator to the list
-		BR4xTranslator *pR4xTran = new BR4xTranslator(&trandata);
+		BR4xTranslator *pR4xTran = new BR4xTranslator(&trand);
 		AddTranslatorToList(pR4xTran, path, image, false);
 			// do not call Acquire() on ptran because I want it to be
 			// deleted the first time Release() is called on it.
