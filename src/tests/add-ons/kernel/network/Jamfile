@@ -13,8 +13,19 @@ SimpleTest net_stack_tester :
 	: be
 ;
 
-LOCATE on <installed>net_stack_tester = [ on net_stack_tester return $(LOCATE) ] ;
-Depends <installed>net_stack_tester : net_stack_tester ;
+{
+	# symlink the userland add-ons dir to the dir where the net_stack_tester
+	# lives
+	local dir = [ on net_stack_tester return $(LOCATE) ] ;
+	MakeLocate <network-add-ons>userland : $(OBOS_ADDON_DIR) ;
+	MakeLocate <network-add-ons>add-ons : $(dir) ;
+	RelSymLink <network-add-ons>add-ons : <network-add-ons>userland ;
+	
+	# alias for the net_stack_tester the modules link against
+	LOCATE on <installed>net_stack_tester = $(dir) ;
+	Depends <installed>net_stack_tester
+		: net_stack_tester <network-add-ons>add-ons ;
+}
 
 # for convenience: this target builds all userland modules
 
