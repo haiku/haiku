@@ -68,7 +68,10 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so"
 
-BEOS_SYSTEM_SERVERS="registrar syslog_daemon"
+BEOS_SYSTEM_SERVERS="registrar syslog_daemon media_server media_addon_server"
+
+BEOS_ADD_ONS_TRANSLATORS="STXTTranslator RTF-Translator"
+BEOS_ADD_ONS_MEDIA="mixer.media_addon"
 
 echo "Building executables and libraries..."
 
@@ -77,9 +80,10 @@ jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS \
+	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA \
 	kernel_uname libnet.so dprintf null zero random \<driver\>tty \
 	\<driver\>config \
-	|| exit 1
+	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
 # create the image and the directory structure
 
@@ -87,10 +91,9 @@ if [ ! $alreadyMounted ]; then
 	echo
 	echo "Creating image..."
 	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
-	mkbfs $imagePath Haiku
+	mkbfs $imagePath Haiku >/dev/null
 	mkdir -p $targetDir
 	sync
-echo ""
 	$ufsMount obfs $imagePath $targetDir || exit 1
 fi
 
@@ -110,6 +113,8 @@ mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
 mkdir -p beos/system/add-ons/kernel/file_systems
 mkdir -p beos/system/add-ons/kernel/generic
 mkdir -p beos/system/add-ons/kernel/partitioning_systems
+mkdir -p beos/system/add-ons/Translators
+mkdir -p beos/system/add-ons/media
 mkdir -p beos/system/boot
 mkdir -p beos/system/lib
 mkdir -p beos/system/servers
@@ -141,6 +146,7 @@ for f in bus_managers/config_manager bus_managers/pci; do
 	cp $f/$name $targetDir/beos/system/add-ons/kernel/$f
 done
 
+
 # drivers
 for f in drivers/arch/x86/keyboard/keyboard; do
 	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
@@ -168,7 +174,7 @@ cp rld.so libroot.so $targetDir/beos/system/lib/
 # servers
 echo "Installing servers..."
 cd $sourceDir/distro/x86.R1/beos/system/servers
-cp $BEOS_SYSTEM_SERVERS $targetDir/beos/system/servers/
+copyattr -d $BEOS_SYSTEM_SERVERS $targetDir/beos/system/servers/
 
 
 # apps
@@ -183,14 +189,17 @@ cd $sourceDir/distro/x86.R1/beos/bin
 cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
 cd $targetDir/beos/bin
 
+
 # scripts and data files
 echo "Installing scripts and data files..."
 cd $sourceDir
 cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
 cp data/etc/profile $targetDir/beos/etc/
 cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
-cp -R distro/x86.R1/beos/etc $targetDir//beos/
+cp -R distro/x86.R1/beos/etc $targetDir/beos/
+cp -R data/settings $targetDir/home/config/
 ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir//home/config/settings/timezone
+
 
 # boot loader
 echo "Installing boot loader..."
@@ -225,6 +234,19 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 	(cd $(dirname $f); ln -fs $linkName .)
 done
 
+
+# add-ons
+echo "Copying add-ons..."
+
+cd $sourceDir/distro/x86.R1/beos/system/add-ons/Translators
+for f in $BEOS_ADD_ONS_TRANSLATORS; do
+	copyattr -d $f $targetDir/beos/system/add-ons/Translators/
+done
+
+cd $sourceDir/distro/x86.R1/beos/system/add-ons/media
+for f in $BEOS_ADD_ONS_MEDIA; do
+	copyattr -d $f $targetDir/beos/system/add-ons/media/
+done
 
 # install MIME database
 mimeDBSource=$sourceDir/src/data/beos_mime
