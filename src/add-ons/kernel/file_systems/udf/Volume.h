@@ -46,14 +46,14 @@ public:
 	int Device() const { return fDevice; }
 	nspace_id Id() const { return fId; }
 	
-	off_t Start() const { return fStart; }
+	off_t Offset() const { return fOffset; }
 	off_t Length() const { return fLength; }
 	
 	uint32 BlockSize() const { return fBlockSize; }
 	uint32 BlockShift() const { return fBlockShift; }
 	
-	off_t AddressForRelativeBlock(off_t block) { return (Start() + block) * BlockSize(); }
-	off_t RelativeAddress(off_t address) { return Start() * BlockSize() + address; }
+	off_t AddressForRelativeBlock(off_t block) { return (Offset() + block) * BlockSize(); }
+	off_t RelativeAddress(off_t address) { return Offset() * BlockSize() + address; }
 		
 	bool IsReadOnly() const { return fReadOnly; }
 	
@@ -101,7 +101,7 @@ private:
 	int fDevice;
 	bool fReadOnly;
 
-	off_t fStart;	//!< Starting block of the volume on the given device
+	off_t fOffset;	//!< Starting block of the volume on the given device
 	off_t fLength;	//!< Block length of volume on the given device
 	uint32 fBlockSize;
 	uint32 fBlockShift;
@@ -134,7 +134,7 @@ Volume::Read(AddressType address, ssize_t length, void *data)
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
 		if (bytesRead != (ssize_t)BlockSize()) {
 			err = B_IO_ERROR;
-			PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", mappedAddress,
+			PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", mappedAddress,
 			       length, bytesRead));
 		}
 	}

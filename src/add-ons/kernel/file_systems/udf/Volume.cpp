@@ -23,7 +23,7 @@ Volume::Volume(nspace_id id)
 	: fId(id)
 	, fDevice(0)
 	, fReadOnly(false)
-	, fStart(0)
+	, fOffset(0)
 	, fBlockSize(0)
 	, fBlockShift(0)
 	, fInitStatus(B_UNINITIALIZED)
@@ -37,7 +37,7 @@ status_t
 Volume::Identify(int device, off_t offset, off_t length, uint32 blockSize, char *volumeName)
 {
 	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "static Volume",
-		("device: %d, offset: %lld, volumeName: %p", device, offset, volumeName));
+		("device: %d, offset: %Ld, volumeName: %p", device, offset, volumeName));
 	if (!volumeName)
 		RETURN(B_BAD_VALUE);
 		
@@ -70,7 +70,7 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
               uint32 flags, uint32 blockSize)
 {
 	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "Volume",
-		("devName = `%s'", deviceName));
+		("deviceName: `%s', offset: %Ld, length %Ld", deviceName, volumeStart, volumeLength));
 	if (!deviceName)
 		RETURN(B_BAD_VALUE);
 	if (_InitStatus() == B_INITIALIZED)
@@ -120,10 +120,15 @@ Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 		const udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
 		err = partition ? B_OK : B_BAD_ADDRESS;
 		if (!err) {
-			*mappedBlock = Start() + partition->start() + address.block();	
+			PRINT(("Offset(): %Ld, partition->start(): %ld, address.block(): %ld\n", Offset(),
+			       partition->start(), address.block()));
+			PRINT(("partition:\n"));
+			PDUMP(partition);
+			*mappedBlock = partition->start() + address.block();	
 		}
 		if (!err) {
-			PRINT(("mapped to block %lld\n", *mappedBlock));
+			PRINT(("mapped to block %Ld\n", *mappedBlock));
+			snooze(5000);
 		}
 	}
 	RETURN(err);
@@ -140,7 +145,7 @@ Volume::MapAddress(udf_long_address address, off_t *mappedAddress)
 	if (!err)
 		*mappedAddress = *mappedAddress * BlockSize();
 	if (!err) {
-		PRINT(("mapped to address %lld\n", *mappedAddress));
+		PRINT(("mapped to address %Ld\n", *mappedAddress));
 	}
 	RETURN_ERROR(err);
 }
@@ -161,7 +166,7 @@ Volume::_Read(udf_extent_address address, ssize_t length, void *data)
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
 		if (bytesRead != (ssize_t)BlockSize()) {
 			err = B_IO_ERROR;
-			PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", mappedAddress,
+			PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", mappedAddress,
 			       length, bytesRead));
 		}
 	}
@@ -182,7 +187,7 @@ Volume::_Read(AddressType address, ssize_t length, void *data)
 		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
 		if (bytesRead != (ssize_t)BlockSize()) {
 			err = B_IO_ERROR;
-			PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", mappedAddress,
+			PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", mappedAddress,
 			       length, bytesRead));
 		}
 	}
@@ -214,7 +219,7 @@ Volume::_Init(int device, off_t offset, off_t length, int blockSize)
 
 	fDevice = device;	
 	fReadOnly = true;
-	fStart = offset;
+	fOffset = offset;
 	fLength = length;	
 	fBlockSize = blockSize;
 	
@@ -366,7 +371,7 @@ Volume::_WalkVolumeRecognitionSequence()
 					break;
 				}
 			} else {
-				SIMPLE_PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", address,
+				SIMPLE_PRINT(("read_pos(pos:%Ld, len:%ld) failed with: 0x%lx\n", address,
 				        BlockSize(), bytesRead));
 				break;
 			}
@@ -405,21 +410,21 @@ Volume::_WalkAnchorVolumeDescriptorSequences()
 				ssize_t bytesRead = read_pos(fDevice, address, chunk.Data(), BlockSize());
 				anchorErr = bytesRead == (ssize_t)BlockSize() ? B_OK : B_IO_ERROR;
 				if (anchorErr) {
-					PRINT(("block %lld: read_pos(pos:%lld, len:%ld) failed with error 0x%lx\n",
+					PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
 					       block, address, BlockSize(), bytesRead));
 				}
 			}			
 			if (!anchorErr) {
 				anchor = reinterpret_cast<udf_anchor_descriptor*>(chunk.Data());
-				anchorErr = anchor->tag().init_check(block);
+				anchorErr = anchor->tag().init_check(block+Offset());
 				if (anchorErr) {
-					PRINT(("block %lld: invalid anchor\n", block));
+					PRINT(("block %Ld: invalid anchor\n", block));
 				} else {
-					PRINT(("block %lld: valid anchor\n", block));
+					PRINT(("block %Ld: valid anchor\n", block));
 				}
 			}
 			if (!anchorErr) {
-				PRINT(("block %lld: anchor:\n", block));
+				PRINT(("block %Ld: anchor:\n", block));
 				PDUMP(anchor);
 				// Found an avds, so try the main sequence first, then
 				// the reserve sequence if the main one fails.
@@ -430,12 +435,12 @@ Volume::_WalkAnchorVolumeDescriptorSequences()
 				
 			}
 			if (!anchorErr) {
-				PRINT(("block %lld: found valid vds\n", avds_locations[i]));
+				PRINT(("block %Ld: found valid vds\n", avds_locations[i]));
 				found_vds = true;
 				break;
 			} //else {
 				// Both failed, so loop around and try another avds
-//				PRINT(("block %lld: vds search failed\n", avds_locations[i]));
+//				PRINT(("block %Ld: vds search failed\n", avds_locations[i]));
 //			}
 		}
 		status_t err = found_vds ? B_OK : B_ERROR;
@@ -454,18 +459,18 @@ Volume::_WalkVolumeDescriptorSequence(udf_extent_address extent)
 	for (uint32 i = 0; i < count; i++)
 	{
 		off_t block = extent.location()+i;
-		off_t address = AddressForRelativeBlock(block);
+		off_t address = block << BlockShift(); //AddressForRelativeBlock(block);
 		MemoryChunk chunk(BlockSize());
 		udf_tag *tag = NULL;
 
-		PRINT(("descriptor #%ld (block %lld):\n", i, block));
+		PRINT(("descriptor #%ld (block %Ld):\n", i, block));
 
 		status_t err = chunk.InitCheck();
 		if (!err) {
 			ssize_t bytesRead = read_pos(fDevice, address, chunk.Data(), BlockSize());
 			err = bytesRead == (ssize_t)BlockSize() ? B_OK : B_IO_ERROR;
 			if (err) {
-				PRINT(("block %lld: read_pos(pos:%lld, len:%ld) failed with error 0x%lx\n",
+				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
 				       block, address, BlockSize(), bytesRead));
 			}
 		}
