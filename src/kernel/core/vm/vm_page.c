@@ -223,7 +223,7 @@ int vm_page_init(kernel_args *ka)
 	}
 
 	// map in the new free page table
-	all_pages = (vm_page *)vm_alloc_from_ka_struct(ka, num_pages * sizeof(vm_page), LOCK_KERNEL|LOCK_RW);
+	all_pages = (vm_page *)vm_alloc_from_ka_struct(ka, num_pages * sizeof(vm_page), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	dprintf("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
 		all_pages, num_pages, (unsigned int)(num_pages * sizeof(vm_page)));
@@ -261,7 +261,7 @@ vm_page_init2(kernel_args *ka)
 
 	null = all_pages;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "page_structures", &null, REGION_ADDR_EXACT_ADDRESS,
-		PAGE_ALIGN(num_pages * sizeof(vm_page)), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		PAGE_ALIGN(num_pages * sizeof(vm_page)), REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
 	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");

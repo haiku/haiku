@@ -543,7 +543,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				(void **)&load_address,
 				addr_specifier,
 				image->regions[i].vmsize,
-				LOCK_RW,
+				B_READ_AREA | B_WRITE_AREA,
 				REGION_PRIVATE_MAP,
 				path,
 				_ROUNDOWN(image->regions[i].fdstart, B_PAGE_SIZE));

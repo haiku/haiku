@@ -210,8 +210,29 @@ put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, int attributes)
 	// put it in the pgdir
 	init_pdentry(e);
 	e->addr = ADDR_SHIFT(pgtable_phys);
-	e->user = !(attributes & LOCK_KERNEL);
-	e->rw = attributes & LOCK_RW;
+
+	// if the region is user accessible, it's automatically read/write
+	// accessible in kernel space
+	e->user = (attributes & B_USER_PROTECTION) != 0;
+	if (e->user)
+		e->rw = (attributes & B_WRITE_AREA) != 0;
+	else
+		e->rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+	e->present = 1;
+}
+
+
+static void
+put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, int attributes)
+{
+	// put it in the pgtable
+	init_ptentry(e);
+	e->addr = ADDR_SHIFT(pgtable_phys);
+	e->user = (attributes & B_USER_PROTECTION) != 0;
+	if (e->user)
+		e->rw = (attributes & B_WRITE_AREA) != 0;
+	else
+		e->rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
 	e->present = 1;
 }
 
@@ -253,7 +274,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, unsigned int attributes)
 		TRACE(("map_tmap: asked for free page for pgtable. 0x%x\n", pgtable));
 
 		// put it in the pgdir
-		put_pgtable_in_pgdir(&pd[index], pgtable, attributes | LOCK_RW);
+		put_pgtable_in_pgdir(&pd[index], pgtable, attributes
+			| (attributes & B_KERNEL_PROTECTION ? B_KERNEL_WRITE_AREA : B_WRITE_AREA));
 
 		// update any other page directories, if it maps kernel space
 		if (index >= FIRST_KERNEL_PGDIR_ENT && index < (FIRST_KERNEL_PGDIR_ENT + NUM_KERNEL_PGDIR_ENTS))
@@ -268,11 +290,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, unsigned int attributes)
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
-	init_ptentry(&pt[index]);
-	pt[index].addr = ADDR_SHIFT(pa);
-	pt[index].user = !(attributes & LOCK_KERNEL);
-	pt[index].rw = attributes & LOCK_RW;
-	pt[index].present = 1;
+	put_ptentry_in_pgtable(&pt[index], pa, attributes);
 
 	put_physical_page_tmap((addr_t)pt);
 
@@ -365,8 +383,10 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, unsigned in
 
 	// read in the page state flags, clearing the modified and accessed flags in the process
 	*out_flags = 0;
-	*out_flags |= pt[index].rw ? LOCK_RW : LOCK_RO;
-	*out_flags |= pt[index].user ? 0 : LOCK_KERNEL;
+	if (pt[index].user)
+		*out_flags |= (pt[index].rw ? B_WRITE_AREA : 0) | B_READ_AREA;
+
+	*out_flags |= (pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA;
 	*out_flags |= pt[index].dirty ? PAGE_MODIFIED : 0;
 	*out_flags |= pt[index].accessed ? PAGE_ACCESSED : 0;
 	*out_flags |= pt[index].present ? PAGE_PRESENT : 0;
@@ -702,12 +722,12 @@ vm_translation_map_module_init(kernel_args *ka)
 
 	// allocate some space to hold physical page mapping info
 	paddr_desc = (paddr_chunk_desc *)vm_alloc_from_ka_struct(ka,
-		sizeof(paddr_chunk_desc) * 1024, LOCK_RW|LOCK_KERNEL);
+		sizeof(paddr_chunk_desc) * 1024, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	num_virtual_chunks = IOSPACE_SIZE / IOSPACE_CHUNK_SIZE;
 	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_ka_struct(ka,
-		sizeof(paddr_chunk_desc *) * num_virtual_chunks, LOCK_RW|LOCK_KERNEL);
+		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	iospace_pgtables = (ptentry *)vm_alloc_from_ka_struct(ka,
-		PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)), LOCK_RW|LOCK_KERNEL);
+		PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p, iospace_pgtables %p\n",
 		paddr_desc, virtual_pmappings, iospace_pgtables));
@@ -736,7 +756,7 @@ vm_translation_map_module_init(kernel_args *ka)
 		for (i = 0; i < (IOSPACE_SIZE / (PAGE_SIZE * 1024)); i++, virt_pgtable += PAGE_SIZE) {
 			vm_translation_map_quick_query(virt_pgtable, &phys_pgtable);
 			e = &page_hole_pgdir[(IOSPACE_BASE / (PAGE_SIZE * 1024)) + i];
-			put_pgtable_in_pgdir(e, phys_pgtable, LOCK_RW|LOCK_KERNEL);
+			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
 
@@ -770,22 +790,22 @@ vm_translation_map_module_init2(kernel_args *ka)
 
 	temp = (void *)kernel_pgdir_virt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_pgdir", &temp,
-		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)paddr_desc;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "physical_page_mapping_descriptors", &temp,
 		REGION_ADDR_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, PAGE_SIZE),
-		REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)virtual_pmappings;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_virtual_chunk_descriptors", &temp,
 		REGION_ADDR_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, PAGE_SIZE),
-		REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)iospace_pgtables;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_pgtables", &temp,
 		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)),
-		REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("vm_translation_map_module_init2: creating iospace\n"));
 	temp = (void *)IOSPACE_BASE;
@@ -808,7 +828,6 @@ status_t
 vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
-	ptentry *pentry;
 	int index;
 
 	TRACE(("quick_tmap: entry pa 0x%x va 0x%x\n", pa, va));
@@ -833,13 +852,7 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 		memset((unsigned int *)((unsigned int)page_hole + (va / PAGE_SIZE / 1024) * PAGE_SIZE), 0, PAGE_SIZE);
 	}
 	// now, fill in the pentry
-	pentry = page_hole + va / PAGE_SIZE;
-
-	init_ptentry(pentry);
-	pentry->addr = ADDR_SHIFT(pa);
-	pentry->user = !(attributes & LOCK_KERNEL);
-	pentry->rw = attributes & LOCK_RW;
-	pentry->present = 1;
+	put_ptentry_in_pgtable(page_hole + va / PAGE_SIZE, pa, attributes);
 
 	arch_cpu_invalidate_TLB_range(va, va);
 

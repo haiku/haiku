@@ -26,10 +26,10 @@
 #define WRITE_COUNT 1024
 #define READ_COUNT 1
 
-// page attributes
-#define PAGE_MODIFIED 0x04
-#define PAGE_ACCESSED 0x08
-#define PAGE_PRESENT  0x10
+// page attributes (in addition to B_READ_AREA etc.)
+#define PAGE_MODIFIED 64
+#define PAGE_ACCESSED 128
+#define PAGE_PRESENT  256
 
 // Should only be used by vm internals
 int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user, addr *newip);

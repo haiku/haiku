@@ -189,13 +189,4 @@ enum {
 #define B_USER_PROTECTION		(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)
 #define B_KERNEL_PROTECTION		(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA)
 
-#define LOCK_RO		0
-#define LOCK_RW		1
-#define LOCK_KERNEL	2
-
-#define PROTECTION_TO_LOCK(protection) \
-	(protection & B_KERNEL_PROTECTION ? \
-		((protection & B_KERNEL_WRITE_AREA ? LOCK_RW : LOCK_RO) | LOCK_KERNEL) \
-		: (protection & B_WRITE_AREA ? LOCK_RW : LOCK_RO))
-
 #endif	/* _KERNEL_VM_TYPES_H */

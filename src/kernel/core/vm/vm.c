@@ -76,9 +76,9 @@ static spinlock max_commit_lock;
 // function declarations
 static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);
 static int map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
-	off_t offset, addr size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
-static int vm_soft_fault(addr address, bool is_write, bool is_user);
-static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr address);
+	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
+static int vm_soft_fault(addr_t address, bool is_write, bool is_user);
+static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
 //static int vm_region_acquire_ref(vm_region *region);
 //static void vm_region_release_ref(vm_region *region);
 //static void vm_region_release_ref2(vm_region *region);
@@ -220,7 +220,7 @@ static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char 
 
 // must be called with this address space's virtual_map.sem held
 static int
-find_and_insert_region_slot(vm_virtual_map *map, addr start, addr size, addr end, int addr_type, vm_region *region)
+find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_region *region)
 {
 	vm_region *last_r = NULL;
 	vm_region *next_r;
@@ -327,7 +327,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr start, addr size, addr end
 
 // a ref to the cache holding this store must be held before entering here
 static int map_backing_store(vm_address_space *aspace, vm_store *store, 
-                             void **vaddr, off_t offset, addr size, 
+                             void **vaddr, off_t offset, addr_t size, 
                              int addr_type, int wiring, int lock, int mapping, 
                              vm_region **_region, const char *region_name)
 {
@@ -422,11 +422,11 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 	}
 
 	{
-		addr search_addr, search_end;
+		addr_t search_addr, search_end;
 
 		if(addr_type == REGION_ADDR_EXACT_ADDRESS) {
-			search_addr = (addr)*vaddr;
-			search_end = (addr)*vaddr + size;
+			search_addr = (addr_t)*vaddr;
+			search_end = (addr_t)*vaddr + size;
 		} else if(addr_type == REGION_ADDR_ANY_ADDRESS) {
 			search_addr = aspace->virtual_map.base;
 			search_end = aspace->virtual_map.base + (aspace->virtual_map.size - 1);
@@ -441,7 +441,7 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 		                                  region);
 		if(err < 0)
 			goto err1b;
-		*vaddr = (addr *)region->base;
+		*vaddr = (addr_t *)region->base;
 	}
 
 	// attach the cache to the region
@@ -484,7 +484,7 @@ err:
 
 region_id
 vm_create_anonymous_region(aspace_id aid, const char *name, void **address, 
-	int addr_type, addr size, int wiring, int lock)
+	int addr_type, addr_t size, int wiring, int lock)
 {
 	int err;
 	vm_region *region;
@@ -557,7 +557,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		case REGION_WIRING_WIRED: {
 			// pages aren't mapped at this point, but we just simulate a fault on
 			// every page, which should allocate them
-			addr va;
+			addr_t va;
 			// XXX remove
 			for(va = region->base; va < region->base + region->size; va += PAGE_SIZE) {
 //				dprintf("mapping wired pages: region 0x%x, cache_ref 0x%x 0x%x\n", region, cache_ref, region->cache_ref);
@@ -569,8 +569,8 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			// the pages should already be mapped. This is only really useful during
 			// boot time. Find the appropriate vm_page objects and stick them in
 			// the cache object.
-			addr va;
-			addr pa;
+			addr_t va;
+			addr_t pa;
 			unsigned int flags;
 			int err;
 			vm_page *page;
@@ -599,8 +599,8 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			break;
 		}
 		case REGION_WIRING_WIRED_CONTIG: {
-			addr va;
-			addr phys_addr;
+			addr_t va;
+			addr_t phys_addr;
 			int err;
 			vm_page *page;
 			off_t offset = 0;
@@ -646,13 +646,13 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 }
 
 region_id vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
-	int addr_type, addr size, int lock, addr phys_addr)
+	int addr_type, addr_t size, int lock, addr_t phys_addr)
 {
 	vm_region *region;
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
-	addr map_offset;
+	addr_t map_offset;
 	int err;
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 
@@ -693,18 +693,18 @@ region_id vm_map_physical_memory(aspace_id aid, const char *name, void **_addres
 
 	// modify the pointer returned to be offset back into the new region
 	// the same way the physical address in was offset
-	*_address = (void *)((addr)*_address + map_offset);
+	*_address = (void *)((addr_t)*_address + map_offset);
 
 	return region->id;
 }
 
-region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr size)
+region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr_t size)
 {
 	vm_region *region;
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
-//	addr map_offset;
+//	addr_t map_offset;
 	int err;
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
@@ -715,36 +715,36 @@ region_id vm_create_null_region(aspace_id aid, char *name, void **address, int a
 
 	// create an null store object
 	store = vm_store_create_null();
-	if(store == NULL)
+	if (store == NULL)
 		panic("vm_map_physical_memory: vm_store_create_null returned NULL");
 	cache = vm_cache_create(store);
-	if(cache == NULL)
+	if (cache == NULL)
 		panic("vm_map_physical_memory: vm_cache_create returned NULL");
 	cache_ref = vm_cache_ref_create(cache);
-	if(cache_ref == NULL)
+	if (cache_ref == NULL)
 		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
 	// tell the page scanner to skip over this region, no pages will be mapped here
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, address, 0, size, addr_type, 0, LOCK_RO, REGION_NO_PRIVATE_MAP, &region, name);
+	err = map_backing_store(aspace, store, address, 0, size, addr_type, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &region, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
-	if(err < 0)
+	if (err < 0)
 		return err;
 
 	return region->id;
 }
 
 static region_id _vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr size, int lock, int mapping, const char *path, off_t offset, bool kernel)
+	addr_t size, int lock, int mapping, const char *path, off_t offset, bool kernel)
 {
 	vm_region *region;
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
 	void *v;
-//	addr map_offset;
+//	addr_t map_offset;
 	int err;
 
 
@@ -813,13 +813,13 @@ restart:
 }
 
 region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr size, int lock, int mapping, const char *path, off_t offset)
+	addr_t size, int lock, int mapping, const char *path, off_t offset)
 {
 	return _vm_map_file(aid, name, address, addr_type, size, lock, mapping, path, offset, true);
 }
 
 region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
-	addr size, int lock, int mapping, const char *upath, off_t offset)
+	addr_t size, int lock, int mapping, const char *upath, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
 	void *address;
@@ -998,7 +998,7 @@ vm_put_region(vm_region *region)
 
 
 int
-vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
+vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 {
 	vm_address_space *aspace;
 	unsigned int null_flags;
@@ -1021,7 +1021,7 @@ display_mem(int argc, char **argv)
 	int item_size;
 	int display_width;
 	int num = 1;
-	addr address;
+	addr_t address;
 	int i;
 	int j;
 
@@ -1094,7 +1094,7 @@ display_mem(int argc, char **argv)
 
 static int dump_cache_ref(int argc, char **argv)
 {
-	addr address;
+	addr_t address;
 	vm_region *region;
 	vm_cache_ref *cache_ref;
 
@@ -1152,7 +1152,7 @@ static const char *page_state_to_text(int state)
 
 static int dump_cache(int argc, char **argv)
 {
-	addr address;
+	addr_t address;
 	vm_cache *cache;
 	vm_page *page;
 
@@ -1243,7 +1243,7 @@ static int dump_region(int argc, char **argv)
 	return 0;
 }
 
-region_id find_region_by_address (addr vaddress)
+region_id find_region_by_address (addr_t vaddress)
 {
 	vm_address_space *aspace;
 	vm_region *region;
@@ -1428,7 +1428,7 @@ void vm_put_aspace(vm_address_space *aspace)
 	return;
 }
 
-aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
+aspace_id vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel)
 {
 	vm_address_space *aspace;
 	int err;
@@ -1629,12 +1629,12 @@ create_preloaded_image_areas(struct preloaded_image *image)
 	strcpy(name + length, "_text");
 	address = (void *)ROUNDOWN(image->text_region.start, PAGE_SIZE);
 	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
-		PAGE_ALIGN(image->text_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		PAGE_ALIGN(image->text_region.size), REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	strcpy(name + length, "_data");
 	address = (void *)ROUNDOWN(image->data_region.start, PAGE_SIZE);
 	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
-		PAGE_ALIGN(image->data_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		PAGE_ALIGN(image->data_region.size), REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 }
 
 
@@ -1661,7 +1661,7 @@ vm_init(kernel_args *ka)
 	max_commit_lock = 0;
 
 	// map in the new heap and initialize it
-	heap_base = vm_alloc_from_ka_struct(ka, HEAP_SIZE, LOCK_KERNEL|LOCK_RW);
+	heap_base = vm_alloc_from_ka_struct(ka, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	TRACE(("heap at 0x%lx\n", heap_base));
 	heap_init(heap_base);
 
@@ -1674,14 +1674,14 @@ vm_init(kernel_args *ka)
 	// create the region and address space hash tables
 	{
 		vm_address_space *aspace;
-		aspace_table = hash_init(ASPACE_HASH_TABLE_SIZE, (addr)&aspace->hash_next - (addr)aspace,
+		aspace_table = hash_init(ASPACE_HASH_TABLE_SIZE, (addr_t)&aspace->hash_next - (addr_t)aspace,
 			&aspace_compare, &aspace_hash);
 		if (aspace_table == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 	{
 		vm_region *region;
-		region_table = hash_init(REGION_HASH_TABLE_SIZE, (addr)&region->hash_next - (addr)region,
+		region_table = hash_init(REGION_HASH_TABLE_SIZE, (addr_t)&region->hash_next - (addr_t)region,
 			&region_compare, &region_hash);
 		if (region_table == NULL)
 			panic("vm_init: error creating aspace hash table\n");
@@ -1707,7 +1707,7 @@ vm_init(kernel_args *ka)
 
 	address = (void *)ROUNDOWN(heap_base, PAGE_SIZE);
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, REGION_ADDR_EXACT_ADDRESS,
-		HEAP_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+		HEAP_SIZE, REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	ka->kernel_image.name = "kernel";
 		// the lazy boot loader currently doesn't set the kernel's name...
@@ -1725,12 +1725,12 @@ vm_init(kernel_args *ka)
 		sprintf(temp, "idle_thread%d_kstack", i);
 		address = (void *)ka->cpu_kstack[i].start;
 		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, REGION_ADDR_EXACT_ADDRESS,
-			ka->cpu_kstack[i].size, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+			ka->cpu_kstack[i].size, REGION_WIRING_WIRED_ALREADY, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 	{
 		void *null;
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "bootdir", &null, REGION_ADDR_ANY_ADDRESS,
-			ka->bootdir_addr.size, LOCK_RO|LOCK_KERNEL, ka->bootdir_addr.start);
+			ka->bootdir_addr.size, B_KERNEL_READ_AREA, ka->bootdir_addr.start);
 	}
 
 	arch_vm_init_endvm(ka);
@@ -1811,7 +1811,7 @@ forbid_page_faults(void)
 }
 
 
-int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user, addr *newip)
+int vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user, addr_t *newip)
 {
 	int err;
 
@@ -1823,9 +1823,9 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 	if (err < 0) {
 		TRACE(("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
 			err, address, fault_address, is_write, is_user, thread_get_current_thread_id()));
-		if(!is_user) {
+		if (!is_user) {
 			struct thread *t = thread_get_current_thread();
-			if(t && t->fault_handler != 0) {
+			if (t && t->fault_handler != 0) {
 				// this will cause the arch dependant page fault handler to
 				// modify the IP on the interrupt frame or whatever to return
 				// to this address
@@ -1846,7 +1846,7 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 
 
 static int
-vm_soft_fault(addr address, bool is_write, bool is_user)
+vm_soft_fault(addr_t address, bool is_write, bool is_user)
 {
 	vm_address_space *aspace;
 	vm_virtual_map *map;
@@ -1865,7 +1865,7 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 	address = ROUNDOWN(address, PAGE_SIZE);
 
-	if(address >= KERNEL_BASE && address <= KERNEL_TOP) {
+	if (address >= KERNEL_BASE && address <= KERNEL_TOP) {
 		aspace = vm_get_kernel_aspace();
 	} else if(address >= USER_BASE && address <= USER_TOP) {
 		aspace = vm_get_current_user_aspace();
@@ -1888,7 +1888,7 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
 	region = vm_virtual_map_lookup(map, address);
-	if(region == NULL) {
+	if (region == NULL) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("vm_soft_fault: va 0x%lx not covered by region in address space\n", address);
@@ -1896,13 +1896,13 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 	}
 
 	// check permissions
-	if(is_user && (region->lock & LOCK_KERNEL) == LOCK_KERNEL) {
+	if (is_user && (region->lock & B_USER_PROTECTION) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("user access on kernel region\n");
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
-	if(is_write && (region->lock & LOCK_RW) == 0) {
+	if (is_write && (region->lock & (B_WRITE_AREA | (is_user ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
 		dprintf("write access attempted on read-only region\n");
@@ -1918,7 +1918,7 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 	release_sem_etc(map->sem, READ_COUNT, 0);
 
 	// see if this cache has a fault handler
-	if(top_cache_ref->cache->store->ops->fault) {
+	if (top_cache_ref->cache->store->ops->fault) {
 		int err = (*top_cache_ref->cache->store->ops->fault)(top_cache_ref->cache->store, aspace, cache_offset);
 		vm_cache_release_ref(top_cache_ref);
 		vm_put_aspace(aspace);
@@ -1931,12 +1931,12 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 	dummy_page.type = PAGE_TYPE_DUMMY;
 
 	last_cache_ref = top_cache_ref;
-	for(cache_ref = top_cache_ref; cache_ref; cache_ref = (cache_ref->cache->source) ? cache_ref->cache->source->ref : NULL) {
+	for (cache_ref = top_cache_ref; cache_ref; cache_ref = (cache_ref->cache->source) ? cache_ref->cache->source->ref : NULL) {
 		mutex_lock(&cache_ref->lock);
 
 		TRACEPFAULT;
 
-		for(;;) {
+		for (;;) {
 			page = vm_cache_lookup_page(cache_ref, cache_offset);
 			if(page != NULL && page->state != PAGE_STATE_BUSY) {
 				vm_page_set_state(page, PAGE_STATE_BUSY);
@@ -1964,13 +1964,13 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 		// insert this dummy page here to keep other threads from faulting on the
 		// same address and chasing us up the cache chain
-		if(cache_ref == top_cache_ref) {
+		if (cache_ref == top_cache_ref) {
 			dummy_page.state = PAGE_STATE_BUSY;
 			vm_cache_insert_page(cache_ref, &dummy_page, cache_offset);
 		}
 
 		// see if the vm_store has it
-		if(cache_ref->cache->store->ops->has_page) {
+		if (cache_ref->cache->store->ops->has_page) {
 			if(cache_ref->cache->store->ops->has_page(cache_ref->cache->store, cache_offset)) {
 				IOVECS(vecs, 1);
 
@@ -1983,10 +1983,10 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 				vecs->vec[0].iov_len = PAGE_SIZE;
 
 				page = vm_page_allocate_page(PAGE_STATE_FREE);
-				(*aspace->translation_map.ops->get_physical_page)(page->ppn * PAGE_SIZE, (addr *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
+				(*aspace->translation_map.ops->get_physical_page)(page->ppn * PAGE_SIZE, (addr_t *)&vecs->vec[0].iov_base, PHYSICAL_PAGE_CAN_WAIT);
 				// handle errors here
 				err = cache_ref->cache->store->ops->read(cache_ref->cache->store, cache_offset, vecs);
-				(*aspace->translation_map.ops->put_physical_page)((addr)vecs->vec[0].iov_base);
+				(*aspace->translation_map.ops->put_physical_page)((addr_t)vecs->vec[0].iov_base);
 
 				mutex_lock(&cache_ref->lock);
 
@@ -2049,20 +2049,20 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 		// try to get a mapping for the src and dest page so we can copy it
 		for(;;) {
-			(*aspace->translation_map.ops->get_physical_page)(src_page->ppn * PAGE_SIZE, (addr *)&src, PHYSICAL_PAGE_CAN_WAIT);
-			err = (*aspace->translation_map.ops->get_physical_page)(page->ppn * PAGE_SIZE, (addr *)&dest, PHYSICAL_PAGE_NO_WAIT);
+			(*aspace->translation_map.ops->get_physical_page)(src_page->ppn * PAGE_SIZE, (addr_t *)&src, PHYSICAL_PAGE_CAN_WAIT);
+			err = (*aspace->translation_map.ops->get_physical_page)(page->ppn * PAGE_SIZE, (addr_t *)&dest, PHYSICAL_PAGE_NO_WAIT);
 			if(err == B_NO_ERROR)
 				break;
 
 			// it couldn't map the second one, so sleep and retry
 			// keeps an extremely rare deadlock from occuring
-			(*aspace->translation_map.ops->put_physical_page)((addr)src);
+			(*aspace->translation_map.ops->put_physical_page)((addr_t)src);
 			snooze(5000);
 		}
 
 		memcpy(dest, src, PAGE_SIZE);
-		(*aspace->translation_map.ops->put_physical_page)((addr)src);
-		(*aspace->translation_map.ops->put_physical_page)((addr)dest);
+		(*aspace->translation_map.ops->put_physical_page)((addr_t)src);
+		(*aspace->translation_map.ops->put_physical_page)((addr_t)dest);
 
 		vm_page_set_state(src_page, PAGE_STATE_ACTIVE);
 
@@ -2087,12 +2087,12 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 	err = 0;
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
-	if(change_count != map->change_count) {
+	if (change_count != map->change_count) {
 		// something may have changed, see if the address is still valid
 		region = vm_virtual_map_lookup(map, address);
-		if(region == NULL
-		  || region->cache_ref != top_cache_ref
-		  || (address - region->base + region->cache_offset) != cache_offset) {
+		if (region == NULL
+			|| region->cache_ref != top_cache_ref
+			|| (address - region->base + region->cache_offset) != cache_offset) {
 			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
 			err = ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
 		}
@@ -2101,9 +2101,10 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 	TRACEPFAULT;
 
 	if (err == 0) {
+		// ToDo: find out what this is about!
 		int new_lock = region->lock;
 		if (page->cache_ref != top_cache_ref && !is_write)
-			new_lock &= ~LOCK_RW;
+			new_lock &= ~(is_user ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
 
 		atomic_add(&page->ref_count, 1);
 		(*aspace->translation_map.ops->lock)(&aspace->translation_map);
@@ -2140,7 +2141,7 @@ vm_soft_fault(addr address, bool is_write, bool is_user)
 
 
 static vm_region *
-vm_virtual_map_lookup(vm_virtual_map *map, addr address)
+vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 {
 	vm_region *region;
 
@@ -2159,17 +2160,17 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr address)
 	return region;
 }
 
-int vm_get_physical_page(addr paddr, addr *vaddr, int flags)
+int vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags)
 {
 	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, vaddr, flags);
 }
 
-int vm_put_physical_page(addr vaddr)
+int vm_put_physical_page(addr_t vaddr)
 {
 	return (*kernel_aspace->translation_map.ops->put_physical_page)(vaddr);
 }
 
-void vm_increase_max_commit(addr delta)
+void vm_increase_max_commit(addr_t delta)
 {
 	int state;
 
@@ -2347,7 +2348,7 @@ _get_area_info(area_id area, area_info *info, size_t size)
 	info->area = region->id;
 	info->address = (void *)region->base;
 	info->size = region->size;
-	info->protection = (region->lock & LOCK_RW ? B_WRITE_AREA : 0) | B_READ_AREA;
+	info->protection = region->lock & B_USER_PROTECTION;
 	info->lock = B_FULL_LOCK;
 	info->team = 1;
 	info->ram_size = region->size;
@@ -2445,10 +2446,11 @@ map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 	if (convertAddressSpec(&addressSpec) < B_OK)
 		return B_BAD_VALUE;
 
-	protection = PROTECTION_TO_LOCK(protection) | LOCK_KERNEL | LOCK_RW;
+	if ((protection & B_KERNEL_PROTECTION) == 0)
+		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
 	return vm_map_physical_memory(vm_get_kernel_aspace_id(), name, _virtualAddress,
-		addressSpec, numBytes, protection, (addr)physicalAddress);
+		addressSpec, numBytes, protection, (addr_t)physicalAddress);
 }
 
 
@@ -2467,9 +2469,6 @@ create_area_etc(struct team *team, const char *name, void **address, uint32 addr
 	if (convertAddressSpec(&addressSpec) < B_OK)
 		return B_BAD_VALUE;
 
-	// create_area() "protection" is vm_create_anonymous_region() "lock"
-	protection = PROTECTION_TO_LOCK(protection);
-
 	// create_area() "lock" is vm_create_anonymous_region() "wiring"
 	if (convertLockToWiring(&lock) < B_OK)
 		return B_BAD_VALUE;
@@ -2485,17 +2484,14 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 {
 	aspace_id areaSpace;
 
-	// create_area() "protection" is vm_create_anonymous_region() "lock"
-	protection = PROTECTION_TO_LOCK(protection);
+	if ((protection & B_KERNEL_PROTECTION) == 0)
+		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
 	switch (addressSpec) {
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_EXACT_KERNEL_ADDRESS:
 			areaSpace = vm_get_kernel_aspace_id();
-			protection |= LOCK_KERNEL | LOCK_RW;
-				// That's required for BeOS compatibility...
-				// create_area_etc() doesn't do this, though
 			break;
 		default:
 			areaSpace = vm_get_current_user_aspace_id();
@@ -2534,7 +2530,7 @@ delete_area(area_id area)
 area_id
 _user_area_for(void *address)
 {
-	return (area_id)find_region_by_address((addr)address);
+	return (area_id)find_region_by_address((addr_t)address);
 }
 
 

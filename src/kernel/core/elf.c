@@ -1087,7 +1087,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				(void **)&regionAddress,
 				REGION_ADDR_EXACT_ADDRESS,
 				fileUpperBound,
-				LOCK_RW, REGION_PRIVATE_MAP,
+				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error allocating region!\n");
@@ -1132,7 +1132,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				(void **)&regionAddress,
 				REGION_ADDR_EXACT_ADDRESS,
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
-				LOCK_RO, REGION_PRIVATE_MAP,
+				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
 				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error mapping text!\n");
