@@ -73,7 +73,7 @@ struct vnode {
 	fs_vnode         private_node;
 	struct fs_mount *mount;
 	struct vnode    *covered_by;
-	int              ref_count;
+	int32            ref_count;
 	bool             delete_me;
 	bool             busy;
 };
@@ -1039,7 +1039,7 @@ vfs_get_cache_ptr(void *vnode)
 int
 vfs_set_cache_ptr(void *vnode, void *cache)
 {
-	if (test_and_set((int *)&(((struct vnode *)vnode)->cache), (int)cache, 0) == 0)
+	if (test_and_set((int32 *)&(((struct vnode *)vnode)->cache), (int32)cache, 0) == 0)
 		return 0;
 
 	return -1;

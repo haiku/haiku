@@ -15,22 +15,22 @@
 
 /* #ifdef _KERNEL_ */
 
-sem_id user_create_sem(int count, const char *name);
-int    user_delete_sem(sem_id id);
-int    user_delete_sem_etc(sem_id id, int return_code);
-int    user_acquire_sem(sem_id id);
-int    user_acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout);
-int    user_release_sem(sem_id id);
-int    user_release_sem_etc(sem_id id, int count, int flags);
-int    user_get_sem_count(sem_id id, int32* thread_count);
-int    user_get_sem_info(sem_id, struct sem_info *, size_t);
-int    user_get_next_sem_info(team_id, uint32 *, struct sem_info *, size_t);
-int    user_set_sem_owner(sem_id id, team_id team);
+sem_id user_create_sem(int32 count, const char *name);
+status_t user_delete_sem(sem_id id);
+status_t user_delete_sem_etc(sem_id id, status_t return_code);
+status_t user_acquire_sem(sem_id id);
+status_t user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
+status_t user_release_sem(sem_id id);
+status_t user_release_sem_etc(sem_id id, int32 count, uint32 flags);
+status_t user_get_sem_count(sem_id id, int32* thread_count);
+status_t user_get_sem_info(sem_id, struct sem_info *, size_t);
+status_t user_get_next_sem_info(team_id, int32 *, struct sem_info *, size_t);
+status_t user_set_sem_owner(sem_id id, team_id team);
 
 
-int    sem_init(kernel_args *ka);
-int    sem_delete_owned_sems(team_id owner);
-int    sem_interrupt_thread(struct thread *t);
+status_t sem_init(kernel_args *ka);
+int sem_delete_owned_sems(team_id owner);
+status_t sem_interrupt_thread(struct thread *t);
 /* #endif */
 
 #endif /* _KERNEL_SEM_H */

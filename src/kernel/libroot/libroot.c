@@ -113,7 +113,7 @@ status_t	acquire_sem(sem_id sem)
 { return sys_acquire_sem(sem); }
 
 // Have to modify flags ???
-int acquire_sem_etc(sem_id sem, int32 count, int32 flags, bigtime_t timeout)
+status_t acquire_sem_etc(sem_id sem, int32 count, uint32 flags, bigtime_t timeout)
 { return sys_acquire_sem_etc(sem, count, flags, timeout); }
 
 // OK
@@ -121,7 +121,7 @@ status_t	release_sem(sem_id sem)
 { return sys_release_sem(sem); }
 
 // Have to modify flags ???
-status_t	release_sem_etc(sem_id sem, int32 count, int32 flags)
+status_t	release_sem_etc(sem_id sem, int32 count, uint32 flags)
 { return sys_release_sem_etc(sem, count, flags); }
 
 // OK
@@ -137,7 +137,7 @@ status_t	_get_sem_info(sem_id sem, sem_info *info, size_t size)
 { return sys_get_sem_info(sem,info, size); }
 
 // OK
-int _get_next_sem_info(team_id team, uint32 *cookie, sem_info *info, size_t size)
+int _get_next_sem_info(team_id team, int32 *cookie, sem_info *info, size_t size)
 { return sys_get_next_sem_info(team,cookie,info, size); }
 
 // TO DO

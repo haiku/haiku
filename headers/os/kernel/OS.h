@@ -163,20 +163,20 @@ typedef struct port_info {
 
 port_id	create_port(int32, const char *);
 port_id	find_port(const char *);
-int     read_port(port_id, int32 *, void *, size_t);
-int     read_port_etc(port_id, int32 *, void *, size_t, uint32, bigtime_t);
-int     write_port(port_id, int32, const void *, size_t);
-int     write_port_etc(port_id, int32, const void *, size_t, uint32, bigtime_t);
-int     close_port(port_id port);
-int     delete_port(port_id port);
+status_t read_port(port_id, int32 *, void *, size_t);
+status_t read_port_etc(port_id, int32 *, void *, size_t, uint32, bigtime_t);
+status_t write_port(port_id, int32, const void *, size_t);
+status_t write_port_etc(port_id, int32, const void *, size_t, uint32, bigtime_t);
+status_t close_port(port_id port);
+status_t delete_port(port_id port);
 
 ssize_t	port_buffer_size(port_id);
 ssize_t	port_buffer_size_etc(port_id, uint32, bigtime_t);
 ssize_t	port_count(port_id);
-int     set_port_owner(port_id, team_id);
+status_t set_port_owner(port_id, team_id);
 
-int     _get_port_info(port_id, port_info *, size_t);
-int     _get_next_port_info(team_id, int32 *, port_info *, size_t);
+status_t _get_port_info(port_id, port_info *, size_t);
+status_t _get_next_port_info(team_id, int32 *, port_info *, size_t);
 
 #define get_port_info(port, info)    \
              _get_port_info((port), (info), sizeof(*(info)))
@@ -206,18 +206,18 @@ typedef struct sem_info {
 	thread_id	latest_holder;
 } sem_info;
 
-sem_id create_sem_etc(int count, const char *name, team_id owner);
-sem_id create_sem(int count, const char *name);
-int    delete_sem(sem_id id);
-int    delete_sem_etc(sem_id id, int return_code);
-int    acquire_sem(sem_id id);
-int    acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout);
-int    release_sem(sem_id id);
-int    release_sem_etc(sem_id id, int count, int flags);
-int    get_sem_count(sem_id id, int32* thread_count);
-int    _get_sem_info(sem_id id, struct sem_info *info, size_t);
-int    _get_next_sem_info(team_id team, uint32 *cookie, struct sem_info *info, size_t);
-int    set_sem_owner(sem_id id, team_id team);
+sem_id create_sem_etc(int32 count, const char *name, team_id owner); /* not public BeOS */
+sem_id create_sem(int32 count, const char *name);
+status_t delete_sem(sem_id id);
+status_t delete_sem_etc(sem_id id, status_t return_code); /* not public BeOS */
+status_t acquire_sem(sem_id id);
+status_t acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout);
+status_t release_sem(sem_id id);
+status_t release_sem_etc(sem_id id, int32 count, uint32 flags);
+status_t get_sem_count(sem_id id, int32* thread_count);
+status_t _get_sem_info(sem_id id, struct sem_info *info, size_t);
+status_t _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t);
+status_t set_sem_owner(sem_id id, team_id team);
 
 #define get_sem_info(sem, info)                \
             _get_sem_info((sem), (info), sizeof(*(info)))

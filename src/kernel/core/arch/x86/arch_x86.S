@@ -8,7 +8,7 @@
 
 .text
 
-/* int atomic_add(int *val, int incr) */
+/* int32 atomic_add(vint32 *val, int32 incr) */
 FUNCTION(atomic_add):
 	movl	4(%esp),%edx
 	movl	8(%esp),%eax
@@ -16,7 +16,7 @@ FUNCTION(atomic_add):
 	xaddl	%eax,(%edx)
 	ret
 
-/* int atomic_and(int *val, int incr) */
+/* int32 atomic_and(vint32 *val, int32 incr) */
 FUNCTION(atomic_and):
 	movl	4(%esp),%edx
 
@@ -32,7 +32,7 @@ _atomic_and1:
 
 	ret
 
-/* int atomic_or(int *val, int incr) */
+/* int32 atomic_or(vint32 *val, int32 incr) */
 FUNCTION(atomic_or):
 	movl	4(%esp),%edx
 
@@ -48,14 +48,14 @@ _atomic_or1:
 
 	ret
 
-/* int atomic_set(int *val, int set_to) */
+/* int32 atomic_set(vint32 *val, int32 set_to) */
 FUNCTION(atomic_set):
 	movl	4(%esp),%edx
 	movl	8(%esp),%eax
 	xchg	%eax,(%edx)
 	ret
 
-/* int test_and_set(int *val, int set_to, int test_val) */
+/* int32 test_and_set(vint32 *val, int32 set_to, int32 test_val) */
 FUNCTION(test_and_set):
 	movl	4(%esp),%edx
 	movl	8(%esp),%ecx

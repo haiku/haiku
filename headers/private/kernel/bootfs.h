@@ -5,6 +5,6 @@
 #ifndef _NEWOS_KERNEL_FS_BOOTFS_H
 #define _NEWOS_KERNEL_FS_BOOTFS_H
 
-int bootstrap_bootfs(void);
+status_t bootstrap_bootfs(void);
 
 #endif

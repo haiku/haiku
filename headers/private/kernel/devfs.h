@@ -8,9 +8,9 @@
 #include <vfs.h>
 #include <Drivers.h>
 
-int bootstrap_devfs(void);
+status_t bootstrap_devfs(void);
 
 /* api drivers will use to publish devices */
-int devfs_publish_device(const char *path, void *ident, device_hooks *calls);
+status_t devfs_publish_device(const char *path, void *ident, device_hooks *calls);
 
 #endif /* _DEVFS_H */

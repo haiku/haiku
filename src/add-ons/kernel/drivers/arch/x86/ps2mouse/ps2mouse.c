@@ -77,7 +77,8 @@ int32	api_version = B_CUR_DRIVER_API_VERSION;
  * Return value:
  * int, ???
  */
-static int handle_mouse_interrupt(void* data)
+static int32 
+handle_mouse_interrupt(void* data)
 {
    char c;
 	static int next_input = 0;
@@ -123,7 +124,8 @@ static int handle_mouse_interrupt(void* data)
 /*
  * mouse_open:
  */
-static int mouse_open(const char *name, uint32 flags, void **cookie)
+static status_t 
+mouse_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
 	return 0;
@@ -132,7 +134,8 @@ static int mouse_open(const char *name, uint32 flags, void **cookie)
 /*
  * mouse_close:
  */
-static int mouse_close(void * cookie)
+static status_t 
+mouse_close(void * cookie)
 {
 	return 0;
 } // mouse_close
@@ -140,7 +143,8 @@ static int mouse_close(void * cookie)
 /*
  * mouse_freecookie:
  */
-static int mouse_freecookie(void * cookie)
+static status_t 
+mouse_freecookie(void * cookie)
 {
 	return 0;
 } // mouse_freecookie
@@ -154,7 +158,8 @@ static int mouse_freecookie(void * cookie)
  * off_t, ignored
  * ssize_t, buffer size, must be at least the size of the data packet
  */
-static ssize_t mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
+static ssize_t 
+mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
 {
    // inform interrupt handler that data is being waited for
    in_read = true;
@@ -184,7 +189,8 @@ static ssize_t mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
 /*
  * mouse_write:
  */
-static ssize_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
+static ssize_t 
+mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;
 	return EROFS;
@@ -193,7 +199,8 @@ static ssize_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *le
 /*
  * mouse_ioctl:
  */
-static int mouse_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+static status_t 
+mouse_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	return EINVAL;
 } // mouse_ioctl
@@ -223,7 +230,8 @@ device_hooks ps2_mouse_hooks = {
  * the "Input buffer full" and "Output buffer full" bits will both be set
  * to 0.
  */
-static void wait_write_ctrl()
+static void 
+wait_write_ctrl()
 {
 	while(in8(PS2_PORT_CTRL) & 0x3);
 } // wait_for_ctrl_output
@@ -233,7 +241,8 @@ static void wait_write_ctrl()
  * Wait until the data port is ready to be written. This requires that
  * the "Input buffer full" bit will be set to 0.
  */
-static void wait_write_data()
+static void 
+wait_write_data()
 {
 	while(in8(PS2_PORT_CTRL) & 0x2);
 } // wait_write_data
@@ -243,7 +252,8 @@ static void wait_write_data()
  * Wait until the data port can be read from. This requires that the
  * "Output buffer full" bit will be set to 1.
  */
-static void wait_read_data()
+static void 
+wait_read_data()
 {
 	while((in8(PS2_PORT_CTRL) & 0x1) == 0);
 } // wait_read_data
@@ -254,7 +264,8 @@ static void wait_read_data()
  * Parameters:
  * unsigned char, byte to write
  */
-static void write_command_byte(unsigned char b)
+static void 
+write_command_byte(unsigned char b)
 {
 	wait_write_ctrl();
 	out8(PS2_CTRL_WRITE_CMD, PS2_PORT_CTRL);
@@ -270,7 +281,8 @@ static void write_command_byte(unsigned char b)
  * Parameters:
  * unsigned char, byte to write
  */
-static void write_aux_byte(unsigned char b)
+static void 
+write_aux_byte(unsigned char b)
 {
 	wait_write_ctrl();
 	out8(PS2_CTRL_WRITE_AUX, PS2_PORT_CTRL);
@@ -284,7 +296,8 @@ static void write_aux_byte(unsigned char b)
  * Return value:
  * unsigned char, byte read
  */
-static unsigned char read_data_byte()
+static unsigned char 
+read_data_byte()
 {
 	wait_read_data();
 	return in8(PS2_PORT_DATA);
@@ -292,7 +305,8 @@ static unsigned char read_data_byte()
 
 
 
-status_t init_hardware()
+status_t 
+init_hardware()
 {
 	/* XXX this driver does not have enough source code to 
 	 * disable the mouse hardware again, so I can't add
@@ -303,7 +317,8 @@ status_t init_hardware()
 } // mouse_dev_init
 
 
-const char **publish_devices(void)
+const char **
+publish_devices(void)
 {
 	static const char *devices[] = {
 		DEVICE_NAME, 
@@ -313,7 +328,8 @@ const char **publish_devices(void)
 	return devices;
 }
 
-device_hooks *find_device(const char *name)
+device_hooks *
+find_device(const char *name)
 {
 	if (!strcmp(name, DEVICE_NAME))
 		return &ps2_mouse_hooks;
@@ -321,7 +337,8 @@ device_hooks *find_device(const char *name)
 	return NULL;
 }
 
-status_t init_driver()
+status_t 
+init_driver()
 {
 	/* XXX parts of this do belong into init_hardware */
 
@@ -355,7 +372,8 @@ status_t init_driver()
 	return 0;
 }
 
-void uninit_driver()
+void 
+uninit_driver()
 {
 	remove_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL);
 	dprintf("removed PS/2 mouse interrupt handler\n");

@@ -73,13 +73,15 @@ const char caps_keymap[128] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static void wait_for_output(void)
+static void
+wait_for_output(void)
 {
 	while(in8(0x64) & 0x2)
 		;
 }
 
-static void set_leds(void)
+static void 
+set_leds(void)
 {
 	wait_for_output();
 	out8(0xed, 0x60);
@@ -87,7 +89,8 @@ static void set_leds(void)
 	out8(leds, 0x60);
 }
 
-static ssize_t _keyboard_read(void *_buf, size_t len)
+static ssize_t 
+_keyboard_read(void *_buf, size_t len)
 {
 	unsigned int saved_tail;
 	char *buf = _buf;
@@ -140,7 +143,8 @@ retry:
 	return copied_bytes;
 }
 
-static void insert_in_buf(char c)
+static void 
+insert_in_buf(char c)
 {
 	unsigned int temp_tail = tail;
 
@@ -156,10 +160,11 @@ static void insert_in_buf(char c)
 	release_sem_etc(keyboard_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
-static int handle_keyboard_interrupt(void* data)
+static int32 
+handle_keyboard_interrupt(void* data)
 {
 	unsigned char key;
-	int retval = B_HANDLED_INTERRUPT;
+	int32 retval = B_HANDLED_INTERRUPT;
 
 	key = in8(0x60);
 //	dprintf("handle_keyboard_interrupt: key = 0x%x\n", key);
@@ -231,23 +236,27 @@ static int handle_keyboard_interrupt(void* data)
 	return retval;
 }
 
-static int keyboard_open(const char *name, uint32 flags, void * *cookie)
+static status_t 
+keyboard_open(const char *name, uint32 flags, void * *cookie)
 {
 	*cookie = NULL;
 	return 0;
 }
 
-static int keyboard_close(void * cookie)
+static status_t 
+keyboard_close(void * cookie)
 {
 	return 0;
 }
 
-static int keyboard_freecookie(void * cookie)
+static status_t 
+keyboard_freecookie(void * cookie)
 {
 	return 0;
 }
 
-static ssize_t keyboard_read(void * cookie, off_t pos, void *buf, size_t *len)
+static ssize_t 
+keyboard_read(void * cookie, off_t pos, void *buf, size_t *len)
 {
 	int rv;
 	if (*len < 0)
@@ -260,12 +269,14 @@ static ssize_t keyboard_read(void * cookie, off_t pos, void *buf, size_t *len)
 	return 0;
 }
 
-static ssize_t keyboard_write(void * cookie, off_t pos, const void *buf,  size_t *len)
+static ssize_t 
+keyboard_write(void * cookie, off_t pos, const void *buf,  size_t *len)
 {
 	return EROFS;
 }
 
-static int keyboard_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+static status_t 
+keyboard_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	return EINVAL;
 }
@@ -283,7 +294,8 @@ device_hooks keyboard_hooks = {
 	NULL
 };
 
-static int setup_keyboard(void)
+static int 
+setup_keyboard(void)
 {
 	keyboard_sem = create_sem(0, "keyboard_sem");
 	if(keyboard_sem < 0)
@@ -304,7 +316,8 @@ static int setup_keyboard(void)
 	return 0;
 }
 
-status_t init_hardware()
+status_t 
+init_hardware()
 {
 	setup_keyboard();
 	install_io_interrupt_handler(0x01, &handle_keyboard_interrupt, NULL, 0);
@@ -312,7 +325,8 @@ status_t init_hardware()
 	return 0;
 }
 
-const char **publish_devices(void)
+const char **
+publish_devices(void)
 {
 	static const char *devices[] = {
 		DEVICE_NAME, 
@@ -322,7 +336,8 @@ const char **publish_devices(void)
 	return devices;
 }
 
-device_hooks *find_device(const char *name)
+device_hooks *
+find_device(const char *name)
 {
 	if (!strcmp(name, DEVICE_NAME))
 		return &keyboard_hooks;
@@ -330,11 +345,13 @@ device_hooks *find_device(const char *name)
 	return NULL;
 }
 
-status_t init_driver()
+status_t 
+init_driver()
 {
 	return 0;
 }
 
-void uninit_driver()
+void 
+uninit_driver()
 {
 }

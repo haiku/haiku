@@ -114,7 +114,7 @@ rootfs_create_vnode(struct rootfs *fs)
 }
 
 
-static int
+static status_t
 rootfs_delete_vnode(struct rootfs *fs, struct rootfs_vnode *v, bool force_delete)
 {
 	// cant delete it if it's in a directory or is a directory
@@ -185,7 +185,7 @@ rootfs_find_in_dir(struct rootfs_vnode *dir, const char *path)
 }
 
 
-static int
+static status_t
 rootfs_insert_in_dir(struct rootfs_vnode *dir, struct rootfs_vnode *v)
 {
 	v->dir_next = dir->stream.dir.dir_head;
@@ -194,7 +194,7 @@ rootfs_insert_in_dir(struct rootfs_vnode *dir, struct rootfs_vnode *v)
 }
 
 
-static int
+static status_t
 rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
 {
 	struct rootfs_vnode *v;
@@ -217,18 +217,18 @@ rootfs_remove_from_dir(struct rootfs_vnode *dir, struct rootfs_vnode *findit)
 }
 
 
-static int
+static bool
 rootfs_is_dir_empty(struct rootfs_vnode *dir)
 {
 	return !dir->stream.dir.dir_head;
 }
 
 
-static int
+static status_t
 rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, bool isDirectory)
 {
 	struct rootfs_vnode *vnode;
-	int status = B_OK;
+	status_t status = B_OK;
 
 	mutex_lock(&fs->lock);
 
@@ -260,12 +260,12 @@ err:
 //	#pragma mark -
 
 
-static int
+static status_t
 rootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *root_vnid)
 {
 	struct rootfs *fs;
 	struct rootfs_vnode *vnode;
-	int err;
+	status_t err;
 
 	TRACE(("rootfs_mount: entry\n"));
 
@@ -325,7 +325,7 @@ err1:
 }
 
 
-static int
+static status_t
 rootfs_unmount(fs_cookie _fs)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -352,7 +352,7 @@ rootfs_unmount(fs_cookie _fs)
 }
 
 
-static int
+static status_t
 rootfs_sync(fs_cookie fs)
 {
 	TRACE(("rootfs_sync: entry\n"));
@@ -361,14 +361,14 @@ rootfs_sync(fs_cookie fs)
 }
 
 
-static int
+static status_t
 rootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *dir = (struct rootfs_vnode *)_dir;
 	struct rootfs_vnode *vnode,*vdummy;
 	struct rootfs_vnode *v1;
-	int status;
+	status_t status;
 
 	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
 	if (dir->stream.type != STREAM_TYPE_DIR)
@@ -397,7 +397,7 @@ err:
 }
 
 
-static int
+static status_t
 rootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
 {
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
@@ -409,7 +409,7 @@ rootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t buffe
 }
 
 
-static int
+static status_t
 rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -433,7 +433,7 @@ rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 }
 
 
-static int
+static status_t
 rootfs_put_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 {
 #if ROOTFS_TRACE
@@ -445,7 +445,7 @@ rootfs_put_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 }
 
 
-static int
+static status_t
 rootfs_remove_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -470,14 +470,14 @@ rootfs_remove_vnode(fs_cookie _fs, fs_vnode _vnode, bool reenter)
 }
 
 
-static int
+static status_t
 rootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *new_vnid)
 {
 	return EINVAL;
 }
 
 
-static int
+static status_t
 rootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 {
 	// allow to open the file, but it can't be done anything with it
@@ -485,7 +485,7 @@ rootfs_open(fs_cookie _fs, fs_vnode _v, int oflags, file_cookie *_cookie)
 }
 
 
-static int
+static status_t
 rootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
 #if ROOTFS_TRACE
@@ -498,7 +498,7 @@ rootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 }
 
 
-static int
+static status_t
 rootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
 	struct rootfs_cookie *cookie = _cookie;
@@ -514,7 +514,7 @@ rootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 }
 
 
-static int
+static status_t
 rootfs_fsync(fs_cookie _fs, fs_vnode _v)
 {
 	return 0;
@@ -544,14 +544,14 @@ rootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 }
 
 
-static int
+static status_t
 rootfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 	struct rootfs_vnode *vnode;
 	bool created_vnode = false;
-	int status = 0;
+	status_t status = 0;
 
 	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n", dir, name, perms,*new_vnid, new_vnid));
 
@@ -597,7 +597,7 @@ err:
 }
 
 
-static int
+static status_t
 rootfs_remove_dir(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct rootfs *fs = _fs;
@@ -609,7 +609,7 @@ rootfs_remove_dir(fs_cookie _fs, fs_vnode _dir, const char *name)
 }
 
 
-static int
+static status_t
 rootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -639,7 +639,7 @@ rootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 }
 
 
-static int
+static status_t
 rootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	struct rootfs_cookie *cookie = _cookie;
@@ -679,7 +679,7 @@ err:
 }
 
 
-static int
+static status_t
 rootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 {
 	struct rootfs *fs = _fs;
@@ -695,7 +695,7 @@ rootfs_rewind_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie)
 }
 
 
-static int
+static status_t
 rootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *buf, size_t len)
 {
 	TRACE(("rootfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n", _v, _cookie, op, buf, len));
@@ -704,7 +704,7 @@ rootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *bu
 }
 
 
-static int
+static status_t
 rootfs_can_page(fs_cookie _fs, fs_vnode _v)
 {
 	return -1;
@@ -725,7 +725,7 @@ rootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 }
 
 
-static int
+static status_t
 rootfs_read_link(fs_cookie _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 {
 	struct rootfs *fs = _fs;
@@ -742,14 +742,14 @@ rootfs_read_link(fs_cookie _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 }
 
 
-static int
+static status_t
 rootfs_symlink(fs_cookie _fs, fs_vnode _dir, const char *name, const char *path, int mode)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 	struct rootfs_vnode *vnode;
 	bool created_vnode = false;
-	int status = 0;
+	status_t status = 0;
 
 	TRACE(("rootfs_symlink: dir %p, name = '%s', path = %s\n", dir, name, path));
 
@@ -798,7 +798,7 @@ err:
 }
 
 
-static int
+static status_t
 rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct rootfs *fs = _fs;
@@ -810,14 +810,14 @@ rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 }
 
 
-static int
+static status_t
 rootfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *olddir = _olddir;
 	struct rootfs_vnode *newdir = _newdir;
 	struct rootfs_vnode *v1, *v2;
-	int err;
+	status_t err;
 
 	TRACE(("rootfs_rename: olddir %p (0x%Lx), oldname '%s', newdir %p (0x%Lx), newname '%s'\n",
 		olddir, olddir->id, oldname, newdir, newdir->id, newname));
@@ -882,7 +882,7 @@ err:
 }
 
 
-static int
+static status_t
 rootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 {
 	struct rootfs_vnode *vnode = _v;
@@ -898,7 +898,7 @@ rootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 }
 
 
-static int
+static status_t
 rootfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
 #if ROOTFS_TRACE
@@ -968,7 +968,7 @@ static struct fs_calls rootfs_calls = {
 };
 
 
-int
+status_t
 bootstrap_rootfs(void)
 {
 	dprintf("bootstrap_rootfs: entry\n");

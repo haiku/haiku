@@ -1,6 +1,9 @@
 #ifndef _KERNEL_ATOMIC_H
 #define _KERNEL_ATOMIC_H
 
+#include <ktypes.h>
+typedef volatile int vint32; //XXX misplaced here
+
 /**
  * @file kernel/atomic.h
  * @brief Prototypes for kernel and user versions of atomic
@@ -17,37 +20,41 @@
 extern "C" {
 #endif 
 
-/* XXX - atomic_set is defined as using a volatile as this stops a 
- * compiler warning, but is there any reason why they shouldn't all
- * be so defined? They were in arch/cpu.h...
+/* atomic_add(), atomic_and(), atomic_or() must 
+ * match the definitions in SupportDefs.h
  */
+
 /**
  * Perform an atomic addition.
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int atomic_add(int *val, int incr);
+int32 atomic_add(vint32 *val, int32 incr);
+
 /**
  * Atomic and operation
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int atomic_and(int *val, int incr);
+int32 atomic_and(vint32 *val, int32 incr);
+
 /**
  * Atomic or operation
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int atomic_or(int *val, int incr);
-int atomic_set(volatile int *val, int set_to);
+int32 atomic_or(vint32 *val, int32 incr);
+
+int32 atomic_set(vint32 *val, int32 set_to);
+
 /* Compare the value of val with test_val. If they
  * are equal then set the value of 'val' to
  * 'set_to'
  */
-int test_and_set(int *val, int set_to, int test_val);
+int32 test_and_set(vint32 *val, int32 set_to, int32 test_val);
 
 /**
  * Atomic add (user version)
@@ -55,29 +62,33 @@ int test_and_set(int *val, int set_to, int test_val);
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int user_atomic_add(int *val, int incr);
+int32 user_atomic_add(vint32 *val, int32 incr);
+
 /**
  * Atomic and (user version)
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int user_atomic_and(int *val, int incr);
+int32 user_atomic_and(vint32 *val, int32 incr);
+
 /**
  * Atomic or (user version)
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
  * @note Returns value of val before addition
  */
-int user_atomic_or(int *val, int incr);
-int user_atomic_set(int *val, int set_to);
+int32 user_atomic_or(vint32 *val, int32 incr);
+
+int32 user_atomic_set(vint32 *val, int32 set_to);
+
 /* Compare the value of val with test_val. If they
  * are equal then set the value of 'val' to
  * 'set_to'
  * @note This is the user version and should not be used within
  *       the kernel.
  */
-int user_test_and_set(int *val, int set_to, int test_val);
+int32 user_test_and_set(vint32 *val, int32 set_to, int32 test_val);
 
 #ifdef __cplusplus
 }
