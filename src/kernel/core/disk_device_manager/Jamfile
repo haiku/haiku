@@ -23,6 +23,7 @@ SharedLibrary disk_device_manager :
 	KFileSystem.cpp
 	KPartition.cpp
 	KPartitioningSystem.cpp
+	KPartitionListener.cpp
 	KPartitionVisitor.cpp
 	KPhysicalPartition.cpp
 	KShadowPartition.cpp
