@@ -85,12 +85,12 @@ _protected_code_segment:
  */
 
 enable_a20:
-	movw	$2402, %ax		// first, query the a20 status
+	movw	$0x2402, %ax		// first, query the a20 status
 	int		$0x15
 	jc		_a20_old_method		// if that fails, use the old AT method
 	test	$0x1, %al
 	jnz		_a20_done			// Is a20 gate already enabled?
-	movw	$2401, %ax
+	movw	$0x2401, %ax
 	int		$0x15
 	jnc		_a20_done
 _a20_old_method:
