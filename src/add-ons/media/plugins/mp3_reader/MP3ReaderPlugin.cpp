@@ -243,12 +243,15 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 
 	BMediaFormats formats;
 	status_t result = formats.InitCheck();
-	if (result != B_OK) {
-		return result;
+	if (result == B_OK) {
+		result = formats.GetFormatFor(description, &data->format);
 	}
-	result = formats.GetFormatFor(description, &data->format);
 	if (result != B_OK) {
-		return result;
+		TRACE("mp3Reader::AllocateCookie: Unable to GetFormatFor mpeg description\n");
+		// ignore error result, use default format
+		data->format.type = B_MEDIA_ENCODED_AUDIO;
+		data->format.user_data_type = B_CODEC_TYPE_INFO;
+		strncpy((char*)data->format.user_data, "mpeg", 4);
 	}
 
 	data->format.u.encoded_audio.bit_rate = bit_rate;
