@@ -58,6 +58,7 @@ Server app_server :
 	# We'll just remove this from the build for a little while...
 	#ScreenDriver.cpp
 	ViewDriver.cpp
+	DirectDriver.cpp
 	DefaultDecorator.cpp
 	Layer.cpp
 	RootLayer.cpp

@@ -656,7 +656,7 @@ void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRec
 
 void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
 {
-	Lock();
+/*	Lock();
 
 	FBBitmap		frameBuffer;
 	FBBitmap		*fbmp = &frameBuffer;
@@ -671,6 +671,7 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect 
 	Unlock();
 	
 	Invalidate(dest);
+*/
 }
 
 void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)
@@ -1915,6 +1916,20 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 
 void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
 {
+	float arc_x;
+	float yrad2 = yrad*yrad;
+	int i;
+	
+	Lock();
+	
+	for (i=0; i<=(int)yrad; i++)
+	{
+		arc_x = xrad*sqrt(1-i*i/yrad2);
+		StrokeSolidLine(BPoint(r.left+xrad-arc_x,r.top+yrad-i),BPoint(r.right-xrad+arc_x,r.top+yrad-i),color);
+		StrokeSolidLine(BPoint(r.left+xrad-arc_x, r.bottom-yrad+i),BPoint(r.right-xrad+arc_x,r.bottom-yrad+i),color);
+	}
+	FillSolidRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),color);
+	Unlock();
 }
 
 /*!
@@ -2562,7 +2577,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const RGB
 
 void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d)
 {
-// IMPLEMENT!!! This is TEMPORALY!!!
+// TODO: IMPLEMENT!!! This is TEMPORARY!!!
 	Lock();
 	//Not quite that simple bub - REDO!!!
 	RGBColor		c = d->highcolor;
