@@ -1,16 +1,19 @@
 #include <stdlib.h>
 #include <Alert.h>
 #include <Autolock.h>
-#include <Debug.h>
 #include <Clipboard.h>
+#include <Debug.h>
+#include <Dragger.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Menu.h>
 #include <MenuItem.h>
+#include <OS.h>
 #include <Path.h>
 #include <PrintJob.h>
 #include <Roster.h>
 #include <ScrollView.h>
+#include <Shelf.h>
 #include <StorageDefs.h>
 #include <String.h>
 #include <TextControl.h>
@@ -21,7 +24,6 @@
 #include <TerminalApp.h>
 #include <TerminalWindow.h>
 
-#include <debugger.h>
 
 BRect terminalWindowBounds(0,0,560,390);
 
@@ -52,10 +54,16 @@ TerminalWindow::InitCheck(void)
 {
 	return fInitStatus;
 }
-	
+
 status_t
 TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 {
+	BView * view = new BView(Bounds(),"view",B_FOLLOW_ALL, B_FRAME_EVENTS|B_WILL_DRAW);
+	AddChild(view);
+	rgb_color white = {255,255,255,0};
+	view->SetViewColor(white);
+	BShelf * shelf = new BShelf(view);
+
 	status_t ignore = RestoreSettings(settingsRef);
 	
 	BString unTitled;
@@ -68,24 +76,47 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	
 	AddChild(fMenuBar);
 
-	// Add textview and scrollview
-	BRect viewFrame;
-	BRect textBounds;
+	// Add shell view and scroll view
+	BRect shellFrame;
+	shellFrame.top = fMenuBar->Bounds().Height();
+	shellFrame.right = Bounds().Width() - B_V_SCROLL_BAR_WIDTH;
+	shellFrame.left = 0;
+	shellFrame.bottom = Bounds().Height();
 	
-	viewFrame = Bounds();
+	fShellView = new BView(shellFrame,"shellview",B_FOLLOW_ALL, B_FRAME_EVENTS|B_WILL_DRAW);
+	rgb_color red = {170,80,80,0};
+	fShellView->SetViewColor(red);
 	
-	viewFrame.top = fMenuBar->Bounds().Height()+1;
-	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
-	viewFrame.left = 0;
-	
-	fShellView = new BView(viewFrame,"shellview",B_FOLLOW_ALL, B_FRAME_EVENTS|B_WILL_DRAW);
-	fShellView->SetLowColor(170,45,45);
+	if (BDragger::AreDraggersDrawn()) {
+		fShellView->ResizeBy(0,-8);
+	}
 	
 	fScrollView = new BScrollView("scrollview", fShellView, B_FOLLOW_ALL, 
-	                              B_FRAME_EVENTS|B_WILL_DRAW, false, true, B_PLAIN_BORDER);
-	AddChild(fScrollView);
-	fShellView->MakeFocus(true);	
+	                              B_FRAME_EVENTS|B_WILL_DRAW, false, true, B_NO_BORDER);
+	view->AddChild(fScrollView);
 
+	// add dragger view
+	BRect draggerFrame;
+	draggerFrame.top = shellFrame.bottom - 8;
+	draggerFrame.right = shellFrame.right;
+	draggerFrame.left = shellFrame.right - 7;
+	draggerFrame.bottom = Bounds().Height();
+
+	BDragger * dragger = new BDragger(draggerFrame,fScrollView,B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM,B_FRAME_EVENTS|B_WILL_DRAW);
+	if (!BDragger::AreDraggersDrawn()) {
+		dragger->Hide();
+	}
+	view->AddChild(dragger);
+
+//	BRect blankFrame;
+//	blankFrame.top = shellFrame.bottom;
+//	blankFrame.right = draggerFrame.left;
+//	blankFrame.left = 0;
+//	blankFrame.bottom = draggerFrame.bottom;
+//	BView * blankView = new BView(blankFrame,"blankview",B_FOLLOW_ALL|B_WILL_DRAW,B_FRAME_EVENTS);
+//	view->AddChild(blankView);
+	fShellView->MakeFocus(true);
+	
 	// Terminal menu
 	fTerminal = new BMenu("Terminal");
 	fMenuBar->AddItem(fTerminal);
