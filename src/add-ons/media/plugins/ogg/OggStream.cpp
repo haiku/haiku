@@ -200,9 +200,9 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		fSeekStreamState = seekStreamState;
 		// we notably do not clear our temporary stream
 		// instead we just let it go out of scope
-		fCurrentPage = fOggFrameInfos[*frame].GetPage();
-		fPacketOnCurrentPage = fOggFrameInfos[*frame].GetPacketOnPage();
-		fCurrentPacket = fOggFrameInfos[*frame].GetPacket();
+		fCurrentPage = fOggFrameInfos[*frame].GetNextPage();
+		fPacketOnCurrentPage = fOggFrameInfos[*frame].GetNextPacketOnPage();
+		fCurrentPacket = fOggFrameInfos[*frame].GetNextPacket();
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		*frame = *time/50000;
 		return Seek(B_MEDIA_SEEK_TO_FRAME,frame,time);
@@ -221,6 +221,9 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 		fOggFrameInfos.push_back(info);
 	}
 	status_t result = GetPacket(&packet);
+	if (fCurrentPacket - fHeaderPackets.size() == fOggFrameInfos.size()) {
+		fOggFrameInfos[fOggFrameInfos.size()-1].SetNext(fEndPage,fPacketOnEndPage,fEndPacket);
+	}
 	if (result != B_OK) {
 		TRACE("OggStream::GetNextChunk failed: GetPacket = %s\n", strerror(result));
 		return result;
