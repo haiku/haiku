@@ -1,23 +1,22 @@
 SubDir OBOS_TOP src apps bin ;
 
 StdBinCommands
-		alert.cpp
-		beep.cpp
-		clipboard.cpp
-		shutdown.cpp
-		clipboard.cpp
-		df.cpp
-		isvolume.cpp
-		lsindex.cpp
-		yes.cpp
-		version.cpp
-		listattr.cpp
-		setversion.cpp
+	alert.cpp
+	beep.cpp
+	clipboard.cpp
+	df.cpp
+	isvolume.cpp
+	lsindex.cpp
+	yes.cpp
+	version.cpp
+	listattr.cpp
+	setversion.cpp
+	shutdown.cpp
 	: be ;
 
 StdBinCommands
-		roster.cpp
-		catattr.cpp
+	roster.cpp
+	catattr.cpp
 	: be stdc++.r4 ;
 
 StdBinCommands
@@ -37,9 +36,10 @@ StdBinCommands
 	unmount.c
 	waitfor.c
 	whoami.c
-;
+	;
 
 #SubInclude OBOS_TOP src apps bin gnu ;
+SubInclude OBOS_TOP src apps bin chkbfs ;
 SubInclude OBOS_TOP src apps bin listdev ;
 SubInclude OBOS_TOP src apps bin mkdos ;
 SubInclude OBOS_TOP src apps bin pc ;
