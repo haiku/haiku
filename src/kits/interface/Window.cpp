@@ -53,7 +53,7 @@
 #include <Roster.h>
 
 // Local Includes --------------------------------------------------------------
-#include "WindowAux.h"
+#include <WindowAux.h>
 #include <TokenSpace.h>
 #include "MessageUtils.h"
 
@@ -1769,11 +1769,11 @@ void BWindow::ResizeBy(float dx, float dy){
 void BWindow::ResizeTo(float width, float height){
 
 		// stay in minimum & maximum frame limits
-	width < fMinWindWidth ? fMinWindWidth : width;
-	width > fMaxWindWidth ? fMaxWindWidth : width;
+	width = (width < fMinWindWidth) ? fMinWindWidth : width;
+	width = (width > fMaxWindWidth) ? fMaxWindWidth : width;
 
-	height < fMinWindHeight ? fMinWindHeight : height;
-	height > fMaxWindHeight ? fMaxWindHeight : height;
+	height = (height < fMinWindHeight) ? fMinWindHeight : height;
+	height = (height > fMaxWindHeight) ? fMaxWindHeight : height;
 
 	serverLink->SetOpCode( AS_WINDOW_RESIZE );
 	serverLink->Attach( width );
@@ -2418,12 +2418,20 @@ void BWindow::detachView(BView *aView){
 //------------------------------------------------------------------------------
 
 void BWindow::setFocus(BView *focusView, bool notifyInputServer){
+	BView* previousFocus = fFocus;
+
+	if (previousFocus == focusView)
+		return;
 
 	fFocus			= NULL;
-	fFocus->Draw( fFocus->Bounds() );
+
+	if (previousFocus != NULL)
+		previousFocus->Invalidate();
 
 	fFocus			= focusView;
-	fFocus->Draw( fFocus->Bounds() );
+
+	if (focusView != NULL)
+		focusView->Invalidate();
 
 // TODO: find out why do we have to notify input server.
 	if (notifyInputServer){
