@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src add-ons kernel drivers arch x86 floppy ;
+
+KernelObjects
+	floppy.c
+	floppy_ctrl.c 
+	device_icons.c
+	:
+	-fno-pic -D_KERNEL_MODE
+	;
+
+KernelLd floppy :
+	<$(SOURCE_GRIST)>floppy.o
+	<$(SOURCE_GRIST)>floppy_ctrl.o
+	<$(SOURCE_GRIST)>device_icons.o
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	drivers/dev/floppy
+; 
+
