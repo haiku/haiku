@@ -169,6 +169,8 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>thread.o
+		# currently only necessary for x86
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
@@ -348,14 +350,14 @@ KernelLd pipe_test :
 	: beos/bin/pipe_test
 	;
 
-KernelLd envtest :
+KernelLd fork_test :
 	libglue2.o
-	<$(SOURCE_GRIST)!apps!envtest>main.o
+	<$(SOURCE_GRIST)!apps>fork_test.o
 	libroot.so
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	: beos/bin/envtest
+	: beos/bin/fork_test
 	;
 
 #if $(OS) = "BEOS" 
