@@ -9,11 +9,29 @@
 #include <elf_priv.h>
 #include <arch/elf.h>
 
-#define ELF_TRACE 0
-#if ELF_TRACE
+
+//#define TRACE_ARCH_ELF
+#ifdef TRACE_ARCH_ELF
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
+#endif
+
+
+#ifdef TRACE_ARCH_ELF
+static const char *kRelocations[] = {
+	"R_386_NONE",
+	"R_386_32",			/* add symbol value */
+	"R_386_PC32",		/* add PC relative symbol value */
+	"R_386_GOT32",		/* add PC relative GOT offset */
+	"R_386_PLT32",		/* add PC relative PLT offset */
+	"R_386_COPY",		/* copy data from shared object */
+	"R_386_GLOB_DAT",	/* set GOT entry to data address */
+	"R_386_JMP_SLOT",	/* set GOT entry to code address */
+	"R_386_RELATIVE",	/* add load address of shared object */
+	"R_386_GOTOFF",		/* add GOT relative symbol address */
+	"R_386_GOTPC",		/* add PC relative GOT table address */
+};
 #endif
 
 
@@ -31,7 +49,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	S = A = P = 0;
 
 	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
-		TRACE(("looking at rel type %d, offset 0x%x\n", ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset));
+		TRACE(("looking at rel type %s, offset 0x%lx\n", kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
 
 		// calc S
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
@@ -48,7 +66,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				vlErr = elf_resolve_symbol(image, sym, resolve_image, sym_prepend, &S);
 				if (vlErr < 0)
 					return vlErr;
-				TRACE(("S %p\n", (void *)S));
+				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, sym)));
 			}
 		}
 		// calc A
@@ -98,6 +116,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				return EPERM;
 		}
 		*(addr_t *)(image->text_region.delta + rel[i].r_offset) = final_val;
+		TRACE(("-> offset %p = %p\n", (void *)(image->text_region.delta + rel[i].r_offset), (void *)final_val));
 	}
 
 	return B_NO_ERROR;
