@@ -68,6 +68,7 @@ private:
 friend class BView;
 friend class BDirectWindow;
 friend class Support;
+friend class BPortLink;
 
 		void	_AddRect(clipping_rect r);
 		void	set_size(long new_size);
