@@ -603,10 +603,10 @@ rule TestObjects
 	# set headers/defines
 	UseCppUnitObjectHeaders $(sources) : $(objects) ;
 	if $(r5) {
-		ObjectDefines $(objects) : TEST_R5 ;
+		ObjectsDefines $(objects) : TEST_R5 ;
 	} else {
 		UsePublicObjectHeaders $(sources) : $(headerDirs) : $(objects) ;
-		ObjectDefines $(objects) : TEST_OBOS ;
+		ObjectsDefines $(objects) : TEST_OBOS ;
 	}
 
 	if ! $(NO_TEST_DEBUG) {
@@ -657,8 +657,7 @@ rule SimpleTest
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(relPath) ] ;
 	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : $(libraries) ;
-	ObjectDefines $(sources) : TEST_OBOS ;
-
+	ObjectsDefines $(sources) : TEST_OBOS ;
 	if ! $(NO_TEST_DEBUG) {
 		# Turn debugging on. That is usually desired for test code.
 		ObjectCcFlags $(sources) : "-g" ;
@@ -919,6 +918,15 @@ actions ResComp1
 	$(2[1]) -o $(1) $(2[2-])
 }
 
+rule ObjectsDefines
+{
+	# Like ObjectDefines, but allows multiple files to be supplied
+	local file ;
+	for file in $(1) {
+		ObjectDefines $(file) : $(2) ;
+	}
+}
+
 rule SourceHdrs
 {
 	# SourceHdrs <sources> : <headers> [ : <gristed objects> ] ;
@@ -931,10 +939,15 @@ rule SourceHdrs
 	local headers = $(2) ;
 	local objects = $(3) ;
 
+	local file ;
 	if $(objects) {
-		ObjectHdrs $(objects) : $(headers) ;
+		for file in $(objects) {
+			ObjectHdrs $(file) : $(headers) ;
+		}
 	} else {
-		ObjectHdrs $(sources) : $(headers) ;
+		for file in $(sources) {
+			ObjectHdrs $(file) : $(headers) ;
+		}
 	}
 
 	# Also add the header search dirs to HDRSEARCH. Note, that these dirs
