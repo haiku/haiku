@@ -15,7 +15,10 @@
 // Type
 class Type {
 public:
-	Type(TypeHandler *handler) : fHandler(handler) {}
+	Type(string typeName, TypeHandler *handler)
+		: fTypeName(typeName), fHandler(handler) {}
+
+	const string &TypeName() const	{ return fTypeName; }
 
 	void SetHandler(TypeHandler *handler)
 	{
@@ -26,14 +29,15 @@ public:
 	TypeHandler	*Handler() const	{ return fHandler; }
 
 private:
+	string		fTypeName;
 	TypeHandler	*fHandler;
 };
 
 // Parameter
 class Parameter : public Type {
 public:
-	Parameter(string name, int32 offset, TypeHandler *handler)
-		: Type(handler),
+	Parameter(string name, int32 offset, string typeName, TypeHandler *handler)
+		: Type(typeName, handler),
 		  fName(name),
 		  fOffset(offset)
 	{
@@ -50,8 +54,11 @@ private:
 // Syscall
 class Syscall {
 public:
-	Syscall(string name, TypeHandler *returnTypeHandler)
-		: fName(name), fReturnType(new Type(returnTypeHandler)) {}
+	Syscall(string name, string returnTypeName, TypeHandler *returnTypeHandler)
+		: fName(name),
+		  fReturnType(new Type(returnTypeName, returnTypeHandler))
+	{
+	}
 
 	const string &Name() const
 	{
@@ -68,9 +75,10 @@ public:
 		fParameters.push_back(parameter);
 	}
 
-	void AddParameter(string name, int32 offset, TypeHandler *handler)
+	void AddParameter(string name, int32 offset, string typeName,
+		TypeHandler *handler)
 	{
-		AddParameter(new Parameter(name, offset, handler));
+		AddParameter(new Parameter(name, offset, typeName, handler));
 	}
 
 	int32 CountParameters() const
