@@ -77,8 +77,9 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fScreenXResolution = 0;
 	fScreenYResolution = 0;
 	fColorSpace = B_RGB32;
-	
-	fViewToken = 0; // is this used for WinBorders?
+
+	// easy way to identify this class.
+	fClassID = AS_ROOTLAYER_CLASS;
 	fHidden	= false;
 	
 }

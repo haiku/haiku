@@ -24,6 +24,14 @@ enum
 	B_LAYER_CHILDREN_DEPENDANT = 0x1000U,
 };
 
+// easy way to determine class type
+enum
+{
+	AS_LAYER_CLASS		= 1,
+	AS_WINBORDER_CLASS	= 2,
+	AS_ROOTLAYER_CLASS	= 3,
+};
+
 class ServerWindow;
 class RootLayer;
 class DisplayDriver;
@@ -70,9 +78,6 @@ public:
 	
 	virtual	void Draw(const BRect &r);
 	
-	void SendViewMovedMsg(void);
-	void SendViewResizedMsg(void);
-	
 	virtual	void Show(bool invalidate=true);
 	virtual	void Hide(bool invalidate=true);
 	bool IsHidden(void) const;
@@ -94,6 +99,8 @@ public:
 	
 	DisplayDriver *GetDisplayDriver(void) const { return fDriver; }
 	ServerWindow *Window(void) const { return fServerWin; }
+	bool IsClientLayer() const;
+	bool IsServerLayer() const;
 
 	void PruneTree(void);
 	
@@ -105,7 +112,11 @@ public:
 	void SetRootLayer(RootLayer *rl){ fRootLayer = rl; }
 	void SetServerWindow(ServerWindow *win);
 	void SetAsTopLayer(bool option) { fIsTopLayer = option; }
-	
+	bool IsTopLayer() const { return fIsTopLayer; }
+
+	void UpdateStart() { fInUpdate = true; }
+	void UpdateEnd() { fInUpdate = false; }
+	bool InUpdate() const { return fInUpdate; }
 
 protected:
 	friend class RootLayer;
@@ -140,9 +151,10 @@ protected:
 	uint32 fFlags;
 	uint32 fResizeMode;
 	bool fHidden;
-	bool fIsUpdating;
+	bool fInUpdate;
 	bool fIsTopLayer;
 	uint16 fAdFlags;
+	int8 fClassID;
 	
 	DisplayDriver *fDriver;
 	LayerData *fLayerData;
@@ -153,6 +165,10 @@ protected:
 private:
 	void RequestDraw(const BRegion &reg, Layer *startFrom);
 	ServerWindow *SearchForServerWindow(void) const;
+
+	void Layer::SendUpdateMsg();
+	void SendViewMovedMsg(void);
+	void SendViewResizedMsg(void);
 
 };
 

@@ -64,10 +64,11 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 
 	fFlags			= flags;
 	fAdFlags		= 0;
+	fClassID		= AS_LAYER_CLASS;
 	fResizeMode		= resize;
 	fHidden			= false;
 	
-	fIsUpdating		= false;
+	fInUpdate		= false;
 	fIsTopLayer		= false;
 	fLevel			= 0;
 	
@@ -439,24 +440,61 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 {
 	STRACE(("Layer(%s)::RequestDraw()\n", GetName()));
 
+	// do not redraw any child until you must
 	int redraw = false;
-
 	if (startFrom == NULL)
 		redraw = true;
 
 	if (fVisible.CountRects() > 0)
 	{
-		fUpdateReg = fVisible;
-		if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
-		else { fUpdateReg.IntersectWith(&reg); }
-		
-		if (fUpdateReg.CountRects() > 0){
-			fDriver->ConstrainClippingRegion(&fUpdateReg);
-			Draw(fUpdateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
+		// client side drawing. Send only one UPDATE message!
+		if (IsClientLayer())
+		{
+			if (IsTopLayer())
+			{
+				// calculate the minimum region/rectangle to be updated with
+				// a single message to the client.
+				fUpdateReg = fFullVisible;
+				if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+				else { fUpdateReg.IntersectWith(&reg); }
 
-	// TODO: WARNING: For the Update code is MUST NOT be emptied
-			fUpdateReg.MakeEmpty();
+				if (fUpdateReg.CountRects() > 0)
+				{
+					SendUpdateMsg();
+				}
+				
+				// we're not that different than other. We too have an
+				// update region to which our drawing is restrincted.
+			}
+
+			// calculate the update region, then...
+			fUpdateReg = fVisible;
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+			else { fUpdateReg.IntersectWith(&reg); }
+
+			if (fUpdateReg.CountRects() > 0)
+			{
+				// clear background with viewColor.
+				fDriver->ConstrainClippingRegion(&fUpdateReg);
+				fDriver->FillRect(fUpdateReg.Frame(), fLayerData->viewcolor);
+				fDriver->ConstrainClippingRegion(NULL);
+			}
+		}
+		// server drawings are immediate.
+		// No IPC is needed so this is done in place.
+		else
+		{
+			fUpdateReg = fVisible;
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+			else { fUpdateReg.IntersectWith(&reg); }
+
+			if (fUpdateReg.CountRects() > 0)
+			{
+				fDriver->ConstrainClippingRegion(&fUpdateReg);
+				Draw(fUpdateReg.Frame());
+				fDriver->ConstrainClippingRegion(NULL);
+				fUpdateReg.MakeEmpty();
+			}
 		}
 	}
 
@@ -1071,6 +1109,20 @@ void Layer::ResizeBy(float x, float y)
 	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
+bool Layer::IsClientLayer() const {
+	switch (fClassID){
+		case AS_WINBORDER_CLASS:
+		case AS_ROOTLAYER_CLASS:
+			return false;
+		default:
+			return true;
+	}
+}
+
+bool Layer::IsServerLayer() const {
+	return !IsClientLayer();
+}
+
 void Layer::PrintToStream(void)
 {
 	printf("\n----------- Layer %s -----------\n",fName->String());
@@ -1221,6 +1273,19 @@ void Layer::SendViewMovedMsg()
 		msg.AddInt64( "when", real_time_clock_usecs() );
 		msg.AddInt32( "_token", fViewToken );
 		msg.AddPoint( "where", fFrame.LeftTop() );
+		
+		fServerWin->SendMessageToClient( &msg );
+	}
+}
+
+void Layer::SendUpdateMsg()
+{
+	if( fServerWin )
+	{
+		BMessage msg;
+		msg.what = _UPDATE_;
+		msg.AddRect( "_rect", ConvertFromTop(fUpdateReg.Frame()) );
+		msg.AddRect( "debug_rect", fUpdateReg.Frame() );
 		
 		fServerWin->SendMessageToClient( &msg );
 	}

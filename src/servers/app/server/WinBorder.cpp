@@ -86,6 +86,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	// unlike BViews, windows start off as hidden
 	fHidden			= true;
 	fServerWin		= win;
+	fClassID		= AS_WINBORDER_CLASS;
 
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
