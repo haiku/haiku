@@ -15,13 +15,10 @@
 class BDiskDevice;
 class BPartition;
 
-extern const char *B_INTEL_PARTITION_STYLE;
+extern const char *B_INTEL_PARTITIONING;
 
 class BSession {
 public:
-	BSession();
-	~BSession();
-
 	BDiskDevice *Device() const;
 
 	off_t Offset() const;
@@ -37,23 +34,26 @@ public:
 	bool IsData() const;
 	bool IsVirtual() const;
 
-	const char *PartitionStyle() const;
+	const char *PartitioningSystem() const;
 
 	int32 UniqueID() const;
 
-	BPartition *EachPartition(BDiskDeviceVisitor *visitor);
-		// return BPartition* if terminated early
+	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
 
 	status_t GetPartitioningParameters(const char *partitioningSystem,
-									   BPoint dialogCenter,
 									   BString *parameters,
+									   BPoint dialogCenter = BPoint(-1, -1),
 									   bool *cancelled = NULL);
 	status_t Partition(const char *partitioningSystem, const char *parameters);
 	status_t Partition(const char *partitioningSystem,
 					   BPoint dialogCenter = BPoint(-1, -1),
 					   bool *cancelled = NULL);
 
+	static status_t GetPartitioningSystemList(BObjectList<BString> *list);
+
 private:
+	BSession();
+	~BSession();
 	BSession(const BSession &);
 	BSession &operator=(const BSession &);
 

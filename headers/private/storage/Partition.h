@@ -18,9 +18,6 @@ class BVolume;
 
 class BPartition {
 public:
-	BPartition();
-	~BPartition();
-
 	BSession *Session() const;
 	BDiskDevice *Device() const;
 
@@ -33,6 +30,7 @@ public:
 	bool IsHidden() const;
 	bool IsVirtual() const;
 	bool IsEmpty() const;
+	bool ContainsFileSystem() const;
 
 	const char *Name() const;
 	const char *Type() const;
@@ -50,22 +48,28 @@ public:
 
 	status_t GetIcon(BBitmap *icon, icon_size which) const;
  
-	status_t Mount(uint32 mountflags = 0, const char *parameters = NULL);
+	status_t Mount(uint32 mountFlags = 0, const char *parameters = NULL);
 	status_t Unmount();
 
 	status_t GetInitializationParameters(const char *fileSystem,
-										 BPoint dialogCenter,
+										 BString *volumeName,
 										 BString *parameters,
+										 BPoint dialogCenter = BPoint(-1, -1),
 										 bool *cancelled = NULL);
-	status_t Initialize(const char *fileSystem, const char *parameters);
+	status_t Initialize(const char *fileSystem, const char *volumeName,
+						const char *parameters);
 	status_t Initialize(const char *fileSystem = "bfs",
 						BPoint dialogCenter = BPoint(-1, -1),
 						bool *cancelled = NULL);
 
-	static status_t GetFileSystemList(BObjectList<BString*> *list);
+// TODO: Return more info, e.g. the long name?
+	static status_t GetFileSystemList(BObjectList<BString> *list);
 	
 private:
+	BPartition();
 	BPartition(const BPartition &);
+	~BPartition();
+
 	BPartition &operator=(const BPartition &);
 
 private:

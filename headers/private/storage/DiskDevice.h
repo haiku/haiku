@@ -17,12 +17,13 @@ public:
 	BDiskDevice();
 	~BDiskDevice();
 
+	off_t Size() const;
+	int32 BlockSize() const;
+
 	int32 CountSessions() const;
 	BSession *SessionAt(int32 index) const;
 
 	int32 CountPartitions() const;
-	
-	int32 BlockSize() const;
 
 	const char *DevicePath() const;
 	void GetName(BString *name, bool includeBusID = true, 
@@ -34,21 +35,18 @@ public:
 	bool IsRemovable() const;
 	bool HasMedia() const;
 	bool IsFloppy() const;
-	uint8 Type() const;		// cf. device_geometry::device_type
+	uint8 Type() const;
 
 	int32 UniqueID() const;
 
 	status_t Eject();
 	status_t LowLevelFormat();	// TODO: remove?
 
-	status_t Update();		// sync this object with reality
+	status_t Update();
 
 	BSession *VisitEachSession(BDiskDeviceVisitor *visitor);
-		// return BSession* if terminated early
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
-		// return BPartition* if terminated early
 	bool Traverse(BDiskDeviceVisitor *visitor);
-		// return true if terminated early
 
 private:
 	BDiskDevice(const BDiskDevice &);

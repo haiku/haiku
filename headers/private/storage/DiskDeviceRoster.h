@@ -7,6 +7,7 @@
 #define _DISK_DEVICE_ROSTER_H
 
 #include <DiskDeviceVisitor.h>
+#include <Messenger.h>
 #include <SupportDefs.h>
 
 class BDiskDevice;
@@ -54,36 +55,27 @@ public:
 
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
 						 BDiskDevice *device = NULL);
-		// return true if terminated early
-
 	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
 							BDiskDevice *device = NULL,
 							BPartition **partition = NULL);
-		// return true if terminated early
 	bool Traverse(BDiskDeviceVisitor *visitor);
-		// return true if terminated early
 
 	bool VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 								   BDiskDevice *device = NULL,
 								   BPartition **partition = NULL);
-		// return true if terminated early
 	bool VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 									 BDiskDevice *device = NULL,
 									 BPartition **partition = NULL);
-		// return true if terminated early
 	bool VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
 										 BDiskDevice *device = NULL,
 										 BPartition **partition = NULL);
-		// return true if terminated early
 
 	
 	status_t GetDeviceWithID(int32 id, BDiskDevice *device) const;
 	status_t GetSessionWithID(int32 id, BDiskDevice *device,
 							  BSession **session) const;
-		// inits device to the device containing the session
 	status_t GetPartitionWithID(int32 id, BDiskDevice *device,
 								BPartition **partition) const;
-		// inits device to the device containing the partition
 
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
