@@ -49,22 +49,22 @@ struct thread_key {
 spinlock thread_spinlock = 0;
 
 // thread list
-static struct thread *idle_threads[MAX_BOOT_CPUS];
-static void *thread_hash = NULL;
-static thread_id next_thread_id = 1;
+static struct thread *sIdleThreads[B_MAX_CPU_COUNT];
+static void *sThreadHash = NULL;
+static thread_id sNextThreadID = 1;
 
-static sem_id gSnoozeSem = -1;
+static sem_id sSnoozeSem = -1;
 
 // death stacks - used temporarily as a thread cleans itself up
 struct death_stack {
-	region_id rid;
-	addr address;
+	region_id area;
+	addr_t address;
 	bool in_use;
 };
-static struct death_stack *death_stacks;
-static unsigned int num_death_stacks;
-static unsigned int volatile death_stack_bitmap;
-static sem_id death_stack_sem;
+static struct death_stack *sDeathStacks;
+static unsigned int sNumDeathStacks;
+static unsigned int volatile sDeathStackBitmap;
+static sem_id sDeathStackSem;
 
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
@@ -156,7 +156,7 @@ create_thread_struct(const char *name)
 
 	strlcpy(t->name, name, B_OS_NAME_LENGTH);
 
-	t->id = atomic_add(&next_thread_id, 1);
+	t->id = atomic_add(&sNextThreadID, 1);
 	t->team = NULL;
 	t->cpu = NULL;
 	t->sem_blocking = -1;
@@ -247,7 +247,7 @@ _create_user_thread_kentry(void)
 	thread->in_kernel = false;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(thread, (addr)thread->entry, thread->args1, thread->args2);
+	arch_thread_enter_uspace(thread, (addr_t)thread->entry, thread->args1, thread->args2);
 
 	// never get here
 	return 0;
@@ -282,7 +282,7 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	cpu_status state;
 	char stack_name[64];
 	bool abort = false;
-	addr mainThreadStackBase = USER_STACK_REGION + USER_STACK_REGION_SIZE;
+	addr_t mainThreadStackBase = USER_STACK_REGION + USER_STACK_REGION_SIZE;
 
 	t = create_thread_struct(name);
 	if (t == NULL)
@@ -298,7 +298,7 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	GRAB_THREAD_LOCK();
 
 	// insert into global list
-	hash_insert(thread_hash, t);
+	hash_insert(sThreadHash, t);
 	RELEASE_THREAD_LOCK();
 
 	GRAB_TEAM_LOCK();
@@ -315,7 +315,7 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 	RELEASE_TEAM_LOCK();
 	if (abort) {
 		GRAB_THREAD_LOCK();
-		hash_remove(thread_hash, t);
+		hash_remove(sThreadHash, t);
 		RELEASE_THREAD_LOCK();
 	}
 	restore_interrupts(state);
@@ -467,14 +467,14 @@ dump_thread_info(int argc, char **argv)
 		id = atoi(argv[1]);
 
 	// walk through the thread list, trying to match name or id
-	hash_open(thread_hash, &i);
-	while ((t = hash_next(thread_hash, &i)) != NULL) {
+	hash_open(sThreadHash, &i);
+	while ((t = hash_next(sThreadHash, &i)) != NULL) {
 		if ((t->name && strcmp(argv[1], t->name) == 0) || t->id == id) {
 			_dump_thread_info(t);
 			break;
 		}
 	}
-	hash_close(thread_hash, &i, false);
+	hash_close(sThreadHash, &i, false);
 	return 0;
 }
 
@@ -485,8 +485,8 @@ dump_thread_list(int argc, char **argv)
 	struct thread *t;
 	struct hash_iterator i;
 
-	hash_open(thread_hash, &i);
-	while ((t = hash_next(thread_hash, &i)) != NULL) {
+	hash_open(sThreadHash, &i);
+	while ((t = hash_next(sThreadHash, &i)) != NULL) {
 		dprintf("%p", t);
 		if (t->name != NULL)
 			dprintf("\t%32s", t->name);
@@ -500,7 +500,7 @@ dump_thread_list(int argc, char **argv)
 			dprintf("\tNOCPU");
 		dprintf("\t0x%lx\n", t->kernel_stack_base);
 	}
-	hash_close(thread_hash, &i, false);
+	hash_close(sThreadHash, &i, false);
 	return 0;
 }
 
@@ -572,14 +572,14 @@ get_death_stack(void)
 	unsigned int bit;
 	int i;
 
-	acquire_sem(death_stack_sem);
+	acquire_sem(sDeathStackSem);
 
 	// grap the thread lock, find a free spot and release
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
-	bit = death_stack_bitmap;
+	bit = sDeathStackBitmap;
 	bit = (~bit)&~((~bit)-1);
-	death_stack_bitmap |= bit;
+	sDeathStackBitmap |= bit;
 	RELEASE_THREAD_LOCK();
 
 	// sanity checks
@@ -594,7 +594,7 @@ get_death_stack(void)
 		bit >>= 1;
 	}
 
-	TRACE(("get_death_stack: returning 0x%lx\n", death_stacks[i].address));
+	TRACE(("get_death_stack: returning 0x%lx\n", sDeathStacks[i].address));
 
 	return i;
 }
@@ -605,18 +605,18 @@ put_death_stack_and_reschedule(unsigned int index)
 {
 	TRACE(("put_death_stack...: passed %d\n", index));
 
-	if (index >= num_death_stacks)
+	if (index >= sNumDeathStacks)
 		panic("put_death_stack: passed invalid stack index %d\n", index);
 
-	if (!(death_stack_bitmap & (1 << index)))
+	if (!(sDeathStackBitmap & (1 << index)))
 		panic("put_death_stack: passed invalid stack index %d\n", index);
 
 	disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	death_stack_bitmap &= ~(1 << index);
+	sDeathStackBitmap &= ~(1 << index);
 
-	release_sem_etc(death_stack_sem, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
 
 	scheduler_reschedule();
 }
@@ -675,7 +675,7 @@ thread_exit2(void *_args)
 	remove_thread_from_team(team_get_kernel_team(), args.t);
 	RELEASE_TEAM_LOCK();
 	GRAB_THREAD_LOCK();
-	hash_remove(thread_hash, args.t);
+	hash_remove(sThreadHash, args.t);
 	RELEASE_THREAD_LOCK();
 
 	// ToDo: is this correct at this point?
@@ -803,21 +803,14 @@ thread_exit(void)
 		// set the new kernel stack officially to the death stack, wont be really switched until
 		// the next function is called. This bookkeeping must be done now before a context switch
 		// happens, or the processor will interrupt to the old stack
-		t->kernel_stack_region_id = death_stacks[death_stack].rid;
-		t->kernel_stack_base = death_stacks[death_stack].address;
+		t->kernel_stack_region_id = sDeathStacks[death_stack].area;
+		t->kernel_stack_base = sDeathStacks[death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
 		arch_thread_switch_kstack_and_call(t, t->kernel_stack_base + KSTACK_SIZE, thread_exit2, &args);
 	}
 
 	panic("never can get here\n");
-}
-
-
-int
-thread_kill_thread_nowait(thread_id id)
-{
-	return send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -856,7 +849,7 @@ thread_get_thread_struct_locked(thread_id id)
 
 	key.id = id;
 
-	return hash_lookup(thread_hash, &key);
+	return hash_lookup(sThreadHash, &key);
 }
 
 
@@ -989,7 +982,7 @@ thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 }
 
 
-int
+status_t
 thread_init(kernel_args *ka)
 {
 	struct thread *t;
@@ -998,17 +991,17 @@ thread_init(kernel_args *ka)
 	TRACE(("thread_init: entry\n"));
 
 	// create the thread hash table
-	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
+	sThreadHash = hash_init(15, (addr_t)&t->all_next - (addr_t)t,
 		&thread_struct_compare, &thread_struct_hash);
 
 	// zero out the dead thread structure q
 	memset(&dead_q, 0, sizeof(dead_q));
 
 	// allocate snooze sem
-	gSnoozeSem = create_sem(0, "snooze sem");
-	if (gSnoozeSem < 0) {
+	sSnoozeSem = create_sem(0, "snooze sem");
+	if (sSnoozeSem < 0) {
 		panic("error creating snooze sem\n");
-		return gSnoozeSem;
+		return sSnoozeSem;
 	}
 
 	// create an idle thread for each cpu
@@ -1034,43 +1027,43 @@ thread_init(kernel_args *ka)
 
 		t->kernel_stack_base = region->base;
 		vm_put_region(region);
-		hash_insert(thread_hash, t);
+		hash_insert(sThreadHash, t);
 		insert_thread_into_team(t->team, t);
-		idle_threads[i] = t;
+		sIdleThreads[i] = t;
 		if (i == 0)
 			arch_thread_set_current_thread(t);
 		t->cpu = &cpu[i];
 	}
 
 	// create a set of death stacks
-	num_death_stacks = smp_get_num_cpus();
-	if (num_death_stacks > 8*sizeof(death_stack_bitmap)) {
+	sNumDeathStacks = smp_get_num_cpus();
+	if (sNumDeathStacks > 8*sizeof(sDeathStackBitmap)) {
 		/*
 		 * clamp values for really beefy machines
 		 */
-		num_death_stacks = 8*sizeof(death_stack_bitmap);
+		sNumDeathStacks = 8*sizeof(sDeathStackBitmap);
 	}
-	death_stack_bitmap = 0;
-	death_stacks = (struct death_stack *)malloc(num_death_stacks * sizeof(struct death_stack));
-	if (death_stacks == NULL) {
+	sDeathStackBitmap = 0;
+	sDeathStacks = (struct death_stack *)malloc(sNumDeathStacks * sizeof(struct death_stack));
+	if (sDeathStacks == NULL) {
 		panic("error creating death stacks\n");
-		return ENOMEM;
+		return B_NO_MEMORY;
 	}
 	{
 		char temp[64];
 
-		for (i = 0; i < num_death_stacks; i++) {
+		for (i = 0; i < sNumDeathStacks; i++) {
 			sprintf(temp, "death_stack%d", i);
-			death_stacks[i].rid = create_area(temp, (void **)&death_stacks[i].address,
+			sDeathStacks[i].area = create_area(temp, (void **)&sDeathStacks[i].address,
 				B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-			if (death_stacks[i].rid < 0) {
+			if (sDeathStacks[i].area < 0) {
 				panic("error creating death stacks\n");
-				return death_stacks[i].rid;
+				return sDeathStacks[i].area;
 			}
-			death_stacks[i].in_use = false;
+			sDeathStacks[i].in_use = false;
 		}
 	}
-	death_stack_sem = create_sem(num_death_stacks, "death_stack_noavail_sem");
+	sDeathStackSem = create_sem(sNumDeathStacks, "death_stack_noavail_sem");
 
 	// set up some debugger commands
 	add_debugger_command("threads", &dump_thread_list, "list all threads");
@@ -1079,15 +1072,15 @@ thread_init(kernel_args *ka)
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
 
-	return 0;
+	return B_OK;
 }
 
 
-int
-thread_init_percpu(int cpu_num)
+status_t
+thread_per_cpu_init(int32 cpu_num)
 {
-	arch_thread_set_current_thread(idle_threads[cpu_num]);
-	return 0;
+	arch_thread_set_current_thread(sIdleThreads[cpu_num]);
+	return B_OK;
 }
 
 
@@ -1260,7 +1253,7 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
 
 	if (thread->state == B_THREAD_WAITING) {
-		if (thread->sem_blocking == gSnoozeSem)
+		if (thread->sem_blocking == sSnoozeSem)
 			info->state = B_THREAD_ASLEEP;
 		else if (thread->sem_blocking == thread->msg.read_sem)
 			info->state = B_THREAD_RECEIVING;
@@ -1328,10 +1321,10 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	if (slot >= next_thread_id)
+	if (slot >= sNextThreadID)
 		goto err;
 
-	while (slot < next_thread_id
+	while (slot < sNextThreadID
 		&& (!(thread = thread_get_thread_struct_locked(slot)) || thread->team->id != team))
 		slot++;
 
@@ -1364,12 +1357,12 @@ find_thread(const char *name)
 	GRAB_THREAD_LOCK();
 
 	// ToDo: this might not be in the same order as find_thread() in BeOS
-	//		which could be theoreticly problematic.
+	//		which could be theoretically problematic.
 	// ToDo: scanning the whole list with the thread lock held isn't exactly
 	//		cheap either - although this function is probably used very rarely.
 
-	hash_open(thread_hash, &iterator);
-	while ((thread = hash_next(thread_hash, &iterator)) != NULL) {
+	hash_open(sThreadHash, &iterator);
+	while ((thread = hash_next(sThreadHash, &iterator)) != NULL) {
 		// Search through hash
 		if (thread->name != NULL && !strcmp(thread->name, name)) {
 			thread_id id = thread->id;
@@ -1445,7 +1438,7 @@ snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 	if (timebase != B_SYSTEM_TIMEBASE)
 		return B_BAD_VALUE;
 
-	status = acquire_sem_etc(gSnoozeSem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
+	status = acquire_sem_etc(sSnoozeSem, 1, B_ABSOLUTE_TIMEOUT | flags, timeout);
 	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 		return B_OK;
 
