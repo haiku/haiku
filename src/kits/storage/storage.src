@@ -11,6 +11,7 @@ STORAGE_KIT_SOURCE =
 	MimeType.cpp
 	Node.cpp
 	NodeInfo.cpp
+	NodeMonitor.cpp
 	OffsetFile.cpp
 	Path.cpp
 	Query.cpp
