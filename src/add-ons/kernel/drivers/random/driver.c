@@ -4,12 +4,12 @@
  */
 
 /* Made into a BeOS /dev/random and /dev/urandom by Daniel Berlin */
-/* Adapted for OpenBeOS by David Reid, Axel Doerfler */
+/* Adapted for Haiku by David Reid, Axel Doerfler */
 
 
 #include <OS.h>
 #include <Drivers.h>
-#include <Errors.h>
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -21,14 +21,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-#ifndef B_SELECT_READ
-	/* these are missing from KernelExport.h ... */
-#	define  B_SELECT_READ       1 
-#	define  B_SELECT_WRITE      2 
-#	define  B_SELECT_EXCEPTION  3 
-extern void notify_select_event(selectsync * sync, uint32 ref);
-#endif /* B_SELECT_READ */
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -463,17 +455,27 @@ random_free(void *cookie)
 	return B_OK;
 }
 
+
 static status_t
 random_select(void *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
 	TRACE((DRIVER_NAME ": select()\n"));
-	/* tell there is already data to read */
-	if (event == B_SELECT_READ)
+
+	if (event == B_SELECT_READ) {
+		/* tell there is already data to read */
+#ifdef COMPILE_FOR_R5
 		notify_select_event(sync, ref);
-	else if (event == B_SELECT_WRITE)
-		return EINVAL; /* not writable */
+#else
+		notify_select_event(sync, ref, event);
+#endif
+	} else if (event == B_SELECT_WRITE) {
+		/* we're not writable */
+		return EINVAL;
+	}
+
 	return B_OK;
 }
+
 
 static status_t
 random_deselect(void *cookie, uint8 event, selectsync *sync)
