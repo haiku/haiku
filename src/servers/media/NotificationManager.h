@@ -22,6 +22,8 @@ public:
 	NotificationManager();
 	~NotificationManager();
 	
+	void Dump();
+	
 	void EnqueueMessage(BMessage *msg);
 
 	void CleanupTeam(team_id team);

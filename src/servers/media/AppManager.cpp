@@ -187,7 +187,7 @@ void AppManager::CleanupAddonServer()
 	ASSERT(false == fLocker->IsLocked());
 
 	TRACE("AppManager: cleaning up media_addon_server\n");
-
+	gNodeManager->CleanupDormantFlavorInfos();
 }
 
 void AppManager::StartAddonServer()
@@ -215,4 +215,16 @@ void AppManager::TerminateAddonServer()
 		// XXX fixme. We should wait until it is gone
 		snooze(1000000);
 	}
+}
+
+void AppManager::Dump()
+{
+	BAutolock lock(fLocker);
+	printf("\n");
+	printf("AppManager: list of applications follows:\n");
+	App *app;	
+	for (fAppMap->Rewind(); fAppMap->GetNext(&app); ) {
+		printf(" team %ld, messenger %svalid\n", app->team, app->messenger.IsValid() ? "" : "NOT ");
+	}
+	printf("AppManager: list end\n");
 }

@@ -18,6 +18,8 @@ public:
 	void StartAddonServer();
 	void TerminateAddonServer();
 	
+	void Dump();	
+	
 private:
 	void CleanupTeam(team_id);
 	void CleanupAddonServer();

@@ -7,6 +7,7 @@
 #include <Message.h>
 #include <Locker.h>
 #include <Autolock.h>
+#include <Path.h>
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
@@ -53,7 +54,7 @@ NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 
 	ASSERT(b);
 	*nodeid = nextnodeid;
 	nextnodeid += 1;
-	TRACE("NodeManager::RegisterNode: node %ld, addon_id %ld, flavor_id %ld, name '%s', kinds %#Lx, port %ld, team %ld\n", *nodeid, addon_id, addon_flavor_id, name, kinds, port, team);
+	TRACE("NodeManager::RegisterNode: node %ld, addon_id %ld, flavor_id %ld, name \"%s\", kinds %#Lx, port %ld, team %ld\n", *nodeid, addon_id, addon_flavor_id, name, kinds, port, team);
 	return B_OK;
 }
 
@@ -161,6 +162,7 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
 		FATAL("!!! NodeManager::GetCloneForId: Error: node %ld not found\n", nodeid);
+		DecrementGlobalRefCount(nodeid, team);
 		return B_ERROR;
 	}
 
@@ -277,7 +279,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 			live_info->node = node;
 			live_info->hint_point = BPoint(0, 0);
 			strcpy(live_info->name, rn->name);
-			TRACE("NodeManager::GetLiveNodeInfo node %ld, name = '%s'\n", node.node, rn->name);
+			TRACE("NodeManager::GetLiveNodeInfo node %ld, name = \"%s\"\n", node.node, rn->name);
 			return B_OK;
 		}
 	}
@@ -381,7 +383,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 			node_info->addon = rn->addon_id;
 			node_info->flavor_id = rn->addon_flavor_id;
 			strcpy(node_info->name, rn->name);
-			TRACE("NodeManager::GetDormantNodeInfo node %ld, addon_id %ld, addon_flavor_id %ld, name '%s'\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
+			TRACE("NodeManager::GetDormantNodeInfo node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
 			return B_OK;
 		}
 	}
@@ -412,6 +414,8 @@ NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 	id = nextaddonid;
 	nextaddonid += 1;
 	
+	printf("NodeManager::RegisterAddon: ref-name \"%s\", assigning id %ld\n", ref.name, id);
+	
 	fAddonPathMap->Insert(id, ref);
 	*newid = id;
 }
@@ -420,22 +424,47 @@ void
 NodeManager::UnregisterAddon(media_addon_id id)
 {
 	BAutolock lock(fLocker);
+
+	printf("NodeManager::UnregisterAddon: id %ld\n", id);
+
 	RemoveDormantFlavorInfo(id);
 	fAddonPathMap->Remove(id);
 }
 
+// this function is only called (indirectly) by the media_addon_server
 void
 NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
 {
 	BAutolock lock(fLocker);
+	
+	printf("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", dfi.node_info.addon, dfi.node_info.flavor_id, dfi.node_info.name, dfi.name, dfi.info);
+
 	fDormantFlavorList->Insert(dfi);
 }
 
+// this function is only called (indirectly) by the media_addon_server
 void
 NodeManager::RemoveDormantFlavorInfo(media_addon_id id)
 {
 	BAutolock lock(fLocker);
-	UNIMPLEMENTED();
+	dormant_flavor_info *flavor;
+	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&flavor); ) {
+		if (flavor->node_info.addon == id) {
+			printf("NodeManager::RemoveDormantFlavorInfo, addon-id %ld, flavor-id %ld, name \"%s\", flavor-name \"%s\", flavor-info \"%s\"\n", flavor->node_info.addon, flavor->node_info.flavor_id, flavor->node_info.name, flavor->name, flavor->info);
+			fDormantFlavorList->RemoveCurrent();
+		}
+	}
+}
+
+// this function is called when the media_addon_server has crashed
+void
+NodeManager::CleanupDormantFlavorInfos()
+{
+	BAutolock lock(fLocker);
+	printf("NodeManager::CleanupDormantFlavorInfos\n");
+	fDormantFlavorList->MakeEmpty();
+	printf("NodeManager::CleanupDormantFlavorInfos done\n");
+	// XXX FlavorsChanged(media_addon_id addonid, int32 newcount, int32 gonecount)
 }
 
 status_t
@@ -526,7 +555,7 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 		if (flavor->node_info.addon == addon && flavor->node_info.flavor_id == flavor_id) {
 			*outFlavor = *flavor;
 			return B_OK;
-		}
+		}	
 	}
 	return B_ERROR;
 }
@@ -536,4 +565,58 @@ NodeManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
 	FATAL("NodeManager::CleanupTeam: should cleanup team %ld\n", team);
+}
+
+void
+NodeManager::Dump()
+{
+	BAutolock lock(fLocker);
+	printf("\n");
+	printf("NodeManager: addon path map follows:\n");
+	entry_ref *ref;
+	media_addon_id *id;
+	for (fAddonPathMap->Rewind(); fAddonPathMap->GetNext(&ref); ) {
+		fAddonPathMap->GetCurrentKey(&id);
+		BPath path(ref);
+		printf(" addon-id %ld, ref-name \"%s\", path \"%s\"\n", *id, ref->name, (path.InitCheck() == B_OK) ? path.Path() : "INVALID");
+	}
+	printf("NodeManager: list end\n");
+	printf("\n");
+	printf("NodeManager: registered nodes map follows:\n");
+	registered_node *rn;
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
+		printf("  node-id %ld, addon-id %ld, addon-flavor-id %ld, port %ld, team %ld, kinds %#08x, name \"%s\"\n",
+			rn->nodeid, rn->addon_id, rn->addon_flavor_id, rn->port, rn->team, rn->kinds, rn->name);
+		printf("    teams (refcount): ");
+		team_id *team;
+		int32 *refcount;
+		for (rn->teamrefcount.Rewind(); rn->teamrefcount.GetNext(&refcount); ) {
+			rn->teamrefcount.GetCurrentKey(&team);
+			printf("%ld (%ld), ", *team, *refcount);
+		}
+		printf("\n");
+		media_input *input;
+		for (rn->inputlist.Rewind(); rn->inputlist.GetNext(&input); ) {
+			printf("    media_input: node-id %ld, node-port %ld, source-port %ld, source-id  %ld, dest-port %ld, dest-id %ld, name \"%s\"\n",
+				input->node.node, input->node.port, input->source.port, input->source.id, input->destination.port, input->destination.id, input->name);
+		}
+		media_output *output;
+		for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
+			printf("    media_output: node-id %ld, node-port %ld, source-port %ld, source-id  %ld, dest-port %ld, dest-id %ld, name \"%s\"\n",
+				output->node.node, output->node.port, output->source.port, output->source.id, output->destination.port, output->destination.id, output->name);
+		}
+	}
+	printf("NodeManager: list end\n");
+	printf("\n");
+	printf("NodeManager: dormant flavor list follows:\n");
+	dormant_flavor_info *dfi;
+	for (fDormantFlavorList->Rewind(); fDormantFlavorList->GetNext(&dfi); ) {
+		printf("  addon-id %ld, addon-flavor-id %ld, addon-name \"%s\"\n",
+			dfi->node_info.addon, dfi->node_info.flavor_id, dfi->node_info.name);
+		printf("    flavor-kinds %#08x, flavor_flags %#08x, internal_id %ld, possible_count %ld, in_format_count %ld, out_format_count %ld\n",
+			 dfi->kinds, dfi->flavor_flags, dfi->internal_id, dfi->possible_count, dfi->in_format_count, dfi->out_format_count);
+		printf("    flavor-name \"%s\"\n", dfi->name);
+		printf("    flavor-info \"%s\"\n", dfi->info);
+	}
+	printf("NodeManager: list end\n");
 }

@@ -44,6 +44,8 @@ public:
 	status_t BroadcastMessage(long, void *, long, long long);
 	status_t LoadState();
 	status_t SaveState();
+	
+	void Dump();
 
 
 	status_t RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team);
@@ -67,7 +69,8 @@ public:
 	status_t GetLiveNodes(BMessage *msg);
 	
 	void AddDormantFlavorInfo(const dormant_flavor_info &dfi);	
-	void RemoveDormantFlavorInfo(media_addon_id id);	
+	void RemoveDormantFlavorInfo(media_addon_id id);
+	void CleanupDormantFlavorInfos();
 	void RegisterAddon(const entry_ref &ref, media_addon_id *newid);
 	void UnregisterAddon(media_addon_id id);
 	status_t GetAddonRef(entry_ref *ref, media_addon_id id);

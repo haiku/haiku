@@ -4,6 +4,7 @@
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Autolock.h>
+#include <string.h>
 #include "NotificationManager.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
@@ -46,6 +47,7 @@ public:
 
 	bool QuitRequested();
 	void HandleMessage(int32 code, void *data, size_t size);
+	void ArgvReceived(int32 argc, char **argv);
 	static int32 controlthread(void *arg);
 
 /* functionality not yet implemented
@@ -110,6 +112,27 @@ ServerApp::~ServerApp()
 	delete_port(control_port);
 	status_t err;
 	wait_for_thread(control_thread,&err);
+}
+
+void ServerApp::ArgvReceived(int32 argc, char **argv)
+{
+	for (int arg = 1; arg < argc; arg++) {
+		if (strstr(argv[arg], "dump")) {
+			gAppManager->Dump();
+			gNodeManager->Dump();
+			gBufferManager->Dump();
+			gNotificationManager->Dump();
+		}
+		if (strstr(argv[arg], "buffer")) {
+			gBufferManager->Dump();
+		}
+		if (strstr(argv[arg], "node")) {
+			gNodeManager->Dump();
+		}
+		if (strstr(argv[arg], "quit")) {
+			PostMessage(B_QUIT_REQUESTED);
+		}
+	}
 }
 
 bool

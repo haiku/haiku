@@ -25,7 +25,7 @@ public:
 	
 	void		CleanupTeam(team_id teamid);
 
-	void 		PrintToStream();
+	void 		Dump();
 
 private:
 	struct buffer_info

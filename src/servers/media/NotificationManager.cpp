@@ -4,6 +4,7 @@
  */
 #include <OS.h>
 #include <Locker.h>
+#include <Autolock.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <MediaNode.h>
@@ -248,4 +249,18 @@ NotificationManager::worker_thread(void *arg)
 {
 	static_cast<NotificationManager *>(arg)->WorkerThread();
 	return 0;
+}
+
+void
+NotificationManager::Dump()
+{
+	BAutolock lock(fLocker);
+	printf("\n");
+	printf("NotificationManager: list of subscribers follows:\n");
+	Notification *n;	
+	for (fNotificationList->Rewind(); fNotificationList->GetNext(&n); ) {
+		printf(" team %ld, what %#08x, node-id %ld, node-port %ld, messenger %svalid\n",
+			n->team, n->what, n->node.node, n->node.port, n->messenger.IsValid() ? "" : "NOT ");
+	}
+	printf("NotificationManager: list end\n");
 }
