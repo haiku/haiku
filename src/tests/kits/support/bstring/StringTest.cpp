@@ -3,6 +3,7 @@
 #include "StringTest.h"
 #include "StringConstructionTest.h"
 #include "StringCountCharTest.h"
+#include "StringOperatorsTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -10,6 +11,7 @@ CppUnit::Test *StringTestSuite()
 	
 	testSuite->addTest(StringConstructionTest::suite());
 	testSuite->addTest(StringCountCharTest::suite());
+	testSuite->addTest(StringOperatorsTest::suite());
 	
 	return(testSuite);
 }
