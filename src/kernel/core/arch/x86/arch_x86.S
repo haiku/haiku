@@ -144,7 +144,7 @@ FUNCTION(i386_fxsave_swap):
 /* void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir); */
 FUNCTION(i386_context_switch):
 	pusha					/* pushes 8 words onto the stack */
-	movl	36(%esp),%eax	/* save current_stack */
+	movl	36(%esp),%eax	/* save old_state->current_stack */
 	movl	%esp,(%eax)
 	pushl	%ss
 	popl	%edx
@@ -152,9 +152,9 @@ FUNCTION(i386_context_switch):
 	movl	44(%esp),%eax	/* get possible new pgdir */
 	orl		%eax,%eax		/* is it null? */
 	je		skip_pgdir_swap
-		movl	%eax,%cr3
+	movl	%eax,%cr3
 skip_pgdir_swap:
-	movl	40(%esp),%eax	/* get new current_stack */
+	movl	40(%esp),%eax	/* get new new_state->current_stack */
 	lss		(%eax),%esp
 	popa
 	ret
@@ -185,7 +185,7 @@ FUNCTION(i386_enter_uspace):
 	movw	$0x23,%cx
 	movw	%cx,%ds
 	movw	%cx,%es
-	movw	%cx,%fs
+	//movw	%cx,%fs			// fs points to the TLS storage (CPU dependent segment)
 	movw	%cx,%gs
 
 	// copy exit stub to stack
@@ -197,7 +197,6 @@ _copy_more:
 	mov	%ecx, (%ebx)
 	cmp	$i386_uspace_exit_stub, %esi
 	jg	_copy_more
-
 
 	// push the args onto the user stack
 	movl	%edx,-4(%ebx)	// args

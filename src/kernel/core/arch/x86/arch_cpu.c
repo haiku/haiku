@@ -11,6 +11,7 @@
 #include <smp.h>
 #include <arch/x86/selector.h>
 #include <Errors.h>
+#include <TLS.h>
 #include <kerrors.h>
 
 #include <stage2.h>
@@ -21,7 +22,7 @@
 static struct tss **tss;
 static int *tss_loaded;
 
-static unsigned int *gdt = 0;
+segment_descriptor *gGDT = NULL;
 
 
 int
@@ -44,16 +45,19 @@ arch_cpu_init(kernel_args *ka)
 int
 arch_cpu_init2(kernel_args *ka)
 {
-	region_id rid;
-	struct tss_descriptor *tss_d;
 	unsigned int i;
 
 	// account for the segment descriptors
-	gdt = (unsigned int *)ka->arch_args.vir_gdt;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "gdt", (void **)&gdt,
+
+	gGDT = (segment_descriptor *)ka->arch_args.vir_gdt;
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "gdt", (void **)&gGDT,
 		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	i386_selector_init(gdt);  // pass the new gdt
+	// currently taken out of the build, because it's not yet used (and assumes
+	// (a fixed number of used GDT entries)
+	//i386_selector_init(gGDT);  // pass the new gdt
+
+	// setup task-state segments
 
 	tss = malloc(sizeof(struct tss *) * ka->num_cpus);
 	if (tss == NULL) {
@@ -69,7 +73,9 @@ arch_cpu_init2(kernel_args *ka)
 	memset(tss_loaded, 0, sizeof(int) * ka->num_cpus);
 
 	for (i = 0; i < ka->num_cpus; i++) {
+		struct segment_descriptor *tss_d;
 		char tss_name[16];
+		region_id rid;
 
 		sprintf(tss_name, "tss%d", i);
 		rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), tss_name, (void **)&tss[i],
@@ -79,25 +85,21 @@ arch_cpu_init2(kernel_args *ka)
 			return ENOMEM;
 		}
 
+		// initialize TSS
 		memset(tss[i], 0, sizeof(struct tss));
 		tss[i]->ss0 = KERNEL_DATA_SEG;
 
 		// add TSS descriptor for this new TSS
-		tss_d = (struct tss_descriptor *)&gdt[10 + i*2];
-		tss_d->limit_00_15 = sizeof(struct tss) & 0xffff;
-		tss_d->limit_19_16 = 0; // not this long
-		tss_d->base_00_15 = (addr)tss[i] & 0xffff;
-		tss_d->base_23_16 = ((addr)tss[i] >> 16) & 0xff;
-		tss_d->base_31_24 = (addr)tss[i] >> 24;
-		tss_d->type = 0x9;
-		tss_d->zero = 0;
-		tss_d->dpl = 0;
-		tss_d->present = 1;
-		tss_d->avail = 0;
-		tss_d->zero1 = 0;
-		tss_d->zero2 = 1;
-		tss_d->granularity = 1;
+		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i], (addr)tss[i], sizeof(struct tss));
 	}
+
+	// setup TLS descriptors (one for every CPU)
+
+	for (i = 0; i < ka->num_cpus; i++) {
+		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_MAX_KEYS * sizeof(void *),
+			DT_DATA_WRITEABLE, DPL_USER);
+	}
+
 	return 0;
 }
 

@@ -24,6 +24,7 @@
 
 #include <arch/x86/interrupts.h>
 #include <arch/x86/faults.h>
+#include <arch/x86/descriptors.h>
 
 #include <stage2.h>
 
@@ -31,15 +32,18 @@
 
 #define MAX_ARGS 16
 
+typedef struct {
+	uint32 a, b;
+} desc_table;
 static desc_table *idt = NULL;
 
 
 static void
 interrupt_ack(int n)
 {
-	if(n >= 0x20 && n < 0x30) {
+	if (n >= 0x20 && n < 0x30) {
 		// 8239 controlled interrupt
-		if(n > 0x27)
+		if (n > 0x27)
 			out8(0x20, 0xa0);	// EOI to pic 2
 		out8(0x20, 0x20);	// EOI to pic 1
 	}
@@ -47,7 +51,7 @@ interrupt_ack(int n)
 
 
 static void
-_set_gate(desc_table *gate_addr, unsigned int addr, int type, int dpl)
+set_gate(desc_table *gate_addr, unsigned int addr, int type, int dpl)
 {
 	unsigned int gate1; // first byte of gate desc
 	unsigned int gate2; // second byte of gate desc
@@ -57,6 +61,29 @@ _set_gate(desc_table *gate_addr, unsigned int addr, int type, int dpl)
 
 	gate_addr->a = gate1;
 	gate_addr->b = gate2;
+}
+
+
+static void
+set_intr_gate(int n, void *addr)
+{
+	set_gate(&idt[n], (unsigned int)addr, 14, DPL_KERNEL);
+}
+
+
+/* XXX - currently unused and static...
+static void
+set_trap_gate(int n, void *addr)
+{
+	set_gate(&idt[n], (unsigned int)addr, 15, DPL_KERNEL);
+}
+*/
+
+
+static void
+set_system_gate(int n, void *addr)
+{
+	set_gate(&idt[n], (unsigned int)addr, 15, DPL_USER);
 }
 
 
@@ -89,29 +116,6 @@ arch_int_disable_io_interrupt(int irq)
 }
 
 
-static void
-set_intr_gate(int n, void *addr)
-{
-	_set_gate(&idt[n], (unsigned int)addr, 14, 0);
-}
-
-
-/* XXX - currently unused and static...
-static void
-set_trap_gate(int n, void *addr)
-{
-	_set_gate(&idt[n], (unsigned int)addr, 15, 0);
-}
-*/
-
-
-static void
-set_system_gate(int n, void *addr)
-{
-	_set_gate(&idt[n], (unsigned int)addr, 15, 3);
-}
-
-
 void
 arch_int_enable_interrupts(void)
 {
@@ -136,8 +140,7 @@ arch_int_restore_interrupts(int oldstate)
 {
 	int flags = oldstate ? 0x200 : 0;
 
-	asm (
-		"pushfl;\n"
+	asm("pushfl;\n"
 		"popl	%1;\n"
 		"andl	$0xfffffdff,%1;\n"
 		"orl	%0,%1;\n"
@@ -174,14 +177,16 @@ i386_handle_trap(struct iframe frame)
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
-	switch(frame.vector) {
-		case 8:
+
+	switch (frame.vector) {
+		case 8:		// double fault
 			ret = i386_double_fault(frame.error_code);
 			break;
-		case 13:
+		case 13:	// general protection fault
 			ret = i386_general_protection_fault(frame.error_code);
 			break;
-		case 14: {
+		case 14:	// page fault
+		{
 			unsigned int cr2;
 			addr newip;
 
@@ -207,7 +212,8 @@ i386_handle_trap(struct iframe frame)
 			}
 			break;
 		}
-		case 99: {
+		case 99:	// syscall
+		{
 			uint64 retcode;
 			unsigned int args[MAX_ARGS];
 			int rc;
@@ -279,6 +285,7 @@ i386_handle_trap(struct iframe frame)
 int
 arch_int_init(kernel_args *ka)
 {
+	// set the global idt variable
 	idt = (desc_table *)ka->arch_args.vir_idt;
 
 	// setup the interrupt controller

@@ -23,13 +23,13 @@
 #include <string.h>
 #include <stdio.h>
 
-static int num_cpus = 1;
-static unsigned int *apic = NULL;
-static unsigned int cpu_apic_id[SMP_MAX_CPUS] = { 0, 0};
-static unsigned int cpu_os_id[SMP_MAX_CPUS] = { 0, 0};
-static unsigned int cpu_apic_version[SMP_MAX_CPUS] = { 0, 0};
-static unsigned int *ioapic = NULL;
-static unsigned int apic_timer_tics_per_sec = 0;
+
+static uint32 *apic = NULL;
+static uint32 cpu_apic_id[SMP_MAX_CPUS] = { 0, 0};
+static uint32 cpu_os_id[SMP_MAX_CPUS] = { 0, 0};
+static uint32 cpu_apic_version[SMP_MAX_CPUS] = { 0, 0};
+static uint32 *ioapic = NULL;
+static uint32 apic_timer_tics_per_sec = 0;
 
 
 static int32
@@ -58,6 +58,7 @@ i386_spurious_interrupt(void *data)
 	// spurious interrupt
 //	dprintf("spurious interrupt on cpu %d\n", arch_smp_get_current_cpu());
 	arch_smp_ack_interrupt();
+
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -68,6 +69,7 @@ i386_smp_error_interrupt(void *data)
 	// smp error interrupt
 //	dprintf("smp error interrupt on cpu %d\n", arch_smp_get_current_cpu());
 	arch_smp_ack_interrupt();
+
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -91,11 +93,10 @@ arch_smp_init(kernel_args *ka)
 {
 	dprintf("arch_smp_init: entry\n");
 
-	if(ka->num_cpus > 1) {
+	if (ka->num_cpus > 1) {
 		// setup some globals
-		num_cpus = ka->num_cpus;
-		apic = ka->arch_args.apic;
-		ioapic = ka->arch_args.ioapic;
+		apic = (uint32 *)ka->arch_args.apic;
+		ioapic = (uint32 *)ka->arch_args.ioapic;
 		memcpy(cpu_apic_id, ka->arch_args.cpu_apic_id, sizeof(ka->arch_args.cpu_apic_id));
 		memcpy(cpu_os_id, ka->arch_args.cpu_os_id, sizeof(ka->arch_args.cpu_os_id));
 		memcpy(cpu_apic_version, ka->arch_args.cpu_apic_version, sizeof(ka->arch_args.cpu_apic_version));
@@ -111,8 +112,6 @@ arch_smp_init(kernel_args *ka)
 		install_interrupt_handler(0xfd, &i386_ici_interrupt, NULL);
 		install_interrupt_handler(0xfe, &i386_smp_error_interrupt, NULL);
 		install_interrupt_handler(0xff, &i386_spurious_interrupt, NULL);
-	} else {
-		num_cpus = 1;
 	}
 	return 0;
 }

@@ -145,8 +145,8 @@ FUNCTION(i386_stack_switch):
 	pushl	%ss
 	cmpl	$KERNEL_DATA_SEG,(%esp)
 	je		kernel_stack2
-		popl	%eax
-		jmp		switch
+	popl	%eax
+	jmp		switch
   kernel_stack2:
 	popl	4(%eax)
 	movl	%esp,(%eax)

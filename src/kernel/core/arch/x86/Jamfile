@@ -7,7 +7,7 @@ KernelStaticLibrary libx86 :
 	<$(SOURCE_GRIST)>arch_elf.c
 	<$(SOURCE_GRIST)>arch_faults.c
 	<$(SOURCE_GRIST)>arch_int.c
-	<$(SOURCE_GRIST)>arch_selector.c
+#	<$(SOURCE_GRIST)>arch_selector.c
 	<$(SOURCE_GRIST)>arch_smp.c
 	<$(SOURCE_GRIST)>arch_thread.c
 	<$(SOURCE_GRIST)>arch_timer.c

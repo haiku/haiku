@@ -18,7 +18,7 @@
 
 
 // from arch_interrupts.S
-extern void	i386_stack_init( struct farcall *interrupt_stack_offset );
+extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
 
 
 void
@@ -37,6 +37,13 @@ i386_pop_iframe(struct thread *thread)
 }
 
 
+static void
+i386_set_fs_register(uint32 segment)
+{
+	asm("movl %0,%%fs" :: "r" (segment));
+}
+
+
 int
 arch_team_init_team_struct(struct team *p, bool kernel)
 {
@@ -52,7 +59,7 @@ arch_thread_init_thread_struct(struct thread *t)
 
 	// let the asm function know the offset to the interrupt stack within struct thread
 	// I know no better ( = static) way to tell the asm function the offset
-	i386_stack_init( &((struct thread*)0)->arch_info.interrupt_stack );
+	i386_stack_init(&((struct thread *)0)->arch_info.interrupt_stack);
 
 	return 0;
 }
@@ -89,7 +96,7 @@ arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(void), 
 //	*kstack_top = 0x00; // interrupts still disabled after the switch
 
 	// simulate initial popad
-	for(i=0; i<8; i++) {
+	for (i = 0; i < 8; i++) {
 		kstack_top--;
 		*kstack_top = 0;
 	}
@@ -123,7 +130,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		t_to->arch_info.current_stack.ss, t_to->arch_info.current_stack.esp);
 #endif
 #if 0
-	for(i=0; i<11; i++)
+	for (i = 0; i < 11; i++)
 		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
 #endif
 	i386_set_kstack(t_to->kernel_stack_base + KSTACK_SIZE);
@@ -134,19 +141,19 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 }
 #endif
 
-	if(t_from->team->_aspace_id >= 0 && t_to->team->_aspace_id >= 0) {
+	if (t_from->team->_aspace_id >= 0 && t_to->team->_aspace_id >= 0) {
 		// they are both uspace threads
-		if(t_from->team->_aspace_id == t_to->team->_aspace_id) {
+		if (t_from->team->_aspace_id == t_to->team->_aspace_id) {
 			// dont change the pgdir, same address space
 			new_pgdir = NULL;
 		} else {
 			// switching to a new address space
 			new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 		}
-	} else if(t_from->team->_aspace_id < 0 && t_to->team->_aspace_id < 0) {
+	} else if (t_from->team->_aspace_id < 0 && t_to->team->_aspace_id < 0) {
 		// they must both be kspace threads
 		new_pgdir = NULL;
-	} else if(t_to->team->_aspace_id < 0) {
+	} else if (t_to->team->_aspace_id < 0) {
 		// the one we're switching to is kspace
 		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->kaspace->translation_map);
 	} else {
@@ -162,11 +169,26 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 }
 #endif
 
-	if((new_pgdir % PAGE_SIZE) != 0)
+	if ((new_pgdir % PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
 	i386_context_switch(&t_from->arch_info, &t_to->arch_info, new_pgdir);
+
+	// set TLS GDT entry to the current thread - since this action is
+	// dependent on the current CPU, we have to do it here
+	{
+		int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
+
+		// ToDo: the TLS storage is currently located simply at the bottom of the user stack
+		//	perhaps we want to put it somewhere else, in a safe place?
+		//	very strange: the user_stack_base pointer seg faults, (+ PAGE_SIZE) improves
+		//		the situation, but the main thread still don't work correctly...
+		//	Also have a look at the stack addresses: the main thread is located at
+		//	0x7ffd600, the ones of the others are at 0x0062b000 and following
+		set_segment_descriptor_base(&gGDT[entry], t_to->user_stack_base + PAGE_SIZE);
+		i386_set_fs_register((entry << 3) | DPL_USER);
+	}
 }
 
 
@@ -184,7 +206,7 @@ arch_thread_dump_info(void *info)
 void
 arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 {
-	dprintf("arch_thread_entry_uspace: entry 0x%lx, args %p, ustack_top 0x%lx\n",
+	dprintf("arch_thread_enter_uspace: entry 0x%lx, args %p, ustack_top 0x%lx\n",
 		entry, args, ustack_top);
 
 	// make sure the fpu is in a good state
