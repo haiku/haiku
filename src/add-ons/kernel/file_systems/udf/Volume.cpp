@@ -19,7 +19,7 @@ using namespace Udf;
 */
 Volume::Volume(nspace_id id)
 	: fId(id)
-	, fDevice(0)
+	, fDevice(-1)
 	, fMounted(false)
 	, fOffset(0)
 	, fLength(0)
@@ -300,7 +300,9 @@ Volume::_Unset()
 {
 	DEBUG_INIT("Volume");
 	fId = 0;
-	fDevice = 0;
+	if (fDevice >= 0)
+		close(fDevice);
+	fDevice = -1;
 	fMounted = false;
 	fOffset = 0;
 	fLength = 0;
