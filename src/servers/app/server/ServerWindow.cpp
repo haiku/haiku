@@ -999,6 +999,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			LayerData		*ld = cl->fLayerData;
 			cl->fLayerData	= cl->fLayerData->prevState;
+			ld->prevState = NULL;
 			delete ld;
 			
 			cl->RebuildFullRegion();
