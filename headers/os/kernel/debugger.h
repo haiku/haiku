@@ -63,27 +63,9 @@ enum {
 	B_THREAD_DEBUG_USER_FLAG_MASK				= 0xffff0000,
 };
 
-// reasons for why a thread is invoking the debugger
-typedef enum {
-	B_THREAD_NOT_RUNNING = 0,	// thread not running (e.g. when starting to
-								// debug)
-	B_SIGNAL_RECEIVED,			// thread received a signal
-	B_TEAM_CREATED,				// thread created a new team
-	B_THREAD_CREATED,			// thread spawned a new thread
-	B_IMAGE_CREATED,			// thread created a new image
-	B_IMAGE_DELETED,			// thread deleted an image
-	B_DEBUGGER_CALL,			// thread called debugger()
-	B_BREAKPOINT_HIT,			// thread hit a breakpoint
-	B_WATCHPOINT_HIT,			// thread hit a memory watchpoint
-	B_PRE_SYSCALL_HIT,			// thread starts a syscall
-	B_POST_SYSCALL_HIT,			// thread finished a syscall
-	B_SINGLE_STEP,				// thread is being single stepped
-	B_EXCEPTION_OCCURRED,		// an exception (fault, trap,...) occurred
-} debug_why_stopped;
-
 // in case of a B_EXCEPTION_OCCURRED event: the type of the exception
 typedef enum {
-	B_NMI						= 0,	// non-maskable interrupt
+	B_NON_MASKABLE_INTERRUPT	= 0,
 	B_MACHINE_CHECK_EXCEPTION,
 	B_SEGMENT_VIOLATION,
 	B_ALIGNMENT_EXCEPTION,
@@ -96,11 +78,6 @@ typedef enum {
 	B_GENERAL_PROTECTION_FAULT,
 	B_FLOATING_POINT_EXCEPTION,
 } debug_exception_type;
-
-extern void get_debug_why_stopped_string(debug_why_stopped whyStopped,
-		char *buffer, int32 bufferSize);
-extern void get_debug_exception_string(debug_exception_type exception,
-		char *buffer, int32 bufferSize);
 
 // Value indicating how a stopped thread shall continue.
 enum {
@@ -128,8 +105,10 @@ typedef enum {
 
 #define B_DEBUG_SIGNAL_TO_MASK(signal) (1ULL << ((signal) - 1))
 
-
-// #pragma mark -
+// maximal number of bytes to read/write via B_DEBUG_MESSAGE_{READ,WRITE]_MEMORY
+enum {
+	B_MAX_READ_WRITE_MEMORY_SIZE	= 1024,
+};
 
 // messages to the debug nub thread
 typedef enum {
@@ -137,11 +116,9 @@ typedef enum {
 	B_DEBUG_MESSAGE_WRITE_MEMORY,		// write to the team's memory
 	B_DEBUG_MESSAGE_SET_TEAM_FLAGS,		// set the team's debugging flags
 	B_DEBUG_MESSAGE_SET_THREAD_FLAGS,	// set a thread's debugging flags
-	B_DEBUG_MESSAGE_RUN_THREAD,			// run a thread full speed
-	B_DEBUG_MESSAGE_STEP_THREAD,		// let a thread execute the next
-										// instruction
-	B_DEBUG_MESSAGE_GET_WHY_STOPPED,	// ask why the thread stopped
+	B_DEBUG_MESSAGE_CONTINUE_THREAD,	// continue a stopped thread
 	B_DEBUG_MESSAGE_SET_CPU_STATE,		// change a stopped thread's CPU state
+	B_DEBUG_MESSAGE_GET_CPU_STATE,		// get the thread's current CPU state
 	B_DEBUG_MESSAGE_SET_BREAKPOINT,		// set a breakpoint
 	B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,	// clear a breakpoint
 	B_DEBUG_MESSAGE_SET_WATCHPOINT,		// set a watchpoint
@@ -157,10 +134,30 @@ typedef enum {
 										// install_team_debugger()
 } debug_nub_message;
 
-// maximal number of bytes to read/write via B_{READ,WRITE]_MEMORY
-enum {
-	B_MAX_READ_WRITE_MEMORY_SIZE	= 1024,
-};
+// messages sent to the debugger
+typedef enum {
+	B_DEBUGGER_MESSAGE_THREAD_DEBUGGED = 0,	// debugger message in reaction to
+											// an invocation of debug_thread()
+	B_DEBUGGER_MESSAGE_DEBUGGER_CALL,		// thread called debugger()
+	B_DEBUGGER_MESSAGE_BREAKPOINT_HIT,		// thread hit a breakpoint
+	B_DEBUGGER_MESSAGE_WATCHPOINT_HIT,		// thread hit a watchpoint
+	B_DEBUGGER_MESSAGE_SINGLE_STEP,			// thread was single-stepped
+	B_DEBUGGER_MESSAGE_PRE_SYSCALL,			// begin of a syscall
+	B_DEBUGGER_MESSAGE_POST_SYSCALL,		// end of a syscall
+	B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,		// thread received a signal
+	B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,	// an exception occurred
+	B_DEBUGGER_MESSAGE_TEAM_CREATED,		// the debugged team created a new
+											// one
+	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
+	B_DEBUGGER_MESSAGE_THREAD_CREATED,		// a thread has been created
+	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
+	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
+	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
+} debug_debugger_message;
+
+
+// #pragma mark -
+// #pragma mark ----- messages to the debug nub thread -----
 
 // B_DEBUG_MESSAGE_READ_MEMORY
 
@@ -205,26 +202,13 @@ typedef struct {
 	int32		flags;			// the new thread debugging flags
 } debug_nub_set_thread_flags;
 
-// B_DEBUG_MESSAGE_RUN_THREAD
-
-typedef struct {
-	thread_id	thread;			// the thread to be run
-	uint32		handle_event;	// how to handle the occurred event
-} debug_nub_run_thread;
-
-// B_DEBUG_MESSAGE_STEP_THREAD
+// B_DEBUG_MESSAGE_CONTINUE_THREAD
 
 typedef struct {
 	thread_id	thread;			// the thread
 	uint32		handle_event;	// how to handle the occurred event
-} debug_nub_step_thread;
-
-// B_DEBUG_MESSAGE_GET_WHY_STOPPED
-
-typedef struct {
-	port_id		reply_port;		// port to send the reply to
-	thread_id	thread;			// the thread
-} debug_nub_get_why_stopped;
+	bool		single_step;	// true == single step, false == run full speed
+} debug_nub_continue_thread;
 
 // B_DEBUG_MESSAGE_SET_CPU_STATE
 
@@ -232,6 +216,20 @@ typedef struct {
 	thread_id			thread;				// the thread
 	debug_cpu_state		cpu_state;			// the new CPU state
 } debug_nub_set_cpu_state;
+
+// B_DEBUG_MESSAGE_GET_CPU_STATE
+
+typedef struct {
+	port_id					reply_port;		// port to send the reply to
+	thread_id				thread;			// the thread
+} debug_nub_get_cpu_state;
+
+typedef struct {
+	status_t				error;		// != B_OK, if something went wrong
+										// (bad thread ID, thread not stopped)
+	debug_debugger_message	message;	// the reason why the thread stopped
+	debug_cpu_state			cpu_state;	// the thread's CPU state
+} debug_nub_get_cpu_state_reply;
 
 // B_DEBUG_MESSAGE_SET_BREAKPOINT
 
@@ -338,10 +336,9 @@ typedef union {
 	debug_nub_write_memory			write_memory;
 	debug_nub_set_team_flags		set_team_flags;
 	debug_nub_set_thread_flags		set_thread_flags;
-	debug_nub_run_thread			run_thread;
-	debug_nub_step_thread			step_thread;
-	debug_nub_get_why_stopped		get_why_stopped;
+	debug_nub_continue_thread		continue_thread;
 	debug_nub_set_cpu_state			set_cpu_state;
+	debug_nub_get_cpu_state			get_cpu_state;
 	debug_nub_set_breakpoint		set_breakpoint;
 	debug_nub_clear_breakpoint		clear_breakpoint;
 	debug_nub_set_watchpoint		set_watchpoint;
@@ -354,24 +351,7 @@ typedef union {
 
 
 // #pragma mark -
-
-// messages sent to the debugger
-typedef enum {
-	B_DEBUGGER_MESSAGE_THREAD_STOPPED = 0,	// thread stopped (e.g. when
-											// starting to debug or when an
-											// error occurs)
-	B_DEBUGGER_MESSAGE_PRE_SYSCALL,			// begin of a syscall
-	B_DEBUGGER_MESSAGE_POST_SYSCALL,		// end of a syscall
-	B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,		// thread received a signal
-	B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,	// an exception occurred
-	B_DEBUGGER_MESSAGE_TEAM_CREATED,		// the debugged team created a new
-											// one
-	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
-	B_DEBUGGER_MESSAGE_THREAD_CREATED,		// a thread has been created
-	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
-	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
-	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
-} debug_debugger_message;
+// #pragma mark ----- messages to the debugger -----
 
 // first member of all debugger messages -- not a message by itself
 typedef struct {
@@ -381,14 +361,43 @@ typedef struct {
 								// for synchronous messages)
 } debug_origin;
 
-// B_DEBUGGER_MESSAGE_THREAD_STOPPED
+// B_DEBUGGER_MESSAGE_THREAD_DEBUGGED
 
 typedef struct {
 	debug_origin		origin;
-	debug_why_stopped	why;		// reason for contacting debugger
+} debug_thread_debugged;
+
+// B_DEBUGGER_MESSAGE_DEBUGGER_CALL
+
+typedef struct {
+	debug_origin		origin;
+	void				*message;	// address of the message passed to
+									// debugger()
+} debug_debugger_call;
+
+// B_DEBUGGER_MESSAGE_BREAKPOINT_HIT
+
+typedef struct {
+	debug_origin		origin;
 	debug_cpu_state		cpu_state;	// cpu state
-	void				*data;		// additional data
-} debug_thread_stopped;
+	bool				software;	// true, if the is a software breakpoint
+									// (i.e. caused by a respective trap
+									// instruction)
+} debug_breakpoint_hit;
+
+// B_DEBUGGER_MESSAGE_WATCHPOINT_HIT
+
+typedef struct {
+	debug_origin		origin;
+	debug_cpu_state		cpu_state;	// cpu state
+} debug_watchpoint_hit;
+
+// B_DEBUGGER_MESSAGE_SINGLE_STEP
+
+typedef struct {
+	debug_origin		origin;
+	debug_cpu_state		cpu_state;	// cpu state
+} debug_single_step;
 
 // B_DEBUGGER_MESSAGE_PRE_SYSCALL
 
@@ -472,7 +481,11 @@ typedef struct {
 
 // union of all messages structures sent to the debugger
 typedef union {
-	debug_thread_stopped			thread_stopped;
+	debug_thread_debugged			thread_debugged;
+	debug_debugger_call				debugger_call;
+	debug_breakpoint_hit			breakpoint_hit;
+	debug_watchpoint_hit			watchpoint_hit;
+	debug_single_step				single_step;
 	debug_pre_syscall				pre_syscall;
 	debug_post_syscall				post_syscall;
 	debug_signal_received			signal_received;
@@ -486,6 +499,13 @@ typedef union {
 
 	debug_origin					origin;	// for convenience (no real message)
 } debug_debugger_message_data;
+
+
+extern void get_debug_message_string(debug_debugger_message message,
+		char *buffer, int32 bufferSize);
+extern void get_debug_exception_string(debug_exception_type exception,
+		char *buffer, int32 bufferSize);
+
 
 #ifdef __cplusplus
 }	// extern "C"
