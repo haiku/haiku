@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src tests kits storage disk_device ;
 
-UsePrivateHeaders $(DOT) ;
+#UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
@@ -15,24 +15,12 @@ SimpleTest DiskDeviceTest
 	  # We compile these classes in. If we would link against libopenbeos
 	  # instead, we couldn't use any GUI. At least not at this time.
 	  #
-	  AddOnImage.cpp
-	  DiskDevice.cpp
-	  DiskDeviceList.cpp
-	  DiskDevicePrivate.cpp
-	  DiskDeviceRoster.cpp
-	  DiskDeviceVisitor.cpp
-	  Mime.cpp
-	  Partition.cpp
-	  PartitioningDialog.cpp
-	  RegistrarDefs.cpp
-	  RosterPrivate.cpp
-	  Session.cpp
+#	  Mime.cpp
+#	  RegistrarDefs.cpp
+#	  RosterPrivate.cpp
 
-	  # from libroot
-	  #
-	  disk_scanner.cpp
-
-	: <boot!home!config!lib>libkernelland_emu.so be
+	: <boot!home!config!lib>libdiskdevice.so be
 ;
 
-Depends DiskDeviceTest : userland_disk_scanner_modules ;
+Depends DiskDeviceTest : userland_disk_scanner_modules
+						 gui_disk_scanner_add_ons ;

@@ -18,62 +18,6 @@
 #include <OS.h>
 #include <Session.h>
 
-// needed only until we can link against libopenbeos
-#include <RegistrarDefs.h>
-#include <Roster.h>
-#include <RosterPrivate.h>
-
-// Hack to make BDiskDeviceRoster communicate with our registrar.
-
-BRoster _be_roster;
-const BRoster *be_roster = &_be_roster;
-
-// init_roster
-void
-init_roster()
-{
-	bool initialized = false;
-	// find the registrar port
-	port_id rosterPort = find_port(kRosterPortName);
-	port_info info;
-	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
-		// construct the roster messenger
-		struct {
-			port_id	fPort;
-			int32	fHandlerToken;
-			team_id	fTeam;
-			int32	extra0;
-			int32	extra1;
-			bool	fPreferredTarget;
-			bool	extra2;
-			bool	extra3;
-			bool	extra4;
-		} fakeMessenger;
-		fakeMessenger.fPort = rosterPort;
-		fakeMessenger.fHandlerToken = 0;
-		fakeMessenger.fTeam = info.team;
-		fakeMessenger.fPreferredTarget = true;
-		BMessenger mainMessenger = *(BMessenger*)&fakeMessenger;
-		// ask for the MIME messenger
-		BMessage reply;
-		status_t error = mainMessenger.SendMessage(B_REG_GET_MIME_MESSENGER,
-												   &reply);
-		if (error == B_OK && reply.what == B_REG_SUCCESS) {
-			BMessenger mimeMessenger;
-			reply.FindMessenger("messenger", &mimeMessenger);
-			BRoster::Private(_be_roster).SetTo(mainMessenger, mimeMessenger);
-			initialized = true;
-		} else {
-		}
-	}
-	if (!initialized) {
-		printf("initializing be_roster failed!\n");
-		exit(1);
-	}
-}
-
-//----------------------------------------------------------------------------
-
 // DumpVisitor
 class DumpVisitor : public BDiskDeviceVisitor {
 public:
@@ -485,6 +429,41 @@ public:
 		Unlock();
 	}
 
+	virtual void ReadyToRun()
+	{
+		// list the available partition add-ons
+		BDiskDeviceRoster roster;
+		char shortName[B_FILE_NAME_LENGTH];
+		char longName[B_FILE_NAME_LENGTH];
+		printf("partition add-ons:\n");
+		while (roster.GetNextPartitioningSystem(shortName, longName) == B_OK) {
+			printf("  `%s' (`%s')\n", shortName, longName);
+		}
+		fDeviceList.Lock();
+		for (int32 i = 0; BDiskDevice *device = fDeviceList.DeviceAt(i); i++) {
+printf("device: `%s'\n", device->Path());
+			if (!strcmp(device->Path(), "/dev/disk/virtual/0/raw")) {
+				if (BSession *session = device->SessionAt(0)) {
+					BString parameters;
+					bool cancelled = false;
+					status_t error = session->GetPartitioningParameters(
+						"intel", &parameters, BRect(), &cancelled);
+					if (error == B_OK) {
+						printf("partitioning parameters: `%s'\n",
+							   parameters.String());
+					} else if (error == B_ERROR && cancelled) {
+						printf("partitioning dialog cancelled\n");
+					} else {
+						printf("error getting partitioning parameters: %s\n",
+							   strerror(error));
+					}
+				}
+				break;
+			}
+		}
+		fDeviceList.Unlock();
+	}
+
 private:
 	MyDeviceList	fDeviceList;
 };
@@ -493,8 +472,6 @@ private:
 int
 main()
 {
-	init_roster();
-	// -----------
 /*
 	TestApp app("application/x-vnd.obos-disk-device-test");
 	BDiskDeviceRoster roster;
