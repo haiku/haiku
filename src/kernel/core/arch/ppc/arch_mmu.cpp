@@ -30,17 +30,17 @@ page_table_entry::SecondaryHash(uint32 primaryHash)
 
 
 void 
-ppc_get_page_table(void **_pageTable, size_t *_size)
+ppc_get_page_table(page_table_entry_group **_pageTable, size_t *_size)
 {
 	uint32 sdr1 = get_sdr1();
 
-	*_pageTable = (void *)(sdr1 & 0xffff0000);
+	*_pageTable = (page_table_entry_group *)(sdr1 & 0xffff0000);
 	*_size = ((sdr1 & 0x1ff) + 1) << 16;
 }
 
 
 void 
-ppc_set_page_table(void *pageTable, size_t size)
+ppc_set_page_table(page_table_entry_group *pageTable, size_t size)
 {
 	set_sdr1(((uint32)pageTable & 0xffff0000) | (((size >> 16) - 1 ) & 0x1ff));
 }

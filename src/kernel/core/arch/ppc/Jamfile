@@ -7,16 +7,16 @@ KernelStaticLibrary libppc :
 	<$(SOURCE_GRIST)>arch_dbg_console.c
 	<$(SOURCE_GRIST)>arch_debug.c
 	<$(SOURCE_GRIST)>arch_elf.c
+	<$(SOURCE_GRIST)>arch_exceptions.S
 	<$(SOURCE_GRIST)>arch_faults.c
 	<$(SOURCE_GRIST)>arch_int.c
 	<$(SOURCE_GRIST)>arch_mmu.cpp
 	<$(SOURCE_GRIST)>arch_smp.c
 	<$(SOURCE_GRIST)>arch_thread.c
 	<$(SOURCE_GRIST)>arch_timer.c
-	<$(SOURCE_GRIST)>arch_vm.c
-	<$(SOURCE_GRIST)>arch_vm_translation_map.c
+	<$(SOURCE_GRIST)>arch_vm.cpp
+	<$(SOURCE_GRIST)>arch_vm_translation_map.cpp
 	<$(SOURCE_GRIST)>arch_asm.S
-#	<$(SOURCE_GRIST)>arch_interrupts.S
 	:
 	-fno-pic -Wno-unused
 	;

@@ -9,7 +9,7 @@
 #include <arch/debug.h>
 
 
-// ToDo: will put stack trace and disassembly routines here
+// ToDo: put stack trace and disassembly routines here
 
 
 void
