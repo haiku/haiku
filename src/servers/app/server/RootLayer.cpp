@@ -1288,10 +1288,8 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					}
 					keymsg.AddString("bytes",string);
 //					keymsg.AddInt32("raw_char",raw_char);
-					
-printf("RootLayer keyboard message:\n");
-keymsg.PrintToStream();					
-printf("\n");
+					keymsg.AddInt32("haiku:token", target->fViewToken);
+
 					win->SendMessageToClient(&keymsg);
 				}
 			}
@@ -1386,7 +1384,8 @@ printf("\n");
 					}
 					keymsg.AddString("bytes",string);
 					keymsg.AddInt32("raw_char",raw_char);
-					
+					keymsg.AddInt32("haiku:token", target->fViewToken);
+
 					win->SendMessageToClient(&keymsg);
 				}
 			}

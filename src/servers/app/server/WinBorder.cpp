@@ -220,7 +220,8 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 			}
 		}
 	}
-	else if (sendMessage && target && target != fTopLayer){
+	else if (sendMessage && target && target != fTopLayer)
+	{
 		BMessage msg;
 		msg.what = B_MOUSE_DOWN;
 		msg.AddInt64("when", evt.when);
@@ -360,13 +361,15 @@ void WinBorder::MouseUp(PointerEvent& evt)
 		return;
 	}
 
-	if (fTopLayer->fFullVisible.Contains(evt.where))
+	Layer	*target = LayerAt(evt.where);
+	if (target && target != fTopLayer)
 	{
 		BMessage upmsg(B_MOUSE_UP);
 		upmsg.AddInt64("when",evt.when);
 		upmsg.AddPoint("where",evt.where);
 		upmsg.AddInt32("modifiers",evt.modifiers);
-			
+		upmsg.AddInt32("haiku:token", target? target->fViewToken: B_NULL_TOKEN);
+
 		Window()->SendMessageToClient(&upmsg);
 	}
 }
