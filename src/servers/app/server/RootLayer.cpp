@@ -916,24 +916,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 					invalidate_layer(this, fFull);
 				}
 
-				WinBorder		*focus = FocusWinBorder();
-				if (exFocus || focus)
-				{
-					if (exFocus && exFocus != focus && exFocus->fDecorator)
-						exFocus->fDecorator->SetFocus(false);
-					if (focus && exFocus != focus && focus->fDecorator)
-						focus->fDecorator->SetFocus(true);
-
-					if (exFocus && focus != exFocus)
-					{
-						// TODO: this line is a hack, decorator is drawn twice.
-						BRegion		reg(exFocus->fVisible);
-						if (focus)
-							reg.Include(&focus->fVisible);
-
-						redraw_layer(this, reg);
-					}
-				}
+				draw_window_tab(exFocus, FocusWinBorder());
 
 				if (action == DEC_DRAG)
 				{
@@ -1555,6 +1538,7 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 {
 	bool	invalidate = false;
 	bool	invalid;
+	WinBorder	*exFocus = FocusWinBorder();
 
 	winBorder->Show(false);
 
@@ -1576,18 +1560,22 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 	}
 
 	get_workspace_windows();
+
 	if (invalidate)
 	{
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
 		invalidate_layer(this, fFull);
 	}
+
+	draw_window_tab(exFocus, FocusWinBorder());
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
 {
-	bool	invalidate = false;
-	bool	invalid;
+	bool		invalidate = false;
+	bool		invalid;
+	WinBorder	*exFocus = FocusWinBorder();
 
 	winBorder->Hide(false);
 
@@ -1610,6 +1598,8 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 		//       plus the full regions of new windows???
 		invalidate_layer(this, fFull);
 	}
+
+	draw_window_tab(exFocus, FocusWinBorder());
 }
 
 void RootLayer::get_workspace_windows()
@@ -1636,3 +1626,22 @@ void RootLayer::get_workspace_windows()
 //printf("Adi: get_workspace_windows DONE\n");
 }
 
+void RootLayer::draw_window_tab(WinBorder *exFocus, WinBorder *focus)
+{
+	if (exFocus || focus)
+	{
+		if (exFocus && exFocus != focus && exFocus->fDecorator)
+			exFocus->fDecorator->SetFocus(false);
+		if (focus && exFocus != focus && focus->fDecorator)
+			focus->fDecorator->SetFocus(true);
+
+		if (exFocus && focus != exFocus)
+		{
+			// TODO: this line is a hack, decorator is drawn twice.
+			BRegion		reg(exFocus->fVisible);
+			if (focus)
+				reg.Include(&focus->fVisible);
+			redraw_layer(this, reg);
+		}
+	}
+}

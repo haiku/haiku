@@ -137,6 +137,7 @@ friend class Desktop;
 			void			hide_winBorder(WinBorder* winBorder);
 
 			void			get_workspace_windows();
+			void 			draw_window_tab(WinBorder *exFocus, WinBorder *focus);
 
 			void			invalidate_layer(Layer *layer, const BRegion &region);
 			void			redraw_layer(Layer *layer, const BRegion &region);

@@ -257,19 +257,24 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 	// add FLOATING_APP windows to the local list of all normal windows.
 	// This is to keep the order all floating windows (app or subset) when we go from
 	// one normal window to another.
-	if (feel == B_FLOATING_APP_WINDOW_FEEL)
+	if (feel == B_FLOATING_APP_WINDOW_FEEL || feel == B_NORMAL_WINDOW_FEEL)
 	{
 		WinBorder	*wb = NULL;
 		int32		count = fWinBorderList.CountItems();
+		int32		feelToLookFor = (feel == B_NORMAL_WINDOW_FEEL ?
+											 B_FLOATING_APP_WINDOW_FEEL :
+											 B_NORMAL_WINDOW_FEEL);
 
 		for(int32 i = 0; i < count; i++)
 		{
 			wb		= (WinBorder*)fWinBorderList.ItemAt(i);
 			if (wb->App()->ClientTeamID() == winBorder->App()->ClientTeamID()
-				&& wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+				&& wb->Window()->Feel() == feelToLookFor)
 				// R2: RootLayer comparison is needed.
 			{
-				wb->fFMWList.AddWinBorder(winBorder);
+				feel == B_NORMAL_WINDOW_FEEL ?
+					winBorder->fFMWList.AddWinBorder(wb) :
+					wb->fFMWList.AddWinBorder(winBorder);
 			}
 		}
 	}
