@@ -135,21 +135,21 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	// In checking for hit test stuff, we start with the smallest rectangles the user might
 	// be clicking on and gradually work our way out into larger rectangles.
 	if(_closerect.Contains(pt))
-		return CLICK_CLOSE;
+		return DEC_CLOSE;
 
 	if(_zoomrect.Contains(pt))
-		return CLICK_ZOOM;
+		return DEC_ZOOM;
 	
 	if(_resizerect.Contains(pt) && _look==B_DOCUMENT_WINDOW_LOOK)
-		return CLICK_RESIZE;
+		return DEC_RESIZE;
 
 	// Clicking in the tab?
 	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
 		if(buttons==B_SECONDARY_MOUSE_BUTTON)
-			return CLICK_MOVETOBACK;
-		return CLICK_DRAG;
+			return DEC_MOVETOBACK;
+		return DEC_DRAG;
 	}
 
 	// We got this far, so user is clicking on the border?
@@ -159,13 +159,13 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	if(brect.Contains(pt) && !clientrect.Contains(pt))
 	{
 		if(_resizerect.Contains(pt))
-			return CLICK_RESIZE;
+			return DEC_RESIZE;
 		
-		return CLICK_DRAG;
+		return DEC_DRAG;
 	}
 
 	// Guess user didn't click anything
-	return CLICK_NONE;
+	return DEC_NONE;
 }
 
 void DefaultDecorator::_DoLayout(void)
