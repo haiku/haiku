@@ -2,6 +2,11 @@ SubDir OBOS_TOP src add-ons kernel generic locked_pool ;
 
 UsePrivateHeaders kernel ;
 
+# enable debug output, if debugging is enabled
+if $(DEBUG) != 0 {
+	SubDirCcFlags [ FDefines TRACE_LOCKED_POOL=1  ] ;
+}
+
 KernelAddon locked_pool : kernel generic :
 	locked_pool.c
 	;

@@ -2,6 +2,11 @@ SubDir OBOS_TOP src add-ons kernel busses ide ide_isa ;
 
 UsePrivateHeaders kernel ;
 
+# disable debug output, if debugging is disabled
+if $(DEBUG) = 0 {
+	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
+}
+
 KernelAddon ide_isa : kernel busses ide :
 	ide_isa.c
 	;

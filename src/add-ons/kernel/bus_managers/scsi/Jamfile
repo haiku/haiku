@@ -4,6 +4,11 @@ UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 
+# disable debug output, if debugging is disabled
+if $(DEBUG) = 0 {
+	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0  ] ;
+}
+
 KernelAddon scsi : kernel bus_managers :
 	bus_raw.c
 	busses.c

@@ -38,7 +38,7 @@
 #include <malloc.h>
 
 
-#define TRACE_LOCKED_POOL
+//#define TRACE_LOCKED_POOL
 #ifdef TRACE_LOCKED_POOL
 #	define TRACE(x) dprintf x
 #else
