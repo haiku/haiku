@@ -40,9 +40,24 @@ enum {
 										// or resized
 	B_DEVICE_PARTITION_ADDED,			// partition added
 	B_DEVICE_PARTITION_REMOVED,			// partition removed
+	B_DEVICE_SESSION_ADDED,				// session added
+	B_DEVICE_SESSION_REMOVED,			// session removed
 	B_DEVICE_MEDIA_CHANGED,				// media changed
 	B_DEVICE_ADDED,						// device added
 	B_DEVICE_REMOVED					// device removed
+};
+
+// notification message "cause" field values
+enum {
+	// helpful causes
+	B_DEVICE_CAUSE_MEDIA_CHANGED,
+	B_DEVICE_CAUSE_FORMATTED,
+	B_DEVICE_CAUSE_PARTITIONED,
+	B_DEVICE_CAUSE_INITIALIZED,
+	// unknown cause
+	B_DEVICE_CAUSE_UNKNOWN,
+	// for internal use only (e.g.: partition added, because device added)
+	B_DEVICE_CAUSE_PARENT_CHANGED,
 };
 
 class BDiskDeviceRoster {
