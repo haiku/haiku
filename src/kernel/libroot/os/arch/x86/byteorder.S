@@ -14,6 +14,15 @@ FUNCTION(__swap_int16):
 	shr		$16, %eax
 	ret
 
+/* this one is much faster on a P4, courtesy of Marcus Overhagen,
+ * a good candidate for per processor optimizations: */
+/*
+FUNCTION(__swap_int16_p4):
+	movl	4(%esp), %eax
+	rolw	$8, %ax
+	ret
+*/
+
 /* uint32 __swap_int32(uint32 value) */
 FUNCTION(__swap_int32):
 	movl	4(%esp), %eax
