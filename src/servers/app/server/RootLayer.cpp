@@ -326,7 +326,13 @@ Layer* RootLayer::VirtualTopChild() const
 	fWinBorderIndex	= fWinBorderCount-1;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-		return fWinBorderList[fWinBorderIndex--];
+{
+		WinBorder *wb = fWinBorderList[fWinBorderIndex];
+		fWinBorderIndex--;
+//printf("Adi: VTC: %p.\n", wb);
+//		return fWinBorderList[fWinBorderIndex--];
+		return wb;
+}
 
 	return NULL;
 }
@@ -334,7 +340,13 @@ Layer* RootLayer::VirtualTopChild() const
 Layer* RootLayer::VirtualLowerSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-		return fWinBorderList[fWinBorderIndex--];
+{
+		WinBorder *wb = fWinBorderList[fWinBorderIndex];
+		fWinBorderIndex--;
+//printf("Adi: VLS: %p.\n", wb);
+		return wb;
+//		return fWinBorderList[fWinBorderIndex--];
+}
 
 	return NULL;
 }
@@ -342,7 +354,13 @@ Layer* RootLayer::VirtualLowerSibling() const
 Layer* RootLayer::VirtualUpperSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-		return fWinBorderList[fWinBorderIndex++];
+{
+		WinBorder *wb = fWinBorderList[fWinBorderIndex];
+		fWinBorderIndex++;
+//printf("Adi: VUS: %p.\n", wb);
+		return wb;
+//		return fWinBorderList[fWinBorderIndex++];
+}
 
 	return NULL;
 }
@@ -352,7 +370,13 @@ Layer* RootLayer::VirtualBottomChild() const
 	fWinBorderIndex	= 0;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-		return fWinBorderList[fWinBorderIndex++];
+{
+		WinBorder *wb = fWinBorderList[fWinBorderIndex];
+		fWinBorderIndex++;
+//printf("Adi: VBC: %p.\n", wb);
+		return wb;
+//		return fWinBorderList[fWinBorderIndex++];
+}
 
 	return NULL;
 }
@@ -365,7 +389,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
 		return;
 	}
-
+//printf("Adi: AddWinBorder(%p)\n", winBorder);
 	uint32		wks = winBorder->Window()->Workspaces();
 
 	// add to current workspace
@@ -885,28 +909,30 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				
 				if (invalidate)
 				{
-					WinBorder		*focus = FocusWinBorder();
+					get_workspace_windows();
+					
+					// TODO: should it be improved by calling with region of hidden windows
+					//       plus the full regions of new windows???
+					invalidate_layer(this, fFull);
+				}
+
+				WinBorder		*focus = FocusWinBorder();
+				if (exFocus || focus)
+				{
 					if (exFocus && exFocus != focus && exFocus->fDecorator)
 						exFocus->fDecorator->SetFocus(false);
 					if (focus && exFocus != focus && focus->fDecorator)
 						focus->fDecorator->SetFocus(true);
 
-					get_workspace_windows();
-					
-					BRegion		reg(target->fFull);
-					reg.Include(&target->fTopLayer->fFull);
-					invalidate_layer(this, reg);
-					if (exFocus && FocusWinBorder() != exFocus)
+					if (exFocus && focus != exFocus)
 					{
-						reg.MakeEmpty();
-						reg.Include(&exFocus->fVisible);
 						// TODO: this line is a hack, decorator is drawn twice.
-						reg.Include(&focus->fVisible);
+						BRegion		reg(exFocus->fVisible);
+						if (focus)
+							reg.Include(&focus->fVisible);
+
 						redraw_layer(this, reg);
 					}
-
-					if (!(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
-						sendMessage = false;
 				}
 
 				if (action == DEC_DRAG)
@@ -919,6 +945,9 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				}
 				else
 				{
+					if (!(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+						sendMessage = false;
+
 					target->Window()->Lock();
 					target->MouseDown(evt, sendMessage);
 					target->Window()->Unlock();
@@ -1533,21 +1562,25 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 	{
 		invalid		= false;
 
-		if (fWorkspace[i] && fWorkspace[i]->HasWinBorder(winBorder))
+		if (fWorkspace[i] &&
+				(fWorkspace[i]->HasWinBorder(winBorder) ||
+				// floating windows are inserted/removed on-the-fly so this window,
+				// although needed may not be in workspace's list.
+				winBorder->Level() == B_FLOATING_APP))
+		{
 			invalid = fWorkspace[i]->ShowWinBorder(winBorder);
+		}
 
 		if (fActiveWksIndex == i)
 			invalidate = invalid;
 	}
 
 	get_workspace_windows();
-
 	if (invalidate)
 	{
-		BRegion		reg(winBorder->fFull);
-		reg.Include(&winBorder->fTopLayer->fFull);
-		invalidate_layer(this, reg);
-//		invalidate_layer(this, winBorder->fFull);
+		// TODO: should it be improved by calling with region of hidden windows
+		//       plus the full regions of new windows???
+		invalidate_layer(this, fFull);
 	}
 }
 
@@ -1573,7 +1606,9 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 
 	if (invalidate)
 	{
-		invalidate_layer(this, winBorder->fFullVisible);
+		// TODO: should it be improved by calling with region of hidden windows
+		//       plus the full regions of new windows???
+		invalidate_layer(this, fFull);
 	}
 }
 
@@ -1594,4 +1629,10 @@ void RootLayer::get_workspace_windows()
 	fWinBorderCount = bufferSize;
 
 	fWinBorderIndex	= 0;
+//for (int32 i = 0; i < fWinBorderCount; i++)
+//{
+//	printf("Adi: %ld get_workspace_windows(%p)\n", i, fWinBorderList[i]);
+//}
+//printf("Adi: get_workspace_windows DONE\n");
 }
+

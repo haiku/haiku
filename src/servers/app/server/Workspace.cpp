@@ -800,7 +800,7 @@ STRACE(("W(%ld)::ShowWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 				}
 				else
 				{
-					// none of the unhiden normal windows have this window as part of their subset.
+					// none of the unhiden normal windows havs this window as part of its subset.
 					// as a result this window won't be added to Workspace's list for it to be shown.
 					return false;
 				}

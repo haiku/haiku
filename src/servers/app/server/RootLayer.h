@@ -164,9 +164,9 @@ friend class Desktop;
 	int32			fActiveWksIndex;
 	int32			fWsCount;
 	Workspace*		fWorkspace[32];
-	mutable WinBorder**		fWinBorderList2;
-	mutable WinBorder**		fWinBorderList;
-	mutable int32			fWinBorderCount;
+	WinBorder**		fWinBorderList2;
+	WinBorder**		fWinBorderList;
+	int32			fWinBorderCount;
 	mutable int32			fWinBorderIndex;
 			int32			fWinBorderListLength;
 

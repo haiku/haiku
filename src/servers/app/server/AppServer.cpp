@@ -789,6 +789,7 @@ int main( int argc, char** argv )
 	if(find_port(SERVER_PORT_NAME)!=B_NAME_NOT_FOUND)
 		return -1;
 
+	srand(real_time_clock_usecs());
 	AppServer	app_server;
 	app_server.Run();
 	return 0;

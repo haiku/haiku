@@ -121,7 +121,7 @@ Layer::~Layer(void)
 		delete fLayerData;
 		fLayerData = NULL;
 	}
-	
+
 	if(fName)
 	{
 		delete fName;
@@ -375,7 +375,7 @@ Layer* Layer::LayerAt(const BPoint &pt)
 {
 	if (fVisible.Contains(pt))
 		return this;
-	
+
 	if (fFullVisible.Contains(pt))
 	{
 		Layer *lay = NULL;
@@ -645,10 +645,9 @@ void Layer::Draw(const BRect &r)
 	r.PrintToStream();
 	#endif	
 	
-//	fDriver->FillRect(r, fLayerData->viewcolor);
-	srand(123);
-	RGBColor c(rand()%255,rand()%255,rand()%255);
-	fDriver->FillRect(r, c);
+	fDriver->FillRect(r, fLayerData->viewcolor);
+//	RGBColor c(rand()%255,rand()%255,rand()%255);
+//	fDriver->FillRect(r, c);
 	
 	// empty HOOK function.
 }
@@ -879,7 +878,6 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	{
 		fFullVisible.MakeEmpty();
 		fVisible = fFull;
-		
 		#ifdef DEBUG_LAYER_REBUILD
 			printf("\n ======= Layer(%s):: RR ****** ======\n", GetName());
 			fFull.PrintToStream();
