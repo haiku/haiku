@@ -40,7 +40,7 @@ vpage::vpage(void) : physPage(NULL),backingNode(NULL),protection(none),dirty(fal
 
 // Does the real setup work for making a vpage.
 // backing and/or physMem can be NULL/0.
-void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state) { 
+void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType prot,pageState state, mmapSharing share) { 
 	// Basic setup from parameters
 	vpage *clonedPage; // This is the page that this page is to be the clone of...
 	error ("vpage::setup: start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
@@ -53,21 +53,35 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 	end_address=start+PAGE_SIZE-1;
 
 // Set up the backing store. If one is specified, use it; if not, get a swap file page.
-	if (backingNode) {
-		clonedPage=vmBlock->vnodeMan->addVnode(*backingNode,*this); // Use the reference version which will make a new one if this one is not found
-		if (clonedPage) {
-			physPage=clonedPage->physPage;	
-			protection=(protection<=readable)?protection: copyOnWrite;
-			if (clonedPage->getProtection()<=readable)
-				clonedPage->setProtection(copyOnWrite);
+	if (backingNode) { // This is an mmapped file (or a cloned area)
+		switch (share) {
+			case CLONE: // This is a cloned area
+			case SHARED: // This is a shared mmap
+				clonedPage=vmBlock->vnodeMan->addVnode(*backingNode,*this); // Use the reference version which will make a new one if this one is not found
+				if (clonedPage) physPage=clonedPage->physPage;	
+				break;
+			case PRIVATE: // This is a one way share - we get others changes (until we make a change) but no one gets our changes
+				clonedPage=vmBlock->vnodeMan->addVnode(*backingNode,*this); // Use the reference version which will make a new one if this one is not found
+				if (clonedPage) physPage=clonedPage->physPage;	
+				protection=(protection<=readable)?protection: copyOnWrite;
+				break;
+			case COPY: // This is not shared - get a fresh page and fresh swap file space and copy the original page
+				physPage=vmBlock->pageMan->getPage();
+				clonedPage=vmBlock->vnodeMan->findVnode(*backing); // Find out if the page we are copying is in memory already...
+				if (clonedPage && clonedPage->physPage) // If it is in memory, copy its values
+					memcpy((void *)(physPage->getAddress()),(void *)(clonedPage->physPage->getAddress()),PAGE_SIZE);
+				else 
+					refresh(); // otherwise, get a copy from disk...
+				backingNode=&(vmBlock->swapMan->findNode()); // Now get swap space (since we don't want to be backed by the file...
+				clonedPage=vmBlock->vnodeMan->addVnode(backingNode,*this); // Add this vnode to the vnode keeper
+				break;
 			}
 		}
 	else { // Going to swap file.
 		backingNode=&(vmBlock->swapMan->findNode());
 		clonedPage=vmBlock->vnodeMan->addVnode(backingNode,*this); // Use the pointer version which will use this one. Should always return NULL
 	}
-
-	// If there is no physical page already and we can't wait to get one, then get one now	
+// If there is no physical page already and we can't wait to get one, then get one now	
 	if (!physPage && (state!=LAZY) && (state!=NO_LOCK)) {
 		physPage=vmBlock->pageMan->getPage();
 		error ("vpage::setup, state = %d, allocated page %x\n",state,physPage);
@@ -76,6 +90,7 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 		if (physPage)
 			atomic_add(&(physPage->count),1);
 		}
+
 	error ("vpage::setup: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 

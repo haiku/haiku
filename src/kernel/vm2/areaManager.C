@@ -285,8 +285,9 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	strcpy(	name,"mmap - need to include fileName");
 		
 	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
-	protectType protType=(prot&PROT_WRITE)?writable:(prot&PROT_READ)?readable:none;
-	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
+
+	protectType protType;
+	protType=(flags&PROT_WRITE)?writable:(flags&(PROT_READ|PROT_EXEC))?readable:none;
 	//error ("flags = %x, anon = %x\n",flags,MAP_ANON);
 	lock();
 	if (flags & MAP_ANON) {
@@ -294,10 +295,17 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 		return addr;
 		}
 
+	int shareCount=0;
+	mmapSharing share;
+	if (flags & MAP_SHARED) { share=SHARED;shareCount++;}
+	if (flags & MAP_PRIVATE) { share=PRIVATE;shareCount++;}
+	if (flags & MAP_COPY){ share=COPY;shareCount++;}
+	if (shareCount!=1)
+		return NULL;
 	area *newArea = new (vmBlock->areaPool->get()) area;
 	newArea->setup(this);
 	//error ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
-	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
+	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset,share);
  	atomic_add(&nextAreaID,1);
 	newArea->setAreaID(nextAreaID);
 	addArea(newArea);

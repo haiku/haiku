@@ -29,8 +29,8 @@ class area : public node
 		area(void);
 		void setup(areaManager *myManager);
 		void freeArea(void);
-		status_t createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/);
-		status_t createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect,int fd,size_t offset);
+		status_t createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL,mmapSharing share=CLONEAREA /* For clone only*/);
+		status_t createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect,int fd,size_t offset, mmapSharing share=CLONEAREA);
 		status_t createArea (char *name, int pageCount,void **address, addressSpec type,pageState state,protectType protect);
 		status_t cloneArea(area *area, char *inName, void **address, addressSpec type,pageState inState,protectType protect);
 		unsigned long mapAddressSpecToAddress(addressSpec type,void *requested,int pageCount);

@@ -21,7 +21,7 @@ class vpage : public node
 		vpage(void);
 		vpage(unsigned long address) {start_address=address-address%PAGE_SIZE;end_address=start_address+PAGE_SIZE-1;} // Only for lookups
 		// Setup should now only be called by the vpage manager...
-		void setup(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state); // backing and/or physMem can be NULL/0.
+		void setup(unsigned long  start,vnode *backing, page *physMem,protectType prot,pageState state, mmapSharing share=CLONEAREA); // backing and/or physMem can be NULL/0.
 		void cleanup(void);
 
 		// Mutators

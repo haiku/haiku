@@ -53,7 +53,7 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int page
 }
 
 // This is the really interesting part of creating an area
-status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/) {
+status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea /* For clone only*/, mmapSharing share) {
 	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %lx, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
 					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
 	vpage *newPage;
@@ -78,7 +78,7 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 				newVnode.fd=fd;
 				newVnode.offset=offset;
 //				vmBlock->vnodeManager->addVNode(newVnode,newPage);
-				newPage->setup(base+PAGE_SIZE*i,&newVnode,NULL,protect,inState);
+				newPage->setup(base+PAGE_SIZE*i,&newVnode,NULL,protect,inState,share);
 				}
 			else
 				newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
@@ -99,8 +99,8 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 	return B_OK;
 }
 
-status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset) {
-	return createAreaGuts(inName,pageCount,address,type,inState,protect,true,fd,offset);
+status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset, mmapSharing share) {
+	return createAreaGuts(inName,pageCount,address,type,inState,protect,true,fd,offset,NULL,share);
 	}
 
 status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect) {

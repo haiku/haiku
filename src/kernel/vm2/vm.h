@@ -47,6 +47,8 @@ enum pageState {FULL,CONTIGUOUS,LAZY,NO_LOCK,LOMEM};
 #define B_DMA_IO       0x00000001
 #define B_READ_DEVICE  0x00000002  
 
+enum mmapSharing {CLONEAREA,SHARED,PRIVATE,COPY};
+
 struct physical_entry  {void *address; 
 		ulong size; 
 		};
