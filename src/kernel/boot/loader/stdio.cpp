@@ -58,6 +58,13 @@ vfprintf(FILE *file, const char *format, va_list list)
 
 
 int
+vprintf(const char *format, va_list args)
+{
+	return vfprintf(stdout, format, args);
+}
+
+
+int
 printf(const char *format, ...)
 {
 	va_list args;
