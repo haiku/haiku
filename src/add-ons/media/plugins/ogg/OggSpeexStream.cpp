@@ -52,7 +52,7 @@ OggSpeexStream::IsValidHeader(const ogg_packet & packet)
 OggSpeexStream::OggSpeexStream(long serialno)
 	: OggStream(serialno)
 {
-
+	TRACE("OggSpeexStream::OggSpeexStream\n");
 }
 
 OggSpeexStream::~OggSpeexStream()
@@ -108,9 +108,6 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// fill out format from header packet
-	format->type = B_MEDIA_ENCODED_AUDIO;
-	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data, "Spee", 4);
 	if (header->bitrate > 0) {
 		format->u.encoded_audio.bit_rate = header->bitrate;
 	} else {
@@ -118,16 +115,11 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 	if (header->nb_channels == 1) {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
-		*frameCount *= 2;
-		*duration *= 2;
 	} else {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 	}
-	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
 	format->u.encoded_audio.output.frame_rate = header->rate;
 	format->u.encoded_audio.output.channel_count = header->nb_channels;
-	format->u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	format->u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
 	// allocate buffer, round up to nearest speex output_length size
 	int buffer_size = AudioBufferSize(&format->u.encoded_audio.output);
 	int output_length = header->frame_size * header->nb_channels *
@@ -153,8 +145,8 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 		SaveHeaderPacket(packet);
 	}
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(&fHeaderPackets));
-	*duration = 80000000;
+	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
+	*duration = 100000000;
 	*frameCount = 60000;
 	return B_OK;
 }

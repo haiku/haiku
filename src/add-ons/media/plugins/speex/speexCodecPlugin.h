@@ -4,11 +4,11 @@
 #include "speex_stereo.h"
 #include "speex_callbacks.h"
 
-class speexDecoder : public Decoder
+class SpeexDecoder : public Decoder
 {
 public:
-				speexDecoder();
-				~speexDecoder();
+				SpeexDecoder();
+				~SpeexDecoder();
 
 	void		GetCodecInfo(media_codec_info &info);
 	status_t	Setup(media_format *inputFormat,
@@ -25,9 +25,6 @@ public:
 					   media_header *mediaHeader, media_decode_info *info);
 					   
 private:
-	void		CopyInfoToEncodedFormat(media_format * format);
-	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);
-
 	SpeexBits		fBits;
 	void *			fDecoderState;
 	SpeexHeader	*	fHeader;
@@ -41,7 +38,7 @@ private:
 };
 
 
-class speexDecoderPlugin : public DecoderPlugin
+class SpeexDecoderPlugin : public DecoderPlugin
 {
 public:
 	Decoder *	NewDecoder();

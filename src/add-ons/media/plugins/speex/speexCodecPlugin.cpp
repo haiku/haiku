@@ -18,9 +18,70 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
-speexDecoder::speexDecoder()
+
+inline size_t
+AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
-	TRACE("speexDecoder::speexDecoder\n");
+	return (raf->format & 0xf) * (raf->channel_count)
+         * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
+}
+
+
+/*
+ * speex descriptions/formats
+ */
+
+
+static media_format_description
+speex_description()
+{
+	media_format_description description;
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'OggS';
+	description.u.misc.codec = 'Spee';
+	return description;
+}
+
+
+static void
+init_speex_media_raw_audio_format(media_raw_audio_format * output)
+{
+	output->format = media_raw_audio_format::B_AUDIO_FLOAT;
+	output->byte_order = B_MEDIA_HOST_ENDIAN;
+}
+
+
+static media_format
+speex_encoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.user_data_type = B_CODEC_TYPE_INFO;
+	strncpy((char*)format.user_data, "Spee", 4);
+	format.u.encoded_audio.frame_size = sizeof(ogg_packet);
+	init_speex_media_raw_audio_format(&format.u.encoded_audio.output);
+	return format;
+}
+
+
+static media_format
+speex_decoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_RAW_AUDIO;
+	init_speex_media_raw_audio_format(&format.u.raw_audio);
+	return format;
+}
+
+
+/*
+ * VorbisDecoder
+ */
+
+
+SpeexDecoder::SpeexDecoder()
+{
+	TRACE("SpeexDecoder::SpeexDecoder\n");
 	speex_bits_init(&fBits);
 	fDecoderState = 0;
 	fHeader = 0;
@@ -32,9 +93,9 @@ speexDecoder::speexDecoder()
 }
 
 
-speexDecoder::~speexDecoder()
+SpeexDecoder::~SpeexDecoder()
 {
-	TRACE("speexDecoder::~speexDecoder\n");
+	TRACE("SpeexDecoder::~SpeexDecoder\n");
 	// the fStereoState is destroyed by fDecoderState
 //	delete fStereoState;
 	speex_bits_destroy(&fBits);
@@ -43,43 +104,40 @@ speexDecoder::~speexDecoder()
 
 
 void
-speexDecoder::GetCodecInfo(media_codec_info &info)
+SpeexDecoder::GetCodecInfo(media_codec_info &info)
 {
-	strcpy(info.short_name, "speex");
-	strcpy(info.pretty_name, "speex decoder, based on libspeex");
+	strncpy(info.short_name, "speex", sizeof(info.short_name));
+	strncpy(info.pretty_name, "speex decoder, by Andrew Bachmann, based on libspeex", sizeof(info.pretty_name));
 }
 
 
 status_t
-speexDecoder::Setup(media_format *inputFormat,
+SpeexDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	if (inputFormat->type != B_MEDIA_ENCODED_AUDIO) {
-		TRACE("speexDecoder::Setup not called with audio stream: not speex\n");
-		return B_ERROR;
+	TRACE("VorbisDecoder::Setup\n");
+	if (!format_is_compatible(speex_encoded_media_format(),*inputFormat)) {
+		return B_MEDIA_BAD_FORMAT;
 	}
-	if (inputFormat->u.encoded_audio.encoding != 'Spee') {
-		TRACE("speexDecoder::Setup not called with 'Spee' stream: not speex\n");
-		return B_ERROR;
-	}
-	if (inputFormat->MetaDataSize() != sizeof(std::vector<ogg_packet> *)) {
-		TRACE("speexDecoder::Setup not called with ogg_packet<vector> meta data: not speex\n");
+	// grab header packets from meta data
+	if (inputFormat->MetaDataSize() != sizeof(std::vector<ogg_packet>)) {
+		TRACE("SpeexDecoder::Setup not called with ogg_packet<vector> meta data: not speex\n");
 		return B_ERROR;
 	}
 	std::vector<ogg_packet> * packets = (std::vector<ogg_packet> *)inputFormat->MetaData();
 	if (packets->size() < 2) {
-		TRACE("speexDecoder::Setup not called with at least two ogg_packets: not speex\n");
+		TRACE("SpeexDecoder::Setup not called with at least two ogg_packets: not speex\n");
 		return B_ERROR;
 	}
 	// parse header packet
 	ogg_packet * packet = &(*packets)[0];
 	fHeader = speex_packet_to_header((char*)packet->packet, packet->bytes);
 	if (fHeader == NULL) {
-		TRACE("speexDecoder::Setup failed in ogg_packet to speex_header conversion\n");
+		TRACE("SpeexDecoder::Setup failed in ogg_packet to speex_header conversion\n");
 		return B_ERROR;
 	}
 	if (packets->size() != 2 + (unsigned)fHeader->extra_headers) {
-		TRACE("speexDecoder::Setup not called with all the extra headers\n");
+		TRACE("SpeexDecoder::Setup not called with all the extra headers\n");
 		delete fHeader;
 		fHeader = 0;
 		return B_ERROR;
@@ -122,25 +180,26 @@ speexDecoder::Setup(media_format *inputFormat,
 	// sanity checks
 #ifdef STRICT_SPEEX
 	if (header->speex_version_id > 1) {
-		TRACE("speexDecoder::Setup failed: version id too new");
+		TRACE("SpeexDecoder::Setup failed: version id too new");
 		return B_ERROR;
 	}
 #endif
 	if (fHeader->mode >= SPEEX_NB_MODES) {
-		TRACE("speexDecoder::Setup failed: unknown speex mode\n");
+		TRACE("SpeexDecoder::Setup failed: unknown speex mode\n");
 		return B_ERROR;
 	}
 	// setup from header
 	SpeexMode * mode = speex_mode_list[fHeader->mode];
 #ifdef STRICT_SPEEX
 	if (mode->bitstream_version != fHeader->mode_bitstream_version) {
-		TRACE("speexDecoder::Setup failed: bitstream version mismatch");
+		TRACE("SpeexDecoder::Setup failed: bitstream version mismatch");
 		return B_ERROR;
 	}
 #endif
+	// initialize decoder
 	fDecoderState = speex_decoder_init(mode);
 	if (fDecoderState == NULL) {
-		TRACE("speexDecoder::Setup failed to initialize the decoder state");
+		TRACE("SpeexDecoder::Setup failed to initialize the decoder state");
 		return B_ERROR;
 	}
 	if (SpeexSettings::PerceptualPostFilter()) {
@@ -159,83 +218,63 @@ speexDecoder::Setup(media_format *inputFormat,
 	}
 	speex_decoder_ctl(fDecoderState, SPEEX_SET_SAMPLING_RATE, &fHeader->rate);
 	// fill out the encoding format
-	CopyInfoToEncodedFormat(inputFormat);
-	return B_OK;
+	media_format requested_format = speex_decoded_media_format();
+	((media_raw_audio_format)requested_format.u.raw_audio) = inputFormat->u.encoded_audio.output;
+	return NegotiateOutputFormat(&requested_format);
 }
 
-void speexDecoder::CopyInfoToEncodedFormat(media_format * format) {
-	format->type = B_MEDIA_ENCODED_AUDIO;
-	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data,"Spee",4);
-	format->u.encoded_audio.encoding
-	 = (media_encoded_audio_format::audio_encoding)'Spee';
-	if (fHeader->bitrate > 0) {
-		format->u.encoded_audio.bit_rate = fHeader->bitrate;
-	} else {
-		speex_decoder_ctl(fDecoderState, SPEEX_GET_BITRATE, &fHeader->bitrate);
-		format->u.encoded_audio.bit_rate = fHeader->bitrate;
-	}
-	if (fHeader->nb_channels == 1) {
-		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
-	} else {
-		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-	}
-	CopyInfoToDecodedFormat(&format->u.encoded_audio.output);
-	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
-}	
 
-inline size_t
-AudioBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
+status_t
+SpeexDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 {
-	return (raf->format & 0xf) * (raf->channel_count)
-         * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
-}
-
-void speexDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
-	raf->frame_rate = (float)fHeader->rate; // XXX int32->float ??
-	raf->channel_count = fHeader->nb_channels;
-	raf->format = media_raw_audio_format::B_AUDIO_FLOAT; // XXX verify: support others?
-	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
-	int buffer_size = raf->buffer_size;
-	if (buffer_size < 512 || buffer_size > 65536) {
-		buffer_size = AudioBufferSize(raf);
+	TRACE("SpeexDecoder::NegotiateOutputFormat\n");
+	// BMediaTrack::DecodedFormat
+	// Pass in ioFormat the format that you want (with wildcards
+	// as applicable). The codec will find and return in ioFormat 
+	// its best matching format.
+	//
+	// BMediaDecoder::SetOutputFormat
+	// sets the format the decoder should output. On return, 
+	// the outputFormat is changed to match the actual format
+	// that will be output; this can be different if you 
+	// specified any wildcards.
+	//
+	media_format format = speex_decoded_media_format();
+	format.u.raw_audio.frame_rate = (float)fHeader->rate;
+	format.u.raw_audio.channel_count = fHeader->nb_channels;
+	format.u.raw_audio.channel_mask = B_CHANNEL_LEFT | (fHeader->nb_channels != 1 ? B_CHANNEL_RIGHT : 0);
+	int buffer_size = ioDecodedFormat->u.raw_audio.buffer_size;
+	if (buffer_size < 512) {
+		buffer_size = AudioBufferSize(&format.u.raw_audio);
 	}
-	int output_length = fHeader->frame_size * fHeader->nb_channels * (raf->format & 0xf);
+	int output_length = fHeader->frame_size * fHeader->nb_channels
+	                 * (format.u.raw_audio.format & 0xf);
 	buffer_size = ((buffer_size - 1) / output_length + 1) * output_length;
-	raf->buffer_size = buffer_size;
-	// setup output variables
-	fFrameSize = (raf->format & 0xf) * raf->channel_count;
-	fOutputBufferSize = buffer_size;
-	fSpeexOutputLength = output_length;
-}
-
-status_t
-speexDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
-{
-	TRACE("speexDecoder::NegotiateOutputFormat\n");
-	// BeBook says: The codec will find and return in ioFormat its best matching format
-	// => This means, we never return an error, and always change the format values
-	//    that we don't support to something more applicable
-	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
-	CopyInfoToDecodedFormat(&ioDecodedFormat->u.raw_audio);
-	// add the media_mult_audio_format fields
-	if (ioDecodedFormat->u.raw_audio.channel_mask == 0) {
-		if (fHeader->nb_channels == 1) {
-			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT;
-		} else {
-			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-		}
+	format.u.raw_audio.buffer_size = buffer_size;
+	if (!format_is_compatible(format,*ioDecodedFormat)) {
+#ifdef NegotiateOutputFormat_AS_BEBOOK_SPEC
+		return B_ERROR;
+#else
+		// Be R5 behavior: never fail (?) => nuke the input format
+		*ioDecodedFormat = format;
+#endif
 	}
+	ioDecodedFormat->SpecializeTo(&format);
+	// setup output variables
+	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * 
+	             (ioDecodedFormat->u.raw_audio.channel_count);
+	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
+	fSpeexOutputLength = output_length;
 	return B_OK;
 }
 
 
 status_t
-speexDecoder::Seek(uint32 seekTo,
+SpeexDecoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
-	TRACE("speexDecoder::Seek\n");
+	TRACE("SpeexDecoder::Seek\n");
 //	int ignore = 0;
 //	speex_decoder_ctl(fDecoderState, SPEEX_RESET_STATE, &ignore);
 	return B_OK;
@@ -243,17 +282,17 @@ speexDecoder::Seek(uint32 seekTo,
 
 
 status_t
-speexDecoder::Decode(void *buffer, int64 *frameCount,
+SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
-//	TRACE("speexDecoder::Decode\n");
+//	TRACE("SpeexDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
 	mediaHeader->start_time = fStartTime;
-	//TRACE("speexDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
+	//TRACE("SpeexDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 
-//	debugger("speexDecoder::Decode");
+//	debugger("SpeexDecoder::Decode");
 	while (out_bytes_needed >= fSpeexOutputLength) {
 		// get a new packet
 		void *chunkBuffer;
@@ -264,11 +303,11 @@ speexDecoder::Decode(void *buffer, int64 *frameCount,
 			goto done;
 		}			
 		if (status != B_OK) {
-			TRACE("speexDecoder::Decode: GetNextChunk failed\n");
+			TRACE("SpeexDecoder::Decode: GetNextChunk failed\n");
 			return status;
 		}
 		if (chunkSize != sizeof(ogg_packet)) {
-			TRACE("speexDecoder::Decode: chunk not ogg_packet-sized\n");
+			TRACE("SpeexDecoder::Decode: chunk not ogg_packet-sized\n");
 			return B_ERROR;
 		}
 		ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
@@ -279,11 +318,11 @@ speexDecoder::Decode(void *buffer, int64 *frameCount,
 				break;
 			}
 			if (ret == -2) {
-				TRACE("speexDecoder::Decode: corrupted stream?\n");
+				TRACE("SpeexDecoder::Decode: corrupted stream?\n");
 				break;
 			}
 			if (speex_bits_remaining(&fBits) < 0) {
-				TRACE("speexDecoder::Decode: decoding overflow: corrupted stream?\n");
+				TRACE("SpeexDecoder::Decode: decoding overflow: corrupted stream?\n");
 				break;
 			}
 			if (fHeader->nb_channels == 2) {
@@ -297,7 +336,7 @@ speexDecoder::Decode(void *buffer, int64 *frameCount,
 done:	
 	uint samples = (out_buffer - (uint8*)buffer) / fFrameSize;
 	fStartTime += (1000000LL * samples) / fHeader->rate;
-	//TRACE("speexDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
+	//TRACE("SpeexDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 
 	if (out_buffer != buffer) {
@@ -306,8 +345,14 @@ done:
 	return B_LAST_BUFFER_ERROR;
 }
 
+
+/*
+ * SpeexDecoderPlugin
+ */
+
+
 Decoder *
-speexDecoderPlugin::NewDecoder()
+SpeexDecoderPlugin::NewDecoder()
 {
 	static BLocker locker;
 	static bool initdone = false;
@@ -315,28 +360,31 @@ speexDecoderPlugin::NewDecoder()
 	if (!initdone) {
 		initdone = true;
 	}
-	return new speexDecoder;
+	return new SpeexDecoder;
 }
 
 
 status_t
-speexDecoderPlugin::RegisterDecoder()
+SpeexDecoderPlugin::RegisterDecoder()
 {
-	// ToDo: what about B_OGG_FORMAT_FAMILY?
-	media_format_description description;
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'ogg ';
-	description.u.misc.codec = 'spee';
+	media_format_description description = speex_description();
+	media_format format = speex_encoded_media_format();
 
-	media_format format;
-	format.type = B_MEDIA_ENCODED_AUDIO;
-	format.u.encoded_audio = media_encoded_audio_format::wildcard;
-
-	return BMediaFormats().MakeFormatFor(&description, 1, &format);
+	BMediaFormats formats;
+	status_t result = formats.InitCheck();
+	if (result != B_OK) {
+		return result;
+	}
+	return formats.MakeFormatFor(&description, 1, &format);
 }
+
+
+/*
+ * instantiate_plugin
+ */
 
 
 MediaPlugin *instantiate_plugin()
 {
-	return new speexDecoderPlugin;
+	return new SpeexDecoderPlugin;
 }
