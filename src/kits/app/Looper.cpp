@@ -351,7 +351,8 @@ void BLooper::AddHandler(BHandler* handler)
 	{
 		fHandlers.AddItem(handler);
 		handler->SetLooper(this);
-		handler->SetNextHandler(this);
+		if (handler != this)	// avoid a cycle
+			handler->SetNextHandler(this);
 		BList* Filters = handler->FilterList();
 		if (Filters)
 		{
@@ -644,9 +645,9 @@ BLooper* BLooper::LooperForThread(thread_id tid)
 			return result->looper;
 		}
 	}
+#endif
 
 	return NULL;
-#endif
 }
 //------------------------------------------------------------------------------
 thread_id BLooper::LockingThread() const
@@ -824,6 +825,7 @@ BLooper::BLooper(const BLooper&)
 BLooper& BLooper::operator=(const BLooper& )
 {
 	// Looper copying not allowed
+	return *this;
 }
 //------------------------------------------------------------------------------
 BLooper::BLooper(int32 priority, port_id port, const char* name)
@@ -1002,6 +1004,7 @@ status_t BLooper::_LockComplete(BLooper* loop, int32 old, thread_id this_tid,
 								sem_id sem, bigtime_t timeout)
 {
 	// What is this for?  Hope I'm not missing something conceptually here ...
+	return B_ERROR;
 }
 //------------------------------------------------------------------------------
 void BLooper::InitData()
@@ -1352,11 +1355,13 @@ BHandler* BLooper::top_level_filter(BMessage* msg, BHandler* t)
 BHandler* BLooper::handler_only_filter(BMessage* msg, BHandler* t)
 {
 	// TODO: implement
+	return NULL;
 }
 //------------------------------------------------------------------------------
 BHandler* BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
 {
 	// TODO: implement
+	return NULL;
 }
 //------------------------------------------------------------------------------
 void BLooper::check_lock()
@@ -1367,6 +1372,7 @@ void BLooper::check_lock()
 BHandler* BLooper::resolve_specifier(BHandler* target, BMessage* msg)
 {
 	// TODO: implement
+	return NULL;
 }
 //------------------------------------------------------------------------------
 void BLooper::UnlockFully()
@@ -1452,9 +1458,9 @@ bool BLooper::IsLooperValid(const BLooper* l)
 		return find_loop_data(sLooperList, sLooperList + sLooperCount,
 							  looper_pred, (void*)l);
 	}
+#endif
 
 	return false;
-#endif
 }
 //------------------------------------------------------------------------------
 void BLooper::RemoveLooper(BLooper* l)
