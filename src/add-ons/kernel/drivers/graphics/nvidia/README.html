@@ -89,6 +89,20 @@ Please read this information carefully *before* installing and using the (open)B
 <br>
 <strong>nv.settings driver configuration:</strong><br>
 <ul>
+	<li><strong>usebios:</strong><br>
+The name of this item may be somewhat misleading, it might be changed in the future. It actually tells the driver if it should coldstart the card or not. The driver will rely on the VGA BIOS to have coldstarted the card before BeOS booted if you specify 'true'.<br>
+To make things look even more complex the driver might actually use the BIOS to determine your cards specifications on *both* possible settings.
+	<ul>
+		<li><strong>false:</strong><br>
+		If you specify <strong>usebios false</strong> the driver will attempt to coldstart the card, which is the preferred way of doing it because of the better tuned setup if all is right. Unfortunately there's not enough info available to make this work reliably, so it's not used by default. This setting would enable you to use your nVidia card as a secondary card in your system. Be advised though that BeOS officially does not (yet) support multiple VGA cards, so you need special software in order to be able to actually use it (a video consumer node for instance).
+		<li><strong>true:</strong> (default setting)<br>
+		Specify <strong>usebios true</strong> unless you want to try to use a nVidia card as a secondary card in your system.
+	</ul>
+	<strong>Notes:</strong>
+ 	<ul>
+ 		<li>On driverversion 0.23 and before usebios had no effect at all. The cards were never coldstarted.
+		<li>Coldstarting is more likely to succeed on TNT and older GeForce cards than it is on newer cards.
+ 	</ul> 
 	<li><strong>memory:</strong> (disabled by default)<br>
 		This option enables you to override the 'memory amount autodetection' of the driver. If autodetection is working incorrect, you can manually set the amount this way. You could also lower the amount of RAM to a lower value than actually there to test with for instance overlay use in applications. So this option is probably mostly of interest to developers. Specify the RAM amount in Mb (use only 'whole' numbers!).<br>
 This option is disabled by default (preceded by a '#').<br>
@@ -159,6 +173,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on July 19, 2004)</p>
+<p>(Page last updated on August 26, 2004)</p>
 </body>
 </html>

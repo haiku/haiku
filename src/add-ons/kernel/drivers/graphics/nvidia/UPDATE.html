@@ -4,9 +4,10 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head 0.23, (Rudolf)</h1></p>
+<p><h1>head 0.24, (Rudolf)</h1></p>
 <ul>
-	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver.
+	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver;
+	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the setting to keep the driver working as always; if you modify it a card coldstart might be attempted (in progress).
 </ul>
 <p><h1>nv_driver 0.22, (Rudolf)</h1></p>
 <ul>

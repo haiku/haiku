@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-7/2004
+   Rudolf Cornelissen 10/2002-8/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.23 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.24 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -781,115 +781,36 @@ void set_crtc_owner(bool head)
 
 static status_t nvxx_general_powerup()
 {
-	status_t result;
-
 	LOG(4, ("INIT: NV powerup\n"));
 	if (si->settings.logmask & 0x80000000) nv_dump_configuration_space();
 
-	/* initialize the shared_info PINS struct */
-	result = parse_pins();
-//	if (result != B_OK) fake_pins();
-//temporary:
+	/* fill-in the cardspecs in the shared_info PINS struct */
 	fake_pins();
-
-	/* log the PINS struct settings */
+	/* only process BIOS for specs and coldstart if requested by user;
+	 * note:
+	 * this in fact frees the driver from relying on the BIOS to be executed
+	 * at system power-up POST time. */
+	if (!si->settings.usebios)
+	{
+		LOG(2, ("INIT: Attempting card coldstart!\n"));
+		/* update the cardspecs in the shared_info PINS struct according to reported
+		 * specs as much as is possible;
+		 * this also coldstarts the card if possible (executes BIOS CMD script(s)) */
+		parse_pins();
+	}
+	else
+	{
+		LOG(2, ("INIT: Skipping card coldstart!\n"));
+	}
+	/* log the final PINS struct settings */
 	dump_pins();
 
-	/* setup CRTC and DAC functions access: determined in parse_pins/fake_pins */
+	/* setup CRTC and DAC functions access: determined in fake_pins */
 	setup_virtualized_heads(si->ps.crtc2_prim);
 
-	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
-//temp:
-return nv_general_bios_to_powergraphics();
-	if (si->settings.usebios || (result != B_OK)) return nv_general_bios_to_powergraphics();
-
-	/*power up the PLLs,LUT,DAC*/
-	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
-
-	/* turn off both displays and the hardcursors (also disables transfers) */
-	head1_dpms(false, false, false);
-	head1_cursor_hide();
-	if (si->ps.secondary_head)
-	{
-		head2_dpms(false, false, false);
-		head2_cursor_hide();
-	}
-
-	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
-	 * (this would create electrical shortcuts,
-	 * resulting in extra chip heat and distortions visible on screen */
-	/* set voltage reference - using DAC reference block partly */
-//	DXIW(VREFCTRL,0x03);
-	/* wait for 100ms for voltage reference to stabilize */
-	delay(100000);
-	/* power up the SYSPLL */
-//	CFGW(OPTION,CFGR(OPTION)|0x20);
-	/* power up the PIXPLL */
-//	DXIW(PIXCLKCTRL,0x08);
-
-	/* disable pixelclock oscillations before switching on CLUT */
-//	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
-	/* disable 15bit mode CLUT-overlay function */
-//	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
-	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
-//	DXIW(MISCCTRL,0x1b);
-	snooze(250);
-	/* re-enable pixelclock oscillations */
-//	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
-
-	/* setup i2c bus */
-	i2c_init();
-
-	/*make sure card is in powergraphics mode*/
-//	VGAW_I(CRTCEXT,3,0x80);      
-
-	/*set the system clocks to powergraphics speed*/
-	LOG(2,("INIT: Setting system PLL to powergraphics speeds\n"));
-	g400_dac_set_sys_pll();
-
-	/* 'official' RAM initialisation */
-	LOG(2,("INIT: RAM init\n"));
-	/* disable hardware plane write mask if SDRAM card */
-//	if (si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) & 0xffffbfff));
-	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
-//	ACCW(PLNWT,0x00000000);
-//	ACCW(PLNWT,0xffffffff);
-	/* program memory control waitstates */
-//	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
-	/* set memory configuration including:
-	 * - SDRAM / SGRAM special functions select. */
-//	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF) | ((si->ps.v3_mem_type & 0x07) << 10));
-//	if (!si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) | (0x01 << 14)));
-	/* set memory buffer type */
-//	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|((si->ps.v3_option2_reg & 0x03) << 12));
-	/* set mode register opcode and streamer flow control */	
-//	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0x0000FFFF)|(si->ps.memrdbk_reg & 0xffff0000));
-	/* set RAM read tap delays */
-//	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.memrdbk_reg & 0x0000ffff));
-	/* wait 200uS minimum */
-	snooze(250);
-
-	/* reset memory (MACCESS is a write only register!) */
-//	ACCW(MACCESS, 0x00000000);
-	/* perform actual RAM reset */
-//	ACCW(MACCESS, 0x00008000);
-	snooze(250);
-	/* start memory refresh */
-//	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
-	/* set memory control waitstate again AFTER the RAM reset */
-//	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
-	/* end 'official' RAM initialisation. */
-
-	/* Bus parameters: enable retries, use advanced read */
-//	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));
-
-	/*enable writing to crtc registers*/
-//	VGAW_I(CRTC,0x11,0);
-
-	/* turn on display one */
-	head1_dpms(true, true, true);
-
-	return B_OK;
+	/* do powerup needed from pre-inited card state as done by system POST cardBIOS
+	 * execution or driver coldstart above */
+	return nv_general_bios_to_powergraphics();
 }
 
 /* this routine switches the CRTC/DAC sets to 'connectors', but only for analog
@@ -970,8 +891,6 @@ status_t nv_general_head_select(bool cross)
  * Should work from VGA BIOS POST init state. */
 static status_t nv_general_bios_to_powergraphics()
 {
-	LOG(2, ("INIT: Skipping card coldstart!\n"));
-
 	/* let acc engine make power off/power on cycle to start 'fresh' */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);

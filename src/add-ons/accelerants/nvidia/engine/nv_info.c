@@ -20,6 +20,8 @@ static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30(void);
 static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
+static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size);
+static status_t exec_type1_script(uint8* rom, uint16 adress);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -85,13 +87,13 @@ status_t parse_pins ()
 	switch (rom[offset + 5])
 	{
 	case 2:
-		pins2_read(rom, offset, ram_cfg);
+		result = pins2_read(rom, offset, ram_cfg);
 		break;
 	case 3:
 	case 4:
 	case 5:
 	case 6:
-		pins3_6_read(rom, offset, ram_cfg);
+		result = pins3_6_read(rom, offset, ram_cfg);
 		break;
 	default:
 		LOG(8,("INFO: unknown PINS version\n"));
@@ -102,7 +104,7 @@ status_t parse_pins ()
 	/* check PINS read result */
 	if (result == B_ERROR)
 	{
-		LOG(8,("INFO: PINS read/decode error\n"));
+		LOG(8,("INFO: PINS read/decode/execute error\n"));
 		return B_ERROR;
 	}
 	/* PINS scan succeeded */
@@ -127,7 +129,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
 
-	return B_ERROR;
+	return coldstart_card(rom, init1, init2, init_size);
 }
 
 static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
@@ -163,92 +165,51 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 		}
 */	}
 
-	return B_ERROR;
+	return coldstart_card(rom, init1, init2, init_size);
 }
 
-/* pins v5 is used by G450 and G550 */
-/*
-static status_t pinsx_read(uint8 *pins, uint8 length)
+static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size)
 {
-	unsigned int m_factor = 6;
+	status_t result = B_OK;
 
-	if (length != 128)
+	LOG(8,("INFO: executing coldstart...\n"));
+
+	/* turn off both displays and the hardcursors (also disables transfers) */
+	nv_crtc_dpms(false, false, false);
+	nv_crtc_cursor_hide();
+	if (si->ps.secondary_head)
 	{
-		LOG(8,("INFO: wrong PINS length, expected 128, got %d\n", length));
-		return B_ERROR;
+		nv_crtc2_dpms(false, false, false);
+		nv_crtc2_cursor_hide();
 	}
 
-	// fill out the shared info si->ps struct
-	if (pins[4] == 0x01) m_factor = 8;
-	if (pins[4] >= 0x02) m_factor = 10;
-
-	si->ps.max_system_vco = m_factor * pins[36];
-	si->ps.max_video_vco = m_factor * pins[37];
-	si->ps.max_pixel_vco = m_factor * pins[38];
-	si->ps.min_system_vco = m_factor * pins[121];
-	si->ps.min_video_vco = m_factor * pins[122];
-	si->ps.min_pixel_vco = m_factor * pins[123];
-
-	if (pins[39] == 0xff) si->ps.max_dac1_clock_8 = si->ps.max_pixel_vco;
-	else si->ps.max_dac1_clock_8 = 4 * pins[39];
-
-	if (pins[40] == 0xff) si->ps.max_dac1_clock_16 = si->ps.max_dac1_clock_8;
-	else si->ps.max_dac1_clock_16 = 4 * pins[40];
-
-	if (pins[41] == 0xff) si->ps.max_dac1_clock_24 = si->ps.max_dac1_clock_16;
-	else si->ps.max_dac1_clock_24 = 4 * pins[41];
-
-	if (pins[42] == 0xff) si->ps.max_dac1_clock_32 = si->ps.max_dac1_clock_24;
-	else si->ps.max_dac1_clock_32 = 4 * pins[42];
-
-	if (pins[124] == 0xff) si->ps.max_dac1_clock_32dh = si->ps.max_dac1_clock_32;
-	else si->ps.max_dac1_clock_32dh = 4 * pins[124];
-
-	if (pins[43] == 0xff) si->ps.max_dac2_clock_16 = si->ps.max_video_vco;
-	else si->ps.max_dac2_clock_16 = 4 * pins[43];
-
-	if (pins[44] == 0xff) si->ps.max_dac2_clock_32 = si->ps.max_dac2_clock_16;
-	else si->ps.max_dac2_clock_32 = 4 * pins[44];
-
-	if (pins[125] == 0xff) si->ps.max_dac2_clock_32dh = si->ps.max_dac2_clock_32;
-	else si->ps.max_dac2_clock_32dh = 4 * pins[125];
-
-	if (pins[118] == 0xff) si->ps.max_dac1_clock = si->ps.max_dac1_clock_8;
-	else si->ps.max_dac1_clock = 4 * pins[118];
-
-	if (pins[119] == 0xff) si->ps.max_dac2_clock = si->ps.max_dac1_clock;
-	else si->ps.max_dac2_clock = 4 * pins[119];
-
-	si->ps.std_engine_clock = 4 * pins[74];
-	si->ps.std_memory_clock = 4 * pins[92];
-
-	si->ps.memory_size = ((pins[114] & 0x03) + 1) * 8;
-	if ((pins[114] & 0x07) > 3)
+	/* execute BIOS coldstart script(s) */
+	if (init1 || init2)
 	{
-		LOG(8,("INFO: unknown RAM size, defaulting to 8Mb\n"));
-		si->ps.memory_size = 8;
+		if (init1)
+			if (exec_type1_script(rom, init1) != B_OK) result = B_ERROR;
+		if (init2)
+			if (exec_type1_script(rom, init2) != B_OK) result = B_ERROR;
+	}
+	else
+	{
+		result = B_ERROR;
 	}
 
-	if (pins[110] & 0x01) si->ps.f_ref = 14.31818;
-	else si->ps.f_ref = 27.00000;
+	if (result != B_OK)
+		LOG(8,("INFO: coldstart failed.\n"));
+	else
+		LOG(8,("INFO: coldstart execution completed OK.\n"));
 
-	// make sure SGRAM functions only get enabled if SGRAM mounted 
-//	if ((pins[114] & 0x18) == 0x08) si->ps.sdram = false;
-//	else si->ps.sdram = true;
+	return result;
+}
 
-	// various registers
-	si->ps.secondary_head = (pins[117] & 0x70);
-	si->ps.tvout = (pins[117] & 0x40);	
-	si->ps.primary_dvi = (pins[117] & 0x02);
-	si->ps.secondary_dvi = (pins[117] & 0x20);
-
-	// not supported:
-	si->ps.max_dac2_clock_8 = 0;
-	si->ps.max_dac2_clock_24 = 0;
+static status_t exec_type1_script(uint8* rom, uint16 adress)
+{
+	//fixme...
 
 	return B_OK;
 }
-*/
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
 void fake_pins(void)
