@@ -1,0 +1,49 @@
+/*
+** StyledEdit.version.rdef
+**
+*/
+
+/* BEOS:APP_VERSION :
+   see also <be/storage/AppFileInfo.h:26>
+
+   note: Although you can specify the system version here,
+         it is not within your rights to do so.  Specify
+         only the application version and trust that the
+         system version will be set for you. (it will)
+   */            
+
+resource(1, "BEOS:APP_VERSION") #'APPV' array {
+	/* major, middle, and minor version */
+	(uint32) 1, (uint32) 0, (uint32) 0,
+	
+	/* "variety"
+	   0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	(uint32) 0,
+	
+	/* internal version */
+	(uint32) 1,
+	
+	/* short info : note that this must be exactly 64 characters, so if
+	   you add to the string, take away from the spaces.  if you use
+	   all the spaces up you must account for the extra null that is
+	   missing as well. */
+	   
+	/*-from start quote to end quote,the next line must be this long-*/
+	"R1.0.0d1","                                                      ",
+	
+	/* long info : Note that this must be exactly 256 characters, so if
+	   you add to the string, take away from the spaces.  If you use
+	   all the spaces up you must account for the extra null that is
+	   missing as well.  So, if you remove [","] replace it with [ ].
+	   You can check this by opening the generated resource file in
+	   QuickRes.  BEOS:APP_VERSION should be 340 bytes long. */
+	   
+	/*-from start quote to end quote,the next line must be this long-*/
+	"OpenBeOS 1.0.0d1 ©2002 OpenBeOS Project.","                     ",
+	"                                                               ",
+	"                                                               ",
+	"                                                               "
+	/*--lines that don't have a comma in them should be this long--*/
+	
+};

@@ -1,0 +1,37 @@
+/*
+** StyledEdit.rdef
+**
+*/
+
+/* BEOS:APP_SIG :
+   application:/x-vnd.obos.app-name
+   */
+
+resource(1, "BEOS:APP_SIG") (#'MIMS') "application/x-vnd.obos.styled-edit";
+
+/* BEOS:APP_FLAGS :
+   00000000 = 							   SINGLE LAUNCH
+   01000000 = 							   MULTIPLE LAUNCH
+   02000000 = 							   EXCLUSIVE LAUNCH
+   04000000 = 			  BACKGROUND APP + SINGLE LAUNCH
+   05000000 = 			  BACKGROUND APP + MULTIPLE LAUNCH
+   06000000 = 			  BACKGROUND APP + EXCLUSIVE LAUNCH
+   08000000 = ARGV_ONLY + 				   SINGLE LAUNCH
+   09000000 = ARGV_ONLY + 				   MULTIPLE LAUNCH
+   0A000000 = ARGV_ONLY + 				   EXCLUSIVE LAUNCH
+   0C000000 = ARGV_ONLY + BACKGROUND APP + SINGLE LAUNCH
+   0D000000 = ARGV_ONLY + BACKGROUND APP + MULTIPLE LAUNCH
+   0E000000 = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
+   */
+
+resource(1, "BEOS:APP_FLAGS") (#'APPF') $"00000000";
+
+/* BEOS:FILE_TYPES :
+   "types" = "text/plain",
+   "types" = ....   
+   */
+
+resource(1, "BEOS:FILE_TYPES") message {
+	"types" = "text/plain",
+	"types" = "text"
+};
