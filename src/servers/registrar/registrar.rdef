@@ -7,7 +7,7 @@
    application:/x-vnd.obos.app-name
    */
 
-resource app_signature "application/x-vnd.OBOS-Registrar";
+resource app_signature "application/x-vnd.haiku-registrar";
 
 /* BEOS:APP_FLAGS :
    00000000 = 							   SINGLE LAUNCH
