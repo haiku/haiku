@@ -73,10 +73,30 @@ BaseBlock::ValidateCheckSum() const
 //	#pragma mark -
 
 
-int32 
-DirectoryBlock::HashIndexFor(const char *name)
+char 
+DirectoryBlock::ToUpperChar(int32 type, char c) const
 {
-	return 0;
+	// Taken from Ralph Babel's "The Amiga Guru Book" (1993), section 15.3.4.3
+
+	if (type == DT_AMIGA_OFS || type == DT_AMIGA_FFS)
+		return c >= 'a' && c <= 'z' ? c + ('A' - 'a') : c;
+
+	return (c >= '\340' && c <= '\376' && c != '\367')
+		|| (c >= 'a' && c <= 'z') ? c + ('A' - 'a') : c;
+}
+
+
+int32 
+DirectoryBlock::HashIndexFor(int32 type, const char *name) const
+{
+	int32 hash = strlen(name);
+	
+	while (name[0]) {
+		hash = (hash * 13 + ToUpperChar(type, name[0])) & 0x7ff;
+		name++;
+	}
+
+	return hash % HashSize();
 }
 
 
@@ -128,6 +148,21 @@ HashIterator::HashIterator(int32 device, DirectoryBlock &directory)
 HashIterator::~HashIterator()
 {
 	free(fData);
+}
+
+
+status_t 
+HashIterator::InitCheck()
+{
+	return fData != NULL ? B_OK : B_NO_MEMORY;
+}
+
+
+void 
+HashIterator::Goto(int32 index)
+{
+	fCurrent = index;
+	fBlock = fDirectory.HashValueAt(index);
 }
 
 

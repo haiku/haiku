@@ -87,7 +87,8 @@ class DirectoryBlock : public NodeBlock {
 		DirectoryBlock(int32 blockSize) : NodeBlock(blockSize) {}
 		DirectoryBlock(void *data, int32 blockSize) : NodeBlock(data, blockSize) {}
 
-		int32 HashIndexFor(const char *name);
+		char ToUpperChar(int32 type, char c) const;
+		int32 HashIndexFor(int32 type, const char *name) const;
 
 		int32 HashValueAt(int32 index) const;
 		int32 NextHashValue(int32 &index) const;
@@ -143,6 +144,8 @@ class HashIterator {
 		HashIterator(int32 device, DirectoryBlock &node);
 		~HashIterator();
 
+		status_t InitCheck();
+		void Goto(int32 index);
 		NodeBlock *GetNext(int32 &block);
 		void Rewind();
 
