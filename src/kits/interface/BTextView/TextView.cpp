@@ -31,6 +31,8 @@
 // - Consider using BObjectList instead of BList
 // for disallowed charachters (it would remove a lot of reinterpret_casts)
 // - Asynchronous mouse tracking
+// - Check for correctness and possible optimizations the calls to Refresh(),
+// to refresh only changed parts of text (currently we often redraw the whole text)
 
 // Standard Includes -----------------------------------------------------------
 #include <cstdlib>
@@ -101,6 +103,8 @@ enum {
 class _BTextTrackState_ {
 
 	// TODO: Implement ? 
+	// It's most probably used to keep track of asynchronous mouse
+	// movements
 public:
 	_BTextTrackState_(bool inSelection)
 		:	fMoved(false),
@@ -112,7 +116,12 @@ public:
 };
 
 
-// Globals ---------------------------------------------------------------------
+// Initialized/finalized by init/fini_interface_kit
+_BWidthBuffer_* BTextView::sWidths = NULL;
+sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
+int32 BTextView::sWidthAtom = 0;
+
+
 static property_info
 sPropertyList[] = {
 	{
@@ -166,12 +175,6 @@ sPropertyList[] = {
 	},
 	{ 0 }
 };
-
-
-// Initialized/finalized by init/fini_interface_kit
-_BWidthBuffer_* BTextView::sWidths = NULL;
-sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
-int32 BTextView::sWidthAtom = 0;
 
 
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
@@ -995,7 +998,7 @@ BTextView::SetText(const char *inText, const text_run_array *inRuns)
 	if (fText->Length() > 0)
 		DeleteText(0, fText->Length()); // TODO: was fText->Length() - 1
 
-	int len = (inText) ? strlen(inText) : 0;
+	int32 len = inText ? strlen(inText) : 0;
 	
 	if (inText != NULL && len > 0)
 		InsertText(inText, len, 0, inRuns);
@@ -2143,7 +2146,7 @@ BTextView::SetTextRect(BRect rect)
 	fTextRect = rect;
 	
 	if (Window() != NULL)
-		Refresh(0, fLines->NumLines(), true, false);
+		Refresh(0, fText->Length(), true, false);
 }
 
 
@@ -2186,7 +2189,7 @@ BTextView::SetTabWidth(float width)
 	fTabWidth = width;
 	
 	if (Window() != NULL)
-		Refresh(0, fLines->NumLines(), true, false);
+		Refresh(0, fText->Length(), true, false);
 }
 
 
@@ -2296,7 +2299,7 @@ BTextView::SetWordWrap(bool wrap)
 			}
 		}
 		
-		Refresh(0, fLines->NumLines(), true, false);
+		Refresh(0, fText->Length(), true, true);
 		
 		if (fActive) {
 			// show the caret, hilite the selection
@@ -2320,14 +2323,19 @@ BTextView::DoesWordWrap() const
 	CALLED();
 	return fWrap;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::SetMaxBytes(int32 max)
 {
 	CALLED();
+	// TODO: Finish this:
+	// We probably have to check if the existing text is longer than the new
+	// fMaxBytes, and truncate if it's the case
 	fMaxBytes = max;
 }
-//------------------------------------------------------------------------------
+
+
 int32
 BTextView::MaxBytes() const
 {
@@ -2363,7 +2371,8 @@ BTextView::AllowChar(uint32 aChar)
 	if (fDisallowedChars != NULL)
 		fDisallowedChars->RemoveItem(reinterpret_cast<void *>(aChar));
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::SetAlignment(alignment flag)
 {
@@ -2381,21 +2390,24 @@ BTextView::SetAlignment(alignment flag)
 		}
 	}
 }
-//------------------------------------------------------------------------------
+
+
 alignment
 BTextView::Alignment() const
 {
 	CALLED();
 	return fAlignment;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::SetAutoindent(bool state)
 {
 	CALLED();
 	fAutoindent = state;
 }
-//------------------------------------------------------------------------------
+
+
 bool
 BTextView::DoesAutoindent() const
 {
@@ -2428,7 +2440,8 @@ BTextView::ColorSpace() const
 	CALLED();
 	return fColorSpace;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::MakeResizable(bool resize, BView *resizeView)
 {
@@ -2447,7 +2460,7 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 
 				else if (fCaretVisible) {
 					InvertCaret();
-					Refresh(0, fLines->NumLines(), true, false);
+					Refresh(0, fText->Length(), true, false);
 				}		
 			}	
 		}
@@ -2459,33 +2472,38 @@ BTextView::MakeResizable(bool resize, BView *resizeView)
 		NewOffscreen();
 	}
 }
-//------------------------------------------------------------------------------
+
+
 bool
 BTextView::IsResizable() const
 {
 	CALLED();
 	return fResizable;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::SetDoesUndo(bool undo)
 {
 	CALLED();
 	if (undo && fUndo == NULL)
 		fUndo = new _BUndoBuffer_(this, B_UNDO_UNAVAILABLE);
+	
 	else if (!undo && fUndo != NULL) {
 		delete fUndo;
 		fUndo = NULL;
 	}
 }
-//------------------------------------------------------------------------------
+
+
 bool
 BTextView::DoesUndo() const
 {
 	CALLED();
 	return fUndo != NULL;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::HideTyping(bool enabled)
 {
@@ -2493,14 +2511,16 @@ BTextView::HideTyping(bool enabled)
 	//TODO: Implement ?
 	//fText->SetPasswordMode(enabled);
 }
-//------------------------------------------------------------------------------
+
+
 bool
 BTextView::IsTypingHidden() const
 {
 	CALLED();
 	return fText->PasswordMode();
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::ResizeToPreferred()
 {
@@ -2509,28 +2529,32 @@ BTextView::ResizeToPreferred()
 	GetPreferredSize(&widht, &height);
 	BView::ResizeTo(widht, height);
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::GetPreferredSize(float *width, float *height)
 {
 	CALLED();
 	BView::GetPreferredSize(width, height);
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::AllAttached()
 {
 	CALLED();
 	BView::AllAttached();
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::AllDetached()
 {
 	CALLED();
 	BView::AllDetached();
 }
-//------------------------------------------------------------------------------
+
+
 void *
 BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 {
@@ -2573,7 +2597,8 @@ BTextView::FlattenRunArray(const text_run_array *inArray, int32 *outSize)
 
 	return array;
 }
-//------------------------------------------------------------------------------
+
+
 text_run_array *
 BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 {
@@ -2694,7 +2719,8 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
 	if (drag == NULL)
 		return;
 
-	// What is this for ? 
+	// Add originator and action
+	drag->AddPointer("be:originator", this);
 	drag->AddInt32("be_actions", B_TRASH_TARGET);
 	
 	// add the text
@@ -2707,9 +2733,6 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
 	
 	drag->AddData("application/x-vnd.Be-text_run_array", B_MIME_TYPE,
 		styles, size);
-	
-	// add the message originator	
-	drag->AddPointer("be:originator", this);
 	
 	free(styles);
 
@@ -3467,6 +3490,8 @@ void
 BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						  bool erase)
 {
+	// TODO: Draw on the "fOffscreen" BBitmap, then draw it on the view
+
 	CALLED();	
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
@@ -4034,7 +4059,7 @@ BTextView::PreviousInitialByte(int32 offset) const
 {
 	CALLED();
 	const char *text = Text();
-	int count = 6;
+	int32 count = 6;
 	
 	for (--offset; (text + offset) > text && count; --offset, --count) {
 		if ((*(text + offset) & 0xc0 ) != 0x80)
@@ -4060,12 +4085,11 @@ BTextView::GetProperty(BMessage *specifier, int32 form,
 
 	} else if (strcmp(property, "Text") == 0) {
 		int32 index, range;
-		char *buffer;
-
+		
 		specifier->FindInt32("index", &index);
 		specifier->FindInt32("range", &range);
 
-		buffer = new char[range + 1];
+		char *buffer = new char[range + 1];
 		GetText(index, range, buffer);
 
 		reply->what = B_REPLY;
@@ -4102,11 +4126,11 @@ BTextView::SetProperty(BMessage *specifier, int32 form,
 
 	} else if (strcmp(property, "Text") == 0) {
 		int32 index, range;
-		const char *buffer;
-
+		
 		specifier->FindInt32("index", &index);
 		specifier->FindInt32("range", &range);
 		
+		const char *buffer = NULL;
 		if (specifier->FindString("data", &buffer) == B_OK)
 			InsertText(buffer, range, index, NULL);
 		else
@@ -4175,7 +4199,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fSelStart += stringLen;
 	fClickOffset = fSelEnd = fSelStart;
 
-	Refresh(0, fLines->NumLines(), true, false);
+	Refresh(0, fSelEnd, true, false);
 	
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current _BInlineInput_ object
