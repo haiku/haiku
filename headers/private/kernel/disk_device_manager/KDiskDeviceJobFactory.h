@@ -1,9 +1,7 @@
-// KDiskDeviceJob.h
+// KDiskDeviceJobFactory.h
 
 #ifndef _K_DISK_DEVICE_JOB_FACTORY_H
 #define _K_DISK_DEVICE_JOB_FACTORY_H
-
-#include <Vector.h>
 
 #include "disk_device_manager.h"
 
@@ -24,7 +22,8 @@ public:
 									bool resizeContents);
 	KDiskDeviceJob *CreateMoveJob(partition_id parentID,
 								  partition_id partitionID, off_t offset,
-								  Vector<partition_id> *contentsToMove);
+								  const partition_id *contentsToMove,
+								  int32 contentsToMoveCount);
 	KDiskDeviceJob *CreateSetNameJob(partition_id parentID,
 									 partition_id partitionID,
 									 const char *name);
@@ -42,6 +41,7 @@ public:
 										disk_system_id diskSystemID,
 										const char *name,
 										const char *parameters);
+	KDiskDeviceJob *CreateUninitializeJob(partition_id partitionID);
 	KDiskDeviceJob *CreateCreateChildJob(partition_id partitionID,
 										 partition_id child, off_t offset,
 										 off_t size, const char *type,

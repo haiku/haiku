@@ -1,8 +1,12 @@
-// KDiskDeviceJob.cpp
+// KDiskDeviceJobFactory.cpp
+
+#include <new>
 
 #include "KDiskDeviceJob.h"
 #include "KDiskDeviceJobFactory.h"
 #include "KScanPartitionJob.h"
+
+using namespace std;
 
 // constructor
 KDiskDeviceJobFactory::KDiskDeviceJobFactory()
@@ -45,7 +49,8 @@ KDiskDeviceJobFactory::CreateResizeJob(partition_id parentID,
 KDiskDeviceJob *
 KDiskDeviceJobFactory::CreateMoveJob(partition_id parentID,
 									 partition_id partitionID, off_t offset,
-									 Vector<partition_id> *contentsToMove)
+									 const partition_id *contentsToMove,
+									 int32 contentsToMoveCount)
 {
 	// not implemented
 	return NULL;
@@ -105,6 +110,14 @@ KDiskDeviceJobFactory::CreateInitializeJob(partition_id partitionID,
 										   disk_system_id diskSystemID,
 										   const char *name,
 										   const char *parameters)
+{
+	// not implemented
+	return NULL;
+}
+
+// CreateUninitializeJob
+KDiskDeviceJob *
+KDiskDeviceJobFactory::CreateUninitializeJob(partition_id partitionID)
 {
 	// not implemented
 	return NULL;
