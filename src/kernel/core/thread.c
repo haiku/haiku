@@ -994,17 +994,6 @@ thread_exit(void)
 }
 
 
-void
-sys_exit_thread(status_t return_value)
-{
-	struct thread *t = thread_get_current_thread();
-	
-	t->return_code = return_value;
-	t->return_flags = THREAD_RETURN_EXIT;
-	send_signal_etc(t->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-}
-
-
 int
 thread_kill_thread(thread_id id)
 {
@@ -1419,8 +1408,32 @@ setrlimit(int resource, const struct rlimit * rlp)
 }
 
 
+
 //	#pragma mark -
-/* user calls */
+//	Calls from within the kernel
+
+void
+sys_exit_thread(status_t return_value)
+{
+	struct thread *t = thread_get_current_thread();
+	
+	t->return_code = return_value;
+	t->return_flags = THREAD_RETURN_EXIT;
+	send_signal_etc(t->id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+}
+
+
+thread_id
+sys_get_current_thread_id()
+{
+	return thread_get_current_thread()->id;
+}
+
+
+
+
+//	#pragma mark -
+//	Calls from userland (with extra address checks)
 
 
 thread_id
