@@ -240,8 +240,16 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 	media_format_description description;
 	description.family = B_MPEG_FORMAT_FAMILY;
 	description.u.mpeg.id = b_mpeg_id_table[mpeg_version_index][layer_index];
+
 	BMediaFormats formats;
-	formats.GetFormatFor(description, &data->format);
+	status_t result = formats.InitCheck();
+	if (result != B_OK) {
+		return result;
+	}
+	result = formats.GetFormatFor(description, &data->format);
+	if (result != B_OK) {
+		return result;
+	}
 
 	data->format.u.encoded_audio.bit_rate = bit_rate;
 	data->format.u.encoded_audio.frame_size = frame_size;
