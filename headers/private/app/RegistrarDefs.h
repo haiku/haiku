@@ -52,6 +52,7 @@ enum {
 	B_REG_REMOVE_PRE_REGISTERED_APP			= 'rgrp',
 	B_REG_REMOVE_APP						= 'rgra',
 	B_REG_SET_THREAD_AND_TEAM				= 'rgtt',
+	B_REG_SET_SIGNATURE						= 'rgss',
 	B_REG_GET_APP_INFO						= 'rgai',
 	B_REG_GET_APP_LIST						= 'rgal',
 	B_REG_ACTIVATE_APP						= 'rgac',
