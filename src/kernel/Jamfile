@@ -12,7 +12,7 @@ KernelLd boot_loader :
 	# libroot functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>byteorder.o
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
@@ -38,7 +38,7 @@ KernelLd stage2 :
 
 	# posix functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
@@ -139,6 +139,7 @@ KernelLd libroot.so :
 	posix_signal.o
 	posix_stdio.o
 #	posix_gnu_libio.o
+#	posix_gnu_stdio.o
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
@@ -190,7 +191,7 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 
  	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
-  	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
+  	<$(SOURCE_GRIST)!libroot!posix!stdio>kernel_vsprintf.o
   	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
