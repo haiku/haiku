@@ -5,8 +5,19 @@
 #ifndef _KERNEL_SYSCALLS_H
 #define _KERNEL_SYSCALLS_H
 
-#include <sys/types.h>
 
-int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);
+#include <SupportDefs.h>
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int32 syscall_dispatcher(uint32 function, void *argBuffer, uint64 *_returnValue);
+status_t generic_syscall_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_SYSCALLS_H */

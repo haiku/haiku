@@ -37,6 +37,8 @@ struct dirent;
 #endif
 
 extern int     		_kern_null();
+extern status_t		_kern_generic_syscall(uint32 subsystem, uint32 function,
+						void *buffer, size_t bufferSize);
 
 extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
 extern int			_kern_setrlimit(int resource, const struct rlimit * rlp);
@@ -194,32 +196,35 @@ extern bigtime_t	_kern_system_time();
 extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
 
 // area functions
-area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
-			size_t size, uint32 lock, uint32 protection);
+extern area_id		_kern_create_area(const char *name, void **address, uint32 addressSpec,
+						size_t size, uint32 lock, uint32 protection);
+extern status_t		_kern_delete_area(area_id area);
+extern area_id		_kern_area_for(void *address);
+extern area_id		_kern_find_area(const char *name);
+extern status_t		_kern_get_area_info(area_id area, area_info *info);
+extern status_t		_kern_get_next_area_info(team_id team, int32 *cookie, area_info *info);
+extern status_t		_kern_resize_area(area_id area, size_t newSize);
+extern status_t		_kern_set_area_protection(area_id area, uint32 newProtection);
+extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
+						uint32 protection, area_id sourceArea);
+
 area_id sys_vm_map_file(const char *name, void **address, int addr_type,
 			addr_t size, int lock, int mapping, const char *path, off_t offset);
-status_t _kern_delete_area(area_id area);
-area_id _kern_area_for(void *address);
-area_id _kern_find_area(const char *name);
-status_t _kern_get_area_info(area_id area, area_info *info);
-status_t _kern_get_next_area_info(team_id team, int32 *cookie, area_info *info);
-status_t _kern_resize_area(area_id area, size_t newSize);
-status_t _kern_set_area_protection(area_id area, uint32 newProtection);
-area_id _kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
-			uint32 protection, area_id sourceArea);
 
 /* kernel port functions */
-port_id		_kern_create_port(int32 queue_length, const char *name);
-int			_kern_close_port(port_id id);
-int			_kern_delete_port(port_id id);
-port_id		_kern_find_port(const char *port_name);
-int			_kern_get_port_info(port_id id, struct port_info *info);
-int		 	_kern_get_next_port_info(team_id team, uint32 *cookie, struct port_info *info);
-ssize_t		_kern_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout);
-int32		_kern_port_count(port_id port);
-ssize_t		_kern_read_port_etc(port_id port,	int32 *msg_code, void *msg_buffer, size_t buffer_size, uint32 flags, bigtime_t timeout);
-int			_kern_set_port_owner(port_id port, team_id team);
-int			_kern_write_port_etc(port_id port, int32 msg_code, const void *msg_buffer, size_t buffer_size, uint32 flags, bigtime_t timeout);
+extern port_id		_kern_create_port(int32 queue_length, const char *name);
+extern status_t		_kern_close_port(port_id id);
+extern status_t		_kern_delete_port(port_id id);
+extern port_id		_kern_find_port(const char *port_name);
+extern status_t		_kern_get_port_info(port_id id, struct port_info *info);
+extern status_t	 	_kern_get_next_port_info(team_id team, uint32 *cookie, struct port_info *info);
+extern ssize_t		_kern_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout);
+extern int32		_kern_port_count(port_id port);
+extern ssize_t		_kern_read_port_etc(port_id port, int32 *msgCode, void *msgBuffer,
+						size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_set_port_owner(port_id port, team_id team);
+extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *msgBuffer,
+						size_t bufferSize, uint32 flags, bigtime_t timeout);
 
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
