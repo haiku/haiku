@@ -63,7 +63,6 @@ struct fork_arg {
 
 // team list
 static void *team_hash = NULL;
-static team_id next_team_id = 1;
 static struct team *kernel_team = NULL;
 
 // some arbitrary chosen limits - should probably depend on the available
@@ -182,9 +181,6 @@ team_init(kernel_args *args)
 
 	// stick it in the team hash
 	hash_insert(team_hash, kernel_team);
-
-	// B_SYSTEM_TEAM is reserved
-	next_team_id = B_SYSTEM_TEAM + 1;
 
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 	return 0;
@@ -661,7 +657,7 @@ create_team_struct(const char *name, bool kernel)
 		return NULL;
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
-	team->id = atomic_add(&next_team_id, 1);
+	team->id = allocate_thread_id();
 	strlcpy(team->name, name, B_OS_NAME_LENGTH);
 	team->num_threads = 0;
 	team->io_context = NULL;
@@ -1047,7 +1043,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 
 	// create a kernel thread, but under the context of the new team
 	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY,
-				teamArgs, team->id);
+				teamArgs, team->id, team->id);
 	if (thread < 0) {
 		err = thread;
 		goto err4;
@@ -1269,7 +1265,7 @@ fork_team(void)
 
 	// create a kernel thread under the context of the new team
 	threadID = spawn_kernel_thread_etc(fork_team_thread_start, parentThread->name,
-					parentThread->priority, forkArgs, team->id);
+					parentThread->priority, forkArgs, team->id, team->id);
 	if (threadID < 0) {
 		status = threadID;
 		goto err4;
@@ -1687,15 +1683,17 @@ _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 	status_t status = B_BAD_TEAM_ID;
 	struct team *team = NULL;
 	int32 slot = *cookie;
+	team_id teamIDEnd;
 
 	int state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	if (slot >= next_team_id)
+	teamIDEnd = peek_next_thread_id();
+	if (slot >= teamIDEnd)
 		goto err;
 
 	// get next valid team
-	while ((slot < next_team_id) && !(team = team_get_team_struct_locked(slot)))
+	while ((slot < teamIDEnd) && !(team = team_get_team_struct_locked(slot)))
 		slot++;
 
 	if (team) {
