@@ -117,8 +117,12 @@ apple_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 	descriptor = (apple_driver_descriptor *)buffer;
 
+	TRACE(("apple: read first chunk (signature = %x)\n", descriptor->signature));
+
 	if (!descriptor->HasValidSignature())
 		return B_ERROR;
+
+	TRACE(("apple: valid partition descriptor!\n"));
 
 	// ToDo: Should probably call get_next_partition() once to know if there
 	//		are any partitions on this disk
