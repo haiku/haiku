@@ -92,6 +92,7 @@ BCharacterSetRoster::FindCharacterSetByPrintName(char * name)
 const BCharacterSet * 
 BCharacterSetRoster::FindCharacterSetByName(char * name)
 {
+	// first search standard names and mime names
 	for (int id = 0 ; (id < character_sets_by_id_count) ; id++) {
 		if (strcmp(character_sets_by_id[id]->GetName(),name) == 0) {
 			return character_sets_by_id[id];
@@ -100,6 +101,9 @@ BCharacterSetRoster::FindCharacterSetByName(char * name)
 		if ((mime != NULL) && (strcmp(mime,name) == 0)) {
 			return character_sets_by_id[id];
 		}
+	}
+	// only after searching all the above names do we look at aliases
+	for (int id = 0 ; (id < character_sets_by_id_count) ; id++) {
 		for (int alias = 0 ; (alias < character_sets_by_id[id]->CountAliases()) ; alias++) {
 			if (strcmp(character_sets_by_id[id]->AliasAt(alias),name) == 0) {
 				return character_sets_by_id[id];
