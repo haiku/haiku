@@ -1,6 +1,6 @@
 #include "PartitionMap.h"
 
-using namespace UDF;
+using namespace Udf;
 
 /*! \brief Initializes the empty partition map.
 */

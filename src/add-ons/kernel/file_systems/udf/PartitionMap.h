@@ -16,7 +16,7 @@
 
 #include "SLList.h"
 
-namespace UDF {
+namespace Udf {
 
 class PartitionMap {
 public:
@@ -28,10 +28,10 @@ public:
 	
 	void dump();
 private:
-	SLList<UDF::udf_partition_descriptor> fList;
+	SLList<Udf::udf_partition_descriptor> fList;
 	uint32 fCount;
 };
 
-};	// namespace UDF
+};	// namespace Udf
 
 #endif	// _UDF_PARTITION_MAP_H
