@@ -14,7 +14,7 @@ extern "C" {
 #endif 
 
 /* file cache */
-extern void *file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int openMode);
+extern void *file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd);
 extern void file_cache_delete(void *_cacheRef);
 extern status_t file_cache_set_size(void *_cacheRef, off_t size);
 
