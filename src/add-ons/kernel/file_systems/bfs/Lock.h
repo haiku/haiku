@@ -22,9 +22,11 @@ class Semaphore {
 	public:
 		Semaphore(const char *name = "bfs sem")
 			:
-			fSemaphore(create_sem(0, name))
 #ifdef USE_BENAPHORE
-			, fCount(1)
+			fSemaphore(create_sem(0, name)),
+			fCount(1)
+#else
+			fSemaphore(create_sem(1, name))
 #endif
 		{
 #ifndef USER
