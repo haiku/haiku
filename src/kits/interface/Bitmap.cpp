@@ -21,6 +21,7 @@
 //
 //	File Name:		Bitmap.cpp
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
+//					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BBitmap objects represent off-screen windows that
 //					contain bitmap data.
 //------------------------------------------------------------------------------
@@ -34,6 +35,11 @@
 #include <InterfaceDefs.h>
 #include <Locker.h>
 #include <OS.h>
+
+// Includes to be able to talk to the app_server
+#include <Application.h>
+#include <ServerProtocol.h>
+#include <PortLink.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -2141,13 +2147,35 @@ void
 BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					int32 bytesPerRow, screen_id screenID)
 {
+	status_t error = B_OK;
+
+	PortLink::ReplyData replydata;
+	PortLink *link=new PortLink(be_app->fServerTo);
+
 	// clean up
 	if (fBasePtr) {
-		free(fBasePtr);
+//		free(fBasePtr);
 		fBasePtr = NULL;
+
+		// AS_DELETE_BITMAP:
+		// Attached Data: 
+		//	1) int32 server token
+		
+		// Reply Code: SERVER_TRUE if successful, 
+		//				SERVER_FALSE if the buffer was already deleted
+		// Reply Data:
+		//		none
+		status_t freestat;
+		link->SetOpCode(AS_DELETE_BITMAP);
+		link->Attach(fServerToken);
+		error=link->FlushWithReply(&replydata);
+		if(replydata.code==SERVER_FALSE)
+			error=B_NO_MEMORY;
+		fBasePtr=NULL;
+		fArea=-1;
+		fServerToken=-1;
 	}
 	// check params
-	status_t error = B_OK;
 	if (!bounds.IsValid() || !is_supported(colorSpace))
 		error = B_BAD_VALUE;
 	if (error == B_OK) {
@@ -2160,21 +2188,68 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	// allocate the bitmap buffer
 	if (error == B_OK) {
 		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
-		fBasePtr = malloc(size);
-		if (fBasePtr) {
+//		fBasePtr = malloc(size);
+
+		// Ask the server (via our owning application) to create a bitmap.
+
+		// AS_CREATE_BITMAP:
+		
+		// Attached Data: 
+		//		None
+		
+		// Reply Code: SERVER_TRUE
+		// Reply Data:
+		//	1) int32 server token
+		//	2) area_id id of the area in which the bitmap data resides
+		//	3) int32 area pointer offset used to calculate fBasePtr
+		
+		// alternatively, if something went wrong
+		// Reply Code: SERVER_FALSE
+		// Reply Data:
+		//		None
+		
+		link->SetOpCode(AS_CREATE_BITMAP);
+		
+		error=link->FlushWithReply(&replydata);
+		
+		// We shouldn't ever have to execute this block, but just in case...
+		if(error!=B_OK)
+			fBasePtr=NULL;
+
+		if(replydata.code==SERVER_TRUE)
+		{
+			int8 *bufferindex=replydata.buffer;
+			
+			// Get token
+			fServerToken=*((int32*)bufferindex); bufferindex+=sizeof(int32);
+			
+			// Get the area in which the data resides
+			fArea=clone_area("shared bitmap area",(void**)&fBasePtr,B_ANY_ADDRESS,
+				B_READ_AREA | B_WRITE_AREA,*((area_id*)bufferindex));
+			bufferindex+=sizeof(area_id);
+			
+			// Jump to the location in the area
+			fBasePtr=(int8*)fBasePtr + *((int32*)bufferindex);
+
 			fSize = size;
 			fColorSpace = colorSpace;
 			fBounds = bounds;
 			fBytesPerRow = bytesPerRow;
-			fWindow = NULL;
-			fServerToken = -1;
-			fToken = -1;
-			fArea = -1;
-			fOrigArea = -1;
 			fFlags = flags;
-		} else
+		}
+		else
+		{
+			fServerToken = -1;
+			fArea = -1;
+			fFlags = flags;
+			
 			error = B_NO_MEMORY;
+		}
+		fWindow = NULL;
+		fToken = -1;
+		fOrigArea = -1;
 	}
+	delete link;
 	fInitError = error;
 }
 
