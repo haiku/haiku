@@ -125,6 +125,7 @@ enum {
 	B_EXECUTE_PROPERTY			= 'PEXE',
 	B_GET_SUPPORTED_SUITES		= 'SUIT',
 	B_UNDO						= 'UNDO',
+	B_REDO						= 'REDO',
 	B_CUT 						= 'CCUT',
 	B_COPY 						= 'COPY',
 	B_PASTE 					= 'PSTE',
