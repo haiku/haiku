@@ -17,7 +17,8 @@ const char *kPartitionTypeUnrecognized	= "Unrecognized";
 
 const char *kPartitionTypeMultisession	= "Multisession Storage Device";
 
-const char *kPartitionTypeCDDA			= "Compact Disc Audio Session";
+const char *kPartitionTypeAudioSession	= "Audio Session";
+const char *kPartitionTypeDataSession	= "Data Session";
 
 const char *kPartitionTypeAmiga			= "Amiga Partition Map";
 const char *kPartitionTypeApple			= "Apple Partition Map";

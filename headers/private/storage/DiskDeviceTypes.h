@@ -22,7 +22,8 @@ extern const char *kPartitionTypeUnrecognized;
 
 extern const char *kPartitionTypeMultisession;
 
-extern const char *kPartitionTypeCDDA;
+extern const char *kPartitionTypeAudioSession;
+extern const char *kPartitionTypeDataSession;
 
 extern const char *kPartitionTypeAmiga;
 extern const char *kPartitionTypeApple;
