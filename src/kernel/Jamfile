@@ -98,8 +98,14 @@ KernelLd kernel.so :
 	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
 
+# ToDo: this is outdated; instead, the standard Be mechanism should be used
 KernelLd libglue.o :	# libglue.o is used for dynamic libraries
-	<$(SOURCE_GRIST)!glue>crt0.o
+	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crti.o
+	$(LIBGCC_DIR)/crtbegin.o
+
+	$(LIBGCC_DIR)/crtend.o
+	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crtn.o
+
 	<$(SOURCE_GRIST)!glue>init_term_dyn.o
 	:
 	: -r
@@ -110,8 +116,12 @@ UnarchiveObjects $(LIBGCC_OBJECTS) : $(LIBGCC_DIR)/libgcc.a ;
 	# we need to link against libgcc.a objects and make
 	# it available to other applications as in BeOS
 
+# ToDo: Rewrite as SharedLibrary
 KernelLd libroot.so :
-	libglue.o
+	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crti.o
+	$(LIBGCC_DIR)/crtbegin.o
+
+	<$(SOURCE_GRIST)!glue>init_term_dyn.o
 
 	$(LIBGCC_OBJECTS)
 	<$(SOURCE_GRIST)!libroot>libroot_init.o
@@ -138,6 +148,9 @@ KernelLd libroot.so :
 	posix_time.o
 	posix_unistd.o
 
+	$(LIBGCC_DIR)/crtend.o
+	<$(SOURCE_GRIST)!glue!arch!$(OBOS_ARCH)>crtn.o
+
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
 	: -shared -soname libroot.so -Bdynamic -export-dynamic
 	: no_gcc
@@ -145,8 +158,7 @@ KernelLd libroot.so :
 	;
 
 KernelLd libglue2.o :	# libglue2.o is used for executables
-	<$(SOURCE_GRIST)!glue>crt0.o
-	<$(SOURCE_GRIST)!glue>init_term_dyn.o
+	libglue.o
 	<$(SOURCE_GRIST)!glue>start_dyn.o
 	:
 	: -r
