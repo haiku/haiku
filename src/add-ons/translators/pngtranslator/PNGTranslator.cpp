@@ -533,7 +533,7 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 	
 	png_structp ppng = NULL;
 	png_infop pinfo = NULL;
-	while (1) {
+	while (ppng == NULL) {
 		// create PNG read pointer with default error handling routines
 		ppng = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 		if (!ppng) {
@@ -555,22 +555,53 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 		// set read callback function
 		png_set_read_fn(ppng, static_cast<void *>(inSource), pngcb_read_data);
 		
-		// Read in the whole PNG all at once! (easy way?)
-		png_read_png(ppng, pinfo,
-			PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING | PNG_TRANSFORM_BGR,
-			png_voidp_NULL);
+		// Read in PNG image info
+		png_read_info(ppng, pinfo);
 			
 		png_uint_32 width, height;
 		int bit_depth, color_type, interlace_type;
 		png_get_IHDR(ppng, pinfo, &width, &height, &bit_depth, &color_type,
 			&interlace_type, int_p_NULL, int_p_NULL);
+		
+		// Setup image transformations to make converting it easier
+		bool balpha = false;
+		
+		if (bit_depth == 16)
+			png_set_strip_16(ppng);
+		else if (bit_depth < 8)
+			png_set_packing(ppng);
 			
-		if ((color_type != PNG_COLOR_TYPE_RGB || bit_depth != 8) &&
-			(color_type != PNG_COLOR_TYPE_RGB_ALPHA || bit_depth != 8)) {
-			debugger("Unsupported colorspace!");
-			result = B_NO_TRANSLATOR;
-			break;
+		if (color_type == PNG_COLOR_TYPE_PALETTE)
+			png_set_palette_to_rgb(ppng);
+			
+		if (png_get_valid(ppng, pinfo, PNG_INFO_tRNS)) {
+			balpha = true;
+			png_set_tRNS_to_alpha(ppng);
 		}
+			
+		// change RGB to BGR as it is in 'bits'
+		if (color_type & PNG_COLOR_MASK_COLOR)
+			png_set_bgr(ppng);
+			
+		// have libpng convert gray to RGB for me
+		if (color_type == PNG_COLOR_TYPE_GRAY ||
+			color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+			png_set_gray_to_rgb(ppng);
+			
+		if (color_type & PNG_COLOR_MASK_ALPHA)
+			balpha = true;
+			
+		if (!balpha)
+			// add filler byte for images without alpha
+			// so that the pixels are 4 bytes each
+			png_set_filler(ppng, 0xff, PNG_FILLER_AFTER);
+		
+		// Check that transformed PNG rowbytes matches
+		// what is expected
+		const int32 kbytes = 4;
+		png_uint_32 rowbytes = png_get_rowbytes(ppng, pinfo);
+		if (rowbytes < kbytes * width)
+			rowbytes = kbytes * width;
 		
 		// Write out the data to outDestination
 		// Construct and write Be bitmap header
@@ -581,7 +612,7 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 		bitsHeader.bounds.right = width - 1;
 		bitsHeader.bounds.bottom = height - 1;
 		bitsHeader.rowBytes = 4 * width;
-		if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+		if (balpha)
 			bitsHeader.colors = B_RGBA32;
 		else
 			bitsHeader.colors = B_RGB32;
@@ -593,28 +624,62 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 		}
 		outDestination->Write(&bitsHeader, sizeof(TranslatorBitmap));
 		
-		// write out bitmap data, one row at a time
-		png_bytep *prows = png_get_rows(ppng, pinfo);
-		if (!prows) {
-			result = B_NO_MEMORY;
+		if (interlace_type == PNG_INTERLACE_NONE) {
+			// allocate buffer for storing PNG row
+			png_bytep prow = new png_byte[rowbytes];
+			if (!prow) {
+				result = B_NO_MEMORY;
+				break;
+			}
+			for (png_uint_32 i = 0; i < height; i++) {
+				png_read_row(ppng, prow, NULL);
+				outDestination->Write(prow, width * kbytes);
+			}
+			
+			// finish reading, pass NULL for info because I 
+			// don't need the extra data
+			png_read_end(ppng, NULL);
+			delete[] prow;
+			prow = NULL;
+			
+			result = B_OK;
+			break;
+			
+		} else {
+			// interlaced PNG image
+			png_bytep *prows = new png_bytep[height];
+			if (!prows) {
+				result = B_NO_MEMORY;
+				break;
+			}
+			// allocate enough memory to store the whole image
+			png_uint_32 n;
+			for (n = 0; n < height; n++) {
+				prows[n] = new png_byte[rowbytes];
+				if (!prows[n])
+					break;
+			}
+			
+			if (n < height)
+				result = B_NO_MEMORY;
+			else {
+				png_read_image(ppng, prows);
+				for (png_uint_32 i = 0; i < height; i++)
+					outDestination->Write(prows[i], width * kbytes);
+				
+				result = B_OK;
+			}
+			
+			// delete row pointers and array of pointers to rows
+			while (n) {
+				n--;
+				delete[] prows[n];
+			}
+			delete[] prows;
+			prows = NULL;
+			
 			break;
 		}
-		
-		int ncopy;
-		if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-			ncopy = 4;
-		else
-			ncopy = 3;
-		for (png_uint_32 i = 0; i < height; i++) {
-			for (png_uint_32 k = 0; k < width; k++) {
-				uint8 pixel[4] = { 0xff };
-				memcpy(pixel, prows[i] + (k * ncopy), ncopy);
-				outDestination->Write(pixel, 4);
-			}
-		}
-		
-		result = B_OK;
-		break;
 	}
 	
 	if (ppng) {
