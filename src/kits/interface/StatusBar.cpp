@@ -201,7 +201,10 @@ void BStatusBar::AttachedToWindow()
 	ResizeTo(Frame().Width(), height);
 
 	if (Parent())
-		SetViewColor(Parent ()->ViewColor());
+	{
+		SetViewColor(Parent()->ViewColor());
+		SetLowColor(Parent()->ViewColor());
+	}
 }
 //------------------------------------------------------------------------------
 void BStatusBar::MessageReceived(BMessage *message)
@@ -342,12 +345,13 @@ void BStatusBar::SetBarHeight(float height)
 	ResizeTo(frame.Width(), fBarHeight + 16);
 }
 //------------------------------------------------------------------------------
-void BStatusBar::SetText ( const char *string )
+void BStatusBar::SetText (const char *string)
 {
 	if (fText)
 		free(fText);
 
-	fText = strdup(string);
+	if (string)
+		fText = strdup(string);
 
 	Invalidate();
 }
@@ -357,7 +361,8 @@ void BStatusBar::SetTrailingText(const char *string)
 	if (fTrailingText)
 		free(fTrailingText);
 
-	fTrailingText = strdup(string);
+	if (string)
+		fTrailingText = strdup(string);
 
 	Invalidate();
 }
@@ -378,13 +383,15 @@ void BStatusBar::Update(float delta, const char *text, const char *trailingText)
 
 	if (fText)
 		free(fText);
-
-	fText = strdup(text);
+	
+	if (text)
+		fText = strdup(text);
 
 	if (fTrailingText)
 		free(fTrailingText);
 
-	fTrailingText = strdup(trailingText);
+	if (trailingText)
+		fTrailingText = strdup(trailingText);
 
 	Invalidate();
 }
@@ -394,17 +401,27 @@ void BStatusBar::Reset(const char *label, const char *trailingLabel)
 	if (fLabel)
 		free(fLabel);
 
-	fLabel = strdup(label);
+	if (label)
+		fLabel = strdup(label);
 
 	if (fTrailingLabel)
 		free(fTrailingLabel);
 
-	fTrailingLabel = strdup(trailingLabel);
+	if (trailingLabel)
+		fTrailingLabel = strdup(trailingLabel);
+
+	if (fText)
+		free(fText);
+
+	if (fTrailingText)
+		free(fTrailingText);
 
 	fCurrent = 0.0f;
+	fMax = 100.0f;
 
 	Invalidate();
 }
+//------------------------------------------------------------------------------
 float BStatusBar::CurrentValue() const
 {
 	return fCurrent;
