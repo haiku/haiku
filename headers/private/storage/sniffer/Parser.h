@@ -19,6 +19,7 @@
 
 class BString;
 
+//! MIME Sniffer related classes
 namespace Sniffer {
 
 class Rule;
@@ -36,6 +37,10 @@ status_t parse(const char *rule, Rule *result, BString *parseError = NULL);
 // Classes used internally by the parser
 //------------------------------------------------------------------------------
 
+//! Manages a stream of characters
+/*! CharStream is used by the scanner portion of the parser, which is implemented
+	in TokenStream::SetTo().
+*/
 class CharStream {
 public:
 	CharStream(const char *string = NULL);
@@ -61,6 +66,7 @@ private:
 	CharStream& operator=(const CharStream &ref);
 };
 
+//! Types of tokens
 typedef enum TokenType {
 	EmptyToken,
 	LeftParen,
@@ -75,8 +81,17 @@ typedef enum TokenType {
 	FloatingPoint
 };
 
+/*! \brief Returns a NULL-terminated string contating the
+		   name of the given token type
+*/
 const char* tokenTypeToString(TokenType type);
 
+//! Base token class returned by TokenStream
+/*! Each token represents a single chunk of relevant information
+    in a given rule. For example, the floating point number "1.2e-35",
+    originally represented as a 7-character string, is added to the
+    token stream as a single FloatToken object.
+*/
 class Token {
 public:
 	Token(TokenType type = EmptyToken, const ssize_t pos = -1);
@@ -92,6 +107,11 @@ protected:
 	ssize_t fPos;
 };
 
+//! String token class
+/*! Single-quoted strings, double-quoted strings, unquoted strings, and
+	hex literals are all converted to StringToken objects by the scanner
+	and from then on treated uniformly.
+*/
 class StringToken : public Token {
 public:
 	StringToken(const char *string, const ssize_t pos);
@@ -101,6 +121,11 @@ protected:
 	char *fString;
 };
 
+//! Integer token class
+/*! Signed or unsigned integer literals are coverted to IntToken objects,
+    which may then be treated as either ints or floats (since a priority
+    of "1" would be valid, but scanned as an int instead of a float).
+*/
 class IntToken : public Token {
 public:
 	IntToken(const int32 value, const ssize_t pos);
@@ -110,6 +135,10 @@ protected:
 	int32 fValue;
 };
 
+//! Floating point token class
+/*! Signed or unsigned, extended or non-extended notation floating point
+    numbers are converted to FloatToken objects by the scanner.
+*/
 class FloatToken : public Token {
 public:
 	FloatToken(const double value, const ssize_t pos);
@@ -118,6 +147,14 @@ protected:
 	double fValue;
 };
 
+//! Manages a stream of Token objects
+/*! Provides Get() and Unget() operations, some handy shortcut operations (Read()
+    and CondRead()), and handles memory management with respect to all the
+    Token objects in the stream (i.e. never delete a Token object returned by Get()).
+    
+    Also, the scanner portion of the parser is implemented in the TokenStream's
+    SetTo() function.
+*/
 class TokenStream {
 public:
 	TokenStream(const char *string = NULL);
@@ -154,6 +191,7 @@ private:
 	TokenStream& operator=(const TokenStream &ref);
 };
 
+//! Handles parsing a sniffer rule, yielding either a parsed rule or a descriptive error message.
 class Parser {
 public:
 	Parser();
