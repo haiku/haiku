@@ -14,4 +14,17 @@ const uint32 SLIDER_DELAY_RATE			= 'SLdr';
 
 const uint32 ERROR_DETECTED				= 'ERor';
 
+//Timezonemessages
+const uint32 REGION_CHANGED				='REch';
+const uint32 TIME_ZONE_CHANGED			='TZch';
+
+//SetButton
+const uint32 SET_TIME_ZONE				='SEti';
+
+//local and GMT settings
+const uint32 RTC_SETTINGS				='RTse';
+
 #endif //TIME_MESSAGES_H
+
+
+

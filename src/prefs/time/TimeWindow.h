@@ -3,8 +3,10 @@
 
 #include <Window.h>
 
+/////////////////////////////////
+#include "SettingsView.h"
 #include "TimeSettings.h"
-#include "TimeView.h"
+#include "ZoneView.h"
 
 class TimeWindow : public BWindow 
 {
@@ -14,11 +16,12 @@ public:
 	
 	bool QuitRequested();
 	void MessageReceived(BMessage *message);
-	void BuildView();
+	void BuildViews();
 	
 private:
-	TimeView	*fView;
-
+	SettingsView 	*fTimeSettings;
+	ZoneView		*fTimeZones;
 };
 
 #endif
+

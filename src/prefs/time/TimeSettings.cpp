@@ -1,6 +1,6 @@
 /*
  * TimeSettings.cpp
- * Time mccall@digitalparadise.co.uk
+ * Time mccall@@digitalparadise.co.uk
  *
  */
  
@@ -61,3 +61,5 @@ TimeSettings::SetWindowCorner(BPoint corner)
 {
 	fCorner=corner;
 }
+
+

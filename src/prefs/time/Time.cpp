@@ -1,6 +1,6 @@
 /*
  * Time.cpp
- * Time mccall@digitalparadise.co.uk
+ * Time mccall@@digitalparadise.co.uk
  *
  */
 
@@ -68,3 +68,6 @@ TimeApplication::~TimeApplication()
 {
 	delete fSettings;
 }
+
+
+
