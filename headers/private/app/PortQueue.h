@@ -30,29 +30,7 @@
 #include <OS.h>
 #include <queue>
 
-class PortMessage
-{
-public:
-	PortMessage(const int32 &code, const void *buffer, const ssize_t &buffersize,
-			 const bool &copy);
-	PortMessage(void);
-	~PortMessage(void);
-	
-	status_t ReadFromPort(const port_id &port, const bigtime_t &timeout=B_INFINITE_TIMEOUT);
-	status_t WriteToPort(const port_id &port);	
-	
-	void SetCode(const int32 &code);
-	void SetBuffer(const void *buffer, const ssize_t &size, const bool &copy=false);
-
-	int32 Code(void) { return _code; }
-	void *Buffer(void) { return _buffer; }
-	ssize_t BufferSize(void) { return _buffersize; }
-	
-private:
-	int32 _code;
-	void *_buffer;
-	ssize_t _buffersize;
-};
+class PortMessage;
 
 class PortQueue
 {

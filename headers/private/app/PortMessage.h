@@ -19,88 +19,49 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		PortQueue.cpp
+//	File Name:		PortMessage.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Facilitation class for reading and queueing messages from ports
+//	Description:	Package class for port messaging-based data
 //  
 //------------------------------------------------------------------------------
-#include "PortQueue.h"
-#include "PortMessage.h"
+#ifndef PORTMESSAGE_H_
+#define PORTMESSAGE_H_
 
-PortQueue::PortQueue(const port_id &port)
+#include <OS.h>
+
+class PortMessage
 {
-	port_info pi;
-	_init=(get_port_info(port,&pi)==B_OK)?true:false;
-	_port=port;
-}
+public:
+	PortMessage(const int32 &code, const void *buffer, const ssize_t &buffersize,
+			 const bool &copy);
+	PortMessage(void);
+	~PortMessage(void);
+	
+	status_t ReadFromPort(const port_id &port, const bigtime_t &timeout=B_INFINITE_TIMEOUT);
+	status_t WriteToPort(const port_id &port);	
+	
+	void SetCode(const int32 &code);
+	void SetBuffer(const void *buffer, const ssize_t &size, const bool &copy=false);
 
-PortQueue::~PortQueue(void)
-{
-	MakeEmpty();
-}
+	int32 Code(void) { return _code; }
+	void *Buffer(void) { return _buffer; }
+	ssize_t BufferSize(void) { return _buffersize; }
+	
+	status_t Read(BPoint *data);
+	status_t Read(BRect *data);
+	status_t Read(float *data);
+	status_t Read(int *data);
+	status_t Read(long *data);
+	status_t Read(double *data);
+	status_t Read(void *data, ssize_t size);
 
-bool PortQueue::SetPort(const port_id &port)
-{
-	port_info pi;
-	_init=(get_port_info(port,&pi)==B_OK)?true:false;
-	_port=port;
+	void Rewind(void);
+	
+private:
+	int32 _code;
+	uint8 *_buffer;
+	ssize_t _buffersize;
+	uint8 *_index;
+};
 
-	return _init;
-}
-
-void PortQueue::GetMessagesFromPort(bool wait_for_messages=false)
-{
-	if(_init)
-	{
-		PortMessage *msg;
-		ssize_t size;
-		port_info pi;
-		get_port_info(_port, &pi);
-		status_t stat;
-
-		if(pi.queue_count==0 && wait_for_messages)
-		{
-			size=port_buffer_size(_port);
-			// now that there is a message, we'll just fall through to the
-			// port-emptying loop
-			get_port_info(_port, &pi);
-		}
-		
-		for(int32 i=0; i<pi.queue_count; i++)
-		{
-			msg=new PortMessage();
-			stat=msg->ReadFromPort(_port,0);
-			
-			if(stat!=B_OK)
-			{
-				delete msg;
-				break;
-			}
-			
-			_q.push(msg);
-		}
-		
-	}
-}
-
-PortMessage *PortQueue::GetMessageFromQueue(void)
-{
-	if(_q.empty())
-		return NULL;
-
-	PortMessage *msg=_q.front();
-	_q.pop();
-	return msg;
-}
-
-void PortQueue::MakeEmpty(void)
-{
-	PortMessage *msg;
-	while(!_q.empty())
-	{
-		msg=_q.front();
-		_q.pop();
-		delete msg;
-	}
-}
-
+#endif
