@@ -1724,7 +1724,7 @@ int
 sys_setenv(const char *name, const char *value, int overwrite)
 {
 	char var[SYS_THREAD_STRING_LENGTH_MAX];
-	int state;
+//	int state;
 	addr_t env_space;
 	char **envp;
 	int envc;
@@ -1742,15 +1742,19 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
 		return -1;
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	env_space = thread_get_current_thread()->team->user_env_base;
+
+	// ToDo: this is totally broken!
+	// (temporary fix is to do this with interrupts enabled)
+
+//	state = disable_interrupts();
+//	GRAB_TEAM_LOCK();
 
 	strcpy(var, name);
 	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
 	name_size = strlen(var);
 	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
 
-	env_space = (addr_t)thread_get_current_thread()->team->user_env_base;
 	envp = (char **)env_space;
 	for (envc = 0; envp[envc]; envc++) {
 		if (!strncmp(envp[envc], var, name_size)) {
@@ -1797,8 +1801,8 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	}
 	TRACE(("sys_setenv: variable set.\n"));
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+//	RELEASE_TEAM_LOCK();
+//	restore_interrupts(state);
 
 	return rc;
 }
@@ -1809,17 +1813,21 @@ sys_getenv(const char *name, char **value)
 {
 	char **envp;
 	char *p;
-	int state;
+//	int state;
 	int i;
 	int len = strlen(name);
 	int rc = -1;
 
 	// ToDo: please put me out of the kernel into libroot.so!
 
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
+	// ToDo: this is totally broken!
+	// (temporary fix is to do this with interrupts enabled)
 
 	envp = (char **)thread_get_current_thread()->team->user_env_base;
+
+//	state = disable_interrupts();
+//	GRAB_TEAM_LOCK();
+
 	for (i = 0; envp[i]; i++) {
 		if (!strncmp(envp[i], name, len)) {
 			p = envp[i] + len;
@@ -1831,8 +1839,8 @@ sys_getenv(const char *name, char **value)
 		}
 	}
 
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
+//	RELEASE_TEAM_LOCK();
+//	restore_interrupts(state);
 	
 	return rc;
 }
