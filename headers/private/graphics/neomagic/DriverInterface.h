@@ -29,7 +29,7 @@ typedef struct {
 	int32	ben;
 } benaphore;
 
-#define INIT_BEN(x)		x.sem = create_sem(0, "G400 "#x" benaphore");  x.ben = 0;
+#define INIT_BEN(x)		x.sem = create_sem(0, "NM "#x" benaphore");  x.ben = 0;
 #define AQUIRE_BEN(x)	if((atomic_add(&(x.ben), 1)) >= 1) acquire_sem(x.sem);
 #define RELEASE_BEN(x)	if((atomic_add(&(x.ben), -1)) > 1) release_sem(x.sem);
 #define	DELETE_BEN(x)	delete_sem(x.sem);
@@ -239,23 +239,28 @@ typedef struct {
 	uint16	data;		/* The value read or written */
 } nm_in_out_isa;
 
+/* move_overlay related info */
+typedef struct {
+	uint32 hcoordv;		/* left and right edges of video output window */
+	uint32 vcoordv;		/* top and bottom edges of video output window */
+	uint32 hsrcendv;	/* horizontal source end in source buffer (clipping) */
+	uint32 a1orgv;		/* vertical source clipping via startadress of source buffer */
+} move_overlay_info;
+
 /* setup ISA BES registers for overlay on ISA cards */
 typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	uint32  card_type;  /* see card_type enum above */
-	uint32 	hcoordv;
-	uint32  vcoordv;
 	uint32  hiscalv;
 	uint32  viscalv;
-	uint32	hsrcstv;
-	uint32  hsrcendv;
-	uint32	a1orgv;
 	uint32  globctlv;
 	uint32  weight;
 	uint8	colkey_r;
 	uint8	colkey_g;
 	uint8	colkey_b;
 	uint16	ob_width;
+	move_overlay_info moi;
+	bool	move_only;
 } nm_bes_data;
 
 /* Set some boolean condition (like enabling or disabling interrupts) */
