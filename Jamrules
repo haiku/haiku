@@ -2150,7 +2150,7 @@ rule Package
 		_setup_$(packagename) = true ;
 
 		NotFile $(packagename) ;
-		Depends packages : $(packagename) ;
+		LocalDepends packages : $(packagename) ;
 
 		MakeLocate $(packagezip) : $(OBOS_PACKAGE_DIR) ;
 		MakeLocate $(packageinstallscript) : $(packagedir) ;
