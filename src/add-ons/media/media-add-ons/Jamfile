@@ -6,6 +6,7 @@ SubDir OBOS_TOP src add-ons media media-add-ons ;
 SubInclude OBOS_TOP src add-ons media media-add-ons legacy ;
 SubInclude OBOS_TOP src add-ons media media-add-ons mixer ;
 SubInclude OBOS_TOP src add-ons media media-add-ons multi_audio ;
+SubInclude OBOS_TOP src add-ons media media-add-ons radeon ;
 SubInclude OBOS_TOP src add-ons media media-add-ons tone_producer_demo ;
 SubInclude OBOS_TOP src add-ons media media-add-ons video_producer_demo ;
 
