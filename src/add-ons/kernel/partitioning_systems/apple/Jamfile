@@ -8,12 +8,11 @@ KernelAddon apple : kernel partitioning_systems :
 	apple.cpp
 	;
 
-# For now build a userland version only.
-Addon <partitioning_system>apple : userland partitioning_systems :
-	apple.cpp
-	;
-
-LinkSharedOSLibs <partitioning_system>apple :
-	libkernelland_emu.so
-	libdisk_device_manager.so
-	;
+#Addon <partitioning_system>apple : userland partitioning_systems :
+#	apple.cpp
+#	;
+#
+#LinkSharedOSLibs <partitioning_system>apple :
+#	libkernelland_emu.so
+#	libdisk_device_manager.so
+#	;

@@ -8,12 +8,11 @@ KernelAddon amiga_rdb : kernel partitioning_systems :
 	amiga_rdb.cpp
 	;
 
-# For now build a userland version only.
-Addon <partitioning_system>amiga_rdb : userland partitioning_systems :
-	amiga_rdb.cpp
-	;
-
-LinkSharedOSLibs <partitioning_system>amiga_rdb :
-	libkernelland_emu.so
-	libdisk_device_manager.so
-	;
+#Addon <partitioning_system>amiga_rdb : userland partitioning_systems :
+#	amiga_rdb.cpp
+#	;
+#
+#LinkSharedOSLibs <partitioning_system>amiga_rdb :
+#	libkernelland_emu.so
+#	libdisk_device_manager.so
+#	;

@@ -17,18 +17,16 @@ local session_files =
 	session.cpp
 	;
 
-Objects $(session_files) ;
-
 KernelAddon session : kernel partitioning_systems :
-	[ FGristFiles $(session_files:S=$(SUFOBJ)) ]
-	;
+	$(session_files)
+;
 
 # also build a userland version
-Addon <partitioning_system>session : userland partitioning_systems :
-	[ FGristFiles $(session_files:S=$(SUFOBJ)) ]
-;
-
-LinkSharedOSLibs <partitioning_system>session :
-	libkernelland_emu.so
-	libdisk_device_manager.so
-;
+#Addon <partitioning_system>session : userland partitioning_systems :
+#	[ FGristFiles $(session_files:S=$(SUFOBJ)) ]
+#;
+#
+#LinkSharedOSLibs <partitioning_system>session :
+#	libkernelland_emu.so
+#	libdisk_device_manager.so
+#;
