@@ -701,7 +701,7 @@ status_t nv_acc_init()
 		/* activate Zcullflush(?) */
 		ACCW(DEBUG3, (ACCR(DEBUG3) | 0x00000001));
 		/* unknown */
-		ACCW(NV30_WHAT, (ACCR(NV30_WHAT) | 0x00040000));
+		ACCW(NV25_WHAT1, (ACCR(NV25_WHAT1) | 0x00040000));
 	}
 
 	/*** setup screen location and pitch ***/
@@ -781,28 +781,28 @@ status_t nv_acc_init()
 		ACCW(NV10_FBTIL5AD, 0);
 		ACCW(NV10_FBTIL6AD, 0);
 		ACCW(NV10_FBTIL7AD, 0);
-		/* copy tile setup stuff from 'source' to acc engine */
+		/* copy some RAM configuration info(?) */
 		if (si->ps.card_arch >= NV20A)
 		{
-			/* unknown: */
 			if (si->ps.card_type > NV40)
 			{
-				ACCW(NV40P_WHAT_T0, ACCR(NV20_FBWHAT0));
-				ACCW(NV40P_WHAT_T1, ACCR(NV20_FBWHAT1));
-				ACCW(NV40P_WHAT_T2, ACCR(NV20_FBWHAT0));
-				ACCW(NV40P_WHAT_T3, ACCR(NV20_FBWHAT1));
+				ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 			}
 			else
 			{
-				ACCW(NV20_WHAT_T0, ACCR(NV20_FBWHAT0));
-				ACCW(NV20_WHAT_T1, ACCR(NV20_FBWHAT1));
+				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
 				if (si->ps.card_type == NV40)
 				{
-					ACCW(NV40_WHAT_T2, ACCR(NV20_FBWHAT0));
-					ACCW(NV40_WHAT_T3, ACCR(NV20_FBWHAT1));
+					ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+					ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 				}
 			}
 		}
+		/* copy tile setup stuff from 'source' to acc engine */
 		/* tile 0: */
 		/* tile invalid, tile adress = $00000 (18bit) */
 		ACCW(NV10_TIL0AD, ACCR(NV10_FBTIL0AD));

@@ -467,15 +467,14 @@ status_t nv_acc_init_dma()
 			ACCW(NV4X_DMA_SRC, 0x00001140);
 			break;
 		case NV30A:
-/*
-              pNv->PGRAPH[0x0084/4] = 0x40108700;//acc DEBUG1
-              pNv->PGRAPH[0x0890/4] = 0x00140000;//0x00400890 nieuw: unknown!!<<<<<<<<(NV25)
-              pNv->PGRAPH[0x008C/4] = 0xf00e0431;//acc DEBUG3
-              pNv->PGRAPH[0x0090/4] = 0x00008000;//acc NV10_DEBUG4
-              pNv->PGRAPH[0x0610/4] = 0xf04b1f36;//NVACC_NV4X_WHAT2 nw, dus ook op NV30!<<<
-              pNv->PGRAPH[0x0B80/4] = 0x1002d888;//0x00400b80 nieuw: unknown!!<<<<<<<
-              pNv->PGRAPH[0x0B88/4] = 0x62ff007f;//0x00400b88 nieuw: unknown!!<<<<<<<
-*/
+			/* init some function blocks, but most is unknown.. */
+			ACCW(DEBUG1, 0x40108700);
+			ACCW(NV25_WHAT1, 0x00140000);
+			ACCW(DEBUG3, 0xf00e0431);
+			ACCW(NV10_DEBUG4, 0x00008000);
+			ACCW(NV25_WHAT0, 0xf04b1f36);
+			ACCW(NV25_WHAT2, 0x1002d888);
+			ACCW(NV25_WHAT4, 0x62ff007f);
 			break;
 		case NV20A:
 /*
@@ -521,11 +520,11 @@ status_t nv_acc_init_dma()
 		{
 			if (si->ps.card_type == NV40)
 			{
-				/* copy unknown tile setup stuff from 'source' to acc engine(?) */
- 				ACCW(NV20_WHAT_T0, ACCR(NV20_FBWHAT0));
-				ACCW(NV20_WHAT_T1, ACCR(NV20_FBWHAT1));
-				ACCW(NV40_WHAT_T2, ACCR(NV20_FBWHAT0));
-				ACCW(NV40_WHAT_T3, ACCR(NV20_FBWHAT1));
+				/* copy some RAM configuration info(?) */
+ 				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
@@ -536,11 +535,11 @@ status_t nv_acc_init_dma()
 			}
 			else
 			{
-				/* copy unknown tile setup stuff from 'source' to acc engine(?) */
-				ACCW(NV40P_WHAT_T0, ACCR(NV20_FBWHAT0));
-				ACCW(NV40P_WHAT_T1, ACCR(NV20_FBWHAT1));
-				ACCW(NV40P_WHAT_T2, ACCR(NV20_FBWHAT0));
-				ACCW(NV40P_WHAT_T3, ACCR(NV20_FBWHAT1));
+				/* copy some RAM configuration info(?) */
+				ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
 
 				/* setup location of active screen in framebuffer */
 				ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
@@ -552,22 +551,25 @@ status_t nv_acc_init_dma()
 		}
 		else /* NV20A and NV30A: */
 		{
-/*
-   			//NVACC_NV20_WHAT0 from NV20_FBWHAT0
-              pNv->PGRAPH[0x09A4/4] = pNv->PFB[0x0200/4];
-     		//NVACC_NV20_WHAT1 from NV20_FBWHAT1
-              pNv->PGRAPH[0x09A8/4] = pNv->PFB[0x0204/4];
+			/* copy some RAM configuration info(?) */
+			ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+			ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+			/* copy some RAM configuration info(?) to some indexed registers: */
+			/* b16-24 is select; b2-13 is adress in 32-bit words */
+			ACCW(RDI_INDEX, 0x00ea0000);
+			/* data is 32-bit */
+			ACCW(RDI_DATA, NV_REG32(NV32_PFB_CONFIG_0));
+			/* b16-24 is select; b2-13 is adress in 32-bit words */
+			ACCW(RDI_INDEX, 0x00ea0004);
+			/* data is 32-bit */
+			ACCW(RDI_DATA, NV_REG32(NV32_PFB_CONFIG_1));
 
-              pNv->PGRAPH[0x0750/4] = 0x00EA0000;
-              pNv->PGRAPH[0x0754/4] = pNv->PFB[0x0200/4];
-              pNv->PGRAPH[0x0750/4] = 0x00EA0004;
-              pNv->PGRAPH[0x0754/4] = pNv->PFB[0x0204/4];
-
-              pNv->PGRAPH[0x0820/4] = 0;//NV20_OFFSET0
-              pNv->PGRAPH[0x0824/4] = 0;//NV20_OFFSET1
-              pNv->PGRAPH[0x0864/4] = pNv->FbMapSize - 1;//NV20_BLIMIT6
-              pNv->PGRAPH[0x0868/4] = pNv->FbMapSize - 1;//NV20_BLIMIT7
-*/
+			/* setup location of active screen in framebuffer */
+			ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			/* setup accesible card memory range */
+			ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
+			ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
 		}
 
 		/* NV20A, NV30A and NV40A: */
