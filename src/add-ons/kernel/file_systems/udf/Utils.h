@@ -36,6 +36,8 @@ const char* bool_to_string(bool value);
 
 status_t check_size_error(ssize_t bytesReturned, ssize_t bytesExpected);
 
+uint16 calculate_crc(uint8 *data, uint16 length);
+
 } // namespace Udf
 
 #endif	// _UDF_UTILS_H

@@ -149,5 +149,24 @@ Udf::check_size_error(ssize_t bytesReturned, ssize_t bytesExpected)
 	       : (bytesReturned >= 0 ? B_ERROR : status_t(bytesReturned));
 }
 
+/*! \brief Calculates the UDF crc checksum for the given byte stream.
+
+	Based on crc code from UDF-2.50 6.5, as permitted.
+
+	\param data Pointer to the byte stream.
+	\param length Length of the byte stream in bytes.
+	
+	\return The crc checksum, or 0 if an error occurred.
+*/
+uint16
+Udf::calculate_crc(uint8 *data, uint16 length)
+{
+	uint16 crc = 0;
+	for ( ; length > 0; length--, data++) 
+		crc = Udf::kCrcTable[(crc >> 8 ^ *data) & 0xff] ^ (crc << 8);
+	return crc;
+}
+
+
 } // namespace Udf
 
