@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src apps terminal ;
+
+# AddResources Terminal :
+#	Terminal.rdef Terminal.icons.rdef Terminal.version.rdef
+#	;
+
+# App Terminal : ;
+#	ColorMenuItem.cpp
+#	FindWindow.cpp
+#	ReplaceWindow.cpp
+#	TerminalApp.cpp
+#	TerminalView.cpp
+#	TerminalWindow.cpp ;
+
+# LinkSharedOSLibs Terminal : be translation tracker ;
