@@ -35,6 +35,13 @@
 #include "ether_driver.h"
 #include "util.h"
 
+
+//#define RTL_NODEBUG
+#ifdef RTL_NODEBUG
+#define dprintf no_printf
+void no_printf( const char *useless , ... ) {};
+#endif
+
 /* ----------
 	global data
 ----- */
@@ -525,10 +532,10 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 		return B_IO_ERROR;
 	}
 	
-	//Check for an error: if needed: resetrx
-	if ( !( packet_header->bits & 0x1 ) || packet_header->length > 1500 )
+	//Check for an error: if needed: resetrx, length may not be bigger than 1514 + 4 CRC
+	if ( !( packet_header->bits & 0x1 ) || packet_header->length > 1518 )
 	{
-		dprintf( "rtl8139_nielx read_hook: Error in package reception!!!\n" );
+		dprintf( "rtl8139_nielx read_hook: Error in package reception: bits: %u length %u!!!\n" , packet_header->bits , packet_header->length);
 		return B_IO_ERROR;
 	}
 	
@@ -546,7 +553,16 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	
 	//Copy the packet
 	*num_bytes = packet_header->length - 4;
-	memcpy( buf , data->receivebufferlog + data->receivebufferoffset + 4 , packet_header->length - 4);  //length-4 because we don't want to copy the 4 bytes CRC
+	if ( data->receivebufferoffset + *num_bytes > 65536 )
+	{
+		//Packet wraps around , copy last bits except header ( = +4 )
+		memcpy( buf , data->receivebufferlog + data->receivebufferoffset + 4 , 0x10000 - ( data->receivebufferoffset + 4 ) ); 
+		//copy remaining bytes from the beginning
+		memcpy( buf + 0x10000 - ( data->receivebufferoffset + 4 ) , data->receivebufferlog , *num_bytes - (0x10000 - ( data->receivebufferoffset + 4 ) ) );
+		dprintf( "rtl8139_nielx read_hook: Wrapping around end of buffer\n" );
+	}
+	else
+		memcpy( buf , data->receivebufferlog + data->receivebufferoffset + 4 , packet_header->length - 4);  //length-4 because we don't want to copy the 4 bytes CRC
 	
 	//Update the buffer -- 4 for the header length, plus 3 for the dword allignment
 	data->receivebufferoffset = ( data->receivebufferoffset + packet_header->length + 4 + 3 ) & ~3;
