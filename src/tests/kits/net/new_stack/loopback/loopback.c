@@ -6,10 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <sys/dirent.h>
-#include <sys/stat.h>
-
-#include <Drivers.h>
+#include <KernelExport.h>
 
 #include "net_stack.h"
 
@@ -23,13 +20,13 @@ static struct net_stack_module_info *g_stack = NULL;
 // -------------------
 status_t init(net_layer *me)
 {
-	printf("%s: initing layer\n", me->name);
+	dprintf("%s: initing layer\n", me->name);
 	return B_OK;
 }
 
 status_t uninit(net_layer *me)
 {
-	printf("loopback: uniniting layer\n");
+	dprintf("loopback: uniniting layer\n");
 	return B_OK;
 }
 
@@ -40,12 +37,13 @@ status_t enable(net_layer *me, bool enable)
 }
 
 
-status_t output_buffer(net_layer *me, net_buffer *buffer)
+status_t process_output(net_layer *me, net_buffer *buffer)
 {
 	if (!buffer)
 		return B_ERROR;
-		
-	return g_stack->push_buffer_up(me, buffer);
+	
+	// Here the magical loopback effect ;-)
+	return g_stack->send_up(me, buffer);
 }
 
 // #pragma mark -
@@ -56,16 +54,16 @@ status_t std_ops(int32 op, ...)
 		case B_MODULE_INIT: {
 			status_t status;
 			
-			printf("loopback: B_MODULE_INIT\n");
+			dprintf("loopback: B_MODULE_INIT\n");
 			status = get_module(NET_STACK_MODULE_NAME, (module_info **) &g_stack);
 			if (status != B_OK)
 				return status;
 			
-			return g_stack->register_layer("*/loopback", &nlmi, NULL, NULL);
+			return g_stack->register_layer("loopback", "loopback/frame", 0, &nlmi, NULL, NULL);
 		}
 			
 		case B_MODULE_UNINIT:
-			printf("loopback: B_MODULE_UNINIT\n");
+			dprintf("loopback: B_MODULE_UNINIT\n");
 			put_module(NET_STACK_MODULE_NAME);
 			break;
 			
@@ -86,8 +84,8 @@ struct net_layer_module_info nlmi = {
 	uninit,
 	enable,
 	NULL,	// no control()
-	output_buffer,
-	NULL	// interface layer: no input_buffer()
+	NULL,	// interface layer: processing input buffer doesn't make sense!
+	process_output
 };
 
 _EXPORT module_info *modules[] = {

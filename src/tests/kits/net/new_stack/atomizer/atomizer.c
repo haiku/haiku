@@ -295,6 +295,7 @@ atomize(const void * at, const char *string, int create) {
 		uint32 high = count;
 		uint32 index = 0;
 		int test = -1;
+		
 		/* do a binary search on the vector for a match */
 		while (low < high) {
 			index = (low + high) / 2;
@@ -302,7 +303,7 @@ atomize(const void * at, const char *string, int create) {
 			if (test < 0)
 				high = index;
 			else if (test > 0)
-				low = index + 1;
+				low = ++index;
 			else
 				break;
 		}

@@ -256,7 +256,7 @@ status_t delete_pool_node2(memory_pool * pool, void * node)
 
 // #pragma mark -
 
-struct memory_pool_module_info mpmi = {
+memory_pool_module_info mpmi = {
 	{
 		MEMORY_POOL_MODULE_NAME,
 		0, 
