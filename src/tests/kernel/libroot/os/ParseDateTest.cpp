@@ -43,16 +43,24 @@ main(int argc, char **argv)
 		"last tuesday",
 		"today",
 		"next tuesday",
+		"tuesday",
 		"1976-12-15",
 		"5.8.1976",
 		"last hour",
 		"1 hour",
 		"now",
 		"12/15/1976",
+		"Sat, 08/23/2003",
+		"Sun, 08/23/2003",
 		"",
 		"next monday 3:00",
+		"thursday 4:42",
+		"this thursday 4:42",
 		"42 minutes",
+		"next 5 minutes",
+		"last 15 minutes",
 		"-15 minutes",
+		"3:33pm GMT",
 		NULL
 	};
 
@@ -63,11 +71,14 @@ main(int argc, char **argv)
 		time_t result = parsedate_etc(dates[0], now, &flags);
 	}
 #else
+	// this crashes the R5 version but not ours:
+	// parsedate(NULL, -1);
+
 	for (int32 i = 0; dates[i]; i++) {
 		int flags = 0;
 		time_t result = parsedate_etc(dates[i], -1, &flags);
-		printf("\"%s\" = %ld (%s) -> %s\n", dates[i], result,
-			parsedate_flags_to_string(result, flags), result == -1 ? "-" : ctime(&result));
+		printf("\"%s\" = %ld (%s) -> %s", dates[i], result,
+			parsedate_flags_to_string(result, flags), result == -1 ? "-\n" : ctime(&result));
 	}
 #endif
 	return 0;
