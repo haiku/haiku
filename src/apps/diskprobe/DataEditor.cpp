@@ -136,31 +136,27 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 
 
 DataEditor::DataEditor()
-	:
-	fLock("data view")
+	: BLocker("data view")
 {
 }
 
 
 DataEditor::DataEditor(entry_ref &ref, const char *attribute)
-	:
-	fLock("data view")
+	: BLocker("data view")
 {
 	SetTo(ref, attribute);
 }
 
 
 DataEditor::DataEditor(BEntry &entry, const char *attribute)
-	:
-	fLock("data view")
+	: BLocker("data view")
 {
 	SetTo(entry, attribute);
 }
 
 
 DataEditor::DataEditor(const DataEditor &editor)
-	:
-	fLock("data view")
+	: BLocker("data view")
 {
 }
 
@@ -290,7 +286,7 @@ DataEditor::AddChange(DataChange *change)
 status_t 
 DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 {
-	if (!fLock.IsLocked())
+	if (!IsLocked())
 		debugger("DataEditor: view not locked");
 
 	if (fNeedsUpdate) {
@@ -309,7 +305,7 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 status_t 
 DataEditor::Remove(off_t offset, off_t length)
 {
-	if (!fLock.IsLocked())
+	if (!IsLocked())
 		debugger("DataEditor: view not locked");
 
 	// not yet implemented
@@ -321,7 +317,7 @@ DataEditor::Remove(off_t offset, off_t length)
 status_t 
 DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 {
-	if (!fLock.IsLocked())
+	if (!IsLocked())
 		debugger("DataEditor: view not locked");
 
 	// not yet implemented
@@ -369,7 +365,7 @@ DataEditor::RemoveRedos()
 status_t 
 DataEditor::Undo()
 {
-	BAutolock locker(fLock);
+	BAutolock locker(this);
 
 	if (!CanUndo())
 		return B_ERROR;
@@ -389,7 +385,7 @@ DataEditor::Undo()
 status_t 
 DataEditor::Redo()
 {
-	BAutolock locker(fLock);
+	BAutolock locker(this);
 
 	if (!CanRedo())
 		return B_ERROR;
@@ -490,7 +486,7 @@ DataEditor::Update()
 status_t
 DataEditor::GetViewBuffer(const uint8 **_buffer)
 {
-	if (!fLock.IsLocked())
+	if (!IsLocked())
 		debugger("DataEditor: view not locked");
 
 	status_t status = B_OK;
@@ -506,20 +502,6 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 
 	*_buffer = fView + fViewOffset - fRealViewOffset;
 	return B_OK;
-}
-
-
-bool 
-DataEditor::Lock()
-{
-	return fLock.Lock();
-}
-
-
-void 
-DataEditor::Unlock()
-{
-	fLock.Unlock();
 }
 
 
@@ -551,7 +533,7 @@ DataEditor::SendNotices(uint32 what, BMessage *message)
 status_t 
 DataEditor::StartWatching(BMessenger target)
 {
-	BAutolock locker(fLock);
+	BAutolock locker(this);
 
 	node_ref node;
 	status_t status = fFile.GetNodeRef(&node);
@@ -574,7 +556,7 @@ DataEditor::StartWatching(BHandler *handler, BLooper *looper)
 void 
 DataEditor::StopWatching(BMessenger target)
 {
-	BAutolock locker(fLock);
+	BAutolock locker(this);
 
 	for (int32 i = fObservers.CountItems(); i-- > 0;) {
 		BMessenger *messenger = fObservers.ItemAt(i);

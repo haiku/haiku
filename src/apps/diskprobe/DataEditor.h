@@ -14,7 +14,7 @@
 
 class DataChange;
 
-class DataEditor {
+class DataEditor : public BLocker {
 	public:
 		DataEditor();
 		DataEditor(entry_ref &ref, const char *attribute = NULL);
@@ -63,10 +63,6 @@ class DataEditor {
 
 		status_t GetViewBuffer(const uint8 **_buffer);
 
-		BLocker &Locker() { return fLock; }
-		bool Lock();
-		void Unlock();
-
 		status_t StartWatching(BMessenger target);
 		status_t StartWatching(BHandler *handler, BLooper *looper = NULL);
 		void StopWatching(BMessenger target);
@@ -92,7 +88,6 @@ class DataEditor {
 		DataChange				*fFirstChange;
 		DataChange				*fLastChange;
 
-		BLocker		fLock;
 		uint8		*fView;
 		off_t		fRealViewOffset, fViewOffset;
 		size_t		fRealViewSize, fViewSize;
