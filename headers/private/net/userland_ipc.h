@@ -25,7 +25,7 @@ enum {
 	NET_STACK_NEW_CONNECTION,
 };
 
-#define MAX_NET_AREAS 5
+#define MAX_NET_AREAS 16
 
 typedef struct {
 	area_id id;
