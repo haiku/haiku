@@ -51,7 +51,7 @@ CommonTestLib libsupporttest.so
 		#BString
 		StringTest.cpp
 		StringConstructionTest.cpp
-		StringCountCharTest.cpp
+		StringAccessTest.cpp
 		StringAssignTest.cpp
 		StringAppendTest.cpp
 		StringSubCopyTest.cpp
