@@ -1399,17 +1399,17 @@ vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 				// Since this cache now lives from the pages in its source cache,
 				// we can change the cache's commitment to take only those pages
 				// into account that really are in this cache.
-	
+
 				// count existing pages in this cache
 				struct vm_page *page = cache->page_list;
 				uint32 count = 0;
-	
+
 				for (; page != NULL; page = page->cache_next) {
 					count++;
 				}
-	
+
 				status = cache->store->ops->commit(cache->store, count * B_PAGE_SIZE);
-	
+
 				// ToDo: we may be able to join with our source cache, if any
 			}
 		}
@@ -2992,7 +2992,9 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 	if ((newProtection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
 
-	return vm_set_area_protection(vm_get_current_user_aspace_id(), area, newProtection);
+	return vm_set_area_protection(vm_get_current_user_aspace_id(), area,
+		newProtection | B_KERNEL_READ_AREA
+			| (newProtection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0));
 }
 
 
@@ -3027,7 +3029,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 		return B_BAD_ADDRESS;
 
 	clonedArea = vm_clone_area(vm_get_current_user_aspace_id(), name, &address,
-		addressSpec, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		addressSpec, protection | B_KERNEL_READ_AREA | (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0),
 		REGION_NO_PRIVATE_MAP, sourceArea);
 	if (clonedArea < B_OK)
 		return clonedArea;
@@ -3069,7 +3071,8 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 		return B_BAD_VALUE;
 
 	area = vm_create_anonymous_area(vm_get_current_user_aspace_id(), (char *)name, &address, 
-				addressSpec, size, lock, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+				addressSpec, size, lock, protection | B_KERNEL_READ_AREA
+					| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0));
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);
