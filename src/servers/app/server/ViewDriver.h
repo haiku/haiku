@@ -130,7 +130,13 @@ public:
 	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
 
 protected:
+	void FillSolidRect(const BRect &rect, RGBColor &color);
+	void FillPatternRect(const BRect &rect, const DrawData *d);
+	void StrokeSolidRect(const BRect &rect, RGBColor &color);
+	void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
 	void SetLayerData(LayerData *d, bool set_font_data=false);
+	void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
+	
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);

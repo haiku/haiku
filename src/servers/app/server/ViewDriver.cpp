@@ -891,6 +891,89 @@ void ViewDriver::InvertRect(const BRect &r)
 	screenwin->Unlock();
 }
 
+void ViewDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+{
+	if(!is_initialized)
+		return;
+		
+	screenwin->Lock();
+	framebuffer->Lock();
+	drawview->SetHighColor(color.GetColor32());
+	drawview->FillRect(rect);
+	drawview->Sync();
+	screenwin->view->Invalidate(rect);
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::FillPatternRect(const BRect &rect, const DrawData *d)
+{
+	if(!d)
+		return;
+	
+	if(!is_initialized)
+		return;
+
+	screenwin->Lock();
+	framebuffer->Lock();
+	drawview->SetHighColor(d->highcolor.GetColor32());
+	drawview->SetLowColor(d->lowcolor.GetColor32());
+	drawview->FillRect(rect,*((pattern*)d->patt.GetInt8()));
+	drawview->Sync();
+	screenwin->view->Invalidate(rect);
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+{
+	if(!d)
+		return;
+	
+	if(!is_initialized)
+		return;
+
+	screenwin->Lock();
+	framebuffer->Lock();
+	drawview->SetHighColor(d->highcolor.GetColor32());
+	drawview->SetLowColor(d->lowcolor.GetColor32());
+	drawview->StrokeLine(start,end,*((pattern*)d->patt.GetInt8()));
+	drawview->Sync();
+	screenwin->view->Invalidate(BRect(start,end));
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+{
+	if(!is_initialized)
+		return;
+
+	screenwin->Lock();
+	framebuffer->Lock();
+	drawview->SetHighColor(color.GetColor32());
+	drawview->StrokeLine(start,end);
+	drawview->Sync();
+	screenwin->view->Invalidate(BRect(start,end));
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+{
+	if(!is_initialized)
+		return;
+
+	screenwin->Lock();
+	framebuffer->Lock();
+	drawview->SetHighColor(color.GetColor32());
+	drawview->StrokeRect(rect);
+	drawview->Sync();
+	screenwin->view->Invalidate(rect);
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
 void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 {
 	if(!is_initialized)
@@ -1663,4 +1746,3 @@ status_t ViewDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
 	BScreen screen;
 	return screen.WaitForRetrace(timeout);
 }
-

@@ -10,6 +10,7 @@ UseFreeTypeHeaders ;
 
 SharedLibrary appserver :
 	areafunc.c
+	Angle.cpp
 	bget.c
 	BitmapManager.cpp
 	ColorSet.cpp
@@ -35,7 +36,6 @@ LinkSharedOSLibs libappserver.so : root be
 
 Server app_server :
 	# Misc. Sources
-	Angle.cpp
 	CursorData.cpp
 	FMWList.cpp
 	PicturePlayer.cpp
