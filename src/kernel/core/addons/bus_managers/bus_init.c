@@ -14,7 +14,9 @@ int bus_init(kernel_args *ka)
 {
 	struct config_manager_for_driver_module_info *cfm;
 	
+#if 0
 	bus_man_init(ka);
+#endif
 
 	if (get_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME, 
 	               (module_info**)&cfm) == 0) {
