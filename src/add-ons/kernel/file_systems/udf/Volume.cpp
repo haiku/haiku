@@ -228,10 +228,12 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			if (!error) {
 				file_set_descriptor *fileSet =
 				 	reinterpret_cast<file_set_descriptor*>(chunk.Data());
+				PDUMP(fileSet);
 				error = fileSet->tag().id() == TAGID_FILE_SET_DESCRIPTOR
 				        ? B_OK : B_ERROR;
 				if (!error) 
-					error = fileSet->tag().init_check(0);
+					error = fileSet->tag().init_check(
+					        logicalVolumeDescriptor.file_set_address().block());
 				if (!error) {
 					PDUMP(fileSet);
 					fRootIcb = new Icb(this, fileSet->root_directory_icb());
