@@ -118,50 +118,21 @@ int16 FontStyle::ConvertToUnicode(uint16 c)
 
 uint16 FontStyle::TranslateStyleToFace(const char *name) const
 {
-	// TODO: see how R5 translates font styles to faces for FontStyle::TranslateStyleToFace
 	if(!name)
 		return 0;
 	
 	BString str(name);
 	
-	if(str.ICompare("ultra light")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("thin")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("extra light")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("light")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("roman")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("book")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("regular")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("plain")==0)
-		return B_REGULAR_FACE;
-	if(str.ICompare("medium")==0)
-		return B_REGULAR_FACE;
 	
-	if(str.ICompare("demibold")==0)
-		return B_BOLD_FACE;
-	if(str.ICompare("bold")==0)
-		return B_BOLD_FACE;
-	if(str.ICompare("black")==0)
-		return B_BOLD_FACE;
-	if(str.ICompare("heavy")==0)
-		return B_BOLD_FACE;
-	if(str.ICompare("extra bold")==0)
-		return B_BOLD_FACE;
-	if(str.ICompare("ultra bold")==0)
+	if(str.IFindFirst("bold")!=B_ERROR)
 		return B_BOLD_FACE;
 	
-	if(str.ICompare("italic")==0)
+	if(str.IFindFirst("italic")!=B_ERROR)
 		return B_ITALIC_FACE;
-	if(str.ICompare("oblique")==0)
-		return B_BOLD_FACE;
+	if(str.IFindFirst("oblique")!=B_ERROR)
+		return B_ITALIC_FACE;
 	
-	return 0;
+	return B_REGULAR_FACE;
 }
 
 /*!
