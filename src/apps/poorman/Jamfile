@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src apps poorman ;
+
+AddResources PoorMan : PoorMan.rsrc ;
+
+App People : PoorMan.cpp
+	PoorManMainView.cpp
+	PoorManWindow.cpp
+	PoorManView.cpp
+	PoorManAdvancedView.cpp
+	StatusSlider.cpp
+	PoorManSiteView.cpp
+	PoorManLoggingView.cpp
+	PoorManPreferencesWindow.cpp 
+	PoorManApplication.cpp
+	constants.cpp
+	;
+
+LinkSharedOSLibs People : be tracker ;
+
