@@ -7,6 +7,8 @@ KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>driver_settings.c
 	<$(SOURCE_GRIST)>fs_attr.c
 	<$(SOURCE_GRIST)>fs_index.c
+	<$(SOURCE_GRIST)>fs_info.c
+	<$(SOURCE_GRIST)>fs_query.c
 	<$(SOURCE_GRIST)>image.c
 	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>sem.c
