@@ -643,6 +643,9 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 status_t 
 BlockAllocator::StartChecking(check_control *control)
 {
+	if (control == NULL)
+		return B_BAD_VALUE;
+
 	status_t status = fLock.Lock();
 	if (status < B_OK)
 		return status;
@@ -673,6 +676,9 @@ BlockAllocator::StartChecking(check_control *control)
 	cookie->iterator = NULL;
 	control->cookie = cookie;
 
+	fCheckCookie = cookie;
+		// to be able to restore nicely if "chkbfs" exited abnormally
+
 	// ToDo: check reserved area in bitmap!
 
 	return B_OK;
@@ -682,7 +688,14 @@ BlockAllocator::StartChecking(check_control *control)
 status_t 
 BlockAllocator::StopChecking(check_control *control)
 {
-	check_cookie *cookie = (check_cookie *)control->cookie;
+	check_cookie *cookie;
+	if (control == NULL)
+		cookie = fCheckCookie;
+	else
+		cookie = (check_cookie *)control->cookie;
+
+	if (cookie == NULL)
+		return B_ERROR;
 
 	if (cookie->iterator != NULL) {
 		delete cookie->iterator;
@@ -694,7 +707,7 @@ BlockAllocator::StopChecking(check_control *control)
 
 	// if CheckNextNode() could completely work through, we can
 	// fix any damages of the bitmap	
-	if (control->status == B_ENTRY_NOT_FOUND) {
+	if (control != NULL && control->status == B_ENTRY_NOT_FOUND) {
 		// calculate the number of used blocks in the check bitmap
 		size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
 		off_t usedBlocks = 0LL;
@@ -727,6 +740,7 @@ BlockAllocator::StopChecking(check_control *control)
 
 	free(fCheckBitmap);
 	fCheckBitmap = NULL;
+	fCheckCookie = NULL;
 	delete cookie;
 	fLock.Unlock();
 
@@ -737,6 +751,9 @@ BlockAllocator::StopChecking(check_control *control)
 status_t
 BlockAllocator::CheckNextNode(check_control *control)
 {
+	if (control == NULL)
+		return B_BAD_VALUE;
+
 	check_cookie *cookie = (check_cookie *)control->cookie;
 
 	while (true) {

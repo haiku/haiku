@@ -17,6 +17,7 @@ class Inode;
 struct disk_super_block;
 struct block_run;
 struct check_control;
+struct check_cookie;
 
 
 class BlockAllocator {
@@ -53,6 +54,7 @@ class BlockAllocator {
 		AllocationGroup	*fGroups;
 		int32			fNumGroups, fBlocksPerGroup;
 		uint32			*fCheckBitmap;
+		check_cookie	*fCheckCookie;
 };
 
 #endif	/* BLOCK_ALLOCATOR_H */
