@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,7 @@
 //
 //	File Name:		WinBorder.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@mymail.ro>
+//					Adi Oanca <adioanca@cotty.iren.ro>
 //	Description:	Layer subclass which handles window management
 //  
 //------------------------------------------------------------------------------
@@ -41,6 +41,7 @@
 #include "Globals.h"
 #include "RootLayer.h"
 #include "Workspace.h"
+#include "TokenSpace.h"
 
 // Toggle general function call output
 //#define DEBUG_WINBORDER
@@ -219,17 +220,16 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 			}
 		}
 	}
-	else if (sendMessage){
+	else if (sendMessage && target && target != fTopLayer){
 		BMessage msg;
-		msg.what= B_MOUSE_DOWN;
+		msg.what = B_MOUSE_DOWN;
 		msg.AddInt64("when", evt.when);
 		msg.AddPoint("where", evt.where);
 		msg.AddInt32("modifiers", evt.modifiers);
 		msg.AddInt32("buttons", evt.buttons);
 		msg.AddInt32("clicks", evt.clicks);
-		
-		// TODO: figure out how to specify the target
-		// msg.AddInt32("token", token);
+		msg.AddInt32("haiku:token", target? target->fViewToken: B_NULL_TOKEN);
+
 		Window()->SendMessageToClient(&msg);
 	}
 	
