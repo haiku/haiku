@@ -681,7 +681,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
     		if((outbound->FindInt32("x", &xValue) == B_OK) 
     			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
 				fMousePos.x += xValue;
-				fMousePos.y += yValue;
+				fMousePos.y -= yValue;
 				outbound->RemoveName("x"); 
 				outbound->RemoveName("y");
 				outbound->AddPoint("where", fMousePos);
