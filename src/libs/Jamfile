@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src libs ;
+
+SubInclude OBOS_TOP src libs freetype2 ;
