@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/1-2004 */
+/* Written by Rudolf Cornelissen 05/2002-2/2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -461,7 +461,7 @@ status_t GET_OVERLAY_CONSTRAINTS
 			oc->v_scale.min = 0.125;
 			break;
 		}
-		/* found spec on the net for GF256-GF4. Still needs confirmation... */
+		/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 		oc->h_scale.max = 8.0;
 		oc->v_scale.max = 8.0;
 

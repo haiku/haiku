@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-1/2004 */
+/* Written by Rudolf Cornelissen 05/2002-2/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -305,7 +305,7 @@ status_t nv_configure_bes
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* (assuming) all cards have a upscaling limit of 8.0 */
+	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	if (hiscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
@@ -433,7 +433,7 @@ status_t nv_configure_bes
 	viscalv = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* (assuming) all cards have a upscaling limit of 8.0 */
+	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	if (viscalv < 0x00002000)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
