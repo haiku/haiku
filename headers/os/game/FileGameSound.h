@@ -1,95 +1,105 @@
-/*******************************************************************************
-/
-/	File:			FileGameSound.h
-/
-/   Description:    BFileGameSound is a class that streams data out of a file.
-/
-/	Copyright 1999, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		FileGameSound.h
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	BFileGameSound is a class that streams data out of a file.
+//------------------------------------------------------------------------------
 
-#if !defined(_FILE_GAME_SOUND_H)
-#define _FILE_GAME_SOUND_H
+#ifndef _FILEGAMESOUND_H
+#define _FILEGAMESOUND_H
 
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
 #include <StreamingGameSound.h>
 
-class BMediaFile;
-namespace BPrivate {
-	class BTrackReader;
-}
+// Project Includes ------------------------------------------------------------
 
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+struct _gs_media_tracker;
+struct _gs_ramp;
+
+// FileGameSound -------------------------------------------------------------
 class BFileGameSound : public BStreamingGameSound
 {
 public:
-							BFileGameSound(
-									const entry_ref * file,
-									bool looping = true,
-									BGameSoundDevice * device = NULL);
-							BFileGameSound(
-									const char * file,
-									bool looping = true,
-									BGameSoundDevice * device = NULL);
+							BFileGameSound(const entry_ref * file,
+											bool looping = true,
+											BGameSoundDevice * device = NULL);
+							BFileGameSound(const char * file,
+											bool looping = true,
+											BGameSoundDevice * device = NULL);
 
-virtual						~BFileGameSound();
+	virtual					~BFileGameSound();
 
-virtual	BGameSound *		Clone() const;
+	virtual	BGameSound *	Clone() const;
 
-virtual	status_t			StartPlaying();
-virtual	status_t			StopPlaying();
-		status_t			Preload();		//	if you have stopped and want to start quickly again
+	virtual	status_t		StartPlaying();
+	virtual	status_t		StopPlaying();
+			status_t		Preload();		//	if you have stopped and want to start quickly again
 
-virtual	void				FillBuffer(
-									void * inBuffer,
-									size_t inByteCount);
-
-virtual	status_t Perform(int32 selector, void * data);
-
-virtual	status_t			SetPaused(
-									bool isPaused,
-									bigtime_t rampTime);
-		enum {
-			B_NOT_PAUSED,
-			B_PAUSE_IN_PROGRESS,
-			B_PAUSED
-		};
-		int32				IsPaused();
+	virtual	void			FillBuffer(void * inBuffer,
+										size_t inByteCount);
+	virtual	status_t 		Perform(int32 selector, void * data);
+	virtual	status_t		SetPaused(bool isPaused,
+										bigtime_t rampTime);
+			enum {
+				B_NOT_PAUSED,
+				B_PAUSE_IN_PROGRESS,
+				B_PAUSED
+			};
+			int32			IsPaused();
 
 private:
 
-		BMediaFile *		_m_soundFile;
-		BPrivate::BTrackReader *	_m_trackReader;
-		bool				_m_looping;
-		bool				_m_stopping;
-		uchar				_m_zero;
-		uchar				_m_reserved_u;
-
-		//	cruft for read-ahead goes here
-		thread_id			_m_streamThread;
-		port_id				_m_streamPort;
-		enum {
-			cmdStartPlaying = 1,
-			cmdStopPlaying,
-			cmdUsedBytes,
-			cmdPreload
-		};
-		int32				_m_loopCount;
-		char *				_m_buffer;
-		size_t				_m_bufferSize;
-		int32				_m_stopCount;
-		int32				_m_pauseState;
-		float				_m_pauseGain;
-		float				_m_pausePan;
-
-static	status_t			stream_thread(
-									void * that);
-		void				LoadFunc();
-		size_t				Load(
-									size_t & offset,
-									size_t bytes);
-		void				read_data(
-									char * dest,
-									size_t bytes);
-
+			_gs_media_tracker *	fAudioStream;
+			
+			bool				fStopping;
+			bool				fLooping;
+			char				fReserved;
+			char *				fBuffer;
+			
+			size_t				fFrameSize;
+			size_t				fBufferSize;
+			size_t				fPlayPosition;
+			
+			thread_id			fReadThread;
+			port_id				fPort;
+			
+			_gs_ramp *			fPausing;
+			bool				fPaused;
+			float				fPauseGain;
+			
+			status_t			Init(const entry_ref* file);
+			
+	static	int32				ReadThread(void* arg);
+			
+			bool				Load();
+			bool				Read(void * buffer, size_t bytes);
+				
 	/* leave these declarations private unless you plan on actually implementing and using them. */
 	BFileGameSound();
 	BFileGameSound(const BFileGameSound&);
@@ -97,7 +107,7 @@ static	status_t			stream_thread(
 
 	/* fbc data and virtuals */
 
-	uint32 _reserved_BFileGameSound_[8];
+	uint32 _reserved_BFileGameSound_[9];
 
 		status_t _Reserved_BFileGameSound_0(int32 arg, ...);	/* SetPaused(bool paused, bigtime_t ramp); */
 virtual	status_t _Reserved_BFileGameSound_1(int32 arg, ...);

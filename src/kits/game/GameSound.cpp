@@ -1,65 +1,120 @@
-/* 
- * Copyright 2002, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the MIT License.
- */
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		GameSound.cpp
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	Provides much of interfaces with BGameSoundDevice on behalf
+//					of the rest of it's childern.
+//------------------------------------------------------------------------------
 
+// Standard Includes -----------------------------------------------------------
+#include <stdio.h>
+
+// System Includes -------------------------------------------------------------
+
+// Project Includes ------------------------------------------------------------
+#include <GameSoundBuffer.h>
+#include <GameSoundDevice.h>
+
+// Local Includes --------------------------------------------------------------
 #include <GameSound.h>
 
+// Local Defines ---------------------------------------------------------------
+
+// BGameSound class ------------------------------------------------------------
 BGameSound::BGameSound(BGameSoundDevice *device)
+		:	fSound(-1)
 {
+	fDevice = GetDefaultDevice();
+	fInitError = fDevice->InitCheck();
+}
+
+
+BGameSound::BGameSound(const BGameSound &other)
+		:	fSound(-1)
+{
+	memcpy(&fFormat, &other.fFormat, sizeof(gs_audio_format));
+	fDevice = GetDefaultDevice();
+	
+	fInitError = fDevice->InitCheck();	
 }
 
 
 BGameSound::~BGameSound()
 {
+	if (fSound >= 0)
+		fDevice->ReleaseBuffer(fSound);
+		
+	ReleaseDevice();
 }
 
 
 status_t
 BGameSound::InitCheck() const
 {
-	return B_ERROR;
+	return fInitError;
 }
 
 
 BGameSoundDevice *
 BGameSound::Device() const
 {
-	return NULL;
+	return fDevice;
 }
 
 
 gs_id
 BGameSound::ID() const
 {
-	return 0;
+	return fSound;
 }
 
 
 const gs_audio_format &
 BGameSound::Format() const
 {
+	return fDevice->Format(fSound);
 }
 
 
 status_t
 BGameSound::StartPlaying()
 {
-	return B_ERROR;
+	fDevice->StartPlaying(fSound);
+	return B_OK;
 }
 
 
 bool
 BGameSound::IsPlaying()
 {
-	return false;
+	return fDevice->IsPlaying(fSound);
 }
 
 
 status_t
 BGameSound::StopPlaying()
 {
-	return B_ERROR;
+	fDevice->StopPlaying(fSound);
+	return B_OK;
 }
 
 
@@ -67,7 +122,14 @@ status_t
 BGameSound::SetGain(float gain,
 					bigtime_t duration)
 {
-	return B_ERROR;
+	gs_attribute attribute;
+	
+	attribute.attribute = B_GS_GAIN;
+	attribute.value = gain;
+	attribute.duration = duration;
+	attribute.flags = 0;
+	
+	return fDevice->SetAttributes(fSound, &attribute, 1); 
 }
 
 
@@ -75,21 +137,44 @@ status_t
 BGameSound::SetPan(float pan,
 				   bigtime_t duration)
 {
-	return B_ERROR;
+	gs_attribute attribute;
+	
+	attribute.attribute = B_GS_PAN;
+	attribute.value = pan;
+	attribute.duration = duration;
+	attribute.flags = 0;
+	
+	return fDevice->SetAttributes(fSound, &attribute, 1);
 }
 
 
 float
 BGameSound::Gain()
 {
-	return 0.0f;
+	gs_attribute attribute;
+	
+	attribute.attribute = B_GS_GAIN;
+	attribute.flags = 0;
+	
+	if (fDevice->GetAttributes(fSound, &attribute, 1) != B_OK)
+		return 0.0;
+		
+	return attribute.value;
 }
 
 
 float
 BGameSound::Pan()
 {
-	return 0.0f;
+	gs_attribute attribute;
+	
+	attribute.attribute = B_GS_PAN;
+	attribute.flags = 0;
+	
+	if (fDevice->GetAttributes(fSound, &attribute, 1) != B_OK)
+		return 0.0;
+		
+	return attribute.value;
 }
 
 
@@ -97,7 +182,7 @@ status_t
 BGameSound::SetAttributes(gs_attribute *inAttributes,
 						  size_t inAttributeCount)
 {
-	return B_ERROR;
+	return fDevice->SetAttributes(fSound, inAttributes, inAttributeCount);
 }
 
 
@@ -105,7 +190,7 @@ status_t
 BGameSound::GetAttributes(gs_attribute *outAttributes,
 						  size_t inAttributeCount)
 {
-	return B_ERROR;
+	return fDevice->GetAttributes(fSound, outAttributes, inAttributeCount);
 }
 
 
@@ -116,7 +201,7 @@ BGameSound::Perform(int32 selector,
 	return B_ERROR;
 }
 
-
+/*
 void *
 BGameSound::operator new(size_t size)
 {
@@ -128,7 +213,7 @@ void
 BGameSound::operator delete(void *ptr)
 {
 }
-
+*/
 
 status_t
 BGameSound::SetMemoryPoolSize(size_t in_poolSize)
@@ -147,34 +232,39 @@ BGameSound::LockMemoryPool(bool in_lockInCore)
 int32
 BGameSound::SetMaxSoundCount(int32 in_maxCount)
 {
-	return 0;
+	return in_maxCount;
 }
 
 
 status_t
 BGameSound::SetInitError(status_t in_initError)
 {
-	return B_ERROR;
+	fInitError = in_initError;
+	return B_OK;
 }
 
 
 status_t
 BGameSound::Init(gs_id handle)
 {
-	return B_ERROR;
+	if (fSound < 0) fSound = handle;
+		 		
+	return B_OK;
 }
 
-
-BGameSound::BGameSound(const BGameSound &other)
-{
-}
-
-
+/*
 BGameSound &
 BGameSound::operator=(const BGameSound &other)
 {
+	if (fSound)
+		fDevice->ReleaseBuffer(fSound);
+	
+	fSound = other.fSound;
+	fInitError = other.fInitError;
+	
+	return this;
 }
-
+*/
 
 /* unimplemented for protection of the user:
  *

@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kits game ;
 UsePublicHeaders game ;
 
 SharedLibrary game :
+	# Public Game Kit
 	DirectWindow.cpp
 	WindowScreen.cpp
 	GameSound.cpp
@@ -10,9 +11,14 @@ SharedLibrary game :
 	FileGameSound.cpp
 	PushGameSound.cpp
 	StreamingGameSound.cpp
+
+	# Internal Functionality
+	GameProducer.cpp
+	GameSoundBuffer.cpp
+	GameSoundDevice.cpp
+	GSUtility.cpp
 ;
 
 LinkSharedOSLibs libgame.so :
-	be
+	be media
 ;
-

@@ -1,15 +1,61 @@
-/* 
- * Copyright 2002, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the MIT License.
- */
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		StreamingGameSound.cpp
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	BStreamingGameSound is a class for all kinds of streaming
+//					(data not known beforehand) game sounds.
+//------------------------------------------------------------------------------
 
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
+
+// Project Includes ------------------------------------------------------------
+#include <GameSoundDevice.h>
+
+// Local Includes --------------------------------------------------------------
 #include <StreamingGameSound.h>
 
+// Local Defines ---------------------------------------------------------------
 BStreamingGameSound::BStreamingGameSound(size_t inBufferFrameCount,
 										 const gs_audio_format *format,
 										 size_t inBufferCount,
 										 BGameSoundDevice *device)
- :	BGameSound(device)
+ 	:	BGameSound(device),
+ 		fStreamHook(NULL),
+ 		fStreamCookie(NULL)
+{
+	if (InitCheck() == B_OK)
+	{
+		status_t error = SetParameters(inBufferFrameCount, format, inBufferCount);
+		SetInitError(error);
+	}	
+}
+
+
+BStreamingGameSound::BStreamingGameSound(BGameSoundDevice *device)
+ 	:	BGameSound(device),
+ 		fStreamHook(NULL),
+ 		fStreamCookie(NULL)
 {
 }
 
@@ -30,7 +76,10 @@ status_t
 BStreamingGameSound::SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
 								   void * cookie)
 {
-	return B_ERROR;
+	fStreamHook = hook;
+	fStreamCookie = cookie;
+	
+	return B_OK;
 }
 
 
@@ -38,14 +87,8 @@ void
 BStreamingGameSound::FillBuffer(void *inBuffer,
 								size_t inByteCount)
 {
-}
-
-
-status_t
-BStreamingGameSound::SetAttributes(gs_attribute *inAttributes,
-								   size_t inAttributeCount)
-{
-	return B_ERROR;
+	if (fStreamHook) 
+		(fStreamHook)(fStreamCookie, inBuffer, inByteCount, this);
 }
 
 
@@ -57,42 +100,38 @@ BStreamingGameSound::Perform(int32 selector,
 }
 
 
-BStreamingGameSound::BStreamingGameSound(BGameSoundDevice *device)
- :	BGameSound(device)
+status_t			
+BStreamingGameSound::SetAttributes(gs_attribute * inAttributes,
+									size_t inAttributeCount)
 {
+	return BGameSound::SetAttributes(inAttributes, inAttributeCount);
 }
 
 
 status_t
 BStreamingGameSound::SetParameters(size_t inBufferFrameCount,
-								   const gs_audio_format *format,
-								   size_t inBufferCount)
+						  const gs_audio_format *format,
+						  size_t inBufferCount)
 {
-	return B_ERROR;
+	gs_id sound;
+	status_t error = Device()->CreateBuffer(&sound, this, format);
+	if (error != B_OK) return error;
+	
+	return BGameSound::Init(sound);
 }
 
 
 bool
 BStreamingGameSound::Lock()
 {
-	return false;
+	return fLock.Lock();
 }
 
 
 void
 BStreamingGameSound::Unlock()
 {
-}
-
-
-void
-BStreamingGameSound::stream_callback(void *cookie,
-									 gs_id handle,
-									 void *buffer,
-									 int32 offset,
-									 int32 size,
-									 size_t bufSize)
-{
+	fLock.Unlock();
 }
 
 

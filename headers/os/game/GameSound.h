@@ -1,110 +1,109 @@
-/*******************************************************************************
-/
-/	File:			GameGameSound.h
-/
-/   Description:    BGameSound is an abstract base class for all sounds being
-/					played using the gamesound kit. Use one of the concrete
-/					subclasses for actually playing sound.
-/
-/	Copyright 1999, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		GameSound.h
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	Base class for play sounds using the game kit
+//------------------------------------------------------------------------------
 
+#ifndef _GAMESOUND_H
+#define _GAMESOUND_H
 
-#if !defined(_GAME_SOUND_H)
-#define _GAME_SOUND_H
+// Standard Includes -----------------------------------------------------------
 
-
+// System Includes -------------------------------------------------------------
 #include <GameSoundDefs.h>
-#include <new>
 
-struct gs_audio_format;
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
 class BGameSoundDevice;
 
-namespace BPrivate {
-	class PrivGameSound;
-}
-
+// BGameSound class -------------------------------------------------------------
 class BGameSound
 {
 public:
-							BGameSound(
-									BGameSoundDevice * device = NULL);
-virtual						~BGameSound();
+									BGameSound(BGameSoundDevice * device = NULL);
+	virtual							~BGameSound();
 
-virtual	BGameSound *		Clone() const = 0;
-		status_t			InitCheck() const;
+	virtual	BGameSound *			Clone() const = 0;
+			status_t				InitCheck() const;
+			
+			// BGameSound attributes
+			BGameSoundDevice *		Device() const;
+			gs_id					ID() const;
+			const gs_audio_format & Format() const;		//	only valid after Init()
 
-		BGameSoundDevice *	Device() const;
-		gs_id				ID() const;
-		const gs_audio_format &
-							Format() const;		//	only valid after Init()
+			// Playing sounds
+	virtual	status_t				StartPlaying();
+	virtual	bool					IsPlaying();
+	virtual	status_t				StopPlaying();
 
-virtual	status_t			StartPlaying();
-virtual	bool				IsPlaying();
-virtual	status_t			StopPlaying();
+			
+			// Modifing the playback
+			status_t				SetGain(float gain,
+											bigtime_t duration = 0);	//	ramp duration in seconds
+			status_t				SetPan(float pan,
+											bigtime_t duration = 0);	//	ramp duration in seconds
+			float					Gain();
+			float					Pan();
 
-		status_t			SetGain(
-									float gain,
-									bigtime_t duration = 0);	//	ramp duration in seconds
-		status_t			SetPan(
-									float pan,
-									bigtime_t duration = 0);	//	ramp duration in seconds
-		float				Gain();
-		float				Pan();
+	virtual	status_t				SetAttributes(gs_attribute * inAttributes,
+													size_t inAttributeCount);
+	virtual	status_t				GetAttributes(gs_attribute * outAttributes,
+													size_t inAttributeCount);
 
-virtual	status_t			SetAttributes(
-									gs_attribute * inAttributes,
-									size_t inAttributeCount);
-virtual	status_t			GetAttributes(
-									gs_attribute * outAttributes,
-									size_t inAttributeCount);
+//			void * 					operator new(size_t size);
+//			void *					operator new(size_t size, const nothrow_t &) throw();
+//			void					operator delete(void * ptr);
+//#if !__MWERKS__
+			//	there's a bug in MWCC under R4.1 and earlier
+//			void					operator delete(void * ptr, 
+//													const nothrow_t &) throw();
+//#endif
 
-virtual	status_t Perform(int32 selector, void * data);
-
-		void * 				operator new(
-									size_t size);
-		void *				operator new(
-									size_t size,
-									const nothrow_t &) throw();
-		void				operator delete(
-									void * ptr);
-#if !__MWERKS__
-		//	there's a bug in MWCC under R4.1 and earlier
-		void				operator delete(
-									void * ptr, 
-									const nothrow_t &) throw();
-#endif
-
-static	status_t			SetMemoryPoolSize(		//	implemented in PrivGameSound.cpp
-									size_t in_poolSize);
-static	status_t			LockMemoryPool(			//	implemented in PrivGameSound.cpp
-									bool in_lockInCore);
-static	int32				SetMaxSoundCount(		//	implemented in PrivGameSound.cpp
-									int32 in_maxCount);
-
+			static	status_t		SetMemoryPoolSize(size_t in_poolSize);
+			static	status_t		LockMemoryPool(bool in_lockInCore);
+			static	int32			SetMaxSoundCount(int32 in_maxCount);
+			
+			virtual	status_t 		Perform(int32 selector, void * data);
 protected:
 
-		status_t			SetInitError(
-									status_t in_initError);
-		status_t			Init(
-									gs_id handle);
+			status_t				SetInitError(status_t in_initError);
+			status_t				Init(gs_id handle);
 
-							BGameSound(
-									const BGameSound & other);
-		BGameSound &		operator=(
-									const BGameSound & other);
-
+									BGameSound(const BGameSound & other);
+			BGameSound &			operator=(const BGameSound & other);
+			
 private:
-
-	friend class BPrivate::PrivGameSound;
-
-		gs_id	_m_handle;
-		BGameSoundDevice *	_m_device;
-		gs_audio_format
-							_m_format;
-		status_t			_m_initError;
-
+			BGameSoundDevice*		fDevice;
+			status_t				fInitError;
+			
+			gs_audio_format			fFormat;		
+			gs_id					fSound;
+	
 	/* leave these declarations private unless you plan on actually implementing and using them. */
 	BGameSound();
 

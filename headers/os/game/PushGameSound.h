@@ -1,30 +1,54 @@
-/*******************************************************************************
-/
-/	File:			PushGameSound.h
-/
-/   Description:    BPushGameSound is a class for games that want to push data
-/					at the system, rather than have a callback get called.
-/
-/	Copyright 1999, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		FileGameSound.h
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	BFileGameSound is a class that streams data out of a file.
+//------------------------------------------------------------------------------
 
+#ifndef _PUSHGAMESOUND_H
+#define _PUSHGAMESOUND_H
+// Standard Includes -----------------------------------------------------------
 
-#if !defined(_PUSH_GAME_SOUND_H)
-#define _PUSH_GAME_SOUND_H
-
+// System Includes -------------------------------------------------------------
 #include <StreamingGameSound.h>
 
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+
+// FileGameSound -------------------------------------------------------------
 class BPushGameSound : public BStreamingGameSound
 {
 public:
-							BPushGameSound(
-									size_t inBufferFrameCount,
-									const gs_audio_format * format,
-									size_t inBufferCount = 2,
-									BGameSoundDevice * device = NULL);
+							BPushGameSound(size_t inBufferFrameCount,
+											const gs_audio_format * format,
+											size_t inBufferCount = 2,
+											BGameSoundDevice * device = NULL);
 
-virtual						~BPushGameSound();
+	virtual					~BPushGameSound();
 
 		enum lock_status {
 			lock_failed = -1,		//	not yet time to do more
@@ -32,56 +56,57 @@ virtual						~BPushGameSound();
 			lock_ok_frames_dropped	//	you may have missed some buffers
 		};
 
-virtual	lock_status		LockNextPage(
-									void ** out_pagePtr,
-									size_t * out_pageSize);
-virtual	status_t			UnlockPage(
-									void * in_pagePtr);
+	virtual	lock_status		LockNextPage(void ** out_pagePtr,
+											size_t * out_pageSize);
+	virtual	status_t		UnlockPage(void * in_pagePtr);
 
-virtual	lock_status		LockForCyclic(
-									void ** out_basePtr,
-									size_t * out_size);
-virtual	status_t			UnlockCyclic();
-virtual	size_t				CurrentPosition();
+	virtual	lock_status		LockForCyclic(void ** out_basePtr,
+											size_t * out_size);
+	virtual	status_t		UnlockCyclic();
+	virtual	size_t			CurrentPosition();
 
-virtual	BGameSound *		Clone() const;
+	virtual	BGameSound *	Clone() const;
 
-virtual	status_t Perform(int32 selector, void * data);
+	virtual	status_t 		Perform(int32 selector, void * data);
 
 protected:
+		
+							BPushGameSound(BGameSoundDevice * device);
 
-virtual	status_t			SetParameters(			//	will allocate handle and call Init()
-									size_t inBufferFrameCount,
-									const gs_audio_format * format,
-									size_t inBufferCount);
+	virtual	status_t		SetParameters(size_t inBufferFrameCount,
+												const gs_audio_format * format,
+												size_t inBufferCount);
 
-virtual	status_t			SetStreamHook(
-									void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
-									void * cookie);
-virtual	void				FillBuffer(			//	default is to call stream hook, if any
-									void * inBuffer,
-									size_t inByteCount);
+	virtual	status_t		SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
+												void * cookie);
+												
+	virtual	void			FillBuffer(void * inBuffer,
+											size_t inByteCount);
 
 
 private:
 
-	/* leave these declarations private unless you plan on actually implementing and using them. */
-	BPushGameSound();
-	BPushGameSound(const BPushGameSound&);
-	BPushGameSound& operator=(const BPushGameSound&);
+			/* leave these declarations private unless you plan on actually implementing and using them. */
+			BPushGameSound();
+			BPushGameSound(const BPushGameSound&);
+			BPushGameSound& operator=(const BPushGameSound&);
 
-		int32				_m_benCount;
-		sem_id				_m_benSem;
-		char *				_m_lockedPtr;
-		char *				_m_playedPtr;
-		size_t				_m_pageSize;
-		int32				_m_pageCount;
-		size_t				_m_bufSize;
-		char *				_m_buffer;
+			bool			BytesReady(size_t * bytes);
+			
+			sem_id			fLock;
+			BList *			fPageLocked;
+			
+			size_t			fLockPos;
+			size_t			fPlayPos;
+			
+			char *			fBuffer;
+			size_t			fPageSize;
+			int32			fPageCount;
+			size_t			fBufferSize;
 
-	/* fbc data and virtuals */
+			/* fbc data and virtuals */
 
-	uint32 _reserved_BPushGameSound_[12];
+			uint32 _reserved_BPushGameSound_[12];
 
 virtual	status_t _Reserved_BPushGameSound_0(int32 arg, ...);
 virtual	status_t _Reserved_BPushGameSound_1(int32 arg, ...);

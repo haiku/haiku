@@ -1,67 +1,87 @@
-/*******************************************************************************
-/
-/	File:			StreamingGameSound.h
-/
-/   Description:    BStreamingGameSound is a class for all kinds of streaming
-/					(data not known beforehand) game sounds.
-/
-/	Copyright 1999, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		StreamingGameSound.h
+//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
+//	Description:	BStreamingGameSound is a class for all kinds of streaming
+//					(data not known beforehand) game sounds.
+//------------------------------------------------------------------------------
 
 
-#if !defined(_STREAMING_GAME_SOUND_H)
-#define _STREAMING_GAME_SOUND_H
+#ifndef _STREAMINGGAMESOUND_H
+#define _STREAMINGGAMESOUND_H
 
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
 #include <SupportDefs.h>
 #include <GameSound.h>
 #include <Locker.h>
 
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+
 class BStreamingGameSound : public BGameSound
 {
 public:
-							BStreamingGameSound(
-									size_t inBufferFrameCount,
-									const gs_audio_format * format,
-									size_t inBufferCount = 2,
-									BGameSoundDevice * device = NULL);
+							BStreamingGameSound(size_t inBufferFrameCount,
+												const gs_audio_format * format,
+												size_t inBufferCount = 2,
+												BGameSoundDevice * device = NULL);
 
-virtual						~BStreamingGameSound();
+	virtual					~BStreamingGameSound();
 
-virtual	BGameSound *		Clone() const;
+	virtual	BGameSound *	Clone() const;
 
-virtual	status_t			SetStreamHook(
-									void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
-									void * cookie);
-virtual	void				FillBuffer(			//	default is to call stream hook, if any
-									void * inBuffer,
-									size_t inByteCount);
+	virtual	status_t		SetStreamHook(void (*hook)(void * inCookie, void * inBuffer, size_t inByteCount, BStreamingGameSound * me),
+										  void * cookie);
+	virtual	void			FillBuffer(void * inBuffer,
+										size_t inByteCount);
 
-virtual	status_t			SetAttributes(
-									gs_attribute * inAttributes,
-									size_t inAttributeCount);
+	virtual	status_t		SetAttributes(gs_attribute * inAttributes,
+										  size_t inAttributeCount);
 
-virtual	status_t Perform(int32 selector, void * data);
+	virtual	status_t 		Perform(int32 selector, void * data);
 
 protected:
 
-							BStreamingGameSound(
-									BGameSoundDevice * device);
-virtual	status_t			SetParameters(			//	will allocate handle and call Init()
-									size_t inBufferFrameCount,
-									const gs_audio_format * format,
-									size_t inBufferCount);
-
-		bool				Lock();
-		void				Unlock();
+							BStreamingGameSound(BGameSoundDevice * device);
+	
+	virtual status_t		SetParameters(size_t inBufferFrameCount,
+								 		  const gs_audio_format * format,
+								 		  size_t inBufferCount);
+		
+			bool			Lock();
+			void			Unlock();
 
 private:
 
-		void				(*_m_streamHook)(void * cookie, void * buffer, size_t bytes, BStreamingGameSound * sound);
-		void *				_m_streamCookie;
-		BLocker				_m_lock;
-
-static	void				stream_callback(void * cookie, gs_id handle, void * buffer, int32 offset, int32 size, size_t bufSize);
+		void				(*fStreamHook)(void * cookie, void * buffer, size_t bytes, BStreamingGameSound * sound);
+		void *				fStreamCookie;
+		BLocker				fLock;
 
 	/* leave these declarations private unless you plan on actually implementing and using them. */
 	BStreamingGameSound();
