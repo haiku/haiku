@@ -44,6 +44,7 @@
 #include "AccelerantDriver.h"
 #include "ViewDriver.h"
 #include "DirectDriver.h"
+#include "DisplayDriverPainter.h"
 
 //#define DEBUG_DESKTOP
 
@@ -93,11 +94,19 @@ void Desktop::Init(void)
 				AddDriver(driver);
 				initDrivers = false;
 			}
+			break;
 		}
 		case DIRECTDRIVER:
 		{
 			// It would be nice to have this for the default testing driver. Someday....
 			driver = new DirectDriver();
+			AddDriver(driver);
+			break;
+		}
+		case PAINTERDRIVER:
+		{
+			// It would be nice to have this for the default testing driver. Someday....
+			driver = new DisplayDriverPainter();
 			AddDriver(driver);
 			break;
 		}
