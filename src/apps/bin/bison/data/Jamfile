@@ -4,15 +4,15 @@ MakeLocate <etc>c.m4 : $(OBOS_ETC_DIR) ;
 File <etc>c.m4 : c.m4 ;
 LocalClean clean : <etc>c.m4 ;
 
-MakeLocate <etc>glr.c :  $(OBOS_ETC_DIR);
+MakeLocate <etc>glr.c :  $(OBOS_ETC_DIR) ;
 File <etc>glr.c : glr.c ;
 LocalClean clean : <etc>glr.c ;
 
-MakeLocate <etc>lalr1.cc :  $(OBOS_ETC_DIR);
+MakeLocate <etc>lalr1.cc :  $(OBOS_ETC_DIR) ;
 File <etc>lalr1.cc : lalr1.cc ;
 LocalClean clean : <etc>lalr1.cc ;
 
-MakeLocate <etc>yacc.c :  $(OBOS_ETC_DIR);
+MakeLocate <etc>yacc.c :  $(OBOS_ETC_DIR) ;
 File <etc>yacc.c : yacc.c ;
 LocalClean clean : <etc>yacc.c ;
 
