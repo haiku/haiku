@@ -317,12 +317,47 @@ static void gx00_bes_calc_move_overlay(move_overlay_info *moi)
 	moi->a1orgv &= 0x01fffff0;
 
 	/* field 1 weight: AND below required by hardware, also make sure 'sign' is always 'positive' */
-	moi->v1srcstv &= 0x0000fffc;//fixme: was v1wghtv
+	moi->v1srcstv &= 0x0000fffc;
 }
 
-//fixme: impl:
 static void gx00_bes_program_move_overlay(move_overlay_info moi)
 {
+	/*************************************
+	 *** sync to BES (Back End Scaler) ***
+	 *************************************/
+
+	/* Make sure reprogramming the BES completes before the next retrace occurs,
+	 * to prevent register-update glitches (double buffer feature). */
+
+	LOG(3,("Overlay: starting register programming beyond Vcount %d\n", CR1R(VCOUNT)));
+	/* Even at 1600x1200x90Hz, a single line still takes about 9uS to complete:
+	 * this resolution will generate about 180Mhz pixelclock while we can do
+	 * upto 360Mhz. So snooze about 4uS to prevent bus-congestion... 
+	 * Appr. 200 lines time will provide enough room even on a 100Mhz CPU if it's
+	 * screen is set to the highest refreshrate/resolution possible. */
+	while ((uint16)CR1R(VCOUNT) > (si->dm.timing.v_total - 200)) snooze(4);
+
+
+	/**************************************
+	 *** actually program the registers ***
+	 **************************************/
+
+	BESW(HCOORD, moi.hcoordv);
+	BESW(VCOORD, moi.vcoordv);
+//	BESW(HISCAL, hiscalv);
+	BESW(HSRCST, moi.hsrcstv);
+	BESW(HSRCEND, moi.hsrcendv);
+//	BESW(HSRCLST, hsrclstv);
+//	BESW(VISCAL, viscalv);
+	BESW(A1ORG, moi.a1orgv);
+	BESW(V1WGHT, moi.v1srcstv);
+//	BESW(V1SRCLST, v1srclstv);
+//	BESW(GLOBCTL, globctlv);  
+//	BESW(CTL, ctlv);  
+
+	/* on a 500Mhz P3 CPU just logging a line costs 400uS (18-19 vcounts at 1024x768x60Hz)!
+	 * programming the registers above actually costs 180uS here */
+	LOG(3,("Overlay: completed at Vcount %d\n", CR1R(VCOUNT)));
 }
 
 status_t gx00_configure_bes
