@@ -123,6 +123,7 @@ void
 StyledEditApp::CloseDocument()
 {
 	fWindowCount--;
+	windowRect.OffsetBy(-15,-15);
 	if (fWindowCount == 0) {
 		BAutolock lock(this);
 		Quit();
