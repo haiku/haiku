@@ -94,4 +94,6 @@ private:
 	cursor_which _current_which;
 };
 
+extern CursorManager *cursormanager;
+
 #endif

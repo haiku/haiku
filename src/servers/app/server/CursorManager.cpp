@@ -28,6 +28,9 @@
 #include "ServerCursor.h"
 #include <Errors.h>
 
+//! The global cursor manager object. Allocated and freed by AppServer class
+CursorManager *cursormanager;
+
 //! Initializes the CursorManager
 CursorManager::CursorManager(void)
 {
