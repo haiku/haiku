@@ -447,7 +447,7 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 			partial = true;
 		}
 
-		if (Cache::Read(fVolume, run, buffer + bytesRead) != B_OK) {
+		if (Cache::Read(fVolume, run, buffer + bytesRead) < B_OK) {
 			*_length = bytesRead;
 			RETURN_ERROR(B_BAD_VALUE);
 		}
