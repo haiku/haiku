@@ -22,6 +22,14 @@ StdBinCommands
 	: be ;
 
 StdBinCommands
+	translate.cpp
+	: be translation ;
+	
+StdBinCommands
+	installsound.cpp
+	: be media ;
+	
+StdBinCommands
 	catattr.cpp
 	roster.cpp
 	: be stdc++.r4 ;
@@ -44,6 +52,7 @@ StdBinCommands
 	ps.c
 	renice.c
 	rescan.c
+	rmattr.cpp
 	sysinfo.c
 	unchop.c
 	unmount.c
