@@ -37,7 +37,7 @@ public:
 	BFile(const entry_ref *ref, uint32 openMode);
 	BFile(const BEntry *entry, uint32 openMode);
 	BFile(const char *path, uint32 openMode);
-	BFile(BDirectory *dir, const char *path, uint32 openMode);
+	BFile(const BDirectory *dir, const char *path, uint32 openMode);
 	virtual ~BFile();
 
 	status_t SetTo(const entry_ref *ref, uint32 openMode);

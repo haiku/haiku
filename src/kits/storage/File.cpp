@@ -94,7 +94,7 @@ BFile::BFile(const char *path, uint32 openMode)
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
-BFile::BFile(BDirectory *dir, const char *path, uint32 openMode)
+BFile::BFile(const BDirectory *dir, const char *path, uint32 openMode)
 	 : BNode(),
 	   BPositionIO(),
 	   fMode(0)
