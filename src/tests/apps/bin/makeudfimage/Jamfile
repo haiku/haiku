@@ -1,0 +1,30 @@
+SubDir OBOS_TOP src tests apps bin makeudfimage ;
+
+UsePrivateHeaders [ FDirName kernel util ] ;	# For kernel_cpp.h
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src apps bin makeudfimage ] ;
+
+TestLib libmakeudfimagetest.so
+	: MakeudfimageTestAddon.cpp
+        # test files
+		AllocatorTest.cpp
+		
+		# makeudfimage files
+		Allocator.cpp
+		PhysicalPartitionAllocator.cpp
+		
+		# udf files
+		UdfDebug.cpp
+		UdfString.cpp
+		UdfStructures.cpp
+		Utils.cpp
+
+	: [ FDirName $(OBOS_TEST_DIR) unittester lib ]
+	: be stdc++.r4
+	:
+;
+
+SEARCH on [ FGristFiles Allocator.cpp PhysicalPartitionAllocator.cpp ]
+	= [ FDirName $(OBOS_TOP) src apps bin makeudfimage ] ;
+SEARCH on [ FGristFiles UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp ] #DString.cpp UdfDebug.cpp UdfString.cpp UdfStructures.cpp Utils.cpp ]
+	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
