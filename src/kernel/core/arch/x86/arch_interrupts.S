@@ -157,7 +157,7 @@ FUNCTION(i386_stack_switch):
 	jmp		*%edx
 
 FUNCTION(i386_return_from_signal):
-	popl	%eax		// flush the only signal handler parameter
+	addl	$12, %esp	// Flushes the 3 arguments to sa_handler
 	movl	$103, %eax	// This syscall will restore the cpu context to the
 	movl	$0, %ecx	// one existing before calling the signal handler
 	lea		4(%esp), %edx
