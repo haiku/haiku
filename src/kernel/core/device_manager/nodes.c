@@ -37,6 +37,9 @@
 #endif
 
 
+benaphore gNodeLock;
+
+
 // increase ref_count of node
 
 void
