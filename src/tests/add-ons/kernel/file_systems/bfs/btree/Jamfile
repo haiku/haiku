@@ -1,0 +1,25 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems befs btree ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+
+rule FPreIncludes { return -include\ $(1:D=$(SUBDIR)) ; }
+
+{
+	local defines = [ FDefines USER DEBUG ] ; # _NO_INLINE_ASM
+	local preIncludes = [ FPreIncludes Journal.h Inode.h ] ;
+	SubDirC++Flags $(defines) $(preIncludes) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+}
+
+SimpleTest btreeTest
+	: test.cpp
+	  Volume.cpp
+	  Inode.cpp
+	  cache.cpp
+	  BPlusTree.cpp
+	  Utility.cpp
+	  Debug.cpp
+	: be ;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles BPlusTree.cpp Utility.cpp Debug.cpp ]
+	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
