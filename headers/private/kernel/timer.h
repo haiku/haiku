@@ -86,6 +86,10 @@ int  timer_interrupt(void);
 int local_timer_cancel_event(timer *event);
 int _local_timer_cancel_event(int curr_cpu, timer *event);
 
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 /** @} */
 
 #endif /* _KERNEL_TIMER_H */
