@@ -600,10 +600,20 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	fSuperBlock.root_dir = ToBlockRun(id);
 
 	if ((flags & VOLUME_NO_INDICES) == 0) {
-		if ((status = CreateIndicesRoot(&transaction)) < B_OK)
+		// The indices root directory will be created automatically
+		// when the standard indices are created (or any other).
+		Index index(this);
+		status = index.Create(&transaction, "name", B_STRING_TYPE);
+		if (status < B_OK)
 			return status;
 
-		// ToDo: add "name", "last_modified", and "size" indices
+		status = index.Create(&transaction, "last_modified", B_INT64_TYPE);
+		if (status < B_OK)
+			return status;
+
+		status = index.Create(&transaction, "size", B_INT64_TYPE);
+		if (status < B_OK)
+			return status;
 	}
 
 	WriteSuperBlock();
