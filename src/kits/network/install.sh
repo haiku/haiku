@@ -76,7 +76,11 @@ function backup()
 		"/boot/home/config/bin/ppp_up" \
 		"/boot/home/config/bin/pppconfig" \
 		"/boot/home/config/bin/route" \
-		"/boot/home/config/bin/traceroute"
+		"/boot/home/config/bin/traceroute" \
+		"/boot/beos/etc/networks" \
+		"/boot/beos/etc/protocols" \
+		"/boot/beos/etc/resolv.conf" \
+		"/boot/beos/etc/services"
 }
 
 
