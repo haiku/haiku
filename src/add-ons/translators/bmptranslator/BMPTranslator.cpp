@@ -569,7 +569,7 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 		if (msheader.compression == BMP_NO_COMPRESS) {
 			uint32 imagesize = get_rowbytes(msheader.width,
 				msheader.bitsperpixel) * msheader.height;
-			if (msheader.imagesize && msheader.imagesize !=
+			if (msheader.imagesize && msheader.imagesize <
 				imagesize)
 				return B_NO_TRANSLATOR;
 			if (fileHeader.fileSize < fileHeader.dataOffset +
