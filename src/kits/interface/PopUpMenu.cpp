@@ -21,6 +21,7 @@
 //
 //	File Name:		PopUpMenu.cpp
 //	Author:			Marc Flerackers (mflerackers@androme.be)
+//					Stefano Ceccherini (burton666@libero.it)
 //	Description:	BPopUpMenu represents a menu that pops up when you
 //                  activate it.
 //------------------------------------------------------------------------------
@@ -297,9 +298,8 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	popup_menu_data *data = new popup_menu_data;
 	sem_id sem = create_sem(0, "window close lock");
 	
-	// Asynchronous menu: we set the BWindow semaphore
-	// and let BWindow do the job for us (??? this is what
-	// it's probably happening, _set_menu_sem_() is undocumented)
+	// Asynchronous menu: we set the BWindow menu's semaphore
+	// and let BWindow block when needed
 	if (async) {
 		data->window = window;
 		_set_menu_sem_(window, sem);
@@ -330,10 +330,14 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 		delete data;
 		return NULL;
 	}
+
 	// Synchronous menu: we block on the sem till
 	// the other thread deletes it.
 	if (!async) {
 		if (window) {
+			// TODO: usually it's not a good idea to check for a particular error
+			// code. Though here we just want to wait till the semaphore is deleted
+			// (it will return B_BAD_SEM_ID in that case), not provide locking or whatever.
 			while (acquire_sem_etc(sem, 1, B_TIMEOUT, 50000) != B_BAD_SEM_ID)
 				window->UpdateIfNeeded();	
 		}

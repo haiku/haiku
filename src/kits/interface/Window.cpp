@@ -127,6 +127,15 @@ static property_info windowPropInfo[] =
 }; 
 //------------------------------------------------------------------------------
 
+
+// TODO: Move this to a better place ?
+void
+_set_menu_sem_(BWindow *window, sem_id sem)
+{
+	window->fMenuSem = sem;
+}
+
+
 // Constructors
 //------------------------------------------------------------------------------
 BWindow::BWindow(BRect frame,
