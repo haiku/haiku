@@ -5,6 +5,7 @@
 
 #include <OS.h>
 #include <Messenger.h>
+#include <string.h>
 #include "debug.h"
 #include "PortPool.h"
 #include "DataExchange.h"
@@ -40,11 +41,11 @@ public:
 initit _initit;
 
 
-void
+status_t
 request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 {
 	reply->result = result;
-	SendToPort(reply_port, 0, reply, replysize);
+	return SendToPort(reply_port, 0, reply, replysize);
 }
 
 
@@ -100,7 +101,7 @@ status_t SendToPort(port_id sendport, int32 msgcode, void *msg, int size)
 	status_t rv;
 	rv = write_port(sendport, msgcode, msg, size);
 	if (rv != B_OK)
-		TRACE("SendToPort: write_port failed\n");
+		TRACE("SendToPort: write_port failed, port %#lx, error %#lx (%s)\n", sendport, rv, strerror(rv));
 	return B_OK;
 }
 
@@ -114,7 +115,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 
 	rv = write_port(requestport, msgcode, request, requestsize);
 	if (rv != B_OK) {
-		TRACE("QueryPort: write_port failed\n");
+		TRACE("QueryPort: write_port failed, port %#lx, error %#lx (%s)\n", requestport, rv, strerror(rv));
 		_PortPool->PutPort(request->reply_port);
 		return rv;
 	}
@@ -123,7 +124,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	_PortPool->PutPort(request->reply_port);
 
 	if (rv < B_OK)
-		TRACE("QueryPort: read_port failed\n");
+		TRACE("QueryPort: read_port failed, port %#lx, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
 	
 	return (rv < B_OK) ? rv : reply->result;
 }

@@ -543,7 +543,7 @@ BMediaNode::operator new(size_t size,
 						 const nothrow_t &) throw()
 {
 	CALLED();
-	return ::operator new(size,nothrow);
+	return ::operator new(size, nothrow);
 }
 
 void
@@ -558,7 +558,7 @@ BMediaNode::operator delete(void * ptr,
 							const nothrow_t &) throw()
 {
 	CALLED();
-	::operator delete(ptr,nothrow);
+	::operator delete(ptr, nothrow);
 }
 
 /*************************************************************
