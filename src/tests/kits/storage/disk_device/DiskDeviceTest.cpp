@@ -11,6 +11,7 @@
 //#include <DiskDeviceList.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
+#include <DiskSystem.h>
 #include <KDiskDeviceManager.h>	// for userland testing only
 #include <Message.h>
 #include <Messenger.h>
@@ -31,9 +32,11 @@ public:
 			pathString = path.Path();
 		else
 			pathString = strerror(error);
-		printf("device %ld: `%s'\n", device->UniqueID(), pathString);
-		printf("  removable:      %d\n", device->IsRemovable());
+		printf("device %ld: `%s'\n", device->ID(), pathString);
 		printf("  has media:      %d\n", device->HasMedia());
+		printf("  removable:      %d\n", device->IsRemovableMedia());
+		printf("  read only:      %d\n", device->IsReadOnlyMedia());
+		printf("  write once:     %d\n", device->IsWriteOnceMedia());
 		printf("  ---\n");
 		Visit(device, 0);
 		return false;
@@ -51,7 +54,7 @@ public:
 				pathString = path.Path();
 			else
 				pathString = strerror(error);
-			printf("%spartition %ld: `%s'\n", prefix, partition->UniqueID(),
+			printf("%spartition %ld: `%s'\n", prefix, partition->ID(),
 				   pathString);
 		}
 		printf("%s  offset:         %lld\n", prefix, partition->Offset());
@@ -241,7 +244,7 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 		int32 id;
 		if (message->FindInt32("device_id", &id) == B_OK) {
 			for (int32 i = 0; BDiskDevice *device = fDevices.ItemAt(i); i++) {
-				if (device->UniqueID() == id) {
+				if (device->ID() == id) {
 					bool updated;
 					status_t error = device->Update(&updated);
 					printf("updated: %d\n", updated);
@@ -503,9 +506,19 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager::Default()->InitialDeviceScan();
 
+	// list all disk devices and partitions
 	BDiskDeviceRoster roster;
 	DumpVisitor visitor;
 	roster.VisitAll(&visitor);
+	// list disk systems
+	BDiskSystem diskSystem;
+	while (roster.GetNextDiskSystem(&diskSystem) == B_OK) {
+		printf("disk system:\n");
+		printf("  name:        `%s'\n", diskSystem.Name());
+		printf("  pretty name: `%s'\n", diskSystem.PrettyName());
+		printf("  file system: %d (!%d)\n", diskSystem.IsFileSystem(),
+			   diskSystem.IsPartitioningSystem());
+	}
 
 	// for userland testing only
 	KDiskDeviceManager::DeleteDefault();
