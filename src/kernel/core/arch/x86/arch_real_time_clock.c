@@ -1,7 +1,9 @@
-/* 
-** Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <arch/real_time_clock.h>
@@ -255,6 +257,17 @@ secs_to_cmos(uint32 seconds, cmos_time *cmos)
 	seconds = seconds % 60;
 
 	cmos->second = int_to_bcd(seconds);
+}
+
+
+//	#pragma mark -
+
+
+status_t
+arch_rtc_init(struct kernel_args *args, struct real_time_data *data)
+{
+	data->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
+	return B_OK;
 }
 
 
