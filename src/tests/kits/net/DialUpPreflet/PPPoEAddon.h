@@ -13,8 +13,6 @@
 
 #include <DialUpAddon.h>
 
-#include <CheckBox.h>
-#include <Message.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -53,6 +51,9 @@ class PPPoEAddon : public DialUpAddon {
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
+		
+		void UnregisterView()
+			{ fPPPoEView = NULL; }
 
 	private:
 		bool fIsNew;

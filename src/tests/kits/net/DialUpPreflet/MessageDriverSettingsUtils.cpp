@@ -1,3 +1,10 @@
+//-----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//  Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
+//-----------------------------------------------------------------------
+
 #include "MessageDriverSettingsUtils.h"
 
 #include <driver_settings.h>
@@ -15,8 +22,8 @@ FindMessageParameter(const char *name, BMessage& message, BMessage& save,
 	// XXX: this should be removed when we can replace BMessage with something better
 	BString string;
 	int32 index = startIndex ? *startIndex : 0;
-	for(; message.FindMessage("Parameters", index, &save) == B_OK; index++) {
-		if(save.FindString("Name", &string) == B_OK && string.ICompare(name) == 0) {
+	for(; message.FindMessage(MDSU_PARAMETERS, index, &save) == B_OK; index++) {
+		if(save.FindString(MDSU_NAME, &string) == B_OK && string.ICompare(name) == 0) {
 			if(startIndex)
 				*startIndex = index;
 			return true;
@@ -35,18 +42,18 @@ AddParameter(const driver_parameter *parameter, BMessage& message)
 		return false;
 	
 	if(parameter->name)
-		message.AddString("Name", parameter->name);
+		message.AddString(MDSU_NAME, parameter->name);
 	else
 		return false;
 	
 	for(int32 index = 0; index < parameter->value_count; index++)
 		if(parameter->values[index])
-			message.AddString("Values", parameter->values[index]);
+			message.AddString(MDSU_VALUES, parameter->values[index]);
 	
 	for(int32 index = 0; index < parameter->parameter_count; index++) {
 		BMessage parameterMessage;
 		AddParameter(&parameter->parameters[index], parameterMessage);
-		message.AddMessage("Parameters", &parameterMessage);
+		message.AddMessage(MDSU_PARAMETERS, &parameterMessage);
 	}
 	
 	return true;
@@ -71,7 +78,7 @@ ReadMessageDriverSettings(const char *name, BMessage& message)
 	for(int32 index = 0; index < settings->parameter_count; index++) {
 		BMessage parameter;
 		AddParameter(&settings->parameters[index], parameter);
-		message.AddMessage("Parameters", &parameter);
+		message.AddMessage(MDSU_PARAMETERS, &parameter);
 	}
 	
 	unload_driver_settings(handle);
@@ -96,7 +103,7 @@ bool
 WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 {
 	const char *name;
-	if(parameter.FindString("Name", &name) != B_OK || !name)
+	if(parameter.FindString(MDSU_NAME, &name) != B_OK || !name)
 		return false;
 	
 	BString line, word(name);
@@ -110,7 +117,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 		line << '\"';
 	line << ' ';
 	
-	for(int32 index = 0; parameter.FindString("Values", index, &name) == B_OK; index++)
+	for(int32 index = 0; parameter.FindString(MDSU_VALUES, index, &name) == B_OK; index++)
 		if(name) {
 			word = name;
 			EscapeWord(word);
@@ -125,7 +132,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	
 	type_code type;
 	int32 parameterCount;
-	parameter.GetInfo("Parameters", &type, &parameterCount);
+	parameter.GetInfo(MDSU_PARAMETERS, &type, &parameterCount);
 	
 	if(parameterCount > 0)
 		line << '{';
@@ -135,7 +142,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	
 	if(parameterCount > 0) {
 		BMessage subParameter;
-		for(int32 index = 0; parameter.FindMessage("Parameters", index,
+		for(int32 index = 0; parameter.FindMessage(MDSU_PARAMETERS, index,
 				&subParameter) == B_OK; index++)
 			WriteParameter(file, subParameter, level + 1);
 		
@@ -158,7 +165,7 @@ WriteMessageDriverSettings(BFile& file, const BMessage& message)
 	file.Seek(0, SEEK_SET);
 	
 	BMessage parameter;
-	for(int32 index = 0; message.FindMessage("Parameters", index, &parameter) == B_OK;
+	for(int32 index = 0; message.FindMessage(MDSU_PARAMETERS, index, &parameter) == B_OK;
 			index++) {
 		if(index > 0)
 			file.Write("\n", 1);

@@ -8,11 +8,13 @@
 #include "DialUpView.h"
 #include "DialUpAddon.h"
 
+#include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
 
 // built-in add-ons
 #include "GeneralAddon.h"
 #include "PPPoEAddon.h"
+#include "ProtocolsAddon.h"
 
 
 #include <PPPInterface.h>
@@ -90,7 +92,7 @@ DialUpView::DialUpView(BRect frame)
 	
 	// add messenger to us so add-ons can contact us
 	BMessenger messenger(this);
-	fAddons.AddMessenger("Messenger", messenger);
+	fAddons.AddMessenger(DUN_MESSENGER, messenger);
 	
 	// create pop-up with all interfaces and "New..."/"Delete current" items
 	fInterfaceMenu = new BPopUpMenu(LABEL_CREATE_NEW);
@@ -107,7 +109,7 @@ DialUpView::DialUpView(BRect frame)
 	fTabView = new BTabView(rect, "TabView");
 	BRect tabViewRect = fTabView->Bounds();
 	tabViewRect.bottom -= fTabView->TabHeight();
-	fAddons.AddRect("TabViewRect", tabViewRect);
+	fAddons.AddRect(DUN_TAB_VIEW_RECT, tabViewRect);
 	
 	rect.top = rect.bottom + 15;
 	rect.bottom = rect.top + 15;
@@ -145,7 +147,7 @@ DialUpView::~DialUpView()
 	// free known add-on types (these should free their known add-on types, etc.)
 	DialUpAddon *addon;
 	for(int32 index = 0;
-			fAddons.FindPointer("DeleteMe", index,
+			fAddons.FindPointer(DUN_DELETE_ON_QUIT, index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++)
 		delete addon;
@@ -232,7 +234,7 @@ DialUpView::LoadSettings(bool isNew)
 	}
 	
 	DialUpAddon *addon;
-	for(int32 index = 0; fAddons.FindPointer("Tab", index,
+	for(int32 index = 0; fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
 			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
 		if(!addon)
 			continue;
@@ -255,7 +257,7 @@ DialUpView::IsModified(bool& settings, bool& profile)
 		// for current addon
 	
 	DialUpAddon *addon;
-	for(int32 index = 0; fAddons.FindPointer("Tab", index,
+	for(int32 index = 0; fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
 			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
 		if(!addon)
 			continue;
@@ -278,7 +280,7 @@ DialUpView::SaveSettings(BMessage& settings, BMessage& profile, bool saveModifie
 	DialUpAddon *addon;
 	TemplateList<DialUpAddon*> addons;
 	for(int32 index = 0;
-			fAddons.FindPointer("Tab", index,
+			fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
 		if(!addon)
@@ -440,14 +442,14 @@ DialUpView::HandleReportMessage(BMessage *message)
 void
 DialUpView::CreateTabs()
 {
-	// create tabs for all registered and valid "Tab" add-ons
+	// create tabs for all registered and valid tab add-ons
 	DialUpAddon *addon;
 	BView *target;
 	float width, height;
 	TemplateList<DialUpAddon*> addons;
 	
 	for(int32 index = 0;
-			fAddons.FindPointer("Tab", index,
+			fAddons.FindPointer(DUN_TAB_ADDON_TYPE, index,
 				reinterpret_cast<void**>(&addon)) == B_OK;
 			index++) {
 		if(!addon || addon->Position() < 0)
@@ -598,19 +600,23 @@ DialUpView::LoadAddons()
 	// Load integrated add-ons:
 	// "General" tab
 	GeneralAddon *generalAddon = new GeneralAddon(&fAddons);
-	fAddons.AddPointer("Tab", generalAddon);
-	fAddons.AddPointer("DeleteMe", generalAddon);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, generalAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, generalAddon);
 	// "PPPoE" device
 	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
-	fAddons.AddPointer("Device", pppoeAddon);
-	fAddons.AddPointer("DeleteMe", pppoeAddon);
+	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, pppoeAddon);
+	// "Protocols" tab
+	ProtocolsAddon *protocolsAddon = new ProtocolsAddon(&fAddons);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, protocolsAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, protocolsAddon);
 	// "PAP" authenticator
 	BMessage addon;
 	addon.AddString("KernelModuleName", "pap");
 	addon.AddString("FriendlyName", "Plain-text Authentication");
 	addon.AddString("TechnicalName", "PAP");
-	fAddons.AddMessage("Authenticator", &addon);
-	// addon.MakeEmpty();
+	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);
+	// addon.MakeEmpty(); // for next authenticator
 	
 	// TODO:
 	// load all add-ons from the add-ons folder
@@ -686,19 +692,4 @@ int32
 DialUpView::CountInterfaces() const
 {
 	return fInterfaceMenu->CountItems() - 3;
-}
-
-
-int32
-DialUpView::FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
-	int32 index = 0)
-{
-	BMenuItem *item;
-	for(; index < menu->CountItems(); index++) {
-		item = menu->ItemAt(index);
-		if(item && name.ICompare(item->Label()) <= 0)
-			return index;
-	}
-	
-	return index;
 }

@@ -14,7 +14,6 @@
 #include <DialUpAddon.h>
 
 #include <CheckBox.h>
-#include <Message.h>
 #include <String.h>
 #include <TextControl.h>
 
@@ -53,8 +52,8 @@ class GeneralAddon : public DialUpAddon {
 		virtual int32 Position() const
 			{ return 0; }
 		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
-		bool LoadDeviceSettings(BMessage *settings, BMessage *profile);
-		bool LoadAuthenticationSettings(BMessage *settings, BMessage *profile);
+		bool LoadDeviceSettings();
+		bool LoadAuthenticationSettings();
 		
 		virtual bool HasTemporaryProfile() const;
 		virtual void IsModified(bool& settings, bool& profile) const;
@@ -109,9 +108,6 @@ class GeneralView : public BView {
 		
 		void AddDevices();
 		void AddAuthenticators();
-		void AddAddonsToMenu(BMenu *menu, const char *type, uint32 what);
-		int32 FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
-			int32 index = 0);
 
 	private:
 		GeneralAddon *fAddon;

@@ -7,10 +7,10 @@ All add-ons must add a "Valid" boolean value to every recognized parameter. The 
 Add-on registration:
 --------------------------------------------------------------------------------------
 Tabs:
-"Tab" : pointer to DialUpAddon object
+DUN_TAB_ADDON_TYPE : pointer to DialUpAddon object
 
 Authenticators:
-"Authenticator" : BMessage with the following entries:
+DUN_AUTHENTICATOR_ADDON_TYPE : BMessage with the following entries:
 {
 	"KernelModule" : string
 	"TechnicalName" : string
@@ -19,18 +19,20 @@ Authenticators:
 }
 
 Devices:
-"Device" : pointer to DialUpAddon object
+DUN_DEVICE_ADDON_TYPE : pointer to DialUpAddon object
 
 Protocols:
-"Protocol" : pointer to DialUpAddon object
+Note: CreateView() should NOT return a view, but open a preferences window (B_MODAL_WINDOW)!
+DUN_PROTOCOL_ADDON_TYPE : pointer to DialUpAddon object
 
 Addons that must be deleted:
-"DeleteMe" : pointer to DialUpAddon object - this will be deleted on exit (you should register all your
-		addons here, too)
+DUN_DELETE_ON_QUIT : pointer to DialUpAddon object - this will be deleted when the preflet quits
+		(you should register all your addons here, too)
 
 
 --------------------------------------------------------------------------------------
 Additional data in the BMessage object for add-ons:
 --------------------------------------------------------------------------------------
-"Messenger" : BMessenger - This messenger can be used to send messages to the preflet
-"TabViewRect" : BRect - This rect should be used for tabs
+DUN_MESSENGER : BMessenger - This messenger can be used to send messages to the preflet
+DUN_TAB_VIEW_RECT : BRect - This rect should be used for tabs
+DUN_DEVICE_VIEW_WIDTH : float - Maximum width a device add-on's view may have

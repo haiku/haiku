@@ -10,13 +10,13 @@
 
 #include "GeneralAddon.h"
 
+#include "InterfaceUtils.h"
 #include "MessageDriverSettingsUtils.h"
 
 #include <Box.h>
 #include <Button.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <Messenger.h>
 #include <PopUpMenu.h>
 #include <StringView.h>
 
@@ -25,6 +25,10 @@
 
 #define MSG_SELECT_DEVICE			'SELD'
 #define MSG_SELECT_AUTHENTICATOR	'SELA'
+
+
+#define GENERAL_TAB_AUTHENTICATION	"Authentication"
+#define GENERAL_TAB_AUTHENTICATORS	"Authenticators"
 
 
 GeneralAddon::GeneralAddon(BMessage *addons)
@@ -47,7 +51,7 @@ DialUpAddon*
 GeneralAddon::FindDevice(const BString& moduleName) const
 {
 	DialUpAddon *addon;
-	for(int32 index = 0; Addons()->FindPointer("Device", index,
+	for(int32 index = 0; Addons()->FindPointer(DUN_DEVICE_ADDON_TYPE, index,
 			reinterpret_cast<void**>(&addon)) == B_OK; index++)
 		if(addon && moduleName == addon->KernelModuleName())
 			return addon;
@@ -74,10 +78,10 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	if(!settings || !profile || isNew)
 		return true;
 	
-	if(!LoadDeviceSettings(settings, profile))
+	if(!LoadDeviceSettings())
 		return false;
 	
-	if(!LoadAuthenticationSettings(settings, profile))
+	if(!LoadAuthenticationSettings())
 		return false;
 	
 	if(fGeneralView)
@@ -89,53 +93,53 @@ GeneralAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 
 
 bool
-GeneralAddon::LoadDeviceSettings(BMessage *settings, BMessage *profile)
+GeneralAddon::LoadDeviceSettings()
 {
 	int32 index = 0;
 	BMessage device;
-	if(!FindMessageParameter(PPP_DEVICE_KEY, *settings, device, &index))
+	if(!FindMessageParameter(PPP_DEVICE_KEY, *fSettings, device, &index))
 		return false;
 			// TODO: tell user that device specification is missing
 	
-	if(device.FindString("Values", &fDeviceName) != B_OK)
+	if(device.FindString(MDSU_VALUES, &fDeviceName) != B_OK)
 		return false;
 			// TODO: tell user that device specification is missing
 	
-	device.AddBool("Valid", true);
-	settings->ReplaceMessage("Parameters", index, &device);
+	device.AddBool(MDSU_VALID, true);
+	fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &device);
 	
 	fDeviceAddon = FindDevice(fDeviceName);
 	if(!fDeviceAddon)
 		return false;
 	
-	return fDeviceAddon->LoadSettings(settings, profile, false);
+	return fDeviceAddon->LoadSettings(fSettings, fProfile, false);
 }
 
 
 bool
-GeneralAddon::LoadAuthenticationSettings(BMessage *settings, BMessage *profile)
+GeneralAddon::LoadAuthenticationSettings()
 {
 	// we only handle the profile (although settings could contain different data)
 	int32 itemIndex = 0;
 	BMessage authentication, item;
 	
-	if(!FindMessageParameter(PPP_AUTHENTICATOR_KEY, *profile, item, &itemIndex))
+	if(!FindMessageParameter(PPP_AUTHENTICATOR_KEY, *fProfile, item, &itemIndex))
 		return true;
 	
 	// find authenticators (though we load all authenticators, we only use one)
 	BString name;
-	for(int32 index = 0; item.FindString("Values", index, &name) == B_OK; index++) {
+	for(int32 index = 0; item.FindString(MDSU_VALUES, index, &name) == B_OK; index++) {
 		BMessage authenticator;
 		if(!GetAuthenticator(name, &authenticator))
 			return false;
 				// fatal error: we do not know how to handle this authenticator
 		
 		MarkAuthenticatorAsValid(name);
-		authentication.AddString("Authenticators", name);
+		authentication.AddString(GENERAL_TAB_AUTHENTICATORS, name);
 		++fAuthenticatorsCount;
 	}
 	
-	fSettings->AddMessage("Authentication", &authentication);
+	fSettings->AddMessage(GENERAL_TAB_AUTHENTICATION, &authentication);
 	
 	bool hasUsername = false;
 		// a username must be present
@@ -144,25 +148,25 @@ GeneralAddon::LoadAuthenticationSettings(BMessage *settings, BMessage *profile)
 	BMessage parameter;
 	int32 parameterIndex = 0;
 	if(FindMessageParameter("User", item, parameter, &parameterIndex)
-			&& parameter.FindString("Values", &fUsername) == B_OK) {
+			&& parameter.FindString(MDSU_VALUES, &fUsername) == B_OK) {
 		hasUsername = true;
-		parameter.AddBool("Valid", true);
-		item.ReplaceMessage("Parameters", parameterIndex, &parameter);
+		parameter.AddBool(MDSU_VALID, true);
+		item.ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
 	}
 	
 	parameterIndex = 0;
 	if(FindMessageParameter("Password", item, parameter, &parameterIndex)
-			&& parameter.FindString("Values", &fPassword) == B_OK) {
+			&& parameter.FindString(MDSU_VALUES, &fPassword) == B_OK) {
 		fHasPassword = true;
-		parameter.AddBool("Valid", true);
-		item.ReplaceMessage("Parameters", parameterIndex, &parameter);
+		parameter.AddBool(MDSU_VALID, true);
+		item.ReplaceMessage(MDSU_PARAMETERS, parameterIndex, &parameter);
 	}
 	
 	// tell DUN whether everything is valid
 	if(hasUsername)
-		item.AddBool("Valid", true);
+		item.AddBool(MDSU_VALID, true);
 	
-	profile->ReplaceMessage("Parameters", itemIndex, &item);
+	fProfile->ReplaceMessage(MDSU_PARAMETERS, itemIndex, &item);
 	
 	return true;
 }
@@ -213,14 +217,14 @@ GeneralAddon::IsAuthenticationModified(bool& settings, bool& profile) const
 		settings = fGeneralView->AuthenticatorName();
 	else {
 		BMessage authentication;
-		if(fSettings->FindMessage("Authentication", &authentication) != B_OK) {
+		if(fSettings->FindMessage(GENERAL_TAB_AUTHENTICATION, &authentication) != B_OK) {
 			settings = profile = false;
 			return;
 				// error!
 		}
 		
 		BString authenticator;
-		if(authentication.FindString("Authenticators", &authenticator) != B_OK) {
+		if(authentication.FindString(GENERAL_TAB_AUTHENTICATORS, &authenticator) != B_OK) {
 			settings = profile = false;
 			return;
 				// error!
@@ -248,24 +252,24 @@ GeneralAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempo
 	
 	if(fGeneralView->AuthenticatorName()) {
 		BMessage authenticator;
-		authenticator.AddString("Name", PPP_AUTHENTICATOR_KEY);
-		authenticator.AddString("Values", fGeneralView->AuthenticatorName());
-		settings->AddMessage("Parameters", &authenticator);
+		authenticator.AddString(MDSU_NAME, PPP_AUTHENTICATOR_KEY);
+		authenticator.AddString(MDSU_VALUES, fGeneralView->AuthenticatorName());
+		settings->AddMessage(MDSU_PARAMETERS, &authenticator);
 		
 		BMessage username;
-		username.AddString("Name", "User");
-		username.AddString("Values", fGeneralView->Username());
-		authenticator.AddMessage("Parameters", &username);
+		username.AddString(MDSU_NAME, "User");
+		username.AddString(MDSU_VALUES, fGeneralView->Username());
+		authenticator.AddMessage(MDSU_PARAMETERS, &username);
 		
 		if(saveTemporary || fGeneralView->DoesSavePassword()) {
 			// save password, too
 			BMessage password;
-			password.AddString("Name", "Password");
-			password.AddString("Values", fGeneralView->Password());
-			authenticator.AddMessage("Parameters", &password);
+			password.AddString(MDSU_NAME, "Password");
+			password.AddString(MDSU_VALUES, fGeneralView->Password());
+			authenticator.AddMessage(MDSU_PARAMETERS, &password);
 		}
 		
-		profile->AddMessage("Parameters", &authenticator);
+		profile->AddMessage(MDSU_PARAMETERS, &authenticator);
 	}
 	
 	return true;
@@ -276,7 +280,7 @@ bool
 GeneralAddon::GetPreferredSize(float *width, float *height) const
 {
 	BRect rect;
-	if(Addons()->FindRect("TabViewRect", &rect) != B_OK)
+	if(Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect) != B_OK)
 		rect.Set(0, 0, 200, 300);
 			// set default values
 	
@@ -294,7 +298,7 @@ GeneralAddon::CreateView(BPoint leftTop)
 {
 	if(!fGeneralView) {
 		BRect rect;
-		Addons()->FindRect("TabViewRect", &rect);
+		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
 		fGeneralView = new GeneralView(this, rect);
 	}
 	
@@ -311,8 +315,8 @@ GeneralAddon::GetAuthenticator(const BString& moduleName, BMessage *entry) const
 		return false;
 	
 	BString name;
-	for(int32 index = 0; Addons()->FindMessage("Authenticator", index, entry) == B_OK;
-			index++) {
+	for(int32 index = 0; Addons()->FindMessage(DUN_AUTHENTICATOR_ADDON_TYPE, index,
+			entry) == B_OK; index++) {
 		entry->FindString("KernelModuleName", &name);
 		if(name == moduleName)
 			return true;
@@ -333,8 +337,8 @@ GeneralAddon::MarkAuthenticatorAsValid(const BString& moduleName)
 			&index); index++) {
 		authenticator.FindString("KernelModuleName", &name);
 		if(name == moduleName) {
-			authenticator.AddBool("Valid", true);
-			fSettings->ReplaceMessage("Parameters", index, &authenticator);
+			authenticator.AddBool(MDSU_VALID, true);
+			fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &authenticator);
 			return true;
 		}
 	}
@@ -344,14 +348,15 @@ GeneralAddon::MarkAuthenticatorAsValid(const BString& moduleName)
 
 
 GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
-	: BView(frame, "GeneralView", B_FOLLOW_NONE, 0),
+	: BView(frame, "General", B_FOLLOW_NONE, 0),
 	fAddon(addon)
 {
 	BRect rect = Bounds();
 	rect.InsetBy(5, 5);
 	rect.bottom = 100;
 	fDeviceBox = new BBox(rect, "Device");
-	Addon()->Addons()->AddFloat("DeviceViewWidth", fDeviceBox->Bounds().Width() - 10);
+	Addon()->Addons()->AddFloat(DUN_DEVICE_VIEW_WIDTH,
+		fDeviceBox->Bounds().Width() - 10);
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top
 		+ 25 // space for topmost control
@@ -436,8 +441,9 @@ GeneralView::Reload()
 	if(Addon()->CountAuthenticators() > 0) {
 		BString kernelModule, authenticator;
 		BMessage authentication;
-		if(Addon()->Settings()->FindMessage("Authentication", &authentication) == B_OK)
-			authentication.FindString("Authenticators", &authenticator);
+		if(Addon()->Settings()->FindMessage(GENERAL_TAB_AUTHENTICATION,
+				&authentication) == B_OK)
+			authentication.FindString(GENERAL_TAB_AUTHENTICATORS, &authenticator);
 		BMenu *menu = fAuthenticatorField->Menu();
 		for(int32 index = 0; index < menu->CountItems(); index++) {
 			item = menu->ItemAt(index);
@@ -575,7 +581,8 @@ GeneralView::ReloadDeviceView()
 void
 GeneralView::AddDevices()
 {
-	AddAddonsToMenu(fDeviceField->Menu(), "Device", MSG_SELECT_DEVICE);
+	AddAddonsToMenu(Addon()->Addons(), fDeviceField->Menu(), DUN_DEVICE_ADDON_TYPE,
+		MSG_SELECT_DEVICE);
 }
 
 
@@ -589,8 +596,8 @@ GeneralView::AddAuthenticators()
 	
 	BMessage addon;
 	for(int32 index = 0;
-			Addon()->Addons()->FindMessage("Authenticator", index, &addon) == B_OK;
-			index++) {
+			Addon()->Addons()->FindMessage(DUN_AUTHENTICATOR_ADDON_TYPE, index,
+			&addon) == B_OK; index++) {
 		BMessage *message = new BMessage(MSG_SELECT_AUTHENTICATOR);
 		message->AddString("KernelModuleName", addon.FindString("KernelModuleName"));
 		
@@ -615,49 +622,4 @@ GeneralView::AddAuthenticators()
 		fAuthenticatorField->Menu()->AddItem(new BMenuItem(name.String(), message),
 			insertAt);
 	}
-}
-
-
-void
-GeneralView::AddAddonsToMenu(BMenu *menu, const char *type, uint32 what)
-{
-	DialUpAddon *addon;
-	for(int32 index = 0; Addon()->Addons()->FindPointer(type, index,
-			reinterpret_cast<void**>(&addon)) == B_OK; index++) {
-		if(!addon || (!addon->FriendlyName() && !addon->TechnicalName()))
-			continue;
-		
-		BMessage *message = new BMessage(what);
-		message->AddPointer("Addon", addon);
-		
-		BString name;
-		if(addon->TechnicalName()) {
-			name << addon->TechnicalName();
-			if(addon->FriendlyName())
-				name << " (";
-		}
-		if(addon->FriendlyName()) {
-			name << addon->FriendlyName();
-			if(addon->TechnicalName())
-				name << ")";
-		}
-		
-		int32 insertAt = FindNextMenuInsertionIndex(menu, name);
-		menu->AddItem(new BMenuItem(name.String(), message), insertAt);
-	}
-}
-
-
-int32
-GeneralView::FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
-	int32 index = 0)
-{
-	BMenuItem *item;
-	for(; index < menu->CountItems(); index++) {
-		item = menu->ItemAt(index);
-		if(item && name.ICompare(item->Label()) <= 0)
-			return index;
-	}
-	
-	return index;
 }

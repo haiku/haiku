@@ -1,12 +1,13 @@
 Short-term TODOs:
 - see if we can reuse some code from the original DUN preflet
-- add "Protocols" tab
 - add "Extras" tab for changing dial-behaviour (auto-redial, dial-on-demand, etc.)
 - add "Revert Changes" button
 - load add-ons
 - write IP (IPCP) protocol add-on
 - move DEVNOTES into a doxygen file and document the rest of the API
 - use dynamic window positioning based on screen size instead of static coordinates
+- really delete interface description files when removing an interface
+- open dialog asking for interface name when creating a new interface
 
 Long-term TODOs:
-- allow selecting multiple authenticators
+- (maybe) allow selecting multiple authenticators (in expert-mode)

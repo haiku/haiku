@@ -18,7 +18,20 @@
 #include <Point.h>
 
 
-#define DUN_MAXIMUM_PRIORITY	50
+#define DUN_MAXIMUM_PRIORITY			50
+
+// add-on types
+#define DUN_TAB_ADDON_TYPE				"Tab"
+#define DUN_AUTHENTICATOR_ADDON_TYPE	"Authenticator"
+#define DUN_DEVICE_ADDON_TYPE			"Device"
+#define DUN_PROTOCOL_ADDON_TYPE			"Protocol"
+
+// other information contained in the add-ons BMessage object
+#define DUN_DELETE_ON_QUIT				"DeleteMe"
+	// the DialUpAddon objects in this list will be deleted when the preflet quits
+#define DUN_MESSENGER					"Messenger"
+#define DUN_TAB_VIEW_RECT				"TabViewRect"
+#define DUN_DEVICE_VIEW_WIDTH			"DeviceViewWidth"
 
 
 class DialUpAddon {

@@ -49,6 +49,8 @@ PPPoEAddon::PPPoEAddon(BMessage *addons)
 
 PPPoEAddon::~PPPoEAddon()
 {
+	delete fPPPoEView;
+		// this may have been set to NULL from the view's destructor!
 }
 
 
@@ -93,41 +95,41 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 			// error: no device
 	
 	BString name;
-	if(device.FindString("Values", &name) != B_OK || name != kKernelModuleName)
+	if(device.FindString(MDSU_VALUES, &name) != B_OK || name != kKernelModuleName)
 		return false;
 			// error: no device
 	
 	BMessage parameter;
 	int32 index = 0;
 	if(!FindMessageParameter(PPPoE_INTERFACE_KEY, device, parameter, &index)
-			|| parameter.FindString("Values", &fInterfaceName) != B_OK)
+			|| parameter.FindString(MDSU_VALUES, &fInterfaceName) != B_OK)
 		return false;
 			// error: no interface
 	else {
-		parameter.AddBool("Valid", true);
-		device.ReplaceMessage("Parameters", index, &parameter);
+		parameter.AddBool(MDSU_VALID, true);
+		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
 	index = 0;
 	if(!FindMessageParameter(PPPoE_AC_NAME_KEY, device, parameter, &index)
-			|| parameter.FindString("Values", &fACName) != B_OK)
+			|| parameter.FindString(MDSU_VALUES, &fACName) != B_OK)
 		fACName = "";
 	else {
-		parameter.AddBool("Valid", true);
-		device.ReplaceMessage("Parameters", index, &parameter);
+		parameter.AddBool(MDSU_VALID, true);
+		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
 	index = 0;
 	if(!FindMessageParameter(PPPoE_SERVICE_NAME_KEY, device, parameter, &index)
-			|| parameter.FindString("Values", &fServiceName) != B_OK)
+			|| parameter.FindString(MDSU_VALUES, &fServiceName) != B_OK)
 		fServiceName = "";
 	else {
-		parameter.AddBool("Valid", true);
-		device.ReplaceMessage("Parameters", index, &parameter);
+		parameter.AddBool(MDSU_VALID, true);
+		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
-	device.AddBool("Valid", true);
-	fSettings->ReplaceMessage("Parameters", deviceIndex, &device);
+	device.AddBool(MDSU_VALID, true);
+	fSettings->ReplaceMessage(MDSU_PARAMETERS, deviceIndex, &device);
 	
 	return true;
 }
@@ -157,30 +159,30 @@ PPPoEAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempora
 			// TODO: tell user that an interface is needed (if we fail because of this)
 	
 	BMessage device, interface;
-	device.AddString("Name", PPP_DEVICE_KEY);
-	device.AddString("Values", kKernelModuleName);
+	device.AddString(MDSU_NAME, PPP_DEVICE_KEY);
+	device.AddString(MDSU_VALUES, kKernelModuleName);
 	
-	interface.AddString("Name", PPPoE_INTERFACE_KEY);
-	interface.AddString("Values", fPPPoEView->InterfaceName());
-	device.AddMessage("Parameters", &interface);
+	interface.AddString(MDSU_NAME, PPPoE_INTERFACE_KEY);
+	interface.AddString(MDSU_VALUES, fPPPoEView->InterfaceName());
+	device.AddMessage(MDSU_PARAMETERS, &interface);
 	
 	if(fPPPoEView->ACName() && strlen(fPPPoEView->ACName()) > 0) {
 		// save access concentrator, too
 		BMessage ac;
-		ac.AddString("Name", PPPoE_AC_NAME_KEY);
-		ac.AddString("Values", fPPPoEView->ACName());
-		device.AddMessage("Parameters", &ac);
+		ac.AddString(MDSU_NAME, PPPoE_AC_NAME_KEY);
+		ac.AddString(MDSU_VALUES, fPPPoEView->ACName());
+		device.AddMessage(MDSU_PARAMETERS, &ac);
 	}
 	
 	if(fPPPoEView->ServiceName() && strlen(fPPPoEView->ServiceName()) > 0) {
 		// save service name, too
 		BMessage service;
-		service.AddString("Name", PPPoE_SERVICE_NAME_KEY);
-		service.AddString("Values", fPPPoEView->ServiceName());
-		device.AddMessage("Parameters", &service);
+		service.AddString(MDSU_NAME, PPPoE_SERVICE_NAME_KEY);
+		service.AddString(MDSU_VALUES, fPPPoEView->ServiceName());
+		device.AddMessage(MDSU_PARAMETERS, &service);
 	}
 	
-	settings->AddMessage("Parameters", &device);
+	settings->AddMessage(MDSU_PARAMETERS, &device);
 	
 	return true;
 }
@@ -190,7 +192,7 @@ bool
 PPPoEAddon::GetPreferredSize(float *width, float *height) const
 {
 	float viewWidth;
-	if(Addons()->FindFloat("DeviceViewWidth", &viewWidth) != B_OK)
+	if(Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &viewWidth) != B_OK)
 		viewWidth = 270;
 			// default value
 	
@@ -208,7 +210,7 @@ PPPoEAddon::CreateView(BPoint leftTop)
 {
 	if(!fPPPoEView) {
 		float width;
-		if(!Addons()->FindFloat("DeviceViewWidth", &width))
+		if(!Addons()->FindFloat(DUN_DEVICE_VIEW_WIDTH, &width))
 			width = 270;
 				// default value
 		
@@ -303,6 +305,7 @@ PPPoEView::PPPoEView(PPPoEAddon *addon, BRect frame)
 
 PPPoEView::~PPPoEView()
 {
+	Addon()->UnregisterView();
 }
 
 

@@ -12,11 +12,13 @@ SimpleTest DialUpPreflet :
 	DialUpView.cpp
 	
 	# utils
+	InterfaceUtils.cpp
 	MessageDriverSettingsUtils.cpp
 	
 	# built-in add-ons
 	GeneralAddon.cpp
 	PPPoEAddon.cpp
+	ProtocolsAddon.cpp
 ;
 
 LinkSharedOSLibs DialUpPreflet : libppp.a be ;
