@@ -455,8 +455,9 @@ start_event_thread(struct adapter *adapter)
 	TRACE("start_event_thread enter\n");
 
 	adapter->event_thread = spawn_kernel_thread(event_handler, "ipro1000 event", 80, adapter);
-	adapter->event_sem = create_sem(0, "ipro1000 event");
 	adapter->event_flags = 0;
+	adapter->event_sem = create_sem(0, "ipro1000 event");
+	set_sem_owner(adapter->event_sem, B_SYSTEM_TEAM);
 	
 	if (adapter->event_thread >= 0 && adapter->event_sem >= 0) {
 		resume_thread(adapter->event_thread);
