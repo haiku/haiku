@@ -474,7 +474,7 @@ bfs_suspend_vnode(void *_ns, void *_node)
 static int
 bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vnode_id *vnid)
 {
-	FUNCTION_START(("file = %s\n",file));
+	//FUNCTION_START(("file = %s\n",file));
 
 	if (_ns == NULL || _directory == NULL || file == NULL)
 		return B_BAD_VALUE;

@@ -107,4 +107,31 @@ template<class Node> struct list {
 };
 
 
+// Some atomic operations that are somehow missing in BeOS:
+//
+//	atomic_test_and_set(value, newValue, testAgainst)
+//		sets "value" to "newValue", if "value" is equal to "testAgainst"
+//	atomic_set(value, newValue)
+//		sets "value" to "newValue"
+
+#if __INTEL__
+	inline int32
+	atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
+	{
+		int32 oldValue;
+		asm volatile("lock; cmpxchg %%ecx, (%%edx)"
+			: "=a" (oldValue) : "a" (testAgainst), "c" (newValue), "d" (value));
+		return oldValue;
+	}
+
+	inline void
+	atomic_set(volatile int32 *value, int32 newValue)
+	{
+		asm volatile("lock; xchg %%eax, (%%edx)"
+			: : "a" (newValue), "d" (value));
+	}
+#else
+#	error The macros atomic_set(), and atomic_test_and_set() are not defined for the target processor
+#endif
+
 #endif	/* UTILITY_H */

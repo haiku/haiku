@@ -10,11 +10,19 @@
 
 
 #include <KernelExport.h>
+#include "Utility.h"
 
 
-// configure here if and when real benaphores should be used
+// Configure here if and when real benaphores should be used
+// Benaphores doesn't make much sense in the kernel, so they are only
+// enabled for the user-space test application
 #ifdef USER
-#	define USE_BENAPHORE 1
+#	define USE_BENAPHORE
+	// if defined, benaphores are used for the Semaphore class
+//#	define FAST_LOCK
+	// the ReadWriteLock class uses a second Semaphore to
+	// speed up locking - only makes sense if USE_BENAPHORE
+	// is defined, too.
 #endif
 
 
@@ -136,7 +144,6 @@ class Locker {
 // expensive regarding that BeOS only allows for a total of 64k
 // semaphores.
 
-//#define FAST_LOCK
 #ifdef FAST_LOCK
 class ReadWriteLock {
 	public:
@@ -317,35 +324,43 @@ class WriteLocked {
 
 // A simple locking structure that doesn't use a semaphore - it's useful
 // if you have to protect critical parts with a short runtime.
+// It also allows to nest several locks for the same thread.
 
 class SimpleLock {
 	public:
 		SimpleLock()
 			:
-			fLock(0),
-			fUnlock(0)
+			fHolder(-1),
+			fCount(0)
 		{
 		}
 
 		status_t Lock(bigtime_t time = 500)
 		{
-			int32 turn = atomic_add(&fLock,1);
-			while (turn != fUnlock)
+			int32 thisThread = find_thread(NULL);
+			int32 current;
+			while ((current = atomic_test_and_set(&fHolder, thisThread, -1)) != -1) {
+				if (current == thisThread)
+					break;
+
 				snooze(time);
+			}
 
 			// ToDo: the lock cannot fail currently! We may want
 			// to change this
+			atomic_add(&fCount, 1);
 			return B_OK;
 		}
 
 		void Unlock()
 		{
-			atomic_add(&fUnlock,1);
+			if (atomic_add(&fCount, -1) == 1)
+				atomic_set(&fHolder, -1);
 		}
 
 	private:
-		vint32	fLock;
-		vint32	fUnlock;
+		vint32	fHolder;
+		vint32	fCount;
 };
 
 // A convenience class to lock the SimpleLock, note the
