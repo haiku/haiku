@@ -91,7 +91,7 @@ get_why_stopped_string(debug_why_stopped whyStopped, char *buffer,
 	if (!buffer || bufferSize <= 0)
 		return;
 
-	if (whyStopped >= 0 && whyStopped < sDebugWhyStringCount)
+	if ((int32)whyStopped >= 0 && (int32)whyStopped < sDebugWhyStringCount)
 		strlcpy(buffer, sDebugWhyStrings[whyStopped], bufferSize);
 	else
 		snprintf(buffer, bufferSize, "Unknown reason %ld", (int32)whyStopped);
