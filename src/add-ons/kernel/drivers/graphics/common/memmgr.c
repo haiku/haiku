@@ -47,6 +47,7 @@ mem_info *mem_init( uint32 start, uint32 len, uint32 block_size, uint32 heap_ent
 	mem_block *first;
 	mem_info *mem;
 	uint i;
+	uint32 size;
 	
 	SHOW_FLOW( 2, "start=%lx, len=%lx, block_size=%lx, heap_entries=%ld",
 		start, len, block_size, heap_entries );
@@ -61,13 +62,21 @@ mem_info *mem_init( uint32 start, uint32 len, uint32 block_size, uint32 heap_ent
 	
 	if( mem->lock < 0 )
 		goto err2;
-		
-	mem->heap = malloc( heap_entries * sizeof( mem_block ));
-	if( mem->heap == NULL )
+	
+	// align size to B_PAGE_SIZE
+	size = heap_entries * sizeof(mem_block);
+	if ((size / B_PAGE_SIZE) * B_PAGE_SIZE != size)
+		size = ((size / B_PAGE_SIZE) + 1) * B_PAGE_SIZE;
+	
+	mem->heap_area = create_area("memmgr_heap_area", (void **)&mem->heap,
+								 B_ANY_ADDRESS, size, B_FULL_LOCK,
+								 B_READ_AREA | B_WRITE_AREA);
+	
+	if (mem->heap_area < 0 || mem->heap == NULL)
 		goto err3;
-		
+	
 	for( i = 1; i < heap_entries; ++i )
-		mem->heap[i].next = &mem->heap[i+1];
+		mem->heap[i-1].next = &mem->heap[i];
 		
 	mem->heap[heap_entries - 1].next = NULL;
 	mem->unused = &mem->heap[1];
@@ -96,9 +105,9 @@ void mem_destroy( mem_info *mem )
 {	
 	SHOW_FLOW0( 2, "" );
 	
-	free( mem->heap );
-	delete_sem( mem->lock );
-	free( mem );
+	delete_area(mem->heap_area);
+	delete_sem(mem->lock);
+	free(mem);
 }
 
 

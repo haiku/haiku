@@ -124,10 +124,12 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 // init GATT (could be used for both PCI and AGP)
 static status_t initGATT( GART_info *gart )
 {
+	area_id map_area;
+	uint32 map_area_size;
 	physical_entry *map;
 	physical_entry PTB_map[1];
 	size_t map_count;
-	int i;
+	uint32 i;
 	uint32 *gatt_entry;
 	size_t num_pages;
 	
@@ -157,7 +159,15 @@ static status_t initGATT( GART_info *gart )
 	memset( gart->GATT.ptr, 0, num_pages * sizeof( uint32 ));
 	
 	map_count = num_pages + 1;
-	map = malloc( map_count * sizeof( physical_entry ) );
+	
+	// align size to B_PAGE_SIZE
+	map_area_size = map_count * sizeof(physical_entry);
+	if ((map_area_size / B_PAGE_SIZE) * B_PAGE_SIZE != map_area_size)
+		map_area_size = ((map_area_size / B_PAGE_SIZE) + 1) * B_PAGE_SIZE;
+	
+	// temporary area where we fill in the memory map (deleted below)
+	map_area = create_area("pci_gart_map_area", (void **)&map, B_ANY_ADDRESS, map_area_size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	dprintf("pci_gart_map_area: %d\n", map_area);
 	
 	get_memory_map( gart->buffer.ptr, gart->buffer.size, map, map_count );
 	
@@ -180,7 +190,7 @@ static status_t initGATT( GART_info *gart )
 		}
 	}
 	
-	free( map );
+	delete_area(map_area);
 	
 	if( i == map_count ) {
 		// this case should never happen

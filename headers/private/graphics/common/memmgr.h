@@ -26,6 +26,7 @@ typedef struct mem_block {
 // memory heap
 typedef struct mem_info {
 	mem_block *first;
+	area_id heap_area;
 	uint32 block_size;
 	sem_id lock;
 	mem_block *heap;
