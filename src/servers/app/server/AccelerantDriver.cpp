@@ -49,10 +49,6 @@
 */
 AccelerantDriver::AccelerantDriver(void) : DisplayDriver()
 {
-	/* Why do I even have drawmode stored here? */
-	//drawmode = DRAW_COPY;
-	drawmode = 0;
-
 	cursor=NULL;
 	under_cursor=NULL;
 	cursorframe.Set(0,0,0,0);

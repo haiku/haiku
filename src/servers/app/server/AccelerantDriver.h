@@ -132,7 +132,7 @@ protected:
 	int GetDepthFromMode(int mode);
 	int GetDepthFromColorspace(int space);
 	ServerCursor *cursor, *under_cursor;
-	int32 drawmode;
+
 	BRect cursorframe;
 	int card_fd;
 	image_id accelerant_image;
