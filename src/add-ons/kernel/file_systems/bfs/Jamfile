@@ -20,7 +20,7 @@ oldOPTIM = $(OPTIM) ;
 	# Enable OpenBFS to be compiled as a full BFS replacement. Will
 	# report itself as "bfs" instead of "obfs"
 	if $(BFS_REPLACEMENT) {
-		defines += BFS_REPLACEMENT
+		defines += BFS_REPLACEMENT ;
 	}	
 
 	if $(DEBUG) = 0 {
