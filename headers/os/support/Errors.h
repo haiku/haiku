@@ -1,10 +1,15 @@
 #ifndef _ERRORS_H
 #define _ERRORS_H
 
-/* POSIX error codes are now all contained within errno.h */
+/* This file contains error codes as defined by BeOS R5.
+ * 
+ * There are 2 other files that contain error codes,
+ * codes starting E are found in posix/errno.h
+ * codes starting with ERR_ are kernel only and found in
+ * private/kernel/kerrors.h
+ */
 
 #include <errno.h>
-#include <limits.h>
 
 /*-------------------------------------------------------------*/
 /*----- Error baselines ---------------------------------------*/

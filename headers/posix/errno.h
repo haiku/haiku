@@ -3,6 +3,10 @@
  *
  * POSIX style error codes.
  * Be values used where required to keep compatibility.
+ *
+ * Errors beginning with B_ can be found in os/support/Errors.h
+ * those starting with ERR_ are kernel only and are found in
+ * private/kernel/kerrors.h
  */
 
 #ifndef _POSIX_ERRNO_H
@@ -128,7 +132,7 @@ enum {
 	ENOTEMPTY,
 	ENOSPC,
 	EROFS,
-	EMFILE,
+	EMFILE = EBADF + 10,
 	EXDEV,
 	ELOOP,
 	EPIPE
