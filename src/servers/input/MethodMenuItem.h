@@ -29,7 +29,6 @@ public:
 		
 	virtual ~MethodMenuItem();
 
-	//virtual void Draw();
 	virtual void DrawContent();
 	virtual void GetContentSize(float *width, float *height);
 

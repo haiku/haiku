@@ -68,21 +68,6 @@ MethodMenuItem::GetContentSize(float *width, float *height)
 		*height = MENUITEM_ICON_SIZE;
 }
 
-/*
-void
-MethodMenuItem::Draw()
-{
-	BMenu *menu = Menu();
-
-	menu->PushState();
-
-	menu->MovePenTo(ContentLocation());
-	DrawContent();
-	menu->PopState();
-
-	BMenuItem::Draw();
-}*/
-
 
 void
 MethodMenuItem::DrawContent()
