@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyConstructionTest1.cpp,v 1.5 2002/08/14 03:34:54 jrand Exp $
+	$Id: PropertyConstructionTest1.cpp,v 1.6 2002/08/15 04:42:06 jrand Exp $
 	
 	This file implements the first test for the OpenBeOS BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:
@@ -12,6 +12,8 @@
 #include <AppDefs.h>
 #include <Message.h>
 #include <TypeConstants.h>
+#include <stdio.h>
+#include <string.h>
 
 
 /*
@@ -49,7 +51,189 @@
 
 
 /*
- *  Method:  PropertyConstructionTest1::PerformTest()
+ *  Method:  PropertyConstructionTest1::DuplicateProperties()
+ *   Descr:  This member function performs this test.
+ */	
+
+
+	property_info *PropertyConstructionTest1::DuplicateProperties(
+	    const property_info *prop1,
+	    int prop_count)
+{
+	int i, j, k;
+	
+	property_info *prop2 = NULL;
+	if (prop1 != NULL) {
+		prop2 = (property_info *) malloc(sizeof(property_info) * (prop_count + 1));
+		memcpy(prop2, prop1, sizeof(property_info) * (prop_count + 1));
+		for(i = 0; i < prop_count; i++) {
+			if (prop1[i].name != NULL) {
+				prop2[i].name = strdup(prop1[i].name);
+			}
+			if (prop1[i].usage != NULL) {
+				prop2[i].usage = strdup(prop1[i].usage);
+			}
+			for(j = 0; j < 3; j++) {
+				for(k = 0; k < 5; k++) {
+					if (prop1[i].ctypes[j].pairs[k].name == NULL) {
+						break;
+					} else {
+						prop2[i].ctypes[j].pairs[k].name =
+						    strdup(prop1[i].ctypes[j].pairs[k].name);
+					}
+				}
+				if (prop1[i].ctypes[j].pairs[0].name == NULL) {
+					break;
+				}
+			}
+		}
+	}
+	return(prop2);
+}
+
+
+/*
+ *  Method:  PropertyConstructionTest1::DuplicateValues()
+ *   Descr:  This member function performs this test.
+ */	
+
+
+	value_info *PropertyConstructionTest1::DuplicateValues(
+	    const value_info *value1,
+	    int value_count)
+{
+	int i;
+	
+	value_info *value2 = NULL;
+	if (value1 != NULL) {
+		value2 = (value_info *) malloc(sizeof(value_info) * (value_count + 1));
+		memcpy(value2, value1, sizeof(value_info) * (value_count + 1));
+		for(i = 0; i < value_count; i++) {
+			if (value1[i].name != NULL) {
+				value2[i].name = strdup(value1[i].name);
+			}
+			if (value1[i].usage != NULL) {
+				value2[i].usage = strdup(value1[i].usage);
+			}
+		}
+	}
+	return(value2);
+}
+
+
+/*
+ *  Method:  PropertyConstructionTest1::CompareProperties()
+ *   Descr:  This member function performs this test.
+ */	
+
+
+	void PropertyConstructionTest1::CompareProperties(
+	    const property_info *prop1,
+	    const property_info *prop2,
+	    int prop_count)
+{
+	int i, j, k;
+
+	if ((prop_count != 0) && (prop1 != prop2)) {
+		assert(prop1 != NULL);
+		assert(prop2 != NULL);
+		for (i = 0; i < prop_count; i++) {
+			assert(prop1[i].name != 0);
+			assert(prop2[i].name != 0);
+			assert(strcmp(prop1[i].name, prop2[i].name) == 0);
+			
+			for(j = 0; j < 10; j++) {
+				assert(prop1[i].commands[j] == prop2[i].commands[j]);
+				if (prop1[i].commands[j] == 0) {
+					break;
+				}
+			}
+			
+			for(j = 0; j < 10; j++) {
+				assert(prop1[i].specifiers[j] == prop2[i].specifiers[j]);
+				if (prop1[i].specifiers[j] == 0) {
+					break;
+				}
+			}
+			
+			if (prop1[i].usage != prop2[i].usage) {
+				if (prop1[i].usage == NULL) {
+					assert(prop2[i].usage == NULL);
+				} else {
+					assert(strcmp(prop1[i].usage, prop2[i].usage) == 0);
+				}
+			}
+			
+			assert(prop1[i].extra_data == prop2[i].extra_data);
+			
+			for(j = 0; j < 10; j++) {
+				assert(prop1[i].types[j] == prop2[i].types[j]);
+				if (prop1[i].types[j] == 0) {
+					break;
+				}
+			}
+			
+			for(j = 0; j < 3; j++) {
+				for(k = 0; k < 5; k++) {
+					if (prop1[i].ctypes[j].pairs[k].name == 0) {
+						assert(prop2[i].ctypes[j].pairs[k].name == 0);
+						break;
+					} else {
+						assert(prop2[i].ctypes[j].pairs[k].name != 0);
+						assert(strcmp(prop1[i].ctypes[j].pairs[k].name,
+						              prop2[i].ctypes[j].pairs[k].name) == 0);
+						assert(prop1[i].ctypes[j].pairs[k].type ==
+						       prop2[i].ctypes[j].pairs[k].type);
+					}
+				}
+				if (prop1[i].ctypes[j].pairs[0].name == 0) {
+					break;
+				}
+			}
+		}
+	}
+}
+
+
+/*
+ *  Method:  PropertyConstructionTest1::CompareValues()
+ *   Descr:  This member function performs this test.
+ */	
+
+
+	void PropertyConstructionTest1::CompareValues(
+	    const value_info *value1,
+	    const value_info *value2,
+	    int value_count)
+{
+	int i;
+	if ((value_count != 0) && (value1 != value2)) {
+		assert(value1 != NULL);
+		assert(value2 != NULL);
+		for (i = 0; i < value_count; i++) {
+			assert(value1[i].name != 0);
+			assert(value2[i].name != 0);
+			assert(strcmp(value1[i].name, value2[i].name) == 0);
+			
+			assert(value1[i].value == value2[i].value);
+			
+			assert(value1[i].kind == value2[i].kind);
+			
+			if (value1[i].usage == 0) {
+				assert(value2[i].usage == 0);
+			} else {
+				assert(value2[i].usage != 0);
+				assert(strcmp(value1[i].usage, value2[i].usage) == 0);
+			}
+			
+			assert(value1[i].extra_data == value2[i].extra_data);
+		}
+	}		
+}
+
+
+/*
+ *  Method:  PropertyConstructionTest1::CheckProperty()
  *   Descr:  This member function performs this test.
  */	
 
@@ -65,10 +249,10 @@
 {
 	char buffer[512];
 	
-	assert(propTest->Properties() == prop_list);
-	assert(propTest->Values() == value_list);
 	assert(propTest->CountProperties() == prop_count);
 	assert(propTest->CountValues() == value_count);
+	CompareProperties(propTest->Properties(), prop_list, prop_count);
+	CompareValues(propTest->Values(), value_list, value_count);
 	assert(!propTest->IsFixedSize());
 	assert(propTest->TypeCode() == B_PROPERTY_INFO_TYPE);
 	assert(propTest->AllowsTypeCode(B_PROPERTY_INFO_TYPE));
@@ -215,6 +399,8 @@
 	};
 	int i;
 	BPropertyInfo *propTest;
+	property_info *propPtr;
+	value_info *valuePtr;
 
 	for (i=0; i < sizeof(theTests) / sizeof(theTests[0]); i++) {
 		propTest = new BPropertyInfo(theTests[i].props, theTests[i].values);
@@ -223,10 +409,18 @@
 				      theTests[i].flat_size, theTests[i].flat_data);
 		delete propTest;
 		
+		propPtr = DuplicateProperties(theTests[i].props, theTests[i].prop_count);
+		valuePtr = DuplicateValues(theTests[i].values, theTests[i].value_count);
+		propTest = new BPropertyInfo(propPtr, valuePtr, true);
+		CheckProperty(propTest, theTests[i].props, theTests[i].values,
+					  theTests[i].prop_count, theTests[i].value_count,
+				      theTests[i].flat_size, theTests[i].flat_data);
+		delete propTest;
+		
 		propTest = new BPropertyInfo;
 		assert(propTest->Unflatten(B_PROPERTY_INFO_TYPE, theTests[i].flat_data,
 		                           theTests[i].flat_size) == B_OK);
-		CheckProperty(propTest, propTest->Properties(), propTest->Values(),
+		CheckProperty(propTest, theTests[i].props, theTests[i].values,
 					  theTests[i].prop_count, theTests[i].value_count,
 				      theTests[i].flat_size, theTests[i].flat_data);
 		delete propTest;

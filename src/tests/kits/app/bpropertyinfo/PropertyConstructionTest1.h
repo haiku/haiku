@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyConstructionTest1.h,v 1.3 2002/08/13 05:17:55 jrand Exp $
+	$Id: PropertyConstructionTest1.h,v 1.4 2002/08/15 04:42:06 jrand Exp $
 	
 	This file defines a class for performing one test of BPropertyInfo
 	functionality.
@@ -26,6 +26,14 @@ private:
 	                   int32 value_count,
 	                   ssize_t flat_size,
 	                   const char *flat_data);
+	void CompareProperties(const property_info *prop1,
+	                       const property_info *prop2,
+	                       int prop_count);
+	void CompareValues(const value_info *value1,
+	                   const value_info *value2,
+	                   int value_count);
+	property_info *DuplicateProperties(const property_info *prop1, int prop_count);
+	value_info *DuplicateValues(const value_info *value1, int value_count);
 	
 public:
 	static Test *suite(void);
