@@ -112,6 +112,7 @@ public:
 	{
 		BMessage message(MSG_MESSAGE_RECEIVED);
 		message.AddMessage("message", _message);
+		message.AddInt32("sender", _message->ReturnAddress().Team());
 		unitTesterMessenger.SendMessage(&message);
 	}
 
