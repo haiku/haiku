@@ -1,25 +1,28 @@
 #include "MediaExtractor.h"
 #include "PluginManager.h"
 #include "debug.h"
-#include <stdio.h>
-#include <string.h>
+
 #include <Autolock.h>
 
-MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
+#include <stdio.h>
+#include <string.h>
+
+
+MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 {
 	CALLED();
 	fSource = source;
 	fStreamInfo = 0;
-	
+
 	fErr = _CreateReader(&fReader, &fStreamCount, &fMff, source);
 	if (fErr) {
 		fStreamCount = 0;
 		fReader = 0;
 		return;
 	}
-		
+
 	fStreamInfo = new stream_info[fStreamCount];
-	
+
 	// initialize stream infos
 	for (int32 i = 0; i < fStreamCount; i++) {
 		fStreamInfo[i].status = B_OK;
@@ -28,7 +31,7 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 		fStreamInfo[i].infoBufferSize = 0;
 		memset(&fStreamInfo[i].encodedFormat, 0, sizeof(fStreamInfo[i].encodedFormat));
 	}
-	
+
 	// create all stream cookies
 	for (int32 i = 0; i < fStreamCount; i++) {
 		if (B_OK != fReader->AllocateCookie(i, &fStreamInfo[i].cookie)) {
@@ -192,11 +195,12 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return res;
 	}
 
-	(*decoder)->Setup(new MediaExtractorChunkProvider(this,stream));
+	(*decoder)->Setup(new MediaExtractorChunkProvider(this, stream));
 	
 	res = (*decoder)->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer , fStreamInfo[stream].infoBufferSize);
 	if (res != B_OK) {
-		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld\n", stream);
+		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld: %ld (%s)\n",
+			stream, res, strerror(res));
 	}
 	return res;
 }
