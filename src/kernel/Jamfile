@@ -253,9 +253,11 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wbuf.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
 
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>abs.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o	
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>div.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>exit.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
@@ -398,9 +400,11 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wbuf.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
 
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>abs.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o	
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>div.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>exit.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o

@@ -1,31 +1,51 @@
 /*
- * Copyright (c) 2002, OpenBeOS Project
+ *  Copyright (c) 2002, OpenBeOS Project.
+ *  All rights reserved.
+ *  Distributed under the terms of the OpenBeOS license. 
  *
- * This file is part of the OpenBeOS system interface.
- * It is distributed under the terms of the OpenBeOS license.
+ *
+ *  exit.c:
+ *  implements the standard C library functions:
+ *    abort, atexit, exit
  *
  *
- * Author(s):
- * Daniel Reinhold (danielre@users.sf.net)
+ *  Author(s):
+ *  Daniel Reinhold (danielre@users.sf.net)
  *
  */
 
 #include <syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <limits.h>
 
 // ToDo: move this puppy to a more standard location
 #include "../stdio/local.h"
 
-// ToDo: this is supposed to be declared in <stdlib.h>
+// ToDo: these are supposed to be declared in <stdlib.h>
+// - - - - - - - - - - - - - - - 
+#define EXIT_SUCCESS  0
+#define EXIT_FAILURE  1
+void abort(void); 
 int  atexit(void (*func)(void));
+// - - - - - - - - - - - - - - - 
 
 
 
-#define _EXIT_STACK_SIZE_ 32
-
-static void (*_Exit_Stack[_EXIT_STACK_SIZE_])(void) = {0};
+static void (*_Exit_Stack[ATEXIT_MAX])(void) = {0};
 static int    _Exit_SP = 0;
+
+
+
+void
+abort()
+{
+	// ToDo: uncomment the raise() call once it is implemented
+	
+	//raise(SIGABRT);
+	exit(EXIT_FAILURE);
+}
 
 
 int
@@ -33,7 +53,7 @@ atexit(void (*func)(void))
 {
 	// push the function pointer onto the exit stack
 	
-	if (_Exit_SP < _EXIT_STACK_SIZE_) {
+	if (_Exit_SP < ATEXIT_MAX) {
 		_Exit_Stack[_Exit_SP++] = func;
 		return 0;
 	}
