@@ -68,7 +68,7 @@ BCursor::BCursor(const void *cursorData)
   // Send data directly to server
   BPrivate::BAppServerLink *serverlink = new BPrivate::BAppServerLink;
   serverlink->Init();
-  serverlink->portlink->SetOpCode(SET_CURSOR_BCURSOR);
+  serverlink->portlink->SetOpCode(AS_SET_CURSOR_BCURSOR);
   serverlink->portlink->Attach((void *)cursorData,68);
 
   //Rumor has it that this API will be cleaned up later

@@ -67,7 +67,7 @@ BWindow::BWindow(BRect frame,
 	// Notify app that we exist
          BWindow *win=this;
          PortLink *link=new PortLink(be_app->fServerFrom);
-         link->SetOpCode(CREATE_WINDOW);
+         link->SetOpCode(AS_CREATE_WINDOW);
          link->Attach(&win,sizeof(BWindow*));
          link->Flush();
          delete link;
@@ -86,7 +86,7 @@ BWindow::BWindow(BRect frame,
          if(be_app->fServerTo!=B_NAME_NOT_FOUND)
 	 {
 	   // Notify server of window's existence
-	   link->SetOpCode(CREATE_WINDOW);
+	   link->SetOpCode(AS_CREATE_WINDOW);
 	   link->Attach(fFrame);
 	   link->Attach((int32)fLook);
 	   link->Attach((int32)fFeel);
@@ -147,7 +147,7 @@ BWindow::BWindow(BRect frame,
 	// Notify app that we exist
          BWindow *win=this;
          PortLink *link=new PortLink(be_app->fServerFrom);
-         link->SetOpCode(CREATE_WINDOW);
+         link->SetOpCode(AS_CREATE_WINDOW);
          link->Attach(&win,sizeof(BWindow*));
          link->Flush();
          delete link;
@@ -166,7 +166,7 @@ BWindow::BWindow(BRect frame,
          if(be_app->fServerTo!=B_NAME_NOT_FOUND)
 	 {
 	   // Notify server of window's existence
-	   link->SetOpCode(CREATE_WINDOW);
+	   link->SetOpCode(AS_CREATE_WINDOW);
 	   link->Attach(fFrame);
 	   link->Attach((int32)fLook);
 	   link->Attach((int32)fFeel);
@@ -221,13 +221,13 @@ BWindow::Quit()
         // I hope this works. If it doesn't, we'll need to do a synchronous msg 
         BWindow *win=this;
         PortLink *link=new PortLink(be_app->fServerFrom);
-        link->SetOpCode(DELETE_WINDOW);
+        link->SetOpCode(AS_DELETE_WINDOW);
         link->Attach(&win,sizeof(BWindow *));
         link->Flush();
         delete link;
         // Server will need to be notified of window destruction
         PortLink *serverlink=new PortLink(be_app->fServerTo);        
-        serverlink->SetOpCode(DELETE_WINDOW);
+        serverlink->SetOpCode(AS_DELETE_WINDOW);
         // serverlink->Attach(&ID,sizeof(int32));   XXX What is ID???
         /* MAYBE */ serverlink->Attach(&win,sizeof(BWindow *));
         serverlink->Flush();
@@ -593,7 +593,7 @@ BWindow::Show()
         {
         	// Notify App_server that it should show the window
         PortLink *serverlink= new PortLink(be_app->fServerTo);
-	    serverlink->SetOpCode(SHOW_WINDOW);
+	    serverlink->SetOpCode(AS_SHOW_WINDOW);
 	    serverlink->Flush();
 	    delete serverlink;
         }
@@ -608,7 +608,7 @@ BWindow::Hide()
 	{
 			// Notify App_server that it should hide this window
             PortLink *serverlink= new PortLink(be_app->fServerTo);			
-		    serverlink->SetOpCode(HIDE_WINDOW);
+		    serverlink->SetOpCode(AS_HIDE_WINDOW);
 	        serverlink->Flush();
             delete serverlink;
 	}
@@ -643,7 +643,7 @@ BWindow::Sync() const
         ssize_t buffersize;
 
     PortLink *drawmsglink=new PortLink(be_app->fServerFrom);
-        drawmsglink->SetOpCode(GFX_SYNC);
+        drawmsglink->SetOpCode(AS_SYNC);
 
         // Reply received:
         // Code: SYNC
