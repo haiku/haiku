@@ -137,6 +137,7 @@ typedef struct {
 		uint16	width;		/* Width and height of the cursor shape (always 16!) */
 		uint16	height;
 		bool	is_visible;	/* Is the cursor currently displayed? */
+		bool	dh_right;	/* Is cursor on right side of stretched screen? */
 	} cursor;
 
   /*colour lookup table*/

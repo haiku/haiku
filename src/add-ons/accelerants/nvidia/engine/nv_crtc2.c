@@ -109,6 +109,9 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* prevent memory adress counter from being reset (linecomp may not occur) */
 	linecomp = target.timing.v_display;
 
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 //fixme: flatpanel 'don't touch' update needed for 'Go' cards!?!
 	if (true)
 	{
@@ -188,9 +191,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 
 		/* setup HSYNC & VSYNC polarity */
 		LOG(2,("CRTC2: sync polarity: "));
-//fixme: how is sync polarity programmed for CRTC2?
-//		temp = NV_REG8(NV8_MISCR);
-temp = 0;
+		temp = NV_REG8(NV8_MISCR);
 		if (target.timing.flags & B_POSITIVE_HSYNC)
 		{
 			LOG(2,("H:pos "));
@@ -211,13 +212,13 @@ temp = 0;
 			LOG(2,("V:neg "));
 			temp |= 0x80;
 		}
-//		NV_REG8(NV8_MISCW) = temp;
+		NV_REG8(NV8_MISCW) = temp;
 
-//		LOG(2,(", MISC reg readback: $%02x\n", NV_REG8(NV8_MISCR)));
+		LOG(2,(", MISC reg readback: $%02x\n", NV_REG8(NV8_MISCR)));
 	}
 
 	/* always disable interlaced operation */
-	/* (interlace is only supported on upto and including NV15 except for NV11) */
+	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
 	CRTC2W(INTERLACE, 0xff);
 
 	return B_OK;
@@ -257,8 +258,10 @@ status_t nv_crtc2_depth(int mode)
 		genctrl = 0x00101130;
 		break;
 	}
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 	CRTC2W(PIXEL, ((CRTC2R(PIXEL) & 0xfc) | viddelay));
-//fixme: check if this works...
 	DAC2W(GENCTRL, genctrl);
 
 	return B_OK;
@@ -269,6 +272,9 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 //	uint8 temp;
 
 	LOG(4,("CRTC2: setting DPMS: "));
+
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
 
 	/* start synchronous reset: required before turning screen off! */
 //fixme: howto switch display on/off?
@@ -318,6 +324,9 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 
 status_t nv_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 {
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 //fixme:
 //	*display = !(SEQR(CLKMODE) & 0x20);
 	*display = true;
@@ -345,6 +354,9 @@ status_t nv_crtc2_set_display_pitch()
 	offset = si->fbc.bytes_per_row / 8;
 
 	LOG(2,("CRTC2: offset register set to: $%04x\n", offset));
+
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
 
 	/*program the card!*/
 	CRTC2W(PITCHL, (offset & 0x00ff));
@@ -378,6 +390,9 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 //		}
 //	}
 
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 	/* upto 4Gb RAM adressing: must be used on NV10 and later! */
 	/* NOTE:
 	 * While this register also exists on pre-NV10 cards, it will
@@ -400,8 +415,11 @@ status_t nv_crtc2_cursor_init()
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 	/* set cursor bitmap adress ... */
-	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
+	if (si->ps.laptop)
 	{
 		/* must be used this way on pre-NV10 and on all 'Go' cards! */
 
@@ -437,13 +455,18 @@ status_t nv_crtc2_cursor_init()
 	NV_REG32(NV32_2CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
-	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
+	nv_crtc2_cursor_show();
 
 	return B_OK;
 }
 
 status_t nv_crtc2_cursor_show()
 {
+	LOG(4,("CRTC2: enabling cursor\n"));
+
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 	/* b0 = 1 enables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
 
@@ -452,6 +475,11 @@ status_t nv_crtc2_cursor_show()
 
 status_t nv_crtc2_cursor_hide()
 {
+	LOG(4,("CRTC2: disabling cursor\n"));
+
+	/* enable access to CRTC2 */
+	CRTC2W(OWNER, 0x03);
+
 	/* b0 = 0 disables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) & 0xfe));
 

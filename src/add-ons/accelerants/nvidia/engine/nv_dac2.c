@@ -33,10 +33,6 @@ status_t nv_dac2_mode(int mode,float brightness)
 
 	if (nv_dac2_palette(r,g,b) != B_OK) return B_ERROR;
 
-	/*set the mode - also sets VCLK dividor*/
-//	DXIW(MULCTRL, mode);
-//	LOG(2,("DAC: mulctrl 0x%02x\n", DXIR(MULCTRL)));
-
 	/* disable palette RAM adressing mask */
 	NV_REG8(NV8_PAL2MASK) = 0xff;
 	LOG(2,("DAC2: PAL pixrdmsk readback $%02x\n", NV_REG8(NV8_PAL2MASK)));
@@ -87,10 +83,6 @@ if (1)
 }
 
 /*program the pixpll - frequency in kHz*/
-/*important notes:
- * PIXPLLC is used - others should be kept as is
- * BESCLK,CRTC2 are not touched 
- */
 status_t nv_dac2_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
@@ -112,9 +104,6 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	/*reprogram (disable,select,wait for stability,enable)*/
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
-
-	/* select pixelPLL registerset C */
-	DAC2W(PLLSEL, 0x10000700);
 
 	/* program new frequency */
 	DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));

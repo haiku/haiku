@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-9/2003
+   Rudolf Cornelissen 11/2002-1/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -123,6 +123,9 @@ status_t nv_crtc_set_timing(display_mode target)
 
 	/* prevent memory adress counter from being reset (linecomp may not occur) */
 	linecomp = target.timing.v_display;
+
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
 //fixme: flatpanel 'don't touch' update needed for 'Go' cards!?!
 	if (true)
@@ -273,6 +276,9 @@ status_t nv_crtc_depth(int mode)
 		genctrl = 0x00101130;
 		break;
 	}
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xfc) | viddelay));
 	DACW(GENCTRL, genctrl);
 
@@ -285,7 +291,11 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 
 	LOG(4,("CRTC: setting DPMS: "));
 
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	/* start synchronous reset: required before turning screen off! */
+	//fixme: we need to seperate the reset condition from DPMS!
 	SEQW(RESET, 0x01);
 
 	/* turn screen off */
@@ -332,6 +342,9 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 
 status_t nv_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 {
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	*display = !(SEQR(CLKMODE) & 0x20);
 	*h = !(CRTCR(REPAINT1) & 0x80);
 	*v = !(CRTCR(REPAINT1) & 0x40);
@@ -357,6 +370,9 @@ status_t nv_crtc_set_display_pitch()
 	offset = si->fbc.bytes_per_row / 8;
 
 	LOG(2,("CRTC: offset register set to: $%04x\n", offset));
+
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
 	/*program the card!*/
 	CRTCW(PITCHL, (offset & 0x00ff));
@@ -389,6 +405,9 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 //			timeout++;
 //		}
 //	}
+
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
 	if (si->ps.card_arch == NV04A)
 	{
@@ -432,6 +451,9 @@ status_t nv_crtc_cursor_init()
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	/* set cursor bitmap adress ... */
 	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
 	{
@@ -469,13 +491,18 @@ status_t nv_crtc_cursor_init()
 	NV_REG32(NV32_CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
-	CRTCW(CURCTL0, (CRTCR(CURCTL0) | 0x01));
+	nv_crtc_cursor_show();
 
 	return B_OK;
 }
 
 status_t nv_crtc_cursor_show()
 {
+	LOG(4,("CRTC: enabling cursor\n"));
+
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	/* b0 = 1 enables cursor */
 	CRTCW(CURCTL0, (CRTCR(CURCTL0) | 0x01));
 
@@ -484,6 +511,11 @@ status_t nv_crtc_cursor_show()
 
 status_t nv_crtc_cursor_hide()
 {
+	LOG(4,("CRTC: disabling cursor\n"));
+
+	/* enable access to CRTC1 on dualhead cards */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+
 	/* b0 = 0 disables cursor */
 	CRTCW(CURCTL0, (CRTCR(CURCTL0) & 0xfe));
 

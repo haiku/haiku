@@ -55,44 +55,9 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	si->cursor.x = x;
 	si->cursor.y = y;
 
-	/*set up minimum amount to scroll*/
-	if (si->dm.flags & DUALHEAD_BITS)
-	{
-/* fixme???? Nvidia always does pixelprecise panning on sec head?? */
-		switch(si->dm.space)
-		{
-		case B_RGB16_LITTLE:
-			h_adjust = 0x1f;
-			break;
-		case B_RGB32_LITTLE:
-			h_adjust = 0x0f;
-			break;
-		default:
-			h_adjust = 0x1f;
-			break;
-		}
-	}
-	else
-	{
-/*		switch(si->dm.space)
-		{
-		case B_CMAP8:
-			h_adjust = 0x07;
-			break;
-		case B_RGB15_LITTLE:case B_RGB16_LITTLE:
-			h_adjust = 0x03;
-			break;
-		case B_RGB32_LITTLE:
-			h_adjust = 0x01;
-			break;
-		default:
-			h_adjust = 0x07;
-			break;
-		}
-*/
-		/* Nvidia always does pixelprecise panning on primary head */
-		h_adjust = 0x00;
-	}
+	/* setting up minimum amount to scroll not needed:
+	 * Nvidia cards can always do pixelprecise panning on both heads */
+	h_adjust = 0x00;
 
 	/* adjust h/v_display_start to move cursor onto screen */
 	switch (si->dm.flags & DUALHEAD_BITS)
@@ -141,14 +106,42 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	if (y > (vds + si->cursor.hot_y)) y -= (vds + si->cursor.hot_y);
 	else y = 0;
 
-	/* account for switched CRTC's */
-//fixme: we need new tweaking to get the cursors working together in dualhead modes...
-//	if (si->switched_crtcs)	x -= si->dm.timing.h_display;
-
 	/* position the cursor on the display */
-	nv_crtc_cursor_position(x,y);
-//	if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+	switch (si->dm.flags & DUALHEAD_BITS)
+	{
+	case DUALHEAD_CLONE:
+		nv_crtc_cursor_position(x,y);
 		nv_crtc2_cursor_position(x,y);
+		break;
+	case DUALHEAD_ON:
+	case DUALHEAD_SWITCH:
+		if (x < si->dm.timing.h_display)
+		{
+			if (si->cursor.dh_right)
+			{
+				LOG(4,("MOVE_CURSOR: now on left side\n"));
+				nv_crtc2_cursor_hide();
+				nv_crtc_cursor_show();
+				si->cursor.dh_right = false;
+			}
+			nv_crtc_cursor_position(x, y);
+		}
+		else
+		{
+			if (!si->cursor.dh_right)
+			{
+				LOG(4,("MOVE_CURSOR: now on right side\n"));
+				nv_crtc_cursor_hide();
+				nv_crtc2_cursor_show();
+				si->cursor.dh_right = true;
+			}
+			nv_crtc2_cursor_position((x - si->dm.timing.h_display), y);
+		}
+		break;
+	default: /* singlehead mode */
+		nv_crtc_cursor_position(x,y);
+		break;
+	}
 }
 
 void SHOW_CURSOR(bool is_visible) 
@@ -156,16 +149,48 @@ void SHOW_CURSOR(bool is_visible)
 	/* record for our info */
 	si->cursor.is_visible = is_visible;
 
-	if (is_visible)
+	switch (si->dm.flags & DUALHEAD_BITS)
 	{
-		nv_crtc_cursor_show();
-//		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+	case DUALHEAD_CLONE:
+		if (is_visible)
+		{
+			nv_crtc_cursor_show();
 			nv_crtc2_cursor_show();
-	}
-	else
-	{
-		nv_crtc_cursor_hide();
-//		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+		}
+		else
+		{
+			nv_crtc_cursor_hide();
 			nv_crtc2_cursor_hide();
+		}
+		break;
+	case DUALHEAD_ON:
+	case DUALHEAD_SWITCH:
+		if (is_visible)
+		{
+			if (!si->cursor.dh_right)
+			{
+				nv_crtc_cursor_show();
+			}
+			else
+			{
+				nv_crtc2_cursor_show();
+			}
+		}
+		else
+		{
+			nv_crtc_cursor_hide();
+			nv_crtc2_cursor_hide();
+		}
+		break;
+	default: /* singlehead mode */
+		if (is_visible)
+		{
+			nv_crtc_cursor_show();
+		}
+		else
+		{
+			nv_crtc_cursor_hide();
+		}
+		break;
 	}
 }

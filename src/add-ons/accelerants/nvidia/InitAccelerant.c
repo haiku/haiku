@@ -100,7 +100,6 @@ status_t INIT_ACCELERANT(int the_fd) {
 	if (1) {
 		time_t now = time (NULL);
 		// LOG not available from here to next LOG: NULL si
-//		MSG(("INIT_ACCELERANT: booted since %f ms %s\n", system_time()/1000.0, real_time_clock()));
 		MSG(("INIT_ACCELERANT: %s", ctime (&now)));
 	}
 
@@ -144,6 +143,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	si->cursor.hot_y = 0;
 	si->cursor.x = 0;
 	si->cursor.y = 0;
+	si->cursor.dh_right = false;
 
 	/*
 	Put the frame buffer immediately following the cursor data. We store this

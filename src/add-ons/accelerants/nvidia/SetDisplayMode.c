@@ -167,6 +167,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the outputs */
 		switch (si->ps.card_type)
 		{
+		//fixme..
 		case G550:
 			switch (target.flags & DUALHEAD_BITS)
 			{
@@ -260,7 +261,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
-	
+
 	/* update driver's mode store */
 	si->dm = target;
 
@@ -274,7 +275,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* set up overlay unit for this mode */
 	nv_bes_init();
 
-	MSG(("SETMODE: booted since %f mS\n", system_time()/1000.0));
+	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
 	/* enable interrupts using the kernel driver */
 	interrupt_enable(true);
@@ -299,45 +300,27 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 
 	LOG(4,("MOVE_DISPLAY: h %d, v %d\n", h_display_start, v_display_start));
 
-	/* reset lower bits, don't return an error! */
-//fixme: not needed in dualhead on Nvidia??? (pixelprecise panning on sec. head??)
-	if (si->dm.flags & DUALHEAD_BITS)
+	/* nVidia cards support pixelprecise panning on both heads in all modes:
+	 * No stepping granularity needed! */
+
+	/* determine bits used for the colordepth */
+	switch(si->dm.space)
 	{
-		switch(si->dm.space)
-		{
-		case B_RGB16_LITTLE:
-			colour_depth=16;
-			h_display_start &= ~0x1f;
-			break;
-		case B_RGB32_LITTLE:
-			colour_depth=32;
-			h_display_start &= ~0x0f;
-			break;
-		default:
-			LOG(8,("SET:Invalid DH colour depth 0x%08x, should never happen\n", si->dm.space));
-			return B_ERROR;
-		}
-	}
-	else
-	{
-		/* Nvidia always does pixelprecise panning on primary head */
-		switch(si->dm.space)
-		{
-		case B_CMAP8:
-			colour_depth=8;
-//			h_display_start &= ~0x07;
-			break;
-		case B_RGB15_LITTLE: case B_RGB16_LITTLE:
-			colour_depth=16;
-//			h_display_start &= ~0x03;
-			break;
-		case B_RGB32_LITTLE:
-			colour_depth=32;
-//			h_display_start &= ~0x01;
-			break;
-		default:
-			return B_ERROR;
-		}
+	case B_CMAP8:
+		colour_depth=8;
+		break;
+	case B_RGB15_LITTLE:
+	case B_RGB16_LITTLE:
+		colour_depth=16;
+		break;
+	case B_RGB24_LITTLE:
+		colour_depth=24;
+		break;
+	case B_RGB32_LITTLE:
+		colour_depth=32;
+		break;
+	default:
+		return B_ERROR;
 	}
 
 	/* do not run past end of display */
@@ -389,9 +372,7 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	return B_OK;
 }
 
-/*
-	Set the indexed color palette.
-*/
+/* Set the indexed color palette */
 void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags) {
 	int i;
 	uint8 *r,*g,*b;
@@ -412,16 +393,8 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 		i++;	
 	}
 	nv_dac_palette(r,g,b);
+	if (si->dm.flags & DUALHEAD_BITS) nv_dac2_palette(r,g,b);
 }
-
-
-/* masks for DPMS control bits */
-enum {
-	H_SYNC_OFF = 0x01,
-	V_SYNC_OFF = 0x02,
-	DISPLAY_OFF = 0x04,
-	BITSMASK = (H_SYNC_OFF | V_SYNC_OFF | DISPLAY_OFF)
-};
 
 /* Put the display into one of the Display Power Management modes. */
 status_t SET_DPMS_MODE(uint32 dpms_flags) {
@@ -485,7 +458,6 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 uint32 DPMS_CAPABILITIES(void) {
 	return 	(B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF);
 }
-
 
 /* Return the current DPMS mode */
 uint32 DPMS_MODE(void) {

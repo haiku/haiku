@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-4 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-5 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -895,19 +895,6 @@ status_t nv_general_bios_to_powergraphics()
 {
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
-	/* unlock card registers for R/W access */
-	CRTCW(LOCK, 0x57);
-	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	if (si->ps.secondary_head)
-	{
-		CRTC2W(LOCK, 0x57);
-		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	}
-
-	/* turn off both displays and the hardcursor (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
-	nv_crtc_cursor_hide();
-
 	/* let acc engine make power off/power on cycle to start 'fresh' */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
@@ -923,6 +910,26 @@ status_t nv_general_bios_to_powergraphics()
 	 * bit  4: PMEDIA,
 	 * bit  0: TVOUT. (> NV04A) */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+
+	/* unlock card registers for R/W access */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+	CRTCW(LOCK, 0x57);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	if (si->ps.secondary_head)
+	{
+		CRTC2W(OWNER, 0x03);
+		CRTC2W(LOCK, 0x57);
+		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	}
+
+	/* turn off both displays and the hardcursors (also disables transfers) */
+	nv_crtc_dpms(false, false, false);
+	nv_crtc_cursor_hide();
+	if (si->ps.secondary_head)
+	{
+		nv_crtc2_dpms(false, false, false);
+		nv_crtc2_cursor_hide();
+	}
 
 	if (si->ps.secondary_head)
 	{
@@ -963,9 +970,23 @@ status_t nv_general_bios_to_powergraphics()
 
 	/* enable 'enhanced mode', enable Vsync & Hsync,
 	 * set DAC palette to 8-bit width, disable large screen */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 	CRTCW(REPAINT1, 0x04);
+	if (si->ps.secondary_head)
+	{
+		CRTC2W(OWNER, 0x03);
+		CRTC2W(REPAINT1, 0x04);
+	}
 
-	/* turn on display */
+	/* enable palettes */
+	DACW(GENCTRL, 0x00100100);
+	if (si->ps.secondary_head) DAC2W(GENCTRL, 0x00100100);
+
+	/* enable programmable PLLs */
+	DACW(PLLSEL, 0x10000700);
+	if (si->ps.secondary_head) DACW(PLLSEL, (DACR(PLLSEL) | 0x20000800));
+
+	/* turn screen one on */
 	nv_crtc_dpms(true, true, true);
 
 	return B_OK;

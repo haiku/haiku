@@ -510,10 +510,10 @@
 #define NV8_PALINDW			0x006813c8
 #define NV8_PALDATA			0x006813c9
 /* secondary head */
-#define NV8_PAL2MASK		0x006833c6//verify!!!
-#define NV8_PAL2INDR		0x006833c7//verify!!!
-#define NV8_PAL2INDW		0x006833c8//verify!!!
-#define NV8_PAL2DATA		0x006833c9//verify!!!
+#define NV8_PAL2MASK		0x006833c6
+#define NV8_PAL2INDR		0x006833c7
+#define NV8_PAL2INDW		0x006833c8
+#define NV8_PAL2DATA		0x006833c9
 
 /* Nvidia PCI direct DAC registers (32bit) */
 /* primary head */
@@ -524,8 +524,7 @@
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_PIXPLLC		0x00680520
-#define NVDAC2_PLLSEL		0x00680524//0x0068250c verify!!!
-#define NVDAC2_GENCTRL		0x00680618//0x00682600 verify!!!
+#define NVDAC2_GENCTRL		0x00682600
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */
@@ -562,6 +561,7 @@
 #define NVCRTCX_CURCTL0		0x31
 #define NVCRTCX_INTERLACE	0x39
 #define NVCRTCX_EXTRA		0x41
+#define NVCRTCX_OWNER		0x44
 
 /* Nvidia ATTRIBUTE indexed registers */
 /* VGA standard registers: */
