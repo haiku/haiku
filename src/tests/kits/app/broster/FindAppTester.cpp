@@ -758,7 +758,7 @@ public:
 void FindAppTester::FindAppTestB9()
 {
 	FileWithTypeCaller caller;
-	for (int32 i = 1; i < commonTestFunctionCount; i++) {
+	for (int32 i = 0; i < commonTestFunctionCount; i++) {
 		NextSubTest();
 		(*commonTestFunctions[i])(caller);
 		tearDown();
@@ -789,7 +789,7 @@ public:
 void FindAppTester::FindAppTestB10()
 {
 	SniffFileTypeCaller caller;
-	for (int32 i = 0; i < commonTestFunctionCount; i++) {
+	for (int32 i = 1; i < commonTestFunctionCount; i++) {
 		NextSubTest();
 		(*commonTestFunctions[i])(caller);
 		tearDown();
