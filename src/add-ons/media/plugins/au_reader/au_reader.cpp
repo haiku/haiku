@@ -160,7 +160,7 @@ auReader::Sniff(int32 *streamCount)
 		return B_ERROR;
 	}
 	
-	fFrameCount = fDataSize / (fChannelCount * fBitsPerSample);
+	fFrameCount = (8 * fDataSize) / (fChannelCount * fBitsPerSample);
 	fDuration = (1000000LL * fFrameCount) / fFrameRate;
 	fBitsPerFrame = fChannelCount * fBitsPerSample;
 	fBlockAlign = fBitsPerFrame;
