@@ -20,7 +20,7 @@
 #include <Message.h>
 #include <Mime.h>
 #if !TEST_R5
-	#include <MimeDatabase.h>
+	#include <mime/database_support.h>
 #endif
 #include <MimeTypeTest.h>
 #include <Path.h>			// Only needed for entry_ref dumps
@@ -38,7 +38,7 @@ static const char *R5DatabaseDir		= "/boot/home/config/settings/beos_mime";
 #if TEST_R5
 static std::string mimeDatabaseDir		= R5DatabaseDir;
 #else
-static std::string mimeDatabaseDir		= BPrivate::MimeDatabase::kDefaultDatabaseDir;
+static std::string mimeDatabaseDir		= BPrivate::Storage::Mime::kDatabaseDir;
 #endif
 
 // MIME Test Types
@@ -1606,7 +1606,82 @@ bool isMIMESupertype(const char *type) {
 	return false;
 }
 
+void
+VerifyInstalledTypes() {
+	BMessage msg;
 
+	// Get the list of installed types
+	CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
+	
+	// Add all the type strings to a std::set
+	std::set<std::string> typeSet;
+	SetAdapter typeAdapter(typeSet);
+	FillWithMimeTypes(typeAdapter, msg, "types");
+
+	// Manually verify that the set of types returned by GetInstalledTypes()
+	// and the types present in the database are exactly the same (ignoring
+	// any files with names made of invalid characters, in case some bozo
+	// manually added such a file :-)
+	BDirectory rootDir(mimeDatabaseDir.c_str());
+	BEntry superEntry;		
+	CHK(rootDir.InitCheck() == B_OK);
+	rootDir.Rewind();
+	while (true) {
+		status_t err = rootDir.GetNextEntry(&superEntry);
+		if (err == B_ENTRY_NOT_FOUND)
+			break;	// End of directory listing
+
+		CHK(!err);	// Any other error is unacceptable :-)
+
+		// Get the leaf name			
+		char superLeafMixed[B_PATH_NAME_LENGTH+1];
+		CHK(superEntry.GetName(superLeafMixed) == B_OK);
+		std::string superLeaf;
+		to_lower(superLeafMixed, superLeaf);
+		
+		// We're only interested in directories, as they map to
+		// supertypes (and since they map thusly, they must also
+		// be valid MIME strings)
+		if (superEntry.IsDirectory() && BMimeType::IsValid(superLeaf.c_str())) {
+			// First, find and remove the supertype from our set				
+			CHK(typeSet.find(superLeaf.c_str()) != typeSet.end());
+			typeSet.erase(superLeaf.c_str());
+			
+			// Second, iterate through all the entries in the directory.
+			// If the entry designates a valid MIME string, find it
+			// in the set and remove it.
+			BDirectory superDir(&superEntry);
+			BEntry subEntry;
+			CHK(superDir.InitCheck() == B_OK);
+			superDir.Rewind();
+			while (true) {
+				status_t err = superDir.GetNextEntry(&subEntry);
+				if (err == B_ENTRY_NOT_FOUND)
+					break;	// End of directory listing
+					
+				CHK(!err);	// Any other error is unacceptable :-)
+				
+				// Get the leaf name
+				char subLeafMixed[B_PATH_NAME_LENGTH+1];
+				CHK(subEntry.GetName(subLeafMixed) == B_OK);
+				std::string subLeaf;
+				to_lower(subLeafMixed, subLeaf);
+				
+				// Verify it's a valid mime string. If so, find and remove from our set
+				std::string subType = superLeaf + "/" + subLeaf;
+				if (BMimeType::IsValid(subType.c_str())) {
+					CHK(typeSet.find(subType.c_str()) != typeSet.end());
+					typeSet.erase(subType.c_str());
+				}
+			}				
+		}
+	}
+	
+	// At this point our set should be empty :-) If it's not, you might check
+	// that you haven't added any superfluous files to your MIME database (like
+	// a __mime_table backup, for instance).
+	CHK(typeSet.size() == 0);
+}
 
 void
 MimeTypeTest::InstalledTypesTest() {
@@ -1615,21 +1690,22 @@ MimeTypeTest::InstalledTypesTest() {
 		BMessage msg;
 		NextSubTest();
 #if !TEST_R5
-		CHK(RES(BMimeType::GetInstalledTypes(NULL)) != B_OK);			// R5 == CRASH!!!
+		CHK(BMimeType::GetInstalledTypes(NULL) != B_OK);			// R5 == CRASH!!!, OBOS == B_BAD_VALUE
 #endif
 		NextSubTest();
 #if !TEST_R5
-		CHK(RES(BMimeType::GetInstalledTypes("text", NULL)) != B_OK);	// R5 == CRASH!!!
+		CHK(BMimeType::GetInstalledTypes("text", NULL) != B_OK);	// R5 == CRASH!!!, OBOS == B_BAD_VALUE
 #endif
 		NextSubTest();
 		CHK(BMimeType::GetInstalledTypes(NULL, &msg) == B_OK);		// Same as GetInstalledTypes(&msg)
+//		msg.PrintToStream();
 		NextSubTest();
 #if !TEST_R5
-		CHK(RES(BMimeType::GetInstalledTypes(NULL, NULL)) != B_OK);		// R5 == CRASH!!!
+		CHK(BMimeType::GetInstalledTypes(NULL, NULL) != B_OK);		// R5 == CRASH!!!, OBOS == B_BAD_VALUE
 #endif
 		NextSubTest();
 #if !TEST_R5
-		CHK(RES(BMimeType::GetInstalledSupertypes(NULL)) != B_OK);		// R5 == CRASH!!!
+		CHK(BMimeType::GetInstalledSupertypes(NULL) != B_OK);		// R5 == CRASH!!!, OBOS == B_BAD_VALUE
 #endif
 	}
 	// Invalid supertype param to GetInstalledTypes(char *super, BMessage*)
@@ -1647,80 +1723,21 @@ MimeTypeTest::InstalledTypesTest() {
 	// the actual database directory listings and verifies they're identical.
 	NextSubTest();
 	{
-		BMessage msg;
-
-		// Get the list of installed types
-		CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
-		
-		// Add all the type strings to a std::set
-		std::set<std::string> typeSet;
-		SetAdapter typeAdapter(typeSet);
-		FillWithMimeTypes(typeAdapter, msg, "types");
-
-		// Manually verify that the set of types returned by GetInstalledTypes()
-		// and the types present in the database are exactly the same (ignoring
-		// any files with names made of invalid characters, in case some bozo
-		// manually added such a file :-)
-		BDirectory rootDir(mimeDatabaseDir.c_str());
-		BEntry superEntry;		
-		CHK(rootDir.InitCheck() == B_OK);
-		rootDir.Rewind();
-		while (true) {
-			status_t err = rootDir.GetNextEntry(&superEntry);
-			if (err == B_ENTRY_NOT_FOUND)
-				break;	// End of directory listing
-
-			CHK(!err);	// Any other error is unacceptable :-)
-
-			// Get the leaf name			
-			char superLeafMixed[B_PATH_NAME_LENGTH+1];
-			CHK(superEntry.GetName(superLeafMixed) == B_OK);
-			std::string superLeaf;
-			to_lower(superLeafMixed, superLeaf);
-			
-			// We're only interested in directories, as they map to
-			// supertypes (and since they map thusly, they must also
-			// be valid MIME strings)
-			if (superEntry.IsDirectory() && BMimeType::IsValid(superLeaf.c_str())) {
-				// First, find and remove the supertype from our set				
-				CHK(typeSet.find(superLeaf.c_str()) != typeSet.end());
-				typeSet.erase(superLeaf.c_str());
-				
-				// Second, iterate through all the entries in the directory.
-				// If the entry designates a valid MIME string, find it
-				// in the set and remove it.
-				BDirectory superDir(&superEntry);
-				BEntry subEntry;
-				CHK(superDir.InitCheck() == B_OK);
-				superDir.Rewind();
-				while (true) {
-					status_t err = superDir.GetNextEntry(&subEntry);
-					if (err == B_ENTRY_NOT_FOUND)
-						break;	// End of directory listing
-						
-					CHK(!err);	// Any other error is unacceptable :-)
-					
-					// Get the leaf name
-					char subLeafMixed[B_PATH_NAME_LENGTH+1];
-					CHK(subEntry.GetName(subLeafMixed) == B_OK);
-					std::string subLeaf;
-					to_lower(subLeafMixed, subLeaf);
-					
-					// Verify it's a valid mime string. If so, find and remove from our set
-					std::string subType = superLeaf + "/" + subLeaf;
-					if (BMimeType::IsValid(subType.c_str())) {
-						CHK(typeSet.find(subType.c_str()) != typeSet.end());
-						typeSet.erase(subType.c_str());
-					}
-				}				
-			}
+		VerifyInstalledTypes();
+		BMimeType mime(testTypeApp1);
+		CHK(mime.InitCheck() == B_OK);
+		if (mime.IsInstalled()) {
+			CHK(mime.Delete() == B_OK);
+			VerifyInstalledTypes();
+			CHK(mime.Install() == B_OK);
+			VerifyInstalledTypes();
+		} else {
+			CHK(mime.Install() == B_OK);
+			VerifyInstalledTypes();
+			CHK(mime.Delete() == B_OK);
+			VerifyInstalledTypes();
 		}
-		
-		// At this point our set should be empty :-) If it's not, you might check
-		// that you haven't added any superfluous files to your MIME database (like
-		// a __mime_table backup, for instance).
-		CHK(typeSet.size() == 0);				
-	}	
+	}
 	// Normal Function -- GetInstalledSupertypes()/GetInstalledTypes(char*,BMessage*)
 	// This test gets the list of installed super types, then iterates through
 	// the actual database directory listings and verifies they're identical.
@@ -1730,6 +1747,7 @@ MimeTypeTest::InstalledTypesTest() {
 
 		// Get the list of installed types
 		CHK(BMimeType::GetInstalledSupertypes(&msg) == B_OK);
+//		msg.PrintToStream();
 		
 		// Add all the type strings to a std::set
 		std::set<std::string> typeSet;
@@ -1769,6 +1787,8 @@ MimeTypeTest::InstalledTypesTest() {
 				// to a std::set to be used for verification
 				BMessage msg;
 				CHK(BMimeType::GetInstalledTypes(superLeaf.c_str(), &msg) == B_OK);
+//				msg.PrintToStream();
+				
 				std::set<std::string> subtypeSet;
 				SetAdapter subtypeAdapter(subtypeSet);
 				FillWithMimeTypes(subtypeAdapter, msg, "types");
