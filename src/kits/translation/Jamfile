@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src kits translation ;
+
+UsePublicHeaders translation ;
+
+SharedLibrary translation :
+	BitmapStream.cpp
+	R4xTranslator.cpp
+	TranslationUtils.cpp
+	Translator.cpp
+	TranslatorRoster.cpp
+;
+
+LinkSharedOSLibs libtranslation.so :
+	be
+;
