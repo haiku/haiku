@@ -37,20 +37,15 @@ Addon i-udf-ds : [ FDirName drive_setup fs ] :
 	udf-ds.cpp
 	CS0String.cpp
 	DiskStructures.cpp
-	PartitionMap.cpp
 	Recognition.cpp
 	UdfDebug.cpp
-	Utils.cpp
-	Volume.cpp
 	
 	: false
 	:
 ;
 
 SEARCH on [ FGristFiles
-		vfs_interface.cpp 
-		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
-		PartitionMap.cpp Recognition.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
+		CS0String.cpp DiskStructures.cpp Recognition.cpp UdfDebug.cpp  
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 rule InstallUDFDS
