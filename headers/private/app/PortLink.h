@@ -11,7 +11,7 @@ class PortLink
 public:
 	PortLink(port_id port);
 	PortLink(const PortLink &link);
-	virtual ~PortLink(void) { }
+	virtual ~PortLink(void);
 
 	void SetOpCode(int32 code);
 

@@ -28,6 +28,7 @@
 #define PORTMESSAGE_H_
 
 #include <OS.h>
+#include <ServerProtocol.h>
 
 class PortMessage
 {
@@ -67,12 +68,13 @@ public:
 		}
 
 	void Rewind(void);
-	
+	void BSessionWorkaround(void);
 private:
 	int32 _code;
 	uint8 *_buffer;
 	ssize_t _buffersize;
 	uint8 *_index;
+	bool is_session_msg;
 };
 
 #endif
