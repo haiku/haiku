@@ -52,8 +52,7 @@ then
     rm ~/config/add-ons/kernel/drivers/bin/ich_ac97
 fi
 
-cp -v `dirname "$0"`/ich_ac97 ~/config/add-ons/kernel/drivers/bin 
-ln -v -s ~/config/add-ons/kernel/drivers/bin/ich_ac97 ~/config/add-ons/kernel/drivers/dev/audio/multi/ich_ac97
+unzip -od / `dirname "$0"`/install.zip
 
 kill -9 Media
 kill -9 media_server
