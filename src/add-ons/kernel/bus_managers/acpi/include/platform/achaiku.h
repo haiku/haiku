@@ -151,8 +151,7 @@
 #define ACPI_INTERNAL_VAR_XFACE
 
 
-#define ACPI_FLUSH_CPU_CACHE()
-/* Implement ACPI_FLUSH_CPU_CACHE to do something! */
+#define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
 
 #ifdef ACPI_DEBUG
 #define ACPI_DEBUG_OUTPUT
@@ -188,8 +187,12 @@
 #define ACPI_USE_SYSTEM_CLIBRARY
 #define ACPI_USE_NATIVE_DIVIDE
 
-#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)
-#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq)
+extern int      acpi_acquire_global_lock(uint32 *lock);
+extern int      acpi_release_global_lock(uint32 *lock);
+
+#define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq) ((Acq) = acpi_acquire_global_lock(GLptr))
+#define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq) ((Acq) = acpi_release_global_lock(GLptr))
+
 
 /* Kernel doesn't have strupr, should be fixed. */
 static __inline char *

@@ -258,9 +258,21 @@ status_t evaluate_method (const char *object, const char *method, acpi_object_ty
 	return (status == AE_OK) ? B_OK : B_ERROR;
 }
 
+void waking_vector(void) {
+	//--- This should do something ---
+}
+
 status_t enter_sleep_state (uint8 state) {
 	ACPI_STATUS status;
 	cpu_status cpu;
+	physical_entry wake_vector;
+	
+	lock_memory(&waking_vector,sizeof(waking_vector),0);
+	get_memory_map(&waking_vector,sizeof(waking_vector),&wake_vector,1);
+	
+	status = AcpiSetFirmwareWakingVector(wake_vector.address);
+	if (status != AE_OK)
+		return B_ERROR;
 	
 	status = AcpiEnterSleepStatePrep(state);
 	if (status != AE_OK)
@@ -275,9 +287,9 @@ status_t enter_sleep_state (uint8 state) {
 	if (status != AE_OK)
 		return B_ERROR;
 	
-	status = AcpiLeaveSleepState(state);
+	/*status = AcpiLeaveSleepState(state);
 	if (status != AE_OK)
-		return B_ERROR;
+		return B_ERROR;*/
 	
 	return B_OK;
 }
