@@ -24,9 +24,13 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) -include [ FDirName $(SUBDIR) Debug.h ] ;
 }
 
+local fsShellSources = 
+	fsh.c rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
+	stub.c tracker.cpp sysdep.c hexdump.c argv.c
+;
+
 SimpleTest bfs_shell :
-	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
-	sysdep.c hexdump.c argv.c
+	$(fsShellSources)
 
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 	BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
@@ -46,6 +50,5 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 SEARCH on [ FGristFiles
-		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
-		sysdep.c hexdump.c argv.c
+		$(fsShellSources)
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;

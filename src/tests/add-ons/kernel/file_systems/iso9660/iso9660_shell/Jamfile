@@ -8,10 +8,14 @@ SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
 }
 
+local fsShellSources = 
+	fsh.c rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
+	stub.c tracker.cpp sysdep.c hexdump.c argv.c
+;
+
 SimpleTest iso9660_shell
 	:
-	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-	sysdep.c hexdump.c argv.c tracker.cpp
+	$(fsShellSources)
 
 	iso.c kernel_interface.c
 	:
@@ -23,6 +27,5 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems iso9660 ] ;
 
 SEARCH on [ FGristFiles
-		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-		sysdep.c hexdump.c argv.c tracker.cpp
+		$(fsShellSources)
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;

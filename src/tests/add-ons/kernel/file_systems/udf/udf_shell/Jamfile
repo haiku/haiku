@@ -12,10 +12,14 @@ UsePrivateHeaders [ FDirName kernel ] ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
 }
 
+local fsShellSources = 
+	fsh.c rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
+	stub.c tracker.cpp sysdep.c hexdump.c argv.c
+;
+
 SimpleTest udf_shell
 	:
-	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-	sysdep.c hexdump.c argv.c tracker.cpp
+	$(fsShellSources)
 
 	udf.cpp
 	DirectoryIterator.cpp DString.cpp Icb.cpp
@@ -35,6 +39,5 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 
 SEARCH on [ FGristFiles
-		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-		sysdep.c hexdump.c argv.c tracker.cpp
+		$(fsShellSources)
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;

@@ -3,7 +3,7 @@
  *
  * Format:
  *
- * static void
+ * static int
  * function(int argc, char **argv)
  * {
  * }
@@ -17,7 +17,7 @@
 #include "bfs_control.h"
 
 
-static void
+static int
 do_chkbfs(int argc, char **argv)
 {
 	struct check_control result;
@@ -27,7 +27,7 @@ do_chkbfs(int argc, char **argv)
 	int fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0);
 	if (fd < 0) {
 	    printf("chkbfs: error opening '.'\n");
-	    return;
+	    return fd;
 	}
 
 	memset(&result, 0, sizeof(result));
@@ -91,5 +91,7 @@ do_chkbfs(int argc, char **argv)
 		printf("errors have been fixed\n");
 
 	sys_close(1, fd);
+
+	return 0;
 }
 
