@@ -21,10 +21,10 @@ main(int argc, char **argv)
 
 	// ToDo: evaluate arguments!
 
-    init_block_cache(16348, 0);
+    init_block_cache(4096, 0);
     init_vnode_layer();
 
-	Volume volume(42);
+	Volume volume(1);
 	status_t status = volume.Initialize(deviceName, "New Disk", blockSize, 0);
 	if (status < B_OK) {
 		fprintf(stderr, "Initializing volume failed: %s\n", strerror(status));
