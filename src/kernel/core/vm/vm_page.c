@@ -169,6 +169,10 @@ vm_page_write_modified(vm_cache *cache)
 			remove_page_from_queue(&page_modified_queue, page);
 			page->state = PAGE_STATE_BUSY;
 			gotPage = true;
+
+			// ToDo: just setting PAGE_STAGE_BUSY is not enough, we would also
+			//	need to remove all mappings of this page - else, you could still
+			//	write to this page.
 		}
 
 		release_spinlock(&page_lock);
