@@ -410,12 +410,18 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 
 status_t
 identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
-	translator_info *outInfo, uint32 outType)
+	translator_info *outInfo, uint32 outType, ssize_t amtread, uint8 *read)
 {
 	// Can only output to bits for now
 	if (outType != B_TRANSLATOR_BITMAP)
 		return B_NO_TRANSLATOR;
-	
+	if (amtread != 8)
+		return B_ERROR;
+		
+	if (!png_check_sig(read, amtread))
+		// if first 8 bytes of stream don't match PNG signature bail
+		return B_NO_TRANSLATOR;
+
 	if (outInfo) {
 		outInfo->type = B_PNG_FORMAT;
 		outInfo->group = B_TRANSLATOR_BITMAP;
@@ -424,8 +430,6 @@ identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
 		strcpy(outInfo->MIME, "image/png");
 		strcpy(outInfo->name, "PNG image");
 	}
-	
-	// LAZY HACK: everything that is not bits is identified as PNG
 		
 	return B_OK;
 }
@@ -489,7 +493,7 @@ PNGTranslator::Identify(BPositionIO *inSource,
 	
 	// Read in the magic number and determine if it
 	// is a supported type
-	uint8 ch[4];
+	uint8 ch[8];
 	if (inSource->Read(ch, 4) != 4)
 		return B_NO_TRANSLATOR;
 		
@@ -517,19 +521,21 @@ PNGTranslator::Identify(BPositionIO *inSource,
 		
 	// Might be PNG image
 	else {
-	
-		return identify_png_header(inSource, ioExtension, outInfo, outType);
+		if (inSource->Read(ch + 4, 4) != 4)
+			return B_NO_TRANSLATOR;
+		return identify_png_header(inSource, ioExtension, outInfo, outType, 8, ch);
 	}
 }
 
 status_t
 translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
-	uint32 outType, BPositionIO *outDestination, bool bheaderonly,
-	bool bdataonly)
+	uint32 outType, BPositionIO *outDestination, ssize_t amtread, uint8 *read,
+	bool bheaderonly, bool bdataonly)
 {
+	if (amtread != 8)
+		return B_ERROR;
+
 	status_t result = B_NO_TRANSLATOR;
-	
-	inSource->Seek(0, SEEK_SET);
 	
 	png_structp ppng = NULL;
 	png_infop pinfo = NULL;
@@ -556,6 +562,7 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 		png_set_read_fn(ppng, static_cast<void *>(inSource), pngcb_read_data);
 		
 		// Read in PNG image info
+		png_set_sig_bytes(ppng, amtread);
 		png_read_info(ppng, pinfo);
 			
 		png_uint_32 width, height;
@@ -724,11 +731,9 @@ translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
 // B_OK, if all went well
 // ---------------------------------------------------------------
 status_t
-PNGTranslator::Translate(BPositionIO *inSource,
-		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination)
-{
-	
+PNGTranslator::Translate(BPositionIO *inSource, const translator_info *inInfo,
+	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
+{	
 	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;
 	if (outType != B_TRANSLATOR_BITMAP && outType != B_PNG_FORMAT)
@@ -744,7 +749,7 @@ PNGTranslator::Translate(BPositionIO *inSource,
 	
 	// Read in the magic number and determine if it
 	// is a supported type
-	uint8 ch[4];
+	uint8 ch[8];
 	inSource->Seek(0, SEEK_SET);
 	if (inSource->Read(ch, 4) != 4)
 		return B_NO_TRANSLATOR;
@@ -769,7 +774,7 @@ PNGTranslator::Translate(BPositionIO *inSource,
 	memcpy(&n32ch, ch, sizeof(uint32));
 	if (n32ch == nbits) {
 		// B_TRANSLATOR_BITMAP type
-		inSource->Seek(0, SEEK_SET);
+		outDestination->Write(ch, 4);
 		
 		const size_t kbufsize = 2048;
 		uint8 buffer[kbufsize];
@@ -781,10 +786,16 @@ PNGTranslator::Translate(BPositionIO *inSource,
 		
 		return B_OK;
 		
-	} else
+	} else {
 		// Might be PNG image
+		if (inSource->Read(ch + 4, 4) != 4)
+			return B_NO_TRANSLATOR;
+		if (!png_check_sig(ch, 8))
+			return B_NO_TRANSLATOR;
+
 		return translate_from_png(inSource, ioExtension, outType,
-			outDestination, bheaderonly, bdataonly);
+			outDestination, 8, ch, bheaderonly, bdataonly);
+	}
 }
 
 // ---------------------------------------------------------------
