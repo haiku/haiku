@@ -336,7 +336,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 		return;
 	}
 	
-	TRACE("MediaAddonServer::AddOnAdded: loading addon %d now...\n", id);
+	TRACE("MediaAddonServer::AddOnAdded: loading addon %ld now...\n", id);
 
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
@@ -455,7 +455,7 @@ MediaAddonServer::InstantiateAutostartFlavors(AddOnInfo *info)
 		printf("trying autostart of node %ld, index %ld\n", info->id, index);
 		rv = info->addon->AutoStart(index, &outNode, &outInternalID, &outHasMore);
 		if (rv == B_OK) {
-			printf("started node\n",index);
+			printf("started node %ld\n",index);
 
 			// XXX IncrementAddonFlavorInstancesCount
 
@@ -483,7 +483,6 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 	media_addon_id *tempid;
 	media_addon_id id;
 	AddOnInfo *info;
-	int32 *tempflavorcount;
 	int32 oldflavorcount;
 	// XXX locking?
 	

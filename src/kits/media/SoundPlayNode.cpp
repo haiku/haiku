@@ -452,14 +452,16 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 		// not properly reporting their latency, but there's not much we can do about
 		// that at the moment, so we try to start producing buffers earlier to
 		// compensate.
-		mInternalLatency += how_much;
+		
+		
+//		mInternalLatency += how_much;
 
 //		if (mInternalLatency > 50000)
 //			mInternalLatency = 50000;
 
-		SetEventLatency(mLatency + mInternalLatency);
+//		SetEventLatency(mLatency + mInternalLatency);
 
-		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
+//		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
 	}
 	else
 	{
@@ -574,7 +576,7 @@ _SoundPlayNode::SendNewBuffer(
 				bool realTimeEvent)
 {
 	CALLED();
-	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
+//	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
 
 //	printf("1) should arrive at %20Ld, now %20Ld\n", event->event_time, TimeSource()->Now());
 		
@@ -586,12 +588,12 @@ _SoundPlayNode::SendNewBuffer(
 	// arrive at it's destination. The MediaEventLooper should have scheduled us early enough
 	// (based on EventLatency() and the SchedulingLatency()) to make this possible.
 
-	bigtime_t scheduling_latency = SchedulingLatency();
+//	bigtime_t scheduling_latency = SchedulingLatency();
 
-	if (lateness > 0) {
+	if (lateness > 5000) {
 		printf("_SoundPlayNode::SendNewBuffer, event sheduled too late, lateness is %Ld\n", lateness);
-		mInternalLatency += 1000;
-		SetEventLatency(mLatency + mInternalLatency);
+//		mInternalLatency += 1000;
+//		SetEventLatency(mLatency + mInternalLatency);
 	}
 
 	// skip buffer creation if output not enabled	
@@ -642,13 +644,12 @@ _SoundPlayNode::SendNewBuffer(
 
 	// The buffer is on its way; now schedule the next one to go
 	// nextEvent is the time at which the buffer should arrive at it's destination
-	bigtime_t nextEvent = mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate);
+	bigtime_t nextEvent = TimeSource()->PerformanceTimeFor(mStartTime + bigtime_t((1000000LL * mFramesSent) / mOutput.format.u.raw_audio.frame_rate));
 	media_timed_event nextBufferEvent(nextEvent, SEND_NEW_BUFFER_EVENT);
-	if (TimeSource()->Now() + mLatency > nextEvent) {
-		printf("SendNewBuffer: already %Ld usec too late for new buffer\n", TimeSource()->Now() + mLatency - nextEvent);
-	}
 //	printf("0) should arrive at %20Ld, now %20Ld\n", nextEvent, TimeSource()->Now());
 	EventQueue()->AddEvent(nextBufferEvent);
+	uint32 dummy;
+	write_port(ControlPort(), -1, &dummy, sizeof(dummy));
 	
 	return B_OK;
 }
@@ -688,8 +689,8 @@ _SoundPlayNode::HandleStart(
 		// and fire off the first "produce a buffer" event.
 	
 		mFramesSent = 0;	
-		mStartTime = event->event_time;
-		media_timed_event firstBufferEvent(mStartTime, SEND_NEW_BUFFER_EVENT);
+		mStartTime = TimeSource()->RealTimeFor(event->event_time, 0);
+		media_timed_event firstBufferEvent(event->event_time, SEND_NEW_BUFFER_EVENT);
 
 		// Alternatively, we could call HandleEvent() directly with this event, to avoid a trip through
 		// the event queue, like this:
@@ -697,6 +698,8 @@ _SoundPlayNode::HandleStart(
 		//		this->HandleEvent(&firstBufferEvent, 0, false);
 		//
 		EventQueue()->AddEvent(firstBufferEvent);
+		uint32 dummy;
+		write_port(ControlPort(), -1, &dummy, sizeof(dummy));
 	}
 	return B_OK;
 }
@@ -758,7 +761,7 @@ _SoundPlayNode::AllocateBuffers()
 	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
 	
 	if (count < 3)
-		count == 3;
+		count = 3;
 	
 	mBufferGroup = new BBufferGroup(size, count);
 }
@@ -770,7 +773,7 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 
 	// get a buffer from our buffer group
 	bigtime_t start = system_time();
-	BBuffer* buf = mBufferGroup->RequestBuffer(mOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	BBuffer* buf = mBufferGroup->RequestBuffer(mOutput.format.u.raw_audio.buffer_size, BufferDuration() / 4);
 	bigtime_t delta = system_time() - start;
 	if (delta > 200)
 		printf("RequestBuffer took %Ld usec\n", delta);
@@ -779,6 +782,7 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	// buffer and go on to the next, to avoid locking up the control thread
 	if (!buf)
 	{
+		printf("RequestBuffer failed\n");
 		return NULL;
 	}
 	

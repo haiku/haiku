@@ -325,7 +325,7 @@ virtual		status_t _Reserved_MediaNode_15(void *);
 		int32 _mChangeCount;			//	deprecated
 		int32 _mChangeCountReserved;	//	deprecated
 		uint64 fKinds;
-		media_node_id _unused;
+		media_node_id fTimeSourceID;
 
 		BBufferProducer * fProducerThis;
 		BBufferConsumer * fConsumerThis;

@@ -13,7 +13,9 @@
 #define IS_INVALID_SOURCE(_src)			((_src).port <= 0)
 #define IS_INVALID_DESTINATION(_dest) 	((_dest).port <= 0)
 
-#define NODE_UNREGISTERED_ID	-2
+#define NODE_JUST_CREATED_ID			-1
+#define NODE_UNREGISTERED_ID			-2
+#define NODE_SYSTEM_TIMESOURCE_ID		1
 
 #define BAD_MEDIA_SERVER_PORT			-222
 #define BAD_MEDIA_ADDON_SERVER_PORT		-444

@@ -69,6 +69,8 @@ status_t
 _event_queue_imp::AddEvent(const media_timed_event &event)
 {
 	BAutolock lock(fLock);
+
+//	printf("        adding      %12Ld  at %12Ld\n", event.event_time, system_time());
 	
 	if (event.type <= 0) {
 		 return B_BAD_VALUE;

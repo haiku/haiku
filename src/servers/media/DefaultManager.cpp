@@ -463,7 +463,7 @@ DefaultManager::ConnectMixerToOutput()
 	roster->PrerollNode(mixer);
 	roster->PrerollNode(soundcard);
 	
-	ts = roster->MakeTimeSourceFor(timesource);
+	ts = roster->MakeTimeSourceFor(mixer);
 	start_at = ts->Now() + 50000;
 	roster->StartNode(mixer, start_at);
 	roster->StartNode(soundcard, start_at);

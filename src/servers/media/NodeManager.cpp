@@ -211,7 +211,6 @@ NodeManager::SetNodeCreator(media_node_id nodeid, team_id creator)
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	bool b;
-	status_t rv;
 
 	TRACE("NodeManager::SetNodeCreator node %ld, creator %ld\n", nodeid, creator);
 

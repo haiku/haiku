@@ -563,24 +563,54 @@ BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
 	CALLED();
-	
-	BTimeSource *source;
-
-	TRACE("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
-	
-	if (0 == (for_node.kind & B_TIME_SOURCE)) {
-		//FATAL("BMediaRoster::MakeTimeSourceFor, node %ld is not a timesource!\n", for_node.node);
-		// XXX It appears that Cortex calls this function on every node, and expects
-		// XXX to be returned a system time source if the for_node is not a timesource
-		media_node clone;
-		GetSystemTimeSource(&clone);
-		source = _TimeSourceObjectManager->GetTimeSource(clone);
-//		ReleaseNode(clone);
-	} else {
-		source = _TimeSourceObjectManager->GetTimeSource(for_node);
+	if (IS_INVALID_NODE(for_node)) {
+		FATAL("BMediaRoster::MakeTimeSourceFor: for_node invalid\n");
+		return NULL;
 	}
 
-	TRACE("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
+	printf("BMediaRoster::MakeTimeSourceFor: node %ld enter\n", for_node.node);
+	
+	// MakeTimeSourceFor() returns a BTimeSource object
+	// corresponding to the specified node's time source.
+	
+	node_get_timesource_request request;
+	node_get_timesource_reply reply;
+	BTimeSource *source;
+	status_t rv;
+	
+	rv = QueryPort(for_node.port, NODE_GET_TIMESOURCE, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		FATAL("BMediaRoster::MakeTimeSourceFor: request failed\n");
+		return NULL;
+	}
+	
+	source = MediaRosterEx(this)->MakeTimeSourceObject(reply.timesource_id);
+
+	printf("BMediaRoster::MakeTimeSourceFor: node %ld leave\n", for_node.node);
+
+	return source;
+}
+
+BTimeSource *
+BMediaRosterEx::MakeTimeSourceObject(media_node_id timesource_id)
+{
+	BTimeSource *source;
+	media_node clone;
+	status_t rv;
+
+	rv = GetNodeFor(timesource_id, &clone);
+	if (rv != B_OK) {
+		FATAL("BMediaRosterEx::MakeTimeSourceObject: GetNodeFor failed\n");
+		return NULL;
+	}
+
+	source = _TimeSourceObjectManager->GetTimeSource(clone);
+	if (source == NULL) {
+		FATAL("BMediaRosterEx::MakeTimeSourceObject: GetTimeSource failed\n");
+		return NULL;
+	}
+
+	//ReleaseNode(clone);
 
 	return source;
 }
@@ -1686,6 +1716,10 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 	media_node clone;
 	status_t rv, result;
 	
+	TRACE("BMediaRoster::SetTimeSourceFor: node %ld will be assigned time source %ld\n", node, time_source);
+
+	printf("BMediaRoster::SetTimeSourceFor: node %ld time source %ld enter\n", node, time_source);
+
 	// we need to get a clone of the node to have a port id
 	rv = GetNodeFor(node, &clone);
 	if (rv != B_OK) {
@@ -1693,8 +1727,6 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 		return B_ERROR;
 	}
 
-	TRACE("BMediaRoster::SetTimeSourceFor: node %ld will be assigned time source %ld\n", node, time_source);
-	
 	// we just send the request to set time_source-id as timesource to the node,
 	// the NODE_SET_TIMESOURCE handler code will do the real assignment
 	result = B_OK;
@@ -1712,6 +1744,8 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 		FATAL("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %ld\n", node);
 		result = B_ERROR;
 	}
+
+	printf("BMediaRoster::SetTimeSourceFor: node %ld time source %ld leave\n", node, time_source);
 
 	return result;
 }

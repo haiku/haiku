@@ -96,7 +96,7 @@ BTimeSource::PerformanceTimeFor(bigtime_t real_time)
 	while (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		snooze(1);
 		
-	return (bigtime_t)(last_perf_time + (real_time - last_real_time) * last_drift);
+	return last_perf_time + (bigtime_t)((real_time - last_real_time) * last_drift);
 }
 
 
@@ -117,7 +117,7 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 	while (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		snooze(1);
 
-	return (bigtime_t)(last_real_time + (performance_time - last_perf_time) / last_drift) - with_latency;
+	return last_real_time - with_latency + (bigtime_t)((performance_time - last_perf_time) / last_drift);
 }
 
 
@@ -168,7 +168,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 //		*drift = 1.0f;
 //		return B_OK;
 //	}
-	//printf("BTimeSource::GetTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, *performance_time, *real_time, *drift);
+//	printf("BTimeSource::GetTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, *performance_time, *real_time, *drift);
 
 	TRACE_TIMESOURCE("BTimeSource::GetTime     timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), *performance_time, *real_time, *drift);
 	return B_OK;

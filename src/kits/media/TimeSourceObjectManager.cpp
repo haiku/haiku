@@ -13,6 +13,7 @@
 #include <Autolock.h>
 #include "TimeSourceObjectManager.h"
 #include "TimeSourceObject.h"
+#include "MediaMisc.h"
 #include "debug.h"
 
 
@@ -23,8 +24,7 @@ namespace BPrivate {
 namespace media {
 
 TimeSourceObjectManager::TimeSourceObjectManager()
- :	fSystemTimeSource(0),
- 	fSystemTimeSourceID(0)
+ :	fSystemTimeSource(0)
 {
 	CALLED();
 	fLock = new BLocker("timesource object manager locker");
@@ -50,6 +50,38 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 	delete fMap;
 }
 
+void
+TimeSourceObjectManager::InitSystemTimeSource()
+{
+	BAutolock lock(fLock);
+
+	if (fSystemTimeSource != 0)
+		return;
+
+	printf("TimeSourceObjectManager::InitSystemTimeSource enter\n");
+	
+	media_node node;
+	node.node = NODE_SYSTEM_TIMESOURCE_ID;
+	node.port = SYSTEM_TIMESOURCE_CONTROL_PORT;
+	node.kind = B_TIME_SOURCE;
+	
+	fSystemTimeSource = new SystemTimeSourceObject(node);
+
+	printf("TimeSourceObjectManager::InitSystemTimeSource leave\n");
+}
+
+
+BTimeSource *
+TimeSourceObjectManager::GetSystemTimeSource()
+{
+	BAutolock lock(fLock);
+
+	if (fSystemTimeSource == 0)
+		InitSystemTimeSource();
+
+	return dynamic_cast<BTimeSource *>(fSystemTimeSource->Acquire());
+}
+
 /* BMediaRoster::MakeTimeSourceFor does use this function to request
  * a time source object. If it is already in memory, it will be
  * Acquired(), if not, a new TimeSourceObject will be created.
@@ -62,20 +94,10 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 
 //	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
 	
-	if (fSystemTimeSource == 0) {
-		media_node clone;
-		status_t rv;
-		// XXX this clone is never released
-		rv = BMediaRoster::Roster()->GetSystemTimeSource(&clone); 
-		if (rv != B_OK) {
-			FATAL("TimeSourceObjectManager::GetTimeSource, GetSystemTimeSource failed\n");
-			return NULL;
-		}
-		fSystemTimeSource = new SystemTimeSourceObject(clone);
-		fSystemTimeSourceID = fSystemTimeSource->ID();
-	}
+	if (fSystemTimeSource == 0)
+		InitSystemTimeSource();
 	
-	if (node.node == fSystemTimeSourceID)
+	if (NODE_SYSTEM_TIMESOURCE_ID == node.node)
 		return dynamic_cast<BTimeSource *>(fSystemTimeSource->Acquire());
 	
 	BTimeSource **pts;

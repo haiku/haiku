@@ -563,8 +563,16 @@ BSoundPlayer::Init(
 	// set the producer's time source to be the "default" time source, which
 	// the Mixer uses too.
 	
-	roster->GetTimeSource(&timeSource);
-	roster->SetTimeSourceFor(_m_node->Node().node, timeSource.node);
+	err = roster->GetTimeSource(&timeSource);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't GetTimeSource\n");
+		goto the_end;
+	}
+	err = roster->SetTimeSourceFor(_m_node->Node().node, timeSource.node);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't SetTimeSourceFor\n");
+		goto the_end;
+	}
 	
 	if(!input) {
 		err = roster->GetFreeInputsFor(*node, &_input, 1, 
@@ -597,6 +605,8 @@ BSoundPlayer::Init(
 		TRACE("BSoundPlayer::Init: Couldn't SetRunModeNode\n");
 		goto the_end;
 	}
+	
+	printf("BSoundPlayer node %ld has timesource %ld\n", _m_node->Node().node, _m_node->TimeSource()->Node().node);
 	
 the_end:
 	TRACE("BSoundPlayer::Init: %s\n", strerror(err));

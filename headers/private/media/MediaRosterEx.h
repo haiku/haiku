@@ -49,6 +49,8 @@ public:
 	status_t GetAllInputs(const media_node & node, List<media_input> *list);
 	status_t PublishOutputs(const media_node & node, List<media_output> *list);
 	status_t PublishInputs(const media_node & node, List<media_input> *list);
+	
+	BTimeSource *MakeTimeSourceObject(media_node_id timesource_id);
 
 private:
 	friend class BMediaRoster;

@@ -109,6 +109,7 @@ enum {
 	NODE_TIME_WARP,
 	NODE_PREROLL,
 	NODE_SET_TIMESOURCE,
+	NODE_GET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
 	NODE_FINAL_RELEASE,
 	
@@ -836,6 +837,15 @@ struct node_time_warp_command : public command_data
 };
 
 struct node_set_timesource_command : public command_data
+{
+	media_node_id timesource_id;
+};
+
+struct node_get_timesource_request : public request_data
+{
+};
+
+struct node_get_timesource_reply : public reply_data
 {
 	media_node_id timesource_id;
 };
