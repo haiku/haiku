@@ -268,6 +268,17 @@ static bool zooi(void)
 static void nv_agp_list_info(agp_info ai)
 {
 	/*
+		list device
+	*/
+	if (ai.class_base == PCI_display)
+		LOG(4,("AGP: device is a graphicscard, subclass ID is $%02x\n", ai.class_sub));
+	else
+		LOG(4,("AGP: device is a hostbridge, subclass ID is $%02x\n", ai.class_sub));
+	LOG(4,("AGP: vendor ID $%04x\n", ai.vendor_id));
+	LOG(4,("AGP: device ID $%04x\n", ai.device_id));
+	LOG(4,("AGP: bus %d, device %d, function %d\n", ai.bus, ai.device, ai.function));
+
+	/*
 		list capabilities
 	*/
 	/* the AGP devices determine AGP speed scheme version used on power-up/reset */
