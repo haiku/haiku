@@ -57,10 +57,6 @@
 #	define RBTRACE(x) ;
 #endif
 
-BRegion	gRedrawReg;
-BList gCopyRegList;
-BList gCopyList;
-
 enum {
 	B_LAYER_ACTION_NONE = 0,
 	B_LAYER_ACTION_MOVE,
@@ -483,9 +479,9 @@ void Layer::RebuildAndForceRedraw(const BRegion& reg, Layer *target)
 	StartRebuildRegions(reg, NULL, B_LAYER_NONE, pt);
 
 	if (target)
-		gRedrawReg.Include(&(target->fFullVisible));
+		fRootLayer->fRedrawReg.Include(&(target->fFullVisible));
 
-	Redraw(gRedrawReg);
+	Redraw(fRootLayer->fRedrawReg);
 
 	EmptyGlobals();
 }
@@ -507,7 +503,7 @@ void Layer::FullInvalidate(const BRegion& region)
 	BPoint pt(0,0);
 	StartRebuildRegions(region, NULL,/* B_LAYER_INVALIDATE, pt); */B_LAYER_NONE, pt);
 	
-	Redraw(gRedrawReg);
+	Redraw(fRootLayer->fRedrawReg);
 	
 	EmptyGlobals();
 }
@@ -520,9 +516,9 @@ void Layer::Invalidate(const BRegion& region)
 	printf("\n");
 	#endif
 	
-	gRedrawReg	= region;
+	fRootLayer->fRedrawReg	= region;
 	
-	Redraw(gRedrawReg);
+	Redraw(fRootLayer->fRedrawReg);
 	
 	EmptyGlobals();
 }
@@ -996,7 +992,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 					r.Exclude(&oldRegion);
 				
 				if(r.CountRects() > 0)
-					gRedrawReg.Include(&r);
+					fRootLayer->fRedrawReg.Include(&r);
 				break;
 			}
 			case B_LAYER_MOVE:
@@ -1014,8 +1010,8 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				{
 					copyReg->OffsetBy(-pt.x, -pt.y);
 					BPoint		*point = new BPoint(pt);
-					gCopyRegList.AddItem(copyReg);
-					gCopyList.AddItem(point);
+					fRootLayer->fCopyRegList.AddItem(copyReg);
+					fRootLayer->fCopyList.AddItem(point);
 				}
 				else
 				{
@@ -1026,7 +1022,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				redrawReg.Exclude(&oldRegion);
 				if(redrawReg.CountRects() > 0 && !(pt.x == 0.0f && pt.y == 0.0f) )
 				{
-					gRedrawReg.Include(&redrawReg);
+					fRootLayer->fRedrawReg.Include(&redrawReg);
 				}
 	
 				break;
@@ -1038,7 +1034,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				redrawReg = fVisible;
 				redrawReg.Exclude(&oldRegion);
 				if(redrawReg.CountRects() > 0)
-					gRedrawReg.Include(&redrawReg);
+					fRootLayer->fRedrawReg.Include(&redrawReg);
 	
 				break;
 			}
@@ -1053,7 +1049,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				redrawReg.Exclude(&oldRegion);
 				if(redrawReg.CountRects() > 0)
 				{
-					gRedrawReg.Include(&redrawReg);
+					fRootLayer->fRedrawReg.Include(&redrawReg);
 				}
 				
 				*copyReg = fVisible;
@@ -1062,8 +1058,8 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				if(copyReg->CountRects() > 0
 					&& !(dummyNewLocation.x == 0.0f && dummyNewLocation.y == 0.0f))
 				{
-					gCopyRegList.AddItem(copyReg);
-					gCopyList.AddItem(new BPoint(dummyNewLocation));
+					fRootLayer->fCopyRegList.AddItem(copyReg);
+					fRootLayer->fCopyList.AddItem(new BPoint(dummyNewLocation));
 				}
 				
 				break;
@@ -1088,7 +1084,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	fFullVisible.PrintToStream();
 	fVisible.PrintToStream();
 	printf("==========RedrawReg===========\n");
-	gRedrawReg.PrintToStream();
+	fRootLayer->fRedrawReg.PrintToStream();
 	printf("=====================\n");
 	#endif
 	
@@ -1121,7 +1117,7 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 	fVisible.PrintToStream();
 	oldVisible.PrintToStream();
 	printf("=====!=====RedrawReg=====!=====\n");
-	gRedrawReg.PrintToStream();
+	fRootLayer->fRedrawReg.PrintToStream();
 	printf("=====================\n");
 	#endif
 	
@@ -1132,17 +1128,17 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 		redrawReg.Exclude(&oldVisible);
 
 	if (redrawReg.CountRects() > 0)
-		gRedrawReg.Include(&redrawReg);
+		fRootLayer->fRedrawReg.Include(&redrawReg);
 	
 	#ifdef DEBUG_LAYER_REBUILD
 	printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());
-	gRedrawReg.PrintToStream();
+	fRootLayer->fRedrawReg.PrintToStream();
 	printf("\n");
 	printf("Layer(%s)::StartRebuildREgions() ended! Copy Region:\n", GetName());
-	for(int32 k=0; k<gCopyRegList.CountItems(); k++)
+	for(int32 k=0; k<fRootLayer->fCopyRegList.CountItems(); k++)
 	{
-		((BRegion*)(gCopyRegList.ItemAt(k)))->PrintToStream();
-		((BPoint*)(gCopyList.ItemAt(k)))->PrintToStream();
+		((BRegion*)(fRootLayer->fCopyRegList.ItemAt(k)))->PrintToStream();
+		((BPoint*)(fRootLayer->fCopyList.ItemAt(k)))->PrintToStream();
 	}
 	printf("\n");
 	#endif
@@ -1178,8 +1174,8 @@ void Layer::move_layer(float x, float y)
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
-	fDriver->CopyRegionList(&gCopyRegList, &gCopyList, gCopyRegList.CountItems(), &fFullVisible);
-	fParent->Redraw(gRedrawReg, this);
+	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
+	fParent->Redraw(fRootLayer->fRedrawReg, this);
 	
 	EmptyGlobals();
 
@@ -1190,12 +1186,12 @@ void Layer::EmptyGlobals()
 {
 	void *item;
 	
-	gRedrawReg.MakeEmpty();
+	fRootLayer->fRedrawReg.MakeEmpty();
 	
-	while((item = gCopyRegList.RemoveItem((int32)0)))
+	while((item = fRootLayer->fCopyRegList.RemoveItem((int32)0)))
 		delete (BRegion*)item;
 	
-	while((item = gCopyList.RemoveItem((int32)0)))
+	while((item = fRootLayer->fCopyList.RemoveItem((int32)0)))
 		delete (BPoint*)item;
 }
 
@@ -1297,8 +1293,8 @@ void Layer::resize_layer(float x, float y)
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_RESIZE, pt);
 	
-	fDriver->CopyRegionList(&gCopyRegList, &gCopyList, gCopyRegList.CountItems(), &fFullVisible);
-	fParent->Redraw(gRedrawReg, this);
+	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
+	fParent->Redraw(fRootLayer->fRedrawReg, this);
 	
 	EmptyGlobals();
 

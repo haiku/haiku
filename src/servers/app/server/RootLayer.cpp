@@ -49,7 +49,7 @@
 #include "DisplayDriver.h"
 #include "ServerProtocol.h"
 
-#define DEBUG_ROOTLAYER
+//#define DEBUG_ROOTLAYER
 
 #ifdef DEBUG_ROOTLAYER
 	#define STRACE(a) printf a
@@ -145,7 +145,6 @@ int32 RootLayer::WorkingThread(void *data)
 	STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
 	for(;;)
 	{
-printf("Getting a message from the queue\n");
 		err = messageQueue.GetNextReply(&code);
 
 		oneRootLayer->Lock();

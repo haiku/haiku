@@ -126,8 +126,13 @@ public:
 	// "Private" to app_server :-) - they should not be used
 	void RemoveAppWindow(WinBorder *wb);
 
-	FMWList fMainFMWList;
-	BLocker fMainLock;
+	FMWList			fMainFMWList;
+	BRegion			fRedrawReg;
+	BList			fCopyRegList;
+	BList			fCopyList;
+
+// TODO: remove! Quick!
+	BLocker			fMainLock;
 
 private:
 
@@ -145,7 +150,7 @@ private:
 
 	thread_id fThreadID;
 	port_id fListenPort;
-	
+
 	BList fScreenPtrList;
 	int32 fRows;
 	int32 fColumns;
