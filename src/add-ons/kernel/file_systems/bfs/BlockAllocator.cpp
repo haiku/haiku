@@ -798,8 +798,9 @@ BlockAllocator::CheckNextNode(check_control *control)
 			control->errors = 0;
 			control->status = CheckInode(inode, control);
 
-			const char *name = inode->Name();
-			strcpy(control->name, name ? name : "(node has no name)");
+			if (inode->GetName(control->name) < B_OK)
+				strcpy(control->name, "(node has no name)");
+
 			control->inode = inode->ID();
 			control->mode = inode->Mode();
 
@@ -826,7 +827,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 				continue;
 
 			// fill in the control data as soon as we have them
-			strcpy(control->name, name);
+			strlcpy(control->name, name, B_FILE_NAME_LENGTH);
 			control->inode = id;
 			control->errors = 0;
 
@@ -847,10 +848,6 @@ BlockAllocator::CheckNextNode(check_control *control)
 					FATAL(("Names differ: tree \"%s\", inode \"%s\"\n", name, localName));
 				}
 			}
-
-			strcpy(control->name, name ? name : "(node has no name)");
-			control->inode = inode->ID();
-			control->mode = inode->Mode();
 
 			control->mode = inode->Mode();
 
