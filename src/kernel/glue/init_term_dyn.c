@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <user_runtime.h>
@@ -10,11 +10,11 @@
 #include "init_term_dyn.h"
 
 
-/* These functions are called from _init()/_fini() (in crti.S, crtn.S)
- * _init/fini_before() is called before crtbegin/end code is executed,
- * _init/fini_after() after this.
- * crtbegin contains code to initialize all global constructors and
- * probably other GCC related things.
+/**	These functions are called from _init()/_fini() (in crti.S, crtn.S)
+ *	_init/_term_before() is called before crtbegin/end code is executed,
+ *	_init/_term_after() after this.
+ *	crtbegin contains code to initialize all global constructors and
+ *	other GCC related things (like exception frames).
  */
 
 

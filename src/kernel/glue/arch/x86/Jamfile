@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src kernel glue arch x86 ;
+
+KernelObjects
+	crti.S
+	crtn.S
+	;
+
