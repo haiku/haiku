@@ -300,8 +300,6 @@ check_path_name(const char *path)
 	return error;
 }
 
-/*! Returns "(null)" if you're a bonehead and pass in a \c NULL pointer.
-*/
 std::string
 to_lower(const char *str)
 {
@@ -310,8 +308,6 @@ to_lower(const char *str)
 	return result;
 }
 
-/*! Returns "(null)" if you're a bonehead and pass in a \c NULL pointer.
-*/
 void
 to_lower(const char *str, std::string &result)
 {
@@ -323,9 +319,6 @@ to_lower(const char *str, std::string &result)
 		result = "(null)";
 }
 
-/*! \c str and \c result may point to the same string. \c result is
-	assumed to be as long as or longer than \c str. 
-*/
 void
 to_lower(const char *str, char *result)
 {
@@ -343,6 +336,54 @@ to_lower(char *str)
 	to_lower(str, str);
 }
 
+void escape_path(const char *str, char *result)
+{
+	if (str && result) {
+		int32 len = strlen(str);
+		
+		for (int32 i = 0; i < len; i++) {
+			char ch = str[i];
+			char escapeChar = 0;
+			
+			switch (ch) {
+				case ' ':
+				case '\'':
+				case '"':
+				case '?':
+				case '\\':
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '*':
+				case '^':
+					escapeChar = ch;
+					break;			
+			}
+			
+			if (escapeChar) {
+				*(result++) = '\\';
+				*(result++) = escapeChar;
+			} else {
+				*(result++) = ch;
+			}
+		}
+		
+		*result = 0;	
+	}
+}
+
+void escape_path(char *str)
+{
+	if (str) {
+		char *copy = new(nothrow) char[strlen(str)+1];
+		if (copy) {
+			strcpy(copy, str);
+			escape_path(copy, str);
+		}
+		delete [] copy;
+	}
+}
 
 };	// namespace Storage
 };	// namespace BPrivate

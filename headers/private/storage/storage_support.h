@@ -39,17 +39,50 @@ status_t check_entry_name(const char *entry);
 //! Checks whether a path name is a valid path name.
 status_t check_path_name(const char *path);
 
-//! Returns a copy of \c str in which all alphabetic characters are lowercase.
+/*! \brief Returns a copy of \c str in which all alphabetic characters
+	are lowercase.
+
+	Returns \c "(null)" if you're a bonehead and pass in a \c NULL pointer.
+*/
 std::string to_lower(const char *str);
 
-//! Places a copy of \c str in \c result in which all alphabetic characters are lowercase.
+/*! \brief Places a copy of \c str in \c result in which all alphabetic
+	characters are lowercase.
+
+	Returns \c "(null)" if you're a bonehead and pass in a \c NULL pointer.
+*/
 void to_lower(const char *str, std::string &result);
 
-//! Copies \c str into \c result, converting any uppercase alphabetics to lowercase.
+/*! \brief Copies \c str into \c result, converting any uppercase alphabetics
+	to lowercase.
+	
+	\a str and \a result may point to the same string. \a result is
+	assumed to be as long as or longer than \a str. 
+*/
 void to_lower(const char *str, char *result);
 
 //! Converts \c str to lowercase.
 void to_lower(char *str);
+
+/*! \brief Escapes any whitespace or other special characters in the path
+
+	\a result must be large enough to accomodate the addition of
+	escape sequences to \a str. \a str and \a result may *NOT* point to
+	the same string.
+	
+	Note that this function was designed for use with the registrar's
+	RecentEntries class, and may not create escapes exactly like you're
+	hoping.	Please double check the code for the function to see if this
+	is the case.
+*/
+void escape_path(const char *str, char *result);
+
+/*! \brief Escapes any whitespace or other special characters in the path
+
+	\a str must be large enough to accomodate the addition of
+	escape sequences.
+*/
+void escape_path(char *str);
 
 };	// namespace Storage
 };	// namespace BPrivate
