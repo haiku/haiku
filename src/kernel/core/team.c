@@ -753,14 +753,19 @@ team_delete_team(struct team *team)
 		struct thread *temp_thread;
 		char death_sem_name[B_OS_NAME_LENGTH];
 		cpu_status state;
+		sem_id deathSem;
+		int32 threadCount;
 
 		sprintf(death_sem_name, "team %ld death sem", team->id);
-		team->death_sem = create_sem(0, death_sem_name);
-		if (team->death_sem < 0)
+		deathSem = create_sem(0, death_sem_name);
+		if (deathSem < 0)
 			panic("thread_exit: cannot init death sem for team %ld\n", team->id);
 
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
+
+		team->death_sem = deathSem;
+		threadCount = team->num_threads;
 
 		// If the team was being debugged, that will stop with the termination
 		// of the nub thread. The team structure has already been removed from
@@ -811,7 +816,7 @@ team_delete_team(struct team *team)
 		restore_interrupts(state);
 
 		// wait until all threads in team are dead.
-		acquire_sem_etc(team->death_sem, team->num_threads, 0, 0);
+		acquire_sem_etc(team->death_sem, threadCount, 0, 0);
 		delete_sem(team->death_sem);
 	}
 
@@ -1158,7 +1163,10 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	struct team *team = thread_get_current_thread()->team;
 	struct team_arg *teamArgs;
 	const char *threadName;
-	status_t status;
+	status_t status = B_OK;
+	cpu_status state;
+	struct thread *thread;
+	thread_id nubThreadID = -1;
 
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld)\n", args[0], argCount, envCount));
 
@@ -1169,10 +1177,33 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	// we currently need to be single threaded here
 	// ToDo: maybe we should just kill all other threads and
 	//	make the current thread the team's main thread?
-	if (team->main_thread != thread_get_current_thread()
-		|| team->main_thread != team->thread_list
-		|| team->main_thread->team_next != NULL)
+	if (team->main_thread != thread_get_current_thread())
 		return B_NOT_ALLOWED;
+
+	// The debug nub thread, a pure kernel thread, is allowed to survive.
+	// We iterate through the thread list to make sure that there's no other
+	// thread.
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+	GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+	if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+		nubThreadID = team->debug_info.nub_thread;
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+	for (thread = team->thread_list; thread; thread = thread->team_next) {
+		if (thread != team->main_thread && thread->id != nubThreadID) {
+			status = B_NOT_ALLOWED;
+			break;
+		}
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (status != B_OK)
+		return status;
 
 	// ToDo: maybe we should make sure upfront that the target path is an app?
 
@@ -1184,6 +1215,8 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	// alarm, signals
 	// thread_atkernel_exit() might not be called at all
 
+	user_debug_prepare_for_exec();
+
 	vm_delete_areas(team->aspace);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
@@ -1191,6 +1224,8 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	vfs_exec_io_context(team->io_context);
 
 	cache_node_launched(argCount, args);
+
+	user_debug_finish_after_exec();
 
 	// rename the team
 

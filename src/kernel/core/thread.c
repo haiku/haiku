@@ -750,7 +750,7 @@ thread_exit2(void *_args)
 	// we can't let the interrupts disabled at this point
 	enable_interrupts();
 
-	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.t->kernel_stack_base));
+	TRACE(("thread_exit2, running on death stack 0x%lx\n", args.death_stack));
 
 	// delete the old kernel stack area
 	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
@@ -808,7 +808,7 @@ thread_exit(void)
 	thread_id mainParentThread = -1;
 	bool deleteTeam = false;
 	uint32 death_stack;
-	sem_id cachedDeathSem, parentDeadSem = -1, groupDeadSem = -1;
+	sem_id cachedDeathSem = -1, parentDeadSem = -1, groupDeadSem = -1;
 	status_t status;
 	struct thread_debug_info debugInfo;
 	team_id teamID = team->id;
@@ -889,6 +889,8 @@ thread_exit(void)
 		remove_thread_from_team(team, thread);
 		insert_thread_into_team(team_get_kernel_team(), thread);
 
+		cachedDeathSem = team->death_sem;
+
 		if (deleteTeam) {
 			struct team *parent = team->parent;
 
@@ -939,8 +941,7 @@ thread_exit(void)
 
 		send_signal_etc(mainParentThread, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cachedDeathSem = -1;
-	} else
-		cachedDeathSem = team->death_sem;
+	}
 
 	// fill all death entries and delete the sem that others will use to wait on us
 	{
