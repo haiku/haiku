@@ -957,6 +957,8 @@ InputServer::EnqueueMethodMessage(BMessage *message)
 
 	fMethodQueue.AddItem(message);
 
+	write_port_etc(fEventLooperPort, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+
 	UnlockMethodQueue();
 
 	return B_OK;
@@ -1479,6 +1481,9 @@ InputServer::MethodizeEvents(BList *events,
 	if (fActiveMethod) {
 
 		BList newList;
+		newList.AddList(&fMethodQueue);
+		fMethodQueue.MakeEmpty();
+
 		for (int32 i=0; i<events->CountItems(); i++) {
 			BMessage *item = (BMessage *)events->ItemAt(i);
 			BList filterList;
@@ -1717,33 +1722,40 @@ InputServer::WatchPort()
 			}
 			continue;
 		}
+
+		if (length == 0) {
+			BList list;
+			DispatchEvents(&list);
+			continue;
+		}
 		
 		BMessage *event = new BMessage;
 	
 		if ((err = event->Unflatten(buffer)) < 0) {
 			PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 			delete event;
-		} else {
-			// This is where the message should be processed.	
+			continue;
+		} 
+		
+		// This is where the message should be processed.	
 
-			// here we test for a message coming from app_server, screen resolution change could have happened
-			if (event->what == FAST_MOUSE_MOVED) {
-				BRect frame = fScreen.Frame();
-				if (frame != fFrame) {
-					fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
-					fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
-					fFrame = frame;
-				}
+		// here we test for a message coming from app_server, screen resolution change could have happened
+		if (event->what == FAST_MOUSE_MOVED) {
+			BRect frame = fScreen.Frame();
+			if (frame != fFrame) {
+				fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
+				fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
+				fFrame = frame;
 			}
-			
-			HandleSetMousePosition(event, event);
-						
-			BList list;
-			list.AddItem(event);
-			DispatchEvents(&list);
-			
-			PRINT(("Event written to port\n"));
 		}
+			
+		HandleSetMousePosition(event, event);
+						
+		BList list;
+		list.AddItem(event);
+		DispatchEvents(&list);
+			
+		PRINT(("Event written to port\n"));
 	}
 
 }
