@@ -29,6 +29,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <View.h>	// for B_XXXXX_MOUSE_BUTTON defines
+#include <Message.h>
 #include <GraphicsDefs.h>
 #include <PortLink.h>
 #include "AppServer.h"
@@ -43,6 +44,7 @@
 #include "TokenHandler.h"
 #include "Utils.h"
 #include "DisplayDriver.h"
+#include "ServerPicture.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
@@ -115,48 +117,52 @@ write_to_buffer(int8 **_buffer, Type value)
 	monitor thread.
 */
 ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
-	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index, int32 handlerID)
+	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport,
+	port_id looperPort, uint32 index, int32 handlerID)
 {
-	_title=new BString;
-	if(string)
+	_title			= new BString;
+	if( string )
 		_title->SetTo(string);
-	_frame=rect;
-	_flags=wflags;
-	_look=wlook;
-	_feel=wfeel;
-	_handlertoken=handlerID;
-	cl			= NULL;
+	_frame			= rect;
+	_flags			= wflags;
+	_look			= wlook;
+	_feel			= wfeel;
+	_handlertoken	= handlerID;
+	cl				= NULL;
+	winLooperPort	= looperPort;
 
-	_winborder=new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
+	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
 	// _sender is the monitored window's event port
-	_sender=winport;
+	_sender			= winport;
 
-	_winlink=new PortLink(_sender);
-	_applink= (winapp)? new PortLink(winapp->_receiver) : NULL;
+	_winlink		= new PortLink(_sender);
+	_applink		= (winapp)? new PortLink(winapp->_receiver) : NULL;
 	
 	// _receiver is the port to which the app sends messages for the server
-	_receiver=create_port(30,_title->String());
+	_receiver		= create_port(30,_title->String());
 
 
-	ses		= new BSession( _receiver, _sender );
+	ses				= new BSession( _receiver, _sender );
 		// Send a reply to our window - it is expecting _receiver port.
 	ses->WriteData( &_receiver, sizeof(port_id) );
 	ses->Sync();
 	
 	top_layer		= NULL;
 	
-	_active=false;
+
+	_active			= false;
 
 	// Spawn our message monitoring _monitorthread
-	_monitorthread=spawn_thread(MonitorWin,_title->String(),B_NORMAL_PRIORITY,this);
-	if(_monitorthread!=B_NO_MORE_THREADS && _monitorthread!=B_NO_MEMORY)
-		resume_thread(_monitorthread);
+	_monitorthread	= spawn_thread( MonitorWin, _title->String(),
+									B_NORMAL_PRIORITY, this );
+	if(_monitorthread != B_NO_MORE_THREADS &&
+		_monitorthread != B_NO_MEMORY)
+		resume_thread( _monitorthread );
 
-	_workspace_index=index;
-	_workspace=NULL;
-
-	_token=win_token_handler.GetToken();
+	_workspace_index= index;
+	_workspace		= NULL;
+	_token			= win_token_handler.GetToken();
 
 	AddWindowToDesktop(this,index,ActiveScreen());
 STRACE(("ServerWindow %s:\n",_title->String() ));
@@ -196,9 +202,12 @@ STRACE(("ServerWindow %s:~ServerWindow()\n",_title->String()));
 void ServerWindow::RequestDraw(BRect rect)
 {
 STRACE(("ServerWindow %s: Request Draw\n",_title->String()));
-	_winlink->SetOpCode(AS_LAYER_DRAW);
-	_winlink->Attach(&rect,sizeof(BRect));
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= _UPDATE_;
+	msg.AddRect("_rect", rect);
+	
+	SendMessageToClient( &msg );
 }
 
 //! Requests an update for the entire window
@@ -218,8 +227,11 @@ STRACE(("ServerWindow %s: Replace Decorator\n",_title->String()));
 void ServerWindow::Quit(void)
 {
 STRACE(("ServerWindow %s: Quit\n",_title->String()));
-	_winlink->SetOpCode(B_QUIT_REQUESTED);
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= B_QUIT_REQUESTED;
+	
+	SendMessageToClient( &msg );
 }
 
 /*!
@@ -304,10 +316,13 @@ bool ServerWindow::HasFocus(void)
 void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 {
 STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspace,(active)?"active":"inactive"));
-	_winlink->SetOpCode(AS_WORKSPACE_ACTIVATED);
-	_winlink->Attach<int32>(workspace);
-	_winlink->Attach<bool>(active);
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= B_WORKSPACE_ACTIVATED;
+	msg.AddInt32("workspace", workspace);
+	msg.AddBool("active", active);
+	
+	SendMessageToClient( &msg );
 }
 
 /*!
@@ -318,10 +333,13 @@ STRACE(("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspa
 void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
 {
 STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,newone));
-	_winlink->SetOpCode(AS_WORKSPACES_CHANGED);
-	_winlink->Attach<int32>(oldone);
-	_winlink->Attach<int32>(newone);
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= B_WORKSPACES_CHANGED;
+	msg.AddInt32("old", oldone);
+	msg.AddInt32("new", newone);
+	
+	SendMessageToClient( &msg );
 }
 
 /*!
@@ -331,9 +349,12 @@ STRACE(("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,
 void ServerWindow::WindowActivated(bool active)
 {
 STRACE(("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"active":"inactive"));
-	_winlink->SetOpCode(AS_WINDOW_ACTIVATED);
-	_winlink->Attach<bool>(active);
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= B_WINDOW_ACTIVATED;
+	msg.AddBool("active", active);
+	
+	SendMessageToClient( &msg );
 }
 
 /*!
@@ -344,10 +365,13 @@ STRACE(("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"acti
 void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace)
 {
 STRACE(("ServerWindow %s: ScreenModeChanged\n",_title->String()));
-	_winlink->SetOpCode(AS_SCREENMODE_CHANGED);
-	_winlink->Attach<BRect>(frame);
-	_winlink->Attach(&cspace,sizeof(color_space));
-	_winlink->Flush();
+	BMessage		msg;
+	
+	msg.what		= B_SCREEN_CHANGED;
+	msg.AddRect("frame", frame);
+	msg.AddInt32("mode", (int32)cspace);
+	
+	SendMessageToClient( &msg );
 }
 
 /*
@@ -670,6 +694,382 @@ void ServerWindow::DispatchMessage( int32 code )
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
+		case AS_LAYER_MOVETO:
+		{
+			float		x, y;
+			
+			ses->ReadFloat( &x );
+			ses->ReadFloat( &y );
+			
+			cl->DoMoveTo(x, y);
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_RESIZETO:
+		{
+			float		newWidth, newHeight;
+			
+			ses->ReadFloat( &newWidth );
+			ses->ReadFloat( &newHeight );
+		/* TODO: check for minimum alowed. WinBorder should provide such
+		 *	a method, based on its decorator.
+		 */
+			cl->DoResizeTo( newWidth, newHeight );
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_COORD:
+		{
+			ses->WriteFloat( cl->_frame.left );
+			ses->WriteFloat( cl->_frame.top );
+			ses->WriteRect( cl->_frame.OffsetToCopy( cl->_boundsLeftTop ) );
+			ses->Sync();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_FLAGS:
+		{
+			ses->ReadUInt32( &(cl->_flags) );
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_HIDE:
+		{
+			cl->Hide();
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SHOW:
+		{
+			cl->Show();
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_LINE_MODE:
+		{
+			int8		lineCap, lineJoin;
+/* TODO: speak with DW! Shouldn't we lock before modifying certain memebers?
+ *	Because redraw code might use an updated value instead of one for witch
+ *		it was called. e.g.: different lineCap or lineJoin. Strange result
+ *		would appear.
+ */
+			ses->ReadInt8( &lineCap );
+			ses->ReadInt8( &lineJoin );
+			ses->ReadFloat( &(cl->_layerdata->miterLimit) );
+			
+			cl->_layerdata->lineCap		= (cap_mode)lineCap;
+			cl->_layerdata->lineJoin	= (join_mode)lineJoin;
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_LINE_MODE:
+		{
+			ses->WriteInt8( (int8)(cl->_layerdata->lineCap) );
+			ses->WriteInt8( (int8)(cl->_layerdata->lineJoin) );
+			ses->WriteFloat( cl->_layerdata->miterLimit );
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_PUSH_STATE:
+		{
+			LayerData		*ld = new LayerData();
+			ld->prevState	= cl->_layerdata;
+			cl->_layerdata	= ld;
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_POP_STATE:
+		{
+			if ( !(cl->_layerdata->prevState) ) {
+				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", _title->String(), cl->_name->String()));
+				break;
+			}
+
+			LayerData		*ld = cl->_layerdata;
+			cl->_layerdata	= cl->_layerdata->prevState;
+			delete ld;
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_SCALE:
+		{
+			ses->ReadFloat( &(cl->_layerdata->scale) );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
+			break;
+		}
+		case AS_LAYER_GET_SCALE:
+		{
+			LayerData		*ld = cl->_layerdata;
+			float			scale = ld->scale;
+
+			while( (ld = ld->prevState) )
+				scale		*= ld->scale;
+			
+			ses->WriteFloat( scale );
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
+			break;
+		}
+		case AS_LAYER_SET_PEN_LOC:
+		{
+			float		x, y;
+			
+			ses->ReadFloat( &x );
+			ses->ReadFloat( &y );
+			
+			cl->_layerdata->penlocation.Set( x, y );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_PEN_LOC:
+		{
+			ses->WritePoint( cl->_layerdata->penlocation );
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_PEN_SIZE:
+		{
+			ses->ReadFloat( &(cl->_layerdata->pensize) );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_PEN_SIZE:
+		{
+			ses->WriteFloat( cl->_layerdata->pensize );
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_HIGH_COLOR:
+		{
+			rgb_color		c;
+			
+			ses->ReadData( &c, sizeof(rgb_color) );
+			
+			cl->_layerdata->highcolor.SetColor( c );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_LOW_COLOR:
+		{
+			rgb_color		c;
+			
+			ses->ReadData( &c, sizeof(rgb_color) );
+			
+			cl->_layerdata->lowcolor.SetColor( c );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_VIEW_COLOR:
+		{
+			rgb_color		c;
+			
+			ses->ReadData( &c, sizeof(rgb_color) );
+			
+			cl->_layerdata->viewcolor.SetColor( c );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_COLORS:
+		{
+			rgb_color		highColor, lowColor, viewColor;
+			
+			highColor		= cl->_layerdata->highcolor.GetColor32();
+			lowColor		= cl->_layerdata->lowcolor.GetColor32();
+			viewColor		= cl->_layerdata->viewcolor.GetColor32();
+			
+			ses->WriteData( &highColor, sizeof(rgb_color) );
+			ses->WriteData( &lowColor, sizeof(rgb_color) );
+			ses->WriteData( &viewColor, sizeof(rgb_color) );
+			ses->Sync();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_BLEND_MODE:
+		{
+			int8		srcAlpha, alphaFunc;
+			
+			ses->ReadInt8( &srcAlpha );
+			ses->ReadInt8( &alphaFunc );
+			
+			cl->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
+			cl->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_BLEND_MODE:
+		{
+			ses->WriteInt8( (int8)(cl->_layerdata->alphaSrcMode) );
+			ses->WriteInt8( (int8)(cl->_layerdata->alphaFncMode) );
+			ses->Sync();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_DRAW_MODE:
+		{
+			int8		drawingMode;
+			
+			ses->ReadInt8( &drawingMode );
+			
+			cl->_layerdata->draw_mode	= (drawing_mode)drawingMode;
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_DRAW_MODE:
+		{
+			ses->WriteInt8( (int8)(cl->_layerdata->draw_mode) );
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_PRINT_ALIASING:
+		{
+			ses->ReadBool( &(cl->_layerdata->fontAliasing) );
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_CLIP_TO_PICTURE:
+		{
+			int32		pictureToken;
+			BPoint		where;
+			
+			ses->ReadInt32( &pictureToken );
+			ses->ReadPoint( &where );
+
+			ServerPicture	*sp = NULL;
+			int32			i = 0;
+
+			for(;;){
+				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
+				if (!sp)
+					break;
+					
+				if( sp->GetToken() == pictureToken ){
+					cl->_layerdata->clippPicture	= sp;
+// TODO: increase that picture's reference count.( ~ allocate a picture )
+					break;
+				}
+			}
+				// avoid compiler warning
+			i = 0;
+
+			cl->_layerdata->clippInverse	= false;
+
+// TODO: redraw.
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
+		{
+			int32		pictureToken;
+			BPoint		where;
+			
+			ses->ReadInt32( &pictureToken );
+			ses->ReadPoint( &where );
+
+			ServerPicture	*sp = NULL;
+			int32			i = 0;
+
+			for(;;){
+				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
+				if (!sp)
+					break;
+					
+				if( sp->GetToken() == pictureToken ){
+					cl->_layerdata->clippPicture	= sp;
+// TODO: increase that picture's reference count.( ~ allocate a picture )
+					break;
+				}
+			}
+				// avoid compiler warning
+			i = 0;
+			
+			cl->_layerdata->clippInverse	= true;
+
+// TODO: redraw.
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_CLIP_REGION:
+		{
+			BRegion		reg;
+			LayerData	*ld;
+			int32		noOfRects;
+		// TODO: I think locking is necesary
+			ld			= cl->_layerdata;
+			reg			= cl->ConvertFromParent( cl->_visible );
+
+			if( ld->clippReg )
+				reg.IntersectWith( ld->clippReg );
+
+			while( (ld = ld->prevState) )
+				if( ld->clippReg )
+					reg.IntersectWith( ld->clippReg );
+
+			noOfRects	= reg.CountRects();
+			ses->WriteInt32( noOfRects );
+
+			for( int i = 0; i < noOfRects; i++){
+				ses->WriteRect( reg.RectAt(i) );
+			}
+
+			ses->Sync();
+		
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_CLIP_REGION:
+		{
+			int32		noOfRects;
+			BRect		r;
+		// TODO: I think locking is necesary
+			if( cl->_layerdata->clippReg )
+				cl->_layerdata->clippReg->MakeEmpty();
+			else
+				cl->_layerdata->clippReg = new BRegion();
+			
+			ses->ReadInt32( &noOfRects );
+			
+			for( int i = 0; i < noOfRects; i++ ){
+				ses->ReadRect( &r );
+				cl->_layerdata->clippReg->Include( r );
+			}
+			
+// TODO: redraw.
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+
 		
 	/********** END: BView Messages ***********/
 	
@@ -1610,6 +2010,8 @@ STRACE(("ServerWindow %s: Set Workspace\n",_title->String()));
 	_workspace=wkspc;
 }
 
+//-----------------------------------------------------------------------
+
 Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 {
 	if( !start )
@@ -1654,6 +2056,22 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 	return NULL;
 }
 
+//-----------------------------------------------------------------------
+
+void ServerWindow::SendMessageToClient( const BMessage* msg ) const{
+	ssize_t		size;
+	char		*buffer;
+	
+	size		= msg->FlattenedSize();
+	buffer		= new char[size];
+	if ( msg->Flatten( buffer, size ) == B_OK ){
+		write_port( winLooperPort, msg->what, buffer, size );
+	}
+	else
+		printf("PANIC: SW: '%s': can't flatten message in 'SendMessageToClient()'\n", _title->String() );
+
+	delete buffer;
+}
 
 //-----------------------------------------------------------------------
 
@@ -1675,10 +2093,7 @@ STRACE(("ActivateWindow: old=%s, new=%s\n",oldwin?oldwin->Title():"NULL",newwin?
 
 /*
  @log
-	* Added a handler for AS_LAYER_SET_FONT_STATE message
-	* Modified a bit AS_LAYER_CREATE handler 'cause I forgot about AS_LAYER_SET_FONT_STATE and hidden state.
-	* Added a handler for AS_LAYER_GET_STATE message
-	* Added a handler for AS_LAYER_DELETE message
-	* Modified FindLayer() - now it works OK
-	* added debugging code for AS_LAYER_CREATE handler.
+ 	*added handlers for AS_LAYER_(MOVE/RESIZE)TO messages
+ 	*added AS_LAYER_GET_COORD handler
+ 	*changed some methods to use BMessage class for sending messages to BWindow
 */
