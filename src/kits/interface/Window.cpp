@@ -1788,7 +1788,10 @@ void BWindow::ResizeTo(float width, float height){
 
 void BWindow::Show(){
 	if ( Thread() == B_ERROR )
+	{
+		Lock();
 		Run();
+	}
 
 	fShowLevel--;
 
@@ -1917,6 +1920,7 @@ void BWindow::InitData(	BRect frame,
 						uint32 flags,
 						uint32 workspace){
 
+	fTitle=NULL;
 	if ( be_app == NULL ){
 		//debugger("You need a valid BApplication object before interacting with the app_server");
 		return;
@@ -1997,7 +2001,7 @@ void BWindow::InitData(	BRect frame,
 	
 
 		// let app_server to know that a window has been created.
-	serverLink		= new PortLink(be_app->fServerTo);
+	serverLink		= new PortLink(be_app->fServerFrom);
 	status_t		replyStat;
 	PortLink::ReplyData		replyData;
 
@@ -2018,11 +2022,13 @@ void BWindow::InitData(	BRect frame,
 
 		// Send and wait for ServerWindow port. Necessary here so we can respond to
 		// messages as soon as Show() is called.
+
 	replyStat		= serverLink->FlushWithReply( &replyData );
 	if ( replyStat != B_OK ){
 		//debugger("First reply from app_server was not received.");
 		return;
 	}
+
 		// unlock, so other threads can do their job.
 	be_app->Unlock();
 	
@@ -2034,7 +2040,7 @@ void BWindow::InitData(	BRect frame,
 		// They need to be sent separately because of the speed reasons.
 	srvGfxLink		= new PortLink( send_port );	
 	
-	delete replyData.buffer;
+//	delete replyData.buffer;
 
 		// Create and attach the top view
 	top_view			= buildTopView();
