@@ -42,6 +42,9 @@ THE SOFTWARE.
 #include "InterfaceUtils.h"
 #include "Utils.h"
 
+#define HAVE_FULLVERSION_PDF_LIB 0
+
+#if HAVE_FULLVERSION_PDF_LIB
 class PermissionLabels {
 private:
 	const char* fName;
@@ -84,6 +87,7 @@ public:
 	void Decode(const char* s);
 	void Encode(BString* s);
 };
+#endif
 
 class DocInfoWindow : public HWindow 
 {
@@ -114,22 +118,28 @@ private:
 	BView                  *fTable;
 	BScrollView            *fTableScrollView;
 	BMenu                  *fKeyList;
+#if HAVE_FULLVERSION_PDF_LIB
 	BTextControl           *fMasterPassword;
 	BTextControl           *fUserPassword;
 	Permissions             fPermissions;
+#endif
 	
 	BMessage*               DocInfo() {  return fDocInfo; }
 
 	BBox*                   CreateTabPanel(BTabView* tabView, const char* label);
 	void                    SetupButtons(BBox* panel);
 	void                    SetupDocInfoView(BBox* panel);
+#if HAVE_FULLVERSION_PDF_LIB
 	BTextControl*           AddPasswordControl(BRect r, BView* panel, const char* name, const char* label);
 	void                    SetupPasswordView(BBox* panel);
 	void                    SetupPermissionsView(BBox* panel);
+#endif
 	void                    BuildTable(BMessage *fromDocInfo);
 	void                    ReadFieldsFromTable(BMessage* doc_info);
+#if HAVE_FULLVERSION_PDF_LIB
 	void                    ReadPasswords();
 	void                    ReadPermissions();
+#endif
 	void                    EmptyKeyList();
 	bool                    IsValidKey(const char *key);
 	void                    AddKey(BMessage* msg, bool textControl);

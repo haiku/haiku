@@ -2,7 +2,7 @@
 
 Printer Settings helper class
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <fs_attr.h>
 
 #include "PrinterPrefs.h"
+#include "Utils.h"
 
 /**
  * Constructor
@@ -276,4 +277,23 @@ PrinterSettings::Validate(const BMessage *msg)
 	// message ok
 	return B_OK;
 }
- 
+
+
+void
+PrinterSettings::Update(BNode* node, BMessage* msg)
+{
+	// Validate the message so that it is good for PDF Writer GUI 
+	PrinterSettings ps(*node);
+	if (ps.Validate(msg) != B_OK) {
+		BMessage settings;
+		// check for previously saved settings
+		if (ps.ReadSettings(&settings) != B_OK) {
+			// if there were none, then create a default set...
+			ps.GetDefaults(&settings);
+			// ...and save them
+			ps.WriteSettings(&settings);
+		}
+		AddFields(&settings, msg, false);
+	}
+}
+

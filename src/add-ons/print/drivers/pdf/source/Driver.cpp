@@ -87,18 +87,7 @@ config_page(BNode *spoolDir, BMessage *msg)
 
 	pagesetupMsg = new BMessage(*msg);
 	
-	// Validate the message so that it is good for PDF Writer GUI 
-	PrinterSettings *ps = new PrinterSettings(*spoolDir);
-	if (ps->Validate(pagesetupMsg) != B_OK) {
-		// check for previously saved settings
-		if (ps->ReadSettings(pagesetupMsg) != B_OK) {
-			// if there were none, then create a default set...
-			ps->GetDefaults(pagesetupMsg);
-			// ...and save them
-			ps->WriteSettings(pagesetupMsg);
-		}
-	}
-	delete ps;
+	PrinterSettings::Update(spoolDir, msg);
 
 /* ======== For testing only ==================
 	
@@ -142,18 +131,7 @@ config_job(BNode *spoolDir, BMessage *msg)
 
 	jobsetupMsg = new BMessage(*msg);
 
-	// Validate the message so that it is good for PDF Writer GUI 
-	PrinterSettings *ps = new PrinterSettings(*spoolDir);
-	if (ps->Validate(jobsetupMsg) != B_OK) {
-		// check for previously saved settings
-		if (ps->ReadSettings(jobsetupMsg) != B_OK) {
-			// if there were none, then create a default set...
-			ps->GetDefaults(jobsetupMsg);
-			// ...and save them
-			ps->WriteSettings(jobsetupMsg);
-		}
-	}
-	delete ps;
+	PrinterSettings::Update(spoolDir, jobsetupMsg);
 
 /* ======== For testing only ==================
 
@@ -209,19 +187,9 @@ instanciate_driver(BNode *spoolDir)
 BMessage* 
 default_settings(BNode* printer)
 {
-// (new BAlert("", "default_settings()", "Driver.cpp"))->Go(); 
-	
-	PrinterSettings *ps = new PrinterSettings(*printer);
 	BMessage *msg = new BMessage();
 
-	// first read the settings from the spool dir
-	if (ps->ReadSettings(msg) != B_OK) {
-		// if there were none, then create a default set...
-		ps->GetDefaults(msg);
-		// ...and save them
-		ps->WriteSettings(msg);
-	}
-	delete ps;
+	PrinterSettings::Update(printer, msg);
 	
 	return msg;
 }

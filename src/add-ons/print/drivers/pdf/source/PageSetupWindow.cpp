@@ -504,11 +504,10 @@ PageSetupWindow::UpdateSetupMessage()
 	}
 
 	// save the settings to the new defaults
-	PrinterSettings *ps = new PrinterSettings(fPrinterDirName.String());
-	if (ps->InitCheck() == B_OK) {
-		ps->WriteSettings(fSetupMsg);
+	PrinterSettings ps(fPrinterDirName.String());
+	if (ps.InitCheck() == B_OK) {
+		ps.WriteSettings(fSetupMsg);
 	}
-	delete ps;
 }
 
 

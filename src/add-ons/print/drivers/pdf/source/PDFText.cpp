@@ -264,7 +264,6 @@ PDFWriter::FindFont(char* fontName, bool embed, font_encoding encoding)
 	if (embed) embed = EmbedFont(fontName);
 
 	BString s;
-	char user_defined[80];
 	const char* encoding_name;
 	if (encoding < user_defined_encoding_start) {	
 		encoding_name = encoding_names[encoding];

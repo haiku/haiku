@@ -66,6 +66,7 @@ public:
 	
 	// From here, it's none of your business! ;-)
 private:
+	BString                 fPrinterName;
 	long 					fExitSem;
 	status_t				fResult;
 	BMessage				*fSetupMsg;

@@ -2,7 +2,7 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -34,11 +34,16 @@ THE SOFTWARE.
 #include <stdlib.h>
 
 #include "PrinterDriver.h"
+#include "PrinterSettings.h"
 #include "JobSetupWindow.h"
 #include "DocInfoWindow.h"
 
 static const char* includeKeys[] = {
-	"doc_info", "master_password", "user_password", "permissions", NULL
+	"doc_info", 
+#if HAVE_FULLVERSION_PDF_LIB
+	"master_password", "user_password", "permissions", 
+#endif
+	NULL
 };
 
 // --------------------------------------------------
@@ -55,6 +60,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		BString	title;
 		title << printerName << " Job Setup";
 		SetTitle(title.String());
+		fPrinterName = printerName;
 	}
 	
 	// ---- Ok, build a default job setup user interface
@@ -82,9 +88,9 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		doc_info.AddString("Author", "");
 		doc_info.AddString("Subject", "");
 		doc_info.AddString("Keywords", "");
-		msg->AddMessage("doc_info", &doc_info);
+		fSetupMsg->AddMessage("doc_info", &doc_info);
 	}
-	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
+	AddFields(&fDocInfo, fSetupMsg, true, NULL, includeKeys);
 	
 	allPages = firstPage == 1 && lastPage == MAX_INT32;
 
@@ -237,8 +243,6 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 void 
 JobSetupWindow::UpdateJobMessage() 
 {
-//	int32 copies = atoi(fCopies->Text());
-//	if (copies <= 0) 
 	int32 copies = 1;
 
 	int32 from;
@@ -256,6 +260,12 @@ JobSetupWindow::UpdateJobMessage()
 	fSetupMsg->ReplaceInt32("first_page", from);
 	fSetupMsg->ReplaceInt32("last_page", to);
 	AddFields(fSetupMsg, &fDocInfo);
+
+	// save the settings to the new defaults
+	PrinterSettings ps(fPrinterName.String());
+	if (ps.InitCheck() == B_OK) {
+		ps.WriteSettings(fSetupMsg);
+	}
 }
 
 
@@ -296,7 +306,6 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			break;
 
 		case DOC_INFO_MSG:
-			fDocInfo.PrintToStream(); fflush(stdout);
 			(new DocInfoWindow(&fDocInfo))->Show();
 			break;
 

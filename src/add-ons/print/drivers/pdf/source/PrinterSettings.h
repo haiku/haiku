@@ -2,7 +2,7 @@
 
 PrinterSettings.h
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -82,7 +82,10 @@ public:
 	status_t ReadSettings(BMessage *msg);
 	status_t GetDefaults(BMessage *msg);
 	status_t Validate(const BMessage *msg);
+
+	static void Update(BNode* node, BMessage* msg);
 };
+
 
 #endif
 

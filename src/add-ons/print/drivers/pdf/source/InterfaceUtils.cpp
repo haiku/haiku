@@ -73,12 +73,11 @@ HWindow::MessageReceived(BMessage* msg)
 static const char* 
 kAbout =
 "PDF Writer for BeOS\n"
-"© 2001, 2002 OpenBeOS\n"
+"© 2001-2003 OpenBeOS\n"
 "\n"
 "\tPhilippe Houdoin - Project Leader\n"
 "\tSimon Gauvin - GUI Design\n"
 "\tMichael Pfeiffer - PDF Generation, Configuration, Interactive Features\n"
-"\tCelerick Stephens - Documentation\n"
 ;
 
 void

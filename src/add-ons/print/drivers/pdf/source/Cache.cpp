@@ -50,8 +50,8 @@ private:
 };
 
 Cache::Cache() 
-	: fNextID(0)
-	, fPass(0) 
+	: fPass(0) 
+	, fNextID(0)
 {};
 
 void Cache::NextPass() { 

@@ -427,7 +427,6 @@ PDFWriter::DeclareFonts()
 
 	for (int i = 0; i < fFonts->Length(); i++) {
 		FontFile* f = fFonts->At(i);
-//		LOG((fLog, "path= %s\n", f->Path()));		
 		if (f->Type() == true_type_type) {
 			parameter_name = "FontOutline";
 		} else { // f->Type() == type1_type
@@ -443,8 +442,6 @@ PDFWriter::DeclareFonts()
 #else
 		sprintf(buffer, "%s==%s", f->Name(), f->Path());
 #endif
-//		LOG((fLog, "%s: %s\n", parameter_name, buffer));
-	
 		PDF_set_parameter(fPdf, parameter_name, buffer);
 	}
 	return B_OK;

@@ -2,7 +2,7 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -66,28 +66,36 @@ static bool InList(const char* list[], const char* name) {
 
 // --------------------------------------------------
 // copied from BeUtils.cpp
-void AddFields(BMessage* to, const BMessage* from, const char* excludeList[], const char* includeList[]) {
+void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const char* excludeList[], const char* includeList[]) {
 	if (to == from) return;
 	char* name;
 	type_code type;
 	int32 count;
 	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
+		const void* data;
+		ssize_t size;
+
 		if (excludeList && InList(excludeList, name)) continue;
 		if (includeList && !InList(includeList, name)) continue;
+
+		if (!overwrite && to->FindData(name, type, 0, &data, &size) == B_OK) {
+			continue;
+		}
 		// replace existing data
 		to->RemoveName(name);
 		
-		const void* data;
-		ssize_t size;
 		for (int32 j = 0; j < count; j ++) {
 			if (from->FindData(name, type, j, &data, &size) == B_OK) {
 				// WTF why works AddData not for B_STRING_TYPE in R5.0.3?
-				if (type == B_STRING_TYPE) to->AddString(name, (const char*)data);
-				else if (type == B_MESSAGE_TYPE) {
+				if (type == B_STRING_TYPE) {
+					to->AddString(name, (const char*)data);
+				} else if (type == B_MESSAGE_TYPE) {
 					BMessage m;
 					from->FindMessage(name, j, &m);
 					to->AddMessage(name, &m);
-				} else to->AddData(name, type, data, size);
+				} else {
+					to->AddData(name, type, data, size);
+				}
 			}
 		}
 	}

@@ -60,6 +60,7 @@ CacheItem* ImageDescription::NewItem(int id) {
 	if (image == NULL) {
 		REPORT(kDebug, -1, "Could not store image in cache!");
 	}
+	return image;
 }
 
 Image* ImageDescription::Store(PDF* pdf, int id, BBitmap* bitmap, int mask) {

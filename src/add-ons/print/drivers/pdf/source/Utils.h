@@ -2,7 +2,7 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -38,7 +38,7 @@ THE SOFTWARE.
 
 
 // adds fields to message or replaces existing fields (copy BeUtils.h)
-void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL);
+void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const char* excludeList[] = NULL, const char* includeList[] = NULL);
 void AddString(BMessage* m, const char* name, const char* value);
 
 class EscapeMessageFilter : public BMessageFilter 

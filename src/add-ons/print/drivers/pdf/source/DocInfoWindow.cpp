@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "InterfaceUtils.h"
 #include <ctype.h>
 
+#if HAVE_FULLVERSION_PDF_LIB
 // pdflib 5.x supports password protection and permissions in the commercial license only!
 static const PermissionLabels gPermissionLabels[] = {
 	PermissionLabels("Prevent printing the file.", "noprint"),
@@ -76,6 +77,7 @@ void Permissions::Encode(BString* s) {
 		}
 	}
 }
+#endif
 
 // --------------------------------------------------
 DocInfoWindow::DocInfoWindow(BMessage *doc_info)
@@ -90,16 +92,20 @@ DocInfoWindow::DocInfoWindow(BMessage *doc_info)
 	BString     permissions;
 	fDocInfo = doc_info;
 	
+#if HAVE_FULLVERSION_PDF_LIB
 	if (DocInfo()->FindString("permissions", &permissions) == B_OK) {
 		fPermissions.Decode(permissions.String());
 	}
+#endif
 	
 	r = Bounds();
 	tabView = new BTabView(r, "tab_view");
 
 	SetupDocInfoView(CreateTabPanel(tabView, "Information"));
-	//SetupPasswordView(CreateTabPanel(tabView, "Password"));
-	//SetupPermissionsView(CreateTabPanel(tabView, "Permissions"));
+#if HAVE_FULLVERSION_PDF_LIB
+	SetupPasswordView(CreateTabPanel(tabView, "Password"));
+	SetupPermissionsView(CreateTabPanel(tabView, "Permissions"));
+#endif
 	
 	AddChild(tabView);
 	MoveTo(320, 320);
@@ -207,6 +213,7 @@ DocInfoWindow::SetupDocInfoView(BBox* panel) {
 }
 
 
+#if HAVE_FULLVERSION_PDF_LIB
 BTextControl*
 DocInfoWindow::AddPasswordControl(BRect r, BView* panel, const char* name, const char* label) {
 	BString s;
@@ -242,6 +249,7 @@ DocInfoWindow::SetupPermissionsView(BBox* panel) {
 
 	SetupButtons(panel);
 }
+#endif
 
 // --------------------------------------------------
 bool 
@@ -268,9 +276,12 @@ DocInfoWindow::MessageReceived(BMessage *msg)
 		case OK_MSG: {
 				BMessage doc_info;
 				ReadFieldsFromTable(&doc_info);
-				DocInfo()->ReplaceMessage("doc_info", &doc_info);
+				DocInfo()->RemoveName("doc_info");
+				DocInfo()->AddMessage("doc_info", &doc_info);
+#if HAVE_FULLVERSION_PDF_LIB
 				ReadPasswords();
 				ReadPermissions();
+#endif
 				Quit();
 			}
 			break;
@@ -320,7 +331,7 @@ DocInfoWindow::BuildTable(BMessage *docInfo)
 	y = 5;
 	w = r.Width() - 10;
 
-	for (int32 i = 0; docInfo->GetInfo(B_STRING_TYPE, i, &name, &type, &count) != B_BAD_INDEX; i++) {
+	for (int32 i = 0; docInfo->GetInfo(B_STRING_TYPE, i, &name, &type, &count) == B_OK; i++) {
 		if (type == B_STRING_TYPE) {
 			BString value;
 			if (docInfo->FindString(name, &value) == B_OK) {
@@ -352,12 +363,13 @@ DocInfoWindow::BuildTable(BMessage *docInfo)
 }
 
 
+#if HAVE_FULLVERSION_PDF_LIB
 // --------------------------------------------------
 void 
 DocInfoWindow::ReadPasswords() 
 {
-	//AddString(DocInfo(), "master_password", fMasterPassword->TextView()->Text());
-	//AddString(DocInfo(), "user_password", fUserPassword->TextView()->Text());
+	AddString(DocInfo(), "master_password", fMasterPassword->TextView()->Text());
+	AddString(DocInfo(), "user_password", fUserPassword->TextView()->Text());
 }
 
 // --------------------------------------------------
@@ -366,9 +378,9 @@ DocInfoWindow::ReadPermissions()
 {
 	BString permissions;
 	fPermissions.Encode(&permissions);
-//	AddString(DocInfo(), "permissions", permissions.String());
+	AddString(DocInfo(), "permissions", permissions.String());
 }
-
+#endif
 
 
 // --------------------------------------------------

@@ -2,7 +2,7 @@
 
 PDF Writer printer driver.
 
-Copyright (c) 2001 OpenBeOS. 
+Copyright (c) 2001-2003 OpenBeOS. 
 
 Authors: 
 	Philippe Houdoin
@@ -133,6 +133,13 @@ PrinterDriver::PrintJob
 	// read job message
 	fJobMsg = msg = new BMessage();
 	msg->Unflatten(fJobFile);
+	// We have to load the settings here for Dano/Zeta because they don't store 
+	// all fields from the message returned by config_job in the job file!
+	printf("JobMsg\n");
+	msg->PrintToStream();
+	PrinterSettings::Update(printerNode, msg);
+	printf("\n\nAfter Update:\n");
+	msg->PrintToStream();
 	
 	if (msg->HasInt32("copies")) {
 		copies = msg->FindInt32("copies");
@@ -242,36 +249,6 @@ PrinterDriver::PrinterSetup(char *printerName)
 status_t 
 PrinterDriver::PageSetup(BMessage *setupMsg, const char *printerName)
 {
-	/*
-	BRect paperRect;
-	BRect printRect;
-
-	// const float kScale			= 8.3333f;
-	const float kScreen			= 72.0f;
-	const float kLetterWidth	= 8.5;
-	const float kLetterHeight	= 11;
-
-	// set default value if property not set
-	if (!setupMsg->HasInt64("xres")) 
-		setupMsg->AddInt64("xres", 360);
-		
-	if (!setupMsg->HasInt64("yres"))
-		setupMsg->AddInt64("yres", 360);
-				
-	if (!setupMsg->HasInt32("orientation"))
-		setupMsg->AddInt32("orientation", PORTRAIT_ORIENTATION);
-			
-	paperRect = BRect(0, 0, kLetterWidth * kScreen, kLetterHeight * kScreen);
-	printRect = BRect(0, 0, kLetterWidth * kScreen, kLetterHeight * kScreen);
- 	
-	if (!setupMsg->HasRect("paper_rect"))
-		setupMsg->AddRect("paper_rect", paperRect);
-
-	if (!setupMsg->HasRect("printable_rect"))
-		setupMsg->AddRect("printable_rect", printRect);
-	 		
-	*/
-
 	// check to see if the messag is built correctly...
 	if (setupMsg->HasFloat("scaling") != B_OK) {
 		PrinterSettings *ps = new PrinterSettings(printerName);
@@ -284,9 +261,6 @@ PrinterDriver::PageSetup(BMessage *setupMsg, const char *printerName)
 				// ...and save them
 				ps->WriteSettings(setupMsg);
 			}
-		} else {
-// Temp
-//(new BAlert("", "Problem Loading Settings", "PrinterDriver"))->Go();
 		}			
 	}
 
