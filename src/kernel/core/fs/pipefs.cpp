@@ -993,7 +993,7 @@ pipefs_fsync(fs_volume _volume, fs_vnode _v)
 }
 
 
-static ssize_t
+static status_t
 pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 	void *buffer, size_t *_length)
 {
@@ -1026,7 +1026,7 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 }
 
 
-static ssize_t
+static status_t
 pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 	const void *buffer, size_t *_length)
 {
