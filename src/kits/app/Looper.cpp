@@ -1383,8 +1383,10 @@ DBG(OUT("LOOPER: no target handler, use this\n"));
 						handler = resolve_specifier(handler, fLastMessage);
 					}
 				}
-else
-DBG(OUT("LOOPER: no scripting message\n"));
+				else
+				{
+					DBG(OUT("LOOPER: no scripting message\n"));
+				}
 				
 				if (handler)
 				{
