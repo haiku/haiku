@@ -1,13 +1,13 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-9/2004
+   Rudolf Cornelissen 11/2002-1/2005
 */
 
 #define MODULE_BIT 0x00020000
 
 #include "nv_std.h"
 
-/*Adjust passed parameters to a valid mode line*/
+/* Adjust passed parameters to a valid mode line */
 status_t nv_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
@@ -755,37 +755,7 @@ status_t nv_crtc2_cursor_define(uint8* andMask,uint8* xorMask)
 /* position the cursor */
 status_t nv_crtc2_cursor_position(uint16 x, uint16 y)
 {
-//	uint16 yhigh;
-
-	/* make sure we are beyond the first line of the cursorbitmap being drawn during
-	 * updating the position to prevent distortions: no double buffering feature */
-	/* Note:
-	 * we need to return as quick as possible or some apps will exhibit lagging.. */
-
-	/* read the old cursor Y position */
-//	yhigh = ((DAC2R(CURPOS) & 0x0fff0000) >> 16); 
-	/* make sure we will wait until we are below both the old and new Y position:
-	 * visible cursorbitmap drawing needs to be done at least... */
-//	if (y > yhigh) yhigh = y;
-
-//	if (yhigh < (si->dm.timing.v_display - 16))
-//	{
-		/* we have vertical lines below old and new cursorposition to spare. So we
-		 * update the cursor postion 'mid-screen', but below that area. */
-//		while (((uint16)(NV_REG32(NV32_RASTER2) & 0x000007ff)) < (yhigh + 16))
-//		{
-//			snooze(10);
-//		}
-//	}
-//	else
-//	{
-		/* no room to spare, just wait for retrace (is relatively slow) */
-//		while ((NV_REG32(NV32_RASTER2) & 0x000007ff) < si->dm.timing.v_display)
-//		{
-			/* don't snooze much longer or retrace might get missed! */
-//			snooze(10);
-//		}
-//	}
+	/* the cursor position is updated during retrace by card hardware */
 
 	/* update cursorposition */
 	DAC2W(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
