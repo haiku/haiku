@@ -17,4 +17,9 @@ static const uint32 kMsgOpenWindowClosed = 'clOw';
 static const uint32 kMsgWindowClosed = 'WiCl';
 static const uint32 kMsgSettingsChanged = 'SeCh';
 
+static const uint32 kMsgOpenFindWindow = 'OpFw';
+static const uint32 kMsgFindWindowClosed = 'clFw';
+static const uint32 kMsgFindTarget = 'FTgt';
+static const uint32 kMsgFind = 'find';
+
 #endif	/* DISK_PROBE_H */

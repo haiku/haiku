@@ -55,8 +55,6 @@ static const uint32 kMsgAddBookmark = 'bmrk';
 static const uint32 kMsgPrint = 'prnt';
 static const uint32 kMsgPageSetup = 'pgsp';
 
-static const uint32 kMsgFind = 'find';
-static const uint32 kMsgFindWindow = 'fndw';
 static const uint32 kMsgStopFind = 'sfnd';
 
 
@@ -970,7 +968,7 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
 			(new BAlert("DiskProbe request",
-				"Could not find pattern", "Ok", NULL, NULL,
+				"Could not find search string.", "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		} else
 			beep();
@@ -1194,7 +1192,8 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A', B_COMMAND_KEY));
 	item->SetTarget(fDataView);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(kMsgFindWindow), 'F', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(kMsgOpenFindWindow),
+								'F', B_COMMAND_KEY));
 	item->SetTarget(this);
 	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find Again", new BMessage(kMsgFind),
 		'G', B_COMMAND_KEY));
@@ -1335,8 +1334,15 @@ ProbeView::AllAttached()
 void
 ProbeView::WindowActivated(bool active)
 {
-	if (active)
-		fDataView->MakeFocus(true);
+	if (!active)
+		return;
+
+	fDataView->MakeFocus(true);
+
+	// set this view as the current find panel's target
+	BMessage target(kMsgFindTarget);
+	target.AddMessenger("target", this);
+	be_app_messenger.SendMessage(&target);
 }
 
 
@@ -1662,14 +1668,15 @@ ProbeView::MessageReceived(BMessage *message)
 			PageSetup();
 			break;
 
-		case kMsgFindWindow:
+		case kMsgOpenFindWindow:
 		{
 			fEditorLooper->QuitFind();
 
-			// ToDo: open find window
-			message->AddData("data", B_RAW_TYPE, "test", 4);
-			message->what = kMsgFind;
-			//break;
+			// set this view as the current find panel's target
+			BMessage find(kMsgOpenFindWindow);
+			find.AddMessenger("target", this);
+			be_app_messenger.SendMessage(&find);
+			break;
 		}
 
 		case kMsgFind:

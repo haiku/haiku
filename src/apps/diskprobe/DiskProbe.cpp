@@ -10,6 +10,7 @@
 #include "FileWindow.h"
 #include "AttributeWindow.h"
 #include "OpenWindow.h"
+#include "FindWindow.h"
 
 #include <Application.h>
 #include <Screen.h>
@@ -76,8 +77,10 @@ class DiskProbe : public BApplication {
 		Settings	fSettings;
 		BFilePanel	*fFilePanel;
 		BWindow		*fOpenWindow;
+		FindWindow	*fFindWindow;
 		uint32		fWindowCount;
 		BRect		fWindowFrame;
+		BMessenger	fFindTarget;
 };
 
 
@@ -192,6 +195,7 @@ Settings::UpdateFrom(BMessage *message)
 DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
+	fFindWindow(NULL),
 	fWindowCount(0)
 {
 	fFilePanel = new BFilePanel();
@@ -359,6 +363,36 @@ DiskProbe::MessageReceived(BMessage *message)
 		case kMsgSettingsChanged:
 			fSettings.UpdateFrom(message);
 			break;
+
+		case kMsgFindWindowClosed:
+			fFindWindow = NULL;
+			break;
+		case kMsgFindTarget:
+		{
+			BMessenger target;
+			if (message->FindMessenger("target", &target) != B_OK)
+				break;
+
+			if (fFindWindow != NULL && fFindWindow->Lock()) {
+				fFindWindow->SetTarget(target);
+				fFindWindow->Unlock();
+			}
+			break;
+		}
+		case kMsgOpenFindWindow:
+		{
+			BMessenger target;
+			if (message->FindMessenger("target", &target) != B_OK)
+				break;
+
+			if (fFindWindow == NULL) {
+				// open it!
+				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), target);
+				fFindWindow->Show();
+			} else
+				fFindWindow->Activate();
+			break;
+		}
 
 		case kMsgOpenFilePanel:
 			fFilePanel->Show();
