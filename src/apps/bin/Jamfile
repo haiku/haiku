@@ -1,15 +1,51 @@
 SubDir OBOS_TOP src apps bin ;
 
+# standard commands that don't need any additional library
+StdBinCommands
+	chop.c
+	clear.c
+#	csplit.c
+	driveinfo.c
+#	echo.c
+	eject.c
+	hd.c
+	isvolume.cpp
+	listarea.c
+	listimage.c
+	listport.c
+	listsem.c
+	lsindex.cpp
+	mount.c
+	prio.c
+	ps.c
+	release.c
+	renice.c
+	rescan.c
+	rmattr.cpp
+	sleep.cpp
+	sysinfo.c
+	unchop.c
+	unmount.c
+	waitfor.c
+	whoami.c
+	;
+
+StdBinCommands
+	top.c
+	tput.c
+	: libtermcap.a
+	;
+
+# standard commands that need libbe.so
 StdBinCommands
 	alert.cpp
 	beep.cpp
 	clipboard.cpp
 	df.cpp
+#	factor.cpp
 	ffm.cpp
 	iroster.cpp
-	isvolume.cpp
 	listattr.cpp
-	lsindex.cpp
 	modifiers.cpp
 	open.cpp
 	play.cpp
@@ -21,60 +57,29 @@ StdBinCommands
 #	yes.cpp
 	: be ;
 
-StdBinCommands
-	sleep.cpp
-	: root ;
-#UsePrivateHeaders kernel ;
-#StdBinCommands
-#	factor.cpp
-#	: be ;	
-
+# standard commands that need libbe.so, libtranslation.so
 StdBinCommands
 	translate.cpp
-	: be translation ;
-	
+	: be translation
+	;
+
+# standard commands that need libbe.so, libmedia.so
 StdBinCommands
 	installsound.cpp
-	: be libmedia.so ;
-	
+	: be libmedia.so
+	;
+
+# standard commands that need libbe.so, libstdc++.r4.so
 StdBinCommands
 	catattr.cpp
 	roster.cpp
-	: be stdc++.r4 ;
+	: be stdc++.r4
+	;
 
-StdBinCommands
-	top.c
-	tput.c
-	: libtermcap.a ;
-	
+# standard commands that need libbe.so, libmail.so
 StdBinCommands
 	mail.cpp
-	: be /boot/beos/system/lib/libmail.so ;
-
-StdBinCommands
-	chop.c
-	clear.c
-#	csplit.c
-	driveinfo.c
-#	echo.c
-	eject.c
-	hd.c
-	listarea.c
-	listimage.c
-	listport.c
-	listsem.c
-	mount.c
-	prio.c
-	ps.c
-	release.c
-	renice.c
-	rescan.c
-	rmattr.cpp
-	sysinfo.c
-	unchop.c
-	unmount.c
-	waitfor.c
-	whoami.c
+	: be /boot/beos/system/lib/libmail.so
 	;
 
 SubInclude OBOS_TOP src apps bin addattr ;
@@ -105,6 +110,7 @@ SubInclude OBOS_TOP src apps bin vim ;
 
 # RCS commands
 SubInclude OBOS_TOP src apps bin rcs ;
+
 # Network command line tools
 SubInclude OBOS_TOP src apps bin arp ;
 SubInclude OBOS_TOP src apps bin ifconfig ;
