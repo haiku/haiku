@@ -11,14 +11,18 @@
 #include "List.h"
 #include "LockerHelper.h"
 
-class PPPAuthenticator;
 class PPPDevice;
+class PPPProtocol;
 class PPPEncapsulator;
 class PPPOptionHandler;
-class PPPProtocol;
 
 
 class PPPInterface {
+	private:
+		// copies are not allowed!
+		PPPInterface(const PPPInterface& copy);
+		PPPInterface& operator= (const PPPInterface& copy);
+
 	public:
 		PPPInterface(driver_settings *settings);
 		~PPPInterface();
@@ -28,7 +32,7 @@ class PPPInterface {
 		driver_settings* Settings()
 			{ return fSettings; }
 		
-		PPPFSM &FSM() const
+		PPPFSM& FSM() const
 			{ return fFSM; }
 		
 		bool RegisterInterface();
@@ -108,7 +112,7 @@ class PPPInterface {
 		status_t ReceiveFromDevice(mbuf *packet);
 
 	private:
-		PPPLCP &LCP() const
+		PPPLCP& LCP() const
 			{ return fLCP; }
 		void CalculateMRU();
 		
@@ -135,7 +139,7 @@ class PPPInterface {
 		List<PPPOptionHandler*> fOptionHandlers;
 		List<ppp_module_info*> fModules;
 		
-		BLocker &fGeneralLock;
+		BLocker& fGeneralLock;
 };
 
 

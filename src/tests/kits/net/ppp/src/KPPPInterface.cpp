@@ -620,9 +620,12 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 	PPPEncapsulator *encapsulator_handler = EncapsulatorFor(protocol);
 	for(; encapsulator_handler;
 		encapsulator_handler = EncapsulatorFor(protocol, encapsulator_handler)) {
-		if(!encapsulator_handler->IsEnabled())
+		if(!encapsulator_handler->IsEnabled()) {
+			// disabled handlers should not be used
+			result = PPP_REJECTED;
 			continue;
-				// disabled handlers should not be used
+		}
+		
 		result = encapsulator_handler->Receive(packet, protocol);
 		if(result == PPP_UNHANDLED)
 			continue;
@@ -634,9 +637,14 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 	PPPProtocol *protocol_handler;
 	for(int32 index = 0; index < CountProtocols(); index++) {
 		protocol_handler = ProtocolAt(index);
-		if(protocol != protocol_handler->Protocol()
-			|| !protocol_handler->IsEnabled())
+		if(protocol != protocol_handler->Protocol())
 			continue;
+		
+		if(!protocol_handler->IsEnabled()) {
+			// disabled handlers should not be used
+			result = PPP_REJECTED;
+			continue;
+		}
 		
 		result = protocol_handler->Receive(packet, protocol);
 		if(result == PPP_UNHANDLED)
@@ -703,6 +711,13 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	
 	if(packet == NULL)
 		return B_ERROR;
+	
+	// check if packet is too big
+	if((packet->m_flags & M_PKTHDR && packet->m_pkt_hdr.len > LinkMTU())
+		|| packet->m_len > LinkMTU()) {
+		m_free(packet);
+		return B_ERROR;
+	}
 	
 	// set protocol (the only header field)
 	protocol = htons(protocol);

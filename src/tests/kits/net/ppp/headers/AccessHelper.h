@@ -16,6 +16,11 @@
 
 
 class AccessHelper {
+	private:
+		// copies are not allowed!
+		AccessHelper(const AccessHelper& copy);
+		AccessHelper& operator= (const AccessHelper& copy);
+
 	public:
 		AccessHelper(vint32 *access) : fAccess(access)
 		{

@@ -16,8 +16,13 @@
 
 
 class LockerHelper {
+	private:
+		// copies are not allowed!
+		LockerHelper(const LockerHelper& copy);
+		LockerHelper& operator= (const LockerHelper& copy);
+
 	public:
-		LockerHelper(BLocker &lock) : fLock(&lock)
+		LockerHelper(BLocker& lock) : fLock(&lock)
 		{
 			if(fLock->Lock() != B_OK)
 				fLock = NULL;

@@ -1,9 +1,9 @@
 #include "KPPPFSM.h"
 
 
-PPPFSM::PPPFSM(PPPInterface &interface)
+PPPFSM::PPPFSM(PPPInterface& interface)
 	: fInterface(&interface), fPhase(PPP_CTOR_DTOR_PHASE),
-	fState(PPP_INITIAL_STATE),
+	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF),
 	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fAuthenticatorIndex(-1), fPeerAuthenticatorIndex(-1)
@@ -18,12 +18,22 @@ PPPFSM::~PPPFSM()
 }
 
 
+uint8
+PPPFSM::NextID()
+{
+	return (uint8) atomic_add(&fID, 1);
+}
+
+
 // remember: NewState() must always be called _after_ IllegalEvent()
 // because IllegalEvent() also looks at the current state.
 void
 PPPFSM::NewState(PPP_STATE next)
 {
 	fState = next;
+	
+	// TODO:
+	// ? if next == OPENED_STATE we may want to reset all option handlers ?
 }
 
 
@@ -99,7 +109,11 @@ PPPFSM::PeerAuthenticationName() const
 }
 
 
-// public events
+// This is called by the device to tell us that it entered establishment
+// phase. We can use Device::Down() to abort establishment until UpEvent()
+// is called.
+// The return value says if we are waiting for an UpEvent(). If false is
+// returned the device should immediately abort its attempt to connect.
 bool
 PPPFSM::TLSNotify()
 {
@@ -116,6 +130,10 @@ PPPFSM::TLSNotify()
 }
 
 
+// This is called by the device to tell us that it entered termination phase.
+// A Device::Up() should wait until the device went down.
+// If false is returned we want to stay connected, though we called
+// Device::Down().
 bool
 PPPFSM::TLFNotify()
 {
@@ -202,8 +220,8 @@ PPPFSM::UpEvent()
 				break;
 			}
 			
-			InitializeRestartCounter();
 			NewState(PPP_REQ_SENT_STATE);
+			InitializeRestartCounter();
 			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
@@ -222,6 +240,7 @@ PPPFSM::DownEvent()
 	// TODO:
 	// ResetProtocols();
 	// ResetEncapsulators();
+	// ResetOptionHandlers();
 	
 	switch(State()) {
 		case PPP_CLOSED_STATE:
@@ -307,9 +326,9 @@ PPPFSM::OpenEvent()
 				return;
 			}
 			
-			InitializeRestartCounter();
 			NewState(PPP_REQ_SENT_STATE);
 			fPhase = PPP_ESTABLISHMENT_PHASE;
+			InitializeRestartCounter();
 			locker.UnlockNow();
 			SendConfigureRequest();
 		break;
@@ -332,9 +351,9 @@ PPPFSM::CloseEvent()
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
-			InitializeRestartCounter();
 			NewState(PPP_CLOSING_STATE);
 			fPhase = PPP_TERMINATION_PHASE;
+			InitializeRestartCounter();
 			locker.UnlockNow();
 			SendTerminateRequest();
 		break;
@@ -366,6 +385,7 @@ PPPFSM::CloseEvent()
 }
 
 
+// timeout (restart counters are > 0)
 void
 PPPFSM::TOGoodEvent()
 {
@@ -393,6 +413,7 @@ PPPFSM::TOGoodEvent()
 }
 
 
+// timeout (restart counters are <= 0)
 void
 PPPFSM::TOBadEvent()
 {
@@ -422,84 +443,438 @@ PPPFSM::TOBadEvent()
 }
 
 
+// receive configure request (acceptable request)
 void
-PPPFSM::RCRGoodEvent(PPPConfigurePacket *packet)
+PPPFSM::RCRGoodEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
-	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RCR_GOOD_EVENT);
+		break;
+		
+		case PPP_CLOSED_STATE:
+			locker.UnlockNow();
+			SendTerminateAck();
+		break;
+		
+		case PPP_STOPPED_STATE:
+			// irc,scr,sca/8
+			// XXX: should we do nothing and wait for DownEvent()?
+		break;
+		
+		case PPP_REQ_SENT_STATE:
+			NewState(PPP_ACK_SENT_STATE);
+		
+		case PPP_ACK_SENT_STATE:
+			locker.UnlockNow();
+			SendConfigureAck(packet);
+		break;
+		
+		case PPP_ACK_RCVD_STATE:
+			NewState(PPP_OPENED_STATE);
+			locker.UnlockNow();
+			SendConfigureAck(packet);
+			ThisLayerUp();
+		break;
+		
+		case PPP_OPENED_STATE:
+			// tld,scr,sca/8
+			NewState(PPP_ACK_SENT_STATE);
+			locker.UnlockNow();
+			SendConfigureRequest();
+			SendConfigureAck(packet);
+			ThisLayerDown();
+		break;
+	}
 }
 
 
+// receive configure request (unacceptable request)
 void
-PPPFSM::RCRBadEvent(PPPConfigurePacket *packet)
+PPPFSM::RCRBadEvent(mbuf *nak, mbuf *reject)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RCR_BAD_EVENT);
+		break;
+		
+		case PPP_CLOSED_STATE:
+			locker.UnlockNow();
+			SendTerminateAck();
+		break;
+		
+		case PPP_STOPPED_STATE:
+			// irc,scr,scn/6
+			// XXX: should we do nothing and wait for DownEvent()?
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendConfigureRequest();
+		
+		case PPP_ACK_SENT_STATE:
+			if(State() == PPP_ACK_SENT_STATE)
+				NewState(PPP_REQ_SENT_STATE);
+					// OPENED_STATE might have set this already
+		
+		case PPP_REQ_SENT_STATE:
+		case PPP_ACK_RCVD_STATE:
+			locker.UnlockNow();
+			if( !nak && ((lcp_packet*)nak)->length > 3)
+				SendConfigureNak(nak);
+			else if( !reject && ((lcp_packet*)reject)->length > 3)
+				SendConfigureNak(reject);
+		break;
+	}
 }
 
 
+// receive configure ack
 void
-PPPFSM::RCAEvent(PPPConfigurePacket *packet)
+PPPFSM::RCAEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RCA_EVENT);
+		break;
+		
+		case PPP_CLOSED_STATE:
+		case PPP_STOPPED_STATE:
+			locker.UnlockNow();
+			SendTerminateAck();
+		break;
+		
+		case PPP_REQ_SENT_STATE:
+			NewState(PPP_ACK_RCVD_STATE);
+			InitializeRestartCounter();
+		break;
+		
+		case PPP_ACK_RCVD_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			SendConfigureRequest();
+		break;
+		
+		case PPP_ACK_SENT_STATE:
+			NewState(PPP_OPENED_STATE);
+			InitializeRestartCounter();
+			locker.UnlockNow();
+			ThisLayerUp();
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendConfigureRequest();
+		break;
+	}
 }
 
 
+// receive configure nak/reject
 void
-PPPFSM::RCNEvent(PPPConfigurePacket *packet)
+PPPFSM::RCNEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RCN_EVENT);
+		break;
+		
+		case PPP_CLOSED_STATE:
+		case PPP_STOPPED_STATE:
+			locker.UnlockNow();
+			SendTermintateAck(packet);
+		break;
+		
+		case PPP_REQ_SENT_STATE:
+		case PPP_ACK_SENT_STATE:
+			InitializeRestartCounter();
+		
+		case PPP_ACK_RCVD_STATE:
+			if(State() == PPP_ACK_RCVD_STATE)
+				NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			SendConfigureRequest();
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendConfigureRequest();
+		break;
+	}
 }
 
 
+// receive terminate request
 void
-PPPFSM::RTREvent()
+PPPFSM::RTREvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RTR_EVENT);
+		break;
+		
+		case PPP_ACK_RCVD_STATE:
+		case PPP_ACK_SENT_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			SendTerminateAck(packet);
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_STOPPING_STATE);
+			ZeroRestartCount();
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendTerminateAck(packet);
+		break;
+		
+		default:
+			locker.UnlockNow();
+			SendTerminateAck(packet);
+	}
 }
 
 
+// receive terminate ack
 void
-PPPFSM::RTAEvent()
+PPPFSM::RTAEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RTA_EVENT);
+		break;
+		
+		case PPP_CLOSING_STATE:
+			NewState(PPP_CLOSED_STATE);
+			locker.UnlockNow();
+			ThisLayerFinished();
+		break;
+		
+		case PPP_CLOSING_STATE:
+			NewState(PPP_STOPPED_STATE);
+			locker.UnlockNow();
+			ThisLayerFinished();
+		break;
+		
+		case PPP_ACK_RCVD_STATE:
+			NewState(REQ_SENT_STATE);
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendConfigureRequest();
+		break;
+	}
 }
 
 
+// receive unknown code
 void
-PPPFSM::RUCEvent()
+PPPFSM::RUCEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RUC_EVENT);
+		break;
+		
+		default:
+			locker.UnlockNow();
+			SendCodeReject(packet);
+	}
 }
 
 
+// receive code/protocol reject (acceptable such as IPX reject)
 void
-PPPFSM::RXJGoodEvent()
+PPPFSM::RXJGoodEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RXJ_GOOD_EVENT);
+		break;
+		
+		case PPP_ACK_RCVD_STATE:
+			NewState(PPP_REQ_SENT_STATE);
+		break;
+	}
 }
 
 
+// receive code/protocol reject (catastrophic such as LCP reject)
 void
-PPPFSM::RXJBadEvent()
+PPPFSM::RXJBadEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RJX_BAD_EVENT);
+		break;
+		
+		case PPP_CLOSING_STATE:
+			NewState(PPP_CLOSED_STATE);
+		
+		case PPP_CLOSED_STATE:
+			locker.UnlockNow();
+			ThisLayerFinished();
+		break;
+		
+		case PPP_STOPPING_STATE:
+		case PPP_REQ_SENT_STATE:
+		case PPP_ACK_RCVD_STATE:
+		case PPP_ACK_SENT_STATE:
+			NewState(PPP_STOPPED_STATE);
+		
+		case PPP_STOPPED_STATE:
+			locker.UnlockNow();
+			ThisLayerFinished();
+		break;
+		
+		case PPP_OPENED_STATE:
+			NewState(PPP_STOPPING_STATE);
+			InitializeRestartCounter();
+			locker.UnlockNow();
+			ThisLayerDown();
+			SendTerminateRequest();
+		break;
+	}
 }
 
 
+// receive echo request/reply, discard request
 void
-PPPFSM::RXREvent()
+PPPFSM::RXREvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
+	switch(State()) {
+		case PPP_INITIAL_STATE:
+		case PPP_STARTING_STATE:
+			IllegalEvent(PPP_RXR_EVENT);
+		break;
+		
+		case PPP_OPENED_STATE:
+			SendEchoReply(packet);
+		break;
+	}
+}
+
+
+// general events (for Good/Bad events)
+void
+PPPFSM::TimerEvent()
+{
+	// TODO:
+	// 
+}
+
+
+// ReceiveConfigureRequest
+// Here we get a configure-request packet from LCP and aks all OptionHandlers
+// if its values are acceptable. From here we call our Good/Bad counterparts.
+void
+PPPFSM::RCREvent(mbuf *packet)
+{
+	PPPConfigurePacket request(packet), nak(PPP_CONFIGURE_NAK),
+		reject(PPP_CONFIGURE_REJECT);
+	PPPOptionHandler *handler;
+	
+	// each handler should add unacceptable values for each item
+	for(int32 item = 0; item < request.CountItems(); item++) {
+		for(int32 index = 0; index < Interface()->CountOptionHandlers();
+			index++) {
+			handler = Interface()->OptionHandlerAt(i);
+			if(!handler->ParseConfigureRequest(&request, item, &nak, &reject)) {
+				// the request contains a value that has been sent more than
+				// once or the value is corrupted
+				CloseEvent();
+			}
+		}
+	}
+	
+	if(nak.CountItems() > 0)
+		RCRBadEvent(nak.ToMbuf(), NULL);
+	else if(reject.CountItmes() > 0)
+		RCRBadEvent(NULL, reject.ToMbuf());
+	else
+		RCRGoodEvent(packet);
+}
+
+
+// ReceiveCodeReject
+// LCP received a code-reject packet and we look if it is acceptable.
+// From here we call our Good/Bad counterparts.
+void
+PPPFSM::RXJEvent(mbuf *packet)
+{
+	lcp_packet *reject = (lcp_packet*) packet;
+	
+	if(reject->code == PPP_CODE_REJECT)
+		RXJBadEvent(packet);
+	else if(reject->code == PPP_PROTOCOL_REJECT) {
+		// disable all handlers for rejected protocol type
+		uint16 rejected = *((uint16*) reject->data);
+			// rejected protocol number
+		
+		if(rejected == PPP_LCP_PROTOCOL) {
+			// LCP must not be rejected!
+			RXJBadEvent(packet);
+			return;
+		}
+		
+		int32 index;
+		PPPProtocol *protocol_handler;
+		PPPEncapsulator *encapsulator_handler = fFirstEncapsulator;
+		
+		for(index = 0; index < Interface()->CountProtocols(); index++) {
+			protocol_handler = Interface()->ProtocolAt(index);
+			if(protocol_handler && protocol_handler->Protocol() == rejected)
+				protocol_handler->SetEnabled(false);
+					// disable protocol
+		}
+		
+		for(; encapsulator_handler;
+			encapsulator_handler = encapsulator_handler->Next()) {
+			if(encapsulator_handler->Protocol() == rejected)
+				encapsulator_handler->SetEnabled(false);
+					// disable encapsulator
+		}
+		
+		RXJGoodEvent(packet);
+	}
 }
 
 
@@ -507,6 +882,7 @@ PPPFSM::RXREvent()
 void
 PPPFSM::IllegalEvent(PPP_EVENT event)
 {
+	// TODO:
 	// update error statistics
 }
 
@@ -558,15 +934,14 @@ PPPFSM::SendConfigureRequest()
 
 
 void
-PPPFSM::SendConfigureAck(PPPConfigurePacket *packet)
+PPPFSM::SendConfigureAck(mbuf *packet)
 {
 }
 
 
 void
-PPPFSM::SendConfigureNak(PPPConfigurePacket *packet)
+PPPFSM::SendConfigureNak(mbuf *packet)
 {
-			// is this needed?
 }
 
 
@@ -577,18 +952,18 @@ PPPFSM::SendTerminateRequest()
 
 
 void
-PPPFSM::SendTerminateAck()
+PPPFSM::SendTerminateAck(mbuf *request)
 {
 }
 
 
 void
-PPPFSM::SendCodeReject()
+PPPFSM::SendCodeReject(mbuf *packet)
 {
 }
 
 
 void
-PPPFSM::SendEchoReply()
+PPPFSM::SendEchoReply(mbuf *request)
 {
 }

@@ -5,31 +5,43 @@
 
 
 typedef struct configure_item {
-	void *data;
-	int32 len;
 	uint8 type;
+	uint8 length;
+	int8 data[0];
+		// the data follows this structure
 } configure_item;
 
 
 class PPPConfigurePacket {
+	private:
+		// copies are not allowed!
+		PPPConfigurePacket(const PPPConfigurePacket& copy);
+		PPPConfigurePacket& operator= (const PPPConfigurePacket& copy);
+
 	public:
-		PPPConfigurePacket(uint8 type);
+		PPPConfigurePacket(uint8 code);
 		PPPConfigurePacket(mbuf *data);
 		~PPPConfigurePacket();
 		
-		bool SetType(uint8 type);
-		uint8 Type() const
-			{ return fType; }
+		bool SetCode(uint8 code);
+		uint8 Code() const
+			{ return fCode; }
 		
-		void AddItem(configure_item *item);
-		bool RemoveItem(configure_item *item);
+		void SetID(uint8 id)
+			{ fID = id; }
+		uint8 ID() const
+			{ return fID; }
+		
+		void AddItem(const configure_item *item);
+		bool RemoveItem(const configure_item *item);
 		int32 CountItems() const;
 		configure_item *ItemAt(int32 index) const;
 		
-		mbuf *ToMbuf() const;
+		mbuf *ToMbuf();
+			// the user is responsible for freeing the mbuf
 
 	private:
-		uint8 fType;
+		uint8 fCode, fID;
 };
 
 

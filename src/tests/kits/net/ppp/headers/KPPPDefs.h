@@ -22,7 +22,7 @@
 #define PPP_MODULES_PATH			"network/ppp-modules"
 
 // built-in protocols
-// #define PPP_LCP_PROTOCOL			0xC021
+#define PPP_LCP_PROTOCOL			0xC021
 
 
 #define PPP_ERROR_BASE				B_ERRORS_END
@@ -181,5 +181,7 @@ enum PPP_LCP_TYPE {
 	PPP_DISCARD_REQUEST = 11
 };
 
+#define PPP_MIN_LCP_CODE PPP_CONFIGURE_REQUEST
+#define PPP_MAX_LCP_CODE PPP_DISCARD_REQUEST
 
 #endif

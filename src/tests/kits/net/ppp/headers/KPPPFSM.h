@@ -12,8 +12,12 @@ class PPPFSM {
 
 	private:
 		// may only be constructed/destructed by PPPInterface
-		PPPFSM(PPPInterface &interface);
+		PPPFSM(PPPInterface& interface);
 		~PPPFSM();
+		
+		// copies are not allowed!
+		PPPFSM(const PPPFSM& copy);
+		PPPFSM& operator= (const PPPFSM& copy);
 
 	public:
 		PPPInterface *Interface() const
@@ -23,6 +27,9 @@ class PPPFSM {
 			{ return fState; }
 		PPP_PHASE Phase() const
 			{ return fPhase; }
+		
+		uint8 NextID();
+			// return the next id for lcp_packets
 		
 		// public events
 		void AuthenticationRequested();
@@ -48,7 +55,7 @@ class PPPFSM {
 		void DownEvent();
 
 	private:
-		BLocker &Locker()
+		BLocker& Locker()
 			{ return fLock; }
 		void LeaveConstructionPhase();
 		void EnterDestructionPhase();
@@ -61,16 +68,21 @@ class PPPFSM {
 		void CloseEvent();
 		void TOGoodEvent();
 		void TOBadEvent();
-		void RCRGoodEvent(PPPConfigurePacket *packet);
-		void RCRBadEvent(PPPConfigurePacket *packet);
-		void RCAEvent(PPPConfigurePacket *packet);
-		void RCNEvent(PPPConfigurePacket *packet);
-		void RTREvent();
-		void RTAEvent();
-		void RUCEvent();
-		void RJXGoodEvent();
-		void RJXBadEvent();
-		void RXREvent();
+		void RCRGoodEvent(mbuf *packet);
+		void RCRBadEvent(mbuf *nak, mbuf *reject);
+		void RCAEvent(mbuf *packet);
+		void RCNEvent(mbuf *packet);
+		void RTREvent(mbuf *packet);
+		void RTAEvent(mbuf *packet);
+		void RUCEvent(mbuf *packet);
+		void RXJGoodEvent(mbuf *packet);
+		void RXJBadEvent(mbuf *packet);
+		void RXREvent(mbuf *packet);
+		
+		// general events (for Good/Bad events)
+		void TimerEvent();
+		void RCREvent(mbuf *packet);
+		void RXJEvent(mbuf *packet);
 		
 		// actions
 		void IllegalEvent(PPP_EVENT event);
@@ -81,21 +93,20 @@ class PPPFSM {
 		void InitializeRestartCount();
 		void ZeroRestartCount();
 		void SendConfigureRequest();
-		void SendConfigureAck(PPPConfigurePacket *packet);
-		
-		void SendConfigureNak(PPPConfigurePacket *packet);
-			// is this needed?
-		
+		void SendConfigureAck(mbuf *packet);
+		void SendConfigureNak(mbuf *packet);
 		void SendTerminateRequest();
-		void SendTerminateAck();
-		void SendCodeReject();
-		void SendEchoReply();
+		void SendTerminateAck(mbuf *request);
+		void SendCodeReject(mbuf *packet);
+		void SendEchoReply(mbuf *request);
 
 	private:
 		PPPInterface *fInterface;
 		
 		PPP_PHASE fPhase;
 		PPP_STATE fState;
+		
+		vint32 fID;
 		
 		PPP_AUTHENTICATION_STATUS fAuthenticationStatus,
 			fPeerAuthenticationStatus;
