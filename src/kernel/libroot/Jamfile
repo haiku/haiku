@@ -52,11 +52,12 @@ KernelMergeObject kernel_posix.o :
 	<$(SOURCE_GRIST)>strtoul.c
 	<$(SOURCE_GRIST)>strtoull.c
 	# sys
-	<$(SOURCE_GRIST)>chmod.c
-	<$(SOURCE_GRIST)>stat.c
-	<$(SOURCE_GRIST)>mkdir.c
- 	<$(SOURCE_GRIST)>select.c
- 	<$(SOURCE_GRIST)>gettimeofday.c
+	chmod.c
+	stat.c
+	mkdir.c
+	select.c
+	gettimeofday.c
+ 	uio.c
 	# time
 	<$(SOURCE_GRIST)>time.c
 	# unistd
