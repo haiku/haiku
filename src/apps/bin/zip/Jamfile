@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src apps bin zip ;
 
+local zip_rsrc = [ FGristFiles zip.rsrc ] ;
+ResComp $(zip_rsrc) : [ FGristFiles zip.rdef ] ;
+
 StaticLibrary zip : 
 	zipup.c
 	crypt.c
@@ -13,28 +16,28 @@ StaticLibrary zip :
 	zipfile.c
 	trees.c
 	crctab.c
-	: : zip.rdef
+	: : zip.rsrc
 ;
 
 BinCommand zip :
 	zip.c
-	: libzip.a be : zip.rdef
+	: libzip.a be : zip.rsrc
 ;
 
 BinCommand zipcloak :
 	zipcloak.c
 	bedefs.c
-	: libzip.a : zip.rdef
+	: libzip.a : zip.rsrc
 ;
 
 BinCommand zipnote :
 	zipnote.c
 	bedefs.c
-	: libzip.a be : zip.rdef
+	: libzip.a be : zip.rsrc
 ;
 
 BinCommand zipsplit :
 	zipsplit.c
 	bedefs.c
-	: libzip.a be : zip.rdef
+	: libzip.a be : zip.rsrc
 ;
