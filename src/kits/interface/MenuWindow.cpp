@@ -24,40 +24,60 @@
 //					Stefano Ceccherini (burton666@libero.it)
 //	Description:	BMenuWindow is a custom BWindow for BMenus.
 //------------------------------------------------------------------------------
-// TODO: Just a very simple implementation for now
+// TODO: Add scrollers
+
+#include <stdio.h>
 
 #include <Menu.h>
-
 #include <MenuWindow.h>
 
 // TODO: taken from Deskbar's WindowMenu.cpp.
 // this should go to some private header.
 const window_feel kMenuWindowFeel = (window_feel)1025;
 
-BMenuWindow::BMenuWindow(BMenu *menu)
+class BMenuFrame : public BView {
+public:
+	BMenuFrame() :
+		BView(BRect(0, 0, 0, 0), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	{
+	};
+	
+	virtual void AttachedToWindow()
+	{
+		BView::AttachedToWindow();
+		ResizeTo(Window()->Bounds().Width(), Window()->Bounds().Height());
+	};
+	
+	virtual void Draw(BRect updateRect)
+	{
+		BRect bounds(Bounds());
+		
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_4_TINT));
+		StrokeRect(bounds);
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
+		StrokeLine(BPoint(bounds.left + 2, bounds.bottom - 1),
+					BPoint(bounds.right - 1, bounds.bottom - 1));
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
+		StrokeLine(BPoint(bounds.left + 1, bounds.top + 1),
+					BPoint(bounds.right - 2, bounds.top + 1));	
+	};
+	
+};
+
+
+BMenuWindow::BMenuWindow(const char *name)
 	:
 	// The window will be resized by BMenu, so just pass a dummy rect
-	BWindow(BRect(0, 0, 0, 0), "Menu", B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
-			B_NOT_ZOOMABLE)
+	BWindow(BRect(0, 0, 0, 0), name, B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
+			B_NOT_ZOOMABLE),
+	fUpperScroller(NULL),
+	fLowerScroller(NULL)
 {
-	fMenu = menu;
-	AddChild(fMenu);	
-	fMenu->MakeFocus(true);
+	BMenuFrame *menuFrame = new BMenuFrame();
+	AddChild(menuFrame);
 }
 
 
 BMenuWindow::~BMenuWindow()
 {
-}
-
-
-void 
-BMenuWindow::WindowActivated(bool active)
-{
-	if (!active) {
-		RemoveChild(fMenu);
-
-		if (Lock())
-			Quit();
-	}
 }

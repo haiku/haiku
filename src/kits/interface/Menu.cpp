@@ -24,6 +24,7 @@
 //					Stefano Ceccherini (burton666@libero.it)
 //	Description:	BMenu display a menu of selectable items.
 //------------------------------------------------------------------------------
+#include <Debug.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Menu.h>
@@ -88,8 +89,7 @@ sPropList[] = {
 
 
 BMenu::BMenu(const char *name, menu_layout layout)
-	:	BView(BRect(), name, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-			B_WILL_DRAW | B_NAVIGABLE),
+	:	BView(BRect(), name, 0,	B_WILL_DRAW),
 		fChosenItem(NULL),
 		fPad(14.0f, 2.0f, 20.0f, 0.0f),
 		fSelected(NULL),
@@ -123,8 +123,7 @@ BMenu::BMenu(const char *name, menu_layout layout)
 
 
 BMenu::BMenu(const char *name, float width, float height)
-	:	BView(BRect(0.0f, width, 0.0f, height), name,
-			B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE),
+	:	BView(BRect(0.0f, width, 0.0f, height), name, 0, B_WILL_DRAW),
 		fChosenItem(NULL),
 		fSelected(NULL),
 		fCachedMenuWindow(NULL),
@@ -190,7 +189,7 @@ BMenu::Archive(BMessage *data, bool deep) const
 	if (Layout() != B_ITEMS_IN_ROW) {
 		err = data->AddInt32("_layout", Layout());
 
-		if (err != B_OK)
+		if (err < B_OK)
 			return err;
 	}
 
@@ -251,35 +250,14 @@ BMenu::DetachedFromWindow()
 bool
 BMenu::AddItem(BMenuItem *item)
 {
-	return AddItem(item, CountItems());
+	return _AddItem(item, CountItems());
 }
 
 
 bool
 BMenu::AddItem(BMenuItem *item, int32 index)
 {
-	item->fSuper = this;
-
-	bool err = fItems.AddItem(item, index);
-
-	if (!err)
-		return err;
-
-	// Make sure we update the layout in case we are already attached.
-	if (Window() && fResizeToFit) {
-		LayoutItems(index);
-		Invalidate();
-	}
-
-	// Find the root menu window, so we can install this item.
-	BMenu *root = this;
-	while (root->Supermenu())
-		root = root->Supermenu();
-
-	if (root->Window())
-		Install(root->Window());
-	
-	return err;
+	return _AddItem(item, index);
 }
 
 
@@ -295,7 +273,7 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 	
 	item->fBounds = frame;
 	
-	return AddItem(item, CountItems());
+	return _AddItem(item, CountItems());
 }
 
 
@@ -305,10 +283,8 @@ BMenu::AddItem(BMenu *submenu)
 	BMenuItem *item = new BMenuItem(submenu);
 	if (!item)
 		return false;
-		
-	submenu->fSuper = this;
-
-	return AddItem(item);
+	
+	return _AddItem(item, CountItems());
 }
 
 
@@ -319,9 +295,7 @@ BMenu::AddItem(BMenu *submenu, int32 index)
 	if (!item)
 		return false;
 		
-	submenu->fSuper = this;
-	
-	return AddItem(item, index);
+	return _AddItem(item, index);
 }
 
 
@@ -333,27 +307,36 @@ BMenu::AddItem(BMenu *submenu, BRect frame)
 			" be called if the menu layout is B_ITEMS_IN_MATRIX");
 	
 	BMenuItem *item = new BMenuItem(submenu);
-	submenu->fSuper = this;
 	item->fBounds = frame;
 	
-	return AddItem(item);
+	return _AddItem(item, CountItems());
 }
 
 
 bool
 BMenu::AddList(BList *list, int32 index)
 {
-	return false;
+	// TODO: test this function, it's not documented in the bebook.
+	int32 numItems = 0;
+	if (list != NULL)
+		numItems = list->CountItems();
+	
+	for (int32 i = 0; i < numItems; i++) {
+		BMenuItem *item = static_cast<BMenuItem *>(list->ItemAt(i));
+		if (item != NULL)
+			_AddItem(item, index + i);
+	}	
+	
+	// TODO: return false if needed
+	return true;
 }
 
 
 bool
 BMenu::AddSeparatorItem()
 {
-	BMenuItem *item = new BSeparatorItem();
-	item->fSuper = this;
-	
-	return fItems.AddItem(item);
+	BMenuItem *item = new BSeparatorItem();	
+	return _AddItem(item, CountItems());
 }
 
 
@@ -1017,11 +1000,13 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	BWindow *window = new BMenuWindow(this);
-
-	window->ResizeTo(Bounds().Width() + 1, Bounds().Height() + 1);
-	window->MoveTo(ScreenLocation());
-	window->Show();
+	// Menu windows get the BMenu's handler name
+	fCachedMenuWindow = new BMenuWindow(Name());
+	
+	fCachedMenuWindow->ChildAt(0)->AddChild(this);
+	fCachedMenuWindow->ResizeTo(Bounds().Width() + 3, Bounds().Height() + 3);
+	fCachedMenuWindow->MoveTo(ScreenLocation());
+	fCachedMenuWindow->Show();
 	
 	return true;
 }
@@ -1030,11 +1015,10 @@ BMenu::_show(bool selectFirstItem)
 void
 BMenu::_hide()
 {
-	BWindow *window = Window();
-	if (window) {
-		window->RemoveChild(this);
-		window->Lock();
-		window->Quit();
+	if (fCachedMenuWindow != NULL) {
+		fCachedMenuWindow->Lock();
+		fCachedMenuWindow->ChildAt(0)->RemoveChild(this);
+		fCachedMenuWindow->Quit();
 	}
 	
 }
@@ -1046,7 +1030,7 @@ BMenu::_track(int *action, long start)
 	// TODO: Take Sticky mode into account, handle submenus
 	BPoint location;
 	ulong buttons;
-	BMenuItem *item = NULL;	
+	BMenuItem *item = NULL;
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
@@ -1094,7 +1078,30 @@ BMenu::_track(int *action, long start)
 bool
 BMenu::_AddItem(BMenuItem *item, int32 index)
 {
-	return false;
+	ASSERT(item != NULL);
+	
+	item->SetSuper(this);
+
+	bool err = fItems.AddItem(item, index);
+
+	if (!err)
+		return err;
+
+	// Make sure we update the layout in case we are already attached.
+	if (Window() && fResizeToFit) {
+		LayoutItems(index);
+		Invalidate();
+	}
+
+	// Find the root menu window, so we can install this item.
+	BMenu *root = this;
+	while (root->Supermenu())
+		root = root->Supermenu();
+
+	if (root->Window())
+		Install(root->Window());
+	
+	return err;
 }
 
 
@@ -1146,12 +1153,11 @@ BMenu::LayoutItems(int32 index)
 
 	ResizeTo(width, height);
 	
-	// TODO: Looks like this call is needed when the layout is
-	// B_ITEMS_IN_MATRIX, otherwise the view is placed in a wrong place
-	// (by the above call). See if we can avoid this by being
-	// smarter in other places.
-	if (fLayout == B_ITEMS_IN_MATRIX)
-		MoveTo(B_ORIGIN);
+	// Move the BMenu to 2, 2, if it's attached to a BMenuWindow,
+	// (that means it's a BMenu, BMenuBars are attached to regular BWindows).
+	// This is needed to be able to draw the frame around the BMenu.
+	if (dynamic_cast<BMenuWindow *>(Window()) != NULL)
+		MoveTo(2, 2);
 }
 
 
@@ -1159,6 +1165,7 @@ void
 BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 						  float* width, float* height)
 {
+	// TODO: Take "bestFit", "moveItems", "index" into account.
 	BRect frame(0, 0, 0, 0);
 	float iWidth, iHeight;
 	BMenuItem *item = NULL;
@@ -1173,7 +1180,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	
 					if (item->fModifiers && item->fShortcutChar)
 						iWidth += 25.0f;
-		
+			
 					item->fBounds.left = 2.0f;
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
@@ -1212,7 +1219,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 				}
 			}
 			
-			for (int i = 0; i < fItems.CountItems(); i++)
+			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.bottom = frame.bottom;
 
 			frame.right = (float)ceil(frame.right) + 8.0f;
@@ -1228,8 +1235,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					frame.right = max_c(frame.right, item->Frame().right);
 					frame.top = min_c(frame.top, item->Frame().top);
 					frame.bottom = max_c(frame.bottom, item->Frame().bottom);
-				}
-			}
+				}			
+			}		
 			break;
 		}
 	
@@ -1239,10 +1246,10 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
-			*width = Parent()->Frame().Width() + 1.0f;
+			*width = Parent()->Frame().Width();
 		else
-			*width = Window()->Frame().Width() + 1.0f;
-
+			*width = Window()->Frame().Width();
+		
 		*height = frame.Height();
 	} else {
 		*width = frame.Width();

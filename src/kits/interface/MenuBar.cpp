@@ -320,8 +320,8 @@ BMenuBar::operator=(const BMenuBar &)
 
 
 void 
-BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool show_menu,
-							BRect *special_rect)
+BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
+							BRect *specialRect)
 {
 	BWindow *window = Window();
 	if (!window) 
@@ -343,10 +343,10 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool show_menu,
 			data.menuBar = this;
 			data.menuIndex = menuIndex;
 			data.sticky = sticky;
-			data.showMenu = show_menu;
-			data.useRect = special_rect != NULL;
+			data.showMenu = showMenu;
+			data.useRect = specialRect != NULL;
 			if (data.useRect)
-				data.rect = *special_rect;
+				data.rect = *specialRect;
 				
 			send_data(fTrackingPID, 0, &data, sizeof(data));
 			resume_thread(fTrackingPID);
@@ -406,10 +406,12 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 			BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
 			if (menuItem) {
 				SelectItem(menuItem);
+				BMenu *menu = menuItem->Submenu();
 				// TODO: Actually, this test shouldn't be needed, as
 				// all BMenuBar's BMenuItems are BMenus.
-				BMenu *menu = menuItem->Submenu();
 				if (menu) {
+					if (IsStickyPrefOn())
+						menu->SetStickyMode(true);
 					do {
 						snooze(40000);
 						GetMouse(&where, &buttons);
@@ -422,7 +424,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 						resultItem = menu->_track((int *)action, startIndex);
 						
 						// "action" is "5" when the BMenu is closed.
-					} while (*action != 5);		
+					} while (*action != 5);
 				}
 				SelectItem(NULL);
 				Invalidate();	
