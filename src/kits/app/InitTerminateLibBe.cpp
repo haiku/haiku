@@ -25,7 +25,7 @@
 //------------------------------------------------------------------------------
 #include <stdio.h>
 
-#include <Roster.h>
+#include <RosterPrivate.h>
 
 // debugging
 //#define DBG(x) x

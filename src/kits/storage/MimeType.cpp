@@ -18,7 +18,7 @@
 #include <stdio.h>			// For printf()
 #include <string.h>			// For strncpy()
 #include <RegistrarDefs.h>
-#include <Roster.h>			// For _send_to_roster_()
+#include <RosterPrivate.h>	// For SendTo()
 
 // Private helper functions
 bool isValidMimeChar(const char ch);
@@ -320,7 +320,7 @@ BMimeType::Install()
 	if (!err)
 		err = msg.AddString("type", Type());
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -356,7 +356,7 @@ BMimeType::Delete()
 	if (!err)
 		err = msg.AddString("type", Type());
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -629,7 +629,7 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 	if (!err)
 		err = msg.AddString("type", Type());
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -703,7 +703,7 @@ BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 	if (!err)
 		err = msg.AddInt32("app verb", verb);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -779,7 +779,7 @@ BMimeType::SetAttrInfo(const BMessage *info)
 	if (!err && info) 
 		err = msg.AddMessage("attr info", info);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -836,7 +836,7 @@ BMimeType::SetFileExtensions(const BMessage *extensions)
 	if (!err && extensions) 
 		err = msg.AddMessage("extensions", extensions);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -878,7 +878,7 @@ BMimeType::SetShortDescription(const char *description)
 	if (!err)
 		err = msg.AddBool("long", false);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -920,7 +920,7 @@ BMimeType::SetLongDescription(const char *description)
 	if (!err)
 		err = msg.AddBool("long", true);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -956,7 +956,7 @@ BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 	if (!err)
 		msg.what = B_REG_MIME_GET_INSTALLED_SUPERTYPES;
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1015,7 +1015,7 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 	if (!err && supertype)
 		err = msg.AddString("supertype", supertype);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1163,7 +1163,7 @@ BMimeType::SetAppHint(const entry_ref *ref)
 	if (!err && ref)
 		err = msg.AddRef("app hint", ref);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1279,7 +1279,7 @@ BMimeType::SetIconForType(const char *type, const BBitmap *icon, icon_size which
 			err = msg.AddString("file type", type);
 	}
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1345,7 +1345,7 @@ BMimeType::SetSnifferRule(const char *rule)
 	if (!err && rule) 
 		err = msg.AddString("sniffer rule", rule);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1474,7 +1474,7 @@ BMimeType::GuessMimeType(const entry_ref *file, BMimeType *type)
 	if (!err)
 		err = msg.AddRef("file ref", file);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1512,7 +1512,7 @@ BMimeType::GuessMimeType(const void *buffer, int32 length, BMimeType *type)
 	if (!err)
 		err = msg.AddData("data", B_RAW_TYPE, buffer, length);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1553,7 +1553,7 @@ BMimeType::GuessMimeType(const char *filename, BMimeType *type)
 	if (!err)
 		err = msg.AddString("filename", filename);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1587,7 +1587,7 @@ BMimeType::StartWatching(BMessenger target)
 	// Build and send the message, read the reply
 	err = msg.AddMessenger("target", target);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1616,7 +1616,7 @@ BMimeType::StopWatching(BMessenger target)
 	// Build and send the message, read the reply
 	err = msg.AddMessenger("target", target);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1796,7 +1796,7 @@ BMimeType::SetSupportedTypes(const BMessage *types, bool fullSync)
 	if (!err)
 		err = msg.AddBool("full sync", fullSync);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)
@@ -1834,7 +1834,7 @@ BMimeType::GetAssociatedTypes(const char *extension, BMessage *types)
 	if (!err)
 		err = msg.AddString("extension", extension);
 	if (!err) 
-		err = _send_to_roster_(&msg, &reply, true);
+		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
 		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
 	if (!err)

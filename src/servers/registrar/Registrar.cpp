@@ -6,6 +6,7 @@
 #include <Message.h>
 #include <OS.h>
 #include <RegistrarDefs.h>
+#include <RosterPrivate.h>
 
 #include "ClipboardHandler.h"
 #include "DiskDeviceManager.h"
@@ -68,7 +69,7 @@ Registrar::~Registrar()
 	delete fRoster;
 	// Invalidate the global be_roster, so that the BApplication destructor
 	// won't dead-lock when sending a message to itself.
-	BPrivate::init_registrar_roster(BMessenger(), BMessenger());
+	BRoster::Private().SetTo(BMessenger(), BMessenger());
 	FUNCTION_END();
 }
 
@@ -233,8 +234,7 @@ Registrar::ReadyToRun()
 	fEventQueue = new EventQueue(kEventQueueName);
 	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
 	// init the global be_roster
-	BPrivate::init_registrar_roster(be_app_messenger,
-									BMessenger(NULL, fMIMEManager));
+	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));
 	// create and schedule the sanity message event
 	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
 									this, B_REG_ROSTER_SANITY_EVENT);
@@ -273,25 +273,6 @@ Registrar*
 Registrar::App()
 {
 	return dynamic_cast<Registrar*>(be_app);
-}
-
-
-// init_registrar_roster
-/*!	\brief Initializes the global \a be_roster.
-
-	While this is done automagically for all other applications while libbe
-	initialization, the registrar needs to help out a bit.
-
-	\param mainMessenger A BMessenger targeting the registrar application.
-	\param mimeMessenger A BMessenger targeting the MIME manager.
-*/
-void
-BPrivate::init_registrar_roster(BMessenger mainMessenger,
-								BMessenger mimeMessenger)
-{
-	BRoster *roster = const_cast<BRoster*>(be_roster);
-	roster->fMess = mainMessenger;
-	roster->fMimeMess = mimeMessenger;
 }
 
 

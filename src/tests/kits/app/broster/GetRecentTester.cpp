@@ -14,6 +14,7 @@
 #include <Message.h>
 #include <Node.h>
 #include <Roster.h>
+#include <RosterPrivate.h>
 
 // Project Includes ------------------------------------------------------------
 #include <TestShell.h>
@@ -1270,8 +1271,8 @@ GetRecentTester::RecentListsLoadSaveClearTest()
 	roster.AddToRecentDocuments(&doc2, test_sigs[1]);
 	roster.AddToRecentFolders(&folder1, test_sigs[0]);
 	roster.AddToRecentFolders(&folder2, test_sigs[1]);
-	roster.AddToRecentApps(appSig1);	
-	roster.AddToRecentApps(appSig2);
+	BRoster::Private(roster).AddToRecentApps(appSig1);	
+	BRoster::Private(roster).AddToRecentApps(appSig2);
 	
 	// Check #1
 	NextSubTest();
@@ -1300,10 +1301,10 @@ GetRecentTester::RecentListsLoadSaveClearTest()
 	
 	// Save to disk and clear
 	NextSubTest();
-	roster.SaveRecentLists(kTempSaveFile);
-	roster.ClearRecentDocuments();
-	roster.ClearRecentFolders();
-	roster.ClearRecentApps();
+	BRoster::Private(roster).SaveRecentLists(kTempSaveFile);
+	BRoster::Private(roster).ClearRecentDocuments();
+	BRoster::Private(roster).ClearRecentFolders();
+	BRoster::Private(roster).ClearRecentApps();
 	
 	// Check #2
 	NextSubTest();
@@ -1323,7 +1324,7 @@ GetRecentTester::RecentListsLoadSaveClearTest()
 	
 	// Load back from disk
 	NextSubTest();
-	roster.LoadRecentLists(kTempSaveFile);
+	BRoster::Private(roster).LoadRecentLists(kTempSaveFile);
 	
 	// Check #3
 	NextSubTest();

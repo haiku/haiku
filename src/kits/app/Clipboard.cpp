@@ -32,8 +32,9 @@
 
 // System Includes -------------------------------------------------------------
 #include <Clipboard.h>
-#include <RegistrarDefs.h>
 #include <Application.h>
+#include <RegistrarDefs.h>
+#include <RosterPrivate.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -56,7 +57,7 @@ BClipboard::BClipboard(const char *name, bool transient = false)
   fSystemCount = 0;
 
   BMessage message(B_REG_GET_CLIPBOARD_MESSENGER), reply;
-  if ( (_send_to_roster_(&message, &reply, false) == B_OK) &&
+  if ( (BRoster::Private().SendTo(&message, &reply, false) == B_OK) &&
        (reply.what == B_REG_SUCCESS) &&
        (reply.FindMessenger("messenger",&fClipHandler) == B_OK) )
   {

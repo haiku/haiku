@@ -18,6 +18,7 @@
 #include <Node.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
+#include <RosterPrivate.h>
 
 #include <unistd.h>
 
@@ -51,7 +52,7 @@ status_t do_mime_update(int32 what, const char *path, int recursive,
 		if (!err)
 			err = msg.AddBool("force", force);
 		if (!err) 
-			err = _send_to_roster_(&msg, &reply, true);
+			err = BRoster::Private().SendTo(&msg, &reply, true);
 		if (!err)
 			err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 		if (!err)

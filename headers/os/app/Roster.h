@@ -39,17 +39,6 @@ class BList;
 class BMessage;
 class BNodeInfo;
 
-// TODO: relocate these private prototypes
-extern "C" int	_init_roster_();
-extern "C" int	_delete_roster_();
-status_t _send_to_roster_(BMessage *message, BMessage *reply, bool mime);
-bool _is_valid_roster_mess_(bool mime);
-
-namespace BPrivate {
-	void init_registrar_roster(BMessenger mainMessenger,
-							   BMessenger mimeMessenger);
-}
-
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
 
@@ -149,15 +138,10 @@ public:
 							const char *appSig = NULL) const;
 		
 /*----- Private or reserved ------------------------------*/
+	class Private;
+
 private:
-	friend class BApplication;
-	friend class BWindow;
-	friend class _BAppCleanup_;
-	friend int	_init_roster_();
-	friend status_t _send_to_roster_(BMessage *, BMessage *, bool);
-	friend bool _is_valid_roster_mess_(bool);
-	friend void BPrivate::init_registrar_roster(BMessenger, BMessenger);
-	friend class GetRecentTester;
+	friend class Private;
 
 	class ArgVector;
 

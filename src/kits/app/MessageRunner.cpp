@@ -29,6 +29,7 @@
 #include <MessageRunner.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
+#include <RosterPrivate.h>
 
 // constructor
 /*!	\brief Creates and initializes a new BMessageRunner.
@@ -98,7 +99,7 @@ BMessageRunner::~BMessageRunner()
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = _send_to_roster_(&request, &reply, false);
+		error = BRoster::Private().SendTo(&request, &reply, false);
 	// ignore the reply, we can't do anything anyway
 }
 
@@ -176,7 +177,7 @@ BMessageRunner::GetInfo(bigtime_t *interval, int32 *count) const
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = _send_to_roster_(&request, &reply, false);
+		error = BRoster::Private().SendTo(&request, &reply, false);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -267,7 +268,7 @@ BMessageRunner::InitData(BMessenger target, const BMessage *message,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = _send_to_roster_(&request, &reply, false);
+		error = BRoster::Private().SendTo(&request, &reply, false);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what == B_REG_SUCCESS) {
@@ -319,7 +320,7 @@ BMessageRunner::SetParams(bool resetInterval, bigtime_t interval,
 	// send the request
 	BMessage reply;
 	if (error == B_OK)
-		error = _send_to_roster_(&request, &reply, false);
+		error = BRoster::Private().SendTo(&request, &reply, false);
 	// evaluate the reply
 	if (error == B_OK) {
 		if (reply.what != B_REG_SUCCESS)

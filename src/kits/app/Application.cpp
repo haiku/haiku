@@ -44,6 +44,7 @@
 #include <PropertyInfo.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
+#include <RosterPrivate.h>
 #include <Window.h>
 
 // Project Includes ------------------------------------------------------------
@@ -216,7 +217,7 @@ BApplication::BApplication(const char* signature, status_t* error)
 BApplication::~BApplication()
 {
 	// unregister from the roster
-	be_roster->RemoveApp(Team());
+	BRoster::Private().RemoveApp(Team());
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
 // R5 doesn't uninitialize be_app_messenger.
@@ -659,15 +660,18 @@ void BApplication::InitData(const char* signature, status_t* error)
 		}
 	}
 	// check whether be_roster is valid
-	if (fInitError == B_OK && !isRegistrar && !_is_valid_roster_mess_(false)) {
+	if (fInitError == B_OK && !isRegistrar
+		&& !BRoster::Private().IsMessengerValid(false)) {
 		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
 		fInitError = B_NO_INIT;
 	}
 	// check whether or not we are pre-registered
 	bool preRegistered = false;
 	app_info appInfo;
-	if (fInitError == B_OK && !isRegistrar)
-		preRegistered = be_roster->IsAppPreRegistered(&ref, team, &appInfo);
+	if (fInitError == B_OK && !isRegistrar) {
+		preRegistered = BRoster::Private().IsAppPreRegistered(&ref, team,
+															  &appInfo);
+	}
 	if (preRegistered) {
 		// we are pre-registered => the app info has been filled in
 		// Check whether we need to replace the looper port with a port
@@ -679,17 +683,17 @@ void BApplication::InitData(const char* signature, status_t* error)
 			appInfo.port = fMsgPort;
 		// check the signature and correct it, if necessary
 		if (strcmp(appInfo.signature, fAppName))
-			be_roster->SetSignature(team, fAppName);
+			BRoster::Private().SetSignature(team, fAppName);
 		// complete the registration
-		fInitError = be_roster->CompleteRegistration(team, thread,
-													 appInfo.port);
+		fInitError = BRoster::Private().CompleteRegistration(team, thread,
+															 appInfo.port);
 	} else if (fInitError == B_OK) {
 		// not pre-registered -- try to register the application
 		team_id otherTeam = -1;
 		// the registrar must not register
 		if (!isRegistrar) {
-			fInitError = be_roster->AddApplication(signature, &ref, appFlags,
-				team, thread, fMsgPort, true, NULL, &otherTeam);
+			fInitError = BRoster::Private().AddApplication(signature, &ref,
+				appFlags, team, thread, fMsgPort, true, NULL, &otherTeam);
 		}
 		if (fInitError == B_ALREADY_RUNNING) {
 			// An instance is already running and we asked for
