@@ -29,6 +29,7 @@
 
 #include <SupportDefs.h>
 
+status_t _control_input_server_(BMessage *command, BMessage *reply);
 status_t _restore_key_map_();
 
 #endif // __INPUT_GLOBALS_H
