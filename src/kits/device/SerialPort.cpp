@@ -1,5 +1,5 @@
 /*
- * Copyright 2002, Jack Burton.
+ * Copyright 2002, Stefano Ceccherini.
  * Copyright 2002, Marcus Overhagen.
  * All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -21,20 +21,19 @@
 /* The directory where the serial driver publishes its devices */ 
 #define SERIAL_DIR "/dev/ports" 
 
-
-/* Creates and initializes a BSerialPort object,	*/
-/* query the driver, and builds a list of available */
-/* serial ports.									*/
-
-/* The BSerialPort object is initialized to these   */
-/* values: */
-/* 19200 BPS,	*/
-/* 8 Data Bits, */
-/* 1 Stop Bit,	*/
-/* No Parity,	*/
-/* Hardware Flow Control, */
-/* Infinite Timeout	*/
-/* and Blocking mode. */	
+/*! \brief Creates and initializes a BSerialPort object.
+	
+	Query the driver, and builds a list of the available
+	serial ports.
+	The BSerialPort object is initialized to these values:
+	- \c B_19200_BPS
+	- \c B_DATA_BITS_8
+	- \c B_STOP_BIT_1
+	- \c B_NO_PARITY
+	- \c B_HARDWARE_CONTROL
+	- \c B_INFINITE_TIMEOUT
+	- Blocking mode
+*/
 BSerialPort::BSerialPort()
 	:	ffd(-1),
 		fBaudRate(B_19200_BPS),
@@ -50,7 +49,9 @@ BSerialPort::BSerialPort()
 }
 
 
-/* Closes the port, if it's open, and deletes the devices list */ 
+/*! \brief Frees the resources associated with the object.
+	Closes the port, if it's open, and deletes the devices list.
+*/ 
 BSerialPort::~BSerialPort()
 {
 	if (ffd > 0)
@@ -63,28 +64,42 @@ BSerialPort::~BSerialPort()
 }
 
 
-/* Opens a serial port. @param a valid port name */
+/*! \brief Opens a serial port.
+	\param portName A valid port name
+		(i.e."/dev/ports/serial2", "serial2", ...)
+	\return
+	- A positive number if the serialport has been succesfully opened.
+	- An errorcode (negative integer) if not.
+*/
 status_t
 BSerialPort::Open(const char *portName)
 {
 	char buf[64];
 	
-	//TODO: Check if portName is a valid name
-	sprintf(buf, SERIAL_DIR"/%s", portName);
-	
+	if (portName == NULL)
+		return B_BAD_VALUE; // Heheee, we won't crash
+		
+	if (portName[0] != '/') 
+		sprintf(buf, SERIAL_DIR"/%s", portName);
+	else
+		// A name like "/dev/ports/serial2" was passed
+		sprintf(buf, "%s", portName);
+		
 	if (ffd > 0) //If this port is already open, close it
 		close(ffd);
-	
-	ffd = open(buf, O_RDWR|O_NONBLOCK); //R5 seem to use this mask 
+ 
+	// We want "open()" to return immediately
+	ffd = open(buf, O_RDWR|O_NONBLOCK); 
 	
 	if (ffd > 0)
 		DriverControl(); //Setup the port
-	
-	return (ffd < 0) ? ffd : B_OK;
+
+	return (ffd > 0) ? ffd : errno;
 }
 
 
-/* Closes the port */
+/*! \brief Closes the port.
+*/
 void
 BSerialPort::Close(void)
 {
@@ -94,33 +109,36 @@ BSerialPort::Close(void)
 }
 
 
-/* Read some data from the serial port. */
-/* @param the buffer where to transfer the data */
-/* @param how many bytes to read	*/
+/*! \brief Reads some bytes from the serial port.
+	\param buf The buffer where to copy the data.
+	\param count The maximum amount of bytes to read.
+	\return The amount of data read.
+*/
 ssize_t
 BSerialPort::Read(void *buf, size_t count)
 {
-	if (ffd < 0) // We have no open port
-		return B_FILE_ERROR; 
+	ssize_t err = read(ffd, buf, count);
 	
-	return read(ffd, buf, count);
+	return (err >= 0) ? err : errno;
 }
 
 
-/* Write some data to the serial port. */
-/* @param the buffer from which transfer the data */
-/* @param how many bytes to write	*/
+/*! \brief Writes some bytes to the serial port.
+	\param buf The buffer which copy the data from.
+	\param count The amount of bytes to write.
+*/
 ssize_t
 BSerialPort::Write(const void *buf, size_t count)
 {
-	if (ffd < 0) // We have no open port
-		return B_FILE_ERROR;
-
-	return write(ffd, buf, count);
+	ssize_t err = write(ffd, buf, count);
+	
+	return (err >= 0) ? err : errno;
 }
 
 
-/* Set blocking mode */
+/*! \brief Set blocking mode
+	\param Blocking If true, enables the blocking mode. If false, disables it.
+*/
 void
 BSerialPort::SetBlocking(bool Blocking)
 {
@@ -129,8 +147,13 @@ BSerialPort::SetBlocking(bool Blocking)
 }
 
 
-/* Set the timeout for the port */
-/* Valid values: B_INFINITE_TIMEOUT or any value between 0 and 25000000 */
+/*! \brief Set the timeout for the port.
+	\param microSeconds The timeout for the port.
+	Valid values are:
+	- \c B_INFINITE_TIMEOUT
+	- Any value between 0 and 25,000,000, but remember that the granularity
+		of the serial driver is 100,000 microseconds.
+*/
 status_t
 BSerialPort::SetTimeout(bigtime_t microSeconds)
 {	
@@ -146,7 +169,33 @@ BSerialPort::SetTimeout(bigtime_t microSeconds)
 }
 
 
-/* Set the data rate (Baud rate) for the port */
+/*! \brief Set the Baud rate for the port.
+	\param bitsPerSeconds The baud rate.
+	Valid values:
+	- \c B_0_BPS
+	- \c B_50_BPS
+	- \c B_75_BPS
+	- \c B_110_BPS
+	- \c B_134_BPS
+	- \c B_150_BPS
+	- \c B_200_BPS
+	- \c B_300_BPS
+	- \c B_600_BPS
+	- \c B_1200_BPS
+	- \c B_1800_BPS
+	- \c B_2400_BPS
+	- \c B_4800_BPS
+	- \c B_9600_BPS
+	- \c B_19200_BPS
+	- \c B_38400_BPS
+	- \c B_57600_BPS
+	- \c B_115200_BPS
+	- \c B_230400_BPS
+	- \c B_31250_BPS
+	\return 
+	- \c B_OK if all goes fine,
+	- an error code if something goes wrong.
+*/
 status_t
 BSerialPort::SetDataRate(data_rate bitsPerSecond)
 {
@@ -156,7 +205,10 @@ BSerialPort::SetDataRate(data_rate bitsPerSecond)
 }
 
 
-/* Get the data rate (Baud Rate) */
+/*! \brief Get the current Baud Rate.
+	\return The current Baud Rate.
+*/
+
 data_rate
 BSerialPort::DataRate(void)
 {
@@ -173,7 +225,9 @@ BSerialPort::SetDataBits(data_bits numBits)
 }
 
 
-/* Get the data bits */
+/*! \brief Get the current data bits.
+ 	\return The current data bits.
+*/
 data_bits
 BSerialPort::DataBits(void)
 {
@@ -181,7 +235,12 @@ BSerialPort::DataBits(void)
 }
 
 
-/* Set the stop bits (1 or 2) */
+/*! \brief Set the stop bits.
+	\param numBits The number of stop bits
+	Valid values:
+	- \c B_STOP_BITS_1 (or \c B_STOP_BIT_1)
+	- \c B_STOP_BITS_2
+*/
 void
 BSerialPort::SetStopBits(stop_bits numBits)
 {
@@ -190,7 +249,9 @@ BSerialPort::SetStopBits(stop_bits numBits)
 }
 
 
-/* Get the stop bits */
+/*! \brief Get the current stop bits.
+	\return The current stop bits.
+*/
 stop_bits
 BSerialPort::StopBits(void)
 {
@@ -198,7 +259,13 @@ BSerialPort::StopBits(void)
 }
 
 
-/* Set the parity mode (ODD, PAIR, or NONE) */
+/*! \brief Set the parity mode.
+	\param which The parity mode to set.
+	Valid values:
+	- \c B_ODD_PARITY
+	- \c B_EVEN_PARITY
+	- \c B_NO_PARITY
+*/
 void
 BSerialPort::SetParityMode(parity_mode which)
 {
@@ -207,7 +274,9 @@ BSerialPort::SetParityMode(parity_mode which)
 }
 
 
-/* Get the parity mode */
+/*! \brief Get the parity mode.
+	\return The current parity mode.
+*/
 parity_mode
 BSerialPort::ParityMode(void)
 {
@@ -215,7 +284,8 @@ BSerialPort::ParityMode(void)
 }
 
 
-/* Clear the input buffer */
+/*! \brief Clear the input buffer.
+*/
 void
 BSerialPort::ClearInput(void)
 {
@@ -223,7 +293,8 @@ BSerialPort::ClearInput(void)
 }
 
 
-/* Clear the output buffer */
+/*! \brief Clear the output buffer.
+*/
 void
 BSerialPort::ClearOutput(void)
 {
@@ -231,7 +302,13 @@ BSerialPort::ClearOutput(void)
 }
 
 
-/* Set the flow control (HARDWARE, SOFTWARE, or NONE) */ 
+/*! \brief Set the flow control
+	\param method The type of flow control.
+	Valid values:
+	- \c B_HARDWARE_CONTROL
+	- \c B_SOFTWARE_CONTROL
+	- \c B_NOFLOW_CONTROL
+*/
 void
 BSerialPort::SetFlowControl(uint32 method)
 {
@@ -240,7 +317,9 @@ BSerialPort::SetFlowControl(uint32 method)
 }
 
 
-/* Get the flow control */
+/*! \brief Returns the selected flow control.
+	\return The flow control for the current open port.	
+*/
 uint32
 BSerialPort::FlowControl(void)
 {
@@ -268,8 +347,11 @@ BSerialPort::SetRTS(bool asserted)
 }
 
 
-/* See how many chars are queued on the serial port, */
-/* waiting to be read */
+/*! \brief See how many chars are queued on the serial port.
+	\param wait_until_this_many A pointer to an int32 where you want
+		that value stored.
+	\return ?
+*/
 status_t
 BSerialPort::NumCharsAvailable(int32 *wait_until_this_many)
 {
@@ -282,7 +364,9 @@ BSerialPort::NumCharsAvailable(int32 *wait_until_this_many)
 }
 
 
-/* See if CTS is set */
+/*! \brief See if the Clear to Send pin is asserted.
+	\return true if CTS is asserted, false if not.
+*/
 bool
 BSerialPort::IsCTS(void)
 {
@@ -295,7 +379,9 @@ BSerialPort::IsCTS(void)
 }
 
 
-/* See if DSR is set */
+/*! \brief See if the Data Set Ready pin is asserted.
+	\return true if DSR is asserted, false if not.
+*/
 bool
 BSerialPort::IsDSR(void)
 {
@@ -308,7 +394,9 @@ BSerialPort::IsDSR(void)
 }
 
 
-/* See if RI is set */
+/*! \brief See if the Ring Indicator pin is asserted.
+	\return true if RI is asserted, false if not.
+*/
 bool
 BSerialPort::IsRI(void)
 {
@@ -321,7 +409,9 @@ BSerialPort::IsRI(void)
 }
 
 
-/* See if DCD is set */
+/*! \brief See if the Data Carrier Detect pin is asserted.
+	\return true if DCD is asserted, false if not.
+*/
 bool
 BSerialPort::IsDCD(void)
 {
@@ -334,10 +424,12 @@ BSerialPort::IsDCD(void)
 }
 
 
-/* Wait until there's something to read from the serial port. */
-/* If no data is ready, it will always block, ignoring the    */
-/* value of SetBlocking(); however, it respects the timeout   */
-/* set by SetTimeout(). */
+/*! \brief Wait until there's something to read from the serial port.
+	If no data is ready, it will always block, ignoring the
+	value of SetBlocking(); however, it respects the timeout
+	set by SetTimeout().
+	\return The number of bytes available to be read.
+*/
 ssize_t
 BSerialPort::WaitForInput(void)
 {
@@ -348,7 +440,10 @@ BSerialPort::WaitForInput(void)
 }
 
 
-/* Returns the number of available Serial Ports. */
+/*! \brief Count the number of available Serial Ports.
+	\return An integer which represents the number of available
+		serial ports.
+*/
 int32
 BSerialPort::CountDevices()
 {
@@ -361,11 +456,14 @@ BSerialPort::CountDevices()
 }
 
 
-/* Get the device name for the given device.*/
-/* The first parameter is the number of the device */
-/* you want to know the name, the second is the buffer */
-/* where you want to store the name, and the third is  */
-/* the length of that buffer. */
+/*! \brief Get the device name for the given device.
+	\param n Number of the device you want to know the name of.
+	\param name The buffer where you want to store the name.
+	\param bufSize The size of the buffer.
+	\return
+	- \c B_ERROR if something goes wrong
+	- \c B_OK if all goes fine.
+*/
 status_t
 BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 {
@@ -375,7 +473,8 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 	if (_fDevices != NULL)
 		dev = static_cast<char*>(_fDevices->ItemAt(n));
 
-	if (dev != NULL && name != NULL) {
+	if (dev != NULL && name != NULL) 
+	{
 		strncpy(name, dev, bufSize);
 		result = B_OK;
 	}
@@ -385,8 +484,10 @@ BSerialPort::GetDeviceName(int32 n, char *name, size_t bufSize)
 
 /* Private or Reserved */
 
-/* Query the serial driver about the available devices, */
-/* and build a list of them. */
+/*! \brief Build a list of available serial ports.
+	Query the serial driver about the available devices,
+	and build a list of them. 
+*/
 void
 BSerialPort::ScanDevices()
 {
@@ -407,75 +508,80 @@ BSerialPort::ScanDevices()
 }
 
 
-/* Send the options to the serial driver. */
-/* Returns B_OK if all goes fine, an error code */
-/* if something goes wrong. */
+/*! \brief Send the selected options to the serial driver.
+	\return
+	- \c B_OK if all goes fine,
+	- an error code if something goes wrong.
+*/
 int
 BSerialPort::DriverControl()
 {
-	struct termio termioControl;
+	struct termio options;
 	int err;
 	
 	if (ffd < 0)
 		return B_NO_INIT;
 	
 	//Load the current settings	
-	err = ioctl(ffd, TCGETA, &termioControl);
+	err = tcgetattr(ffd, &options);
 	if (err < 0)
 		return errno;
 		
 	// Reset all flags	
-	termioControl.c_cflag &= ~(CRTSCTS | CSIZE | CBAUD | CSTOPB | PARODD | PARENB);
-	termioControl.c_iflag &= ~(IXON | IXOFF | IXANY | INPCK);
-	termioControl.c_lflag &= ~(ECHO | ECHONL | ISIG | ICANON);
+	options.c_cflag &= ~(CRTSCTS | CSIZE | CBAUD | CSTOPB | PARODD | PARENB);
+	options.c_iflag &= ~(IXON | IXOFF | IXANY | INPCK);
+	options.c_lflag &= ~(ECHO | ECHONL | ISIG | ICANON);
 		
 	//Set the flags to the wanted values
 	if (fFlow & B_HARDWARE_CONTROL)
-		termioControl.c_cflag |= CRTSCTS;
+		options.c_cflag |= CRTSCTS;
 	
 	if (fFlow & B_SOFTWARE_CONTROL)
-		termioControl.c_iflag |= (IXON | IXOFF);
+		options.c_iflag |= (IXON | IXOFF);
 	
 	if (fStopBits & B_STOP_BITS_2)
-		termioControl.c_cflag |= CSTOPB; // We want 2 stop bits
+		options.c_cflag |= CSTOPB; // Set 2 stop bits
 	
-	if (fDataBits == B_DATA_BITS_8)
-		termioControl.c_cflag |= CS8; // We want 8 data bits
+	if (fDataBits & B_DATA_BITS_8)
+		options.c_cflag |= CS8; // Set 8 data bits
 	
 	//Ok, set the parity now
 	if (fParityMode != B_NO_PARITY)
 	{
-		termioControl.c_cflag |= PARENB; //Enable parity
+		options.c_cflag |= PARENB; //Enable parity
 		if (fParityMode == B_ODD_PARITY)
-			termioControl.c_cflag |= PARODD; //Select odd parity
+			options.c_cflag |= PARODD; //Select odd parity
 	}
 	
 	//Set the baud rate	
-	termioControl.c_cflag |= (fBaudRate & CBAUD); 
+	cfsetispeed(&options, fBaudRate);
+	cfsetospeed(&options, fBaudRate);
+	
+	//options.c_cflag |= (fBaudRate & CBAUD); 
 	
 	//Set the timeout
 	if (fBlocking)
 	{
 		if (fTimeout == B_INFINITE_TIMEOUT)
 		{
-			termioControl.c_cc[VTIME] = 0;
-			termioControl.c_cc[VMIN] = 1;
+			options.c_cc[VTIME] = 0;
+			options.c_cc[VMIN] = 1;
 		} 
 		else if (fTimeout == 0)
-			termioControl.c_cc[VMIN] = 0;
+			options.c_cc[VMIN] = 0;
 		else 
 		{
-			int t = fTimeout / 100000;
-			termioControl.c_cc[VTIME] = (t == 0) ? 1 : t;
-			termioControl.c_cc[VMIN] = 1;
+			int timeout = fTimeout / 100000; 
+			options.c_cc[VTIME] = (timeout == 0) ? 1 : timeout;
+			options.c_cc[VMIN] = 1;
 		}
 	} else
-		termioControl.c_cc[VMIN] = 0;
+		options.c_cc[VMIN] = 0;
 		
 	//Ok, finished. Now tell the driver what we decided	
-	err = ioctl(ffd, TCSETA, &termioControl);
+	err = tcsetattr(ffd, TCSANOW, &options);
 	
-	return err > 0 ? err : errno;	
+	return (err > 0) ? err : errno;	
 }
 
 
