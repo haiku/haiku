@@ -17,4 +17,10 @@ INTERFACE_KIT_SOURCE =
 	TextControl.cpp
 	TextInput.cpp
 	Window.cpp
+
+	# BTextView
+	LineBuffer.cpp
+	StyleBuffer.cpp
+	TextGapBuffer.cpp
+	TextView.cpp
 ;

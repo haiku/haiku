@@ -15,6 +15,7 @@ UsePublicHeaders [ FDirName add-ons file_system ] ;
 UsePrivateHeaders shared ;
 
 # Add subsubdirs to the SEARCH_SOURCE.
+SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) storage mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) storage sniffer ] ;
 
