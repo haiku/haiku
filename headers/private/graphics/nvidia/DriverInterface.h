@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-7/2004.
+	Rudolf Cornelissen 10/2002-9/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -248,11 +248,12 @@ typedef struct {
 
 		/* PINS */
 		float f_ref;				/* PLL reference-oscillator frequency (Mhz) */
+		bool ext_pll;				/* the extended PLL contains more dividers */
 		uint32 max_system_vco;		/* graphics engine PLL VCO limits (Mhz) */
 		uint32 min_system_vco;
 		uint32 max_pixel_vco;		/* dac1 PLL VCO limits (Mhz) */
 		uint32 min_pixel_vco;
-		uint32 max_video_vco;		/* dac2, maven PLL VCO limits (Mhz) */
+		uint32 max_video_vco;		/* dac2 PLL VCO limits (Mhz) */
 		uint32 min_video_vco;
 		uint32 std_engine_clock;	/* graphics engine clock speed needed (Mhz) */
 		uint32 std_memory_clock;	/* card memory clock speed needed (Mhz) */
