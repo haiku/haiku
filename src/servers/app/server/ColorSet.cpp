@@ -57,13 +57,20 @@ ColorSet::ColorSet(const ColorSet &cs)
 	menu_selected_background=cs.menu_selected_background;
 	menu_text=cs.menu_text;
 	menu_selected_text=cs.menu_selected_text;
+	menu_selected_border=cs.menu_selected_border;
+
+	keyboard_navigation_base=cs.keyboard_navigation_base;
+	keyboard_navigation_pulse=cs.keyboard_navigation_pulse;
+
+	success=cs.success;
+	failure=cs.failure;
+	shine=cs.shine;
+	shadow=cs.shadow;
 
 	window_tab=cs.window_tab;
 	window_tab_text=cs.window_tab_text;
 	inactive_window_tab=cs.inactive_window_tab;
 	inactive_window_tab_text=cs.inactive_window_tab_text;
-	keyboard_navigation=cs.keyboard_navigation;
-	desktop=cs.desktop;
 }
 
 /*!
@@ -102,14 +109,20 @@ void ColorSet::SetColors(const ColorSet &cs)
 	menu_selected_background=cs.menu_selected_background;
 	menu_text=cs.menu_text;
 	menu_selected_text=cs.menu_selected_text;
+	menu_selected_border=cs.menu_selected_border;
+
+	keyboard_navigation_base=cs.keyboard_navigation_base;
+	keyboard_navigation_pulse=cs.keyboard_navigation_pulse;
+
+	success=cs.success;
+	failure=cs.failure;
+	shine=cs.shine;
+	shadow=cs.shadow;
 
 	window_tab=cs.window_tab;
 	window_tab_text=cs.window_tab_text;
 	inactive_window_tab=cs.inactive_window_tab;
 	inactive_window_tab_text=cs.inactive_window_tab_text;
-	
-	keyboard_navigation=cs.keyboard_navigation;
-	desktop=cs.desktop;
 }
 
 /*!
@@ -135,13 +148,19 @@ void ColorSet::PrintToStream(void)
 	printf("menu_selected_background "); menu_selected_background.PrintToStream();
 	printf("menu_text "); menu_text.PrintToStream();
 	printf("menu_selected_text "); menu_selected_text.PrintToStream();
+	printf("menu_selected_border "); menu_selected_border.PrintToStream();
+
+	printf("keyboard_navigation_base "); keyboard_navigation_base.PrintToStream();
+	printf("keyboard_navigation_pulse "); keyboard_navigation_pulse.PrintToStream();
+
+	printf("success "); success.PrintToStream();
+	printf("failure "); failure.PrintToStream();
+	printf("shine "); shine.PrintToStream();
+	printf("shadow "); shadow.PrintToStream();
 
 	printf("window_tab "); window_tab.PrintToStream();
 	printf("window_tab_text "); window_tab_text.PrintToStream();
 
 	printf("inactive_window_tab "); inactive_window_tab.PrintToStream();
 	printf("inactive_window_tab_text "); inactive_window_tab_text.PrintToStream();
-
-	printf("keyboard_navigation "); keyboard_navigation.PrintToStream();
-	printf("desktop "); desktop.PrintToStream();
 }

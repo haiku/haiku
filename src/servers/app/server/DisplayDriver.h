@@ -29,7 +29,6 @@
 #define _DISPLAY_DRIVER_H_
 
 #include <GraphicsCard.h>
-#include <SupportDefs.h>
 #include <OS.h>
 
 #include <View.h>

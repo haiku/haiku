@@ -33,6 +33,7 @@
 #include <List.h>
 #include <String.h>
 #include <OS.h>
+#include <Locker.h>
 #include "LayerData.h"
 
 class ServerWindow;

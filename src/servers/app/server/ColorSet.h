@@ -61,14 +61,22 @@ public:
 	menu_selected_background,
 	menu_text,
 	menu_selected_text,
+	menu_selected_border,
 
+	keyboard_navigation_base,
+	keyboard_navigation_pulse,
+	
+	success,
+	failure,
+	shine,
+	shadow,
+
+	// Not all of these guys don't exist in InterfaceDefs.h, but we keep 
+	// them as part of the color set anyway - they're important nonetheless
 	window_tab,
 	window_tab_text,
 	inactive_window_tab,
-	inactive_window_tab_text,
-
-	keyboard_navigation,
-	desktop;
+	inactive_window_tab_text;
 };
 
 #endif

@@ -29,6 +29,7 @@
 
 #include <SupportDefs.h>
 #include <Rect.h>
+#include <Region.h>
 #include <String.h>
 #include <Window.h>
 #include "LayerData.h"

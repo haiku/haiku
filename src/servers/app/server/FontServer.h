@@ -69,12 +69,11 @@ public:
 	bool SetSystemBold(const char *family, const char *style, float size);
 	bool SetSystemFixed(const char *family, const char *style, float size);
 	bool FontsNeedUpdated(void) { return need_update; }
-
-	void FontsUpdated(void) { need_update=false; }
-protected:
 	/*!
 		\brief Called when the fonts list has been updated
 	*/
+	void FontsUpdated(void) { need_update=false; }
+protected:
 	FontFamily *_FindFamily(const char *name);
 	FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 	bool init;

@@ -1757,7 +1757,7 @@ bool AccelerantDriver::DumpToFile(const char *path)
 */
 float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-		if(!string || !d || !d->font)
+	if(!string || !d || !d->font)
 		return 0.0;
 	_Lock();
 
