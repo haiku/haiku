@@ -53,3 +53,5 @@ InstallUDF install : udf ;
 
 # restore original optimization level
 OPTIM = $(oldOPTIM) ;
+
+SubInclude OBOS_TOP src add-ons kernel file_systems udf drive_setup_addon ;
