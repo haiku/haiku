@@ -23,15 +23,14 @@ typedef struct net_timer net_timer;
 typedef void (*net_timer_func)(net_timer *timer, void *cookie);	// timer callback prototype
 
 // Generic lockers support
-
 typedef int benaphore;
 #define create_benaphore(a, b)
 #define delete_benaphore(a)
 #define lock_benaphore(a)
 #define unlock_benaphore(a)
 
-#include "net_interface.h"
-
+// Networking layer(s) definition
+#include "net_layer.h"
 
 // Network stack main module definition
 
@@ -46,11 +45,14 @@ struct net_stack_module_info {
 	 */
 	 
 	/*
-	 * Data-Link layer
+	 * Net layers handling
 	 */
 	
-	status_t (*register_interface)(ifnet_t *ifnet);
-	status_t (*unregister_interface)(ifnet_t *ifnet);
+	status_t (*register_layer)(net_layer *layer);
+	status_t (*unregister_layer)(net_layer *layer);
+	
+	status_t  (*push_buffer_up)(net_layer *me, net_buffer *buffer);
+	status_t  (*push_buffer_down)(net_layer *me, net_buffer *buffer);
 
 	/*
 	 * Buffer(s) support

@@ -74,7 +74,6 @@ int test_buffer()
   printf("data = [%s]\n", data);
 
   g_stack->delete_buffer(buffer, false);
-
   return 0;
 }
 
