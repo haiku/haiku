@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <Application.h>
 #include <Autolock.h>
 #include <Message.h>
 #include <NodeMonitor.h>
@@ -543,6 +544,7 @@ NodeMonitor::NodeMonitor()
 // destructor
 NodeMonitor::~NodeMonitor()
 {
+	delete_sem(fMessageCountSem);
 }
 
 // Init
@@ -779,9 +781,10 @@ NodeManager::~NodeManager()
 		fNodeMonitor->Lock();
 		fNodeMonitor->Quit();
 	}
+
 	if (fNodeMonitoringProcessor >= 0) {
-		int32 result;
-		wait_for_thread(fNodeMonitoringProcessor, &result);
+		status_t status;
+		wait_for_thread(fNodeMonitoringProcessor, &status);
 	}
 }
 
@@ -1350,10 +1353,12 @@ DBG(OUT("  -> entryCount: %ld, error: `%s'\n", reply->entryCount, strerror(reply
 	return error;
 }
 
-// main
-int
-main()
+// request_loop
+int32
+request_loop(void *data)
 {
+	port_id requestPort = *(port_id*)data;
+
 	// init node manager
 	status_t error = NodeManager::GetDefault()->Init();
 	if (error != B_OK) {
@@ -1361,15 +1366,9 @@ main()
 		return 1;
 	}
 
-	// create the request port
-	port_id port = create_port(1, STAT_CACHE_SERVER_PORT_NAME);
-	if (port < 0) {
-		fprintf(stderr, "Failed to create request port: %s\n", strerror(port));
-		return 1;
-	}
-
+	// handle requests until our port goes away
 	stat_cache_request request;
-	while (read_request(port, request) == B_OK) {
+	while (read_request(requestPort, request) == B_OK) {
 		BAutolock _(NodeManager::GetDefault());
 		switch (request.command) {
 			case STAT_CACHE_COMMAND_STAT:
@@ -1385,6 +1384,39 @@ main()
 	}
 
 	// delete the request port
-	delete_port(port);
+	if (delete_port(requestPort) == B_OK)
+		be_app->PostMessage(B_QUIT_REQUESTED);
+	return 0;
+}
+
+// main
+int
+main()
+{
+	// create the request port
+	port_id requestPort = create_port(1, STAT_CACHE_SERVER_PORT_NAME);
+	if (requestPort < 0) {
+		fprintf(stderr, "Failed to create request port: %s\n",
+			strerror(requestPort));
+		return 1;
+	}
+
+	// start the request handling loop
+	thread_id requestLoop = spawn_thread(request_loop, "request loop",
+		B_NORMAL_PRIORITY, &requestPort);
+	if (resume_thread(requestLoop) < B_OK)
+		return -1;
+
+	// the BApplication is only needed for a smooth server shutdown
+	BApplication app("application/x-vnd.haiku.jam-cacheserver");
+	app.Run();
+
+	// delete the request port
+	delete_port(requestPort);
+
+	// wait for the request handling loop to quit
+	status_t result;
+	wait_for_thread(requestLoop, &result);
+
 	return 0;
 }

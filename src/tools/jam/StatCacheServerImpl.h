@@ -7,8 +7,6 @@
 #include <string>
 
 #include <Entry.h>
-#include <Locker.h>
-#include <Looper.h>
 #include <MessageQueue.h>
 #include <Node.h>
 #include <OS.h>
