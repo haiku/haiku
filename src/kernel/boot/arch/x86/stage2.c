@@ -87,7 +87,7 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	// verify we can run on this cpu
 	if (check_cpu() < 0) {
 		dprintf("\nSorry, this computer appears to be lacking some of the features\n");
-		dprintf("needed by NewOS. It is currently only able to run on\n");
+		dprintf("needed by OpenBeOS. It is currently only able to run on\n");
 		dprintf("Pentium class cpus and above, with a few exceptions to\n");
 		dprintf("that rule.\n");
 		dprintf("\nPlease reset your computer to continue.");
@@ -196,7 +196,7 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		// put standard segment descriptors in it
 		clear_segment_descriptor(&gdt[0]);
 		set_segment_descriptor(&gdt[1], 0, 0xfffff, DT_CODE_READABLE, DPL_KERNEL);
-			// seg 0x10 - kernel 4GB code
+			// seg 0x08 - kernel 4GB code
 		set_segment_descriptor(&gdt[2], 0, 0xfffff, DT_DATA_WRITEABLE, DPL_KERNEL);
 			// seg 0x10 - kernel 4GB data
 
@@ -703,7 +703,7 @@ kputs(const char *str)
 		else
 			kScreenBase[screenOffset++] = 0xf00 | *str;
 
-		if (screenOffset > SCREEN_WIDTH * SCREEN_HEIGHT)
+		if (screenOffset >= SCREEN_WIDTH * SCREEN_HEIGHT)
 			scrup();
 
 		str++;
