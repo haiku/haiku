@@ -1,0 +1,8 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/pdf";
+
+resource(2, "META:SNIFF_RULE") "0.50          (\"%PDF\")";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.mp-xpdf";

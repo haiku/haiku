@@ -1,0 +1,14 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "application/zip";
+
+resource(2, "META:SNIFF_RULE") "0.40          (\"PK\\003\\004\")";
+
+resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.obos-Expander";
+
+resource(4, "META:EXTENS") message(234)
+{
+	"extensions" = "zip",
+	"type" = "application/zip"
+};

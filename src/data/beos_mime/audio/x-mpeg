@@ -1,0 +1,106 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "audio/x-mpeg";
+
+resource(3, "META:L:DESC") #'MLDC' "MPEG audio file";
+
+resource(4, "META:S:DESC") #'MSDC' "MPEG audio file";
+
+resource(5, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+
+resource(6, "META:EXTENS") message(234)
+{
+	"extensions" = "mp2",
+	"extensions" = "MP2",
+	"extensions" = "mp3",
+	"extensions" = "MP3",
+	"type" = "audio/x-mpeg"
+};
+
+resource(7, "META:ATTR_INFO") message(233)
+{
+	"attr:name" = "Audio:Artist",
+	"attr:name" = "Audio:Title",
+	"attr:name" = "Audio:Album",
+	"attr:name" = "Audio:Track",
+	"attr:name" = "Audio:Year",
+	"attr:name" = "Audio:Comment",
+	"attr:name" = "Audio:Genre",
+	"attr:name" = "Audio:Rating",
+	"attr:name" = "Audio:Length",
+	"attr:name" = "Audio:Bitrate",
+	"attr:public_name" = "Artist",
+	"attr:public_name" = "Title",
+	"attr:public_name" = "Album",
+	"attr:public_name" = "Track",
+	"attr:public_name" = "Year",
+	"attr:public_name" = "Comment",
+	"attr:public_name" = "Genre",
+	"attr:public_name" = "Rating",
+	"attr:public_name" = "Playing time",
+	"attr:public_name" = "Bitrate",
+	"attr:type" = 'CSTR',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'LONG',
+	"attr:type" = 'LONG',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'LONG',
+	"attr:type" = 'CSTR',
+	"attr:type" = 'CSTR',
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = true,
+	"attr:editable" = false,
+	"attr:editable" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:extra" = false,
+	"attr:width" = 30,
+	"attr:width" = 30,
+	"attr:width" = 30,
+	"attr:width" = 30,
+	"attr:width" = 30,
+	"attr:width" = 40,
+	"attr:width" = 30,
+	"attr:width" = 15,
+	"attr:width" = 60,
+	"attr:width" = 50,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 0,
+	"attr:alignment" = 1,
+	"attr:alignment" = 1,
+	"type" = "audio/x-mpeg",
+	"type" = "audio/x-mpeg"
+};
+

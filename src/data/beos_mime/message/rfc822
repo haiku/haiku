@@ -1,0 +1,6 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "message/rfc822";
+
+resource(2, "META:PREF_APP") #'MSIG' "application/x-vnd.Be-MAIL";

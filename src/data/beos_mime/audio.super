@@ -1,0 +1,34 @@
+
+resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
+
+resource(1, "META:TYPE") "audio";
+
+resource(2, "META:L:DESC") #'MLDC' "generic audio";
+
+resource(3, "META:S:DESC") #'MSDC' "generic audio";
+
+resource(4, "META:PREF_APP") #'MSIG' "application/x-vnd.videolan-vlc";
+
+resource(5, "META:EXTENS") message(234)
+{
+	"type" = "audio"
+};
+
+resource(6, "META:ATTR_INFO") message(233)
+{
+	"attr:name" = "Audio:Length",
+	"attr:name" = "Audio:Bitrate",
+	"attr:public_name" = "Playing time",
+	"attr:public_name" = "Bitrate",
+	"attr:type" = 'CSTR',
+	"attr:type" = 'CSTR',
+	"attr:viewable" = true,
+	"attr:viewable" = true,
+	"attr:editable" = false,
+	"attr:editable" = false,
+	"attr:width" = 60,
+	"attr:width" = 50,
+	"attr:alignment" = 1,
+	"attr:alignment" = 1,
+	"type" = "audio"
+};
