@@ -17,6 +17,9 @@ struct preloaded_image {
 	elf_region	data_region;
 	addr_range	dynamic_section;
 	struct Elf32_Ehdr elf_header;
+
+	image_id	id;
+		// the ID field will be filled out in the kernel
 };
 
 #endif	/* KERNEL_BOOT_ELF_H */
