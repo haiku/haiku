@@ -1135,12 +1135,21 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 	if (with == NULL)
 		return *this; //TODO: do something smart
 	
-	int32 pos;
+	int32 pos, offset = 0;
 	int32 withLen = strlen(with);
-	while ((pos = strcspn(String(), setOfChars)) < Length()) {
+	
+	while ((pos = strcspn(String() + offset, setOfChars)) < Length()) {
+		offset += pos;
+		if (offset >= Length())
+			break;
+		_OpenAtBy(offset, withLen - 1);
+		memcpy(_privateData + offset, with, withLen);
+		offset += withLen;
+	}
+	/*while ((pos = strcspn(String() + offset, setOfChars)) < Length()) {
 		_OpenAtBy(pos, withLen - 1);
 		memcpy(_privateData + pos, with, withLen);
-	}
+	}*/
 	return *this;
 }
 
