@@ -32,6 +32,34 @@
 // 4 MB chunks, to optimize for 4 MB pages
 #define IOSPACE_CHUNK_SIZE (4*1024*1024)
 
+typedef struct page_table_entry {
+	uint32	present:1;
+	uint32	rw:1;
+	uint32	user:1;
+	uint32	write_through:1;
+	uint32	cache_disabled:1;
+	uint32	accessed:1;
+	uint32	dirty:1;
+	uint32	reserved:1;
+	uint32	global:1;
+	uint32	avail:3;
+	uint32	addr:20;
+} page_table_entry;
+
+typedef struct page_directory_entry {
+	uint32	present:1;
+	uint32	rw:1;
+	uint32	user:1;
+	uint32	write_through:1;
+	uint32	cache_disabled:1;
+	uint32	accessed:1;
+	uint32	reserved:1;
+	uint32	page_size:1;
+	uint32	global:1;
+	uint32	avail:3;
+	uint32	addr:20;
+} page_directory_entry;
+
 // data and structures used to represent physical pages mapped into iospace
 typedef struct paddr_chunk_descriptor {
 	struct paddr_chunk_descriptor *next_q; // must remain first in structure, queue code uses it
@@ -44,7 +72,7 @@ static paddr_chunk_desc **virtual_pmappings; // will be one ptr per virtual chun
 static int first_free_vmapping;
 static int num_virtual_chunks;
 static queue mapped_paddr_lru;
-static ptentry *iospace_pgtables = NULL;
+static page_table_entry *iospace_pgtables = NULL;
 static mutex iospace_mutex;
 static sem_id iospace_full_sem;
 
@@ -52,17 +80,17 @@ static sem_id iospace_full_sem;
 
 // vm_translation object stuff
 typedef struct vm_translation_map_arch_info {
-	pdentry *pgdir_virt;
-	pdentry *pgdir_phys;
+	page_directory_entry *pgdir_virt;
+	page_directory_entry *pgdir_phys;
 	int num_invalidate_pages;
 	addr_t pages_to_invalidate[PAGE_INVALIDATE_CACHE_SIZE];
 } vm_translation_map_arch_info;
 
 
-static ptentry *page_hole = NULL;
-static pdentry *page_hole_pgdir = NULL;
-static pdentry *kernel_pgdir_phys = NULL;
-static pdentry *kernel_pgdir_virt = NULL;
+static page_table_entry *page_hole = NULL;
+static page_directory_entry *page_hole_pgdir = NULL;
+static page_directory_entry *kernel_pgdir_phys = NULL;
+static page_directory_entry *kernel_pgdir_virt = NULL;
 
 static vm_translation_map *tmap_list;
 static spinlock tmap_list_lock;
@@ -94,22 +122,38 @@ i386_translation_map_get_pgdir(vm_translation_map *map)
 }
 
 
-static void
-init_pdentry(pdentry *e)
+static inline void
+init_page_directory_entry(page_directory_entry *entry)
 {
-	*(int *)e = 0;
+	*(uint32 *)entry = 0;
+}
+
+
+static inline void
+update_page_directory_entry(page_directory_entry *entry, page_directory_entry *with)
+{
+	// update page directory entry atomically
+	*(uint32 *)entry = *(uint32 *)with;
+}
+
+
+static inline void
+init_page_table_entry(page_table_entry *entry)
+{
+	*(uint32 *)entry = 0;
+}
+
+
+static inline void
+update_page_table_entry(page_table_entry *entry, page_table_entry *with)
+{
+	// update page table entry atomically
+	*(uint32 *)entry = *(uint32 *)with;
 }
 
 
 static void
-init_ptentry(ptentry *e)
-{
-	*(int *)e = 0;
-}
-
-
-static void
-_update_all_pgdirs(int index, pdentry e)
+_update_all_pgdirs(int index, page_directory_entry e)
 {
 	vm_translation_map *entry;
 	unsigned int state = disable_interrupts();
@@ -129,7 +173,7 @@ _update_all_pgdirs(int index, pdentry e)
 static status_t
 early_query(addr_t va, addr_t *_physicalAddress)
 {
-	ptentry *pentry;
+	page_table_entry *pentry;
 
 	if (page_hole_pgdir[VADDR_TO_PDENT(va)].present == 0) {
 		// no pagetable here
@@ -232,11 +276,13 @@ destroy_tmap(vm_translation_map *map)
 
 
 static void
-put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, uint32 attributes)
+put_pgtable_in_pgdir(page_directory_entry *entry,
+	addr_t pgtable_phys, uint32 attributes)
 {
+	page_directory_entry table;
 	// put it in the pgdir
-	init_pdentry(e);
-	e->addr = ADDR_SHIFT(pgtable_phys);
+	init_page_directory_entry(&table);
+	table.addr = ADDR_SHIFT(pgtable_phys);
 
 	// ToDo: we ignore the attributes of the page table - for compatibility
 	//	with BeOS we allow having user accessible areas in the kernel address
@@ -245,36 +291,42 @@ put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, uint32 attributes)
 	//	this fact, too.
 	//	We might want to get rid of this possibility one day, especially if
 	//	we intend to port it to a platform that does not support this.
-	e->user = 1;
-	e->rw = 1;
-	e->present = 1;
+	table.user = 1;
+	table.rw = 1;
+	table.present = 1;
+	update_page_directory_entry(entry, &table);
 }
 
 
 static void
-put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, uint32 attributes)
+put_page_table_entry_in_pgtable(page_table_entry *entry,
+	addr_t physicalAddress, uint32 attributes)
 {
-	// put it in the pgtable
-	init_ptentry(e);
-	e->addr = ADDR_SHIFT(pgtable_phys);
+	page_table_entry page;
+	init_page_table_entry(&page);
+
+	page.addr = ADDR_SHIFT(physicalAddress);
 
 	// if the page is user accessible, it's automatically
 	// accessible in kernel space, too (but with the same
 	// protection)
-	e->user = (attributes & B_USER_PROTECTION) != 0;
-	if (e->user)
-		e->rw = (attributes & B_WRITE_AREA) != 0;
+	page.user = (attributes & B_USER_PROTECTION) != 0;
+	if (page.user)
+		page.rw = (attributes & B_WRITE_AREA) != 0;
 	else
-		e->rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
-	e->present = 1;
+		page.rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+	page.present = 1;
+
+	// put it in the page table
+	update_page_table_entry(entry, &page);
 }
 
 
 static status_t
 map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 {
-	pdentry *pd;
-	ptentry *pt;
+	page_directory_entry *pd;
+	page_table_entry *pt;
 	unsigned int index;
 	int err;
 
@@ -324,7 +376,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
-	put_ptentry_in_pgtable(&pt[index], pa, attributes);
+	put_page_table_entry_in_pgtable(&pt[index], pa, attributes);
 
 	put_physical_page_tmap((addr_t)pt);
 
@@ -342,8 +394,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 static status_t
 unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
-	ptentry *pt;
-	pdentry *pd = map->arch_data->pgdir_virt;
+	page_table_entry *pt;
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 	int err;
 
@@ -393,8 +445,8 @@ restart:
 static status_t
 query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, uint32 *out_flags)
 {
-	ptentry *pt;
-	pdentry *pd = map->arch_data->pgdir_virt;
+	page_table_entry *pt;
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 	int err;
 
@@ -443,8 +495,8 @@ get_mapped_size_tmap(vm_translation_map *map)
 static status_t
 protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attributes)
 {
-	ptentry *pt;
-	pdentry *pd = map->arch_data->pgdir_virt;
+	page_table_entry *pt;
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 	int err;
 
@@ -498,8 +550,8 @@ restart:
 static status_t
 clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 {
-	ptentry *pt;
-	pdentry *pd = map->arch_data->pgdir_virt;
+	page_table_entry *pt;
+	page_directory_entry *pd = map->arch_data->pgdir_virt;
 	int index;
 	int err;
 	int tlb_flush = false;
@@ -567,7 +619,7 @@ static status_t
 map_iospace_chunk(addr_t va, addr_t pa)
 {
 	int i;
-	ptentry *pt;
+	page_table_entry *pt;
 	addr_t ppn;
 	int state;
 
@@ -579,7 +631,7 @@ map_iospace_chunk(addr_t va, addr_t pa)
 	ppn = ADDR_SHIFT(pa);
 	pt = &iospace_pgtables[(va - IOSPACE_BASE) / B_PAGE_SIZE];
 	for (i = 0; i < 1024; i++) {
-		init_ptentry(&pt[i]);
+		init_page_table_entry(&pt[i]);
 		pt[i].addr = ppn + i;
 		pt[i].user = 0;
 		pt[i].rw = 1;
@@ -765,7 +817,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	}
 
 	// zero out the bottom portion of the new pgdir
-	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0, NUM_USER_PGDIR_ENTS * sizeof(pdentry));
+	memset(map->arch_data->pgdir_virt + FIRST_USER_PGDIR_ENT, 0, NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
 
 	// insert this new map into the map list
 	{
@@ -774,7 +826,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 
 		// copy the top portion of the pgdir from the current one
 		memcpy(map->arch_data->pgdir_virt + FIRST_KERNEL_PGDIR_ENT, kernel_pgdir_virt + FIRST_KERNEL_PGDIR_ENT,
-			NUM_KERNEL_PGDIR_ENTS * sizeof(pdentry));
+			NUM_KERNEL_PGDIR_ENTS * sizeof(page_directory_entry));
 
 		map->next = tmap_list;
 		tmap_list = map;
@@ -803,14 +855,14 @@ arch_vm_translation_map_init(kernel_args *args)
 	TRACE(("vm_translation_map_init: entry\n"));
 
 	// page hole set up in stage2
-	page_hole = (ptentry *)args->arch_args.page_hole;
+	page_hole = (page_table_entry *)args->arch_args.page_hole;
 	// calculate where the pgdir would be
-	page_hole_pgdir = (pdentry *)(((unsigned int)args->arch_args.page_hole) + (B_PAGE_SIZE * 1024 - B_PAGE_SIZE));
+	page_hole_pgdir = (page_directory_entry *)(((unsigned int)args->arch_args.page_hole) + (B_PAGE_SIZE * 1024 - B_PAGE_SIZE));
 	// clear out the bottom 2 GB, unmap everything
-	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(pdentry) * NUM_USER_PGDIR_ENTS);
+	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(page_directory_entry) * NUM_USER_PGDIR_ENTS);
 
-	kernel_pgdir_phys = (pdentry *)args->arch_args.phys_pgdir;
-	kernel_pgdir_virt = (pdentry *)args->arch_args.vir_pgdir;
+	kernel_pgdir_phys = (page_directory_entry *)args->arch_args.phys_pgdir;
+	kernel_pgdir_virt = (page_directory_entry *)args->arch_args.vir_pgdir;
 
 	tmap_list_lock = 0;
 	tmap_list = NULL;
@@ -821,7 +873,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	num_virtual_chunks = IOSPACE_SIZE / IOSPACE_CHUNK_SIZE;
 	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_kernel_args(args,
 		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	iospace_pgtables = (ptentry *)vm_alloc_from_kernel_args(args,
+	iospace_pgtables = (page_table_entry *)vm_alloc_from_kernel_args(args,
 		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p, iospace_pgtables %p\n",
@@ -844,7 +896,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	{
 		addr_t phys_pgtable;
 		addr_t virt_pgtable;
-		pdentry *e;
+		page_directory_entry *e;
 		int i;
 
 		virt_pgtable = (addr_t)iospace_pgtables;
@@ -933,7 +985,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 	index = VADDR_TO_PDENT(va);
 	if (page_hole_pgdir[index].present == 0) {
 		addr_t pgtable;
-		pdentry *e;
+		page_directory_entry *e;
 		// we need to allocate a pgtable
 		pgtable = get_free_page(args);
 		// pgtable is in pages, convert to physical address
@@ -949,7 +1001,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 		memset((unsigned int *)((unsigned int)page_hole + (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
 	}
 	// now, fill in the pentry
-	put_ptentry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes);
+	put_page_table_entry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes);
 
 	arch_cpu_invalidate_TLB_range(va, va);
 

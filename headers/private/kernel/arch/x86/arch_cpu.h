@@ -24,8 +24,6 @@ struct tss {
 	uint32 ss1;
 	uint32 sp2;
 	uint32 ss2;
-	uint32 sp3;
-	uint32 ss3;
 	uint32 cr3;
 	uint32 eip, eflags, eax, ecx, edx, ebx, esp, ebp, esi, edi;
 	uint32 es, cs, ss, ds, fs, gs;
@@ -35,34 +33,6 @@ struct tss {
 };
 
 /**************************************************************************/
-
-typedef struct ptentry {		// page table entry
-	unsigned int present:1;
-	unsigned int rw:1;
-	unsigned int user:1;
-	unsigned int write_through:1;
-	unsigned int cache_disabled:1;
-	unsigned int accessed:1;
-	unsigned int dirty:1;
-	unsigned int reserved:1;
-	unsigned int global:1;
-	unsigned int avail:3;
-	unsigned int addr:20;
-} ptentry;
-
-typedef struct pdentry {		// page directory entry
-	unsigned int present:1;
-	unsigned int rw:1;
-	unsigned int user:1;
-	unsigned int write_through:1;
-	unsigned int cache_disabled:1;
-	unsigned int accessed:1;
-	unsigned int reserved:1;
-	unsigned int page_size:1;
-	unsigned int global:1;
-	unsigned int avail:3;
-	unsigned int addr:20;
-} pdentry;
 
 struct iframe {
 	unsigned int gs;
