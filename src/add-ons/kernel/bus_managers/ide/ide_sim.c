@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -198,41 +198,40 @@ static uchar
 sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 {
 	char *controller_name;
-	
+
 	SHOW_FLOW0( 4, "" );
-	
-	if( bus->disconnected )
+
+	if (bus->disconnected)
 		return SCSI_NO_HBA;
-	
+
 	info->hba_inquiry = SCSI_PI_TAG_ABLE | SCSI_PI_WIDE_16;
-	
+
 	info->hba_misc = 0;
 
-	memset( info->vuhba_flags, 0, sizeof( info->vuhba_flags ));
+	memset(info->vuhba_flags, 0, sizeof(info->vuhba_flags));
 	// we don't need any of the private data
 	info->sim_priv = 0;
-		
+
 	// there is no initiator for IDE, but SCSI needs it for scanning
 	info->initiator_id = 2;	
 	// there's no controller limit, so set it higher then the maximum
 	// number of queued requests, which is 32 per device * 2 devices
 	info->hba_queue_size = 65;
-	
-	strncpy( info->sim_vid, "OpenBeOS", SCSI_SIM_ID );
-	
-	if( pnp->get_attr_string( bus->node, 
-		SCSI_DESCRIPTION_CONTROLLER_NAME, &controller_name, true ) == B_OK )
-	{
-		strncpy( info->hba_vid, controller_name, SCSI_HBA_ID );
-		free( controller_name );
-	} else
-		strncpy( info->hba_vid, "", SCSI_HBA_ID );
 
-	strncpy( info->controller_family, "IDE", SCSI_FAM_ID );
-	strncpy( info->controller_type, "IDE", SCSI_TYPE_ID );
-	
-	SHOW_FLOW0( 4, "done" );
-	
+	strncpy(info->sim_vid, "Haiku", SCSI_SIM_ID);
+
+	if (pnp->get_attr_string(bus->node, SCSI_DESCRIPTION_CONTROLLER_NAME,
+			&controller_name, true) == B_OK) {
+		strlcpy(info->hba_vid, controller_name, SCSI_HBA_ID);
+		free(controller_name);
+	} else
+		strlcpy(info->hba_vid, "", SCSI_HBA_ID);
+
+	strlcpy(info->controller_family, "IDE", SCSI_FAM_ID);
+	strlcpy(info->controller_type, "IDE", SCSI_TYPE_ID);
+
+	SHOW_FLOW0(4, "done");
+
 	return SCSI_REQ_CMP;
 }
 
@@ -246,14 +245,9 @@ scan_device(ide_bus_info *bus, int device)
 	// bus when a bus or device scan is issued, so we
 	// have to use a SPC for that to be sure no one else
 	// is accessing the device or bus concurrently
-dprintf("1\n");
 	schedule_synced_pc(bus, &bus->scan_bus_syncinfo, (void *)device);
 
-dprintf("2\n");
 	acquire_sem(bus->scan_device_sem);
-
-dprintf("3\n");
-	return;	
 }
 
 
@@ -268,12 +262,6 @@ sim_scan_bus(ide_bus_info *bus)
 		return SCSI_NO_HBA;
 
 	for (i = 0; i < bus->max_devices; ++i) {
-		// ToDo: remove me! (this speeds up detection in bochs - because
-		//	timing seems to be broken there)
-		if (i == 1) {
-			dprintf("ignore 1!\n");
-			continue;
-		}
 		scan_device(bus, i);
 	}
 
@@ -379,7 +367,7 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	uint num_running;
 
 	FAST_LOG2(bus->log, ev_ide_finish_request, (uint32)qrequest, resubmit);
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	// save request first, as qrequest can be reused as soon as
 	// access_finished is called!
@@ -556,77 +544,75 @@ ide_sim_init_bus(pnp_node_handle node, void *user_cookie, void **cookie)
 	ide_bus_info *bus;
 	int res;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	// first prepare the info structure	
 	bus = (ide_bus_info *)malloc(sizeof(*bus));
 	if (bus == NULL)
 		return B_NO_MEMORY;
-		
-	memset( bus, 0, sizeof( *bus ));
+
+	memset(bus, 0, sizeof(*bus));
 	bus->node = node;
 	bus->lock = 0;
 	bus->num_running_reqs = 0;
 	bus->active_qrequest = NULL;
 	bus->disconnected = false;
-	
+
 	{
 		int32 channel_id = -1;
-		
-		pnp->get_attr_uint32( node, IDE_CHANNEL_ID_ITEM, (uint32 *)&channel_id, true );
-		
-		sprintf( bus->name, "ide_bus %d", (int)channel_id );
+
+		pnp->get_attr_uint32(node, IDE_CHANNEL_ID_ITEM, (uint32 *)&channel_id, true);
+
+		sprintf(bus->name, "ide_bus %d", (int)channel_id);
 	}
-	
-	bus->log = fast_log->start_log( bus->name, ide_events );
-	if( bus->log == NULL ) {
+
+	bus->log = fast_log->start_log(bus->name, ide_events);
+	if (bus->log == NULL) {
 		res = B_NO_MEMORY;
 		goto err;
 	}
-	
-	init_synced_pc( &bus->scan_bus_syncinfo, scan_device_worker );
-	init_synced_pc( &bus->disconnect_syncinfo, disconnect_worker );
-	
+
+	init_synced_pc(&bus->scan_bus_syncinfo, scan_device_worker);
+	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
+
 	bus->scsi_cookie = user_cookie;
-	
 	bus->state = ide_state_idle;
-	
 	bus->timer.bus = bus;
-	
 	bus->synced_pc_list = NULL;
-	if( (res = scsi->alloc_dpc( &bus->irq_dpc )) < 0 )
+
+	if ((res = scsi->alloc_dpc(&bus->irq_dpc)) < 0)
 		goto err1;
-		
+
 	bus->active_device = NULL;
-	bus->sync_wait_sem = create_sem( 0, "ide_sync_wait" );
-	if( bus->sync_wait_sem < 0 ) {
+	bus->sync_wait_sem = create_sem(0, "ide_sync_wait");
+	if (bus->sync_wait_sem < 0) {
 		res = bus->sync_wait_sem;
 		goto err2;
 	}
-		
+
 	bus->devices[0] = bus->devices[1] = NULL;
-	
-	bus->scan_device_sem = create_sem( 0, "ide_scan_finished" );
-	if( bus->scan_device_sem < 0 ) {
+
+	bus->scan_device_sem = create_sem(0, "ide_scan_finished");
+	if (bus->scan_device_sem < 0) {
 		res = bus->scan_device_sem;
 		goto err3;
 	}
-	
-	res = INIT_BEN( &bus->status_report_ben, "ide_status_report" );
-	if( res < 0 ) 
+
+	res = INIT_BEN(&bus->status_report_ben, "ide_status_report");
+	if (res < 0) 
 		goto err4;
-	
+
 	bus->first_device = NULL;
-		
+
 	// read restrictions of controller
-	
-	if( pnp->get_attr_uint8( node, 
-		IDE_CONTROLLER_MAX_DEVICES_ITEM, &bus->max_devices, true ) != B_OK )
+
+	if (pnp->get_attr_uint8(node, IDE_CONTROLLER_MAX_DEVICES_ITEM,
+			&bus->max_devices, true) != B_OK)
 		// per default, 2 devices are supported per node
 		bus->max_devices = 2;
-		
-	bus->max_devices = min( bus->max_devices, 2 );
-	
+
+	bus->max_devices = min(bus->max_devices, 2);
+
 	if (pnp->get_attr_uint8(node, IDE_CONTROLLER_CAN_DMA_ITEM, &bus->can_DMA, true) != B_OK)
 		// per default, no dma support
 		bus->can_DMA = false;
@@ -710,21 +696,20 @@ disconnect_worker(ide_bus_info *bus, void *arg)
 }
 
 
-static void ide_sim_bus_removed( pnp_node_handle node, ide_bus_info *bus )
+static void
+ide_sim_bus_removed(pnp_node_handle node, ide_bus_info *bus)
 {	
-	if( bus == NULL )
+	if (bus == NULL)
 		// driver not loaded - no manual intervention needed
 		return;
-		
+
 	// XPT must not issue further commands
-	scsi->block_bus( bus->scsi_cookie );
+	scsi->block_bus(bus->scsi_cookie);
 	// make sure, we refuse all new commands
 	bus->disconnected = true;
 	// abort all running commands with SCSI_NO_HBA
 	// (the scheduled function also unblocks the bus when finished)
-	schedule_synced_pc( bus, &bus->disconnect_syncinfo, NULL );
-
-	return;
+	schedule_synced_pc(bus, &bus->disconnect_syncinfo, NULL);
 }
 
 
@@ -737,39 +722,39 @@ ide_sim_get_restrictions(ide_bus_info *bus, uchar target_id,
 	// we declare even ATA devices as ATAPI so we have to emulate fewer
 	// commands
 	*is_atapi = true;
-	
+
 	// we emulate autosense for ATA devices
 	*no_autosense = false;
-	
-	if( device != NULL && device->is_atapi ) {
-		// we don't support native autosense for ATAPI devices 
+
+	if (device != NULL && device->is_atapi) {
+		// we don't support native autosense for ATAPI devices
 		*no_autosense = true;
 	}
-	
+
 	*max_blocks = 255;
-	
-	if( device->is_atapi ) {
-		if( strncmp( device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI", 
-		 	strlen( "IOMEGA  ZIP 100       ATAPI" )) == 0 ||
-		 	strncmp( device->infoblock.model_number, "IOMEGA  Clik!", 
-		 	strlen( "IOMEGA  Clik!" )) == 0 )
-		{
-			SHOW_ERROR0( 2, "Found buggy ZIP/Clik! drive - restricting transmission size" );
+
+	if (device->is_atapi) {
+		if (strncmp(device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI", 
+		 		strlen("IOMEGA  ZIP 100       ATAPI")) == 0
+		 	|| strncmp( device->infoblock.model_number, "IOMEGA  Clik!", 
+		 		strlen( "IOMEGA  Clik!")) == 0) {
+			SHOW_ERROR0(2, "Found buggy ZIP/Clik! drive - restricting transmission size");
 			*max_blocks = 64;
 		}
-	} 
+	}
 }
 
 
-static status_t std_ops( int32 op, ... )
+static status_t
+std_ops(int32 op, ...)
 {
-	switch( op ) {
-	case B_MODULE_INIT:
-	case B_MODULE_UNINIT:
-		return B_OK;
-		
-	default:
-		return B_ERROR;
+	switch (op) {
+		case B_MODULE_INIT:
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
 	}
 }
 
