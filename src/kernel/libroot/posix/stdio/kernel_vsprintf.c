@@ -280,8 +280,16 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		/* get the conversion qualifier */
 
 		qualifier = -1;
-		if (format[0] == 'h' || format[0] == 'l' || format[0] == 'L')
+		if (format[0] == 'h' || format[0] == 'L') {
 			qualifier = *format++;
+		} else if (format[0] == 'l')  {
+			format++;
+			if (format[0] == 'l') {
+				qualifier = 'L';
+				format++;
+			} else
+				qualifier = 'l';
+		}
 
 		/* default base */
 		base = 10;
