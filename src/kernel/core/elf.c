@@ -558,12 +558,20 @@ insert_preloaded_image(struct preloaded_image *preloadedImage)
 		goto error2;
 
 	register_elf_image(image);
+	preloadedImage->id = image->id;
+		// modules_init() uses this information to get the preloaded images
+
 	return B_OK;
 
 error2:
 	free(image);
 error1:
 	free(elfHeader);
+
+	// clean up preloaded image resources (this image won't be used anymore)
+	delete_area(preloadedImage->text_region.id);
+	delete_area(preloadedImage->data_region.id);
+	preloadedImage->id = -1;
 
 	return status;
 }
