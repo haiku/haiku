@@ -1,5 +1,16 @@
 CHANGES
 
+From version 1.5b2 to 2.0b1 (6/27/2003):
+
+- updated to PDFlib Lite 5.0.0
+- static linked to PDFlib
+- added basic support for stroke/fill opacity (transparency)
+- add image cache
+- ui clean up of Advanced Settings
+- added expanded/collapsed state to bookmarks
+- added link destination
+- bug fixes
+
 From version 1.5b1 to 1.5b2 (7/5/2002):
 
 - fixed bug in install script
