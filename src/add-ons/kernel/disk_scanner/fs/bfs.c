@@ -10,6 +10,7 @@
 #include <disk_scanner/fs.h>
 
 #define BFS_FS_MODULE_NAME "disk_scanner/fs/bfs/v1"
+const char *kModuleDebugName = "fs/bfs";
 
 //#define TRACE(x)
 #define TRACE(x) dprintf x
@@ -127,7 +128,7 @@ static
 status_t
 std_ops(int32 op, ...)
 {
-	TRACE(("fs/bfs: std_ops(0x%lx)\n", op));
+	TRACE(("%s: std_ops(0x%lx)\n", kModuleDebugName, op));
 	switch(op) {
 		case B_MODULE_INIT:
 		case B_MODULE_UNINIT:
@@ -162,6 +163,8 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 /*! \brief Returns true if the given partition is a valid BFS partition.
 
 	See fs_identify_hook() for more information.
+
+	\todo Fill in partitionInfo->mounted_at with something useful.
 */
 static
 bool
@@ -169,8 +172,8 @@ bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 				float *priority)
 {
 	bool result = false;
-	TRACE(("fs/bfs: identify(%d, %p, offset: %lld)\n", deviceFD, partitionInfo,
-	       partitionInfo ? partitionInfo->info.offset : -1));
+	TRACE(("%s: identify(%d, %p, offset: %lld)\n", kModuleDebugName, deviceFD,
+	       partitionInfo, partitionInfo ? partitionInfo->info.offset : -1));
 
 	if (partitionInfo) {
 		uchar *buffer = NULL;
@@ -195,12 +198,15 @@ bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 			{
 				result = false;
 			} else {
-				strcpy(partitionInfo->file_system_short_name, "bfs");
-				strcpy(partitionInfo->file_system_long_name, "Be File System");
-				strcpy(partitionInfo->volume_name, superBlock->name);
-				result = true;
+				if (partitionInfo->file_system_short_name)
+					strcpy(partitionInfo->file_system_short_name, "bfs");
+				if (partitionInfo->file_system_long_name)
+					strcpy(partitionInfo->file_system_long_name, "Be File System");
+				if (partitionInfo->volume_name)
+					strcpy(partitionInfo->volume_name, superBlock->name);
 				if (priority)
 					*priority = 0;
+				result = true;
 			}
 			free(buffer);
 		}
