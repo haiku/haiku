@@ -79,7 +79,7 @@ Translator JPEGTranslator :
 
 LinkSharedOSLibs JPEGTranslator : be translation ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	JPEGTranslator :
 	boot home config add-ons Translators ;
 

@@ -4,7 +4,7 @@ Translator PPMTranslator : PPMMain.cpp PPMTranslator.cpp colorspace.cpp ;
 
 LinkSharedOSLibs PPMTranslator : be translation ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	PPMTranslator :
 	boot home config add-ons Translators ;
 

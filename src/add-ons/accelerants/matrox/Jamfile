@@ -20,7 +20,7 @@ Addon mga.accelerant : accelerants :
 	: false : libmatrox_engine.a
 ;
 
-Package openbeos-matrox-cvs :
+Package haiku-matrox-cvs :
 	mga.accelerant :
 	boot home config add-ons accelerants ;
 

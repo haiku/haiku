@@ -7,15 +7,15 @@ R5KernelAddon mga.driver : kernel drivers bin :
 	driver.c
 ;
 
-Package openbeos-matrox-cvs :
+Package haiku-matrox-cvs :
 	README.html UPDATE.html ;
-Package openbeos-matrox-cvs :
+Package haiku-matrox-cvs :
 	mga.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-matrox-cvs :
+Package haiku-matrox-cvs :
 	<kernel!drivers!dev!graphics>mga.driver :
 	boot home config add-ons kernel drivers dev graphics ;
-Package openbeos-matrox-cvs :
+Package haiku-matrox-cvs :
 	mga.settings :
 	boot home config settings kernel drivers ;
 

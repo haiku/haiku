@@ -16,7 +16,7 @@ Translator STXTTranslator :
 
 LinkSharedOSLibs STXTTranslator : be translation ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	STXTTranslator :
 	boot home config add-ons Translators ;
 

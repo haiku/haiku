@@ -15,9 +15,9 @@ LinkSharedOSLibs libtranslation.so :
 MakeLocate <develop>libtranslation.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libtranslation.so : libtranslation.so ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	README.html ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	libtranslation.so :
 	boot home config lib ;

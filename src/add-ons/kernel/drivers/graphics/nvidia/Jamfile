@@ -7,15 +7,15 @@ R5KernelAddon nv.driver : kernel drivers bin :
 	driver.c
 ;
 
-Package openbeos-nvidia-cvs :
+Package haiku-nvidia-cvs :
 	README.html UPDATE.html ;
-Package openbeos-nvidia-cvs :
+Package haiku-nvidia-cvs :
 	nv.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-nvidia-cvs :
+Package haiku-nvidia-cvs :
 	<kernel!drivers!dev!graphics>nv.driver :
 	boot home config add-ons kernel drivers dev graphics ;
-Package openbeos-nvidia-cvs :
+Package haiku-nvidia-cvs :
 	nv.settings :
 	boot home config settings kernel drivers ;
 

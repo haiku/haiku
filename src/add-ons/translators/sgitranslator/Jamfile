@@ -17,7 +17,7 @@ Translator SGITranslator :
 
 LinkSharedOSLibs SGITranslator : be translation ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	SGITranslator :
 	boot home config add-ons Translators ;
 

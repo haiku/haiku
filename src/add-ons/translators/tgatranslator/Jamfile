@@ -17,7 +17,7 @@ Translator TGATranslator :
 
 LinkSharedOSLibs TGATranslator : be translation ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	TGATranslator :
 	boot home config add-ons Translators ;
 

@@ -35,7 +35,7 @@ Addon radeon.accelerant : accelerants :
 
 LinkSharedOSLibs radeon.accelerant : root be ;
 
-Package openbeos-radeon-cvs :
+Package haiku-radeon-cvs :
 	radeon.accelerant : 
 	boot home config add-ons accelerants ;
 

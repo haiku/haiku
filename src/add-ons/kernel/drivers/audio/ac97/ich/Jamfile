@@ -25,10 +25,10 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 #	-fno-pic -D_KERNEL_MODE
 #	;
 
-Packages openbeos-ich-ac97-cvs openbeos-ich-ac97-debug-cvs :
+Package haiku-ich-ac97-cvs :
 	ich_ac97 :
 	boot home config add-ons kernel drivers bin ;
-Packages openbeos-ich-ac97-cvs openbeos-ich-ac97-debug-cvs :
+Package haiku-ich-ac97-cvs :
 	<kernel!drivers!dev!audio!multi>ich_ac97 :
 	boot home config add-ons kernel drivers dev audio multi ;
 

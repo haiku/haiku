@@ -7,15 +7,15 @@ R5KernelAddon nm.driver : kernel drivers bin :
 	driver.c
 ;
 
-Package openbeos-neomagic-cvs :
+Package haiku-neomagic-cvs :
 	README.html UPDATE.html ;
-Package openbeos-neomagic-cvs :
+Package haiku-neomagic-cvs :
 	nm.driver : 
 	boot home config add-ons kernel drivers bin ;
-Package openbeos-neomagic-cvs :
+Package haiku-neomagic-cvs :
 	<kernel!drivers!dev!graphics>nm.driver :
 	boot home config add-ons kernel drivers dev graphics ;
-Package openbeos-neomagic-cvs :
+Package haiku-neomagic-cvs :
 	nm.settings :
 	boot home config settings kernel drivers ;
 

@@ -53,7 +53,7 @@ Translator TIFFTranslator :
 
 LinkSharedOSLibs TIFFTranslator : be translation libz.a ;
 
-Package openbeos-translationkit-cvs :
+Package haiku-translationkit-cvs :
 	TIFFTranslator :
 	boot home config add-ons Translators ;
 

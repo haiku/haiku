@@ -81,13 +81,13 @@ SEARCH on [ FGristFiles
 		util.c
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
 
-Package openbeos-echo24-cvs
+Package haiku-echo24-cvs
 	:
 	echo24
 	:
 	boot home config add-ons kernel drivers bin ;
 
-Package openbeos-echo24-cvs
+Package haiku-echo24-cvs
 	:
 	<kernel!drivers!dev!audio!multi>echo24
 	:

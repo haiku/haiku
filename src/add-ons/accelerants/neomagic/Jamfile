@@ -20,7 +20,7 @@ Addon nm.accelerant : accelerants :
 	: false : libneomagic_engine.a
 ;
 
-Package openbeos-neomagic-cvs :
+Package haiku-neomagic-cvs :
 	nm.accelerant :
 	boot home config add-ons accelerants ;
 
