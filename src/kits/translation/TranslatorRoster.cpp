@@ -1424,8 +1424,8 @@ BTranslatorRoster::LoadTranslator(const char *path)
 			return err;
 
 		// add this translator to the list
-		BR4xTranslator *pR4xTran = new BR4xTranslator(&trand);
-		AddTranslatorToList(pR4xTran, path, image, false);
+		BFuncTranslator *pFuncTran = new BFuncTranslator(&trand);
+		AddTranslatorToList(pFuncTran, path, image, false);
 			// do not call Acquire() on ptran because I want it to be
 			// deleted the first time Release() is called on it.
 			
