@@ -24,7 +24,9 @@
 	// speed up locking - only makes sense if USE_BENAPHORE
 	// is defined, too.
 #endif
-
+#ifdef FAST_LOCK
+#	error implement recursive write locking first
+#endif
 
 class Semaphore {
 	public:
@@ -164,13 +166,7 @@ class RecursiveLock {
 		{
 			thread_id thread = find_thread(NULL);
 			if (thread != fOwner) {
-				#if __MWERKS__ && !USER //--- The R5 PowerPC kernel doesn't have panic()
-					char blip[255];
-					sprintf(blip,"RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
-					kernel_debugger(blip);
-				#else
-					panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
-				#endif
+				panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
 			}
 
 			if (--fOwnerCount == 0) {
@@ -379,22 +375,44 @@ class ReadWriteLock {
 
 		status_t Lock()
 		{
+			thread_id currentThread = find_thread(NULL);
+			if (currentThread == fOwner) {
+				fOwnerCount++;
+				return B_OK;
+			}
 			return acquire_sem(fSemaphore);
 		}
 		
 		void Unlock()
 		{
+			thread_id currentThread = find_thread(NULL);
+			if (fOwner == currentThread && --fOwnerCount > 0)
+				return;
+
 			release_sem(fSemaphore);
 		}
 		
 		status_t LockWrite()
 		{
-			return acquire_sem_etc(fSemaphore, MAX_READERS, 0, 0);
+			thread_id currentThread = find_thread(NULL);
+			if (currentThread == fOwner) {
+				fOwnerCount++;
+				return B_OK;
+			}
+			status_t status = acquire_sem_etc(fSemaphore, MAX_READERS, 0, 0);
+			if (status >= B_OK) {
+				fOwner = currentThread;
+				fOwnerCount = 1;
+			}
+			return status;
 		}
 		
 		void UnlockWrite()
 		{
-			release_sem_etc(fSemaphore, MAX_READERS, 0);
+			if (--fOwnerCount == 0) {
+				fOwner = -1;
+				release_sem_etc(fSemaphore, MAX_READERS, 0);
+			}
 		}
 
 	private:
@@ -402,6 +420,8 @@ class ReadWriteLock {
 		friend class WriteLocked;
 
 		sem_id		fSemaphore;
+		thread_id	fOwner;
+		int32		fOwnerCount;
 };
 #endif	// FAST_LOCK
 
@@ -431,15 +451,22 @@ class WriteLocked {
 	public:
 		WriteLocked(ReadWriteLock &lock)
 			:
-			fLock(lock)
+			fLock(&lock)
 		{
 			fStatus = lock.LockWrite();
+		}
+
+		WriteLocked(ReadWriteLock *lock)
+			:
+			fLock(lock)
+		{
+			fStatus = lock != NULL ? lock->LockWrite() : B_ERROR;
 		}
 
 		~WriteLocked()
 		{
 			if (fStatus == B_OK)
-				fLock.UnlockWrite();
+				fLock->UnlockWrite();
 		}
 
 		status_t IsLocked()
@@ -448,7 +475,7 @@ class WriteLocked {
 		}
 
 	private:
-		ReadWriteLock	&fLock;
+		ReadWriteLock	*fLock;
 		status_t		fStatus;
 };
 
