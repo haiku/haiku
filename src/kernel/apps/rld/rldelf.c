@@ -146,7 +146,7 @@ static struct uspace_program_args const *gProgramArgs;
 #define	FATAL(x,y...) \
 	if (x) { \
 		dprintf("rld.so: " y); \
-		_kern_exit(0); \
+		_kern_exit_team(0); \
 	}
 
 void
@@ -167,7 +167,7 @@ dprintf(const char *format, ...)
 #define	FATAL(x,y...) \
 	if (x) { \
 		printf("rld.so: " y); \
-		_kern_exit(0); \
+		_kern_exit_team(0); \
 	}
 
 #endif

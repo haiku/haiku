@@ -1,14 +1,10 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Author(s): Daniel Reinhold (danielre@users.sf.net)
-**            Axel Dörfler, axeld@pinc-software.de
-**
-*/
-
-/* implements the standard C library functions:
- * abort, atexit, exit
+ * Copyright 2004, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Author(s):
+ *		Daniel Reinhold, danielre@users.sf.net
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -62,6 +58,6 @@ exit(int status)
 	_IO_cleanup();
 
 	// exit with status code
-	_kern_exit(status);
+	_kern_exit_team(status);
 }
 
