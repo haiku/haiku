@@ -1,0 +1,78 @@
+SubDir OBOS_TOP src tests servers input prefs ;
+
+UsePrivateHeaders interface ;
+UsePrivateHeaders app ;
+UsePrivateHeaders input ;
+
+AddResources KeymapTest : Keymap.rdef ;
+
+if $(COMPILE_FOR_R5) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
+Preference KeymapTest :
+	KeymapApplication.cpp
+	KeymapWindow.cpp
+	KeymapListItem.cpp
+	Keymap.cpp
+	KeymapTextView.cpp
+
+	InterfaceDefs.cpp
+	Input.cpp
+	: be tracker ;
+
+SEARCH on [ FGristFiles
+	KeymapApplication.cpp
+	KeymapWindow.cpp
+	KeymapListItem.cpp
+	Keymap.cpp
+	KeymapTextView.cpp
+	Keymap.rdef ]
+	= [ FDirName $(OBOS_TOP) src prefs keymap ] ;
+
+AddResources KeyboardTest : Keyboard.rsrc ;
+
+Preference KeyboardTest : 
+	Keyboard.cpp 
+	KeyboardSettings.cpp 
+	KeyboardView.cpp 
+	KeyboardWindow.cpp 
+
+	InterfaceDefs.cpp
+	Input.cpp
+	: translation be ;
+
+SEARCH on [ FGristFiles
+	Keyboard.cpp 
+	KeyboardSettings.cpp 
+	KeyboardView.cpp 
+	KeyboardWindow.cpp 
+	Keyboard.rsrc ]
+	= [ FDirName $(OBOS_TOP) src prefs keyboard ] ;
+
+AddResources MouseTest : Mouse.rdef ;
+
+Preference MouseTest : 
+	Mouse.cpp 
+	MouseSettings.cpp 
+	MouseWindow.cpp
+	MouseView.cpp 
+	SettingsView.cpp
+
+	InterfaceDefs.cpp
+	Input.cpp
+	: translation be
+	;
+
+SEARCH on [ FGristFiles
+	Mouse.cpp 
+	MouseSettings.cpp 
+	MouseWindow.cpp
+	MouseView.cpp 
+	SettingsView.cpp
+	Mouse.rdef
+	]
+	= [ FDirName $(OBOS_TOP) src prefs mouse ] ;
+
+SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ] 
+	= [ FDirName $(OBOS_TOP) src kits interface ] ;
