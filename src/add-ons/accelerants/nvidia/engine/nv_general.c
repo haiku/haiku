@@ -1133,8 +1133,7 @@ static status_t nv_general_bios_to_powergraphics()
 	 * Note:
 	 * This may only be done when no transfers are in progress on the bus, so now
 	 * is probably a good time.. */
-//fixme: implement route through kerneldriver to access AGP busmanager: in progress...
-//	nv_agp_setup();
+	nv_agp_setup();
 
 	/* turn screen one on */
 	head1_dpms(true, true, true);

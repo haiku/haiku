@@ -16,6 +16,7 @@
 #include <Drivers.h>
 #include <PCI.h>
 #include <OS.h>
+#include "AGP.h"
 
 #define DRIVER_PREFIX "nv" // apsed
 
@@ -64,7 +65,9 @@ enum {
 	NV_GET_PCI,
 	NV_SET_PCI,
 	NV_DEVICE_NAME,
-	NV_RUN_INTERRUPTS
+	NV_RUN_INTERRUPTS,
+	NV_GET_NTH_AGP_INFO,
+	NV_ENABLE_AGP
 };
 
 /* max. number of overlay buffers */
@@ -318,6 +321,21 @@ typedef struct {
 	uint32	magic;		/* magic number to make sure the caller groks us */
 	char	*name;		/* The name of the device, less the /dev root */
 } nv_device_name;
+
+/* Retrieve an AGP device interface if there. Usefull to find the AGP speed scheme
+used (pre 3.x or 3.x) */
+typedef struct {
+	uint32		magic;	/* magic number to make sure the caller groks us */
+	uint8		index;	/* device index in list of devices found */
+	bool		exist;	/* we got AGP device info */
+	agp_info	agpi;	/* AGP interface info of a device */
+} nv_nth_agp_info;
+
+/* Execute an AGP command */
+typedef struct {
+	uint32		magic;	/* magic number to make sure the caller groks us */
+	uint32		cmd;	/* actual command to execute */
+} nv_cmd_agp;
 
 enum {
 	

@@ -14,6 +14,7 @@
 #include <driver_settings.h>
 #include <malloc.h>
 #include <stdlib.h> // for strtoXX
+#include "AGP.h"
 
 /* this is for the standardized portion of the driver API */
 /* currently only one operation is defined: B_GET_ACCELERANT_SIGNATURE */
@@ -77,7 +78,8 @@ static void probe_devices(void);
 static int32 nv_interrupt(void *data);
 
 static DeviceData		*pd;
-static pci_module_info	*pci_bus;
+static pci_module_info	*pci_bus = NULL;
+static agp_module_info	*agp_bus = NULL;
 static device_hooks graphics_device_hooks = {
 	open_hook,
 	close_hook,
@@ -403,6 +405,9 @@ init_driver(void) {
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
 
+	/* get a handle for the agp bus if it exists */
+	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
+
 	/* driver private data */
 	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
 	if (!pd) {
@@ -443,6 +448,9 @@ void uninit_driver(void) {
 
 	/* put the pci module away */
 	put_module(B_PCI_MODULE_NAME);
+
+	/* put the agp module away if it's there */
+	if (agp_bus) put_module(B_AGP_MODULE_NAME);
 }
 
 static status_t map_device(device_info *di)
@@ -978,7 +986,29 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				result = B_OK;
 			}
 		} break;
+		case NV_GET_NTH_AGP_INFO: {
+			nv_nth_agp_info *nai = (nv_nth_agp_info *)buf;
+			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
+				nai->exist = false;
+				if (agp_bus) {
+					if ((*agp_bus->get_nth_agp_info)(nai->index, &(nai->agpi)) == B_NO_ERROR) {
+						nai->exist = true;
+					}
+				}
+				result = B_OK;
+			}
+		} break;
+		case NV_ENABLE_AGP: {
+			nv_cmd_agp *nca = (nv_cmd_agp *)buf;
+			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
+				if (agp_bus) {
+					(*agp_bus->enable_agp)(&(nca->cmd));
+				} else {
+					nca->cmd = 0;
+				}
+				result = B_OK;
+			}
+		} break;
 	}
 	return result;
 }
-

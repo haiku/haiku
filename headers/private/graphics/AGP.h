@@ -6,7 +6,7 @@
 /	For more information, see "AGP interface specification", Revision 2.0 and 3.0,
 /	Intel Corporation, 1998-2002.
 /
-/	Rudolf Cornelissen 6/2004.
+/	Rudolf Cornelissen 6/2004-7/2004.
 /
 *******************************************************************************/
 

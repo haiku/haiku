@@ -1,9 +1,5 @@
 /* Author:
    Rudolf Cornelissen 6/2004-7/2004
-
-   Note:
-   Most of this stuff will probably be relocated to the AGP busmanager module later on,
-   but for now we have something to test with...
 */
 
 #define MODULE_BIT 0x00000100
@@ -11,18 +7,43 @@
 #include <unistd.h>
 #include "nv_std.h"
 
-static void nv_agp_list_caps(agp_info ai);
+static void nv_agp_list_info(agp_info ai);
 static bool has_AGP_interface(agp_info *ai_card, uint8 *adress);
-
-#define PCI_CFGR(A)   (nv_pci_access.offset = A, ioctl(fd,NV_GET_PCI, &nv_pci_access, sizeof(nv_pci_access)), nv_pci_access.value)
-#define PCI_CFGW(A,B) (nv_pci_access.offset = A, nv_pci_access.value = B, ioctl(fd,NV_SET_PCI,&nv_pci_access,sizeof(nv_pci_access)))
+static bool zooi(void);
 
 status_t nv_agp_setup(void)
 {
-	char path[MAXPATHLEN];
-	int agp_fd;
-	agp_info ai_card, ai_bridge;
-//	uint8 rq_depth_card, rq_depth_bridge;
+	nv_nth_agp_info nai;
+	uint8 index;
+
+	/* set the magic number so the driver knows we're for real */
+	nai.magic = NV_PRIVATE_DATA_MAGIC;
+
+	/* contact driver and get a pointer to the registers and shared data */
+	for (index = 0; index < 8; index++)
+	{
+		/* get nth AGP device info */
+
+		ioctl(fd, NV_GET_NTH_AGP_INFO, &nai, sizeof(nai));
+		/* exit if we didn't get one */
+		if (!nai.exist)
+		{
+			if (index != 0)
+				LOG(4,("AGP: end of AGP capable devices list.\n"));
+			else
+				LOG(4,("AGP: no AGP capable devices found.\n"));
+			break;
+		}
+
+		LOG(4,("AGP: AGP capable device #%d:\n", (index + 1)));
+		/* log capabilities */
+		nv_agp_list_info(nai.agpi);
+	}
+}
+
+static bool zooi(void)
+{
+	agp_info ai_card;
 	uint8 adress;
 
 	/* check for card's AGP capabilities - see PCI specification */
@@ -58,17 +79,17 @@ status_t nv_agp_setup(void)
 		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
 	}
 
-	nv_agp_list_caps(ai_card);
+//	nv_agp_list_caps(ai_card);
 
 	/* check for motherboard AGP host bridge */
 	/* open the BeOS AGP kernel driver, the permissions aren't important */
-	strcpy(path, "/dev/graphics/agp/1");
-	agp_fd = open(path, B_READ_WRITE);
-	if (agp_fd < 0)
+//	strcpy(path, "/dev/graphics/agp/1");
+//	agp_fd = open(path, B_READ_WRITE);
+//	if (agp_fd < 0)
 	{
 		LOG(4,("AGP: cannot open AGP host bridge driver, aborting!\n"));
 		/* program card for PCI access */
-		PCI_CFGW((adress + 8), 0x00000000);
+//		PCI_CFGW((adress + 8), 0x00000000);
 
 		return B_ERROR;
 	}
@@ -82,9 +103,9 @@ status_t nv_agp_setup(void)
 	{
 		LOG(4,("AGP: host bridge failed to respond correctly, aborting AGP setup!\n"));
 		/* close host bridge driver */
-		close(agp_fd);
+//		close(agp_fd);
 		/* program card for PCI access */
-		PCI_CFGW((adress + 8), 0x00000000);
+//		PCI_CFGW((adress + 8), 0x00000000);
 
 		return B_ERROR;
 	}
@@ -93,7 +114,7 @@ status_t nv_agp_setup(void)
 //	LOG(4,("AGP: host bridge supports specification %d.%d;\n",
 //		((ai_bridge.config.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
 //		((ai_bridge.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
-	nv_agp_list_caps(ai_bridge);
+//	nv_agp_list_caps(ai_bridge);
 
 	/* abort if specified by user in nv.settings */
 	if (si->settings.force_pci)
@@ -101,9 +122,9 @@ status_t nv_agp_setup(void)
 		/* user specified not to use AGP */
 		LOG(4,("AGP: forcing PCI mode (specified in nv.settings).\n"));
 		/* close host bridge driver */
-		close(agp_fd);
+//		close(agp_fd);
 		/* program card for PCI access */
-		PCI_CFGW((adress + 8), 0x00000000);
+//		PCI_CFGW((adress + 8), 0x00000000);
 
 		return B_ERROR;
 	}
@@ -116,9 +137,9 @@ status_t nv_agp_setup(void)
 	{
 		LOG(4,("AGP: no AGP modes possible, aborting AGP setup!\n"));
 		/* close host bridge driver */
-		close(agp_fd);
+//		close(agp_fd);
 		/* program card for PCI access */
-		PCI_CFGW((adress + 8), 0x00000000);
+//		PCI_CFGW((adress + 8), 0x00000000);
 
 		return B_ERROR;
 	}
@@ -129,9 +150,9 @@ status_t nv_agp_setup(void)
 	{
 		LOG(4,("AGP: compatibility problem detected, aborting AGP setup!\n"));
 		/* close host bridge driver */
-		close(agp_fd);
+//		close(agp_fd);
 		/* program card for PCI access */
-		PCI_CFGW((adress + 8), 0x00000000);
+//		PCI_CFGW((adress + 8), 0x00000000);
 
 		return B_ERROR;
 	}
@@ -239,90 +260,69 @@ status_t nv_agp_setup(void)
 	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
 
 	/* close host bridge driver */
-	close(agp_fd);
+//	close(agp_fd);
 
 	return B_OK;
 }
 
-static void nv_agp_list_caps(agp_info ai)
+static void nv_agp_list_info(agp_info ai)
 {
 	/*
 		list capabilities
-	 */
-	/* the mainboard and graphicscard determine AGP version used on power-up/reset */
-//	if (!(ai.config.agp_stat & AGP_rate_rev))
+	*/
+	/* the AGP devices determine AGP speed scheme version used on power-up/reset */
+	if (!(ai.interface.agp_stat & AGP_rate_rev))
 	{
 		/* AGP 2.0 scheme applies */
-//		if (ai.config.agp_stat & AGP_2_1x)
-		{
+		if (ai.interface.agp_stat & AGP_2_1x)
 			LOG(4,("AGP: AGP 2.0 1x mode is available\n"));
-		}
-//		if (ai.config.agp_stat & AGP_2_2x)
-		{
+		if (ai.interface.agp_stat & AGP_2_2x)
 			LOG(4,("AGP: AGP 2.0 2x mode is available\n"));
-		}
-//		if (ai.config.agp_stat & AGP_2_4x)
-		{
+		if (ai.interface.agp_stat & AGP_2_4x)
 			LOG(4,("AGP: AGP 2.0 4x mode is available\n"));
-		}
 	}
-//	else
+	else
 	{
 		/* AGP 3.0 scheme applies */
-//		if (ai.config.agp_stat & AGP_3_4x)
-		{
+		if (ai.interface.agp_stat & AGP_3_4x)
 			LOG(4,("AGP: AGP 3.0 4x mode is available\n"));
-		}
-//		if (ai.config.agp_stat & AGP_3_8x)
-			{
+		if (ai.interface.agp_stat & AGP_3_8x)
 			LOG(4,("AGP: AGP 3.0 8x mode is available\n"));
-		}
 	}
-//	if (ai.config.agp_stat & AGP_FW) LOG(4,("AGP: fastwrite transfers are supported\n"));
-//	if (ai.config.agp_stat & AGP_SBA) LOG(4,("AGP: sideband adressing is supported\n"));
-//	LOG(4,("AGP: %d queued AGP requests can be handled.\n",
-//		(((ai.config.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1)));
+	if (ai.interface.agp_stat & AGP_FW) LOG(4,("AGP: fastwrite transfers are supported\n"));
+	if (ai.interface.agp_stat & AGP_SBA) LOG(4,("AGP: sideband adressing is supported\n"));
+	LOG(4,("AGP: %d queued AGP requests can be handled.\n",
+		(((ai.interface.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1)));
 
 	/*
 		list current settings
 	 */
 	LOG(4,("AGP: listing current active settings:\n"));
-	/* the mainboard and graphicscard determine AGP version used on power-up/reset */
-//	if (!(ai.config.agp_stat & AGP_rate_rev))
+	if (!(ai.interface.agp_stat & AGP_rate_rev))
 	{
 		/* AGP 2.0 scheme applies */
-//		if (ai.config.agp_cmd & AGP_2_1x)
-		{
+		if (ai.interface.agp_cmd & AGP_2_1x)
 			LOG(4,("AGP: AGP 2.0 1x mode is set\n"));
-		}
-//		if (ai.config.agp_cmd & AGP_2_2x)
-		{
+		if (ai.interface.agp_cmd & AGP_2_2x)
 			LOG(4,("AGP: AGP 2.0 2x mode is set\n"));
-		}
-//		if (ai.config.agp_cmd & AGP_2_4x)
-		{
+		if (ai.interface.agp_cmd & AGP_2_4x)
 			LOG(4,("AGP: AGP 2.0 4x mode is set\n"));
-		}
 	}
-//	else
+	else
 	{
 		/* AGP 3.0 scheme applies */
-//		if (ai.config.agp_cmd & AGP_3_4x)
-		{
+		if (ai.interface.agp_cmd & AGP_3_4x)
 			LOG(4,("AGP: AGP 3.0 4x mode is set\n"));
-		}
-//		if (ai.config.agp_cmd & AGP_3_8x)
-			{
+		if (ai.interface.agp_cmd & AGP_3_8x)
 			LOG(4,("AGP: AGP 3.0 8x mode is set\n"));
-		}
 	}
-//	if (ai.config.agp_cmd & AGP_FW) LOG(4,("AGP: fastwrite transfers are enabled\n"));
-//	if (ai.config.agp_cmd & AGP_SBA) LOG(4,("AGP: sideband adressing is enabled\n"));
-//	LOG(4,("AGP: max. AGP queued request depth is set to %d\n",
-//		(((ai.config.agp_cmd & AGP_RQ) >> AGP_RQ_shift) + 1)));
-//	if (ai.config.agp_cmd & AGP_enable)
+	if (ai.interface.agp_cmd & AGP_FW) LOG(4,("AGP: fastwrite transfers are enabled\n"));
+	if (ai.interface.agp_cmd & AGP_SBA) LOG(4,("AGP: sideband adressing is enabled\n"));
+	LOG(4,("AGP: max. AGP queued request depth is set to %d\n",
+		(((ai.interface.agp_cmd & AGP_RQ) >> AGP_RQ_shift) + 1)));
+	if (ai.interface.agp_cmd & AGP_enable)
 		LOG(4,("AGP: this AGP interface is currently enabled.\n"));
-//	else
+	else
 		LOG(4,("AGP: this AGP interface is currently disabled.\n"));
 }
 
@@ -333,18 +333,18 @@ static bool has_AGP_interface(agp_info *ai_card, uint8 *adress)
 	/* check if device implements a list of capabilities */
 	if (CFGR(DEVCTRL) & 0x00100000)
 	{
-		uint32 item;
+		uint32 item = 0;
 		uint8 item_adress;
 
 		/* get pointer to PCI capabilities list */
 		item_adress = CFGR(CFG_0) & 0x000000ff;
 		/* read first item from list */
-		item = PCI_CFGR(item_adress);
+//		item = PCI_CFGR(item_adress);
 		while ((item & AGP_next_ptr) && ((item & AGP_id_mask) != AGP_id))
 		{
 			/* read next item from list */
 			item_adress = ((item & AGP_next_ptr) >> AGP_next_ptr_shift);
-			item = PCI_CFGR(item_adress);
+//			item = PCI_CFGR(item_adress);
 		}
 		if ((item & AGP_id_mask) == AGP_id)
 		{
@@ -362,6 +362,3 @@ static bool has_AGP_interface(agp_info *ai_card, uint8 *adress)
 	}
 	return has_AGP;
 }
-
-#undef PCI_CFGR
-#undef PCI_CFGW
