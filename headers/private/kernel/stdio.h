@@ -1,8 +1,11 @@
 /* stdio.h
  */
 
-#ifndef _STDIO_H_
+#if !defined(_STDIO_H_) && !defined(_STDIO_H)
+	// this is a workaround until we have a new stdio.h file
+	// BeOS' stdio.h defines _STDIO_H_ while Linux' defines _STDIO_H
 #define _STDIO_H_
+#define _STDIO_H
 
 #include <ktypes.h>
 #include <stdarg.h>
