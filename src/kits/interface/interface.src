@@ -4,6 +4,7 @@ INTERFACE_KIT_SOURCE =
 	Box.cpp
 	Button.cpp
 	CheckBox.cpp
+	ColorUtils.cc
 	Control.cpp
 	Deskbar.cpp
 	Font.cpp
