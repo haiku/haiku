@@ -27,6 +27,7 @@
 
 #include <Message.h>
 
+#include "MessageDeliverer.h"
 #include "Watcher.h"
 
 // Watcher
@@ -88,7 +89,7 @@ Watcher::Target() const
 status_t
 Watcher::SendMessage(BMessage *message)
 {
-	return fTarget.SendMessage(message, (BHandler*)NULL, 0);
+	return MessageDeliverer::Default()->DeliverMessage(message, fTarget);
 }
 
 

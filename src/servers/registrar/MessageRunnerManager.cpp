@@ -29,6 +29,7 @@
 
 #include <Autolock.h>
 #include <Message.h>
+#include <MessagePrivate.h>
 #include <Messenger.h>
 #include <OS.h>
 #include <RegistrarDefs.h>
@@ -36,6 +37,7 @@
 #include "Debug.h"
 #include "Event.h"
 #include "EventQueue.h"
+#include "MessageDeliverer.h"
 #include "MessageRunnerManager.h"
 
 /*!	\class MessageRunnerManager
@@ -163,7 +165,23 @@ struct MessageRunnerManager::RunnerInfo {
 	{
 		if (count > 0)
 			count--;
-		status_t error = target.SendMessage(message, replyTarget, 0);
+
+		// set the reply target
+		BMessage::Private(message).SetReply(replyTarget);
+
+		// deliver the message: We use the MessageDeliverer to allow the
+		// message to be delivered, even if the target port is temporarily
+		// full. For periodic message runners, that have to deliver further
+		// messages, we restrict the delivery timeout to the message interval.
+		status_t error;
+		if (count > 0) {
+			error = MessageDeliverer::Default()->DeliverMessage(message, target,
+				interval);
+		} else {
+			error = MessageDeliverer::Default()->DeliverMessage(message,
+				target);
+		}
+
 		// B_WOULD_BLOCK is as good as B_OK. We return an error only, if
 		// there are serious problems with the target, i.e. if it doesn't
 		// exist anymore for instance. A full message port is harmless.

@@ -29,8 +29,10 @@
 
 #include <Application.h>
 #include <AppMisc.h>
+#include <AutoDeleter.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <Path.h>
 #include <storage_support.h>
@@ -39,11 +41,12 @@
 #include <stdio.h>
 
 #include "Debug.h"
+#include "EventMaskWatcher.h"
+#include "MessageDeliverer.h"
 #include "RegistrarDefs.h"
 #include "RosterAppInfo.h"
 #include "RosterSettingsCharStream.h"
 #include "TRoster.h"
-#include "EventMaskWatcher.h"
 
 using namespace BPrivate;
 
@@ -717,6 +720,16 @@ TRoster::HandleBroadcast(BMessage *request)
 		&& request->FindMessenger("reply_target", &replyTarget) != B_OK) {
 		error = B_BAD_VALUE;
 	}
+
+	// allocate an error for the message targets
+	BMessenger *targets = NULL;
+	if (error == B_OK) {
+		targets = new(nothrow) BMessenger[fRegisteredApps.CountInfos()];
+		if (!targets)
+			error = B_NO_MEMORY;
+	}
+	ArrayDeleter<BMessenger> targetsDeleter(targets);
+
 	// reply to the request -- do this first, don't let the inquirer wait
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
@@ -726,19 +739,30 @@ TRoster::HandleBroadcast(BMessage *request)
 		reply.AddInt32("error", error);
 		request->SendReply(&reply);
 	}
+
 	// broadcast the message
 	team_id registrarTeam = BPrivate::current_team();
 	if (error == B_OK) {
+		// get the list of targets
+		int32 targetCount = 0;
 		for (AppInfoList::Iterator it = fRegisteredApps.It();
 			 it.IsValid();
 			 ++it) {
 			// don't send the message to the requesting team or the registrar
 			if ((*it)->team != team && (*it)->team != registrarTeam) {
-				BMessenger messenger;
-				BMessenger::Private messengerPrivate(messenger);
+				BMessenger::Private messengerPrivate(targets[targetCount]);
 				messengerPrivate.SetTo((*it)->team, (*it)->port, 0, true);
-				messenger.SendMessage(&message, replyTarget, 0);
+				targetCount++;
 			}
+		}
+
+		if (targetCount > 0) {
+			// set the reply target
+			BMessage::Private(message).SetReply(replyTarget);
+
+			// send the messages
+			MessageDeliverer::Default()->DeliverMessage(&message, targets,
+				targetCount);
 		}
 	}
 
@@ -1208,7 +1232,9 @@ TRoster::_AppActivated(RosterAppInfo *info)
 			messengerPrivate.SetTo(info->team, info->port, 0, true);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", true);
-			messenger.SendMessage(&message);
+			// not sure, if it makes sense to use the MessageDeliverer here
+			MessageDeliverer::Default()->DeliverMessage(&message, messenger);
+
 			// notify the watchers
 			BMessage watcherMessage(B_SOME_APP_ACTIVATED);
 			_AddMessageWatchingInfo(&watcherMessage, info);
@@ -1234,7 +1260,8 @@ TRoster::_AppDeactivated(RosterAppInfo *info)
 			messengerPrivate.SetTo(info->team, info->port, 0, true);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", false);
-			messenger.SendMessage(&message);
+			// not sure, if it makes sense to use the MessageDeliverer here
+			MessageDeliverer::Default()->DeliverMessage(&message, messenger);
 		}
 	}
 }
