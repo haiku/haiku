@@ -81,7 +81,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.07 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-1 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -817,6 +817,31 @@ status_t nv_general_bios_to_powergraphics()
 		//fixme: add other function blocks...
 		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
+	}
+
+	//fixme: FX5600 cards have a second postdivider for the pixel PLL VCO.
+	//find it and program it, instead of relying on the cards BIOS...
+	//BIOS tested: FX5600 BIOS V4.31.20.38.00
+	/* non-NV31 cards have no second postdivider */
+	si->pixpll_vco_div2 = 1;
+	if (si->ps.card_type == NV31)
+	{
+		/* only reading b0-7, as the rest seems to be write-only */
+		uint16 v_display = CRTCR(VDISPE) + 1;
+		if ((!(CRTCR(REPAINT1) & 0x01)) &&
+			((v_display == (600 & 0xff)) || (v_display == (1200 & 0xff))))
+		{
+			/* if a VESA mode was already set, and the mode was 800x600 or 1600x1200
+			 * the BIOS programs the second VCO postdivider to 5 */
+			si->pixpll_vco_div2 = 5;
+			LOG(2, ("INIT: assuming NV31 pixPLL second VCO postdivider is set to 5!\n"));
+		}
+		else
+		{
+			/* else the BIOS programs the second VCO postdivider to 4 */
+			si->pixpll_vco_div2 = 4;
+			LOG(2, ("INIT: assuming NV31 pixPLL second VCO postdiviver is set to 4!\n"));
+		}
 	}
 
 	/* enable 'enhanced mode', enable Vsync & Hsync,

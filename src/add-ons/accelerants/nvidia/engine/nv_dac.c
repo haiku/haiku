@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 7/2003
+   Rudolf Cornelissen 12/2003
 */
 
 #define MODULE_BIT 0x00010000
@@ -234,6 +234,9 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		/* check if this is within range of the VCO specs */
 		if ((f_vco >= si->ps.min_pixel_vco) && (f_vco <= si->ps.max_pixel_vco))
 		{
+			/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
+			f_vco /= si->pixpll_vco_div2;
+
 			/* iterate trough all valid reference-frequency postscaler settings */
 			for (m = 7; m <= 14; m++)
 			{
@@ -246,7 +249,9 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 				if ((n < 1) || (n > 255))	continue;
 
 				/* find error in frequency this setting gives */
-				error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
+				/* si->pixpll_vco_div2 below is NV31 (FX5600) tweak (missing register) */
+				error =
+					fabs((req_pclk / si->pixpll_vco_div2) - (((si->ps.f_ref / m) * n) / p));
 
 				/* note the setting if best yet */
 				if (error < error_best)
@@ -267,6 +272,9 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 
 	/* log the VCO frequency found */
 	f_vco = ((si->ps.f_ref / m) * n);
+	/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
+	f_vco *= si->pixpll_vco_div2;
+
 	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
 
 	/* return the results */

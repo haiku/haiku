@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-4/2003.
+	Rudolf Cornelissen 10/2002-12/2003.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -200,7 +200,9 @@ typedef struct {
 		CH7006,
 		CH7007,
 		SAA7102,
+		SAA7104,
 		SAA7108,
+		SAA7114,
 		BT868,
 		BT869,
 		CX25870,
@@ -249,13 +251,16 @@ typedef struct {
 		uint32 memory_size;			/* memory (Mb) */
 	} ps;
 
-  /*mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb)*/
+	/* mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb) */
 	uint8 rom_mirror[32768];
 
-  /*CRTC delay -> used in timing for MAVEN, depending on which CRTC is driving it*/
+	/* CRTC delay -> used in timing for MAVEN, depending on which CRTC is driving it */
 	uint8 crtc_delay;
 
-  /* apsed: some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
+	/* NV31 (FX5600) tweak to get pixelPLL going (unknown register) */
+	uint16 pixpll_vco_div2;
+
+	/* apsed: some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
 	settings settings;
 
 	struct
