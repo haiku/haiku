@@ -74,7 +74,7 @@ notify_probe_by_file(device_node_info *node, const char *consumer_name)
 		return res;
 
 	// resolve link to actual driver file
-	resolved_path = malloc(PATH_MAX + 1);
+	resolved_path = (char *)malloc(PATH_MAX + 1);
 	if (resolved_path == NULL) {
 		res = B_NO_MEMORY;
 		goto err;
@@ -144,7 +144,7 @@ compose_driver_names(device_node_info *node, const char *dir,
 	int id;
 	status_t res;
 
-	term_array = malloc(num_parts * sizeof(size_t));
+	term_array = (size_t *)malloc(num_parts * sizeof(size_t));
 	if (term_array == NULL)
 		return B_NO_MEMORY;
 
@@ -420,7 +420,7 @@ notify_dynamic_consumer(device_node_info *node, const char *pattern,
 		pattern, *has_normal_driver));
 
 	// we need three buffers - allocate them at once for simplicity
-	buffers = malloc(3 * (PATH_MAX + 1));
+	buffers = (char *)malloc(3 * (PATH_MAX + 1));
 	if (buffers == NULL)
 		return B_NO_MEMORY;
 
@@ -479,7 +479,7 @@ pnp_notify_dynamic_consumers(device_node_info *node)
 
 	TRACE(("pnp_notify_dynamic_consumers()\n"));
 
-	buffer = malloc(PATH_MAX + 1);
+	buffer = (char *)malloc(PATH_MAX + 1);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
@@ -541,7 +541,7 @@ pnp_notify_fixed_consumers(device_node_info *node)
 
 	TRACE(("pnp_notify_fixed_consumers()\n"));
 
-	buffer = malloc(PATH_MAX + 1);
+	buffer = (char *)malloc(PATH_MAX + 1);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
