@@ -48,6 +48,8 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 
+#define FAST_MOUSE_MOVED '_FMM'		// received from app_server when screen res changed, but could be sent to too. 
+
 
 extern "C" void RegisterDevices(input_device_ref** devices)
 {
@@ -93,7 +95,8 @@ int main()
  *   Descr: 
  */
 InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
-	sSafeMode(false)
+	sSafeMode(false),
+	fScreen(B_MAIN_SCREEN_ID)
 {
 #if DEBUG == 2
 	if (sLogFile == NULL)
@@ -101,9 +104,8 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 #endif
 
 	CALLED();
-	void *pointer=NULL;
 	
-	EventLoop(pointer);
+	EventLoop();
 	
 	uint8 p1;
 	uint32 p2 = 1;
@@ -137,7 +139,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 
 		PRINT(("is_as port :%ld\n", fAsPort));
 		
-		//buffer[1] = 0;
+		buffer[1] = fEventLooperPort;
 		buffer[0] = fAsPort;
 	
 		status_t err;
@@ -209,9 +211,9 @@ InputServer::InitKeyboardMouseStates(void)
 	// This is where we determine the screen resolution from the app_server and find the center of the screen
 	// sMousePos is then set to the center of the screen.
 
-	fMousePos.x = 200;
-	fMousePos.y = 200;
-
+	fFrame = fScreen.Frame();
+	fMousePos = BPoint(fFrame.right/2, fFrame.bottom/2);
+	
 	if (LoadKeymap()!=B_OK)
 		LoadSystemKeymap();
 		
@@ -328,9 +330,9 @@ InputServer::QuitRequested(void)
 	fAddOnManager->SaveState();
 	gDeviceManager.SaveState();
 	
-	kill_thread(ISPortThread);
-	delete_port(EventLooperPort);
-	EventLooperPort = -1;
+	kill_thread(fISPortThread);
+	delete_port(fEventLooperPort);
+	fEventLooperPort = -1;
 	return true;
 }
 
@@ -690,15 +692,13 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
    		case B_MOUSE_MOVED:
    		case B_MOUSE_DOWN:
    		case B_MOUSE_UP:
+   		case FAST_MOUSE_MOVED:
    			// get point and button from msg
     		if((outbound->FindInt32("x", &xValue) == B_OK) 
     			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
 				fMousePos.x += xValue;
 				fMousePos.y -= yValue;
-				if (fMousePos.x<0)
-					fMousePos.x = 0;
-				if (fMousePos.y<0)
-					fMousePos.y = 0;
+				fMousePos.ConstrainTo(fFrame);
 				outbound->RemoveName("x"); 
 				outbound->RemoveName("y");
 				outbound->AddPoint("where", fMousePos);
@@ -810,7 +810,8 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
 status_t
 InputServer::HandleGetSetKeyMap(BMessage *message,
                                      BMessage *reply)
-{
+{	
+	CALLED();
 	status_t status;
 	if (message->what == IS_GET_KEY_MAP) {
 		status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
@@ -1024,7 +1025,7 @@ InputServer::EnqueueDeviceMessage(BMessage *message)
 	char buffer[length];
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
-	return write_port(EventLooperPort, 0, buffer, length);
+	return write_port(fEventLooperPort, 0, buffer, length);
 }
 
 
@@ -1043,7 +1044,7 @@ InputServer::EnqueueMethodMessage(BMessage *message)
 	char buffer[length];
 	if ((err = message->Flatten(buffer,length)) < B_OK)
 		return err;
-	return write_port(EventLooperPort, 0, buffer, length);
+	return write_port(fEventLooperPort, 0, buffer, length);
 }
 
 
@@ -1108,15 +1109,15 @@ InputServer::MethodReplicant(void)
  *   Descr: 
  */
 status_t
-InputServer::EventLoop(void *)
+InputServer::EventLoop()
 {
 	CALLED();
-	EventLooperPort = create_port(100, "obos_is_event_port");
-	if(EventLooperPort < 0) {
-		_sPrintf("OBOS InputServer: create_port error: (0x%x) %s\n",EventLooperPort,strerror(EventLooperPort));
+	fEventLooperPort = create_port(100, "obos_is_event_port");
+	if(fEventLooperPort < 0) {
+		_sPrintf("OBOS InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort));
 	} 
-	ISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
-	resume_thread(ISPortThread);
+	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
+	resume_thread(fISPortThread);
 
 	return 0;
 }
@@ -1656,18 +1657,18 @@ InputServer::WatchPort()
 	
 	while (true) { 
 		// Block until we find the size of the next message
-		ssize_t    	length = port_buffer_size(EventLooperPort);
+		ssize_t    	length = port_buffer_size(fEventLooperPort);
 		PRINT(("[Event Looper] BMessage Size = %lu\n", length));
 		
 		int32     	code;
 		char buffer[length];
 		
-		status_t err = read_port(EventLooperPort, &code, buffer, length);
+		status_t err = read_port(fEventLooperPort, &code, buffer, length);
 		if(err != length) {
 			if(err >= 0) {
-				printf("InputServer: failed to read full packet (read %lu of %lu)\n", err, length);
+				PRINT(("InputServer: failed to read full packet (read %lu of %lu)\n", err, length));
 			} else {
-				printf("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err));
+				PRINT(("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err)));
 			}
 			continue;
 		}
@@ -1675,12 +1676,21 @@ InputServer::WatchPort()
 		BMessage *event = new BMessage;
 	
 		if ((err = event->Unflatten(buffer)) < 0) {
-			printf("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err));
+			PRINT(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 			delete event;
 		} else {
 			// This is where the message should be processed.	
-			//PRINT_OBJECT(*event);
 
+			// here we test for a message coming from app_server, screen resolution change could have happened
+			if (event->what == FAST_MOUSE_MOVED) {
+				BRect frame = fScreen.Frame();
+				if (frame != fFrame) {
+					fMousePos.x = fMousePos.x * frame.Width() / fFrame.Width();
+					fMousePos.y = fMousePos.y * frame.Height() / fFrame.Height();
+					fFrame = frame;
+				}
+			}
+			
 			HandleSetMousePosition(event, event);
 						
 			BList list;

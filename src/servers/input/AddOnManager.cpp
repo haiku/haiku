@@ -59,13 +59,15 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 	if (status < B_OK)
 		return status;
 
-	printf("AddOnManager::RegisterAddOn(): trying to load \"%s\"\n", path.Path());
+	PRINT(("AddOnManager::RegisterAddOn(): trying to load \"%s\"\n", path.Path()));
 
 	image_id addon_image = load_add_on(path.Path());
 	
-	if (addon_image < B_OK)
+	if (addon_image < B_OK) {
+		PRINT(("load addon %s failed\n", path.Path()));
 		return addon_image;
-		
+	}
+	
 	BEntry parent;
 	entry.GetParent(&parent);
 	BPath parentPath(&parent);
@@ -76,21 +78,21 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_device",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			printf("AddOnManager::RegisterAddOn(): can't find instantiate_input_device in \"%s\"\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_device in \"%s\"\n",
+				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerDevice *isd = (*instantiate_func)();
 		if (isd == NULL) {
-			printf("AddOnManager::RegisterAddOn(): instantiate_input_device in \"%s\" returned NULL\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_device in \"%s\" returned NULL\n",
+				path.Path()));
 			goto exit_error;
 		}
 		status_t status = isd->InitCheck();
 		if (status != B_OK) {
-			printf("AddOnManager::RegisterAddOn(): BInputServerDevice.InitCheck in \"%s\" returned %s\n",
-				path.Path(), strerror(status));
+			PRINT(("AddOnManager::RegisterAddOn(): BInputServerDevice.InitCheck in \"%s\" returned %s\n",
+				path.Path(), strerror(status)));
 			delete isd;
 			goto exit_error;
 		}
@@ -103,21 +105,21 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_filter",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			printf("AddOnManager::RegisterAddOn(): can't find instantiate_input_filter in \"%s\"\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_filter in \"%s\"\n",
+				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerFilter *isf = (*instantiate_func)();
 		if (isf == NULL) {
-			printf("AddOnManager::RegisterAddOn(): instantiate_input_filter in \"%s\" returned NULL\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_filter in \"%s\" returned NULL\n",
+				path.Path()));
 			goto exit_error;
 		}
 		status_t status = isf->InitCheck();
 		if (status != B_OK) {
-			printf("AddOnManager::RegisterAddOn(): BInputServerFilter.InitCheck in \"%s\" returned %s\n",
-				path.Path(), strerror(status));
+			PRINT(("AddOnManager::RegisterAddOn(): BInputServerFilter.InitCheck in \"%s\" returned %s\n",
+				path.Path(), strerror(status)));
 			delete isf;
 			goto exit_error;
 		}
@@ -129,15 +131,15 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_method",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			printf("AddOnManager::RegisterAddOn(): can't find instantiate_input_method in \"%s\"\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_method in \"%s\"\n",
+				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerMethod *ism = (*instantiate_func)();
 		if (ism == NULL) {
-			printf("AddOnManager::RegisterAddOn(): instantiate_input_method in \"%s\" returned NULL\n",
-				path.Path());
+			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_method in \"%s\" returned NULL\n",
+				path.Path()));
 			goto exit_error;
 		}
 		status_t status = ism->InitCheck();

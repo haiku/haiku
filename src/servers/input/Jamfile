@@ -35,6 +35,8 @@ UsePrivateHeaders app ;
 UsePrivateHeaders input ;
 UsePrivateHeaders storage ;
 
+SubDirC++Flags -DADD_ON_STABLE_SECONDS=1 ;	# for AddOnMonitorHandler.cpp
+
 Server input_server :
 	InputServer.cpp
 	InputServerDevice.cpp

@@ -49,6 +49,7 @@
 #include <InterfaceDefs.h>
 #include <Message.h>
 #include <OS.h>
+#include <Screen.h>
 #include <SupportDefs.h>
 
 #define INPUTSERVER_SIGNATURE "application/x-vnd.OBOS-input_server"
@@ -140,7 +141,7 @@ public:
 	//SetActiveMethod(_BMethodAddOn_*);
 	const BMessenger* MethodReplicant(void);
 
-	status_t EventLoop(void*);
+	status_t 		EventLoop();
 	static bool     EventLoopRunning(void);
 
 	bool DispatchEvents(BList*);
@@ -191,9 +192,9 @@ private:
 	char			*fChars;		// current keymap chars
 	uint32			fCharsSize;		// current keymap char count
 	
-	port_id			ISPort;
-	port_id      	EventLooperPort;
-	thread_id    	ISPortThread;
+	port_id      	fEventLooperPort;
+	thread_id    	fISPortThread;
+	
 	static int32 	ISPortWatcher(void *arg);
 	void WatchPort();
 	
@@ -202,6 +203,9 @@ private:
 	AddOnManager 	*fAddOnManager;
 	
 	BList			fEventsCache;
+	
+	BScreen			fScreen;
+	BRect			fFrame;
 
 #ifndef COMPILE_FOR_R5	
 	// added this to communicate via portlink
