@@ -12,7 +12,7 @@
 #include "AudioMixer.h"
 #include "Resampler.h"
 #include "debug.h"
-#include "TList.h"
+#include "RtList.h"
 
 #define DOUBLE_RATE_MIXING 	0
 
@@ -405,6 +405,10 @@ MixerCore::MixThread()
 	Unlock();
 	
 	printf("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
+
+	#define MAX_TYPES	18
+	RtList<chan_info> InputChanInfos[MAX_TYPES];
+	RtList<chan_info> MixChanInfos[fOutput->GetOutputChannelCount()]; // XXX this does not support changing output channel count
 	
 	event_time = time_base;
 	frame_pos = 0;
@@ -428,26 +432,24 @@ MixerCore::MixThread()
 		ASSERT((frame_base + frame_pos) % fMixBufferFrameCount == 0);
 
 		PRINT(4, "create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
-
-		// XXX this is a test, copy the the left and right channel from input 1 or 0
-		
-		#define MAX_TYPES	18
 		
 		int64 cur_framepos = frame_base + frame_pos;
 		
-		List<chan_info> InputChanInfos[MAX_TYPES];
-		List<chan_info> MixChanInfos[fOutput->GetOutputChannelCount()];
-
 		MixerInput *input;
 		for (int i = 0; (input = Input(i)) != 0; i++) {
 			int count = input->GetMixerChannelCount();
 			for (int chan = 0; chan < count; chan++) {
-				chan_info info;
 				int type;
-				input->GetMixerChannelInfo(chan, cur_framepos, (const float **)&info.base, &info.sample_offset, &type, &info.gain);
+				const float *base;
+				uint32 sample_offset;
+				float gain;
+				input->GetMixerChannelInfo(chan, cur_framepos, &base, &sample_offset, &type, &gain);
 				if (type < 0 || type >= MAX_TYPES)
 					continue;
-				InputChanInfos[type].Insert(info);
+				chan_info *info = InputChanInfos[type].Create();
+				info->base = (const char *)base;
+				info->sample_offset = sample_offset;
+				info->gain = gain;
 			}
 		}
 		
@@ -462,11 +464,11 @@ MixerCore::MixThread()
 					continue;
 				int count3 = InputChanInfos[type].CountItems();
 				for (int j = 0; j < count3; j++) {
-					chan_info *info;
-					InputChanInfos[type].Get(j, &info);
-					chan_info newinfo = *info;
-					newinfo.gain *= gain;
-					MixChanInfos[chan].Insert(newinfo);
+					chan_info *info = InputChanInfos[type].ItemAt(j);
+					chan_info *newinfo = MixChanInfos[chan].Create();
+					newinfo->base = info->base;
+					newinfo->sample_offset = info->sample_offset;
+					newinfo->gain = info->gain * gain;
 				}
 			}
 		}
@@ -479,15 +481,14 @@ MixerCore::MixThread()
 			ZeroFill(&fMixBuffer[chan], dst_sample_offset, fMixBufferFrameCount);
 			int count2 = MixChanInfos[chan].CountItems();
 			for (int i = 0; i < count2; i++) {
-				chan_info *info;
-				MixChanInfos[chan].Get(i, &info);
+				chan_info *info = MixChanInfos[chan].ItemAt(i);
 				char *dst = (char *)&fMixBuffer[chan];
+				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n", info->base, info->sample_offset, info->gain);
 				for (int j = 0; j < fMixBufferFrameCount; j++) {
 					*(float *)dst += *(const float *)info->base * info->gain;
 					dst += dst_sample_offset;
 					info->base += info->sample_offset;
 				}
-				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n", info->base, info->sample_offset, info->gain);
 			}
 		}
 
@@ -507,6 +508,8 @@ MixerCore::MixThread()
 										1.0);
 			}
 			PRINT(4, "send buffer, inframes %ld, outframes %ld\n",fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
+			
+			// swap byte order if necessary
 
 			// fill in the buffer header
 			media_header* hdr = buf->Header();
@@ -523,6 +526,12 @@ MixerCore::MixThread()
 		} else {
 			printf("MixerCore: #### RequestBuffer failed\n");
 		}
+
+		// make all lists empty
+		for (int i = 0; i < MAX_TYPES; i++)
+			InputChanInfos[i].MakeEmpty();
+		for (int i = 0; i < fOutput->GetOutputChannelCount(); i++)
+			MixChanInfos[i].MakeEmpty();
 		
 		// schedule next event
 		frame_pos += fMixBufferFrameCount;
