@@ -10,22 +10,17 @@
 
 #include <interface/View.h>
 #include <interface/ListView.h>
-#include <app/MessageRunner.h>
-
 
 class DataTranslationsView : public BListView {
-	public:
-		DataTranslationsView(BRect rect,
-			const char *name, list_view_type type = B_SINGLE_SELECTION_LIST );
-			
-		~DataTranslationsView();
-		void MessageReceived(BMessage *message);
-		virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
-		
-	private:
+public:
+	DataTranslationsView(BRect rect, const char *name,
+		list_view_type type = B_SINGLE_SELECTION_LIST);
+
+	~DataTranslationsView();
 	
-				
-		BMessageRunner *messagerunner;
+	void MessageReceived(BMessage *message);
+	
+	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
 };
 
 #endif
