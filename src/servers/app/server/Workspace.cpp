@@ -113,6 +113,9 @@ Workspace::~Workspace(void)
 */
 bool Workspace::AddLayerPtr(WinBorder *layer)
 {
+	if (layer == NULL)
+		debugger("NULL pointer in Workspace::AddLayerPtr\n");
+
 	// allocate a new item
 	ListData		*item;
 	item			= new ListData;
@@ -130,15 +133,13 @@ bool Workspace::AddLayerPtr(WinBorder *layer)
 
 	STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
 
-	// this may happen in case of subset windows.
-	if(!(layer->IsHidden()))
-	{
-		// do a *smart* search and set the new 'front'
-		SearchAndSetNewFront(layer);
+	BringToFrontANormalWindow(layer);
 
-		// do a *smart* search and set the new 'focus' + a redraw
-		SetFocusLayer(layer);
-	}
+	// do a *smart* search and set the new 'front'
+	SearchAndSetNewFront(layer);
+
+	// do a *smart* search and set the new 'focus'
+	SearchAndSetNewFocus(layer);
 	
 	return true;
 }
@@ -200,14 +201,9 @@ bool Workspace::RemoveLayerPtr(WinBorder *layer)
 		// reset some internal variables
 		layer->SetMainWinBorder(NULL);
 
-		// its RootLayer is set to NULL by Layer::RemoveChild(layer);
-
 		STRACE(("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID()));
 
-		if(wasFocus)
-			SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
-		else
-			Invalidate();
+		SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
 
 		return true;
 	}
@@ -267,51 +263,9 @@ bool Workspace::HideSubsetWindows(WinBorder *layer)
 	}
 }
 
-WinBorder *Workspace::SetFocusLayer(WinBorder *layer)
-{
-	STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
-
-	if(!(desktop->fGeneralLock.IsLocked()))
-		debugger("Workspace::SetFocusLayer - desktop->fGeneralLock must be LOCKED!\n");
-
-	WinBorder		*previousFocus = FocusLayer();
-
-	SearchAndSetNewFocus(layer);
-
-	if(previousFocus != FocusLayer())
-	{
-		if(previousFocus)
-			previousFocus->HighlightDecorator(false);
-
-		if(FocusLayer())
-			FocusLayer()->HighlightDecorator(true);
-	}
-	
-	STRACE(("\n#Workspace(%ld)::SetFOCUSLayer( %s ) ENDED\n", ID(), layer? layer->GetName(): "NULL"));
-	
-	return FocusLayer();
-}
-
 WinBorder *Workspace::FocusLayer() const
 {
 	return fFocusItem ? fFocusItem->layerPtr : NULL;
-}
-
-WinBorder *Workspace::SetFrontLayer(WinBorder *layer)
-{
-	STRACE(("\n@Workspace(%ld)::SetFrontLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
-
-	if(!(desktop->fGeneralLock.IsLocked()))
-		debugger("Workspace::SetFRONTLayer - desktop->fGeneralLock must be LOCKED!\n");
-
-	SearchAndSetNewFront(layer);
-	
-	STRACESTREAM();
-	
-	// TODO: remove?
-	Invalidate();
-
- 	return fFrontItem? fFrontItem->layerPtr: NULL;;
 }
 
 WinBorder *Workspace::FrontLayer() const

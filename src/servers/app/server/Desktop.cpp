@@ -259,6 +259,14 @@ void Desktop::AddWinBorder(WinBorder* winBorder)
 		// other windows are added to the current RootLayer only.
 		ActiveRootLayer()->AddWinBorder(winBorder);
 
+	// TODO: try to unify this code with that for B_MOUSE_DOWN
+	winBorder->Window()->Lock();
+	BRegion invalidRegion;
+	invalidRegion.Include(&(winBorder->fFull));
+	invalidRegion.Include(&(winBorder->fTopLayer->fFull));
+	winBorder->fParent->RebuildAndForceRedraw(invalidRegion, winBorder);
+	winBorder->Window()->Unlock();
+
 	// add that pointer to user winboder list so that we can keep track of them.		
 	fLayerLock.Lock();
 	fWinBorderList.AddItem(winBorder);
@@ -345,7 +353,8 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 					ws->BringToFrontANormalWindow(target);
 					ws->SearchAndSetNewFront(target);
 					previousFocus	= ws->FocusLayer();
-					activeFocus		= ws->SetFocusLayer(target);
+					ws->SearchAndSetNewFocus(target);
+					activeFocus		= ws->FocusLayer();
 
 					activeFocus->Window()->Lock();
 

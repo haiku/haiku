@@ -216,12 +216,6 @@ void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
 	if (!(fMainLock.IsLocked()))
 		debugger("RootLayer::AddWinBorderToWorkspaces - fMainLock has to be locked!\n");
 
-	if (wks == B_CURRENT_WORKSPACE)
-	{
-		ActiveWorkspace()->AddLayerPtr(winBorder);
-		return;
-	}
-	
 	for( int32 i=0; i < 32; i++)
 	{
 		if( wks & (0x00000001 << i) && i < WorkspaceCount())
@@ -243,7 +237,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName()));
 
 	// in case we want to be added to the current workspace
-	if (winBorder->Window()->Workspaces() == 0)
+	if (winBorder->Window()->Workspaces() == B_CURRENT_WORKSPACE)
 		winBorder->Window()->QuietlySetWorkspaces(0x00000001 << (ActiveWorkspaceIndex()-1));
 
 	// add winBorder to the known list of WinBorders so we can keep track of it.
@@ -253,86 +247,43 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	switch(winBorder->Window()->Feel())
 	{
 		case B_MODAL_SUBSET_WINDOW_FEEL:
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
 		{
-printf("XXXXXXXX1: 21\n");
 			// this kind of window isn't added anywhere. It will be added
 			//	to main window's subset when winBorder::AddToSubsetOf(main)
 			//	will be called.
 			break;
 		}
 		case B_MODAL_APP_WINDOW_FEEL:
+		case B_FLOATING_APP_WINDOW_FEEL:
 		{
-printf("XXXXXXXX1: 22\n");
 			// add to app's list of Floating/Modal windows (as opposed to the system's)
 			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
 
-			// determine in witch workspaces to add this winBorder.
+			// determine in which workspaces to add this winBorder object.
 			uint32		wks = 0;
-
-			// TODO: change later when you put this code into the server
 			for (int32 i=0; i<WorkspaceCount(); i++)
 			{
+				// if we find a window belonging to winBorder's team, add winBorder to that workspace.
 				Workspace	*ws = WorkspaceAt(i+1);
 				for (WinBorder *wb = ws->GoToBottomItem(); wb!=NULL; wb = ws->GoToUpperItem())
 				{
-					if ( !(wb->IsHidden()) &&
-						 winBorder->Window()->ClientTeamID() == wb->Window()->ClientTeamID())
+					if ( winBorder->Window()->ClientTeamID() == wb->Window()->ClientTeamID())
 					{
 						wks = wks | winBorder->Window()->Workspaces();
 						break;
 					}
 				}
 			}
-			// by using _bottomchild and _uppersibling.
 
 			AddWinBorderToWorkspaces(winBorder, wks);
 			break;
 		}
 				
 		case B_MODAL_ALL_WINDOW_FEEL:
-		{
-printf("XXXXXXXX1: 23\n");
-			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
-			fMainFMWList.AddItem(winBorder);
-			
-			// add this winBorder to all workspaces
-			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
-			break;
-		}
-
-		case B_FLOATING_SUBSET_WINDOW_FEEL:
-		{
-printf("XXXXXXXX1: 24\n");
-			// this kind of window isn't added anywhere. It *will* be added to WS's list
-			//	when its main window will become the front one.
-			//	Also, it will be added to MainWinBorder's list when
-			//	winBorder::AddToSubset(main) is called.
-			break;
-		}
-				
-		case B_FLOATING_APP_WINDOW_FEEL:
-		{
-printf("XXXXXXXX1: 25\n");
-			// add to app's list of Floating/Modal windows (as opposed to the system's)
-			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
-			
-			for (int32 i=0; i<WorkspaceCount(); i++){
-				Workspace	*ws = WorkspaceAt(i+1);
-				WinBorder	*wb = ws->FrontLayer();
-				if(wb && wb->Window()->ClientTeamID() == winBorder->Window()->ClientTeamID()
-					&& wb->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
-				{
-					ws->AddLayerPtr(winBorder);
-				}
-			}
-
-			break;
-		}
-				
 		case B_FLOATING_ALL_WINDOW_FEEL:
 		{
-printf("XXXXXXXX1: 26\n");
-			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
+			// add to system's list of Floating/Modal Windows
 			fMainFMWList.AddItem(winBorder);
 			
 			// add this winBorder to all workspaces
@@ -342,25 +293,24 @@ printf("XXXXXXXX1: 26\n");
 		
 		case B_NORMAL_WINDOW_FEEL:
 		{
-printf("XXXXXXXX1: 27\n");
 			// add this winBorder to the specified workspaces
 			AddWinBorderToWorkspaces(winBorder, winBorder->Window()->Workspaces());
 			break;
 		}
+
 		case B_SYSTEM_LAST:
 		case B_SYSTEM_FIRST:
 		{
-printf("XXXXXXXX1: 28\n");
 			// add this winBorder to all workspaces
 			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
 			break;
 		}
 		default:{
-printf("XXXXXXXX1: 29\n");
+			debugger("RootLayer::AddWinBorder() - what kind of window is this?");
 			break;
 		}
 	}	// end switch(winborder->Feel())
-printf("XXXXXXXX1: 4\n");	
+
 	fMainLock.Unlock();
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName()));
 	
@@ -456,7 +406,7 @@ bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
 	
 	if (!winBorder)
 	{
-		ActiveWorkspace()->SetFrontLayer(NULL);
+		ActiveWorkspace()->SearchAndSetNewFront(NULL);
 		return true;
 	}
 	
@@ -486,12 +436,12 @@ bool RootLayer::SetFrontWinBorder(WinBorder* winBorder)
 
 	if(newWorkspace != ActiveWorkspaceIndex())
 	{
-		WorkspaceAt(newWorkspace)->SetFrontLayer(winBorder);
+		WorkspaceAt(newWorkspace)->SearchAndSetNewFront(winBorder);
 		SetActiveWorkspaceByIndex(newWorkspace);
 	}
 	else
 	{
-		ActiveWorkspace()->SetFrontLayer(winBorder);
+		ActiveWorkspace()->SearchAndSetNewFront(winBorder);
 	}
 	
 	fMainLock.Unlock();

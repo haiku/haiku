@@ -288,7 +288,7 @@ void ServerWindow::Show(void)
 					ws->BringToFrontANormalWindow(fWinBorder);
 					ws->SearchAndSetNewFront(fWinBorder);
 					previousFocus	= ws->FocusLayer();
-					ws->SetFocusLayer(fWinBorder);
+					ws->SearchAndSetNewFocus(fWinBorder);
 // TODO: only do this in for the active workspace!
 					// first redraw previous window's decorator. It has lost focus state.
 					if (previousFocus)
@@ -351,12 +351,12 @@ void ServerWindow::Hide(void)
 			if (ws->FrontLayer() == fWinBorder)
 			{
 				ws->HideSubsetWindows(fWinBorder);
-				ws->SetFocusLayer(ws->FrontLayer());
+				ws->SearchAndSetNewFocus(ws->FrontLayer());
 			}
 			else
 			{
 				if (ws->FocusLayer() == fWinBorder)
-					ws->SetFocusLayer(fWinBorder);
+					ws->SearchAndSetNewFocus(fWinBorder);
 				else
 					ws->Invalidate();
 			}

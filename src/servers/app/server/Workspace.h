@@ -54,9 +54,7 @@ public:
 	bool AddLayerPtr(WinBorder *layer);
 	bool RemoveLayerPtr(WinBorder *layer);
 	bool HideSubsetWindows(WinBorder *layer);
-	WinBorder *SetFocusLayer(WinBorder *layer);
 	WinBorder *FocusLayer(void) const;
-	WinBorder *SetFrontLayer(WinBorder *layer);
 	WinBorder *FrontLayer(void) const;
 	
 	void MoveToBack(WinBorder *newLast);

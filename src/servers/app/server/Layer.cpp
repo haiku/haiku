@@ -446,7 +446,15 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	int redraw = false;
 	if (startFrom == NULL)
 		redraw = true;
-
+/*
+srand(real_time_clock_usecs());
+RGBColor c(rand()/256,34,56);
+BRegion	reg1 = reg;
+fDriver->ConstrainClippingRegion(&reg1);
+fDriver->FillRect(reg.Frame(), c);
+fDriver->ConstrainClippingRegion(NULL);
+snooze(1000000);
+*/
 	if (fVisible.CountRects() > 0)
 	{
 		// client side drawing. Send only one UPDATE message!
@@ -526,7 +534,6 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 void Layer::Draw(const BRect &r)
 {
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
-
 #ifdef DEBUG_LAYER
 printf("Layer::Draw: ");
 r.PrintToStream();
