@@ -12,7 +12,7 @@
 #include <DataIO.h>
 #include <stdio.h>	// for SEEK_* defines
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 Pattern::Pattern(const std::string &string, const std::string &mask)
 	: fCStatus(B_NO_INIT)
@@ -160,3 +160,6 @@ Pattern::SetErrorMessage(const char *msg) {
 	delete fErrorMessage;
 	fErrorMessage = (msg) ? (new(nothrow) Err(msg, -1)) : (NULL);
 }
+
+
+

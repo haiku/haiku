@@ -218,7 +218,7 @@ entry_ref::operator=(const entry_ref &ref)
 	- operator=(const BEntry&)
 */
 BEntry::BEntry()
-	  : fDirFd(StorageKit::NullFd),
+	  : fDirFd(BPrivate::Storage::NullFd),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -235,7 +235,7 @@ BEntry::BEntry()
 
 */
 BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
-	  : fDirFd(StorageKit::NullFd),
+	  : fDirFd(BPrivate::Storage::NullFd),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -253,7 +253,7 @@ BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
 */
 
 BEntry::BEntry(const entry_ref *ref, bool traverse)
-	  : fDirFd(StorageKit::NullFd),
+	  : fDirFd(BPrivate::Storage::NullFd),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -272,7 +272,7 @@ BEntry::BEntry(const entry_ref *ref, bool traverse)
 	
 */
 BEntry::BEntry(const char *path, bool traverse)
-	  : fDirFd(StorageKit::NullFd),
+	  : fDirFd(BPrivate::Storage::NullFd),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -284,7 +284,7 @@ BEntry::BEntry(const char *path, bool traverse)
 	\see operator=(const BEntry&)
 */
 BEntry::BEntry(const BEntry &entry)
-	  : fDirFd(StorageKit::NullFd),
+	  : fDirFd(BPrivate::Storage::NullFd),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -323,8 +323,8 @@ BEntry::Exists() const
 		return false;
 
 	// Attempt to find the entry in our current directory
-	StorageKit::LongDirEntry entry;
-	return StorageKit::find_dir(fDirFd, fName, &entry, sizeof(entry)) == B_OK;
+	BPrivate::Storage::LongDirEntry entry;
+	return BPrivate::Storage::find_dir(fDirFd, fName, &entry, sizeof(entry)) == B_OK;
 }
 
 /*! \brief Fills in a stat structure for the entry. The information is copied into
@@ -349,7 +349,7 @@ BEntry::GetStat(struct stat *result) const
 	if (status != B_OK)
 		return status;
 		
-	return StorageKit::get_stat(ref, result);
+	return BPrivate::Storage::get_stat(ref, result);
 }
 
 /*! \brief Reinitializes the BEntry to the path or directory path combination,
@@ -371,7 +371,7 @@ BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 		return (fCStatus = B_BAD_VALUE);
 
 	fCStatus = B_OK;
-	if (StorageKit::is_absolute_path(path))	{
+	if (BPrivate::Storage::is_absolute_path(path))	{
 		SetTo(path, traverse);
 	} else {
 		if (dir->InitCheck() != B_OK)
@@ -379,7 +379,7 @@ BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 		// get the dir's path
 		char rootPath[B_PATH_NAME_LENGTH + 1];
 		if (fCStatus == B_OK) {
-			fCStatus = StorageKit::dir_to_path(dir->get_fd(), rootPath,
+			fCStatus = BPrivate::Storage::dir_to_path(dir->get_fd(), rootPath,
 											   B_PATH_NAME_LENGTH + 1);
 		}
 		// Concatenate our two path strings together
@@ -418,7 +418,7 @@ BEntry::SetTo(const entry_ref *ref, bool traverse)
 
 	char path[B_PATH_NAME_LENGTH + 1];
 
-	fCStatus = StorageKit::entry_ref_to_path(ref, path,
+	fCStatus = BPrivate::Storage::entry_ref_to_path(ref, path,
 											 B_PATH_NAME_LENGTH + 1);
 	return (fCStatus == B_OK) ? SetTo(path, traverse) : fCStatus ;
 }
@@ -438,20 +438,20 @@ BEntry::SetTo(const char *path, bool traverse)
 	// check the argument
 	fCStatus = (path ? B_OK : B_BAD_VALUE);
 	if (fCStatus == B_OK)
-		fCStatus = StorageKit::check_path_name(path);
+		fCStatus = BPrivate::Storage::check_path_name(path);
 	if (fCStatus == B_OK) {
 		// Get the path and leaf portions of the given path
 		char *pathStr, *leafStr;
 		pathStr = leafStr = NULL;
-		fCStatus = StorageKit::split_path(path, pathStr, leafStr);
+		fCStatus = BPrivate::Storage::split_path(path, pathStr, leafStr);
 		if (fCStatus == B_OK) {
 			// Open the directory
-			StorageKit::FileDescriptor dirFd;
-			fCStatus = StorageKit::open_dir(pathStr, dirFd);
+			BPrivate::Storage::FileDescriptor dirFd;
+			fCStatus = BPrivate::Storage::open_dir(pathStr, dirFd);
 			if (fCStatus == B_OK) {
 				fCStatus = set(dirFd, leafStr, traverse);
 				if (fCStatus != B_OK)
-					StorageKit::close_dir(dirFd);		
+					BPrivate::Storage::close_dir(dirFd);		
 			}
 		}
 		delete [] pathStr;
@@ -465,8 +465,8 @@ void
 BEntry::Unset()
 {
 	// Close the directory
-	if (fDirFd != StorageKit::NullFd) {
-		StorageKit::close_dir(fDirFd);
+	if (fDirFd != BPrivate::Storage::NullFd) {
+		BPrivate::Storage::close_dir(fDirFd);
 	}
 	
 	// Free our leaf name
@@ -474,7 +474,7 @@ BEntry::Unset()
 		delete [] fName;
 	}
 
-	fDirFd = StorageKit::NullFd;
+	fDirFd = BPrivate::Storage::NullFd;
 	fName = NULL;
 	fCStatus = B_NO_INIT;
 }
@@ -497,7 +497,7 @@ BEntry::GetRef(entry_ref *ref) const
 		return B_BAD_VALUE;
 	
 	struct stat st;
-	status_t error = StorageKit::get_stat(fDirFd, &st);
+	status_t error = BPrivate::Storage::get_stat(fDirFd, &st);
 	if (error == B_OK) {
 		ref->device = st.st_dev;
 		ref->directory = st.st_ino;
@@ -588,7 +588,7 @@ status_t BEntry::GetParent(BEntry *entry) const
 	if (status == B_OK) {
 	
 		// Verify we aren't an entry representing "/"
-		status = StorageKit::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND
+		status = BPrivate::Storage::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND
 														: B_OK ;
 		if (status == B_OK) {
 
@@ -635,7 +635,7 @@ BEntry::GetParent(BDirectory *dir) const
 	if (status == B_OK) {
 	
 		// Verify we aren't an entry representing "/"
-		status = StorageKit::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND : B_OK ;
+		status = BPrivate::Storage::entry_ref_is_root_dir(ref) ? B_ENTRY_NOT_FOUND : B_OK ;
 		if (status == B_OK) {
 
 			// Now point the entry_ref to the parent directory (instead of ourselves)
@@ -709,9 +709,9 @@ BEntry::Rename(const char *path, bool clobber)
 	status_t status = B_OK;
 	// Convert the given path to an absolute path, if it isn't already.
 	char fullPath[B_PATH_NAME_LENGTH + 1];
-	if (!StorageKit::is_absolute_path(path)) {
+	if (!BPrivate::Storage::is_absolute_path(path)) {
 		// Convert our directory to an absolute pathname
-		status = StorageKit::dir_to_path(fDirFd, fullPath,
+		status = BPrivate::Storage::dir_to_path(fDirFd, fullPath,
 										 B_PATH_NAME_LENGTH + 1);
 		if (status == B_OK) {
 			// Concatenate our pathname to it
@@ -724,8 +724,8 @@ BEntry::Rename(const char *path, bool clobber)
 	if (status == B_OK && !clobber) {
 		// We're not supposed to kill an already-existing file,
 		// so we'll try to figure out if it exists by stat()ing it.
-		StorageKit::Stat s;
-		status = StorageKit::get_stat(path, &s);
+		BPrivate::Storage::Stat s;
+		status = BPrivate::Storage::get_stat(path, &s);
 		if (status == B_OK)
 			status = B_FILE_EXISTS;
 		else if (status == B_ENTRY_NOT_FOUND)
@@ -736,7 +736,7 @@ BEntry::Rename(const char *path, bool clobber)
 		BPath oldPath;
 		status = GetPath(&oldPath);
 		if (status == B_OK) {
-			status = StorageKit::rename(oldPath.Path(), path);
+			status = BPrivate::Storage::rename(oldPath.Path(), path);
 			if (status == B_OK)
 				status = SetTo(path, false);
 		}
@@ -779,10 +779,10 @@ BEntry::MoveTo(BDirectory *dir, const char *path = NULL, bool clobber)
 
 	status_t status = B_OK;
 	// Determine the absolute path of the target entry.
-	if (!StorageKit::is_absolute_path(path)) {
+	if (!BPrivate::Storage::is_absolute_path(path)) {
 		// Convert our directory to an absolute pathname
 		char fullPath[B_PATH_NAME_LENGTH + 1];
-		status = StorageKit::dir_to_path(dir->get_fd(), fullPath,
+		status = BPrivate::Storage::dir_to_path(dir->get_fd(), fullPath,
 										 B_PATH_NAME_LENGTH + 1);
 		// Concatenate our pathname to it
 		if (status == B_OK) {
@@ -822,7 +822,7 @@ BEntry::Remove()
 	if (status != B_OK)
 		return status;
 		
-	return StorageKit::remove(path.Path());
+	return BPrivate::Storage::remove(path.Path());
 }
 
 
@@ -885,7 +885,7 @@ BEntry::operator=(const BEntry &item)
 
 	Unset();
 	if (item.fCStatus == B_OK) {
-		fCStatus = StorageKit::dup_dir(item.fDirFd, fDirFd);
+		fCStatus = BPrivate::Storage::dup_dir(item.fDirFd, fDirFd);
 		if (fCStatus == B_OK) {
 			fCStatus = set_name(item.fName);
 		}
@@ -922,7 +922,7 @@ BEntry::set_stat(struct stat &st, uint32 what)
 	if (status != B_OK)
 		return status;
 	
-	return StorageKit::set_stat(path.Path(), st, what);
+	return BPrivate::Storage::set_stat(path.Path(), st, what);
 }
 
 /*! Sets the Entry to point to the entry named by \c leaf in the given directory. If \c traverse
@@ -932,7 +932,7 @@ BEntry::set_stat(struct stat &st, uint32 what)
 	\c leaf <b>must</b> be a leaf-name only (i.e. it must contain no '/' characters),
 	otherwise this function will return \c B_BAD_VALUE. If \c B_OK is returned, 
 	the caller is no longer responsible for closing the directory file descriptor
-	with a call to StorageKit::close_dir.
+	with a call to BPrivate::Storage::close_dir.
 	
 	\param dirFd File descriptor of the directory in which the entry resides
 	\param leaf Pointer to a string containing the entry's leaf name
@@ -944,16 +944,16 @@ BEntry::set_stat(struct stat &st, uint32 what)
 	
 */
 status_t
-BEntry::set(StorageKit::FileDescriptor dirFd, const char *leaf, bool traverse)
+BEntry::set(BPrivate::Storage::FileDescriptor dirFd, const char *leaf, bool traverse)
 {
 	// Verify that path is valid
-	status_t error = StorageKit::check_entry_name(leaf);
+	status_t error = BPrivate::Storage::check_entry_name(leaf);
 	if (error != B_OK)
 		return error;
 	// Check whether the entry is abstract or concrete.
 	// We try traversing concrete entries only.
-	StorageKit::LongDirEntry dirEntry;
-	bool isConcrete = (StorageKit::find_dir(dirFd, leaf, &dirEntry,
+	BPrivate::Storage::LongDirEntry dirEntry;
+	bool isConcrete = (BPrivate::Storage::find_dir(dirFd, leaf, &dirEntry,
 											sizeof(dirEntry)) == B_OK);
 	if (traverse && isConcrete) {
 		// Though the link traversing strategy is iterative, we introduce
@@ -964,10 +964,10 @@ BEntry::set(StorageKit::FileDescriptor dirFd, const char *leaf, bool traverse)
 
 		// convert the dir FD into a BPath
 		entry_ref ref;
-		error = StorageKit::dir_to_self_entry_ref(dirFd, &ref);
+		error = BPrivate::Storage::dir_to_self_entry_ref(dirFd, &ref);
 		char dirPathname[B_PATH_NAME_LENGTH + 1];
 		if (error == B_OK) {
-			error = StorageKit::entry_ref_to_path(&ref, dirPathname,
+			error = BPrivate::Storage::entry_ref_to_path(&ref, dirPathname,
 												  sizeof(dirPathname));
 		}
 		BPath dirPath(dirPathname);
@@ -1006,13 +1006,13 @@ BEntry::set(StorageKit::FileDescriptor dirFd, const char *leaf, bool traverse)
 				if (isLink)
 					error = B_LINK_LIMIT;
 				else {
-					StorageKit::FileDescriptor newDirFd = StorageKit::NullFd;
-					error = StorageKit::open_dir(dirPath.Path(), newDirFd);
+					BPrivate::Storage::FileDescriptor newDirFd = BPrivate::Storage::NullFd;
+					error = BPrivate::Storage::open_dir(dirPath.Path(), newDirFd);
 					if (error == B_OK) {
 						// If we are successful, we are responsible for the
 						// supplied FD. Thus we close it.
-						StorageKit::close_dir(dirFd);
-						dirFd = StorageKit::NullFd;
+						BPrivate::Storage::close_dir(dirFd);
+						dirFd = BPrivate::Storage::NullFd;
 						fDirFd = newDirFd;
 						// handle "/", which has a "" Leaf()
 						if (linkPath == "/")
@@ -1076,9 +1076,9 @@ BEntry::Dump(const char *name)
 	
 	printf("fCStatus == %ld\n", fCStatus);
 	
-	StorageKit::LongDirEntry entry;
+	BPrivate::Storage::LongDirEntry entry;
 	if (fDirFd != -1
-		&& StorageKit::find_dir(fDirFd, ".", &entry, sizeof(entry)) == B_OK) {
+		&& BPrivate::Storage::find_dir(fDirFd, ".", &entry, sizeof(entry)) == B_OK) {
 		printf("dir.device == %ld\n", entry.d_pdev);
 		printf("dir.inode  == %lld\n", entry.d_pino);
 	} else {
@@ -1133,4 +1133,7 @@ operator<(const entry_ref & a, const entry_ref & b)
 				|| (a.name != NULL && b.name != NULL
 					&& strcmp(a.name, b.name) < 0))))));
 }
+
+
+
 

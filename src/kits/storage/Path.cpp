@@ -126,7 +126,7 @@ BPath::SetTo(const entry_ref *ref)
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		char path[B_PATH_NAME_LENGTH + 1];
-		error = StorageKit::entry_ref_to_path(ref, path, sizeof(path));
+		error = BPrivate::Storage::entry_ref_to_path(ref, path, sizeof(path));
 		if (error == B_OK)
 			error = set_path(path);	// the path is already normalized
 	}
@@ -173,12 +173,12 @@ status_t
 BPath::SetTo(const char *path, const char *leaf, bool normalize)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && leaf && StorageKit::is_absolute_path(leaf))
+	if (error == B_OK && leaf && BPrivate::Storage::is_absolute_path(leaf))
 		error = B_BAD_VALUE;
 	char newPath[B_PATH_NAME_LENGTH + 1];
 	if (error == B_OK) {
 		// we always normalize relative paths
-		normalize |= !StorageKit::is_absolute_path(path);
+		normalize |= !BPrivate::Storage::is_absolute_path(path);
 		// build a new path from path and leaf
 		// copy path first
 		uint32 pathLen = strlen(path);
@@ -213,7 +213,7 @@ BPath::SetTo(const char *path, const char *leaf, bool normalize)
 		if (error == B_OK) {
 			if (normalize) {
 				char normalizedPath[B_PATH_NAME_LENGTH + 1];
-				error = StorageKit::get_canonical_path(newPath, normalizedPath,
+				error = BPrivate::Storage::get_canonical_path(newPath, normalizedPath,
 													   sizeof(normalizedPath));
 				if (error == B_OK)
 					error = set_path(normalizedPath);
@@ -714,3 +714,6 @@ BPath::MustNormalize(const char *path)
 	\var status_t BPath::fCStatus
 	\brief The object's initialization status.
 */
+
+
+

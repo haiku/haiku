@@ -10,7 +10,8 @@
 
 #include <ctype.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // QueryNode
 
@@ -482,4 +483,8 @@ QueryStack::_GetSubTree(QueryNode *&rootNode)
 }
 
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
+
+
+

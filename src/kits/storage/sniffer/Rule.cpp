@@ -12,7 +12,7 @@
 #include <sniffer/Rule.h>
 #include <DataIO.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 Rule::Rule()
 	: fPriority(0.0)
@@ -69,6 +69,9 @@ Rule::SetTo(double priority, std::vector<DisjList*>* list) {
 		throw new Err("Sniffer pattern error: invalid priority", -1);
 	fConjList = list;
 }
+
+
+
 
 
 

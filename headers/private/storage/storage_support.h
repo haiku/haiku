@@ -12,7 +12,8 @@
 #define _STORAGE_SUPPORT_H
 
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 //! Returns whether the supplied path is absolute.
 bool is_absolute_path(const char *path);
@@ -37,6 +38,9 @@ status_t check_entry_name(const char *entry);
 //! Checks whether a path name is a valid path name.
 status_t check_path_name(const char *path);
 
-} // namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _STORAGE_SUPPORT_H
+
+

@@ -20,6 +20,8 @@
 class BString;
 
 //! MIME Sniffer related classes
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 class Rule;
@@ -323,8 +325,12 @@ private:
 	Err *fOutOfMemErr;
 };
 
-}	// namespace Sniffer
-
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_PARSER_H
+
+
+
 

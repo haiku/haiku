@@ -15,6 +15,8 @@
 
 class BPositionIO;
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 class Err;
@@ -46,6 +48,10 @@ private:
 	Err *fErrorMessage;
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_PATTERN_H
+
+

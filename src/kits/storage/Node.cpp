@@ -83,8 +83,8 @@ node_ref::operator=(const node_ref &ref)
 /*!	\brief Creates an uninitialized BNode object
 */
 BNode::BNode()
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 }
@@ -94,8 +94,8 @@ BNode::BNode()
 	\param ref the entry_ref referring to the entry
 */
 BNode::BNode(const entry_ref *ref)
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(ref);
@@ -106,8 +106,8 @@ BNode::BNode(const entry_ref *ref)
 	\param entry the BEntry representing the entry
 */
 BNode::BNode(const BEntry *entry)
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(entry);
@@ -118,8 +118,8 @@ BNode::BNode(const BEntry *entry)
 	\param path the path referring to the entry
 */
 BNode::BNode(const char *path)
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(path);
@@ -132,8 +132,8 @@ BNode::BNode(const char *path)
 	\param path the entry's path name relative to \a dir
 */
 BNode::BNode(const BDirectory *dir, const char *path)
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(dir, path);
@@ -143,8 +143,8 @@ BNode::BNode(const BDirectory *dir, const char *path)
 	\param node the BNode to be copied
 */
 BNode::BNode(const BNode &node)
-	 : fFd(StorageKit::NullFd),
-	   fAttrFd(StorageKit::NullFd),
+	 : fFd(BPrivate::Storage::NullFd),
+	   fAttrFd(BPrivate::Storage::NullFd),
 	   fCStatus(B_NO_INIT)
 {
 	*this = node;
@@ -179,7 +179,7 @@ BNode::InitCheck() const
 status_t
 BNode::GetStat(struct stat *st) const
 {
-	return (fCStatus != B_OK) ? fCStatus : StorageKit::get_stat(fFd, st) ;
+	return (fCStatus != B_OK) ? fCStatus : BPrivate::Storage::get_stat(fFd, st) ;
 }
 
 /*! \brief Reinitializes the object to the specified entry_ref.
@@ -189,7 +189,7 @@ BNode::GetStat(struct stat *st) const
 	- \c B_BAD_VALUE: \c NULL \a ref.
 	- \c B_ENTRY_NOT_FOUND: The entry could not be found.
 	- \c B_BUSY: The entry is locked.
-	\todo Currently implemented using StorageKit::entry_ref_to_path().
+	\todo Currently implemented using BPrivate::Storage::entry_ref_to_path().
 		  Reimplement!
 */
 status_t
@@ -199,7 +199,7 @@ BNode::SetTo(const entry_ref *ref)
 	char path[B_PATH_NAME_LENGTH + 1];
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = StorageKit::entry_ref_to_path(ref, path,
+		error = BPrivate::Storage::entry_ref_to_path(ref, path,
 											  B_PATH_NAME_LENGTH + 1);
 	}
 	if (error == B_OK)
@@ -248,7 +248,7 @@ BNode::SetTo(const char *path)
 {
 	Unset();	
 	if (path != NULL) 
-		fCStatus = StorageKit::open(path, O_RDWR | O_NOTRAVERSE, fFd);
+		fCStatus = BPrivate::Storage::open(path, O_RDWR | O_NOTRAVERSE, fFd);
 	return fCStatus;
 }
 
@@ -269,7 +269,7 @@ BNode::SetTo(const BDirectory *dir, const char *path)
 {
 	Unset();
 	status_t error = (dir && path ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && StorageKit::is_absolute_path(path))
+	if (error == B_OK && BPrivate::Storage::is_absolute_path(path))
 		error = B_BAD_VALUE;
 	BEntry entry;
 	if (error == B_OK)
@@ -308,8 +308,8 @@ BNode::Lock()
 
 	// We'll need to keep lock around if the kernel function
 	// doesn't just work on file descriptors
-//	StorageKit::FileLock lock;
-//	return StorageKit::lock(fFd, StorageKit::READ_WRITE, &lock);
+//	BPrivate::Storage::FileLock lock;
+//	return BPrivate::Storage::lock(fFd, BPrivate::Storage::READ_WRITE, &lock);
 }
 
 /*!	\brief Unlocks the node.
@@ -336,7 +336,7 @@ BNode::Unlock()
 status_t
 BNode::Sync()
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR : StorageKit::sync(fFd) ;
+	return (fCStatus != B_OK) ? B_FILE_ERROR : BPrivate::Storage::sync(fFd) ;
 }
 
 /*!	\brief Writes data from a buffer to an attribute.
@@ -366,7 +366,7 @@ BNode::WriteAttr(const char *attr, type_code type, off_t offset,
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
 	else {
-		ssize_t result = StorageKit::write_attr(fFd, attr, type, offset,
+		ssize_t result = BPrivate::Storage::write_attr(fFd, attr, type, offset,
 												buffer, len);
 		return result;
 	}
@@ -394,7 +394,7 @@ BNode::ReadAttr(const char *attr, type_code type, off_t offset,
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
 	else {
-		ssize_t result = StorageKit::read_attr(fFd, attr, type, offset, buffer,
+		ssize_t result = BPrivate::Storage::read_attr(fFd, attr, type, offset, buffer,
 											   len);
 		return result;
 	}
@@ -413,7 +413,7 @@ status_t
 BNode::RemoveAttr(const char *name)
 {
 	return (fCStatus != B_OK) ? B_FILE_ERROR
-							  : StorageKit::remove_attr(fFd, name);
+							  : BPrivate::Storage::remove_attr(fFd, name);
 }
 
 /*!	\brief Moves the attribute given by \a oldname to \a newname.
@@ -433,7 +433,7 @@ BNode::RenameAttr(const char *oldname, const char *newname)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	return StorageKit::rename_attr(fFd, oldname, newname);
+	return BPrivate::Storage::rename_attr(fFd, oldname, newname);
 }
 
 
@@ -451,7 +451,7 @@ status_t
 BNode::GetAttrInfo(const char *name, struct attr_info *info) const
 {
 	return (fCStatus != B_OK) ? B_FILE_ERROR
-							  : StorageKit::stat_attr(fFd, name, info);
+							  : BPrivate::Storage::stat_attr(fFd, name, info);
 }
 
 /*!	\brief Returns the next attribute in the node's list of attributes.
@@ -482,8 +482,8 @@ BNode::GetNextAttrName(char *buffer)
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;
 		
-	StorageKit::LongDirEntry entry;
-	status_t error = StorageKit::read_attr_dir(fAttrFd, entry);
+	BPrivate::Storage::LongDirEntry entry;
+	status_t error = BPrivate::Storage::read_attr_dir(fAttrFd, entry);
 	if (error == B_OK) {
 		strncpy(buffer, entry.d_name, B_ATTR_NAME_LENGTH);
 		return B_OK;
@@ -502,7 +502,7 @@ BNode::RewindAttrs()
 {
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;	
-	StorageKit::rewind_attr_dir(fAttrFd);
+	BPrivate::Storage::rewind_attr_dir(fAttrFd);
 	return B_OK;
 }
 
@@ -587,8 +587,8 @@ BNode::operator=(const BNode &node)
 	Unset();	
 	// We have to manually dup the node, because R5::BNode::Dup()
 	// is not declared to be const (which IMO is retarded).
-	fFd = StorageKit::dup(node.fFd);
-	fCStatus = (fFd == StorageKit::NullFd) ? B_NO_INIT : B_OK ;
+	fFd = BPrivate::Storage::dup(node.fFd);
+	fCStatus = (fFd == BPrivate::Storage::NullFd) ? B_NO_INIT : B_OK ;
 	return *this;
 }
 
@@ -605,7 +605,7 @@ BNode::operator==(const BNode &node) const
 		return true;		
 	if (fCStatus == B_OK && node.InitCheck() == B_OK) {
 		// Check if they're identical
-		StorageKit::Stat s1, s2;
+		BPrivate::Storage::Stat s1, s2;
 		if (GetStat(&s1) != B_OK)
 			return false;
 		if (node.GetStat(&s2) != B_OK)
@@ -635,7 +635,7 @@ BNode::operator!=(const BNode &node) const
 int
 BNode::Dup()
 {
-	return StorageKit::dup(fFd);
+	return BPrivate::Storage::dup(fFd);
 }
 
 
@@ -659,7 +659,7 @@ void BNode::_ReservedNode6() { }
 		  thereafter.
 */
 status_t
-BNode::set_fd(StorageKit::FileDescriptor fd)
+BNode::set_fd(BPrivate::Storage::FileDescriptor fd)
 {
 	if (fFd != -1)
 		close_fd();
@@ -670,20 +670,20 @@ BNode::set_fd(StorageKit::FileDescriptor fd)
 /*!	\brief Closes the node's file descriptor(s).
 	To be implemented by subclasses to close the file descriptor using the
 	proper system call for the given file-type. This implementation calls
-	StorageKit::close(fFd) and also StorageKit::close_attr_dir(fAttrDir)
+	BPrivate::Storage::close(fFd) and also BPrivate::Storage::close_attr_dir(fAttrDir)
 	if necessary.
 */
 void
 BNode::close_fd()
 {
-	if (fAttrFd != StorageKit::NullFd)
+	if (fAttrFd != BPrivate::Storage::NullFd)
 	{
-		StorageKit::close_attr_dir(fAttrFd);
-		fAttrFd = StorageKit::NullFd;
+		BPrivate::Storage::close_attr_dir(fAttrFd);
+		fAttrFd = BPrivate::Storage::NullFd;
 	}	
-	if (fFd != StorageKit::NullFd) {
+	if (fFd != BPrivate::Storage::NullFd) {
 		close(fFd);
-		fFd = StorageKit::NullFd;
+		fFd = BPrivate::Storage::NullFd;
 	}	
 }
 
@@ -711,7 +711,7 @@ BNode::set_stat(struct stat &st, uint32 what)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	return StorageKit::set_stat(fFd, st, what);
+	return BPrivate::Storage::set_stat(fFd, st, what);
 }
 
 /*! \brief Verifies that the BNode has been properly initialized, and then
@@ -722,8 +722,8 @@ BNode::set_stat(struct stat &st, uint32 what)
 status_t
 BNode::InitAttrDir()
 {
-	if (fCStatus == B_OK && fAttrFd == StorageKit::NullFd) 
-		return StorageKit::open_attr_dir(fFd, fAttrFd);
+	if (fCStatus == B_OK && fAttrFd == BPrivate::Storage::NullFd) 
+		return BPrivate::Storage::open_attr_dir(fFd, fAttrFd);
 	return fCStatus;	
 }
 
@@ -733,7 +733,7 @@ BNode::InitAttrDir()
 
 /*!	\var BNode::fAttrFd
 	This appears to be passed to the attribute directory functions
-	like a StorageKit::Dir would be, but it's actually a file descriptor.
+	like a BPrivate::Storage::Dir would be, but it's actually a file descriptor.
 	Best I can figure, the R5 syscall for reading attributes must've
 	just taken a file descriptor. Depending on what our kernel ends up
 	providing, this may or may not be replaced with an Dir*
@@ -742,3 +742,6 @@ BNode::InitAttrDir()
 /*!	\var BNode::fCStatus
 	The object's initialization status.
 */
+
+
+

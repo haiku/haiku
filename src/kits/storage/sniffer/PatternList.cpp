@@ -13,7 +13,7 @@
 #include <DataIO.h>
 #include <stdio.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 PatternList::PatternList(Range range)
 	: DisjList()
@@ -61,3 +61,6 @@ PatternList::Add(Pattern *pattern) {
 	if (pattern)
 		fList.push_back(pattern);
 }
+
+
+

@@ -13,7 +13,7 @@
 #include <sniffer/RPattern.h>
 #include <DataIO.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 RPattern::RPattern(Range range, Pattern *pattern)
 	: fRange(range)
@@ -59,3 +59,6 @@ RPattern::Sniff(BPositionIO *data, bool caseInsensitive) const {
 	else 
 		return fPattern->Sniff(fRange, data, caseInsensitive);
 }
+
+
+

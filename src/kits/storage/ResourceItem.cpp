@@ -14,7 +14,8 @@
 
 #include <DataIO.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // constructor
 ResourceItem::ResourceItem()
@@ -187,5 +188,9 @@ ResourceItem::IsModified() const
 }
 
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
+
+
+
 

@@ -12,7 +12,7 @@
 #include <sniffer/Parser.h>
 #include <stdio.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 Range::Range(int32 start, int32 end)
 	: fStart(-1)
@@ -60,3 +60,6 @@ Range::SetTo(int32 start, int32 end) {
 		fCStatus = B_OK;
 	}
 }
+
+
+

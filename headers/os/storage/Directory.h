@@ -87,11 +87,11 @@ private:
 
 private:
 	virtual void close_fd();
-	StorageKit::FileDescriptor get_fd() const;
+	BPrivate::Storage::FileDescriptor get_fd() const;
 
 private:
 	uint32 _reservedData[7];
-	StorageKit::FileDescriptor fDirFd;
+	BPrivate::Storage::FileDescriptor fDirFd;
 
 	friend class BEntry;
 };
@@ -107,3 +107,5 @@ status_t create_directory(const char *path, mode_t mode);
 #endif
 
 #endif	// _DIRECTORY_H
+
+

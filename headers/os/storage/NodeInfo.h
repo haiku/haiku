@@ -87,3 +87,5 @@ private:
 #endif // USE_OPENBEOS_NAMESPACE
 
 #endif // _NODE_INFO_H
+
+

@@ -1114,8 +1114,8 @@ BMimeType::SetSnifferRule(const char *rule)
 status_t
 BMimeType::CheckSnifferRule(const char *rule, BString *parseError)
 {
-	Sniffer::Rule snifferRule;	
-	return Sniffer::parse(rule, &snifferRule, parseError);
+	BPrivate::Storage::Sniffer::Rule snifferRule;	
+	return BPrivate::Storage::Sniffer::parse(rule, &snifferRule, parseError);
 }
 
 // GuessMimeType
@@ -1249,3 +1249,6 @@ toLower(const char *str, char *result) {
 	result[i] = 0;
 	return B_OK;
 }
+
+
+

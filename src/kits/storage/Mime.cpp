@@ -76,3 +76,6 @@ get_device_icon(const char *dev, void *icon, int32 size)
 	return NOT_IMPLEMENTED;
 }
 
+
+
+

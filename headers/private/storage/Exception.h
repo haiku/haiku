@@ -8,7 +8,8 @@
 
 #include <String.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 class Exception {
 public:
@@ -106,6 +107,9 @@ private:
 	BString		fDescription;
 };
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _EXCEPTION_H
+
+

@@ -14,7 +14,8 @@
 #include <SupportDefs.h>
 #include "storage_support.h"
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 /*!	\param path the path
 	\return \c true, if \a path is not \c NULL and absolute, \c false otherwise
@@ -315,4 +316,8 @@ check_path_name(const char *path)
 }
 
 
-} // namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
+
+
+

@@ -19,7 +19,8 @@
 #include "kernel_interface.h"
 #include "QueryPredicate.h"
 
-using namespace StorageKit;
+using namespace BPrivate::Storage;
+
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -598,8 +599,8 @@ BQuery::GetNextRef(entry_ref *ref)
 	if (error == B_OK && !_HasFetched())
 		error = B_FILE_ERROR;
 	if (error == B_OK) {
-		StorageKit::LongDirEntry entry;
-		if (StorageKit::read_query(fQueryFd, &entry, sizeof(entry), 1) != 1)
+		BPrivate::Storage::LongDirEntry entry;
+		if (BPrivate::Storage::read_query(fQueryFd, &entry, sizeof(entry), 1) != 1)
 			error = B_ENTRY_NOT_FOUND;
 		if (error == B_OK)
 			*ref = entry_ref(entry.d_pdev, entry.d_pino, entry.d_name);
@@ -770,3 +771,6 @@ void BQuery::_ReservedQuery3() {}
 void BQuery::_ReservedQuery4() {}
 void BQuery::_ReservedQuery5() {}
 void BQuery::_ReservedQuery6() {}
+
+
+

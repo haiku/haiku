@@ -13,7 +13,8 @@
 
 #include "ResourceItem.h"
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // constructor
 ResourcesContainer::ResourcesContainer()
@@ -207,5 +208,9 @@ ResourcesContainer::IsModified() const
 }
 
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
+
+
+
 

@@ -12,6 +12,8 @@
 #include <SupportDefs.h>
 #include <string>
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 //! Exception class used by the MIME Sniffer
@@ -47,6 +49,10 @@ private:
 	ssize_t fPos;
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_ERR_H
+
+

@@ -21,7 +21,8 @@
 #include "ResourcesDefs.h"
 //#include "Warnings.h"
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // ELF defs
 static const uint32	kMaxELFHeaderSize			= sizeof(Elf32_Ehdr) + 32;
@@ -1232,5 +1233,9 @@ ResourceFile::_MakeEmptyResourceFile()
 }
 
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
+
+
+
 

@@ -40,7 +40,7 @@ struct LongDIR : DIR { char _buffer[B_FILE_NAME_LENGTH]; };
 /*! Returns information about the file system on the specified device. */
 
 status_t
-StorageKit::stat_dev(dev_t dev, fs_info* info)
+BPrivate::Storage::stat_dev(dev_t dev, fs_info* info)
 {
 	return fs_stat_dev(dev, info);
 }
@@ -51,7 +51,7 @@ StorageKit::stat_dev(dev_t dev, fs_info* info)
 //------------------------------------------------------------------------------
 
 status_t
-StorageKit::open( const char *path, OpenFlags flags, FileDescriptor &result )
+BPrivate::Storage::open( const char *path, OpenFlags flags, FileDescriptor &result )
 {
 	if (path == NULL) {
 		result = -1;
@@ -70,7 +70,7 @@ StorageKit::open( const char *path, OpenFlags flags, FileDescriptor &result )
 /*! Same as the other version of open() except the file is created with the
 	permissions given by creationFlags if it doesn't exist. */
 status_t
-StorageKit::open( const char *path, OpenFlags flags,
+BPrivate::Storage::open( const char *path, OpenFlags flags,
 				  CreationFlags creationFlags, FileDescriptor &result )
 {
 	if (path == NULL) {
@@ -84,7 +84,7 @@ StorageKit::open( const char *path, OpenFlags flags,
 }
 
 status_t
-StorageKit::close(StorageKit::FileDescriptor file)
+BPrivate::Storage::close(BPrivate::Storage::FileDescriptor file)
 {
 	return (::close(file) == -1) ? errno : B_OK ;
 }
@@ -95,7 +95,7 @@ StorageKit::close(StorageKit::FileDescriptor file)
 	\return the number of bytes actually read or an error code
 */
 ssize_t
-StorageKit::read(StorageKit::FileDescriptor fd, void *buf, size_t len)
+BPrivate::Storage::read(BPrivate::Storage::FileDescriptor fd, void *buf, size_t len)
 {
 	ssize_t result = (buf == NULL ? B_BAD_VALUE : B_OK);
 	if (result == B_OK) {
@@ -113,7 +113,7 @@ StorageKit::read(StorageKit::FileDescriptor fd, void *buf, size_t len)
 	\return the number of bytes actually read or an error code
 */
 ssize_t
-StorageKit::read(StorageKit::FileDescriptor fd, void *buf, off_t pos,
+BPrivate::Storage::read(BPrivate::Storage::FileDescriptor fd, void *buf, off_t pos,
 				 size_t len)
 {
 	ssize_t result = (buf == NULL || pos < 0 ? B_BAD_VALUE : B_OK);
@@ -131,7 +131,7 @@ StorageKit::read(StorageKit::FileDescriptor fd, void *buf, off_t pos,
 	\return the number of bytes actually written or an error code
 */
 ssize_t
-StorageKit::write(StorageKit::FileDescriptor fd, const void *buf, size_t len)
+BPrivate::Storage::write(BPrivate::Storage::FileDescriptor fd, const void *buf, size_t len)
 {
 	ssize_t result = (buf == NULL ? B_BAD_VALUE : B_OK);
 	if (result == B_OK) {
@@ -149,7 +149,7 @@ StorageKit::write(StorageKit::FileDescriptor fd, const void *buf, size_t len)
 	\return the number of bytes actually written or an error code
 */
 ssize_t
-StorageKit::write(StorageKit::FileDescriptor fd, const void *buf, off_t pos,
+BPrivate::Storage::write(BPrivate::Storage::FileDescriptor fd, const void *buf, off_t pos,
 				  size_t len)
 {
 	ssize_t result = (buf == NULL || pos < 0 ? B_BAD_VALUE : B_OK);
@@ -169,8 +169,8 @@ StorageKit::write(StorageKit::FileDescriptor fd, const void *buf, off_t pos,
 			beginning of the file, or an error code
 */
 off_t
-StorageKit::seek(StorageKit::FileDescriptor fd, off_t pos,
-				 StorageKit::SeekMode mode)
+BPrivate::Storage::seek(BPrivate::Storage::FileDescriptor fd, off_t pos,
+				 BPrivate::Storage::SeekMode mode)
 {
 	off_t result = ::lseek(fd, pos, mode);
 	if (result == -1)
@@ -183,7 +183,7 @@ StorageKit::seek(StorageKit::FileDescriptor fd, off_t pos,
 			beginning of the file, or an error code
 */
 off_t
-StorageKit::get_position(StorageKit::FileDescriptor fd)
+BPrivate::Storage::get_position(BPrivate::Storage::FileDescriptor fd)
 {
 	off_t result = ::lseek(fd, 0, SEEK_CUR);
 	if (result == -1)
@@ -191,8 +191,8 @@ StorageKit::get_position(StorageKit::FileDescriptor fd)
 	return result;
 }
 
-StorageKit::FileDescriptor
-StorageKit::dup(StorageKit::FileDescriptor file)
+BPrivate::Storage::FileDescriptor
+BPrivate::Storage::dup(BPrivate::Storage::FileDescriptor file)
 {
 	return ::dup(file);
 }
@@ -204,7 +204,7 @@ StorageKit::dup(StorageKit::FileDescriptor file)
 	\return B_OK, if everything went fine, or an error code.
 */
 status_t
-StorageKit::dup( FileDescriptor file, FileDescriptor& result )
+BPrivate::Storage::dup( FileDescriptor file, FileDescriptor& result )
 {
 	status_t error = B_OK;
 	if (file == -1)
@@ -218,13 +218,13 @@ StorageKit::dup( FileDescriptor file, FileDescriptor& result )
 }
 
 status_t
-StorageKit::sync( FileDescriptor file )
+BPrivate::Storage::sync( FileDescriptor file )
 {
 	return (fsync(file) == -1) ? errno : B_OK ;
 }
 
 //! /todo Get rid of DumpLock() at some point (it's only for debugging)
-void DumpLock(StorageKit::FileLock &lock)
+void DumpLock(BPrivate::Storage::FileLock &lock)
 {
 	cout << endl;
 	cout << "type   == ";
@@ -258,7 +258,7 @@ void DumpLock(StorageKit::FileLock &lock)
 // are unimplemented in BeOS R5. Thus locking we'll have to wait for the new
 // kernel. I believe this function would work if fcntl() worked correctly.
 status_t
-StorageKit::lock(FileDescriptor file, OpenFlags mode, FileLock *lock)
+BPrivate::Storage::lock(FileDescriptor file, OpenFlags mode, FileLock *lock)
 {
 	return B_FILE_ERROR;
 /*
@@ -307,7 +307,7 @@ StorageKit::lock(FileDescriptor file, OpenFlags mode, FileLock *lock)
 // are unimplemented in BeOS R5. Thus locking will have to wait for the new
 // kernel. I believe this function would work if fcntl() worked correctly.
 status_t
-StorageKit::unlock(FileDescriptor file, FileLock *lock)
+BPrivate::Storage::unlock(FileDescriptor file, FileLock *lock)
 {
 	return B_FILE_ERROR;
 
@@ -322,7 +322,7 @@ StorageKit::unlock(FileDescriptor file, FileLock *lock)
 }
 
 status_t
-StorageKit::get_stat(const char *path, Stat *s)
+BPrivate::Storage::get_stat(const char *path, Stat *s)
 {
 	if (path == NULL || s == NULL)
 		return B_BAD_VALUE;
@@ -331,7 +331,7 @@ StorageKit::get_stat(const char *path, Stat *s)
 }
 
 status_t
-StorageKit::get_stat(FileDescriptor file, Stat *s)
+BPrivate::Storage::get_stat(FileDescriptor file, Stat *s)
 {
 	if (s == NULL)
 		return B_BAD_VALUE;
@@ -340,17 +340,17 @@ StorageKit::get_stat(FileDescriptor file, Stat *s)
 }
 
 status_t
-StorageKit::get_stat(entry_ref &ref, Stat *result)
+BPrivate::Storage::get_stat(entry_ref &ref, Stat *result)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	status_t status;
 	
-	status = StorageKit::entry_ref_to_path(&ref, path, B_PATH_NAME_LENGTH + 1);
-	return (status != B_OK) ? status : StorageKit::get_stat(path, result);
+	status = BPrivate::Storage::entry_ref_to_path(&ref, path, B_PATH_NAME_LENGTH + 1);
+	return (status != B_OK) ? status : BPrivate::Storage::get_stat(path, result);
 }		
 
 status_t
-StorageKit::set_stat(FileDescriptor file, Stat &s, StatMember what)
+BPrivate::Storage::set_stat(FileDescriptor file, Stat &s, StatMember what)
 {
 	int result;
 	
@@ -401,7 +401,7 @@ StorageKit::set_stat(FileDescriptor file, Stat &s, StatMember what)
 }
 
 status_t
-StorageKit::set_stat(const char *file, Stat &s, StatMember what)
+BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 {
 	int result;
 	
@@ -479,7 +479,7 @@ StorageKit::set_stat(const char *file, Stat &s, StatMember what)
 //------------------------------------------------------------------------------
 
 ssize_t
-StorageKit::read_attr ( StorageKit::FileDescriptor file, const char *attribute,
+BPrivate::Storage::read_attr ( BPrivate::Storage::FileDescriptor file, const char *attribute,
 						uint32 type, off_t pos, void *buf, size_t count )
 {
 	if (attribute == NULL || buf == NULL)
@@ -490,7 +490,7 @@ StorageKit::read_attr ( StorageKit::FileDescriptor file, const char *attribute,
 }
 
 ssize_t
-StorageKit::write_attr ( StorageKit::FileDescriptor file,
+BPrivate::Storage::write_attr ( BPrivate::Storage::FileDescriptor file,
 						 const char *attribute, uint32 type, off_t pos,
 						 const void *buf,  size_t count )
 {
@@ -502,7 +502,7 @@ StorageKit::write_attr ( StorageKit::FileDescriptor file,
 }
 
 status_t
-StorageKit::rename_attr(FileDescriptor file, const char *oldName,
+BPrivate::Storage::rename_attr(FileDescriptor file, const char *oldName,
 						const char *newName)
 {
 	status_t error = (oldName && newName ? B_OK : B_BAD_VALUE);
@@ -553,7 +553,7 @@ StorageKit::rename_attr(FileDescriptor file, const char *oldName,
 }
 
 status_t
-StorageKit::remove_attr ( StorageKit::FileDescriptor file, const char *attr )
+BPrivate::Storage::remove_attr ( BPrivate::Storage::FileDescriptor file, const char *attr )
 {
 	if (attr == NULL)
 		return B_BAD_VALUE;	
@@ -566,7 +566,7 @@ StorageKit::remove_attr ( StorageKit::FileDescriptor file, const char *attr )
 }
 
 status_t
-StorageKit::stat_attr( FileDescriptor file, const char *name, AttrInfo *ai )
+BPrivate::Storage::stat_attr( FileDescriptor file, const char *name, AttrInfo *ai )
 {
 	if (name == NULL || ai == NULL)
 		return B_BAD_VALUE;
@@ -580,7 +580,7 @@ StorageKit::stat_attr( FileDescriptor file, const char *name, AttrInfo *ai )
 //------------------------------------------------------------------------------
 
 status_t
-StorageKit::open_attr_dir( FileDescriptor file, FileDescriptor &result )
+BPrivate::Storage::open_attr_dir( FileDescriptor file, FileDescriptor &result )
 {
 	result = NullFd;
 	if (DIR *dir = ::fs_fopen_attr_dir(file)) {
@@ -591,7 +591,7 @@ StorageKit::open_attr_dir( FileDescriptor file, FileDescriptor &result )
 }
 
 status_t
-StorageKit::rewind_attr_dir( FileDescriptor dir )
+BPrivate::Storage::rewind_attr_dir( FileDescriptor dir )
 {
 	if (dir < 0)
 		return B_BAD_VALUE;
@@ -606,7 +606,7 @@ StorageKit::rewind_attr_dir( FileDescriptor dir )
 
 // buffer must be large enough!!!
 status_t
-StorageKit::read_attr_dir( FileDescriptor dir, StorageKit::DirEntry& buffer )
+BPrivate::Storage::read_attr_dir( FileDescriptor dir, BPrivate::Storage::DirEntry& buffer )
 {
 	// init a DIR structure
 	LongDIR dirDir;
@@ -629,9 +629,9 @@ StorageKit::read_attr_dir( FileDescriptor dir, StorageKit::DirEntry& buffer )
 }
 
 status_t
-StorageKit::close_attr_dir ( FileDescriptor dir )
+BPrivate::Storage::close_attr_dir ( FileDescriptor dir )
 {
-	if (dir == StorageKit::NullFd)
+	if (dir == BPrivate::Storage::NullFd)
 		return B_BAD_VALUE;
 		
 	// init a DIR structure
@@ -648,7 +648,7 @@ StorageKit::close_attr_dir ( FileDescriptor dir )
 //------------------------------------------------------------------------------
 
 status_t
-StorageKit::open_dir( const char *path, FileDescriptor &result )
+BPrivate::Storage::open_dir( const char *path, FileDescriptor &result )
 {
 	result = NullFd;
 	if (DIR *dir = ::opendir(path)) {
@@ -664,7 +664,7 @@ StorageKit::open_dir( const char *path, FileDescriptor &result )
 	\return B_OK, if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::create_dir( const char *path, mode_t mode )
+BPrivate::Storage::create_dir( const char *path, mode_t mode )
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -681,7 +681,7 @@ StorageKit::create_dir( const char *path, mode_t mode )
 	\return B_OK, if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::create_dir( const char *path, FileDescriptor &result,
+BPrivate::Storage::create_dir( const char *path, FileDescriptor &result,
 						mode_t mode )
 {
 	status_t error = create_dir(path, mode);
@@ -700,7 +700,7 @@ StorageKit::create_dir( const char *path, FileDescriptor &result,
 	- \c B_BAD_VALUE, if \a buffer is NULL, or the supplied buffer is too small
 */
 int32
-StorageKit::read_dir( FileDescriptor dir, DirEntry *buffer, size_t length,
+BPrivate::Storage::read_dir( FileDescriptor dir, DirEntry *buffer, size_t length,
 					  int32 count )
 {
 	// init a DIR structure
@@ -729,7 +729,7 @@ StorageKit::read_dir( FileDescriptor dir, DirEntry *buffer, size_t length,
 }
 
 status_t
-StorageKit::rewind_dir( FileDescriptor dir )
+BPrivate::Storage::rewind_dir( FileDescriptor dir )
 {
 	if (dir < 0)
 		return B_BAD_VALUE;
@@ -743,7 +743,7 @@ StorageKit::rewind_dir( FileDescriptor dir )
 }
 
 status_t
-StorageKit::find_dir( FileDescriptor dir, const char *name,
+BPrivate::Storage::find_dir( FileDescriptor dir, const char *name,
 					  DirEntry *result, size_t length )
 {
 	if (dir < 0 || name == NULL || result == NULL)
@@ -751,9 +751,9 @@ StorageKit::find_dir( FileDescriptor dir, const char *name,
 	
 	status_t status;
 	
-	status = StorageKit::rewind_dir(dir);
+	status = BPrivate::Storage::rewind_dir(dir);
 	if (status == B_OK) {
-		while (	StorageKit::read_dir(dir, result, length, 1) == 1)
+		while (	BPrivate::Storage::read_dir(dir, result, length, 1) == 1)
 		{
 			if (strcmp(result->d_name, name) == 0)
 				return B_OK;
@@ -765,12 +765,12 @@ StorageKit::find_dir( FileDescriptor dir, const char *name,
 }
 
 status_t
-StorageKit::find_dir( FileDescriptor dir, const char *name, entry_ref *result )
+BPrivate::Storage::find_dir( FileDescriptor dir, const char *name, entry_ref *result )
 {
 	status_t status = (result ? B_OK : B_BAD_VALUE);
 	LongDirEntry entry;
 	if (status == B_OK)
-		status = StorageKit::find_dir(dir, name, &entry, sizeof(entry));
+		status = BPrivate::Storage::find_dir(dir, name, &entry, sizeof(entry));
 	if (status == B_OK) {
 		result->device = entry.d_pdev;
 		result->directory = entry.d_pino;
@@ -780,13 +780,13 @@ StorageKit::find_dir( FileDescriptor dir, const char *name, entry_ref *result )
 }
 
 status_t
-StorageKit::dup_dir( FileDescriptor dir, FileDescriptor &result )
+BPrivate::Storage::dup_dir( FileDescriptor dir, FileDescriptor &result )
 {
-	return StorageKit::dup(dir, result);
+	return BPrivate::Storage::dup(dir, result);
 }
 
 status_t
-StorageKit::close_dir( FileDescriptor dir )
+BPrivate::Storage::close_dir( FileDescriptor dir )
 {
 	// init a DIR structure
 	if (LongDIR* dirDir = (LongDIR*)malloc(sizeof(LongDIR))) {
@@ -806,7 +806,7 @@ StorageKit::close_dir( FileDescriptor dir )
 	\return B_OK, if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::create_link( const char *path, const char *linkToPath )
+BPrivate::Storage::create_link( const char *path, const char *linkToPath )
 {
 	status_t error = (path && linkToPath ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -823,7 +823,7 @@ StorageKit::create_link( const char *path, const char *linkToPath )
 	\return B_OK, if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::create_link( const char *path, const char *linkToPath,
+BPrivate::Storage::create_link( const char *path, const char *linkToPath,
 						 FileDescriptor &result)
 {
 	status_t error = create_link(path, linkToPath);
@@ -833,7 +833,7 @@ StorageKit::create_link( const char *path, const char *linkToPath,
 }
 
 ssize_t
-StorageKit::read_link( const char *path, char *result, size_t size )
+BPrivate::Storage::read_link( const char *path, char *result, size_t size )
 {
 	if (result == NULL)
 		return B_BAD_VALUE;
@@ -853,7 +853,7 @@ StorageKit::read_link( const char *path, char *result, size_t size )
 }
 
 ssize_t
-StorageKit::read_link( FileDescriptor fd, char *result, size_t size )
+BPrivate::Storage::read_link( FileDescriptor fd, char *result, size_t size )
 {
 	ssize_t error = (result ? B_OK : B_BAD_VALUE);
 	// no way to implement it :-(
@@ -868,7 +868,7 @@ StorageKit::read_link( FileDescriptor fd, char *result, size_t size )
 //------------------------------------------------------------------------------
 
 status_t
-StorageKit::open_query( dev_t device, const char *query, uint32 flags,
+BPrivate::Storage::open_query( dev_t device, const char *query, uint32 flags,
 						FileDescriptor &result )
 {
 	if (flags & B_LIVE_QUERY)
@@ -882,7 +882,7 @@ StorageKit::open_query( dev_t device, const char *query, uint32 flags,
 }
 
 status_t
-StorageKit::open_live_query( dev_t device, const char *query, uint32 flags,
+BPrivate::Storage::open_live_query( dev_t device, const char *query, uint32 flags,
 							 port_id port, int32 token,
 							 FileDescriptor &result )
 {
@@ -906,7 +906,7 @@ StorageKit::open_live_query( dev_t device, const char *query, uint32 flags,
 	- \c B_BAD_VALUE, if \a buffer is NULL, or the supplied buffer is too small
 */
 int32
-StorageKit::read_query( FileDescriptor query, DirEntry *buffer, size_t length,
+BPrivate::Storage::read_query( FileDescriptor query, DirEntry *buffer, size_t length,
 						int32 count )
 {
 	// init a DIR structure
@@ -935,7 +935,7 @@ StorageKit::read_query( FileDescriptor query, DirEntry *buffer, size_t length,
 }
 
 status_t
-StorageKit::close_query( FileDescriptor query )
+BPrivate::Storage::close_query( FileDescriptor query )
 {
 	// init a DIR structure
 	if (LongDIR* queryDir = (LongDIR*)malloc(sizeof(LongDIR))) {
@@ -951,7 +951,7 @@ StorageKit::close_query( FileDescriptor query )
 //------------------------------------------------------------------------------
 
 status_t
-StorageKit::entry_ref_to_path( const struct entry_ref *ref, char *result,
+BPrivate::Storage::entry_ref_to_path( const struct entry_ref *ref, char *result,
 							   size_t size )
 {
 	if (ref == NULL) {
@@ -963,22 +963,22 @@ StorageKit::entry_ref_to_path( const struct entry_ref *ref, char *result,
 }
 
 status_t
-StorageKit::entry_ref_to_path( dev_t device, ino_t directory, const char *name,
+BPrivate::Storage::entry_ref_to_path( dev_t device, ino_t directory, const char *name,
 							   char *result, size_t size )
 {
 	return entry_ref_to_path_adapter(device, directory, name, result, size);
 }
 
 status_t
-StorageKit::dir_to_self_entry_ref( FileDescriptor dir, entry_ref *result )
+BPrivate::Storage::dir_to_self_entry_ref( FileDescriptor dir, entry_ref *result )
 {
-	if (dir == StorageKit::NullFd || result == NULL)
+	if (dir == BPrivate::Storage::NullFd || result == NULL)
 		return B_BAD_VALUE;
 	return find_dir(dir, ".", result);
 }
 
 status_t
-StorageKit::dir_to_path( FileDescriptor dir, char *result, size_t size )
+BPrivate::Storage::dir_to_path( FileDescriptor dir, char *result, size_t size )
 {
 	if (dir < 0 || result == NULL)
 		return B_BAD_VALUE;
@@ -1000,7 +1000,7 @@ StorageKit::dir_to_path( FileDescriptor dir, char *result, size_t size )
 	\return \c B_OK if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::get_canonical_path(const char *path, char *result, size_t size)
+BPrivate::Storage::get_canonical_path(const char *path, char *result, size_t size)
 {
 	status_t error = (path && result ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -1041,7 +1041,7 @@ StorageKit::get_canonical_path(const char *path, char *result, size_t size)
 	\return \c B_OK if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::get_canonical_path(const char *path, char *&result)
+BPrivate::Storage::get_canonical_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -1066,7 +1066,7 @@ StorageKit::get_canonical_path(const char *path, char *&result)
 	\return \c B_OK if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::get_canonical_dir_path(const char *path, char *result, size_t size)
+BPrivate::Storage::get_canonical_dir_path(const char *path, char *result, size_t size)
 {
 	status_t error = (path && result ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -1086,7 +1086,7 @@ StorageKit::get_canonical_dir_path(const char *path, char *result, size_t size)
 	\return \c B_OK if everything went fine, an error code otherwise
 */
 status_t
-StorageKit::get_canonical_dir_path(const char *path, char *&result)
+BPrivate::Storage::get_canonical_dir_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -1106,7 +1106,7 @@ StorageKit::get_canonical_dir_path(const char *path, char *&result)
 }
 
 status_t
-StorageKit::get_app_path(char *buffer)
+BPrivate::Storage::get_app_path(char *buffer)
 {
 	status_t error = (buffer ? B_OK : B_BAD_VALUE);
 	image_info info;
@@ -1127,14 +1127,14 @@ StorageKit::get_app_path(char *buffer)
 }
 
 bool
-StorageKit::entry_ref_is_root_dir( entry_ref &ref )
+BPrivate::Storage::entry_ref_is_root_dir( entry_ref &ref )
 {
 	return ref.directory == 1 && ref.device == 1 && ref.name[0] == '.'
 		   && ref.name[1] == 0;
 }
 
 status_t
-StorageKit::rename(const char *oldPath, const char *newPath)
+BPrivate::Storage::rename(const char *oldPath, const char *newPath)
 {
 	if (oldPath == NULL || newPath == NULL)
 		return B_BAD_VALUE;
@@ -1144,11 +1144,14 @@ StorageKit::rename(const char *oldPath, const char *newPath)
 
 /*! Removes path from the filesystem. */
 status_t
-StorageKit::remove(const char *path)
+BPrivate::Storage::remove(const char *path)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;
 	
 	return (::remove(path) == -1) ? errno : B_OK ;
 }
+
+
+
 

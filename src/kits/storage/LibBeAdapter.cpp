@@ -42,3 +42,6 @@ is_type_swapped_adapter(type_code type)
 	return is_type_swapped(type);
 }
  
+
+
+

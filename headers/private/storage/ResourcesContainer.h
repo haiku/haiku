@@ -12,7 +12,8 @@
 
 #include <List.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 class ResourceItem;
 
@@ -70,6 +71,9 @@ private:
 	bool	fIsModified;
 };
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _RESOURCES_CONTAINER_H
+
+

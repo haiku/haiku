@@ -17,7 +17,8 @@
 struct resource_info;
 struct PEFContainerHeader;
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 class Exception;
 struct MemArea;
@@ -123,6 +124,9 @@ ResourceFile::_GetUInt32(uint32 value)
 	return (fHostEndianess ? value : B_SWAP_INT32(value));
 }
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _RESOURCE_FILE_H
+
+

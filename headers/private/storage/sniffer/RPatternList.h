@@ -14,6 +14,8 @@
 
 class BPositionIO;
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 class Err;	
@@ -34,6 +36,10 @@ private:
 	std::vector<RPattern*> fList;
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_R_PATTERN_LIST_H
+
+

@@ -24,7 +24,7 @@
 #include "ResourceItem.h"
 #include "ResourcesContainer.h"
 
-using namespace StorageKit;
+using namespace BPrivate::Storage;
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -845,4 +845,7 @@ void BResources::_ReservedResources5() {}
 void BResources::_ReservedResources6() {}
 void BResources::_ReservedResources7() {}
 void BResources::_ReservedResources8() {}
+
+
+
 

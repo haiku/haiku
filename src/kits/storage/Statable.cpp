@@ -322,3 +322,6 @@ BStatable::GetVolume(BVolume *vol) const
 void BStatable::_OhSoStatable1() {}
 void BStatable::_OhSoStatable2() {}
 void BStatable::_OhSoStatable3() {}
+
+
+

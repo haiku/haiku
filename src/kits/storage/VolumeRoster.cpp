@@ -116,7 +116,7 @@ BVolumeRoster::GetBootVolume(BVolume* boot_vol)
 		
 		if(deviceID >= 0) {
 			fs_info			fsInfo;
-			int				err = StorageKit::stat_dev(deviceID, &fsInfo);
+			int				err = BPrivate::Storage::stat_dev(deviceID, &fsInfo);
 			
 			if (err == 0) {
 				if(std::strcmp(fsInfo.device_name, kBootVolumeName) == 0) {
@@ -179,4 +179,7 @@ BVolumeRoster::Messenger(void) const
 #ifdef USE_OPENBEOS_NAMESPACE
 }
 #endif
+
+
+
 

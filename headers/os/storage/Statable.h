@@ -81,3 +81,5 @@ public:
 #endif // USE_OPENBEOS_NAMESPACE
 
 #endif // _STATABLE_H
+
+

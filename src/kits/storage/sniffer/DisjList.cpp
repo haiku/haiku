@@ -9,7 +9,7 @@
 
 #include <sniffer/DisjList.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 DisjList::DisjList()
 	: fCaseInsensitive(false)
@@ -28,4 +28,7 @@ bool
 DisjList::IsCaseInsensitive() {
 	return fCaseInsensitive;
 }
+
+
+
 

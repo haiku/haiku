@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <string>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 // Suite
 CppUnit::Test*

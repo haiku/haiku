@@ -10,7 +10,7 @@
 #include <sniffer/Err.h>
 #include <new.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 //------------------------------------------------------------------------------
 // Err
@@ -92,3 +92,6 @@ void
 Err::SetPos(ssize_t pos) {
 	fPos = pos;
 }
+
+
+

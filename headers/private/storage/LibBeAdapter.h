@@ -17,3 +17,5 @@ extern status_t swap_data_adapter(type_code type, void *data, size_t length,
 extern bool is_type_swapped_adapter(type_code type);
 
 #endif	// _LIB_BE_ADAPTER_H
+
+

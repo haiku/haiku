@@ -138,7 +138,7 @@ BResourceStrings::SetStringFile(const entry_ref *ref)
 		fFileRef = *ref;
 	} else {
 		char appPath[B_PATH_NAME_LENGTH + 1];
-		error = StorageKit::get_app_path(appPath);
+		error = BPrivate::Storage::get_app_path(appPath);
 		if (error == B_OK)
 			error = get_ref_for_path(appPath, &fileRef);
 	}
@@ -399,4 +399,7 @@ BResourceStrings::_string_id_hash::assign_string(const char *str,
 			data = const_cast<char*>(str);
 	}
 }
+
+
+
 

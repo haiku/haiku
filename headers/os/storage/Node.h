@@ -115,14 +115,14 @@ private:
 	uint32 rudeData[4];
 
 private:
-	status_t set_fd(StorageKit::FileDescriptor fd);
+	status_t set_fd(BPrivate::Storage::FileDescriptor fd);
 	virtual void close_fd();
 	void set_status(status_t newStatus);
 
 	virtual status_t set_stat(struct stat &st, uint32 what);
 
-	StorageKit::FileDescriptor fFd;
-	StorageKit::FileDescriptor fAttrFd;
+	BPrivate::Storage::FileDescriptor fFd;
+	BPrivate::Storage::FileDescriptor fAttrFd;
 	status_t fCStatus;
 
 	status_t InitAttrDir();
@@ -135,3 +135,5 @@ private:
 #endif
 
 #endif	// _NODE_H
+
+

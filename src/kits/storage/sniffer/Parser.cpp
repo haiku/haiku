@@ -21,7 +21,7 @@
 #include <string.h>
 #include <String.h>	// BString
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 // Miscellaneous helper functions
 char escapeChar(char ch);
@@ -37,7 +37,7 @@ bool isDecimalChar(char ch);
 bool isPunctuation(char ch);
 
 //! Parses the given rule.
-/*! The resulting parsed Sniffer::Rule structure is stored in \c rule, which
+/*! The resulting parsed Rule structure is stored in \c rule, which
 	must be pre-allocated. If parsing fails, a descriptive error message (meant
 	to be viewed in a monospaced font) is placed in the pre-allocated \c BString
 	pointed to by \c parseError (which may be \c NULL if you don't care about
@@ -45,7 +45,7 @@ bool isPunctuation(char ch);
 	
 	\param rule Pointer to a NULL-terminated string containing the sniffer
 	            rule to be parsed
-	\param result Pointer to a pre-allocated \c Sniffer::Rule object into which the result
+	\param result Pointer to a pre-allocated \c Rule object into which the result
 	              of parsing is placed upon success.
 	\param parseError Point to pre-allocated \c BString object into which
 	                  a descriptive error message is stored upon failure.
@@ -55,7 +55,7 @@ bool isPunctuation(char ch);
 	- B_BAD_MIME_SNIFFER_RULE: Failure
 */
 status_t
-Sniffer::parse(const char *rule, Rule *result, BString *parseError) {
+BPrivate::Storage::Sniffer::parse(const char *rule, Rule *result, BString *parseError) {
 	Parser parser;
 	return parser.Parse(rule, result, parseError);
 }
@@ -743,7 +743,7 @@ TokenStream::InitCheck() const {
 	
 //! Returns a pointer to the next token in the stream.
 /*! The TokenStream object retains owner ship of the Token object returned by Get().
-    If Get() is called at the end of the stream, a pointer to a Sniffer::Err object is thrown.
+    If Get() is called at the end of the stream, a pointer to a Err object is thrown.
 */
 const Token*
 TokenStream::Get() {
@@ -759,7 +759,7 @@ TokenStream::Get() {
 }
 
 //! Places token returned by the most recent call to Get() back on the head of the stream.
-/*! If Unget() is called at the beginning of the stream, a pointer to a Sniffer::Err object is thrown.
+/*! If Unget() is called at the beginning of the stream, a pointer to a Err object is thrown.
 */
 void
 TokenStream::Unget() {
@@ -773,7 +773,7 @@ TokenStream::Unget() {
 
 
 /*! \brief Reads the next token in the stream and verifies it is of the given type,
-	throwing a pointer to a Sniffer::Err object if it is not.
+	throwing a pointer to a Err object if it is not.
 */
 void
 TokenStream::Read(TokenType type) {
@@ -954,7 +954,7 @@ isPunctuation(char ch) {
 }
 
 const char*
-Sniffer::tokenTypeToString(TokenType type) {
+BPrivate::Storage::Sniffer::tokenTypeToString(TokenType type) {
 	switch (type) {
 		case LeftParen:
 			return "LeftParen";
@@ -1341,3 +1341,6 @@ Parser::ThrowUnexpectedTokenError(TokenType expected1, TokenType expected2, cons
 	                + (found ? tokenTypeToString(found->Type()) : "NULL token")).c_str()
 	                , (found ? found->Pos() : stream.EndPos()));	
 }
+
+
+

@@ -11,7 +11,8 @@
 
 #include "OffsetFile.h"
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // constructor
 OffsetFile::OffsetFile()
@@ -166,6 +167,9 @@ OffsetFile::Offset() const
 	return fOffset;
 }
 
+};	// namespace Storage
+};	// namespace BPrivate
 
-};	// namespace StorageKit
+
+
 

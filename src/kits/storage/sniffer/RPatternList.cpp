@@ -13,7 +13,7 @@
 #include <DataIO.h>
 #include <stdio.h>
 
-using namespace Sniffer;
+using namespace BPrivate::Storage::Sniffer;
 
 RPatternList::RPatternList()
 	: DisjList()
@@ -61,3 +61,6 @@ RPatternList::Add(RPattern *rpattern) {
 	if (rpattern)
 		fList.push_back(rpattern);
 }
+
+
+

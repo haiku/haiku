@@ -41,7 +41,7 @@ public:
 
 	// WORKAROUND
 	// SetTo() methods: Part of a work around until someone has an idea how to
-	// get StorageKit::read_link(FileDescriptor,...) to work.
+	// get BPrivate::Storage::read_link(FileDescriptor,...) to work.
 	status_t SetTo(const entry_ref *ref);
 	status_t SetTo(const BEntry *entry);
 	status_t SetTo(const char *path);
@@ -57,7 +57,7 @@ public:
 
 	// WORKAROUND
 	// operator=(): Part of a work around until someone has an idea how to
-	// get StorageKit::read_link(FileDescriptor,...) to work.
+	// get BPrivate::Storage::read_link(FileDescriptor,...) to work.
 	BSymLink &operator=(const BSymLink &link);
 
 private:
@@ -70,13 +70,13 @@ private:
 
 	// WORKAROUND
 	// fSecretEntry: Part of a work around until someone has an idea how to
-	// get StorageKit::read_link(FileDescriptor,...) to work.
+	// get BPrivate::Storage::read_link(FileDescriptor,...) to work.
 //	uint32 _reservedData[4];
 	uint32 _reservedData[3];
 	BEntry *fSecretEntry;
 
 private:
-	StorageKit::FileDescriptor get_fd() const;
+	BPrivate::Storage::FileDescriptor get_fd() const;
 };
 
 #ifdef USE_OPENBEOS_NAMESPACE
@@ -84,3 +84,5 @@ private:
 #endif
 
 #endif	// _SYM_LINK_H
+
+

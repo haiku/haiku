@@ -13,7 +13,8 @@
 #include <DataIO.h>
 #include <File.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 /*!
 	\class OffsetFile
@@ -58,6 +59,9 @@ private:
 	off_t				fCurrentPosition;
 };
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _OFFSET_FILE_H
+
+

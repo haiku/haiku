@@ -13,7 +13,8 @@
 #include <DataIO.h>
 #include <String.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 /*!
 	\class ResourceItem
@@ -82,6 +83,9 @@ private:
 	bool		fIsModified;
 };
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _RESOURCE_ITEM_H
+
+

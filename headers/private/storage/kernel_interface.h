@@ -28,7 +28,8 @@ typedef struct entry_ref;
 /*! Encompasses the functions used internally by the Storage Kit to
 	interface with the kernel, as well as various internal support functions,
 	data types, and type aliases. */
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // Type aliases
 typedef dirent DirEntry;
@@ -63,7 +64,7 @@ status_t stat_dev(dev_t dev, fs_info* info);
 	new file descriptor if successful, -1 otherwise. This version
 	fails if the given file does not exist, or if you specify
 	O_CREAT as one of the flags (use the four argument version
-	of StorageKit::open() if you wish to create the file when
+	of BPrivate::Storage::open() if you wish to create the file when
 	it doesn't already exist). */
 status_t open(const char *path, OpenFlags flags, FileDescriptor &result);
 
@@ -190,13 +191,13 @@ status_t rewind_dir(FileDescriptor dir);
 /*! Iterates through the given directory searching for an entry whose name
 	matches that given by name. On success, places the DirEntry in result
 	and returns B_OK. On failures, returns an error code and sets result to
-	StorageKit::NullDir.
+	BPrivate::Storage::NullDir.
 	
 	<b>Note:</b> This call modifies the internal position marker of dir. */
 status_t find_dir(FileDescriptor dir, const char *name, DirEntry *result,
 				   size_t length);
 
-/*! Calls the other version of StorageKit::find_dir() and stores the results
+/*! Calls the other version of BPrivate::Storage::find_dir() and stores the results
 	in the given entry_ref. */
 status_t find_dir(FileDescriptor dir, const char *name, entry_ref *result);
 
@@ -328,7 +329,9 @@ status_t rename(const char *oldPath, const char *newPath);
 /*! Removes path from the filesystem. */
 status_t remove(const char *path);
 
-
-} // namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _STORAGE_KIT_KERNEL_INTERFACE_H
+
+

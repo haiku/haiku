@@ -27,7 +27,7 @@ namespace OpenBeOS {
 BDirectory::BDirectory()
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 }
 
@@ -38,7 +38,7 @@ BDirectory::BDirectory()
 BDirectory::BDirectory(const BDirectory &dir)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	*this = dir;
 }
@@ -51,7 +51,7 @@ BDirectory::BDirectory(const BDirectory &dir)
 BDirectory::BDirectory(const entry_ref *ref)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	SetTo(ref);
 }
@@ -64,7 +64,7 @@ BDirectory::BDirectory(const entry_ref *ref)
 BDirectory::BDirectory(const node_ref *nref)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	SetTo(nref);
 }
@@ -77,7 +77,7 @@ BDirectory::BDirectory(const node_ref *nref)
 BDirectory::BDirectory(const BEntry *entry)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	SetTo(entry);
 }
@@ -90,7 +90,7 @@ BDirectory::BDirectory(const BEntry *entry)
 BDirectory::BDirectory(const char *path)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	SetTo(path);
 }
@@ -105,7 +105,7 @@ BDirectory::BDirectory(const char *path)
 BDirectory::BDirectory(const BDirectory *dir, const char *path)
 		  : BNode(),
 			BEntryList(),
-			fDirFd(StorageKit::NullFd)
+			fDirFd(BPrivate::Storage::NullFd)
 {
 	SetTo(dir, path);
 }
@@ -139,7 +139,7 @@ BDirectory::~BDirectory()
 	- \c B_BUSY: A node was busy.
 	- \c B_FILE_ERROR: A general file error.
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
-	\todo Currently implemented using StorageKit::entry_ref_to_path().
+	\todo Currently implemented using BPrivate::Storage::entry_ref_to_path().
 		  Reimplement!
 */
 status_t
@@ -149,7 +149,7 @@ BDirectory::SetTo(const entry_ref *ref)
 	char path[B_PATH_NAME_LENGTH + 1];
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		error = StorageKit::entry_ref_to_path(ref, path,
+		error = BPrivate::Storage::entry_ref_to_path(ref, path,
 											  B_PATH_NAME_LENGTH + 1);
 	}
 	if (error == B_OK)
@@ -241,24 +241,24 @@ BDirectory::SetTo(const char *path)
 {
 	Unset();	
 	status_t result = (path ? B_OK : B_BAD_VALUE);
-	StorageKit::FileDescriptor newDirFd = StorageKit::NullFd;
+	BPrivate::Storage::FileDescriptor newDirFd = BPrivate::Storage::NullFd;
 	if (result == B_OK)
-		result = StorageKit::open_dir(path, newDirFd);
+		result = BPrivate::Storage::open_dir(path, newDirFd);
 	if (result == B_OK) {
 		// We have to take care that BNode doesn't stick to a symbolic link.
 		// open_dir() does always traverse those. Therefore we open the FD for
 		// BNode (without the O_NOTRAVERSE flag).
-		StorageKit::FileDescriptor fd = StorageKit::NullFd;
-		result = StorageKit::open(path, O_RDWR, fd);
+		BPrivate::Storage::FileDescriptor fd = BPrivate::Storage::NullFd;
+		result = BPrivate::Storage::open(path, O_RDWR, fd);
 		if (result == B_OK) {
 			result = set_fd(fd);
 			if (result != B_OK)
-				StorageKit::close(fd);
+				BPrivate::Storage::close(fd);
 		}
 		if (result == B_OK)
 			fDirFd = newDirFd;
 		else
-			StorageKit::close_dir(newDirFd);
+			BPrivate::Storage::close_dir(newDirFd);
 	}
 	// finally set the BNode status
 	set_status(result);
@@ -290,7 +290,7 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 {
 	Unset();
 	status_t error = (dir && path ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && StorageKit::is_absolute_path(path))
+	if (error == B_OK && BPrivate::Storage::is_absolute_path(path))
 		error = B_BAD_VALUE;
 	BEntry entry;
 	if (error == B_OK)
@@ -316,7 +316,7 @@ BDirectory::SetTo(const BDirectory *dir, const char *path)
 	- \c B_BUSY: A node was busy.
 	- \c B_FILE_ERROR: A general file error.
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
-	\todo Implemented using StorageKit::dir_to_self_entry_ref(). Check, if
+	\todo Implemented using BPrivate::Storage::dir_to_self_entry_ref(). Check, if
 		  there is a better alternative.
 */
 status_t
@@ -329,7 +329,7 @@ BDirectory::GetEntry(BEntry *entry) const
 		error = B_NO_INIT;
 	entry_ref ref;
 	if (error == B_OK)
-		error = StorageKit::dir_to_self_entry_ref(fDirFd, &ref);
+		error = BPrivate::Storage::dir_to_self_entry_ref(fDirFd, &ref);
 	if (error == B_OK)
 		error = entry->SetTo(&ref);
 	return error;
@@ -431,7 +431,7 @@ BDirectory::Contains(const char *path, int32 nodeFlags) const
 	bool result = true;
 	if (path) {
 		BEntry entry;
-		if (InitCheck() == B_OK && !StorageKit::is_absolute_path(path))
+		if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 			entry.SetTo(this, path);
 		else
 			entry.SetTo(path);
@@ -490,13 +490,13 @@ BDirectory::Contains(const BEntry *entry, int32 nodeFlags) const
 	if (result && InitCheck() == B_OK) {
 		char dirPath[B_PATH_NAME_LENGTH + 1];
 		char entryPath[B_PATH_NAME_LENGTH + 1];
-		result = (StorageKit::dir_to_path(fDirFd, dirPath,
+		result = (BPrivate::Storage::dir_to_path(fDirFd, dirPath,
 										  B_PATH_NAME_LENGTH + 1) == B_OK);
 		entry_ref ref;
 		if (result)
 			result = (entry->GetRef(&ref) == B_OK);
 		if (result) {
-			result = (StorageKit::entry_ref_to_path(&ref, entryPath,
+			result = (BPrivate::Storage::entry_ref_to_path(&ref, entryPath,
 													B_PATH_NAME_LENGTH + 1)
 					  == B_OK);
 		}
@@ -606,10 +606,10 @@ BDirectory::GetNextRef(entry_ref *ref)
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_FILE_ERROR;
 	if (error == B_OK) {
-		StorageKit::LongDirEntry entry;
+		BPrivate::Storage::LongDirEntry entry;
 		bool next = true;
 		while (error == B_OK && next) {
-			if (StorageKit::read_dir(fDirFd, &entry, sizeof(entry), 1) != 1)
+			if (BPrivate::Storage::read_dir(fDirFd, &entry, sizeof(entry), 1) != 1)
 				error = B_ENTRY_NOT_FOUND;
 			if (error == B_OK) {
 				next = (!strcmp(entry.d_name, ".")
@@ -650,7 +650,7 @@ BDirectory::GetNextDirents(dirent *buf, size_t bufSize, int32 count)
 	if (result == B_OK && InitCheck() != B_OK)
 		result = B_FILE_ERROR;
 	if (result == B_OK)
-		result = StorageKit::read_dir(fDirFd, buf, bufSize, count);
+		result = BPrivate::Storage::read_dir(fDirFd, buf, bufSize, count);
 	return result;
 }
 
@@ -673,7 +673,7 @@ BDirectory::Rewind()
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_FILE_ERROR;
 	if (error == B_OK)
-		error = StorageKit::rewind_dir(fDirFd);
+		error = BPrivate::Storage::rewind_dir(fDirFd);
 	return error;
 }
 
@@ -698,9 +698,9 @@ BDirectory::CountEntries()
 	status_t error = Rewind();
 	int32 count = 0;
 	if (error == B_OK) {
-		StorageKit::LongDirEntry entry;
+		BPrivate::Storage::LongDirEntry entry;
 		while (error == B_OK) {
-			if (StorageKit::read_dir(fDirFd, &entry, sizeof(entry), 1) != 1)
+			if (BPrivate::Storage::read_dir(fDirFd, &entry, sizeof(entry), 1) != 1)
 				error = B_ENTRY_NOT_FOUND;
 			if (error == B_OK
 				&& strcmp(entry.d_name, ".") && strcmp(entry.d_name, "..")) {
@@ -740,7 +740,7 @@ BDirectory::CreateDirectory(const char *path, BDirectory *dir)
 	if (error == B_OK) {
 		// get the actual (absolute) path using BEntry's help
 		BEntry entry;
-		if (InitCheck() == B_OK && !StorageKit::is_absolute_path(path))
+		if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 			entry.SetTo(this, path);
 		else
 			entry.SetTo(path);
@@ -749,7 +749,7 @@ BDirectory::CreateDirectory(const char *path, BDirectory *dir)
 		if (error == B_OK)
 			error = entry.GetPath(&realPath);
 		if (error == B_OK)
-			error = StorageKit::create_dir(realPath.Path());
+			error = BPrivate::Storage::create_dir(realPath.Path());
 		if (error == B_OK && dir)
 			error = dir->SetTo(realPath.Path());
 	}
@@ -793,7 +793,7 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 						  | (failIfExists ? B_FAIL_IF_EXISTS : 0);
 		BFile tmpFile;
 		BFile *realFile = (file ? file : &tmpFile);
-		if (InitCheck() == B_OK && !StorageKit::is_absolute_path(path))
+		if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 			error = realFile->SetTo(this, path, openMode);
 		else
 			error = realFile->SetTo(path, openMode);
@@ -831,7 +831,7 @@ BDirectory::CreateSymLink(const char *path, const char *linkToPath,
 	if (error == B_OK) {
 		// get the actual (absolute) path using BEntry's help
 		BEntry entry;
-		if (InitCheck() == B_OK && !StorageKit::is_absolute_path(path))
+		if (InitCheck() == B_OK && !BPrivate::Storage::is_absolute_path(path))
 			entry.SetTo(this, path);
 		else
 			entry.SetTo(path);
@@ -840,7 +840,7 @@ BDirectory::CreateSymLink(const char *path, const char *linkToPath,
 		if (error == B_OK)
 			error = entry.GetPath(&realPath);
 		if (error == B_OK)
-			error = StorageKit::create_link(realPath.Path(), linkToPath);
+			error = BPrivate::Storage::create_link(realPath.Path(), linkToPath);
 		if (error == B_OK && link)
 			error = link->SetTo(realPath.Path());
 	}
@@ -863,7 +863,7 @@ BDirectory::operator=(const BDirectory &dir)
 			*((BNode*)this) = dir;
 			if (InitCheck() == B_OK) {
 				// duplicate the file descriptor
-				status_t status = StorageKit::dup_dir(dir.fDirFd, fDirFd);
+				status_t status = BPrivate::Storage::dup_dir(dir.fDirFd, fDirFd);
 				if (status != B_OK)
 					Unset();
 				set_status(status);
@@ -887,9 +887,9 @@ void BDirectory::_ReservedDirectory6() {}
 void
 BDirectory::close_fd()
 {
-	if (fDirFd != StorageKit::NullFd) {
-		StorageKit::close_dir(fDirFd);
-		fDirFd = StorageKit::NullFd;
+	if (fDirFd != BPrivate::Storage::NullFd) {
+		BPrivate::Storage::close_dir(fDirFd);
+		fDirFd = BPrivate::Storage::NullFd;
 	}
 	BNode::close_fd();
 }
@@ -899,7 +899,7 @@ BDirectory::close_fd()
 	directly.
 	\return the file descriptor, or -1, if not properly initialized.
 */
-StorageKit::FileDescriptor
+BPrivate::Storage::FileDescriptor
 BDirectory::get_fd() const
 {
 	return fDirFd;
@@ -943,7 +943,7 @@ create_directory(const char *path, mode_t mode)
 		int32 nextComponent;
 		do {
 			// get the next path component
-			error = StorageKit::parse_first_path_component(path, component,
+			error = BPrivate::Storage::parse_first_path_component(path, component,
 														   nextComponent);
 			if (error == B_OK) {
 				// append it to the BPath
@@ -964,7 +964,7 @@ create_directory(const char *path, mode_t mode)
 						if (!entry.IsDirectory())	// but is no directory
 							error = B_NOT_A_DIRECTORY;
 					} else	// it doesn't exists -- create it
-						error = StorageKit::create_dir(dirPath.Path(), mode);
+						error = BPrivate::Storage::create_dir(dirPath.Path(), mode);
 				}
 			}
 		} while (error == B_OK && nextComponent != 0);
@@ -976,3 +976,6 @@ create_directory(const char *path, mode_t mode)
 #ifdef USE_OPENBEOS_NAMESPACE
 };		// namespace OpenBeOS
 #endif
+
+
+

@@ -126,7 +126,7 @@ BVolume::SetTo(
 	// Call the kernel function that gets device information
 	//	in order to determine the device status:
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(dev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(dev, &fsInfo);
 	
 	if (err != 0) {
 		fCStatus = errno;
@@ -189,7 +189,7 @@ BVolume::GetRootDirectory(
 		//	the device and root node values.
 		
 		fs_info			fsInfo;
-		int				err = StorageKit::stat_dev(fDev, &fsInfo);
+		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 		
 		if (err != 0) {
 			currentStatus = errno;
@@ -226,7 +226,7 @@ BVolume::Capacity(void) const
 		//	and calculate the total storage capacity.
 		
 		fs_info			fsInfo;
-		int				err = StorageKit::stat_dev(fDev, &fsInfo);
+		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 		
 		if (err == 0) {
 			totalBytes = fsInfo.block_size * fsInfo.total_blocks;
@@ -255,7 +255,7 @@ BVolume::FreeBytes(void) const
 		//	and calculate the free storage available.
 		
 		fs_info			fsInfo;
-		int				err = StorageKit::stat_dev(fDev, &fsInfo);
+		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 		
 		if (err == 0) {
 			remainingBytes = fsInfo.block_size * fsInfo.free_blocks;
@@ -284,7 +284,7 @@ BVolume::GetName(
 		//	and copies the device name into the buffer.
 		
 		fs_info			fsInfo;
-		int				err = StorageKit::stat_dev(fDev, &fsInfo);
+		int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 		
 		if (err != 0) {
 			currentStatus = errno;
@@ -365,7 +365,7 @@ BVolume::IsRemovable(void) const
 	//	and determines whether or not the device is removable.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsRemovable = (fsInfo.flags & B_FS_IS_REMOVABLE);
@@ -389,7 +389,7 @@ BVolume::IsReadOnly(void) const
 	//	and determines whether or not the device is read-only.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsReadOnly = (fsInfo.flags & B_FS_IS_READONLY);
@@ -414,7 +414,7 @@ BVolume::IsPersistent(void) const
 	//	is persistent.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsPersistent = (fsInfo.flags & B_FS_IS_PERSISTENT);
@@ -439,7 +439,7 @@ BVolume::IsShared(void) const
 	//	over a network.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeIsShared = (fsInfo.flags & B_FS_IS_SHARED);
@@ -464,7 +464,7 @@ BVolume::KnowsMime(void) const
 	//	MIME types.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsMime = (fsInfo.flags & B_FS_HAS_MIME);
@@ -490,7 +490,7 @@ BVolume::KnowsAttr(void) const
 	//	volume accept attributes.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsAttr = (fsInfo.flags & B_FS_HAS_ATTR);
@@ -516,7 +516,7 @@ BVolume::KnowsQuery(void) const
 	//	respond to queries.
 	
 	fs_info			fsInfo;
-	int				err = StorageKit::stat_dev(fDev, &fsInfo);
+	int				err = BPrivate::Storage::stat_dev(fDev, &fsInfo);
 	
 	if (err == 0) {
 		volumeKnowsQuery = (fsInfo.flags & B_FS_HAS_QUERY);
@@ -611,3 +611,6 @@ void BVolume::_TurnUpTheVolume8() {}
 #ifdef USE_OPENBEOS_NAMESPACE
 }
 #endif
+
+
+

@@ -11,6 +11,8 @@
 
 class BPositionIO;
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 //! Abstract class defining methods acting on a list of ORed patterns
@@ -26,6 +28,10 @@ protected:
 	bool fCaseInsensitive;
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_DISJ_LIST_H
+
+

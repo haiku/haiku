@@ -192,7 +192,7 @@ BSymLink::ReadLink(char *buf, size_t size)
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_FILE_ERROR;
 	if (error == B_OK)
-		error = StorageKit::read_link(get_fd(), buf, size);
+		error = BPrivate::Storage::read_link(get_fd(), buf, size);
 	return error;
 */
 // WORKAROUND
@@ -207,9 +207,9 @@ BSymLink::ReadLink(char *buf, size_t size)
 		error = fSecretEntry->GetRef(&ref);
 	char path[B_PATH_NAME_LENGTH + 1];
 	if (error == B_OK)
-		error = StorageKit::entry_ref_to_path(&ref, path, sizeof(path));
+		error = BPrivate::Storage::entry_ref_to_path(&ref, path, sizeof(path));
 	if (error == B_OK)
-		error = StorageKit::read_link(path, buf, size);
+		error = BPrivate::Storage::read_link(path, buf, size);
 	return error;
 }
 
@@ -263,7 +263,7 @@ BSymLink::MakeLinkedPath(const BDirectory *dir, BPath *path)
 	if (result == 0)
 		result = ReadLink(contents, sizeof(contents));
 	if (result >= 0) {
-		if (StorageKit::is_absolute_path(contents))
+		if (BPrivate::Storage::is_absolute_path(contents))
 			result = path->SetTo(contents);
 		else
 			result = path->SetTo(dir, contents);
@@ -286,7 +286,7 @@ BSymLink::IsAbsolute()
 	char contents[B_PATH_NAME_LENGTH + 1];
 	bool result = (ReadLink(contents, sizeof(contents)) >= 0);
 	if (result)
-		result = StorageKit::is_absolute_path(contents);
+		result = BPrivate::Storage::is_absolute_path(contents);
 	return result;
 }
 
@@ -315,7 +315,7 @@ void BSymLink::_ReservedSymLink6() {}
 /*! To be used instead of accessing the BNode's private \c fFd member directly.
 	\return the file descriptor, or -1, if not properly initialized.
 */
-StorageKit::FileDescriptor
+BPrivate::Storage::FileDescriptor
 BSymLink::get_fd() const
 {
 	return fFd;
@@ -325,3 +325,6 @@ BSymLink::get_fd() const
 #ifdef USE_OPENBEOS_NAMESPACE
 };		// namespace OpenBeOS
 #endif
+
+
+

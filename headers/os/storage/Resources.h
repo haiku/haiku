@@ -16,9 +16,11 @@
 namespace OpenBeOS {
 #endif
 
-namespace StorageKit {
-	class ResourcesContainer;
-	class ResourceFile;
+namespace BPrivate {
+	namespace Storage {
+		class ResourcesContainer;
+		class ResourceFile;
+	};
 };
 
 /*!
@@ -99,8 +101,8 @@ private:
 
 private:
 	BFile							fFile;
-	StorageKit::ResourcesContainer	*fContainer;
-	StorageKit::ResourceFile		*fResourceFile;
+	BPrivate::Storage::ResourcesContainer	*fContainer;
+	BPrivate::Storage::ResourceFile		*fResourceFile;
 	bool							fReadOnly;
 	bool							_pad[3];
 	uint32							_reserved[3];	// FBC
@@ -112,3 +114,5 @@ private:
 #endif
 
 #endif	// _RESOURCES_H
+
+

@@ -15,7 +15,8 @@
 #include <Query.h>
 #include <String.h>
 
-namespace StorageKit {
+namespace BPrivate {
+namespace Storage {
 
 // QueryNode
 class QueryNode {
@@ -201,6 +202,9 @@ private:
 	BList	fNodes;
 };
 
-};	// namespace StorageKit
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _QUERY_PREDICATE_H
+
+

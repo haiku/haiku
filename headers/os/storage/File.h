@@ -71,7 +71,7 @@ private:
 	uint32 _reservedData[8];
 
 private:
-	StorageKit::FileDescriptor get_fd() const;
+	BPrivate::Storage::FileDescriptor get_fd() const;
 
 private:
 	//! The file's open mode.
@@ -83,3 +83,5 @@ private:
 #endif
 
 #endif	// _FILE_H
+
+

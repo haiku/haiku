@@ -20,10 +20,12 @@
 class BVolume;
 struct entry_ref;
 
-namespace StorageKit {
-	class QueryNode;
-	class QueryStack;
-	class QueryTree;
+namespace BPrivate {
+	namespace Storage {
+		class QueryNode;
+		class QueryStack;
+		class QueryTree;
+	};
 };
 
 typedef enum {
@@ -97,7 +99,7 @@ public:
 
 private:
 	bool _HasFetched() const;
-	status_t _PushNode(StorageKit::QueryNode *node, bool deleteOnError);
+	status_t _PushNode(BPrivate::Storage::QueryNode *node, bool deleteOnError);
 	status_t _SetPredicate(const char *expression);
 	status_t _EvaluateStack();
 
@@ -111,13 +113,15 @@ private:
 
 private:
 	int32		_reservedData[4];	// FBC
-	StorageKit::QueryStack *fStack;
+	BPrivate::Storage::QueryStack *fStack;
 	char		*fPredicate;
 	dev_t		fDevice;
 	bool		fLive;
 	port_id		fPort;
 	long		fToken;
-	StorageKit::FileDescriptor fQueryFd;
+	BPrivate::Storage::FileDescriptor fQueryFd;
 };
 
 #endif	// _QUERY_H
+
+

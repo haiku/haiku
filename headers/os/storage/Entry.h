@@ -90,11 +90,11 @@ private:
 	/*! BEntry implementation of BStatable::set_stat() */
 	virtual	status_t set_stat(struct stat &st, uint32 what);
 	
-	status_t set(StorageKit::FileDescriptor dir, const char *path,
+	status_t set(BPrivate::Storage::FileDescriptor dir, const char *path,
 				 bool traverse);
 
 	/*! File descriptor for the entry's parent directory. */
-	StorageKit::FileDescriptor fDirFd;
+	BPrivate::Storage::FileDescriptor fDirFd;
 	
 	/*! Leaf name of the entry. */
 	char *fName;
@@ -118,3 +118,7 @@ bool operator<(const entry_ref &a, const entry_ref &b);
 #endif
 
 #endif	// _ENTRY_H
+
+
+
+

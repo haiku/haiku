@@ -103,3 +103,5 @@ const uint32	kResourceInfoTableEndSize		= 8;
 
 
 #endif	// _DEF_RESOURCES_H
+
+

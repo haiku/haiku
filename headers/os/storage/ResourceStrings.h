@@ -88,3 +88,5 @@ private:
 };
 
 #endif	// _RESOURCE_STRINGS_H
+
+

@@ -14,6 +14,8 @@
 
 class BPositionIO;
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 class DisjList;
@@ -40,6 +42,10 @@ private:
 	std::vector<DisjList*> *fConjList;	// A list of DisjLists to be ANDed
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_RULE_H
+
+

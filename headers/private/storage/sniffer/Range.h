@@ -11,6 +11,8 @@
 
 #include <SupportDefs.h>
 
+namespace BPrivate {
+namespace Storage {
 namespace Sniffer {
 
 class Err;
@@ -33,6 +35,10 @@ private:
 	status_t fCStatus;
 };
 
-}
+};	// namespace Sniffer
+};	// namespace Storage
+};	// namespace BPrivate
 
 #endif	// _SNIFFER_RANGE_H
+
+
