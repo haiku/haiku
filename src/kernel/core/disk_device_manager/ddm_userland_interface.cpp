@@ -1760,7 +1760,9 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	if (strcmp(name, proposedName))
 		return B_BAD_VALUE;
 	// unitialize the partition's contents and set the new parameters
-	partition->UninitializeContents(true);
+	error = partition->UninitializeContents(true);
+	if (error != B_OK)
+		return error;
 	partition->SetDiskSystem(diskSystem);
 	error = partition->SetContentName(name);
 	if (error != B_OK)
@@ -1788,8 +1790,7 @@ _kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 	// unitialize the partition's contents and set the new parameters
-	partition->UninitializeContents(true);
-	return B_OK;
+	return partition->UninitializeContents(true);
 }
 
 // _kern_create_child_partition
