@@ -1396,8 +1396,11 @@ MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParam
 				i++;
 			}
 			
-			(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-			nbParameters++;
+			PRINT(("nb parameters : %d\n", nbParameters));
+			if (nbParameters > 0) {
+				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
+				nbParameters++;
+			}
 		} else if(MMC[i].flags & B_MULTI_MIX_ENABLE) {
 			PRINT(("NEW_ENABLE\n"));
 			if(MMC[i].string == S_MUTE)
