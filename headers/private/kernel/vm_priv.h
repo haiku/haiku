@@ -32,9 +32,9 @@
 #define RESERVED_REGION_ID -1
 
 // page attributes (in addition to B_READ_AREA etc.)
-#define PAGE_MODIFIED 64
-#define PAGE_ACCESSED 128
-#define PAGE_PRESENT  256
+#define PAGE_MODIFIED 0x1000
+#define PAGE_ACCESSED 0x2000
+#define PAGE_PRESENT  0x4000
 
 // Should only be used by vm internals
 status_t vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser, addr_t *newip);

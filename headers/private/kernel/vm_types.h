@@ -170,21 +170,24 @@ enum {
 // Note: the VM probably won't support all combinations - it will try
 // its best, but create_area() will fail if it has to.
 // Of course, the exact behaviour will be documented somewhere...
-#define B_EXECUTE_AREA			4
-#define B_STACK_AREA			8
+#define B_EXECUTE_AREA			0x04
+#define B_STACK_AREA			0x08
 	// "stack" protection is not available on most platforms - it's used
 	// to only commit memory as needed, and have guard pages at the
 	// bottom of the stack.
 	// "execute" protection is currently ignored, but nevertheless, you
 	// should use it if you require to execute code in that area.
 
-#define B_KERNEL_EXECUTE_AREA	64
-#define B_KERNEL_STACK_AREA		128
+#define B_KERNEL_EXECUTE_AREA	0x40
+#define B_KERNEL_STACK_AREA		0x80
 
 #define B_USER_PROTECTION \
 	(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA | B_STACK_AREA)
 #define B_KERNEL_PROTECTION \
 	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA \
-	 | B_KERNEL_STACK_AREA | B_USER_CLONEABLE_AREA)
+	| B_KERNEL_STACK_AREA)
+
+#define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
+#define B_KERNEL_AREA_FLAGS		(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA)
 
 #endif	/* _KERNEL_VM_TYPES_H */
