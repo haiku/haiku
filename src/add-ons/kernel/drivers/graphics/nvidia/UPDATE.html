@@ -4,19 +4,18 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.19), (Rudolf)</h1></p>
+<p><h1>head (0.21), (Rudolf)</h1></p>
 <ul>
 	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of unaccelerated graphics.
 	<ul>
- 	<li>Tested Quake 2 in software rendering mode over here using timedemo1 with demo1.dm2: framerates jumped up to 140% of the 'original' in 'just' AGP2.0 4X mode!
+ 	<li>Tested Quake 2 in software rendering mode over here using timedemo1 with demo1.dm2: framerates jumped up to 140% of the 'original' in  AGP2.0 4X mode!
 	<li>Also tested video playback using bitmap output mode: CPU load drops considerably depending on desktop colordepth and resolution of the video played back.<br>
 	<li>2D acceleration will not speedup because it's working 'local', so within the graphics cards engine and it's RAM only.
 	</ul>
 <strong>Note please:</strong><br>
 	<ul>
-	<li>You need the new AGP kernel driver I setup for this feature, without it you will remain using PCI mode as usual.
-	<li>This AGP stuff BTW will be re-setup later on (as a module) to be graphics driver-independant so all AGP cards, even AGP cards running in VESA mode, can profit from it.
-	<li>If you have trouble with AGP, you have the option to shut it off by setting 'force_pci true' in nv.settings now.
+	<li>You need the new (seperate) (open)BeOS AGP busmanager module that has been setup for this feature, without it you will remain using PCI mode as usual.
+	<li>If you have trouble with AGP, you have the option to shut it off by setting 'force_pci true' in nv.settings. You are adviced however to tweak the AGP busmanager settings file instead, as this might enable you to keep using AGP mode, be it in a slower setting.
 	</ul>
 	<li>Updated CRTC modeline tuning for panels: this should fix the 'right-shifted' picture on some panels in their native modes;
 	<li>Fixed BIOS ROM dump (to file) option;

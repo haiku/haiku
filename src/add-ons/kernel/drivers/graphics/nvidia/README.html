@@ -35,7 +35,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards (overlay follows head in dualhead stretch/switch modes);
 	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel (widescreen) support;
-	<li>Basic AGP mode support on AGP cards, using the (seperate) BeOS AGP driver.
+	<li>Basic AGP mode support on AGP cards, using the new (seperate) (open)BeOS AGP busmanager.
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
@@ -135,6 +135,10 @@ Keep this option set to <strong>force_pci false</strong>, unless the graphics ca
 		<li><strong>true:</strong><br>
 <strong>force_pci true</strong> prevents the graphicsdriver from activating AGP mode, so it will be using PCI mode like it has always been in the past. The downside of this is that this comes at a performance penalty if your motherboard supports the AGP 'fastwrite' (FW) option, which won't be utilized with this setting.
 	</ul>
+<strong>Note:</strong>
+<ul>
+	<li>If you have trouble using AGP mode, you should prefer tweaking the AGP busmanager settings file as it might well enable you to use a 'lesser' AGP mode instead of falling back to PCI mode alltogether. 
+</ul>
 	<li><strong>unhide_fw:</strong><br>
 This option is only used if your card is running in AGP mode. It's a real <strong>tweak</strong> option. It's officially unsupported, and it's unknown if it can do harm to your card or system. It exists because using it <strong>can</strong> speedup unaccelerated graphics <strong>a lot</strong>. Think about video playback or playing quake2 in software rendering mode...
 	<ul>
