@@ -15,6 +15,7 @@
 class BDirectory;
 class BDiskDevice;
 class BDiskDeviceJob;
+class BDiskDeviceVisiting;
 class BDiskDeviceVisitor;
 class BDiskScannerPartitionAddOn;
 class BDiskSystem;
@@ -108,7 +109,6 @@ public:
 	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
 							BDiskDevice *device = NULL,
 							BPartition **partition = NULL);
-	bool VisitAll(BDiskDeviceVisitor *visitor);
 
 	bool VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
 								   BDiskDevice *device = NULL,

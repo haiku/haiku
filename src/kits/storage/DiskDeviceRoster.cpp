@@ -202,9 +202,11 @@ BDiskDeviceRoster::VisitEachDevice(BDiskDeviceVisitor *visitor,
 }
 
 // VisitEachPartition
-/*!	\brief Iterates through the all devices' partitions.
+/*!	\brief Pre-order traverses the trees spanned by the BDiskDevices and their
+		   subobjects.
 
-	The supplied visitor's Visit(BPartition*) is invoked for each partition.
+	The supplied visitor's Visit(BDiskDevice*) method is invoked for each
+	disk device and Visit(BPartition*) for each (non-disk device) partition.
 	If Visit() returns \c true, the iteration is terminated and this method
 	returns \c true. If supplied, \a device is set to the concerned device
 	and in \a partition the pointer to the partition object is returned.
@@ -232,40 +234,11 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 		BPartition *foundPartition = NULL;
 		while (!foundPartition && GetNextDevice(useDevice) == B_OK)
 			foundPartition = useDevice->VisitEachDescendant(visitor);
-			// TODO: That probably not correct. VisitEachDescendant()
-			// should also invoke Visit(BDiskDevice*).
 		fDeviceCookie = oldCookie;
 		if (!terminatedEarly)
 			useDevice->Unset();
 		else if (device && partition)
 			*partition = foundPartition;
-	}
-	return terminatedEarly;
-}
-
-// VisitAll
-/*!	\brief Pre-order traverses the trees of the spanned by the BDiskDevices
-		   and their subobjects.
-
-	The supplied visitor's Visit() is invoked for each device, for each
-	session and for each partition.
-	If Visit() returns \c true, the iteration is terminated and this method
-	returns \c true as well.
-
-	\param visitor The visitor.
-	\return \c true, if the iteration was terminated, \c false otherwise.
-*/
-bool
-BDiskDeviceRoster::VisitAll(BDiskDeviceVisitor *visitor)
-{
-	bool terminatedEarly = false;
-	if (visitor) {
-		int32 oldCookie = fDeviceCookie;
-		fDeviceCookie = 0;
-		BDiskDevice device;
-		while (!terminatedEarly && GetNextDevice(&device) == B_OK)
-			terminatedEarly = device.VisitEachDescendant(visitor);
-		fDeviceCookie = oldCookie;
 	}
 	return terminatedEarly;
 }
