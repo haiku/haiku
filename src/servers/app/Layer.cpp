@@ -551,15 +551,15 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		if (updateReg.CountRects() > 0)
 		{
 			fOwner->zUpdateReg.Include(&updateReg);			
-			if (!fOwner->fInUpdate)
+			if (!fOwner->fInUpdate && !fOwner->fRequestSent)
 			{
-// TODO: WHAT if 2 or more update requests are sent before we start to processing the first one.
 				fOwner->fUpdateReg = fOwner->zUpdateReg;
-//fOwner->cnt++;
-//if (fOwner->cnt != 1)
-//	debugger("Adi: Not Allowed!");
+fOwner->cnt++;
+if (fOwner->cnt != 1)
+	debugger("Adi: Not Allowed!");
 				fOwner->zUpdateReg.MakeEmpty();
 				SendUpdateMsg(fOwner->fUpdateReg);
+				fOwner->fRequestSent = true;
 			}
 		}
 	}
@@ -630,12 +630,12 @@ void Layer::UpdateStart()
 		WinBorder	*wb = (WinBorder*)this;
 
 		wb->fInUpdate = true;
-// TODO: wb->fUpdateReg seems to be invalid from time to time. Fix that! [See TODO in RequestDraw]
+		wb->fRequestSent = false;
 		wb->yUpdateReg = wb->fUpdateReg;
 		wb->fUpdateReg.MakeEmpty();
-//wb->cnt--;
-//if (wb->cnt != 0)
-//	debugger("Adi2: Not Allowed!");
+wb->cnt--;
+if (wb->cnt != 0)
+	debugger("Adi2: Not Allowed!");
 	}
 }
 
