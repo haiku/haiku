@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tools elfsymbolpatcher ;
+
+UseHeaders [ FDirName $(OBOS_TOP) headers tools elfsymbolpatcher ] ;
+
+StaticLibrary elfsymbolpatcher
+	: ElfFile.cpp
+	  ElfImage.cpp
+	  ElfSymbolPatcher.cpp
+;
