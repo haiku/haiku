@@ -2168,14 +2168,14 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 {
 	int err;
 
-//	dprintf("vm_page_fault: page fault at 0x%x, ip 0x%x\n", address, fault_address);
+	TRACE(("vm_page_fault: page fault at 0x%x, ip 0x%x\n", address, fault_address));
 
 	*newip = 0;
 
 	err = vm_soft_fault(address, is_write, is_user);
 	if (err < 0) {
-		TRACE(("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
-			err, address, fault_address, is_write, is_user, thread_get_current_thread_id()));
+		dprintf("vm_page_fault: vm_soft_fault returned error %d on fault at 0x%lx, ip 0x%lx, write %d, user %d, thread 0x%lx\n",
+			err, address, fault_address, is_write, is_user, thread_get_current_thread_id());
 		if (!is_user) {
 			struct thread *t = thread_get_current_thread();
 			if (t && t->fault_handler != 0) {
@@ -2214,8 +2214,8 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	int change_count;
 	int err;
 
-//	dprintf("vm_soft_fault: thid 0x%x address 0x%x, isWrite %d, isUser %d\n",
-//		thread_get_current_thread_id(), address, isWrite, isUser);
+	TRACE(("vm_soft_fault: thid 0x%x address 0x%x, isWrite %d, isUser %d\n",
+		thread_get_current_thread_id(), address, isWrite, isUser));
 
 	address = ROUNDOWN(originalAddress, PAGE_SIZE);
 
@@ -2255,7 +2255,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (isUser && (region->lock & B_USER_PROTECTION) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("user access on kernel region\n");
+		dprintf("user access on kernel region 0x%lx at %p\n", region->id, (void *)originalAddress);
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
 	if (isWrite && (region->lock & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
@@ -2386,7 +2386,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (page == NULL) {
 		// we still haven't found a page, so we allocate a clean one
 		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
-		TRACE(("vm_soft_fault: just allocated page 0x%x\n", page->ppn));
+		TRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->ppn));
 
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
