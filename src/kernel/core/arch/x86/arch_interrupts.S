@@ -93,17 +93,17 @@ int_bottom:
 	movl	%eax,%ds
 	movl	%eax,%es
 	movl	%ss,%ebx
-	movl	%esp,%esi
-	cmpl	%eax,%ebx 	// check if we changed the stack
+	movl	%esp,%esi		// save the old stack pointer
+	cmpl	%eax,%ebx 		// check if we changed the stack
 	jne		custom_stack
   kernel_stack:
 	call	i386_handle_trap
 	pop		%gs
-	pop		%fs			// kernel stacks don't care about TLS (which uses %fs)
+	addl	$4, %esp		// we skip %fs, as this contains the CPU dependent TLS segment
 	pop		%es
 	pop		%ds
 	popa
-	addl	$16,%esp
+	addl	$16,%esp		// ignore the vector, error code, and original eax/edx values
 	iret
 
 	// custom stack -> copy registers to kernel stack and switch there
@@ -112,23 +112,23 @@ int_bottom:
 	movl	%eax,%es		// the iframe is on the wrong stack
 	addl	_interrupt_stack_offset,%edx
 	lss		(%edx),%esp
-	movl	%ebx,%ds
+	movl	%ebx,%ds		// point %ds to the user stack segment
 	subl	$92,%esp
-	movl	%esp,%edi
-	movl	$21,%ecx
-	rep		movsl
+	movl	%esp,%edi		// copy to the current stack
+	movl	$21,%ecx		// copy sizeof(iframe)
+	rep		movsl			// %esi still points to the old custom stack address
 	movl	%eax,%ds
 	subl	$84,%esi
-	movl	%esi,(%edi)		// save custom stack address
-	movl	%ebx,4(%edi)
+	movl	%esi,(%edi)		// save custom stack address and segment *after* the
+	movl	%ebx,4(%edi)	// iframe structure on the stack
 	call	i386_handle_trap
 	lss		84(%esp),%esp	// reload custom stack address
 	pop		%gs
-	addl	$4, %esp		// we skip %fs, as this contains the CPU dependent TLS segment
+	pop		%fs				// doesn't come from userland, doesn't need TLS, may have changed %fs
 	pop		%es
 	pop		%ds
 	popa
-	addl	$16,%esp
+	addl	$16,%esp		// ignore the vector, error code, and original eax/edx values
 	iret
 
 _interrupt_stack_offset:
@@ -190,13 +190,13 @@ FUNCTION(i386_end_return_from_signal):
  */
 
 FUNCTION(i386_restore_frame_from_syscall):
-	add		$4, %esp	// make the iframe our current stack position (we don't need the
-						// return address anymore, as we will use the one of the frame)
-	pop		%gs			// recreate the frame environment
-	addl	$4, %esp	// we skip %fs, as this contains the CPU dependent TLS segment
+	addl	$4, %esp		// make the iframe our current stack position (we don't need the
+							// return address anymore, as we will use the one of the frame)
+	pop		%gs				// recreate the frame environment
+	addl	$4, %esp		// we skip %fs, as this contains the CPU dependent TLS segment
 	pop		%es
 	pop		%ds
 	popa
-	addl	$16,%esp	// ignore the vector, error code, and original eax/edx values
-						// (which contain the syscall number and argument pointer)
+	addl	$16,%esp		// ignore the vector, error code, and original eax/edx values
+							// (which contain the syscall number and argument pointer)
 	iret
