@@ -895,13 +895,9 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 	BMessage drag(B_SIMPLE_DATA);
 	drag.AddInt32("be:actions", B_COPY_TARGET);
 	drag.AddString("be:clip_name", "Bitmap Clip"); 
-	// XXX undocumented fields
+	// ShowImage specific fields
 	drag.AddPoint("be:_source_point", sourcePoint);
 	drag.AddRect("be:_frame", fSelectionRect);
-	// XXX meaning unknown???
-	// drag.AddInt32("be:_format", e.g.: B_TGA_FORMAT);
-	// drag.AddInt32("be_translator", translator_id);
-	// drag.AddPointer("be:_bitmap_ptr, ?);
 	if (AddSupportedTypes(&drag, bitmap)) {
 		// we also support "Passing Data via File" protocol
 		drag.AddString("be:types", B_FILE_MIME_TYPE);
@@ -912,6 +908,7 @@ ShowImageView::BeginDrag(BPoint sourcePoint)
 		sourcePoint.y *= fScaleY;
 		// DragMessage takes ownership of bitmap
 		DragMessage(&drag, bitmap, B_OP_ALPHA, sourcePoint);
+		bitmap = NULL;
 	}
 }
 
@@ -1376,7 +1373,54 @@ void
 ShowImageView::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
+		case MSG_SELECTION_BITMAP:
+		{
+			// In response to a B_SIMPLE_DATA message, a view will
+			// send this message and expect a reply with a pointer to
+			// the currently selected bitmap clip. Although this view
+			// allocates the BBitmap * sent in the reply, it is only
+			// to be used and deleted by the view that is being replied to.
+			BMessage msg;
+			msg.AddPointer("be:_bitmap_ptr", CopySelection());
+			pmsg->SendReply(&msg);
+			break;
+		}
+			
+		case B_SIMPLE_DATA:
+			// If a user drags a clip from another ShowImage window,
+			// request a BBitmap pointer to that clip, allocated by the
+			// other view, for use solely by this view, so that it can
+			// be dropped/pasted onto this view.
+			if (pmsg->WasDropped()) {
+				BMessenger retMsgr, localMsgr(this);
+				retMsgr = pmsg->ReturnAddress();
+				if (retMsgr != localMsgr) {
+					BMessage msgReply;
+					retMsgr.SendMessage(MSG_SELECTION_BITMAP, &msgReply);
+					BBitmap *bitmap = NULL;
+					if (msgReply.FindPointer("be:_bitmap_ptr",
+						reinterpret_cast<void **>(&bitmap)) == B_OK) {
+						BRect sourceRect;
+						BPoint point, sourcePoint;
+						pmsg->FindPoint("be:_source_point", &sourcePoint);
+						pmsg->FindRect("be:_frame", &sourceRect);
+						point = pmsg->DropPoint();
+						point.Set(point.x - (sourcePoint.x - sourceRect.left),
+							point.y - (sourcePoint.y - sourceRect.top));
+							// adjust drop point before scaling is factored in
+						point = ConvertFromScreen(point);
+						point = ViewToImage(point);
+						
+						PasteBitmap(bitmap, point);
+					}
+					
+				}
+			}
+			break;
+			
 		case B_COPY_TARGET:
+			printf("\n\nB_COPY_TARGET:\n");
+			pmsg->PrintToStream();
 			HandleDrop(pmsg);
 			break;
 		case B_MOUSE_WHEEL_CHANGED:
@@ -1486,30 +1530,37 @@ ShowImageView::Cut()
 }
 
 void
+ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
+{
+	if (bitmap && bitmap->IsValid()) {
+		MergeSelection();
+				
+		SetHasSelection(true);
+		fSelBitmap = bitmap;
+		fCopyFromRect = BRect();
+		fSelectionRect = bitmap->Bounds();
+	
+		if (fBitmap->Bounds().Contains(point))
+			// Set the selection rectangle to the same location it was
+			// copied from, but only if the background bitmap is large enough
+			// to contain that point
+			fSelectionRect.OffsetBy(point);
+		
+		Invalidate();
+	}
+}
+
+void
 ShowImageView::Paste()
 {	
 	if (be_clipboard->Lock()) {	
 		BMessage *pclip;
 		if ((pclip = be_clipboard->Data()) != NULL) {
-			BBitmap *pbits = dynamic_cast<BBitmap *>(BBitmap::Instantiate(pclip));
-			if (pbits) {
-				MergeSelection();
-				
-				SetHasSelection(true);
-				fSelBitmap = pbits;
-				fCopyFromRect = BRect();
-				fSelectionRect = pbits->Bounds();
-				
-				BPoint point;
-				if (pclip->FindPoint("be:location", &point) == B_OK &&
-					fBitmap->Bounds().Contains(point))
-					// Set the selection rectangle to the same location it was
-					// copied from, but only if the background bitmap is large enough
-					// to contain that point
-					fSelectionRect.OffsetBy(point);
-				
-				Invalidate();
-			}
+			BPoint point(0, 0);
+			pclip->FindPoint("be:location", &point);
+			BBitmap *pbits;
+			pbits = dynamic_cast<BBitmap *>(BBitmap::Instantiate(pclip));
+			PasteBitmap(pbits, point);
 		}
 		
 		be_clipboard->Unlock(); 

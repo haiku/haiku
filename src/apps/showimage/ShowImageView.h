@@ -133,6 +133,7 @@ private:
 	void AddToRecentDocuments();
 	void AddWhiteRect(BRect &rect);
 	void GetSelMergeRects(BRect &srcBits, BRect &destRect);
+	void PasteBitmap(BBitmap *bitmap, BPoint point);
 	void MergeSelection();
 	void DeleteScaler();
 	void DeleteBitmap();

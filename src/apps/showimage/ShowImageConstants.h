@@ -45,6 +45,7 @@ const uint32 MSG_DITHER_IMAGE		= 'mDIM';
 const uint32 MSG_MODIFIED			= 'mMOD';
 const uint32 MSG_UPDATE_STATUS		= 'mUPS';
 const uint32 MSG_SELECTION			= 'mSEL';
+const uint32 MSG_SELECTION_BITMAP	= 'mSBT';
 const uint32 MSG_PAGE_FIRST			= 'mPGF';
 const uint32 MSG_PAGE_LAST			= 'mPGL';
 const uint32 MSG_PAGE_NEXT			= 'mPGN';
