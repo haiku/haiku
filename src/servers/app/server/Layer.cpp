@@ -694,7 +694,7 @@ printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
 		BRegion *i=new BRegion(oldframe);
 		if(TestRectIntersection(oldframe,_frame))
 			i->Exclude(_frame);
-
+		
 		if(_parent->_invalid==NULL)
 			_parent->_invalid=i;
 		else
@@ -703,11 +703,21 @@ printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
 			delete i;
 		}
 		_parent->_is_dirty=true;
+
+		// if _uppersibling is non-NULL, we have other layers which we may have been
+		// covering up. If we did cover up some siblings, they need to be redrawn
+		for(Layer *sib=_uppersibling;sib!=NULL;sib=sib->_uppersibling)
+		{
+			if(TestRectIntersection(oldframe,sib->_frame))
+			{
+				// The boundaries intersect on screen, so invalidate the area that
+				// was hidden
+				sib->Invalidate(oldframe & sib->_frame);
+				sib->_is_dirty=true;
+			}
+		}
 	}
 	_is_dirty=true;
-//	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
-//		lay->MoveBy(x,y);
-//	Invalidate(Frame());
 }
 
 /*!
@@ -985,13 +995,59 @@ BRect Layer::ConvertFromTop(BRect rect)
 		return(rect);
 }
 
-// TODO: Implement and document
+/*!
+	\brief Makes the layer the backmost layer belonging to its parent
+	
+	This function will do nothing if the Layer has no parent or no siblings. Region 
+	rebuilding is not performed.
+*/
 void Layer::MakeTopChild(void)
 {
+	// Handle redundant and pointless cases
+	if(!_parent || (!_uppersibling && !_lowersibling) || _parent->_topchild==this)
+		return;
+	
+	// Pull ourselves out of the layer tree
+	if(_uppersibling)
+		_uppersibling->_lowersibling=_lowersibling;
+		
+	if(_lowersibling)
+		_lowersibling->_uppersibling=_uppersibling;
+	
+	// Set this layer's upper/lower sib pointers to appropriate values
+	_uppersibling=NULL;
+	_lowersibling=_parent->_topchild;
+	
+	// move former top child down a layer
+	_lowersibling->_uppersibling=this;
+	_parent->_topchild=this;
 }
 
-// TODO: Implement and document
+/*!
+	\brief Makes the layer the frontmost layer belonging to its parent
+	
+	This function will do nothing if the Layer has no parent or no siblings. Region 
+	rebuilding is not performed.
+*/
 void Layer::MakeBottomChild(void)
 {
+	// Handle redundant and pointless cases
+	if(!_parent || (!_uppersibling && !_lowersibling) || _parent->_bottomchild==this)
+		return;
+	
+	// Pull ourselves out of the layer tree
+	if(_uppersibling)
+		_uppersibling->_lowersibling=_lowersibling;
+		
+	if(_lowersibling)
+		_lowersibling->_uppersibling=_uppersibling;
+	
+	// Set this layer's upper/lower sib pointers to appropriate values
+	_uppersibling=_parent->_bottomchild;
+	_lowersibling=NULL;
+	
+	// move former bottom child up a layer
+	_uppersibling->_lowersibling=this;
+	_parent->_bottomchild=this;
+	
 }
-
