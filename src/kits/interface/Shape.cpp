@@ -518,7 +518,7 @@ void BShape::GetData(int32 *opCount, int32 *ptCount, uint32 **opList,
 	*opCount = data->opCount;
 	*ptCount = data->ptCount;
 	*opList = data->opList;
-	*ptList =data->ptList;
+	*ptList = data->ptList;
 }
 //------------------------------------------------------------------------------
 void BShape::SetData(int32 opCount, int32 ptCount, uint32 *opList,

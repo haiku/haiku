@@ -1699,8 +1699,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			// 9) port_id - reply port
 			
 			// Returns:
-			// 1) size_t - message size
-			// 2) flattened BMessage containing archived BShape
+			// 1) BShape with glyph shape
 			// numChars times
 			
 			uint16 famid, styid;
@@ -1735,22 +1734,9 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 				BShape **shapes = font.GetGlyphShapes(charArray, numChars);
 				if (shapes) {
 					replylink.StartMessage(SERVER_TRUE);
-					for (int32 i = 0; i < numChars; i++) {
-						BMessage message;
-						if (shapes[i]->Archive(&message) != B_OK)
-							break;
-						delete shapes[i];
-						
-						size_t size = message.FlattenedSize();
-						char *buffer = new char[size];
-						if (message.Flatten(buffer, size) != B_OK) {
-							delete buffer;
-							break;
-						}
-						
-						replylink.Attach<size_t>(size);
-						replylink.Attach(buffer, size);
-					}
+					for (int32 i = 0; i < numChars; i++)
+						replylink.AttachShape(*shapes[i]);
+					
 					replylink.Flush();
 				} else {
 					replylink.StartMessage(SERVER_FALSE);

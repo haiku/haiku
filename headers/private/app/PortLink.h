@@ -68,6 +68,7 @@ public:
 	status_t Attach(const void *data, ssize_t size);
 	status_t AttachString(const char *string);
 	status_t AttachRegion(const BRegion &region);
+	status_t AttachShape(BShape &shape);
 	template <class Type> status_t Attach(const Type& data)
 	{
 		return Attach(&data, sizeof(Type));
@@ -77,6 +78,7 @@ public:
 	status_t Read(void *data, ssize_t size);
 	status_t ReadString(char **string);
 	status_t ReadRegion(BRegion *region);
+	status_t ReadShape(BShape *shape);
 	template <class T> status_t Read(T *data)
 	{
 		return fReader->Read(data,sizeof(T));

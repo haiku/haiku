@@ -1163,32 +1163,8 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	if(code!=SERVER_TRUE)
 		return;
 	
-	// This is going to be dog slow, but it'll do for now
-	char *buffer=NULL;
-	size_t buffersize=0;
-	
-	for(int32 i=0; i<numChars; i++)
-	{
-		size_t msgsize;
-		
-		link.Read<size_t>(&msgsize);
-		if(msgsize>buffersize)
-		{
-			delete buffer;
-			buffer=new char[msgsize];
-		}
-		
-		link.Read(buffer,msgsize);
-		
-		BMessage shapemsg;
-		shapemsg.Unflatten(buffer);
-		
-		BShape shape(&shapemsg);
-		glyphShapeArray[i]->Clear();
-		glyphShapeArray[i]->AddShape(&shape);
-	}
-	
-	delete buffer;
+	for(int32 i = 0; i < numChars; i++)
+		link.ReadShape(glyphShapeArray[i]);
 }
    
 

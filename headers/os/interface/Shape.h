@@ -78,6 +78,8 @@ virtual	void			_ReservedShape4();
 		friend class	TPicture;
 		friend class	BView;
 		friend class	BFont;
+		friend class	BPortLink;
+
 		void			GetData(int32 *opCount, int32 *ptCount, uint32 **opList, BPoint **ptList);
 		void			SetData(int32 opCount, int32 ptCount, uint32 *opList, BPoint *ptList);
 		void			InitData();
