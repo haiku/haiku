@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tools ;
 
 SubInclude OBOS_TOP src tools cppunit ;
+SubInclude OBOS_TOP src tools elfsymbolpatcher ;
 SubInclude OBOS_TOP src tools hey ;
 SubInclude OBOS_TOP src tools rc ;
 SubInclude OBOS_TOP src tools translation ;
