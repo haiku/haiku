@@ -92,11 +92,9 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fSwitchTerminals = new BMenuItem("Switch Terminals", new BMessage(TERMINAL_SWITCH_TERMINAL), 'G');
 	fTerminal->AddItem(fSwitchTerminals);
 	fSwitchTerminals->SetTrigger('T');
-	fSwitchTerminals->SetTarget(be_app);
 	
 	fStartNewTerminal = new BMenuItem("Start New Terminal", new BMessage(TERMINAL_START_NEW_TERMINAL), 'N');
 	fTerminal->AddItem(fStartNewTerminal);
-	fStartNewTerminal->SetTarget(be_app);
 	
 	fLogToFile = new BMenuItem("Log to File...", new BMessage(TERMINAL_LOG_TO_FILE));
 	fTerminal->AddItem(fLogToFile);
@@ -239,7 +237,14 @@ TerminalWindow::RestoreSettings(entry_ref * settingsRef)
 void
 TerminalWindow::MessageReceived(BMessage *message)
 {
-	switch(message->what){
+	switch (message->what){
+		case TERMINAL_START_NEW_TERMINAL: {
+			status_t result = be_roster->Launch(APP_SIGNATURE);
+			if (result != B_OK) {
+				// TODO: notify user
+			}
+		}
+		break;
 		case B_COPY:
 			fTextView->Copy(be_clipboard);
 		break;

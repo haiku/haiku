@@ -1,6 +1,7 @@
 #include <Autolock.h>
 #include <Path.h>
 #include <Point.h>
+#include <Alert.h>
 
 #include <Constants.h>
 #include <TerminalApp.h>
@@ -52,31 +53,10 @@ void TerminalApp::DispatchMessage(BMessage *msg, BHandler *handler)
 	}
 }
 
-#include <Alert.h>
-
 void
 TerminalApp::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case TERMINAL_START_NEW_TERMINAL: {
-			status_t result = be_roster->Launch(APP_SIGNATURE);
-			if (result != B_OK) {
-				// TODO: notify user
-			}
-		}
-		break;
-		case B_SILENT_RELAUNCH: {
-			BAlert * go = new BAlert("SILENT","RELAUNCH","OH YEAH");
-			go->Go();
-			OpenTerminal();
-		}
-		break;
-		case B_REFS_RECEIVED: {
-			BAlert * go = new BAlert("REFS","RECEIVED","OH YEAH");
-			go->Go();
-			OpenTerminal(message);
-		}
-		break;
 		default:
 			BApplication::MessageReceived(message);
 		break;
@@ -88,26 +68,30 @@ TerminalApp::OpenTerminal(BMessage * message)
 {
 	BPoint windowPoint(7,26);
 	TerminalWindow * terminal = new TerminalWindow(windowPoint,message);
+	fWindowOpened = true;
 }
+
+#include <Roster.h>
 
 void
 TerminalApp::RefsReceived(BMessage *message)
 {
-	int32		refNum;
-	entry_ref	ref;
-	status_t	err;
-	
-	refNum = 0;
-	do {
-		err = message->FindRef("refs", refNum, &ref);
-		if (err != B_OK)
-			return;
-		BMessage single(OPEN_TERMINAL);
-		single.AddRef("refs",&ref);
-		OpenTerminal(&single);
-		refNum++;
-		printf("refNum = %ld\n",refNum);
-	} while (true);
+	int32 i = 0;
+	entry_ref ref;
+	if (IsLaunching()) {
+		// peel off the first ref and open it ourselves
+		if (message->FindRef("refs",i++,&ref) == B_OK) {
+			BMessage file(OPEN_TERMINAL);
+			file.AddRef("refs",&ref);
+			OpenTerminal(&file);
+		}
+	}
+	// handle any other refs by launching them as separate apps
+	while (message->FindRef("refs",i++,&ref) == B_OK) {
+		BMessage * file = new BMessage(OPEN_TERMINAL);
+		file->AddRef("refs",&ref);
+		be_roster->Launch(APP_SIGNATURE,file);
+	}
 }
 
 void
@@ -250,6 +234,7 @@ TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 					}
 				break;
 				case '?':
+					printf("wth is that?\n");
 					return;
 				break;
 				default:
