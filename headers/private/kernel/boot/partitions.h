@@ -1,7 +1,7 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_BOOT_PARTITIONS_H
 #define KERNEL_BOOT_PARTITIONS_H
 
@@ -34,6 +34,8 @@ class Partition : public Node, public partition_data {
 		bool IsFileSystem() const { return fIsFileSystem; }
 		bool IsPartitioningSystem() const { return fIsPartitioningSystem; }
 		const char *ModuleName() const { return fModuleName; }
+
+		int FD() const { return fFD; }
 
 	private:
 		int			fFD;
