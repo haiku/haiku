@@ -17,11 +17,26 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
-inline size_t
-AudioBufferSize(const media_raw_audio_format &raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
+
+inline void
+AdjustBufferSize(media_raw_audio_format * raf, bigtime_t buffer_duration = 50000 /* 50 ms */)
 {
-	return (raf.format & 0xf) * (raf.channel_count)
-         * (size_t)((raf.frame_rate * buffer_duration) / 1000000.0);
+	int frame_size = (raf->format & 0xf) * raf->channel_count;
+	if (raf->buffer_size == 0) {
+		raf->buffer_size = frame_size * (size_t)((raf->frame_rate * buffer_duration) / 1000000.0);
+	} else {
+		raf->buffer_size = (raf->buffer_size / frame_size) * frame_size;
+	}
+}
+
+
+static media_format
+vorbis_decoded_media_format()
+{
+	media_format format;
+	format.type = B_MEDIA_RAW_AUDIO;
+	init_vorbis_media_raw_audio_format(&format.u.raw_audio);
+	return format;
 }
 
 
@@ -93,8 +108,10 @@ VorbisDecoder::Setup(media_format *inputFormat,
 	// initialize decoder
 	vorbis_synthesis_init(&fDspState,&fInfo);
 	vorbis_block_init(&fDspState,&fBlock);
-
-	return B_OK;
+	// setup default output
+	media_format requested_format = vorbis_decoded_media_format();
+	((media_raw_audio_format)requested_format.u.raw_audio) = inputFormat->u.encoded_audio.output;
+	return NegotiateOutputFormat(&requested_format);
 }
 
 
@@ -115,24 +132,18 @@ VorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	//
 	// Be R5 behavior seems to be that we can never fail.  If we
 	// don't support the requested format, just return one we do.
-
-	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
-	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
-	ioDecodedFormat->u.raw_audio.frame_rate = (float)fInfo.rate;
-	ioDecodedFormat->u.raw_audio.channel_count = fInfo.channels;
-	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
-		ioDecodedFormat->u.raw_audio.channel_mask = (fInfo.channels == 1) ? B_CHANNEL_LEFT : (B_CHANNEL_LEFT | B_CHANNEL_RIGHT);
-		
-	int frame_size = (ioDecodedFormat->u.raw_audio.format & 0xf) * ioDecodedFormat->u.raw_audio.channel_count;
-	if (ioDecodedFormat->u.raw_audio.buffer_size == 0 || (ioDecodedFormat->u.raw_audio.buffer_size % frame_size) != 0)
-		ioDecodedFormat->u.raw_audio.buffer_size = AudioBufferSize(ioDecodedFormat->u.raw_audio);
-
+	media_format format = vorbis_decoded_media_format();
+	format.u.raw_audio.frame_rate = (float)fInfo.rate;
+	format.u.raw_audio.channel_count = fInfo.channels;
+	format.u.raw_audio.channel_mask = B_CHANNEL_LEFT | (fInfo.channels != 1 ? B_CHANNEL_RIGHT : 0);
+	if (!format_is_compatible(format,*ioDecodedFormat)) {
+		*ioDecodedFormat = format;
+	}
+	ioDecodedFormat->SpecializeTo(&format);
+	AdjustBufferSize(&ioDecodedFormat->u.raw_audio);
 	// setup output variables
-	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * 
-	             (ioDecodedFormat->u.raw_audio.channel_count);
+	fFrameSize = ioDecodedFormat->AudioFrameSize();
 	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
-
 	return B_OK;
 }
 
