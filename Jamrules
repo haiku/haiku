@@ -45,6 +45,7 @@ if $(WARNINGS) {
 
 KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
 KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
+KERNEL_CCFLAGS += "-DBOCHS_E9_HACK=$(BOCHS_E9_HACK) " ;
 
 AR = ar r ;
 OPTIM = -O2 ;

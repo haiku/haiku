@@ -10,8 +10,6 @@
 #include <arch/cpu.h>
 #include <arch/dbg_console.h>
 
-#include <arch/bochs_hack.h>
-
 #include <stage2.h>
 
 #include <string.h>
