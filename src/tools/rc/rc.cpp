@@ -27,7 +27,7 @@
 
 #include "rdef.h"
 
-#define TITLE "OpenBeOS Resource Compiler 1.1"
+#define TITLE "Haiku Resource Compiler 1.1"
 
 #define DEFAULT_OUT_RSRC  "out.rsrc"
 #define DEFAULT_OUT_RDEF  "out.rdef"
