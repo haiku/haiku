@@ -24,7 +24,9 @@ status_t init_messaging_service();
 status_t send_message(const void *message, int32 messageSize,
 	const messaging_target *targets, int32 targetCount);
 
+// syscalls
 area_id _user_register_messaging_service(sem_id lockingSem, sem_id counterSem);
+status_t _user_unregister_messaging_service();
 
 #ifdef __cplusplus
 }
@@ -39,7 +41,7 @@ namespace BPrivate {
 	class KMessage;
 }
 
-status_t send_message(const KMessage *message,
+status_t send_message(const BPrivate::KMessage *message,
 	const messaging_target *targets,
 	int32 targetCount);
 
