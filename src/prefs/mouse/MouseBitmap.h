@@ -14,7 +14,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 const int32 kMouseWidth = 57;
-const int32 kMouseHeight = 86;
+const int32 kMouseHeight = 82;
 const color_space kMouseColorSpace = B_CMAP8;
 
 const unsigned char kMouseBits [] = {
