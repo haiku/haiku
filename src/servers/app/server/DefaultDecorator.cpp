@@ -298,7 +298,7 @@ void DefaultDecorator::ResizeBy(BPoint pt)
 //	_tabrect.
 
 	_resizerect.OffsetBy(pt);
-	_zoomrect.OffsetBy(pt);
+//	_zoomrect.OffsetBy(pt);
 	_borderrect.right	+= pt.x;
 	_borderrect.bottom	+= pt.y;
 	
