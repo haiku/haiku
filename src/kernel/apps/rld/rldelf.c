@@ -50,6 +50,8 @@
 #define	PAGE_BASE(x) ((x) & ~(PAGE_MASK))
 #define TO_PAGE_SIZE(x) ((x + (PAGE_MASK)) & ~(PAGE_MASK))
 
+#define RLD_PROGRAM_BASE 0x00200000
+	/* keep in sync with app ldscript */
 
 enum {
 	RFLAG_RW				= 0x0001,
@@ -563,23 +565,17 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			baseName, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		if (image->dynamic_ptr && !fixed) {
-			/*
-			 * relocatable image... we can afford to place wherever
-			 */
+			// relocatable image... we can afford to place wherever
 			if (i == 0) {
-				/*
-				 * but only the first segment gets a free ride
-				 */
-				loadAddress = 0;
-				addressSpecifier = B_ANY_ADDRESS;
+				// but only the first segment gets a free ride
+				loadAddress = RLD_PROGRAM_BASE;
+				addressSpecifier = B_BASE_ADDRESS;
 			} else {
 				loadAddress = image->regions[i].vmstart + image->regions[i-1].delta;
 				addressSpecifier = B_EXACT_ADDRESS;
 			}
 		} else {
-			/*
-			 * not relocatable, put it where it asks or die trying
-			 */
+			// not relocatable, put it where it asks or die trying
 			loadAddress = image->regions[i].vmstart;
 			addressSpecifier = B_EXACT_ADDRESS;
 		}
@@ -608,9 +604,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
 			image->regions[i].vmstart = loadAddress;
 
-			/*
-			 * handle trailer bits in data segment
-			 */
+			// handle trailer bits in data segment
 			if (image->regions[i].flags & RFLAG_RW) {
 				addr_t startClearing;
 				addr_t toClear;
