@@ -18,7 +18,7 @@
 
 #include <arch/x86/interrupts.h>
 
-#define TRACE_ARCH_VM
+//#define TRACE_ARCH_VM
 #ifdef TRACE_ARCH_VM
 #	define TRACE(x) dprintf x
 #else
@@ -40,7 +40,7 @@ arch_vm_init_post_area(kernel_args *args)
 	void *dmaAddress;
 	area_id id;
 
-	TRACE(("arch_vm_init2: entry\n"));
+	TRACE(("arch_vm_init_post_area: entry\n"));
 
 	// account for DMA area and mark the pages unusable
 	vm_mark_page_range_inuse(0x0, 0xa0000 / B_PAGE_SIZE);
@@ -49,7 +49,7 @@ arch_vm_init_post_area(kernel_args *args)
 	id = map_physical_memory("dma_region", (void *)0x0, 0xa0000,
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &dmaAddress);
 	if (id < 0) {
-		panic("arch_vm_init_post_areas: unable to map dma region\n");
+		panic("arch_vm_init_post_area: unable to map dma region\n");
 		return B_NO_MEMORY;
 	}
 

@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -274,11 +274,11 @@ i386_handle_trap(struct iframe frame)
 }
 
 
-int
-arch_int_init(kernel_args *ka)
+status_t
+arch_int_init(kernel_args *args)
 {
 	// set the global idt variable
-	idt = (desc_table *)ka->arch_args.vir_idt;
+	idt = (desc_table *)args->arch_args.vir_idt;
 
 	// setup the interrupt controller
 	out8(0x11, 0x20);	// Start initialization sequence for #1.
@@ -337,16 +337,18 @@ arch_int_init(kernel_args *ka)
 	set_intr_gate(254, &trap254);
 	set_intr_gate(255, &trap255);
 
-	return 0;
+	return B_OK;
 }
 
 
-int
-arch_int_init2(kernel_args *ka)
+status_t
+arch_int_init_post_vm(kernel_args *args)
 {
-	idt = (desc_table *)ka->arch_args.vir_idt;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "idt", (void *)&idt,
-		B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
+	area_id area;
+
+	idt = (desc_table *)args->arch_args.vir_idt;
+	area = create_area("idt", (void *)&idt, B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	return 0;
+
+	return area >= B_OK ? B_OK : area;
 }
