@@ -6,35 +6,33 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
-#include <console.h>
-#include <debug.h>
-#include <malloc.h>
-#include <int.h>
-#include <vm.h>
+#include <KernelExport.h>
 #include <lock.h>
 #include <devfs.h>
-#include <Drivers.h>
-#include <Errors.h>
 
-#include <arch/cpu.h>
-#include <arch/int.h>
+#include <boot/kernel_args.h>
 
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "font.h"
 
+//#define TRACE_FB_CONSOLE
+#ifdef TRACE_FB_CONSOLE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 int fb_console_dev_init(kernel_args *ka);
 
-#if 0
-// this version makes the sh4 compiler throw up
 #define WRAP(x, limit) ((x) % (limit))
+	// This version makes the sh4 compiler throw up
+	// This would work: (((x) >= (limit)) ? ((x) - (limit)) : (x))
 #define INC_WITH_WRAP(x, limit) WRAP((x) + 1, (limit))
-#else
-#define WRAP(x, limit) (((x) >= (limit)) ? ((x) - (limit)) : (x))
-#define INC_WITH_WRAP(x, limit) WRAP((x) + 1, (limit))
-#endif
 
 enum {
 	CONSOLE_OP_WRITEXY = 2376
@@ -89,12 +87,12 @@ render_line8(char *line, int line_num)
 	int i;
 	uint8 *fb_spot = (uint8 *)(console.fb + line_num * CHAR_HEIGHT * console.fb_x);
 
-	for(y = 0; y < CHAR_HEIGHT; y++) {
+	for (y = 0; y < CHAR_HEIGHT; y++) {
 		uint8 *render_spot = console.render_buf;
-		for(x = 0; x < console.columns; x++) {
-			if(line[x]) {
+		for (x = 0; x < console.columns; x++) {
+			if (line[x]) {
 				uint8 bits = FONT[CHAR_HEIGHT * line[x] + y];
-				for(i = 0; i < CHAR_WIDTH; i++) {
+				for (i = 0; i < CHAR_WIDTH; i++) {
 					if(bits & 1) *render_spot = console.color;
 					else *render_spot = console.bcolor;
 					bits >>= 1;
@@ -120,12 +118,12 @@ render_line16(char *line, int line_num)
 	int i;
 	uint16 *fb_spot = (uint16 *)(console.fb + line_num * CHAR_HEIGHT * console.fb_x * 2);
 
-	for(y = 0; y < CHAR_HEIGHT; y++) {
+	for (y = 0; y < CHAR_HEIGHT; y++) {
 		uint16 *render_spot = console.render_buf;
-		for(x = 0; x < console.columns; x++) {
-			if(line[x]) {
+		for (x = 0; x < console.columns; x++) {
+			if (line[x]) {
 				uint8 bits = FONT[CHAR_HEIGHT * line[x] + y];
-				for(i = 0; i < CHAR_WIDTH; i++) {
+				for (i = 0; i < CHAR_WIDTH; i++) {
 					if(bits & 1) *render_spot = console.color;
 					else *render_spot = console.bcolor;
 					bits >>= 1;
@@ -151,12 +149,12 @@ render_line32(char *line, int line_num)
 	int i;
 	uint32 *fb_spot = (uint32 *)(console.fb + line_num * CHAR_HEIGHT * console.fb_x * 4);
 
-	for(y = 0; y < CHAR_HEIGHT; y++) {
+	for (y = 0; y < CHAR_HEIGHT; y++) {
 		uint32 *render_spot = console.render_buf;
-		for(x = 0; x < console.columns; x++) {
-			if(line[x]) {
+		for (x = 0; x < console.columns; x++) {
+			if (line[x]) {
 				uint8 bits = FONT[CHAR_HEIGHT * line[x] + y];
-				for(i = 0; i < CHAR_WIDTH; i++) {
+				for (i = 0; i < CHAR_WIDTH; i++) {
 					if(bits & 1) *render_spot = console.color;
 					else *render_spot = console.bcolor;
 					bits >>= 1;
@@ -174,18 +172,19 @@ render_line32(char *line, int line_num)
 }
 
 
-// scans through the lines, seeing if any needs to be repainted
+/** scans through the lines, seeing if any needs to be repainted */
+
 static void
-repaint()
+repaint(void)
 {
 	int i;
 	int line_num;
 
 	line_num = console.first_line;
-	for(i = 0; i < console.rows; i++) {
-//		dprintf("line_num = %d\n", line_num);
-		if(console.dirty_lines[line_num]) {
-//			dprintf("repaint(): rendering line %d %d\n", line_num, i);
+	for (i = 0; i < console.rows; i++) {
+		//TRACE(("line_num = %d\n", line_num));
+		if (console.dirty_lines[line_num]) {
+			//TRACE(("repaint(): rendering line %d %d, func = %p\n", line_num, i, console.render_line));
 			console.render_line(console.lines[line_num], i);
 			console.dirty_lines[line_num] = 0;
 		}
@@ -204,10 +203,10 @@ scrup(void)
 	// move the pointer to the top line down one
 	console.first_line = INC_WITH_WRAP(console.first_line, console.num_lines);
 
-//	dprintf("scrup: first_line now %d\n", console.first_line);
+	TRACE(("scrup: first_line now %d\n", console.first_line));
 
 	line_num = console.first_line;
-	for(i=0; i<console.rows; i++) {
+	for (i = 0; i < console.rows; i++) {
 		console.dirty_lines[line_num] = 1;
 		line_num = INC_WITH_WRAP(line_num, console.num_lines);
 	}
@@ -221,7 +220,7 @@ scrup(void)
 static void
 lf(void)
 {
-	if(console.y + 1 < console.rows) {
+	if (console.y + 1 < console.rows) {
 		console.y++;
 		return;
 	}
@@ -241,14 +240,14 @@ del(void)
 {
 	int target_line = WRAP(console.first_line + console.y, console.num_lines);
 
-	if(console.x > 0) {
+	if (console.x > 0) {
 		console.x--;
 		console.lines[target_line][console.x] = ' ';
 		console.dirty_lines[target_line] = 1;
 	}
 }
 
-
+#if 0
 static void
 save_cur(void)
 {
@@ -263,20 +262,20 @@ restore_cur(void)
 	console.x = console.saved_x;
 	console.y = console.saved_y;
 }
+#endif
 
 
 static char
-console_putch(const char c)
+console_put_character(const char c)
 {
 	int target_line;
 
-	if(console.x+1 >= console.columns) {
+	if (console.x + 1 >= console.columns) {
 		cr();
 		lf();
 	}
 
 	target_line = WRAP(console.first_line + console.y, console.num_lines);
-//	dprintf("target_line = %d\n", target_line);
 	console.lines[target_line][console.x++] = c;
 	console.lines[target_line][console.x] = 0;
 	console.dirty_lines[target_line] = 1;
@@ -285,14 +284,23 @@ console_putch(const char c)
 }
 
 
-static
-void tab(void)
+static void
+tab(void)
 {
+	int i = console.x;
+
 	console.x = (console.x + TAB_SIZE) & ~TAB_MASK;
 	if (console.x >= console.columns) {
 		console.x -= console.columns;
+		i = 0;
 		lf();
 	}
+
+	// We need to insert spaces, or else the whole line is going to be ignored.
+	for (; i < console.x; i++)
+		console.lines[console.first_line + console.y][i] = ' ';
+
+	// There is no need to mark the line dirty
 }
 
 
@@ -313,8 +321,6 @@ console_freecookie(void * cookie)
 static status_t
 console_close(void * cookie)
 {
-//	dprintf("console_close: entry\n");
-
 	return B_OK;
 }
 
@@ -333,13 +339,14 @@ console_read(void * cookie, off_t pos, void *buffer, size_t *_length)
 
 
 static status_t
-_console_write(const void *buf, size_t *len)
+_console_write(const void *buffer, size_t *_length)
 {
+	size_t length = *_length;
 	size_t i;
 	const char *c;
 
-	for (i = 0; i < *len; i++) {
-		c = &((const char *)buf)[i];
+	for (i = 0; i < length; i++) {
+		c = &((const char *)buffer)[i];
 		switch (*c) {
 			case '\n':
 				cr();
@@ -357,7 +364,7 @@ _console_write(const void *buf, size_t *len)
 			case '\0':
 				break;
 			default:
-				console_putch(*c);
+				console_put_character(*c);
 		}
 	}
 	return B_OK;
@@ -365,15 +372,15 @@ _console_write(const void *buf, size_t *len)
 
 
 static status_t
-console_write(void * cookie, off_t pos, const void *buffer, size_t *len)
+console_write(void * cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	status_t err;
 
-//	dprintf("console_write: entry, len = %d\n", len);
+	TRACE(("console_write: text = \"%s\", len = %lu\n", (char *)buffer, *_length));
 
 	mutex_lock(&console.lock);
 
-	err = _console_write(buffer, len);
+	err = _console_write(buffer, _length);
 //	update_cursor(x, y);
 	repaint();
 
@@ -389,7 +396,7 @@ console_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 	int err;
 	
 	switch (op) {
-		case CONSOLE_OP_WRITEXY:
+/*		case CONSOLE_OP_WRITEXY:
 		{
 			size_t wlen;
 			int x,y;
@@ -409,7 +416,7 @@ console_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 			mutex_unlock(&console.lock);
 			break;
 		}
-		default:
+*/		default:
 			err = EINVAL;
 	}
 
@@ -417,7 +424,7 @@ console_ioctl(void *cookie, uint32 op, void *buffer, size_t len)
 }
 
 
-device_hooks fb_console_hooks = {
+static device_hooks sFrameBufferConsoleHooks = {
 	&console_open,
 	&console_close,
 	&console_freecookie,
@@ -426,93 +433,92 @@ device_hooks fb_console_hooks = {
 	&console_write,
 	NULL,
 	NULL,
-//	NULL,
-//	NULL
 };
 
 
 int
 fb_console_dev_init(kernel_args *ka)
 {
-	if (ka->fb.enabled) {
-		int i;
+	int i;
 
-		dprintf("fb_console_dev_init: framebuffer found at 0x%lx, x %d, y %d, bit depth %d\n",
-			ka->fb.mapping.start, ka->fb.x_size, ka->fb.y_size, ka->fb.bit_depth);
+	if (!ka->fb.enabled)
+		return B_OK;
 
-		memset(&console, 0, sizeof(console));
+	TRACE(("fb_console_dev_init: framebuffer found at 0x%lx, x %d, y %d, bit depth %d\n",
+		ka->fb.mapping.start, ka->fb.x_size, ka->fb.y_size, ka->fb.bit_depth));
 
-		if (ka->fb.already_mapped) {
-			console.fb = ka->fb.mapping.start;
-		} else {
-			vm_map_physical_memory(vm_get_kernel_aspace_id(), "vesa_fb", (void *)&console.fb, B_ANY_KERNEL_ADDRESS,
-				ka->fb.mapping.size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, ka->fb.mapping.start);
-		}
+	memset(&console, 0, sizeof(console));
 
-		console.fb_x = ka->fb.x_size;
-		console.fb_y = ka->fb.y_size;
-		console.fb_pixel_bytes = ka->fb.bit_depth / 8;
-		console.fb_size = ka->fb.mapping.size;
+	if (ka->fb.already_mapped) {
+		console.fb = ka->fb.mapping.start;
+	} else {
+		map_physical_memory("vesa_fb", (void *)ka->fb.mapping.start, ka->fb.mapping.size,
+			B_ANY_KERNEL_ADDRESS, /*B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA*/ 0, (void **)&console.fb);
+	}
 
-		switch (console.fb_pixel_bytes) {
-			case 1:
-				console.render_line = &render_line8;
-				console.color = 0;		// black
-				console.bcolor = 63;	// white
-				break;
-			case 2:
-				console.render_line = &render_line16;
-				console.color = 0xffff;
-				console.bcolor = 0;
-				break;
-			case 4:
-				console.render_line = &render_line32;
-				console.color = 0x00ffffff;
-				console.bcolor = 0;
-				break;
+	console.fb_x = ka->fb.x_size;
+	console.fb_y = ka->fb.y_size;
+	console.fb_pixel_bytes = ka->fb.bit_depth / 8;
+	console.fb_size = ka->fb.mapping.size;
 
-			default:
-				return 0;
-		}
+	switch (console.fb_pixel_bytes) {
+		case 1:
+			console.render_line = &render_line8;
+			console.color = 0;		// black
+			console.bcolor = 63;	// white
+			break;
+		case 2:
+			console.render_line = &render_line16;
+			console.color = 0xffff;
+			console.bcolor = 0;
+			break;
+		case 4:
+			console.render_line = &render_line32;
+			console.color = 0x00ffffff;
+			console.bcolor = 0;
+			break;
 
-		dprintf("framebuffer mapped at 0x%lx\n", console.fb);
+		default:
+			return 0;
+	}
 
-		// figure out the number of rows/columns we have
-		console.rows = console.fb_y / CHAR_HEIGHT;
-		console.columns = console.fb_x / CHAR_WIDTH;
-		dprintf("%d rows %d columns\n", console.rows, console.columns);
+	TRACE(("framebuffer mapped at 0x%lx\n", console.fb));
 
-		console.x = 0;
-		console.y = 0;
-		console.saved_x = 0;
-		console.saved_y = 0;
+	// figure out the number of rows/columns we have
+	console.rows = console.fb_y / CHAR_HEIGHT;
+	console.columns = console.fb_x / CHAR_WIDTH;
+	TRACE(("%d rows %d columns\n", console.rows, console.columns));
 
-		dprintf("console %p\n", &console);
+	console.x = 0;
+	console.y = 0;
+	console.saved_x = 0;
+	console.saved_y = 0;
 
-		// allocate some memory for this
-		console.render_buf = malloc(console.fb_x * console.fb_pixel_bytes);
-		memset((void *)console.render_buf, console.bcolor, console.fb_x * console.fb_pixel_bytes);
-		console.buf = malloc(console.rows * (console.columns+1));
-		memset(console.buf, 0, console.rows * (console.columns+1));
-		console.lines = malloc(console.rows * sizeof(char *));
-		console.dirty_lines = malloc(console.rows);
-		// set up the line pointers
-		for (i = 0; i < console.rows; i++) {
-			console.lines[i] = (char *)((addr_t)console.buf + i*(console.columns+1));
-			console.dirty_lines[i] = 1;
-		}
-		console.num_lines = console.rows;
-		console.first_line = 0;
+	// allocate some memory for this
+	console.render_buf = malloc(console.fb_x * console.fb_pixel_bytes);
+	memset((void *)console.render_buf, console.bcolor, console.fb_x * console.fb_pixel_bytes);
+	console.buf = malloc(console.rows * (console.columns+1));
+	memset(console.buf, 0, console.rows * (console.columns+1));
+	console.lines = malloc(console.rows * sizeof(char *));
+	console.dirty_lines = malloc(console.rows);
+	// set up the line pointers
+	for (i = 0; i < console.rows; i++) {
+		console.lines[i] = (char *)((addr_t)console.buf + i*(console.columns+1));
+		console.dirty_lines[i] = 1;
+	}
+	console.num_lines = console.rows;
+	console.first_line = 0;
 
-		repaint();
+	repaint();
 
-		mutex_init(&console.lock, "console_lock");
-		console.keyboard_fd = open("/dev/keyboard", O_RDONLY);
-		if (console.keyboard_fd < 0)
-			panic("fb_console_dev_init: error opening /dev/keyboard\n");
+	mutex_init(&console.lock, "console_lock");
+	console.keyboard_fd = open("/dev/keyboard", O_RDONLY);
+	if (console.keyboard_fd < 0)
+		panic("fb_console_dev_init: error opening /dev/keyboard\n");
 
-		// create device node
-		devfs_publish_device("console", NULL, &fb_console_hooks);
+	// create device node
+	if (devfs_publish_device("console", NULL, &sFrameBufferConsoleHooks) != B_OK)
+		panic("fb_console: could not publish device!\n");
 
 #if 0
 {
@@ -564,7 +570,6 @@ fb_console_dev_init(kernel_args *ka)
 		}
 }
 #endif
-	}
 
 	return 0;
 }
