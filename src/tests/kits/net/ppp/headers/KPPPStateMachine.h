@@ -45,7 +45,17 @@ class PPPStateMachine {
 			{ return fPhase; }
 		
 		uint8 NextID();
-			// return the next id for lcp_packets
+			// return the next id for LCP packets
+		
+		void SetMagicNumber(uint32 magicNumber)
+			{ fMagicNumber = magicNumber; }
+		uint32 MagicNumber() const
+			{ return fMagicNumber; }
+		
+		// public actions
+		bool Reconfigure();
+		bool SendEchoRequest();
+		bool SendDiscardRequest();
 		
 		// public events
 		void AuthenticationRequested();
@@ -124,7 +134,7 @@ class PPPStateMachine {
 		void ThisLayerFinished();
 		void InitializeRestartCount();
 		void ZeroRestartCount();
-		void SendConfigureRequest();
+		bool SendConfigureRequest();
 		void SendConfigureAck(struct mbuf *packet);
 		void SendConfigureNak(struct mbuf *packet);
 		void SendTerminateRequest();
@@ -147,6 +157,7 @@ class PPPStateMachine {
 		PPP_STATE fState;
 		
 		vint32 fID;
+		uint32 fMagicNumber;
 		
 		PPP_AUTHENTICATION_STATUS fAuthenticationStatus,
 			fPeerAuthenticationStatus;
@@ -157,8 +168,8 @@ class PPPStateMachine {
 		// counters and timers
 		int32 fMaxRequest, fMaxTerminate, fMaxNak;
 		int32 fRequestCounter, fTerminateCounter, fNakCounter;
-		uint8 fRequestID, fTerminateID;
-			// the ID we used for the last configure/terminate request
+		uint8 fRequestID, fTerminateID, fEchoID;
+			// the ID we used for the last configure/terminate/echo request
 		bigtime_t fNextTimeout;
 };
 

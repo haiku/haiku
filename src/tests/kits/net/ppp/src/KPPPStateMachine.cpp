@@ -23,12 +23,12 @@
 
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(&interface), fLCP(interface.LCP()), fPhase(PPP_DOWN_PHASE),
-	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF),
+	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF), fMagicNumber(0),
 	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fAuthenticationName(NULL), fPeerAuthenticationName(NULL),
 	fMaxRequest(10), fMaxTerminate(2), fMaxNak(5),
-	fRequestID(0), fTerminateID(0), fNextTimeout(0)
+	fRequestID(0), fTerminateID(0), fEchoID(0), fNextTimeout(0)
 {
 }
 
@@ -86,6 +86,77 @@ PPPStateMachine::NewPhase(PPP_PHASE next)
 		fPhase = PPP_DOWN_PHASE;
 	else
 		fPhase = next;
+}
+
+
+// public actions
+bool
+PPPStateMachine::Reconfigure()
+{
+	LockerHelper locker(fLock);
+	
+	if(State() < PPP_REQ_SENT_STATE)
+		return false;
+	
+	NewState(PPP_REQ_SENT_STATE);
+	NewPhase(PPP_ESTABLISHMENT_PHASE);
+	
+	DownProtocols();
+	DownEncapsulators();
+	ResetOptionHandlers();
+	
+	locker.UnlockNow();
+	
+	return SendConfigureRequest();
+}
+
+
+bool
+PPPStateMachine::SendEchoRequest()
+{
+	if(State() != PPP_OPENED_STATE)
+		return false;
+	
+	struct mbuf *packet = m_gethdr(MT_DATA);
+	if(!packet)
+		return false;
+	
+	packet->m_data += LCP().AdditionalOverhead();
+	packet->m_len = 8;
+		// echo requests are at least eight bytes long
+	
+	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
+	request->code = PPP_ECHO_REQUEST;
+	request->id = NextID();
+	fEchoID = request->id;
+	request->length = htons(packet->m_len);
+	memcpy(request->data, &fMagicNumber, sizeof(fMagicNumber));
+	
+	return LCP.Send(packet) == B_OK;
+}
+
+
+bool
+PPPStateMachine::SendDiscardRequest()
+{
+	if(State() != PPP_OPENED_STATE)
+		return false;
+	
+	struct mbuf *packet = m_gethdr(MT_DATA);
+	if(!packet)
+		return false;
+	
+	packet->m_data += LCP().AdditionalOverhead();
+	packet->m_len = 8;
+		// discard requests are at least eight bytes long
+	
+	ppp_lcp_packet *request = mtod(packet, ppp_lcp_packet*);
+	request->code = PPP_DISCARD_REQUEST;
+	request->id = NextID();
+	request->length = htons(packet->m_len);
+	memcpy(request->data, &fMagicNumber, sizeof(fMagicNumber));
+	
+	return LCP.Send(packet) == B_OK;
 }
 
 
@@ -1067,6 +1138,8 @@ PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol,
 void
 PPPStateMachine::RXJGoodEvent(struct mbuf *packet)
 {
+	// This method does not m_freem(packet) because the acceptable rejects are
+	// also passed to the parent. RXJEvent() will m_freem(packet) when needed.
 	LockerHelper locker(fLock);
 	
 	switch(State()) {
@@ -1135,6 +1208,11 @@ PPPStateMachine::RXREvent(struct mbuf *packet)
 {
 	ppp_lcp_packet *echo = mtod(packet, ppp_lcp_packet*);
 	
+	if(echo->code == PPP_ECHO_REPLY && echo->id != fEchoID) {
+		// TODO:
+		// log that we got a reply, but no request was sent
+	}
+	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -1145,6 +1223,7 @@ PPPStateMachine::RXREvent(struct mbuf *packet)
 			if(echo->code == PPP_ECHO_REQUEST)
 				SendEchoReply(packet);
 		return;
+			// this prevents the packet from being freed
 		
 		default:
 			;
@@ -1401,7 +1480,7 @@ PPPStateMachine::ZeroRestartCount()
 }
 
 
-void
+bool
 PPPStateMachine::SendConfigureRequest()
 {
 	--fRequestCounter;
@@ -1414,19 +1493,19 @@ PPPStateMachine::SendConfigureRequest()
 		// add all items
 		if(!LCP().OptionHandlerAt(index)->AddToRequest(&request)) {
 			CloseEvent();
-			return;
+			return false;
 		}
 	}
 	
-	LCP().Send(request.ToMbuf(LCP().AdditionalOverhead()));
+	return LCP().Send(request.ToMbuf(LCP().AdditionalOverhead())) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 {
 	if(!packet)
-		return;
+		return false;
 	
 	mtod(packet, ppp_lcp_packet*)->code = PPP_CONFIGURE_ACK;
 	PPPConfigurePacket ack(packet);
@@ -1435,15 +1514,15 @@ PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++)
 		LCP().OptionHandlerAt(index)->SendingAck(&ack);
 	
-	LCP().Send(packet);
+	return LCP().Send(packet) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 {
 	if(!packet)
-		return;
+		return false;
 	
 	ppp_lcp_packet *nak = mtod(packet, ppp_lcp_packet*);
 	if(nak->code == PPP_CONFIGURE_NAK) {
@@ -1454,16 +1533,16 @@ PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 			--fNakCounter;
 	}
 	
-	LCP().Send(packet);
+	return LCP().Send(packet) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendTerminateRequest()
 {
 	struct mbuf *m = m_gethdr(MT_DATA);
 	if(!m)
-		return;
+		return false;
 	
 	--fTerminateCounter;
 	
@@ -1477,11 +1556,11 @@ PPPStateMachine::SendTerminateRequest()
 	request->id = fTerminateID = NextID();
 	request->length = htons(4);
 	
-	LCP().Send(m);
+	return LCP().Send(m) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 {
 	struct mbuf *reply = request;
@@ -1491,7 +1570,7 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 	if(!reply) {
 		reply = m_gethdr(MT_DATA);
 		if(!reply)
-			return;
+			return false;
 		
 		reply->m_data += LCP().AdditionalOverhead();
 		reply->m_len = 4;
@@ -1502,17 +1581,17 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 	
 	ack = mtod(reply, ppp_lcp_packet*);
 	ack->code = PPP_TERMINATE_ACK;
-	ack->length = 4;
+	ack->length = htons(4);
 	
-	LCP().Send(reply);
+	return LCP().Send(reply) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code)
 {
 	if(!packet)
-		return;
+		return false;
 	
 	int32 length;
 		// additional space needed for this reject
@@ -1547,21 +1626,28 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code
 	if(code == PPP_PROTOCOL_REJECT)
 		memcpy(&reject->data, &protocol, sizeof(protocol));
 	
-	LCP().Send(packet);
+	return LCP().Send(packet) == B_OK;
 }
 
 
-void
+bool
 PPPStateMachine::SendEchoReply(struct mbuf *request)
 {
 	if(!request)
-		return;
+		return false;
 	
 	ppp_lcp_packet *reply = mtod(request, ppp_lcp_packet*);
 	reply->code = PPP_ECHO_REPLY;
 		// the request becomes a reply
 	
-	LCP().Send(request);
+	if(request->m_flags & M_PKTHDR)
+		request->m_pkthdr.len = 8;
+	
+	request->m_len = 8;
+	
+	memcpy(reply->data, &fMagicNumber, sizeof(fMagicNumber));
+	
+	return LCP().Send(request) == B_OK;
 }
 
 

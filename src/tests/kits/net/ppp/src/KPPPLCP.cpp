@@ -159,13 +159,25 @@ PPPLCP::Send(struct mbuf *packet)
 status_t
 PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 {
+	if(!packet)
+		return B_ERROR;
+	
 	if(protocol != PPP_LCP_PROTOCOL)
 		return PPP_UNHANDLED;
+	
+	struct mbuf *copy = m_gethdr(MT_DATA);
+	if(copy) {
+		copy->m_data += AdditionalOverhead();
+		copy->m_len = packet->m_len;
+		memcpy(copy->m_data, packet->m_data, copy->m_len);
+	}
 	
 	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
 	if(ntohs(data->length) < 4)
 		return B_ERROR;
+	
+	bool handled = true;
 	
 	switch(data->code) {
 		case PPP_CONFIGURE_REQUEST:
@@ -198,36 +210,62 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 		break;
 		
 		case PPP_ECHO_REQUEST:
+		case PPP_ECHO_REPLY:
+		case PPP_DISCARD_REQUEST:
 			StateMachine().RXREvent(packet);
 		break;
 		
-		case PPP_ECHO_REPLY:
-		case PPP_DISCARD_REQUEST:
+		default:
 			m_freem(packet);
-			// do nothing
-		break;
-		
-		default: {
-			status_t result = PPP_UNHANDLED;
-			
-			// try to find LCP extensions that can handle this code
-			PPPLCPExtension *extension;
-			for(int32 index = 0; index < CountLCPExtensions(); index++) {
-				extension = LCPExtensionAt(index);
-				if(extension->IsEnabled() && extension->Code() == data->code)
-					result = extension->Receive(packet, data->code);
+			handled = false;
+	}
+	
+	if(!copy)
+		return handled ? B_OK : B_ERROR;
+	
+	packet = copy;
+	copy = NULL;
+	
+	status_t result = B_OK;
+	
+	// Try to find LCP extensions that can handle this code.
+	// We must duplicate the packet in order to ask all handlers.
+	PPPLCPExtension *extension;
+	for(int32 index = 0; index < CountLCPExtensions(); index++) {
+		extension = LCPExtensionAt(index);
+		if(extension->IsEnabled() && extension->Code() == data->code) {
+			if(!copy) {
+				copy = m_gethdr(MT_DATA);
+				if(!copy)
+					return B_ERROR;
+				
+				copy->m_data += AdditionalOverhead();
+				copy->m_len = packet->m_len;
+				memcpy(copy->m_data, packet->m_data, copy->m_len);
 			}
 			
-			if(result == PPP_UNHANDLED) {
-				StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
-				return PPP_REJECTED;
-			}
+			result = extension->Receive(copy, data->code);
 			
-			return result;
+			if(result == B_OK) {
+				copy = NULL;
+				handled = true;
+			} else if(result != PPP_UNHANDLED)
+				return result;
 		}
 	}
 	
-	return B_OK;
+	if(copy)
+		m_freem(copy);
+	
+	if(!handled) {
+		StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
+		return PPP_REJECTED;
+	}
+	
+	if(packet)
+		m_freem(packet);
+	
+	return result;
 }
 
 

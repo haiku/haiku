@@ -11,7 +11,10 @@
 #include "net_module.h"
 
 
-#define PPP_MANAGER_MODULE_NAME "network/interfaces/ppp"
+#define PPP_MANAGER_MODULE_NAME		 "network/interfaces/ppp"
+
+#define PPP_UNDEFINED_INTERFACE_ID	0
+	// create_interface() returns this value on failure
 
 // this allows you to ask for specific interface_ids
 enum PPP_INTERFACE_FILTER {
@@ -29,6 +32,7 @@ typedef struct ppp_manager_info {
 	void (*delete_interface)(interface_id ID);
 		// this marks the interface for deletion
 	void (*remove_interface)(interface_id ID);
+		// remove the interface from database (make sure you can delete it yourself!)
 	
 	ifnet* (*register_interface)(interface_id ID);
 	bool (*unregister_interface)(interface_id ID);

@@ -240,6 +240,7 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			ppp_interface_info *info = (ppp_interface_info*) data;
 			memset(info, 0, sizeof(ppp_interface_info_t));
 			info->settings = Settings();
+			info->ifnet = Ifnet();
 			info->mode = Mode();
 			info->state = State();
 			info->phase = Phase();

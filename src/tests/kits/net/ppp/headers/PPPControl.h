@@ -86,6 +86,7 @@ typedef struct ppp_control_info {
 
 typedef struct ppp_interface_info {
 	const driver_settings *settings;
+	struct ifnet *ifnet;
 	
 	PPP_MODE mode;
 	PPP_STATE state;
