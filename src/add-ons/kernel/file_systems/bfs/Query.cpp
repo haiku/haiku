@@ -22,6 +22,7 @@
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 #include <AppDefs.h>
+#include <fs_query.h>
 
 #include <malloc.h>
 #include <stdio.h>
@@ -130,14 +131,17 @@ class Equation : public Term {
 
 		virtual status_t InitCheck();
 
-		status_t	ParseQuotedString(char **_start,char **_end);
+		status_t	ParseQuotedString(char **_start, char **_end);
 		char		*CopyString(char *start, char *end);
 
-		virtual status_t Match(Inode *inode,const char *attribute = NULL,int32 type = 0,const uint8 *key = NULL,size_t size = 0);
+		virtual status_t Match(Inode *inode, const char *attribute = NULL, int32 type = 0,
+						const uint8 *key = NULL, size_t size = 0);
 		virtual void Complement();
 
-		status_t	PrepareQuery(Volume *volume, Index &index, TreeIterator **iterator);
-		status_t	GetNextMatching(Volume *volume,TreeIterator *iterator,struct dirent *dirent,size_t bufferSize);
+		status_t	PrepareQuery(Volume *volume, Index &index, TreeIterator **iterator,
+						bool queryNonIndexed);
+		status_t	GetNextMatching(Volume *volume, TreeIterator *iterator,
+						struct dirent *dirent, size_t bufferSize);
 
 		virtual void CalculateScore(Index &index);
 		virtual int32 Score() const { return fScore; }
@@ -905,10 +909,15 @@ Equation::CalculateScore(Index &index)
 
 
 status_t
-Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator)
+Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator, bool queryNonIndexed)
 {
-	type_code type;
 	status_t status = index.SetTo(fAttribute);
+	
+	// if we should query attributes without an index, we can just proceed here
+	if (status < B_OK && !queryNonIndexed)
+		return B_ENTRY_NOT_FOUND;
+
+	type_code type;
 
 	// special case for OP_UNEQUAL - it will always operate through the whole index
 	// but we need the call to the original index to get the correct type
@@ -1428,13 +1437,14 @@ Expression::InitCheck()
 //	#pragma mark -
 
 
-Query::Query(Volume *volume, Expression *expression)
+Query::Query(Volume *volume, Expression *expression, uint32 flags)
 	:
 	fVolume(volume),
 	fExpression(expression),
 	fCurrent(NULL),
 	fIterator(NULL),
 	fIndex(volume),
+	fFlags(flags),
 	fPort(-1)
 {
 	// if the expression has a valid root pointer, the whole tree has
@@ -1468,14 +1478,16 @@ Query::Query(Volume *volume, Expression *expression)
 		} else if (term->Op() == OP_EQUATION || fStack.Push((Equation *)term) < B_OK)
 			FATAL(("Unknown term on stack or stack error"));
 	}
-	
-	volume->AddQuery(this);
+
+	if (fFlags & B_LIVE_QUERY)
+		volume->AddQuery(this);
 }
 
 
 Query::~Query()
 {
-	fVolume->RemoveQuery(this);
+	if (fFlags & B_LIVE_QUERY)
+		fVolume->RemoveQuery(this);
 }
 
 
@@ -1488,12 +1500,13 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 		if (fIterator == NULL) {
 			if (!fStack.Pop(&fCurrent)
 				|| fCurrent == NULL
-				|| fCurrent->PrepareQuery(fVolume, fIndex, &fIterator) < B_OK)
+				|| fCurrent->PrepareQuery(fVolume, fIndex, &fIterator,
+						fFlags & B_QUERY_NON_INDEXED) < B_OK)
 				return B_ENTRY_NOT_FOUND;
 		}
 		if (fCurrent == NULL)
 			RETURN_ERROR(B_ERROR);
-	
+
 		status_t status = fCurrent->GetNextMatching(fVolume, fIterator, dirent, size);
 		if (status < B_OK) {
 			delete fIterator;
@@ -1512,6 +1525,13 @@ Query::SetLiveMode(port_id port, int32 token)
 {
 	fPort = port;
 	fToken = token;
+
+	if ((fFlags & B_LIVE_QUERY) == 0) {
+		// you can decide at any point to set the live query mode,
+		// only live queries have to be updated by attribute changes
+		fFlags |= B_LIVE_QUERY;
+		fVolume->AddQuery(this);
+	}
 }
 
 
