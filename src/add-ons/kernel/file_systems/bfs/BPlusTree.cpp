@@ -1622,6 +1622,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 
 		nodeOffset = nextOffset;
 	}
+	FATAL(("b+tree node at %Ld could not be loaded\n", nodeOffset));
 	RETURN_ERROR(B_ERROR);
 }
 
