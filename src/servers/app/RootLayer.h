@@ -74,6 +74,12 @@ public:
 			WinBorder*			WinBorderAt(const BPoint& pt) const;
 	inline	WinBorder*			FocusWinBorder() const { return fWorkspace[fActiveWksIndex]->Focus(); }
 	inline	WinBorder*			FrontWinBorder() const { return fWorkspace[fActiveWksIndex]->Front(); }
+	inline	WinBorder*			ActiveWinBorder() const {
+									return (fWorkspace[fActiveWksIndex]->Focus() == 
+												fWorkspace[fActiveWksIndex]->Front()
+											&& fWorkspace[fActiveWksIndex]->Front() != NULL)?
+									fWorkspace[fActiveWksIndex]->Front(): NULL;
+								}
 
 	inline	void				SetWorkspaceCount(int32 wksCount);
 	inline	int32				WorkspaceCount() const { return fWsCount; }
@@ -138,6 +144,8 @@ friend class Desktop;
 
 			void				invalidate_layer(Layer *layer, const BRegion &region);
 			void				redraw_layer(Layer *layer, const BRegion &region);
+
+			void				winborder_activation(WinBorder* exActive);
 
 			// Input related methods
 			void				MouseEventHandler(int32 code, BPortLink& link);
