@@ -374,6 +374,7 @@
 # include <signal.h>
 # include <string.h>
 # include <time.h>
+# include <limits.h>
 
 # ifndef OS_QNX
 # include <memory.h>
