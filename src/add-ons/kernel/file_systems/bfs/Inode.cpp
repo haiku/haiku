@@ -1805,7 +1805,7 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 
 	RecursiveLocker locker(fVolume->Lock());
 
-	// does the file even exists?
+	// does the file even exist?
 	off_t id;
 	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)
 		return B_ENTRY_NOT_FOUND;
