@@ -1026,78 +1026,17 @@ struct buffer_clone_info
  *************************************************************/
 
 
-//	If you for some reason need to get rid of the media_server (and friends)
-//	use these functions, rather than sending messages yourself.
-//	The callback will be called for various stages of the process, with 100 meaning completely done
-//	The callback should always return TRUE for the time being.
-status_t shutdown_media_server(bigtime_t timeout = B_INFINITE_TIMEOUT, bool (*progress)(int stage, const char * message, void * cookie) = NULL, void * cookie = NULL)
-{
-	status_t err = B_OK;
-	BMessage msg(B_QUIT_REQUESTED), reply;
-	if((err = msg.AddBool("be:_user_request", true))!=B_OK)
-		return err;
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
-		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE);
-		progress(10, "Telling media_server to quit.", cookie);
-		
-		if((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000))!=B_OK)
-			return err;
-		int32 rv;
-		if(((err = reply.FindInt32("error", &rv))==B_OK) && (rv != B_OK))
-			return err;
-	}
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
-		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
-		progress(20, "Telling media_addon_server to quit.", cookie);
-		
-		if((err = messenger.SendMessage(&msg, &reply, 2000000, 2000000))!=B_OK)
-			return err;
-		int32 rv;
-		if(((err = reply.FindInt32("error", &rv))==B_OK) && (rv != B_OK))
-			return err;
-	}
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
-		progress(40, "Waiting for media_server to quit.", cookie);
-		snooze(200000);
-	}
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
-		progress(50, "Waiting for media_addon_server to quit.", cookie);
-		snooze(200000);
-	}
-	
-	progress(70, "Cleaning Up.", cookie);
-	snooze(2000000);
-	kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
-	kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
-	
-	progress(100, "Done Shutting Down.", cookie);
-	snooze(1000000);
-	
-	return B_OK;
-}
+// shutdown_media_server()
+// is provided by libbe.so and thus not implemented here
 
-status_t launch_media_server(uint32 flags = 0)
-{
-	status_t err = B_OK;
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE) 
-		|| be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
-		return B_ALREADY_RUNNING;
-	err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
-	if (err == B_OK) {
-		for(int32 i=0; i<15; i++) {
-			snooze(2000000);
-			BMessage msg(1), reply;
-			BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
-			err = B_MEDIA_SYSTEM_FAILURE;
-			if (messenger.IsValid()) {
-				messenger.SendMessage(&msg, &reply, 2000000, 2000000);
-				err = B_OK;
-				break;
-			}
-		}
-	} 
-	return err;
-}
+
+// launch_media_server()
+// is provided by libbe.so and thus not implemented here
+
+
+/*************************************************************
+ * 
+ *************************************************************/
 
 
 //	Given an image_id, prepare that image_id for realtime media
