@@ -4,6 +4,7 @@ KernelObjects
 	exec_test.c
 	false_main.c
 	fibo_main.c
+	fork_test.c
 	init.c
 	monitor_test.c
 	pipe_test.c

@@ -1,20 +1,22 @@
 /*
-** Copyright 2003-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
+
+#include <image.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <syscalls.h>
 
 
 int
 main(int argc, char **argv)
 {
-	int i, rc;
-	team_id pid;
+	int i;
+	thread_id pid;
+	status_t rc;
 	char temp[16];
 	char *var;
 	
@@ -42,7 +44,7 @@ main(int argc, char **argv)
 
 	if (argc > 1) {
 		char buffer[16];
-		char *_argv[] = { argv[0], buffer, NULL };
+		const char *_argv[] = { argv[0], buffer, NULL };
 		int val = atoi(argv[1]) - 1;
 		
 		sprintf(temp, "VAR_%d", val);
@@ -54,8 +56,8 @@ main(int argc, char **argv)
 		if (val > 0) {
 			printf("Spawning test (%d left)\n", val);
 			sprintf(buffer, "%d", val);
-			pid = _kern_create_team(_argv[0], _argv[0], _argv, 2, NULL, 0, 5);
-			_kern_wait_for_team(pid, &rc);
+			pid = load_image(2, _argv, (const char **)environ);
+			wait_for_thread(pid, &rc);
 		}
 	}
 	return 0;

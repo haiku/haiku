@@ -345,19 +345,20 @@ int main(int argc, char **argv)
 		printf("spawning %d copies of true\n", 100);
 
 		for(i=0; i<100; i++) {
-			team_id id;
+			const char *args[] = {"true", NULL};
+			thread_id id;
 			bigtime_t t;
 
 			printf("%d...", i);
 
 			t = system_time();
 
-			id = _kern_create_team("/bin/true", "true", NULL, 0, NULL, 0, 20);
-			if(id <= 0x2) {
+			id = load_image(1, args, (const char **)environ);
+			if (id <= 0x2) {
 				printf("new team returned 0x%lx!\n", id);
 				return -1;
 			}
-			_kern_wait_for_team(id, NULL);
+			wait_for_thread(id, NULL);
 
 			printf("done (%Ld usecs)\n", system_time() - t);
 		}

@@ -4,9 +4,11 @@
 */
 
 
+#include <image.h>
+
 #include <unistd.h>
 #include <stdio.h>
-#include <syscalls.h>
+#include <stdlib.h>
 #include <fcntl.h>
 
 
@@ -26,32 +28,35 @@ setup_io(void)
 
 
 int
-main()
+main(int argc, char **argv)
 {
 	setup_io();
 
 	printf("Welcome to Haiku!\n");
 
 	{
-		team_id pid;
+		const char *args[] = {"fortune", NULL};
+		thread_id thread;
 
-		pid = _kern_create_team("/bin/fortune", "/bin/fortune", NULL, 0, NULL, 0, 5);
-		if (pid >= 0) {
-			int retcode;
-			_kern_wait_for_team(pid, &retcode);
+		thread = load_image(1, args, (const char **)environ);
+		if (thread >= B_OK) {
+			status_t returnCode;
+			wait_for_thread(thread, &returnCode);
 		} else
 			printf("Failed to create a team for fortune.\n");
 	}
 
 	while (1) {
-		team_id pid;
+		const char *args[] = {"shell", NULL};
+		thread_id thread;
 
-		pid = _kern_create_team("/bin/shell", "/bin/shell", NULL, 0, NULL, 0, 5);
-		if (pid >= 0) {
-			int retcode;
-			printf("init: spawned shell, pid 0x%lx\n", pid);
-			_kern_wait_for_team(pid, &retcode);
-			printf("init: shell exited with return code %d\n", retcode);
+		thread = load_image(1, args, (const char **)environ);
+		if (thread >= B_OK) {
+			status_t returnCode;
+
+			printf("init: spawned shell, pid 0x%lx\n", thread);
+			wait_for_thread(thread, &returnCode);
+			printf("init: shell exited with return code %ld\n", returnCode);
 		} else
 			printf("Failed to start a shell :(\n");
 	}

@@ -4,6 +4,8 @@
 */
 
 #include <syscalls.h>
+#include <image.h>
+
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +38,7 @@ cmd_exec(int argc, char *argv[])
 
 
 int
-cmd_create_proc(int argc,char *argv[])
+cmd_create_proc(int argc, char *argv[])
 {
 	bool must_wait=true;
 	team_id pid;
@@ -50,9 +52,9 @@ cmd_create_proc(int argc,char *argv[])
 		return 0;
 	}
 
-	tmp =  argv[argc - 1];
+	tmp = argv[argc - 1];
 
-	if( !find_file_in_path(argv[0],filename,SCAN_SIZE)){
+	if (!find_file_in_path(argv[0], filename, SCAN_SIZE)) {
 		printf("can't find '%s' \n",argv[0]);
 		return 0;
 	}
@@ -74,10 +76,10 @@ cmd_create_proc(int argc,char *argv[])
 		}
 	}
 
-	pid = _kern_create_team(filename,filename, argv, argc, NULL, 0, 5);
+	pid = load_image(argc, (const char **)argv, (const char **)environ);
 	if (pid >= 0) {
 		if (must_wait)
-			_kern_wait_for_team(pid, NULL);
+			wait_for_thread(pid, NULL);
 	} else {
 		printf("Error: cannot execute '%s'\n", filename);
 		return 0; // should be -1, but the shell would exit

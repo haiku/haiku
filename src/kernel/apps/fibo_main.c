@@ -4,18 +4,18 @@
 */
 
 
+#include <image.h>
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <syscalls.h>
 
 
-static
-void
+static void
 usage(char const *app)
 {
 	printf("usage: %s [-s] ###\n", app);
-	_kern_exit(-1);
+	exit(-1);
 }
 
 
@@ -46,20 +46,20 @@ main(int argc, char *argv[])
 	if (num < 2) {
 		result = 1;
 	} else {
-		team_id pid;
-		int retcode;
+		thread_id pid;
+		status_t retcode;
 		char buffer[64];
-		char *aaargv[] = { "/boot/bin/fibo", "-s", buffer, NULL };
+		const char *aaargv[] = { "/boot/bin/fibo", "-s", buffer, NULL };
 		int  aaargc = 3;
 
 		sprintf(buffer, "%d", num-1);
-		pid = _kern_create_team(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
-		_kern_wait_for_team(pid, &retcode);
+		pid = load_image(aaargc, aaargv, (const char **)environ);
+		wait_for_thread(pid, &retcode);
 		result = retcode;
 
 		sprintf(buffer, "%d", num-2);
-		pid = _kern_create_team(aaargv[0], aaargv[0], aaargv, aaargc, NULL, 0, 5);
-		_kern_wait_for_team(pid, &retcode);
+		pid = load_image(aaargc, aaargv, (const char **)environ);
+		wait_for_thread(pid, &retcode);
 		result += retcode;
 	}
 

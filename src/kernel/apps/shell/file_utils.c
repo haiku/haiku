@@ -1,6 +1,7 @@
+#include <image.h>
+
 #include <string.h>
 #include <ctype.h>
-#include <syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <Errors.h>
@@ -85,11 +86,11 @@ exec_file(int argc, char *argv[], status_t *retcode)
 	if (!find_file_in_path(argv[0], filename, SCAN_SIZE))
 		return SHE_FILE_NOT_FOUND;
 
-	pid = _kern_create_team(filename, filename, argv, argc, NULL, 0, 5);
+	pid = load_image(argc, (const char **)argv, (const char **)environ);
     if (pid < 0)
     	return SHE_CANT_EXECUTE;
 
-	_kern_wait_for_team(pid, retcode);
+	wait_for_thread(pid, retcode);
 
 	return SHE_NO_ERROR;
 }

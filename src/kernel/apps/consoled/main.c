@@ -5,6 +5,7 @@
 
 
 #include <OS.h>
+#include <image.h>
 #include <syscalls.h>
 
 #include <termios.h>
@@ -143,7 +144,7 @@ start_console(struct console *con)
 
 
 static pid_t
-start_process(const char *path, const char *name, char **argv, int argc, struct console *con)
+start_process(int argc, const char **argv, struct console *con)
 {
 	int saved_stdin, saved_stdout, saved_stderr;
 	pid_t pid;
@@ -156,8 +157,9 @@ start_process(const char *path, const char *name, char **argv, int argc, struct 
 	dup2(con->tty_slave_fd, 1);
 	dup2(con->tty_slave_fd, 2);
 
-	// XXX launch
-	pid = _kern_create_team(path, name, argv, argc, NULL, 0, 5/*, PROC_FLAG_NEW_PGROUP*/);
+	pid = load_image(argc, argv, (const char **)environ);
+	resume_thread(pid);
+	setpgid(pid, 0);
 
 	dup2(saved_stdin, 0);
 	dup2(saved_stdout, 1);
@@ -192,15 +194,15 @@ main(void)
 	for (;;) {
 		pid_t shell_process;
 		status_t retcode;
-		char *argv[3];
+		const char *argv[3];
 
 		argv[0] = "/bin/shell";
 //		argv[1] = "-s";
 //		argv[2] = "/boot/loginscript";
-		shell_process = start_process("/bin/shell", "shell", argv, 1, &theconsole);
+		shell_process = start_process(1, argv, &theconsole);
 
-		_kern_wait_for_team(shell_process, &retcode);
-		
+		wait_for_thread(shell_process, &retcode);
+
 		puts("Restart shell");
 	}
 
