@@ -2031,8 +2031,8 @@ rule Copy
 
 actions Copy
 {
-	cp -dp $(>) $(<) ;
-	if [ -f $(>) ] ; then copyattr $(>) $(<) ; fi ;
+	cp -dp "$(>)" "$(<)" ;
+	if [ -f "$(>)" ] ; then copyattr "$(>)" "$(<)" ; fi ;
 }
 
 rule Packages
@@ -2171,5 +2171,5 @@ rule LinkInstallZip
 
 actions together LinkInstallZip
 {
-	ln -sf `pwd`/$(2) $(1) ;
+	ln -sf `pwd`/"$(2)" "$(1)" ;
 }
