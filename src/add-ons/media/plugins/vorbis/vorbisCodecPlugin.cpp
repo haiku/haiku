@@ -189,9 +189,19 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				TRACE("VorbisDecoder::Decode: GetNextChunk failed\n");
 				return status;
 			}
-			if (mh.user_data_type != OGG_PACKET_DATA_TYPE) {
-				TRACE("VorbisDecoder::Decode: chunk missing ogg_packet data");
-				return B_ERROR;
+			ogg_packet packet;
+			if (mh.user_data_type == OGG_PACKET_DATA_TYPE) {
+				memcpy(&packet, mh.user_data, sizeof(packet));
+			} else {
+				// According to http://lists.xiph.org/pipermail/theora-dev/2004-May/002161.html
+				// this is invalid, but results from it are tolerable and better than nothing.
+				TRACE("VorbisDecoder::Decode: using compatibility chunk interpretation\n");
+				packet.b_o_s = 0;
+				packet.e_o_s = 0;
+				packet.granulepos = -1;
+				packet.packetno = 7;
+				packet.packet = static_cast<unsigned char *>(chunkBuffer);
+				packet.bytes = chunkSize;
 			}
 			if (!synced) {
 				if (mh.start_time > 0) {
@@ -199,9 +209,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 					synced = true;
 				}
 			}
-			ogg_packet * packet = reinterpret_cast<ogg_packet*>(mh.user_data);
-			packet->packet = static_cast<unsigned char *>(chunkBuffer);
-			if (vorbis_synthesis(&fBlock, packet)==0) {
+			if (vorbis_synthesis(&fBlock, &packet)==0) {
 				vorbis_synthesis_blockin(&fDspState,&fBlock);
 			}
 		}
