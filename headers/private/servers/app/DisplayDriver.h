@@ -258,6 +258,8 @@ public:
 	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
 
 protected:
+friend class Layer;
+friend class WinBorder;
 
 	ServerCursor *_GetCursor(void);
 	virtual void HLinePatternThick(int32 x1, int32 x2, int32 y);
@@ -296,7 +298,9 @@ protected:
 	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
 	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source);
-	
+		// temporarily virtual - until clipping code is added in DisplayDriver
+	virtual	void ConstrainClippingRegion(BRegion *reg);
+
 	PatternHandler fDrawPattern;
 	RGBColor fDrawColor;
 	int fLineThickness;
