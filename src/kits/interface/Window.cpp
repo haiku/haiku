@@ -59,7 +59,7 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-#define DEBUG_WIN
+//#define DEBUG_WIN
 #ifdef DEBUG_WIN
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -828,8 +828,9 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			if (fFocus)
-				fFocus->MessageReceived( msg );
+			BView *wheelView=LastMouseMovedView();
+			if(wheelView)
+				wheelView->MessageReceived( msg );
 			break;
 		}
 		case B_MOUSE_DOWN:
@@ -865,7 +866,6 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "buttons", (int32*)&buttons );
-			
 			sendMessageUsingEventMask( B_MOUSE_MOVED, where );
 			break;
 		}
@@ -2799,13 +2799,16 @@ void BWindow::sendMessageUsingEventMask( int32 message, BPoint where )
 
 			if (destView != fLastMouseMovedView)
 			{
- 				fLastMouseMovedView->MouseMoved( destView->ConvertFromScreen( where ), B_EXITED_VIEW , dragMessage);
+				if(fLastMouseMovedView)
+	 				fLastMouseMovedView->MouseMoved( destView->ConvertFromScreen( where ), B_EXITED_VIEW , dragMessage);
  				destView->MouseMoved( ConvertFromScreen( where ), B_ENTERED_VIEW, dragMessage);
  				fLastMouseMovedView		= destView;
+ 				break;
 			}
 			else
 			{
  				destView->MouseMoved( ConvertFromScreen( where ), B_INSIDE_VIEW , dragMessage);
+ 				break;
 			}
 
 			// I'm guessing that B_OUTSIDE_VIEW is given to the view that has focus,
