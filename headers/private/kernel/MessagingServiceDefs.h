@@ -33,10 +33,6 @@ struct messaging_command {
 	char	data[0];
 };
 
-struct messaging_command_new_area {
-	area_id	area;
-};
-
 struct messaging_command_send_message {
 	int32				message_size;
 	int32				target_count;
