@@ -604,7 +604,14 @@ main()
 	// test resize a partition
 	if (error == B_OK) {
 		if (BPartition *partition = device.ChildAt(1)) {
-			status_t status = partition->Resize(1024 * 200, false);
+			// uninitialize contents
+			status_t status = partition->Uninitialize();
+			if (status != B_OK) {
+				printf("Uninitializing the partition failed: %s\n",
+					   strerror(status));
+			}
+			// resize
+			status = partition->Resize(1024 * 200);
 			if (status != B_OK) {
 				printf("Resizing the partition failed: %s\n",
 					   strerror(status));
