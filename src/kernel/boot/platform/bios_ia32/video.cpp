@@ -44,18 +44,16 @@ vga_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 static status_t
 vesa_get_mode_info(uint16 mode, struct vbe_mode_info *modeInfo)
 {
-	struct vbe_mode_info *info = (vbe_mode_info *)kExtraSegmentScratch;
 	struct bios_regs regs;
 	regs.eax = 0x4f01;
 	regs.ecx = mode;
-	regs.es = 0;
-	regs.edi = (addr_t)info;
+	regs.es = ADDRESS_SEGMENT(modeInfo);
+	regs.edi = ADDRESS_OFFSET(modeInfo);
 	call_bios(0x10, &regs);
 
 	if ((regs.eax & 0xffff) != 0x4f)
 		return B_ENTRY_NOT_FOUND;
 
-	memcpy(modeInfo, info, sizeof(vbe_mode_info));
 	return B_OK;
 }
 
@@ -159,7 +157,7 @@ vesa_set_mode(uint16 mode)
 {
 	struct bios_regs regs;
 	regs.eax = 0x4f02;
-	regs.ebx = mode;
+	regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
 	call_bios(0x10, &regs);
 
 	if ((regs.eax & 0xffff) != 0x4f)
