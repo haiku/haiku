@@ -159,6 +159,21 @@ OpenDMLFile::InitData()
 			fStreamData[stream].index_chunk_entry_pos = 0;
 		} else {
 			fStreamData[stream].superindex = 0;
+
+
+
+
+			fStreamData[stream].index_entry_start = 0;
+			fStreamData[stream].index_base_offset = 0;
+			fStreamData[stream].index_entry_size = 0;
+			fStreamData[stream].index_entry_count = 0;
+			fStreamData[stream].index_entry_pos = 0;
+			fStreamData[stream].index_chunk = new char [INDEX_CHUNK_SIZE];
+			fStreamData[stream].index_chunk_entry_count = 0;
+			fStreamData[stream].index_chunk_entry_pos = 0;
+
+
+
 		}
 
  	}
