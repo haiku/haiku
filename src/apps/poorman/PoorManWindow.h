@@ -5,9 +5,6 @@
  *	Version: 0.1
  */
 
-
-#include <SupportDefs.h>
-
 #ifndef POOR_MAN_WINDOW_H
 #define POOR_MAN_WINDOW_H
 
@@ -23,6 +20,7 @@
 #include <StringView.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <SupportDefs.h>
 
 #include "PoorManView.h"
 #include "PoorManPreferencesWindow.h"

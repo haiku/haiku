@@ -8,6 +8,8 @@
 #ifndef STATUS_SLIDER
 #define STATUS_SLIDER
 
+#define BEOS_R5_COMPATIBLE
+
 #include <Slider.h>
 
 
