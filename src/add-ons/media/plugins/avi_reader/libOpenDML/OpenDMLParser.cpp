@@ -133,12 +133,21 @@ OpenDMLParser::Parse(BPositionIO *source)
 		uint32 temp;
 		uint32 fourcc;
 		uint32 size;
+		uint64 maxsize;
+		
+		maxsize = fSize - pos;
+		
+		if (maxsize < 13) {
+			ERROR("OpenDMLParser::Parse: remaining size too small for RIFF AVI chunk data at pos %lld\n", pos);
+			return false;
+		}
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
 			return false;
 		}
 		pos += 4;
+		maxsize -= 4;
 		fourcc = AVI_UINT32(temp);
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
@@ -146,11 +155,20 @@ OpenDMLParser::Parse(BPositionIO *source)
 			return false;
 		}
 		pos += 4;
+		maxsize -= 4;
 		size = AVI_UINT32(temp);
 
 		if (size == 0) {
 			ERROR("OpenDMLParser::Parse: Error: chunk of size 0 found\n");
 			return false;
+		}
+
+		TRACE("OpenDMLParser::Parse: chunk '"FOURCC_FORMAT"', size = %lu, maxsize %Ld\n", FOURCC_PARAM(fourcc), size, maxsize);
+		
+		if (size > maxsize) {
+			ERROR("OpenDMLParser::Parse: Warning chunk '"FOURCC_FORMAT"', size = %lu extends beyond end of file\n", FOURCC_PARAM(fourcc), size);
+			ERROR("OpenDMLParser::Parse: Chunk at filepos %Ld truncated to %Ld, filesize %Ld\n", pos - 8, maxsize, fSize);
+			size = maxsize;
 		}
 		
 		if (fourcc == FOURCC('J','U','N','K')) {
@@ -163,13 +181,13 @@ OpenDMLParser::Parse(BPositionIO *source)
 				ERROR("OpenDMLParser::Parse: not a RIFF file\n");
 				return false;
 			} else {
-				TRACE("OpenDMLParser::Parse: unknown chunk '"FOURCC_FORMAT"' (expected 'RIFF'), size = %lu  ignored\n", FOURCC_PARAM(fourcc), size);
+				TRACE("OpenDMLParser::Parse: unknown chunk '"FOURCC_FORMAT"' (expected 'RIFF'), size = %lu ignored\n", FOURCC_PARAM(fourcc), size);
 				goto cont;
 			}
 			
 		}
 
-		TRACE("OpenDMLParser::Parse: RIFF chunk %d size: %lu bytes\n", riff_chunk_number, size);
+		TRACE("OpenDMLParser::Parse: it's a RIFF chunk!\n");
 
 		if (sizeof(temp) != fSource->ReadAt(pos, &temp, sizeof(temp))) {
 			ERROR("OpenDMLParser::Parse: read error at pos %llu\n", pos);
@@ -183,7 +201,7 @@ OpenDMLParser::Parse(BPositionIO *source)
 		}
 
 		if (fourcc != FOURCC('A','V','I',' ') && fourcc != FOURCC('A','V','I','X')) {
-			TRACE("OpenDMLParser::Parse: unknown chunk '"FOURCC_FORMAT"' , size = %lu  ignored\n", FOURCC_PARAM(fourcc), size);
+			TRACE("OpenDMLParser::Parse: unknown RIFF subchunk '"FOURCC_FORMAT"' , size = %lu ignored, filepos %Ld, filesize %Ld\n", FOURCC_PARAM(fourcc), size, pos - 8, fSize);
 			goto cont;
 		}
 		
@@ -203,7 +221,12 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 	TRACE("OpenDMLParser::ParseChunk_AVI\n");
 	uint64 pos = start;
 	uint64 end = start + size;
-	
+
+	if (size < 9) {
+		ERROR("OpenDMLParser::ParseChunk_AVI: chunk is to small at pos %llu\n", start);
+		return false;
+	}
+
 	while (pos < end) {
 		uint32 temp;
 		uint32 Chunkfcc;
@@ -223,11 +246,18 @@ OpenDMLParser::ParseChunk_AVI(int number, uint64 start, uint32 size)
 		pos += 4;
 		Chunksize = AVI_UINT32(temp);
 
-		TRACE("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"', size = %lu\n", FOURCC_PARAM(Chunkfcc), Chunksize);
+		uint32 maxsize = end - pos;
+
+		TRACE("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"', size = %lu, maxsize %lu\n", FOURCC_PARAM(Chunkfcc), Chunksize, maxsize);
 
 		if (Chunksize == 0) {
-			ERROR("OpenDMLParser::ParseChunk_AVI: Error: chunk of size 0 found\n");
+			ERROR("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
 			return false;
+		}
+
+		if (Chunksize > maxsize) {
+			TRACE("OpenDMLParser::ParseChunk_AVI: chunk '"FOURCC_FORMAT"', size = %lu too big, truncated to %lu\n", FOURCC_PARAM(Chunkfcc), Chunksize, maxsize);
+			Chunksize = maxsize;
 		}
 
 		if (Chunkfcc == FOURCC('L','I','S','T')) {
@@ -254,6 +284,11 @@ OpenDMLParser::ParseChunk_LIST(uint64 start, uint32 size)
 	TRACE("OpenDMLParser::ParseChunk_LIST\n");
 	uint32 temp;
 	uint32 fourcc;
+	
+	if (size < 5) {
+		ERROR("OpenDMLParser::ParseChunk_LIST: chunk is to small at pos %llu\n", start);
+		return false;
+	}
 
 	if (sizeof(temp) != fSource->ReadAt(start, &temp, sizeof(temp))) {
 		ERROR("OpenDMLParser::ParseChunk_LIST: read error at pos %llu\n", start);
@@ -581,7 +616,7 @@ OpenDMLParser::ParseChunk_dmlh(uint64 start, uint32 size)
 	fOdmlExtendedHeaderValid = true;
 	
 	TRACE("fOdmlExtendedHeader:\n");
-	TRACE("total_frames   = %ld\n", fOdmlExtendedHeader.total_frames);
+	TRACE("total_frames   = %lu\n", fOdmlExtendedHeader.total_frames);
 
 	return true;
 }
@@ -604,6 +639,11 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 	uint64 pos = start;
 	uint64 end = start + size;
 
+	if (size < 9) {
+		ERROR("OpenDMLParser::ParseList_generic: list too small at pos %llu\n",pos);
+		return false;
+	}
+
 	while (pos < end) {
 		uint32 temp;
 		uint32 Chunkfcc;
@@ -622,12 +662,19 @@ OpenDMLParser::ParseList_generic(uint64 start, uint32 size)
 		}
 		pos += 4;
 		Chunksize = AVI_UINT32(temp);
+		
+		uint32 maxsize = end - pos;
 
-		TRACE("OpenDMLParser::ParseList_generic: chunk '"FOURCC_FORMAT"', size = %ld\n", FOURCC_PARAM(Chunkfcc), Chunksize);
+		TRACE("OpenDMLParser::ParseList_generic: chunk '"FOURCC_FORMAT"', size = %lu, maxsize = %lu\n", FOURCC_PARAM(Chunkfcc), Chunksize, maxsize);
 
 		if (Chunksize == 0) {
-			ERROR("OpenDMLParser::ParseList_generic: Error: chunk of size 0 found\n");
+			ERROR("OpenDMLParser::ParseList_generic: chunk '"FOURCC_FORMAT"' has size 0\n", FOURCC_PARAM(Chunkfcc));
 			return false;
+		}
+
+		if (Chunksize > maxsize) {
+			TRACE("OpenDMLParser::ParseList_generic: chunk '"FOURCC_FORMAT"', size = %lu too big, truncated to %lu\n", FOURCC_PARAM(Chunkfcc), Chunksize, maxsize);
+			Chunksize = maxsize;
 		}
 
 		if (Chunkfcc == FOURCC('a','v','i','h')) {
