@@ -206,7 +206,19 @@ struct my_stat {
 #define MY_SEEK_SET 0
 #define MY_SEEK_CUR 1
 #define MY_SEEK_END 2
- 
+
+// O_NOTRAVERSE is called O_NOFOLLOW under Linux
+#ifndef O_NOTRAVERSE
+	#ifdef O_NOFOLLOW
+		#define O_NOTRAVERSE 0
+	#else
+		#define O_NOFOLLOW 0
+	#endif
+#endif
+#ifndef S_IUMSK
+	#define S_IUMSK (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO)
+#endif
+
 
 #ifdef __BEOS__
 
