@@ -170,39 +170,41 @@ create_port(int32 queue_length, const char *name)
 	int 	state;
 	sem_id 	sem_r, sem_w;
 	port_id retval;
+	int		name_len;
 	char 	*temp_name;
-	void 	*q;
+	struct port_msg *q;
 	team_id	owner;
 	
 	if (ports_active == false)
 		return B_BAD_PORT_ID;
 
-	// check & dup name
-	if (name) {
-		int name_len = strlen(name);
-
-		temp_name = (char *)kmalloc(min(name_len + 1, SYS_MAX_OS_NAME_LEN));
-		if(temp_name == NULL)
-			return ENOMEM;
-		strncpy(temp_name, name, SYS_MAX_OS_NAME_LEN-1);
-		temp_name[SYS_MAX_OS_NAME_LEN-1] = 0;
-	} else {
-		temp_name = (char *)kmalloc(sizeof("default_port_name")+1);
-		if(temp_name == NULL)
-			return ENOMEM;
-		strcpy(temp_name, "default_port_name");
-	}
-	
-	// check queue length & alloc
+	// check queue length
 	if (queue_length < 1)
 		return EINVAL;
 	if (queue_length > MAX_QUEUE_LENGTH)
 		return EINVAL;
-	q = (void *)kmalloc( queue_length * sizeof(struct port_msg) );
+
+	// check & dup name
+	if (name == NULL)
+		name = "unnamed port";
+
+	name_len = strlen(name) + 1;
+	name_len = min(name_len, SYS_MAX_OS_NAME_LEN);
+	temp_name = (char *)kmalloc(name_len);
+	if (temp_name == NULL)
+		return ENOMEM;
+	strlcpy(temp_name, name, name_len);
+
+	// alloc queue
+	q = (struct port_msg *)kmalloc( queue_length * sizeof(struct port_msg) );
 	if (q == NULL) {
 		kfree(temp_name); // dealloc name, too
 		return ENOMEM;
 	}
+
+	// init cbuf list of the queue
+	for (i=0; i<queue_length; i++)
+		q[i].data_cbuf = 0;
 
 	// create sem_r with owner set to -1
 	sem_r = create_sem_etc(0, temp_name, -1);
@@ -259,8 +261,6 @@ create_port(int32 queue_length, const char *name)
 	}
 	// not enough ports...
 	RELEASE_PORT_LIST_LOCK();
-	kfree(q);
-	kfree(temp_name);
 	retval = B_NO_MORE_PORTS;
 	dprintf("create_port(): B_NO_MORE_PORTS\n");
 
@@ -276,7 +276,7 @@ out:
 	return retval;
 }
 
-status_t			
+status_t
 close_port(port_id id)
 {
 	int 	state;
@@ -295,6 +295,7 @@ close_port(port_id id)
 	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
+		dprintf("close_port: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
