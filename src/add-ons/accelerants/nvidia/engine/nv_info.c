@@ -23,8 +23,10 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
 static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
+static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
+static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
 static status_t	nv_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
@@ -315,7 +317,7 @@ static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
 
 		while (adress && (result == B_OK))
 		{
-			result = exec_type1_script(rom, adress, &size, ram_tab);
+			result = exec_type2_script(rom, adress, &size, ram_tab);
 			/* next command script, please */
 			init += 2;
 			adress = *((uint16*)(&(rom[init])));
@@ -340,8 +342,9 @@ static status_t coldstart_card_516_up(uint8* rom, uint16 init, uint16 ram_tab)
 	return result;
 }
 
-/* This routine is complete for pre-NV10. It's tested on a Elsa Erazor III with TNT2
- * (NV05) and on a no-name TNT2-M64. Both cards coldstart perfectly. */
+/* This routine is complete, and is used for pre-NV10 cards. It's tested on a Elsa
+ * Erazor III with TNT2 (NV05) and on a no-name TNT2-M64. Both cards coldstart
+ * perfectly. */
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
 {
 	status_t result = B_OK;
@@ -356,7 +359,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	{
 		LOG(8,("INFO: $%04x ($%02x); ", adress, rom[adress]));
 
-		//fixme: complete for NV10 and later (if possible) ...
 		switch (rom[adress])
 		{
 		case 0x59:
@@ -387,10 +389,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				target.timing.pixel_clock = (data2 * 1000);
 				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
-//fixme?
-				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-//					DACW(PIXPLLC2, 0x80000401);
 			}
 			log_pll(reg);
 			break;
@@ -427,8 +425,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			/* execute */
 			adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
-			//fixme: setup_ram_config is also used on NV11 (at least), which means the
-			//       routine should function differently there!
 			/* always done */
 			setup_ram_config(rom, ram_tab);
 			break;
@@ -460,48 +456,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			NV_REG32(reg) = data2;
 			NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
 			NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
-			break;
-		case 0x66: /* new on NV11 */
-			LOG(8,("NV11+ xxx cmd, skipping...\n"));
-
-			*size -= 1;
-			if (*size < 0)
-			{
-				LOG(8,("script size error, aborting!\n\n"));
-				end = true;
-				result = B_ERROR;
-				break;
-			}
-
-			adress += 1;
-			break;
-		case 0x67: /* new on NV11 */
-			LOG(8,("NV11+ xxx cmd, skipping...\n"));
-
-			*size -= 1;
-			if (*size < 0)
-			{
-				LOG(8,("script size error, aborting!\n\n"));
-				end = true;
-				result = B_ERROR;
-				break;
-			}
-
-			adress += 1;
-			break;
-		case 0x68: /* new on NV11 */
-			LOG(8,("NV11+ xxx cmd, skipping...\n"));
-
-			*size -= 1;
-			if (*size < 0)
-			{
-				LOG(8,("script size error, aborting!\n\n"));
-				end = true;
-				result = B_ERROR;
-				break;
-			}
-
-			adress += 1;
 			break;
 		case 0x69:
 			*size -= 5;
@@ -542,8 +496,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			}
 
 			/* execute */
-			//fixme: NV32_NV4STRAPINFO is a pre-NV10 specific register. How about NV11?
-			//       should this cmd 'exist' there?!? if, so: with different exec?
 			adress += 1;
 			data = NV_REG32(NV32_NV4STRAPINFO);
 			and_out = *((uint8*)(&(rom[adress])));
@@ -743,10 +695,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				target.timing.pixel_clock = (data * 10);
 				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
-//fixme?
-				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
-//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-//					DACW(PIXPLLC2, 0x80000401);
 			}
 			log_pll(reg);
 			break;
@@ -899,6 +847,276 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	}
 
 	//fixme?: do RAM size test
+}
+
+/* this routine is used for NV10 and later */
+static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
+{
+	status_t result = B_OK;
+	bool end = false;
+	bool exec = true;
+	uint8 index, byte, safe;
+	uint32 reg, data, data2, and_out, or_in, safe32;
+
+	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
+
+	while (!end)
+	{
+		LOG(8,("INFO: $%04x ($%02x); ", adress, rom[adress]));
+
+		//fixme: complete (if possible) ...
+		switch (rom[adress])
+		{
+		case 0x63:
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			LOG(8,("cmd 'setup RAM config' (always done)\n"));
+			//fixme: setup...
+			/* always done */
+			setup_ram_config_nv10_up(rom, ram_tab);
+			break;
+		case 0x65: /* identical to type1 */
+			*size -= 13;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data2 = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'WR 32bit REG $%08x = $%08x, then = $%08x' (always done)\n",
+				reg, data, data2));
+			/* always done */
+			/* (alternate NV-specific access to PCI config space registers:) */
+			safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
+			NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
+			NV_REG32(reg) = data;
+			NV_REG32(reg) = data2;
+			NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
+			NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+			break;
+		case 0x69: /* identical to type1 */
+			*size -= 5;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			or_in = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'RD 8bit ISA I/O REG $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+				reg, and_out, or_in));
+			if (exec)
+			{
+				byte = ISARB(reg);
+				byte &= (uint8)and_out;
+				byte |= (uint8)or_in;
+				ISAWB(reg, byte);
+			}
+			break;
+		case 0x6e: /* identical to type1 */
+			*size -= 13;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			and_out = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			or_in = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'RD 32bit REG $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
+				reg, and_out, or_in));
+			if (exec)
+			{
+				data = NV_REG32(reg);
+				data &= and_out;
+				data |= or_in;
+				NV_REG32(reg) = data;
+			}
+			break;
+		//fixme? this is correct on NV11, but how about newer cards???
+		case 0x36: /* new */
+		case 0x66: /* new */
+		case 0x67: /* new */
+		case 0x68: /* new */
+		case 0x6c: /* new */
+		case 0x71: /* identical to type1 */
+			LOG(8,("cmd 'END', execution completed.\n\n"));
+			end = true;
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+			break;
+		case 0x72: /* identical to type1 */
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+
+			/* execute */
+			adress += 1;
+			LOG(8,("cmd 'PGM commands'\n"));
+			LOG(8,("INFO: ---Executing following command(s):'\n"));
+			exec = true;
+			break;
+		case 0x74: /* identical to type1 */
+			*size -= 3;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			LOG(8,("cmd 'SNOOZE for %d ($%04x) microSeconds' (always done)\n", data, data));
+			/* always done */
+			snooze(data);
+			break;
+		case 0x78: /* identical to type1 */
+			*size -= 6;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			or_in = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'RD 8bit idx ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
+				index, reg, and_out, or_in));
+			if (exec)
+			{
+				safe = ISARB(reg);
+				ISAWB(reg, index);
+				byte = ISARB(reg + 1);
+				byte &= (uint8)and_out;
+				byte |= (uint8)or_in;
+				ISAWB((reg + 1), byte);
+				ISAWB(reg, safe);
+			}
+			break;
+		case 0x79:
+			*size -= 7;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			//fixme: setup new PLL routines that adhere to pins speeds for VCO, etc...
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			LOG(8,("cmd 'calculate and set PLL 32bit REG $%08x for %.3fMHz'\n", reg, (data / 100.0)));
+			if (exec)
+			{
+				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
+				display_mode target;
+				float calced_clk;
+				uint8 m, n, p;
+				target.timing.pixel_clock = (data * 10);
+				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
+				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
+//fixme?
+				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
+//				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+//					DACW(PIXPLLC2, 0x80000401);
+			}
+			log_pll(reg);
+			break;
+		case 0x7a: /* identical to type1 */
+			*size -= 9;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'WR 32bit REG' $%08x = $%08x\n", reg, data));
+			if (exec) NV_REG32(reg) = data;
+			break;
+		default:
+			LOG(8,("unknown cmd, aborting!\n\n"));
+			end = true;
+			result = B_ERROR;
+			break;
+		}
+	}
+
+	return result;
+}
+
+static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
+{
 }
 
 //fixme: move to crtc sourcefile, also setup for crtc2(?)
