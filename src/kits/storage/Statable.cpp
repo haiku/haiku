@@ -109,14 +109,9 @@ BStatable::GetOwner(uid_t *owner) const
 status_t 
 BStatable::SetOwner(uid_t owner)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_uid = owner;
-		error = set_stat(statData, WSTAT_UID);
-	}
-	return error;
+	statData.st_uid = owner;
+	return set_stat(statData, WSTAT_UID);
 }
 	
 /*!	\brief Returns the group owner of the node.
@@ -142,14 +137,9 @@ BStatable::GetGroup(gid_t *group) const
 status_t
 BStatable::SetGroup(gid_t group)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_gid = group;
-		error = set_stat(statData, WSTAT_GID);
-	}
-	return error;
+	statData.st_gid = group;
+	return set_stat(statData, WSTAT_GID);
 }
 	
 /*!	\brief Returns the permissions of the node.
@@ -175,14 +165,11 @@ BStatable::GetPermissions(mode_t *perms) const
 status_t
 BStatable::SetPermissions(mode_t perms)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_mode = (statData.st_mode & ~S_IUMSK) | (perms & S_IUMSK);
-		error = set_stat(statData, WSTAT_MODE);
-	}
-	return error;
+	// the FS should do the correct masking -- only the S_IUMSK part is
+	// modifiable
+	statData.st_mode = perms;
+	return set_stat(statData, WSTAT_MODE);
 }
 
 /*!	\brief Get the size of the node's data (not counting attributes).
@@ -224,14 +211,9 @@ BStatable::GetModificationTime(time_t *mtime) const
 status_t
 BStatable::SetModificationTime(time_t mtime)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_mtime = mtime;
-		error = set_stat(statData, WSTAT_MTIME);
-	}
-	return error;
+	statData.st_mtime = mtime;
+	return set_stat(statData, WSTAT_MTIME);
 }
 
 /*!	\brief Returns the time the node was created.
@@ -257,14 +239,9 @@ BStatable::GetCreationTime(time_t *ctime) const
 status_t
 BStatable::SetCreationTime(time_t ctime)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_crtime = ctime;
-		error = set_stat(statData, WSTAT_CRTIME);
-	}
-	return error;
+	statData.st_crtime = ctime;
+	return set_stat(statData, WSTAT_CRTIME);
 }
 
 /*!	\brief Returns the time the node was accessed.
@@ -292,14 +269,9 @@ BStatable::GetAccessTime(time_t *atime) const
 status_t
 BStatable::SetAccessTime(time_t atime)
 {
-	status_t error;
 	struct stat statData;
-	error = GetStat(&statData);
-	if (error == B_OK) {
-		statData.st_atime = atime;
-		error = set_stat(statData, WSTAT_ATIME);
-	}
-	return error;
+	statData.st_atime = atime;
+	return set_stat(statData, WSTAT_ATIME);
 }
 
 /*!	\brief Returns the volume the node lives on.
@@ -322,6 +294,4 @@ BStatable::GetVolume(BVolume *vol) const
 void BStatable::_OhSoStatable1() {}
 void BStatable::_OhSoStatable2() {}
 void BStatable::_OhSoStatable3() {}
-
-
 
