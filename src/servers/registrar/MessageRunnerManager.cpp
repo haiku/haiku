@@ -38,12 +38,57 @@
 #include "EventQueue.h"
 #include "MessageRunnerManager.h"
 
-// the minimal time interval for message runners
+/*!	\class MessageRunnerManager
+	\brief Manages the registrar side "shadows" of BMessageRunners.
+
+	The class features four methods to which the registrar application
+	dispatches the message runner specific request messages.
+
+	Each active message runner (i.e. one that still has messages to be sent)
+	is represented by a RunnerInfo that comprises all necessary information,
+	among these a RunnerEvent added to the event queue. When the event is
+	executed, it calls the _DoEvent() method, which in turn sends the message
+	runner message to the respective target and schedules the event for the
+	next time the message has to be sent (_ScheduleEvent()).
+
+	A couple of helper methods provide convenient access to the RunnerInfo
+	list (\a fRunnerInfos). A BLocker (\a fLock) and respective locking
+	methods are used to serialize the access to the member variables.
+*/
+
+/*! \var BList MessageRunnerManager::fRunnerInfos
+	\brief The list of RunnerInfos.
+*/
+
+/*! \var BLocker MessageRunnerManager::fLock
+	\brief A locker used to serialize the access to the object's variable
+		   members.
+*/
+
+/*! \var EventQueue *MessageRunnerManager::fEventQueue
+	\brief Event queue used by the manager.
+*/
+
+/*! \var int32 MessageRunnerManager::fNextToken
+	\brief Next unused token for message runners.
+*/
+
+
+//! The minimal time interval for message runners (50 ms).
 static const bigtime_t kMininalTimeInterval = 50000LL;
 
 // RunnerEvent
+/*!	\brief Event class used to by the message runner manager.
+
+	For each active message runner such an event is used. It invokes
+	MessageRunnerManager::_DoEvent() on execution.
+*/
 class MessageRunnerManager::RunnerEvent : public Event {
 public:
+	/*!	\brief Creates a new RunnerEvent.
+		\param manager The message runner manager.
+		\param info The RunnerInfo for the message runner.
+	*/
 	RunnerEvent(MessageRunnerManager *manager, RunnerInfo *info)
 		: Event(false),
 		  fManager(manager),
@@ -51,19 +96,37 @@ public:
 	{
 	}
 
-	virtual bool Do()
+	/*!	\brief Hook method invoked when the event is executed.
+
+		Implements Event. Calls MessageRunnerManager::_DoEvent().
+		
+		\param queue The event queue executing the event.
+		\return \c true, if the object shall be deleted, \c false otherwise.
+	*/
+	virtual bool Do(EventQueue *queue)
 	{
 		return fManager->_DoEvent(fInfo);
 	}
 
 private:
-	MessageRunnerManager	*fManager;
-	RunnerInfo				*fInfo;
+	MessageRunnerManager	*fManager;	//!< The message runner manager.
+	RunnerInfo				*fInfo;		//!< The message runner info.
 };
 
 
 // RunnerInfo
+/*!	\brief Contains all needed information about an active message runner.
+*/
 struct MessageRunnerManager::RunnerInfo {
+	/*!	\brief Creates a new RunnerInfo.
+		\param team The team owning the message runner.
+		\param token The unique token associated with the message runner.
+		\param target The target the message shall be sent to.
+		\param message The message to be sent to the target.
+		\param interval The message runner's time interval.
+		\param count The number of times the message shall be sent.
+		\param replyTarget The reply target for the delivered message.
+	*/
 	RunnerInfo(team_id team, int32 token, BMessenger target, BMessage *message,
 			   bigtime_t interval, int32 count, BMessenger replyTarget)
 		: team(team),
@@ -79,12 +142,21 @@ struct MessageRunnerManager::RunnerInfo {
 	{
 	}
 
+	/*!	\brief Frees all resources associated with the object.
+
+		The message and the event are delete.
+	*/
 	~RunnerInfo()
 	{
 		delete message;
 		delete event;
 	}
 
+	/*!	\brief Delivers the message to the respective target.
+		\return \c B_OK, if the message has successfully been delivered or
+				the target does still exist and its message port is full,
+				an error code otherwise.
+	*/
 	status_t DeliverMessage()
 	{
 		if (count > 0)
@@ -98,20 +170,29 @@ struct MessageRunnerManager::RunnerInfo {
 		return error;
 	}
 
-	team_id		team;
-	int32		token;
-	BMessenger	target;
-	BMessage	*message;
-	bigtime_t	interval;
-	int32		count;
-	BMessenger	replyTarget;
-	bigtime_t	time;
-	RunnerEvent	*event;
-	bool		rescheduled;
+	team_id		team;			//!< The team owning the message runner.
+	int32		token;			/*!< The unique token associated with the
+									 message runner. */
+	BMessenger	target;			//!< The target the message shall be sent to.
+	BMessage	*message;		//!< The message to be sent to the target.
+	bigtime_t	interval;		//!< The message runner's time interval.
+	int32		count;			/*!< The number of times the message shall be
+									 sent. */
+	BMessenger	replyTarget;	/*!< The reply target for the delivered
+									 message. */
+	bigtime_t	time;			/*!< Time at which the next message will be
+									 sent. */
+	RunnerEvent	*event;			//!< Runner event for the message runner.
+	bool		rescheduled;	/*!< Set to \c true when the event has been
+									 started to be executed while it was
+									 rescheduled. */
 };
 
 
 // constructor
+/*!	\brief Creates a new MessageRunnerManager.
+	\param eventQueue The EventQueue the manager shall use.
+*/
 MessageRunnerManager::MessageRunnerManager(EventQueue *eventQueue)
 	: fRunnerInfos(),
 	  fLock(),
@@ -121,6 +202,11 @@ MessageRunnerManager::MessageRunnerManager(EventQueue *eventQueue)
 }
 
 // destructor
+/*!	\brief Frees all resources associated with the object.
+
+	The manager's event queue must already have been stopped
+	(EventQueue::Die()).
+*/
 MessageRunnerManager::~MessageRunnerManager()
 {
 	// The event queue should already be stopped, but must still exist.
@@ -136,6 +222,9 @@ MessageRunnerManager::~MessageRunnerManager()
 }
 
 // HandleRegisterRunner
+/*!	\brief Handles a registration request (BMessageRunner::InitData()).
+	\param request The request message.
+*/
 void
 MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 {
@@ -218,6 +307,9 @@ MessageRunnerManager::HandleRegisterRunner(BMessage *request)
 }
 
 // HandleUnregisterRunner
+/*!	\brief Handles an unregistration request (BMessageRunner destructor).
+	\param request The request message.
+*/
 void
 MessageRunnerManager::HandleUnregisterRunner(BMessage *request)
 {
@@ -250,6 +342,9 @@ MessageRunnerManager::HandleUnregisterRunner(BMessage *request)
 }
 
 // HandleSetRunnerParams
+/*!	\brief Handles an parameter change request (BMessageRunner::SetParams()).
+	\param request The request message.
+*/
 void
 MessageRunnerManager::HandleSetRunnerParams(BMessage *request)
 {
@@ -316,6 +411,9 @@ MessageRunnerManager::HandleSetRunnerParams(BMessage *request)
 }
 
 // HandleGetRunnerInfo
+/*!	\brief Handles an get info request (BMessageRunner::GetInfo()).
+	\param request The request message.
+*/
 void
 MessageRunnerManager::HandleGetRunnerInfo(BMessage *request)
 {
@@ -350,6 +448,9 @@ MessageRunnerManager::HandleGetRunnerInfo(BMessage *request)
 }
 
 // Lock
+/*!	\brief Locks the manager.
+	\return \c true, if locked successfully, \c false otherwise.
+*/
 bool
 MessageRunnerManager::Lock()
 {
@@ -357,6 +458,8 @@ MessageRunnerManager::Lock()
 }
 
 // Unlock
+/*!	\brief Unlocks the manager.
+*/
 void
 MessageRunnerManager::Unlock()
 {
@@ -364,6 +467,13 @@ MessageRunnerManager::Unlock()
 }
 
 // _AddInfo
+/*!	\brief Adds a RunnerInfo to the list of RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param info The RunnerInfo to be added.
+	\return \c true, if added successfully, \c false otherwise.
+*/
 bool
 MessageRunnerManager::_AddInfo(RunnerInfo *info)
 {
@@ -371,6 +481,14 @@ MessageRunnerManager::_AddInfo(RunnerInfo *info)
 }
 
 // _RemoveInfo
+/*!	\brief Removes a RunnerInfo from the list of RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param info The RunnerInfo to be removed.
+	\return \c true, if removed successfully, \c false, if the list doesn't
+			contain the supplied info.
+*/
 bool
 MessageRunnerManager::_RemoveInfo(RunnerInfo *info)
 {
@@ -378,6 +496,14 @@ MessageRunnerManager::_RemoveInfo(RunnerInfo *info)
 }
 
 // _RemoveInfo
+/*!	\brief Removes a RunnerInfo at a given index from the list of RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param index The index of the RunnerInfo to be removed.
+	\return \c true, if removed successfully, \c false, if the supplied index
+			is out of range.
+*/
 MessageRunnerManager::RunnerInfo*
 MessageRunnerManager::_RemoveInfo(int32 index)
 {
@@ -385,6 +511,15 @@ MessageRunnerManager::_RemoveInfo(int32 index)
 }
 
 // _RemoveInfoWithToken
+/*!	\brief Removes a RunnerInfo with a specified token from the list of
+		   RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param token The token identifying the RunnerInfo to be removed.
+	\return \c true, if removed successfully, \c false, if the list doesn't
+			contain an info with the supplied token.
+*/
 MessageRunnerManager::RunnerInfo*
 MessageRunnerManager::_RemoveInfoWithToken(int32 token)
 {
@@ -396,6 +531,14 @@ MessageRunnerManager::_RemoveInfoWithToken(int32 token)
 }
 
 // _DeleteInfo
+/*!	\brief Removes a RunnerInfo from the list of RunnerInfos and deletes it.
+
+	\note The manager must be locked.
+
+	\param index The index of the RunnerInfo to be deleted.
+	\return \c true, if removed and deleted successfully, \c false, if the
+			list doesn't contain the supplied info.
+*/
 bool
 MessageRunnerManager::_DeleteInfo(RunnerInfo *info, bool eventRemoved)
 {
@@ -411,6 +554,12 @@ MessageRunnerManager::_DeleteInfo(RunnerInfo *info, bool eventRemoved)
 }
 
 // _CountInfos
+/*!	\brief Returns the number of RunnerInfos in the list of RunnerInfos.
+
+	\note The manager must be locked.
+
+	\return Returns the number of RunnerInfos in the list of RunnerInfos.
+*/
 int32
 MessageRunnerManager::_CountInfos() const
 {
@@ -418,6 +567,15 @@ MessageRunnerManager::_CountInfos() const
 }
 
 // _InfoAt
+/*!	\brief Returns the RunnerInfo at the specified index in the list of
+		   RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param index The index of the RunnerInfo to be returned.
+	\return The runner info at the specified index, or \c NULL, if the index
+			is out of range.
+*/
 MessageRunnerManager::RunnerInfo*
 MessageRunnerManager::_InfoAt(int32 index) const
 {
@@ -425,6 +583,14 @@ MessageRunnerManager::_InfoAt(int32 index) const
 }
 
 // _InfoForToken
+/*!	\brief Returns the RunnerInfo with the specified index.
+
+	\note The manager must be locked.
+
+	\param token The token identifying the RunnerInfo to be returned.
+	\return The runner info at the specified index, or \c NULL, if the list
+			doesn't contain an info with the specified token.
+*/
 MessageRunnerManager::RunnerInfo*
 MessageRunnerManager::_InfoForToken(int32 token) const
 {
@@ -432,6 +598,15 @@ MessageRunnerManager::_InfoForToken(int32 token) const
 }
 
 // _IndexOf
+/*!	\brief Returns the index of the supplied RunnerInfo in the list of
+		   RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param info The RunnerInfo whose index shall be returned.
+	\return The index of the supplied RunnerInfo, or -1, if the list doesn't
+			contain the supplied info.
+*/
 int32
 MessageRunnerManager::_IndexOf(RunnerInfo *info) const
 {
@@ -439,6 +614,16 @@ MessageRunnerManager::_IndexOf(RunnerInfo *info) const
 }
 
 // _IndexOfToken
+/*!	\brief Returns the index of the RunnerInfo identified by the supplied
+		   token in the list of RunnerInfos.
+
+	\note The manager must be locked.
+
+	\param token The token identifying the RunnerInfo whose index shall be
+		   returned.
+	\return The index of the requested RunnerInfo, or -1, if the list doesn't
+			contain an info with the supplied token.
+*/
 int32
 MessageRunnerManager::_IndexOfToken(int32 token) const
 {
@@ -450,6 +635,15 @@ MessageRunnerManager::_IndexOfToken(int32 token) const
 }
 
 // _DoEvent
+/*!	\brief Invoked when a message runner's event is executed.
+
+	If the message runner info is still valid and the event was not just
+	rescheduled, the message is delivered to the message runner's target
+	and the event is rescheduled.
+
+	\param info The message runner's info.
+	\return \c true, if the event object shall be deleted, \c false otherwise.
+*/
 bool
 MessageRunnerManager::_DoEvent(RunnerInfo *info)
 {
@@ -491,6 +685,16 @@ MessageRunnerManager::_DoEvent(RunnerInfo *info)
 }
 
 // _ScheduleEvent
+/*!	\brief Schedules the event for a message runner for the next time a
+		   message has to be sent.
+
+	\note The manager must be locked.
+
+	\param info The message runner's info.
+	\return \c true, if the event successfully been rescheduled, \c false,
+			if either all messages have already been sent or the event queue
+			doesn't allow adding the event (e.g. due to insufficient memory).
+*/
 bool
 MessageRunnerManager::_ScheduleEvent(RunnerInfo *info)
 {
@@ -511,6 +715,12 @@ info->token, info->interval, info->count, scheduled, info->time, system_time()))
 }
 
 // _NextToken
+/*!	\brief Returns a new unused message runner token.
+
+	\note The manager must be locked.
+
+	\return A new unused message runner token.
+*/
 int32
 MessageRunnerManager::_NextToken()
 {
