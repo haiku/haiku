@@ -11,6 +11,9 @@
  */
 
 
+#define _FS_INTERFACE_H
+	// don't include that file
+
 #include "bfs_control.h"
 
 

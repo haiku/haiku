@@ -31,7 +31,7 @@ SimpleTest mkbfs :
 	rootfs.c
 
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
-	BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
+	BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 	Debug.cpp
 	:
 	;
@@ -43,7 +43,7 @@ SimpleTest allocationGroups :
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
-		BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
+		BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
 
