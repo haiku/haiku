@@ -41,6 +41,10 @@ struct elf_image_info {
 	struct Elf32_Rel *pltrel;
 	int			pltrel_len;
 	int			pltrel_type;
+
+	struct Elf32_Sym *debug_symbols;
+	uint32		num_debug_symbols;
+	const char	*debug_string_table;
 };
 
 
