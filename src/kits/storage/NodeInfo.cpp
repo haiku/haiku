@@ -34,7 +34,7 @@ enum {
 };
 
 // constructor
-/*!	\brief Creates an uninitialized BNode object.
+/*!	\brief Creates an uninitialized BNodeInfo object.
 
 	After created a BNodeInfo with this, you should call SetTo().
 
@@ -47,7 +47,7 @@ BNodeInfo::BNodeInfo()
 }
 
 // constructor
-/*!	\brief Creates a BNode object and initializes it to the supplied node.
+/*!	\brief Creates a BNodeInfo object and initializes it to the supplied node.
 
 	\param node The node to gather information on. Can be any flavor.
 
