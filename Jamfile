@@ -5,6 +5,27 @@ InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
 NotFile alltests ;
 Depends alltests : r5tests obostests ;
 
+# Pseudo-target to build the mail kit only
+NotFile MailKit ;
+Depends MailKit :
+	libmail.so
+	mail_daemon
+	E-mail
+	BeMail
+
+	# mail_daemon addons
+	Inbox
+	Outbox
+	Message\ Parser
+	New\ Mail\ Notification
+	Match\ Header
+	R5\ Daemon\ Filter
+	IMAP
+	POP3
+	SMTP
+	Fortune
+;
+
 # Pseudo-target to build the network kit only
 NotFile NetworkingKit ;
 Depends NetworkingKit :
@@ -16,7 +37,7 @@ Depends NetworkingKit :
 	ping ifconfig <bin>route traceroute arp pppconfig
 	
 	# network drivers:
-	sis900 rtl8139
+	sis900 rtl8139 rtl8169 via-rhine ipro1000 wb840 bcm440x bcm570x 
 	
 	# PPP devices:
 	modem pppoe
