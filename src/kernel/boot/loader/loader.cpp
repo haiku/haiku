@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -62,18 +62,17 @@ load_kernel(stage2_args *args, Directory *volume)
 	if (fd < B_OK)
 		return fd;
 
-	puts("load kernel...");
+	dprintf("load kernel...\n");
 
 	status_t status = elf_load_image(fd, &gKernelArgs.kernel_image);
 
 	close(fd);
 
 	if (status < B_OK) {
-		printf("loading kernel failed: %ld!\n", status);
+		dprintf("loading kernel failed: %ld!\n", status);
 		return status;
 	}
 
-	puts("kernel loaded successfully");
 	return B_OK;
 }
 

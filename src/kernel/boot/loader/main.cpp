@@ -18,7 +18,7 @@
 
 //#define TRACE_MAIN
 #ifdef TRACE_MAIN
-#	define TRACE(x) printf x
+#	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
@@ -44,7 +44,7 @@ main(stage2_args *args)
 	if (vfs_init(args) < B_OK)
 		panic("Could not initialize VFS!\n");
 
-	puts("Welcome to the Haiku boot loader!");
+	dprintf("Welcome to the Haiku boot loader!\n");
 
 	bool mountedAllVolumes = false;
 
