@@ -20,6 +20,7 @@
 
 
 void list_area_info(team_id id);
+void list_area_info_a(const char *arg);
 void show_memory_totals(void);
 
 
@@ -38,7 +39,7 @@ main(int argc, char **argv)
 	} else {
 		// list for each team_id on the command line
 		while (--argc)
-			list_area_info(atoi(*++argv));
+			list_area_info_a(*++argv);
 	}
 
 	return 0;
@@ -82,12 +83,33 @@ list_area_info(team_id id)
 		printf("%5ld %32s  %08lx %8lx %8lx %5ld %5ld %5ld\n",
 			areaInfo.area,
 			areaInfo.name,
-			(addr_t)areaInfo.address,
+			(void *)areaInfo.address,
 			areaInfo.size,
 			areaInfo.ram_size,
 			areaInfo.copy_count,
 			areaInfo.in_count,
 			areaInfo.out_count);
+	}
+}
+
+
+void
+list_area_info_a(const char *arg)
+{
+	int32 cookie = 0;
+	team_info info;
+	team_id tid;
+
+	tid = atoi(arg);
+	// if atoi returns >0 it's likely it's a number, else take it as string
+	if (tid > 0) {
+		list_area_info(tid);
+		return;
+	}
+	while (get_next_team_info(&cookie, &info) >= B_OK) {
+		if (strstr(info.args, arg)) {
+			list_area_info(info.team);
+		}
 	}
 }
 

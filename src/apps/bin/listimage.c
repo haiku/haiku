@@ -31,10 +31,13 @@ list_images_for_team_by_id(team_id id)
 	status_t status;
 
 	status = get_team_info(id, &teamInfo);
-	if (status < B_OK)
+	if (id != 1 && status < B_OK)
 		return status;
 
-	printf("\nTEAM %4ld (%s):\n", id, teamInfo.args);
+	if (id == 1)
+		printf("\nKERNEL TEAM:\n");
+	else
+		printf("\nTEAM %4ld (%s):\n", id, teamInfo.args);
 	printf("   ID                                                             name       text       data seq#      init#\n");
 	printf("------------------------------------------------------------------------------------------------------------\n");
 
@@ -42,12 +45,12 @@ list_images_for_team_by_id(team_id id)
 		printf("%5ld %64s 0x%08lx 0x%08lx %4ld %10lu\n",
 			imageInfo.id,
 			imageInfo.name,
-			(addr_t)imageInfo.text,
-			(addr_t)imageInfo.data,
+			(void *)imageInfo.text,
+			(void *)imageInfo.data,
 			imageInfo.sequence,
 			imageInfo.init_order);
 	}
-	if (status != B_ENTRY_NOT_FOUND) {
+	if (status != B_ENTRY_NOT_FOUND && status != EINVAL) {
 		printf("get images failed: %s\n", strerror(status));
 		return status;
 	}
@@ -61,7 +64,7 @@ list_images_for_team(const char *arg)
 	int32 cookie = 0;
 	team_info info;
 
-	if (isdigit(arg[0])) {
+	if (atoi(arg) > 0) {
 		if (list_images_for_team_by_id(atoi(arg)) == B_OK)
 			return;
 	}
