@@ -9,6 +9,7 @@
 #include <Buffer.h>
 #include <malloc.h>
 #include "debug.h"
+#include "MediaMisc.h"
 #include "DataExchange.h"
 #include "BufferIdCache.h"
 
@@ -80,7 +81,7 @@ BBufferConsumer::NotifyLateProducer(const media_source &what_source,
 									bigtime_t performance_time)
 {
 	CALLED();
-	if (what_source == media_source::null)
+	if (IS_INVALID_SOURCE(what_source))
 		return;
 
 	producer_late_notice_received_command command;
@@ -103,9 +104,9 @@ BBufferConsumer::SetVideoClippingFor(const media_source &output,
 									 void *_reserved_)
 {
 	CALLED();
-	if (output == media_source::null)
+	if (IS_INVALID_SOURCE(output))
 		return B_MEDIA_BAD_SOURCE;
-	if (destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
 	if (short_count > int(B_MEDIA_MESSAGE_SIZE - sizeof(producer_video_clipping_changed_command)) / 2)
 		debugger("BBufferConsumer::SetVideoClippingFor short_count too large (8000 limit)\n");
@@ -141,10 +142,10 @@ BBufferConsumer::SetOutputEnabled(const media_source &source,
 								  void *_reserved_)
 {
 	CALLED();
-	if (destination == media_destination::null)
-		return B_MEDIA_BAD_DESTINATION;
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
+	if (IS_INVALID_DESTINATION(destination))
+		return B_MEDIA_BAD_DESTINATION;
 
 	producer_enable_output_command command;
 	
@@ -169,10 +170,10 @@ BBufferConsumer::RequestFormatChange(const media_source &source,
 									 void *_reserved_)
 {
 	CALLED();
-	if (destination == media_destination::null)
-		return B_MEDIA_BAD_DESTINATION;
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
+	if (IS_INVALID_DESTINATION(destination))
+		return B_MEDIA_BAD_DESTINATION;
 
 	producer_format_change_requested_command command;
 	
@@ -194,7 +195,7 @@ BBufferConsumer::RequestAdditionalBuffer(const media_source &source,
 										 void *_reserved)
 {
 	CALLED();
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_additional_buffer_requested_command command;
@@ -215,7 +216,7 @@ BBufferConsumer::RequestAdditionalBuffer(const media_source &source,
 										 void *_reserved)
 {
 	CALLED();
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_additional_buffer_requested_command command;
@@ -241,9 +242,9 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 {
 	CALLED();
 
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
-	if (destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
 	
 	producer_set_buffer_group_command *command;
@@ -303,10 +304,10 @@ BBufferConsumer::SendLatencyChange(const media_source &source,
 								   uint32 flags)
 {
 	CALLED();
-	if (destination == media_destination::null)
-		return B_MEDIA_BAD_DESTINATION;
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
+	if (IS_INVALID_DESTINATION(destination))
+		return B_MEDIA_BAD_DESTINATION;
 
 	producer_latency_changed_command command;
 	
@@ -470,7 +471,7 @@ BBufferConsumer::SetVideoClippingFor(const media_source &output,
 									 int32 *change_tag)
 {
 	CALLED();
-	if (output == media_source::null)
+	if (IS_INVALID_SOURCE(output))
 		return B_MEDIA_BAD_SOURCE;
 	if (short_count > int(B_MEDIA_MESSAGE_SIZE - sizeof(producer_video_clipping_changed_command)) / 2)
 		debugger("BBufferConsumer::SetVideoClippingFor short_count too large (8000 limit)\n");
@@ -505,10 +506,10 @@ BBufferConsumer::RequestFormatChange(const media_source &source,
 									 int32 *change_tag)
 {
 	CALLED();
-	if (destination == media_destination::null)
-		return B_MEDIA_BAD_DESTINATION;
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
+	if (IS_INVALID_DESTINATION(destination))
+		return B_MEDIA_BAD_DESTINATION;
 
 	producer_format_change_requested_command command;
 	
@@ -531,7 +532,7 @@ BBufferConsumer::SetOutputEnabled(const media_source &source,
 								  int32 *change_tag)
 {
 	CALLED();
-	if (source == media_source::null)
+	if (IS_INVALID_SOURCE(source))
 		return B_MEDIA_BAD_SOURCE;
 
 	producer_enable_output_command command;

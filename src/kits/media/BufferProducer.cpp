@@ -7,6 +7,7 @@
 #include <BufferGroup.h>
 #include <Buffer.h>
 #include "debug.h"
+#include "MediaMisc.h"
 #include "DataExchange.h"
 
 /*************************************************************
@@ -354,7 +355,7 @@ BBufferProducer::SendDataStatus(int32 status,
 								bigtime_t at_time)
 {
 	CALLED();
-	if (destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
 		
 	consumer_producer_data_status_command command;
@@ -371,7 +372,7 @@ BBufferProducer::ProposeFormatChange(media_format *format,
 									 const media_destination &for_destination)
 {
 	CALLED();
-	if (for_destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(for_destination))
 		return B_MEDIA_BAD_DESTINATION;
 		
 	consumer_accept_format_request request;
@@ -395,9 +396,9 @@ BBufferProducer::ChangeFormat(const media_source &for_source,
 							  media_format *format)
 {
 	CALLED();
-	if (for_source == media_source::null)
+	if (IS_INVALID_SOURCE(for_source))
 		return B_MEDIA_BAD_SOURCE;
-	if (for_destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(for_destination))
 		return B_MEDIA_BAD_DESTINATION;
 		
 	consumer_format_changed_request request;
@@ -418,7 +419,7 @@ BBufferProducer::FindLatencyFor(const media_destination &for_destination,
 								media_node_id *out_timesource)
 {
 	CALLED();
-	if (for_destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(for_destination))
 		return B_MEDIA_BAD_DESTINATION;
 		
 	status_t rv;
@@ -446,7 +447,7 @@ BBufferProducer::FindSeekTag(const media_destination &for_destination,
 							 uint32 in_flags)
 {
 	CALLED();
-	if (for_destination == media_destination::null)
+	if (IS_INVALID_DESTINATION(for_destination))
 		return B_MEDIA_BAD_DESTINATION;
 		
 	status_t rv;

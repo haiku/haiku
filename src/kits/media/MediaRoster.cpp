@@ -13,6 +13,7 @@
 #include <TimeSource.h>
 #include "debug.h"
 #include "TList.h"
+#include "MediaMisc.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
@@ -174,7 +175,7 @@ PublishOutputs(const media_node & node, List<media_output> *list)
 	if (count > MAX_OUTPUTS) {
 		void *start_addr;
 		size_t size;
-		size = ((count * sizeof(media_output)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+		size = ROUND_UP_TO_PAGE(count * sizeof(media_output));
 		request.area = create_area("publish outputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
 			FATAL("PublishOutputs: failed to create area, %#lx\n", request.area);
@@ -219,7 +220,7 @@ PublishInputs(const media_node & node, List<media_input> *list)
 	if (count > MAX_INPUTS) {
 		void *start_addr;
 		size_t size;
-		size = ((count * sizeof(media_input)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+		size = ROUND_UP_TO_PAGE(count * sizeof(media_input));
 		request.area = create_area("publish inputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (request.area < B_OK) {
 			FATAL("PublishInputs: failed to create area, %#lx\n", request.area);
@@ -422,7 +423,7 @@ status_t
 BMediaRoster::ReleaseNode(const media_node & node)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	server_release_node_request request;
@@ -484,11 +485,11 @@ BMediaRoster::Connect(const media_source & from,
 	CALLED();
 	if (io_format == NULL || out_output == NULL || out_input == NULL)
 		return B_BAD_VALUE;
-	if (from == media_source::null) {
+	if (IS_INVALID_SOURCE(from)) {
 		FATAL("BMediaRoster::Connect: media_source invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
-	if (to == media_destination::null) {
+	if (IS_INVALID_DESTINATION(to)) {
 		FATAL("BMediaRoster::Connect: media_destination invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
@@ -620,19 +621,19 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 						 const media_destination & destination)
 {
 	CALLED();
-	if (source_nodeid <= 0) {
+	if (IS_INVALID_NODEID(source_nodeid)) {
 		FATAL("BMediaRoster::Disconnect: source media_node_id invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
-	if (destination_nodeid <= 0) {
-		FATAL("BMediaRoster::Disconnect: source media_node_id invalid\n");
+	if (IS_INVALID_NODEID(destination_nodeid)) {
+		FATAL("BMediaRoster::Disconnect: destination media_node_id invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	if (source == media_source::null) {
+	if (IS_INVALID_SOURCE(source)) {
 		FATAL("BMediaRoster::Disconnect: media_source invalid\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
-	if (destination == media_destination::null) {
+	if (IS_INVALID_DESTINATION(destination)) {
 		FATAL("BMediaRoster::Disconnect: media_destination invalid\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
@@ -701,7 +702,7 @@ BMediaRoster::StopNode(const media_node & node,
 					   bool immediate)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	printf("BMediaRoster::StopNode, node %ld, at perf %Ld %s\n", node.node, at_performance_time, immediate ? "NOW" : "");
@@ -720,7 +721,7 @@ BMediaRoster::SeekNode(const media_node & node,
 					   bigtime_t at_performance_time)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	printf("BMediaRoster::SeekNode, node %ld, at perf %Ld, to perf %Ld\n", node.node, at_performance_time, to_media_time);
@@ -738,7 +739,7 @@ BMediaRoster::StartTimeSource(const media_node & node,
 							  bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node <= 0) {
+	if (IS_INVALID_NODE(node)) {
 		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -763,7 +764,7 @@ BMediaRoster::StopTimeSource(const media_node & node,
 							 bool immediate)
 {
 	CALLED();
-	if (node.node <= 0) {
+	if (IS_INVALID_NODE(node)) {
 		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -788,7 +789,7 @@ BMediaRoster::SeekTimeSource(const media_node & node,
 							 bigtime_t at_real_time)
 {
 	CALLED();
-	if (node.node <= 0) {
+	if (IS_INVALID_NODE(node)) {
 		FATAL("BMediaRoster::StartTimeSource node invalid\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -823,7 +824,7 @@ BMediaRoster::SetRunModeNode(const media_node & node,
 							 BMediaNode::run_mode mode)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	node_set_run_mode_command msg;
@@ -837,7 +838,7 @@ status_t
 BMediaRoster::PrerollNode(const media_node & node)
 {
 	CALLED();
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	char dummy;
@@ -872,7 +873,7 @@ BMediaRoster::SetProducerRate(const media_node & producer,
 							  int32 denom)
 {
 	CALLED();
-	if (producer.node == 0)
+	if (IS_INVALID_NODE(producer))
 		return B_MEDIA_BAD_NODE;
 	if ((producer.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
@@ -906,7 +907,7 @@ BMediaRoster::GetLiveNodeInfo(const media_node & node,
 	CALLED();
 	if (out_live_info == NULL)
 		return B_BAD_VALUE;	
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	server_get_live_node_info_request request;
@@ -1004,7 +1005,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 							   media_type filter_type)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_free_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1044,7 +1045,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 									int32 * out_total_count)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_active_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1082,7 +1083,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 							  int32 * out_total_count)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1119,7 +1120,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 								media_type filter_type)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_free_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1159,7 +1160,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 									 int32 * out_total_count)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_active_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1197,7 +1198,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 							   int32 * out_total_count)
 {
 	CALLED();
-	if (node.node <= 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (IS_INVALID_NODE(node) || (node.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -1265,7 +1266,7 @@ BMediaRoster::StartWatching(const BMessenger & where,
 		FATAL("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
-	if (node.node <= 0) {
+	if (IS_INVALID_NODE(node)) {
 		FATAL("BMediaRoster::StartWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -1307,7 +1308,7 @@ BMediaRoster::StopWatching(const BMessenger & where,
 {
 	CALLED();
 	// messenger may already be invalid, so we don't check this
-	if (node.node <= 0) {
+	if (IS_INVALID_NODE(node)) {
 		FATAL("BMediaRoster::StopWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
@@ -1474,7 +1475,7 @@ BMediaRoster::SetTimeSourceFor(media_node_id node,
 							   media_node_id time_source)
 {
 	CALLED();
-	if (node <= 0 || time_source <= 0)
+	if (IS_INVALID_NODEID(node) || IS_INVALID_NODEID(time_source))
 		return B_BAD_VALUE;
 	
 	media_node clone;
@@ -1705,7 +1706,7 @@ BMediaRoster::GetDormantNodeFor(const media_node & node,
 	CALLED();
 	if (out_info == NULL)
 		return B_BAD_VALUE;	
-	if (node.node <= 0)
+	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
 	server_get_dormant_node_for_request request;
