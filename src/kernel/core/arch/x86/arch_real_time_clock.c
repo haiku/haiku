@@ -26,7 +26,7 @@ typedef struct	{
 	uint8 century;
 } cmos_time;
 
-uint32 secs_per_month[12] = {SECONDS_31, SECONDS_28, SECONDS_31, SECONDS_30, 
+static uint32 sSecsPerMonth[12] = {SECONDS_31, SECONDS_28, SECONDS_31, SECONDS_30, 
 	SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_31, SECONDS_30, SECONDS_31, SECONDS_30,
 	SECONDS_31};
 
@@ -60,19 +60,19 @@ int_to_bcd(uint32 number)
 }
 
 
-static int
+static bool
 leap_year(uint32 year)
 {
 	if (year % 400 == 0)
-		return 1;
+		return true;
 
 	if (year % 100 == 0)
-		return 0;
+		return false;
 
 	if (year % 4 == 0)
-		return 1;
+		return true;
 
-	return 0;
+	return false;
 }
 
 
@@ -92,15 +92,13 @@ same_time(const cmos_time *time1, const cmos_time *time2)
 static uint8
 cmos_read(uint8 addr)
 {
-	int wait_time;
-
-	wait_time = 10000;
+	int waitTime = 10000;
 
 	// Wait until bit 7 of Status Register A (indicating whether or not an update is in
 	// progress) is clear if we are reading one of the clock data registers...
 	if (addr < 0x0a) {
 		out8(0x0a, CMOS_ADDR_PORT);
-		while ((in8(CMOS_DATA_PORT) & 0x80) && --wait_time);
+		while ((in8(CMOS_DATA_PORT) & 0x80) && --waitTime);
 	}
 
 	// then read the value.
@@ -177,6 +175,10 @@ cmos_to_secs(const cmos_time *cmos)
 
 	wholeYear = bcd_to_int(cmos->century) * 100 + bcd_to_int(cmos->year);
 
+	// ToDo: get rid of these loops and compute the correct value
+	//	i.e. days = (long)(year > 0) + year*365 + --year/4 - year/100 + year/400;
+	//	let sSecsPerMonth[] have the values already added up
+
 	// Add up the seconds from all years since 1970 that have elapsed.
 	for (i = BASE_YEAR; i < wholeYear; ++i) {
 		time += secs_this_year(i);
@@ -184,7 +186,7 @@ cmos_to_secs(const cmos_time *cmos)
 
 	// Add up the seconds from all months passed this year.
 	for (i = 0; i < bcd_to_int(cmos->month) - 1 && i < 12; ++i)
-		time += secs_per_month[i];
+		time += sSecsPerMonth[i];
 
 	// Add up the seconds from all days passed this month.
 	if (leap_year(wholeYear) && bcd_to_int(cmos->month) > 2)
@@ -230,7 +232,7 @@ secs_to_cmos(uint32 seconds, cmos_time *cmos)
 	month = 1;
 	isLeapYear = leap_year(wholeYear);
 	do {
-		temp = seconds - secs_per_month[month - 1];
+		temp = seconds - sSecsPerMonth[month - 1];
 
 		if (isLeapYear && month == 2)
 			temp -= SECONDS_DAY;
