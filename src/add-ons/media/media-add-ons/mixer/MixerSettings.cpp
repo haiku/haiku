@@ -1,6 +1,7 @@
 #include <MediaDefs.h>
 #include <Locker.h>
 #include <Path.h>
+#include <File.h>
 #include <OS.h>
 
 #include "MixerCore.h"
@@ -11,6 +12,8 @@
 
 #define SAVE_DELAY		5000000		// delay saving of settings for 5s
 #define SAVE_RUNTIME	30000000	// stop save thread after 30s inactivity
+
+#define SETTINGS_VERSION 0x94251601
 
 MixerSettings::MixerSettings()
  :	fLocker(new BLocker),
@@ -40,6 +43,7 @@ MixerSettings::SetSettingsFile(const char *file)
 	delete fSettingsFile;
 	fSettingsFile = new BPath(file);
 	fLocker->Unlock();
+	Load();
 }
 
 bool
@@ -216,64 +220,125 @@ MixerSettings::SetRefuseInputFormatChange(bool yesno)
 void
 MixerSettings::SaveConnectionSettings(MixerInput *input)
 {
+	fLocker->Lock();
+	int index = -1;
+	
+	// try to find matching name first
+	for (int i = 0; i < MAX_INPUT_SETTINGS; i++) {
+		if (fInputSetting[i].IsEmpty())
+			continue;
+		if (0 == strcmp(fInputSetting[i].FindString("name"), input->MediaInput().name)) {
+			index = i;
+			break;
+		}
+	}
+	if (index == -1) {
+		// try to find empty location
+		for (int i = 0; i < MAX_INPUT_SETTINGS; i++) {
+			if (fInputSetting[i].IsEmpty()) {
+				index = i;
+				break;
+			}
+		}
+	}
+	if (index == -1) {
+		// find lru location
+		index = 0;
+		for (int i = 0; i < MAX_INPUT_SETTINGS; i++) {
+			if (fInputSetting[i].FindInt64("lru") < fInputSetting[index].FindInt64("lru"))
+				index = i;
+		}
+	}
+
+	TRACE("SaveConnectionSettings: using entry %d\n", index);
+
+	fInputSetting[index].MakeEmpty();
+	fInputSetting[index].AddInt64("lru", system_time());
+	fInputSetting[index].AddString("name", input->MediaInput().name);
+
+	int count = input->GetInputChannelCount();
+	fInputSetting[index].AddInt32("InputChannelCount", count);
+	fInputSetting[index].AddBool("InputIsEnabled", input->IsEnabled());
+	
+	for (int i = 0; i < count; i++)
+		fInputSetting[index].AddFloat("InputChannelGain", input->GetInputChannelGain(i));
+
+	// XXX should save channel destinations and mixer channels
+
+	fLocker->Unlock();
+
 	StartDeferredSave();
 }
 
 void
 MixerSettings::LoadConnectionSettings(MixerInput *input)
 {
+	fLocker->Lock();
+	int index;
+	for (index = 0; index < MAX_INPUT_SETTINGS; index++) {
+		if (fInputSetting[index].IsEmpty())
+			continue;
+		if (0 == strcmp(fInputSetting[index].FindString("name"), input->MediaInput().name))
+			break;
+	}
+	if (index == MAX_INPUT_SETTINGS) {
+		TRACE("LoadConnectionSettings: entry not found\n");
+		fLocker->Unlock();
+		return;
+	}
+	
+	TRACE("LoadConnectionSettings: found entry %d\n", index);
+	
+	int count = input->GetInputChannelCount();
+	if (fInputSetting[index].FindInt32("InputChannelCount") == count) {
+		for (int i = 0; i < count; i++)
+			input->SetInputChannelGain(i, fInputSetting[index].FindFloat("InputChannelGain", i));
+		input->SetEnabled(fInputSetting[index].FindBool("InputIsEnabled"));
+	}
+	
+	// XXX should load channel destinations and mixer channels
+		
+	fInputSetting[index].ReplaceInt64("lru", system_time());
+	
+	fLocker->Unlock();
+	
+	StartDeferredSave();
 }
 
 void
 MixerSettings::SaveConnectionSettings(MixerOutput *output)
 {
+	fLocker->Lock();
+	
+	fOutputSetting.MakeEmpty();
+	
+	int count = output->GetOutputChannelCount();
+	fOutputSetting.AddInt32("OutputChannelCount", count);
+	for (int i = 0; i < count; i++)
+		fOutputSetting.AddFloat("OutputChannelGain", output->GetOutputChannelGain(i));
+	fOutputSetting.AddBool("OutputIsMuted", output->IsMuted());
+	
+	// XXX should save channel sources and source gains
+	
+	fLocker->Unlock();
+	
 	StartDeferredSave();
 }
 
 void
 MixerSettings::LoadConnectionSettings(MixerOutput *output)
 {
-}
-
-void
-MixerSettings::SaveConnectionSettingsSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count)
-{
 	fLocker->Lock();
 	
-	// XXX work 
+	int count = output->GetOutputChannelCount();
+	if (fOutputSetting.FindInt32("OutputChannelCount") == count) {
+		for (int i = 0; i < count; i++)
+			output->SetOutputChannelGain(i, fOutputSetting.FindFloat("OutputChannelGain", i));
+		output->SetMuted(fOutputSetting.FindBool("OutputIsMuted"));
+	}
 	
-	fLocker->Unlock();
-	StartDeferredSave();
-}
-
-void
-MixerSettings::LoadConnectionSettingsSetting(const char *name, uint32 channel_mask, float *gain, int gain_count)
-{
-	fLocker->Lock();
-	
-	// XXX work 
-	
-	fLocker->Unlock();
-}
-	
-void
-MixerSettings::SaveSetting(const char *name, int value)
-{
-	fLocker->Lock();
-	
-	// XXX work 
-	
-	fLocker->Unlock();
-	StartDeferredSave();
-}
-
-void
-MixerSettings::LoadSetting(const char *name, int *value, int default_value /* = 0 */)
-{
-	fLocker->Lock();
-	
-	// XXX work 
-	
+	// XXX should load channel sources and source gains
+		
 	fLocker->Unlock();
 }
 
@@ -287,12 +352,27 @@ MixerSettings::Save()
 		return;
 	}
 	TRACE("MixerSettings: SAVE!\n");
-
-
-
 	
-	// XXX work 
+	BMessage msg;
+	msg.AddInt32("version", SETTINGS_VERSION);
+	msg.AddData("settings", B_RAW_TYPE, (void *)&fSettings, sizeof(fSettings));
+	msg.AddMessage("output", &fOutputSetting);
+	for (int i = 0; i < MAX_INPUT_SETTINGS; i++)
+		msg.AddMessage("input", &fInputSetting[i]);
+		
+	size_t size;
+	char *buffer;
+    size_t length; 
+    
+    length = msg.FlattenedSize();
+    buffer = new char [length];
+    msg.Flatten(buffer, length);
+
+	BFile file(fSettingsFile->Path(), B_READ_WRITE | B_CREATE_FILE);
+	file.Write(buffer, length);
 	
+   	delete [] buffer;
+		
 	fSettingsDirty = false;
 	fLocker->Unlock();
 }
@@ -317,6 +397,54 @@ MixerSettings::Load()
 		fLocker->Unlock();
 		return;
 	}
+	
+	BFile file(fSettingsFile->Path(), B_READ_WRITE);
+	off_t size = 0;
+	file.GetSize(&size);
+	if (size == 0) {
+		fLocker->Unlock();
+		TRACE("MixerSettings: no settings file\n");
+		return;
+	}
+
+	char * buffer = new char[size];
+	if (size != file.Read(buffer, size)) {
+		delete [] buffer;
+		fLocker->Unlock();
+		TRACE("MixerSettings: can't read settings file\n");
+		return;
+	}
+
+	BMessage msg;
+	if (B_OK != msg.Unflatten(buffer)) {
+		delete [] buffer;
+		fLocker->Unlock();
+		TRACE("MixerSettings: can't unflatten settings\n");
+		return;
+	}
+
+	delete [] buffer;
+
+	if (msg.FindInt32("version") != SETTINGS_VERSION) {
+		fLocker->Unlock();
+		TRACE("MixerSettings: settings have wrong version\n");
+		return;
+	}
+	
+	const void *data;
+	ssize_t datasize = 0;
+	
+	msg.FindData("settings", B_RAW_TYPE, &data, &datasize);
+	if (datasize != sizeof(fSettings)) {
+		fLocker->Unlock();
+		TRACE("MixerSettings: settings have wrong size\n");
+		return;
+	}
+	memcpy((void *)&fSettings, data, sizeof(fSettings));
+	
+	msg.FindMessage("output", &fOutputSetting);
+	for (int i = 0; i < MAX_INPUT_SETTINGS; i++)
+		msg.FindMessage("input", i, &fInputSetting[i]);
 	
 	fLocker->Unlock();
 }

@@ -1,8 +1,12 @@
 #ifndef _MIXER_SETTINGS_H
 #define _MIXER_SETTINGS_H
 
+#include <Message.h>
+
 class MixerInput;
 class MixerOutput;
+
+#define MAX_INPUT_SETTINGS	50
 
 class MixerSettings
 {
@@ -47,12 +51,6 @@ public:
 	
 protected:
 
-	void	SaveConnectionSettingsSetting(const char *name, uint32 channel_mask, const float *gain, int gain_count);
-	void	LoadConnectionSettingsSetting(const char *name, uint32 channel_mask, float *gain, int gain_count);
-
-	void	SaveSetting(const char *name, int value);
-	void	LoadSetting(const char *name, int *value, int default_value = 0);
-
 	void	StartDeferredSave();
 	void	StopDeferredSave();
 	
@@ -83,8 +81,11 @@ protected:
 		bool	RefuseOutputFormatChange;
 		bool	RefuseInputFormatChange;
 	};
-
+	
 	volatile settings	fSettings;
+
+	BMessage fOutputSetting;
+	BMessage fInputSetting[MAX_INPUT_SETTINGS];
 };
 
 #endif //_MIXER_SETTINGS_H
