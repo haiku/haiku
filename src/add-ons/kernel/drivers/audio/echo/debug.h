@@ -67,7 +67,7 @@
 extern "C" {
 #endif
 
-	void log_create();
+	void log_create(void);
 	void log_printf(const char *text,...);
 	void debug_printf(const char *text,...);
 #ifdef __cplusplus
@@ -78,7 +78,7 @@ extern "C" {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	void log_create();
+	void log_create(void);
 	void debug_printf(const char *text,...);
 #ifdef __cplusplus
 }

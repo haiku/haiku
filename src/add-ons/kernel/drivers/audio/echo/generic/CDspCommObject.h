@@ -696,9 +696,9 @@ protected :
 	//
 	//	Load code into ASIC
 	//
-	virtual BOOL LoadASIC( DWORD dwCmd, PBYTE pCode, DWORD dwSize );
+	BOOL LoadASIC( DWORD dwCmd, PBYTE pCode, DWORD dwSize );
 	virtual BOOL LoadASIC() { return TRUE; }
-
+	
 	//
 	//	Check status of ASIC - loaded or not loaded
 	//

@@ -42,7 +42,6 @@ static sem_id loglock;
 
 void debug_printf(const char *text,...);
 void log_printf(const char *text,...);
-void log_create();
 
 void debug_printf(const char *text,...)
 {
