@@ -798,8 +798,9 @@ vm_translation_map_module_init2(kernel_args *ka)
 // the pgdir entries back at itself, effectively mapping the contents of all of the 4MB of pagetables
 // into a 4 MB region. It's only used here, and is later unmapped.
 
-int
-vm_translation_map_quick_map(kernel_args *ka, addr va, addr pa, unsigned int attributes, addr (*get_free_page)(kernel_args *))
+status_t
+vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
+	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	ptentry *pentry;
 	int index;
