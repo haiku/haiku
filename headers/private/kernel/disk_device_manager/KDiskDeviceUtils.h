@@ -155,18 +155,30 @@ public:
 		_Unlock();
 	}
 
-	inline AutoLocker<Lockable, Locking> &operator=(Lockable *lockable)
+	inline void SetTo(Lockable *lockable, bool alreadyLocked)
 	{
 		_Unlock();
 		fLockable = lockable;
-		_Lock();
+		fLocked = alreadyLocked;
+		if (!fLocked)
+			_Lock();
+	}
+
+	inline void SetTo(Lockable &lockable, bool alreadyLocked)
+	{
+		SetTo(&lockable, alreadyLocked);
+	}
+
+	inline AutoLocker<Lockable, Locking> &operator=(Lockable *lockable)
+	{
+		SetTo(lockable);
+		return *this;
 	}
 
 	inline AutoLocker<Lockable, Locking> &operator=(Lockable &lockable)
 	{
-		_Unlock();
-		fLockable = &lockable;
-		_Lock();
+		SetTo(&lockable);
+		return *this;
 	}
 
 	inline bool IsLocked() const	{ return fLocked; }
