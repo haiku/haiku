@@ -187,8 +187,10 @@ static status_t
 get_word(char **_pos, char **_word, bool allowNewLine)
 {
 	char *pos = *_pos;
-	bool quoted = false, newLine = false, end = false;
-	bool escaped = false;
+	char quoted = 0;
+	bool newLine = false, end = false;
+	int escaped = 0;
+	bool charEscaped = false;
 
 	// Skip any white space and comments
 	while (pos[0] && ((allowNewLine && (isspace(pos[0]) || pos[0] == '#'))
@@ -205,31 +207,31 @@ get_word(char **_pos, char **_word, bool allowNewLine)
 		return B_NO_ERROR;
 
 	// Read in a word - might contain escaped (\) spaces, or it
-	// might also be quoted (").
+	// might also be quoted (" or ').
 
-	if (pos[0] == '"') {
-		quoted = true;
+	if (pos[0] == '"' || pos[0] == '\'') {
+		quoted = pos[0];
 		pos++;
 	}
 	*_word = pos;
 
 	while (pos[0]) {
-		if (pos[0] == '\\' && pos[1] == ' ') {
-			escaped = true;
-			pos++;
-		} else if (quoted && pos[0] == '\\' && pos[1] == '"') {
-			escaped = true;
-			pos++;
-		} else if (pos[0] == '\n')
+		if (charEscaped)
+			charEscaped = false;
+		else if (pos[0] == '\\') {
+			charEscaped = true;
+			escaped++;
+		} else if ((!quoted && isspace(pos[0])) || (quoted && pos[0] == quoted))
 			break;
-		else if ((!quoted && isspace(pos[0])) || (quoted && pos[0] == '"'))
-			break;
-
 		pos++;
 	}
 
 	// "String exceeds line" - missing end quote
-	if (quoted && pos[0] != '"')
+	if (quoted && pos[0] != quoted)
+		return B_BAD_DATA;
+
+	// last character is a backslash
+	if (charEscaped)
 		return B_BAD_DATA;
 
 	end = pos[0] == '\0';
@@ -239,12 +241,13 @@ get_word(char **_pos, char **_word, bool allowNewLine)
 	// Correct name if there were any escaped characters
 	if (escaped) {
 		char *word = *_word;
-		while (word < pos) {
-			if (word[0] == '\\'
-				&& ((quoted && word[1] == '"')
-					|| (!quoted && word[1] == ' ')))
-				memmove(word, word + 1, pos - word);
-
+		int offset = 0;
+		while (word <= pos) {
+			if (word[0] == '\\') {
+				offset--;
+				word++;
+			}
+			word[offset] = word[0];
 			word++;
 		}
 	}
@@ -489,6 +492,7 @@ get_driver_boolean_parameter(void *handle, const char *keyName, bool unknownValu
 
 	// ToDo: This takes just the first argument/value, and checks that one;
 	// I don't know if they are used to work that way in BeOS, though.
+	// bonefish: Yep, exactly like that.
 
 	// check for the argument
 	if (parameter->value_count <= 0)
