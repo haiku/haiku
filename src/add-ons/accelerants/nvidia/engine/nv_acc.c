@@ -7,6 +7,32 @@
     - the Linux UtahGLX 3D driver.
 */
 
+/*
+	note:
+	Can't get NV40 and higher going using this PIO mode acceleration system ATM.
+	Here's the problem:
+	The FIFO is not functioning correctly: the proof of this is that you can only
+	readout	the PIO FIFO fill-level register (FifoFree) once before it stops responding
+	(returns only zeros on all reads after the first one).
+	You can see the issued commands are actually placed in the FIFO because the first
+	read of FifoFree corresponds to what you'd expect.
+	There is no visual confirmation of any command actually being executed by the
+	acceleration engine, so we don't know if the FIFO places commands in the engine.
+	BTW:
+	The FifoFree register exhibits the exact same behaviour in DMA acceleration mode.
+	It's no problem there because we use the DMAPut and DMAGet registers instead.
+
+	The non-functioning Fifo in PIO mode might have one of these reasons:
+	- lack of specs: maybe additional programming is required.
+	- hardware fault: as probably no-one uses PIO mode acceleration anymore these days,
+	  nVidia might not care about this any longer.
+
+	note also:
+	Keeping this PIO mode acceleration stuff here for now to guarantee compatibility
+	with current 3D acceleration attempts: the utahGLX 3D driver cooperated with the
+	PIO mode acceleration functions in the XFree drivers (upto/including XFree 4.2.0).
+*/
+
 #define MODULE_BIT 0x00080000
 
 #include "nv_std.h"
@@ -676,12 +702,14 @@ status_t nv_acc_init()
 		}
 		else
 		{
-			ACCW(PR_CTX1_0, 0x00000000); /* NV_ROP5_SOLID 0 */
-			ACCW(PR_CTX1_2, 0x00000000); /* NV_IMAGE_BLACK_RECTANGLE 1 */
-			ACCW(PR_CTX1_4, 0x02000000); /* NV_IMAGE_PATTERN 2 */
-			ACCW(PR_CTX1_6, 0x00000000); /* NV_IMAGE_BLIT 4 */
-			ACCW(PR_CTX1_8, 0x02000000); /* NV4_GDI_RECTANGLE_TEXT 5 */
-			ACCW(PR_CTX1_A, 0x00000000); /* NV10_CONTEXT_SURFACES_2D 9 */
+			//fixme: select colorspace here (and in other depths), or add
+			//the appropriate SURFACE command(s).
+			ACCW(PR_CTX1_0, 0x00000000); /* NV_ROP5_SOLID */
+			ACCW(PR_CTX1_2, 0x00000000); /* NV_IMAGE_BLACK_RECTANGLE */
+			ACCW(PR_CTX1_4, 0x02000000); /* NV_IMAGE_PATTERN */
+			ACCW(PR_CTX1_6, 0x00000000); /* NV_IMAGE_BLIT */
+			ACCW(PR_CTX1_8, 0x02000000); /* NV4_GDI_RECTANGLE_TEXT */
+			ACCW(PR_CTX1_A, 0x02000000); /* NV10_CONTEXT_SURFACES_2D */
 		}
 		break;
 	case B_RGB15_LITTLE:
@@ -968,11 +996,13 @@ status_t nv_acc_init()
 		ACCW(NV10_PIPEADR, 0x00000040);
 		ACCW(NV10_PIPEDAT, 0x00000000);
 
-		//fixme:
-		//this 'set' seems to hang the NV43 engine if executed:
+		//fixme: this 'set' seems to hang the NV43 engine if executed:
 		//status remains 'busy' forever in this case.
-		ACCW(NV10_PIPEADR, 0x00000800);
-		for (cnt = 0; cnt < (16 * 16); cnt++) ACCW(NV10_PIPEDAT, 0x00000000);
+		if (si->ps.card_arch < NV40A)
+		{
+			ACCW(NV10_PIPEADR, 0x00000800);
+			for (cnt = 0; cnt < (16 * 16); cnt++) ACCW(NV10_PIPEDAT, 0x00000000);
+		}
 
 		/* turn lightning on */
 		ACCW(NV10_XFMOD0, 0x30000000);
@@ -1019,11 +1049,17 @@ status_t nv_acc_init()
 	si->engine.fifo.handle[0] = NV_ROP5_SOLID;
 	si->engine.fifo.handle[1] = NV_IMAGE_BLACK_RECTANGLE;
 	si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
-	si->engine.fifo.handle[3] = NV1_IMAGE_FROM_CPU;
+	if (si->ps.card_arch < NV40A)
+		si->engine.fifo.handle[3] = NV1_IMAGE_FROM_CPU;
+	else
+		si->engine.fifo.handle[3] = NV10_CONTEXT_SURFACES_2D;
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 	si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
-	si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
-	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
+	if (si->ps.card_arch < NV40A)
+	{
+		si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
+		si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
+	}
 	/* preset no FIFO channels assigned to cmd's */
 	for (cnt = 0; cnt < 0x20; cnt++)
 	{
@@ -1042,8 +1078,11 @@ status_t nv_acc_init()
 	ACCW(FIFO_CH3, (0x80000000 | si->engine.fifo.handle[3])); /* Pixmap (not used or 3D only?) */
 	ACCW(FIFO_CH4, (0x80000000 | si->engine.fifo.handle[4])); /* Blit */
 	ACCW(FIFO_CH5, (0x80000000 | si->engine.fifo.handle[5])); /* Bitmap */
-	ACCW(FIFO_CH6, (0x80000000 | si->engine.fifo.handle[6])); /* Line (not used or 3D only?) */
-	ACCW(FIFO_CH7, (0x80000000 | si->engine.fifo.handle[7])); /* Textured Triangle (3D only) */
+	if (si->ps.card_arch < NV40A)
+	{
+		ACCW(FIFO_CH6, (0x80000000 | si->engine.fifo.handle[6])); /* Line (not used or 3D only?) */
+		ACCW(FIFO_CH7, (0x80000000 | si->engine.fifo.handle[7])); /* Textured Triangle (3D only) */
+	}
 
 	/* initialize our local pointers */
 	nv_acc_assert_fifo();

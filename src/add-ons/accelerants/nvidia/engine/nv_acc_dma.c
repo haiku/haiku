@@ -4,15 +4,7 @@
    Rudolf Cornelissen 8/2003-2/2005.
 
    This code was possible thanks to:
-    - the Linux XFree86 NV driver,
-    - the Linux UtahGLX 3D driver.
-*/
-
-/*
-	note:
-	attempting DMA because without it I can't get NV40 and higher going ATM.
-	Maybe later we can forget about the non-DMA version: that depends on
-	3D acceleration attempts).
+    - the Linux XFree86 NV driver.
 */
 
 #define MODULE_BIT 0x00080000
