@@ -25,8 +25,6 @@
 //  
 //------------------------------------------------------------------------------
 
-// TODO: Update this to have GetMode, GetWidth, etc return the proper values
-
 #include <stdio.h>
 #include <iostream.h>
 #include <Message.h>
@@ -65,7 +63,7 @@ VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	SetViewColor(B_TRANSPARENT_32_BIT);
-	viewbmp=new BBitmap(bounds,B_RGB32,true);
+	viewbmp=new BBitmap(bounds,B_CMAP8,true);
 
 	// This link for sending mouse messages to the OBAppServer.
 	// This is only to take the place of the Input Server. I suppose I could write
@@ -74,7 +72,7 @@ VDView::VDView(BRect bounds)
 	serverlink=new PortLink(find_port(SERVER_INPUT_PORT));
 
 	// Create a cursor which isn't just a box
-	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);
+	cursor=new BBitmap(BRect(0,0,20,20),B_CMAP8,true);
 	BView *v=new BView(cursor->Bounds(),"v", B_FOLLOW_NONE, B_WILL_DRAW);
 	hide_cursor=0;
 
@@ -333,6 +331,10 @@ ViewDriver::ViewDriver(void)
 	framebuffer=screenwin->view->viewbmp;
 	serverlink=screenwin->view->serverlink;
 	hide_cursor=0;
+	_SetWidth(640);
+	_SetHeight(480);
+	_SetDepth(8);
+	_SetMode(B_8_BIT_640x480);
 }
 
 ViewDriver::~ViewDriver(void)
@@ -374,7 +376,7 @@ void ViewDriver::SetMode(int32 space)
 {
 	screenwin->Lock();
 	int16 w=640,h=480;
-	color_space s;
+	color_space s=B_CMAP8;
 
 	switch(space)
 	{
@@ -403,24 +405,33 @@ void ViewDriver::SetMode(int32 space)
 		case B_32_BIT_800x600:
 		case B_32_BIT_1024x768:
 			s=B_RGBA32;
+			_SetDepth(32);
 			break;
 		case B_16_BIT_640x480:
 		case B_16_BIT_800x600:
 		case B_16_BIT_1024x768:
 			s=B_RGBA15;
+			_SetDepth(15);
 			break;
 		case B_8_BIT_640x480:
 		case B_8_BIT_800x600:
 		case B_8_BIT_1024x768:
 			s=B_CMAP8;
+			_SetDepth(8);
 			break;
 		default:
+			_SetDepth(8);
 			break;
 	}
 	
 	
 	delete framebuffer;
-	
+
+	// don't forget to update the internal vars!
+	_SetWidth(w);
+	_SetHeight(h);
+	_SetMode(space);
+
 	screenwin->view->viewbmp=new BBitmap(BRect(0,0,w-1,h-1),s,true);
 	framebuffer=screenwin->view->viewbmp;
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
@@ -431,6 +442,8 @@ void ViewDriver::SetMode(int32 space)
 	drawview->FillRect(drawview->Bounds());
 	drawview->Sync();
 	framebuffer->Unlock();
+
+	_SetBytesPerRow(framebuffer->BytesPerRow());
 	screenwin->view->Invalidate();
 	screenwin->Unlock();
 }

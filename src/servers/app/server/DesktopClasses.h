@@ -40,7 +40,7 @@ class RGBColor;
 class Workspace
 {
 public:
-	Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo);
+	Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, DisplayDriver *gfxdriver);
 	~Workspace(void);
 	void SetBGColor(const RGBColor &c);
 	RGBColor BGColor();

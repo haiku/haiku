@@ -34,13 +34,15 @@ extern RGBColor workspace_default_color;
 	\brief Sets up internal variables needed by the Workspace
 	\param gcinfo The graphics card info
 	\param fbinfo The frame buffer info
+	\param gfxdriver DisplayDriver for the associated RootLayer
 */
-Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo)
+Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, DisplayDriver *gfxdriver)
 {
 	_gcinfo=gcinfo;
 	_fbinfo=fbinfo;
 	
-	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1), "Workspace Root");
+	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1),
+		"Workspace Root",gfxdriver);
 	_rootlayer->SetColor(workspace_default_color);
 }
 
@@ -150,7 +152,7 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 		_workspacecount = workspaces;
 		for (int i=0; i<workspaces; i++)
 		{
-			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo));
+			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo,_driver));
 		}
 		_resolution=_driver->GetMode();
 		_currentworkspace=0;
@@ -183,7 +185,7 @@ Screen::~Screen(void)
 */
 void Screen::AddWorkspace(int32 index)
 {
-	Workspace *workspace = new Workspace(_gcinfo,_fbinfo);
+	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,_driver);
 	if ( (index == -1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
 }

@@ -34,7 +34,7 @@
 class RootLayer : public Layer
 {
 public:
-	RootLayer(BRect rect, const char *layername);
+	RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver);
 	~RootLayer();
 	void RequestDraw();
 	void RequestDraw(const BRect &r);

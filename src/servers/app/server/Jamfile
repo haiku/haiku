@@ -45,7 +45,11 @@ Server app_server :
 	ViewDriver.cpp
 	WinBorder.cpp
 ;
-LinkSharedOSLibs app_server : be root game translation 
+
+LINKFLAGS on app_server ?= $(LINKFLAGS) ;
+LINKFLAGS on app_server += -lbe ;
+
+LinkSharedOSLibs app_server : root game translation 
 							   <boot!home!config!lib>libopenbeos.so 
 							   <boot!home!config!lib>libfreetype.so ;
 

@@ -31,20 +31,19 @@
 
 /*!
 	\brief Sets up internal variables needed by the RootLayer
-	\param frame 
-	\param name 
+	\param rect Frame of the root layer
+	\param layername Name of the root layer. Not really used.
+	\param gfxdriver Pointer to the related graphics driver
 */
-RootLayer::RootLayer(BRect rect, const char *layername)
+RootLayer::RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver)
 	: Layer(rect,layername,B_FOLLOW_NONE,0, NULL)
 {
-	_driver=GetGfxDriver();
+	_driver=gfxdriver;
 	_invalid=new BRegion(Bounds());
 	_is_dirty=true;
 }
 
-/*!
-	\brief Frees all allocated heap memory (which happens to be none) ;)
-*/
+//! Frees all allocated heap memory (which happens to be none) ;)
 RootLayer::~RootLayer()
 {
 }
