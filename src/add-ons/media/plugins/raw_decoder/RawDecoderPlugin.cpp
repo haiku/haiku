@@ -41,6 +41,8 @@ RawDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	string_for_format(*ioDecodedFormat, s, sizeof(s));
 	printf("RawDecoder::NegotiateOutputFormat enter: %s\n", s);
 
+	// XXX we should allow different buffer size, sample format and byte order and do translation in decode!
+
 	*ioDecodedFormat = fInputFormat;
 
 	string_for_format(*ioDecodedFormat, s, sizeof(s));

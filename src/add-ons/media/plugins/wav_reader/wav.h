@@ -12,7 +12,7 @@ struct chunk_struct
 	uint32 len;
 };
 
-struct common_struct 
+struct format_struct 
 { 
 	uint16 format_tag; 
 	uint16 channels; 
@@ -22,10 +22,21 @@ struct common_struct
 	uint16 bits_per_sample;
 }; 
 
-struct wave_header
+struct format_struct_extensible
 { 
-	riff_struct   riff;
-	chunk_struct  format;
-	common_struct common;
-	chunk_struct  data;
-};
+	uint16 format_tag; // 0xfffe for extensible format
+	uint16 channels; 
+	uint32 samples_per_sec; 
+	uint32 avg_bytes_per_sec; 
+	uint16 block_align; 
+	uint16 bits_per_sample;
+	uint16 ext_size;
+	uint16 valid_bits_per_sample;
+	uint32 channel_mask;
+	uint8  guid[16]; // first two bytes are format code
+}; 
+
+struct fact_struct 
+{ 
+	uint32 sample_length; 
+}; 

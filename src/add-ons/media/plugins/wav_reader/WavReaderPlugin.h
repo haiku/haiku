@@ -31,8 +31,15 @@ public:
 	
 private:
 	BPositionIO *	fSource;
-	uint64			fDataSize;
-	wave_header 	fRawHeader;
+	int64			fFileSize;
+	int64			fDataStart;
+	int64			fDataSize;
+
+	int32			fChannelCount;
+	int32			fFrameRate;
+	int				fBitsPerSample;
+	uint16			fFormatCode;
+	uint16			fBlockAlign;
 };
 
 
