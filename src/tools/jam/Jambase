@@ -378,6 +378,7 @@ else if $(OS) = BEOS && $(OSPLAT) = PPC
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
+	LEX			?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= mwld ;
 	LINKFLAGS	?= "" ;
@@ -398,6 +399,7 @@ else if $(OS) = BEOS
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
+	LEX			?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= gcc ;
 	MANDIR		?= /boot/home/config/man ;
