@@ -9,6 +9,9 @@
 #include <SupportDefs.h>
 
 
+// ToDo: most of this is probably arch dependent. When the PPC port comes
+//	to this, it should be properly separated and moved into the arch tree.
+
 struct real_time_data {
 	uint64	boot_time;
 	uint32	system_time_conversion_factor;
