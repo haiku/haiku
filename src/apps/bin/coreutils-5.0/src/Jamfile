@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src apps bin coreutils-5.0 src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 
 StdBinCommands
 	basename.c

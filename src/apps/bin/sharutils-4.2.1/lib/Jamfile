@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin sharutils-4.2.1 lib ;
 
-SubDirCcFlags += -DHAVE_CONFIG_H ;
+SubDirCcFlags -DHAVE_CONFIG_H ;
 
 StaticLibrary sharutils : 
 alloca.c

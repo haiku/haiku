@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin less-381 ;
 
-SubDirCcFlags += -DSYSDIR=\'\"/etc\"\' ;
+SubDirCcFlags -DSYSDIR=\'\"/etc\"\' ;
 
 BinCommand less : 
 	main.c screen.c brac.c ch.c charset.c cmdbuf.c command.c decode.c edit.c filename.c forwback.c 

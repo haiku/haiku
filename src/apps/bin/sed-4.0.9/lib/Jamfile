@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin sed-4.0.9 lib ;
 
-SubDirCcFlags += -DHAVE_CONFIG_H ;
+SubDirCcFlags -DHAVE_CONFIG_H ;
 
 StaticLibrary sedutils : 
 alloca.c getline.c getopt.c getopt1.c memchr.c memcmp.c memmove.c mkstemp.c obstack.c
