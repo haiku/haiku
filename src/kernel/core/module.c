@@ -470,7 +470,8 @@ check_module_image(const char *path, const char *searchedName)
 	return match;
 }
 
-	
+
+#ifdef SUPPORT_BOOTFS	
 /** Recursively scans through the provided path for the specified module
  *	named "searchedName".
  *	If "searchedName" is NULL, all modules will be scanned.
@@ -505,7 +506,7 @@ recurse_directory(const char *path, const char *searchedName)
 			goto exit;
 		}
 
-		if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, ".."))
+		if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, "..") || !strcmp(dirent->d_name, "boot"))
 			continue;
 
 		size = strlen(path) + strlen(dirent->d_name) + 2;	
@@ -553,6 +554,7 @@ exit:
 	closedir(dir);
 	return status;
 }
+#endif
 
 
 /** This is only called if we fail to find a module already in our cache...
@@ -975,8 +977,26 @@ register_preloaded_module_image(struct preloaded_image *image)
 		(void **)&moduleImage->dependencies);
 		// this is allowed to be NULL
 
-	moduleImage->path = strdup(image->name);
-	if (!moduleImage->path) {
+	// Try to recreate the full module path, so that we don't try to load the
+	// image again when asked for a module it does not export (would only be
+	// problematic if it had got replaced and the new file actually exports
+	// that module). Also helpful for recurse_directory().
+	{
+		// ToDo: this is kind of a hack to have the full path in the hash
+		//	(it always assumes the preloaded add-ons to be in the system directory)
+		char path[B_FILE_NAME_LENGTH];
+		const char *name, *suffix;
+		if (moduleImage->info[0]
+			&& (suffix = strstr(name = moduleImage->info[0]->name, image->name)) != NULL) {
+			// even if strlcpy() is used here, it's by no means safe against buffer overflows
+			size_t length = strlcpy(path, "/boot/beos/system/add-ons/kernel/", sizeof(path));
+			strlcpy(path + length, name, strlen(image->name) + 1 + (suffix - name));
+
+			moduleImage->path = strdup(path);
+		} else
+			moduleImage->path = strdup(image->name);
+	}
+	if (moduleImage->path == NULL) {
 		status = B_NO_MEMORY;
 		goto error;
 	}
@@ -988,7 +1008,7 @@ register_preloaded_module_image(struct preloaded_image *image)
 	hash_insert(sModuleImagesHash, moduleImage);
 
 	for (info = moduleImage->info; *info; info++) {
-		create_module(*info, image->name, index++, NULL);
+		create_module(*info, moduleImage->path, index++, NULL);
 	}
 
 	return B_OK;
@@ -1276,7 +1296,7 @@ get_module(const char *path, module_info **_info)
 
 	if ((module->flags & B_BUILT_IN_MODULE) == 0) {
 		/* We now need to find the module_image for the module. This should
-		 * be in memory if we have just run search_modules, but may not be
+		 * be in memory if we have just run search_module(), but may not be
 		 * if we are using cached information.
 		 * We can't use the module->module_image pointer, because it is not
 		 * reliable at this point (it won't be set to NULL when the module_image
@@ -1284,11 +1304,11 @@ get_module(const char *path, module_info **_info)
 		 */
 		if (get_module_image(module->file, &moduleImage) < B_OK)
 			goto err;
-	
+
 		// (re)set in-memory data for the loaded module
 		module->info = moduleImage->info[module->offset];
 		module->module_image = moduleImage;
-	
+
 		// the module image must not be unloaded anymore
 		if (module->flags & B_KEEP_LOADED)
 			module->module_image->keep_loaded = true;
