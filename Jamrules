@@ -1046,7 +1046,7 @@ rule SourceHdrs
 								  [ on $(file) return $(HDRS) ] ] ;
 		}
 	} else {
-		for file in $(sources) {
+		for file in $(sources:S=$(SUFOBJ)) {
 			ObjectHdrs $(file) : $(headers) ;
 			# also reformat the assembler headers
 			ASHDRS on $(file) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS)
@@ -1217,7 +1217,7 @@ rule UseArchObjectHeaders
 	if $(objects) {
 		targets = $(objects) ;
 	} else {
-		targets = $(sources) ;
+		targets = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 	}
 	local opt = -D$(OBOS_TARGET_DEFINE) ;
 
