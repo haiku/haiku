@@ -9,9 +9,9 @@ CommonTestLib libstoragetest.so
 		EntryTest.cpp
 		FindDirectoryTest.cpp
 		FileTest.cpp
+		MimeSnifferTest.cpp
 		MimeTypeTest.cpp
 		NodeTest.cpp
-		ParserTest.cpp
 		PathTest.cpp
 		QueryTest.cpp
 		ResourcesTest.cpp
