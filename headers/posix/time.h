@@ -10,12 +10,24 @@
 
 typedef long clock_t;
 typedef long time_t;
+typedef long suseconds_t;
+typedef long useconds_t;
 
 #define CLOCKS_PER_SEC	1000
 #define CLK_TCK			CLOCKS_PER_SEC
 
 #define MAX_TIMESTR		70
 	/* maximum length of a string returned by asctime(), and ctime() */
+
+struct timespec {
+	time_t	tv_sec;		/* seconds */
+	long	tv_nsec;	/* and nanoseconds */
+};
+
+struct itimerspec {
+	struct timespec it_interval;
+	struct timespec it_value;
+};
 
 struct tm {
 	int	tm_sec;
