@@ -9,10 +9,10 @@
 #include <MailAddon.h>
 #include <MailSettings.h>
 #include <Looper.h>
-#include <status.h>
 
 class BStringList;
 class BMailStatusWindow;
+class BMailStatusView;
 class BMailChain;
 
 class BMailChainCallback {
