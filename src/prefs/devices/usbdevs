@@ -1814,12 +1814,36 @@ product VIVITAR DSC350		0x0003	DSC350 Camera
 product VODAFONE MC3G		0x5000	Mobile Connect 3G datacard
 
 /* Wacom products */
-product WACOM CT0405U		0x0000	CT-0405-U Tablet
+product WACOM PEN_PARTNER	0x0000	Pen Partner
+product WACOM CINTIQ_PARTNER	0x0003	Cintiq Partner
 product WACOM GRAPHIRE		0x0010	Graphire
-product WACOM GRAPHIRE3_4X5	0x0013	Graphire3 4x5
-product WACOM INTUOSA5		0x0021	Intuos A5
-product WACOM GD0912U		0x0022	Intuos 9x12 Graphics Tablet
- 
+product WACOM GRAPHIRE2_4X5	0x0011	Graphire2 4x5\"
+product WACOM GRAPHIRE2_5X7	0x0012	Graphire2 5x7\"
+product WACOM GRAPHIRE3_4X5	0x0013	Graphire3 4x5\"
+product WACOM GRAPHIRE3_6X8	0x0014	Graphire3 6x8\"
+product WACOM INTUOS_4X5	0x0020	Intuos 4x5\"
+product WACOM INTUOS_6X8	0x0021	Intuos 6x8\"
+product WACOM INTUOS_9X12	0x0022	Intuos 9x12\"
+product WACOM INTUOS_12X12	0x0023	Intuos 12x12\"
+product WACOM INTUOS_12X18	0x0024	Intuos 12x18\"
+product WACOM PL400		0x0030	PL400
+product WACOM PL500		0x0031	PL500
+product WACOM PL600		0x0032	PL600
+product WACOM PL600SX		0x0033	PL600SX
+product WACOM PL550		0x0034	PL550
+product WACOM PL800		0x0035	PL800
+product WACOM CINTIQ_21UX	0x003f	Cintiq 21UX
+product WACOM INTUOS2_4X5	0x0041	Intuos2 4x5\"
+product WACOM INTUOS2_6X8	0x0042	Intuos2 6x8\"
+product WACOM INTUOS2_9X12	0x0043	Intuos2 9x12\"
+product WACOM INTUOS2_12X12	0x0044	Intuos2 12x12\"
+product WACOM INTUOS2_12X18	0x0045	Intuos2 12x18\"
+product WACOM VOLITO		0x0060	Volito
+product WACOM INTUOS3_4X5	0x00b0	Intuos3 4x5\"
+product WACOM INTUOS3_6X8	0x00b1	Intuos3 6x8\"
+product WACOM INTUOS3_9X12	0x00b2	Intuos3 9x12\"
+
+
 /* Xirlink products */
 product XIRLINK IMAGING		0x800d	IMAGING DEVICE
 product XIRLINK PCCAM		0x8080	IBM PC Camera
