@@ -15,6 +15,7 @@ struct user_partition_data {
 	uint32				flags;
 	dev_t				volume;
 	int32				change_counter;	// needed?
+	disk_system_id		disk_system;
 	char				*name;
 	char				*content_name;
 	char				*type;
