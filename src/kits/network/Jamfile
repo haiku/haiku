@@ -1,11 +1,13 @@
 SubDir OBOS_TOP src kits network ;
 
+Package haiku-networkingkit-cvs :
+	README.html install.sh 
+;
+
 SubInclude OBOS_TOP src kits network libbind ;
 SubInclude OBOS_TOP src kits network libnet ;
 SubInclude OBOS_TOP src kits network libnetapi ;
 SubInclude OBOS_TOP src kits network libsocket ;
 
-Package haiku-networkingkit-cvs :
-	README.html install.sh ;
 
 
