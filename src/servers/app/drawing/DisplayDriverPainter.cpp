@@ -1097,8 +1097,29 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 									  const LineArrayData *linedata,
 									  const DrawData *d)
 {
-	// I'm suspecting this is not used
-	printf("DisplayDriverPainter::StrokeLineArray()\n");
+	if(!d || !linedata || numlines <= 0)
+		return;
+	
+	if (Lock()) {
+		DrawData d;
+		d.draw_mode = B_OP_COPY;
+		const LineArrayData *data;
+		
+		data = (const LineArrayData *)&(linedata[0]);
+		d.highcolor = data->color;
+		fPainter->SetDrawData(&d);
+		BRect touched = fPainter->StrokeLine(data->pt1, data->pt2);
+		
+		for (int32 i = 1; i < numlines; i++) {
+			data = (const LineArrayData *)&(linedata[i]);
+			d.highcolor = data->color;
+			fPainter->SetDrawData(&d);
+			touched = touched | fPainter->StrokeLine(data->pt1, data->pt2);
+		}
+		
+		fGraphicsCard->Invalidate(touched);
+		Unlock();
+	}
 }
 
 // SetDPMSMode
