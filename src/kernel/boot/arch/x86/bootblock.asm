@@ -25,11 +25,12 @@
 ; ** THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ; /*
-; ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
+; ** Copyright 2004, The OpenBeOS Team. All rights reserved.
+; ** Distributed under the terms of the OpenBeOS License.
+; **
+; ** Copyright 2001-2004, Travis Geiselbrecht. All rights reserved.
 ; ** Distributed under the terms of the NewOS License.
-; */
-
-; /*
+; **
 ; ** Reviewed, documented and some minor modifications and bug-fixes
 ; ** applied by Michael Noisternig on 2001-09-02.
 ; */
@@ -89,15 +90,17 @@ unreal:
 	sti
 	mov		si,loadmsg
 	call	print
-	dec		cx				 ; TK: one sector is already read as second part of boot block
 	call	load_floppy      ; read remaining sectors at address edi
 	call 	disable_floppy_motor
 	mov		si,okmsg
 	call	print
 	cli
 
+	; uncomment the next two lines to enable the VESA mode switch
 	; call	enable_vesa
-	mov		[in_vesa],al
+	; mov		[in_vesa],al
+
+	call	find_mem_size_real
 
 	mov		ebx,[dword 0x100074] ; load dword at rel. address 0x74 from read-destination-buffer
 	add		ebx,0x101000         ; for stage2 entry
@@ -111,7 +114,7 @@ unreal:
 	jmp		dword 0x8:code32     ; flush prefetch queue
 code32:
 BITS 32
-	mov		ax,0x10          ; load descriptor 2 in all segment selectors (except cs)
+	mov		ax,0x10				; load descriptor 2 in all segment selectors (except cs)
 	mov		ds,ax
 	mov		es,ax
 	mov		fs,ax
@@ -120,38 +123,39 @@ BITS 32
 	mov		ebp,0x10000
 	mov		esp,ebp
 
-	mov		eax,[vesa_info]
+	mov		eax,[vesa_info]		; set up arguments for _start()
 	push	eax
 
 	xor		eax,eax
 	mov		al,[in_vesa]
 	push	eax
 
-	call	find_mem_size
+	xor		eax,eax
+	mov		al,[ext_mem_count]
 	push	eax
 
-	call	ebx              ; jump to stage2 entry
-inf:jmp		short inf
+	cmp		al, 0x0
+	je		probe_mem
 
-; find memory size by testing
-; OUT: eax = memory size
-find_mem_size:
-	mov		eax,0x31323738   ; test value
-	mov		esi,0x100ff0     ; start above conventional mem + HMA = 1 MB + 1024 Byte
-_fms_loop:
-	mov		edx,[esi]        ; read value
-	mov		[esi],eax        ;   write test value
-	mov		ecx,[esi]        ;   read it again
-	mov		[esi],edx        ; write back old value
-	cmp		ecx,eax
-	jnz		_fms_loop_out    ; read value != test value -> above mem limit
-	add		esi,0x1000       ; test next page (4 K)
-	jmp		short _fms_loop
-_fms_loop_out:
-	mov		eax,esi
-	sub		eax,0x1000
-	add		eax,byte +0x10
-	ret
+	mov		eax,[ext_mem_info]
+	push	eax
+
+	xor		eax,eax				; argument mem_size is loaded
+	push	eax					; with zero
+
+	jmp		call_stage2
+
+probe_mem:
+	xor		eax,eax				; argument ext_mem_info is
+	push	eax					; loaded with zero
+
+	call	find_mem_size_probe
+	push	eax
+	; falls through
+
+call_stage2:
+	call	ebx					; jump to stage2 entry
+inf:jmp		short inf
 
 BITS 16
 ; read sectors into memory
@@ -276,12 +280,63 @@ gdt:
 
 retrycnt	db 3
 in_vesa     db 0
-vesa_info	dw 0
+vesa_info	dd 0
+ext_mem_info 	dd 0
+ext_mem_count	db 0
 
 	times 510-($-$$) db 0  ; filler for boot sector
 	dw	0xaa55             ; magic number for boot sector
 
 ; Starting here is the second sector of the boot code
+
+BITS 32
+; find memory size by testing
+; OUT: eax = memory size
+find_mem_size_probe:
+	mov		eax,0x31323738   ; test value
+	mov		esi,0x100ff0     ; start above conventional mem + HMA = 1 MB + 1024 Byte
+_fms_loop:
+	mov		edx,[esi]        ; read value
+	mov		[esi],eax        ;   write test value
+	mov		ecx,[esi]        ;   read it again
+	mov		[esi],edx        ; write back old value
+	cmp		ecx,eax
+	jnz		_fms_loop_out    ; read value != test value -> above mem limit
+	add		esi,0x1000       ; test next page (4 K)
+	jmp		short _fms_loop
+_fms_loop_out:
+	mov		eax,esi
+	sub		eax,0x1000
+	add		eax,byte +0x10
+	ret
+
+BITS 16
+find_mem_size_real:
+	; use int 0x15, EAX=0xe820 to test for memory
+	; assumes es is null
+	
+	mov		ebx,0
+	mov		edi,0x7000		; the extended memory structures will go at 0x7000
+	mov		[ext_mem_info],edi
+
+find_mem_next:
+	mov		eax,0xe820
+	mov		edx,'PAMS'		; 'SMAP' in the correct order
+	mov		ecx,0x20
+
+	int		0x15
+	jc		done_mem_real	; if carry is set, it wasn't supported
+
+	inc		byte [ext_mem_count]	; increment the count of the number
+
+	cmp		ebx,0x0			; test if we're done
+	je		done_mem_real
+
+	add		edi,0x20		; increment the buffer by 0x20
+	jmp		find_mem_next
+	
+done_mem_real:
+	ret
 
 ; fool around with vesa mode
 enable_vesa:
@@ -325,6 +380,7 @@ mode_loop:
 	test	ax,0x1        ; test the supported bit
 	jz		next_mode
 	test	ax,0x08       ; test the linear frame mode bit
+	jz		next_mode
 	mov		ax,[es:di+18]
 	cmp		ax,VESA_X_TARGET       ; x
 	jne		next_mode

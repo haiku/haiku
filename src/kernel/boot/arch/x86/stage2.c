@@ -25,11 +25,19 @@ const unsigned kBSSSize = 0x9000;
 #	define MESSAGE(x)
 #endif
 
+// memory structure returned by int 0x15, ax 0xe820
+typedef struct ext_memory {
+	uint64 base_addr;
+	uint64 length;
+	uint64 type;
+	uint64 filler;
+} ext_memory;
+
 // we're running out of the first 'file' contained in the bootdir, which is
 // a set of binaries and data packed back to back, described by an array
 // of boot_entry structures at the beginning. The load address is fixed.
 #define BOOTDIR_ADDR 0x100000
-static const boot_entry *bootdir = (boot_entry*)BOOTDIR_ADDR;
+static const boot_entry *bootdir = (boot_entry *)BOOTDIR_ADDR;
 
 // stick the kernel arguments in a pseudo-random page that will be mapped
 // at least during the call into the kernel. The kernel should copy the
@@ -37,7 +45,7 @@ static const boot_entry *bootdir = (boot_entry*)BOOTDIR_ADDR;
 static kernel_args *ka = (kernel_args *)0x20000;
 
 // needed for message
-static uint16 *kScreenBase = (unsigned short*) 0xb8000;
+static uint16 *kScreenBase = (uint16 *)0xb8000;
 static uint32 screenOffset = 0;
 
 unsigned int cv_factor = 0;
@@ -50,6 +58,7 @@ static uint32 *pgdir = 0;
 static uint32 *pgtable = 0;
 
 // function decls for this module
+static void sort_addr_range(addr_range *range, int count);
 static void calculate_cpu_conversion_factor(void);
 static void load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0,
 	addr_range *ar1, uint32 *start_addr, addr_range *dynamic_section);
@@ -57,6 +66,9 @@ static int mmu_init(kernel_args *ka, uint32 *next_paddr);
 static void mmu_map_page(uint32 vaddr, uint32 paddr);
 static int check_cpu(void);
 
+
+extern void _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
+	int in_vesa, uint32 vesa_ptr);
 
 /* called by the stage1 bootloader.
  * State:
@@ -67,7 +79,8 @@ static int check_cpu(void);
  */
 
 void
-_start(uint32 mem, int in_vesa, uint32 vesa_ptr)
+_start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
+	int in_vesa, uint32 vesa_ptr)
 {
 	uint32 *idt;
 	segment_descriptor *gdt;
@@ -82,7 +95,8 @@ _start(uint32 mem, int in_vesa, uint32 vesa_ptr)
 	clearscreen();
 
 	dprintf("stage2 bootloader entry.\n");
-	dprintf("memsize = 0x%x, in_vesa %d, vesa_ptr 0x%x\n", mem, in_vesa, vesa_ptr);
+	dprintf("args: memsize 0x%x, emem_block %p, emem_count %d, in_vesa %d, vesa = %p\n", 
+		memSize, extMemoryBlock, extMemoryCount, in_vesa, vesa_ptr);
 
 	// verify we can run on this cpu
 	if (check_cpu() < 0) {
@@ -93,6 +107,16 @@ _start(uint32 mem, int in_vesa, uint32 vesa_ptr)
 		dprintf("\nPlease reset your computer to continue.");
 
 		for (;;);
+	}
+
+	if (extMemoryCount > 0) {
+		uint32 i;
+
+		dprintf("extended memory info (from 0xe820):\n");
+		for (i = 0; i < extMemoryCount; i++) {
+			dprintf("    base 0x%Lx, len 0x%Lx, type %Ld\n", 
+				extMemoryBlock[i].base_addr, extMemoryBlock[i].length, extMemoryBlock[i].type);
+		}
 	}
 
 	// calculate the conversion factor that translates rdtsc time to real microseconds
@@ -234,18 +258,96 @@ _start(uint32 mem, int in_vesa, uint32 vesa_ptr)
 	ka->arch_args.vir_pgdir = next_vaddr;
 	next_vaddr += PAGE_SIZE;
 
-	// save the kernel args
-	ka->arch_args.system_time_cv_factor = cv_factor;
-	ka->physical_memory_range[0].start = 0;
-	ka->physical_memory_range[0].size = mem;
-	ka->num_physical_memory_ranges = 1;
-	ka->str = NULL;
+	// mark memory that we know is used
 	ka->physical_allocated_range[0].start = BOOTDIR_ADDR;
 	ka->physical_allocated_range[0].size = next_paddr - BOOTDIR_ADDR;
 	ka->num_physical_allocated_ranges = 1;
+
+	// figure out the memory map
+	if (extMemoryCount > 0) {
+		uint32 i;
+
+		ka->num_physical_memory_ranges = 0;
+
+		for (i = 0; i < extMemoryCount; i++) {
+			if (extMemoryBlock[i].type == 1) {
+				// round everything up to page boundaries, exclusive of pages it partially occupies
+				extMemoryBlock[i].length -= (extMemoryBlock[i].base_addr % PAGE_SIZE)
+					? (PAGE_SIZE - (extMemoryBlock[i].base_addr % PAGE_SIZE)) : 0;
+				extMemoryBlock[i].base_addr = ROUNDUP(extMemoryBlock[i].base_addr, PAGE_SIZE);
+				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, PAGE_SIZE);
+
+				// this is mem we can use
+				if (ka->num_physical_memory_ranges == 0) {
+					ka->physical_memory_range[0].start = (addr_t)extMemoryBlock[i].base_addr;
+					ka->physical_memory_range[0].size = (addr_t)extMemoryBlock[i].length;
+					ka->num_physical_memory_ranges++;
+				} else {
+					// we might have to extend the previous hole
+					addr_t previous_end = ka->physical_memory_range[ka->num_physical_memory_ranges - 1].start
+						+ ka->physical_memory_range[ka->num_physical_memory_ranges - 1].size;
+
+					if (previous_end <= extMemoryBlock[i].base_addr
+						&& ((extMemoryBlock[i].base_addr - previous_end) < 0x100000)) {
+						// extend the previous buffer
+						ka->physical_memory_range[ka->num_physical_memory_ranges - 1].size +=
+							(extMemoryBlock[i].base_addr - previous_end) +
+							extMemoryBlock[i].length;
+
+						// mark the gap between the two allocated ranges in use
+						ka->physical_allocated_range[ka->num_physical_allocated_ranges].start = previous_end;
+						ka->physical_allocated_range[ka->num_physical_allocated_ranges].size = extMemoryBlock[i].base_addr - previous_end;
+						ka->num_physical_allocated_ranges++;
+					}
+				}
+			}
+		}
+	} else {
+		// we dont have an extended map, assume memory is contiguously mapped at 0x0
+		ka->physical_memory_range[0].start = 0;
+		ka->physical_memory_range[0].size = memSize;
+		ka->num_physical_memory_ranges = 1;
+
+		// mark the bios area allocated
+		ka->physical_allocated_range[ka->num_physical_allocated_ranges].start = 0x9f000; // 640k - 1 page
+		ka->physical_allocated_range[ka->num_physical_allocated_ranges].size = 0x61000;
+		ka->num_physical_allocated_ranges++;
+	}
+
+	// save the memory we've virtually allocated (for the kernel and other stuff)
 	ka->virtual_allocated_range[0].start = KERNEL_BASE;
 	ka->virtual_allocated_range[0].size = next_vaddr - KERNEL_BASE;
 	ka->num_virtual_allocated_ranges = 1;
+
+	// sort the address ranges
+	sort_addr_range(ka->physical_memory_range, ka->num_physical_memory_ranges);
+	sort_addr_range(ka->physical_allocated_range, ka->num_physical_allocated_ranges);
+	sort_addr_range(ka->virtual_allocated_range, ka->num_virtual_allocated_ranges);
+
+#if 1
+	{
+		unsigned int i;
+
+		dprintf("phys memory ranges:\n");
+		for (i = 0; i < ka->num_physical_memory_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->physical_memory_range[i].start, ka->physical_memory_range[i].size);
+		}
+
+		dprintf("allocated phys memory ranges:\n");
+		for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->physical_allocated_range[i].start, ka->physical_allocated_range[i].size);
+		}
+
+		dprintf("allocated virt memory ranges:\n");
+		for (i = 0; i < ka->num_virtual_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->virtual_allocated_range[i].start, ka->virtual_allocated_range[i].size);
+		}
+	}
+#endif
+
+	// save the kernel args
+	ka->arch_args.system_time_cv_factor = cv_factor;
+	ka->str = NULL;
 	ka->arch_args.page_hole = 0xffc00000;
 	ka->num_cpus = 1;
 #if 0
@@ -491,6 +593,27 @@ sleep(uint64 time)
 }
 
 
+static void
+sort_addr_range(addr_range *range, int count)
+{
+	addr_range tempRange;
+	bool done;
+	int i;
+
+	do {
+		done = true;
+		for (i = 1; i < count; i++) {
+			if (range[i].start < range[i - 1].start) {
+				done = false;
+				memcpy(&tempRange, &range[i], sizeof(addr_range));
+				memcpy(&range[i], &range[i - 1], sizeof(addr_range));
+				memcpy(&range[i - 1], &tempRange, sizeof(addr_range));
+			}
+		}
+	} while (!done);
+}
+
+
 #define outb(value,port) \
 	asm("outb %%al,%%dx"::"a" (value),"d" (port))
 
@@ -687,10 +810,12 @@ static void
 scrup()
 {
 	int i;
+
 	memcpy(kScreenBase, kScreenBase + SCREEN_WIDTH,
 		SCREEN_WIDTH * SCREEN_HEIGHT * 2 - SCREEN_WIDTH * 2);
 	screenOffset = (SCREEN_HEIGHT - 1) * SCREEN_WIDTH;
-	for(i=0; i<SCREEN_WIDTH; i++)
+
+	for (i = 0; i < SCREEN_WIDTH; i++)
 		kScreenBase[screenOffset + i] = 0x0720;
 }
 
@@ -720,7 +845,7 @@ dprintf(const char *fmt, ...)
 	char temp[256];
 
 	va_start(args, fmt);
-	ret = vsprintf(temp,fmt,args);
+	ret = vsprintf(temp, fmt, args);
 	va_end(args);
 
 	kputs(temp);
