@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 #ifdef COMPILE_FOR_R5
-extern status_t notify_select_event(struct selectsync *sync, uint32 ref);
+extern void notify_select_event(struct selectsync *sync, uint32 ref);
 #else
 extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
 #endif
