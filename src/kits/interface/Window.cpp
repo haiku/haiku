@@ -364,7 +364,7 @@ void BWindow::Minimize(bool minimize){
 		return;		
 
 	serverLink->SetOpCode( AS_WINDOW_MINIMIZE );
-	serverLink->Attach( minimize );
+	serverLink->Attach<bool>( minimize );
 
 	Lock();
 	serverLink->Flush( );
@@ -380,7 +380,7 @@ status_t BWindow::SendBehind(const BWindow* window){
 	PortLink::ReplyData		replyData;
 	
 	serverLink->SetOpCode( AS_SEND_BEHIND );
-	serverLink->Attach( _get_object_token_(window) );	
+	serverLink->Attach<int32>( _get_object_token_(window) );	
 
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -447,7 +447,7 @@ void BWindow::BeginViewTransaction(){
 void BWindow::EndViewTransaction(){
 	if ( fInTransaction ){
 // !!!!!!!!! if not '(int32)AS_END_TRANSACTION' we receive an error ?????
-		srvGfxLink->Attach( (int32)AS_END_TRANSACTION );
+		srvGfxLink->Attach<int32>( (int32)AS_END_TRANSACTION );
 		fInTransaction		= false;
 		Flush();
 	}
@@ -924,10 +924,10 @@ void BWindow::SetSizeLimits(float minWidth, float maxWidth,
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode( AS_SET_SIZE_LIMITS );
-	serverLink->Attach( fMinWindWidth );
-	serverLink->Attach( fMaxWindWidth );
-	serverLink->Attach( fMinWindHeight );
-	serverLink->Attach( fMaxWindHeight );
+	serverLink->Attach<float>( fMinWindWidth );
+	serverLink->Attach<float>( fMaxWindWidth );
+	serverLink->Attach<float>( fMinWindHeight );
+	serverLink->Attach<float>( fMaxWindHeight );
 		
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -1207,7 +1207,7 @@ void BWindow::Activate(bool active){
 		return;
 
 	serverLink->SetOpCode( AS_ACTIVATE_WINDOW );
-	serverLink->Attach( active );
+	serverLink->Attach<bool>( active );
 	
 	Lock();
 	serverLink->Flush( );
@@ -1419,7 +1419,7 @@ status_t BWindow::AddToSubset(BWindow* window){
 		PortLink::ReplyData		replyData;
 
 		serverLink->SetOpCode( AS_ADD_TO_SUBSET );
-		serverLink->Attach( _get_object_token_(window) );
+		serverLink->Attach<int32>( _get_object_token_(window) );
 		
 		Lock();
 		serverLink->FlushWithReply( &replyData );
@@ -1442,7 +1442,7 @@ status_t BWindow::RemoveFromSubset(BWindow* window){
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode( AS_REM_FROM_SUBSET );
-	serverLink->Attach( _get_object_token_(window) );
+	serverLink->Attach<int32>( _get_object_token_(window) );
 		
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -1599,15 +1599,15 @@ status_t BWindow::SetWindowAlignment(window_alignment mode,
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode( AS_SET_ALIGNMENT );
-	serverLink->Attach( (int32)mode );
-	serverLink->Attach( h );
-	serverLink->Attach( hOffset );
-	serverLink->Attach( width );
-	serverLink->Attach( widthOffset );
-	serverLink->Attach( v );
-	serverLink->Attach( vOffset );
-	serverLink->Attach( height );
-	serverLink->Attach( heightOffset );
+	serverLink->Attach<int32>( (int32)mode );
+	serverLink->Attach<int32>( h );
+	serverLink->Attach<int32>( hOffset );
+	serverLink->Attach<int32>( width );
+	serverLink->Attach<int32>( widthOffset );
+	serverLink->Attach<int32>( v );
+	serverLink->Attach<int32>( vOffset );
+	serverLink->Attach<int32>( height );
+	serverLink->Attach<int32>( heightOffset );
 
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -1697,7 +1697,7 @@ void BWindow::SetWorkspaces(uint32 workspaces){
 //	PortLink::ReplyData			replyData;
 
 	serverLink->SetOpCode( AS_SET_WORKSPACES );
-	serverLink->Attach( (int32)workspaces );
+	serverLink->Attach<int32>( (int32)workspaces );
 	
 	Lock();
 	serverLink->Flush( );
@@ -1742,8 +1742,8 @@ void BWindow::MoveTo( BPoint point ){
 void BWindow::MoveTo(float x, float y){
 
 	serverLink->SetOpCode( AS_WINDOW_MOVE );
-	serverLink->Attach( x );
-	serverLink->Attach( y );
+	serverLink->Attach<float>( x );
+	serverLink->Attach<float>( y );
 	
 	Lock();
 	serverLink->Flush();
@@ -1776,8 +1776,8 @@ void BWindow::ResizeTo(float width, float height){
 	height = (height > fMaxWindHeight) ? fMaxWindHeight : height;
 
 	serverLink->SetOpCode( AS_WINDOW_RESIZE );
-	serverLink->Attach( width );
-	serverLink->Attach( height );
+	serverLink->Attach<float>( width );
+	serverLink->Attach<float>( height );
 	
 	Lock();
 	serverLink->Flush( );
@@ -2006,12 +2006,12 @@ void BWindow::InitData(	BRect frame,
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode(AS_CREATE_WINDOW);
-	serverLink->Attach(fFrame);
-	serverLink->Attach((int32)WindowLookToInteger(fLook));
-	serverLink->Attach((int32)WindowFeelToInteger(fFeel));
-	serverLink->Attach((int32)fFlags);
-	serverLink->Attach((int32)workspace);
-	serverLink->Attach((int32)_get_object_token_(this));
+	serverLink->Attach<BRect>(fFrame);
+	serverLink->Attach<int32>((int32)WindowLookToInteger(fLook));
+	serverLink->Attach<int32>((int32)WindowFeelToInteger(fFeel));
+	serverLink->Attach<int32>((int32)fFlags);
+	serverLink->Attach<int32>((int32)workspace);
+	serverLink->Attach<int32>((int32)_get_object_token_(this));
 	serverLink->Attach(&receive_port,sizeof(port_id));
 		// We add one so that the string will end up NULL-terminated.
 	serverLink->Attach( (char*)title, strlen(title)+1 );
@@ -2349,7 +2349,7 @@ void BWindow::attachTopView(){
 // TODO: implement after you have a messaging protocol with app_server
 
 	serverLink->SetOpCode( AS_LAYER_CREATE_ROOT );
-	serverLink->Attach( _get_object_token_( top_view ) ); // no need for that!
+	serverLink->Attach<int32>( _get_object_token_( top_view ) ); // no need for that!
 /*	serverLink->Attach( top_view->Name() );
 	serverLink->Attach( fCachedBounds.OffsetToCopy( origin_h, origin_v ) );
 	serverLink->Attach( ...ResizeMode... );
@@ -2369,7 +2369,7 @@ void BWindow::detachTopView(){
 // TODO: detach all views
 
 	serverLink->SetOpCode( AS_LAYER_DELETE_ROOT );
-	serverLink->Attach( _get_object_token_( top_view ) ); // no need for that!
+	serverLink->Attach<int32>( _get_object_token_( top_view ) ); // no need for that!
 
 	Lock();
 	serverLink->Flush();

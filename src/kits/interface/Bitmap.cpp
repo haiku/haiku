@@ -2175,7 +2175,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		//		none
 		status_t freestat;
 		link->SetOpCode(AS_DELETE_BITMAP);
-		link->Attach(fServerToken);
+		link->Attach<int32>(fServerToken);
 		error=link->FlushWithReply(&replydata);
 		if(replydata.code==SERVER_FALSE)
 			error=B_NO_MEMORY;
@@ -2207,11 +2207,11 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// 4) int32 bytes_per_row
 		// 5) int32 screen_id::id
 		link->SetOpCode(AS_CREATE_BITMAP);
-		link->Attach(bounds);
+		link->Attach<BRect>(bounds);
 		link->Attach(&colorSpace, sizeof(color_space));
-		link->Attach((int32)flags);
-		link->Attach(bytesPerRow);
-		link->Attach(screenID.id);
+		link->Attach<int32>((int32)flags);
+		link->Attach<int32>(bytesPerRow);
+		link->Attach<int32>(screenID.id);
 		
 		// Reply Code: SERVER_TRUE
 		// Reply Data:

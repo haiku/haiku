@@ -47,9 +47,9 @@ _IMPEXP_BE status_t set_screen_space(int32 index, uint32 res, bool stick = true)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_SET_SCREEN_MODE);
-	link->Attach(index);
-	link->Attach((int32)res);
-	link->Attach(stick);
+	link->Attach<int32>(index);
+	link->Attach<int32>((int32)res);
+	link->Attach<bool>(stick);
 	link->Flush();
 	delete link;
 }
@@ -222,7 +222,7 @@ _IMPEXP_BE void set_workspace_count(int32 count)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_SET_WORKSPACE_COUNT);
-	link->Attach(count);
+	link->Attach<int32>(count);
 	link->Flush();
 	delete link;
 }
@@ -246,7 +246,7 @@ _IMPEXP_BE void activate_workspace(int32 workspace)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_ACTIVATE_WORKSPACE);
-	link->Attach(workspace);
+	link->Attach<int32>(workspace);
 	link->Flush();
 	delete link;
 }
@@ -289,7 +289,7 @@ _IMPEXP_BE void set_focus_follows_mouse(bool follow)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
-	link->Attach(follow);
+	link->Attach<bool>(follow);
 	link->Flush();
 	delete link;
 }
@@ -304,7 +304,7 @@ _IMPEXP_BE bool focus_follows_mouse()
 	delete link;
 
 	bool ffm;
-	pmsg.Read(&ffm);
+	pmsg.Read<bool>(&ffm);
 	return ffm;
 }
 
