@@ -106,6 +106,9 @@ public:
 	void SetVolumeID(dev_t volumeID);
 	dev_t VolumeID() const;
 
+	void SetMountCookie(void *cookie);
+	void *MountCookie() const;
+
 	virtual status_t Mount(uint32 mountFlags, const char *parameters);
 	virtual status_t Unmount();
 

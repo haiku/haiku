@@ -49,6 +49,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
 	fPartitionData.flags = B_PARTITION_BUSY | B_PARTITION_DESCENDANT_BUSY;
 	fPartitionData.volume = -1;
+	fPartitionData.mount_cookie = NULL;
 	fPartitionData.name = NULL;
 	fPartitionData.content_name = NULL;
 	fPartitionData.type = NULL;
@@ -501,6 +502,20 @@ dev_t
 KPartition::VolumeID() const
 {
 	return fPartitionData.volume;
+}
+
+// SetMountCookie
+void
+KPartition::SetMountCookie(void *cookie)
+{
+	fPartitionData.mount_cookie = cookie;
+}
+
+// MountCookie
+void *
+KPartition::MountCookie() const
+{
+	return fPartitionData.mount_cookie;
 }
 
 // Mount

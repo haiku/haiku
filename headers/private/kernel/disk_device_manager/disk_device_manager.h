@@ -28,6 +28,7 @@ typedef struct partition_data {
 	uint32			status;			// [sys]
 	uint32			flags;
 	dev_t			volume;			// [sys]
+	void			*mount_cookie;	// [sys] 
 	char			*name;			// max: B_OS_NAME_LENGTH
 	char			*content_name;	//
 	char			*type;			//
