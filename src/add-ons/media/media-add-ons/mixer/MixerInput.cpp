@@ -304,34 +304,28 @@ MixerInput::UpdateInputChannelDestinationMask()
 		fInputChannelInfo[i].destination_mask = GetChannelMask(i, fInputChannelMask);
 	
 	// specialize this, depending on the available physical output channels
-	switch (fCore->OutputChannelCount()) {
-		case 0:
-		case 1:
-			break;
-			
-		case 2:
-			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
-			}
-			break;
-			
-		default:
-			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
-			}
-			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
-			}
-			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
-			}
-			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
-				fInputChannelInfo[1].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
-			}
-			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-				fInputChannelInfo[1].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
-			}
-			break;
+	if (fCore->OutputChannelCount() <= 2) {
+		// less or equal two channels
+		if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+			fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
+		}
+	} else {
+		// more than two channel output card
+		if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
+			fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
+		}
+		if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
+			fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+		}
+		if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+			fInputChannelInfo[0].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+		}
+		if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
+			fInputChannelInfo[1].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+		}
+		if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
+			fInputChannelInfo[1].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+		}
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++)
