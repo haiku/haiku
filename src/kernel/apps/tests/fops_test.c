@@ -14,26 +14,28 @@
 #define NEW_FORTUNE "The path has been shown - we are the ones who must walk it"
 
 
-static void read_file(FILE *f)
+static void
+read_file(FILE *f)
 {
+	char buffer[2048];
 	int lines = 0;
-	char *buffer, *tmp;
-	size_t bytes = 0;
-	
-	while ((buffer = fgetln(f, &bytes)) != NULL) {
-		if (*buffer == '#')
+
+	while ((fgets(buffer, sizeof(buffer), f)) != NULL) {
+		size_t bytes = strlen(buffer);
+
+		if (buffer[0] == '#')
 			continue;
-		tmp = (char*) malloc(bytes + 1);
-		if (!tmp)
-			break;
-		memcpy(tmp, buffer, bytes);
-		if (tmp[bytes - 1] != '\n')
-			tmp[bytes - 1] = '\n';
-		fprintf(stdout, "%d: %s", ++lines, tmp);
+
+		if (buffer[bytes - 1] != '\n')
+			buffer[bytes - 1] = '\n';
+
+		fprintf(stdout, "%d: %s", ++lines, buffer);
 	}
 }
 
-int main(int argc, char **argv)
+
+int
+main(int argc, char **argv)
 {
 	FILE *f;
 	
