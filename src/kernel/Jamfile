@@ -348,6 +348,10 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!system>wrappers.o
 	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
 
+	<$(SOURCE_GRIST)!libc!sys>chmod.o
+	<$(SOURCE_GRIST)!libc!sys>stat.o
+	<$(SOURCE_GRIST)!libc!sys>mkdir.o
+
 	<$(SOURCE_GRIST)!libc!unistd>access.o
 	<$(SOURCE_GRIST)!libc!unistd>chown.o
 	<$(SOURCE_GRIST)!libc!unistd>close.o
@@ -468,6 +472,10 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!system>syscalls.o
 	<$(SOURCE_GRIST)!libc!system>wrappers.o
 	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
+
+	<$(SOURCE_GRIST)!libc!sys>chmod.o
+	<$(SOURCE_GRIST)!libc!sys>stat.o
+	<$(SOURCE_GRIST)!libc!sys>mkdir.o
 
 	<$(SOURCE_GRIST)!libc!unistd>access.o
 	<$(SOURCE_GRIST)!libc!unistd>chown.o
