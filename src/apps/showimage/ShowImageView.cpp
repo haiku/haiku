@@ -385,30 +385,32 @@ ShowImageView::AlignBitmap()
 {
 	BRect rect(fpBitmap->Bounds());
 	float width, height;
-	width = Bounds().Width()-2*PEN_SIZE;
-	height = Bounds().Height()-2*PEN_SIZE;
+	width = Bounds().Width()-2*PEN_SIZE+1;
+	height = Bounds().Height()-2*PEN_SIZE+1;
 	if (width == 0 || height == 0) return rect;
 	if (fResizeToViewBounds) {
 		float s;
-		s = width / rect.Width();
+		s = width / (rect.Width()+1);
 			
 		if (s * rect.Height() <= height) {
+			// XXX temporary solution, fZoom should not be changed here
 			fZoom = s;
-			rect.right = width;
-			rect.bottom = s * rect.Height();
+			rect.right = width-1;
+			rect.bottom = static_cast<int>(s * (rect.Height()+1))-1;
 			// center vertically
 			rect.OffsetBy(0, (height - rect.Height()) / 2);
 		} else {
-			fZoom = height / rect.Height();
-			rect.right = fZoom * rect.Width();
-			rect.bottom = height;
+			// XXX temporary solution, fZoom should not be changed here
+			fZoom = height / (rect.Height()+1);
+			rect.right = static_cast<int>(fZoom * (rect.Width()+1))-1;
+			rect.bottom = height-1;
 			// center horizontally
 			rect.OffsetBy((width - rect.Width()) / 2, 0);
 		}
 	} else {
 		// zoom image
-		rect.right = ((int)(rect.right+1)*fZoom)-1; 
-		rect.bottom = ((int)(rect.bottom+1)*fZoom)-1;
+		rect.right = static_cast<int>((rect.right+1)*fZoom)-1; 
+		rect.bottom = static_cast<int>((rect.bottom+1)*fZoom)-1;
 		// align
 		switch (fHAlignment) {
 			case B_ALIGN_CENTER:
