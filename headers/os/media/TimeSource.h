@@ -22,6 +22,7 @@ namespace BPrivate { namespace media {
 	class TimeSourceObject;
 	class SystemTimeSourceObject;
 	struct TimeSourceTransmit;
+	struct SlaveNodes;
 } }
 
 
@@ -124,9 +125,9 @@ virtual		status_t _Reserved_TimeSource_5(void *);
 		bool fStarted;
 		area_id fArea;
 		volatile BPrivate::media::TimeSourceTransmit *fBuf;
-		_BSlaveNodeStorageP * _mSlaveNodes;
+		BPrivate::media::SlaveNodes *fSlaveNodes;
 
-		area_id _mOrigArea;
+		area_id _reserved_area;
 		bool fIsRealtime;
 		bool _reserved_bool_[3];
 		uint32 _reserved_time_source_[10];
@@ -142,6 +143,8 @@ virtual	status_t AddMe(BMediaNode * node);
 		void	DirectStop(bigtime_t at, bool immediate);
 		void	DirectSeek(bigtime_t to, bigtime_t at);
 		void	DirectSetRunMode(run_mode mode);
+		void	DirectAddMe(const media_node &node);
+		void	DirectRemoveMe(const media_node &node);
 };
 
 

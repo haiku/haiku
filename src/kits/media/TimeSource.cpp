@@ -4,9 +4,12 @@
  *  DESCR: 
  ***********************************************************************/
 #include <TimeSource.h>
+#include <Autolock.h>
+#include <string.h>
 #include "debug.h"
 #include "DataExchange.h"
 #include "ServerInterface.h"
+#include "TimeSourceObject.h"
 
 namespace BPrivate { namespace media {
 
@@ -21,6 +24,15 @@ struct TimeSourceTransmit // sizeof() must be <= 4096
 	float drift[INDEX_COUNT];
 };
 
+struct SlaveNodes
+{
+	#define SLAVE_NODES_COUNT 300
+	BLocker locker;
+	int32 count;
+	media_node_id node_id[SLAVE_NODES_COUNT];
+	port_id node_port[SLAVE_NODES_COUNT];
+};
+
 } }
 
 
@@ -33,6 +45,8 @@ BTimeSource::~BTimeSource()
 	CALLED();
 	if (fArea > 0)
 		delete_area(fArea);
+	if (fSlaveNodes)
+		free(fSlaveNodes);
 }
 
 /*************************************************************
@@ -173,11 +187,22 @@ BTimeSource::BTimeSource() :
 	fStarted(false),
 	fArea(-1),
 	fBuf(NULL),
+	fSlaveNodes((BPrivate::media::SlaveNodes*)malloc(sizeof(BPrivate::media::SlaveNodes))),
 	fIsRealtime(false)
 {
 	CALLED();
 	AddNodeKind(B_TIME_SOURCE);
 //	printf("##### BTimeSource::BTimeSource() name %s, id %ld\n", Name(), ID());
+
+	if (fSlaveNodes == NULL) {
+		FATAL("Error: BTimeSource::BTimeSource() fSlaveNodes == NULL\n");
+		return;
+	}
+
+	// initialize the slave node storage
+	fSlaveNodes->count = 0;
+	memset(&fSlaveNodes->node_id, 0, SLAVE_NODES_COUNT * sizeof(media_node_id));
+	memset(&fSlaveNodes->node_port, 0, SLAVE_NODES_COUNT * sizeof(port_id));
 
 	// This constructor is only called by real time sources that inherit
 	// BTimeSource. We create the communication area in FinishCreate(),
@@ -217,6 +242,20 @@ BTimeSource::HandleMessage(int32 message,
 			}
 			return B_OK;
 		}
+		
+		case TIMESOURCE_ADD_SLAVE_NODE:
+		{
+			const timesource_add_slave_node_command *data = static_cast<const timesource_add_slave_node_command *>(rawdata);
+			DirectAddMe(data->node);
+			return B_OK;
+		}
+
+		case TIMESOURCE_REMOVE_SLAVE_NODE:
+		{
+			const timesource_remove_slave_node_command *data = static_cast<const timesource_remove_slave_node_command *>(rawdata);
+			DirectRemoveMe(data->node);
+			return B_OK;
+		}
 	}
 	return B_ERROR;
 }
@@ -247,16 +286,39 @@ void
 BTimeSource::BroadcastTimeWarp(bigtime_t at_real_time,
 							   bigtime_t new_performance_time)
 {
-	UNIMPLEMENTED();
-	// call BMediaNode::TimeWarp() of all slaved nodes
+	CALLED();
+	// calls BMediaNode::TimeWarp() of all slaved nodes
+	
+	BAutolock lock(fSlaveNodes->locker);
+
+	for (int i = 0, n = 0; i < SLAVE_NODES_COUNT && n != fSlaveNodes->count; i++) {
+		if (fSlaveNodes->node_id[i] != 0) {
+			node_time_warp_command cmd;
+			cmd.at_real_time = at_real_time;
+			cmd.to_performance_time = new_performance_time;
+			SendToPort(fSlaveNodes->node_port[i], NODE_TIME_WARP, &cmd, sizeof(cmd));
+			n++;
+		}
+	}
 }
 
 
 void
 BTimeSource::SendRunMode(run_mode mode)
 {
-	UNIMPLEMENTED();
+	CALLED();
 	// send the run mode change to all slaved nodes
+
+	BAutolock lock(fSlaveNodes->locker);
+
+	for (int i = 0, n = 0; i < SLAVE_NODES_COUNT && n != fSlaveNodes->count; i++) {
+		if (fSlaveNodes->node_id[i] != 0) {
+			node_set_run_mode_command cmd;
+			cmd.mode = mode;
+			SendToPort(fSlaveNodes->node_port[i], NODE_SET_RUN_MODE, &cmd, sizeof(cmd));
+			n++;
+		}
+	}
 }
 
 
@@ -290,6 +352,7 @@ BTimeSource::BTimeSource(media_node_id id) :
 	fStarted(false),
 	fArea(-1),
 	fBuf(NULL),
+	fSlaveNodes(NULL),
 	fIsRealtime(false)
 {
 	CALLED();
@@ -342,20 +405,94 @@ BTimeSource::FinishCreate()
 status_t
 BTimeSource::RemoveMe(BMediaNode *node)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	CALLED();
+	if (fKinds & NODE_KIND_SHADOW_TIMESOURCE) {
+		timesource_remove_slave_node_command cmd;
+		cmd.node = node->Node();
+		SendToPort(fControlPort, TIMESOURCE_REMOVE_SLAVE_NODE, &cmd, sizeof(cmd));
+	} else {
+		DirectRemoveMe(node->Node());
+	}
+	return B_OK;
 }
 
 
 status_t
 BTimeSource::AddMe(BMediaNode *node)
 {
-	UNIMPLEMENTED();
-
-	return B_ERROR;
+	CALLED();
+	if (fKinds & NODE_KIND_SHADOW_TIMESOURCE) {
+		timesource_add_slave_node_command cmd;
+		cmd.node = node->Node();
+		SendToPort(fControlPort, TIMESOURCE_ADD_SLAVE_NODE, &cmd, sizeof(cmd));
+	} else {
+		DirectAddMe(node->Node());
+	}
+	return B_OK;
 }
 
+
+void
+BTimeSource::DirectAddMe(const media_node &node)
+{
+	CALLED();
+	// XXX this code has race conditions and is pretty dumb, and it
+	// XXX won't detect nodes that crash and don't remove themself.
+	BAutolock lock(fSlaveNodes->locker);
+
+	if (fSlaveNodes->count == SLAVE_NODES_COUNT) {
+		FATAL("BTimeSource::DirectAddMe out of slave node slots\n");
+		return;
+	}
+	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
+		if (fSlaveNodes->node_id[i] == 0) {
+			fSlaveNodes->node_id[i] = node.node;
+			fSlaveNodes->node_port[i] = node.port;
+			fSlaveNodes->count += 1;
+			if (fSlaveNodes->count == 1) {
+				// start the time source
+				time_source_op_info msg;
+				msg.op = B_TIMESOURCE_START;
+				msg.real_time = RealTime();
+				printf("starting time source\n");
+				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
+			}
+			return;
+		}
+	}
+	FATAL("BTimeSource::DirectAddMe failed\n");
+}
+
+void
+BTimeSource::DirectRemoveMe(const media_node &node)
+{
+	// XXX this code has race conditions and is pretty dumb, and it
+	// XXX won't detect nodes that crash and don't remove themself.
+	CALLED();
+	BAutolock lock(fSlaveNodes->locker);
+
+	if (fSlaveNodes->count == 0) {
+		FATAL("BTimeSource::DirectRemoveMe no slots used\n");
+		return;
+	}
+	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
+		if (fSlaveNodes->node_id[i] == node.node && fSlaveNodes->node_port[i] == node.port) {
+			fSlaveNodes->node_id[i] = 0;
+			fSlaveNodes->node_port[i] = 0;
+			fSlaveNodes->count -= 1;
+			if (fSlaveNodes->count == 0) {
+				// stop the time source
+				time_source_op_info msg;
+				msg.op = B_TIMESOURCE_STOP_IMMEDIATELY;
+				msg.real_time = RealTime();
+				printf("stopping time source\n");
+				write_port(fControlPort, TIMESOURCE_OP, &msg, sizeof(msg));
+			}
+			return;
+		}
+	}
+	FATAL("BTimeSource::DirectRemoveMe failed\n");
+}
 
 void
 BTimeSource::DirectStart(bigtime_t at)

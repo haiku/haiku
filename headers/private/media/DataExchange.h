@@ -149,11 +149,13 @@ enum {
 	FILEINTERFACE_MESSAGE_END,
 	CONTROLLABLE_MESSAGE_START = 0x600,
 	CONTROLLABLE_MESSAGE_END,
-	TIMESOURECE_MESSAGE_START = 0x700,
+	TIMESOURCE_MESSAGE_START = 0x700,
 	
 	TIMESOURCE_OP, // datablock is a struct time_source_op_info
+	TIMESOURCE_ADD_SLAVE_NODE,
+	TIMESOURCE_REMOVE_SLAVE_NODE,
 	
-	TIMESOURECE_MESSAGE_END,
+	TIMESOURCE_MESSAGE_END,
 };
 
 
@@ -875,7 +877,14 @@ struct node_set_timesource_command : public command_data
 	media_node_id timesource_id;
 };
 
+struct timesource_add_slave_node_command : public command_data
+{
+	media_node node;
+};
 
-
+struct timesource_remove_slave_node_command : public command_data
+{
+	media_node node;
+};
 
 #endif // _DATA_EXCHANGE_H

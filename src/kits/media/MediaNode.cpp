@@ -103,6 +103,12 @@ BMediaNode::~BMediaNode()
 	// BeBook: by the BMediaNode destructor, but it might be convenient to call it sometime before 
 	// BeBook: you delete your node instance, depending on your implementation and circumstances.
 
+	// first we remove the time source
+	if (fTimeSource) {
+		fTimeSource->RemoveMe(this);
+		fTimeSource->Release();
+	}
+
 	// Attention! We do not unregister TimeSourceObject nodes,
 	// or delete their control ports, since they are only a
 	// shadow object, and the real one still exists
@@ -112,9 +118,6 @@ BMediaNode::~BMediaNode()
 		if (fControlPort > 0)
 			delete_port(fControlPort);
 	}
-
-	if (fTimeSource)
-		fTimeSource->Release();
 }
 
 /*************************************************************
@@ -362,7 +365,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 			return B_OK;
 	}
 
-	if (message > TIMESOURECE_MESSAGE_START && message < TIMESOURECE_MESSAGE_END) {
+	if (message > TIMESOURCE_MESSAGE_START && message < TIMESOURCE_MESSAGE_END) {
 		if (!fTimeSourceThis)
 			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
 		INFO("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
@@ -599,7 +602,7 @@ BMediaNode::HandleBadMessage(int32 code,
 	CALLED();
 
 	TRACE("BMediaNode::HandleBadMessage: code %#08lx, buffer %p, size %ld\n", code, buffer, size);
-	if (code < NODE_MESSAGE_START || code > TIMESOURECE_MESSAGE_END) {
+	if (code < NODE_MESSAGE_START || code > TIMESOURCE_MESSAGE_END) {
 		FATAL("BMediaNode::HandleBadMessage: unknown code!\n");
 	} else {
 		/* All messages targeted to nodes should be handled here,
