@@ -721,7 +721,7 @@ MimeSnifferTest::ScannerTest() {
 		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
 		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
 		  		S("\000abc_xyz123"),
-		  		S("\204a1"),
+		  		S("\241a1"),
 		  		S("!?\\"),
 		  		S("\x00"), S("\x12"), S("\xAB\xCD"), S("\xAB\xCD"),
 		  			S("\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFE\xDC\xBA")
@@ -749,7 +749,7 @@ MimeSnifferTest::ScannerTest() {
 				CHK(token);
 
 //				cout << tokenTypeToString(token->Type()) << endl;
-/*	
+/*
 				if (token->Type() == CharacterString) 
 					cout << " token1 == " << token->String() << endl;
 				if (testCases[i].tokens[j]->Type() == CharacterString)
@@ -758,15 +758,17 @@ MimeSnifferTest::ScannerTest() {
 				if (token->Type() == CharacterString) 
 				{
 					const char *str = token->String();
+					printf("parser: ");
 					for (int i = 0; i < strlen(str); i++)
-						printf("%x", str[i]);
+						printf("%x ", str[i]);
 					printf("\n");
 				}
 				if (testCases[i].tokens[j]->Type() == CharacterString)
 				{
 					const char *str = (testCases[i].tokens[j])->String();
+					printf("tester: ");
 					for (int i = 0; i < strlen(str); i++)
-						printf("%x", str[i]);
+						printf("%x ", str[i]);
 					printf("\n");
 				}
 	
@@ -781,7 +783,7 @@ MimeSnifferTest::ScannerTest() {
 						cout << " float == " << token->Float() << endl;
 						break;
 				}
-*/	
+*/
 				CHK(*token == *(testCases[i].tokens[j]));
 				delete testCases[i].tokens[j];
 			}
@@ -791,8 +793,8 @@ MimeSnifferTest::ScannerTest() {
 			delete e;
 			throw *err;
 		}
-
 	}
+	
 #endif	// !TEST_R5
 }
 
@@ -961,6 +963,80 @@ MimeSnifferTest::ParserTest() {
 			"Sniffer pattern error: expecting '|', ')', or possibly '&'"
 #endif
 		},
+		
+		// Miscellaneous tests designed to hit every remaining
+		// relevant "throw new Err()" statement in the scanner.
+		// R5 versions will come later...
+#if !TEST_R5
+		{ "\x03  ", "Sniffer pattern error: invalid character '\x03'" },
+		{ "\"blah", "Sniffer pattern error: unterminated double-quoted string" },
+		{ "0xThisIsNotAHexCode", "Sniffer pattern error: incomplete hex code" },
+		{ "0xAndNeitherIsThis:-)", "Sniffer pattern error: bad hex literal" },
+		{ ".NotAFloat", "Sniffer pattern error: incomplete floating point number" },
+		{ "-NotANumber", "Sniffer pattern error: incomplete signed number" },
+		{ "+NotANumber", "Sniffer pattern error: incomplete signed number" },
+
+		{ "0.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ ".0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.0e", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		
+		{ "0.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ ".0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.0e-", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		
+		{ "0.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ ".0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "1e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "-1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+		{ "+1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
+
+		{ "\\11\"quotes_are_illegal_here", "Sniffer pattern error: illegal unquoted character '\"'" },
+		{ "\\11'quotes_are_illegal_here", "Sniffer pattern error: illegal unquoted character '''" },
+		
+		{ "\\11\\", "Sniffer pattern error: incomplete escape sequence" },
+		{ "\"Escape!! \\", "Sniffer pattern error: incomplete escape sequence" },
+		{ "'Escape!! \\", "Sniffer pattern error: incomplete escape sequence" },
+
+		{ "\\x", "Sniffer pattern error: incomplete escaped hex code" },
+		{ "\\xNotAHexCode", "Sniffer pattern error: incomplete escaped hex code" },		
+		{ "\\xAlsoNotAHexCode", "Sniffer pattern error: incomplete escaped hex code" },
+		{ "\\x0", "Sniffer pattern error: incomplete escaped hex code" },
+		
+		{ "1.0 (\\377)", NULL },
+		{ "\\400", "Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)" },
+		{ "\\777", "Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)" },
+		{ "1.0 (\\800)", NULL },
+		
+		{ NULL, "Sniffer pattern error: NULL pattern" },
+
+		{ "-2", "Sniffer pattern error: invalid priority" },
+		{ "+2", "Sniffer pattern error: invalid priority" },
+		
+		{ "1.0", "Sniffer pattern error: missing expression" },
+#endif	// !TEST_R5
+
 
 //		{ "1E-25 ('ABCD')", "Sniffer pattern error: missing pattern" },
 			// I don't currently understand what's wrong with the above rule... R5
@@ -972,20 +1048,25 @@ MimeSnifferTest::ParserTest() {
 //cout << endl << "----------------------------------------------------------------------" << endl;
 		NextSubTest();
 		test_case &testCase = testCases[i];
-//		cout << endl << testCase.rule << endl;
+//cout << endl << testCase.rule << endl;
 		BString parseError;
 		status_t error = BMimeType::CheckSnifferRule(testCase.rule,
 													 &parseError);
 		if (testCase.error == NULL) {
 			if (error != B_OK) {
 				cout << endl << "This sucker's gonna fail..."
-				     << endl << "RULE: '" << testCase.rule
+				     << endl << "RULE: '" << testCase.rule << "'"
 				     << endl << "ERROR: "
 				     << endl << parseError.String()
 				     << endl;
 			}
 			CHK(error == B_OK);
 		} else {
+
+//			if (parseError.FindLast(testCase.error) >= 0) {
+//				cout << endl << parseError.String(); // << endl;
+//				cout << endl << testCase.error << endl;
+//			}
 //			cout << endl << parseError.String(); // << endl;
 /*
 			if (parseError.FindLast(testCase.error) >= 0) {
