@@ -11,6 +11,7 @@
 #include <image.h>
 #include <Message.h>
 #include <AppDefs.h>
+#include <InterfaceDefs.h>
 #include <TypeConstants.h>
 
 #include <termios.h>
@@ -19,6 +20,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "VTkeymap.h"
 
 //#define USE_INPUT_SERVER
 	// define this if consoled should use the input_server to
@@ -100,7 +103,25 @@ keyboard_reader(void *arg)
 			continue;
 		event.FindData("bytes", B_STRING_TYPE, (const void**)&string, &length);
 
-		write(con->tty_master_fd, string, length);
+		if (length <= 2)
+			switch (*string) {
+			case B_LEFT_ARROW:
+				write(con->tty_master_fd, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE));
+				break;
+			case B_RIGHT_ARROW:
+				write(con->tty_master_fd, RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE));
+				break;
+			case B_UP_ARROW:
+				write(con->tty_master_fd, UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE));
+				break;
+			case B_DOWN_ARROW:
+				write(con->tty_master_fd, DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE));
+				break;
+			default:
+				write(con->tty_master_fd, string, length);
+			}	
+		else 
+			write(con->tty_master_fd, string, length);
 	}
 #else	// USE_INPUT_SERVER
 	char buffer[1024];
