@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include "Layer.h"
 #include "ServerWindow.h"
+#include "WinBorder.h"
 #include "RGBColor.h"
-//#include "MyDriver.h"
+#include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "LayerData.h"
 
@@ -19,8 +20,6 @@
 #else
 #	define STRACE(x) ;
 #endif
-
-BRect		SCREENBOUNDS;
 
 BRegion		gRedrawReg;
 BList		gCopyRegList;
@@ -68,6 +67,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	_resize_mode	= resize;
 	_hidden			= false;
 	_is_updating	= false;
+	fIsTopLayer		= false;
 	_level			= 0;
 	_view_token		= token;
 	
@@ -75,10 +75,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	clipToPicture	= NULL;
 
 	/* NOW all regions (_visible, _fullVisible, _full) are empty */
-	RebuildFullRegion();
-// TODO: remove!
-	if (token == 21)
-		SCREENBOUNDS	= frame;
+	printf("Layer(%s) successfuly created\n", GetName());
 }
 
 //! Destructor frees all allocated heap space
@@ -130,7 +127,10 @@ printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 	_bottomchild		= layer;
 
 	layer->SetRootLayer(fRootLayer);
-	layer->SetServerWindow(this->SearchForServerWindow());
+	// higher level objects like RootLayers do not have ServerWindow objects attached
+	// This is in case o a WinBorder object which already has a valid _serverwin memeber.
+	if(!(layer->_serverwin))
+		layer->SetServerWindow(this->SearchForServerWindow());
 	layer->RebuildFullRegion();
 
 	Layer		*c = layer->_topchild; //c = short for: current
@@ -141,7 +141,7 @@ printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 			// action block
 			{
 				c->SetRootLayer(fRootLayer);
-				c->SetServerWindow(this->SearchForServerWindow());
+				c->SetServerWindow(c->SearchForServerWindow());
 				c->RebuildFullRegion();
 			}
 
@@ -169,7 +169,7 @@ printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 				}
 		}
 	
-	if ( !(layer->IsHidden()) && layer->fRootLayer){
+	if ( !(layer->IsHidden()) && layer->fRootLayer && !IsHidden()){
 		FullInvalidate( layer->_full );
 	}
 printf("Layer(%s)::AddChild(%s) ENDED\n", GetName(), layer->GetName());
@@ -209,6 +209,7 @@ void Layer::RemoveChild(Layer *layer)
 			// action block
 			{
 				c->SetRootLayer(NULL);
+				c->SetServerWindow(NULL);
 				c->_full.MakeEmpty();
 				c->_fullVisible.MakeEmpty();
 				c->_visible.MakeEmpty();
@@ -244,6 +245,7 @@ void Layer::RemoveChild(Layer *layer)
 	}
 
 	layer->fRootLayer	= NULL;
+	layer->_serverwin	= NULL;
 	layer->_full.MakeEmpty();
 	layer->_fullVisible.MakeEmpty();
 	layer->_visible.MakeEmpty();
@@ -392,6 +394,7 @@ printf("\n");
 
 void Layer::Redraw(const BRegion& reg, Layer *startFrom)
 {
+printf("Layer(%s)::Redraw();\n", GetName());
 	BRegion		*pReg = const_cast<BRegion*>(&reg);
 
 	if(_serverwin){
@@ -409,10 +412,30 @@ printf("Layer::Redraw ENDED\n");
 }
 
 void Layer::RequestClientUpdate(const BRegion &reg, Layer *startFrom){
+printf("Layer(%s)::RequestClientUpdate();\n", GetName());
 	if (IsHidden()){
 		// this layer has nothing visible on screen, so bail out.
 		return;
 	}
+// TODO: remove!
+	if (_visible.CountRects() > 0){
+		fUpdateReg		= _visible;
+		fUpdateReg.IntersectWith(&reg);
+
+			// NOTE: CLEAR to the background color!
+
+			// draw itself.
+		if (fUpdateReg.CountRects() > 0){
+			fDriver->ConstrainClippingRegion(&fUpdateReg);
+			Draw(fUpdateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
+		}
+
+		fUpdateReg.MakeEmpty();
+	}
+	return;
+
+
 // TODO: use startFrom!
 
 // TODO: Do that! here? or after a message sent by the client just before calling BView::Draw(r)
@@ -442,7 +465,9 @@ printf("Layer(%s)::RequestDraw()\n", GetName());
 
 			// draw itself.
 		if (fUpdateReg.CountRects() > 0){
+			fDriver->ConstrainClippingRegion(&fUpdateReg);
 			Draw(fUpdateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
 		}
 
 		fUpdateReg.MakeEmpty();
@@ -464,11 +489,13 @@ printf("Layer(%s)::RequestDraw()\n", GetName());
 
 void Layer::Draw(const BRect &r)
 {
+
+// TODO/NOTE: this should be an empty method! the next lines are for testing only
 printf("Layer::Draw() Called\n");
 //	RGBColor	col(152,102,51);
 //	DRIVER->FillRect_(r, 1, col, &fUpdateReg);
 //snooze(1000000);
-//	DRIVER->FillRect_(r, 1, fBackColor, &fUpdateReg);
+	fDriver->FillRect(r, fBackColor);
 
 	// empty HOOK function.
 }
@@ -565,28 +592,32 @@ uint32 Layer::CountChildren(void) const
 
 void Layer::RebuildFullRegion( ){
 
-	if (_parent)
+	if (_parent && !IsTopLayer())
 		_full.Set( _parent->ConvertToTop( _frame ) );
 	else
-		_full.Set( ConvertToTop( _frame ) );
+		_full.Set( _frame );
 
 // TODO: Convert to screen coordinates!
 	LayerData		*ld;
 	ld			= _layerdata;
 	do{
 			// clip to user region
-		if ( ld->clippReg )
+		if(ld->clippReg)
 			_full.IntersectWith( ld->clippReg );
 	} while( (ld = ld->prevState) );
 
 		// clip to user picture region
-	if ( clipToPicture )
-		if ( clipToPictureInverse ) {
+	if(clipToPicture)
+		if(clipToPictureInverse) {
 			_full.Exclude( clipToPicture );
 		}
 		else{
 			_full.IntersectWith( clipToPicture );
 		}
+
+	if(IsTopLayer()){
+		_full.Exclude( _serverwin->fWinBorder->fDecFull );		
+	}
 }
 
 void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset)
@@ -716,7 +747,7 @@ printf("1) Action B_LAYER_MASK_RESIZE\n");
 		case B_LAYER_MOVE:{
 			BRegion		redrawReg;
 			BRegion		*copyReg = new BRegion();
-			BRegion		screenReg(SCREENBOUNDS);
+			BRegion		screenReg(fRootLayer->Bounds());
 
 			oldRegion.OffsetBy(pt.x, pt.y);
 			oldRegion.IntersectWith(&_fullVisible);
