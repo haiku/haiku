@@ -41,6 +41,7 @@
 #include "Entry.h"
 #include "Locker.h"
 #include "Debug.h"
+#include <String.h>
 
 #include "InputServerDeviceListEntry.h"
 #include "InputServerFilterListEntry.h"
@@ -48,12 +49,9 @@
 #include "Message.h"
 
 // include app_server headers for communication
+#include <PortLink.h>
+#include <ServerProtocol.h>
 
-#include "PortLink.h"
-#include "ServerProtocol.h"
-
-#define SERVER_PORT_NAME "OBappserver"
-#define SERVER_INPUT_PORT "OBinputport"
 #define X_VALUE "x"
 #define Y_VALUE "y"
 
@@ -95,7 +93,7 @@ int main()
  */
 InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_server")
 {
-	void *pointer;
+	void *pointer=NULL;
 	
 	EventLoop(pointer);
 
@@ -1087,8 +1085,174 @@ int InputServer::DispatchEvent(BMessage *message)
     			}
     		break;
     		}
-   				// Should be some Mouse Down and Up code here ..
-   				// Along with some Key Down and up codes ..
+    	case B_MOUSE_DOWN:{
+
+			BPoint pt;
+			int32 buttons,clicks,mod;
+			int64 time=(int64)real_time_clock();
+			
+			if(message->FindPoint("where",&pt)!=B_OK ||
+					message->FindInt32("modifiers",&mod)!=B_OK ||
+					message->FindInt32("buttons",&buttons)!=B_OK ||
+					message->FindInt32("clicks",&clicks)!=B_OK)
+				break;
+		
+			appsvrlink->SetOpCode(B_MOUSE_DOWN);
+			appsvrlink->Attach(&time, sizeof(int64));
+			appsvrlink->Attach(&pt.x,sizeof(float));
+			appsvrlink->Attach(&pt.y,sizeof(float));
+			appsvrlink->Attach(&mod, sizeof(uint32));
+			appsvrlink->Attach(&buttons, sizeof(uint32));
+			appsvrlink->Attach(&clicks, sizeof(uint32));
+			appsvrlink->Flush();
+    		break;
+    		}
+    	case B_MOUSE_UP:{
+			BPoint pt;
+			int32 mod;
+			int64 time=(int64)real_time_clock();
+
+			if(message->FindPoint("where",&pt)!=B_OK ||
+					message->FindInt32("modifiers",&mod)!=B_OK)
+				break;
+			
+			appsvrlink->SetOpCode(B_MOUSE_UP);
+			appsvrlink->Attach(&time, sizeof(int64));
+			appsvrlink->Attach(&pt.x,sizeof(float));
+			appsvrlink->Attach(&pt.y,sizeof(float));
+			appsvrlink->Attach(&mod, sizeof(uint32));
+			appsvrlink->Flush();
+    		break;
+    		}
+    	case B_MOUSE_WHEEL_CHANGED:{
+			float x,y;
+			message->FindFloat("be:wheel_delta_x",&x);
+			message->FindFloat("be:wheel_delta_y",&y);
+			int64 time=real_time_clock();
+			
+			appsvrlink->SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			appsvrlink->Attach(&time,sizeof(int64));
+			appsvrlink->Attach(x);
+			appsvrlink->Attach(y);
+			appsvrlink->Flush();
+			break;
+    		}
+		case B_KEY_DOWN:{
+			bigtime_t systime;
+			int32 scancode, asciicode,repeatcount,modifiers;
+			int8 utf8data[3];
+			BString string;
+			int8 keyarray[16];
+
+			systime=(int64)real_time_clock();
+			message->FindInt32("key",&scancode);
+			message->FindInt32("be:key_repeat",&repeatcount);
+			message->FindInt32("modifiers",&modifiers);
+			message->FindInt32("raw_char",&asciicode);
+			message->FindInt8("byte",0,utf8data);
+			message->FindInt8("byte",1,utf8data+1);
+			message->FindInt8("byte",2,utf8data+2);
+			message->FindString("bytes",&string);
+			for(int8 i=0;i<15;i++)
+				message->FindInt8("states",i,&keyarray[i]);
+			appsvrlink->SetOpCode(B_KEY_DOWN);
+			appsvrlink->Attach(&systime,sizeof(bigtime_t));
+			appsvrlink->Attach(scancode);
+			appsvrlink->Attach(asciicode);
+			appsvrlink->Attach(repeatcount);
+			appsvrlink->Attach(modifiers);
+			appsvrlink->Attach(utf8data,sizeof(int8)*3);
+			appsvrlink->Attach(string.Length()+1);
+			appsvrlink->Attach(string.String());
+			appsvrlink->Attach(keyarray,sizeof(int8)*16);
+			appsvrlink->Flush();
+			break;
+		}
+		case B_KEY_UP:{
+			bigtime_t systime;
+			int32 scancode, asciicode,modifiers;
+			int8 utf8data[3];
+			BString string;
+			int8 keyarray[16];
+
+			systime=(int64)real_time_clock();
+			message->FindInt32("key",&scancode);
+			message->FindInt32("raw_char",&asciicode);
+			message->FindInt32("modifiers",&modifiers);
+			message->FindInt8("byte",0,utf8data);
+			message->FindInt8("byte",1,utf8data+1);
+			message->FindInt8("byte",2,utf8data+2);
+			message->FindString("bytes",&string);
+			for(int8 i=0;i<15;i++)
+				message->FindInt8("states",i,&keyarray[i]);
+			appsvrlink->SetOpCode(B_KEY_UP);
+			appsvrlink->Attach(&systime,sizeof(bigtime_t));
+			appsvrlink->Attach(scancode);
+			appsvrlink->Attach(asciicode);
+			appsvrlink->Attach(modifiers);
+			appsvrlink->Attach(utf8data,sizeof(int8)*3);
+			appsvrlink->Attach(string.Length()+1);
+			appsvrlink->Attach(string.String());
+			appsvrlink->Attach(keyarray,sizeof(int8)*16);
+			appsvrlink->Flush();
+			break;
+		}
+		case B_UNMAPPED_KEY_DOWN:{
+			bigtime_t systime;
+			int32 scancode,modifiers;
+			int8 keyarray[16];
+
+			systime=(int64)real_time_clock();
+			message->FindInt32("key",&scancode);
+			message->FindInt32("modifiers",&modifiers);
+			for(int8 i=0;i<15;i++)
+				message->FindInt8("states",i,&keyarray[i]);
+			appsvrlink->SetOpCode(B_UNMAPPED_KEY_DOWN);
+			appsvrlink->Attach(&systime,sizeof(bigtime_t));
+			appsvrlink->Attach(scancode);
+			appsvrlink->Attach(modifiers);
+			appsvrlink->Attach(keyarray,sizeof(int8)*16);
+			appsvrlink->Flush();
+			break;
+		}
+		case B_UNMAPPED_KEY_UP:{
+			bigtime_t systime;
+			int32 scancode,modifiers;
+			int8 keyarray[16];
+
+			systime=(int64)real_time_clock();
+			message->FindInt32("key",&scancode);
+			message->FindInt32("modifiers",&modifiers);
+			for(int8 i=0;i<15;i++)
+				message->FindInt8("states",i,&keyarray[i]);
+			appsvrlink->SetOpCode(B_UNMAPPED_KEY_UP);
+			appsvrlink->Attach(&systime,sizeof(bigtime_t));
+			appsvrlink->Attach(scancode);
+			appsvrlink->Attach(modifiers);
+			appsvrlink->Attach(keyarray,sizeof(int8)*16);
+			appsvrlink->Flush();
+			break;
+		}
+		case B_MODIFIERS_CHANGED:{
+			bigtime_t systime;
+			int32 scancode,modifiers,oldmodifiers;
+			int8 keyarray[16];
+
+			systime=(int64)real_time_clock();
+			message->FindInt32("key",&scancode);
+			message->FindInt32("modifiers",&modifiers);
+			message->FindInt32("be:old_modifiers",&oldmodifiers);
+			for(int8 i=0;i<15;i++)
+				message->FindInt8("states",i,&keyarray[i]);
+			appsvrlink->SetOpCode(B_MODIFIERS_CHANGED);
+			appsvrlink->Attach(&systime,sizeof(bigtime_t));
+			appsvrlink->Attach(scancode);
+			appsvrlink->Attach(modifiers);
+			appsvrlink->Attach(oldmodifiers);
+			appsvrlink->Attach(keyarray,sizeof(int8)*16);
+			appsvrlink->Flush();
+			break;
+		}
    		default:
       		break;
    			

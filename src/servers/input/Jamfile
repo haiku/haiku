@@ -6,11 +6,12 @@ SubDir OBOS_TOP src servers input ;
 #	input_server.rsrc
 #	;
 
+UsePrivateHeaders app ;
+
 Server input_server :
 	InputServer.cpp
 	InputServerDevice.cpp
 	InputServerFilter.cpp
 	InputServerMethod.cpp
-	PortLink.cpp
 ;
-LinkSharedOSLibs input_server : be root ;
+LinkSharedOSLibs input_server : be root <boot!home!config!lib>libopenbeos.so ;
