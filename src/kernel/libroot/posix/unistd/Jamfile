@@ -16,6 +16,7 @@ KernelMergeObject posix_unistd.o :
 	ioctl.c
 	link.c
 	lseek.c
+	mknod.c
 	mount.c
 	open.c
 	pipe.c
