@@ -7,6 +7,14 @@
 	BMimeType implementation.
 */
 #include <MimeType.h>
+#include <ctype.h>		// For tolower()
+#include <new.h>		// For new(nothrow)
+#include <stdio.h>		// For printf()
+#include <string.h>		// For strncpy()
+
+// Private helper functions
+bool isValidMimeChar(const char ch);
+status_t toLower(const char *str, char *result);
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -26,6 +34,8 @@ const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 /*!	\brief Creates an uninitialized BMimeType object.
 */
 BMimeType::BMimeType()
+	: fType(NULL)
+	, fCStatus(B_NO_INIT)
 {
 }
 
@@ -37,7 +47,10 @@ BMimeType::BMimeType()
 	\param mimeType The MIME string.
 */
 BMimeType::BMimeType(const char *mimeType)
+	: fType(NULL)
+	, fCStatus(B_NO_INIT)
 {
+	SetTo(mimeType);
 }
 
 // destructor
@@ -45,6 +58,7 @@ BMimeType::BMimeType(const char *mimeType)
 */
 BMimeType::~BMimeType()
 {
+	Unset();
 }
 
 // SetTo
@@ -72,7 +86,19 @@ BMimeType::~BMimeType()
 status_t
 BMimeType::SetTo(const char *mimeType)
 {
-	return NOT_IMPLEMENTED;
+	if (!mimeType || !BMimeType::IsValid(mimeType)) {
+		fCStatus = B_BAD_VALUE;
+	} else {
+		Unset();
+		fType = new(nothrow) char[strlen(mimeType)+1];
+		if (fType) {
+			strcpy(fType, mimeType);
+			fCStatus = B_OK;
+		} else {
+			fCStatus = B_NO_MEMORY;
+		}
+	}
+	return fCStatus;
 }
 
 // Unset
@@ -81,6 +107,10 @@ BMimeType::SetTo(const char *mimeType)
 void
 BMimeType::Unset()
 {
+	if (fType)
+		delete [] fType;
+	fType = NULL;
+	fCStatus = B_NO_INIT;
 }
 
 // InitCheck
@@ -92,7 +122,7 @@ BMimeType::Unset()
 status_t
 BMimeType::InitCheck() const
 {
-	return NOT_IMPLEMENTED;
+	return fCStatus;
 }
 
 // Type
@@ -103,7 +133,7 @@ BMimeType::InitCheck() const
 const char *
 BMimeType::Type() const
 {
-	return NULL;	// not implemented
+	return fType;
 }
 
 // IsValid
@@ -115,7 +145,7 @@ BMimeType::Type() const
 bool
 BMimeType::IsValid() const
 {
-	return false;	// not implemented
+	return InitCheck() == B_OK && BMimeType::IsValid(Type());
 }
 
 // IsSupertypeOnly
@@ -126,7 +156,17 @@ BMimeType::IsValid() const
 bool
 BMimeType::IsSupertypeOnly() const
 {
-	return false;	// not implemented
+	if (fCStatus == B_OK) {
+		// We assume here fCStatus will be B_OK *only* if
+		// the MIME string is valid
+		int len = strlen(fType);
+		for (int i = 0; i < len; i++) {
+			if (fType[i] == '/')
+				return false;
+		}
+		return true;
+	} else
+		return false;
 }
 
 // IsInstalled
@@ -152,12 +192,34 @@ BMimeType::IsInstalled() const
 		   initialized to this object's supertype.
 	\return
 	- \c B_OK: Everything went fine.
-	- \c B_BAD_VALUE: \c NULL \a superType or this object is not initialized.
+	- \c B_BAD_VALUE: \c NULL \a superType, this object is not initialized,
+	  or this object <i> is </i> a supertype.
 */
 status_t
 BMimeType::GetSupertype(BMimeType *superType) const
 {
-	return NOT_IMPLEMENTED;
+	if (!superType)
+		return B_BAD_VALUE;
+	superType->Unset();
+
+	status_t err = (fCStatus == B_OK ? B_OK : B_BAD_VALUE);
+	if (!err) {
+		int len = strlen(fType);
+		int i;
+		for (i = 0; i < len; i++) {
+			if (fType[i] == '/')
+				break;
+		}
+		if (i == len)
+			err = B_BAD_VALUE;		// IsSupertypeOnly() == true
+		else {
+			char superMime[B_MIME_TYPE_LENGTH+1];
+			strncpy(superMime, fType, i);
+			superMime[i] = 0;
+			err = superType->SetTo(superMime);
+		}
+	}
+	return err;
 }
 
 // ==
@@ -170,7 +232,21 @@ BMimeType::GetSupertype(BMimeType *superType) const
 bool
 BMimeType::operator==(const BMimeType &type) const
 {
-	return false;	// not implemented
+	char lower1[B_MIME_TYPE_LENGTH+1];
+	char lower2[B_MIME_TYPE_LENGTH+1];
+	
+	if (InitCheck() == B_OK && type.InitCheck() == B_OK) {
+		status_t err = toLower(Type(), lower1);
+		if (!err)
+			err = toLower(type.Type(), lower2);
+		if (!err) 
+			err = (strcmp(lower1, lower2) == 0 ? B_OK : B_ERROR);
+		return err == B_OK;
+	} else if (InitCheck() == B_NO_INIT && type.InitCheck() == B_NO_INIT) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 // ==
@@ -184,7 +260,10 @@ BMimeType::operator==(const BMimeType &type) const
 bool
 BMimeType::operator==(const char *type) const
 {
-	return false;	// not implemented
+	BMimeType mime;
+	if (type)
+		mime.SetTo(type);
+	return (*this) == mime;
 }
 
 // Contains
@@ -197,7 +276,14 @@ BMimeType::operator==(const char *type) const
 bool
 BMimeType::Contains(const BMimeType *type) const
 {
-	return false;	// not implemented
+	if (!type)
+		return false;
+	if (*this == *type)
+		return true;
+	BMimeType super;
+	if (type->GetSupertype(&super) == B_OK && *this == super)
+		return true;
+	return false;	
 }
 
 // Install
@@ -740,7 +826,47 @@ BMimeType::GetWildcardApps(BMessage *wild_ones)
 bool
 BMimeType::IsValid(const char *string)
 {
-	return false;	// not implemented
+	if (!string)
+		return false;
+		
+	bool foundSlash = false;		
+	int len = strlen(string);
+	if (len > B_MIME_TYPE_LENGTH || len == 0)
+		return false;
+		
+	for (int i = 0; i < len; i++) {
+		char ch = string[i];
+		if (ch == '/') {
+			if (foundSlash || i == 0 || i == len-1)
+				return false;
+			else
+				foundSlash = true;
+		} else if (!isValidMimeChar(ch)) {
+			return false;
+		}
+	}	
+	return true;
+}
+
+bool isValidMimeChar(const char ch)
+{
+	return    ch > 32		// Handles white space and most CTLs
+	       && ch != '/'
+	       && ch != '<'
+	       && ch != '>'
+	       && ch != '@'
+	       && ch != ','
+	       && ch != ';'
+	       && ch != ':'
+	       && ch != '"'
+	       && ch != '('
+	       && ch != ')'
+	       && ch != '['
+	       && ch != ']'
+	       && ch != '?'
+	       && ch != '='
+	       && ch != '\\'
+	       && ch != 127;	// DEL
 }
 
 // GetAppHint
@@ -1082,7 +1208,7 @@ BMimeType::StopWatching(BMessenger target)
 status_t
 BMimeType::SetType(const char *mimeType)
 {
-	return NOT_IMPLEMENTED;
+	SetTo(mimeType);
 }
 
 
@@ -1106,3 +1232,16 @@ BMimeType::BMimeType(const BMimeType &)
 {
 }
 
+// Returns a lowercase version of str in result. Result must
+// be preallocated and is assumed to be of adequate length.
+status_t
+toLower(const char *str, char *result) {
+	if (!str || !result)
+		return B_BAD_VALUE;
+	int len = strlen(str);
+	int i;
+	for (i = 0; i < len; i++)
+		result[i] = tolower(str[i]);
+	result[i] = 0;
+	return B_OK;
+}

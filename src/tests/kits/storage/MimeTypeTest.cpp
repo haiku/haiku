@@ -2289,11 +2289,11 @@ MimeTypeTest::InitTest()
 	{
 		BMimeType type(NULL);
 		CHK(type.Type() == NULL);
-		CHK(type.InitCheck() == B_NO_INIT);
+		CHK(type.InitCheck() != B_OK);		// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
 		CHK(type.Type() == NULL);
-		CHK(type.SetTo(NULL) == B_NO_INIT);
+		CHK(type.SetTo(NULL) != B_OK);		// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
 		CHK(type.Type() == NULL);
-		CHK(type.SetType(NULL) == B_NO_INIT);
+		CHK(type.SetType(NULL) != B_OK);	// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
 		CHK(type.Type() == NULL);
 	}
 }
@@ -3727,27 +3727,32 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 }
 
 
+/* KEY:
+   + == Tests implemented
+   * == Function implemented
+*/
+
 /* Ingo's functions:
 
 	// initialization
-+	BMimeType();
-+	BMimeType(const char *mimeType);
-(	virtual ~BMimeType();)
++*	BMimeType();
++*	BMimeType(const char *mimeType);
+(*	virtual ~BMimeType();)
 
-+	status_t SetTo(const char *mimeType);
-+	status_t SetType(const char *mimeType);
-+	void Unset();
-+	status_t InitCheck() const;
++*	status_t SetTo(const char *mimeType);
++*	status_t SetType(const char *mimeType);
++*	void Unset();
++*	status_t InitCheck() const;
 
 	// string access
-+	const char *Type() const;
-+	bool IsValid() const;
-+	static bool IsValid(const char *mimeType);
-+	bool IsSupertypeOnly() const;
-+	status_t GetSupertype(BMimeType *superType) const;
-+	bool Contains(const BMimeType *type) const;
-+	bool operator==(const BMimeType &type) const;
-+	bool operator==(const char *type) const;
++*	const char *Type() const;
++*	bool IsValid() const;
++*	static bool IsValid(const char *mimeType);
++*	bool IsSupertypeOnly() const;
++*	status_t GetSupertype(BMimeType *superType) const;
++*	bool Contains(const BMimeType *type) const;
++*	bool operator==(const BMimeType &type) const;
++*	bool operator==(const char *type) const;
 
 	// MIME database monitoring
 +	static status_t StartWatching(BMessenger target);
@@ -3778,6 +3783,7 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 	// MIME database access
 +	status_t Install();
 +	status_t Delete();
++	bool IsInstalled() const;
 +	status_t GetIcon(BBitmap *icon, icon_size size) const;
 +	status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const;
 +	status_t GetAttrInfo(BMessage *info) const;
@@ -3793,11 +3799,11 @@ printf("type: %s, should be: %s\n", type.Type(), realType);
 +	status_t SetShortDescription(const char *description);
 +	status_t SetLongDescription(const char *description);
 
-	static status_t GetInstalledSupertypes(BMessage *super_types);
-	static status_t GetInstalledTypes(BMessage *types);
-	static status_t GetInstalledTypes(const char *super_type,
++	static status_t GetInstalledSupertypes(BMessage *super_types);
++	static status_t GetInstalledTypes(BMessage *types);
++	static status_t GetInstalledTypes(const char *super_type,
 									  BMessage *subtypes);
-	static status_t GetWildcardApps(BMessage *wild_ones);
++	static status_t GetWildcardApps(BMessage *wild_ones);
 
 +	status_t GetAppHint(entry_ref *ref) const;
 +	status_t SetAppHint(const entry_ref *ref);

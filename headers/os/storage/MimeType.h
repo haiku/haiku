@@ -83,7 +83,6 @@ public:
 	const char *Type() const;
 	bool IsValid() const;
 	bool IsSupertypeOnly() const;
-	bool IsInstalled() const;
 	status_t GetSupertype(BMimeType *superType) const;
 
 	bool operator==(const BMimeType &type) const;
@@ -94,6 +93,7 @@ public:
 	/* These functions are for managing data in the meta mime file*/
 	status_t Install();
 	status_t Delete();
+	bool IsInstalled() const;
 	status_t GetIcon(BBitmap *icon, icon_size size) const;
 	status_t GetPreferredApp(char *signature, app_verb verb = B_OPEN) const;
 	status_t GetAttrInfo(BMessage *info) const;
@@ -170,6 +170,7 @@ private:
 	BMimeType(const BMimeType &);
 
 /*
+	void InitData(const char *type);
 	void InitData(const char *type);
 	status_t OpenFile(bool create_file = false, dev_t dev = -1) const;
 	status_t CloseFile() const;
