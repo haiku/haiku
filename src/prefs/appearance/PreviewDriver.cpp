@@ -133,15 +133,22 @@ void PreviewDriver::InvertRect(const BRect &r)
 	view->viewbmp->Unlock();
 }
 
-void PreviewDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors)
+void PreviewDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,
+	 const DrawData *d)
 {
+	if(!linedata || !d)
+		return;
+	
 	view->viewbmp->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
 	drawview->SetPenSize(d->pensize);
 	drawview->BeginLineArray(numlines);
 	for(int32 i=0; i<numlines; i++)
-		drawview->AddLine(pts[2*i],pts[(2*i)+1],colors[i].GetColor32());
+	{
+		const LineArrayData *data=&(linedata[i]);
+		drawview->AddLine(data->pt1,data->pt2,data->color);
+	}
 	drawview->EndLineArray();
 	drawview->Sync();
 	view->Invalidate();
