@@ -76,7 +76,7 @@ struct fs_calls {
 	int (*fs_free_cookie)(fs_cookie fs, fs_vnode v, file_cookie cookie);
 	ssize_t (*fs_read)(fs_cookie fs, fs_vnode v, file_cookie cookie, void *buf, off_t pos, size_t *len);
 	ssize_t (*fs_write)(fs_cookie fs, fs_vnode v, file_cookie cookie, const void *buf, off_t pos, size_t *len);
-	int (*fs_seek)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, int st);
+	off_t (*fs_seek)(fs_cookie fs, fs_vnode v, file_cookie cookie, off_t pos, int seekType);
 
 	/* directory operations */
 	int (*fs_create_dir)(fs_cookie fs, fs_vnode dir, const char *name, int perms, vnode_id *new_vnid);
@@ -153,7 +153,7 @@ int sys_sync(void);
 int sys_open(const char *path, int omode);
 int sys_open_dir(const char *path);
 int sys_fsync(int fd);
-int sys_seek(int fd, off_t pos, int seek_type);
+off_t sys_seek(int fd, off_t pos, int seekType);
 int sys_create(const char *path, int omode, int perms);
 int sys_create_dir(const char *path, int perms);
 int sys_unlink(const char *path);
@@ -171,7 +171,7 @@ int user_sync(void);
 int user_open(const char *path, int omode);
 int user_open_dir(const char *path);
 int user_fsync(int fd);
-int user_seek(int fd, off_t pos, int seek_type);
+off_t user_seek(int fd, off_t pos, int seekType);
 int user_create(const char *path, int omode, int perms);
 int user_create_dir(const char *path, int perms);
 int user_unlink(const char *path);

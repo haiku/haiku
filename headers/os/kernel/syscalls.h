@@ -33,7 +33,7 @@ int     sys_open(const char *path, int omode);
 int     sys_close(int fd);
 ssize_t sys_read(int fd, void *buf, off_t pos, size_t len);
 ssize_t sys_write(int fd, const void *buf, off_t pos, size_t len);
-int     sys_seek(int fd, off_t pos, int seek_type);
+off_t   sys_seek(int fd, off_t pos, int seek_type);
 int     sys_ioctl(int fd, ulong op, void *buf, size_t length);
 int     sys_unlink(const char *path);
 int     sys_rename(const char *oldpath, const char *newpath);
