@@ -158,13 +158,11 @@ BNetAddress::BNetAddress( BMessage* archive )
  * Input parameter:
  *     refparam     : Instance to assign from.
  */
-BNetAddress& BNetAddress::operator=( const BNetAddress& refparam )
+BNetAddress & BNetAddress::operator=( const BNetAddress& refparam )
 {
-    if ( clone( refparam ) == B_OK )
-    {
-        return *this;
-    }
+    clone(refparam);
     // TODO: what do return on clone() failure!?
+    return *this;
 }
 
 
