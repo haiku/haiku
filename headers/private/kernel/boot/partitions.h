@@ -24,7 +24,9 @@ class Partition : public partition_data, public Node {
 		virtual int32 Type() const;
 
 		Partition *AddChild();
-		status_t Scan();
+
+		status_t Mount(Directory **_fileSystem = NULL);
+		status_t Scan(bool mountFileSystems);
 
 		Partition *Parent() const { return fParent; }
 		bool IsFileSystem() const { return fIsFileSystem; }
