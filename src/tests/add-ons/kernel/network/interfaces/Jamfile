@@ -2,6 +2,6 @@ SubDir OBOS_TOP src tests add-ons kernel network interfaces ;
 
 SubInclude OBOS_TOP src tests add-ons kernel network interfaces ethernet ;
 SubInclude OBOS_TOP src tests add-ons kernel network interfaces loopback ;
-# SubInclude OBOS_TOP src tests add-ons kernel network interfaces ppp ;
+SubInclude OBOS_TOP src tests add-ons kernel network interfaces ppp ;
 
 

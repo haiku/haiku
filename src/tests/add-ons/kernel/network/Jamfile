@@ -26,7 +26,10 @@ Depends userland_network_modules :
 	# interfaces modules
 	<userland>loopback
 	<userland>ethernet
-	# <userland>ppp
+	<userland>ppp
+
+	# ppp modules
+	<userland>pppoe
 
 	# protocols modules
 	<userland>raw
@@ -38,4 +41,5 @@ Depends userland_network_modules :
 
 SubInclude OBOS_TOP src tests add-ons kernel network core ;
 SubInclude OBOS_TOP src tests add-ons kernel network interfaces ;
+SubInclude OBOS_TOP src tests add-ons kernel network ppp ;
 SubInclude OBOS_TOP src tests add-ons kernel network protocols ;

@@ -1,21 +1,14 @@
 SubDir OBOS_TOP src tests add-ons kernel network interfaces ppp ;
 
 UsePrivateHeaders net ;
-UsePrivateHeaders [ FDirName kernel ] ;
-UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
-
-# for kernel_cpp.cpp/h and BLocker
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core util ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces ppp ] ;
 
+
 Addon <userland>ppp : userland network interfaces : 
-	kernel_cpp.cpp
 	ppp.cpp
 	PPPManager.cpp
 ;
 
-LinkSharedOSLibs <userland>ppp : libkernelppp.a <installed>net_stack_tester ;
-
+LinkSharedOSLibs <userland>ppp : libuserlandppp.a <installed>net_stack_tester be ;

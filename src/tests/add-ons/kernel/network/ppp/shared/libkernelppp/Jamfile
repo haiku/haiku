@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src tests add-ons kernel network ppp shared libkernelppp ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
+
+
+StaticLibrary userlandppp :
+	KPPPConfigurePacket.cpp
+	KPPPDevice.cpp
+	KPPPInterface.cpp
+	KPPPLayer.cpp
+	KPPPLCP.cpp
+	KPPPLCPExtension.cpp
+	KPPPOptionHandler.cpp
+	KPPPProtocol.cpp
+	KPPPReportManager.cpp
+	KPPPStateMachine.cpp
+	KPPPUtils.cpp
+	settings_tools.cpp
+	
+	# integrated modules
+	_KPPPMRUHandler.cpp
+	_KPPPAuthenticationHandler.cpp
+	_KPPPPFCHandler.cpp
+;
