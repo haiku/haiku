@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -39,16 +39,16 @@
 ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
 		int32 bytesperline, screen_id screen)
 {
-	_initialized=false;
+	fInitialized=false;
 
 	// WARNING: '1' is added to the width and height. Same is done in FBBitmap
 	// subclass, so if you modify here make sure to do the same under FBBitmap::SetSize(...)
-	_width=rect.IntegerWidth()+1;
-	_height=rect.IntegerHeight()+1;
-	_space=space;
-	_area=B_ERROR;
-	_buffer=NULL;
-	_flags=flags;
+	fWidth=rect.IntegerWidth()+1;
+	fHeight=rect.IntegerHeight()+1;
+	fSpace=space;
+	fArea=B_ERROR;
+	fBuffer=NULL;
+	fFlags=flags;
 
 	_HandleSpace(space, bytesperline);
 }
@@ -56,27 +56,27 @@ ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
 //! Copy constructor does not copy the buffer.
 ServerBitmap::ServerBitmap(const ServerBitmap *bmp)
 {
-	_initialized=false;
-	_area=B_ERROR;
-	_buffer=NULL;
+	fInitialized=false;
+	fArea=B_ERROR;
+	fBuffer=NULL;
 
 	if(bmp)
 	{
-		_width=bmp->_width;
-		_height=bmp->_height;
-		_bytesperrow=bmp->_bytesperrow;
-		_space=bmp->_space;
-		_flags=bmp->_flags;
-		_bpp=bmp->_bpp;
+		fWidth=bmp->fWidth;
+		fHeight=bmp->fHeight;
+		fBytesPerRow=bmp->fBytesPerRow;
+		fSpace=bmp->fSpace;
+		fFlags=bmp->fFlags;
+		fBitsPerPixel=bmp->fBitsPerPixel;
 	}
 	else
 	{
-		_width=0;
-		_height=0;
-		_bytesperrow=0;
-		_space=B_NO_COLOR_SPACE;
-		_flags=0;
-		_bpp=0;
+		fWidth=0;
+		fHeight=0;
+		fBytesPerRow=0;
+		fSpace=B_NO_COLOR_SPACE;
+		fFlags=0;
+		fBitsPerPixel=0;
 	}
 }
 
@@ -93,7 +93,7 @@ ServerBitmap::~ServerBitmap(void)
 */
 uint32 ServerBitmap::BitsLength(void) const
 {
-	return (uint32)(_bytesperrow*_height);
+	return (uint32)(fBytesPerRow*fHeight);
 }
 
 /*! 
@@ -104,9 +104,9 @@ uint32 ServerBitmap::BitsLength(void) const
 */
 void ServerBitmap::_AllocateBuffer(void)
 {
-	if(_buffer!=NULL)
-		delete _buffer;
-	_buffer=new uint8[BitsLength()];
+	if(fBuffer!=NULL)
+		delete fBuffer;
+	fBuffer=new uint8[BitsLength()];
 }
 
 /*!
@@ -116,10 +116,10 @@ void ServerBitmap::_AllocateBuffer(void)
 */
 void ServerBitmap::_FreeBuffer(void)
 {
-	if(_buffer!=NULL)
+	if(fBuffer!=NULL)
 	{
-		delete _buffer;
-		_buffer=NULL;
+		delete fBuffer;
+		fBuffer=NULL;
 	}
 }
 
@@ -165,11 +165,11 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_HLS24:
 		case B_CMY24:
 		{
-			if(bytesperline<(_width*4))
-				_bytesperrow=_width*4;
+			if(bytesperline<(fWidth*4))
+				fBytesPerRow=fWidth*4;
 			else
-				_bytesperrow=bytesperline;
-			_bpp=32;
+				fBytesPerRow=bytesperline;
+			fBitsPerPixel=32;
 			break;
 		}
 		// Calculate size and dword-align
@@ -177,8 +177,8 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		// 1-bit
 		case B_GRAY1:
 		{
-			int32 numbytes=_width>>3;
-			if((_width % 8) != 0)
+			int32 numbytes=fWidth>>3;
+			if((fWidth % 8) != 0)
 				numbytes++;
 			if(bytesperline<numbytes)
 			{
@@ -186,14 +186,14 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 				{
 					if( (numbytes+i)%4==0)
 					{
-						_bytesperrow=numbytes+i;
+						fBytesPerRow=numbytes+i;
 						break;
 					}
 				}
 			}
 			else
-				_bytesperrow=bytesperline;
-			_bpp=1;
+				fBytesPerRow=bytesperline;
+			fBitsPerPixel=1;
 		}		
 
 		// 8-bit
@@ -206,20 +206,20 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_YCbCr420:
 		case B_YUV422:
 		{
-			if(bytesperline<_width)
+			if(bytesperline<fWidth)
 			{
 				for(int8 i=0;i<4;i++)
 				{
-					if( (_width+i)%4==0)
+					if( (fWidth+i)%4==0)
 					{
-						_bytesperrow=_width+i;
+						fBytesPerRow=fWidth+i;
 						break;
 					}
 				}
 			}
 			else
-				_bytesperrow=bytesperline;
-			_bpp=8;
+				fBytesPerRow=bytesperline;
+			fBitsPerPixel=8;
 			break;
 		}
 
@@ -235,20 +235,20 @@ void ServerBitmap::_HandleSpace(color_space space, int32 bytesperline)
 		case B_YCbCr444:
 		case B_YUV444:
 		{
-			if(bytesperline<_width*2)
+			if(bytesperline<fWidth*2)
 			{
-				if( (_width*2) % 4 !=0)
-					_bytesperrow=(_width+1)*2;
+				if( (fWidth*2) % 4 !=0)
+					fBytesPerRow=(fWidth+1)*2;
 				else
-					_bytesperrow=_width*2;
+					fBytesPerRow=fWidth*2;
 			}
 			else
-				_bytesperrow=bytesperline;
-			_bpp=16;
+				fBytesPerRow=bytesperline;
+			fBitsPerPixel=16;
 			break;
 		}
 		case B_NO_COLOR_SPACE:
-			_bpp=0;
+			fBitsPerPixel=0;
 			break;
 	}
 }

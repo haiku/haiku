@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -119,7 +119,7 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 	Lock();
 	fCursorList->AddItem(sc);
 	int32 value=fTokenizer.GetToken();
-	sc->_token=value;
+	sc->fToken=value;
 	Unlock();
 	
 	return value;
@@ -139,7 +139,7 @@ void CursorManager::DeleteCursor(int32 token)
 	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
 		temp=(ServerCursor*)fCursorList->ItemAt(i);
-		if(temp && temp->_token==token)
+		if(temp && temp->fToken==token)
 		{
 			fCursorList->RemoveItem(i);
 			delete temp;
@@ -607,7 +607,7 @@ ServerCursor *CursorManager::FindCursor(int32 token)
 	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
 		temp=(ServerCursor*)fCursorList->ItemAt(i);
-		if(temp && temp->_token==token)
+		if(temp && temp->fToken==token)
 			return temp;
 	}
 	return NULL;

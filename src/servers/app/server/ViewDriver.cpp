@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -244,7 +244,7 @@ void VDView::MessageReceived(BMessage *msg)
 }
 
 VDWindow::VDWindow(BRect frame)
-	: BWindow(frame, "OpenBeOS App Server", B_TITLED_WINDOW,
+	: BWindow(frame, "Haiku App Server", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
 	view=new VDView(Bounds());
@@ -466,11 +466,11 @@ void VDWindow::WindowActivated(bool active)
 
 ViewDriver::ViewDriver(void)
 {
-	_displaymode.virtual_width=640;
-	_displaymode.virtual_height=480;
-	_displaymode.space=B_RGBA32;
+	fDisplayMode.virtual_width=640;
+	fDisplayMode.virtual_height=480;
+	fDisplayMode.space=B_RGBA32;
 
-	screenwin=new VDWindow(BRect(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1).OffsetToCopy(offset));
+	screenwin=new VDWindow(BRect(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1).OffsetToCopy(offset));
 	framebuffer=screenwin->view->viewbmp;
 	serverlink=screenwin->view->serverlink;
 	hide_cursor=0;
@@ -527,9 +527,9 @@ void ViewDriver::SetMode(const display_mode &mode)
 	if(!is_initialized)
 		return;
 
-	if (_displaymode.virtual_width==mode.virtual_width &&
-		_displaymode.virtual_height==mode.virtual_height &&
-		_displaymode.space==mode.space)
+	if (fDisplayMode.virtual_width==mode.virtual_width &&
+		fDisplayMode.virtual_height==mode.virtual_height &&
+		fDisplayMode.space==mode.space)
 	{
 		return;
 	}
@@ -930,8 +930,8 @@ status_t ViewDriver::GetDeviceInfo(accelerant_device_info *info)
 	// a software-only driver, but we'll have some fun, anyway.
 	
 	info->version=100;
-	sprintf(info->name,"OpenBeOS ViewDriver");
-	sprintf(info->chipset,"OpenBeOS Chipset");
+	sprintf(info->name,"Haiku, Inc. ViewDriver");
+	sprintf(info->chipset,"Haiku, Inc. Chipset");
 	sprintf(info->serial_no,"3.14159265358979323846");
 	info->memory=134217728;	// 128 MB, not that we really have that much. :)
 	info->dac_speed=0xFFFFFFFF;	// *heh*
@@ -1083,7 +1083,7 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 		return;
 	}
 	
-	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	if(((uint32)destbmp->ColorSpace() & 0x000F) != (fDisplayMode.space & 0x000F))
 	{
 		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
 		return;
@@ -1117,7 +1117,7 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 			destrect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 
 	if(!work_rect.Contains(sourcerect))
 		return;
@@ -1211,6 +1211,6 @@ void ViewDriver::Invalidate(const BRect &r)
 		return;
 	
 	screenwin->Lock();
-	screenwin->view->Invalidate();
+	screenwin->view->Draw(r);
 	screenwin->Unlock();
 }

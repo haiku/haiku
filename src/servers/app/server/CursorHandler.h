@@ -19,35 +19,60 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		ServerPicture.cpp
+//	File Name:		CursorHandler.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Server-side counterpart to BPicture
+//	Description:	class for handling cursor display for DisplayDriver
 //  
 //------------------------------------------------------------------------------
-#include <AreaLink.h>
-#include "TokenHandler.h"
-#include "ServerPicture.h"
+#ifndef CURSORHANDLER_H
+#define CURSORHANDLER_H
 
-TokenHandler picture_token_handler;
+#include "GraphicsBuffer.h"
+#include "ServerCursor.h"
+#include "ServerBitmap.h"
 
-ServerPicture::ServerPicture(void)
+class DisplayDriver;
+
+/*!
+	\class CursorHandler CursorHandler.h
+	\brief Object used by DisplayDriver to handle all the messiness of displaying the cursor
+*/
+class CursorHandler
 {
-	_token=picture_token_handler.GetToken();
+public:
+	CursorHandler(DisplayDriver *driver);
+	~CursorHandler(void);
 	
-	_initialized=false;
+	bool IntersectsCursor(const BRect &r);
 	
-	int8 *ptr;
-	_area=create_area("ServerPicture",(void**)&ptr,B_ANY_ADDRESS,B_PAGE_SIZE,
-		B_NO_LOCK,B_READ_AREA | B_WRITE_AREA);
+	void SetCursor(ServerCursor *cursor);
+	ServerCursor *GetCursor(void) const { return fCursor; }
 	
-	if(_area!=B_BAD_VALUE && _area!=B_NO_MEMORY && _area!=B_ERROR)
-		_initialized=true;
+	void MoveTo(const BPoint &pt);
 	
-	arealink=(_initialized)?new AreaLink(_area):NULL;
-}
+	void Hide(void);
+	void Show(void);
+	void Obscure(void);
+	bool IsHidden(void) const { return (fHideLevel>0); }
+	bool IsObscured(void) const { return fIsObscured; }
+	
+	void DriverHide(void);
+	void DriverShow(void);
+private:
+	
+	DisplayDriver *fDriver;
 
-ServerPicture::~ServerPicture(void)
-{
-	if(arealink)
-		delete arealink;
-}
+	BRect fOldPosition;
+	BRect fPosition;
+	BPoint fCursorPos;
+	
+	UtilityBitmap *fSavedData;
+	ServerCursor *fCursor;
+	int8 fHideLevel;
+	
+	bool fDriverHidden;
+	bool fIsObscured;
+	bool fValidSaveData;
+};
+
+#endif

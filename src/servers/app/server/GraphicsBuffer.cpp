@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -37,6 +37,11 @@ GraphicsBuffer::GraphicsBuffer(uint8 *buffer, uint32 width, uint32 height, uint3
 	fMaxHeight=0;
 	
 	SetTo(buffer, width, height, rowbytes);
+}
+
+GraphicsBuffer::GraphicsBuffer(const GraphicsBuffer &buffer)
+{
+	SetTo(buffer.fBuffer, buffer.fWidth, buffer.fHeight, buffer.fBytesPerRow);
 }
 
 GraphicsBuffer::~GraphicsBuffer()
@@ -85,3 +90,8 @@ void GraphicsBuffer::Unset(void)
 }
 
 
+GraphicsBuffer &GraphicsBuffer::operator=(const GraphicsBuffer &buffer)
+{
+	SetTo(buffer.fBuffer, buffer.fWidth, buffer.fHeight, buffer.fBytesPerRow);
+	return *this;
+}

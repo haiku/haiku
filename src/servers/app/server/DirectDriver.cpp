@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -625,7 +625,7 @@ void DirectDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 			destrect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 
 	if(!work_rect.Contains(sourcerect))
 		return;
@@ -912,7 +912,7 @@ void DDView::MessageReceived(BMessage *msg)
 }
 
 DDWindow::DDWindow(uint16 width, uint16 height, color_space space, DirectDriver *owner)
-: BDirectWindow(BRect(0,0,width-1,height-1), "OpenBeOS App Server",B_TITLED_WINDOW,
+: BDirectWindow(BRect(0,0,width-1,height-1), "Haiku, Inc. App Server",B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_MOVABLE)
 {
 	AddChild(new DDView(Bounds()));

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -112,9 +112,9 @@ void BitmapDriver::SetTarget(ServerBitmap *target)
 	
 	if(target)
 	{
-		_displaymode.virtual_width=target->Width();
-		_displaymode.virtual_height=target->Height();
-		_displaymode.space=target->ColorSpace();
+		fDisplayMode.virtual_width=target->Width();
+		fDisplayMode.virtual_height=target->Height();
+		fDisplayMode.space=target->ColorSpace();
 		
 		fGraphicsBuffer=new GraphicsBuffer((uint8*)fTarget->Bits(),fTarget->Bounds().Width(),
 				fTarget->Bounds().Height(),fTarget->BytesPerRow());
@@ -840,7 +840,7 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 		return;
 	}
 	
-	if(((uint32)bitmap->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	if(((uint32)bitmap->ColorSpace() & 0x000F) != (fDisplayMode.space & 0x000F))
 	{
 		printf("CopyBitmap returned - unequal buffer pixel depth\n");
 		return;
@@ -881,7 +881,7 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 			source.bottom = work_rect.bottom;
 	}
 	
-	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 	
 	if( !(work_rect.Contains(destrect)) )
 	{
@@ -936,7 +936,7 @@ void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 		return;
 	}
 	
-	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
+	if(((uint32)destbmp->ColorSpace() & 0x000F) != (fDisplayMode.space & 0x000F))
 	{
 		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
 		return;
@@ -970,7 +970,7 @@ void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 			destrect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,_displaymode.virtual_width-1,_displaymode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 
 	// Is there anything at all to copy?
 	if(!work_rect.Contains(sourcerect))

@@ -1,5 +1,5 @@
 /*------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -23,7 +23,7 @@
 //	Author:			John Walker <kelvin@fourmilab.ch>
 //					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	public domain BGET pool allocator converted to C++
-//					Distributed with OpenBeOS under MIT license
+//					Distributed with Haiku under MIT license
 //  
 //------------------------------------------------------------------------------*/
 

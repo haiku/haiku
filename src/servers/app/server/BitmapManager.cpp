@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -69,7 +69,7 @@ BitmapManager::~BitmapManager(void)
 			tbmp=(ServerBitmap*)bmplist->RemoveItem(0L);
 			if(tbmp)
 			{
-				fMemPool->ReleaseBuffer(tbmp->_buffer);
+				fMemPool->ReleaseBuffer(tbmp->fBuffer);
 				delete tbmp;
 				tbmp=NULL;
 			}
@@ -105,15 +105,15 @@ ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int3
 		delete bmp;
 		return NULL;
 	}
-	bmp->_area=area_for(bmpbuffer);
-	bmp->_buffer=bmpbuffer;
-	bmp->_token=tokenizer.GetToken();
-	bmp->_initialized=true;
+	bmp->fArea=area_for(bmpbuffer);
+	bmp->fBuffer=bmpbuffer;
+	bmp->fToken=tokenizer.GetToken();
+	bmp->fInitialized=true;
 	
 	// calculate area offset
 	area_info ai;
-	get_area_info(bmp->_area,&ai);
-	bmp->_offset=bmpbuffer-(uint8*)ai.address;
+	get_area_info(bmp->fArea,&ai);
+	bmp->fOffset=bmpbuffer-(uint8*)ai.address;
 	
 	bmplist->AddItem(bmp);
 	release_sem(lock);
@@ -136,7 +136,7 @@ void BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 	}
 
 	// Server code will require a check to ensure bitmap doesn't have its own area		
-	fMemPool->ReleaseBuffer(tbmp->_buffer);
+	fMemPool->ReleaseBuffer(tbmp->fBuffer);
 	delete tbmp;
 
 	release_sem(lock);

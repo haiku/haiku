@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@
 #include <Rect.h>
 #include <string.h>
 #include <stdio.h>
+#include <malloc.h>
 #include <View.h>	// for B_XXXXX_MOUSE_BUTTON defines
 #include <Message.h>
 #include <GraphicsDefs.h>
@@ -50,7 +51,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -1891,10 +1892,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			pointlist=new BPoint[pointcount];
 			
+			fSession->Read(pointlist, sizeof(BPoint)*pointcount);
+			
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=cl->ConvertToTop(pointlist[i]);
 			
-			// TODO: modify DisplayDriver::StrokePolygon to utilize a boundary BRect
 			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
 					cl->fLayerData,isclosed);
 			
@@ -1905,12 +1907,10 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_FILL_POLYGON:
 		{
 			BRect polyframe;
-			bool isclosed;
 			int32 pointcount;
 			BPoint *pointlist;
 			
 			fSession->Read<BRect>(&polyframe);
-			fSession->Read<bool>(&isclosed);
 			fSession->Read<int32>(&pointcount);
 			
 			pointlist=new BPoint[pointcount];
@@ -1920,8 +1920,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			for(int32 i=0; i<pointcount; i++)
 				pointlist[i]=cl->ConvertToTop(pointlist[i]);
 			
-			// TODO: modify DisplayDriver::FillPolygon to utilize a boundary BRect
-			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,cl->fLayerData);
+			desktop->GetDisplayDriver()->FillPolygon(pointlist,pointcount,polyframe,cl->fLayerData);
 			
 			delete [] pointlist;
 			
@@ -1984,7 +1983,6 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_FILL_REGION:
 		{
-			// TODO: Implement AS_FILL_REGION
 			int32 rectcount;
 			BRect *rectlist;
 			
@@ -1998,7 +1996,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
 			// least it works for now. :)
 			for(int32 i=0; i<rectcount; i++)
-				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(cl->ConvertToTop(rectlist[i])),cl->fLayerData);
+				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(rectlist[i]),cl->fLayerData);
 			
 			delete [] rectlist;
 			
@@ -2012,34 +2010,53 @@ void ServerWindow::DispatchMessage(int32 code)
 			// TODO: Implement AS_STROKE_LINEARRAY
 			break;
 		}
-		case AS_MOVEPENBY:
+		case AS_DRAW_STRING:
 		{
-			// TODO: Implement AS_MOVEPENBY
+			char *string;
+			int32 length;
+			BPoint location;
+			escapement_delta delta;
+			
+			fSession->Read<BPoint>(&location);
+			fSession->Read<escapement_delta>(&delta);
+			fSession->ReadString(&string);
+			
+			if(cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->DrawString(string,length,cl->ConvertToTop(location),
+						cl->fLayerData);
+			
+			free(string);
 			break;
 		}
 		case AS_MOVEPENTO:
 		{
-			// TODO: Implement AS_MOVEPENTO
+			float x,y;
+			
+			fSession->Read<float>(&x);
+			fSession->Read<float>(&y);
+			if(cl && cl->fLayerData)
+				cl->fLayerData->penlocation.Set(x,y);
+			
 			break;
 		}
 		case AS_SETPENSIZE:
 		{
-			// TODO: Implement AS_SETPENSIZE
-			break;
-		}
-		case AS_DRAW_STRING:
-		{
-			// TODO: Implement AS_DRAW_STRING
+			float size;
+			
+			fSession->Read<float>(&size);
+			if(cl && cl->fLayerData)
+				cl->fLayerData->pensize=size;
+			
 			break;
 		}
 		case AS_SET_FONT:
 		{
-			// TODO: Implement AS_SET_FONT
+			// TODO: Implement AS_SET_FONT?
 			break;
 		}
 		case AS_SET_FONT_SIZE:
 		{
-			// TODO: Implement AS_SET_FONT_SIZE
+			// TODO: Implement AS_SET_FONT_SIZE?
 			break;
 		}
 		default:

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -38,8 +38,8 @@
 ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow, screen_id screen)
  : ServerBitmap(r,cspace,flags,bytesperrow,screen)
 {
-	_hotspot=hotspot;
-	_hotspot.ConstrainTo(Bounds());
+	fHotSpot=hotspot;
+	fHotSpot.ConstrainTo(Bounds());
 
 	_AllocateBuffer();
 }
@@ -58,7 +58,7 @@ ServerCursor::ServerCursor(int8 *data)
 	// to RGBA32. Eventually, there will be support for 16 and 8-bit depths
 	if(data)
 	{	
-		_initialized=true;
+		fInitialized=true;
 		uint32 black=0xFF000000,
 			white=0xFFFFFFFF,
 			*bmppos;
@@ -68,13 +68,14 @@ ServerCursor::ServerCursor(int8 *data)
 	
 		cursorpos=(uint16*)(data+4);
 		maskpos=(uint16*)(data+36);
+		fHotSpot.Set(data[3],data[2]);
 		
 		_AllocateBuffer();
 		
 		// for each row in the cursor data
 		for(j=0;j<16;j++)
 		{
-			bmppos=(uint32*)(_buffer+ (j*BytesPerRow()) );
+			bmppos=(uint32*)(fBuffer+ (j*BytesPerRow()) );
 	
 			// On intel, our bytes end up swapped, so we must swap them back
 			cursorflip=(cursorpos[j] & 0xFF) << 8;
@@ -96,10 +97,10 @@ ServerCursor::ServerCursor(int8 *data)
 	}
 	else
 	{
-		_width=0;
-		_height=0;
-		_bytesperrow=0;
-		_space=B_NO_COLOR_SPACE;
+		fWidth=0;
+		fHeight=0;
+		fBytesPerRow=0;
+		fSpace=B_NO_COLOR_SPACE;
 	}
 }
 
@@ -111,13 +112,13 @@ ServerCursor::ServerCursor(const ServerCursor *cursor)
  : ServerBitmap(cursor)
 {
 	_AllocateBuffer();
-	_initialized=true;
+	fInitialized=true;
 
 	if(cursor)
 	{	
-		if(cursor->_buffer)
-			memcpy(_buffer, cursor->_buffer, BitsLength());
-		_hotspot=cursor->_hotspot;
+		if(cursor->fBuffer)
+			memcpy(fBuffer, cursor->fBuffer, BitsLength());
+		fHotSpot=cursor->fHotSpot;
 	}
 }
 
@@ -133,11 +134,11 @@ ServerCursor::~ServerCursor(void)
 */
 void ServerCursor::SetHotSpot(BPoint pt)
 {
-	_hotspot=pt;
-	_hotspot.ConstrainTo(Bounds());
+	fHotSpot=pt;
+	fHotSpot.ConstrainTo(Bounds());
 }
 
 void ServerCursor::SetAppSignature(const char *signature)
 {
-	_app_signature.SetTo( (signature)?signature:"" );
+	fAppSignature.SetTo( (signature)?signature:"" );
 }
