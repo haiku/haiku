@@ -13,7 +13,9 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 
+#include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
+#include <disk_device_manager/KDiskDeviceUtils.h>
 #include <syscalls.h>
 #include <boot/kernel_args.h>
 #include <vfs.h>
@@ -91,9 +93,30 @@ struct fs_mount {
 	recursive_lock	rlock;	// guards the vnodes list
 	struct vnode	*root_vnode;
 	struct vnode	*covers_vnode;
+	KPartition		*partition;
 	struct list		vnodes;
 	bool			unmounting;
 };
+
+// RecursiveLockAutoLocking
+class RecursiveLockAutoLocking {
+public:
+	inline bool Lock(recursive_lock *lockable)
+	{
+		recursive_lock_lock(lockable);
+		return true;
+	}
+
+	inline void Unlock(recursive_lock *lockable)
+	{
+		recursive_lock_unlock(lockable);
+	}
+};
+
+// RecursiveLockAutoLocker
+typedef AutoLocker<recursive_lock, RecursiveLockAutoLocking >
+	RecursiveLockAutoLocker;
+
 
 static mutex sFileSystemsMutex;
 
@@ -2033,7 +2056,7 @@ vfs_bootstrap_file_systems(void)
 	status_t status;
 
 	// bootstrap the root filesystem
-	status = _kern_mount("/", NULL, "rootfs", NULL);
+	status = _kern_mount("/", NULL, "rootfs", B_MOUNT_READ_ONLY, NULL);
 	if (status < B_OK)
 		panic("error mounting rootfs!\n");
 
@@ -2041,19 +2064,19 @@ vfs_bootstrap_file_systems(void)
 
 	// bootstrap the devfs
 	_kern_create_dir(-1, "/dev", 0755);
-	status = _kern_mount("/dev", NULL, "devfs", NULL);
+	status = _kern_mount("/dev", NULL, "devfs", B_MOUNT_READ_ONLY, NULL);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
 	_kern_create_dir(-1, "/pipe", 0755);
-	status = _kern_mount("/pipe", NULL, "pipefs", NULL);
+	status = _kern_mount("/pipe", NULL, "pipefs", B_MOUNT_READ_ONLY, NULL);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
 	// bootstrap the bootfs (if possible)
 	_kern_create_dir(-1, "/boot", 0755);
-	status = _kern_mount("/boot", NULL, "bootfs", NULL);
+	status = _kern_mount("/boot", NULL, "bootfs", B_MOUNT_READ_ONLY, NULL);
 	if (status < B_OK) {
 		// this is no fatal exception at this point, as we may mount
 		// a real on disk file system later
@@ -2079,7 +2102,6 @@ vfs_mount_boot_file_system()
 	KDiskDeviceManager::CreateDefault();
 
 	status_t status;
-#if 0
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 
 	status = manager->InitialDeviceScan();
@@ -2092,14 +2114,14 @@ vfs_mount_boot_file_system()
 		}
 	} else
 		dprintf("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
-#endif
 
 	file_system_info *bootfs;
 	if ((bootfs = get_file_system("bootfs")) == NULL) {
 		// no bootfs there, yet
 
 		// ToDo: do this for real!
-		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw", "bfs", NULL);
+		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw",
+			"bfs", B_MOUNT_READ_ONLY, NULL);
 		if (status < B_OK)
 			panic("could not get boot device: %s!\n", strerror(status));
 	} else
@@ -3617,7 +3639,8 @@ out:
 
 
 static status_t
-fs_mount(char *path, const char *device, const char *fsName, void *args, bool kernel)
+fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
+	void *args, bool kernel)
 {
 	struct fs_mount *mount;
 	struct vnode *covered_vnode = NULL;
@@ -3627,18 +3650,54 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	FUNCTION(("fs_mount: entry. path = '%s', fs_name = '%s'\n", path, fsName));
 
 	// The path is always safe, we just have to make sure that fsName is
-	// almost valid - we can't make any assumptions about device and args,
-	// though.
+	// almost valid - we can't make any assumptions about args, though.
 	if (fsName == NULL || fsName[0] == '\0')
 		return B_BAD_VALUE;
 
-	recursive_lock_lock(&sMountOpLock);
+	RecursiveLockAutoLocker mountOpLocker(sMountOpLock);
+
+	// If the file system is not a "virtual" one, the device argument should
+	// point to a real file/device (if given at all).
+	// get the partition
+	KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
+	KPartition* partition = NULL;
+	if (!(flags & B_MOUNT_VIRTUAL_DEVICE) && device) {
+		// get a corresponding partition from the DDM
+		partition = ddm->RegisterPartition(device, true);
+			// TODO: Normalize the path!
+			// TODO: Support for mounting images!
+		if (!partition) {
+			PRINT(("fs_mount(): Partition `%s' not found.\n", device));
+			return B_ENTRY_NOT_FOUND;
+		}
+	}
+	PartitionRegistrar partitionRegistrar(partition, true);
+
+	// Write lock the partition's device. For the time being, we keep the lock
+	// until we're done mounting -- not nice, but ensure, that no-one is
+	// interfering.
+	// TODO: Find a better solution.
+	KDiskDevice* diskDevice = NULL;
+	if (partition) {
+		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
+		if (!diskDevice) {
+			PRINT(("fs_mount(): Failed to lock disk device!\n"));
+			return B_ERROR;
+		}
+	}
+	DeviceWriteLocker writeLocker(diskDevice, true);
+
+	// make sure, that the partition is not busy
+	if (partition) {
+		if (partition->IsBusy() || partition->IsDescendantBusy()) {
+			PRINT(("fs_mount(): Partition is busy.\n"));
+			return B_BUSY;
+		}
+	}
 
 	mount = (struct fs_mount *)malloc(sizeof(struct fs_mount));
-	if (mount == NULL) {
-		err = B_NO_MEMORY;
-		goto err;
-	}
+	if (mount == NULL)
+		return B_NO_MEMORY;
 
 	list_init_etc(&mount->vnodes, offsetof(struct vnode, mount_link));
 
@@ -3663,6 +3722,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	mount->id = sNextMountID++;
 	mount->unmounting = false;
+	mount->partition = NULL;
 
 	mutex_lock(&sMountMutex);
 
@@ -3733,7 +3793,15 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (!sRoot)
 		sRoot = mount->root_vnode;
 
-	recursive_lock_unlock(&sMountOpLock);
+	// supply the partition (if any) with the mount cookie and mark it mounted
+	if (partition) {
+		partition->SetMountCookie(mount->cookie);
+		partition->AddFlags(B_PARTITION_MOUNTED);
+
+		// keep a partition reference as long as the partition is mounted
+		partitionRegistrar.Detach();
+		mount->partition = partition;
+	}
 
 	return B_OK;
 
@@ -3755,8 +3823,6 @@ err3:
 	free(mount->fs_name);
 err1:
 	free(mount);
-err:
-	recursive_lock_unlock(&sMountOpLock);
 
 	return err;
 }
@@ -3775,7 +3841,7 @@ fs_unmount(char *path, bool kernel)
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
-	recursive_lock_lock(&sMountOpLock);
+	RecursiveLockAutoLocker mountOpLocker(sMountOpLock);
 
 	mount = find_mount(vnode->device);
 	if (!mount)
@@ -3784,8 +3850,29 @@ fs_unmount(char *path, bool kernel)
 	if (mount->root_vnode != vnode) {
 		// not mountpoint
 		put_vnode(vnode);
-		err = ERR_VFS_NOT_MOUNTPOINT;
-		goto err;
+		return ERR_VFS_NOT_MOUNTPOINT;
+	}
+
+	// if the volume is associated with a partition, lock the device of the
+	// partition as long as we are unmounting
+	KDiskDeviceManager* ddm = KDiskDeviceManager::Default();
+	KPartition *partition = mount->partition;
+	KDiskDevice *diskDevice = NULL;
+	if (partition) {
+		diskDevice = ddm->WriteLockDevice(partition->Device()->ID());
+		if (!diskDevice) {
+			PRINT(("fs_unmount(): Failed to lock disk device!\n"));
+			return B_ERROR;
+		}
+	}
+	DeviceWriteLocker writeLocker(diskDevice, true);
+
+	// make sure, that the partition is not busy
+	if (partition) {
+		if (partition->IsBusy() || partition->IsDescendantBusy()) {
+			PRINT(("fs_unmount(): Partition is busy.\n"));
+			return B_BUSY;
+		}
 	}
 
 	/* grab the vnode master mutex to keep someone from creating
@@ -3805,8 +3892,7 @@ fs_unmount(char *path, bool kernel)
 			mutex_unlock(&sVnodeMutex);
 			put_vnode(mount->root_vnode);
 
-			err = EBUSY;
-			goto err;
+			return EBUSY;
 		}
 	}
 
@@ -3839,7 +3925,7 @@ fs_unmount(char *path, bool kernel)
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
-	recursive_lock_unlock(&sMountOpLock);
+	mountOpLocker.Unlock();
 
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
 
@@ -3850,11 +3936,11 @@ fs_unmount(char *path, bool kernel)
 	free(mount->fs_name);
 	free(mount);
 
-	return 0;
+	// dereference the partition
+	if (partition)
+		partition->Unregister();
 
-err:
-	recursive_lock_unlock(&sMountOpLock);
-	return err;
+	return 0;
 }
 
 
@@ -4048,12 +4134,13 @@ err:
 
 
 status_t
-_kern_mount(const char *path, const char *device, const char *fs_name, void *args)
+_kern_mount(const char *path, const char *device, const char *fs_name,
+	uint32 flags, void *args)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
-	return fs_mount(pathBuffer, device, fs_name, args, true);
+	return fs_mount(pathBuffer, device, fs_name, flags, args, true);
 }
 
 
@@ -4662,7 +4749,8 @@ _kern_setcwd(int fd, const char *path)
 
 
 status_t
-_user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
+_user_mount(const char *upath, const char *udevice, const char *ufs_name,
+	uint32 flags, void *args)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char fs_name[B_OS_NAME_LENGTH + 1];
@@ -4689,7 +4777,7 @@ _user_mount(const char *upath, const char *udevice, const char *ufs_name, void *
 	} else
 		device[0] = '\0';
 
-	return fs_mount(path, device, fs_name, args, false);
+	return fs_mount(path, device, fs_name, flags, args, false);
 }
 
 
