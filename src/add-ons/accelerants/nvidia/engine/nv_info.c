@@ -37,6 +37,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab);
+static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec);
 static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
@@ -883,14 +884,21 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 /* this routine is used for NV10 and later */
 static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab)
 {
-	status_t result = B_OK;
-	bool end = false;
 	bool exec = true;
-	uint8 index, byte, byte2, safe, shift;
-	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
 	LOG(8,("INFO: ---Executing following command(s):'\n"));
+
+	return exec_type2_script_mode(rom, adress, size, tabs, ram_tab, &exec);
+}
+
+/* this routine is used for NV10 and later */
+static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
+{
+	status_t result = B_OK;
+	bool end = false;
+	uint8 index, byte, byte2, safe, shift;
+	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
 
 	while (!end)
 	{
@@ -928,7 +936,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			LOG(8,("INFO: (cont.) RD 32bit data from subtable with size $%04x, at offset (result << 2),\n",
 				size32));
 			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
-			if (exec && reg2)
+			if (*exec && reg2)
 			{
 				safe = ISARB(reg);
 				ISAWB(reg, index);
@@ -997,7 +1005,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			}
 			LOG(8,("INFO: (cont.) 'calc and set PLL 32bit reg $%08x for %.3fMHz'\n",
 				reg2, (data2 / 100.0)));
-			if (exec && reg2)
+			if (*exec && reg2)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
 				display_mode target;
@@ -1043,7 +1051,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				reg, byte2, and_out));
 			LOG(8,("INFO: (cont.) RD 8bit ISA reg $%02x via $%04x, AND-out = $%02x, OR-in lsb result 32bit, WR-bk'\n",
 				index, reg2, and_out2));
-			if (exec)
+			if (*exec)
 			{
 				data = NV_REG32(reg);
 				if (byte2 < 0x80)
@@ -1077,8 +1085,8 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			/* execute */
 			adress += 1;
 			LOG(8,("cmd 'invert current mode'\n"));
-			exec = !exec;
-			if (exec)
+			*exec = !(*exec);
+			if (*exec)
 				LOG(8,("INFO: ---Executing following command(s):'\n"));
 			else
 				LOG(8,("INFO: ---Not executing following command(s):'\n"));
@@ -1097,7 +1105,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			data = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			exec_cmd_39_type2(rom, data, tabs, &exec);
+			exec_cmd_39_type2(rom, data, tabs, exec);
 			break;
 		case 0x62: /* new */
 			*size -= 5;
@@ -1118,7 +1126,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			byte = *((uint8*)(&(rom[adress])));
 			adress += 1;
 			LOG(8,("cmd 'WR idx ISA reg $%02x via $%04x = $%02x'\n", index, reg, byte));
-			if (exec)
+			if (*exec)
 			{
 				safe = ISARB(reg);
 				ISAWW(reg, ((((uint16)byte) << 8) | index));
@@ -1190,7 +1198,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			LOG(8,("cmd 'RD 8bit ISA reg $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				reg, and_out, or_in));
-			if (exec)
+			if (*exec)
 			{
 				byte = ISARB(reg);
 				byte &= (uint8)and_out;
@@ -1214,7 +1222,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			data2 = *((uint16*)(&(rom[(tabs.InitScriptTablePtr + (data << 1))])));
 			LOG(8,("cmd 'gosub script #$%02x at adress $%04x'\n", data, data2));
-			if (exec && data2)
+			if (*exec && data2)
 			{
 				result = exec_type2_script(rom, data2, size, tabs, ram_tab);
 				LOG(8,("INFO: ---Reverting to pre-gosub 'execution' mode.\n"));
@@ -1240,7 +1248,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 4;
 			LOG(8,("cmd 'RD 32bit reg $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
 				reg, and_out, or_in));
-			if (exec)
+			if (*exec)
 			{
 				data = NV_REG32(reg);
 				data &= and_out;
@@ -1277,7 +1285,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 					safe32, reg2, data2));
 				safe32++;
  			}
-			if (exec)
+			if (*exec)
 			{
 				safe32 = 0;
 				while (safe32 < size32)
@@ -1318,7 +1326,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			LOG(8,("cmd 'PGM commands'\n"));
 			LOG(8,("INFO: ---Executing following command(s):'\n"));
-			exec = true;
+			*exec = true;
 			break;
 		case 0x74: /* identical to type1 */
 			*size -= 3;
@@ -1362,7 +1370,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			if (data != data2)
 			{
 				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
-				exec = false;
+				*exec = false;
 			}
 			else
 			{
@@ -1397,7 +1405,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			if (byte != byte2)
 			{
 				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
-				exec = false;
+				*exec = false;
 			}
 			else
 			{
@@ -1426,7 +1434,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
-			if (exec)
+			if (*exec)
 			{
 				safe = ISARB(reg);
 				ISAWB(reg, index);
@@ -1455,7 +1463,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			data = *((uint16*)(&(rom[adress])));
 			adress += 2;
 			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
-			if (exec)
+			if (*exec)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
 				display_mode target;
@@ -1489,7 +1497,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			data = *((uint32*)(&(rom[adress])));
 			adress += 4;
 			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
-			if (exec) NV_REG32(reg) = data;
+			if (*exec) NV_REG32(reg) = data;
 			break;
 		default:
 			LOG(8,("unknown cmd, aborting!\n\n"));
