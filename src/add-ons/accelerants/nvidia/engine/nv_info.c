@@ -909,7 +909,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 }
 
 /* this routine is used for NV10 and later. It's tested on a GeForce2 MX400 (NV11),
- * GeForce4 MX440 (NV18) and a GeForceFX 5200 (NV34).
+ * GeForce4 MX440 (NV18), GeForce4 Ti4200 (NV28) and a GeForceFX 5200 (NV34).
  * These cards coldstart perfectly. */
 static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
 {
@@ -1205,6 +1205,29 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			else
 			{
 				*adress += (size32 << 1);
+			}
+			break;
+		case 0x61: /* new */
+			*size -= 4;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			byte = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			LOG(8,("cmd 'WR ISA reg $%04x = $%02x'\n", reg, byte));
+			if (*exec)
+			{
+				translate_ISA_PCI(&reg);
+				NV_REG8(reg) = byte;
 			}
 			break;
 		case 0x62: /* new */
