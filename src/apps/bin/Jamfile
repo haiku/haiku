@@ -31,3 +31,12 @@ SubInclude OBOS_TOP src apps bin listdev ;
 SubInclude OBOS_TOP src apps bin mkdos ;
 SubInclude OBOS_TOP src apps bin pc ;
 
+# Network command line tools
+SubInclude OBOS_TOP src apps bin arp ;
+SubInclude OBOS_TOP src apps bin ifconfig ;
+# SubInclude OBOS_TOP src apps bin pppconfig ;
+SubInclude OBOS_TOP src apps bin ping ;
+SubInclude OBOS_TOP src apps bin route ;
+SubInclude OBOS_TOP src apps bin traceroute ;
+
+
