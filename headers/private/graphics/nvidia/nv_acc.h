@@ -1,7 +1,7 @@
 /* 
 	definitions for used nVidia acceleration engine commands.
 
-	Written by Rudolf Cornelissen 12/2004-1/2005
+	Written by Rudolf Cornelissen 12/2004-2/2005
 */
 
 #ifndef NV_ACC_H
@@ -61,6 +61,7 @@ typedef struct {
 } cmd_nv_image_blit;
 
 //fixme: using nv4_gdi_rectangle_text for DMA acc. Differs slightly from this one!
+//WARNING: nv4_gdi_rectangle_text can only do 32 unclipped rects at once!
 typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
