@@ -26,6 +26,10 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 							    logical_volume_descriptor &logicalVolumeDescriptor,
 							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount);
+							    
+static status_t
+walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
+                        extent_address descriptorSequence, uint32 sequenceNumber = 0);
 
 //------------------------------------------------------------------------------
 // externally visible functions
@@ -57,6 +61,13 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 			                                                logicalVolumeDescriptor,
 			                                                partitionDescriptors,
 			                                                partitionDescriptorCount);
+		}
+		
+		// Now walk the integrity sequence and make sure the last integrity
+		// descriptor is a closed descriptor
+		if (!error) {
+			error = walk_integrity_sequence(device, blockSize, blockShift,
+			                                logicalVolumeDescriptor.integrity_sequence_extent());
 		}
 	} else {
 		PRINT(("Block size must be a positive power of two! (blockSize = %ld)\n", blockSize));
@@ -252,20 +263,20 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 
 		PRINT(("descriptor #%ld (block %Ld):\n", i, block));
 
-		status_t loopErr = chunk.InitCheck();
-		if (!loopErr) {
+		status_t loopError = chunk.InitCheck();
+		if (!loopError) {
 			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
-			loopErr = bytesRead == (ssize_t)blockSize ? B_OK : B_IO_ERROR;
-			if (loopErr) {
+			loopError = bytesRead == (ssize_t)blockSize ? B_OK : B_IO_ERROR;
+			if (loopError) {
 				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
 				       block, address, blockSize, bytesRead));
 			}
 		}
-		if (!loopErr) {
+		if (!loopError) {
 			tag = reinterpret_cast<descriptor_tag *>(chunk.Data());
-			loopErr = tag->init_check(block);
+			loopError = tag->init_check(block);
 		}
-		if (!loopErr) {
+		if (!loopError) {
 			// Now decide what type of descriptor we have
 			switch (tag->id()) {
 				case TAGID_UNDEFINED:
@@ -421,5 +432,90 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 		partitionDescriptorCount = uniquePartitions;	
 			
 	RETURN(error);
+}
+
+/*! \brief Walks the integrity sequence in the extent given by \a descriptorSequence.
+
+	\return
+	- \c B_OK: Success. the sequence was terminated by a valid, closed
+	           integrity descriptor.
+	- \c B_ENTRY_NOT_FOUND: The sequence was empty.
+	- (other error code): The sequence was non-empty and did not end in a valid,
+                          closed integrity descriptor.
+*/                        	
+static status_t
+walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
+                        extent_address descriptorSequence, uint32 sequenceNumber)
+{
+	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
+	           descriptorSequence.location(), descriptorSequence.length()));
+	uint32 count = descriptorSequence.length() >> blockShift;
+		
+	bool lastDescriptorWasClosed = false;
+	status_t error = count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
+	for (uint32 i = 0; error == B_OK && i < count; i++)
+	{
+		off_t block = descriptorSequence.location()+i;
+		off_t address = block << blockShift; 
+		MemoryChunk chunk(blockSize);
+		descriptor_tag *tag = NULL;
+
+		PRINT(("integrity descriptor #%ld:%ld (block %Ld):\n", sequenceNumber, i, block));
+
+		status_t loopError = chunk.InitCheck();
+		if (!loopError) {
+			ssize_t bytesRead = read_pos(device, address, chunk.Data(), blockSize);
+			loopError = check_size_error(bytesRead, blockSize);
+			if (loopError) {
+				PRINT(("block %Ld: read_pos(pos:%Ld, len:%ld) failed with error 0x%lx\n",
+				       block, address, blockSize, bytesRead));
+			}
+		}
+		if (!loopError) {
+			tag = reinterpret_cast<descriptor_tag *>(chunk.Data());
+			loopError = tag->init_check(block);
+		}
+		if (!loopError) {
+			// Check the descriptor type and see if it's closed.
+			loopError = tag->id() == TAGID_LOGICAL_VOLUME_INTEGRITY_DESCRIPTOR
+			            ? B_OK : B_BAD_DATA;
+			if (!loopError) {
+				logical_volume_integrity_descriptor *descriptor =
+					reinterpret_cast<logical_volume_integrity_descriptor*>(chunk.Data());
+				PDUMP(descriptor);
+				lastDescriptorWasClosed = descriptor->integrity_type() == INTEGRITY_CLOSED;
+				// Check a continuation extent if necessary. Note that this effectively
+				// ends our search through this extent
+				extent_address &next = descriptor->next_integrity_extent();
+				if (next.length() > 0) {
+					status_t nextError = walk_integrity_sequence(device, blockSize, blockShift,
+					                                             next, sequenceNumber+1);
+					if (nextError && nextError != B_ENTRY_NOT_FOUND) {
+						// Continuation proved invalid
+						error = nextError;
+						break;						
+					} else {
+						// Either the continuation was valid or empty; either way,
+						// we're done searching.
+						break;
+					}  
+				}
+			} else {
+				PDUMP(tag);
+			}				
+		}
+		// If we hit an error on the first item, consider the extent empty,
+		// otherwise just break out of the loop and assume part of the
+		// extent is unrecorded
+		if (loopError) {
+			if (i == 0) 
+				error = B_ENTRY_NOT_FOUND;
+			else
+				break;
+		}
+	}
+	if (!error)
+		error = lastDescriptorWasClosed ? B_OK : B_BAD_DATA;
+	RETURN(error);					
 }
 
