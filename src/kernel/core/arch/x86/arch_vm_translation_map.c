@@ -12,7 +12,6 @@
 #include <vm_priv.h>
 #include <smp.h>
 #include <util/queue.h>
-#include <kerrors.h>
 #include <memheap.h>
 #include <arch/vm_translation_map.h>
 
@@ -128,24 +127,23 @@ _update_all_pgdirs(int index, pdentry e)
 // XXX currently assumes this translation map is active
 
 static status_t
-early_query(addr_t va, addr_t *out_physical)
+early_query(addr_t va, addr_t *_physicalAddress)
 {
 	ptentry *pentry;
 
 	if (page_hole_pgdir[VADDR_TO_PDENT(va)].present == 0) {
 		// no pagetable here
-		return ERR_VM_PAGE_NOT_PRESENT;
+		return B_ERROR;
 	}
 
 	pentry = page_hole + va / B_PAGE_SIZE;
 	if (pentry->present == 0) {
 		// page mapping not valid
-		return ERR_VM_PAGE_NOT_PRESENT;
+		return B_ERROR;
 	}
 
-	*out_physical = pentry->addr << 12;
-
-	return 0;
+	*_physicalAddress = pentry->addr << 12;
+	return B_OK;
 }
 
 
@@ -321,7 +319,8 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 	// now, fill in the pentry
 	do {
-		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr), (addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
+				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
 	} while (err < 0);
 	index = VADDR_TO_PTENT(va);
 
@@ -442,11 +441,57 @@ get_mapped_size_tmap(vm_translation_map *map)
 
 
 static status_t
-protect_tmap(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes)
+protect_tmap(vm_translation_map *map, addr_t start, addr_t end, uint32 attributes)
 {
-	// XXX finish
-	panic("protect_tmap called, not implemented\n");
-	return ERR_UNIMPLEMENTED;
+	ptentry *pt;
+	pdentry *pd = map->arch_data->pgdir_virt;
+	int index;
+	int err;
+
+	start = ROUNDOWN(start, B_PAGE_SIZE);
+	end = ROUNDUP(end, B_PAGE_SIZE);
+
+	TRACE(("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end, attributes));
+
+restart:
+	if (start >= end)
+		return 0;
+
+	index = VADDR_TO_PDENT(start);
+	if (pd[index].present == 0) {
+		// no pagetable here, move the start up to access the next page table
+		start = ROUNDUP(start + 1, B_PAGE_SIZE);
+		goto restart;
+	}
+
+	do {
+		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr),
+				(addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
+	} while (err < 0);
+
+	for (index = VADDR_TO_PTENT(start); index < 1024 && start < end; index++, start += B_PAGE_SIZE) {
+		if (pt[index].present == 0) {
+			// page mapping not valid
+			continue;
+		}
+
+		TRACE(("protect_tmap: protect page 0x%lx\n", start));
+
+		pt[index].user = (attributes & B_USER_PROTECTION) != 0;
+		if ((attributes & B_USER_PROTECTION) != 0)
+			pt[index].rw = (attributes & B_WRITE_AREA) != 0;
+		else
+			pt[index].rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+
+		if (map->arch_data->num_invalidate_pages < PAGE_INVALIDATE_CACHE_SIZE)
+			map->arch_data->pages_to_invalidate[map->arch_data->num_invalidate_pages] = start;
+
+		map->arch_data->num_invalidate_pages++;
+	}
+
+	put_physical_page_tmap((addr_t)pt);
+
+	goto restart;
 }
 
 
@@ -634,7 +679,7 @@ put_physical_page_tmap(addr_t va)
 	if (desc == NULL) {
 		mutex_unlock(&iospace_mutex);
 		panic("put_physical_page called on page at va 0x%lx which is not checked out\n", va);
-		return ERR_VM_GENERAL;
+		return B_ERROR;
 	}
 
 	if (--desc->ref_count == 0) {

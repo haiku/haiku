@@ -1509,20 +1509,11 @@ vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
 	if (status == B_OK && area->protection != newProtection) {
 		// remap existing pages in this cache
 		struct vm_translation_map *map = &area->aspace->translation_map;
-		struct vm_page *page = cache->page_list;
 
 		map->ops->lock(map);
-
-		for (; page != NULL; page = page->cache_next) {
-			// only map those pages inside the area
-			if (page->offset >= area->cache_offset
-				&& page->offset < area->cache_offset + area->size) {
-				map->ops->map(map, area->base + page->offset - area->cache_offset,
-					page->ppn * B_PAGE_SIZE, newProtection);
-			}
-		}
-
+		map->ops->protect(map, area->base, area->base + area->size, newProtection);
 		map->ops->unlock(map);
+
 		area->protection = newProtection;
 	}
 
