@@ -166,6 +166,8 @@ Printer::Printer(const BDirectory* node, Resource* res)
 	
 		// Add us to the global list of known printer definitions
 	sPrinters.AddItem(this);
+	
+	ResetJobStatus();
 }
 
 Printer::~Printer()
@@ -388,6 +390,15 @@ status_t Printer::LoadPrinterAddon(image_id& id)
 	return rc;
 }
 
+
+// ---------------------------------------------------------------
+// AddCurrentPrinter
+//
+// Add printer name to message.
+//
+// Parameters:
+//    msg - message.
+// ---------------------------------------------------------------
 void Printer::AddCurrentPrinter(BMessage* msg)
 {
 	BString name;
@@ -399,6 +410,15 @@ void Printer::AddCurrentPrinter(BMessage* msg)
 	}
 }
 
+
+// ---------------------------------------------------------------
+// MessageReceived
+//
+// Handle scripting messages.
+//
+// Parameters:
+//    msg - message.
+// ---------------------------------------------------------------
 void Printer::MessageReceived(BMessage* msg)
 {
 	switch(msg->what) {
@@ -416,11 +436,46 @@ void Printer::MessageReceived(BMessage* msg)
 	}
 }
 
+// ---------------------------------------------------------------
+// GetName
+//
+// Get the name from spool directory.
+//
+// Parameters:
+//    name - the name of the printer.
+// ---------------------------------------------------------------
 void Printer::GetName(BString& name) {
 	if (B_OK != SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name))
 		name = "Unknown Printer";
 }
 
+// ---------------------------------------------------------------
+// ResetJobStatus
+//
+// Reset status of "processing" jobs to "waiting" at print_server start.
+// ---------------------------------------------------------------
+void Printer::ResetJobStatus() {
+	if (fPrinter.Lock()) {
+		const int32 n = fPrinter.CountJobs();
+		for (int32 i = 0; i < n; i ++) {
+			Job* job = fPrinter.JobAt(i);
+			if (job->Status() == kProcessing) job->SetStatus(kWaiting);
+		}
+		fPrinter.Unlock();
+	}
+}
+
+// ---------------------------------------------------------------
+// HasCurrentPrinter
+//
+// Try to read the printer name from job file.
+//
+// Parameters:
+//    name - the printer name.
+//
+// Returns:
+//    true if successful.
+// ---------------------------------------------------------------
 bool Printer::HasCurrentPrinter(BString& name) {
 	BMessage settings;
 		// read settings from spool file and get printer name
@@ -431,6 +486,17 @@ bool Printer::HasCurrentPrinter(BString& name) {
 		settings.FindString(PSRV_FIELD_CURRENT_PRINTER, &name) == B_OK;
 }
 
+// ---------------------------------------------------------------
+// MoveJob
+//
+// Try to move job to another printer folder.
+//
+// Parameters:
+//    name - the printer folder name.
+//
+// Returns:
+//    true if successful.
+// ---------------------------------------------------------------
 bool Printer::MoveJob(const BString& name) {
 	BPath file(&fJob->EntryRef());
 	BPath path;
@@ -442,6 +508,20 @@ bool Printer::MoveJob(const BString& name) {
 	return entry.MoveTo(&dir) == B_OK;
 }
 
+// ---------------------------------------------------------------
+// FindSpooledJob
+//
+// Looks if there is a job waiting to be processed and moves
+// jobs to the proper printer folder.
+//
+// Note: 
+//       Our implementation of BPrintJob moves jobs to the
+//       proper printer folder.
+//       
+//
+// Returns:
+//    true if there is a job present in fJob.
+// ---------------------------------------------------------------
 bool Printer::FindSpooledJob() {
 	BString name2;
 	GetName(name2);
@@ -450,9 +530,11 @@ bool Printer::FindSpooledJob() {
 		if (fJob) {
 			BString name;
 			if (HasCurrentPrinter(name) && name != name2 && MoveJob(name)) {
+					// job in wrong printer folder moved to apropriate one
 				fJob->SetStatus(kUnknown, false); // so that fPrinter.GetNextJob skips it
 				fJob->Release();
 			} else {
+					// job found
 				fJob->SetPrinter(this);
 				return true;
 			}
@@ -461,6 +543,18 @@ bool Printer::FindSpooledJob() {
 	return false;
 }
 
+// ---------------------------------------------------------------
+// PrintSpooledJob
+//
+// Loads the printer add-on and calls its take_job function with
+// the spool file as argument.
+//
+// Parameters:
+//    spoolFile - the spool file.
+//
+// Returns:
+//    B_OK if successful.
+// ---------------------------------------------------------------
 status_t Printer::PrintSpooledJob(BFile* spoolFile)
 {
 	take_job_func_t func;
@@ -491,6 +585,15 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile)
 }
 
 
+// ---------------------------------------------------------------
+// PrintThread
+//
+// Loads the printer add-on and calls its take_job function with
+// the spool file as argument.
+//
+// Parameters:
+//    job - the spool job.
+// ---------------------------------------------------------------
 void Printer::PrintThread(Job* job) {
 		// Wait until resource is available
 	fResource->Lock();
@@ -514,12 +617,29 @@ void Printer::PrintThread(Job* job) {
 	be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);	
 }
 
+// ---------------------------------------------------------------
+// print_thread
+//
+// Print thread entry, calls PrintThread with spool job.
+//
+// Parameters:
+//    data - spool job.
+//
+// Returns:
+//    0 always.
+// ---------------------------------------------------------------
 status_t Printer::print_thread(void* data) {
 	Job* job = static_cast<Job*>(data);
 	job->GetPrinter()->PrintThread(job);
 	return 0;
 }
 
+// ---------------------------------------------------------------
+// StartPrintThread
+//
+// Sets the status of the current spool job to "processing" and
+// starts the print_thread.
+// ---------------------------------------------------------------
 void Printer::StartPrintThread() {
 	Acquire();
 	thread_id tid = spawn_thread(print_thread, "print", B_NORMAL_PRIORITY, (void*)fJob);

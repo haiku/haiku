@@ -122,6 +122,7 @@ private:
 		// Accessor
 	BDirectory* SpoolDir() { return fPrinter.GetSpoolDir(); }
 
+	void ResetJobStatus();
 	bool HasCurrentPrinter(BString& name);
 	bool MoveJob(const BString& name);
 		// Get next spooled job if any
