@@ -1144,7 +1144,11 @@ int InputServer::DispatchEvent(BMessage *message)
     PRINT(("[DispatchEvent] x = %lu:\n", xValue));
 	
 	port_id pid = find_port(SERVER_INPUT_PORT);
-   	BPortLink *appsvrlink = new BPortLink(pid);
+
+	// BPortLink is incompatible with R5 one
+#ifndef COMPILE_FOR_R5
+
+	BPortLink *appsvrlink = new BPortLink(pid);
    	switch(message->what){
    		case B_MOUSE_MOVED:{
     		// get point and button from msg
@@ -1334,6 +1338,9 @@ int InputServer::DispatchEvent(BMessage *message)
    			
 		}
 	delete appsvrlink;
+	
+#endif	// COMPILE_FOR_R5
+
     return true;
 }
 

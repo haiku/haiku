@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src servers input ;
 
+if $(COMPILE_FOR_R5) {
+	SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
 AddResources input_server : input_server.rdef ;
 
 UsePrivateHeaders app ;
@@ -19,8 +23,13 @@ Server input_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 
-	: be <boot!home!config!lib>libopenbeos.so
+	: be
 ;
+
+if $(COMPILE_FOR_R5) {
+} else {
+	LinkSharedOSLibs input_server : <boot!home!config!lib>libopenbeos.so ;
+}
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp
