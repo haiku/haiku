@@ -433,37 +433,14 @@
 
 /* acc engine fifo setup registers (for function_register 'mappings') */
 #define	NVACC_FIFO			0x00800000
-#define	NVACC_FIFO_00800000	0x00800000
-#define	NVACC_FIFO_00802000	0x00802000
-#define	NVACC_FIFO_00804000	0x00804000
-#define	NVACC_FIFO_00806000	0x00806000
-#define	NVACC_FIFO_00808000	0x00808000
-#define	NVACC_FIFO_0080a000	0x0080a000
-#define	NVACC_FIFO_0080c000	0x0080c000
-#define	NVACC_FIFO_0080e000	0x0080e000
-
-/* ROP3 registers (Raster OPeration) */
-#define NV16_ROP_FIFOFREE	0x00800010 /* little endian */
-#define NVACC_ROP_ROP3		0x00800300 /* 'mapped' from 0x00420300 */
-
-/* clip registers */
-#define NV16_CLP_FIFOFREE	0x00802010 /* little endian */
-#define NVACC_CLP_TOPLEFT	0x00802300 /* 'mapped' from 0x00450300 */
-#define NVACC_CLP_WIDHEIGHT	0x00802304 /* 'mapped' from 0x00450304 */
-
-/* pattern registers */
-#define NV16_PAT_FIFOFREE	0x00804010 /* little endian */
-#define NVACC_PAT_SHAPE		0x00804308 /* 'mapped' from 0x00460308 */
-#define NVACC_PAT_COLOR0	0x00804310 /* 'mapped' from 0x00460310 */
-#define NVACC_PAT_COLOR1	0x00804314 /* 'mapped' from 0x00460314 */
-#define NVACC_PAT_MONO1		0x00804318 /* 'mapped' from 0x00460318 */
-#define NVACC_PAT_MONO2		0x0080431c /* 'mapped' from 0x0046031c */
-
-/* blit registers */
-#define NV16_BLT_FIFOFREE	0x00808010 /* little endian */
-#define NVACC_BLT_TOPLFTSRC	0x00808300 /* 'mapped' from 0x00500300 */
-#define NVACC_BLT_TOPLFTDST	0x00808304 /* 'mapped' from 0x00500304 */
-#define NVACC_BLT_SIZE		0x00808308 /* 'mapped' from 0x00500308 */
+#define	NVACC_FIFO_CH0		0x00800000
+#define	NVACC_FIFO_CH1		0x00802000
+#define	NVACC_FIFO_CH2		0x00804000
+#define	NVACC_FIFO_CH3		0x00806000
+#define	NVACC_FIFO_CH4		0x00808000
+#define	NVACC_FIFO_CH5		0x0080a000
+#define	NVACC_FIFO_CH6		0x0080c000
+#define	NVACC_FIFO_CH7		0x0080e000
 
 /* used bitmap registers */
 #define NV16_BMP_FIFOFREE	0x0080a010 /* little endian */
