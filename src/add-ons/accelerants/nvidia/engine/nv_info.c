@@ -259,8 +259,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			log_pll(reg);
 			break;
 		case 0x5a:
-			LOG(8,("xxx cmd, skipping...\n"));
-
 			*size -= 7;
 			if (*size < 0)
 			{
@@ -270,7 +268,15 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				break;
 			}
 
-			adress += 7;
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			data = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			data2 = *((uint32*)(&(rom[data])));
+			LOG(8,("cmd 'WR indirect 32bit REG' $%08x = $%08x\n", reg, data2));
+			if (exec) NV_REG32(reg) = data2;
 			break;
 		case 0x63:
 			LOG(8,("xxx cmd, skipping...\n"));
