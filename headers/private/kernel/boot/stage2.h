@@ -19,7 +19,9 @@ extern "C" {
 #endif
 
 extern void *kernel_args_malloc(size_t size);
+extern char *kernel_args_strdup(const char *string);
 extern void kernel_args_free(void *address);
+
 extern int main(struct stage2_args *args);
 
 #ifdef __cplusplus
