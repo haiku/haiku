@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src add-ons kernel drivers graphics ;
 
+SubInclude OBOS_TOP src add-ons kernel drivers graphics matrox ;
 SubInclude OBOS_TOP src add-ons kernel drivers graphics nvidia ;
