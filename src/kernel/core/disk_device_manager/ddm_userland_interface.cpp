@@ -918,8 +918,8 @@ _kern_validate_set_partition_type(partition_id partitionID,
 {
 	if (!_type)
 		return B_BAD_VALUE;
-	char type[B_OS_NAME_LENGTH];
-	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	char type[B_FILE_NAME_LENGTH];
+	status_t error = ddm_strlcpy(type, _type, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -990,11 +990,11 @@ _kern_validate_create_child_partition(partition_id partitionID,
 	}
 	off_t offset;
 	off_t size;
-	char type[B_OS_NAME_LENGTH];
+	char type[B_FILE_NAME_LENGTH];
 	char *parameters = NULL;
 	user_memcpy(&offset, _offset, sizeof(offset));
 	user_memcpy(&size, _size, sizeof(size));
-	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	status_t error = ddm_strlcpy(type, _type, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
 	if (_parameters) {
@@ -1048,10 +1048,10 @@ _kern_get_next_supported_partition_type(partition_id partitionID,
 			error = diskSystem ? B_OK : B_ENTRY_NOT_FOUND;
 			if (!error) {
 				// get the info
-				char type[B_OS_NAME_LENGTH];
+				char type[B_FILE_NAME_LENGTH];
 				error = diskSystem->GetNextSupportedType(partition, &cookie, type);
 				if (!error) {
-					error = ddm_strlcpy(_type, type, B_OS_NAME_LENGTH);
+					error = ddm_strlcpy(_type, type, B_FILE_NAME_LENGTH);
 				}
 			}
 		}
@@ -1068,8 +1068,8 @@ _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 {
 	if (!_contentType || !_type)
 		return B_BAD_VALUE;
-	char contentType[B_OS_NAME_LENGTH];
-	status_t error = ddm_strlcpy(contentType, _contentType, B_OS_NAME_LENGTH);
+	char contentType[B_FILE_NAME_LENGTH];
+	status_t error = ddm_strlcpy(contentType, _contentType, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1079,9 +1079,9 @@ _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 		return false;
 	DiskSystemLoader loader(diskSystem, true);
 	// get the info
-	char type[B_OS_NAME_LENGTH];
+	char type[B_FILE_NAME_LENGTH];
 	if (diskSystem->GetTypeForContentType(contentType, type)) {
-		return ddm_strlcpy(_type, type, B_OS_NAME_LENGTH);
+		return ddm_strlcpy(_type, type, B_FILE_NAME_LENGTH);
 	}
 	return B_ERROR;
 }
@@ -1303,7 +1303,7 @@ _kern_set_partition_name(partition_id partitionID, int32 changeCounter,
 {
 	if (!_name)
 		return B_BAD_VALUE;
-	char name[B_OS_NAME_LENGTH];
+	char name[B_FILE_NAME_LENGTH];
 	status_t error = ddm_strlcpy(name, _name, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
@@ -1316,7 +1316,7 @@ _kern_set_partition_name(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 	// check name
-	char proposedName[B_OS_NAME_LENGTH];
+	char proposedName[B_FILE_NAME_LENGTH];
 	strcpy(proposedName, name);
 	error = validate_set_partition_name(partition, changeCounter,
 												 proposedName);
@@ -1341,7 +1341,7 @@ _kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 {
 	if (!_name)
 		return B_BAD_VALUE;
-	char name[B_OS_NAME_LENGTH];
+	char name[B_FILE_NAME_LENGTH];
 	status_t error = ddm_strlcpy(name, _name, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
@@ -1354,7 +1354,7 @@ _kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 	// check name
-	char proposedName[B_OS_NAME_LENGTH];
+	char proposedName[B_FILE_NAME_LENGTH];
 	strcpy(proposedName, name);
 	error = validate_set_partition_content_name(partition,
 		changeCounter, proposedName);
@@ -1379,8 +1379,8 @@ _kern_set_partition_type(partition_id partitionID, int32 changeCounter,
 {
 	if (!_type)
 		return B_BAD_VALUE;
-	char type[B_OS_NAME_LENGTH];
-	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	char type[B_FILE_NAME_LENGTH];
+	status_t error = ddm_strlcpy(type, _type, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -1499,7 +1499,7 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	if (!_diskSystemName || !_name || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
 	char diskSystemName[B_OS_NAME_LENGTH];
-	char name[B_OS_NAME_LENGTH];
+	char name[B_FILE_NAME_LENGTH];
 	char *parameters = NULL;
 	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH);
 	if (!error)
@@ -1527,7 +1527,7 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 		if (!error) {
 			DiskSystemLoader loader(diskSystem, true);
 			// check parameters
-			char proposedName[B_OS_NAME_LENGTH];
+			char proposedName[B_FILE_NAME_LENGTH];
 			strcpy(proposedName, name);
 			error = validate_initialize_partition(partition, changeCounter,
 				diskSystemName, proposedName, parameters);
@@ -1583,9 +1583,9 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 {
 	if (!_type || parametersSize > B_DISK_DEVICE_MAX_PARAMETER_SIZE)
 		return B_BAD_VALUE;
-	char type[B_OS_NAME_LENGTH];
+	char type[B_FILE_NAME_LENGTH];
 	char *parameters = NULL;
-	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	status_t error = ddm_strlcpy(type, _type, B_FILE_NAME_LENGTH);
 	if (error)
 		return error;
 	if (_parameters) {
