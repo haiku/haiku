@@ -29,6 +29,10 @@
 #include <stdio.h>
 
 
+static const uint32 kMsgSliderUpdate = 'slup';
+static const uint32 kMsgPositionUpdate = 'poup';
+
+
 class IconView : public BView {
 	public:
 		IconView(BRect frame, entry_ref *ref, bool isDevice);
@@ -46,33 +50,62 @@ class IconView : public BView {
 };
 
 
-class Slider : public BSlider {
+class PositionSlider : public BSlider {
 	public:
-		Slider(BRect rect, const char *name);
-		virtual ~Slider();
+		PositionSlider(BRect rect, const char *name, BMessage *message,
+			off_t size, uint32 blockSize);
+		virtual ~PositionSlider();
 
 		virtual void DrawBar();
+
+		off_t Position() const;
+		off_t Size() const { return fSize; }
+		uint32 BlockSize() const { return fBlockSize; }
+
+		void SetPosition(off_t position);
+		void SetSize(off_t size);
+		void SetBlockSize(uint32 blockSize);
+
+	private:
+		void Reset();
+
+		static const int32 kMaxSliderLimit = 0x7fffff80;
+			// this is the maximum value that BSlider seem to work with fine
+
+		off_t	fSize;
+		uint32	fBlockSize;
 };
 
 
-class HeaderView : public BView {
+class HeaderView : public BView, public BInvoker {
 	public:
-		HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *attribute = NULL);
+		HeaderView(BRect frame, entry_ref *ref, DataEditor &editor);
 		virtual ~HeaderView();
 
 		virtual void AttachedToWindow();
 		virtual void Draw(BRect updateRect);
 		virtual void GetPreferredSize(float *_width, float *_height);
+		virtual void MessageReceived(BMessage *message);
+
+		base_type Base() const { return fBase; }
+		void SetBase(base_type);
 
 	private:
+		void FormatValue(char *buffer, size_t bufferSize, off_t value);
+		void UpdatePositionViews(off_t position);
+		void UpdateFileSizeView();
+
 		const char		*fAttribute;
+		off_t			fFileSize;
+		uint32			fBlockSize;
+		base_type		fBase;
 
 		BTextControl	*fPositionControl;
 		BStringView		*fPathView;
 		BStringView		*fSizeView;
 		BStringView		*fOffsetView;
 		BStringView		*fFileOffsetView;
-		BSlider			*fPositionSlider;
+		PositionSlider	*fPositionSlider;
 		IconView		*fIconView;
 };
 
@@ -147,20 +180,24 @@ IconView::UpdateIcon()
 //	#pragma mark -
 
 
-Slider::Slider(BRect rect, const char *name)
-	: BSlider(rect, name, NULL, NULL, 0, 0x10000000, B_HORIZONTAL,
-		B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT)
+PositionSlider::PositionSlider(BRect rect, const char *name, BMessage *message,
+	off_t size, uint32 blockSize)
+	: BSlider(rect, name, NULL, message, 0, kMaxSliderLimit, B_HORIZONTAL,
+		B_TRIANGLE_THUMB, B_FOLLOW_LEFT_RIGHT),
+	fSize(size),
+	fBlockSize(blockSize)
 {
+	Reset();
 }
 
 
-Slider::~Slider()
+PositionSlider::~PositionSlider()
 {
 }
 
 
 void 
-Slider::DrawBar()
+PositionSlider::DrawBar()
 {
 	BView *view = OffscreenView();
 
@@ -209,16 +246,75 @@ Slider::DrawBar()
 }
 
 
+void
+PositionSlider::Reset()
+{
+	SetKeyIncrementValue(int32(1.0 * kMaxSliderLimit / (fSize / fBlockSize) + 0.5));
+}
+
+
+off_t
+PositionSlider::Position() const
+{
+	// ToDo:
+	// Note: this code is far from being perfect: depending on the file size, it has
+	//	a maxium granularity that might be less than the actual block size demands...
+	//	The only way to work around this that I can think of, is to replace the slider
+	//	class completely with one that understands off_t values.
+	//	For example, with a block size of 512 bytes, it should be good enough for about
+	//	1024 GB - and that's not really that far away these days.
+
+	return (off_t(1.0 * fSize * Value() / kMaxSliderLimit + 0.5) / fBlockSize) * fBlockSize;
+}
+
+
+void
+PositionSlider::SetPosition(off_t position)
+{
+	position /= fBlockSize;
+	SetValue(int32(1.0 * kMaxSliderLimit * position / (fSize / fBlockSize) + 0.5));
+}
+
+
+void
+PositionSlider::SetSize(off_t size)
+{
+	if (size == fSize)
+		return;
+
+	off_t position = Position();
+	fSize = size;
+	Reset();
+	SetPosition(position);
+}
+
+
+void 
+PositionSlider::SetBlockSize(uint32 blockSize)
+{
+	if (blockSize == fBlockSize)
+		return;
+
+	off_t position = Position();
+	fBlockSize = blockSize;
+	Reset();
+	SetPosition(position);
+}
+
+
 //	#pragma mark -
 
 
-HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *attribute)
+HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	: BView(frame, "probeHeader", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
-	fAttribute(attribute)
+	fAttribute(editor.Attribute()),
+	fFileSize(editor.FileSize()),
+	fBlockSize(editor.BlockSize()),
+	fBase(kHexBase)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fIconView = new IconView(BRect(10, 10, 41, 41), ref, isDevice);
+	fIconView = new IconView(BRect(10, 10, 41, 41), ref, editor.IsDevice());
 	AddChild(fIconView);
 
 	BFont boldFont = *be_bold_font;
@@ -227,16 +323,16 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *a
 	plainFont.SetSize(10.0);
 
 	BStringView *stringView = new BStringView(BRect(50, 6, frame.right, 20),
-		B_EMPTY_STRING, attribute != NULL ? "Attribute: " : isDevice ? "Device: " : "File: ");
+		B_EMPTY_STRING, editor.IsAttribute() ? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
 	BPath path(ref);
 	BString string = path.Path();
-	if (attribute != NULL) {
+	if (fAttribute != NULL) {
 		string.Prepend(" (");
-		string.Prepend(attribute);
+		string.Prepend(fAttribute);
 		string.Append(")");
 	}
 	BRect rect = stringView->Frame();
@@ -256,7 +352,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *a
 	rect.right += 75;
 	rect.OffsetBy(0, -2);
 		// BTextControl oddities
-	fPositionControl = new BTextControl(rect, B_EMPTY_STRING, NULL, "0x0", NULL);
+	fPositionControl = new BTextControl(rect, B_EMPTY_STRING, NULL, "0x0", new BMessage(kMsgPositionUpdate));
 	fPositionControl->SetDivider(0.0);
 	fPositionControl->SetFont(&plainFont);
 	fPositionControl->TextView()->SetFontAndColor(&plainFont);
@@ -269,6 +365,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *a
 	fSizeView = new BStringView(rect, B_EMPTY_STRING, "of 0x0");
 	fSizeView->SetFont(&plainFont);
 	AddChild(fSizeView);
+	UpdateFileSizeView();
 
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
@@ -287,7 +384,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *a
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
 	stringView = new BStringView(rect, B_EMPTY_STRING,
-		attribute != NULL ? "Attribute Offset: " : isDevice ? "Device Offset: " : "File Offset: ");
+		editor.IsAttribute() ? "Attribute Offset: " : editor.IsDevice() ? "Device Offset: " : "File Offset: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -303,7 +400,9 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, bool isDevice, const char *a
 	rect.InsetBy(3, 0);
 	rect.top = 48;
 	rect.bottom = 60;
-	fPositionSlider = new Slider(rect, "slider");
+	fPositionSlider = new PositionSlider(rect, "slider", new BMessage(kMsgSliderUpdate),
+		editor.FileSize(), editor.BlockSize());
+	fPositionSlider->SetModificationMessage(new BMessage(kMsgSliderUpdate));
 	fPositionSlider->SetBarThickness(8);
 	fPositionSlider->ResizeToPreferred();
 	AddChild(fPositionSlider);
@@ -318,6 +417,10 @@ HeaderView::~HeaderView()
 void 
 HeaderView::AttachedToWindow()
 {
+	SetTarget(Window());
+
+	fPositionControl->SetTarget(this);
+	fPositionSlider->SetTarget(this);
 }
 
 
@@ -344,6 +447,96 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 }
 
 
+void 
+HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
+{
+	snprintf(buffer, bufferSize, fBase == kHexBase ? "0x%Lx" : "%Ld", value);
+}
+
+
+void
+HeaderView::UpdatePositionViews(off_t position)
+{
+	char buffer[64];
+	FormatValue(buffer, sizeof(buffer), position / fBlockSize);
+	fPositionControl->SetText(buffer);
+
+	FormatValue(buffer, sizeof(buffer), position);
+	fFileOffsetView->SetText(buffer);
+}
+
+
+void 
+HeaderView::UpdateFileSizeView()
+{
+	char buffer[64];
+	strcpy(buffer, "of ");
+	FormatValue(buffer + 3, sizeof(buffer) - 3, fFileSize / fBlockSize);
+	fSizeView->SetText(buffer);
+}
+
+
+void 
+HeaderView::SetBase(base_type type)
+{
+	if (fBase == type)
+		return;
+
+	fBase = type;
+	UpdatePositionViews(fPositionSlider->Position());
+	UpdateFileSizeView();
+}
+
+
+void 
+HeaderView::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgSliderUpdate:
+		{
+			off_t position = fPositionSlider->Position();
+
+			// update position text control
+			UpdatePositionViews(position);
+
+			// notify our target
+			BMessage update(kMsgPositionUpdate);
+			update.AddInt64("position", position);
+			Messenger().SendMessage(&update);
+			break;
+		}
+
+		case kMsgPositionUpdate:
+		{
+			off_t position = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
+
+			// update views
+			UpdatePositionViews(position);
+			fPositionSlider->SetPosition(position);
+
+			// notify our target
+			BMessage update(kMsgPositionUpdate);
+			update.AddInt64("position", position);
+			Messenger().SendMessage(&update);
+			break;
+		}
+
+		case kMsgBaseType:
+		{
+			int32 type;
+			if (message->FindInt32("base", &type) != B_OK)
+				break;
+
+			SetBase((base_type)type);
+			break;
+		}
+
+		default:
+			BView::MessageReceived(message);
+	}
+}
+
+
 //	#pragma mark -
 
 
@@ -353,7 +546,7 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	fEditor.SetTo(*ref, attribute);
 
 	rect = Bounds();
-	fHeaderView = new HeaderView(rect, ref, fEditor.IsDevice(), fEditor.Attribute());
+	fHeaderView = new HeaderView(rect, ref, fEditor);
 	fHeaderView->ResizeToPreferred();
 	AddChild(fHeaderView);
 
@@ -460,16 +653,36 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(new BMenuItem(subMenu));
 	bar->AddItem(menu);
 
+	// Number Base (hex/decimal)
+
 	menu = new BMenu("View");
 	subMenu = new BMenu("Base");
-	subMenu->AddItem(new BMenuItem("Decimal", NULL, 'D', B_COMMAND_KEY));
-	subMenu->AddItem(new BMenuItem("Hex", NULL, 'H', B_COMMAND_KEY));
+	BMenuItem *item;
+	BMessage *message = new BMessage(kMsgBaseType);
+	message->AddInt32("base", kDecimalBase);
+	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D', B_COMMAND_KEY));
+	item->SetTarget(this);
+	if (fHeaderView->Base() == kDecimalBase)
+		item->SetMarked(true);
+
+	message = new BMessage(kMsgBaseType);
+	message->AddInt32("base", kHexBase);
+	subMenu->AddItem(item = new BMenuItem("Hex", message, 'H', B_COMMAND_KEY));
+	item->SetTarget(this);
+	if (fHeaderView->Base() == kHexBase)
+		item->SetMarked(true);
+
+	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
+
+	// Block Size
 
 	subMenu = new BMenu("BlockSize");
 	subMenu->AddItem(new BMenuItem("512", NULL));
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
+
+	// Font Size
 
 	subMenu = new BMenu("Font Size");
 	const int32 fontSizes[] = {9, 10, 12, 14, 18, 24, 36, 48};
@@ -487,8 +700,33 @@ ProbeView::AttachedToWindow()
 
 
 void 
+ProbeView::AllAttached()
+{
+	fHeaderView->SetTarget(this);
+}
+
+
+void 
 ProbeView::MessageReceived(BMessage *message)
 {
-	BView::MessageReceived(message);
+	switch (message->what) {
+		case kMsgBaseType:
+		{
+			int32 type;
+			if (message->FindInt32("base", &type) != B_OK)
+				break;
+
+			fHeaderView->SetBase((base_type)type);
+			fDataView->SetBase((base_type)type);
+			break;
+		}
+
+		case kMsgPositionUpdate:
+			// ToDo: update data
+			break;
+
+		default:
+			BView::MessageReceived(message);
+	}
 }
 
