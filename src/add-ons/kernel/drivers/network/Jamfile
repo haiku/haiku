@@ -7,3 +7,5 @@ SubInclude OBOS_TOP src add-ons kernel drivers network wb840 ;
 SubInclude OBOS_TOP src add-ons kernel drivers network via-rhine ;
 SubInclude OBOS_TOP src add-ons kernel drivers network rtl8169 ;
 SubInclude OBOS_TOP src add-ons kernel drivers network ipro1000 ;
+
+SubIncludeGPL OBOS_TOP src add-ons kernel drivers network bcm440x ;

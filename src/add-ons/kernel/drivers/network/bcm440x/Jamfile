@@ -1,0 +1,51 @@
+SubDir OBOS_TOP src add-ons kernel drivers network bcm440x ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+R5KernelAddon bcm440x : kernel drivers bin :
+	b44lm.c
+	b44um.c
+	mempool.c
+	;
+
+Package haiku-networkingkit-cvs :
+	bcm440x :
+	boot home config add-ons kernel drivers bin ;
+Package haiku-networkingkit-cvs :
+	<kernel!drivers!dev!net>bcm440x :
+	boot home config add-ons kernel drivers dev net ;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>bcm440x ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : bcm440x ;
+}
+
+
+rule InstallSiS900
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallSiS900
+{
+	cp $(>) /boot/home/config/add-ons/kernel/drivers/bin/
+}
+
+#InstallSiS900 install : sis900 ;
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	sis900 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>sis900 : 
+	installed-symlink 
+;
+
