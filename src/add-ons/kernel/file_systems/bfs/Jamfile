@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
 
+# save original optimization level
+oldOPTIM = $(OPTIM) ;
+
 # set some additional defines
 {
 	local defines =
@@ -48,3 +51,6 @@ actions ignore InstallBFS
 }
 
 InstallBFS install : obfs ;
+
+# restore original optimization level
+OPTIM = $(oldOPTIM) ;
