@@ -22,13 +22,25 @@
 
 #include <OS.h>
 #include <Debug.h>
+
 #include <unistd.h>
 
 using namespace BPrivate;
 
 
-static area_id heap_region = -1;
-static addr_t brk;
+struct free_chunk {
+	free_chunk	*next;
+	size_t		size;
+};
+
+static const size_t kInitialHeapSize = 50 * B_PAGE_SIZE;
+	// that's about what hoard allocates anyway
+
+static area_id sHeapArea;
+static hoardLockType sHeapLock;
+static addr_t sHeapBase;
+static size_t sHeapSize, sHeapAreaSize;
+static free_chunk *sFreeChunks;
 
 
 // ToDo: add real fork() support!
@@ -36,15 +48,98 @@ static addr_t brk;
 extern "C" status_t
 __init_heap(void)
 {
-	// XXX do something better here
-	if (heap_region < 0) {
-		heap_region = create_area("heap", (void **)&brk,
-			B_ANY_ADDRESS, 1024 * B_PAGE_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	}
-	return 0;
+	sHeapAreaSize = kInitialHeapSize;
+	sHeapBase = 0x10000000;
+		// let the heap start at 256 MB for now
+
+	// ToDo: add a VM call that instructs other areas to avoid the space after the heap when possible
+	//	(and if not, create it at the end of that range, so that the heap can grow as much as possible)
+	sHeapArea = create_area("heap", (void **)&sHeapBase, B_BASE_ADDRESS,
+		sHeapAreaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+
+	hoardLockInit(sHeapLock, "heap");
+	return sHeapArea >= B_OK ? B_OK : sHeapArea;
 }
 
 namespace BPrivate {
+
+void *
+hoardSbrk(long size)
+{
+	assert(size > 0);
+
+	// align size request
+	size = (size + hoardHeap::ALIGNMENT - 1) & ~(hoardHeap::ALIGNMENT - 1);
+
+	hoardLock(sHeapLock);
+
+	// find chunk in free list
+	
+	free_chunk *chunk = sFreeChunks, *last = NULL;
+	for (; chunk != NULL; chunk = chunk->next, last = chunk) {
+		if (chunk->size < (size_t)size)
+			continue;
+
+		// this chunk is large enough to satisfy the request
+
+		SERIAL_PRINT(("HEAP-%ld: found free chunk to hold %ld bytes\n",
+			find_thread(NULL), size));
+
+		void *address = (void *)chunk;
+
+		if (chunk->size + sizeof(free_chunk) > (size_t)size)
+			chunk = (free_chunk *)((addr_t)chunk + size);
+		else
+			chunk = chunk->next;
+		
+		if (last != NULL)
+			last->next = chunk;
+		else
+			sFreeChunks = chunk;
+
+		hoardUnlock(sHeapLock);
+		return address;
+	}
+
+	// There was no chunk, let's see if the area is large enough
+
+	size_t oldHeapSize = sHeapSize;
+	sHeapSize += size;
+
+	// round to next page size
+	size_t pageSize = (sHeapSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	if (pageSize < sHeapAreaSize) {
+		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n", find_thread(NULL), size));
+		// the area is large enough already
+		hoardUnlock(sHeapLock);
+		return (void *)(sHeapBase + oldHeapSize);
+	}
+
+	// We need to grow the area
+
+	SERIAL_PRINT(("HEAP-%ld: need to resize heap area to %ld (%ld requested)\n",
+		find_thread(NULL), pageSize, size));
+
+	if (resize_area(sHeapArea, pageSize) < B_OK) {
+		// out of memory - ToDo: as a fall back, we could try to allocate another area
+		hoardUnlock(sHeapLock);
+		return NULL;
+	}
+
+	sHeapAreaSize = pageSize;
+
+	hoardUnlock(sHeapLock);
+	return (void *)(sHeapBase + oldHeapSize);
+}
+
+
+void
+hoardUnsbrk(void *ptr, long size)
+{
+	// NOT CURRENTLY IMPLEMENTED!
+}
+
 
 void
 hoardCreateThread(hoardThreadType &thread,
@@ -118,22 +213,6 @@ hoardGetNumProcessors(void)
 		return 1;
 
 	return info.cpu_count;
-}
-
-
-void *
-hoardSbrk(long size)
-{
-	void *ret = (void *)brk;
-	brk += size + hoardHeap::ALIGNMENT - 1;
-	return ret;
-}
-
-
-void
-hoardUnsbrk(void *ptr, long size)
-{
-	// NOT CURRENTLY IMPLEMENTED!
 }
 
 
