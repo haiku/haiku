@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 keyboard ;
 
+UsePrivateHeaders input ;
+
+if $(COMPILE_FOR_R5) {
+	SubDirCcFlags -DCOMPILE_FOR_R5 ;
+}
+
 KernelObjects
 	keyboard.c
 	:
@@ -17,4 +23,28 @@ KernelLd keyboard :
 	:
 	drivers/dev/keyboard
 	; 
+
+R5KernelAddon <driver>keyboard : kernel drivers bin :
+        atkeyboard.c
+;
+
+# Link to kernel/drivers/dev/input
+{
+        local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
+        local instDriver = <kernel!drivers!dev!input>keyboard ;
+        MakeLocate $(instDriver) : $(dir) ;
+        RelSymLink $(instDriver) : <driver>keyboard ;
+}
+
+#Package haiku-inputkit-cvs
+#       :
+#       <driver>keyboard
+#       :
+#       boot home config add-ons kernel drivers bin ;
+
+#Package haiku-inputkit-cvs
+#       :
+#       <kernel!drivers!dev!input>keyboard
+#       :
+#       boot home config add-ons kernel drivers dev input ;
 
