@@ -119,12 +119,15 @@ PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
 	fSelectedIconMini(NULL),
 	fSelectedIconLarge(NULL),
-	fNumberOfPrinters(0),
-	fNoPrinterAvailable(0)
+	fReferences(0),
+	fHasReferences(0),
+	fUseConfigWindow(true)
 {
+	fSettings = Settings::GetSettings();
+	LoadSettings();
 		// If our superclass initialized ok
 	if (*err == B_OK) { 
-		fNoPrinterAvailable = create_sem(1, "");
+		fHasReferences = create_sem(1, "has_references");
 		
 			// let us try as well
 		SetupPrinterList();
@@ -141,6 +144,11 @@ PrintServerApp::PrintServerApp(status_t* err)
 			// Start handling of spooled files
 		PostMessage(PSRV_PRINT_SPOOLED_JOB);
 	}
+}
+
+PrintServerApp::~PrintServerApp() {
+	SaveSettings();
+	delete fSettings;
 }
 
 bool PrintServerApp::QuitRequested()
@@ -167,10 +175,10 @@ bool PrintServerApp::QuitRequested()
 		}
 
 			// Wait for printers
-		if (fNoPrinterAvailable > 0) {
-			acquire_sem(fNoPrinterAvailable);
-			delete_sem(fNoPrinterAvailable);
-			fNoPrinterAvailable = 0;
+		if (fHasReferences > 0) {
+			acquire_sem(fHasReferences);
+			delete_sem(fHasReferences);
+			fHasReferences = 0;
 		}
 
 		ASSERT(fSelectedIconMini != NULL);
@@ -182,6 +190,13 @@ bool PrintServerApp::QuitRequested()
 	return rc;
 }
 
+void PrintServerApp::Acquire() {
+		if (atomic_add(&fReferences, 1) == 0) acquire_sem(fHasReferences);
+}
+
+void PrintServerApp::Release() {
+		if (atomic_add(&fReferences, -1) == 1) release_sem(fHasReferences);
+}
 
 void PrintServerApp::RegisterPrinter(BDirectory* printer) {
 	BString transport, address, connection;
@@ -195,8 +210,7 @@ void PrintServerApp::RegisterPrinter(BDirectory* printer) {
 		Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
 	 	Printer* p = new Printer(printer, r);
 	 	AddHandler(p);
-		if (fNumberOfPrinters == 0) acquire_sem(fNoPrinterAvailable);
-		fNumberOfPrinters ++;
+	 	Acquire();
 	}
 }
 
@@ -209,9 +223,8 @@ void PrintServerApp::UnregisterPrinter(Printer* printer) {
 void PrintServerApp::NotifyPrinterDeletion(Printer* printer) {
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
-		fNumberOfPrinters --;
 		fResourceManager.Free(printer->GetResource());
-		if (fNumberOfPrinters == 0) release_sem(fNoPrinterAvailable);
+		Release();
 	}
 }
 
@@ -299,9 +312,6 @@ status_t PrintServerApp::SetupPrinterList()
 void
 PrintServerApp::MessageReceived(BMessage* msg)
 {
-//	fprintf(stdout, "PrintServerApp\n");
-//	msg->PrintToStream(); printf("\n\n");
-//	fflush(stdout);
 	switch(msg->what) {
 		case PSRV_GET_ACTIVE_PRINTER:
 		case PSRV_MAKE_PRINTER_ACTIVE_QUIETLY:
@@ -591,4 +601,23 @@ PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 			return ::TestForAddonExistence(name, B_BEOS_ADDONS_DIRECTORY, "Print", outPath);
 
 	return B_OK;
+}
+
+
+bool PrintServerApp::OpenSettings(BFile& file, bool forReading) {
+	BPath path;
+	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY;
+	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK &&
+		path.Append("print_server_settings") == B_OK &&
+		file.SetTo(path.Path(), openMode) == B_OK;
+}
+
+void PrintServerApp::LoadSettings() {
+	BFile file;
+	if (OpenSettings(file, true)) fSettings->Load(&file);
+}
+
+void PrintServerApp::SaveSettings() {
+	BFile file;
+	if (OpenSettings(file, false)) fSettings->Save(&file);
 }

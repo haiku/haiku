@@ -95,10 +95,12 @@ public:
 	BHandler* ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 								int32 form, const char* prop);
 								
+	void GetName(BString& name);
 	Resource* GetResource() { return fResource; }
 	
 private:
 	status_t LoadPrinterAddon(image_id& id);
+	void AddCurrentPrinter(BMessage* m);
 
 	Folder fPrinter;           // the printer spooling directory
 	Resource* fResource;       // the resource required for processing a print job
@@ -112,6 +114,8 @@ private:
 		// Accessor
 	BDirectory* SpoolDir() { return fPrinter.GetSpoolDir(); }
 
+	bool HasCurrentPrinter(BString& name);
+	bool MoveJob(const BString& name);
 		// Get next spooled job if any
 	bool FindSpooledJob();
 	status_t PrintSpooledJob(BFile* spoolFile);

@@ -226,9 +226,10 @@ status_t Printer::ConfigurePage(BMessage& settings)
 		if ((rc=get_image_symbol(id, "config_page", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
 				// call the function and check its result
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
-			if (new_settings != NULL && new_settings->what != 'baad')
+			if (new_settings != NULL && new_settings->what != 'baad') {
 				settings = *new_settings;
-			else
+				AddCurrentPrinter(&settings);
+			} else
 				rc = B_ERROR;
 			delete new_settings;
 		}
@@ -264,9 +265,10 @@ status_t Printer::ConfigureJob(BMessage& settings)
 		if ((rc=get_image_symbol(id, "config_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
 				// call the function and check its result
 			BMessage* new_settings = (*func)(SpoolDir(), &settings);
-			if ((new_settings != NULL) && (new_settings->what != 'baad'))
+			if ((new_settings != NULL) && (new_settings->what != 'baad')) {
 				settings = *new_settings;
-			else
+				AddCurrentPrinter(&settings);
+			} else
 				rc = B_ERROR;
 			delete new_settings;
 		}
@@ -315,6 +317,7 @@ status_t Printer::GetDefaultSettings(BMessage& settings) {
 			BMessage* new_settings = (*func)(SpoolDir());
 			if (new_settings) {
 				settings = *new_settings; 
+				AddCurrentPrinter(&settings);
 			} else {
 				rc = B_ERROR;
 			}
@@ -367,12 +370,19 @@ status_t Printer::LoadPrinterAddon(image_id& id)
 	return rc;
 }
 
+void Printer::AddCurrentPrinter(BMessage* msg)
+{
+	BString name;
+	GetName(name);
+	if (msg->HasString(PSRV_FIELD_CURRENT_PRINTER)) {
+		msg->ReplaceString(PSRV_FIELD_CURRENT_PRINTER, name.String());
+	} else {
+		msg->AddString(PSRV_FIELD_CURRENT_PRINTER, name.String());
+	}
+}
+
 void Printer::MessageReceived(BMessage* msg)
 {
-	printf("Printer::MessageReceived(): ");
-	msg->PrintToStream();			
-
-
 	switch(msg->what) {
 		case B_GET_PROPERTY:
 		case B_SET_PROPERTY:
@@ -388,10 +398,49 @@ void Printer::MessageReceived(BMessage* msg)
 	}
 }
 
+void Printer::GetName(BString& name) {
+	if (B_OK != SpoolDir()->ReadAttrString(PSRV_PRINTER_ATTR_PRT_NAME, &name))
+		name = "Unknown Printer";
+}
+
+bool Printer::HasCurrentPrinter(BString& name) {
+	BMessage settings;
+		// read settings from spool file and get printer name
+	BFile jobFile(&fJob->EntryRef(), B_READ_WRITE);
+	return jobFile.InitCheck() == B_OK &&
+		jobFile.Seek(sizeof(print_file_header), SEEK_SET) == sizeof(print_file_header) &&
+		settings.Unflatten(&jobFile) == B_OK &&
+		settings.FindString(PSRV_FIELD_CURRENT_PRINTER, &name) == B_OK;
+}
+
+bool Printer::MoveJob(const BString& name) {
+	BPath file(&fJob->EntryRef());
+	BPath path;
+	file.GetParent(&path);
+	path.Append(".."); path.Append(name.String());
+	BDirectory dir(path.Path());
+	BEntry entry(&fJob->EntryRef());
+		// try to move job file to proper directory
+	return entry.MoveTo(&dir) == B_OK;
+}
+
 bool Printer::FindSpooledJob() {
-	fJob = fPrinter.GetNextJob();
-	if (fJob) fJob->SetPrinter(this);
-	return fJob;
+	BString name2;
+	GetName(name2);
+	do {
+		fJob = fPrinter.GetNextJob();
+		if (fJob) {
+			BString name;
+			if (HasCurrentPrinter(name) && name != name2 && MoveJob(name)) {
+				fJob->SetStatus(kUnknown, false); // so that fPrinter.GetNextJob skips it
+				fJob->Release();
+			} else {
+				fJob->SetPrinter(this);
+				return true;
+			}
+		}
+	} while (fJob != NULL);
+	return false;
 }
 
 status_t Printer::PrintSpooledJob(BFile* spoolFile)

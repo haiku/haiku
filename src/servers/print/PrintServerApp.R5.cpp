@@ -14,7 +14,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2001, 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -39,26 +39,35 @@
 
 #include "pr_server.h"
 #include "Printer.h"
+#include "ConfigWindow.h"
 
 	// BeOS API
-#include <PrintJob.h>
 #include <Alert.h>
-
-	// TODO: 
-	//	Somehow block application that wants to show page/printer config dialog
-	//	Handle situation where there are pending print jobs but printer is requested for deletion
+#include <Autolock.h>
+#include <PrintJob.h>
 
 struct AsyncThreadParams {
+	PrintServerApp* app;
 	Printer* printer;
 	BMessage* message;
 
-	AsyncThreadParams(Printer* p, BMessage* m)
-		: printer(p)
+	AsyncThreadParams(PrintServerApp* app, Printer* p, BMessage* m)
+		: app(app)
+		, printer(p)
 		, message(m)
-	{ }
+	{ 
+		app->Acquire();
+		if (printer) printer->Acquire();
+	}
 
 	~AsyncThreadParams() {
+		if (printer) printer->Release();
 		delete message;
+		app->Release();
+	}
+	
+	BMessage* AcquireMessage() { 
+		BMessage* m = message; message = NULL; return m;
 	}
 };
 
@@ -67,62 +76,61 @@ status_t PrintServerApp::async_thread(void* data)
 	AsyncThreadParams* p = (AsyncThreadParams*)data;
 	
 	Printer* printer = p->printer;
-	BMessage* msg = p->message;
+	BMessage* msg = p->AcquireMessage();
+
+	{
+		AutoReply sender(msg, 'stop');
+		switch (msg->what) {
+				// Handle showing the page config dialog
+			case PSRV_SHOW_PAGE_SETUP: {
+				if (p->app->fUseConfigWindow) {
+					ConfigWindow* w = new ConfigWindow(kPageSetup, printer, msg, &sender);
+					w->Go();
+				} else if (printer != NULL) {
+						BMessage reply(*msg);
+						if (printer->ConfigurePage(reply) == B_OK) {
+							sender.SetReply(&reply);
+							break;
+						}
+					}
+					else {
+							// If no default printer, give user choice of aborting or setting up a printer
+						BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
+						if (alert->Go() == 1) {
+							run_add_printer_panel();
+						}						
+					}
+				}
+				break;
 	
-	switch (msg->what) {
-			// Handle showing the page config dialog
-		case PSRV_SHOW_PAGE_SETUP: {
+				// Handle showing the print config dialog
+			case PSRV_SHOW_PRINT_SETUP: {
+					if (p->app->fUseConfigWindow) {
+						ConfigWindow* w = new ConfigWindow(kJobSetup, printer, msg, &sender);
+						w->Go();
+					} else if (printer != NULL) {
+						BMessage reply(*msg);
+						if (printer->ConfigureJob(reply) == B_OK) {
+							sender.SetReply(&reply);
+							break;
+						}
+					}
+				}
+				break;
+	
+				// Retrieve default configuration message from printer add-on
+			case PSRV_GET_DEFAULT_SETTINGS:
 				if (printer != NULL) {
-					BMessage reply(*msg);
-					if (printer->ConfigurePage(reply) == B_OK) {
-						msg->SendReply(&reply);
+					BMessage reply;
+					if (printer->GetDefaultSettings(reply) == B_OK) {
+						sender.SetReply(&reply);
 						break;
 					}
 				}
-				else {
-						// If no default printer, give user choice of aborting or setting up a printer
-					BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
-					if (alert->Go() == 1) {
-						run_add_printer_panel();
-					}
-					
-				}
-					// Always stop dialog flow	
-				BMessage reply('stop');
-				msg->SendReply(&reply);
-			}
-			break;
+				break;
+		}	
+	}
 
-			// Handle showing the print config dialog
-		case PSRV_SHOW_PRINT_SETUP: {
-				if (printer != NULL) {
-					BMessage reply(*msg);
-					if (printer->ConfigureJob(reply) == B_OK) {
-						msg->SendReply(&reply);
-						break;
-					}
-				}
-				BMessage reply('stop');
-				msg->SendReply(&reply);
-			}
-			break;
-
-			// Retrieve default configuration message from printer add-on
-		case PSRV_GET_DEFAULT_SETTINGS:
-			if (printer != NULL) {
-				BMessage reply;
-				if (printer->GetDefaultSettings(reply) == B_OK) {
-					msg->SendReply(&reply);
-					break;
-				}
-			}
-			BMessage reply('stop');
-			msg->SendReply(&reply);
-			break;
-
-	}	
-
-	if (printer) printer->Release();
 	delete p;
 }
 
@@ -130,12 +138,11 @@ status_t PrintServerApp::async_thread(void* data)
 // Async. processing of received message
 void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 {
-	AsyncThreadParams* data = new AsyncThreadParams(fDefaultPrinter, msg);
+	AsyncThreadParams* data = new AsyncThreadParams(this, fDefaultPrinter, msg);
 
 	thread_id tid = spawn_thread(async_thread, "async", B_NORMAL_PRIORITY, (void*)data);
 
 	if (tid > 0) {
-		if (fDefaultPrinter) fDefaultPrinter->Acquire();
 		resume_thread(tid);	
 	} else {
 		delete data;
@@ -148,7 +155,17 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {
 				BMessage reply('okok');
-				reply.AddString("printer_name", fDefaultPrinter ? fDefaultPrinter->Name() : "");
+				BString printerName = fDefaultPrinter ? fDefaultPrinter->Name() : "";
+				BString mime;
+				if (fUseConfigWindow && MimeTypeForSender(msg, mime)) {
+					BAutolock lock(gLock);
+					if (lock.IsLocked()) {
+							// override with printer for application
+						PrinterSettings* p = fSettings->FindPrinterSettings(mime.String());
+						if (p) printerName = p->GetPrinter();
+					}
+				}
+				reply.AddString("printer_name", printerName);
 				reply.AddInt32("color", BPrintJob::B_COLOR_PRINTER);	// BeOS knows not if color or not, so always color
 				msg->SendReply(&reply);
 			}

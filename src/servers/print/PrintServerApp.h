@@ -39,6 +39,7 @@
 #define PRINTSERVERAPP_H
 
 #include "ResourceManager.h"
+#include "Settings.h"
 
 class PrintServerApp;
 
@@ -61,6 +62,10 @@ class PrintServerApp : public BApplication
 	typedef BApplication Inherited;
 public:
 	PrintServerApp(status_t* err);
+	~PrintServerApp();
+	
+	void Acquire();
+	void Release();
 	
 	bool QuitRequested();
 	void MessageReceived(BMessage* msg);
@@ -73,6 +78,10 @@ public:
 	BHandler* ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 								int32 form, const char* prop);
 private:
+	bool OpenSettings(BFile& file, bool forReading);
+	void LoadSettings();
+	void SaveSettings();
+
 	status_t SetupPrinterList();
 
 	void     HandleSpooledJobs();
@@ -96,8 +105,10 @@ private:
 	Printer* fDefaultPrinter;
 	BBitmap* fSelectedIconMini;
 	BBitmap* fSelectedIconLarge;
-	int     fNumberOfPrinters;    // number of existing Printer objects
-	sem_id  fNoPrinterAvailable;  // can be acquired if number of printers == 0
+	vint32   fReferences; 
+	sem_id   fHasReferences;
+	Settings*fSettings;
+	bool     fUseConfigWindow;
 	
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 	static status_t async_thread(void* data);
