@@ -362,11 +362,11 @@ void TranslatorRosterTest::GetTranslatorInfoTest() {
  */
 void TranslatorRosterTest::GetTranslatorsTest() {
 	//open image to get a translator for
-	BFile image("./data/images/image.png", B_READ_ONLY);
+	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
 
 	NextSubTest();
-	BFile garbled("./data/garbled_data", B_READ_ONLY);
+	BFile garbled("../src/tests/kits/translation/data/garbled_data", B_READ_ONLY);
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
 	translator_info* info;
@@ -404,11 +404,11 @@ void TranslatorRosterTest::GetTranslatorsTest() {
  */
 void TranslatorRosterTest::IdentifyTest() {
 	//open image to get a translator for
-	BFile image("./data/images/image.png", B_READ_ONLY);
+	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
 
 	//NextSubTest();
-	BFile garbled("./data/garbled_data", B_READ_ONLY);
+	BFile garbled("../src/tests/kits/translation/data/garbled_data", B_READ_ONLY);
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
 	translator_info* info = new translator_info;
@@ -467,13 +467,13 @@ void TranslatorRosterTest::MakeConfigurationViewTest() {
  */
 void TranslatorRosterTest::TranslateTest() {
 	//input
-	BFile input("./data/images/image.jpg", B_READ_ONLY);
+	BFile input("../src/tests/kits/translation/data/images/image.jpg", B_READ_ONLY);
 
 	//temp file for generic format
 	BFile temp("/tmp/TranslatorRosterTest.temp", B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	
 	//output file
-	BFile output("./data/images/image.out.png", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	BFile output("../src/tests/kits/translation/data/images/image.out.png", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	
 	roster = BTranslatorRoster::Default();
 	

@@ -94,7 +94,7 @@ void BitmapStreamTest::ConstructorTest() {
  */
 void BitmapStreamTest::DetachBitmapTest() {
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
-	BFile file("./data/images/image.gif", B_READ_ONLY);
+	BFile file("../src/tests/kits/translation/data/images/image.gif", B_READ_ONLY);
 	CPPUNIT_ASSERT(file.InitCheck() == B_OK);
 
 	NextSubTest();
