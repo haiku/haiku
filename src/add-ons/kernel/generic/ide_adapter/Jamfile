@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel generic ide_adapter ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon ide_adapter : kernel generic :
+	ide_adapter.c
+	;
+
