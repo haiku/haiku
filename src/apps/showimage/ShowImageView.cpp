@@ -1814,7 +1814,7 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *out_image, bool n
 	int32 cur;
 	
 	if (curImage.GetParent(&parent) != B_OK)
-		return -1;
+		return false;
 
 	while (parent.GetNextRef(&entry) == B_OK) {
 		if (entry != *in_current) {
