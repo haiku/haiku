@@ -67,6 +67,7 @@ public:
 
 	void CheckNotificationMessages(const NotificationMessage *messages,
 								   int32 count);
+	void VerifyInstalledTypes();
 
 private:
 	BTestApp	*fApplication;
