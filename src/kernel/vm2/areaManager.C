@@ -8,12 +8,14 @@ areaManager::areaManager(void)
 
 unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 {
+//	areas.dump();
 	unsigned long end=start+(pages*PAGE_SIZE)-1;
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		if (cur)
 			{
 			area *myArea=(area *)cur;
+//			printf ("Looking for %x, %d pages; current = %x\n",start,pages,myArea->getEndAddress());
 			if (!myArea->couldAdd(start,end))
 				{ // if we don't work, there must be an overlap, so go to the end of this area.
 				start=myArea->getEndAddress();
@@ -40,7 +42,7 @@ area *areaManager::findArea(void *address)
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
-	//	printf ("areaManager::findArea: Looking for %d\n",address);
+//		printf ("areaManager::findArea: Looking for %x between %x and %x\n",address,myArea->getStartAddress(),myArea->getEndAddress());
 		if (myArea->contains(address))
 				return myArea;
 		}

@@ -97,7 +97,10 @@ void vmInterface::freeArea(int Area)
 status_t vmInterface::getAreaInfo(int Area,area_info *dest)
 	{
 	area *oldArea=getAM()->findArea(Area);	
-	return oldArea->getInfo(dest);
+	if (oldArea)
+		return oldArea->getInfo(dest);
+	else
+		printf ("vmInterface::getAreaInfo: unable to find requested area\n");
 	}
 
 status_t vmInterface::getNextAreaInfo(int  process,int32 *cookie,area_info *dest)

@@ -24,13 +24,22 @@ class list {
 		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return n;} 
 		void remove(node *toNuke)
 			{
-			bool done=false;
-			for (struct node *cur=rock;!done && cur->next;cur=cur->next)
-				if (cur->next==toNuke)
-					{
-					cur->next=toNuke->next;
-					done=true;
-					}
+//			printf ("list::remove starting: nuking %x \n",toNuke);
+//			list::dump();	
+			if (rock==toNuke)
+				rock=rock->next;
+			else
+				{
+				bool done=false;
+				for (struct node *cur=rock;!done && cur->next;cur=cur->next)
+					if (cur->next==toNuke)
+						{
+						cur->next=toNuke->next;
+						done=true;
+						}
+				}
+//			printf ("list::remove ending: \n");
+//			list::dump();	
 			}
 		void dump(void)
 			{

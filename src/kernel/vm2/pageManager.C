@@ -33,26 +33,26 @@ pageManager::pageManager(int pages)
 page *pageManager::getPage(void)
 	{
 	page *ret=NULL;
-	printf ("pageManager::getPage: Checking clean\n");
+	//printf ("pageManager::getPage: Checking clean\n");
 	printf ("pageManager::getPage:cleanCount = %d\n", clean.nodeCount);
 	if (clean.count())
 		{
-		printf ("pageManager::getPage:locking clean\n");
+		//printf ("pageManager::getPage:locking clean\n");
 		acquire_sem(cleanLock);
-		printf ("pageManager::getPage:locked clean\n");
+		//printf ("pageManager::getPage:locked clean\n");
 		ret=(page *)clean.next();
-		printf ("pageManager::getPage:got next clean\n");
+		//printf ("pageManager::getPage:got next clean\n");
 		release_sem(cleanLock);
-		printf ("pageManager::getPage:unlocked clean\n");
+		//printf ("pageManager::getPage:unlocked clean\n");
 		} // This could fail if someone swoops in and steal our page.
 	if (!ret && unused.count())
 		{
-		printf ("pageManager::getPage:Checking unused\n");
+		//printf ("pageManager::getPage:Checking unused\n");
 		acquire_sem(unusedLock);
 		ret=(page *)unused.next();
-		printf ("pageManager::getPage:got next unused\n");
+		//printf ("pageManager::getPage:got next unused\n");
 		release_sem(unusedLock);
-		printf ("pageManager::getPage:next unused = %x\n",ret);
+		//printf ("pageManager::getPage:next unused = %x\n",ret);
 		if (ret)
 			ret->zero();
 		} // This could fail if someone swoops in and steal our page.
@@ -62,6 +62,7 @@ page *pageManager::getPage(void)
 		inUse.add(ret);
 		release_sem(inUseLock);
 		}
+	printf ("pageManager::getPage:leaving with page = %x\n", ret);
 	return ret;
 	}
 
@@ -89,7 +90,7 @@ void pageManager::cleaner(void)
 			clean.add(first);
 			release_sem(cleanLock);
 			release_sem(unusedLock);
-			printf ("pageManager::cleaner: All done with vacuum a page\n");
+			//printf ("pageManager::cleaner: All done with vacuum a page\n");
 			snooze(125000);	
 			}
 		}

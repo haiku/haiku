@@ -55,7 +55,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
-	printf ("vpage::fault: address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
+	//printf ("vpage::fault: address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -78,7 +78,7 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 	// Update the architecture specific stuff here...
 	// This refresh is unneeded if the data was never written out... 
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	printf ("vpage::fault: Refreshed\n");
+	//printf ("vpage::fault: Refreshed\n");
 
 	}
 

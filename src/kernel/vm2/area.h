@@ -37,6 +37,7 @@ class area : public node
 		status_t setProtection(protectType prot);
 		bool couldAdd(unsigned long start,unsigned long end) { return ((end<start_address) || (start>end_address));}
 		unsigned long getEndAddress(void) {return end_address;}
+		unsigned long getStartAddress(void) {return start_address;}
 		void pager(int desperation);
 		void saver(void);
 

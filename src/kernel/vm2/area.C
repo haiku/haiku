@@ -85,14 +85,14 @@ void area::freeArea(void)
 	vpages.dump();
 	for (struct node *cur=vpages.rock;cur;)
 		{
-		printf ("area::freeArea: wasting a page: %x\n",cur);
+		//printf ("area::freeArea: wasting a page: %x\n",cur);
 		vpage *page=(vpage *)cur;
 		page->flush();
-		printf ("area::freeArea: flushed a page \n");
+		//printf ("area::freeArea: flushed a page \n");
 		cur=cur->next;
 		delete page; // Probably need to add a destructor
 		}
-	printf ("area::freeArea: unlocking \n");
+	//printf ("area::freeArea: unlocking \n");
 	manager->unlock();
 	printf ("area::freeArea: ending \n");
 	}
