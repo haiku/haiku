@@ -2,6 +2,7 @@ APP_KIT_SOURCE =
 	Application.cpp
 	AppMisc.cpp
 	Cursor.cpp
+	Clipboard.cpp
 	Handler.cpp
 	InitTerminateLibBe.cpp
 	Invoker.cpp
