@@ -172,14 +172,14 @@ typedef struct ppp_interface_info_t {
 
 //!	Structure used by \c PPPC_GET_STATISTICS.
 typedef struct ppp_statistics {
-	uint64 bytesReceived, packetsReceived;
-	uint64 bytesSent, packetsSent;
+	int64 bytesReceived, packetsReceived;
+	int64 bytesSent, packetsSent;
 	
 	// TODO: currently unused
-	uint64 errorBytesReceived, errorPacketsReceived;
+	int64 errorBytesReceived, errorPacketsReceived;
 	
 	// TODO: add compression statistics?
-	uint8 _reserved_[80];
+	int8 _reserved_[80];
 } ppp_statistics;
 
 //!	Structure used by \c PPPC_GET_DEVICE_INFO.

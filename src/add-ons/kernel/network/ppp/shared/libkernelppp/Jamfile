@@ -12,6 +12,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 
 
 R5KernelStaticLibrary kernelppp :
+	atomic.S
 	kernel_cpp.cpp
 	
 	KPPPConfigurePacket.cpp

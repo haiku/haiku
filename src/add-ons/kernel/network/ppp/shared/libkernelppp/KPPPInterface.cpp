@@ -423,6 +423,7 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			info->connectRetriesLimit = fConnectRetriesLimit;
 			info->connectRetryDelay = ConnectRetryDelay();
 			info->reconnectDelay = ReconnectDelay();
+			info->connectedSince = ConnectedSince();
 			info->idleSince = IdleSince();
 			info->disconnectAfterIdleSince = DisconnectAfterIdleSince();
 			info->doesConnectOnDemand = DoesConnectOnDemand();
@@ -1389,14 +1390,8 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 			return B_ERROR;
 		}
 		
-		// TODO: always use atomic_add64 when Haiku is finished
-#ifdef __HAIKU__
 		atomic_add64(&fStatistics.bytesSent, length);
 		atomic_add64(&fStatistics.packetsSent, 1);
-#else
-		atomic_add((int32*) &fStatistics.bytesSent, length);
-		atomic_add((int32*) &fStatistics.packetsSent, 1);
-#endif
 		return SendToNext(packet, 0);
 			// this is normally the device, but there can be something inbetween
 	} else {
@@ -1518,14 +1513,8 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 		m_adj(packet, 2);
 	}
 	
-	// TODO: always use atomic_add64 when Haiku is finished
-#ifdef __HAIKU__
 	atomic_add64(&fStatistics.bytesReceived, length);
 	atomic_add64(&fStatistics.packetsReceived, 1);
-#else
-	atomic_add((int32*) &fStatistics.bytesReceived, length);
-	atomic_add((int32*) &fStatistics.packetsReceived, 1);
-#endif
 	return Receive(packet, protocolNumber);
 }
 

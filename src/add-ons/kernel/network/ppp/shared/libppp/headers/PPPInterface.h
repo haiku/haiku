@@ -32,6 +32,7 @@ class PPPInterface {
 		
 		status_t GetSettingsEntry(BEntry *entry) const;
 		bool GetInterfaceInfo(ppp_interface_info_t *info) const;
+		bool GetStatistics(ppp_statistics *statistics) const;
 		bool HasSettings(const driver_settings *settings) const;
 		
 		void SetProfile(const driver_settings *profile) const;

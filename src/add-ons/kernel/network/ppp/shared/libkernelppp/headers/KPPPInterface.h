@@ -93,6 +93,10 @@ class KPPPInterface : public KPPPLayer {
 		uint32 ReconnectDelay() const
 			{ return fReconnectDelay; }
 		
+		//! Time when connection was established successfully.
+		bigtime_t ConnectedSince() const
+			{ return fConnectedSince; }
+		
 		//!	Used for reporting that a packet was send/received (updates idle time).
 		void UpdateIdleSince()
 			{ fUpdateIdleSince = true; }

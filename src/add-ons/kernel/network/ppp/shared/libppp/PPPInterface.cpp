@@ -181,6 +181,22 @@ PPPInterface::GetInterfaceInfo(ppp_interface_info_t *info) const
 }
 
 
+/*!	\brief Get transfer statistics for this interface.
+	
+	\param statistics The structure is copied into this argument.
+	
+	\return \c true on success, \c false otherwise.
+*/
+bool
+PPPInterface::GetStatistics(ppp_statistics *statistics) const
+{
+	if(!statistics)
+		return false;
+	
+	return Control(PPPC_GET_STATISTICS, statistics, sizeof(ppp_statistics)) == B_OK;
+}
+
+
 //!	Compares interface's settings to given driver_settings structure.
 bool
 PPPInterface::HasSettings(const driver_settings *settings) const

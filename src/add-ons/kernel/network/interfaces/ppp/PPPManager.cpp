@@ -746,12 +746,11 @@ PPPManager::SettingsChanged()
 {
 	// get default interface name and update interfaces if it changed
 	void *handle = load_driver_settings("ptpnet.settings");
-	char *name = get_driver_parameter(handle, "default", NULL, NULL);
-	if(name)
-		name = strdup(name);
+	const char *name = get_driver_parameter(handle, "default", NULL, NULL);
 	unload_driver_settings(handle);
 	
-	if((!fDefaultInterface && !name) || !strcmp(name, fDefaultInterface))
+	if((!fDefaultInterface && !name) || (fDefaultInterface && name
+			&& !strcmp(name, fDefaultInterface)))
 		return;
 	
 	ppp_interface_entry *entry = EntryFor(fDefaultInterface);
@@ -759,9 +758,13 @@ PPPManager::SettingsChanged()
 			&& entry->interface->StateMachine().Phase() == PPP_DOWN_PHASE)
 		DeleteInterface(entry->interface->ID());
 	
-	free(fInterfaceName);
-	fInterfaceName = name;
+	free(fDefaultInterface);
+	if(!name) {
+		fDefaultInterface = NULL;
+		return;
+	}
 	
+	fDefaultInterface = strdup(name);
 	ppp_interface_id id = CreateInterfaceWithName(name);
 	entry = EntryFor(id);
 	if(entry && entry->interface)

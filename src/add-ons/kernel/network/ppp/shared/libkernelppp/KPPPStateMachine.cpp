@@ -124,12 +124,13 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 	fPhase = next;
 	
 	if(Phase() == PPP_ESTABLISHED_PHASE) {
+		Interface().fConnectedSince = system_time();
+		
 		if(Interface().Ifnet())
 			Interface().Ifnet()->if_flags |= IFF_UP | IFF_RUNNING;
 		
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL,
 			&fInterface.fID, sizeof(ppp_interface_id));
-		Interface().fConnectedSince = system_time();
 	}
 }
 
