@@ -29,8 +29,6 @@ private:
 	char reserved[128];
 };
 
-
-
 enum
 {	//	flavor_flags
 	B_FLAVOR_IS_GLOBAL = 0x100000L,	//	force in media_addon_server, only one instance
@@ -82,7 +80,11 @@ virtual	status_t	Flatten(void *buffer, ssize_t size) const;
 virtual	status_t	Unflatten(type_code c, const void *buf, ssize_t size);
 };
 
-
+namespace BPrivate {
+namespace media {
+	class DormantNodeManager;
+};
+};
 
 /* a MediaAddOn is something which can manufacture MediaNodes */
 class BMediaAddOn
@@ -151,6 +153,8 @@ private:
 		BMediaAddOn(const BMediaAddOn & clone);
 		BMediaAddOn & operator=(const BMediaAddOn & clone);
 
+		friend class BPrivate::media::DormantNodeManager;
+
 		/* Mmmh, stuffing! */
 virtual		status_t _Reserved_MediaAddOn_2(void *);
 virtual		status_t _Reserved_MediaAddOn_3(void *);
@@ -159,8 +163,8 @@ virtual		status_t _Reserved_MediaAddOn_5(void *);
 virtual		status_t _Reserved_MediaAddOn_6(void *);
 virtual		status_t _Reserved_MediaAddOn_7(void *);
 
-	image_id 		_fImage;
-	media_addon_id	_fAddon;
+	image_id 		fImage;
+	media_addon_id	fAddon;
 	uint32			_reserved_media_add_on_[7];
 };
 
