@@ -51,6 +51,7 @@ typedef struct {
 #define TV_PAL (1<<9)
 #define TV_NTSC (2<<9)
 #define TV_CAPABLE (1<<11)
+#define TV_VIDEO (1<<12)
 
 #define SKD_MOVE_CURSOR    0x00000001
 #define SKD_PROGRAM_CLUT   0x00000002
@@ -68,8 +69,6 @@ enum {
 
 /* max. number of overlay buffers */
 #define MAXBUFFERS 3
-/* max. pixelclock speed the BES supports */
-#define BESMAXSPEED 135000
 
 /* internal used info on overlay buffers */
 typedef	struct
@@ -256,10 +255,7 @@ typedef struct {
 	/* mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb) */
 	uint8 rom_mirror[32768];
 
-	/* NV31 (FX5600) tweak to get pixelPLL going (unknown register) */
-	uint16 pixpll_vco_div2;
-
-	/* apsed: some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
+	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
 	settings settings;
 
 	struct

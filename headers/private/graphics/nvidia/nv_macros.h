@@ -67,54 +67,6 @@
 #define NVCFG_CFG_49	0xf8 //unknown if used
 #define NVCFG_CFG_50	0xfc //unknown if used
 
-/*    if(pNv->SecondCRTC) {
-       pNv->riva.PCIO = pNv->riva.PCIO0 + 0x2000;
-       pNv->riva.PCRTC = pNv->riva.PCRTC0 + 0x800;
-       pNv->riva.PRAMDAC = pNv->riva.PRAMDAC0 + 0x800;
-       pNv->riva.PDIO = pNv->riva.PDIO0 + 0x2000;
-    } else {
-       pNv->riva.PCIO = pNv->riva.PCIO0;
-       pNv->riva.PCRTC = pNv->riva.PCRTC0;
-       pNv->riva.PRAMDAC = pNv->riva.PRAMDAC0;
-       pNv->riva.PDIO = pNv->riva.PDIO0;
-    }
-
-    pNv->riva.PCIO0 = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
-                                           pNv->PciTag, regBase+0x00601000,
-                                           0x00003000);
-    pNv->riva.PDIO0 = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
-                                           pNv->PciTag, regBase+0x00681000,
-                                           0x00003000);
-    pNv->riva.PVIO = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
-                                           pNv->PciTag, regBase+0x000C0000,
-                                           0x00001000);
-    pNv->riva.PRAMDAC0 = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00680000, 0x00003000);
-    pNv->riva.PCRTC0 = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                     regBase+0x00600000, 0x00003000);
-
-    pNv->riva.FIFO    = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00800000, 0x00010000);
-
-    pNv->riva.PFIFO   = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00002000, 0x00002000);
-
-    pNv->riva.PFB     = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00100000, 0x00001000);
-
-    pNv->riva.PMC     = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00000000, 0x00009000);
-
-    pNv->riva.PTIMER  = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00009000, 0x00001000);
-
-    pNv->riva.PRAMIN = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                     regBase+0x00710000, 0x00010000);
-
-    pNv->riva.PGRAPH  = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
-                                      regBase+0x00400000, 0x00002000);
-*/
-
 /* used NV INT registers for vblank */
 #define NV32_MAIN_INTE		0x00000140
 #define NV32_CRTC_INTS		0x00600100
@@ -474,6 +426,13 @@
 #define NV32_NV10STRAPINFO	0x0010020c
 #define NV32_NVSTRAPINFO2	0x00101000
 
+/* registers needed for 'coldstart' */
+#define NV32_COREPLL		0x00680500
+#define NV32_MEMPLL			0x00680504
+#define NV32_COREPLL2		0x00680570 /* NV31, NV36 only */
+#define NV32_MEMPLL2		0x00680574 /* NV31, NV36 only */
+#define NV32_CONFIG         0x00600804
+
 /* primary head */
 #define NV8_ATTRINDW		0x006013c0
 #define NV8_ATTRDATW		0x006013c0
@@ -483,7 +442,6 @@
 #define NV8_CRTCDAT			0x006013d5
 #define NV8_INSTAT1			0x006013da
 #define NV32_NV10FBSTADD32	0x00600800
-#define NV32_CONFIG         0x00600804//not yet used (coldstart)...
 #define NV32_RASTER			0x00600808
 #define NV32_NV10CURADD32	0x0060080c
 #define NV32_CURCONF		0x00600810
@@ -498,7 +456,7 @@
 #define NV8_CRTC2DAT		0x006033d5
 #define NV8_2INSTAT1		0x006033da//verify!!!
 #define NV32_NV10FB2STADD32	0x00602800
-#define NV32_RASTER2		0x00602808//verify!!!
+#define NV32_RASTER2		0x00602808
 #define NV32_NV10CUR2ADD32	0x0060280c
 #define NV32_2CURCONF		0x00602810
 #define NV32_2FUNCSEL		0x00602860
@@ -520,10 +478,12 @@
 #define NVDAC_CURPOS		0x00680300
 #define NVDAC_PIXPLLC		0x00680508
 #define NVDAC_PLLSEL		0x0068050c
+#define NVDAC_PIXPLLC2		0x00680578 /* NV31, NV36 only */
 #define NVDAC_GENCTRL		0x00680600
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_PIXPLLC		0x00680520
+#define NVDAC2_PIXPLLC2		0x0068057c /* NV31, NV36 only */
 #define NVDAC2_GENCTRL		0x00682600
 
 /* Nvidia CRTC indexed registers */
@@ -539,12 +499,12 @@
 #define NVCRTCX_PRROWSCN	0x08
 #define NVCRTCX_MAXSCLIN	0x09
 #define NVCRTCX_VGACURCTRL	0x0a
-#define NVCRTCX_FBSTADDH	0x0c //confirmed
-#define NVCRTCX_FBSTADDL	0x0d //confirmed
+#define NVCRTCX_FBSTADDH	0x0c
+#define NVCRTCX_FBSTADDL	0x0d
 #define NVCRTCX_VSYNCS		0x10
 #define NVCRTCX_VSYNCE		0x11
 #define NVCRTCX_VDISPE		0x12
-#define NVCRTCX_PITCHL		0x13 //confirmed
+#define NVCRTCX_PITCHL		0x13
 #define NVCRTCX_VBLANKS		0x15
 #define NVCRTCX_VBLANKE		0x16
 #define NVCRTCX_MODECTL		0x17
@@ -553,6 +513,7 @@
 #define NVCRTCX_REPAINT0	0x19
 #define NVCRTCX_REPAINT1	0x1a
 #define NVCRTCX_LOCK		0x1f
+#define NVCRTCX_BUFFER		0x21
 #define NVCRTCX_LSR			0x25
 #define NVCRTCX_PIXEL		0x28
 #define NVCRTCX_HEB			0x2d
@@ -568,7 +529,7 @@
 #define NVATBX_MODECTL		0x10
 #define NVATBX_OSCANCOLOR	0x11
 #define NVATBX_COLPLANE_EN	0x12
-#define NVATBX_HORPIXPAN	0x13 //confirmed
+#define NVATBX_HORPIXPAN	0x13
 #define NVATBX_COLSEL		0x14
 
 /* Nvidia SEQUENCER indexed registers */
