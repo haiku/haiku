@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.36 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.37 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1259,6 +1259,16 @@ static status_t nv_general_bios_to_powergraphics()
 	/* turn on DAC2 if it exists
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
 	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
+
+	/* NV40 and NV45 need a 'tweak' to make sure the CRTC FIFO's/shiftregisters get
+	 * their data in time (otherwise momentarily ghost images of windows or such
+	 * may appear on heavy acceleration engine use for instance, especially in 32-bit
+	 * colordepth) */
+	if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
+	{
+		/* clear b15: some framebuffer config item (unknown) */
+		NV_REG32(NV32_PFB_CLS_PAGE2) &= 0xffff7fff;
+	}
 
 	/* setup AGP:
 	 * Note:

@@ -443,7 +443,6 @@ status_t nv_acc_init_dma()
 				ACCW(NV40_WHAT1, 0x000000a0);
 				ACCW(NV40_WHAT2, 0x0078e366);
 				ACCW(NV40_WHAT3, 0x0000014c);
-//				NV_REG32(NV32_PFB_CLS_PAGE2) &= 0xffff7fff; //clear b15 (unknown)
 				break;
 			case NV41:
 				ACCW(NV40P_WHAT0, 0x83280eff);
