@@ -423,11 +423,18 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 int
 udf_release_vnode(void *ns, void *node, char reenter)
 {
+// No debug-to-file in release_vnode; can cause a deadlock in
+// rare circumstances.
+#if !DEBUG_TO_FILE
 	DEBUG_INIT_ETC(NULL, ("node: %p", node));
-	
+#endif	
 	Udf::Icb *icb = reinterpret_cast<Udf::Icb*>(node);
 	delete icb;
+#if !DEBUG_TO_FILE
 	RETURN(B_OK);
+#else
+	return B_OK;
+#endif
 }
 
 
