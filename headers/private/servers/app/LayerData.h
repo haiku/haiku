@@ -46,54 +46,58 @@ class Layer;
 class DrawData
 {
 public:
-	DrawData(void);
-	DrawData(const DrawData &data);
-	~DrawData(void);
-	DrawData &operator=(const DrawData &from);
-	BPoint penlocation;
+								DrawData(void);
+								DrawData(const DrawData &data);
+	virtual						~DrawData(void);
+			DrawData& operator=(const DrawData &from);
+	// uncomment when needed. Also implement it! :-)
+//	virtual	void				PrintToStream() const;
 
-	RGBColor highcolor,
-			 lowcolor;
+			BPoint				penlocation;
 
-	float pensize;
-	Pattern patt;
-	drawing_mode draw_mode;
+			RGBColor			highcolor,
+					 			lowcolor;
+
+			float				pensize;
+			Pattern				patt;
+			drawing_mode		draw_mode;
 	
-	cap_mode lineCap;
-	join_mode lineJoin;
-	float miterLimit;
+			cap_mode			lineCap;
+			join_mode			lineJoin;
+			float				miterLimit;
 	
-	source_alpha alphaSrcMode;
-	alpha_function alphaFncMode;
-	float scale;
-	bool fontAliasing;
-	ServerFont font;
+			source_alpha		alphaSrcMode;
+			alpha_function		alphaFncMode;
+			float				scale;
+			bool				fontAliasing;
+			ServerFont			font;
 	
-	BRegion	*clippReg;
+			BRegion*			clippReg;
 	
-	escapement_delta edelta;
-	
+			escapement_delta	edelta;
 };
 
 class LayerData : public DrawData
 {
 public:
-	LayerData(void);
-	LayerData(const Layer *layer);
-	LayerData(const LayerData &data);
-	LayerData &operator=(const LayerData &from);
-	~LayerData(void);
-	
-	BPoint coordOrigin;
+								LayerData(void);
+								LayerData(const Layer *layer);
+								LayerData(const LayerData &data);
+	virtual						~LayerData(void);
+			LayerData &operator=(const LayerData &from);
 
-	RGBColor viewcolor;
+	virtual	void				PrintToStream() const;
 
-	// We have both because we are not going to suffer from the limitation that R5
-	// places on us. We can have both. :)
-	ServerBitmap *background;
-	ServerBitmap *overlay;
+			BPoint				coordOrigin;
 
-	// used for the state stack
-	LayerData *prevState;
+			RGBColor			viewcolor;
+
+			// We have both because we are not going to suffer from the limitation that R5
+			// places on us. We can have both. :)
+			ServerBitmap*		background;
+			ServerBitmap*		overlay;
+
+			// used for the state stack
+			LayerData*			prevState;
 };
 #endif
