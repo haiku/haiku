@@ -2,6 +2,17 @@
 
 namespace BPrivate {
 
+BCharacterSet::BCharacterSet()
+{
+	id = 0;
+	MIBenum = 106;
+	print_name = "Unicode";
+	iana_name = "UTF-8";
+	mime_name = "UTF-8";
+	aliases_count = 0;
+	aliases = NULL;
+}
+
 BCharacterSet::BCharacterSet(uint32 _id, uint32 _MIBenum, const char * _print_name,
                              const char * _iana_name, const char * _mime_name,
                              const char ** _aliases)
