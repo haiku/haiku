@@ -59,9 +59,9 @@ KernelLd kernel :
 	kernel_disk_device_manager.o
 	kernel_util.o
 	kernel_messaging.o
+	kernel_debug.o
 
 	lib$(OBOS_ARCH).a
-	libdrivers.a
 
 	linkhack.so
 
@@ -85,9 +85,9 @@ KernelLd kernel.so :
 	kernel_disk_device_manager.o
 	kernel_util.o
 	kernel_messaging.o
+	kernel_debug.o
 
 	lib$(OBOS_ARCH).a
-	libdrivers.a
 
 	linkhack.so
 
@@ -312,6 +312,16 @@ KernelLd symlink :
 	: beos/bin/symlink
 	;
 
+KernelLd <bootfloppy>consoled :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!consoled>consoled.o
+	libroot.so
+	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	: beos/bin/consoled
+	;
+
 # Note: shell is a built in target, thus we need the grist.
 KernelLd obos_shell :
 	libglue2.o
@@ -328,7 +338,7 @@ KernelLd obos_shell :
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
-	: beos/bin/shell
+	: beos/bin/sh
 	;
 
 KernelLd testapp :
@@ -371,22 +381,20 @@ KernelLd fork_test :
 	: beos/bin/fork_test
 	;
 
-#if $(OS) = "BEOS" 
-#{
-#	KernelConfigSection addons/drivers/dev/misc/pcspeaker 
-#		: 
-#		elf32 
-#		:
-#		/boot/home/config/add-ons/kernel/drivers/bin/pcspeaker 
-#		;
+KernelConfigSection drivers/dev/tty
+	: elf32
+	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/drivers/dev/tty
+	;
 
-#	KernelConfigSection addons/drivers/dev/net/tulip 
-#		: 
-#		elf32 
-#		: 
-#		/boot/beos/system/add-ons/kernel/drivers/bin/tulip 
-#		;
-#}
+KernelConfigSection drivers/dev/console
+	: elf32
+	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/drivers/dev/console
+	;
+
+KernelConfigSection addons/kernel/console/vga_text
+	: elf32
+	: $(OBOS_TOP)/distro/$(OBOS_ARCH).R1/beos/system/add-ons/kernel/console/vga_text
+	;
 
 KernelLd kernel_ps :
 	libglue2.o
@@ -426,6 +434,10 @@ KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_A
 
 Depends kernel.so : kernel ;
 	# kernel.so will be rebuilt with the kernel
+
+Depends $(OBOS_FLOPPY) : tty ;
+Depends $(OBOS_FLOPPY) : console ;
+Depends $(OBOS_FLOPPY) : vga_text ;
 
 Depends boot_floppy : $(OBOS_FLOPPY) ;
 NotFile boot_floppy ;
