@@ -110,6 +110,8 @@ SYSCALL2(sys_get_thread_info, 88)
 SYSCALL3(sys_get_next_thread_info, 89)
 SYSCALL2(sys_get_team_info, 90)
 SYSCALL2(sys_get_next_team_info, 91)
+SYSCALL1(sys_kill_team, 39)
+SYSCALL0(sys_get_current_team_id, 40)
 
 /* image calls */
 SYSCALL2(sys_register_image, 114)
@@ -124,13 +126,15 @@ SYSCALL2(sys_stop_notifying, 120)
 
 /* VM calls */
 SYSCALL6(_kern_create_area, 29)
-SYSCALL6(sys_vm_clone_region, 30)
+SYSCALL5(_kern_clone_area, 30)
 SYSCALL9(sys_vm_map_file, 31)
 SYSCALL1(_kern_delete_area, 32)
-SYSCALL2(sys_vm_get_region_info, 33)
-SYSCALL1(sys_find_region_by_name, 34)
-SYSCALL1(sys_kill_team, 39)
-SYSCALL0(sys_get_current_team_id, 40)
+SYSCALL2(_kern_get_area_info, 33)
+SYSCALL1(_kern_find_area, 34)
+SYSCALL3(_kern_get_next_area_info, 122)
+SYSCALL2(_kern_set_area_protection, 123)
+SYSCALL2(_kern_resize_area, 124)
+SYSCALL1(_kern_area_for, 125)
 
 /* port syscalls */
 SYSCALL2(sys_port_create, 43)

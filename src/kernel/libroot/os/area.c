@@ -17,26 +17,24 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size,
 
 
 area_id
-clone_area(const char *name, void **dest_addr, uint32 addr_spec,
-	uint32 protection, area_id source)
+clone_area(const char *name, void **address, uint32 addressSpec,
+	uint32 protection, area_id sourceArea)
 {
-	// ToDo: Not 100% sure about the REGION_PRIVATE_MAP
-	return sys_vm_clone_region(name, dest_addr, addr_spec, source, REGION_PRIVATE_MAP, protection);
+	return _kern_clone_area(name, address, addressSpec, protection, sourceArea);
 }
 
 
 area_id
 find_area(const char *name)
 {
-	return sys_find_region_by_name(name);
+	return _kern_find_area(name);
 }
 
 
 area_id
-area_for(void *addr)
+area_for(void *address)
 {
-	// ToDo: implement area_for()
-	return B_ERROR;
+	return _kern_area_for(address);
 }
 
 
@@ -50,16 +48,14 @@ delete_area(area_id id)
 status_t
 resize_area(area_id id, size_t newSize)
 {
-	// ToDo: implement resize_area()
-	return B_ERROR;
+	return _kern_resize_area(id, newSize);
 }
 
 
 status_t
 set_area_protection(area_id id, uint32 protection)
 {
-	// ToDo: implement set_area_protection()
-	return B_ERROR;
+	return _kern_set_area_protection(id, protection);
 }
 
 
@@ -69,17 +65,16 @@ _get_area_info(area_id id, area_info *areaInfo, size_t size)
 	// size is not yet used, but may, if area_info changes
 	(void)size;
 
-	return sys_vm_get_region_info(id, (void *)areaInfo);
+	return _kern_get_area_info(id, areaInfo);
 }
 
 
 status_t
-_get_next_area_info(team_id team, int32 *cookie, area_info *ainfo, size_t size)
+_get_next_area_info(team_id team, int32 *cookie, area_info *areaInfo, size_t size)
 {
 	// size is not yet used, but may, if area_info changes
 	(void)size;
 
-	// ToDo: implement _get_next_area_info()
-	return B_ERROR;
+	return _kern_get_next_area_info(team, cookie, areaInfo);
 }
 
