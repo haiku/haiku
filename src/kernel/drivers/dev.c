@@ -4,6 +4,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <stage2.h>
 #include <dev.h>
@@ -16,7 +17,7 @@
 #include <memheap.h>
 
 #ifdef ARCH_x86
-#include <arch/x86/console_dev.h>
+#	include <arch/x86/console_dev.h>
 #endif
 
 #include <fb_console.h>
@@ -41,7 +42,7 @@ int dev_init(kernel_args *ka)
 	
 	dprintf("dev_init: entry\n");
 
-	for (ptr = device_paths; (*ptr); ptr++) {	
+	for (ptr = device_paths; (*ptr); ptr++) {
 		fd = sys_open_dir(*ptr);
 		if (fd >= 0) {
 			ssize_t len;
@@ -51,6 +52,7 @@ int dev_init(kernel_args *ka)
 			while ((len = sys_read_dir(fd, dirent, sizeof(buf), 1)) > 0) {
 				dprintf("loading '%s' dev module\n", dirent->d_name);
 				dev_load_dev_module(dirent->d_name, *ptr);
+				dprintf("loaded dev module!\n");
 			}
 			sys_close(fd);
 		}
@@ -67,7 +69,9 @@ int dev_init(kernel_args *ka)
 	return 0;
 }
 
-image_id dev_load_dev_module(const char *name, const char *dirpath)
+
+image_id
+dev_load_dev_module(const char *name, const char *dirpath)
 {
 	image_id id;
 	char path[SYS_MAX_PATH_LEN];
@@ -84,7 +88,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 
 	/* Load the module, return error if unable */
 	id = elf_load_kspace(path, "");
-	if(id < 0)
+	if (id < 0)
 		return id;
 
 	/* Don't get all the symbols we will require initially. Just get the
@@ -106,7 +110,12 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 		dprintf("DEV: %s: mandatory driver symbol(s) missing! :(\n", name);
 		id = EINVAL;
 		goto error;
-	} 
+	}
+	/* ToDo: we should fail if the driver doesn't export the api_version,
+	 * but right now, there are some drivers in our tree that doesn't...
+	 */
+	if (api_version == NULL)
+		dprintf("driver \"%s\" has no api_version set!\n", name);
 
 	/* Next, do we have an init_hardware function? If we do run it and
 	 * if it fails simply fall through to the exit...
@@ -151,7 +160,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 				keep_loaded = true;
 		}
 	}
-	
+
 	/* If we've managed to publish at least one of the device entry
 	 * points that the driver wished us to then we MUST keep the driver in
 	 * memory or the pointer that devfs has will become invalid.
@@ -159,7 +168,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 	 */
 	if (keep_loaded)
 		return id;
-	
+
 	/* If the function gets here then the following has happenned...
 	 * - the driver has been loaded
 	 * - it has appeared valid
@@ -167,19 +176,14 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 	 * - init_driver has been run OK
 	 * - publish_devices return empty paths list or
 	 *   devfs_publish_device has for some reason failed on each path.
-	 * 
-	 * The error value we're about to return is 0, which probably
-	 * means we're loosing error information here :(
-	 * XXX - what error code should we be returning
-	 *
-	 * However, before we unload ourselves we will try to find and run
-	 * the uninit routine.
 	 */
 
 	uninit_driver = (void *) elf_lookup_symbol(id, "uninit_driver");
 	if (uninit_driver)
 		uninit_driver();
-	id = 0;
+
+	// ToDo: That might not be the best error code
+	id = ENXIO;
 
 error:
 	/* If we've gotten here then the driver will be unloaded and an
