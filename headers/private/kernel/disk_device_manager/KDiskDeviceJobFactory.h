@@ -3,6 +3,8 @@
 #ifndef _K_DISK_DEVICE_JOB_FACTORY_H
 #define _K_DISK_DEVICE_JOB_FACTORY_H
 
+#include <Vector.h>
+
 #include "disk_device_manager.h"
 
 namespace BPrivate {
@@ -15,30 +17,44 @@ public:
 	KDiskDeviceJobFactory();
 	~KDiskDeviceJobFactory();
 
-	KDiskDeviceJob *CreateCreateChildJob(partition_id partition,
-										 partition_id child, off_t offset,
-										 off_t size, const char *parameters);
-	KDiskDeviceJob *CreateDefragmentJob(partition_id partition);
-	KDiskDeviceJob *CreateDeleteChildJob(partition_id parent,
-										 partition_id partition);
-	KDiskDeviceJob *CreateScanPartitionJob(partition_id partition);
-	KDiskDeviceJob *CreateInitializeJob(partition_id partition,
+	KDiskDeviceJob *CreateDefragmentJob(partition_id partitionID);
+	KDiskDeviceJob *CreateRepairJob(partition_id partitionID, bool checkOnly);
+	KDiskDeviceJob *CreateResizeJob(partition_id parentID,
+									partition_id partitionID, off_t size,
+									bool resizeContents);
+	KDiskDeviceJob *CreateMoveJob(partition_id parentID,
+								  partition_id partitionID, off_t offset,
+								  Vector<partition_id> *contentsToMove);
+	KDiskDeviceJob *CreateSetNameJob(partition_id parentID,
+									 partition_id partitionID,
+									 const char *name);
+	KDiskDeviceJob *CreateSetContentNameJob(partition_id partitionID,
+											const char *name);
+	KDiskDeviceJob *CreateSetTypeJob(partition_id parentID,
+									 partition_id partitionID,
+									 const char *type);
+	KDiskDeviceJob *CreateSetParametersJob(partition_id parentID,
+										   partition_id partitionID,
+										   const char *parameters);
+	KDiskDeviceJob *CreateSetContentParametersJob(partition_id partitionID,
+												  const char *parameters);
+	KDiskDeviceJob *CreateInitializeJob(partition_id partitionID,
 										disk_system_id diskSystemID,
+										const char *name,
 										const char *parameters);
-	KDiskDeviceJob *CreateMoveJob(partition_id parent, partition_id partition,
-								  off_t offset);
-	KDiskDeviceJob *CreateRepairJob(partition_id partition);
-	KDiskDeviceJob *CreateResizeJob(partition_id parent,
-									partition_id partition, off_t size);
-	KDiskDeviceJob *CreateSetParametersJob(partition_id parent,
-										   partition_id partition,
-										   const char *parameters,
-										   const char *contentParameters);
+	KDiskDeviceJob *CreateCreateChildJob(partition_id partitionID,
+										 partition_id child, off_t offset,
+										 off_t size, const char *type,
+										 const char *parameters);
+	KDiskDeviceJob *CreateDeleteChildJob(partition_id parentID,
+										 partition_id partitionID);
+
+	KDiskDeviceJob *CreateScanPartitionJob(partition_id partitionID);
 };
 
 } // namespace DiskDevice
 } // namespace BPrivate
 
-using BPrivate::DiskDevice::KDiskDeviceJobQueue;
+using BPrivate::DiskDevice::KDiskDeviceJobFactory;
 
 #endif	// _K_DISK_DEVICE_JOB_FACTORY_H
