@@ -135,12 +135,12 @@ class PPPStateMachine {
 		void InitializeRestartCount();
 		void ZeroRestartCount();
 		bool SendConfigureRequest();
-		void SendConfigureAck(struct mbuf *packet);
-		void SendConfigureNak(struct mbuf *packet);
-		void SendTerminateRequest();
-		void SendTerminateAck(struct mbuf *request = NULL);
-		void SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code);
-		void SendEchoReply(struct mbuf *request);
+		bool SendConfigureAck(struct mbuf *packet);
+		bool SendConfigureNak(struct mbuf *packet);
+		bool SendTerminateRequest();
+		bool SendTerminateAck(struct mbuf *request = NULL);
+		bool SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code);
+		bool SendEchoReply(struct mbuf *request);
 		
 		void BringHandlersUp();
 		uint32 BringPhaseUp();

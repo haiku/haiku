@@ -132,7 +132,7 @@ PPPStateMachine::SendEchoRequest()
 	request->length = htons(packet->m_len);
 	memcpy(request->data, &fMagicNumber, sizeof(fMagicNumber));
 	
-	return LCP.Send(packet) == B_OK;
+	return LCP().Send(packet) == B_OK;
 }
 
 
@@ -156,7 +156,7 @@ PPPStateMachine::SendDiscardRequest()
 	request->length = htons(packet->m_len);
 	memcpy(request->data, &fMagicNumber, sizeof(fMagicNumber));
 	
-	return LCP.Send(packet) == B_OK;
+	return LCP().Send(packet) == B_OK;
 }
 
 
