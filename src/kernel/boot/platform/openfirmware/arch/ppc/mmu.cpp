@@ -1,5 +1,5 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -23,7 +23,7 @@ uint32 sPageTableHashMask;
 
 
 static void
-remove_range_index(address_range *ranges, uint32 &numRanges, uint32 index)
+remove_range_index(addr_range *ranges, uint32 &numRanges, uint32 index)
 {
 	if (index + 1 == numRanges) {
 		// remove last range
@@ -31,13 +31,13 @@ remove_range_index(address_range *ranges, uint32 &numRanges, uint32 index)
 		return;
 	}
 
-	memmove(&ranges[index], &ranges[index + 1], sizeof(address_range) * (numRanges - 1 - index));
+	memmove(&ranges[index], &ranges[index + 1], sizeof(addr_range) * (numRanges - 1 - index));
 	numRanges--;
 }
 
 
 static status_t
-insert_memory_range(address_range *ranges, uint32 &numRanges, uint32 maxRanges,
+insert_memory_range(addr_range *ranges, uint32 &numRanges, uint32 maxRanges,
 	const void *_start, uint32 size)
 {
 	addr_t start = ROUNDOWN(addr_t(_start), B_PAGE_SIZE);
@@ -173,7 +173,7 @@ find_physical_memory_ranges(size_t &total)
 
 
 static bool
-is_in_range(address_range *ranges, uint32 numRanges, void *address, size_t size)
+is_in_range(addr_range *ranges, uint32 numRanges, void *address, size_t size)
 {
 	addr_t start = (addr_t)address;
 	addr_t end = start + size;
