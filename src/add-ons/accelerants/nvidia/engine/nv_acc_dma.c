@@ -118,7 +118,7 @@ status_t nv_acc_init_dma()
 	if (si->ps.card_arch >= NV40A)
 	{
 		/* (first set) */
-		ACCW(HT_HANDL_00, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
+		ACCW(HT_HANDL_00, (0x80000000 | NV10_CONTEXT_SURFACES_2D)); /* 32bit handle (not used) */
 		ACCW(HT_VALUE_00, 0x0010114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
@@ -208,11 +208,11 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
 		ACCW(PR_CTX0_9, 0x00000000); /* extra */
 		ACCW(PR_CTX1_9, 0x00000000); /* extra */
-		/* setup set '6' for cmd NV3_SURFACE_1 (not used) */
-		ACCW(PR_CTX0_A, 0x02080059); /* NVclass $059, nv10+: little endian */
+		/* setup set '6' for cmd NV10_CONTEXT_SURFACES_2D */
+		ACCW(PR_CTX0_A, 0x02080062); /* NVclass $062, nv10+: little endian */
 		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_A, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
+		ACCW(PR_CTX2_6, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+		ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
 		ACCW(PR_CTX0_B, 0x00000000); /* extra */
 		ACCW(PR_CTX1_B, 0x00000000); /* extra */
 		/* setup DMA set pointed at by PF_CACH1_DMAI */
@@ -566,7 +566,7 @@ status_t nv_acc_init_dma()
 	si->engine.fifo.handle[0] = NV_ROP5_SOLID;
 	si->engine.fifo.handle[1] = NV_IMAGE_BLACK_RECTANGLE;
 	si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
-	si->engine.fifo.handle[3] = NV1_IMAGE_FROM_CPU;
+	si->engine.fifo.handle[3] = NV4_SURFACE; /* NV10_CONTEXT_SURFACES_2D is identical */
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 	si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
 	si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
@@ -614,11 +614,8 @@ status_t nv_acc_init_dma()
 		(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
 
 	si->engine.dma.cmdbuffer[0x06] = (1 << 18) | 0x06000;
-//	si->engine.dma.cmdbuffer[0x07] =
-//		(0x80000000 | si->engine.fifo.handle[3]); /* Pixmap (not used or 3D only?) */
-//fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
 	si->engine.dma.cmdbuffer[0x07] =
-		(0x80000000 | si->engine.fifo.handle[0]);
+		(0x80000000 | si->engine.fifo.handle[3]); /* 2D Surface */
 
 	si->engine.dma.cmdbuffer[0x08] = (1 << 18) | 0x08000;
 	si->engine.dma.cmdbuffer[0x09] =
@@ -732,6 +729,7 @@ static void nv_acc_assert_fifo_dma(void)
 	if (!si->engine.fifo.ch_ptr[NV_ROP5_SOLID] ||
 		!si->engine.fifo.ch_ptr[NV_IMAGE_BLACK_RECTANGLE] ||
 		!si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN] ||
+		!si->engine.fifo.ch_ptr[NV4_SURFACE] ||
 		!si->engine.fifo.ch_ptr[NV_IMAGE_BLIT] ||
 		!si->engine.fifo.ch_ptr[NV3_GDI_RECTANGLE_TEXT])
 	{
@@ -744,6 +742,7 @@ static void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[0]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[1]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[2]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[3]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[4]] = 0;
 		si->engine.fifo.ch_ptr[si->engine.fifo.handle[5]] = 0;
 
@@ -751,6 +750,7 @@ static void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.handle[0] = NV_ROP5_SOLID;
 		si->engine.fifo.handle[1] = NV_IMAGE_BLACK_RECTANGLE;
 		si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
+		si->engine.fifo.handle[3] = NV4_SURFACE;
 		si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 		si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
 
@@ -766,6 +766,7 @@ static void nv_acc_assert_fifo_dma(void)
 		//ACCW(FIFO_CH0, (0x80000000 | si->engine.fifo.handle[0])); /* Raster OPeration */
 		//ACCW(FIFO_CH1, (0x80000000 | si->engine.fifo.handle[1])); /* Clip */
 		//ACCW(FIFO_CH2, (0x80000000 | si->engine.fifo.handle[2])); /* Pattern */
+		//ACCW(FIFO_CH3, (0x80000000 | si->engine.fifo.handle[3])); /* 2D Surface */
 		//ACCW(FIFO_CH4, (0x80000000 | si->engine.fifo.handle[4])); /* Blit */
 		//ACCW(FIFO_CH5, (0x80000000 | si->engine.fifo.handle[5])); /* Bitmap */
 	}
