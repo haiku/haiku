@@ -234,29 +234,72 @@ int32 api_version = B_CUR_FS_API_VERSION;
 	      instances.
 */
 int
-udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
+udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 		size_t parmsLength, void **volumeCookie, vnode_id *rootID)
 {
 	INITIALIZE_DEBUGGING_OUTPUT_FILE("/boot/home/Desktop/udf_debug.txt");
-	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("deviceName: `%s'", deviceName));
+	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("name: `%s'", name));
 
 	status_t err = B_OK;
+	char *deviceName = (char*)name;
+	off_t deviceOffset = 0;
 	off_t deviceSize = 0;	// in blocks
 	Udf::Volume *volume = NULL;
+	partition_info info;
 	device_geometry geometry;
 
-	// Open the device (read only should be fine), get its geometry,
-	// and calculate its length. 
-	int device = open(deviceName, O_RDONLY);
+	// Here we need to figure out the length of the device, and if we're
+	// attempting to open a multisession volume, we need to figure out the
+	// offset into the raw disk at which the volume begins, then open the
+	// the raw volume itself instead of the fake partition device the
+	// kernel gives us, since multisession UDF volumes are allowed to access
+	// the data in their own partition, as well as the data in any partitions
+	// that precede them physically on the disc. 
+	int device = open(name, O_RDONLY);
 	err = device < B_OK ? device : B_OK;
 	if (!err) {
-		if (ioctl(device, B_GET_GEOMETRY, &geometry) == 0) {
+	
+		// First try to treat the device like a special partition device. If that's
+		// what we have, then we can use the partition_info data to figure out the
+		// name of the raw device (which we'll open instead), the offset into the
+		// raw device at which the volume of interest will begin, and the total
+		// length from the beginning of the raw device that we're allowed to access.
+		//
+		// If that fails, then we try to treat the device as an actual raw device,
+		// and see if we can get the device size with B_GET_GEOMETRY syscall, since
+		// stat()ing a raw device appears to not work.
+		//
+		// Finally, if that also fails, we're probably stuck with trying to mount
+		// a regular file, so we just stat() it to get the device size.
+		//
+		// If that fails, you're just SOL. 
+		
+		if (ioctl(device, B_GET_PARTITION_INFO, &info) == 0) {
+			PRINT(("partition_info:\n"));
+			PRINT(("  offset:             %Ld\n", info.offset));
+			PRINT(("  size:               %Ld\n", info.size));
+			PRINT(("  logical_block_size: %ld\n", info.logical_block_size));
+			PRINT(("  session:            %ld\n", info.session));
+			PRINT(("  partition:          %ld\n", info.partition));
+			PRINT(("  device:             `%s'\n", info.device));
+			deviceName = info.device;
+			deviceOffset = info.offset / info.logical_block_size;
+			deviceSize = deviceOffset + info.size / info.logical_block_size;
+		} else if (ioctl(device, B_GET_GEOMETRY, &geometry) == 0) {
+			PRINT(("geometry_info:\n"));
+			PRINT(("  sectors_per_track: %ld\n", geometry.sectors_per_track));
+			PRINT(("  cylinder_count:    %ld\n", geometry.cylinder_count));
+			PRINT(("  head_count:        %ld\n", geometry.head_count));
+			deviceOffset = 0;
 			deviceSize = (off_t)geometry.sectors_per_track
 				* geometry.cylinder_count * geometry.head_count;
 		} else {
 			struct stat stat;
 			err = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
 			if (!err) {
+				PRINT(("stat_info:\n"));
+				PRINT(("  st_size: %Ld\n", stat.st_size));
+				deviceOffset = 0;
 				deviceSize = stat.st_size / 2048;
 			}
 		}
@@ -270,7 +313,7 @@ udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 		err = volume ? B_OK : B_NO_MEMORY;
 	}
 	if (!err) {
-		err = volume->Mount(deviceName, 0, deviceSize, flags, 2048);
+		err = volume->Mount(deviceName, deviceOffset, deviceSize, flags, 2048);
 	}
 		
 	if (!err) {
@@ -350,7 +393,7 @@ udf_sync(void *ns)
 int
 udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 {
-	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("id: %lld, reenter: %s", id, (reenter ? "true" : "false")));
+	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("id: %Ld, reenter: %s", id, (reenter ? "true" : "false")));
 	
 	if (!ns)
 		RETURN(B_BAD_VALUE);
@@ -434,7 +477,7 @@ udf_walk(void *ns, void *_dir, const char *filename, char **resolvedPath, vnode_
 			err = get_vnode(volume->Id(), *vnodeId, reinterpret_cast<void**>(&icb));
 		}
 	}
-	PRINT(("vnodeId: %lld\n", *vnodeId));
+	PRINT(("vnodeId: %Ld\n", *vnodeId));
 
 	
 	RETURN(err);		
