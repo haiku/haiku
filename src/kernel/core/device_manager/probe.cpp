@@ -58,6 +58,7 @@ const char *pnp_registration_dirs[2] = {
 static const char *kModulePaths[] = {
 	COMMON_MODULES_DIR,
 	"/boot/beos/system/add-ons/kernel",//SYSTEM_MODULES_DIR,
+	"/boot",	// ToDo: this is for the bootfs boot - to be removed
 	NULL
 };
 
