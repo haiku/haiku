@@ -15,6 +15,7 @@
 #include <scsi.h>
 
 #include <fsproto.h>
+#include <fs_volume.h>
 #include <lock.h>
 #include <cache.h>
 
