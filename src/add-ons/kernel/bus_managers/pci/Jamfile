@@ -1,18 +1,21 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci ;
 
 KernelStaticLibrary pci_bus_manager :
-pci.c
-;
+	pci.c
+	;
 
 KernelLd pci :
-pci_bus_manager.a
-pci_arch_$(OBOS_ARCH)_bus_manager.a
-kernel.so
-
-: $(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
-: -Bdynamic -shared
-:
-# : add-ons/kernel/bus_managers/pci
-;
+	pci_bus_manager.a
+	pci_arch_$(OBOS_ARCH)_bus_manager.a
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+#	add-ons/kernel/bus_managers/pci
+	addons/kernel/pci
+	;
 
 SubInclude OBOS_TOP src add-ons kernel bus_managers pci arch $(OBOS_ARCH) ;
