@@ -13,6 +13,7 @@
 
 #include "openfirmware.h"
 #include "console.h"
+#include "machine.h"
 
 
 #define HEAP_SIZE 32768
@@ -26,6 +27,8 @@ extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
 extern uint8 __bss_start;
 extern uint8 _end;
+
+uint32 gMachine;
 
 
 static void
@@ -43,6 +46,34 @@ static void
 clear_bss(void)
 {
 	memset(&__bss_start, 0, &_end - &__bss_start);
+}
+
+
+static void 
+determine_machine(void)
+{
+	int root = of_finddevice("/");
+	char buffer[64];
+	int length;
+	if ((length = of_getprop(root, "device_type", buffer, sizeof(buffer) - 1)) == OF_FAILED)
+		return;
+	buffer[length] = '\0';
+
+	// ToDo: add more, and be as generic as possible
+
+	gMachine = MACHINE_UNKNOWN;
+
+	if (!strcasecmp("chrp", buffer))
+		gMachine = MACHINE_CHRP;
+	else if (!strcasecmp("bootrom", buffer))
+		gMachine = MACHINE_MAC;
+
+	if ((length = of_getprop(root, "model", buffer, sizeof(buffer) - 1)) == OF_FAILED)
+		return;
+	buffer[length] = '\0';
+
+	if (!strcasecmp("pegasos", buffer))
+		gMachine |= MACHINE_PEGASOS;
 }
 
 
@@ -68,8 +99,15 @@ start(void *openFirmwareEntry)
 	args.heap_size = HEAP_SIZE;
 
 	of_init(openFirmwareEntry);
+
+	determine_machine();
 	console_init();
+
+	// Initialize and take over MMU and set the OpenFirmware callbacks - it 
+	// will ask us for memory after that instead of maintaining it itself
+	// (the kernel will need to adjust the callback later on as well)
 	arch_mmu_init();
+	arch_set_callback();
 
 	main(&args);
 		// if everything wents fine, main() never returns
