@@ -56,6 +56,8 @@ public:
 	void SetHotSpot(BPoint pt);
 	const char *GetAppSignature(void) { return fAppSignature.String(); }
 	void SetAppSignature(const char *signature);
+	void SetOwningTeam(team_id tid) { fOwningTeam=tid; }
+	team_id OwningTeam(void) const { return fOwningTeam; }
 	
 	//! Returns the cursor's ID
 	int32 ID(void) { return fToken; }
@@ -63,6 +65,7 @@ private:
 	friend class CursorManager;
 	
 	BPoint fHotSpot;
+	team_id fOwningTeam;
 	BString fAppSignature;
 };
 
