@@ -30,7 +30,7 @@ static void pinsnv30_arch_fake(void);
 static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30_40(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
-static status_t pins3_6_read(uint8 *rom, uint32 offset);
+static status_t pins3_5_read(uint8 *rom, uint32 offset);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
 static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
@@ -97,7 +97,8 @@ status_t parse_pins ()
 	LOG(2,("INFO: PINS checksum is OK; PINS version is %d.%d\n",
 		rom[offset + 5], rom[offset + 6]));
 
-	/* fill out the si->ps struct as far as is possible */
+	/* update the si->ps struct as far as is possible and coldstart card */
+	//fixme: NV40 and up(?) nolonger use this system...
 	switch (rom[offset + 5])
 	{
 	case 2:
@@ -106,8 +107,7 @@ status_t parse_pins ()
 	case 3:
 	case 4:
 	case 5:
-	case 6:
-		result = pins3_6_read(rom, offset);
+		result = pins3_5_read(rom, offset);
 		break;
 	default:
 		LOG(8,("INFO: unknown PINS version\n"));
@@ -148,7 +148,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	return coldstart_card(rom, init1, init2, init_size, ram_tab);
 }
 
-static status_t pins3_6_read(uint8 *rom, uint32 offset)
+static status_t pins3_5_read(uint8 *rom, uint32 offset)
 {
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
@@ -166,33 +166,12 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
 
-	//fixme: extract RAM and core speeds from startscripts..
-	//fixme: add 'parsing scripts while not actually executing' as warmstart method,
-	//       instead of not parsing at all: this will update the driver's speeds
-	//       as below, while logging the scripts as well (for our learning pleasure :)
-
-	/* pins 5.16 and higher is more extensive, and works differently from before */
-	if (((rom[offset + 5]) >= 5) && ((rom[offset + 6]) >= 0x10))
+	/* pins 5.06 and higher has VCO range info */
+	if (((rom[offset + 5]) == 5) && ((rom[offset + 6]) >= 0x06))
 	{
-		uint32 fvco_min, fvco_max;
-
-		/* pins 5.16 and up have a more extensive command list table, and have more
-		 * commands to choose from as well. */
-		//fixme: how about pins 6???
-		PinsTables tabs;
-		tabs.InitScriptTablePtr = rom[offset + 75] + (rom[offset + 76] * 256);
-		tabs.MacroIndexTablePtr = rom[offset + 77] + (rom[offset + 78] * 256);
-		tabs.MacroTablePtr = rom[offset + 79] + (rom[offset + 80] * 256);
-		tabs.ConditionTablePtr = rom[offset + 81] + (rom[offset + 82] * 256);
-		tabs.IOConditionTablePtr = rom[offset + 83] + (rom[offset + 84] * 256);
-		tabs.IOFlagConditionTablePtr = rom[offset + 85] + (rom[offset + 86] * 256);
-		tabs.InitFunctionTablePtr = rom[offset + 87] + (rom[offset + 88] * 256);
-
-		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
-
 		/* get PLL VCO range info */
-		fvco_max = *((uint32*)(&(rom[offset + 67])));
-		fvco_min = *((uint32*)(&(rom[offset + 71])));
+		uint32 fvco_max = *((uint32*)(&(rom[offset + 67])));
+		uint32 fvco_min = *((uint32*)(&(rom[offset + 71])));
 
 		LOG(8,("INFO: PLL VCO range is %dkHz - %dkHz\n", fvco_min, fvco_max));
 
@@ -204,6 +183,28 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		//si->ps.max_pixel_vco = fvco_max / 1000;
 		//si->ps.min_video_vco = fvco_min / 1000;
 		//si->ps.max_video_vco = fvco_max / 1000;
+	}
+
+	//fixme: extract RAM and core speeds from startscripts..
+	//fixme: add 'parsing scripts while not actually executing' as warmstart method,
+	//       instead of not parsing at all: this will update the driver's speeds
+	//       as below, while logging the scripts as well (for our learning pleasure :)
+
+	/* pins 5.16 and higher is more extensive, and works differently from before */
+	if (((rom[offset + 5]) == 5) && ((rom[offset + 6]) >= 0x10))
+	{
+		/* pins 5.16 and up have a more extensive command list table, and have more
+		 * commands to choose from as well. */
+		PinsTables tabs;
+		tabs.InitScriptTablePtr = rom[offset + 75] + (rom[offset + 76] * 256);
+		tabs.MacroIndexTablePtr = rom[offset + 77] + (rom[offset + 78] * 256);
+		tabs.MacroTablePtr = rom[offset + 79] + (rom[offset + 80] * 256);
+		tabs.ConditionTablePtr = rom[offset + 81] + (rom[offset + 82] * 256);
+		tabs.IOConditionTablePtr = rom[offset + 83] + (rom[offset + 84] * 256);
+		tabs.IOFlagConditionTablePtr = rom[offset + 85] + (rom[offset + 86] * 256);
+		tabs.InitFunctionTablePtr = rom[offset + 87] + (rom[offset + 88] * 256);
+
+		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
 
 		return coldstart_card_516_up(rom, tabs, ram_tab);
 	}
