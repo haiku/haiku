@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src data etc timezones ;
 
+NotFile timezone_files ;
+Depends files : timezone_files ;
+
 rule MkZicComp
 {
 	local binaries = $(1) ;
@@ -9,7 +12,7 @@ rule MkZicComp
 	
 	MakeLocate $(binaries) : [ FDirName $(OBOS_ETC_DIR) timezones ] ;
 	
-	LocalDepends files : $(binaries) ;
+	LocalDepends timezone_files : $(binaries) ;
 	Depends $(binaries) : $(source) zic ;
 	
 	MkZicComp1 $(binaries) : zic $(source) "" ;
