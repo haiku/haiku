@@ -24,8 +24,9 @@ static const char *kTrackerSig = "application/x-vnd.Be-TRAK";
 int usage(int ret)
 {
 	printf("\nSend files to trash, or restore them.\nUsage:\n");
-	printf("trash [--empty] file ...\n");
+	printf("trash [--empty|--list] file ...\n");
 	printf("\t--empty\tempty the Trash\n");
+	printf("\t--list\tlist what's already in the Trash\n");
 	printf("untrash [--all] [file ...]\n");
 	//printf("restore [--all] [file ...]\n");
 	return ret;
@@ -103,13 +104,56 @@ status_t trash(const char *f)
 	return 0;
 }
 
+status_t show_trashed_file(const char *f)
+{
+	status_t err;
+	char original_path[B_PATH_NAME_LENGTH];
+	BPath path(f);
+	BNode node(f);
+	err = node.ReadAttr(kAttrOriginalPath, B_STRING_TYPE, 0LL, original_path, B_PATH_NAME_LENGTH);
+	if (err < 0)
+		return 0;
+	//printf("%s\n\t[from] %s\n", f, original_path);
+	printf("%s\n\tas: %s\n", original_path, f);
+	return 0;
+}
+
+status_t foreach_in_trash(status_t (*iterator)(const char *))
+{
+	status_t err;
+	dev_t dev;
+	char trash_dir[B_PATH_NAME_LENGTH];
+	for (dev = 0; ; ) {
+		if (next_dev(&dev) < B_OK)
+			break;
+		//for each in trash_dir
+		err = find_directory(B_TRASH_DIRECTORY, dev, false, trash_dir, B_PATH_NAME_LENGTH);
+		if (err)
+			continue; /* skip trashless volumes */
+		BDirectory trashDir(trash_dir);
+		err = trashDir.InitCheck();
+		if (err < 0)
+			return err;
+		entry_ref er;
+		while (trashDir.GetNextRef(&er) == B_OK) {
+			BPath path(&er);
+			if ((err = path.InitCheck()))
+				return err;
+			err = iterator(path.Path());
+			if (err)
+				return err;
+		}
+	}
+	return B_OK;
+}
+
+
 int main(int argc, char **argv)
 {
 	int dountrash = 0;
 	int i;
 	int err = 0;
 	int fd;
-	char trash_dir[B_PATH_NAME_LENGTH];
 	if (strstr(argv[0], "untrash") || strstr(argv[0], "restore"))
 		dountrash = 1;
 	if (argc < 2)
@@ -130,10 +174,15 @@ int main(int argc, char **argv)
 	}
 	if (dountrash && !strcmp(argv[1], "--all")) {
 		/* restore all trashed files */
-		//for each in all volumes
-		
-			//for each in trash_dir
-			
+		err = foreach_in_trash(untrash);
+		if (err) {
+			fprintf(stderr, "untrash: %s\n", strerror(err));
+			return 1;
+		}
+		return 0;
+	}
+	if (!strcmp(argv[1], "--list")) {
+		err = foreach_in_trash(show_trashed_file);
 		return 0;
 	}
 	/* restore files... */
