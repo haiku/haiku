@@ -2157,7 +2157,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 					address, fault_address);
 			}
 		} else {
-			dprintf("vm_page_fault: killing team 0x%lx\n", thread_get_current_thread()->team->id);
+			dprintf("vm_page_fault: killing team 0x%lx, ip 0x%lx\n", thread_get_current_thread()->team->id, fault_address);
 			kill_team(team_get_current_team_id());
 		}
 	}
@@ -2167,7 +2167,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 
 
 static int
-vm_soft_fault(addr_t address, bool is_write, bool is_user)
+vm_soft_fault(addr_t originalAddress, bool is_write, bool is_user)
 {
 	vm_address_space *aspace;
 	vm_virtual_map *map;
@@ -2178,13 +2178,14 @@ vm_soft_fault(addr_t address, bool is_write, bool is_user)
 	off_t cache_offset;
 	vm_page dummy_page;
 	vm_page *page = NULL;
+	addr_t address;
 	int change_count;
 	int err;
 
 //	dprintf("vm_soft_fault: thid 0x%x address 0x%x, is_write %d, is_user %d\n",
 //		thread_get_current_thread_id(), address, is_write, is_user);
 
-	address = ROUNDOWN(address, PAGE_SIZE);
+	address = ROUNDOWN(originalAddress, PAGE_SIZE);
 
 	if (IS_KERNEL_ADDRESS(address)) {
 		aspace = vm_get_kernel_aspace();
@@ -2212,7 +2213,7 @@ vm_soft_fault(addr_t address, bool is_write, bool is_user)
 	if (region == NULL) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("vm_soft_fault: va 0x%lx not covered by region in address space\n", address);
+		dprintf("vm_soft_fault: va 0x%lx not covered by region in address space\n", originalAddress);
 		return ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
 	}
 
@@ -2226,7 +2227,7 @@ vm_soft_fault(addr_t address, bool is_write, bool is_user)
 	if (is_write && (region->lock & (B_WRITE_AREA | (is_user ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("write access attempted on read-only region 0x%lx at %p\n", region->id, (void *)address);
+		dprintf("write access attempted on read-only region 0x%lx at %p\n", region->id, (void *)originalAddress);
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
 
