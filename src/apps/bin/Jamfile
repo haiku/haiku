@@ -12,6 +12,7 @@ StdBinCommands
 		yes.cpp
 		version.cpp
 		listattr.cpp
+		setversion.cpp
 	: be ;
 
 StdBinCommands
@@ -33,6 +34,7 @@ StdBinCommands
 	renice.c
 	rescan.c
 	unchop.c
+	unmount.c
 	waitfor.c
 	whoami.c
 ;
