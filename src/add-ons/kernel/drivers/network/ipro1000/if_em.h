@@ -196,18 +196,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define PCI_ANY_ID                      (~0U)
 #define ETHER_ALIGN                     2
 
-/* Defines for printing debug information */
-
-#define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  dprintf("ipro1000: " S "\n")
-#define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  dprintf("ipro1000: " S "\n", A)
-#define INIT_DEBUGOUT2(S, A, B)     if (DEBUG_INIT)  dprintf("ipro1000: " S "\n", A, B)
-#define IOCTL_DEBUGOUT(S)           if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n")
-#define IOCTL_DEBUGOUT1(S, A)       if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n", A)
-#define IOCTL_DEBUGOUT2(S, A, B)    if (DEBUG_IOCTL) dprintf("ipro1000: " S "\n", A, B)
-#define HW_DEBUGOUT(S)              if (DEBUG_HW) dprintf("ipro1000: " S "\n")
-#define HW_DEBUGOUT1(S, A)          if (DEBUG_HW) dprintf("ipro1000: " S "\n", A)
-#define HW_DEBUGOUT2(S, A, B)       if (DEBUG_HW) dprintf("ipro1000: " S "\n", A, B)
-
 
 /* Supported RX Buffer Sizes */
 #define EM_RXBUFFER_2048        2048
@@ -341,11 +329,11 @@ struct adapter {
 	boolean_t pcix_82544;
 	boolean_t in_detach;
 
-#ifdef DBG_STATS
+#if DEBUG_DISPLAY_STATS
 	unsigned long   no_pkts_avail;
 	unsigned long   clean_tx_interrupts;
-
 #endif
+
 	struct em_hw_stats stats;
 };
 

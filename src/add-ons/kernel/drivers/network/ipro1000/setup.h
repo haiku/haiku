@@ -19,10 +19,10 @@
 #ifndef __SETUP_H
 #define __SETUP_H
 
-#define VERSION "0.2"
+#define VERSION "0.3"
 
-#define INFO1 "ipro1000: Intel PRO/1000 Family Driver. Version " VERSION " Build " __DATE__ " "__TIME__
-#define INFO2 "ipro1000: Copyright (c) 2001-2003, Intel Corporation. All rights reserved."
-#define INFO3 "ipro1000: Copyright (c) 2004 Marcus Overhagen. All rights reserved."
+#define INFO1 "Intel PRO/1000 Family Driver. Version " VERSION " Build " __DATE__ " "__TIME__
+#define INFO2 "Copyright (c) 2001-2003, Intel Corporation. All rights reserved."
+#define INFO3 "Copyright (c) 2004 Marcus Overhagen. All rights reserved."
 
 #endif

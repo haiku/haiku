@@ -94,7 +94,7 @@ ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr)
 {
 	ipro1000_device *dev = ifp->if_softc->dev;
 
-	TRACE("ether_ifattach\n");
+	INIT_DEBUGOUT("ether_ifattach");
 
 	memcpy(dev->macaddr, etheraddr, 6);
 	
@@ -103,15 +103,15 @@ ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr)
 	ifp->if_rcv_sem = create_sem(0, "ifp->if_rcv_sem");
 	set_sem_owner(ifp->if_rcv_sem, B_SYSTEM_TEAM);
 	
-	TRACE("calling if_init...\n");
+	INIT_DEBUGOUT("calling if_init...");
 	ifp->if_init(ifp->if_softc);
-	TRACE("done calling if_init!\n");
+	INIT_DEBUGOUT("done calling if_init!");
 }
 
 void
 ether_ifdetach(struct ifnet *ifp)
 {
-	TRACE("ether_ifdetach\n");
+	INIT_DEBUGOUT("ether_ifdetach");
 
 	delete_sem(ifp->if_rcv_sem);
 }

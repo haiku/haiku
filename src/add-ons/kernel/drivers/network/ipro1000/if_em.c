@@ -33,14 +33,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /*$FreeBSD: /repoman/r/ncvs/src/sys/dev/em/if_em.c,v 1.2.2.19 2004/04/22 22:03:26 ru Exp $*/
 
+#include "debug.h"
 #include "if_em.h"
 #include "util.h"
 
-
-/*********************************************************************
- *  Set this to one to display debug statistics                                                   
- *********************************************************************/
-int em_display_debug_stats = DEBUG_TRACE_STATS;
 
 /*********************************************************************
  *  Function prototypes            
@@ -56,8 +52,8 @@ static int  em_ioctl(struct ifnet *, u_long, caddr_t);
 static void em_watchdog(struct ifnet *);
 static void em_init(void *);
 static void em_stop(void *);
-static void em_media_status(struct ifnet *, struct ifmediareq *);
-static int  em_media_change(struct ifnet *);
+//static void em_media_status(struct ifnet *, struct ifmediareq *);
+//static int  em_media_change(struct ifnet *);
 static void em_identify_hardware(struct adapter *);
 static int  em_allocate_pci_resources(struct adapter *);
 static void em_free_pci_resources(struct adapter *);
@@ -100,12 +96,12 @@ static int  em_82547_tx_fifo_reset(struct adapter *);
 static void em_82547_move_tail(void *arg);
 static void em_print_debug_info(struct adapter *);
 static int  em_is_valid_ether_addr(u_int8_t *);
-static int  em_sysctl_stats(SYSCTL_HANDLER_ARGS);
-static int  em_sysctl_debug_info(SYSCTL_HANDLER_ARGS);
+//static int  em_sysctl_stats(SYSCTL_HANDLER_ARGS);
+//static int  em_sysctl_debug_info(SYSCTL_HANDLER_ARGS);
 static u_int32_t em_fill_descriptors (u_int64_t address, 
                               u_int32_t length, 
                               PDESC_ARRAY desc_array);
-static int  em_sysctl_int_delay(SYSCTL_HANDLER_ARGS);
+//static int  em_sysctl_int_delay(SYSCTL_HANDLER_ARGS);
 static void em_add_int_delay_sysctl(struct adapter *, const char *,
                                     const char *, struct em_int_delay_info *,
                                     int, int); 
@@ -163,7 +159,7 @@ em_attach(device_t dev)
 
 	/* Allocate, clear, and link in our adapter structure */
 	if (!(adapter = device_get_softc(dev))) {
-		dprintf("ipro1000: adapter structure allocation failed\n");
+		ERROROUT("adapter structure allocation failed");
 		splx(s);
 		return(ENOMEM);
 	}
@@ -452,7 +448,7 @@ em_detach(device_t dev)
 static int
 start_event_thread(struct adapter *adapter)
 {
-	TRACE("start_event_thread enter\n");
+	INIT_DEBUGOUT("start_event_thread enter");
 
 	adapter->event_thread = spawn_kernel_thread(event_handler, "ipro1000 event", 80, adapter);
 	adapter->event_flags = 0;
@@ -461,16 +457,16 @@ start_event_thread(struct adapter *adapter)
 	
 	if (adapter->event_thread >= 0 && adapter->event_sem >= 0) {
 		resume_thread(adapter->event_thread);
-		TRACE("start_event_thread leave\n");
+		INIT_DEBUGOUT("start_event_thread leave");
 		return 0;
 	}
 
-	TRACE("start_event_thread failed\n");
+	ERROROUT("start_event_thread failed");
 
 	delete_sem(adapter->event_sem);
 	kill_thread(adapter->event_thread);
 
-	TRACE("start_event_thread leave\n");
+	INIT_DEBUGOUT("start_event_thread leave");
 	return -1;
 }
 
@@ -479,14 +475,14 @@ stop_event_thread(struct adapter *adapter)
 {
 	status_t thread_return_value;
 	
-	TRACE("stop_event_thread enter\n");
+	INIT_DEBUGOUT("stop_event_thread enter");
 	
 	delete_sem(adapter->event_sem);
 	wait_for_thread(adapter->event_thread, &thread_return_value);	
 	adapter->event_thread = -1;
 	adapter->event_sem = -1;
 
-	TRACE("stop_event_thread leave\n");
+	INIT_DEBUGOUT("stop_event_thread leave");
 }
 
 
@@ -617,7 +613,7 @@ em_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 		}
 		break;
 	default:
-		IOCTL_DEBUGOUT1("ioctl received: UNKNOWN (0x%x)\n", (int)command);
+		IOCTL_DEBUGOUT1("ioctl received: UNKNOWN (0x%x)", (int)command);
 		error = EINVAL;
 	}
 
@@ -808,7 +804,7 @@ event_handler(void *cookie)
 		atomic_and(&adapter->event_flags, ~events);	 // and clear
 
 		if (events & EVENT_LINK_CHANGED) {
-			TRACE("EVENT_LINK_CHANGED\n");
+			INIT_DEBUGOUT("EVENT_LINK_CHANGED");
 			untimeout(em_local_timer, adapter, adapter->timer_handle);
 			adapter->hw.get_link_status = 1;
 			em_check_for_link(&adapter->hw);
@@ -820,7 +816,7 @@ event_handler(void *cookie)
 }
 
 
-
+#if 0
 /*********************************************************************
  *
  *  Media Ioctl callback
@@ -948,6 +944,7 @@ em_media_change(struct ifnet *ifp)
 
 	return(0);
 }
+#endif // #if 0
 
 #define EM_FIFO_HDR              0x10
 #define EM_82547_PKT_THRESH      0x3e0
@@ -1292,7 +1289,7 @@ em_set_multi(struct adapter * adapter)
         u_int8_t  mta[MAX_NUM_MULTICAST_ADDRESSES * ETH_LENGTH_OF_ADDRESS];
         struct ifmultiaddr  *ifma;
         int mcnt = 0;
-        struct ifnet   *ifp = &adapter->interface_data.ac_if;
+//        struct ifnet   *ifp = &adapter->interface_data.ac_if;
     
         IOCTL_DEBUGOUT("em_set_multi: begin");
  
@@ -1362,7 +1359,7 @@ em_local_timer(void *arg)
 	em_check_for_link(&adapter->hw);
 	em_print_link_status(adapter);
 	em_update_stats_counters(adapter);   
-	if (em_display_debug_stats && ifp->if_flags & IFF_RUNNING) {
+	if (DEBUG_DISPLAY_STATS && ifp->if_flags & IFF_RUNNING) {
 		em_print_hw_stats(adapter);
 		em_print_debug_info(adapter);
 	}
@@ -1842,7 +1839,7 @@ em_initialize_transmit_unit(struct adapter * adapter)
 	E1000_WRITE_REG(&adapter->hw, TDT, 0);
 
 
-	HW_DEBUGOUT2("Base = %lx, Length = %lx\n", 
+	HW_DEBUGOUT2("Base = %lx, Length = %lx", 
 		     E1000_READ_REG(&adapter->hw, TDBAL),
 		     E1000_READ_REG(&adapter->hw, TDLEN));
 
@@ -2022,7 +2019,7 @@ em_clean_transmit_interrupts(struct adapter * adapter)
                 return;
 
         s = splimp();
-#ifdef DBG_STATS
+#if DEBUG_DISPLAY_STATS
         adapter->clean_tx_interrupts++;
 #endif
         num_avail = adapter->num_tx_desc_avail;	
@@ -2315,7 +2312,7 @@ em_process_receive_interrupts(struct adapter * adapter, int count)
         current_desc = &adapter->rx_desc_base[i];
 
 	if (!((current_desc->status) & E1000_RXD_STAT_DD)) {
-#ifdef DBG_STATS
+#if DEBUG_DISPLAY_STATS
 		adapter->no_pkts_avail++;
 #endif
 		return;
@@ -2762,7 +2759,7 @@ em_update_stats_counters(struct adapter *adapter)
 
 /**********************************************************************
  *
- *  This routine is called only when em_display_debug_stats is enabled.
+ *  This routine is called only when DEBUG_DISPLAY_STATS is enabled.
  *  This routine provides a way to take a look at important statistics
  *  maintained by the driver and hardware.
  *
@@ -2770,6 +2767,7 @@ em_update_stats_counters(struct adapter *adapter)
 static void
 em_print_debug_info(struct adapter *adapter)
 {
+#if DEBUG_DISPLAY_STATS
 	int unit = adapter->unit;
 	uint8_t *hw_addr = adapter->hw.hw_addr;
 
@@ -2780,12 +2778,10 @@ em_print_debug_info(struct adapter *adapter)
 	dprintf("ipro1000/%d:rx_int_delay = %ld, rx_abs_int_delay = %ld\n", unit, 
 	       E1000_READ_REG(&adapter->hw, RDTR),
 	       E1000_READ_REG(&adapter->hw, RADV));
-#ifdef DBG_STATS
 	dprintf("ipro1000/%d: Packets not Avail = %ld\n", unit, 
 	       adapter->no_pkts_avail);
 	dprintf("ipro1000/%d: CleanTxInterrupts = %ld\n", unit, 
 	       adapter->clean_tx_interrupts);
-#endif
 	snooze(10000); // give syslog reader some time to catchup
 	dprintf("ipro1000/%d: fifo workaround = %Ld, fifo_reset = %Ld\n", unit, 
 	       (long long)adapter->tx_fifo_wrk, 
@@ -2806,13 +2802,13 @@ em_print_debug_info(struct adapter *adapter)
 	dprintf("ipro1000/%d: Driver dropped packets = %ld\n", unit, 
 	       adapter->dropped_pkts);
 	snooze(10000); // give syslog reader some time to catchup
-
-	return;
+#endif
 }
 
 static void
 em_print_hw_stats(struct adapter *adapter)
 {
+#if DEBUG_DISPLAY_STATS
 	int unit = adapter->unit;
 
 	dprintf("ipro1000/%d: Excessive collisions = %Ld\n", unit,
@@ -2855,8 +2851,7 @@ em_print_hw_stats(struct adapter *adapter)
 	       (long long)adapter->stats.gprc);
 	dprintf("ipro1000/%d: Good Packets Xmtd = %Ld\n", unit,
 	       (long long)adapter->stats.gptc);
-
-	return;
+#endif
 }
 
 #if 0

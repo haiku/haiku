@@ -24,8 +24,6 @@
 #include <string.h>
 #include <driver_settings.h>
 
-//#define DEBUG
-
 #include "debug.h"
 #include "device.h"
 #include "driver.h"
@@ -72,14 +70,14 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	int dev_id;
 	int mask;
 	
-	TRACE("ipro1000_open()\n");
+	DEVICE_DEBUGOUT("ipro1000_open()");
 
 	for (dev_id = 0; (deviceName = gDevNameList[dev_id]) != NULL; dev_id++) {
 		if (!strcmp(name, deviceName))
 			break;
 	}		
 	if (deviceName == NULL) {
-		ERROR("invalid device name");
+		ERROROUT("invalid device name");
 		return B_ERROR;
 	}
 	
@@ -110,7 +108,7 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	ipro1000_read_settings(device);
 
 	if (em_attach(device) != 0) {
-		TRACE("em_attach failed\n");
+		DEVICE_DEBUGOUT("em_attach failed");
 		goto err;
 	}
 	
@@ -128,7 +126,7 @@ ipro1000_close(void* cookie)
 {
 	ipro1000_device *device = (ipro1000_device *)cookie;
 	struct ifnet *ifp = &device->adapter->interface_data.ac_if;
-	TRACE("ipro1000_close()\n");
+	DEVICE_DEBUGOUT("ipro1000_close()");
 	
 	device->closed = true;
 	release_sem(ifp->if_rcv_sem);
@@ -141,10 +139,10 @@ status_t
 ipro1000_free(void* cookie)
 {
 	ipro1000_device *device = (ipro1000_device *)cookie;
-	TRACE("ipro1000_free()\n");
+	DEVICE_DEBUGOUT("ipro1000_free()");
 
 	if (em_detach(device) != 0) {
-		TRACE("em_detach failed\n");
+		DEVICE_DEBUGOUT("em_detach failed");
 	}
 
 	free(device);
@@ -162,31 +160,31 @@ ipro1000_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 	status_t stat;
 	int len;
 	
-//	TRACE("ipro1000_read() enter\n");
+//	DEVICE_DEBUGOUT("ipro1000_read() enter");
 	
 	if (device->closed) {
-		TRACE("ipro1000_read() interrupted 1\n");
+		DEVICE_DEBUGOUT("ipro1000_read() interrupted 1");
 		return B_INTERRUPTED;
 	}
 retry:
 	stat = acquire_sem_etc(ifp->if_rcv_sem, 1, B_CAN_INTERRUPT | (device->nonblocking ? B_TIMEOUT : 0), 0);
 	if (device->closed) {
-		// TRACE("ipro1000_read() interrupted 2\n"); // net_server will crash if we print this (race condition in net_server?)
+		// DEVICE_DEBUGOUT("ipro1000_read() interrupted 2"); // net_server will crash if we print this (race condition in net_server?)
 		return B_INTERRUPTED;
 	}
 	if (stat == B_WOULD_BLOCK) {
-		TRACE("ipro1000_read() would block (OK 0 bytes)\n");
+		DEVICE_DEBUGOUT("ipro1000_read() would block (OK 0 bytes)");
 		*num_bytes = 0;
 		return B_OK;
 	}
 	if (stat != B_OK) {
-		TRACE("ipro1000_read() error\n");
+		DEVICE_DEBUGOUT("ipro1000_read() error");
 		return B_ERROR;
 	}
 	
 	IF_DEQUEUE(&ifp->if_rcv, mb);
 	if (!mb) {
-		ERROR("ipro1000_read() mbuf not ready\n");
+		ERROROUT("ipro1000_read() mbuf not ready");
 		goto retry;
 	}
 	
@@ -201,7 +199,7 @@ retry:
 	
 	m_freem(mb);
 	
-//	TRACE("ipro1000_read() leave, %d bytes\n", len);
+//	DEVICE_DEBUGOUT1("ipro1000_read() leave, %d bytes", len);
 	return B_OK;
 }
 
@@ -214,7 +212,7 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 	struct ifnet *ifp = &device->adapter->interface_data.ac_if;
 	struct mbuf *mb;
 	
-//	TRACE("ipro1000_write() enter\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() enter");
 
 	// allocate mbuf	
 	for (;;) {
@@ -226,7 +224,7 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 			return B_INTERRUPTED;
 	}
 
-//	TRACE("ipro1000_write() 1\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() 1");
 
 	// allocate memory
 	for (;;) {
@@ -240,7 +238,7 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 		}
 	}
 
-//	TRACE("ipro1000_write() 2\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() 2");
 
 	// copy data
 	mb->m_len = *num_bytes;
@@ -248,12 +246,12 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 		mb->m_len = MCLBYTES;
 	memcpy(mtod(mb, uint8 *), buffer, mb->m_len);
 
-//	TRACE("ipro1000_write() 3\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() 3");
 
 	// add mbuf to send queue
 	IF_APPEND(&ifp->if_snd, mb);
 
-//	TRACE("ipro1000_write() 4\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() 4");
 
 	// wait for output available
 	while (ifp->if_flags & IFF_OACTIVE) {
@@ -262,7 +260,7 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 			return B_INTERRUPTED;
 	}
 
-//	TRACE("ipro1000_write() 5\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() 5");
 	
 	// send everything (if still required)
 	if (ifp->if_snd.ifq_head != NULL)
@@ -280,9 +278,9 @@ ipro1000_write(void* cookie, off_t position, const void* buffer, size_t* num_byt
 //	t = system_time() - t;
 	
 //	if (t > 20)
-//		TRACE("write %Ld\n", t);
+//		DEVICE_DEBUGOUT("write %Ld", t);
 
-//	TRACE("ipro1000_write() finished\n");
+//	DEVICE_DEBUGOUT("ipro1000_write() finished");
 	
 	return B_OK;
 }
@@ -295,47 +293,47 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 
 	switch (op) {
 		case ETHER_INIT:
-			TRACE("ipro1000_control() ETHER_INIT\n");
+			DEVICE_DEBUGOUT("ipro1000_control() ETHER_INIT");
 			return B_OK;
 		
 		case ETHER_GETADDR:
-			TRACE("ipro1000_control() ETHER_GETADDR\n");
+			DEVICE_DEBUGOUT("ipro1000_control() ETHER_GETADDR");
 			memcpy(arg, &device->macaddr, sizeof(device->macaddr));
 			return B_OK;
 			
 		case ETHER_NONBLOCK:
 			if (*(int32 *)arg) {
-				TRACE("non blocking mode on\n");
+				DEVICE_DEBUGOUT("non blocking mode on");
 				device->nonblocking = true;
 			} else {
-				TRACE("non blocking mode off\n");
+				DEVICE_DEBUGOUT("non blocking mode off");
 				device->nonblocking = false;
 			}
 			return B_OK;
 
 		case ETHER_ADDMULTI:
-			TRACE("ipro1000_control() ETHER_ADDMULTI not supported\n");
+			DEVICE_DEBUGOUT("ipro1000_control() ETHER_ADDMULTI not supported");
 			break;
 		
 		case ETHER_REMMULTI:
-			TRACE("ipro1000_control() ETHER_REMMULTI not supported\n");
+			DEVICE_DEBUGOUT("ipro1000_control() ETHER_REMMULTI not supported");
 			return B_OK;
 		
 		case ETHER_SETPROMISC:
 			if (*(int32 *)arg) {
-				TRACE("promiscuous mode on not supported\n");
+				DEVICE_DEBUGOUT("promiscuous mode on not supported");
 			} else {
-				TRACE("promiscuous mode off\n");
+				DEVICE_DEBUGOUT("promiscuous mode off");
 			}
 			return B_OK;
 
 		case ETHER_GETFRAMESIZE:
-			TRACE("ipro1000_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)\n", device->maxframesize,  device->maxframesize - ENET_HEADER_SIZE);
+			DEVICE_DEBUGOUT2("ipro1000_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)", device->maxframesize,  device->maxframesize - ENET_HEADER_SIZE);
 			*(uint32*)arg = device->maxframesize;
 			return B_OK;
 			
 		default:
-			TRACE("ipro1000_control() Invalid command\n");
+			DEVICE_DEBUGOUT("ipro1000_control() Invalid command");
 			break;
 	}
 	

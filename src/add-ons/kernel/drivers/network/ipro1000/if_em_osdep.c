@@ -77,7 +77,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, int d, int e, int f, int g)
 		case SYS_RES_IOPORT:
 		{
 			uint32 v = pci_read_config(dev, *rid, 4) & PCI_address_io_mask;
-			TRACE("bus_alloc_resource SYS_RES_IOPORT, reg 0x%x, adr %p\n", *rid, (void *)v);
+			INIT_DEBUGOUT2("bus_alloc_resource SYS_RES_IOPORT, reg 0x%x, adr %p\n", *rid, (void *)v);
 			return (struct resource *) v;
 		}
 		
@@ -86,7 +86,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, int d, int e, int f, int g)
 			uint32 v = pci_read_config(dev, *rid, 4) & PCI_address_memory_32_mask;
 			uint32 size = 128 * 1024; // XXX get size from BAR
 			void *virt;
-			TRACE("bus_alloc_resource SYS_RES_MEMORY, reg 0x%x, adr %p\n", *rid, (void *)v);
+			INIT_DEBUGOUT2("bus_alloc_resource SYS_RES_MEMORY, reg 0x%x, adr %p\n", *rid, (void *)v);
 			if (map_mem(&virt, (void *)v, size, 0, "SYS_RES_MEMORY") < 0)
 				return 0;
 			return (struct resource *) virt;
@@ -96,14 +96,14 @@ bus_alloc_resource(device_t dev, int type, int *rid, int d, int e, int f, int g)
 		{
 			uint8 v = pci_read_config(dev, PCI_interrupt_line, 1);
 			if (v == 0 || v == 0xff) {
-				ERROR("bus_alloc_resource SYS_RES_IRQ: no irq\n");
+				ERROROUT("bus_alloc_resource SYS_RES_IRQ: no irq");
 				return 0;
 			}
 			return (struct resource *)(int)v;
 		}
 		
 		default:
-			TRACE("bus_alloc_resource default!\n");
+			INIT_DEBUGOUT("bus_alloc_resource default!\n");
 			return 0;
 	}
 }
@@ -121,7 +121,7 @@ bus_release_resource(device_t dev, int type, int reg, struct resource *res)
 			return;
 		
 		default:
-			TRACE("bus_release_resource default!\n");
+			INIT_DEBUGOUT("bus_release_resource default!\n");
 			return;
 	}
 }

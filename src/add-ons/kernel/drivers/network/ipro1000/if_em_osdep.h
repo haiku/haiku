@@ -42,28 +42,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include "driver.h"
 #include "device.h"
-#include "debug.h"
 #include "timer.h"
+#include "debug.h"
 
 #define usec_delay(x) snooze(x)
 #define msec_delay(x) snooze(1000*(x))
-
-#define MSGOUT(S, A, B)     dprintf("ipro1000: " S "\n", A, B)
-#define DEBUGFUNC(F)        DEBUGOUT(F);
-
-#if DEBUG_HW
-	#define DEBUGOUT(S)         dprintf("ipro1000: " S "\n")
-	#define DEBUGOUT1(S,A)      dprintf("ipro1000: " S "\n",A)
-	#define DEBUGOUT2(S,A,B)    dprintf("ipro1000: " S "\n",A,B)
-	#define DEBUGOUT3(S,A,B,C)  dprintf("ipro1000: " S "\n",A,B,C)
-	#define DEBUGOUT7(S,A,B,C,D,E,F,G)  dprintf("ipro1000: " S "\n",A,B,C,D,E,F,G)
-#else
-	#define DEBUGOUT(S)
-	#define DEBUGOUT1(S,A)
-	#define DEBUGOUT2(S,A,B)
-	#define DEBUGOUT3(S,A,B,C)
-	#define DEBUGOUT7(S,A,B,C,D,E,F,G)
-#endif
 
 // no longer used in FreeBSD
 #define splx(s)
@@ -144,7 +127,7 @@ static inline unsigned long vtophys(unsigned long virtual_addr)
 {
 	physical_entry pe;
 	if (get_memory_map((void *)virtual_addr, 2048, &pe, 1) < 0) {
-		TRACE("get_memory_map failed for %p\n", (void *)virtual_addr);
+		ERROROUT1("get_memory_map failed for %p\n", (void *)virtual_addr);
 		return 0;
 	}
 	return (unsigned long) pe.address;

@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 
-//#define DEBUG
-
 #include "debug.h"
 #include "timer.h"
 #include "device.h"
@@ -87,7 +85,7 @@ init_hardware(void)
 	status_t res;
 	int i;
 
-	TRACE("init_hardware()\n");
+	INIT_DEBUGOUT("init_hardware()");
 
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci) < B_OK)
 		return B_ERROR;
@@ -115,9 +113,9 @@ init_driver(void)
 	load_driver_symbols("ipro1000");
 #endif
 	
-	dprintf(INFO1"\n");
-	dprintf(INFO2"\n");
-	dprintf(INFO3"\n");
+	dprintf("ipro1000: " INFO1 "\n");
+	dprintf("ipro1000: " INFO2 "\n");
+	dprintf("ipro1000: " INFO3 "\n");
 	
 	item = (pci_info *)malloc(sizeof(pci_info));
 	if (!item)
@@ -133,7 +131,7 @@ init_driver(void)
 		if (info) {
 			char name[64];
 			sprintf(name, "net/ipro1000/%d", cards);
-			PRINT("/dev/%s is a %s\n", name, info);
+			dprintf("ipro1000: /dev/%s is a %s\n", name, info);
 			gDevList[cards] = item;
 			gDevNameList[cards] = strdup(name);
 			gDevNameList[cards + 1] = NULL;
@@ -145,8 +143,6 @@ init_driver(void)
 				break;
 		}
 	}
-	
-	TRACE("found %d cards\n", cards);
 
 	free(item);
 
@@ -154,12 +150,12 @@ init_driver(void)
 		goto err_cards;
 		
 	if (initialize_timer() != B_OK) {
-		ERROR("timer init failed\n");
+		ERROROUT("timer init failed");
 		goto err_timer;
 	}
 
 	if (mempool_init(cards * 768) != B_OK) {
-		ERROR("mempool init failed\n");
+		ERROROUT("mempool init failed");
 		goto err_mempool;
 	}
 	
@@ -184,7 +180,7 @@ uninit_driver(void)
 {
 	int32 i;
 
-	TRACE("uninit_driver()\n");
+	INIT_DEBUGOUT("uninit_driver()");
 
 	terminate_timer();
 	

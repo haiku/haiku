@@ -46,17 +46,17 @@ mempool_init(int count)
 	
 	int i;
 	
-	TRACE("chunk_size %d, mbuf_size %d\n", chunk_size, mbuf_size);
-	TRACE("chunk_alloc_size %d, mbuf_alloc_size %d\n", chunk_alloc_size, mbuf_alloc_size);
+	INIT_DEBUGOUT2("chunk_size %d, mbuf_size %d", chunk_size, mbuf_size);
+	INIT_DEBUGOUT2("chunk_alloc_size %d, mbuf_alloc_size %d", chunk_alloc_size, mbuf_alloc_size);
 	
 	chunk_pool = area_malloc(chunk_alloc_size);
 	if (!chunk_pool) {
-		ERROR("failed to allocate chunk storage of %d bytes\n", chunk_alloc_size);
+		ERROROUT1("failed to allocate chunk storage of %d bytes\n", chunk_alloc_size);
 		return -1;
 	}
 	mbuf_pool = area_malloc(mbuf_alloc_size);
 	if (!mbuf_pool) {
-		ERROR("failed to allocate mbuf storage of %d bytes\n", mbuf_alloc_size);
+		ERROROUT1("failed to allocate mbuf storage of %d bytes\n", mbuf_alloc_size);
 		area_free(chunk_pool);
 		return -1;
 	}
@@ -69,7 +69,7 @@ mempool_init(int count)
 		mbuf_pool_put(mbuf_base + i * mbuf_size);
 	}
 
-	TRACE("mempool init success\n");
+	INIT_DEBUGOUT("mempool init success");
 	return 0;
 }
 
