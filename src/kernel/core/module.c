@@ -13,6 +13,7 @@
 #include <lock.h>
 #include <khash.h>
 #include <elf.h>
+#include <boot/elf.h>
 
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -920,6 +921,60 @@ register_builtin_modules(struct module_info **info)
 }
 
 
+static status_t
+register_preloaded_module_image(struct preloaded_image *image)
+{
+	module_image *moduleImage;
+	struct module_info **info;
+	status_t status;
+	int32 index = 0;
+
+	if (image->id < 0)
+		return B_BAD_VALUE;
+
+	moduleImage = (module_image *)malloc(sizeof(module_image));
+	if (moduleImage == NULL)
+		return B_NO_MEMORY;
+
+	if (get_image_symbol(image->id, "modules", B_SYMBOL_TYPE_DATA,
+			(void **)&moduleImage->info) != B_OK) {
+		status = B_BAD_TYPE;
+		goto error;
+	}
+
+	moduleImage->dependencies = NULL;
+	get_image_symbol(image->id, "module_dependencies", B_SYMBOL_TYPE_DATA,
+		(void **)&moduleImage->dependencies);
+		// this is allowed to be NULL
+
+	moduleImage->path = strdup(image->name);
+	if (!moduleImage->path) {
+		status = B_NO_MEMORY;
+		goto error;
+	}
+
+	moduleImage->image = image->id;
+	moduleImage->ref_count = 0;
+	moduleImage->keep_loaded = false;
+
+	hash_insert(sModuleImagesHash, moduleImage);
+
+	for (info = moduleImage->info; *info; info++) {
+		create_module(*info, image->name, index++, NULL);
+	}
+
+	return B_OK;
+
+error:
+	free(moduleImage);
+	
+	// we don't need this image anymore
+	unload_kernel_add_on(image->id);
+
+	return status;
+}
+
+
 static int
 dump_modules(int argc, char **argv)
 {
@@ -937,8 +992,8 @@ dump_modules(int argc, char **argv)
 	}
 
 	hash_rewind(sModuleImagesHash, &iterator);
-	dprintf("\n-- loaded modules:\n");
-	
+	dprintf("\n-- loaded module images:\n");
+
 	while ((image = (struct module_image *)hash_next(sModuleImagesHash, &iterator)) != NULL) {
 		dprintf("%p: \"%s\" (image_id = %ld), info = %p, refcount = %ld, %s\n", image,
 			image->path, image->image, image->info, image->ref_count,
@@ -959,6 +1014,8 @@ dump_modules(int argc, char **argv)
 status_t
 module_init(kernel_args *args)
 {
+	struct preloaded_image *image;
+
 	if (recursive_lock_init(&sModulesLock, "modules rlock") < B_OK)
 		return B_ERROR;
 
@@ -976,7 +1033,9 @@ module_init(kernel_args *args)
 
 	// register preloaded images
 
-	// ToDo!
+	for (image = args->preloaded_images; image != NULL; image = image->next) {
+		register_preloaded_module_image(image);
+	}
 
 	// ToDo: set sDisableUserAddOns from kernel_args!
 
