@@ -406,13 +406,24 @@ void
 BApplication::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-	
-		// TODO: Handle these
 		case B_COUNT_PROPERTIES:
 		case B_GET_PROPERTY:
 		case B_SET_PROPERTY:
+		{
+			int32 index;
+			BMessage specifier;
+			int32 what;
+			const char *property = NULL;
+			bool scriptHandled = false;
+			if (message->GetCurrentSpecifier(&index, &specifier, &what, &property) == B_OK) {
+				if (ScriptReceived(message, index, &specifier, what, property))
+					scriptHandled = true;
+			}
+			if (!scriptHandled)
+				BLooper::MessageReceived(message);
 			break;
-
+		}
+		
 		// Bebook says: B_SILENT_RELAUNCH
 		// Sent to a single-launch application when it's activated by being launched
 		// (for example, if the user double-clicks its icon in Tracker).
@@ -754,9 +765,19 @@ void BApplication::_ReservedApplication8()
 {
 }
 //------------------------------------------------------------------------------
-bool BApplication::ScriptReceived(BMessage* msg, int32 index, BMessage* specifier, int32 form, const char* property)
+bool
+BApplication::ScriptReceived(BMessage *message, int32 index, BMessage *specifier,
+							int32 what, const char *property)
 {
-	return false; // TODO: Implement? Not implemented?
+	// TODO: Implement
+	printf("message:\n");
+	message->PrintToStream();
+	printf("index: %ld\n", index);
+	printf("specifier:\n");
+	specifier->PrintToStream();
+	printf("what: %ld\n", what);
+	printf("property: %s\n", property ? property : "");
+	return false;
 }
 //------------------------------------------------------------------------------
 void BApplication::run_task()
