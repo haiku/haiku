@@ -9,10 +9,6 @@
 
 #include <OS.h>
 #include <image.h>
-#include <Message.h>
-#include <AppDefs.h>
-#include <InterfaceDefs.h>
-#include <TypeConstants.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -21,11 +17,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "VTkeymap.h"
 
 //#define USE_INPUT_SERVER
 	// define this if consoled should use the input_server to
 	// get to its keyboard input
+
+#ifdef USE_INPUT_SERVER
+#	include <Message.h>
+#	include <AppDefs.h>
+#	include <InterfaceDefs.h>
+#	include <TypeConstants.h>
+
+#	include "VTkeymap.h"
+#endif
+
 
 struct console {
 	int console_fd;
