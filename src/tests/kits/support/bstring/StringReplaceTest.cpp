@@ -67,7 +67,7 @@ StringReplaceTest::PerformTest(void)
 	//&Replace(char, char, int32, int32)
 	NextSubTest();
 	str1 = new BString("she sells sea shells on the sea shore");
-	str1->Replace('s' 't', 4, 2);
+	str1->Replace('s', 't', 4, 2);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "she tellt tea thells on the sea shore") == 0);
 	delete str1;
 

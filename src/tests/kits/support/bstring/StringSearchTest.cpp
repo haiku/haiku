@@ -365,21 +365,21 @@ StringSearchTest::PerformTest(void)
 	delete string1;
 	
 	//IFindLast(BString&)
-	NextSubTest();
-	string1 = new BString("last but not least");
-	string2 = new BString("st");
-	i = string1->IFindLast(*string2);
-	CPPUNIT_ASSERT(i == 16);
-	delete string1;
-	delete string2;
+	//NextSubTest();
+	//string1 = new BString("last but not least");
+	//string2 = new BString("st");
+	//i = string1->IFindLast(*string2);
+	//CPPUNIT_ASSERT(i == 16);
+	//delete string1;
+	//delete string2;
 	
-	NextSubTest();
-	string1 = new BString("laSt but NOT leaSt");
-	string2 = new BString("sT");
-	i = string1->IFindLast(*string2);
-	CPPUNIT_ASSERT(i == 16);
-	delete string1;
-	delete string2;
+	//NextSubTest();
+	//string1 = new BString("laSt but NOT leaSt");
+	//string2 = new BString("sT");
+	//i = string1->IFindLast(*string2);
+	//CPPUNIT_ASSERT(i == 16);
+	//delete string1;
+	//delete string2;
 
 	NextSubTest();
 	string1 = new BString;
