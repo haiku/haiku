@@ -31,10 +31,12 @@
 #include <GraphicsDefs.h>
 
 void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255);
-void SetRGBColor(rgb_color *col,uint16 color);
+void SetRGBColor15(rgb_color *col,uint16 color);
+void SetRGBColor16(rgb_color *col,uint16 color);
 void SetRGBColor(rgb_color *col,uint32 color);
 
 uint8 FindClosestColor(rgb_color *palette, rgb_color color);
+uint16 FindClosestColor15(rgb_color color);
 uint16 FindClosestColor16(rgb_color color);
 
 rgb_color MakeBlendColor(rgb_color col, rgb_color col2, float position);
