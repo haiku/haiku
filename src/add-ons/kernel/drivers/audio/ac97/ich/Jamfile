@@ -8,7 +8,8 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 	debug.c
 	ich.c
 	io.c
-	util.c   
+	util.c
+	ac97.c
 ;
 
 # For OpenBeOS we should be building the driver objects this way.
@@ -19,6 +20,7 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 #	ich.c
 #	io.c
 #	util.c   
+#	ac97.c
 #	:
 #	-fno-pic -D_KERNEL_MODE
 #	;

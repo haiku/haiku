@@ -25,7 +25,6 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#define VERSION "Version 1.0, Copyright (c) 2002 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ ## "\n"
 
 //#define DEBUG 1
 
@@ -40,6 +39,7 @@
 #include "ich.h"
 #include "util.h"
 #include "ac97_multi.h"
+#include "ac97.h"
 
 int32 			api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -201,10 +201,13 @@ bool interrupt_test(void)
 	free(testresult);
 
 	#if DEBUG
-		if (result)
+		if (result) {
 			TRACE(("got interrupt after %Lu us\n",duration));
-		else
+			LOG(("got interrupt after %Lu us\n",duration));
+		} else {
 			TRACE(("no interrupt, timeout after %Lu us\n",duration));
+			LOG(("no interrupt, timeout after %Lu us\n",duration));
+		}
 	#endif
 
 	return result;
@@ -311,23 +314,26 @@ init_driver(void)
 	bigtime_t start;
 	
 	TRACE(("init_driver\n"));
-	TRACE((VERSION));
+	LOG_CREATE();
 	
 	ASSERT(sizeof(ich_bd) == 8);
 	
 	rv = probe_device();
 	if (rv != B_OK) {
+		LOG(("No supported audio hardware found.\n"));
 		TRACE(("hardware not found\n"));
 		return B_ERROR;
 	}
 
 	dprintf("ich-ac97: " VERSION "\n");
 	dprintf("ich-ac97: found %s, IRQ = %ld, NAMBAR = %#lX, NABMBAR = %#lX, MMBAR = %#lX, MBBAR = %#lX\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar);
+	LOG(("Found %s\nIRQ = %ld\nNAMBAR = %#lX\nNABMBAR = %#lX\nMMBAR = %#lX\nMBBAR = %#lX\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar));
 
 	/* before doing anything else, map the IO memory */
 	rv = map_io_memory();
 	if (rv != B_OK) {
 		dprintf("ich-ac97: mapping of memory IO space failed\n");
+		LOG(("mapping of memory IO space failed\n"));
 		return B_ERROR;
 	}
 	
@@ -344,6 +350,7 @@ init_driver(void)
 	rv = ich_reg_read_32(ICH_REG_GLOB_CNT);
 	if ((rv & CNT_COLD) == 0) {
 		TRACE(("cold reset failed\n"));
+		LOG(("cold reset failed\n"));
 	}
 
 	/* wait until a codec is ready */
@@ -356,8 +363,10 @@ init_driver(void)
 	}
 	if ((rv & STA_PCR)) {
 		TRACE(("primary codec ready after %Ld us\n",(system_time() - start)));
+		LOG(("primary codec ready after %Ld us\n",(system_time() - start)));
 	} else {
 		TRACE(("primary codec not ready after %Ld us\n",(system_time() - start)));
+		LOG(("primary codec not ready after %Ld us\n",(system_time() - start)));
 	}
 	while ((system_time() - start) < 1000000) {
 		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
@@ -367,8 +376,10 @@ init_driver(void)
 	}
 	if ((rv & STA_SCR)) {
 		TRACE(("secondary codec ready after %Ld us\n",(system_time() - start)));
+		LOG(("secondary codec ready after %Ld us\n",(system_time() - start)));
 	} else {
 		TRACE(("secondary codec not ready after %Ld us\n",(system_time() - start)));
+		LOG(("secondary codec not ready after %Ld us\n",(system_time() - start)));
 	}
 	if ((rv & (STA_PCR | STA_SCR)) == 0) {
 		dprintf("ich-ac97: compatible chipset found, but no codec ready!\n");
@@ -377,6 +388,7 @@ init_driver(void)
 	}
 	if ((rv & STA_PCR) == 0 && (rv & STA_SCR) != 0) {
 		TRACE(("using secondary codec!\n"));
+		LOG(("using secondary codec!\n"));
 		config->nambar += 0x80;
 	}
 
@@ -387,6 +399,7 @@ init_driver(void)
 
 	if (0 == chan_pi || 0 == chan_po || 0 == chan_mc) {
 		dprintf("ich-ac97: couldn't allocate memory for channel descriptors!\n");
+		LOG(("couldn't allocate memory for channel descriptors!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -409,6 +422,7 @@ init_driver(void)
 		  chan_pi->bd_area < B_OK || chan_pi->buffer_area < B_OK || chan_pi->userbuffer_area < B_OK ||
 		  chan_mc->bd_area < B_OK || chan_mc->buffer_area < B_OK || chan_mc->userbuffer_area < B_OK) {
 		dprintf("ich-ac97: couldn't allocate memory for DMA buffers!\n");
+		LOG(("ich-ac97: couldn't allocate memory for DMA buffers!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -420,7 +434,8 @@ init_driver(void)
 	chan_mc->buffer_ready_sem = create_sem(0,"mc buffer ready");			/* 0 available mic in buffers */
 	
 	if (chan_po->buffer_ready_sem < B_OK || chan_pi->buffer_ready_sem < B_OK || chan_mc->buffer_ready_sem < B_OK) {
-		dprintf("ich-ac97: couldn't semaphores!\n");
+		dprintf("ich-ac97: couldn't create semaphores!\n");
+		LOG(("ich-ac97: couldn't create semaphores!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -436,8 +451,12 @@ init_driver(void)
 	ich_codec_write(0x00, 0x0000);
 	snooze(50000); // 50 ms
 
-	TRACE(("reading codec\n"));
-	TRACE(("codec = %#04x\n",ich_codec_read(0x00)));
+	ac97_init();
+	ac97_amp_enable(true);
+
+	LOG(("codec vendor id = %#08x\n",ac97_get_vendor_id()));
+	LOG(("codec descripton = %s\n",ac97_get_vendor_id_description()));
+	LOG(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement()));
 
 	/* reset all channels */
 	reset_chan(chan_pi);
@@ -452,6 +471,7 @@ init_driver(void)
 	/* first test if interrupts are working, on some Laptops they don't work :-( */
 	if (config->irq != 0 && false == interrupt_test()) {
 		TRACE(("interrupt not working, using a kernel thread for polling\n"));
+		LOG(("interrupt not working, using a kernel thread for polling\n"));
 		config->irq = 0; /* don't use interrupts */
 	}
 
@@ -497,6 +517,9 @@ uninit_driver(void)
 		if (chan_po) TRACE(("chan_po frames_count = %Ld\n",chan_po->played_frames_count));
 		if (chan_pi) TRACE(("chan_pi frames_count = %Ld\n",chan_pi->played_frames_count));
 		if (chan_mc) TRACE(("chan_mc frames_count = %Ld\n",chan_mc->played_frames_count));
+		if (chan_po) LOG(("chan_po frames_count = %Ld\n",chan_po->played_frames_count));
+		if (chan_pi) LOG(("chan_pi frames_count = %Ld\n",chan_pi->played_frames_count));
+		if (chan_mc) LOG(("chan_mc frames_count = %Ld\n",chan_mc->played_frames_count));
 	#endif
 	
 	/* reset all channels */

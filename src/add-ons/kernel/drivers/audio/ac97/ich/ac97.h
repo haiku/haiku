@@ -25,51 +25,38 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef _ICH_H_
-#define _ICH_H_
+#ifndef _AC97_H_
+#define _AC97_H_
 
-#include "hardware.h"
+enum AC97_REGISTER {
+	AC97_RESET				= 0x00,
+	AC97_MASTER_VOLUME		= 0x02,
+	AC97_AUX_OUT_VOLUME		= 0x04,
+	AC97_MONO_VOLUME		= 0x06,
+	AC97_MASTER_TONE		= 0x08,
+	AC97_PC_BEEP_VOLUME		= 0x0A,
+	AC97_PHONE_VOLUME		= 0x0C,
+	AC97_MIC_VOLUME			= 0x0E,
+	AC97_LINE_IN_VOLUME		= 0x10,
+	AC97_CD_VOLUME			= 0x12,
+	AC97_VIDEO_VOLUME		= 0x14,
+	AC97_AUX_IN_VOLUME		= 0x16,
+	AC97_PCM_OUT_VOLUME		= 0x18,
+	AC97_RECORD_SELECT		= 0x1A,
+	AC97_RECORD_GAIN		= 0x1C,
+	AC97_RECORD_GAIN_MIC	= 0x1E,
+	AC97_GENERAL_PURPOSE	= 0x20,
+	AC97_3D_CONTROL			= 0x22,
+	AC97_PAGING				= 0x24,
+	AC97_POWERDOWN			= 0x26,
+	AC97_VENDOR_ID1			= 0x7C,
+	AC97_VENDOR_ID2			= 0x7E
+};
 
-#define VERSION "Version 1.1, Copyright (c) 2002 Marcus Overhagen, compiled on " ## __DATE__ ## " " ## __TIME__ 
-#define DRIVER_NAME "ich_ac97"
-
-#define BUFFER_SIZE		2048
-#define BUFFER_COUNT	2
-#define BUFFER_FRAMES_COUNT (BUFFER_SIZE / 4)
-
-/* the software channel descriptor */
-typedef struct {
-	uint32	regbase;
-
-	volatile int32	lastindex;
-	volatile int64	played_frames_count;
-	volatile bigtime_t played_real_time;
-	volatile bool running;
-	volatile void *backbuffer;
-	sem_id buffer_ready_sem;
-
-	void	*buffer_log_base;
-	void	*buffer_phy_base;
-	void 	*buffer[ICH_BD_COUNT];
-	void	*bd_phy_base;
-	void	*bd_log_base;
-	ich_bd 	*bd[ICH_BD_COUNT];
-	
-	/* 
-	 * a second set of buffers, exported to the multiaudio api (bad idea)
-	 */
-	void	*userbuffer[BUFFER_COUNT];
-	void	*userbuffer_base;
-	
-	area_id buffer_area;
-	area_id userbuffer_area;
-	area_id bd_area;
-} ich_chan;
-
-extern ich_chan * chan_pi;
-extern ich_chan * chan_po;
-extern ich_chan * chan_mc;
-
-void start_chan(ich_chan *chan);
+const char *	ac97_get_3d_stereo_enhancement();
+const char *	ac97_get_vendor_id_description();
+uint32			ac97_get_vendor_id();
+void			ac97_amp_enable(bool yesno);
+void			ac97_init();
 
 #endif

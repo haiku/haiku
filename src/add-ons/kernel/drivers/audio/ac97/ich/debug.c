@@ -27,14 +27,22 @@
  */
 #include <KernelExport.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <OS.h>
 #include "debug.h"
 #include "ich.h"
 
+static const char * logfile="/boot/home/ich_ac97.log";
+static sem_id loglock;
+
 void debug_printf(const char *text,...);
+void log_printf(const char *text,...);
+void log_create();
 
 void debug_printf(const char *text,...)
 {
+#if DEBUG != 5
 	char buf[1024];
 	va_list ap;
 
@@ -47,5 +55,32 @@ void debug_printf(const char *text,...)
 	#if DEBUG > 1
 		snooze(150000);
 	#endif
+#endif
+}
+
+void log_create()
+{
+	int fd = open(logfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	const char *text = DRIVER_NAME ", " VERSION "\n";
+	loglock = create_sem(1,"logfile sem");
+	write(fd,text,strlen(text));
+	close(fd);
+}
+
+void log_printf(const char *text,...)
+{
+	int fd;
+	char buf[1024];
+	va_list ap;
+
+	acquire_sem(loglock);
+	fd = open(logfile, O_WRONLY | O_APPEND);
+	va_start(ap,text);
+	vsprintf(buf,text,ap);
+	va_end(ap);
+	write(fd,buf,strlen(buf));
+	/* fsync(fd); */
+	close(fd);
+	release_sem(loglock);
 }
 
