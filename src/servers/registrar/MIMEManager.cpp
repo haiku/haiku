@@ -115,9 +115,16 @@ MIMEManager::MessageReceived(BMessage *message)
 			message->SendReply(&reply, this);				
 			break;
 		}
+
+		case B_REG_MIME_UNSUPPORT_TYPES:
+		{
+			// TODO: implement
+printf("MIMEMan: B_REG_MIME_UNSUPPORT_TYPES\n");
+			break;
+		}
 	
 		default:
-			printf("MIMEMan: msg->what == %.4s\n", &(message->what));
+			printf("MIMEMan: msg->what == %.4s\n", (char*)&(message->what));
 			BLooper::MessageReceived(message);
 			break;
 	}
