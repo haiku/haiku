@@ -9,13 +9,13 @@
 	This is an improper name - this bus manager uses the PnP manager to
 	load device drivers, but calling it ISA PnP manager would be wrong as
 	ISA PnP information isn't used at all.
-	
+
 	All ISA drivers must be Universal driver (see pnp_manager.h), as they
 	are all direct children of the ISA bus node. Having an ISA PnP bus manager
 	(which we don't), one node would be created per ISA device and thus you 
 	could write Specific drivers, but under normal ISA we don't even know 
 	how many devices are there, therefore the Universal driver trick.
-	
+
 	Apart from the loading, the main change is the resource manager. In
 	a driver, you must allocate the resources before registering the node and
 	deallocate it when your node is removed and if the driver isn't loaded at
@@ -28,12 +28,7 @@
 #define _ISA2_H
 
 #include <device_manager.h>
-
-
-enum {
-	B_8_BIT_TRANSFER,
-	B_16_BIT_TRANSFER
-};
+#include <ISA.h>
 
 // maximum size of one dma transfer 
 // (in bytes for 8 bit transfer, in words for 16 bit transfer)
