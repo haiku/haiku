@@ -73,14 +73,14 @@ int main(int argc, char **argv)
 				keymap.Save(output_ref);
 				return 0;
 			} else if (operation == 'h') {
-                                entry_ref ref;
-                                get_ref_for_path(argv[i], &ref);
-                                Keymap keymap;
-                                keymap.LoadSourceFromRef(ref);
-
-                                keymap.SaveAsHeader(output_ref);
-                                return 0;
-                        } else 
+		        entry_ref ref;
+		        get_ref_for_path(argv[i], &ref);
+		        Keymap keymap;
+		        keymap.LoadSourceFromRef(ref);
+		
+		        keymap.SaveAsHeader(output_ref);
+		        return 0;
+            } else 
 				break;
 		}
 	}

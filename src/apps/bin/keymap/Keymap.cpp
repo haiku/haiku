@@ -699,7 +699,7 @@ Keymap::Save(entry_ref &ref)
 
 
 const char header_header[] =
-"/*\tHaiku \t*/"
+"/*\tHaiku \t*/\n"
 "/*\n"
 " This file is generated automatically. Don't edit ! \n"
 "*/\n";
@@ -717,8 +717,109 @@ Keymap::SaveAsHeader(entry_ref &ref)
                 return;
         }
 
-	file.Write(header_header, strlen(header_header));
+	int fd = file.Dup();
+	FILE * f = fdopen(fd, "w");
 
+	fprintf(f, "%s", header_header);
+	fprintf(f, "#include <InterfaceDefs.h>\n");
+	fprintf(f, "const key_map sSystemKeymap = {\n");
+	fprintf(f, "\tversion:%ld,\n", fKeys.version);
+	fprintf(f, "\tcaps_key:0x%lx,\n", fKeys.caps_key);
+	fprintf(f, "\tscroll_key:0x%lx,\n", fKeys.scroll_key);
+	fprintf(f, "\tnum_key:0x%lx,\n", fKeys.num_key);
+	fprintf(f, "\tleft_shift_key:0x%lx,\n", fKeys.left_shift_key);
+	fprintf(f, "\tright_shift_key:0x%lx,\n", fKeys.right_shift_key);
+	fprintf(f, "\tleft_command_key:0x%lx,\n", fKeys.left_command_key);
+	fprintf(f, "\tright_command_key:0x%lx,\n", fKeys.right_command_key);
+	fprintf(f, "\tleft_control_key:0x%lx,\n", fKeys.left_control_key);
+	fprintf(f, "\tright_control_key:0x%lx,\n", fKeys.right_control_key);
+	fprintf(f, "\tleft_option_key:0x%lx,\n", fKeys.left_option_key);
+	fprintf(f, "\tright_option_key:0x%lx,\n", fKeys.right_option_key);
+	fprintf(f, "\tmenu_key:0x%lx,\n", fKeys.menu_key);
+	fprintf(f, "\tlock_settings:0x%lx,\n", fKeys.lock_settings);
+	
+	fprintf(f, "\tcontrol_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.control_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\toption_caps_shift_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_shift_map[i]);
+	fprintf(f, "\t},\n");
+		
+	fprintf(f, "\toption_caps_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.option_caps_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\toption_shift_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.option_shift_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\toption_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.option_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tcaps_shift_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.caps_shift_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tcaps_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.caps_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tshift_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.shift_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tnormal_map:{\n");
+	for (uint32 i=0; i<128; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.normal_map[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tacute_dead_key:{\n");
+	for (uint32 i=0; i<32; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.acute_dead_key[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tgrave_dead_key:{\n");
+	for (uint32 i=0; i<32; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.grave_dead_key[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tcircumflex_dead_key:{\n");
+	for (uint32 i=0; i<32; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.circumflex_dead_key[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tdieresis_dead_key:{\n");
+	for (uint32 i=0; i<32; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.dieresis_dead_key[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\ttilde_dead_key:{\n");
+	for (uint32 i=0; i<32; i++)
+		fprintf(f, "\t\t%ld,\n", fKeys.tilde_dead_key[i]);
+	fprintf(f, "\t},\n");
+	
+	fprintf(f, "\tacute_tables:0x%lx,\n", fKeys.acute_tables);
+	fprintf(f, "\tgrave_tables:0x%lx,\n", fKeys.grave_tables);
+	fprintf(f, "\tcircumflex_tables:0x%lx,\n", fKeys.circumflex_tables);
+	fprintf(f, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
+	fprintf(f, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
+	
+	fprintf(f, "};\n");
+	
+	fprintf(f, "const char sSystemKeyChars[] = {\n");
+	for (uint32 i=0; i<fCharsSize; i++)
+		fprintf(f, "\t0x%hx,\n", fChars[i]);
+	fprintf(f, "};\n");
 }
 
 
