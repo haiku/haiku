@@ -425,7 +425,7 @@ BString::Remove(int32 from, int32 length)
 BString&
 BString::RemoveFirst(const BString &string)
 {
-	int32 pos = _FindAfter(string.String(), 0, -1);
+	int32 pos = _ShortFindAfter(string.String(), string.Length());
 	
 	if (pos >= 0)
 		_privateData = _ShrinkAtBy(pos, string.Length());
@@ -437,7 +437,7 @@ BString::RemoveFirst(const BString &string)
 BString&
 BString::RemoveLast(const BString &string)
 {
-	int32 pos = _FindBefore(string.String(), Length(), -1);
+	int32 pos = _FindBefore(string.String(), Length(), string.Length());
 	
 	if (pos >= 0)
 		_privateData = _ShrinkAtBy(pos, string.Length());
@@ -450,7 +450,7 @@ BString&
 BString::RemoveAll(const BString &string)
 {
 	int32 pos = B_ERROR;
-	while ((pos = _FindAfter(string.String(), 0, -1)) >= 0)
+	while ((pos = _ShortFindAfter(string.String(), string.Length())) >= 0)
 		_ShrinkAtBy(pos, string.Length());
 
 	return *this;
@@ -461,7 +461,7 @@ BString&
 BString::RemoveFirst(const char *str)
 {
 	if (str) {
-		int32 pos = _FindAfter(str, 0, -1);
+		int32 pos = _ShortFindAfter(str, strlen(str));
 		if (pos >= 0)
 			_ShrinkAtBy(pos, strlen(str));
 	}
@@ -474,7 +474,7 @@ BString::RemoveLast(const char *str)
 {
 	if (str) {
 		int32 len = strlen(str);
-		int32 pos = _FindBefore(str, Length(), -1);
+		int32 pos = _FindBefore(str, Length(), len);
 		if (pos >= 0)
 			_ShrinkAtBy(pos, len);
 	}
@@ -488,7 +488,7 @@ BString::RemoveAll(const char *str)
 	if (str) {
 		int32 pos;
 		int32 len = strlen(str);
-		while ((pos = _FindAfter(str, 0, -1)) >= 0)
+		while ((pos = _ShortFindAfter(str, len)) >= 0)
 			_ShrinkAtBy(pos, len);
 	}
 	return *this;
@@ -1112,7 +1112,7 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 	
 	int32 pos;
 	int32 withLen = strlen(with);
-	while ((pos = strcspn(String(), setofChars)) < Length()) {
+	while ((pos = strcspn(String(), setOfChars)) < Length()) {
 		_OpenAtBy(pos, withLen - 1);
 		memcpy(_privateData + pos, with, withLen);
 	}
