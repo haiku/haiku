@@ -129,7 +129,7 @@ private:
 	friend class BBitmap;
 	friend class BScrollBar;
 	friend class BPrivateScreen;
-	friend BPrivate::BAppServerLink;
+	friend class BPrivate::BAppServerLink;
 	friend void _toggle_handles_(bool);
 
 							BApplication(uint32 signature);
