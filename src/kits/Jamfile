@@ -1,5 +1,13 @@
 SubDir OBOS_TOP src kits ;
 
+# Allow if defined allows to run applications without the registrar
+# -- for development only, of course.
+if $(RUN_WITHOUT_REGISTRAR) {
+	local defines = [ FDefines RUN_WITHOUT_REGISTRAR ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
 # Collect libopenbeos.so sources.
 subdirs = app interface support storage ;
 for subdir in $(subdirs) {
