@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.21), (Rudolf)</h1></p>
+<p><h1>nv_driver 0.22, (Rudolf)</h1></p>
 <ul>
 	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of unaccelerated graphics.
 	<ul>
@@ -25,6 +25,7 @@
 	<li>Added option in nv.settings to 'unhide' fastwrite support in AGP cards. Some older cards support FW even though normally they don't show it so it won't get activated (confirmed GeForce2 MX400, NV11).<br>
  	<strong>NOTE please:</strong><br>
  	This is a tweak that you <strong>can</strong> enable, but you do so at your own risk (of course)!
+ 	<li>Fixed RAM amount detection for GeForce2 and GeForce4 MX Integrated GPU boards.
 </ul>
 <p><h1>nv_driver 0.10, (Rudolf)</h1></p>
 <ul>

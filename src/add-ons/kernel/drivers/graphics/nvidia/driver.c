@@ -783,6 +783,26 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	si->device = di->pcii.device;
 	si->function = di->pcii.function;
 
+	/* note the amount of system RAM the system BIOS assigned to the card if applicable:
+	 * unified memory architecture (UMA) */
+	switch ((((uint32)(si->device_id)) << 16) | si->vendor_id)
+	{
+	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
+		/* device at bus #0, device #0, function #1 holds value at byte-index 0x7C */
+		si->ps.memory_size =
+			((((*pci_bus->read_pci_config)(0, 0, 1, 0x7c, 4)) & 0x000007c0) >> 6) + 1;
+		break;
+	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
+		/* device at bus #0, device #0, function #1 holds value at byte-index 0x84 */
+		si->ps.memory_size =
+			((((*pci_bus->read_pci_config)(0, 0, 1, 0x84, 4)) & 0x000007f0) >> 4) + 1;
+		break;
+	default:
+		/* all other cards have own RAM: the amount of which is determined in the
+		 * accelerant. */
+		break;
+	}
+
 	/* map the device */
 	result = map_device(di);
 	if (result < 0) goto free_shared;
