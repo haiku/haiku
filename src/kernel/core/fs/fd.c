@@ -1,6 +1,6 @@
 /* Operations on file descriptors
 ** 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -16,12 +16,9 @@
 #include <malloc.h>
 #include <string.h>
 
-#define CHECK_USER_ADDR(x) \
-	if ((addr)(x) >= KERNEL_BASE && (addr)(x) <= KERNEL_TOP) \
-		return B_BAD_ADDRESS;
 
-#define TRACE_FD 0
-#if TRACE_FD
+//#define TRACE_FD
+#ifdef TRACE_FD
 #	define TRACE(x) dprintf x
 #	define PRINT(x) dprintf x
 #else
@@ -305,10 +302,10 @@ fd_is_valid(int fd, bool kernel)
 
 
 ssize_t
-user_read(int fd, off_t pos, void *buffer, size_t length)
+_user_read(int fd, off_t pos, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
-	ssize_t retval;
+	ssize_t bytesRead;
 
 	/* This is a user_function, so abort if we have a kernel address */
 	if (!IS_USER_ADDRESS(buffer))
@@ -318,44 +315,63 @@ user_read(int fd, off_t pos, void *buffer, size_t length)
 	if (!descriptor)
 		return B_FILE_ERROR;
 
+	if (pos == -1)
+		pos = descriptor->pos;
+
 	if (descriptor->ops->fd_read) {
-		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
-		if (retval >= 0)
-			retval = (ssize_t)length;
+		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
+		if (bytesRead >= B_OK) {
+			if (length > 0x7fffffff)
+				bytesRead = 0x7fffffff;
+			else
+				bytesRead = (ssize_t)length;
+
+			descriptor->pos = pos + length;
+		}
 	} else
-		retval = EINVAL;
+		bytesRead = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return retval;
+	return bytesRead;
 }
 
 
 ssize_t
-user_write(int fd, off_t pos, const void *buffer, size_t length)
+_user_write(int fd, off_t pos, const void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
-	ssize_t retval = 0;
+	ssize_t bytesWritten = 0;
 
-	CHECK_USER_ADDR(buffer)
+	if (IS_KERNEL_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
 
+	if (pos == -1)
+		pos = descriptor->pos;
+
 	if (descriptor->ops->fd_write) {
-		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
-		if (retval >= 0)
-			retval = (ssize_t)length;
+		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
+		if (bytesWritten >= B_OK) {
+			if (length > 0x7fffffff)
+				bytesWritten = 0x7fffffff;
+			else
+				bytesWritten = (ssize_t)length;
+
+			descriptor->pos = pos + length;
+		}
 	} else
-		retval = EINVAL;
+		bytesWritten = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return retval;
+	return bytesWritten;
 }
 
 
 off_t
-user_seek(int fd, off_t pos, int seekType)
+_user_seek(int fd, off_t pos, int seekType)
 {
 	struct file_descriptor *descriptor;
 
@@ -375,13 +391,14 @@ user_seek(int fd, off_t pos, int seekType)
 }
 
 
-int
-user_ioctl(int fd, ulong op, void *buffer, size_t length)
+status_t
+_user_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	int status;
 
-	CHECK_USER_ADDR(buffer)
+	if (IS_KERNEL_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	PRINT(("user_ioctl: fd %d\n", fd));
 
@@ -400,12 +417,13 @@ user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
+_user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	CHECK_USER_ADDR(buffer)
+	if (IS_KERNEL_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	PRINT(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
 
@@ -427,7 +445,7 @@ user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 
 
 status_t
-user_rewind_dir(int fd)
+_user_rewind_dir(int fd)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
@@ -458,7 +476,8 @@ _user_read_stat(int fd, struct stat *userStat, size_t statSize)
 		return B_BAD_VALUE;
 
 	/* This is a user_function, so abort if we have a kernel address */
-	CHECK_USER_ADDR(userStat)
+	if (IS_KERNEL_ADDRESS(userStat))
+		return B_BAD_ADDRESS;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -491,7 +510,8 @@ _user_write_stat(int fd, const struct stat *userStat, size_t statSize, int statM
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
 
-	CHECK_USER_ADDR(userStat)
+	if (IS_KERNEL_ADDRESS(userStat))
+		return B_BAD_ADDRESS;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -517,8 +537,8 @@ _user_write_stat(int fd, const struct stat *userStat, size_t statSize, int statM
 }
 
 
-int
-user_close(int fd)
+status_t
+_user_close(int fd)
 {
 	struct io_context *io = get_current_io_context(false);
 	struct file_descriptor *descriptor = get_fd(io, fd);
@@ -536,14 +556,14 @@ user_close(int fd)
 
 
 int
-user_dup(int fd)
+_user_dup(int fd)
 {
 	return dup_fd(fd, false);
 }
 
 
 int
-user_dup2(int ofd, int nfd)
+_user_dup2(int ofd, int nfd)
 {
 	return dup2_fd(ofd, nfd, false);
 }
@@ -554,53 +574,69 @@ user_dup2(int ofd, int nfd)
 
 
 ssize_t
-sys_read(int fd, off_t pos, void *buffer, size_t length)
+_kern_read(int fd, off_t pos, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
-	ssize_t retval;
+	ssize_t bytesRead;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
 		return B_FILE_ERROR;
 
+	if (pos == -1)
+		pos = descriptor->pos;
+
 	if (descriptor->ops->fd_read) {
-		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
-		if (retval >= 0)
-			retval = (ssize_t)length;
+		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
+		if (bytesRead >= B_OK) {
+			if (length > 0x7fffffff)
+				bytesRead = 0x7fffffff;
+			else
+				bytesRead = (ssize_t)length;
+
+			descriptor->pos = pos + length;
+		}
 	} else
-		retval = EINVAL;
+		bytesRead = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return retval;
+	return bytesRead;
 }
 
 
 ssize_t
-sys_write(int fd, off_t pos, const void *buffer, size_t length)
+_kern_write(int fd, off_t pos, const void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
-	ssize_t retval;
+	ssize_t bytesWritten;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	if (descriptor->ops->fd_write) {
-		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
-		if (retval >= 0)
-			retval = (ssize_t)length;
+	if (pos == -1)
+		pos = descriptor->pos;
 
-		PRINT(("sys_write(%d) = %ld (rlen = %ld)\n", fd, retval, length));
+	if (descriptor->ops->fd_write) {
+		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
+		if (bytesWritten >= B_OK) {
+			if (length > 0x7fffffff)
+				bytesWritten = 0x7fffffff;
+			else
+				bytesWritten = (ssize_t)length;
+
+			descriptor->pos = pos + length;
+		}
 	} else
-		retval = EINVAL;
+		bytesWritten = B_BAD_VALUE;
 
 	put_fd(descriptor);
-	return retval;
+	return bytesWritten;
 }
 
 
 off_t
-sys_seek(int fd, off_t pos, int seekType)
+_kern_seek(int fd, off_t pos, int seekType)
 {
 	struct file_descriptor *descriptor;
 
@@ -618,8 +654,8 @@ sys_seek(int fd, off_t pos, int seekType)
 }
 
 
-int
-sys_ioctl(int fd, ulong op, void *buffer, size_t length)
+status_t
+_kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 	int status;
@@ -641,7 +677,7 @@ sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
+_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
@@ -666,7 +702,7 @@ sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 
 
 status_t
-sys_rewind_dir(int fd)
+_kern_rewind_dir(int fd)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
@@ -756,8 +792,8 @@ _kern_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask)
 }
 
 
-int
-sys_close(int fd)
+status_t
+_kern_close(int fd)
 {
 	struct io_context *io = get_current_io_context(true);
 	struct file_descriptor *descriptor = get_fd(io, fd);
@@ -773,14 +809,14 @@ sys_close(int fd)
 
 
 int
-sys_dup(int fd)
+_kern_dup(int fd)
 {
 	return dup_fd(fd, true);
 }
 
 
 int
-sys_dup2(int ofd, int nfd)
+_kern_dup2(int ofd, int nfd)
 {
 	return dup2_fd(ofd, nfd, true);
 }
