@@ -8,6 +8,7 @@ StaticLibrary
 	PicturePrinter.cpp
 	PrintJobReader.cpp
 	PictureIterator.cpp
+	PrintTransport.cpp
 	;
 
 StaticLibrary
