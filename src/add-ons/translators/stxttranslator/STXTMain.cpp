@@ -55,7 +55,7 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.obos-bmp-translator");
+	BApplication app("application/x-vnd.obos-stxt-translator");
 	STXTTranslator *ptranslator = new STXTTranslator;
 	BView *view = NULL;
 	BRect rect(0, 0, 225, 175);
