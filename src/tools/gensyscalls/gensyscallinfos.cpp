@@ -211,13 +211,14 @@ private:
 		if (!fInput.getline(buffer, sizeof(buffer)))
 			throw EOFException("Unexpected end of input.");
 		// parse it
+		vector<string> line;
 		int len = strlen(buffer);
 		int tokenStart = 0;
 		for (int i = 0; i < len; i++) {
 			char c = buffer[i];
 			if (isspace(c)) {
 				if (tokenStart < i)
-					fTokens.push_back(string(buffer + tokenStart, buffer + i));
+					line.push_back(string(buffer + tokenStart, buffer + i));
 				tokenStart = i + 1;
 				continue;
 			}
@@ -232,16 +233,24 @@ private:
 				case ';':
 				case ',':
 					if (tokenStart < i) {
-						fTokens.push_back(string(buffer + tokenStart,
+						line.push_back(string(buffer + tokenStart,
 												 buffer + i));
 					}
-					fTokens.push_back(string(buffer + i, buffer + i + 1));
+					line.push_back(string(buffer + i, buffer + i + 1));
 					tokenStart = i + 1;
 					break;
 			}
 		}
 		if (tokenStart < len)
-			fTokens.push_back(string(buffer + tokenStart, buffer + len));
+			line.push_back(string(buffer + tokenStart, buffer + len));
+		// drop the line, if it starts with "# <number>", as those are
+		// directions from the pre-processor to the compiler
+		if (line.size() >= 2) {
+			if (line[0] == "#" && isdigit(line[1][0]))
+				return;
+		}
+		for (int i = 0; i < (int)line.size(); i++)
+			fTokens.push_back(line[i]);
 	}
 
 private:
