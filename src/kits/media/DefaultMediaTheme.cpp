@@ -52,10 +52,33 @@ class TitleView : public BView {
 }	// namespace BPrivate
 
 
+static bool 
+parameter_should_be_hidden(BParameter &parameter)
+{
+	// ToDo: note, this is probably completely stupid, but it's the only
+	// way I could safely remove the null parameters that are not shown
+	// by the R5 media theme
+	if (parameter.Type() != BParameter::B_NULL_PARAMETER
+		|| strcmp(parameter.Kind(), B_WEB_PHYSICAL_INPUT))
+		return false;
+
+	for (int32 i = 0; i < parameter.CountOutputs(); i++) {
+		if (!strcmp(parameter.OutputAt(0)->Kind(), B_INPUT_MUX))
+			return true;
+	}
+
+	return false;
+}
+
+
+//	#pragma mark -
+
+
 SeparatorView::SeparatorView(BRect frame)
 	: BView(frame, "-", B_FOLLOW_NONE, B_WILL_DRAW)
 {
 	fVertical = frame.Width() < frame.Height();
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -217,6 +240,9 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 {
 	CALLED();
 
+	if (group.Flags() & B_HIDDEN_PARAMETER)
+		return NULL;
+
 	BRect rect(hintRect);
 	BBox *view = new BBox(rect, group.Name());
 	view->SetBorder(B_NO_BORDER);
@@ -309,10 +335,8 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 			subView->MoveTo((width - frame.Width()) / 2, frame.top);
 		else {
 			// tweak the PopUp views to look better
-			if (dynamic_cast<BOptionPopUp *>(subView) != NULL) {
+			if (dynamic_cast<BOptionPopUp *>(subView) != NULL)
 				subView->ResizeTo(width, frame.Height());
-				//subView->SetDivider(10);
-			}
 		}
 	}
 
@@ -327,6 +351,10 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 BView *
 DefaultMediaTheme::MakeSelfHostingViewFor(BParameter &parameter, const BRect &hintRect)
 {
+	if (parameter.Flags() & B_HIDDEN_PARAMETER
+		|| parameter_should_be_hidden(parameter))
+		return NULL;
+
 	BView *view = MakeViewFor(&parameter, &hintRect);
 	if (view == NULL) {
 		// The MakeViewFor() method above returns a BControl - which we
