@@ -423,55 +423,11 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 	InputServer::gInputMethodList.AddItem(method);
 	
 	if (((InputServer*)be_app)->MethodReplicant() == NULL) {
-		app_info info;
-        	be_app->GetAppInfo(&info);
-
-        	status_t err = BDeskbar().AddItem(&info.ref);
-        	if (err!=B_OK) {
-                	PRINTERR(("Deskbar refuses to add method replicant\n"));
-        	} 
-		BMessage request(B_GET_PROPERTY);
-		BMessenger to;
-		BMessenger status;
-
-		request.AddSpecifier("Messenger");
-		request.AddSpecifier("Shelf");
-
-		// In the Deskbar the Shelf is in the View "Status" in Window "Deskbar"
-		request.AddSpecifier("View", "Status");
-		request.AddSpecifier("Window", "Deskbar");
-		to = BMessenger("application/x-vnd.Be-TSKB", -1);
-
-		BMessage reply;
-
-		if ((to.SendMessage(&request, &reply) == B_OK) 
-			&& (reply.FindMessenger("result", &status) == B_OK)) {
-
-			// enum replicant in Status view
-			int32 index = 0;
-			int32 uid;
-			while ((uid = GetReplicantAt(status, index++)) >= B_OK) {
-				BMessage rep_info;
-				if (GetReplicantName(status, uid, &rep_info) != B_OK) {
-					continue;
-				}
-				const char *name;
-				if ((rep_info.FindString("result", &name) == B_OK) 
-					&& (strcmp(name, REPLICANT_CTL_NAME)==0)) {
-					BMessage rep_view;
-					if (GetReplicantView(status, uid, &rep_view)==0) {
-						BMessenger result;
-						if (rep_view.FindMessenger("result", &result) == B_OK) {
-							((InputServer*)be_app)->SetMethodReplicant(new BMessenger(result));
-						}
-					} 
-				}
-			}
-		}
+		LoadReplicant();
 
 		if (((InputServer*)be_app)->MethodReplicant()) {
 			_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
-                	addon->AddMethod();
+			addon->AddMethod();
 		}
 	}
 
@@ -482,6 +438,56 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 }
 
 
+void
+AddOnManager::LoadReplicant()
+{
+	CALLED();
+	app_info info;
+      	be_app->GetAppInfo(&info);
+
+      	status_t err = BDeskbar().AddItem(&info.ref);
+      	if (err!=B_OK) {
+              	PRINTERR(("Deskbar refuses to add method replicant: %s\n", strerror(err)));
+      	}
+	BMessage request(B_GET_PROPERTY);
+	BMessenger to;
+	BMessenger status;
+
+	request.AddSpecifier("Messenger");
+	request.AddSpecifier("Shelf");
+
+	// In the Deskbar the Shelf is in the View "Status" in Window "Deskbar"
+	request.AddSpecifier("View", "Status");
+	request.AddSpecifier("Window", "Deskbar");
+	to = BMessenger("application/x-vnd.Be-TSKB", -1);
+
+	BMessage reply;
+
+	if ((to.SendMessage(&request, &reply) == B_OK) 
+		&& (reply.FindMessenger("result", &status) == B_OK)) {
+
+		// enum replicant in Status view
+		int32 index = 0;
+		int32 uid;
+		while ((uid = GetReplicantAt(status, index++)) >= B_OK) {
+			BMessage rep_info;
+			if (GetReplicantName(status, uid, &rep_info) != B_OK) {
+				continue;
+			}
+			const char *name;
+			if ((rep_info.FindString("result", &name) == B_OK) 
+				&& (strcmp(name, REPLICANT_CTL_NAME)==0)) {
+				BMessage rep_view;
+				if (GetReplicantView(status, uid, &rep_view)==0) {
+					BMessenger result;
+					if (rep_view.FindMessenger("result", &result) == B_OK) {
+						((InputServer*)be_app)->SetMethodReplicant(new BMessenger(result));
+					}
+				} 
+			}
+		}
+	}
+}
 
 
 //
@@ -608,6 +614,9 @@ AddOnManager::MessageReceived(BMessage *message)
 			break;
 		case SYSTEM_SHUTTING_DOWN:
 			status = HandleSystemShuttingDown(message, &reply);
+			break;
+		case IS_METHOD_REGISTER:
+			status = HandleMethodReplicant(message, &reply);
 			break;
 		default:
 		{
@@ -738,6 +747,36 @@ status_t
 AddOnManager::HandleSystemShuttingDown(BMessage *message,
                                      BMessage *reply)
 {
+	CALLED();
+	
 	// TODO
+	return B_OK;
+}
+
+/*
+ *  Method: AddOnManager::HandleMethodReplicant()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleMethodReplicant(BMessage *message,
+                                     BMessage *reply)
+{
+	CALLED();
+	LoadReplicant();
+	
+	BAutolock lock(InputServer::gInputMethodListLocker);
+	
+	if (((InputServer*)be_app)->MethodReplicant()) {
+		_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
+		addon->AddMethod();
+		
+		for (int32 i=0; i<InputServer::gInputMethodList.CountItems(); i++) {
+			BInputServerMethod *method = 
+				(BInputServerMethod *)InputServer::gInputMethodList.ItemAt(i);
+			_BMethodAddOn_ *addon = method->fOwner;
+			addon->AddMethod();
+		}
+	}
+	
 	return B_OK;
 }

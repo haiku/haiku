@@ -45,6 +45,7 @@
 
 #include "InputServer.h"
 #include "InputServerTypes.h"
+#include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
 // include app_server headers for communication
@@ -476,6 +477,7 @@ InputServer::MessageReceived(BMessage *message)
 		case IS_STOP_DEVICE:
 		case IS_CONTROL_DEVICES:
 		case SYSTEM_SHUTTING_DOWN:
+		case IS_METHOD_REGISTER:
 			fAddOnManager->PostMessage(message);
 			return;
 		case B_SOME_APP_LAUNCHED: {
@@ -778,6 +780,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 			if ((outbound->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK) 
 				&& (size == (ssize_t)sizeof(fKey_info.key_states)))
 				memcpy(fKey_info.key_states, data, size);
+				
 		}
    		default:
 			break;
@@ -992,21 +995,21 @@ status_t
 InputServer::SetNextMethod(bool direction)
 {
 	LockMethodQueue();
-
+	
 	int32 index = gInputMethodList.IndexOf(fActiveMethod);
-	if (index < 0) {
-		UnlockMethodQueue();
-		return B_ERROR;
-	}
-
 	index += (direction ? 1 : -1);
 	
-	if (index < 0)
-		index = fMethodQueue.CountItems() - 1;
-	if (index >= fMethodQueue.CountItems())
-		index = 0;
+	if (index < -1)
+		index = gInputMethodList.CountItems() - 1;
+	if (index >= gInputMethodList.CountItems())
+		index = -1;
 
-	SetActiveMethod((BInputServerMethod *)gInputMethodList.ItemAt(index));
+	BInputServerMethod *method = &gKeymapMethod;
+
+	if (index != -1)
+		method = (BInputServerMethod *)gInputMethodList.ItemAt(index);
+		
+	SetActiveMethod(method);
 
 	UnlockMethodQueue();
 	return B_OK;
@@ -1445,9 +1448,9 @@ InputServer::SanitizeEvents(BList *events)
 				// we scan for Alt+Space key down events which means we change to next input method
 				// Note : Shift+Alt+Space key allows to change to the previous input method
 				if ((fKey_info.modifiers & B_COMMAND_KEY) 
-					&& (fKey_info.key_states[B_SPACE >> 3] & (1 << (7 - (B_SPACE % 8))))) {
+					&& (fKey_info.key_states[KEY_Spacebar >> 3] & (1 << (7 - (KEY_Spacebar % 8))))) {
 					SetNextMethod(!fKey_info.modifiers & B_SHIFT_KEY);
-
+				
 					// this event isn't sent to the user
 					events->RemoveItem(index);
 					delete event;
@@ -1617,10 +1620,14 @@ InputServer::ControlDevices(const char* name, input_device_type type, uint32 cod
  *  Method: InputServer::DoMouseAcceleration()
  *   Descr: 
  */
-bool 
-InputServer::DoMouseAcceleration(long *,
-                                 long *)
+bool
+InputServer::DoMouseAcceleration(int32 *x,
+                                 int32 *y)
 {
+	CALLED();
+	int32 speed = fMouseSettings.MouseSpeed() >> 15;
+	//*y = *x * speed;
+	PRINT(("DoMouse : %ld %ld %ld %ld\n", *x, *y, speed, fMouseSettings.MouseSpeed()));
 	return true;
 }
 
@@ -1635,6 +1642,7 @@ InputServer::SetMousePos(long *,
                          long,
                          long)
 {
+	CALLED();
 	return true;
 }
 
@@ -1648,6 +1656,7 @@ InputServer::SetMousePos(long *,
                          long *,
                          BPoint)
 {
+	CALLED();
 	return true;
 }
 
@@ -1662,6 +1671,7 @@ InputServer::SetMousePos(long *,
                          float,
                          float)
 {
+	CALLED();
 	return true;
 }
 

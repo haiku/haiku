@@ -166,7 +166,7 @@ public:
 	static status_t StartStopDevices(BInputServerDevice *isd, bool);
 	static status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
 
-	bool DoMouseAcceleration(long*, long*);
+	bool DoMouseAcceleration(int32*, int32*);
 	bool SetMousePos(long*, long*, long, long);
 	bool SetMousePos(long*, long*, BPoint);
 	bool SetMousePos(long*, long*, float, float);

@@ -92,6 +92,7 @@ MethodReplicant::~MethodReplicant()
 MethodReplicant *
 MethodReplicant::Instantiate(BMessage *data)
 {
+	CALLED();
 	if (!validate_instantiation(data, REPLICANT_CTL_NAME))
 		return NULL;
 	return new MethodReplicant(data);
@@ -111,17 +112,15 @@ MethodReplicant::Archive(BMessage *data, bool deep) const
 void
 MethodReplicant::AttachedToWindow()
 {
+	CALLED();
 	BMessenger messenger(this);
 	BMessage msg(IS_METHOD_REGISTER);
 	msg.AddMessenger("address", messenger);
 
 	BMessenger inputMessenger(fSignature);
-	BMessage reply;
-	if (inputMessenger.SendMessage(&msg, &reply)!=B_OK) {
+	if (inputMessenger.SendMessage(&msg)!=B_OK) {
 		printf("error when contacting input_server\n");
 	}
-
-	PRINT_OBJECT(reply);
 }
 
 
