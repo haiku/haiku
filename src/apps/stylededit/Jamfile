@@ -21,4 +21,4 @@ App StyledEdit :
 SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 SEARCH on <src!apps!stylededit>string_helper.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 
-LinkSharedOSLibs StyledEdit : be translation tracker textencoding ;
+LinkSharedOSLibs StyledEdit : be translation tracker libtextencoding.so ;
