@@ -10,6 +10,8 @@
 
 #include "DirectoryIterator.h"
 
+#include <stdio.h>
+
 using namespace Udf;
 
 status_t
@@ -19,7 +21,7 @@ DirectoryIterator::GetNextEntry(vnode_id *id, char *name, uint32 *length)
 		return B_BAD_VALUE;
 
 	if (fCount < 5) 
-		sprintf(name, "entry #%d", fCount++);
+		sprintf(name, "entry #%ld", fCount++);
 	else 
 		return B_ENTRY_NOT_FOUND;
 		
