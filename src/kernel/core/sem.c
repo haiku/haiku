@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -55,11 +55,10 @@ struct sem_entry {
 static int32 sMaxSems = 4096;
 static int32 sUsedSems = 0;
 
-static struct sem_entry *gSems = NULL;
-static region_id         gSemRegion = 0;
-static bool              gSemsActive = false;
-static struct sem_entry	*gFreeSemsHead = NULL;
-static struct sem_entry	*gFreeSemsTail = NULL;
+static struct sem_entry *sSems = NULL;
+static bool sSemsActive = false;
+static struct sem_entry	*sFreeSemsHead = NULL;
+static struct sem_entry	*sFreeSemsTail = NULL;
 
 static spinlock sem_spinlock = 0;
 #define GRAB_SEM_LIST_LOCK()     acquire_spinlock(&sem_spinlock)
@@ -83,9 +82,9 @@ dump_sem_list(int argc, char **argv)
 	int i;
 
 	for (i = 0; i < sMaxSems; i++) {
-		if (gSems[i].id >= 0)
-			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &gSems[i], gSems[i].id,
-					gSems[i].u.used.name);
+		if (sSems[i].id >= 0)
+			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &sSems[i], sSems[i].id,
+					sSems[i].u.used.name);
 	}
 	return 0;
 }
@@ -129,20 +128,20 @@ dump_sem_info(int argc, char **argv)
 			return 0;
 		} else {
 			unsigned slot = num % sMaxSems;
-			if (gSems[slot].id != (int)num) {
+			if (sSems[slot].id != (int)num) {
 				dprintf("sem 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
-			dump_sem(&gSems[slot]);
+			dump_sem(&sSems[slot]);
 			return 0;
 		}
 	}
 
 	// walk through the sem list, trying to match name
 	for (i = 0; i < sMaxSems; i++) {
-		if (gSems[i].u.used.name != NULL
-			&& strcmp(argv[1], gSems[i].u.used.name) == 0) {
-			dump_sem(&gSems[i]);
+		if (sSems[i].u.used.name != NULL
+			&& strcmp(argv[1], sSems[i].u.used.name) == 0) {
+			dump_sem(&sSems[i]);
 			return 0;
 		}
 	}
@@ -163,18 +162,18 @@ dump_sem_info(int argc, char **argv)
 static void
 free_sem_slot(int slot, sem_id nextID)
 {
-	struct sem_entry *sem = gSems + slot;
+	struct sem_entry *sem = sSems + slot;
 	// set next_id to the next possible value; for sanity check the current ID
 	if (nextID < 0)
 		sem->u.unused.next_id = slot;
 	else
 		sem->u.unused.next_id = nextID;
 	// append the entry to the list
-	if (gFreeSemsTail)
-		gFreeSemsTail->u.unused.next = sem;
+	if (sFreeSemsTail)
+		sFreeSemsTail->u.unused.next = sem;
 	else
-		gFreeSemsHead = sem;
-	gFreeSemsTail = sem;
+		sFreeSemsHead = sem;
+	sFreeSemsTail = sem;
 	sem->u.unused.next = NULL;
 }
 
@@ -182,19 +181,20 @@ free_sem_slot(int slot, sem_id nextID)
 status_t
 sem_init(kernel_args *ka)
 {
+	area_id area;
 	int i;
 
 	TRACE(("sem_init: entry\n"));
 
 	// create and initialize semaphore table
-	gSemRegion = create_area("sem_table", (void **)&gSems, B_ANY_KERNEL_ADDRESS,
+	area = create_area("sem_table", (void **)&sSems, B_ANY_KERNEL_ADDRESS,
 		sizeof(struct sem_entry) * sMaxSems, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (gSemRegion < 0)
+	if (area < 0)
 		panic("unable to allocate semaphore table!\n");
 
-	memset(gSems, 0, sizeof(struct sem_entry) * sMaxSems);
+	memset(sSems, 0, sizeof(struct sem_entry) * sMaxSems);
 	for (i = 0; i < sMaxSems; i++) {
-		gSems[i].id = -1;
+		sSems[i].id = -1;
 		free_sem_slot(i, i);
 	}
 
@@ -204,7 +204,7 @@ sem_init(kernel_args *ka)
 
 	TRACE(("sem_init: exit\n"));
 
-	gSemsActive = true;
+	sSemsActive = true;
 
 	return 0;
 }
@@ -227,7 +227,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	char *tempName;
 	size_t nameLength;
 
-	if (gSemsActive == false || sUsedSems == sMaxSems)
+	if (sSemsActive == false || sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 
 	if (name == NULL)
@@ -244,12 +244,12 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	GRAB_SEM_LIST_LOCK();
 
 	// get the first slot from the free list
-	sem = gFreeSemsHead;
+	sem = sFreeSemsHead;
 	if (sem) {
 		// remove it from the free list
-		gFreeSemsHead = sem->u.unused.next;
-		if (!gFreeSemsHead)
-			gFreeSemsTail = NULL;
+		sFreeSemsHead = sem->u.unused.next;
+		if (!sFreeSemsHead)
+			sFreeSemsTail = NULL;
 		// init the slot
 		GRAB_SEM_LOCK(*sem);
 		sem->id = sem->u.unused.next_id;
@@ -291,7 +291,7 @@ delete_sem(sem_id id)
 	char *old_name;
 	struct thread_queue release_queue;
 
-	if (gSemsActive == false)
+	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
@@ -299,10 +299,10 @@ delete_sem(sem_id id)
 	slot = id % sMaxSems;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != id) {
-		RELEASE_SEM_LOCK(gSems[slot]);
+	if (sSems[slot].id != id) {
+		RELEASE_SEM_LOCK(sSems[slot]);
 		restore_interrupts(state);
 		TRACE(("delete_sem: invalid sem_id %ld\n", id));
 		return B_BAD_SEM_ID;
@@ -312,7 +312,7 @@ delete_sem(sem_id id)
 	release_queue.head = release_queue.tail = NULL;
 
 	// free any threads waiting for this semaphore
-	while ((t = thread_dequeue(&gSems[slot].u.used.q)) != NULL) {
+	while ((t = thread_dequeue(&sSems[slot].u.used.q)) != NULL) {
 		t->state = B_THREAD_READY;
 		t->sem.acquire_status = B_BAD_SEM_ID;
 		t->sem.count = 0;
@@ -320,11 +320,11 @@ delete_sem(sem_id id)
 		released_threads++;
 	}
 
-	gSems[slot].id = -1;
-	old_name = gSems[slot].u.used.name;
-	gSems[slot].u.used.name = NULL;
+	sSems[slot].id = -1;
+	old_name = sSems[slot].u.used.name;
+	sSems[slot].u.used.name = NULL;
 
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 
 	// append slot to the free list
 	GRAB_SEM_LIST_LOCK();
@@ -366,20 +366,20 @@ sem_timeout(timer *data)
 	slot = args->blocked_sem_id % sMaxSems;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
 	TRACE(("sem_timeout: called on 0x%x sem %ld, tid %ld\n", data, args->blocked_sem_id, args->blocked_thread));
 
-	if (gSems[slot].id != args->blocked_sem_id) {
+	if (sSems[slot].id != args->blocked_sem_id) {
 		// this thread was not waiting on this semaphore
 		panic("sem_timeout: thid %ld was trying to wait on sem %ld which doesn't exist!\n",
 			args->blocked_thread, args->blocked_sem_id);
 	}
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
-	remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, B_TIMED_OUT);
+	remove_thread_from_sem(t, &sSems[slot], &wakeup_queue, B_TIMED_OUT);
 	
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 
 	GRAB_THREAD_LOCK();
 	// put the threads in the run q here to make sure we dont deadlock in sem_interrupt_thread
@@ -408,7 +408,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 	int state;
 	status_t status = B_OK;
 	
-	if (gSemsActive == false)
+	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 
 	if (!kernel_startup && !are_interrupts_enabled())
@@ -416,38 +416,40 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (count <= 0)
+	if (count <= 0
+		|| (flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) == (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) {
 		return B_BAD_VALUE;
+	}
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 	
-	if (gSems[slot].id != id) {
+	if (sSems[slot].id != id) {
 		TRACE(("acquire_sem_etc: bad sem_id %ld\n", id));
 		status = B_BAD_SEM_ID;
 		goto err;
 	}
 
-	if (gSems[slot].u.used.count - count < 0 && (flags & B_TIMEOUT) != 0
+	if (sSems[slot].u.used.count - count < 0 && (flags & B_TIMEOUT) != 0
 		&& timeout <= 0) {
 		// immediate timeout
 		status = B_WOULD_BLOCK;
 		goto err;
 	}
 
-	if ((gSems[slot].u.used.count -= count) < 0) {
+	if ((sSems[slot].u.used.count -= count) < 0) {
 		// we need to block
 		struct thread *t = thread_get_current_thread();
 		timer timeout_timer; // stick it on the stack, since we may be blocking here
 		struct sem_timeout_args args;
 
 		TRACE_BLOCK(("acquire_sem_etc(id = %ld): block name = %s, thread = %p,"
-					 " name = %s\n", id, gSems[slot].u.used.name, t, t->name));
+					 " name = %s\n", id, sSems[slot].u.used.name, t, t->name));
 
 		// do a quick check to see if the thread has any pending signals
 		// this should catch most of the cases where the thread had a signal
 		if ((flags & B_CAN_INTERRUPT) && t->sig_pending) {
-			gSems[slot].u.used.count += count;
+			sSems[slot].u.used.count += count;
 			status = B_INTERRUPTED;
 			goto err;
 		}
@@ -456,10 +458,10 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		t->sem.flags = flags;
 		t->sem.blocking = id;
 		t->sem.acquire_count = count;
-		t->sem.count = min(-gSems[slot].u.used.count, count);
+		t->sem.count = min(-sSems[slot].u.used.count, count);
 			// store the count we need to restore upon release
 		t->sem.acquire_status = B_NO_ERROR;
-		thread_enqueue(t, &gSems[slot].u.used.q);
+		thread_enqueue(t, &sSems[slot].u.used.q);
 
 		if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
 			TRACE(("sem_acquire_etc: setting timeout sem for %Ld usecs, semid %d, tid %d\n",
@@ -477,7 +479,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 					B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER);			
 		}
 
-		RELEASE_SEM_LOCK(gSems[slot]);
+		RELEASE_SEM_LOCK(sSems[slot]);
 		GRAB_THREAD_LOCK();
 		// check again to see if a signal is pending.
 		// it may have been delivered while setting up the sem, though it's pretty unlikely
@@ -488,11 +490,11 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 			// here, since the threadlock is held. The previous check would have found most
 			// instances, but there was a race, so we have to handle it. It'll be more messy...
 			wakeup_queue.head = wakeup_queue.tail = NULL;
-			GRAB_SEM_LOCK(gSems[slot]);
-			if (gSems[slot].id == id) {
-				remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, EINTR);
+			GRAB_SEM_LOCK(sSems[slot]);
+			if (sSems[slot].id == id) {
+				remove_thread_from_sem(t, &sSems[slot], &wakeup_queue, EINTR);
 			}
-			RELEASE_SEM_LOCK(gSems[slot]);
+			RELEASE_SEM_LOCK(sSems[slot]);
 			while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
 				scheduler_enqueue_in_run_queue(t);
 			}
@@ -512,13 +514,13 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		restore_interrupts(state);
 
 		TRACE_BLOCK(("acquire_sem_etc(id = %ld): exit block name = %s, "
-					 "thread = %p (%s)\n", id, gSems[slot].u.used.name, t,
+					 "thread = %p (%s)\n", id, sSems[slot].u.used.name, t,
 					 t->name));
 		return t->sem.acquire_status;
 	}
 
 err:
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
 
 	return status;
@@ -540,7 +542,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	cpu_status state;
 	status_t status = B_OK;
 
-	if (gSemsActive == false)
+	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
@@ -548,9 +550,9 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != id) {
+	if (sSems[slot].id != id) {
 		TRACE(("sem_release_etc: invalid sem_id %ld\n", id));
 		status = B_BAD_SEM_ID;
 		goto err;
@@ -563,7 +565,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	releaseQueue.head = releaseQueue.tail = NULL;
 
 	if (flags & B_RELEASE_ALL) {
-		count = -gSems[slot].u.used.count;
+		count = -sSems[slot].u.used.count;
 
 		// is there anything to do for us at all?
 		if (count == 0)
@@ -572,14 +574,14 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 	while (count > 0) {
 		int delta = count;
-		if (gSems[slot].u.used.count < 0) {
-			struct thread *thread = thread_lookat_queue(&gSems[slot].u.used.q);
+		if (sSems[slot].u.used.count < 0) {
+			struct thread *thread = thread_lookat_queue(&sSems[slot].u.used.q);
 
 			delta = min(count, thread->sem.count);
 			thread->sem.count -= delta;
 			if (thread->sem.count <= 0) {
 				// release this thread
-				thread = thread_dequeue(&gSems[slot].u.used.q);
+				thread = thread_dequeue(&sSems[slot].u.used.q);
 				thread_enqueue(thread, &releaseQueue);
 				thread->state = B_THREAD_READY;
 				thread->sem.count = 0;
@@ -587,10 +589,10 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		} else if (flags & B_RELEASE_IF_WAITING_ONLY)
 			break;
 
-		gSems[slot].u.used.count += delta;
+		sSems[slot].u.used.count += delta;
 		count -= delta;
 	}
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 
 	// pull off any items in the release queue and put them in the run queue
 	if (releaseQueue.head != NULL) {
@@ -614,7 +616,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	goto outnolock;
 
 err:
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 outnolock:
 	restore_interrupts(state);
 
@@ -628,7 +630,7 @@ get_sem_count(sem_id id, int32 *thread_count)
 	int slot;
 	int state;
 
-	if (gSemsActive == false)
+	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
@@ -638,18 +640,18 @@ get_sem_count(sem_id id, int32 *thread_count)
 	slot = id % sMaxSems;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != id) {
-		RELEASE_SEM_LOCK(gSems[slot]);
+	if (sSems[slot].id != id) {
+		RELEASE_SEM_LOCK(sSems[slot]);
 		restore_interrupts(state);
 		TRACE(("sem_get_count: invalid sem_id %ld\n", id));
 		return B_BAD_SEM_ID;
 	}
 
-	*thread_count = gSems[slot].u.used.count;
+	*thread_count = sSems[slot].u.used.count;
 
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
@@ -691,7 +693,7 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t size)
 	int state;
 	int slot;
 
-	if (!gSemsActive)
+	if (!sSemsActive)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
@@ -701,15 +703,15 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t size)
 	slot = id % sMaxSems;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != id) {
+	if (sSems[slot].id != id) {
 		status = B_BAD_SEM_ID;
 		TRACE(("get_sem_info: invalid sem_id %ld\n", id));
 	} else
-		fill_sem_info(&gSems[slot], info, size);
+		fill_sem_info(&sSems[slot], info, size);
 
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
 
 	return status;
@@ -729,14 +731,14 @@ _get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info, size_t s
 	int slot;
 	bool found = false;
 
-	if (!gSemsActive)
+	if (!sSemsActive)
 		return B_NO_MORE_SEMS;
 	if (_cookie == NULL || info == NULL || size != sizeof(sem_info))
 		return B_BAD_VALUE;
 
 	if (team == B_CURRENT_TEAM)
 		team = team_get_current_team_id();
-	/* prevents gSems[].owner == -1 >= means owned by a port */
+	/* prevents sSems[].owner == -1 >= means owned by a port */
 	if (team < 0 || !team_is_valid(team))
 		return B_BAD_TEAM_ID; 
 
@@ -748,18 +750,18 @@ _get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info, size_t s
 	GRAB_SEM_LIST_LOCK();
 
 	while (slot < sMaxSems) {
-		if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
-			GRAB_SEM_LOCK(gSems[slot]);
-			if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
+		if (sSems[slot].id != -1 && sSems[slot].u.used.owner == team) {
+			GRAB_SEM_LOCK(sSems[slot]);
+			if (sSems[slot].id != -1 && sSems[slot].u.used.owner == team) {
 				// found one!
-				fill_sem_info(&gSems[slot], info, size);
+				fill_sem_info(&sSems[slot], info, size);
 
-				RELEASE_SEM_LOCK(gSems[slot]);
+				RELEASE_SEM_LOCK(sSems[slot]);
 				slot++;
 				found = true;
 				break;
 			}
-			RELEASE_SEM_LOCK(gSems[slot]);
+			RELEASE_SEM_LOCK(sSems[slot]);
 		}
 		slot++;
 	}
@@ -780,7 +782,7 @@ set_sem_owner(sem_id id, team_id team)
 	int state;
 	int slot;
 
-	if (gSemsActive == false)
+	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
@@ -790,10 +792,10 @@ set_sem_owner(sem_id id, team_id team)
 	slot = id % sMaxSems;
 
 	state = disable_interrupts();
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != id) {
-		RELEASE_SEM_LOCK(gSems[slot]);
+	if (sSems[slot].id != id) {
+		RELEASE_SEM_LOCK(sSems[slot]);
 		restore_interrupts(state);
 		TRACE(("set_sem_owner: invalid sem_id %ld\n", id));
 		return B_BAD_SEM_ID;
@@ -804,9 +806,9 @@ set_sem_owner(sem_id id, team_id team)
 	// this case!
 	// The only safe way to do this is to prevent either team (the new
 	// or the old owner) from dying until we leave the spinlock.
-	gSems[slot].u.used.owner = team;
+	sSems[slot].u.used.owner = team;
 
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
@@ -833,17 +835,17 @@ sem_interrupt_thread(struct thread *t)
 
 	slot = t->sem.blocking % sMaxSems;
 
-	GRAB_SEM_LOCK(gSems[slot]);
+	GRAB_SEM_LOCK(sSems[slot]);
 
-	if (gSems[slot].id != t->sem.blocking) {
+	if (sSems[slot].id != t->sem.blocking) {
 		panic("sem_interrupt_thread: thread 0x%lx sez it's blocking on sem 0x%lx, but that sem doesn't exist!\n", t->id, t->sem.blocking);
 	}
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
-	if (remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, EINTR) != B_OK)
+	if (remove_thread_from_sem(t, &sSems[slot], &wakeup_queue, EINTR) != B_OK)
 		panic("sem_interrupt_thread: thread 0x%lx not found in sem 0x%lx's wait queue\n", t->id, t->sem.blocking);
 
-	RELEASE_SEM_LOCK(gSems[slot]);
+	RELEASE_SEM_LOCK(sSems[slot]);
 
 	while ((t = thread_dequeue(&wakeup_queue)) != NULL) {
 		scheduler_enqueue_in_run_queue(t);
@@ -902,6 +904,9 @@ sem_delete_owned_sems(team_id owner)
 	int i;
 	int count = 0;
 
+	// ToDo: that looks horribly inefficient - maybe it would be better
+	//	to have them in a list in the team
+
 	if (owner < 0)
 		return B_BAD_TEAM_ID;
 
@@ -909,8 +914,8 @@ sem_delete_owned_sems(team_id owner)
 	GRAB_SEM_LIST_LOCK();
 
 	for (i = 0; i < sMaxSems; i++) {
-		if (gSems[i].id != -1 && gSems[i].u.used.owner == owner) {
-			sem_id id = gSems[i].id;
+		if (sSems[i].id != -1 && sSems[i].u.used.owner == owner) {
+			sem_id id = sSems[i].id;
 
 			RELEASE_SEM_LIST_LOCK();
 			restore_interrupts(state);
