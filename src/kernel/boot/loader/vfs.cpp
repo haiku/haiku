@@ -651,7 +651,7 @@ close(int fd)
 
 // ToDo: remove this kludge when possible
 int
-#ifdef fstat
+#if defined(fstat) && !defined(main)
 _fstat(int fd, struct stat *stat, size_t /*statSize*/)
 #else
 fstat(int fd, struct stat *stat)
