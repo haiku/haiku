@@ -398,12 +398,20 @@ void if_attach(struct ifnet *ifp)
 
 void if_detach(struct ifnet *ifp)
 {
-	struct ifnet **p = &devices, *q;
-
-	for (; (*p)->if_next != ifp ; (*p) = (*p)->if_next)
-		continue;
-	q = (*p)->if_next->if_next;
-	(*p)->if_next = q;
+	struct ifnet *p = devices, *q = NULL;
+	
+	for(; p && p != ifp; p = p->if_next)
+		q = p;
+	
+	if(!p)
+		return;
+	
+	if(q)
+		q->if_next = p->if_next;
+	else
+		devices = p->if_next;
+	
+	free(p->if_name);
 }
 	
 /* XXX - memcpy used as copyin / copyout not available. I did look
