@@ -50,9 +50,8 @@ status_t nv_agp_setup(void)
 		if (!nai.agp_bus)
 		{
 			LOG(4,("AGP: no AGP busmanager found.\n"));
-
-			/* make sure the card is in PCI mode if it's an AGP type after all */
-			CFGW(AGPCMD, 0x00000000);
+			/* don't touch AGP command register, we don't know what has been setup:
+			 * touching it anyway might 'hang' the graphics card! */
 
 			return B_ERROR;
 		}
@@ -97,32 +96,33 @@ status_t nv_agp_setup(void)
 	{
 		LOG(4,("AGP: the graphicscard this accelerant controls is PCI type.\n"));
 
-		/* make sure the card is in PCI mode if it's an AGP type after all */
+		/* make sure card is set for PCI access */
 		CFGW(AGPCMD, 0x00000000);
 
 		return B_ERROR;
 	}
 
-	/* abort if specified by user in nv.settings */
-	//fixme: should probably be removed now... or updated to work via the busmanager.
 	if (si->settings.force_pci)
 	{
-		/* user specified not to use AGP */
-		LOG(4,("AGP: forcing PCI mode (specified in nv.settings).\n"));
-		/* program card for PCI access */
-		CFGW(AGPCMD, 0x00000000);
+		/* set PCI mode if specified by user in nv.settings */
+		LOG(4,("AGP: forcing PCI mode (specified in nv.settings)\n"));
 
-		return B_ERROR;
+		/* let the AGP busmanager setup PCI mode.
+		 * (the AGP speed scheme is of no consequence now) */
+		nca.cmd = 0x00000000;
+		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
 	}
+	else
+	{
+		/* activate AGP mode */
+		LOG(4,("AGP: activating AGP mode...\n"));
 
-	/* activate AGP mode */
-	LOG(4,("AGP: activating AGP mode...\n"));
-
-	/* let the AGP busmanager worry about what mode to set.. */
-	nca.cmd = (0xfffffff7);
-	/* ..but we do need to select the right speed scheme fetched from our card */
-	if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
-	ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
+		/* let the AGP busmanager worry about what mode to set.. */
+		nca.cmd = 0xfffffff7;
+		/* ..but we do need to select the right speed scheme fetched from our card */
+		if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
+		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
+	}
 
 	/* list mode now activated */
 	nv_agp_list_active(nca.cmd);
