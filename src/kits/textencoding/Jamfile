@@ -14,4 +14,8 @@ LinkSharedOSLibs libtextencoding.so : be ;
 MakeLocate <develop>libtextencoding.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libtextencoding.so : libtextencoding.so ;
 
+Package haiku-maildaemon-cvs :
+	libtextencoding.so :
+	boot home config lib ;
+
 SubInclude OBOS_TOP src kits textencoding libiconv ;
