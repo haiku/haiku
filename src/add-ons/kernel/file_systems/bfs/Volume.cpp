@@ -21,6 +21,18 @@
 #include <ctype.h>
 
 
+static const int32 kDesiredAllocationGroups = 56;
+	// This is the number of allocation groups that will be tried
+	// to be given for newly initialized disks.
+	// That's only relevant for smaller disks, though, since any
+	// of today's disk sizes already reach the maximum length
+	// of an allocation group (65536 blocks).
+	// It seems to create appropriate numbers for smaller disks
+	// with this setting, though (i.e. you can create a 400 MB
+	// file on a 1 GB disk without the need for double indirect
+	// blocks).
+
+
 class DeviceOpener {
 	public:
 		DeviceOpener(const char *device, int mode);
@@ -172,11 +184,34 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 	num_blocks = numBlocks;
 	used_blocks = 0;
 
-	// ToDo: set allocation group stuff for real (this is hardcoded for a 10 MB file)!!!
+	// Get the minimum ag_shift (that's determined by the block size)
 
 	blocks_per_ag = 1;
-	num_ags = 2;
 	ag_shift = 13;
+
+	int32 bitsPerBlock = blockSize << 3;
+	off_t bitmapBlocks = (numBlocks + bitsPerBlock - 1) / bitsPerBlock;
+
+	for (int32 i = 8192; i < bitsPerBlock; i *= 2) {
+		ag_shift++;
+	}
+
+	// Many allocation groups help applying allocation policies, but if
+	// they are too small, we will need to many block_runs to cover large
+	// files (see above to get an explanation of the kDesiredAllocationGroups
+	// constant).
+
+	while (true) {
+		num_ags = bitmapBlocks / blocks_per_ag;
+		if (num_ags > kDesiredAllocationGroups) {
+			if (ag_shift == 16)
+				break;
+
+			ag_shift++;
+			blocks_per_ag++;
+		} else
+			break;
+	}
 }
 
 
