@@ -419,7 +419,8 @@ BBufferConsumer::HandleMessage(int32 message,
 		{
 			const consumer_connected_request *request = static_cast<const consumer_connected_request *>(data);
 			consumer_connected_reply reply;
-			rv = Connected(request->producer, request->where, request->with_format, &reply.input);
+			reply.input = request->input;
+			rv = Connected(request->input.source, request->input.destination, request->input.format, &reply.input);
 			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}

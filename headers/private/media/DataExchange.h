@@ -443,9 +443,7 @@ struct consumer_accept_format_reply : public reply_data
 
 struct consumer_connected_request : public request_data
 {
-	media_source producer;
-	media_destination where;
-	media_format with_format;
+	media_input input;
 };
 
 struct consumer_connected_reply : public reply_data
