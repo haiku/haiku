@@ -32,6 +32,8 @@
 #include <string.h>
 
 #include <AppFileInfo.h>
+#include <Application.h>
+#include <AppMisc.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -587,18 +589,66 @@ BRoster::FindApp(entry_ref *ref, entry_ref *app) const
 
 
 /* Launching, activating, and broadcasting to apps */
+
 // Broadcast
+/*!	\brief Sends a message to all running applications.
+
+	The methods doesn't broadcast the message itself, but it asks the roster
+	to do so. It immediatly returns after sending the request. The return
+	value only tells about whether the request has successfully been sent.
+
+	The message is sent asynchronously. Replies to it go to the application.
+	(\c be_app_messenger).
+
+	\param message The message to be broadcast.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a message.
+	- other error codes
+*/
 status_t
-BRoster::Broadcast(BMessage *msg) const
+BRoster::Broadcast(BMessage *message) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	return Broadcast(message, be_app_messenger);
 }
 
 // Broadcast
+/*!	\brief Sends a message to all running applications.
+
+	The methods doesn't broadcast the message itself, but it asks the roster
+	to do so. It immediatly returns after sending the request. The return
+	value only tells about whether the request has successfully been sent.
+
+	The message is sent asynchronously. Replies to it go to the specified
+	target (\a replyTo).
+
+	\param message The message to be broadcast.
+	\param replyTo Reply target for the message.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a message.
+	- other error codes
+*/
 status_t
-BRoster::Broadcast(BMessage *msg, BMessenger replyTo) const
+BRoster::Broadcast(BMessage *message, BMessenger replyTo) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = (message ? B_OK : B_BAD_VALUE);
+	// compose the request message
+	BMessage request(B_REG_BROADCAST);
+	if (error == B_OK)
+		error = request.AddInt32("team", BPrivate::current_team());
+	if (error == B_OK)
+		error = request.AddMessage("message", message);
+	if (error == B_OK)
+		error = request.AddMessenger("reply_target", replyTo);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // StartWatching
