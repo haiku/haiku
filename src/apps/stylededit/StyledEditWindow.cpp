@@ -176,10 +176,13 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	
 	menu->AddSeparatorItem();
 	menu->AddItem(menuItem= new BMenuItem("Find...", new BMessage(MENU_FIND),'F'));
-	menu->AddItem(menuItem= new BMenuItem("Find Again",new BMessage(MENU_FIND_AGAIN),'G'));
+	menu->AddItem(fFindAgainItem= new BMenuItem("Find Again",new BMessage(MENU_FIND_AGAIN),'G'));
+	fFindAgainItem->SetEnabled(false);
+	
 	menu->AddItem(menuItem= new BMenuItem("Find Selection", new BMessage(MENU_FIND_SELECTION),'H'));
 	menu->AddItem(menuItem= new BMenuItem("Replace...", new BMessage(MENU_REPLACE),'R'));
-	menu->AddItem(menuItem= new BMenuItem("Replace Same", new BMessage(MENU_REPLACE_SAME),'T'));
+	menu->AddItem(fReplaceSameItem= new BMenuItem("Replace Same", new BMessage(MENU_REPLACE_SAME),'T'));
+	fReplaceSameItem->SetEnabled(false);
 	
 	//Add the "Font"-menu:
 	BMessage		*fontMessage;
@@ -363,6 +366,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		case MSG_SEARCH:
 			{
 			message->FindString("findtext", &fStringToFind);
+			fFindAgainItem->SetEnabled(true);
 			message->FindBool("casesens", &fCaseSens);
 			message->FindBool("wrap", &fWrapAround);
 			message->FindBool("backsearch", &fBackSearch);
@@ -398,12 +402,19 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			message->FindString("FindText",&findIt);
 			message->FindString("ReplaceText",&replaceWith);
 			fStringToFind= findIt;
+			fFindAgainItem->SetEnabled(true);
 			fReplaceString= replaceWith;
+			fReplaceSameItem->SetEnabled(true);
 			fCaseSens= caseSens;
 			fWrapAround= wrap;
 			fBackSearch= backSearch;
 			
 			Replace(findIt, replaceWith, caseSens, wrap, backSearch);
+		}
+		break;
+		case MENU_REPLACE_SAME:
+		{
+			Replace(fStringToFind,fReplaceString,fCaseSens,fWrapAround,fBackSearch);
 		}
 		break;
 		case MSG_REPLACE_ALL:
@@ -418,7 +429,9 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			message->FindBool("allwindows", &allWindows);
 			
 			fStringToFind= findIt;
+			fFindAgainItem->SetEnabled(true);
 			fReplaceString= replaceWith;
+			fReplaceSameItem->SetEnabled(true);
 			fCaseSens= caseSens;
 			
 			
@@ -1263,6 +1276,7 @@ StyledEditWindow::FindSelection()
 	viewText= fTextView->Text();
 				
 	viewText.CopyInto(fStringToFind, selectionStart, selectionLength);
+	fFindAgainItem->SetEnabled(true);
 	Search(fStringToFind, fCaseSens, fWrapAround, fBackSearch);
 
 }/***StyledEditWindow::FindSelection()***/
@@ -1295,6 +1309,11 @@ StyledEditWindow::ReplaceAll(BString findIt, BString replaceWith, bool caseSens)
 		viewText.ReplaceAll(findIt.String(),replaceWith.String());
 	else
 		viewText.IReplaceAll(findIt.String(),replaceWith.String());
+	
+	if (viewText.Compare(fTextView->Text()) == 0) {
+		// they are the same
+		return;
+	}
 	
 	int32 textStart, textFinish;
 	fTextView->GetSelection(&textStart, &textFinish);

@@ -60,6 +60,9 @@ private:
 	BMenuItem		*fCopyItem;
 	BMenuItem		*fClearItem;
 	
+	BMenuItem		*fFindAgainItem;
+	BMenuItem		*fReplaceSameItem;
+		
 	BMenuItem		*fBlackItem;
 	BMenuItem		*fRedItem;
 	BMenuItem		*fGreenItem;
