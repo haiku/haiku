@@ -1,5 +1,5 @@
 /* 
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -107,10 +107,7 @@ rtc_init(kernel_args *args)
 		// we don't panic because it's not kernel critical
 	}
 
-	// ToDo: initialization of the system time conversion factor is an x86 thing
-	//	and should be moved there
-	sRealTimeData->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
-	
+	arch_rtc_init(args, sRealTimeData);
 	rtc_hw_to_system();
 
 	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
