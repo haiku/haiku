@@ -3,7 +3,7 @@ But, beware:
 - the net_server binary should be symlinked as _APP_ in each sub-drectories, so 
   each module can be linked against it to find the kernel module API exported in this app.
 - the net_server will try to load the modules from a local add-ons folder, which should
-  be build by hand today: please symlink each module like this:
+  be setup by hands today: please symlink each module like this:
 
   net_server
   add-ons\
@@ -11,8 +11,10 @@ But, beware:
       memory_pool -> ../../memory_pool/memory_pool
     network\
       stack -> ../../stack/stack
-      protocols\
-      interfaces\
-        ethernet -> ../../../ethernet/ethernet
-        loopback -> ../../../loopback/loopback
+      layers\
+        protocols\
+          arp -> ../../../../arp/arp
+        interfaces\
+          ethernet -> ../../../../ethernet/ethernet
+          loopback -> ../../../../loopback/loopback
   
