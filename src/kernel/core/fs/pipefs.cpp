@@ -1,7 +1,7 @@
 /* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <KernelExport.h>
@@ -509,6 +509,8 @@ Inode::WriteBufferToChain(const void **_buffer, size_t *_bytesLeft, bool nonBloc
 	const void *buffer = *_buffer;
 	size_t bufferSize = *_bytesLeft;
 
+	TRACE(("Inode::WriteBufferToChain(buffer = %p, bytes = %lu)\n", buffer, bufferSize));
+
 	// if this is a blocking call, we need to make sure that data can
 	// still come in and we don't block the whole inode data transfer
 	// to prevent deadlocks from happening
@@ -579,6 +581,8 @@ Inode::FillPendingRequests()
 {
 	size_t bytesLeft = cbuf_get_length(fBufferChain);
 
+	TRACE(("Inode::FillPendingRequests(): bytesLeft = %lu\n", bytesLeft));
+
 	ReadRequest *request;
 	DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
 	while (bytesLeft != 0 && (request = iterator.Next()) != NULL) {
@@ -601,6 +605,8 @@ void
 Inode::FillPendingRequests(const void **_buffer, size_t *_bytesLeft)
 {
 	team_id team = team_get_current_team_id();
+
+	TRACE(("Inode::FillPendingRequests(buffer = %p, bytes = %lu)\n", *_buffer, *_bytesLeft));
 
 	ReadRequest *request;
 	DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
@@ -656,6 +662,8 @@ Inode::AddRequest(ReadRequest &request)
 status_t
 Inode::RemoveRequest(ReadRequest &request)
 {
+	TRACE(("Inode::RemoveRequest(request = %p)\n", &request));
+
 	if (benaphore_lock(&fRequestLock) != B_OK)
 		return B_ERROR;
 
@@ -686,13 +694,15 @@ Inode::Open(int openMode)
 void
 Inode::Close(int openMode)
 {
+	TRACE(("Inode::Close(openMode = %d)\n", openMode));
+
 	if ((openMode & O_ACCMODE) == O_WRONLY
 		&& atomic_add(&fWriterCount, -1) == 1) {
 		// Our last writer has been closed; if the pipe
 		// contains no data, unlock all waiting readers
 
 		benaphore_lock(&fRequestLock);
-		
+
 		if (cbuf_get_length(fBufferChain) == 0) {
 			ReadRequest *request;
 			DoublyLinked::Iterator<ReadRequest> iterator(fRequests);
@@ -1055,7 +1065,9 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 	volume->Unlock();
 
 	cookie->open_mode = openMode;
+	inode->Open(openMode);
 
+	TRACE(("  create cookie = %p\n", cookie));
 	*_cookie = (void *)cookie;
 	*_newVnodeID = inode->ID();
 
@@ -1077,10 +1089,13 @@ pipefs_open(fs_volume _volume, fs_vnode _node, int openMode, fs_cookie *_cookie)
 {
 	Inode *inode = (Inode *)_node;
 
+	TRACE(("pipefs_open(): node = %p, openMode = %d\n", inode, openMode));
+
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
+	TRACE(("  open cookie = %p\n", cookie));
 	cookie->open_mode = openMode;
 	inode->Open(openMode);
 
@@ -1130,7 +1145,8 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 	file_cookie *cookie = (file_cookie *)_cookie;
 	Inode *inode = (Inode *)_node;
 
-	TRACE(("pipefs_read: vnode %p, cookie %p, len 0x%lx, mode = %d\n", _node, cookie, *_length, cookie->open_mode));
+	TRACE(("pipefs_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n", _node, cookie, *_length,
+		cookie->open_mode));
 
 	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;
@@ -1178,7 +1194,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/
 	file_cookie *cookie = (file_cookie *)_cookie;
 	Inode *inode = (Inode *)_node;
 
-	TRACE(("pipefs_write: vnode %p, cookie %p, len 0x%lx\n", _node, cookie, *_length));
+	TRACE(("pipefs_write(vnode = %p, cookie = %p, length = %lu)\n", _node, cookie, *_length));
 
 	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
 		return B_NOT_ALLOWED;
@@ -1436,7 +1452,7 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 
 	stat->st_dev = volume->ID();
 	stat->st_ino = inode->ID();
-	
+
 	benaphore_lock(inode->RequestLock());
 	stat->st_size = inode->BytesInChain();
 	benaphore_unlock(inode->RequestLock());
