@@ -1,0 +1,110 @@
+#
+# Internet (IP) protocols
+#
+# Updated based on RFC 1340, Assigned Numbers (July 1992).
+# See also http://www.isi.edu/in-notes/iana/assignments/protocol-numbers
+#
+ip			0		IP			# internet protocol, pseudo protocol number
+icmp		1		ICMP		# internet control message protocol
+igmp		2		IGMP		# Internet Group Management
+ggp			3		GGP			# gateway-gateway protocol
+ipencap		4		IP-ENCAP	# IP encapsulated in IP (officially ``IP'')
+st			5		ST			# ST datagram mode
+tcp			6		TCP			# transmission control protocol
+ucl			7		UCL			# UCL
+egp			8		EGP			# exterior gateway protocol
+igp			9		IGP			# any private interior gateway
+bbn-rcc-mon	10		BBN-RCC-MON	# BBN RCC Monitoring
+nvp-ii		11		NVP-II		# Network Voice Protocol
+pup			12		PUP			# PARC universal packet protocol
+argus		13		ARGUS		# ARGUS
+emcon		14		EMCON		# EMCON
+xnet		15		XNET		# Cross Net Debugger
+chaos		16		CHAOS		# Chaos
+udp			17		UDP			# user datagram protocol
+mux         18MUX# Multiplexing
+dcn-meas    19DCN-MEAS# DCN Measurement Subsystems   
+hmp         20HMP# host monitoring protocol
+prm         21PRM# Packet Radio Measurement
+xns-idp     22XNS-IDP# Xerox NS IDP
+trunk-1     23TRUNK-1# Trunk-1
+trunk-2     24TRUNK-2# Trunk-2
+leaf-1      25LEAF-1# Leaf-1
+leaf-2      26LEAF-2# Leaf-2
+rdp         27RDP# "reliable datagram" protocol
+irtp        28IRTP# Internet Reliable Transaction
+iso-tp4     29ISO-TP4# ISO Transport Protocol class 4
+netblt      30NETBLT# Bulk Data Transfer Protocol
+mfe-nsp     31MFE-NSP# MFE Network Services Protocol
+merit-inp   32MERIT-INP# MERIT Internodal Protocol
+sep         33SEP# Sequential Exchange Protocol
+3pc         343PC# Third Party Connect Protocol
+idpr        35IDPR# Inter-Domain Policy Routing Protocol
+xtp         36XTP# Xpress Tranfer Protocol
+ddp         37DDP# Datagram Delivery Protocol
+idpr-cmtp   38IDPR-CMTP# IDPR Control Message Transport Proto
+idpr-cmtp   39IDPR-CMTP# IDPR Control Message Transport
+il          40IL# IL Transport Protocol
+ipv6        41IPv6# Internet Protocol version 6
+sdrp        42SDRP# Source Demand Routing Protocol
+sip-sr      43SIP-SR# SIP Source Route
+sip-frag    44SIP-FRAG# SIP Fragment
+idrp        45IDRP# Inter-Domain Routing Protocol
+rsvp        46RSVP# Reservation Protocol
+gre         47GRE# General Routing Encapsulation  
+mhrp        48MHRP# Mobile Host Routing Protocol
+bna         49BNA# BNA
+esp         50IPSEC-ESP# Encap Security Payload
+ah          51IPSEC-AH# Authentication Header
+i-nlsp      52I-NLSP# Integrated Net Layer Security TUBA
+swipe       53SWIPE# IP with Encryption
+nhrp        54NHRP# NBMA Next Hop Resolution Protocol
+mobileip    55MOBILEIP# MobileIP encapsulation
+skip        57SKIP# SKIP
+ipv6-icmp   58IPv6-ICMP# ICMP for IPv6
+ipv6-nonxt  59IPv6-NoNxt# No Next Header for IPv6
+ipv6-opts   60IPv6-Opts# Destination Options for IPv6
+any         61any# host internal protocol
+cftp        62CFTP# CFTP
+any         63any# local network
+sat-expak   64SAT-EXPAK# SATNET and Backroom EXPAK
+kryptolan   65KRYPTOLAN# Kryptolan
+rvd         66RVD# MIT Remote Virtual Disk Protocol
+ippc        67IPPC# Internet Pluribus Packet Core
+any         68any# distributed file system
+sat-mon     69SAT-MON# SATNET Monitoring
+visa        70VISA# VISA Protocol
+ipcv        71IPCV# Internet Packet Core Utility
+cpnx        72CPNX# Computer Protocol Network Executive
+cphb        73CPHB# Computer Protocol Heart Beat
+wsn         74WSN# Wang Span Network
+pvp         75PVP# Packet Video Protocol
+br-sat-mon  76BR-SAT-MON# Backroom SATNET Monitoring
+sun-nd      77SUN-ND# SUN ND PROTOCOL-Temporary
+wb-mon      78WB-MON# WIDEBAND Monitoring
+wb-expak    79WB-EXPAK# WIDEBAND EXPAK
+iso-ip      80ISO-IP# ISO Internet Protocol
+vmtp        81VMTP# Versatile Message Transport
+secure-vmtp 82SECURE-VMTP     # SECURE-VMTP
+vines       83VINES# VINES
+ttp         84TTP# TTP
+nsfnet-igp  85NSFNET-IGP# NSFNET-IGP
+dgp         86DGP# Dissimilar Gateway Protocol
+tcf         87TCF# TCF
+igrp        88IGRP# IGRP
+ospf        89OSPFIGP# Open Shortest Path First IGP
+sprite-rpc  90Sprite-RPC# Sprite RPC Protocol
+larp        91LARP# Locus Address Resolution Protocol
+mtp         92MTP# Multicast Transport Protocol
+ax.25       93AX.25# AX.25 Frames
+ipip        94IPIP# Yet Another IP encapsulation
+micp        95MICP# Mobile Internetworking Control Pro.
+scc-sp      96SCC-SP# Semaphore Communications Sec. Pro.
+etherip     97ETHERIP# Ethernet-within-IP Encapsulation
+encap       98ENCAP# Yet Another IP encapsulation
+any         99any# private encryption scheme
+gmtp       100GMTP# GMTP
+pim        103PIM# Protocol Independent Multicast
+ipcomp     108IPComp# IP Payload Compression Protocol
+vrrp       112VRRP# Virtual Router Redundancy Protocol
+reserved   255Reserved# 
