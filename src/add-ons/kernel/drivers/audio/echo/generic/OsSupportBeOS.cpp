@@ -96,6 +96,11 @@ void OsAllocateInit()
 //
 //===========================================================================
 
+// OsAllocateNonPaged is used to (surprise!) allocate non-paged memory.  Non-paged 
+// memory is defined as memory that is always physically resident - that is, the virtual 
+// memory manager won't swap this memory to disk.  Nonpaged memory can be accessed 
+// from the interrupt handler. 
+// Nonpaged memory has no particular requirements on address alignment. 
 
 ECHOSTATUS OsAllocateNonPaged
 (
@@ -264,6 +269,11 @@ ECHOSTATUS COsSupport::OsSnooze
 //
 //---------------------------------------------------------------------------
 
+// COsSupport::OsPageAllocate is used for allocating memory that is read and written by 
+// the DSP.  This means that any memory allocated by OsPageAllocate must be nonpaged 
+// and should be aligned on at least a 32 byte address boundary.  It must be aligned on at 
+// least a 4 byte boundary. 
+
 ECHOSTATUS COsSupport::OsPageAllocate
 (
 	DWORD			dwPageCt,				// How many pages to allocate
@@ -346,7 +356,8 @@ PVOID COsSupport::operator new( size_t Size )
 {
 	PVOID 		pMemory;
 	
-	// not from our pool since that may not be around yet
+	// it's probably better to not rtm alloc this
+	// but it does need to be resident	
 	pMemory = rtm_alloc(NULL,Size);
 	
 	if ( NULL == pMemory )
