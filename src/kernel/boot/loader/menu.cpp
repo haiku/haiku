@@ -403,6 +403,8 @@ add_safe_mode_menu()
 	Menu *safeMenu = new Menu(SAFE_MODE_MENU, "Safe Mode Options");
 	MenuItem *item;
 
+	safeMenu->AddItem(item = new MenuItem("Safe mode"));
+	item->SetType(MENU_ITEM_MARKABLE);
 	safeMenu->AddItem(item = new MenuItem("Disable user add-ons"));
 	item->SetType(MENU_ITEM_MARKABLE);
 
