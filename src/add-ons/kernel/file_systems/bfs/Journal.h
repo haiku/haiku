@@ -2,7 +2,7 @@
 #define JOURNAL_H
 /* Journal - transaction and logging
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
@@ -18,10 +18,8 @@
 #	define _IMPEXP_KERNEL
 #endif
 
-extern "C" {
-	#include <lock.h>
-	#include <cache.h>
-}
+#include <lock.h>
+#include <cache.h>
 
 #include "Volume.h"
 #include "Chain.h"
