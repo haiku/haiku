@@ -49,6 +49,8 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 	if (screenFrame.top > windowRect.top - kMargin)
 		MoveBy(0, kMargin + screenFrame.top - windowRect.top);
 
+	SetFeel(B_MODAL_APP_WINDOW_FEEL); /* avoid gettign it under Deskbar sometimes with FocusFollowsMouse */
+	
 	float value = 0.0;
 	bool retrying = false;
 	this->dontBeep = dontBeep;
