@@ -32,7 +32,6 @@
 // Standard Includes -----------------------------------------------------------
 #include <algobase.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 // System Includes -------------------------------------------------------------
@@ -347,9 +346,11 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (newSize > fMallocSize)
 		error = SetSize(newSize);
 			
-	if (error == B_OK)
+	if (error == B_OK) {
 		memcpy(fData + pos, buffer, size);
-		
+		if (pos + size > fLength)
+			fLength = pos + size;
+	}
 	return error != B_OK ? error : size;
 }
 
