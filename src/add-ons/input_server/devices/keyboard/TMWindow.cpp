@@ -25,9 +25,12 @@ const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
-extern "C" void _kshutdown_(long arg);
-#define SHUTDOWN_HALT 0
-#define SHUTDOWN_REBOOT 1
+#ifdef COMPILE_FOR_R5
+extern "C" void _kshutdown_(bool reboot);
+#else
+#include <syscalls.h>
+#define _kshutdown_(x) _kern_shutdown(x)
+#endif
 
 TMWindow::TMWindow()
 	: BWindow(BRect(0,0,350,300), "Team Monitor", 
@@ -102,7 +105,7 @@ TMWindow::MessageReceived(BMessage *msg)
 	switch(msg->what)
 	{
 		case TM_FORCE_REBOOT:
-			_kshutdown_(SHUTDOWN_REBOOT);
+			_kshutdown_(true);
 			break;
 		case TM_KILL_APPLICATION: {
 				TMListItem *item = (TMListItem*)fBackground->fListView->ItemAt(
