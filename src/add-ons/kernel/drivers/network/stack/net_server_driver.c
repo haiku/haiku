@@ -95,6 +95,7 @@ typedef struct {
 	port_id		local_port;
 	port_id		remote_port;
 	area_id		area;
+	thread_id	socket_thread;
 
 	sem_id		command_sem;
 	net_command *commands;
@@ -738,6 +739,9 @@ execute_command(net_server_cookie *nsc, uint32 op, void *data, uint32 length)
 			return command->result;
 		}
 		FATAL(("command couldn't be executed: %s\n", strerror(status)));
+		// if (status == B_INTERRUPTED)
+			// Signaling our net_server counterpart, so his socket thread awake too...
+		// 	send_signal_etc(nsc->socket_thread, SIGINT, 0);
 		return status;
 	}
 }
@@ -809,6 +813,7 @@ init_connection(void **cookie)
 		return err;
 	}
 	
+	nsc->socket_thread = connection.socket_thread;
 	nsc->nb_commands = connection.numCommands;
 	nsc->command_index = 0;
 	nsc->selecters = NULL;

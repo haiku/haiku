@@ -45,6 +45,7 @@ typedef struct {
 typedef struct {
 	port_id	port;
 	area_id area;
+	thread_id socket_thread;
 
 	sem_id	commandSemaphore;	// command queue
 	uint32	numCommands,bufferSize;

@@ -18,6 +18,44 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct commands_info {
+	int op;
+	const char *name
+} commands_info;
+
+#define C2N(op) { op, #op }
+
+commands_info g_commands_info[] = {
+	C2N(NET_STACK_SOCKET), 
+	C2N(NET_STACK_BIND), 
+	C2N(NET_STACK_RECVFROM), 
+	C2N(NET_STACK_RECV), 
+	C2N(NET_STACK_SENDTO), 
+	C2N(NET_STACK_SEND), 
+	C2N(NET_STACK_LISTEN),
+	C2N(NET_STACK_ACCEPT),
+	C2N(NET_STACK_CONNECT),
+	C2N(NET_STACK_SHUTDOWN),
+	C2N(NET_STACK_GETSOCKOPT),
+	C2N(NET_STACK_SETSOCKOPT),
+	C2N(NET_STACK_GETSOCKNAME),
+	C2N(NET_STACK_GETPEERNAME),
+	C2N(NET_STACK_SYSCTL),
+	C2N(NET_STACK_SELECT),
+	C2N(NET_STACK_DESELECT),
+	C2N(NET_STACK_GET_COOKIE),
+	C2N(NET_STACK_STOP),
+	C2N(NET_STACK_NOTIFY_SOCKET_EVENT),
+	C2N(NET_STACK_OPEN),
+	C2N(NET_STACK_CLOSE),
+	C2N(NET_STACK_NEW_CONNECTION),
+	
+	{ 0, "Unknown!" }
+};
+
+#undef C2N
+
+
 
 extern struct core_module_info *core;
 
@@ -157,6 +195,7 @@ connection_runner(void *_cookie)
 {
 	connection_cookie *cookie = (connection_cookie *)_cookie;
 	bool run = true;
+	commands_info *ci;
 
 	while (run) {
 		net_area_info area[MAX_NET_AREAS];
@@ -177,24 +216,32 @@ connection_runner(void *_cookie)
 			printf("could not clone command areas!\n");
 			continue;
 		}
-
+		
+		
+		ci = g_commands_info;
+		while(ci && ci->op) {
+			if (ci->op == command->op)
+				break;
+			ci++;
+		}
+		
 		args = convert_to_local(&command->area[0],&area[0], command->data);
-		printf("command %lx (index = %ld), buffer = %p, length = %ld, result = %ld\n",
-			command->op, index, args, command->length, command->result);
+		printf("command %s (0x%lx) (index = %ld), buffer = %p, length = %ld, result = %ld\n",
+			ci->name, command->op, index, args, command->length, command->result);
 
 		switch (command->op) {
 			case NET_STACK_OPEN:
 				cookie->openFlags = args->u.integer;
-				printf("opening socket, mode = %lx!\n", cookie->openFlags);
+				printf("Opening socket connection, mode = %lx!\n", cookie->openFlags);
 				break;
 
 			case NET_STACK_CLOSE:
-				printf("closing socket...\n");
+				printf("Closing socket connection...\n");
 				run = false;
 				break;
 
 			case NET_STACK_SOCKET:
-				printf("open a socket... family = %d, type = %d, proto = %d\n",
+				printf("Creating stack socket... family = %d, type = %d, proto = %d\n",
 					args->u.socket.family, args->u.socket.type, args->u.socket.proto);
 				status = core->socket_init(&cookie->socket);
 				if (status == 0)
@@ -386,53 +433,55 @@ connection_runner(void *_cookie)
 
 
 static status_t
-init_connection(net_connection *connection,connection_cookie **_cookie)
+init_connection(net_connection *connection, connection_cookie **_cookie)
 {
 	connection_cookie *cookie;
 	net_command *commands;
 
-	cookie = (connection_cookie *)malloc(sizeof(connection_cookie));
+	cookie = (connection_cookie *) malloc(sizeof(connection_cookie));
 	if (cookie == NULL) {
-		fprintf(stderr,"couldn't allocate memory for cookie.\n");
+		fprintf(stderr, "couldn't allocate memory for cookie.\n");
 		return B_NO_MEMORY;
 	}
 
-	connection->area = create_area("net connection",(void *)&commands,B_ANY_ADDRESS,
+	connection->area = create_area("net connection", (void *) &commands, B_ANY_ADDRESS,
 			CONNECTION_BUFFER_SIZE + CONNECTION_COMMAND_SIZE,
-			B_NO_LOCK,B_READ_AREA | B_WRITE_AREA);
+			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (connection->area < B_OK) {
-		fprintf(stderr,"couldn't create area: %s.\n",strerror(connection->area));
+		fprintf(stderr, "couldn't create area: %s.\n", strerror(connection->area));
 		free(cookie);
 		return connection->area;
 	}
 	memset(commands,0,NUM_COMMANDS * sizeof(net_command));
 
-	connection->port = create_port(CONNECTION_QUEUE_LENGTH,"net stack connection");
+	connection->port = create_port(CONNECTION_QUEUE_LENGTH, "net stack connection");
 	if (connection->port < B_OK) {
-		fprintf(stderr,"couldn't create port: %s.\n",strerror(connection->port));
+		fprintf(stderr, "couldn't create port: %s.\n", strerror(connection->port));
 		delete_area(connection->area);
 		free(cookie);
 		return connection->port;
 	}
 	
-	connection->commandSemaphore = create_sem(0,"net command queue");
+	connection->commandSemaphore = create_sem(0, "net command queue");
 	if (connection->commandSemaphore < B_OK) {
-		fprintf(stderr,"couldn't create semaphore: %s.\n",strerror(connection->commandSemaphore));
+		fprintf(stderr, "couldn't create semaphore: %s.\n", strerror(connection->commandSemaphore));
 		delete_area(connection->area);
 		delete_port(connection->port);
 		free(cookie);
 		return connection->commandSemaphore;
 	}
 
-	cookie->runner = spawn_thread(connection_runner,"connection runner",B_NORMAL_PRIORITY,cookie);
+	cookie->runner = spawn_thread(connection_runner, "connection runner", B_NORMAL_PRIORITY, cookie);
 	if (cookie->runner < B_OK) {
-		fprintf(stderr,"couldn't create thread: %s.\n",strerror(cookie->runner));
+		fprintf(stderr, "couldn't create thread: %s.\n", strerror(cookie->runner));
 		delete_sem(connection->commandSemaphore);
 		delete_area(connection->area);
 		delete_port(connection->port);
 		free(cookie);
 		return B_ERROR;
 	}
+
+	connection->socket_thread = cookie->runner;
 
 	connection->numCommands = NUM_COMMANDS;
 	connection->bufferSize = CONNECTION_BUFFER_SIZE;
@@ -475,7 +524,7 @@ connection_opener(void *_unused)
 	while(true) {
 		port_id port;
 		int32 msg;
-		ssize_t bytes = read_port(gStackPort,&msg,&port,sizeof(port_id));
+		ssize_t bytes = read_port(gStackPort, &msg, &port, sizeof(port_id));
 		if (bytes < B_OK)
 			return bytes;
 
@@ -484,10 +533,11 @@ connection_opener(void *_unused)
 			connection_cookie *cookie;
 
 			printf("incoming connection...\n");
-			if (init_connection(&connection,&cookie) == B_OK)
-				write_port(port,NET_STACK_NEW_CONNECTION,&connection,sizeof(net_connection));
+			if (init_connection(&connection, &cookie) == B_OK)
+				write_port(port, NET_STACK_NEW_CONNECTION, &connection, sizeof(net_connection));
 		} else
-			fprintf(stderr,"connection_opener: received unknown command: %lx (expected = %lx)\n",msg,(int32)NET_STACK_NEW_CONNECTION);
+			fprintf(stderr, "connection_opener: received unknown command: %lx (expected = %lx)\n",
+				msg, (int32) NET_STACK_NEW_CONNECTION);
 	}
 	return 0;
 }
@@ -496,11 +546,11 @@ connection_opener(void *_unused)
 status_t
 init_userland_ipc(void)
 {
-	gStackPort = create_port(CONNECTION_QUEUE_LENGTH,NET_STACK_PORTNAME);
+	gStackPort = create_port(CONNECTION_QUEUE_LENGTH, NET_STACK_PORTNAME);
 	if (gStackPort < B_OK)
 		return gStackPort;
 
-	gConnectionOpener = spawn_thread(connection_opener,"connection opener",B_NORMAL_PRIORITY,NULL);
+	gConnectionOpener = spawn_thread(connection_opener, "connection opener", B_NORMAL_PRIORITY, NULL);
 	if (resume_thread(gConnectionOpener) < B_OK) {
 		delete_port(gStackPort);
 		if (gConnectionOpener >= B_OK) {
@@ -532,7 +582,7 @@ main(void)
 		return -1;
 
 	puts("Userland_ipc - test is running. Press <Return> to quit.");
-	fgets(buffer,sizeof(buffer),stdin);
+	fgets(buffer, sizeof(buffer), stdin);
 
 	shutdown_userland_ipc();
 
