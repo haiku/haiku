@@ -67,6 +67,7 @@ void
 TerminalApp::OpenTerminal(BMessage * message)
 {
 	TerminalWindow * terminal = new TerminalWindow(message);
+	(void)terminal;
 	fWindowOpened = true;
 }
 
@@ -132,7 +133,7 @@ struct option title_opt = { "title", required_argument, 0, 't' } ;
 struct option options[] =
  { curbg_opt, curfg_opt, bg_opt, fg_opt, 
    geom_opt, help_opt, meta_opt, pref_opt,
-   selbg_opt, selfg_opt, title_opt, 0
+   selbg_opt, selfg_opt, title_opt, {0}
  };
 
 status_t
@@ -164,7 +165,6 @@ TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 	if (argc > 1) {
 		if (argv[1][0] == '-') {
 			const char * execname = (argc >= 1 ? argv[0] : "");
-			const char * title = 0;
 			int indexptr = 0;
 			int ch;
 			char * const * optargv = argv;
@@ -177,12 +177,12 @@ TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 				case 'g':
 					printf("geometry is %s = ",optarg);
 					int m, n;
-					if ((sscanf(optarg,"%ldx%ld%s",&m,&n) != 2) || (m < 0) || (n < 0)) {
+					if ((sscanf(optarg,"%dx%d",&m,&n) != 2) || (m < 0) || (n < 0)) {
 						printf("??\n");
 						printf("geometry must be of the format MxN where M and N are positive integers\n");
 						return;
 					}
-					printf("%ld,%ld\n",m,n);
+					printf("%d,%d\n",m,n);
 					terminal.AddInt32("columns",m);
 					terminal.AddInt32("rows",n);					
 				break;
@@ -305,9 +305,9 @@ TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 					}
 					break;
 					default:
-						printf("invalid indexptr %ld\n",indexptr);
+						printf("invalid indexptr %d\n",indexptr);
 						return;
-					}		
+					}
 				}
 			}
 		}

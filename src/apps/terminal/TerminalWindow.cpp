@@ -62,9 +62,10 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	AddChild(view);
 	rgb_color white = {255,255,255,0};
 	view->SetViewColor(white);
-	BShelf * shelf = new BShelf(view);
+//	BShelf * shelf = new BShelf(view);
 
-	status_t ignore = RestoreSettings(settingsRef);
+//	status_t ignore = RestoreSettings(settingsRef);
+	RestoreSettings(settingsRef);
 	
 	BString unTitled;
 	unTitled.SetTo("Terminal ");

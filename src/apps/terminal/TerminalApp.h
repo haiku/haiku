@@ -4,6 +4,7 @@
 #include <Application.h>
 #include <Message.h>
 #include <Roster.h>
+#include <cassert>
 
 class TerminalWindow;
 
@@ -15,6 +16,7 @@ public:
 	virtual         ~TerminalApp();
 	virtual void 	MessageReceived(BMessage *message);
 	virtual	void	ArgvReceived(int32 argc, char * const argv[], const char * cwd);
+	virtual	void	ArgvReceived(int32 argc, char **argv) { assert(false); }
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
 
