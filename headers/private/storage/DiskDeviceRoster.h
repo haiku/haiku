@@ -102,7 +102,6 @@ public:
 		// publishes: /dev/disk/virtual/files/<disk device ID>/raw
 	status_t UnregisterFileDevice(const char *filename);
 	status_t UnregisterFileDevice(partition_id device);
-// TODO: Add the respective syscalls. Also for Get{Device,Partition}ForPath()
 
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
 						 BDiskDevice *device = NULL);
@@ -117,22 +116,14 @@ public:
 	bool VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 									 BDiskDevice *device = NULL,
 									 BPartition **partition = NULL);
-	bool VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
-										 BDiskDevice *device = NULL,
-										 BPartition **partition = NULL);
-	bool VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
-									 BDiskDevice *device = NULL,
-									 BPartition **partition = NULL);
 									 
 	status_t GetDeviceWithID(partition_id id, BDiskDevice *device) const;
 	status_t GetPartitionWithID(partition_id id, BDiskDevice *device,
 								BPartition **partition) const;
 
-	partition_id GetDeviceForPath(const char *filename, BDiskDevice *device,
-								  bool registerIfFile = false);
-	partition_id GetPartitionForPath(const char *filename, BDiskDevice *device,
-									 BPartition **partition,
-									 bool registerIfFile = false);
+	status_t GetDeviceForPath(const char *filename, BDiskDevice *device);
+	status_t GetPartitionForPath(const char *filename, BDiskDevice *device,
+								 BPartition **partition);
 
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);

@@ -85,7 +85,7 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 													&neededSize);
 	if (id < 0)
 		return id;
-	return device->_SetTo(id, neededSize);
+	return device->_SetTo(id, true, false, neededSize);
 }
 
 // RewindDevices
@@ -141,24 +141,27 @@ BDiskDeviceRoster::RewindActiveJobs()
 partition_id
 BDiskDeviceRoster::RegisterFileDevice(const char *filename)
 {
-	// not implemented
-	return B_ERROR;
+	if (!filename)
+		return B_BAD_VALUE;
+	return _kern_register_file_device(filename);
 }
 
 // UnregisterFileDevice
 status_t
 BDiskDeviceRoster::UnregisterFileDevice(const char *filename)
 {
-	// not implemented
-	return B_ERROR;
+	if (!filename)
+		return B_BAD_VALUE;
+	return _kern_unregister_file_device(-1, filename);
 }
 
 // UnregisterFileDevice
 status_t
 BDiskDeviceRoster::UnregisterFileDevice(partition_id device)
 {
-	// not implemented
-	return B_ERROR;
+	if (device < 0)
+		return B_BAD_VALUE;
+	return _kern_unregister_file_device(device, NULL);
 }
 
 // VisitEachDevice
@@ -334,66 +337,6 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 	return terminatedEarly;
 }
 
-// VisitEachInitializablePartition
-/*!	\brief Iterates through the all devices' partitions that are initializable.
-
-	The supplied visitor's Visit(BPartition*) is invoked for each
-	initializable partition.
-	If Visit() returns \c true, the iteration is terminated and this method
-	returns \c true. If supplied, \a device is set to the concerned device
-	and in \a partition the pointer to the partition object is returned.
-
-	\param visitor The visitor.
-	\param device Pointer to a pre-allocated BDiskDevice to be initialized
-		   to the device at which the iteration was terminated.
-		   May be \c NULL.
-	\param partition Pointer to a pre-allocated BPartition pointer to be set
-		   to the partition at which the iteration was terminated.
-		   May be \c NULL.
-	\return \c true, if the iteration was terminated, \c false otherwise.
-*/
-bool
-BDiskDeviceRoster::VisitEachInitializablePartition(BDiskDeviceVisitor *visitor,
-												   BDiskDevice *device,
-												   BPartition **partition)
-{
-/*	bool terminatedEarly = false;
-	if (visitor) {
-		struct InitializablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition, int32)
-				{ return !partition->CanInitialize(NULL); }
-				// TODO: ???
-		} filter;
-		PartitionFilterVisitor filterVisitor(visitor, &filter);
-		terminatedEarly
-			= VisitEachPartition(&filterVisitor, device, partition);
-	}
-	return terminatedEarly;
-*/
-	// not implemented
-	return false;
-// TODO: Clarify semantics.
-}
-
-// VisitEachPartitionablePartition
-bool
-BDiskDeviceRoster::VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
-												   BDiskDevice *device,
-												   BPartition **partition)
-{
-	bool terminatedEarly = false;
-	if (visitor) {
-		struct PartitionablePartitionFilter : public PartitionFilter {
-			virtual bool Filter(BPartition *partition, int32)
-				{ return partition->ContainsPartitioningSystem(); }
-		} filter;
-		PartitionFilterVisitor filterVisitor(visitor, &filter);
-		terminatedEarly
-			= VisitEachPartition(&filterVisitor, device, partition);
-	}
-	return terminatedEarly;
-}
-
 // GetDeviceWithID
 /*!	\brief Returns a BDiskDevice for a given ID.
 
@@ -410,9 +353,9 @@ BDiskDeviceRoster::VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
 status_t
 BDiskDeviceRoster::GetDeviceWithID(int32 id, BDiskDevice *device) const
 {
-//	return _GetObjectWithID("device_id", id, device);
-	// not implemented
-	return B_ERROR;
+	if (!device)
+		return B_BAD_VALUE;
+	return device->_SetTo(id, true, false, 0);
 }
 
 // GetPartitionWithID
@@ -436,35 +379,56 @@ status_t
 BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
 									  BPartition **partition) const
 {
-/*	status_t error = (device && partition ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = _GetObjectWithID("partition_id", id, device);
-	if (error == B_OK)
-		*partition = device->PartitionWithID(id);
-	return error;
-*/
-	// not implemented
-	return B_ERROR;
+	if (!device || !partition)
+		return B_BAD_VALUE;
+	// download the device data
+	status_t error = device->_SetTo(id, false, false, 0);
+	if (error != B_OK)
+		return error;
+	// find the partition object
+	*partition = device->FindDescendant(id);
+	if (!*partition)	// should never happen!
+		return B_ENTRY_NOT_FOUND;
+	return B_OK;
 }
 
 // GetDeviceForPath
-partition_id
-BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device,
-									bool registerIfFile)
+status_t
+BDiskDeviceRoster::GetDeviceForPath(const char *filename, BDiskDevice *device)
 {
-	// not implemented
-	return B_ERROR;
+	if (!filename || !device)
+		return B_BAD_VALUE;
+	// get the device ID
+	size_t neededSize = 0;
+	partition_id id = _kern_find_disk_device(filename, &neededSize);
+	if (id < 0)
+		return id;
+	// download the device data
+	return device->_SetTo(id, true, false, neededSize);
 }
 
 // GetPartitionForPath
-partition_id
+status_t
 BDiskDeviceRoster::GetPartitionForPath(const char *filename,
 									   BDiskDevice *device,
-									   BPartition **partition,
-									   bool registerIfFile)
+									   BPartition **partition)
 {
-	// not implemented
-	return B_ERROR;
+	if (!filename || !device || !partition)
+		return B_BAD_VALUE;
+	// get the partition ID
+	size_t neededSize = 0;
+	partition_id id = _kern_find_partition(filename, &neededSize);
+	if (id < 0)
+		return id;
+	// download the device data
+	status_t error = device->_SetTo(id, false, false, neededSize);
+	if (error != B_OK)
+		return error;
+	// find the partition object
+	*partition = device->FindDescendant(id);
+	if (!*partition)	// should never happen!
+		return B_ENTRY_NOT_FOUND;
+	return B_OK;
 }
 
 // StartWatching
