@@ -1,6 +1,6 @@
 /* NV Acceleration functions */
 /* Author:
-   Rudolf Cornelissen 8/2003-12/2004.
+   Rudolf Cornelissen 8/2003-1/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -27,8 +27,8 @@ blit
 	We should be able to do FIFO assignment setup changes on-the-fly now, using
 	all the engine-command-handles that are pre-defined on any FIFO channel.
 
-	Maybe we can even setup new additional handles to previously unused engine
-	commands now, and there might even be a chance DMA can be setup(?).
+	We should be able to even setup new additional handles to previously unused engine
+	commands now, and DMA use should also be possible.
 */
 
 /* FIFO channel pointers */
@@ -86,25 +86,36 @@ status_t nv_acc_init()
 	ACCW(PF_CACH1_PSH0, 0x00000000);
 	/* cache1 pull0 access disabled */
 	ACCW(PF_CACH1_PUL0, 0x00000000);
-	/* cache1 push1 mode = pio */
+
+	//fixme: set these up for DMA use one day..
+	/* cache1 push1 mode = pio (disable DMA use) */
 	ACCW(PF_CACH1_PSH1, 0x00000000);
-	/* cache1 DMA instance adress = 0 (b0-15) */
+	/* cache1 DMA instance adress = none (b0-15);
+	 * instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000). */
+	/* note:
+	 * should point to a DMA definition in CTX register space (which is sort of RAM) */
 	ACCW(PF_CACH1_DMAI, 0x00000000);
+
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
 	ACCW(PF_CACH0_PUL0, 0x00000000);
-	/* RAM HT (hash table(?)) baseadress = $10000 (b4-8), size = 4k,
-	 * search = 128 (byte offset between hash 'sets'(?)) */
-	/* (note: so(?) HT base is $00710000, last is $00710fff) */
+	/* RAM HT (hash table) baseadress = $10000 (b4-8), size = 4k,
+	 * search = 128 (is byte offset between hash 'sets') */
+	/* note:
+	 * so HT base is $00710000, last is $00710fff.
+	 * In this space you define the engine command handles (HT_HANDL_XX), which
+	 * in turn points to the defines in CTX register space (which is sort of RAM) */
 	ACCW(PF_RAMHT, 0x03000100);
 	/* RAM FC baseadress = $11000 (b3-8) (size is fixed to 0.5k(?)) */
-	/* (note: so(?) FC base is $00711000, last is $007111ff) */
+	/* note:
+	 * so FC base is $00711000, last is $007111ff. (not used?) */
 	ACCW(PF_RAMFC, 0x00000110);
 	/* RAM RO baseadress = $11200 (b1-8), size = 0.5k */
-	/* (note: so(?) RO base is $00711200, last is $007113ff) */
-	/* (note also:
-	 *  This means(?) the PRAMIN CTX registers are accessible from base $00711400) */
+	/* note:
+	 * so RO base is $00711200, last is $007113ff. (not used?) */
+	/* note also:
+	 * This means(?) the PRAMIN CTX registers are accessible from base $00711400. */
 	ACCW(PF_RAMRO, 0x00000112);
 	/* PFIFO size: ch0-15 = 512 bytes, ch16-31 = 124 bytes */
 	ACCW(PF_SIZE, 0x0000ffff);
@@ -131,7 +142,8 @@ status_t nv_acc_init()
 	 * 'instance' tells you where the engine command is stored in 'PR_CTXx_x' sets
 	 * below: instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000).
 	 * That command is linked to the handle noted here. This handle is then used to
-	 * tell the FIFO to which engine command it is connected! */
+	 * tell the FIFO to which engine command it is connected!
+	 * (CTX registers are actually a sort of RAM space.) */
 	/* (first set) */
 	ACCW(HT_HANDL_00, NV1_IMAGE_FROM_CPU); /* 32bit handle (not used?) */
 	ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
@@ -191,13 +203,15 @@ status_t nv_acc_init()
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
 	/* note:
-	 * CTX determines which FIFO channels point to what engine commands. */
-	/* (setup 'root' set first) */
-	ACCW(PR_CTX0_R, 0x00003000); /* NVclass = NVroot, chromakey and userclip enabled */
-	/* fixme: CTX1_R should reflect RAM amount? (no influence on current used functions) */
-	ACCW(PR_CTX1_R, 0x01ffffff); /* cardmemory mask(?) */
-	ACCW(PR_CTX2_R, 0x00000002); /* ??? */
-	ACCW(PR_CTX3_R, 0x00000002); /* ??? */
+	 * CTX determines which HT handles point to what engine commands.
+	 * (CTX registers are actually a sort of RAM space.) */
+	/* (setup a DMA define 'set') */
+	ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
+								  * DMA target node is NVM (non-volatile memory?)
+								  * (instead of doing PCI or AGP transfers) */
+	ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit */
+	ACCW(PR_CTX2_R, 0x00000002); /* DMA access type is READ_AND_WRITE */
+	ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
 	/* setup set '0' for cmd NV_ROP5_SOLID */
 	ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
