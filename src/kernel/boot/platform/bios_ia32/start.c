@@ -1,13 +1,12 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
 #include "console.h"
 #include "cpu.h"
 #include "mmu.h"
-#include "video.h"
 #include "keyboard.h"
 
 #include <KernelExport.h>
@@ -106,7 +105,6 @@ _start(void)
 	console_init();
 	cpu_init();
 	mmu_init();
-	video_init();
 
 	spin(50000);
 		// wait a bit to give the user the opportunity to press a key
