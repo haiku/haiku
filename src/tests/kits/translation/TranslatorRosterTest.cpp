@@ -54,7 +54,7 @@ TranslatorRosterTest::TranslatorRosterTest(std::string name) : BTestCase(name) {
 TranslatorRosterTest::~TranslatorRosterTest() {
 }
 
-CppUnit::Test*
+CppUnit::Test *
 TranslatorRosterTest::Suite() {
 	/* create our suite */
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite("TranslatorRoster");
@@ -93,7 +93,7 @@ void TranslatorRosterTest::InitializeTest() {
 	int32 outCurVersion;
 	int32 outMinVersion;
 	long inAppVersion;
-	const char* info = proster->Version(&outCurVersion, &outMinVersion, inAppVersion);
+	const char *info = proster->Version(&outCurVersion, &outMinVersion, inAppVersion);
 	printf("Default TranslatorRoster aquired. Version: %s\n", info);
 }
 
@@ -102,7 +102,7 @@ void TranslatorRosterTest::InitializeTest() {
  */
 void TranslatorRosterTest::ConstructorTest() {
 	//shared instance of TranslatorRoster
-	BTranslatorRoster* proster;
+	BTranslatorRoster *proster;
 
 	// Create TranslatorRoster using noargs constructor
 	// (GetAllTranslatorsTest also tests this constructor)
@@ -184,10 +184,17 @@ void TranslatorRosterTest::ConstructorTest() {
  * BTranslatorRoster *Default()
  */
 void TranslatorRosterTest::DefaultTest() {
-	//already done in Initialize - added for completeness sake
 	NextSubTest();
-	BTranslatorRoster* proster = BTranslatorRoster::Default();
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(proster != NULL);
+	
+	// delete the default BTranslatorRoster
+	// (may not always be the appropriate thing to do,
+	// but it should work without blowing up)
+	NextSubTest();
+	delete proster;
+	proster = NULL;
+	CPPUNIT_ASSERT(BTranslatorRoster::Default());
 }
 
 /**
@@ -204,8 +211,8 @@ void TranslatorRosterTest::InstantiateTest() {
 	//Create our BMessage
 	BMessage translator_message;
 	
-	//create BTranslator using empty message (must return NULL)
-	proster = (BTranslatorRoster*) BTranslatorRoster::Instantiate(&translator_message);
+	//create BTranslatorRoster using empty message (must return NULL)
+	proster = (BTranslatorRoster *) BTranslatorRoster::Instantiate(&translator_message);
 	CPPUNIT_ASSERT(proster == NULL);
 	delete proster;
 	proster = NULL;
