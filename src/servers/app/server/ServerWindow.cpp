@@ -249,9 +249,7 @@ void ServerWindow::ReplaceDecorator(void)
 //! Requests that the ServerWindow's BWindow quit
 void ServerWindow::Quit(void)
 {
-	if (!IsLocked())
-		debugger("you must lock a ServerWindow object before calling ::Quit()\n");
-
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Quit\n",fTitle.String()));
 	BMessage msg;
 	
@@ -263,9 +261,8 @@ void ServerWindow::Quit(void)
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Show\n",fTitle.String()));
-	if (!IsLocked())
-		debugger("you must lock a ServerWindow object before calling ::Show()\n");
 
 	if(!fWinBorder->IsHidden())
 		return;
@@ -276,9 +273,8 @@ void ServerWindow::Show(void)
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	STRACE(("ServerWindow %s: Hide\n",fTitle.String()));
-	if (!IsLocked())
-		debugger("you must lock a ServerWindow object before calling ::Hide()\n");
 
 	if(fWinBorder->IsHidden())
 		return;
@@ -297,10 +293,10 @@ bool ServerWindow::IsHidden(void) const
 //------------------------------------------------------------------------------
 void ServerWindow::Minimize(bool status)
 {
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	// This function doesn't need much -- check to make sure that we should and
 	// send the message to the client. According to the BeBook, the BWindow hook function
 	// does all the heavy lifting for us. :)
-	
 	bool sendMessages = false;
 
 	if (status)
@@ -334,6 +330,7 @@ void ServerWindow::Minimize(bool status)
 // Sends a message to the client to perform a Zoom
 void ServerWindow::Zoom(void)
 {
+	// NOTE: if you do something else, other than sending a port message, PLEASE lock
 	BMessage msg;
 	msg.what=B_ZOOM;
 	SendMessageToClient(&msg);

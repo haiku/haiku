@@ -539,6 +539,7 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 void RootLayer::SetActiveWorkspace(int32 index)
 {
 	STRACE(("RootLayer(%s)::SetActiveWorkspace(%ld)\n", GetName(), index));
+	// we need to lock the window list here so no other window can be created 
 	desktop->Lock();
 
 	// if fWorkspace[index] object does not exist, create and add allowed WinBorders
@@ -896,9 +897,9 @@ bool RootLayer::SetScreenResolution(int32 width, int32 height, uint32 colorspace
 //---------------------------------------------------------------------------
 //				Input related methods
 //---------------------------------------------------------------------------
+inline
 void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 {
-	// TODO: locking mechanism needs SERIOUS rethought
 	switch(code)
 	{
 		case B_MOUSE_DOWN:
@@ -956,12 +957,11 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				}
 				else
 				{
-					if (!(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+					if (exFocus != FocusWinBorder()
+						 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
 
-					target->Window()->Lock();
 					target->MouseDown(evt, sendMessage);
-					target->Window()->Unlock();
 				}
 
 				fMouseTarget = target;
@@ -991,9 +991,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			// currently mouse up goes to the same window which received mouse down
 			if (fMouseTarget)
 			{
-				fMouseTarget->Window()->Lock();
 				fMouseTarget->MouseUp(evt);
-				fMouseTarget->Window()->Unlock();
 				fMouseTarget = NULL;
 			}
 
@@ -1042,9 +1040,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				}
 				else
 				{
-					fMouseTarget->Window()->Lock();
 					fMouseTarget->MouseMoved(evt);
-					fMouseTarget->Window()->Unlock();
 				}
 			}
 			else
@@ -1052,9 +1048,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				WinBorder	*target = WinBorderAt(evt.where);
 				if (target)
 				{
-					target->Window()->Lock();
 					target->MouseMoved(evt);
-					target->Window()->Unlock();
 				}
 			}
 
@@ -1077,9 +1071,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			if (FocusWinBorder())
 			{
 				BPoint		cursorPos = GetDisplayDriver()->GetCursorPosition();
-				FocusWinBorder()->Window()->Lock();
 				FocusWinBorder()->MouseWheel(evt, cursorPos);
-				FocusWinBorder()->Window()->Unlock();
 			}
 			break;
 		}
@@ -1091,6 +1083,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 	}
 }
 
+inline
 void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 {
 
@@ -1268,8 +1261,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 
 			Workspace *ws=ActiveWorkspace();
 			
-			Lock();
-			
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
@@ -1295,8 +1286,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			Unlock();
-
 			if (string)
 				free(string);
 			break;
@@ -1364,8 +1353,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			Lock();
-			
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
@@ -1389,8 +1376,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			Unlock();
-
 			if (string)
 				free(string);
 			break;
@@ -1416,8 +1401,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			Lock();
-			
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
@@ -1434,7 +1417,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			Unlock();
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
@@ -1458,8 +1440,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			Workspace *ws=ActiveWorkspace();
 			
-			Lock();
-			
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
@@ -1476,7 +1456,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				}
 			}
 			
-			Unlock();
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -1498,8 +1477,6 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 
 			Workspace *ws=ActiveWorkspace();
 			
-			Lock();
-			
 			WinBorder *target=ws->Focus();
 			if(target)
 			{
@@ -1515,7 +1492,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					win->SendMessageToClient(&keymsg);
 				}
 			}
-			Unlock();
+
 			break;
 		}
 		default:

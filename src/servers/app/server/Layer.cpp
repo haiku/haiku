@@ -50,7 +50,7 @@
 #	define STRACE(x) ;
 #endif
 
-#define DEBUG_LAYER_REBUILD
+//#define DEBUG_LAYER_REBUILD
 #ifdef DEBUG_LAYER_REBUILD
 #	define RBTRACE(x) printf x
 #else
@@ -763,7 +763,7 @@ void Layer::RebuildFullRegion(void)
 void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset)
 {
 	STRACE(("Layer(%s)::RebuildRegions() START\n", GetName()));
-	
+
 	// TODO:/NOTE: this method must be executed as quickly as possible.
 	
 	// Currently SendView[Moved/Resized]Msg() simply constructs a message and calls
@@ -876,12 +876,12 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 
 	if (!IsHidden())
 	{
-		fFullVisible.MakeEmpty();
-		fVisible = fFull;
 		#ifdef DEBUG_LAYER_REBUILD
 			printf("Layer(%s) real action START\n", GetName());
 			fFull.PrintToStream();
 		#endif
+		fFullVisible.MakeEmpty();
+		fVisible = fFull;
 		
 		if (fParent && fVisible.CountRects() > 0)
 		{
