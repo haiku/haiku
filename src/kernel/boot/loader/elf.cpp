@@ -29,6 +29,7 @@ verify_elf_header(struct Elf32_Ehdr &header)
 	if (memcmp(header.e_ident, ELF_MAGIC, 4) != 0
 		|| header.e_ident[4] != ELFCLASS32
 		|| header.e_phoff == 0
+		|| !header.IsHostEndian()
 		|| header.e_phentsize != sizeof(struct Elf32_Phdr))
 		return B_BAD_TYPE;
 
