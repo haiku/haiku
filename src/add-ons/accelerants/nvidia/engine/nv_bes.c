@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-10/2003 */
+/* Written by Rudolf Cornelissen 05/2002-12/2003 */
 
 #define MODULE_BIT 0x00000200
 
@@ -296,14 +296,16 @@ status_t nv_configure_bes
 		}
 		break;
 	case NV30A:
-		/* GeForceFX series have a downscaling limit of 0.5 */
-		if (hiscalv > (2 << 16))
+		/* GeForceFX series have a downscaling limit of 0.5 (except NV31!) */
+		if ((hiscalv > (2 << 16)) && (si->ps.card_type != NV31))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */
 			hiscalv = (2 << 16);
 			LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
 		}
-		break;
+		/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!
+		 * So let it fall through... */
+		if (si->ps.card_type != NV31) break;
 	default:
 		/* the rest has a downscaling limit of 0.125 */
 		if (hiscalv > (8 << 16))
@@ -422,14 +424,16 @@ status_t nv_configure_bes
 		}
 		break;
 	case NV30A:
-		/* GeForceFX series have a downscaling limit of 0.5 */
-		if (viscalv > (2 << 16))
+		/* GeForceFX series have a downscaling limit of 0.5 (except NV31!) */
+		if ((viscalv > (2 << 16)) && (si->ps.card_type != NV31))
 		{
 			/* (non-inverse) factor too small, set factor to min. valid value */
 			viscalv = (2 << 16);
 			LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
 		}
-		break;
+		/* NV31 (confirmed GeForceFX 5600) has NV20A scaling limits!
+		 * So let it fall through... */
+		if (si->ps.card_type != NV31) break;
 	default:
 		/* the rest has a downscaling limit of 0.125 */
 		if (viscalv > (8 << 16))
