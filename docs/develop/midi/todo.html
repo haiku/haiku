@@ -13,6 +13,8 @@
 
 <h3>Small Things</h3>
 
+<p><b>Communicating with device drivers.</b> The midi_server already has a pretty good parser that turns an incoming stream of bytes into MIDI messages. It uses read() to read a single byte at a time. However, the midi_driver.h file lists a number of ioctl() opcodes that we are currently not using. Should we? In addition, do we really need to spawn a new thread for each device? The R5 midi_server doesn't appear to do this. An optional feature is to implement "running status" for MIDI OUT ports (i.e. when writing to the device driver). This would be pretty simple to add.</p>
+
 <p><b>BMidiStore is slow.</b> Importing a Standard MIDI File of a few hundred kilobytes takes too long for my taste. The one from R5 is at least twice as fast. It is important to speed this up since BMidiStore is used by BMidiSynthFile to play MIDI files. We don't want games to slow down too much.</p>
 
 <p><b>MPU401 kernel module.</b> Greg Crain did a great job of writing this module. Unfortunately, we only know how the v1 interface works; v2 is not documented. What's worse, most Be R5 drivers use v2. Currently, the module returns B_ERROR when a device is opened with v2. Is this going to be a problem for us? It depends on whether we will be able to use the closed-source Be drivers with our own kernel &mdash; if not, then we can simply ignore v2.</p>
