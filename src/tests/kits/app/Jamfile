@@ -73,6 +73,7 @@ CommonTestLib libapptest.so
 		# BMessage
 		MessageTest.cpp
 		MessageConstructTest.cpp
+		MessageDestructTest.cpp
 		MessageOpAssignTest.cpp
 		MessageEasyFindTest.cpp
 
