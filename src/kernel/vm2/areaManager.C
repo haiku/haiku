@@ -30,8 +30,8 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start) {
 //			error ("Looking for %x, %d pages; current = %x\n",start,pages,myArea->getEndAddress());
 			if (!myArea->couldAdd(start,end))
 				{ // if we don't work, there must be an overlap, so go to the end of this area.
-				start=myArea->getEndAddress();
-				end=start+(pages*PAGE_SIZE)-1;
+				start=myArea->getEndAddress()+1; // Since the end address == last byte in the area...
+				end=start+(pages*PAGE_SIZE)-1; // See above...
 				}
 			}
 		}

@@ -177,7 +177,7 @@ char vpage::getByte(unsigned long address,areaManager *manager) {
 	if (!physPage)
 		if (!manager->fault((void *)(address),false))
 			throw ("vpage::getByte");
-	error ("vpage::getByte: About to return %c from %x\n", *((char *)(address-start_address+physPage->getAddress())),(address-start_address+physPage->getAddress()));
+//	error ("vpage::getByte: About to return %c from %x\n", *((char *)(address-start_address+physPage->getAddress())),(address-start_address+physPage->getAddress()));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
