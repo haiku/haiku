@@ -130,7 +130,10 @@ ich_codec_read(int regno)
 {
 	status_t rv;
 	ASSERT(regno >= 0);
+	ASSERT((regno & 1) == 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
+	if (regno == 0x54) // intel uses 0x54 for GPIO access, we filter it!
+		return 0;
 	rv = ich_codec_wait();
 	if (rv != B_OK)
 		PRINT(("semaphore timeout reading register %#x\n",regno));
@@ -145,7 +148,10 @@ ich_codec_write(int regno, uint16 value)
 {
 	status_t rv;
 	ASSERT(regno >= 0);
+	ASSERT((regno & 1) == 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
+	if (regno == 0x54) // intel uses 0x54 for GPIO access, we filter it!
+		return;
 	rv = ich_codec_wait();
 	if (rv != B_OK)
 		PRINT(("semaphore timeout writing register %#x\n",regno));

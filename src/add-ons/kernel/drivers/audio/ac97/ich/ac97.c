@@ -586,11 +586,6 @@ ac97_reg_is_valid(ac97_dev *dev, uint8 reg)
 		return false;
 
 	switch (dev->codec_id) {
-		case CODEC_ID_ALC201A:
-			if (reg != 0x54) /* reading register 0x54 causes a semaphore timeout on the next register accessed */
-				return true;
-			return false;
-
 		case CODEC_ID_AK4540:
 		case CODEC_ID_AK4542:
 			if (reg < 0x1e || reg == 0x20 || reg == 0x26 || reg > 0x7a)
