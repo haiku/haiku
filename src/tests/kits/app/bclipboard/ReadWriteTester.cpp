@@ -294,8 +294,6 @@ void ReadWriteTester::StartWatching1()
   BApplication app("application/x-vnd.clipboardtest");
   BClipboard clip("StartWatching1");
   BMessage *data;
-  char *str;
-  ssize_t size;
 
   BLooper *looper = new BLooper();
   RWHandler handler;
