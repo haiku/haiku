@@ -1090,13 +1090,11 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 			if (free < NUM_DIRECT_BLOCKS) {
 				// can we merge the last allocated run with the new one?
 				int32 last = free - 1;
-				if (free > 0
-					&& data->direct[last].allocation_group == run.allocation_group
-					&& data->direct[last].start + data->direct[last].length == run.start) {
+				if (free > 0 && data->direct[last].MergeableWith(run))
 					data->direct[last].length += run.length;
-				} else {
+				else
 					data->direct[free] = run;
-				}
+
 				data->max_direct_range += run.length * fVolume->BlockSize();
 				data->size = blocksNeeded > 0 ? data->max_direct_range : size;
 				continue;
@@ -1145,13 +1143,11 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 				// try to insert the run to the last one - note that this doesn't
 				// take block borders into account, so it could be further optimized
 				int32 last = free - 1;
-				if (free > 0
-					&& runs[last].allocation_group == run.allocation_group
-					&& runs[last].start + runs[last].length == run.start) {
+				if (free > 0 && runs[last].MergeableWith(run))
 					runs[last].length += run.length;
-				} else {
+				else
 					runs[free] = run;
-				}
+
 				data->max_indirect_range += run.length << fVolume->BlockShift();
 				data->size = blocksNeeded > 0 ? data->max_indirect_range : size;
 
@@ -1627,8 +1623,8 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	if (inode->Flags() & INODE_NO_CACHE)
 		return B_NOT_ALLOWED;
 
-	// It's a bit stupid, but indices are regarded as directories
-	// in BFS - so a test for a directory always succeeds, but you
+	// Inode::IsDirectory() is true also for indices (furthermore, the S_IFDIR
+	// bit is set for indices in BFS, not for attribute directories) - but you
 	// should really be able to do whatever you want with your indices
 	// without having to remove all files first :)
 	if (!inode->IsIndex()) {
