@@ -53,7 +53,6 @@ region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_ty
 	region_id source_region, int mapping, int lock);
 int vm_delete_region(aspace_id aid, region_id id);
 region_id vm_find_region_by_name(aspace_id aid, const char *name);
-int vm_get_region_info(region_id id, vm_region_info *info);
 
 int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
 int vm_get_physical_page(addr paddr, addr *vaddr, int flags);
@@ -66,13 +65,18 @@ int user_strlcpy(char *to, const char *from, size_t size);
 int user_memset(void *s, char c, size_t count);
 
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
-	size_t size, uint32 lock, uint32 protection);
+			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
-region_id user_vm_clone_region(char *uname, void **uaddress, int addr_type,
-	region_id source_region, int mapping, int lock);
 region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
-	addr size, int lock, int mapping, const char *upath, off_t offset);
-int user_vm_get_region_info(region_id id, vm_region_info *uinfo);
+			addr size, int lock, int mapping, const char *upath, off_t offset);
+area_id _user_area_for(void *address);
+area_id _user_find_area(const char *name);
+status_t _user_get_area_info(area_id area, area_info *info);
+status_t _user_get_next_area_info(team_id team, int32 *cookie, area_info *info);
+status_t _user_resize_area(area_id area, size_t newSize);
+status_t _user_set_area_protection(area_id area, uint32 newProtection);
+area_id _user_clone_area(const char *name, void **_address, uint32 addressSpec, 
+			uint32 protection, area_id sourceArea);
 
 region_id find_region_by_name(const char *);
 region_id find_region_by_address (addr);

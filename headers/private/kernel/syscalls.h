@@ -79,13 +79,18 @@ status_t sys_stop_watching(dev_t device, ino_t node, uint32 flags,
 
 // area functions
 area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
-	size_t size, uint32 lock, uint32 protection);
-region_id sys_vm_clone_region(const char *name, void **address, int addr_type,
-	region_id source_region, int mapping, int lock);
+			size_t size, uint32 lock, uint32 protection);
 region_id sys_vm_map_file(const char *name, void **address, int addr_type,
-	addr size, int lock, int mapping, const char *path, off_t offset);
+			addr size, int lock, int mapping, const char *path, off_t offset);
 status_t _kern_delete_area(area_id area);
-int sys_vm_get_region_info(region_id id, vm_region_info *info);
+area_id _kern_area_for(void *address);
+area_id _kern_find_area(const char *name);
+status_t _kern_get_area_info(area_id area, area_info *info);
+status_t _kern_get_next_area_info(team_id team, int32 *cookie, area_info *info);
+status_t _kern_resize_area(area_id area, size_t newSize);
+status_t _kern_set_area_protection(area_id area, uint32 newProtection);
+area_id _kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
+			uint32 protection, area_id sourceArea);
 
 /* kernel port functions */
 port_id		sys_port_create(int32 queue_length, const char *name);

@@ -69,17 +69,6 @@ typedef struct vm_cache {
 	unsigned int scan_skip : 1;
 } vm_cache;
 
-// info about a region that external entities may want to know
-// used in vm_get_region_info()
-typedef struct vm_region_info {
-	region_id id;
-	addr base;
-	addr size;
-	int lock;
-	int wiring;
-	char name[SYS_MAX_OS_NAME_LEN];
-} vm_region_info;
-
 // vm region
 typedef struct vm_region {
 	char *name;
