@@ -56,7 +56,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 {
 	// set up queue
 	fInQueue = start_ifq();
-	fInQueueThread = spawn_kernel_thread(in_queue_thread, "PPPInterface: Input",
+	fInQueueThread = spawn_thread(in_queue_thread, "PPPInterface: Input",
 		B_NORMAL_PRIORITY, this);
 	resume_thread(fInQueueThread);
 	
@@ -1137,7 +1137,7 @@ PPPInterface::Redial()
 	info->interface = this;
 	info->thread = &fRedialThread;
 	
-	fRedialThread = spawn_kernel_thread(redial_func, "PPPInterface: redial_thread",
+	fRedialThread = spawn_thread(redial_func, "PPPInterface: redial_thread",
 		B_NORMAL_PRIORITY, info);
 	
 	resume_thread(fRedialThread);

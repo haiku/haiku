@@ -111,10 +111,12 @@ PPPLCP::Down()
 status_t
 PPPLCP::Send(struct mbuf *packet)
 {
-	if(!Interface())
+	if(Target())
+		return Target()->Send(packet, PPP_LCP_PROTOCOL);
+	else if(Interface())
+		return Interface()->Send(packet, PPP_LCP_PROTOCOL);
+	else
 		return B_ERROR;
-	
-	return Interface()->Send(packet, PPP_LCP_PROTOCOL);
 }
 
 
