@@ -17,8 +17,8 @@ typedef uint32 ppp_interface_id;
 
 
 // settings keys
-#define PPP_DIALING_NOTIFICATION_KEY		"DialingNotification"
-	// userland ppp_server handles this key
+#define PPP_ASK_BEFORE_DIALING_KEY			"AskBeforeDialing"
+	// userland ppp_server and preflet handle this key
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
 #define PPP_DIAL_RETRIES_LIMIT_KEY			"DialRetriesLimit"
