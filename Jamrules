@@ -724,6 +724,22 @@ rule StaticLibrary
 	MakeLocate lib$(<).a : $(OBOS_STLIB_DIR) ;
 }
 
+rule R5KernelStaticLibrary
+{
+	# R5KernelStaticLibrary <name> : <sources> ;
+	
+	local lib = lib$(1).a ;
+	local sources = $(2) ;
+
+	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(sources) ;
+	Library $(lib) : $(sources) ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
+								-fno-exceptions -fno-rtti ;
+}
+
 rule MergeObjectFromObjects
 {
 	# MergeObjectFromObjects <name> : <objects> ;
