@@ -23,28 +23,13 @@
 
 struct fs_info;
 
+typedef void *fs_cookie;
+typedef void *file_cookie;
+typedef void *fs_vnode;
+
 #ifdef __cplusplus
 extern "C" {
 #endif 
-
-
-#if 0
-struct fs_calls {
-	int (*fs_mount)(void **fs_cookie, void *flags, void *covered_vnode, fs_id id, void **priv_vnode_root);
-	int (*fs_unmount)(void *fs_cookie);
-	int (*fs_register_mountpoint)(void *fs_cookie, void *vnode, void *redir_vnode);
-	int (*fs_unregister_mountpoint)(void *fs_cookie, void *vnode);
-	int (*fs_dispose_vnode)(void *fs_cookie, void *vnode);
-	int (*fs_open)(void *fs_cookie, void *base_vnode, const char *path, const char *stream, stream_type stream_type, void **vnode, void **cookie, struct redir_struct *redir);
-	int (*fs_seek)(void *fs_cookie, void *vnode, void *cookie, off_t pos, int seek_type);
-	int (*fs_read)(void *fs_cookie, void *vnode, void *cookie, void *buf, off_t pos, size_t *len);
-	int (*fs_write)(void *fs_cookie, void *vnode, void *cookie, const void *buf, off_t pos, size_t *len);
-	int (*fs_ioctl)(void *fs_cookie, void *vnode, void *cookie, ulong op, void *buf, size_t len);
-	int (*fs_close)(void *fs_cookie, void *vnode, void *cookie);
-	int (*fs_create)(void *fs_cookie, void *base_vnode, const char *path, const char *stream, stream_type stream_type, struct redir_struct *redir);
-	int (*fs_stat)(void *fs_cookie, void *base_vnode, const char *path, const char *stream, stream_type stream_type, struct vnode_stat *stat, struct redir_struct *redir);
-};
-#endif
 
 struct fs_calls {
 	/* general operations */
@@ -52,11 +37,11 @@ struct fs_calls {
 	int (*fs_unmount)(fs_cookie fs);
 
 	int (*fs_read_fs_info)(fs_cookie fs, struct fs_info *info);
-	int (*fs_write_fs_info)(fs_cookie fs, struct fs_info *info, int mask);
+	int (*fs_write_fs_info)(fs_cookie fs, const struct fs_info *info, int mask);
 	int (*fs_sync)(fs_cookie fs);
 
 	/* vnode operations */
-	int (*fs_lookup)(fs_cookie fs, fs_vnode dir, const char *name, vnode_id *_id);
+	int (*fs_lookup)(fs_cookie fs, fs_vnode dir, const char *name, vnode_id *_id, int *_type);
 	int (*fs_get_vnode_name)(fs_cookie fs, fs_vnode vnode, char *buffer, size_t bufferSize);
 
 	int (*fs_get_vnode)(fs_cookie fs, vnode_id id, fs_vnode *_vnode, bool reenter);
@@ -72,11 +57,13 @@ struct fs_calls {
 	int (*fs_ioctl)(fs_cookie fs, fs_vnode v, file_cookie cookie, ulong op, void *buffer, size_t length);
 	int (*fs_fsync)(fs_cookie fs, fs_vnode v);
 
+	int (*fs_read_link)(fs_cookie fs, fs_vnode link, char *buffer, size_t bufferSize);
+	int (*fs_symlink)(fs_cookie fs, fs_vnode dir, const char *name, const char *path);
 	int (*fs_unlink)(fs_cookie fs, fs_vnode dir, const char *name);
 	int (*fs_rename)(fs_cookie fs, fs_vnode olddir, const char *oldname, fs_vnode newdir, const char *newname);
 
 	int (*fs_read_stat)(fs_cookie fs, fs_vnode v, struct stat *stat);
-	int (*fs_write_stat)(fs_cookie fs, fs_vnode v, struct stat *stat, int statMask);
+	int (*fs_write_stat)(fs_cookie fs, fs_vnode v, const struct stat *stat, int statMask);
 
 	/* file operations */
 	int (*fs_create)(fs_cookie fs, fs_vnode dir, const char *name, int omode, int perms, file_cookie *_cookie, vnode_id *_newVnodeID);
@@ -171,6 +158,7 @@ int sys_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode
 int sys_create(const char *path, int omode, int perms);
 int sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int sys_create_dir(const char *path, int perms);
+int sys_symlink(const char *path, const char *toPath);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
 int sys_write_stat(const char *path, struct stat *stat, int stat_mask);
@@ -192,6 +180,7 @@ int user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omod
 int user_create(const char *path, int omode, int perms);
 int user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int user_create_dir(const char *path, int perms);
+int user_symlink(const char *path, const char *toPath);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
 int user_read_stat(const char *path, struct stat *stat);
