@@ -373,7 +373,7 @@ status_t nv_crtc_set_display_pitch()
 	/* enable access to CRTC1 on dualhead cards */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 
-	/*program the card!*/
+	/* program the card */
 	CRTCW(PITCHL, (offset & 0x00ff));
 	CRTCW(REPAINT0, ((CRTCR(REPAINT0) & 0x1f) | ((offset & 0x0700) >> 3)));
 

@@ -355,7 +355,7 @@ status_t nv_crtc2_set_display_pitch()
 	/* enable access to CRTC2 */
 	CRTC2W(OWNER, 0x03);
 
-	/*program the card!*/
+	/* program the card */
 	CRTC2W(PITCHL, (offset & 0x00ff));
 	CRTC2W(REPAINT0, ((CRTC2R(REPAINT0) & 0x1f) | ((offset & 0x0700) >> 3)));
 
