@@ -41,6 +41,8 @@ extern FTC_Manager ftmanager;
 FT_Library ftlib;
 FontServer *fontserver;
 
+//#define PRINT_FONT_LIST
+
 /*!
 	\brief Access function to request a face via the FreeType font cache
 */
@@ -221,6 +223,10 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 		
 		if(!family)
 		{
+			#ifdef PRINT_FONT_LIST
+			printf("Font Family: %s\n",face->family_name);
+			#endif
+
 			family=new FontFamily(face->family_name);
 			families->AddItem(family);
 		}
@@ -230,6 +236,10 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 			FT_Done_Face(face);
 			continue;
 		}
+
+		#ifdef PRINT_FONT_LIST
+		printf("\tFont Style: %s\n",face->style_name);
+		#endif
 
 		// Has vertical metrics?
 		family->AddStyle(path.Path(),face);

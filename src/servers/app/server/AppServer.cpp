@@ -84,12 +84,14 @@ AppServer::AppServer(void)
 	// Create the font server and scan the proper directories.
 	fontserver=new FontServer;
 	fontserver->Lock();
-	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
+
+	// Used for testing purposes
 
 	// TODO: Uncomment when actually put to use. Commented out for speed
+//	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
 //	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-//	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
-//	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
+	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
+	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
 	fontserver->SaveList();
 
 	if(!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE))

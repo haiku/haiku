@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src servers app server fonts ttfonts ;
+
+OBOSInstall install_fonts : [ FDirName $(OBOS_FONTS_DIR) ttfonts ] :
+	Vera.ttf
+	VeraBd.ttf
+	VeraMoBI.ttf
+	VeraMoIt.ttf
+	VeraSe.ttf
+	VeraBI.ttf
+	VeraIt.ttf
+	VeraMoBd.ttf
+	VeraMono.ttf
+	VeraSeBd.ttf
+;

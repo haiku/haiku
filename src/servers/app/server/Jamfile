@@ -1,5 +1,8 @@
 SubDir OBOS_TOP src servers app server ;
 
+SubInclude OBOS_TOP src servers app server fonts ;
+Depends app_server : install_fonts ;
+
 AddResources app_server : app_server.rsrc ;
 
 UseLibraryHeaders png zlib ;
