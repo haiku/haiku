@@ -4,7 +4,7 @@ SubDirCcFlags -DHAVE_CONFIG_H ;
 
 StaticLibrary greputils : 
 alloca.c
-atexit.c
+# atexit.c
 closeout.c
 error.c
 exclude.c
