@@ -2,6 +2,7 @@
 #define TRACKER_H
 
 #include <SupportDefs.h>
+#include <OS.h>
 #include <AppDefs.h>
 #include <sys/types.h>
 
@@ -21,5 +22,11 @@ typedef struct update_message {
 
 
 extern port_id gTrackerPort;
+
+extern
+#ifdef __cplusplus
+"C"
+#endif
+int32 tracker_loop(void *data);
 
 #endif	/* TRACKER_H */

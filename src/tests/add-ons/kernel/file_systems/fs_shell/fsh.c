@@ -20,7 +20,6 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "myfs.h"
 #include "kprotos.h"
 #include "argv.h"
 #include "tracker.h"
@@ -978,68 +977,6 @@ do_threadfiletest(int argc, char **argv)
 	}
 
 	do_lat_fs(0,NULL);
-}
-
-
-port_id gTrackerPort;
-
-
-static void
-tracker_query_file(dev_t device, ino_t parent, char *name)
-{
-	struct stat stat;
-	int status, fd;
-
-	if (name == NULL || parent == 0)
-		return;
-
-	fd = sys_open_entry_ref(1, device, parent, name, O_RDONLY, 0);
-	if (fd < 0)	{
-		printf("tracker: could not open file: %s\n", name);
-		return;
-	}
-
-	status = sys_rstat(true, fd, NULL, &stat, 1);
-	if (status < 0) {
-		printf("tracker: could not stat file: %s\n", name);
-	}
-
-	sys_close(true, fd);
-}
-
-
-static int32
-tracker_loop(void *data)
-{
-	// create global messaging port
-	
-	gTrackerPort = create_port(128, "fsh tracker port");
-	if (gTrackerPort < B_OK)
-		return gTrackerPort;
-
-	while (true) {
-		update_message message;
-		uint32 code;
-		status_t status = read_port(gTrackerPort, &code, &message, sizeof(message));
-		if (status < B_OK)
-			continue;
-
-		if (code == FSH_KILL_TRACKER)
-			break;
-
-		if (code == FSH_NOTIFY_LISTENER) {
-			printf("tracker: notify listener received\n");
-			if (message.op != B_ATTR_CHANGED && message.op != B_DEVICE_UNMOUNTED)
-				tracker_query_file(message.device, message.parentNode, message.name);
-		} else if (code == B_QUERY_UPDATE) {
-			printf("tracker: query update received\n");
-			tracker_query_file(message.device, message.parentNode, message.name);
-		} else {
-			printf("tracker: unknown code received: 0x%lx\n", code);
-		}
-	}
-
-	delete_port(gTrackerPort);
 }
 
 
