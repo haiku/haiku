@@ -7,6 +7,7 @@
 #include <MediaNode.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdint.h>
 #include "debug.h"
 
 /*************************************************************
@@ -1044,13 +1045,24 @@ status_t media_realtime_init_thread(thread_id thread, size_t stack_used, uint32 
 
 media_encode_info::media_encode_info()
 {
-	UNIMPLEMENTED();
+	flags = 0;
+	used_data_size = 0;
+	start_time = 0;
+	time_to_encode = INT64_MAX;
+	file_format_data = NULL;
+	file_format_data_size = 0;
+	codec_data = NULL;
+	codec_data_size = 0;
 }
 
 
 media_decode_info::media_decode_info()
 {
-	UNIMPLEMENTED();
+	time_to_decode = INT64_MAX;
+	file_format_data = NULL;
+	file_format_data_size = 0;
+	codec_data = NULL;
+	codec_data_size = 0;
 }
 
 
