@@ -1838,7 +1838,7 @@ status_t BMessage::send_message(port_id port, team_id port_owner, int32 token,
 	}
 
 	{
-		BMessenger messenger(team, reply_port, B_ANY_TOKEN, false);
+		BMessenger messenger(team, reply_port, B_PREFERRED_TOKEN, false);
 		err = _send_(port, token, preferred, send_timeout, true, messenger);
 	}
 	if (err)
