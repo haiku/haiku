@@ -121,6 +121,13 @@ RootFileSystem::Rewind(void *_cookie)
 }
 
 
+bool 
+RootFileSystem::IsEmpty()
+{
+	return list_is_empty(&fList);
+}
+
+
 status_t 
 RootFileSystem::AddNode(Node *node)
 {
