@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -14,9 +14,9 @@
 #include <bus/scsi/scsi_periph.h>
 #include <blkman.h>
 
-#define debug_level_flow 4
-#define debug_level_error 4
-#define debug_level_info 4
+#define debug_level_flow 0
+#define debug_level_info 1
+#define debug_level_error 2
 
 #define DEBUG_MSG_PREFIX "SCSI_DSK -- "
 
