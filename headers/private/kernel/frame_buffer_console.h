@@ -11,6 +11,16 @@ struct kernel_args;
 
 
 #define FRAME_BUFFER_CONSOLE_MODULE_NAME "console/frame_buffer/v1"
+#define FRAME_BUFFER_BOOT_INFO "frame_buffer/v1"
+
+struct frame_buffer_boot_info {
+	area_id	area;
+	addr_t	frame_buffer;
+	int32	width;
+	int32	height;
+	int32	depth;
+	int32	bytes_per_row;
+};
 
 #ifdef __cplusplus
 extern "C" {

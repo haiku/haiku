@@ -17,6 +17,7 @@ if $(OS) != BEOS {
 }
 
 KernelMergeObject kernel_core.o :
+	boot_item.cpp
 	cpu.c
 	elf.c
 	faults.c

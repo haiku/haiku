@@ -5,9 +5,10 @@
 
 #include <KernelExport.h>
 #include <lock.h>
+#include <boot_item.h>
 #include <fs/devfs.h>
-
 #include <boot/kernel_args.h>
+
 #include <frame_buffer_console.h>
 #include "font.h"
 
@@ -63,6 +64,7 @@ static uint32 sPalette32[] = {
 };
 
 static struct console_info sConsole;
+static struct frame_buffer_boot_info sBootInfo;
 
 
 static inline uint8
@@ -313,7 +315,7 @@ frame_buffer_console_init(kernel_args *args)
 	sConsole.area = map_physical_memory("vesa_fb",
 		(void *)args->frame_buffer.physical_buffer.start,
 		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA, &frameBuffer);
+		B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA, &frameBuffer);
 	if (sConsole.area < B_OK)
 		return sConsole.area;
 
@@ -334,6 +336,13 @@ frame_buffer_console_init(kernel_args *args)
 	}
 	frame_buffer_update((addr_t)frameBuffer, args->frame_buffer.width, args->frame_buffer.height,
 		args->frame_buffer.depth, bytesPerRow);
+
+	sBootInfo.frame_buffer = (addr_t)frameBuffer;
+	sBootInfo.width = args->frame_buffer.width;
+	sBootInfo.height = args->frame_buffer.height;
+	sBootInfo.depth = args->frame_buffer.depth;
+	sBootInfo.bytes_per_row = bytesPerRow;
+	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo, sizeof(frame_buffer_boot_info));
 
 	return B_OK;
 }
