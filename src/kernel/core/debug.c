@@ -1,8 +1,8 @@
 /* This file contains the debugger */
 
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -537,14 +537,18 @@ dprintf(const char *fmt, ...)
 void
 _user_debug_output(const char *userString)
 {
-	char string[1024];
+	char string[512];
+	int32 length;
 
 	if (!sSerialDebugEnabled)
 		return;
 
-	if (!IS_USER_ADDRESS(userString)
-		|| user_strlcpy(string, userString, sizeof(string)) < B_OK)
+	if (!IS_USER_ADDRESS(userString))
 		return;
 
-	dbg_puts(userString);
+	do {
+		length = user_strlcpy(string, userString, sizeof(string));
+		dbg_puts(string);
+		userString += sizeof(string) - 1;
+	} while (length >= (ssize_t)sizeof(string));
 }
