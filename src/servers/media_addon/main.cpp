@@ -73,6 +73,7 @@ public:
 	MediaAddonServer(const char *sig);
 	~MediaAddonServer();
 	void ReadyToRun();
+	bool QuitRequested();
 	void MessageReceived(BMessage *msg);
 	
 	void WatchDir(BEntry *dir);
@@ -82,7 +83,7 @@ public:
 	static int32 controlthread(void *arg);
 
 	void PutAddonIfPossible(AddOnInfo *info);
-	void InstantiatePhysialInputsAndOutputs(AddOnInfo *info);
+	void InstantiatePhysicalInputsAndOutputs(AddOnInfo *info);
 	void InstantiateAutostartFlavors(AddOnInfo *info);
 	void DestroyInstantiatedFlavors(AddOnInfo *info);
 	
@@ -97,12 +98,15 @@ public:
 	port_id		control_port;
 	thread_id	control_thread;
 	bool		fStartup;
+	
+	typedef BApplication inherited;
 };
 
 MediaAddonServer::MediaAddonServer(const char *sig) : 
 	BApplication(sig),
 	fStartup(true)
 {
+	CALLED();
 	mediaroster = BMediaRoster::Roster();
 	filemap = new Map<ino_t, media_addon_id>;
 	infomap = new Map<media_addon_id, AddOnInfo>;
@@ -113,6 +117,8 @@ MediaAddonServer::MediaAddonServer(const char *sig) :
 
 MediaAddonServer::~MediaAddonServer()
 {
+	CALLED();
+	
 	delete_port(control_port);
 	status_t err;
 	wait_for_thread(control_thread,&err);
@@ -239,7 +245,7 @@ MediaAddonServer::ReadyToRun()
 	
 	infomap->Rewind();
 	while (infomap->GetNext(&info))
-		InstantiatePhysialInputsAndOutputs(info);
+		InstantiatePhysicalInputsAndOutputs(info);
 
 	infomap->Rewind();
 	while (infomap->GetNext(&info))
@@ -252,6 +258,23 @@ MediaAddonServer::ReadyToRun()
 	server_rescan_defaults_command cmd;
 	SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
 }
+
+
+bool
+MediaAddonServer::QuitRequested()
+{
+	CALLED();
+	
+	AddOnInfo *info;
+	infomap->Rewind();
+	while(infomap->GetNext(&info)) {
+		DestroyInstantiatedFlavors(info);
+		PutAddonIfPossible(info);
+	}
+	
+	return true;
+}
+
 
 void 
 MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
@@ -399,7 +422,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	// After startup is done, we simply do it for each new
 	// loaded add-on, too.
 	if (!fStartup) {
-		InstantiatePhysialInputsAndOutputs(info);
+		InstantiatePhysicalInputsAndOutputs(info);
 		InstantiateAutostartFlavors(info);
 		PutAddonIfPossible(info);
 
@@ -415,7 +438,66 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 void
 MediaAddonServer::DestroyInstantiatedFlavors(AddOnInfo *info)
 {
-	printf("MediaAddonServer::DestroyInstantiatedFlavors");
+	printf("MediaAddonServer::DestroyInstantiatedFlavors\n");
+	media_node *node;
+	while (info->active_flavors.GetNext(&node)) {
+		if ((node->kind & B_TIME_SOURCE) 
+			&& (mediaroster->StopTimeSource(*node, 0, true)!=B_OK)) {
+			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop timesource\n");
+			continue;
+		}	
+	
+		if(mediaroster->StopNode(*node, 0, true)!=B_OK) {
+			printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't stop node\n");
+			continue;
+		}
+		
+		if (node->kind & B_BUFFER_CONSUMER) { 
+			media_input inputs[16];
+			int32 count = 0;
+			if(mediaroster->GetConnectedInputsFor(*node, inputs, 16, &count)!=B_OK) {
+				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get connected inputs\n");
+				continue;
+			}
+			
+			for(int32 i=0; i<count; i++) {
+				media_node_id sourceNode;
+				if((sourceNode = mediaroster->NodeIDFor(inputs[i].source.port)) < 0) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get source node id\n");
+					continue;
+				}
+				
+				if(mediaroster->Disconnect(sourceNode, inputs[i].source, node->node, inputs[i].destination)!=B_OK) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't disconnect input\n");
+					continue;
+				}
+			}
+		}
+		
+		if (node->kind & B_BUFFER_PRODUCER) { 
+			media_output outputs[16];
+			int32 count = 0;
+			if(mediaroster->GetConnectedOutputsFor(*node, outputs, 16, &count)!=B_OK) {
+				printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get connected outputs\n");
+				continue;
+			}
+			
+			for(int32 i=0; i<count; i++) {
+				media_node_id destNode;
+				if((destNode = mediaroster->NodeIDFor(outputs[i].destination.port)) < 0) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't get destination node id\n");
+					continue;
+				}
+				
+				if(mediaroster->Disconnect(node->node, outputs[i].source, destNode, outputs[i].destination)!=B_OK) {
+					printf("MediaAddonServer::DestroyInstantiatedFlavors couldn't disconnect output\n");
+					continue;
+				}
+			}
+		}
+	
+		info->active_flavors.RemoveCurrent();
+	}
 }
 
 void
@@ -428,8 +510,9 @@ MediaAddonServer::PutAddonIfPossible(AddOnInfo *info)
 }
 
 void
-MediaAddonServer::InstantiatePhysialInputsAndOutputs(AddOnInfo *info)
+MediaAddonServer::InstantiatePhysicalInputsAndOutputs(AddOnInfo *info)
 {
+	CALLED();
 	int count = info->addon->CountFlavors();
 	for (int i = 0; i < count; i++) {
 		const flavor_info *flavorinfo;
@@ -620,6 +703,7 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
+		default: inherited::MessageReceived(msg); break;
 	}
 	printf("MediaAddonServer: Unhandled message:\n");
 	msg->PrintToStream();
@@ -627,7 +711,7 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 
 int main()
 {
-	new MediaAddonServer("application/x-vnd.OpenBeOS-media-addon-server");
+	new MediaAddonServer("application/x-vnd.OpenBeOS-addon-host");
 	be_app->Run();
 	return 0;
 }
