@@ -18,6 +18,8 @@ public:
 virtual			~BSession();
 		void	SetSendPort( port_id port );
 		void	SetRecvPort( port_id port );
+		port_id GetSendPort(void) const { return fSendPort; }
+		port_id GetRecvPort(void) const { return fReceivePort; }
 		bool	DropInputBuffer();
 
 		char*		ReadString();
