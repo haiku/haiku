@@ -806,13 +806,18 @@ rule LinkSharedOSLibs
 	# "/boot/.../libfoo.so". If the basename starts with "lib" or the thingy
 	# has a dirname or grist, it is added to the NEEDLIBS variable (i.e. the
 	# file will be bound!), otherwise it is prefixed "-l" and added to
-	# LINKLIBS.
+	# LINKLIBS. If you want to specify a target that isn't a library and
+	# also has neither grist nor a dirname, you can prepend "<nogrist>" as
+	# grist; it will be stripped by this rule.
 	
 	for i in $(>)
 	{
 		local isfile = ;
 		if $(i:D) || $(i:G) {
 			isfile = true ;
+			if $(i:G) = <nogrist> {
+				i = $(i:G=) ;
+			}
 		} else {
 			switch $(i:B)
 			{
