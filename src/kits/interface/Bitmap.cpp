@@ -31,20 +31,16 @@
 #include <new>
 #include <stdlib.h>
 
+#include <Application.h>
 #include <Bitmap.h>
-#include <InterfaceDefs.h>
 #include <Locker.h>
-#include <OS.h>
 #include <View.h>
+#include <Window.h>
 
 // Includes to be able to talk to the app_server
-#include <Application.h>
 #include <ServerProtocol.h>
 #include <AppServerLink.h>
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR
-};
 
 // TODO: system palette -- hard-coded for now, when the app server is ready
 // we should use system_colors() or BScreen::ColorMap().
@@ -787,6 +783,7 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 				| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
 	InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
 			   B_MAIN_SCREEN_ID);
+
 }
 
 // constructor
@@ -969,7 +966,7 @@ BBitmap::IsValid() const
 status_t
 BBitmap::LockBits(uint32 *state)
 {
-	return NOT_IMPLEMENTED;
+	return B_ERROR;
 }
 
 // UnlockBits
@@ -2053,7 +2050,8 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 status_t
 BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 {
-	return NOT_IMPLEMENTED;
+	// TODO: Implement
+	return B_ERROR;
 }
 
 // AddChild
@@ -2067,6 +2065,8 @@ BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 void
 BBitmap::AddChild(BView *view)
 {
+	if (fWindow != NULL)
+		fWindow->AddChild(view);
 }
 
 // RemoveChild
@@ -2076,7 +2076,7 @@ BBitmap::AddChild(BView *view)
 bool
 BBitmap::RemoveChild(BView *view)
 {
-	return false;	// not implemented
+	return fWindow != NULL ? fWindow->RemoveChild(view) : false;
 }
 
 // CountChildren
@@ -2086,7 +2086,7 @@ BBitmap::RemoveChild(BView *view)
 int32
 BBitmap::CountChildren() const
 {
-	return 0;	// not implemented
+	return fWindow != NULL ? fWindow->CountChildren() : 0;
 }
 
 // ChildAt
@@ -2098,7 +2098,7 @@ BBitmap::CountChildren() const
 BView*
 BBitmap::ChildAt(int32 index) const
 {
-	return NULL;	// not implemented
+	return fWindow != NULL ? fWindow->ChildAt(index) : NULL;
 }
 
 // FindView
@@ -2110,7 +2110,7 @@ BBitmap::ChildAt(int32 index) const
 BView*
 BBitmap::FindView(const char *viewName) const
 {
-	return NULL;	// not implemented
+	return fWindow != NULL ? fWindow->FindView(viewName) : NULL;
 }
 
 // FindView
@@ -2122,7 +2122,7 @@ BBitmap::FindView(const char *viewName) const
 BView *
 BBitmap::FindView(BPoint point) const
 {
-	return NULL;	// not implemented
+	return fWindow != NULL ? fWindow->FindView(point) : NULL;
 }
 
 // Lock
@@ -2136,7 +2136,7 @@ BBitmap::FindView(BPoint point) const
 bool
 BBitmap::Lock()
 {
-	return false;	// not implemented
+	return fWindow != NULL ? fWindow->Lock() : false;
 }
 
 // Unlock
@@ -2147,6 +2147,8 @@ BBitmap::Lock()
 void
 BBitmap::Unlock()
 {
+	if (fWindow != NULL)
+		fWindow->Unlock();
 }
 
 // IsLocked
@@ -2159,7 +2161,7 @@ BBitmap::Unlock()
 bool
 BBitmap::IsLocked() const
 {
-	return false;	// not implemented
+	return fWindow != NULL ? fWindow->IsLocked() : false;
 }
 
 // Perform
@@ -2168,7 +2170,7 @@ BBitmap::IsLocked() const
 status_t
 BBitmap::Perform(perform_code d, void *arg)
 {
-	return NOT_IMPLEMENTED;
+	return BArchivable::Perform(d, arg);
 }
 
 // FBC

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -932,10 +932,13 @@ BHandler *BListView::ResolveSpecifier(BMessage *msg, int32 index,
 	return this;
 }
 //------------------------------------------------------------------------------
-status_t BListView::GetSupportedSuites( BMessage *data )
+status_t
+BListView::GetSupportedSuites(BMessage *data )
 {
+	BPropertyInfo propertyInfo(prop_list);
+	
 	data->AddString("suites", "suite/vnd.Be-list-view");
-	data->AddFlat("messages", &BPropertyInfo(prop_list));
+	data->AddFlat("messages", &propertyInfo);
 	
 	return BView::GetSupportedSuites(data);
 }
