@@ -30,12 +30,8 @@ private:
 	vorbis_dsp_state	fDspState;
 	vorbis_block		fBlock;
 	media_raw_video_format fOutput;
-	int32			fResidualBytes;
-	uint8 *			fResidualBuffer;
-	uint8 *			fDecodeBuffer;
 	bigtime_t		fStartTime;
 	int				fFrameSize;
-	int				fBitRate;
 	int				fOutputBufferSize;
 };
 

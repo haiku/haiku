@@ -21,12 +21,8 @@ vorbisDecoder::vorbisDecoder()
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
 
-	fResidualBytes = 0;
-	fResidualBuffer = 0;
-	fDecodeBuffer = new uint8 [DECODE_BUFFER_SIZE];
 	fStartTime = 0;
 	fFrameSize = 0;
-	fBitRate = 0;
 	fOutputBufferSize = 0;
 }
 
@@ -34,7 +30,6 @@ vorbisDecoder::vorbisDecoder()
 vorbisDecoder::~vorbisDecoder()
 {
 	TRACE("vorbisDecoder::~vorbisDecoder\n");
-	delete [] fDecodeBuffer;
 }
 
 
@@ -143,9 +138,7 @@ vorbisDecoder::Seek(uint32 seekTo,
 				 int64 seekFrame, int64 *frame,
 				 bigtime_t seekTime, bigtime_t *time)
 {
-	debugger("vorbisDecoder::Seek");
 	TRACE("vorbisDecoder::Seek\n");
-	fResidualBytes = 0;
 	return B_OK;
 }
 
