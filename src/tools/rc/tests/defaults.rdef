@@ -1,0 +1,70 @@
+
+enum { R_Type1 = 30, R_Type2 };
+
+type #'CSTR' teep1 { string x };
+type(20) #'LONG' teep2 { int32 x };
+type(21, "def name1") #'LONG' teep3 { int32 x };
+type(R_Type1) #'LONG' teep4 { int32 x };
+type(R_Type2, "def name2") #'LONG' teep5 { int32 x };
+type("def name3") #'RAWT' teep6 { array x };
+
+enum
+{
+	R_Res1 = 4, R_Res2, R_Res3, R_Res4, R_Res5, R_Res6,
+	R_Res7, R_Res8, R_Res9, R_Res10, R_Res11, R_Res12
+};
+
+resource 123;                       // id 1, no name
+resource(2) 123;                    // id 2, no name
+resource(3, "over ride") 123;       // id 3, name "over ride"
+resource(R_Res1) 123;               // id 4, no name
+resource(R_Res2, "over ride") 123;  // id 5, name "over ride"
+resource("over ride") 10.0;         // id 1, name "over ride"
+
+resource teep1 "blah";                       // id 1, no name
+resource(2) teep1 "blah";                    // id 2, no name
+resource(3, "over ride") teep1 "blah";       // id 3, name "over ride"
+resource(R_Res1) teep1 "blah";               // id 4, no name
+resource(R_Res2, "over ride") teep1 "blah";  // id 5, name "over ride"
+//resource("over ride") teep1 "blah";        // duplicate resource (1) 
+
+resource teep2 123;                       // id 20, no name
+resource(40) teep2 123;                   // id 40, no name
+resource(41, "over ride") teep2 123;      // id 41, name "over ride"
+resource(R_Res3) teep2 123;               // id 6, no name
+resource(R_Res4, "over ride") teep2 123;  // id 7, name "over ride"
+//resource("over ride") teep2 123;        // duplicate resource (20)
+
+resource teep3 123;                       // id 21, name "def name1"
+resource(42) teep3 123;                   // id 42, name "def name1"
+resource(43, "over ride") teep3 123;      // id 43, name "over ride"
+resource(R_Res5) teep3 123;               // id 8, name "def name1" / R_Res5
+resource(R_Res6, "over ride") teep3 123;  // id 9, name "over ride"
+//resource("over ride") teep3 123;        // duplicate resource (21)
+
+resource teep4 123;                       // id 30, no name / R_Type1
+resource(44) teep4 123;                   // id 44, no name / R_Type1
+resource(45, "over ride") teep4 123;      // id 45, name "over ride"
+resource(R_Res7) teep4 123;               // id 10, no name
+resource(R_Res8, "over ride") teep4 123;  // id 11, name "over ride"
+//resource("over ride") teep4 123;        // duplicate resource (30)
+
+resource teep5 123;                       // id 31, name "def name2"
+resource(46) teep5 123;                   // id 46, name "def name2"
+resource(47, "over ride") teep5 123;      // id 47, name "over ride"
+resource(R_Res9) teep5 123;               // id 12, name "def name2" / R_Res9
+resource(R_Res10, "over ride") teep5 123; // id 13, name "over ride"
+//resource("over ride") teep5 123;        // duplicate resource (31)
+
+resource teep6 123;                       // id 1, name "def name3"
+resource(48) teep6 123;                   // id 48, name "def name3"
+resource(49, "over ride") teep6 123;      // id 49, name "over ride"
+resource(R_Res11) teep6 123;              // id 14, name "def name3" / R_Res11
+resource(R_Res12, "over ride") teep6 123; // id 15, name "over ride"
+//resource("over ride") teep6 123;        // duplicate resource (1)
+
+//resource (int8) 123;      // unknown type int8
+resource() (int8) 123;      // a possible workaround
+
+type(0) teep7 { int32 x };
+resource teep7 (int8) 123;

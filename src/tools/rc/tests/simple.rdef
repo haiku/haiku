@@ -1,0 +1,179 @@
+
+resource(1) 100;
+resource(1) "123";            // should be okay because types differ
+//resource(1) 123;            // duplicate resource 1
+//resource(0x100000001) 100;  // duplicate resource 1
+
+///* this is a /* nested */ comment */
+
+resource(-1) 100;
+resource(0xFFFFFFFE) 101;     // -2
+resource(- 0x7FFFFFFF) 102;   // -2147483647
+resource(-0x80000000) 103;    // -2147483648
+resource( 0x80000001) "104";  // -2147483647
+resource(-0x80000001) 105;    //  2147483647
+resource(-3, "name") 106;
+
+resource(10, "nom") "hello";
+resource(11, "") 123;         // should ignore name
+
+//------------------------------------------------------------------------------
+
+resource(20) true;
+resource(21) false;
+//resource(22) (int32) true;  // invalid cast
+
+resource(30) 12345;
+resource(31) (int32) 12345;
+resource(32) (uint32) 12345;
+resource(33) (size_t) 12345;
+resource(34) (ssize_t) 12345;
+resource(35) (time_t) 12345;
+resource(36) (int64) 1234;
+resource(37) (uint64) 1234;
+resource(38) (off_t) 0xffaa;
+resource(39) (int8) 12345;
+resource(40) (uint8) 12345;
+resource(41) (int16) 12345;
+resource(42) (uint16) 12345;
+resource(43) (float) 12345;
+resource(44) (double) 12345;
+resource(44) (raw) 12345;
+
+resource(45) -123;
+resource(46) - 123;
+resource(47) -0xFFFF;              // -65535
+resource(48) -0xFFFFFFFF;          // 1
+resource(49) -0x7FFFFFFF;          // -2147483647
+resource(50) -0x80000000;          // -2147483648
+resource(51)  0x80000001;          // -2147483647
+resource(52) -0x80000001;          // 2147483647
+resource(53) (uint64) -0xFFFFFFFF; // 18446744069414584321
+resource(54) -1;
+resource(55) 'what';               //  2003329396
+resource(56) -'what';              // -2003329396
+resource(57) 0b1;
+resource(58) 0b11111111111111111111111111111111;  // -1
+resource(59) (uint64) 0b1111111111111111111111111111111111111111111111111111111111111111;  // 18446744073709551615
+//resource(59) - -123;  // syntax error
+
+resource(60) 10.0;
+resource(61) (float) 10.0;
+resource(62) (double) 10.0;
+resource(63) -10.0;
+resource(64) - 10.0;
+resource(65) (raw) 10.0;
+//resource(69) - -10.0;  // syntax error
+
+resource(70) "fancy";
+resource(71) (string) "pants";
+resource(72) "w00t\0dude";
+resource(73) "fancy" "pants";
+resource(74) "";
+resource(75) "" "this" "wont" "" "scare" "" "me" "";
+resource(76) (raw) "fancy";
+//resource(79) "hi", "ho";    // , not allowed
+
+resource(80) $"4041";
+resource(81) (buffer) $"4041";
+resource(82) (raw) $"4041";
+resource(83) $"4041" $"4243";
+resource(84) $"";
+resource(85) $"" $"40" $"" $"41" $"";
+resource(86) (array) $"4041";
+//resource(89) $"0";          // too few digits
+//resource(89) $"GA";         // invalid digit
+//resource(89) $"FF", $"AA";  // , not allowed
+
+resource(90) (#'blah') $"4041";
+resource(91) (#'blah') (uint16) 1234;
+resource(92) #'blah' 1234;
+resource(93) #'blah' (uint16) 1234;
+//resource(95) (#'blah' uint16) 1234;  // we don't allow this notation
+
+//------------------------------------------------------------------------------
+
+enum {
+	R_Boolean = 100,
+	R_Int8 = 100,
+	R_Character = 100,
+	R_String = 100,
+	R_Double = 100,
+	R_Float = 100,
+	R_Int64 = 100,
+	R_Int32 = 100,
+	R_MIMEString = 100,
+	R_Offset = 100,
+	R_Pointer = 100,
+	R_Raw = 100,
+	R_Int16 = 100,
+	R_Size = 100,
+	R_Status = 100,
+	R_Time = 100,
+	R_UInt8 = 100,
+	R_UInt64 = 100,
+	R_UInt32 = 100,
+	R_UInt16 = 100
+};
+
+resource(R_Boolean) false;
+resource(R_Int8) (int8)4;
+resource(R_Character) (#'CHAR') $"28";
+resource(R_String) "Dance and song";
+resource(R_Double) (double)0.0;
+resource(R_Float) 0.0;
+resource(R_Int64) (int64)-125829120;
+resource(R_Int32) -123450;
+resource(R_MIMEString) (#'MIMS') "application/octet-stream";
+resource(R_Offset) (off_t)0;
+resource(R_Pointer) (#'PNTR') $"00000000";
+resource(R_Raw) $"";
+resource(R_Int16) (int16)-1234;
+resource(R_Size) (size_t)0;
+resource(R_Status) (ssize_t)0;
+resource(R_Time) (time_t)0;
+resource(R_UInt8) (uint8)200;
+resource(R_UInt64) (uint64)17293822569102704640;
+resource(R_UInt32) (uint32)251658240;
+resource(R_UInt16) (uint16)61440;
+
+resource(120) $"40414243";
+
+resource(121) (#200)
+	$"DE8765005507E15BC8033E2CD6BFB72620DD87F9780325D0BB2DAC7DAEE9AC9B"
+	$"6C7398DB05ADC01C5E41CBC0CCDA19DBE9FFEF7430BE3525C5FCBC419BB90000";
+
+//------------------------------------------------------------------------------
+
+// The decompile should escape the special characters, except \P, which
+// is not special (the \ is dropped). Unlike deres, rc does not split the
+// string literal into two parts at the newline.
+resource(200) "a \tshort string\nwith \bplenty\fof\r\vescapes\P";
+
+// More stuff that should be escaped.
+resource(201) "some other \"special\" characters like \\ and \0x01 and \002";
+
+// Decompiling should create a "#'CSTR' array" with two items, because the
+// string contains an embedded null character. By the way, beres does not
+// recognize \0 as null, but rc does.
+resource(202) "alongstring-alongstringg\000-alongstringg-alongstringg-alongstringgalongstringg-alongstringg-alongstringg-alongstringg-alongstring";
+
+// Don't do the following in your own resource files. It should not crash
+// the compiler or decompiler, but pretending that non-string data is a
+// null-terminated string is A Bad Thing (tm).
+resource(210) (#'CSTR') $"4041";
+resource(212) (#'CSTR') (uint64) 5678;
+
+// Should decompile as raw, not as string.
+resource(213) (#200) 100;
+
+// The decompiler sees this as a string literal.
+resource(214) (#200) $"6400";
+
+// The decompiler creates the symbolic names R_BOOL_MyName and R_CSTR_MyName,
+// with values 215 and 216, respectively. 
+resource(215, "MyName") true;
+resource(216, "MyName") "true";
+
+// The decompiler creates the symbol R_200_MyName.
+resource(217, "MyName") (#200) 123;

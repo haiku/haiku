@@ -1,0 +1,91 @@
+/*
+ * Definitions for the types that are built into the compiler.
+ */
+
+/* BPoint object. */
+type #'BPNT' point
+{
+	float x,
+	float y 
+};
+
+/* BRect object. */
+type #'RECT' rect
+{
+	float left,
+	float top,
+	float right,
+	float bottom
+};
+
+/* rgb_color object. */
+type #'RGBC' rgb_color
+{
+	uint8 red,
+	uint8 green,
+	uint8 blue,
+	uint8 alpha = 0xFF
+};
+
+/* Application signature. */
+type(1, "BEOS:APP_SIG") #'MIMS' app_signature
+{
+	string signature  // max 240 bytes (including null)
+};
+
+/* Application launch flags */
+type(1, "BEOS:APP_FLAGS") #'APPF' app_flags
+{
+	// 0x00000000 B_SINGLE_LAUNCH
+	// 0x01000000 B_MULTIPLE_LAUNCH
+	// 0x02000000 B_EXCLUSIVE_LAUNCH
+	// 0x04000000 B_BACKGROUND_APP
+	// 0x08000000 B_ARGV_ONLY
+	uint32 flags
+};
+
+/*
+ * Application version info. Should always be 340 bytes. The system
+ * will automatically append 340 additional bytes with "system info".
+ */
+type(1, "BEOS:APP_VERSION") #'APPV' app_version
+{
+	uint32 major,
+	uint32 middle,
+	uint32 minor,
+
+	// 0 = development  1 = alpha          2 = beta
+	// 3 = gamma        4 = golden master  5 = final
+	uint32 variety,  
+
+	uint32 internal,
+
+	string short_info =  // must be exactly 64 bytes (including null)
+		"                                                               ",
+
+	string long_info =   // must be exactly 256 bytes (including null)
+		"                                                                "
+		"                                                                "
+		"                                                                "
+		"                                                               "
+};
+
+/* Large (32x32, 8-bit) application icon. */
+type(101, "BEOS:L:STD_ICON") #'ICON' large_icon
+{
+	array icon  // 1024 bytes
+};
+
+/* Small (16x16, 8-bit) application icon. */
+type(101, "BEOS:M:STD_ICON") #'MICN' mini_icon
+{
+	array icon  // 256 bytes
+};
+
+/* Supported file types. */
+type(1, "BEOS:FILE_TYPES") #'MSGG' file_types
+{
+	// contains one or more fields called "types", each of which
+	// has a MIME type value, for example: "types" = "text/plain"
+	message types
+};

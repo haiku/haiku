@@ -1,0 +1,223 @@
+
+type #'smpl' simple { int8 x };
+resource(801) simple { 4 };
+resource(802) simple { 257 };
+resource(803) simple { (int64)-1 };
+
+// Type codes do not have to be unique, so even though #'BYTE' is used
+// for the int8 built-in type, we can also use it for our own types.
+type #'BYTE' mybyte { int8 x };
+resource(805) mybyte { 4 };
+resource(806) mybyte { 257 };
+resource(807) mybyte { (int64)-1 };
+//resource(808) (mybyte) 123;  // invalid cast
+//resource(809) (mybyte) "yeah";  // invalid cast
+
+type #'RAWT' myraw { array x }; 
+resource(810) myraw { array { $"1234" } };
+resource(811) myraw { x = array { $"1234" } };
+resource(812) myraw { $"1234" };
+resource(813) (raw) myraw { $"1234" };
+resource(814) (myraw) myraw { $"1234" };
+resource(815) myraw;
+//resource(816) (myraw) array { $"1234" };  // invalid cast
+
+// all resources become "0100000002000000000300"
+type #'what' type1 { int32 a, int32 b, bool d, int16 e };  // size 11
+resource(810) type1 { 1, 2, false, 3 };
+resource(811) type1 { d = false, 1, 2, 3 };
+resource(812) type1 { d = false, e = 3, b = 2, 1 };
+resource(813) type1 { d = false, e = 3, 6, 7, a = 1, b = 2 };
+resource(814) type1 { 6, 7, false, 9, d = false, e = 3, a = 1, b = 2 };
+
+type #'RECT' myrect { float left, float top, float bottom, float right };
+
+// becomes { 1.00000, 2.00000, 3.00000, 4.00000 }
+resource(820) myrect { 1, 2, 3, 4 };
+
+// becomes { 1.00000, 2.00000, 3.00000, 4.00000 }
+resource(821) myrect { left = 1, 2, 3, 4 };
+
+// becomes { 3.00000, 2.00000, 4.00000, 5.00000 }
+resource(822) myrect { 1, 2, left = 3, 4, 5 };
+
+// becomes { 3.00000, 2.00000, 4.00000, 0 }
+resource(823) myrect { 1, 2, left = 3, 4 };
+
+// becomes { 2.00000, 1.00000, 3.00000, 4.00000 }
+resource(824) myrect { top = 1, 2, 3, 4 };
+
+// becomes { 1.00000, 0.00000, 0.00000, 0.00000 }
+resource(825) myrect { 1 };
+
+// becomes $"0000803F000000400000404000008040"
+resource(826) (raw) myrect { 1, 2, 3, 4 };
+
+// becomes { 1.00000, 2.00000, 3.00000, 4.00000 }
+resource(827) #'RECT' (raw) myrect { 1, 2, 3, 4 };
+resource(828) #'RECT' $"0000803F000000400000404000008040";
+
+//resource(829) myrect { left = 1, 2, 3, 4, 5 };  // too many fields
+//resource(829) myrect { dude = 1, 2, 3, 4, 5 };  // unknown field
+//resource(829) myrect { (float) top = 1, 2, 3, 4 };  // unknown type top
+
+enum { NoConflict = 100 };
+type #'RAWT' NoConflict { int32 a };
+
+// Types are not identified by their type_code, but by their name, so the
+// size of typ3 should be 5, even though typ1 and 2 have the same code.
+type #'same' typ1 { int8 x };
+type #'same' typ2 { int32 x };
+type #'diff' typ3 { typ1 a, typ2 b };
+resource(830) typ3 { typ1 { 1 }, typ2 { 2 } };
+resource(831) typ3 { b = typ2 { 1 }, a = typ1 { 2 } };
+resource(832) typ3 { b = typ2 1, a = typ1 2 };
+resource(833) typ3 { typ1 1, typ2 2 };
+//resource(834) typ3 { typ2 { 1 }, typ1 { 2 } };          // invalid cast
+//resource(834) typ3 { a = typ2 { 1 }, b = typ1 { 2 } };  // invalid cast
+//resource(834) typ3 { a = { 1 }, b = { 2 } };            // invalid cast
+
+// Size of this type's data should still be 8, even though the default
+// value for one of the fields is an int8.
+type #'RAWT' rect2 { float a, float b = (int8) 12 };
+resource(835) rect2 { 1 };
+
+type #'cmpd' compound { int16 a = 100, int16 b = 0x80 };
+type #'nest' nested { compound c = compound { 16, 32 }, int8 i = 4 };
+type #'nst2' nested2 { compound c, int8 i };
+resource(840) compound { };
+resource(841) compound;
+resource(842) nested { compound { }, 1 };
+resource(843) nested2 { compound, 1 };
+resource(844) nested;
+resource(845) nested2;
+
+type #'CSTR' strings { string a, string b = "yo" };
+resource(850) strings;
+resource(851) strings { a = "long", b = "longer" };
+resource(852) strings { b = "long" };
+//resource(859) (string) strings { "long", "longer" };  // invalid cast
+
+type #'RAWT' msgs { archive BBitmap a };
+resource(860) msgs;
+resource(861) msgs { a = archive BBitmap { "field" = "value" } };
+
+type #'MSGG' msgs2 { message m = message('yeah') { "fld" = "val" } };
+resource(862) msgs2;
+
+// When you decompile these, it only sees the first message.
+type #'RAWT' msgs3 { message m, archive BBitmap a };
+type #'zzzz' msgs4
+{ 
+	message m = message { "f" = "v" }, 
+	message n = message { "v" = "f" }
+};
+resource(863) msgs3;
+resource(864) msgs4;
+
+type #'zzzz' msgs5 { int8 x, message m, message n };
+resource(865) msgs5;
+resource(866) msgs5 { 4, message('yoyo') { "f" = "v" } };
+
+type #'what' onefield { int32 flags };
+resource(870) onefield 100;
+
+type ye_olde_raw { int32 a };
+resource(871) ye_olde_raw 64;
+
+//type #'what' sometype { UnKnOwN x };      // unknown type
+//type #'what' B_INT8_TYPE { int8 x };      // duplicate type (built-in)
+//type #'RECT' myrect { float x };          // duplicate type
+//type #'RAWT' whoops { float x = "wrong" } // invalid cast
+//type #'jump' jump { int8 x, jump j };     // unknown type jump
+
+//resource(890) tooSoon 123;         // unknown type (must
+//type #'soon' tooSoon { int32 x };  // be defined first)
+
+//resource(890) UnKnOwN { 123 };                // unknown type
+//resource(890) (UnKnOwN) { 123 };              // unknown type
+//resource(890) message('blah') { UnKnOwN x };  // unknown type
+//resource(890) myraw { 123 };                  // invalid cast
+//resource(890) (myrect) { 123 };               // invalid cast
+
+enum {
+	R_Point = 100,
+	R_Rect = 100,
+	R_Color = 100,
+};
+
+resource(R_Point) point { -8.30573e+26, -1.0977e+37 };
+resource(880) point;
+
+resource(R_Rect) rect { 0.0, 0.0, -1.0, -1.0 };
+resource(881) rect;
+
+resource(R_Color) rgb_color { 0xaa, 0xbb, 0x88, 0x80 };
+resource(882) rgb_color;
+
+resource app_signature "application/x-vnd.vendor.appname";
+resource app_flags;
+
+resource app_version;
+
+resource large_icon array
+{
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+};
+
+resource mini_icon array
+{
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+};
+
+resource file_types message
+{
+	"types" = "text/plain",
+	"types" = "text/x-source-code"
+};

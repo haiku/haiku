@@ -1,0 +1,11 @@
+/*
+ * Master test script for the resource compiler.
+ */
+
+#include "enum.rdef"
+#include "simple.rdef"
+#include "array.rdef"
+#include "message.rdef"
+#include "type.rdef"
+
+//#include "defaults.rdef"  // test separately

@@ -1,0 +1,208 @@
+
+// "what" code should default to 0.
+resource(401) message { "field1" = "value1" };
+
+// Fields with casts, type codes, and nested compound data.
+resource(402) message(1000)
+{
+	"small1" = (int8) 257,         // 1
+	int8 "small2" = 257,           // 1
+	int8 "small3" = (int8) 257,    // 1
+	uint8 "small4" = (int8) -1,    // (uint8)255
+	int8 "small5" = (uint8) -1,    // -1
+	int8 "small6" = (int8) -1,     // -1
+	uint8 "small7" = (uint8) -1,   // (uint8)255
+
+	"large1" = (int64) 3,
+	int64 "large2" = 3,
+	int64 "large3" = (int32) 3,
+	int32 "large4" = (int64) 3,
+
+	"string1" = "some text",
+//	string "string2" = 123,    // invalid cast
+//	int32 "string3" = "text",  // invalid cast
+
+	#'BYTE' "typecode1" = 1234,        // does not become "(int8)-46"
+	#'blah' int16 "typecode2" = 1234,  // becomes 16-bit, but raw encoded
+
+	"array1" = array { $"40", $"41" },
+	buffer "array2" = array { $"50" $"51" },
+	raw "array3" = array { "w00t", "dude" },
+	array "array4" = array { "w00t", 1234 },
+	array "array5" = (array) array { "w00t", 1234 },
+	//raw "array3" = { "w00t", "dude" },  // syntax error
+
+	"msg1" = message { "field" = "value" },
+	message "msg2" = message(2000) { "field" = "value" },
+	message "msg3" = (message) message(2000) { "field" = "value" },
+	#'blah' message "msg4" = message { "field" = "value" }
+//	,message(2000) "msg5" = message(2000) { "fld" = "val" }  // not supported
+};
+
+// "Arrays" of fields, i.e. multiple fields with the same name.
+resource(403) message('blah')
+{
+	"integer" = 1,
+	"integer" = 3,
+	"integer" = 2
+//	,"integer" = "hi there"   // type conflict
+};
+
+// Tests whether the decompiler correctly outputs nested messages.
+resource(404) message('blah')
+{
+	"sub1" = message('bla1') { "string1" = "value1" },
+	"sub1" = message('bla2') { "string2" = "value2" },
+	"sub1" = message('bla2') { "string2" = "value2", "string3" = "value3" },
+	"SomeField" = 2,
+	"sub2" = message('bla3') { "string3" = "value3" }
+};
+
+// Another comma test for the decompiler.
+resource(405) #'w00t' message('blah')
+{
+	"integer1" = 1,
+	"sub" = message { "string1" = "woot1" },
+	"integer2" = 2
+};
+
+// The decompiler should still recognize this as a message.
+resource(406) #'RAWT' message { "field" = "value" };
+
+//resource(407) (int32) message { "field" = "value" };  // invalid cast
+//resource(407) (buffer) message { "field" = "value" }; // invalid cast
+
+// beres allows you to specify a what code inside the cast, 
+// but we don't (beres ignores it anyway):
+//resource(407) (message('blah')) message { "field" = "value"; }
+
+// Decompiler turns the very long string into an array.
+resource(408) message 
+{
+	"longstring" = "alongstring-alongstringg\000-alongstringg-alongstringg-alongstringgalongstringg-alongstringg-alongstringg-alongstringg-alongstring",
+	"longarray" = array { $"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabb" },
+	#'blah' "longblah" = array { $"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabb" },
+	"textarray" = array { "pompiedom" }
+};
+
+// Note: negative "what" values are allowed, but the decompiler converts
+// them to unsigned, just like type codes (which cannot be negative).
+resource(409) message(-1) { "field" = "value" };
+resource(410) message(0x80000000) { "field" = "value" };
+resource(411) message(0x7FFFFFFF) { "field" = "value" };
+resource(412) message(-100001) { "field" = "value" };
+resource(413) #100001 message(-100001) { "field" = "value" };
+//resource(414) #-100001 message { "f" = "v" };  // syntax error
+
+resource(415) message { };
+resource(416) message;
+resource(417) message('blah') { };
+resource(418) message('blah');
+
+// Decompiles to an empty message.
+resource(419) $"31424F460100001212000000000000000100";
+
+resource(420) message('blah') {
+	"sub" = message('bla1') { "string1" = "woot1" },
+	"sub" = message('bla2') { "string2" = "woot2" },
+	int8 "small integer" = 1,
+	"integer" = 2,
+	"integer" = 3,
+	"large integer" = (int64)3,
+	"string" = "some text",
+	"sub2" = message('bla3') { "string3" = "woot3" }
+};
+
+resource(421) #'w00t' message('blah') {
+	"integer1" = 1,
+	"sub" = message('bla1') { "string1" = "woot1" },
+	"integer2" = 2
+};
+
+//------------------------------------------------------------------------------
+
+resource(701) #'BBMP' archive BSomeClass { "data" = 123 };
+resource(702) archive BSomeClass { "data" = 123 };
+resource(703) archive("dynamic", 'blah') BSomeClass { "data" = 123 };
+resource(704) archive("dynamic") BSomeClass { "data" = 123 };
+resource(705) archive(, 200) BSomeClass { "data" = 123 };
+resource(706) (archive BSomeClass) archive BSomeClass { "data" = 123 };
+resource(707) archive(, -1) BSomeClass { "data" = 123 };
+resource(700) archive BSomeClass { "" = $"" };  // empty archive trick
+
+// When you cast an archive to a message, beres strips the 
+// "class" field from the message (so it will no longer be
+// recognized as an archive), but we don't.
+resource(708) (message) archive BSomeClass { "data" = 123 };
+
+// beres allows you to specify the add_on name and what code 
+// inside the cast, but we don't (beres ignores it anyway).
+//resource(709) (archive("t", 1) BSomeClass) archive BSomeClass { "d" = 123 };
+
+//resource(709) (archive) archive BSomeClass { "d" = 123 };    // syntax error
+//resource(709) archive("dynamic",) BSomeClass { "d" = 123 };  // syntax error
+
+//------------------------------------------------------------------------------
+
+enum {
+	R_BBMP_kLargeNewGroupIcon = 516,
+	R_BBMP_kSmallNewGroupIcon = 517,
+};
+
+resource(R_BBMP_kLargeNewGroupIcon) #'BBMP' archive BBitmap {
+	"_frame" = rect { 0.0, 0.0, 31.0, 31.0 },
+	"_cspace" = 4,
+	"_bmflags" = 1,
+	"_rowbytes" = 32,
+	"_data" =  array {
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFF00FAFA0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFF00FAF8FAFA0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFF000000FAF8F8F8FAFA0000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF00FAFA0000F8F8F8F8F8FAFA00FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF00FAF8FAFA0000F8F8F8F8F800FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF00FAF8F8F8FAFA0000F8F8F800FFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF00FAF8F8F8F8F8FAFA00F8F80000FFFFFFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF001BF8F8F8F8F8F8F8000E0F1C1C0000FFFFFFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF001B0F0F0FF8F8F8F8003F3F0E0F1C1C0000FFFFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F0E0FF8F800003F3F3F0E0F1C1C0000FFFFFFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F0E0F1C1C00003F3F3F0E0F1A190000FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F0E0F1C1C00003F3F3F0E1A1900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F0E0F1C1C00003F3F171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F3F3F0E0F1A190000171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F3F3F3F3F0E1A1900171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B0F3F3F3F3F3F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B183F3F3F3F3F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFF001B1C17183F3F3F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFFFF00001B1C17183F3F3F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFF0000191A17173F3F3F3F3F3F3F171900171900FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFF0000191A17173F3F3F3F3F171900171A00FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFF0000191A17173F3F3F1719001A1900FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFF0000191A17173F171900001900FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000191A17171A00FF0000FFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000191A1900FFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00001900FFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000FFFFFFFFFFFFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	}
+};
+
+resource(R_BBMP_kSmallNewGroupIcon) #'BBMP' archive BBitmap {
+	"_frame" = rect { 0.0, 0.0, 15.0, 15.0 },
+	"_cspace" = 4,
+	"_bmflags" = 1,
+	"_rowbytes" = 16,
+	"_data" =  array {
+		$"FFFFFFFF0E0EFFFFFFFFFFFFFFFFFFFFFFFFFF0EFAFA0E0EFFFFFFFFFFFFFFFF"
+		$"FFFF0E0EF8F8FAFA0EFFFFFFFFFFFFFFFFFF0EFAFA0EF8F80EFFFFFFFFFFFFFF"
+		$"FFFF0EF8F8FAFA0E0E0EFFFFFFFFFFFFFFFF0E1818F8F80E3F3F0E0EFFFFFFFF"
+		$"FFFF0E183F18180F0F3F3F0E12FFFFFFFFFF0E183F3F3F18180F0F0E12FFFFFF"
+		$"FFFF0E183F3F3F3F3F18180E12FFFFFFFFFF0E183F3F3F3F3F3F1C0E12FFFFFF"
+		$"FFFF0E0E181C3F3F3F3F1C0E12FFFFFFFFFFFFFF0E0E171C3F3F1C0E12FFFFFF"
+		$"FFFFFFFFFFFF0E0E171C1C0E12FFFFFFFFFFFFFFFFFFFFFF0E0E170E12FFFFFF"
+		$"FFFFFFFFFFFFFFFFFFFF0E0EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	}
+};

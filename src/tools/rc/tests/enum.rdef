@@ -1,0 +1,34 @@
+
+// Although useless, enums may be empty.
+enum { };
+
+enum
+{
+	R_Test1,   // starts at 0
+	R_Test2
+};
+
+enum
+{
+	R_Test10,         // is also 0
+	R_Test11 = 1000,
+	R_Test12 = 1111,
+	R_Test13,         // should be 1112
+	R_Test14 = 999,
+	R_Test15 = -999,  // may have comma
+};
+
+//enum { R_Test10 = 7 };  // duplicate symbol
+
+resource(R_Test1) 123;
+//resource(R_Test10) 123;  // duplicate resource
+resource(R_Test11) 123;
+resource(R_Test15) 123;
+resource(R_Test15) "123";
+//resource(R_NotExists) 123;  // unknown symbol
+
+resource(R_Test12) 123;
+resource(R_Test13) 123;                      // should have ID 1112
+resource(R_Test13, "yeah") $"4041";          // R_RAWT_yeah
+resource(R_Test13, "yeah\0what") 10.0;       // R_FLOT_yeah
+//resource(R_Test13, "yeah\0what") $"4041";  // duplicate resource
