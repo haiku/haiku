@@ -13,6 +13,7 @@ Server app_server :
 	CursorData.cpp
 	TokenHandler.cpp
 	PatternHandler.cpp
+	PicturePlayer.cpp
 
 	ColorSet.cpp
 	RectUtils.cpp

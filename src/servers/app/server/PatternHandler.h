@@ -32,7 +32,7 @@
 typedef union
 {
 	uint64 type64;
-	uint8 type8[8];
+	int8 type8[8];
 } pattern_union;
 
 /*!
