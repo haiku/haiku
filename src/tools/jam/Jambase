@@ -384,12 +384,19 @@ else if $(OS) = BEOS
 	BINDIR		?= /boot/apps ;
 	CC		?= gcc ;
 	C++		?= $(CC) ;
+	CHMOD		?= chmod ;
+	CHGRP		?= chgrp ;
+	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
 	LIBDIR		?= /boot/develop/libraries ;
 	LINK		?= gcc ;
-	LINKLIBS	?= -lnet ;
 	NOARSCAN	?= true ;
+	RANLIB		?= ranlib ;
 	STDHDRS		?= /boot/develop/headers/posix ;
+	YACC		?= bison -y ;
+	YACCGEN		?= .c ;
+	YACCFILES	?= y.tab ;
+	YACCFLAGS	?= -d ;
 }
 else if $(UNIX)
 {
