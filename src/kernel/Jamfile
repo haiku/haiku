@@ -306,6 +306,9 @@ KernelLd libroot.so :
 
 	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
+	<$(SOURCE_GRIST)!libroot!posix>fnmatch.o
+	<$(SOURCE_GRIST)!libroot!posix>glob.o
+	<$(SOURCE_GRIST)!libroot!posix>pwd.o
 	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
 
 	<$(SOURCE_GRIST)!libroot!posix!malloc>arch-specific.o
@@ -404,21 +407,23 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!unistd>access.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>chown.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>close.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>conf.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>directory.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>dup.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>dup2.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>getopt.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>lseek.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>directory.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>link.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>read.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>write.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>sleep.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>usleep.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>truncate.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>hostname.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>ioctl.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>link.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>lseek.o
 	<$(SOURCE_GRIST)!libroot!posix!unistd>mount.o
-	<$(SOURCE_GRIST)!libroot!posix!unistd>conf.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>read.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>sleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>truncate.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>usergroup.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>usleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>write.o
 
 	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>fabs.o
 	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>frexp.o
