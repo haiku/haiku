@@ -2,8 +2,8 @@
 ** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
-#ifndef FS_SELECT_H
-#define FS_SELECT_H
+#ifndef VFS_SELECT_H
+#define VFS_SELECT_H
 
 typedef struct select_info {
 	uint8	events;
@@ -35,4 +35,4 @@ enum select_events {
 #define INDEX_FROM_REF(ref) ((ref) & 0xffffUL)
 #define SELECT_FLAG_FROM_REF(ref) ((ref) >> 16L)
 
-#endif	/* FS_SELECT_H */
+#endif	/* VFS_SELECT_H */

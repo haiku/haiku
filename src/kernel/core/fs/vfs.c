@@ -2666,6 +2666,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 err:
 	delete_sem(sync.sem);
+	kfree(sync.set);
 
 	return count;
 }
@@ -2789,6 +2790,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 
 err:
 	delete_sem(sync.sem);
+	kfree(sync.set);
 
 	return count;
 }
