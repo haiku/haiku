@@ -10,24 +10,19 @@ Devices Windows Header by Sikosis
 #define __DEVICESWINDOWS_H__
 
 #include "Devices.h"
-#include "DevicesViews.h"
+#include "cm_wrapper.h"
 
-class DevicesView;
-class ResourceUsageView;
-class IRQView;
-class ModemView;
-
+#define MODEM_ADDED 'moad'
 
 class ResourceUsageWindow : public BWindow
 {
 	public:
-    	ResourceUsageWindow(BRect frame);
+    	ResourceUsageWindow(BRect frame, BList &);
 	    ~ResourceUsageWindow();
 	    virtual void MessageReceived(BMessage *message);
+	    
 	private:
-		void InitWindow(void);
-	    ResourceUsageView*	 ptrResourceUsageView;
-	    IRQView*             ptrIRQView;
+		void InitWindow(BList &);
 	    BTabView		     *tabView;
 	    BTab			     *tab;
 };
@@ -36,16 +31,12 @@ class ResourceUsageWindow : public BWindow
 class ModemWindow : public BWindow
 {
 	public:
-    	ModemWindow(BRect frame);
+    	ModemWindow(BRect frame, BMessenger);
 	    ~ModemWindow();
 	    virtual void MessageReceived(BMessage *message);
 	private:
 		void InitWindow(void);
-	    ModemView*	 ptrModemView;
-	    
-	    BBox		 *boxInternalModem;
-	    BButton      *btnAdd;
-	    BButton		 *btnCancel;
+	    BMessenger fMessenger;
 };
 
 
@@ -56,11 +47,13 @@ class DevicesWindow : public BWindow
 	    ~DevicesWindow();
     	virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
-   	    virtual void FrameResized(float width, float height); 
 	private:
 		void InitWindow(void);
+		void InitDevices(bus_type bus);
 		void LoadSettings(BMessage *msg);
 		void SaveSettings(void);
+		void UpdateDeviceInfo();
+		
 		ResourceUsageWindow*	ptrResourceUsageWindow;
 		ModemWindow* 			ptrModemWindow;
 		
@@ -68,7 +61,15 @@ class DevicesWindow : public BWindow
         BStringView      *stvCurrentState;
         BMenuBar		 *menubar;        
         
-	    DevicesView*	 ptrDevicesView;
+	    BList			fList;
+	    
+	    BListItem        *systemMenu, *isaMenu, *pciMenu, *jumperedMenu;
+	    BOutlineListView *outline;
+	    BStringView *stvIRQ;
+		BStringView *stvDMA;
+		BStringView *stvIORanges;
+		BStringView *stvMemoryRanges;
+		BButton *btnConfigure;		
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 Devices - DevicesWindow by Sikosis
 
-(C)2003-2004 OBOS
+(C)2003 OBOS
 
 */
 
@@ -13,6 +13,7 @@ Devices - DevicesWindow by Sikosis
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <ClassInfo.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -31,13 +32,14 @@ Devices - DevicesWindow by Sikosis
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <String.h>
 #include <StringView.h>
 #include <Window.h>
 #include <View.h>
 
 #include "Devices.h"
-#include "DevicesViews.h"
 #include "DevicesWindows.h"
+#include "DevicesInfo.h"
 
 const uint32 MENU_FILE_ABOUT_DEVICES = 'mfad';
 const uint32 MENU_FILE_QUIT = 'mfqt';
@@ -47,6 +49,7 @@ const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM = 'mdcj';
 const uint32 MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM = 'mdcm';
 const uint32 MENU_DEVICES_RESOURCE_USAGE = 'mdru';
 const uint32 BTN_CONFIGURE = 'bcfg';
+const uint32 SELECTION_CHANGED = 'slch';
 
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
@@ -64,7 +67,7 @@ static void CenterWindowOnScreen(BWindow* w)
 
 
 // DevicesWindow - Constructor
-DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "OBOS Devices", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
+DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "Devices", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
 {
 	InitWindow();
 	CenterWindowOnScreen(this);
@@ -77,6 +80,37 @@ DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "OBOS Devices", B_TI
     BMessage msg;
     msg.Unflatten(&file);
     LoadSettings (&msg);
+    
+    status_t error;
+
+	if ((error = init_cm_wrapper()) < 0) {
+		printf("Error initializing configuration manager (%s)\n", strerror(error));
+		exit(1);
+	}
+    
+    InitDevices(B_ISA_BUS);
+    InitDevices(B_PCI_BUS);
+    
+    for (int32 i=fList.CountItems()-1; i>=0; i--) {
+		DevicesInfo *deviceInfo = (DevicesInfo *) fList.ItemAt(i);
+		struct device_info *info = deviceInfo->GetInfo();
+		BListItem *item = systemMenu;
+		if (info->bus == B_ISA_BUS)
+			item = systemMenu;
+		else if (info->bus == B_PCI_BUS)
+			item = pciMenu;
+		
+		outline->AddUnder(new DeviceItem(deviceInfo, deviceInfo->GetName()), item);
+	}
+	
+	if (outline->CountItemsUnder(jumperedMenu, true)==0)
+		outline->AddUnder(new BStringItem("<no devices>"), jumperedMenu);
+	if (outline->CountItemsUnder(pciMenu, true)==0)
+		outline->AddUnder(new BStringItem("<no devices>"), pciMenu);
+	if (outline->CountItemsUnder(isaMenu, true)==0)
+		outline->AddUnder(new BStringItem("<no devices>"), isaMenu);
+	if (outline->CountItemsUnder(systemMenu, true)==0)
+		outline->AddUnder(new BStringItem("<no devices>"), systemMenu);
 	
 	Show();
 }
@@ -86,7 +120,10 @@ DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "OBOS Devices", B_TI
 // DevicesWindow - Destructor
 DevicesWindow::~DevicesWindow()
 {
-	exit(0);
+	void *item;
+	while ((item = fList.RemoveItem((int32)0)))
+		delete item;
+	uninit_cm_wrapper();
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -99,76 +136,63 @@ void DevicesWindow::InitWindow(void)
 	BRect r;
 	r = Bounds(); // the whole view
 	
-	BMenu *FileMenu;
-	BMenu *DevicesMenu;
-	BMenu *JumperedDevicesMenu;
 	BMenuItem *mniRemoveJumperedDevice;
 	
 	// Add the menu bar
 	menubar = new BMenuBar(r, "menu_bar");
 
 	// Add File menu to menu bar
-	FileMenu = new BMenu("File");
-	FileMenu->AddItem(new BMenuItem("About Devices" B_UTF8_ELLIPSIS, new BMessage(MENU_FILE_ABOUT_DEVICES), 0));
-	FileMenu->AddSeparatorItem();
-	FileMenu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
+	BMenu *menu = new BMenu("File");
+	menu->AddItem(new BMenuItem("About Devices" B_UTF8_ELLIPSIS, new BMessage(MENU_FILE_ABOUT_DEVICES), 0));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Quit", new BMessage(MENU_FILE_QUIT), 'Q'));
+	menubar->AddItem(menu);
 	
-	DevicesMenu = new BMenu("Devices");
-	JumperedDevicesMenu = new BMenu("New Jumpered Device");
-	JumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), 0));
-	JumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), 0));
+	menu = new BMenu("Devices");
+	menubar->AddItem(menu);
+	
+	BMenu *jumperedDevicesMenu = new BMenu("New Jumpered Device");
+	jumperedDevicesMenu->AddItem(new BMenuItem("Custom ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_CUSTOM), 0));
+	jumperedDevicesMenu->AddItem(new BMenuItem("Modem ...", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM), 0));
 	
 	//DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
-	DevicesMenu->AddItem(JumperedDevicesMenu);
+	menu->AddItem(jumperedDevicesMenu);
 	
-	DevicesMenu->AddItem(mniRemoveJumperedDevice = new BMenuItem("Remove Jumpered Device", new BMessage(MENU_DEVICES_REMOVE_JUMPERED_DEVICE), 'R'));
-	DevicesMenu->AddSeparatorItem();
-	DevicesMenu->AddItem(new BMenuItem("Resource Usage", new BMessage(MENU_DEVICES_RESOURCE_USAGE), 'U'));
+	menu->AddItem(mniRemoveJumperedDevice = new BMenuItem("Remove Jumpered Device", new BMessage(MENU_DEVICES_REMOVE_JUMPERED_DEVICE), 'R'));
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Resource Usage", new BMessage(MENU_DEVICES_RESOURCE_USAGE), 'U'));
 	
 	mniRemoveJumperedDevice->SetEnabled(false);
-	
-	menubar->AddItem(FileMenu);
-	menubar->AddItem(DevicesMenu);
 	
 	// Create the StringViews
 	stvDeviceName = new BStringView(BRect(LeftMargin, 16, 150, 40), "DeviceName", "Device Name");
 	stvCurrentState = new BStringView(BRect(RightMargin, 16, r.right-10, 40), "CurrentState", "Current State");
 	
-	BStringView *stvIRQ;
-	BStringView *stvDMA;
-	BStringView *stvIORanges;
-	BStringView *stvMemoryRanges;
-	float fCurrentHeight = 280;
-	float fCurrentGap = 16;
-	stvIRQ = new BStringView(BRect(r.left+20,r.top+fCurrentHeight,r.left+80,r.top+fCurrentHeight+20),"IRQ","IRQs:");
+	float fCurrentHeight = 279;
+	float fCurrentGap = 15;
+	stvIRQ = new BStringView(BRect(r.left+22,r.top+fCurrentHeight,r.right-13,r.top+fCurrentHeight+20),"IRQ","IRQs:", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCurrentHeight = fCurrentHeight + fCurrentGap;
-	stvDMA = new BStringView(BRect(r.left+20,r.top+fCurrentHeight,r.left+80,r.top+fCurrentHeight+20),"DMA","DMAs:");
+	stvDMA = new BStringView(BRect(r.left+22,r.top+fCurrentHeight,r.right-13,r.top+fCurrentHeight+20),"DMA","DMAs:", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCurrentHeight = fCurrentHeight + fCurrentGap;
-	stvIORanges = new BStringView(BRect(r.left+20,r.top+fCurrentHeight,r.left+80,r.top+fCurrentHeight+20),"IORanges","IO Ranges:");
+	stvIORanges = new BStringView(BRect(r.left+22,r.top+fCurrentHeight,r.right-13,r.top+fCurrentHeight+20),"IORanges","IO Ranges:", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCurrentHeight = fCurrentHeight + fCurrentGap;
-	stvMemoryRanges = new BStringView(BRect(r.left+20,r.top+fCurrentHeight,r.left+160,r.top+fCurrentHeight+20),"MemoryRanges","Memory Ranges:");
+	stvMemoryRanges = new BStringView(BRect(r.left+22,r.top+fCurrentHeight,r.right-13,r.top+fCurrentHeight+20),"MemoryRanges","Memory Ranges:", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCurrentHeight = fCurrentHeight + fCurrentGap;
 	
 	// Create the OutlineView
-	BRect outlinerect(r.left+12,r.top+50,r.right-29,r.top+262);
-	BOutlineListView *outline;
-	BListItem        *topmenu;
-	BListItem        *submenu;
+	BRect outlinerect(r.left+12,r.top+45,r.right-29,r.top+262);
 	BScrollView      *outlinesv;
 
-	outline = new BOutlineListView(outlinerect,"devices_list", B_SINGLE_SELECTION_LIST);
-	outline->AddItem(topmenu = new BStringItem("System Devices"));
-	outline->AddUnder(new BStringItem("<no devices>"), topmenu);
-	outline->AddUnder(new BStringItem("<no devices>"), topmenu);
-	outline->AddItem(topmenu = new BStringItem("ISA/Plug and Play Devices"));
-	outline->AddUnder(submenu = new BStringItem("<no devices>"), topmenu);
-	outline->AddItem(topmenu = new BStringItem("PCI Devices"));
-	outline->AddUnder(submenu = new BStringItem("<no devices>"), topmenu);
-	outline->AddItem(topmenu = new BStringItem("Jumpered Devices"));
-	outline->AddUnder(submenu = new BStringItem("<no devices>"), topmenu);
+	outline = new BOutlineListView(outlinerect,"devices_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM);
+	outline->AddItem(systemMenu = new BStringItem("System Devices"));
+	outline->AddItem(isaMenu = new BStringItem("ISA/Plug and Play Devices"));
+	outline->AddItem(pciMenu = new BStringItem("PCI Devices"));
+	outline->AddItem(jumperedMenu = new BStringItem("Jumpered Devices"));
+	
+	outline->SetSelectionMessage(new BMessage(SELECTION_CHANGED));
 	
 	// Add ScrollView to Devices Window
-	outlinesv = new BScrollView("scroll_devices", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, true, B_FANCY_BORDER);
+	outlinesv = new BScrollView("scroll_devices", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
 	
 	// Setup the OutlineView 
 	outline->AllAttached();
@@ -187,43 +211,32 @@ void DevicesWindow::InitWindow(void)
 	// Create BBox (or Frame)
 	BBox  *BottomFrame;
 	BRect BottomFrameRect(r.left+11,r.bottom-124,r.right-12,r.bottom-12);
-	BottomFrame = new BBox(BottomFrameRect, "BottomFrame", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_FANCY_BORDER);
+	BottomFrame = new BBox(BottomFrameRect, "BottomFrame", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
 	
 	// Create BButton - Configure
-	BButton *btnConfigure;
-	BRect ConfigureButtonRect(r.left+298,r.bottom-44,r.right-23,r.bottom-20);
-	btnConfigure = new BButton(ConfigureButtonRect,"btnConfigure","Configure", new BMessage(BTN_CONFIGURE), B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	BRect ConfigureButtonRect(r.left+298,r.bottom-47,r.right-23,r.bottom-23);
+	btnConfigure = new BButton(ConfigureButtonRect,"btnConfigure","Configure", new BMessage(BTN_CONFIGURE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 	btnConfigure->MakeDefault(true);
 	btnConfigure->SetEnabled(false);
 	
 	// Create a basic View
-	AddChild(ptrDevicesView = new DevicesView(r));
+	BBox *background = new BBox(Bounds(), "background", B_FOLLOW_ALL_SIDES, B_WILL_DRAW, B_PLAIN_BORDER);
+	AddChild(background);
 	
 	// Add Child(ren)	
-	ptrDevicesView->AddChild(menubar);
-	ptrDevicesView->AddChild(stvDeviceName);
-	ptrDevicesView->AddChild(stvCurrentState);
-	ptrDevicesView->AddChild(stvIRQ);
-	ptrDevicesView->AddChild(stvDMA);
-	ptrDevicesView->AddChild(stvIORanges);
-	ptrDevicesView->AddChild(stvMemoryRanges);
-	ptrDevicesView->AddChild(outlinesv);
-	ptrDevicesView->AddChild(btnConfigure);
-	ptrDevicesView->AddChild(BottomFrame);
+	background->AddChild(menubar);
+	background->AddChild(stvDeviceName);
+	background->AddChild(stvCurrentState);
+	background->AddChild(stvIRQ);
+	background->AddChild(stvDMA);
+	background->AddChild(stvIORanges);
+	background->AddChild(stvMemoryRanges);
+	background->AddChild(outlinesv);
+	background->AddChild(btnConfigure);
+	background->AddChild(BottomFrame);
 	
 	// Set Window Limits
-	SetSizeLimits(396,396,400,400);
-}
-// ---------------------------------------------------------------------------------------------------------- //
-
-
-// DevicesWindow::FrameResized
-void DevicesWindow::FrameResized (float width, float height)
-{
-	BRect r;
-	r = Bounds();
-	
-	// enforce width but not height
+	SetSizeLimits(396,396,400,BScreen().Frame().Height());
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -257,8 +270,6 @@ void DevicesWindow::SaveSettings(void)
 	BMessage msg;
 	msg.AddRect("windowframe",Frame());
 	
-	//printf("%i",outline->
-	
     BPath path;
     status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
     if (result == B_OK)
@@ -272,7 +283,8 @@ void DevicesWindow::SaveSettings(void)
 
 
 // DevicesWindow::MessageReceived -- receives messages
-void DevicesWindow::MessageReceived (BMessage *message)
+void 
+DevicesWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
@@ -288,14 +300,24 @@ void DevicesWindow::MessageReceived (BMessage *message)
 			break;
 		case MENU_DEVICES_NEW_JUMPERED_DEVICE_MODEM:
 			{
-				ptrModemWindow = new ModemWindow(BRect (0,0,200,194));
+				ptrModemWindow = new ModemWindow(BRect(0,0,200,194), BMessenger(this));
 			}
 			break;		
 		case MENU_DEVICES_RESOURCE_USAGE:
 			{
-				ptrResourceUsageWindow = new ResourceUsageWindow(BRect (0,0,430,350));
+				ptrResourceUsageWindow = new ResourceUsageWindow(BRect(0,0,430,350), fList);
 			}
-			break;	
+			break;
+		case SELECTION_CHANGED:
+			{
+				UpdateDeviceInfo();
+			}
+			break;
+		case MODEM_ADDED:
+			{
+				
+			}
+			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -303,3 +325,168 @@ void DevicesWindow::MessageReceived (BMessage *message)
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+void
+DevicesWindow::InitDevices(bus_type bus)
+{
+	status_t size;
+	uint64 cookie;
+	struct device_info dummy, *info;
+	struct device_configuration *current; 
+	struct possible_device_configurations *possible;
+	
+	cookie = 0;
+	while (get_next_device_info(bus, &cookie, &dummy, sizeof(dummy)) == B_OK) {
+		info = (struct device_info *)malloc(dummy.size);
+		if (!info) {
+			printf("Out of core\n");
+			break;
+		}
+
+		if (get_device_info_for(cookie, info, dummy.size) != B_OK) {
+			printf("Error getting device information\n");
+			break;
+		}
+
+		size = get_size_of_current_configuration_for(cookie);
+		if (size < B_OK) {
+			printf("Error getting the size of the current configuration\n");
+			break;
+		}
+		current = (struct device_configuration *)malloc(size);
+		if (!current) {
+			printf("Out of core\n");
+			break;
+		}
+
+		if (get_current_configuration_for(cookie, current, size) != B_OK) {
+			printf("Error getting the current configuration\n");
+			break;
+		}
+
+		size = get_size_of_possible_configurations_for(cookie);
+		if (size < B_OK) {
+			printf("Error getting the size of the possible configurations\n");
+			break;
+		}
+		possible = (struct possible_device_configurations *)malloc(size);
+		if (!possible) {
+			printf("Out of core\n");
+			break;
+		}
+
+		if (get_possible_configurations_for(cookie, possible, size) != B_OK) {
+			printf("Error getting the possible configurations\n");
+			break;
+		}
+		
+		fList.AddItem(new DevicesInfo(info, current, possible));			
+	}
+	
+}
+
+void 
+DevicesWindow::UpdateDeviceInfo()
+{
+	DeviceItem *item = (DeviceItem *)outline->ItemAt(outline->CurrentSelection());
+	if (item && is_instance_of(item, DeviceItem) ) {
+		DevicesInfo *deviceInfo = item->GetInfo();
+		struct device_configuration *current = deviceInfo->GetCurrent();
+		resource_descriptor r;
+		
+		{
+			BString text = "IRQs: ";
+			bool first = true;
+			int32 num = count_resource_descriptors_of_type(current, B_IRQ_RESOURCE);
+			
+			for (int32 i=0;i<num;i++) {
+				get_nth_resource_descriptor_of_type(current, i, B_IRQ_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				uint32 mask = r.d.m.mask;
+				int i = 0;
+				if (!mask)
+					continue;
+				
+				for (;mask;mask>>=1,i++)
+					if (mask & 1) {
+						char value[50];
+						sprintf(value, "%s%d", first ? "" : ",", i);
+						text += value;
+						first = false;
+					}
+			}
+			stvIRQ->SetText(text.String());
+		}
+		
+		{
+			BString text = "DMAs: ";
+			bool first = true;
+			int32 num = count_resource_descriptors_of_type(current, B_DMA_RESOURCE);
+			
+			for (int32 i=0;i<num;i++) {
+				get_nth_resource_descriptor_of_type(current, i, B_DMA_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				uint32 mask = r.d.m.mask;
+				int i = 0;
+				if (!mask)
+					continue;
+				
+				for (;mask;mask>>=1,i++)
+					if (mask & 1) {
+						char value[50];
+						sprintf(value, "%s%d", first ? "" : ",", i);
+						text += value;
+						first = false;
+					}
+			}
+			stvDMA->SetText(text.String());
+		}
+		
+		{
+			BString text = "IO Ranges: ";
+			bool first = true;
+			int32 num = count_resource_descriptors_of_type(current, B_IO_PORT_RESOURCE);
+			
+			for (int32 i=0;i<num;i++) {
+				get_nth_resource_descriptor_of_type(current, i, B_IO_PORT_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				char value[50];
+				sprintf(value, "%s0x%04lx - 0x%04lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
+				text += value;
+				first = false;
+			}
+			if (text.Length()>70) {
+				text.Truncate(70);
+				text += "...";
+			}
+			stvIORanges->SetText(text.String());
+		}
+		
+		{
+			BString text = "Memory Ranges: ";
+			bool first = true;
+			int32 num = count_resource_descriptors_of_type(current, B_MEMORY_RESOURCE);
+			
+			for (int32 i=0;i<num;i++) {
+				get_nth_resource_descriptor_of_type(current, i, B_MEMORY_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				char value[50];
+				sprintf(value, "%s0x%06lx - 0x%06lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
+				text += value;
+				first = false;
+			}
+			if (text.Length()>70) {
+				text.Truncate(70);
+				text += "...";
+			}
+			stvMemoryRanges->SetText(text.String());
+		}
+		
+		btnConfigure->SetEnabled(true);
+	} else {
+		stvIRQ->SetText("IRQs: ");
+		stvDMA->SetText("DMAs: ");
+		stvIORanges->SetText("IO Ranges: ");
+		stvMemoryRanges->SetText("Memory Ranges: ");
+		btnConfigure->SetEnabled(false);
+	}
+}

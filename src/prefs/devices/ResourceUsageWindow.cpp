@@ -4,12 +4,13 @@ ResourceUsageWindow
 
 Author: Sikosis
 
-(C)2003-2004 OBOS - Released under the MIT License
+(C)2003 OBOS - Released under the MIT License
 
 */
 
 // Includes ------------------------------------------------------------------------------------------ //
 #include <Application.h>
+#include <Box.h>
 #include <List.h>
 #include <ListView.h>
 #include <Path.h>
@@ -22,14 +23,161 @@ Author: Sikosis
 #include <View.h>
 
 #include "Devices.h"
+#include "DevicesInfo.h"
 #include "DevicesWindows.h"
-#include "DevicesViews.h"
+
+class IRQDMAItem : public BListItem
+{
+	public:
+		IRQDMAItem(int32 number, const char* name);
+		~IRQDMAItem();
+		virtual void DrawItem(BView *, BRect, bool = false);
+	private:
+		char* fName;
+		int32 fNumber;
+};
+
+
+IRQDMAItem::IRQDMAItem(int32 number, const char* name)
+	: BListItem(),
+	fNumber(number)
+{
+	fName = strdup(name);
+}
+
+IRQDMAItem::~IRQDMAItem()
+{
+	delete fName;
+}
+
+/***********************************************************
+ * DrawItem
+ ***********************************************************/
+void 	
+IRQDMAItem::DrawItem(BView *owner, BRect itemRect, bool complete)
+{
+	rgb_color kBlack = { 0,0,0,0 };
+	rgb_color kHighlight = { 156,154,156,0 };
+		
+	if (IsSelected() || complete) {
+		rgb_color color;
+		if (IsSelected())
+			color = kHighlight;
+		else
+			color = owner->ViewColor();
+		
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
+		owner->FillRect(itemRect);
+		owner->SetHighColor(kBlack);
+		
+	} else {
+		owner->SetLowColor(owner->ViewColor());
+	}
+	
+	BPoint point = itemRect.LeftTop() + BPoint(5, 10);
+	
+	owner->SetHighColor(kBlack);
+	owner->SetFont(be_plain_font);
+	owner->MovePenTo(point);
+	if (fNumber > -1) {
+		char string[2];
+		sprintf(string, "%ld", fNumber);
+		owner->DrawString(string);
+	}
+	point += BPoint(28, 0);
+	owner->MovePenTo(point);
+	owner->DrawString(fName);
+}
+
+class RangeItem : public BListItem
+{
+	public:
+		RangeItem(uint32 lowAddress, uint32 highAddress, const char* name);
+		~RangeItem();
+		virtual void DrawItem(BView *, BRect, bool = false);
+		static int Compare(const void *firstArg, const void *secondArg);
+	private:
+		char* fName;
+		uint32 fLowAddress, fHighAddress;
+};
+
+
+RangeItem::RangeItem(uint32 lowAddress, uint32 highAddress, const char* name)
+	: BListItem(),
+	fLowAddress(lowAddress), 
+	fHighAddress(highAddress)
+{
+	fName = strdup(name);
+}
+
+RangeItem::~RangeItem()
+{
+	delete fName;
+}
+
+/***********************************************************
+ * DrawItem
+ ***********************************************************/
+void 	
+RangeItem::DrawItem(BView *owner, BRect itemRect, bool complete)
+{
+	rgb_color kBlack = { 0,0,0,0 };
+	rgb_color kHighlight = { 156,154,156,0 };
+		
+	if (IsSelected() || complete) {
+		rgb_color color;
+		if (IsSelected())
+			color = kHighlight;
+		else
+			color = owner->ViewColor();
+		
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
+		owner->FillRect(itemRect);
+		owner->SetHighColor(kBlack);
+		
+	} else {
+		owner->SetLowColor(owner->ViewColor());
+	}
+	
+	BPoint point = itemRect.LeftTop() + BPoint(17, 10);
+	owner->SetFont(be_fixed_font);
+	owner->SetHighColor(kBlack);
+	owner->MovePenTo(point);
+	
+	if (fLowAddress >= 0) {
+		char string[255];
+		sprintf(string, "0x%04lx - 0x%04lx", fLowAddress, fHighAddress);
+		owner->DrawString(string);
+	}
+	point += BPoint(174, 0);
+	owner->SetFont(be_plain_font);
+	owner->MovePenTo(point);
+	owner->DrawString(fName);
+}
+
+int 
+RangeItem::Compare(const void *firstArg, const void *secondArg)
+{
+	const RangeItem *item1 = *static_cast<const RangeItem * const *>(firstArg);
+	const RangeItem *item2 = *static_cast<const RangeItem * const *>(secondArg);
+	
+	if (item1->fLowAddress < item2->fLowAddress) {
+		return -1;
+	} else if (item1->fLowAddress > item2->fLowAddress) {
+		return 1;
+	} else 
+		return 0;
+
+}
+
 // -------------------------------------------------------------------------------------------------- //
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
 static void CenterWindowOnScreen(BWindow* w)
 {
-	BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	BRect screenFrame = (BScreen().Frame());
 	BPoint pt;
 	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
 	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
@@ -41,9 +189,10 @@ static void CenterWindowOnScreen(BWindow* w)
 
 
 // ResourceUsageWindow - Constructor
-ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "Resource Usage", B_TITLED_WINDOW, B_MODAL_SUBSET_WINDOW_FEEL , 0)
+ResourceUsageWindow::ResourceUsageWindow(BRect frame, BList &list) 
+	: BWindow (frame, "Resource Usage", B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL , B_NOT_ZOOMABLE|B_NOT_RESIZABLE)
 {
-	InitWindow();
+	InitWindow(list);
 	CenterWindowOnScreen(this);
 	Show();
 }
@@ -53,76 +202,151 @@ ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "Resourc
 // ResourceUsageWindow - Destructor
 ResourceUsageWindow::~ResourceUsageWindow()
 {
-	//exit(0);
+	
 }
 // -------------------------------------------------------------------------------------------------- //
 
 
 // ResourceUsageWindow::InitWindow -- Initialization Commands here
-void ResourceUsageWindow::InitWindow(void)
+void ResourceUsageWindow::InitWindow(BList &list)
 {
-	BRect r;
-	BRect rtab;
-	BRect rlist;
-	r = Bounds();
-    rtab = Bounds();
-    rtab.top += 10;
-    rlist = Bounds();
+	BRect rtab = Bounds();
+	BRect rlist = Bounds();
+	rtab.top += 10;
     rlist.top += 10;
     rlist.left += 12;
-    rlist.right -= 15;
+    rlist.right -= 15 + B_V_SCROLL_BAR_WIDTH;
     rlist.bottom -= 47;
     
-    ptrIRQView = new IRQView(r);
-        
-	// Create the TabView and Tabs
+    // Create the TabView and Tabs
 	tabView = new BTabView(rtab,"resource_usage_tabview");
 	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
 	rtab = tabView->Bounds();
 	rtab.InsetBy(5,5);
-	tab = new BTab();
-	tabView->AddTab(ptrIRQView, tab);
-	tab->SetLabel("IRQ");
-	tab = new BTab();
-	tabView->AddTab(new DMAView(r), tab);
-	tab->SetLabel("DMA");
-	tab = new BTab();
-	tabView->AddTab(new IORangeView(r), tab);
-	tab->SetLabel("IO Range");
-	tab = new BTab();
-	tabView->AddTab(new MemoryRangeView(r), tab);
-	tab->SetLabel("Memory Range");
 	
 	// Create the ListViews
-	BListView *IRQListView;
-	BListView *DMAListView;
-	
-	IRQListView = new BListView(rlist, "IRQListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	BListView *IRQListView = new BListView(rlist, "IRQListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 						B_WILL_DRAW | B_NAVIGABLE);
-	DMAListView = new BListView(rlist, "DMAListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	BListView *DMAListView = new BListView(rlist, "DMAListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+						B_WILL_DRAW | B_NAVIGABLE);
+	BListView *IORangeListView = new BListView(rlist, "IORangeListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+						B_WILL_DRAW | B_NAVIGABLE);
+	BListView *memoryListView = new BListView(rlist, "memoryListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 						B_WILL_DRAW | B_NAVIGABLE);
 						
-	BString tmp;
-	tmp.SetTo("0       Timer");
-	Lock();
-	IRQListView->AddItem(new BStringItem(tmp.String()));
-	Unlock();
-    ptrIRQView->AddChild(IRQListView);
-    
-    // write function to add items to IRQ list 
-    
-    // write another function that just deals with getting the IRQ list
-    
+	BScrollView *IRQScrollView = new BScrollView("scroll_list1", IRQListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
+		0, false, true, B_FANCY_BORDER);
+	BScrollView *DMAScrollView = new BScrollView("scroll_list2", DMAListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
+		0, false, true, B_FANCY_BORDER);
+	BScrollView *IORangeScrollView = new BScrollView("scroll_list3", IORangeListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
+		0, false, true, B_FANCY_BORDER);
+	BScrollView *memoryScrollView = new BScrollView("scroll_list4", memoryListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
+		0, false, true, B_FANCY_BORDER);
 	
-	// Create the Views
-	AddChild(ptrResourceUsageView = new ResourceUsageView(r));
-	ptrResourceUsageView->AddChild(tabView);
+	tab = new BTab();
+	tabView->AddTab(IRQScrollView, tab);
+	tab->SetLabel("IRQ");
+	tab = new BTab();
+	tabView->AddTab(DMAScrollView, tab);
+	tab->SetLabel("DMA");
+	tab = new BTab();
+	tabView->AddTab(IORangeScrollView, tab);
+	tab->SetLabel("IO Range");
+	tab = new BTab();
+	tabView->AddTab(memoryScrollView, tab);
+	tab->SetLabel("Memory Range");
+					
+	{
+		uint32 mask = 1;
+		
+		for (int i=0;i<16;mask<<=1,i++) {
+			bool first = true;
+				
+			for (int32 j=0; j<list.CountItems(); j++) {
+				DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
+				struct device_configuration *current = deviceInfo->GetCurrent();
+				resource_descriptor r;
+						
+				int32 num = count_resource_descriptors_of_type(current, B_IRQ_RESOURCE);
+				
+				for (int32 k=0;k<num;k++) {
+					get_nth_resource_descriptor_of_type(current, k, B_IRQ_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					
+					if (mask & r.d.m.mask) {
+						IRQListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetName()));					
+						first = false;
+					}
+				}
+			}
+			
+			if (first) {
+				IRQListView->AddItem(new IRQDMAItem(i, ""));
+			}
+		}
+	}
+	
+	{
+		uint32 mask = 1;
+		
+		for (int i=0;i<8;mask<<=1,i++) {
+			bool first = true;
+				
+			for (int32 j=0; j<list.CountItems(); j++) {
+				DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
+				struct device_configuration *current = deviceInfo->GetCurrent();
+				resource_descriptor r;
+						
+				int32 num = count_resource_descriptors_of_type(current, B_DMA_RESOURCE);
+				
+				for (int32 k=0;k<num;k++) {
+					get_nth_resource_descriptor_of_type(current, k, B_DMA_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					
+					if (mask & r.d.m.mask) {
+						DMAListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetName()));					
+						first = false;
+					}
+				}
+			}
+			
+			if (first) {
+				DMAListView->AddItem(new IRQDMAItem(i, ""));
+			}
+		}
+	}
+
+	{
+		for (int32 j=0; j<list.CountItems(); j++) {
+			DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
+			struct device_configuration *current = deviceInfo->GetCurrent();
+			resource_descriptor r;
+					
+			int32 num = count_resource_descriptors_of_type(current, B_IO_PORT_RESOURCE);
+			
+			for (int32 k=0;k<num;k++) {
+				get_nth_resource_descriptor_of_type(current, k, B_IO_PORT_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				
+				IORangeListView->AddItem(new RangeItem(r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
+			}
+		}
+	
+		IORangeListView->SortItems(&RangeItem::Compare);
+	}
+	
+	BBox *background = new BBox(Bounds(), "background");
+	background->SetBorder(B_NO_BORDER);
+	AddChild(background);
+	background->AddChild(tabView);
 }
 // -------------------------------------------------------------------------------------------------- //
 
 
 // ResourceUsageWindow::MessageReceived -- receives messages
-void ResourceUsageWindow::MessageReceived (BMessage *message)
+void 
+ResourceUsageWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
@@ -132,4 +356,3 @@ void ResourceUsageWindow::MessageReceived (BMessage *message)
 	}
 }
 // -------------------------------------------------------------------------------------------------- //
-

@@ -13,18 +13,16 @@ Devices by Sikosis
 
 #include "Devices.h"
 #include "DevicesWindows.h"
-#include "DevicesViews.h"
-#include "DevicesConstants.h"
+
+#define APP_SIGNATURE "application/x-vnd.OBOS.Devices"  // Application Signature and Title
+
 // ---------------------------------------------------------------------------------------------------------- //
-
-DevicesWindow   *ptrDevicesWindow;
-
 
 // Devices -- constructor 
 Devices::Devices() : BApplication (APP_SIGNATURE)
 {
 	BRect DevicesWindowRect(0,0,396,400);
-	ptrDevicesWindow = new DevicesWindow(DevicesWindowRect);
+	new DevicesWindow(DevicesWindowRect);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 

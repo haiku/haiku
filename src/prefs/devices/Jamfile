@@ -1,15 +1,16 @@
 SubDir OBOS_TOP src prefs devices ;
 
-AddResources Devices : Devices.rsrc ;
+AddResources Devices : Devices.rdef ;
 
 UsePrivateHeaders Devices ;
 
 Preference Devices :
 	Devices.cpp
 	DevicesWindow.cpp
-	DevicesViews.cpp
 	ResourceUsageWindow.cpp
 	ModemWindow.cpp
+	cm_wrapper.c
+	DevicesInfo.cpp
 ;
 
 LinkSharedOSLibs Devices : be ;
