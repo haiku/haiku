@@ -18,8 +18,8 @@
 #include <stdlib.h>
 
 #include <arch/cpu.h>
-
-#include <elf32.h>
+#include <arch/elf.h>
+#include <elf_priv.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -27,41 +27,12 @@
 #define ELF_TRACE 0
 #if ELF_TRACE
 #	define PRINT(x) dprintf x
+#	define TRACE(x) dprintf x
 #else
-#	define PRINT(x)
+#	define PRINT(x) ;
+#	define TRACE(x) ;
 #endif
 
-struct elf_region {
-	region_id id;
-	addr start;
-	addr size;
-	long delta;
-};
-
-struct elf_image_info {
-	struct elf_image_info *next;
-	char *name;
-	image_id id;
-	int32 ref_count;
-	void *vnode;
-	struct elf_region regions[2]; // describes the text and data regions
-	addr dynamic_ptr; // pointer to the dynamic section
-	struct elf_linked_image *linked_images;
-
-	struct Elf32_Ehdr *eheader;
-
-	// pointer to symbol participation data structures
-	char *needed;
-	unsigned int *symhash;
-	struct Elf32_Sym *syms;
-	char *strtab;
-	struct Elf32_Rel *rel;
-	int rel_len;
-	struct Elf32_Rela *rela;
-	int rela_len;
-	struct Elf32_Rel *pltrel;
-	int pltrel_len;
-};
 
 // XXX TK this shall contain a list of linked images
 //        (don't know enough about ELF how to get this list)
@@ -75,13 +46,6 @@ static struct elf_image_info *kernel_image = NULL;
 static mutex image_lock;
 static mutex image_load_lock;
 static image_id next_image_id = 0;
-
-#define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
-#define SYMNAME(image, sym) STRING(image, (sym)->st_name)
-#define SYMBOL(image, num) ((struct Elf32_Sym *)&(image)->syms[num])
-#define HASHTABSIZE(image) ((image)->symhash[0])
-#define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
-#define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
 int
@@ -296,6 +260,8 @@ dump_image_info(struct elf_image_info *image)
 	dprintf(" rel_len 0x%x\n", image->rel_len);
 	dprintf(" rela %p\n", image->rela);
 	dprintf(" rela_len 0x%x\n", image->rela_len);
+	dprintf(" pltrel %p\n", image->pltrel);
+	dprintf(" pltrel_len 0x%x\n", image->pltrel_len);
 }
 
 /* XXX - Currently unused
@@ -401,13 +367,16 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
-			// TK: procedure linkage table
 			case DT_JMPREL:
 				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->regions[0].delta);
 				break;
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;
 				break;
+			case DT_PLTREL:
+				image->pltrel_type = d[i].d_un.d_val;
+				break;
+
 			default:
 				continue;
 		}
@@ -426,12 +395,12 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 }
 
 
-/* this function first tries to see if the first image and it's already resolved symbol is okay, otherwise
- * it tries to link against the shared_image
- * XXX gross hack and needs to be done better
+/**	this function first tries to see if the first image and it's already resolved symbol is okay, otherwise
+ *	it tries to link against the shared_image
+ *	XXX gross hack and needs to be done better
  */
 
-static int
+int
 elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct elf_image_info *shared_image, const char *sym_prepend,addr *sym_addr)
 {
 	struct Elf32_Sym *sym2;
@@ -462,10 +431,10 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			}
 
 			*sym_addr = sym2->st_value + shared_image->regions[0].delta;
-                        return B_NO_ERROR;
+			return B_NO_ERROR;
 		case SHN_ABS:
 			*sym_addr = sym->st_value;
-                        return B_NO_ERROR;
+			return B_NO_ERROR;
 		case SHN_COMMON:
 			// XXX finish this
 			PRINT(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
@@ -478,125 +447,42 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 }
 
 
-static int
-elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
-	struct Elf32_Rel *rel, int rel_len )
-{
-	struct Elf32_Sym *sym;
-	int vlErr;
-	addr S;
-	addr A;
-	addr P;
-	addr final_val;
-	int i;
-
-	S = A = P = 0;
-	
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
-		PRINT(("looking at rel type %d, offset 0x%x\n", ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset));
-
-		// calc S
-		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_386_32:
-			case R_386_PC32:
-			case R_386_GLOB_DAT:
-			case R_386_JMP_SLOT:
-			case R_386_GOTOFF:
-				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
-
-				vlErr = elf_resolve_symbol(image, sym, kernel_image, sym_prepend, &S);
-				if (vlErr < 0)
-					return vlErr;
-				PRINT(("S %p\n", (void *)S));
-		}
-		// calc A
-		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_386_32:
-			case R_386_PC32:
-			case R_386_GOT32:
-			case R_386_PLT32:
-			case R_386_RELATIVE:
-			case R_386_GOTOFF:
-			case R_386_GOTPC:
-				A = *(addr *)(image->regions[0].delta + rel[i].r_offset);
-				PRINT(("A %p\n", (void *)A));
-				break;
-		}
-		// calc P
-		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_386_PC32:
-			case R_386_GOT32:
-			case R_386_PLT32:
-			case R_386_GOTPC:
-				P = image->regions[0].delta + rel[i].r_offset;
-				PRINT(("P %p\n", (void *)P));
-				break;
-		}
-
-		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_386_NONE:
-				continue;
-			case R_386_32:
-				final_val = S + A;
-				break;
-			case R_386_PC32:
-				final_val = S + A - P;
-				break;
-			case R_386_RELATIVE:
-				// B + A;
-				final_val = image->regions[0].delta + A;
-				break;
-			case R_386_JMP_SLOT:
-			case R_386_GLOB_DAT:
-				final_val = S;
-				break;
-			default:
-				dprintf("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
-				return EPERM;
-		}
-		*(addr *)(image->regions[0].delta + rel[i].r_offset) = final_val;
-	}
-	
-	return B_NO_ERROR;
-}
-
-
 // XXX for now just link against the kernel
+
 static int
 elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 {
-	int res = B_NO_ERROR;
+	int status = B_NO_ERROR;
 
 	PRINT(("top of elf_relocate\n"));
 
 	// deal with the rels first
 	if (image->rel) {
-		dprintf("total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel));
-		res = elf_relocate_rel(image, sym_prepend, image->rel, image->rel_len);
-		
-		if (res)
-			return res;
+		TRACE(("total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel)));
+
+		status = arch_elf_relocate_rel(image, sym_prepend, kernel_image, image->rel, image->rel_len);
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->pltrel) {
-		dprintf("total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel));
-		res = elf_relocate_rel(image, sym_prepend, image->pltrel, image->pltrel_len);
+		TRACE(("total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
 
-		if (res)
-			return res;
+		if (image->pltrel_type == DT_REL)
+			status = arch_elf_relocate_rel(image, sym_prepend, kernel_image, image->pltrel, image->pltrel_len);
+		else
+			status = arch_elf_relocate_rela(image, sym_prepend, kernel_image, (struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+		if (status < B_OK)
+			return status;
 	}
 
 	if (image->rela) {
-#if ELF_TRACE
-		int i;
-		for(i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
-			dprintf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
-		}
-#endif
-		dprintf("RELA relocations not supported\n");
-		return EPERM;
+		status = arch_elf_relocate_rela(image, sym_prepend, kernel_image, image->rela, image->rela_len);
+		if (status < B_OK)
+			return status;
 	}
-	return res;
+
+	return status;
 }
 
 
