@@ -10,6 +10,8 @@
 namespace BPrivate {
 namespace DiskDevice {
 
+class KPath;
+
 class KFileDiskDevice : public KDiskDevice {
 public:
 	KFileDiskDevice(partition_id id = -1);
@@ -25,6 +27,8 @@ public:
 //	virtual void Dump(bool deep = true, int32 level = 0);
 
 private:
+	static status_t _GetDirectoryPath(partition_id id, KPath *path);
+
 	static status_t _RegisterDevice(const char *file, const char *device);
 	static status_t _UnregisterDevice(const char *device);
 

@@ -10,6 +10,7 @@
 
 #include <KDiskDeviceUtils.h>
 #include <KFileDiskDevice.h>
+#include <KPath.h>
 
 #include "virtualdrive.h"
 
@@ -44,17 +45,17 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 	}
 	// normalize the file path
 	// TODO: For the time being, we get an absolute file name only.
-	char tmpFilePath[B_PATH_NAME_LENGTH];
+	KPath tmpFilePath;
 	if (filePath[0] != '/') {
-		int32 len = (int32)B_PATH_NAME_LENGTH - (int32)strlen(filePath) - 2;
-		if (len < 0)
-			return B_ERROR;
+		if (tmpFilePath.InitCheck() != B_OK)
+			return tmpFilePath.InitCheck();
 		// prepend the current directory path
-		if (!getcwd(tmpFilePath, len))
+		if (!getcwd(tmpFilePath.LockBuffer(), tmpFilePath.BufferSize() - 1))
 			return B_ERROR;
-		strcat(tmpFilePath, "/");
-		strcat(tmpFilePath, filePath);
-		filePath = tmpFilePath;
+		tmpFilePath.UnlockBuffer();
+		if (tmpFilePath.Append(filePath) != B_OK)
+			return B_ERROR;
+		filePath = tmpFilePath.Path();
 	}
 	// check the file
 	struct stat st;
@@ -63,8 +64,10 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 	if (!S_ISREG(st.st_mode))
 		return B_BAD_VALUE;
 	// create the device, if requested
-	char tmpDevicePath[B_PATH_NAME_LENGTH];
+	KPath tmpDevicePath;
 	if (!devicePath) {
+		if (tmpDevicePath.InitCheck() != B_OK)
+			return tmpDevicePath.InitCheck();
 		// no device path: we shall create a new device entry
 		// make the file devices dir
 		if (mkdir(kFileDevicesDir, 0777) != 0) {
@@ -72,12 +75,15 @@ KFileDiskDevice::SetTo(const char *filePath, const char *devicePath)
 				return errno;
 		}
 		// make the directory
-		sprintf(tmpDevicePath, "%s/%ld", kFileDevicesDir, ID());
-		if (mkdir(tmpDevicePath, 0777) != 0)
+		status_t error = _GetDirectoryPath(ID(), tmpDevicePath);
+		if (error != B_OK)
+			return error;
+		if (mkdir(tmpDevicePath.Path(), 0777) != 0)
 			return errno;
 		// get the device path name
-		sprintf(tmpDevicePath, "%s/%ld/raw", kFileDevicesDir, ID());
-		devicePath = tmpDevicePath;
+		if (tmpDevicePath.Append("raw") != B_OK)
+			return B_BUFFER_OVERFLOW;
+		devicePath = tmpDevicePath.Path();
 		// register the file as virtual drive
 		status_t error = _RegisterDevice(filePath, devicePath);
 		if (error != B_OK)
@@ -96,9 +102,9 @@ KFileDiskDevice::Unset()
 	// remove the device and the directory it resides in
 	if (Path() && ID() >= 0) {
 		_UnregisterDevice(Path());
-		char dirPath[B_PATH_NAME_LENGTH];
-		sprintf(dirPath, "%s/%ld", kFileDevicesDir, ID());
-		rmdir(dirPath);
+		KPath dirPath;
+		if (_GetDirectoryPath(ID(), &dirPath) == B_OK)
+			rmdir(dirPath.Path());
 	}
 	// free file path
 	free(fFilePath);
@@ -127,6 +133,8 @@ KFileDiskDevice::_RegisterDevice(const char *file, const char *device)
 	// as a device and then simply symlink the assigned device to the
 	// desired device location. Replace that with the
 	// respective kernel magic for the OBOS kernel!
+	// -> Well, we could simply symlink the file there. Doesn't work for R5,
+	// but we should be able to deal with it properly.
 
 	// open the virtualdrive control device
 	int fd = open(VIRTUAL_DRIVE_CONTROL_DEVICE, O_RDONLY);
@@ -188,6 +196,21 @@ KFileDiskDevice::_UnregisterDevice(const char *_device)
 	if (error == B_OK) {
 		if (remove(_device) < 0)
 			error = errno;
+	}
+	return error;
+}
+
+// _GetDirectoryPath
+status_t
+KFileDiskDevice::_GetDirectoryPath(partition_id id, KPath *path)
+{
+	if (!path || path->InitCheck() != B_OK)
+		return path->InitCheck();
+	status_t error = path->SetString(kFileDevicesDir);
+	if (error == B_OK) {
+		char idBuffer[12]
+		sprintf(idBuffer, "%ld", id);
+		error = path->Append(idBuffer);
 	}
 	return error;
 }
