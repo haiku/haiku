@@ -1203,8 +1203,8 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		TGAImageSpec imagespec;
 		imagespec.xorigin = 0;
 		imagespec.yorigin = 0;
-		imagespec.width = bitsHeader.bounds.Width() + 1;
-		imagespec.height = bitsHeader.bounds.Height() + 1;
+		imagespec.width = (uint16) bitsHeader.bounds.Width() + 1;
+		imagespec.height = (uint16) bitsHeader.bounds.Height() + 1;
 		imagespec.depth = 0;
 		imagespec.descriptor = TGA_ORIGIN_VERT_BIT;
 		
@@ -1435,15 +1435,14 @@ translate_from_tgatc_to_bits(BPositionIO *inSource,
 				case 32:
 					if (nalpha == 8)
 						memcpy(pbitspixel, ptgapixel, 4);
-					else {
+					else
 						memcpy(pbitspixel, ptgapixel, 3);
-						pbitspixel[3] = 255;
-					}
 					break;
+					
 				case 24:
 					memcpy(pbitspixel, ptgapixel, 3);
-					pbitspixel[3] = 255;
 					break;
+					
 				case 16:
 					val = ptgapixel[0] + (ptgapixel[1] << 8);
 					pbitspixel[0] =
@@ -1454,9 +1453,8 @@ translate_from_tgatc_to_bits(BPositionIO *inSource,
 						((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
 					if (nalpha == 1)
 						pbitspixel[3] = (val & 0x8000) ? 255 : 0;
-					else
-						pbitspixel[3] = 255;
 					break;
+					
 				case 15:
 					val = ptgapixel[0] + (ptgapixel[1] << 8);
 					pbitspixel[0] =
@@ -1465,8 +1463,12 @@ translate_from_tgatc_to_bits(BPositionIO *inSource,
 						((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
 					pbitspixel[2] =
 						((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
-					pbitspixel[3] = 255;
 					break;
+					
+				case 8:
+					memset(pbitspixel, ptgapixel[0], 3);
+					break;
+					
 				default:
 					break;
 			}
@@ -1574,7 +1576,6 @@ translate_from_tgacm_to_bits(BPositionIO *inSource,
 					
 				case 24:
 					memcpy(pbitspixel, ptgapixel, 3);
-					pbitspixel[3] = 255;
 					break;
 					
 				case 16:
@@ -1587,8 +1588,6 @@ translate_from_tgacm_to_bits(BPositionIO *inSource,
 						((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
 					if (nalpha == 1)
 						pbitspixel[3] = (val & 0x8000) ? 255 : 0;
-					else
-						pbitspixel[3] = 255;
 					break;
 					
 				case 15:
@@ -1599,7 +1598,6 @@ translate_from_tgacm_to_bits(BPositionIO *inSource,
 						((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
 					pbitspixel[2] =
 						((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
-					pbitspixel[3] = 255;
 					break;
 					
 				default:
@@ -1626,6 +1624,346 @@ translate_from_tgacm_to_bits(BPositionIO *inSource,
 
 	return B_OK;
 }
+
+status_t
+translate_from_tgacmrle_to_bits(BPositionIO *inSource,
+	BPositionIO *outDestination, TGAColorMapSpec &mapspec,
+	TGAImageSpec &imagespec, uint8 *pmap)
+{
+	bool bvflip;
+	if (imagespec.descriptor & TGA_ORIGIN_VERT_BIT)
+		bvflip = false;
+	else
+		bvflip = true;
+	uint8 nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
+
+	int32 bitsRowBytes = imagespec.width * 4;
+	int32 tgaPalBytesPerPixel = mapspec.entrysize / 8;
+	if (mapspec.entrysize % 8)
+		tgaPalBytesPerPixel++;
+	int32 tgaBytesPerPixel = imagespec.depth / 8;
+	if (imagespec.depth % 8)
+		tgaBytesPerPixel++;
+	uint16 tgapixrow = 0, tgapixcol = 0;
+	
+	// Setup outDestination so that it can be written to
+	// from the end of the file to the beginning instead of
+	// the other way around
+	off_t bitsFileSize = (bitsRowBytes * imagespec.height) + 
+		sizeof(TranslatorBitmap);
+	if (outDestination->SetSize(bitsFileSize) != B_OK)
+		// This call should work for BFile and BMallocIO objects,
+		// but may not work for other BPositionIO based types
+		return B_ERROR;
+	off_t bitsoffset = (imagespec.height - 1) * bitsRowBytes;
+	if (bvflip)
+		outDestination->Seek(bitsoffset, SEEK_CUR);
+	
+	// allocate row buffers
+	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	if (!bitsRowData)
+		return B_ERROR;
+
+	// perform the actual translation
+	memset(bitsRowData, 0xff, bitsRowBytes);
+	uint8 *pbitspixel = bitsRowData;
+	uint8 packethead;
+	ssize_t rd = inSource->Read(&packethead, 1);
+	while (rd == 1) {
+		uint16 val;
+		uint8 *ptgapixel;
+		// Run Length Packet
+		if (packethead & TGA_RLE_PACKET_TYPE_BIT) {
+			uint8 tgaindex, rlecount;
+			rlecount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
+			rd = inSource->Read(&tgaindex, 1);
+			if (rd == tgaBytesPerPixel) {
+				ptgapixel = pmap + (tgaindex * tgaPalBytesPerPixel);
+				for (uint8 i = 0; i < rlecount; i++) {
+					switch (mapspec.entrysize) {
+						case 32:
+							memcpy(pbitspixel, ptgapixel, 4);
+							break;
+					
+						case 24:
+							memcpy(pbitspixel, ptgapixel, 3);
+							break;
+					
+						case 16:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							if (nalpha == 1)
+								pbitspixel[3] = (val & 0x8000) ? 255 : 0;
+							break;
+					
+						case 15:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							break;
+							
+						case 8:
+							memset(pbitspixel, ptgapixel[0], 3);
+							break;
+					
+						default:
+							break;
+					}
+					pbitspixel += 4;
+				}
+				tgapixcol += rlecount;
+			} else
+				break; // error
+		
+		// Raw Packet
+		} else {
+			uint8 tgaIndexBuf[128], rawcount;
+			rawcount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
+			rd = inSource->Read(tgaIndexBuf, rawcount);
+			if (rd == rawcount) {
+				for (uint8 i = 0; i < rawcount; i++) {
+					ptgapixel = pmap +
+					(tgaIndexBuf[i] * tgaPalBytesPerPixel);
+					switch (mapspec.entrysize) {
+						case 32:
+							memcpy(pbitspixel, ptgapixel, 4);
+							break;
+					
+						case 24:
+							memcpy(pbitspixel, ptgapixel, 3);
+							break;
+					
+						case 16:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							if (nalpha == 1)
+								pbitspixel[3] = (val & 0x8000) ? 255 : 0;
+							break;
+					
+						case 15:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							break;
+							
+						case 8:
+							memset(pbitspixel, ptgapixel[0], 3);
+							break;
+					
+						default:
+							break;
+					}
+					pbitspixel += 4;
+				} // for (uint8 i = 0; i < rawcount; i++)
+				tgapixcol += rawcount;
+			} else
+				break;
+		}
+		
+		if (tgapixcol == imagespec.width) {
+			outDestination->Write(bitsRowData, bitsRowBytes);
+			tgapixcol = 0;
+			tgapixrow++;
+			if (tgapixrow == imagespec.height)
+				break;
+			if (bvflip)
+				outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
+			pbitspixel = bitsRowData;
+		}
+		rd = inSource->Read(&packethead, 1);
+	}
+	
+	delete[] bitsRowData;
+
+	return B_OK;
+}
+
+status_t
+translate_from_tgarle_to_bits(BPositionIO *inSource,
+	BPositionIO *outDestination, TGAImageSpec &imagespec)
+{
+	bool bvflip;
+	if (imagespec.descriptor & TGA_ORIGIN_VERT_BIT)
+		bvflip = false;
+	else
+		bvflip = true;
+	uint8 nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
+
+	int32 bitsRowBytes = imagespec.width * 4;
+	int32 tgaBytesPerPixel = imagespec.depth / 8;
+	if (imagespec.depth % 8)
+		tgaBytesPerPixel++;
+	uint16 tgapixrow = 0, tgapixcol = 0;
+	
+	// Setup outDestination so that it can be written to
+	// from the end of the file to the beginning instead of
+	// the other way around
+	off_t bitsFileSize = (bitsRowBytes * imagespec.height) + 
+		sizeof(TranslatorBitmap);
+	if (outDestination->SetSize(bitsFileSize) != B_OK)
+		// This call should work for BFile and BMallocIO objects,
+		// but may not work for other BPositionIO based types
+		return B_ERROR;
+	off_t bitsoffset = (imagespec.height - 1) * bitsRowBytes;
+	if (bvflip)
+		outDestination->Seek(bitsoffset, SEEK_CUR);
+	
+	// allocate row buffers
+	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	if (!bitsRowData)
+		return B_ERROR;
+
+	// perform the actual translation
+	memset(bitsRowData, 0xff, bitsRowBytes);
+	uint8 *pbitspixel = bitsRowData;
+	uint8 packethead;
+	ssize_t rd = inSource->Read(&packethead, 1);
+	while (rd == 1) {
+		uint16 val;	
+		// Run Length Packet
+		if (packethead & TGA_RLE_PACKET_TYPE_BIT) {
+			uint8 tgapixel[4], rlecount;
+			rlecount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
+			rd = inSource->Read(tgapixel, tgaBytesPerPixel);
+			if (rd == tgaBytesPerPixel) {
+				for (uint8 i = 0; i < rlecount; i++) {
+					switch (imagespec.depth) {
+						case 32:
+							memcpy(pbitspixel, tgapixel, 4);
+							break;
+					
+						case 24:
+							memcpy(pbitspixel, tgapixel, 3);
+							break;
+					
+						case 16:
+							val = tgapixel[0] + (tgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							if (nalpha == 1)
+								pbitspixel[3] = (val & 0x8000) ? 255 : 0;
+							break;
+					
+						case 15:
+							val = tgapixel[0] + (tgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							break;
+							
+						case 8:
+							memset(pbitspixel, tgapixel[0], 3);
+							break;
+					
+						default:
+							break;
+					}
+					pbitspixel += 4;
+				}
+				tgapixcol += rlecount;
+			} else
+				break; // error
+		
+		// Raw Packet
+		} else {
+			uint8 tgaPixelBuf[512], rawcount;
+			uint16 rawbytes;
+			rawcount = (packethead & ~TGA_RLE_PACKET_TYPE_BIT) + 1;
+			rawbytes = tgaBytesPerPixel * rawcount;
+			rd = inSource->Read(tgaPixelBuf, rawbytes);
+			if (rd == rawbytes) {
+				uint8 *ptgapixel;
+				ptgapixel = tgaPixelBuf;
+				for (uint8 i = 0; i < rawcount; i++) {
+					switch (imagespec.depth) {
+						case 32:
+							memcpy(pbitspixel, ptgapixel, 4);
+							break;
+					
+						case 24:
+							memcpy(pbitspixel, ptgapixel, 3);
+							break;
+					
+						case 16:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							if (nalpha == 1)
+								pbitspixel[3] = (val & 0x8000) ? 255 : 0;
+							break;
+					
+						case 15:
+							val = ptgapixel[0] + (ptgapixel[1] << 8);
+							pbitspixel[0] =
+								((val & 0x1f) << 3) | ((val & 0x1f) >> 2);
+							pbitspixel[1] =
+								((val & 0x3e0) >> 2) | ((val & 0x3e0) >> 7);
+							pbitspixel[2] =
+								((val & 0x7c00) >> 7) | ((val & 0x7c00) >> 12);
+							break;
+							
+						case 8:
+							memset(pbitspixel, ptgapixel[0], 3);
+							break;
+					
+						default:
+							break;
+					}
+					ptgapixel += tgaBytesPerPixel;
+					pbitspixel += 4;
+				} // for (uint8 i = 0; i < rawcount; i++)
+				tgapixcol += rawcount;
+			} else
+				break;
+		}
+		
+		if (tgapixcol == imagespec.width) {
+			outDestination->Write(bitsRowData, bitsRowBytes);
+			tgapixcol = 0;
+			tgapixrow++;
+			if (tgapixrow == imagespec.height)
+				break;
+			if (bvflip)
+				outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
+			pbitspixel = bitsRowData;
+		}
+		rd = inSource->Read(&packethead, 1);
+	}
+	
+	delete[] bitsRowData;
+
+	return B_OK;
+}
+
 
 // ---------------------------------------------------------------
 // translate_from_tga
@@ -1728,7 +2066,9 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		}
 
 		bitsHeader.rowBytes = imagespec.width * 4;
-		if (imagespec.descriptor & TGA_DESC_ALPHABITS)
+		if (fileheader.imagetype != TGA_NOCOMP_BW &&
+			fileheader.imagetype != TGA_RLE_BW &&
+			imagespec.descriptor & TGA_DESC_ALPHABITS)
 			bitsHeader.colors = B_RGBA32;
 		else
 			bitsHeader.colors = B_RGB32;
@@ -1750,6 +2090,7 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		// write out the actual image data
 		switch (fileheader.imagetype) {
 			case TGA_NOCOMP_TRUECOLOR:
+			case TGA_NOCOMP_BW:
 				result = translate_from_tgatc_to_bits(inSource,
 					outDestination, imagespec);
 				break;
@@ -1759,15 +2100,24 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 					outDestination, mapspec, imagespec, ptgapalette);
 				break;
 				
+			case TGA_RLE_TRUECOLOR:
+			case TGA_RLE_BW:
+				result = translate_from_tgarle_to_bits(inSource,
+					outDestination, imagespec);
+				break;
+				
+			case TGA_RLE_COLORMAP:
+				result = translate_from_tgacmrle_to_bits(inSource,
+					outDestination, mapspec, imagespec, ptgapalette);
+				break;
+				
 			default:
 				result = B_NO_TRANSLATOR;
 				break;
 		}
 		
-		if (ptgapalette) {
-			delete[] ptgapalette;
-			ptgapalette = NULL;
-		}
+		delete[] ptgapalette;
+		ptgapalette = NULL;
 		
 		return result;
 		
