@@ -41,7 +41,7 @@ class ProtocolsAddon : public DialUpAddon {
 		bool LoadProtocolSettings(const BMessage& parameter);
 		
 		virtual bool HasTemporaryProfile() const;
-		virtual void IsModified(bool& settings, bool& profile) const;
+		virtual void IsModified(bool *settings, bool *profile) const;
 		
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);

@@ -35,8 +35,8 @@ class DialUpView : public BView {
 		void WatchInterface(ppp_interface_id ID);
 		
 		bool LoadSettings(bool isNew);
-		void IsModified(bool& settings, bool& profile);
-		bool SaveSettings(BMessage& settings, BMessage& profile, bool saveTemporary);
+		void IsModified(bool *settings, bool *profile);
+		bool SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary);
 		bool SaveSettingsToFile();
 		
 		void LoadInterfaces();

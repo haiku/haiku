@@ -11,17 +11,32 @@
 #include <ListView.h>
 #include <Menu.h>
 #include <MenuItem.h>
+#include <Screen.h>
 #include <String.h>
 #include <StringItem.h>
+#include <Window.h>
+
+
+BPoint
+center_on_screen(BRect rect, BWindow *window = NULL)
+{
+	BRect screenFrame = (BScreen(window).Frame());
+	BPoint point((screenFrame.Width() - rect.Width()) / 2.0,
+		(screenFrame.Height() - rect.Height()) / 2.0);
+	if(!screenFrame.Contains(point))
+		point.Set(0, 0);
+	
+	return point;
+}
 
 
 int32
-FindNextMenuInsertionIndex(BMenu *menu, const BString& name, int32 index = 0)
+FindNextMenuInsertionIndex(BMenu *menu, const char *name, int32 index = 0)
 {
 	BMenuItem *item;
 	for(; index < menu->CountItems(); index++) {
 		item = menu->ItemAt(index);
-		if(item && name.ICompare(item->Label()) <= 0)
+		if(item && strcasecmp(name, item->Label()) <= 0)
 			return index;
 	}
 	
@@ -30,13 +45,13 @@ FindNextMenuInsertionIndex(BMenu *menu, const BString& name, int32 index = 0)
 
 
 int32
-FindNextListInsertionIndex(BListView *list, const BString& name)
+FindNextListInsertionIndex(BListView *list, const char *name)
 {
 	int32 index = 0;
 	BStringItem *item;
 	for(; index < list->CountItems(); index++) {
 		item = static_cast<BStringItem*>(list->ItemAt(index));
-		if(item && name.ICompare(item->Text()) <= 0)
+		if(item && strcasecmp(name, item->Text()) <= 0)
 			return index;
 	}
 	
@@ -68,7 +83,7 @@ AddAddonsToMenu(const BMessage *source, BMenu *menu, const char *type, uint32 wh
 				name << ")";
 		}
 		
-		int32 insertAt = FindNextMenuInsertionIndex(menu, name);
+		int32 insertAt = FindNextMenuInsertionIndex(menu, name.String());
 		menu->AddItem(new BMenuItem(name.String(), message), insertAt);
 	}
 }

@@ -19,10 +19,10 @@ class BFile;
 #define MDSU_VALID				"Valid"
 
 
-extern bool FindMessageParameter(const char *name, BMessage& message,
-	BMessage& save, int32 *startIndex = NULL);
+extern bool FindMessageParameter(const char *name, const BMessage& message,
+	BMessage *save, int32 *startIndex = NULL);
 
-extern bool ReadMessageDriverSettings(const char *name, BMessage& message);
+extern bool ReadMessageDriverSettings(const char *name, BMessage *message);
 extern bool WriteMessageDriverSettings(BFile& file, const BMessage& message);
 
 #endif

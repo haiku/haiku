@@ -14,11 +14,13 @@ class DialUpAddon;
 class BListView;
 class BMenu;
 class BString;
+class BWindow;
 
 
-extern int32 FindNextMenuInsertionIndex(BMenu *menu, const BString& name,
+extern BPoint center_on_screen(BRect rect, BWindow *window = NULL);
+extern int32 FindNextMenuInsertionIndex(BMenu *menu, const char *name,
 	int32 index = 0);
-extern int32 FindNextListInsertionIndex(BListView *list, const BString& name);
+extern int32 FindNextListInsertionIndex(BListView *list, const char *name);
 extern void AddAddonsToMenu(const BMessage *source, BMenu *menu, const char *type,
 	uint32 what);
 

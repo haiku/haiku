@@ -62,8 +62,8 @@ class DialUpAddon {
 			{ return false; }
 		virtual bool HasTemporaryProfile() const
 			{ return false; }
-		virtual void IsModified(bool& settings, bool& profile) const
-			{ settings = profile = false; }
+		virtual void IsModified(bool *settings, bool *profile) const
+			{ *settings = *profile = false; }
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 				bool saveTemporary)
 			{ return false; }
@@ -83,7 +83,7 @@ class DialUpAddon {
 	private:
 		BMessage *fAddons;
 		
-		char _reserved[31];
+		int32 _reserved[7];
 };
 
 

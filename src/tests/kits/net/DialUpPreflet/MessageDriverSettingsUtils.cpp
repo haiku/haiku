@@ -16,14 +16,15 @@
 
 
 bool
-FindMessageParameter(const char *name, BMessage& message, BMessage& save,
+FindMessageParameter(const char *name, const BMessage& message, BMessage *save,
 	int32 *startIndex = NULL)
 {
 	// XXX: this should be removed when we can replace BMessage with something better
 	BString string;
 	int32 index = startIndex ? *startIndex : 0;
-	for(; message.FindMessage(MDSU_PARAMETERS, index, &save) == B_OK; index++) {
-		if(save.FindString(MDSU_NAME, &string) == B_OK && string.ICompare(name) == 0) {
+	for(; message.FindMessage(MDSU_PARAMETERS, index, save) == B_OK; index++) {
+		if(save->FindString(MDSU_NAME, &string) == B_OK
+				&& string.ICompare(name) == 0) {
 			if(startIndex)
 				*startIndex = index;
 			return true;
@@ -36,24 +37,24 @@ FindMessageParameter(const char *name, BMessage& message, BMessage& save,
 
 static
 bool
-AddParameter(const driver_parameter *parameter, BMessage& message)
+AddParameter(const driver_parameter *parameter, BMessage *message)
 {
-	if(!parameter)
+	if(!parameter || !message)
 		return false;
 	
 	if(parameter->name)
-		message.AddString(MDSU_NAME, parameter->name);
+		message->AddString(MDSU_NAME, parameter->name);
 	else
 		return false;
 	
 	for(int32 index = 0; index < parameter->value_count; index++)
 		if(parameter->values[index])
-			message.AddString(MDSU_VALUES, parameter->values[index]);
+			message->AddString(MDSU_VALUES, parameter->values[index]);
 	
 	for(int32 index = 0; index < parameter->parameter_count; index++) {
 		BMessage parameterMessage;
-		AddParameter(&parameter->parameters[index], parameterMessage);
-		message.AddMessage(MDSU_PARAMETERS, &parameterMessage);
+		AddParameter(&parameter->parameters[index], &parameterMessage);
+		message->AddMessage(MDSU_PARAMETERS, &parameterMessage);
 	}
 	
 	return true;
@@ -61,9 +62,9 @@ AddParameter(const driver_parameter *parameter, BMessage& message)
 
 
 bool
-ReadMessageDriverSettings(const char *name, BMessage& message)
+ReadMessageDriverSettings(const char *name, BMessage *message)
 {
-	if(!name)
+	if(!name || !message)
 		return false;
 	
 	void *handle = load_driver_settings(name);
@@ -77,8 +78,8 @@ ReadMessageDriverSettings(const char *name, BMessage& message)
 	
 	for(int32 index = 0; index < settings->parameter_count; index++) {
 		BMessage parameter;
-		AddParameter(&settings->parameters[index], parameter);
-		message.AddMessage(MDSU_PARAMETERS, &parameter);
+		AddParameter(&settings->parameters[index], &parameter);
+		message->AddMessage(MDSU_PARAMETERS, &parameter);
 	}
 	
 	unload_driver_settings(handle);

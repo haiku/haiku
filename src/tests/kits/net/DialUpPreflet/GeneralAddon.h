@@ -56,9 +56,9 @@ class GeneralAddon : public DialUpAddon {
 		bool LoadAuthenticationSettings();
 		
 		virtual bool HasTemporaryProfile() const;
-		virtual void IsModified(bool& settings, bool& profile) const;
-		void IsDeviceModified(bool& settings, bool& profile) const;
-		void IsAuthenticationModified(bool& settings, bool& profile) const;
+		virtual void IsModified(bool *settings, bool *profile) const;
+		void IsDeviceModified(bool *settings, bool *profile) const;
+		void IsAuthenticationModified(bool *settings, bool *profile) const;
 		
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
@@ -96,15 +96,22 @@ class GeneralView : public BView {
 		bool DoesSavePassword() const
 			{ return fSavePassword->Value(); }
 		
+		bool HasTemporaryProfile() const
+			{ return !DoesSavePassword() || (fDeviceAddon &&
+				fDeviceAddon->HasTemporaryProfile()); }
+		
+		DialUpAddon *DeviceAddon() const
+			{ return fDeviceAddon; }
 		const char *DeviceName() const;
 		const char *AuthenticatorName() const;
-		bool IsDeviceModified() const;
+		void IsDeviceModified(bool *settings, bool *profile) const;
 		
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
 
 	private:
 		void ReloadDeviceView();
+		void UpdateControls();
 		
 		void AddDevices();
 		void AddAuthenticators();

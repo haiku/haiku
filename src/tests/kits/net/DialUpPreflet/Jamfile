@@ -15,6 +15,7 @@ SimpleTest DialUpPreflet :
 	# utils
 	InterfaceUtils.cpp
 	MessageDriverSettingsUtils.cpp
+	TextRequestDialog.cpp
 	
 	# built-in add-ons
 	GeneralAddon.cpp

@@ -11,6 +11,8 @@
 #include "IPCPAddon.h"
 
 #include "MessageDriverSettingsUtils.h"
+#include <stl_algobase.h>
+	// for max()
 
 #include <Box.h>
 #include <Button.h>
@@ -18,6 +20,7 @@
 #include <PPPDefs.h>
 #include <IPCP.h>
 	// from IPCP addon
+
 
 #define MSG_CHANGE_SETTINGS			'CHGS'
 #define MSG_RESET_SETTINGS			'RSTS'
@@ -76,13 +79,14 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fProfile = profile;
 	if(!settings || !profile || isNew) {
 		fIPCPWindow->Reload();
+			// reset all views
 		return true;
 	}
 	
 	BMessage protocol;
 	
 	// settings
-	int32 protocolIndex = FindIPCPProtocol(*fSettings, protocol);
+	int32 protocolIndex = FindIPCPProtocol(*fSettings, &protocol);
 	if(protocolIndex < 0)
 		return false;
 	
@@ -90,24 +94,22 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
 	
 	// profile
-	protocolIndex = FindIPCPProtocol(*fProfile, protocol);
+	protocolIndex = FindIPCPProtocol(*fProfile, &protocol);
 	if(protocolIndex < 0)
 		return false;
 	
 	// the "Local" side parameter
 	BMessage local;
 	int32 localSideIndex = 0;
-	if(!FindMessageParameter(IPCP_LOCAL_SIDE_KEY, protocol, local, &localSideIndex)) {
-		protocol.AddBool(MDSU_VALID, true);
-		fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
-		return true;
-	}
+	if(!FindMessageParameter(IPCP_LOCAL_SIDE_KEY, protocol, &local, &localSideIndex))
+		local.MakeEmpty();
+			// just fall through and pretend we have an empty "Local" side parameter
 	
 	// now load the supported parameters (the client-relevant subset)
 	BString name;
 	BMessage parameter;
 	int32 index = 0;
-	if(!FindMessageParameter(IPCP_IP_ADDRESS_KEY, local, parameter, &index)
+	if(!FindMessageParameter(IPCP_IP_ADDRESS_KEY, local, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fIPAddress) != B_OK)
 		fIPAddress = "";
 	else {
@@ -119,7 +121,7 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	}
 	
 	index = 0;
-	if(!FindMessageParameter(IPCP_PRIMARY_DNS_KEY, local, parameter, &index)
+	if(!FindMessageParameter(IPCP_PRIMARY_DNS_KEY, local, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fPrimaryDNS) != B_OK)
 		fPrimaryDNS = "";
 	else {
@@ -131,7 +133,7 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	}
 	
 	index = 0;
-	if(!FindMessageParameter(IPCP_SECONDARY_DNS_KEY, local, parameter, &index)
+	if(!FindMessageParameter(IPCP_SECONDARY_DNS_KEY, local, &parameter, &index)
 			|| parameter.FindString(MDSU_VALUES, &fSecondaryDNS) != B_OK)
 		fSecondaryDNS = "";
 	else {
@@ -154,18 +156,18 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 
 
 void
-IPCPAddon::IsModified(bool& settings, bool& profile) const
+IPCPAddon::IsModified(bool *settings, bool *profile) const
 {
 	// some part of this work is done by the "Protocols" tab, thus we do not need to
 	// check whether we are a new protocol or not
-	settings = false;
+	*settings = false;
 	
 	if(!fSettings) {
-		profile = false;
+		*profile = false;
 		return;
 	}
 	
-	profile = (fIPAddress != fIPCPWindow->IPAddress()
+	*profile = (fIPAddress != fIPCPWindow->IPAddress()
 		|| fPrimaryDNS != fIPCPWindow->PrimaryDNS()
 		|| fSecondaryDNS != fIPCPWindow->SecondaryDNS());
 }
@@ -245,12 +247,15 @@ IPCPAddon::CreateView(BPoint leftTop)
 
 
 int32
-IPCPAddon::FindIPCPProtocol(BMessage& message, BMessage& protocol) const
+IPCPAddon::FindIPCPProtocol(const BMessage& message, BMessage *protocol) const
 {
+	if(!protocol)
+		return -1;
+	
 	BString name;
 	for(int32 index = 0; FindMessageParameter(PPP_PROTOCOL_KEY, message, protocol,
 			&index); index++)
-		if(protocol.FindString(MDSU_VALUES, &name) == B_OK
+		if(protocol->FindString(MDSU_VALUES, &name) == B_OK
 				&& name == kKernelModuleName)
 			return index;
 	
@@ -291,18 +296,7 @@ IPCPWindow::IPCPWindow(IPCPAddon *addon, BRect frame)
 	float ipAddressWidth = backgroundView->StringWidth(fIPAddress->Label()) + 5;
 	float primaryDNSWidth = backgroundView->StringWidth(fPrimaryDNS->Label()) + 5;
 	float secondaryDNSWidth = backgroundView->StringWidth(fSecondaryDNS->Label()) + 5;
-	float controlWidth;
-	if(ipAddressWidth > primaryDNSWidth) {
-		if(ipAddressWidth > secondaryDNSWidth)
-			controlWidth = ipAddressWidth;
-		else
-			controlWidth = secondaryDNSWidth;
-	} else {
-		if(primaryDNSWidth > secondaryDNSWidth)
-			controlWidth = primaryDNSWidth;
-		else
-			controlWidth = secondaryDNSWidth;
-	}
+	float controlWidth = max(max(ipAddressWidth, primaryDNSWidth), secondaryDNSWidth);
 	
 	fIPAddress->SetDivider(controlWidth);
 	fPrimaryDNS->SetDivider(controlWidth);
@@ -329,7 +323,7 @@ IPCPWindow::IPCPWindow(IPCPAddon *addon, BRect frame)
 	AddChild(backgroundView);
 	SetDefaultButton(fOKButton);
 	Run();
-		// this must be set in order for Reload() to work properly
+		// this must be called in order for Reload() to work properly
 }
 
 
@@ -337,6 +331,7 @@ void
 IPCPWindow::Reload()
 {
 	Lock();
+	fIPAddress->MakeFocus(true);
 	fIPAddress->SetText(Addon()->IPAddress());
 	fPreviousIPAddress = Addon()->IPAddress();
 	fPrimaryDNS->SetText(Addon()->PrimaryDNS());

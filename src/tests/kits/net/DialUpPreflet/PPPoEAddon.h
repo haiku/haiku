@@ -45,7 +45,7 @@ class PPPoEAddon : public DialUpAddon {
 		
 		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
 		
-		virtual void IsModified(bool& settings, bool& profile) const;
+		virtual void IsModified(bool *settings, bool *profile) const;
 		
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
@@ -76,7 +76,7 @@ class PPPoEView : public BView {
 		void Reload();
 		
 		const char *InterfaceName() const
-			{ return fInterfaceName->Text(); }
+			{ return fInterfaceName.String(); }
 		const char *ACName() const
 			{ return fACName->Text(); }
 		const char *ServiceName() const
@@ -86,11 +86,18 @@ class PPPoEView : public BView {
 		virtual void MessageReceived(BMessage *message);
 
 	private:
+		void ReloadInterfaces();
+
+	private:
 		PPPoEAddon *fAddon;
 		BButton *fServiceButton, *fCancelButton, *fOKButton;
-		BTextControl *fInterfaceName, *fACName, *fServiceName;
+		BMenuField *fInterface;
+		BMenuItem *fOtherInterface;
+		BString fInterfaceName;
+		BTextControl *fACName, *fServiceName;
 		BWindow *fServiceWindow;
 		BString fPreviousACName, fPreviousServiceName;
+			// for the case that the user presses "Cancel" in the service window
 };
 
 

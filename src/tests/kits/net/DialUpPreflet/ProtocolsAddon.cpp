@@ -25,6 +25,7 @@
 
 
 #define MSG_ADD_PROTOCOL			'ADDP'
+#define MSG_FINISH_ADD_PROTOCOL		'FADD'
 #define MSG_REMOVE_PROTOCOL			'REMP'
 #define MSG_SHOW_PREFERENCES		'SHOW'
 #define MSG_UPDATE_BUTTONS			'UBTN'
@@ -65,7 +66,7 @@ ProtocolsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	
 	// ask protocols to load their settings
 	BMessage parameter;
-	for(int32 index = 0; FindMessageParameter(PPP_PROTOCOL_KEY, *fProfile, parameter,
+	for(int32 index = 0; FindMessageParameter(PPP_PROTOCOL_KEY, *fProfile, &parameter,
 			&index); index++)
 		if(!LoadProtocolSettings(parameter))
 			return false;
@@ -120,15 +121,15 @@ ProtocolsAddon::HasTemporaryProfile() const
 
 
 void
-ProtocolsAddon::IsModified(bool& settings, bool& profile) const
+ProtocolsAddon::IsModified(bool *settings, bool *profile) const
 {
-	settings = profile = false;
+	*settings = *profile = false;
 	
 	if(!fSettings || !fProtocolsView)
 		return;
 	
 	if(CountProtocols() != fProtocolsView->CountProtocols()) {
-		settings = profile = true;
+		*settings = *profile = true;
 		return;
 	}
 	
@@ -139,15 +140,15 @@ ProtocolsAddon::IsModified(bool& settings, bool& profile) const
 			reinterpret_cast<void**>(&protocol)) == B_OK; index++) {
 		if(!protocol->KernelModuleName() // this is actually an error
 				|| !fProtocolsView->HasProtocol(protocol->KernelModuleName())) {
-			settings = profile = true;
+			*settings = *profile = true;
 			return;
 		}
 		
-		protocol->IsModified(protocolSettingsChanged, protocolProfileChanged);
+		protocol->IsModified(&protocolSettingsChanged, &protocolProfileChanged);
 		if(protocolSettingsChanged)
-			settings = true;
+			*settings = true;
 		if(protocolProfileChanged)
-			profile = true;
+			*profile = true;
 	}
 }
 
@@ -265,7 +266,8 @@ ProtocolsView::ProtocolsView(ProtocolsAddon *addon, BRect frame)
 	AddChild(fPreferencesButton);
 	
 	fProtocolsMenu = new BPopUpMenu("UnregisteredProtocols", false, false);
-	AddAddonsToMenu(Addon()->Addons(), fProtocolsMenu, DUN_PROTOCOL_ADDON_TYPE, 0);
+	AddAddonsToMenu(Addon()->Addons(), fProtocolsMenu, DUN_PROTOCOL_ADDON_TYPE,
+		MSG_FINISH_ADD_PROTOCOL);
 }
 
 
@@ -307,6 +309,7 @@ ProtocolsView::Reload()
 void
 ProtocolsView::AttachedToWindow()
 {
+	fProtocolsMenu->SetTargetForItems(this);
 	SetViewColor(Parent()->ViewColor());
 	fListView->SetTarget(this);
 	fAddButton->SetTarget(this);
@@ -335,10 +338,15 @@ ProtocolsView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
 		case MSG_ADD_PROTOCOL: {
-			BMenuItem *selected = fProtocolsMenu->Go(fAddButton->ConvertToScreen(
-				fAddButton->Bounds().RightTop()), false, true);
-			
-			int32 index = RegisterProtocol(fProtocolsMenu->IndexOf(selected));
+			fProtocolsMenu->Go(fAddButton->ConvertToScreen(
+				fAddButton->Bounds().RightTop()), true, true, true);
+		} break;
+		
+		case MSG_FINISH_ADD_PROTOCOL: {
+			int32 index;
+			message->FindInt32("index", &index);
+			index = RegisterProtocol(index);
+				// this returns the new index of the item (now for the list view)
 			UpdateButtons();
 			
 			if(index > 0)
@@ -358,7 +366,10 @@ ProtocolsView::MessageReceived(BMessage *message)
 			
 			if(selected) {
 				DialUpAddon *addon = selected->Addon();
-				addon->CreateView(ConvertToScreen(Bounds().LeftTop()));
+				float width, height;
+				addon->GetPreferredSize(&width, &height);
+				BRect rect(0, 0, width, height);
+				addon->CreateView(center_on_screen(rect, Window()));
 					// show the preferences window
 			}
 		} break;
@@ -448,11 +459,10 @@ ProtocolsView::UnregisterProtocol(int32 index)
 		return;
 	
 	const char *label = remove->Text();
-	BMessage *message = new BMessage(MSG_ADD_PROTOCOL);
-		// the 'what' field is merely set to get around the compiler warning
+	BMessage *message = new BMessage(MSG_FINISH_ADD_PROTOCOL);
 	message->AddPointer("Addon", remove->Addon());
 	BMenuItem *item = new BMenuItem(label, message);
-	
+	item->SetTarget(this);
 	index = FindNextMenuInsertionIndex(fProtocolsMenu, label);
 	fProtocolsMenu->AddItem(item, index);
 	delete remove;

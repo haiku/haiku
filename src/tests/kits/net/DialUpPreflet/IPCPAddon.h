@@ -45,14 +45,14 @@ class IPCPAddon : public DialUpAddon {
 		virtual const char *KernelModuleName() const;
 		
 		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
-		virtual void IsModified(bool& settings, bool& profile) const;
+		virtual void IsModified(bool *settings, bool *profile) const;
 		virtual bool SaveSettings(BMessage *settings, BMessage *profile,
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
 
 	private:
-		int32 FindIPCPProtocol(BMessage& message, BMessage& protocol) const;
+		int32 FindIPCPProtocol(const BMessage& message, BMessage *protocol) const;
 
 	private:
 		bool fIsNew;

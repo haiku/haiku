@@ -8,6 +8,8 @@
 #include <Application.h>
 #include <Window.h>
 
+#include "InterfaceUtils.h"
+
 #include "DialUpView.h"
 
 
@@ -42,7 +44,9 @@ int main()
 DialUpApplication::DialUpApplication()
 	: BApplication(DIAL_UP_SIGNATURE)
 {
-	DialUpWindow *window = new DialUpWindow(BRect(150, 50, 450, 435));
+	BRect rect(150, 50, 450, 435);
+	DialUpWindow *window = new DialUpWindow(rect);
+	window->MoveTo(center_on_screen(rect, window));
 	window->Show();
 }
 
