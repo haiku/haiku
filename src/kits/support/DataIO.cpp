@@ -48,16 +48,20 @@
 
 
 // *** BDataIO ***
+
+// Construction
 BDataIO::BDataIO()
 {
 }
 
 
+// Destruction
 BDataIO::~BDataIO()
 {
 }
 
 
+// Private or Reserved
 BDataIO::BDataIO(const BDataIO &)
 {
 	//Copying not allowed
@@ -71,55 +75,40 @@ BDataIO::operator=(const BDataIO &)
 	return *this;
 }
 
-void 
-BDataIO::_ReservedDataIO1(){}
 
-void 
-BDataIO::_ReservedDataIO2(){}
-
-void 
-BDataIO::_ReservedDataIO3(){}
-
-void 
-BDataIO::_ReservedDataIO4(){}
+// FBC
+void BDataIO::_ReservedDataIO1(){}
+void BDataIO::_ReservedDataIO2(){}
+void BDataIO::_ReservedDataIO3(){}
+void BDataIO::_ReservedDataIO4(){}
 
 #if !_PR3_COMPATIBLE_
-void 
-BDataIO::_ReservedDataIO5(){}
-
-void 
-BDataIO::_ReservedDataIO6(){}
-
-void 
-BDataIO::_ReservedDataIO7(){}
-
-void 
-BDataIO::_ReservedDataIO8(){}
-
-void 
-BDataIO::_ReservedDataIO9(){}
-
-void 
-BDataIO::_ReservedDataIO10(){}
-
-void 
-BDataIO::_ReservedDataIO11(){}
-
-void 
-BDataIO::_ReservedDataIO12(){}
+void BDataIO::_ReservedDataIO5(){}
+void BDataIO::_ReservedDataIO6(){}
+void BDataIO::_ReservedDataIO7(){}
+void BDataIO::_ReservedDataIO8(){}
+void BDataIO::_ReservedDataIO9(){}
+void BDataIO::_ReservedDataIO10(){}
+void BDataIO::_ReservedDataIO11(){}
+void BDataIO::_ReservedDataIO12(){}
 #endif
 
+
 // *** BPositionIO ***
+
+// Construction
 BPositionIO::BPositionIO()
 {
 }
 
 
+// Destruction
 BPositionIO::~BPositionIO()
 {
 }
 
 
+// Read
 ssize_t
 BPositionIO::Read(void *buffer, size_t size)
 {
@@ -132,6 +121,7 @@ BPositionIO::Read(void *buffer, size_t size)
 }
 
 
+// Write
 ssize_t
 BPositionIO::Write(const void *buffer, size_t size)
 {
@@ -144,54 +134,38 @@ BPositionIO::Write(const void *buffer, size_t size)
 }
 
 
+// SetSize
 status_t
 BPositionIO::SetSize(off_t size)
 {
 	return B_ERROR;
 }
 
-void 
-BPositionIO::_ReservedPositionIO1(){}
 
-void 
-BPositionIO::_ReservedPositionIO2(){}
-
-void 
-BPositionIO::_ReservedPositionIO3(){}
-
-void 
-BPositionIO::_ReservedPositionIO4(){}
+// FBC
+void BPositionIO::_ReservedPositionIO1(){}
+void BPositionIO::_ReservedPositionIO2(){}
+void BPositionIO::_ReservedPositionIO3(){}
+void BPositionIO::_ReservedPositionIO4(){}
 
 #if !_PR3_COMPATIBLE_
-void 
-BPositionIO::_ReservedPositionIO5(){}
-
-void 
-BPositionIO::_ReservedPositionIO6(){}
-
-void 
-BPositionIO::_ReservedPositionIO7(){}
-
-void 
-BPositionIO::_ReservedPositionIO8(){}
-
-void 
-BPositionIO::_ReservedPositionIO9(){}
-
-void 
-BPositionIO::_ReservedPositionIO10(){}
-
-void 
-BPositionIO::_ReservedPositionIO11(){}
-
-void 
-BPositionIO::_ReservedPositionIO12(){}
+void BPositionIO::_ReservedPositionIO5(){}
+void BPositionIO::_ReservedPositionIO6(){}
+void BPositionIO::_ReservedPositionIO7(){}
+void BPositionIO::_ReservedPositionIO8(){}
+void BPositionIO::_ReservedPositionIO9(){}
+void BPositionIO::_ReservedPositionIO10(){}
+void BPositionIO::_ReservedPositionIO11(){}
+void BPositionIO::_ReservedPositionIO12(){}
 #endif
 
+
 // *** BMemoryIO ***
+
+// Construction
 BMemoryIO::BMemoryIO(void *p, size_t len)
 		:fReadOnly(false),
-		fBuf((char*)p),
+		fBuf(static_cast<char*>(p)),
 		fLen(len),
 		fPhys(len),
 		fPos(0)
@@ -210,11 +184,13 @@ BMemoryIO::BMemoryIO(const void *p, size_t len)
 }
 
 
+// Destruction
 BMemoryIO::~BMemoryIO()
 {
 }
 
 
+// ReadAt
 ssize_t
 BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 {
@@ -223,13 +199,14 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 		
 	ssize_t sizeRead = 0;
 	if (pos >= 0 && pos < fLen) {
-		sizeRead = min((off_t)size, fLen - pos);
+		sizeRead = min(static_cast<off_t>(size), fLen - pos);
 		memcpy(buffer, fBuf + pos, sizeRead);
 	}
 	return sizeRead;
 }
 
 
+// WriteAt
 ssize_t
 BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 {	
@@ -241,7 +218,7 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		
 	ssize_t sizeWritten = 0;	
 	if (pos >= 0 && pos < fPhys) {
-		sizeWritten = min((off_t)size, fPhys - pos);
+		sizeWritten = min(static_cast<off_t>(size), fPhys - pos);
 		memcpy(fBuf + pos, buffer, sizeWritten);
 	}
 	
@@ -252,6 +229,7 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 }
 
 
+// Seek
 off_t
 BMemoryIO::Seek(off_t position, uint32 seek_mode)
 {
@@ -272,6 +250,7 @@ BMemoryIO::Seek(off_t position, uint32 seek_mode)
 }
 
 
+// Position
 off_t
 BMemoryIO::Position() const
 {
@@ -279,6 +258,7 @@ BMemoryIO::Position() const
 }
 
 
+// SetSize
 status_t
 BMemoryIO::SetSize(off_t size)
 {
@@ -295,6 +275,7 @@ BMemoryIO::SetSize(off_t size)
 }
 
 
+// Private or Reserved
 BMemoryIO::BMemoryIO(const BMemoryIO &)
 {
 	//Copying not allowed
@@ -308,15 +289,15 @@ BMemoryIO::operator=(const BMemoryIO &)
 	return *this;
 }
 
-void 
-BMemoryIO::_ReservedMemoryIO1(){}
 
-void 
-BMemoryIO::_ReservedMemoryIO2(){}
+// FBC
+void BMemoryIO::_ReservedMemoryIO1(){}
+void BMemoryIO::_ReservedMemoryIO2(){}
 
 
 // *** BMallocIO ***
-// constructor
+
+// Construction
 BMallocIO::BMallocIO()
 		 : fBlockSize(256),
 		   fMallocSize(0),
@@ -327,7 +308,7 @@ BMallocIO::BMallocIO()
 }
 
 
-// destructor
+// Destruction
 BMallocIO::~BMallocIO()
 {
 	if (fData)
@@ -344,7 +325,7 @@ BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
 	
 	ssize_t sizeRead = 0;
 	if (pos >= 0 && pos < fLength) {
-		sizeRead = min((off_t)size, fLength - pos);
+		sizeRead = min(static_cast<off_t>(size), fLength - pos);
 		memcpy(buffer, fData + pos, sizeRead);
 	}
 	return sizeRead;
@@ -358,7 +339,7 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 		
-	size_t newSize = max(pos + size, (off_t)fLength);
+	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
 	status_t error = _Resize(newSize);	
 	if (error == B_OK)
 		memcpy(fData + pos, buffer, size);
@@ -450,12 +431,11 @@ BMallocIO::_Resize(off_t size)
 			size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
 			if (newSize != fMallocSize) {
 				// we need to resize
-				if (char *newData = (char*)realloc(fData, newSize)) {
+				if (char *newData = (char*)(realloc(fData, newSize)) {
 					// set the new area to 0
-					if (fMallocSize < newSize) {
+					if (fMallocSize < newSize)
 						memset(newData + fMallocSize, 0,
-							   newSize - fMallocSize);
-					}
+							newSize - fMallocSize);
 					fData = newData;
 					fMallocSize = newSize;
 				} else	// couldn't alloc the memory
@@ -473,14 +453,14 @@ BMallocIO::_Resize(off_t size)
 void BMallocIO::_ReservedMallocIO1() {}
 void BMallocIO::_ReservedMallocIO2() {}
 
-// copy constructor
+
+// Private or Reserved
 BMallocIO::BMallocIO(const BMallocIO &)
 {
 	// copying not allowed...
 }
 
 
-// assignment operator
 BMallocIO &
 BMallocIO::operator=(const BMallocIO &)
 {
