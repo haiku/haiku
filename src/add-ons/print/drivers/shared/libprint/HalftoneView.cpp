@@ -70,7 +70,7 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 	halftone.setBlackValue(Halftone::kLowValueMeansBlack);
 
 	const int widthBytes = (width + 7) / 8; // byte boundary
-	uchar buffer[widthBytes];
+	uchar* buffer = new uchar[widthBytes];
 	
 	const uchar* src = (uchar*)testImage.Bits();
 	uchar* dstRow = (uchar*)preview.Bits();
@@ -116,6 +116,8 @@ void HalftonePreviewView::preview(float gamma, float min, Halftone::DitherType d
 		src += testImage.BytesPerRow();
 		dstRow += preview.BytesPerRow();
 	}
+
+	delete buffer;
 	
 	SetViewBitmap(&preview);
 	Invalidate();
