@@ -168,8 +168,8 @@ BMessage::BMessage(BMessage *a_message)
 //------------------------------------------------------------------------------
 BMessage::~BMessage()
 {
-	if (fBody)
-		delete fBody;
+	// ToDo: send outstanding reply!
+	delete fBody;
 }
 //------------------------------------------------------------------------------
 BMessage& BMessage::operator=(const BMessage& msg)
