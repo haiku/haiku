@@ -38,7 +38,9 @@ class FindTextView : public BTextView {
 		virtual void MakeFocus(bool state);
 		virtual void TargetedByScrollView(BScrollView *view);
 
+		find_mode Mode() const { return fMode; }
 		status_t SetMode(find_mode mode);
+
 		void SetData(BMessage &message);
 		void GetData(BMessage &message);
 
@@ -367,7 +369,7 @@ FindTextView::GetData(BMessage &message)
 //	#pragma mark -
 
 
-FindWindow::FindWindow(BRect rect, BMessenger &target)
+FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	: BWindow(rect, "Find", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
@@ -407,6 +409,7 @@ FindWindow::FindWindow(BRect rect, BMessenger &target)
 							NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top - 5 - fCaseCheckBox->Bounds().Height());
+	fCaseCheckBox->SetValue(previous.FindBool("case_sensitive"));
 	view->AddChild(fCaseCheckBox);
 
 	// and now those inbetween
@@ -418,6 +421,7 @@ FindWindow::FindWindow(BRect rect, BMessenger &target)
 						rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3),
 						B_FOLLOW_ALL);
 	fTextView->SetWordWrap(true);
+	fTextView->SetData(previous);
 
 	BScrollView *scrollView = new BScrollView("scroller", fTextView, B_FOLLOW_ALL, B_WILL_DRAW, false, false);
 	view->AddChild(scrollView);
@@ -465,6 +469,7 @@ FindWindow::MessageReceived(BMessage *message)
 			BMessage find(kMsgFind);
 			fTextView->GetData(find);
 			find.AddBool("case_sensitive", fCaseCheckBox->Value() != 0);
+			find.AddInt8("find_mode", fTextView->Mode());
 			fTarget.SendMessage(&find);
 
 			PostMessage(B_QUIT_REQUESTED);

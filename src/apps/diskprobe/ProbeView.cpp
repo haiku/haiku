@@ -1673,7 +1673,8 @@ ProbeView::MessageReceived(BMessage *message)
 			fEditorLooper->QuitFind();
 
 			// set this view as the current find panel's target
-			BMessage find(kMsgOpenFindWindow);
+			BMessage find(*fFindAgainMenuItem->Message());
+			find.what = kMsgOpenFindWindow;
 			find.AddMessenger("target", this);
 			be_app_messenger.SendMessage(&find);
 			break;

@@ -387,7 +387,7 @@ DiskProbe::MessageReceived(BMessage *message)
 
 			if (fFindWindow == NULL) {
 				// open it!
-				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), target);
+				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), *message, target);
 				fFindWindow->Show();
 			} else
 				fFindWindow->Activate();

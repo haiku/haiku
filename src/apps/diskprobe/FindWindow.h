@@ -15,7 +15,7 @@ class BCheckBox;
 
 class FindWindow : public BWindow {
 	public:
-		FindWindow(BRect rect, BMessenger &target);
+		FindWindow(BRect rect, BMessage &previous, BMessenger &target);
 		virtual ~FindWindow();
 
 		virtual void WindowActivated(bool active);
