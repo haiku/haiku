@@ -2,6 +2,7 @@ APP_KIT_SOURCE =
 	Application.cpp
 	Cursor.cpp
 	Handler.cpp
+	InitTerminateLibBe.cpp
 	Invoker.cpp
 	Looper.cpp
 	LooperList.cpp
