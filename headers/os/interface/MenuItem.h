@@ -114,35 +114,11 @@ private:
 		uint32		_reserved[4];
 };
 
-/*----------------------------------------------------------------*/
-/*----- BSeparatorItem class -------------------------------------*/
-
-class BSeparatorItem : public BMenuItem
-{
-public:
-						BSeparatorItem();
-						BSeparatorItem(BMessage *data);
-virtual					~BSeparatorItem();
-virtual	status_t		Archive(BMessage *data, bool deep = true) const;
-static	BArchivable		*Instantiate(BMessage *data);
-virtual	void			SetEnabled(bool state);
-
-protected:
-
-virtual	void			GetContentSize(float *width, float *height);
-virtual	void			Draw();
-
-/*----- Private or reserved -----------------------------------------*/
-private:
-virtual	void		_ReservedSeparatorItem1();
-virtual	void		_ReservedSeparatorItem2();
-
-		BSeparatorItem	&operator=(const BSeparatorItem &);
-
-		uint32		_reserved[1];
-};
-
 /*-------------------------------------------------------------*/
 /*-------------------------------------------------------------*/
+
+// We moved BSeparatorItem's declaration to its own file, but for source
+// compatibility we have to export that class from here too.
+#include <SeparatorItem.h>
 
 #endif /* _MENU_ITEM_H */
