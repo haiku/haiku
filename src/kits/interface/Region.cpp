@@ -48,10 +48,10 @@ cleanup_region_1(BRegion *region)
 			-1, -2
 		};
 	
-	int32 newCount = -1;
+	long newCount = -1;
 		
 	if (region->count > 0) {
-		for (int32 x = 0; x < region->count; x++) {
+		for (long x = 0; x < region->count; x++) {
 			clipping_rect rect = region->data[x];
 						
 			if ((rect.left == testRect.left)
@@ -144,9 +144,9 @@ cleanup_region_horizontal(BRegion *region)
 			-2, -1
 		};
 	
-	int32 newCount = -1;
+	long newCount = -1;
 
-	for (int x = 0; x < region->count; x++) {
+	for (long x = 0; x < region->count; x++) {
 		clipping_rect rect = region->data[x];
 			if ((rect.top == testRect.top) && (rect.bottom == testRect.bottom)
 								&& (rect.left == testRect.right + 1)) {
@@ -228,8 +228,8 @@ and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 		
 	zero_region(dest);
 			
-	for (int32 f = 0; f < first->count; f++) {
-		for (int32 s = 0; s < second->count; s++) {
+	for (long f = 0; f < first->count; f++) {
+		for (long s = 0; s < second->count; s++) {
 			clipping_rect testRect = sect_rect(first->data[f],
 				second->data[s]);
 			if (valid_rect(testRect))
@@ -263,7 +263,7 @@ and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 	// Otherwise, we check the rect of the first region against the rects
 	// of the second, and we add their intersections to the destination region
 		zero_region(dest);
-		for (int32 x = 0; x < second->count; x++) {
+		for (long x = 0; x < second->count; x++) {
 			clipping_rect testRect = sect_rect(first->data[0], second->data[x]);
 			if (valid_rect(testRect))
 				dest->_AddRect(testRect);
@@ -320,7 +320,7 @@ append_region(BRegion *first, BRegion *second, BRegion *dest)
 	
 	copy_region(first, dest);
 
-	for (int c = 0; c < second->count; c++)
+	for (long c = 0; c < second->count; c++)
 		dest->_AddRect(second->data[c]);	
 }
 
@@ -352,7 +352,7 @@ r_or(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long
 	 	firstRect.top = max_c(firstRect.top, top);
 	 	firstRect.bottom = min_c(firstRect.bottom, bottom);
 	 	
-	 	if (valid_rect(firstRect));
+	 	if (valid_rect(firstRect))
 	 		dest->_AddRect(firstRect);
 	 	if (first->data[i1].bottom <= bottom)
 	 		i1++;
@@ -403,10 +403,11 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 	int32 top;
 	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
 	do {
+		long x;
 		top = bottom + 1;
 		bottom = 0x10000000;
 		
-		for (int x = a; x < first->count; x++) {
+		for (x = a; x < first->count; x++) {
 			int32 n = first->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
@@ -414,7 +415,7 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 				bottom = first->data[x].bottom;
 		}	
 		
-		for (int x = b; x < second->count; x++) {
+		for (x = b; x < second->count; x++) {
 			int32 n = second->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
@@ -466,11 +467,11 @@ or_region_no_x(BRegion *first, BRegion *second, BRegion *dest)
 	zero_region(dest);
 	
 	if (first->count == 0)
-		for (int x = 0; x < second->count; x++)
+		for (long x = 0; x < second->count; x++)
 			dest->_AddRect(second->data[x]);
 	
 	else if (second->count == 0)
-		for (int x = 0; x < first->count; x++)
+		for (long x = 0; x < first->count; x++)
 			dest->_AddRect(first->data[x]);
 	
 	else {
@@ -567,11 +568,13 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 	
 	int32 top;
 	int32 bottom = min_c(first->bound.top, second->bound.top) - 1;
+
 	do {
+		long x;
 		top = bottom + 1;
 		bottom = 0x10000000;
 		
-		for (int x = a; x < first->count; x++) {
+		for (x = a; x < first->count; x++) {
 			int32 n = first->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
@@ -579,7 +582,7 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 				bottom = first->data[x].bottom;
 		}	
 		
-		for (int x = b; x < second->count; x++) {
+		for (x = b; x < second->count; x++) {
 			int32 n = second->data[x].top - 1;
 			if (n >= top && n < bottom)
 				bottom = n;
@@ -710,7 +713,7 @@ BRect
 BRegion::RectAt(int32 index)
 {
 	if (index >= 0 && index < count)
-		return to_BRect(data[count]);
+		return to_BRect(data[index]);
 	
 	return BRect(); //An invalid BRect
 }
@@ -792,7 +795,7 @@ BRegion::Intersects(clipping_rect rect) const
 	if (!valid_rect(sect_rect(rect, bound)))
 		return false;
 
-	for (int c = 0; c < count; c++) {
+	for (long c = 0; c < count; c++) {
 		if (valid_rect(sect_rect(data[c], rect)))
 			return true;
 	}
@@ -813,7 +816,7 @@ BRegion::Contains(BPoint pt) const
 	if (!point_in(bound, pt))
 		return false;
 
-	for (int c = 0; c < count; c++) {
+	for (long c = 0; c < count; c++) {
 		if (point_in(data[c], pt))
 			return true;
 	}
@@ -833,7 +836,7 @@ BRegion::Contains(int32 x, int32 y)
 	if (!point_in(bound, x, y))
 		return false;
 
-	for (int c = 0; c < count; c++) {
+	for (long c = 0; c < count; c++) {
 		if (point_in(data[c], x, y))
 			return true;
 	}
@@ -848,7 +851,7 @@ BRegion::PrintToStream() const
 {
 	Frame().PrintToStream();
 	
-	for (int c = 0; c < count; c++) {
+	for (long c = 0; c < count; c++) {
 		clipping_rect *rect = &data[c];
 		printf("data = BRect(l:%ld.0, t:%ld.0, r:%ld.0, b:%ld.0)\n",
 			rect->left, rect->top, rect->right, rect->bottom);
@@ -864,7 +867,7 @@ void
 BRegion::OffsetBy(int32 dh, int32 dv)
 {
 	if (count > 0) {
-		for (int c = 0; c < count; c++) {
+		for (long c = 0; c < count; c++) {
 			data[c].left += dh;
 			data[c].right += dh;
 			data[c].top += dv;
@@ -1025,7 +1028,7 @@ BRegion::_AddRect(clipping_rect rect)
 	else {
 		// Wait! We could merge "rect" with one of the
 		// existing rectangles...
-		int32 last = count - 1;
+		long last = count - 1;
 		if ((rect.top == data[last].bottom + 1) 
 				&& (rect.left == data[last].left)
 				&& (rect.right == data[last].right)) {
