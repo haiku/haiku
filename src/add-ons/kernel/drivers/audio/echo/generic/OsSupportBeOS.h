@@ -333,7 +333,7 @@ private:
 	//
 	// Define data here.
 	//
-#ifdef _DEBUG
+#ifdef ECHO_DEBUG
 	DWORD					m_dwPageBlockCount;
 #endif
 	
