@@ -49,14 +49,14 @@ install_handler(int sig, beos_signal_func_ptr handler)
 {
 	struct sigaction newa;
 	struct sigaction olda;
-	
+
 	memset(&newa, 0, sizeof(newa));
-	
+
 	newa.sa_handler = (__signal_func_ptr)handler;
 	newa.sa_flags = SA_NOMASK | SA_RESTART;
 	newa.sa_userdata = "test!";
-	
-	if (sys_sigaction(sig, &newa, &olda) < 0) {
+
+	if (sigaction(sig, &newa, &olda) < 0) {
 		printf("Failed installing handler for sig #%d!\n", sig);
 	}
 }
@@ -94,7 +94,7 @@ main(int argc, char **argv)
 	
 	if (argc != 2)
 		usage();
-	
+
 	switch (argv[1][0]) {
 		case '1':
 			printf("Spawning some threads...\n");
@@ -107,7 +107,7 @@ main(int argc, char **argv)
 			break;
 		case '3':
 			install_handler(SIGALRM, alarm_handler);
-			sys_set_alarm(5000000, B_PERIODIC_ALARM);
+			set_alarm(5000000, B_PERIODIC_ALARM);
 			break;
 	}
 	printf("Done. Entering sleep mode...\n");
@@ -116,7 +116,7 @@ main(int argc, char **argv)
 			// this never gets called as the syscall is always restarted
 			printf("sig_test (main): snooze was interrupted!\n");
 	}
-	
+
 	return 0;
 }
 
