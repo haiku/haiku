@@ -135,6 +135,15 @@ BPartition::IsMounted() const
 	// return (fPartitionData && fPartitionData->volume >= 0);
 }
 
+// IsBusy
+bool
+BPartition::IsBusy() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags
+				& (B_PARTITION_BUSY | B_PARTITION_DESCENDANT_BUSY)));
+}
+
 // Flags
 /*!	\brief Returns the flags for this partitions.
 
@@ -194,7 +203,7 @@ BPartition::ContentType() const
 	return (fPartitionData ? fPartitionData->content_type : NULL);
 }
 
-// UniqueID
+// ID
 /*!	\brief Returns a unique identifier for this partition.
 
 	The ID is not persistent, i.e. in general won't be the same after
@@ -205,7 +214,7 @@ BPartition::ContentType() const
 	\return A unique identifier for this partition.
 */
 int32
-BPartition::UniqueID() const
+BPartition::ID() const
 {
 	return (fPartitionData ? fPartitionData->id : -1);
 }

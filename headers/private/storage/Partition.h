@@ -35,6 +35,7 @@ public:
 	bool IsDevice() const;
 	bool IsReadOnly() const;
 	bool IsMounted() const;
+	bool IsBusy() const;
 
 	uint32 Flags() const;		
 	
@@ -42,8 +43,7 @@ public:
 	const char *ContentName() const;
 	const char *Type() const;			// See DiskDeviceTypes.h
 	const char *ContentType() const;	// See DiskDeviceTypes.h
-	partition_id UniqueID() const;
-		// TODO: just ID() ?
+	partition_id ID() const;
 
 	status_t GetDiskSystem(BDiskSystem *diskSystem) const;
 	
@@ -82,13 +82,28 @@ public:
 	status_t ValidateMove(off_t*) const;
 	status_t Move(off_t);
 
+	bool CanSetName() const;
+	status_t ValidateSetName(char *name) const;
+		// adjusts name to be suitable
+	status_t SetName(const char *name);
+
+	bool CanSetContentName(bool *whileMounted = NULL) const;
+	status_t ValidateSetContentName(char *name) const;
+		// adjusts name to be suitable
+	status_t SetContentName(const char *name);
+
+	bool CanSetType() const;
+	status_t ValidateSetType(const char *type) const;
+		// type must be one the parent disk system's GetNextSupportedType()
+		// returns.
+	status_t SetType(const char *type);
+
 	bool CanEditParameters(bool *whileMounted = NULL) const;
 	status_t GetParameterEditor(
                BDiskScannerParameterEditor **editor,
                BDiskScannerParameterEditor **contentEditor);
-    status_t SetParameters(const char *parameters, const char *contentParameters);
-
-// TODO: Add name/content name editing methods, Also in BDiskSystem.
+    status_t SetParameters(const char *parameters,
+    					   const char *contentParameters);
 
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
