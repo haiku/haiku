@@ -344,16 +344,10 @@ static void gx00_bes_program_move_overlay(move_overlay_info moi)
 
 	BESW(HCOORD, moi.hcoordv);
 	BESW(VCOORD, moi.vcoordv);
-//	BESW(HISCAL, hiscalv);
 	BESW(HSRCST, moi.hsrcstv);
 	BESW(HSRCEND, moi.hsrcendv);
-//	BESW(HSRCLST, hsrclstv);
-//	BESW(VISCAL, viscalv);
 	BESW(A1ORG, moi.a1orgv);
 	BESW(V1WGHT, moi.v1srcstv);
-//	BESW(V1SRCLST, v1srclstv);
-//	BESW(GLOBCTL, globctlv);  
-//	BESW(CTL, ctlv);  
 
 	/* on a 500Mhz P3 CPU just logging a line costs 400uS (18-19 vcounts at 1024x768x60Hz)!
 	 * programming the registers above actually costs 180uS here */
