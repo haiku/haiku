@@ -715,6 +715,21 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 			break;
 		}
+		case AS_LAYER_COPY_BITS:
+		{
+			BRect src;
+			BRect dest;
+			
+			link.Read<BRect>(&src);
+			link.Read<BRect>(&dest);
+			
+			src = cl->ConvertToTop(src);
+			dest = cl->ConvertToTop(dest);
+			
+			cl->fDriver->CopyBits(src, dest, cl->fLayerData);
+			
+			break;
+		}
 		case AS_SET_CURRENT_LAYER:
 		{
 			int32 token;
