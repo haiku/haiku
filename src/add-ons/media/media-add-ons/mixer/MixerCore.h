@@ -43,15 +43,11 @@ public:
 	uint32 OutputChannelCount();
 
 private:
-		// handle mixing in separate thread
-		// not implemented (yet)
-		
-		static	int32		_mix_thread_(void *data);
-		int32				MixThread();
-	
+	static int32 _mix_thread_(void *arg);
+	void MixThread();
 	
 private:
-	BLocker *fLocker;
+	BLocker		*fLocker;
 	
 	BList		*fInputs;
 	MixerOutput	*fOutput;
@@ -68,6 +64,8 @@ private:
 	
 	BBufferGroup *fBufferGroup;
 	BTimeSource	*fTimeSource;
+	thread_id	fMixThread;
+	sem_id		fMixThreadWaitSem;
 };
 
 

@@ -40,7 +40,9 @@ MixerCore::MixerCore()
  	fDoubleRateMixing(DOUBLE_RATE_MIXING),
  	fLastMixStartTime(0),
 	fBufferGroup(0),
-	fTimeSource(0)
+	fTimeSource(0),
+	fMixThread(-1),
+	fMixThreadWaitSem(-1)
 {
 }
 
@@ -48,6 +50,9 @@ MixerCore::~MixerCore()
 {
 	delete fLocker;
 	delete fInputs;
+
+	ASSERT(fMixThreadWaitSem == -1);
+	ASSERT(fMixThread == -1);
 
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
@@ -221,6 +226,9 @@ MixerCore::Start(bigtime_t time)
 		return;
 		
 	fRunning = true;
+	fMixThreadWaitSem = create_sem(0, "mix thread wait");
+	fMixThread = spawn_thread(_mix_thread_, "Yeah baby, very shagadelic", 12, this);
+	resume_thread(fMixThread);
 }
 
 void
@@ -229,7 +237,16 @@ MixerCore::Stop()
 	ASSERT_LOCKED();
 	if (!fRunning)
 		return;
+
+	ASSERT(fMixThread > 0);
+	ASSERT(fMixThreadWaitSem > 0);
+	
+	status_t unused;
+	delete_sem(fMixThreadWaitSem);
+	wait_for_thread(fMixThread, &unused);	
 		
+	fMixThread = -1;
+	fMixThreadWaitSem = -1;
 	fRunning = false;
 }
 
@@ -249,44 +266,50 @@ MixerCore::IsStarted()
 	return fRunning;
 }
 
-
-/*
-	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
-
-
-		if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
-		{
-			memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
-			memcpy(channel->fData, indata + (channel->fDataSize - total_offset), buffer->SizeUsed() - (channel->fDataSize - total_offset));	
-		} 
-		else
-			memcpy(channel->fData + total_offset, indata, buffer->SizeUsed());
-
-		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
-		{
-			RequestAdditionalBuffer(channel->fInput.source, buffer);
-		}
-		
-		break;
-	}
-
-
-// use this later for separate threads
-
 int32
-AudioMixer::_mix_thread_(void *data)
+MixerCore::_mix_thread_(void *arg)
 {
-	return ((AudioMixer *)data)->MixThread();
+	static_cast<MixerCore *>(arg)->MixThread();
+	return 0;
 }
 
-int32 
-AudioMixer::MixThread()
+void
+MixerCore::MixThread()
 {
-	while (1)
-	{
-		snooze(500000);
-	}
+	bigtime_t 	event_time;
+	bigtime_t 	base;
+	bigtime_t 	latency;
+	int64		pos;
 	
-}
+	pos = 0;
+	latency = 30000;
+	base = event_time = fTimeSource->Now();
+	for (;;) {
+		status_t rv;
+		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, latency));
+		if (rv == B_INTERRUPTED)
+			continue;
+		if (rv < B_OK)
+			return;
+			
+		// mix all data from all inputs into the mix buffer
+		
+		// request a buffer
+		BBuffer* buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 10000);
+		
+		// copy data from mix buffer into output buffer
 
-*/
+		// fill in the buffer header
+		media_header* hdr = buf->Header();
+		hdr->type = B_MEDIA_RAW_AUDIO;
+		hdr->size_used = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
+		hdr->time_source = fTimeSource->ID();
+		hdr->start_time = event_time;
+		
+		// send the buffer
+		
+		// shedule next event
+		pos += fMixBufferFrameCount;
+		event_time = base + bigtime_t((1000000LL * pos) / fMixBufferFrameRate);
+	}
+}
