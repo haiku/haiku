@@ -84,6 +84,9 @@ enum
 	// app-defined specifiers start at B_SPECIFIERS_END+1
 };
 
+namespace BPrivate {
+	class BMessageBody;
+}
 
 // BMessage class --------------------------------------------------------------
 class BMessage
@@ -309,15 +312,14 @@ virtual	void		_ReservedMessage2();
 virtual	void		_ReservedMessage3();
 
 		void		init_data();
-		int32		flatten_hdr(uchar *result,
-								ssize_t size,
-								uchar flags) const;
+		status_t	flatten_hdr(BDataIO *stream) const;
+		status_t	unflatten_hdr(BDataIO *stream, bool& swap);
+		status_t	flatten_target_info(BDataIO *stream,
+										ssize_t size,
+										uchar flags) const;
 		status_t	real_flatten(char *result,
-								ssize_t size,
-								uchar flags) const;
-		status_t	real_flatten(BDataIO *stream,
-								ssize_t size,
-								uchar flags) const;
+								ssize_t size) const;
+		status_t	real_flatten(BDataIO *stream) const;
 		char		*stack_flatten(char *stack_ptr,
 									ssize_t stack_size,
 									bool incl_reply,
@@ -428,7 +430,10 @@ static	BBlockCache	*sMsgCache;
 		uint32				fChangeCount;
 		int32				fCurSpecifier;
 		uint32				fPtrOffset;
-		uint32				_reserved[3];
+
+		// ejaesler: Stealing one for my whacky BMessageBody l33tness
+		uint32				_reserved[2];
+		BPrivate::BMessageBody*	fBody;
 
 		BMessage::entry_hdr	*fEntries;
 
