@@ -32,12 +32,12 @@ const uint32 _B_TRANSPARENT_MAGIC_RGBA32_BIG = 0x77747700;
 // misc.
 const struct screen_id _B_MAIN_SCREEN_ID = {0};
 
-template<class T> void compare(T a, T b);
+template<class T> void compare(T &a, T &b);
 
 
 template<>
 void
-compare<pattern>(const pattern &a, const pattern &b)
+compare<const pattern>(const pattern &a, const pattern &b)
 {
 	for (int32 i = 0; i < 8; i++)
 		CHK(a.data[i] == b.data[i]);
@@ -46,7 +46,7 @@ compare<pattern>(const pattern &a, const pattern &b)
 
 template<>
 void
-compare<rgb_color>(const rgb_color a, const rgb_color b)
+compare<const rgb_color>(const rgb_color &a, const rgb_color &b)
 {
 	CHK(a.red == b.red);
 	CHK(a.green == b.green);
@@ -57,7 +57,7 @@ compare<rgb_color>(const rgb_color a, const rgb_color b)
 
 template<class T>
 void
-compare(T a, T b)
+compare(T &a, T &b)
 {
 	CHK(a == b);
 }

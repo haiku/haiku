@@ -120,8 +120,10 @@ private:
 	status_t fInitStatus;
 	vnode_id fId;
 	SinglyLinkedList<DirectoryIterator*> fIteratorList;
-	FileEntry<file_icb_entry> fFileEntry;
-	FileEntry<extended_file_icb_entry> fExtendedEntry;	
+	/* [zooey]: gcc-2.95.3 requires the explicit namespace here, otherwise
+	   it complains about a syntax error(!). This is most probably a bug. */
+	Udf::FileEntry<file_icb_entry> fFileEntry;
+	Udf::FileEntry<extended_file_icb_entry> fExtendedEntry;	
 };
 
 /*! \brief Does the dirty work of reading using the given DescriptorList object

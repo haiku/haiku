@@ -39,7 +39,11 @@
 #undef	HAVE_INITFINI
 
 /* Define if __attribute__((section("foo"))) puts quotes around foo.  */
-#define	HAVE_SECTION_QUOTES 1
+/*#define	HAVE_SECTION_QUOTES 1
+ [zooey]: defining this causes assembler errors, and I don't think
+          that any BeOS-gcc actually produces quotes in sections...
+*/
+#undef	HAVE_SECTION_QUOTES
 
 /* Define if using the GNU assembler, gas.  */
 #define	HAVE_GNU_AS 1
