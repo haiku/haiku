@@ -26,8 +26,6 @@
 //------------------------------------------------------------------------------
 // TODO: Add scrollers
 
-#include <stdio.h>
-
 #include <Menu.h>
 #include <MenuWindow.h>
 
@@ -35,10 +33,11 @@
 // this should go to some private header.
 const window_feel kMenuWindowFeel = (window_feel)1025;
 
+// This draws the frame around the BMenu
 class BMenuFrame : public BView {
 public:
 	BMenuFrame() :
-		BView(BRect(0, 0, 0, 0), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+		BView(BRect(0, 0, 1, 1), "menu frame", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 	{
 	};
 	
@@ -57,9 +56,12 @@ public:
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 		StrokeLine(BPoint(bounds.left + 2, bounds.bottom - 1),
 					BPoint(bounds.right - 1, bounds.bottom - 1));
+		StrokeLine(BPoint(bounds.right - 1, bounds.top + 1),
+					BPoint(bounds.right - 1, bounds.bottom - 1));
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 		StrokeLine(BPoint(bounds.left + 1, bounds.top + 1),
-					BPoint(bounds.right - 2, bounds.top + 1));	
+					BPoint(bounds.right - 2, bounds.top + 1));
+			
 	};
 	
 };

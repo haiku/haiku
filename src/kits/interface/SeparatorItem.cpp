@@ -95,7 +95,7 @@ BSeparatorItem::Draw()
 		case 0:
 			// TODO: Check if drawing is pixel perfect
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_2_TINT));
+				B_DARKEN_1_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 1.0f, bounds.top + 4.0f),
 				BPoint(bounds.right - 1.0f, bounds.top + 4.0f));
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
@@ -108,7 +108,7 @@ BSeparatorItem::Draw()
 		case 1:
 			// TODO: Check if drawing is pixel perfect
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_2_TINT));
+				B_DARKEN_1_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
 				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
@@ -120,7 +120,7 @@ BSeparatorItem::Draw()
 			
 		case 2:
 			menu->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-				B_DARKEN_2_TINT));
+				B_DARKEN_1_TINT));
 			menu->StrokeLine(BPoint(bounds.left + 9.0f, bounds.top + 4.0f),
 				BPoint(bounds.right - 9.0f, bounds.top + 4.0f));
 			menu->StrokeLine(BPoint(bounds.left + 10.0f, bounds.top + 5.0f),

@@ -1004,7 +1004,7 @@ BMenu::_show(bool selectFirstItem)
 	fCachedMenuWindow = new BMenuWindow(Name());
 	
 	fCachedMenuWindow->ChildAt(0)->AddChild(this);
-	fCachedMenuWindow->ResizeTo(Bounds().Width() + 3, Bounds().Height() + 3);
+	fCachedMenuWindow->ResizeTo(Bounds().Width() + 4, Bounds().Height() + 4);
 	fCachedMenuWindow->MoveTo(ScreenLocation());
 	fCachedMenuWindow->Show();
 	
@@ -1181,11 +1181,11 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 					if (item->fModifiers && item->fShortcutChar)
 						iWidth += 25.0f;
 			
-					item->fBounds.left = 2.0f;
+					item->fBounds.left = 0.0f;
 					item->fBounds.top = frame.bottom;
 					item->fBounds.bottom = item->fBounds.top + iHeight + fPad.top + fPad.bottom;
 
-					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right);
+					frame.right = max_c(frame.right, iWidth + fPad.left + fPad.right) + 20;
 					frame.bottom = item->fBounds.bottom + 1.0f;
 				}
 			}
@@ -1193,8 +1193,8 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			for (int32 i = 0; i < fItems.CountItems(); i++)
 				ItemAt(i)->fBounds.right = frame.right;
 
-			frame.right = (float)ceil(frame.right) + 2.0f;
-			frame.bottom += 1.0f;
+			frame.right = (float)ceil(frame.right);
+			frame.bottom--;
 			break;
 		}
 		
@@ -1244,11 +1244,12 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 			break;
 	}
 	
+	// This is for BMenuBar.
 	if ((ResizingMode() & B_FOLLOW_LEFT_RIGHT) == B_FOLLOW_LEFT_RIGHT) {
 		if (Parent())
-			*width = Parent()->Frame().Width();
+			*width = Parent()->Frame().Width() + 1;
 		else
-			*width = Window()->Frame().Width();
+			*width = Window()->Frame().Width() + 1;
 		
 		*height = frame.Height();
 	} else {
