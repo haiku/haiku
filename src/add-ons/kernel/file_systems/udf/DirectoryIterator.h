@@ -28,10 +28,11 @@ class Icb;
 class DirectoryIterator {
 public:
 
-	status_t GetNextEntry(vnode_id *id, char *name, uint32 *length);
+	status_t GetNextEntry(char *name, uint32 *length, vnode_id *id);
 	void Rewind();
 	
-	Icb* Parent() const { return fParent; }
+	Icb* Parent() { return fParent; }
+	const Icb* Parent() const { return fParent; }
 	
 private:
 	friend class Icb;
@@ -41,7 +42,8 @@ private:
 	void Invalidate();					// called by Icb::~Icb() 
 
 	Icb *fParent;
-	uint32 fCount;						// Used to implement fake iteration until file reading is implemented
+	off_t fPosition;
+	bool fAtBeginning;
 };
 
 };	// namespace Udf

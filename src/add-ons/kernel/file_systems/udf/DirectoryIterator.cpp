@@ -10,22 +10,71 @@
 
 #include "DirectoryIterator.h"
 
+#include <dirent.h>
 #include <stdio.h>
+
+#include "Icb.h"
+
+#include "CS0String.h"
+#include "Utils.h"
 
 using namespace Udf;
 
 status_t
-DirectoryIterator::GetNextEntry(vnode_id *id, char *name, uint32 *length)
+DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 {
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_DIRECTORY_OPS, "DirectoryIterator",
+	               ("name: %p, length: %p, id: %p", name, length, id));
+
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
-	if (fCount < 5) 
-		sprintf(name, "entry #%ld", fCount++);
-	else 
+	status_t err = B_OK;
+	if (fAtBeginning) {
+		sprintf(name, ".");
+		*length = 2;
+		*id = Parent()->Id();
+		fAtBeginning = false;
+	} else {
+
+	if (uint64(fPosition) >= Parent()->Length())
 		return B_ENTRY_NOT_FOUND;
+
+	uint8 data[kMaxFileIdSize];
+	udf_file_id_descriptor *entry = reinterpret_cast<udf_file_id_descriptor*>(data);
+
+	uint32 block = 0;
+	off_t offset = fPosition;
+
+	size_t entryLength = kMaxFileIdSize;
+	// First read in the static portion of the file id descriptor,
+	// then, based on the information therein, read in the variable
+	// length tail portion as well.
+	err = Parent()->Read(offset, entry, &entryLength, &block);
+	if (!err && entryLength >= sizeof(udf_file_id_descriptor) && entry->tag().init_check(block) == B_OK) {
+		PDUMP(entry);
+		offset += entry->total_length();
 		
-	return B_OK;
+		if (entry->is_parent()) {
+			sprintf(name, "..");
+			*length = 3;
+		} else {
+			CS0String string(entry->id(), entry->id_length());
+			PRINT(("id == `%s'\n", string.String()));
+			PRINT(("vnode_id: %lld\n", to_vnode_id(entry->icb())));
+			DUMP(entry->icb());
+			sprintf(name, "%s", string.String());
+			*length = string.Length();
+		}		
+		*id = to_vnode_id(entry->icb());
+	}	
+
+	if (!err)
+		fPosition = offset;
+	}
+//	size_t dynamicLength = sizeof(udf_file_id_descriptor);
+ 
+ 	RETURN(err);
 }
 
 /*	\brief Rewinds the iterator to point to the first
@@ -34,12 +83,14 @@ DirectoryIterator::GetNextEntry(vnode_id *id, char *name, uint32 *length)
 void
 DirectoryIterator::Rewind()
 {
-	fCount = 0;
+	fPosition = 0;
+	fAtBeginning = true;
 }
 
 DirectoryIterator::DirectoryIterator(Icb *parent)
 	: fParent(parent)
-	, fCount(0)
+	, fPosition(0)
+	, fAtBeginning(true)
 {
 }
 
