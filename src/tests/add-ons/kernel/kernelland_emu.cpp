@@ -15,6 +15,8 @@
 #include <Path.h>
 #include <String.h>
 
+#include <devfs.h>
+
 #ifdef TRACE
 #undef TRACE
 #endif
@@ -659,6 +661,25 @@ thread_id
 spawn_kernel_thread(thread_func func, const char *name, int32 priority, void *data)
 {
 	return spawn_thread(func, name, priority, data);
+}
+
+
+extern "C" status_t
+devfs_unpublish_partition(const char *path)
+{
+	printf("unpublish partition: %s\n", path);
+	return B_OK;
+}
+
+
+extern "C" status_t
+devfs_publish_partition(const char *path, const partition_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	printf("publish partition: %s (device \"%s\", size %Ld)\n", path, info->device, info->size);
+	return B_OK;
 }
 
 
