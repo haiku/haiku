@@ -168,7 +168,10 @@ BMessage::BMessage(BMessage *a_message)
 //------------------------------------------------------------------------------
 BMessage::~BMessage()
 {
-	// ToDo: send outstanding reply!
+	if (IsSourceWaiting())
+	{
+		SendReply(B_NO_REPLY);
+	}
 	delete fBody;
 }
 //------------------------------------------------------------------------------
