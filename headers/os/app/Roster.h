@@ -39,8 +39,11 @@ class BList;
 class BMessage;
 class BNodeInfo;
 
+// TODO: relocate these private prototypes
 extern "C" int	_init_roster_();
 extern "C" int	_delete_roster_();
+status_t _send_to_roster_(BMessage *message, BMessage *reply, bool mime);
+bool _is_valid_roster_mess_(bool mime);
 
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
