@@ -219,8 +219,13 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 
 		tabView->AddTab(groupView);
 
+		// enlarge the bounding rectangle as needed
+
 		if (groupView->Bounds().Width() + 5 > rect.Width())
 			rect.right = groupView->Bounds().Width() - 1;
+
+		if (groupView->Bounds().Height() > rect.Height())
+			rect.bottom = groupView->Bounds().Height();
 	}
 
 	if (tabView != NULL) {
@@ -228,6 +233,8 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 
 		rect = tabView->Bounds();
 		rect.InsetBySelf(1, 1);
+		rect.top += tabView->TabHeight();
+
 		tabView->ContainerView()->ResizeTo(rect.Width(), rect.Height());
 	}
 
@@ -244,8 +251,8 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		return NULL;
 
 	BRect rect(hintRect);
-	BBox *view = new BBox(rect, group.Name());
-	view->SetBorder(B_NO_BORDER);
+	BView *view = new BView(rect, group.Name(), B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// Add the sub-group views
 
@@ -365,7 +372,7 @@ DefaultMediaTheme::MakeSelfHostingViewFor(BParameter &parameter, const BRect &hi
 			if (parameter.Group()->ParameterAt(0) == &parameter) {
 				// this is the first parameter in this group, so
 				// let's use a nice title view
-				
+
 				TitleView *titleView = new TitleView(hintRect, parameter.Name());
 				titleView->ResizeToPreferred();
 
