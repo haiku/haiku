@@ -32,9 +32,12 @@
 /*****************************************************************************/
 #include "TranslationUtilsTest.h"
 #include <stdio.h>
+#include <TranslatorFormats.h>
+	// for B_TRANSLATOR_EXT_*
 #include <TranslatorRoster.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <OS.h>
 
 /* cppunit framework */
 #include <cppunit/Test.h>
@@ -75,7 +78,22 @@ TranslationUtilsTest::Suite()
 void
 TranslationUtilsTest::GetBitmapTest()
 {
+	// Open a PNG image file using GetBitmap without specifying
+	// a BTranslatorRoster
 	NextSubTest();
+	BApplication app(
+		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+	BBitmap *pbits = NULL;
+	pbits = BTranslationUtils::GetBitmap(
+		"../src/tests/kits/translation/data/images/image.png");
+	CPPUNIT_ASSERT(pbits);
+	CPPUNIT_ASSERT(pbits->Bits());
+	CPPUNIT_ASSERT(pbits->BitsLength() == 443904);
+	CPPUNIT_ASSERT(pbits->BytesPerRow() == 1536);
+	CPPUNIT_ASSERT(pbits->Bounds().IntegerWidth() == 383);
+	CPPUNIT_ASSERT(pbits->Bounds().IntegerHeight() == 288);
+	delete pbits;
+	pbits = NULL;
 }
 
 void
@@ -93,7 +111,44 @@ TranslationUtilsTest::PutStyledTextTest()
 void
 TranslationUtilsTest::GetDefaultSettingsTest()
 {
+	// Test translator_id version with a BTranslatorRoster * supplied
 	NextSubTest();
+	BApplication app(
+		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+	BMessage *pmsg = NULL;
+	bool bdummy = false;
+	translator_id *pids = NULL;
+	int32 ncount = 0;
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster);
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pids, &ncount) == B_OK);
+	CPPUNIT_ASSERT(pids && ncount > 0);
+	pmsg = BTranslationUtils::GetDefaultSettings(pids[0], proster);
+	CPPUNIT_ASSERT(pmsg);
+	delete pmsg;
+	pmsg = NULL;
+	
+	// Test translator_id version without a BTranslatorRoster supplied
+	NextSubTest();
+	pmsg = BTranslationUtils::GetDefaultSettings(pids[0]);
+	CPPUNIT_ASSERT(pmsg);
+	delete pmsg;
+	pmsg = NULL;
+	delete[] pids;
+	pids = NULL;
+	
+	// Get settings from the OBOS TGATranslator and ensure that
+	// all of its settings are there
+	NextSubTest();
+	pmsg = BTranslationUtils::GetDefaultSettings("TGA Images", 100);
+	CPPUNIT_ASSERT(pmsg);
+	CPPUNIT_ASSERT(pmsg->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY,
+		&bdummy) == B_OK);
+	CPPUNIT_ASSERT(pmsg->FindBool(B_TRANSLATOR_EXT_DATA_ONLY,
+		&bdummy) == B_OK);
+	CPPUNIT_ASSERT(pmsg->FindBool("tga /rle", &bdummy) == B_OK);
+	delete pmsg;
+	pmsg = NULL;
 }
 
 void
