@@ -7,6 +7,7 @@
 	BMimeType implementation.
 */
 #include <MimeType.h>
+#include <Bitmap.h>
 #include <ctype.h>			// For tolower()
 #include <new.h>			// For new(nothrow)
 #include <stdio.h>			// For printf()
@@ -324,7 +325,7 @@ BMimeType::Install()
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -360,7 +361,7 @@ BMimeType::Delete()
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -385,9 +386,9 @@ BMimeType::Delete()
 
 */
 status_t
-BMimeType::GetIcon(BBitmap *icon, icon_size) const
+BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetIcon(Type(), icon, size);
 }
 
 // GetPreferredApp
@@ -413,7 +414,7 @@ BMimeType::GetIcon(BBitmap *icon, icon_size) const
 status_t
 BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetPreferredApp(Type(), signature, verb);
 }
 
 // GetAttrInfo
@@ -619,12 +620,82 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 	\return
 	- \c B_OK: Success
 	- "error code": Failure	
-
+ 
 */
 status_t
-BMimeType::SetIcon(const BBitmap *icon, icon_size)
+BMimeType::SetIcon(const BBitmap *icon, icon_size size)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = icon ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	void *data = NULL;
+	int32 dataSize;
+	
+	if (!err)
+		err = BPrivate::MimeDatabase::GetIconData(icon, size, &data, &dataSize);
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_ICON);
+	if (!err)
+		err = msg.AddData("icon data", B_RAW_TYPE, data, dataSize);
+	if (!err)
+		err = msg.AddInt32("icon size", size);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+
+	delete [] data;
+	return err;
+	
+
+/*	This is the code I was using before BBitmap::Instantiate
+	blew up on me 
+
+	status_t err = icon ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	BMessage archive;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_ICON);
+	if (!err)
+		err = icon->Archive(&archive);
+	archive.PrintToStream();
+	if (!err) 
+		err = msg.AddMessage("icon archive", &archive);
+	if (!err)
+		err = msg.AddInt32("size", size);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;
+*/
 }
 
 // SetPreferredApp
@@ -650,7 +721,32 @@ BMimeType::SetIcon(const BBitmap *icon, icon_size)
 status_t
 BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = signature ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_PREFERRED_APP);
+	if (!err) 
+		err = msg.AddString("signature", signature);
+	if (!err)
+		err = msg.AddInt32("app verb", verb);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // SetAttrInfo
@@ -769,6 +865,8 @@ BMimeType::SetShortDescription(const char *description)
 	status_t result;
 	
 	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
 	if (!err) 
 		err = msg.AddInt32("which", B_REG_MIME_DESCRIPTION);
 	if (!err) 
@@ -780,7 +878,7 @@ BMimeType::SetShortDescription(const char *description)
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -813,18 +911,18 @@ BMimeType::SetLongDescription(const char *description)
 	status_t result;
 	
 	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
 	if (!err) 
 		err = msg.AddInt32("which", B_REG_MIME_DESCRIPTION);
 	if (!err) 
 		err = msg.AddString("description", description);
 	if (!err)
 		err = msg.AddBool("long", true);
-	if (!err)
-		err = msg.AddString("type", Type());
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -984,7 +1082,7 @@ bool isValidMimeChar(const char ch)
 status_t
 BMimeType::GetAppHint(entry_ref *ref) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetAppHint(Type(), ref);
 }
 
 // SetAppHint
@@ -1008,7 +1106,30 @@ BMimeType::GetAppHint(entry_ref *ref) const
 status_t
 BMimeType::SetAppHint(const entry_ref *ref)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = ref ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = InitCheck();	
+
+	BMessage msg(B_REG_MIME_SET_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_APP_HINT);
+	if (!err)
+		err = msg.AddRef("app hint", ref);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // GetIconForType
@@ -1289,7 +1410,7 @@ BMimeType::StartWatching(BMessenger target)
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1318,7 +1439,7 @@ BMimeType::StopWatching(BMessenger target)
 	if (!err) 
 		err = _send_to_roster_(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_SIMPLE_DATA ? B_OK : B_BAD_VALUE;
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
