@@ -77,6 +77,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	clipToPicture	= NULL;
 	
 	// NOW all regions (fVisible, fFullVisible, fFull) are empty
+	fClipReg		= &fVisible;
 	STRACE(("Layer(%s) successfuly created\n", GetName()));
 }
 
@@ -509,8 +510,14 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			// Update one.
 			BRegion common(lay->fFullVisible);
 			common.IntersectWith(&reg);
-			if (common.CountRects() > 0)
+			if (common.CountRects() > 0){
+				// lock/unlock if we are a winborder
+				if (lay->fClassID == AS_WINBORDER_CLASS)
+					lay->Window()->Lock();
 				lay->RequestDraw(reg, NULL);
+				if (lay->fClassID == AS_WINBORDER_CLASS)
+					lay->Window()->Unlock();
+			}
 		}
 	}
 }
@@ -533,6 +540,21 @@ r.PrintToStream();
 	// empty HOOK function.
 }
 
+void Layer::UpdateStart()
+{
+	// durring update we are not allowed to draw outside the update region.
+	// why should we? we only need that region redrawn!
+	fInUpdate = true;
+	fClipReg = &fUpdateReg;
+}
+
+void Layer::UpdateEnd()
+{
+	// the usual case. Drawing is permited in the whole visible area.
+	fInUpdate = false;
+	fClipReg = &fVisible;
+	fUpdateReg.MakeEmpty();
+}
 
 void Layer::Show(bool invalidate)
 {

@@ -1455,6 +1455,16 @@ void ServerWindow::DispatchMessage(int32 code)
 
 			break;
 		}
+		case AS_BEGIN_UPDATE:
+		{
+			cl->UpdateStart();
+			break;
+		}
+		case AS_END_UPDATE:
+		{
+			cl->UpdateEnd();
+			break;
+		}
 
 		// ********** END: BView Messages ***********
 		

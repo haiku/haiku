@@ -114,9 +114,10 @@ public:
 	void SetAsTopLayer(bool option) { fIsTopLayer = option; }
 	bool IsTopLayer() const { return fIsTopLayer; }
 
-	void UpdateStart() { fInUpdate = true; }
-	void UpdateEnd() { fInUpdate = false; }
+	void UpdateStart();
+	void UpdateEnd();
 	bool InUpdate() const { return fInUpdate; }
+	BRegion* ClippingRegion() const { return fClipReg; }
 
 protected:
 	friend class RootLayer;
@@ -140,6 +141,7 @@ protected:
 	BRegion	fFullVisible;
 	BRegion	fFull;
 	BRegion	fUpdateReg;
+	BRegion *fClipReg;
 	
 	BRegion *clipToPicture;
 	bool clipToPictureInverse;
