@@ -10,9 +10,12 @@
 
 /* pins V5.16 and up ROM infoblock stuff */
 typedef struct {
-	uint16	InitScriptTablePtr;	/* ptr to list of ptrs to scripts to exec */
-	uint16	ConditionTablePtr;	/* ptr to list of PCI regs and bits to tst for exec mode */
-	uint16	IOConditionTablePtr;/* ptr to list of ISA regs and bits to tst for exec mode */
+	uint16	InitScriptTablePtr;		/* ptr to list of ptrs to scripts to exec */
+	uint16	MacroIndexTablePtr;		/* ptr to list with indexes and sizes of items in MacroTable */
+	uint16	MacroTablePtr;			/* ptr to list with items containing multiple 32bit reg writes */
+	uint16	ConditionTablePtr;		/* ptr to list of PCI regs and bits to tst for exec mode */
+	uint16	IOConditionTablePtr;	/* ptr to list of ISA regs and bits to tst for exec mode */
+	uint16	InitFunctionTablePtr;	/* ptr to list of startadresses of fixed ROM init routines */
 } PinsTables;
 
 static void detect_panels(void);
@@ -177,8 +180,11 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		//fixme: how about pins 6???
 		PinsTables tabs;
 		tabs.InitScriptTablePtr = rom[offset + 75] + (rom[offset + 76] * 256);
+		tabs.MacroIndexTablePtr = rom[offset + 77] + (rom[offset + 78] * 256);
+		tabs.MacroTablePtr = rom[offset + 79] + (rom[offset + 80] * 256);
 		tabs.ConditionTablePtr = rom[offset + 81] + (rom[offset + 82] * 256);
 		tabs.IOConditionTablePtr = rom[offset + 83] + (rom[offset + 84] * 256);
+		tabs.InitFunctionTablePtr = rom[offset + 87] + (rom[offset + 88] * 256);
 
 		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
 
@@ -1119,6 +1125,47 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				data &= and_out;
 				data |= or_in;
 				NV_REG32(reg) = data;
+			}
+			break;
+		case 0x6f: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			data = (*((uint8*)(&(rom[adress]))) << 1);
+			adress += 1;
+			data += tabs.MacroIndexTablePtr;
+			offset32 = (*((uint8*)(&(rom[data]))) << 3);
+			size32 = *((uint8*)(&(rom[(data + 1)])));
+			offset32 += tabs.MacroTablePtr;
+			/* note: min 1, max 255 commands can be requested */
+			LOG(8,("cmd 'do $%02x time(s) a 32bit reg WR with 32bit data':\n", size32));
+			safe32 = 0;
+			while (safe32 < size32)
+			{
+				reg2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3))])));
+				data2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3) + 4)])));
+				LOG(8,("INFO: (cont.) (#$%02x) cmd 'WR 32bit reg' $%08x = $%08x\n",
+					safe32, reg2, data2));
+				safe32++;
+ 			}
+			if (exec)
+			{
+				safe32 = 0;
+				while (safe32 < size32)
+				{
+					reg2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3))])));
+					data2 = *((uint32*)(&(rom[(offset32 + (safe32 << 3) + 4)])));
+					NV_REG32(reg2) = data2;
+					safe32++;
+				}
 			}
 			break;
 		//fixme? this is correct on NV11, but how about newer cards???
