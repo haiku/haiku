@@ -440,18 +440,19 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	fIconView = new IconView(BRect(10, 10, 41, 41), ref, editor.IsDevice());
 	AddChild(fIconView);
 
-	BRect rect = Bounds();
-	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
-						new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
-	fStopButton->ResizeToPreferred();
-	fStopButton->MoveTo(rect.right - 5 - fStopButton->Bounds().Width(), 5);
-	fStopButton->Hide();
-	AddChild(fStopButton);
-
 	BFont boldFont = *be_bold_font;
 	boldFont.SetSize(10.0);
 	BFont plainFont = *be_plain_font;
 	plainFont.SetSize(10.0);
+
+	BRect rect = Bounds();
+	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
+						new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+	fStopButton->SetFont(&plainFont);
+	fStopButton->ResizeToPreferred();
+	fStopButton->MoveTo(rect.right - 4 - fStopButton->Bounds().Width(), 4);
+	fStopButton->Hide();
+	AddChild(fStopButton);
 
 	BStringView *stringView = new BStringView(BRect(50, 6, rect.right, 20),
 		B_EMPTY_STRING, editor.IsAttribute() ? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
@@ -473,7 +474,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	fPathView->SetFont(&plainFont);
 	AddChild(fPathView);
 
-	float top = 27;
+	float top = 28;
 	if (editor.IsAttribute()) {
 		top += 3;
 		stringView = new BStringView(BRect(50, top, frame.right, top + 15), B_EMPTY_STRING, "Attribute Type: ");
@@ -497,7 +498,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 			// ToDo: for now
 		AddChild(fTypeControl);
 
-		top += 24;
+		top += 25;
 	} else
 		fTypeControl = NULL;
 
