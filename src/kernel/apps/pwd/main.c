@@ -45,7 +45,8 @@
 #include <unistd.h>
 
 static char *getcwd_logical(void);
-void usage(void);
+//void usage(void);
+int usage(void);
 
 int
 main(int argc, char *argv[])
@@ -80,20 +81,25 @@ main(int argc, char *argv[])
         if ((!physical && (p = getcwd_logical()) != NULL) ||
             (p = getcwd(NULL, 0)) != NULL)
                 printf("%s\n", p);
-        else
-                //err(1, ".");	Taken a quick look at this
-		//		perhaps it could be replaced with
-		//		just an exit(1) ? Andrew McCall
+        //else
+        //	err(1, ".");	Taken a quick look at this
+	//			perhaps it could be replaced with
+	//			just an exit(1) ? Andrew McCall
+		
 
-        exit(0);
+        //exit(0);
+	return B_NO_ERROR;
 }
 
-void
+
+//void
+int
 usage(void)
 {
 
         (void)fprintf(stderr, "usage: pwd [-LP]\n");
-        exit(1);
+        //exit(1);
+	return B_ERROR;
 }
 
 static char *

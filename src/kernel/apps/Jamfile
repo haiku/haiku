@@ -16,3 +16,4 @@ SubInclude OBOS_TOP src kernel apps envtest ;
 SubInclude OBOS_TOP src kernel apps testapp ;
 SubInclude OBOS_TOP src kernel apps tests ;
 SubInclude OBOS_TOP src kernel apps uname ;
+SubInclude OBOS_TOP src kernel apps pwd ;

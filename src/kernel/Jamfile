@@ -769,6 +769,18 @@ KernelLd uname :
         bin/uname
         ;
 
+KernelLd pwd :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!pwd>main.o
+	libc.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+        :
+        :
+        :
+        bin/pwd
+        ;
+
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 
 BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
