@@ -216,16 +216,16 @@ arch_thread_dump_info(void *info)
  */
 
 void
-arch_thread_enter_uspace(struct thread *t, addr entry, void *args)
+arch_thread_enter_uspace(struct thread *t, addr entry, void *args1, void *args2)
 {
 	addr ustack_top = t->user_stack_base + STACK_SIZE;
 
-	dprintf("arch_thread_enter_uspace: entry 0x%lx, args %p, ustack_top 0x%lx\n",
-		entry, args, ustack_top);
+	dprintf("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
+		entry, args1, args2, ustack_top);
 
 	// make sure the fpu is in a good state
 	asm("fninit");
-	
+
 	// access the new stack to make sure the memory page is present
 	// while interrupts are disabled.
 	// XXX does this belong there, should caller take care of it?
@@ -238,7 +238,7 @@ arch_thread_enter_uspace(struct thread *t, addr entry, void *args)
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
 
-	i386_enter_uspace(entry, args, ustack_top - 4);
+	i386_enter_uspace(entry, args1, args2, ustack_top - 4);
 }
 
 

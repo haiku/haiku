@@ -490,7 +490,7 @@ team_create_team2(void *args)
 	team->state = TEAM_STATE_NORMAL;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(t, entry, uspa);
+	arch_thread_enter_uspace(t, entry, uspa, NULL);
 
 	// never gets here
 	return 0;

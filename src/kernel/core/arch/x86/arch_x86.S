@@ -179,11 +179,12 @@ i386_uspace_exit_stub:
 i386_uspace_exit_stub_end:
 
 
-/* void i386_enter_uspace(addr entry, void *args, addr ustack_top); */
+/* void i386_enter_uspace(addr entry, void *args1, void *args2, addr ustack_top); */
 FUNCTION(i386_enter_uspace):
 	movl	4(%esp),%eax	// get entry point
 	movl	8(%esp),%edx	// get arguments
-	movl	12(%esp),%ebx	// get user stack
+	movl	12(%esp),%edi
+	movl	16(%esp),%ebx	// get user stack
 	movw	$USER_DATA_SEG,%cx
 	movw	%cx,%ds
 	movw	%cx,%es
@@ -201,9 +202,10 @@ _copy_more:
 	jg	_copy_more
 
 	// push the args onto the user stack
-	movl	%edx,-4(%ebx)	// args
-	movl	%ebx,-8(%ebx)	// fake return address to copied exit stub
-	sub		$8,%ebx
+	movl	%edi,-4(%ebx)	// args1
+	movl	%edx,-8(%ebx)	// args2
+	movl	%ebx,-12(%ebx)	// fake return address to copied exit stub
+	sub		$12,%ebx
 
 	pushl	$USER_DATA_SEG	// user data segment
 	pushl	%ebx			// user stack

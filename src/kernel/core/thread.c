@@ -179,7 +179,7 @@ create_thread_struct(const char *name)
 	t->team_next = NULL;
 	t->queue_next = NULL;
 	t->priority = -1;
-	t->args = NULL;
+	t->args1 = NULL;  t->args2 = NULL;
 	t->sig_pending = 0;
 	t->sig_block_mask = 0;
 	memset(t->sig_action, 0, 32 * sizeof(struct sigaction));
@@ -255,7 +255,7 @@ _create_user_thread_kentry(void)
 	thread->in_kernel = false;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(thread, (addr)thread->entry, thread->args);
+	arch_thread_enter_uspace(thread, (addr)thread->entry, thread->args1, thread->args2);
 
 	// never get here
 	return 0;
@@ -278,12 +278,12 @@ _create_kernel_thread_kentry(void)
 	// call the entry function with the appropriate args
 	func = (void *)thread->entry;
 
-	return func(thread->args);
+	return func(thread->args1);
 }
 
 
 static thread_id
-create_thread(const char *name, team_id teamID, thread_func entry, void *args, int32 priority, bool kernel)
+create_thread(const char *name, team_id teamID, thread_func entry, void *args1, void *args2, int32 priority, bool kernel)
 {
 	struct thread *t;
 	struct team *team;
@@ -339,7 +339,8 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args, i
 	if (t->kernel_stack_region_id < 0)
 		panic("_create_thread: error creating kernel stack!\n");
 
-	t->args = args;
+	t->args1 = args1;
+	t->args2 = args2;
 	t->entry = entry;
 
 	if (kernel) {
@@ -436,7 +437,7 @@ _dump_thread_info(struct thread *t)
 	dprintf("sem_errcode:  0x%x\n", t->sem_errcode);
 	dprintf("sem_flags:    0x%x\n", t->sem_flags);
 	dprintf("fault_handler: %p\n", (void *)t->fault_handler);
-	dprintf("args:         %p\n", t->args);
+	dprintf("args:         %p %p\n", t->args1, t->args2);
 	dprintf("entry:        %p\n", (void *)t->entry);
 	dprintf("team:         %p\n", t->team);
 	dprintf("return_code_sem: 0x%lx\n", t->return_code_sem);
@@ -1126,7 +1127,7 @@ thread_init_percpu(int cpu_num)
 thread_id
 spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
 {
-	return create_thread(name, team, function, arg, priority, true);
+	return create_thread(name, team, function, arg, NULL, priority, true);
 }
 
 
@@ -1492,7 +1493,7 @@ resume_thread(thread_id id)
 thread_id
 spawn_kernel_thread(thread_func function, const char *name, int32 priority, void *arg)
 {
-	return create_thread(name, team_get_kernel_team()->id, function, arg, priority, true);
+	return create_thread(name, team_get_kernel_team()->id, function, arg, NULL, priority, true);
 }
 
 
@@ -1570,7 +1571,7 @@ user_set_thread_priority(thread_id thread, int32 newPriority)
 
 
 thread_id
-user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *args)
+user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *data1, void *data2)
 {
 	char name[SYS_MAX_OS_NAME_LEN];
 
@@ -1579,7 +1580,7 @@ user_spawn_thread(thread_func entry, const char *userName, int32 priority, void 
 		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return create_thread(name, thread_get_current_thread()->team->id, entry, args, priority, false);
+	return create_thread(name, thread_get_current_thread()->team->id, entry, data1, data2, priority, false);
 }
 
 

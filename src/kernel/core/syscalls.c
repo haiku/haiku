@@ -247,7 +247,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_vm_get_region_info((region_id)arg0, (vm_region_info *)arg1);
 			break;
 		case SYSCALL_SPAWN_THREAD:
-			*call_ret = user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3);
+			*call_ret = user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3, (void *)arg4);
 			break;
 		case SYSCALL_SET_THREAD_PRIORITY:
 			*call_ret = user_set_thread_priority((thread_id)arg0, (int32)arg1);
