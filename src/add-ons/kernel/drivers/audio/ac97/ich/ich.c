@@ -428,18 +428,20 @@ ich_clock_calibrate()
 
 	LOG(("ich_clock_calibrate: finished, rate %ld\n", rate));
 
-	if (rate > (44100 - 300) && rate < (44100 + 300)) {
-		ac97_set_clock(config->ac97, 44100);
+	if (rate > (44100 - 1000) && rate < (44100 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 44100\n"));
-	} else if (rate > (48000 - 300) && rate < (48000 + 300)) {
-		ac97_set_clock(config->ac97, 48000);
+		ac97_set_clock(config->ac97, 44100);
+	} else if (rate > (48000 - 1000) && rate < (48000 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 48000\n"));
-	} else if (rate > (41194 - 300) && rate < (41194 + 300)) {
-		ac97_set_clock(config->ac97, 41194);
+		ac97_set_clock(config->ac97, 48000);
+	} else if (rate > (41194 - 1000) && rate < (41194 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 41194\n"));
-	} else if (rate > (55930 - 300) && rate < (55930 + 300)) {
-		ac97_set_clock(config->ac97, 55930);
+		ac97_set_clock(config->ac97, 41194);
+	} else if (rate > (55930 - 1000) && rate < (55930 + 1000)) {
 		LOG(("ich_clock_calibrate: setting clock 55930\n"));
+		ac97_set_clock(config->ac97, 55930);
+	} else {
+		LOG(("ich_clock_calibrate: NOT setting clock\n"));
 	}
 
 	if (	!ac97_set_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, 44100)

@@ -351,6 +351,9 @@ static status_t get_buffers(multi_buffer_list *data)
 
 static status_t buffer_exchange(multi_buffer_info *data)
 {
+#if DEBUG
+	static int debug_buffers_exchanged = 0;
+#endif
 	cpu_status status;
 	void *backbuffer;
 /*	
@@ -395,6 +398,12 @@ static status_t buffer_exchange(multi_buffer_info *data)
 		data->recorded_frames_count = 0;
 	}
 */
+#if DEBUG
+	debug_buffers_exchanged++;
+	if (((debug_buffers_exchanged % 100) == 1) && (debug_buffers_exchanged < 1111)) {
+		LOG(("buffer_exchange: %d buffers processed\n", debug_buffers_exchanged));
+	}
+#endif
 
 	return B_OK;
 
