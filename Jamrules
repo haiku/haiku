@@ -392,7 +392,6 @@ rule StdBinCommands
 	for source in $(1)
 	{
 		local target = $(source:S=) ;
-		target = [ FGristFiles $(target) ] ;
 
 		BinCommand $(target) : $(source) : $(libs) : $(ress) ;
 	}
