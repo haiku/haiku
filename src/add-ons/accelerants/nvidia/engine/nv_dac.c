@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-3/2004
+   Rudolf Cornelissen 12/2003-4/2004
 */
 
 #define MODULE_BIT 0x00010000
@@ -18,7 +18,6 @@ bool nv_dac_crt_connected(void)
 	uint32 output, dac;
 	bool present;
 
-//fixme? checkout NV11...
 	/* save output connector setting */
 	output = DACR(OUTPUT);
 	/* save DAC state */

@@ -1,6 +1,6 @@
 /* program the secondary DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-3/2004
+   Rudolf Cornelissen 12/2003-4/2004
 */
 
 #define MODULE_BIT 0x00001000
@@ -16,7 +16,9 @@ bool nv_dac2_crt_connected()
 	uint32 output, dac;
 	bool present;
 
-//fixme? checkout NV11...
+	/* NOTE:
+	 * NV11 can't do this: It will report DAC1 status instead. */
+
 	/* save output connector setting */
 	output = DAC2R(OUTPUT);
 	/* save DAC state */

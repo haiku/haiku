@@ -9,6 +9,7 @@
 #include "nv_std.h"
 
 static void detect_panels(void);
+static void setup_output_matrix(void);
 static void pinsnv4_fake(void);
 static void pinsnv5_nv5m64_fake(void);
 static void pinsnv6_fake(void);
@@ -246,71 +247,13 @@ void fake_pins(void)
 	/* find out the BIOS preprogrammed panel use status... */
 	detect_panels();
 
-//in progress!
-	if (si->ps.secondary_head)
-	{
-		if (si->ps.card_type != NV11)
-		{
-			uint8 monitors = 0x00;
-
-			/* presetup by the card's BIOS, we can't change this (lack of info) */
-			if (si->ps.tmds1_active) monitors |= 0x01;
-			if (si->ps.tmds2_active) monitors |= 0x02;
-//fixme: checkout NV25, NV18, NV11... NV34 must use DAC _and_ DAC2 for det.
-			/* connect analog outputs straight through */
-			nv_general_output_select(false);
-			/* sense analog monitor on primary connector */
-			if (nv_dac_crt_connected()) monitors |= 0x04;
-			/* cross connect analog outputs */
-			nv_general_output_select(true);
-			/* sense analog monitor on secondary connector */
-			if (nv_dac_crt_connected()) monitors |= 0x08;
-			/* re-connect analog outputs straight through */
-			nv_general_output_select(false);
-
-//fixme! two monitors on one DAC _can_ happen!!! (switch analog outputs then!)
-			switch (monitors)
-			{
-			case 0x01:	/* digital panel on DAC1, nothing on DAC2 */
-			case 0x04:	/* analog panel or CRT on DAC1, nothing on DAC2 */
-			case 0x05:	/* both types on DAC1, nothing on DAC2 (shouldn't happen) */
-				LOG(2,("INFO: head 1 has a monitor only: defaulting to head 1 use\n"));
-				break;
-			case 0x02:	/* digital panel on DAC2, nothing on DAC1 */
-			case 0x08:	/* analog panel or CRT on DAC2, nothing on DAC1 */
-			case 0x0a:	/* both types on DAC2, nothing on DAC1 (shouldn't happen) */
-				LOG(2,("INFO: head 2 has a monitor only: defaulting to head 2 use\n"));
-				si->ps.crtc2_prim = true;
-				break;
-			default:	/* monitors found on both DACs, or nothing found at all */
-				LOG(2,("INFO: head 2 has a monitor only: defaulting to head 2 use\n"));
-				break;
-			}
-		}
-		else
-		{
-			LOG(4,("INFO: NV11 outputs are hardwired to be straight-through\n"));
-		}
-	}
-//
-
-//fixme: remove..
-	/* if no panel, but one analog monitor is detected, and it's on the secondary
-	 * head on dualhead cards, we use that head as primary head */
-/*	if (si->ps.secondary_head && !si->ps.tmds1_active && !si->ps.tmds2_active)
-	{
-		if (nv_dac2_crt_connected() && !nv_dac_crt_connected())
-		{
-			LOG(2,("INFO: CRTC2 has a monitor only: defaulting to CRTC2 use\n"));
-			si->ps.crtc2_prim = true;
-		}
-	}
-*/
+	/* determine and setup output devices and heads */
+	setup_output_matrix();
 
 	/* select other CRTC for primary head use if specified by user in settings file */
 	if (si->ps.secondary_head && si->settings.switchhead)
 	{
-		LOG(2,("INFO: switching CRTC's (specified in settings file)\n"));
+		LOG(2,("INFO: inverting head use (specified in settings file)\n"));
 		si->ps.crtc2_prim = !si->ps.crtc2_prim;
 	}
 }
@@ -384,7 +327,6 @@ static void detect_panels()
 	si->ps.master_tmds2 = false;
 	si->ps.tmds1_active = false;
 	si->ps.tmds2_active = false;
-	si->ps.crtc2_prim = false;
 	/* determine the situation we are in... (regarding flatpanels) */
 	/* fixme: add VESA DDC EDID stuff one day... */
 	/* fixme: find out how to program those transmitters one day instead of
@@ -495,14 +437,6 @@ static void detect_panels()
 	if (si->ps.tmds2_active)
 		si->ps.panel2_aspect = (si->ps.panel2_width / ((float)si->ps.panel2_height));
 
-	/* if one panel is detected, and it's on the secondary head on dualhead cards,
-	 * we use that head as primary head */
-	if (si->ps.secondary_head && si->ps.tmds2_active && !si->ps.tmds1_active)
-	{
-		LOG(2,("INFO: CRTC2 has a panel only: defaulting to CRTC2 for primary use\n"));
-		si->ps.crtc2_prim = true;
-	}
-
 	/* dump some panel configuration registers... */
 	LOG(2,("INFO: Dumping flatpanel registers:\n"));
 	LOG(2,("DAC1: FP_HDISPEND: %d\n", DACR(FP_HDISPEND)));
@@ -560,6 +494,145 @@ static void detect_panels()
 		LOG(2,("DAC2: FUNCSEL: $%08x\n", NV_REG32(NV32_2FUNCSEL)));
 	}
 	LOG(2,("INFO: End flatpanel registers dump.\n"));
+}
+
+//fixme: in progress!!
+static void setup_output_matrix()
+{
+	/* setup defaults: */
+	/* no monitors (output devices) detected */
+	si->ps.monitors = 0x00;
+	/* head 1 will be the primary head */
+	si->ps.crtc2_prim = false;
+
+	/* setup output devices and heads */
+	if (si->ps.secondary_head)
+	{
+		if (si->ps.card_type != NV11)
+		{
+			/* setup defaults: */
+			/* connect analog outputs straight through */
+			nv_general_output_select(false);
+
+			/* presetup by the card's BIOS, we can't change this (lack of info) */
+			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
+			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
+			/* detect analog monitors (confirmed working OK on NV18, NV28 and NV34): */
+			/* sense analog monitor on primary connector */
+			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			/* sense analog monitor on secondary connector */
+			if (nv_dac2_crt_connected()) si->ps.monitors |= 0x20;
+
+			/* setup correct output and head use */
+			//fixme? add TVout (only, so no CRT(s) connected) support...
+			switch (si->ps.monitors)
+			{
+			case 0x00: /* no monitor found at all */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x01: /* digital panel on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x02: /* analog panel or CRT on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x03: /* both types on head 1, nothing on head 2 */
+				LOG(2,("INFO: head 1 has a digital panel AND an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has nothing connected:\n"));
+				LOG(2,("INFO: correcting...\n"));
+				/* cross connect analog outputs so analog panel or CRT gets head 2 */
+				nv_general_output_select(true);
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x10: /* nothing on head 1, digital panel on head 2 */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			case 0x20: /* nothing on head 1, analog panel or CRT on head 2 */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			case 0x30: /* nothing on head 1, both types on head 2 */
+				LOG(2,("INFO: head 1 has nothing connected;\n"));
+				LOG(2,("INFO: head 2 has a digital panel AND an analog panel or CRT:\n"));
+				LOG(2,("INFO: correcting...\n"));
+				/* cross connect analog outputs so analog panel or CRT gets head 1 */
+				nv_general_output_select(true);
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			case 0x11: /* digital panels on both heads */
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x12: /* analog panel or CRT on head 1, digital panel on head 2 */
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has a digital panel:\n"));
+				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
+				si->ps.crtc2_prim = true;
+				break;
+			case 0x21: /* digital panel on head 1, analog panel or CRT on head 2 */
+				LOG(2,("INFO: head 1 has a digital panel;\n"));
+				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			case 0x22: /* analog panel(s) or CRT(s) on both heads */
+				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
+				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			default: /* more than two monitors connected to just two outputs: illegal! */
+				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
+				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
+				break;
+			}
+		}
+		else /* dualhead NV11 cards */
+		{
+			/* confirmed no analog output switch-options for NV11 */
+			LOG(2,("INFO: NV11 outputs are hardwired to be straight-through\n"));
+
+			/* presetup by the card's BIOS, we can't change this (lack of info) */
+			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
+			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
+			/* detect analog monitor (confirmed working OK on NV11): */
+			/* sense analog monitor on primary connector */
+			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			/* (sense analog monitor on secondary connector is impossible on NV11) */
+
+			/* setup correct output and head use */
+			//fixme? add TVout (only, so no CRT(s) connected) support...
+			switch (si->ps.monitors)
+			{
+				//fixme: add/setup NV11 matrix use!!!
+			}
+		}
+	}
+	else /* singlehead cards */
+	{
+		/* presetup by the card's BIOS, we can't change this (lack of info) */
+		if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
+		/* detect analog monitor (confirmed working OK on all cards): */
+		/* sense analog monitor on primary connector */
+		if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+
+		//fixme? add TVout (only, so no CRT connected) support...
+	}
 }
 
 void get_panel_modelines(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
@@ -1080,5 +1153,6 @@ void dump_pins(void)
 		LOG(2,("panel width: %d, height: %d, aspect ratio: %1.2f\n",
 			si->ps.panel2_width, si->ps.panel2_height, si->ps.panel2_aspect));
 	}
+	LOG(2,("monitor (output devices) setup matrix: $%02x\n", si->ps.monitors));
 	LOG(2,("INFO: end pinsdump.\n"));
 }

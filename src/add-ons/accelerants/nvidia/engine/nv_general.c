@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-14 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-15 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -882,8 +882,7 @@ status_t nv_general_output_select(bool cross)
 	/* make sure this call is warranted */
 	if (si->ps.secondary_head)
 	{
-		/* NV11 cards can't switch heads; we lack info to switch heads via outputs
-		 * if flatpanels are used */
+		/* NV11 cards can't switch heads (confirmed) */
 		if (si->ps.card_type != NV11)
 		{
 			if (cross)
@@ -892,7 +891,7 @@ status_t nv_general_output_select(bool cross)
 
 				/* enable head 2 on connector 1 */
 				/* (b8 = select CRTC (head) for output,
-				 *  b4 = enable DVI???,
+				 *  b4 = ??? (confirmed not to be a FP switch),
 				 *  b0 = enable CRT) */
 				DACW(OUTPUT, 0x00000101);
 				/* enable head 1 on connector 2 */
