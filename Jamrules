@@ -267,8 +267,8 @@ rule TestLib
 	MakeLocateObjects $(sources) ;
 	Main $(target) : $(sources) ;
 	MakeLocate $(target) : $(dest) ;
-	DEPENDS $(target) : libcppunit.so ;
-	DEPENDS obostests : $(target) ;
+	Depends $(target) : libcppunit.so ;
+	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
 	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
@@ -313,12 +313,12 @@ rule R5TestLib
 	{
 		local object = [ R5ObjectNames $(source) ] ;
 		Object $(object) : $(source) ;
-		Depends obj : $(object) ;
+		LocalDepends obj : $(object) ;
 	}
 
 	MakeLocate $(target) : $(dest) ;
-	DEPENDS $(target) : libcppunit.so ;
-	DEPENDS r5tests : $(target) ;
+	Depends $(target) : libcppunit.so ;
+	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
 	ObjectDefines $(objects) : TEST_R5 ;
 	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
