@@ -1422,8 +1422,10 @@ vfs_get_vnode_cache(void *_vnode, void **_cache)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	if (vnode->cache != NULL)
+	if (vnode->cache != NULL) {
+		*_cache = vnode->cache;
 		return B_OK;
+	}
 
 	mutex_lock(&sVnodeMutex);
 
@@ -1431,7 +1433,8 @@ vfs_get_vnode_cache(void *_vnode, void **_cache)
 	// The cache could have been created in the meantime
 	if (vnode->cache == NULL)
 		status = vm_create_vnode_cache(vnode, (void **)&vnode->cache);
-	else
+
+	if (status == B_OK)
 		*_cache = vnode->cache;
 
 	mutex_unlock(&sVnodeMutex);
