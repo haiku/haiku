@@ -40,6 +40,7 @@ void vm_put_region(vm_region *region);
 struct team;
 area_id create_area_etc(struct team *team, char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection);
+status_t delete_area_etc(struct team *team, area_id area);
 
 region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);
