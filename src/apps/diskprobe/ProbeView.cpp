@@ -34,6 +34,7 @@
 #include <fs_attr.h>
 
 #include <stdio.h>
+#include <string.h>
 
 
 #define DRAW_SLIDER_BAR
@@ -971,11 +972,11 @@ ProbeView::UpdateAttributesMenu(BMenu *menu)
 void 
 ProbeView::AddSaveMenuItems(BMenu *menu, int32 index)
 {
-	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Save", new BMessage(B_SAVE_REQUESTED)), index++);
-	item->SetTarget(this);
-	item->SetEnabled(false);
-	//menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS, NULL));
+	menu->AddItem(fSaveMenuItem = new BMenuItem("Save", new BMessage(B_SAVE_REQUESTED),
+		'S', B_COMMAND_KEY), index);
+	fSaveMenuItem->SetTarget(this);
+	fSaveMenuItem->SetEnabled(false);
+	//menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS, NULL), index);
 }
 
 
@@ -1235,6 +1236,13 @@ void
 ProbeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
+		case B_SAVE_REQUESTED:
+		{
+			status_t status = fEditor.Save();
+			printf("save returned: %s\n", strerror(status));
+			break;
+		}
+
 		case B_OBSERVER_NOTICE_CHANGE: {
 			int32 what;
 			if (message->FindInt32(B_OBSERVE_WHAT_CHANGE, &what) != B_OK)
@@ -1318,6 +1326,9 @@ ProbeView::MessageReceived(BMessage *message)
 
 			if (message->FindBool("can_redo", &enabled) == B_OK)
 				fRedoMenuItem->SetEnabled(enabled);
+
+			if (message->FindBool("modified", &enabled) == B_OK)
+				fSaveMenuItem->SetEnabled(enabled);
 			break;
 		}
 

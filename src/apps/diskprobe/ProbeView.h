@@ -53,6 +53,7 @@ class ProbeView : public BView {
 		BMenuItem		*fPasteMenuItem;
 		BMenuItem		*fUndoMenuItem, *fRedoMenuItem;
 		BMenuItem		*fNativeMenuItem, *fSwappedMenuItem;
+		BMenuItem		*fSaveMenuItem;
 };
 
 #endif	/* PROBE_VIEW_H */
