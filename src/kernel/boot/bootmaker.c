@@ -426,8 +426,8 @@ void makeboot(section *s, char *outfile)
         
         if(!type) die("section %s has no type",s->name);
 
-        strncpy(centry.be_name,s->name,32);
-        centry.be_name[31] = 0;
+        strncpy(centry.be_name,s->name, BOOTDIR_NAMELEN);
+        centry.be_name[BOOTDIR_NAMELEN - 1] = 0;
 
         if(!file) die("section %s has no file",s->name);
         rawdata[c]= ((strcmp(type, "elf32")==0)?loadstripfile:loadfile)(file,&rawsize[c]);
@@ -475,7 +475,7 @@ void makeboot(section *s, char *outfile)
         c++;
         s = s->next;
         
-        if(c==64) die("too many sections (>63)",NULL);
+        if(c == BOOTDIR_MAX_ENTRIES) die("too many sections (>63)",NULL);
     }
 
     if((fd = open(outfile, O_BINARY|O_WRONLY|O_CREAT|O_TRUNC, 0666)) < 0) {
