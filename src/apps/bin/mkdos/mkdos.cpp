@@ -433,15 +433,13 @@ status_t Initialize(int fatbits, const char *device, const char *label, bool nop
 		printf("Initializing will erase all existing data on the drive.\n");
 		printf("Do you wish to proceed? ");
 		char answer[1000];
-		char *p = answer;
+		char *p;
 		memset(answer, 0, 1000);
 		fflush(stdout);
-		while ((p < answer + 1000) && (read(0, p, 1) == 1) && (*p != '\n') && (*p != '\r'))
-			p++;
-		*p = '\0';
-		
-		//scanf("%s",answer); //XXX who wants to fix this buffer overflow?
-		if ((strlen(answer) < 1) || (0 != strncasecmp(answer, "yes", strlen(answer)))) {
+		p = fgets(answer, 1000, stdin);
+		if (p && (p=strchr(p, '\n')))
+			*p = '\0'; /* remove newline */
+		if ((p == NULL) || (strlen(answer) < 1) || (0 != strncasecmp(answer, "yes", strlen(answer)))) {
 			printf("drive NOT initialized\n");
 			close(fd);
 			return B_OK;
