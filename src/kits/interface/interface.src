@@ -9,6 +9,7 @@ INTERFACE_KIT_SOURCE =
 	CheckBox.cpp
 	ClientFontList.cpp
 	ColorUtils.cc
+	ColorControl.cpp
 	Control.cpp
 	Deskbar.cpp
 	Dragger.cpp
@@ -30,7 +31,7 @@ INTERFACE_KIT_SOURCE =
 	Point.cpp
 	Polygon.cpp
 	PopUpMenu.cpp
-	#PrintJob.cpp
+	PrintJob.cpp
 	PrivateScreen.cpp
 	RadioButton.cpp
 	Rect.cpp
