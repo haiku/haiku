@@ -1,12 +1,14 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci ;
 
-KernelStaticLibrary pci_bus_manager :
-	pci.c
+KernelMergeObject pci_bus_manager.o : 
+	<$(SOURCE_GRIST)>pci.c
+	:
+	-fno-pic -Wno-unused -D_KERNEL_MODE
 	;
 
 KernelLd pci :
-	pci_bus_manager.a
-	pci_arch_$(OBOS_ARCH)_bus_manager.a
+	pci_bus_manager.o
+	pci_arch_$(OBOS_ARCH)_bus_manager.o
 	kernel.so
 	:
 	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
