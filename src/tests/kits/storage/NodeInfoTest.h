@@ -8,6 +8,7 @@
 #include <BasicTest.h>
 
 class BApplication;
+class BBitmap;
 class CppUnit::Test;
 
 class NodeInfoTest : public BasicTest
@@ -34,6 +35,10 @@ public:
 
 private:
 	BApplication	*fApplication;
+	BBitmap			*fIconM1;
+	BBitmap			*fIconM2;
+	BBitmap			*fIconL1;
+	BBitmap			*fIconL2;
 };
 
 #endif	// NODE_INFO_TEST_H
