@@ -13,6 +13,28 @@ namespace DiskDevice {
 
 // helper functions
 
+// min
+template<typename T>
+static inline
+const T&
+min(const T &a, const T &b)
+{
+	if (a < b)
+		return a;
+	return b;
+}
+
+// max
+template<typename T>
+static inline
+const T&
+max(const T &a, const T &b)
+{
+	if (a < b)
+		return b;
+	return a;
+}
+
 // set_string
 static inline
 status_t
