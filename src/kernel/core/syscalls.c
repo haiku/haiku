@@ -203,7 +203,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_release_sem_etc((sem_id)arg0, (int)arg1, (int)arg2);
 			break;
 		case SYSCALL_GET_CURRENT_THREAD_ID:
-			*call_ret = thread_get_current_thread()->id;
+			*call_ret = thread_get_current_thread_id();
 			break;
 		case SYSCALL_EXIT_THREAD:
 			sys_exit_thread((status_t)arg0);
