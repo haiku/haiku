@@ -2,5 +2,3 @@
 - make sure all packets are received
 - Confirm to the Opentracker coding guidelines
 - Implement the free_hook
-- Think of a less memory intensive way
-- Hammer out the kernel panics caused by the read_hook and the packetlist.*
