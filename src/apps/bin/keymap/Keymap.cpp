@@ -25,6 +25,13 @@
 
 #define CHARS_TABLE_MAXSIZE  10000
 
+Keymap::Keymap()
+	: fChars(NULL),
+	fCharsSize(0)
+{
+}
+
+
 void 
 Keymap::GetKey( char *chars, int32 offset, char* string) 
 {
