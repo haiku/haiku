@@ -1,23 +1,24 @@
 SubDir OBOS_TOP src kernel core arch ppc ;
 
 KernelStaticLibrary libppc :
-	<$(SOURCE_GRIST)>arch_atomic.c
-	<$(SOURCE_GRIST)>arch_cpu.c
-	<$(SOURCE_GRIST)>arch_cpu_asm.S
-	<$(SOURCE_GRIST)>arch_dbg_console.c
-	<$(SOURCE_GRIST)>arch_debug.c
-	<$(SOURCE_GRIST)>arch_elf.c
-	<$(SOURCE_GRIST)>arch_exceptions.S
-	<$(SOURCE_GRIST)>arch_faults.c
-	<$(SOURCE_GRIST)>arch_int.c
-	<$(SOURCE_GRIST)>arch_mmu.cpp
-	<$(SOURCE_GRIST)>arch_real_time_clock.c
-	<$(SOURCE_GRIST)>arch_smp.c
-	<$(SOURCE_GRIST)>arch_thread.c
-	<$(SOURCE_GRIST)>arch_timer.c
-	<$(SOURCE_GRIST)>arch_vm.cpp
-	<$(SOURCE_GRIST)>arch_vm_translation_map.cpp
-	<$(SOURCE_GRIST)>arch_asm.S
+	arch_atomic.c
+	arch_cpu.c
+	arch_cpu_asm.S
+	arch_dbg_console.c
+	arch_debug.c
+	arch_elf.c
+	arch_exceptions.S
+	arch_faults.c
+	arch_int.c
+	arch_mmu.cpp
+	arch_real_time_clock.c
+	arch_smp.c
+	arch_system_info.c
+	arch_thread.c
+	arch_timer.c
+	arch_vm.cpp
+	arch_vm_translation_map.cpp
+	arch_asm.S
 	:
 	-fno-pic -Wno-unused
 	;
