@@ -305,7 +305,7 @@ BMimeType::Contains(const BMimeType *type) const
 	
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::Install()
@@ -341,7 +341,7 @@ BMimeType::Install()
 	
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::Delete()
@@ -379,7 +379,7 @@ BMimeType::Delete()
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
-	- "error code": Failure	
+	- other error code: Failure	
 
 */
 status_t
@@ -409,7 +409,7 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No preferred app exists for the given type and app_verb
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetPreferredApp(char *signature, app_verb verb) const
@@ -468,7 +468,7 @@ BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 	            the MIME type's associated file attributes is stored.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetAttrInfo(BMessage *info) const
@@ -505,7 +505,7 @@ BMimeType::GetAttrInfo(BMessage *info) const
 	                  MIME type's associated file extensions will be stored.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetFileExtensions(BMessage *extensions) const
@@ -527,7 +527,7 @@ BMimeType::GetFileExtensions(BMessage *extensions) const
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No short description exists for the given type
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetShortDescription(char *description) const
@@ -549,7 +549,7 @@ BMimeType::GetShortDescription(char *description) const
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No long description exists for the given type
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetLongDescription(char *description) const
@@ -612,7 +612,7 @@ BMimeType::GetLongDescription(char *description) const
 	                  of the supporting applications will be copied.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure	
+	- other error code: Failure	
 */
 status_t
 BMimeType::GetSupportingApps(BMessage *signatures) const
@@ -655,7 +655,7 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 					 and \c B_MINI_ICON are supported.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure	
+	- other error code: Failure	
  
 */
 status_t
@@ -682,7 +682,7 @@ BMimeType::SetIcon(const BBitmap *icon, icon_size which)
 	            Currently, the only supported app verb is \c B_OPEN.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetPreferredApp(const char *signature, app_verb verb)
@@ -760,7 +760,7 @@ BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 	            MIME type.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetAttrInfo(const BMessage *info)
@@ -817,7 +817,7 @@ BMimeType::SetAttrInfo(const BMessage *info)
 	                  the new list of file extensions to associate with this MIME type.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetFileExtensions(const BMessage *extensions)
@@ -857,7 +857,7 @@ BMimeType::SetFileExtensions(const BMessage *extensions)
 	\param description Pointer to a pre-allocated string containing the new short description
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetShortDescription(const char *description)
@@ -899,7 +899,7 @@ BMimeType::SetShortDescription(const char *description)
 	\param description Pointer to a pre-allocated string containing the new long description
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetLongDescription(const char *description)
@@ -941,7 +941,7 @@ BMimeType::SetLongDescription(const char *description)
 	                   MIME supertypes will be copied.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetInstalledSupertypes(BMessage *supertypes)
@@ -977,7 +977,7 @@ BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 	             MIME types will be copied.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetInstalledTypes(BMessage *types)
@@ -998,7 +998,7 @@ BMimeType::GetInstalledTypes(BMessage *types)
 	                MIME subtypes will be copied.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure		
+	- other error code: Failure		
 */
 status_t
 BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
@@ -1039,7 +1039,7 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 	                 applications supporting files of any type are copied.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure	
+	- other error code: Failure	
 */
 status_t
 BMimeType::GetWildcardApps(BMessage *wild_ones)
@@ -1117,7 +1117,7 @@ bool isValidMimeChar(const char ch)
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No app hint exists for the given type
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::GetAppHint(entry_ref *ref) const
@@ -1144,7 +1144,7 @@ BMimeType::GetAppHint(entry_ref *ref) const
 	\param ref Pointer to a pre-allocated \c entry_ref containting the location of the new app hint
 	\return
 	- \c B_OK: Success
-	- "error code": Failure
+	- other error code: Failure
 */
 status_t
 BMimeType::SetAppHint(const entry_ref *ref)
@@ -1199,7 +1199,7 @@ BMimeType::SetAppHint(const entry_ref *ref)
 	\return
 	- \c B_OK: Success
 	- \c B_ENTRY_NOT_FOUND: No icon of the given size exists for the given type
-	- "error code": Failure	
+	- other error code: Failure	
 
 */
 status_t
@@ -1244,7 +1244,7 @@ BMimeType::GetIconForType(const char *type, BBitmap *icon, icon_size which) cons
 					 and \c B_MINI_ICON are supported.
 	\return
 	- \c B_OK: Success
-	- "error code": Failure	
+	- other error code: Failure	
 
 */
 status_t
@@ -1453,7 +1453,7 @@ BMimeType::CheckSnifferRule(const char *rule, BString *parseError)
 	"application/octet-stream", the filename is examined for extensions.
 
 	\param ref Pointer to the entry_ref referring to the entry.
-	\param result Pointer to a pre-allocated BMimeType which is set to the
+	\param type Pointer to a pre-allocated BMimeType which is set to the
 		   resulting MIME type.
 	\return
 	- \c B_OK: Everything went fine.
@@ -1461,25 +1461,69 @@ BMimeType::CheckSnifferRule(const char *rule, BString *parseError)
 	- \c B_NAME_NOT_FOUND: \a ref refers to an abstract entry.
 */
 status_t
-BMimeType::GuessMimeType(const entry_ref *file, BMimeType *result)
+BMimeType::GuessMimeType(const entry_ref *file, BMimeType *type)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = file && type ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_SNIFF);
+	BMessage reply;
+	status_t result;
+	const char *str;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddRef("file ref", file);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindString("mime type", &str);
+	if (!err)
+		err = type->SetTo(str);
+	return err;	
 }
 
 // GuessMimeType
 /*!	\brief Guesses a MIME type for the supplied chunk of data.
 	\param buffer Pointer to the data buffer.
 	\param length Size of the buffer in bytes.
-	\param result Pointer to a pre-allocated BMimeType which is set to the
+	\param type Pointer to a pre-allocated BMimeType which is set to the
 		   resulting MIME type.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a buffer or \a result.
 */
 status_t
-BMimeType::GuessMimeType(const void *buffer, int32 length, BMimeType *result)
+BMimeType::GuessMimeType(const void *buffer, int32 length, BMimeType *type)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = buffer && type ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_SNIFF);
+	BMessage reply;
+	status_t result;
+	const char *str;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddData("data", B_RAW_TYPE, buffer, length);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindString("mime type", &str);
+	if (!err)
+		err = type->SetTo(str);
+	return err;
 }
 
 // GuessMimeType
@@ -1489,16 +1533,38 @@ BMimeType::GuessMimeType(const void *buffer, int32 length, BMimeType *result)
 	doesn't need to exist at all.
 
 	\param filename The filename.
-	\param result Pointer to a pre-allocated BMimeType which is set to the
+	\param type Pointer to a pre-allocated BMimeType which is set to the
 		   resulting MIME type.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a ref or \a result.
 */
 status_t
-BMimeType::GuessMimeType(const char *filename, BMimeType *result)
+BMimeType::GuessMimeType(const char *filename, BMimeType *type)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = filename && type ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_SNIFF);
+	BMessage reply;
+	status_t result;
+	const char *str;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("filename", filename);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindString("mime type", &str);
+	if (!err)
+		err = type->SetTo(str);
+	return err;	
 }
 
 // StartWatching
@@ -1739,6 +1805,45 @@ BMimeType::SetSupportedTypes(const BMessage *types, bool fullSync)
 		err = result;	
 	return err;	
 }
+
+// GetAssociatedTypes
+/*! \brief Returns a list of mime types associated with the given file extension
+
+	The list of types is returned in the pre-allocated \c BMessage pointed to
+	by \a types. The types are stored in the message's "types" field, which
+	is an array of \c B_STRING_TYPE values.
+	
+	\param extension The file extension of interest
+	\param types Pointer to a pre-allocated BMessage into which the result will
+	             be stored
+	             
+	\return
+	- \c B_OK: success
+	- other error code: failure
+*/
+status_t
+BMimeType::GetAssociatedTypes(const char *extension, BMessage *types)
+{
+	status_t err = extension && types ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_GET_ASSOCIATED_TYPES);
+	BMessage &reply = *types;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("extension", extension);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	return err;	
+}
+
 
 // Returns a lowercase version of str in result. Result must
 // be preallocated and is assumed to be of adequate length.

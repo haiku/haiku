@@ -12,12 +12,14 @@
 #include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <Locker.h>
 #include <Message.h>
 #include <mime/database_access.h>
 #include <mime/database_support.h>
 #include <MimeType.h>
 #include <Node.h>
 #include <Path.h>
+#include <String.h>
 #include <storage_support.h>
 #include <TypeConstants.h>
 
@@ -43,6 +45,28 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+// update_mime_info_async_params
+/*! \brief All the neccessary data for managing an asynchronous update_mime_info()
+	call bundled into a single struct.
+*/
+struct update_mime_info_async_data : public async_thread_data {
+public:
+	entry_ref ref;
+	bool recursive;
+	bool force;
+	
+	update_mime_info_async_data(const entry_ref *ref, bool recursive, bool force)
+		: async_thread_data()
+		, ref(ref ? *ref : entry_ref())
+		, recursive(recursive)
+		, force(force)
+	{
+	}
+private:
+	update_mime_info_async_data();
+};
+
+
 /*!
 	\class Database
 	\brief Mime::Database is the master of the MIME data base.
@@ -67,9 +91,28 @@ Database::Database()
 
 // destructor
 /*!	\brief Frees all resources associated with this object.
+
+	Any currently running asynchronous update threads are instructed
+	to politely exit and then waited on. 
 */
 Database::~Database()
 {
+	std::list<async_thread_data*>::iterator i;
+	DBG(OUT("Asking async threads to quit...\n"));
+	for (i = fAsyncThreads.begin();
+			i != fAsyncThreads.end();
+				i++)
+	{
+		DBG(OUT(" id == %ld\n", (*i)->id));
+		(*i)->post_exit_notification();
+	}
+	for (i = fAsyncThreads.begin();
+			i != fAsyncThreads.end();
+				i++)
+	{
+		status_t exitValue;
+		wait_for_thread((*i)->id, &exitValue);
+	}
 }
 
 // InitCheck
@@ -396,8 +439,6 @@ Database::SetPreferredApp(const char *type, const char *signature, app_verb verb
 
 // SetSnifferRule
 /*! \brief Sets the mime sniffer rule for the given mime type
-	
-	\todo This ought to trigger an update to the sniffer rule manager whenever we write one
 */
 status_t
 Database::SetSnifferRule(const char *type, const char *rule)
@@ -408,6 +449,8 @@ Database::SetSnifferRule(const char *type, const char *rule)
 	if (!err)
 		err = write_mime_attr(type, kSnifferRuleAttr, rule, strlen(rule)+1,
 		                        kSnifferRuleType, &didCreate);
+	if (!err)
+		err = fSnifferRules.SetSnifferRule(type, rule);
 	if (!err && didCreate)
 		err = SendInstallNotification(type);
 	if (!err)
@@ -532,6 +575,101 @@ Database::GetSupportingApps(const char *type, BMessage *signatures)
 	return fSupportingApps.GetSupportingApps(type, signatures);
 }
 
+// GetAssociatedTypes
+/*! \brief Returns a list of mime types associated with the given file extension
+
+	Please see BMimeType::GetAssociatedTypes() for more details.
+*/
+status_t
+Database::GetAssociatedTypes(const char *extension, BMessage *types)
+{
+	return B_ERROR;
+}
+
+// GuessMimeType
+/*!	\brief Guesses a MIME type for the entry referred to by the given
+	\c entry_ref.
+	
+	This version of GuessMimeType() combines the features of the other
+	versions: First the data of the given file are checked (sniffed).
+	If sniffing fails, the filename is examined for extensions. If this
+	fails, the "application/octet-stream" is returned.
+	
+	\param ref Pointer to the entry_ref referring to the entry.
+	\param type Pointer to a pre-allocated BString which is set to the
+		   resulting MIME type.
+	\return
+	- \c B_OK: success (even if the guess returned is "application/octet-stream")
+	- other error code: failure
+*/
+status_t
+Database::GuessMimeType(const entry_ref *file, BString *result)
+{
+	status_t err = file && result ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = fSnifferRules.GuessMimeType(file, result);
+	if (err == kMimeGuessFailureError)
+		err = fAssociatedTypes.GuessMimeType(file, result);
+	if (err == kMimeGuessFailureError) {
+		result->SetTo(kGenericFileType);
+		err = B_OK;
+	}
+	return err;
+}
+
+// GuessMimeType
+/*!	\brief Guesses a MIME type for the supplied chunk of data.
+
+	See \c SnifferRules::GuessMimeType(BPositionIO*, BString*)
+	for more details.
+
+	\param buffer Pointer to the data buffer.
+	\param length Size of the buffer in bytes.
+	\param type Pointer to a pre-allocated BString which is set to the
+		   resulting MIME type.
+	\return
+	- \c B_OK: success
+	- error code: failure
+*/
+status_t
+Database::GuessMimeType(const void *buffer, int32 length, BString *result)
+{
+	status_t err = buffer && result ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = fSnifferRules.GuessMimeType(buffer, length, result);
+	if (err == kMimeGuessFailureError) {
+		result->SetTo(kGenericFileType);
+		err = B_OK;
+	}
+	return err;
+}
+
+// GuessMimeType
+/*!	\brief Guesses a MIME type for the given filename.
+
+	Only the filename itself is taken into consideration (in particular its
+	name extension), not the entry or corresponding data it refers to (in fact,
+	an entry with that name need not exist at all.
+
+	\param filename The filename.
+	\param type Pointer to a pre-allocated BString which is set to the
+		   resulting MIME type.
+	\return
+	- \c B_OK: success
+	- error code: failure
+*/
+status_t
+Database::GuessMimeType(const char *filename, BString *result)
+{
+	status_t err = filename && result ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = fAssociatedTypes.GuessMimeType(filename, result);
+	if (err == kMimeGuessFailureError) {
+		result->SetTo(kGenericFileType);
+		err = B_OK;
+	}
+	return err;
+}
 
 // StartWatching
 //!	Subscribes the given BMessenger to the MIME monitor service
@@ -827,6 +965,8 @@ Database::DeleteSnifferRule(const char *type)
 {
 	status_t err = delete_attribute(type, kSnifferRuleAttr);
 	if (!err)
+		err = fSnifferRules.DeleteSnifferRule(type);
+	if (!err)
 		err = SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type, B_META_MIME_DELETED);
 	return err;
 }
@@ -865,6 +1005,62 @@ Database::DeleteSupportedTypes(const char *type, bool fullSync)
 	return err;
 }
 
+// UpdateMimeInfoAsync
+/*! \brief Performs the corresponding update_mime_info() call asynchronously (i.e
+	in a new thread).
+	
+*/
+status_t
+Database::UpdateMimeInfoAsync(const entry_ref *ref, bool recursive, bool force)
+{
+	thread_id id = -1;
+	status_t err;
+	update_mime_info_async_data *data;
+	
+	data = new(nothrow) update_mime_info_async_data(ref, recursive, force);
+	err = data ? B_OK : B_NO_MEMORY;
+	// Spawn the thread
+	if (!err) {	
+		id = spawn_thread(&Database::UpdateMimeInfoAsyncEntry, "mime updater (umi)",
+						    B_NORMAL_PRIORITY, (void*)data);
+		err = id >= 0 ? B_OK : id;
+	}
+	// Update the thread_id, store the thread info, and get it running
+	if (!err) {
+		data->id = id;
+		fAsyncThreads.push_back(data);
+		err = resume_thread(id);
+	}
+	if (!err)
+		DBG(OUT("spawned new update_mime_info() thread, id == %ld\n", id));
+	return err;
+}
+
+// CleanupAfterAsyncThread
+/*! \brief Removes the given thread from the list of currently running asynchronous
+	threads and frees its associated shared \c async_thread_data object.
+*/
+status_t
+Database::CleanupAfterAsyncThread(thread_id id)
+{
+	status_t err = B_ENTRY_NOT_FOUND;
+	std::list<async_thread_data*>::iterator i;
+	for (i = fAsyncThreads.begin(); i != fAsyncThreads.end(); i++) {
+		if (*i) {
+			if ((*i)->id == id) {
+				delete *i;
+				fAsyncThreads.erase(i);
+				err = B_OK;
+				break;
+			}			
+		} else {
+			OUT("WARNING: NULL async_thread_data pointer found in Mime::Database::fAsyncThreads list\n");
+			fAsyncThreads.erase(i);
+		}
+	}			
+	return err;
+}
+
 // SendInstallNotification
 //! \brief Sends a \c B_MIME_TYPE_CREATED notification to the mime monitor service
 status_t
@@ -875,6 +1071,8 @@ Database::SendInstallNotification(const char *type)
 	return err;
 }
 
+// SendDeleteNotification
+//! \brief Sends a \c B_MIME_TYPE_DELETED notification to the mime monitor service
 status_t
 //! \brief Sends a \c B_MIME_TYPE_DELETED notification to the mime monitor service
 Database::SendDeleteNotification(const char *type)
@@ -990,17 +1188,27 @@ Database::SendMonitorUpdate(int32 which, const char *type, int32 action) {
 */
 status_t
 Database::SendMonitorUpdate(BMessage &msg) {
-	DBG(OUT("Database::SendMonitorUpdate(BMessage&)\n"));
+//	DBG(OUT("Database::SendMonitorUpdate(BMessage&)\n"));
 	status_t err;
 	std::set<BMessenger>::const_iterator i;
 	for (i = fMonitorMessengers.begin(); i != fMonitorMessengers.end(); i++) {
 		status_t err = (*i).SendMessage(&msg, (BHandler*)NULL);
 		if (err)
-			DBG(OUT("Database::SendMonitorUpdate(BMessage&): BMessenger::SendMessage failed, %p\n", err));
+			DBG(OUT("Database::SendMonitorUpdate(BMessage&): BMessenger::SendMessage failed, 0x%lx\n", err));
 	}
-	DBG(OUT("Database::SendMonitorUpdate(BMessage&) done\n"));
+//	DBG(OUT("Database::SendMonitorUpdate(BMessage&) done\n"));
 	err = B_OK;
 	return err;
+}
+
+// UpdateMimeInfoAsyncEntry(void *data)
+/*! \brief Entry point for asynchronous update_mime_info() threads
+*/
+int32
+Database::UpdateMimeInfoAsyncEntry(void *data)
+{
+	update_mime_info_async_data *info = (update_mime_info_async_data*)data;
+	return update_mime_info(&(info->ref), info->recursive, info->force, info);
 }
 
 } // namespace Mime

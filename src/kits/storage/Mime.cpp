@@ -7,14 +7,25 @@
 	Mime type C functions implementation.
 */
 
+#include <fs_attr.h>
+#include <fs_info.h>
+#include <Drivers.h>
+#include <Entry.h>
 #include <Mime.h>
+#include <MimeType.h>
+#include <mime/database_access.h>
+#include <Node.h>
+#include <RegistrarDefs.h>
+#include <Roster.h>
+
+#include <unistd.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
 // update_mime_info
-/*!	\brief Updates the MIME information for one or more files.
+/*!	\brief Updates the MIME information (i.e MIME type) for one or more files.
 	If \a path points to a file, the MIME information for this file are
 	updated only. If it points to a directory and \a recursive is non-null,
 	the information for all the files in the given directory tree are updated.
@@ -34,7 +45,43 @@ enum {
 int
 update_mime_info(const char *path, int recursive, int synchronous, int force)
 {
-	return NOT_IMPLEMENTED;
+	BEntry root;
+	entry_ref ref; 
+	if (!path)
+		recursive = true;
+		
+	status_t err = root.SetTo(path ? path : "/");
+	if (!err)
+		err = root.GetRef(&ref);
+	if (!err) {
+		// If the call is to be synchronous, handle it locally,
+		// otherwise pass it off to the registrar
+		if (synchronous) {
+			err = BPrivate::Storage::Mime::update_mime_info(&ref, recursive, force);
+		} else {
+			BMessage msg(B_REG_MIME_UPDATE_MIME_INFO_ASYNC);
+			BMessage reply;
+			status_t result;
+			const char *str;
+			
+			// Build and send the message, read the reply
+			if (!err)
+				err = msg.AddRef("entry", &ref);
+			if (!err)
+				err = msg.AddBool("recursive", recursive);
+			if (!err)
+				err = msg.AddBool("force", force);
+			if (!err) 
+				err = _send_to_roster_(&msg, &reply, true);
+			if (!err)
+				err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+			if (!err)
+				err = reply.FindInt32("result", &result);
+			if (!err) 
+				err = result;
+		}
+	}
+	return err;
 }
 
 // create_app_meta_mime
@@ -64,8 +111,14 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 /*!	Retrieves an icon associated with a given device.
 	\param dev The path to the device.
 	\param icon A pointer to a buffer the icon data shall be written to.
-	\param size The size of the icon. Currently the sizes 16 (small) and
-		   32 (large) are supported.
+	\param size The size of the icon. Currently the sizes 16 (small, i.e
+	            \c B_MINI_ICON) and 32 (large, 	i.e. \c B_LARGE_ICON) are
+	            supported.
+	            
+	\todo The mounted directories for volumes can also have META:X:STD_ICON
+		  attributes. Should those attributes override the icon returned
+		  by ioctl(,B_GET_ICON,)?
+		  
 	\return
 	- \c B_OK: Everything went fine.
 	- An error code otherwise.
@@ -73,8 +126,50 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 status_t
 get_device_icon(const char *dev, void *icon, int32 size)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = dev && icon
+				     && (size == B_LARGE_ICON || size == B_MINI_ICON)
+				       ? B_OK : B_BAD_VALUE;
+	
+	int fd = -1;
+	
+	if (!err) {
+		fd = open(dev, O_RDONLY);
+		err = fd != -1 ? B_OK : B_BAD_VALUE;
+	}
+	if (!err) {
+		device_icon iconData = { size, icon };
+		err = ioctl(fd, B_GET_ICON, &iconData);
+	}
+	if (fd != -1) {
+		// If the file descriptor was open()ed, we need to close it
+		// regardless. Only if we haven't yet encountered any errors
+		// do we make note close()'s return value, however.
+		status_t error = close(fd);
+		if (!err)
+			err = error;
+	}
+	return err;	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

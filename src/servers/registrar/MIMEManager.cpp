@@ -4,6 +4,7 @@
 #include <ClassInfo.h>
 #include <Message.h>
 #include <RegistrarDefs.h>
+#include <String.h>
 #include <TypeConstants.h>
 
 #include <stdio.h>
@@ -114,12 +115,82 @@ MIMEManager::MessageReceived(BMessage *message)
 
 		case B_REG_MIME_GET_SUPPORTING_APPS:
 		{
-			BMessage reply;
 			const char *type;
 			err = message->FindString("type", &type);
 			if (!err) 
 				err = fDatabase.GetSupportingApps(type, &reply);
 				
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			message->SendReply(&reply, this);				
+			break;
+		}
+		
+		case B_REG_MIME_GET_ASSOCIATED_TYPES:
+		{
+			const char *extension;
+			err = message->FindString("extension", &extension);
+			if (!err)
+				err = fDatabase.GetAssociatedTypes(extension, &reply);
+				
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			message->SendReply(&reply, this);				
+			break;
+		}
+		
+		case B_REG_MIME_SNIFF:
+		{
+			BString str;
+			entry_ref ref;
+			const char *filename;
+			err = message->FindString("filename", &filename);
+			if (!err)
+				err = fDatabase.GuessMimeType(filename, &str);
+			else if (err == B_NAME_NOT_FOUND) {
+				err = message->FindRef("file ref", &ref);
+				if (!err)
+					err = fDatabase.GuessMimeType(&ref, &str);
+				else if (err == B_NAME_NOT_FOUND) {
+//					err = message->FindData("file ref", &ref);
+//					if (!err)
+//						err = fDatabase.GuessMimeType(data, length, &str);
+				}
+			}
+			if (!err)
+				err = reply.AddString("mime type", str);
+								
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			message->SendReply(&reply, this);				
+			break;		
+		}
+		
+		case B_REG_MIME_UPDATE_MIME_INFO_ASYNC:
+		{
+			entry_ref ref;
+			bool recursive, force;
+			err = message->FindRef("entry", &ref);
+			if (!err)
+				err = message->FindBool("recursive", &recursive);
+			if (!err)
+				err = message->FindBool("force", &force);
+			if (!err) 
+				err = fDatabase.UpdateMimeInfoAsync(&ref, recursive, force);
+		
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			message->SendReply(&reply, this);				
+			break;
+		}
+		
+		case B_REG_MIME_ASYNC_THREAD_FINISHED:
+		{
+			thread_id id;
+			err = message->FindInt32("thread id", &id);
+			if (!err)
+				err = fDatabase.CleanupAfterAsyncThread(id);
+
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
 			message->SendReply(&reply, this);				

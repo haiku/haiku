@@ -10,9 +10,12 @@
 #ifndef _MIME_DATABASE_H
 #define _MIME_DATABASE_H
 
-#include <mime/InstalledTypes.h>
-#include <mime/SupportingApps.h>
 #include <Mime.h>
+#include <mime/AssociatedTypes.h>
+#include <mime/InstalledTypes.h>
+#include <mime/SnifferRules.h>
+#include <mime/SupportingApps.h>
+#include <mime/database_access.h>
 #include <Messenger.h>
 #include <StorageDefs.h>
 
@@ -23,6 +26,9 @@
 class BNode;
 class BBitmap;
 class BMessage;
+class BString;
+
+struct entry_ref;
 
 namespace BPrivate {
 namespace Storage {
@@ -58,13 +64,12 @@ public:
 	status_t GetInstalledTypes(const char *super_type,
 									  BMessage *subtypes);
 	status_t GetSupportingApps(const char *type, BMessage *signatures);
+	status_t GetAssociatedTypes(const char *extension, BMessage *types);
 
 	// Sniffer
-//	static status_t CheckSnifferRule(const char *rule, BString *parseError);
-//	static status_t GuessMimeType(const entry_ref *file, BMimeType *result);
-//	static status_t GuessMimeType(const void *buffer, int32 length,
-//								  BMimeType *result);
-//	static status_t GuessMimeType(const char *filename, BMimeType *result);
+	status_t GuessMimeType(const entry_ref *file, BString *result);
+	status_t GuessMimeType(const void *buffer, int32 length, BString *result);
+	status_t GuessMimeType(const char *filename, BString *result);
 
 	// Monitor
 	status_t StartWatching(BMessenger target);
@@ -81,11 +86,15 @@ public:
 	status_t DeletePreferredApp(const char *type, app_verb verb = B_OPEN);
 	status_t DeleteSnifferRule(const char *type);
 	status_t DeleteSupportedTypes(const char *type, bool fullSync);
+	
+	// Asynchronous C function calls
+	status_t UpdateMimeInfoAsync(const entry_ref *ref, bool recursive, bool force);
+	status_t CleanupAfterAsyncThread(thread_id id);
 
 private:	
+	// Functions to send monitor notifications
 	status_t SendInstallNotification(const char *type);
 	status_t SendDeleteNotification(const char *type);	
-	
 	status_t SendMonitorUpdate(int32 which, const char *type, const char *extraType,
 	                             bool largeIcon, int32 action);
 	status_t SendMonitorUpdate(int32 which, const char *type, const char *extraType,
@@ -96,10 +105,16 @@ private:
 	                             int32 action);
 	status_t SendMonitorUpdate(BMessage &msg);
 	
+	// Entry point functions for asynchronous update threads
+	static int32 UpdateMimeInfoAsyncEntry(void *data);
+	
 	status_t fCStatus;
 	std::set<BMessenger> fMonitorMessengers;
+	AssociatedTypes fAssociatedTypes;
 	InstalledTypes fInstalledTypes;
+	SnifferRules fSnifferRules;
 	SupportingApps fSupportingApps;
+	std::list<async_thread_data*> fAsyncThreads;
 };
 
 } // namespace Mime

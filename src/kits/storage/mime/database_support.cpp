@@ -78,10 +78,19 @@ const int32 kSupportedTypesType		= B_MESSAGE_TYPE;
 
 // Message fields
 const char *kApplicationsField				= "applications";
+const char *kExtensionsField				= "extensions";
 const char *kSupertypesField				= "super_types";
 const char *kSupportingAppsSubCountField	= "be:sub";
 const char *kSupportingAppsSuperCountField	= "be:super";
 const char *kTypesField						= "types";
+
+// Mime types
+const char *kGenericFileType	= "application/octet-stream";
+const char *kDirectoryType		= "application/x-vnd.Be-directory";
+const char *kSymlinkType		= "application/x-vnd.Be-symlink";
+
+// Error codes
+const status_t kMimeGuessFailureError	= B_ERRORS_END+1;
 
 // type_to_filename
 //! Converts the given MIME type to an absolute path in the MIME database.
@@ -225,6 +234,30 @@ read_mime_attr_message(const char *type, const char *attr, BMessage *msg)
 	return err;
 }
 
+// read_mime_attr_string
+/*! \brief Reads a BString from the given attribute of the given
+	MIME type.
+	
+	If no entry for the given type exists in the database, the function fails
+	and the contents of \c str are undefined.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param str Pointer to a pre-allocated BString into which the attribute
+			   data stored.
+*/
+ssize_t
+read_mime_attr_string(const char *type, const char *attr, BString *str)
+{
+	BNode node;
+	ssize_t err = (type && attr && str ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = open_type(type, &node);	
+	if (!err) 
+		err = node.ReadAttrString(attr, str);
+	return err;
+}
+
 // write_mime_attr
 /*! \brief Writes \c len bytes of the given data to the given attribute
 	       for the given MIME type.
@@ -236,7 +269,7 @@ read_mime_attr_message(const char *type, const char *attr, BMessage *msg)
 	\param data Pointer to the data to write
 	\param len The number of bytes to write
 	\param datatype The data type of the given data
-*/
+*/	
 status_t
 write_mime_attr(const char *type, const char *attr, const void *data,
 	size_t len, type_code datatype, bool *didCreate)

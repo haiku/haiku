@@ -59,10 +59,19 @@ extern const int32 kSupportedTypesType;
 
 // Message fields
 extern const char *kApplicationsField;
+extern const char *kExtensionsField;
 extern const char *kSupertypesField;
 extern const char *kSupportingAppsSubCountField;
 extern const char *kSupportingAppsSuperCountField;
 extern const char *kTypesField;
+
+// Mime types
+extern const char *kGenericFileType;
+extern const char *kDirectoryType;
+extern const char *kSymlinkType;
+
+// Error codes (to be used only by BPrivate::Storage::Mime members)
+extern const status_t kMimeGuessFailureError;
 
 std::string type_to_filename(const char *type);
 
@@ -72,6 +81,7 @@ status_t open_or_create_type(const char *type, BNode *result, bool *didCreate);
 ssize_t read_mime_attr(const char *type, const char *attr, void *data,
                        size_t len, type_code datatype);
 status_t read_mime_attr_message(const char *type, const char *attr, BMessage *msg);
+status_t read_mime_attr_string(const char *type, const char *attr, BString *str);
 status_t write_mime_attr(const char *type, const char *attr, const void *data,
 						     size_t len, type_code datatype, bool *didCreate);	
 status_t write_mime_attr_message(const char *type, const char *attr,

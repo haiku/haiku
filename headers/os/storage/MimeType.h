@@ -145,10 +145,10 @@ public:
 
 	/* calls to ask the sniffer to identify the MIME type of a file or data in
 	   memory */
-	static status_t GuessMimeType(const entry_ref *file, BMimeType *result);
+	static status_t GuessMimeType(const entry_ref *file, BMimeType *type);
 	static status_t GuessMimeType(const void *buffer, int32 length,
-								  BMimeType *result);
-	static status_t GuessMimeType(const char *filename, BMimeType *result);
+								  BMimeType *type);
+	static status_t GuessMimeType(const char *filename, BMimeType *type);
 
 	static status_t StartWatching(BMessenger target);
 	static status_t StopWatching(BMessenger target);
@@ -201,6 +201,9 @@ private:
 //	status_t CloseFile() const;
 	status_t GetSupportedTypes(BMessage *types);
 	status_t SetSupportedTypes(const BMessage *types, bool fullSync = true);
+	
+	static status_t GetAssociatedTypes(const char *extension, BMessage *types);
+	
 //	void MimeChanged(int32 w, const char *type = NULL,
 //					 bool large = true) const;
 
