@@ -24,6 +24,10 @@
 // Used for providing identifiers for views
 int32 view_counter=0;
 
+// defined in WindowBorder.cpp locking not necessary - the only
+// thread which accesses them is the Poller thread
+extern bool is_moving_window,is_resizing_window,is_sliding_tab;
+
 // Used in window focus management
 ServerWindow *active_serverwindow=NULL;
 
@@ -371,6 +375,9 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 	// Find the window which will receive our mouse event.
 	Layer *root=GetRootLayer();
 	WindowBorder *winborder;
+	
+	// activeborder is used to remember windows when resizing/moving windows
+	// or sliding a tab
 	ASSERT(root!=NULL);
 
 	// Dispatch the mouse event to the proper window
@@ -406,7 +413,6 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 				mousewin=winborder->Window();
 				ASSERT(mousewin!=NULL);
 				winborder->MouseDown(pt,buttons,modifiers);
-				
 #ifdef DEBUG_SERVERWIN
 printf("ServerWindow() %s: MouseDown(%.1f,%.1f)\n",mousewin->title->String(),x,y);
 #endif
@@ -465,7 +471,14 @@ printf("ServerWindow() %s: MouseUp(%.1f,%.1f)\n",mousewin->title->String(),x,y);
 			uint32 buttons=*((uint32*)index);
 			BPoint pt(x,y);
 
-			if(!is_moving_window)
+			if(is_moving_window || is_resizing_window || is_sliding_tab)
+			{
+				mousewin=active_serverwindow;
+				ASSERT(mousewin!=NULL);
+
+				mousewin->winborder->MouseMoved(pt,buttons,0);
+			}
+			else
 			{
 				winborder=(WindowBorder*)root->GetChildAt(pt);
 				if(winborder)
@@ -476,13 +489,6 @@ printf("ServerWindow() %s: MouseUp(%.1f,%.1f)\n",mousewin->title->String(),x,y);
 					winborder->MouseMoved(pt,buttons,0);
 				}
 			}				
-			else
-			{
-				mousewin=active_serverwindow;
-				ASSERT(mousewin!=NULL);
-
-				mousewin->winborder->MouseMoved(pt,buttons,0);
-			}
 			break;
 		}
 		default:
