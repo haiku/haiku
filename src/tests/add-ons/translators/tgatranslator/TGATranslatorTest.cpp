@@ -1,4 +1,32 @@
+/*****************************************************************************/
+// TGATranslatorTest
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGATranslatorTest.cpp
+//
+// Unit testing code to test the OBOS TGATranslator
+//
+//
+// Copyright (c) 2003 OpenBeOS Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
 #include "TGATranslatorTest.h"
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
@@ -155,8 +183,13 @@ TGATranslatorTest::IdentifyTest()
 	
 	// Identify (successfully identify the following files)
 	const IdentifyInfo aBitsPaths[] = {
-		{ "/boot/home/resources/tga/screen1_16.bits", "" },
-		{ "/boot/home/resources/tga/ugly_24_none_true.bits", "" }
+		{ "/boot/home/resources/tga/screen1_24.bits", "" },
+		{ "/boot/home/resources/tga/b_gray1-2.bits", "" },
+		{ "/boot/home/resources/tga/b_gray1.bits", "" },
+		{ "/boot/home/resources/tga/b_rgb15.bits", "" },
+		{ "/boot/home/resources/tga/b_rgb16.bits", "" },
+		{ "/boot/home/resources/tga/b_rgb32.bits", "" },
+		{ "/boot/home/resources/tga/b_cmap8.bits", "" }
 	};
 	const IdentifyInfo aTgaPaths[] = {
 		{ "/boot/home/resources/tga/blocks_16_rle_true.tga",
@@ -227,70 +260,98 @@ TGATranslatorTest::IdentifyTest()
 struct TranslatePaths {
 	const char *tgaPath;
 	const char *bitsPath;
+	bool bcompress;
 };
 
 void
 TranslateTests(TGATranslatorTest *ptest, BTranslatorRoster *proster,
-	const TranslatePaths *paths, int32 len)
+	const TranslatePaths *paths, int32 len, bool btgainput)
 {
+	// Setup BMessages for specifying TGATranslator settings
+	const char *krleoption = "tga /rle";
+	BMessage compmsg, nocompmsg, *pmsg;
+	CPPUNIT_ASSERT(compmsg.AddBool(krleoption, true) == B_OK);
+	CPPUNIT_ASSERT(nocompmsg.AddBool(krleoption, false) == B_OK);
+
 	// Perform translations on every file in the array
 	for (int32 i = 0; i < len; i++) {
 		// Setup input files	
 		ptest->NextSubTest();
-		BFile tga_file, bits_file;
-		CPPUNIT_ASSERT(tga_file.SetTo(paths[i].tgaPath, B_READ_ONLY) == B_OK);
-		CPPUNIT_ASSERT(bits_file.SetTo(paths[i].bitsPath, B_READ_ONLY) == B_OK);
-		printf(" [%s] ", paths[i].tgaPath);
+		BFile tgafile, bitsfile, *pinput;
+		CPPUNIT_ASSERT(tgafile.SetTo(paths[i].tgaPath, B_READ_ONLY) == B_OK);
+		CPPUNIT_ASSERT(bitsfile.SetTo(paths[i].bitsPath, B_READ_ONLY) == B_OK);
+		if (btgainput) {
+			printf(" [%s] ", paths[i].tgaPath);
+			pinput = &tgafile;
+		} else {
+			printf(" [%s] ", paths[i].bitsPath);
+			pinput = &bitsfile;
+		}
 		
-		BMallocIO mallio, dmallio;
+		// RLE compression option
+		if (paths[i].bcompress)
+			pmsg = &compmsg;
+		else
+			pmsg = &nocompmsg;
+			
+		// create temporary files where the translated data will
+		// be stored
+		BFile tmpfile("/tmp/tgatmp", B_READ_WRITE | B_CREATE_FILE |
+			B_ERASE_FILE);
+		BFile dtmpfile("/tmp/tgadtmp", B_READ_WRITE | B_CREATE_FILE |
+			B_ERASE_FILE);
+		CPPUNIT_ASSERT(tmpfile.InitCheck() == B_OK);
+		CPPUNIT_ASSERT(dtmpfile.InitCheck() == B_OK);
 		
 		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_BITMAP)
 		ptest->NextSubTest();
-		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&tga_file, NULL, NULL, &mallio,
+		CPPUNIT_ASSERT(tmpfile.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(tmpfile.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput, NULL, pmsg, &tmpfile,
 			B_TRANSLATOR_ANY_TYPE) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(mallio, bits_file) == true);
+		CPPUNIT_ASSERT(CompareStreams(tmpfile, bitsfile) == true);
 		
 		// Convert to B_TRANSLATOR_BITMAP
 		ptest->NextSubTest();
-		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&tga_file, NULL, NULL, &mallio,
+		CPPUNIT_ASSERT(tmpfile.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(tmpfile.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput, NULL, pmsg, &tmpfile,
 			B_TRANSLATOR_BITMAP) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(mallio, bits_file) == true);
+		CPPUNIT_ASSERT(CompareStreams(tmpfile, bitsfile) == true);
 		
-		// Convert bits mallio to B_TRANSLATOR_BITMAP dmallio
+		// Convert bits tmpfile to B_TRANSLATOR_BITMAP dtmpfile
 		ptest->NextSubTest();
-		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+		CPPUNIT_ASSERT(dtmpfile.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(dtmpfile.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&tmpfile, NULL, pmsg, &dtmpfile,
 			B_TRANSLATOR_BITMAP) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(dmallio, bits_file) == true);
+		CPPUNIT_ASSERT(CompareStreams(dtmpfile, bitsfile) == true);
 		
 		// Convert to B_TGA_FORMAT
 		ptest->NextSubTest();
-		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&tga_file, NULL, NULL, &mallio,
+		CPPUNIT_ASSERT(tmpfile.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(tmpfile.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(pinput, NULL, pmsg, &tmpfile,
 			B_TGA_FORMAT) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(mallio, tga_file) == true);
+		CPPUNIT_ASSERT(CompareStreams(tmpfile, tgafile) == true);
 		
-		// Convert TGA mallio to B_TRANSLATOR_BITMAP dmallio
-		ptest->NextSubTest();
-		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
-			B_TRANSLATOR_BITMAP) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(dmallio, bits_file) == true);
+		if (btgainput || strstr(paths[i].bitsPath, "24")) {
+			// Convert TGA tmpfile to B_TRANSLATOR_BITMAP dtmpfile
+			ptest->NextSubTest();
+			CPPUNIT_ASSERT(dtmpfile.Seek(0, SEEK_SET) == 0);
+			CPPUNIT_ASSERT(dtmpfile.SetSize(0) == B_OK);
+			CPPUNIT_ASSERT(proster->Translate(&tmpfile, NULL, pmsg, &dtmpfile,
+				B_TRANSLATOR_BITMAP) == B_OK);
+			CPPUNIT_ASSERT(CompareStreams(dtmpfile, bitsfile) == true);
 		
-		// Convert TGA mallio to B_TGA_FORMAT dmallio
-		ptest->NextSubTest();
-		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
-		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
-		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
-			B_TGA_FORMAT) == B_OK);
-		CPPUNIT_ASSERT(CompareStreams(dmallio, tga_file) == true);
+			// Convert TGA tmpfile to B_TGA_FORMAT dtmpfile
+			ptest->NextSubTest();
+			CPPUNIT_ASSERT(dtmpfile.Seek(0, SEEK_SET) == 0);
+			CPPUNIT_ASSERT(dtmpfile.SetSize(0) == B_OK);
+			CPPUNIT_ASSERT(proster->Translate(&tmpfile, NULL, pmsg, &dtmpfile,
+				B_TGA_FORMAT) == B_OK);
+			CPPUNIT_ASSERT(CompareStreams(dtmpfile, tgafile) == true);
+		}
 	}
 }
 
@@ -337,63 +398,103 @@ TGATranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(filesize == 0);
 	
 	// Translate TGA images to bits
-	const TranslatePaths aPaths[] = {
+	const TranslatePaths aTgaInputs[] = {
 		{ "/boot/home/resources/tga/blocks_16_rle_true.tga",
-			"/boot/home/resources/tga/blocks_color.bits" },
+			"/boot/home/resources/tga/blocks_color.bits", false },
 		{ "/boot/home/resources/tga/blocks_24_none_true.tga",
-			"/boot/home/resources/tga/blocks_color.bits" },
+			"/boot/home/resources/tga/blocks_color.bits", false },
 		{ "/boot/home/resources/tga/blocks_24_rle_true.tga",
-			"/boot/home/resources/tga/blocks_color.bits" },
+			"/boot/home/resources/tga/blocks_color.bits", false },
 		{ "/boot/home/resources/tga/blocks_8_none_gray.tga",
-			"/boot/home/resources/tga/blocks_gray.bits" },
+			"/boot/home/resources/tga/blocks_gray.bits", false },
 		{ "/boot/home/resources/tga/blocks_8_rle_cmap.tga",
-			"/boot/home/resources/tga/blocks_color.bits" },
+			"/boot/home/resources/tga/blocks_color.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_16_none_true.tga",
-			"/boot/home/resources/tga/cloudcg_16.bits" },
+			"/boot/home/resources/tga/cloudcg_16.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_16_rle_true.tga",
-			"/boot/home/resources/tga/cloudcg_16.bits" },
+			"/boot/home/resources/tga/cloudcg_16.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_24_none_true.tga",
-			"/boot/home/resources/tga/cloudcg_24.bits" },
+			"/boot/home/resources/tga/cloudcg_24.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_24_rle_true.tga",
-			"/boot/home/resources/tga/cloudcg_24.bits" },
+			"/boot/home/resources/tga/cloudcg_24.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_8_none_cmap.tga",
-			"/boot/home/resources/tga/cloudcg_8_cmap.bits" },
+			"/boot/home/resources/tga/cloudcg_8_cmap.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_8_none_gray.tga",
-			"/boot/home/resources/tga/cloudcg_8_gray.bits" },
+			"/boot/home/resources/tga/cloudcg_8_gray.bits", false },
 		{ "/boot/home/resources/tga/cloudcg_8_rle_cmap.tga",
-			"/boot/home/resources/tga/cloudcg_8_cmap.bits" },
+			"/boot/home/resources/tga/cloudcg_8_cmap.bits", false },
 		{ "/boot/home/resources/tga/graycloudcg_8_rle_cmap.tga",
-			"/boot/home/resources/tga/cloudcg_8_gray.bits" },
+			"/boot/home/resources/tga/cloudcg_8_gray.bits", false },
 		{ "/boot/home/resources/tga/grayblocks_8_rle_cmap.tga",
-			"/boot/home/resources/tga/blocks_gray.bits" },
+			"/boot/home/resources/tga/blocks_gray.bits", false },
 		{ "/boot/home/resources/tga/screen1_16_none_true.tga",
-			"/boot/home/resources/tga/screen1_16.bits" },
+			"/boot/home/resources/tga/screen1_16.bits", false },
 		{ "/boot/home/resources/tga/screen1_16_rle_true.tga",
-			"/boot/home/resources/tga/screen1_16.bits" },
+			"/boot/home/resources/tga/screen1_16.bits", false },
 		{ "/boot/home/resources/tga/screen1_24_none_true.tga",
-			"/boot/home/resources/tga/screen1_24.bits" },
+			"/boot/home/resources/tga/screen1_24.bits", false },
 		{ "/boot/home/resources/tga/screen1_24_rle_true.tga",
-			"/boot/home/resources/tga/screen1_24.bits" },
+			"/boot/home/resources/tga/screen1_24.bits", false },
 		{ "/boot/home/resources/tga/screen1_8_none_cmap.tga",
-			"/boot/home/resources/tga/screen1_8_cmap.bits" },
+			"/boot/home/resources/tga/screen1_8_cmap.bits", false },
 		{ "/boot/home/resources/tga/screen1_8_none_gray.tga",
-			"/boot/home/resources/tga/screen1_8_gray.bits" },
+			"/boot/home/resources/tga/screen1_8_gray.bits", false },
 		{ "/boot/home/resources/tga/screen1_8_rle_cmap.tga",
-			"/boot/home/resources/tga/screen1_8_cmap.bits" },
+			"/boot/home/resources/tga/screen1_8_cmap.bits", false },
 		{ "/boot/home/resources/tga/grayscreen1_8_rle_cmap.tga",
-			"/boot/home/resources/tga/screen1_8_gray.bits" },
+			"/boot/home/resources/tga/screen1_8_gray.bits", false },
 		{ "/boot/home/resources/tga/ugly_16_none_true.tga",
-			"/boot/home/resources/tga/ugly_16_none_true.bits" },
+			"/boot/home/resources/tga/ugly_16_none_true.bits", false },
 		{ "/boot/home/resources/tga/ugly_24_none_true.tga",
-			"/boot/home/resources/tga/ugly_24_none_true.bits" },
+			"/boot/home/resources/tga/ugly_24_none_true.bits", false },
 		{ "/boot/home/resources/tga/ugly_32_none_true.tga",
-			"/boot/home/resources/tga/ugly_32_none_true.bits" },
+			"/boot/home/resources/tga/ugly_32_none_true.bits", false },
 		{ "/boot/home/resources/tga/ugly_8_none_cmap.tga",
-			"/boot/home/resources/tga/ugly_8_none_cmap.bits" }
+			"/boot/home/resources/tga/ugly_8_none_cmap.bits", false }
+	};
+	const TranslatePaths aBitsInputs[] = {
+		{ "/boot/home/resources/tga/cloudcg_24.tga",
+			"/boot/home/resources/tga/cloudcg_24.bits", false },
+		{ "/boot/home/resources/tga/cloudcg_24_rle.tga",
+			"/boot/home/resources/tga/cloudcg_24.bits", true },
+		{ "/boot/home/resources/tga/ugly_32.tga",
+			"/boot/home/resources/tga/ugly_32_none_true.bits", false },
+		{ "/boot/home/resources/tga/ugly_32_rle.tga",
+			"/boot/home/resources/tga/ugly_32_none_true.bits", true },
+		{ "/boot/home/resources/tga/screen1_24_rle.tga",
+			"/boot/home/resources/tga/screen1_24.bits", true },
+		{ "/boot/home/resources/tga/ugly_24_rle_true.tga",
+			"/boot/home/resources/tga/ugly_24_none_true.bits", true },
+		{ "/boot/home/resources/tga/b_gray1-2.tga",
+			"/boot/home/resources/tga/b_gray1-2.bits", false },
+		{ "/boot/home/resources/tga/b_gray1-2_rle.tga",
+			"/boot/home/resources/tga/b_gray1-2.bits", true },
+		{ "/boot/home/resources/tga/b_gray1.tga",
+			"/boot/home/resources/tga/b_gray1.bits", false },
+		{ "/boot/home/resources/tga/b_gray1_rle.tga",
+			"/boot/home/resources/tga/b_gray1.bits", true },
+		{ "/boot/home/resources/tga/b_rgb15.tga",
+			"/boot/home/resources/tga/b_rgb15.bits", false },
+		{ "/boot/home/resources/tga/b_rgb15_rle.tga",
+			"/boot/home/resources/tga/b_rgb15.bits", true },
+		{ "/boot/home/resources/tga/b_rgb16.tga",
+			"/boot/home/resources/tga/b_rgb16.bits", false },
+		{ "/boot/home/resources/tga/b_rgb16_rle.tga",
+			"/boot/home/resources/tga/b_rgb16.bits", true },
+		{ "/boot/home/resources/tga/b_rgb32.tga",
+			"/boot/home/resources/tga/b_rgb32.bits", false },
+		{ "/boot/home/resources/tga/b_rgb32_rle.tga",
+			"/boot/home/resources/tga/b_rgb32.bits", true },
+		{ "/boot/home/resources/tga/b_cmap8.tga",
+			"/boot/home/resources/tga/b_cmap8.bits", false },
+		{ "/boot/home/resources/tga/b_cmap8_rle.tga",
+			"/boot/home/resources/tga/b_cmap8.bits", true },
 	};
 	
-	TranslateTests(this, proster, aPaths,
-		sizeof(aPaths) / sizeof(TranslatePaths));
+	TranslateTests(this, proster, aTgaInputs,
+		sizeof(aTgaInputs) / sizeof(TranslatePaths), true);
+	TranslateTests(this, proster, aBitsInputs,
+		sizeof(aBitsInputs) / sizeof(TranslatePaths), false);
 	
 	delete proster;
 	proster = NULL;
