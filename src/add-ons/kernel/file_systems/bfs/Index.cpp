@@ -226,12 +226,15 @@ Index::Update(Transaction *transaction, const char *name, int32 type, const uint
 	if (type == B_MIME_STRING_TYPE)
 		type = B_STRING_TYPE;
 
-	// if the two keys are identical, don't do anything
+	// If the two keys are identical, don't do anything - only compare if the
+	// type has been set, until we have a real type code, we can't do much
+	// about the comparison here
 	if (type != 0 && !compareKeys(type, oldKey, oldLength, newKey, newLength))
 		return B_OK;
 
 	// update all live queries about the change, if they have an index or not
-	fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength, newKey, newLength);
+	if (type != 0)
+		fVolume->UpdateLiveQueries(inode, name, type, oldKey, oldLength, newKey, newLength);
 
 	status_t status;
 	if (((name != fName || strcmp(name, fName)) && (status = SetTo(name)) < B_OK)
@@ -242,6 +245,10 @@ Index::Update(Transaction *transaction, const char *name, int32 type, const uint
 	if (type == 0 && !compareKeys(Type(), oldKey, oldLength, newKey, newLength))
 		return B_OK;
 
+	// same for the live query update
+	if (type == 0)
+		fVolume->UpdateLiveQueries(inode, name, Type(), oldKey, oldLength, newKey, newLength);
+		
 	BPlusTree *tree;
 	if ((status = Node()->GetTree(&tree)) < B_OK)
 		return status;

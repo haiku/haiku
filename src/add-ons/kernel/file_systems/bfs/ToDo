@@ -54,11 +54,13 @@ Inode
 Indices
 
  - consider Index::UpdateLastModified() writing back the updated inode
+ - clearing up Index::Update() and live query update (seems to be a bit confusing right now)
 
 
 Attributes
 
  - Inode::WriteAttribute() doesn't check if the attribute data may fit into the small_data region if there already is that attribute as an attribute file
+ - for indices, we could get the old data from there when doing a query update
 
 
 Volume

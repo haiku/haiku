@@ -98,6 +98,7 @@ class Inode : public CachedBlock {
 		SimpleLock &SmallDataLock() { return fSmallDataLock; }
 
 		mode_t Mode() const { return Node()->mode; }
+		uint32 Type() const { return Node()->type; }
 		int32 Flags() const { return Node()->flags; }
 		bool IsContainer() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
 			// note, that this test will also be true for S_IFBLK (not that it's used in the fs :)

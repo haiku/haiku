@@ -1701,7 +1701,7 @@ bfs_read_attrdir(void *_ns, void *node, void *_cookie, long *num, struct dirent 
 int
 bfs_remove_attr(void *_ns, void *_node, const char *name)
 {
-	FUNCTION_START(("name = \"%s\"\n",name));
+	FUNCTION_START(("name = \"%s\"\n", name));
 
 	if (_ns == NULL || _node == NULL || name == NULL)
 		return B_BAD_VALUE;
@@ -1746,7 +1746,8 @@ bfs_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInf
 	Inode *inode = (Inode *)_node;
 	if (inode == NULL || inode->Node() == NULL)
 		RETURN_ERROR(B_ERROR);
-	
+
+	// first, try to find it in the small data region
 	small_data *smallData = NULL;
 	if (inode->SmallDataLock().Lock() == B_OK)
 	{
@@ -1759,12 +1760,12 @@ bfs_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInf
 	if (smallData != NULL)
 		return B_OK;
 
-	// search in the attribute directory
+	// then, search in the attribute directory
 	Inode *attribute;
 	status_t status = inode->GetAttribute(name, &attribute);
 	if (status == B_OK) {
-		attrInfo->type = attribute->Node()->type;
-		attrInfo->size = attribute->Node()->data.size;
+		attrInfo->type = attribute->Type();
+		attrInfo->size = attribute->Size();
 
 		inode->ReleaseAttribute(attribute);
 		return B_OK;
@@ -1786,10 +1787,12 @@ bfs_write_attr(void *_ns, void *_node, const char *name, int type, const void *b
 	// Writing the name attribute using this function is not allowed,
 	// also using the reserved indices name, last_modified, and size
 	// shouldn't be allowed.
+	// ToDo: we might think about allowing to update those values, but
+	//	really change their corresponding values in the bfs_inode structure
 	if (name[0] == FILE_NAME_NAME && name[1] == '\0'
-		|| !strcmp(name,"name")
-		|| !strcmp(name,"last_modified")
-		|| !strcmp(name,"size"))
+		|| !strcmp(name, "name")
+		|| !strcmp(name, "last_modified")
+		|| !strcmp(name, "size"))
 		RETURN_ERROR(B_NOT_ALLOWED);
 
 	Volume *volume = (Volume *)_ns;

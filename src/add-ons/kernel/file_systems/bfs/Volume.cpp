@@ -277,6 +277,20 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type, const
 }
 
 
+/** Checks if there is a live query whose results depend on the presence
+ *	or value of the specified attribute.
+ *	Don't use it if you already have all the data together to evaluate
+ *	the queries - it wouldn't safe you anything in this case.
+ */
+
+bool 
+Volume::CheckForLiveQuery(const char *attribute)
+{
+	// ToDo: check for a live query that depends on the specified attribute
+	return true;
+}
+
+
 void 
 Volume::AddQuery(Query *query)
 {

@@ -548,12 +548,12 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
 	// correctly terminate the small_data section
 	item = item->Next();
 	if (!item->IsLast(Node()))
-		memset(item,0,(uint8 *)Node() + fVolume->InodeSize() - (uint8 *)item);
+		memset(item, 0, (uint8 *)Node() + fVolume->InodeSize() - (uint8 *)item);
 
 	// update all current iterators
 	AttributeIterator *iterator = NULL;
 	while ((iterator = fIterators.Next(iterator)) != NULL)
-		iterator->Update(index,1);
+		iterator->Update(index, 1);
 
 	return B_OK;
 }
@@ -733,30 +733,28 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 	uint8 oldBuffer[BPLUSTREE_MAX_KEY_LENGTH], *oldData = NULL;
 	size_t oldLength = 0;
 
-	// ToDo: we actually depend on that the contents of "buffer" are constant
-	// if they get changed during the write (hey, user programs), we may mess
+	// ToDo: we actually depend on that the contents of "buffer" are constant.
+	// If they get changed during the write (hey, user programs), we may mess
 	// up our index trees!
 
 	Index index(fVolume);
-	bool hasIndex = index.SetTo(name) == B_OK;
+	index.SetTo(name);
 
 	Inode *attribute = NULL;
 	status_t status = B_OK;
 
 	if (GetAttribute(name, &attribute) < B_OK) {
 		// save the old attribute data
-		if (hasIndex) {
-			fSmallDataLock.Lock();
+		fSmallDataLock.Lock();
 
-			small_data *smallData = FindSmallData(name);
-			if (smallData != NULL) {
-				oldLength = smallData->data_size;
-				if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
-					oldLength = BPLUSTREE_MAX_KEY_LENGTH;
-				memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
-			}
-			fSmallDataLock.Unlock();
+		small_data *smallData = FindSmallData(name);
+		if (smallData != NULL) {
+			oldLength = smallData->data_size;
+			if (oldLength > BPLUSTREE_MAX_KEY_LENGTH)
+				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
+			memcpy(oldData = oldBuffer, smallData->Data(), oldLength);
 		}
+		fSmallDataLock.Unlock();
 
 		// if the attribute doesn't exist yet (as a file), try to put it in the
 		// small_data section first - if that fails (due to insufficent space),
@@ -773,7 +771,7 @@ Inode::WriteAttribute(Transaction *transaction, const char *name, int32 type, of
 	if (attribute != NULL) {
 		if (attribute->Lock().LockWrite() == B_OK) {
 			// save the old attribute data (if this fails, oldLength will reflect it)
-			if (hasIndex) {
+			if (fVolume->CheckForLiveQuery(name)) {
 				oldLength = BPLUSTREE_MAX_KEY_LENGTH;
 				if (attribute->ReadAt(0, oldBuffer, &oldLength) == B_OK)
 					oldData = oldBuffer;
@@ -817,7 +815,7 @@ Inode::RemoveAttribute(Transaction *transaction, const char *name)
 	bool hasIndex = index.SetTo(name) == B_OK;
 
 	// update index for attributes in the small_data section
-	if (hasIndex) {
+	{
 		fSmallDataLock.Lock();
 
 		small_data *smallData = FindSmallData(name);
@@ -825,7 +823,7 @@ Inode::RemoveAttribute(Transaction *transaction, const char *name)
 			uint32 length = smallData->data_size;
 			if (length > BPLUSTREE_MAX_KEY_LENGTH)
 				length = BPLUSTREE_MAX_KEY_LENGTH;
-			index.Update(transaction, name, 0, smallData->Data(), length, NULL, 0, this);
+			index.Update(transaction, name, smallData->type, smallData->Data(), length, NULL, 0, this);
 		}
 		fSmallDataLock.Unlock();
 	}
@@ -842,11 +840,12 @@ Inode::RemoveAttribute(Transaction *transaction, const char *name)
 
 		// update index
 		Inode *attribute;
-		if (hasIndex && GetAttribute(name, &attribute) == B_OK) {
+		if ((hasIndex || fVolume->CheckForLiveQuery(name))
+			&& GetAttribute(name, &attribute) == B_OK) {
 			uint8 data[BPLUSTREE_MAX_KEY_LENGTH];
 			size_t length = BPLUSTREE_MAX_KEY_LENGTH;
 			if (attribute->ReadAt(0, data, &length) == B_OK)
-				index.Update(transaction, name, 0, data, length, NULL, 0, this);
+				index.Update(transaction, name, attribute->Type(), data, length, NULL, 0, this);
 
 			ReleaseAttribute(attribute);
 		}
@@ -2023,7 +2022,7 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	// Everything worked well until this point, we have a fully
 	// initialized inode, and we want to keep it
 	allocator.Keep();
-	
+
 	if (_id != NULL)
 		*_id = inode->ID();
 	if (_inode != NULL)
