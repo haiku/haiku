@@ -417,7 +417,12 @@ CommonFindAppTest10(FindAppCaller &caller)
 	CHK(caller(fileType1, &ref) == B_OK);
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+// OBOS: We set the app hint for app type 2. There's no reason not to do it.
+#ifdef TEST_R5
 	CHK(BMimeType(appType2).IsInstalled() == false);
+#else
+	check_app_type(appType2, appFile1);
+#endif
 }
 
 /*
