@@ -345,6 +345,15 @@ thread_id find_thread(const char *);
 
 status_t snooze(bigtime_t);
 
+status_t _get_team_info(team_id id, team_info *info, size_t size);
+status_t _get_next_team_info(int32 *cookie, team_info *info, size_t size);
+
+#define get_team_info(id, info)				\
+			_get_team_info((id), (info), sizeof(*(info)))
+
+#define get_next_team_info(cookie, info)	\
+			_get_next_sem_info((cookie), (info), sizeof(*(info)))
+
 /** @} */
 #ifdef __cplusplus
 }

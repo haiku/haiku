@@ -376,7 +376,7 @@ get_vnode(fs_id fsID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 		if (vnode) {
 			if (vnode->busy) {
 				mutex_unlock(&vfs_vnode_mutex);
-				thread_snooze(10000); // 10 ms
+				snooze(10000); // 10 ms
 				mutex_lock(&vfs_vnode_mutex);
 				continue;
 			}

@@ -245,7 +245,7 @@ void i386_handle_trap(struct int_frame frame)
 	if (ret == B_INVOKE_SCHEDULER) {
 		int state = disable_interrupts();
 		GRAB_THREAD_LOCK();
-		thread_resched();
+		resched();
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	}

@@ -136,7 +136,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = system_time();
 			break;
 		case SYSCALL_SNOOZE:
-			*call_ret = user_thread_snooze((bigtime_t)INT32TOINT64(arg0, arg1));
+			*call_ret = snooze((bigtime_t)INT32TOINT64(arg0, arg1));
 			break;
 		case SYSCALL_SEM_CREATE:
 			*call_ret = user_create_sem((int)arg0, (const char *)arg1);
@@ -283,9 +283,11 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_FDDUP2:
 			*call_ret = user_dup2(arg0, arg1);
 			break;
+/* obsolete; replaced by get_next_team_info
 		case SYSCALL_GET_PROC_TABLE:
 			*call_ret = user_team_get_table((struct team_info *)arg0, (size_t)arg1);
 			break;
+*/
 		case SYSCALL_GETRLIMIT:
 			*call_ret = user_getrlimit((int)arg0, (struct rlimit *)arg1);
 			break;

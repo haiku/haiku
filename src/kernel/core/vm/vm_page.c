@@ -288,7 +288,7 @@ static int page_scrubber(void *unused)
 	dprintf("page_scrubber starting...\n");
 
 	for(;;) {
-		thread_snooze(100000); // 100ms
+		snooze(100000); // 100ms
 
 		if(page_free_queue.count > 0) {
 			state = disable_interrupts();

@@ -46,6 +46,14 @@ extern spinlock_t thread_spinlock;
 #define GRAB_THREAD_LOCK()    acquire_spinlock(&thread_spinlock)
 #define RELEASE_THREAD_LOCK() release_spinlock(&thread_spinlock)
 
+extern struct thread_queue dead_q;
+
+extern spinlock_t team_spinlock;
+	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
+	// but not the other way (to avoid deadlock)
+#define GRAB_TEAM_LOCK()    acquire_spinlock(&team_spinlock)
+#define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
+
 enum {
 	THREAD_STATE_READY = 0,   // ready to run
 	THREAD_STATE_RUNNING, // running right now somewhere

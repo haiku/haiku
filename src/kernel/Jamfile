@@ -121,10 +121,12 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>pools.o 
 	<$(SOURCE_GRIST)!core>port.o
 	<$(SOURCE_GRIST)!core>queue.o 
+	<$(SOURCE_GRIST)!core>scheduler.o
 	<$(SOURCE_GRIST)!core>sem.o 
 	<$(SOURCE_GRIST)!core>smp.o
 	<$(SOURCE_GRIST)!core>syscalls.o 
 	<$(SOURCE_GRIST)!core>sysctl.o
+	<$(SOURCE_GRIST)!core>team.o 
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
 
@@ -165,10 +167,12 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>pools.o 
 	<$(SOURCE_GRIST)!core>port.o
 	<$(SOURCE_GRIST)!core>queue.o 
+	<$(SOURCE_GRIST)!core>scheduler.o
 	<$(SOURCE_GRIST)!core>sem.o 
 	<$(SOURCE_GRIST)!core>smp.o
 	<$(SOURCE_GRIST)!core>syscalls.o 
 	<$(SOURCE_GRIST)!core>sysctl.o
+	<$(SOURCE_GRIST)!core>team.o 
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
 

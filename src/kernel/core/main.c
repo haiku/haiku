@@ -81,6 +81,7 @@ int _start(kernel_args *oldka, int cpu_num)
 		vm_init_postsem(&ka);
 		cbuf_init();
 		vfs_init(&ka);
+		team_init(&ka);
 		thread_init(&ka);
 		port_init(&ka);
 
@@ -96,7 +97,7 @@ int _start(kernel_args *oldka, int cpu_num)
 
 		smp_wake_up_all_non_boot_cpus();
 		smp_enable_ici(); // ici's were previously being ignored
-		thread_start_threading();
+		start_scheduler();
 	} else {
 		// this is run per cpu for each AP processor after they've been set loose
 		thread_init_percpu(cpu_num);

@@ -1633,7 +1633,7 @@ static int vm_thread_dump_max_commit(void *unused)
 	(void)(unused);
 
 	for(;;) {
-		thread_snooze(1000000);
+		snooze(1000000);
 		if(oldmax != max_commit)
 			dprintf("max_commit 0x%x\n", max_commit);
 		oldmax = max_commit;
@@ -1934,7 +1934,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 
 			// page must be busy
 			mutex_unlock(&cache_ref->lock);
-			thread_snooze(20000);
+			snooze(20000);
 			mutex_lock(&cache_ref->lock);
 		}
 
@@ -2040,7 +2040,7 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 			// it couldn't map the second one, so sleep and retry
 			// keeps an extremely rare deadlock from occuring
 			(*aspace->translation_map.ops->put_physical_page)((addr)src);
-			thread_snooze(5000);
+			snooze(5000);
 		}
 
 		memcpy(dest, src, PAGE_SIZE);

@@ -267,7 +267,7 @@ int delete_sem_etc(sem_id id, int return_code)
 		while ((t = thread_dequeue(&release_queue)) != NULL) {
 			thread_enqueue_run_q(t);
 		}
-		thread_resched();
+		resched();
 		RELEASE_THREAD_LOCK();
 	}
 
@@ -415,7 +415,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 			}
 			// fall through and reschedule since another thread with a higher priority may have been woken up
 		}
-		thread_resched();
+		resched();
 		RELEASE_THREAD_LOCK();
 
 		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
@@ -510,7 +510,7 @@ int release_sem_etc(sem_id id, int count, int flags)
 			t->priority = priority;
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
-			thread_resched();
+			resched();
 		}
 		RELEASE_THREAD_LOCK();
 	}

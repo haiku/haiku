@@ -135,7 +135,7 @@ static int page_daemon()
 	dprintf("page daemon starting\n");
 
 	for(;;) {
-		thread_snooze(PAGE_DAEMON_INTERVAL);
+		snooze(PAGE_DAEMON_INTERVAL);
 
 		// scan through all of the address spaces
 		vm_aspace_walk_start(&i);

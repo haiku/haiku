@@ -36,38 +36,12 @@
 #include <syscalls.h>
 
 
-struct team_key {
-	team_id id;
-};
-
 struct thread_key {
 	thread_id id;
 };
 
-struct team_arg {
-	char *path;
-	char **args;
-	char **envp;
-	unsigned int argc;
-	unsigned int envc;
-};
-
-static struct team *create_team_struct(const char *name, bool kernel);
-static int team_struct_compare(void *_p, const void *_key);
-static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range);
-
 // global
 spinlock_t thread_spinlock = 0;
-
-// team list
-static void *team_hash = NULL;
-static struct team *kernel_team = NULL;
-static team_id next_team_id = 0;
-static spinlock_t team_spinlock = 0;
-	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
-	// but not the other way (to avoid deadlock)
-#define GRAB_TEAM_LOCK() acquire_spinlock(&team_spinlock)
-#define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
 
 // thread list
 static struct thread *idle_threads[MAX_BOOT_CPUS];
@@ -89,15 +63,13 @@ static sem_id death_stack_sem;
 
 // thread queues
 static struct thread_queue run_q[THREAD_NUM_PRIORITY_LEVELS] = { { NULL, NULL }, };
-static struct thread_queue dead_q;
+struct thread_queue dead_q;
 
-static int _rand(void);
 static void thread_entry(void);
 static struct thread *thread_get_thread_struct_locked(thread_id id);
 /* XXX - not currently used, so commented out
 static struct team *team_get_team_struct(team_id id);
  */
-static struct team *team_get_team_struct_locked(team_id id);
 static void thread_kthread_exit(void);
 static void deliver_signal(struct thread *t, int signal);
 
@@ -213,81 +185,6 @@ static int thread_struct_compare(void *_t, const void *_key)
 
 	if(t->id == key->id) return 0;
 	else return 1;
-}
-
-// Frees an array of strings in kernel space
-// Parameters
-//		strings		strings array
-//		strc		number of strings in array
-static void kfree_strings_array(char **strings, int strc)
-{
-	int cnt = strc;
-
-	if(strings != NULL) {
-		for(cnt = 0; cnt < strc; cnt++){
-			kfree(strings[cnt]);
-		}
-	    kfree(strings);
-	}
-}
-
-// Copy an array of strings from user space to kernel space
-// Parameters
-//		strings		userspace strings array
-//		strc		number of strings in array
-//		kstrings	pointer to the kernel copy
-// Returns < 0 on error and **kstrings = NULL
-static int user_copy_strings_array(char **strings, int strc, char ***kstrings)
-{
-	char **lstrings;
-	int err;
-	int cnt;
-	char *source;
-	char buf[SYS_THREAD_STRING_LENGTH_MAX];
-
-	*kstrings = NULL;
-
-	if ((addr)strings >= KERNEL_BASE && (addr)strings <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	lstrings = (char **)kmalloc((strc + 1) * sizeof(char *));
-	if (lstrings == NULL){
-		return ENOMEM;
-	}
-
-	// scan all strings and copy to kernel space
-
-	for (cnt = 0; cnt < strc; cnt++) {
-		err = user_memcpy(&source, &(strings[cnt]), sizeof(char *));
-		if(err < 0)
-			goto error;
-
-		if ((addr)source >= KERNEL_BASE && (addr)source <= KERNEL_TOP){
-			err = ERR_VM_BAD_USER_MEMORY;
-			goto error;
-		}
-
-		err = user_strncpy(buf, source, SYS_THREAD_STRING_LENGTH_MAX - 1);
-		if (err < 0)
-			goto error;
-		buf[SYS_THREAD_STRING_LENGTH_MAX - 1] = 0;
-
-		lstrings[cnt] = (char *)kstrdup(buf);
-		if (lstrings[cnt] == NULL){
-			err = ENOMEM;
-			goto error;
-		}
-	}
-
-	lstrings[strc] = NULL;
-
-	*kstrings = lstrings;
-	return B_NO_ERROR;
-
-error:
-	kfree_strings_array(lstrings, cnt);
-	dprintf("user_copy_strings_array failed %d \n", err);
-	return err;
 }
 
 static unsigned int thread_struct_hash(void *_t, const void *_key, unsigned int range)
@@ -514,7 +411,7 @@ thread_id thread_create_kernel_thread(const char *name, int (*func)(void *), voi
 	return _create_thread(name, team_get_kernel_team()->id, (addr)func, args, -1, true);
 }
 
-static thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
+thread_id thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *args, struct team *p)
 {
 	return _create_thread(name, p->id, (addr)func, args, -1, true);
 }
@@ -535,7 +432,7 @@ int thread_suspend_thread(thread_id id)
 	}
 
 	if (t != NULL) {
-		if (t->team == kernel_team) {
+		if (t->team == team_get_kernel_team()) {
 			// no way
 			retval = EPERM;
 		} else if (t->in_kernel == true) {
@@ -628,61 +525,6 @@ int thread_set_priority(thread_id id, int priority)
 
 	return retval;
 }
-
-static void _dump_team_info(struct team *p)
-{
-	dprintf("TEAM: %p\n", p);
-	dprintf("id:          0x%x\n", p->id);
-	dprintf("name:        '%s'\n", p->name);
-	dprintf("next:        %p\n", p->next);
-	dprintf("num_threads: %d\n", p->num_threads);
-	dprintf("state:       %d\n", p->state);
-	dprintf("pending_signals: 0x%x\n", p->pending_signals);
-	dprintf("ioctx:       %p\n", p->ioctx);
-	dprintf("path:        '%s'\n", p->path);
-	dprintf("aspace_id:   0x%x\n", p->_aspace_id);
-	dprintf("aspace:      %p\n", p->aspace);
-	dprintf("kaspace:     %p\n", p->kaspace);
-	dprintf("main_thread: %p\n", p->main_thread);
-	dprintf("thread_list: %p\n", p->thread_list);
-}
-
-static int dump_team_info(int argc, char **argv)
-{
-	struct team *p;
-	int id = -1;
-	unsigned long num;
-	struct hash_iterator i;
-
-	if(argc < 2) {
-		dprintf("team: not enough arguments\n");
-		return 0;
-	}
-
-	// if the argument looks like a hex number, treat it as such
-	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		num = atoul(argv[1]);
-		if(num > vm_get_kernel_aspace()->virtual_map.base) {
-			// XXX semi-hack
-			_dump_team_info((struct team*)num);
-			return 0;
-		} else {
-			id = num;
-		}
-	}
-
-	// walk through the thread list, trying to match name or id
-	hash_open(team_hash, &i);
-	while((p = hash_next(team_hash, &i)) != NULL) {
-		if((p->name && strcmp(argv[1], p->name) == 0) || p->id == id) {
-			_dump_team_info(p);
-			break;
-		}
-	}
-	hash_close(team_hash, &i, false);
-	return 0;
-}
-
 
 static const char *state_to_text(int state)
 {
@@ -914,7 +756,7 @@ static void put_death_stack_and_reschedule(unsigned int index)
 
 	release_sem_etc(death_stack_sem, 1, B_DO_NOT_RESCHEDULE);
 
-	thread_resched();
+	resched();
 }
 
 int thread_init(kernel_args *ka)
@@ -923,25 +765,6 @@ int thread_init(kernel_args *ka)
 	unsigned int i;
 
 //	dprintf("thread_init: entry\n");
-
-	// create the team hash table
-	team_hash = hash_init(15, (addr)&kernel_team->next - (addr)kernel_team,
-		&team_struct_compare, &team_struct_hash);
-
-	// create the kernel team
-	kernel_team = create_team_struct("kernel_team", true);
-	if(kernel_team == NULL)
-		panic("could not create kernel team!\n");
-	kernel_team->state = TEAM_STATE_NORMAL;
-
-	kernel_team->ioctx = vfs_new_io_context(NULL);
-	if(kernel_team->ioctx == NULL)
-		panic("could not create ioctx for kernel team!\n");
-
-	//XXX should initialize kernel_team->path here. Set it to "/"?
-
-	// stick it in the team hash
-	hash_insert(team_hash, kernel_team);
 
 	// create the thread hash table
 	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
@@ -1028,7 +851,6 @@ int thread_init(kernel_args *ka)
 	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
 	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
 	add_debugger_command("next_team", &dump_next_thread_in_team, "dump the next thread in the team of the last thread viewed");
-	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 
 	return 0;
 }
@@ -1037,42 +859,6 @@ int thread_init_percpu(int cpu_num)
 {
 	arch_thread_set_current_thread(idle_threads[cpu_num]);
 	return 0;
-}
-
-// this starts the scheduler. Must be run under the context of
-// the initial idle thread.
-void thread_start_threading(void)
-{
-	int state;
-
-	// XXX may not be the best place for this
-	// invalidate all of the other processors' TLB caches
-	state = disable_interrupts();
-	arch_cpu_global_TLB_invalidate();
-	smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVL_PAGE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-	restore_interrupts(state);
-
-	// start the other processors
-	smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_ASYNC);
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	thread_resched();
-
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-}
-
-int user_thread_snooze(bigtime_t time)
-{
-	thread_snooze(time);
-	return B_NO_ERROR;
-}
-
-void thread_snooze(bigtime_t time)
-{
-	acquire_sem_etc(snooze_sem, 1, B_TIMEOUT, time);
 }
 
 status_t snooze(bigtime_t timeout)
@@ -1121,7 +907,7 @@ static void thread_exit2(void *_args)
 	// remove this thread from all of the global lists
 	disable_interrupts();
 	GRAB_TEAM_LOCK();
-	remove_thread_from_team(kernel_team, args.t);
+	remove_thread_from_team(team_get_kernel_team(), args.t);
 	RELEASE_TEAM_LOCK();
 	GRAB_THREAD_LOCK();
 	hash_remove(thread_hash, args.t);
@@ -1162,22 +948,22 @@ void thread_exit(int retcode)
 		vm_delete_region(p->_aspace_id, rid);
 	}
 
-	if(p != kernel_team) {
+	if(p != team_get_kernel_team()) {
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 		remove_thread_from_team(p, t);
-		insert_thread_into_team(kernel_team, t);
+		insert_thread_into_team(team_get_kernel_team(), t);
 		if(p->main_thread == t) {
 			// this was main thread in this team
 			delete_team = true;
-			hash_remove(team_hash, p);
+			team_remove_team_from_hash(p);
 			p->state = TEAM_STATE_DEATH;
 		}
 		RELEASE_TEAM_LOCK();
 		// swap address spaces, to make sure we're running on the kernel's pgdir
-		vm_aspace_swap(kernel_team->kaspace);
+		vm_aspace_swap(team_get_kernel_team()->kaspace);
 		restore_interrupts(state);
 
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
@@ -1215,7 +1001,7 @@ void thread_exit(int retcode)
 			// Now wait for all of the threads to die
 			// XXX block on a semaphore
 			while((volatile int)p->num_threads > 0) {
-				thread_snooze(10000); // 10 ms
+				snooze(10000); // 10 ms
 			}
 #endif
 			acquire_sem_etc(p->death_sem, p->num_threads, 0, 0);
@@ -1276,7 +1062,7 @@ static int _thread_kill_thread(thread_id id, bool wait_on)
 
 	t = thread_get_thread_struct_locked(id);
 	if(t != NULL) {
-		if(t->team == kernel_team) {
+		if(t->team == team_get_kernel_team()) {
 			// can't touch this
 			rc = EPERM;
 		} else {
@@ -1373,48 +1159,6 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	return rc;
 }
 
-int user_team_wait_on_team(team_id id, int *uretcode)
-{
-	int retcode;
-	int rc, rc2;
-
-	if((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = team_wait_on_team(id, &retcode);
-	if(rc < 0)
-		return rc;
-
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-	if(rc2 < 0)
-		return rc2;
-
-	return rc;
-}
-
-int team_wait_on_team(team_id id, int *retcode)
-{
-	struct team *p;
-	thread_id tid;
-	int state;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-	p = team_get_team_struct_locked(id);
-	if(p && p->main_thread) {
-		tid = p->main_thread->id;
-	} else {
-		tid = ERR_INVALID_HANDLE;
-	}
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	if(tid < 0)
-		return tid;
-
-	return thread_wait_on_thread(tid, retcode);
-}
-
 struct thread *thread_get_thread_struct(thread_id id)
 {
 	struct thread *t;
@@ -1438,556 +1182,6 @@ static struct thread *thread_get_thread_struct_locked(thread_id id)
 	key.id = id;
 
 	return hash_lookup(thread_hash, &key);
-}
-
-/* XXX - static but unused
-static struct team *team_get_team_struct(team_id id)
-{
-	struct team *p;
-	int state;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	p = team_get_team_struct_locked(id);
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	return p;
-}
-*/
-
-static struct team *team_get_team_struct_locked(team_id id)
-{
-	struct team_key key;
-
-	key.id = id;
-
-	return hash_lookup(team_hash, &key);
-}
-
-static void thread_context_switch(struct thread *t_from, struct thread *t_to)
-{
-	bigtime_t now;
-
-	// track kernel time
-	now = system_time();
-	t_from->kernel_time += now - t_from->last_time;
-	t_to->last_time = now;
-
-	t_to->cpu = t_from->cpu;
-	arch_thread_set_current_thread(t_to);
-	t_from->cpu = NULL;
-	arch_thread_context_switch(t_from, t_to);
-}
-
-static int _rand(void)
-{
-	static int next = 0;
-
-	if(next == 0)
-		next = system_time();
-
-	next = next * 1103515245 + 12345;
-	return((next >> 16) & 0x7FFF);
-}
-
-static int reschedule_event(timer *unused)
-{
-	// this function is called as a result of the timer event set by the scheduler
-	// returning this causes a reschedule on the timer event
-	thread_get_current_thread()->cpu->info.preempted= 1;
-	return B_INVOKE_SCHEDULER;
-}
-
-// NOTE: expects thread_spinlock to be held
-void thread_resched(void)
-{
-	struct thread *next_thread = NULL;
-	int last_thread_pri = -1;
-	struct thread *old_thread = thread_get_current_thread();
-	int i;
-	bigtime_t quantum;
-	timer *quantum_timer;
-
-//	dprintf("top of thread_resched: cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread());
-
-	switch(old_thread->next_state) {
-		case THREAD_STATE_RUNNING:
-		case THREAD_STATE_READY:
-//			dprintf("enqueueing thread 0x%x into run q. pri = %d\n", old_thread, old_thread->priority);
-			thread_enqueue_run_q(old_thread);
-			break;
-		case THREAD_STATE_SUSPENDED:
-			dprintf("suspending thread 0x%x\n", old_thread->id);
-			break;
-		case THREAD_STATE_FREE_ON_RESCHED:
-			thread_enqueue(old_thread, &dead_q);
-			break;
-		default:
-//			dprintf("not enqueueing thread 0x%x into run q. next_state = %d\n", old_thread, old_thread->next_state);
-			;
-	}
-	old_thread->state = old_thread->next_state;
-
-	// search the real-time queue
-	for(i = THREAD_MAX_RT_PRIORITY; i >= THREAD_MIN_RT_PRIORITY; i--) {
-		next_thread = thread_dequeue_run_q(i);
-		if(next_thread)
-			goto found_thread;
-	}
-
-	// search the regular queue
-	for(i = THREAD_MAX_PRIORITY; i > THREAD_IDLE_PRIORITY; i--) {
-		next_thread = thread_lookat_run_q(i);
-		if(next_thread != NULL) {
-			// skip it sometimes
-			if(_rand() > 0x3000) {
-				next_thread = thread_dequeue_run_q(i);
-				goto found_thread;
-			}
-			last_thread_pri = i;
-			next_thread = NULL;
-		}
-	}
-	if(next_thread == NULL) {
-		if(last_thread_pri != -1) {
-			next_thread = thread_dequeue_run_q(last_thread_pri);
-			if(next_thread == NULL)
-				panic("next_thread == NULL! last_thread_pri = %d\n", last_thread_pri);
-		} else {
-			next_thread = thread_dequeue_run_q(THREAD_IDLE_PRIORITY);
-			if(next_thread == NULL)
-				panic("next_thread == NULL! no idle priorities!\n");
-		}
-	}
-
-found_thread:
-	next_thread->state = THREAD_STATE_RUNNING;
-	next_thread->next_state = THREAD_STATE_READY;
-	
-	if ((next_thread != old_thread) || (old_thread->cpu->info.preempted)) {
-		// XXX calculate quantum
-		quantum = 3000;
-		quantum_timer = &old_thread->cpu->info.quantum_timer;
-		if (!old_thread->cpu->info.preempted)
-			_local_timer_cancel_event(old_thread->cpu->info.cpu_num, quantum_timer);
-		old_thread->cpu->info.preempted = 0;
-		add_timer(quantum_timer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
-		if (next_thread != old_thread)
-			thread_context_switch(old_thread, next_thread);
-	}
-
-#if 0
-	// XXX should only reset the quantum timer if we are switching to a new thread,
-	// or we got here as a result of a quantum expire.
-
-	// XXX calculate quantum
-	quantum = 10000;
-
-	// get the quantum timer for this cpu
-	quantum_timer = &old_thread->cpu->info.quantum_timer;
-	if(!old_thread->cpu->info.preempted) {
-		_local_timer_cancel_event(old_thread->cpu->info.cpu_num, quantum_timer);
-	}
-	old_thread->cpu->info.preempted = 0;
-	add_timer(quantum_timer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
-
-	if(next_thread != old_thread) {
-//		dprintf("thread_resched: cpu %d switching from thread %d to %d\n",
-//			smp_get_current_cpu(), old_thread->id, next_thread->id);
-		thread_context_switch(old_thread, next_thread);
-	}
-#endif
-}
-
-static int team_struct_compare(void *_p, const void *_key)
-{
-	struct team *p = _p;
-	const struct team_key *key = _key;
-
-	if(p->id == key->id) return 0;
-	else return 1;
-}
-
-static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range)
-{
-	struct team *p = _p;
-	const struct team_key *key = _key;
-
-	if(p != NULL)
-		return (p->id % range);
-	else
-		return (key->id % range);
-}
-
-struct team *team_get_kernel_team(void)
-{
-	return kernel_team;
-}
-
-team_id team_get_kernel_team_id(void)
-{
-	if(!kernel_team)
-		return 0;
-	else
-		return kernel_team->id;
-}
-
-team_id team_get_current_team_id(void)
-{
-	return thread_get_current_thread()->team->id;
-}
-
-static struct team *create_team_struct(const char *name, bool kernel)
-{
-	struct team *p;
-
-	p = (struct team *)kmalloc(sizeof(struct team));
-	if(p == NULL)
-		goto error;
-	p->id = atomic_add(&next_team_id, 1);
-	strncpy(&p->name[0], name, SYS_MAX_OS_NAME_LEN-1);
-	p->name[SYS_MAX_OS_NAME_LEN-1] = 0;
-	p->num_threads = 0;
-	p->ioctx = NULL;
-	p->path[0] = 0;
-	p->_aspace_id = -1;
-	p->aspace = NULL;
-	p->kaspace = vm_get_kernel_aspace();
-	vm_put_aspace(p->kaspace);
-	p->thread_list = NULL;
-	p->main_thread = NULL;
-	p->state = TEAM_STATE_BIRTH;
-	p->pending_signals = SIG_NONE;
-	p->death_sem = -1;
-	p->user_env_base = NULL;
-
-	if(arch_team_init_team_struct(p, kernel) < 0)
-		goto error1;
-
-	return p;
-
-error1:
-	kfree(p);
-error:
-	return NULL;
-}
-
-static void delete_team_struct(struct team *p)
-{
-	kfree(p);
-}
-
-static int get_arguments_data_size(char **args,int argc)
-{
-	int cnt;
-	int tot_size = 0;
-
-	for(cnt = 0; cnt < argc; cnt++)
-		tot_size += strlen(args[cnt]) + 1;
-	tot_size += (argc + 1) * sizeof(char *);
-
-	return tot_size + sizeof(struct uspace_prog_args_t);
-}
-
-static int team_create_team2(void *args)
-{
-	int err;
-	struct thread *t;
-	struct team *p;
-	struct team_arg *pargs = args;
-	char *path;
-	addr entry;
-	char ustack_name[128];
-	int tot_top_size;
-	char **uargs;
-	char **uenv;
-	char *udest;
-	struct uspace_prog_args_t *uspa;
-	unsigned int arg_cnt;
-	unsigned int env_cnt;
-
-	t = thread_get_current_thread();
-	p = t->team;
-
-	dprintf("team_create_team2: entry thread %d\n", t->id);
-
-	// create an initial primary stack region
-
-	tot_top_size = STACK_SIZE + ENV_SIZE + PAGE_ALIGN(get_arguments_data_size(pargs->args, pargs->argc));
-	t->user_stack_base = ((USER_STACK_REGION - tot_top_size) + USER_STACK_REGION_SIZE);
-	sprintf(ustack_name, "%s_primary_stack", p->name);
-	t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, ustack_name, (void **)&t->user_stack_base,
-		REGION_ADDR_EXACT_ADDRESS, tot_top_size, REGION_WIRING_LAZY, LOCK_RW);
-	if(t->user_stack_region_id < 0) {
-		panic("team_create_team2: could not create default user stack region\n");
-		return t->user_stack_region_id;
-	}
-
-	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE + ENV_SIZE);
-	uargs = (char **)(uspa + 1);
-	udest = (char  *)(uargs + pargs->argc + 1);
-//	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
-
-	for(arg_cnt = 0; arg_cnt < pargs->argc; arg_cnt++) {
-		uargs[arg_cnt] = udest;
-		user_strcpy(udest, pargs->args[arg_cnt]);
-		udest += (strlen(pargs->args[arg_cnt]) + 1);
-	}
-	uargs[arg_cnt] = NULL;
-
-	p->user_env_base = t->user_stack_base + STACK_SIZE;
-	uenv  = (char **)p->user_env_base;
-	udest = (char *)p->user_env_base + ENV_SIZE - 1;
-//	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
-	for (env_cnt=0; env_cnt<pargs->envc; env_cnt++) {
-		udest -= (strlen(pargs->envp[env_cnt]) + 1);
-		uenv[env_cnt] = udest;
-		user_strcpy(udest, pargs->envp[env_cnt]);
-	}
-	uenv[env_cnt] = NULL;
-
-	user_memcpy(uspa->prog_name, p->name, sizeof(uspa->prog_name));
-	user_memcpy(uspa->prog_path, pargs->path, sizeof(uspa->prog_path));
-	uspa->argc = arg_cnt;
-	uspa->argv = uargs;
-	uspa->envc = env_cnt;
-	uspa->envp = uenv;
-
-	if (pargs->args != NULL)
-		kfree_strings_array(pargs->args, pargs->argc);
-	if (pargs->envp != NULL)
-		kfree_strings_array(pargs->envp, pargs->envc);
-
-	path = pargs->path;
-	dprintf("team_create_team2: loading elf binary '%s'\n", path);
-
-	err = elf_load_uspace("/boot/libexec/rld.so", p, 0, &entry);
-	if(err < 0){
-		// XXX clean up team
-		return err;
-	}
-
-	// free the args
-	kfree(pargs->path);
-	kfree(pargs);
-
-	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
-
-	p->state = TEAM_STATE_NORMAL;
-
-	// jump to the entry point in user space
-	arch_thread_enter_uspace(entry, uspa, t->user_stack_base + STACK_SIZE);
-
-	// never gets here
-	return 0;
-}
-
-team_id team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
-{
-	struct team *p;
-	thread_id tid;
-	team_id pid;
-	int err;
-	unsigned int state;
-//	int sem_retcode;
-	struct team_arg *pargs;
-
-	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
-
-	p = create_team_struct(name, false);
-	if(p == NULL)
-		return ENOMEM;
-
-	pid = p->id;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-	hash_insert(team_hash, p);
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	// copy the args over
-	pargs = (struct team_arg *)kmalloc(sizeof(struct team_arg));
-	if(pargs == NULL){
-		err = ENOMEM;
-		goto err1;
-	}
-	pargs->path = (char *)kstrdup(path);
-	if(pargs->path == NULL){
-		err = ENOMEM;
-		goto err2;
-	}
-	pargs->argc = argc;
-	pargs->args = args;
-	pargs->envp = envp;
-	pargs->envc = envc;
-
-	// create a new ioctx for this team
-	p->ioctx = vfs_new_io_context(thread_get_current_thread()->team->ioctx);
-	if(!p->ioctx) {
-		err = ENOMEM;
-		goto err3;
-	}
-
-	//XXX should set p->path to path(?) here.
-
-	// create an address space for this team
-	p->_aspace_id = vm_create_aspace(p->name, USER_BASE, USER_SIZE, false);
-	if (p->_aspace_id < 0) {
-		err = p->_aspace_id;
-		goto err4;
-	}
-	p->aspace = vm_get_aspace_by_id(p->_aspace_id);
-
-	// create a kernel thread, but under the context of the new team
-	tid = thread_create_kernel_thread_etc(name, team_create_team2, pargs, p);
-	if (tid < 0) {
-		err = tid;
-		goto err5;
-	}
-
-	thread_resume_thread(tid);
-
-	return pid;
-
-err5:
-	vm_put_aspace(p->aspace);
-	vm_delete_aspace(p->_aspace_id);
-err4:
-	vfs_free_io_context(p->ioctx);
-err3:
-	kfree(pargs->path);
-err2:
-	kfree(pargs);
-err1:
-	// remove the team structure from the team hash table and delete the team structure
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-	hash_remove(team_hash, p);
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-	delete_team_struct(p);
-//err:
-	return err;
-}
-
-team_id user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
-{
-	char path[SYS_MAX_PATH_LEN];
-	char name[SYS_MAX_OS_NAME_LEN];
-	char **kargs;
-	char **kenv;
-	int rc;
-
-	dprintf("user_team_create_team : argc=%d \n",argc);
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_copy_strings_array(args, argc, &kargs);
-	if (rc < 0)
-		goto error;
-	
-	if (envp == NULL) {
-		envp = (char **)thread_get_current_thread()->team->user_env_base;
-		for (envc = 0; envp && (envp[envc]); envc++);
-	}
-	rc = user_copy_strings_array(envp, envc, &kenv);
-	if (rc < 0)
-		goto error;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		goto error;
-
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if (rc < 0)
-		goto error;
-
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	return team_create_team(path, name, kargs, argc, kenv, envc, priority);
-error:
-	kfree_strings_array(kargs, argc);
-	kfree_strings_array(kenv, envc);
-	return rc;
-}
-
-
-// used by PS command and anything else interested in a team list
-int user_team_get_table(team_info *pbuf, size_t len)
-{
-#if 0
-	struct team *p;
-	struct hash_iterator i;
-	struct team_info pi;
-	int state;
-	int count=0;
-	int max = (len / sizeof(struct team_info));
-
-	if((addr)pbuf >= KERNEL_BASE && (addr)pbuf <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	hash_open(team_hash, &i);
-	while(((p = hash_next(team_hash, &i)) != NULL) && (count < max)) {
-		pi.id = p->id;
-		strcpy(pi.name, p->name);
-		pi.state = p->state;
-		pi.num_threads = p->num_threads;
-		count++;
-		user_memcpy(pbuf, &pi, sizeof(struct team_info));
-		pbuf=pbuf + sizeof(struct team_info);
-	}
-	hash_close(team_hash, &i, false);
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	if (count < max)
-		return count;
-	else
-		return ENOMEM;
-#endif
-	return 0;
-}
-
-
-int team_kill_team(team_id id)
-{
-	int state;
-	struct team *p;
-//	struct thread *t;
-	thread_id tid = -1;
-	int retval = 0;
-
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	p = team_get_team_struct_locked(id);
-	if(p != NULL) {
-		tid = p->main_thread->id;
-	} else {
-		retval = ERR_INVALID_HANDLE;
-	}
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-	if(retval < 0)
-		return retval;
-
-	// just kill the main thread in the team. The cleanup code there will
-	// take care of the team
-	return thread_kill_thread(tid);
 }
 
 // sets the pending signal flag on a thread and possibly does some work to wake it up, etc.
@@ -2035,7 +1229,7 @@ static void _check_for_thread_sigs(struct thread *t, int state)
 		t->pending_signals &= ~SIG_SUSPEND;
 		t->next_state = THREAD_STATE_SUSPENDED;
 		// XXX will probably want to delay this
-		thread_resched();
+		resched();
 	}
 }
 
@@ -2173,170 +1367,3 @@ int setrlimit(int resource, const struct rlimit * rlp)
 
 	return 0;
 }
-
-int user_setenv(const char *uname, const char *uvalue, int overwrite)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char value[SYS_THREAD_STRING_LENGTH_MAX];
-	int rc;
-
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if(rc < 0)
-		return rc;
-
-	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-
-	rc = user_strncpy(value, uvalue, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if(rc < 0)
-		return rc;
-
-	value[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-
-	return sys_setenv(name, value, overwrite);
-}
-
-int sys_setenv(const char *name, const char *value, int overwrite)
-{
-	char var[SYS_THREAD_STRING_LENGTH_MAX];
-	int state;
-	addr env_space;
-	char **envp;
-	int envc;
-	bool var_exists = false;
-	int var_pos = 0;
-	int name_size;
-	int rc = 0;
-	int i;
-	char *p;
-	
-	dprintf("sys_setenv: entry (name=%s, value=%s)\n", name, value);
-	
-	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
-		return -1;
-	
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-	
-	strcpy(var, name);
-	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
-	name_size = strlen(var);
-	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
-	
-	env_space = (addr)thread_get_current_thread()->team->user_env_base;
-	envp = (char **)env_space;
-	for (envc=0; envp[envc]; envc++) {
-		if (!strncmp(envp[envc], var, name_size)) {
-			var_exists = true;
-			var_pos = envc;
-		}
-	}
-	if (!var_exists)
-		var_pos = envc;
-	dprintf("sys_setenv: variable does%s exist\n", var_exists ? "" : " not");
-	if ((!var_exists) || (var_exists && overwrite)) {
-		
-		// XXX- make a better allocator
-		if (var_exists) {
-			if (strlen(var) <= strlen(envp[var_pos])) {
-				strcpy(envp[var_pos], var);
-			}
-			else {
-				for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
-					if (envp[i] < p)
-						p = envp[i];
-				p -= (strlen(var) + 1);
-				if (p < (char *)env_space + (envc * sizeof(char *))) {
-					rc = -1;
-				}
-				else {
-					envp[var_pos] = p;
-					strcpy(envp[var_pos], var);
-				}
-			}
-		}
-		else {
-			for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
-				if (envp[i] < p)
-					p = envp[i];
-			p -= (strlen(var) + 1);
-			if (p < (char *)env_space + ((envc + 1) * sizeof(char *))) {
-				rc = -1;
-			}
-			else {
-				envp[envc] = p;
-				strcpy(envp[envc], var);
-				envp[envc + 1] = NULL;
-			}
-		}
-	}
-	dprintf("sys_setenv: variable set.\n");
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-	
-	return rc;
-}
-
-int user_getenv(const char *uname, char **uvalue)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char *value;
-	int rc;
-
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if (rc < 0)
-		return rc;
-	
-	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-	
-	rc = sys_getenv(name, &value);
-	if (rc < 0)
-		return rc;
-	
-	rc = user_memcpy(uvalue, &value, sizeof(char *));
-	if (rc < 0)
-		return rc;
-	
-	return 0;
-}
-
-int sys_getenv(const char *name, char **value)
-{
-	char **envp;
-	char *p;
-	int state;
-	int i;
-	int len = strlen(name);
-	int rc = -1;
-	
-	state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	envp = (char **)thread_get_current_thread()->team->user_env_base;
-	for (i=0; envp[i]; i++) {
-		if (!strncmp(envp[i], name, len)) {
-			p = envp[i] + len;
-			if (*p == '=') {
-				*value = (p + 1);
-				rc = 0;
-				break;
-			}
-		}
-	}
-	
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-	
-	return rc;
-}
-
