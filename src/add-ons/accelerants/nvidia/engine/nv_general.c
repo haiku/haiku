@@ -657,23 +657,7 @@ status_t nv_set_cas_latency()
 
 	switch(si->ps.card_type)
 	{
-	case G550:
-			if (0)//!si->ps.sdram)
-			{
-				LOG(4,("INIT: G100 SGRAM CAS tuning not permitted, aborting.\n"));
-				return B_OK;
-			}
-			/* SDRAM card */
-			for (latency = 4; latency >= 2; latency-- )
-			{
-				/* MCTLWTST is a write-only register! */
-//				ACCW(MCTLWTST, ((si->ps.mctlwtst_reg & 0xfffffffc) | (latency - 2)));
-				result = test_ram();
-				if (result == B_OK) break;
-			}
-			break;
 	default:
-			/* fixme: Millenium2 and others if needed */
 			LOG(4,("INIT: RAM CAS tuning not implemented for this card, aborting.\n"));
 			return B_OK;
 			break;

@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-7/2004
+   Rudolf Cornelissen 7/2003-8/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -18,16 +18,16 @@ static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
 static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30(void);
-static status_t pins5_read(uint8 *pins, uint8 length);
+static status_t pins2_read(uint8 *rom, uint32 offset);
+static status_t pins5_read(uint8 *rom, uint32 offset);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
 {
-	uint8 pins_len = 0;
 	uint8 *rom;
-	uint8 *pins;
 	uint8 chksum = 0;
 	int i;
+	uint32 offset;
 	status_t result = B_ERROR;
 
 	/* preset PINS read status to failed */
@@ -43,52 +43,68 @@ status_t parse_pins ()
 		return B_ERROR;
 	}
 	LOG(2,("INFO: BIOS signature $AA55 found OK\n"));
-	/* check for a valid PINS struct adress */
-	pins = rom + (rom[0x7FFC]|(rom[0x7FFD]<<8));
-	if ((pins - rom) > 0x7F80)
+
+	/* find the PINS struct adress */
+	for (offset = 0; offset < 65536; offset++)
 	{
-		LOG(8,("INFO: invalid PINS adress\n"));
+		if (rom[offset    ] != 0xff) continue;
+		if (rom[offset + 1] != 0x7f) continue;
+		if (rom[offset + 2] != 0x4e) continue; /* N */
+		if (rom[offset + 3] != 0x56) continue; /* V */
+		if (rom[offset + 4] != 0x00) continue;
+
+		LOG(8,("INFO: PINS signature found\n"));
+		break;
+	}
+
+	if (offset > 65535)
+	{
+		LOG(8,("INFO: PINS signature not found\n"));
 		return B_ERROR;
 	}
-	/* checkout new PINS struct version if there */
-	if ((pins[0] == 0x2E) && (pins[1] == 0x41))
+
+	/* verify PINS checksum */
+	for (i = 0; i < 8; i++)
 	{
-		pins_len = pins[2];
-		if (pins_len < 3 || pins_len > 128)
-		{
-			LOG(8,("INFO: invalid PINS size\n"));
-			return B_ERROR;
-		}
-		
-		/* calculate PINS checksum */
-		for (i = 0; i < pins_len; i++)
-		{
-			chksum += pins[i];
-		}
-		if (chksum)
-		{
-			LOG(8,("INFO: PINS checksum error\n"));
-			return B_ERROR;
-		}
-		LOG(2,("INFO: new PINS, version %u.%u, length %u\n", pins[5], pins[4], pins[2]));
-		/* fill out the si->ps struct if possible */
-		switch (pins[5])
-		{
-			case 5:
-				result = pins5_read(pins, pins_len);
-				break;
-			default:
-				LOG(8,("INFO: unknown PINS version\n"));
-				return B_ERROR;
-				break;
-		}
+		chksum += rom[offset + i];
 	}
-	/* no valid PINS signature found */
-	else
+	if (chksum)
 	{
-		LOG(8,("INFO: no PINS signature found\n"));
+		LOG(8,("INFO: PINS checksum error\n"));
 		return B_ERROR;
 	}
+
+	/* checkout PINS struct version */
+	LOG(2,("INFO: PINS checksum is OK; PINS version is %d.%d\n",
+		rom[offset + 5], rom[offset + 6]));
+
+	/* fill out the si->ps struct if possible */
+	switch (rom[offset + 5])
+	{
+	case 2:
+		pins2_read(rom, offset);
+		break;
+	case 3:
+		//fixme:
+		pins5_read(rom, offset);
+		break;
+	case 4:
+		//fixme:
+		pins5_read(rom, offset);
+		break;
+	case 5:
+		pins5_read(rom, offset);
+		break;
+	case 6:
+		//fixme:
+		pins5_read(rom, offset);
+		break;
+	default:
+		LOG(8,("INFO: unknown PINS version\n"));
+		return B_ERROR;
+		break;
+	}
+
 	/* check PINS read result */
 	if (result == B_ERROR)
 	{
@@ -101,8 +117,43 @@ status_t parse_pins ()
 	return B_OK;
 }
 
+static status_t pins2_read(uint8 *rom, uint32 offset)
+{
+	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
+	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
+	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	char* vendor_name  = &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
+	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
+	char* product_rev  = &(rom[(rom[offset + 44] + (rom[offset + 45] * 256))]);
+
+	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: vendor name: %s\n", vendor_name));
+	LOG(8,("INFO: product name: %s\n", product_name));
+	LOG(8,("INFO: product rev: %s\n", product_rev));
+
+	return B_ERROR;
+}
+
+static status_t pins5_read(uint8 *rom, uint32 offset)
+{
+	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
+	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
+	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
+	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
+	char* product_rev  = &(rom[(rom[offset + 50] + (rom[offset + 51] * 256))]);
+
+	LOG(8,("INFO: init_1 $%04x, init_2 $%04x, size $%04x\n", init1, init2, init_size));
+	LOG(8,("INFO: vendor name: %s\n", vendor_name));
+	LOG(8,("INFO: product name: %s\n", product_name));
+	LOG(8,("INFO: product rev: %s\n", product_rev));
+
+	return B_ERROR;
+}
+
 /* pins v5 is used by G450 and G550 */
-static status_t pins5_read(uint8 *pins, uint8 length)
+/*
+static status_t pinsx_read(uint8 *pins, uint8 length)
 {
 	unsigned int m_factor = 6;
 
@@ -112,7 +163,7 @@ static status_t pins5_read(uint8 *pins, uint8 length)
 		return B_ERROR;
 	}
 
-	/* fill out the shared info si->ps struct */
+	// fill out the shared info si->ps struct
 	if (pins[4] == 0x01) m_factor = 8;
 	if (pins[4] >= 0x02) m_factor = 10;
 
@@ -166,22 +217,23 @@ static status_t pins5_read(uint8 *pins, uint8 length)
 	if (pins[110] & 0x01) si->ps.f_ref = 14.31818;
 	else si->ps.f_ref = 27.00000;
 
-	/* make sure SGRAM functions only get enabled if SGRAM mounted */
+	// make sure SGRAM functions only get enabled if SGRAM mounted 
 //	if ((pins[114] & 0x18) == 0x08) si->ps.sdram = false;
 //	else si->ps.sdram = true;
 
-	/* various registers */
+	// various registers
 	si->ps.secondary_head = (pins[117] & 0x70);
 	si->ps.tvout = (pins[117] & 0x40);	
 	si->ps.primary_dvi = (pins[117] & 0x02);
 	si->ps.secondary_dvi = (pins[117] & 0x20);
 
-	/* not supported: */
+	// not supported:
 	si->ps.max_dac2_clock_8 = 0;
 	si->ps.max_dac2_clock_24 = 0;
 
 	return B_OK;
 }
+*/
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
 void fake_pins(void)
