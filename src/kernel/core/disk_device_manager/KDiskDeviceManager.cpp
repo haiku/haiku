@@ -37,6 +37,11 @@
 static const char *kPartitioningSystemPrefix	= "partitioning_systems";
 static const char *kFileSystemPrefix			= "file_systems";
 
+
+// singleton instance
+KDiskDeviceManager *KDiskDeviceManager::sDefaultManager = NULL;
+
+
 // is_active_job_status
 static
 bool
@@ -200,38 +205,43 @@ KDiskDeviceManager::InitCheck() const
 	return (fLock.Sem() >= 0 ? B_OK : fLock.Sem());
 }
 
-// CreateDefault
+
+/** This creates the system's default DiskDeviceManager.
+ *	The creation is not thread-safe, and shouldn't be done
+ *	more than once.
+ */
+
 status_t
 KDiskDeviceManager::CreateDefault()
 {
-	status_t error = B_OK;
-	if (!fDefaultManager) {
-		fDefaultManager = new(nothrow) KDiskDeviceManager;
-		if (fDefaultManager) {
-			error = fDefaultManager->InitCheck();
-			if (error != B_OK)
-				DeleteDefault();
-		} else
-			error = B_NO_MEMORY;
-	}
-	return (fDefaultManager ? B_OK : B_NO_MEMORY);
+	if (sDefaultManager != NULL)
+		return B_OK;
+
+	sDefaultManager = new(nothrow) KDiskDeviceManager;
+	if (sDefaultManager == NULL)
+		return B_NO_MEMORY;
+
+	return sDefaultManager->InitCheck();
 }
 
-// DeleteDefault
+
+/**	This deletes the default DiskDeviceManager. The
+ *	deletion is not thread-safe either, you should
+ *	make sure that it's called only once.
+ */
+
 void
 KDiskDeviceManager::DeleteDefault()
 {
-	if (fDefaultManager) {
-		delete fDefaultManager;
-		fDefaultManager = NULL;
-	}
+	delete sDefaultManager;
+	sDefaultManager = NULL;
 }
 
 // Default
 KDiskDeviceManager *
 KDiskDeviceManager::Default()
 {
-	return fDefaultManager;
+	return sDefaultManager;
 }
 
 // Lock
@@ -906,9 +916,11 @@ KDiskDeviceManager::_AddFileSystem(const char *name)
 {
 	if (!name)
 		return B_BAD_VALUE;
+
 	KDiskSystem *diskSystem = new(nothrow) KFileSystem(name);
 	if (!diskSystem)
 		return B_NO_MEMORY;
+
 	return _AddDiskSystem(diskSystem);
 }
 
@@ -1131,8 +1143,4 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 		delete jobQueue;
 	return error;
 }
-
-
-// singleton instance
-KDiskDeviceManager *KDiskDeviceManager::fDefaultManager = NULL;
 
