@@ -752,10 +752,11 @@ rule R5KernelStaticLibrary
 rule MergeObjectFromObjects
 {
 	# MergeObjectFromObjects <name> : <objects> ;
+	local objects = [ FGristFiles $(2) ] ;
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
-	Depends $(<) : $(>) ;
+	Depends $(1) : $(objects) ;
 	LINK on $(1) = ld ;
-	MergeObjectFromObjects1 $(1) : [ FGristFiles $(2) ] ;
+	MergeObjectFromObjects1 $(1) : $(objects) ;
 }
 
 actions MergeObjectFromObjects1
