@@ -81,9 +81,16 @@ CheckTiff(translator_info *pti, const char *imageType)
 	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/tiff") == 0);
 }
 
+// coveniently group path of image with
+// the expected Identify() string for that image
+struct IdentifyInfo {
+	const char *imagePath;
+	const char *identifyString;
+};
+
 void
 IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
-	const char **paths, const char **imageTypes, int32 len, bool bbits)
+	const IdentifyInfo *pinfo, int32 len, bool bbits)
 {
 	translator_info ti;
 	printf(" [%d] ", (int) bbits);
@@ -91,8 +98,8 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 	for (int32 i = 0; i < len; i++) {
 		ptest->NextSubTest();
 		BFile file;
-		printf(" [%s] ", paths[i]);
-		CPPUNIT_ASSERT(file.SetTo(paths[i], B_READ_ONLY) == B_OK);
+		printf(" [%s] ", pinfo[i].imagePath);
+		CPPUNIT_ASSERT(file.SetTo(pinfo[i].imagePath, B_READ_ONLY) == B_OK);
 
 		// Identify (output: B_TRANSLATOR_ANY_TYPE)
 		ptest->NextSubTest();
@@ -101,7 +108,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti, imageTypes[i]);
+			CheckTiff(&ti, pinfo[i].identifyString);
 	
 		// Identify (output: B_TRANSLATOR_BITMAP)
 		ptest->NextSubTest();
@@ -111,7 +118,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti, imageTypes[i]);
+			CheckTiff(&ti, pinfo[i].identifyString);
 	
 		// Identify (output: B_TIFF_FORMAT)
 		ptest->NextSubTest();
@@ -121,7 +128,7 @@ IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
 		if (bbits)
 			CheckBits(&ti);
 		else
-			CheckTiff(&ti, imageTypes[i]);
+			CheckTiff(&ti, pinfo[i].identifyString);
 	}
 }
 
@@ -156,77 +163,73 @@ TIFFTranslatorTest::IdentifyTest()
 	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
 	
 	// Identify (successfully identify the following files)
-	const char *aBitsFiles[] = {
-		"/boot/home/resources/tiff/beer.bits",
-		"/boot/home/resources/tiff/blocks.bits"
+	const IdentifyInfo aBitsPaths[] = {
+		{ "/boot/home/resources/tiff/beer.bits", "" },
+		{ "/boot/home/resources/tiff/blocks.bits", "" }
 	};
-	const char *aTiffFiles[] = {
-		"/boot/home/resources/tiff/beer_rgb_nocomp.tif",
-		"/boot/home/resources/tiff/beer_rgb_nocomp_big.tif",
-		"/boot/home/resources/tiff/blocks_rgb_nocomp.tif",
-		"/boot/home/resources/tiff/hills_bw_huffman.tif",
-		"/boot/home/resources/tiff/hills_cmyk_nocomp.tif",
-		"/boot/home/resources/tiff/hills_cmyk_nocomp_big.tif",
-		"/boot/home/resources/tiff/hills_rgb_nocomp.tif",
-		"/boot/home/resources/tiff/hills_rgb_packbits.tif",
-		"/boot/home/resources/tiff/homes_bw_fax.tif",
-		"/boot/home/resources/tiff/homes_bw_huffman.tif",
-		"/boot/home/resources/tiff/homes_bw_nocomp.tif",
-		"/boot/home/resources/tiff/homes_bw_nocomp_big.tif",
-		"/boot/home/resources/tiff/homes_bw_packbits.tif",
-		"/boot/home/resources/tiff/homes_cmap4_nocomp.tif",
-		"/boot/home/resources/tiff/homes_cmap4_nocomp_big.tif",
-		"/boot/home/resources/tiff/homes_cmap4_packbits.tif",
-		"/boot/home/resources/tiff/homes_gray8_nocomp.tif",
-		"/boot/home/resources/tiff/homes_gray8_nocomp_big.tif",
-		"/boot/home/resources/tiff/homes_gray8_packbits.tif",
-		"/boot/home/resources/tiff/logo_cmap4_nocomp.tif",
-		"/boot/home/resources/tiff/logo_cmap4_nocomp_big.tif",
-		"/boot/home/resources/tiff/logo_cmap4_packbits.tif",
-		"/boot/home/resources/tiff/logo_cmap8_nocomp.tif",
-		"/boot/home/resources/tiff/logo_cmap8_nocomp_big.tif",
-		"/boot/home/resources/tiff/logo_cmap8_packbits.tif",
-		"/boot/home/resources/tiff/logo_cmyk_nocomp.tif",
-		"/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
-		"/boot/home/resources/tiff/vsmall_rgb_nocomp.tif"
+	const IdentifyInfo aTiffPaths[] = {
+		{ "/boot/home/resources/tiff/beer_rgb_nocomp.tif",
+			"TIFF Image (Little, RGB, None)" },
+		{ "/boot/home/resources/tiff/beer_rgb_nocomp_big.tif",
+			"TIFF Image (Big, RGB, None)" },
+		{ "/boot/home/resources/tiff/blocks_rgb_nocomp.tif",
+			"TIFF Image (Little, RGB, None)" },
+		{ "/boot/home/resources/tiff/hills_bw_huffman.tif",
+			"TIFF Image (Little, Mono, Huffman)" },
+		{ "/boot/home/resources/tiff/hills_cmyk_nocomp.tif",
+			"TIFF Image (Little, CMYK, None)" },
+		{ "/boot/home/resources/tiff/hills_cmyk_nocomp_big.tif",
+			"TIFF Image (Big, CMYK, None)" },
+		{ "/boot/home/resources/tiff/hills_rgb_nocomp.tif",
+			"TIFF Image (Little, RGB, None)" },
+		{ "/boot/home/resources/tiff/hills_rgb_packbits.tif",
+			"TIFF Image (Little, RGB, PackBits)" },
+		{ "/boot/home/resources/tiff/homes_bw_fax.tif",
+			"TIFF Image (Little, Mono, Group 3)" },
+		{ "/boot/home/resources/tiff/homes_bw_huffman.tif",
+			"TIFF Image (Little, Mono, Huffman)" },
+		{ "/boot/home/resources/tiff/homes_bw_nocomp.tif",
+			"TIFF Image (Little, Mono, None)" },
+		{ "/boot/home/resources/tiff/homes_bw_nocomp_big.tif",
+			"TIFF Image (Big, Mono, None)" },
+		{ "/boot/home/resources/tiff/homes_bw_packbits.tif",
+			"TIFF Image (Little, Mono, PackBits)" },
+		{ "/boot/home/resources/tiff/homes_cmap4_nocomp.tif",
+			"TIFF Image (Little, Palette, None)" },
+		{ "/boot/home/resources/tiff/homes_cmap4_nocomp_big.tif",
+			"TIFF Image (Big, Palette, None)" },
+		{ "/boot/home/resources/tiff/homes_cmap4_packbits.tif",
+			"TIFF Image (Little, Palette, PackBits)" },
+		{ "/boot/home/resources/tiff/homes_gray8_nocomp.tif",
+			"TIFF Image (Little, Gray, None)" },
+		{ "/boot/home/resources/tiff/homes_gray8_nocomp_big.tif",
+			"TIFF Image (Big, Gray, None)" },
+		{ "/boot/home/resources/tiff/homes_gray8_packbits.tif",
+			"TIFF Image (Little, Gray, PackBits)" },
+		{ "/boot/home/resources/tiff/logo_cmap4_nocomp.tif",
+			"TIFF Image (Little, Palette, None)" },
+		{ "/boot/home/resources/tiff/logo_cmap4_nocomp_big.tif",
+			"TIFF Image (Big, Palette, None)" },
+		{ "/boot/home/resources/tiff/logo_cmap4_packbits.tif",
+			"TIFF Image (Little, Palette, PackBits)" },
+		{ "/boot/home/resources/tiff/logo_cmap8_nocomp.tif",
+			"TIFF Image (Little, Palette, None)" },
+		{ "/boot/home/resources/tiff/logo_cmap8_nocomp_big.tif",
+			"TIFF Image (Big, Palette, None)" },
+		{ "/boot/home/resources/tiff/logo_cmap8_packbits.tif",
+			"TIFF Image (Little, Palette, PackBits)" },
+		{ "/boot/home/resources/tiff/logo_cmyk_nocomp.tif",
+			"TIFF Image (Little, CMYK, None)" },
+		{ "/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
+			"TIFF Image (Little, Palette, None)" },
+		{ "/boot/home/resources/tiff/vsmall_rgb_nocomp.tif",
+			"TIFF Image (Little, RGB, None)" }
 	};
-	const char *aTiffTypes[] = {
-		"TIFF Image (Little, RGB, None)",
-		"TIFF Image (Big, RGB, None)",
-		"TIFF Image (Little, RGB, None)",
-		"TIFF Image (Little, Mono, Huffman)",
-		"TIFF Image (Little, CMYK, None)",
-		"TIFF Image (Big, CMYK, None)",
-		"TIFF Image (Little, RGB, None)",
-		"TIFF Image (Little, RGB, PackBits)",
-		"TIFF Image (Little, Mono, Group 3)",
-		"TIFF Image (Little, Mono, Huffman)",
-		"TIFF Image (Little, Mono, None)",
-		"TIFF Image (Big, Mono, None)",
-		"TIFF Image (Little, Mono, PackBits)",
-		"TIFF Image (Little, Palette, None)",
-		"TIFF Image (Big, Palette, None)",
-		"TIFF Image (Little, Palette, PackBits)",
-		"TIFF Image (Little, Gray, None)",
-		"TIFF Image (Big, Gray, None)",
-		"TIFF Image (Little, Gray, PackBits)",
-		"TIFF Image (Little, Palette, None)",
-		"TIFF Image (Big, Palette, None)",
-		"TIFF Image (Little, Palette, PackBits)",
-		"TIFF Image (Little, Palette, None)",
-		"TIFF Image (Big, Palette, None)",
-		"TIFF Image (Little, Palette, PackBits)",
-		"TIFF Image (Little, CMYK, None)",
-		"TIFF Image (Little, Palette, None)",
-		"TIFF Image (Little, RGB, None)",
-	};
-	CPPUNIT_ASSERT((sizeof(aTiffFiles) / sizeof(const char *)) ==
-		(sizeof(aTiffTypes) / sizeof(const char *)));
 
-	IdentifyTests(this, proster, aTiffFiles, aTiffTypes,
-		sizeof(aTiffFiles) / sizeof(const char *), false);
-	IdentifyTests(this, proster, aBitsFiles, NULL,
-		sizeof(aBitsFiles) / sizeof(const char *), true);
+	IdentifyTests(this, proster, aTiffPaths,
+		sizeof(aTiffPaths) / sizeof(IdentifyInfo), false);
+	IdentifyTests(this, proster, aBitsPaths,
+		sizeof(aBitsPaths) / sizeof(IdentifyInfo), true);
 	
 	delete proster;
 	proster = NULL;
