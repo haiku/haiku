@@ -1,0 +1,31 @@
+<HTML>
+<BODY>
+
+<H1>Misc notes</H1>
+
+<UL>
+
+<LI><P>Sometimes the midi_server's debug output shows an "Application -1 not 
+registered" error message. This means it cannot figure out which app an 
+incoming BMessage came from. The server ignores those messages.</P>
+
+<P>How can this happen? libmidi2 has two ways of sending messages to the 
+midi_server: it either expects a reply back or not. In the first case, it is 
+obvious to the midi_server what the reply address of the message is. In the 
+second case, even though it is not necessary for the server to send a message 
+back, it still uses the reply address to determine which app the message came 
+from. For this, BMessenger uses be_app_messenger of the client app.</P>
+
+<P>However, if the client app has no BApplication  object, there is no 
+be_app_messenger either. Now, the midi_server cannot determine where the 
+message came from and will ignore it. Is this important? For example, when such 
+a client app Release()'s its endpoints, it sends a message to the server 
+without a return address. Now the server ignores that message and does not 
+remove the endpoint from the roster. Of course, after the client app has died, 
+the endpoints will be removed eventually. Does all of this matter? Not really, 
+because only trivial apps will have no BApplication object.</P></LI>
+
+</UL>
+
+</BODY>
+</HTML>
