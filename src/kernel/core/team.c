@@ -23,6 +23,13 @@
 #include <syscalls.h>
 #include <tls.h>
 
+#define TRACE_TEAM 0
+#if TRACE_TEAM
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 struct team_key {
 	team_id id;
@@ -845,105 +852,87 @@ user_wait_for_team(team_id id, status_t *_userReturnCode)
 
 
 team_id
-user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
+user_team_create_team(const char *userPath, const char *userName,
+	char **userArgs, int argCount, char **userEnv, int envCount, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
 	char name[SYS_MAX_OS_NAME_LEN];
-	char **kargs;
-	char **kenv;
+	char **args = NULL;
+	char **env = NULL;
 	int rc;
 
-	dprintf("user_team_create_team : argc=%d \n",argc);
+	TRACE(("user_team_create_team: argc = %d\n", argCount));
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userName))
+		return B_BAD_ADDRESS;
 
-	rc = user_copy_strings_array(args, argc, &kargs);
+	rc = user_copy_strings_array(userArgs, argCount, &args);
 	if (rc < 0)
 		goto error;
-	
-	if (envp == NULL) {
-		envp = (char **)thread_get_current_thread()->team->user_env_base;
-		for (envc = 0; envp && (envp[envc]); envc++);
+
+	if (userEnv == NULL) {
+		// ToDo: this doesn't look particularly safe to me - where
+		//	is user_env_base?
+		userEnv = (char **)thread_get_current_thread()->team->user_env_base;
+		for (envCount = 0; userEnv && (userEnv[envCount]); envCount++);
 	}
-	rc = user_copy_strings_array(envp, envc, &kenv);
-	if (rc < 0)
+	if (user_copy_strings_array(userEnv, envCount, &env) < B_OK
+		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK
+		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK) {
+		rc = B_BAD_ADDRESS;
 		goto error;
+	}
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		goto error;
+	return team_create_team(path, name, args, argCount, env, envCount, priority);
 
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if (rc < 0)
-		goto error;
-
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	return team_create_team(path, name, kargs, argc, kenv, envc, priority);
 error:
-	kfree_strings_array(kargs, argc);
-	kfree_strings_array(kenv, envc);
+	kfree_strings_array(args, argCount);
+	kfree_strings_array(env, envCount);
 	return rc;
 }
 
 
 status_t
-user_get_team_info(team_id id, team_info *info)
+user_get_team_info(team_id id, team_info *userInfo)
 {
-	team_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-		
-	rc = _get_team_info(id, &kinfo, sizeof(team_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
+	status_t status;
+	team_info info;
+
+	if (!CHECK_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;	
+
+	status = _get_team_info(id, &info, sizeof(team_info));
+	if (status == B_OK) {
+		if (user_memcpy(userInfo, &info, sizeof(team_info)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return status;
 }
 
 
 status_t
-user_get_next_team_info(int32 *cookie, team_info *info)
+user_get_next_team_info(int32 *userCookie, team_info *userInfo)
 {
-	int32 kcookie;
-	team_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)cookie >= KERNEL_BASE && (addr)cookie <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	
-	rc2 = user_memcpy(&kcookie, cookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc = _get_next_team_info(&kcookie, &kinfo, sizeof(team_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(cookie, &kcookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
+	status_t status;
+	team_info info;
+	int32 cookie;
+
+	if (!CHECK_USER_ADDRESS(userCookie)
+		|| !CHECK_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status = _get_next_team_info(&cookie, &info, sizeof(team_info));
+	if (status != B_OK)
+		return status;
+
+	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+		|| user_memcpy(userInfo, &info, sizeof(team_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
