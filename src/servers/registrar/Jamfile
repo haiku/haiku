@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src servers registrar ;
+
+UsePublicHeaders app ;
+UsePrivateHeaders app ;
+
+Server obos_registrar :
+	ClipboardHandler.cpp
+	MIMEManager.cpp
+	Registrar.cpp
+;
+LinkSharedOSLibs obos_registrar :
+	<boot!home!config!lib>libopenbeos.so
+	be root
+;
