@@ -1111,6 +1111,7 @@ void BLooper::InitData()
 	fRunCalled = false;
 	fQueue = new BMessageQueue();
 	fCommonFilters = NULL;
+	fLastMessage = NULL;
 	fPreferred = NULL;
 	fTaskID = B_ERROR;
 	fTerminating = false;
