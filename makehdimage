@@ -58,11 +58,13 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	grep cat less clockconfig du rm date find locate xargs \
 	isvolume shutdown safemode sysinfo kill diff cmp more \
 	renice rmattr addattr listdev pwd chmod chown chgrp dd \
-	tee md5sum catattr query lsindex mkindex roster listimage"
+	tee md5sum catattr query lsindex mkindex roster listimage \
+	quit open translate setvolume"
 
-BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
+BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
+	libtranslation.so libbind.so libnetapi.so libsocket.so"
 
-BEOS_SYSTEM_SERVERS="registrar"
+BEOS_SYSTEM_SERVERS="registrar syslog_daemon"
 
 jam -q kernel boot_loader config_manager pci isa ide scsi \
 	ide_isa bfs blkman fast_log ide_adapter locked_pool \
@@ -105,6 +107,7 @@ mkdir -p beos/system/lib
 mkdir -p beos/system/servers
 mkdir -p home/config
 mkdir -p home/config/settings
+mkdir -p var/tmp
 
 # modules
 
