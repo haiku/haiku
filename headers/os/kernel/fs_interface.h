@@ -21,26 +21,27 @@ typedef void *fs_volume;
 typedef void *fs_cookie;
 typedef void *fs_vnode;
 
-/* passed to fs_write_stat() */
+/* passed to write_stat() */
 enum write_stat_mask {
-	FS_WSTAT_MODE	= 0x0001,
-	FS_WSTAT_UID	= 0x0002,
-	FS_WSTAT_GID	= 0x0004,
-	FS_WSTAT_SIZE	= 0x0008,
-	FS_WSTAT_ATIME	= 0x0010,
-	FS_WSTAT_MTIME	= 0x0020,
-	FS_WSTAT_CRTIME	= 0x0040
+	FS_WRITE_STAT_MODE		= 0x0001,
+	FS_WRITE_STAT_UID		= 0x0002,
+	FS_WRITE_STAT_GID		= 0x0004,
+	FS_WRITE_STAT_SIZE		= 0x0008,
+	FS_WRITE_STAT_ATIME		= 0x0010,
+	FS_WRITE_STAT_MTIME		= 0x0020,
+	FS_WRITE_STAT_CRTIME	= 0x0040
 };
 
-#define	WFSSTAT_NAME	0x0001
+/* passed to write_fs_info() */
+#define	FS_WRITE_FSINFO_NAME	0x0001
 
-#define	B_CURRENT_FS_API_VERSION 3
+#define	B_CURRENT_FS_API_VERSION 1
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
 
-struct fs_calls {
+typedef struct fs_ops {
 	/* general operations */
 	status_t (*mount)(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
@@ -134,10 +135,14 @@ struct fs_calls {
 	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
 	status_t (*read_query)(fs_volume fs, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
-};
+} fs_ops;
 
 #ifdef __cplusplus
 }
 #endif
+
+/* variables exported by the file system add-on */
+extern fs_ops	fs_entry;
+extern int32	api_version;
 
 #endif	/* _FS_INTERFACE_H */
