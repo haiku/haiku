@@ -230,7 +230,7 @@ _VECTOR_SET_CLASS_NAME::MakeEmpty()
 /*!	\brief Returns an iterator referring to the beginning of the set.
 
 	If the set is not empty, Begin() refers to its first element,
-	otherwise it is equal to End() and must not be dereference!
+	otherwise it is equal to End() and must not be dereferenced!
 
 	\return An iterator referring to the beginning of the set.
 */
@@ -246,7 +246,7 @@ _VECTOR_SET_CLASS_NAME::Begin()
 /*!	\brief Returns an iterator referring to the beginning of the set.
 
 	If the set is not empty, Begin() refers to its first element,
-	otherwise it is equal to End() and must not be dereference!
+	otherwise it is equal to End() and must not be dereferenced!
 
 	\return An iterator referring to the beginning of the set.
 */
@@ -364,7 +364,7 @@ _VECTOR_SET_CLASS_NAME::Find(const Value &value) const
 
 	If the set contains an element with the specified value, an iterator
 	to it is returned. Otherwise \a less indicates whether an iterator to
-	the immediately smaller or greater element shall be returned.
+	the directly smaller or greater element shall be returned.
 
 	If \a less is \c true and the first element in the set has a greater
 	value than the specified one, End() is returned. Similarly, when \a less
@@ -405,7 +405,7 @@ _VECTOR_SET_CLASS_NAME::FindClose(const Value &value, bool less)
 
 	If the set contains an element with the specified value, an iterator
 	to it is returned. Otherwise \a less indicates whether an iterator to
-	the immediately smaller or greater element shall be returned.
+	the directly smaller or greater element shall be returned.
 
 	If \a less is \c true and the first element in the set has a greater
 	value than the specified one, End() is returned. Similarly, when \a less

@@ -120,6 +120,11 @@ private:
 	typedef VectorIterator<Value>	Iterator;
 
 public:
+	inline VectorIterator<Value>()
+		: fElement(NULL)
+	{
+	}
+
 	inline VectorIterator<Value>(const Iterator &other)
 		: fElement(other.fElement)
 	{
@@ -187,7 +192,7 @@ public:
 
 // private
 public:
-	inline VectorIterator<Value>(Value *element = NULL)
+	inline VectorIterator<Value>(Value *element)
 		: fElement(element)
 	{
 	}
@@ -447,7 +452,7 @@ _VECTOR_CLASS_NAME::MakeEmpty()
 /*!	\brief Returns an iterator referring to the beginning of the vector.
 
 	If the vector is not empty, Begin() refers to its first element,
-	otherwise it is equal to End() and must not be dereference!
+	otherwise it is equal to End() and must not be dereferenced!
 
 	\return An iterator referring to the beginning of the vector.
 */
@@ -463,7 +468,7 @@ _VECTOR_CLASS_NAME::Begin()
 /*!	\brief Returns an iterator referring to the beginning of the vector.
 
 	If the vector is not empty, Begin() refers to its first element,
-	otherwise it is equal to End() and must not be dereference!
+	otherwise it is equal to End() and must not be dereferenced!
 
 	\return An iterator referring to the beginning of the vector.
 */
