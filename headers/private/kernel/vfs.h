@@ -9,6 +9,8 @@
 #include <kernel.h>
 #include <stage2.h>
 #include <sys/stat.h>
+#include <sys/select.h>
+#include <signal.h>
 #include <dirent.h>
 #include <fs_interface.h>
 
@@ -22,6 +24,8 @@
 	uint8 _##name[sizeof(iovecs) + (size)*sizeof(iovec)]; \
 	iovecs *name = (iovecs *)_##name
 
+struct selectsync;
+struct pollfd;
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,6 +41,10 @@ int vfs_test(void);
 struct rlimit;
 int vfs_getrlimit(int resource, struct rlimit * rlp);
 int vfs_setrlimit(int resource, const struct rlimit * rlp);
+
+// ToDo: for now; this prototype should be in os/drivers/Drivers.h
+//	or similar places.
+extern status_t notify_select_event(struct selectsync *sync, uint32 ref);
 
 /* calls needed by fs internals */
 int vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *v);
@@ -80,6 +88,9 @@ int sys_rename(const char *oldpath, const char *newpath);
 int sys_access(const char *path, int mode);
 int sys_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
 int sys_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
+int sys_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+	bigtime_t timeout, sigset_t *sigMask);
+int sys_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
 int sys_open_attr_dir(int fd, const char *path);
 int sys_create_attr(int fd, const char *name, uint32 type, int openMode);
 int sys_open_attr(int fd, const char *name, int openMode);
@@ -117,6 +128,9 @@ int user_rename(const char *oldpath, const char *newpath);
 int user_access(const char *path, int mode);
 int user_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
 int user_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
+int user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+	bigtime_t timeout, sigset_t *sigMask);
+int user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
 int user_open_attr_dir(int fd, const char *path);
 int user_create_attr(int fd, const char *name, uint32 type, int openMode);
 int user_open_attr(int fd, const char *name, int openMode);

@@ -1,10 +1,9 @@
-/* file.h
- *
- * File Descriptors
- */
- 
-#ifndef _FILE_H
-#define _FILE_H
+/* 
+** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+#ifndef _FD_H
+#define _FD_H
 
 #include <sem.h>
 #include <lock.h>
@@ -14,6 +13,7 @@
 
 
 struct file_descriptor;
+struct select_sync;
 struct fs_mount;
 struct vnode;
 
@@ -31,8 +31,9 @@ struct fd_ops {
 	ssize_t		(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
 	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
-//	int			(*fd_poll)(struct file_descriptor *, int);
-	status_t	(*fd_read_dir)(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
+	status_t	(*fd_select)(struct file_descriptor *, uint8 event, uint32 ref, struct select_sync *sync);
+	status_t	(*fd_deselect)(struct file_descriptor *, uint8 event, struct select_sync *sync);
+	status_t	(*fd_read_dir)(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 	status_t	(*fd_rewind_dir)(struct file_descriptor *);
 	status_t	(*fd_read_stat)(struct file_descriptor *, struct stat *);
 	status_t	(*fd_write_stat)(struct file_descriptor *, const struct stat *, int statMask);
@@ -70,11 +71,15 @@ enum fd_types {
 
 /* Prototypes */
 
-struct file_descriptor *alloc_fd(void);
-int new_fd(struct io_context *, struct file_descriptor *);
-struct file_descriptor *get_fd(struct io_context *, int);
-void put_fd(struct file_descriptor *);
-void free_fd(struct file_descriptor *);
+extern struct file_descriptor *alloc_fd(void);
+extern int new_fd(struct io_context *, struct file_descriptor *);
+extern struct file_descriptor *get_fd(struct io_context *, int);
+extern void put_fd(struct file_descriptor *);
+extern void free_fd(struct file_descriptor *);
+extern status_t select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel);
+extern status_t deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel);
+extern bool fd_is_valid(int fd, bool kernel);
+
 static struct io_context *get_current_io_context(bool kernel);
 
 /* The prototypes of the (sys|user)_ functions are currently defined in vfs.h */
@@ -90,4 +95,4 @@ static __inline struct io_context *get_current_io_context(bool kernel)
 	return thread_get_current_thread()->team->ioctx;
 }
 
-#endif /* _FILE_H */
+#endif /* _FD_H */
