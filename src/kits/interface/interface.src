@@ -6,6 +6,7 @@ INTERFACE_KIT_SOURCE =
 	CheckBox.cpp
 	Control.cpp
 	Deskbar.cpp
+	Font.cpp
 	PictureButton.cpp
 	Point.cpp
 	RadioButton.cpp
