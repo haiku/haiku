@@ -25,6 +25,10 @@ struct bios_regs {
 
 #define CARRY_FLAG	0x01
 
+static const addr_t kDataSegmentScratch = 0x10020;	// about 768 bytes
+static const addr_t kDataSegmentBase = 0x10000;
+static const addr_t kExtraSegmentScratch = 0x2000;	// about 24 kB
+
 extern
 #ifdef __cplusplus
 "C"
