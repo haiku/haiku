@@ -158,7 +158,7 @@ Partition::Type() const
 Partition *
 Partition::AddChild()
 {
-	Partition *child = new Partition(volume);
+	Partition *child = new Partition(fFD);
 	if (child == NULL)
 		return NULL;
 
@@ -271,7 +271,7 @@ create_child_partition(partition_id id, int32 index, partition_id childID)
 
 	// we cannot do anything with the child here, because it was not
 	// yet initialized by the partition module.
-	TRACE(("new child partition!"));
+	TRACE(("new child partition!\n"));
 
 	return child;
 }
