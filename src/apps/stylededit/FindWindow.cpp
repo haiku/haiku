@@ -7,13 +7,18 @@
 #include "Constants.h"
 #include "FindWindow.h"
 
+
 // FindWindow::FindWindow()
-FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, bool *caseState, bool *wrapState, bool *backState)
-			: BWindow(frame,"FindWindow", B_MODAL_WINDOW, B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE)
+FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString,
+	bool *caseState, bool *wrapState, bool *backState)
+	: BWindow(frame, "FindWindow", B_MODAL_WINDOW,
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_CURRENT_WORKSPACE)
 {
-	AddChild(fFindView=new BBox(Bounds(),"FindView",B_FOLLOW_ALL,B_WILL_DRAW,B_PLAIN_BORDER));
-	fFindView->SetViewColor(221,222,221);
-	
+	fFindView = new BBox(Bounds(), "FindView", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
+	fFindView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fFindView);
+
 	font_height height;
 	fFindView->GetFontHeight(&height);
 	float lineHeight = height.ascent+height.descent+height.leading;

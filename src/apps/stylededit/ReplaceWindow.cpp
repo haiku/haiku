@@ -8,15 +8,20 @@
 #include <Constants.h>
 #include <ReplaceWindow.h>
 
-ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString, BString *replaceString, bool *caseState, bool *wrapState, bool *backState)
-				: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW, B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE) 
+
+ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString,
+	BString *replaceString, bool *caseState, bool *wrapState, bool *backState)
+	: BWindow(frame, "ReplaceWindow", B_MODAL_WINDOW,
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_CURRENT_WORKSPACE) 
 {
-	AddChild(fReplaceView=new BBox(Bounds(),"ReplaceView",B_FOLLOW_ALL,B_WILL_DRAW,B_PLAIN_BORDER));
-	fReplaceView->SetViewColor(216,216,216);
-	
-	char * findLabel = "Find:";
+	fReplaceView = new BBox(Bounds(), "ReplaceView", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
+	fReplaceView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(fReplaceView);
+
+	char *findLabel = "Find:";
 	float findWidth = fReplaceView->StringWidth(findLabel);
-	fReplaceView->AddChild (fSearchString= new BTextControl(BRect(5,10,290,50), "", findLabel,NULL, NULL,
+	fReplaceView->AddChild(fSearchString= new BTextControl(BRect(5,10,290,50), "", findLabel,NULL, NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
 	
 	char * replaceWithLabel = "Replace with:";
