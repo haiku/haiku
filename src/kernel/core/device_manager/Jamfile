@@ -12,7 +12,7 @@ KernelMergeObject kernel_device_manager.o :
 	nodes.c
 	notifications.c
 	patterns.c
-	probe.c
+	probe.cpp
 	registration.c
 	root_node.c
 	scan.c
