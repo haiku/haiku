@@ -836,7 +836,7 @@ static void print_pir_table(struct pir_table *tbl)
  */
 static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 {
-	uint16 command = 0;
+	uint16 command;
 	uint8 mybus;
 	struct pci_device *pcid;
 	struct pci_bus *pcib;
@@ -861,17 +861,17 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 
 	pcii = (pci_info*)kmalloc(sizeof(pci_info));
 	if (!pcii)
-		return;
+		goto pci_bridge_skip_infolist;
 	pcid = (struct pci_device*)kmalloc(sizeof(struct pci_device));
 	if (!pcid) {
 		kfree(pcii);
-		return;
+		goto pci_bridge_skip_infolist;
 	}
 	pcib = (struct pci_bus *)kmalloc(sizeof(struct pci_bus));
 	if (!pcib) {
 		kfree(pcii);
 		kfree(pcid);
-		return;
+		goto pci_bridge_skip_infolist;
 	}
 	
 	pcid->info = pcii;
@@ -920,10 +920,12 @@ static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 			pci_busses = pcib;
 	}
 
-	command |= 0x03;
-	write_pci_config(mybus, dev, func, PCI_command, 2, command);
-
 	show_pci_details(pcii);
+
+pci_bridge_skip_infolist:
+
+	command |= 0x03;
+	write_pci_config(bus, dev, func, PCI_command, 2, command);
 	return;
 }
 
