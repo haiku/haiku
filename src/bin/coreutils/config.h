@@ -1582,7 +1582,7 @@
 /* #undef mkstemp */
 
 /* Define to rpl_mktime if the replacement function should be used. */
-#define mktime rpl_mktime
+//#define mktime rpl_mktime
 
 /* Define to `int' if <sys/types.h> does not define. */
 /* #undef mode_t */
