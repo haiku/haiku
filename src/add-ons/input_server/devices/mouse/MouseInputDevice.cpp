@@ -29,6 +29,18 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+//#define DEBUG 1
+#if DEBUG
+	#define LOG(text) fputs(text, sLogFile)
+#else
+	#define LOG(text)
+#endif
+
+FILE *MouseInputDevice::sLogFile = NULL;
+
+// TODO: These are "stolen" from the kb_mouse driver on bebits, which uses
+// the same protocol as BeOS one. They're just here to test this add-on with
+// the BeOS mouse driver.
 const static uint32 kGetMouseMovements = 10099;
 const static uint32 kGetMouseAccel = 10101;
 const static uint32 kSetMouseAccel = 10102;
@@ -59,12 +71,15 @@ MouseInputDevice::MouseInputDevice()
 	: 	fThread(-1),
 		fQuit(false)
 {
+	// TODO: Open "/dev/input/mouse/serial/0" as well, and what about USB mouses ?
 	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
 	if (fFd >= 0)
 		fThread = spawn_thread(DeviceWatcher, "mouse watcher thread",
 			B_NORMAL_PRIORITY, this);
-	
-	fLogFile = fopen("/boot/home/device_log.log", "w");
+
+#if DEBUG
+	sLogFile = fopen("/var/log/mouse_device_log.log", "w");
+#endif
 }
 
 
@@ -77,8 +92,10 @@ MouseInputDevice::~MouseInputDevice()
 	
 	if (fFd >= 0)
 		close(fFd);
-	
-	fclose(fLogFile);
+
+#if DEBUG
+	fclose(sLogFile);
+#endif
 }
 
 
@@ -140,9 +157,10 @@ MouseInputDevice::InitCheck()
 status_t
 MouseInputDevice::Start(const char *name, void *cookie)
 {
-	fputs("Start(", fLogFile);
-	fputs(name, fLogFile);
-	fputs(")\n", fLogFile);
+	char log[128];
+	snprintf(log, 128, "Start(%s)\n", name);
+
+	LOG(log);
 	resume_thread(fThread);
 	
 	return B_OK;
@@ -150,9 +168,12 @@ MouseInputDevice::Start(const char *name, void *cookie)
 
 
 status_t
-MouseInputDevice::Stop(const char *device, void *cookie)
+MouseInputDevice::Stop(const char *name, void *cookie)
 {
-	fputs("Stop()\n", fLogFile);
+	char log[128];
+	snprintf(log, 128, "Stop(%s)\n", name);
+
+	LOG(log);
 	
 	suspend_thread(fThread);
 	
@@ -164,7 +185,10 @@ status_t
 MouseInputDevice::Control(const char *name, void *cookie,
 						  uint32 command, BMessage *message)
 {
-	fputs("Control()\n", fLogFile);
+	char log[128];
+	snprintf(log, 128, "Control(%s, code: %lu)\n", name, command);
+
+	LOG(log);
 
 	if (command == B_NODE_MONITOR)
 		HandleMonitor(message);
@@ -194,18 +218,51 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		ioctl(dev->fFd, kGetMouseMovements, &movements);
 		
 		// TODO: send B_MOUSE_UP/B_MOUSE_DOWN messages
-		
-		message = new BMessage(B_MOUSE_MOVED);
-		if (message) {
-			message->AddInt32("buttons", movements.buttons);
-			message->AddInt32("x", movements.xdelta);
-			message->AddInt32("y", movements.ydelta);
-			snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld\n", 
+		int32 buttons = dev->fButtons - movements.buttons;
+	
+		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld\n", 
 				movements.buttons, movements.xdelta, movements.ydelta);
 			
-			fputs(log, dev->fLogFile);
+		LOG(log);
+
+		// TODO: B_MOUSE_DOWN and B_MOUSE_UP messages don't seem
+		// to reach the application,
+		// for some reason. Check if they reach the input server.
+		if (buttons != 0) {
+			message = new BMessage;				
+			if (buttons < 0) {
+				buttons = -buttons;
+				message->what = B_MOUSE_DOWN;
+				LOG("B_MOUSE_DOWN\n");
 				
+			} else if (buttons > 0) {
+				message->what = B_MOUSE_UP;
+				LOG("B_MOUSE_UP\n");
+			}
+			
+			message->AddInt64("when", movements.mouse_time);
+			message->AddInt32("buttons", buttons);
+			message->AddInt32("clicks", movements.click_count);
+			// TODO: do we need to add the "where" field ? 
+			// I guess not, as the input server will probably know the
+			// cursor position
+			
 			dev->EnqueueMessage(message);
+						
+			dev->fButtons = movements.buttons;
+		
+		}
+
+		if (movements.xdelta != 0 || movements.ydelta != 0) {
+			message = new BMessage(B_MOUSE_MOVED);
+			if (message) {
+				message->AddInt64("when", movements.mouse_time);
+				message->AddInt32("buttons", movements.buttons);
+				message->AddInt32("x", movements.xdelta);
+				message->AddInt32("y", movements.ydelta);
+					
+				dev->EnqueueMessage(message);
+			}
 		}
 		snooze(1000);
 	}

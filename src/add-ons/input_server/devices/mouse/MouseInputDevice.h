@@ -29,7 +29,9 @@
 
 #include <InputServerDevice.h>
 #include <InterfaceDefs.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 
 // TODO : these structs are needed in : input_server, mouse driver, mouse addon, mouse prefs
 // => factorisation has to be done in a global header, possibly private
@@ -68,11 +70,12 @@ private:
 	thread_id fThread;
 	int fFd;
 	bool fQuit;
-	FILE *fLogFile;
-	
-	static int32 DeviceWatcher(void *arg);
-	
+			
 	mouse_settings	fSettings;
+
+	static FILE *sLogFile;
+
+	static int32 DeviceWatcher(void *arg);
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();
