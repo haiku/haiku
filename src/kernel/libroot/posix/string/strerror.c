@@ -15,44 +15,38 @@ strerror(int errnum)
 {
 	switch (errnum) {
 		/* General Errors */
-		// B_OK
 		case B_NO_ERROR:
 			return "No Error";
 
-		// B_ERROR
-		case ERR_GENERAL:
+		case B_ERROR:
 			return "General Error";
 
-		// B_INTERRUPTED
-		case EINTR:
+		case B_INTERRUPTED:
+			// EINTR
 			return "Interrupted system call";
 
-		// B_NO_MEMORY:
-		case ENOMEM:
+		case B_NO_MEMORY:
+			// ENOMEM
 			return "Cannot allocate memory";	// "No memory"
 
-		// B_IO_ERROR
-		// EIO
-		case ERR_IO_ERROR:
+		case B_IO_ERROR:
+			// EIO
 			return "Input/Output error";	// "I/O Error"
 
-		// B_BAD_VALUE:
-		case EINVAL:
+		case B_BAD_VALUE:
+			// EINVAL
 			return "Invalid Argument";
 
-		// B_TIMED_OUT
-//		case ERR_TIMED_OUT:
-		case ETIMEDOUT:
+		case B_TIMED_OUT:
+			// ETIMEDOUT
 			return "Timed out";	// "Operation timed out"
 
-		// B_NOT_ALLOWED
-//		case ERR_NOT_ALLOWED:
-		case EPERM:
+		case B_NOT_ALLOWED:
+			// EPERM
 			return "Operation not permitted";	// "Operation not allowed"
 
-		// B_PERMISSION_DENIED
-//		case ERR_PERMISSION_DENIED:
-		case EACCES:
+		case B_PERMISSION_DENIED:
+			// EACCES
 			return "Operation not permitted";	// "Permission denied"
 
 		case ERR_INVALID_BINARY:
@@ -61,23 +55,22 @@ strerror(int errnum)
 		case ERR_INVALID_HANDLE:
 			return "Invalid ID Handle";
 
-		/* EMFILE */
 		case ERR_NO_MORE_HANDLES:
 			return "No more handles";
 
-		// B_FILE_ERROR
-		case EBADF:
+		case B_FILE_ERROR:
+			// EBADF
 			return "Bad file descriptor";
 
-		// B_ENTRY_NOT_FOUND
-		case ENOENT:
+		case B_ENTRY_NOT_FOUND:
+			// ENOENT
 			return "No such file or directory";
 
 		case ENFILE:
 			return "Too many open files in system"; // "File table overflow"
 
-		// B_NO_MORE_FDS			
-		case EMFILE:
+		case B_NO_MORE_FDS:
+			// EMFILE
 			return "Too many open files";
 
 		case ENXIO:
@@ -99,7 +92,6 @@ strerror(int errnum)
 
 		case ERR_NOT_IMPLEMENTED_YET:
 			return "Not implemented yet";
-
 
 		/* Semaphore errors */
 		case B_BAD_SEM_ID:
@@ -131,23 +123,19 @@ strerror(int errnum)
 		case ERR_VFS_PATH_NOT_FOUND:
 			return "VFS path not found";
 
-//		case ERR_VFS_INSUFFICIENT_BUF:
 		case ENOBUFS:
 			return "VFS insufficient buffer";	// "No buffer space available"
 
-		// B_READ_ONLY_DEVICE
-//		case ERR_VFS_READONLY_FS:
-		case EROFS:
+		case B_READ_ONLY_DEVICE:
+			// EROFS:
 			return "VFS readonly filesystem";	// "Read-only file system"
 
-		// B_FILE_EXISTS
-//		case ERR_VFS_ALREADY_EXISTS:
-		case EEXIST:
+		case B_FILE_EXISTS:
+			// EEXIST
 			return "VFS already exists";	// "File or Directory already exists"
 
-		// B_BUSY
-//		case ERR_VFS_FS_BUSY:
-		case EBUSY:
+		case B_BUSY:
+			// EBUSY
 			return "Device busy";	// "Device/File/Resource busy"
 
 		case ERR_VFS_FD_TABLE_FULL:
@@ -159,9 +147,8 @@ strerror(int errnum)
 		case ERR_VFS_DIR_NOT_EMPTY:
 			return "Directory not empty";
 
-		// B_NOT_A_DIRECTORY
-//		case ERR_VFS_NOT_DIR:
-		case ENOTDIR:
+		case B_NOT_A_DIRECTORY:
+			// ENOTDIR
 			return "Not a directory";
 
 		case ERR_VFS_WRONG_STREAM_TYPE:
@@ -591,8 +578,10 @@ strerror(int errnum)
 		case B_NOT_A_MESSAGE:
 			return "Data is not a message";
 
-		default: {
+		default:
+		{
 			static char unknown[28];
+
 			sprintf(unknown, "Unknown Error (%d)", errnum);
 			return unknown;
 		}
