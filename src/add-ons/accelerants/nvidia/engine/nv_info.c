@@ -268,6 +268,12 @@ static void detect_panels()
 	/* unlock CRTC1 */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+
+	LOG(2,("INFO: Dumping flatpanel related CRTC registers:\n"));
+	LOG(2,("CRTC1: LCD register: $%02x\n", CRTCR(LCD)));
+	LOG(2,("CRTC1: register $59: $%02x\n", CRTCR(0x59)));
+	LOG(2,("CRTC1: register $9f: $%02x\n", CRTCR(0x9f)));
+
 	/* detect active slave device (if any) */
 	slaved_for_dev1 = (CRTCR(PIXEL) & 0x80);
 	if (slaved_for_dev1)
@@ -280,18 +286,25 @@ static void detect_panels()
 	{
 		/* check secondary head: */
 		/* enable access to CRTC2 */
-		CRTCW(OWNER, 0x03);
+		CRTC2W(OWNER, 0x03);
 		/* unlock CRTC2 */
-		CRTCW(LOCK, 0x57);
-		CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+		CRTC2W(LOCK, 0x57);
+		CRTC2W(VSYNCE ,(CRTC2R(VSYNCE) & 0x7f));
+
+		LOG(2,("CRTC2: LCD register: $%02x\n", CRTC2R(LCD)));
+		LOG(2,("CRTC2: register $59: $%02x\n", CRTC2R(0x59)));
+		LOG(2,("CRTC2: register $9f: $%02x\n", CRTC2R(0x9f)));
+
 		/* detect active slave device (if any) */
-		slaved_for_dev2 = (CRTCR(PIXEL) & 0x80);
+		slaved_for_dev2 = (CRTC2R(PIXEL) & 0x80);
 		if (slaved_for_dev2)
 		{
 			/* if the panel isn't selected, tvout is.. */
-			tvout2 = !(CRTCR(LCD) & 0x01);
+			tvout2 = !(CRTC2R(LCD) & 0x01);
 		}
 	}
+
+	LOG(2,("INFO: End flatpanel related CRTC registers dump.\n"));
 
 	/* do some presets */
 	si->ps.panel1_width = 0;
@@ -384,6 +397,8 @@ static void detect_panels()
 		(si->ps.panel1_width == si->ps.panel2_width) &&
 		(si->ps.panel1_height == si->ps.panel2_height))
 	{
+		LOG(2,("INFO: correcting double detection of single panel!\n"));
+
 		if (DACR(FP_TG_CTRL) & 0x80000000)
 		{
 			/* LVDS panel is on CRTC2, so clear false primary detection */
