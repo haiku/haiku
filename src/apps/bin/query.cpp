@@ -8,6 +8,7 @@
 // Modified by Jerome Duval on November 03, 2003
 //
 
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -19,7 +20,9 @@
 #include <support/SupportDefs.h>
 #include <support/String.h>
 
+
 extern "C" {
+	// ToDo: include the correct header
 	int32 getopt(int32, const char **, const char *);
 	extern char *optarg;
 	extern int32 optind;
@@ -29,53 +32,62 @@ extern "C" {
 bool o_all_volumes = false;       // Query all volumes?
 bool o_escaping = true;       // Escape metacharacters?
 
-void usage(void)
+
+void
+usage(void)
 {
 	printf("usage:  query [ -e ] [ -a || -v volume ] expression\n");
 	printf("        -e         don't escape meta-characters\n");
 	printf("        -a         perform the query on all volumes\n");
 	printf("        -v <file>  perform the query on just one volume;\n");
 	printf("                   <file> can be any file on that volume.\n");
-	printf("                   defaults to the boot volume.\n");
+	printf("                   defaults to the current volume.\n");
 	printf(" hint:  query 'name=foo' will find a file named \"foo\"\n");
 	exit(0);
 }
 
-void perform_query(BVolume *v, const char *predicate)
+
+void
+perform_query(BVolume &volume, const char *predicate)
 {
 	BQuery query;
-	
+
 	// Set up the volume and predicate for the query.
-	query.SetVolume(v);
+	query.SetVolume(&volume);
 	query.SetPredicate(predicate);
 
 	if (query.Fetch() != B_OK) {
 		printf("query: bad query expression\n");
 		return;
 	}
-	
-	BEntry e;
-	BPath p;
-	while (query.GetNextEntry(&e) == B_OK) {
-		e.GetPath(&p);
+
+	BEntry entry;
+	BPath path;
+	while (query.GetNextEntry(&entry) == B_OK) {
+		if (entry.GetPath(&path) < B_OK) {
+			fprintf(stderr, "could not get path for entry\n");
+			continue;
+		}
+
 		printf("%s\n", o_escaping ? 
-			BString().CharacterEscape(p.Path(), " ()?*&\"'[]^\\~|;!<>*$", '\\').String() :
-			p.Path());
+			BString().CharacterEscape(path.Path(), " ()?*&\"'[]^\\~|;!<>*$", '\\').String()
+			: path.Path());
 	}
-	
-	return;
 }
 
-int main(int32 argc, const char **argv)
+
+int
+main(int32 argc, const char **argv)
 {
 	// Make sure we have the minimum number of arguments.
-	if (argc < 2) usage();	
+	if (argc < 2)
+		usage();	
 
 	// Which volume do we make the query on?
-	char volume_path[B_FILE_NAME_LENGTH];
-	// Default to the boot volume.
-	strcpy(volume_path, "/boot");
-	
+	// Default to the current volume.
+	char volumePath[B_FILE_NAME_LENGTH];
+	strcpy(volumePath, ".");
+
 	// Parse command-line arguments.
 	int32 opt;
 	while ((opt = getopt(argc, argv, "ave:")) != -1) {
@@ -83,50 +95,48 @@ int main(int32 argc, const char **argv)
 		case 'a':
 			o_all_volumes = true;
 			break;
-			
+
 		case 'e':
 			o_escaping = false;
 			break;
-		
+
 		case 'v':
-			strncpy(volume_path, optarg, B_FILE_NAME_LENGTH);
+			strncpy(volumePath, optarg, B_FILE_NAME_LENGTH);
 			break;
-		
+
 		default:
 			usage();
 			break;
 		}
 	}
 
-	BVolume query_volume;
-	
+	BVolume volume;
+
 	if (!o_all_volumes) {
 		// Find the volume that the query should be performed on,
 		// and set the query to it.
-		BEntry e(volume_path);
-		if (e.InitCheck() != B_OK) {
-			printf("query: %s is not a valid file\n", volume_path);
+		BEntry entry(volumePath);
+		if (entry.InitCheck() != B_OK) {
+			printf("query: %s is not a valid file\n", volumePath);
 			exit(0);
 		}
-		e.GetVolume(&query_volume);
+		entry.GetVolume(&volume);
 
-		if (!query_volume.KnowsQuery())
-			printf("query: volume containing %s is not query-enabled\n", volume_path);
+		if (!volume.KnowsQuery())
+			printf("query: volume containing %s is not query-enabled\n", volumePath);
 		else
-			perform_query(&query_volume, argv[optind]);
-		
-		exit(0);
-	}			
-
-	// Okay, we want to query all the disks -- so iterate over
-	// them, one by one, running the query.
-	BVolumeRoster volume_roster;
-	while (volume_roster.GetNextVolume(&query_volume) == B_OK) {
-		// We don't print errors here -- this will catch /pipe and
-		// other filesystems we don't care about.
-		if (query_volume.KnowsQuery())
-			perform_query(&query_volume, argv[optind]);
+			perform_query(volume, argv[optind]);
+	} else {	
+		// Okay, we want to query all the disks -- so iterate over
+		// them, one by one, running the query.
+		BVolumeRoster volumeRoster;
+		while (volumeRoster.GetNextVolume(&volume) == B_OK) {
+			// We don't print errors here -- this will catch /pipe and
+			// other filesystems we don't care about.
+			if (volume.KnowsQuery())
+				perform_query(volume, argv[optind]);
+		}
 	}
 
-	exit(0);	
+	return 0;
 }
