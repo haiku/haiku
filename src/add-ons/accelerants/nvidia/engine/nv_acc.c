@@ -33,11 +33,11 @@ static uint8 depth;
 
 status_t nv_acc_wait_idle()
 {
-	volatile int i;
-	while (ACCR(STATUS)&(1<<16))
-	{
-		for (i=0;i<10000;i++); /*spin in place so I do not hammer the bus*/
-	};
+//	volatile int i;
+//	while (ACCR(STATUS)&(1<<16))
+//	{
+//		for (i=0;i<10000;i++); /*spin in place so I do not hammer the bus*/
+//	};
 	return B_OK;
 }
 

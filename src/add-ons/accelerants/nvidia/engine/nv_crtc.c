@@ -415,9 +415,9 @@ status_t nv_crtc_cursor_init()
 	const uint32 curadd = 0;
 
 	/* set cursor bitmap adress ... */
-	if (si->ps.card_arch == NV04A)
+	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
 	{
-		/* must be used this way on pre-NV10! */
+		/* must be used this way on pre-NV10 and on all 'Go' cards! */
 
 		/* cursorbitmap must start on 2Kbyte boundary: */
 		/* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */
@@ -429,9 +429,10 @@ status_t nv_crtc_cursor_init()
 	}
 	else
 	{
-		/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+		/* upto 4Gb RAM adressing:
+		 * can be used on NV10 and later (except for 'Go' cards)! */
 		/* NOTE:
-		 * This register does not exist on pre-NV10 cards. */
+		 * This register does not exist on pre-NV10 and 'Go' cards. */
 
 		/* cursorbitmap must still start on 2Kbyte boundary: */
 		NV_REG32(NV32_NV10CURADD32) = (curadd & 0xfffff800);
@@ -528,14 +529,15 @@ status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 /*position the cursor*/
 status_t nv_crtc_cursor_position(uint16 x ,uint16 y)
 {
-	/* make sure we are not in retrace, because the register(s) might get copied
-	 * during our reprogramming them (double buffering feature) */
-//fixme if needed...
-/*	while (ACCR(STATUS) & 0x08)
+	/* make sure we are in retrace on pre-NV10 cards to prevent distortions:
+	 * no double buffering feature */
+	if (si->ps.card_arch == NV04A)
 	{
-		snooze(4);
+		while (!(NV_REG32(NV32_RASTER) & 0x00010000))
+		{
+			snooze(4);
+		}
 	}
-*/
 
 	DACW(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
 

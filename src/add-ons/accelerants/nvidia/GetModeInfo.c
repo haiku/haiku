@@ -130,5 +130,7 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 /* Return the semaphore id that will be used to signal a vertical sync occured.  */
 sem_id ACCELERANT_RETRACE_SEMAPHORE(void)
 {
-	return si->vblank;
+//	return si->vblank;
+//temp:
+	return B_ERROR;
 }
