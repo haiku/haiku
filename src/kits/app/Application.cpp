@@ -72,8 +72,8 @@ BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 // This isn't static because it's used by PrivateScreen.cpp
 BPrivateScreen *gPrivateScreen = NULL;
 
-property_info gApplicationPropInfo[] =
-{
+static property_info
+sPropertyInfo[] = {
 	{
 		"Window",
 			{},
@@ -687,7 +687,7 @@ status_t BApplication::GetSupportedSuites(BMessage* data)
 		err = data->AddString("Suites", "suite/vnd.Be-application");
 		if (!err)
 		{
-			BPropertyInfo PropertyInfo(gApplicationPropInfo);
+			BPropertyInfo PropertyInfo(sPropertyInfo);
 			err = data->AddFlat("message", &PropertyInfo);
 			if (!err)
 			{
