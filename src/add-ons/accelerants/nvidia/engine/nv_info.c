@@ -21,7 +21,7 @@ static void getstrap_arch_nv10_20_30(void);
 static status_t pins2_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg);
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size);
-static status_t exec_type1_script(uint8* rom, uint16 adress);
+static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -171,6 +171,7 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset, uint8 ram_cfg)
 static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size)
 {
 	status_t result = B_OK;
+	int16 size = init_size;
 
 	LOG(8,("INFO: executing coldstart...\n"));
 
@@ -187,9 +188,9 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	if (init1 || init2)
 	{
 		if (init1)
-			if (exec_type1_script(rom, init1) != B_OK) result = B_ERROR;
-		if (init2)
-			if (exec_type1_script(rom, init2) != B_OK) result = B_ERROR;
+			if (exec_type1_script(rom, init1, &size) != B_OK) result = B_ERROR;
+		if (init2 && (result == B_OK))
+			if (exec_type1_script(rom, init2, &size) != B_OK) result = B_ERROR;
 	}
 	else
 	{
@@ -204,11 +205,152 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	return result;
 }
 
-static status_t exec_type1_script(uint8* rom, uint16 adress)
+static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 {
-	//fixme...
+	status_t result = B_OK;
+	bool end = false;
 
-	return B_OK;
+	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
+
+	while (!end)
+	{
+		LOG(8,("INFO: $%04x ($%02x); ", adress, rom[adress]));
+
+		//fixme: complete...
+		switch (rom[adress])
+		{
+		case 0x59:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 7;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 7;
+			break;
+		case 0x5a:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 7;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 7;
+			break;
+		case 0x63:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 1;
+			break;
+		case 0x65:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 13;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 13;
+			break;
+		case 0x6e:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 13;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 13;
+			break;
+		case 0x71:
+			LOG(8,("END cmd, execution completed.\n\n"));
+			end = true;
+
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error!\n\n"));
+				result = B_ERROR;
+			}
+			break;
+		case 0x78:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 6;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 6;
+			break;
+		case 0x79:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 7;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 7;
+			break;
+		case 0x7a:
+			LOG(8,("xxx cmd, skipping...\n"));
+
+			*size -= 9;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			adress += 9;
+			break;
+		default:
+			LOG(8,("unknown cmd, aborting!\n\n"));
+			end = true;
+			result = B_ERROR;
+			break;
+		}
+	}
+
+	return result;
 }
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
