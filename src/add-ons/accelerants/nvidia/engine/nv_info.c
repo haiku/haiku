@@ -2838,10 +2838,20 @@ static void pinsnv30_arch_fake(void)
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
 	si->ps.min_system_vco = 128;
-	si->ps.max_pixel_vco = 350;
-	si->ps.min_pixel_vco = 128;
-	si->ps.max_video_vco = 350;
-	si->ps.min_video_vco = 128;
+	if (si->ps.ext_pll)
+	{
+		si->ps.max_pixel_vco = 600;
+		si->ps.min_pixel_vco = 220;
+		si->ps.max_video_vco = 600;
+		si->ps.min_video_vco = 220;
+	}
+	else
+	{
+		si->ps.max_pixel_vco = 350;
+		si->ps.min_pixel_vco = 128;
+		si->ps.max_video_vco = 350;
+		si->ps.min_video_vco = 128;
+	}
 	si->ps.max_dac1_clock = 350;
 	si->ps.max_dac1_clock_8 = 350;
 	si->ps.max_dac1_clock_16 = 350;
