@@ -75,9 +75,12 @@ public:
 	void HandleAddToRecentDocuments(BMessage *request);
 	void HandleAddToRecentFolders(BMessage *request);
 	void HandleAddToRecentApps(BMessage *request);
-	void HandleClearRecentDocuments(BMessage *request);
-	void HandleClearRecentFolders(BMessage *request);
-	void HandleClearRecentApps(BMessage *request);
+	void HandleLoadRecentLists(BMessage *request);
+	void HandleSaveRecentLists(BMessage *request);
+
+	void ClearRecentDocuments();
+	void ClearRecentFolders();
+	void ClearRecentApps();
 
 	status_t Init();
 

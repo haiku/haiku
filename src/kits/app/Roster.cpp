@@ -2209,6 +2209,9 @@ BRoster::AddToRecentApps(const char *appSig) const
 void
 BRoster::ClearRecentDocuments() const
 {
+	BMessage request(B_REG_CLEAR_RECENT_DOCUMENTS);
+	BMessage reply;
+	fMess.SendMessage(&request, &reply);
 }
 
 /*! \brief Sends a request to the roster to clear the recent
@@ -2217,6 +2220,9 @@ BRoster::ClearRecentDocuments() const
 void
 BRoster::ClearRecentFolders() const
 {
+	BMessage request(B_REG_CLEAR_RECENT_FOLDERS);
+	BMessage reply;
+	fMess.SendMessage(&request, &reply);
 }
 
 /*! \brief Sends a request to the roster to clear the recent
@@ -2225,6 +2231,71 @@ BRoster::ClearRecentFolders() const
 void
 BRoster::ClearRecentApps() const
 {
+	BMessage request(B_REG_CLEAR_RECENT_APPS);
+	BMessage reply;
+	fMess.SendMessage(&request, &reply);
+}
+
+// LoadRecentLists
+/*! \brief Loads the system's recently used document, folder, and
+	application lists from the specified file.
+	
+	\note The current lists are cleared before loading the new lists
+	
+	\param filename The name of the file to load from
+*/
+void
+BRoster::LoadRecentLists(const char *filename) const
+{
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_LOAD_RECENT_LISTS);
+	if (error == B_OK)
+		error = request.AddString("filename", filename);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	status_t result;
+	if (error == B_OK)
+		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (error == B_OK)
+		error = reply.FindInt32("result", &result);
+	if (error == B_OK)
+		error = result;
+	// Nothing to return... how sad :-(
+	// return error;
+}
+
+// SaveRecentLists
+/*! \brief Saves the system's recently used document, folder, and
+	application lists to the specified file.
+	
+	\param filename The name of the file to save to
+*/
+void
+BRoster::SaveRecentLists(const char *filename) const
+{
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_SAVE_RECENT_LISTS);
+	if (error == B_OK)
+		error = request.AddString("filename", filename);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	status_t result;
+	if (error == B_OK)
+		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+	if (error == B_OK)
+		error = reply.FindInt32("result", &result);
+	if (error == B_OK)
+		error = result;
+	// Nothing to return... how sad :-(
+	// return error;
 }
 
 /*-----------------------------------------------------*/

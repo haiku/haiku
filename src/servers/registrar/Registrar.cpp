@@ -156,13 +156,19 @@ Registrar::MessageReceived(BMessage *message)
 			fRoster->HandleAddToRecentApps(message);
 			break;
 		case B_REG_CLEAR_RECENT_DOCUMENTS:
-			fRoster->HandleClearRecentDocuments(message);
+			fRoster->ClearRecentDocuments();
 			break;
 		case B_REG_CLEAR_RECENT_FOLDERS:
-			fRoster->HandleClearRecentFolders(message);
+			fRoster->ClearRecentFolders();
 			break;
 		case B_REG_CLEAR_RECENT_APPS:
-			fRoster->HandleClearRecentApps(message);
+			fRoster->ClearRecentApps();
+			break;
+		case B_REG_LOAD_RECENT_LISTS:
+			fRoster->HandleLoadRecentLists(message);
+			break;
+		case B_REG_SAVE_RECENT_LISTS:
+			fRoster->HandleSaveRecentLists(message);
 			break;
 		// message runner requests
 		case B_REG_REGISTER_MESSAGE_RUNNER:

@@ -157,6 +157,7 @@ private:
 	friend status_t _send_to_roster_(BMessage *, BMessage *, bool);
 	friend bool _is_valid_roster_mess_(bool);
 	friend void BPrivate::init_registrar_roster(BMessenger, BMessenger);
+	friend class GetRecentTester;
 
 	class ArgVector;
 
@@ -212,6 +213,8 @@ private:
 	void ClearRecentDocuments() const;
 	void ClearRecentFolders() const;
 	void ClearRecentApps() const;
+	void LoadRecentLists(const char *file) const;
+	void SaveRecentLists(const char *file) const;
 
 	BMessenger	fMess;
 	BMessenger	fMimeMess;

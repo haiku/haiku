@@ -794,7 +794,8 @@ TRoster::HandleStopWatching(BMessage *request)
 /*!	\brief Handles a GetRecentDocuments() request.
 	\param request The request message
 */
-void TRoster::HandleGetRecentDocuments(BMessage *request)
+void
+TRoster::HandleGetRecentDocuments(BMessage *request)
 {
 	FUNCTION_START();
 	_HandleGetRecentEntries(request);
@@ -805,7 +806,8 @@ void TRoster::HandleGetRecentDocuments(BMessage *request)
 /*!	\brief Handles a GetRecentFolders() request.
 	\param request The request message
 */
-void TRoster::HandleGetRecentFolders(BMessage *request)
+void
+TRoster::HandleGetRecentFolders(BMessage *request)
 {
 	FUNCTION_START();
 	_HandleGetRecentEntries(request);
@@ -816,7 +818,8 @@ void TRoster::HandleGetRecentFolders(BMessage *request)
 /*!	\brief Handles a GetRecentApps() request.
 	\param request The request message
 */
-void TRoster::HandleGetRecentApps(BMessage *request)
+void
+TRoster::HandleGetRecentApps(BMessage *request)
 {
 	FUNCTION_START();
 
@@ -841,7 +844,8 @@ void TRoster::HandleGetRecentApps(BMessage *request)
 /*!	\brief Handles an AddToRecentDocuments() request.
 	\param request The request message
 */
-void TRoster::HandleAddToRecentDocuments(BMessage *request)
+void
+TRoster::HandleAddToRecentDocuments(BMessage *request)
 {
 	FUNCTION_START();
 
@@ -859,7 +863,6 @@ void TRoster::HandleAddToRecentDocuments(BMessage *request)
 		error = request->FindString("app sig", &appSig);
 	if (!error)
 		error = fRecentDocuments.Add(&ref, appSig);
-	error = B_ERROR;
 	reply.AddInt32("result", error);
 	request->SendReply(&reply);	
 
@@ -870,7 +873,8 @@ void TRoster::HandleAddToRecentDocuments(BMessage *request)
 /*!	\brief Handles an AddToRecentFolders() request.
 	\param request The request message
 */
-void TRoster::HandleAddToRecentFolders(BMessage *request)
+void
+TRoster::HandleAddToRecentFolders(BMessage *request)
 {
 	FUNCTION_START();
 
@@ -888,7 +892,6 @@ void TRoster::HandleAddToRecentFolders(BMessage *request)
 		error = request->FindString("app sig", &appSig);
 	if (!error)
 		error = fRecentFolders.Add(&ref, appSig);
-	error = B_ERROR;
 	reply.AddInt32("result", error);
 	request->SendReply(&reply);	
 
@@ -899,32 +902,97 @@ void TRoster::HandleAddToRecentFolders(BMessage *request)
 /*!	\brief Handles an AddToRecentApps() request.
 	\param request The request message
 */
-void TRoster::HandleAddToRecentApps(BMessage *request)
+void
+TRoster::HandleAddToRecentApps(BMessage *request)
 {
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleAddToRecentApps(NULL) called\n")));
+		return;
+	}
+
+	const char *appSig;
+	BMessage reply(B_REG_RESULT);
+
+	status_t error = request->FindString("app sig", &appSig);
+	if (!error)
+		error = fRecentApps.Add(appSig);
+	reply.AddInt32("result", error);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
 }
 
-// HandleClearRecentDocuments
-/*!	\brief Handles a ClearRecentDocuments() request.
-	\param request The request message
-*/
-void TRoster::HandleClearRecentDocuments(BMessage *request)
+void
+TRoster::HandleLoadRecentLists(BMessage *request)
 {
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleLoadRecentLists(NULL) called\n")));
+		return;
+	}
+
+	const char *filename;
+	BMessage reply(B_REG_RESULT);
+
+	status_t error = request->FindString("filename", &filename);
+	if (!error)
+		error = _LoadRosterSettings(filename);
+	reply.AddInt32("result", error);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
 }
 
-// HandleClearRecentFolders
-/*!	\brief Handles a ClearRecentFolders() request.
-	\param request The request message
-*/
-void TRoster::HandleClearRecentFolders(BMessage *request)
+void
+TRoster::HandleSaveRecentLists(BMessage *request)
 {
+	FUNCTION_START();
+
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleSaveRecentLists(NULL) called\n")));
+		return;
+	}
+
+	const char *filename;
+	BMessage reply(B_REG_RESULT);
+
+	status_t error = request->FindString("filename", &filename);
+	if (!error)
+		error = _SaveRosterSettings(filename);
+	reply.AddInt32("result", error);
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
 }
 
-// HandleClearRecentApps
-/*!	\brief Handles a ClearRecentApps() request.
-	\param request The request message
+// ClearRecentDocuments
+/*!	\brief Clears the current list of recent documents
 */
-void TRoster::HandleClearRecentApps(BMessage *request)
+void
+TRoster::ClearRecentDocuments()
 {
+	fRecentDocuments.Clear();
+}
+
+// ClearRecentFolders
+/*!	\brief Clears the current list of recent folders
+*/
+void
+TRoster::ClearRecentFolders()
+{
+	fRecentFolders.Clear();
+}
+
+// ClearRecentApps
+/*!	\brief Clears the current list of recent apps
+*/
+void
+TRoster::ClearRecentApps()
+{
+	fRecentApps.Clear();
 }
 
 // Init
