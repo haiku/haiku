@@ -209,21 +209,21 @@ user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-user_read_dir(int fd, struct dirent *buffer,size_t bufferSize)
+user_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
 	CHECK_USER_ADDR(buffer)
 
-	PRINT(("user_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld)\n",fd,buffer,bufferSize));
+	PRINT(("user_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld, count = %d)\n",fd,buffer,bufferSize,maxCount));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
 		return EBADF;
 
 	if (descriptor->ops->fd_read_dir) {
-		uint32 count;
+		uint32 count = maxCount;
 		retval = descriptor->ops->fd_read_dir(descriptor,buffer,bufferSize,&count);
 		if (retval >= 0)
 			retval = count;
@@ -389,19 +389,19 @@ sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize)
+sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	PRINT(("sys_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld)\n",fd,buffer,bufferSize));
+	PRINT(("sys_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld, count = %u)\n",fd,buffer,bufferSize,maxCount));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
 		return EBADF;
 
 	if (descriptor->ops->fd_read_dir) {
-		uint32 count;
+		uint32 count = maxCount;
 		retval = descriptor->ops->fd_read_dir(descriptor,buffer,bufferSize,&count);
 		if (retval >= 0)
 			retval = count;
