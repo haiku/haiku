@@ -7,6 +7,7 @@ Addon reader.media_addon : media :
 	../AbstractFileInterfaceAddOn.cpp
 	MediaReader.cpp
 	MediaReaderAddOn.cpp
+	misc.cpp
 ;
 
 LinkSharedOSLibs reader.media_addon : be media ;

@@ -74,8 +74,9 @@ BMediaNode * MediaReaderAddOn::InstantiateNodeFor(
 		fprintf(stderr,"<- NULL\n");
 		return 0; // we refuse to crash because you were stupid
 	}
-	size_t defaultChunkSize = size_t(8192); // XXX: read from add-on's attributes
-	float defaultBitRate = 800000;
+	// XXX: read from add-on's attributes
+	size_t defaultChunkSize = size_t(8192); // 8192 bytes = 8 Kilobytes
+	float defaultBitRate = 2048; // = 2048 kilobits/millisec = 256000 Kilobytes/sec
 	MediaReader * node
 		= new MediaReader(defaultChunkSize,
 						  defaultBitRate,
