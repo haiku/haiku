@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -349,7 +349,7 @@ void BMidiLocalProducer::SprayEvent(
 
 					#ifdef DEBUG
 					printf("*** spraying: ");
-					for (int32 t = 0; t < buf_size; ++t)
+					for (uint32 t = 0; t < buf_size; ++t)
 					{
 						printf("%02X, ", buffer[t]);
 					}

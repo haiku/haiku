@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -27,6 +27,8 @@
 #include <Message.h>
 
 class BMidiRoster;
+
+namespace BPrivate {
 
 // Receives messages from the midi_server on behalf of the 
 // BMidiRoster. Also keeps track of the list of endpoints.
@@ -135,5 +137,7 @@ private:
 	void DumpEndpoints();
 	#endif
 };
+
+} // namespace BPrivate
 
 #endif // MIDI_ROSTER_LOOPER_H

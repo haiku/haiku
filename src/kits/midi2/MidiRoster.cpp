@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -26,6 +26,8 @@
 #include "MidiRosterLooper.h"
 #include "protocol.h"
 
+using namespace BPrivate;
+
 // The midi_debug_level and midi_dispatcher_priority symbols 
 // were exported by Be's libmidi2, and even though they do not 
 // appear in the headers, some apps may still be using them. 
@@ -46,15 +48,17 @@ int32 midi_dispatcher_priority = B_REAL_TIME_PRIORITY;
 static BMidiRoster* roster = NULL;
 
 // Destroys the BMidiRoster instance when the app quits.
-static class BMidiRosterKiller
+namespace BPrivate
 {
-public:
-	~BMidiRosterKiller()
+	static struct BMidiRosterKiller
 	{
-		delete roster;
-	}
-} 
-killer;
+		~BMidiRosterKiller()
+		{
+			delete roster;
+		}
+	} 
+	midi_roster_killer;
+}
 
 //------------------------------------------------------------------------------
 

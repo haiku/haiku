@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -26,6 +26,8 @@
 #include "MidiRoster.h"
 #include "MidiRosterLooper.h"
 #include "protocol.h"
+
+using namespace BPrivate;
 
 //------------------------------------------------------------------------------
 
