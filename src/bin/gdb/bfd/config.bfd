@@ -572,6 +572,10 @@ case "${targ}" in
     targ_defvec=bfd_elf32_i386_vec
     targ_selvecs="i386pe_vec i386pei_vec"
     ;;
+  i[3-7]86-*-haiku*)
+    targ_defvec=bfd_elf32_i386_vec
+    targ_selvecs="i386pe_vec i386pei_vec"
+    ;;
   i[3-7]86-*-interix*)
     targ_defvec=i386pei_vec
     targ_selvecs="i386pe_vec"
