@@ -39,7 +39,8 @@ public:
 	BMidiLocalConsumer(const char *name = NULL);
 	
 	void SetLatency(bigtime_t latency);
-
+	int32 GetProducerID(void);
+	
 	void SetTimeout(bigtime_t when, void *data);	
 	virtual void Timeout(void *data);
 	
@@ -79,7 +80,8 @@ protected:
 private:
 
 	friend class BMidiRoster;
-
+	friend class BMidiDispatcher;
+	
 	virtual void _Reserved1();
 	virtual void _Reserved2();
 	virtual void _Reserved3();
@@ -93,7 +95,8 @@ private:
 	bigtime_t fTimeout;
 	void *fTimeoutData;
 	
-	uint32 _reserved[2];
+	int32 fCurrentProducer;
+	uint32 _reserved[1];
 };
 
 #endif
