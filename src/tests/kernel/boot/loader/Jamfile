@@ -1,0 +1,56 @@
+SubDir OBOS_TOP src tests kernel boot loader ;
+
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
+
+ObjectDefines 
+	heap.cpp 
+	main.cpp
+	vfs.cpp
+	partitions.cpp
+	stdio.cpp
+	RootFileSystem.cpp
+	: 
+	malloc=boot_malloc free=boot_free 
+	read_pos=boot_read_pos close=boot_close
+	;
+
+# This lets the correct stdio.h header be available
+# on the build platform.
+# This will be fixed with the move to GNU's stdio header
+if $(OS) = "LINUX" {
+#	SubDirC++Flags -include /usr/include/stdio.h ;
+} else {
+	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
+}
+
+SimpleTest BootLoaderTest :
+	platform_start.cpp
+	#platform_console.cpp
+	platform_debug.cpp
+	platform_devices.cpp
+	platform_heap.cpp
+	Handle.cpp
+
+	main.cpp
+	vfs.cpp
+	partitions.cpp
+	heap.cpp
+	RootFileSystem.cpp
+
+	list.c
+	:
+	: -fno-builtin
+	;
+
+# Tell Jam where to find the utility sources
+SEARCH on [ FGristFiles list.c ]
+    = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
+SEARCH on [ FGristFiles 
+		main.cpp vfs.cpp partitions.cpp
+		heap.cpp RootFileSystem.cpp
+	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
+
