@@ -2,8 +2,8 @@ SubDir OBOS_TOP src kernel ;
 
 KernelLd boot_loader :
 	boot_platform_$(OBOS_BOOT_PLATFORM).o
-	boot_partitions.a
 	boot_loader.a
+	boot_partitions.a
 
 	# file systems
 	boot_bfs.a
@@ -21,6 +21,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/stage2.ld 
