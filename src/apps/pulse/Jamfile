@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src apps pulse ;
 
+AddResources Pulse : Pulse.rsrc ;
+
 App Pulse : BottomPrefsView.cpp
 	ConfigView.cpp
 	CPUButton.cpp
@@ -15,4 +17,3 @@ App Pulse : BottomPrefsView.cpp
 
 LinkSharedOSLibs Pulse : be ;
 
-AddResources Pulse : Pulse.rsrc ;
