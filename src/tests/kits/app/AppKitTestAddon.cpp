@@ -7,6 +7,7 @@
 #include "blooper/LooperTest.h"
 #include "bmessagequeue/MessageQueueTest.h"
 #include "bmessenger/MessengerTest.h"
+#include "bpropertyinfo/PropertyInfoTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("App");
@@ -17,6 +18,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BLooper", LooperTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());
+	suite->addTest("BPropertyInfo", PropertyInfoTestSuite());
 	
 	return suite;
 }
