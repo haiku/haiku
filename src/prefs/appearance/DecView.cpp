@@ -51,8 +51,32 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
+	BRect cvrect(0,0,50,25);
+
+	cvrect.OffsetTo(Bounds().right-60,10);
+
+	apply=new BButton(cvrect,"ApplyButton","Apply",
+		new BMessage(APPLY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
+		B_WILL_DRAW | B_NAVIGABLE);
+	AddChild(apply);
+
+	// set up app_server emulation
+	driver=new PreviewDriver();
+	if(!driver->Initialize())
+		printf("Uh-oh... Couldn't initialize graphics module for server emu!\n");
+	else
+	{
+		preview=driver->View();
+		AddChild(preview);
+
+		BRect temp(driver->View()->Bounds());
+		
+		preview->MoveTo(apply->Frame().left-temp.Width()-20,apply->Frame().top);
+	}
+
 	// Set up list of color attributes
-	declist=new BListView(BRect(10,10,110,110),"DecoratorList");
+	cvrect.Set(10,10,preview->Frame().left-20-B_V_SCROLL_BAR_WIDTH, preview->Frame().bottom);
+	declist=new BListView(cvrect,"DecoratorList");
 	
 	scrollview=new BScrollView("ScrollView",declist, B_FOLLOW_LEFT |
 		B_FOLLOW_TOP, 0, false, true);
@@ -61,28 +85,8 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	
 	declist->SetSelectionMessage(new BMessage(DECORATOR_CHOSEN));
 
-	BRect cvrect(0,0,50,25);
 
-	cvrect.OffsetTo(Bounds().right-60,
-		scrollview->Frame().top);
-
-	apply=new BButton(cvrect,"ApplyButton","Apply",
-		new BMessage(APPLY_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
-		B_WILL_DRAW | B_NAVIGABLE);
-	AddChild(apply);
-
-	// set up app_server emulation
-	
-	driver=new PreviewDriver();
-	if(!driver->Initialize())
-		printf("Uh-oh... Couldn't initialize graphics module for server emu!\n");
-	else
-	{
-		preview=driver->View();
-		AddChild(preview);
-		preview->MoveTo(scrollview->Frame().right+20,scrollview->Frame().top);
-	}
-
+	// Finish setup
 	ldata.highcolor.SetColor(51,102,160);
 	pat_solid_high=0xFFFFFFFFFFFFFFFFLL;
 	driver->FillRect(preview_bounds,&ldata,(int8*)&pat_solid_high);

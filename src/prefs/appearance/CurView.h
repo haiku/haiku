@@ -41,8 +41,21 @@
 #include <StringView.h>
 #include <FilePanel.h>
 #include <Invoker.h>
+#include <SysCursor.h>
+#include <Bitmap.h>
 
 class APRWindow;
+
+class BitmapView : public BView
+{
+public:
+	BitmapView(const BPoint &pt);
+	~BitmapView(void);
+	void SetBitmap(BBitmap *bmp);
+	void Draw(BRect r);
+protected:
+	BBitmap *bitmap;
+};
 
 class CurView : public BView
 {
@@ -54,13 +67,9 @@ public:
 	void SaveSettings(void);
 	void LoadSettings(void);
 	void SetDefaults(void);
-	void NotifyServer(void);
-	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
 protected:
 	friend APRWindow;
 	BMenu *LoadCursorSets(void);
-	void SaveCursorSet(const BString &name);
-	void LoadCursorSet(const BString &name);
 	void SetCursorSetName(const char *name);
 
 	BButton *apply,*revert,*defaults;
@@ -74,6 +83,8 @@ protected:
 	BFilePanel *savepanel;
 	BString cursorset_name;
 	BString prev_set_name;
+	CursorSet *cursorset;
+	BitmapView *bmpview;
 };
 
 #endif

@@ -36,6 +36,8 @@
 #include <PortLink.h>
 #include "defs.h"
 #include "ServerConfig.h"
+#include <ServerProtocol.h>
+#include <PortMessage.h>
 #include <InterfaceDefs.h>
 
 //#define DEBUG_CURSORSET
@@ -48,7 +50,10 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
+	
+	
+	cursorset=new CursorSet("Default");
+	
 	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
@@ -73,6 +78,7 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	wellrect.right=wellrect.left+50;
 	cursorset_label=new BStringView(wellrect,"cursorset_label","Cursor Set: ");
 	AddChild(cursorset_label);
+	cursorset_label->ResizeToPreferred();
 	cursorset_name="<untitled>";
 
 
@@ -122,6 +128,14 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	AddChild(apply);
 	apply->SetEnabled(false);
 
+	cvrect.Set(0,0,48,48);
+	BPoint pt;
+	pt.x=scrollview->Frame().right+(Bounds().right-scrollview->Frame().right-cvrect.Width())/2;
+	pt.y=mb->Frame().bottom+(apply->Frame().top-mb->Frame().bottom-cvrect.Height())/2;
+	
+	bmpview=new BitmapView(pt);
+	AddChild(bmpview);
+
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
@@ -137,6 +151,7 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 CurView::~CurView(void)
 {
 	delete savepanel;
+	delete cursorset;
 }
 
 void CurView::AllAttached(void)
@@ -338,14 +353,26 @@ printf("Loading cursor sets from disk\n");
 	}
 
 	int32 count=dir.CountEntries();
-
+	
+	
 	BMessage *msg;
+	CursorSet cs(NULL);
+	
 	for(int32 i=0;i<count;i++)
 	{
 		dir.GetNextEntry(&entry);
 		entry.GetPath(&path);
 		
+		if(cs.Load(path.Path())!=B_OK)
+			continue;
+		
+		// Don't include the default set in the menu
+		name=path.Leaf();
+		if(name.Compare("Default")==0)
+			continue;
+		
 		name=path.Path();
+		
 		name.Remove(0,name.FindLast('/')+1);
 
 		msg=new BMessage(LOAD_CURSORSET);
@@ -356,103 +383,6 @@ printf("Loading cursor sets from disk\n");
 	return menu;
 }	
 
-void CurView::LoadCursorSet(const BString &name)
-{
-/*
-	// Load the current GUI cursor settings from a cursor set file.
-
-#ifdef DEBUG_CURSORSET
-printf("LoadCursorSet: %s\n",name.String());
-#endif
-
-	BDirectory dir,newdir;
-	if(dir.SetTo(CURSOR_SET_DIR)==B_ENTRY_NOT_FOUND)
-	{
-#ifdef DEBUG_CURSORSET
-printf("Cursor set folder not found. Creating %s\n",COLOR_SET_DIR);
-#endif
-		create_directory(COLOR_SET_DIR,0777);
-	}
-
-	BString path(COLOR_SET_DIR);
-	path+=name.String();
-	BFile file(path.String(),B_READ_ONLY);
-
-	if(file.InitCheck()!=B_OK)
-	{
-#ifdef DEBUG_CURSORSET
-printf("Couldn't open file %s for read\n",path.String());
-#endif
-		return;
-	}
-	if(settings.Unflatten(&file)==B_OK)
-	{
-#ifdef DEBUG_CURSORSET
-settings.PrintToStream();
-#endif
-		BString internal_name;
-		settings.FindString("name",&internal_name);
-//		BString namestr("Cursor Set: ");
-//		namestr+=internal_name.String();
-//		cursorset_label->SetText(namestr.String());
-		SetCursorSetName(internal_name.String());
-		return;
-	}
-#ifdef DEBUG_CURSORSET
-printf("Error unflattening file %s\n",name.String());
-#endif
-*/
-}
-
-void CurView::SaveCursorSet(const BString &name)
-{
-/*
-	// Save the current cursor attributes as a flattened BMessage in the 
-	// cursor set folder
-	BString path(COLOR_SET_DIR);
-	path+=name.String();
-
-#ifdef DEBUG_CURSORSET
-printf("SaveCursorSet: %s\n",path.String());
-#endif
-
-	if(settings.ReplaceString("name",name.String())!=B_OK)
-	{
-#ifdef DEBUG_CURSORSET
-printf("SaveCursorSet: Couldn't replace set name in settings\n");
-#endif
-	}
-
-	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
-
-	if(file.InitCheck()!=B_OK)
-	{
-#ifdef DEBUG_CURSORSET
-printf("SaveCursorSet: Couldn't open settings file for write\n");
-#endif
-	}
-	
-	if(settings.Flatten(&file)!=B_OK)
-	{
-#ifdef DEBUG_CURSORSET
-printf("SaveCursorSet: Couldn't flatten settings to file\n");
-#endif
-		return;
-	}
-
-	BMessage *msg=new BMessage(LOAD_CURSORSET);
-	msg->AddString("name",name.String());
-
-	if(cursorset_menu->AddItem(new BMenuItem(name.String(),msg))==false)
-	{
-#ifdef DEBUG_CURSORSET
-printf("SaveCursorSet: Error in adding item to menu\n");
-#endif
-	}
-	SetCursorSetName(name.String());
-*/
-}
-
 void CurView::SetCursorSetName(const char *name)
 {
 	if(!name)
@@ -461,6 +391,7 @@ void CurView::SetCursorSetName(const char *name)
 	cursorset_name=name;
 	namestr+=name;
 	cursorset_label->SetText(namestr.String());
+	cursorset_label->ResizeToPreferred();
 	cursorset_label->Invalidate();
 }
 
@@ -474,17 +405,15 @@ void CurView::SaveSettings(void)
 #ifdef DEBUG_CURSORSET
 printf("SaveSettings: %s\n",path.String());
 #endif
-	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
+	cursorset->Save(path.String(),B_CREATE_FILE|B_ERASE_FILE);
 	
-	settings.Flatten(&file);
 	prev_set_name=cursorset_name;
-	revert->SetEnabled(false);
 	revert->SetEnabled(false);
 }
 
 void CurView::LoadSettings(void)
 {
-/*	// Load the current GUI cursor settings from disk. This is done instead of
+	// Load the current GUI cursor settings from disk. This is done instead of
 	// getting them from the server at this point for testing purposes. Comment
 	// out the #define LOAD_SETTINGS_FROM_DISK line to use the server query code
 #ifdef DEBUG_CURSORSET
@@ -502,10 +431,11 @@ printf("Cursor set folder not found. Creating %s\n",SERVER_SETTINGS_DIR);
 	}
 
 	BString path(SERVER_SETTINGS_DIR);
-	path+=COLOR_SETTINGS_NAME;
-	BFile file(path.String(),B_READ_ONLY);
+	path+=CURSOR_SETTINGS_NAME;
+	
+	status_t stat=cursorset->Load(path.String());
 
-	if(file.InitCheck()!=B_OK)
+	if(stat!=B_OK)
 	{
 #ifdef DEBUG_CURSORSET
 printf("Couldn't open file %s for read\n",path.String());
@@ -514,166 +444,58 @@ printf("Couldn't open file %s for read\n",path.String());
 		SaveSettings();
 		return;
 	}
-	if(settings.Unflatten(&file)==B_OK)
-	{
-		settings.FindString("name",&cursorset_name);
-		SetCursorSetName(cursorset_name.String());
-		prev_set_name=cursorset_name;
-		picker->SetValue(GetCursorFromMessage(&settings,attrstring.String()));
-#ifdef DEBUG_CURSORSET
-settings.PrintToStream();
-#endif
-		return;
-	}
-#ifdef DEBUG_CURSORSET
-printf("Error unflattening SystemCursors file %s\n",path.String());
-#endif
-	
-	// If we get this far, we have encountered an error, so reset the settings
-	// to the defaults
-	SetDefaults();
-	SaveSettings();
-*/
+
+	settings.FindString("name",&cursorset_name);
+	SetCursorSetName(cursorset_name.String());
+	prev_set_name=cursorset_name;
+	return;
 }
 
 void CurView::SetDefaults(void)
 {
-/*
-#ifdef DEBUG_CURSORSET
-printf("Initializing cursor settings to defaults\n");
-#endif
-	settings.MakeEmpty();
-	settings.AddString("name","Default");
-	cursorset_name="Default";
+	// The server will perform the necessary work to set defaults, so just ask it to do the
+	// work for us. It is a synchronous procedure, so we will notify the server and load the cursor
+	// set 'Default'.
+	BString string(CURSOR_SET_DIR);
+	string+="Default";
+	
+	cursorset->Load(string.String());
 
-	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
-	rgb_color col={216,216,216,255};
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	port_id port=find_port(SERVER_PORT_NAME);
+	if(port==B_NAME_NOT_FOUND)
+		return;
+		
+	PortLink link(port);
+	PortMessage pmsg;
+	
+	link.SetOpCode(AS_SET_SYSCURSOR_DEFAULTS);
+	link.FlushWithReply(&pmsg);
 
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_PANEL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute((color_which)B_DOCUMENT_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_DOCUMENT_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,245,245,245);
-	whichitem.SetAttribute((color_which)B_CONTROL_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_CONTROL_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_CONTROL_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,115,120,184);
-	whichitem.SetAttribute((color_which)B_CONTROL_HIGHLIGHT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,170,50,184);
-	whichitem.SetAttribute((color_which)B_NAVIGATION_BASE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_NAVIGATION_PULSE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute((color_which)B_SHINE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_SHADOW_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BORDER_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,0);
-	whichitem.SetAttribute((color_which)B_TOOLTIP_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_TOOLTIP_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,255,0);
-	whichitem.SetAttribute((color_which)B_SUCCESS_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,0,0);
-	whichitem.SetAttribute((color_which)B_FAILURE_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,51,102,160);
-	whichitem.SetAttribute((color_which)B_MENU_SELECTED_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	whichitem.SetAttribute(B_PANEL_BACKGROUND_COLOR);
-	SetRGBColor(&col,216,216,216);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,216,216,216,0);
-	whichitem.SetAttribute(B_MENU_BACKGROUND_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute(B_MENU_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,255,255);
-	whichitem.SetAttribute(B_MENU_SELECTED_ITEM_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,255,203,0);
-	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,0,0,0);
-	whichitem.SetAttribute((color_which)B_WINDOW_TAB_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,232,232,232);
-	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,80,80,80);
-	whichitem.SetAttribute((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR);
-	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
-
-//	BString labelstr("Color Set: ");
-//	labelstr+=cursorset_name;
-//	cursorset_label->SetText(labelstr.String());
-	SetCursorSetName("Default");
-*/
 }
 
-void CurView::NotifyServer(void)
+BitmapView::BitmapView(const BPoint &pt)
+ : BView(BRect(0,0,48,48).OffsetToCopy(pt),"bitmapview",B_FOLLOW_NONE,B_WILL_DRAW)
 {
+	bitmap=NULL;
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-rgb_color CurView::GetColorFromMessage(BMessage *msg, const char *name, int32 index=0)
+BitmapView::~BitmapView(void)
 {
-/*	
-	// Simple function to do the dirty work of getting an rgb_color from
-	// a message
-	rgb_color *col,rcolor={0,0,0,0};
-	ssize_t size;
-
-	if(!msg || !name)
-		return rcolor;
-
-	if(msg->FindData(name,(type_code)'RGBC',index,(const void**)&col,&size)==B_OK)
-		rcolor=*col;
-	return rcolor;
-*/
+	if(bitmap)
+		delete bitmap;
 }
+
+void BitmapView::SetBitmap(BBitmap *bmp)
+{
+	if(bitmap)
+		delete bitmap;
+	bitmap=bmp;
+}
+
+void BitmapView::Draw(BRect r)
+{
+	if(bitmap)
+		DrawBitmap(bitmap);
+}
+

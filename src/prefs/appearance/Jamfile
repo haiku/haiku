@@ -10,7 +10,7 @@ Preference Appearance :
 	CurView.cpp
 	DecView.cpp
 	PreviewDriver.cpp
-	SysCursorAPI.cpp
+#	SysCursorAPI.cpp
 	ColorWell.cpp
 	ColorWhichItem.cpp
 	CursorWhichItem.cpp

@@ -87,6 +87,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	wellrect.right=colorwell->Frame().left - 20;
 	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
 	AddChild(colorset_label);
+	colorset_label->ResizeToPreferred();
 	colorset_name=new BString("<untitled>");
 
 
@@ -568,6 +569,7 @@ void APRView::SetColorSetName(const char *name)
 	colorset_name->SetTo(name);
 	namestr+=name;
 	colorset_label->SetText(namestr.String());
+	colorset_label->ResizeToPreferred();
 	colorset_label->Invalidate();
 }
 
