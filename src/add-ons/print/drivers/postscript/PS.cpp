@@ -48,6 +48,8 @@ bool PSDriver::startPage(int page)
 {
 	page ++;
 	writeSpoolString("%%%%Page: %d %d\n", page, page);
+	writeSpoolString("gsave\n");
+	setupCTM();
 	return true;
 }
 
@@ -55,12 +57,21 @@ bool PSDriver::endPage(int)
 {
 	try {
 		fPrintedPages ++;
+		writeSpoolString("grestore\n");
 		writeSpoolString("showpage\n");
 		return true;
 	}
 	catch (TransportException &err) {
 		return false;
 	} 
+}
+
+void PSDriver::setupCTM() {
+	// move origin from bottom left to top left
+	writeSpoolString("0 %f translate\n", getJobData()->getPaperRect().Height());
+	// y values increase from top to bottom
+	// units of measure is dpi
+	writeSpoolString("72 %d div 72 -%d div scale\n", 2*getJobData()->getXres(), 2*getJobData()->getYres());
 }
 
 bool PSDriver::endDoc(bool)
@@ -235,15 +246,6 @@ void PSDriver::jobStart()
 	writeSpoolString("%%%%BeginDefaults\n");
 	writeSpoolString("%%%%PageMedia: Plain\n");
 	writeSpoolString("%%%%EndDefaults\n");
-	
-	// setup CTM
-	writeSpoolString("%%%%BeginSetup\n");
-	// move origin from bottom left to top left
-	writeSpoolString("0 %f translate\n", getJobData()->getPaperRect().Height());
-	// y values increase from top to bottom
-	// units of measure is dpi
-	writeSpoolString("72 %d div 72 -%d div scale\n", getJobData()->getXres(), getJobData()->getYres());
-	writeSpoolString("%%%%EndSetup\n");
 }
 
 void PSDriver::startRasterGraphics(int x, int y, int width, int height, int widthByte)

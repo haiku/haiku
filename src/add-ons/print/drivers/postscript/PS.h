@@ -22,8 +22,8 @@ protected:
 	virtual bool endDoc(bool success);
 
 private:
+	void setupCTM();
 	void jobStart();
-	float scale(int d);
 	void startRasterGraphics(int x, int y, int width, int height, int widthByte);
 	void endRasterGraphics();
 	void rasterGraphics(
