@@ -147,21 +147,23 @@ status_t nv_acc_init()
 		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 	}
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
+	/* note:
+	 * CTX determines which FIFO channels point to what engine commands. */
 	/* (setup 'root' set first) */
 	ACCW(PR_CTX0_R, 0x00003000); /* NVclass = NVroot, chromakey and userclip enabled */
 	/* fixme: CTX1_R should reflect RAM amount? (no influence on current used functions) */
 	ACCW(PR_CTX1_R, 0x01ffffff); /* cardmemory mask(?) */
 	ACCW(PR_CTX2_R, 0x00000002); /* ??? */
 	ACCW(PR_CTX3_R, 0x00000002); /* ??? */
-	/* (setup set '0') */
+	/* setup set '0' for cmd NV_ROP5_SOLID */
 	ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
-	/* (setup set '1') */
+	/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
 	ACCW(PR_CTX0_1, 0x01008019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_1, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_1, 0x00000000); /* method traps disabled */
-	/* (setup set '2') */
+	/* setup set '2' for cmd NV_IMAGE_PATTERN */
 	ACCW(PR_CTX0_2, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
@@ -169,11 +171,11 @@ status_t nv_acc_init()
 	ACCW(PR_CTX0_3, 0x01008021); /* NVclass $021, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_3, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_3, 0x00000000); /* method traps disabled */
-	/* (setup set '4') */
+	/* setup set '4' for cmd NV_IMAGE_BLIT */
 	ACCW(PR_CTX0_4, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_4, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
-	/* (setup set '5') */
+	/* setup set '5' for cmd NV3_GDI_RECTANGLE_TEXT */
 	ACCW(PR_CTX0_5, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
 	ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
 	ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
@@ -183,13 +185,19 @@ status_t nv_acc_init()
 	ACCW(PR_CTX1_6, 0x00000d01); /* format is A8RGB24, MSB mono */
 	ACCW(PR_CTX2_6, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_6, 0x00000000); /* method traps disabled */
-	/* (setup set '7') */
+	/* setup set '7' ... */
 	if (si->ps.card_arch != NV04A)
+	{
+		/* ... for cmd NV10_DX5_TEXTURE_TRIANGLE */
 		ACCW(PR_CTX0_7, 0x0300a094); /* NVclass $094, patchcfg ROP_AND, userclip enable,
 									  * context surface0 valid, nv10+: little endian */
+	}
 	else
+	{
+		/* ... for cmd NV4_DX5_TEXTURE_TRIANGLE */
 		ACCW(PR_CTX0_7, 0x0300a054); /* NVclass $054, patchcfg ROP_AND, userclip enable,
 									  * context surface0 valid */
+	}
 	ACCW(PR_CTX1_7, 0x00000d01); /* format is A8RGB24, MSB mono */
 	ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
 	ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
@@ -726,8 +734,7 @@ status_t nv_acc_init()
 static void nv_init_for_3D(void)
 {
 	/* setup PGRAPH unknown registers and modify (pre-cleared) pipe stuff for 3D use */
-	//if (si->ps.card_arch >= NV10A)
-	if (0)
+	if (si->ps.card_arch >= NV10A)
 	{
 		/* setup unknown PGRAPH stuff */
 		ACCW(PGWHAT_00, 0x00000000);
