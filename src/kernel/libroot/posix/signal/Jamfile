@@ -11,14 +11,10 @@ KernelMergeObject posix_signal.o :
 	-fPIC -DPIC
 	;
 
-MergeObjectFromObjects kernel_posix_signal.o :
-#	<$(SOURCE_GRIST)>raise.o
-	<$(SOURCE_GRIST)>send_signal.o
-	<$(SOURCE_GRIST)>sigaction.o
-	<$(SOURCE_GRIST)>signal.o
-	<$(SOURCE_GRIST)>sigset.o
-	<$(SOURCE_GRIST)>strsignal.o
-	:
-	-fPIC -DPIC
-	;
+# there are no files in the kernel
+
+#MergeObjectFromObjects kernel_posix_signal.o :
+#	:
+#	-fPIC -DPIC
+#	;
 

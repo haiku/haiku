@@ -133,16 +133,23 @@ has_data(thread_id thread)
 */
 
 status_t
-snooze(bigtime_t microseconds)
+snooze_etc(bigtime_t timeout, int timeBase, uint32 flags)
 {
-	return sys_snooze_until(sys_system_time() + microseconds, B_SYSTEM_TIMEBASE);
+	return sys_snooze_etc(timeout, timeBase, flags);
 }
 
 
 status_t
-snooze_until(bigtime_t time, int timeBase)
+snooze(bigtime_t timeout)
 {
-	return sys_snooze_until(time, timeBase);
+	return snooze_etc(timeout, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT);
+}
+
+
+status_t
+snooze_until(bigtime_t timeout, int timeBase)
+{
+	return snooze_etc(timeout, timeBase, B_ABSOLUTE_TIMEOUT);
 }
 
 
