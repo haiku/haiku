@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -26,8 +26,8 @@
 #include <BeBuild.h>
 #include <SupportDefs.h>
 #include <Archivable.h>
-#include <sys/socket.h>
 
+#include <sys/socket.h>
 
 #include <NetAddress.h>
 #include <NetBuffer.h>
@@ -44,25 +44,26 @@
 
 // Nettle forward declarations
 class NLEndpoint;
-class NLAddress;
-class NLPacket;
-
 
 
 class BNetEndpoint : public BArchivable
 {
 public:
 
-	BNetEndpoint(int proto = SOCK_STREAM);
+	BNetEndpoint(int type = SOCK_STREAM);
+	BNetEndpoint(int family, int type, int protocol);
+	BNetEndpoint(const BNetEndpoint &);
+	BNetEndpoint(BMessage *archive);
+
+	BNetEndpoint & operator=(const BNetEndpoint &);
+
 	virtual ~BNetEndpoint();
 
 	/*
 	 * It is important to call InitCheck() after creating an instance of this class.
 	 */	
-	status_t InitCheck();
+	status_t InitCheck() const;
 
-	BNetEndpoint &operator=(const BNetEndpoint &);
-	BNetEndpoint(const BNetEndpoint &);
 
 	/*
 	 * When a BNetEndpoint is archived, it saves various state information
@@ -71,10 +72,9 @@ public:
 	 * is later instantiated the connection to the FTP server will be reopened 
 	 * automatically.
 	 */
-	BNetEndpoint(BMessage *archive);
 	virtual	status_t Archive(BMessage *into, bool deep = true) const;
-	static BArchivable *Instantiate(BMessage *archive);
-		
+	static BArchivable * Instantiate(BMessage *archive);
+	
 
 	/*	
 	 * BNetEndpoint::SetProtocol()
@@ -105,8 +105,8 @@ public:
 	 * BNetEndpoint. RemoteAddr() returns a BNetAddress corresponding to the address of
 	 * the remote peer we are connected to, if using a connected stream protocol.
 	 */
-	const BNetAddress &LocalAddr();
-	const BNetAddress &RemoteAddr();
+	const BNetAddress & LocalAddr() const;
+	const BNetAddress & RemoteAddr() const;
 	
 	/*
 	 * BNetEndpoint::Socket() returns the actual socket used for data communications.
@@ -127,7 +127,7 @@ public:
 	 *
 	 * Bind this BNetEndpoint to a local address.  Calling bind() without specifying 
 	 * a BNetAddress or port number binds to a random local port.  The actual port 
-	 * bound to can be determined by a subsequent call to BNetEndpoint::getAddr().
+	 * bound to can be determined by a subsequent call to BNetEndpoint::LocalAddr().
 	 *
 	 * Returns B_OK if successful, B_ERROR otherwise.
 	 */
@@ -264,10 +264,14 @@ private:
 	virtual	void		_ReservedBNetEndpointFBCCruft5();
 	virtual	void		_ReservedBNetEndpointFBCCruft6();
 
-	int32				__ReservedBNetEndpointFBCCruftData[9];
-	BNetAddress m_peer;
+	int			m_socket;
+	bigtime_t	m_timeout;
+	int			m_last_error;
 	BNetAddress m_addr;
+	BNetAddress m_peer;
 	BNetAddress m_conaddr;
+
+	int32				__ReservedBNetEndpointFBCCruftData[6];
 };
 
 
