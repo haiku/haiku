@@ -38,6 +38,8 @@
 	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
 		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
 	#define LOG_ERR(text...) LOG(text)
+
+FILE *KeyboardInputDevice::sLogFile = NULL;
 #else
 	#define LOG(text...)
 	#define LOG_ERR(text...) fprintf(stderr, text)
@@ -354,8 +356,6 @@ const uint32 at_keycode_map[] = {
 };
 
 
-FILE *KeyboardInputDevice::sLogFile = NULL;
-
 extern "C"
 BInputServerDevice *
 instantiate_input_device()
@@ -441,7 +441,12 @@ KeyboardInputDevice::Start(const char *name, void *cookie)
 {
 	CALLED();
 	keyboard_device *device = (keyboard_device *)cookie;
+
+	if ((device->fd = open(device->path, O_RDWR)) < B_OK)
+		return B_ERROR;
 	
+	InitFromSettings(device);
+
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", name);
 	
@@ -462,9 +467,13 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 	keyboard_device *device = (keyboard_device *)cookie;
 	
 	LOG("Stop(%s)\n", name);
+
+	close(device->fd);
 	
 	device->active = false;
 	if (device->device_watcher >= 0) {
+		suspend_thread(device->device_watcher);
+		resume_thread(device->device_watcher);
 		status_t dummy;
 		wait_for_thread(device->device_watcher, &dummy);
 	}
@@ -545,6 +554,7 @@ KeyboardInputDevice::AddDevice(const char *path)
 		delete device;
 		return B_ERROR;
 	}
+	close(device->fd);
 		
 	device->device_watcher = -1;
 	device->active = false;
@@ -562,8 +572,6 @@ KeyboardInputDevice::AddDevice(const char *path)
 	devices[1] = NULL;
 	
 	fDevices.AddItem(device);
-	
-	InitFromSettings(device);
 	
 	return RegisterDevices(devices);
 }

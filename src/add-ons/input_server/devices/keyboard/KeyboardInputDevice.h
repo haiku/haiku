@@ -60,8 +60,9 @@ public:
 	
 	virtual status_t Control(const char *name, void *cookie,
 							 uint32 command, BMessage *message);
-							 
-	static FILE *sLogFile;	
+#ifdef DEBUG							 
+	static FILE *sLogFile;
+#endif
 private:
 	status_t HandleMonitor(BMessage *message);
 	status_t InitFromSettings(void *cookie, uint32 opcode = 0);

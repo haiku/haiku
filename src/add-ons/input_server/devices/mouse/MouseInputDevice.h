@@ -29,10 +29,9 @@
 
 #include <InputServerDevice.h>
 #include <InterfaceDefs.h>
-
+#include <List.h>
 #include <stdio.h>
 
-class BList;
 class MouseInputDevice : public BInputServerDevice {
 public:
 	MouseInputDevice();
@@ -48,15 +47,18 @@ public:
 private:
 	status_t HandleMonitor(BMessage *message);
 	status_t InitFromSettings(void *cookie, uint32 opcode = 0);
+	void RecursiveScan(const char *directory);
 	
 	status_t AddDevice(const char *path);
 	status_t RemoveDevice(const char *path);
 	
 	static int32 DeviceWatcher(void *arg);
 			
-	BList *fDevices;
-	
-	static FILE *sLogFile;	
+	BList fDevices;
+#ifdef DEBUG
+public:
+	static FILE *sLogFile;
+#endif
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();
