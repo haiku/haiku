@@ -47,7 +47,7 @@
 #define PSRV_SHOW_PAGE_SETUP				'pgst'
 #define PSRV_SHOW_PRINT_SETUP				'ppst'
 #define PSRV_PRINT_SPOOLED_JOB				'psns'
-#define PSRV_GET_DEFAULT_CONFIGURATION      'pdef'
+#define PSRV_GET_DEFAULT_SETTINGS      'pdef'
 
 // mime file types
 #define PSRV_PRINTER_FILETYPE		"application/x-vnd.Be.printer"
@@ -77,5 +77,20 @@
 #define PSRV_PRINTER_ATTR_CNX				"connection"
 #define PSRV_PRINTER_ATTR_PNP				"_PNP"
 #define PSRV_PRINTER_ATTR_MDL				"_MDL"
+
+// job settings fields
+#define PSRV_FIELD_CURRENT_PRINTER "current_printer"
+#define PSRV_FIELD_XRES "xres"
+#define PSRV_FIELD_YRES "yres"
+#define PSRV_FIELD_PAPER_RECT "paper_rect"
+#define PSRV_FIELD_PRINTABLE_RECT "printable_rect"
+#define PSRV_FIELD_FIRST_PAGE "first_page"
+#define PSRV_FIELD_LAST_PAGE "last_page"
+
+// optional job settings field
+#define PSRV_FIELD_ORIENTATION "orientation"
+#define PSRV_FIELD_COPIES "copies"
+#define PSRV_FIELD_SCALE "scale"
+#define PSRV_FIELD_QUALITY "quality"
 
 #endif
