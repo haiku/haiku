@@ -26,11 +26,20 @@
 
 #include "rld_priv.h"
 
+#define TRACE_RLD
+#ifdef TRACE_RLD
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 // ToDo: implement better locking strategy
 // ToDo: implement unload_program()
 // ToDo: implement load_addon()/unload_addon(): at the very least, we will have to make
 //	sure that B_ADD_ON_IMAGE is set correctly
 // ToDo: implement search paths $LIBRARY_PATH, $ADDON_PATH
+// ToDo: implement lazy binding
 
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
 #define	PAGE_OFFS(y) ((y) & (PAGE_MASK))
@@ -140,6 +149,23 @@ static struct uspace_program_args const *gProgramArgs;
 		printf("rld.so: " y); \
 		_kern_exit(0); \
 	}
+
+
+#ifdef TRACE_RLD
+void
+dprintf(const char *format, ...)
+{
+	char buffer[1024];
+
+	va_list list;
+	va_start(list, format);
+	
+	vsnprintf(buffer, sizeof(buffer), format, list);
+	_kern_debug_output(buffer);
+
+	va_end(list);
+}
+#endif
 
 
 static void
@@ -545,6 +571,9 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 
 			if (image->regions[i].id < 0)
 				goto error;
+
+			TRACE(("\"%s\" at %p (%s)\n", path, (void *)load_address,
+				image->regions[i].flags & RFLAG_RW ? "rw" : "read-only"));
 
 			image->regions[i].delta = load_address - image->regions[i].vmstart;
 			image->regions[i].vmstart = load_address;
@@ -992,6 +1021,8 @@ load_program(char const *path, void **_entry)
 
 	rld_lock();
 		// for now, just do stupid simple global locking
+
+	TRACE(("rld: load %s\n", path));
 
 	image = load_container(path, MAGIC_APP_NAME, B_APP_IMAGE);
 
