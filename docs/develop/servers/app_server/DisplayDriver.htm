@@ -1,0 +1,202 @@
+<HTML>
+<HEAD>
+<TITLE>DisplayDriver.htm</TITLE>
+<style type="text/css">
+  <!--
+	.Default {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 12pt}
+	.OBOS-Function-Def {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 16pt}
+	.OBOS-Title {background-color: rgb(255,255,255); color: rgb(0,128,0); font-family: 'Dutch801 Rm BT'; font-size: 24pt}
+	.Text-Background {background-color: rgb(255,255,255)}
+	.GR-Default {}
+	.Body {margin: 0px}
+	.Footer {margin: 0px}
+	.Header {margin: 0px}
+	.WP-Default {text-align: left; text-indent: 0px; margin-left: 0px; margin-right: 0px}
+  -->
+</style>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV class="sheet" id="Sheet 1">
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">DisplayDriver class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<P class="Body" style="margin: 0px">The DisplayDriver class is not a useful class unto itself. It is to provide a consistent interface for the rest of the app_server to whatever rendering context it is utilizing, whether it be a remote screen, a ServerBitmap, installed graphics hardware, or whatever. Documentation below will describe the role of each function.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><BR>
+Member Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=618 HEIGHT=537 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">DisplayDriver(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">~DisplayDriver(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool Initialize(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Shutdown(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void DrawBitmap(ServerBitmap *bmp, SRect src, SRect dest)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void DrawChar(char c, SPoint pt)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void DrawString(const char *string, int32 length, SPoint pt, escapement_delta *delta=NULL)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void Stroke/FillBezier(SPoint *pts, layerdata *d, int8 *pat)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void Stroke/FillEllipse(SRect r, layerdata *d, int8 *pattern)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void Stroke/FillArc(SRect r, float angle, float span, layerdata *d, int8 *pattern)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void StrokeLine(SPoint start, SPoint end, layerdata *d, int8 *pattern)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void StrokePolygon(SPoint *ptlist, int32 numpts, SRect rect, layerdata *d, int8 *pattern, bool is_closed=true)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void FillPolygon(SPoint *ptlist, int32 numpts, SRect rect, layerdata *d, int8 *pattern)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void Stroke/FillRect(SRect r, layerdata *d, int8 *pattern)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void Stroke/FillRoundRect(SRect r, float xrad, float yrad, layerdata *d, int8 *pattern)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=47>
+			<P class="Body" style="margin: 0px">void Stroke/FillShape(SShape *sh, layerdata *d, int8 *pattern)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void Stroke/FillTriangle(SPoints *pts, SRect r, layerdata *d, int8 *pattern)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void StrokeLineArray(SPoint *pts, int32 numlines, rgb_color *colors, layerdata *d)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawPicture(SPicture *pic, SPoint pt)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void CopyBits(SRect src, SRect dest)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void InvertRect(SRect r)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">uint8 GetDepth(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">uint16 GetHeight(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">uint16 GetWidth(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">screen_mode GetMode(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetMode(screen_mode mode)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=224 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool DumpToFile(const char *path)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			&nbsp;
+		</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">DisplayDriver(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">~DisplayDriver(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">bool Initialize(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void Shutdown(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These four are for general start and stop procedures. The constructor and destructor concern themselves with the internal members common to all drivers, such as the current cursor and the access semaphore. Subclasses will probably end up using these to handle memory allocation-related issues, but likely not much else. Initialize() and Shutdown() are for general setup internal to the module. Note that if Initialize() returns false, the server will not use the module, call Shutdown(), and then delete it as accordingly.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void CopyBits(SRect src, SRect dest)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void InvertRect(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawBitmap(ServerBitmap *bmp, SRect src, SRect dest, render_mode mode)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawPicture(SPicture *pic, SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawChar(char c, SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawString(const char *string, int32 length, SPoint pt, escapement_delta *delta=NULL)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def"><BR>
+void StrokeArc(SRect r, float angle, float span, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillArc(SRect r, float angle, float span, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeBezier(SPoint *pts, layerdata *d, int8 *pat)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillBezier(SPoint *pts, layerdata *d, int8 *pat)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeEllipse(SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillEllipse(SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeLine(SPoint start, SPoint end, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeLineArray(SPoint *pts, int32 numlines, rgb_color *colors, layerdata *d)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokePolygon(SPoint *ptlist, int32 numpts, SRect rect, layerdata *d, int8 *pattern, bool is_closed=true)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillPolygon(SPoint *ptlist, int32 numpts, SRect rect, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeRect(SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillRect(SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeRoundRect(SRect r, float xrad, float yrad, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillRoundRect(SRect r, float xrad, float yrad, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeShape(SShape *sh, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillShape(SShape *sh, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void StrokeTriangle(SPoints *pts, SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void FillTriangle(SPoints *pts, SRect r, layerdata *d, int8 *pattern)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These drawing functions are the meat and potatoes of the graphics module. Defining any or all of them is completely optional. However, the default versions of these functions will do nothing. Thus, implementing them is likely a good idea, even if not required.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">uint8 GetDepth(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">uint16 GetHeight(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">uint16 GetWidth(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">screen_mode GetMode(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetMode(screen_mode mode)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These five functions are called internally in order to get information about the current state of the buffer in the module. GetDepth should return 8, 16, or 32, in any event because the server handles RGB color spaces of these depths only.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">bool DumpToFile(const char *path)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+DumpToFile is completely optional, providing a hook which allows screenshots to be taken. The default version does nothing but return false. If a screenshot is successful, return true.</P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
+</DIV>
+</BODY>
+</HTML>

@@ -1,0 +1,385 @@
+<HTML>
+<HEAD>
+<TITLE>Decorator.htm</TITLE>
+<style type="text/css">
+  <!--
+	.Default {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 12pt}
+	.OBOS-Function-Def {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 16pt}
+	.OBOS-Title {background-color: rgb(255,255,255); color: rgb(0,128,0); font-family: 'Dutch801 Rm BT'; font-size: 24pt}
+	.Text-Background {background-color: rgb(255,255,255)}
+	.GR-Default {}
+	.Body {margin: 0px}
+	.Footer {margin: 0px}
+	.Header {margin: 0px}
+	.WP-Default {text-align: left; text-indent: 0px; margin-left: 0px; margin-right: 0px}
+  -->
+</style>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV class="sheet" id="Sheet 1">
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">Decorator class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<P class="Body" style="margin: 0px">Decorators provide the actual drawing for a window's looks.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><BR>
+Member Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=617 HEIGHT=270 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=203 HEIGHT=32>
+			<P class="Body" style="margin: 0px">Decorator(SRect int32 wlook, int32 wfeel, int32 wflags)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=32>
+			<P class="Body" style="margin: 0px">~Decorator(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetColors(color_set colors)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetDriver(DisplayDriver *driver)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetClose(bool is_down)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetMinimize(bool is_down)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetZoom(bool is_down)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetFlags(int32 wflags)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetFeel(int32 wfeel)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetLook(int32 wlook)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool GetClose(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool GetMinimize(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool GetZoom(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 GetLook(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=18>
+			<P class="Body" style="margin: 0px">int32 GetFeel(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=18>
+			<P class="Body" style="margin: 0px">int32 GetFlags(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetTitle(const char *string)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetFont(SFont *sf)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _ClipTitle(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetFocus(bool is_active)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool GetFocus(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			&nbsp;
+		</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<BR>
+Virtual Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=617 HEIGHT=289 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void MoveBy(float x, float y)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void MoveBy(SPoint pt)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void ResizeBy(float x, float y)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void ResizeBy(SPoint pt)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Draw(SRect r)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Draw(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawClose(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawFrame(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawMinimize(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawTab(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawTitle(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void DrawZoom(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawClose(SRect r)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawFrame(SRect r)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawMinimize(SRect r)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawTab(SRect r)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawTitle(SRect r)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void _DrawZoom(SRect r)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=32>
+			<P class="Body" style="margin: 0px">SRegion GetFootprint(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=32>
+			<P class="Body" style="margin: 0px">click_type Clicked(SPoint pt, int32 buttons, int32 modifiers)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void _SetFocus(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=32>
+			&nbsp;
+		</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+_ Indicates a protected member function</P>
+<P class="Body" style="margin: 0px"><BR>
+Exported C Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+Decorator *create_decorator(SRect frame, int32 wlook, int32 wfeel, int32 wflags)</P>
+<P class="Body" style="margin: 0px">float get_decorator_version(void)</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+Enumerated Types</P>
+<P class="Body" style="margin: 0px"><BR>
+click_type {</P>
+<P class="Body" style="margin: 0px">	CLICK_NONE</P>
+<P class="Body" style="margin: 0px">	CLICK_ZOOM</P>
+<P class="Body" style="margin: 0px">	CLICK_CLOSE</P>
+<P class="Body" style="margin: 0px">	CLICK_MINIMIZE</P>
+<P class="Body" style="margin: 0px">	CLICK_TAB</P>
+<P class="Body" style="margin: 0px">	CLICK_MOVE</P>
+<P class="Body" style="margin: 0px">	CLICK_MOVETOBACK</P>
+<P class="Body" style="margin: 0px">	CLICK_MOVETOFRONT</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_L</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_T</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_R</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_B</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_LT</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_RT</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_LB</P>
+<P class="Body" style="margin: 0px">	CLICK_RESIZE_RB</P>
+<P class="Body" style="margin: 0px">}</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">Decorator(SRect int32 wlook, int32 wfeel, int32 wflags)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Sets up internal variables common to all decorators.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Assign parameters to respective data members</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">~Decorator(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Empty.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void SetColors(color_set colors)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetDriver(DisplayDriver *driver)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetClose(bool is_down)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetMinimize(bool is_down)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetZoom(bool is_down)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetFlags(int32 wflags)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetFeel(int32 wfeel)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetLook(int32 wlook)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">bool GetClose(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">bool GetMinimize(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">bool GetZoom(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">int32 GetLook(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">int32 GetFeel(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">int32 GetFlags(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetTitle(const char *string)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void SetFont(SFont *sf)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These functions work with the internal members common to all Decorators - assigning them and returning them. Additionally, SetTitle() and SetFont() set the clip_font flag to true.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void ClipTitle(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+ClipTitle calculates how much of the title will actually be displayed when _DrawTitle() is called. </P>
+<P class="Body" style="margin: 0px"><BR>
+<span style="color: rgb(255,51,0)">&lt;To be fleshed out once font subsystem is better understood&gt;</span></P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void SetFocus(bool is_active)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+This is for handling color states when a window receives or loses the focus.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Set focus flag to whatever is_active is.</P>
+<P class="Body" style="margin: 0px">2) call hook function _SetFocus()</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">bool GetFocus(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the focus state held by the decorator</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Return the focus flag</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">Virtual Functions</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Most of these functions have a default behavior which can be overridden, but are implemented to handle the more common implementations.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void MoveBy(float x, float y)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void MoveBy(SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Move all member rectangles of Decorator by the specified amount. </P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void ResizeBy(float x, float y)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void ResizeBy(SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Resize the client frame, window frame, and the tab frame (width only) by the specified amount. Button rectangles - close, minimize, and zoom - are not modified.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void Draw(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void Draw(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Main drawing call which checks the intersection of the rectangle passed to it and draws all items which intersect it. Draw(void) simply performs drawing calls to draw the entire decorator's footprint area.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Check for intersection with SRect which encompasses the decorator's footprint and return if no intersection.</P>
+<P class="Body" style="margin: 0px">2) Call _DrawFrame(intersection)</P>
+<P class="Body" style="margin: 0px">3) Call _DrawTab(intersection)</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void DrawClose(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawClose(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawMinimize(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawMinimize(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawZoom(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawZoom(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Each of these is designed to utilize their respective button rectangles. The public (void) versions simply call the internal protected ones with the button rectangle. These protected versions are, by default, empty. The rectangle passed to them is the invalid area to be drawn, which is not necessarily the entire button's rectangle.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void DrawFrame(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawFrame(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Draws the frame, if any. The public version amounts to _DrawFrame(framerect). The protected version is expected to not cover up the client frame when drawing. Any drawing within the clientrect member will end up being drawn over by the window's child views.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void DrawTab(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTab(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Draws the window's tab, if any. DrawTab() amounts to _DrawTab(tabrect). If window titles are displayed, the _DrawTitle call is expected to be made here. Button-drawing calls, assuming that a window's buttons are in the tab, should be made here, as well.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">void DrawTitle(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTitle(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These cause the window's title to be drawn. DrawTitle() amounts to _DrawTitle(titlerect). _DrawTitle() should check the clip_title flag and call ClipTitle() only if it is true.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span style="color: rgb(255,51,0)">&lt;To be fleshed out once font subsystem is better understood&gt;</span></P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void _SetFocus(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+This hook function is primarily used to change colors used when a window changes focus states and is called immediately after the state is changed. If, for example, a decorator does not use OpenBeOS' GUI color set, it would change its drawing colors to reflect the change in focus.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">SRegion GetFootprint(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+This returns the "footprint" of the decorator, i.e. the area which is occupied by the window which is is the border surrounding the main client rectangle. It is possible to have oddly-shaped window borders, like ellipses and circles, but the resulting performance hit would reduce the said decorator to a novelty and not something useable. All versions are to construct an SRegion which the border occupies. This footprint is permitted to include the client rectangle area, but this area must not be actually drawn upon by the decorator itself. The default version returns the frame which encompasses all other rectangles - the "frame" member which belongs to its window border.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">click_type Clicked(SPoint pt, int32 buttons, int32 modifiers)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Clicked() performs hit testing for the decorator, given input conditions. This function is required by ALL subclasses expecting to do more than display itself. The return type will cause the server to take the appropriate actions, such as close the window, get ready to move it, etc.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">extern "C" Decorator *create_decorator(SRect frame, int32 wlook, int32 wfeel, int32 wflags)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Required export function which simply allocates an instance of the decorator and returns it.</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">extern "C" float get_decorator_version(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="Default"><BR>
+This should, for now, return 1.00.</span></P>
+<P class="Body" style="margin: 0px"><span class="Default"><BR>
+</span></P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
+</DIV>
+</BODY>
+</HTML>
