@@ -7,7 +7,7 @@
   #include <net/socket.h>
   #include <net/netdb.h>
   #ifdef HAVE_ARPA_INET
-	// inet_addr() is not defined in netdb.h anymore under BONE & sooner
+	// inet_addr() is not defined in netdb.h anymore under BONE & later
     #include <arpa/inet.h>	
   #endif
 #endif	// WIN32
