@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-6 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-7 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1005,22 +1005,16 @@ status_t nv_general_bios_to_powergraphics()
 
 /* Check if mode virtual_size adheres to the cards _maximum_ contraints, and modify
  * virtual_size to the nearest valid maximum for the mode on the card if not so.
- * Then: check if virtual_width adheres to the cards _multiple_ constraints, and
+ * Also: check if virtual_width adheres to the cards granularity constraints, and
  * create mode slopspace if not so.
- * We use acc multiple constraints here if we expect we can use acceleration, because
- * acc constraints are worse than CRTC constraints.
+ * We use acc or crtc granularity constraints based on the 'worst case' scenario.
  *
  * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
-//fixme: seperate heads for real dualhead modes:
-//CRTC1 and 2 constraints differ!
 status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
 {
-	/* Note:
-	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
-	 * or 'equals' the acceleration engine memory pitch granularity! */
-
 	uint32 video_pitch;
 	uint32 acc_mask, crtc_mask;
+	uint32 max_crtc_width, max_acc_width;
 	uint8 depth = 8;
 
 	/* determine pixel multiple based on 2D/3D engine constraints */
@@ -1060,13 +1054,37 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		break;
 	}
 
-	/* determine pixel multiple based on CRTC memory pitch constraints.
+	/* determine pixel multiple based on CRTC memory pitch constraints:
+	 * -> all NV cards have same constraints on CRTC1 and CRTC2;
+	 * -> if CRTC1 and CRTC2 are adressed in combined mode (OWNER = $04),
+	 *    dualhead cards have the same CRTC granularity as singlehead cards;
+	 * -> if CRTC1 and CRTC2 are adressed seperately (OWNER is $00 or $03),
+	 *    dualhead cards have bigger granularity than singlehead cards: this
+	 *    mode is used on dualhead cards with this driver.
+	 *
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	switch (si->ps.card_arch)
+	if (si->ps.secondary_head)
 	{
-	default:
-		/* all NV cards */
+		/* confirmed for:
+		 * GeForceFX 5200 */
+		// fixme: still confirm for GeForce2 MX400, GeForce4 MX440, GeForceFX 5600...
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x1f; break;
+			case B_RGB15: crtc_mask = 0x0f; break;
+			case B_RGB16: crtc_mask = 0x0f; break;
+			case B_RGB24: crtc_mask = 0x1f; break;
+			case B_RGB32: crtc_mask = 0x07; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+	}
+	else /* singlehead cards */
+	{
+		/* confirmed for:
+		 * TNT1, TNT2, TNT2-M64 */
 		switch (target->space)
 		{
 			case B_CMAP8: crtc_mask = 0x07; break;
@@ -1078,29 +1096,9 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
-//fixme for NV..
-		/* see G400 specs: CRTC2 has different constraints */
-		/* Note:
-		 * set for RGB and B_YCbCr422 modes. Other modes need larger multiples! */
-		if (target->flags & DUALHEAD_BITS)
-		{
-			switch (target->space)
-			{
-				case B_RGB16: crtc_mask = 0x1f; break;
-				case B_RGB32: crtc_mask = 0x0f; break;
-				default:
-					LOG(8,("INIT: illegal DH color space: 0x%08x\n", target->space));
-					return B_ERROR;
-			}
-		}
-//end fixme.
-		break;
 	}
 
-	/* check if we can setup this mode with acceleration:
-	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
-	*acc_mode = true;
-	/* check virtual_width */
+	/* set virtual_width limit for accelerated modes */
 	switch (si->ps.card_arch)
 	{
 	case NV04A:
@@ -1108,19 +1106,14 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		 * TNT1, TNT2, TNT2-M64 */
 		switch(target->space)
 		{
-		case B_CMAP8:
-			if (target->virtual_width > 8176) *acc_mode = false;
-			break;
-		case B_RGB15_LITTLE:
-		case B_RGB16_LITTLE:
-			if (target->virtual_width > 4088) *acc_mode = false;
-			break;
-		case B_RGB24_LITTLE:
-			if (target->virtual_width > 2720) *acc_mode = false;
-			break;
-		case B_RGB32_LITTLE:
-			if (target->virtual_width > 2044) *acc_mode = false;
-			break;
+			case B_CMAP8: max_acc_width = 8176; break;
+			case B_RGB15: max_acc_width = 4088; break;
+			case B_RGB16: max_acc_width = 4088; break;
+			case B_RGB24: max_acc_width = 2720; break;
+			case B_RGB32: max_acc_width = 2044; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
 		}
 		break;
 	default:
@@ -1128,19 +1121,14 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		 * GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
 		switch(target->space)
 		{
-		case B_CMAP8:
-			if (target->virtual_width > 16368) *acc_mode = false;
-			break;
-		case B_RGB15_LITTLE:
-		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8184) *acc_mode = false;
-			break;
-		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5456) *acc_mode = false;
-			break;
-		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4092) *acc_mode = false;
-			break;
+			case B_CMAP8: max_acc_width = 16368; break;
+			case B_RGB15: max_acc_width =  8184; break;
+			case B_RGB16: max_acc_width =  8184; break;
+			case B_RGB24: max_acc_width =  5456; break;
+			case B_RGB32: max_acc_width =  4092; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
 		}
 		/* NV31 (confirmed GeForceFX 5600) has NV20A granularity!
 		 * So let it fall through... */
@@ -1150,65 +1138,127 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		 * GeForce4 Ti4200 */
 		switch(target->space)
 		{
-		case B_CMAP8:
-			if (target->virtual_width > 16320) *acc_mode = false;
-			break;
-		case B_RGB15_LITTLE:
-		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8160) *acc_mode = false;
-			break;
-		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5440) *acc_mode = false;
-			break;
-		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4080) *acc_mode = false;
-			break;
+			case B_CMAP8: max_acc_width = 16320; break;
+			case B_RGB15: max_acc_width =  8160; break;
+			case B_RGB16: max_acc_width =  8160; break;
+			case B_RGB24: max_acc_width =  5440; break;
+			case B_RGB32: max_acc_width =  4080; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
 		}
 		break;
 	}
-	/* virtual_height */
-	/* (NV cards can even do more than this(?)...
-	 *  but 4096 is confirmed on all cards at max. accelerated width.) */
-	if (target->virtual_height > 4096) *acc_mode = false;
 
-	/* now check NV virtual_size based on CRTC constraints */
+	/* set virtual_width limit for unaccelerated modes */
+	if (si->ps.secondary_head)
 	{
-		/* virtual_width */
-		//fixme for NV CRTC2?...:
+		/* confirmed for:
+		 * GeForceFX 5200 */
+		// fixme: still confirm for GeForce2 MX400, GeForce4 MX440, GeForceFX 5600...
 		switch(target->space)
 		{
-		case B_CMAP8:
-			if (target->virtual_width > 16376)
-				target->virtual_width = 16376;
-			break;
-		case B_RGB15_LITTLE:
-		case B_RGB16_LITTLE:
-			if (target->virtual_width > 8188)
-				target->virtual_width = 8188;
-			break;
-		case B_RGB24_LITTLE:
-			if (target->virtual_width > 5456)
-				target->virtual_width = 5456;
-			break;
-		case B_RGB32_LITTLE:
-			if (target->virtual_width > 4094)
-				target->virtual_width = 4094;
-			break;
+			case B_CMAP8: max_crtc_width = 16352; break;
+			case B_RGB15: max_crtc_width =  8176; break;
+			case B_RGB16: max_crtc_width =  8176; break;
+			case B_RGB24: max_crtc_width =  5440; break;
+			case B_RGB32: max_crtc_width =  4088; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
 		}
+	}
+	else /* singlehead cards */
+	{
+		/* confirmed for:
+		 * TNT1, TNT2, TNT2-M64 */
+		switch(target->space)
+		{
+			case B_CMAP8: max_crtc_width = 16376; break;
+			case B_RGB15: max_crtc_width =  8188; break;
+			case B_RGB16: max_crtc_width =  8188; break;
+			case B_RGB24: max_crtc_width =  5456; break;
+			case B_RGB32: max_crtc_width =  4094; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+	}
 
+	/* check for acc capability, and adjust mode to adhere to hardware constraints */
+	if (max_acc_width <= max_crtc_width)
+	{
+		/* check if we can setup this mode with acceleration */
+		*acc_mode = true;
+		/* virtual_width */
+		if (target->virtual_width > max_acc_width) *acc_mode = false;
+		/* virtual_height */
+		/* (NV cards can even do more than this(?)...
+		 *  but 4096 is confirmed on all cards at max. accelerated width.) */
+		if (target->virtual_height > 4096) *acc_mode = false;
+
+		/* now check virtual_size based on CRTC constraints */
+		if (target->virtual_width > max_crtc_width) target->virtual_width = max_crtc_width;
 		/* virtual_height: The only constraint here is the cards memory size which is
 		 * checked later on in ProposeMode: virtual_height is adjusted then if needed.
 		 * 'Limiting here' to the variable size that's at least available (uint16). */
 		if (target->virtual_height > 65535) target->virtual_height = 65535;
-	}
 
-	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
-	 * it was confined above, so we can finally calculate safely if we need slopspace
-	 * for this mode... */
-	if (*acc_mode)
-		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
-	else
-		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+		/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
+		 * it was confined above, so we can finally calculate safely if we need slopspace
+		 * for this mode... */
+		if (*acc_mode)
+		{
+			/* the mode needs to adhere to the largest granularity imposed... */
+			if (acc_mask < crtc_mask)
+				video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+			else
+				video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
+		}
+		else /* unaccelerated mode */
+			video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+	}
+	else /* max_acc_width > max_crtc_width */
+	{
+		/* check if we can setup this mode with acceleration */
+		*acc_mode = true;
+		/* (we already know virtual_width will be no problem) */
+		/* virtual_height */
+		/* (NV cards can even do more than this(?)...
+		 *  but 4096 is confirmed on all cards at max. accelerated width.) */
+		if (target->virtual_height > 4096) *acc_mode = false;
+
+		/* now check virtual_size based on CRTC constraints */
+		if (*acc_mode)
+		{
+			/* note that max_crtc_width already adheres to crtc_mask */
+			if (target->virtual_width > (max_crtc_width & ~acc_mask))
+					target->virtual_width = (max_crtc_width & ~acc_mask);
+		}
+		else /* unaccelerated mode */
+		{
+			if (target->virtual_width > max_crtc_width)
+					target->virtual_width = max_crtc_width;
+		}
+		/* virtual_height: The only constraint here is the cards memory size which is
+		 * checked later on in ProposeMode: virtual_height is adjusted then if needed.
+		 * 'Limiting here' to the variable size that's at least available (uint16). */
+		if (target->virtual_height > 65535) target->virtual_height = 65535;
+
+		/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
+		 * it was confined above, so we can finally calculate safely if we need slopspace
+		 * for this mode... */
+		if (*acc_mode)
+		{
+			/* the mode needs to adhere to the largest granularity imposed... */
+			if (acc_mask < crtc_mask)
+				video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+			else
+				video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
+		}
+		else /* unaccelerated mode */
+			video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+	}
 
 	LOG(2,("INIT: memory pitch will be set to %d pixels for colorspace 0x%08x\n",
 														video_pitch, target->space)); 
