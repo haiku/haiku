@@ -11,13 +11,6 @@ Server app_server :
 	TokenHandler.cpp
 	PatternHandler.cpp
 
-	# PortLink will disappear as soon as I can figure out how to link the server
-	# against libopenbeos
-	PortLink.cpp
-	
-	# ColorUtils will disappear as soon as I can figure out how to link the server
-	# against libopenbeos
-	ColorUtils.cc
 	ColorSet.cpp
 	RectUtils.cpp
 	RGBColor.cpp
@@ -45,5 +38,6 @@ Server app_server :
 	ViewDriver.cpp
 ;
 LinkSharedOSLibs app_server : be root game translation 
+							   <boot!home!config!lib>libopenbeos.so 
 							   <boot!home!config!lib>libfreetype.so ;
 
