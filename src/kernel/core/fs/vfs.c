@@ -38,8 +38,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <resource.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <stddef.h>

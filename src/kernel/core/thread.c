@@ -32,7 +32,7 @@
 #include <kimage.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <kerrors.h>
 #include <syscalls.h>
 #include <ksignal.h>

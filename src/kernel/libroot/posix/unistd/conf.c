@@ -6,7 +6,7 @@
 
 #include <unistd.h>
 #include <syscalls.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <errno.h>
 
 

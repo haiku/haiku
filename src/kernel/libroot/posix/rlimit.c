@@ -4,7 +4,7 @@
 */
 
 
-#include <resource.h>
+#include <sys/resource.h>
 #include <syscalls.h>
 #include <errno.h>
 

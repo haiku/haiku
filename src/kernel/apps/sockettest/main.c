@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <Errors.h>
 #include <errno.h>
 #include <sys/socket.h>

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <syscalls.h>
 #include <ktypes.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <Errors.h>
 #include <errno.h>
 #include <OS.h>

@@ -17,7 +17,7 @@
 #include <port.h>
 #include <cpu.h>
 #include <arch/cpu.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
 #include <sysctl.h>

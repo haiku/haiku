@@ -7,7 +7,7 @@
 
 #include <ktypes.h>
 #include <defines.h>
-#include <resource.h>
+#include <sys/resource.h>
 #include <vfs_types.h>
 #include <vm_types.h>
 #include <thread_types.h>
