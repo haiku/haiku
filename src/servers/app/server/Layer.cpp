@@ -58,8 +58,8 @@
 	\param flags BView flags as defined in View.h
 	\param win ServerWindow to which the Layer belongs
 */
-Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
-				int32 flags, ServerWindow *win)
+Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
+				uint32 flags, ServerWindow *win)
 {
 	// frame is in _parent layer's coordinates
 	if(frame.IsValid())
@@ -83,6 +83,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
 	_invalid		= new BRegion( _frame );
 
 	_flags			= flags;
+	_resize_mode	= resize;
 	_hidden			= false;
 	_is_dirty		= false;
 	_is_updating	= false;
