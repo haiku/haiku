@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kernel libroot os arch x86 ;
 KernelMergeObject os_arch_$(OBOS_ARCH).o :
 	atomic.S
 	byteorder.S
+	get_stack_frame.S
 	system_info.c
 	system_time.S
 	thread.c
