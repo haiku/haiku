@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"> 
+
+<HTML> 
+<HEAD> 
+<TITLE>OpenBeOS Network Kit</TITLE> 
+<META http-equiv=Content-Type content="text/html; charset=windows-1252"> 
+<STYLE type="text/css"> 
+body 
+{ 
+        text-indent: 0in; 
+        font-stretch: normal; 
+        text-align: left; 
+        font-weight: normal; 
+        text-decoration: none; 
+        font-variant: normal; 
+        color: #000000; 
+        font-size: 12pt; 
+        font-style: normal; 
+        widows: 2; 
+        font-family: "Century Gothic", "Trebuchet MS", "Trebuchet", "Arial", "Helvetica"; 
+        background-color: #ffffff; 
+} 
+</STYLE> 
+</HEAD> 
+<BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
+
+<H1>OpenBeOS Network Kit: R5 compatibility</H1>
+
+<P>Unfortunatly, R5 and sooner (net_server based) network stack development header file (/develop/headers/be/net/socket.h) definition of 
+network structures and constantes are not BSD standard ones.<BR>
+BONE, otherwise, try to follow at best these standards definitions which,
+in turn, break binary compatibility with R5 network apps compiled for R5 network stack.<BR>
+Hence why you needs to link against libsocket.so, libbind.so and libbnetapi.so BONE apps instead of
+R5 libnet.so and libnetapi.so libraries...
+</P>
+<P>So, here we are. By design, we must:
+<UL>
+<LI>Provide backward binary compatibility with old, non-standard, network definitions used
+by apps linked against R5 network stack;
+<LI>But use the standard/de-facto BSD network definitions, to increase Unix network apps ports ease under
+OpenBeOS.
+</UL>
+</P>
+
+<P>Network definitions differences:
+</P>
+<P><TABLE cellpadding=2 cellspacing=2 border=0>
+<TR bgcolor=#E5E5E5 valign="top">
+<TH>Item<TH width="25%">R5 stack<TH width="25%">BONE stack<TH width="25%">OpenBeOS stack
+
+<TR bgcolor=#E5E5E5 valign="top">
+<TD><font color=#0000A0>socket.h</font> header file
+<TD><font color=#0000A0>be/net/socket.h</font>
+<TD><font color=#0000A0>be/bone/sys/socket.h</font>
+<TD><font color=#0000A0>posix/sys/socket.h</font>
+
+<TR bgcolor=#E5E5E5><TD>SOCK_DGRAM<TD>1<TD>2<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SOCK_STREAM<TD>2<TD>1<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SOCK_RAW<TD>not defined<TD>3<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SOCK_MISC<TD>not defined<TD>255<TD>idem as BONE
+
+<TR bgcolor=#E5E5E5><TD>SOL_SOCKET<TD>1<TD>0xffffffff<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_DEBUG<TD>1<TD>0x00000004<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_REUSEADDR<TD>2<TD>0x00000040<TD>idem as BONE
+<TR bgcolor=#E5E5E5><TD>SO_NONBLOCK<TD>3<TD>SO_NONBLOCK<TD>idem as BONE
+
+<TR bgcolor=#E5E5E5 valign="top"><TD>sockaddr
+<TD><TT>struct sockaddr {<BR>
+&nbsp;&nbsp;unsigned short sa_family;<BR>
+&nbsp;&nbsp;char sa_data[10];<BR>
+};</TT>
+<TD><TT>struct sockaddr {<BR>
+&nbsp;&nbsp;uint8 sa_len;<BR>			
+&nbsp;&nbsp;uint8 sa_family;<BR>		
+&nbsp;&nbsp;uint8 sa_data[30];<BR>	
+};</TT>
+<TD>idem as BONE
+
+<TR bgcolor=#E5E5E5><TD>shutdown()
+<TD>not defined<TD>defined<TD>idem as BONE
+
+
+<TR bgcolor=#E5E5E5 valign="top">
+<TD><font color=#0000A0>in.h</font> header file
+<TD><font color=#0000A0>be/net/netinet/in.h</font>, which in turn include <BR>
+<font color=#0000A0>be/net/socket.h</font>
+<TD><font color=#0000A0>be/bone/netinet/in.h</font>
+<TD><font color=#0000A0>posix/netinet/in.h</font>
+
+</TABLE>
+</P>
+
+<HR>
+
+<H6>Philippe Houdoin, January 2nd, 2004</H6>
+
+</BODY>
+</HTML>
