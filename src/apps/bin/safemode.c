@@ -1,32 +1,35 @@
-/* safemode.c - tells if safemode is active
+/*
  * (c) 2004, Jérôme DUVAL for Haiku
  * released under the MIT licence.
  *
- * ChangeLog:
- * 08-29-2004 v1.0
- *  Initial.
- * 
  * safemode
  */
 
+
+#include <syscalls.h>
+
 #include <stdio.h>
 #include <strings.h>
-#include <SupportDefs.h>
 
-// i don't know the exact signature but this one works
-extern status_t _kget_safemode_option_(char* name, uint8 *p1, uint32 *p2);
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-	uint8 p1;
-	uint32 p2 = 1;
-	status_t err;
-	
-	err = _kget_safemode_option_("safemode", &p1, &p2);
-	if (err == B_OK) {
-		printf("yes\n");
-	} else
-		printf("no\n");
+	char buffer[B_FILE_NAME_LENGTH];
+	size_t size = sizeof(buffer);
+
+	status_t status = _kern_get_safemode_option("safemode", buffer, &size);
+	if (status == B_OK) {
+		if (!strncasecmp(buffer, "true", size)
+			|| !strncasecmp(buffer, "yes", size)
+			|| !strncasecmp(buffer, "on", size)
+			|| !strncasecmp(buffer, "enabled", size)) {
+			puts("yes");
+			return 1;
+		}
+	}
+
+	puts("no");
 	return 0;
 }
 
