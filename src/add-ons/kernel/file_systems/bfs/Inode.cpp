@@ -302,7 +302,7 @@ Inode::MakeSpaceForSmallData(Transaction *transaction, const char *name, int32 b
 	ASSERT(fSmallDataLock.IsLocked());
 
 	while (bytes > 0) {
-		small_data *item = Node()->small_data_start, *max = NULL;
+		small_data *item = Node()->SmallDataStart(), *max = NULL;
 		int32 index = 0, maxIndex = 0;
 		for (; !item->IsLast(Node()); item = item->Next(), index++) {
 			// should not remove those
@@ -408,7 +408,7 @@ Inode::RemoveSmallData(Transaction *transaction, const char *name)
 
 	// search for the small_data item
 
-	small_data *item = Node()->small_data_start;
+	small_data *item = Node()->SmallDataStart();
 	int32 index = 0;
 	while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 		item = item->Next();
@@ -449,7 +449,7 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
 
 	SimpleLocker locker(fSmallDataLock);
 
-	small_data *item = Node()->small_data_start;
+	small_data *item = Node()->SmallDataStart();
 	int32 index = 0;
 	while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 		item = item->Next();
@@ -480,7 +480,7 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
 					return B_ERROR;
 
 				// reset our pointers
-				item = Node()->small_data_start;
+				item = Node()->SmallDataStart();
 				index = 0;
 				while (!item->IsLast(Node()) && strcmp(item->Name(), name)) {
 					item = item->Next();
@@ -531,7 +531,7 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
 			return B_ERROR;
 
 		// get new last item!
-		item = Node()->small_data_start;
+		item = Node()->SmallDataStart();
 		index = 0;
 		while (!item->IsLast(Node())) {
 			item = item->Next();
@@ -584,7 +584,7 @@ Inode::GetNextSmallData(small_data **_smallData) const
 
 	// begin from the start?
 	if (data == NULL)
-		data = Node()->small_data_start;
+		data = Node()->SmallDataStart();
 	else
 		data = data->Next();
 
@@ -2091,7 +2091,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type, vnode_id 
 	// read attributes out of the small data section
 
 	if (fCurrentSmallData >= 0) {
-		small_data *item = fInode->Node()->small_data_start;
+		small_data *item = fInode->Node()->SmallDataStart();
 
 		fInode->SmallDataLock().Lock();
 

@@ -133,11 +133,8 @@ struct small_data {
 	uint32		type;
 	uint16		name_size;
 	uint16		data_size;
-	
-#if __MWERKS__
-	char		name[1];	// name_size long, followed by data
-		// ToDo: this is bad and breaks the code
-#else
+
+#if !__MWERKS__ //-- mwcc doesn't support thingy[0], so we patch Name() instead
 	char		name[0];	// name_size long, followed by data
 #endif
 
@@ -186,13 +183,18 @@ struct bfs_inode {
 	};
 	int32		pad[4];
 
-#if __MWERKS__
-	small_data	small_data_start[1];
-		// ToDo: this reduces the space you have in an inode for attributes
-#else
+#if !__MWERKS__
 	small_data	small_data_start[0];
 #endif
-
+	
+	inline small_data *SmallDataStart() const {
+		#if __MWERKS__
+			return (small_data *)(&pad[4] /* last item in pad + sizeof(int32) */);
+		#else
+			return small_data_start;
+		#endif
+	}
+	
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }
 	int32 GroupID() const { return BFS_ENDIAN_TO_HOST_INT32(gid); }
@@ -341,14 +343,18 @@ block_run::Run(int32 group, uint16 start, uint16 length)
 inline char *
 small_data::Name() const
 {
+#if __MWERKS__
+	return (char *)(uint32(&data_size)+uint32(sizeof(data_size)));
+#else
 	return const_cast<char *>(name);
+#endif
 }
 
 
 inline uint8 *
 small_data::Data() const
 {
-	return (uint8 *)name + NameSize() + 3;
+	return (uint8 *)Name() + NameSize() + 3;
 }
 
 
