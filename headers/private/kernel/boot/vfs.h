@@ -59,8 +59,6 @@ class Directory : public Node {
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
 		virtual status_t Rewind(void *cookie) = 0;
 		virtual bool IsEmpty() = 0;
-
-		virtual status_t AddNode(Node *node);
 };
 
 /** The console based nodes don't need cookies for I/O, they
@@ -76,12 +74,10 @@ class ConsoleNode : public Node {
 		virtual ssize_t Write(const void *buffer, size_t bufferSize);
 };
 
-/** The root file system */
-extern Directory *gRoot;
-
 /* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);
+extern void register_boot_file_system(Directory *directory);
 extern Directory *get_boot_file_system(stage2_args *args);
 extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
