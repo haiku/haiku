@@ -10,6 +10,8 @@ APP_KIT_SOURCE =
 	Handler.cpp
 	InitTerminateLibBe.cpp
 	Invoker.cpp
+	LinkMsgReader.cpp
+	LinkMsgSender.cpp
 	Looper.cpp
 	LooperList.cpp
 	Message.cpp
