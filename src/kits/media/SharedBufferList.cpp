@@ -257,7 +257,8 @@ _shared_buffer_list::RecycleBuffer(BBuffer *buffer)
 	
 	int reclaimed_count;
 	
-	media_buffer_id id = buffer->ID();
+//	media_buffer_id id = buffer->ID();
+	media_buffer_id id = buffer->fBufferID;
 
 	if (Lock() != B_OK)
 		return B_ERROR;
