@@ -1,0 +1,8 @@
+/*!
+\mainpage The OpenBeOS Book
+
+\section kits Kits and Servers
+
+- \ref midi1
+- \ref midi2
+*/
