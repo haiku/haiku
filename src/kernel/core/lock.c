@@ -38,10 +38,8 @@ recursive_lock_init(recursive_lock *lock, const char *name)
 	lock->recursion = 0;
 	lock->sem = create_sem(1, name);
 
-	if (lock->sem >= B_OK) {
-		//set_sem_owner(lock->sem, B_SYSTEM_TEAM);
+	if (lock->sem >= B_OK)
 		return B_OK;
-	}
 
 	return lock->sem;
 }
@@ -111,10 +109,8 @@ mutex_init(mutex *m, const char *name)
 	m->holder = -1;
 
 	m->sem = create_sem(1, name);
-	if (m->sem >= B_OK) {
-		//set_sem_owner(m->sem, B_SYSTEM_TEAM);
+	if (m->sem >= B_OK)
 		return B_OK;
-	}
 
 	return m->sem;
 }
@@ -175,10 +171,8 @@ benaphore_init(benaphore *ben, const char *name)
 
 	ben->count = 1;
 	ben->sem = create_sem(0, name);
-	if (ben->sem >= B_OK) {
-		set_sem_owner(ben->sem, B_SYSTEM_TEAM);
+	if (ben->sem >= B_OK)
 		return B_OK;
-	}
 
 	return ben->sem;
 }
@@ -205,10 +199,8 @@ rw_lock_init(rw_lock *lock, const char *name)
 		name = "r/w lock";
 
 	lock->sem = create_sem(RW_MAX_READERS, name);
-	if (lock->sem >= B_OK) {
-		set_sem_owner(lock->sem, B_SYSTEM_TEAM);
+	if (lock->sem >= B_OK)
 		return B_OK;
-	}
 
 	return lock->sem;
 }
