@@ -431,8 +431,10 @@ static int recurse_directory(const char *path, const char *match)
 		return -1;
 
 	dirent = kmalloc(bufferSize);
-	if (!dirent)
+	if (!dirent) {
+		sys_close(dir);
 		return -1;
+	}
 
 	/* loop until we have a match or we run out of entries */
 	while (res <= 0) {
