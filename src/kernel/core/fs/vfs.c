@@ -2905,7 +2905,7 @@ err1:
 
 err:
 	mutex_unlock(&gMountMutex);	
-	return B_ENTRY_NOT_FOUND;
+	return B_BAD_VALUE;
 }
 
 
@@ -2957,6 +2957,108 @@ index_dir_rewind(struct file_descriptor *descriptor)
 		return FS_MOUNT_CALL(mount, rewind_index_dir)(mount->cookie, descriptor->cookie);
 
 	return EOPNOTSUPP;
+}
+
+
+static status_t
+index_create(mount_id mountID, const char *name, uint32 type, uint32 flags, bool kernel)
+{
+	struct fs_mount *mount;
+	fs_cookie cookie;
+	int status;
+
+	FUNCTION(("index_create(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
+
+	mutex_lock(&gMountMutex);	
+
+	mount = find_mount(mountID);
+	if (mount == NULL)
+		goto err;
+
+	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
+	mutex_unlock(&gMountMutex);	
+
+	if (FS_MOUNT_CALL(mount, create_index) == NULL)
+		return EROFS;
+
+	return FS_MOUNT_CALL(mount, create_index)(mount->cookie, name, type, flags);
+
+err:
+	mutex_unlock(&gMountMutex);	
+	return B_BAD_VALUE;
+}
+
+
+static status_t
+index_read_stat(struct file_descriptor *descriptor, struct stat *stat)
+{
+	struct vnode *vnode = descriptor->u.vnode;
+
+	// ToDo: currently unused!
+	FUNCTION(("index_read_stat: stat 0x%p\n", stat));
+	if (!FS_CALL(vnode, read_index_stat))
+		return EOPNOTSUPP;
+
+	return EOPNOTSUPP;
+	//return FS_CALL(vnode, read_index_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat);
+}
+
+
+static status_t
+index_name_read_stat(mount_id mountID, const char *name, struct stat *stat, bool kernel)
+{
+	struct fs_mount *mount;
+	fs_cookie cookie;
+	int status;
+
+	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
+
+	mutex_lock(&gMountMutex);	
+
+	mount = find_mount(mountID);
+	if (mount == NULL)
+		goto err;
+
+	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
+	mutex_unlock(&gMountMutex);	
+
+	if (FS_MOUNT_CALL(mount, read_index_stat) == NULL)
+		return EOPNOTSUPP;
+
+	return FS_MOUNT_CALL(mount, read_index_stat)(mount->cookie, name, stat);
+
+err:
+	mutex_unlock(&gMountMutex);	
+	return B_BAD_VALUE;
+}
+
+
+static status_t
+index_remove(mount_id mountID, const char *name, bool kernel)
+{
+	struct fs_mount *mount;
+	fs_cookie cookie;
+	int status;
+
+	FUNCTION(("index_remove(mountID = %ld, name = %s, kernel = %d)\n", mountID, name, kernel));
+
+	mutex_lock(&gMountMutex);	
+
+	mount = find_mount(mountID);
+	if (mount == NULL)
+		goto err;
+
+	// ToDo: lock the mount in some way - i.e. increment the root node's ref counter
+	mutex_unlock(&gMountMutex);	
+
+	if (FS_MOUNT_CALL(mount, remove_index) == NULL)
+		return EROFS;
+
+	return FS_MOUNT_CALL(mount, remove_index)(mount->cookie, name);
+
+err:
+	mutex_unlock(&gMountMutex);	
+	return B_BAD_VALUE;
 }
 
 
@@ -3603,6 +3705,34 @@ sys_rename_attr(int fromFile, const char *fromName, int toFile, const char *toNa
 
 
 int
+sys_open_index_dir(dev_t device)
+{
+	return index_dir_open(device, true);
+}
+
+
+int
+sys_create_index(dev_t device, const char *name, uint32 type, uint32 flags)
+{
+	return index_create(device, name, type, flags, true);
+}
+
+
+int
+sys_read_index_stat(dev_t device, const char *name, struct stat *stat)
+{
+	return index_name_read_stat(device, name, stat, true);
+}
+
+
+int
+sys_remove_index(dev_t device, const char *name)
+{
+	return index_remove(device, name, true);
+}
+
+
+int
 sys_getcwd(char *buffer, size_t size)
 {
 	char path[SYS_MAX_PATH_LEN];
@@ -4128,6 +4258,61 @@ user_rename_attr(int fromFile, const char *userFromName, int toFile, const char 
 		return B_BAD_ADDRESS;
 
 	return attr_rename(fromFile, fromName, toFile, toName, false);
+}
+
+
+int
+user_open_index_dir(dev_t device)
+{
+	return index_dir_open(device, false);
+}
+
+
+int
+user_create_index(dev_t device, const char *userName, uint32 type, uint32 flags)
+{
+	char name[B_FILE_NAME_LENGTH];
+	
+	if (!CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return index_create(device, name, type, flags, false);
+}
+
+
+int
+user_read_index_stat(dev_t device, const char *userName, struct stat *userStat)
+{
+	char name[B_FILE_NAME_LENGTH];
+	struct stat stat;
+	status_t status;
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| !CHECK_USER_ADDRESS(userStat)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status = index_name_read_stat(device, name, &stat, false);
+	if (status == B_OK) {
+		if (user_memcpy(userStat, &stat, sizeof(stat)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return status;
+}
+
+
+int
+user_remove_index(dev_t device, const char *userName)
+{
+	char name[B_FILE_NAME_LENGTH];
+	
+	if (!CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return index_remove(device, name, false);
 }
 
 

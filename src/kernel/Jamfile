@@ -324,11 +324,13 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!os>area.o
 	<$(SOURCE_GRIST)!libroot!os>debug.o
 	<$(SOURCE_GRIST)!libroot!os>fs_attr.o
+	<$(SOURCE_GRIST)!libroot!os>fs_index.o
 	<$(SOURCE_GRIST)!libroot!os>port.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os>systeminfo.o
 	<$(SOURCE_GRIST)!libroot!os>thread.o
 	<$(SOURCE_GRIST)!libroot!os>team.o
+	<$(SOURCE_GRIST)!libroot!os>time.o
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 
@@ -362,6 +364,7 @@ KernelLd libroot.so :
  	<$(SOURCE_GRIST)!libroot!posix!stdio>fputc.o
  	<$(SOURCE_GRIST)!libroot!posix!stdio>fputs.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>fread.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fseek.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>fwrite.o
  	<$(SOURCE_GRIST)!libroot!posix!stdio>fvwrite.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>fwalk.o
@@ -376,6 +379,7 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>puts.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>putw.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>refill.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>rewind.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>rget.o
 	<$(SOURCE_GRIST)!libroot!posix!stdio>sscanf.o
  	<$(SOURCE_GRIST)!libroot!posix!stdio>sprintf.o

@@ -159,6 +159,18 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_RENAME_ATTR:
 			*call_ret = user_rename_attr((int)arg0, (const char *)arg1, (int)arg2, (const char *)arg3);
 			break;
+		case SYSCALL_OPEN_INDEX_DIR:
+			*call_ret = user_open_index_dir((dev_t)arg0);
+			break;
+		case SYSCALL_CREATE_INDEX:
+			*call_ret = user_create_index((dev_t)arg0, (const char *)arg1, (uint32)arg2, (uint32)arg3);
+			break;
+		case SYSCALL_READ_INDEX_STAT:
+			*call_ret = user_read_index_stat((dev_t)arg0, (const char *)arg1, (struct stat *)arg2);
+			break;
+		case SYSCALL_REMOVE_INDEX:
+			*call_ret = user_remove_index((dev_t)arg0, (const char *)arg1);
+			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
 			break;
