@@ -2,7 +2,6 @@ SubDir OBOS_TOP src kernel libroot posix stdlib ;
 
 KernelMergeObject posix_stdlib.o :
 	<$(SOURCE_GRIST)>abs.c
-	<$(SOURCE_GRIST)>assert.c
 	<$(SOURCE_GRIST)>atof.c 
 	<$(SOURCE_GRIST)>atoi.c 
 	<$(SOURCE_GRIST)>bsearch.c
@@ -28,7 +27,6 @@ KernelMergeObject posix_stdlib.o :
 
 MergeObjectFromObjects kernel_posix_stdlib.o :
 	<$(SOURCE_GRIST)>abs.o
-	<$(SOURCE_GRIST)>assert.o
 	<$(SOURCE_GRIST)>atoi.o
 	<$(SOURCE_GRIST)>bsearch.o
 	<$(SOURCE_GRIST)>merge.o

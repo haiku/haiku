@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kernel libroot posix ;
 UsePrivateHeaders [ FDirName syslog_daemon ] ;
 
 KernelMergeObject posix_main.o :
+ 	<$(SOURCE_GRIST)>assert.c
  	<$(SOURCE_GRIST)>dlfcn.c
  	<$(SOURCE_GRIST)>errno.c
  	<$(SOURCE_GRIST)>fnmatch.c
