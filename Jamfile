@@ -79,6 +79,7 @@ Depends MediaKit :
 	au_reader
 	avcodec
 	avi_reader
+	matroska
 	mp3_decoder
 	mp3_reader
 	musepack
