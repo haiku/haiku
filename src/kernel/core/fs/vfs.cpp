@@ -102,27 +102,26 @@ static mutex sFileSystemsMutex;
 
 /**	\brief Guards sMountsTable.
 
-	The holder is allowed to read access the sMountsTable. Write access
-	additionally requires the sMountOpMutex (which has to be locked before
-	acquiring sMountMutex). Manipulation of the fs_mount structures themselves
+	The holder is allowed to read/write access the sMountsTable.
+	Manipulation of the fs_mount structures themselves
 	(and their destruction) requires different locks though.
 */
 static mutex sMountMutex;
 
 /**	\brief Guards mount/unmount operations.
 
-	The fs_mount() and fs_unmount() hold the mutex during their whole operation.
-	That is locking the mutex ensures that no FS is mounted/unmounted. In
+	The fs_mount() and fs_unmount() hold the lock during their whole operation.
+	That is locking the lock ensures that no FS is mounted/unmounted. In
 	particular this means that
 	- sMountsTable will not be modified,
 	- the fields immutable after initialization of the fs_mount structures in
 	  sMountsTable will not be modified,
 	- vnode::covered_by of any vnode in sVnodeTable will not be modified,
 	
-	The thread trying to lock the mutex must not hold sVnodeMutex or
+	The thread trying to lock the lock must not hold sVnodeMutex or
 	sMountMutex.
 */
-static mutex sMountOpMutex;
+static recursive_lock sMountOpLock;
 
 /**	\brief Guards sVnodeTable.
 
@@ -130,7 +129,7 @@ static mutex sMountOpMutex;
 	to any unbusy vnode in that table, save
 	to the immutable fields (device, id, private_node, mount) to which
 	only read-only access is allowed, and to the field covered_by, which is
-	guarded by sMountOpMutex.
+	guarded by sMountOpLock.
 
 	The thread trying to lock the mutex must not hold sMountMutex.
 */
@@ -934,12 +933,14 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode = nextVnode;
 
 		// see if we hit a mount point
+		recursive_lock_lock(&sMountOpLock);
 		if (vnode->covered_by) {
 			nextVnode = vnode->covered_by;
 			inc_vnode_ref_count(nextVnode);
 			put_vnode(vnode);
 			vnode = nextVnode;
 		}
+		recursive_lock_unlock(&sMountOpLock);
 	}
 
 	*_vnode = vnode;
@@ -2044,7 +2045,7 @@ vfs_init(kernel_args *ka)
 	if (mutex_init(&sFileSystemsMutex, "vfs_lock") < 0)
 		panic("vfs_init: error allocating file systems lock\n");
 
-	if (mutex_init(&sMountOpMutex, "vfs_mount_op_lock") < 0)
+	if (recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock") < 0)
 		panic("vfs_init: error allocating mount op lock\n");
 
 	if (mutex_init(&sMountMutex, "vfs_mount_lock") < 0)
@@ -2523,12 +2524,12 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 		if (status != B_OK)
 			return;
 
-		mutex_lock(&sMountOpMutex);
+		recursive_lock_lock(&sMountOpLock);
 		if (vnode->covered_by) {
 			entry->d_dev = vnode->covered_by->device;
 			entry->d_ino = vnode->covered_by->id;
 		}
-		mutex_unlock(&sMountOpMutex);
+		recursive_lock_unlock(&sMountOpLock);
 
 		put_vnode(vnode);
 	}
@@ -3465,7 +3466,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	if (fsName == NULL || fsName[0] == '\0')
 		return B_BAD_VALUE;
 
-	mutex_lock(&sMountOpMutex);
+	recursive_lock_lock(&sMountOpLock);
 
 	mount = (struct fs_mount *)malloc(sizeof(struct fs_mount));
 	if (mount == NULL) {
@@ -3535,7 +3536,17 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 			goto err5;
 		}
 
-		// ToDo: insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
+		// make sure covered_vnode is a DIR
+		struct stat coveredNodeStat;
+		err = FS_CALL(covered_vnode, read_stat)(covered_vnode->mount->cookie,
+			covered_vnode->private_node, &coveredNodeStat);
+		if (err < 0)
+			goto err5;
+
+		if (!S_ISDIR(coveredNodeStat.st_mode)) {
+			err = B_NOT_A_DIRECTORY;
+			goto err5;
+		}
 
 		if (covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
@@ -3555,14 +3566,14 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		goto err7;
 
 	// No race here, since fs_mount() is the only function changing
-	// covers_vnode (and holds sMountOpMutex at that time).
+	// covers_vnode (and holds sMountOpLock at that time).
 	if (mount->covers_vnode)
 		mount->covers_vnode->covered_by = mount->root_vnode;
 
 	if (!sRoot)
 		sRoot = mount->root_vnode;
 
-	mutex_unlock(&sMountOpMutex);
+	recursive_lock_unlock(&sMountOpLock);
 
 	return B_OK;
 
@@ -3587,7 +3598,7 @@ err2:
 err1:
 	free(mount);
 err:
-	mutex_unlock(&sMountOpMutex);
+	recursive_lock_unlock(&sMountOpLock);
 
 	return err;
 }
@@ -3606,7 +3617,7 @@ fs_unmount(char *path, bool kernel)
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
-	mutex_lock(&sMountOpMutex);
+	recursive_lock_lock(&sMountOpLock);
 
 	mount = find_mount(vnode->device);
 	if (!mount)
@@ -3670,7 +3681,7 @@ fs_unmount(char *path, bool kernel)
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
-	mutex_unlock(&sMountOpMutex);
+	recursive_lock_unlock(&sMountOpLock);
 
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
 
@@ -3685,7 +3696,7 @@ fs_unmount(char *path, bool kernel)
 	return 0;
 
 err:
-	mutex_unlock(&sMountOpMutex);
+	recursive_lock_unlock(&sMountOpLock);
 	return err;
 }
 
@@ -3699,7 +3710,7 @@ fs_sync(void)
 	FUNCTION(("vfs_sync: entry.\n"));
 
 	/* cycle through and call sync on each mounted fs */
-	mutex_lock(&sMountOpMutex);
+	recursive_lock_lock(&sMountOpLock);
 	mutex_lock(&sMountMutex);
 
 	hash_open(sMountsTable, &iter);
@@ -3710,7 +3721,7 @@ fs_sync(void)
 	hash_close(sMountsTable, &iter, false);
 
 	mutex_unlock(&sMountMutex);
-	mutex_unlock(&sMountOpMutex);
+	recursive_lock_unlock(&sMountOpLock);
 
 	return 0;
 }
