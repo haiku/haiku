@@ -15,7 +15,10 @@
 // Always define the symbols needed when not linking against libgcc.a --
 // we simply override them.
 
+// ... it doesn't seem to work with this symbol at least.
+#ifndef USING_LIBGCC
 const nothrow_t std::nothrow = {};
+#endif
 
 #if __GNUC__ == 2
 

@@ -7,5 +7,5 @@ KernelMergeObject kernel_util.o :
 	kernel_cpp.cpp
 	KMessage.cpp
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE
+	: -fno-pic -Wno-unused -D_KERNEL_MODE -DUSING_LIBGCC
 	;
