@@ -1526,8 +1526,8 @@ rule UnarchiveObjects
 
 actions UnarchiveObjects
 {
-	cd `dirname $(1[1])`
-	ar -x "$(2)" $(1)
+	cd $(1[1]:D)
+	ar -x "$(2)" $(1:B).o
 	cd -
 }
 
