@@ -35,7 +35,7 @@ GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
 
 UsePublicHeaders os support ;
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
-LinkSharedOSLibs gensyscalls : stdc++.r4 ;
+LinkSharedOSLibs gensyscalls : $(BUILD_LIBSTDC++) ;
 UsePrivateObjectHeaders gensyscalls.cpp : kernel ;
 UseArchObjectHeaders gensyscalls.cpp : $(OBOS_ARCH) ;
 
