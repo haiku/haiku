@@ -37,6 +37,7 @@
 #include <String.h>
 
 
+/*---- Construction --------------------------------------------------------*/
 BString::BString()
 	:_privateData(NULL)	
 {
@@ -63,12 +64,12 @@ BString::BString(const char *str, int32 maxLength)
 {
 	if (str) {
 		int32 len = (int32)strlen(str);
-		len = min(len, maxLength);
-		_Init(str, len);
+		_Init(str, min(len, maxLength));
 	}
 }
 
 
+/*---- Destruction ---------------------------------------------------------*/
 BString::~BString()
 {
 	if (_privateData)
@@ -171,7 +172,7 @@ BString::Adopt(BString &from, int32 length)
 	from._privateData = NULL;
 
 	if (length < Length())
-		_privateData = _GrowBy(length - Length()); //Negative value
+		_privateData = _GrowBy(length - Length()); //Negative
 
 	return *this;
 }
@@ -188,6 +189,7 @@ BString::SetTo(char c, int32 count)
 	return *this;	
 }
 
+
 /*---- Substring copying ---------------------------------------------------*/
 BString &BString::CopyInto(BString &into, int32 fromOffset, int32 length) const
 {
@@ -202,7 +204,7 @@ BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 	if (into) {
 		int32 len = min(Length() - fromOffset , length);
 		strncpy(into, _privateData + fromOffset, len);
-		into[len] = 0; 
+		into[len] = '\0'; 
 	}
 }
 
@@ -386,14 +388,17 @@ BString::Insert(char c, int32 count, int32 pos)
 BString&
 BString::Truncate(int32 newLength, bool lazy = true)
 {
+	if (newLength < 0)
+		return *this;
+		
 	if (newLength < Length()) {
 #if 0 
 		if (lazy)
 			; //ToDo: Implement
 		else
 #endif		
-			_privateData = _GrowBy(newLength - Length()); // Negative value	
-		_privateData[Length()] = 0;
+			_privateData = _GrowBy(newLength - Length()); //Negative	
+		_privateData[Length()] = '\0';
 	}
 	return *this;
 }
@@ -422,7 +427,11 @@ BString::RemoveFirst(const BString &string)
 BString&
 BString::RemoveLast(const BString &string)
 {
-	//TODO: Implement
+	int32 pos = _FindBefore(string.String(), Length(), -1);
+	
+	if (pos >= 0)
+		_privateData = _ShrinkAtBy(pos, string.Length());
+		
 	return *this;
 }
 
@@ -453,7 +462,12 @@ BString::RemoveFirst(const char *str)
 BString&
 BString::RemoveLast(const char *str)
 {
-	//TODO: Implement
+	if (str) {
+		int32 len = strlen(str);
+		int32 pos = _FindBefore(str, len, -1);
+		if (pos >= 0)
+			_privateData = _ShrinkAtBy(pos, len);
+	}
 	return *this;
 }
 
@@ -486,7 +500,10 @@ BString::RemoveSet(const char *setOfCharsToRemove)
 BString&
 BString::MoveInto(BString &into, int32 from, int32 length)
 {
-	//TODO: Implement
+	int32 len = min(Length() - from, length);
+	into.SetTo(String() + from, len);
+	_privateData = _ShrinkAtBy(from, len);
+
 	return *this;
 }
 
@@ -498,7 +515,7 @@ BString::MoveInto(char *into, int32 from, int32 length)
 	if (into && (from + length <= Length())) {
 		memcpy(into, String() + from, length);
 		_privateData = _ShrinkAtBy(from, length);
-		into[length] = 0;
+		into[length] = '\0';
 	}		 
 }
 
@@ -593,18 +610,179 @@ BString::FindFirst(const char *string, int32 fromOffset) const
 int32
 BString::FindFirst(char c) const
 {
-	return _FindAfter(&c, 0, -1);
+	char *tmp = (char*)malloc(2);
+	tmp[0] = c;
+	tmp[1] = '\0';
+	int32 result = _FindAfter(tmp, 0, -1);
+	free(tmp);
+	
+	return result;	
 }
 
 
 int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
-	return _FindAfter(&c, fromOffset, -1);
+	char *tmp = (char*)malloc(2);
+	tmp[0] = c;
+	tmp[1] = '\0';
+	int32 result = _FindAfter(tmp, fromOffset, -1);
+	free(tmp);
+	
+	return result;	
 }
 
 
 /*---- Replacing -----------------------------------------------------------*/
+BString&
+BString::ReplaceFirst(char replaceThis, char withThis)
+{
+	int32 pos = FindFirst(replaceThis, 0);
+	if (pos >= 0)
+		_privateData[pos] = withThis;
+	return *this;
+}
+
+
+BString&
+BString::ReplaceLast(char replaceThis, char withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
+{
+	int32 pos = B_ERROR;
+	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0)
+		_privateData[pos] = withThis;
+	return *this;
+}
+
+
+BString&
+BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::ReplaceFirst(const char *replaceThis, const char *withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::ReplaceLast(const char *replaceThis, const char *withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceFirst(char replaceThis, char withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceLast(char replaceThis, char withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceFirst(const char *replaceThis, const char *withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceLast(const char *replaceThis, const char *withThis)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::ReplaceSet(const char *setOfChars, char with)
+{
+	int32 pos = Length();
+	while ((pos = strcspn(String(), setOfChars)) < Length())
+		_privateData[pos] = with;
+	return *this;
+}
+
+
+BString&
+BString::ReplaceSet(const char *setOfChars, const char *with)
+{
+	//TODO: Implement
+	return *this;
+}
+
 
 /*---- Fast low-level manipulation -----------------------------------------*/
 char*
@@ -626,15 +804,90 @@ BString::UnlockBuffer(int32 length)
 		len = strlen(_privateData);
 
 	if (len != Length())
-		_privateData = _GrowBy(len - Length()); // Can be negative
-
+		_privateData = _GrowBy(len - Length());
+		
 	return *this;
 }
 
 
 /*---- Uppercase<->Lowercase ------------------------------------------------*/
+BString&
+BString::ToLower()
+{
+	int count = 0;
+	for (; count < Length(); count++)
+		if (isalpha(_privateData[count]))
+			_privateData[count] = tolower(_privateData[count]);
+	
+	return *this;
+}
+
+
+BString&
+BString::ToUpper()
+{
+	int count = 0;
+	for (; count < Length(); count++)
+		if (isalpha(_privateData[count]))
+			_privateData[count] = toupper(_privateData[count]);
+	
+	return *this;
+}
+
+
+BString&
+BString::Capitalize()
+{
+	int count = 0;
+	for (; count < Length(); count++)
+		if (isalpha(_privateData[count])) {
+			_privateData[count] = toupper(_privateData[count]);
+			break;
+		}
+	return *this;
+}
+
+
+BString&
+BString::CapitalizeEachWord()
+{
+	//TODO: Implement
+	return *this;
+}
+
 
 /*----- Escaping and Deescaping --------------------------------------------*/
+BString&
+BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::CharacterDeescape(const char *original, char escapeChar)
+{
+	//TODO: Implement
+	return *this;
+}
+
+
+BString&
+BString::CharacterDeescape(char escapeChar)
+{
+	//TODO: Implement
+	return *this;
+}
+
 
 /*---- Simple sprintf replacement calls ------------------------------------*/
 /*---- Slower than sprintf but type and overflow safe ----------------------*/
@@ -724,7 +977,7 @@ BString::_Init(const char* str, int32 len)
 {
 	assert(str != NULL);
 	_privateData = _GrowBy(len);
-	strncpy(_privateData, str, len);
+	memcpy(_privateData, str, len);
 }
 
 
@@ -734,12 +987,10 @@ BString::_DoAssign(const char *str, int32 len)
 	assert(str != NULL);	
 	int32 curLen = Length();
 	
-	if (len > curLen)
+	if (len != curLen)
 		_privateData = _GrowBy(len - curLen);
-	else if (len < curLen)
-		_privateData = _ShrinkAtBy(0, curLen - len);
 		
-	strncpy(_privateData, str, len);
+	memcpy(_privateData, str, len);
 }
 
 
@@ -747,15 +998,18 @@ void
 BString::_DoAppend(const char *str, int32 len)
 {
 	assert(str != NULL);
+	
+	int32 length = Length();
 	_privateData = _GrowBy(len);
-	strncat(_privateData, str, len);
+	memcpy(_privateData + length, str, len);
 }
 
 
 char*
 BString::_GrowBy(int32 size)
-{	
-	int32 curLen = Length(); 
+{		
+	int32 curLen = Length(); 	
+	assert(curLen + size >= 0);
 	
 	if (_privateData) {
 		_privateData -= sizeof(int32);
@@ -767,7 +1021,7 @@ BString::_GrowBy(int32 size)
 	_privateData += sizeof(int32);
 	
 	_SetLength(curLen + size);	
-	_privateData[Length()] = 0;
+	_privateData[Length()] = '\0';
 	
 	return _privateData;
 }
@@ -785,7 +1039,7 @@ BString::_OpenAtBy(int32 offset, int32 length)
 			oldLength - offset);
 	
 	_SetLength(oldLength + length);
-	_privateData[Length()] = 0;
+	_privateData[Length()] = '\0';
 	
 	return _privateData;	
 }
@@ -805,7 +1059,7 @@ BString::_ShrinkAtBy(int32 offset, int32 length)
 	_privateData += sizeof(int32);
 	
 	_SetLength(oldLength - length);	
-	_privateData[Length()] = 0;
+	_privateData[Length()] = '\0';
 	
 	return _privateData;
 }
@@ -816,13 +1070,15 @@ BString::_DoPrepend(const char *str, int32 count)
 {
 	assert(str != NULL);
 	_privateData = _OpenAtBy(0, count);
-	strncpy(_privateData, str, count);
+	memcpy(_privateData, str, count);
 }
 
 
 int32
 BString::_FindAfter(const char *str, int32 offset, int32) const
 {	
+	assert(str != NULL);
+	
 	if (offset > Length())
 		return B_ERROR;
 
@@ -830,8 +1086,55 @@ BString::_FindAfter(const char *str, int32 offset, int32) const
 
 	if (ptr != NULL)
 		return ptr - (String() + offset);
-	else
+	
+	return B_ERROR;
+}
+
+
+int32
+BString::_IFindAfter(const char *str, int32 offset, int32 ) const
+{
+	assert(str != NULL);
+	if (offset > Length())
 		return B_ERROR;
+
+	char *ptr = strcasestr(String() + offset, str);
+
+	if (ptr != NULL)
+		return ptr - (String() + offset);
+
+	return B_ERROR;
+}
+
+
+int32
+BString::_ShortFindAfter(const char *str, int32 ) const
+{
+	assert(str != NULL);
+	//TODO: Implement?
+	return B_ERROR;
+}
+
+
+int32
+BString::_FindBefore(const char *str, int32 offset, int32 ) const
+{
+	assert(str != NULL);
+	if (offset <= 0)
+		return B_ERROR;
+	
+	//TODO: Implement
+	
+	return B_ERROR;	
+}
+
+
+int32
+BString::_IFindBefore(const char *str, int32 , int32 ) const
+{
+	assert(str != NULL);
+	//TODO: Implement
+	return B_ERROR;
 }
 
 
@@ -840,6 +1143,13 @@ BString::_SetLength(int32 length)
 {
 	*((int32*)_privateData - 1) = length & 0x7fffffff;
 }
+
+
+#if DEBUG
+// TODO: Implement?
+BString::_SetUsingAsCString(bool) {}
+BString::_AssertNotUsingAsCString() {}
+#endif
 
 
 /*----- Non-member compare for sorting, etc. ------------------------------*/

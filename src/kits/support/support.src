@@ -6,5 +6,5 @@ SUPPORT_KIT_SOURCE =
 	List.cpp
 	Locker.cpp
 	StopWatch.cpp
-#	String.cpp
+	String.cpp
 ;
