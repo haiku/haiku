@@ -834,27 +834,27 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	page_hole = NULL;
 
 	temp = (void *)kernel_pgdir_virt;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_pgdir", &temp,
-		B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	create_area("kernel_pgdir", &temp, B_EXACT_ADDRESS, B_PAGE_SIZE,
+		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)paddr_desc;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "physical_page_mapping_descriptors", &temp,
-		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, B_PAGE_SIZE),
+	create_area("physical_page_mapping_descriptors", &temp, B_EXACT_ADDRESS,
+		ROUNDUP(sizeof(paddr_chunk_desc) * 1024, B_PAGE_SIZE),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)virtual_pmappings;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_virtual_chunk_descriptors", &temp,
-		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_PAGE_SIZE),
+	create_area("iospace_virtual_chunk_descriptors", &temp, B_EXACT_ADDRESS,
+		ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_PAGE_SIZE),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)iospace_pgtables;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_pgtables", &temp,
-		B_EXACT_ADDRESS, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)),
+	create_area("iospace_pgtables", &temp, B_EXACT_ADDRESS,
+		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("vm_translation_map_init_post_area: creating iospace\n"));
 	temp = (void *)IOSPACE_BASE;
-	vm_create_null_region(vm_get_kernel_aspace_id(), "iospace", &temp,
+	vm_create_null_area(vm_get_kernel_aspace_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
 	TRACE(("vm_translation_map_init_post_area: done\n"));

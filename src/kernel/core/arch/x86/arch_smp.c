@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -98,29 +98,27 @@ apic_write(uint32 offset, uint32 data)
 
 
 status_t
-arch_smp_init(kernel_args *ka)
+arch_smp_init(kernel_args *args)
 {
 	TRACE(("arch_smp_init: entry\n"));
 
-	if (ka->num_cpus > 1) {
+	if (args->num_cpus > 1) {
 		// setup some globals
-		apic = (uint32 *)ka->arch_args.apic;
-		ioapic = (uint32 *)ka->arch_args.ioapic;
-		memcpy(cpu_apic_id, ka->arch_args.cpu_apic_id, sizeof(ka->arch_args.cpu_apic_id));
-		memcpy(cpu_os_id, ka->arch_args.cpu_os_id, sizeof(ka->arch_args.cpu_os_id));
-		memcpy(cpu_apic_version, ka->arch_args.cpu_apic_version, sizeof(ka->arch_args.cpu_apic_version));
-		apic_timer_tics_per_sec = ka->arch_args.apic_time_cv_factor;
+		apic = (uint32 *)args->arch_args.apic;
+		ioapic = (uint32 *)args->arch_args.ioapic;
+		memcpy(cpu_apic_id, args->arch_args.cpu_apic_id, sizeof(args->arch_args.cpu_apic_id));
+		memcpy(cpu_os_id, args->arch_args.cpu_os_id, sizeof(args->arch_args.cpu_os_id));
+		memcpy(cpu_apic_version, args->arch_args.cpu_apic_version, sizeof(args->arch_args.cpu_apic_version));
+		apic_timer_tics_per_sec = args->arch_args.apic_time_cv_factor;
 
 		// setup regions that represent the apic & ioapic
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "local_apic", (void *)&apic,
-			B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "ioapic", (void *)&ioapic,
-			B_EXACT_ADDRESS, B_PAGE_SIZE, B_ALREADY_WIRED,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		create_area("local apic", (void *)&apic, B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		create_area("ioapic", (void *)&ioapic, B_EXACT_ADDRESS, B_PAGE_SIZE,
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 		// set up the local apic on the boot cpu
-		arch_smp_per_cpu_init(ka, 0);
+		arch_smp_per_cpu_init(args, 0);
 
 		install_interrupt_handler(0xfb, &i386_timer_interrupt, NULL);
 		install_interrupt_handler(0xfd, &i386_ici_interrupt, NULL);
@@ -132,7 +130,7 @@ arch_smp_init(kernel_args *ka)
 
 
 static int
-smp_setup_apic(kernel_args *ka)
+smp_setup_apic(kernel_args *args)
 {
 	uint32 config;
 
