@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "CS0String.h"
+#include "Utils.h"
 
 using namespace Udf;
 
@@ -274,7 +275,7 @@ long_address::dump() const
 //----------------------------------------------------------------------
 
 void
-descriptor_tag ::dump() const
+descriptor_tag::dump() const
 {
 	DUMP_INIT("descriptor_tag");
 	PRINT(("id:            %d (%s)\n", id(), tag_id_to_string(tag_id(id()))));
@@ -290,15 +291,41 @@ descriptor_tag ::dump() const
 /*! \brief Calculates the tag's CRC, verifies the tag's checksum, and
 	verifies the tag's location on the medium.
 	
+	Note that this function makes the assumption that the descriptor_tag
+	is the first data member in a larger descriptor structure, the remainder
+	of which immediately follows the descriptor_tag itself in memory. This
+	is generally a safe assumption, as long as the entire descriptor (and
+	not the its tag) is read in before init_check() is called. If this is
+	not the case, it's best to call this function with a \a calculateCrc
+	value of false, to keep from trying to calculate a crc value on invalid
+	and possibly unowned memory.
+	
+	\param block The block location of this descriptor as taken from the
+	             corresponding allocation descriptor. If the address specifies
+	             a block in a partition, the partition block is the desired
+	             location, not the mapped physical disk block.
+	\param calculateCrc Whether or not to perform the crc calculation
+	                    on the descriptor data following the tag.                
+	
 	\todo Calc the CRC.
 */
 status_t 
-descriptor_tag ::init_check(uint32 diskBlock)
+descriptor_tag::init_check(uint32 block, bool calculateCrc)
 {
-	DEBUG_INIT("descriptor_tag");
-	PRINT(("location (paramater)    == %ld\n", diskBlock));
-	PRINT(("location (in structure) == %ld\n", location()));
-	status_t error = (diskBlock == location()) ? B_OK : B_NO_INIT;
+	DEBUG_INIT_ETC("descriptor_tag", ("location: %ld, calculateCrc: %s",
+	               block, bool_to_string(calculateCrc)));
+	PRINT(("location   (paramater)    == %ld\n", block));
+	PRINT(("location   (in structure) == %ld\n", location()));
+	if (calculateCrc) {
+		PRINT(("crc        (calculated)   == %d\n",
+		       Udf::calculate_crc(reinterpret_cast<uint8*>(this)+sizeof(descriptor_tag),
+		       crc_length())))
+	} else {
+		PRINT(("crc        (calculated)   == (not calculated)\n"));
+	}
+	PRINT(("crc        (in structure) == %d\n", crc()));
+	PRINT(("crc_length (in structure) == %d\n", crc_length()));
+	status_t error = (block == location()) ? B_OK : B_NO_INIT;
 	// checksum
 	if (!error) {
 		uint32 sum = 0;
@@ -308,7 +335,12 @@ descriptor_tag ::init_check(uint32 diskBlock)
 			sum += ((uint8*)this)[i];
 		error = sum % 256 == checksum() ? B_OK : B_NO_INIT;
 	}
-	
+	// crc
+	if (!error && calculateCrc) {
+		uint16 _crc = Udf::calculate_crc(reinterpret_cast<uint8*>(this)
+		               + sizeof(descriptor_tag), crc_length());
+		error = _crc == crc() ? B_OK : B_NO_INIT;
+	}	
 	RETURN(error);
 	
 }

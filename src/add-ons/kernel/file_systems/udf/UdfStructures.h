@@ -428,7 +428,7 @@ struct descriptor_tag  {
 public:
 	void dump() const;	
 
-	status_t init_check(uint32 diskBlock);
+	status_t init_check(uint32 block, bool calculateCrc = true);
 
 	uint16 id() const { return B_LENDIAN_TO_HOST_INT16(_id); }
 	uint16 version() const { return B_LENDIAN_TO_HOST_INT16(_version); }
