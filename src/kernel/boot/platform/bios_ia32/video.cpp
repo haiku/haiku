@@ -410,12 +410,13 @@ platform_switch_to_logo(void)
 	}
 
 	addr_t lastBase = gKernelArgs.frame_buffer.physical_buffer.start;
+	int32 bytesPerPixel = (modeInfo.bits_per_pixel + 7) / 8;
 
 	gKernelArgs.frame_buffer.width = modeInfo.width;
 	gKernelArgs.frame_buffer.height = modeInfo.height;
 	gKernelArgs.frame_buffer.depth = modeInfo.bits_per_pixel;
 	gKernelArgs.frame_buffer.physical_buffer.size = gKernelArgs.frame_buffer.width
-		* gKernelArgs.frame_buffer.height * (gKernelArgs.frame_buffer.depth / 8);
+		* gKernelArgs.frame_buffer.height * bytesPerPixel;
 	gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
 
 	// ToDo: we assume that physical base is constant through the different resolutions
@@ -450,7 +451,7 @@ platform_switch_to_logo(void)
 	// ToDo: this is a temporary hack!
 	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.width
 		* (gKernelArgs.frame_buffer.height - kHeight - 60)
-		* (gKernelArgs.frame_buffer.depth/8) + gKernelArgs.frame_buffer.width - kWidth - 40;
+		* bytesPerPixel + gKernelArgs.frame_buffer.width - kWidth - 40;
 	for (int32 i = 0; i < kHeight; i++) {
 		memcpy((void *)(start + gKernelArgs.frame_buffer.width * i),
 			&kImageData[i * kWidth], kWidth);
