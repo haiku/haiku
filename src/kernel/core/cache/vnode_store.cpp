@@ -8,9 +8,9 @@
 
 #include <file_cache.h>
 #include <vfs.h>
-#include <vm.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 
 static void
@@ -24,12 +24,7 @@ static off_t
 store_commit(struct vm_store *_store, off_t size)
 {
 	vnode_store *store = (vnode_store *)_store;
-	// ToDo: enable this again when "size" is maintained correctly
-#if 0
-	// we don't like committing more memory than we have
-	if (size > store->size)
-		size = store->size;
-#endif
+
 	store->vm.committed_size = size;
 	return size;
 }
@@ -49,8 +44,28 @@ static status_t
 store_read(struct vm_store *_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	vnode_store *store = (vnode_store *)_store;
-	return vfs_read_pages(store->vnode, offset, vecs, count, _numBytes);
-		// ToDo: the file system must currently clear out the remainder of the last page...
+	size_t bytesUntouched = *_numBytes;
+
+	status_t status = vfs_read_pages(store->vnode, offset, vecs, count, _numBytes);
+
+	bytesUntouched -= *_numBytes;
+
+	// if the request could be filled completely, or an error occured, we're done here
+	if (status < B_OK || bytesUntouched == 0)
+		return status;
+
+	// Clear out any leftovers that were not touched by the above read - we're
+	// doing this here so that not every file system/device has to implement
+	// this
+	for (int32 i = count; i-- > 0 && bytesUntouched != 0;) {
+		size_t length = min_c(bytesUntouched, vecs[i].iov_len);
+
+		// ToDo: will have to map the pages in later (when we switch to physical pages)
+		memset((void *)((addr_t)vecs[i].iov_base + vecs[i].iov_len - length), 0, length);
+		bytesUntouched -= length;
+	}
+
+	return B_OK;
 }
 
 
