@@ -36,6 +36,7 @@
 #include <Archivable.h>
 #include <File.h>
 #include <Application.h>
+#include <OS.h>
 
 /* cppunit framework */
 #include <cppunit/Test.h>
@@ -187,6 +188,7 @@ void TranslatorRosterTest::DefaultTest() {
 	NextSubTest();
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(proster != NULL);
+	// TODO: actually check if all the right translators are loaded
 	
 	// delete the default BTranslatorRoster
 	// (may not always be the appropriate thing to do,
@@ -194,7 +196,30 @@ void TranslatorRosterTest::DefaultTest() {
 	NextSubTest();
 	delete proster;
 	proster = NULL;
-	CPPUNIT_ASSERT(BTranslatorRoster::Default());
+	
+	// If the default BTranslatorRoster was not
+	// deleted properly, it would likely show up in
+	// this test or the next
+	NextSubTest();
+	proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster);
+	
+	// Make sure the default BTranslatorRoster works
+	// after a delete has been performed
+	// TODO: actually check if all the right translators are loaded
+	NextSubTest();
+	translator_id *pids = NULL;
+	int32 ncount = -1;
+	status_t result = proster->GetAllTranslators(&pids, &ncount);
+	CPPUNIT_ASSERT(pids);
+	delete[] pids;
+	pids = NULL;
+	CPPUNIT_ASSERT(ncount > 0);
+	
+	// Delete again to be sure that it still won't blow up
+	NextSubTest();
+	delete proster;
+	proster = NULL;
 }
 
 /**
@@ -207,19 +232,60 @@ void TranslatorRosterTest::DefaultTest() {
 void TranslatorRosterTest::InstantiateTest() {
 	//shared instance of TranslatorRoster
 	BTranslatorRoster* proster = NULL;
-
-	//Create our BMessage
-	BMessage translator_message;
-	
+	BMessage bmsg;
+		
 	//create BTranslatorRoster using empty message (must return NULL)
-	proster = (BTranslatorRoster *) BTranslatorRoster::Instantiate(&translator_message);
+	NextSubTest();
+	proster = dynamic_cast<BTranslatorRoster *>
+		(BTranslatorRoster::Instantiate(&bmsg));
 	CPPUNIT_ASSERT(proster == NULL);
 	delete proster;
 	proster = NULL;
 	
-	// TODO: add a case with a BMessage containing a single Translator to load
+	// BMessage containing a single Translator to load
+	NextSubTest();
+	status_t result;
+	result = bmsg.AddString("class", "BTranslatorRoster");
+	CPPUNIT_ASSERT(result == B_OK);
+	result = bmsg.AddString("be:translator_path",
+		"/boot/home/config/add-ons/Translators/BMPTranslator");
+	CPPUNIT_ASSERT(result == B_OK);
+	proster = dynamic_cast<BTranslatorRoster *>
+		(BTranslatorRoster::Instantiate(&bmsg));
+	CPPUNIT_ASSERT(proster);
+	
+	translator_id *pids = NULL;
+	int32 ncount = -1;
+	result = proster->GetAllTranslators(&pids, &ncount);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(pids);
+	CPPUNIT_ASSERT(ncount == 1);
+	const char *strName = NULL, *strInfo = NULL;
+	int32 nversion = -1;
+	result = proster->GetTranslatorInfo(pids[0], &strName, &strInfo, &nversion);
+	CPPUNIT_ASSERT(result == B_OK);
+	CPPUNIT_ASSERT(strName);
+	CPPUNIT_ASSERT(strInfo);
+	CPPUNIT_ASSERT(nversion > 0);
+	CPPUNIT_ASSERT(strcmp("BMP Images", strName) == 0);
+	delete proster;
+	proster = NULL;
+			
 	// TODO: add a case with a BMessage containing multiple Translators to load
-	// TODO: add a case with a slightly corrupt BMessage
+	
+	// slightly corrupt BMessage, Instantiate 
+	// should fail because class information is missing
+	NextSubTest();
+	result = bmsg.MakeEmpty();
+	CPPUNIT_ASSERT(result == B_OK);
+	result = bmsg.AddString("be:translator_path",
+		"/boot/home/config/add-ons/Translators/BMPTranslator");
+	CPPUNIT_ASSERT(result == B_OK);
+	proster = dynamic_cast<BTranslatorRoster *>
+		(BTranslatorRoster::Instantiate(&bmsg));
+	CPPUNIT_ASSERT(proster == NULL);
+	delete proster;
+	proster = NULL;
 }
 
 /**
@@ -240,6 +306,48 @@ void TranslatorRosterTest::VersionTest() {
 	CPPUNIT_ASSERT(outMinVersion > 0);
 }
 
+//
+// Compares proster to the default BTranslatorRoster to
+// ensure that they have the same translators and the
+// same number of translators
+//
+void CompareWithDefault(BTranslatorRoster *proster)
+{
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
+	
+	translator_id *pInstids = NULL, *pDefids = NULL;
+	int32 instcount = 0, defcount = 0, ndummy = 0;
+	const char *strDefName = NULL, *strInstName = NULL, *strDummy = NULL;
+	
+	CPPUNIT_ASSERT(proster->GetAllTranslators(&pInstids, &instcount) == B_OK);
+	CPPUNIT_ASSERT(pInstids);
+	CPPUNIT_ASSERT(pDefRoster->GetAllTranslators(&pDefids, &defcount) == B_OK);
+	CPPUNIT_ASSERT(pDefids);
+	CPPUNIT_ASSERT(defcount == instcount);
+	
+	for (int32 i = 0; i < defcount; i++) {
+		int32 matches;
+		matches = 0;
+		CPPUNIT_ASSERT(
+			pDefRoster->GetTranslatorInfo(pDefids[i], &strDefName, &strDummy, &ndummy) == B_OK);
+		CPPUNIT_ASSERT(strDefName);
+		for (int32 k = 0; k < instcount; k++) {
+			CPPUNIT_ASSERT(
+				proster->GetTranslatorInfo(pInstids[k], &strInstName, &strDummy, &ndummy) == B_OK);
+			CPPUNIT_ASSERT(strInstName);
+			
+			if (strcmp(strDefName, strInstName) == 0)
+				matches++;
+		}
+		CPPUNIT_ASSERT(matches == 1);
+	}
+	
+	delete[] pInstids;
+	pInstids = NULL;
+	delete[] pDefids;
+	pDefids = NULL;
+}
 /**
  * Tests:
  * virtual status_t AddTranslators(const char *load_path = NULL) 
@@ -261,14 +369,12 @@ void TranslatorRosterTest::AddTranslatorsTest() {
 		proster->AddTranslators("/boot/home/config/add-ons/Translators/:/system/add-ons/Translators/") == B_OK);
 
 	NextSubTest();
-	int32 num_translators = 0;
+	int32 instcount = 0;
 	translator_id* translators = NULL;
-	proster->GetAllTranslators(&translators, &num_translators);
-	
+	proster->GetAllTranslators(&translators, &instcount);
+	CPPUNIT_ASSERT(instcount > 0);
 	// TODO: count the number of files in all of the directories specified above
-	// TODO: and make certain that it matches num_translators
-	
-	CPPUNIT_ASSERT(num_translators > 0);
+	// TODO: and make certain that it matches instcount
 	delete[] translators;
 	translators = NULL;
 	
@@ -278,15 +384,10 @@ void TranslatorRosterTest::AddTranslatorsTest() {
 	proster = new BTranslatorRoster();
 	CPPUNIT_ASSERT(proster->AddTranslators() == B_OK);
 	
+	// make sure that every translator in the Default BTranslatorRoster is in
+	// proster, and make certain that it is in there ONLY ONCE
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetAllTranslators(&translators, &num_translators) == B_OK);
-	CPPUNIT_ASSERT(num_translators > 0);
-	
-	// TODO: compare the translators and number of translators from proster
-	// TODO: to the default translators from BTranslatorRoster::Default()
-	
-	delete[] translators;
-	translators = NULL;
+	CompareWithDefault(proster);
 	delete proster;
 	proster = NULL;
 }
@@ -304,43 +405,21 @@ void TranslatorRosterTest::ArchiveTest() {
 	
 	NextSubTest();
 	CPPUNIT_ASSERT(pDefRoster != NULL);
-	
-	NextSubTest();
 	CPPUNIT_ASSERT(pDefRoster->Archive(&translator_message) == B_OK);
 
 	// make sure instantiate makes an "exact" copy of the default translator
 	NextSubTest();
 	BTranslatorRoster *proster = NULL;
-	proster = (BTranslatorRoster*) BTranslatorRoster::Instantiate(&translator_message);
+	proster = dynamic_cast<BTranslatorRoster *>
+		(BTranslatorRoster::Instantiate(&translator_message));
 	CPPUNIT_ASSERT(proster != NULL);
-	
-	NextSubTest();
-	translator_id *pDefids = NULL, *pInstids = NULL;
-	int32 defcount = 0, instcount = 42;
-	CPPUNIT_ASSERT(pDefRoster->GetAllTranslators(&pDefids, &defcount) == B_OK);
-	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetAllTranslators(&pInstids, &instcount) == B_OK);
-	
-	NextSubTest();
-	CPPUNIT_ASSERT(defcount == instcount);
 	
 	// make sure that every translator in the pDefRoster is in
 	// proster, and make certain that it is in there ONLY ONCE
 	NextSubTest();
-	for (int32 i = 0; i < defcount; i++) {
-		int32 matches;
-		matches = 0;
-		for (int32 k = 0; k < instcount; k++) {
-			if (pDefids[i] == pInstids[k])
-				matches++;
-		}
-		CPPUNIT_ASSERT(matches == 1);
-	}
-	
-	delete[] pDefids;
-	pDefids = NULL;
-	delete[] pInstids;
-	pInstids = NULL;
+	CompareWithDefault(proster);
+	delete proster;
+	proster = NULL;
 }
 
 /**
@@ -374,9 +453,9 @@ void TranslatorRosterTest::GetAllTranslatorsTest() {
 	// default translators
 	NextSubTest();
 	nloaded = 42;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();	
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();	
 	CPPUNIT_ASSERT(
-		proster->GetAllTranslators(&pids, &nloaded) == B_NO_ERROR);
+		pDefRoster->GetAllTranslators(&pids, &nloaded) == B_NO_ERROR);
 	CPPUNIT_ASSERT(nloaded > 0);
 	CPPUNIT_ASSERT(pids != NULL);
 	
@@ -412,7 +491,7 @@ void TranslatorRosterTest::GetAllTranslatorsTest() {
 		kTranslatorName = kTranslatorInfo = NULL;
 		nTranslatorVersion = -246;
 		
-		proster->GetTranslatorInfo(pids[i], &kTranslatorName,
+		pDefRoster->GetTranslatorInfo(pids[i], &kTranslatorName,
 			&kTranslatorInfo, &nTranslatorVersion);
 			
 		CPPUNIT_ASSERT(kTranslatorName);
@@ -439,30 +518,63 @@ void TranslatorRosterTest::GetAllTranslatorsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::GetConfigurationMessageTest() {
-	BMessage translator_message;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-
+void TranslatorRosterTest::GetConfigurationMessageTest()
+{
+	NextSubTest();
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
 
 	//get id for a translator (just use the first one)
-	unsigned long translatorid;
-	int32 num_translators;
-	translator_id* translators;
-	proster->GetAllTranslators(&translators, &num_translators);
-	translatorid = translators[0];
+	int32 num_translators = -1;
+	translator_id* translators = NULL;
+	pDefRoster->GetAllTranslators(&translators, &num_translators);
+	CPPUNIT_ASSERT(translators);
+	
+	translator_id translatorid = translators[0];
 	delete[] translators;
 	translators = NULL;
 	
 	//get conf for invalid translator
-	CPPUNIT_ASSERT(proster->GetConfigurationMessage(-1, &translator_message) == B_NO_TRANSLATOR);
+	BMessage translator_message;
+	CPPUNIT_ASSERT(pDefRoster->GetConfigurationMessage(-1, &translator_message) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(translator_message.IsEmpty());
 	
 	//get conf for invalid ioExtension (BMessage)
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetConfigurationMessage(translatorid, NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(pDefRoster->GetConfigurationMessage(translatorid, NULL) == B_BAD_VALUE);
 	
 	//get config for actual translator
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetConfigurationMessage(translatorid, &translator_message) == B_OK);
+	CPPUNIT_ASSERT(translator_message.MakeEmpty() == B_OK);
+	CPPUNIT_ASSERT(pDefRoster->GetConfigurationMessage(translatorid, &translator_message) == B_OK);
+}
+
+// Code used by both GetInputFormatsTest and GetOutputFormatsTest
+void GetInputOutputFormatsTest(TranslatorRosterTest *prt, bool binput)
+{
+	prt->NextSubTest();
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
+	
+	translator_id* translators = NULL;
+	int32 num_translators = -1;
+	pDefRoster->GetAllTranslators(&translators, &num_translators);
+	CPPUNIT_ASSERT(num_translators > 0);
+
+	for (int32 i = 0; i < num_translators; i++) {
+		const translation_format *fmts = NULL;
+		int32 num_fmts = -1;
+		status_t result;
+		prt->NextSubTest();
+		if (binput)
+			result = pDefRoster->GetInputFormats(translators[i], &fmts, &num_fmts);
+		else
+			result = pDefRoster->GetOutputFormats(translators[i], &fmts, &num_fmts);
+		CPPUNIT_ASSERT(result == B_OK);
+		CPPUNIT_ASSERT(num_fmts >= 0);
+	}
+	delete[] translators;
+	translators = NULL;
 }
 
 /**
@@ -471,21 +583,9 @@ void TranslatorRosterTest::GetConfigurationMessageTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::GetInputFormatsTest() {
-	translator_id* translators;
-	int32 num_translators;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();	
-	proster->GetAllTranslators(&translators, &num_translators);
-	CPPUNIT_ASSERT(num_translators > 0);
-	
-	NextSubTest();
-	for (int32 i=0;i<num_translators;i++) {
-		const translation_format *fmts;
-		int32 num_fmts;
-		proster->GetInputFormats(translators[i], &fmts, &num_fmts);
-		CPPUNIT_ASSERT(num_fmts >= 0);
-	}
-	delete [] translators;
+void TranslatorRosterTest::GetInputFormatsTest()
+{
+	GetInputOutputFormatsTest(this, true);
 }
 
 /**
@@ -494,21 +594,9 @@ void TranslatorRosterTest::GetInputFormatsTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::GetOutputFormatsTest() {
-	translator_id* translators;
-	int32 num_translators;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();	
-	proster->GetAllTranslators(&translators, &num_translators);
-	CPPUNIT_ASSERT(num_translators > 0);
-	
-	NextSubTest();
-	for (int32 i=0;i<num_translators;i++) {
-		const translation_format *fmts;
-		int32 num_fmts;
-		proster->GetOutputFormats(translators[i], &fmts, &num_fmts);
-		CPPUNIT_ASSERT(num_fmts >= 0);		
-	}
-	delete [] translators;
+void TranslatorRosterTest::GetOutputFormatsTest()
+{
+	GetInputOutputFormatsTest(this, false);
 }
 
 /**
@@ -517,20 +605,26 @@ void TranslatorRosterTest::GetOutputFormatsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::GetTranslatorInfoTest() {
-	translator_id* translators;
-	int32 num_translators;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	proster->GetAllTranslators(&translators, &num_translators);	
-	for (int32 i=0;i<num_translators;i++) {
-		const char* outName;
-		const char* outInfo;
-		int32 outVersion;
-		
-		CPPUNIT_ASSERT(proster->GetTranslatorInfo(-1, &outName, &outInfo, &outVersion) == B_NO_TRANSLATOR);
+void TranslatorRosterTest::GetTranslatorInfoTest()
+{
+	NextSubTest();
+	translator_id* translators = NULL;
+	int32 num_translators = -1;
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
+	
+	CPPUNIT_ASSERT(pDefRoster->GetAllTranslators(&translators, &num_translators) == B_OK);
+	for (int32 i = 0; i < num_translators; i++) {
+		const char *outName = NULL;
+		const char *outInfo = NULL;
+		int32 outVersion = -1;
 		
 		NextSubTest();
-		CPPUNIT_ASSERT(proster->GetTranslatorInfo(translators[i], &outName, &outInfo, &outVersion) == B_OK);
+		CPPUNIT_ASSERT(
+			pDefRoster->GetTranslatorInfo(-1, &outName, &outInfo, &outVersion) == B_NO_TRANSLATOR);
+		CPPUNIT_ASSERT(
+			pDefRoster->GetTranslatorInfo(translators[i], &outName, &outInfo, &outVersion) == B_OK);
+		CPPUNIT_ASSERT(outName);
 	}	
 	delete[] translators;
 	translators = NULL;
@@ -542,7 +636,9 @@ void TranslatorRosterTest::GetTranslatorInfoTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::GetTranslatorsTest() {
+void TranslatorRosterTest::GetTranslatorsTest()
+{
+	NextSubTest();
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//open image to get a translator for
 	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
@@ -552,28 +648,29 @@ void TranslatorRosterTest::GetTranslatorsTest() {
 	BFile garbled("../src/tests/kits/translation/data/garbled_data", B_READ_ONLY);
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
-	translator_info* info;
-	int32 outCount;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	translator_info* info = NULL;
+	int32 outCount = -1;
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
 
 	//get translator, specifying wrong args
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetTranslators(&garbled, NULL, NULL, &outCount) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(
+		pDefRoster->GetTranslators(&garbled, NULL, NULL, &outCount) == B_BAD_VALUE);
 
 	//get translator, specifying wrong args
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetTranslators(&garbled, NULL, &info, NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(
+		pDefRoster->GetTranslators(&garbled, NULL, &info, NULL) == B_BAD_VALUE);
 
 	//get translator for garbled data
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetTranslators(&garbled, NULL, &info, &outCount) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(
+		pDefRoster->GetTranslators(&garbled, NULL, &info, &outCount) == B_NO_TRANSLATOR);
 		
 	//get translator for image
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->GetTranslators(&image, NULL, &info, &outCount) == B_OK);
-	
-	NextSubTest();
-
+	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&image, NULL, &info, &outCount) == B_OK);
 	CPPUNIT_ASSERT(outCount > 0);
 
 	delete[] info;
@@ -586,7 +683,9 @@ void TranslatorRosterTest::GetTranslatorsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::IdentifyTest() {
+void TranslatorRosterTest::IdentifyTest()
+{
+	NextSubTest();
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//open image to get a translator for
 	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
@@ -595,26 +694,30 @@ void TranslatorRosterTest::IdentifyTest() {
 	//NextSubTest();
 	BFile garbled("../src/tests/kits/translation/data/garbled_data", B_READ_ONLY);
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
-	
-	translator_info* info = new translator_info;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
+
+	NextSubTest();	
+	translator_info *pinfo = new translator_info;
+	memset(pinfo, 0, sizeof(translator_info));
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
 	
 	//get translator, specifying wrong args
 	NextSubTest();	
-	CPPUNIT_ASSERT(proster->Identify(&garbled, NULL, NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(pDefRoster->Identify(&garbled, NULL, NULL) == B_BAD_VALUE);
 	
 	//get translator for garbled data
 	NextSubTest();	
-	CPPUNIT_ASSERT(proster->Identify(&garbled, NULL, info) == B_NO_TRANSLATOR);
+	CPPUNIT_ASSERT(pDefRoster->Identify(&garbled, NULL, pinfo) == B_NO_TRANSLATOR);
 	
 	//get translator for image
 	NextSubTest();
-	delete info;
-	info = new translator_info;
-	CPPUNIT_ASSERT(proster->Identify(&image, NULL, info) == B_OK);
+	delete pinfo;
+	pinfo = new translator_info;
+	memset(pinfo, 0, sizeof(pinfo));
+	CPPUNIT_ASSERT(pDefRoster->Identify(&image, NULL, pinfo) == B_OK);
 	
-	delete info;
-	info = NULL;
+	delete pinfo;
+	pinfo = NULL;
 }
 
 /**
@@ -623,19 +726,45 @@ void TranslatorRosterTest::IdentifyTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::MakeConfigurationViewTest() {
+void TranslatorRosterTest::MakeConfigurationViewTest()
+{
 	//create invalid rect - if it is valid after the
 	//MakeConfigurationView call the test has succeded
+	NextSubTest();
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	BRect extent(-1, -1, -1, -1);
-	
 	//create config view
-	BView* view;
-	translator_id* translators;
-	int32 num_translators;
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	proster->GetAllTranslators(&translators, &num_translators);	
-	proster->MakeConfigurationView(translators[0], NULL, &view, &extent);
+	BView *view = NULL;
+	translator_id *translators = NULL;
+	int32 num_translators = -1;
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster);
+	
+	NextSubTest();
+	CPPUNIT_ASSERT(
+		pDefRoster->GetAllTranslators(&translators, &num_translators) == B_OK);
+	CPPUNIT_ASSERT(translators);
+	CPPUNIT_ASSERT(num_translators > 0);
+	
+	// bad parameters	
+	NextSubTest();
+	CPPUNIT_ASSERT(
+		pDefRoster->MakeConfigurationView(translators[0], NULL, &view, NULL) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(
+		pDefRoster->MakeConfigurationView(translators[0], NULL, NULL, &extent) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(
+		pDefRoster->MakeConfigurationView(translators[0], NULL, NULL, NULL) == B_BAD_VALUE);
+		
+	// bad translator id
+	NextSubTest();
+	CPPUNIT_ASSERT(
+		pDefRoster->MakeConfigurationView(-1, NULL, &view, &extent) == B_NO_TRANSLATOR);
+	
+	// should work
+	NextSubTest();
+	CPPUNIT_ASSERT(
+		pDefRoster->MakeConfigurationView(translators[0], NULL, &view, &extent) == B_OK);
+	// TODO: Add a test that uses a valid BMessage with actual settings in it
 
 	//check validity
 	CPPUNIT_ASSERT(extent.IsValid() == true);
@@ -652,10 +781,11 @@ void TranslatorRosterTest::MakeConfigurationViewTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-void TranslatorRosterTest::TranslateTest() {
+void TranslatorRosterTest::TranslateTest()
+{
+	NextSubTest();
 	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//input
-	NextSubTest();
 	BFile input("../src/tests/kits/translation/data/images/image.jpg", B_READ_ONLY);
 	CPPUNIT_ASSERT(input.InitCheck() == B_OK);
 
@@ -673,19 +803,20 @@ void TranslatorRosterTest::TranslateTest() {
 	
 	//get default translators
 	NextSubTest();
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	CPPUNIT_ASSERT(proster != NULL);
+	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(pDefRoster != NULL);
 	
 	//translate to generic
 	NextSubTest();
-	CPPUNIT_ASSERT(proster->Translate(&input, NULL, NULL, &temp, B_TRANSLATOR_BITMAP) == B_OK);
+	CPPUNIT_ASSERT(pDefRoster->Translate(&input, NULL, NULL, &temp, B_TRANSLATOR_BITMAP) == B_OK);
 	
 	//translate to specific
 	NextSubTest();	
-	CPPUNIT_ASSERT(proster->Translate(&temp, NULL, NULL, &output, B_TGA_FORMAT) == B_OK);
+	CPPUNIT_ASSERT(pDefRoster->Translate(&temp, NULL, NULL, &output, B_TGA_FORMAT) == B_OK);
 }
 
-int main() {
+int main()
+{
 	//needed by MakeConfigurationView
 	TranslatorRosterTest test;
 	test.InitializeTest();
