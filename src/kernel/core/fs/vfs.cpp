@@ -3535,10 +3535,9 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 			goto err5;
 		}
 
-		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
+		// ToDo: insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
 
-		if (covered_vnode != sRoot
-			&& covered_vnode->mount->root_vnode == covered_vnode) {
+		if (covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
 			goto err5;
 		}
