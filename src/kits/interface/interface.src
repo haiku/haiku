@@ -17,6 +17,7 @@ INTERFACE_KIT_SOURCE =
 	RadioButton.cpp
 	Rect.cpp
 	Region.cpp
+	region_helpers.cpp
 	ScrollBar.cpp
 	StatusBar.cpp
 	StringView.cpp
