@@ -27,6 +27,13 @@ class ResourceUsageView : public BView
 };
 
 
+class ModemView : public BView
+{
+	public:
+		ModemView(BRect frame);
+};	
+
+
 class IRQView : public BView
 {
 	public:
@@ -53,6 +60,8 @@ class MemoryRangeView : public BView
 	public:
 		MemoryRangeView(BRect frame);
 };				
+
+
 
 #endif
 

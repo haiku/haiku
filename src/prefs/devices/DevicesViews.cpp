@@ -71,3 +71,10 @@ MemoryRangeView::MemoryRangeView (BRect frame) : BView (frame, "MemoryRangeView"
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 // ---------------------------------------------------------------------------------------------------------- //
+
+// ModemView - Constructor
+ModemView::ModemView (BRect frame) : BView (frame, "ModemView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW )
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+}
+// ---------------------------------------------------------------------------------------------------------- //

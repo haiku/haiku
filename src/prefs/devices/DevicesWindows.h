@@ -15,6 +15,8 @@ Devices Windows Header by Sikosis
 class DevicesView;
 class ResourceUsageView;
 class IRQView;
+class ModemView;
+
 
 class ResourceUsageWindow : public BWindow
 {
@@ -31,6 +33,21 @@ class ResourceUsageWindow : public BWindow
 };
 
 
+class ModemWindow : public BWindow
+{
+	public:
+    	ModemWindow(BRect frame);
+	    ~ModemWindow();
+	    virtual void MessageReceived(BMessage *message);
+	private:
+		void InitWindow(void);
+	    ModemView*	 ptrModemView;
+	    
+	    BButton      *btnAdd;
+	    BButton		 *btnCancel;
+};
+
+
 class DevicesWindow : public BWindow
 {
 	public:
@@ -43,7 +60,8 @@ class DevicesWindow : public BWindow
 		void InitWindow(void);
 		void LoadSettings(BMessage *msg);
 		void SaveSettings(void);
-		ResourceUsageWindow* ptrResourceUsageWindow; 
+		ResourceUsageWindow*	ptrResourceUsageWindow;
+		ModemWindow* 			ptrModemWindow;
 		
         BStringView      *stvDeviceName;
         BStringView      *stvCurrentState;
