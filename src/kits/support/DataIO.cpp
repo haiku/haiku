@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -28,23 +28,12 @@
 //					BMallocIO and BMemoryIO classes implement the protocol,
 //					as does BFile in the Storage Kit.
 //------------------------------------------------------------------------------
-
-// Standard Includes -----------------------------------------------------------
 #include <algorithm>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-// System Includes -------------------------------------------------------------
 #include <DataIO.h>
-
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
 
 
 // *** BDataIO ***
@@ -312,8 +301,7 @@ BMallocIO::BMallocIO()
 // Destruction
 BMallocIO::~BMallocIO()
 {
-	if (fData)
-		free(fData);
+	free(fData);
 }
 
 
