@@ -36,7 +36,7 @@ namespace BPrivate {
 
 // AutoDeleter
 
-template<typename C, typename Delete>
+template<typename C, typename DeleteFunc>
 class AutoDeleter {
 public:
 	inline AutoDeleter()
@@ -56,8 +56,20 @@ public:
 
 	inline void SetTo(C *object)
 	{
-		fDelete(fObject);
-		fObject = object;
+		if (object != fObject) {
+			fDelete(fObject);
+			fObject = object;
+		}
+	}
+
+	inline void Unset()
+	{
+		SetTo(NULL);
+	}
+
+	inline void Delete()
+	{
+		SetTo(NULL);
 	}
 
 	inline C *Detach()
@@ -68,8 +80,8 @@ public:
 	}
 
 private:
-	C		*fObject;
-	Delete	fDelete;
+	C			*fObject;
+	DeleteFunc	fDelete;
 };
 
 
