@@ -2217,7 +2217,10 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 			release_sem_etc(map->sem, READ_COUNT, 0);
 			vm_put_aspace(aspace);
 #endif
-			kill_team(team_get_current_team_id());
+			if (user_debug_fault_occurred(B_SEGMENT_VIOLATION))
+				kill_team(team_get_current_team_id());
+				// bonefish: ToDo: Shouldn't we send a SIGSEGV instead of
+				// killing the team straight away?
 		}
 	}
 
