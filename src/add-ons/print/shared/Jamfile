@@ -10,3 +10,15 @@ StaticLibrary
 	PictureIterator.cpp
 	;
 
+StaticLibrary
+	transportaddon
+	:
+	TransportAddOn.cpp
+	;
+
+
+StaticLibrary
+	printerdriveraddon
+	:
+	PrinterDriverAddOn.cpp
+	;
