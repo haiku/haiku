@@ -39,7 +39,7 @@
  * DEBUG == 2, TRACE & LOG, PRINT with snooze()
  */
 #ifndef DEBUG
-	#define DEBUG 0
+	#define DEBUG 1
 #endif
 
 #undef PRINT

@@ -519,8 +519,8 @@ init_driver(void)
 	ac97_init();
 	ac97_amp_enable(true);
 
-	LOG(("codec vendor id = %#08x\n",ac97_get_vendor_id()));
-	LOG(("codec descripton = %s\n",ac97_get_vendor_id_description()));
+	LOG(("codec vendor id      = %#08x\n",ac97_get_vendor_id()));
+	LOG(("codec descripton     = %s\n",ac97_get_vendor_id_description()));
 	LOG(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement()));
 
 	/* reset all channels */
@@ -546,11 +546,26 @@ init_driver(void)
 		int_thread_id = spawn_kernel_thread(int_thread, "ich_ac97 interrupt poller", B_REAL_TIME_PRIORITY, 0);
 		resume_thread(int_thread_id);
 	}
+	
+	LOG(("codec master output = %#04x\n",ich_codec_read(config->codecoffset + 0x02)));
+	LOG(("codec aux output    = %#04x\n",ich_codec_read(config->codecoffset + 0x04)));
+	LOG(("codec mono output   = %#04x\n",ich_codec_read(config->codecoffset + 0x06)));
+	LOG(("codec pcm output    = %#04x\n",ich_codec_read(config->codecoffset + 0x18)));
 
+	LOG(("writing codec registers\n"));
 	/* enable master output */
 	ich_codec_write(config->codecoffset + 0x02, 0x0000);
+	/* enable aux output */
+	ich_codec_write(config->codecoffset + 0x04, 0x0000);
+	/* enable mono output */
+	ich_codec_write(config->codecoffset + 0x06, 0x0000);
 	/* enable pcm output */
 	ich_codec_write(config->codecoffset + 0x18, 0x0404);
+
+	LOG(("codec master output = %#04x\n",ich_codec_read(config->codecoffset + 0x02)));
+	LOG(("codec aux output    = %#04x\n",ich_codec_read(config->codecoffset + 0x04)));
+	LOG(("codec mono output   = %#04x\n",ich_codec_read(config->codecoffset + 0x06)));
+	LOG(("codec pcm output    = %#04x\n",ich_codec_read(config->codecoffset + 0x18)));
 
 #if 0
 	/* enable pcm input */

@@ -33,6 +33,8 @@
 
 //#define DEBUG 1
 
+#define REVERSE_EAMP_POLARITY 0
+
 #include "debug.h"
 #include "io.h"
 
@@ -124,6 +126,10 @@ ac97_amp_enable(bool yesno)
 		default:
 		{
 			LOG(("powerdown register was = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
+			#if REVERSE_EAMP_POLARITY
+				yesno = !yesno;
+				LOG(("using reverse eamp polarity\n"));
+			#endif
 			if (yesno)
 				ich_codec_write(config->codecoffset + AC97_POWERDOWN, ich_codec_read(AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
 			else
