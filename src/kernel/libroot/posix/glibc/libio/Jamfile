@@ -55,6 +55,7 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iogetline.c
 	<$(SOURCE_GRIST)>iogets.c
 	<$(SOURCE_GRIST)>iopadn.c
+	<$(SOURCE_GRIST)>iopopen.c
 	<$(SOURCE_GRIST)>ioputs.c
 	<$(SOURCE_GRIST)>ioseekoff.c
 	<$(SOURCE_GRIST)>ioseekpos.c

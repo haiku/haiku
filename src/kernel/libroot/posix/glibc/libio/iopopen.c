@@ -29,6 +29,9 @@
 #ifndef _POSIX_SOURCE
 # define _POSIX_SOURCE
 #endif
+
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "libioP.h"
 #if _IO_HAVE_SYS_WAIT
 #include <signal.h>
@@ -40,59 +43,11 @@
 # include <unistd.h>
 # include <shlib-compat.h>
 #endif
-#include <sys/types.h>
-#include <sys/wait.h>
-
-#ifndef _IO_fork
-#ifdef _LIBC
-#define _IO_fork __vfork
-#else
-#define _IO_fork vfork /* defined in libiberty, if needed */
-#endif
-extern _IO_pid_t _IO_fork __P ((void));
-#endif
 
 #endif /* _IO_HAVE_SYS_WAIT */
 
-#ifndef _IO_pipe
-#ifdef _LIBC
-#define _IO_pipe __pipe
-#else
-#define _IO_pipe pipe
-#endif
-extern int _IO_pipe __P ((int des[2]));
-#endif
-
-#ifndef _IO_dup2
-#ifdef _LIBC
-#define _IO_dup2 __dup2
-#else
-#define _IO_dup2 dup2
-#endif
-extern int _IO_dup2 __P ((int fd, int fd2));
-#endif
-
-#ifndef _IO_waitpid
-#ifdef _LIBC
-#define _IO_waitpid __waitpid
-#else
-#define _IO_waitpid waitpid
-#endif
-#endif
-
-#ifndef _IO_execl
-#define _IO_execl execl
-#endif
-#ifndef _IO__exit
-#define _IO__exit _exit
-#endif
-
 #ifndef _IO_close
-#ifdef _LIBC
-#define _IO_close __close
-#else
-#define _IO_close close
-#endif
+#	define _IO_close close
 #endif
 
 struct _IO_proc_file
@@ -112,11 +67,13 @@ static struct _IO_proc_file *proc_file_chain;
 #ifdef _IO_MTSAFE_IO
 static _IO_lock_t proc_file_chain_lock = _IO_lock_initializer;
 
+#if 0
 static void
 unlock (void *not_used)
 {
   _IO_lock_unlock (proc_file_chain_lock);
 }
+#endif
 #endif
 
 _IO_FILE *
@@ -132,7 +89,7 @@ _IO_new_proc_open (fp, command, mode)
   _IO_pid_t child_pid;
   if (_IO_file_is_open (fp))
     return NULL;
-  if (_IO_pipe (pipe_fds) < 0)
+  if (pipe(pipe_fds) < 0)
     return NULL;
   if (mode[0] == 'r' && mode[1] == '\0')
     {
@@ -153,7 +110,7 @@ _IO_new_proc_open (fp, command, mode)
       __set_errno (EINVAL);
       return NULL;
     }
-  ((_IO_proc_file *) fp)->pid = child_pid = _IO_fork ();
+  ((_IO_proc_file *) fp)->pid = child_pid = fork();
   if (child_pid == 0)
     {
       int child_std_end = mode[0] == 'r' ? 1 : 0;
@@ -162,7 +119,7 @@ _IO_new_proc_open (fp, command, mode)
       _IO_close (parent_end);
       if (child_end != child_std_end)
 	{
-	  _IO_dup2 (child_end, child_std_end);
+	  dup2(child_end, child_std_end);
 	  _IO_close (child_end);
 	}
       /* POSIX.2:  "popen() shall ensure that any streams from previous
@@ -171,8 +128,8 @@ _IO_new_proc_open (fp, command, mode)
       for (p = proc_file_chain; p; p = p->next)
 	_IO_close (_IO_fileno ((_IO_FILE *) p));
 
-      _IO_execl ("/bin/sh", "sh", "-c", command, (char *) 0);
-      _IO__exit (127);
+      execl("/bin/sh", "sh", "-c", command, (char *)0);
+      _exit(127);
     }
   _IO_close (child_end);
   if (child_pid < 0)
@@ -274,7 +231,7 @@ _IO_new_proc_close (fp)
      described in POSIX.2, such implementations are not conforming." */
   do
     {
-      wait_pid = _IO_waitpid (((_IO_proc_file *) fp)->pid, &wstatus, 0);
+      wait_pid = waitpid(((_IO_proc_file *) fp)->pid, &wstatus, 0);
     }
   while (wait_pid == -1 && errno == EINTR);
   if (wait_pid == -1)
