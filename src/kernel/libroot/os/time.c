@@ -46,7 +46,7 @@ uint32
 real_time_clock(void)
 {
 	return (sRealTimeData->boot_time + system_time()
-		+ sRealTimeData->timezone_offset) / 1000000;
+		- (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset)) / 1000000;
 }
 
 
@@ -54,7 +54,7 @@ bigtime_t
 real_time_clock_usecs(void)
 {
 	return sRealTimeData->boot_time + system_time()
-		+ sRealTimeData->timezone_offset;
+		- (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
 }
 
 

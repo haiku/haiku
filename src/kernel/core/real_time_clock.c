@@ -123,7 +123,7 @@ void
 set_real_time_clock(uint32 currentTime)
 {
 	sRealTimeData->boot_time = currentTime * 1000000LL - system_time()
-		- sRealTimeData->timezone_offset;
+		+ (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
 	rtc_system_to_hw();
 }
 
@@ -131,8 +131,8 @@ set_real_time_clock(uint32 currentTime)
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->boot_time + system_time() + 
-		sRealTimeData->timezone_offset) / 1000000;
+	return (sRealTimeData->boot_time + system_time() - 
+		(sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset)) / 1000000;
 }
 
 
@@ -140,8 +140,8 @@ bigtime_t
 real_time_clock_usecs(void)
 {
 	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return sRealTimeData->boot_time + system_time() +
-		sRealTimeData->timezone_offset;
+	return sRealTimeData->boot_time + system_time() -
+		(sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
 }
 
 //	#pragma mark -
