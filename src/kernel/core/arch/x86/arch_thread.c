@@ -28,6 +28,30 @@ extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
 extern void i386_restore_frame_from_syscall(struct iframe frame);
 
 
+static struct arch_thread sInitialState;
+	// ToDo:
+	// __attribute__ ((aligned(16)));
+	// the fpu_state must be aligned on a 16 byte boundary, so that fxsave can use it
+
+
+status_t
+arch_thread_init(struct kernel_args *args)
+{
+	// save one global valid FPU state; it will be copied in the arch dependent
+	// part of each new thread
+
+	asm("fninit");
+	// ToDo: add MMX/SSE support (ie. use fxsave)
+	i386_fsave(sInitialState.fpu_state);
+
+	// let the asm function know the offset to the interrupt stack within struct thread
+	// I know no better ( = static) way to tell the asm function the offset
+	i386_stack_init(&((struct thread *)0)->arch_info.interrupt_stack);
+
+	return B_OK;
+}
+
+
 void
 i386_push_iframe(struct thread *thread, struct iframe *frame)
 {
@@ -77,29 +101,23 @@ set_tls_context(struct thread *thread)
 }
 
 
-int
+status_t
 arch_team_init_team_struct(struct team *p, bool kernel)
 {
-	return 0;
+	return B_OK;
 }
 
 
-int
-arch_thread_init_thread_struct(struct thread *t)
+status_t
+arch_thread_init_thread_struct(struct thread *thread)
 {
 	// set up an initial state (stack & fpu)
-	memset(&t->arch_info, 0, sizeof(t->arch_info));
-
-	// ToDo: note, this has to be done only once
-	// let the asm function know the offset to the interrupt stack within struct thread
-	// I know no better ( = static) way to tell the asm function the offset
-	i386_stack_init(&((struct thread *)0)->arch_info.interrupt_stack);
-
-	return 0;
+	memcpy(&thread->arch_info, &sInitialState, sizeof(struct arch_thread));
+	return B_OK;
 }
 
 
-int
+status_t
 arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
@@ -139,7 +157,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 	t->arch_info.current_stack.esp = kstack_top;
 	t->arch_info.current_stack.ss = (addr_t *)KERNEL_DATA_SEG;
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -243,9 +261,6 @@ arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args
 
 	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
 		entry, args1, args2, ustack_top));
-
-	// make sure the fpu is in a good state
-	asm("fninit");
 
 	// access the new stack to make sure the memory page is present
 	// while interrupts are disabled.
