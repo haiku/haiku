@@ -33,6 +33,7 @@ allocator(void *_pool)
 		pool.PutBuffer(buffer);
 		printf("\t%ld. released buffer\n", id);
 	}
+	return 0;
 }
 
 
@@ -46,7 +47,7 @@ main(int argc, char **argv)
 		for (int i = 0; i < NUM_THREADS; i++) {
 			thread[i] = spawn_thread(allocator, "", B_NORMAL_PRIORITY, (void *)&pool);
 			if (thread[i] < B_OK)
-				fprintf(stderr, "Couldn't spawn thread %ld\n", i);
+				fprintf(stderr, "Couldn't spawn thread %d\n", i);
 			resume_thread(thread[i]);
 		}
 
