@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 extern void mmu_init(void);
+extern void mmu_init_for_kernel(void);
 extern void *mmu_allocate(void *virtualAddress, size_t size);
 extern void mmu_free(void *virtualAddress, size_t size);
 
