@@ -52,16 +52,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifndef __P
-#define	__P(s) s
-#endif
-
 // phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
 extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
 
 /* XXX: things from route.c */
-extern char *routename __P((struct sockaddr *));
-extern char *netname __P((struct sockaddr *));
+extern char *routename(struct sockaddr *);
+extern char *netname(struct sockaddr *);
 extern int nflag;
 
 #define ROUNDUP(a) \
@@ -94,11 +90,11 @@ static const struct bits bits[] = {
 	{ 0 }
 };
 
-static void p_rtentry __P((struct rt_msghdr *));
-static void p_sockaddr __P((struct sockaddr *, int, int));
-static void p_flags __P((int, char *));
-static void pr_rthdr __P((void));
-static void pr_family __P((int));
+static void p_rtentry(struct rt_msghdr *);
+static void p_sockaddr(struct sockaddr *, int, int);
+static void p_flags(int, char *);
+static void pr_rthdr(void);
+static void pr_family(int);
 
 int	keyword(char *);
 void usage(char *);
