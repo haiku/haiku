@@ -17,6 +17,7 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	manager->InitialDeviceScan();
+	KDiskDeviceManager::DeleteDefault();
 	return 0;
 }
 
