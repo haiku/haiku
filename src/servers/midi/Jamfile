@@ -2,6 +2,10 @@ SubDir OBOS_TOP src servers midi ;
 
 UsePrivateHeaders midi ;
 
+AddResources midi_server :
+	midi_server.rdef
+;
+
 Server midi_server :
 	MidiServerApp.cpp 
 ;

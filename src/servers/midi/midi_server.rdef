@@ -1,0 +1,5 @@
+
+resource app_signature "application/x-vnd.OpenBeOS.midi-server";
+
+resource app_flags 0x00000004;  // BACKGROUND_APP | SINGLE_LAUNCH
+
