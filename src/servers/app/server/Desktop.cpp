@@ -239,7 +239,13 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 	if (!winBorder)
 		return;
 
+	// R2: how to determine the RootLayer to which this window should be added???
+	// for now, use ActiveRootLayer() because we only have one instance.
+
 	int32 feel = winBorder->Window()->Feel();
+
+	// we are ServerApp thread, we need to lock RootLayer here.
+	ActiveRootLayer()->Lock();
 
 	// we're playing with window list. lock first.
 	Lock();
@@ -285,20 +291,22 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 		winBorder->App()->fAppFMWList.AddWinBorder(winBorder);
 	}
 
+	// send WinBorder to be added to workspaces
+	ActiveRootLayer()->AddWinBorder(winBorder);
+
 	// hey, unlock!
 	Unlock();
 
-	// R2: how to determine the RootLayer to which this window should be added???
-	// for now, use ActiveRootLayer() because we only have one instance.
-
-	// send WinBorder to be added to workspaces
-	ActiveRootLayer()->AddWinBorder(winBorder);
+	ActiveRootLayer()->Unlock();
 }
 
 void Desktop::RemoveWinBorder(WinBorder *winBorder)
 {
 	if (!winBorder)
 		return;
+
+	// we are ServerApp thread, we need to lock RootLayer here.
+	ActiveRootLayer()->Lock();
 
 	// we're playing with window list. lock first.
 	Lock();
@@ -348,6 +356,8 @@ void Desktop::RemoveWinBorder(WinBorder *winBorder)
 
 	// unlock!
 	Unlock();
+
+	ActiveRootLayer()->Unlock();
 }
 
 void Desktop::AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder)
