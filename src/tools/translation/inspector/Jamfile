@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src tools translation inspector ;
+
+AddResources Inspector : Inspector.rsrc ;
+
+App Inspector : 
+	StatusCheck.cpp
+	ImageView.cpp
+	ImageWindow.cpp
+	InspectorApp.cpp ;
+
+LinkSharedOSLibs Inspector : be tracker translation ;
+
