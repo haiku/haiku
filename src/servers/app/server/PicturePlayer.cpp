@@ -388,8 +388,8 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				int16 alphaSrcMode = GetInt16();
 				int16 alphaFncMode = GetInt16();
-				fldata.alpha_mode=(source_alpha)alphaSrcMode;
-				fldata.blending_mode=(alpha_function)alphaFncMode;
+				fldata.alphaSrcMode = (source_alpha)alphaSrcMode;
+				fldata.alphaFncMode = (alpha_function)alphaFncMode;
 				break;
 			}
 			case B_PIC_SET_FONT_FAMILY:

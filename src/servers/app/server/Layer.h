@@ -36,6 +36,7 @@
 #include <Locker.h>
 #include "LayerData.h"
 #include "DesktopClasses.h"
+#include "TokenHandler.h"
 
 class ServerWindow;
 class PortLink;
@@ -54,8 +55,8 @@ class Screen;
 class Layer
 {
 public:
-	Layer(BRect frame, const char *name, int32 resize, 
-			int32 flags,ServerWindow *win);
+	Layer(BRect frame, const char *name, int32 token, int32 resize, 
+			int32 flags, ServerWindow *win);
 	virtual ~Layer(void);
 
 	void AddChild(Layer *child, Layer *before=NULL, bool rebuild=true);
@@ -109,32 +110,28 @@ protected:
 	friend class RootLayer;
 	friend class WinBorder;
 	friend class Screen;
-
+	friend class ServerWindow;
 	
-	BRect _frame;
-
-	Layer	*_parent,
-			*_uppersibling,
-			*_lowersibling,
-			*_topchild,
-			*_bottomchild;
-	
-	BRegion *_visible,
-			*_invalid,
-			*_full;
-
-	ServerWindow *_serverwin;
-
-	BString *_name;	
-	int32 _view_token;
-	int32 _level;
-	int32 _flags;
-	uint8 _hidecount;
-	bool _is_dirty;
-	bool _is_updating;
-	bool _regions_invalid;
-	LayerData *_layerdata;
-	PortLink *_portlink;
+	BRect		_frame;
+	Layer		*_parent,
+				*_uppersibling,
+				*_lowersibling,
+				*_topchild,
+				*_bottomchild;
+	BRegion		*_visible,
+				*_invalid,
+				*_full;
+	ServerWindow	*_serverwin;
+	BString		*_name;	
+	int32		_view_token;
+	int32		_level;
+	int32		_flags;
+	bool		_hidden;
+	bool		_is_dirty;
+	bool		_is_updating;
+	bool		_regions_invalid;
+	LayerData	*_layerdata;
+	PortLink	*_portlink;
 };
 
 #endif

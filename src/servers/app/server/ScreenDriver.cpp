@@ -50,6 +50,13 @@
 #include "LayerData.h"
 #include "PNGDump.h"
 
+#ifdef DEBUG_DRIVER_MODULE
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
+
 enum
 {
 SDWIN_CLEAR=100,
@@ -458,9 +465,7 @@ void ScreenDriver::CopyBits(BRect src, BRect dest)
 
 void ScreenDriver::DrawBitmap(ServerBitmap *bitmap, BRect src, BRect dest)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ScreenDriver:: DrawBitmap unimplemented()\n");
-#endif
+STRACE(("ScreenDriver:: DrawBitmap unimplemented()\n"));
 }
 
 void ScreenDriver::DrawChar(char c, BPoint pt, LayerData *d)
@@ -473,9 +478,7 @@ void ScreenDriver::DrawChar(char c, BPoint pt, LayerData *d)
 /*
 void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ScreenDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y);
-#endif
+STRACE(("ScreenDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y));
 	if(!d)
 		return;
 	BRect r;
@@ -770,9 +773,8 @@ void ScreenDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Patt
 
 void ScreenDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ScreenDriver:: StrokeLineArray unimplemented\n");
-#endif
+STRACE(("ScreenDriver:: StrokeLineArray unimplemented\n"));
+
 }
 
 void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)

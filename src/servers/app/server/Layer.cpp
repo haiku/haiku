@@ -36,9 +36,6 @@
 #include "RectUtils.h"
 #include "RootLayer.h"
 
-//! TokenHandler object used to provide IDs for all Layers and, thus, BViews
-TokenHandler view_token_handler;
-
 /*!
 	\brief Constructor
 	\param frame Size and placement of the Layer
@@ -47,41 +44,39 @@ TokenHandler view_token_handler;
 	\param flags BView flags as defined in View.h
 	\param win ServerWindow to which the Layer belongs
 */
-Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWindow *win)
+Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
+				int32 flags, ServerWindow *win)
 {
 	// frame is in _parent layer's coordinates
 	if(frame.IsValid())
-		_frame=frame;
+		_frame		= frame;
 	else
-		_frame.Set(0,0,5,5);
+		_frame.Set(0, 0, 5, 5);
 
-	_name=new BString(name);
-
+	_name			= new BString(name);
 	// Layer does not start out as a part of the tree
-	_parent=NULL;
-	_uppersibling=NULL;
-	_lowersibling=NULL;
-	_topchild=NULL;
-	_bottomchild=NULL;
+	_parent			= NULL;
+	_uppersibling	= NULL;
+	_lowersibling	= NULL;
+	_topchild		= NULL;
+	_bottomchild	= NULL;
 
-	_visible=new BRegion(Frame());
-	_full=new BRegion(Frame());
-	_invalid=new BRegion(Frame());
+	_visible		= new BRegion( _frame );
+	_full			= new BRegion( _frame );
+	_invalid		= new BRegion( _frame );
 
-	_serverwin=win;
+	_flags			= flags;
+	_hidden			= false;
+	_is_dirty		= false;
+	_is_updating	= false;
+	_regions_invalid= false;
+	_level			= 0;
+	_view_token		= token;
+	_layerdata		= new LayerData;
 	
-	// We have view tokens to be able to identify BViews
-	_view_token=view_token_handler.GetToken();
-
-	_flags=flags;
-
-	_hidecount=0;
-	_is_dirty=false;
-	_is_updating=false;
-	_regions_invalid=false;
-
-	_level=0;
-	_layerdata=new LayerData;
+	_serverwin		= win;
+		// what's this needed for?
+	_portlink		= NULL;
 }
 
 //! Destructor frees all allocated heap space
@@ -131,7 +126,7 @@ printf("Layer::AddChild lacks before support\n");
 		return;
 	}
 	layer->_parent=this;
-	if(layer->_visible && layer->_hidecount==0 && _visible)
+	if(layer->_visible && layer->_hidden==false && _visible)
 	{
 		RootLayer	*rl;
 		rl			= dynamic_cast<RootLayer*>(this);
@@ -142,9 +137,8 @@ printf("Layer::AddChild lacks before support\n");
 		else{
 			// Technically, we could safely take the address of ConvertToParent(BRegion)
 			// but we don't just to avoid a compiler nag
-			BRegion *reg=new BRegion(layer->ConvertToParent(layer->_visible));
-			_visible->Exclude(reg);
-			delete reg;
+			BRegion 	reg(layer->ConvertToParent(layer->_visible));
+			_visible->Exclude(&reg);
 		}
 	}
 
@@ -186,11 +180,10 @@ void Layer::RemoveChild(Layer *layer, bool rebuild)
 		return;
 	}
 
-	if(_hidecount==0 && layer->_visible && layer->_parent->_visible)
+	if( !_hidden && layer->_visible && layer->_parent->_visible)
 	{
-		BRegion *reg=new BRegion(ConvertToParent(_visible));
-		layer->_parent->_visible->Include(reg);
-		delete reg;
+		BRegion		reg(ConvertToParent(_visible));
+		layer->_parent->_visible->Include(&reg);
 	}
 
 	// Take care of _parent
@@ -252,7 +245,7 @@ Layer *Layer::GetChildAt(BPoint pt, bool recursive)
 			if(child->_bottomchild!=NULL)
 				child->GetChildAt(pt,true);
 			
-			if(child->_hidecount>0)
+			if(child->_hidden)
 				continue;
 			
 			if(child->_frame.Contains(pt))
@@ -263,7 +256,7 @@ Layer *Layer::GetChildAt(BPoint pt, bool recursive)
 	{
 		for(child=_bottomchild; child!=NULL; child=child->_uppersibling)
 		{
-			if(child->_hidecount>0)
+			if(child->_hidden)
 				continue;
 			if(child->_frame.Contains(pt))
 				return child;
@@ -357,7 +350,7 @@ void Layer::Invalidate(BRegion& region)
 	BRect r;
 
 	// See if the region intersects with our current area
-	if(region.Intersects(Bounds()) && _hidecount==0)
+	if(region.Intersects(Bounds()) && !_hidden)
 	{
 		BRegion clippedreg(region);
 		clippedreg.IntersectWith(_visible);
@@ -374,7 +367,7 @@ void Layer::Invalidate(BRegion& region)
 	BRegion *reg;
 	for(Layer *lay=_topchild;lay!=NULL; lay=lay->_lowersibling)
 	{
-		if(lay->_hidecount==0)
+		if(lay->_hidden==false)
 		{	
 			reg=new BRegion(lay->ConvertFromParent(&region));
 	
@@ -442,7 +435,7 @@ printf("Layer: %s: RequestDraw(%.1f,%.1f,%.1f,%.1f) - unimplemented\n",
 	_name->String(),r.left,r.top,r.right,r.bottom);
 
 	// TODO: Implement and fix
-/*	if(_visible==NULL || _hidecount>0)
+/*	if(_visible==NULL || _hidden)
 		return;
 
 	if(_serverwin)
@@ -541,18 +534,14 @@ void Layer::UpdateRegions(bool force)
 //! Show the layer. Operates just like the BView call with the same name
 void Layer::Show(void)
 {
-	if(_hidecount==0)
+	if( !_hidden )
 		return;
-
-	_hidecount--;
-
-	if(_hidecount>0)
-		return;
+	
+	_hidden		= false;
 
 	if( _parent ){
-		BRegion *reg=new BRegion(ConvertToParent(_visible));
-		_parent->_visible->Exclude(reg);
-		delete reg;
+		BRegion 	reg(ConvertToParent(_visible));
+		_parent->_visible->Exclude( &reg );
 		_parent->_is_dirty=true;
 	}
 	_is_dirty=true;
@@ -581,15 +570,16 @@ void Layer::Show(void)
 //! Hide the layer. Operates just like the BView call with the same name
 void Layer::Hide(void)
 {
-	if(_hidecount==0)
-	{
-		BRegion *reg=new BRegion(ConvertToParent(_visible));
-		_parent->_visible->Include(reg);
-		delete reg;
-		_parent->_is_dirty=true;
-		_is_dirty=true;
-	}
-	_hidecount++;
+	if ( _hidden )
+		return;
+
+	_hidden		= true;
+
+	BRegion 	reg(ConvertToParent(_visible));
+	_parent->_visible->Include( &reg );
+
+	_parent->_is_dirty=true;
+	_is_dirty=true;
 	
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
@@ -602,7 +592,7 @@ void Layer::Hide(void)
 */
 bool Layer::IsHidden(void)
 {
-	return (_hidecount==0)?false:true;
+	return _hidden;
 }
 
 /*!
@@ -714,7 +704,7 @@ void Layer::RebuildRegions(bool include_children)
 		childlay->_visible->MakeEmpty();
 		childlay->_visible->Include(childlay->_full);
 
-		if(childlay->_visible && childlay->_hidecount==0)
+		if(childlay->_visible && childlay->_hidden==false)
 			childlay->_visible->IntersectWith(_visible);
 
 	}
@@ -734,7 +724,7 @@ void Layer::RebuildRegions(bool include_children)
 		if( clipregion.CountRects()>0 &&
 			TestRectIntersection(siblay->Frame(),clipregion.Frame()) && 
 			siblay->_visible && 
-			siblay->_hidecount==0 )
+			siblay->_hidden==false )
 		{
 			siblay->_visible->Exclude(&clipregion);
 		}
@@ -779,7 +769,7 @@ void Layer::PrintToStream(void)
 		printf("Bottom child: NULL\n");
 	printf("Frame: "); _frame.PrintToStream();
 	printf("Token: %ld\nLevel: %ld\n",_view_token, _level);
-	printf("Hide count: %u\n",_hidecount);
+	printf("Hide count: %s\n",_hidden?"true":"false");
 	if(_invalid)
 	{
 		printf("Invalid Areas: "); _invalid->PrintToStream();

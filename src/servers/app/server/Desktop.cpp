@@ -30,6 +30,7 @@
 #include "ServerConfig.h"
 
 #include "ViewDriver.h"
+#include "ServerWindow.h"
 
 #if DISPLAYDRIVER == SCREENDRIVER
 #include "ScreenDriver.h"
@@ -39,12 +40,12 @@
 #include "AccelerantDriver.h"
 #endif
 
-#include "ServerWindow.h"
-
 //#define DEBUG_DESKTOP
-
 #ifdef DEBUG_DESKTOP
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
 #endif
 
 bool ReadOBOSWorkspaceData(void);
@@ -88,9 +89,7 @@ void unlock_workspaces(void) { desktop_private::workspacelock.Unlock(); }
 */
 void InitDesktop(void)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: InitWorkspace\n");
-#endif
+STRACE(("Desktop: InitWorkspace\n"));
 	desktop_private::screenlist=new BList(0);
 	DisplayDriver *tdriver;
 	Screen *s=NULL;
@@ -116,9 +115,7 @@ printf("Desktop: InitWorkspace\n");
 		tdriver->Shutdown();
 		delete tdriver;
 		tdriver=NULL;
-#ifdef DEBUG_DESKTOP
-printf("\t NULL display driver. OK. We crash now. :P\n");
-#endif
+STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 	}
 #else // end if not TEST_MODE
 
@@ -143,9 +140,7 @@ printf("\t NULL display driver. OK. We crash now. :P\n");
 		tdriver->Shutdown();
 		delete tdriver;
 		tdriver=NULL;
-#ifdef DEBUG_DESKTOP
-printf("\t NULL display driver. OK. We crash now. :P\n");
-#endif
+STRACE(("\t NULL display driver. OK. We crash now. :P\n"));
 	}
 #endif
 	
@@ -156,8 +151,7 @@ printf("\t NULL display driver. OK. We crash now. :P\n");
 		desktop_private::activescreen=s;
 		s->SetSpace(0,B_32_BIT_640x480,true);
 	}
-#ifdef DEBUG_DESKTOP
-else
+#ifndef DEBUG_DESKTOP
 printf("ERROR: NULL display driver\n");
 #endif
 }
@@ -165,9 +159,7 @@ printf("ERROR: NULL display driver\n");
 //! Shuts down the graphics subsystem
 void ShutdownDesktop(void)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: ShutdownDesktop\n");
-#endif
+STRACE(("Desktop: ShutdownDesktop\n"));
 	Screen *s;
 	
 	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
@@ -195,9 +187,7 @@ printf("Desktop: ShutdownDesktop\n");
 */
 void AddWorkspace(int32 index)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: AddWorkspace(%ld)\n",index+1);
-#endif
+STRACE(("Desktop: AddWorkspace(%ld)\n",index+1));
 	lock_workspaces();
 	lock_layers();
 	
@@ -225,9 +215,7 @@ printf("Desktop: AddWorkspace(%ld)\n",index+1);
 */
 void DeleteWorkspace(int32 index)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: DeleteWorkspace(%ld)\n",index+1);
-#endif
+STRACE(("Desktop: DeleteWorkspace(%ld)\n",index+1));
 	lock_workspaces();
 	lock_layers();
 	
@@ -273,9 +261,7 @@ int32 CountWorkspaces(void)
 */
 void SetWorkspaceCount(int32 count)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: SetWorkspaceCount(%ld)\n",count);
-#endif
+STRACE(("Desktop: SetWorkspaceCount(%ld)\n",count));
 	if(count<1 || count>32)
 		return;
 	lock_workspaces();
@@ -328,9 +314,7 @@ Workspace *WorkspaceAt(int32 index)
 */
 void SetWorkspace(int32 workspace)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: SetWorkspace(%ld)\n",workspace+1);
-#endif
+STRACE(("Desktop: SetWorkspace(%ld)\n",workspace+1));
 	lock_workspaces();
 	if(workspace<0 || workspace>(CountWorkspaces()-1))
 	{
@@ -355,9 +339,7 @@ printf("Desktop: SetWorkspace(%ld)\n",workspace+1);
 */
 void SetScreen(screen_id id)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: SetScreen(%ld)\n",id.id);
-#endif
+STRACE(("Desktop: SetScreen(%ld)\n",id.id));
 	Screen *scr;
 	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
 	{
@@ -425,10 +407,10 @@ DisplayDriver *GetGfxDriver(screen_id screen)
 */
 status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: SetSpace(%ld,%ld,%s,%ld)\n",index+1,res,
-	stick?"stick":"non-stick",screen.id);
-#endif
+
+STRACE(("Desktop: SetSpace(%ld,%ld,%s,%ld)\n",index+1,res,
+	stick?"stick":"non-stick",screen.id));
+
 	desktop_private::workspacelock.Lock();
 	status_t stat=desktop_private::activescreen->SetSpace(index,res,stick);
 	desktop_private::workspacelock.Unlock();
@@ -443,10 +425,10 @@ printf("Desktop: SetSpace(%ld,%ld,%s,%ld)\n",index+1,res,
 */
 void AddWindowToDesktop(ServerWindow *win, int32 workspace, screen_id screen)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: AddWindowToDesktop(%s,%ld,%ld)\n",win?win->GetTitle():"NULL",
-	workspace+1,screen.id);
-#endif
+
+STRACE(("Desktop: AddWindowToDesktop(%s,%ld,%ld)\n",win?win->GetTitle():"NULL",
+	workspace+1,screen.id));
+
 	// Workspace() will be non-NULL if it has already been added to the desktop
 	if(!win || win->GetWorkspace())
 		return;
@@ -463,10 +445,10 @@ printf("Desktop: AddWindowToDesktop(%s,%ld,%ld)\n",win?win->GetTitle():"NULL",
 }
 
 WinBorder* WindowContainsPoint( BPoint pt ){
-#ifdef DEBUG_DESKTOP
-printf("Desktop: WindowContainsPoint(%s,%f,%f)\n",win?win->GetTitle():"NULL",
-	pt.x, pt.y);
-#endif
+
+STRACE(("Desktop: WindowContainsPoint(%s,%f,%f)\n",win?win->GetTitle():"NULL",
+	pt.x, pt.y));
+
 	WinBorder		*wb;
 
 	desktop_private::workspacelock.Lock();
@@ -485,9 +467,7 @@ printf("Desktop: WindowContainsPoint(%s,%f,%f)\n",win?win->GetTitle():"NULL",
 */
 void RemoveWindowFromDesktop(ServerWindow *win)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: RemoveWindowFromDesktop(%s)\n",win?win->GetTitle():"NULL");
-#endif
+STRACE(("Desktop: RemoveWindowFromDesktop(%s)\n",win?win->GetTitle():"NULL"));
 	lock_workspaces();
 	lock_layers();
 	
@@ -519,9 +499,7 @@ ServerWindow *GetActiveWindow(void)
 */
 void SetActiveWindow(ServerWindow *win)
 {
-#ifdef DEBUG_DESKTOP
-printf("Desktop: SetActiveWindow(%s)\n",win?win->GetTitle():"NULL");
-#endif
+STRACE(("Desktop: SetActiveWindow(%s)\n",win?win->GetTitle():"NULL"));
 	lock_workspaces();
 	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
 	if(win && win->GetWorkspace()!=w)

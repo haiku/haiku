@@ -30,7 +30,7 @@
 
 class DisplayDriver;
 class RGBColor;
-class Layer;
+//class Layer;
 
 /*!
 	\class RootLayer RootLayer.h

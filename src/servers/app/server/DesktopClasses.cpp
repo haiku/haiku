@@ -43,10 +43,17 @@
 //#define DEBUG_SCREEN
 
 #ifdef DEBUG_WORKSPACE
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE_WS(x) printf x
+#else
+#	define STRACE_WS(x) ;
 #endif
+
 #ifdef DEBUG_SCREEN
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE_SCREEN(x) printf x
+#else
+#	define STRACE_SCREEN(x) ;
 #endif
 
 // Defined and initialized in AppServer.cpp
@@ -68,9 +75,7 @@ Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &
 	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1),
 		"Workspace Root",_screen->GetGfxDriver());
 	_rootlayer->SetColor(workspace_default_color);
-#ifdef DEBUG_WORKSPACE
-printf("Workspace::Workspace(%s)\n",_rootlayer->GetName());
-#endif
+STRACE_WS(("Workspace::Workspace(%s)\n",_rootlayer->GetName()));
 }
 
 /*!
@@ -86,9 +91,7 @@ Workspace::Workspace(as_workspace_data *data, Screen *screen)
 */
 Workspace::~Workspace(void)
 {
-#ifdef DEBUG_WORKSPACE
-printf("Workspace::~Workspace(%s)\n",_rootlayer->GetName());
-#endif
+STRACE_WS(("Workspace::~Workspace(%s)\n",_rootlayer->GetName()));
 	if(_rootlayer)
 	{
 		_rootlayer->PruneTree();
@@ -103,9 +106,8 @@ printf("Workspace::~Workspace(%s)\n",_rootlayer->GetName());
 */
 void Workspace::SetBGColor(const RGBColor &c)
 {
-#ifdef DEBUG_WORKSPACE
-printf("Workspace::SetBGColor(): "); c.PrintToStream();
-#endif
+STRACE_WS(("Workspace::SetBGColor(): "));
+	c.PrintToStream();
 	_rootlayer->SetColor(c);
 }
 
@@ -134,9 +136,7 @@ RootLayer *Workspace::GetRoot(void)
 */
 void Workspace::SetData(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo)
 {
-#ifdef DEBUG_WORKSPACE
-printf("Workspace::SetData(%s)\n",_rootlayer->GetName());
-#endif
+STRACE_WS(("Workspace::SetData(%s)\n",_rootlayer->GetName()));
 	if(_fbinfo.display_width!=fbinfo.display_width || 
 		_fbinfo.display_height!=fbinfo.display_height)
 	{
@@ -167,9 +167,7 @@ void Workspace::GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo)
 */
 void Workspace::SetSpace(int32 res)
 {
-#ifdef DEBUG_WORKSPACE
-printf("Workspace::SetSpace(%ld) unimplemented\n",res);
-#endif
+STRACE_WS(("Workspace::SetSpace(%ld) unimplemented\n",res));
 	// TODO: Implement
 }
 
@@ -180,9 +178,7 @@ printf("Workspace::SetSpace(%ld) unimplemented\n",res);
 */
 Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces);
-#endif
+STRACE_SCREEN(("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces));
 	_workspacelist=NULL;
 	_driver=gfxmodule;
 	_resolution=0;
@@ -238,9 +234,7 @@ printf("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces);
 */
 Screen::~Screen(void)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::~Screen\n");
-#endif
+STRACE_SCREEN(("Screen::~Screen\n"));
 	if ( _workspacelist )
 	{
 		int i;
@@ -258,9 +252,7 @@ printf("Screen::~Screen\n");
 */
 void Screen::AddWorkspace(int32 index)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::AddWorkspace(%ld)\n",index+1);
-#endif
+STRACE_SCREEN(("Screen::AddWorkspace(%ld)\n",index+1));
 	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,this);
 	if ( (index == -1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
@@ -275,9 +267,7 @@ printf("Screen::AddWorkspace(%ld)\n",index+1);
 */
 void Screen::AddWorkspace(Workspace *workspace,int32 index)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::AddWorkspace(%s)\n",(workspace && workspace->GetRoot())?workspace->GetRoot()->GetName():"NULL");
-#endif
+STRACE_SCREEN(("Screen::AddWorkspace(%s)\n",(workspace && workspace->GetRoot())?workspace->GetRoot()->GetName():"NULL"));
 	if ( (index==-1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
 }
@@ -288,9 +278,7 @@ printf("Screen::AddWorkspace(%s)\n",(workspace && workspace->GetRoot())?workspac
 */
 void Screen::DeleteWorkspace(int32 index)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::DeleteWorkspace(%ld)\n",index+1);
-#endif
+STRACE_SCREEN(("Screen::DeleteWorkspace(%ld)\n",index+1));
 	Workspace *workspace;
 	workspace = (Workspace *)_workspacelist->RemoveItem(index);
 	if ( workspace )
@@ -330,9 +318,7 @@ void Screen::SetWorkspaceCount(int32 count)
 	if ( _currentworkspace > count-1 )
 		SetWorkspace(count-1);
 
-#ifdef DEBUG_SCREEN
-printf("Screen::SetWorkspaceCount(%ld)\n",count);
-#endif
+STRACE_SCREEN(("Screen::SetWorkspaceCount(%ld)\n",count));
 }
 
 /*!
@@ -350,9 +336,7 @@ int32 Screen::CurrentWorkspace(void)
 */
 void Screen::SetWorkspace(int32 index)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::SetWorkspace(%ld)\n",index+1);
-#endif
+STRACE_SCREEN(("Screen::SetWorkspace(%ld)\n",index+1));
 	if ( (index >= 0) && (index <= _workspacecount-1) )
 	{
 		_currentworkspace = index;
@@ -366,9 +350,7 @@ printf("Screen::SetWorkspace(%ld)\n",index+1);
 */
 void Screen::Activate(bool active)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::Activate(%s)\n",active?"active":"inactive");
-#endif
+STRACE_SCREEN(("Screen::Activate(%s)\n",active?"active":"inactive"));
 	_active=active;
 }
 
@@ -390,9 +372,7 @@ DisplayDriver *Screen::GetGfxDriver(void)
 */
 status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::SetSpace(%ld,%ld,%s)\n",index,res,stick?"stick":"non-stick");
-#endif
+STRACE_SCREEN(("Screen::SetSpace(%ld,%ld,%s)\n",index,res,stick?"stick":"non-stick"));
 	// the specified workspace isn't active, so this should be easy...
 	Workspace *wkspc=(Workspace*)_workspacelist->ItemAt(index);
 	if(!wkspc)
@@ -419,9 +399,7 @@ printf("Screen::SetSpace(%ld,%ld,%s)\n",index,res,stick?"stick":"non-stick");
 */
 void Screen::AddWindow(ServerWindow *win, int32 workspace)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::AddWindow(%s,%ld)\n",win?win->GetTitle():"NULL", workspace+1);
-#endif
+STRACE_SCREEN(("Screen::AddWindow(%s,%ld)\n",win?win->GetTitle():"NULL", workspace+1));
 	if(!win || !win->_winborder)
 		return;
 	
@@ -439,9 +417,7 @@ printf("Screen::AddWindow(%s,%ld)\n",win?win->GetTitle():"NULL", workspace+1);
 */
 void Screen::RemoveWindow(ServerWindow *win)
 {
-#ifdef DEBUG_SCREEN
-printf("Screen::RemoveWindow(%s)\n",win?win->GetTitle():"NULL");
-#endif
+STRACE_SCREEN(("Screen::RemoveWindow(%s)\n",win?win->GetTitle():"NULL"));
 	if(!win || !win->_winborder)
 		return;
 	
@@ -458,7 +434,7 @@ WinBorder* Screen::GetWindowAt( BPoint pt ){
 	Layer	*child;
 	for(child = rl->_bottomchild; child!=NULL; child = child->_uppersibling)
 	{
-		if(child->_hidecount>0)
+		if(child->_hidden)
 			continue;
 		wb		= dynamic_cast<WinBorder*>( child );
 		if (wb)

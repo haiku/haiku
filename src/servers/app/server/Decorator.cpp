@@ -28,7 +28,6 @@
 #include "ColorSet.h"
 #include "Decorator.h"
 #include "DisplayDriver.h"
-
 #include <stdio.h>
 
 /*!

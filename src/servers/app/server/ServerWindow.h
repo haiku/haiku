@@ -36,8 +36,6 @@
 #include <Window.h>
 #include <PortMessage.h>
 
-#include <Session.h>
-
 class BString;
 class BMessenger;
 class BPoint;
@@ -46,6 +44,8 @@ class Decorator;
 class PortLink;
 class WinBorder;
 class Workspace;
+class BSession;
+class Layer;
 
 /*!
 	\class ServerWindow ServerWindow.h
@@ -100,6 +100,8 @@ public:
 
 	//! Returns the window's title
 	const char *Title(void) { return _title->String(); }
+	
+			Layer*			FindLayer(const Layer* start, int32 token) const;
 protected:	
 	friend class ServerApp;
 	friend class WinBorder;
@@ -124,7 +126,9 @@ protected:
 	int32 _handlertoken;
 	
 // ADI:
-	BSession	*ses;	
+	BSession*	ses;
+	Layer*		top_layer;
+	Layer*		cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
 };
 
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);
