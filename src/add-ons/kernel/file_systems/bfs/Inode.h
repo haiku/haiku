@@ -34,6 +34,7 @@ extern "C" {
 class BPlusTree;
 class TreeIterator;
 class AttributeIterator;
+class InodeAllocator;
 
 
 enum inode_type {
@@ -199,6 +200,7 @@ class Inode : public CachedBlock {
 		status_t Append(Transaction *transaction,off_t bytes);
 		status_t Trim(Transaction *transaction);
 
+		status_t Free(Transaction *transaction);
 		status_t Sync();
 
 		// create/remove inodes
@@ -217,17 +219,20 @@ class Inode : public CachedBlock {
 			// no implementation
 
 		friend AttributeIterator;
+		friend InodeAllocator;
 
-		status_t RemoveSmallData(small_data *item,int32 index);
+		status_t RemoveSmallData(small_data *item, int32 index);
 
 		void AddIterator(AttributeIterator *iterator);
 		void RemoveIterator(AttributeIterator *iterator);
 
-		status_t FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,off_t size,off_t offset,off_t &max);
-		status_t FreeStreamArray(Transaction *transaction, block_run *array, uint32 arrayLength, off_t size, off_t &offset, off_t &max);
+		status_t FreeStaticStreamArray(Transaction *transaction, int32 level, block_run run,
+					off_t size, off_t offset, off_t &max);
+		status_t FreeStreamArray(Transaction *transaction, block_run *array, uint32 arrayLength,
+					off_t size, off_t &offset, off_t &max);
 		status_t AllocateBlockArray(Transaction *transaction, block_run &run);
-		status_t GrowStream(Transaction *transaction,off_t size);
-		status_t ShrinkStream(Transaction *transaction,off_t size);
+		status_t GrowStream(Transaction *transaction, off_t size);
+		status_t ShrinkStream(Transaction *transaction, off_t size);
 
 		BPlusTree		*fTree;
 		Inode			*fAttributes;
