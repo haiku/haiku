@@ -182,6 +182,7 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 			strcpy(processor, "Celeron");
 			break;
 		case B_CPU_INTEL_PENTIUM_III:
+		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
 			strcpy(processor, "Pentium III");
 			break;
 		case B_CPU_AMD_K5_MODEL0:
@@ -201,7 +202,17 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 			strcpy(processor, "K6-III");
 			break;
 		case B_CPU_AMD_ATHLON_MODEL1:
+		case B_CPU_AMD_ATHLON_MODEL2:
+		case B_CPU_AMD_ATHLON_THUNDERBIRD:
 			strcpy(processor, "Athlon");
+			break;
+		case B_CPU_AMD_ATHLON_XP:
+		case B_CPU_AMD_ATHLON_XP_MODEL2:
+		case B_CPU_AMD_ATHLON_XP_MODEL3:
+			strcpy(processor, "Athlon XP");
+			break;
+		case B_CPU_AMD_DURON:
+			strcpy(processor, "Duron");
 			break;
 		case B_CPU_CYRIX_GXm:
 			strcpy(processor, "GXm");
