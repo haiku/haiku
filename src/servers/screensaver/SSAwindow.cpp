@@ -19,7 +19,7 @@ SSAwindow::SSAwindow(BRect frame) : BDirectWindow(frame, "ScreenSaver Window",
 SSAwindow::~SSAwindow() 
 {
 	Hide();
-	Sync();
+//	Sync();
 }
 
 

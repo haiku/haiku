@@ -15,7 +15,8 @@ public:
 	ScreenSaverApp();
 	bool LoadAddOn(void);
 	void ReadyToRun(void);
-	bool QuitRequested(void);
+//	bool QuitRequested(void);
+//	void Quit(void);
 	virtual void MessageReceived(BMessage *message);
 	void ShowPW(void);
 private:
@@ -28,6 +29,7 @@ private:
 	thread_id fThreadID;
 	uint32 fBlankTime;
 
+	void shutdown(void);
 };
 
 #endif //SCREEN_SAVER_H

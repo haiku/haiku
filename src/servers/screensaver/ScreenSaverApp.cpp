@@ -82,14 +82,14 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 			}
 			else  {
 				printf ("Quitting!\n");
-				Quit();
+				shutdown();
 			}
 		break;
     case 'MOO1':
 		if (real_time_clock()-fBlankTime>fPref.PasswordTime())
 			ShowPW();
 		else 
-			Quit();
+			shutdown();
 		break;
     default:
       	BApplication::MessageReceived(message);
@@ -98,12 +98,14 @@ ScreenSaverApp::MessageReceived(BMessage *message)
 }
 
 
-bool 
-ScreenSaverApp::QuitRequested(void) 
+void 
+ScreenSaverApp::shutdown(void) 
 {
+	if (fWin)
+		fWin->Hide();
 	if (fThreadID)
 		kill_thread(fThreadID);
 	if (fThrd)
 		delete fThrd;
-	return true;
+	Quit();
 }
