@@ -112,6 +112,12 @@ struct vbe_mode_info {
 #define MODE_MEMORY_DIRECT_COLOR	6
 #define MODE_MEMORY_YUV				7
 
+// set mode flags
+#define SET_MODE_MASK				0x01ff
+#define SET_MODE_SPECIFY_CRTC		(1 << 11)
+#define SET_MODE_LINEAR_BUFFER		(1 << 14)
+#define SET_MODE_DONT_CLEAR_MEMORY	(1 << 15)
+
 
 /* VBE 3.0 protected mode interface
  * The BIOS area can be scanned for the protected mode
