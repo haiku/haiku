@@ -982,7 +982,7 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 		fSaveMessage->AddString("name", name);
 		SetTitle(name);
 	}
-	Select(0,0);
+	fTextView->Select(0,0);
 }/*** StyledEditWindow::OpenFile() ***/
 
 void
