@@ -158,6 +158,30 @@ class Iterator {
 		group_destination	fDestination;
 };
 
+class Worker {
+	public:
+		Worker(RTF::Header &start);
+		virtual ~Worker();
+
+		void Work() throw (status_t);
+
+	protected:
+		virtual void Group(RTF::Group *group);
+		virtual void GroupEnd(RTF::Group *group);
+		virtual void Command(RTF::Command *command);
+		virtual void Text(RTF::Text *text);
+
+		RTF::Header &Start();
+		void Skip();
+		void Abort(status_t status);
+
+	private:
+		void Dispatch(RTF::Element *element);
+
+		RTF::Header	&fStart;
+		bool		fSkip;
+};
+
 }	// namespace RTF
 
 #endif	/* RTF_H */

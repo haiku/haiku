@@ -746,3 +746,92 @@ Iterator::Next()
 	return element;
 }
 
+
+//	#pragma mark -
+
+
+Worker::Worker(RTF::Header &start)
+	:
+	fStart(start)
+{
+}
+
+
+Worker::~Worker()
+{
+}
+
+
+void
+Worker::Dispatch(Element *element)
+{
+	if (RTF::Group *group = dynamic_cast<RTF::Group *>(element)) {
+		fSkip = false;
+		Group(group);
+
+		if (fSkip)
+			return;
+
+		for (int32 i = 0; (element = group->ElementAt(i)) != NULL; i++)
+			Dispatch(element);
+
+		GroupEnd(group);
+	} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(element)) {
+		Command(command);
+	} else if (RTF::Text *text = dynamic_cast<RTF::Text *>(element)) {
+		Text(text);
+	}
+}
+
+
+void
+Worker::Work() throw (status_t)
+{
+	Dispatch(&fStart);
+}
+
+
+void
+Worker::Group(RTF::Group *group)
+{
+}
+
+
+void
+Worker::GroupEnd(RTF::Group *group)
+{
+}
+
+
+void
+Worker::Command(RTF::Command *command)
+{
+}
+
+
+void
+Worker::Text(RTF::Text *text)
+{
+}
+
+
+RTF::Header &
+Worker::Start()
+{
+	return fStart;
+}
+
+
+void
+Worker::Skip()
+{
+	fSkip = true;
+}
+
+
+void
+Worker::Abort(status_t status)
+{
+	throw status;
+}
+
