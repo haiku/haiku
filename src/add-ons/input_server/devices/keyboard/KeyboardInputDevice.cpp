@@ -613,12 +613,15 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				states[(keycode)>>3] &= (!(1 << (7 - ((keycode) & 0x7))));
 
 			uint32 modifiers = keymap->Modifier(keycode);
-			if (modifiers) {
+			if (modifiers 
+				&& ( !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)) 
+					|| at_kbd->is_keydown)) {
 				BMessage *msg = new BMessage;
 				msg->AddInt64("when", at_kbd->timestamp);
 				msg->what = B_MODIFIERS_CHANGED;
 				msg->AddInt32("be:old_modifiers", currentModifiers);
-				if (at_kbd->is_keydown)
+				if ((at_kbd->is_keydown && !(modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK)))
+					|| (at_kbd->is_keydown && !(currentModifiers & modifiers)))
 					currentModifiers |= modifiers;
 				else
 					currentModifiers &= !modifiers;
