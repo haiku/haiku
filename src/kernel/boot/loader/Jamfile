@@ -3,6 +3,7 @@ SubDir OBOS_TOP src kernel boot loader ;
 # SubDirHdrs $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
