@@ -167,7 +167,7 @@ void* AbstractPointerListHelper::BinarySearch(const void* key, const void** item
 			low = index + 1;
 		} else {
 			// key == item
-			return static_cast<void*>(item);
+			return const_cast<void *>(item);
 		}
 	}
 	// item not found
@@ -380,7 +380,7 @@ public:
 
 	int Compare(const void *arg, const void *item) {
 		// need to adapt arguments and return value
-		return -fPredicate(item, static_cast<void*>(arg));
+		return -fPredicate(item, const_cast<void *>(arg));
 	}
 
 private:
