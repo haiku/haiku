@@ -19,6 +19,10 @@
 #include "shell_history.h"
 
 
+#define ECHO 0
+	// echoes input when unequal 0
+
+
 static int
 readline(char *buf, int len)
 {	
@@ -33,9 +37,11 @@ readline(char *buf, int len)
 			// ESC -- used to display command history:
 			//   erase all characters on the current line,
 			//   then display the previously saved command
+#if ECHO
 			while (i--) {
 				printf("\b");
 			}
+#endif
 			
 			strcpy (buf, fetch_history_command());
 			i = printf("%s", buf);
@@ -45,7 +51,9 @@ readline(char *buf, int len)
 			// backspace:
 			//   erase the last character written
 			if (i > 0) {
+#if ECHO
 				printf("\b");
+#endif
 				--i;
 			}
 			break;
@@ -53,12 +61,16 @@ readline(char *buf, int len)
 		case '\n':
 			buf[i] = 0;
 			store_history_command(buf);
+#if ECHO
 			printf("\n");
+#endif
 			return i;
 
 		default:
 			buf[i] = ch;
+#if ECHO
 			printf("%c", ch);
+#endif
 			i++;
 		}
 	}

@@ -23,8 +23,10 @@ print_usage(bool error)
 	fprintf((error ? stderr : stdout), kUsage);
 }
 
-void init_arguments(int argc,char **argv){
 
+void
+init_arguments(int argc,char **argv)
+{
 	int cnt = 1;
 	int shell_argc = 0;
 	char name[255];
@@ -48,6 +50,10 @@ void init_arguments(int argc,char **argv){
 				gCommandToExecute = argv[cnt];
 				// ignore further args
 				return;
+			case '-':
+				// ignore standard bash option
+				if (!strcmp(option, "--login"))
+					break;
 			default:
 				print_usage(true);
 				exit(1);
