@@ -22,36 +22,20 @@ public:
 	const char *Name() const;
 	const char *PrettyName() const;
 
-	bool SupportsDefragmenting(BPartition *partition,
-							   bool *whileMounted) const;
-	bool SupportsRepairing(BPartition *partition, bool checkOnly,
-						   bool *whileMounted) const;
-	bool SupportsResizing(BPartition *partition, bool *whileMounted) const;
-	bool SupportsResizingChild(BPartition *child) const;
-	bool SupportsMoving(BPartition *partition, bool *whileMounted) const;
-	bool SupportsMovingChild(BPartition *child) const;
-	bool SupportsSettingName(BPartition *partition) const;
-	bool SupportsSettingContentName(BPartition *partition,
-									bool *whileMounted) const;
-	bool SupportsSettingType(BPartition *partition) const;
-	bool SupportsCreatingChild(BPartition *partition) const;
-	bool SupportsDeletingChild(BPartition *child) const;
-	bool SupportsInitializing(BPartition *partition) const;
-	bool SupportsInitializingChild(BPartition *child,
-								   const char *diskSystem) const;
-
-	status_t ValidateResize(BPartition *partition, off_t *size) const;
-	status_t ValidateResizeChild(BPartition *child, off_t *size) const;
-	status_t ValidateMove(BPartition *partition, off_t *start) const;
-	status_t ValidateMoveChild(BPartition *child, off_t *start) const;
-	status_t ValidateSetName(BPartition *partition, char *name) const;
-	status_t ValidateSetContentName(BPartition *partition, char *name) const;
-	status_t ValidateSetType(BPartition *partition, const char *type) const;
-	status_t ValidateCreateChild(BPartition *partition, off_t *start,
-								 off_t *size, const char *type,
-								 const char *parameters) const;
-	status_t ValidateInitialize(BPartition *partition, char *name,
-								const char *parameters) const;
+	bool SupportsDefragmenting(bool *whileMounted) const;
+	bool SupportsRepairing(bool checkOnly, bool *whileMounted) const;
+	bool SupportsResizing(bool *whileMounted) const;
+	bool SupportsResizingChild() const;
+	bool SupportsMoving(bool *whileMounted) const;
+	bool SupportsMovingChild() const;
+	bool SupportsSettingName() const;
+	bool SupportsSettingContentName(bool *whileMounted) const;
+	bool SupportsSettingType() const;
+	bool SupportsSettingParameters() const;
+	bool SupportsSettingContentParameters(bool *whileMounted) const;
+	bool SupportsCreatingChild() const;
+	bool SupportsDeletingChild() const;
+	bool SupportsInitializing() const;
 
 	status_t GetNextSupportedType(BPartition *partition, int32 *cookie,
 								  char *type) const;
@@ -74,7 +58,7 @@ private:
 	disk_system_id	fID;
 	BString			fName;
 	BString			fPrettyName;
-	bool			fFileSystem;
+	uint32			fFlags;
 };
 
 #endif	// _DISK_SYSTEM_H

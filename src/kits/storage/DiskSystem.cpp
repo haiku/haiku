@@ -12,7 +12,7 @@ BDiskSystem::BDiskSystem()
 	: fID(B_NO_INIT),
 	  fName(),
 	  fPrettyName(),
-	  fFileSystem(false)
+	  fFlags(0)
 {
 }
 
@@ -44,275 +44,173 @@ BDiskSystem::PrettyName() const
 
 // SupportsDefragmenting
 bool
-BDiskSystem::SupportsDefragmenting(BPartition *partition,
-								   bool *whileMounted) const
+BDiskSystem::SupportsDefragmenting(bool *whileMounted) const
 {
-	return (InitCheck() == B_OK && IsFileSystem()
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_defragmenting_partition(fID,
-					partition->_ShadowID(), whileMounted));
+	if (InitCheck() != B_OK
+		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted) {
+		*whileMounted = (IsFileSystem()
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED));
+	}
+	return true;
 }
 
 // SupportsRepairing
 bool
-BDiskSystem::SupportsRepairing(BPartition *partition, bool checkOnly,
-							   bool *whileMounted) const
+BDiskSystem::SupportsRepairing(bool checkOnly, bool *whileMounted) const
 {
-	return (InitCheck() == B_OK
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_repairing_partition(fID, partition->_ShadowID(),
-												  checkOnly, whileMounted));
+	uint32 mainBit = B_DISK_SYSTEM_SUPPORTS_REPAIRING;
+	uint32 mountedBit = B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED;
+	if (checkOnly) {
+		mainBit = B_DISK_SYSTEM_SUPPORTS_CHECKING;
+		mountedBit = B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED;
+	}
+	if (InitCheck() != B_OK || !(fFlags & mainBit)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted)
+		*whileMounted = (IsFileSystem() && (fFlags & mountedBit));
+	return true;
 }
 
 // SupportsResizing
 bool
-BDiskSystem::SupportsResizing(BPartition *partition, bool *whileMounted) const
+BDiskSystem::SupportsResizing(bool *whileMounted) const
 {
-	return (InitCheck() == B_OK
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_resizing_partition(fID, partition->_ShadowID(),
-												 whileMounted));
+	if (InitCheck() != B_OK
+		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted) {
+		*whileMounted = (IsFileSystem()
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED));
+	}
+	return true;
 }
 
 // SupportsResizingChild
 bool
-BDiskSystem::SupportsResizingChild(BPartition *child) const
+BDiskSystem::SupportsResizingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& child && child->_IsShadow() && child->Parent()
-			&& child->Parent()->_DiskSystem() == fID
-			&& _kern_supports_resizing_child_partition(fID,
-													   child->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD));
 }
 
 // SupportsMoving
 bool
-BDiskSystem::SupportsMoving(BPartition *partition, bool *whileMounted) const
+BDiskSystem::SupportsMoving(bool *whileMounted) const
 {
-	return (InitCheck() == B_OK
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_moving_partition(fID, partition->_ShadowID(),
-											   whileMounted));
+	if (InitCheck() != B_OK
+		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted) {
+		*whileMounted = (IsFileSystem()
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED));
+	}
+	return true;
 }
 
 // SupportsMovingChild
 bool
-BDiskSystem::SupportsMovingChild(BPartition *child) const
+BDiskSystem::SupportsMovingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& child && child->_IsShadow() && child->Parent()
-			&& child->Parent()->_DiskSystem() == fID
-			&& _kern_supports_moving_child_partition(fID, child->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD));
 }
 
 // SupportsSettingName
 bool
-BDiskSystem::SupportsSettingName(BPartition *partition) const
+BDiskSystem::SupportsSettingName() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& partition && partition->_IsShadow() && partition->Parent()
-			&& partition->Parent()->_DiskSystem() == fID
-			&& _kern_supports_setting_partition_name(fID,
-													 partition->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_NAME));
 }
 
 // SupportsSettingContentName
 bool
-BDiskSystem::SupportsSettingContentName(BPartition *partition,
-										bool *whileMounted) const
+BDiskSystem::SupportsSettingContentName(bool *whileMounted) const
 {
-	return (InitCheck() == B_OK
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_setting_partition_content_name(fID,
-					partition->_ShadowID(), whileMounted));
+	if (InitCheck() != B_OK
+		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted) {
+		*whileMounted = (IsFileSystem()
+			&& (fFlags
+				& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED));
+	}
+	return true;
 }
 
 // SupportsSettingType
 bool
-BDiskSystem::SupportsSettingType(BPartition *partition) const
+BDiskSystem::SupportsSettingType() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& partition && partition->_IsShadow() && partition->Parent()
-			&& partition->Parent()->_DiskSystem() == fID
-			&& _kern_supports_setting_partition_type(fID,
-													 partition->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE));
+}
+
+// SupportsSettingParameters
+bool
+BDiskSystem::SupportsSettingParameters() const
+{
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS));
+}
+
+// SupportsSettingContentParameters
+bool
+BDiskSystem::SupportsSettingContentParameters(bool *whileMounted) const
+{
+	if (InitCheck() != B_OK
+		|| !(fFlags & B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS)) {
+		if (whileMounted)
+			*whileMounted = false;
+		return false;
+	}
+	if (whileMounted) {
+		*whileMounted = (IsFileSystem()
+			&& (fFlags
+		& B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED));
+	}
+	return true;
 }
 
 // SupportsCreatingChild
 bool
-BDiskSystem::SupportsCreatingChild(BPartition *partition) const
+BDiskSystem::SupportsCreatingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& partition && partition->_IsShadow()
-			&& partition->_DiskSystem() == fID
-			&& _kern_supports_creating_child_partition(fID,
-					partition->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD));
 }
 
 // SupportsDeletingChild
 bool
-BDiskSystem::SupportsDeletingChild(BPartition *child) const
+BDiskSystem::SupportsDeletingChild() const
 {
 	return (InitCheck() == B_OK && IsPartitioningSystem()
-			&& child && child->_IsShadow() && child->Parent()
-			&& child->Parent()->_DiskSystem() == fID
-			&& _kern_supports_deleting_child_partition(fID,
-													   child->_ShadowID()));
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD));
 }
 
 // SupportsInitializing
 bool
-BDiskSystem::SupportsInitializing(BPartition *partition) const
+BDiskSystem::SupportsInitializing() const
 {
 	return (InitCheck() == B_OK
-			&& partition && partition->_IsShadow()
-			&& _kern_supports_initializing_partition(fID,
-				partition->_ShadowID()));
-}
-
-// SupportsInitializingChild
-bool
-BDiskSystem::SupportsInitializingChild(BPartition *child,
-									   const char *diskSystem) const
-{
-	return (InitCheck() == B_OK && IsPartitioningSystem() && diskSystem
-			&& child && child->_IsShadow() && child->Parent()
-			&& child->Parent()->_DiskSystem() == fID
-			&& _kern_supports_initializing_child_partition(fID,
-					child->_ShadowID(), diskSystem));
-}
-
-// ValidateResize
-status_t
-BDiskSystem::ValidateResize(BPartition *partition, off_t *size) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!size || !partition || !partition->_IsShadow()
-		|| partition->_DiskSystem() != fID) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_resize_partition(fID, partition->_ShadowID(), size);
-}
-
-// ValidateResizeChild
-status_t
-BDiskSystem::ValidateResizeChild(BPartition *child, off_t *size) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!size || !child || !child->_IsShadow() || !child->Parent()
-		|| child->Parent()->_DiskSystem() != fID || !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_resize_child_partition(fID, child->_ShadowID(),
-												 size);
-}
-
-// ValidateMove
-status_t
-BDiskSystem::ValidateMove(BPartition *partition, off_t *start) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!start || !partition || !partition->_IsShadow()
-		|| partition->_DiskSystem() != fID) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_move_partition(fID, partition->_ShadowID(), start);
-}
-
-// ValidateMoveChild
-status_t
-BDiskSystem::ValidateMoveChild(BPartition *child, off_t *start) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!start || !child || !child->_IsShadow() || !child->Parent()
-		|| child->Parent()->_DiskSystem() != fID || !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_move_child_partition(fID, child->_ShadowID(), start);
-}
-
-// ValidateSetName
-status_t
-BDiskSystem::ValidateSetName(BPartition *partition, char *name) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!name || !partition || !partition->_IsShadow() || !partition->Parent()
-		|| partition->Parent()->_DiskSystem() != fID
-		|| !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_set_partition_name(fID, partition->_ShadowID(),
-											 name);
-}
-
-// ValidateSetContentName
-status_t
-BDiskSystem::ValidateSetContentName(BPartition *partition, char *name) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!name || !partition || !partition->_IsShadow()
-		|| partition->_DiskSystem() != fID) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_set_partition_content_name(fID,
-				partition->_ShadowID(), name);
-}
-
-// ValidateSetType
-status_t
-BDiskSystem::ValidateSetType(BPartition *partition, const char *type) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-	if (!type || !partition || !partition->_IsShadow() || !partition->Parent()
-		|| partition->Parent()->_DiskSystem() != fID
-		|| !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_set_partition_type(fID, partition->_ShadowID(),
-											 type);
-}
-
-// ValidateCreateChild
-status_t
-BDiskSystem::ValidateCreateChild(BPartition *partition, off_t *start,
-								 off_t *size, const char *type,
-								 const char *parameters) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-// parameter may be NULL
-	if (!start || !size || !type || !partition || !partition->_IsShadow()
-		|| partition->_DiskSystem() != fID || !IsPartitioningSystem()) {
-		return B_BAD_VALUE;
-	}
-	return _kern_validate_create_child_partition(fID, partition->_ShadowID(),
-				start, size, type, parameters);
-}
-
-// ValidateInitialize
-status_t
-BDiskSystem::ValidateInitialize(BPartition *partition, char *name,
-								const char *parameters) const
-{
-	if (InitCheck() != B_OK)
-		return InitCheck();
-// parameters may be NULL
-	if (!name || !partition || !partition->_IsShadow())
-		return B_BAD_VALUE;
-	return _kern_validate_initialize_partition(fID, partition->_ShadowID(),
-											   name, parameters);
+			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_INITIALIZING));
 }
 
 // GetNextSupportedType
@@ -346,14 +244,14 @@ BDiskSystem::GetTypeForContentType(const char *contentType, char *type) const
 bool
 BDiskSystem::IsPartitioningSystem() const
 {
-	return (InitCheck() == B_OK && !fFileSystem);
+	return (InitCheck() == B_OK && !(fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
 }
 
 // IsFileSystem
 bool
 BDiskSystem::IsFileSystem() const
 {
-	return (InitCheck() == B_OK && fFileSystem);
+	return (InitCheck() == B_OK && (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
 }
 
 // IsSubSystemFor
@@ -389,7 +287,7 @@ BDiskSystem::_SetTo(user_disk_system_info *info)
 	fID = info->id;
 	fName = info->name;
 	fPrettyName = info->pretty_name;
-	fFileSystem = info->file_system;
+	fFlags = info->flags;
 	return B_OK;
 }
 
@@ -400,6 +298,6 @@ BDiskSystem::_Unset()
 	fID = B_NO_INIT;
 	fName = (const char*)NULL;
 	fPrettyName = (const char*)NULL;
-	fFileSystem = false;
+	fFlags = 0;
 }
 
