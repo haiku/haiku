@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-12/2004.
+	Rudolf Cornelissen 10/2002-1/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -190,6 +190,11 @@ typedef struct {
 			uint32	handle[0x08];	/* FIFO channel's cmd handle for the owning cmd */
 			uint32	ch_ptr[0x20];	/* cmd handle's ptr to it's assigned FIFO ch (if any) */
 		} fifo;
+		struct {
+			uint32 *cmdbuffer;	/* location of DMA command buffer */
+			uint32 put;			/* */
+			uint32 current;		/* */
+		}dma;
 	} engine;
 
 	/* pointers to first and last free memory adress for 3D use: cardmem local offsets */
