@@ -58,8 +58,6 @@ VideoProducer::VideoProducer(
 
 	fOutput.destination = media_destination::null;
 
-	AddNodeKind(B_PHYSICAL_INPUT);
-
 	fInitStatus = B_OK;
 	return;
 }

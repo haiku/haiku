@@ -17,7 +17,7 @@ MediaAddOn::MediaAddOn(image_id imid)
 	/* Customize these parameters to match those of your node */
 	fFlavorInfo.name = "Demo Video Producer";
 	fFlavorInfo.info = "Demo Video Producer";
-	fFlavorInfo.kinds = B_BUFFER_PRODUCER | B_CONTROLLABLE | B_PHYSICAL_INPUT;
+	fFlavorInfo.kinds = B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	fFlavorInfo.flavor_flags = 0;
 	fFlavorInfo.internal_id = 0;
 	fFlavorInfo.possible_count = 5; // limited to 5 instances (just for testing)
