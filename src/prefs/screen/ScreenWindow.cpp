@@ -575,7 +575,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("800 x 600"))
@@ -672,7 +672,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1024 x 768"))
@@ -770,7 +770,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1152 x 864"))
@@ -868,7 +868,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1280 x 1024"))
@@ -965,7 +965,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			else if (fResolutionMenu->FindMarked() == fResolutionMenu->FindItem("1600 x 1200"))
@@ -1063,7 +1063,7 @@ void ScreenWindow::MessageReceived(BMessage* message)
 						modelist++;
 					}
 					
-					mode->timing.pixel_clock = (mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000;
+					mode->timing.pixel_clock = (uint32) ((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
 				}
 			}
 			
