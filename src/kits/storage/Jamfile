@@ -13,8 +13,10 @@ LinkSharedOSLibs libbeadapter.so :
 # The library containing the storage kit classes.
 
 UsePrivateHeaders storage ;
+UsePrivateHeaders app ;
 
 UsePublicHeaders storage ;
+UsePublicHeaders app ;
 UsePublicHeaders [ FDirName add-ons file_system ] ;
 
 # This is something of a hack until we get around to
@@ -30,6 +32,7 @@ SharedLibrary storage :
 	File.cpp
 	FindDirectory.cpp
 	Mime.cpp
+	MimeDatabase.cpp
 	MimeType.cpp
 	Node.cpp
 	#NodeInfo.cpp
@@ -59,6 +62,7 @@ SharedLibrary storage :
 	storage_support.cpp
 ;
 LinkSharedOSLibs libstorage.so :
+	libopenbeos.so
 	be
 	libbeadapter.so
 	stdc++.r4
