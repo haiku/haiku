@@ -7,6 +7,8 @@
 #include "LockerHelper.h"
 
 
+#define PPP_REPLY(sender, value) send_data_with_timeout((sender), (value), NULL, 0, B_REPORT_TIMEOUT)
+
 class PPPReportManager {
 	public:
 		PPPReportManager(BLocker& lock);

@@ -65,10 +65,12 @@ enum {
 	PPP_NO_FLAGS = 0x00,
 	PPP_ALWAYS_ALLOWED = 0x01,
 		// protocol may send/receive in PPP_ESTABLISHMENT_PHASE
-	PPP_NEEDS_DOWN = 0x02
+	PPP_NEEDS_DOWN = 0x02,
 		// protocol needs a Down() in addition to a Reset() to
 		// terminate the connection properly (losing the connection
 		// still results in a Reset() only)
+	PPP_NOT_IMPORTANT = 0x03
+		// if this protocol fails to go up we do not disconnect
 };
 
 // phase when the protocol is brought up

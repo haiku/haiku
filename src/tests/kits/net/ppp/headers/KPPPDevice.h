@@ -29,6 +29,7 @@ class PPPDevice {
 			{ return fMTU; }
 		virtual uint32 PreferredMTU() const = 0;
 		
+		// these calls must not block
 		virtual void Up() = 0;
 		virtual void Down() = 0;
 		virtual void Listen() = 0;

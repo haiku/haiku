@@ -82,7 +82,7 @@ PPPReportManager::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 len
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
 		ppp_report_request& request = fReportRequests.ItemAt(index);
 		
-		result = send_data_with_timeout(request.port, PPP_REPORT_CODE, &report,
+		result = send_data_with_timeout(request.thread, PPP_REPORT_CODE, &report,
 			sizeof(report), PPP_REPORT_TIMEOUT);
 		
 		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
@@ -91,10 +91,21 @@ PPPReportManager::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 len
 			continue;
 		} else if(result == B_OK) {
 			if(request.flags & PPP_WAIT_FOR_REPLY) {
-				result = receive_data_with_timeout(fPort, &code, NULL, 0,
-					PPP_REPORT_TIMEOUT);
+				if(request.flags & PPP_NO_REPLY_TIMEOUT) {
+					sender = -1;
+					while(sender != request.thread)
+						code = receive_data(&sender, NULL, 0);
+					result = B_OK;
+				} else {
+					sender = -1;
+					result = B_OK;
+					while(sender != request.thread && result == B_OK)
+						result = receive_data_with_timeout(&sender, &code, NULL, 0,
+							PPP_REPORT_TIMEOUT);
+				}
+				
 				if(result == B_OK && code != B_OK)
-					successful = false;
+					acceptable = false;
 			}
 		}
 		

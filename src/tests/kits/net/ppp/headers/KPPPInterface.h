@@ -19,6 +19,8 @@ class PPPOptionHandler;
 
 
 class PPPInterface {
+		friend class PPPStateMachine;
+
 	private:
 		// copies are not allowed!
 		PPPInterface(const PPPInterface& copy);
@@ -136,6 +138,7 @@ class PPPInterface {
 		PPPLCP fLCP;
 		PPPReportManager fReportManager;
 		ifnet *fIfnet;
+		thread_id fUpThread;
 		
 		ppp_manager_info *fManager;
 		

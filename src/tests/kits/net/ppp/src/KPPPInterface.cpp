@@ -26,7 +26,7 @@
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
 	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
-	fIfnet(NULL), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
+	fIfnet(NULL), fUpThread(-1), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
 	fDevice(NULL), fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
 {
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
@@ -344,6 +344,9 @@ PPPInterface::EncapsulatorFor(uint16 protocol,
 bool
 PPPInterface::AddChild(PPPInterface *child)
 {
+	if(!child || child->Mode() != Mode())
+		return false;
+	
 	LockerHelper locker(fLock);
 	
 	if(fChildren.HasItem(child) || !fChildren.AddItem(child))
@@ -402,28 +405,88 @@ PPPInterface::SetDialOnDemand(bool dialondemand = true)
 	// check if we need to register/unregister
 	if(!Ifnet() && fDialOnDemand)
 		RegisterInterface();
-	else if(Ifnet() && !fDialOnDemand && Phase() == PPP_DOWN_PHASE)
+	else if(Ifnet() && !fDialOnDemand && Phase() == PPP_DOWN_PHASE) {
 		UnregisterInterface();
+		Delete();
+	}
 }
 
 
 bool
 PPPInterface::Up()
 {
-	// ToDo:
-	// instead of waiting for state change we should wait until
-	// all retries are done
-	
-	if(!InitCheck() || Phase() != PPP_DOWN_PHASE)
+	if(!InitCheck() || Phase() == PPP_TERMINATION_PHASE)
 		return false;
 	
 	if(IsUp())
 		return true;
 	
-	// TODO:
-	// Add one-time connection report request and wait
-	// for results. If we lost the connection we should
-	// consider redialing.
+	ppp_report_packet report;
+	thread_id me = find_thread(NULL), sender;
+	
+	// one thread has to do the real task while all other threads are observers
+	fLock.Lock();
+	if(fUpThread == -1)
+		fUpThread = me;
+	
+	fReportManager.EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
+	fLock.Unlock();
+	
+	if(me != fUpThread) {
+		// I am an observer
+		while(true) {
+			if(IsUp()) {
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return true;
+			}
+			
+			if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE) {
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return true;
+			}
+			
+			if(IsUp()) {
+				PPP_REPLY(sender, B_OK);
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return true;
+			}
+			
+			if(report.type != PPP_CONNECTION_REPORT) {
+				PPP_REPLY(sender, B_OK);
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			}
+			
+			if(report.code == PPP_GOING_UP) {
+				PPP_REPLY(sender, B_OK);
+				continue;
+			} else if(report.code == PPP_UP_SUCCESSFUL) {
+				PPP_REPLY(sender, B_OK);
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return true;
+			} else if(report.code == PPP_DOWN_SUCCESSFUL
+					|| report.code == PPP_UP_ABORTED) {
+				PPP_REPLY(sender, B_OK);
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return false;
+			} else if(report.code == PPP_UP_FAILED) {
+				// TODO:
+				// if maximum number of retries is reached we return false
+				// otherwise we wait for the next dial-attempt
+			} else if(report.code == PPP_AUTHENTICATION_FAILED) {
+				PPP_REPLY(sender, B_OK);
+				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+				return false;
+			} else if(report.code == PPP_CONNECTION_LOST) {
+				// TODO:
+				// if autoredial is enabled wait for redial attemts (just continue)
+			}
+		}
+	} else {
+		// I am the thread for the real task
+		while(true) {
+			
+		}
+	}
 	
 	return false;
 }

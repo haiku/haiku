@@ -2,7 +2,11 @@
 
 
 // TODO:
-// do not forget to reset authentication status when needed
+// do not forget to reset authentication status when:
+// - connection is lost
+// - reconfiguring?
+// - terminating
+// - ...
 
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(&interface), fPhase(PPP_DOWN_PHASE),
@@ -49,8 +53,16 @@ PPPStateMachine::NewPhase(PPP_PHASE next)
 {
 	// Report a down event to parent if we are not usable anymore.
 	// The report threads get their notification later.
-	if(Phase() == PPP_ESTABLISHED_PHASE && Interface()->Parent())
-		Interface()->Parent()->StateMachine().DownEvent(Interface());
+	if(Phase() == PPP_ESTABLISHED_PHASE && next != Phase()) {
+		if(Interface()->Ifnet())
+			Interface()->Ifnet()->if_flags &= ~IFF_RUNNING;
+		
+		if(!Interface()->DoesDialOnDemand())
+			Interface()->UnregisterInterface();
+		
+		if(Interface()->Parent())
+			Interface()->Parent()->StateMachine().DownEvent(Interface());
+	}
 	
 	// there is nothing after established phase and nothing before down phase
 	if(next > PPP_ESTABLISHED_PHASE)
@@ -161,13 +173,14 @@ PPPStateMachine::UpEvent(PPPInterface *interface)
 	LockerHelper locker(fLock);
 	
 	if(Phase() <= PPP_TERMINATION_PHASE || State() != PPP_STARTING_STATE) {
-		interface->Down();
+		interface->StateMachine().CloseEvent();
 		return;
 	}
 	
 	NewState(PPP_OPENED_STATE);
 	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
 		NewPhase(PPP_AUTHENTICATION_PHASE);
+		locker.UnlockNow();
 		ThisLayerUp();
 	}
 }
@@ -189,8 +202,10 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 				++count;
 		}
 		
-		if(count == 0 && Interface()->Ifnet())
-			Interface()->Ifnet()->if_flags &= ~IFF_RUNNING;
+		if(count == 0) {
+			locker.UnlockNow();
+			DownEvent();
+		}
 	}
 }
 
@@ -198,8 +213,8 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 void
 PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
-	// All protocols must go up.
-	CloseEvent();
+	if(protocol->Flags() & PPP_NOT_IMPORTANT)
+		CloseEvent();
 }
 
 
@@ -222,8 +237,8 @@ PPPStateMachine::DownEvent(PPPProtocol *protocol)
 void
 PPPStateMachine::UpFailedEvent(PPPEncapsulator *encapsulator)
 {
-	// All encapsulators must go up.
-	CloseEvent();
+	if(encapsulator->Flags() & PPP_NOT_IMPORTANT)
+		CloseEvent();
 }
 
 
@@ -337,9 +352,15 @@ PPPStateMachine::UpEvent()
 				NewState(PPP_CLOSED_STATE);
 				locker.UnlockNow();
 				ThisLayerFinished();
+				
+				return;
 			}
 			
 			// TODO: handle server-up!
+			NewState(PPP_REQ_SENT_STATE);
+			InitializeRestartCount();
+			locker.UnlockNow();
+			SendConfigureRequest();
 		break;
 		
 		case PPP_STARTING_STATE:
@@ -381,7 +402,7 @@ PPPStateMachine::DownEvent()
 		case PPP_STOPPED_STATE:
 			// The RFC says we should reconnect, but our implementation
 			// will only do this if auto-redial is enabled (only clients).
-			NewStatus(PPP_STARTING_STATE);
+			NewState(PPP_STARTING_STATE);
 		break;
 		
 		case PPP_STOPPING_STATE:
@@ -389,7 +410,7 @@ PPPStateMachine::DownEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 		case PPP_OPENED_STATE:
-			NewStatus(PPP_STARTING_STATE);
+			NewState(PPP_STARTING_STATE);
 		break;
 		
 		default:
@@ -406,7 +427,9 @@ PPPStateMachine::DownEvent()
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
 		if(fAuthentiactionStatus == PPP_AUTHENTICATION_FAILED
-				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED)
+				|| fAuthenticationStatus == PPP_AUTHENTICATING
+				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
+				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface()->Report(PPP_CONNECTION_REPORT, PPP_AUTHENTICATION_FAILED,
 				NULL, 0);
 		else
@@ -421,10 +444,14 @@ PPPStateMachine::DownEvent()
 		if(Interface()->DoesAutoRedial()) {
 			// TODO:
 			// Redial()
-		} else
+		} else if(!Interface()->DoesDialOnDemand())
 			Interface()->Delete();
-	} else
-		Report(PPP_CONNECTION_REPORT, PPP_DOWN_SUCCESSFUL, NULL, 0);
+	} else {
+		Interface()->Report(PPP_CONNECTION_REPORT, PPP_DOWN_SUCCESSFUL, NULL, 0);
+		
+		if(!Interface()->DoesDialOnDemand())
+			Interface()->Delete();
+	}
 }
 
 
@@ -436,11 +463,21 @@ PPPStateMachine::OpenEvent()
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
-			NewState(PPP_STARTING_STATE);
+			if(!Interface()->Report(PPP_CONNECTION_REPORT, PPP_GOING_UP, NULL, 0))
+				return;
+			
+			if(Interface()->Mode() == PPP_SERVER_MODE) {
+				NewPhase(PPP_ESTABLISHMENT_PHASE);
+				
+				if(Interface()->Device())
+					Interface()->Device()->Listen();
+			} else
+				NewState(PPP_STARTING_STATE);
+			
 			if(Interface()->IsMultilink() && !Interface()->Parent()) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
 				for(int32 i = 0; i < Interface()->CountChildren(); i++)
-					Interface()->ChildAt(i)->Up();
+					Interface()->ChildAt(i)->StateMachine().OpenEvent();
 			} else {
 				locker.UnlockNow();
 				ThisLayerStarted();
@@ -473,12 +510,14 @@ PPPStateMachine::CloseEvent()
 	
 	if(Interface()->IsMultilink() && !Interface()->Parent()) {
 		NewState(PPP_INITIAL_STATE);
-		NewPhase(PPP_DOWN_PHASE);
+		
+		if(Phase() != PPP_DOWN_PHASE)
+			NewPhase(PPP_TERMINATION_PHASE);
 		
 		ThisLayerDown();
 		
 		for(int32 i = 0; i < Interface()->CountChildren(); i++)
-			Interface()->ChildAt(i)->Down();
+			Interface()->ChildAt(i)->StateMachine().CloseEvent();
 		
 		return;
 	}
@@ -1328,7 +1367,7 @@ PPPStateMachine::BringHandlersUp()
 		if(BringPhaseUp() > 0)
 			break;
 		
-		fLock.Lock();
+		LockerHelper locker(fLock);
 		
 		if(Phase() < PPP_AUTHENTICATION_PHASE)
 			return;
@@ -1336,14 +1375,12 @@ PPPStateMachine::BringHandlersUp()
 			if(Interface()->Parent())
 				Interface()->Parent()->StateMachine().UpEvent(Interface());
 			
-			// TODO:
-			// Report(PPP_CONNECTION_REPORT, PPP_UP_SUCCESSFUL, NULL, 0);
 			if(Interface()->Ifnet())
 				Interface()->Ifnet()->if_flags |= IFF_RUNNING;
+			
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_UP_SUCCESSFUL, NULL, 0);
 		} else
 			NewPhase(Phase() + 1);
-		
-		fLock.Unlock();
 	}
 }
 
