@@ -264,3 +264,10 @@ arch_cpu_idle(void)
 	}
 }
 
+
+void
+arch_cpu_sync_icache(void *address, size_t length)
+{
+	// instruction cache is always consistent on x86
+}
+
