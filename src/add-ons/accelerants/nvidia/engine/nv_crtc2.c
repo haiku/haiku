@@ -426,8 +426,14 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 		/* end synchronous reset if display should be enabled */
 		SEQW(RESET, 0x03);
 
-		/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
-		if (si->ps.tmds2_active) DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) & 0xcfffffff));
+		if (si->ps.tmds2_active)
+		{
+			/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
+			 * internal transmitters... */
+			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) & 0xcfffffff));
+			/* ... and powerup external TMDS transmitter if it exists */
+			CRTC2W(LCD, (CRTC2R(LCD) | 0x10));
+		}
 
 		LOG(4,("display on, "));
 	}
@@ -435,8 +441,14 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 	{
 		SEQW(CLKMODE, (temp | 0x20));
 
-		/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
-		if (si->ps.tmds2_active) DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) | 0x30000000));
+		if (si->ps.tmds2_active)
+		{
+			/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
+			 * internal transmitters... */
+			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) | 0x30000000));
+			/* ... and powerdown external TMDS transmitter if it exists */
+			CRTC2W(LCD, (CRTC2R(LCD) & 0xef));
+		}
 
 		LOG(4,("display off, "));
 	}
