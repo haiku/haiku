@@ -227,7 +227,7 @@ InputServer::InitKeyboardMouseStates(void)
 {
 	CALLED();
 	// This is where we determine the screen resolution from the app_server and find the center of the screen
-	// sMousePos is then set to the center of the screen.
+	// fMousePos is then set to the center of the screen.
 
 	fFrame = fScreen.Frame();
 	fMousePos = BPoint(fFrame.right/2, fFrame.bottom/2);
@@ -767,9 +767,20 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 		break;
     	
     	// some Key Down and up codes ..
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED: {
+			ssize_t size;
+			uint8 *data;
+			outbound->FindInt32("modifiers", (int32*)&fKey_info.modifiers);
+			if ((outbound->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) == B_OK) 
+				&& (size == (ssize_t)sizeof(fKey_info.key_states)))
+				memcpy(fKey_info.key_states, data, size);
+		}
    		default:
-      		break;
-   			
+			break;
 	}
 
 	return B_OK;
