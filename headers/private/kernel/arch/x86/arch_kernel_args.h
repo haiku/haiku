@@ -2,10 +2,12 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _KERNEL_ARCH_x86_STAGE2_H
-#define _KERNEL_ARCH_x86_STAGE2_H
+#ifndef KERNEL_ARCH_x86_KERNEL_ARGS_H
+#define KERNEL_ARCH_x86_KERNEL_ARGS_H
 
-#include <boot/stage2_struct.h>
+#ifndef KERNEL_BOOT_KERNEL_ARGS_H
+#	error This file is included from <boot/kernel_args.h> only
+#endif
 
 #define MAX_BOOT_PTABLES 4
 
@@ -38,4 +40,4 @@ typedef struct {
 	uint32	cpu_apic_version[MAX_BOOT_CPUS];
 } arch_kernel_args;
 
-#endif	/* _KERNEL_ARCH_x86_STAGE2_H */
+#endif	/* KERNEL_ARCH_x86_KERNEL_ARGS_H */
