@@ -60,7 +60,7 @@ extern int		daemon(int nochdir, int noclose);
 extern int		system(const char *command);
 
 extern char		*mktemp(char *name);
-extern int		mkstemp(char *template);
+extern int		mkstemp(char *templat);
 
 /* environment variables */
 extern char		**environ;
