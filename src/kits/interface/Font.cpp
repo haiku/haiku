@@ -69,8 +69,7 @@ _font_control_(BFont *font, int32 cmd, void *data)
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(cmd);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 	{
@@ -105,8 +104,7 @@ count_font_families(void)
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(AS_COUNT_FONT_FAMILIES);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return -1;
@@ -128,8 +126,7 @@ count_font_styles(font_family name)
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(AS_COUNT_FONT_STYLES);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return -1;
@@ -158,8 +155,8 @@ get_font_family(int32 index, font_family *name, uint32 *flags)
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(AS_GET_FAMILY_NAME);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.Attach<int32>(index);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_ERROR;
@@ -194,8 +191,7 @@ get_font_style(font_family family, int32 index, font_style *name,
 	link.StartMessage(AS_GET_STYLE_NAME);
 	link.Attach(family,sizeof(font_family));
 	link.Attach<int32>(index);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_ERROR;
@@ -236,8 +232,7 @@ get_font_style(font_family family, int32 index, font_style *name,
 	link.StartMessage(AS_GET_STYLE_NAME);
 	link.Attach(family,sizeof(font_family));
 	link.Attach<int32>(index);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_ERROR;
@@ -266,8 +261,7 @@ update_font_families(bool check_only)
 	
 	link.StartMessage(AS_QUERY_FONTS_CHANGED);
 	link.Attach<bool>(check_only);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return false;
@@ -386,8 +380,7 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	link.StartMessage(AS_SET_FAMILY_AND_STYLE);
 	link.Attach(family,sizeof(font_family));
 	link.Attach(style,sizeof(font_style));
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_ERROR;
@@ -442,8 +435,7 @@ BFont::SetFamilyAndFace(const font_family family, uint16 face)
 	link.StartMessage(AS_SET_FAMILY_AND_FACE);
 	link.Attach(family,sizeof(font_family));
 	link.Attach<uint16>(face);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_ERROR;
@@ -516,8 +508,7 @@ BFont::GetFamilyAndStyle(font_family *family, font_style *style) const
 	link.StartMessage(AS_GET_FAMILY_AND_STYLE);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 		
 	if(code!=SERVER_TRUE)
 		return;
@@ -593,8 +584,7 @@ BFont::Direction(void) const
 	link.StartMessage(AS_GET_FONT_DIRECTION);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return B_FONT_LEFT_TO_RIGHT;
@@ -614,8 +604,7 @@ BFont::IsFixed(void) const
 	link.StartMessage(AS_QUERY_FONT_FIXED);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return false;
@@ -649,8 +638,7 @@ BFont::BoundingBox(void) const
 	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return BRect(0,0,0,0);
@@ -686,8 +674,7 @@ BFont::CountTuned(void) const
 	link.StartMessage(AS_GET_TUNED_COUNT);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return -1;
@@ -711,8 +698,7 @@ BFont::GetTunedInfo(int32 index, tuned_font_info *info) const
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<uint32>(index);
-	link.Flush();
-	link.GetNextReply(&code);
+	link.FlushWithReply(&code);
 	
 	if(code!=SERVER_TRUE)
 		return;
