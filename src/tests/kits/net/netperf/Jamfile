@@ -2,6 +2,10 @@ SubDir OBOS_TOP src tests kits net netperf ;
 
 Depends netperf : install_netperf_scripts ;
 
+if ! $(BONE_COMPATIBLE) {
+	SubDirCcFlags -DBUILDING_R5_LIBNET -Dclose=closesocket ;
+}
+
 SimpleTest netperf : 
 	netperf.c
 	netsh.c
@@ -12,7 +16,7 @@ SimpleTest netperf :
 	nettest_xti.c
 	nettest_ipv6.c
 	nettest_dns.c
-	: libsocket.so libbind.so
+	: $(NETWORK_LIBS)
 ;
 
 SimpleTest netserver : 
@@ -25,7 +29,7 @@ SimpleTest netserver :
 	nettest_xti.c
 	nettest_ipv6.c
 	nettest_dns.c
-	: libsocket.so libbind.so
+	: $(NETWORK_LIBS)
 ;
 
 OBOSInstall install_netperf_scripts : [ FDirName $(OBOS_TEST_DIR) kits net netperf ] :

@@ -2,9 +2,13 @@ SubDir OBOS_TOP src apps bin traceroute ;
 
 UsePrivateHeaders net ;
 
+if ! $(BONE_COMPATIBLE) {
+	SubDirCcFlags -DBUILDING_R5_LIBNET ;
+}
+
 BinCommand traceroute :
 	traceroute.c
-: libsocket.so libbind.so ;
+: $(NETWORK_LIBS) ;
 
 # Installation -- in the test directory for the time being
 OBOSInstall install-networking

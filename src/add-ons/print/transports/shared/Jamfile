@@ -2,7 +2,11 @@ SubDir OBOS_TOP src add-ons print transports shared ;
 
 SetupObjectsDir ;
 
-ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -Dclosesocket=close ;
+if $(BONE_COMPATIBLE) {
+	ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -Dclosesocket=close ;
+} else {
+	ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -DBUILDING_R5_LIBNET ;
+}
 
 Objects
 	DbgMsg.cpp

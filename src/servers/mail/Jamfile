@@ -18,13 +18,7 @@ Server mail_daemon :
 	main.cpp
 ;
 
-LinkSharedOSLibs mail_daemon : be libmail.so tracker stdc++.r4 ;
-
-if $(BONE_COMPATIBLE) {
-	LinkSharedOSLibs mail_daemon : socket ;
-} else {
-	LinkSharedOSLibs mail_daemon : net ;
-}
+LinkSharedOSLibs mail_daemon : be libmail.so tracker stdc++.r4 $(NETWORK_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	mail_daemon : 

@@ -20,16 +20,10 @@ Addon POP3 : mail_daemon inbound_protocols :
 	SimpleMailProtocol.cpp
 	md5c.c ;
 
-LinkSharedOSLibs POP3 : be libmail.so ;
+LinkSharedOSLibs POP3 : be libmail.so $(NETWORK_LIBS) ;
 
 if $(USESSL) {
 	LinkSharedOSLibs POP3 : ssl crypto ;
-}
-
-if $(BONE_COMPATIBLE) {
-	LinkSharedOSLibs POP3 : socket bind ;
-} else {
-	LinkSharedOSLibs POP3 : net ;
 }
 
 Package haiku-maildaemon-cvs :

@@ -51,13 +51,8 @@ LinkSharedOSLibs libmail.so :
 	libtextencoding.so
 	tracker
 	stdc++.r4
+	$(NETWORK_LIBS)
 ;
-
-if $(BONE_COMPATIBLE) {
-	LinkSharedOSLibs libmail.so : socket ;
-} else {
-	LinkSharedOSLibs libmail.so : net ;
-}
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libmail.so : libmail.so ;

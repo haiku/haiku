@@ -20,16 +20,10 @@ Addon IMAP : mail_daemon inbound_protocols :
 	imap_config.cpp
 	NestedString.cpp ;
 
-LinkSharedOSLibs IMAP : be libmail.so ;
+LinkSharedOSLibs IMAP : be libmail.so $(NETWORK_LIBS) ;
 
 if $(USESSL) {
 	LinkSharedOSLibs IMAP : ssl crypto ;
-}
-
-if $(BONE_COMPATIBLE) {
-	LinkSharedOSLibs IMAP : socket bind ;
-} else {
-	LinkSharedOSLibs IMAP : net ;
 }
 
 Package haiku-maildaemon-cvs :

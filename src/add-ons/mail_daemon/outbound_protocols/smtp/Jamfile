@@ -13,13 +13,7 @@ Addon SMTP : mail_daemon outbound_protocols :
 	smtp.cpp
 	md5c.c ;
 
-LinkSharedOSLibs SMTP : be libmail.so ;
-
-if $(BONE_COMPATIBLE) {
-	LinkSharedOSLibs SMTP : socket bind ;
-} else {
-	LinkSharedOSLibs SMTP : net ;
-}
+LinkSharedOSLibs SMTP : be libmail.so $(NETWORK_LIBS) ;
 
 Package haiku-maildaemon-cvs :
 	SMTP : 

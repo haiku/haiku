@@ -107,6 +107,11 @@ switch $(TARGET_PLATFORM)
 		HAIKU_COMPATIBLE = true ;
 	}
 }
+if $(BONE_COMPATIBLE) {
+	NETWORK_LIBS = libsocket.so libbind.so ;
+} else {
+	NETWORK_LIBS = libnet.so ;
+}
 
 # Determine if we're building on PPC or x86
 # Determine mimetype of executable
