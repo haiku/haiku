@@ -24,6 +24,8 @@
 //	Description:	A helper class for TRoster. A list of RosterAppInfos.
 //------------------------------------------------------------------------------
 
+#include <string.h>
+
 #include "AppInfoList.h"
 #include "RosterAppInfo.h"
 
