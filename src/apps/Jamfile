@@ -10,6 +10,7 @@ SubInclude OBOS_TOP src apps magnify ;
 SubInclude OBOS_TOP src apps mediaplayer ;
 SubInclude OBOS_TOP src apps midiplayer ;
 SubInclude OBOS_TOP src apps people ;
+SubInclude OBOS_TOP src apps poorman ;
 SubInclude OBOS_TOP src apps pulse ;
 SubInclude OBOS_TOP src apps showimage ;
 SubInclude OBOS_TOP src apps stylededit ;
