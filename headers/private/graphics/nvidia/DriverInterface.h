@@ -67,7 +67,9 @@ enum {
 	NV_DEVICE_NAME,
 	NV_RUN_INTERRUPTS,
 	NV_GET_NTH_AGP_INFO,
-	NV_ENABLE_AGP
+	NV_ENABLE_AGP,
+	NV_ISA_OUT,
+	NV_ISA_IN
 };
 
 /* max. number of overlay buffers */
@@ -340,6 +342,14 @@ typedef struct {
 	bool		agp_bus;/* indicates if we have access to the AGP busmanager */
 	uint32		cmd;	/* actual command to execute */
 } nv_cmd_agp;
+
+/* Read or write a value in ISA I/O space */
+typedef struct {
+	uint32	magic;		/* magic number to make sure the caller groks us */
+	uint16	adress;		/* Offset to read/write */
+	uint8	size;		/* Number of bytes to transfer */
+	uint16	data;		/* The value read or written */
+} nv_in_out_isa;
 
 enum {
 	
