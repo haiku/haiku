@@ -208,15 +208,23 @@ BAppFileInfo::GetSupportedTypes(BMessage *types) const
 	The supported MIME types must be stored in a field "types" of type
 	\c B_STRING_TYPE in \a types.
 
+	The method informs the registrar about this news.
+	For each supported type the result of BMimeType::GetSupportingApps() will
+	afterwards include the signature of this application. That is, the
+	application file needs to have a signature set.
+
+	\a syncAll specifies whether the not longer supported types shall be
+	updated as well, i.e. whether this application shall be remove from the
+	lists of supporting applications.
+
 	\param types The supported types to be assigned to the file.
 		   May be \c NULL.
-	\param syncAll ???
+	\param syncAll \c true to also synchronize the not longer supported
+		   types, \c false otherwise.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_NO_INIT: The object is not properly initialized.
 	- other error codes
-
-	\todo What does \a syncAll mean?
 */
 status_t
 BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
@@ -227,10 +235,8 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 // SetSupportedTypes
 /*!	\brief Sets the MIME types supported by the application.
 
-	If \a types is \c NULL the application's supported types are unset.
-
-	The supported MIME types must be stored in a field "types" of type
-	\c B_STRING_TYPE in \a types.
+	This method is a short-hand for SetSupportedTypes(types, true).
+	\see SetSupportedType(const BMessage*, bool) for detailed information.
 
 	\param types The supported types to be assigned to the file.
 		   May be \c NULL.
