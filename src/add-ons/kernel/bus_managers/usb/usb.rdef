@@ -16,5 +16,5 @@ resource app_version {
 	variety = 0,
 	internal = 1,
 	short_info = "USB system software",
-	long_info = "OpenBeOS - This driver is (c) 2003-2004 Niels Sascha Reedijk"
+	long_info = "Haiku - This driver is (c) 2003-2004 Niels Sascha Reedijk"
 };
