@@ -614,8 +614,36 @@ void
 NodeManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
-	FATAL("NodeManager::CleanupTeam: should cleanup team %ld\n", team);
+
 	fDefaultManager->CleanupTeam(team);
+
+	FATAL("NodeManager::CleanupTeam: team %ld\n", team);
+
+	registered_node *rn;
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
+		// if the team hosting this node is gone, remove node from database
+		if (rn->team == team) {
+			FATAL("NodeManager::CleanupTeam: removing node id %ld, team %ld\n", rn->nodeid, team);
+			fRegisteredNodeMap->RemoveCurrent();
+			continue;
+		}
+		// check the list of teams that have references to this node, and remove the team
+		team_id *pteam;
+		int32 *prefcount;
+		for (rn->teamrefcount.Rewind(); rn->teamrefcount.GetNext(&prefcount); ) {
+			rn->teamrefcount.GetCurrentKey(&pteam);
+			if (*pteam == team) {
+				FATAL("NodeManager::CleanupTeam: removing %ld refs from node id %ld, team %ld\n", *prefcount, rn->nodeid, team);
+				rn->teamrefcount.RemoveCurrent();
+				break;
+			}
+		}
+		// if the team refcount is now empty, also remove the node
+		if (rn->teamrefcount.IsEmpty()) {
+			FATAL("NodeManager::CleanupTeam: removing node id %ld that has no teams\n", rn->nodeid);
+			fRegisteredNodeMap->RemoveCurrent();
+		}
+	}
 }
 
 status_t
