@@ -10,3 +10,5 @@ BinCommand setup  : testSetup.C : root be libvm.so ;
 BinCommand mmapTest1  : mmapTest1.C : root be libvm.so ; 
 BinCommand mmapTest2  : mmapTest2.C : root be libvm.so ; 
 BinCommand mmapTest3  : mmapTest3.C : root be libvm.so ; 
+BinCommand createAreaFails  : createAreaFails.C : root be libvm.so ; 
+BinCommand createAreaTestsGood  : createAreaTestsGood.C : root be libvm.so ; 
