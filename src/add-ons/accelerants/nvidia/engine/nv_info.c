@@ -296,6 +296,9 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 
 	LOG(8,("INFO: now executing coldstart...\n"));
 
+//test:
+//NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
 
@@ -329,6 +332,11 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 		nv_crtc2_dpms(false, false, false);
 		nv_crtc2_cursor_hide();
 	}
+
+//test:
+//	ACCW(PT_NUMERATOR, 0x00000008);
+	/* set timer denominator to 3 (in b0-15) */
+//	ACCW(PT_DENOMINATR, 0x00000003);
 
 	/* execute all BIOS coldstart script(s) */
 	if (tabs.InitScriptTablePtr)
@@ -997,6 +1005,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			reg2 = *((uint32*)(&(rom[*adress])));
 			*adress += 4;
+			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
+				index, reg, and_out, shift));
+			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
+				size32));
+			LOG(8,("INFO: (cont.) RD table-index ($%02x) for cmd $39'\n",
+				offset32));
 			translate_ISA_PCI(&reg);
 			NV_REG8(reg) = index;
 			byte = NV_REG8(reg + 1);
@@ -1004,12 +1018,6 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			data = (byte >> shift);
 			data <<= 1;
 			data2 = *((uint16*)(&(rom[(*adress + data)])));
-			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
-				index, reg, and_out, shift));
-			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
-				size32));
-			LOG(8,("INFO: (cont.) RD table-index ($%02x) for cmd $39'\n",
-				offset32));
 			if (offset32 < 0x80)
 			{
 				bool double_f = true;
@@ -1475,12 +1483,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			index = *((uint8*)(&(rom[(data + 2)])));
 			and_out = *((uint8*)(&(rom[(data + 3)])));
 			byte2 = *((uint8*)(&(rom[(data + 4)])));
+			LOG(8,("cmd 'CHK bits AND-out $%02x idx ISA reg $%02x via $%04x for $%02x'\n",
+				and_out, index, reg, byte2));
 			translate_ISA_PCI(&reg);
 			NV_REG8(reg) = index;
 			byte = NV_REG8(reg + 1);
 			byte &= (uint8)and_out;
-			LOG(8,("cmd 'CHK bits AND-out $%02x idx ISA reg $%02x via $%04x for $%02x'\n",
-				and_out, index, reg, byte2));
 			if (byte != byte2)
 			{
 				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
@@ -1597,6 +1605,8 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	offset32 = *((uint16*)(&(rom[data + 5])));
 	and_out2 = *((uint8*)(&(rom[(data + 7)])));
 	byte2 = *((uint8*)(&(rom[(data + 8)])));
+	LOG(8,("cmd 'AND-out bits $%02x idx ISA reg $%02x via $%04x, shift-right = $%02x,\n",
+		and_out, index, reg, shift));
 	translate_ISA_PCI(&reg);
 	NV_REG8(reg) = index;
 	byte = NV_REG8(reg + 1);
@@ -1604,8 +1614,6 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	offset32 += (byte >> shift);
 	safe = byte = *((uint8*)(&(rom[offset32])));
 	byte &= (uint8)and_out2;
-	LOG(8,("cmd 'AND-out bits $%02x idx ISA reg $%02x via $%04x, shift-right = $%02x,\n",
-		and_out, index, reg, shift));
 	LOG(8,("INFO: (cont.) use result as index in table to get data $%02x,\n",
 		safe));
 	LOG(8,("INFO: (cont.) then chk bits AND-out $%02x of data for $%02x'\n",
