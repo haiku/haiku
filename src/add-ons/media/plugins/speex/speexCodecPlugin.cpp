@@ -75,7 +75,7 @@ speex_decoded_media_format()
 
 
 /*
- * VorbisDecoder
+ * SpeexDecoder
  */
 
 
@@ -115,7 +115,7 @@ status_t
 SpeexDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
-	TRACE("VorbisDecoder::Setup\n");
+	TRACE("SpeexDecoder::Setup\n");
 	if (!format_is_compatible(speex_encoded_media_format(),*inputFormat)) {
 		return B_MEDIA_BAD_FORMAT;
 	}
@@ -275,8 +275,8 @@ SpeexDecoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	TRACE("SpeexDecoder::Seek\n");
-//	int ignore = 0;
-//	speex_decoder_ctl(fDecoderState, SPEEX_RESET_STATE, &ignore);
+	int ignore = 0;
+	speex_decoder_ctl(fDecoderState, SPEEX_RESET_STATE, &ignore);
 	return B_OK;
 }
 
