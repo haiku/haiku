@@ -25,7 +25,7 @@
 
 //#define DO_PROFILING
 
-//#include "video_util.h"
+#include "video_util.h"
 
 struct codec_table { CodecID id; media_type type; media_format_family family; uint32 fourcc; const char *prettyname;};
 
