@@ -26,11 +26,9 @@
 //
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <string.h>
 #include <stdlib.h>
 
-// System Includes -------------------------------------------------------------
 #include <MenuItem.h>
 #include <String.h>
 #include <Message.h>
@@ -382,7 +380,7 @@ BMenuItem::Draw()
 			B_DISABLED_LABEL_TINT));
 
 	fSuper->MovePenTo(ContentLocation());
-	//DrawContent();
+	DrawContent();
 
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
