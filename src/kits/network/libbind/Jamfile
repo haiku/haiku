@@ -191,4 +191,4 @@ OBOSInstallRelSymLink install-networking
 Package haiku-networkingkit-cvs :
 	libbind.so :
 #	boot home config lib ;
-	boot home Desktop openbeos-networkingkit lib ;
+	boot home Desktop haiku-networkingkit lib ;

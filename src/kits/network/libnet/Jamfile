@@ -81,4 +81,4 @@ Package haiku-networkingkit-cvs :
 Package haiku-networkingkit-cvs :
 	libnet.so :
 #	boot home config lib ;
-	boot home Desktop openbeos-networkingkit lib ;
+	boot home Desktop haiku-networkingkit lib ;
