@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -6,7 +9,6 @@
 #define _LIBSYS_SYSCALLS_H
 
 
-//#include <arch_cpu.h>
 #include <OS.h>
 #include <image.h>
 #include <sys/select.h>
@@ -84,9 +86,11 @@ extern status_t		_kern_get_next_thread_info(team_id team, int32 *cookie, thread_
 extern status_t		_kern_get_team_info(team_id id, team_info *info);
 extern status_t		_kern_get_next_team_info(int32 *cookie, team_info *info);
 
-int sys_send_signal(pid_t tid, uint sig);
-int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-bigtime_t sys_set_alarm(bigtime_t time, uint32 mode);
+// signal functions
+extern int			_kern_send_signal(pid_t tid, uint sig);
+extern int			_kern_sigprocmask(int how, const sigset_t *set, sigset_t *oldSet);
+extern int			_kern_sigaction(int sig, const struct sigaction *action, struct sigaction *oldAction);
+extern bigtime_t	_kern_set_alarm(bigtime_t time, uint32 mode);
 
 // image functions
 extern image_id		_kern_register_image(image_info *info, size_t size);
