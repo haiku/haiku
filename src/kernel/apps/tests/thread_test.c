@@ -1,18 +1,15 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 
+#include <OS.h>
+
 #include <string.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <syscalls.h>
-#include <ktypes.h>
-#include <sys/resource.h>
-#include <Errors.h>
-#include <OS.h>
 #include <stdlib.h>
+
 
 #define THREADS    5
 #define START_VAL  1

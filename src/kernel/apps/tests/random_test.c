@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <syscalls.h>
-#include <ktypes.h>
 #include <sys/resource.h>
 #include <Errors.h>
 #include <errno.h>
