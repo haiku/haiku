@@ -168,6 +168,9 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 					 int64 *frame, bigtime_t *time)
 {
 	CALLED();
+	if (fStreamInfo[stream].status != B_OK)
+		return fStreamInfo[stream].status;
+	
 	status_t result;
 	result = fReader->Seek(fStreamInfo[stream].cookie, seekTo, frame, time);
 	if (result != B_OK)
@@ -186,6 +189,9 @@ MediaExtractor::GetNextChunk(int32 stream,
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader)
 {
+	if (fStreamInfo[stream].status != B_OK)
+		return fStreamInfo[stream].status;
+
 #if DISABLE_CHUNK_CACHE > 0
 	static BLocker locker;
 	BAutolock lock(locker);
@@ -272,6 +278,8 @@ MediaExtractor::ExtractorThread()
 		do {
 			refill_done = false;
 			for (int32 stream = 0; stream < fStreamCount; stream++) {
+				if (fStreamInfo[stream].status != B_OK)
+					continue;
 				if (fStreamInfo[stream].chunkCache->NeedsRefill()) {
 					media_header mediaHeader;
 					void *chunkBuffer;
