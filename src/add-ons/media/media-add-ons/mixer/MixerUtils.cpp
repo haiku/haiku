@@ -3,8 +3,10 @@
 #include <string.h>
 
 #include "MixerUtils.h"
+#include "debug.h"
 
-void string_for_channel_mask(char *str, uint32 mask)
+void
+string_for_channel_mask(char *str, uint32 mask)
 {
 	str[0] = 0;
 	if (mask == 0) {
@@ -36,7 +38,8 @@ void string_for_channel_mask(char *str, uint32 mask)
 		sprintf(str + strlen(str), "0x%08X", mask);
 }
 
-int count_nonzero_bits(uint32 value)
+int
+count_nonzero_bits(uint32 value)
 {
 	int count = 0;
 	for (int i = 0; i < 32; i++)
@@ -45,7 +48,8 @@ int count_nonzero_bits(uint32 value)
 	return count;
 }
 
-void fix_multiaudio_format(media_multi_audio_format *format)
+void
+fix_multiaudio_format(media_multi_audio_format *format)
 {
 	if (format->format == media_raw_audio_format::B_AUDIO_INT) {
 		if (format->valid_bits != 0 && (format->valid_bits < 16 || format->valid_bits >= 32))
@@ -65,6 +69,12 @@ void fix_multiaudio_format(media_multi_audio_format *format)
 		case 2:
 			if (count_nonzero_bits(format->channel_mask) != 2) {
 				format->channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+				format->matrix_mask = 0;
+			}
+			break;
+		case 3:
+			if (count_nonzero_bits(format->channel_mask) != 3) {
+				format->channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_CENTER;
 				format->matrix_mask = 0;
 			}
 			break;
@@ -92,5 +102,45 @@ void fix_multiaudio_format(media_multi_audio_format *format)
 				format->matrix_mask = 0;
 			}
 			break;
+		
+		default:
+			break;
+	}
+}
+
+uint32
+GetChannelMask(int channel, uint32 all_channel_masks)
+{
+	ASSERT(channel <= count_nonzero_bits(all_channel_masks));
+
+	uint32 mask = 1;
+	int pos = 0;
+	for (;;) {
+		while ((all_channel_masks & mask) == 0)
+			mask <<= 1;
+		if (pos == channel)
+			return mask;
+		pos++;
+		mask <<= 1;
+		if (mask == 0)
+			return 0;
+	}
+}
+
+void
+CopySamples(float *_dst, int32 _dst_sample_offset,
+			const float *_src, int32 _src_sample_offset,
+			int32 _sample_count)
+{
+	ASSERT(sizeof(float) == sizeof(uint32));
+	register const char * src = (const char *) _src;
+	register char * dst = (char *) _dst;
+	register int32 sample_count = _sample_count;
+	register int32 dst_sample_offset = _dst_sample_offset;
+	register int32 src_sample_offset = _src_sample_offset;
+	while (sample_count--) {
+		*(uint32 *)dst = *(const uint32 *)src;
+		src += src_sample_offset;
+		dst += dst_sample_offset;
 	}
 }

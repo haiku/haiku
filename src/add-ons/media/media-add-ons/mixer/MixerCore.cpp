@@ -2,6 +2,7 @@
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
+#include "MixerUtils.h"
 #include "Debug.h"
 
 #define MAX_OUTPUT_BUFFER_LENGTH	50000LL /* 50 ms */
@@ -12,6 +13,8 @@ MixerCore::MixerCore()
  :	fLocker(new BLocker),
 	fOutputBufferLength(MAX_OUTPUT_BUFFER_LENGTH),
 	fInputBufferLength(3 * MAX_OUTPUT_BUFFER_LENGTH),
+	fMixFrameRate(96000),
+	fMixStartTime(0),
 	fInputs(new BList),
 	fOutput(0),
 	fNextInputID(1),
@@ -24,12 +27,12 @@ MixerCore::~MixerCore()
 	delete fLocker;
 	delete fInputs;
 }
-	
+
 bool
 MixerCore::AddInput(const media_input &input)
 {
 	ASSERT_LOCKED();
-	fInputs->AddItem(new MixerInput(this, input));
+	fInputs->AddItem(new MixerInput(this, input, fMixFrameRate, frames_for_duration(fMixFrameRate, fInputBufferLength), fMixStartTime));
 	return true;
 }
 
@@ -105,6 +108,9 @@ void
 MixerCore::OutputFormatChanged(const media_format *format)
 {
 	ASSERT_LOCKED();
+	
+		void ChangeMixBufferFormat(float samplerate, int32 frames, int32 channelcount, uint32 channel_mask);
+
 }
 
 void
@@ -163,7 +169,6 @@ void
 MixerCore::OutputBufferLengthChanged(bigtime_t length)
 {
 }
-
 
 
 /*

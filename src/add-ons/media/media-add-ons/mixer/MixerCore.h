@@ -40,6 +40,8 @@ public:
 
 	uint32 OutputBufferSize();
 	bool IsStarted();
+	
+	uint32 OutputChannelCount();
 
 private:
 	void OutputBufferLengthChanged(bigtime_t length);
@@ -55,6 +57,8 @@ private:
 	
 	bigtime_t	fOutputBufferLength;
 	bigtime_t	fInputBufferLength;
+	float		fMixFrameRate;
+	bigtime_t	fMixStartTime;
 	
 	BList		*fInputs;
 	MixerOutput	*fOutput;
