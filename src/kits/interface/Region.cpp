@@ -435,7 +435,8 @@ BRegion::_AddRect(clipping_rect rect)
 {
 	ASSERT(count >= 0);
 	ASSERT(data_size >= 0);
-	
+	ASSERT(valid_rect(rect));
+
 	// Should we just reallocate the memory and
 	// copy the rect ?
 	bool addRect = true; 

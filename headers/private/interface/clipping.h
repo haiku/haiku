@@ -12,6 +12,8 @@
 	calculations).
 */
 
+
+// Returns the union of the given rects.
 static inline clipping_rect
 union_rect(clipping_rect r1, clipping_rect r2)
 {
@@ -43,6 +45,7 @@ sect_rect(clipping_rect r1, clipping_rect r2)
 }
 
 
+// Adds the given offsets to the given rect.
 static inline void
 offset_rect(clipping_rect &rect, int32 x, int32 y)
 {
@@ -53,13 +56,15 @@ offset_rect(clipping_rect &rect, int32 x, int32 y)
 }
 
 
+// Converts the given clipping_rect to a BRect
 static inline BRect
 to_BRect(clipping_rect rect)
 {
-	return BRect(rect.left, rect.top, rect.right, rect.bottom);
+	return BRect((float)rect.left, (float)rect.top, (float)rect.right, (float)rect.bottom);
 }
 
 
+// Converts the given BRect to a clipping_rect.
 static inline clipping_rect
 to_clipping_rect(BRect rect)
 {
@@ -74,6 +79,7 @@ to_clipping_rect(BRect rect)
 }
 
 
+// Checks if the given point lies in the given rect's area
 static inline bool
 point_in(clipping_rect rect, int32 px, int32 py)
 {
@@ -84,6 +90,7 @@ point_in(clipping_rect rect, int32 px, int32 py)
 }
 
 
+// Same as above, but it accepts a BPoint parameter
 static inline bool
 point_in(clipping_rect rect, BPoint pt)
 {
@@ -94,6 +101,7 @@ point_in(clipping_rect rect, BPoint pt)
 }
 
 
+// Checks if the rect is valid
 static inline bool
 valid_rect(clipping_rect rect)
 {
@@ -103,14 +111,25 @@ valid_rect(clipping_rect rect)
 }
 
 
+// Checks if the two rects intersect.
 static inline bool
 rects_intersect(clipping_rect rectA, clipping_rect rectB)
 {
+	// TODO: should we skip that check and let the caller do this
+	// kind of work ?
+	if (!valid_rect(rectA) || !valid_rect(rectB))
+		return false;
+
+	// TODO: Is there a better algorithm ? 
+	// the one we used is faster than
+	// ' return valid_rect(sect_rect(rectA, rectB)); ', though.
+
 	return !(rectA.left > rectB.right || rectA.top > rectB.bottom
 			|| rectA.right < rectB.left || rectA.bottom < rectB.top);
 }
 
 
+// Returns the width of the given rect.
 static inline int32
 rect_width(clipping_rect rect)
 {
@@ -118,6 +137,7 @@ rect_width(clipping_rect rect)
 }
 
 
+// Returns the height of the given rect.
 static inline int32
 rect_height(clipping_rect rect)
 {
