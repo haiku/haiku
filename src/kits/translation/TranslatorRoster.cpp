@@ -489,22 +489,9 @@ BTranslatorRoster::AddTranslator(BTranslator *translator)
 	status_t result = B_NOT_INITIALIZED;
 		
 	if (fSem > 0 && acquire_sem(fSem) == B_NO_ERROR) {
-		// Determine if translator is already in the list
-		translator_node *pNode = fpTranslators;
-		while (pNode) {
-			// If translator is in the list, don't add it
-			if (!strcmp(pNode->translator->TranslatorName(),
-				translator->TranslatorName())) {
-				result = B_OK;
-				break;
-			}
-			pNode = pNode->next;
-		}
-		
-		// if translator is NOT in the list, add it
-		if (!pNode)
-			result = AddTranslatorToList(translator);
-		
+		// Add the translator to the list even if
+		// it is already in the list
+		result = AddTranslatorToList(translator);
 		release_sem(fSem);
 	}
 
