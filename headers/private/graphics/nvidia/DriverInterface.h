@@ -266,8 +266,12 @@ typedef struct {
 		uint32 memory_size;			/* memory (Mb) */
 	} ps;
 
-	/* mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb) */
-	uint8 rom_mirror[32768];
+	/* mirror of the ROM (copied in driver, because may not be mapped permanently) */
+	struct
+	{
+		uint8 	mirror[128 * 1024];
+		uint32	size;
+	} rom;
 
 	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
 	settings settings;
