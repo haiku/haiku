@@ -285,9 +285,11 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			                        (size_t *)arg3, (void *)arg4, 
 			                        (size_t)arg5);
 			break;
+/* removed until net code has goneback into build
 		case SYSCALL_SOCKET:
 			*call_ret = socket((int)arg0, (int)arg1, (int)arg2, false);
 			break;
+ */
 		case SYSCALL_GETDTABLESIZE:
 			// ToDo: the correct way would be to lock the io_context
 			// or just call vfs_getrlimit()
