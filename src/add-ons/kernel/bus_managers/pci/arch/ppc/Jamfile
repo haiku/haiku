@@ -3,4 +3,5 @@ SubDir OBOS_TOP src add-ons kernel bus_managers pci arch ppc ;
 KernelStaticLibrary pci_arch_ppc_bus_manager :
 	pci_config.c
 	pci_io.c
+	pci_irq.c
 ;
