@@ -3,7 +3,6 @@
  * Definitions here are for kernel use only. For the actual
  * definitions of port functions, please look at OS.h
  */
-
 #ifndef _KERNEL_PORT_H
 #define _KERNEL_PORT_H
 
@@ -16,7 +15,6 @@ int delete_owned_ports(team_id owner);
 
 // temp: test
 void port_test(void);
-int	 port_test_thread_func(void* arg);
 
 // user-level API
 port_id		user_create_port(int32 queue_length, const char *name);
@@ -45,4 +43,4 @@ status_t	user_write_port_etc(port_id port,
 				uint32 flags,
 				bigtime_t timeout);
 
-#endif
+#endif	/* _KERNEL_PORT_H */
