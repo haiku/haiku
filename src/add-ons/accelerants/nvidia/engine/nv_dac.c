@@ -288,7 +288,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 				//fixme: PLL calcs will be resetup/splitup/updated...
 				if (si->ps.card_type == NV36)
 				{
-					if (((si->ps.f_ref / m) < 3.0) || ((si->ps.f_ref / m) > 9.0)) continue;
+					if (((si->ps.f_ref / m) < 3.2) || ((si->ps.f_ref / m) > 6.4)) continue;
 				}
 				else
 				{
