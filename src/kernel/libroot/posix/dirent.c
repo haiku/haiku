@@ -76,6 +76,23 @@ readdir(DIR *dir)
 }
 
 
+int
+readdir_r(DIR *dir, struct dirent *entry, struct dirent **_result)
+{
+	ssize_t count = _kern_read_dir(dir->fd, entry, sizeof(struct dirent) + B_FILE_NAME_LENGTH, 1);
+	if (count < B_OK)
+		return count;
+
+	if (count == 0) {
+		// end of directory
+		*_result = NULL;
+	} else
+		*_result = entry;
+
+	return 0;
+}
+
+
 void
 rewinddir(DIR *dir)
 {
@@ -89,6 +106,7 @@ rewinddir(DIR *dir)
  *	but here for BeOS compatiblity.
  */
 
+// ToDo: disable this for the kernel build! (will be possible once we use Kernel build rules for the kernel only)
 
 int dirfd(DIR *dir);
 
