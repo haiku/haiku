@@ -383,6 +383,28 @@ udf_file_set_descriptor::dump()
 }
 
 void
+udf_file_id_descriptor::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS, "udf_file_id_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("version_number:            %d\n", version_number()));
+	PRINT(("may_be_hidden:             %d\n", may_be_hidden()));
+	PRINT(("is_directory:              %d\n", is_directory()));
+	PRINT(("is_deleted:                %d\n", is_deleted()));
+	PRINT(("is_parent:                 %d\n", is_parent()));
+	PRINT(("is_metadata_stream:        %d\n", is_metadata_stream()));
+	PRINT(("id_length:                 %d\n", id_length()));
+	PRINT(("icb:\n"));
+	DUMP(icb());
+	PRINT(("implementation_use_length: %d\n", is_parent()));
+	PRINT(("id: `"));
+	for (int i = 0; i < id_length(); i++)
+		SIMPLE_PRINT(("%c", id()[i]));
+	SIMPLE_PRINT(("'\n"));
+}
+
+void
 udf_icb_entry_tag::dump()
 {
 	DUMP_INIT(CF_PUBLIC, "udf_icb_entry_tag");
