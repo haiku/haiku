@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src add-ons kernel drivers tty ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon tty : kernel drivers dev :
+	driver.cpp
+	tty.cpp
+	master.cpp
+	slave.cpp
+	;

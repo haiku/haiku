@@ -10,3 +10,4 @@ SubInclude OBOS_TOP src add-ons kernel drivers graphics ;
 SubInclude OBOS_TOP src add-ons kernel drivers misc ;
 SubInclude OBOS_TOP src add-ons kernel drivers network ;
 SubInclude OBOS_TOP src add-ons kernel drivers random ;
+SubInclude OBOS_TOP src add-ons kernel drivers tty ;
