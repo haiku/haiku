@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-16), (Rudolf)</h1></p>
+<p><h1>head (0.10-17), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -12,14 +12,9 @@
 	<li>Added flatpanel specific CRTC modeline and DFP modeline tuning: DVI connected panels work now on both heads (if applicable);
 	<li>Fixed fullscreen overlay on DVI panels;
 	<li>Added aspect correction programming for flatpanels: corrects if mode aspect differs too much from panel aspect;
-	<li>Added flatpanel LVDS and TMDS transmitters powerup if a panel is detected;
-	<li>Updated NV11 and NV17 panel detection code: head should be identified correctly now;
 	<li>Fixed acceleration engine management regarding sync_to_token: no more updating glitches should occur now;
 	<li>Added recognition for GeForce4 MX 4000, GeForceFX 5700LE and GeForceFX 5700VE cards; also modified a few others to be more correct;
-	<li>Updated panel detection code once more: pre NV18 DVI panels should be working again now;
-	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters;
-	<li>Added panel(s) native mode(s) to the modelist exported by the driver. You can now set it (them) by just selecting it from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example): the extra mode(s) will be at the bottom of the list;
-	<li>Removed a bug in the panel detection code and added a bit more logging;
+	<li>Added panel(s) native mode(s) to the modelist exported by the driver. You can now set it (them) by just selecting it from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example): the extra mode(s) will be at the bottom of the list (for now);
 	<li>Implemented virtualized CRTC1/DAC1 and CRTC2/DAC2 access: when one flatpanel is found on a card that panel is always primary output now;
 	<li>Dualhead switch mode is operational with flatpanels now (via the virtualized setup);
 	<li>The user has the option to select the primary output via nv.settings now (via the new 'switchhead' option);
@@ -27,8 +22,17 @@
 	<li>Added dualhead switch mode for NV11 (works via virtualized head access implemented now);
 	<li>Modified dualhead switch mode for all other cards to work via the virtualized head access also;
 	<li>Modified overlay to work correctly with the virtualized setup;
-	<li>Added output-devices/heads matrix setup: the driver now selects the right head for primary output and dualhead should work for all cards with all monitor-types now;
+	<li>Added output-devices/heads matrix setup: the driver now selects the right head for primary output and dualhead should work for all cards with all monitor-types now (if connected before boot);
 	<li>Updated head selection code for register programming: NV11 needs a special treatment (again); NV11 dualhead modes are finally OK now, including switch mode.
+</ul>
+The 'features' listed below are temporarily(?) shutdown. If your panel does not work with driver 0.10-17, <strong>PLEASE SEND FEEDBACK!</strong> Send me a logfile with full logging enabled as well. <strong>Feedback without accompaning logfiles are of very little use!</strong><br>
+<br>
+<strong>NOTE:</strong><br>
+These features are shutdown because they are possibly dangerous without feedback: No documentation on this exists, so this was setup by me tested on my cards only. Feedback to me will help me gain more info about <strong>IF</strong> we need this, and <strong>IF</strong> it's OK to use it. This will be accomplished by me sending 'tweaked' versions to you with these features enabled one by one, depending on the logfile you send me, <strong>AND</strong> the feedback I get from you about those tweaks working or not!!
+<ul>
+	<li>Added flatpanel LVDS and TMDS transmitters powerup if a panel is detected;
+	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters.
+
 </ul>
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
 <ul>
