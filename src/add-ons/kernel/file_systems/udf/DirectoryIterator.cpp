@@ -23,7 +23,7 @@ using namespace Udf;
 status_t
 DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC | CF_DIRECTORY_OPS, "DirectoryIterator",
+	DEBUG_INIT_ETC("DirectoryIterator",
 	               ("name: %p, length: %p, id: %p", name, length, id));
 
 	if (!id || !name || !length)

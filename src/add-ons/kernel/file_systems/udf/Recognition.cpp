@@ -2,6 +2,7 @@
 
 #include "CS0String.h"
 #include "MemoryChunk.h"
+#include "Utils.h"
 
 using namespace Udf;
 
@@ -36,7 +37,7 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 				   partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
+	DEBUG_INIT_ETC(NULL, ("device: %d, offset: %Ld, length: %Ld, "
 	               "blockSize: %ld, [...descriptors, etc...]", device, offset,
 	               length, blockSize));
 
@@ -68,7 +69,7 @@ status_t
 Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
                    char *volumeName)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
+	DEBUG_INIT_ETC(NULL, ("device: %d, offset: %Ld, length: %Ld, "
 	               "blockSize: %ld, volumeName: %p", device, offset, length,
 	               blockSize, volumeName));
 	logical_volume_descriptor logicalVolumeDescriptor;
@@ -93,7 +94,7 @@ static
 status_t
 walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize, uint32 blockShift)
 {
-	DEBUG_INIT(CF_PRIVATE, NULL);
+	DEBUG_INIT(NULL);
 	// vrs starts at block 16. Each volume structure descriptor (vsd)
 	// should be one block long. We're expecting to find 0 or more iso9660
 	// vsd's followed by some ECMA-167 vsd's.
@@ -163,7 +164,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 							            partition_descriptor partitionDescriptors[],
 							            uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT(CF_PRIVATE, NULL);
+	DEBUG_INIT(NULL);
 	const uint8 avds_location_count = 4;
 	const off_t avds_locations[avds_location_count] = {
 														256,
@@ -234,7 +235,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
+	DEBUG_INIT_ETC(NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
 	           descriptorSequence.location(), descriptorSequence.length()));
 	uint32 count = descriptorSequence.length() >> blockShift;
 		

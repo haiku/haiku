@@ -23,7 +23,7 @@ Icb::Icb(Volume *volume, long_address address)
 	, fFileEntry(&fData)
 	, fExtendedEntry(&fData)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC, "Icb", ("volume: %p, address(block: %ld, "
+	DEBUG_INIT_ETC("Icb", ("volume: %p, address(block: %ld, "
 	               "partition: %d, length: %ld)", volume, address.block(),
 	               address.partition(), address.length()));  
 	status_t error = volume ? B_OK : B_BAD_VALUE;
@@ -60,7 +60,7 @@ Icb::ModificationTime()
 status_t
 Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC | CF_HIGH_VOLUME, "Icb",
+	DEBUG_INIT_ETC("Icb",
 	               ("pos: %Ld, buffer: %p, length: (%p)->%ld", pos, buffer, length, (length ? *length : 0)));
 
 	if (!buffer || !length || pos < 0)
@@ -127,7 +127,7 @@ Icb::GetDirectoryIterator(DirectoryIterator **iterator)
 status_t
 Icb::Find(const char *filename, vnode_id *id)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC | CF_DIRECTORY_OPS | CF_HIGH_VOLUME, "Icb",
+	DEBUG_INIT_ETC("Icb",
 	               ("filename: `%s', id: %p", filename, id));
 	               
 	if (!filename || !id)

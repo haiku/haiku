@@ -13,18 +13,19 @@ BinCommand makeudfimage
 	: makeudfimage.cpp
 	  Allocator.cpp
 	  ConsoleListener.cpp
-	  Debug.cpp
 	  Shell.cpp
 	  UdfBuilder.cpp
 
 	  # Common Udf source files
 	  CS0String.cpp
+	  UdfDebug.cpp
 	  UdfStructures.cpp
+	  Utils.cpp
 
 	: stdc++.r4
 	
 ;
 
-SEARCH on [ FGristFiles CS0String.cpp UdfStructures.cpp ]
+SEARCH on [ FGristFiles CS0String.cpp UdfDebug.cpp UdfStructures.cpp Utils.cpp ]
 	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 

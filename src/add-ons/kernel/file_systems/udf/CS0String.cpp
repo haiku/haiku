@@ -49,7 +49,7 @@ CS0String::CS0String(const char *cs0, uint32 length)
 
 CS0String::~CS0String()
 {
-	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
+	DEBUG_INIT("CS0String");	
 
 	_Clear();
 }
@@ -63,7 +63,7 @@ CS0String::SetTo(const char *cs0)
 void
 CS0String::SetTo(const char *cs0, uint32 length)
 {
-	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
+	DEBUG_INIT("CS0String");	
 
 	_Clear();
 
@@ -125,7 +125,7 @@ CS0String::SetTo(const char *cs0, uint32 length)
 void
 CS0String::_Clear()
 {
-	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
+	DEBUG_INIT("CS0String");	
 
 	delete [] fUtf8String;
 	fUtf8String = NULL;

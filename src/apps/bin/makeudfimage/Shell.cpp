@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #include "ConsoleListener.h"
-#include "Debug.h"
+#include "UdfDebug.h"
 #include "UdfBuilder.h"
 
 Shell::Shell()

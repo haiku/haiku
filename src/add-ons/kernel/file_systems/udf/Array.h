@@ -13,6 +13,7 @@
 #include "kernel_cpp.h"
 
 #include "SupportDefs.h"
+#include "UdfDebug.h"
 
 namespace Udf {
 
@@ -48,7 +49,7 @@ struct array<uint8, arrayLength> {
 		char classname[40];
 		sprintf(classname, "array<uint8, %ld>", arrayLength);
 		
-		DUMP_INIT(CF_PUBLIC | CF_DUMP | CF_HIGH_VOLUME, classname);
+		DUMP_INIT(classname);
 		
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)
@@ -71,7 +72,7 @@ struct array<char, arrayLength> {
 		char classname[40];
 		sprintf(classname, "array<uint8, %ld>", arrayLength);
 		
-		DUMP_INIT(CF_PUBLIC | CF_DUMP | CF_HIGH_VOLUME, classname);
+		DUMP_INIT(classname);
 		
 		for (uint32 i = 0; i < arrayLength; i++) {
 			if (i % bytesPerRow == 0)

@@ -38,7 +38,7 @@ bool
 ds_fs_id(partition_data *data, int32 device, uint64 sessionOffset,
 		 int32 blockSize)
 {
-	DEBUG_INIT_ETC(CF_HELPER, NULL, ("%p, %ld, %Lu, %ld", data,
+	DEBUG_INIT_ETC(NULL, ("%p, %ld, %Lu, %ld", data,
 	               device, sessionOffset, blockSize));
 
 	if (!data || device < 0)

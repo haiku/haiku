@@ -27,7 +27,7 @@ PhysicalPartition::~PhysicalPartition()
 status_t
 PhysicalPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC, "PhysicalPartition", ("%ld", logicalBlock));
+	DEBUG_INIT_ETC("PhysicalPartition", ("%ld", logicalBlock));
 	if (logicalBlock >= fLength)
 		return B_BAD_ADDRESS;
 	else {

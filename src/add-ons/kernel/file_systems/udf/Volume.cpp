@@ -45,7 +45,7 @@ status_t
 Volume::Mount(const char *deviceName, off_t offset, off_t length,
               uint32 blockSize, uint32 flags)
 {
-	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "Volume",
+	DEBUG_INIT_ETC("Volume",
 	               ("deviceName: `%s', offset: %Ld, length: %Ld, blockSize: %ld, "
                    "flags: %ld", deviceName, offset, length, blockSize, flags));
 	if (!deviceName)
@@ -271,7 +271,7 @@ Volume::Name() const {
 status_t
 Volume::MapBlock(long_address address, off_t *mappedBlock)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume",
+	DEBUG_INIT_ETC("Volume",
 		           ("partition: %d, block: %ld, mappedBlock: %p",
 		           address.partition(), address.block(), mappedBlock));
 	status_t error = mappedBlock ? B_OK : B_BAD_VALUE;

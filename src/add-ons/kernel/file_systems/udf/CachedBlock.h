@@ -104,7 +104,7 @@ CachedBlock::Keep()
 inline void
 CachedBlock::Unset()
 {
-	DEBUG_INIT(CF_HIGH_VOLUME | CF_PUBLIC, "CachedBlock");
+	DEBUG_INIT("CachedBlock");
 	if (fBlock) {
 		PRINT(("releasing block #%Ld\n", BlockNumber()));	
 		release_block(fVolume->Device(), fBlockNumber);
@@ -116,7 +116,7 @@ CachedBlock::Unset()
 inline uint8 *
 CachedBlock::SetTo(off_t block, bool empty = false)
 {
-	DEBUG_INIT_ETC(CF_HIGH_VOLUME | CF_PUBLIC, "CachedBlock", ("block: %Ld, empty: %s",
+	DEBUG_INIT_ETC("CachedBlock", ("block: %Ld, empty: %s",
 	               block, (empty ? "true" : "false")));
 	Unset();
 	fBlockNumber = block;

@@ -54,7 +54,7 @@ template <uint32 length>
 CS0String::CS0String(const array<char, length> &cs0)
 	: fUtf8String(NULL)
 {
-	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
+	DEBUG_INIT("CS0String");	
 
 	SetTo(cs0);
 }

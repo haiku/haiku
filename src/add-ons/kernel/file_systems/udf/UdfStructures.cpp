@@ -122,7 +122,7 @@ volume_structure_descriptor_header::id_matches(const char *id)
 void
 charspec::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "charspec");
+	DUMP_INIT("charspec");
 	PRINT(("character_set_type: %d\n", character_set_type()));
 	PRINT(("character_set_info: `%s'\n", character_set_info()));
 }
@@ -135,7 +135,7 @@ charspec::dump() const
 void
 timestamp::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "timestamp");
+	DUMP_INIT("timestamp");
 	PRINT(("type:                %d\n", type()));
 	PRINT(("timezone:            %d\n", timezone()));
 	PRINT(("year:                %d\n", year()));
@@ -169,7 +169,7 @@ entity_id::entity_id(uint8 flags, char *identifier, char *identifier_suffix)
 void
 entity_id::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "entity_id");
+	DUMP_INIT("entity_id");
 	PRINT(("flags:             %d\n", flags()));
 	PRINT(("identifier:        `%.23s'\n", identifier()));
 	PRINT(("identifier_suffix: `%s'\n", identifier_suffix()));
@@ -201,7 +201,7 @@ extent_address::extent_address(uint32 location, uint32 length)
 void
 extent_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "extent_address");
+	DUMP_INIT("extent_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("location: %ld\n", location()));
 }
@@ -209,7 +209,7 @@ extent_address::dump() const
 void
 logical_block_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "logical_block_address");
+	DUMP_INIT("logical_block_address");
 	PRINT(("block:     %ld\n", block()));
 	PRINT(("partition: %d\n", partition()));
 }
@@ -217,7 +217,7 @@ logical_block_address::dump() const
 void
 long_address::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "long_address");
+	DUMP_INIT("long_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("block:    %ld\n", block()));
 	PRINT(("partiton: %d\n", partition()));
@@ -232,7 +232,7 @@ long_address::dump() const
 void
 descriptor_tag ::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "descriptor_tag");
+	DUMP_INIT("descriptor_tag");
 	PRINT(("id:            %d (%s)\n", id(), tag_id_to_string(tag_id(id()))));
 	PRINT(("version:       %d\n", version()));
 	PRINT(("checksum:      %d\n", checksum()));
@@ -251,7 +251,7 @@ descriptor_tag ::dump() const
 status_t 
 descriptor_tag ::init_check(uint32 diskBlock)
 {
-	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "descriptor_tag");
+	DEBUG_INIT("descriptor_tag");
 	PRINT(("location (paramater)    == %ld\n", diskBlock));
 	PRINT(("location (in structure) == %ld\n", location()));
 	status_t error = (diskBlock == location()) ? B_OK : B_NO_INIT;
@@ -277,7 +277,7 @@ descriptor_tag ::init_check(uint32 diskBlock)
 void
 primary_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "primary_volume_descriptor");
+	DUMP_INIT("primary_volume_descriptor");
 	
 	CS0String string;
 	
@@ -321,7 +321,7 @@ primary_volume_descriptor::dump() const
 void
 anchor_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "anchor_volume_descriptor");
+	DUMP_INIT("anchor_volume_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("main_vds:\n"));
@@ -338,7 +338,7 @@ anchor_volume_descriptor::dump() const
 void
 implementation_use_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "implementation_use_descriptor");
+	DUMP_INIT("implementation_use_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number: %ld\n", vds_number()));
@@ -357,7 +357,7 @@ const uint8 Udf::kMaxPartitionDescriptors = 2;
 void
 partition_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "partition_descriptor");
+	DUMP_INIT("partition_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                %ld\n", vds_number()));
@@ -384,7 +384,7 @@ partition_descriptor::dump() const
 void
 logical_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "logical_volume_descriptor");
+	DUMP_INIT("logical_volume_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                %ld\n", vds_number()));
@@ -471,7 +471,7 @@ logical_volume_descriptor::operator=(const logical_volume_descriptor &rhs)
 void
 physical_partition_map::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "physical_partition_map");
+	DUMP_INIT("physical_partition_map");
 	PRINT(("type: %d\n", type()));
 	PRINT(("length: %d\n", length()));
 	PRINT(("volume_sequence_number: %d\n", volume_sequence_number()));
@@ -485,7 +485,7 @@ physical_partition_map::dump()
 void
 sparable_partition_map::dump()
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "sparable_partition_map");
+	DUMP_INIT("sparable_partition_map");
 	PRINT(("type: %d\n", type()));
 	PRINT(("length: %d\n", length()));
 	PRINT(("partition_type_id:"));
@@ -506,7 +506,7 @@ sparable_partition_map::dump()
 void
 unallocated_space_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "unallocated_space_descriptor");
+	DUMP_INIT("unallocated_space_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                  %ld\n", vds_number()));
@@ -522,7 +522,7 @@ unallocated_space_descriptor::dump() const
 void
 terminating_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "terminating_descriptor");
+	DUMP_INIT("terminating_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 }
@@ -534,7 +534,7 @@ terminating_descriptor::dump() const
 void
 file_set_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "file_set_descriptor");
+	DUMP_INIT("file_set_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("recording_date_and_time:\n"));
@@ -570,7 +570,7 @@ file_set_descriptor::dump() const
 void
 file_id_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS, "file_id_descriptor");
+	DUMP_INIT("file_id_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("version_number:            %d\n", version_number()));
@@ -592,7 +592,7 @@ file_id_descriptor::dump() const
 void
 icb_entry_tag::dump() const
 {
-	DUMP_INIT(CF_PUBLIC, "icb_entry_tag");
+	DUMP_INIT("icb_entry_tag");
 	PRINT(("prior_entries: %ld\n", prior_recorded_number_of_direct_entries()));
 	PRINT(("strategy_type: %d\n", strategy_type()));
 	PRINT(("strategy_parameters:\n"));
@@ -637,7 +637,7 @@ icb_entry_tag::dump() const
 void
 icb_header::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_DUMP, "icb_header");
+	DUMP_INIT("icb_header");
 
 	PRINT(("tag:\n"));
 	DUMP(tag());

@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 
-#include "Debug.h"
+#include "UdfDebug.h"
 
 UdfBuilder::UdfBuilder(const ProgressListener &listener)
 	: fListener(listener)

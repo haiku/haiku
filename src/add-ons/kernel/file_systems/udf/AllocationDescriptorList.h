@@ -48,7 +48,7 @@ public:
 		, fDescriptorNumber(0)
 		, fBlockIndex(0)
 	{
-		DEBUG_INIT(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>");
+		DEBUG_INIT("AllocationDescriptorList<>");
 		_WalkContinuationChain(_CurrentDescriptor());
 	}
 	
@@ -62,7 +62,7 @@ public:
 		       and thus its contents should be interpreted as all zeros.
 	*/
 	status_t FindExtent(off_t start, long_address *extent, bool *isEmpty) {
-		DEBUG_INIT_ETC(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>",
+		DEBUG_INIT_ETC("AllocationDescriptorList<>",
 		               ("start: %Ld, extent: %p, isEmpty: %p", start, extent, isEmpty));
 		off_t startBlock = start >> fVolume->BlockShift();
 	
@@ -102,7 +102,7 @@ public:
 private:
 	
 	Descriptor* _CurrentDescriptor() const {
-		DEBUG_INIT(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>");
+		DEBUG_INIT("AllocationDescriptorList<>");
 		PRINT(("(_DescriptorIndex()+1)*sizeof(Descriptor) = %ld\n", (_DescriptorIndex()+1)*sizeof(Descriptor)));
 		PRINT(("_DescriptorArraySize() = %ld\n", _DescriptorArraySize()));
 		PRINT(("_DescriptorArray() = %p\n", _DescriptorArray()));
@@ -112,7 +112,7 @@ private:
 	}
 
 	status_t _MoveToNextDescriptor() {
-		DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "AllocationDescriptorList<>"); 
+		DEBUG_INIT("AllocationDescriptorList<>"); 
 	
 		Descriptor* descriptor = _CurrentDescriptor();
 		if (!descriptor) {
@@ -142,7 +142,7 @@ private:
 	}
 	
 	void _WalkContinuationChain(Descriptor *descriptor) {
-		DEBUG_INIT_ETC(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>",
+		DEBUG_INIT_ETC("AllocationDescriptorList<>",
 		               ("descriptor: %p", descriptor));
 		if (descriptor && fAccessor.GetType(*descriptor) == EXTENT_TYPE_CONTINUATION) {
 			// Load the new block, make sure we're not trying

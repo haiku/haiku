@@ -97,7 +97,7 @@ private:
 	descriptor_tag & Tag() { return (reinterpret_cast<icb_header*>(fData.Block()))->tag(); }
 	icb_entry_tag& IcbTag() { return (reinterpret_cast<icb_header*>(fData.Block()))->icb_tag(); }
 	AbstractFileEntry* AbstractEntry() {
-		DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Icb");
+		DEBUG_INIT("Icb");
 		return (Tag().id() == TAGID_EXTENDED_FILE_ENTRY)
 //	             ? reinterpret_cast<extended_file_icb_entry*>(fData.Block())
 //	             : reinterpret_cast<file_icb_entry*>(fData.Block()));
@@ -128,7 +128,7 @@ template <class DescriptorList>
 status_t
 Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Icb", ("list: %p, pos: %Ld, buffer: %p, length: (%p)->%ld",
+	DEBUG_INIT_ETC("Icb", ("list: %p, pos: %Ld, buffer: %p, length: (%p)->%ld",
 	               &list, pos, _buffer, length, (length ? *length : 0))); 
 	if (!_buffer || !length)
 		RETURN(B_BAD_VALUE);

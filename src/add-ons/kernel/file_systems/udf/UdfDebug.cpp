@@ -2,24 +2,25 @@
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
 //
-//  UDF version copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
+//  This version copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //  Initial version copyright (c) 2002 Axel Dörfler, axeld@pinc-software.de
 //----------------------------------------------------------------------
 
-/*! \file UdfDebug.cpp
+/*! \file Debug.cpp
 
 	Support code for handy debugging macros.
 */
 
 #include "UdfDebug.h"
 
+#include <stdlib.h>
 #include <KernelExport.h>
 #include <TLS.h>
 
 //----------------------------------------------------------------------
 // Long-winded overview of the debug output macros:
 //----------------------------------------------------------------------
-/*! \def DEBUG_INIT(categoryFilter)
+/*! \def DEBUG_INIT()
 	\brief Increases the indentation level, prints out the enclosing function's
 	name, and creates a \c DebugHelper object on the stack to automatically
 	decrease the indentation level upon function exit.
@@ -27,13 +28,7 @@
 	This macro should be called at the very beginning of any function in
 	which you wish to use any of the other debugging macros.
 	
-	\param categoryFilter Combination of _DebugCategoryFlags values specifying
-	       the category of the enclosing function.
-	
 	If DEBUG is undefined, does nothing.
-	
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def PRINT(x)
@@ -44,9 +39,6 @@
 	         e.g. PRINT(("%d\n", 0));
 	
 	If DEBUG is undefined, does nothing.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def LPRINT(x)
@@ -57,9 +49,6 @@
 	         e.g. PRINT(("%d\n", 0));
 	
 	If DEBUG is undefined, does nothing.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def SIMPLE_PRINT(x)
@@ -70,9 +59,6 @@
 	         e.g. PRINT(("%d\n", 0));
 
 	If DEBUG is undefined, does nothing.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */	         
 //----------------------------------------------------------------------
 /*! \def PRINT_INDENT()
@@ -84,9 +70,6 @@
 	intended for general consumption, but you might find it useful.
 	
 	If DEBUG is undefined, does nothing.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def REPORT_ERROR(error)
@@ -100,9 +83,6 @@
 	\param error A \c status_t error code to report.
 	
 	If DEBUG is undefined, does nothing.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def RETURN_ERROR(error)
@@ -113,9 +93,6 @@
 	\param error A \c status_t error code to report (if negative) and return.
 	
 	If DEBUG is undefined, silently returns the value in \c error.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def RETURN(error)
@@ -126,9 +103,6 @@
 	\param error A \c status_t error code to report and return.
 	
 	If DEBUG is undefined, silently returns the value in \c error.
-
-	\note If the enclosing function's category flags are not part of the currently
-	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
 /*! \def FATAL(x)
@@ -140,8 +114,6 @@
 	         e.g. PRINT(("%d\n", 0));
 	
 	If DEBUG is undefined, does nothing.
-
-	\note Category flags have no effect on this macro.
 */
 //----------------------------------------------------------------------
 /*! \def INFORM(x)
@@ -154,8 +126,6 @@
 
 	I'll say it again: Prints its output regardless to DEBUG being defined or
 	undefined.
-
-	\note Category flags have no effect on this macro.
 */
 //----------------------------------------------------------------------
 /*! \def DBG(x)
@@ -164,8 +134,6 @@
 	\a x disappear into the ether.
 	
 	\param x Damn near anything resembling valid C\C++.
-	
-	\note Category flags have no effect on this macro.
 */
 //----------------------------------------------------------------------
 /*! \def DIE(x)
@@ -336,7 +304,7 @@ dbg_printf(const char *format,...)
 	char buffer[1024];
 	va_list args;
 	va_start(args, format);
-	// no vsnprintf() on PPC and in kernel
+	// no vsnprintf() on PPC 
 	#if defined(__INTEL__) && USER
 		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
 	#else
@@ -354,13 +322,11 @@ dbg_printf(const char *format,...)
 
 /*! \brief Increases the current indentation level.
 */
-DebugHelper::DebugHelper(uint32 categoryFlags, const char *className, uint8 tabCount)
-	: fCategoryFlags(categoryFlags)
-	, fTabCount(tabCount)
+DebugHelper::DebugHelper(const char *className, uint8 tabCount)
+	: fTabCount(tabCount)
 	, fClassName(NULL)
 {
-	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
-		indent(fTabCount);
+	indent(fTabCount);
 	if (className) {
 		fClassName = (char*)malloc(strlen(className)+1);
 		if (fClassName)
@@ -372,8 +338,7 @@ DebugHelper::DebugHelper(uint32 categoryFlags, const char *className, uint8 tabC
 */
 DebugHelper::~DebugHelper()
 {
-	if ((CategoryFlags() & CATEGORY_FILTER) == CategoryFlags())
-		unindent(fTabCount);
+	unindent(fTabCount);
 	free(fClassName);
 }
 
