@@ -24,8 +24,10 @@
 	// don't include that file
 
 #ifndef __BEOS__
+
 #define _ERRORS_H
 	// don't include <Errors.h>, we use the platform <errno.h>
+
 #define dprintf build_platform_dprintf
 #include <stdio.h>
 #undef dprintf
@@ -210,9 +212,9 @@ struct my_stat {
 // O_NOTRAVERSE is called O_NOFOLLOW under Linux
 #ifndef O_NOTRAVERSE
 	#ifdef O_NOFOLLOW
-		#define O_NOTRAVERSE 0
+		#define O_NOTRAVERSE O_NOFOLLOW
 	#else
-		#define O_NOFOLLOW 0
+		#define O_NOTRAVERSE 0
 	#endif
 #endif
 #ifndef S_IUMSK
