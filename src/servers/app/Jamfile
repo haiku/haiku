@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src servers app server ;
+SubDir OBOS_TOP src servers app ;
 
 Depends app_server : install_fonts ;
 
@@ -80,4 +80,4 @@ LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserv
 							   <boot!home!config!lib>libopenbeos.so 
 							   libfreetype.so ;
 
-SubInclude OBOS_TOP src servers app server fonts ;
+SubInclude OBOS_TOP src servers app fonts ;
