@@ -39,7 +39,5 @@ MergeObjectFromObjects kernel_posix_stdlib.o :
 	<$(SOURCE_GRIST)>strtoll.o
 	<$(SOURCE_GRIST)>strtoul.o
 	<$(SOURCE_GRIST)>strtoull.o
-	:
-	-fPIC -DPIC
 	;
 
