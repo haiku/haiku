@@ -416,10 +416,15 @@ ExpanderWindow::RefsReceived(BMessage *msg)
 				fExpandButton->SetEnabled(true);
 				fExpandItem->SetEnabled(true);
 			}
-				
-			fShowContents->SetEnabled(true);
-			fShowItem->SetEnabled(true);
-			
+		
+			if (fShowContents->Value() == B_CONTROL_ON) {
+				StopListing(); 
+				StartListing();
+			} else {
+				fShowContents->SetEnabled(true);
+				fShowItem->SetEnabled(true);
+			}
+
 			bool fromApp;
 			if (msg->FindBool("fromApp", &fromApp)==B_OK) {
 				AutoExpand();
