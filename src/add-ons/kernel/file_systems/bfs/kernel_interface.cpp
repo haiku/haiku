@@ -692,13 +692,18 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 }
 
 
+/** Sets the open-mode flags for the open file cookie - only
+ *	supports O_APPEND currently, but that should be sufficient
+ *	for a file system.
+ */
+
 int 
-bfs_setflags(void *ns, void *node, void *cookie, int flags)
+bfs_setflags(void *_ns, void *_node, void *_cookie, int flags)
 {
 	FUNCTION_START(("node = %p, flags = %d", node, flags));
 
-	// ToDo: implement bfs_setflags()!
-	INFORM(("setflags not yet implemented...\n"));
+	file_cookie *cookie = (file_cookie *)_cookie;
+	cookie->open_mode = (cookie->open_mode & ~O_APPEND) | (flags & O_APPEND);
 
 	return B_OK;
 }

@@ -66,7 +66,7 @@ Volume
 
 kernel_interface
 
- - missing functions, maybe they are not really needed: bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_setflags(), bfs_link()
+ - missing functions, maybe they are not really needed: bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_link()
  - bfs_rename() currently doesn't respect any permissions
 
 
