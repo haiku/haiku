@@ -74,7 +74,7 @@ BSerialPort::BSerialPort()
 */ 
 BSerialPort::~BSerialPort()
 {
-	if (ffd > 0)
+	if (ffd >= 0)
 		close(ffd);
 	
 	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
@@ -112,9 +112,9 @@ BSerialPort::Open(const char *portName)
 	// to some issues. I added this flag having read some comments
 	// by Marco Nelissen on the annotated BeBook.
 	// I think BeOS uses O_RDWR|O_NONBLOCK here.
-	ffd = open(buf, O_RDWR|O_NONBLOCK|O_EXCL); 
+	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL); 
 	
-	if (ffd > 0) {
+	if (ffd >= 0) {
 		//Setup the port
 		int ret = fcntl(ffd, F_GETFL);
 		fcntl(ffd, F_SETFL, ret & 0x7F);
@@ -123,7 +123,7 @@ BSerialPort::Open(const char *portName)
 	}
 	// TODO: I wonder why the return type is a status_t, 
 	// since we (as BeOS does) return the descriptor number for the device... 
-	return (ffd > 0) ? ffd : errno;
+	return (ffd >= 0) ? ffd : errno;
 }
 
 
@@ -132,7 +132,7 @@ BSerialPort::Open(const char *portName)
 void
 BSerialPort::Close(void)
 {
-	if (ffd > 0)
+	if (ffd >= 0)
 		close(ffd);
 	ffd = -1;
 }
@@ -244,7 +244,8 @@ BSerialPort::DataRate(void)
 }
 
 
-/* Set the data bits (7 or 8) */
+/*! \brief Set the data bits (7 or 8)
+*/
 void
 BSerialPort::SetDataBits(data_bits numBits)
 {
@@ -361,7 +362,7 @@ BSerialPort::SetDTR(bool asserted)
 {
 	status_t status = ioctl(ffd, TCSETDTR, &asserted);
 	
-	return (status > 0) ? status : errno;
+	return (status >= 0) ? status : errno;
 }
 
 
@@ -371,7 +372,7 @@ BSerialPort::SetRTS(bool asserted)
 {
 	status_t status = ioctl(ffd, TCSETRTS, &asserted);
 	
-	return (status > 0) ? status : errno;
+	return (status >= 0) ? status : errno;
 }
 
 
