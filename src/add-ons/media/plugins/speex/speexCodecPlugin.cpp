@@ -312,12 +312,6 @@ done:
 Decoder *
 SpeexDecoderPlugin::NewDecoder(uint index)
 {
-	static BLocker locker;
-	static bool initdone = false;
-	BAutolock lock(locker);
-	if (!initdone) {
-		initdone = true;
-	}
 	return new SpeexDecoder;
 }
 
