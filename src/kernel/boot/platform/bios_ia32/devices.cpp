@@ -95,6 +95,8 @@ class BIOSDrive : public Node {
 		BIOSDrive(uint8 driveID);
 		virtual ~BIOSDrive();
 
+		status_t InitCheck() const;
+
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
@@ -219,6 +221,14 @@ BIOSDrive::~BIOSDrive()
 }
 
 
+status_t 
+BIOSDrive::InitCheck() const
+{
+	return fLBA ? B_OK : B_ERROR;
+		// ToDo: for now...
+}
+
+
 ssize_t 
 BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
@@ -309,8 +319,12 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
 	printf("boot drive ID: %x\n", gBootDriveID);
 
-	Node *drive = new BIOSDrive(gBootDriveID);
-	
+	BIOSDrive *drive = new BIOSDrive(gBootDriveID);
+	if (drive->InitCheck() != B_OK) {
+		puts("no boot drive!");
+		return B_ERROR;
+	}
+
 	printf("drive size: %Ld bytes\n", drive->Size());
 
 	*_device = drive;
@@ -350,6 +364,7 @@ platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 	if (get_number_of_drives(&driveCount) == B_OK)
 		printf("number of drives: %d\n", driveCount);
 
-	return B_OK;
+	return B_OK; 
 }
+
 
