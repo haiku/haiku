@@ -4,6 +4,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <stage2.h>
 #include <Errors.h>
 #include <kernel.h>
@@ -48,7 +49,7 @@ int _start(kernel_args *oldka, int cpu_num)
 	cpu_preboot_init(&ka);
 
 	// if we're not a boot cpu, spin here until someone wakes us up
-	if(smp_trap_non_boot_cpus(&ka, cpu_num) == B_NO_ERROR) {
+	if (smp_trap_non_boot_cpus(&ka, cpu_num) == B_NO_ERROR) {
 		// we're the boot processor, so wait for all of the APs to enter the kernel
 		smp_wait_for_ap_cpus(&ka);
 
@@ -103,7 +104,8 @@ int _start(kernel_args *oldka, int cpu_num)
 	int_enable_interrupts();
 
 	dprintf("main: done... begin idle loop on cpu %d\n", cpu_num);
-	for(;;);
+	for(;;)
+		arch_cpu_idle();
 
 	return 0;
 }
