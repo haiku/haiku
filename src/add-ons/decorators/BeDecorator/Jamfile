@@ -3,10 +3,12 @@ SubDir OBOS_TOP src add-ons decorators BeDecorator ;
 Addon BeDecorator : decorators :
 	BeDecorator.cpp
 	ColorSet.cpp
-	ColorUtils.cc
 	Decorator.cpp
 	DisplayDriver.cpp
 	RGBColor.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+	SystemPalette.cpp
 ;
 
-LinkSharedOSLibs BeDecorator : be ;
+LinkSharedOSLibs BeDecorator : be libopenbeos.so ;

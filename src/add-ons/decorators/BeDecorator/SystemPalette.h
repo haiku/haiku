@@ -19,64 +19,18 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		ColorSet.h
+//	File Name:		SystemPalette.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for encapsulating GUI system colors
-//					
+//	Description:	One global function to generate the palette which is 
+//					the default BeOS System palette and the variable to go with it
 //  
 //------------------------------------------------------------------------------
-#ifndef COLORSET_H_
-#define COLORSET_H_
+#ifndef _SYSTEM_PALETTE_H_
+#define _SYSTEM_PALETTE_H_
 
-#include "RGBColor.h"
+#include <GraphicsDefs.h>
 
-/*!
-	\class ColorSet ColorSet.h
-	\brief Encapsulates GUI system colors
-*/
-class ColorSet
-{
-public:
-	ColorSet(void);
-	ColorSet(const ColorSet &cs);
-	ColorSet & operator=(const ColorSet &cs);
-	void SetColors(const ColorSet &cs);
-	void PrintToStream(void);
-	
-	RGBColor panel_background,
-	panel_text,
-
-	document_background,
-	document_text,
-
-	control_background,
-	control_text,
-	control_highlight,
-	control_border,
-
-	tooltip_background,
-	tooltip_text,
-
-	menu_background,
-	menu_selected_background,
-	menu_text,
-	menu_selected_text,
-	menu_selected_border,
-
-	keyboard_navigation_base,
-	keyboard_navigation_pulse,
-	
-	success,
-	failure,
-	shine,
-	shadow,
-
-	// Not all of these guys don't exist in InterfaceDefs.h, but we keep 
-	// them as part of the color set anyway - they're important nonetheless
-	window_tab,
-	window_tab_text,
-	inactive_window_tab,
-	inactive_window_tab_text;
-};
+void GenerateSystemPalette(rgb_color *palette);
+extern rgb_color system_palette[];
 
 #endif
