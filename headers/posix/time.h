@@ -4,6 +4,10 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
+
+#include <sys/types.h>
+
+
 typedef long clock_t;
 typedef long time_t;
 
