@@ -417,8 +417,8 @@ struct driver_module_info {
 
 	status_t (*uninit_device)(void *cookie);
 		// driver gets unloaded.
-	
-	status_t (*probe)(device_node_handle parent);
+
+	status_t (*register_device)(device_node_handle parent);
 		// parent was added or is rescanned.
 		// check whether this parent is supported and register 
 		// any consumer device. Dynamic consumers must return
