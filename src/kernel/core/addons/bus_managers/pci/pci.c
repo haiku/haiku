@@ -74,59 +74,105 @@ struct pci_config *pci_list;
 #define CONFIG_REQ_PORT    0xCF8
 #define CONFIG_DATA_PORT   0xCFC
 
-#define CONFIG_REQ(bus, device, func, offs) (0x80000000 | (bus << 16) | \
-                                            (((device << 3) | (func & 0x07)) << 8) | \
-                                            (offs & ~3))
 
-static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar offset, uchar size)
+#define CONFIG_ADDR_1(bus, device, func, reg) \
+	(0x80000000 | (bus << 16) | (device << 11) | (func << 8) | (reg & ~3))
+
+#define CONFIG_ADDR_2(dev, reg) \
+	(uint16)(0xC00 | (dev << 8) | reg)
+	
+static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg, uchar size)
 {
 	if (pci_mode == 1) {
 		/* write request details */
-		out32(CONFIG_REQ(bus, device, function, offset), 0xCF8);	
+		out32(CONFIG_ADDR_1(bus, device, function, reg), CONFIG_REQ_PORT);	
 		/* Now read data back from the data port...
 		 * offset for 1 byte can be 1,2 or 3
 		 * offset for 2 bytes can be 1 or 2
 		 */
 		switch (size) {
 			case 1:
-				return in8 (CONFIG_DATA_PORT + (offset & 3));
+				return in8 (CONFIG_DATA_PORT + (reg & 3));
 			case 2:
-				return in16(CONFIG_DATA_PORT + (offset & 2));
+				return in16(CONFIG_DATA_PORT + (reg & 2));
 			case 4:
-				return in32(CONFIG_DATA_PORT + offset);
+				return in32(CONFIG_DATA_PORT + reg);
 			default:
-				dprintf("read_pci_config: called for %d bytes!!\n", size);
+				dprintf("ERROR: read_pci_config: called for %d bytes!!\n", size);
 		}
 	} else if (pci_mode == 2) {
-		dprintf("PCI: Config Mechanism 2 not yet supported!\n");
+		uint32 rv = 0;
+		if (device & 0x10)
+			return EINVAL;
+
+		out8((uint8)(0xF0 | (function << 1)), 0xCF8);
+		out8(bus, 0xCFA);
+		
+		switch (size) {
+			case 1:
+				rv = in8 (CONFIG_ADDR_2(device, reg));
+				break;
+			case 2:
+				rv = in16(CONFIG_ADDR_2(device, reg));
+				break;
+			case 4:
+				rv = in32(CONFIG_ADDR_2(device, reg));
+				break;
+			default:
+				dprintf("ERROR: read_pci_config: called for %d bytes!!\n", size);
+		}			
+		out8(0, 0xCF8);
+		return rv;
 	} else
 		dprintf("PCI: Config Mechanism %d isn't known!\n", pci_mode);
 
 	return 0;
 }
 
-static void write_pci_config(uchar bus, uchar device, uchar function, uchar offset, 
-                               uchar size, uint32 value)
+static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg, 
+                             uchar size, uint32 value)
 {
 	if (pci_mode == 1) {
 		/* write request details */
-		out32(CONFIG_REQ(bus, device, function, offset), 0xCF8);	
+		out32(CONFIG_ADDR_1(bus, device, function, reg), CONFIG_REQ_PORT);	
 		/* Now read data back from the data port...
 		 * offset for 1 byte can be 1,2 or 3
 		 * offset for 2 bytes can be 1 or 2
 		 */
 		switch (size) {
 			case 1:
-				out8 (value, CONFIG_DATA_PORT + (offset & 3));
+				out8 (value, CONFIG_DATA_PORT + (reg & 3));
+				break;
 			case 2:
-				out16(value, CONFIG_DATA_PORT + (offset & 2));
+				out16(value, CONFIG_DATA_PORT + (reg & 2));
+				break;
 			case 4:
-				out32(value, CONFIG_DATA_PORT + offset);
+				out32(value, CONFIG_DATA_PORT + reg);
+				break;
 			default:
-				dprintf("read_pci_config: called for %d bytes!!\n", size);
+				dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
 		}
 	} else if (pci_mode == 2) {
-		dprintf("PCI: Config Mechanism 2 not yet supported\n");
+		if (device & 0x10)
+			return;
+
+		out8((uint8)(0xF0 | (function << 1)), 0xCF8);
+		out8(bus, 0xCFA);
+		
+		switch (size) {
+			case 1:
+				out8 (value, CONFIG_ADDR_2(device, reg));
+				break;
+			case 2:
+				out16(value, CONFIG_ADDR_2(device, reg));
+				break;
+			case 4:
+				out32(value, CONFIG_ADDR_2(device, reg));
+				break;
+			default:
+				dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
+		}
+		out8(0, 0xCF8);
 	} else
 		dprintf("PCI: Config Mechanism %d isn't known!\n", pci_mode);
 	
@@ -221,7 +267,6 @@ static int check_pci(void)
 	return -1;
 }
 	
-	
 static void scan_pci(void)
 {
 	int bus, dev, func; 	
@@ -238,7 +283,6 @@ static void scan_pci(void)
 				struct found_pci_device *npcid = NULL;
 				uint16 vendor_id = read_pci_config(bus, dev, func, 0, 2);
 				uint16 device_id;
-				uint8 int_line = 0, int_pin = 0;
 				/* If we get 0xffff then there is no device here. As there can't
 				 * be any gaps in function allocation this tells us that we
 				 * can move onto the next device/bus
@@ -276,61 +320,76 @@ static void scan_pci(void)
 				}
 
 				/* basic header */
-				pcii->vendor_id = vendor_id;
-				pcii->device_id = device_id;
 				pcii->bus = bus;
 				pcii->device = dev;
 				pcii->function = func;
+				pcii->vendor_id = vendor_id;
+				pcii->device_id = device_id;
+
 				pcii->revision =    read_pci_config(bus, dev, func, PCI_revision, 1);
 				pcii->class_api =   read_pci_config(bus, dev, func, PCI_class_api, 1);
 				pcii->class_sub =   read_pci_config(bus, dev, func, PCI_class_sub, 1);
 				pcii->class_base =  read_pci_config(bus, dev, func, PCI_class_base, 1);
-				pcii->line_size =   read_pci_config(bus, dev, func, PCI_line_size, 1);
-				pcii->latency =     read_pci_config(bus, dev, func, PCI_latency, 1);
-				pcii->header_type = read_pci_config(bus, dev, func, PCI_header_type, 1);			        
-				pcii->bist =        read_pci_config(bus, dev, func, PCI_bist, 1);
-				
-				int_line =          read_pci_config(bus, dev, func, PCI_interrupt_line, 1);
-				int_pin =           read_pci_config(bus, dev, func, PCI_interrupt_pin, 1);
-				
-				/* device type specific headers based on header_type declared */
-				if (pcii->header_type == 0) {
-					/* header type 0 */
-					pcii->u.h0.cardbus_cis =         read_pci_config(bus, dev, func, PCI_cardbus_cis, 4);
-					pcii->u.h0.subsystem_id =        read_pci_config(bus, dev, func, PCI_subsystem_id, 2);
-					pcii->u.h0.subsystem_vendor_id = read_pci_config(bus, dev, func, PCI_subsystem_vendor_id, 2);
-					pcii->u.h0.rom_base_pci =        read_pci_config(bus, dev, func, PCI_rom_base, 4);
-					pcii->u.h0.interrupt_line =      int_line;
-					pcii->u.h0.interrupt_pin =       int_pin;					
-				} else if (pcii->header_type == 1) {
-					/* header_type 1 */
-					/* PCI-PCI bridge - may be used for AGP */
-					pcii->u.h1.rom_base_pci =        read_pci_config(bus, dev, func, PCI_bridge_rom_base, 4);
-					pcii->u.h1.primary_bus =         read_pci_config(bus, dev, func, PCI_primary_bus, 1);
-					pcii->u.h1.secondary_bus =       read_pci_config(bus, dev, func, PCI_secondary_bus, 1);
-					pcii->u.h1.secondary_latency =   read_pci_config(bus, dev, func, PCI_secondary_latency, 1);
-					pcii->u.h1.secondary_status =    read_pci_config(bus, dev, func, PCI_secondary_status, 2);
-					pcii->u.h1.subordinate_bus =     read_pci_config(bus, dev, func, PCI_subordinate_bus, 1);
-					pcii->u.h1.io_base =             read_pci_config(bus, dev, func, PCI_io_base, 1);
-					pcii->u.h1.io_limit =            read_pci_config(bus, dev, func, PCI_io_limit, 1);
-					pcii->u.h1.memory_base =         read_pci_config(bus, dev, func, PCI_memory_base, 2);
-					pcii->u.h1.memory_limit =        read_pci_config(bus, dev, func, PCI_memory_limit, 2);
-					pcii->u.h1.prefetchable_memory_base =  read_pci_config(bus, dev, func, PCI_prefetchable_memory_base, 2);
-					pcii->u.h1.prefetchable_memory_limit = read_pci_config(bus, dev, func, PCI_prefetchable_memory_limit, 2);
-					pcii->u.h1.bridge_control =      read_pci_config(bus, dev, func, PCI_bridge_control, 1);
-					pcii->u.h1.interrupt_line =      int_line;
-					pcii->u.h1.interrupt_pin =       int_pin;
-				} else if (pcii->header_type == 0x80) {
-					/* ??? */
-				}
+
+				pcii->header_type = read_pci_config(bus, dev, func, PCI_header_type, 1);
+				pcii->header_type &= PCI_header_type_mask;			        		
 
 				npcid->info = pcii;
 				/* Add the device to the list */
 				insque(npcid, &pci_dev_list);
 			}
-		/* next device */	
 		}
-	/* next bus */
+	}
+}
+
+static void fill_pci_structure(pci_info *pcii)
+{
+	uint8 bus = pcii->bus, dev = pcii->device, func = pcii->function;
+	uint8 int_line = 0, int_pin = 0;
+	
+	pcii->latency =     read_pci_config(bus, dev, func, PCI_latency, 1);
+	pcii->bist =        read_pci_config(bus, dev, func, PCI_bist, 1);
+	pcii->line_size =   read_pci_config(bus, dev, func, PCI_line_size, 1);
+				
+	int_line =          read_pci_config(bus, dev, func, PCI_interrupt_line, 1);
+	int_pin =           read_pci_config(bus, dev, func, PCI_interrupt_pin, 1);
+	int_pin &= PCI_pin_mask;
+
+	/* device type specific headers based on header_type declared */
+	if (pcii->header_type == PCI_header_type_generic) {
+		/* header type 0 */
+		pcii->u.h0.cardbus_cis =         read_pci_config(bus, dev, func, PCI_cardbus_cis, 4);
+		pcii->u.h0.subsystem_id =        read_pci_config(bus, dev, func, PCI_subsystem_id, 2);
+		pcii->u.h0.subsystem_vendor_id = read_pci_config(bus, dev, func, PCI_subsystem_vendor_id, 2);
+		pcii->u.h0.rom_base_pci =        read_pci_config(bus, dev, func, PCI_rom_base, 4);
+		pcii->u.h0.interrupt_line =      int_line;
+		pcii->u.h0.interrupt_pin =       int_pin;			
+	} else if (pcii->header_type == PCI_header_type_PCI_to_PCI_bridge) {
+		/* header_type 1 */
+		/* PCI-PCI bridge - may be used for AGP */				
+		pcii->u.h1.rom_base_pci =        read_pci_config(bus, dev, func, PCI_bridge_rom_base, 4);
+		pcii->u.h1.primary_bus =         read_pci_config(bus, dev, func, PCI_primary_bus, 1);
+		pcii->u.h1.secondary_bus =       read_pci_config(bus, dev, func, PCI_secondary_bus, 1);
+		pcii->u.h1.secondary_latency =   read_pci_config(bus, dev, func, PCI_secondary_latency, 1);
+		pcii->u.h1.secondary_status =    read_pci_config(bus, dev, func, PCI_secondary_status, 2);
+		pcii->u.h1.subordinate_bus =     read_pci_config(bus, dev, func, PCI_subordinate_bus, 1);
+		pcii->u.h1.memory_base =         read_pci_config(bus, dev, func, PCI_memory_base, 2);
+		pcii->u.h1.memory_limit =        read_pci_config(bus, dev, func, PCI_memory_limit, 2);
+		pcii->u.h1.prefetchable_memory_base =  read_pci_config(bus, dev, func, PCI_prefetchable_memory_base, 2);
+		pcii->u.h1.prefetchable_memory_limit = read_pci_config(bus, dev, func, PCI_prefetchable_memory_limit, 2);
+		pcii->u.h1.bridge_control =      read_pci_config(bus, dev, func, PCI_bridge_control, 1);
+		pcii->u.h1.subsystem_vendor_id = read_pci_config(bus, dev, func, PCI_sub_vendor_id_1, 2);
+		pcii->u.h1.subsystem_id        = read_pci_config(bus, dev, func, PCI_sub_device_id_1, 2);		
+		pcii->u.h1.interrupt_line =      int_line;
+		pcii->u.h1.interrupt_pin =       int_pin;
+					
+	} else if (pcii->header_type == PCI_header_type_cardbus) {
+		pcii->u.h2.subsystem_vendor_id = read_pci_config(bus, dev, func, PCI_sub_vendor_id_2, 2);
+		pcii->u.h2.subsystem_id =        read_pci_config(bus, dev, func, PCI_sub_device_id_2, 2);		
+		
+	}else if (pcii->header_type == PCI_multifunction) {
+		dprintf("PCI: multifunction device detected\n");
+		/* ??? */
 	}
 }
 
@@ -367,6 +426,8 @@ static long get_nth_pci_info(long index, pci_info *copyto)
 	 */
 	if (iter > 0 || !fpd->info)
 		return B_DEV_ID_ERROR;
+
+	fill_pci_structure(fpd->info);
 	
 	memcpy(copyto, fpd->info, sizeof(pci_info));
 	return 0;
