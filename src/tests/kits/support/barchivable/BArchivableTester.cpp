@@ -59,6 +59,8 @@ void TBArchivableTestCase::InvalidArchiveShallow()
 				Resultant archive has a string field labeled "class".
 				Field "class" contains the string "BArchivable".
  */
+#include <stdio.h>
+#include <Debug.h>
 void TBArchivableTestCase::ValidArchiveShallow()
 {
 	BMessage Storage;
@@ -66,6 +68,7 @@ void TBArchivableTestCase::ValidArchiveShallow()
 	CPPUNIT_ASSERT(Archive.Archive(&Storage, false) == B_OK);
 	const char* name;
 	CPPUNIT_ASSERT(Storage.FindString("class", &name) == B_OK);
+	printf("\n%s\n", name);
 	CPPUNIT_ASSERT(strcmp(name, "BArchivable") == 0);
 }
 //------------------------------------------------------------------------------
