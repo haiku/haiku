@@ -20,6 +20,7 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
+#define B_PREFERRED_TOKEN	-2		/* A little bird told me about this one */
 #define B_NULL_TOKEN		-1
 #define B_ANY_TOKEN			0
 #define B_HANDLER_TOKEN		1
