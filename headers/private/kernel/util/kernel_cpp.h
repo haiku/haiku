@@ -40,14 +40,14 @@ operator new[](size_t size) throw (std::bad_alloc)
  
 
 inline void
-operator delete(void *ptr)
+operator delete(void *ptr) throw ()
 {
 	free(ptr);
 } 
 
 
 inline void
-operator delete[](void *ptr)
+operator delete[](void *ptr) throw ()
 {
 	free(ptr);
 }
