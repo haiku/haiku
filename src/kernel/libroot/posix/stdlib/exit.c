@@ -1,8 +1,9 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Author(s): Daniel Reinhold (danielre@users.sf.net)
+**            Axel Dörfler, axeld@pinc-software.de
 **
 */
 
@@ -18,11 +19,11 @@
 #include <limits.h>
 
 
-extern void (*_IO_cleanup)(void);
+extern void _IO_cleanup(void);
 extern void _thread_do_exit_notification(void);
 
-static void (*_gExitStack[ATEXIT_MAX])(void) = {0};
-static int32 _gExitStackIndex = 0;
+static void (*sExitStack[ATEXIT_MAX])(void) = {0};
+static int32 sExitStackIndex = 0;
 
 
 void
@@ -37,12 +38,12 @@ int
 atexit(void (*func)(void))
 {
 	// push the function pointer onto the exit stack
-	int32 index = atomic_add(&_gExitStackIndex, 1);
+	int32 index = atomic_add(&sExitStackIndex, 1);
 
 	if (index >= ATEXIT_MAX)
 		return -1;
 
-	_gExitStack[index] = func;
+	sExitStack[index] = func;
 	return 0;
 }
 
@@ -54,8 +55,8 @@ exit(int status)
 	_thread_do_exit_notification();
 
 	// unwind the exit stack, calling the registered functions
-	while (_gExitStackIndex-- > 0)
-		(*_gExitStack[_gExitStackIndex])();
+	while (sExitStackIndex-- > 0)
+		(*sExitStack[sExitStackIndex])();
 
 	// close all open files
 	_IO_cleanup();
