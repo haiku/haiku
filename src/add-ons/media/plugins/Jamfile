@@ -15,3 +15,9 @@ SubInclude OBOS_TOP src add-ons media plugins raw_decoder ;
 SubInclude OBOS_TOP src add-ons media plugins avcodec ;
 SubInclude OBOS_TOP src add-ons media plugins vorbis ;
 SubInclude OBOS_TOP src add-ons media plugins speex ;
+
+# The following add-ons are GPL licensed, and can only be used with
+# software whose license is GPL compatible. To include these GPL
+# licensed add-ons, you need to run configure with the --include-gpl-addons
+# parameter
+SubIncludeGPL OBOS_TOP src add-ons media plugins ac3_decoder ;
