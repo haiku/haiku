@@ -27,13 +27,16 @@
 /*****************************************************************************/
 
 #include <stdio.h>
-#include <Bitmap.h>
 #include <Message.h>
 #include <ScrollBar.h>
 #include <StopWatch.h>
 #include <Alert.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <File.h>
+#include <Bitmap.h>
+#include <TranslatorRoster.h>
+#include <BitmapStream.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
@@ -43,6 +46,9 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	: BView(rect, name, resizingMode, flags)
 {
 	fpbitmap = NULL;
+	fdocumentIndex = 1;
+	fdocumentCount = 1;
+	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
@@ -53,9 +59,60 @@ ShowImageView::~ShowImageView()
 }
 
 void
-ShowImageView::SetBitmap(BBitmap *pbitmap)
+ShowImageView::SetImage(const entry_ref *pref)
 {
-	fpbitmap = pbitmap;
+	delete fpbitmap;
+	fpbitmap = NULL;
+	
+	entry_ref ref;
+	if (!pref)
+		ref = fcurrentRef;
+	else
+		ref = *pref;
+
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	if (!proster)
+		return;
+	BFile file(&ref, B_READ_ONLY);
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
+	BMessage ioExtension;
+	if (ref != fcurrentRef)
+		// if new image, reset to first document
+		fdocumentIndex = 1;
+	if (ioExtension.AddInt32("/documentIndex", fdocumentIndex) != B_OK)
+		return;
+	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP) != B_OK)
+		return;
+	
+	// Translate image data and create a new ShowImage window
+	BBitmapStream outstream;
+	if (proster->Translate(&file, &info, &ioExtension, &outstream,
+		B_TRANSLATOR_BITMAP) != B_OK)
+		return;
+	if (outstream.DetachBitmap(&fpbitmap) != B_OK)
+		return;
+	fcurrentRef = ref;
+	
+	// get the number of documents (pages) if it has been supplied
+	int32 documentCount = 0;
+	if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK &&
+		documentCount > 0)
+		fdocumentCount = documentCount;
+	else
+		fdocumentCount = 1;
+		
+	// send message to parent about new image
+	BString str = info.name;
+	str << " (page " << fdocumentIndex << " of " << fdocumentCount << ")";
+	BMessage msg(MSG_UPDATE_STATUS);
+	msg.AddString("status", str);
+	BMessenger msgr(Window());
+	msgr.SendMessage(&msg);
+		
+	FixupScrollBars();
+	Invalidate();
 }
 
 BBitmap *
@@ -125,3 +182,50 @@ ShowImageView::FixupScrollBars()
 	}
 }
 
+int32
+ShowImageView::CurrentPage()
+{
+	return fdocumentIndex;
+}
+
+int32
+ShowImageView::PageCount()
+{
+	return fdocumentCount;
+}
+
+void
+ShowImageView::FirstPage()
+{
+	if (fdocumentIndex != 1) {
+		fdocumentIndex = 1;
+		SetImage(NULL);
+	}
+}
+
+void
+ShowImageView::LastPage()
+{
+	if (fdocumentIndex != fdocumentCount) {
+		fdocumentIndex = fdocumentCount;
+		SetImage(NULL);
+	}
+}
+
+void
+ShowImageView::NextPage()
+{
+	if (fdocumentIndex < fdocumentCount) {
+		fdocumentIndex++;
+		SetImage(NULL);
+	}
+}
+
+void
+ShowImageView::PrevPage()
+{
+	if (fdocumentIndex > 1) {
+		fdocumentIndex--;
+		SetImage(NULL);
+	}
+}

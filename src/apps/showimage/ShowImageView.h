@@ -30,6 +30,9 @@
 #define _ShowImageView_h
 
 #include <View.h>
+#include <Bitmap.h>
+#include <Entry.h>
+#include <String.h>
 
 class ShowImageView : public BView {
 public:
@@ -37,7 +40,7 @@ public:
 		uint32 flags);
 	~ShowImageView();
 	
-	void SetBitmap(BBitmap *pbitmap);
+	void SetImage(const entry_ref *pref);
 	BBitmap *GetBitmap();
 	
 	virtual void AttachedToWindow();
@@ -47,7 +50,18 @@ public:
 	
 	void FixupScrollBars();
 	
+	int32 CurrentPage();
+	int32 PageCount();
+	
+	void FirstPage();
+	void LastPage();
+	void NextPage();
+	void PrevPage();
+	
 private:
+	entry_ref fcurrentRef;
+	int32 fdocumentIndex;
+	int32 fdocumentCount;
 	BBitmap *fpbitmap;
 };
 

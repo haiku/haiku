@@ -48,32 +48,7 @@
 #include "ShowImageView.h"
 #include "ShowImageStatusView.h"
 
-status_t
-ShowImageWindow::NewWindow(const entry_ref *pref)
-{
-	// Get identify string (image type)
-	BString strId = "Unknown image type";
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	if (!proster)
-		return B_ERROR;
-	BFile file(pref, B_READ_ONLY);
-	translator_info info;
-	if (proster->Identify(&file, NULL, &info) == B_OK)
-		strId = info.name;
-	
-	// Translate image data and create a new ShowImage window
-	file.Seek(0, SEEK_SET);
-	BBitmap* pbitmap = BTranslationUtils::GetBitmap(&file);
-	if (pbitmap) {
-		ShowImageWindow* pwin = new ShowImageWindow(pref, pbitmap, strId);
-		return pwin->InitCheck();			
-	}
-
-	return B_ERROR;		
-}
-
-ShowImageWindow::ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap,
-	BString &strId)
+ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
 	fpsavePanel = NULL;
@@ -91,9 +66,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap,
 	
 	// create the image view	
 	fpimageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED);
-	fpimageView->SetBitmap(pbitmap);
-	
+		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED);	
 	// wrap a scroll view around the view
 	BScrollView *pscrollView = new BScrollView("image_scroller", fpimageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
@@ -112,12 +85,10 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap,
 
 	rect.left = 0;
 	rect.right = kstatusWidth - 1;	
-	ShowImageStatusView *pstatusView;
-	pstatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
+	fpstatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
 		B_WILL_DRAW);
-	pstatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
-	pstatusView->SetText(strId);
-	AddChild(pstatusView);
+	fpstatusView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	AddChild(fpstatusView);
 	
 	rect = Bounds();
 	rect.top    = viewFrame.top;
@@ -127,11 +98,13 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap,
 	pvscroll = new BScrollBar(rect, "vscroll", fpimageView, 0, 150, B_VERTICAL);
 	AddChild(pvscroll);
 	
-	WindowRedimension(pbitmap);
+	SetSizeLimits(250, 100000, 100, 100000);
 	
 	// finish creating window
 	SetRef(pref);
 	UpdateTitle();
+
+	fpimageView->SetImage(pref);
 
 	Show();
 }
@@ -198,6 +171,13 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', false);
+	pbar->AddItem(pmenu);
+
+	pmenu = new BMenu("Page");
+	AddItemMenu(pmenu, "First", MSG_PAGE_FIRST, 'F', 0, 'W', true);
+	AddItemMenu(pmenu, "Last", MSG_PAGE_LAST, 'L', 0, 'W', true);
+	AddItemMenu(pmenu, "Next", MSG_PAGE_NEXT, 'N', 0, 'W', true);
+	AddItemMenu(pmenu, "Previous", MSG_PAGE_PREV, 'P', 0, 'W', true);
 	pbar->AddItem(pmenu);
 
 	pmenu = new BMenu("Image");
@@ -282,6 +262,14 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			delete fpsavePanel;
 			fpsavePanel = NULL;
 			break;
+			
+		case MSG_UPDATE_STATUS:
+		{
+			BString str;
+			if (pmsg->FindString("status", &str) == B_OK)
+				fpstatusView->SetText(str);
+			break;
+		}
 
 		case B_UNDO:
 			break;
@@ -294,6 +282,22 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_CLEAR_SELECT:
 			break;
 		case MSG_SELECT_ALL:
+			break;
+			
+		case MSG_PAGE_FIRST:
+			fpimageView->FirstPage();
+			break;
+			
+		case MSG_PAGE_LAST:
+			fpimageView->LastPage();
+			break;
+			
+		case MSG_PAGE_NEXT:
+			fpimageView->NextPage();
+			break;
+			
+		case MSG_PAGE_PREV:
+			fpimageView->PrevPage();
 			break;
 
 		case MSG_DITHER_IMAGE:

@@ -35,6 +35,7 @@
 #include <String.h>
 
 class ShowImageView;
+class ShowImageStatusView;
 
 // BMessage field names used in Save messages
 #define TRANSLATOR_FLD "be:translator"
@@ -42,9 +43,7 @@ class ShowImageView;
 
 class ShowImageWindow : public BWindow {
 public:
-	static status_t NewWindow(const entry_ref *pref);
-
-	ShowImageWindow(const entry_ref *pref, BBitmap *pbitmap, BString &strId);
+	ShowImageWindow(const entry_ref *pref);
 	virtual ~ShowImageWindow();
 
 	virtual void FrameResized(float width, float height);
@@ -76,6 +75,7 @@ private:
 	BMenuBar *fpbar;
 	entry_ref *fpref;
 	ShowImageView *fpimageView;
+	ShowImageStatusView *fpstatusView;
 };
 
 #endif /* _ShowImageWindow_h */

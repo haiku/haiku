@@ -153,12 +153,5 @@ ShowImageApp::RefsReceived(BMessage *pmsg)
 void
 ShowImageApp::Open(const entry_ref *pref)
 {
-	if (ShowImageWindow::NewWindow(pref) != B_OK) {
-		char errStr[B_FILE_NAME_LENGTH + 50];
-		sprintf(errStr, "Couldn't open file: %s",
-			(pref && pref->name) ? pref->name : "???");
-
-		BAlert* pAlert = new BAlert("file i/o error", errStr, "OK");
-		pAlert->Go();
-	}
+	new ShowImageWindow(pref);
 }

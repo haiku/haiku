@@ -41,6 +41,11 @@ const uint32 MSG_SAVE_PANEL			= 'mFSP';
 const uint32 MSG_CLEAR_SELECT		= 'mCSL';
 const uint32 MSG_SELECT_ALL			= 'mSAL';
 const uint32 MSG_DITHER_IMAGE		= 'mDIM';
+const uint32 MSG_UPDATE_STATUS		= 'mUPS';
+const uint32 MSG_PAGE_FIRST			= 'mPGF';
+const uint32 MSG_PAGE_LAST			= 'mPGL';
+const uint32 MSG_PAGE_NEXT			= 'mPGN';
+const uint32 MSG_PAGE_PREV			= 'mPGP';
 
 extern const char *APP_SIG;
 
