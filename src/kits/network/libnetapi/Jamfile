@@ -10,7 +10,7 @@ SharedLibrary netapi :
 ;
 
 LinkSharedOSLibs libnetapi.so :
-	be socket bind
+	be libsocket.so libbind.so
 ;
 
 # Installation -- in the test directory for the time being
