@@ -27,6 +27,15 @@
 //  
 //------------------------------------------------------------------------------*/
 
+/*
+	This class is based on the BGET pool allocator. Original code was in standard
+	ANSI C with a bunch of static variables. The original code was placed into the
+	MemPool class and the original allocation, release, and compacting functions
+	were made into virtual members. MemPool also, unlike the original code, makes 
+	use of malloc() and free() to handle dynamic memory needs. AreaPool is a MemPool
+	subclass which uses areas to handle memory management needs in large chunks.
+*/
+
 
 // Buffer allocation size quantum: all buffers allocated are a multiple of this size.  '
 // This MUST be a power of two.
@@ -35,7 +44,8 @@
 #include <stdio.h>
 #include <OS.h>
 #include <assert.h>
-#include <memory.h>
+#include <malloc.h>
+#include <string.h>
 #include <ctype.h>
 
 //  Declare the interface, including the requested buffer size type, ssize_t.
@@ -90,35 +100,6 @@ static struct bfhead freelist =
 };
 
 
-// Total space currently allocated
-//static ssize_t totalloc = 0;
-
-// Number of GetBuffer() and ReleaseBuffer() calls
-//static long numget = 0, numrel = 0;
-
-// Number of pool blocks
-//static long numpblk = 0;
-
- // Number of block gets and rels
-//static long numpget = 0, numprel = 0;
-
-// Number of direct gets and rels
-//static long numdget = 0, numdrel = 0;
-
-// Expansion block size
-//static ssize_t exp_incr = 0;
-
-// 0: no AddToPool calls have been made
-// -1: not all pool blocks are the same size
-// >0: (common) block size for all AddToPool calls made so far
-//static ssize_t pool_len = 0;
-
-// Automatic expansion block management functions
-//static int (*compfcn)(ssize_t sizereq, int sequence) = NULL;
-//static void *(*acqfcn)(ssize_t size) = NULL;
-//static void (*relfcn)(void *buf) = NULL;
-
-
 //  Minimum allocation quantum:
 #define QLSize	(sizeof(struct qlinks))
 #define SizeQ	((SizeQuant > QLSize) ? SizeQuant : QLSize)
@@ -147,17 +128,7 @@ MemPool::~MemPool(void)
 {
 }
 
-
-
-
-
-
-
-
-
-
-
-//  BGET  --  Allocate a buffer.
+//  Allocate a buffer from the available space in the memory pool
 void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 {
     ssize_t size = requested_size;
@@ -372,46 +343,9 @@ void *MemPool::GetBuffer(ssize_t requested_size, bool zero)
 
 }
 
-// BGETZ  --  Allocate a buffer and clear its contents to zero.  We clear
-// the entire contents of the buffer to zero, not just the region 
-// requested by the caller.
-/*
-void *bgetz(ssize_t size)
-{
-    char *buf = (char *) GetBuffer(size);
-
-    if (buf != NULL) 
-    {
-	   	struct bhead *b;
-		ssize_t rsize;
-	
-		b = BH(buf - sizeof(struct bhead));
-		rsize = -(b->bsize);
-		
-		if (rsize == 0) 
-		{
-		    struct bdhead *bd;
-		
-		    bd = BDH(buf - sizeof(struct bdhead));
-		    rsize = bd->tsize - sizeof(struct bdhead);
-		}
-		else 
-		{
-		    rsize -= sizeof(struct bhead);
-		}
-		
-		assert(rsize >= size);
-		memset(buf, 0, (MemSize) rsize);
-    }
-    return ((void *) buf);
-}
-*/
-
-//  BGETR  --  Reallocate a buffer.  This is a minimal implementation,
-// simply in terms of ReleaseBuffer()  and  GetBuffer().	 It  could  be
-// enhanced to allow the buffer to grow into adjacent free
-// blocks and to avoid moving data unnecessarily.
-
+// Reallocate a buffer.  This is a minimal implementation, simply in terms 
+// of ReleaseBuffer()  and  GetBuffer(). It could be enhanced to allow the 
+// buffer to grow into adjacent free blocks and to avoid moving data unnecessarily.
 void *MemPool::ReallocateBuffer(void *buf, ssize_t size)
 {
     void *nbuf;
@@ -588,21 +522,7 @@ void MemPool::ReleaseBuffer(void *buf)
     }
 }
 
-/*
-// BECTL -- Establish automatic pool expansion control
-void bectl( int (*compact) (ssize_t sizereq, int sequence), 
-	void *(*acquire) (ssize_t size),
-	void (*release) (void *buf),
-	ssize_t pool_incr )
-{
-    compfcn = compact;
-    acqfcn = acquire;
-    relfcn = release;
-    exp_incr = pool_incr;
-}
-*/
-
-// BPOOL -- Add a region of memory to the buffer pool.
+// Add a region of memory to the buffer pool.
 void MemPool::AddToPool(void *buf, ssize_t len)
 {
     struct bfhead *b = BFH(buf);
@@ -667,7 +587,7 @@ void MemPool::AddToPool(void *buf, ssize_t len)
 }
 
 
-//  BSTATS  --	Return buffer allocation free space statistics. 
+// Return buffer allocation free space statistics. 
 void MemPool::Stats(ssize_t *curalloc, ssize_t *totfree, ssize_t *maxfree,
 	 long *nget, long *nrel)
 {
@@ -693,7 +613,7 @@ void MemPool::Stats(ssize_t *curalloc, ssize_t *totfree, ssize_t *maxfree,
 }
 
 
-//  BSTATSE  --  Return extended statistics 
+// Return extended statistics 
 void MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *nprel, 
 	long *ndget, long *ndrel)
 {
@@ -707,9 +627,9 @@ void MemPool::ExtendedStats(ssize_t *pool_incr, long *npool, long *npget, long *
 
 
 
-//  BUFDUMP  --  Dump the data in a buffer.  This is called with the  user
-// data pointer, and backs up to the buffer header.  It will
-// dump either a free block or an allocated one.
+// Dump the data in a buffer. This is called with the user data pointer, 
+// and backs up to the buffer header.  It will dump either a free block 
+// or an allocated one.
 void MemPool::BufferDump(void *buf)
 {
     struct bfhead *b;
@@ -772,11 +692,10 @@ void MemPool::BufferDump(void *buf)
     }
 }
 
-//  BPOOLD  --	Dump a buffer pool.  The buffer headers are always listed.
-// If DUMPALLOC is nonzero, the contents of allocated buffers
-// are  dumped.   If  DUMPFREE  is  nonzero,  free blocks are
-// dumped as well.  If FreeWipe  checking	is  enabled,  free
-// blocks	which  have  been clobbered will always be dumped.
+// Dump a buffer pool. The buffer headers are always listed. If DUMPALLOC is 
+// nonzero, the contents of allocated buffers are  dumped. If DUMPFREE is 
+// nonzero,  free blocks are dumped as well. If FreeWipe checking is enabled,
+// free blocks which have been clobbered will always be dumped.
 void MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
 {
     struct bfhead *b = BFH(buf);
@@ -825,7 +744,7 @@ void MemPool::PoolDump(void *buf, bool dumpalloc, bool dumpfree)
     }
 }
 
-// BPOOLV  --  Validate a buffer pool.
+// Validate a buffer pool.
 int MemPool::Validate(void *buf)
 {
     struct bfhead *b = BFH(buf);
@@ -879,11 +798,12 @@ int *MemPool::CompactMem(ssize_t sizereq, int sequence)
 
 void *MemPool::AcquireMem(ssize_t size)
 {
-	return NULL;
+	return malloc(size);
 }
 
 void MemPool::ReleaseMem(void *buffer)
 {
+	free(buffer);
 }
 
 AreaPool::AreaPool(void)
@@ -909,13 +829,13 @@ void *AreaPool::AcquireMem(ssize_t size)
 		else
 			areasize=size;
 	}
-	a=create_area("bitmap_area",(void**)&parea,B_ANY_ADDRESS,areasize,
+	
+	a=create_area("AreaPool_area",(void**)&parea,B_ANY_ADDRESS,areasize,
 			B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if(a==B_BAD_VALUE ||
-	   a==B_NO_MEMORY ||
-	   a==B_ERROR)
+	
+	if(a==B_BAD_VALUE || a==B_NO_MEMORY || a==B_ERROR)
 	{
-	   	printf("PANIC: BitmapManager couldn't allocate area!!\n");
+	   	printf("ERROR: AreaPool couldn't allocate area!!\n");
 	   	return NULL;
 	}
 
@@ -928,6 +848,7 @@ void AreaPool::ReleaseMem(void *buffer)
 
 	if(trash==B_ERROR)
 		return;
+	
 	delete_area(trash);
 }
 

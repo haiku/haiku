@@ -45,6 +45,7 @@ Server app_server :
 	FMWList.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
+	RAMLinkMsgReader.cpp
 
 	# Manager Classes
 	AppServer.cpp

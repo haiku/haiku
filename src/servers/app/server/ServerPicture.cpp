@@ -24,7 +24,6 @@
 //	Description:	Server-side counterpart to BPicture
 //  
 //------------------------------------------------------------------------------
-#include <AreaLink.h>
 #include "TokenHandler.h"
 #include "ServerPicture.h"
 
@@ -42,12 +41,8 @@ ServerPicture::ServerPicture(void)
 	
 	if(_area!=B_BAD_VALUE && _area!=B_NO_MEMORY && _area!=B_ERROR)
 		_initialized=true;
-	
-	arealink=(_initialized)?new AreaLink(_area):NULL;
 }
 
 ServerPicture::~ServerPicture(void)
 {
-	if(arealink)
-		delete arealink;
 }

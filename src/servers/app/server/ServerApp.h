@@ -30,6 +30,8 @@
 
 #include <OS.h>
 #include <String.h>
+#include <LinkMsgReader.h>
+#include <LinkMsgSender.h>
 #include "FMWList.h"
 
 class AppServer;
@@ -39,6 +41,7 @@ class BList;
 class DisplayDriver;
 class ServerCursor;
 class ServerBitmap;
+class AreaPool;
 
 /*!
 	\class ServerApp ServerApp.h
@@ -80,8 +83,8 @@ protected:
 	friend class AppServer;
 	friend class ServerWindow;
 	
-	void _DispatchMessage(int32 code, BPortLink& link);
-	ServerBitmap* _FindBitmap(int32 token);
+//	void DispatchMessage(int32 code, BPortLink& msg);
+	void DispatchMessage(int32 code, LinkMsgReader &link);
 	
 	port_id	fClientAppPort,
 			fMessagePort,
@@ -94,7 +97,9 @@ protected:
 	
 	team_id fClientTeamID;
 	
-	BPortLink *fAppLink;
+	LinkMsgReader *fMsgReader;
+	LinkMsgSender *fMsgSender;
+	
 	BList *fSWindowList,
 		  *fBitmapList,
 		  *fPictureList;
@@ -103,7 +108,7 @@ protected:
 	bool fCursorHidden;
 	bool fIsActive;
 	int32 fHandlerToken;
-	area_id fSharedMem;
+	AreaPool *fSharedMem;
 };
 
 #endif

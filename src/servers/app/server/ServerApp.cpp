@@ -38,10 +38,12 @@
 
 #include "AppServer.h"
 #include "BitmapManager.h"
+#include "BGet++.h"
 #include "CursorManager.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
 #include "FontServer.h"
+#include "RAMLinkMsgReader.h"
 #include "RootLayer.h"
 #include "ServerApp.h"
 #include "ServerScreen.h"
@@ -92,20 +94,16 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	// fMessagePort is the port we receive messages from our BApplication
 	fMessagePort=rcvport;
 
-	fAppLink = new BPortLink(fClientAppPort, fMessagePort);
+	fMsgReader = new LinkMsgReader(fMessagePort);
+	fMsgSender = new LinkMsgSender(fClientAppPort);
 
 	fSWindowList=new BList(0);
 	fBitmapList=new BList(0);
 	fPictureList=new BList(0);
 	fIsActive=false;
 	
-	char *dummy;
-	fSharedMem=create_area("rw_shared_area",(void**)&dummy,B_ANY_ADDRESS,4096,B_NO_LOCK,
-			B_READ_AREA|B_WRITE_AREA);
+	fSharedMem=new AreaPool;
 	
-	if(fSharedMem<0)
-		printf("PANIC: Couldn't create shared app_server area!\n");
-
 	ServerCursor *defaultc=cursormanager->GetCursor(B_CURSOR_DEFAULT);
 	
 	fAppCursor=(defaultc)?new ServerCursor(defaultc):NULL;
@@ -150,11 +148,14 @@ ServerApp::~ServerApp(void)
 	fPictureList->MakeEmpty();
 	delete fPictureList;
 
-	delete fAppLink;
-	fAppLink=NULL;
+	delete fMsgReader;
+	fMsgReader=NULL;
+	
+	delete fMsgSender;
+	fMsgSender=NULL;
+	
 	if(fAppCursor)
 		delete fAppCursor;
-
 
 	cursormanager->RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
@@ -165,7 +166,8 @@ ServerApp::~ServerApp(void)
 	thread_info info;
 	if(get_thread_info(fMonitorThreadID,&info)==B_OK)
 		kill_thread(fMonitorThreadID);
-	delete_area(fSharedMem);
+	
+	delete fSharedMem;
 }
 
 /*!
@@ -208,10 +210,10 @@ bool ServerApp::PingTarget(void)
 			printf("PANIC: ServerApp %s could not find the app_server port in PingTarget()!\n",fSignature.String());
 			return false;
 		}
-		fAppLink->SetSendPort(serverport);
-		fAppLink->StartMessage(AS_DELETE_APP);
-		fAppLink->Attach(&fMonitorThreadID,sizeof(thread_id));
-		fAppLink->Flush();
+		fMsgSender->SetPort(serverport);
+		fMsgSender->StartMessage(AS_DELETE_APP);
+		fMsgSender->Attach(&fMonitorThreadID,sizeof(thread_id));
+		fMsgSender->Flush();
 		return false;
 	}
 	return true;
@@ -280,7 +282,8 @@ int32 ServerApp::MonitorApp(void *data)
 	// Message-dispatching loop for the ServerApp
 	
 	ServerApp *app = (ServerApp *)data;
-	BPortLink msgqueue(-1, app->fMessagePort);
+	LinkMsgReader msgqueue(app->fMessagePort);
+	
 	bool quitting = false;
 	int32 code;
 	status_t err = B_OK;
@@ -288,7 +291,8 @@ int32 ServerApp::MonitorApp(void *data)
 	while(!quitting)
 	{
 		STRACE(("info: ServerApp::MonitorApp listening on port %ld.\n", app->fMessagePort));
-		err = msgqueue.GetNextReply(&code);
+//		err = msgqueue.GetNextReply(&code);
+		err = msgqueue.GetNextMessage(&code);
 		if (err < B_OK)
 			break;
 
@@ -329,16 +333,16 @@ int32 ServerApp::MonitorApp(void *data)
 					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->fSignature.String());
 					break;
 				}
-				app->fAppLink->SetSendPort(serverport);
-				app->fAppLink->StartMessage(AS_DELETE_APP);
-				app->fAppLink->Attach(&app->fMonitorThreadID, sizeof(thread_id));
-				app->fAppLink->Flush();
+				app->fMsgSender->SetPort(serverport);
+				app->fMsgSender->StartMessage(AS_DELETE_APP);
+				app->fMsgSender->Attach(&app->fMonitorThreadID, sizeof(thread_id));
+				app->fMsgSender->Flush();
 				break;
 			}
 			default:
 			{
 				STRACE(("ServerApp %s: Got a Message to dispatch\n",app->fSignature.String()));
-				app->_DispatchMessage(code, msgqueue);
+				app->DispatchMessage(code, msgqueue);
 				break;
 			}
 		}
@@ -358,7 +362,7 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
+void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 {
 	LayerData ld;
 	switch(code)
@@ -412,18 +416,115 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			}
 */			break;
 		}
+		case AS_AREA_MESSAGE:
+		{
+			// This occurs in only one kind of case: a message is too big to send over a port. This
+			// is really an edge case, so this shouldn't happen *too* often
+			
+			// Attached Data:
+			// 1) area_id id of an area already owned by the server containing the message
+			// 2) size_t offset of the pointer in the area
+			// 3) size_t size of the message
+			
+			area_id area;
+			size_t offset;
+			size_t msgsize;
+			area_info ai;
+			int8 *msgpointer;
+			
+			msg.Read<area_id>(&area);
+			msg.Read<size_t>(&offset);
+			msg.Read<size_t>(&msgsize);
+			
+			// Part sanity check, part get base pointer :)
+			if(get_area_info(area,&ai)!=B_OK)
+				break;
+			
+			msgpointer=(int8*)ai.address + offset;
+			
+			RAMLinkMsgReader mlink(msgpointer);
+			DispatchMessage(mlink.Code(),mlink);
+			
+			// This is a very special case in the sense that when ServerMemIO is used for this 
+			// purpose, it will be set to NOT automatically free the memory which it had 
+			// requested. This is the server's job once the message has been dispatched.
+			fSharedMem->ReleaseBuffer(msgpointer);
+			
+			break;
+		}
 		case AS_ACQUIRE_SERVERMEM:
 		{
+			// This particular call is more than a bit of a pain in the neck. We are given a
+			// size of a chunk of memory needed. We need to (1) allocate it, (2) get the area for
+			// this particular chunk, (3) find the offset in the area for this chunk, and (4)
+			// tell the client about it. Good thing this particular call isn't used much
+			
 			// Received from a ServerMemIO object requesting operating memory
 			// Attached Data:
 			// 1) size_t requested size
+			// 2) port_id reply_port
 			
-			// TODO: Implement AS_ACQUIRE_SERVERMEM
+			size_t memsize;
+			port_id replyport;
+			
+			msg.Read<size_t>(&memsize);
+			msg.Read<port_id>(&replyport);
+			
+			// TODO: I wonder if ACQUIRE_SERVERMEM should have a minimum size requirement?
+
+			void *sharedmem=fSharedMem->GetBuffer(memsize);
+			
+			BPortLink replylink(replyport);
+			if(memsize<1 || sharedmem==NULL)
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+				break;
+			}
+			
+			area_id owningArea=area_for(sharedmem);
+			area_info ai;
+			
+			if(owningArea==B_ERROR || get_area_info(owningArea,&ai)!=B_OK)
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+				break;
+			}
+			
+			int32 areaoffset=((int32*)sharedmem)-((int32*)ai.address);
+			STRACE(("Successfully allocated shared memory of size %ld\n",memsize));
+			
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<area_id>(owningArea);
+			replylink.Attach<int32>(areaoffset);
+			replylink.Flush();
+			
 			break;
 		}
 		case AS_RELEASE_SERVERMEM:
 		{
-			// TODO: Implement AS_RELEASE_SERVERMEM
+			// Received when a ServerMemIO object on destruction
+			// Attached Data:
+			// 1) area_id owning area
+			// 2) int32 area offset
+			
+			area_id owningArea;
+			area_info ai;
+			int32 areaoffset;
+			void *sharedmem;
+			
+			msg.Read<area_id>(&owningArea);
+			msg.Read<int32>(&areaoffset);
+			
+			if(owningArea<0 || get_area_info(owningArea,&ai)!=B_OK)
+				break;
+			
+			STRACE(("Successfully freed shared memory\n"));
+			sharedmem=((int32*)ai.address)+areaoffset;
+			
+			fSharedMem->ReleaseBuffer(sharedmem);
+			
 			break;
 		}
 		case AS_UPDATE_DECORATOR:
