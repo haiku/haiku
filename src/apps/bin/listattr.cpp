@@ -2,7 +2,7 @@
 // Created: 11th October 2002
 // Modified: 11th October 2002
 
-#include <cstdio>
+#include <stdio.h>
 #include <Node.h>
 #include <fs_attr.h>
 
