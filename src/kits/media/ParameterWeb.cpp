@@ -267,7 +267,7 @@ skip_in_buffer(void **_buffer, uint32 bytes)
 template<class Type> Type
 swap32(Type value, bool doSwap)
 {
-	ASSERT(sizeof(Type) == 4);
+	STATIC_ASSERT(sizeof(Type) == 4);
 
 	if (doSwap)
 		return (Type)B_SWAP_INT32((int32)value);

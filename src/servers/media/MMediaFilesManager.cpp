@@ -106,7 +106,6 @@ MMediaFilesManager::LoadState()
 			break;
 		TRACE("%s {\n", str);
 		do {
-	        int32 vol = 0;
 	        len = ReadPascalString(file, &key);
 	        if (len < 0)
 	                return B_ERROR;

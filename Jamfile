@@ -38,9 +38,9 @@ Depends MediaKit :
 	video_producer_demo.media_addon
 	legacy.media_addon
 	multi_audio.media_addon
-	reader.media_addon
-	writer.media_addon
-	demultiplexer.media_addon 
+#	reader.media_addon
+#	writer.media_addon
+#	demultiplexer.media_addon 
 
 	# codecs
 	wav_reader
