@@ -667,7 +667,7 @@ status_t BMessage::PopSpecifier()
 		return fBody->FindData<TYPE>(name, index, p, TYPESPEC);						\
 	}																				\
 	status_t BMessage::Replace ## fnName(const char* name, TYPE val)				\
-	{ return ReplaceData(name, TYPESPEC, 0, &val, sizeof(TYPE)); }					\
+	{ return Replace ## fnName(name, 0, val); }										\
 	status_t BMessage::Replace ## fnName(const char *name, int32 index, TYPE val)	\
 	{  return fBody->ReplaceData<TYPE>(name, index, val, TYPESPEC); }				\
 	bool BMessage::Has ## fnName(const char* name, int32 n) const					\

@@ -182,6 +182,8 @@ class TMessageItemTest : public TestCase, public TypePolicy<Type>
 		void MessageItemTest6();
 		void MessageItemTest7();
 		void MessageItemTest8();
+		void MessageItemTest9();
+		void MessageItemTest10();
 
 		static TestSuite* Suite();
 
@@ -229,7 +231,7 @@ template
 void
 TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
 MessageItemTest2()
-{debugger(__PRETTY_FUNCTION__);
+{
 	BMessage msg;
 	Type in = InitPolicy::Test1();
 	Type out = InitPolicy::Zero();
@@ -464,6 +466,52 @@ template
 	class AssertPolicy,
 	class ComparePolicy
 >
+void
+TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
+MessageItemTest9()
+{
+	BMessage msg;
+	Type in = InitPolicy::Test1();
+	CPPUNIT_ASSERT(FuncPolicy::Add(msg, NULL, in) == B_BAD_VALUE);
+}
+//------------------------------------------------------------------------------
+template
+<
+	class Type,
+	type_code TypeCode,
+	class FuncPolicy,
+	class InitPolicy,
+	class AssertPolicy,
+	class ComparePolicy
+>
+void 
+TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
+MessageItemTest10()
+{
+	BMessage msg;
+	Type in = InitPolicy::Test1();
+	Type out = InitPolicy::Zero();
+	CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in) == B_OK);
+	CPPUNIT_ASSERT(FuncPolicy::Has(msg, NULL, 0) == false);
+	CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, NULL, 0),
+										  AssertPolicy::Invalid()));
+	CPPUNIT_ASSERT(FuncPolicy::Find(msg, NULL, 0, &out) == B_BAD_VALUE);
+	TypePtr pout = NULL;
+	ssize_t size;
+	status_t err = FuncPolicy::FindData(msg, NULL, TypeCode, 0, 
+										(const void**)&pout, &size);
+	CPPUNIT_ASSERT(err = B_BAD_VALUE);
+}
+//------------------------------------------------------------------------------
+template
+<
+	class Type,
+	type_code TypeCode,
+	class FuncPolicy,
+	class InitPolicy,
+	class AssertPolicy,
+	class ComparePolicy
+>
 TestSuite* 
 TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
 Suite()
@@ -478,6 +526,10 @@ Suite()
 	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest6);
 	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest7);
 	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest8);
+#ifndef TEST_R5
+	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest9);
+	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest10);
+#endif
 
 	return suite;
 }

@@ -119,7 +119,7 @@ status_t BMessageBody::AddData(const char *name, const T1 &data, type_code type)
 {
 	// The flattened message format in R5 only allows 1 byte
 	// for the length of field names
-	if (strlen(name) > 255) return B_BAD_VALUE;
+	if (!name || (strlen(name) > 255)) return B_BAD_VALUE;
 
 	status_t err = B_OK;
 	BMessageField* BMF = FindData(name, type, err);
@@ -158,31 +158,33 @@ template<class T1>
 status_t BMessageBody::FindData(const char *name, int32 index, T1 *data,
 								type_code type)
 {
-	status_t err = B_OK;
+	if (!name)
+	{
+		return B_BAD_VALUE;
+	}
 	if (index < 0)
 	{
-		err = B_BAD_INDEX;
+		return B_BAD_INDEX;
 	}
-	else
+
+	status_t err = B_OK;
+	BMessageField* Item = FindData(name, type, err);
+	if (Item)
 	{
-		BMessageField* Item = FindData(name, type, err);
-		if (Item)
+		BMessageFieldImpl<T1>* RItem =
+			dynamic_cast<BMessageFieldImpl<T1>*>(Item);
+		if (!RItem)
 		{
-			BMessageFieldImpl<T1>* RItem =
-				dynamic_cast<BMessageFieldImpl<T1>*>(Item);
-			if (!RItem)
-			{
-				debugger("\n\n\tyou \033[44;1;37mB\033[41;1;37me"
-						 "\033[m screwed\n\n");
-			}
-			if (index < RItem->CountItems())
-			{
-				*data = RItem->Data()[index];
-			}
-			else
-			{
-				err = B_BAD_INDEX;
-			}
+			debugger("\n\n\tyou \033[44;1;37mB\033[41;1;37me"
+					 "\033[m screwed\n\n");
+		}
+		if (index < RItem->CountItems())
+		{
+			*data = RItem->Data()[index];
+		}
+		else
+		{
+			err = B_BAD_INDEX;
 		}
 	}
 
@@ -193,30 +195,32 @@ template<class T1>
 status_t BMessageBody::ReplaceData(const char *name, int32 index,
 								   const T1 &data, type_code type)
 {
-	status_t err = B_OK;
+	if (!name)
+	{
+		return B_BAD_VALUE;
+	}
 	if (index < 0)
 	{
-		err = B_BAD_INDEX;
+		return B_BAD_INDEX;
 	}
-	else
+
+	status_t err = B_OK;
+	BMessageField* Item = FindData(name, type, err);
+	if (Item)
 	{
-		BMessageField* Item = FindData(name, type, err);
-		if (Item)
+		BMessageFieldImpl<T1>* RItem =
+			dynamic_cast<BMessageFieldImpl<T1>*>(Item);
+		if (!RItem)
 		{
-			BMessageFieldImpl<T1>* RItem =
-				dynamic_cast<BMessageFieldImpl<T1>*>(Item);
-			if (!RItem)
-			{
-				debugger("\n\n\tyou \033[44;1;37mB\033[41;1;37me\033[m screwed\n\n");
-			}
-			if (index < RItem->Data().Size())
-			{
-				RItem->Data()[index] = data;
-			}
-			else
-			{
-				err = B_BAD_INDEX;
-			}
+			debugger("\n\n\tyou \033[44;1;37mB\033[41;1;37me\033[m screwed\n\n");
+		}
+		if (index < RItem->Data().Size())
+		{
+			RItem->Data()[index] = data;
+		}
+		else
+		{
+			err = B_BAD_INDEX;
 		}
 	}
 

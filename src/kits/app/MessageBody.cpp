@@ -315,7 +315,7 @@ void BMessageBody::operator delete(void* ptr, size_t size)
 //------------------------------------------------------------------------------
 bool BMessageBody::HasData(const char* name, type_code t, int32 n) const
 {
-	if (n < 0)
+	if (!name || n < 0)
 	{
 		return false;
 	}
@@ -358,8 +358,13 @@ BMessageField* BMessageBody::FindData(const char* name, type_code type,
 									  status_t& err) const
 {
 	BMessageField* Item = NULL;
-	err = B_OK;
+	if (!name)
+	{
+		err = B_BAD_VALUE;
+		return Item;
+	}
 
+	err = B_OK;
 	TMsgDataMap::const_iterator i = fData.find(name);
 	if (i == fData.end())
 	{
