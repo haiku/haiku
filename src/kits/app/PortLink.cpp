@@ -1,27 +1,29 @@
-/*
-	PortLink.cpp:
-		A helper class for port-based messaging
-
-------------------------------------------------------------------------
-How it works:
-	The class utilizes a fixed-size array of PortLinkData object pointers. When
-data is attached, a new PortLinkData object is allocated and a copy of the
-passed data is created inside it. When the time comes for the message to be sent,
-the data is pieced together into a flattened array and written to the port.
-------------------------------------------------------------------------
-Data members:
-
-*attachments[]	- fixed-size array of pointers used to hold the attached data
-opcode		- message value which is sent along with any data
-target		- port to which the message is sent when Flush() is called
-replyport	- port used with synchronous messaging - FlushWithReply()
-bufferlength - total bytes taken up by attachments
-num_attachments	- internal variable which is used to track which "slot"
-					will be the next one to receive an attachment object
-port_ok - flag to signal whether it's ok to send a message
-capacity - contains the storage capacity of the target port.
-*/
-
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		PortLink.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	A helper class for port-based messaging
+//
+//------------------------------------------------------------------------------
 #include "PortLink.h"
 #include <string.h>
 #include <stdio.h>
@@ -40,26 +42,32 @@ capacity - contains the storage capacity of the target port.
 #include <stdio.h>
 #endif
 
-// Internal data storage class for holding attached data whilst it is waiting
-// to be Flattened() and then Flushed(). There is no need for this to be called outside
-// the PortLink class. 
+/*!
+	\class PortLinkData PortLink.cpp
+	\brief Internal data storage class
+	
+	PortLinkData objects serve to hold attached data whilst it is waiting to be Flattened() 
+	and then Flushed(). There is no need for this to be used outside the PortLink class. 
+*/
 class PortLinkData
 {
 public:
 	PortLinkData(void);
 	~PortLinkData(void);
-	status_t Set(void *data, size_t size);
+	status_t Set(const void *data, size_t size);
 	char *buffer;
 	size_t buffersize;
 };
 
+/*!
+	\brief Constructor
+	\param port A valid target port_id 
+*/
 PortLink::PortLink(port_id port)
 {
 #ifdef PLDEBUG
 printf("PortLink(%lu)\n",port);
 #endif
-	// For this class to be useful (and to prevent a lot of init problems)
-	// we require a port in the constructor
 	target=port;
 	port_info pi;
 	port_ok=(get_port_info(target,&pi)==B_OK)?true:false;
@@ -78,14 +86,17 @@ printf("\tReply port: %lu\n",replyport);
 	// TODO: initialize all attachments pointers to NULL
 }
 
+/*!
+	\brief Copy Constructor
+	\param port A valid target port_id 
+
+	The copy constructor copies everything except a PortLink's attachments.
+*/
 PortLink::PortLink(const PortLink &link)
 {
 #ifdef PLDEBUG
 printf("PortLink(PortLink*)\n");
 #endif
-	// The copy constructor copies everything except a PortLink's attachments. If there
-	// is some reason why someday I might need to change this behavior, I will, but
-	// for now there is no real reason I can think of.
 	target=link.target;
 	opcode=link.opcode;
 	port_ok=link.port_ok;
@@ -103,6 +114,7 @@ printf("\tReply port: %lu\n",replyport);
 	// TODO: initialize all attachments pointers to NULL
 }
 
+//! Empties all attachments in addition to deleting the attachment list itself
 PortLink::~PortLink(void)
 {
 #ifdef PLDEBUG
@@ -118,6 +130,13 @@ printf("~PortLink()\n");
 	delete attachlist;
 }
 
+/*!
+	\brief Sets the link's message code
+	\param code Message code to use
+	
+	This code is persistent over sending messages - it will not change unless 
+	SetOpCode is called again.
+*/
 void PortLink::SetOpCode(int32 code)
 {
 #ifdef PLDEBUG
@@ -132,6 +151,10 @@ printf("PortLink::SetOpCode(%c%c%c%c)\n",
 	opcode=code;
 }
 
+/*!
+	\brief Changes the PortLink's target port
+	\param port A valid target port_id
+*/
 void PortLink::SetPort(port_id port)
 {
 #ifdef PLDEBUG
@@ -145,6 +168,10 @@ printf("PortLink::SetPort(%lu)\n",port);
 	capacity=pi.capacity;
 }
 
+/*!
+	\brief Returns the PortLink's target port
+	\return The PortLink's target port
+*/
 port_id PortLink::GetPort(void)
 {
 #ifdef PLDEBUG
@@ -368,7 +395,7 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 	return B_OK;
 }
 
-status_t PortLink::Attach(void *data, size_t size)
+status_t PortLink::Attach(const void *data, size_t size)
 {
 #ifdef PLDEBUG
 printf("Attach(%p,%ld)\n",data,size);
@@ -675,7 +702,7 @@ PortLinkData::~PortLinkData(void)
 		free(buffer);
 }
 
-status_t PortLinkData::Set(void *data, size_t size)
+status_t PortLinkData::Set(const void *data, size_t size)
 {
 #ifdef PLD_DEBUG
 printf("PortLinkData::Set(%p,%lu)\n",data,size);
