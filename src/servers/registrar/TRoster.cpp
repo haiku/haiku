@@ -233,12 +233,13 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 	if (error == B_OK) {
 		if (team >= 0) {
 			// everything is fine -- set the values
-			if (RosterAppInfo *info = fRegisteredApps.InfoFor(team)) {
+			RosterAppInfo *info = fRegisteredApps.InfoFor(team);
+			if (info && info->state == APP_STATE_PRE_REGISTERED) {
 				info->thread = thread;
 				info->port = port;
 				info->state = APP_STATE_REGISTERED;
 			} else
-				SET_ERROR(error, B_REG_APP_NOT_REGISTERED);
+				SET_ERROR(error, B_REG_APP_NOT_PRE_REGISTERED);
 		} else
 			SET_ERROR(error, B_BAD_VALUE);
 	}
@@ -534,9 +535,9 @@ TRoster::HandleGetAppList(BMessage *request)
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
 		// get the list
-		for (int32 i = 0;
-			 RosterAppInfo *info = fRegisteredApps.InfoAt(i);
-			 i++) {
+		for (AppInfoList::Iterator it(fRegisteredApps.It());
+			 RosterAppInfo *info = *it;
+			 ++it) {
 			if (!signature || !strcmp(signature, info->signature))
 				reply.AddInt32("teams", info->team);
 		}
@@ -766,7 +767,7 @@ TRoster::_ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info)
 			case APP_STATE_PRE_REGISTERED:
 				preRegistered = true;
 				break;
-			case APP_STATE_INVALID:
+			case APP_STATE_UNREGISTERED:
 			case APP_STATE_REGISTERED:
 				preRegistered = false;
 				break;
