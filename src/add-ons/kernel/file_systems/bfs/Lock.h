@@ -15,11 +15,9 @@
 
 
 // Configure here if and when real benaphores should be used
-// Benaphores doesn't make much sense in the kernel, so they are only
-// enabled for the user-space test application
+#define USE_BENAPHORE
+	// if defined, benaphores are used for the Semaphore/RecursiveLock classes
 #ifdef USER
-#	define USE_BENAPHORE
-	// if defined, benaphores are used for the Semaphore class
 //#	define FAST_LOCK
 	// the ReadWriteLock class uses a second Semaphore to
 	// speed up locking - only makes sense if USE_BENAPHORE
@@ -85,7 +83,7 @@ class Semaphore {
 #endif
 };
 
-// a convenience class to lock the benaphore
+// a convenience class to lock a Semaphore object
 
 class Locker {
 	public:
@@ -110,6 +108,103 @@ class Locker {
 	private:
 		Semaphore	&fLock;
 		status_t	fStatus;
+};
+
+
+//**** Recursive Lock
+
+class RecursiveLock {
+	public:
+		RecursiveLock(const char *name)
+			:
+#ifdef USE_BENAPHORE
+			fSemaphore(create_sem(0, name)),
+			fCount(1),
+#else
+			fSemaphore(create_sem(1, name)),
+#endif
+			fOwner(-1)
+		{
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
+		}
+
+		status_t Lock()
+		{
+			thread_id thread = find_thread(NULL);
+			if (thread == fOwner) {
+				fOwnerCount++;
+				return B_OK;
+			}
+
+			status_t status;
+#ifdef USE_BENAPHORE
+			if (atomic_add(&fCount, -1) > 0)
+				status = B_OK;
+			else
+#endif
+				status = acquire_sem(fSemaphore);
+
+			if (status == B_OK) {
+				fOwner = thread;
+				fOwnerCount = 1;
+			}
+
+			return status;
+		}
+
+		status_t Unlock()
+		{
+			thread_id thread = find_thread(NULL);
+			if (thread != fOwner)
+				panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
+
+			if (--fOwnerCount == 0) {
+				fOwner = -1;
+#ifdef USE_BENAPHORE
+				if (atomic_add(&fCount, 1) < 0)
+#endif
+					return release_sem(fSemaphore);
+			}
+
+			return B_OK;
+		}
+
+	private:
+		sem_id	fSemaphore;
+#ifdef USE_BENAPHORE
+		vint32	fCount;
+#endif
+		thread_id	fOwner;
+		int32		fOwnerCount;
+};
+
+// a convenience class to lock an RecursiveLock object
+
+class RecursiveLocker {
+	public:
+		RecursiveLocker(RecursiveLock &lock)
+			: fLock(lock)
+		{
+			fStatus = lock.Lock();
+			ASSERT(fStatus == B_OK);
+		}
+
+		~RecursiveLocker()
+		{
+			if (fStatus == B_OK)
+				fLock.Unlock();
+		}
+
+		status_t Status() const
+		{
+			return fStatus;
+		}
+
+	private:
+		RecursiveLock	&fLock;
+		status_t		fStatus;
 };
 
 
@@ -144,7 +239,7 @@ class Locker {
 // have to be called when there is no one waiting.
 // The disadvantage is the use of 2 real semaphores which is quite
 // expensive regarding that BeOS only allows for a total of 64k
-// semaphores.
+// semaphores (since every open BFS inode has such a lock).
 
 #ifdef FAST_LOCK
 class ReadWriteLock {
@@ -211,7 +306,7 @@ class ReadWriteLock {
 				// Acquire sem for all readers currently not using a semaphore.
 				// But if we are not the only write lock in the queue, just get
 				// the one for us
-				status = acquire_sem_etc(fSemaphore,readers <= 0 ? 1 : MAX_READERS - readers,0,0);
+				status = acquire_sem_etc(fSemaphore, readers <= 0 ? 1 : MAX_READERS - readers, 0, 0);
 			}
 			fWriteLock.Unlock();
 
@@ -220,10 +315,10 @@ class ReadWriteLock {
 		
 		void UnlockWrite()
 		{
-			int32 readers = atomic_add(&fCount,MAX_READERS);
+			int32 readers = atomic_add(&fCount, MAX_READERS);
 			if (readers < 0) {
 				// release sem for all readers only when we were the only writer
-				release_sem_etc(fSemaphore,readers <= -MAX_READERS ? 1 : -readers,0);
+				release_sem_etc(fSemaphore, readers <= -MAX_READERS ? 1 : -readers, 0);
 			}
 		}
 
@@ -281,12 +376,12 @@ class ReadWriteLock {
 		
 		status_t LockWrite()
 		{
-			return acquire_sem_etc(fSemaphore,MAX_READERS,0,0);
+			return acquire_sem_etc(fSemaphore, MAX_READERS, 0, 0);
 		}
 		
 		void UnlockWrite()
 		{
-			release_sem_etc(fSemaphore,MAX_READERS,0);
+			release_sem_etc(fSemaphore, MAX_READERS, 0);
 		}
 
 	private:

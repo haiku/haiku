@@ -1788,6 +1788,8 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	if (GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
+	RecursiveLocker locker(fVolume->Lock());
+
 	// does the file even exists?
 	off_t id;
 	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) < B_OK)
@@ -1879,6 +1881,10 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
 	Volume *volume = transaction->GetVolume();
 	BPlusTree *tree = NULL;
+
+	RecursiveLocker locker(volume->Lock());
+		// ToDo: it would be nicer to only lock the parent directory, if possible
+		//	(but that lock will already be held during any B+tree action)
 
 	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory

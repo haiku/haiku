@@ -49,6 +49,7 @@ Inode
  - exchange Inode::OldLastModified() with Inode::NewLastModified(), and don't change the last_modified field directly in Inode::WriteAt() for consistency in case of a crash
  - the size is only updated in bfs_close() - but if the system crashes before, the entry in the size index doesn't match the one in the inode anymore - it would be better to let the data.size not reflect the real file size in this case (since the max_xxx_range entries are always correct)
  - Inode::FillGapWithZeros() currently disabled; apart from being slow, it really shouldn't be executed while a transaction is running, because that stops all other threads from doing anything (which can be a long time for a 100 MB file)
+ - need better locking mechanism in combination with B+trees etc.!
 
 
 Indices

@@ -274,6 +274,8 @@ bfs_read_fs_stat(void *_ns, struct fs_info *info)
 
 	Volume *volume = (Volume *)_ns;
 
+	RecursiveLocker locker(volume->Lock());
+
 	// File system flags.
 	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME | B_FS_HAS_QUERY |
 			(volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
@@ -302,7 +304,7 @@ bfs_write_fs_stat(void *_ns, struct fs_info *info, long mask)
 	Volume *volume = (Volume *)_ns;
 	disk_super_block &superBlock = volume->SuperBlock();
 
-	Locker locker(volume->Lock());
+	RecursiveLocker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
 
@@ -1011,6 +1013,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	// are we already done?
 	if (oldDirectory == newDirectory && !strcmp(oldName, newName))
 		return B_OK;
+
+	RecursiveLocker locker(volume->Lock());
 
 	// get the directory's tree, and a pointer to the inode which should be changed
 	BPlusTree *tree;
