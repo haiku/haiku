@@ -130,9 +130,14 @@ status_t nv_crtc_set_timing(display_mode target)
 			(((uint16)((si->ps.p1_timing.h_total / ((float)si->ps.p1_timing.h_display)) *
 			target.timing.h_display)) & 0xfff8) - 8;
 
+		//fixme: can be removed if community confirms no problems with modified setup!
+		//(confirmed this 'problem' on NV34 and NV11 now.)
 		/* NV11 timing has tighter constraints than later cards */
-		if ((si->ps.card_type == NV11) &&
-			(target.timing.h_display == si->ps.p1_timing.h_display))
+//		if ((si->ps.card_type == NV11) &&
+//			(target.timing.h_display == si->ps.p1_timing.h_display))
+
+		/* in native mode the CRTC needs some extra time to keep synced correctly */
+		if (target.timing.h_display == si->ps.p1_timing.h_display)
 		{
 			target.timing.h_total -= 56;
 		}

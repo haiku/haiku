@@ -275,6 +275,10 @@ static void nv_agp_list_caps(agp_info ai)
 	}
 	if (ai.config.agp_cmd & AGP_FW) LOG(4,("AGP: fastwrite transfers are enabled\n"));
 	if (ai.config.agp_cmd & AGP_SBA) LOG(4,("AGP: sideband adressing is enabled\n"));
-	LOG(4,("AGP: max. AGP queued request depth is set to %d.\n",
+	LOG(4,("AGP: max. AGP queued request depth is set to %d\n",
 		(((ai.config.agp_cmd & AGP_RQ) >> AGP_RQ_shift) + 1)));
+	if (ai.config.agp_cmd & AGP_enable)
+		LOG(4,("AGP: this AGP interface is currently enabled.\n"));
+	else
+		LOG(4,("AGP: this AGP interface is currently disabled.\n"));
 }
