@@ -1588,8 +1588,8 @@ static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 	stat = B_ERROR;
 	while ((cnt < 4) && (stat != B_OK))
 	{
-		/* read RAM size(?) */
-		data = NV_REG32(NV32_PFB_FIFO_DATA);
+		/* read RAM size */
+		data = NV_REG32(NV32_NV10STRAPINFO);
 		/* subtract 1MB */
 		data -= 0x00100000;
 		/* generate testadress by adding 128Mb */
@@ -1632,7 +1632,7 @@ static void write_RMA(uint32 reg, uint32 data)
 	ISAWW(0x03d2, (reg >> 16));
 	/* select RMA port 'write data' mode */
 	ISAWW(0x03d4, 0x0738);
-	/* set send data through RMA port */
+	/* send data through RMA port */
 	ISAWW(0x03d0, (data & 0x0000ffff));
 	ISAWW(0x03d2, (data >> 16));
 	/* re-select RMA port 'set adress' mode (just to be sure) */
