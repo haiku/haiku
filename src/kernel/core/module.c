@@ -426,8 +426,8 @@ static int recurse_directory(const char *path, const char *match)
 	int res = 0, dir;
 	int bufferSize = sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1;
 	struct dirent *dirent;
-	
-	if ((dir = sys_open(path, STREAM_TYPE_DIR, 0)) < 0)
+
+	if ((dir = sys_open_dir(path)) < 0)
 		return -1;
 
 	dirent = kmalloc(bufferSize);
@@ -453,7 +453,7 @@ static int recurse_directory(const char *path, const char *match)
 		strlcat(newpath, "/", slen);
 		strlcat(newpath, dirent->d_name, slen);
 
-		if ((res = sys_rstat(newpath, &stat)) != B_NO_ERROR) {
+		if ((res = sys_read_stat(newpath, &stat)) != B_NO_ERROR) {
 			kfree(newpath);
 			break;
 		}
@@ -663,25 +663,25 @@ static inline int module_create_dir_iterator( module_iterator *iter, int file, c
 
 static inline int module_enter_dir(module_iterator *iter, const char *path)
 {
-	int file;
+	int dir;
 	int res;
 	
-	file = sys_open( path, STREAM_TYPE_DIR, 0 );
-	if (file < 0 ) {
-		SHOW_FLOW( 3, "couldn't open directory %s (%s)\n", path, strerror( file ));
-		
+	dir = sys_open_dir(path);
+	if (dir < 0 ) {
+		SHOW_FLOW(3, "couldn't open directory %s (%s)\n", path, strerror(dir));
+
 		// there are so many errors for "not found" that we don't bother
 		// and always assume that the directory suddenly disappeared
 		return B_NO_ERROR;
 	}
 						
-	res = module_create_dir_iterator(iter, file, path);
+	res = module_create_dir_iterator(iter, dir, path);
 	if (res != B_NO_ERROR) {
-		sys_close(file);
+		sys_close(dir);
 		return ENOMEM;
 	}
-	
-	SHOW_FLOW( 3, "entered directory %s\n", path );				
+
+	SHOW_FLOW(3, "entered directory %s\n", path);
 	return B_NO_ERROR;
 }
 
@@ -779,8 +779,8 @@ static inline int module_traverse_dir(module_iterator *iter)
 
 	SHOW_FLOW( 3, "got %s\n", name );
 
-	if (strcmp( name, "." ) == 0 ||
-		strcmp( name, ".." ) == 0 )
+	if (strcmp(name, ".") == 0 ||
+		strcmp(name, "..") == 0 )
 		return B_NO_ERROR;
 	
 	/* currently, sys_read returns an error if buffer is too small
@@ -796,7 +796,7 @@ static inline int module_traverse_dir(module_iterator *iter)
 	iter->cur_header = NULL;
 	iter->module_pos = 0;
 		
-	if ((res = sys_rstat(path, &stat)) != B_NO_ERROR )
+	if ((res = sys_read_stat(path, &stat)) != B_NO_ERROR)
 		return res;
 		
 	if (S_ISREG(stat.st_mode)) {

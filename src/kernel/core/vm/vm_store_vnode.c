@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
 #include <memheap.h>
@@ -41,12 +42,12 @@ static int vnode_has_page(struct vm_store *store, off_t offset)
 
 static ssize_t vnode_read(struct vm_store *store, off_t offset, iovecs *vecs)
 {
-	return vfs_readpage(STORE_DATA(store)->vn, vecs, offset);
+	return vfs_read_page(STORE_DATA(store)->vn, vecs, offset);
 }
 
 static ssize_t vnode_write(struct vm_store *store, off_t offset, iovecs *vecs)
 {
-	return vfs_writepage(STORE_DATA(store)->vn, vecs, offset);
+	return vfs_write_page(STORE_DATA(store)->vn, vecs, offset);
 }
 
 /* unused

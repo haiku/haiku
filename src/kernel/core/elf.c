@@ -501,7 +501,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 
 	dprintf("elf_load: entry path '%s', proc %p\n", path, p);
 
-	fd = sys_open(path, STREAM_TYPE_FILE, 0);
+	fd = sys_open(path, 0);
 	if(fd < 0)
 		return fd;
 		
@@ -669,7 +669,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 
 //	dprintf("elf_load_kspace: entry path '%s'\n", path);
 
-	fd = sys_open(path, STREAM_TYPE_FILE, 0);
+	fd = sys_open(path, 0);
 	if(fd < 0)
 		return fd;
 
@@ -907,7 +907,7 @@ int elf_unload_kspace( const char *path )
 	void *vnode;
 	struct elf_image_info *image;
 	
-	fd = sys_open(path, STREAM_TYPE_FILE, 0);
+	fd = sys_open(path, 0);
 	if(fd < 0)
 		return fd;
 

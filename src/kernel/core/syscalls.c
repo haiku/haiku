@@ -61,7 +61,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_sync();
 			break;
 		case SYSCALL_OPEN:
-			*call_ret = user_open((const char *)arg0, (stream_type)arg1, (int)arg2);
+			*call_ret = user_open((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_CLOSE:
 			*call_ret = user_close((int)arg0);
@@ -78,6 +78,9 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SEEK:
 			*call_ret = user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
 			break;
+		case SYSCALL_OPEN_DIR:
+			*call_ret = user_open_dir((const char *)arg0);
+			break;
 		case SYSCALL_READ_DIR:
 			*call_ret = user_read_dir((int)arg0, (struct dirent *)arg1, (size_t)arg2, (uint32)arg3);
 			break;
@@ -88,7 +91,10 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)arg3);
 			break;
 		case SYSCALL_CREATE:
-			*call_ret = user_create((const char *)arg0, (stream_type)arg1);
+			*call_ret = user_create((const char *)arg0, (int)arg1, (int)arg2);
+			break;
+		case SYSCALL_CREATE_DIR:
+			*call_ret = user_create_dir((const char *)arg0, (int)arg1);
 			break;
 		case SYSCALL_UNLINK:
 			*call_ret = user_unlink((const char *)arg0);
@@ -97,13 +103,13 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_rename((const char *)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_RSTAT:
-			*call_ret = user_rstat((const char *)arg0, (struct stat *)arg1);
+			*call_ret = user_read_stat((const char *)arg0, (struct stat *)arg1);
 			break;
 		case SYSCALL_FSTAT:
 			*call_ret = user_fstat((int)arg0, (struct stat*)arg1);
 			break;
 		case SYSCALL_WSTAT:
-			*call_ret = user_wstat((const char *)arg0, (struct stat *)arg1, (int)arg2);
+			*call_ret = user_write_stat((const char *)arg0, (struct stat *)arg1, (int)arg2);
 			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();

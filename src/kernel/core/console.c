@@ -68,7 +68,7 @@ int con_init(kernel_args *ka)
 {
 	dprintf("con_init: entry\n");
 
-	console_fd = sys_open("/dev/console", STREAM_TYPE_DEVICE, 0);
+	console_fd = sys_open("/dev/console", 0);
 	dprintf("console_fd = %d\n", console_fd);
 
 	return 0;

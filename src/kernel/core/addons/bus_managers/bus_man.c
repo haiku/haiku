@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <OS.h>
 #include <kernel.h>
 #include <lock.h>
@@ -24,6 +25,7 @@ typedef struct bus {
 static bus *bus_list;
 static mutex bus_lock;
 
+
 int bus_man_init(kernel_args *ka)
 {
 	mutex_init(&bus_lock, "bus_lock");
@@ -37,8 +39,8 @@ static bus *find_bus(const char *path)
 {
 	bus *b;
 
-	for(b = bus_list; b != NULL; b = b->next) {
-		if(!strcmp(b->path, path))
+	for (b = bus_list; b != NULL; b = b->next) {
+		if (!strcmp(b->path, path))
 			break;
 	}
 	return b;
@@ -53,15 +55,15 @@ int bus_register_bus(const char *path)
 
 	mutex_lock(&bus_lock);
 
-	if(!find_bus(path)) {
+	if (!find_bus(path)) {
 		b = (bus *)kmalloc(sizeof(bus));
-		if(b == NULL) {
+		if (b == NULL) {
 			err = ENOMEM;
 			goto err;
 		}
 
 		b->path = kmalloc(strlen(path)+1);
-		if(b->path == NULL) {
+		if (b->path == NULL) {
 			err = ENOMEM;
 			kfree(b);
 			goto err;
@@ -80,51 +82,58 @@ err:
 	return err;
 }
 
-static int bus_find_device_recurse(int *n, char *base_path, int base_fd, id_list *vendor_ids, id_list *device_ids)
+static int bus_find_device_recurse(int *n, char *base_path, int max_path_len, int base_fd, id_list *vendor_ids, id_list *device_ids)
 {
-	char leaf[256];
+	char buffer[sizeof(struct dirent) + SYS_MAX_NAME_LEN + 1];
+	struct dirent *dirent = (struct dirent *)buffer;
 	int base_path_len = strlen(base_path);
 	ssize_t len;
-	int fd;
 	int err;
 	struct stat stat;
 
-	while((len = sys_read(base_fd, &leaf, -1, sizeof(leaf))) > 0) {
-		// reset the base_path to the original string passed in
-		base_path[base_path_len] = 0;
+	while ((len = sys_read_dir(base_fd, dirent, sizeof(buffer), 1)) > 0) {
+		int fd;
 
-		strlcat(base_path, leaf, sizeof(leaf));
-		fd = sys_open(base_path, STREAM_TYPE_ANY, 0);
-		if(fd < 0)
+		// reset the base_path to the original string passed in
+		base_path[base_path_len] = '\0';
+		dirent->d_name[dirent->d_reclen] = '\0';
+		strlcat(base_path, dirent->d_name, max_path_len);
+
+		err = sys_read_stat(base_path, &stat);
+		if (err < 0)
 			continue;
-		err = sys_rstat(base_path, &stat);
-		if(err < 0) {
+
+		if (S_ISDIR(stat.st_mode)) {
+			fd = sys_open_dir(base_path);
+			if (fd < 0)
+				continue;
+
+			strlcat(base_path, "/", max_path_len);
+			err = bus_find_device_recurse(n, base_path, max_path_len, fd, vendor_ids, device_ids);
 			sys_close(fd);
-			continue;
-		}
-		if(S_ISDIR(stat.st_mode)) {
-			strcat(base_path, "/");	/* XXXfreston... this is unsafe!!!! */
-			err = bus_find_device_recurse(n, base_path, fd, vendor_ids, device_ids);
-			sys_close(fd);
-			if(err >= 0)
+			if (err >= 0)
 				return err;
 			continue;
-		} else if(S_ISREG(stat.st_mode)) {
+		} else if (S_ISREG(stat.st_mode)) {
 			// we opened the device
 			// XXX assumes PCI
 			struct pci_cfg cfg;
 			uint32 i, j;
 
+			fd = sys_open(base_path, 0);
+			if (fd < 0)
+				continue;
+
 			err = sys_ioctl(fd, PCI_GET_CFG, &cfg, sizeof(struct pci_cfg));
-			if(err >= 0) {
+			if (err >= 0) {
 				// see if the vendor & device id matches
-				for(i=0; i<vendor_ids->num_ids; i++) {
-					if(cfg.vendor_id == vendor_ids->id[i]) {
-						for(j=0; j<device_ids->num_ids; j++) {
-							if(cfg.device_id == device_ids->id[j]) {
+				for (i = 0; i < vendor_ids->num_ids; i++) {
+					if (cfg.vendor_id == vendor_ids->id[i]) {
+						for (j = 0; j < device_ids->num_ids; j++) {
+							if (cfg.device_id == device_ids->id[j]) {
 								// found it
 								(*n)--;
-								if(*n <= 0)
+								if (*n <= 0)
 									return fd;
 							}
 						}
@@ -145,22 +154,22 @@ int bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev
 	bus *b;
 	int err = -1;
 
-	for(b = bus_list; b != NULL && err < 0; b = b->next) {
-		base_fd = sys_open(b->path, STREAM_TYPE_DIR, 0);
-		if(base_fd < 0)
+	for (b = bus_list; b != NULL && err < 0; b = b->next) {
+		base_fd = sys_open_dir(b->path);
+		if (base_fd < 0)
 			continue;
 
 		strlcpy(path, b->path, sizeof(path));
 		strlcat(path, "/", sizeof(path));
-		fd = bus_find_device_recurse(&n, path, base_fd, vendor_ids, device_ids);
-		if(fd >= 0) {
+		fd = bus_find_device_recurse(&n, path, sizeof(path), base_fd, vendor_ids, device_ids);
+		if (fd >= 0) {
 			// we have a device!
 			// XXX assumes pci
 			struct pci_cfg cfg;
 			int i;
 
 			err = sys_ioctl(fd, PCI_GET_CFG, &cfg, sizeof(struct pci_cfg));
-			if(err >= 0) {
+			if (err >= 0) {
 				// copy the relevant data from the pci config to the more generic config
 				memset(dev, 0, sizeof(device));
 				dev->vendor_id = cfg.vendor_id;

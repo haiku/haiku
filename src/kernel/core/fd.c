@@ -37,7 +37,7 @@ alloc_fd(void)
 	struct file_descriptor *f;
 
 	f = kmalloc(sizeof(struct file_descriptor));
-	if(f) {
+	if (f) {
 		f->vnode = NULL;
 		f->cookie = NULL;
 		f->ref_count = 1;
@@ -186,6 +186,26 @@ user_write(int fd, const void *buffer, off_t pos, size_t length)
 
 
 int
+user_seek(int fd, off_t pos, int seek_type)
+{
+	struct file_descriptor *descriptor;
+	int status;
+
+	descriptor = get_fd(get_current_io_context(false), fd);
+	if (!descriptor)
+		return EBADF;
+
+	if (descriptor->ops->fd_seek)
+		status = descriptor->ops->fd_seek(descriptor, pos, seek_type);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+int
 user_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
@@ -204,6 +224,7 @@ user_ioctl(int fd, ulong op, void *buffer, size_t length)
 	else
 		status = EOPNOTSUPP;
 
+	put_fd(descriptor);
 	return status;
 }
 
@@ -365,6 +386,26 @@ sys_write(int fd, const void *buffer, off_t pos, size_t length)
 
 
 int
+sys_seek(int fd, off_t pos, int seek_type)
+{
+	struct file_descriptor *descriptor;
+	int status;
+
+	descriptor = get_fd(get_current_io_context(true), fd);
+	if (!descriptor)
+		return EBADF;
+
+	if (descriptor->ops->fd_seek)
+		status = descriptor->ops->fd_seek(descriptor, pos, seek_type);
+	else
+		status = EOPNOTSUPP;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+int
 sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
@@ -396,7 +437,7 @@ sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 
 	PRINT(("sys_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld, count = %u)\n",fd,buffer,bufferSize,maxCount));
 
-	descriptor = get_fd(get_current_io_context(false), fd);
+	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return EBADF;
 
@@ -421,7 +462,7 @@ sys_rewind_dir(int fd)
 
 	PRINT(("user_rewind_dir(fd = %d)\n",fd));
 
-	descriptor = get_fd(get_current_io_context(false), fd);
+	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return EBADF;
 
