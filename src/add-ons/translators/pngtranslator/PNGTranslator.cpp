@@ -139,10 +139,7 @@ BPositionIO *
 get_pio(png_structp ppng)
 {
 	BPositionIO *pio = NULL;
-	pio = static_cast<BPositionIO *>(png_get_io_ptr(ppng));
-	if (!pio)
-		debugger("pio is NULL");
-		
+	pio = static_cast<BPositionIO *>(png_get_io_ptr(ppng));		
 	return pio;
 }
 
