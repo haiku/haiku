@@ -50,16 +50,6 @@ static struct mp_flt_struct *mp_flt_ptr = NULL;
 static int smp_get_current_cpu(void);
 
 
-static void
-sleep(uint64 time)
-{
-	uint64 start = system_time();
-
-	while(system_time() - start <= time)
-		;
-}
-
-
 static uint32
 map_page(uint32 paddr, uint32 vaddr)
 {
@@ -427,7 +417,7 @@ smp_boot_all_cpus(void)
 			;
 
 		/* wait 10ms */
-		sleep(10000);
+		spin(10000);
 
 		/* is this a local apic or an 82489dx ? */
 		num_startups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0) ? 2 : 0;
@@ -445,7 +435,7 @@ smp_boot_all_cpus(void)
 			apic_write(APIC_ICR1, config);
 
 			/* wait */
-			sleep(200);
+			spin(200);
 
 			while ((apic_read(APIC_ICR1)& 0x00001000) == 0x00001000)
 				;
