@@ -15,15 +15,14 @@ typedef uint32 ppp_interface_id;
 
 
 // settings keys
-#define PPP_ASK_BEFORE_DIALING_KEY			"AskBeforeDialing"
-	// userland ppp_server and preflet handle this key
+#define PPP_ASK_BEFORE_CONNECTING_KEY			"AskBeforeConnecting"
+	// userland ppp_up and preflet handle this key
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
-#define PPP_DIAL_RETRIES_LIMIT_KEY			"DialRetriesLimit"
-#define PPP_DIAL_RETRY_DELAY_KEY			"DialRetryDelay"
-#define PPP_DIAL_ON_DEMAND_KEY				"DialOnDemand"
-#define PPP_AUTO_REDIAL_KEY					"AutoRedial"
-#define PPP_REDIAL_DELAY_KEY				"RedialDelay"
+#define PPP_CONNECT_RETRIES_LIMIT_KEY			"ConnectRetriesLimit"
+#define PPP_CONNECT_RETRY_DELAY_KEY			"ConnectRetryDelay"
+#define PPP_AUTO_RECONNECT_KEY					"AutoReconnect"
+#define PPP_RECONNECT_DELAY_KEY				"ReconnectDelay"
 #define PPP_LOAD_MODULE_KEY					"LoadModule"
 #define PPP_PROTOCOL_KEY					"Protocol"
 #define PPP_DEVICE_KEY						"Device"

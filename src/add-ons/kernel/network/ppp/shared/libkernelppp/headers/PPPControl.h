@@ -47,8 +47,8 @@ enum ppp_control_ops {
 	// KPPPInterface
 	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
 	PPPC_SET_MRU,
-	PPPC_SET_DIAL_ON_DEMAND,
-	PPPC_SET_AUTO_REDIAL,
+	PPPC_SET_CONNECT_ON_DEMAND,
+	PPPC_SET_AUTO_RECONNECT,
 	PPPC_HAS_INTERFACE_SETTINGS,
 	PPPC_SET_PROFILE,
 	
@@ -151,11 +151,11 @@ typedef struct ppp_interface_info {
 	uint32 protocolsCount, optionHandlersCount, LCPExtensionsCount, childrenCount;
 	uint32 MRU, interfaceMTU;
 	
-	uint32 dialRetry, dialRetriesLimit;
-	uint32 dialRetryDelay, redialDelay;
+	uint32 connectRetry, connectRetriesLimit;
+	uint32 connectRetryDelay, reconnectDelay;
 	uint32 idleSince, disconnectAfterIdleSince;
 	
-	bool doesDialOnDemand, doesAutoRedial, hasDevice, isMultilink, hasParent;
+	bool doesConnectOnDemand, doesAutoReconnect, hasDevice, isMultilink, hasParent;
 } ppp_interface_info;
 /*!	\brief You \e must use this encapsulator instead of \c ppp_interface_info!
 	

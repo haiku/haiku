@@ -183,7 +183,7 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	++entry->accessing;
 	locker.UnlockNow();
 	
-	if(!entry->interface->DoesDialOnDemand()
+	if(!entry->interface->DoesConnectOnDemand()
 			&& ifp->if_flags & (IFF_UP | IFF_RUNNING) != (IFF_UP | IFF_RUNNING)) {
 		m_freem(buf);
 		--entry->accessing;
@@ -232,7 +232,7 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 	switch(cmd) {
 		case SIOCSIFFLAGS:
 			if(((ifreq*)data)->ifr_flags & IFF_DOWN) {
-				if(entry->interface->DoesDialOnDemand()
+				if(entry->interface->DoesConnectOnDemand()
 						&& entry->interface->Phase() == PPP_DOWN_PHASE)
 					DeleteInterface(entry->interface->ID());
 				else

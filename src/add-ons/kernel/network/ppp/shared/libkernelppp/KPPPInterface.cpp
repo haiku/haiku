@@ -52,17 +52,17 @@
 // TODO:
 // - implement timers with support for setting next event instead of receiving timer
 //    events periodically
-// - add missing settings support (DialRetryDelay, etc.)
+// - add missing settings support (ConnectRetryDelay, etc.)
 
 
-//!	Private structure needed for redialing.
-typedef struct redial_info {
+//!	Private structure needed for reconnecting.
+typedef struct reconnect_info {
 	KPPPInterface *interface;
 	thread_id *thread;
 	uint32 delay;
-} redial_info;
+} reconnect_info;
 
-status_t redial_thread(void *data);
+status_t reconnect_thread(void *data);
 
 // other functions
 status_t interface_deleter_thread(void *data);
@@ -91,9 +91,9 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fUpThread(-1),
 	fOpenEventThread(-1),
 	fCloseEventThread(-1),
-	fRedialThread(-1),
-	fDialRetry(0),
-	fDialRetriesLimit(0),
+	fReconnectThread(-1),
+	fConnectRetry(0),
+	fConnectRetriesLimit(0),
 	fManager(NULL),
 	fIdleSince(0),
 	fMRU(1500),
@@ -101,8 +101,8 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fHeaderLength(2),
 	fParent(NULL),
 	fIsMultilink(false),
-	fAutoRedial(false),
-	fDialOnDemand(false),
+	fAutoReconnect(false),
+	fConnectOnDemand(false),
 	fMode(PPP_CLIENT_MODE),
 	fLocalPFCState(PPP_PFC_DISABLED),
 	fPeerPFCState(PPP_PFC_DISABLED),
@@ -171,11 +171,11 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		delete pfcHandler;
 	}
 	
-	// set up dial delays
-	fDialRetryDelay = 3000;
-		// 3s delay between each new attempt to redial
-	fRedialDelay = 1000;
-		// 1s delay between lost connection and redial
+	// set up connect delays
+	fConnectRetryDelay = 3000;
+		// 3s delay between each new attempt to reconnect
+	fReconnectDelay = 1000;
+		// 1s delay between lost connection and reconnect
 	
 	if(get_module(PPP_INTERFACE_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		ERROR("KPPPInterface: Manager module not found!\n");
@@ -214,12 +214,12 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		fMode = PPP_CLIENT_MODE;
 		// we are a client by default
 	
-	SetAutoRedial(
+	SetAutoReconnect(
 		get_boolean_value(
-		get_settings_value(PPP_AUTO_REDIAL_KEY, fSettings),
+		get_settings_value(PPP_AUTO_RECONNECT_KEY, fSettings),
 		false)
 		);
-		// auto redial is disabled by default
+		// auto reconnect is disabled by default
 	
 	// load all protocols and the device
 	if(!LoadModules(fSettings, 0, fSettings->parameter_count)) {
@@ -261,9 +261,9 @@ KPPPInterface::~KPPPInterface()
 		// tell all listeners that we are being destroyed
 	
 	int32 tmp;
-	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
+	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
 		// tell thread that we are being destroyed (200ms timeout)
-	wait_for_thread(fRedialThread, &tmp);
+	wait_for_thread(fReconnectThread, &tmp);
 	wait_for_thread(fOpenEventThread, &tmp);
 	wait_for_thread(fCloseEventThread, &tmp);
 	
@@ -418,14 +418,14 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			info->childrenCount = CountChildren();
 			info->MRU = MRU();
 			info->interfaceMTU = InterfaceMTU();
-			info->dialRetry = fDialRetry;
-			info->dialRetriesLimit = fDialRetriesLimit;
-			info->dialRetryDelay = DialRetryDelay();
-			info->redialDelay = RedialDelay();
+			info->connectRetry = fConnectRetry;
+			info->connectRetriesLimit = fConnectRetriesLimit;
+			info->connectRetryDelay = ConnectRetryDelay();
+			info->reconnectDelay = ReconnectDelay();
 			info->idleSince = IdleSince();
 			info->disconnectAfterIdleSince = DisconnectAfterIdleSince();
-			info->doesDialOnDemand = DoesDialOnDemand();
-			info->doesAutoRedial = DoesAutoRedial();
+			info->doesConnectOnDemand = DoesConnectOnDemand();
+			info->doesAutoReconnect = DoesAutoReconnect();
 			info->hasDevice = Device();
 			info->isMultilink = IsMultilink();
 			info->hasParent = Parent();
@@ -438,18 +438,18 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			SetMRU(*((uint32*)data));
 		break;
 		
-		case PPPC_SET_DIAL_ON_DEMAND:
+		case PPPC_SET_CONNECT_ON_DEMAND:
 			if(length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
-			SetDialOnDemand(*((uint32*)data));
+			SetConnectOnDemand(*((uint32*)data));
 		break;
 		
-		case PPPC_SET_AUTO_REDIAL:
+		case PPPC_SET_AUTO_RECONNECT:
 			if(length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
-			SetAutoRedial(*((uint32*)data));
+			SetAutoReconnect(*((uint32*)data));
 		break;
 		
 		case PPPC_HAS_INTERFACE_SETTINGS:
@@ -841,41 +841,41 @@ KPPPInterface::ChildAt(int32 index) const
 }
 
 
-//!	Enables or disables the auto-redial feture.
+//!	Enables or disables the auto-reconnect feture.
 void
-KPPPInterface::SetAutoRedial(bool autoRedial = true)
+KPPPInterface::SetAutoReconnect(bool autoReconnect = true)
 {
-	TRACE("KPPPInterface: SetAutoRedial(%s)\n", autoRedial ? "true" : "false");
+	TRACE("KPPPInterface: SetAutoReconnect(%s)\n", autoReconnect ? "true" : "false");
 	
 	if(Mode() != PPP_CLIENT_MODE)
 		return;
 	
 	LockerHelper locker(fLock);
 	
-	fAutoRedial = autoRedial;
+	fAutoReconnect = autoReconnect;
 }
 
 
-//!	Enables or disables the dial-on-demand feature.
+//!	Enables or disables the connect-on-demand feature.
 void
-KPPPInterface::SetDialOnDemand(bool dialOnDemand = true)
+KPPPInterface::SetConnectOnDemand(bool connectOnDemand = true)
 {
-	// All protocols must check if DialOnDemand was enabled/disabled after this
+	// All protocols must check if ConnectOnDemand was enabled/disabled after this
 	// interface went down. This is the only situation where a change is relevant.
 	
-	TRACE("KPPPInterface: SetDialOnDemand(%s)\n", dialOnDemand ? "true" : "false");
+	TRACE("KPPPInterface: SetConnectOnDemand(%s)\n", connectOnDemand ? "true" : "false");
 	
-	// Only clients support DialOnDemand.
+	// Only clients support ConnectOnDemand.
 	if(Mode() != PPP_CLIENT_MODE) {
-		TRACE("KPPPInterface::SetDialOnDemand(): Wrong mode!\n");
-		fDialOnDemand = false;
+		TRACE("KPPPInterface::SetConnectOnDemand(): Wrong mode!\n");
+		fConnectOnDemand = false;
 		return;
-	} else if(DoesDialOnDemand() == dialOnDemand)
+	} else if(DoesConnectOnDemand() == connectOnDemand)
 		return;
 	
 	LockerHelper locker(fLock);
 	
-	fDialOnDemand = dialOnDemand;
+	fConnectOnDemand = connectOnDemand;
 	
 	// Do not allow changes when we are disconnected (only main interfaces).
 	// This would make no sense because
@@ -883,7 +883,7 @@ KPPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 	//    could not establish a connection (the user cannot access hidden interfaces)
 	// - disabling: the interface disappears as seen from the user, so we delete it
 	if(!Parent() && State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE) {
-		if(!dialOnDemand)
+		if(!connectOnDemand)
 			Delete();
 				// as long as the protocols were not configured we can just delete us
 		
@@ -891,10 +891,10 @@ KPPPInterface::SetDialOnDemand(bool dialOnDemand = true)
 	}
 	
 	// check if we need to set/unset flags
-	if(dialOnDemand) {
+	if(connectOnDemand) {
 		if(Ifnet())
 			Ifnet()->if_flags |= IFF_UP;
-	} else if(!dialOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
+	} else if(!connectOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
 		if(Ifnet())
 			Ifnet()->if_flags &= ~IFF_UP;
 	}
@@ -947,9 +947,9 @@ KPPPInterface::Up()
 	
 	ReportManager().EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
 	
-	// fUpThread/fRedialThread tells the state machine to go up (using a new thread
+	// fUpThread/fReconnectThread tells the state machine to go up (using a new thread
 	// because we might not receive report messages otherwise)
-	if(me == fUpThread || me == fRedialThread) {
+	if(me == fUpThread || me == fReconnectThread) {
 		if(fOpenEventThread != -1) {
 			int32 tmp;
 			wait_for_thread(fOpenEventThread, &tmp);
@@ -960,13 +960,13 @@ KPPPInterface::Up()
 	}
 	fLock.Unlock();
 	
-	if(me == fRedialThread && me != fUpThread)
+	if(me == fReconnectThread && me != fUpThread)
 		return true;
-			// the redial thread is doing a DialRetry in this case (fUpThread
+			// the reconnect thread is doing a ConnectRetry in this case (fUpThread
 			// is waiting for new reports)
 	
 	while(true) {
-		// A wrong code usually happens when the redial thread gets notified
+		// A wrong code usually happens when the reconnect thread gets notified
 		// of a Down() request. In that case a report will follow soon, so
 		// this can be ignored.
 		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
@@ -977,7 +977,7 @@ KPPPInterface::Up()
 		
 		if(IsUp()) {
 			if(me == fUpThread) {
-				fDialRetry = 0;
+				fConnectRetry = 0;
 				fUpThread = -1;
 			}
 			
@@ -987,7 +987,7 @@ KPPPInterface::Up()
 		
 		if(report.type == PPP_DESTRUCTION_REPORT) {
 			if(me == fUpThread) {
-				fDialRetry = 0;
+				fConnectRetry = 0;
 				fUpThread = -1;
 			}
 			
@@ -1003,10 +1003,10 @@ KPPPInterface::Up()
 			continue;
 		} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
 			if(me == fUpThread) {
-				fDialRetry = 0;
+				fConnectRetry = 0;
 				fUpThread = -1;
-				send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
-					// notify redial thread that we do not need it anymore
+				send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
+					// notify reconnect thread that we do not need it anymore
 			}
 			
 			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
@@ -1016,7 +1016,7 @@ KPPPInterface::Up()
 				|| report.code == PPP_REPORT_LOCAL_AUTHENTICATION_FAILED
 				|| report.code == PPP_REPORT_PEER_AUTHENTICATION_FAILED) {
 			if(me == fUpThread) {
-				fDialRetry = 0;
+				fConnectRetry = 0;
 				fUpThread = -1;
 				
 				if(report.code != PPP_REPORT_DOWN_SUCCESSFUL)
@@ -1030,7 +1030,7 @@ KPPPInterface::Up()
 		if(me != fUpThread) {
 			// I am an observer
 			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
-				if(fDialRetry >= fDialRetriesLimit || fUpThread == -1) {
+				if(fConnectRetry >= fConnectRetriesLimit || fUpThread == -1) {
 					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
 					return false;
 				} else {
@@ -1038,7 +1038,7 @@ KPPPInterface::Up()
 					continue;
 				}
 			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
-				if(DoesAutoRedial()) {
+				if(DoesAutoReconnect()) {
 					PPP_REPLY(sender, B_OK);
 					continue;
 				} else {
@@ -1049,10 +1049,10 @@ KPPPInterface::Up()
 		} else {
 			// I am the thread for the real task
 			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
-				if(fDialRetry >= fDialRetriesLimit) {
+				if(fConnectRetry >= fConnectRetriesLimit) {
 					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: >=maxretries!\n");
 					
-					fDialRetry = 0;
+					fConnectRetry = 0;
 					fUpThread = -1;
 					Delete();
 					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
@@ -1061,22 +1061,22 @@ KPPPInterface::Up()
 				} else {
 					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: <maxretries\n");
 					
-					++fDialRetry;
+					++fConnectRetry;
 					PPP_REPLY(sender, B_OK);
 					TRACE("KPPPInterface::Up(): DEVICE_UP_FAILED: replied\n");
-					Redial(DialRetryDelay());
+					Reconnect(ConnectRetryDelay());
 					continue;
 				}
 			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
 				// the state machine knows that we are going up and leaves
-				// the redial task to us
-				if(DoesAutoRedial() && fDialRetry < fDialRetriesLimit) {
-					++fDialRetry;
+				// the reconnect task to us
+				if(DoesAutoReconnect() && fConnectRetry < fConnectRetriesLimit) {
+					++fConnectRetry;
 					PPP_REPLY(sender, B_OK);
-					Redial(DialRetryDelay());
+					Reconnect(ConnectRetryDelay());
 					continue;
 				} else {
-					fDialRetry = 0;
+					fConnectRetry = 0;
 					fUpThread = -1;
 					Delete();
 					PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
@@ -1111,8 +1111,8 @@ KPPPInterface::Down()
 	else if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
 		return true;
 	
-	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
-		// the redial thread should be notified that the user wants to disconnect
+	send_data_with_timeout(fReconnectThread, 0, NULL, 0, 200);
+		// the reconnect thread should be notified that the user wants to disconnect
 	
 	// this locked section guarantees that there are no state changes before we
 	// enable the connection reports
@@ -1286,7 +1286,7 @@ KPPPInterface::IsAllowedToSend() const
 
 /*!	\brief Sends a packet to the device.
 	
-	This brings the interface up if dial-on-demand is enabled and we are not
+	This brings the interface up if connect-on-demand is enabled and we are not
 	connected. \n
 	PFC encoding is handled here.
 	
@@ -1313,8 +1313,8 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	}
 	
-	// go up if DialOnDemand enabled and we are down
-	if(protocolNumber != PPP_LCP_PROTOCOL && DoesDialOnDemand()
+	// go up if ConnectOnDemand enabled and we are down
+	if(protocolNumber != PPP_LCP_PROTOCOL && DoesConnectOnDemand()
 			&& (Phase() == PPP_DOWN_PHASE
 				|| Phase() == PPP_ESTABLISHMENT_PHASE)
 			&& !Up()) {
@@ -1549,7 +1549,7 @@ KPPPInterface::RegisterInterface()
 	if(!fIfnet)
 		return false;
 	
-	if(DoesDialOnDemand())
+	if(DoesConnectOnDemand())
 		fIfnet->if_flags |= IFF_UP;
 	
 	CalculateInterfaceMTU();
@@ -1714,38 +1714,38 @@ KPPPInterface::CalculateBaudRate()
 }
 
 
-//!	Redials. Waits a given delay (in miliseconds) before redialing.
+//!	Reconnects. Waits a given delay (in miliseconds) before reconnecting.
 void
-KPPPInterface::Redial(uint32 delay)
+KPPPInterface::Reconnect(uint32 delay)
 {
-	TRACE("KPPPInterface: Redial(%ld)\n", delay);
+	TRACE("KPPPInterface: Reconnect(%ld)\n", delay);
 	
-	if(fRedialThread != -1)
+	if(fReconnectThread != -1)
 		return;
 	
 	// start a new thread that calls our Up() method
-	redial_info info;
+	reconnect_info info;
 	info.interface = this;
-	info.thread = &fRedialThread;
+	info.thread = &fReconnectThread;
 	info.delay = delay;
 	
-	fRedialThread = spawn_kernel_thread(redial_thread, "KPPPInterface: redial_thread",
+	fReconnectThread = spawn_kernel_thread(reconnect_thread, "KPPPInterface: reconnect_thread",
 		B_NORMAL_PRIORITY, NULL);
 	
-	resume_thread(fRedialThread);
+	resume_thread(fReconnectThread);
 	
-	send_data(fRedialThread, 0, &info, sizeof(redial_info));
+	send_data(fReconnectThread, 0, &info, sizeof(reconnect_info));
 }
 
 
 status_t
-redial_thread(void *data)
+reconnect_thread(void *data)
 {
-	redial_info info;
+	reconnect_info info;
 	thread_id sender;
 	int32 code;
 	
-	receive_data(&sender, &info, sizeof(redial_info));
+	receive_data(&sender, &info, sizeof(reconnect_info));
 	
 	// we try to receive data instead of snooze, so we can quit on destruction
 	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {

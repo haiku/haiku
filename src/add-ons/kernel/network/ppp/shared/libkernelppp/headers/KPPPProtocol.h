@@ -86,7 +86,7 @@ class KPPPProtocol : public KPPPLayer {
 		/*!	\brief Bring this protocol down.
 			
 			You must call DownStarted() from here. \n
-			If DialOnDemand is supported check for DialOnDemand settings change.
+			If ConnectOnDemand is supported check for ConnectOnDemand settings change.
 		*/
 		virtual bool Down() = 0;
 		//!	Is this protocol up?

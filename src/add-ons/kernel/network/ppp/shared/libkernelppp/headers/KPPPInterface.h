@@ -82,12 +82,12 @@ class KPPPInterface : public KPPPLayer {
 		struct ifnet *Ifnet() const
 			{ return fIfnet; }
 		
-		//!	Delay in miliseconds between a dial retry.
-		uint32 DialRetryDelay() const
-			{ return fDialRetryDelay; }
-		//!	Delay in miliseconds to wait until redialing.
-		uint32 RedialDelay() const
-			{ return fRedialDelay; }
+		//!	Delay in miliseconds between a connect retry.
+		uint32 ConnectRetryDelay() const
+			{ return fConnectRetryDelay; }
+		//!	Delay in miliseconds to wait until reconnecting.
+		uint32 ReconnectDelay() const
+			{ return fReconnectDelay; }
 		
 		//!	Used for reporting that a packet was send/received (updates idle time).
 		void UpdateIdleSince()
@@ -143,15 +143,15 @@ class KPPPInterface : public KPPPLayer {
 		bool IsMultilink() const
 			{ return fIsMultilink; }
 		
-		void SetAutoRedial(bool autoRedial = true);
-		//!	Returns whether this interface redials automatically.
-		bool DoesAutoRedial() const
-			{ return fAutoRedial; }
+		void SetAutoReconnect(bool autoReconnect = true);
+		//!	Returns whether this interface reconnects automatically.
+		bool DoesAutoReconnect() const
+			{ return fAutoReconnect; }
 		
-		void SetDialOnDemand(bool dialOnDemand = true);
-		//!	Returns whether dial-on-demand (auto-dial) is enabled.
-		bool DoesDialOnDemand() const
-			{ return fDialOnDemand; }
+		void SetConnectOnDemand(bool connectOnDemand = true);
+		//!	Returns whether connect-on-demand (auto-connect) is enabled.
+		bool DoesConnectOnDemand() const
+			{ return fConnectOnDemand; }
 		
 		//!	Clients are in \c PPP_CLIENT_MODE and servers are in \c PPP_SERVER_MODE.
 		ppp_mode Mode() const
@@ -241,7 +241,7 @@ class KPPPInterface : public KPPPLayer {
 		void CallCloseEvent()
 			{ StateMachine().CloseEvent(); }
 		
-		void Redial(uint32 delay);
+		void Reconnect(uint32 delay);
 		
 		// multilink methods
 		//!	Set the parent of this interface.
@@ -256,9 +256,9 @@ class KPPPInterface : public KPPPLayer {
 		
 		thread_id fUpThread, fOpenEventThread, fCloseEventThread;
 		
-		thread_id fRedialThread;
-		uint32 fDialRetry, fDialRetriesLimit;
-		uint32 fDialRetryDelay, fRedialDelay;
+		thread_id fReconnectThread;
+		uint32 fConnectRetry, fConnectRetriesLimit;
+		uint32 fConnectRetryDelay, fReconnectDelay;
 		
 		ppp_interface_module_info *fManager;
 		
@@ -270,7 +270,7 @@ class KPPPInterface : public KPPPLayer {
 		TemplateList<KPPPInterface*> fChildren;
 		bool fIsMultilink;
 		
-		bool fAutoRedial, fDialOnDemand;
+		bool fAutoReconnect, fConnectOnDemand;
 		
 		ppp_mode fMode;
 		ppp_pfc_state fLocalPFCState, fPeerPFCState;

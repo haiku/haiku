@@ -424,7 +424,7 @@ IPCP::UpdateAddresses()
 {
 	RemoveRoutes();
 	
-	if(State() != PPP_OPENED_STATE && !Interface().DoesDialOnDemand())
+	if(State() != PPP_OPENED_STATE && !Interface().DoesConnectOnDemand())
 		return;
 	
 	struct in_aliasreq inreq;

@@ -671,7 +671,7 @@ KPPPStateMachine::DownEvent()
 		
 		case PPP_STOPPED_STATE:
 			// The RFC says we should reconnect, but our implementation
-			// will only do this if auto-redial is enabled (only clients).
+			// will only do this if auto-reconnect is enabled (only clients).
 			NewState(PPP_STARTING_STATE);
 		break;
 		
@@ -692,11 +692,11 @@ KPPPStateMachine::DownEvent()
 	
 	DownProtocols();
 	
-	// maybe we need to redial
+	// maybe we need to reconnect
 	if(State() == PPP_STARTING_STATE) {
-		bool needsRedial = false;
+		bool needsReconnect = false;
 		
-		// we do not try to redial if authentication failed
+		// we do not try to reconnect if authentication failed
 		if(fLocalAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
@@ -708,10 +708,10 @@ KPPPStateMachine::DownEvent()
 				PPP_REPORT_PEER_AUTHENTICATION_FAILED, &fInterface.fID,
 				sizeof(ppp_interface_id));
 		else {
-			// if we are going up and lost connection the redial attempt becomes
-			// a dial retry which is managed by the main thread in Interface::Up()
+			// if we are going up and lost connection the reconnect attempt becomes
+			// a connect retry which is managed by the main thread in Interface::Up()
 			if(Interface().fUpThread == -1)
-				needsRedial = true;
+				needsReconnect = true;
 			
 			// test if UpFailedEvent() was not called
 			if(oldPhase != PPP_DOWN_PHASE)
@@ -724,9 +724,9 @@ KPPPStateMachine::DownEvent()
 		
 		NewState(PPP_INITIAL_STATE);
 		
-		if(Interface().DoesAutoRedial()) {
-			if(needsRedial)
-				Interface().Redial(Interface().RedialDelay());
+		if(Interface().DoesAutoReconnect()) {
+			if(needsReconnect)
+				Interface().Reconnect(Interface().ReconnectDelay());
 		} else
 			Interface().Delete();
 	} else {

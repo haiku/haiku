@@ -22,7 +22,7 @@ class PPPoEDevice;
 #define PPPoE_TIMEOUT			3000000
 	// 3 seconds
 #define PPPoE_MAX_ATTEMPTS		2
-	// maximum number of PPPoE's dial-retries
+	// maximum number of PPPoE's connect-retries
 
 #define PPPoE_VERSION			0x1
 #define PPPoE_TYPE				0x1
