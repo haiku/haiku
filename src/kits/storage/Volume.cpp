@@ -289,29 +289,15 @@ BVolume::SetName(const char *name)
 status_t
 BVolume::GetIcon(BBitmap *icon, icon_size which) const
 {
-	// check parameter and initialization
-	status_t error = (icon && InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
-	BRect rect;
-	if (error == B_OK) {
-		if (which == B_MINI_ICON)
-			rect.Set(0, 0, 15, 15);
-		else if (which == B_LARGE_ICON)
-			rect.Set(0, 0, 31, 31);
-		else
-			error = B_BAD_VALUE;
-	}
-	// check whether icon size and bitmap dimensions do match
-	if (error == B_OK
-		&& (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)) {
-		error = B_BAD_VALUE;
-	}
+	// check initialization
+	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
 	// get FS stat
 	fs_info info;
 	if (error == B_OK && fs_stat_dev(fDevice, &info) != 0)
 		error = errno;
 	// get the icon
 	if (error == B_OK)
-		error = get_device_icon(info.device_name, icon->Bits(), which);
+		error = get_device_icon(info.device_name, icon, which);
 	return error;
 }
 

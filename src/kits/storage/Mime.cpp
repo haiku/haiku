@@ -9,6 +9,7 @@
 
 #include <fs_attr.h>
 #include <fs_info.h>
+#include <Bitmap.h>
 #include <Drivers.h>
 #include <Entry.h>
 #include <Mime.h>
@@ -161,26 +162,45 @@ get_device_icon(const char *dev, void *icon, int32 size)
 	return err;	
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// get_device_icon
+/*!	Retrieves an icon associated with a given device.
+	\param dev The path to the device.
+	\param icon A pointer to a pre-allocated BBitmap of the correct dimension
+		   to store the requested icon (16x16 for the mini and 32x32 for the
+		   large icon).
+	\param which Specifies the size of the icon to be retrieved:
+		   \c B_MINI_ICON for the mini and \c B_LARGE_ICON for the large icon.
+	            
+	\todo The mounted directories for volumes can also have META:X:STD_ICON
+		  attributes. Should those attributes override the icon returned
+		  by ioctl(,B_GET_ICON,)?
+		  
+	\return
+	- \c B_OK: Everything went fine.
+	- An error code otherwise.
+*/
+status_t
+get_device_icon(const char *dev, BBitmap *icon, icon_size which)
+{
+	// check parameters
+	status_t error = (dev && icon ? B_OK : B_BAD_VALUE);
+	BRect rect;
+	if (error == B_OK) {
+		if (which == B_MINI_ICON)
+			rect.Set(0, 0, 15, 15);
+		else if (which == B_LARGE_ICON)
+			rect.Set(0, 0, 31, 31);
+		else
+			error = B_BAD_VALUE;
+	}
+	// check whether icon size and bitmap dimensions do match
+	if (error == B_OK
+		&& (icon->Bounds() != rect || icon->ColorSpace() != B_CMAP8)) {
+		error = B_BAD_VALUE;
+	}
+	// get the icon
+	if (error == B_OK)
+		error = get_device_icon(dev, icon->Bits(), which);
+	return error;
+}
 
