@@ -871,7 +871,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	bool end = false;
 	bool exec = true;
 	uint8 index, byte, byte2, safe;
-	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32;
+	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
 
@@ -882,6 +882,50 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 		//fixme: complete (if possible) ...
 		switch (rom[adress])
 		{
+		case 0x32: /* new */
+//fixme:
+			*size -= 11;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			byte2 = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			size32 = ((*((uint8*)(&(rom[adress])))) << 2);
+			adress += 1;
+			reg2 = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
+				index, reg, and_out, byte2));
+			LOG(8,("INFO: (cont.) RD 32bit data from subtable with size $%04x, at offset (result << 2),\n",
+				size32));
+			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
+			if (exec && reg2)
+			{
+				safe = ISARB(reg);
+				ISAWB(reg, index);
+				byte = ISARB(reg + 1);
+				ISAWB(reg, safe);
+				byte &= (uint8)and_out;
+				byte >>= byte2;
+				offset32 = (byte << 2);
+				data = *((uint32*)(&(rom[(adress + offset32)])));
+				NV_REG32(reg2) = data;
+			}
+			adress += size32;
+			break;
 		case 0x37: /* new */
 			*size -= 11;
 			if (*size < 0)
@@ -906,7 +950,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			and_out2 = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			LOG(8,("cmd 'RD 32bit reg $%08x, rotate-right = $%02x, AND-out lsb = $%02x,\n",
+			LOG(8,("cmd 'RD 32bit reg $%08x, shift-right = $%02x, AND-out lsb = $%02x,\n",
 				reg, byte2, and_out));
 			LOG(8,("INFO: (cont.) RD 8bit ISA reg $%02x via $%04x, AND-out = $%02x, OR-in lsb result 32bit, WR-bk'\n",
 				index, reg2, and_out2));
