@@ -6,6 +6,7 @@ KernelMergeObject posix_time.o :
 	<$(SOURCE_GRIST)>difftime.c
 	<$(SOURCE_GRIST)>localtime.c
 	<$(SOURCE_GRIST)>mktime.c
+	<$(SOURCE_GRIST)>strftime.cpp
 	<$(SOURCE_GRIST)>time.c
 	:
 	-fPIC -DPIC
