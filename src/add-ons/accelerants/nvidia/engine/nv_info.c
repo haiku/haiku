@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-9/2004
+   Rudolf Cornelissen 7/2003-10/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -886,7 +886,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	bool exec = true;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
-	LOG(8,("INFO: ---Executing following command(s):'\n"));
+	LOG(8,("INFO: ---Executing following command(s):\n"));
 
 	return exec_type2_script_mode(rom, &adress, size, tabs, ram_tab, &exec);
 }
@@ -1160,11 +1160,17 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			size32 = *((uint8*)(&(rom[*adress])));
 			if (!size32) size32 = 256;
 			*adress += 1;
-//fix log and doublecheck exe
-			LOG(8,("cmd 'blabla'\n"));
+			LOG(8,("cmd 'do following cmd structure $%03x time(s)':\n", size32));
 			for (index = 0; index < size32; index++)
 			{
-				LOG(8,("INFO (cont.) blabla\n"));
+				or_in2 = *((uint8*)(&(rom[*adress])));
+				*adress += 1;
+				data2 = *((uint8*)(&(rom[*adress])));
+				*adress += 1;
+				LOG(8,("INFO (cont.) (#$%02x) cmd 'WR 32bit reg $%08x = $%08x, RD 32bit reg $%08x,\n",
+					index, reg2, data2, reg));
+				LOG(8,("INFO (cont.) AND-out $%08x, OR-in $%08x, OR-in $%08x, WR-bk'\n",
+					and_out, or_in, or_in2));
 			}
 			if (*exec)
 			{
