@@ -13,6 +13,7 @@
  */
 #include <Messenger.h>
 #include <MediaNode.h>
+#define DEBUG 1
 #include "debug.h"
 #include "DataExchange.h"
 #include "Notifications.h"

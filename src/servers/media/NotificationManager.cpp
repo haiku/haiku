@@ -1,9 +1,14 @@
+/* 
+ * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <OS.h>
 #include <Locker.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <MediaNode.h>
 #include <Debug.h>
+#include "debug.h"
 #include "NodeManager.h"
 #include "DataExchange.h"
 #include "Notifications.h"
@@ -64,6 +69,8 @@ NotificationManager::RequestNotifications(BMessage *msg)
 	n.node = *node;
 	n.what = what;
 	n.team = team;
+	
+	TRACE("NotificationManager::RequestNotifications node %ld, team %ld, what %#lx\n",node->node, team, what);
 
 	fLocker->Lock();
 	fNotificationList->Insert(n);
@@ -90,6 +97,8 @@ NotificationManager::CancelNotifications(BMessage *msg)
 	msg->FindInt32(NOTIFICATION_PARAM_WHAT, &what);
 	msg->FindData("node", B_RAW_TYPE, reinterpret_cast<const void **>(&node), &nodesize);
 	ASSERT(nodesize == sizeof(media_node));
+
+	TRACE("NotificationManager::CancelNotifications node %ld, team %ld, what %#lx\n",node->node, team, what);
 	
 	/* if 		what == B_MEDIA_WILDCARD && node == media_node::null
 	 *		=> delete all notifications for the matching team & messenger 
@@ -141,6 +150,8 @@ NotificationManager::SendNotifications(BMessage *msg)
 	msg->RemoveName(NOTIFICATION_PARAM_WHAT);
 	msg->what = what;
 
+	TRACE("NotificationManager::SendNotifications what %#lx\n", what);
+
 	fLocker->Lock();
 
 	Notification n;
@@ -182,6 +193,7 @@ NotificationManager::SendNotifications(BMessage *msg)
 				break;
 		}
 
+		TRACE("NotificationManager::SendNotifications sending\n");
 		n.messenger.SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
 	}
 
@@ -191,6 +203,7 @@ NotificationManager::SendNotifications(BMessage *msg)
 void
 NotificationManager::CleanupTeam(team_id team)
 {
+	TRACE("NotificationManager::CleanupTeam team %ld\n", team);
 	fLocker->Lock();
 
 	Notification n;

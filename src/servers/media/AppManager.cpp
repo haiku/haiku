@@ -1,3 +1,7 @@
+/* 
+ * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <OS.h>
 #include <Messenger.h>
 #include <Autolock.h>

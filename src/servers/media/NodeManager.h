@@ -1,7 +1,26 @@
+/* 
+ * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include "TList.h"
 #include "TMap.h"
 #include "TStack.h"
 #include "DataExchange.h"
+
+struct registered_node
+{
+	media_node_id nodeid;
+	media_addon_id addon_id;
+	int32 addon_flavor_id;
+	char name[B_MEDIA_NAME_LENGTH];
+	uint64 kinds;
+	port_id port;
+	team_id team;
+	int32 globalrefcount;
+	Map<team_id, int32> teamrefcount;
+	List<media_input> inputlist;
+	List<media_output> outputlist;
+};
 
 class BufferManager;
 
@@ -21,9 +40,7 @@ public:
 	status_t FindNodesFor(long, long, BMessage &, char const *);
 	status_t FindNodesForPort(long, BMessage &, char const *);
 	status_t UnregisterTeamNodes(long, BMessage &, char const *, long *, BufferManager *);
-	status_t IncrementGlobalRefCount(long);
 	status_t DumpGlobalReferences(BMessage &, char const *);
-	status_t DecrementGlobalRefCount(long, BMessage *);
 	status_t BroadcastMessage(long, void *, long, long long);
 	status_t LoadState();
 	status_t SaveState();
@@ -41,6 +58,8 @@ public:
 	status_t GetInstances(media_node_id *node_ids, int32* count, int32 maxcount, media_addon_id addon_id, int32 addon_flavor_id);
 	status_t GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, const media_format *inputformat = NULL, const media_format *outputformat = NULL, const char* name = NULL, uint64 require_kinds = 0);
 	status_t GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node);
+	status_t IncrementGlobalRefCount(media_node_id nodeid, team_id team);
+	status_t DecrementGlobalRefCount(media_node_id nodeid, team_id team);
 
 	/* Add media_node_id of all live nodes to the message
 	 * int32 "media_node_id" (multiple items)
@@ -66,7 +85,9 @@ public:
 
 private:
 	media_addon_id nextaddonid;
+	media_node_id nextnodeid;
 	
 	List<dormant_flavor_info> *fDormantFlavorList;
 	Map<media_addon_id,entry_ref> *fAddonPathMap;
+	Map<media_node_id,registered_node> *fRegisteredNodeMap;
 };

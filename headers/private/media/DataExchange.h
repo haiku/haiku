@@ -39,7 +39,7 @@ struct request_data
 {
 	port_id reply_port;
 
-	void SendReply(status_t result, reply_data *reply, int replysize) const;
+	status_t SendReply(status_t result, reply_data *reply, int replysize) const;
 };
 
 // The base struct used for all raw replys
@@ -233,8 +233,8 @@ struct server_publish_inputs_request : public request_data
 	media_node node;
 	int32 count;
 	area_id area;	// if count > MAX_INPUTS, inputs are in the area
-					// area is created in the server, and also deleted
-					// in the server after the reply has been received
+					// area is created in the library, and also deleted
+					// in the library after the reply has been received
 	media_input inputs[MAX_INPUTS];
 };
 
@@ -247,6 +247,8 @@ struct server_publish_outputs_request : public request_data
 	media_node node;
 	int32 count;
 	area_id area; // if count > MAX_OUTPUTS, outputs are in the area
+					// area is created in the library, and also deleted
+					// in the library after the reply has been received
 	media_output outputs[MAX_OUTPUTS];
 };
 
@@ -366,7 +368,7 @@ struct server_get_live_nodes_reply : public reply_data
 {
 	int32 count;
 	area_id area; 	// if count > MAX_LIVE_INFO, live_node_infos are in the area
-					// area is created in the server, but deleted in the application
+					// area is created in the server, but deleted in the library
 	live_node_info live_info[MAX_LIVE_INFO]; 
 };
 

@@ -32,6 +32,10 @@ public:
 		MediaServerMessenger = new BMessenger(NEW_MEDIA_SERVER_SIGNATURE);
 		MediaServerPort = find_port("media_server port");
 		MediaAddonServerPort = find_port("media_addon_server port");
+		
+		thread_info info; 
+		get_thread_info(find_thread(NULL), &info); 
+		team = info.team; 
 	}
 	~initit()
 	{

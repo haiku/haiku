@@ -59,7 +59,7 @@ Queue::AddItem(void *item)
 	if (fSem < 0) {
 		rv = B_ERROR;
 	} else {
-		if (B_OK == fList->AddItem(item)) {
+		if (fList->AddItem(item)) { // AddItem returns a bool
 			release_sem(fSem);
 			rv = B_OK;
 		} else {

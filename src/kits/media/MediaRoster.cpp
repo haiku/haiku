@@ -17,6 +17,7 @@
 #include "debug.h"
 #include "TStack.h"
 #include "PortPool.h"
+#include "SystemTimeSource.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
@@ -432,8 +433,8 @@ BMediaRoster::ReleaseNode(const media_node & node)
 BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
-	UNIMPLEMENTED();
-	return 0;
+	BROKEN();
+	return new _SysTimeSource(); // XXX fix this
 }
 
 
@@ -867,7 +868,7 @@ BMediaRoster::GetLiveNodeInfo(const media_node & node,
 	
 	request.node = node;
 	
-	rv = QueryAddonServer(SERVER_GET_LIVE_NODE_INFO, &request, sizeof(request), &reply, sizeof(reply));
+	rv = QueryServer(SERVER_GET_LIVE_NODE_INFO, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK)
 		return rv;
 	
@@ -915,6 +916,7 @@ BMediaRoster::GetLiveNodes(live_node_info * out_live_nodes,
 	rv = QueryServer(SERVER_GET_LIVE_NODES, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
 		TRACE("BMediaRoster::GetLiveNodes failed\n");
+		*io_total_count = 0;
 		return rv;
 	}
 
@@ -926,6 +928,7 @@ BMediaRoster::GetLiveNodes(live_node_info * out_live_nodes,
 		if (clone < B_OK) {
 			TRACE("BMediaRoster::GetLiveNodes failed to clone area, %#lx\n", clone);
 			delete_area(reply.area);
+			*io_total_count = 0;
 			return B_ERROR;
 		}
 
@@ -963,11 +966,12 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 	media_input *input;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllInputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != input->format.type)
 			continue; // media_type used, but doesn't match
@@ -1001,11 +1005,12 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 	media_input *input;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllInputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
 		if (input->source == media_source::null)
 			continue; // consumer source not connected
@@ -1037,11 +1042,12 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 	media_input *input;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllInputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
 		out_inputs[i] = *input;
 		*out_total_count += 1;
@@ -1072,11 +1078,12 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 	media_output *output;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllOutputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != output->format.type)
 			continue; // media_type used, but doesn't match
@@ -1110,11 +1117,12 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 	media_output *output;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllOutputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
 		if (output->destination == media_destination::null)
 			continue; // producer destination not connected
@@ -1146,11 +1154,12 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 	media_output *output;
 	status_t rv;
 
+	*out_total_count = 0;
+
 	rv = GetAllOutputs(node, &stack);
 	if (B_OK != rv)
 		return rv;
 
-	*out_total_count = 0;
 	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
 		out_outputs[i] = *output;
 		*out_total_count += 1;
@@ -1282,6 +1291,8 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	request.kinds = node->Kinds();
 	request.port = node->ControlPort();
 	request.team = team;
+
+	TRACE("BMediaRoster::RegisterNode: sending SERVER_REGISTER_NODE: port %ld, kinds %#Lx, team %ld, name '%s'\n", request.port, request.kinds, request.team, request.name);
 	
 	rv = QueryServer(SERVER_REGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
@@ -1294,8 +1305,12 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	ASSERT(reply.nodeid == node->Node().node);
 	ASSERT(reply.nodeid == node->ID());
 
+	TRACE("BMediaRoster::RegisterNode: before callback: port %ld, name '%s'\n", node->ControlPort(), node->Name());
+
 	// call the callback
 	node->NodeRegistered();
+
+	TRACE("BMediaRoster::RegisterNode: after callback: port %ld, name '%s'\n", node->ControlPort(), node->Name());
 
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
@@ -1309,6 +1324,8 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 		if (B_OK == GetAllInputs(node->Node(), &stack))
 			PublishInputs(node->Node(), &stack);
 	}
+	BPrivate::media::notifications::NodesCreated(&reply.nodeid, 1);
+
 
 	TRACE("BMediaRoster::RegisterNode: registered node %s, id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
 
@@ -1339,6 +1356,9 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 	request.nodeid = node->ID();
 	request.team = team;
 
+	// send a notification
+	BPrivate::media::notifications::NodesDeleted(&request.nodeid, 1);
+
 	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
 		TRACE("BMediaRoster::UnregisterNode: failed to unregister node %s (error %#lx)\n", node->Name(), rv);
@@ -1348,7 +1368,7 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 	if (reply.addon_id != -1)
 		_DormantNodeManager->PutAddon(reply.addon_id);
 
-	// we are a friend class of BMediaNode and initilize this member variable
+	// we are a friend class of BMediaNode and invalidate this member variable
 	node->fNodeID = -2;
 	
 	return B_OK;
@@ -1559,7 +1579,9 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		printf("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
 		return B_ERROR;
 	}
-	flavor_info temp;
+	flavor_info temp; // XXX fix this!
+	temp.name = "XXX flavor_info name";
+	temp.info = "XXX flavor_info info";
 	temp.internal_id = in_info.flavor_id;
 	node = addon->InstantiateNodeFor(&temp, &config, &out_error);
 	if (!node) {
@@ -1601,7 +1623,7 @@ BMediaRoster::GetDormantNodeFor(const media_node & node,
 	
 	request.node = node;
 	
-	rv = QueryAddonServer(SERVER_GET_DORMANT_NODE_FOR, &request, sizeof(request), &reply, sizeof(reply));
+	rv = QueryServer(SERVER_GET_DORMANT_NODE_FOR, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK)
 		return rv;
 	

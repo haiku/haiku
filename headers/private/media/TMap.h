@@ -6,7 +6,7 @@ template<class key, class value> class Map
 public:
 	Map() : count(0) {}
 	
-	void Insert(const key &k, const value &v)
+	bool Insert(const key &k, const value &v)
 	{
 		value temp;
 		if (count == MAXENT) debugger("template Map out of memory");
@@ -14,6 +14,7 @@ public:
 		list[count].k = k;
 		list[count].v = v;
 		count++;
+		return true;
 	}
 
 	bool Get(const key &k, value *v)

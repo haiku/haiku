@@ -1,3 +1,7 @@
+/* 
+ * Copyright 2002, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <MediaDefs.h>
 #include <Autolock.h>
 #include "BufferManager.h"

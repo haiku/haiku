@@ -22,6 +22,14 @@ public:
 		*v = list[index];
 		return true;
 	}
+
+	bool GetPointerAt(int32 index, value **v)
+	{
+		if (index < 0 || index >= count) 
+			return false;
+		*v = &list[index];
+		return true;
+	}
 	
 	// you can't Remove() while iterating through the map using GetAt()
 	bool Remove(int32 index) 
@@ -32,6 +40,11 @@ public:
 		if (count > 0)
 			list[index] = list[count];
 		return true;
+	}
+	
+	void MakeEmpty()
+	{
+		count = 0;
 	}
 
 private:
