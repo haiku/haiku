@@ -1607,7 +1607,7 @@ rule UnarchiveObjects
 actions UnarchiveObjects
 {
 	cd $(1[1]:D)
-	ar -x "$(2)" $(1:D=)
+	ar -x "$(2)" $(1:BS)
 	cd -
 }
 
