@@ -49,6 +49,10 @@ const uint32 MENU_LOC_DELETE_CURRENT = 'MLDl';
 const uint32 TEST_BOX_1 = 'Tb1';
 const uint32 TEST_BOX_2 = 'Tb2';
 
+const uint32 ADD_NEW_CONNECTION = 'adnc';
+
+//const char *kConnectionName = "ConnectionName";
+
 struct last_active { int x;int y;};
 class DUNView; 
 

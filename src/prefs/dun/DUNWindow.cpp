@@ -2,15 +2,18 @@
 
 DUNWindow - DialUp Networking BWindow
 
-Authors: Sikosis (beos@gravity24hr.com)
+Authors: Sikosis (phil@sikosis.com)
 		 Misza (misza@ihug.com.au) 
 
-(C) 2002-2003 OpenBeOS under MIT license
+(C) 2002-2004 OpenBeOS under MIT license
 
 */
 /*-----WARNING MESSY CODE AHEAD :-)------*/
+
+#include <String.h>
 #include "DUNWindow.h"
 #include "NewConnectionWindow.h"
+
 
 // Add these to Constants file
 const int DUN_WINDOW_STATE_DEFAULT = 0;  // default - closed
@@ -28,7 +31,9 @@ float ModemFormHeightDefault = 324;
 BRect windowRectModem(ModemFormTopDefault,ModemFormLeftDefault,ModemFormLeftDefault+ModemFormWidthDefault,ModemFormTopDefault+ModemFormHeightDefault);
 
 // DUNWindow -- constructor for DUNWindow Class
-DUNWindow::DUNWindow(BRect frame) : BWindow (frame, "OBOS Dial-up Networking", B_TITLED_WINDOW, B_NOT_RESIZABLE |B_NOT_ZOOMABLE, 0) {
+DUNWindow::DUNWindow(BRect frame) : BWindow (frame, "OBOS Dial-up Networking", B_TITLED_WINDOW,
+															 B_NOT_RESIZABLE |B_NOT_ZOOMABLE, 0)
+{
    InitWindow();
    Show();
 }
@@ -356,7 +361,7 @@ void DUNWindow::MessageReceived (BMessage *message)
     		errormsg->Go();
 		}	
 			break;
-
+		
 		case BTN_DISCONNECT:
 		{
    	    	disconnectbutton->SetEnabled(false);
@@ -401,22 +406,35 @@ void DUNWindow::MessageReceived (BMessage *message)
 
 	   	case MENU_CON_NEW:
 	   	{
+	   		// open new connection window
 	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,260,73));
 	   	}
 	   		break;
 
    	    case BTN_MODEM:
   	   	{	
+  	   		// open modem window
   	   		modemWindow = new ModemWindow(windowRectModem);
 	   	}
 	   	    break;	
 	   	    
   	    case BTN_SETTINGS:
   	    {
+  	    	// open settings window
   	   		settingsWindow = new SettingsWindow(BRect(367.0, 268.0, 657.0, 500.0));
   	   	}	
  	 	    break;
- 	 	    
+ 	 	
+ 	 	case ADD_NEW_CONNECTION:
+ 	 	{
+ 	 		// add and set our new connection
+ 	 		BString fConnectionName;
+			message->FindString("ConnectionName", &fConnectionName);
+			printf("ConnectionName = %s\n",fConnectionName.String());
+ 	 		// add to dropdown
+ 	 		// set as current item with tick
+ 	 	}
+ 	 		break;    
         default:
         {
 			BWindow::MessageReceived(message);

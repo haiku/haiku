@@ -22,7 +22,7 @@ public:
    DUN();
    virtual void MessageReceived(BMessage *message);
 private:
-	DUNWindow* dunWindow;
+	DUNWindow*	 ptrDUNWindow;
 };
 
 #endif

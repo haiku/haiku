@@ -2,9 +2,9 @@
 
 NewConnectionWindow - DialUp Networking
 
-Author: Sikosis (beos@gravity24hr.com)
+Author: Sikosis (phil@sikosis.com)
 
-(C) 2002 OpenBeOS under MIT license
+(C)2002-2004 OpenBeOS under MIT license
 
 */
 
@@ -22,6 +22,7 @@ Author: Sikosis (beos@gravity24hr.com)
 #include <Window.h>
 #include <View.h>
 
+#include "DUNWindow.h"
 #include "NewConnectionWindow.h"
 #include "DUNView.h"
 
@@ -101,20 +102,21 @@ void NewConnectionWindow::MessageReceived (BMessage *message)
 	switch(message->what)
 	{
 		case BTN_ADD:
-			char tmp[256];
-			sprintf(tmp,"%s",txtNewConnection->Text());
-			(new BAlert("",tmp,"tmp"))->Go();
-			
-			// need to create a new file called txtNewConnection->Text() and
-			// place it in the /boot/home/config/settings/DUN/DUNCONNECT directory
-			
+			{
+			// Send Messages to DUNWindow to Add New Connectionupdate
+			BWindow *ptrDUNWindow;
+			ptrDUNWindow = be_app->WindowAt(0); // its the first window
+			BMessage msg(ADD_NEW_CONNECTION);
+			msg.AddString("ConnectionName", txtNewConnection->Text());
+			BMessenger(ptrDUNWindow).SendMessage(&msg);
+
 			// before closing we need to change the main window to state 1
-						
+
 			Quit();
+			}
 			break;
 		case BTN_CANCEL:
 		    Quit();
-			//Hide(); // change later 
 			break;
 		default:
 			BWindow::MessageReceived(message);

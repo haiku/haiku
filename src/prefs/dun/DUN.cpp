@@ -43,18 +43,19 @@ float FormHeightState2 = 282;
 
 BRect windowRect(FormTopDefault,FormLeftDefault,FormLeftDefault+FormWidthDefault,FormTopDefault+FormHeightDefault);
 
-
-
 // DUN -- constructor for DUN Class
-DUN::DUN() : BApplication (APP_SIGNATURE) {
-    dunWindow = new DUNWindow(windowRect);
+DUN::DUN() : BApplication (APP_SIGNATURE)
+{
+    ptrDUNWindow = new DUNWindow(windowRect);
 }
 // ------------------------------------------------------------------------------- //
 
 
 // DUN::MessageReceived -- handles incoming messages
-void DUN::MessageReceived (BMessage *message) {
-	switch(message->what) {
+void DUN::MessageReceived (BMessage *message)
+{
+	switch(message->what)
+	{
     	default:
         	BApplication::MessageReceived(message); // pass it along ... 
          	break;
@@ -63,9 +64,12 @@ void DUN::MessageReceived (BMessage *message) {
 // ------------------------------------------------------------------------------- //
 
 // DUN Main
-int main(void) {
+int main(void)
+{
 	DUN theApp;
 	theApp.Run();
 	return 0;
 }
 // end
+
+
