@@ -1,0 +1,42 @@
+SubDir OBOS_TOP src add-ons kernel drivers network bcm570x ;
+
+SubDirCcFlags -w -DINCLUDE_TBI_SUPPORT=1 ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+R5KernelAddon bcm570x : kernel drivers bin :
+	autoneg.c
+	b57um.c
+	tigon3.c
+	mempool.c
+	;
+
+Package haiku-networkingkit-cvs :
+	bcm570x :
+	boot home config add-ons kernel drivers bin ;
+Package haiku-networkingkit-cvs :
+	<kernel!drivers!dev!net>bcm570x :
+	boot home config add-ons kernel drivers dev net ;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>bcm570x ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : bcm570x ;
+}
+
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	bcm570x 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>bcm570x : 
+	installed-symlink 
+;
+
