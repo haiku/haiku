@@ -620,7 +620,31 @@ void RootLayer::SetActiveWorkspace(Workspace *ws)
 	if (fActiveWorkspace == ws || !ws)
 		return;
 	
+	int32 index;
+	WinBorder *winborder;
+	
+	// Notify windows in current workspace of change
+	if(fActiveWorkspace)
+	{
+		index=fWorkspaceList.IndexOf(fActiveWorkspace);
+		winborder=fActiveWorkspace->GoToTopItem();
+		while(winborder)
+		{
+			winborder->Window()->WorkspaceActivated(index,false);
+			winborder=(WinBorder*)winborder->fLowerSibling;
+		}
+	}
+	
 	fActiveWorkspace	= ws;
+	
+	// Notify windows in new workspace of change
+	index=fWorkspaceList.IndexOf(fActiveWorkspace);
+	winborder=fActiveWorkspace->GoToTopItem();
+	while(winborder)
+	{
+		winborder->Window()->WorkspaceActivated(index,true);
+		winborder=(WinBorder*)winborder->fLowerSibling;
+	}
 }
 
 int32 RootLayer::ActiveWorkspaceIndex() const{

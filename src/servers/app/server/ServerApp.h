@@ -66,8 +66,7 @@ public:
 	void Activate(bool value);
 	bool PingTarget(void);
 	
-	void PostMessage(int32 code, size_t size=0,int8 *buffer=NULL);
-/*	void WindowBroadcast(int32 code); */
+	void PostMessage(int32 code);
 	
 	void SendMessageToClient( const BMessage* msg ) const;
 	void SetAppCursor(void);

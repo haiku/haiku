@@ -49,7 +49,7 @@
 #include "Desktop.h"
 
 //#define DEBUG_KEYHANDLING
-//#define DEBUG_SERVER
+#define DEBUG_SERVER
 
 #ifdef DEBUG_KEYHANDLING
 #	include <stdio.h>
@@ -785,7 +785,7 @@ void AppServer::Broadcast(int32 code)
 		app=(ServerApp*)fAppList->ItemAt(i);
 		if(!app)
 			{ printf("PANIC in AppServer::Broadcast()\n"); continue; }
-		app->PostMessage(code, sizeof(int32), (int8*)&code);
+		app->PostMessage(code);
 	}
 	release_sem(fAppListLock);
 }

@@ -42,7 +42,9 @@
 #include "Desktop.h"
 #include "DisplayDriver.h"
 #include "FontServer.h"
+#include "RootLayer.h"
 #include "ServerApp.h"
+#include "ServerScreen.h"
 #include "ServerWindow.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
@@ -120,50 +122,6 @@ ServerApp::~ServerApp(void)
 	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
 	int32 i;
 	
-//	WindowBroadcast(AS_QUIT_APP);
-	
-// TODO: wait for our ServerWindow threads.
-/*
-	bool ready=true;
-	desktop->fLayerLock.Lock();
-	do{
-		ready	= true;
-
-		int32	count = desktop->fWinBorderList.CountItems();
-		for( int32 i = 0; i < count; i++)
-		{
-			ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
-			if (ClientTeamID() == sw->ClientTeamID())
-			{
-				thread_id		tid = sw->ThreadID();
-				status_t		temp;
-
-				desktop->fLayerLock.Unlock();
-				
-				printf("waiting for thread %s\n", sw->Title());
-				wait_for_thread(tid, &temp);
-
-				desktop->fLayerLock.Lock();
-
-				ready		= false;
-				break;
-			}
-		}
-	} while(!ready);
-	desktop->fLayerLock.Unlock();
-*/
-/*	
-	ServerWindow *tempwin;
-	for(i=0;i<fSWindowList->CountItems();i++)
-	{
-		tempwin=(ServerWindow*)fSWindowList->ItemAt(i);
-		if(tempwin)
-			delete tempwin;
-	}
-	fSWindowList->MakeEmpty();
-	delete fSWindowList;
-*/
-
 	ServerBitmap *tempbmp;
 	for(i=0;i<fBitmapList->CountItems();i++)
 	{
@@ -199,7 +157,6 @@ ServerApp::~ServerApp(void)
 	thread_info info;
 	if(get_thread_info(fMonitorThreadID,&info)==B_OK)
 		kill_thread(fMonitorThreadID);
-
 }
 
 /*!
@@ -255,31 +212,13 @@ bool ServerApp::PingTarget(void)
 	\brief Send a message to the ServerApp with no attachments
 	\param code ID code of the message to post
 */
-void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
+void ServerApp::PostMessage(int32 code)
 {
-	write_port(fMessagePort,code, buffer, size);
+	BPortLink link(fMessagePort);
+	link.StartMessage(code);
+	link.Flush();
 }
 
-/*!
-	\brief Send a simple message to all of the ServerApp's ServerWindows
-	\param msg The message code to broadcast
-*/
-/*
-void ServerApp::WindowBroadcast(int32 code)
-{
-	desktop->fLayerLock.Lock();
-	int32 count=desktop->fWinBorderList.CountItems();
-	for(int32 i=0; i<count; i++)
-	{
-		ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
-		BMessage msg(code);
-		sw->Lock();
-		sw->SendMessageToClient(&msg);
-		sw->Unlock();
-	}
-	desktop->fLayerLock.Unlock();
-}
-*/
 /*!
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
@@ -366,11 +305,6 @@ int32 ServerApp::MonitorApp(void *data)
 				break;
 			}
 			
-			// TODO: Fix
-			// Using this case is a hack. The ServerApp is receiving a message with a '0' code after
-			// it sends the quit message on server shutdown and I can't find what's sending it. This
-			// must be found and fixed!
-			case 0:
 			case B_QUIT_REQUESTED:
 			{
 				STRACE(("ServerApp %s: B_QUIT_REQUESTED\n",app->fSignature.String()));
@@ -519,9 +453,6 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			msg.Read<port_id>(&looperPort);
 			msg.ReadString(&title);
 
-			//TODO: deprecate - just use sendPort
-//			msg.Read<port_id>(&replyport); 
-
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
@@ -662,30 +593,40 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			// 1) int32 workspace #
 			// 2) uint32 screen mode
 			// 3) bool make default
-			int32 workspace;
+			int32 index;
 			uint32 mode;
 			bool stick;
-			msg.Read<int32>(&workspace);
+			msg.Read<int32>(&index);
 			msg.Read<uint32>(&mode);
 			msg.Read<bool>(&stick);
 
-			//TODO: Resolve			
-			//SetSpace(workspace,mode,ActiveScreen(),stick);
-
+			RootLayer *root=desktop->ActiveRootLayer();
+			Workspace *workspace=root->WorkspaceAt(index);
+			
+			if(!workspace)
+			{
+				// apparently out of range or something, so we do nothing. :)
+				break;
+			}
+			
+			// TODO: Add mode-setting code to Workspace class
+			//workspace->SetMode(mode,stick);
 			break;
 		}
 		case AS_ACTIVATE_WORKSPACE:
 		{
 			STRACE(("ServerApp %s: Activate Workspace\n",fSignature.String()));
+			
 			// Attached data
 			// 1) int32 workspace index
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
 			msg.Read<int32>(&workspace);
-
-			//TODO: Resolve
-			//SetWorkspace(workspace);
+			
+			RootLayer *root=desktop->ActiveRootLayer();
+			if(root)
+				root->SetActiveWorkspaceByIndex(workspace);
 			break;
 		}
 		

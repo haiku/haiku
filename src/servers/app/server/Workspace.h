@@ -90,6 +90,7 @@ public:
 	void SearchAndSetNewFocus(WinBorder *preferred);
 	void BringToFrontANormalWindow(WinBorder *layer);
 	
+	
 private:
 	
 	void InsertItem(ListData *item, ListData *before);
