@@ -32,6 +32,8 @@ typedef void (*synth_controller_hook) (
 class BMidiSynth;
 class BMidiSynthFile;
 
+namespace BPrivate { class BSoftSynth; }
+
 class BSynth 
 {
 public:
@@ -93,7 +95,13 @@ private:
 	virtual void _ReservedSynth3();
 	virtual void _ReservedSynth4();
 
-	uint32 _reserved[13];
+	void Init();
+	
+	BPrivate::BSoftSynth* synth;
+	synth_mode synthMode;
+	int32 clientCount;
+
+	uint32 _reserved[10];
 };
 
 extern _IMPEXP_MIDI BSynth* be_synth;

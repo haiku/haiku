@@ -66,7 +66,7 @@ protected:
 	void* fSongVariables;
 	void* fPerformanceVariables;
 	bool fMidiQueue;
-
+	
 private:
 
 	friend class BSynth;
@@ -78,7 +78,11 @@ private:
 
 	virtual void Run();
 
-	uint32 _reserved[4];
+	bigtime_t creationTime;
+	int16 transpose;
+	bool inputEnabled;
+
+	uint32 _reserved;
 };
 
 #endif // _MIDI_SYNTH_H
