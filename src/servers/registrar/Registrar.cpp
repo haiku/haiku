@@ -71,7 +71,7 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_COMPLETE_REGISTRATION:
 			fRoster->HandleCompleteRegistration(message);
 			break;
-		case B_REG_IS_PRE_REGISTERED:
+		case B_REG_IS_APP_PRE_REGISTERED:
 			fRoster->HandleIsAppPreRegistered(message);
 			break;
 		case B_REG_REMOVE_PRE_REGISTERED_APP:
@@ -83,8 +83,14 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_SET_THREAD_AND_TEAM:
 			fRoster->HandleSetThreadAndTeam(message);
 			break;
-		case B_REG_GET_RUNNING_APP_INFO:
-			fRoster->HandleGetRunningAppInfo(message);
+		case B_REG_GET_APP_INFO:
+			fRoster->HandleGetAppInfo(message);
+			break;
+		case B_REG_GET_APP_LIST:
+			fRoster->HandleGetAppList(message);
+			break;
+		case B_REG_ACTIVATE_APP:
+			fRoster->HandleActivateApp(message);
 			break;
 		default:
 			BApplication::MessageReceived(message);
