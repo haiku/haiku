@@ -25,36 +25,35 @@ public:
 	virtual void ScreenChanged(BRect frame, color_space mode);
 
 private:
-	void				CheckApplyEnabled();
+	void CheckApplyEnabled();
+	void CheckUpdateDisplayModes();
 	
-	ScreenSettings		*fSettings;
-	ScreenView			*fScreenView;
-	ScreenDrawView		*fScreenDrawView;
-	BPopUpMenu			*fWorkspaceMenu;
-	BMenuField			*fWorkspaceField;
-	BPopUpMenu			*fWorkspaceCountMenu;
-	BMenuField			*fWorkspaceCountField;
-	BPopUpMenu			*fResolutionMenu;
-	BMenuField			*fResolutionField;
-	BPopUpMenu			*fColorsMenu;
-	BMenuField			*fColorsField;
-	BPopUpMenu			*fRefreshMenu;
-	BMenuField			*fRefreshField;
-	BMenuItem			*fCurrentWorkspaceItem;
-	BMenuItem			*fAllWorkspacesItem;
-	BButton				*fDefaultsButton;
-	BButton				*fApplyButton;
-	BButton				*fRevertButton;
-	BBox				*fScreenBox;
-	BBox 				*fControlsBox;
-	BMenuItem			*fInitialResolution;
-	BMenuItem			*fInitialColors;
-	BMenuItem			*fInitialRefresh;
-	display_mode		fInitialMode;
-	display_mode		*fSupportedModes;
-	uint32				fTotalModes;
-	float				fCustomRefresh;
-	float				fInitialRefreshN;
+	ScreenSettings *fSettings;
+	ScreenView *fScreenView;
+	ScreenDrawView *fScreenDrawView;
+	BPopUpMenu *fWorkspaceMenu;
+	BMenuField *fWorkspaceField;
+	BPopUpMenu *fWorkspaceCountMenu;
+	BMenuField *fWorkspaceCountField;
+	BPopUpMenu *fResolutionMenu;
+	BMenuField *fResolutionField;
+	BPopUpMenu *fColorsMenu;
+	BMenuField *fColorsField;
+	BPopUpMenu *fRefreshMenu;
+	BMenuField *fRefreshField;
+	BMenuItem *fCurrentWorkspaceItem;
+	BMenuItem *fAllWorkspacesItem;
+	BButton	*fDefaultsButton;
+	BButton	*fApplyButton;
+	BButton	*fRevertButton;
+	BMenuItem *fInitialResolution;
+	BMenuItem *fInitialColors;
+	BMenuItem *fInitialRefresh;
+	display_mode fInitialMode;
+	display_mode *fSupportedModes;
+	uint32 fTotalModes;
+	float fCustomRefresh;
+	float fInitialRefreshN;
 };
 
 #endif

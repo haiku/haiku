@@ -7,6 +7,7 @@ class ScreenDrawView : public BView
 {
 public:
 	ScreenDrawView(BRect frame, char *name);
+	~ScreenDrawView();
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
 	virtual void MessageReceived(BMessage *message);
@@ -14,7 +15,10 @@ public:
 
 private:
 	rgb_color desktopColor;
-	int32 fResolution;
+	int32 fWidth;
+	int32 fHeight;
+	BBitmap *fScreen1,
+			*fScreen2;
 };
 
 #endif

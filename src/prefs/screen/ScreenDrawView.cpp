@@ -1,8 +1,10 @@
+#include <Bitmap.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <TranslationUtils.h>
 #include <View.h>
 
 #include <cstdlib>
@@ -22,7 +24,21 @@ ScreenDrawView::ScreenDrawView(BRect rect, char *name)
 	display_mode mode;	
 	screen.GetMode(&mode);
 
-	fResolution = mode.virtual_width;
+	fWidth = mode.virtual_width;
+	fHeight = mode.virtual_height;
+#ifdef USE_BITMAPS
+	fScreen1 = BTranslationUtils::GetBitmap("screen_1");
+	fScreen2 = BTranslationUtils::GetBitmap("screen_2");
+#endif
+}
+
+
+ScreenDrawView::~ScreenDrawView()
+{
+#ifdef USE_BITMAPS
+	delete fScreen1;
+	delete fScreen2;
+#endif
 }
 
 
@@ -44,12 +60,13 @@ ScreenDrawView::MouseDown(BPoint point)
 void
 ScreenDrawView::Draw(BRect updateRect)
 {
+#ifndef USE_BITMAPS
 	rgb_color red = { 228, 0, 0, 255 };
 	rgb_color black = { 0, 0, 0, 255 };
 	rgb_color darkColor = {160, 160, 160, 255};
-	
+
 	//FIXME: Make the draw code resolution independent
-	if (fResolution == 1600) 
+	if (fWidth == 1600) 
 	{	
 		SetHighColor(darkColor);
 	
@@ -71,7 +88,7 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(4.0, 75.0), BPoint(5.0, 75.0));
 	}
-	else if(fResolution == 1280)
+	else if(fWidth == 1280)
 	{
 		SetHighColor(darkColor);
 	
@@ -93,7 +110,7 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(15.0, 70.0), BPoint(16.0, 70.0));
 	}
-	else if(fResolution == 1152)
+	else if(fWidth == 1152)
 	{
 		SetHighColor(darkColor);
 	
@@ -115,7 +132,7 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(19.0, 66.0), BPoint(20.0, 66.0));
 	}
-	else if(fResolution == 1024)
+	else if(fWidth == 1024)
 	{
 		SetHighColor(darkColor);
 	
@@ -137,7 +154,7 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(22.0, 62.0), BPoint(23.0, 62.0));
 	}
-	else if(fResolution == 800)
+	else if(fWidth == 800)
 	{
 		SetHighColor(darkColor);
 	
@@ -159,7 +176,7 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(29.0, 56.0), BPoint(30.0, 56.0));
 	}
-	else if(fResolution == 640)
+	else if(fWidth == 640)
 	{
 		SetHighColor(darkColor);
 	
@@ -181,6 +198,27 @@ ScreenDrawView::Draw(BRect updateRect)
 		
 		StrokeLine(BPoint(35.0, 53.0), BPoint(36.0, 53.0));
 	}
+#else
+	SetHighColor(desktopColor);
+	FillRect(Bounds()); 
+	BRect bitmapBounds(fScreen1->Bounds());
+	BRect dest;
+	dest.left = Bounds().left;
+	dest.top = Bounds().top;
+	dest.right = Bounds().left + (bitmapBounds.Width() * 100) / fWidth;
+	dest.bottom = Bounds().top + (bitmapBounds.Height() * 100) / fHeight;
+	DrawBitmap(fScreen1, dest);
+	
+	BRect bitmapBounds2(fScreen2->Bounds());
+	BRect dest2;
+	dest2.top = Bounds().top;
+	dest2.right = Bounds().right;
+	dest2.bottom = Bounds().top + (bitmapBounds2.Height() * 100) / fHeight;
+	dest2.left = Bounds().right - (bitmapBounds2.Width() * 100) / fWidth;
+	
+	DrawBitmap(fScreen2, dest2);
+#endif
+
 }
 
 
@@ -194,10 +232,12 @@ ScreenDrawView::MessageReceived(BMessage* message)
 			BString resolution;		
 			message->FindString("resolution", &resolution);
 			
-			int32 nextfResolution = atoi(resolution.String());
+			int32 nextWidth = atoi(resolution.String());
+			resolution.Truncate(resolution.FindFirst('x') + 1); 
 			
-			if (fResolution != nextfResolution)	{
-				fResolution = nextfResolution;
+			if (fWidth != nextWidth)	{
+				fWidth = nextWidth;
+				fHeight = atoi(resolution.String());
 				
 				Invalidate();
 			}
