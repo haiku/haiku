@@ -1976,7 +1976,11 @@ BMediaRosterEx::InstantiateDormantNode(media_addon_id addonid, int32 flavorid, t
 		return B_ERROR;
 	}
 	
-	ASSERT(node_info.internal_id == flavorid);
+	//ASSERT(node_info.internal_id == flavorid);
+	if (node_info.internal_id != flavorid) {
+		FATAL("BMediaRosterEx::InstantiateDormantNode failed: ID mismatch for addon-id %ld, flavor-id %ld, node_info.internal_id %ld, node_info.name %s\n", addonid, flavorid, node_info.internal_id, node_info.name);
+		return B_ERROR;
+	}
 
 	// load the BMediaAddOn object
 	BMediaAddOn *addon;
