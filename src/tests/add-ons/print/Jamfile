@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests add-ons print ;
+
+SubInclude OBOS_TOP src tests add-ons print pdf ;

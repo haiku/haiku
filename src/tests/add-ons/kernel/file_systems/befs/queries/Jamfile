@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems befs queries ;
+
+SimpleTest queryTest
+	: test.cpp
+	: be ;
+

@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src tests ;
 
+SubInclude OBOS_TOP src tests add-ons ;
 SubInclude OBOS_TOP src tests kits ;
