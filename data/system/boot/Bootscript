@@ -51,12 +51,13 @@ exec >/dev/null 2>&1
 
 # Set up the environment
 
+export SAFEMODE=`/bin/safemode`
+
 SCRIPTS=beos/system/boot
 launchscript $SCRIPTS/SetupEnvironment
 
-# Launch clockconfig
+# Sets timezone etc.
 runprog beos/bin/clockconfig
 
 # Launch consoled
-
 launch beos/bin/consoled
