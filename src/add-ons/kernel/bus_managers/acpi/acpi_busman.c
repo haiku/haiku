@@ -7,8 +7,15 @@
 
 status_t acpi_std_ops(int32 op,...);
 status_t acpi_rescan_stub(void);
-uint32 read_acpi_reg(uint32 id);
-void write_acpi_reg(uint32 id, uint32 value);
+
+void enable_fixed_event (uint32 event);
+void disable_fixed_event (uint32 event);
+
+uint32 fixed_event_status (uint32 event);
+void reset_fixed_event (uint32 event);
+
+status_t install_fixed_event_handler	(uint32 event, interrupt_handler *handler, void *data); 
+status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler); 
 
 struct acpi_module_info acpi_module = {
 	{
@@ -21,8 +28,12 @@ struct acpi_module_info acpi_module = {
 		acpi_rescan_stub
 	},
 	
-	read_acpi_reg,
-	write_acpi_reg
+	enable_fixed_event,
+	disable_fixed_event,
+	fixed_event_status,
+	reset_fixed_event,
+	install_fixed_event_handler,
+	remove_fixed_event_handler
 };
 
 _EXPORT module_info *modules[] = {
@@ -79,12 +90,28 @@ status_t acpi_rescan_stub(void) {
 	return B_OK;
 }
 
-uint32 read_acpi_reg(uint32 id) {
-	uint32 value;
-	AcpiGetRegister(id,&value,ACPI_MTX_LOCK);
-	return value;
+void enable_fixed_event (uint32 event) {
+	AcpiEnableEvent(event,0);
 }
 
-void write_acpi_reg(uint32 id, uint32 value) {
-	AcpiSetRegister(id,value,ACPI_MTX_LOCK);
+void disable_fixed_event (uint32 event) {
+	AcpiDisableEvent(event,0);
+}
+
+uint32 fixed_event_status (uint32 event) {
+	ACPI_EVENT_STATUS status = 0;
+	AcpiGetEventStatus(event,&status);
+	return (status/* & ACPI_EVENT_FLAG_SET*/);
+}
+
+void reset_fixed_event (uint32 event) {
+	AcpiClearEvent(event);
+}
+
+status_t install_fixed_event_handler (uint32 event, interrupt_handler *handler, void *data) {
+	return ((AcpiInstallFixedEventHandler(event,handler,data) == AE_OK) ? B_OK : B_ERROR);
+}
+
+status_t remove_fixed_event_handler	(uint32 event, interrupt_handler *handler) {
+	return ((AcpiRemoveFixedEventHandler(event,handler) == AE_OK) ? B_OK : B_ERROR);
 }
