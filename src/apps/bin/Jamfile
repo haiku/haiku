@@ -79,6 +79,7 @@ StdBinCommands
 
 SubInclude OBOS_TOP src apps bin addattr ;
 SubInclude OBOS_TOP src apps bin bc ;
+SubInclude OBOS_TOP src apps bin bison ;
 SubInclude OBOS_TOP src apps bin chkbfs ;
 SubInclude OBOS_TOP src apps bin coreutils-5.0 ;
 SubInclude OBOS_TOP src apps bin desklink ;
