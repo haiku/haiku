@@ -1862,7 +1862,25 @@ create_preloaded_image_areas(struct preloaded_image *image)
 }
 
 
-// ToDo: have a vm_free_kernel_args() called!
+/**	Frees all previously kernel arguments areas from the kernel_args structure.
+ *	Any boot loader resources contained in that arguments must not be accessed
+ *	anymore past this point.
+ */
+
+void
+vm_free_kernel_args(kernel_args *args)
+{
+	uint32 i;
+
+	TRACE(("vm_free_kernel_args()\n"));
+
+	for (i = 0; i < args->num_kernel_args_ranges; i++) {
+		area_id area = area_for((void *)args->kernel_args_range[i].start);
+		if (area >= B_OK)
+			delete_area(area);
+	}
+}
+
 
 static void
 allocate_kernel_args(kernel_args *args)
@@ -2032,7 +2050,7 @@ vm_init_post_sem(kernel_args *args)
 
 	region_hash_sem = create_sem(WRITE_COUNT, "region_hash_sem");
 
-	return heap_init_postsem(args);
+	return heap_init_post_sem(args);
 }
 
 
@@ -2048,7 +2066,7 @@ vm_init_post_thread(kernel_args *args)
 
 	vm_daemon_init();
 
-	return 0;
+	return heap_init_post_thread(args);
 }
 
 
