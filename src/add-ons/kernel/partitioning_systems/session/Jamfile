@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src add-ons kernel partitioning_systems session ;
+
+#UsePrivateHeaders $(DOT) ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
+{
+	local defines = [ FDefines USER ] ; 
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+# For now build a userland version only.
+Addon <partitioning_system>session : userland partitioning_systems :
+	Debug.cpp
+	Disc.cpp
+	session.cpp
+;
+
+LinkSharedOSLibs <partitioning_system>session :
+	libkernelland_emu.so
+	libdisk_device_manager.so
+;
