@@ -49,7 +49,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -916,7 +916,6 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			cl->MoveBy(x, y);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZETO:
@@ -931,7 +930,6 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			cl->ResizeBy(newWidth, newHeight);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COORD:
@@ -1144,6 +1142,8 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->ReadData(&c, sizeof(rgb_color));
 			
 			cl->_layerdata->viewcolor.SetColor(c);
+			
+			cl->Invalidate(cl->_visible);
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
@@ -1562,9 +1562,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->ReadFloat(&yResizeBy);
 			
 			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
-printf("===> ddd = %f %f", xResizeBy, yResizeBy);
-			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Resize unimplemented\n",fTitle.String()));
+
 			break;
 		}
 		case B_MINIMIZE:
@@ -2184,7 +2182,6 @@ int32 ServerWindow::MonitorWin(void *data)
 			{
 				STRACE(("ServerWindow %s received Quit request\n",win->Title()));
 				quitting = true;
-printf("Deleting window...\n");
 				delete win;
 				break;
 			}

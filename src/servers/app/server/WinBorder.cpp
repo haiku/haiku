@@ -21,7 +21,7 @@
 //
 //	File Name:		WinBorder.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Adi Oanca <adioanca@myrealbox.com>
+//					Adi Oanca <adioanca@mymail.ro>
 //	Description:	Layer subclass which handles window management
 //  
 //------------------------------------------------------------------------------
@@ -48,8 +48,8 @@
 //#define DEBUG_WINBORDER
 
 // toggle
-#define DEBUG_WINBORDER_MOUSE
-#define DEBUG_WINBORDER_CLICK
+//#define DEBUG_WINBORDER_MOUSE
+//#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
 #	include <stdio.h>
@@ -119,7 +119,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 //---------------------------------------------------------------------------
 WinBorder::~WinBorder(void)
 {
-STRACE(("WinBorder %s:~WinBorder()\n",GetName()));
+STRACE(("WinBorder(%s):~WinBorder()\n",GetName()));
 	if (fDecorator)	{
 		delete fDecorator;
 		fDecorator		= NULL;
@@ -130,6 +130,7 @@ STRACE(("WinBorder %s:~WinBorder()\n",GetName()));
 }
 //---------------------------------------------------------------------------
 void WinBorder::RebuildFullRegion(void){
+STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
 	BRegion			topLayerFull;
 	Layer			*topLayer = _serverwin->fTopLayer;
 	topLayerFull.Set( ConvertToTop(*fNewTopLayerFrame) );
@@ -315,7 +316,7 @@ void WinBorder::HighlightDecorator(const bool &active)
 //---------------------------------------------------------------------------
 void WinBorder::Draw(const BRect &r)
 {
-printf("WinBorder(%s)::Draw()\n", GetName());
+STRACE(("WinBorder(%s)::Draw()\n", GetName()));
 	if(fDecorator){
 		// decorator is allowed to draw in its entire visible region, not just in the update one.
 		fUpdateReg		= _visible;
@@ -339,6 +340,7 @@ snooze(1000000);
 //---------------------------------------------------------------------------
 void WinBorder::MoveBy(float x, float y)
 {
+STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
 	if(fDecorator){
 		fDecorator->MoveBy(x,y);
 		fDecFull->OffsetBy(x,y);
@@ -349,6 +351,7 @@ void WinBorder::MoveBy(float x, float y)
 //---------------------------------------------------------------------------
 void WinBorder::ResizeBy(float x, float y)
 {
+STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	if(fDecorator){
 		fDecorator->ResizeBy(x,y);
 	}
@@ -413,6 +416,7 @@ void WinBorder::SetLevel(){
 }
 //---------------------------------------------------------------------------
 void WinBorder::AddToSubsetOf(WinBorder* main){
+STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
 	if (!main || (main && !(main->GetRootLayer())))
 		return;
 
@@ -466,6 +470,7 @@ void WinBorder::AddToSubsetOf(WinBorder* main){
 }
 //---------------------------------------------------------------------------
 void WinBorder::RemoveFromSubsetOf(WinBorder* main){
+STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
 	RootLayer		*rl = main->GetRootLayer();
 
 	desktop->fGeneralLock.Lock();

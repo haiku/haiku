@@ -12,13 +12,20 @@
 #include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "LayerData.h"
+#include <stdio.h>
 
 //#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
+#endif
+
+//#define DEBUG_LAYER_REBUILD
+#ifdef DEBUG_LAYER_REBUILD
+#	define RBTRACE(x) printf x
+#else
+#	define RBTRACE(x) ;
 #endif
 
 BRegion		gRedrawReg;
@@ -74,7 +81,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	clipToPicture	= NULL;
 
 	/* NOW all regions (_visible, _fullVisible, _full) are empty */
-	printf("Layer(%s) successfuly created\n", GetName());
+	STRACE(("Layer(%s) successfuly created\n", GetName()));
 }
 
 //! Destructor frees all allocated heap space
@@ -108,7 +115,7 @@ Layer::~Layer(void)
 
 void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 {
-printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
+STRACE(("Layer(%s)::AddChild(%s) START\n", GetName(), layer->GetName()));
 	if( layer->_parent != NULL ) {
 		printf("ERROR: AddChild(): Layer already has a _parent\n");
 		return;
@@ -171,11 +178,12 @@ printf("Layer(%s)::AddChild(%s)\n", GetName(), layer->GetName());
 	if ( !(layer->IsHidden()) && layer->fRootLayer && !IsHidden()){
 		FullInvalidate( layer->_full );
 	}
-printf("Layer(%s)::AddChild(%s) ENDED\n", GetName(), layer->GetName());
+STRACE(("Layer(%s)::AddChild(%s) END\n", GetName(), layer->GetName()));
 }
 
 void Layer::RemoveChild(Layer *layer)
 {
+STRACE(("Layer(%s)::RemoveChild(%s) START\n", GetName(), layer->GetName()));
 	if( layer->_parent == NULL ){
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
 		return;
@@ -248,7 +256,7 @@ void Layer::RemoveChild(Layer *layer)
 	layer->_full.MakeEmpty();
 	layer->_fullVisible.MakeEmpty();
 	layer->_visible.MakeEmpty();
-
+STRACE(("Layer(%s)::RemoveChild(%s) END\n", GetName(), layer->GetName()));
 }
 
 void Layer::RemoveSelf()
@@ -366,9 +374,11 @@ void Layer::FullInvalidate(const BRect &rect)
 
 void Layer::FullInvalidate(const BRegion& region)
 {
-printf("Layer(%s)::FullInvalidate():\n", GetName());
-region.PrintToStream();
-printf("\n");
+STRACE(("Layer(%s)::FullInvalidate():\n", GetName()));
+#ifdef DEBUG_LAYER
+ region.PrintToStream();
+ printf("\n");
+#endif
 
 	BPoint		pt(0,0);
 	StartRebuildRegions(region, NULL,/* B_LAYER_INVALIDATE, pt); */B_LAYER_NONE, pt);
@@ -380,9 +390,11 @@ printf("\n");
 
 void Layer::Invalidate(const BRegion& region)
 {
-printf("Layer(%s)::Invalidate():\n", GetName());
-region.PrintToStream();
-printf("\n");
+STRACE(("Layer(%s)::Invalidate():\n", GetName()));
+#ifdef DEBUG_LAYER
+ region.PrintToStream();
+ printf("\n");
+#endif
 
 	gRedrawReg	= region;
 
@@ -393,7 +405,7 @@ printf("\n");
 
 void Layer::Redraw(const BRegion& reg, Layer *startFrom)
 {
-printf("Layer(%s)::Redraw();\n", GetName());
+STRACE(("Layer(%s)::Redraw();\n", GetName()));
 	BRegion		*pReg = const_cast<BRegion*>(&reg);
 
 	if(_serverwin){
@@ -407,11 +419,11 @@ printf("Layer(%s)::Redraw();\n", GetName());
 			RequestDraw(reg, startFrom);
 		}
 	}
-printf("Layer::Redraw ENDED\n");
+STRACE(("Layer::Redraw ENDED\n"));
 }
 
 void Layer::RequestClientUpdate(const BRegion &reg, Layer *startFrom){
-printf("Layer(%s)::RequestClientUpdate();\n", GetName());
+STRACE(("Layer(%s)::RequestClientUpdate()\n", GetName()));
 	if (IsHidden()){
 		// this layer has nothing visible on screen, so bail out.
 		return;
@@ -455,7 +467,7 @@ printf("Layer(%s)::RequestClientUpdate();\n", GetName());
 
 void Layer::RequestDraw(const BRegion &reg, Layer *startFrom, bool redraw)
 {
-printf("Layer(%s)::RequestDraw()\n", GetName());
+STRACE(("Layer(%s)::RequestDraw()\n", GetName()));
 	if (_visible.CountRects() > 0 && !IsHidden()){
 		fUpdateReg		= _visible;
 		fUpdateReg.IntersectWith(&reg);
@@ -488,9 +500,8 @@ printf("Layer(%s)::RequestDraw()\n", GetName());
 
 void Layer::Draw(const BRect &r)
 {
-
 // TODO/NOTE: this should be an empty method! the next lines are for testing only
-printf("Layer::Draw() Called\n");
+STRACE(("Layer::Draw() Called\n"));
 //	RGBColor	col(152,102,51);
 //	DRIVER->FillRect_(r, 1, col, &fUpdateReg);
 //snooze(1000000);
@@ -502,7 +513,7 @@ printf("Layer::Draw() Called\n");
 
 void Layer::Show(void)
 {
-printf("Layer(%s)::Show()\n", GetName());
+STRACE(("Layer(%s)::Show()\n", GetName()));
 	if( !IsHidden() )
 		return;
 	
@@ -516,7 +527,7 @@ printf("Layer(%s)::Show()\n", GetName());
 
 void Layer::Hide(void)
 {
-printf("\n\nLayer(%s)::Hide()\n", GetName());
+STRACE(("Layer(%s)::Hide()\n", GetName()));
 	if ( IsHidden() )
 		return;
 
@@ -590,6 +601,7 @@ uint32 Layer::CountChildren(void) const
 }
 
 void Layer::RebuildFullRegion( ){
+STRACE(("Layer(%s)::RebuildFullRegion()\n", GetName()));
 	if (_parent)
 		_full.Set( _parent->ConvertToTop( _frame ) );
 	else
@@ -623,6 +635,7 @@ void Layer::RebuildFullRegion( ){
 
 void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset)
 {
+STRACE(("Layer(%s)::RebuildRegions() START\n", GetName()));
 //NOTE: this method must be executed as fast as possible.
 	// Currently SendView[Moved/Resized]Msg() simply constructs a message and calls
 	//		ServerWindow::SendMessageToClient()
@@ -642,12 +655,12 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	RRLabel1:
 	switch(action){
 		case B_LAYER_NONE:{
-printf("1) Action B_LAYER_NONE\n");
+RBTRACE(("1) Action B_LAYER_NONE\n"));
 			oldRegion		= _visible;
 			break;
 		}
 		case B_LAYER_MOVE:{
-printf("1) Action B_LAYER_MOVE\n");
+RBTRACE(("1) Action B_LAYER_MOVE\n"));
 			oldRegion	= _fullVisible;
 			_frame.OffsetBy(pt.x, pt.y);
 			_full.OffsetBy(pt.x, pt.y);
@@ -658,13 +671,13 @@ printf("1) Action B_LAYER_MOVE\n");
 			break;
 		}
 		case B_LAYER_SIMPLE_MOVE:{
-printf("1) Action B_LAYER_SIMPLE_MOVE\n");
+RBTRACE(("1) Action B_LAYER_SIMPLE_MOVE\n"));
 			_full.OffsetBy(pt.x, pt.y);
 
 			break;
 		}
 		case B_LAYER_RESIZE:{
-printf("1) Action B_LAYER_RESIZE\n");
+RBTRACE(("1) Action B_LAYER_RESIZE\n"));
 			oldRegion	= _visible;
 
 			_frame.right	+= pt.x;
@@ -677,7 +690,7 @@ printf("1) Action B_LAYER_RESIZE\n");
 			break;
 		}
 		case B_LAYER_MASK_RESIZE:{
-printf("1) Action B_LAYER_MASK_RESIZE\n");
+RBTRACE(("1) Action B_LAYER_MASK_RESIZE\n"));
 			oldRegion	= _visible;
 
 			BPoint		offset, rSize;
@@ -816,19 +829,22 @@ printf("1) Action B_LAYER_MASK_RESIZE\n");
 //	_fullVisible.MakeEmpty();
 //	_visible.MakeEmpty();
 //}
-printf("\n ======= Layer(%s)::RR finals ======\n", GetName());
-oldRegion.PrintToStream();
-_full.PrintToStream();
-_fullVisible.PrintToStream();
-_visible.PrintToStream();
-printf("==========RedrawReg===========\n");
-gRedrawReg.PrintToStream();
-printf("=====================\n");
+#ifdef DEBUG_LAYER_REBUILD
+ printf("\n ======= Layer(%s)::RR finals ======\n", GetName());
+ oldRegion.PrintToStream();
+ _full.PrintToStream();
+ _fullVisible.PrintToStream();
+ _visible.PrintToStream();
+ printf("==========RedrawReg===========\n");
+ gRedrawReg.PrintToStream();
+ printf("=====================\n");
+#endif
+STRACE(("Layer(%s)::RebuildRegions() END\n", GetName()));
 }
 
 void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt)
 {
-printf("Layer(%s)::StartRebuildRegions()\n", GetName());
+STRACE(("Layer(%s)::StartRebuildRegions() START\n", GetName()));
 	if(!_parent)
 		_fullVisible	= _full;
 
@@ -846,36 +862,42 @@ printf("Layer(%s)::StartRebuildRegions()\n", GetName());
 			lay->RebuildRegions(reg, B_LAYER_NONE, pt, BPoint(0.0f, 0.0f));
 		}
 	}
-
-printf("\n ===!=== Layer(%s)::SRR finals ===!===\n", GetName());
-_full.PrintToStream();
-_fullVisible.PrintToStream();
-_visible.PrintToStream();
-oldVisible.PrintToStream();
-printf("=====================\n");
-gRedrawReg.PrintToStream();
+#ifdef DEBUG_LAYER_REBUILD
+ printf("\n ===!=== Layer(%s)::SRR finals ===!===\n", GetName());
+ _full.PrintToStream();
+ _fullVisible.PrintToStream();
+ _visible.PrintToStream();
+ oldVisible.PrintToStream();
+ printf("=====!=====RedrawReg=====!=====\n");
+ gRedrawReg.PrintToStream();
+ printf("=====================\n");
+#endif
 
 	BRegion		redrawReg(_visible);
 		// if this is the first time
 	if (oldVisible.CountRects() > 0){
-printf("YES, it happens\n");
 		redrawReg.Exclude(&oldVisible);
 	}
 	gRedrawReg.Include(&redrawReg);
+	
+#ifdef DEBUG_LAYER_REBUILD
+ printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());
+ gRedrawReg.PrintToStream();
+ printf("\n");
+ printf("Layer(%s)::StartRebuildREgions() ended! Copy Region:\n", GetName());
+ for(int32 k=0; k<gCopyRegList.CountItems(); k++){
+	((BRegion*)(gCopyRegList.ItemAt(k)))->PrintToStream();
+	((BPoint*)(gCopyList.ItemAt(k)))->PrintToStream();
+ }
+ printf("\n");
+#endif
 
-	printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());
-	gRedrawReg.PrintToStream();
-	printf("\n");
-	printf("Layer(%s)::StartRebuildREgions() ended! Copy Region:\n", GetName());
-	for(int32 k=0; k<gCopyRegList.CountItems(); k++){
-		((BRegion*)(gCopyRegList.ItemAt(k)))->PrintToStream();
-		((BPoint*)(gCopyList.ItemAt(k)))->PrintToStream();
-	}
-	printf("\n");
+STRACE(("Layer(%s)::StartRebuildRegions() END\n", GetName()));
 }
 
 void Layer::MoveBy(float x, float y)
 {
+STRACE(("Layer(%s)::MoveBy() START\n", GetName()));
 	if(!_parent){
 		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
@@ -891,6 +913,7 @@ void Layer::MoveBy(float x, float y)
 	_parent->Redraw(gRedrawReg, this);
 
 	EmptyGlobals();
+STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
 }
 
 void Layer::EmptyGlobals(){
@@ -907,7 +930,7 @@ void Layer::EmptyGlobals(){
 }
 
 uint32 Layer::ResizeOthers(float x, float y, BPoint coords[], BPoint *ptOffset){
-printf("Layer(%s): x=%f y=%f\n", GetName(), x, y);
+STRACE(("Layer(%s)::ResizeOthers() START\n", GetName()));
 	uint32		rmask		= _resize_mode;
 		// offset
 	coords[0].x		= 0.0f;
@@ -917,55 +940,43 @@ printf("Layer(%s): x=%f y=%f\n", GetName(), x, y);
 	coords[1].y		= 0.0f;
 
 	if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_
-			&& (rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_)
-	{
-printf("Layer(%s) - step 1\n", GetName());
+			&& (rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_){
 		coords[1].x		= x;
 	}
 	else if ((rmask & 0x00000f00UL)>>8 == _VIEW_LEFT_){
-printf("Layer(%s) - step 2\n", GetName());
 	}
 	else if ((rmask & 0x0000000fUL)>>0 == _VIEW_RIGHT_){
-printf("Layer(%s) - step 3\n", GetName());
 		coords[0].x		= x;
 	}
 	else if ((rmask & 0x00000f00UL)>>8 == _VIEW_CENTER_){
-printf("Layer(%s) - step 4\n", GetName());
 		coords[0].x		= x/2;
 	}
 	else { // illegal flag. Do nothing.
-printf("Layer(%s) - step 5\n", GetName());
 	}
 
 
 	if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_
-			&& (rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_)
-	{
+			&& (rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_){
 		coords[1].y		= y;
-printf("Layer(%s) - sstep 1\n", GetName());
 	}
 	else if ((rmask & 0x0000f000UL)>>12 == _VIEW_TOP_){
-printf("Layer(%s) - sstep 2\n", GetName());
 	}
 	else if ((rmask & 0x000000f0UL)>>4 == _VIEW_BOTTOM_){
-printf("Layer(%s) - sstep 3\n", GetName());
 		coords[0].y		= y;
 	}
 	else if ((rmask & 0x0000f000UL)>>12 == _VIEW_CENTER_){
-printf("Layer(%s) - sstep 4\n", GetName());
 		coords[0].y		= y/2;
 	}
 	else { // illegal flag. Do nothing.
-printf("Layer(%s) - sstep 5\n", GetName());
 	}
 
-printf("Layer(%s): coord[0].x=%f coord[0].y=%f\n", GetName(), coords[0].x, coords[0].y);
-printf("Layer(%s): coord[1].x=%f coord[1].y=%f\n", GetName(), coords[1].x, coords[1].y);
+STRACE(("Layer(%s)::ResizeOthers() END\n", GetName()));
 	return 0UL;
 }
 
 void Layer::ResizeBy(float x, float y)
 {
+STRACE(("Layer(%s)::ResizeBy() START\n", GetName()));
 	if(!_parent){
 		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
@@ -983,6 +994,7 @@ void Layer::ResizeBy(float x, float y)
 	_parent->Redraw(gRedrawReg, this);
 
 	EmptyGlobals();
+STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
 void Layer::PrintToStream(void)
