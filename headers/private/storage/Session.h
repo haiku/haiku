@@ -54,8 +54,6 @@ public:
 					   BRect dialogCenter = BRect(),
 					   bool *cancelled = NULL);
 
-	static status_t GetPartitioningSystemList(BObjectList<BString> *list);
-
 private:
 	BSession();
 	BSession(const BSession &);
