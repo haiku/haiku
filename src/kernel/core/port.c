@@ -6,6 +6,7 @@
 
 #include <OS.h>
 #include <port.h>
+#include <sem.h>
 #include <kernel.h>
 #include <arch/int.h>
 #include <debug.h>
@@ -16,6 +17,7 @@
 #include <kerrors.h>
 #include <string.h>
 #include <stdlib.h>
+
 
 struct port_msg {
 	int		msg_code;
@@ -203,7 +205,7 @@ create_port(int32 queue_length, const char *name)
 	}
 
 	// init cbuf list of the queue
-	for (i=0; i<queue_length; i++)
+	for (i = 0; i < queue_length; i++)
 		q[i].data_cbuf = 0;
 
 	// create sem_r with owner set to -1
@@ -230,7 +232,7 @@ create_port(int32 queue_length, const char *name)
 	GRAB_PORT_LIST_LOCK();
 
 	// find the first empty spot
-	for(i=0; i<MAX_PORTS; i++) {
+	for (i = 0; i < MAX_PORTS; i++) {
 		if(ports[i].id == -1) {
 			// make the port_id be a multiple of the slot it's in
 			if(i >= next_port % MAX_PORTS) {
@@ -276,15 +278,16 @@ out:
 	return retval;
 }
 
+
 status_t
 close_port(port_id id)
 {
 	int 	state;
 	int		slot;
 
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 	slot = id % MAX_PORTS;
 
@@ -308,6 +311,7 @@ close_port(port_id id)
 	return B_NO_ERROR;
 }
 
+
 status_t
 delete_port(port_id id)
 {
@@ -320,9 +324,9 @@ delete_port(port_id id)
 	char *old_name;
 	struct port_msg *q;
 
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -366,6 +370,7 @@ delete_port(port_id id)
 	return B_NO_ERROR;
 }
 
+
 port_id
 find_port(const char *port_name)
 {
@@ -373,17 +378,17 @@ find_port(const char *port_name)
 	int state;
 	int ret_val = B_BAD_PORT_ID;
 
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(port_name == NULL)
+	if (port_name == NULL)
 		return B_BAD_PORT_ID;
 
 	// lock list of ports
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
-	
+
 	// loop over list
-	for(i=0; i<MAX_PORTS; i++) {
+	for (i = 0; i < MAX_PORTS; i++) {
 		// lock every individual port before comparing
 		GRAB_PORT_LOCK(ports[i]);
 		if(strcmp(port_name, ports[i].name) == 0) {
@@ -400,17 +405,18 @@ find_port(const char *port_name)
 	return ret_val;
 }
 
+
 status_t
 _get_port_info(port_id id, port_info *info, size_t size)
 {
 	int slot;
 	int state;
 
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
 	if (info == NULL)
 		return EINVAL;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -418,7 +424,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %ld\n", id);
@@ -440,17 +446,17 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	return B_NO_ERROR;
 }
 
+
 status_t
-_get_next_port_info(team_id team, int32 *cookie, struct port_info *info,
-                   size_t size)
+_get_next_port_info(team_id team, int32 *cookie, struct port_info *info, size_t size)
 {
 	int state;
 	int slot;
 	
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
 	if (cookie == NULL)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	if (*cookie == NULL) {
 		// return first found
@@ -495,26 +501,26 @@ _get_next_port_info(team_id team, int32 *cookie, struct port_info *info,
 	return B_NO_ERROR;
 }
 
+
 ssize_t
 port_buffer_size(port_id id)
 {
 	return port_buffer_size_etc(id, 0, 0);
 }
 
+
 ssize_t
-port_buffer_size_etc(port_id id,
-					uint32 flags,
-					bigtime_t timeout)
+port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 {
 	int slot;
 	int res;
 	int t;
 	int len;
 	int state;
-		
-	if(ports_active == false)
+	
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -522,7 +528,7 @@ port_buffer_size_etc(port_id id,
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %ld\n", id);
@@ -570,16 +576,17 @@ port_buffer_size_etc(port_id id,
 	return len;
 }
 
+
 ssize_t
 port_count(port_id id)
 {
 	int slot;
 	int state;
 	int32 count;
-	
-	if(ports_active == false)
+
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -587,7 +594,7 @@ port_count(port_id id)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("port_count: invalid port_id %ld\n", id);
@@ -606,22 +613,17 @@ port_count(port_id id)
 	return count;
 }
 
+
 status_t
-read_port(port_id port,
-			int32 *msg_code,
-			void *msg_buffer,
-			size_t buffer_size)
+read_port(port_id port, int32 *msg_code, void *msg_buffer, size_t buffer_size)
 {
 	return read_port_etc(port, msg_code, msg_buffer, buffer_size, 0, 0);
 }
 
+
 status_t
-read_port_etc(port_id id,
-				int32	*msg_code,
-				void	*msg_buffer,
-				size_t	buffer_size,
-				uint32	flags,
-				bigtime_t	timeout)
+read_port_etc(port_id id, int32 *msg_code, void *msg_buffer, size_t buffer_size,
+	uint32 flags, bigtime_t timeout)
 {
 	int		slot;
 	int 	state;
@@ -632,14 +634,14 @@ read_port_etc(port_id id,
 	cbuf*	msg_store;
 	int32	code;
 	int		err;
-	
-	if(ports_active == false)
+
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
-	if(msg_code == NULL)
+	if (msg_code == NULL)
 		return EINVAL;
-	if((msg_buffer == NULL) && (buffer_size > 0))
+	if ((msg_buffer == NULL) && (buffer_size > 0))
 		return EINVAL;
 	if (timeout < 0)
 		return EINVAL;
@@ -651,7 +653,7 @@ read_port_etc(port_id id,
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("read_port_etc: invalid port_id %ld\n", id);
@@ -736,15 +738,16 @@ read_port_etc(port_id id,
 	return siz;
 }
 
+
 status_t
 set_port_owner(port_id id, team_id team)
 {
 	int slot;
 	int state;
 	
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -752,7 +755,7 @@ set_port_owner(port_id id, team_id team)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("set_port_owner: invalid port_id %ld\n", id);
@@ -769,22 +772,17 @@ set_port_owner(port_id id, team_id team)
 	return B_NO_ERROR;
 }
 
+
 status_t
-write_port(port_id id,
-	int32 msg_code,
-	const void *msg_buffer,
-	size_t buffer_size)
+write_port(port_id id, int32 msg_code, const void *msg_buffer, size_t buffer_size)
 {
 	return write_port_etc(id, msg_code, msg_buffer, buffer_size, 0, 0);
 }
 
+
 status_t
-write_port_etc(port_id id,
-	int32 msg_code,
-	const void *msg_buffer,
-	size_t buffer_size,
-	uint32 flags,
-	bigtime_t timeout)
+write_port_etc(port_id id, int32 msg_code, const void *msg_buffer,
+	size_t buffer_size, uint32 flags, bigtime_t timeout)
 {
 	int slot;
 	int state;
@@ -795,9 +793,9 @@ write_port_etc(port_id id,
 	int32 c1, c2;
 	int err;
 	
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if(id < 0)
+	if (id < 0)
 		return B_BAD_PORT_ID;
 
 	// mask irrelevant flags
@@ -812,7 +810,7 @@ write_port_etc(port_id id,
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
-	if(ports[slot].id != id) {
+	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
 		restore_interrupts(state);
 		dprintf("write_port_etc: invalid port_id %ld\n", id);
@@ -905,21 +903,24 @@ write_port_etc(port_id id,
 	return B_NO_ERROR;
 }
 
+
 /* this function cycles through the ports table, deleting all the ports that are owned by
    the passed team_id */
-int delete_owned_ports(team_id owner)
+
+int
+delete_owned_ports(team_id owner)
 {
 	int state;
 	int i;
 	int count = 0;
-	
-	if(ports_active == false)
+
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
 
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
-	for(i=0; i<MAX_PORTS; i++) {
+	for (i = 0; i < MAX_PORTS; i++) {
 		if(ports[i].id != -1 && ports[i].owner == owner) {
 			port_id id = ports[i].id;
 
@@ -947,7 +948,8 @@ int delete_owned_ports(team_id owner)
 
 port_id test_p1, test_p2, test_p3, test_p4;
 
-void port_test()
+void
+port_test()
 {
 	char testdata[5];
 	thread_id t;
@@ -1012,7 +1014,9 @@ void port_test()
 	
 }
 
-int port_test_thread_func(void* arg)
+
+int
+port_test_thread_func(void* arg)
 {
 	int32 msg_code;
 	int n;
@@ -1036,11 +1040,14 @@ int port_test_thread_func(void* arg)
 	return 0;
 }
 
+
+//	#pragma mark -
 /* 
  *	user level ports
  */
 
-port_id user_create_port(int32 queue_length, const char *uname)
+port_id
+user_create_port(int32 queue_length, const char *uname)
 {
 	if(uname != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
@@ -1060,19 +1067,25 @@ port_id user_create_port(int32 queue_length, const char *uname)
 	}
 }
 
-status_t user_close_port(port_id id)
+
+status_t
+user_close_port(port_id id)
 {
 	return close_port(id);
 }
 
-status_t user_delete_port(port_id id)
+
+status_t
+user_delete_port(port_id id)
 {
 	return delete_port(id);
 }
 
-port_id	user_find_port(const char *port_name)
+
+port_id
+user_find_port(const char *port_name)
 {
-	if(port_name != NULL) {
+	if (port_name != NULL) {
 		char name[SYS_MAX_OS_NAME_LEN];
 		status_t rc;
 
@@ -1090,7 +1103,9 @@ port_id	user_find_port(const char *port_name)
 	}
 }
 
-status_t user_get_port_info(port_id id, struct port_info *uinfo)
+
+status_t
+user_get_port_info(port_id id, struct port_info *uinfo)
 {
 	status_t 			res;
 	struct port_info	info;
@@ -1098,20 +1113,20 @@ status_t user_get_port_info(port_id id, struct port_info *uinfo)
 
 	if (uinfo == NULL)
 		return EINVAL;
-	if((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
+	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	res = get_port_info(id, &info);
 	// copy to userspace
 	rc = user_memcpy(uinfo, &info, sizeof(struct port_info));
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 	return res;
 }
 
-status_t user_get_next_port_info(team_id uteam,
-				int32 *ucookie,
-				struct port_info *uinfo)
+
+status_t
+user_get_next_port_info(team_id uteam, int32 *ucookie, struct port_info *uinfo)
 {
 	status_t 			res;
 	struct port_info	info;
@@ -1122,39 +1137,45 @@ status_t user_get_next_port_info(team_id uteam,
 		return EINVAL;
 	if (uinfo == NULL)
 		return EINVAL;
-	if((addr)ucookie >= KERNEL_BASE && (addr)ucookie <= KERNEL_TOP)
+	if ((addr)ucookie >= KERNEL_BASE && (addr)ucookie <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
+	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	// copy from userspace
 	rc = user_memcpy(&cookie, ucookie, sizeof(int32));
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 	
 	res = get_next_port_info(uteam, &cookie, &info);
 	// copy to userspace
 	rc = user_memcpy(ucookie, &info, sizeof(int32));
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 	rc = user_memcpy(uinfo,   &info, sizeof(struct port_info));
-	if(rc < 0)
+	if (rc < 0)
 		return rc;
 	return res;
 }
 
-ssize_t	user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
+
+ssize_t
+user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
 {
 	return port_buffer_size_etc(port, flags | B_CAN_INTERRUPT, timeout);
 }
 
-ssize_t user_port_count(port_id port)
+
+ssize_t
+user_port_count(port_id port)
 {
 	return port_count(port);
 }
 
-status_t user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
-							size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
+
+status_t
+user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
+	size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
 {
 	ssize_t		res;
 	int32		msg_code;
@@ -1180,13 +1201,17 @@ status_t user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
 	return res;
 }
 
-status_t user_set_port_owner(port_id port, team_id team)
+
+status_t
+user_set_port_owner(port_id port, team_id team)
 {
 	return set_port_owner(port, team);
 }
 
-status_t user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,
-				size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
+
+status_t
+user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,
+	size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
 {
 	if (umsg_buffer == NULL)
 		return EINVAL;
