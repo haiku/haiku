@@ -6,6 +6,7 @@
 #include <Messenger.h>
 #include <mime/UpdateMimeInfoThread.h>
 #include <mime/CreateAppMetaMimeThread.h>
+#include <Path.h>
 #include <RegistrarDefs.h>
 #include <String.h>
 #include <TypeConstants.h>
@@ -233,8 +234,9 @@ MIMEManager::MessageReceived(BMessage *message)
 			// Launch the thread
 			if (!err) {
 				err = fThreadManager.LaunchThread(thread);
-				if (!err)
+				if (!err) {
 					stillOwnThread = false;
+				}
 			}
 				
 			// If something went wrong, we need to notify the sender regardless. However,

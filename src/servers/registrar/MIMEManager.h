@@ -5,7 +5,7 @@
 
 #include <Looper.h>
 #include <mime/Database.h>
-#include <ThreadManager.h>
+#include <RegistrarThreadManager.h>
 
 class MIMEManager : public BLooper {
 public:
@@ -18,7 +18,7 @@ private:
 	void HandleDeleteParam(BMessage *message);
 	
 	BPrivate::Storage::Mime::Database fDatabase;
-	ThreadManager fThreadManager;
+	RegistrarThreadManager fThreadManager;
 	BMessenger fManagerMessenger;
 };
 
