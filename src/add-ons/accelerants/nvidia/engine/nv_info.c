@@ -39,6 +39,8 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
+static void write_RMA(uint32 reg, uint32 data);
+static uint32 read_RMA(uint32 reg);
 static status_t	nv_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
@@ -1122,7 +1124,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				ISAWB(reg, safe);
 			}
 			break;
-		case 0x63:
+		case 0x63: /* new setup compared to pre-NV10 version */
 			*size -= 1;
 			if (*size < 0)
 			{
@@ -1135,7 +1137,6 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			/* execute */
 			adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
-			//fixme: setup...
 			/* always done */
 			setup_ram_config_nv10_up(rom, ram_tab);
 			break;
@@ -1541,6 +1542,129 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
 {
+	uint32 data;
+	uint8 cnt = 0;
+	status_t stat = B_ERROR;
+
+	/* set 'refctrl is valid' */
+	NV_REG32(NV32_PFB_REFCTRL) = 0x80000000;
+
+	/* check RAM for 256bits buswidth(?) */
+	while ((cnt < 4) && (stat != B_OK))
+	{
+		/* reset RAM adress 128Mb + $1c four times */
+		write_RMA(0x8800001c, 0x00000000);
+		write_RMA(0x8800001c, 0x00000000);
+		write_RMA(0x8800001c, 0x00000000);
+		write_RMA(0x8800001c, 0x00000000);
+		/* write testpattern */
+		write_RMA(0x8800001c, 0x4e563131);
+		/* reset RAM adress 128Mb + $1c + 256bits */
+		write_RMA(0x8800003c, 0x00000000);
+		/* check testpattern to have survived */
+		if (read_RMA(0x8800001c) == 0x4e563131) stat = B_OK;
+		cnt++;
+	}
+
+	/* if pattern did not hold modify RAM-type setup */
+	if (stat != B_OK)
+	{
+		data = NV_REG32(NV32_PFB_CONFIG_0);
+		if (data & 0x00000010)
+		{
+			data &= 0xffffffcf;
+		}
+		else
+		{
+			data &= 0xffffffcf;
+			data |= 0x00000020;
+		}
+		NV_REG32(NV32_PFB_CONFIG_0) = data;
+	}
+
+	/* check RAM bankswitching stuff(?) */
+	cnt = 0;
+	stat = B_ERROR;
+	while ((cnt < 4) && (stat != B_OK))
+	{
+		/* read RAM size(?) */
+		data = NV_REG32(NV32_PFB_FIFO_DATA);
+		/* subtract 1MB */
+		data -= 0x00100000;
+		/* generate testadress by adding 128Mb */
+		data += 0x08000000;
+		/* write testpattern at generated RAM adress */
+		write_RMA((0x80000000 + data), 0x4e564441);
+		/* reset RAM adress 128Mb */
+		write_RMA(0x88000000, 0x00000000);
+		/* dummyread RAM adress 128Mb four times */
+		read_RMA(0x88000000);
+		read_RMA(0x88000000);
+		read_RMA(0x88000000);
+		read_RMA(0x88000000);
+		/* check testpattern to have survived */
+		if (read_RMA(0x80000000 + data) == 0x4e564441) stat = B_OK;
+		cnt++;
+	}
+
+	/* if pattern did not hold modify RAM-type setup */
+	if (stat != B_OK)
+	{
+		NV_REG32(NV32_PFB_CONFIG_0) &= 0xffffefff;
+	}
+}
+
+/* this function is very handy for RAM size testing (doesn't need mapping) */
+/* RMA is a port that allows access to all of the cards 32bit registers and all
+ * of the cards RAM from old ISA I/O space via the GPU.
+ * RAM starts at 'offset' $80000000 */
+static void write_RMA(uint32 reg, uint32 data)
+{
+	uint8 safe;
+
+	/* save old CRTC index register */
+	safe = ISARB(0x03d4);
+	/* select RMA port 'set adress' mode */
+	ISAWW(0x03d4, 0x0338);
+	/* set adress in RMA port */
+	ISAWW(0x03d0, (reg & 0x0000ffff));
+	ISAWW(0x03d2, (reg >> 16));
+	/* select RMA port 'write data' mode */
+	ISAWW(0x03d4, 0x0738);
+	/* set send data through RMA port */
+	ISAWW(0x03d0, (data & 0x0000ffff));
+	ISAWW(0x03d2, (data >> 16));
+	/* re-select RMA port 'set adress' mode (just to be sure) */
+	ISAWW(0x03d4, 0x0338);
+	/* restore old CRTC index register */
+	ISAWB(0x03d4, safe);
+}
+
+/* this function is very handy for RAM size testing (doesn't need mapping) */
+/* RMA is a port that allows access to all of the cards 32bit registers and all
+ * of the cards RAM from old ISA I/O space via the GPU.
+ * RAM starts at 'offset' $80000000 */
+static uint32 read_RMA(uint32 reg)
+{
+	uint8 safe;
+	uint32 data;
+
+	/* save old CRTC index register */
+	safe = ISARB(0x03d4);
+	/* select RMA port 'set adress' mode */
+	ISAWW(0x03d4, 0x0338);
+	/* set adress in RMA port */
+	ISAWW(0x03d0, (reg & 0x0000ffff));
+	ISAWW(0x03d2, (reg >> 16));
+	/* select RMA port 'read data' mode */
+	ISAWW(0x03d4, 0x0538);
+	/* read data from RMA port */
+	data = ISARW(0x03d0);
+	data |= ((ISARW(0x03d2)) << 16);
+	/* re-select RMA port 'set adress' mode (just to be sure) */
+	ISAWW(0x03d4, 0x0338);
+	/* restore old CRTC index register */
+	ISAWB(0x03d4, safe);
 }
 
 //fixme: move to crtc sourcefile, also setup for crtc2(?)
