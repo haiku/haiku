@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kernel libroot posix string ;
 
 KernelMergeObject posix_string.o :
+	bcmp.c
 	bcopy.c
 	bzero.c
 	memchr.c
