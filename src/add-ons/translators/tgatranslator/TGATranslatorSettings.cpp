@@ -1,8 +1,11 @@
 /*****************************************************************************/
 // TGATranslatorSettings
+// Written by Michael Wilber, OBOS Translation Kit Team
+//
 // TGATranslatorSettings.cpp
 //
-// The description goes here.
+// This class manages (saves/loads/locks/unlocks) the settings
+// for the TGATranslator.
 //
 //
 // Copyright (c) 2002 OpenBeOS Project
@@ -32,6 +35,20 @@
 	// for B_TRANSLATOR_EXT_*
 #include "TGATranslatorSettings.h"
 
+// ---------------------------------------------------------------
+// Constructor
+//
+// Sets the default settings, location for the settings file
+// and sets the reference count to 1
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
 TGATranslatorSettings::TGATranslatorSettings()
 	: flock("TGA Settings Lock")
 {
@@ -50,6 +67,20 @@ TGATranslatorSettings::TGATranslatorSettings()
 		// RLE compression is off by default
 }
 
+// ---------------------------------------------------------------
+// Acquire
+//
+// Returns a pointer to the TGATranslatorSettings and increments
+// the reference count. 
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns: pointer to this TGATranslatorSettings object
+// ---------------------------------------------------------------
 TGATranslatorSettings *
 TGATranslatorSettings::Acquire()
 {
@@ -63,6 +94,23 @@ TGATranslatorSettings::Acquire()
 	return psettings;
 }
 
+// ---------------------------------------------------------------
+// Release
+//
+// Decrements the reference count and deletes the
+// TGATranslatorSettings if the reference count is zero.
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns: pointer to this TGATranslatorSettings object if
+// the reference count is greater than zero, returns NULL
+// if the reference count is zero and the TGATranslatorSettings
+// object has been deleted
+// ---------------------------------------------------------------
 TGATranslatorSettings *
 TGATranslatorSettings::Release()
 {
@@ -81,10 +129,38 @@ TGATranslatorSettings::Release()
 	return psettings;	
 }
 
+// ---------------------------------------------------------------
+// Destructor
+//
+// Does nothing!
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns:
+// ---------------------------------------------------------------
 TGATranslatorSettings::~TGATranslatorSettings()
 {
 }
-	
+
+// ---------------------------------------------------------------
+// LoadSettings
+//
+// Loads the settings by reading them from the default
+// settings file.
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns: B_OK if there were no errors or an error code from
+// BFile::SetTo() or BMessage::Unflatten() if there were errors
+// ---------------------------------------------------------------
 status_t
 TGATranslatorSettings::LoadSettings()
 {
@@ -106,6 +182,23 @@ TGATranslatorSettings::LoadSettings()
 	return result;
 }
 
+// ---------------------------------------------------------------
+// LoadSettings
+//
+// Loads the settings from a BMessage passed to the function.
+//
+// Preconditions:
+//
+// Parameters:	pmsg	pointer to BMessage that contains the
+//						settings
+//
+// Postconditions:
+//
+// Returns: B_BAD_VALUE if pmsg is NULL or invalid options
+// have been found, B_OK if there were no
+// errors or an error code from BMessage::FindBool() or
+// BMessage::ReplaceBool() if there were other errors
+// ---------------------------------------------------------------
 status_t
 TGATranslatorSettings::LoadSettings(BMessage *pmsg)
 {
@@ -134,15 +227,17 @@ TGATranslatorSettings::LoadSettings(BMessage *pmsg)
 			// are mutually exclusive
 			result = B_BAD_VALUE;
 		else {
-			fmsgSettings.ReplaceBool(
-				B_TRANSLATOR_EXT_HEADER_ONLY, bheaderOnly);
-				
-			fmsgSettings.ReplaceBool(
-				B_TRANSLATOR_EXT_DATA_ONLY, bdataOnly);
-				
-			fmsgSettings.ReplaceBool(TGA_SETTING_RLE, brle);
-			
 			result = B_OK;
+			
+			result = fmsgSettings.ReplaceBool(
+				B_TRANSLATOR_EXT_HEADER_ONLY, bheaderOnly);
+			
+			if (result == B_OK)
+				result = fmsgSettings.ReplaceBool(
+					B_TRANSLATOR_EXT_DATA_ONLY, bdataOnly);
+		
+			if (result == B_OK)		
+				result = fmsgSettings.ReplaceBool(TGA_SETTING_RLE, brle);
 		}
 		flock.Unlock();
 	}
@@ -150,6 +245,21 @@ TGATranslatorSettings::LoadSettings(BMessage *pmsg)
 	return result;
 }
 
+// ---------------------------------------------------------------
+// SaveSettings
+//
+// Saves the settings as a flattened BMessage to the default
+// settings file
+//
+// Preconditions:
+//
+// Parameters:
+//
+// Postconditions:
+//
+// Returns: B_OK if no errors or an error code from BFile::SetTo()
+// or BMessage::Flatten() if there were errors
+// ---------------------------------------------------------------
 status_t
 TGATranslatorSettings::SaveSettings()
 {
@@ -168,6 +278,23 @@ TGATranslatorSettings::SaveSettings()
 	return result;
 }
 
+// ---------------------------------------------------------------
+// GetConfigurationMessage
+//
+// Saves the current settings to the BMessage passed to the
+// function
+//
+// Preconditions:
+//
+// Parameters:	pmsg	pointer to BMessage where the settings
+//						will be stored
+//
+// Postconditions:
+//
+// Returns: B_OK if there were no errors or an error code from
+// BMessage::RemoveName() or BMessage::AddBool() if there were
+// errors
+// ---------------------------------------------------------------
 status_t
 TGATranslatorSettings::GetConfigurationMessage(BMessage *pmsg)
 {
@@ -188,24 +315,46 @@ TGATranslatorSettings::GetConfigurationMessage(BMessage *pmsg)
 		}
 		if (i == klen) {
 			flock.Lock();
+			result = B_OK;
 			
-			pmsg->AddBool(B_TRANSLATOR_EXT_HEADER_ONLY,
+			result = pmsg->AddBool(B_TRANSLATOR_EXT_HEADER_ONLY,
 				SetGetHeaderOnly());
-				
-			pmsg->AddBool(B_TRANSLATOR_EXT_DATA_ONLY,
-				SetGetDataOnly());
-				
-			pmsg->AddBool(TGA_SETTING_RLE,
-				SetGetRLE());
+			
+			if (result == B_OK)
+				result = pmsg->AddBool(B_TRANSLATOR_EXT_DATA_ONLY,
+					SetGetDataOnly());
+		
+			if (result == B_OK)		
+				result = pmsg->AddBool(TGA_SETTING_RLE,
+					SetGetRLE());
 				
 			flock.Unlock();
-			result = B_OK;
 		}
 	}
 	
 	return result;
 }
 
+// ---------------------------------------------------------------
+// SetGetHeaderOnly
+//
+// Sets the state of the HeaderOnly setting (if pbHeaderOnly
+// is not NULL) and returns the previous value of the
+// HeaderOnly setting.
+//
+// If the HeaderOnly setting is true, only the header of
+// the image will be output; the data will not be output.
+//
+// Preconditions:
+//
+// Parameters:	pbHeaderOnly	pointer to a bool specifying
+//								the new value of the
+//								HeaderOnly setting
+//
+// Postconditions:
+//
+// Returns: the prior value of the HeaderOnly setting
+// ---------------------------------------------------------------
 bool
 TGATranslatorSettings::SetGetHeaderOnly(bool *pbHeaderOnly)
 {
@@ -220,6 +369,26 @@ TGATranslatorSettings::SetGetHeaderOnly(bool *pbHeaderOnly)
 	return bprevValue;
 }
 
+// ---------------------------------------------------------------
+// SetGetDataOnly
+//
+// Sets the state of the DataOnly setting (if pbDataOnly
+// is not NULL) and returns the previous value of the
+// DataOnly setting.
+//
+// If the DataOnly setting is true, only the data of
+// the image will be output; the header will not be output.
+//
+// Preconditions:
+//
+// Parameters:	pbDataOnly		pointer to a bool specifying
+//								the new value of the
+//								DataOnly setting
+//
+// Postconditions:
+//
+// Returns: the prior value of the DataOnly setting
+// ---------------------------------------------------------------
 bool
 TGATranslatorSettings::SetGetDataOnly(bool *pbDataOnly)
 {
@@ -233,7 +402,25 @@ TGATranslatorSettings::SetGetDataOnly(bool *pbDataOnly)
 	
 	return bprevValue;
 }
-	
+
+// ---------------------------------------------------------------
+// SetGetRLE
+//
+// Sets the state of the RLE setting (if pbRLE is not NULL)
+// and returns the previous value of the RLE setting.
+//
+// If the RLE setting is true, TGA images created by the 
+// TGATranslator will be RLE compressed.
+//
+// Preconditions:
+//
+// Parameters:	pbRLE	pointer to bool which specifies
+//						the new value for the RLE setting
+//
+// Postconditions:
+//
+// Returns: the prior value of the RLE setting
+// ---------------------------------------------------------------
 bool
 TGATranslatorSettings::SetGetRLE(bool *pbRLE)
 {
