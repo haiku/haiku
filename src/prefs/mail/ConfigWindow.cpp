@@ -538,7 +538,7 @@ ConfigWindow::MakeHowToView()
 			{
 				// copy and enlarge a 32x32 8-bit bitmap
 				char *bits = (char *)bitmap->Bits();
-				for (int32 i = 0, j = -64;i < length;i++)
+				for (int32 i=0, j=-64; i<(int32)length; i++)
 				{
 					if ((i % 32) == 0)
 						j += 64;
@@ -816,7 +816,7 @@ ConfigWindow::SetToGeneralSettings(BMailSettings *settings)
 		item->SetMarked(true);
 	if (BMenuItem *item = fStatusLookField->Menu()->ItemAt(settings->StatusWindowLook()))
 		item->SetMarked(true);
-	if (BMenuItem *item = fStatusWorkspaceField->Menu()->ItemAt(settings->StatusWindowWorkspaces() != B_ALL_WORKSPACES ? 0 : 1))
+	if (BMenuItem *item = fStatusWorkspaceField->Menu()->ItemAt((uint32)settings->StatusWindowWorkspaces() != B_ALL_WORKSPACES ? 0 : 1))
 		item->SetMarked(true);
 
 	BMessenger messenger("application/x-vnd.Be-POST");

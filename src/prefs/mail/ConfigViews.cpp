@@ -50,7 +50,6 @@ AccountConfigView::AccountConfigView(BRect rect,Account *account)
 		fAccount(account)
 {
 	SetLabel(MDR_DIALECT_CHOICE ("Account Configuration","アカウント設定"));
-	BMailChain *settings = account->Inbound() ? account->Inbound() : account->Outbound();
 
 	rect = Bounds().InsetByCopy(8,8);
 	rect.top += 10;
@@ -538,7 +537,7 @@ FiltersConfigView::FiltersConfigView(BRect rect,Account *account)
 
 	BMenuItem *item;
 	BMessage *msg;
-	if (fChain = fAccount->Inbound())
+	if ((fChain = fAccount->Inbound()))
 	{
 		menu->AddItem(item = new BMenuItem(MDR_DIALECT_CHOICE ("Incoming E-mail Filters","受信フィルタ"),msg = new BMessage(kMsgChainSelected)));
 		msg->AddPointer("chain",fChain);
