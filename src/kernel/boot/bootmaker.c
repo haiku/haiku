@@ -46,7 +46,7 @@
 #ifdef i386
 #	define xLITTLE_ENDIAN 1
 #endif
-#ifdef __ppc__
+#if defined(__ppc__) || defined(__PPC__) || defined(__POWERPC__)
 #	define xBIG_ENDIAN 1
 #endif
 
