@@ -36,9 +36,6 @@
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Button.h>
-// TODO: Fix
-// This is hacked in because something in Accelerant.h or SupportDefs.h is lame!
-//typedef unsigned int			uint;
 #include <Screen.h>
 #include <TextView.h>
 #include <View.h>
@@ -360,8 +357,8 @@ void BAlert::MessageReceived(BMessage* msg)
 //------------------------------------------------------------------------------
 void BAlert::FrameResized(float new_width, float new_height)
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: BAlerts are, by nature, not resizable. Do nothing.
+	
 	BWindow::FrameResized(new_width, new_height);
 }
 //------------------------------------------------------------------------------
@@ -383,36 +380,31 @@ BHandler* BAlert::ResolveSpecifier(BMessage* msg, int32 index,
 								   BMessage* specifier, int32 form,
 								   const char* property)
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: Undocumented. A disassembly reveals that it calls the BWindow version
 	return BWindow::ResolveSpecifier(msg, index, specifier, form, property);
 }
 //------------------------------------------------------------------------------
 status_t BAlert::GetSupportedSuites(BMessage* data)
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: Undocumented, but testing reveals that it calls the BWindow version
 	return BWindow::GetSupportedSuites(data);
 }
 //------------------------------------------------------------------------------
 void BAlert::DispatchMessage(BMessage* msg, BHandler* handler)
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: Undocumented. A disassembly reveals that it calls the BWindow version
 	BWindow::DispatchMessage(msg, handler);
 }
 //------------------------------------------------------------------------------
 void BAlert::Quit()
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: Undocumented. A disassembly reveals that it calls the BWindow version
 	BWindow::Quit();
 }
 //------------------------------------------------------------------------------
 bool BAlert::QuitRequested()
 {
-	// Nothing in documentation; will have to test
-	// TODO: Implement?
+	// DW: Undocumented. A disassembly reveals that it calls the BWindow version
 	return BWindow::QuitRequested();
 }
 //------------------------------------------------------------------------------
