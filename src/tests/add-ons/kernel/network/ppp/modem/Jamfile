@@ -4,13 +4,13 @@ UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp ] ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pppoe ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp modem ] ;
 
 
 Addon <userland>pppoe : userland network ppp :
-	pppoe.cpp
-	PPPoEDevice.cpp
-	DiscoveryPacket.cpp
+	modem.cpp
+	ModemDevice.cpp
+	ACFCHandler.cpp
 ;
 
 LinkSharedOSLibs <userland>pppoe : <userland>libkernelppp.a <installed>net_stack_tester be ;

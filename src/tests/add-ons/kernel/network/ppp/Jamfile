@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests add-ons kernel network ppp ;
 
 SubInclude OBOS_TOP src tests add-ons kernel network ppp ipcp ;
+SubInclude OBOS_TOP src tests add-ons kernel network ppp modem ;
 SubInclude OBOS_TOP src tests add-ons kernel network ppp pap ;
 SubInclude OBOS_TOP src tests add-ons kernel network ppp pppoe ;
 SubInclude OBOS_TOP src tests add-ons kernel network ppp shared ;
