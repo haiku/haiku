@@ -218,20 +218,33 @@ check_cpu_features()
 }
 
 
-void
+//	#pragma mark -
+
+
+extern "C" void
+spin(bigtime_t microseconds)
+{
+	bigtime_t time = system_time();
+
+	while((system_time() - time) < microseconds)
+		;
+}
+
+
+extern "C" void
 cpu_boot_other_cpus()
 {
 	smp_boot();
 }
 
 
-void
+extern "C" void
 cpu_init()
 {
 	if (check_cpu_features() != B_OK)
 		panic("You need a Pentium or higher in order to boot!\n");
 
-	//gKernelArgs.arch_args.system_time_cv_factor = calculate_cpu_conversion_factor();
+	gKernelArgs.arch_args.system_time_cv_factor = calculate_cpu_conversion_factor();
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
 }
