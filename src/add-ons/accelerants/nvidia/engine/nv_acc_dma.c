@@ -1058,6 +1058,11 @@ void nv_acc_assert_fifo_dma(void)
 	note also:
 	splitting up each command list into sublists (see routines below) prevents
 	a lot more nested calls, further increasing the speed with upto 70%.
+	
+	finally:
+	sending the sublist to just one single engine command even further increases
+	speed with upto another 10%. This can't be done for blits though, as this engine-
+	command's hardware does not support multiple objects.
 */
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
@@ -1135,12 +1140,13 @@ void FILL_RECTANGLE_DMA(engine_token *et, uint32 colorIndex, fill_rect_params *l
 		count -= subcnt;
 
 		/* wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+		if (nv_acc_fifofree_dma(1 + (2 * subcnt)) != B_OK) return;
 
+		/* issue fill command once... */
+		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, (2 * subcnt));
+		/* ... and send multiple rects (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			/* now setup fill (writing 3 32bit words) */
-			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
@@ -1183,12 +1189,13 @@ void FILL_SPAN_DMA(engine_token *et, uint32 colorIndex, uint16 *list, uint32 cou
 		count -= subcnt;
 
 		/* wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+		if (nv_acc_fifofree_dma(1 + (2 * subcnt)) != B_OK) return;
 
+		/* issue fill command once... */
+		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, (2 * subcnt));
+		/* ... and send multiple rects (spans) (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			/* now setup fill (writing 3 32bit words) */
-			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 				(((list[i+1]) << 16) | ((list[i]) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
@@ -1230,12 +1237,13 @@ void INVERT_RECTANGLE_DMA(engine_token *et, fill_rect_params *list, uint32 count
 		count -= subcnt;
 
 		/* wait for room in fifo for bitmap cmd if needed. */
-		if (nv_acc_fifofree_dma(3 * subcnt) != B_OK) return;
+		if (nv_acc_fifofree_dma(1 + (2 * subcnt)) != B_OK) return;
 
+		/* issue fill command once... */
+		nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, (2 * subcnt));
+		/* ... and send multiple rects (engine cmd supports 32 max) */
 		while (subcnt--)
 		{
-			/* now setup fill (writing 3 32bit words) */
-			nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 				(((list[i].left) << 16) | ((list[i].top) & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
 			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
