@@ -32,6 +32,7 @@ else
         quit "application/x-vnd.Be-TSKB"
 
         rm /boot/home/config/add-ons/mail_daemon/inbound_filters/AGMSBayesianSpamFilter
+        rm /boot/home/config/lib/libtextencoding.so
 
         unzip -od / install.zip
 
