@@ -191,6 +191,9 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SNOOZE_ETC:
 			*call_ret = user_snooze_etc((bigtime_t)INT32TOINT64(arg0, arg1), (int)arg2, (int32)arg3);
 			break;
+
+		/* semaphore syscalls */
+
 		case SYSCALL_SEM_CREATE:
 			*call_ret = user_create_sem((int)arg0, (const char *)arg1);
 			break;
@@ -209,6 +212,44 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SEM_RELEASE_ETC:
 			*call_ret = user_release_sem_etc((sem_id)arg0, (int)arg1, (int)arg2);
 			break;
+
+		/* VM/area syscalls */
+
+		case SYSCALL_CREATE_AREA:
+			*call_ret = _user_create_area((char *)arg0, (void **)arg1, (uint32)arg2,
+				(size_t)arg3, (uint32)arg4, (uint32)arg5);
+			break;
+		case SYSCALL_CLONE_AREA:
+			*call_ret = _user_clone_area((char *)arg0, (void **)arg1, (uint32)arg2,
+				(uint32)arg3, (area_id)arg4);
+			break;
+		case SYSCALL_VM_MAP_FILE:
+			*call_ret = user_vm_map_file(
+				(char *)arg0, (void **)arg1, (int)arg2,
+				(addr)arg3, (int)arg4, (int)arg5, (const char *)arg6,
+				(off_t)INT32TOINT64(arg7, arg8));
+			break;
+		case SYSCALL_FIND_AREA:
+			*call_ret = _user_find_area((const char *)arg0);
+			break;
+		case SYSCALL_DELETE_AREA:
+			*call_ret = _user_delete_area((area_id)arg0);
+			break;
+		case SYSCALL_GET_AREA_INFO:
+			*call_ret = _user_get_area_info((area_id)arg0, (area_info *)arg1);
+			break;
+		case SYSCALL_GET_NEXT_AREA_INFO:
+			*call_ret = _user_get_next_area_info((team_id)arg0, (int32 *)arg1, (area_info *)arg2);
+			break;
+		case SYSCALL_SET_AREA_PROTECTION:
+			*call_ret = _user_set_area_protection((area_id)arg0, (uint32)arg1);
+			break;
+		case SYSCALL_AREA_FOR:
+			*call_ret = _user_area_for((void *)arg0);
+			break;
+
+		/* Thread/team syscalls */
+
 		case SYSCALL_GET_CURRENT_THREAD_ID:
 			*call_ret = thread_get_current_thread_id();
 			break;
@@ -224,30 +265,6 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			break;
 		case SYSCALL_WAIT_ON_TEAM:
 			*call_ret = user_wait_for_team((team_id)arg0, (status_t *)arg1);
-			break;
-		case SYSCALL_CREATE_AREA:
-			*call_ret = _user_create_area((char *)arg0, (void **)arg1, (uint32)arg2,
-				(size_t)arg3, (uint32)arg4, (uint32)arg5);
-			break;
-		case SYSCALL_VM_CLONE_REGION:
-			*call_ret = user_vm_clone_region(
-				(char *)arg0, (void **)arg1, (int)arg2,
-				(region_id)arg3, (int)arg4, (int)arg5);
-			break;
-		case SYSCALL_VM_MAP_FILE:
-			*call_ret = user_vm_map_file(
-				(char *)arg0, (void **)arg1, (int)arg2,
-				(addr)arg3, (int)arg4, (int)arg5, (const char *)arg6,
-				(off_t)INT32TOINT64(arg7, arg8));
-			break;
-		case SYSCALL_VM_FIND_REGION_BY_NAME:
-			*call_ret = find_region_by_name((const char *)arg0);
-			break;
-		case SYSCALL_DELETE_AREA:
-			*call_ret = _user_delete_area((area_id)arg0);
-			break;
-		case SYSCALL_VM_GET_REGION_INFO:
-			*call_ret = user_vm_get_region_info((region_id)arg0, (vm_region_info *)arg1);
 			break;
 		case SYSCALL_SPAWN_THREAD:
 			*call_ret = user_spawn_thread((thread_func)arg0, (const char *)arg1, (int)arg2, (void *)arg3, (void *)arg4);
