@@ -13,28 +13,33 @@
 
 #define DEVICE_NAME "zero"
 
-static int zero_open(const char *name, uint32 flags, void **cookie)
+static status_t
+zero_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
 	return 0;
 }
 
-static int zero_close(void * cookie)
+static status_t
+zero_close(void * cookie)
 {
 	return 0;
 }
 
-static int zero_freecookie(void * cookie)
+static status_t
+zero_freecookie(void * cookie)
 {
 	return 0;
 }
 
-static int zero_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+static status_t
+zero_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	return EPERM;
 }
 
-static ssize_t zero_read(void * cookie, off_t pos, void *buf, size_t *len)
+static ssize_t
+zero_read(void * cookie, off_t pos, void *buf, size_t *len)
 {
 	int rc;
 
@@ -45,17 +50,20 @@ static ssize_t zero_read(void * cookie, off_t pos, void *buf, size_t *len)
 	return 0;
 }
 
-static ssize_t zero_write(void * cookie, off_t pos, const void *buf, size_t *len)
+static ssize_t
+zero_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	return 0;
 }
 
-status_t init_hardware()
+status_t
+init_hardware()
 {
 	return 0;
 }
 
-const char **publish_devices(void)
+const char **
+publish_devices(void)
 {
 	static const char *devices[] = {
 		DEVICE_NAME, 
@@ -65,7 +73,8 @@ const char **publish_devices(void)
 	return devices;
 }
 
-device_hooks *find_device(const char *name)
+device_hooks *
+find_device(const char *name)
 {
 	static device_hooks hooks = {
 		&zero_open,
@@ -89,13 +98,14 @@ device_hooks *find_device(const char *name)
 	return NULL;
 }
 
-status_t init_driver()
+status_t
+init_driver()
 {
 	return 0;
 }
 
-void uninit_driver()
+void
+uninit_driver()
 {
 }
-
 

@@ -12,43 +12,51 @@
 
 #define DEVICE_NAME "null"
 
-static int null_open(const char *name, uint32 flags, void * *cookie)
+static status_t
+null_open(const char *name, uint32 flags, void * *cookie)
 {
 	*cookie = NULL;
 	return 0;
 }
 
-static int null_close(void * cookie)
+static status_t
+null_close(void * cookie)
 {
 	return 0;
 }
 
-static int null_freecookie(void * cookie)
+static status_t
+null_freecookie(void * cookie)
 {
 	return 0;
 }
 
-static int null_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+static status_t
+null_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
 	return EPERM;
 }
 
-static ssize_t null_read(void * cookie, off_t pos, void *buf, size_t *len)
+static ssize_t
+null_read(void * cookie, off_t pos, void *buf, size_t *len)
 {
 	return 0;
 }
 
-static ssize_t null_write(void * cookie, off_t pos, const void *buf, size_t *len)
+static ssize_t
+null_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	return 0;
 }
 
-status_t init_hardware()
+status_t
+init_hardware()
 {
 	return 0;
 }
 
-const char **publish_devices(void)
+const char **
+publish_devices(void)
 {
 	static const char *devices[] = {
 		DEVICE_NAME, 
@@ -58,7 +66,8 @@ const char **publish_devices(void)
 	return devices;
 }
 
-device_hooks *find_device(const char *name)
+device_hooks *
+find_device(const char *name)
 {
 	static device_hooks hooks = {
 		&null_open,
@@ -82,12 +91,14 @@ device_hooks *find_device(const char *name)
 	return NULL;
 }
 
-status_t init_driver()
+status_t
+init_driver()
 {
 	return 0;
 }
 
-void uninit_driver()
+void
+uninit_driver()
 {
 }
 
