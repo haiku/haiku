@@ -54,7 +54,6 @@
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <math.h>
-#include <posix/math.h>
 
 // Local Includes --------------------------------------------------------------
 
