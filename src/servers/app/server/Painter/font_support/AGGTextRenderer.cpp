@@ -195,7 +195,8 @@ void
 AGGTextRenderer::RenderString(const char* string,
 							  font_renderer_solid_type* solidRenderer,
 							  font_renderer_bin_type* binRenderer,
-							  const Transformable& transform)
+							  const Transformable& transform,
+							  BPoint* nextCharPos)
 {
 	fFontEngine.hinting(fHinted);
 	fFontEngine.height((int32)(fPtSize/* * 16.0*/));
@@ -258,7 +259,6 @@ AGGTextRenderer::RenderString(const char* string,
 			if (glyph) {
 
 				if (fKerning) {
-//					fFontManager.add_kerning(&x, &y);
 					fFontManager.add_kerning(&advanceX, &advanceY);
 				}
 
@@ -309,12 +309,18 @@ AGGTextRenderer::RenderString(const char* string,
 				}
 	
 				// increment pen position
-//				x += glyph->advance_x + (fAdvanceScale - 1.0) * fFontEngine.height();
-//				y += glyph->advance_y;
 				advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
 				advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
 			}
 			++p;
+		}
+		if (nextCharPos) {
+			x += fAdvanceScale * advanceX;
+			if (advanceX > 0.0 && fAdvanceScale > 1.0)
+				x += (fAdvanceScale - 1.0) * fFontEngine.height();
+			y += advanceY;
+			nextCharPos->x = x;
+			nextCharPos->y = y;
 		}
 	} else {
 		fprintf(stderr, "UTF8 -> Unicode conversion failed: %s\n", strerror(ret));
@@ -378,7 +384,6 @@ AGGTextRenderer::Bounds(const char* string,
 					if (glyph) {
 	
 						if (fKerning) {
-	//						fFontManager.add_kerning(&x, &y);
 							fFontManager.add_kerning(&advanceX, &advanceY);
 						}
 	
@@ -421,8 +426,6 @@ AGGTextRenderer::Bounds(const char* string,
 							bounds = bounds.IsValid() ? bounds | t : t;
 		
 						// increment pen position
-	//					x += glyph->advance_x + (fAdvanceScale - 1.0) * fFontEngine.height();
-	//					y += glyph->advance_y;
 						advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
 						advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
 					}

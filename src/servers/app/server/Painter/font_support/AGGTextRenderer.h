@@ -32,7 +32,8 @@ class AGGTextRenderer : public TextRenderer {
 	virtual	void				RenderString(const char* utf8String,
 											 font_renderer_solid_type* solidRenderer,
 											 font_renderer_bin_type* binRenderer,
-											 const Transformable& transform);
+											 const Transformable& transform,
+											 BPoint* nextCharPos = NULL);
 
 	virtual	BRect				Bounds(const char* utf8String,
 									   const Transformable& transform);
