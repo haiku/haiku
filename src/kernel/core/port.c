@@ -237,16 +237,15 @@ create_port(int32 queue_length, const char *name)
 
 	// find the first empty spot
 	for (i = 0; i < MAX_PORTS; i++) {
-		if(gPorts[i].id == -1) {
+		if (gPorts[i].id == -1) {
 			// make the port_id be a multiple of the slot it's in
-			if(i >= gNextPort % MAX_PORTS) {
+			if (i >= gNextPort % MAX_PORTS)
 				gNextPort += i - gNextPort % MAX_PORTS;
-			} else {
+			else
 				gNextPort += MAX_PORTS - (gNextPort % MAX_PORTS - i);
-			}
-			gPorts[i].id		= gNextPort++;
-			gPorts[i].lock	= 0;
+
 			GRAB_PORT_LOCK(gPorts[i]);
+			gPorts[i].id = gNextPort++;
 			RELEASE_PORT_LIST_LOCK();
 
 			gPorts[i].capacity	= queue_length;
@@ -376,37 +375,35 @@ delete_port(port_id id)
 
 
 port_id
-find_port(const char *port_name)
+find_port(const char *name)
 {
+	port_id portFound = B_BAD_PORT_ID;
+	cpu_status state;
 	int i;
-	int state;
-	int ret_val = B_BAD_PORT_ID;
 
 	if (ports_active == false)
 		return B_BAD_PORT_ID;
-	if (port_name == NULL)
+	if (name == NULL)
 		return B_BAD_PORT_ID;
 
-	// lock list of gPorts
-	state = disable_interrupts();
-	GRAB_PORT_LIST_LOCK();
+	// Since we have to check every single port, and we don't
+	// care if it goes away at any point, we're only grabbing
+	// the port lock in question, not the port list lock
 
 	// loop over list
-	for (i = 0; i < MAX_PORTS; i++) {
+	for (i = 0; i < MAX_PORTS && portFound < B_OK; i++) {
 		// lock every individual port before comparing
+		state = disable_interrupts();
 		GRAB_PORT_LOCK(gPorts[i]);
-		if(strcmp(port_name, gPorts[i].name) == 0) {
-			ret_val = gPorts[i].id;
-			RELEASE_PORT_LOCK(gPorts[i]);
-			break;
-		}
-		RELEASE_PORT_LOCK(gPorts[i]);
-	}
-	
-	RELEASE_PORT_LIST_LOCK();
-	restore_interrupts(state);
 
-	return ret_val;
+		if (gPorts[i].id >= 0 && !strcmp(name, gPorts[i].name))
+			portFound = gPorts[i].id;
+
+		RELEASE_PORT_LOCK(gPorts[i]);
+		restore_interrupts(state);
+	}
+
+	return portFound;
 }
 
 
