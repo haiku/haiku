@@ -34,12 +34,12 @@ actions ignore InstallSiS900
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
-	sis900 
-;
+# OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+# 	sis900 
+# ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed>sis900 : 
-	installed-symlink 
-;
+# OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+# 	<installed>sis900 : 
+#	installed-symlink 
+# ;
 

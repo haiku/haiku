@@ -33,13 +33,13 @@ actions ignore InstallRTL8139
 
 # Installation
 
-OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
-	rtl8139 
-;
+# OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+# 	rtl8139 
+# ;
 
-OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed>rtl8139 : 
-	installed-symlink 
-;
+# OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+# 	<installed>rtl8139 : 
+# 	installed-symlink 
+# ;
 
 
