@@ -225,7 +225,7 @@ BMediaEventLooper::ControlLoop()
 			// only the scheduling latency). 
 			// XXX well, fix this later
 			latency = fEventLatency + fSchedulingLatency; 
-			
+
 			if (fEventQueue.HasEvents() && (TimeSource()->Now() - latency) >= fEventQueue.FirstEventTime()) {
 				is_realtime = false;
 				break;
@@ -262,9 +262,9 @@ BMediaEventLooper::ControlLoop()
 		if (err == B_OK) {
 			bigtime_t lateness;
 			if (is_realtime)
-				lateness = TimeSource()->RealTime() - event.event_time - fEventLatency;
+				lateness = TimeSource()->RealTime() + fEventLatency - event.event_time;
 			else
-				lateness = TimeSource()->Now() - event.event_time - fEventLatency;
+				lateness = TimeSource()->Now() + fEventLatency - event.event_time;
 			DispatchEvent(&event, lateness, is_realtime);
 		}
 	}

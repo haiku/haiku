@@ -528,7 +528,15 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 		buffer->Recycle();
 		return;
 	}
-	
+
+	bigtime_t now = system_time(); // XXX debugging
+	bigtime_t send = buffer->Header()->file_pos; // XXX debugging
+	printf("buffer received at %10Ld, was send at %10Ld, delta %7Ld  # ", now, send, now - send);
+
+
+//	printf("2) should arrive at %20Ld, now %20Ld\n", buffer->Header()->start_time, TimeSource()->Now());
+//	printf("buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
+
 	// to receive the buffer at the right time,
 	// push it through the event looper
 	media_timed_event event(buffer->Header()->start_time,
@@ -540,10 +548,18 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 
 
 void
-AudioMixer::HandleInputBuffer(BBuffer *buffer)
+AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 {
 	media_header *hdr = buffer->Header();
 
+	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), buffer->Header()->start_time, TimeSource()->Now(), lateness);
+
+//	printf("3) should arrive at %20Ld, now %20Ld\n", buffer->Header()->start_time, TimeSource()->Now());
+
+	bigtime_t now = TimeSource()->Now();
+	bigtime_t perf_time = hdr->start_time;				
+	bigtime_t how_late = now - perf_time - fLatency;
+		
 	// check input
 	int inputcount = fMixerInputs.CountItems();
 	
@@ -554,23 +570,17 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer)
 		if (channel->fInput.destination.id != hdr->destination)
 			continue;
 
-		bigtime_t now = TimeSource()->Now();
-		bigtime_t perf_time = hdr->start_time;				
-		bigtime_t how_late = now - perf_time;
-		bigtime_t event_latency = EventLatency();
-		
-		if (how_late > (event_latency + 2000)) {
-			how_late -= event_latency;
-			printf("Received buffer %Ld usecs late from %s\n", how_late, channel->fInput.name);
+		if (how_late > 0) {
+			printf("Received buffer %Ld usecs late, lateness %Ld\n", how_late, lateness);
 			if (RunMode() != B_OFFLINE && RunMode() != B_RECORDING) {
 				printf("sending notify\n");
-				NotifyLateProducer(channel->fInput.source, max_c(500, how_late), perf_time);
+				NotifyLateProducer(channel->fInput.source, how_late, perf_time);
 			} else if (RunMode() == B_DROP_DATA) {
 				printf("dropping buffer\n");
 				return;
 			}
 		}
-	
+
 		size_t sample_size = channel->fInput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	
 		// calculate total byte offset for writing to the ringbuffer
@@ -580,6 +590,9 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer)
 				channel->fInput.format.u.raw_audio.frame_rate) * 
 				sample_size * channel->fInput.format.u.raw_audio.channel_count)) % int(channel->fDataSize);
 */
+		if (channel->fDataSize == 0)
+			break;
+			
 		size_t total_offset = int(channel->fEventOffset + channel->fInput.format.u.raw_audio.buffer_size)  % int(channel->fDataSize);
 		
 		char *indata = (char *)buffer->Data();
@@ -604,10 +617,14 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer)
 void
 AudioMixer::SendNewBuffer(bigtime_t event_time)
 {
-
+	bigtime_t start = system_time();
 	BBuffer *outbuffer = fBufferGroup->RequestBuffer(fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	bigtime_t delta = system_time() - start;
+	if (delta > 200)
+		printf("RequestBuffer took %Ld usec\n", delta);
+
 	if (!outbuffer) {
-		printf("Could not allocate buffer\n");
+		printf("AudioMixer: Could not allocate buffer\n");
 		return;
 	}
 				
@@ -619,11 +636,15 @@ AudioMixer::SendNewBuffer(bigtime_t event_time)
 	outheader->time_source = TimeSource()->ID();
 	outheader->start_time = event_time;
 	
+	bigtime_t start2 = system_time();
 	if (B_OK != SendBuffer(outbuffer, fOutput.destination)) {
-		printf("Could not send buffer to output : %s\n", fOutput.name);
+		printf("AudioMixer: Could not send buffer to output : %s\n", fOutput.name);
 		outbuffer->Recycle();
 	}
-}	
+	bigtime_t delta2 = system_time() - start2;
+	if (delta2 > 200)
+		printf("SendBuffer took %Ld usec\n", delta2);
+}
 
 
 void
@@ -648,6 +669,7 @@ status_t
 AudioMixer::GetLatencyFor( const media_destination &for_whom, bigtime_t *out_latency, 
 							media_node_id *out_timesource)
 {
+	printf("AudioMixer::GetLatencyFor\n");
 
 	if (! IsValidDest(for_whom))
 		return B_MEDIA_BAD_DESTINATION;
@@ -657,6 +679,8 @@ AudioMixer::GetLatencyFor( const media_destination &for_whom, bigtime_t *out_lat
 	
 	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
+
+	printf("AudioMixer::GetLatencyFor %Ld\n", EventLatency());
 
 	return B_OK;
 
@@ -967,11 +991,12 @@ AudioMixer::SetBufferGroup(const media_source &for_source, BBufferGroup *newGrou
 status_t
 AudioMixer::GetLatency(bigtime_t *out_latency)
 {
-
 	// report our *total* latency:  internal plus downstream plus scheduling
 	*out_latency = EventLatency() + SchedulingLatency();
+
+	printf("AudioMixer::GetLatency %Ld\n", *out_latency);
+
 	return B_OK;
-	
 }
 
 status_t
@@ -1077,11 +1102,16 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 	
 	fInternalLatency = latency_end - latency_start;
 	printf("Internal latency is %Ld usecs\n", fInternalLatency);
+	fInternalLatency += 15000;
+	printf("Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	delete mouse;
 	
 	// might need to tweak the latency
 	SetEventLatency(fLatency + fInternalLatency);
+	
+	printf("AudioMixer: SendLatencyChange %Ld\n", EventLatency());
+	SendLatencyChange(source, dest, EventLatency());
 
 	// calculate buffer duration and set it	
 	if (fOutput.format.u.raw_audio.frame_rate == 0) {
@@ -1128,9 +1158,15 @@ AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, big
 	if (what == fOutput.source) {
 		if (RunMode() == B_INCREASE_LATENCY) {
 			fInternalLatency += how_much;
-			
+
+//			if (fInternalLatency > 50000)
+//				fInternalLatency = 50000;
+
 			printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
 			SetEventLatency(fLatency + fInternalLatency);
+		
+//			printf("AudioMixer: SendLatencyChange %Ld (2)\n", EventLatency());
+//			SendLatencyChange(source, dest, EventLatency());
 		}
 	}
 }
@@ -1198,7 +1234,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, boo
 	
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
-			HandleInputBuffer((BBuffer *)event->pointer);
+			HandleInputBuffer((BBuffer *)event->pointer, lateness);
 			((BBuffer *)event->pointer)->Recycle();
 			break;
 		}
@@ -1316,9 +1352,9 @@ AudioMixer::AllocateBuffers()
 	size_t size = fOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32((fLatency / (BufferDuration() + 1)) + 1);
 	
-	if (count < 2) {
+	if (count < 3) {
 		printf("AudioMixer: calculated only %ld buffers, that's not enough\n", count);
-		count = 2;
+		count = 3;
 	}
 	
 	printf("AudioMixer: allocating %ld buffers\n", count);

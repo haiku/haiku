@@ -140,7 +140,7 @@ virtual status_t HandleStop(
 						const media_timed_event *event,
 						bigtime_t lateness,
 						bool realTimeEvent = false);
-virtual status_t HandleBuffer(
+virtual status_t SendNewBuffer(
 						const media_timed_event *event,
 						bigtime_t lateness,
 						bool realTimeEvent = false);
@@ -163,7 +163,6 @@ private:
 	bool 				mOutputEnabled;
 	media_output		mOutput;
 	BBufferGroup		*mBufferGroup;
-	media_format 		mPreferredFormat;
 	media_format		mFormat;
 	bigtime_t 			mLatency;
 	bigtime_t 			mInternalLatency;

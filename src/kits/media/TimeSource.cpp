@@ -168,6 +168,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 //		*drift = 1.0f;
 //		return B_OK;
 //	}
+	//printf("BTimeSource::GetTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, *performance_time, *real_time, *drift);
 
 	TRACE_TIMESOURCE("BTimeSource::GetTime     timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), *performance_time, *real_time, *drift);
 	return B_OK;
@@ -292,6 +293,8 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 	fBuf->perftime[index] = performance_time;
 	fBuf->drift[index] = drift;
 	atomic_add(&fBuf->readindex, 1);
+
+	//printf("BTimeSource::PublishTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), fBuf->readindex, performance_time, real_time, drift);
 }
 
 

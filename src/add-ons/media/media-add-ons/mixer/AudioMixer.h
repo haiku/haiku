@@ -49,7 +49,7 @@ class AudioMixer :
 		status_t			FillMixBuffer(void *outbuffer, size_t size);
 		
 		void				SendNewBuffer(bigtime_t event_time);
-		void				HandleInputBuffer(BBuffer *buffer);
+		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
 					
 	// BMediaNode methods
 

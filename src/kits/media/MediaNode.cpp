@@ -661,6 +661,7 @@ BMediaNode::HandleMessage(int32 message,
 				fTimeSource->AddMe(this);
 			}
 			TRACE("BMediaNode::HandleMessage NODE_SET_TIMESOURCE: node %ld has been assigned time source %ld\n", ID(), fTimeSource->ID());
+			printf("BMediaNode::HandleMessage NODE_SET_TIMESOURCE: node %ld has been assigned time source %ld\n", ID(), fTimeSource->ID());
 			
 			//roster->StartTimeSource(fTimeSource->Node(), fTimeSource->RealTime());
 			return B_OK;
