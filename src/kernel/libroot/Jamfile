@@ -15,11 +15,12 @@ KernelObjects
 
 KernelMergeObject kernel_os_main.o :
 	driver_settings.c
+	fs_info.c
 	: -fno-pic -DKERNEL_OS_MAIN
 	;
 
 SEARCH on [ FGristFiles
-		driver_settings.c
+		driver_settings.c fs_info.c
 	] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
 
 # kernel libroot posix files
