@@ -1,0 +1,10 @@
+#	OpenBeOS  /etc/networks
+#
+
+# Internet networks (from nic.ddn.mil)
+# 1) The multicast network
+BASE-ADDRESS.MCAST.NET	224
+loopback		127	loop
+
+# Your subnets follow...
+
