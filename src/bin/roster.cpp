@@ -89,7 +89,8 @@ usage(int exitCode)
 {
 	fprintf(stderr, "usage: %s [-nt]\n"
 		"  -n, --name\t\tInstead of the full path, only the name of the teams are written\n"
-		"  -t, --no-trunc\tDon't truncate the path name\n",
+		"  -t, --no-trunc\tDon't truncate the path name\n"
+		"  -h, --help\t\tDisplay this help and exit\n",
 		kProgramName);
 
 	exit(exitCode);
@@ -104,7 +105,7 @@ main(int argc, char **argv)
 	// Don't have an BApplication as it is not needed for what we do
 
 	int c;
-	while ((c = getopt_long(argc, argv, "nt", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "nth", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 'n':
 				mode |= kNameOnlyMode;
