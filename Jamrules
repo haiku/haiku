@@ -1238,7 +1238,7 @@ rule UseArchHeaders
 
 	SubDirCcFlags $(opt)  ;
 	SubDirC++Flags $(opt)  ;
-	HDRS += $(headers) ;
+	UseHeaders $(headers) ;
 }
 
 rule UseArchObjectHeaders
