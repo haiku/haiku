@@ -21,8 +21,8 @@ resource app_version
 
 	internal = 3,
 
-	short_info = "BeMail 3.0",
-	long_info = "BeMail 3.0.0 ©2004 Haiku"
+	short_info = "BeMail 3.0.2",
+	long_info = "BeMail 3.0.2 ©2004 Haiku"
 };
 
 resource(1, "BEOS:APP_FLAGS") #'APPF' $"00000000";
