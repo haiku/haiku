@@ -109,9 +109,9 @@ template<class Node> struct list {
 
 // Some atomic operations that are somehow missing in BeOS:
 //
-//	atomic_test_and_set(value, newValue, testAgainst)
+//	_atomic_test_and_set(value, newValue, testAgainst)
 //		sets "value" to "newValue", if "value" is equal to "testAgainst"
-//	atomic_set(value, newValue)
+//	_atomic_set(value, newValue)
 //		sets "value" to "newValue"
 
 #if _NO_INLINE_ASM
@@ -119,7 +119,7 @@ template<class Node> struct list {
 	// They are only used for single processor user space tests
 	// (and don't even work correctly there)
 	inline int32
-	atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
+	_atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
 	{
 		int32 oldValue = *value;
 		if (oldValue == testAgainst)
@@ -129,13 +129,13 @@ template<class Node> struct list {
 	}
 
 	inline void
-	atomic_set(volatile int32 *value, int32 newValue)
+	_atomic_set(volatile int32 *value, int32 newValue)
 	{
 		*value = newValue;
 	}
 #elif __INTEL__
 	inline int32
-	atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
+	_atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
 	{
 		int32 oldValue;
 		asm volatile("lock; cmpxchg %%ecx, (%%edx)"
@@ -144,13 +144,13 @@ template<class Node> struct list {
 	}
 
 	inline void
-	atomic_set(volatile int32 *value, int32 newValue)
+	_atomic_set(volatile int32 *value, int32 newValue)
 	{
 		asm volatile("lock; xchg %%eax, (%%edx)"
 			: : "a" (newValue), "d" (value));
 	}
 #else
-#	error The macros atomic_set(), and atomic_test_and_set() are not defined for the target processor
+#	error The macros _atomic_set(), and _atomic_test_and_set() are not defined for the target processor
 #endif
 
 

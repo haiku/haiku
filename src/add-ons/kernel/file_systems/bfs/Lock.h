@@ -457,7 +457,7 @@ class SimpleLock {
 		{
 			int32 thisThread = find_thread(NULL);
 			int32 current;
-			while ((current = atomic_test_and_set(&fHolder, thisThread, -1)) != -1) {
+			while ((current = _atomic_test_and_set(&fHolder, thisThread, -1)) != -1) {
 				if (current == thisThread)
 					break;
 
@@ -473,7 +473,7 @@ class SimpleLock {
 		void Unlock()
 		{
 			if (atomic_add(&fCount, -1) == 1)
-				atomic_set(&fHolder, -1);
+				_atomic_set(&fHolder, -1);
 		}
 
 		bool IsLocked() const
