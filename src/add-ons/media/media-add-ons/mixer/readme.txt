@@ -1,39 +1,35 @@
 OpenBeOS Audio Mixer
-David Shipman, 2002
+David Shipman, 14/08/2002
 
 Overview
 
-The node is based on a mediaeventlooper, using the HandleEvent loop to compile
-the mixed buffer output. 
-Each input creates a ringbuffer (fixed size "looped" buffer) for its input - this way
-buffer contents can be placed in the ringbuffer and recycled immediately.
+The node is based on a mediaeventlooper, using the HandleEvent loop to compile the mixed buffer output. 
+Each input creates a ringbuffer (fixed size "looped" buffer) for its input - this way buffer contents can be 
+placed in the ringbuffer and the buffer recycled immediately.
 
-Inputs are maintained using a list of input_channel structs - inputs are created/
-destroyed dynamically when producers connect/disconnect.
+Inputs are maintained using a list of mixer_input objects - inputs are created/destroyed dynamically when 
+producers connect/disconnect.
 
 Done
 
 - node functions as a replacement for the BeOS R5 mixer.media-addon
-- IO/conversion between stereo B_AUDIO_FLOAT and B_AUDIO_SHORT streams
+- IO/conversion between the major audio types (FLOAT, SHORT)
+- interface mostly done (all gain controls operational)
+- mixing with different gain levels is functional
 
 Tested
 
 - Output to emu10k1 (SBLive)
-- Input from CL-Amp and emu10k1-in
+- Input from CL-Amp, file-readers, SoundPlay, music software - almost all work well
 
-Bugs
-
-- Soundplay, extractor nodes, and a variety of others connect, but sound really bad!
-- When input stops, the current ringbuffer contents continue to be played
-
-To Do (lots) (vaguely in order of importance)
+To Do (vaguely in order of importance)
 
 - fix bugs
-- support for remaining formats
-- samplerate conversion
-- Interface (BControllable)
+- format negotation fine-tuning - some nodes still connect with weird formats
+- rewrite of buffer mixing routines - at the moment its really inefficient, and a total mess
+- complete interface (add mutes, panning)
 - multithreading (separate mix thread)
-- tidy up code
+- mixer save (to save parameter states when a node is disconnected)
 
 Notes :
 

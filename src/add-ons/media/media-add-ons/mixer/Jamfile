@@ -5,6 +5,7 @@ UsePrivateHeaders media ;
 Addon mixer.media_addon : media :
 	AudioMixer.cpp
 	MixerAddOn.cpp
+	FillMixBuffer.cpp
 ;
 
 LinkSharedOSLibs mixer.media_addon : be media ;

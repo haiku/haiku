@@ -14,7 +14,7 @@ extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image) {
 	return new AudioMixerAddon(image);
 }
 
-// -------------------------------------------------------- //
+// ------------------------------------------------------- //
 // ctor/dtor
 // -------------------------------------------------------- //
 
@@ -32,6 +32,7 @@ status_t AudioMixerAddon::InitCheck(
 }
 	
 int32 AudioMixerAddon::CountFlavors() {
+
 	return 1;
 }
 
@@ -41,27 +42,26 @@ status_t AudioMixerAddon::GetFlavorAt(
 	if(n)
 		return B_ERROR;
 	
-	flavor_info* pInfo = new flavor_info;
-	pInfo->internal_id = n;
-	pInfo->name = "AudioMixer";
-	pInfo->info =
+	flavor_info* fInfo = new flavor_info;
+	fInfo->internal_id = n;
+	fInfo->name = "AudioMixer";
+	fInfo->info =
 		"AudioMixer media addon\n";
-		"By David Shipman, 2002";
-	pInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
-	pInfo->flavor_flags = 0;
-	pInfo->possible_count = 0;
+	fInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
+	fInfo->flavor_flags = B_FLAVOR_IS_LOCAL;
+	fInfo->possible_count = 500;
 	
-	media_format* pFormat = new media_format;
-	pFormat->type = B_MEDIA_RAW_AUDIO;
-	pFormat->u.raw_audio = media_raw_audio_format::wildcard;
+	media_format* fFormat = new media_format;
+	fFormat->type = B_MEDIA_RAW_AUDIO;
+	fFormat->u.raw_audio = media_raw_audio_format::wildcard;
 	
-	pInfo->in_format_count = 1;
-	pInfo->in_formats = pFormat;
+	fInfo->in_format_count = 1;
+	fInfo->in_formats = fFormat;
 	
-	pInfo->out_format_count = 1;
-	pInfo->out_formats = pFormat;
+	fInfo->out_format_count = 1;
+	fInfo->out_formats = fFormat;
 	
-	*out_info = pInfo;
+	*out_info = fInfo;
 	return B_OK;
 }
 
@@ -78,7 +78,7 @@ status_t AudioMixerAddon::GetConfigurationFor(
 	BMessage* into_message) {
 	
 	// no config yet
-	return B_OK;
+	return B_ERROR;
 }
 
 // end

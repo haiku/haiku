@@ -8,11 +8,63 @@
 #include "AudioMixer.h"
 #include "IOStructures.h"
 
+#include <media/RealtimeAlloc.h>
 #include <media/Buffer.h>
 #include <media/TimeSource.h>
+#include <media/ParameterWeb.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+#define MALLOC_DEBUG = 1;
+
+//
+
+mixer_input::mixer_input(media_input &input)
+{
+
+	fInput = input;
+
+	fEventOffset = 0;
+	fDataSize = 0;
+	
+	enabled = false;
+	
+	int channelCount = fInput.format.u.raw_audio.channel_count;
+	
+	fGainDisplay = new float[channelCount];
+	fGainScale = new float[channelCount];
+	
+	for (int i = 0; i < channelCount; i++)
+	{
+		fGainScale[i] = 1.0;
+		fGainDisplay[i] = 0.0;
+	}
+		
+	fMuteValue = 0;
+	fPanValue = 0;
+
+	fGainDisplayLastChange = 0;
+	fMuteValueLastChange = 0;
+	fPanValueLastChange = 0;
+
+}
+
+mixer_input::~mixer_input()
+{
+	if (fGainDisplay)
+		delete fGainDisplay;
+	if (fGainScale)
+		delete fGainScale;
+	
+	if (fData)
+		rtm_free(fData);
+	
+	printf("mixer_input deleted\n");
+
+}
+
 
 // AudioMixer support classes
 
@@ -54,10 +106,117 @@ AudioMixer::IsValidSource( media_source source)
 	
 }
 
+char *
+StringForFormat(const media_format format)
+{
+
+	char *name = new char[B_MEDIA_NAME_LENGTH];
+
+	sprintf(name, "%g kHz ", format.u.raw_audio.frame_rate / 1000.0);
+
+	switch (format.u.raw_audio.format)
+	{
+		case media_raw_audio_format::B_AUDIO_FLOAT:
+		
+			strncat(name, "float", 5);
+			break;
+			
+		case media_raw_audio_format::B_AUDIO_SHORT:
+		
+			strncat(name, "16bit", 5);
+			break;
+
+	}
+	
+	return name;
+
+}
+
+/*
+// Interface
+*/
+
+BParameterWeb *
+AudioMixer::BuildParameterWeb()
+{
+
+	BParameterWeb *web = new BParameterWeb();
+
+	BParameterGroup *top = web->MakeGroup(Name()); // top level group
+	
+	BParameterGroup *masterGroup = top->MakeGroup("Master"); // 'Master' group split
+	BParameterGroup *channelsGroup = top->MakeGroup("Channels"); // 'Channels' group split
+	
+	BParameterGroup *headerGroup = masterGroup->MakeGroup("Master"); // The 'header group' for this split... 
+	
+	headerGroup->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_OUTPUT);
+	headerGroup->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "44.1kHz 16bit", B_GENERIC); // set our initial display like R5's mixer... 
+	headerGroup->MakeDiscreteParameter(2, B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
+	headerGroup->MakeContinuousParameter(3, B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 1.0)->SetChannelCount(2);
+	headerGroup->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT);
+	
+	(headerGroup->ParameterAt(0))->AddOutput(headerGroup->ParameterAt(1));
+	(headerGroup->ParameterAt(1))->AddOutput(headerGroup->ParameterAt(2));
+	(headerGroup->ParameterAt(2))->AddOutput(headerGroup->ParameterAt(3));
+	(headerGroup->ParameterAt(3))->AddOutput(headerGroup->ParameterAt(4));
+		
+	int inputsCount = fMixerInputs.CountItems();
+	
+	for (int which_input = 1; which_input < inputsCount; which_input ++)
+	{
+	
+		mixer_input *mixerInput = (mixer_input *)fMixerInputs.ItemAt(which_input);
+	
+		char *groupNumLabel = new char[4];
+	
+		sprintf(groupNumLabel, "%d", which_input);
+
+		BParameterGroup *group = channelsGroup->MakeGroup(groupNumLabel);
+	
+		int baseID = (which_input) * 65536;
+	
+		char *formatString = StringForFormat(mixerInput->fInput.format);
+		
+		group->MakeNullParameter(baseID + 100, B_MEDIA_RAW_AUDIO, mixerInput->fInput.name, B_WEB_BUFFER_OUTPUT); // name of attached producer
+		group->MakeNullParameter(baseID + 300, B_MEDIA_RAW_AUDIO, formatString, B_GENERIC); // display information about format
+		group->MakeDiscreteParameter(baseID + 3, B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
+		group->MakeContinuousParameter(baseID + 4, B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 1.0)
+			->SetChannelCount(mixerInput->fInput.format.u.raw_audio.channel_count);
+
+		bool panning = false;
+	
+		if (fOutput.destination != media_destination::null)
+		{
+			if (mixerInput->fInput.format.u.raw_audio.channel_count < fOutput.format.u.raw_audio.channel_count)
+			{
+			
+				group->MakeContinuousParameter(baseID + 1, B_MEDIA_RAW_AUDIO, "Pan", B_BALANCE, "L R", -1.0, 1.0, 0.02);
+				(group->ParameterAt(0))->AddOutput(group->ParameterAt(1));	
+				(group->ParameterAt(1))->AddOutput(group->ParameterAt(4));
+				(group->ParameterAt(4))->AddOutput(group->ParameterAt(2));
+				(group->ParameterAt(2))->AddOutput(group->ParameterAt(3));
+				
+				panning = true;
+					
+			}
+		}
+		
+		if (!panning)
+		{
+			(group->ParameterAt(0))->AddOutput(group->ParameterAt(1));
+			(group->ParameterAt(1))->AddOutput(group->ParameterAt(2));
+			(group->ParameterAt(2))->AddOutput(group->ParameterAt(3));
+		}
+		
+	}
+
+	return web;		
+}
+
 // 'structors... 
 
 AudioMixer::AudioMixer(BMediaAddOn *addOn)
-		:	BMediaNode("OBOS Mixer"),
+		:	BMediaNode("Audio Mixer"),
 			BBufferConsumer(B_MEDIA_RAW_AUDIO),
 			BBufferProducer(B_MEDIA_RAW_AUDIO),
 			BControllable(),
@@ -69,7 +228,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 			fStartTime(0), fNextEventTime(0),
 			fFramesSent(0),
 			fOutputEnabled(true),
-			fBufferGroup(NULL)
+			fBufferGroup(NULL),
+			fNextFreeID(1)
 			
 			
 {
@@ -81,7 +241,7 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 	fPrefOutputFormat.type = B_MEDIA_RAW_AUDIO;
 	
 	fPrefOutputFormat.u.raw_audio.format = media_raw_audio_format::wildcard.format; // B_AUDIO_FLOAT
-	fPrefOutputFormat.u.raw_audio.frame_rate = 44100; //media_raw_audio_format::wildcard.frame_rate;
+	fPrefOutputFormat.u.raw_audio.frame_rate = media_raw_audio_format::wildcard.frame_rate; 
 	fPrefOutputFormat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 
 	fPrefOutputFormat.u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size; //2048
@@ -92,10 +252,10 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 	fPrefInputFormat.type = B_MEDIA_RAW_AUDIO;
 	
 	fPrefInputFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	fPrefInputFormat.u.raw_audio.frame_rate = media_raw_audio_format::wildcard.frame_rate;//44100; //
+	fPrefInputFormat.u.raw_audio.frame_rate = 96000; //wildcard?
 	fPrefInputFormat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 
-	fPrefInputFormat.u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size;//1024; //
+	fPrefInputFormat.u.raw_audio.buffer_size = 1024;
 	fPrefInputFormat.u.raw_audio.channel_count = 2; //media_raw_audio_format::wildcard.channel_count;
 
 	//fInput.source = media_source::null;
@@ -109,23 +269,17 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 	
 	strcpy(fOutput.name, "Audio Mix");
 
-	input_channel *freechannel = new input_channel;
+	fMasterGainScale = new float[2];
+	fMasterGainDisplay = new float[2];
 	
-	freechannel->DataAvailable = false;
+	fMasterGainDisplay[0] = 0.0;
+	fMasterGainDisplay[1] = 0.0;
 	
-	media_input freeinput;
+	fMasterGainScale[0] = 1.0;
+	fMasterGainScale[1] = 1.0;
 	
-	freeinput.format = fPrefInputFormat;
-	freeinput.source = media_source::null;
-	freeinput.destination.port = ControlPort();
-	freeinput.destination.id = 0;	
+	fMasterGainDisplayLastChange = TimeSource()->Now();
 	
-	strcpy(freeinput.name, "Free Input");
-	
-	freechannel->fInput = freeinput;
-	
-	fInputChannels.AddItem(freechannel);
-
 }
 
 AudioMixer::~AudioMixer()
@@ -160,27 +314,159 @@ AudioMixer::AddOn(int32 *internal_id) const
 //
 
 status_t 
-AudioMixer::GetParameterValue( int32 id, bigtime_t* last_change, 
-								void* value, size_t* ioSize)
+AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
+								void *value, size_t *ioSize)
 {
 
-	switch (id)
+	int idGroup = int(id/65536.0);
+	
+	if (idGroup == 0)
+	{
+		if (id == 3)
+		{						
+			float *valueOut = (float *)value;
+			valueOut[0] = fMasterGainDisplay[0];
+			valueOut[1] = fMasterGainDisplay[1];
+			
+			*last_change = fMasterGainDisplayLastChange;
+			*ioSize = 8;
+		
+			return B_OK;
+		}
+		else if (id == 2)
+		{
+					
+			int *valueOut = (int *)value;
+			*valueOut = fMasterMuteValue;
+							
+			*last_change = fMasterMuteValueLastChange;
+			*ioSize = 4;
+		
+			return B_OK;
+		}
+	}
+	else
 	{
 	
-		default:
+		mixer_input *mixerInput = (mixer_input *)fMixerInputs.ItemAt(idGroup);
 		
-			return B_ERROR;
+		int idBase = idGroup * 65536;
+		
+		if (id == idBase + 4)
+		{
+			float *valueOut = (float *)value;
+			valueOut[0] = mixerInput->fGainDisplay[0];
+			valueOut[1] = mixerInput->fGainDisplay[1];
+			
+			*last_change = mixerInput->fGainDisplayLastChange;
+			*ioSize = 8;
+		
+			return B_OK;
+		}
+		else if (id == idBase + 3)
+		{
+			int *valueOut = (int *)value;
+			*valueOut = mixerInput->fMuteValue;
+							
+			*last_change = mixerInput->fMuteValueLastChange;
+			*ioSize = 4;
+		
+			return B_OK;
+		}		
 	
-	}
-
-	return B_OK;
+	}			
+			
+	return B_ERROR;
 
 }
 
 void 
-AudioMixer::SetParameterValue( int32 id, bigtime_t performance_time, 
-								const void* value, size_t size)
+AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
+								const void *value, size_t ioSize)
 {
+	
+	int idGroup = int(id/65536.0);
+	
+	if (idGroup == 0)
+	{
+		if (id == 3)
+		{			
+					
+			float *inValue = (float *)value;
+			if (ioSize == 4) {
+				fMasterGainDisplay[0] = inValue[0];
+				fMasterGainDisplay[1] = inValue[0];
+			}
+			else if (ioSize == 8) {
+				fMasterGainDisplay[0] = inValue[0];
+				fMasterGainDisplay[1] = inValue[1];
+			}
+			
+			fMasterGainDisplayLastChange = when;
+			
+			BroadcastNewParameterValue(fMasterGainDisplayLastChange,
+				id, fMasterGainDisplay, ioSize);
+		
+			fMasterGainScale[0] = pow(2, (fMasterGainDisplay[0] / 6));
+			fMasterGainScale[1] = pow(2, (fMasterGainDisplay[1] / 6));
+			
+		}
+		else if (id == 2)
+		{
+			
+			int *inValue = (int *)value;
+			
+			fMasterMuteValue = *inValue;
+							
+			fMasterMuteValueLastChange = when;
+			
+			BroadcastNewParameterValue(fMasterMuteValueLastChange,
+				id, &fMasterMuteValue, ioSize);
+		
+		}
+	}
+	else
+	{
+	
+		mixer_input *mixerInput = (mixer_input *)fMixerInputs.ItemAt(idGroup);
+		
+		int idBase = idGroup * 65536;
+		
+		if (id == idBase + 4)
+		{
+		
+			float *inValue = (float *)value;
+			if (ioSize == 4) {
+				mixerInput->fGainDisplay[0] = inValue[0];
+				mixerInput->fGainDisplay[1] = inValue[0];
+			}
+			else if (ioSize == 8) {
+				mixerInput->fGainDisplay[0] = inValue[0];
+				mixerInput->fGainDisplay[1] = inValue[1];
+			}
+			
+			mixerInput->fGainDisplayLastChange = when;
+			
+			BroadcastNewParameterValue(mixerInput->fGainDisplayLastChange,
+				id, mixerInput->fGainDisplay, ioSize);
+		
+			mixerInput->fGainScale[0] = pow(2, (mixerInput->fGainDisplay[0] / 6));
+			mixerInput->fGainScale[1] = pow(2, (mixerInput->fGainDisplay[1] / 6));
+			
+		}
+		else if (id == idBase + 3)
+		{
+			int *inValue = (int *)value;
+			
+			mixerInput->fMuteValue = *inValue;
+							
+			mixerInput->fMuteValueLastChange = when;
+			
+			BroadcastNewParameterValue(mixerInput->fMuteValueLastChange,
+				id, &mixerInput->fMuteValue, ioSize);
+		}		
+	
+	}			
 
 }
 
@@ -194,6 +480,8 @@ AudioMixer::HandleMessage( int32 message, const void *data, size_t size)
 	
 	// since we're using a mediaeventlooper, there shouldn't be any messages
 	
+	printf("Received message to BBufferConsumer - this should not be!\n");
+	
 	return B_ERROR;
 
 }
@@ -205,14 +493,14 @@ AudioMixer::AcceptFormat(const media_destination &dest, media_format *format)
 	// we accept any raw audio 
 
 	if (IsValidDest(dest))
-	{		
-		if (format->type == B_MEDIA_RAW_AUDIO)
-			return B_OK;
-		else
+	{	
+		if ((format->type != B_MEDIA_UNKNOWN_TYPE) && (format->type != B_MEDIA_RAW_AUDIO))
 			return B_MEDIA_BAD_FORMAT;
+		else
+			return B_OK;
 	}
 	else
-	return B_MEDIA_BAD_DESTINATION;	
+		return B_MEDIA_BAD_DESTINATION;	
 	
 }
 
@@ -220,9 +508,9 @@ status_t
 AudioMixer::GetNextInput(int32 *cookie, media_input *out_input)
 {
 
-	if (*cookie < fInputChannels.CountItems() && *cookie >= 0)
+	if ((*cookie < fMixerInputs.CountItems()) && (*cookie >= 0))
 	{
-		input_channel *channel = (input_channel *)fInputChannels.ItemAt(*cookie);
+		mixer_input *channel = (mixer_input *)fMixerInputs.ItemAt(*cookie);
 		*out_input = channel->fInput;
 		*cookie += 1;
 		return B_OK;
@@ -246,100 +534,79 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 
 	if (buffer)
 	{
-	if (buffer->Header()->type == B_MEDIA_PARAMETERS) 
-	{
-		ApplyParameterData(buffer->Data(), buffer->SizeUsed());
-		buffer->Recycle();
-	}
-	else 
-	{
-	
-		media_header *hdr = buffer->Header();
-				
-		// check input
-		
-		input_channel *channel;
-		
-		int inputcount = fInputChannels.CountItems();
-		
-		for (int i = 0; i < inputcount; i++)
+		if (buffer->Header()->type == B_MEDIA_PARAMETERS) 
 		{
-			channel = (input_channel *)fInputChannels.ItemAt(i);
-			if (channel->fInput.destination.id == hdr->destination)
-			{
-			
-			i = inputcount;
-						
-			bigtime_t now = TimeSource()->Now();
-			bigtime_t perf_time = hdr->start_time;				
-			bigtime_t how_early = perf_time - fLatency - now;
-
-			if ((RunMode() != B_OFFLINE) && 
-			(RunMode() != B_RECORDING) &&
-			(how_early < 0))
-			{
-				
-				NotifyLateProducer(channel->fInput.source, -how_early, perf_time);
-		
-			}
-			else
-			{
-
-				size_t sample_size;
-			
-				switch (channel->fInput.format.u.raw_audio.format)
-				{
-			
-					case (media_raw_audio_format::B_AUDIO_FLOAT):
-					case (media_raw_audio_format::B_AUDIO_INT):
-					
-						sample_size = 4;
-						break;
-				
-					case (media_raw_audio_format::B_AUDIO_SHORT):
-					
-						sample_size = 2;
-						break;
-						
-					case (media_raw_audio_format::B_AUDIO_CHAR):
-					case (media_raw_audio_format::B_AUDIO_UCHAR):
-					
-						sample_size = 1;
-						break;
-											
-				}
-	
-				// calculate total byte offset for writing to the ringbuffer
-				// this takes account of the Event offset, as well as the buffer's start time			
-
-				size_t total_offset = int(channel->fEventOffset + ((((perf_time - fNextEventTime) / 1000000) * 
-					channel->fInput.format.u.raw_audio.frame_rate) * 
-					sample_size * channel->fInput.format.u.raw_audio.channel_count)) % int(channel->fDataSize);
-
-				char *indata = (char *)buffer->Data();
-															
-				if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
-				{
-					memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
-					memcpy(channel->fData, indata + (channel->fDataSize - total_offset), buffer->SizeUsed() - (channel->fDataSize - total_offset));	
-				} 
-				else
-					memcpy(channel->fData + total_offset, indata, buffer->SizeUsed());
-						
-			}
-		
+			printf("Control Buffer Received\n");
+			ApplyParameterData(buffer->Data(), buffer->SizeUsed());
 		}
-		
-		buffer->Recycle();
-		
-		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
+		else 
 		{
-			RequestAdditionalBuffer(channel->fInput.source, buffer);
-		}
 		
+			media_header *hdr = buffer->Header();
+					
+			// check input
+			
+			mixer_input *channel;
+			
+			int inputcount = fMixerInputs.CountItems();
+			
+			for (int i = 0; i < inputcount; i++)
+			{
+			
+				channel = (mixer_input *)fMixerInputs.ItemAt(i);
+				
+				if (channel->fInput.destination.id == hdr->destination)
+				{
+				
+					i = inputcount;
+							
+					bigtime_t now = TimeSource()->Now();
+					bigtime_t perf_time = hdr->start_time;				
+					bigtime_t how_early = perf_time - fLatency - now;
+		
+					if ((RunMode() != B_OFFLINE) && 
+					(RunMode() != B_RECORDING) &&
+					(how_early < 0))
+					{
+						printf("Received buffer %d usecs late from %s\n", -how_early, channel->fInput.name);
+						NotifyLateProducer(channel->fInput.source, -how_early, perf_time);
+					}
+					else
+					{
+					
+						size_t sample_size = channel->fInput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
+		
+						// calculate total byte offset for writing to the ringbuffer
+						// this takes account of the Event offset, as well as the buffer's start time			
+		
+						size_t total_offset = int(channel->fEventOffset + ((((perf_time - fNextEventTime) / 1000000) * 
+							channel->fInput.format.u.raw_audio.frame_rate) * 
+							sample_size * channel->fInput.format.u.raw_audio.channel_count)) % int(channel->fDataSize);
+		
+						char *indata = (char *)buffer->Data();
+														
+						if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
+						{
+							memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
+							memcpy(channel->fData, indata + (channel->fDataSize - total_offset), buffer->SizeUsed() - (channel->fDataSize - total_offset));	
+						} 
+						else
+							memcpy(channel->fData + total_offset, indata, buffer->SizeUsed());
+												
+					}
+				
+				}	
+			
+			if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
+			{
+				RequestAdditionalBuffer(channel->fInput.source, buffer);
+			}
+			
 		}
 				
 	}
+	
+	buffer->Recycle();
 	
 	}
 }
@@ -352,8 +619,12 @@ AudioMixer::ProducerDataStatus( const media_destination &for_whom,
 	if (IsValidDest(for_whom))
 	{
 		media_timed_event event(at_performance_time, BTimedEventQueue::B_DATA_STATUS,
-			(void *)&for_whom, BTimedEventQueue::B_NO_CLEANUP, status, 0, NULL);
+			(void *)(&for_whom), BTimedEventQueue::B_NO_CLEANUP, status, 0, NULL);
 		EventQueue()->AddEvent(event);
+		
+		// FIX_THIS
+		// the for_whom destination is not being sent correctly - verify in HandleEvent loop
+		
 	}
 
 }
@@ -365,8 +636,11 @@ AudioMixer::GetLatencyFor( const media_destination &for_whom, bigtime_t *out_lat
 
 	if (! IsValidDest(for_whom))
 		return B_MEDIA_BAD_DESTINATION;
+		
+	// return our event latency - this includes our internal + downstream 
+	// latency, but _not_ the scheduling latency
 	
-	*out_latency = EventLatency() + SchedulingLatency();
+	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
 
 	return B_OK;
@@ -380,32 +654,90 @@ AudioMixer::Connected( const media_source &producer, const media_destination &wh
 	if (! IsValidDest(where))
 		return B_MEDIA_BAD_DESTINATION;
 	
-	input_channel *channel = new input_channel;
-
-	media_input freeinput;
+	char *name = out_input->name;
+	mixer_input *mixerInput;
 	
-	freeinput.format = with_format;
-	freeinput.source = producer;
-	freeinput.destination.port = ControlPort();
-	freeinput.destination.id = fInputChannels.CountItems();
+	// We use fNextFreeID to keep track of the next available input
+	// 1-4 are our initial "free" inputs
 	
-	strcpy(freeinput.name, "Used Input"); // should be the name of the upstream producer
-
-	channel->fInput = freeinput;
+	if (fNextFreeID < 5)
+	{
 	
-	fInputChannels.AddItem(channel);
+		mixerInput = (mixer_input *)fMixerInputs.ItemAt(fNextFreeID);
 
-	// update connection info
+		mixerInput->fInput.format = with_format;
+		mixerInput->fInput.source = producer;
 
-	*out_input = channel->fInput;
+		strcpy(mixerInput->fInput.name, name);
 
-	channel->fData = (char *)malloc(131072); // CHANGE_THIS - we only need to allocate space for as many
-	channel->fDataSize = 131072;			// input buffers as would fill an output - plus one
+	}
+	else
+	{
 	
-	memset(channel->fData, 0, channel->fDataSize);
+		media_input *newInput = new media_input;
 	
-	channel->DataAvailable = true;
+		newInput->format = with_format;
+		newInput->source = producer;
+		newInput->destination.port = ControlPort();
+		newInput->destination.id = fNextFreeID;
+		newInput->node = Node();
+		
+		strcpy(newInput->name, name);
+		
+		mixerInput = new mixer_input(*newInput);
+		
+		fMixerInputs.AddItem(mixerInput, fNextFreeID);	
+	
+	}
 
+	// Recalculate the next available input
+	
+	bool idSet = 0;
+	int testID = fNextFreeID;
+	int inputsCount = fMixerInputs.CountItems();
+	
+	for (int testID = fNextFreeID; testID < inputsCount; testID ++)
+	{
+		
+		mixer_input *testInput = (mixer_input *)fMixerInputs.ItemAt(testID);
+		
+		if (testID < 5)
+		{
+			if (testInput->fInput.source == media_source::null) {
+				fNextFreeID = testID;
+				idSet = 1;
+				testID = inputsCount;
+			}
+		}
+		else
+		{
+			if (testInput->fInput.destination.id > testID)
+			{
+				fNextFreeID = testID;
+				idSet = 1;
+				testID = inputsCount;		
+			}	
+		
+		}
+	
+	}
+	if (!idSet)
+		fNextFreeID = inputsCount;
+	
+	// Set up the ringbuffer in which to write incoming data
+	
+	mixerInput->fData = (char *)rtm_alloc(NULL, 65536); // CHANGE_THIS - we only need to allocate space for as many
+	mixerInput->fDataSize = 65536;			// input buffers as would fill an output - plus one
+		
+	memset(mixerInput->fData, 0, mixerInput->fDataSize);
+		
+	mixerInput->enabled = true;
+
+	*out_input = mixerInput->fInput;
+	
+	fWeb = BuildParameterWeb();
+	SetParameterWeb(fWeb);
+				
 	return B_OK;
 
 }
@@ -414,33 +746,75 @@ void
 AudioMixer::Disconnected( const media_source &producer, const media_destination &where)
 {
 	
-	input_channel *channel;
+	// One of our inputs has been disconnected
+	// If its one of our initial "Free" inputs, we need to set it back to its original state 
+	// Otherwise, we can delete the input
 	
-	// disconnected - remove the input from our list
+	mixer_input *mixerInput;
 
-	int inputcount = fInputChannels.CountItems();
+	int inputcount = fMixerInputs.CountItems();
 		
-	for (int i = 0; i < inputcount; i++)
+	for (int i = 1; i < inputcount; i++)
 	{
-		channel = (input_channel *)fInputChannels.ItemAt(i);
-		if (channel->fInput.destination == where)
-		{
+		mixerInput = (mixer_input *)fMixerInputs.ItemAt(i);
+		if (mixerInput->fInput.destination == where)
+		{	
+			if (mixerInput->fInput.source != media_source::null) // input already disconnected?
+			{
+				if ((mixerInput->fInput.destination.id > 0) && (mixerInput->fInput.destination.id < 5))
+				{
+					mixerInput->fInput.source = media_source::null;
+					strcpy(mixerInput->fInput.name, "Free");
+					mixerInput->fInput.format = fPrefInputFormat;
+									
+					rtm_free(mixerInput->fData);
+					
+					mixerInput->fData = NULL;
+					
+					mixerInput->fEventOffset = 0;
+					mixerInput->fDataSize = 0;
+					
+					delete mixerInput->fGainDisplay, mixerInput->fGainScale;
+					
+					mixerInput->fMuteValue = 0;
+					mixerInput->fPanValue = 0.0;
+					
+					mixerInput->enabled = false;
+					
+					int channelCount = mixerInput->fInput.format.u.raw_audio.channel_count;
+	
+					mixerInput->fGainDisplay = new float[channelCount];
+					mixerInput->fGainScale = new float[channelCount];
+	
+					for (int i = 0; i < channelCount; i++)
+					{
+						mixerInput->fGainScale[i] = 1.0;
+						mixerInput->fGainDisplay[i] = 0.0;
+					}
+					
+				}
+				else if (mixerInput->fInput.destination.id > 4)
+				{
+				
+					delete mixerInput;
+					fMixerInputs.RemoveItem(mixerInput);
+					
+				}
+			}
+			
+			fWeb = BuildParameterWeb();
+			SetParameterWeb(fWeb);
+			
+			if (mixerInput->fInput.destination.id < fNextFreeID)
+				fNextFreeID = mixerInput->fInput.destination.id;
 			
 			i = inputcount;
-			
-	//		channel->DataAvailable = false;
-	//		memset(channel->fData, 0, channel->fDataSize);
-		
-			delete channel->fData;
-		
-			delete channel;
-		
-			fInputChannels.RemoveItem(channel);
 		
 		}
+		else printf("Disconnection requested for input with no source\n");
 		
-	}
-	
+	}					
+
 }
 
 status_t
@@ -452,6 +826,7 @@ AudioMixer::FormatChanged( const media_source &producer, const media_destination
 	// and change our ringbuffer size if needs be
 	// Not supported (yet)
 
+	printf("Format changed\n");
 	return B_ERROR;
 	
 }
@@ -602,7 +977,13 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	if (format->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
 		
-	else if ((format->u.raw_audio.format != media_raw_audio_format::B_AUDIO_FLOAT) &&  // currently support floating point
+		// CHANGE_THIS  -  we're messing around with formats, need to clean up
+		// still need to check u.raw_audio.format
+	
+	if (format->u.raw_audio.format == media_raw_audio_format::wildcard.format)
+		format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
+	
+	if ((format->u.raw_audio.format != media_raw_audio_format::B_AUDIO_FLOAT) &&  // currently support floating point
 		(format->u.raw_audio.format != media_raw_audio_format::B_AUDIO_SHORT))		// and 16bit int audio
 		return B_MEDIA_BAD_FORMAT;
 
@@ -610,11 +991,10 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	// or else the consumer is prone to divide-by-zero errors
 
 	if(format->u.raw_audio.frame_rate == media_raw_audio_format::wildcard.frame_rate)
-		format->u.raw_audio.frame_rate = fPrefOutputFormat.u.raw_audio.frame_rate;
+		format->u.raw_audio.frame_rate = 44100;
 
 	if(format->u.raw_audio.channel_count == media_raw_audio_format::wildcard.channel_count)
-		format->u.raw_audio.channel_count = fPrefOutputFormat.u.raw_audio.channel_count;
-//		format->u.raw_audio.channel_count = 2;
+		format->u.raw_audio.channel_count = 2;
 
 	if(format->u.raw_audio.byte_order == media_raw_audio_format::wildcard.byte_order)
 		format->u.raw_audio.byte_order = fPrefOutputFormat.u.raw_audio.byte_order;
@@ -632,16 +1012,13 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	return B_OK;
 }
 
+
 void 
 AudioMixer::Connect( status_t error, const media_source &source, const media_destination &dest, 
 						const media_format &format, char *io_name)
 {
-	//FPRINTF(stderr, "AudioMixer::Connect\n");
+	printf("AudioMixer::Connect\n");
 
-	// If something earlier failed, Connect() might still be called, but with a non-zero
-	// error code.  When that happens we simply unreserve the connection and do
-	// nothing else.
-	
 	// we need to check which output dest refers to - we only have one for now
 	
 	if (error)
@@ -664,33 +1041,23 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 
 	// we need at least the length of a full output buffer's latency (I think?)
 
-	size_t sample_size;
-			
-	switch (fOutput.format.u.raw_audio.format)
-	{
-			
-		case (media_raw_audio_format::B_AUDIO_FLOAT):
-		case (media_raw_audio_format::B_AUDIO_INT):
-					
-			sample_size = 4;
-			break;
-				
-		case (media_raw_audio_format::B_AUDIO_SHORT):
-			
-			sample_size = 2;
-			break;
-						
-		case (media_raw_audio_format::B_AUDIO_CHAR):
-		case (media_raw_audio_format::B_AUDIO_UCHAR):
-			
-			sample_size = 1;
-			break;
-											
-	}
+	size_t sample_size = fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 
 	size_t framesPerBuffer = (fOutput.format.u.raw_audio.buffer_size / sample_size) / fOutput.format.u.raw_audio.channel_count;
 	
-	fInternalLatency = (framesPerBuffer / fOutput.format.u.raw_audio.frame_rate) * 1000000.0;
+	//fInternalLatency = (framesPerBuffer / fOutput.format.u.raw_audio.frame_rate); // test * 1000000
+	
+	void *mouse = malloc(fOutput.format.u.raw_audio.buffer_size);
+	
+	bigtime_t latency_start = TimeSource()->RealTime();
+	FillMixBuffer(mouse, fOutput.format.u.raw_audio.buffer_size);
+	bigtime_t latency_end = TimeSource()->RealTime();
+	
+	fInternalLatency = latency_end - latency_start;
+	printf("Latency set at %d usecs\n", fInternalLatency);
+	
+	delete mouse;
+	
 
 	// might need to tweak the latency
 
@@ -698,10 +1065,10 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 
 	// reset our buffer duration, etc. to avoid later calculations
 	// crashes w/ divide-by-zero when connecting to a variety of nodes... 
-	if (fOutput.format.u.raw_audio.frame_rate == media_raw_audio_format::wildcard.frame_rate)
-	{
-		fOutput.format.u.raw_audio.frame_rate = 44100;
-	}
+//	if (fOutput.format.u.raw_audio.frame_rate == media_raw_audio_format::wildcard.frame_rate)
+//	{
+//		fOutput.format.u.raw_audio.frame_rate = 44100;
+//	}
 	
 	bigtime_t duration = bigtime_t(1000000) * framesPerBuffer / bigtime_t(fOutput.format.u.raw_audio.frame_rate);
 	SetBufferDuration(duration);
@@ -713,10 +1080,12 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 	if (!fBufferGroup) AllocateBuffers();
 }
 
+
 void 
 AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 {
 
+	printf("AudioMixer::Disconnect\n");
 	// Make sure that our connection is the one being disconnected
 	if ((where == fOutput.destination) && (what == fOutput.source)) // change later for multisource outputs
 	{
@@ -728,54 +1097,33 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 
 }
 
+
 void 
 AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, bigtime_t performance_time)
 {
 
-	// If we're late, we need to catch up.  Respond in a manner appropriate to our
-	// current run mode.
+	// We've produced some late buffers... Increase Latency 
+	// is the only runmode in which we can do anything about this
+	
 	if (what == fOutput.source)
-	{
-		if (RunMode() == B_RECORDING)
+		if (RunMode() == B_INCREASE_LATENCY)
 		{
-			// A hardware capture node can't adjust; it simply emits buffers at
-			// appropriate points.  We (partially) simulate this by not adjusting
-			// our behavior upon receiving late notices -- after all, the hardware
-			// can't choose to capture "sooner"....
-		}
-		else if (RunMode() == B_INCREASE_LATENCY)
-		{
-			// We're late, and our run mode dictates that we try to produce buffers
-			// earlier in order to catch up.  This argues that the downstream nodes are
-			// not properly reporting their latency, but there's not much we can do about
-			// that at the moment, so we try to start producing buffers earlier to
-			// compensate.
 			fInternalLatency += how_much;
 			SetEventLatency(fLatency + fInternalLatency);
-
 		}
-		else
-		{
-			// The other run modes dictate various strategies for sacrificing data quality
-			// in the interests of timely data delivery.  The way *we* do this is to skip
-			// a buffer, which catches us up in time by one buffer duration.
-			// this should be the "drop data" mode - decrease precision could repeat the buffer ?
-			
-			//size_t nSamples = fOutput.format.u.raw_audio.buffer_size / sizeof(float);
-			//fFramesSent += (nSamples / 2);
+		
+	printf("Late notice received. Buffer was %d usecs late\n", how_much);
 
-		}
-	}
 }
+
 
 void 
 AudioMixer::EnableOutput(const media_source &what, bool enabled, int32 *_deprecated_)
 {
 
-	// If I had more than one output, I'd have to walk my list of output records to see
-	// which one matched the given source, and then enable/disable that one.  But this
-	// node only has one output, so I just make sure the given source matches, then set
-	// the enable state accordingly.
+	// right now we've only got one output... check this against the supplied
+	// media_source and set its state accordingly... 
+
 	if (what == fOutput.source)
 	{
 		fOutputEnabled = enabled;
@@ -794,13 +1142,34 @@ AudioMixer::NodeRegistered()
 		Run();
 		
 		fOutput.node = Node();
-		fInput.node = Node();
+		
+		
+		for (int i = 0; i < 5; i++)
+		{
+
+			media_input *newInput = new media_input;
+	
+			newInput->format = fPrefInputFormat;
+			newInput->source = media_source::null;
+			newInput->destination.port = ControlPort();
+			newInput->destination.id = i;
+			newInput->node = Node();
+			strcpy(newInput->name, "Free"); // 
+			
+			mixer_input *mixerInput = new mixer_input(*newInput);
+			
+			fMixerInputs.AddItem(mixerInput);
+			
+		}
 		
 		SetPriority(120);
+		
+		fWeb = BuildParameterWeb();
 		
 		SetParameterWeb(fWeb);
 
 }
+
 
 void 
 AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, 
@@ -821,184 +1190,8 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 				
 				if (outbuffer)
 				{
-					
-					int32 outChannels = fOutput.format.u.raw_audio.channel_count;
-					
-					// we have an output buffer - now it needs to be filled!
 
-					switch (fOutput.format.u.raw_audio.format)
-					{
-						case media_raw_audio_format::B_AUDIO_FLOAT:
-						{
-							float *outdata = (float*)outbuffer->Data();
-							
-							memset(outdata, 0, sizeof(outdata));
-							
-							int numsamples = int(fOutput.format.u.raw_audio.buffer_size / sizeof(float));
-							
-							for (int c = 0; c < fInputChannels.CountItems(); c++)
-							{
-								input_channel *channel = (input_channel *)fInputChannels.ItemAt(c);
-															
-								if (channel->DataAvailable == true) // formerly DataAvailable
-								{
-									int32 inChannels = channel->fInput.format.u.raw_audio.channel_count;
-									bool split = outChannels > inChannels;
-									bool mix = outChannels < inChannels;
-									
-									
-									if (fOutput.format.u.raw_audio.frame_rate == channel->fInput.format.u.raw_audio.frame_rate)
-									{
-										switch(channel->fInput.format.u.raw_audio.format) 
-										{
-											
-											case media_raw_audio_format::B_AUDIO_FLOAT:
-	
-												if (split)
-												{		}
-												else if (mix)
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-													//	outdata[s] = (float *)(channel->fData)[s]
-													}
-												}
-												else
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-														float *indata = (float *)channel->fData;
-														int os = ((channel->fEventOffset / 4) + s) % int(channel->fDataSize / 4);
-														//outdata[s] = indata[ int(((channel->fEventOffset) * 0.25) + s) % int(channel->fDataSize / 4)];
-														outdata[s] = float(indata[os]);			
-													//	fHost->PostMessage(int32(32767 * indata[os]));											
-														//*(float *)channel->fData[channel->fEventOffset/4) + s) % channel->fDataSize];
-													}
-																				
-													channel->fEventOffset = (channel->fEventOffset + fOutput.format.u.raw_audio.buffer_size) % 
-														channel->fDataSize;
-
-												}
-																								
-												break;	
-												
-											case media_raw_audio_format::B_AUDIO_SHORT:
-											
-												if (split)
-												{		}
-												else if (mix)
-												{
-				
-												}
-												else
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-														int16 *indata = (int16 *)channel->fData;
-														int os = ((channel->fEventOffset / 2) + s) % int(channel->fDataSize / 2);
-														//outdata[s] = indata[ int(((channel->fEventOffset) * 0.25) + s) % int(channel->fDataSize / 4)];
-														outdata[s] = float(indata[os] / 32767.0);		
-														//*(float *)channel->fData[channel->fEventOffset/4) + s) % channel->fDataSize];
-													}
-													
-													channel->fEventOffset = (channel->fEventOffset + fOutput.format.u.raw_audio.buffer_size / 2) % 
-														channel->fDataSize;
-			
-												}
-												
-												break;
-																
-											} // end formatswitch
-											
-										} // end same-samplerate condition
-									
-									} // data
-							
-								} // chan-loop
-							} // cur-case
-						
-						case media_raw_audio_format::B_AUDIO_SHORT:
-						
-							int16 *outdata = (int16*)outbuffer->Data();
-							int numsamples = int(fOutput.format.u.raw_audio.buffer_size / sizeof(int16));
-							
-							memset(outdata, 0, outbuffer->SizeAvailable());
-											
-							for (int c = 0; c < fInputChannels.CountItems(); c++)
-							{
-								input_channel *channel = (input_channel *)fInputChannels.ItemAt(c);
-															
-								if (channel->DataAvailable == true) // only use if there are buffers waiting 
-								{									// CHANGE_THIS - we still get looped audio when there are no buffers
-									int32 inChannels = channel->fInput.format.u.raw_audio.channel_count;
-									bool split = outChannels > inChannels;
-									bool mix = outChannels < inChannels;
-								
-									if (fOutput.format.u.raw_audio.frame_rate == channel->fInput.format.u.raw_audio.frame_rate)
-									{
-										switch(channel->fInput.format.u.raw_audio.format) 
-										{
-											
-											case media_raw_audio_format::B_AUDIO_FLOAT:
-	
-												if (split)
-												{		}
-												else if (mix)
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-													//	outdata[s] = (float *)(channel->fData)[s]
-													}
-												}
-												else
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-														float *indata = (float *)channel->fData;
-														int os = ((channel->fEventOffset / 4) + s) % int(channel->fDataSize / 4);
-														outdata[s] = outdata[s] + int16(32767 * indata[os]);			
-													}
-																				
-													channel->fEventOffset = (channel->fEventOffset + fOutput.format.u.raw_audio.buffer_size * 2) % 
-														channel->fDataSize;
-
-												}
-																								
-												break;	
-												
-											case media_raw_audio_format::B_AUDIO_SHORT:
-											
-												if (split)
-												{		}
-												else if (mix)
-												{
-				
-												}
-												else
-												{
-													for (int s = 0; s < numsamples; s++)
-													{
-														int16 *indata = (int16 *)channel->fData;
-														int os = ((channel->fEventOffset / 2) + s) % int(channel->fDataSize / 2);
-														outdata[s] = outdata[s] + indata[os];
-													}
-													
-													channel->fEventOffset = (channel->fEventOffset + (fOutput.format.u.raw_audio.buffer_size / 2)) % 
-														channel->fDataSize;
-
-												}
-												
-												break;
-																
-											}
-										}
-									
-									}
-							
-								}
-							}
-					// for each input, check the format, then mix into output buffer
-
+					FillMixBuffer(outbuffer->Data(), outbuffer->SizeAvailable());
 					
 					media_header *outheader = outbuffer->Header();
 					outheader->type = B_MEDIA_RAW_AUDIO;
@@ -1016,7 +1209,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 					bigtime_t stamp;
 					if (RunMode() == B_RECORDING)
 						stamp = event->event_time; // this is actually the same as the other modes, since we're using 
-					else							// a timedevent queue and adding events at 
+					else							// a timedevent queue and adding events at fNextEventTime
 					{
 						
 						// we're in a live performance mode
@@ -1033,35 +1226,19 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 					status_t err = SendBuffer(outbuffer, fOutput.destination);
 												
 					if(err != B_OK)
+					{
 						outbuffer->Recycle();
+						printf("Could not send buffer to output : %s\n", fOutput.name);
+					}
 						
 					}
+				
+				else
+					printf("Failed to allocate a buffer\n");
 					
 				// even if we didn't get a buffer allocated, we still need to send the next event
 				
-				size_t sample_size;
-			
-				switch (fOutput.format.u.raw_audio.format)
-				{
-			
-					case (media_raw_audio_format::B_AUDIO_FLOAT):
-					case (media_raw_audio_format::B_AUDIO_INT):
-					
-						sample_size = 4;
-						break;
-				
-					case (media_raw_audio_format::B_AUDIO_SHORT):
-					
-						sample_size = 2;
-						break;
-						
-					case (media_raw_audio_format::B_AUDIO_CHAR):
-					case (media_raw_audio_format::B_AUDIO_UCHAR):
-					
-						sample_size = 1;
-						break;
-											
-				}
+				size_t sample_size = fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	
 				int framesperbuffer = (fOutput.format.u.raw_audio.buffer_size / (sample_size * fOutput.format.u.raw_audio.channel_count));
 					
@@ -1073,9 +1250,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 					
 				media_timed_event nextBufferEvent(fNextEventTime, BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
-				
-		
-							
+
 			}
 
 		
@@ -1119,22 +1294,32 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 
 		case BTimedEventQueue::B_DATA_STATUS:
 		{
+		
+			printf("DataStatus message\n");
 			
-			input_channel *channel;
+			mixer_input *mixerInput;
 			
-			int inputcount = fInputChannels.CountItems();
+			int inputcount = fMixerInputs.CountItems();
 		
 			for (int i = 0; i < inputcount; i++)
 			{
-				channel = (input_channel *)fInputChannels.ItemAt(i);
-				if (channel->fInput.destination == (media_destination &)event->pointer)
+				mixerInput = (mixer_input *)fMixerInputs.ItemAt(i);
+				if (mixerInput->fInput.destination == (media_destination &)event->pointer)
 				{
+				
+					printf("Valid DatasStatus destination\n");
+				
+					mixerInput->fProducerDataStatus = event->data;
+					
+					if (mixerInput->fProducerDataStatus == B_DATA_AVAILABLE)
+						printf("B_DATA_AVAILABLE\n");
+					else if (mixerInput->fProducerDataStatus == B_DATA_NOT_AVAILABLE)
+						printf("B_DATA_NOT_AVAILABLE\n");
+					else if (mixerInput->fProducerDataStatus == B_PRODUCER_STOPPED)
+						printf("B_PRODUCER_STOPPED\n");			
+					
 					i = inputcount;
-					channel->fProducerDataStatus = event->data;
-					if (channel->fProducerDataStatus == B_DATA_AVAILABLE)
-						channel->DataAvailable = true;
-					else
-						channel->DataAvailable = false;
+					
 				}
 			}
 			break;
@@ -1158,7 +1343,7 @@ AudioMixer::AllocateBuffers()
 
 	// allocate enough buffers to span our downstream latency, plus one
 	size_t size = fOutput.format.u.raw_audio.buffer_size;
-	int32 count = int32(fLatency / BufferDuration() + 1 + 1);
+	int32 count = int32((fLatency / (BufferDuration() + 1)) + 1);
 
 	fBufferGroup = new BBufferGroup(size, count);
 	
