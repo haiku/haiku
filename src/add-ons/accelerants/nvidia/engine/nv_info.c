@@ -407,6 +407,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
+				target.space = B_CMAP8;
 				target.timing.pixel_clock = (data2 * 1000);
 				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
@@ -713,6 +714,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
+				target.space = B_CMAP8;
 				target.timing.pixel_clock = (data * 10);
 				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
@@ -1340,6 +1342,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 				display_mode target;
 				float calced_clk;
 				uint8 m, n, p;
+				target.space = B_CMAP8;
 				target.timing.pixel_clock = (data * 10);
 				nv_dac_pix_pll_find(target, &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
