@@ -16,6 +16,7 @@
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
+#include <arch/user_debugger.h>
 
 //#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
@@ -39,8 +40,7 @@ void
 clear_team_debug_info(struct team_debug_info *info)
 {
 	if (info) {
-		atomic_set(&info->flags, B_TEAM_DEBUG_SIGNALS
-			| B_TEAM_DEBUG_PRE_SYSCALL | B_TEAM_DEBUG_POST_SYSCALL);
+		atomic_set(&info->flags, B_TEAM_DEBUG_DEFAULT_FLAGS);
 		info->debugger_team = -1;
 		info->debugger_port = -1;
 		info->nub_thread = -1;
@@ -89,7 +89,8 @@ void
 clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 {
 	if (info) {
-		atomic_set(&info->flags, (dying ? B_THREAD_DEBUG_DYING : 0));
+		atomic_set(&info->flags,
+			B_THREAD_DEBUG_DEFAULT_FLAGS | (dying ? B_THREAD_DEBUG_DYING : 0));
 		info->debug_port = -1;
 	}
 }
@@ -109,8 +110,39 @@ destroy_thread_debug_info(struct thread_debug_info *info)
 }
 
 
-static void
-thread_hit_debug_event(uint32 event, const void *message, int32 size)
+void
+get_team_debug_info(team_debug_info &teamDebugInfo)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	memcpy(&teamDebugInfo, &thread->team->debug_info, sizeof(team_debug_info));
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+}
+
+
+void
+prepare_thread_stopped_message(debug_thread_stopped &message,
+	debug_why_stopped whyStopped, port_id nubPort, void *data)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	message.thread = thread->id;
+	message.team = thread->team->id;
+	message.why = whyStopped;
+	message.nub_port = nubPort;
+	message.data = data;
+	arch_get_debug_cpu_state(&message.cpu_state);
+}
+
+
+static status_t
+thread_hit_debug_event(uint32 event, const void *message, int32 size,
+	debug_why_stopped whyStopped, void *additionalData)
 {
 	struct thread *thread = thread_get_current_thread();
 
@@ -132,7 +164,7 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size)
 		if (port < 0) {
 			dprintf("thread_hit_debug_event(): Failed to create debug port: "
 				"%s\n", strerror(port));
-			return;
+			return port;
 		}
 
 		setPort = true;
@@ -189,19 +221,24 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size)
 	if (error != B_OK) {
 		TRACE(("thread_hit_debug_event() error: thread: %ld, error: %lx\n",
 			thread->id, error));
-		return;
+		return error;
 	}
 
 	// send a message to the debugger port
 	TRACE(("thread_hit_debug_event(): thread: %ld, sending message to debugger "
 		"port %ld\n", thread->id, debuggerPort));
-	error = write_port(debuggerPort, event, message, size);
+	do {
+		error = write_port(debuggerPort, event, message, size);
+	} while (error == B_INTERRUPTED);
+
+	status_t result = B_THREAD_DEBUG_HANDLE_EVENT;
+
 	if (error == B_OK) {
 		bool done = false;
 		while (!done) {
 			// read a command from the debug port
 			int32 command;
-			debugged_thread_message commandMessage;
+			debugged_thread_message_data commandMessage;
 			ssize_t commandMessageSize = read_port(port, &command,
 				&commandMessage, sizeof(commandMessage));
 			if (commandMessageSize < 0) {
@@ -216,8 +253,35 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size)
 				case B_DEBUGGED_THREAD_MESSAGE_CONTINUE:
 					TRACE(("thread_hit_debug_event(): thread: %ld: "
 						"B_DEBUGGED_THREAD_MESSAGE_CONTINUE\n", thread->id));
+					result = commandMessage.run.handle_event;
 					done = true;
 					break;
+
+				case B_DEBUGGED_THREAD_GET_WHY_STOPPED:
+				{
+					// get the team debug info (just in case it has changed)
+					team_debug_info teamDebugInfo;
+					get_team_debug_info(teamDebugInfo);
+					if (!(teamDebugInfo.flags
+							& B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
+						done = true;
+						break;
+					}
+					debuggerPort = teamDebugInfo.debugger_port;
+
+					// prepare the message
+					debug_thread_stopped stoppedMessage;
+					prepare_thread_stopped_message(stoppedMessage, whyStopped,
+						teamDebugInfo.nub_port, additionalData);
+
+					// send it
+					do {
+						error = write_port(debuggerPort, event, &stoppedMessage,
+							sizeof(stoppedMessage));
+					} while (error == B_INTERRUPTED);
+
+					break;
+				}
 			}
 		}
 	} else {
@@ -233,6 +297,8 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size)
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
+
+	return (error == B_OK ? result : error);
 }
 
 
@@ -259,14 +325,13 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 	message.syscall = syscall;
 
 	// copy the syscall args
-	if (!(teamDebugFlags & B_TEAM_DEBUG_SYSCALL_FAST_TRACE)
-		&& syscall < (uint32)kSyscallCount) {
+	if (syscall < (uint32)kSyscallCount) {
 		if (kSyscallInfos[syscall].parameter_size > 0)
 			memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
-		sizeof(message));
+		sizeof(message), B_PRE_SYSCALL_HIT, NULL);
 }
 
 
@@ -297,28 +362,18 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	message.syscall = syscall;
 
 	// copy the syscall args
-	if (!(teamDebugFlags & B_TEAM_DEBUG_SYSCALL_FAST_TRACE)
-		&& syscall < (uint32)kSyscallCount) {
+	if (syscall < (uint32)kSyscallCount) {
 		if (kSyscallInfos[syscall].parameter_size > 0)
 			memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_POST_SYSCALL, &message,
-		sizeof(message));
+		sizeof(message), B_POST_SYSCALL_HIT, NULL);
 }
 
 
-uint32
-user_debug_handle_signal(int signal, bool deadly)
-{
-	// TODO: Maybe provide the signal handler as info for the debugger as well.
-	// TODO: Implement!
-	return B_THREAD_DEBUG_HANDLE_SIGNAL;
-}
-
-
-void
-user_debug_stop_thread()
+static status_t
+stop_thread(debug_why_stopped whyStopped, void *additionalData)
 {
 	// ensure that a debugger is installed for this team
 	port_id nubPort;
@@ -327,21 +382,203 @@ user_debug_stop_thread()
 		dprintf("user_debug_stop_thread(): Failed to install debugger: "
 			"thread: %ld: %s\n", thread_get_current_thread()->id,
 			strerror(error));
-		return;
+		return error;
 	}
-
-	struct thread *thread = thread_get_current_thread();
 
 	// prepare the message
 	debug_thread_stopped message;
+	prepare_thread_stopped_message(message, B_THREAD_NOT_RUNNING, nubPort,
+		additionalData);
+
+	return thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, &message,
+		sizeof(message), whyStopped, additionalData);
+}
+
+
+/**	\brief To be called when an unhandled processor fault (exception/error)
+ *		   occurred.
+ *	\param fault The debug_why_stopped value identifying the kind of fault.
+ *	\return \c true, if the caller shall continue normally, i.e. usually send
+ *			a deadly signal. \c false, if the debugger insists to continue the
+ *			program (e.g. because it has solved the removed the cause of the
+ *			problem).
+ */
+bool
+user_debug_fault_occurred(debug_why_stopped fault)
+{
+	return (stop_thread(fault, NULL) != B_THREAD_DEBUG_IGNORE_EVENT);
+}
+
+
+bool
+user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
+{
+	// check, if a debugger is installed and is interested in team creation
+	// events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_SIGNALS)) {
+		return true;
+	}
+
+	// prepare the message
+	debug_signal_received message;
 	message.thread = thread->id;
 	message.team = thread->team->id;
-	message.why = B_THREAD_NOT_RUNNING;
-	message.nub_port = nubPort;
-	// TODO: Remaining message fields.
+	message.signal = signal;
+	message.handler = *handler;
+	message.deadly = deadly;
 
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, &message,
-		sizeof(message));
+	status_t result = thread_hit_debug_event(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,
+		&message, sizeof(message), B_SIGNAL_RECEIVED, NULL);
+	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
+}
+
+
+void
+user_debug_stop_thread()
+{
+	stop_thread(B_THREAD_NOT_RUNNING, NULL);
+}
+
+
+void
+user_debug_team_created(team_id teamID)
+{
+	// check, if a debugger is installed and is interested in team creation
+	// events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_TEAM_CREATION)) {
+		return;
+	}
+
+	// prepare the message
+	debug_team_created message;
+	message.thread = thread->id;
+	message.team = thread->team->id;
+	message.new_team = teamID;
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
+		sizeof(message), B_TEAM_CREATED, NULL);
+}
+
+
+void
+user_debug_team_deleted(team_id teamID, port_id debuggerPort)
+{
+	if (debuggerPort >= 0) {
+		debug_team_deleted message;
+		message.team = teamID;
+		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
+			sizeof(message), B_RELATIVE_TIMEOUT, 0);
+			// TODO: Would it be OK to wait here?
+	}
+}
+
+
+void
+user_debug_thread_created(thread_id threadID)
+{
+	// check, if a debugger is installed and is interested in thread events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_THREADS)) {
+		return;
+	}
+
+	// prepare the message
+	debug_thread_created message;
+	message.thread = thread->id;
+	message.team = thread->team->id;
+	message.new_thread = threadID;
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
+		sizeof(message), B_THREAD_CREATED, NULL);
+}
+
+
+void
+user_debug_thread_deleted(team_id teamID, thread_id threadID)
+{
+	// get the team debug flags and debugger port
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	struct team *team = team_get_team_struct_locked(teamID);
+
+	int32 teamDebugFlags = 0;
+	port_id debuggerPort = -1;
+	if (team) {
+		teamDebugFlags = atomic_get(&team->debug_info.flags);
+		debuggerPort = team->debug_info.debugger_port;
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	// check, if a debugger is installed and is interested in thread events
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_THREADS)) {
+		return;
+	}
+
+	// notify the debugger
+	if (debuggerPort >= 0) {
+		debug_thread_deleted message;
+		message.thread = threadID;
+		message.team = teamID;
+		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
+			&message, sizeof(message), B_RELATIVE_TIMEOUT, 0);
+			// TODO: Would it be OK to wait here?
+	}
+}
+
+
+void
+user_debug_image_created(const image_info *imageInfo)
+{
+	// check, if a debugger is installed and is interested in image events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_IMAGES)) {
+		return;
+	}
+
+	// prepare the message
+	debug_image_created message;
+	message.thread = thread->id;
+	message.team = thread->team->id;
+	memcpy(&message.info, imageInfo, sizeof(image_info));
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
+		sizeof(message), B_IMAGE_CREATED, NULL);
+}
+
+
+void
+user_debug_image_deleted(const image_info *imageInfo)
+{
+	// check, if a debugger is installed and is interested in image events
+	struct thread *thread = thread_get_current_thread();
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (~teamDebugFlags
+		& (B_TEAM_DEBUG_DEBUGGER_INSTALLED | B_TEAM_DEBUG_IMAGES)) {
+		return;
+	}
+
+	// prepare the message
+	debug_image_deleted message;
+	message.thread = thread->id;
+	message.team = thread->team->id;
+	memcpy(&message.info, imageInfo, sizeof(image_info));
+
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
+		sizeof(message), B_IMAGE_DELETED, NULL);
 }
 
 
@@ -518,8 +755,46 @@ debug_nub_thread(void *)
 			{
 				// get the parameters
 				thread_id threadID = message.run_thread.thread;
+				uint32 handleEvent = message.run_thread.handle_event;
 
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_RUN_THREAD: "
+					"thread: %ld, handle event: %lu\n", nubThread->id,
+					threadID, handleEvent));
+
+				// find the thread and get its debug port
+				state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				port_id threadDebugPort = -1;
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread && thread->team == nubThread->team
+					&& thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) {
+					threadDebugPort = thread->debug_info.debug_port;
+				}
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				// send a message to the debugged thread
+				if (threadDebugPort >= 0) {
+					debugged_thread_run commandMessage;
+					commandMessage.handle_event = handleEvent;
+
+					write_port(threadDebugPort,
+						B_DEBUGGED_THREAD_MESSAGE_CONTINUE, &commandMessage,
+						sizeof(commandMessage));
+				}
+
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_GET_WHY_STOPPED:
+			{
+				// get the parameters
+				thread_id threadID = message.get_why_stopped.thread;
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_WHY_STOPPED: "
 					"thread: %ld\n", nubThread->id, threadID));
 
 				// find the thread and get its debug port
@@ -540,7 +815,7 @@ debug_nub_thread(void *)
 				// send a message to the debugged thread
 				if (threadDebugPort >= 0) {
 					write_port(threadDebugPort,
-						B_DEBUGGED_THREAD_MESSAGE_CONTINUE, NULL, 0);
+						B_DEBUGGED_THREAD_GET_WHY_STOPPED, NULL, 0);
 				}
 
 				break;
@@ -590,22 +865,8 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 	} else
 		error = B_BAD_TEAM_ID;
 
-//int32 teamDebugFlags = team->debug_info.flags;
-//team_debug_info *teamDebugInfo = &team->debug_info;
-
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-
-//if (error != B_OK) {
-//dprintf("install_team_debugger(): First check failed: team: %p (%ld), "
-//"sizeof(struct team): %lu, info: %p, flags: %lx, error: %lx\n", team, team->id, sizeof(struct team), teamDebugInfo, teamDebugFlags, error);
-//dprintf("  dead_children: %p, dead_children.kernel_time: %p, aspace: %p, "
-//"image_list: %p, arch_info: %p, debug_info: %p, dead_threads_kernel_time: %p, "
-//"dead_threads_user_time: %p\n", &team->dead_children,
-//&team->dead_children.kernel_time, &team->aspace, &team->image_list,
-//&team->arch_info, &team->debug_info, &team->dead_threads_kernel_time,
-//&team->dead_threads_user_time);
-//}
 
 	if (done || error != B_OK) {
 		TRACE(("install_team_debugger() done1: %ld\n",
@@ -671,12 +932,29 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 				done = true;
 				result = team->debug_info.nub_port;
 			} else {
-				atomic_or(&team->debug_info.flags,
-					B_TEAM_DEBUG_DEBUGGER_INSTALLED);
+				atomic_set(&team->debug_info.flags,
+					B_TEAM_DEBUG_DEFAULT_FLAGS
+					| B_TEAM_DEBUG_DEBUGGER_INSTALLED);
 				team->debug_info.nub_port = nubPort;
 				team->debug_info.nub_thread = nubThread;
 				team->debug_info.debugger_team = debuggerTeam;
 				team->debug_info.debugger_port = debuggerPort;
+
+				// set the user debug flags of all threads to the default
+				GRAB_THREAD_LOCK();
+
+				for (struct thread *thread = team->thread_list;
+					 thread;
+					 thread = thread->team_next) {
+					if (thread->id != nubThread) {
+						int32 flags = thread->debug_info.flags
+							& ~B_THREAD_DEBUG_USER_FLAG_MASK;
+						atomic_set(&thread->debug_info.flags,
+							flags | B_THREAD_DEBUG_DEFAULT_FLAGS);
+					}
+				}
+
+				RELEASE_THREAD_LOCK();
 			}
 		} else
 			error = B_BAD_TEAM_ID;
@@ -734,9 +1012,8 @@ _user_debugger(const char *message)
 		_user_exit_team(1);
 	}
 
-	// send the debugger message
-// TODO:...
-_user_exit_team(1);
+	// notify the debugger
+	stop_thread(B_DEBUGGER_CALL, (void*)message);
 }
 
 
