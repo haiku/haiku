@@ -1021,6 +1021,7 @@ file_system_info gRootFileSystem = {
 
 	/* common */
 	&rootfs_ioctl,
+	NULL,	// fs_set_flags()
 	&rootfs_fsync,
 
 	&rootfs_read_link,

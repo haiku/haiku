@@ -1289,6 +1289,16 @@ pipefs_ioctl(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 }
 
 
+static status_t
+pipefs_set_flags(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, int flags)
+{
+	file_cookie *cookie = (file_cookie *)_cookie;
+
+	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
+	return B_OK;
+}
+
+
 static bool
 pipefs_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
 {
@@ -1432,6 +1442,7 @@ file_system_info gPipeFileSystem = {
 
 	/* common */
 	&pipefs_ioctl,
+	&pipefs_set_flags,
 	&pipefs_fsync,
 
 	NULL,	// fs_read_link()

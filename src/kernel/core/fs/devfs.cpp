@@ -1138,6 +1138,22 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *b
 }
 
 
+static status_t
+devfs_set_flags(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, int flags)
+{
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
+
+	// we need to pass the O_NONBLOCK flag to the underlying device
+
+	if (!S_ISCHR(vnode->stream.type))
+		return B_NOT_ALLOWED;
+
+	return vnode->stream.u.dev.info->control(cookie->u.dev.dcookie, flags & O_NONBLOCK ?
+		B_SET_NONBLOCKING_IO : B_SET_BLOCKING_IO, NULL, 0);
+}
+
+
 static bool
 devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 {
@@ -1360,6 +1376,7 @@ file_system_info gDeviceFileSystem = {
 
 	/* common */
 	&devfs_ioctl,
+	&devfs_set_flags,
 	&devfs_fsync,
 
 	NULL,	// read_link
