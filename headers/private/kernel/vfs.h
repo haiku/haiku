@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -21,8 +21,6 @@
 #define DEFAULT_FD_TABLE_SIZE	128
 #define MAX_FD_TABLE_SIZE		2048
 #define MAX_NODE_MONITORS		4096
-
-#include <vfs_types.h>
 
 
 struct kernel_args;
