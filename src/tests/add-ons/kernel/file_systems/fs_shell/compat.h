@@ -173,6 +173,10 @@ typedef long long          bigtime_t;
 typedef long               thread_id;
 typedef long               status_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 sem_id     create_sem(long count, const char *name);
 long       delete_sem(sem_id sem);
 long       acquire_sem(sem_id sem);
@@ -189,8 +193,15 @@ ssize_t    write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes);
 ssize_t    readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count);
 ssize_t    writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __BEOS__ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void     panic(const char *msg, ...);
 int      device_is_read_only(const char *device);
@@ -200,5 +211,8 @@ int      device_is_removeable(int fd);
 int      lock_removeable_device(int fd, bool on_or_off);
 void     hexdump(void *address, int size);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _COMPAT_H */

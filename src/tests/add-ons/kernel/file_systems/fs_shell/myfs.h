@@ -2,12 +2,13 @@
 #define MYFS_H
 
 
+#include "fsproto.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "compat.h"
-#include "fsproto.h"
 
 #include "lock.h"
 #include "cache.h"

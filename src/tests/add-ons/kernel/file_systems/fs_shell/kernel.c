@@ -2329,7 +2329,7 @@ parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
  * get_vnode
  */
 
-int
+status_t
 get_vnode(nspace_id nsid, vnode_id vnid, void **data)
 {
     int         err;
@@ -2347,7 +2347,7 @@ get_vnode(nspace_id nsid, vnode_id vnid, void **data)
  * put_vnode
  */
 
-int
+status_t
 put_vnode(nspace_id nsid, vnode_id vnid)
 {
     vnode           *vn;
@@ -2367,7 +2367,7 @@ put_vnode(nspace_id nsid, vnode_id vnid)
  * new_vnode
  */
 
-int
+status_t
 new_vnode(nspace_id nsid, vnode_id vnid, void *data)
 {
 //    int retries = 20;
@@ -2432,7 +2432,7 @@ restart:
  * remove_vnode
  */
 
-int
+status_t
 remove_vnode(nspace_id nsid, vnode_id vnid)
 {
     vnode       *vn;
@@ -2452,7 +2452,7 @@ remove_vnode(nspace_id nsid, vnode_id vnid)
  * unremove_vnode
  */
 
-int
+status_t
 unremove_vnode(nspace_id nsid, vnode_id vnid)
 {
     vnode       *vn;
@@ -2472,7 +2472,7 @@ unremove_vnode(nspace_id nsid, vnode_id vnid)
  * is_vnode_removed
  */
 
-int
+status_t
 is_vnode_removed(nspace_id nsid, vnode_id vnid)
 {
     vnode       *vn;
@@ -3315,7 +3315,7 @@ free_fds(fdarray *fds)
 // dummies
 
 
-int
+status_t
 notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id vnidc, const char *name)
 {
 #ifdef DEBUG
@@ -3330,7 +3330,7 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 }
 
 
-int
+status_t
 send_notification(port_id port, long token, ulong what, long op, nspace_id nsida,
 		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
 		const char *name)
