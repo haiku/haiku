@@ -1,4 +1,5 @@
 #include <Debug.h>
+#include <Region.h>
 
 #include <clipping.h>
 #include "region_helpers.h"
@@ -250,6 +251,13 @@ copy_region_n(BRegion *source, BRegion *dest, long count)
 }
 
 
+/*!	\brief Modify the destination region to be the intersection of the two given regions.
+	\param first The first region to be intersected.
+	\param second The second region to be intersected.
+	\param dest The destination region.
+	
+	Called by and_region() when the intersection is complex.
+*/	
 void
 and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
@@ -273,7 +281,13 @@ and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 }
 
 
-
+/*!	\brief Modify the destination region to be the intersection of the two given regions.
+	\param first The first region to be intersected.
+	\param second The second region to be intersected.
+	\param dest The destination region.
+	
+	Called by and_region() when one of the two region contains just one rect.
+*/	
 void
 and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 {
