@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src tests kits net DialUpPreflet ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+
+SimpleTest DialUpPreflet :
+	DialUpApplication.cpp
+	DialUpView.cpp
+	
+	# utils
+	MessageDriverSettingsUtils.cpp
+	
+	# built-in add-ons
+	GeneralAddon.cpp
+;
+
+LinkSharedOSLibs DialUpPreflet : be libppp.a ;

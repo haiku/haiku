@@ -1,0 +1,31 @@
+--------------------------------------------------------------------------------------
+Notes for add-on developers:
+--------------------------------------------------------------------------------------
+All add-ons must add a "Valid" boolean value to every recognized parameter. The preflet will check if all values were recognized and if not it will ask the user if he wants to edit the interface anyway...
+
+--------------------------------------------------------------------------------------
+Add-on registration:
+--------------------------------------------------------------------------------------
+Tabs:
+"Tab" : pointer to DialUpAddon object
+
+Authenticators:
+"Authenticator" : BMessage with the following entries:
+{
+	"KernelModule" : string
+	"TechnicalName" : string
+	"FriendlyName" : string
+	"Position" : int32
+}
+
+Devices:
+"Device" : pointer to DialUpAddon object
+
+Protocols:
+"Protocol" : pointer to DialUpAddon object
+
+--------------------------------------------------------------------------------------
+Additional data in the BMessage object for add-ons:
+--------------------------------------------------------------------------------------
+"Messenger" : BMessenger - This messenger can be used to send messages to the preflet
+"TabViewRect" : BRect - This rect should be used for tabs

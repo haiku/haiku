@@ -1,0 +1,15 @@
+BUGs/Hacks:
+- FIXME: the MessageDriverSettings API uses a little hack to allow adding new entries to sub-messages without replacing the old one
+
+Short-term TODOs:
+- add "Protocols" tab
+- add "Extras" tab for changing dial-behaviour (auto-redial, dial-on-demand, etc.)
+- add "Revert changes" button
+- load add-ons
+- write IP (IPCP) protocol add-on
+- write PAP authenticator add-on
+- write PPPoE device add-on
+- move DEVNOTES into a doxygen file and document the rest of the API
+
+Long-term TODOs:
+- allow selecting multiple authenticators
