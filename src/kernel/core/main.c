@@ -26,7 +26,6 @@
 #include <cbuf.h>
 #include <elf.h>
 #include <cpu.h>
-#include <bus.h>
 #include <kdriver_settings.h>
 #include <kmodule.h>
 #include <int.h>
