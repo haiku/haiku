@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-1 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-2 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -371,44 +371,9 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
 	 * or 'equals' the acceleration engine memory pitch granularity! */
 
-	uint32 video_pitch;
-	uint32 acc_mask, crtc_mask;
+	uint32 video_pitch = 0;
+	uint32 crtc_mask;
 	uint8 depth = 8;
-
-//fixme: checkout the acc pitch constraints for all cards...
-	/* determine pixel multiple based on 2D/3D engine constraints */
-	switch (si->ps.card_type)
-	{
-/*	case G100:
-		switch (target->space)
-		{
-			case B_CMAP8: acc_mask = 0x7f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x3f; depth = 16; break;
-			case B_RGB16: acc_mask = 0x3f; depth = 16; break;
-			case B_RGB24: acc_mask = 0x7f; depth = 24; break;
-			default:
-				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-*/	default:
-		/* see G100 and up specs:
-		 * these cards can do 2D as long as multiples of 32 are used.
-		 * (Note: don't mix this up with adress linearisation!) */
-		switch (target->space)
-		{
-			case B_CMAP8: depth =  8; break;
-			case B_RGB15: depth = 16; break;
-			case B_RGB16: depth = 16; break;
-			case B_RGB24: depth = 24; break;
-			default:
-				LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-//assuming accpitch = 32 for now..
-		acc_mask = 0x1f;
-		break;
-	}
 
 	/* determine pixel multiple based on CRTC memory pitch constraints.
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
@@ -417,66 +382,55 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	 * CRTC pitch constraints are the same for all Neomagic cards */
 	switch (target->space)
 	{
-		case B_CMAP8: crtc_mask = 0x07; break;
-		case B_RGB15: crtc_mask = 0x03; break;
-		case B_RGB16: crtc_mask = 0x03; break;
-		case B_RGB24: crtc_mask = 0x07; break; 
+		case B_CMAP8: crtc_mask = 0x07; depth =  8; break;
+		case B_RGB15: crtc_mask = 0x03; depth = 16; break;
+		case B_RGB16: crtc_mask = 0x03; depth = 16; break;
+		case B_RGB24: crtc_mask = 0x07; depth = 24; break; 
 		default:
 			LOG(8,("INIT: unsupported colorspace: 0x%08x\n", target->space));
 			return B_ERROR;
 	}
 
 	/* check if we can setup this mode with acceleration:
-	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
+	 * constraints are same for all cards */
 	*acc_mode = true;
-	/* check virtual_width */
+
 	switch (si->ps.card_type)
 	{
-	case G100:
-		/* acc constraint: */
-		if (target->virtual_width > 2048) *acc_mode = false;
+	case NM2097:
+	case NM2160:
+		if (target->space != B_RGB24) *acc_mode = true;
+		else *acc_mode = false;
 		break;
 	default:
-		/* G200-G550 */
-		/* acc constraint: */
-		if (target->virtual_width > 4096) *acc_mode = false;
-		/* for 32bit mode a lower CRTC1 restriction applies! */
-//		if ((target->space == B_RGB32_LITTLE) && (target->virtual_width > (4092 & ~acc_mask)))
-//			*acc_mode = false;
+		*acc_mode = false;
 		break;
 	}
+
+	/* virtual_width */
+	if (target->virtual_width > 1600) *acc_mode = false;
+
 	/* virtual_height */
 	if (target->virtual_height > 2048) *acc_mode = false;
 
-//fixme: (temp)
-*acc_mode = false;
-
-	/* now check virtual_size based on CRTC constraints,
-	 * making sure virtual_width stays within the 'mask' constraint: which is only
-	 * nessesary because of an extra constraint in MIL1/2 cards that exists here. */
-
-//fixme: checkout cardspecs here!!
-
+	/* now check virtual_size based on CRTC constraints and modify if needed */
+//fixme: checkout cardspecs here!! (NM2160 can do 8192 _bytes_ at least (in theory))
 	{
 		/* virtual_width */
-		//fixme for CRTC2 (identical on all G400+ cards):
-		//16bit mode: max. virtual_width == 16352 (no extra mask needed);
-		//32bit mode: max. virtual_width == 8176 (no extra mask needed);
-		//other colordepths are unsupported on CRTC2.
 		switch(target->space)
 		{
 		case B_CMAP8:
-			if (target->virtual_width > (16368 & ~crtc_mask))
-				target->virtual_width = (16368 & ~crtc_mask);
+			if (target->virtual_width > 16368)
+				target->virtual_width = 16368;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
-			if (target->virtual_width > (8184 & ~crtc_mask))
-				target->virtual_width = (8184 & ~crtc_mask);
+			if (target->virtual_width > 8184)
+				target->virtual_width = 8184;
 			break;
 		case B_RGB24_LITTLE:
-			if (target->virtual_width > (5456 & ~crtc_mask))
-				target->virtual_width = (5456 & ~crtc_mask);
+			if (target->virtual_width > 5456)
+				target->virtual_width = 5456;
 			break;
 		}
 
@@ -489,9 +443,68 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace
 	 * for this mode... */
+	/* note:
+	 * we prefer unaccelerated modes above accelerated ones if not enough RAM exists
+	 * and the mode can be closer matched to the requested one if unaccelerated. */
 	if (*acc_mode)
-		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
-	else
+	{
+		uint32 mem_avail, bytes_X_height;
+
+		/* calculate amount of available memory */
+		mem_avail = (si->ps.memory_size * 1024);
+		if (si->settings.hardcursor) mem_avail -= si->ps.curmem_size;
+		/* helper */
+		bytes_X_height = (depth >> 3) * target->virtual_height;
+
+		/* Accelerated modes work with a table, there are very few fixed settings.. */
+		if (target->virtual_width == 640) video_pitch = 640;
+		else
+			if (target->virtual_width <= 800)
+			{
+				if (((800 * bytes_X_height) > mem_avail) &&
+					(target->virtual_width < (800 - crtc_mask)))
+					*acc_mode = false;
+				else
+					video_pitch = 800;
+			}
+			else
+				if (target->virtual_width <= 1024)
+				{
+					if (((1024 * bytes_X_height) > mem_avail) &&
+						(target->virtual_width < (1024 - crtc_mask)))
+						*acc_mode = false;
+					else
+						video_pitch = 1024;
+				}
+				else
+					if (target->virtual_width <= 1152)
+					{
+						if (((1152 * bytes_X_height) > mem_avail) &&
+							(target->virtual_width < (1152 - crtc_mask)))
+							*acc_mode = false;
+						else
+							video_pitch = 1152;
+					}
+					else
+						if (target->virtual_width <= 1280)
+						{
+							if (((1280 * bytes_X_height) > mem_avail) &&
+								(target->virtual_width < (1280 - crtc_mask)))
+								*acc_mode = false;
+							else
+								video_pitch = 1280;
+						}
+						else
+							if (target->virtual_width <= 1600)
+							{
+								if (((1600 * bytes_X_height) > mem_avail) &&
+									(target->virtual_width < (1600 - crtc_mask)))
+									*acc_mode = false;
+								else
+									video_pitch = 1600;
+							}
+	}
+	if (!*acc_mode)
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
 
 	LOG(2,("INIT: memory pitch will be set to %d pixels for colorspace 0x%08x\n",

@@ -21,10 +21,16 @@ blit
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
-	while (ACCR(STATUS) & 0x00000001)
+	switch (si->ps.card_type)
 	{
-		/* snooze a bit so I do not hammer the bus */
-		snooze (100); 
+	case NM2097:
+	case NM2160:
+		while (ACCR(STATUS) & 0x00000001)
+		{
+			/* snooze a bit so I do not hammer the bus */
+			snooze (100); 
+		}
+		break;
 	}
 
 	return B_OK;
@@ -80,6 +86,9 @@ status_t nm_acc_init()
 	case 1600:
 		si->engine.control |= (7 << 10);
 		break;
+	default:
+		LOG(8,("ACC: init, invalid mode width\n"));
+		return B_ERROR;
 	}
 
 	/* fixme?: setup clipping */
@@ -90,9 +99,6 @@ status_t nm_acc_init()
 /* screen to screen blit - i.e. move windows around and scroll within them. */
 status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
-	uint32 t_start,t_end,offset;
-	uint32 b_start,b_end;
-
 	/* make sure the previous command (if any) is completed */
 	nm_acc_wait_idle();
 
@@ -120,19 +126,16 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
  * Engine function bitblit, paragraph 4.5.7.2 */
 status_t nm_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
 {
-	uint32 t_start,t_end,offset;
-	uint32 b_start,b_end;
-
 	return B_ERROR;
 
 	/*find where the top,bottom and offset are*/
 //	offset = (si->fbc.bytes_per_row / (depth >> 3));
 
 //	t_end = t_start = xs + (offset*ys) + src_dst;
-	t_end += w;
+//	t_end += w;
 
 //	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
-	b_end +=w;
+//	b_end +=w;
 
 	/* sgnzero bit _must_ be '0' before accessing SGN! */
 //	ACCW(DWGCTL,0x00000000);
