@@ -370,18 +370,16 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
 {
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(SHOW_CURSOR);
-	link->Flush();
-	delete link;
+	// Because we're just sending an opcode, we can skip the PortLink and simply
+	// call write_port top the server communications port.
+	write_port(fServerTo,SHOW_CURSOR,NULL,0);
 }
 //------------------------------------------------------------------------------
 void BApplication::HideCursor()
 {
-	PortLink *link=new PortLink(fServerTo);
-	link->SetOpCode(HIDE_CURSOR);
-	link->Flush();
-	delete link;
+	// Because we're just sending an opcode, we can skip the PortLink and simply
+	// call write_port top the server communications port.
+	write_port(fServerTo,HIDE_CURSOR,NULL,0);
 }
 //------------------------------------------------------------------------------
 void BApplication::ObscureCursor()
@@ -394,13 +392,14 @@ void BApplication::ObscureCursor()
 //------------------------------------------------------------------------------
 bool BApplication::IsCursorHidden() const
 {
-	// TODO: talk to app_server
-
-	// Requires FlushWithReply(). Waiting until it has been updated.
-	// Protocol: Setup link, set opcode to QUERY_CURSOR_HIDDEN and FlushWithReply
-	// The replied message will be SERVER_TRUE if hidden, SERVER_FALSE if not. --DW
+	PortLink::ReplyData data;
 	
-	return false;	// not implemented
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(QUERY_CURSOR_HIDDEN);
+	link->FlushWithReply(&data);
+	delete link;
+	
+	return (data.code==SERVER_TRUE)?true:false;
 }
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const void* cursor)
@@ -757,10 +756,19 @@ void BApplication::InitData(const char* signature, status_t* error)
 //------------------------------------------------------------------------------
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 {
+	PortLink *link=new PortLink(fServerTo);
+	link->SetOpCode(BEGIN_RECT_TRACKING);
+	link->Attach(r);
+	link->Attach(trackWhole);
+	link->Flush();
+	delete link;
 }
 //------------------------------------------------------------------------------
 void BApplication::EndRectTracking()
 {
+	// Because we're just sending an opcode, we can skip the PortLink and simply
+	// call write_port top the server communications port.
+	write_port(fServerTo,END_RECT_TRACKING,NULL,0);
 }
 //------------------------------------------------------------------------------
 void BApplication::get_scs()
