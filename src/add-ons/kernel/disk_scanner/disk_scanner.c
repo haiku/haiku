@@ -21,8 +21,8 @@ static const char *kFSModulePrefix			= "disk_scanner/fs";
 
 // prototypes
 static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
-static status_t get_partition_module_block(int deviceFD, off_t sessionOffset,
-	off_t sessionSize, const uchar *block, int32 blockSize,
+static status_t get_partition_module_block(int deviceFD,
+	const session_info *sessionOffset, const uchar *block,
 	partition_module_info **partitionModule);
 
 
@@ -100,9 +100,8 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 // get_partition_module_block
 static
 status_t
-get_partition_module_block(int deviceFD, off_t sessionOffset,
-						   off_t sessionSize, const uchar *block,
-						   int32 blockSize,
+get_partition_module_block(int deviceFD, const session_info *sessionInfo,
+						   const uchar *block,
 						   partition_module_info **partitionModule)
 {
 	// Iterate through the list of partition modules and return the first one
@@ -117,8 +116,7 @@ get_partition_module_block(int deviceFD, off_t sessionOffset,
 			partition_module_info *module = NULL;
 			TRACE(("disk_scanner: trying partition module: `%s'\n", moduleName));
 			if (get_module(moduleName, (module_info**)&module) == B_OK) {
-				if (module->identify(deviceFD, sessionOffset, sessionSize,
-									 block, blockSize)) {
+				if (module->identify(deviceFD, sessionInfo, block)) {
 					// found module
 					*partitionModule = module;
 					break;
@@ -137,22 +135,24 @@ get_partition_module_block(int deviceFD, off_t sessionOffset,
 // get_partition_module
 static
 status_t
-disk_scanner_get_partition_module(int deviceFD, off_t sessionOffset,
-							  off_t sessionSize, int32 blockSize,
-							  partition_module_info **partitionModule)
+disk_scanner_get_partition_module(int deviceFD,
+								  const session_info *sessionInfo,
+								  partition_module_info **partitionModule)
 {
-	status_t error = (partitionModule ? B_OK : B_BAD_VALUE);
-	TRACE(("disk_scanner: get_partition_module(%d, %lld, %lld, %ld)\n", deviceFD,
-		   sessionOffset, sessionSize, blockSize));
+	status_t error = (partitionModule && sessionInfo ? B_OK : B_BAD_VALUE);
+	TRACE(("disk_scanner: get_partition_module(%d, %lld, %lld, %ld)\n",
+		   deviceFD, sessionInfo->offset, sessionInfo->size,
+		   sessionInfo->logical_block_size));
 	if (error == B_OK) {
+		off_t sessionOffset = sessionInfo->offset;
+		int32 blockSize = sessionInfo->logical_block_size;
 		// read the first block of the session and let the helper function
 		// do the job
 		uchar *block = NULL;
 		error = read_block(deviceFD, sessionOffset, blockSize, &block);
 		if (error == B_OK) {
-			error = get_partition_module_block(deviceFD, sessionOffset,
-											   sessionSize, block, blockSize,
-											   partitionModule);
+			error = get_partition_module_block(deviceFD, sessionInfo,
+											   block, partitionModule);
 			free(block);
 		}
 	}
@@ -163,7 +163,7 @@ disk_scanner_get_partition_module(int deviceFD, off_t sessionOffset,
 static
 status_t
 disk_scanner_get_nth_session_info(int deviceFD, int32 index,
-							  session_info *sessionInfo)
+								  session_info *sessionInfo)
 {
 	status_t error = B_OK;
 	session_module_info *sessionModule = NULL;
@@ -217,9 +217,10 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 // get_nth_partition_info
 static
 status_t
-disk_scanner_get_nth_partition_info(int deviceFD, off_t sessionOffset,
-								off_t sessionSize,
-								extended_partition_info *partitionInfo)
+disk_scanner_get_nth_partition_info(int deviceFD,
+									const session_info *sessionInfo,
+									int32 partitionIndex,
+									extended_partition_info *partitionInfo)
 {
 	partition_module_info *partitionModule = NULL;
 	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
@@ -228,14 +229,18 @@ disk_scanner_get_nth_partition_info(int deviceFD, off_t sessionOffset,
 		   partitionInfo->info.logical_block_size, partitionInfo->info.session,
 		   partitionInfo->info.partition));
 	if (error == B_OK) {
-		int32 blockSize = partitionInfo->info.logical_block_size;
-		int32 partitionIndex = partitionInfo->info.partition;
-		// read the first block of the session and get the partition module
+		off_t sessionOffset = sessionInfo->offset;
+		off_t sessionSize = sessionInfo->size;
+		int32 blockSize = sessionInfo->logical_block_size;
 		uchar *block = NULL;
+		// fill in the fields we do already know
+		partitionInfo->info.logical_block_size = blockSize;
+		partitionInfo->info.session = sessionInfo->index;
+		partitionInfo->info.partition = partitionIndex;
+		// read the first block of the session and get the partition module
 		error = read_block(deviceFD, sessionOffset, blockSize, &block);
 		if (error == B_OK) {
-			error = get_partition_module_block(deviceFD, sessionOffset,
-											   sessionSize, block, blockSize,
+			error = get_partition_module_block(deviceFD, sessionInfo, block,
 											   &partitionModule);
 			if (error == B_ENTRY_NOT_FOUND
 				&& partitionInfo->info.partition == 0) {
@@ -252,8 +257,8 @@ disk_scanner_get_nth_partition_info(int deviceFD, off_t sessionOffset,
 		}
 		// get the info
 		if (error == B_OK && partitionModule) {
-			error = partitionModule->get_nth_info(deviceFD, sessionOffset,
-				sessionSize, block, blockSize, partitionIndex, partitionInfo);
+			error = partitionModule->get_nth_info(deviceFD, sessionInfo,
+				block, partitionIndex, partitionInfo);
 		}
 		// cleanup
 		if (partitionModule)
@@ -278,6 +283,8 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 		   partitionInfo->info.offset, partitionInfo->info.size,
 		   partitionInfo->info.logical_block_size));
 	if (error == B_OK && ((list = open_module_list(kFSModulePrefix)))) {
+		extended_partition_info bestInfo;
+		float bestPriority = -2;
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
 		error = B_ENTRY_NOT_FOUND;
@@ -285,13 +292,26 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 			 bufferSize = sizeof(moduleName)) {
 			fs_module_info *module = NULL;
 			TRACE(("disk_scanner: trying fs module: `%s'\n", moduleName));
-			if (get_module(moduleName, (module_info**)&module) == B_OK && module) {
-				if (module->identify(deviceFD, partitionInfo)) 
+			// get the module
+			if (get_module(moduleName, (module_info**)&module) == B_OK) {
+				// get the info
+				extended_partition_info info = *partitionInfo;
+				float priority = 0;
+				if (module->identify(deviceFD, &info, &priority)) {
+					// copy the info, if it is the first or the has a higher
+					// priority than the one found before
+					if (error == B_ENTRY_NOT_FOUND
+						|| priority > bestPriority) {
+						bestInfo = info;
+						bestPriority = priority;
+					}
 					error = B_OK;
+				}
 				put_module(moduleName);
-				if (error == B_OK)
-					break;
 			}
+			// set the return value
+			if (error == B_OK)
+				*partitionInfo = bestInfo;
 		}
 		close_module_list(list);
 	}
