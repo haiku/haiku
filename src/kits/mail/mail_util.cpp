@@ -401,7 +401,6 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 				convert_id = cs->GetConversionID();
 			}
 		}
-
 		if (convert_id == B_MAIL_NULL_CONVERSION)
 		{
 			// unidentified charset

@@ -41,8 +41,12 @@ enum	mail_flags			{B_MAIL_PENDING	= 1,	/* waiting to be sent*/
 
 #define B_MAIL_TYPE			"text/x-email"			/* mime type*/
 
+/* Everything past this point is deprecated. See MailMessage.h, mail_encoding.h
+	and MailDaemon.h for alternatives. */
 
-/* -----------------------------------------------------------------------*/
+/* DEPRECATED -- DEPRECATED -- DEPRECATED -- DEPRECATED -- DEPRECATED */
+/* DEPRECATED -- DEPRECATED -- DEPRECATED -- DEPRECATED -- DEPRECATED */
+
 /* defines...*/
 
 /* schedule days */
@@ -86,7 +90,6 @@ typedef struct {
 	bool		alert;
 	bool		beep;
 } mail_notification;
-
 
 /* -----------------------------------------------------------------------*/
 /* global functions...*/
