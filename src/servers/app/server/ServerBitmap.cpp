@@ -42,6 +42,8 @@ ServerBitmap::ServerBitmap(BRect rect,color_space space, int32 flags,
 	_initialized=false;
 
 	_area=B_ERROR;
+//!!! WARNING !!! '1' is added to the width and height. Same is done in FBBitmap
+// subclass, so if you modify here make sure to do the same under FBBitmap::SetSize(...)
 	_width=rect.IntegerWidth()+1;
 	_height=rect.IntegerHeight()+1;
 	_space=space;
