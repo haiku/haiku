@@ -364,7 +364,7 @@ status_t nv_crtc2_set_display_pitch()
 
 status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp) 
 {
-	uint8 temp;
+	uint32 timeout = 0;
 
 	LOG(4,("CRTC2: setting card RAM to be displayed bpp %d\n", bpp));
 
@@ -372,7 +372,15 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC2: frameRAM: $%08x\n", si->framebuffer));
 	LOG(2,("CRTC2: framebuffer: $%08x\n", si->fbc.frame_buffer));
 
-	/* retrace sync not needed here: doublebuffering in hardware */
+	/* we might have no retraces during setmode! */
+	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
+	while (((NV_REG32(NV32_RASTER2) & 0x000007ff) < si->dm.timing.v_display) &&
+			(timeout < (25000/10)))
+	{
+		/* don't snooze much longer or retrace might get missed! */
+		snooze(10);
+		timeout++;
+	}
 
 	/* enable access to CRTC2 */
 	CRTC2W(OWNER, 0x03);
@@ -386,8 +394,7 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 	NV_REG32(NV32_NV10FB2STADD32) = (startadd & 0xfffffffc);
 
 	/* set byte adress: (b0 - 1) */
-	temp = (ATB2R(HORPIXPAN) & 0xf9);
-	ATB2W(HORPIXPAN, (temp | ((startadd & 0x00000003) << 1)));
+	ATB2W(HORPIXPAN, ((startadd & 0x00000003) << 1));
 
 	return B_OK;
 }

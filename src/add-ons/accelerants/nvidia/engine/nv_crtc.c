@@ -383,6 +383,7 @@ status_t nv_crtc_set_display_pitch()
 status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
 	uint8 temp;
+	uint32 timeout = 0;
 
 	LOG(4,("CRTC: setting card RAM to be displayed bpp %d\n", bpp));
 
@@ -390,7 +391,15 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC: frameRAM: $%08x\n", si->framebuffer));
 	LOG(2,("CRTC: framebuffer: $%08x\n", si->fbc.frame_buffer));
 
-	/* retrace sync not needed here: doublebuffering in hardware */
+	/* we might have no retraces during setmode! */
+	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
+	while (((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
+			(timeout < (25000/10)))
+	{
+		/* don't snooze much longer or retrace might get missed! */
+		snooze(10);
+		timeout++;
+	}
 
 	/* enable access to CRTC1 on dualhead cards */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
@@ -424,8 +433,7 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	}
 
 	/* set NV4/NV10 byte adress: (b0 - 1) */
-	temp = (ATBR(HORPIXPAN) & 0xf9);
-	ATBW(HORPIXPAN, (temp | ((startadd & 0x00000003) << 1)));
+	ATBW(HORPIXPAN, ((startadd & 0x00000003) << 1));
 
 	return B_OK;
 }
