@@ -1374,6 +1374,28 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				NV_REG8(reg) = byte;
 			}
 			break;
+		case 0x6a: /* new */
+			*size -= 2;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			data = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			data2 = *((uint16*)(&(rom[(tabs.InitScriptTablePtr + (data << 1))])));
+			LOG(8,("cmd 'jump to script #$%02x at adress $%04x'\n", data, data2));
+			if (*exec)
+			{
+				*adress = data2;
+				LOG(8,("INFO: ---Jumping; not touching 'execution' mode.\n"));
+			}
+			break;
 		case 0x6b: /* new */
 			*size -= 2;
 			if (*size < 0)
