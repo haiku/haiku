@@ -21,6 +21,7 @@
 #include <fd.h>
 #include <sysctl.h>
 #include <ksocket.h>
+#include <kimage.h>
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 
@@ -364,6 +365,21 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_TEST_AND_SET:
 			*call_ret = user_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
 			break;
+
+		// image calls
+		case SYSCALL_REGISTER_IMAGE:
+			*call_ret = user_register_image((image_info *)arg0, (size_t)arg1);
+			break;
+		case SYSCALL_UNREGISTER_IMAGE:
+			*call_ret = user_unregister_image((image_id)arg0);
+			break;
+		case SYSCALL_GET_IMAGE_INFO:
+			*call_ret = user_get_image_info((image_id)arg0, (image_info *)arg1, (size_t)arg2);
+			break;
+		case SYSCALL_GET_NEXT_IMAGE_INFO:
+			*call_ret = user_get_next_image_info((team_id)arg0, (int32 *)arg1, (image_info *)arg2, (size_t)arg3);
+			break;
+
 		case SYSCALL_SYSCTL:
 			*call_ret = user_sysctl((int *)arg0, (uint)arg1, (void *)arg2, 
 			                        (size_t *)arg3, (void *)arg4, 
