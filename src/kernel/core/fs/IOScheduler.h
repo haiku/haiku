@@ -8,6 +8,7 @@
 
 #include <OS.h>
 #include <Drivers.h>
+#include <pnp_devfs.h>
 
 #include <util/DoublyLinkedList.h>
 #include <lock.h>
@@ -35,7 +36,7 @@ class IORequest {
 
 class IOScheduler {
 	public:
-		IOScheduler(const char *name, device_hooks *hooks);
+		IOScheduler(const char *name, pnp_devfs_driver_info *hooks);
 		~IOScheduler();
 
 		status_t InitCheck() const;
@@ -50,9 +51,9 @@ class IOScheduler {
 		static int32 scheduler(void *);
 
 	private:
-		device_hooks	*fDeviceHooks;
-		mutex			fLock;
-		thread_id		fThread;
+		pnp_devfs_driver_info	*fDeviceHooks;
+		mutex					fLock;
+		thread_id				fThread;
 		DoublyLinked::List<IORequest, &IORequest::link> fRequests;
 };
 

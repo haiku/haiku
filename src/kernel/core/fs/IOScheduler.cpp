@@ -41,7 +41,7 @@ IORequest::IORequest(void *_cookie, off_t _offset, const void *_buffer, size_t _
 //	#pragma mark -
 
 
-IOScheduler::IOScheduler(const char *name, device_hooks *hooks)
+IOScheduler::IOScheduler(const char *name, pnp_devfs_driver_info *hooks)
 	:
 	fDeviceHooks(hooks)
 {
