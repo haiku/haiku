@@ -24,7 +24,7 @@
 #include <String.h>
 
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 #include "TestApp.h"
 #include "TestUtils.h"
 

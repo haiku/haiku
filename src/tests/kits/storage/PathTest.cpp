@@ -10,7 +10,7 @@
 #include <Entry.h>
 #include <Path.h>
 #include <TypeConstants.h>
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 // Suite
 CppUnit::Test*

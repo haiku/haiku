@@ -8,7 +8,7 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 
-#include "Test.StorageKit.h"	// For "shell" global variable
+#include "StorageKitTester.h"	// For "shell" global variable
 #include "FileTest.h"
 
 // Suite

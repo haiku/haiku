@@ -18,7 +18,7 @@
 #include <Query.h>
 #include <String.h>
 #include <Volume.h>
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 #include "TestApp.h"
 #include "TestUtils.h"
 

@@ -1,7 +1,7 @@
 // TestUtils.cpp
 
 #include "TestUtils.h"
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 status_t DecodeResult(status_t result) {
 	if (!shell.BeVerbose())

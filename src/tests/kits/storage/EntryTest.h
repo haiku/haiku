@@ -5,7 +5,7 @@
 
 #include "StatableTest.h"
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 #include "TestUtils.h"
 
 class BEntry;

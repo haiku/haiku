@@ -8,7 +8,7 @@
 #include <Path.h>
 #include <SymLink.h>
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 #include "SymLinkTest.h"
 
 // Suite

@@ -15,7 +15,7 @@
 #include <String.h>
 #include <TypeConstants.h>
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 static const char *testDir		= "/tmp/testDir";
 static const char *x86ResFile	= "/tmp/testDir/x86.rsrc";

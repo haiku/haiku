@@ -8,7 +8,7 @@
 
 #include <SupportDefs.h>
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 class BasicTest : public StorageKit::TestCase
 {

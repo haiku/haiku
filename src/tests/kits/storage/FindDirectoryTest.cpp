@@ -13,7 +13,7 @@
 #include <Path.h>
 #include <Volume.h>
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 
 const directory_which directories[] = {

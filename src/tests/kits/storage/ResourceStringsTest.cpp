@@ -18,7 +18,7 @@
 #include <String.h>
 #include <TypeConstants.h>
 
-#include "Test.StorageKit.h"
+#include "StorageKitTester.h"
 
 
 static const char *testDir		= "/tmp/testDir";
