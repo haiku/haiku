@@ -61,10 +61,14 @@ class Printer;
 class Printer : public BHandler
 {
 	typedef BHandler Inherited;
+
 public:
 	Printer(const BNode* node);
 	~Printer();
-	
+
+	void Acquire();
+	void Release();
+		
 		// Static helper functions
 	static Printer* Find(const BString& name);
 	static Printer* At(int32 idx);
@@ -87,6 +91,7 @@ private:
 	status_t LoadPrinterAddon(image_id& id);
 
 	BNode fNode;
+	int32 fRefCount;
 	
 	static BObjectList<Printer> sPrinters;
 };

@@ -82,6 +82,8 @@ private:
 	BBitmap fSelectedIconLarge;
 
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
+	static status_t async_thread(void* data);
+	void AsyncHandleMessage(BMessage* msg);
 	void Handle_BeOSR5_Message(BMessage* msg);
 };
 

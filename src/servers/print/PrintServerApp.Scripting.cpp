@@ -107,7 +107,7 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					status_t rc = B_BAD_VALUE;
 					
 					if (printer != NULL && (rc=printer->Remove()) == B_OK) {
-						delete printer;
+						printer->Release();
 					}
 					
 					BMessage reply(B_REPLY);

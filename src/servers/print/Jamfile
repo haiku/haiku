@@ -3,14 +3,26 @@ SubDir OBOS_TOP src servers print ;
 UsePrivateHeaders interface ;
 UsePrivateHeaders shared ;
 
-AddResources print_server : PrintServer.FileTypes.rsrc ;
-
-Server print_server :
+Server 
+	print_server 
+	:
 	PrintServerApp.cpp
 	PrintServerApp.R5.cpp
 	PrintServerApp.Scripting.cpp
 	Printer.Scripting.cpp
 	Printer.cpp
 	BeUtils.cpp
-;
-LinkSharedOSLibs print_server : be root ;
+	;
+
+LinkSharedOSLibs 
+	print_server 
+	: 
+	be 
+	root 
+	;
+
+XRes
+	print_server
+	:
+	PrintServer.FileTypes.rsrc
+	;

@@ -47,8 +47,94 @@
 #include <PrintJob.h>
 #include <Alert.h>
 
+	// TODO: 
+	//	Somehow block application that wants to show page/printer config dialog
+	//	Handle situation where there are pending print jobs but printer is requested for deletion
+
+struct AsyncThreadParams {
+	Printer* printer;
+	BMessage message;
+
+	AsyncThreadParams(Printer* p, BMessage* m)
+		: printer(p)
+		, message(*m)
+	{ }
+};
+
+status_t PrintServerApp::async_thread(void* data)
+{
+	AsyncThreadParams* p = (AsyncThreadParams*)data;
+	
+	Printer* printer = p->printer;
+	BMessage* msg = &p->message;
+	
+	switch (msg->what) {
+			// Handle showing the page config dialog
+		case PSRV_SHOW_PAGE_SETUP: {
+				if (printer != NULL) {
+					BMessage reply(*msg);
+					if (printer->ConfigurePage(reply) == B_OK) {
+						msg->SendReply(&reply);
+						break;
+					}
+				}
+				else {
+						// If no default printer, give user choice of aborting or setting up a printer
+					BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
+					if (alert->Go() == 1) {
+						run_add_printer_panel();
+					}
+					
+				}
+					// Always stop dialog flow	
+				BMessage reply('stop');
+				msg->SendReply(&reply);
+			}
+			break;
+
+			// Handle showing the print config dialog
+		case PSRV_SHOW_PRINT_SETUP: {
+				if (printer != NULL) {
+					BMessage reply(*msg);
+					if (printer->ConfigureJob(reply) == B_OK) {
+						msg->SendReply(&reply);
+						break;
+					}
+				}
+				BMessage reply('stop');
+				msg->SendReply(&reply);
+			}
+			break;
+
+	}	
+
+	if (printer) printer->Release();
+	delete p;
+}
+
+
+// Async. processing of received message
+void PrintServerApp::AsyncHandleMessage(BMessage* msg)
+{
+	AsyncThreadParams* data = new AsyncThreadParams(fDefaultPrinter, msg);
+
+	thread_id tid = spawn_thread(async_thread, "async", B_NORMAL_PRIORITY, (void*)data);
+
+	if (tid > 0) {
+		if (fDefaultPrinter) fDefaultPrinter->Acquire();
+		resume_thread(tid);	
+	} else {
+		delete data;
+	}
+}
+
+
 void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 {
+	printf("PrintServerApp::Handle_BeOSR5_Message\n");
+	msg->PrintToStream();			
+	fflush(stdout);
+
 	switch(msg->what) {
 			// Get currently selected printer
 		case PSRV_GET_ACTIVE_PRINTER: {
@@ -98,41 +184,9 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 			}
 			break;
 
-			// Handle showing the page config dialog
-		case PSRV_SHOW_PAGE_SETUP: {
-				if (fDefaultPrinter != NULL) {
-					BMessage reply(*msg);
-					if (fDefaultPrinter->ConfigurePage(reply) == B_OK) {
-						msg->SendReply(&reply);
-					}
-				}
-				else {
-						// If no default printer, give user choice of aborting or setting up a printer
-					BAlert* alert = new BAlert("Info", "Hang on there! You don't have any printers set up!\nYou'll need to do that before trying to print\n\nWould you like to set up a printer now?", "No thanks", "Sure!");
-					if (alert->Go() == 1) {
-						run_add_printer_panel();
-					}
-					
-						// Always stop dialog flow	
-					BMessage reply('stop');
-					msg->SendReply(&reply);
-				}
-			}
-			break;
-
-			// Handle showing the print config dialog
-		case PSRV_SHOW_PRINT_SETUP: {
-				if (fDefaultPrinter != NULL) {
-					BMessage reply(*msg);
-					if (fDefaultPrinter->ConfigureJob(reply) == B_OK) {
-						msg->SendReply(&reply);
-					}
-				}
-				else {
-					BMessage reply('stop');
-					msg->SendReply(&reply);
-				}
-			}
+		case PSRV_SHOW_PAGE_SETUP: 
+		case PSRV_SHOW_PRINT_SETUP: 
+			AsyncHandleMessage(msg);
 			break;
 
 			// Tell printer addon to print a spooled job

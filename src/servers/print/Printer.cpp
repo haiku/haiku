@@ -108,7 +108,8 @@ Printer* Printer::At(int32 idx)
 // ---------------------------------------------------------------
 Printer::Printer(const BNode* node)
 	: Inherited(B_EMPTY_STRING),
-	fNode(*node)
+	fNode(*node),
+	fRefCount(1)
 {
 		// Set our name to the name of the passed node
 	BString name;
@@ -124,6 +125,17 @@ Printer::~Printer()
 {
 	sPrinters.RemoveItem(this);
 	be_app->RemoveHandler(this);
+}
+
+void Printer::Acquire()
+{
+	fRefCount ++;
+}
+
+void Printer::Release()
+{
+	fRefCount --;
+	if (fRefCount == 0) delete this;
 }
 
 status_t Printer::Remove()
