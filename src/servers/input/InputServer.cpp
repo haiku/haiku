@@ -1441,49 +1441,6 @@ InputServer::MethodizeEvents(BList *,
  *   Descr: 
  */
 status_t 
-InputServer::StartStopDevices(const char*       deviceName,
-                                       input_device_type deviceType,
-                                       bool              doStart)
-{
-	CALLED();
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
-	{
-		PRINT(("Device #%d\n", i));
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (NULL == item)
-			continue;
-			
-		BInputServerDevice* isd = item->mIsd;
-		input_device_ref   dev = item->mDev;
-		
-		PRINT(("Hey\n"));
-		
-		if (NULL != isd)
-			continue;
-			
-		if (deviceType == dev.type) {
-			if (doStart) {
-				PRINT(("  Starting: %s\n", dev.name));
-				isd->Start(dev.name, dev.cookie);
-				item->mStarted = true;
-			} else {
-				PRINT(("  Stopping: %s\n", dev.name));
-				isd->Stop(dev.name, dev.cookie);
-				item->mStarted = false;
-			}
-		}
-	}
-	EXIT();
-	
-	return B_OK;
-}
-
-
-/*
- *  Method: InputServer::StartStopDevices()
- *   Descr: 
- */
-status_t 
 InputServer::StartStopDevices(BInputServerDevice *isd,
                                        bool              doStart)
 {

@@ -145,43 +145,33 @@ BInputServerDevice::RegisterDevices(input_device_ref **devices)
 {
 	CALLED();
 
-	// Lock this section of code so that access to the device list
-	// is serialized.  Be sure to release the lock before exitting.
-	//
 	BAutolock lock(InputServer::gInputDeviceListLocker);
 
-	//bool has_pointing_device = false;
-	//bool has_keyboard_device = false;
-	
 	input_device_ref *device = NULL;
 	for (int i = 0; NULL != (device = devices[i]); i++) {
-		// :TODO: Check to make sure that each device is valid and
-		// that it is not already registered.
-		// getDeviceIndex()
+		if (device->type != B_POINTING_DEVICE 
+			&& device->type != B_KEYBOARD_DEVICE 
+			&& device->type != B_UNDEFINED_DEVICE)
+			continue;
+			
+		bool found = false;
+		for (int j = InputServer::gInputDeviceList.CountItems() - 1; j >= 0; j--) {
+			InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(j);
+			if (!item)
+				continue;
+				
+			if (strcmp(device->name, item->mDev.name) == 0) {
+				found = true;
+				break;
+			}
+		}
 		
-		InputServer::gInputDeviceList.AddItem(new InputDeviceListItem(this, *device) );
-		
-		//has_pointing_device = has_pointing_device || (device->type == B_POINTING_DEVICE);
-		//has_keyboard_device = has_keyboard_device || (device->type == B_KEYBOARD_DEVICE);
+		if (!found) {
+			InputServer::gInputDeviceList.AddItem(new InputDeviceListItem(this, *device) );
+			Start(device->name, device->cookie);
+		}
 	}
 
-	// If the InputServer event loop is running, signal the InputServer
-	// to start all devices of the type managed by this InputServerDevice.
-	//
-	/*if (InputServer::EventLoopRunning() )
-	{
-		if (has_pointing_device)
-		{
-			InputServer::StartStopDevices(NULL, B_POINTING_DEVICE, true);
-		}
-		if (has_keyboard_device)
-		{
-			InputServer::StartStopDevices(NULL, B_KEYBOARD_DEVICE, true);
-		}
-	}*/
-	
-	InputServer::StartStopDevices(this, true);
-	
 	return B_OK;
 }
 
@@ -195,14 +185,22 @@ BInputServerDevice::UnregisterDevices(input_device_ref **devices)
 {
     CALLED();
     
-    // Lock this section of code so that access to the device list
-	// is serialized.  Be sure to release the lock before exitting.
-	//
-	BAutolock lock(InputServer::gInputDeviceListLocker);
+    BAutolock lock(InputServer::gInputDeviceListLocker);
 
 	input_device_ref *device = NULL;
 	for (int i = 0; NULL != (device = devices[i]); i++) {
-	
+		
+		for (int j = InputServer::gInputDeviceList.CountItems() - 1; j >= 0; j--) {
+			InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(j);
+			if (!item)
+				continue;
+				
+			if (strcmp(device->name, item->mDev.name) == 0) {
+				Stop(item->mDev.name, item->mDev.cookie);
+				InputServer::gInputDeviceList.RemoveItem(j);
+				break;
+			}
+		}
 	}
 	
     return B_OK;

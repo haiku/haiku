@@ -159,7 +159,6 @@ public:
 	bool SanitizeEvents(BList*);
 	bool MethodizeEvents(BList*, bool);
 
-	static status_t StartStopDevices(const char *, input_device_type, bool);
 	static status_t StartStopDevices(BInputServerDevice *isd, bool);
 	status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
 
