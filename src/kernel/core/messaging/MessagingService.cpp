@@ -26,8 +26,7 @@ using namespace std;
 
 static MessagingService *sMessagingService = NULL;
 
-//static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
-static const int32 kMessagingAreaSize = B_PAGE_SIZE;
+static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
 
 // init_messaging_service
 status_t
