@@ -4,26 +4,20 @@ createArea
 	- improve some of the successful tests.
 
 freeArea
-	- on invalid area
-	- twice on same area
+	- successful tests
 
 getAreaInfo
-	- on non-existant area
-	- with NULL pointer
+	- successful tests
 
 getNextAreaInfo
 	- on first area
 	- on last area
 
 getAreaByName
-	- with NULL
-	- with unknown name
-	- with valid name
+	- more successful tests
 
 getAreaByAddress
-	- with good address
-	- with bad address
-	- with NULL address
+	- more successful tests
 
 cloneArea
 	- invalid area to clone
