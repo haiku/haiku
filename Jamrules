@@ -85,6 +85,7 @@ switch $(TARGET_PLATFORM)
 {
 	case r5 :
 	{
+		CCFLAGS += -DCOMPILE_FOR_R5 ;
 		C++FLAGS += -DCOMPILE_FOR_R5 ;
 	}
 	case bone : 
