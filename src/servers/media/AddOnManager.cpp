@@ -195,7 +195,7 @@ AddOnManager::RegisterAddOns()
 			entry_ref ref;
 			make_entry_ref(entry_info->dir_nref.device, entry_info->dir_nref.node,
 			               entry_info->name, &ref);
-			BEntry entry(&ref, true);
+			BEntry entry(&ref, false);
 			fManager->RegisterAddOn(entry);
 		}
 		virtual void	AddOnDisabled(const add_on_entry_info * entry_info) {
