@@ -31,7 +31,7 @@
 #define VOLUME_UPDATED 'vlud'
 
 VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
-	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0),
+	: BWindow(frame, "VolumeSlider", B_BORDERED_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL, B_ASYNCHRONOUS_CONTROLS | B_WILL_ACCEPT_FIRST_CLICK, 0),
 	aOutNode(NULL),
 	paramWeb(NULL),
 	mixerParam(NULL)
@@ -49,8 +49,6 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 	if (screenFrame.top > windowRect.top - kMargin)
 		MoveBy(0, kMargin + screenFrame.top - windowRect.top);
 
-	SetFeel(B_MODAL_APP_WINDOW_FEEL); /* avoid gettign it under Deskbar sometimes with FocusFollowsMouse */
-	
 	float value = 0.0;
 	bool retrying = false;
 	this->dontBeep = dontBeep;
