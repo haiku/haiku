@@ -165,7 +165,8 @@ printf("WinBorder(%s)::Draw()\n", GetName());
 			// restrict Decorator drawing to the update region only.
 			fDriver->ConstrainClippingRegion(&fUpdateReg);
 fUpdateReg.PrintToStream();
-fDriver->FillRect(r, fBackColor);
+RGBColor		c(128, 56, 98);
+fDriver->FillRect(r, c);
 snooze(1000000);
 			// NOTE: r is NOT transformed from Screen coordinates
 			fDecorator->Draw(r);
