@@ -36,7 +36,7 @@ static
 status_t
 print_help()
 {
-	fprintf(stderr, "OpenBeOS Network Team: pppconfig: sVersion %s\n", sVersion);
+	fprintf(stderr, "Haiku Network Team: pppconfig: sVersion %s\n", sVersion);
 	fprintf(stderr, "With pppconfig you can create and manage PPP connections.\n");
 	fprintf(stderr, "Usage:\n");
 	fprintf(stderr, "pppconfig show | -a\n");
