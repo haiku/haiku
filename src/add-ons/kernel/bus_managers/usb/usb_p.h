@@ -69,9 +69,6 @@ public:
 	area_id AllocArea( void **log , void **phy , size_t size , const char *name ); 
 
 private:
-	//Small wrapper around AllocArea 
-	status_t AllocArea( uint8 id ); 
-	
 	Vector<BusManager *>	m_busmodules;//Stores all the bus modules
 	sem_id 					m_master;			//The master lock
 	sem_id					m_datalock;			//Lock that controls data transfers

@@ -35,6 +35,78 @@ Stack::Stack()
 	//Create the data lock
 	m_datalock = create_sem( 0 , "usb data lock" );
 	set_sem_owner( m_datalock , B_SYSTEM_TEAM );
+
+	//Initialise the memory chunks: create 8, 16 and 32 byte-heaps
+	//NOTE: This is probably the most ugly code you will see in the
+	//whole stack. Unfortunately this is needed because of the fact
+	//that the compiler doesn't like us to apply pointer arithmethic
+	//to (void *) pointers. 
+	
+	// 8-byte heap
+	m_areafreecount[0] = 0;
+	m_areas[0] = AllocArea( &m_logical[0] , &m_physical[0] , B_PAGE_SIZE ,
+	                        "8-byte chunk area" );
+	if ( m_areas[0] < B_OK )
+	{
+		dprintf( "USB: 8-byte chunk area failed to initialise\n" );
+		return;
+	}
+
+	m_8_listhead = m_logical[0];
+
+	for ( int i = 0 ; i < B_PAGE_SIZE/8 ; i++ )
+	{
+		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[0] + 8 * i);
+		chunk->physical = (void *)((uint32)m_physical[0] + 8 * i);
+		if ( i != B_PAGE_SIZE / 8 - 1 )
+			chunk->next_item = (void *)((uint32)m_logical[0] + 8 * ( i + 1 ) );
+		else
+			chunk->next_item = NULL;
+	}
+	
+	// 16-byte heap
+	m_areafreecount[1] = 0;
+	m_areas[1] = AllocArea( &m_logical[1] , &m_physical[1] , B_PAGE_SIZE ,
+	                        "16-byte chunk area" );
+	if ( m_areas[1] < B_OK )
+	{
+		dprintf( "USB: 16-byte chunk area failed to initialise\n" );
+		return;
+	}
+
+	m_16_listhead = m_logical[1];
+
+	for ( int i = 0 ; i < B_PAGE_SIZE/16 ; i++ )
+	{
+		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[1] + 16 * i);
+		chunk->physical = (void *)((uint32)m_physical[1] + 16 * i);
+		if ( i != B_PAGE_SIZE / 16 - 1 )
+			chunk->next_item = (void *)((uint32)m_logical[1] + 16 * ( i + 1 ));
+		else
+			chunk->next_item = NULL;
+	}
+
+	// 32-byte heap
+	m_areafreecount[2] = 0;
+	m_areas[2] = AllocArea( &m_logical[2] , &m_physical[2] , B_PAGE_SIZE ,
+	                        "32-byte chunk area" );
+	if ( m_areas[2] < B_OK )
+	{
+		dprintf( "USB: 32-byte chunk area failed to initialise\n" );
+		return;
+	}
+
+	m_32_listhead = m_logical[2];
+
+	for ( int i = 0 ; i < B_PAGE_SIZE/32 ; i++ )
+	{
+		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[2] + 32 * i);
+		chunk->physical = (void *)((uint32)m_physical[2] + 32 * i);
+		if ( i != B_PAGE_SIZE / 32 - 1 )
+			chunk->next_item = (void *)((uint32)m_logical[2] + 32 * ( i + 1 ));
+		else
+			chunk->next_item = NULL;
+	}
 	
 	//Check for host controller modules
 	void *list = open_module_list( "busses/usb" );
@@ -53,57 +125,6 @@ Stack::Stack()
 	
 	if( m_busmodules.Count() == 0 )
 		return;
-
-	//Initialise the memory chunks: create 8, 16 and 32 byte-heaps
-	//NOTE: This is probably the most ugly code you will see in the
-	//whole stack. Unfortunately this is needed because of the fact
-	//that the compiler doesn't like us to apply pointer arithmethic
-	//to (void *) pointers. 
-	
-	
-	uint16 size = 0;
-	for ( int i = 0 ; i < 3 ; i++ )
-	{
-		size = 2^(3+i);
-		dprintf( "USB: Initialising %u-byte chunk area\n" , size );
-		m_areafreecount[i] = 0;
-	
-		if ( AllocArea(0) < B_OK )
-		{
-			dprintf( "USB: %u-byte chunk area failed to initialise\n" , size );
-			return;
-		}
-		
-		void *listhead;
-		
-		switch (size)
-		{
-		case 8:
-			listhead = m_8_listhead;
-			break;
-		case 16:
-			listhead = m_16_listhead;
-			break;
-		case 32:
-			listhead = m_32_listhead;
-			break;
-		default:
-			dprintf( "USB: Strange error: %u-byte chunks don't exist\n", size );
-			return;
-		}
-
-		listhead = m_logical[i];
-
-		for ( int j = 0 ; j < B_PAGE_SIZE/size ; j++ )
-		{
-			memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[i] + size * j);
-			chunk->physical = (void *)((uint32)m_physical[i] + size * j);
-			if ( j != B_PAGE_SIZE / size - 1 )
-				chunk->next_item = (void *)((uint32)m_logical[i] + size * ( j + 1 ) );
-			else
-				chunk->next_item = NULL;
-		}
-	}
 }
 
 Stack::~Stack()
@@ -111,6 +132,9 @@ Stack::~Stack()
 	//Release the bus modules
 	for( Vector<BusManager *>::Iterator i = m_busmodules.Begin() ; i != m_busmodules.End() ; i++ )
 		delete (*i);
+	delete_area( m_areas[0] );
+	delete_area( m_areas[1] );
+	delete_area( m_areas[2] );
 }	
 	
 
@@ -221,19 +245,6 @@ area_id Stack::AllocArea( void **log , void **phy , size_t size , const char *na
 		*phy = pe.address;
 	dprintf("area = %ld, size = %ld, log = %#08lX, phy = %#08lX\n",areaid,size,(uint32)logadr,(uint32)(pe.address));
 	return areaid;
-}
-
-//Wrapper for the above, but it works on our internal data structures
-status_t Stack::AllocArea( uint8 id )
-{
-	if ( id > USB_MAX_AREAS )
-		return B_ERROR;
-	
-	m_areas[id] = AllocArea( &m_logical[id] , &m_physical[id] , B_PAGE_SIZE , "internal USB stack area" );
-	
-	if ( m_areas[id] < B_OK )
-		return B_ERROR;
-	return B_OK;
 }
 	
 Stack *data = 0;
