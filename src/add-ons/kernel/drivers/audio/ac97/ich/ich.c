@@ -723,7 +723,7 @@ device_hooks ich_hooks = {
 ----- */
 
 const char**
-publish_devices()
+publish_devices(void)
 {
 	return ich_name;
 }
