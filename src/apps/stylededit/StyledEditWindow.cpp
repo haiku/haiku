@@ -264,13 +264,14 @@ StyledEditWindow::InitWindow()
 	//"Align"-subMenu:
 	subMenu= new BMenu("Align");
 	subMenu->SetRadioMode(true); 
-	subMenu->AddItem(menuItem= new BMenuItem("Left", new BMessage(ALIGN_LEFT)));
+
+	subMenu->AddItem(fAlignLeft = new BMenuItem("Left", new BMessage(ALIGN_LEFT)));
 	menuItem->SetMarked(true); 
 	
-	subMenu->AddItem(menuItem= new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
-	subMenu->AddItem(menuItem= new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
+	subMenu->AddItem(fAlignCenter = new BMenuItem("Center", new BMessage(ALIGN_CENTER)));
+	subMenu->AddItem(fAlignRight = new BMenuItem("Right", new BMessage(ALIGN_RIGHT)));
 	menu->AddItem(subMenu);
-	menu->AddItem(fWrapItem= new BMenuItem("Wrap Lines", new BMessage(WRAP_LINES)));
+	menu->AddItem(fWrapItem = new BMenuItem("Wrap Lines", new BMessage(WRAP_LINES)));
 	fWrapItem->SetMarked(true);
 	/***************************MENUS ADDED***********************/
 	
@@ -433,97 +434,110 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		break;
 		case FONT_COLOR:
 		{
-		void		*v; 
-		rgb_color 	*color;
-		
-		message->FindPointer("colour",&v); 
-		color= (rgb_color *) v; 
-		SetFontColor(color);
+			void		*v; 
+			rgb_color 	*color;
+			
+			message->FindPointer("colour",&v); 
+			color= (rgb_color *) v; 
+			SetFontColor(color);
 		}
 		break;
 /*********"Document"-menu*************/
 		case ALIGN_LEFT:
-		fTextView->SetAlignment(B_ALIGN_LEFT);
+			fTextView->SetAlignment(B_ALIGN_LEFT);
+			fClean = false;
+			fRevertItem->SetEnabled(fSaveMessage != NULL);
+			fSaveItem->SetEnabled(true);
 		break;
 		case ALIGN_CENTER:
-		fTextView->SetAlignment(B_ALIGN_CENTER);
+			fTextView->SetAlignment(B_ALIGN_CENTER);
+			fClean = false;
+			fRevertItem->SetEnabled(fSaveMessage != NULL);
+			fSaveItem->SetEnabled(true);
 		break;
 		case ALIGN_RIGHT:
-		fTextView->SetAlignment(B_ALIGN_RIGHT);
+			fTextView->SetAlignment(B_ALIGN_RIGHT);
+			fClean = false;
+			fRevertItem->SetEnabled(fSaveMessage != NULL);
+			fSaveItem->SetEnabled(true);
 		break;
 		case WRAP_LINES:
-			if(fTextView->DoesWordWrap()){
+			if (fTextView->DoesWordWrap()) {
 				fTextView->SetWordWrap(false);
 				fWrapItem->SetMarked(false);
-				}
-			else{
+			} else {
 				fTextView->SetWordWrap(true);
 				fWrapItem->SetMarked(true);
+				BRect textRect;
+				textRect = fTextView->Bounds();
+				textRect.OffsetTo(B_ORIGIN);
+				textRect.InsetBy(TEXT_INSET,TEXT_INSET);
+				fTextView->SetTextRect(textRect);
 			}	
+			fClean = false;
+			fRevertItem->SetEnabled(fSaveMessage != NULL);
+			fSaveItem->SetEnabled(true);
 		break;
-		case ENABLE_ITEMS:
-			{
+		case ENABLE_ITEMS: {
 			fCutItem->SetEnabled(true);
 			fCopyItem->SetEnabled(true);
 			fClearItem->SetEnabled(true);
-			}
+		}
 		break;
-		case DISABLE_ITEMS:
-			{
+		case DISABLE_ITEMS: {
 			fCutItem->SetEnabled(false);
 			fCopyItem->SetEnabled(false);
 			fClearItem->SetEnabled(false);
-			}
+		}
 		break;
-		case TEXT_CHANGED:
-			{
-				if (fUndoFlag) {
-					if (fUndoCleans) {
-						// we cleaned!
-						fClean = true;
-						fUndoCleans = false;
-					} else if (fClean) { 
-					   // if we were clean
-					   // then a redo will make us clean again
-					   fRedoCleans = true;
-					   fClean = false;
-					}					
-					// set mode
-					fCanUndo = false;
-					fCanRedo = true;
-					fUndoItem->SetLabel("Redo Typing");
-					fUndoItem->SetEnabled(true);
-					fUndoFlag = false;
-				} else {
-					if (fRedoFlag && fRedoCleans) {
-						// we cleaned!
-						fClean = true;
-						fRedoCleans = false;
-					} else if (fClean) {
-						// if we were clean
-						// then an undo will make us clean again
-						fUndoCleans = true;
-						fClean = false;
-					} else {
-						// no more cleaning from undo now...
-						fUndoCleans = false;
-					}
-					// set mode
-					fCanUndo = true;
-					fCanRedo = false;
-					fUndoItem->SetLabel("Undo Typing");
-					fUndoItem->SetEnabled(true);
-					fRedoFlag = false;
-				}
-				if (fClean) {
-					fRevertItem->SetEnabled(false);
-				    fSaveItem->SetEnabled(fSaveMessage == NULL);
-				} else {
-					fRevertItem->SetEnabled(fSaveMessage != NULL);
-					fSaveItem->SetEnabled(true);
+		case TEXT_CHANGED: {
+			if (fUndoFlag) {
+				if (fUndoCleans) {
+					// we cleaned!
+					fClean = true;
+					fUndoCleans = false;
+				} else if (fClean) { 
+				   // if we were clean
+				   // then a redo will make us clean again
+				   fRedoCleans = true;
+				   fClean = false;
 				}					
-				// clear flags
+				// set mode
+				fCanUndo = false;
+				fCanRedo = true;
+				fUndoItem->SetLabel("Redo Typing");
+				fUndoItem->SetEnabled(true);
+				fUndoFlag = false;
+			} else {
+				if (fRedoFlag && fRedoCleans) {
+					// we cleaned!
+					fClean = true;
+					fRedoCleans = false;
+				} else if (fClean) {
+					// if we were clean
+					// then an undo will make us clean again
+					fUndoCleans = true;
+					fClean = false;
+				} else {
+					// no more cleaning from undo now...
+					fUndoCleans = false;
+				}
+				// set mode
+				fCanUndo = true;
+				fCanRedo = false;
+				fUndoItem->SetLabel("Undo Typing");
+				fUndoItem->SetEnabled(true);
+				fRedoFlag = false;
 			}
+			if (fClean) {
+				fRevertItem->SetEnabled(false);
+			    fSaveItem->SetEnabled(fSaveMessage == NULL);
+			} else {
+				fRevertItem->SetEnabled(fSaveMessage != NULL);
+				fSaveItem->SetEnabled(true);
+			}					
+			// clear flags
+		}
 		break;
 		default:
 		BWindow::MessageReceived(message);
@@ -631,7 +645,7 @@ StyledEditWindow::Save(BMessage *message)
 	if(err!= B_OK)
 		return err;
 	
-	err= BTranslationUtils::WriteStyledEditFile(fTextView, &file);
+	err= fTextView->WriteStyledEditFile(&file);
 	if(err != B_OK)
 		return err;
 
@@ -700,9 +714,29 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 	if (fileinit == B_OK){
 		status_t result;
 		result = fTextView->GetStyledText(&file); //he he he :)
-		if (result == B_OK) {
+
+		if (result != B_OK) {
 			// TODO: notify user?
 		}
+
+		// update alignment
+		switch (fTextView->Alignment()) {
+			case B_ALIGN_LEFT:
+				fAlignLeft->SetMarked(true);
+			break;
+			case B_ALIGN_CENTER:
+				fAlignCenter->SetMarked(true);
+			break;
+			case B_ALIGN_RIGHT:
+				fAlignRight->SetMarked(true);
+			break;
+			default:
+				// weird
+			break;
+		}
+	
+		// update word wrapping
+		fWrapItem->SetMarked(fTextView->DoesWordWrap());
 	} else {
 		fSaveItem->SetEnabled(true); // allow saving new files
 	}
@@ -749,11 +783,30 @@ StyledEditWindow::RevertToSaved()
 	fSaveMessage->FindString("name", &name);
 		
 	BDirectory dir(&ref);
-			
+
  	BFile file(&dir, name, B_READ_ONLY | B_CREATE_FILE);
 	fTextView->Reset();  			    //clear the textview...
 	fTextView->GetStyledText(&file); 	//and fill it from the file
-	
+
+	// update alignment
+	switch (fTextView->Alignment()) {
+		case B_ALIGN_LEFT:
+			fAlignLeft->SetMarked(true);
+		break;
+		case B_ALIGN_CENTER:
+			fAlignCenter->SetMarked(true);
+		break;
+		case B_ALIGN_RIGHT:
+			fAlignRight->SetMarked(true);
+		break;
+		default:
+			// weird
+		break;
+	}
+
+	// update word wrapping
+	fWrapItem->SetMarked(fTextView->DoesWordWrap());
+
 	// clear undo modes
 	fUndoItem->SetLabel("Can't Undo");
 	fUndoItem->SetEnabled(false);

@@ -53,6 +53,9 @@ private:
 	BMenuItem		*fCopyItem;
 	BMenuItem		*fClearItem;
 	BMenuItem		*fWrapItem;
+	BMenuItem		*fAlignLeft;
+	BMenuItem		*fAlignCenter;
+	BMenuItem		*fAlignRight;
 	BString         fStringToFind;
 	BString			fReplaceString;
 	
