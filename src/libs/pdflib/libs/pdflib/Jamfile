@@ -5,6 +5,8 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs png ] ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs tiff ] ;
 
+SubDirCcFlags -w ;
+
 UseLibraryHeaders pdflib ;
 
 StaticLibrary pdf : 

@@ -4,6 +4,8 @@ UseLibraryHeaders pdflib ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src libs pdflib libs flate ] ;
 
+SubDirCcFlags -w ;
+
 StaticLibrary pdf : 
 	pc_arc4.c
 	pc_core.c

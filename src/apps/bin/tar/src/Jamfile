@@ -5,7 +5,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 # set some additional defines
 {
-	SubDirCcFlags -DHAVE_CONFIG_H ;
+	SubDirCcFlags -DHAVE_CONFIG_H -w ;
 }
 
 local tar_rsrc = [ FGristFiles tar.rsrc ] ;
