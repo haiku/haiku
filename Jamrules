@@ -46,6 +46,9 @@ LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(OBOS_BUILD_DIR) ;
 	include BuildConfig ;
 }
 
+# Save the platform default headers.
+PLATFORM_DEFAULT_HEADERS = $(HDRS) ;
+
 # We do not include any local BeOS system headers by default
 CCFLAGS += -nostdinc ;
 C++FLAGS += -nostdinc ;
@@ -200,6 +203,12 @@ rule SetupR5Includes
 {
 	# Unsets HDRS, so that the OBOS headers do not `shadow' the system headers.
 	HDRS = ;
+}
+
+rule SetupDefaultIncludes
+{
+	# Resets HDRS to the default headers for the build platform.
+	HDRS = $(PLATFORM_DEFAULT_HEADERS) ;
 }
 
 #-------------------------------------------------------------------------------
@@ -1475,14 +1484,23 @@ actions KernelStaticLibraryObjects
 	ar -r "$(1)" "$(2)" ;
 }
 
-rule SystemMain
+rule BuildPlatformMain
 {
-	# Usage SystemMain <target> : <sources> ;
+	# Usage BuildPlatformMain <target> : <sources> ;
 	SetupObjectsDir ;
+	SetupDefaultIncludes ;
 
-	LINKLIBS on $(1) = ;
+	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
+	local oldCCFLAGS = $(CCFLAGS) ;
+	local oldC++FLAGS = $(C++FLAGS) ;
+	CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
+	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
 
 	Main $(1) : $(2) ;
+
+	# Reset CCFLAGS and C++FLAGS to original values.
+	CCFLAGS = $(oldCCFLAGS) ;
+	C++FLAGS = $(oldC++FLAGS) ;
 }
 
 rule KernelConfigSection
