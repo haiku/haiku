@@ -31,7 +31,8 @@ setup_rtc_boottime()
 		printf("setup_rtc_boottime: error getting real time data info\n");
 		return err;
 	}
-	sBootTime = &((struct real_time_data *)info.address)->boot_time;
+	
+	sBootTime = &(((struct real_time_data *)info.address)->boot_time);
 	return B_OK;
 }
 
