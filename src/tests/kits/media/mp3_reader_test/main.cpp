@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 	
 	BDataIO *source;
 	if (SEEKABLE)
-		source = new BFile(FILENAME, O_RDWR);
+		source = new BFile(argc == 2 ? argv[1] : FILENAME, O_RDWR);
 	else
-		source = new FileDataIO(FILENAME, O_RDWR);
+		source = new FileDataIO(argc == 2 ? argv[1] : FILENAME, O_RDWR);
 
 	TRACE("main: calling setup...\n");
 
