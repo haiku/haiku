@@ -96,13 +96,12 @@ enum {
 #define MAXBUFFERS 3
 
 /* internal used info on overlay buffers */
-typedef	struct
-{
+typedef	struct {
 	uint16 slopspace;
 	uint32 size;
 } int_buf_info;
 
-typedef struct settings {  // apsed, see comments in nv.settings
+typedef struct { // apsed, see comments in nv.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
 	bool   dumprom;
@@ -115,7 +114,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	bool   force_pci;
 	bool   unhide_fw;
 	bool   pgm_panel;
-} settings;
+} nv_settings;
 
 /*shared info*/
 typedef struct {
@@ -311,7 +310,7 @@ typedef struct {
 	uint8 rom_mirror[65536];
 
 	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
-	settings settings;
+	nv_settings settings;
 
 	struct
 	{

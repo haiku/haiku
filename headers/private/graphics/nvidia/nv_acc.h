@@ -47,6 +47,64 @@ typedef struct {
 } cmd_nv_image_blit;
 
 typedef struct {
+	uint32 reserved00[0x0004];
+	uint16 FifoFree;			/* little endian (FIFO internal register) */
+	uint16 Nop;					/* little endian (FIFO internal register) */
+	uint32 reserved01[0x00fa];
+	uint32 Color1A;				/* b0-31 is color */
+	struct
+	{
+		uint32 LeftTop;			/* b0-15 is top, b16-31 is left */
+		uint32 WidthHeight;		/* b0-15 is height, b16-31 is width */
+	} UnclippedRectangle[0x40];	/* command can handle upto 64 unclipped rects */
+//XFree also defines: (not used AFAIK ATM)
+/*
+    U032 reserved04[(0x080)-3];
+    struct
+    {
+        U032 TopLeft;
+        U032 BottomRight;
+    } ClipB;
+    U032 Color1B;
+    struct
+    {
+        U032 TopLeft;
+        U032 BottomRight;
+    } ClippedRectangle[64];
+    U032 reserved05[(0x080)-5];
+    struct
+    {
+        U032 TopLeft;
+        U032 BottomRight;
+    } ClipC;
+    U032 Color1C;
+    U032 WidthHeightC;
+    U032 PointC;
+    U032 MonochromeData1C;
+    U032 reserved06[(0x080)+121];
+    struct
+    {
+        U032 TopLeft;
+        U032 BottomRight;
+    } ClipD;
+    U032 Color1D;
+    U032 WidthHeightInD;
+    U032 WidthHeightOutD;
+    U032 PointD;
+    U032 MonochromeData1D;
+    U032 reserved07[(0x080)+120];
+    struct
+    {
+        U032 TopLeft;
+        U032 BottomRight;
+    } ClipE;
+    U032 Color0E;
+    U032 Color1E;
+    U032 WidthHeightInE;
+    U032 WidthHeightOutE;
+    U032 PointE;
+    U032 MonochromeData01E;
+*/
 } cmd_nv3_gdi_rectangle_text;
 
 typedef struct {

@@ -442,12 +442,6 @@
 #define	NVACC_FIFO_CH6		0x0080c000
 #define	NVACC_FIFO_CH7		0x0080e000
 
-/* used bitmap registers */
-#define NV16_BMP_FIFOFREE	0x0080a010 /* little endian */
-#define NVACC_BMP_COLOR1A	0x0080a3fc /* 'mapped' from 0x006b03fc */
-#define NVACC_BMP_UCRECTL_0	0x0080a400 /* 'mapped' from 0x006b0400 */
-#define NVACC_BMP_UCRECSZ_0	0x0080a404 /* 'mapped' from 0x006b0404 */
-
 /* Nvidia PCI direct registers */
 #define NV32_PWRUPCTRL		0x00000200
 #define NV32_DUALHEAD_CTRL	0x000010f0//verify!!!
