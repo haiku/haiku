@@ -52,11 +52,22 @@ typedef struct extended_partition_info {
 extern "C" {
 #endif
 
+// getting infos
 status_t get_nth_session_info(int deviceFD, int32 index,
 							  session_info *sessionInfo);
 status_t get_nth_partition_info(int deviceFD, int32 sessionIndex,
 								int32 partitionIndex,
 								extended_partition_info *partitionInfo);
+
+// partitioning
+status_t partition_session(int deviceFD, int32 sessionIndex,
+						   const char *identifier, const char *parameters);
+
+// initialization
+// TODO: Move to <unistd.h>. It fits better there.
+status_t initialize_volume(const char *where, const char *fileSystem, 
+						   const char *volumeName, const char *parameters);
+
 
 #ifdef  __cplusplus
 }
