@@ -315,7 +315,7 @@ device_hooks console_hooks = {
 int
 console_dev_init(kernel_args *ka)
 {
-	if (!ka->fb.enabled) {
+	if (!ka->frame_buffer.enabled) {
 		dprintf("con_init: mapping vid mem\n");
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "vid_mem", (void *)&origin, B_ANY_KERNEL_ADDRESS,
 			SCREEN_END - SCREEN_START, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, SCREEN_START);
