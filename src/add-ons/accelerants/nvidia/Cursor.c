@@ -142,7 +142,8 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	else y = 0;
 
 	/* account for switched CRTC's */
-	if (si->switched_crtcs)	x -= si->dm.timing.h_display;
+//fixme: we need new tweaking to get the cursors working together in dualhead modes...
+//	if (si->switched_crtcs)	x -= si->dm.timing.h_display;
 
 	/* position the cursor on the display */
 	nv_crtc_cursor_position(x,y);

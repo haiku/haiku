@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-3 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-4 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -296,7 +296,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV25)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x028010de: /* Nvidia GeForce4 Ti 4600 AGP8X (4800?) */
+	case 0x028010de: /* Nvidia GeForce4 Ti 4800 AGP8X */
 	case 0x028110de: /* Nvidia GeForce4 Ti 4200 AGP8X */
 		si->ps.card_type = NV28;
 		si->ps.card_arch = NV20A;
@@ -436,7 +436,7 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
-	case 0x032810de: /* Nvidia GeForce FX 5200 Go */
+	case 0x032810de: /* Nvidia GeForce FX 5200 Go 32M/64M */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;

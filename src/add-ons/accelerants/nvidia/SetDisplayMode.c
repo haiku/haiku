@@ -76,10 +76,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	}
 	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
 
-	/* overlay engine, cursor and MOVE_DISPLAY need to know the status even when
-	 * in singlehead mode */
-	si->switched_crtcs = false;
-
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
 
@@ -171,118 +167,22 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the outputs */
 		switch (si->ps.card_type)
 		{
-		case NV11:
+		case G550:
 			switch (target.flags & DUALHEAD_BITS)
 			{
 			case DUALHEAD_ON:
 			case DUALHEAD_CLONE:
+				//fixme: set output connectors only
 				nv_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
-				si->switched_crtcs = false;
 				break;
 			case DUALHEAD_SWITCH:
-				if (i2c_sec_tv_adapter() == B_OK)
-				{
-					/* Don't switch CRTC's because MAVEN YUV is impossible then, 
-					 * and primary head output will be limited to 135Mhz pixelclock. */
-					LOG(4,("SETMODE: secondary TV-adapter detected, switching buffers\n"));
-					nv_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
-					si->switched_crtcs = true;
-				}
-				else
-				{
-					/* This limits the pixelclocks on both heads to 135Mhz,
-					 * but you can use overlay on the other output now. */
-					LOG(4,("SETMODE: no secondary TV-adapter detected, switching CRTCs\n"));
-					nv_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
-					si->switched_crtcs = false;
-				}
+				//fixme: set output connectors only
+				nv_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
 				break;
-			}
-			break;
-		//fixme: 
-		//setup crtc_delay and vertical timing adjust for G450(?)/G550, 
-		//and remove the '+1' in crtc2 vertical timing(?)
-		case NV17:
-			if (!si->ps.primary_dvi)
-			/* output connector use is always 'straight-through' */
-			//fixme: re-evaluate when DVI is setup... 
-			{
-				switch (target.flags & DUALHEAD_BITS)
-				{
-				case DUALHEAD_ON:
-				case DUALHEAD_CLONE:
-					nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-					si->switched_crtcs = false;
-					break;
-				case DUALHEAD_SWITCH:
-					if (i2c_sec_tv_adapter() == B_OK)
-					{
-						/* Don't switch CRTC's because MAVEN YUV and TVout is impossible then, 
-						 * and primary head output will be limited to 235Mhz pixelclock. */
-						LOG(4,("SETMODE: secondary TV-adapter detected, switching buffers\n"));
-						nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-						si->switched_crtcs = true;
-					}
-					else
-					{
-						/* This limits the pixelclocks on both heads to 235Mhz,
-						 * but you can use overlay on the other output now. */
-						LOG(4,("SETMODE: no secondary TV-adapter detected, switching CRTCs\n"));
-						nv_general_dac_select(DS_CRTC1CON2_CRTC2CON1);
-						si->switched_crtcs = false;
-					}
-					break;
-				}
-			}
-			else
-			/* output connector use is cross-linked if no TV cable connected! */
-			//fixme: re-evaluate when DVI is setup... 
-			{
-				switch (target.flags & DUALHEAD_BITS)
-				{
-				case DUALHEAD_ON:
-				case DUALHEAD_CLONE:
-					if (i2c_sec_tv_adapter() == B_OK)
-					{
-						nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-						si->switched_crtcs = false;
-					}
-					else
-					{
-						/* This limits the pixelclocks on both heads to 235Mhz,
-						 * but you can use overlay on the other output now. */
-						nv_general_dac_select(DS_CRTC1CON2_CRTC2CON1);
-						si->switched_crtcs = false;
-					}
-					break;
-				case DUALHEAD_SWITCH:
-					if (i2c_sec_tv_adapter() == B_OK)
-					{
-						/* Don't switch CRTC's because MAVEN YUV and TVout is impossible then, 
-						 * and primary head output will be limited to 235Mhz pixelclock. */
-						LOG(4,("SETMODE: secondary TV-adapter detected, switching buffers\n"));
-						nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-						si->switched_crtcs = true;
-					}
-					else
-					{
-						LOG(4,("SETMODE: no secondary TV-adapter detected, switching CRTCs\n"));
-						nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-						si->switched_crtcs = false;
-					}
-					break;
-				}
 			}
 			break;
 		default:
 			break;
-		}
-
-		if (si->switched_crtcs)
-		{
-				uint32 temp = startadd;
-				startadd = startadd_right;
-				startadd_right = temp;
 		}
 
 		/*Tell card what memory to display*/
@@ -305,11 +205,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		if (!(target2.flags & TV_BITS))	result = nv_crtc2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
-		if (si->ps.tvout && (target2.flags & TV_BITS))
-		{
-			si->crtc_delay += 5;
-			maventv_init(target2);
-		}
+		if (si->ps.tvout && (target2.flags & TV_BITS)) maventv_init(target2);
 	}
 	else /* single head mode */
 	{
@@ -470,14 +366,6 @@ status_t MOVE_DISPLAY(uint16 h_display_start, uint16 v_display_start) {
 	startadd += h_display_start * (colour_depth >> 3);
 	startadd += (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 	startadd_right = startadd + si->dm.timing.h_display * (colour_depth >> 3);
-
-	/* account for switched CRTC's */
-	if (si->switched_crtcs)
-	{
-		uint32 temp = startadd;
-		startadd = startadd_right;
-		startadd_right = temp;
-	}
 
 	interrupt_enable(false);
 

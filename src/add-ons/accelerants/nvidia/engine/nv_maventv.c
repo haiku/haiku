@@ -689,41 +689,41 @@ int maventv_init(display_mode target)
 //	if (si->ps.card_type <= G400MAX)
 	{
 		/* setup TV-mode 'copy' of CRTC2, setup PLL, inputs, outputs and sync-locks */
-		MAVW(MONSET, 0x00);
-		MAVW(MONEN, 0xA2);
+//		MAVW(MONSET, 0x00);
+//		MAVW(MONEN, 0xA2);
 
 		/* xmiscctrl */
 		//unknown regs:
-		MAVWW(WREG_0X8E_L, 0x1EFF); 
-		MAVW(BREG_0XC6, 0x01);
+//		MAVWW(WREG_0X8E_L, 0x1EFF); 
+//		MAVW(BREG_0XC6, 0x01);
 
-		MAVW(LOCK, 0x01);
-		MAVW(OUTMODE, 0x08);
-		MAVW(LUMA, 0x78);
-		MAVW(STABLE, 0x02);
-		MAVW(MONEN, 0xB3);
+//		MAVW(LOCK, 0x01);
+//		MAVW(OUTMODE, 0x08);
+//		MAVW(LUMA, 0x78);
+//		MAVW(STABLE, 0x02);
+//		MAVW(MONEN, 0xB3);
 
 		/* setup video PLL */
 		g100_g400max_maventv_vid_pll_find(
 			tv_target, &ht_new, &ht_last_line, &m_result, &n_result, &p_result);
-		MAVW(PIXPLLM, m_result);
-		MAVW(PIXPLLN, n_result);
-		MAVW(PIXPLLP, (p_result | 0x80));
+//		MAVW(PIXPLLM, m_result);
+//		MAVW(PIXPLLN, n_result);
+//		MAVW(PIXPLLP, (p_result | 0x80));
 
-		MAVW(MONSET, 0x20);
+//		MAVW(MONSET, 0x20);
 
-		MAVW(TEST, 0x10);
+//		MAVW(TEST, 0x10);
 
 		/* htotal - 2 */
-		MAVWW(HTOTALL, ht_new);
+//		MAVWW(HTOTALL, ht_new);
 
 		/* last line in field can have different length */
 		/* hlen - 2 */
-		MAVWW(LASTLINEL, ht_last_line);
+//		MAVWW(LASTLINEL, ht_last_line);
 
 		/* horizontal vidrst pos: 0 <= vidrst pos <= htotal - 2 */
-		MAVWW(HVIDRSTL, (ht_last_line - si->crtc_delay - 
-						(tv_target.timing.h_sync_end - tv_target.timing.h_sync_start)));
+//		MAVWW(HVIDRSTL, (ht_last_line - si->crtc_delay - 
+//						(tv_target.timing.h_sync_end - tv_target.timing.h_sync_start)));
 		//ORG (does the same but with limit checks but these limits should never occur!):
 //		slen = tv_target.timing.h_sync_end - tv_target.timing.h_sync_start;
 //		hcrt = tv_target.timing.h_total - slen - si->crtc_delay;
@@ -733,35 +733,35 @@ int maventv_init(display_mode target)
 //		MAVWW(HVIDRSTL, hcrt);
 
 		/* who knows */
-		MAVWW(HSYNCSTRL, 0x0004);//must be 4!!
+//		MAVWW(HSYNCSTRL, 0x0004);//must be 4!!
 
 		/* hblanking end: 100% */
-		MAVWW(HSYNCLENL, (tv_target.timing.h_total - tv_target.timing.h_sync_end));
+//		MAVWW(HSYNCLENL, (tv_target.timing.h_total - tv_target.timing.h_sync_end));
 
 		/* vertical line count - 1 */
-		MAVWW(VTOTALL, (tv_target.timing.v_total - 1));
+//		MAVWW(VTOTALL, (tv_target.timing.v_total - 1));
 
 		/* vertical vidrst pos */
-		MAVWW(VVIDRSTL, (tv_target.timing.v_total - 2));
+//		MAVWW(VVIDRSTL, (tv_target.timing.v_total - 2));
 
 		/* something end... [A6]+1..[A8] */
-		MAVWW(VSYNCSTRL, 0x0001);
+//		MAVWW(VSYNCSTRL, 0x0001);
 
 		/* vblanking end: stop vblanking */
-		MAVWW(VSYNCLENL, (tv_target.timing.v_sync_end - tv_target.timing.v_sync_start - 1));
+//		MAVWW(VSYNCLENL, (tv_target.timing.v_sync_end - tv_target.timing.v_sync_start - 1));
 		//org: no visible diff:
 		//MAVWW(VSYNCLENL, (tv_target.timing.v_total - tv_target.timing.v_sync_start - 1));
 
 		/* something start... 0..[A4]-1 */
-		MAVWW(VDISPLAYL, 0x0000);
+//		MAVWW(VDISPLAYL, 0x0000);
 		//std setmode (no visible difference)
 		//MAVWW(VDISPLAYL, (tv_target.timing.v_total - 1));
 
 		/* ... */
-		MAVWW(WREG_0X98_L, 0x0000);
+//		MAVWW(WREG_0X98_L, 0x0000);
 
 		/* moves picture up/down and so on... */
-		MAVWW(VSOMETHINGL, 0x0001); /* Fix this... 0..VTotal */
+//		MAVWW(VSOMETHINGL, 0x0001); /* Fix this... 0..VTotal */
 
 		{
 			uint32 h_display_tv;
@@ -810,8 +810,8 @@ int maventv_init(display_mode target)
 			h_display_tv = h_display_tv >> 1;
 			/* limit value to register contraints */
 			if (h_display_tv > 0xFF) h_display_tv = 0xFF;
-			MAVW(HSCALETV, h_scale_tv);
-			MAVW(HDISPLAYTV, h_display_tv);
+//			MAVW(HSCALETV, h_scale_tv);
+//			MAVW(HDISPLAYTV, h_display_tv);
 
 
 			/* calculate line inputbuffer length */
@@ -848,7 +848,7 @@ int maventv_init(display_mode target)
 				ib_length = ib_min_length;
 				LOG(4,("MAVENTV: limiting line inputbuffer length, setting minimal usable: %d\n", ib_length));
 			}
-			MAVWW(HDISPLAYL, ib_length);
+//			MAVWW(HDISPLAYL, ib_length);
 		}
 
 		{
@@ -899,34 +899,34 @@ int maventv_init(display_mode target)
 			/* make sure we get no round-off error artifacts on screen */
 			t_scale_tv--;
 
-			MAVWW(TSCALETVL, t_scale_tv);
-			MAVW(VDISPLAYTV, v_display_tv);
+//			MAVWW(TSCALETVL, t_scale_tv);
+//			MAVW(VDISPLAYTV, v_display_tv);
 		}
 
-		MAVW(TEST, 0x00);
+//		MAVW(TEST, 0x00);
 
 		/* gamma correction registers */
-		MAVW(GAMMA1, 0x00);
-		MAVW(GAMMA2, 0x00);
-		MAVW(GAMMA3, 0x00);
-		MAVW(GAMMA4, 0x1F);
-		MAVW(GAMMA5, 0x10);
-		MAVW(GAMMA6, 0x10);
-		MAVW(GAMMA7, 0x10);
-		MAVW(GAMMA8, 0x64);	/* 100 */
-		MAVW(GAMMA9, 0xC8);	/* 200 */
+//		MAVW(GAMMA1, 0x00);
+//		MAVW(GAMMA2, 0x00);
+//		MAVW(GAMMA3, 0x00);
+//		MAVW(GAMMA4, 0x1F);
+//		MAVW(GAMMA5, 0x10);
+//		MAVW(GAMMA6, 0x10);
+//		MAVW(GAMMA7, 0x10);
+//		MAVW(GAMMA8, 0x64);	/* 100 */
+//		MAVW(GAMMA9, 0xC8);	/* 200 */
 
 		/* set flickerfilter */
 		/* OFF: is dependant on MAVEN chip version(?): NV_TVO_B = $40, else $00.
 		 * ON : always set $a2. */
-		MAVW(FFILTER, 0xa2);
+//		MAVW(FFILTER, 0xa2);
 
 		/* 0x10 or anything ored with it */
 		//fixme? linux uses 0x14...
-		MAVW(TEST, (MAVR(TEST) & 0x10));
+//		MAVW(TEST, (MAVR(TEST) & 0x10));
 
 		/* output: SVideo/Composite */
-		MAVW(OUTMODE, 0x08);
+//		MAVW(OUTMODE, 0x08);
 	}
 //	else /* card_type is >= G450 */
 	{

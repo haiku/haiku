@@ -1,5 +1,5 @@
 /* Nvidia TNT and GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-12/2003 */
+/* Written by Rudolf Cornelissen 05/2002-1/2004 */
 
 #define MODULE_BIT 0x00000200
 
@@ -104,10 +104,12 @@ status_t nv_configure_bes
 	 * constraints only */
 	crtc_hstart = si->dm.h_display_start;
 	/* make dualhead switch mode with TVout enabled work while we're at it.. */
-	if (si->switched_crtcs)
+//fixme: probably no fix at all needed on NV cards...
+/*	if (si->switched_crtcs)
 	{
 		crtc_hstart += si->dm.timing.h_display;
 	}
+*/
 	/* horizontal end is the first position beyond the displayed range on the CRTC */
 	crtc_hend = crtc_hstart + si->dm.timing.h_display;
 	crtc_vstart = si->dm.v_display_start;
