@@ -44,6 +44,7 @@ SharedLibrary media :
 	# Internal Functionality
 	BufferIdCache.cpp
 	DataExchange.cpp
+	DefaultMediaTheme.cpp
 	DormantNodeManager.cpp
 	Notifications.cpp
 	PortPool.cpp
