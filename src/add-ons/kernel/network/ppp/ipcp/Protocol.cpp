@@ -21,7 +21,7 @@
 #ifdef _KERNEL_MODE
 	#define spawn_thread spawn_kernel_thread
 	#define printf dprintf
-#elif DEBUG
+#else
 	#include <cstdio>
 #endif
 
