@@ -7,9 +7,9 @@
 typedef unsigned long nfds_t;
 
 struct pollfd {
-	int fd;
-	int events;		/* events to look for */
-	int revents;	/* events that occured */
+	int		fd;
+	short	events;		/* events to look for */
+	short	revents;	/* events that occured */
 };
 
 /* events & revents - compatible with the B_SELECT_xxx definitions in Drivers.h */
