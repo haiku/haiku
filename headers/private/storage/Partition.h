@@ -53,8 +53,9 @@ public:
 	status_t GetVolume(BVolume *volume) const;
 	status_t GetIcon(BBitmap *icon, icon_size which) const;
 
-	status_t Mount(uint32 mountFlags = 0, const char *parameters = NULL);
-	status_t Unmount();
+	status_t Mount(const char *mountPoint = NULL, uint32 mountFlags = 0,
+		const char *parameters = NULL);
+	status_t Unmount(uint32 unmountFlags = 0);
 	
 	// Hierarchy Info
 
