@@ -1,5 +1,9 @@
-/* second CTRC functionality */
-/* Mark Watson 6/2000 */
+/* second CTRC functionality
+
+   Authors:
+   Mark Watson 6/2000,
+   Rudolf Cornelissen 12/2002
+*/
 
 #define MODULE_BIT 0x00020000
 
@@ -22,12 +26,14 @@ status_t g400_crtc2_set_timing(
 	}
 
 	/*program the second CRTC*/
-	CR2W(HPARAM,(((hdisp_e-8)<<16) | (htotal-8)));
-	CR2W(HSYNC,(((hsync_e-8)<<16) | (hsync_s-8)));
-	CR2W(VPARAM,(((vdisp_e-1)<<16) | (vtotal-1)));
-	CR2W(VSYNC,(((vsync_e-1)<<16) | (vsync_s-1)));
-	CR2W(PRELOAD,(((vsync_s)<<16) | (hsync_s)));
-	CR2W(MISC,((0xfff<<16) | ((!hsync_pos)<<8) | ((!vsync_pos)<<9)));
+	CR2W(HPARAM, ((((hdisp_e - 8) & 0x0fff) << 16) | ((htotal - 8) & 0x0fff)));
+	CR2W(HSYNC, ((((hsync_e - 8) & 0x0fff) << 16) | ((hsync_s - 8) & 0x0fff)));
+	CR2W(VPARAM, ((((vdisp_e - 1) & 0x0fff) << 16) | ((vtotal - 1) & 0x0fff)));
+	CR2W(VSYNC, ((((vsync_e - 1) & 0x0fff) << 16) | ((vsync_s - 1) & 0x0fff)));
+	//Mark: (wrong AFAIK, warning: SETMODE MAVEN-CRTC delay is now tuned to new setup!!)
+	//CR2W(PRELOAD, (((vsync_s & 0x0fff) << 16) | (hsync_s & 0x0fff)));
+	CR2W(PRELOAD, ((((vsync_s - 1) & 0x0fff) << 16) | ((hsync_s - 8) & 0x0fff)));
+	CR2W(MISC, ((0xfff << 16) | (((!hsync_pos) & 0x01) << 8) | (((!vsync_pos) & 0x01) << 9)));
 
 	return B_OK;
 }
@@ -51,6 +57,7 @@ status_t g400_crtc2_depth(int mode)
 
 status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v)
 {
+	//fixme: CTL b0=1 is CRTC2 enabled, 0 is disabled. This code is dangerous...
 	CR2W(CTL,(CR2R(CTL)&0xFFF0077E)|(display&h&v)); /*enable second CRTC if required*/
 
 	/*ignore h,v because they are not supported*/

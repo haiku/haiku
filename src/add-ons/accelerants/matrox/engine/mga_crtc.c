@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 10/2002
+   Rudolf Cornelissen 11-12/2002
 */
 
 #define MODULE_BIT 0x00040000
@@ -109,14 +109,14 @@ status_t gx00_crtc_set_timing(
 
 	LOG(4,("CRTC: setting timing\n"));
 
-	/*Modify parameters as required by the G400/G200*/
-	htotal=(ht>>3)-5;
-	hdisp_e=(hd_e>>3)-1;
-	hsync_s=(hs_s>>3);
-	hsync_e=(hs_e>>3);
-	hblnk_s=hdisp_e;
-	hblnk_e=htotal+4;
-	
+	/* Modify parameters as required by the G400/G200 */
+	htotal = ((ht >> 3) - 5);
+	hdisp_e = ((hd_e >> 3) -1);	//so: timing - 8
+	hblnk_s = hdisp_e;			//so: timing - 8
+	hblnk_e = (htotal + 4);		//so: timing - 8
+	hsync_s = (hs_s >> 3);
+	hsync_e = (hs_e >> 3);
+
 	vtotal=vt-2;
 	vdisp_e=vd_e-1;
 	vsync_s=vs_s-1;
@@ -149,6 +149,7 @@ status_t gx00_crtc_set_timing(
 		((vsync_s&0x100)>>(8-2))|((vsync_s&0x200)>>(9-7))|
 		((vblnk_s&0x100)>>(8-3))|((linecomp&0x100)>>(8-4))
 	));
+	VGAW_I(CRTC,0x8,0x00);
 	VGAW_I(CRTC,0x9,((vblnk_s&0x200)>>(9-5))|((linecomp&0x200)>>(9-6)));
 	VGAW_I(CRTC,0x10,vsync_s&0xFF);
 	VGAW_I(CRTC,0x11,((VGAR_I(CRTC,0x11))&0xF0)|(vsync_e&0xF));
@@ -157,7 +158,8 @@ status_t gx00_crtc_set_timing(
 	VGAW_I(CRTC,0x16,vblnk_e&0xFF);
 	VGAW_I(CRTC,0x18,linecomp&0xFF);
 
-	/*horizontal - extended regs*/
+	/* horizontal - extended regs */
+	/* do not touch external sync reset inputs: used for TVout */
 	VGAW_I(CRTCEXT,1,
 	(
 		((htotal&0x100)>>8)|
@@ -219,7 +221,8 @@ status_t gx00_crtc_dpms(uint8 display,uint8 h,uint8 v) // MIL2
 	VGAW_I(SEQ,1,(!display)<<5);
 	VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0xCF)|((!v)<<5))|((!h)<<4);
 	
-	VGAW_I(CRTC,0x17,0xC3);/*do not force disable all syncs and other stuff*/
+	/* set some required fixed values for proper MGA mode initialisation */
+	VGAW_I(CRTC,0x17,0xC3);
 	VGAW_I(CRTC,0x14,0x00);
 
 	return B_OK;
@@ -258,18 +261,8 @@ status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp)
 
 	LOG(4,("CRTC: setting card RAM to be displayed bpp %d\n", bpp));
 
-	/*figure out startadd value hardware needs*/
-	/*switch(bpp) 
-	{
-		case 8:case 24:
-			startadd>>=1;
-		case 16:
-			startadd>>=1;
-		case 32:
-			startadd>>=1;
-			break;
-	}*/
-	startadd>>=3; // apsed, TODO doc Matrox g200 g400 4.6.5 is false?
+	/* Matrox docs are false/incomplete, always program qword adress. */
+	startadd >>= 3;
 
 	LOG(2,("CRTC: startadd: %x\n",startadd));
 	LOG(2,("CRTC: frameRAM: %x\n",si->framebuffer));
@@ -297,27 +290,98 @@ status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	return B_OK;
 }
 
-status_t gx00_crtc_mem_priority(uint8 HIPRILVL)
+status_t gx00_crtc_mem_priority(uint8 colordepth)
 {	
-	if (si->ps.card_type<G100) return B_ERROR; // apsed TODO, not used, see after SetDisplayMode.c/interrupt_enable()
+	float tpixclk, tmclk, refresh, temp;
+	uint8 mp, vc, hiprilvl, maxhipri, prioctl;
 
-	LOG(4,("CRTC: Setting memory priority level: %x\n",HIPRILVL));
-	
-	switch (HIPRILVL)
+	/* we can only do this if card pins is read OK *and* card is coldstarted! */
+	if (si->settings.usebios || (si->ps.pins_status != B_OK))
+	{
+		LOG(4,("CRTC: Card not coldstarted, skipping memory priority level setup\n"));
+		return B_OK;
+	}
+
+	/* only on G200 the mem_priority register should be programmed with this formula */
+	if (si->ps.card_type != G200)
+	{
+		LOG(4,("CRTC: Memory priority level setup not needed, skipping\n"));
+		return B_OK;
+	}
+
+	/* make sure the G200 is running at peak performance, so for instance high-res
+	 * overlay distortions due to bandwidth limitations are minimal.
+	 * Note please that later cards have plenty of bandwidth to cope by default.
+	 * Note also that the formula needed is entirely cardtype-dependant! */
+	LOG(4,("CRTC: Setting G200 memory priority level\n"));
+
+	/* set memory controller pipe depth, assuming no codec or Vin operating */
+	switch ((si->ps.memrdbk_reg & 0x00c00000) >> 22)
 	{
 	case 0:
-		VGAW_I(CRTCEXT,6,0x00);
+		mp = 52;
 		break;
-	case 1:case 2:case 3:
-		VGAW_I(CRTCEXT,6,0x10|HIPRILVL);
+	case 1:
+		mp = 41;
 		break;
-	case 4:case 5:case 6:case 7:
-		VGAW_I(CRTCEXT,6,0x20|HIPRILVL);
+	case 2:
+		mp = 32;
 		break;
 	default:
-		LOG(8,("CRTC: Memory priority level violation: %x\n",HIPRILVL));
-		return B_ERROR;
+		mp = 52;
+		LOG(8,("CRTC: Streamer flowcontrol violation in PINS, defaulting to %%00\n"));
+		break;
 	}
+
+	/* calculate number of videoclocks needed per 8 pixels */
+	vc = (8 * colordepth) / 64;
+	
+	/* calculate pixelclock period (nS) */
+	tpixclk = 1000000 / si->dm.timing.pixel_clock;
+
+	/* calculate memoryclock period (nS) */
+	if (si->ps.v3_option2_reg & 0x08)
+	{
+		tmclk = 1000.0 / si->ps.std_engine_clock;
+	}
+	else
+	{
+		if (si->ps.v3_clk_div & 0x02)
+			tmclk = 3000.0 / si->ps.std_engine_clock;
+		else
+			tmclk = 2000.0 / si->ps.std_engine_clock;
+	}
+
+	/* calculate refreshrate of current displaymode */
+	refresh = ((si->dm.timing.pixel_clock * 1000) /
+		((uint32)si->dm.timing.h_total * (uint32)si->dm.timing.v_total));
+
+	/* calculate high priority request level, but stay on the 'crtc-safe' side:
+	 * hence 'formula + 1.0' instead of 'formula + 0.5' */
+	temp = (((((mp * tmclk) + (11 * vc * tpixclk)) / tpixclk) - (vc - 1)) / (8 * vc)) + 1.0;
+	if (temp > 7.0) temp = 7.0;
+	if (temp < 0.0) temp = 0.0;
+	hiprilvl = 7 - ((uint8) temp);
+	/* limit non-crtc priority so crtc always stays 'just' OK */
+	if (hiprilvl > 4) hiprilvl = 4;
+	if ((si->dm.timing.v_display > 768) && (hiprilvl > 3)) hiprilvl = 3;
+	if ((si->dm.timing.v_display > 864) && (hiprilvl > 2) && (refresh >= 76.0)) hiprilvl = 2; 
+	if ((si->dm.timing.v_display > 1024) && (hiprilvl > 2)) hiprilvl = 2;
+
+	/* calculate maximum high priority requests */
+	temp = (vc * (tmclk / tpixclk)) + 0.5;
+	if (temp > (float)hiprilvl) temp = (float)hiprilvl;
+	if (temp < 0.0) temp = 0.0;
+	maxhipri = ((uint8) temp);
+
+	/* program the card */
+	prioctl = ((hiprilvl & 0x07) | ((maxhipri & 0x07) << 4));	
+	VGAW_I(CRTCEXT, 6, prioctl);
+
+	/* log results */
+	LOG(4,("CRTC: Vclks/char is %d, pixClk period %02.2fnS, memClk period %02.2fnS\n",
+		vc, tpixclk, tmclk));
+	LOG(4,("CRTC: memory priority control register is set to $%02x\n", prioctl));
 
 	return B_OK;
 }
@@ -326,11 +390,17 @@ status_t gx00_crtc_cursor_init()
 {
 	int i;
 	uint32 * fb;
-	const uint32 curadd = 0; // apsed, TODO with ramaddr -> taken care off.
+	/* cursor bitmap will be stored at the start of the framebuffer */
+	const uint32 curadd = 0;
 
-	/*store cursor at the start of the framebuffer*/
-	DXIW(CURADDL,curadd >> 10); /*data at curadd in framebuffer*/
+	/* set cursor bitmap adress ... */
+	DXIW(CURADDL,curadd >> 10);
 	DXIW(CURADDH,curadd >> 18);
+	/* ... and repeat that: G100 requires other programming order than other cards!?! */
+	DXIW(CURADDL,curadd >> 10);
+	DXIW(CURADDH,curadd >> 18);
+
+	/* activate hardware cursor */
 	DXIW(CURCTRL,1);
 
 	/*set cursor colour*/
@@ -394,6 +464,13 @@ status_t gx00_crtc_cursor_position(uint16 x ,uint16 y)
 
 	x+=i;
 	y+=i;
+
+	/* make sure we are not in retrace, because the register(s) might get copied
+	 * during our reprogramming them (double buffering feature) */
+	while (ACCR(STATUS) & 0x08)
+	{
+		snooze(4);
+	}
 
 	DACW(CURSPOSXL,x&0xFF);
 	DACW(CURSPOSXH,x>>8);

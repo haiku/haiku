@@ -1,6 +1,7 @@
 /*general card functions*/
 status_t gx00_general_powerup();
 status_t mga_set_cas_latency();
+status_t gx50_general_output_select();
 status_t gx00_general_dac_select(int);
 status_t gx00_general_wait_retrace();
 //status_t gx00_general_bios_to_powergraphics();
@@ -27,9 +28,6 @@ status_t i2c_maven_probe(void);
 
 
 /*card info functions*/
-status_t g450_card_info();
-status_t g400_card_info();
-status_t g200_card_info();
 status_t parse_pins(void);
 status_t pins1_read(uint8 *pins, uint8 length);
 status_t pins2_read(uint8 *pins, uint8 length);
@@ -53,6 +51,7 @@ status_t gx00_dac_palette(uint8*,uint8*,uint8*);
 status_t gx00_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t gx00_dac_set_pix_pll(display_mode target);
 
+status_t g450_dac_set_sys_pll();
 status_t g400_dac_set_sys_pll();
 status_t g200_dac_set_sys_pll();
 status_t g100_dac_set_sys_pll();
@@ -123,9 +122,13 @@ status_t gx00_acc_wait_idle();
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
-status_t gx00_configure_bes(const overlay_buffer *ob, const overlay_window *ow, int offset);
+status_t gx00_configure_bes
+	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t gx00_release_bes();
+
+/* I2C functions */
+status_t i2c_sec_tv_adapter();
 
 /*driver structures and enums*/
 enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3,BPP32DIR=4,BPP32=7};
-enum{DS_CRTCDAC_CRTC2MAVEN, DS_CRTCMAVEN_CRTC2DAC, DS_CRTCDAC_CRTC2DAC2, DS_CRTCDAC_CRTCDAC2};
+enum{DS_CRTC1DAC_CRTC2MAVEN, DS_CRTC1MAVEN_CRTC2DAC, DS_CRTC1CON1_CRTC2CON2, DS_CRTC1CON2_CRTC2CON1};

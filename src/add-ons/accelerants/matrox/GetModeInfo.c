@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson
-	Rudolf Cornelissen 9/2002
+	Rudolf Cornelissen 9-11/2002
 */
 
 #define MODULE_BIT 0x02000000
@@ -42,6 +42,7 @@ status_t GET_FRAME_BUFFER_CONFIG(frame_buffer_config *afb)
 status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high) 
 {
 	uint32 max_pclk = 0;
+	uint32 min_pclk = 0;
 
 	/* check for NULL pointers */
 	if ((dm == NULL) || (low == NULL) || (high == NULL)) return B_ERROR;
@@ -123,7 +124,14 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 		}
 		/* return values in kHz */
 		*high = max_pclk * 1000;
-	}	
+	}
+
+	/* clamp lower limit to 48Hz vertical refresh for now.
+	 * Apparantly the BeOS screenprefs app does limit the upper refreshrate to 90Hz,
+	 * while it does not limit the lower refreshrate. */
+	min_pclk = ((uint32)dm->timing.h_total * (uint32)dm->timing.v_total * 48) / 1000;
+	if (min_pclk > *low) *low = min_pclk;
+
 	return B_OK;
 }
 

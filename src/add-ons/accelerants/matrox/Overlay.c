@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/09-2002 V0.13 beta1 */
+/* Written by Rudolf Cornelissen 05/10-2002 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -6,20 +6,6 @@
  */
 
 #define MODULE_BIT 0x00000400
-
-/* Note:
- * In order to enable OVERLAY logging, in file mga.settings include a line with:
- *
- * logmask 0x08000604 # log OVERLAY use in full
- *
- * Make sure you copy the resulting file to ~/config/settings/kernel/drivers/ ! 
- *
- * Beware that enabling OVERLAY logging will create a very large logfile quickly in
- * your home folder (named mga.accelerant.log) if you use double buffered overlay
- * playback (100Mb will be reached in 'no time', like in a few days or so.).
- *
- * For testing purposes, you might want to have full logging enabled though...
- */
 
 #include "acc_std.h"
 
@@ -591,11 +577,6 @@ status_t CONFIGURE_OVERLAY
 {
 	int offset = 0; /* used for buffer index */
 
-	/* in BeOS R5.0.3 (maybe DANO works different):
-	 * '*ov' is the output size on the desktop: does not change if clipped.
-	 * h_start and v_start are always 0, width and heigth are the size of the window.
-	 * Because the width and height can also be found in '*ow', '*ov' is not used. */
-
 	LOG(4,("Overlay: Configure_overlay called: "));
 
 	/* Note:
@@ -649,7 +630,7 @@ status_t CONFIGURE_OVERLAY
 		{
 			LOG(4,("succesfull, switching to buffer %d\n", offset));
 
-			gx00_configure_bes(ob, ow, offset);
+			gx00_configure_bes(ob, ow, ov, offset);
 
 			return B_OK;
 		}

@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 10/2002
+	Rudolf Cornelissen 11-12/2002
 */
 
 #define MODULE_BIT 0x00200000
@@ -29,16 +29,6 @@ static void interrupt_enable(bool flag) {
 	result = ioctl(fd, GX00_RUN_INTERRUPTS, &sbs, sizeof(sbs));
 }
 
-//	       apsed TODO gx00_crtc_mem_priority() ?? 
-//	/*calculate if high priority request are needed and how many*/
-//	Tpix = 1000000.0/(dm->timing.pixel_clock);
-//	Tmclk = si->ps.mem_clk_period;
-//	temp = (128/colour_depth);
-//	HIPRILVL = 64*Tmclk + (1-46*(temp))*Tpix;
-//	HIPRILVL/= -8*Tpix*temp;
-//	gx00_crtc_mem_priority((uint8)HIPRILVL);
-//	/*XXX - memory priority*/
-
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */
 status_t SET_DISPLAY_MODE(display_mode *mode_to_set) 
 {
@@ -47,8 +37,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	uint8 colour_depth=32;
 	status_t result;
 	uint32 startadd,startadd_right;
-//	double HIPRILVL;
-//	double Tmclk,Tpix,temp;	
 // apsed TODO startadd is 19 bits if < g200
 
 	uint8 display,h,v;
@@ -100,7 +88,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	LOG(1,("DUALHEAD: %d\n",target.flags&DUALHEAD_BITS));
 	if ((target.flags&DUALHEAD_BITS)) /*if some dualhead mode*/
 	{
-		
+		uint16 crtc1_vdisplay, crtc2_vdisplay;
+
 		/*set the pixel clock PLL(s)*/
 		if (gx00_dac_set_pix_pll(target)==B_ERROR)
 			LOG(8,("SET: error setting pixel clock (internal DAC)\n"));
@@ -114,18 +103,20 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			LOG(8,("SET: not setting maven clock (G450?)\n"));
 		}
 
-		/*set the colour depth for CRTC1, CRTC2 and the DAC*/
+		/*set the colour depth for CRTC1, CRTC2, the DAC and the MAVEN */
 		switch(target.space)
 		{
 		case B_RGB16_LITTLE:
 			colour_depth=16;
-			gx00_dac_mode(BPP16,1.0);
+			gx00_dac_mode(BPP16, 1.0);
+			gx00_maven_mode(BPP16, 1.0);
 			gx00_crtc_depth(BPP16);
 			g400_crtc2_depth(BPP16);
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth=32;
-			gx00_dac_mode(BPP32,1.0);
+			gx00_dac_mode(BPP32, 1.0);
+			gx00_maven_mode(BPP32DIR, 1.0);
 			gx00_crtc_depth(BPP32);
 			g400_crtc2_depth(BPP32DIR);
 			break;
@@ -140,16 +131,130 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*work out where the "right" screen starts*/
 		startadd_right=startadd+(target.timing.h_display*(colour_depth>>3));
 
-		/*set the output DAC*/
+		/* calculate needed MAVEN-CRTC delay: formula valid for straight-through CRTC's */
+		si->crtc_delay = 44 + 0 * (colour_depth == 16);
+
+		/* setup vertical timing adjust for crtc1 and crtc2 for straight-through CRTC's */
+		crtc1_vdisplay = target.timing.v_display;
+		/* (extra "blanking" line for MAVEN) */
+		crtc2_vdisplay = target.timing.v_display + 1;
+
+		/* set the outputs */
 		switch (si->ps.card_type)
 		{
-		case G450:
-			gx00_general_dac_select(DS_CRTCDAC_CRTC2DAC2);
-			switched_crtcs = false;
+		case G400:
+		case G400MAX:
+			switch (target.flags&DUALHEAD_BITS)
+			{
+			case DUALHEAD_ON:
+			case DUALHEAD_CLONE:
+				gx00_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
+				switched_crtcs = false;
+				break;
+			case DUALHEAD_SWITCH:
+				if (i2c_sec_tv_adapter() == B_OK)
+				{
+					/* Don't switch CRTC's because MAVEN YUV is impossible then, 
+					 * and primary head output will be limited to 135Mhz pixelclock. */
+					LOG(4,("SET: secondary TV-adapter detected, switching buffers\n"));
+					gx00_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
+					switched_crtcs = true;
+				}
+				else
+				{
+					/* This limits the pixelclocks on both heads to 135Mhz,
+					 * but you can use overlay on the other output now. */
+					LOG(4,("SET: no secondary TV-adapter detected, switching CRTCs\n"));
+					gx00_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
+					switched_crtcs = false;
+					/* re-calculate MAVEN-CRTC delay: formula valid for crossed CRTC's */
+					si->crtc_delay = 17 + 4 * (colour_depth == 16);
+					/* re-setup vertical timing adjust for crtc1 and crtc2 for crossed CRTC's */
+					/* (extra "blanking" line for MAVEN) */
+					crtc1_vdisplay = target.timing.v_display + 1;
+					crtc2_vdisplay = target.timing.v_display;
+				}
+				break;
+			}
 			break;
-		case G400:case G400MAX:
-			gx00_general_dac_select(DS_CRTCMAVEN_CRTC2DAC);
-			switched_crtcs = false;
+		//fixme: 
+		//use current SETMODE MAVEN programming only on G400/G400MAX;
+		//and copy & modify/resetup this stuff for G450(?)/G550 cards!
+		//warning:
+		//setup crtc_delay and vertical timing adjust for G450(?)/G550, 
+		//and remove the '+1' in crtc2 vertical timing(?)
+		case G450:
+		case G550:
+			if (!si->ps.primary_dvi)
+			/* output connector use is always 'straight-through' */
+			//fixme: re-evaluate when DVI is setup... 
+			{
+				switch (target.flags&DUALHEAD_BITS)
+				{
+				case DUALHEAD_ON:
+				case DUALHEAD_CLONE:
+					gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+					switched_crtcs = false;
+					break;
+				case DUALHEAD_SWITCH:
+					if (i2c_sec_tv_adapter() == B_OK)
+					{
+						/* Don't switch CRTC's because MAVEN YUV and TVout is impossible then, 
+						 * and primary head output will be limited to 235Mhz pixelclock. */
+						LOG(4,("SET: secondary TV-adapter detected, switching buffers\n"));
+						gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+						switched_crtcs = true;
+					}
+					else
+					{
+						/* This limits the pixelclocks on both heads to 235Mhz,
+						 * but you can use overlay on the other output now. */
+						LOG(4,("SET: no secondary TV-adapter detected, switching CRTCs\n"));
+						gx00_general_dac_select(DS_CRTC1CON2_CRTC2CON1);
+						switched_crtcs = false;
+					}
+					break;
+				}
+			}
+			else
+			/* output connector use is cross-linked if no TV cable connected! */
+			//fixme: re-evaluate when DVI is setup... 
+			{
+				switch (target.flags&DUALHEAD_BITS)
+				{
+				case DUALHEAD_ON:
+				case DUALHEAD_CLONE:
+					if (i2c_sec_tv_adapter() == B_OK)
+					{
+						gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+						switched_crtcs = false;
+					}
+					else
+					{
+						/* This limits the pixelclocks on both heads to 235Mhz,
+						 * but you can use overlay on the other output now. */
+						gx00_general_dac_select(DS_CRTC1CON2_CRTC2CON1);
+						switched_crtcs = false;
+					}
+					break;
+				case DUALHEAD_SWITCH:
+					if (i2c_sec_tv_adapter() == B_OK)
+					{
+						/* Don't switch CRTC's because MAVEN YUV and TVout is impossible then, 
+						 * and primary head output will be limited to 235Mhz pixelclock. */
+						LOG(4,("SET: secondary TV-adapter detected, switching buffers\n"));
+						gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+						switched_crtcs = true;
+					}
+					else
+					{
+						LOG(4,("SET: no secondary TV-adapter detected, switching CRTCs\n"));
+						gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+						switched_crtcs = false;
+					}
+					break;
+				}
+			}
 			break;
 		default:
 			break;
@@ -163,20 +268,16 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/*Tell card what memory to display*/
-		si->crtc_delay=17+4*(colour_depth==16);
 		switch (target.flags&DUALHEAD_BITS)
 		{
 		case DUALHEAD_ON:
-			gx00_crtc_set_display_start(startadd_right,colour_depth);
-			g400_crtc2_set_display_start(startadd,colour_depth);
+		case DUALHEAD_SWITCH:
+			gx00_crtc_set_display_start(startadd,colour_depth);
+			g400_crtc2_set_display_start(startadd_right,colour_depth);
 			break;
 		case DUALHEAD_CLONE:
 			gx00_crtc_set_display_start(startadd,colour_depth);
 			g400_crtc2_set_display_start(startadd,colour_depth);
-			break;
-		case DUALHEAD_SWITCH:
-			gx00_crtc_set_display_start(startadd,colour_depth);
-			g400_crtc2_set_display_start(startadd_right,colour_depth);
 			break;
 		}
 
@@ -187,7 +288,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			target.timing.h_sync_start,
 			target.timing.h_sync_end,
 			target.timing.h_total,
-			(target.timing.v_display+1), /*extra "blanking" line for MAVEN*/
+			crtc1_vdisplay,
 			target.timing.v_sync_start,
 			target.timing.v_sync_end,
 			target.timing.v_total,
@@ -201,7 +302,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			target.timing.h_sync_start,
 			target.timing.h_sync_end,
 			target.timing.h_total,
-			(target.timing.v_display),
+			crtc2_vdisplay,
 			target.timing.v_sync_start,
 			target.timing.v_sync_end,
 			target.timing.v_total,
@@ -216,7 +317,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 				target.timing.h_sync_start,
 				target.timing.h_sync_end,
 				target.timing.h_total,
-				(target.timing.v_display+1), /*extra "blanking" line*/
+				(target.timing.v_display+1), /* The extra "blanking" line */
 				target.timing.v_sync_start,
 				target.timing.v_sync_end,
 				target.timing.v_total,
@@ -234,6 +335,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*TVout support*/
 		if (si->ps.secondary_tvout && (target.flags&TV_BITS))
 		{
+			//fixme: re-tune if needed, checkout cross and straight crtc's seperately..
 			si->crtc_delay+=5;
 
 			/*create a my tim(m)ing structure... for tvout*/
@@ -251,12 +353,12 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			if (target.flags&TV_PAL)
 			{
 				LOG(2, ("OUTMODE: PAL\n"));
-				maven_set_mode(2);
+				maven_set_mode(1);
 			}
 			else
 			{
 				LOG(2, ("OUTMODE: NTSC\n"));
-				maven_set_mode(1);
+				maven_set_mode(2);
 			}
 
 			maven_out_compute(&tv_timing, &tv_regs);
@@ -301,8 +403,23 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/*tell the card what memory to display*/
 		gx00_crtc_set_display_start(startadd,colour_depth);
-		if (si->ps.card_type >= G100) 
-			gx00_general_dac_select(DS_CRTCDAC_CRTC2MAVEN);
+		/* enable primary analog output */
+		switch (si->ps.card_type)
+		{
+		case G100:
+		case G200: 
+		case G400:
+		case G400MAX: 
+			gx00_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
+			break;
+		case G450:
+		case G550: 
+			gx00_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
+			gx50_general_output_select();
+			break;
+		default:
+			break;
+		}
 		
 		/*set the timing*/
 		result = gx00_crtc_set_timing /*crtc1*/
@@ -343,6 +460,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* enable interrupts using the kernel driver */
 	interrupt_enable(true);
+
+	/* optimize memory-access if needed */
+	gx00_crtc_mem_priority(colour_depth);
 
 	/* Tune RAM CAS-latency if needed. Must be done *here*! */
 	mga_set_cas_latency();

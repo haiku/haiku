@@ -158,8 +158,8 @@ status_t check_overlay_capability(uint32 feature)
 	switch(si->ps.card_type)
 	{
 	case G200:
-	case G400:		/* is also G400MAX in accelerant for now? */
-	case G400MAX: 	/* not used in accelerant yet? */
+	case G400:
+	case G400MAX:
 	case G450: 		/* is also G550 in accelerant for now */
 	case G550:		/* not used in accelerant yet */
 		/* export video overlay functions */

@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002
+   Rudolf Cornelissen 10-12/2002
 */
 
 #define MODULE_BIT 0x00008000
@@ -54,60 +54,62 @@ static void mga_dump_configuration_space (void)
 status_t gx00_general_powerup()
 {
 	status_t status;
-	uint32 class;
+	uint32 card_class;
 
-	//detect card type and powerup
+	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
 	case 0x0519102b: //MGA-2064 Millenium PCI
 	case 0x051a102b: //MGA-1064 Mystic PCI
-		LOG(8,("POWERUP: unimplemented Matrox device %08x\n",CFGR(DEVID)));
+		LOG(8,("POWERUP: Unimplemented Matrox device %08x\n",CFGR(DEVID)));
 		return B_ERROR;
 	case 0x051b102b:case 0x051f102b: //MGA-2164 Millenium 2 PCI/AGP
-		si->ps.card_type=MIL2;
-		LOG(4,("POWERUP:Detected MGA-2164 Millennium 2\n"));
+		si->ps.card_type = MIL2;
+		LOG(4,("POWERUP: Detected MGA-2164 Millennium 2\n"));
 		status = mil2_general_powerup();
 		break;
 	case 0x1000102b:case 0x1001102b: //G100
-		si->ps.card_type=G100;
-		LOG(4,("POWERUP:Detected G100\n"));
+		si->ps.card_type = G100;
+		LOG(4,("POWERUP: Detected G100\n"));
 		status = g100_general_powerup();
 		break;
 	case 0x0520102b:case 0x0521102b: //G200
-		si->ps.card_type=G200;
-		LOG(4,("POWERUP:Detected G200\n"));
+		si->ps.card_type = G200;
+		LOG(4,("POWERUP: Detected G200\n"));
 		status = g200_general_powerup();
 		break;
-	case 0x0525102b: //G400
-		LOG(4,("POWERUP:Detected G4"));
-		//Check if it is a G450...
-		class = 0xff&CFGR(CLASS);
-		if (class & 0x80) //G450
+	case 0x0525102b: //G400, G400MAX or G450
+		LOG(4,("POWERUP: Detected G4"));
+		/* get classinfo to distinguish different types */
+		card_class = CFGR(CLASS) & 0xff;
+		if (card_class & 0x80)
 		{
-			si->ps.card_type=G450;
-			LOG(4, ("50 revision %x\n", class&0x7f));
+			/* G450 */
+			si->ps.card_type = G450;
+			LOG(4, ("50 revision %x\n", card_class & 0x7f));
 			status = g450_general_powerup();
 		}
-		else //G400
+		else
 		{
-			si->ps.card_type=G400;
-			LOG(4, ("00 revision %x\n", class&0x7f));
+			/* standard G400, G400MAX */
+			/* the only difference is the max RAMDAC speed, accounted for via pins. */
+			si->ps.card_type = G400;
+			LOG(4, ("00 revision %x\n", card_class & 0x7f));
 			status = g400_general_powerup();
 		}
 		break;
 	case 0x2527102b://G550 patch from Jean-Michel Batto
-		si->ps.card_type=G450;
-		LOG(4,("POWERUP:Detected G550\n"));
+		si->ps.card_type = G450;
+		LOG(4,("POWERUP: Detected G550\n"));
 		status = g450_general_powerup();
 		break;	
 	default:
-		LOG(8,("POWERUP:Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
+		LOG(8,("POWERUP: Failed to detect valid card 0x%08x\n",CFGR(DEVID)));
 		return B_ERROR;
 	}
 
-	/*override memory if requested by user*/
-	// even if detection works on the G400
-	if (si->settings.memory != 0) // apsed
+	/* override memory detection if requested by user */
+	if (si->settings.memory != 0)
 		si->ps.memory_size = si->settings.memory;
 
 	return status;
@@ -252,61 +254,20 @@ status_t mil2_general_powerup()
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 	mil2_dac_init();
 
+//rudolf: sync on green test:
+	/* disable 15bit mode CLUT-overlay function */
+	//enable 'sync on green' option
+//	DXIW(GENCTRL, DXIR(GENCTRL | 0x20));
+	/* enable composite sync instead of Hsync only */
+//	VGAW_I(CRTCEXT,3,(VGAR_I(CRTCEXT,3) | 0x40));      
+//end sync on green test.
+
 	VGAW_I(SEQ,1,0x00);
 	/*enable screen*/
 return B_OK;
 
-	return B_ERROR; // apsed TODO MIL2 taken from G100, avoid DXIR/W DACR/W 
-	
-	/*power up the PLLs,LUT,DAC*/
-	/*this bit should not be needed if BIOS has initialised it*/
-	LOG(2,("INIT:PLL/LUT/DAC powerup\n"));
-	DXIW(VREFCTRL,0x3F);                /*set voltage reference - using DAC reference block*/
-	delay(100000);                      /*wait for 100ms for voltage reference to stabalise*/
-	CFGW(OPTION,CFGR(OPTION)|0x20);     /*power up the SYSPLL - sets syspllpdN to 1*/
-	while(!(DXIR(SYSPLLSTAT)&0x40));    /*wait for the SYSPLL frequency to lock*/
-	LOG(2,("INIT: SYS PLL locked\n"));
-	DXIW(PIXCLKCTRL,0x08);              /*power up the PIXPLL - sets pixpllpdN to 1*/
-	while(!(DXIR(PIXPLLSTAT)&0x40));    /*wait for the PIXPLL frequency to lock*/
-	LOG(2,("INIT: PIX PLL locked\n"));
-	DXIW(MISCCTRL,0x1b);                /*CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC*/
-
-	/* setup i2c bus */
-	i2c_init();
-
-	/*make sure card is in powergraphics mode*/
-	VGAW_I(CRTCEXT,3,0x80);      
-
-	/*set the system clocks to powergraphics speed*/
-	LOG(2,("INIT:Setting SYS/PIX plls to powergraphics speeds\n"));
-	g100_dac_set_sys_pll();
-
-	/*RAM initialisation*/
-	LOG(2,("INIT:RAM init\n"));
-	gx00_crtc_dpms(0,0,0);						/*turn off both displays*/
-	ACCW(MCTLWTST,si->ps.mem_ctl);                                  /*set memory wait states*/
-	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF)|si->ps.mem_type);         /*set RAM type and config*/
-	CFGW(OPTION2,(CFGR(OPTION2)&0xC100)|(si->ps.mem_rd));           /*set MEMRDCLK*/
-	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|(si->ps.membuf<<12));   /*set the memory buffer type*/
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MACCESS,ACCR(MACCESS)&0xFFFF7FFF);                         /*reset memory*/          
-	delay(250);
-	ACCW(MACCESS,ACCR(MACCESS)|0xC000);              		/*sets JEDEC as well*/
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MACCESS,ACCR(MACCESS)&0xFFFF3FFF);
-	delay(250);
-	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.mem_rd&0xFFFF));/*set tap delays*/
-	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff)|(si->ps.mem_rfhcnt<<15)); /*start memory refresh*/
-
-	/*Bus parameters*/
-	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));                    /*enable retries, use advanced read*/
-
-	/*enable writing to crtc registers*/
-	VGAW_I(CRTC,0x11,0);
-
-	/*turn on display one*/
-	gx00_crtc_dpms(1,1,1);
-
+	// apsed TODO MIL2 taken from G100, avoid DXIR/W DACR/W 
+	//rudolf: G100 version that was here nolonger exists, look at new implementation...
 	return B_OK;
 }
 
@@ -329,20 +290,32 @@ status_t g100_general_powerup()
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
 	/*power up the PLLs,LUT,DAC*/
-	/*this bit should not be needed if BIOS has initialised it*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
+	/* turn off both displays and the hardcursor (also disables transfers) */
+	gx00_crtc_dpms(0,0,0);
+	gx00_crtc_cursor_hide();
 	/* G100 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
 	 * resulting in extra chip heat and distortions visible on screen */
-	DXIW(VREFCTRL,0x03);                /*set voltage reference - using DAC reference block partly */
-	delay(100000);                      /*wait for 100ms for voltage reference to stabalise*/
-	CFGW(OPTION,CFGR(OPTION)|0x20);     /*power up the SYSPLL - sets syspllpdN to 1*/
-	while(!(DXIR(SYSPLLSTAT)&0x40));    /*wait for the SYSPLL frequency to lock*/
-	LOG(2,("INIT: SYS PLL locked\n"));
-	DXIW(PIXCLKCTRL,0x08);              /*power up the PIXPLL - sets pixpllpdN to 1*/
-	while(!(DXIR(PIXPLLSTAT)&0x40));    /*wait for the PIXPLL frequency to lock*/
-	LOG(2,("INIT: PIX PLL locked\n"));
-	DXIW(MISCCTRL,0x1b);                /*CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC*/
+	/* set voltage reference - using DAC reference block partly */
+	DXIW(VREFCTRL,0x03);
+	/* wait for 100ms for voltage reference to stabilize */
+	delay(100000);
+	/* power up the SYSPLL */
+	CFGW(OPTION,CFGR(OPTION)|0x20);
+	/* power up the PIXPLL */
+	DXIW(PIXCLKCTRL,0x08);
+
+	/* disable pixelclock oscillations before switching on CLUT */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
+	/* disable 15bit mode CLUT-overlay function */
+	//fixme: setup b5 later for 'sync on green' option
+	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
+	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
+	DXIW(MISCCTRL,0x1b);
+	snooze(250);
+	/* re-enable pixelclock oscillations */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
 
 	/* setup i2c bus */
 	i2c_init();
@@ -356,14 +329,13 @@ status_t g100_general_powerup()
 
 	/* 'official' RAM initialisation */
 	LOG(2,("INIT: RAM init\n"));
-	/* turn off both displays (also disables transfers) */
-	gx00_crtc_dpms(0,0,0);
-	/* disable plane write mask (needed for SDRAM) */
+	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
+	ACCW(PLNWT,0x00000000);
 	ACCW(PLNWT,0xffffffff);
 	/* program memory control waitstates */
 	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
-	/* set memory configuration:
-	 * - no split framebuffer,
+	/* set memory configuration including:
+	 * - no split framebuffer.
 	 * - Mark says b14 (G200) should be done also though not defined for G100 in spec,
 	 * - b3 v3_mem_type was included by Mark for memconfig setup: but looks like not defined */
 	CFGW(OPTION,(CFGR(OPTION)&0xFFFF8FFF) | ((si->ps.v3_mem_type & 0x04) << 10));
@@ -372,16 +344,13 @@ status_t g100_general_powerup()
 	 *   but looks like v3_mem_type b1 is not defined,
 	 * - Mark also says: place v3_mem_type b1 in option2 bit13 (if not 0x03) but b13 = reserved. */
 	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|((si->ps.v3_mem_type & 0x01) << 12));
-	/* set mode register opcode to $0 */	
-//	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xE1FFFFFF)); /* G200 only */
-	/* set RAM read tap delay G100 */
+	/* set RAM read tap delay */
 	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFFFF0) | ((si->ps.v3_mem_type & 0xf0) >> 4));
-//	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|the_setting); /* G200 version */
 	/* wait 200uS minimum */
 	snooze(250);
 
 	/* reset memory */
-	ACCW(MACCESS,ACCR(MACCESS)&0xFFFF7FFF);
+	ACCW(MACCESS, 0x00000000);
 	/* select JEDEC reset method */
 	ACCW(MACCESS,ACCR(MACCESS)|0x4000);
 	/* perform actual RAM reset */
@@ -424,52 +393,78 @@ status_t g200_general_powerup()
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
 	/*power up the PLLs,LUT,DAC*/
-	/*this bit should not be needed if BIOS has initialised it*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
-//rudolf: check from here on:
-	DXIW(VREFCTRL,0x3f);                /*set voltage reference - using DAC reference block*/
-	delay(100000);                      /*wait for 100ms for voltage reference to stabalise*/
-	CFGW(OPTION,CFGR(OPTION)|0x20);     /*power up the SYSPLL - sets syspllpdN to 1*/
-	while(!(DXIR(SYSPLLSTAT)&0x40));    /*wait for the SYSPLL frequency to lock*/
-	LOG(2,("INIT: SYS PLL locked\n"));
-	DXIW(PIXCLKCTRL,0x08);              /*power up the PIXPLL - sets pixpllpdN to 1*/
-	while(!(DXIR(PIXPLLSTAT)&0x40));    /*wait for the PIXPLL frequency to lock*/
-	LOG(2,("INIT: PIX PLL locked\n"));
-	DXIW(MISCCTRL,0x1b);                /*CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC*/
-//until here
+	/* turn off both displays and the hardcursor (also disables transfers) */
+	gx00_crtc_dpms(0,0,0);
+	gx00_crtc_cursor_hide();
+	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
+	 * (this would create electrical shortcuts,
+	 * resulting in extra chip heat and distortions visible on screen */
+	/* set voltage reference - using DAC reference block partly */
+	DXIW(VREFCTRL,0x03);
+	/* wait for 100ms for voltage reference to stabilize */
+	delay(100000);
+	/* power up the SYSPLL */
+	CFGW(OPTION,CFGR(OPTION)|0x20);
+	/* power up the PIXPLL */
+	DXIW(PIXCLKCTRL,0x08);
+
+	/* disable pixelclock oscillations before switching on CLUT */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
+	/* disable 15bit mode CLUT-overlay function */
+	//fixme: setup b5 later for 'sync on green' option
+	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
+	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
+	DXIW(MISCCTRL,0x1b);
+	snooze(250);
+	/* re-enable pixelclock oscillations */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
 
 	/* setup i2c bus */
 	i2c_init();
-
-//rudolf: remove:
-	/*read the PINS and other stuff*/
-	if (g200_card_info()==B_ERROR)
-		return B_ERROR;
-//until here
 
 	/*make sure card is in powergraphics mode*/
 	VGAW_I(CRTCEXT,3,0x80);      
 
 	/*set the system clocks to powergraphics speed*/
-	LOG(2,("INIT: Setting SYS/PIX plls to powergraphics speeds\n"));
+	LOG(2,("INIT: Setting system PLL to powergraphics speeds\n"));
 	g200_dac_set_sys_pll();
 
-	/*RAM initialisation*/
-	LOG(2,("INIT:RAM init\n"));
-	gx00_crtc_dpms(0,0,0);						/*turn off both displays*/
-	ACCW(MCTLWTST,si->ps.mem_ctl);                                  /*set memory wait states*/
-	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF)|si->ps.mem_type);         /*set RAM type and config*/
-	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF)|(si->ps.mem_rd&0xFFFF0000));/*set MEMRDBK - mrsopcode*/
-	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|(si->ps.membuf<<12));   /*set the memory buffer type*/
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MACCESS,ACCR(MACCESS)&0xFFFF7FFF);                         /*reset memory*/          
-	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.mem_rd&0xFFFF));/*set tap delays*/
-	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff)|(si->ps.mem_rfhcnt<<15)); /*start memory refresh*/
+	/* 'official' RAM initialisation */
+	LOG(2,("INIT: RAM init\n"));
+	/* disable hardware plane write mask if SDRAM card */
+	if (si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) & 0xffffbfff));
+	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
+	ACCW(PLNWT,0x00000000);
+	ACCW(PLNWT,0xffffffff);
+	/* program memory control waitstates */
+	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
+	/* set memory configuration including:
+	 * - SDRAM / SGRAM special functions select. */
+	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF) | ((si->ps.v3_mem_type & 0x07) << 10));
+	if (!si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) | (0x01 << 14)));
+	/* set memory buffer type */
+	CFGW(OPTION2,(CFGR(OPTION2)&0xFFFFCFFF)|((si->ps.v3_option2_reg & 0x03) << 12));
+	/* set mode register opcode and streamer flow control */	
+	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0x0000FFFF)|(si->ps.memrdbk_reg & 0xffff0000));
+	/* set RAM read tap delays */
+	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.memrdbk_reg & 0x0000ffff));
+	/* wait 200uS minimum */
+	snooze(250);
 
-	/*Bus parameters*/
-	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));                    /*enable retries, use advanced read*/
+	/* reset memory */
+	ACCW(MACCESS, 0x00000000);
+	/* perform actual RAM reset */
+	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
+	snooze(250);
+	/* start memory refresh */
+	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
+	/* set memory control waitstate again AFTER the RAM reset */
+	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
+	/* end 'official' RAM initialisation. */
+
+	/* Bus parameters: enable retries, use advanced read */
+	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));
 
 	/*enable writing to crtc registers*/
 	VGAW_I(CRTC,0x11,0);
@@ -485,8 +480,7 @@ status_t g400_general_powerup()
 {
 	status_t result;
 	
-	//fully functional G400 powerup -> uses settings from my card if no PINS
-	LOG(4, ("INIT: G400 powerup\n"));
+	LOG(4, ("INIT: G400/G400MAX powerup\n"));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -500,52 +494,78 @@ status_t g400_general_powerup()
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
 	/*power up the PLLs,LUT,DAC*/
-	/*this bit should not be needed if BIOS has initialised it*/
-	LOG(4,("INIT: G400 PLL/LUT/DAC powerup\n"));
-	DXIW(VREFCTRL,0x30);                /*set voltage reference - using DAC reference block*/
-	delay(100000);                      /*wait for 100ms for voltage reference to stabalise*/
-	CFGW(OPTION,CFGR(OPTION)|0x20);     /*power up the SYSPLL - sets syspllpdN to 1*/
-	while(!(DXIR(SYSPLLSTAT)&0x40));    /*wait for the SYSPLL frequency to lock*/
-	LOG(2,("INIT: SYS PLL locked\n"));
-	DXIW(PIXCLKCTRL,0x08);              /*power up the PIXPLL - sets pixpllpdN to 1*/
-	while(!(DXIR(PIXPLLSTAT)&0x40));    /*wait for the PIXPLL frequency to lock*/
-	LOG(2,("INIT: PIX PLL locked\n"));
-	DXIW(MISCCTRL,0x9b);                /*CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC*/
-	DXIW(MAFCDEL,0x2);                  /*makes CRTC2 stable! Matrox specify 8, but use 4 - grrrr!*/
+	LOG(4,("INIT: PLL/LUT/DAC powerup\n"));
+	/* turn off both displays and the hardcursor (also disables transfers) */
+	gx00_crtc_dpms(0,0,0);
+	g400_crtc2_dpms(0,0,0);
+	gx00_crtc_cursor_hide();
+
+	/* set voltage reference - not using DAC reference block */
+	DXIW(VREFCTRL,0x00);
+	/* wait for 100ms for voltage reference to stabilize */
+	delay(100000);
+	/* power up the SYSPLL */
+	CFGW(OPTION,CFGR(OPTION)|0x20);
+	/* power up the PIXPLL */
+	DXIW(PIXCLKCTRL,0x08);
+
+	/* disable pixelclock oscillations before switching on CLUT */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
+	/* disable 15bit mode CLUT-overlay function */
+	//fixme: setup b5 later for 'sync on green' option
+	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
+	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
+	DXIW(MISCCTRL,0x9b);
+	snooze(250);
+	/* re-enable pixelclock oscillations */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
+
+	DXIW(MAFCDEL,0x02);                 /*makes CRTC2 stable! Matrox specify 8, but use 4 - grrrr!*/
 	DXIW(PANELMODE,0x00);               /*eclipse panellink*/
 
 	/* setup i2c bus */
 	i2c_init();
 
-//rudolf: remove
-	/*read the PINS and other stuff*/
-	if (g400_card_info()==B_ERROR)
-		return B_ERROR;
-//end remove
-
-	/*make sure card is in powergraphics mode*/
+	/* make sure card is in powergraphics mode */
 	VGAW_I(CRTCEXT,3,0x80);      
 
-	/*set the system clocks to powergraphics speed*/
-	LOG(2,("INIT: Setting SYS/PIX plls to powergraphics speeds\n"));
+	/* set the system clocks to powergraphics speed */
+	LOG(2,("INIT: Setting system PLL to powergraphics speeds\n"));
 	g400_dac_set_sys_pll();
 
-	/*RAM initialisation*/
-	LOG(2,("INIT:RAM init\n"));
-	gx00_crtc_dpms(0,0,0);						/*turn off both displays*/
-	g400_crtc2_dpms(0,0,0);
-	ACCW(MCTLWTST,si->ps.mem_ctl);                                  /*set memory wait states*/
-	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF)|si->ps.mem_type);         /*set RAM type and config*/
-	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF)|(si->ps.mem_rd&0xFFFF0000));/*set MEMRDBK - mrsopcode*/
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MACCESS,ACCR(MACCESS)&0xFFFF7FFF);                         /*reset memory*/          
-	ACCW(MACCESS,ACCR(MACCESS)|0x8000);             
-	delay(250);                                                     /*wait for 250microseconds*/
-	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.mem_rd&0xFFFF));/*set tap delays*/
-	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff)|(si->ps.mem_rfhcnt<<15)); /*start memory refresh*/
+	/* 'official' RAM initialisation */
+	LOG(2,("INIT: RAM init\n"));
+	/* disable hardware plane write mask if SDRAM card */
+	if (si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) & 0xffffbfff));
+	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
+	ACCW(PLNWT,0x00000000);
+	ACCW(PLNWT,0xffffffff);
+	/* program memory control waitstates */
+	ACCW(MCTLWTST, si->ps.mctlwtst_reg);
+	/* set memory configuration including:
+	 * - SDRAM / SGRAM special functions select. */
+	CFGW(OPTION,(CFGR(OPTION)&0xFFFF83FF) | (si->ps.option_reg & 0x00001c00));
+	if (!si->ps.sdram) CFGW(OPTION,(CFGR(OPTION) | (0x01 << 14)));
+	/* set mode register opcode and streamer flow control */	
+	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0x0000FFFF)|(si->ps.memrdbk_reg & 0xffff0000));
+	/* set RAM read tap delays */
+	ACCW(MEMRDBK,(ACCR(MEMRDBK)&0xFFFF0000)|(si->ps.memrdbk_reg & 0x0000ffff));
+	/* wait 200uS minimum */
+	snooze(250);
 
-	/*Bus parameters*/
-	CFGW(OPTION,(CFGR(OPTION)|(1<<22)|(0<<29)));                    /*enable retries, use advanced read*/
+	/* reset memory */
+	ACCW(MACCESS, 0x00000000);
+	/* perform actual RAM reset */
+	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
+	snooze(250);
+	/* start memory refresh */
+	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
+	/* set memory control waitstate again AFTER the RAM reset */
+	ACCW(MCTLWTST,si->ps.mctlwtst_reg);
+	/* end 'official' RAM initialisation. */
+
+	/* 'advance read' busparameter and 'memory priority' enable/disable setup */
+	CFGW(OPTION, ((CFGR(OPTION) & 0xefbfffff) | (si->ps.option_reg & 0x10400000)));
 
 	/*enable writing to crtc registers*/
 	VGAW_I(CRTC,0x11,0);
@@ -557,16 +577,18 @@ status_t g400_general_powerup()
 
 	/*turn on display one*/
 	gx00_crtc_dpms(1,1,1);
+
 	return B_OK;
 }
 
 static 
 status_t g450_general_powerup()
 {
-	uint32 temp;
+	//fixme: check if g450 and g550 powerup should be the same! (DAC outputconnector?)
 	status_t result;
+	uint32 pwr_cas[] = {0, 1, 5, 6, 7, 5, 2, 3};
 
-	LOG(4, ("INIT: G450 powerup\n"));
+	LOG(4, ("INIT: G450/G550 powerup\n"));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -576,82 +598,159 @@ status_t g450_general_powerup()
 	/* log the PINS struct settings */
 	dump_pins();
 
-//rudolf: remove if impl in PINS above:
-	// various sensible defaults for G450
-	si->ps.sdram = true;
-//end remove
-
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
-	/*power up the PLLs,LUT,DAC*/
-//rudolf: checkout coldstart from here:
+	/* power up the PLLs,LUT,DAC */
+	LOG(4,("INIT: PLL/LUT/DAC powerup\n"));
+	/* disable outputs */
+	DXIW(OUTPUTCONN,0x00); 
+	/* turn off both displays and the hardcursor (also disables transfers) */
+	gx00_crtc_dpms(0,0,0);
+	//fixme:
+	//g400_crtc2_dpms(0,0,0);
+	gx00_crtc_cursor_hide();
 
-	//In case you are interested here is some of the G450 powerup stuff -> nonfunction as yet
-		
-	//These are the values of OPTION->OPTION4 used in Linux
-	//rudolf: get from PINS...
-	CFGW(OPTION, 0x400a1160);
-	CFGW(OPTION2, 0x100ac00);
-	CFGW(OPTION3, 0x90a409);
-	CFGW(OPTION4, 0x80000004);
+	/* power up everything except DVI electronics (for now) */
+	DXIW(PWRCTRL,0x1b); 
+	/* set voltage reference - not using DAC reference block */
+	DXIW(VREFCTRL,0x00);
+	/* wait for 100ms for voltage reference to stabilize */
+	delay(100000);
+	/* power up the SYSPLL */
+	CFGW(OPTION,CFGR(OPTION)|0x20);
+	/* power up the PIXPLL */
+	DXIW(PIXCLKCTRL,0x08);
 
-//rudolf: remove
-	/*read the PINS and other stuff*/
-	if (g450_card_info()==B_ERROR)
-		return B_ERROR;
-//end remove
+	/* disable pixelclock oscillations before switching on CLUT */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
+	/* disable 15bit mode CLUT-overlay function */
+	//fixme: setup b5 later for 'sync on green' option
+	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
+	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
+	DXIW(MISCCTRL,0x9b);
+	snooze(250);
 
-	//various init (as bios)
-	CFGW(OPTION, ((CFGR(OPTION)&0xf8404164) | (si->ps.option&0x207e00)) );
-	CFGW(OPTION2, (CFGR(OPTION2) | (0xfc00&si->ps.option2)));
-	ACCW(MCTLWTST, si->ps.mem_ctl);
-	CFGW(OPTION4, (si->ps.option4&0x6000000f));
-	ACCW(MEMRDBK, si->ps.mem_rd);
+	/* re-enable pixelclock oscillations */
+	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) & 0xfb));
 
-	ACCW(MACCESS, ((si->ps.maccess&0x80)>>1) );
+	//fixme:
+	DXIW(MAFCDEL,0x02);                 /*makes CRTC2 stable! Matrox specify 8, but use 4 - grrrr!*/
+	DXIW(PANELMODE,0x00);               /*eclipse panellink*/
 
-	CFGW(OPTION4,((si->ps.option4&0x60000004)|0x80000000));
+	/* setup i2c bus */
+	i2c_init();
 
-	delay(250);
+	/* make sure card is in powergraphics mode */
+	VGAW_I(CRTCEXT,3,0x80);      
 
-	if 
-	(
-		((si->ps.option&0x200000) == 0) &&
-		((si->ps.maccess&0x200) == 0)
-	)
+	/* set the system clocks to powergraphics speed */
+	LOG(2,("INIT: Setting system PLL to powergraphics speeds\n"));
+	g450_dac_set_sys_pll();
+
+	/* 'official' RAM initialisation */
+	LOG(2,("INIT: RAM init\n"));
+	/* stop memory refresh, and setup b9, memconfig, b13, sgram planemask function, b21 fields,
+	 * and don't touch the rest */
+	CFGW(OPTION, ((CFGR(OPTION) & 0xf8400164) | (si->ps.option_reg & 0x00207e00)));
+	/* setup b10-b15 unknown field */
+	CFGW(OPTION2, ((CFGR(OPTION2) & 0xffff0200) | (si->ps.option2_reg & 0x0000fc00)));
+
+	/* program memory control waitstates */
+	ACCW(MCTLWTST, si->ps.mctlwtst_reg);
+	/* program option4 b0-3 and b29-30 fields, reset the rest: stop memory clock */
+	CFGW(OPTION4, (si->ps.option4_reg & 0x6000000f));
+	/* set RAM read tap delays and mode register opcode / streamer flow control */
+	ACCW(MEMRDBK, si->ps.memrdbk_reg);
+	/* b7 v5_mem_type = done by Mark Watson. fixme: still confirm! (unknown bits) */
+	ACCW(MACCESS, ((((uint32)si->ps.v5_mem_type) & 0x80) >> 1));
+	/* clear b0-1 and 3, and set b31 in option4: re-enable memory clock */
+	CFGW(OPTION4, ((si->ps.option4_reg & 0x60000004) | 0x80000000));
+	snooze(250);
+
+	/* if DDR RAM */
+	if ((si->ps.v5_mem_type & 0x0060) == 0x0020) 
 	{
-			ACCW(MEMRDBK, ((si->ps.mem_rd)&0xffffefff));
-
-			if ((si->ps.maccess&0x100) == 0)
+		/* if not 'EMRSW RAM-option' available */
+		if (!(si->ps.v5_mem_type & 0x0100))
+		{
+			/* clear unknown bits */
+			ACCW(MACCESS, 0x00000000);
+			/* clear b12: unknown bit */
+			ACCW(MEMRDBK, (si->ps.memrdbk_reg & 0xffffefff));
+		}
+		else
+			/* if not 'DLL RAM-option' available */
+			if (!(si->ps.v5_mem_type & 0x0200))
 			{
-					ACCW(MACCESS, ACCR(MACCESS)&0xffff00ff);
+				/* clear b12: unknown bit */
+				ACCW(MEMRDBK, (si->ps.memrdbk_reg & 0xffffefff));
 			}
 	}
 
-	temp = ACCR(MACCESS);
-	temp &=0xffff80ff;
-	temp = temp|((temp&0x8000)>>1)|0x8000;
-	ACCW(MACCESS, temp);
+	/* create positive flank to generate memory reset */
+	ACCW(MACCESS,ACCR(MACCESS) & 0xffff7fff);
+	ACCW(MACCESS,ACCR(MACCESS) | 0x00008000);
+	snooze(250);
 
-	temp &= 0xffff7fff;
-	ACCW(MACCESS, temp);
+	/* start memory refresh */
+	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
 
-	delay(250);
+	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
+	ACCW(PLNWT,0x00000000);
+	ACCW(PLNWT,0xffffffff);
 
-	if ((si->ps.maccess&0x400) == 0)
+	/* if not 'MEMCASLT RAM-option' available */
+	if (!(si->ps.v5_mem_type & 0x0400))
 	{
-			temp = si->ps.mem_ctl;
-			temp = (temp &0x7) + 3;
-			temp |= si->ps.mem_ctl &0xfffffff8;
-			ACCW(MCTLWTST, temp);
+		/* calculate powergraphics CAS-latency from pins CAS-latency, and update register setting */
+		ACCW(MCTLWTST,
+			((si->ps.mctlwtst_reg & 0xfffffff8) | pwr_cas[(si->ps.mctlwtst_reg & 0x07)]));
+
 	}
 
-	temp = CFGR(OPTION);
-	temp &=0xffe07fff;
-	temp |= si->ps.option&0x1f8000;
-	CFGW(OPTION, temp);
+	/*enable writing to crtc registers*/
+	VGAW_I(CRTC,0x11,0);
+	//fixme..
+	if (si->ps.secondary_head)
+	{
+		//MAVW(LOCK,0x01);
+		CR2W(DATACTL,0x00000000);
+	}
 
+	/* enable primary analog output */
+	gx50_general_output_select();
+
+	/*turn on display one*/
+	gx00_crtc_dpms(1,1,1);
+
+	return B_OK;
+}
+
+status_t gx50_general_output_select()
+{
+	/* make sure this call is warranted */
+	if ((si->ps.card_type != G450) && (si->ps.card_type != G550)) return B_ERROR;
+
+	/* choose primary analog outputconnector */
+	if ((si->ps.primary_dvi) && (si->ps.secondary_head) && (si->ps.secondary_tvout))
+	{
+		if (i2c_sec_tv_adapter() == B_OK)
+		{
+			LOG(4,("INIT: secondary TV-adapter detected, using primary connector\n"));
+			DXIW(OUTPUTCONN,0x01); 
+		}
+		else
+		{
+			LOG(4,("INIT: no secondary TV-adapter detected, using secondary connector\n"));
+			DXIW(OUTPUTCONN,0x04); 
+		}
+	}
+	else
+	{
+		LOG(4,("INIT: using primary connector\n"));
+		DXIW(OUTPUTCONN,0x01); 
+	}
 	return B_OK;
 }
 
@@ -664,27 +763,27 @@ status_t gx00_general_dac_select(int dac)
 	/*MISCCTRL, clock src,...*/
 	switch(dac)
 	{
-		case DS_CRTCDAC_CRTC2MAVEN: /*CRTC->DAC,CRTC2->MAFC*/
+		case DS_CRTC1DAC_CRTC2MAVEN:
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
 			CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002); /*external clk*/
 			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77)); 
 			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x82);
 			break;
-		case DS_CRTCMAVEN_CRTC2DAC:  /*CRTC->MAVEN,CRTC2->DAC*/
+		case DS_CRTC1MAVEN_CRTC2DAC:
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x2); /*external clk*/
 			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20)); /*internal clk*/
 			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)|0x88));
 			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x02);
 			break;
-		case DS_CRTCDAC_CRTC2DAC2:
-			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
-			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20)); /*internal clk - gets DAC*/
-	//FIXME		VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77)); 
-	//FIXME		DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x82);
-			break;
-		case DS_CRTCDAC_CRTCDAC2:
+		case DS_CRTC1CON1_CRTC2CON2:
 			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
 			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x0<<20)); /*internal clk - no DAC PTR*/
+			DXIW(OUTPUTCONN,0x09); 
+			break;
+		case DS_CRTC1CON2_CRTC2CON1:
+			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
+			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20)); /*internal clk - gets DAC*/
+			DXIW(OUTPUTCONN,0x05); 
 			break;
 		default:
 			return B_ERROR;

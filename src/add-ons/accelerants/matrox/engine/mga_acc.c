@@ -1,7 +1,7 @@
 /* MGA Acceleration functions */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002
+   Rudolf Cornelissen 10-12/2002
 */
 
 #define MODULE_BIT 0x00080000
@@ -44,21 +44,20 @@ status_t gx00_acc_init()
 {
 	ACCW(OPMODE,0); // cleanup bitblt
 
-	/*Set the Z origin to the start of FB (otherwise lockup on blits)*/
-	if (si->ps.card_type>=G100)
-		ACCW(ZORG,0);
+	/* Set the Z origin to the start of FB (otherwise lockup on blits) */
+	if (si->ps.card_type>=G100) ACCW(ZORG,0);
 
-	/*MACCESS - for 2D, only pixel width is important > all others can be 0*/
+	/* Set pixel width */
 	switch(si->dm.space)
 	{
 	case B_CMAP8:
-		ACCW(MACCESS,0);
+		ACCW(MACCESS, ((ACCR(MACCESS) & 0xfffffffc) | 0x00));
 		break;
 	case B_RGB15_LITTLE:case B_RGB16_LITTLE:
-		ACCW(MACCESS,1); 
+		ACCW(MACCESS, ((ACCR(MACCESS) & 0xfffffffc) | 0x01)); 
 		break;
 	case B_RGB32_LITTLE:case B_RGBA32_LITTLE:
-		ACCW(MACCESS,2);
+		ACCW(MACCESS, ((ACCR(MACCESS) & 0xfffffffc) | 0x02));
 		break;
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
@@ -81,9 +80,9 @@ if ((si->ps.card_type==MIL2) && (si->dm.space==B_CMAP8)) {
 	// ylin shall be 1 if 800x600 
 	ACCW(PITCH, (1<<15) | (si->dm.virtual_width&0x0FFF));
 }
-	/*PLNWT - plane write mask*/
-//	if (si->ps.card_type>=G200) // apsed: PLNWT exists also in MIL2, G100
-	ACCW(PLNWT,0xFFFFFFFF); /*all planes are written*/
+	/* disable plane write mask (needed for SDRAM): actual change needed to get it sent to RAM */
+	ACCW(PLNWT,0x00000000);
+	ACCW(PLNWT,0xffffffff);
 
 	if (si->ps.card_type>=G200) {
 		/*DSTORG - location of active screen in framebuffer*/
@@ -93,8 +92,7 @@ if ((si->ps.card_type==MIL2) && (si->dm.space==B_CMAP8)) {
 		ACCW(SRCORG,(si->fbc.frame_buffer)-(si->framebuffer));
 	}
 
-	/*YDSTORG - apsed, if not inited, BitBlts may fails on g200, see YTOP/BOT after */
-	/* Used for G100, included in acceleration routines also: */
+	/* init YDSTORG - apsed, if not inited, BitBlts may fails on g200 */
 	src_dst = 0;
 	ACCW(YDSTORG, src_dst);
 
@@ -120,13 +118,15 @@ if ((si->ps.card_type==MIL2) && (si->dm.space==B_CMAP8)) {
 	}
 	ACCW(YDSTORG,src_dst);
 
-	/*clipping*/
-	ACCW(CXBNDRY,((si->dm.virtual_width -1)<<16)|(0)); /*i.e. highest and lowest right pixel value*/
+	/* clipping */
+	/* i.e. highest and lowest X pixel adresses */
+	ACCW(CXBNDRY,((si->dm.virtual_width - 1) << 16) | (0));
 
-	// apsed TODO g200 shall be YDSTORG + value
-	// apsed TODO why -1, must be a multiple of 32 since MIl2
-	ACCW(YTOP,0);
-	ACCW(YBOT,(si->dm.virtual_height*si->dm.virtual_width)-1); /*y address must be linear*/
+	/* Y pixel addresses must be linear */
+	/* lowest adress */
+	ACCW(YTOP, 0 + src_dst);
+	/* highest adress */
+	ACCW(YBOT,((si->dm.virtual_height - 1) * si->dm.virtual_width) + src_dst);
 
 	return B_OK;
 }

@@ -8,10 +8,9 @@
 #accelerant "mga.accelerant"
 
 # mga.accelerant parameters
-usebios    true			# if true rely on bios to coldstart the card instead of by the driver
-					# currently also: if false use BIOS PINS config info, otherwise just guess...
+usebios    false			# if true rely on bios to coldstart the card instead of driver
 #memory     2			# in MB, override builtin memory size detection
-hardcursor true			# if true use on-chip cursor capabilities
+hardcursor false			# if true use on-chip cursor capabilities
 #logmask   0x00000000	# nothing logged, except errors, is default
 #logmask   0x80000000	# log card physical features
 #logmask   0x80000000	# log following mask
