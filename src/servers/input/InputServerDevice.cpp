@@ -60,9 +60,7 @@ BInputServerDevice::~BInputServerDevice()
 status_t
 BInputServerDevice::InitCheck()
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
@@ -73,9 +71,7 @@ BInputServerDevice::InitCheck()
 status_t
 BInputServerDevice::SystemShuttingDown()
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
@@ -87,9 +83,7 @@ status_t
 BInputServerDevice::Start(const char *device,
                           void *cookie)
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
@@ -101,9 +95,7 @@ status_t
 BInputServerDevice::Stop(const char *device,
                          void *cookie)
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
@@ -117,9 +109,7 @@ BInputServerDevice::Control(const char *device,
                             uint32 code,
                             BMessage *message)
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 

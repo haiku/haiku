@@ -59,9 +59,7 @@ BInputServerFilter::~BInputServerFilter()
 status_t
 BInputServerFilter::InitCheck()
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
@@ -73,9 +71,7 @@ filter_result
 BInputServerFilter::Filter(BMessage *message,
                            BList *outList)
 {
-    filter_result dummy;
-
-    return dummy;
+    return B_DISPATCH_MESSAGE;
 }
 
 

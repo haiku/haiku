@@ -61,9 +61,7 @@ BInputServerMethod::~BInputServerMethod()
 status_t
 BInputServerMethod::MethodActivated(bool active)
 {
-    status_t dummy;
-
-    return dummy;
+    return B_OK;
 }
 
 
