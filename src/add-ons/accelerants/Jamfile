@@ -7,5 +7,6 @@ SubInclude OBOS_TOP src add-ons accelerants neomagic ;
 SubInclude OBOS_TOP src add-ons accelerants nvidia ;
 SubInclude OBOS_TOP src add-ons accelerants radeon ;
 SubInclude OBOS_TOP src add-ons accelerants tdfx ;
+SubInclude OBOS_TOP src add-ons accelerants skeleton ;
 
 SubIncludeGPL OBOS_TOP src add-ons accelerants atimach64 ;
