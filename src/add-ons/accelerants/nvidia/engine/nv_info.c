@@ -1037,6 +1037,10 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				float calced_clk;
 				uint8 m, n, p;
 				nv_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
+				/* programming the PLL needs to be done in steps! (confirmed NV28) */
+				data2 = NV_REG32(reg2);
+				NV_REG32(reg2) = ((data2 & 0xffff0000) | (n << 8) | m);
+				data2 = NV_REG32(reg2);
 				NV_REG32(reg2) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
@@ -1553,6 +1557,10 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 				float calced_clk;
 				uint8 m, n, p;
 				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
+				/* programming the PLL needs to be done in steps! (confirmed NV28) */
+				data = NV_REG32(reg);
+				NV_REG32(reg) = ((data & 0xffff0000) | (n << 8) | m);
+				data = NV_REG32(reg);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 //fixme?
 				/* program 2nd set N and M scalers if they exist (b31=1 enables them) */
