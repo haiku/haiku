@@ -7,6 +7,7 @@ SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM
 
 SharedLibrary kernelland_emu :
 	kernelland_emu.cpp
+	strlcpy.c
 	lock.c
 	list.c
 
@@ -14,6 +15,10 @@ SharedLibrary kernelland_emu :
 
 AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;
+
+SEARCH on [ FGristFiles 
+		strlcpy.c
+	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 
 SEARCH on [ FGristFiles 
 		lock.c
