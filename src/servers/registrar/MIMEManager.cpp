@@ -15,6 +15,7 @@
 #include <string>
 
 using namespace std;
+using namespace BPrivate;
 
 #include "MIMEManager.h"
 

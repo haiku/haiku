@@ -74,6 +74,8 @@
 */
 
 
+using namespace BPrivate;
+
 //! The minimal time interval for message runners (50 ms).
 static const bigtime_t kMininalTimeInterval = 50000LL;
 

@@ -9,6 +9,8 @@
 #include "Clipboard.h"
 #include "ClipboardHandler.h"
 
+using namespace BPrivate;
+
 /*!
 	\class ClipboardHandler
 	\brief Handles all clipboard related requests.
