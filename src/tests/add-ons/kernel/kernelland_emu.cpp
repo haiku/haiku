@@ -709,7 +709,7 @@ dprintf(const char *format,...)
 
 // user_memcpy
 extern "C"
-int
+status_t
 user_memcpy(void *to, const void *from, size_t size)
 {
 	char *tmp = (char *)to;
@@ -742,7 +742,7 @@ user_strcpy(char *to, const char *from)
 	\return strlen(\a from).
 */
 extern "C"
-int
+ssize_t 
 user_strlcpy(char *to, const char *from, size_t size)
 {
 	int from_length = 0;
