@@ -19,6 +19,7 @@
 #include <arch/vm_translation_map.h>
 #include <boot/kernel_args.h>
 
+#include <signal.h>
 #include <string.h>
 #include <stdlib.h>
 
