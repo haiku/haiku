@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open block device manager
@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 
-#define TRACE_BLOCK_IO
+//#define TRACE_BLOCK_IO
 #ifdef TRACE_BLOCK_IO
 #	define TRACE(x) dprintf x
 #else
