@@ -45,7 +45,8 @@ struct ext_mime mimes[] = {
 	{ "ogg", "audio/x-vorbis" }, 
 	{ "mpc", "audio/x-mpc" }, 
 	{ "asf", "application/x-asf" }, 
-	{ "riff", "application/x-riff" }, 
+	{ "riff", "application/x-riff" },
+	{ "wma", "audio/x-ms-wma" },
 
 	{ "bmp", "image/x-bmp" },
 	{ "fax", "image/g3fax" },
@@ -96,6 +97,7 @@ struct ext_mime mimes[] = {
 	{ "mpg", "video/mpeg" },
 	{ "mpeg", "video/mpeg" },
 	{ "ogm", "video/x-ogm" },
+	{ "wmv", "video/x-ms-wmv" },
 	{ "rm", "application/vnd.rn-realmedia" },
 	{ "rn", "application/vnd.rn-realmedia" },
 
