@@ -71,6 +71,11 @@ enum {
 	B_REG_MIME_UPDATE_MIME_INFO				= 'rgup',
 	B_REG_MIME_CREATE_APP_META_MIME			= 'rgca',
 	B_REG_MIME_UPDATE_THREAD_FINISHED		= 'rgtf',
+	// message runner requests
+	B_REG_REGISTER_MESSAGE_RUNNER			= 'rgrr',
+	B_REG_UNREGISTER_MESSAGE_RUNNER			= 'rgru',
+	B_REG_SET_MESSAGE_RUNNER_PARAMS			= 'rgrx',
+	B_REG_GET_MESSAGE_RUNNER_INFO			= 'rgri',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
