@@ -40,7 +40,8 @@
 #include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "LayerData.h"
-#include <stdio.h>
+#include "PortLink.h"
+#include "ServerProtocol.h"
 
 //#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
@@ -1159,6 +1160,18 @@ void Layer::MoveBy(float x, float y)
 		return;
 	}
 
+	BPortLink	msg(-1, -1);
+	msg.StartMessage(AS_ROOTLAYER_LAYER_MOVE);
+	msg.Attach<Layer*>(this);
+	msg.Attach<float>(x);
+	msg.Attach<float>(y);
+	GetRootLayer()->EnqueueMessage(msg);
+
+	STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
+}
+
+void Layer::move_layer(float x, float y)
+{
 	fFrameAction	= B_LAYER_ACTION_MOVE;
 
 	BPoint pt(x,y);	
@@ -1171,8 +1184,6 @@ void Layer::MoveBy(float x, float y)
 	EmptyGlobals();
 
 	fFrameAction	= B_LAYER_ACTION_NONE;	
-
-	STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
 }
 
 void Layer::EmptyGlobals()
@@ -1265,6 +1276,18 @@ void Layer::ResizeBy(float x, float y)
 		return;
 	}
 
+	BPortLink	msg(-1, -1);
+	msg.StartMessage(AS_ROOTLAYER_LAYER_RESIZE);
+	msg.Attach<Layer*>(this);
+	msg.Attach<float>(x);
+	msg.Attach<float>(y);
+	GetRootLayer()->EnqueueMessage(msg);
+
+	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
+}
+
+void Layer::resize_layer(float x, float y)
+{
 	fFrameAction	= B_LAYER_ACTION_RESIZE;
 
 	BPoint pt(x,y);	
@@ -1280,8 +1303,6 @@ void Layer::ResizeBy(float x, float y)
 	EmptyGlobals();
 
 	fFrameAction	= B_LAYER_ACTION_NONE;
-
-	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
 //! Prints information about the layer's current state

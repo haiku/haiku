@@ -411,7 +411,7 @@ void WinBorder::MoveBy(float x, float y)
 	if(fDecorator)
 		fDecorator->MoveBy(x,y);
 
-	Layer::MoveBy(x,y);
+	move_layer(x,y);
 }
 
 //! Resizes the winborder with redraw
@@ -423,7 +423,7 @@ void WinBorder::ResizeBy(float x, float y)
 	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
 
-	Layer::ResizeBy(x,y);
+	resize_layer(x,y);
 }
 
 //! Returns true if hidden

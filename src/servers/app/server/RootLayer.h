@@ -42,6 +42,7 @@ class Screen;
 class WinBorder;
 class Desktop;
 class DisplayDriver;
+class BPortLink;
 
 /*!
 	\class RootLayer RootLayer.h
@@ -115,6 +116,7 @@ public:
 	void Unlock() { fAllRegionsLock.Unlock(); }
 	bool IsLocked() { return fAllRegionsLock.IsLocked(); }
 	void RunThread();
+	status_t EnqueueMessage(BPortLink &message);
 	void GoInvalidate(const Layer *layer, const BRegion &region);
 	void GoRedraw(const Layer *layer, const BRegion &region);
 

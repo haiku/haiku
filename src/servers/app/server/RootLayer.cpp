@@ -211,6 +211,26 @@ int32 RootLayer::WorkingThread(void *data)
 				oneRootLayer->redraw_layer(layer, redrawRegion);
 				break;
 			}
+			case AS_ROOTLAYER_LAYER_MOVE:
+			{
+				Layer		*layer = NULL;
+				float		x, y;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.Read<float>(&x);
+				messageQueue.Read<float>(&y);
+				layer->move_layer(x, y);
+				break;
+			}
+			case AS_ROOTLAYER_LAYER_RESIZE:
+			{
+				Layer		*layer = NULL;
+				float		x, y;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.Read<float>(&x);
+				messageQueue.Read<float>(&y);
+				layer->resize_layer(x, y);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), oneRootLayer->code));
 				break;
@@ -242,6 +262,12 @@ void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
 		layer = layer->fParent;
 
 	layer->FullInvalidate(region);
+}
+
+status_t RootLayer::EnqueueMessage(BPortLink &message)
+{
+	message.SetSendPort(fListenPort);
+	message.Flush();
 }
 
 void RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
