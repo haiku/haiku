@@ -145,7 +145,7 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 	_workspacecount=0;
 	_init=false;
 	_active=false;
-	_id=screen_id_handler.GetToken();
+	_id.id=screen_id_handler.GetToken();
 
 	if (_driver)
 	{

@@ -95,7 +95,7 @@ public:
 	Workspace *GetWorkspace(int32 index);
 	Workspace *GetActiveWorkspace(void);
 	//! Returns the unique identifier for the screen
-	int32 GetID(void) { return _id; }
+	screen_id GetID(void) { return _id; }
 protected:
 	int32 _resolution;
 	ServerWindow *_activewin;
@@ -107,7 +107,7 @@ protected:
 	Workspace *_activeworkspace;
 	graphics_card_info _gcinfo;
 	frame_buffer_info _fbinfo;
-	int32 _id;
+	screen_id _id;
 };
 
 #endif

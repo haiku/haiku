@@ -234,18 +234,38 @@ int32 CountWorkspaces(void)
 	set by BeOS. Making the limit higher will cause unreachable workspaces because of the 
 	API interface used to access them. Were this to change, the only limiting factor for 
 	workspace count would be the hardware itself.
+	
 */
 void SetWorkspaceCount(int32 count)
 {
+	if(count<1 || count>32)
+		return;
+	lock_workspaces();
+	Screen *scr;
+	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
+	{
+		scr=(Screen*)desktop_private::screenlist->ItemAt(i);
+		if(!scr)
+			continue;
+		scr->SetWorkspaceCount(count);
+	}
+	unlock_workspaces();
 }
 
 /*!
 	\brief Returns the index of the active workspace
-	\return the index of the active workspace
+	\return the index of the active workspace or -1 if an internal error occurred.
 */
 int32 CurrentWorkspace(void)
 {
-	return 0;
+	lock_workspaces();
+	int32 id=-1;
+
+	if(desktop_private::activescreen)
+		id=desktop_private::activescreen->CurrentWorkspace();
+	unlock_workspaces();
+
+	return id;
 }
 
 /*!
@@ -253,10 +273,12 @@ int32 CurrentWorkspace(void)
 */
 Workspace *WorkspaceAt(int32 index)
 {
+	lock_workspaces();
+	Workspace *w=NULL;
 	if(desktop_private::activescreen)
-		return desktop_private::activescreen->GetWorkspace(index);
-	
-	return NULL;
+		w=desktop_private::activescreen->GetWorkspace(index);
+	unlock_workspaces();
+	return w;
 }
 
 /*!
@@ -268,6 +290,22 @@ Workspace *WorkspaceAt(int32 index)
 */
 void SetWorkspace(int32 workspace)
 {
+	lock_workspaces();
+	if(workspace<0 || workspace>(CountWorkspaces()-1))
+	{
+		unlock_workspaces();
+		return;
+	}
+
+	Screen *scr;
+	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
+	{
+		scr=(Screen*)desktop_private::screenlist->ItemAt(i);
+		if(!scr)
+			continue;
+		scr->SetWorkspace(workspace);
+	}
+	unlock_workspaces();
 }
 
 /*!
@@ -276,6 +314,19 @@ void SetWorkspace(int32 workspace)
 */
 void SetScreen(screen_id id)
 {
+	Screen *scr;
+	for(int32 i=0;i<desktop_private::screenlist->CountItems();i++)
+	{
+		scr=(Screen*)desktop_private::screenlist->ItemAt(i);
+		if(!scr)
+			continue;
+		if(scr->GetID().id==id.id)
+		{
+			desktop_private::activescreen->Activate(false);
+			desktop_private::activescreen=scr;
+			desktop_private::activescreen->Activate(true);
+		}
+	}
 }
 
 /*!
@@ -284,7 +335,7 @@ void SetScreen(screen_id id)
 */
 int32 CountScreens(void)
 {
-	return 0;
+	return desktop_private::screenlist->CountItems();;
 }
 
 /*!
@@ -293,7 +344,7 @@ int32 CountScreens(void)
 */
 screen_id ActiveScreen(void)
 {
-	return B_MAIN_SCREEN_ID;
+	return desktop_private::activescreen->GetID();
 }
 
 /*!
@@ -355,13 +406,13 @@ void AddWindowToDesktop(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE, 
 */
 void RemoveWindowFromDesktop(ServerWindow *win)
 {
-	desktop_private::workspacelock.Lock();
-	desktop_private::layerlock.Lock();
+	lock_workspaces();
+	lock_layers();
 	
 	win->SetWorkspace(NULL);
 	
-	desktop_private::layerlock.Unlock();
-	desktop_private::workspacelock.Unlock();
+	unlock_layers();
+	unlock_workspaces();
 }
 
 /*!
@@ -370,9 +421,9 @@ void RemoveWindowFromDesktop(ServerWindow *win)
 */
 ServerWindow *GetActiveWindow(void)
 {
-	desktop_private::workspacelock.Lock();
+	lock_workspaces();
 	ServerWindow *w=desktop_private::activescreen->ActiveWindow();
-	desktop_private::workspacelock.Unlock();
+	unlock_workspaces();
 
 	return w;
 }
@@ -385,7 +436,7 @@ ServerWindow *GetActiveWindow(void)
 */
 void SetActiveWindow(ServerWindow *win)
 {
-	desktop_private::workspacelock.Lock();
+	lock_workspaces();
 	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
 	if(win->GetWorkspace()!=w)
 	{
@@ -396,8 +447,7 @@ void SetActiveWindow(ServerWindow *win)
 	ServerWindow *oldwin=desktop_private::activescreen->ActiveWindow();
 	ActivateWindow(oldwin,win);
 	
-	
-	desktop_private::workspacelock.Unlock();
+	unlock_workspaces();
 }
 
 /*!
@@ -408,9 +458,11 @@ void SetActiveWindow(ServerWindow *win)
 */
 Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID)
 {
-	desktop_private::workspacelock.Lock();
+	lock_workspaces();
+	lock_layers();
 	Layer *r=desktop_private::activescreen->GetRootLayer();
-	desktop_private::workspacelock.Unlock();
+	unlock_layers();
+	unlock_workspaces();
 
 	return r;
 }
@@ -429,7 +481,7 @@ Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN
 */
 void set_drag_message(int32 size, int8 *flattened)
 {
-	desktop_private::draglock.Lock();
+	lock_dragdata();
 
 	if(desktop_private::dragmessage)
 	{
@@ -439,7 +491,7 @@ void set_drag_message(int32 size, int8 *flattened)
 	desktop_private::dragmessage=flattened;
 	desktop_private::dragmessagesize=size;
 
-	desktop_private::draglock.Unlock();
+	unlock_dragdata();
 }
 
 /*!
@@ -456,27 +508,27 @@ int8 *get_drag_message(int32 *size)
 {
 	int8 *ptr=NULL;
 	
-	desktop_private::draglock.Lock();
+	lock_dragdata();
 
 	if(desktop_private::dragmessage)
 	{
 		ptr=desktop_private::dragmessage;
 		*size=desktop_private::dragmessagesize;
 	}
-	desktop_private::draglock.Unlock();
+	unlock_dragdata();
 	return ptr;
 }
 
 //! Empties current drag data and allows for new data to be assigned
 void empty_drag_message(void)
 {
-	desktop_private::draglock.Lock();
+	lock_dragdata();
 
 	if(desktop_private::dragmessage)
 		delete desktop_private::dragmessage;
 	desktop_private::dragmessage=NULL;
 	desktop_private::dragmessagesize=0;
 
-	desktop_private::draglock.Unlock();
+	unlock_dragdata();
 }
 
