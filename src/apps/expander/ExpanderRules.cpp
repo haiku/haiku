@@ -112,7 +112,7 @@ ExpanderRules::~ExpanderRules()
 {
 	void *item;
 	while ((item = fList.RemoveItem((int32)0)))
-		delete item;
+		delete (ExpanderRule*)item;
 }
 
 
