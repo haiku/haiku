@@ -5,14 +5,16 @@
 #ifndef _KERNEL_DEBUG_H
 #define _KERNEL_DEBUG_H
 
+
 #include <kernel.h>
-#include <stage2.h>
-#include <cdefs.h>
+
+
+struct kernel_args;
 
 extern int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
 
-int  dbg_init(kernel_args *ka);
-int  dbg_init2(kernel_args *ka);
+int  dbg_init(struct kernel_args *ka);
+int  dbg_init2(struct kernel_args *ka);
 char dbg_putch(char c);
 void dbg_puts(const char *s);
 bool dbg_set_serial_debug(bool new_val);
@@ -22,7 +24,6 @@ bool dbg_get_serial_debug(void);
 #define  B_KDEBUG_CONT   2
 #define  B_KDEBUG_QUIT   3
 
-extern void dbg_save_registers(int *);	/* arch provided */
 
 #if DEBUG 
 #	define ASSERT(x) \

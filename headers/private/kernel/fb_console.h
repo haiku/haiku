@@ -2,11 +2,11 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _FB_CONSOLE_DEV_H
-#define _FB_CONSOLE_DEV_H
+#ifndef KERNEL_FB_CONSOLE_H
+#define KERNEL_FB_CONSOLE_H
 
-#include <stage2.h>
+struct kernel_args;
 
-int fb_console_dev_init(kernel_args *ka);
+int fb_console_dev_init(struct kernel_args *ka);
 
-#endif
+#endif	/* KERNEL_FB_CONSOLE_H */

@@ -5,7 +5,6 @@
 #define _STDIO_H
 
 #include <ktypes.h>
-#include <cdefs.h>
 #include <stdarg.h>
 
 #ifdef __cplusplus
@@ -126,6 +125,17 @@ extern FILE __sF[];
 #endif
 
 #define EOF -1
+
+// ToDo: that's only a temporary solution
+#ifdef __GNUC__
+#	define __PRINTFLIKE(__fmt,__varargs) __attribute__((__format__ (__printf__, __fmt, __varargs)))
+#	define __SCANFLIKE(__fmt,__varargs) __attribute__((__format__ (__scanf__, __fmt, __varargs)))
+#	define __PURE __attribute__((__const__))
+#else
+#	define __PRINTFLIKE(__fmt,__varargs)
+#	define __SCANFLIKE(__fmt,__varargs)
+#	define __PURE
+#endif
 
 int printf(char const *format, ...) __PRINTFLIKE(1,2);
 int fprintf(FILE *stream, char const *format, ...) __PRINTFLIKE(2,3);

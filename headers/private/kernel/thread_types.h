@@ -2,11 +2,10 @@
 ** 
 ** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _KERNEL_THREAD_TYPES_H
 #define _KERNEL_THREAD_TYPES_H
 
-#include <stage2.h>
+
 #include <ktypes.h>
 #include <cbuf.h>
 #include <vm.h>

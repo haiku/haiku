@@ -6,12 +6,14 @@
 #define _KERNEL_VM_PAGE_H
 
 #include <kernel.h>
-#include <stage2.h>
 #include <vm.h>
 
-int vm_page_init(kernel_args *ka);
-int vm_page_init2(kernel_args *ka);
-int vm_page_init_postthread(kernel_args *ka);
+struct kernel_args;
+
+
+int vm_page_init(struct kernel_args *ka);
+int vm_page_init2(struct kernel_args *ka);
+int vm_page_init_postthread(struct kernel_args *ka);
 
 int vm_mark_page_inuse(addr page);
 int vm_mark_page_range_inuse(addr start_page, addr len);
@@ -22,5 +24,4 @@ vm_page *vm_page_allocate_page_run(int state, addr len);
 vm_page *vm_page_allocate_specific_page(addr page_num, int state);
 vm_page *vm_lookup_page(addr page_num);
 
-#endif
-
+#endif	/* _KERNEL_VM_PAGE_H */

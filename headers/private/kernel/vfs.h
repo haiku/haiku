@@ -7,7 +7,6 @@
 #define _KERNEL_VFS_H
 
 #include <kernel.h>
-#include <stage2.h>
 #include <sys/stat.h>
 #include <sys/select.h>
 #include <signal.h>
@@ -23,6 +22,7 @@
 #include <vfs_types.h>
 
 
+struct kernel_args;
 struct file_descriptor;
 struct selectsync;
 struct pollfd;
@@ -51,7 +51,7 @@ typedef struct io_context {
 extern "C" {
 #endif 
 
-int vfs_init(kernel_args *ka);
+int vfs_init(struct kernel_args *ka);
 int vfs_bootstrap_all_filesystems(void);
 int vfs_register_filesystem(const char *name, struct fs_ops *calls);
 void *vfs_new_io_context(void *parent_ioctx);

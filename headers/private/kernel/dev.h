@@ -6,7 +6,8 @@
 #define _KERNEL_DEV_H
 
 #include <image.h>
-#include <stage2.h>
+
+struct kernel_args;
 
 int dev_init(kernel_args *ka);
 image_id dev_load_dev_module(const char *name, const char *directory);

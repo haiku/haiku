@@ -5,17 +5,20 @@
 #ifndef _KERNEL_VM_H
 #define _KERNEL_VM_H
 
+
 #include <kernel.h>
-#include <stage2.h>
 #include <defines.h>
 #include <vfs.h>
 #include <vm_types.h>
 #include <arch/vm_translation_map.h>
 
+struct kernel_args;
+
+
 //void vm_dump_areas(vm_address_space *aspace);
 int vm_init(kernel_args *ka);
-int vm_init_postsem(kernel_args *ka);
-int vm_init_postthread(kernel_args *ka);
+int vm_init_postsem(struct kernel_args *ka);
+int vm_init_postthread(struct kernel_args *ka);
 
 aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel);
 int vm_delete_aspace(aspace_id);

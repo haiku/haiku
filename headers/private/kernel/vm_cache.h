@@ -7,9 +7,11 @@
 
 #include <kernel.h>
 #include <vm.h>
-#include <stage2.h>
 
-int vm_cache_init(kernel_args *ka);
+struct kernel_args;
+
+
+int vm_cache_init(struct kernel_args *ka);
 vm_cache *vm_cache_create(vm_store *store);
 vm_cache_ref *vm_cache_ref_create(vm_cache *cache);
 void vm_cache_acquire_ref(vm_cache_ref *cache_ref, bool acquire_store_ref);
@@ -20,5 +22,4 @@ void vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page);
 int vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region);
 int vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region);
 
-#endif
-
+#endif	/* _KERNEL_VM_CACHE_H */

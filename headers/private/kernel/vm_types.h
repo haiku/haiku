@@ -1,8 +1,11 @@
+/*
+** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+** Distributed under the terms of the NewOS License.
+*/
 #ifndef _KERNEL_VM_TYPES_H
 #define _KERNEL_VM_TYPES_H
 
 #include <kernel.h>
-#include <stage2.h>
 #include <defines.h>
 #include <vfs.h>
 #include <arch/vm_translation_map.h>

@@ -5,11 +5,12 @@
 #ifndef _KERNEL_CONSOLE_H
 #define _KERNEL_CONSOLE_H
 
-#include <stage2.h>
-#include <cdefs.h>
+#include <stdio.h>
 
-int con_init(kernel_args *ka);
+struct kernel_args;
+
+int con_init(struct kernel_args *ka);
 void kprintf(const char *fmt, ...) __PRINTFLIKE(1,2);
 void kprintf_xy(int x, int y, const char *fmt, ...) __PRINTFLIKE(3,4);
 
-#endif
+#endif	/* _KERNEL_CONSOLE_H */

@@ -1,44 +1,27 @@
+/*
+** Copyright 2002, Travis Geiselbrecht. All rights reserved.
+** Distributed under the terms of the NewOS License.
+*/
 #ifndef _KERNEL_CPU_H
 #define _KERNEL_CPU_H
 
-/**
- * @file kernel/cpu.h
- * @brief CPU Local per-CPU data structure
- */
 
-#include <stage2.h>
 #include <smp.h>
 #include <timer.h>
 
-/**
- * @defgroup CPU CPU Structures (not architecture specific)
- * @ingroup OpenBeOS_Kernel
- * @{
- */
+struct kernel_args;
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
-/**
- * CPU local data structure
- */
-/**
- * One structure per cpu. 
- * The structure contains data that is local to the CPU,
- * helping reduce the amount of cache thrashing.
- */
+/* CPU local data structure */
+
 typedef union cpu_ent {
-	/** The information structure, followed by alignment bytes to make it ?? bytes */
 	struct {
-		/** Number of this CPU, starting from 0 */
 		int cpu_num;
-		/** If set this will force a reschedule when the quantum timer expires */
+		
+		// thread.c: used to force a reschedule at quantum expiration time
 		int preempted;
-		/** Quantum timer */
 		timer quantum_timer;
 	} info;
-	/** Alignment bytes */
 	uint32 align[16];
 } cpu_ent;
 
@@ -47,33 +30,18 @@ typedef union cpu_ent {
  */
 extern cpu_ent cpu[MAX_BOOT_CPUS];
 
-/**
- * Perform pre-boot initialisation
- * @param ka The kernel_args structure
- */
-int cpu_preboot_init(kernel_args *ka);
-/**
- * Initialise a CPU
- * @param ka The kernel_args structure
- */
-int cpu_init(kernel_args *ka);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-/**
- * Get a pointer to the CPU's local data structure
- */
-/**
- * This is declared as an inline function in this header
- */
+int cpu_preboot_init(struct kernel_args *ka);
+int cpu_init(struct kernel_args *ka);
 cpu_ent *get_cpu_struct(void);
 
-/**
- * Inline declaration of get_cpu_struct(void)
- */
 extern inline cpu_ent *get_cpu_struct(void) { return &cpu[smp_get_current_cpu()]; }
 
 #ifdef __cplusplus
 }
 #endif
-/** @} */
 
-#endif /* _KERNEL_CPU_H */
+#endif	/* _KERNEL_CPU_H */

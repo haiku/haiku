@@ -1,17 +1,16 @@
-/* sem.h
- *
- * Definitions here are for kernel use ONLY!
- *
- * For the actual definitions of the calls for sems please look in
- * OS.h
- */
-
-#ifndef _SEM_H
-#define _SEM_H
+/*
+** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+** Distributed under the terms of the NewOS License.
+*/
+#ifndef KERNEL_SEM_H
+#define KERNEL_SEM_H
 
 #include <OS.h>
 #include <thread.h>
-#include <stage2.h>
+
+
+struct kernel_args;
+
 
 /* user calls */
 sem_id user_create_sem(int32 count, const char *name);
@@ -28,8 +27,8 @@ status_t user_set_sem_owner(sem_id id, team_id team);
 
 /* kernel calls */
 extern sem_id	create_sem_etc(int32 count, const char *name, team_id owner);
-extern status_t	sem_init(kernel_args *ka);
+extern status_t	sem_init(struct kernel_args *ka);
 extern int		sem_delete_owned_sems(team_id owner);
 extern status_t	sem_interrupt_thread(struct thread *t);
 
-#endif	/* _KERNEL_SEM_H */
+#endif	/* KERNEL_SEM_H */

@@ -5,7 +5,9 @@
 #ifndef _PCI_BUS_H
 #define _PCI_BUS_H
 
-#include <stage2.h>
+#include <SupportDefs.h>
+
+struct kernel_args;
 
 struct pci_cfg {
 	uint16 vendor_id;

@@ -2,11 +2,11 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _NEWOS_KERNEL_ARCH_DEVS_H
-#define _NEWOS_KERNEL_ARCH_DEVS_H
+#ifndef KERNEL_ARCH_DEVS_H
+#define KERNEL_ARCH_DEVS_H
 
-#include <stage2.h>
+struct kernel_args;
 
-int devs_init(kernel_args *ka);
+int devs_init(struct kernel_args *ka);
 
-#endif
+#endif	/* KERNEL_ARCH_DEVS_H */

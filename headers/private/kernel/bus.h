@@ -2,14 +2,17 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#ifndef _BUS_H
-#define _BUS_H
+#ifndef KERNEL_BUS_H
+#define KERNEL_BUS_H
 
-#include <stage2.h>
+
 #include <module.h>
 
-int bus_init(kernel_args *ka);
-int bus_man_init(kernel_args *ka);
+
+struct kernel_args;
+
+int bus_init(struct kernel_args *ka);
+int bus_man_init(struct kernel_args *ka);
 
 int bus_register_bus(const char *path);
 
@@ -33,4 +36,4 @@ typedef struct device {
 
 int bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev);
 
-#endif
+#endif	/* KERNEL_BUS_H */

@@ -6,13 +6,14 @@
 #define _KERNEL_MEMHEAP_H
 
 #include <kernel.h>
-#include <stage2.h>
+
+struct kernel_args;
 
 #define HEAP_SIZE	0x00400000
 	// 4 MB heap for the kernel
 
 
 int   heap_init(addr new_heap_base);
-int   heap_init_postsem(kernel_args *ka);
+int   heap_init_postsem(struct kernel_args *ka);
 
 #endif	/* _KERNEL_MEMHEAP_H */
