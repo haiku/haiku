@@ -4,6 +4,7 @@ UsePrivateHeaders graphics ;
 
 Package haiku-agp :
 	README.html ;
+	UPDATE.html ;
 
 Package haiku-agp :
 	agp :
