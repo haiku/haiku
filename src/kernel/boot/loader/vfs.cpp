@@ -72,7 +72,7 @@ Node::Close(void *cookie)
 }
 
 
-#pragma mark -
+//	#pragma mark -
 
 
 ConsoleNode::ConsoleNode()
@@ -95,7 +95,7 @@ ConsoleNode::Write(const void *buffer, size_t bufferSize)
 }
 
 
-#pragma mark -
+//	#pragma mark -
 
 
 Descriptor::Descriptor(Node *node, void *cookie)
@@ -170,7 +170,7 @@ Descriptor::Release()
 }
 
 
-#pragma mark -
+//	#pragma mark -
 
 
 static Descriptor *
