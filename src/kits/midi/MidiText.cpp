@@ -180,7 +180,7 @@ void BMidiText::WaitAndPrint(uint32 time)
 
 	SnoozeUntil(time);
 
-	printf("%u: ", time - startTime);	
+	printf("%lu: ", time - startTime);	
 }
 
 //------------------------------------------------------------------------------

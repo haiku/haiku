@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002-2004 Matthijs Hollemans
  * Copyright (c) 2002 Jerome Leveque
  * Copyright (c) 2002 Paul Stadler
  *
@@ -924,7 +924,7 @@ void BMidiStore::WriteTrack()
 	uint32 oldTime;
 	uint32 newTime;
 
-	for (int32 t = 0; t < CountEvents(); ++t)
+	for (uint32 t = 0; t < CountEvents(); ++t)
 	{
 		BMidiEvent* event = EventAt(t);
 
