@@ -317,7 +317,7 @@ BFont::BFont(void)
 	fFamilyID(0),
 	fStyleID(0),
 	fSize(10.0),
-	fShear(0.0),
+	fShear(90.0),
 	fRotation(0.0),
 	fSpacing(0),
 	fEncoding(0),
