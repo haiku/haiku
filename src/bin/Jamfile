@@ -108,6 +108,7 @@ SubInclude OBOS_TOP src bin diffutils ;
 SubInclude OBOS_TOP src bin findutils ;
 SubInclude OBOS_TOP src bin flex ;
 SubInclude OBOS_TOP src bin gawk ;
+SubInclude OBOS_TOP src bin gdb ;
 SubInclude OBOS_TOP src bin grep ;
 SubInclude OBOS_TOP src bin keymap ;
 SubInclude OBOS_TOP src bin less ;

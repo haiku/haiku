@@ -1,0 +1,56 @@
+SubDir OBOS_TOP src bin gdb readline ;
+
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+local RL_LIBRARY_VERSION = 4.3 ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DRL_LIBRARY_VERSION=\\\"$(RL_LIBRARY_VERSION)\\\" ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;	# for <readline/*.h> includes
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) support ] ;
+
+StaticLibrary <gdb>readline : 
+	bind.c
+	callback.c
+	compat.c
+	complete.c
+	display.c
+	funmap.c
+	histexpand.c
+	histfile.c
+	history.c
+	histsearch.c
+	isearch.c
+	keymaps.c
+	kill.c
+	input.c
+	macro.c
+	mbutil.c
+	misc.c
+	nls.c
+	parens.c
+	readline.c
+	rltty.c
+	search.c
+	shell.c
+	#savestring.c
+	signals.c
+	terminal.c
+	text.c
+	tilde.c
+	undo.c
+	util.c
+	vi_mode.c
+	xmalloc.c
+
+	# in support
+	wcwidth.c
+
+	: [ FCurrentObjectsDir ]
+;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
