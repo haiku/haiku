@@ -239,7 +239,10 @@ status_t register_device(const char *path, void *cookie)
 	edd->max_frame_size = frame_size;
 	edd->reader_thread = -1;
 
-	return g_stack->register_layer(path, "ethernet/frame", 0, &nlmi, edd, NULL);
+	if (strncmp(path, "/dev/net/", 9) == 0)
+		path += 9;	// drop the path root from layer(s) name(s)
+
+	return g_stack->register_layer(path, "interface/ethernet", 0, &nlmi, edd, NULL);
 }
 
 // ----------------------------------------------------

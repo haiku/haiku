@@ -59,7 +59,7 @@ status_t std_ops(int32 op, ...)
 			if (status != B_OK)
 				return status;
 			
-			return g_stack->register_layer("loopback", "loopback/frame", 0, &nlmi, NULL, NULL);
+			return g_stack->register_layer("loopback", "interface/*", 0, &nlmi, NULL, NULL);
 		}
 			
 		case B_MODULE_UNINIT:
