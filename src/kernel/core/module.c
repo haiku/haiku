@@ -86,12 +86,18 @@ typedef struct module {
 
 #define B_BUILT_IN_MODULE	2
 
+typedef struct module_path {
+	const char			*name;
+	uint32				base_length;
+} module_path;
+
 typedef struct module_iterator {
-	const char			**path_stack;
+	module_path			*stack;
 	int32				stack_size;
 	int32				stack_current;
 
 	char				*prefix;
+	size_t				prefix_length;
 	DIR					*current_dir;
 	status_t			status;
 	int32				module_offset;
@@ -100,6 +106,7 @@ typedef struct module_iterator {
 	module_image		*module_image;
 	module_info			**current_header;
 	const char			*current_path;
+	int32				path_base_length;
 	const char			*current_module_path;
 	bool				builtin_modules;
 } module_iterator;
@@ -118,8 +125,8 @@ static recursive_lock gModulesLock;
  * ToDo: these are not yet BeOS compatible (because the current bootfs is very limited)
  */
 static const char * const gModulePaths[] = {
-	"/boot/addons",
-	"/boot/user-addons",
+	"/boot/addons/kernel",
+	"/boot/home/config/add-ons/kernel",
 };
 
 #define NUM_MODULE_PATHS (sizeof(gModulePaths) / sizeof(gModulePaths[0]))
@@ -710,34 +717,34 @@ uninit_module(module *module)
 
 
 static const char *
-iterator_pop_path_from_stack(module_iterator *iterator)
+iterator_pop_path_from_stack(module_iterator *iterator, uint32 *_baseLength)
 {
-	if (iterator->stack_current > 0)
-		return iterator->path_stack[--iterator->stack_current];
+	if (iterator->stack_current <= 0)
+		return NULL;
 
-	return NULL;
+	if (_baseLength)
+		*_baseLength = iterator->stack[iterator->stack_current - 1].base_length;
+
+	return iterator->stack[--iterator->stack_current].name;
 }
 
 
 static status_t
-iterator_push_path_on_stack(module_iterator *iterator, const char *path)
+iterator_push_path_on_stack(module_iterator *iterator, const char *path, uint32 baseLength)
 {
 	if (iterator->stack_current + 1 > iterator->stack_size) {
 		// allocate new space on the stack
-		const char **stack = (const char **)malloc((iterator->stack_size + 8) * sizeof(char *));
+		module_path *stack = (module_path *)realloc(iterator->stack,
+			(iterator->stack_size + 8) * sizeof(module_path));
 		if (stack == NULL)
 			return B_NO_MEMORY;
-		
-		if (iterator->path_stack != NULL) {
-			memcpy(stack, iterator->path_stack, iterator->stack_current * sizeof(char *));
-			free(iterator->path_stack);
-		}
-		
-		iterator->path_stack = stack;
+
+		iterator->stack = stack;
 		iterator->stack_size += 8;
 	}
-	
-	iterator->path_stack[iterator->stack_current++] = path;
+
+	iterator->stack[iterator->stack_current].name = path;
+	iterator->stack[iterator->stack_current++].base_length = baseLength;
 	return B_OK;
 }
 
@@ -750,18 +757,24 @@ iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_buffe
 	TRACE(("iterator_get_next_module() -- start\n"));
 
 	if (iterator->builtin_modules) {
-		if (sBuiltInModules[iterator->module_offset] != NULL) {
-			*_bufferSize = strlcpy(buffer,
-				sBuiltInModules[iterator->module_offset++]->name, *_bufferSize);
+		int32 i;
+
+		for (i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
+			// the module name must fit the prefix
+			if (strncmp(sBuiltInModules[i]->name, iterator->prefix, iterator->prefix_length))
+				continue;
+
+			*_bufferSize = strlcpy(buffer, sBuiltInModules[i]->name, *_bufferSize);
+			iterator->module_offset = i + 1;
 			return B_OK;
-		} else
-			iterator->builtin_modules = false;
+		}
+		iterator->builtin_modules = false;
 	}
 
-nextDirectory:
+nextPath:
 	if (iterator->current_dir == NULL) {
 		// get next directory path from the stack
-		const char *path = iterator_pop_path_from_stack(iterator);
+		const char *path = iterator_pop_path_from_stack(iterator, &iterator->path_base_length);
 		if (path == NULL) {
 			// we are finished, there are no more entries on the stack
 			return B_ENTRY_NOT_FOUND;
@@ -775,16 +788,17 @@ nextDirectory:
 		if (iterator->current_dir == NULL) {
 			// we don't throw an error here, but silently go to
 			// the next directory on the stack
-			goto nextDirectory;
+			goto nextPath;
 		}
 	}
 
 nextModuleImage:
 	if (iterator->current_header == NULL) {
 		// get next entry from the current directory
-		char path[SYS_MAX_PATH_LEN];
+		char path[B_PATH_NAME_LENGTH];
 		struct dirent *dirent;
 		struct stat st;
+		int32 passedOffset, commonLength;
 
 		errno = 0;
 
@@ -795,9 +809,25 @@ nextModuleImage:
 			if (errno < B_OK)
 				return errno;
 
-			goto nextDirectory;
+			goto nextPath;
 		}
 
+		// check if the prefix matches
+		passedOffset = strlen(iterator->current_path) + 1;
+		commonLength = iterator->path_base_length + iterator->prefix_length - passedOffset;
+
+		if (commonLength > 0) {
+			// the prefix still reaches into the new path part
+			int32 length = strlen(dirent->d_name);
+			if (commonLength > length)
+				commonLength = length;
+
+			if (strncmp(dirent->d_name,
+					iterator->prefix + passedOffset - iterator->path_base_length, commonLength))
+				goto nextModuleImage;
+		}
+
+		// we're not interested in traversing these again
 		if (!strcmp(dirent->d_name, ".")
 			|| !strcmp(dirent->d_name, ".."))
 			goto nextModuleImage;
@@ -816,7 +846,8 @@ nextModuleImage:
 			return B_NO_MEMORY;
 
 		if (S_ISDIR(st.st_mode)) {
-			status = iterator_push_path_on_stack(iterator, iterator->current_module_path);
+			status = iterator_push_path_on_stack(iterator, iterator->current_module_path,
+							iterator->path_base_length);
 			if (status < B_OK)
 				return status;
 
@@ -840,25 +871,32 @@ nextModuleImage:
 		iterator->module_offset = 0;
 	}
 
-	if (*iterator->current_header == NULL) {
-		iterator->current_header = NULL;
-		free((void *)iterator->current_module_path);
-		iterator->current_module_path = NULL;
+	// search the current module image until we've got a match
+	while (*iterator->current_header != NULL) {
+		module_info *info = *iterator->current_header;
 
-		put_module_image(iterator->module_image);
-		iterator->module_image = NULL;
+		// ToDo: we might want to create a module here and cache it in the hash table
 
-		goto nextModuleImage;
+		iterator->current_header++;
+		iterator->module_offset++;
+
+		if (strncmp(info->name, iterator->prefix, iterator->prefix_length))
+			continue;
+
+		*_bufferSize = strlcpy(buffer, info->name, *_bufferSize);
+		return B_OK;
 	}
 
-	// ToDo: we might want to create a module here and cache it in the hash table
+	// leave this module and get the next one
 
-	*_bufferSize = strlcpy(buffer, (*iterator->current_header)->name, *_bufferSize);
+	iterator->current_header = NULL;
+	free((void *)iterator->current_module_path);
+	iterator->current_module_path = NULL;
 
-	iterator->current_header++;
-	iterator->module_offset++;
+	put_module_image(iterator->module_image);
+	iterator->module_image = NULL;
 
-	return B_OK;
+	goto nextModuleImage;
 }
 
 
@@ -955,7 +993,6 @@ module_init(kernel_args *args)
 void *
 open_module_list(const char *prefix)
 {
-	char path[SYS_MAX_PATH_LEN];
 	module_iterator *iterator;
 	uint32 i;
 
@@ -973,29 +1010,25 @@ open_module_list(const char *prefix)
 		free(iterator);
 		return NULL;
 	}
+	iterator->prefix_length = strlen(prefix);
 
 	// first, we'll traverse over the built-in modules
 	iterator->builtin_modules = true;
 
 	// put all search paths on the stack
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
-		const char *p;
+		const char *path;
 
 		if (modules_disable_user_addons && i >= USER_MODULE_PATHS)
 			break;
 
-		strcpy(path, gModulePaths[i]);
-		if (prefix && *prefix) {
-			strcat(path, "/");
-			strlcat(path, prefix, sizeof(path));
-		}
-
-		p = strdup(path);
-		if (p == NULL) {
+		path = strdup(gModulePaths[i]);
+		if (path == NULL) {
 			// ToDo: should we abort the whole operation here?
+			//	if we do, don't forget to empty the stack
 			continue;
 		}
-		iterator_push_path_on_stack(iterator, p);
+		iterator_push_path_on_stack(iterator, path, strlen(path) + 1);
 	}
 
 	return (void *)iterator;
@@ -1017,7 +1050,7 @@ close_module_list(void *cookie)
 		return B_BAD_VALUE;
 
 	// free stack
-	while ((path = iterator_pop_path_from_stack(iterator)) != NULL)
+	while ((path = iterator_pop_path_from_stack(iterator, NULL)) != NULL)
 		free((void *)path);
 
 	// close what have been left open
@@ -1027,7 +1060,7 @@ close_module_list(void *cookie)
 	if (iterator->current_dir != NULL)
 		closedir(iterator->current_dir);
 
-	free(iterator->path_stack);
+	free(iterator->stack);
 	free((void *)iterator->current_path);
 	free((void *)iterator->current_module_path);
 
