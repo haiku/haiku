@@ -89,7 +89,7 @@ static property_info prop_list[] =
 		{ B_NAME_SPECIFIER, B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER, 0 },
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack." },
-	0
+	{}
 };
 
 //------------------------------------------------------------------------------
@@ -253,7 +253,7 @@ status_t BMenu::Archive(BMessage *data, bool deep) const
 	if (err != B_OK)
 		return err;
 
-	err = data->AddFloat("_maxwidth", fDynamicName);
+	err = data->AddFloat("_maxwidth", fMaxContentWidth);
 
 	if (err != B_OK)
 		return err;
