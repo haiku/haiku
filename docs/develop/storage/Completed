@@ -3,3 +3,157 @@
 #
 # This file contains completed ToDo items.
 
+Module:      BEntry
+Location:    SetTo(const BDirectory *, const char *, bool)
+Description: Reimplement! Concatenating dir and leaf to an absolute path
+             prevents the user from accessing entries with longer absolute
+             path. R5 handles this without problems.
+Priority:    medium
+Requires:    - OBOS kernel?
+
+
+Module:      BEntry
+Location:    SetTo(const BDirectory *, const char *, bool)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BVolume
+Location:    operator==()
+Description: Implement.
+Priority:    high
+
+
+Module:      StatableTest
+Location:    GetXYZTest()
+Description: Uncomment GetVolume() test, when BVolume::==() is implemented.
+Priority:    low
+Requires:    - implementation of BVolume::operator==()
+
+
+Module:      kernel_interface
+Location:    set_stat(const char*, StatMember)
+Description: Implement WSTAT_CRTIME.
+Priority:    medium
+Comment:     not longer necessary as we use the Haiku kernel syscalls now
+
+
+Module:      BeOS R5::libroot
+Location:    
+Description: Propose a project wide common handling of the
+             B_FILE/PATH_NAME_LENGTH (+ 1?) issue.
+Priority:    low
+Comment:     B_FILE/PATH_NAME_LENGTH already include the terminating null
+
+
+Module:      BSymLink
+Location:    
+Description: Remove the work-around introduced because of the missing FD
+             version of readlink().
+Priority:    medium
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const entry_ref *)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const BEntry *)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const BDirectory*, const char*)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    Lock(), Unlock()
+Description: Implement when kernel support is available.
+Priority:    medium
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const entry_ref *, uint32)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const BEntry *, uint32)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*, uint32).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const BDirectory*, const char*, uint32)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*, uint32).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    SetTo(const entry_ref *)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    SetTo(const BEntry *)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    SetTo(const BDirectory*, const char*)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    GetEntry()
+Description: Check if necessary to reimplement! Implemented using
+             StorageKit::dir_to_self_entry_ref().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BQuery
+Location:    SetTarget()
+Description: Used a bad hack to get port and token of the BMessenger. Fix it.
+Priority:    low
+Requires:    - respective function(s) to be provided by the IK team
+
+
+Module:      kernel_interface
+Location:    remove_attr()
+Description: Verify return behavior of fs_remove_attr().
+Priority:    medium
+Comment:     not longer necessary as we use the Haiku kernel syscalls now
+
+
+Module:      BVolume
+Location:    SetName()
+Description: Should also rename the mount point.
+Priority:    medium

@@ -534,3 +534,9 @@ Location:    GetVersionInfo(), SetVersionInfo()
 Description: Crash when passing a NULL version_info.
              
 
+Module:      BTest
+Location:    SetName()
+Description: Should also rename the mount point.
+Priority:    medium
+
+
