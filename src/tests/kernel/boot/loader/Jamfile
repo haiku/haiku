@@ -13,8 +13,7 @@ ObjectDefines
 	stdio.cpp
 	RootFileSystem.cpp
 	: 
-	malloc=boot_malloc free=boot_free 
-	read_pos=boot_read_pos close=boot_close
+	malloc=boot_malloc free=boot_free read_pos=boot_read_pos close=boot_close
 	;
 
 # This lets the correct stdio.h header be available
@@ -27,7 +26,7 @@ if $(OS) = "LINUX" {
 	SubDirC++Flags -DHAVE_READ_POS=1 ;
 }
 
-SimpleTest BootLoaderTest :
+BuildPlatformTest BootLoaderTest :
 	platform_start.cpp
 	#platform_console.cpp
 	platform_debug.cpp
