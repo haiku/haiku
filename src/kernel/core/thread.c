@@ -1531,7 +1531,7 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 	struct thread *thread = NULL;
 	cpu_status state;
 	int slot;
-	thread_id threadIDEnd;
+	thread_id lastThreadID;
 
 	if (info == NULL || size != sizeof(thread_info) || team < B_OK)
 		return B_BAD_VALUE;
@@ -1546,11 +1546,11 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	threadIDEnd = peek_next_thread_id();
-	if (slot >= threadIDEnd)
+	lastThreadID = peek_next_thread_id();
+	if (slot >= lastThreadID)
 		goto err;
 
-	while (slot < threadIDEnd
+	while (slot < lastThreadID
 		&& (!(thread = thread_get_thread_struct_locked(slot)) || thread->team->id != team))
 		slot++;
 
