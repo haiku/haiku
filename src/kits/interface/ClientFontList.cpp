@@ -32,7 +32,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <String.h>
-#include "PortLink.h"
+
+#include <PortLink.h>
+#include <PortMessage.h>
 #include <ServerProtocol.h>
 #include <ServerConfig.h>
 
@@ -110,17 +112,14 @@ printf("ClientFontList::Update(%s) - %s\n", (check_only)?"true":"false",SERVER_F
 
 	if(serverport!=B_NAME_NOT_FOUND)
 	{
-		status_t stat;
-		int32 code;
-		ssize_t buffersize;
-	
+		PortMessage pmsg;
 		serverlink->SetOpCode(AS_QUERY_FONTS_CHANGED);
-		serverlink->FlushWithReply(&code, &stat, &buffersize);
+		serverlink->FlushWithReply(&pmsg);
 	
 		// Attached Data: none
 		// Reply: SERVER_TRUE if fonts have changed, SERVER_FALSE if not
 		
-		needs_update=(code==SERVER_TRUE)?true:false;
+		needs_update=(pmsg.Code()==SERVER_TRUE)?true:false;
 	}
 #ifdef DEBUG_CLIENT_FONT_LIST
 	else

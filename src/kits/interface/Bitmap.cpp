@@ -40,6 +40,7 @@
 #include <Application.h>
 #include <ServerProtocol.h>
 #include <PortLink.h>
+#include <PortMessage.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -2157,7 +2158,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 {
 	status_t error = B_OK;
 
-	PortLink::ReplyData replydata;
+	PortMessage pmsg;
 	PortLink *link=new PortLink(be_app->fServerTo);
 
 	// clean up
@@ -2176,8 +2177,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 //		status_t freestat;
 		link->SetOpCode(AS_DELETE_BITMAP);
 		link->Attach<int32>(fServerToken);
-		error=link->FlushWithReply(&replydata);
-		if(replydata.code==SERVER_FALSE)
+		error=link->FlushWithReply(&pmsg);
+		if(pmsg.Code()==SERVER_FALSE)
 			error=B_NO_MEMORY;
 		fBasePtr=NULL;
 		fArea=-1;
@@ -2223,26 +2224,28 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// Reply Code: SERVER_FALSE
 		// Reply Data:
 		//		None
-		error=link->FlushWithReply(&replydata);
+		error=link->FlushWithReply(&pmsg);
 		
 		// We shouldn't ever have to execute this block, but just in case...
 		if(error!=B_OK)
 			fBasePtr=NULL;
 
-		if(replydata.code==SERVER_TRUE)
+		if(pmsg.Code()==SERVER_TRUE)
 		{
-			int8 *bufferindex=replydata.buffer;
-			
 			// Get token
-			fServerToken=*((int32*)bufferindex); bufferindex+=sizeof(int32);
+			area_id bmparea;
+			int32 areaoffset;
+			
+			pmsg.Read<int32>(&fServerToken);
+			pmsg.Read<area_id>(&bmparea);
+			pmsg.Read<int32>(&areaoffset);
 			
 			// Get the area in which the data resides
 			fArea=clone_area("shared bitmap area",(void**)&fBasePtr,B_ANY_ADDRESS,
-				B_READ_AREA | B_WRITE_AREA,*((area_id*)bufferindex));
-			bufferindex+=sizeof(area_id);
+				B_READ_AREA | B_WRITE_AREA,bmparea);
 			
 			// Jump to the location in the area
-			fBasePtr=(int8*)fBasePtr + *((int32*)bufferindex);
+			fBasePtr=(int8*)fBasePtr + areaoffset;
 
 			fSize = size;
 			fColorSpace = colorSpace;
