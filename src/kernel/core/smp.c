@@ -602,3 +602,16 @@ smp_disable_ici()
 	ici_enabled = false;
 	return B_NO_ERROR;
 }
+
+
+//	#pragma mark -
+//	public exported functions
+
+
+void
+call_all_cpus(void (*f)(void *, int), void *cookie)
+{
+	// ToDo: this is a dummy, but at least it works for single CPU machines
+	f(cookie, smp_get_current_cpu());
+}
+
