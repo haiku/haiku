@@ -237,7 +237,7 @@ done:
 	jmp		done
 
 
-FUNCTION(dbg_save_registers):
+FUNCTION(arch_dbg_save_registers):
 	pushl	%esi
 	pushl	%eax
 	movl	12(%esp), %esi
