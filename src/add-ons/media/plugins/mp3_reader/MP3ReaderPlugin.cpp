@@ -150,7 +150,10 @@ mp3Reader::Sniff(int32 *streamCount)
 	}
 
 	fFileSize = Source()->Seek(0, SEEK_END);
-
+	if (fFileSize < 0) {
+		TRACE("mp3Reader::Sniff: non seekable sources not supported\n");
+		return B_ERROR;
+	}
 	TRACE("mp3Reader::Sniff: file size is %Ld bytes\n", fFileSize);
 	
 	if (!IsMp3File()) {
