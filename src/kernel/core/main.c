@@ -172,10 +172,16 @@ main2(void *unused)
 	TRACE(("Init modules\n"));
 	module_init(&ka);
 
-	vm_free_kernel_args(&ka);
+	// ToDo: the preloaded image debug data is placed in the kernel args, and
+	//	thus, if they are enabled, the kernel args shouldn't be freed, so
+	//	that we don't have to copy them.
+	//	What is yet missing is a mechanism that controls this (via driver settings).
+	if (0) {
 		// module_init() is supposed to be the last user of the kernel args
 		// Note: don't confuse the kernel_args structure (which is never freed)
 		// with the kernel args ranges it contains (and which are freed here).
+		vm_free_kernel_args(&ka);
+	}
 
 	/* bootstrap all the filesystems */
 	TRACE(("Bootstrap file systems\n"));
