@@ -82,7 +82,7 @@ class FolderFilter : public BMailFilter
 
 FolderFilter::FolderFilter(BMessage* msg,BMailChainRunner *therunner)
 	: BMailFilter(msg),
-	runner(therunner), chain_id(msg->FindInt32("chain")), size_limit(-1)
+	chain_id(msg->FindInt32("chain")), runner(therunner), size_limit(-1)
 {
 	fNumberOfFilesSaved = 0;
 	dest_string = runner->Chain()->MetaData()->FindString("path");

@@ -53,7 +53,7 @@ class NotifyFilter : public BMailFilter
 
 
 NotifyFilter::NotifyFilter(BMessage* msg,BMailChainRunner *runner)
-	: BMailFilter(msg), _runner(runner), callback(NULL)
+	: BMailFilter(msg), callback(NULL), _runner(runner)
 {
 	strategy = msg->FindInt32("notification_method");
 }
@@ -77,9 +77,10 @@ status_t NotifyFilter::ProcessMailMessage(BPositionIO**, BEntry*, BMessage*heade
 }
 
 NotifyCallback::NotifyCallback (int32 notification_method, BMailChainRunner *us,NotifyFilter *ref2) : 
-	strategy(notification_method),
+	num_messages(0),
 	chainrunner(us),
-	num_messages(0), parent(ref2)
+	strategy(notification_method),
+	parent(ref2)
 {
 }
 
