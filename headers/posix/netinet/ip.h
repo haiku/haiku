@@ -14,10 +14,10 @@
 #define IPVERSION 4
 
 struct ip {
-#if B_HOST_IS_BENDIAN
+#if 	BYTE_ORDER == BIG_ENDIAN
 	uint8	ip_v:4;
 	uint8	ip_hl:4;
-#else
+#elif	BYTE_ORDER == LITTLE_ENDIAN
 	uint8	ip_hl:4;
 	uint8	ip_v:4;
 #endif
@@ -73,10 +73,10 @@ struct  ip_timestamp {
 	uint8 ipt_code;/* IPOPT_TS */
 	uint8 ipt_len;/* size of structure (variable) */
 	uint8 ipt_ptr;/* index of current entry */
-#if B_HOST_IS_BENDIAN
+#if 	BYTE_ORDER == BIG_ENDIAN
 	uint8 ipt_oflw:4,
 	      ipt_flg:4;
-#else
+#elif	BYTE_ORDER == LITTLE_ENDIAN
 	uint8 ipt_flg:4,
 	      ipt_oflw:4;
 #endif
