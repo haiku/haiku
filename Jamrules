@@ -194,6 +194,7 @@ rule StdBinCommands
 {
 	# StdBinCommands <sources> : <libs> ;
 	local libs = $(2) ;
+	local source ;
 	for source in $(1)
 	{
 		local target = $(source:S=) ;
@@ -264,30 +265,17 @@ rule TestLib
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local headerDirs = $(5) ;
+	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
+	# Our Main replacement.
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : $(headerDirs) ;
 
-#	SetupIncludes ;
-	SetupObjectsDir ;
-	MakeLocateObjects $(sources) ;
-	Main $(target) : $(sources) ;
 	MakeLocate $(target) : $(dest) ;
 	Depends $(target) : libcppunit.so ;
 	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
-	UseCppUnitObjectHeaders $(sources) ;
-	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
-	ObjectDefines $(sources) : TEST_OBOS ;
 	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
-
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(sources) : "-g" ;
-	ObjectC++Flags $(sources) : "-g" ;
-
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
 }
 
 rule R5TestLib
@@ -306,37 +294,15 @@ rule R5TestLib
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
 
-	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
-
-	SetupObjectsDir ;
-	MakeLocateObjects $(objects) ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
-	local source ;
-	for source in [ FGristFiles $(sources) ]
-	{
-		local object = [ R5ObjectNames $(source) ] ;
-		Object $(object) : $(source) ;
-		LocalDepends obj : $(object) ;
-	}
+	TestObjects $(sources) : : true ;
 
 	MakeLocate $(target) : $(dest) ;
 	Depends $(target) : libcppunit.so ;
 	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
-	UseCppUnitObjectHeaders $(objects) ;
-	ObjectDefines $(objects) : TEST_R5 ;
 	LINKFLAGS on $(target) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(target)\" ;
-
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(objects) : "-g" ;
-	ObjectC++Flags $(objects) : "-g" ;
-
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
 }
 
 rule CommonUnitTest
@@ -374,29 +340,16 @@ rule UnitTest
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local headerDirs = $(5) ;
+	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
+	# Our Main replacement.
+	MainFromObjects $(target) : $(objects) ;
+	TestObjects $(sources) : $(headerDirs) ;
 
-#	SetupIncludes ;
-	SetupObjectsDir ;
-	MakeLocateObjects $(sources) ;
-	Main $(target) : $(sources) ;
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
 	Depends $(target) : libcppunit.so ;
 	Depends obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
-	UseCppUnitObjectHeaders $(sources) ;
-	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
-	ObjectDefines $(sources) : TEST_OBOS ;
-
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(sources) : "-g" ;
-	ObjectC++Flags $(sources) : "-g" ;
-
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
 }
 
 rule R5UnitTest
@@ -415,36 +368,14 @@ rule R5UnitTest
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
 
-	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
-
-	SetupObjectsDir ;
-	MakeLocateObjects $(objects) ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
-	local source ;
-	for source in [ FGristFiles $(sources) ]
-	{
-		local object = [ R5ObjectNames $(source) ] ;
-		Object $(object) : $(source) ;
-		LocalDepends obj : $(object) ;
-	}
+	TestObjects $(sources) : : true ;
 
 	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
 	Depends $(target) : libcppunit.so ;
 	Depends r5tests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
-	UseCppUnitObjectHeaders $(objects) ;
-	ObjectDefines $(objects) : TEST_R5 ;
-
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(objects) : "-g" ;
-	ObjectC++Flags $(objects) : "-g" ;
-
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
 }
 
 rule R5ObjectNames
@@ -454,6 +385,70 @@ rule R5ObjectNames
 	# Moreover each object names gets "_r5" inserted before the object suffix.
 	local objects = $(1:S=)_r5 ;
 	return [ FGristFiles $(objects:S=$(SUFOBJ)) ] ;
+}
+
+rule R5Objects
+{
+	# R5Objects <sources>
+	# Similar to Objects, but appends "_r5" to the object file names.
+	# <sources> The source files.
+
+	local sources = $(1) ;
+	local source ;
+	for source in [ FGristFiles $(sources) ]
+	{
+		local object = [ R5ObjectNames $(source) ] ;
+		Object $(object) : $(source) ;
+		LocalDepends obj : $(object) ;
+	}
+}
+
+rule TestObjects
+{
+	# TestLib <sources> : <public headers> : <r5>
+	# Compiles objects for tests.
+	# <sources> The list of sources.
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+	# <r5> If set, "_r5" is appended to the object file names and
+	# <public headers> is ignored. Furthermore the pre-processor macro
+	# TEST_R5 is defined, TEST_OBOS otherwise.
+
+	local sources = $(1) ;
+	local headerDirs = $(2) ;
+	local r5 = $(3) ;
+	local objects ;
+
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
+
+	SetupObjectsDir ;
+
+	# compile
+	if $(r5) {
+		objects = [ R5ObjectNames $(sources) ] ;
+		R5Objects $(sources) ;
+	} else {
+		objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
+		Objects $(sources) ;
+	}
+
+	# set headers/defines
+	UseCppUnitObjectHeaders $(objects) ;
+	if $(r5) {
+		ObjectDefines $(objects) : TEST_R5 ;
+	} else {
+		UsePublicObjectHeaders $(objects) : $(headerDirs) ;
+		ObjectDefines $(objects) : TEST_OBOS ;
+	}
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(objects) : "-g" ;
+	ObjectC++Flags $(objects) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
 }
 
 rule R5SharedLibraryNames
