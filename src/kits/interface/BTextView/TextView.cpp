@@ -2912,30 +2912,39 @@ BTextView::HandlePageKey(uint32 inPageKey)
 	
 	int32 modifiers = 0;
 	BMessage *currentMessage = Window()->CurrentMessage();
-	currentMessage->FindInt32("modifiers", &modifiers);
+	if (currentMessage)
+		currentMessage->FindInt32("modifiers", &modifiers);
 
 	bool shiftDown = modifiers & B_SHIFT_KEY;
 
-	int32 oldOffset;;
 	int32 newOffset;
 	
+	STELinePtr line = NULL; 
+
 	switch (inPageKey) {
 		case B_HOME:
-			oldOffset = fSelStart;
-			newOffset = 0;
+			line = (*fLines)[CurrentLine()];
+			newOffset = line->offset;
 			ScrollToOffset(newOffset);
 			if (shiftDown)
-				Select(newOffset, oldOffset);
+				Select(newOffset, fSelStart);
 			else
 				Select(newOffset, newOffset);
 			break;
 
 		case B_END:
-			oldOffset = fSelEnd;
-			newOffset = fText->Length();
+			// If we are on the last line, just go to the last
+			// charachter in the buffer, otherwise get the starting
+			// offset of the next line, and go to the previous charachter
+			if (CurrentLine() + 1 < fLines->NumLines()) {
+				line = (*fLines)[CurrentLine() + 1];
+				newOffset = PreviousInitialByte(line->offset);
+			} else
+				newOffset = fText->Length();
+
 			ScrollToOffset(newOffset);
 			if (shiftDown)
-				Select(oldOffset, newOffset);
+				Select(fSelEnd, newOffset);
 			else
 				Select(newOffset, newOffset);
 			break;
