@@ -67,12 +67,14 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 			interface.GetInterfaceInfo(&info);
 			printf("\n");
 			
-			// type and name (if it has one)
+			// type and unit (if it has one)
 			if(info.info.if_unit >= 0) {
 				printf("Type: Visible\n");
 				printf("\tInterface: ppp%ld\n", info.info.if_unit);
 			} else
 				printf("Type: Hidden\n");
+			
+			printf("\tName: %s\n", info.info.name);
 			
 			// ID
 			printf("\tID: %ld\n", interface.ID());
@@ -233,8 +235,6 @@ static
 status_t
 show_details(const char *name)
 {
-	// Name may either be an interface name (ppp0, etc.) or an interface ID.
-	
 	if(!name || strlen(name) == 0)
 		return -1;
 	
@@ -259,6 +259,8 @@ show_details(const char *name)
 		printf("Interface: ppp%ld\n", info.info.if_unit);
 	} else
 		printf("Type: Hidden\n");
+	
+	printf("Name: %s\n", info.info.name);
 	
 	// ID
 	printf("ID: %ld\n", interface.ID());
