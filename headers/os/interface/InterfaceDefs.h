@@ -386,11 +386,3 @@ const float B_DISABLED_MARK_TINT		= B_LIGHTEN_2_TINT;
 /*-------------------------------------------------------------*/
 
 #endif	// _INTERFACE_DEFS_H
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
