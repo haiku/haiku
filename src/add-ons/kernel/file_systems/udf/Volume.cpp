@@ -9,7 +9,7 @@
 #include "Volume.h"
 
 #include "Block.h"
-#include "Debug.h"
+#include "DiskStructures.h"
 
 using namespace UDF;
 
@@ -23,6 +23,9 @@ Volume::Volume(nspace_id id)
 	: fID(id)
 	, fDevice(0)
 	, fReadOnly(false)
+	, fStartAddress(0)
+	, fBlockSize(0)
+	, fInitStatus(B_UNINITIALIZED)
 {
 }
 
@@ -35,12 +38,20 @@ Volume::Identify(int device, off_t base)
 /*! \brief Attempts to mount the given device.
 */
 status_t
-Volume::Mount(const char *deviceName, uint32 flags)
+Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
+              uint32 flags, uint32 blockSize)
 {
+	DEBUG_INIT();
 	if (!deviceName)
 		RETURN_ERROR(B_BAD_VALUE);
+	if (_InitStatus() == B_INITIALIZED)
+		RETURN_ERROR(B_BUSY);
+			// Already mounted, thank you for asking
 		
 	fReadOnly = flags & B_READ_ONLY;
+	fStartAddress = volumeStart;
+	fLength = volumeLength;	
+	fBlockSize = blockSize;
 	
 	// Open the device, trying read only if readwrite fails
 	fDevice = open(deviceName, fReadOnly ? O_RDONLY : O_RDWR);
@@ -54,15 +65,132 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	// If the device is actually a normal file, try to disable the cache
 	// for the file in the parent filesystem
 	struct stat stat;
-	status_t err = fstat(fDevice, &stat) < 0 ? B_OK : B_ERROR;
+	status_t err = fstat(fDevice, &stat) < 0 ? B_ERROR : B_OK;
 	if (!err) {
 		if (stat.st_mode & S_IFREG && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
-			// Probably should die some sort of painful death here.
+			// Apparently it's a bad thing if you can't disable the file
+			// cache for a non-device disk image you're trying to mount...
+			DIE(("Unable to disable cache of underlying file system. "
+			     "I hear that's bad. :-(\n"));
 		}
+		// So far so good. The device is ready to be accessed now.
+		fInitStatus = B_DEVICE_INITIALIZED;
 	}
 	
 	// Now identify the volume
+	if (!err)
+		err = _Identify();
 
-	return B_ERROR;
+	RETURN(B_ERROR);
+}
+
+/*!	\brief Walks through the volume recognition and descriptor sequences,
+	gathering volume description info as it goes.
+
+	Note that the 512 avdp location is, technically speaking, only valid on
+	unlosed CD-R media in the absense of an avdp at 256. For now I'm not
+	bothering with such silly details, and instead am just checking for it
+	last.
+*/
+status_t
+Volume::_Identify()
+{
+	DEBUG_INIT();
+	
+	status_t err = _InitStatus() == B_DEVICE_INITIALIZED ? B_OK : B_BAD_VALUE;
+
+	// Check for a valid volume recognition sequence
+	if (!err)
+		err = _WalkVolumeRecognitionSequence();	
+	
+	// Now hunt down a volume descriptor sequence from one of
+	// the anchor volume pointers (if there are any).
+	if (!err) {
+		const uint8 avds_location_count = 4;
+		const off_t avds_locations[avds_location_count] = { 256,
+		                                                    Length()-256,
+		                                                    Length(),
+		                                                    512,
+		                                                  };
+	
+		// Found an avds, so try the main sequence first, then
+		// the reserve sequence if the main one fails.
+		
+		// Both failed, so try another avds
+		
+	}		
+	
+	RETURN(err);
+}
+
+status_t
+Volume::_WalkVolumeRecognitionSequence()
+{
+	DEBUG_INIT();
+	// vrs starts at block 16. Each volume structure descriptor (vsd)
+	// should be one block long. We're expecting to find 0 or more iso9660
+	// vsd's followed by some ECMA-167 vsd's.
+	Block<volume_structure_descriptor_header> descriptor(BlockSize());
+	status_t err = descriptor.InitCheck();
+	if (!err) {
+		bool foundISO = false;
+		bool foundExtended = false;
+		bool foundECMA167 = false;
+		bool foundECMA168 = false;
+		bool foundBoot = false;
+		for (uint32 block = 16; true; block++) {
+	    	PRINT(("block %ld: ", block))
+			off_t address = RelativeAddressForBlock(block);
+			ssize_t bytesRead = read_pos(fDevice, address, descriptor.Data(), BlockSize());
+			if (bytesRead == (ssize_t)BlockSize())
+		    {
+				if (descriptor.Data()->id_matches(kVSDID_ISO)) {
+					SIMPLE_PRINT(("found ISO9660 descriptor\n"));
+					foundISO = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_BEA)) {
+					SIMPLE_PRINT(("found BEA descriptor\n"));
+					foundExtended = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_TEA)) {
+					SIMPLE_PRINT(("found TEA descriptor\n"));
+					foundExtended = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_ECMA167_2)) {
+					SIMPLE_PRINT(("found ECMA-167 rev 2 descriptor\n"));
+					foundECMA167 = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_ECMA167_3)) {
+					SIMPLE_PRINT(("found ECMA-167 rev 3 descriptor\n"));
+					foundECMA167 = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_BOOT)) {
+					SIMPLE_PRINT(("found boot descriptor\n"));
+					foundBoot = true;
+				} else if (descriptor.Data()->id_matches(kVSDID_ECMA168)) {
+					SIMPLE_PRINT(("found ECMA-168 descriptor\n"));
+					foundECMA168 = true;
+				} else {
+					SIMPLE_PRINT(("found invalid descriptor, id = `%.5s'\n", descriptor.Data()->id));
+					break;
+				}
+			} else {
+				SIMPLE_PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", address,
+				        BlockSize(), bytesRead));
+				break;
+			}
+		}
+		
+		// If we find an ECMA-167 descriptor, OR if we find a beginning
+		// or terminating extended area descriptor with NO ECMA-168
+		// descriptors, we return B_OK to signal that we should go
+		// looking for valid anchors.
+		err = foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
+	}
+	
+	RETURN(err);
+}
+
+status_t
+Volume::_WalkVolumeDescriptorSequence(off_t start)
+{
+	DEBUG_INIT();
+	
+	RETURN(B_ERROR);
 }
 

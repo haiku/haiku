@@ -22,32 +22,60 @@ extern "C" {
 }
 
 #include "cpp.h"
+#include "UdfDebug.h"
 
 namespace UDF {
 
 class Volume {
 public:
+	static status_t Identify(int device, off_t base = 0);
+
 	Volume(nspace_id id);
-	
-	static status_t Identify(int device) { return Identify(device, 0); }
-	static status_t Identify(int device, off_t base);
-	
-	status_t Mount(const char *deviceName, uint32 flags);
+		
+	status_t Mount(const char *deviceName, off_t volumeStart, off_t volumeLength, uint32 flags, 
+	               uint32 blockSize = 2048);
 	status_t Unmount();
 	
-	nspace_id GetID() { return fID; }
-
 	const char *Name() const;
 	int Device() const { return fDevice; }
+	nspace_id ID() const { return fID; }
+	
+	off_t StartAddress() const { return fStartAddress; }
+	off_t Length() const { return fLength; }
+	
+	uint32 BlockSize() const { return fBlockSize; }
+	off_t RelativeAddressForBlock(off_t block) { return StartAddress() + block * BlockSize(); }
+	off_t RelativeAddress(off_t address) { return StartAddress() + address; }
+	
 	
 	bool IsReadOnly() const { return fReadOnly; }
 	
-	vnode_id ToVnodeID(off_t block) const { return (vnode_id)block; }
+	vnode_id ToVnodeID(off_t block) const { return (vnode_id)block; }	
+private:
+	status_t _InitStatus() const { return fInitStatus; }
+	// Private _InitStatus() status_t values
+	enum {
+		B_UNINITIALIZED = B_ERRORS_END+1,	//!< Completely uninitialized
+		B_DEVICE_INITIALIZED,				//!< Initialized enough to access underlying device safely
+		
+		B_INITIALIZED = B_OK,
+	};
 	
+	// Called by Mount(), either directly or indirectly
+	status_t _Identify();
+	status_t _WalkVolumeRecognitionSequence();
+	status_t _WalkVolumeDescriptorSequence(off_t start);
+		
 private:
 	nspace_id fID;
 	int fDevice;
-	bool fReadOnly;	
+	bool fReadOnly;
+
+	off_t fStartAddress;	//!< Start address of volume on given device
+	off_t fLength;			//!< Length of volume (in blocks)
+	uint32 fBlockSize;
+
+	status_t fInitStatus;
 };
 
 };	// namespace UDF
