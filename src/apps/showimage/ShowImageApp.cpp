@@ -150,6 +150,13 @@ ShowImageApp::MessageReceived(BMessage *pmsg)
 void
 ShowImageApp::RefsReceived(BMessage *pmsg)
 {
+	//
+	// If a tracker window opened me, get a messenger from it.
+	//
+	if (pmsg->HasMessenger("TrackerViewToken")) {
+		pmsg->FindMessenger("TrackerViewToken", &fTrackerMessenger);
+	}
+
 	uint32 type;
 	int32 count;
 	status_t ret = pmsg->GetInfo("refs", &type, &count);
@@ -166,7 +173,7 @@ ShowImageApp::RefsReceived(BMessage *pmsg)
 void
 ShowImageApp::Open(const entry_ref *pref)
 {
-	new ShowImageWindow(pref);
+	new ShowImageWindow(pref, fTrackerMessenger);
 }
 
 void

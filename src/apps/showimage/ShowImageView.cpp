@@ -252,6 +252,12 @@ ShowImageView::IsImage(const entry_ref *pref)
 	return true;
 }
 
+void
+ShowImageView::SetTrackerMessenger(const BMessenger& trackerMessenger)
+{
+	fTrackerMessenger = trackerMessenger;
+}
+
 // send message to parent about new image
 void 
 ShowImageView::Notify(const char* status)
@@ -1879,62 +1885,61 @@ ShowImageView::FreeEntries(BList* entries)
 	entries->MakeEmpty();
 }
 
-bool
-ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
+
+void 
+ShowImageView::SetTrackerSelectionToCurrent()
 {
-	ASSERT(next || !rewind);
-	BEntry curImage(in_current);
-	entry_ref entry, *ref;
-	BDirectory parent;
-	BList entries;
-	bool found = false;
-	int32 cur;
-	
-	if (curImage.GetParent(&parent) != B_OK)
+	BMessage setsel(B_SET_PROPERTY);
+	setsel.AddSpecifier("Selection");
+	setsel.AddRef("data", &fCurrentRef);
+	fTrackerMessenger.SendMessage(&setsel);
+}
+
+bool
+ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
+{
+	// shamelessly stolen, I mean copied from BeMail!
+	// XXX rewind is not implemented yet => slide show will stop with last image
+
+	if (!fTrackerMessenger.IsValid())
 		return false;
 
-	while (parent.GetNextRef(&entry) == B_OK) {
-		if (entry != *in_current) {
-			entries.AddItem(new entry_ref(entry));
-		} else {
-			// insert current ref, so we can find it easily after sorting
-			entries.AddItem(in_current);
-		}
-	}
-	
-	entries.SortItems(CompareEntries);
-	
-	cur = entries.IndexOf(in_current);
-	ASSERT(cur >= 0);
+	//
+	//	Ask the Tracker what the next/prev file in the window is.
+	//	Continue asking for the next reference until a valid
+	//	image is found.
+	//
+	entry_ref nextRef = *in_current;
+	bool foundRef = false;
+	while (!foundRef)
+	{
+		BMessage request(B_GET_PROPERTY);
+		BMessage spc;
+		if (next)
+			spc.what = 'snxt';
+		else
+			spc.what = 'sprv';
 
-	// remove it so FreeEntries() does not delete it
-	entries.RemoveItem(in_current);
-	
-	if (next) {
-		// find the next image in the list
-		if (rewind) cur = 0; // start with first
-		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
-			if (IsImage(ref)) {
-				found = true;
-				*out_image = (const entry_ref)*ref;
-				break;
-			}
+		spc.AddString("property", "Entry");
+		spc.AddRef("data", &nextRef);
+
+		request.AddSpecifier(&spc);
+		BMessage reply;
+		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK) {
+			return false;
 		}
-	} else {
-		// find the previous image in the list
-		cur --;
-		for (; cur >= 0; cur --) {
-			ref = (entry_ref*)entries.ItemAt(cur);
-			if (IsImage(ref)) {
-				found = true;
-				*out_image = (const entry_ref)*ref;
-				break;
-			}
+		
+		if (reply.FindRef("result", &nextRef) != B_OK) {
+			return false;
+		}
+		
+		if (IsImage(&nextRef)) {
+			foundRef = true;
 		}
 	}
 
-	FreeEntries(&entries);
-	return found;
+	*ref = nextRef;
+	return foundRef;
 }
 
 bool
@@ -1957,6 +1962,7 @@ ShowImageView::ShowNextImage(bool next, bool rewind)
 			if (!found)
 				return false;
 		}
+		SetTrackerSelectionToCurrent();
 		return true;
 	}
 	return false;
@@ -1972,6 +1978,20 @@ bool
 ShowImageView::PrevFile()
 {
 	return ShowNextImage(false, false);
+}
+
+bool
+ShowImageView::HasNextFile()
+{
+	entry_ref ref;
+	return FindNextImage(&fCurrentRef, &ref, true, false);
+}
+
+bool
+ShowImageView::HasPrevFile()
+{
+	entry_ref ref;
+	return FindNextImage(&fCurrentRef, &ref, false, false);
 }
 
 bool
@@ -2087,26 +2107,31 @@ ShowImageView::DoImageOperation(ImageProcessor::operation op, bool quiet)
 	}	
 }
 
+// image operation initiated by user
+void
+ShowImageView::UserDoImageOperation(ImageProcessor::operation op, bool quiet)
+{
+	fUndo.Clear();
+	DoImageOperation(op, quiet);
+}
+
 void
 ShowImageView::Rotate(int degree)
 {
 	if (degree == 90) {
-		fUndo.Clear();
-		DoImageOperation(ImageProcessor::kRotateClockwise);
+		UserDoImageOperation(ImageProcessor::kRotateClockwise);
 	} else if (degree == 270) {
-		fUndo.Clear();
-		DoImageOperation(ImageProcessor::kRotateAntiClockwise);
+		UserDoImageOperation(ImageProcessor::kRotateAntiClockwise);
 	}
 }
 
 void
 ShowImageView::Mirror(bool vertical) 
 {
-	fUndo.Clear();
 	if (vertical) {
-		DoImageOperation(ImageProcessor::kMirrorVertical);
+		UserDoImageOperation(ImageProcessor::kMirrorVertical);
 	} else {
-		DoImageOperation(ImageProcessor::kMirrorHorizontal);
+		UserDoImageOperation(ImageProcessor::kMirrorHorizontal);
 	}
 }
 
@@ -2117,8 +2142,7 @@ ShowImageView::Invert()
 		// Only allow an invert operation if the
 		// bitmap color space is supported by the
 		// invert algorithm
-		fUndo.Clear();
-		DoImageOperation(ImageProcessor::kInvert);
+		UserDoImageOperation(ImageProcessor::kInvert);
 	}
 }
 

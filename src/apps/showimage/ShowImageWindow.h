@@ -56,7 +56,7 @@ private:
 
 class ShowImageWindow : public BWindow {
 public:
-	ShowImageWindow(const entry_ref *pref);
+	ShowImageWindow(const entry_ref *pref, const BMessenger& trackerMessenger);
 	virtual ~ShowImageWindow();
 
 	virtual void FrameResized(float width, float height);

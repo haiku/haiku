@@ -39,6 +39,7 @@
 #include "Filter.h"
 #include "ShowImageUndo.h"
 
+// delay scaling operation, so that a sequence of zoom in/out operations works smoother
 #define DELAYED_SCALING 1
 
 class ShowImageView : public BView {
@@ -49,6 +50,7 @@ public:
 	
 	void Pulse();
 	
+	void SetTrackerMessenger(const BMessenger& trackerMessenger);
 	status_t SetImage(const entry_ref *pref);
 	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, const translation_format* format);
 	void SetDither(bool dither);
@@ -99,6 +101,8 @@ public:
 	void GoToPage(int32 page);
 	bool NextFile();
 	bool PrevFile();
+	bool HasNextFile();
+	bool HasPrevFile();
 	void SetSlideShowDelay(float seconds);
 	float GetSlideShowDelay() const { return fSlideShowDelay / 10.0; }
 	bool SlideShowStarted() const { return fSlideShow; }
@@ -150,6 +154,7 @@ private:
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
 	void DoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
+	void UserDoImageOperation(enum ImageProcessor::operation op, bool quiet = false);
 	BRect AlignBitmap();
 	void Setup(BRect r);
 	BPoint ImageToView(BPoint p) const;
@@ -158,6 +163,7 @@ private:
 	bool IsImage(const entry_ref* pref);
 	static int CompareEntries(const void* a, const void* b);
 	void FreeEntries(BList* entries);
+	void SetTrackerSelectionToCurrent();
 	bool FindNextImage(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind);
 	bool ShowNextImage(bool next, bool rewind);
 	bool FirstFile();
@@ -189,6 +195,7 @@ private:
 	void SettingsSetBool(const char* name, bool value);
 	void SetIcon(bool clear, icon_size which);
 	
+	BMessenger fTrackerMessenger; // of the window that this was launched from
 	entry_ref fCurrentRef; // of the image
 	bool fDither;          // dither the image
 	int32 fDocumentIndex;  // of the image in the file

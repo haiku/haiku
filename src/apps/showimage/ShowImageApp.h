@@ -54,6 +54,7 @@ private:
 	void BroadcastToWindows(BMessage *pmsg);
 	void CheckClipboard();
 
+	BMessenger fTrackerMessenger; // of the window this was launched
 	BFilePanel *fOpenPanel;
 	bool fPulseStarted;
 	ShowImageSettings fSettings;

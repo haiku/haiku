@@ -93,7 +93,7 @@ RecentDocumentsMenu::AddDynamicItem(add_state s)
 
 // Implementation of ShowImageWindow
 
-ShowImageWindow::ShowImageWindow(const entry_ref *pref)
+ShowImageWindow::ShowImageWindow(const entry_ref *pref, const BMessenger& trackerMessenger)
 	: BWindow(BRect(5, 24, 250, 100), "", B_DOCUMENT_WINDOW, 0)
 {
 	fSavePanel = NULL;
@@ -154,8 +154,9 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	
 	SetSizeLimits(250, 100000, 100, 100000);
 	
-	// finish creating window
+	// finish creating the window
 	fImageView->SetImage(pref);
+	fImageView->SetTrackerMessenger(trackerMessenger);
 
 	if (InitCheck() == B_OK) {
 		// add View menu here so it can access ShowImageView methods 
@@ -512,6 +513,9 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			EnableMenuItem(fBar, MSG_PAGE_NEXT, benable);
 			EnableMenuItem(fBar, MSG_PAGE_PREV, benable);
 			
+			EnableMenuItem(fBar, MSG_FILE_NEXT, fImageView->HasNextFile());
+			EnableMenuItem(fBar, MSG_FILE_PREV, fImageView->HasPrevFile());
+			
 			if (fGoToPageMenu->CountItems() != pages) {
 				// Only rebuild the submenu if the number of
 				// pages is different
@@ -759,7 +763,7 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_SCALE_BILINEAR:
 			fImageView->SetScaleBilinear(ToggleMenuItem(pmsg->what));
 			break;
-					
+
 		default:
 			BWindow::MessageReceived(pmsg);
 			break;
