@@ -75,6 +75,7 @@ KernelLd kernel :
 	:
 	: kernel
 	;
+LINKLIBS on kernel += $(KERNEL_C++_SUPPORT_LIBS) ;
 
 KernelLd kernel.so :
 	kernel_core.o
@@ -99,6 +100,7 @@ KernelLd kernel.so :
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/kernel.ld 
 	: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
+LINKLIBS on kernel.so += $(KERNEL_C++_SUPPORT_LIBS) ;
 
 # ToDo: this is outdated; instead, the standard Be mechanism should be used
 KernelLd libglue.o :	# libglue.o is used for dynamic libraries
