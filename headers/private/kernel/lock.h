@@ -5,131 +5,89 @@
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
+
 #include <OS.h>
 #include <kernel.h>
 #include <debug.h>
 
-typedef struct recursive_lock {
-	sem_id sem;
-	thread_id holder;
-	int recursion;
-} recursive_lock;
 
-int recursive_lock_create(recursive_lock *lock);
-void recursive_lock_destroy(recursive_lock *lock);
-bool recursive_lock_lock(recursive_lock *lock);
-bool recursive_lock_unlock(recursive_lock *lock);
-int recursive_lock_get_recursion(recursive_lock *lock);
+typedef struct recursive_lock {
+	sem_id		sem;
+	thread_id	holder;
+	int			recursion;
+} recursive_lock;
 
 #define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
 
 typedef struct mutex {
-	sem_id sem;
-	thread_id holder;
+	sem_id		sem;
+	thread_id	holder;
 } mutex;
-
-int mutex_init(mutex *m, const char *name);
-void mutex_destroy(mutex *m);
-void mutex_lock(mutex *m);
-void mutex_unlock(mutex *m);
 
 #define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 
-// for read/write locks
-#define MAX_READERS 100000
-
-struct benaphore {
+typedef struct benaphore {
 	sem_id	sem;
 	int32	count;
-};
+} benaphore;
 
-typedef struct benaphore benaphore;
-
-// it may make sense to add a status field to the rw_lock to
-// be able to check if the semaphore could be locked
-
-// Note: using rw_lock in this way probably doesn't make too much sense
-// for use in the kernel, we may change this in the near future.
-// It basically uses 2 benaphores to create the rw_lock which is not
-// necessary in the kernel -- axeld, 2002/07/18.
-// Furthermore, those should probably be __inlines - I didn't know about
-// them earlier... :-)
-
-struct rw_lock {
+// Note: this is currently a trivial r/w lock implementation
+//	it will be replaced with something better later - this
+//	or a similar API will be made publically available at this point.
+typedef struct rw_lock {
 	sem_id		sem;
 	int32		count;
 	benaphore	writeLock;
-};
+} rw_lock;
 
-typedef struct rw_lock rw_lock;
+#define RW_MAX_READERS 1000000
 
-#define INIT_BENAPHORE(lock,name) \
-	{ \
-		(lock).count = 1; \
-		(lock).sem = create_sem(0, name); \
-	}
 
-#define CHECK_BENAPHORE(lock) \
-	((lock).sem)
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define UNINIT_BENAPHORE(lock) \
-	delete_sem((lock).sem);
+extern status_t	recursive_lock_init(recursive_lock *lock, const char *name);
+extern void recursive_lock_destroy(recursive_lock *lock);
+extern bool recursive_lock_lock(recursive_lock *lock);
+extern bool recursive_lock_unlock(recursive_lock *lock);
+extern int	recursive_lock_get_recursion(recursive_lock *lock);
 
-#define ACQUIRE_BENAPHORE(lock) \
-	(atomic_add(&((lock).count), -1) <= 0 ? \
-		acquire_sem_etc((lock).sem, 1, B_CAN_INTERRUPT, 0) \
-		: 0)
+extern status_t	mutex_init(mutex *m, const char *name);
+extern void mutex_destroy(mutex *m);
+extern void mutex_lock(mutex *m);
+extern void mutex_unlock(mutex *m);
 
-#define RELEASE_BENAPHORE(lock) \
-	{ \
-		if (atomic_add(&((lock).count), 1) < 0) \
-			release_sem_etc((lock).sem, 1, B_CAN_INTERRUPT); \
-	}
+extern status_t benaphore_init(benaphore *ben, const char *name);
+extern void benaphore_destroy(benaphore *ben);
 
-/* read/write lock */
-#define INIT_RW_LOCK(lock,name) \
-	{ \
-		(lock).sem = create_sem(0, name); \
-		(lock).count = MAX_READERS; \
-		INIT_BENAPHORE((lock).writeLock, "r/w write lock"); \
-	}
+static inline status_t
+benaphore_lock(benaphore *ben)
+{
+	if (atomic_add(&ben->count, -1) <= 0)
+		return acquire_sem(ben->sem);
 
-#define CHECK_RW_LOCK(lock) \
-	((lock).sem)
+	return B_OK;
+}
 
-#define UNINIT_RW_LOCK(lock) \
-	delete_sem((lock).sem); \
-	UNINIT_BENAPHORE((lock).writeLock)
+static inline status_t
+benaphore_unlock(benaphore *ben)
+{
+	if (atomic_add(&ben->count, 1) < 0)
+		return release_sem(ben->sem);
 
-#define ACQUIRE_READ_LOCK(lock) \
-	{ \
-		if (atomic_add(&(lock).count, -1) <= 0) \
-			acquire_sem_etc((lock).sem, 1, B_CAN_INTERRUPT, 0); \
-	}
+	return B_OK;
+}
 
-#define RELEASE_READ_LOCK(lock) \
-	{ \
-		if (atomic_add(&(lock).count, 1) < 0) \
-			release_sem_etc((lock).sem, 1, B_CAN_INTERRUPT); \
-	}
+extern status_t rw_lock_init(rw_lock *lock, const char *name);
+extern void rw_lock_destroy(rw_lock *lock);
+extern status_t rw_lock_read_lock(rw_lock *lock);
+extern status_t rw_lock_read_unlock(rw_lock *lock);
+extern status_t rw_lock_write_lock(rw_lock *lock);
+extern status_t rw_lock_write_unlock(rw_lock *lock);
 
-#define ACQUIRE_WRITE_LOCK(lock) \
-	{ \
-		int32 readers; \
-		ACQUIRE_BENAPHORE((lock).writeLock); \
-		readers = atomic_add(&(lock).count, -MAX_READERS); \
-		if (readers < MAX_READERS) \
-			acquire_sem_etc((lock).sem,readers <= 0 ? 1 : MAX_READERS - readers, \
-			                B_CAN_INTERRUPT,0); \
-		RELEASE_BENAPHORE((lock).writeLock); \
-	}
-
-#define RELEASE_WRITE_LOCK(lock) \
-	{ \
-		int32 readers = atomic_add(&(lock).count,MAX_READERS); \
-		if (readers < 0) \
-			release_sem_etc((lock).sem,readers <= -MAX_READERS ? 1 : -readers,B_CAN_INTERRUPT); \
-	}
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_LOCK_H */
