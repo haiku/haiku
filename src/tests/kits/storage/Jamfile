@@ -28,24 +28,16 @@ CommonUnitTest StorageKitTester
 	local libdir = [ on StorageKitTester FDirName $(LOCATE[1]) lib ] ;
 	MakeLocate <$(SOURCE_GRIST)>libstorage.so : $(libdir) ;
 	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
-	local splitLibdir = [ SplitPath $(libdir) ] ;
-	SymLink <$(SOURCE_GRIST)>libstorage.so
-		: [ FRelPath $(splitLibdir)
-			: [ on libstorage.so SplitPath $(LOCATE[1]) ] libstorage.so ] ;
-	SymLink <$(SOURCE_GRIST)>libbeadapter.so
-		: [ FRelPath $(splitLibdir)
-			: [ on libbeadapter.so SplitPath $(LOCATE[1]) ] libbeadapter.so ] ;
+	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
+	RelSymLink <$(SOURCE_GRIST)>libbeadapter.so : libbeadapter.so ;
 	DEPENDS StorageKitTester StorageKitTester_r5
 		: <$(SOURCE_GRIST)>libstorage.so <$(SOURCE_GRIST)>libbeadapter.so ;
 }
 
 # To run the tests some test files must be around.
 {
-	local resdir = [ on StorageKitTester FDirName $(LOCATE[1]) resources ] ;
-	resdir = $(resdir:G=<storage!kit!test!files>) ;
-	SymLink $(resdir) : [ FRelPath [ SplitPath $(resdir:D) ]
-									: [ SplitPath $(SUBDIR) ] resources ] ;
-	NOUPDATE $(resdir) ;
+	local resdir = <storage!kit!test!files>resources ;
+	MakeLocate $(resdir) : [ on StorageKitTester return $(LOCATE[1]) ] ;
+	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
 	DEPENDS StorageKitTester StorageKitTester_r5 : $(resdir) ;
 }
-
