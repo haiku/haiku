@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src servers screensaver ;
 
+UsePrivateHeaders screen_saver ;
+
 Server OBOSscreensaver :
 	ScreenSaverApp.cpp
 	SSAwindow.cpp

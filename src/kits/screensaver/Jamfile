@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kits screensaver ;
 
-UsePrivateHeaders screensaver ;
+UsePrivateHeaders screen_saver ;
 
 SharedLibrary screensaver :
 	ScreenSaver.cpp
