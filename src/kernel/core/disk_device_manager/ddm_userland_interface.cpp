@@ -1614,6 +1614,23 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 		partition, B_PARTITION_INITIALIZE);
 }
 
+// _kern_uninitialize_partition
+status_t
+_kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->WriteLockPartition(partitionID);
+	if (!partition)
+		return B_ENTRY_NOT_FOUND;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceWriteLocker locker(partition->Device(), true);
+	// unitialize the partition's contents and set the new parameters
+	partition->UninitializeContents(true);
+	return B_OK;
+}
+
 // _kern_create_child_partition
 status_t
 _kern_create_child_partition(partition_id partitionID, int32 changeCounter,

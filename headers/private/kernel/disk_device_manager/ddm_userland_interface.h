@@ -192,6 +192,8 @@ status_t _kern_initialize_partition(partition_id partitionID,
 									int32 changeCounter,
 									const char *diskSystemName,
 									const char *name, const char *parameters);
+status_t _kern_uninitialize_partition(partition_id partitionID,
+									  int32 changeCounter);
 status_t _kern_create_child_partition(partition_id partitionID,
 									  int32 changeCounter, off_t offset,
 									  off_t size, const char *type,
