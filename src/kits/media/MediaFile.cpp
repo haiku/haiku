@@ -105,6 +105,7 @@ status_t
 BMediaFile::SetTo(const entry_ref *ref)
 {
 	debugger("BMediaFile::SetTo not implemented");
+	return B_OK;
 }
 
 
@@ -112,6 +113,7 @@ status_t
 BMediaFile::SetTo(BDataIO *destination)
 {
 	debugger("BMediaFile::SetTo not implemented");
+	return B_OK;
 }
 
 

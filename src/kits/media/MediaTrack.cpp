@@ -546,6 +546,9 @@ BMediaTrack::Web()
 status_t
 BMediaTrack::GetParameterWeb(BParameterWeb** outWeb)
 {
+	UNIMPLEMENTED();
+
+	return B_OK;
 }
 
 

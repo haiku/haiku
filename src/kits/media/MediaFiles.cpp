@@ -38,7 +38,7 @@ BMediaFiles::RewindTypes()
 	server_rewindtypes_reply reply;
 	
 	for(int32 i = 0; i < m_types.CountItems(); i++)
-		delete m_types.ItemAt(i);
+		delete (BString*)m_types.ItemAt(i);
 		
 	m_types.MakeEmpty();
 
@@ -98,7 +98,7 @@ BMediaFiles::RewindRefs(const char *type)
 	server_rewindrefs_reply reply;
 	
 	for(int32 i = 0; i < m_items.CountItems(); i++)
-		delete m_items.ItemAt(i);
+		delete (BString*)m_items.ItemAt(i);
 		
 	m_items.MakeEmpty();
 
