@@ -174,6 +174,10 @@ rule UnitTest
 	local libraries = $(4) ;
 	local headerDirs = $(5) ;
 
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
+
 #	SetupIncludes ;
 	UseCppUnitHeaders ;
 	SetupObjectsDir ;
@@ -189,6 +193,9 @@ rule UnitTest
 	# Turn debugging on. That is usually desired for test code.
 	ObjectCcFlags $(sources) : "-g" ;
 	ObjectC++Flags $(sources) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
 }
 
 rule R5UnitTest
@@ -206,6 +213,10 @@ rule R5UnitTest
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
+
+	# Turn optimization off.
+	local optim = $(OPTIM) ;
+	OPTIM = ;
 
 	UseCppUnitHeaders ;
 	SetupObjectsDir ;
@@ -230,6 +241,9 @@ rule R5UnitTest
 	# Turn debugging on. That is usually desired for test code.
 	ObjectCcFlags $(objects) : "-g" ;
 	ObjectC++Flags $(objects) : "-g" ;
+
+	# Turn optimization on again.
+	OPTIM = $(optim) ;
 }
 
 rule R5ObjectNames
@@ -435,6 +449,36 @@ rule UseArchHeaders
 
 }
 
+rule SplitPath
+{
+	# SplitPath <path> ;
+	# Decomposes a path into its components.
+	local path = $(1:G=) ;
+	local components ;
+	while $(path:D)
+	{
+		# Note: $(path:B) returns "." for "..", but $(path:D=) is fine.
+		components = $(path:D=) $(components) ;
+		path = $(path:D) ;
+	}
+	components = $(path) $(components) ;
+	return $(components) ;
+}
+
+rule SymLink
+{
+	# SymLink <target> : <source> ;
+	# Links <target> to <source>.
+	# <source> is the exact link contents. No binding is done.
+	LINKCONTENTS on $(1) = $(2) ;
+	SymLink1 $(1) ;
+}
+
+actions SymLink1
+{
+	$(RM) $(1) && $(LN) -s $(LINKCONTENTS) $(1)
+}
+
 #-------------------------------------------------------------------------------
 # Low-level OBOS utility rules
 #-------------------------------------------------------------------------------
@@ -637,8 +681,6 @@ rule SystemMain
 	# Usage SystemMain <target> : <sources> : <rqd_by> ;
 	SetupObjectsDir ;
 
-	CCFLAGS on $(1) = $(OPTIM) ;
-	C++FLAGS on $(1) = $(OPTIM) ;
 	LINKLIBS = ;
 
 	# This allows us to preset certain commands we use
