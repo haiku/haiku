@@ -1,0 +1,17 @@
+# Sample settings file for the dosfs plugin
+#
+# This file should be moved to the directory
+# /boot/home/config/settings/kernel/drivers/
+#
+# lock device:
+# true = (default) locks the device's door if:
+# 	the filesystem is RW
+#	the device is removable
+# false = no door locking
+lock_device true
+
+# sync mode:
+# 0 = (default) no sync after each operation
+# 1 = sync after each operation on removable media only
+# 2 = sync after each operation always
+op_sync_mode 0
