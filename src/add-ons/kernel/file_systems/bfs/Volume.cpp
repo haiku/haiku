@@ -141,7 +141,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 						fIndicesNode = new Inode(this, ToVnode(Indices()));
 						if (fIndicesNode == NULL
 							|| fIndicesNode->InitCheck() < B_OK
-							|| !fIndicesNode->IsDirectory()) {
+							|| !fIndicesNode->IsContainer()) {
 							INFORM(("bfs: volume doesn't have indices!\n"));
 
 							if (fIndicesNode) {
@@ -236,17 +236,12 @@ Volume::CreateIndicesRoot(Transaction *transaction)
 {
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
-							S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, &id);
+		S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, &id, &fIndicesNode);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
 	fSuperBlock.indices = ToBlockRun(id);
-	WriteSuperBlock();
-
-	// The Vnode destructor will unlock the inode, but it has already been
-	// locked by the Inode::Create() call.
-	Vnode vnode(this,id);
-	return vnode.Get(&fIndicesNode);
+	return WriteSuperBlock();
 }
 
 

@@ -353,7 +353,7 @@ BPlusTree::SetTo(Inode *stream)
 	
 		if (fHeader->data_type > BPLUSTREE_DOUBLE_TYPE
 			|| (stream->Mode() & S_INDEX_DIR) && toMode[fHeader->data_type] != mode
-			|| !stream->IsDirectory()) {
+			|| !stream->IsContainer()) {
 			D(	dump_bplustree_header(fHeader);
 				dump_inode(stream->Node());
 			);

@@ -176,15 +176,9 @@ Index::Create(Transaction *transaction,const char *name,uint32 type)
 			RETURN_ERROR(status);
 	}
 
-	vnode_id id;
-	status = Inode::Create(transaction,fVolume->IndicesNode(),name,S_INDEX_DIR | S_DIRECTORY | mode,0,type,&id);
-	if (status == B_OK) {
-		// since Inode::Create() lets the created inode open if "id" is specified,
-		// we don't need to call Vnode::Keep() here
-		Vnode vnode(fVolume,id);
-		return vnode.Get(&fNode);
-	}
-	return status;
+	// Inode::Create() will keep the inode locked for us
+	return Inode::Create(transaction, fVolume->IndicesNode(), name,
+		S_INDEX_DIR | S_DIRECTORY | mode, 0, type, NULL, &fNode);
 }
 
 
