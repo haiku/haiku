@@ -42,11 +42,13 @@ public:
 	status_t WriteToPort(const port_id &port);	
 	
 	void SetCode(const int32 &code);
+	void SetProtocol(int32 protocol) { _protocol=protocol; }
 	void SetBuffer(const void *buffer, const ssize_t &size, const bool &copy=false);
 
 	int32 Code(void) { return _code; }
 	void *Buffer(void) { return _buffer; }
 	ssize_t BufferSize(void) { return _buffersize; }
+	int32 Protocol(void) const { return _protocol; }
 	
 	status_t Read(void *data, ssize_t size);
 	status_t ReadString(char **string);
@@ -74,6 +76,7 @@ private:
 	uint8 *_buffer;
 	ssize_t _buffersize;
 	uint8 *_index;
+	int32 _protocol;
 };
 
 #endif

@@ -69,6 +69,7 @@ private:
 	char	*fSendBuffer;
 	int32	fSendPosition;
 	int32	fSendCode;
+	int32	*fDataSize;
 };
 
 #endif
