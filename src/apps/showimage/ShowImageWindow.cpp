@@ -286,6 +286,7 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, 'W', true);
 	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, 'W', true);
 	fGoToPageMenu = new BMenu("Go To Page");
+	fGoToPageMenu->SetRadioMode(true);
 	pmenu->AddItem(fGoToPageMenu);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
@@ -513,11 +514,6 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 				BMenuItem *pcurItem;
 				pcurItem = fGoToPageMenu->ItemAt(curPage - 1);
 				if (!pcurItem->IsMarked()) {
-					// If the current page isn't marked, unmark everything
-					// then mark the current page
-					int32 items = fGoToPageMenu->CountItems();
-					for (int32 i = 0; i < items; i++)
-						fGoToPageMenu->ItemAt(i)->SetMarked(false);
 					pcurItem->SetMarked(true);
 				}
 			}

@@ -153,8 +153,9 @@ private:
 	uint32 GetMouseButtons();
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
+	void LayoutCaption(BFont &font, BPoint &textPos, BRect &background);
 	void DrawCaption();
-	void EraseCaption();
+	void UpdateCaption();
 	void DrawSelectionBox(BRect &rect);
 	Scaler* GetScaler(BRect rect);
 	void DrawImage(BRect rect);
@@ -176,6 +177,7 @@ private:
 	Scaler* fScaler;       // holds the scaled image if bilinear scaling is enabled
 	bool fShrinkToBounds;  // shrink images to view bounds that are larger than the view
 	bool fZoomToBounds;    // zoom images to view bounds that are smaller than the view
+	bool fShrinkOrZoomToBounds;
 	bool fHasBorder;       // should the image have a border?
 	alignment fHAlignment; // horizontal alignment (left and centered only)
 	vertical_alignment fVAlignment; // vertical alignment (left and centered only)

@@ -191,8 +191,6 @@ Scaler::Matches(BRect rect) const {
 
 
 // Scale bilinear using floating point calculations
-typedef int32 intType;
-
 typedef struct {
 	intType srcColumn;
 	float alpha0;
@@ -316,26 +314,6 @@ Scaler::ScaleBilinear(intType fromRow, int32 toRow)
 // Scale bilinear using fixed point calculations
 // Is already more than two times faster than floating point version
 // on AMD Athlon 1 GHz and Intel Pentium III 866 MHz.
-typedef int64 long_fixed_point;
-typedef int32 fixed_point;
-
-// Could use shift operator instead of multiplication and division, 
-// but compiler will optimize it for use anyway.
-#define to_fixed_point(number) static_cast<fixed_point>((number) * kFPPrecisionFactor)
-#define from_fixed_point(number) ((number) / kFPPrecisionFactor)
-#define to_float(number) from_fixed_point(static_cast<float>(number))
-
-#define int_value(number) ((number) & kFPInverseMask)
-#define tail_value(number) ((number) & kFPPrecisionMask)
-
-// Has to be called after muliplication of two fixed point values
-#define mult_correction(number) ((number) / kFPPrecisionFactor)
-
-const int32 kFPPrecision = 8; // (32-kFPPrecision).kFPPrecision
-const int32 kFPPrecisionFactor = (1 << kFPPrecision);
-const int32 kFPPrecisionMask = ((kFPPrecisionFactor)-1);
-const int32 kFPInverseMask = (~kFPPrecisionMask);
-const int32 kFPOne = to_fixed_point(1);
 
 typedef struct {
 	int32 srcColumn;
@@ -464,6 +442,143 @@ Scaler::ScaleBilinearFP(intType fromRow, int32 toRow)
 }
 
 void
+Scaler::RowValues(float* sum, const uchar* src, intType srcW, intType fromX, intType toX, const float a0X, const float a1X, const float deltaX, const int32 kBPP)
+{
+	sum[0] = a0X * src[0];
+	sum[1] = a0X * src[1];
+	sum[2] = a0X * src[2];
+	
+	src += kBPP;
+	
+	for (int32 x = fromX+1; x < toX; x ++, src += kBPP) {
+		sum[0] += src[0];
+		sum[1] += src[1];
+		sum[2] += src[2];
+	}
+	
+	if (toX <= srcW) {
+		sum[0] += a1X * src[0];
+		sum[1] += a1X * src[1];
+		sum[2] += a1X * src[2];
+	}
+	
+	sum[0] /= deltaX;
+	sum[1] /= deltaX;
+	sum[2] /= deltaX;
+}
+
+typedef struct {
+	int32 from;
+	int32 to;
+	float alpha0;
+	float alpha1;
+} DownScaleColumnData;
+
+void
+Scaler::DownScaleBilinear(intType fromRow, int32 toRow)
+{
+	BBitmap* src;
+	BBitmap* dest;
+	intType srcW, srcH;
+	intType destW, destH;
+	intType x, y;
+	const uchar* srcBits;
+	uchar* destBits;
+	intType srcBPR, destBPR;
+	const uchar* srcData;
+	uchar* destDataRow;
+	uchar* destData;
+	const int32 kBPP = 4;
+	DownScaleColumnData* columnData;
+
+	src = GetSrcImage();
+	dest = GetDestImage();
+		
+	srcW = src->Bounds().IntegerWidth();
+	srcH = src->Bounds().IntegerHeight();
+	destW = dest->Bounds().IntegerWidth();
+	destH = dest->Bounds().IntegerHeight();
+	
+	srcBits = (uchar*)src->Bits();
+	destBits = (uchar*)dest->Bits();
+	srcBPR = src->BytesPerRow();
+	destBPR = dest->BytesPerRow();
+	
+	destDataRow = destBits + fromRow * destBPR;
+	
+	const float deltaX = (srcW + 1.0) / (destW + 1.0);
+	const float deltaY = (srcH + 1.0) / (destH + 1.0);
+
+	columnData = new DownScaleColumnData[destW+1];
+	DownScaleColumnData* cd = columnData;
+	for (x = 0; x <= destW; x ++, cd ++) {
+		const float fFromX = x * deltaX;
+		const float fToX = fFromX + deltaX;
+			
+		cd->from = (intType)fFromX;
+		cd->to = (intType)fToX;
+		
+		cd->alpha0 = 1.0 - (fFromX - cd->from);
+		cd->alpha1 = fToX - cd->to;		
+	}
+		
+	for (y = fromRow; IsRunning() && y <= toRow; y ++, destDataRow += destBPR) {
+		const float fFromY = y * deltaY;
+		const float fToY = fFromY + deltaY;
+		
+		const intType fromY = (intType)fFromY;
+		const intType toY = (intType)fToY;
+		
+		const float a0Y = 1.0 - (fFromY - fromY);
+		const float a1Y = fToY - toY;	
+			
+		const uchar* srcDataRow = srcBits + fromY * srcBPR;
+		destData = destDataRow;
+	
+		cd = columnData;
+		for (x = 0; x <= destW; x ++, destData += kBPP, cd ++) {
+			const intType fromX = cd->from;
+			const intType toX = cd->to;
+			
+			const float a0X = cd->alpha0;
+			const float a1X = cd->alpha1;
+
+			srcData = srcDataRow + fromX * kBPP;
+														
+			float totalSum[3];
+			float sum[3];
+			
+			RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, deltaX, kBPP);
+			totalSum[0] = a0Y * sum[0];
+			totalSum[1] = a0Y * sum[1];
+			totalSum[2] = a0Y * sum[2];
+			
+			srcData += srcBPR;
+			
+			for (int32 r = fromY+1; r < toY; r ++, srcData += srcBPR) {
+				RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, deltaX, kBPP);
+				totalSum[0] += sum[0];
+				totalSum[1] += sum[1];
+				totalSum[2] += sum[2];
+			}
+			
+			if (toY <= srcH) {
+				RowValues(sum, srcData, srcW, fromX, toX, a0X, a1X, deltaX, kBPP);
+				totalSum[0] += a1Y * sum[0];
+				totalSum[1] += a1Y * sum[1];
+				totalSum[2] += a1Y * sum[2];
+			}
+			
+			destData[0] = static_cast<uchar>(totalSum[0] / deltaY);
+			destData[1] = static_cast<uchar>(totalSum[1] / deltaY);
+			destData[2] = static_cast<uchar>(totalSum[2] / deltaY);
+		}
+	}
+
+	delete columnData;
+}
+
+void
 Scaler::Run(int i, int n)
 {	
 	int32 from, to, height;
@@ -474,5 +589,9 @@ Scaler::Run(int i, int n)
 	} else {
 		to = from + height - 1;
 	}
-	ScaleBilinearFP(from, to);
+	if (GetDestImage()->Bounds().Width() >= GetSrcImage()->Bounds().Width()) {
+		ScaleBilinearFP(from, to);
+	} else {
+		DownScaleBilinear(from, to);
+	}
 }

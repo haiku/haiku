@@ -38,6 +38,28 @@
 
 class Filter;
 
+typedef int32 intType;
+typedef int64 long_fixed_point;
+typedef int32 fixed_point;
+
+// Could use shift operator instead of multiplication and division, 
+// but compiler will optimize it for use anyway.
+#define to_fixed_point(number) static_cast<fixed_point>((number) * kFPPrecisionFactor)
+#define from_fixed_point(number) ((number) / kFPPrecisionFactor)
+#define to_float(number) from_fixed_point(static_cast<float>(number))
+
+#define int_value(number) ((number) & kFPInverseMask)
+#define tail_value(number) ((number) & kFPPrecisionMask)
+
+// Has to be called after muliplication of two fixed point values
+#define mult_correction(number) ((number) / kFPPrecisionFactor)
+
+const int32 kFPPrecision = 8; // (32-kFPPrecision).kFPPrecision
+const int32 kFPPrecisionFactor = (1 << kFPPrecision);
+const int32 kFPPrecisionMask = ((kFPPrecisionFactor)-1);
+const int32 kFPInverseMask = (~kFPPrecisionMask);
+const int32 kFPOne = to_fixed_point(1);
+
 // Used by class Filter 
 class FilterThread {
 public:
@@ -124,6 +146,8 @@ public:
 private:
 	void ScaleBilinear(int32 fromRow, int32 toRow);
 	void ScaleBilinearFP(int32 fromRow, int32 toRow);
+	inline void RowValues(float* sum, const uchar* srcData, intType srcW, intType fromX, intType toX, const float a0X, const float a1X, const float deltaX, const int32 kBPP);
+	void DownScaleBilinear(int32 fromRow, int32 toRow);
 
 	BRect fRect;
 };

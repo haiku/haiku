@@ -47,6 +47,7 @@
 #include <Clipboard.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Region.h>
 
 
 #include "ShowImageApp.h"
@@ -325,7 +326,7 @@ ShowImageView::SetShowCaption(bool show)
 {
 	if (fShowCaption != show) {
 		fShowCaption = show;
-		Invalidate();
+		UpdateCaption();
 	}
 }
 
@@ -438,8 +439,9 @@ ShowImageView::AlignBitmap()
 	width = Bounds().Width()-2*PEN_SIZE+1;
 	height = Bounds().Height()-2*PEN_SIZE+1;
 	if (width == 0 || height == 0) return rect;
-	if (fShrinkToBounds && (rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
-		fZoomToBounds && rect.Width() < Bounds().Width() && rect.Height() < Bounds().Height()) {
+	fShrinkOrZoomToBounds = fShrinkToBounds && (rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
+		fZoomToBounds && rect.Width() < Bounds().Width() && rect.Height() < Bounds().Height();
+	if (fShrinkOrZoomToBounds) {
 		float s;
 		s = width / (rect.Width()+1.0);
 			
@@ -541,14 +543,12 @@ ShowImageView::DrawBorder(BRect border)
 }
 
 void
-ShowImageView::DrawCaption()
+ShowImageView::LayoutCaption(BFont &font, BPoint &pos, BRect &rect)
 {
 	font_height fontHeight;
 	float width, height;
 	BRect bounds(Bounds());
-	BFont font(be_plain_font);
-	BPoint pos;
-	BRect rect;
+	font = be_plain_font;
 	width = font.StringWidth(fCaption.String()) + 1; // 1 for text shadow
 	font.GetHeight(&fontHeight);
 	height = fontHeight.ascent + fontHeight.descent;
@@ -561,7 +561,16 @@ ShowImageView::DrawCaption()
 	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
 	rect.OffsetTo(pos);
 	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+}
 		
+void
+ShowImageView::DrawCaption()
+{
+	BFont font;
+	BPoint pos;
+	BRect rect;
+	LayoutCaption(font, pos, rect);		
+
 	PushState();
 	// draw background
 	SetDrawingMode(B_OP_ALPHA);
@@ -584,29 +593,19 @@ ShowImageView::DrawCaption()
 }
 
 void
-ShowImageView::EraseCaption()
+ShowImageView::UpdateCaption()
 {
-	font_height fontHeight;
-	float width, height;
-	BRect bounds(Bounds());
-	BFont font(be_plain_font);
+	BFont font;
 	BPoint pos;
 	BRect rect;
-	width = font.StringWidth(fCaption.String()) + 1; // 1 for text shadow
-	font.GetHeight(&fontHeight);
-	height = fontHeight.ascent + fontHeight.descent;
-	// center text horizontally
-	pos.x = (bounds.left + bounds.right - width)/2;
-	// flush bottom
-	pos.y = bounds.bottom - fontHeight.descent - 5;
-	
-	// background rectangle
-	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
-	rect.OffsetTo(pos);
-	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
+	LayoutCaption(font, pos, rect);		
 	
 	// draw over portion of image where caption is located
+	BRegion clip(rect);
+	PushState();
+	ConstrainClippingRegion(&clip);
 	Draw(rect);
+	PopState();
 }
 
 Scaler*
@@ -1158,7 +1157,7 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 	bool caption = fShowCaption;
 	if (caption) {
 		fShowCaption = false;
-		EraseCaption();
+		UpdateCaption();
 	}
 		
 	ScrollBy(x, y);
@@ -1166,7 +1165,7 @@ ShowImageView::ScrollRestricted(float x, float y, bool absolute)
 	if (caption) {
 		// show the caption again
 		fShowCaption = true;
-		DrawCaption();
+		UpdateCaption();
 	}
 }
 
@@ -1189,16 +1188,16 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 	if (numBytes == 1) {
 		switch (*bytes) {
 			case B_DOWN_ARROW: 
-				ScrollRestrictedBy(0, 10); Invalidate();
+				ScrollRestrictedBy(0, 10);
 				break;
 			case B_UP_ARROW: 
-				ScrollRestrictedBy(0, -10); Invalidate();
+				ScrollRestrictedBy(0, -10);
 				break;
 			case B_LEFT_ARROW: 
-				ScrollRestrictedBy(-10, 0); Invalidate();
+				ScrollRestrictedBy(-10, 0);
 				break;
 			case B_RIGHT_ARROW: 
-				ScrollRestrictedBy(10, 0); Invalidate();
+				ScrollRestrictedBy(10, 0);
 				break;
 			case B_SPACE:
 			case B_ENTER:
@@ -1299,7 +1298,7 @@ ShowImageView::FixupScrollBar(orientation o, float bitmapLength, float viewLengt
 
 	psb = ScrollBar(o);
 	if (psb) {
-		if (fHasBorder) {
+		if (fHasBorder && !fShrinkOrZoomToBounds) {
 			bitmapLength += BORDER_WIDTH*2;
 		}
 		range = bitmapLength - viewLength;
