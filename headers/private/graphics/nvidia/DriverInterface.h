@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-6/2004.
+	Rudolf Cornelissen 10/2002-7/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -81,6 +81,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
 	bool   dumprom;
+	bool   unhide_fw;
 	// for accelerant
 	uint32 logmask;
 	uint32 memory;
@@ -88,6 +89,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	bool   hardcursor;
 	bool   switchhead;
 	bool   force_pci;
+	bool   pgm_panel;
 } settings;
 
 /*shared info*/
