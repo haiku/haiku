@@ -1,7 +1,5 @@
 /*****************************************************************************/
-// OpenBeOS InputServer
-//
-// Version: [0.0.5] [Development Stage]
+// Haiku InputServer
 //
 // [Description]
 //
@@ -10,7 +8,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2002-2004 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -43,9 +41,6 @@
 #include <String.h>
 
 #include "InputServer.h"
-#include "InputServerDeviceListEntry.h"
-#include "InputServerFilterListEntry.h"
-#include "InputServerMethodListEntry.h"
 #include "InputServerTypes.h"
 
 // include app_server headers for communication
@@ -158,314 +153,6 @@ InputServer::InitKeyboardMouseStates(void)
 	sMousePos.y = 200;
 
 }
-
-/*void
-InputServer::InitTestDevice()
-{
-	CALLED();
-	
-	const char* path = "/boot/home/Projects/InputServer/ISD/nervous/nervous";
-	printf("InputServer::InitTestDevice - Loading add-on . . .\n");
-	image_id addon_image = load_add_on(path);
-	if (B_ERROR != addon_image)
-	{
-		status_t            isd_status = B_NO_INIT;
-		BInputServerDevice* (*func)()  = NULL;
-		printf("InputServer::InitTestDevice - Resolving symbol . . .\n");
-		if (B_OK == get_image_symbol(addon_image, "instantiate_input_device", B_SYMBOL_TYPE_TEXT, (void**)&func) )
-		{
-			printf("Found instantiate_input_device.\n");
-			if (NULL != func)
-			{
-				BInputServerDevice* isd = (*func)();
-				if (NULL != isd)
-				{
-					printf("InputServer::InitTestDevice - Calling InitCheck . . .\n");
-					isd_status = isd->InitCheck();
-					mInputServerDeviceList.AddItem(
-						new InputServerDeviceListEntry(path, isd_status, isd) );
-					if (B_OK == isd_status)
-					{
-						//printf("Starting Nervous . . .\n");
-						//isd->Start("Nervous Device", NULL);
-					}
-					else
-					{
-						printf("InitCheck failed.\n");
-					}
-				}
-			}
-		}
-		if (B_OK != isd_status)
-		{
-			// Free resources associated with ISD's
-			// that failed to initialize.
-			//
-			//unload_add_on(addon_image);
-		}
-	}
-	EXIT();
-}*/
-
-/*
- *  Method: InputServer::InitDevices()
- *   Descr: 
- */
-/*void
-InputServer::InitDevices(void)
-{
-	CALLED();
-	
-	BDirectory  dir;
-	BPath       addon_dir;
-	BPath       addon_path;
-	BEntry      entry;
-	directory_which addon_dirs[] =
-	            {
-	                B_BEOS_ADDONS_DIRECTORY,
-	                B_COMMON_ADDONS_DIRECTORY,
-	                B_USER_ADDONS_DIRECTORY
-	            };
-	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
-
-	// Find all Input Server Devices in each of the predefined
-	// addon directories.
-	//
-	for (int i = 0; i < addon_dir_count; i++)
-	{
-		if (B_OK == find_directory(addon_dirs[i], &addon_dir) )
-		{
-			addon_dir.Append("input_server/devices");
-			dir.SetTo(addon_dir.Path() );
-			while (B_NO_ERROR == dir.GetNextEntry(&entry, false) )
-			{
-				entry.GetPath(&addon_path);
-				printf("Adding %s . . .\n", addon_path.Path() );
-				AddInputServerDevice(addon_path.Path() );
-			}
-		}
-	}
-	EXIT();
-}*/
-
-
-/*
- *  Method: InputServer::AddInputServerDevice()
- *   Descr: 
- */
-/*status_t
-InputServer::AddInputServerDevice(const char* path)
-{
-	image_id addon_image= load_add_on(path);
-	if (B_ERROR != addon_image)
-	{
-		status_t            isd_status = B_NO_INIT;
-		BInputServerDevice* (*func)()  = NULL;
-		if (B_OK == get_image_symbol(addon_image, "instantiate_input_device", B_SYMBOL_TYPE_TEXT, (void**)&func) )
-		{
-			if (NULL != func)
-			{
-				/*
-			    // :DANGER: Only reenable this section if this
-			    //          InputServer can start and manage the
-			    //          devices, otherwise the system will hang.
-			    //			    
-				BInputServerDevice* isd = (*func)();
-				if (NULL != isd)
-				{
-					isd_status = isd->InitCheck();
-					mInputServerDeviceList.AddItem(
-						new InputServerDeviceListEntry(path, isd_status, isd) );
-				}
-				*/
-				/*mInputServerDeviceList.AddItem(
-					new InputServerDeviceListEntry(path, B_NO_INIT, NULL) );
-			}
-		}
-		if (B_OK != isd_status)
-		{
-			// Free resources associated with ISD's
-			// that failed to initialize.
-			//
-			unload_add_on(addon_image);
-		}
-	}
-	return 0;
-}*/
-
-
-/*
- *  Method: InputServer::InitFilters()
- *   Descr: 
- */
-/*void
-InputServer::InitFilters(void)
-{
-	CALLED();
-	
-	BDirectory  dir;
-	BPath       addon_dir;
-	BPath       addon_path;
-	BEntry      entry;
-	directory_which addon_dirs[] =
-	            {
-	                B_BEOS_ADDONS_DIRECTORY,
-	                B_COMMON_ADDONS_DIRECTORY,
-	                B_USER_ADDONS_DIRECTORY
-	            };
-	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
-
-	// Find all Input Filters in each of the predefined
-	// addon directories.
-	//
-	for (int i = 0; i < addon_dir_count; i++)
-	{
-		if (B_OK == find_directory(addon_dirs[i], &addon_dir) )
-		{
-			addon_dir.Append("input_server/filters");
-			dir.SetTo(addon_dir.Path() );
-			while (B_NO_ERROR == dir.GetNextEntry(&entry, false) )
-			{
-				entry.GetPath(&addon_path);
-				printf("Adding %s . . .\n", addon_path.Path() );
-				AddInputServerFilter(addon_path.Path() );
-			}
-		}
-	}
-	EXIT();
-}*/
-
-
-/*
- *  Method: InputServer::AddInputServerFilter()
- *   Descr: 
- */
-/*status_t
-InputServer::AddInputServerFilter(const char* path)
-{
-	image_id addon_image= load_add_on(path);
-	if (B_ERROR != addon_image)
-	{
-		status_t            isf_status = B_NO_INIT;
-		BInputServerFilter* (*func)()  = NULL;
-		if (B_OK == get_image_symbol(addon_image, "instantiate_input_filter", B_SYMBOL_TYPE_TEXT, (void**)&func) )
-		{
-			if (NULL != func)
-			{
-				/*
-			    // :DANGER: Only reenable this section if this
-			    //          InputServer can start and manage the
-			    //          filters, otherwise the system will hang.
-			    //			    
-				BInputFilter isf = (*func)();
-				if (NULL != isf)
-				{
-					isf_status = isf->InitCheck();
-					mInputServerFilterList.AddItem(
-						new InputServerFilterListEntry(path, isf_status, isf );
-				}
-				*/
-				/*mInputServerFilterList.AddItem(
-					new InputServerFilterListEntry(path, B_NO_INIT, NULL) );
-			}
-		}
-		if (B_OK != isf_status)
-		{
-			// Free resources associated with InputServerFilters
-			// that failed to initialize.
-			//
-			unload_add_on(addon_image);
-		}
-	}
-	return 0;
-}*/
-
-
-/*
- *  Method: InputServer::InitMethods()
- *   Descr: 
- */
-/*void
-InputServer::InitMethods(void)
-{
-	CALLED();
-	
-	BDirectory  dir;
-	BPath       addon_dir;
-	BPath       addon_path;
-	BEntry      entry;
-	directory_which addon_dirs[] =
-	            {
-	                B_BEOS_ADDONS_DIRECTORY,
-	                B_COMMON_ADDONS_DIRECTORY,
-	                B_USER_ADDONS_DIRECTORY
-	            };
-	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
-
-	// Find all Input Methods in each of the predefined
-	// addon directories.
-	//
-	for (int i = 0; i < addon_dir_count; i++)
-	{
-		if (B_OK == find_directory(addon_dirs[i], &addon_dir) )
-		{
-			addon_dir.Append("input_server/methods");
-			dir.SetTo(addon_dir.Path() );
-			while (B_NO_ERROR == dir.GetNextEntry(&entry, false) )
-			{
-				entry.GetPath(&addon_path);
-				printf("Adding %s . . .\n", addon_path.Path() );
-				AddInputServerMethod(addon_path.Path() );
-			}
-		}
-	}
-	EXIT();
-}*/
-
-
-/*
- *  Method: InputServer::AddInputServerMethod()
- *   Descr: 
- */
-/*status_t
-InputServer::AddInputServerMethod(const char* path)
-{
-	image_id addon_image= load_add_on(path);
-	if (B_ERROR != addon_image)
-	{
-		status_t            ism_status = B_NO_INIT;
-		BInputServerMethod* (*func)()  = NULL;
-		if (B_OK == get_image_symbol(addon_image, "instantiate_input_method", B_SYMBOL_TYPE_TEXT, (void**)&func) )
-		{
-			if (NULL != func)
-			{
-				/*
-			    // :DANGER: Only reenable this section if this
-			    //          InputServer can start and manage the
-			    //          methods, otherwise the system will hang.
-			    //			    
-				BInputServerMethod ism = (*func)();
-				if (NULL != ism)
-				{
-					ism_status = ism->InitCheck();
-					mInputServerMethodList.AddItem(
-						new InputServerMethodListEntry(path, ism_status, ism) );
-				}
-				*/
-				/*mInputServerMethodList.AddItem(
-					new InputServerMethodListEntry(path, B_NO_INIT, NULL) );
-			}
-		}
-		if (B_OK != ism_status)
-		{
-			// Free resources associated with InputServerMethods
-			// that failed to initialize.
-			//
-			unload_add_on(addon_image);
-		}
-	}
-	return 0;
-}*/
 
 
 /*
@@ -618,12 +305,6 @@ InputServer::MessageReceived(BMessage *message)
 		case SYSTEM_SHUTTING_DOWN:
 			status = HandleSystemShuttingDown(message, &reply);
 			break;
-		case B_NODE_MONITOR:
-			status = HandleNodeMonitor(message);
-			break;
-		/*case B_QUIT_REQUESTED:
-			QuitRequested();
-			break;*/
 		default:
 		{
 			PRINT(("Default message ... \n"));
@@ -660,10 +341,12 @@ InputServer::HandleGetSetMouseType(BMessage* message,
                                      BMessage* reply)
 {
 	status_t status;
-	if (message->FindInt32("mouse_type", &sMouseType)==B_OK)
+	int32	type;
+	if (message->FindInt32("mouse_type", &type)==B_OK) {
+		fMouseSettings.SetMouseType(type);
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_TYPE_CHANGED, NULL);
-	else
-		status = reply->AddInt32("mouse_type", sMouseType);
+	} else
+		status = reply->AddInt32("mouse_type", 	fMouseSettings.MouseType());
 	return status;
 }
 
@@ -677,10 +360,12 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
                                              BMessage* reply)
 {
 	status_t status;
-	if (message->FindInt32("mouse_acceleration", &sMouseAcceleration) == B_OK)
+	int32 factor;
+	if (message->FindInt32("speed", &factor) == B_OK) {
+		fMouseSettings.SetAccelerationFactor(factor);
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_ACCELERATION_CHANGED, NULL);
-	else
-		status = reply->AddInt32("mouse_acceleration", sMouseAcceleration);
+	} else
+		status = reply->AddInt32("speed", fMouseSettings.AccelerationFactor());
 	return status;
 }
 
@@ -694,10 +379,12 @@ InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
                                           BMessage* reply)
 {
 	status_t status;
-	if (message->FindInt64("key_repeat_delay", &sKeyRepeatDelay) == B_OK)
+	bigtime_t delay;
+	if (message->FindInt64("delay", &delay) == B_OK) {
+		fKeyboardSettings.SetKeyboardRepeatDelay(delay);
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_DELAY_CHANGED, NULL);
-	else
-		status = reply->AddInt64("key_repeat_delay", sKeyRepeatDelay);
+	} else
+		status = reply->AddInt64("delay", fKeyboardSettings.KeyboardRepeatDelay());
 	return status;
 }
 
@@ -773,10 +460,12 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message,
                                       BMessage* reply)
 {
 	status_t status;
-	if (message->FindInt32("mouse_speed", &sMouseSpeed) == B_OK)
+	int32 speed;
+	if (message->FindInt32("speed", &speed) == B_OK) {
+		fMouseSettings.SetMouseSpeed(speed);
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_SPEED_CHANGED, NULL);
-	else
-		status = reply->AddInt32("mouse_speed", sMouseSpeed);
+	} else
+		status = reply->AddInt32("speed", fMouseSettings.MouseSpeed());
 	return status;
 }
 
@@ -836,11 +525,14 @@ InputServer::HandleGetSetMouseMap(BMessage* message,
 	mouse_map *map;
 	ssize_t    size;
 	
-	if (message->FindData("mouse_map", B_RAW_TYPE, (const void**)&map, &size) == B_OK) {
-		memcpy(&sMouseMap, map, sizeof(sMouseMap) );
+	if (message->FindData("mousemap", B_RAW_TYPE, (const void**)&map, &size) == B_OK) {
+		fMouseSettings.SetMapping(*map);
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_MAP_CHANGED, NULL);
-	} else 
-		status = reply->AddData("mouse_map", B_RAW_TYPE, &sMouseMap, sizeof(sMouseMap) );
+	} else {
+		mouse_map 	map;
+		fMouseSettings.Mapping(map);
+		status = reply->AddData("mousemap", B_RAW_TYPE, &map, sizeof(mouse_map) );
+	} 
 	return status;
 }
 
@@ -866,10 +558,12 @@ InputServer::HandleGetSetClickSpeed(BMessage *message,
                                       BMessage *reply)
 {
 	status_t status = B_ERROR;
-	if (message->FindInt64("mouse_click_speed", &sMouseClickSpeed) == B_OK)
+	bigtime_t	click_speed;
+	if (message->FindInt64("speed", &click_speed) == B_OK) {
+		fMouseSettings.SetClickSpeed(click_speed);
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_CLICK_SPEED_CHANGED, NULL);
-	else
-		status = reply->AddInt64("mouse_click_speed", sMouseClickSpeed);
+	} else
+		status = reply->AddInt64("speed", fMouseSettings.ClickSpeed());
 	return status;
 }
 
@@ -883,10 +577,12 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
                                          BMessage* reply)
 {
 	status_t status;
-	if (message->FindInt32("key_repeat_rate", &sKeyRepeatRate) == B_OK)
+	int32	key_repeat_rate;
+	if (message->FindInt32("rate", &key_repeat_rate) == B_OK) {
+		fKeyboardSettings.SetKeyboardRepeatRate(key_repeat_rate);
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_RATE_CHANGED, NULL);
-	else
-		status = reply->AddInt32("key_repeat_rate", sKeyRepeatRate);
+	} else
+		status = reply->AddInt32("rate", fKeyboardSettings.KeyboardRepeatRate());
 	return status;
 }
 
@@ -991,17 +687,6 @@ InputServer::HandleSystemShuttingDown(BMessage *message,
 {
 	status_t status;
 	return status;
-}
-
-
-/*
- *  Method: InputServer::HandleNodeMonitor()
- *   Descr: 
- */
-status_t
-InputServer::HandleNodeMonitor(BMessage *message)
-{
-
 }
 
 

@@ -1,10 +1,10 @@
 /*****************************************************************************/
-// OpenBeOS input_server Backend Application
+// Haiku input_server
 //
-// This is the primary application class for the OpenBeOS input_server.
+// This is the primary application class for the Haiku input_server.
 //
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2001-2004 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -36,6 +36,8 @@
 #include <InputServerMethod.h>
 #include "AddOnManager.h"
 #include "DeviceManager.h"
+#include "MouseSettings.h"
+#include "KeyboardSettings.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -107,10 +109,6 @@ public:
 	virtual void ArgvReceived(long, char**);
 
 	void InitKeyboardMouseStates(void);
-	
-	//void InitDevices(void);
-	//void InitFilters(void);
-	//void InitMethods(void);
 
 	virtual bool QuitRequested(void);
 	virtual void ReadyToRun(void);
@@ -184,25 +182,15 @@ public:
 	static DeviceManager	gDeviceManager;
 	
 private:
-	/*void InitTestDevice();
-	
-	status_t AddInputServerDevice(const char* path);
-	status_t AddInputServerFilter(const char* path);
-	status_t AddInputServerMethod(const char* path);*/
-	
 	bool 			sEventLoopRunning;
 	bool 			sSafeMode;
 	port_id 		sEventPort;
 	BPoint			sMousePos;
-	int32			sMouseType;
-	int32			sMouseSpeed;
-	int32			sMouseAcceleration;
-	bigtime_t		sMouseClickSpeed;
-	int32			sKeyRepeatRate;
-	bigtime_t       sKeyRepeatDelay;
 	int32			sKeyboardLocks;
 	uint16			sKeyboardID;
-	mouse_map		sMouseMap;
+	
+	KeyboardSettings	fKeyboardSettings;
+	MouseSettings		fMouseSettings;
 
 	key_info		s_key_info;		// current key info
 	key_map			s_key_map;		// current key_map
@@ -216,10 +204,6 @@ private:
 	void WatchPort();
 	
 	static bool doStartStopDevice(void*, void*);
-	
-	//static BList mInputServerDeviceList;
-	//static BList mInputServerFilterList;
-	//static BList mInputServerMethodList;
 	
 	// added this to communicate via portlink
 	

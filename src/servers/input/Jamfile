@@ -19,6 +19,9 @@ Server input_server :
 	AddOnManager.cpp
 	DeviceManager.cpp
 
+	MouseSettings.cpp
+	KeyboardSettings.cpp
+
 	# storage
 	AddOnMonitor.cpp
 	AddOnMonitorHandler.cpp

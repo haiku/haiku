@@ -1,16 +1,14 @@
 /*****************************************************************************/
-// OpenBeOS InputServer
+// Haiku InputServer
 //
-// Version: [0.0.5] [Development Stage]
-//
-// [Description]
+// This is the InputServerFilter implementation
 //
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2002-2004 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),

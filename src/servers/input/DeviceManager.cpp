@@ -1,6 +1,6 @@
 /*
-** Copyright 2004, the OpenBeOS project. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2004, the Haiku project. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Author : Jérôme Duval
 ** Original authors: Marcus Overhagen, Axel Dörfler

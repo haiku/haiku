@@ -1,6 +1,6 @@
 /*
-** Copyright 2004, the OpenBeOS project. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2004, the Haiku project. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Author : Jérôme Duval
 ** Original authors: Marcus Overhagen, Axel Dörfler
@@ -253,12 +253,12 @@ AddOnManager::RegisterAddOns()
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
+//		B_BEOS_ADDONS_DIRECTORY
 	};
 	const char subDirectories[][24] = {
 		"input_server/devices",
 		"input_server/filters",
-		"input_server/methods",
+		"input_server/methods"
 	};
 	fHandler = new IAHandler(this);
 	fAddOnMonitor = new AddOnMonitor(fHandler);
