@@ -271,6 +271,10 @@ BVolume::FreeBytes(void) const
 //	GetName (public)
 // ----------------------------------------------------------------------
 //	Copies the name of the volume into the supplied buffer.
+//
+//	The string pointed to by \a name must be long enough to
+//  hold the entire volume name. A length of B_PATH_NAME_LENGTH
+//  is safe and reccommended.
 
 status_t
 BVolume::GetName(
