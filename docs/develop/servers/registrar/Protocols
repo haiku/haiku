@@ -377,7 +377,7 @@ message fields:
 	REG_MIME_PREFERRED_APP:		"signature": B_STRING_TYPE,
 								"app verb": B_INT32_TYPE
 	REG_MIME_ATTR_INFO:			"attr info": B_MESSAGE_TYPE
-	REG_MIME_FILE_EXTENSIONS:	"extensions": B_STRING_TYPE[]
+	REG_MIME_FILE_EXTENSIONS:	"extensions": B_MESSAGE_TYPE
 	REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
 								"description": B_STRING_TYPE
 	REG_MIME_SNIFFER_RULE:		"sniffer rule": B_STRING_TYPE
