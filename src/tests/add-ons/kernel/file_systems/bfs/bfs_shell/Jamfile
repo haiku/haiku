@@ -24,7 +24,8 @@ C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
 
 Objects [ FGristFiles additional_commands.c ] ;
 
-ObjectsDefines [ FGristFiles additional_commands.c ] : _NO_INLINE_ASM ;
+ObjectsDefines [ FGristFiles additional_commands.c ]
+	: _NO_INLINE_ASM _GNU_SOURCE ;
 
 # Reset CCFLAGS and C++FLAGS to original values.
 CCFLAGS = $(oldCCFLAGS) ;
