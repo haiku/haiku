@@ -4,6 +4,9 @@
 */
 
 
+#include "menu.h"
+#include "loader.h"
+
 #include <boot/stage2.h>
 #include <boot/vfs.h>
 #include <boot/platform.h>
@@ -22,7 +25,7 @@
 
 
 extern "C" int
-boot(stage2_args *args)
+main(stage2_args *args)
 {
 	TRACE(("boot(): enter\n"));
 
@@ -39,20 +42,62 @@ boot(stage2_args *args)
 
 	puts("Welcome to the OpenBeOS boot loader!");
 
-	if (mount_boot_file_systems() < B_OK)
-		panic("Could not locate any supported boot devices!\n");
+	bool mountedAllVolumes = false;
 
+	Directory *volume = get_boot_file_system(args);
+
+	if (volume == NULL || platform_user_menu_requested()) {
+		if (volume == NULL)
+			puts("\tno boot path found, scan for all partitions...\n");
+
+		if (mount_file_systems(args) < B_OK)
+			panic("Could not locate any supported boot devices!\n");
+
+		mountedAllVolumes = true;
+
+		if (user_menu(&volume) < B_OK) {
+			// user requested to quit the loader
+			goto out;
+		}
+	}
+
+	if (volume != NULL) {
+		// we got a volume to boot from!
+		status_t status;
+		while ((status = load_kernel(args, volume)) < B_OK) {
+			// loading the kernel failed, so let the user choose another
+			// volume to boot from until it works
+			volume = NULL;
+
+			if (!mountedAllVolumes) {
+				// mount all other file systems, if not already happened
+				if (mount_file_systems(args) < B_OK)
+					panic("Could not locate any supported boot devices!\n");
+
+				mountedAllVolumes = true;
+			}
+
+			if (user_menu(&volume) < B_OK || volume == NULL) {
+				// user requested to quit the loader
+				goto out;
+			}
+		}
+
+		// if everything is okay, continue booting
+		if (status == B_OK) {
+			load_modules(args, volume);
+
+			// ToDo: cleanup, heap_release() etc.
+			start_kernel();
+		}
+	}
+
+out:
 	heap_release();
 	return 0;
 }
 
 #if 0
-void *get_boot_device(stage2_args *args);
-void *user_menu();
-void load_boot_drivers(void *device);
-void load_boot_modules(void *device);
-void load_driver_settings(void *device);
-
 
 void
 load_kernel(void *deviceHandle)
@@ -64,25 +109,5 @@ load_kernel(void *deviceHandle)
 	/* load kernel into memory and relocate it */
 }
 
-
-int
-main(stage2_args *args)
-{
-	/* pre-state2 initialization is already done at this point */
-
-	void *device = get_boot_device(args);
-	if (device == NULL)
-		device = user_menu();
-
-	if (device == NULL)
-		panic("No boot partition found");
-
-	load_kernel(device);
-	load_boot_drivers(device);
-	load_boot_modules(device);
-	load_driver_settings(device);
-
-	start_kernel();
-}
 #endif
 
