@@ -313,7 +313,7 @@ dbg_puts(const char *s)
 static int
 cmd_reboot(int argc, char **argv)
 {
-	shutdown(true);
+	arch_cpu_shutdown(true);
 	return 0;
 		// I'll be really suprised if this line ever runs! ;-)
 }
