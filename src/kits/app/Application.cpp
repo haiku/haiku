@@ -60,6 +60,7 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
+#define RUN_WITHOUT_REGISTRAR
 
 // Globals ---------------------------------------------------------------------
 BApplication*	be_app = NULL;
@@ -220,11 +221,8 @@ BApplication::BApplication(const char* signature, status_t* error)
 //------------------------------------------------------------------------------
 BApplication::~BApplication()
 {
-	// unregister from the roster
-	BRoster::Private().RemoveApp(Team());
-
 	// tell all loopers(usualy windows) to quit. Also, wait for them.
-	BLooper*	Looper = NULL;
+	BWindow*	window = NULL;
 	BList		looperList;
 	{
 		using namespace BPrivate;
@@ -235,13 +233,16 @@ BApplication::~BApplication()
 
 	for (int32 i = 0; i < looperList.CountItems(); i++)
 	{
-		Looper	= dynamic_cast<BLooper*>((BLooper*)looperList.ItemAt(i));
-		if (Looper && Looper != this)
+		window	= dynamic_cast<BWindow*>((BLooper*)looperList.ItemAt(i));
+		if (window)
 		{
-			Looper->Lock();
-			Looper->Quit();
+			window->Lock();
+			window->Quit();
 		}
 	}
+
+	// unregister from the roster
+	BRoster::Private().RemoveApp(Team());
 
 	// tell app_server we're quiting...
 	PortLink		link(fServerFrom);
