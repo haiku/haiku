@@ -1,13 +1,32 @@
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2004, Haiku
+//
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
+//
+//
+//  File:        KeymapWindow.cpp
+//  Author:      Sandor Vroemisse, Jérôme Duval
+//  Description: Keymap Preferences
+//  Created :    July 12, 2004
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #include <Alert.h>
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
 #include <Debug.h>
+#include <Directory.h>
+#include <FindDirectory.h>
 #include <GraphicsDefs.h>
 #include <ListView.h>
 #include <MenuItem.h>
+#include <Path.h>
 #include <ScrollView.h>
 #include <StringView.h>
+#include <TextView.h>
 #include <View.h>
 #include "KeymapWindow.h"
 #include "KeymapListItem.h"
@@ -32,41 +51,38 @@ KeymapWindow::KeymapWindow( BRect frame )
 	:	BWindow( frame, WINDOW_TITLE, B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE|B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS )
 {
-	rgb_color	tempColor;
-	BRect		bounds = Bounds();
-	BMenuBar	*menubar;
-
-	fApplication = (KeymapApplication*) be_app;
-	fSelectedMap = fApplication->CurrentMap();
-	
 	// Add the menu bar
-	menubar = AddMenuBar();
+	BMenuBar *menubar = AddMenuBar();
 
 	// The view to hold all but the menu bar
+	BRect bounds = Bounds();
 	bounds.top = menubar->Bounds().bottom + 1;
-	fPlaceholderView = new BView( bounds, "placeholderView", 
+	BView *placeholderView = new BView( bounds, "placeholderView", 
 		B_FOLLOW_NONE, 0 );
-	tempColor = ui_color( B_MENU_BACKGROUND_COLOR );
-	fPlaceholderView->SetViewColor( tempColor );
-	AddChild( fPlaceholderView );
+	placeholderView->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	AddChild( placeholderView );
 
 	// Create the Maps box and contents
-	AddMaps();
+	AddMaps(placeholderView);
+	
+	fMapView = new MapView(BRect(149,29,601,209), "mapView", &fCurrentMap);
+	AddChild(fMapView);
+	
+	BMenuItem *item = fFontMenu->FindMarked();
+	if (item) {
+		fMapView->SetFontFamily(item->Label());
+	}
 	
 	// The 'Use' button
-	bounds.Set( 527,200, 600,220 );
-	fUseButton = new BButton( bounds, "useButton", "Use",
+	fUseButton = new BButton(BRect(527,200, 600,220), "useButton", "Use",
 		new BMessage( USE_KEYMAP ));
-	fPlaceholderView->AddChild( fUseButton );
+	placeholderView->AddChild( fUseButton );
 	
 	// The 'Revert' button
-	bounds.Set( 442,200, 515,220 );
-	fRevertButton = new BButton( bounds, "revertButton", "Revert",
+	fRevertButton = new BButton(BRect(442,200, 515,220), "revertButton", "Revert",
 		new BMessage( REVERT ));
-	fPlaceholderView->AddChild( fRevertButton );
-
-	fMapView = new MapView(BRect(149,29,601,209), "mapView");
-	AddChild(fMapView);
+	placeholderView->AddChild( fRevertButton );
+	
 }
 
 
@@ -120,7 +136,8 @@ KeymapWindow::AddMenuBar()
 	menubar->AddItem( menu );
 	
 	// Create the Font menu
-	menu = new BMenu( "Font" );
+	fFontMenu = new BMenu( "Font" );
+	fFontMenu->SetRadioMode(true);
 	int32 numFamilies = count_font_families(); 
 	font_family family, current_family;
 	font_style current_style; 
@@ -128,113 +145,70 @@ KeymapWindow::AddMenuBar()
 	
 	be_plain_font->GetFamilyAndStyle(&current_family, &current_style);
 		
-	for ( int32 i = 0; i < numFamilies; i++ )
+	for (int32 i = 0; i < numFamilies; i++ )
 		if ( get_font_family(i, &family, &flags) == B_OK ) {
 			BMenuItem *item = 
 				new BMenuItem(family, new BMessage( MENU_FONT_CHANGED));
-			menu->AddItem(item);
+			fFontMenu->AddItem(item);
 			if(strcmp(family, current_family) == 0)
 				item->SetMarked(true);
 		}
-	menubar->AddItem( menu );
+	menubar->AddItem( fFontMenu );
 	
 	return menubar;
 }
 
 
 void 
-KeymapWindow::AddMaps()
+KeymapWindow::AddMaps(BView *placeholderView)
 {
 	// The Maps box
 	BRect bounds = BRect(9,11,140,226);
 	BBox *mapsBox = new BBox(bounds);
 	mapsBox->SetLabel("Maps");
-	fPlaceholderView->AddChild( mapsBox );
+	placeholderView->AddChild( mapsBox );
 
 	// The System list
 	BStringView *systemLabel = new BStringView(BRect(13,13,113,33), "system", "System");
 	mapsBox->AddChild(systemLabel);
 	
 	bounds = BRect( 13,35, 103,105 );
-	BList *entryList = fApplication->SystemMaps();
 	fSystemListView = new BListView( bounds, "systemList" );
-	BList *listItems = ListItemsFromEntryList( entryList );
-	fSystemListView->AddList( listItems );
+	
 	mapsBox->AddChild( new BScrollView( "systemScrollList", fSystemListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true ));
 	fSystemListView->SetSelectionMessage( new BMessage( SYSTEM_MAP_SELECTED ));
-	delete listItems;
-	delete entryList;
 
 	// The User list
 	BStringView *userLabel = new BStringView(BRect(13,110,113,128), "user", "User");
 	mapsBox->AddChild(userLabel);
 
 	bounds = BRect(13,130,103,200);
-	entryList = fApplication->UserMaps();
 	fUserListView = new BListView( bounds, "userList" );
 	// '(Current)'
-	KeymapListItem *currentKeymapItem = ItemFromEntry( fApplication->CurrentMap() );
+	KeymapListItem *currentKeymapItem = (KeymapListItem*)fUserListView->FirstItem();
 	if( currentKeymapItem != NULL )
 		fUserListView->AddItem( currentKeymapItem );
 	// Saved keymaps
-	listItems = ListItemsFromEntryList( entryList );
-	fUserListView->AddList( listItems );
 	mapsBox->AddChild( new BScrollView( "systemScrollList", fUserListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true ));
 	fUserListView->SetSelectionMessage( new BMessage( USER_MAP_SELECTED ));
-	delete listItems;
-	delete entryList;
 	
 	
-}
-
-
-BList* 
-KeymapWindow::ListItemsFromEntryList( BList * entryList)
-{
-	BEntry			*currentEntry;
-	BList			*listItems;
-	int				nrItems;
-	#ifdef DEBUG
-		char	name[B_FILE_NAME_LENGTH];
-	#endif //DEBUG
-
-	listItems = new BList();
-	nrItems = entryList->CountItems();
-	for( int index=0; index<nrItems; index++ ) {
-		currentEntry = (BEntry*)entryList->ItemAt( index );
-		listItems->AddItem( new KeymapListItem( currentEntry ));
-		
-		#ifdef DEBUG
-			currentEntry->GetName( name );
-			printf("New list item: %s\n",name);
-		#endif //DEBUG
-	}
-
-	return listItems;
-}
-
-
-KeymapListItem* 
-KeymapWindow::ItemFromEntry( BEntry *entry )
-{
-	KeymapListItem	*item;
-
-	if( entry->Exists() ) {
-		item = new KeymapListItem( entry );
-		item->SetText( "(Current)" );
-	}
-	else
-		item = NULL;
-
-	return item;
+	FillSystemMaps();
+	
+	FillUserMaps();
+	
+	fUserListView->Select(0);
+	fCurrentMap.Load(((KeymapListItem*)fUserListView->FirstItem())->KeymapEntry());
 }
 
 
 bool 
 KeymapWindow::QuitRequested()
 {
+	if (!IsActive())
+		return false;
 	be_app->PostMessage( B_QUIT_REQUESTED );
 	return true;
 }
@@ -262,49 +236,46 @@ KeymapWindow::MessageReceived( BMessage* message )
 			break;
 		case MENU_EDIT_SELECT_ALL:
 			break;
+		case MENU_FONT_CHANGED:
+		{
+			BMenuItem *item = fFontMenu->FindMarked();
+			if (item) {
+				fMapView->SetFontFamily(item->Label());
+				fMapView->Invalidate();
+			}	
+		}
+			break;
 		case SYSTEM_MAP_SELECTED:
-			HandleSystemMapSelected( message );
+		{
+			KeymapListItem *keymapListItem = 
+				(KeymapListItem*)fSystemListView->ItemAt(fSystemListView->CurrentSelection());
+			if (keymapListItem) {
+				fCurrentMap.Load(keymapListItem->KeymapEntry());
+				fMapView->Invalidate();
+				
+				// Deselect item in other BListView
+				fUserListView->DeselectAll();
+			}
+		}
 			break;
 		case USER_MAP_SELECTED:
-			HandleUserMapSelected( message );
+		{	
+			KeymapListItem *keymapListItem = 
+				(KeymapListItem*)fUserListView->ItemAt(fUserListView->CurrentSelection());
+			if (keymapListItem) {
+				fCurrentMap.Load(keymapListItem->KeymapEntry());
+				fMapView->Invalidate();
+					
+				// Deselect item in other BListView
+				fSystemListView->DeselectAll();
+			}
+		}
 			break;
 		case USE_KEYMAP:
 			UseKeymap();
 			break;
 		case REVERT:	// do nothing, just like the original
 			break;
-
-		case B_KEY_DOWN:
-		case B_KEY_UP:
-		case B_UNMAPPED_KEY_DOWN:
-		case B_UNMAPPED_KEY_UP:
-		case B_MODIFIERS_CHANGED: {
-			key_info info;
-			const uint8 *states;
-			ssize_t size;
-			bool need_update = false;
-			
-			if ((message->FindData("states", 'UBYT', (const void **)&states, &size)==B_OK)
-				&& (message->FindInt32("modifiers", (int32 *)&info.modifiers) == B_OK)) {
-				if (fMapView->fOldKeyInfo.modifiers != info.modifiers) {
-					need_update = true;
-				}
-				
-				for (int8 i=0; i<16; i++)
-					if (fMapView->fOldKeyInfo.key_states[i] != states[i]) {
-						need_update = true;
-						break;
-					}
-					
-				if (need_update) {
-					fMapView->fOldKeyInfo.modifiers = info.modifiers;
-					for (int8 j=0; j<16; j++) 
-						fMapView->fOldKeyInfo.key_states[j] = states[j];
-					fMapView->Invalidate();
-				}
-			}
-			break;
-		}
 		default:	
 			BWindow::MessageReceived( message );
 			break;
@@ -313,71 +284,437 @@ KeymapWindow::MessageReceived( BMessage* message )
 
 
 void 
-KeymapWindow::HandleSystemMapSelected( BMessage *selectionMessage )
-{
-	HandleMapSelected( selectionMessage, fSystemListView, fUserListView );
-}
-
-
-void 
-KeymapWindow::HandleUserMapSelected( BMessage *selectionMessage )
-{
-	HandleMapSelected( selectionMessage, fUserListView, fSystemListView );
-}
-
-
-void 
-KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
-	BListView * selectedView, BListView * otherView )
-{
-	int32	index;
-	KeymapListItem	*keymapListItem;
-
-	// Anything selected?
-	index = selectedView->CurrentSelection( 0 );
-	if( index < 0 ) {
-		#if DEBUG
-			printf("index<0; HandleMapSelected ends here.\n");
-	
-		#endif //DEBUG
-		return;
-	}
-	
-	// Store selected map in fSelectedMap
-	keymapListItem = (KeymapListItem*)selectedView->ItemAt( index );
-	if( keymapListItem == NULL )
-		return;
-	fSelectedMap = keymapListItem->KeymapEntry();
-	#if DEBUG
-		char	name[B_FILE_NAME_LENGTH];
-		fSelectedMap->GetName( name );
-		printf("fSelectedMap has been set to %s\n",name);
-	#endif //DEBUG
-
-	// Deselect item in other BListView
-	otherView->DeselectAll();
-}
-
-
-void 
 KeymapWindow::UseKeymap()
 {
-	if( fSelectedMap != NULL )
-		fApplication->UseKeymap( fSelectedMap );
-	else {
-		// There is no keymap selected!
-		BAlert	*alert;
-		alert = new BAlert( "w>noKeymap", "No keymap has been selected", "Bummer",
-			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT );
-		alert->Go();
-	}
+	//TODO 
 }
 
 
-MapView::MapView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
+void
+KeymapWindow::FillSystemMaps()
 {
+	BPath path;
+	if (find_directory(B_BEOS_ETC_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Keymap");
+	
+	BDirectory directory;		
+	entry_ref ref;
+	
+	if (directory.SetTo(path.Path()) == B_OK)
+		while( directory.GetNextRef(&ref) == B_OK ) {
+			fSystemListView->AddItem(new KeymapListItem(ref));
+		}
+}
 
+
+void 
+KeymapWindow::FillUserMaps()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+			
+	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
+
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Keymap");
+	
+	BDirectory directory;
+	
+	if (directory.SetTo(path.Path()) == B_OK)
+		while( directory.GetNextRef(&ref) == B_OK ) {
+			fUserListView->AddItem(new KeymapListItem(ref));
+		}
+}
+
+
+BEntry* 
+KeymapWindow::CurrentMap()
+{
+	return NULL;
+}
+
+
+MapView::MapView(BRect rect, const char *name, Keymap* keymap)
+	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW),
+		fCurrentFont(*be_plain_font),
+		fCurrentMap(keymap)
+{
+	BRect keyRect = BRect(11,50,29,68);
+	int32 i = 1;
+	fKeysRect[i] = keyRect;
+	
+	// Fx keys
+	i++;
+	keyRect.OffsetBySelf(36,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	i++;
+	keyRect.OffsetBySelf(27,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	i++;
+	keyRect.OffsetBySelf(27,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	// Pause, PrintScreen, ...
+	i++;
+	keyRect.OffsetBySelf(35,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	// 1st line : numbers and backspace
+	i++;
+	keyRect = BRect(11,78,29,96);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.right += 18;
+	fKeysRect[i] = keyRect;
+	keyRect.left += 18;
+	
+	// Insert, pg up ...
+	i++;
+	keyRect.OffsetBySelf(35,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	// 2nd line : tab and azerty ...
+	i = 0x26;
+	keyRect = BRect(11,96,38,114);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(27,0);
+	keyRect.right -= 9;
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.right += 9;
+	fKeysRect[i] = keyRect;
+	keyRect.left += 9;
+	
+	// Suppr, pg down ...
+	i++;
+	keyRect.OffsetBySelf(35,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	// 3rd line : caps and qsdfg ...
+	i = 0x3b;
+	keyRect = BRect(11,114,47,132);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(36,0);
+	keyRect.right -= 18;
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.right += 18;
+	fKeysRect[i] = keyRect;
+	keyRect.left += 18;
+	
+	// 4th line : shift and wxcv ...
+	i = 0x4b;
+	keyRect = BRect(11,132,56,150);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(45,0);
+	keyRect.right -= 27;
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.right += 27;
+	fKeysRect[i] = keyRect;
+	keyRect.left += 27;
+	
+	//5th line : Ctrl, Alt, Space ...
+	i = 0x5c;
+	keyRect = BRect(11,150,38,168);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(27,0);
+	keyRect.OffsetBySelf(26,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(27,0);
+	keyRect.right += 92;
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.right -= 92;
+	keyRect.OffsetBySelf(92,0);
+	keyRect.OffsetBySelf(27,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(26,0);
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	
+	// Arrows
+	i++;
+	keyRect = BRect(298,150,316,168);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i = 0x57;
+	keyRect.OffsetBySelf(-18,-18);
+	fKeysRect[i] = keyRect;
+	
+	// numkeys
+	i = 0x22;
+	keyRect = BRect(369,78,387,96);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i = 0x37;
+	keyRect.OffsetBySelf(-54, 18);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.bottom += 18;
+	fKeysRect[i] = keyRect;
+	i = 0x48;
+	keyRect.bottom -= 18;
+	keyRect.OffsetBySelf(-54, 18);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i = 0x58;
+	keyRect.OffsetBySelf(-36, 18);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.OffsetBySelf(18,0);
+	keyRect.bottom += 18;
+	fKeysRect[i] = keyRect;
+	i = 0x64;
+	keyRect.bottom -= 18;
+	keyRect.OffsetBySelf(-54, 18);
+	keyRect.right += 18;
+	fKeysRect[i] = keyRect;
+	i++;
+	keyRect.right -= 18;
+	keyRect.OffsetBySelf(36,0);
+	fKeysRect[i] = keyRect;
+	
+	for (uint8 j = 0; j<128; j++)
+		fKeysVertical[j] = false;
+		
+	fKeysVertical[0x5e] = true;
+	
+	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
+	BRect textRect = frameRect;
+	textRect.OffsetTo(B_ORIGIN);
+	textRect.InsetBy(1,1);
+	fTextView = new BTextView(frameRect, "testzone", textRect,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
+	fTextView->MakeEditable(true);
+	fTextView->MakeSelectable(true);
+	fTextView->SetViewColor(255,255,255);
+	AddChild(fTextView);
+	
 }
 
 
@@ -420,296 +757,126 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(r.right, r.bottom-9), BPoint(r.right, r.bottom-2));
 	
 	int32 i = 1;
-#define isPressed(i) (fOldKeyInfo.key_states[i>>3] & (1 << (7 - i%8)) ) 
 	
 	// Esc key
-	BRect keyRect = BRect(11,50,29,68);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(i);
 	
-	DrawBorder(keyRect.InsetByCopy(-1, -1));
+	DrawBorder(BRect(10,49,30,69));
 	
 	// Fx keys
-	i++;
-	keyRect.OffsetBySelf(36,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
+	DrawBorder(BRect(46, 49, 120, 69));
 	
-	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
+	DrawBorder(BRect(127, 49, 201, 69));
 	
-	i++;
-	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	
-	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
-	
-	i++;
-	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	
-	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
+	DrawBorder(BRect(208, 49, 282, 69));
 	
 	// Pause, PrintScreen, ...
-	i++;
-	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	
-	DrawBorder(BRect(keyRect.left - 37, 49, keyRect.right + 1, 69));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
+	DrawBorder(BRect(297, 49, 353, 69));
 	
 	// 1st line : numbers and backspace
-	i++;
-	keyRect = BRect(11,78,29,96);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.right += 18;
-	DrawKey(keyRect, isPressed(i));
-	keyRect.left += 18;
-	
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
 	// Insert, pg up ...
-	i++;
-	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(0x20));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(0x21));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
 	
-	DrawBorder(BRect(keyRect.left - 37, 77, keyRect.right + 1, 115));
+	DrawBorder(BRect(297, 77, 353, 115));
 	
 	// 2nd line : tab and azerty ...
 	i = 0x26;
-	keyRect = BRect(11,96,38,114);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(27,0);
-	keyRect.right -= 9;
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.right += 9;
-	DrawKey(keyRect, isPressed(i));
-	keyRect.left += 9;
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
 	
 	// Suppr, pg down ...
-	i++;
-	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
 	// 3rd line : caps and qsdfg ...
 	i = 0x3b;
-	keyRect = BRect(11,114,47,132);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(36,0);
-	keyRect.right -= 18;
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.right += 18;
-	DrawKey(keyRect, isPressed(i));
-	keyRect.left += 18;
 	
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+			
 	// 4th line : shift and wxcv ...
 	i = 0x4b;
-	keyRect = BRect(11,132,56,150);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(45,0);
-	keyRect.right -= 27;
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.right += 27;
-	DrawKey(keyRect, isPressed(i));
-	keyRect.left += 27;
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
 	
+		
 	//5th line : Ctrl, Alt, Space ...
 	i = 0x5c;
-	keyRect = BRect(11,150,38,168);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(27,0);
-	keyRect.OffsetBySelf(26,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(27,0);
-	keyRect.right += 92;
-	DrawKey(keyRect, isPressed(i), true);
-	i++;
-	keyRect.right -= 92;
-	keyRect.OffsetBySelf(92,0);
-	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(26,0);
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
 	
 	SetHighColor(80,80,80);
 	StrokeLine(BPoint(10,169), BPoint(10,77));
@@ -731,18 +898,12 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(11,169));
 	
 	// Arrows
-	i++;
-	keyRect = BRect(298,150,316,168);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+		
 	i = 0x57;
-	keyRect.OffsetBySelf(-18,-18);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(i);
 	
 	SetHighColor(80,80,80);
 	StrokeLine(BPoint(297,169), BPoint(297,149));
@@ -757,64 +918,33 @@ MapView::Draw(BRect rect)
 	
 	// numkeys
 	i = 0x22;
-	keyRect = BRect(369,78,387,96);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i = 0x37;
-	keyRect.OffsetBySelf(-54, 18);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.bottom += 18;
-	DrawKey(keyRect, isPressed(i));
-	i = 0x48;
-	keyRect.bottom -= 18;
-	keyRect.OffsetBySelf(-54, 18);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i = 0x58;
-	keyRect.OffsetBySelf(-36, 18);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.OffsetBySelf(18,0);
-	keyRect.bottom += 18;
-	DrawKey(keyRect, isPressed(i));
-	i = 0x64;
-	keyRect.bottom -= 18;
-	keyRect.OffsetBySelf(-54, 18);
-	keyRect.right += 18;
-	DrawKey(keyRect, isPressed(i));
-	i++;
-	keyRect.right -= 18;
-	keyRect.OffsetBySelf(36,0);
-	DrawKey(keyRect, isPressed(i));
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
 	
-	DrawBorder(BRect(keyRect.left - 37, 77, keyRect.right + 19, 169));
+	i = 0x37;
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	
+	i = 0x48;
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	
+	i = 0x58;
+	DrawKey(i);
+	DrawKey(++i);
+	DrawKey(++i);
+	DrawKey(++i);
+	
+	i = 0x64;
+	DrawKey(i);
+	DrawKey(++i);
+		
+	DrawBorder(BRect(368, 77, 442, 169));
 	
 	// lights
 #define isLighted(i) (fOldKeyInfo.modifiers & i) 
@@ -885,16 +1015,34 @@ MapView::Draw(BRect rect)
 	FillRect(r);
 	FillRect(BRect(354,41,355,43));
 	
+	// around the textview
+	SetHighColor(0,0,0);
+	r = BRect(11, 13, Bounds().right-11, 31);
+	StrokeLine(r.LeftBottom(), r.LeftTop());
+	StrokeLine(r.RightTop());
+	SetHighColor(80,80,80);
+	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftTop()+BPoint(1,1));
+	StrokeLine(r.RightTop()+BPoint(0,1));
+	SetHighColor(136,136,136);
+	StrokeLine(r.LeftBottom()+BPoint(2,-1), r.LeftTop()+BPoint(2,2));
+	StrokeLine(r.RightTop()+BPoint(0,2));
+	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftBottom()+BPoint(1,0));
+	SetHighColor(255,255,255);
+	StrokeLine(r.RightTop()+BPoint(0,1), r.RightBottom());
+	StrokeLine(r.LeftBottom()+BPoint(2,0));
 	BView::Draw(rect);
 }
 
 
 void
-MapView::DrawKey(BRect rect, bool pressed, bool vertical)
+MapView::DrawKey(int32 keyCode)
 {
-	BRect r = rect;
+	BRect r = fKeysRect[keyCode];
 	SetHighColor(0,0,0);
 	StrokeRect(r);
+	
+	bool pressed = (fOldKeyInfo.key_states[keyCode>>3] & (1 << (7 - keyCode%8)));
+	bool vertical = fKeysVertical[keyCode];
 	
 	if (!pressed) {
 		r.InsetBySelf(1,1);
@@ -940,7 +1088,7 @@ MapView::DrawKey(BRect rect, bool pressed, bool vertical)
 		if (!vertical) {
 			int32 w1 = 4;
 			int32 w2 = 3;
-			if(rect.Width() > 20) {
+			if(fKeysRect[keyCode].Width() > 20) {
 				w1 = 6;
 				w2 = 6;
 			}
@@ -975,20 +1123,26 @@ MapView::DrawKey(BRect rect, bool pressed, bool vertical)
 		r.InsetBySelf(1,1);
 		SetHighColor(48,48,48);
 		StrokeRect(r);
-		SetHighColor(136,136,136);
-		StrokeLine(BPoint(r.left+1, r.bottom), r.RightBottom());
-		StrokeLine(BPoint(r.right, r.top+1));
+		
+		BeginLineArray(2);
+		rgb_color color1 = {136,136,136};
+		AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color1);
+		AddLine(r.RightBottom(), BPoint(r.right, r.top+1), color1);
+		EndLineArray();
 		
 		r.InsetBySelf(1,1);
 		SetHighColor(72,72,72);
 		StrokeRect(r);
-		SetHighColor(48,48,48);
-		StrokeLine(r.LeftTop(), r.LeftTop());
-		SetHighColor(152,152,152);
-		StrokeLine(BPoint(r.left+1, r.bottom), r.RightBottom());
-		StrokeLine(r.RightTop());
-		SetHighColor(160,160,160);
-		StrokeLine(r.RightTop());
+		
+		BeginLineArray(4);
+		rgb_color color2 = {48,48,48};
+		AddLine(r.LeftTop(), r.LeftTop(), color2);
+		rgb_color color3 = {152,152,152};
+		AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color3);
+		AddLine(r.RightBottom(), r.RightTop(), color3);
+		rgb_color color4 = {160,160,160};
+		AddLine(r.RightTop(), r.RightTop(), color4);
+		EndLineArray();
 		
 		r.InsetBySelf(1,1);
 		SetHighColor(112,112,112);
@@ -997,17 +1151,39 @@ MapView::DrawKey(BRect rect, bool pressed, bool vertical)
 		StrokeLine(r.LeftTop(), r.LeftTop());
 		
 	}
+	
+	char *str;
+	fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str);
+	if (str) {
+		bool hasGlyphs;
+		fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
+		if (hasGlyphs) {
+			SetFont(&fCurrentFont);
+			SetDrawingMode(B_OP_COPY);
+			SetHighColor(0,0,0);
+			SetLowColor(184,184,184);
+			BPoint point = fKeysRect[keyCode].LeftBottom();
+			point.x += 4;
+			point.y -= 5;
+			DrawString(str, point);
+			SetDrawingMode(B_OP_OVER);
+		}
+	}	
 }
 
 
 void
-MapView::DrawBorder(BRect borderRect)
+MapView::DrawBorder(BRect bRect)
 {
-	SetHighColor(80,80,80);
-	StrokeRect(borderRect);
-	SetHighColor(255,255,255);
-	StrokeLine(BPoint(borderRect.left + 1, borderRect.bottom), borderRect.RightBottom());
-	StrokeLine(BPoint(borderRect.right, borderRect.top + 1));
+	rgb_color gray = {80,80,80};
+	rgb_color white = {255,255,255};
+	
+	BeginLineArray(4);
+	AddLine(bRect.LeftTop(), bRect.LeftBottom(), gray);
+	AddLine(bRect.LeftTop(), bRect.RightTop(), gray);
+	AddLine(BPoint(bRect.left + 1, bRect.bottom), bRect.RightBottom(), white);
+	AddLine(bRect.RightBottom(), BPoint(bRect.right, bRect.top + 1), white);
+	EndLineArray();
 }
 
 
@@ -1023,27 +1199,28 @@ MapView::MessageReceived(BMessage *msg)
 			key_info info;
 			const uint8 *states;
 			ssize_t size;
-			bool need_update = false;
 			
 			if ((msg->FindData("states", 'UBYT', (const void **)&states, &size)==B_OK)
 				&& (msg->FindInt32("modifiers", (int32 *)&info.modifiers) == B_OK)) {
 				if (fOldKeyInfo.modifiers != info.modifiers) {
-					need_update = true;
-				}
-				
-				for (int8 i=0; i<16; i++)
-					if (fOldKeyInfo.key_states[i] != states[i]) {
-						need_update = true;
-						break;
-					}
-					
-				if (need_update) {
 					fOldKeyInfo.modifiers = info.modifiers;
-					for (int8 j=0; j<16; j++) 
-						fOldKeyInfo.key_states[j] = states[j];
+					for (int8 i=0; i<16; i++) 
+						fOldKeyInfo.key_states[i] = states[i];
 					Invalidate();
-				}
+				} else {
+				
+					for (int8 i=0; i<16; i++)
+						if (fOldKeyInfo.key_states[i] != states[i]) {
+							uint8 stbits = fOldKeyInfo.key_states[i] ^ states[i];
+							fOldKeyInfo.key_states[i] = states[i];
+							for (int8 j=7; stbits; j--,stbits>>=1)
+								if (stbits & 1)
+									DrawKey(i*8 + j);
+														
+						}
+				}											
 			}
+			
 			break;
 		}
 		default:

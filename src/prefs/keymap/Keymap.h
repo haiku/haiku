@@ -6,23 +6,29 @@
 //  by the Haiku license.
 //
 //
-//  File:        KeymapListItem.cpp
-//  Author:      Sandor Vroemisse, Jérôme Duval
+//  File:        Keymap.h
+//  Author:      Jérôme Duval
 //  Description: Keymap Preferences
 //  Created :    July 12, 2004
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-/*
- * A BStringItem modified such that it holds
- * the BEntry object it corresponds with
- */
- 
-#include "KeymapListItem.h"
+#ifndef KEYMAP_H
+#define KEYMAP_H
 
+#include <InterfaceDefs.h>
+#include <Entry.h>
 
-KeymapListItem::KeymapListItem( entry_ref &keymap, const char* name )
-	:	BStringItem( name ? name : keymap.name ),
-		fKeymap(keymap)
+class Keymap 
 {
-}
+public:
+	status_t Load(entry_ref &ref);
+	void DumpKeymap();
+	void GetChars(int32 keyCode, uint32 modifiers, char **chars);
+private:
+	char *fChars;
+	key_map fKeys;
+};
+
+
+#endif //KEYMAP_H

@@ -5,5 +5,6 @@ AddResources Keymap : Keymap.rdef ;
 Preference Keymap :
 	KeymapApplication.cpp
 	KeymapWindow.cpp
-	KeymapListItem.cpp 
+	KeymapListItem.cpp
+	Keymap.cpp
 	: be ;

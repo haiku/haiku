@@ -1,7 +1,24 @@
-#include <add-ons/input_server/InputServerDevice.h>
-#include <storage/File.h>
-#include <app/Application.h>
-#include <storage/Directory.h>
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2004, Haiku
+//
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
+//
+//
+//  File:        KeymapApplication.cpp
+//  Author:      Sandor Vroemisse, Jérôme Duval
+//  Description: Keymap Preferences
+//  Created :    July 12, 2004
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+#include <InputServerDevice.h>
+#include <File.h>
+#include <Application.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <Path.h>
 #if DEBUG
 	#include <interface/Input.h>
 	#include <stdio.h>
@@ -27,67 +44,11 @@ void KeymapApplication::MessageReceived( BMessage * message )
 }
 
 
-/*
- * Returns a BList containing BEntry objects
- * representing the systems' keymap files
- */
-BList* KeymapApplication::SystemMaps()
-{
-	// TODO: find a constant containing this path and use that instead
-	return EntryList( "/boot/beos/etc/Keymap" );
-}
-
-BList* KeymapApplication::UserMaps()
-{
-	// TODO: find a constant containing this path and use that instead
-	return EntryList( "/boot/home/config/settings/Keymap" );
-}
-
-BList*	KeymapApplication::EntryList( char *directoryPath )
-{
-	BList		*entryList;
-	BDirectory	*directory;
-	BEntry		*currentEntry;
 
 
-	entryList = new BList();
-	directory = new BDirectory();
 
-	if( directory->SetTo( directoryPath ) == B_OK )
-		// put each files' name in the list
-		while( true ) {
-			currentEntry = new BEntry();
-			if( directory->GetNextEntry( currentEntry, true ) != B_OK ) {
-				delete currentEntry;
-				break;
-			}
-			entryList->AddItem( currentEntry );
-			#if DEBUG
-				char	name[B_FILE_NAME_LENGTH];
-				currentEntry->GetName( name );
-				printf("Found: %s\n",name);
-			#endif //DEBUG
-		}
-	else {
-		// something went wrong; no system keymaps today
-		// TODO: catch error codes and act appropriately
-		
-	}
-	delete directory;
-
-	return entryList;
-}
-
-BEntry* KeymapApplication::CurrentMap()
-{
-	BEntry		*entry;
-
-	// TODO: find a constant containing this path and use that instead
-	entry = new BEntry( "/boot/home/config/settings/Key_map" );
-	return entry;
-}
-
-bool KeymapApplication::UseKeymap( BEntry *keymap )
+/*bool 
+KeymapApplication::UseKeymap( BEntry *keymap )
 { // Copies keymap to ~/config/settings/key_map
 	BFile	*inFile;
 	BFile	*outFile;
@@ -132,14 +93,18 @@ bool KeymapApplication::UseKeymap( BEntry *keymap )
 	return true;
 }
 
-bool KeymapApplication::IsValidKeymap( BFile *inFile )
+
+bool 
+KeymapApplication::IsValidKeymap( BFile *inFile )
 {
 	// TODO: implement this thing
 
 	return true;
 }
 
-int KeymapApplication::Copy( BFile *original, BFile *copy )
+
+int 
+KeymapApplication::Copy( BFile *original, BFile *copy )
 {
 	char	*buffer[ COPY_BUFFER_SIZE ];
 	int 	offset = 0;
@@ -169,9 +134,11 @@ int KeymapApplication::Copy( BFile *original, BFile *copy )
 	}
 	
 	return errorCode;
-}
+}*/
 
-int KeymapApplication::NotifyInputServer()
+
+int 
+KeymapApplication::NotifyInputServer()
 {
 	// This took me days to find out. Go figure.
 	// Be didn't need to restart the thing - they prolly used
@@ -182,10 +149,11 @@ int KeymapApplication::NotifyInputServer()
 }
 
 
-int main ()
+int 
+main ()
 {
 	new KeymapApplication;
 	be_app->Run();
 	delete be_app;
-	return 0;
+	return B_OK;
 }
