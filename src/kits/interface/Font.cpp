@@ -1147,9 +1147,15 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	
 	link.StartMessage(AS_GET_GLYPH_SHAPES);
 	
-	link.Attach<int32>(numChars);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
+	link.Attach<float>(fShear);
+	link.Attach<float>(fRotation);
+	link.Attach<uint32>(fFlags);
 	
-	for(int32 i=0; i<numChars; i++)
+	link.Attach<int32>(numChars);
+	for(int32 i = 0; i < numChars; i++)
 		link.Attach<char>(charArray[i]);
 	
 	link.FlushWithReply(&code);

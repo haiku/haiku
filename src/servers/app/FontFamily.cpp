@@ -146,7 +146,6 @@ uint16 FontStyle::TranslateStyleToFace(const char *name) const
 	
 	if(str.IFindFirst("bold")!=B_ERROR)
 		return B_BOLD_FACE;
-	
 	if(str.IFindFirst("italic")!=B_ERROR)
 		return B_ITALIC_FACE;
 	if(str.IFindFirst("oblique")!=B_ERROR)
@@ -154,6 +153,7 @@ uint16 FontStyle::TranslateStyleToFace(const char *name) const
 	
 	return B_REGULAR_FACE;
 }
+
 
 /*!
 	\brief Constructor

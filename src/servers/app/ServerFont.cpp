@@ -24,8 +24,12 @@
 //	Description:	Shadow BFont class
 //  
 //------------------------------------------------------------------------------
+#include <Shape.h>
 #include "ServerFont.h"
 #include "FontServer.h"
+#include "Angle.h"
+#include FT_FREETYPE_H
+#include FT_OUTLINE_H
 
 /*! 
 	\brief Constructor
@@ -169,6 +173,110 @@ void ServerFont::Height(font_height *fh)
 	
 	if(fStyle)
 		*fh=fStyle->GetHeight(fSize);
+}
+
+// functions needed to convert a freetype vector graphics to a BShape
+inline BPoint
+VectorToPoint(FT_Vector *vector)
+{
+	BPoint result;
+	result.x = float(int32(vector->x)) / 2097152;
+	result.y = -float(int32(vector->y)) / 2097152;
+	return result;
+}
+
+int
+MoveToFunc(FT_Vector *to, void *user)
+{
+	((BShape *)user)->MoveTo(VectorToPoint(to));
+	return 0;
+}
+
+int
+LineToFunc(FT_Vector *to, void *user)
+{
+	((BShape *)user)->LineTo(VectorToPoint(to));
+	return 0;
+}
+
+int
+ConicToFunc(FT_Vector *control, FT_Vector *to, void *user)
+{
+	BPoint controls[3];
+	
+	controls[0] = VectorToPoint(control);
+	controls[1] = VectorToPoint(to);
+	controls[2] = controls[1];
+	
+	((BShape *)user)->BezierTo(controls);
+	return 0;
+}
+
+int
+CubicToFunc(FT_Vector *control1, FT_Vector *control2, FT_Vector *to, void *user)
+{
+	BPoint controls[3];
+	
+	controls[0] = VectorToPoint(control1);
+	controls[1] = VectorToPoint(control2);
+	controls[2] = VectorToPoint(to);
+	
+	((BShape *)user)->BezierTo(controls);
+	return 0;
+}
+
+BShape **
+ServerFont::GetGlyphShapes(const char charArray[], int32 numChars) const
+{
+	if (!charArray || numChars <= 0)
+		return NULL;
+	
+	FT_Outline_Funcs funcs;
+	funcs.move_to = MoveToFunc;
+	funcs.line_to = LineToFunc;
+	funcs.conic_to = ConicToFunc;
+	funcs.cubic_to = CubicToFunc;
+	
+	FT_Face face = fStyle->GetFTFace();
+	if (!face)
+		return NULL;
+	
+	FT_Set_Char_Size(face, 0, int32(fSize) * 64, 72, 72);
+	
+	Angle rotation(frotation);
+	Angle shear(fshear);
+	
+	// First, rotate
+	FT_Matrix rmatrix;
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000);
+	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000);
+	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000);
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000);
+	
+	// Next, shear
+	FT_Matrix smatrix;
+	smatrix.xx = (FT_Fixed)(0x10000); 
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000);
+	smatrix.yx = (FT_Fixed)(0);
+	smatrix.yy = (FT_Fixed)(0x10000);
+	
+	// Multiply togheter
+	FT_Matrix_Multiply(&rmatrix, &smatrix);
+	
+	FT_Vector pen;
+	FT_Set_Transform(face, &smatrix, &pen);
+	
+	BShape **shapes = (BShape **)malloc(sizeof(BShape *) * numChars);
+	for (int i = 0; i < numChars; i++) {
+		shapes[i] = new BShape();
+		shapes[i]->Clear();
+		FT_Load_Char(face, charArray[i], FT_LOAD_NO_BITMAP);
+		FT_Outline outline = face->glyph->outline;
+		FT_Outline_Decompose(&outline, &funcs, shapes[i]);
+		shapes[i]->Close();
+	}
+	
+	return shapes;
 }
 
 /*!

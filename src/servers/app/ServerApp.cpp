@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ScrollBar.h>
+#include <Shape.h>
 #include <ServerProtocol.h>
 
 #include "AppServer.h"
@@ -1681,6 +1682,84 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			}
 			
 			fontserver->Unlock();
+			
+			break;
+		}
+		case AS_GET_GLYPH_SHAPES:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - point size
+			// 4) float - shear
+			// 5) float - rotation
+			// 6) uint32 - flags
+			// 7) int32 - numChars
+			// 8) char - chars (numChars times)
+			// 9) port_id - reply port
+			
+			// Returns:
+			// 1) size_t - message size
+			// 2) flattened BMessage containing archived BShape
+			// numChars times
+			
+			uint16 famid, styid;
+			uint32 flags;
+			float ptsize, shear, rotation;
+			
+			msg.Read<uint16>(&famid);
+			msg.Read<uint16>(&styid);
+			msg.Read<float>(&ptsize);
+			msg.Read<float>(&shear);
+			msg.Read<float>(&rotation);
+			msg.Read<uint32>(&flags);
+			
+			int32 numChars;
+			msg.Read<int32>(&numChars);
+			
+			char charArray[numChars];			
+			for (int32 i = 0; i < numChars; i++)
+				msg.Read<char>(&charArray[i]);
+			
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			ServerFont font;
+			if (font.SetFamilyAndStyle(famid, styid) == B_OK) {
+				font.SetSize(ptsize);
+				font.SetShear(shear);
+				font.SetRotation(rotation);
+				font.SetFlags(flags);
+				
+				BShape **shapes = font.GetGlyphShapes(charArray, numChars);
+				if (shapes) {
+					replylink.StartMessage(SERVER_TRUE);
+					for (int32 i = 0; i < numChars; i++) {
+						BMessage message;
+						if (shapes[i]->Archive(&message) != B_OK)
+							break;
+						delete shapes[i];
+						
+						size_t size = message.FlattenedSize();
+						char *buffer = new char[size];
+						if (message.Flatten(buffer, size) != B_OK) {
+							delete buffer;
+							break;
+						}
+						
+						replylink.Attach<size_t>(size);
+						replylink.Attach(buffer, size);
+					}
+					replylink.Flush();
+				} else {
+					replylink.StartMessage(SERVER_FALSE);
+					replylink.Flush();
+				}
+			} else {
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
 			
 			break;
 		}
