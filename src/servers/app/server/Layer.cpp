@@ -152,8 +152,6 @@ void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 	}
 	_bottomchild	= layer;
 
-	layer->_level	= _level+1;
-
 
 	layer->RebuildFullRegion();
 
@@ -1079,7 +1077,7 @@ void Layer::PrintToStream(void)
 	else
 		printf("Bottom child: NULL\n");
 	printf("Frame: "); _frame.PrintToStream();
-	printf("Token: %ld\nLevel: %ld\n",_view_token, _level);
+	printf("Token: %ld\n",_view_token);
 	printf("Hide count: %s\n",_hidden?"true":"false");
 	printf("Visible Areas: "); _visible.PrintToStream();
 	printf("Is updating = %s\n",(_is_updating)?"yes":"no");

@@ -76,16 +76,20 @@ bool Workspace::AddLayerPtr(WinBorder* layer){
 	item->upperItem	= NULL;
 	item->lowerItem	= NULL;
 
+	opLock.Lock();
 		// insert 'item' at the end. It doesn't matter where we add it,
 		// it will be placed correctly by SearchAndSetNewFront(item->layerPtr);
 	InsertItem(item, NULL);
+	opLock.Unlock();
 
 STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
 		// do a *smart* search and set the new 'front'
 	SearchAndSetNewFront(layer);
 		// do a *smart* search and set the new 'focus'
-	SearchAndSetNewFocus(layer);
-//STRACESTREAM();
+	//SearchAndSetNewFocus(layer); // - it WILL be called!
+		// this also does a redraw
+	SetFocusLayer(layer);
+	
 	return true;
 }
 /* Removes a WinBorder from workspace's list. It DOES NOT delete it!
@@ -101,6 +105,8 @@ STRACE(("BEFORE ANY opperation:\n"));
 STRACESTREAM();
 		// search to see if this workspace has WinBorder's pointer in its list
 	ListData	*item = NULL;
+
+	opLock.Lock();
 	if ((item = HasItem(layer))){
 		ListData	*nextItem = NULL;
 		bool		wasFront, wasFocus;
@@ -123,29 +129,45 @@ STRACESTREAM();
 			// remove from workspace's list
 		RemoveItem(item);
 
+		opLock.Unlock();
+
 			// reset some internal variables
 		layer->SetMainWinBorder(NULL);
 		// its RootLayer is set to NULL by Layer::RemoveChild(layer);
 printf("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID());
-		if (wasFront)
-			SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
+		if (wasFront){
+			if(wasFocus){
+				SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
+				SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
+			}
+			else
+				SetFrontLayer(nextItem? nextItem->layerPtr: NULL);
+		}
 
-		if (wasFocus)
-			SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
+		if (wasFocus && !wasFront)
+			SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
 STRACE(("AFTER opperations...\n"));
 STRACESTREAM();
+
 			// delete item struct, we no longer need that
 		delete item;
 		return true;
 	}
 	else{
 printf("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID());
+		opLock.Unlock();
 		return false;
 	}
 }
 //---------------------------------------------------------------------------
 WinBorder* Workspace::SetFocusLayer(WinBorder* layer){
+STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
+	
 	SearchAndSetNewFocus(layer);
+STRACESTREAM();
+// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
+	Invalidate();
+
 	return fFocusItem? fFocusItem->layerPtr : NULL;
 }
 //---------------------------------------------------------------------------
@@ -156,12 +178,9 @@ WinBorder* Workspace::FocusLayer() const{
 WinBorder* Workspace::SetFrontLayer(WinBorder* layer){
 STRACE(("\n@Workspace(%ld)::SetFrontLayer( %s )\n", ID(), layer? layer->GetName(): "NULL"));
 	SearchAndSetNewFront(layer);
-//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
-	if(fOwner->ActiveWorkspace() == this)
-		fOwner->DoInvalidate(BRegion(fOwner->Bounds()), NULL);
-//----------------
-
-// TODO: if (desktop->FrontWinBorder() != layer) REBUILD & INVALIDATE!
+STRACESTREAM();
+// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
+	Invalidate();
 
  	return fFrontItem? fFrontItem->layerPtr: NULL;;
 }
@@ -231,6 +250,13 @@ printf("%s - SELECTED!\n", wb->GetName());
 	}
 	opLock.Unlock();
 	return target;
+}
+//---------------------------------------------------------------------------
+void Workspace::Invalidate(){
+//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
+	if(fOwner->ActiveWorkspace() == this)
+		fOwner->DoInvalidate(BRegion(fOwner->Bounds()), NULL);
+//----------------
 }
 //---------------------------------------------------------------------------
 void Workspace::InsertItem(ListData* item, ListData* before){
@@ -469,6 +495,8 @@ STRACE(("#WS(%ld)::SASNF(%s) ENDED 1\n", ID(), preferred? preferred->GetName(): 
 	ListData		*lastInserted;
 	lastInserted	= FindPlace(HasItem(preferred));
 	preferred		= lastInserted? lastInserted->layerPtr: NULL;
+STRACE(("-WS(%ld)::SASNF(%s) - after FindPlace...", ID(), preferred? preferred->GetName(): "NULL"));
+STRACESTREAM();
 
 		// if the new front layer is the same... there is no point continuing
 	if(fFrontItem == lastInserted){
@@ -538,6 +566,8 @@ STRACE((" SAME TeamID\n"));
 							listItem	= listItem->lowerItem;
 							RemoveItem(item);
 						}
+						else
+							listItem	= listItem->lowerItem;
 					}
 					else
 						listItem	= listItem->lowerItem;
@@ -551,6 +581,7 @@ STRACE((" SAME TeamID\n"));
 					else
 						finalFMWList.AddItem(item);
 				}
+
 					// colapse the 2 lists
 				finalFMWList.AddFMWList(&commonFMW);
 				finalFMWList.AddFMWList(&appFMW);
@@ -913,13 +944,13 @@ void Workspace::SearchAndSetNewFocus(WinBorder* preferred){
 
 	bool		selectOthers = false;
 	ListData	*item = NULL;
+
 	for(item = fBottomItem; item != NULL; item = item->upperItem){
 			// if this WinBorder doesn't want to have focus... get to the next one
 		if (item->layerPtr->Window()->Flags() & B_AVOID_FOCUS)
 			continue;
 
-			// this means there is no modal window before our preferred one.
-		if (item->layerPtr == preferred)
+		if (preferred && item->layerPtr == preferred){
 				// our preffered one is hidden so... select another one
 			if (preferred && preferred->IsHidden()){
 				selectOthers = true;
@@ -928,24 +959,34 @@ void Workspace::SearchAndSetNewFocus(WinBorder* preferred){
 			else{
 				break;
 			}
+		}
+
+		if (item->layerPtr->_level == B_SYSTEM_FIRST || item->layerPtr->_level == B_MODAL_ALL_FEEL)
+		{
+			break;
+		}
+
+		if (item->layerPtr->_level == B_MODAL_APP_FEEL
+			 && (preferred && preferred->Window()->ClientTeamID() == item->layerPtr->Window()->ClientTeamID()))
+		{
+			break;
+		}
+
+		if (item->layerPtr->_level == B_MODAL_SUBSET_FEEL
+			&& (preferred && item->layerPtr->MainWinBorder() == preferred))
+		{
+			break;
+		}
 
 			// select one window, other than a system_last one!
-		if (selectOthers && item->layerPtr->_level != B_SYSTEM_LAST)
-			break;
-
-			// we now chose a modal window to give focus to
-		if (item->layerPtr->_level == B_SYSTEM_FIRST
-			|| item->layerPtr->_level == B_MODAL_ALL_FEEL
-			|| item->layerPtr->_level == B_MODAL_APP_FEEL
-			|| item->layerPtr->_level == B_MODAL_SUBSET_FEEL)
-		{
+		if (selectOthers && item->layerPtr->_level != B_SYSTEM_LAST){
 			break;
 		}
 	}
 
 		// there are no windows below us to select. take the one from above us.
 	if(selectOthers && !item){
-			// there HAS to be a 
+			// there HAS to be valid
 		item 	= HasItem(preferred);
 		if (item)
 			item= item->lowerItem;

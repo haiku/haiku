@@ -136,10 +136,11 @@ void Desktop::SetActiveRootLayer(RootLayer* rl){
 		return;
 
 	fActiveRootLayer	= rl;
-	
+
+// TODO: fix!!!!!!!!!!!!!!!!!!!!!!!! or not?
 		// also set he new front and focus
-	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
+//	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
+//	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
 	
 // TODO: other tasks required when this happens. I don't know them now.
 // Rebuild & Invalidate
@@ -195,9 +196,10 @@ void Desktop::AddWinBorder(WinBorder* winBorder){
 	fLayerLock.Lock();
 	fWinBorderList.AddItem(winBorder);
 	fLayerLock.Unlock();
-
-	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
+	
+// TODO: remove those 2? I vote for: YES! still... have to think...
+//	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
+//	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
 }
 //---------------------------------------------------------------------------
 void Desktop::RemoveWinBorder(WinBorder* winBorder){
@@ -209,10 +211,11 @@ void Desktop::RemoveWinBorder(WinBorder* winBorder){
 		winBorder->GetRootLayer()->RemoveWinBorder(winBorder);
 	}
 
-	if (winBorder == fFrontWinBorder)
-		SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-	if (winBorder == fFocusWinBorder)
-		SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
+// TODO: remove those 4? I vote for: YES! still... have to think...
+//	if (winBorder == fFrontWinBorder)
+//		SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
+//	if (winBorder == fFocusWinBorder)
+//		SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
 
 	fLayerLock.Lock();
 	fWinBorderList.RemoveItem(winBorder);
@@ -228,9 +231,11 @@ void Desktop::SetFrontWinBorder(WinBorder* winBorder){
 // TODO: implement
 }
 //---------------------------------------------------------------------------
-void Desktop::SetFocusWinBorder(WinBorder* winBorder){
-	if (fFocusWinBorder == winBorder && (winBorder && !winBorder->IsHidden()))
+void Desktop::SetFoocusWinBorder(WinBorder* winBorder){
+	if (FocusWinBorder() == winBorder && (winBorder && !winBorder->IsHidden()))
 		return;
+
+	fFocusWinBorder		= FocusWinBorder();
 
 	// NOTE: we assume both, the old and new focus layer are in the active workspace
 	WinBorder	*newFocus = NULL;
@@ -240,8 +245,26 @@ void Desktop::SetFocusWinBorder(WinBorder* winBorder){
 	}
 	
 	if(winBorder){
+// TODO: NO! this call is to determine the correct order! NOT to rebuild/redraw anything!
+// TODO: WinBorder::SetFront... will do that - both!
+// TODO: modify later
+// TODO: same applies for the focus state - RootLayer::SetFocus also does redraw
+//	Workspace::SetFocus - Only determines the focus! Just like above!
+/*
 		newFocus	= winBorder->GetRootLayer()->ActiveWorkspace()->SetFocusLayer(winBorder);
 		newFocus->SetFocus(true);
+*/
+		Workspace		*aws;
+
+		aws				= winBorder->GetRootLayer()->ActiveWorkspace();
+		aws->SearchAndSetNewFocus(winBorder);
+		
+			//why do put this line? Eh... I will remove it later...
+		newFocus		= aws->FocusLayer();
+
+		aws->FocusLayer()->SetFocus(true);
+		
+		aws->Invalidate();
 	}
 
 	fFocusWinBorder		= newFocus;
@@ -253,8 +276,8 @@ WinBorder* Desktop::FrontWinBorder(void) const{
 }
 //---------------------------------------------------------------------------
 WinBorder* Desktop::FocusWinBorder(void) const{
-//	return fActiveRootLayer->ActiveWorkspace()->FocusLayer();
-	return fFocusWinBorder;
+	return fActiveRootLayer->ActiveWorkspace()->FocusLayer();
+//	return fFocusWinBorder;
 }
 
 				// Input related methods
@@ -285,21 +308,17 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			ws			= rl->ActiveWorkspace();
 			target		= ws->SearchLayerUnderPoint(pt);
 			if (target){
-				printf("\t '%s' was selected.\n", target->GetName());
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
 
-
-				ws->SetFrontLayer(target);
-				SetFocusWinBorder(target);
-// TODO: improve!
-				rl->Invalidate(rl->Bounds());
-
+				ws->SearchAndSetNewFront(target);
+// NOTE: !!! Be VERY careful about this method !!!!
+				SetFoocusWinBorder(target);
+				//ws->SetFocusLayer(target);
 
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();
 			}
-
 			break;
 		}
 		case B_MOUSE_UP:{
@@ -428,6 +447,18 @@ void Desktop::PrintToStream(){
 		printf("\t%ld\n", ((Screen*)fScreenList.ItemAt(i))->ScreenNumber());
 	}
 	
+}
+//---------------------------------------------------------------------------
+WinBorder* Desktop::FindWinBorderByServerWindowToken(int32 token){
+	WinBorder*		wb;
+	fLayerLock.Lock();
+	for (int32 i = 0; (wb = (WinBorder*)fWinBorderList.ItemAt(i)); i++){
+		if (wb->Window()->ClientToken() == token)
+			break;
+	}
+	fLayerLock.Unlock();
+	
+	return wb;
 }
 //---------------------------------------------------------------------------
 void Desktop::PrintVisibleInRootLayerNo(int32 no){

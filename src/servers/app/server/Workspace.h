@@ -41,6 +41,7 @@ public:
 			bool				GoToItem(WinBorder* layer);
 
 			WinBorder*			SearchLayerUnderPoint(BPoint pt);
+			void				Invalidate();
 
 			void				SetLocalSpace(const uint32 colorspace);
 			uint32				LocalSpace() const;
@@ -56,6 +57,10 @@ public:
 			void				PrintToStream() const;
 			void				PrintItem(ListData *item) const;
 
+// .... private :-) - do not use!
+			void				SearchAndSetNewFront(WinBorder* preferred);
+			void				SearchAndSetNewFocus(WinBorder* preferred);
+
 private:
 
 			void				InsertItem(ListData* item, ListData* before);
@@ -64,8 +69,6 @@ private:
 			ListData*			HasItem(WinBorder* layer);
 
 			ListData*			FindPlace(ListData* pref);
-			void				SearchAndSetNewFront(WinBorder* preferred);
-			void				SearchAndSetNewFocus(WinBorder* preferred);
 
 			int32				fID;
 			uint32				fSpace;

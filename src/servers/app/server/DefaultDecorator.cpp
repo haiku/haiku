@@ -301,7 +301,17 @@ STRACE(("DefaultDecorator: Get Footprint\n"));
 	// object's visible region.
 	if(!region)
 		return;
+
+	if(_look == B_NO_BORDER_WINDOW_LOOK){
+		region->Set(_frame);
+		return;
+	}
 	
+	if(_look == B_BORDERED_WINDOW_LOOK){
+		region->Set(_borderrect);
+		return;
+	}
+
 	region->Set(_borderrect);
 	region->Include(_tabrect);
 }
@@ -408,7 +418,7 @@ void DefaultDecorator::_DrawTab(BRect r)
 STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
 		return;
 	
 	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
@@ -443,7 +453,7 @@ STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Draw the buttons if we're supposed to	
 	if(!(_flags & B_NOT_CLOSABLE))
 		_DrawClose(_closerect);
-	if(!(_flags & B_NOT_ZOOMABLE))
+	if(!(_flags & B_NOT_ZOOMABLE) && _look != B_MODAL_WINDOW_LOOK)
 		_DrawZoom(_zoomrect);
 }
 
@@ -531,9 +541,12 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-		_layerdata.highcolor = RGBColor( 255, 255, 255 );	
+		_layerdata.highcolor = RGBColor( 192, 192, 192 );	
 		_driver->FillRect(_frame,_layerdata.highcolor);
 	#endif
+
+	if(_look == B_NO_BORDER_WINDOW_LOOK)
+		return;
 
 	if(!borderwidth){
 		return;
@@ -798,7 +811,12 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 		}
 	}
 
-	_driver->StrokeLineArray(points,numlines,_layerdata.pensize,colors);
+	if(_feel == B_NO_BORDER_WINDOW_LOOK){
+		//do(draw) nothing!
+	}
+	else{
+		_driver->StrokeLineArray(points,numlines,_layerdata.pensize,colors);
+	}
 	
 	delete rightindices;
 	delete leftindices;
@@ -808,81 +826,89 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	{
 		r=_resizerect;
 //		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-		
+
+		switch(_look){
 		// This code is strictly for B_DOCUMENT_WINDOW looks
-		if(_look==B_DOCUMENT_WINDOW_LOOK)
-		{
-			r.right-=4;
-			r.bottom-=4;
-			_layerdata.highcolor=framecolors[2];
+			case B_DOCUMENT_WINDOW_LOOK:{
+				r.right-=4;
+				r.bottom-=4;
+				_layerdata.highcolor=framecolors[2];
 
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),_layerdata.pensize,_layerdata.highcolor);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
+				_driver->StrokeLine(r.LeftTop(),r.RightTop(),_layerdata.pensize,_layerdata.highcolor);
+				_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
 
-			r.OffsetBy(1,1);
-			_layerdata.highcolor=framecolors[0];
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),_layerdata.pensize,_layerdata.highcolor);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
+				r.OffsetBy(1,1);
+				_layerdata.highcolor=framecolors[0];
+				_driver->StrokeLine(r.LeftTop(),r.RightTop(),_layerdata.pensize,_layerdata.highcolor);
+				_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
 			
-			r.OffsetBy(1,1);
-			_layerdata.highcolor=framecolors[1];
-			_driver->FillRect(r,_layerdata.highcolor);
+				r.OffsetBy(1,1);
+				_layerdata.highcolor=framecolors[1];
+				_driver->FillRect(r,_layerdata.highcolor);
 			
-/*			r.left+=2;
-			r.top+=2;
-			r.right-=3;
-			r.bottom-=3;
+/*				r.left+=2;
+				r.top+=2;
+				r.right-=3;
+				r.bottom-=3;
 */
-			r.right-=2;
-			r.bottom-=2;
-			int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+				r.right-=2;
+				r.bottom-=2;
+				int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 		
-			rgb_color halfcol, startcol, endcol;
-			float rstep,gstep,bstep,i;
+				rgb_color halfcol, startcol, endcol;
+				float rstep,gstep,bstep,i;
 			
-			int steps=(w<h)?w:h;
+				int steps=(w<h)?w:h;
 		
-			startcol=framecolors[0].GetColor32();
-			endcol=framecolors[4].GetColor32();
+				startcol=framecolors[0].GetColor32();
+				endcol=framecolors[4].GetColor32();
 		
-			halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
+				halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
 		
-			rstep=(startcol.red-halfcol.red)/steps;
-			gstep=(startcol.green-halfcol.green)/steps;
-			bstep=(startcol.blue-halfcol.blue)/steps;
+				rstep=(startcol.red-halfcol.red)/steps;
+				gstep=(startcol.green-halfcol.green)/steps;
+				bstep=(startcol.blue-halfcol.blue)/steps;
 			
-			// Explicitly locking the driver is normally unnecessary. However, we need to do
-			// this because we are rapidly drawing a series of calls which would not necessarily
-			// draw correctly if we didn't do so.
-			_driver->Lock();
-			for(i=0;i<=steps; i++)
-			{
-				_layerdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
-					uint8(startcol.green-(i*gstep)),
-					uint8(startcol.blue-(i*bstep)));
+				// Explicitly locking the driver is normally unnecessary. However, we need to do
+				// this because we are rapidly drawing a series of calls which would not necessarily
+				// draw correctly if we didn't do so.
+				_driver->Lock();
+				for(i=0;i<=steps; i++)
+				{
+					_layerdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
+						uint8(startcol.green-(i*gstep)),
+						uint8(startcol.blue-(i*bstep)));
 				
-				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),_layerdata.pensize,_layerdata.highcolor);
+					_driver->StrokeLine(BPoint(r.left,r.top+i),
+						BPoint(r.left+i,r.top),_layerdata.pensize,_layerdata.highcolor);
 		
-				_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
-					uint8(halfcol.green-(i*gstep)),
-					uint8(halfcol.blue-(i*bstep)));
-				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),_layerdata.pensize,_layerdata.highcolor);			
+					_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
+						uint8(halfcol.green-(i*gstep)),
+						uint8(halfcol.blue-(i*bstep)));
+					_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
+						BPoint(r.left+i,r.top+steps),_layerdata.pensize,_layerdata.highcolor);			
+				}
+				_driver->Unlock();
+//				_layerdata.highcolor=framecolors[4];
+//				_driver->StrokeRect(r,_layerdata.pensize,_layerdata.highcolor);
+				break;
 			}
-			_driver->Unlock();
-//			_layerdata.highcolor=framecolors[4];
-//			_driver->StrokeRect(r,_layerdata.pensize,_layerdata.highcolor);
-		}
-		else
-		{
-			_layerdata.highcolor=framecolors[2];
-			_driver->StrokeLine(BPoint(r.right-4,r.top),BPoint(r.right-2,r.top),
-				_layerdata.pensize,_layerdata.highcolor);
-			_driver->StrokeLine(BPoint(r.left,r.bottom-4),BPoint(r.left,r.bottom-2),
-				_layerdata.pensize,_layerdata.highcolor);
+
+			case B_TITLED_WINDOW_LOOK:
+			case B_FLOATING_WINDOW_LOOK:{
+				_layerdata.highcolor=framecolors[2];
+				_driver->StrokeLine(BPoint(r.right-4,r.top),BPoint(r.right-2,r.top),
+					_layerdata.pensize,_layerdata.highcolor);
+				_driver->StrokeLine(BPoint(r.left,r.bottom-4),BPoint(r.left,r.bottom-2),
+					_layerdata.pensize,_layerdata.highcolor);
+				
+				break;
+			}
+			
+			default:{
+				// draw no resize corner
+				break;
+			}
 		}
 	}
-
-	
 }

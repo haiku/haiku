@@ -129,6 +129,7 @@ public:
 									{ fWorkspaces = wks; }
 			void				QuietlySetFeel(int32 feel)
 									{ _feel = feel; }
+			int32				ClientToken() const { return _handlertoken; }
 
 			FMWList				fWinFMWList;
 protected:	

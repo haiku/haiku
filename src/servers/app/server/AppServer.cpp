@@ -520,6 +520,8 @@ void AppServer::DispatchMessage(PortMessage *msg)
 				{
 					srvapp		= (ServerApp *)_applist->RemoveItem(i);
 					if(srvapp){
+						status_t		temp;
+						wait_for_thread(srvapp_id, &temp);
 						delete srvapp;
 						srvapp	= NULL;
 					}

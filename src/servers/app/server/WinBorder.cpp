@@ -721,19 +721,40 @@ void WinBorder::AddToSubsetOf(WinBorder* main){
 			// because this window is in a subset it should appear in the
 			// workspaces its main window appears in.
 		Window()->QuietlySetWorkspaces(main->Window()->Workspaces());
-			// this is a *modal* window, so add it to workspaces.
-		if ( !(main->IsHidden()) && Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL){
-			main->GetRootLayer()->AddWinBorderToWorkspaces(this, main->Window()->Workspaces());
+			// this is a *modal* window, so add it to main windows workspaces.
+		if (Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL){
+			RootLayer		*rl = main->GetRootLayer();
+			rl->fMainLock.Lock();
+			rl->AddWinBorderToWorkspaces(this, main->Window()->Workspaces());
+			rl->fMainLock.Unlock();
 		}
 			// this a *floating* window so if the main window is 'front',
-			// 	add it to the current workspace.
+			// 	add it to workspace.
 		if ( !(main->IsHidden()) && Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
-			int32	count = main->GetRootLayer()->WorkspaceCount();
-			for(int32 i=0; i < count; i++){
-				Workspace	*ws = main->GetRootLayer()->WorkspaceAt(i+1);
-				if(ws->FrontLayer() == main)
+			RootLayer		*rl = main->GetRootLayer();
+
+			desktop->fGeneralLock.Lock();
+printf("WinBorder(%s)::AddToSubsetOf() - General lock acquired\n", GetName());
+			rl->fMainLock.Lock();
+printf("WinBorder(%s)::AddToSubsetOf() - Main lock acquired\n", GetName());
+			for(int32 i = 0; i < rl->WorkspaceCount(); i++){
+				Workspace	*ws = rl->WorkspaceAt(i+1);
+				if(ws->FrontLayer() == main){
+printf("\n@\n@\n");
+ws->PrintToStream();
 					ws->AddLayerPtr(this);
+					if(rl->ActiveWorkspace() == ws && !IsHidden()){
+							ws->Invalidate();
+printf("\n#\n#\n");
+ws->PrintToStream();
+printf("\n#\n#\n");
+					}
+				}
 			}
+		rl->fMainLock.Unlock();
+printf("WinBorder(%s)::AddToSubsetOf() - Main lock released\n", GetName());
+		desktop->fGeneralLock.Unlock();
+printf("WinBorder(%s)::AddToSubsetOf() - General lock released\n", GetName());
 		}
 	}
 }
@@ -757,7 +778,7 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main){
 //---------------------------------------------------------------------------
 void WinBorder::PrintToStream(){
 	printf("\t%s", GetName());
-		if (Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+/*		if (Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
 			printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
 		if (Window()->Feel() == B_FLOATING_APP_WINDOW_FEEL)
 			printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
@@ -771,9 +792,24 @@ void WinBorder::PrintToStream(){
 			printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
 		if (Window()->Feel() == B_NORMAL_WINDOW_FEEL)
 			printf("\t%s", "B_NORMAL_WINDOW_FEEL");
+*/
+		if (_level == B_FLOATING_SUBSET_FEEL)
+			printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
+		if (_level == B_FLOATING_APP_FEEL)
+			printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
+		if (_level == B_FLOATING_ALL_FEEL)
+			printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
+		if (_level == B_MODAL_SUBSET_FEEL)
+			printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
+		if (_level == B_MODAL_APP_FEEL)
+			printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
+		if (_level == B_MODAL_ALL_FEEL)
+			printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
+		if (_level == B_NORMAL_FEEL)
+			printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
 	printf("\t%s\n", _hidden?"hidden" : "not hidden");
-	_full.PrintToStream();
+//	_full.PrintToStream();
 }
 //---------------------------------------------------------------------------
 void WinBorder::UpdateColors(void)

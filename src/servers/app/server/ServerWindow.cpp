@@ -292,22 +292,23 @@ void ServerWindow::Show(void)
 STRACE(("ServerWindow %s: Show\n",_title->String()));
 	if(_winborder)
 	{
-		desktop->fGeneralLock.Lock();
-		_winborder->Show();
-		desktop->fGeneralLock.Unlock();
-
 		RootLayer	*rl		= _winborder->GetRootLayer();
 
 		desktop->fGeneralLock.Lock();
 printf("ServerWindow(%s)::Show() - General lock acquired\n", _winborder->GetName());
 		rl->fMainLock.Lock();
 printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName());
+
+		_winborder->Show();
+
 		int32		wksCount= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
-			if (fWorkspaces & (0x00000001UL << i))
-				rl->WorkspaceAt(i+1)->SetFrontLayer(_winborder);
+			if (fWorkspaces & (0x00000001UL << i)){
+				Workspace		*ws = rl->WorkspaceAt(i+1);
+				ws->SearchAndSetNewFront(_winborder);
+				ws->SetFocusLayer(_winborder);
+			}
 		}
-		desktop->SetFocusWinBorder(_winborder);
 		rl->fMainLock.Unlock();
 printf("ServerWindow(%s)::Show() - Main lock released\n", _winborder->GetName());
 		desktop->fGeneralLock.Unlock();
@@ -320,25 +321,36 @@ void ServerWindow::Hide(void)
 {
 STRACE(("ServerWindow %s: Hide\n",_title->String()));
 	if(_winborder){
-		desktop->fGeneralLock.Lock();
-		_winborder->Hide();
-		desktop->fGeneralLock.Unlock();
-
 		RootLayer	*rl		= _winborder->GetRootLayer();
 		Workspace	*ws		= NULL;
 
+		desktop->fGeneralLock.Lock();
+printf("ServerWindow(%s)::Hide() - General lock acquired\n", _winborder->GetName());
 		rl->fMainLock.Lock();
+printf("ServerWindow(%s)::Hide() - Main lock acquired\n", _winborder->GetName());
+
+		_winborder->Hide();
+
 		int32		wksCount= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
 			ws		= rl->WorkspaceAt(i+1);
 			if ( ws->FrontLayer() == _winborder){
-				ws->SetFrontLayer(_winborder);
+				if(ws->FocusLayer() == _winborder){
+						// do not redraw! just set the new front.
+					ws->SearchAndSetNewFront(_winborder);
+						// redraw also
+					ws->SetFocusLayer(_winborder);
+				}
+				else{
+						// redraw also
+					ws->SetFrontLayer(_winborder);
+				}
 			}
 		}
-
-		if(desktop->FocusWinBorder() == _winborder)
-			desktop->SetFocusWinBorder(_winborder);
 		rl->fMainLock.Unlock();
+printf("ServerWindow(%s)::Hide() - Main lock released\n", _winborder->GetName());
+		desktop->fGeneralLock.Unlock();
+printf("ServerWindow(%s)::Hide() - General lock released\n", _winborder->GetName());
 	}
 }
 
@@ -1358,8 +1370,24 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_ADD_TO_SUBSET:
 		{
+			WinBorder	*wb;
+			int32		mainToken;
+			
+			ses->ReadInt32(&mainToken);
+			
+			wb			= desktop->FindWinBorderByServerWindowToken(mainToken);
+			if(wb){
+				ses->WriteInt32(SERVER_TRUE);
+				ses->Sync();
+				
+				_winborder->AddToSubsetOf(wb);
+			}
+			else{
+				ses->WriteInt32(SERVER_FALSE);
+				ses->Sync();
+			}
 			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Add_To_Subset unimplemented\n",_title->String()));
+			STRACE(("\n\n\n\n\n\nServerWindow %s: Message ADD_TO_SUBSET unimplemented\n",_title->String()));
 			break;
 		}
 		case AS_REM_FROM_SUBSET:
@@ -2011,7 +2039,6 @@ int32 ServerWindow::MonitorWin(void *data)
 	{
 		code		= 0;
 		win->ses->ReadInt32(&code);
-		
 		switch(code){
 				// this means the client has been killed
 			case 0:{

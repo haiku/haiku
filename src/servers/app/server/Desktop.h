@@ -41,7 +41,7 @@ public:
 			void				RemoveWinBorder(WinBorder* winBorder);
 			bool				HasWinBorder(WinBorder* winBorder);
 			void				SetFrontWinBorder(WinBorder* winBorder);
-			void				SetFocusWinBorder(WinBorder* winBorder);
+			void				SetFoocusWinBorder(WinBorder* winBorder);
 			WinBorder*			FrontWinBorder(void) const;
 			WinBorder*			FocusWinBorder(void) const;
 
@@ -74,6 +74,8 @@ public:
 
 // "Private" to app_server :-) - means they should not be used very much
 			void				RemoveSubsetWindow(WinBorder* wb);
+			WinBorder*			FindWinBorderByServerWindowToken(int32 token);
+
 			BLocker				fGeneralLock;
 			BLocker				fLayerLock;
 			BList				fWinBorderList;
