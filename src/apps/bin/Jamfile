@@ -92,6 +92,7 @@ SubInclude OBOS_TOP src apps bin gawk ;
 SubInclude OBOS_TOP src apps bin grep-2.5 ;
 SubInclude OBOS_TOP src apps bin less-381 ;
 SubInclude OBOS_TOP src apps bin listdev ;
+SubInclude OBOS_TOP src apps bin make ;
 SubInclude OBOS_TOP src apps bin makeudfimage ;
 SubInclude OBOS_TOP src apps bin mkdos ;
 SubInclude OBOS_TOP src apps bin patch ;
