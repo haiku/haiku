@@ -95,10 +95,23 @@ _debugPrintf(const char *fmt, ...)
 
 
 int
-_sPrintf(const char * message, ...)
+_sPrintf(const char *fmt, ...)
 {
-	puts("*** _sPrintf call - not yet implemented ***");
-	printf("%s\n", message);
+	va_list ap;
+	int ret;
+	char buffer[256]; // seems to be the size used in R5
+
+	// TODO : we need locking here
+	
+	va_start(ap, fmt);
+	ret = vsnprintf(buffer, 256, fmt, ap);
+	va_end(ap);
+
+	if (!ret)
+		return ret;
+
+	_kern_debug_output(buffer);	
+
 	return 0;
 }
 
