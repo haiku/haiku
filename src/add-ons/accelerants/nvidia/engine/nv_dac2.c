@@ -100,13 +100,17 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	{
 		return result;
 	}
-	
+
 	/*reprogram (disable,select,wait for stability,enable)*/
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
 //	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
 
 	/* program new frequency */
 	DAC2W(PIXPLLC, ((p << 16) | (n << 8) | m));
+
+	/* program MSByte N and M scalers if they exist (b31=1 enables them) */
+	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+		DAC2W(PIXPLLC2, 0x80000401);
 
 	/* Wait for the PIXPLL frequency to lock until timeout occurs */
 //fixme: do NV cards have a LOCK indication bit??
@@ -221,8 +225,8 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 		/* check if this is within range of the VCO specs */
 		if ((f_vco >= si->ps.min_video_vco) && (f_vco <= si->ps.max_video_vco))
 		{
-			/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
-			f_vco /= si->pixpll_vco_div2;
+			/* FX5600 and FX5700 tweak for MSbytes N and M scalers */
+			if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36)) f_vco /= 4;
 
 			/* iterate trough all valid reference-frequency postscaler settings */
 			for (m = 7; m <= 14; m++)
@@ -236,9 +240,13 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 				if ((n < 1) || (n > 255))	continue;
 
 				/* find error in frequency this setting gives */
-				/* si->pixpll_vco_div2 below is NV31 (FX5600) tweak (missing register) */
-				error =
-					fabs((req_pclk / si->pixpll_vco_div2) - (((si->ps.f_ref / m) * n) / p));
+				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
+				{
+					/* FX5600 and FX5700 tweak for MSbytes N and M scalers */
+					error = fabs((req_pclk / 4) - (((si->ps.f_ref / m) * n) / p));
+				}
+				else
+					error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
 
 				/* note the setting if best yet */
 				if (error < error_best)
@@ -259,8 +267,8 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 
 	/* log the VCO frequency found */
 	f_vco = ((si->ps.f_ref / m) * n);
-	/* NV31 (FX5600) tweak (missing register for 2nd VCO postscaler) */
-	f_vco *= si->pixpll_vco_div2;
+	/* FX5600 and FX5700 tweak for MSbytes N and M scalers */
+	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36)) f_vco *= 4;
 
 	LOG(2,("DAC2: pix VCO frequency found %fMhz\n", f_vco));
 

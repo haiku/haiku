@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-5 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-6 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -911,6 +911,9 @@ status_t nv_general_bios_to_powergraphics()
 	 * bit  0: TVOUT. (> NV04A) */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
+	/* select colormode CRTC registers base adresses */
+	NV_REG8(NV8_MISCW) = 0xcb;
+
 	/* unlock card registers for R/W access */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 	CRTCW(LOCK, 0x57);
@@ -939,42 +942,50 @@ status_t nv_general_bios_to_powergraphics()
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 	}
 
-	//fixme: FX5600 cards have a second postdivider for the pixel PLL VCO.
-	//find it and program it, instead of relying on the cards BIOS...
-	//BIOS tested: FX5600 BIOS V4.31.20.38.00
-
-	//UPDATE: create new pllsetup (all 4 PLL's) for NV31(FX5600) and NV36(FX5700)
-	//these cards have extra N and M dividers at offset $70 above primary dividers.
-
-	/* non-NV31/NV36 cards have no second postdivider */
-	si->pixpll_vco_div2 = 1;
-	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-	{
-		/* only reading b0-7, as the rest seems to be write-only */
-		uint16 v_display = CRTCR(VDISPE) + 1;
-		if ((!(CRTCR(REPAINT1) & 0x01)) &&
-			((v_display == (600 & 0xff)) || (v_display == (1200 & 0xff))))
-		{
-			/* if a VESA mode was already set, and the mode was 800x600 or 1600x1200
-			 * the BIOS programs the second VCO postdivider to 5 */
-			si->pixpll_vco_div2 = 5;
-			LOG(2, ("INIT: assuming NV31 pixPLL second VCO postdivider is set to 5!\n"));
-		}
-		else
-		{
-			/* else the BIOS programs the second VCO postdivider to 4 */
-			si->pixpll_vco_div2 = 4;
-			LOG(2, ("INIT: assuming NV31 pixPLL second VCO postdiviver is set to 4!\n"));
-		}
-	}
-
+	/* enable 'enhanced' mode on primary head: */
+	/* enable access to primary head */
+	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+	/* don't doublebuffer CRTC access: set programmed values immediately */
+	CRTCW(BUFFER, 0xff);
+	/* select VGA mode (old VGA register) */
+	CRTCW(MODECTL, 0xc3);
+	/* select graphics mode (old VGA register) */
+	SEQW(MEMMODE, 0x0e);
+	/* select 8 dots character clocks (old VGA register) */
+	SEQW(CLKMODE, 0x21);
+	/* select VGA mode (old VGA register) */
+	GRPHW(MODE, 0x00);
+	/* select graphics mode (old VGA register) */
+	GRPHW(MISC, 0x01);
+	/* select graphics mode (old VGA register) */
+	ATBW(MODECTL, 0x01);
 	/* enable 'enhanced mode', enable Vsync & Hsync,
 	 * set DAC palette to 8-bit width, disable large screen */
-	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
 	CRTCW(REPAINT1, 0x04);
+
+	/* enable 'enhanced' mode on secondary head: */
 	if (si->ps.secondary_head)
 	{
+		/* enable access to secondary head (is SEQ2, GRPH2, CRTC2, ATB2, etc!!) */
 		CRTC2W(OWNER, 0x03);
+		/* select colormode CRTC2 registers base adresses */
+		NV_REG8(NV8_MISCW) = 0xcb;
+		/* don't doublebuffer CRTC2 access: set programmed values immediately */
+		CRTC2W(BUFFER, 0xff);
+		/* select VGA mode (old VGA register) */
+		CRTC2W(MODECTL, 0xc3);
+		/* select graphics mode (old VGA register) */
+		SEQW(MEMMODE, 0x0e);
+		/* select 8 dots character clocks (old VGA register) */
+		SEQW(CLKMODE, 0x21);
+		/* select VGA mode (old VGA register) */
+		GRPHW(MODE, 0x00);
+		/* select graphics mode (old VGA register) */
+		GRPHW(MISC, 0x01);
+		/* select graphics mode (old VGA register) */
+		ATB2W(MODECTL, 0x01);
+		/* enable 'enhanced mode', enable Vsync & Hsync,
+		 * set DAC palette to 8-bit width, disable large screen */
 		CRTC2W(REPAINT1, 0x04);
 	}
 
