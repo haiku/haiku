@@ -779,14 +779,14 @@ BFont::TruncateString(BString *inOut, uint32 mode, float width) const
 	
 	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<uint32>(mode);
 	link.Attach<float>(width);
 	link.Attach<int32>(1);
 	link.AttachString(inOut->String());
 	link.FlushWithReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return;
 	
 	char *string;
 	link.ReadString(&string);
@@ -808,9 +808,6 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	
 	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<uint32>(mode);
 	link.Attach<float>(width);
 	link.Attach<int32>(numStrings);
@@ -819,6 +816,9 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 		link.AttachString(stringArray[i]);
 	
 	link.FlushWithReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return;
 	
 	for(int32 i=0; i<numStrings; i++)
 	{
@@ -842,9 +842,6 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 	
 	link.StartMessage(AS_GET_TRUNCATED_STRINGS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<uint32>(mode);
 	link.Attach<float>(width);
 	link.Attach<int32>(numStrings);
@@ -853,6 +850,9 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 		link.AttachString(stringArray[i]);
 	
 	link.FlushWithReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return;
 	
 	// TODO: Look into a possible BPortLink::ReadIntoString() method to speed things
 	// like this up, along with the other string truncation functions
@@ -913,9 +913,6 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	
 	link.StartMessage(AS_GET_STRING_WIDTHS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<int32>(numStrings);
 	
 	for(int32 i=0; i<numStrings; i++)
@@ -926,6 +923,9 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+	
 	for(int32 i=0; i<numStrings; i++)
 		link.Read<float>(&widthArray[i]);
 }
@@ -965,8 +965,6 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(AS_GET_ESCAPEMENTS);
-	if(code!=SERVER_TRUE)
-		return;
 	
 	link.Attach<int32>(numChars);
 	
@@ -990,6 +988,9 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 	}
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+
 	for(int32 i=0; i<numChars; i++)
 		link.Read<BPoint>(&escapementArray[i]);
 }
@@ -1006,9 +1007,6 @@ BFont::GetEdges(const char charArray[], int32 numBytes, edge_info edgeArray[]) c
 	
 	link.StartMessage(AS_GET_EDGES);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<int32>(numBytes);
 	
 	for(int32 i=0; i<numBytes; i++)
@@ -1016,6 +1014,9 @@ BFont::GetEdges(const char charArray[], int32 numBytes, edge_info edgeArray[]) c
 	
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+	
 	for(int32 i=0; i<numBytes; i++)
 		link.Read<edge_info>(&edgeArray[i]);
 }
@@ -1064,9 +1065,6 @@ BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_met
 	
 	link.StartMessage(AS_GET_BOUNDINGBOXES_CHARS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<font_metric_mode>(mode);
 	
 	if(delta)
@@ -1086,6 +1084,9 @@ BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_met
 	
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+	
 	for(int32 i=0; i<numChars; i++)
 		link.Read<BRect>(&boundingBoxArray[i]);
 }
@@ -1102,9 +1103,6 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	BPrivate::BAppServerLink link;
 	
 	link.StartMessage(AS_GET_BOUNDINGBOXES_STRINGS);
-	
-	if(code!=SERVER_TRUE)
-		return;
 	
 	link.Attach<font_metric_mode>(mode);
 	link.Attach<int32>(numStrings);
@@ -1129,6 +1127,9 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 	}
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+	
 	for(int32 i=0; i<numStrings; i++)
 		link.Read<BRect>(&boundingBoxArray[i]);
 }
@@ -1138,7 +1139,6 @@ void
 BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShapeArray[]) const
 {
 	// TODO: implement code specifically for passing BShapes to and from the server
-	
 	if(!charArray ||  numChars<1 || !glyphShapeArray)
 		return;
 	
@@ -1147,15 +1147,15 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 	
 	link.StartMessage(AS_GET_GLYPH_SHAPES);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<int32>(numChars);
 	
 	for(int32 i=0; i<numChars; i++)
 		link.Attach<char>(charArray[i]);
 	
 	link.FlushWithReply(&code);
+	
+	if(code!=SERVER_TRUE)
+		return;
 	
 	// This is going to be dog slow, but it'll do for now
 	char *buffer=NULL;
@@ -1197,9 +1197,6 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 	
 	link.StartMessage(AS_GET_HAS_GLYPHS);
 	
-	if(code!=SERVER_TRUE)
-		return;
-	
 	link.Attach<int32>(numChars);
 	
 	for(int32 i=0; i<numChars; i++)
@@ -1207,6 +1204,9 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) con
 	
 	link.FlushWithReply(&code);
 
+	if(code!=SERVER_TRUE)
+		return;
+	
 	for(int32 i=0; i<numChars; i++)
 		link.Read<bool>(&hasArray[i]);
 }

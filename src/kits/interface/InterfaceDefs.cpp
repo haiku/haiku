@@ -83,9 +83,10 @@ get_scroll_bar_info(scroll_bar_info *info)
 	int32 code;
 	link.StartMessage(AS_GET_SCROLLBAR_INFO);
 	link.FlushWithReply(&code);
-	link.Read<scroll_bar_info>(info);
+	if(code==SERVER_TRUE)
+		link.Read<scroll_bar_info>(info);
 	
-	return B_OK;
+	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
 }
 
 
@@ -101,7 +102,7 @@ set_scroll_bar_info(scroll_bar_info *info)
 	link.StartMessage(AS_SET_SCROLLBAR_INFO);
 	link.Attach<scroll_bar_info>(*info);
 	link.FlushWithReply(&code);
-	return B_OK;
+	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
 }
 
 #endif // COMPILE_FOR_R5
@@ -419,13 +420,14 @@ keyboard_navigation_color()
 _IMPEXP_BE int32
 count_workspaces()
 {
-	int32 count;
+	int32 count=1;
 	
 	BAppServerLink link;
 	int32 code;
 	link.StartMessage(AS_COUNT_WORKSPACES);
 	link.FlushWithReply(&code);
-	link.Read<int32>(&count);
+	if(code==SERVER_TRUE)
+		link.Read<int32>(&count);
 	return count;
 }
 
@@ -443,13 +445,14 @@ set_workspace_count(int32 count)
 _IMPEXP_BE int32
 current_workspace()
 {
-	int32 index;
+	int32 index = 1;
 	
 	BAppServerLink link;
 	int32 code;
 	link.StartMessage(AS_CURRENT_WORKSPACE);
 	link.FlushWithReply(&code);
-	link.Read<int32>(&index);
+	if(code==SERVER_TRUE)
+		link.Read<int32>(&index);
 	
 	return index;
 }
@@ -468,13 +471,14 @@ activate_workspace(int32 workspace)
 _IMPEXP_BE bigtime_t
 idle_time()
 {
-	bigtime_t idletime;
+	bigtime_t idletime = 0;
 	
 	BAppServerLink link;
 	int32 code;
 	link.StartMessage(AS_IDLE_TIME);
 	link.FlushWithReply(&code);
-	link.Read<int64>(&idletime);
+	if(code==SERVER_TRUE)
+		link.Read<int64>(&idletime);
 	
 	return idletime;
 }
@@ -518,13 +522,14 @@ set_focus_follows_mouse(bool follow)
 _IMPEXP_BE bool
 focus_follows_mouse()
 {
-	bool ffm;
+	bool ffm = false;
 	
 	BAppServerLink link;
 	int32 code;
 	link.StartMessage(AS_FOCUS_FOLLOWS_MOUSE);
 	link.FlushWithReply(&code);
-	link.Read<bool>(&ffm);
+	if(code==SERVER_TRUE)
+		link.Read<bool>(&ffm);
 	return ffm;
 }
 
@@ -548,7 +553,8 @@ mouse_mode()
 	int32 code;
 	link.StartMessage(AS_GET_MOUSE_MODE);
 	link.FlushWithReply(&code);
-	link.Read<mode_mouse>(&mode);
+	if(code==SERVER_TRUE)
+		link.Read<mode_mouse>(&mode);
 	return mode;
 }
 
