@@ -130,22 +130,30 @@ public:
 	virtual	status_t			WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
 
 protected:
-	void FillSolidRect(const BRect &rect, RGBColor &color);
-	void FillPatternRect(const BRect &rect, const DrawData *d);
-	void StrokeSolidRect(const BRect &rect, RGBColor &color);
-	void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	void SetDrawData(const DrawData *d, bool set_font_data=false);
-	void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
-	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
-	void CopyToBitmap(ServerBitmap *target, const BRect &source);
-	
+	virtual	void				FillSolidRect(const BRect &rect, RGBColor &color);
+	virtual	void				FillPatternRect(const BRect &rect, const DrawData *d);
+	virtual	void				StrokeSolidRect(const BRect &rect, RGBColor &color);
+	virtual	void				StrokeSolidLine(const BPoint &start, const BPoint &end,
+												RGBColor &color);
+	virtual	void				SetDrawData(const DrawData *d, bool set_font_data=false);
+	virtual	void				StrokePatternLine(const BPoint &start, const BPoint &end,
+													const DrawData *d);
+	virtual	void				CopyBitmap(ServerBitmap *bitmap, const BRect &source,
+											const BRect &dest, const DrawData *d);
+	virtual	void CopyToBitmap(ServerBitmap *target, const BRect &source);
+		// temporarily virtual - until clipping code is added in DisplayDriver
+	virtual	void ConstrainClippingRegion(BRegion *reg);	
+
+
 	virtual	bool				AcquireBuffer(FBBitmap *bmp);
 	virtual	void				ReleaseBuffer(void);
 	virtual	void				Invalidate(const BRect &r);
 	
 //	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
 //	void BlitGray2RGB32(FT_Bitmap *src, BPoint pt, DrawData *d);
-	rgb_color GetBlitColor(rgb_color src, rgb_color dest, DrawData *d, bool use_high=true);
+	rgb_color					GetBlitColor(rgb_color src, rgb_color dest,
+											 DrawData *d, bool use_high=true);
+
 	int hide_cursor;
 	bool obscure_cursor;
 	BBitmap *framebuffer;

@@ -1233,6 +1233,24 @@ void ViewDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 }
 
+void ViewDriver::ConstrainClippingRegion(BRegion *reg)
+{
+	if(!is_initialized)
+	{
+		printf("ConstrainClippingRegion returned - not init\n");
+		return;
+	}
+
+	screenwin->Lock();
+	framebuffer->Lock();
+
+//	screenwin->view->ConstrainClippingRegion(reg);
+	drawview->ConstrainClippingRegion(reg);
+
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
 bool ViewDriver::AcquireBuffer(FBBitmap *bmp)
 {
 	if(!bmp || !is_initialized)
