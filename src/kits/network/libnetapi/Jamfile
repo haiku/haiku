@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kits network libnetapi ;
 
+Depends libnetapi.so : libnet.so ;
+
 UsePrivateHeaders net ;
 
 SharedLibrary netapi :
@@ -18,3 +20,7 @@ OBOSInstallRelSymLink install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
 	: libnetapi.so
 	: installed-networking-test ;
+
+Package openbeos-networkingkit-cvs :
+	libnetapi.so :
+	boot home config lib ;

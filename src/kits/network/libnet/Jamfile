@@ -7,6 +7,8 @@ UsePrivateHeaders net ;
 LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nostdlib ;
 }
 
+Depends libnet.so : install_network_etc_files ;
+
 SharedLibrary net :
 	socket.c
 	select.c 
@@ -50,8 +52,24 @@ SharedLibrary net :
 		: root
 ;
 
+OBOSInstall install_network_etc_files : [ FDirName $(OBOS_ETC_DIR) ] :
+	resolv.conf
+	services
+	protocols
+	networks
+;
+
 # Installation -- in the test directory for the time being
 OBOSInstallRelSymLink install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net lib ]
 	: libnet.so
 	: installed-networking-test ;
+
+
+
+Package openbeos-networkingkit-cvs :
+	README.html ;
+
+Package openbeos-networkingkit-cvs :
+	libnet.so :
+	boot home config lib ;
