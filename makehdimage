@@ -66,9 +66,8 @@ jam -q kernel boot_loader config_manager pci isa ide scsi \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB \
-	kernel_uname libnet.so null zero random \<driver\>tty "<driver>config" \
+	kernel_uname libnet.so null zero random \<driver\>tty \<driver\>config \
 	|| exit 1
-
 
 # create the image and the directory structure
 
@@ -81,8 +80,11 @@ if [ ! $alreadyMounted ]; then
 fi
 
 cd $targetDir
-# this avoids diskspace leaking with current combination userlandfs/obfs
-rm -Rf *
+
+# this avoids diskspace leaking with our current BFS version
+# (because of some unidentified bugs, of course :)
+rm -rf beos
+
 mkdir -p beos/system/add-ons/kernel/bus_managers
 mkdir -p beos/system/add-ons/kernel/generic
 mkdir -p beos/system/add-ons/kernel/file_systems
