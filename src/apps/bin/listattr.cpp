@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	if(argc < 2)
 	{
 		printf("usage: listattr 'filename' ['filename' ...]\n");
-		return 0;
+		return 1;
 	}
 	
 	for(int i = 1; i < argc; ++i)
@@ -36,6 +36,12 @@ int main(int argc, char *argv[])
 			{
 			case 0x4d494d53:
 				printf("  MIME str");
+				break;
+			case 0x43535452:
+				printf("      Text");
+				break;
+			case 0x4c4f4e47:
+				printf("    Int-32");
 				break;
 			default:
 				printf("0x%lx", attrInfo.type);

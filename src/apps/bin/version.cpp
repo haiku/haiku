@@ -1,6 +1,6 @@
 // Author: Ryan Fleet
 // Created: 9th October 2002
-// Modified: 10th October 2002
+// Modified: 14th October 2002
 
 #include <cstdio>
 #include <cstring>
@@ -20,33 +20,33 @@ void help(void)
 }
 
 
-void getversion(const char *filename, version_kind kind, bool bLongFlag, bool bNumericalFlag)
+int getversion(const char *filename, version_kind kind, bool bLongFlag, bool bNumericalFlag)
 {
 	BFile file(filename, O_RDONLY);
 	if(file.InitCheck() != B_OK)
 	{
 		printf("Couldn't get file info!\n");
-		return;
+		return 1;
 	}
 	
 	BAppFileInfo info(&file);
 	if(info.InitCheck() != B_OK)
 	{
 		printf("Couldn't get file info!\n");
-		return;
+		return 1;
 	}
 		
 	version_info version;
 	if(info.GetVersionInfo(&version, kind) != B_OK)
 	{
 		printf("Version unknown!\n");
-		return;
+		return 1;
 	}
 	
 	if(true == bLongFlag)
 	{
 		printf("%s\n", version.long_info);
-		return;
+		return 0;
 	}
 	
 	if(true == bNumericalFlag)
@@ -64,10 +64,12 @@ void getversion(const char *filename, version_kind kind, bool bLongFlag, bool bN
 		case 5: printf("f "); break;	
 		};
 		printf("%lu\n", version.internal);
-		return;
+		return 0;
 	}
 	
 	printf("%s\n", version.short_info);
+	
+	return 0;
 }
 
 
@@ -182,12 +184,18 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-		
+	
+	int status = 0;
+	int retval = 0;	
 	for(i = 1; i < argc; ++i)
 	{
 		if(strncmp(argv[i], "-", 1) != 0)
-			getversion(argv[i], kind, bLongFlag, bNumericalFlag);
+		{
+			status = getversion(argv[i], kind, bLongFlag, bNumericalFlag);
+			if(status != 0)
+				retval = 1;		
+		}
 	}
 
-	return 0;
+	return retval;
 }
