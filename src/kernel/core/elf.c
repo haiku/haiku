@@ -208,17 +208,18 @@ find_image_by_vnode(void *vnode)
 static struct elf_image_info *
 create_image_struct()
 {
-	struct elf_image_info *image;
-
-	image = (struct elf_image_info *)malloc(sizeof(struct elf_image_info));
-	if(!image)
+	struct elf_image_info *image = (struct elf_image_info *)malloc(sizeof(struct elf_image_info));
+	if (image == NULL)
 		return NULL;
+
 	memset(image, 0, sizeof(struct elf_image_info));
+
 	image->regions[0].id = -1;
 	image->regions[1].id = -1;
 	image->id = atomic_add(&next_image_id, 1);
 	image->ref_count = 1;
 	image->linked_images = NULL;
+
 	return image;
 }
 
@@ -859,9 +860,9 @@ error4:
 	if (image->regions[0].id >= 0)
 		delete_area(image->regions[0].id);
 error3:
-	free(image);
-error2:
 	free(pheaders);
+error2:
+	free(image);
 error1:
 	free(eheader);
 error:
@@ -960,6 +961,56 @@ error0:
 }
 
 
+static status_t
+insert_preloaded_image(struct preloaded_image *preloadedImage)
+{
+	struct Elf32_Ehdr *elfHeader;
+	struct elf_image_info *image;
+	status_t status;
+
+	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(struct Elf32_Ehdr));
+	if (elfHeader == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(elfHeader, &preloadedImage->elf_header, sizeof(struct Elf32_Ehdr));
+	status = verify_eheader(elfHeader);
+	if (status < B_OK)
+		goto error1;
+
+	image = create_image_struct();
+	if (image == NULL) {
+		status = B_NO_MEMORY;
+		goto error1;
+	}
+
+	image->vnode = NULL;
+	image->eheader = elfHeader;
+	image->name = strdup(preloadedImage->name);
+	image->dynamic_ptr = preloadedImage->dynamic_section.start;
+
+	image->regions[0] = preloadedImage->text_region;
+	image->regions[1] = preloadedImage->data_region;
+
+	status = elf_parse_dynamic_section(image);
+	if (status < B_OK)
+		goto error2;
+
+	status = elf_relocate(image, "");
+	if (status < B_OK)
+		goto error2;
+
+	insert_image_in_list(image);
+	return B_OK;
+
+error2:
+	free(image);
+error1:
+	free(elfHeader);
+
+	return status;
+}
+
+
 status_t
 elf_init(kernel_args *ka)
 {
@@ -1001,16 +1052,12 @@ elf_init(kernel_args *ka)
 		dprintf("elf_init: WARNING elf_parse_dynamic_section couldn't find dynamic section.\n");
 
 	// insert it first in the list of kernel images loaded
-	kernel_images = NULL;
 	insert_image_in_list(kernel_image);
 
 	// Build image structures for all preloaded images.
 	// Again, the VM has already created areas for them.
-	// ToDo: not yet :)
 	for (image = ka->preloaded_images; image != NULL; image = image->next) {
-		//struct elf_image_info *info;
-
-		dprintf("preloaded image: %s\n", image->name);
+		insert_preloaded_image(image);
 	}
 
 	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
