@@ -45,7 +45,8 @@ typedef struct extended_partition_info {
 	char	volume_name[B_FILE_NAME_LENGTH];			/* "", if hidden */
 	char	mounted_at[B_FILE_NAME_LENGTH];				/* "", if not mounted */
 										//< better B_PATH_NAME_LENGTH?
-	uint8	partition_code;
+	uint32	partition_code;
+	uint32	file_system_flags;			/* same as fs_info::flags */
 } extended_partition_info;
 
 #ifdef  __cplusplus
@@ -57,7 +58,8 @@ status_t get_nth_session_info(int deviceFD, int32 index,
 							  session_info *sessionInfo);
 status_t get_nth_partition_info(int deviceFD, int32 sessionIndex,
 								int32 partitionIndex,
-								extended_partition_info *partitionInfo);
+								extended_partition_info *partitionInfo,
+								char *partitionMapName);
 
 // partitioning
 status_t get_partitioning_parameters(int deviceFD, int32 sessionIndex,
