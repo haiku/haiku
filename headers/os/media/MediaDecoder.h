@@ -45,8 +45,7 @@ class BMediaDecoder {
 		BMediaDecoder(const BMediaDecoder &);
 		BMediaDecoder & operator=(const BMediaDecoder &);
 
-		static status_t next_chunk(void *classptr, void **chunkData, size_t *chunkLen, media_header *mh);
-		void	ReleaseDecoder();
+		status_t AttachToDecoder();
 
 		BPrivate::media::Decoder	*fDecoder;
 		int32				fDecoderID;
