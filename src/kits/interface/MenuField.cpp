@@ -25,6 +25,8 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <stdlib.h>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include <MenuBar.h>
@@ -255,10 +257,9 @@ void BMenuField::MouseDown(BPoint where)
 	if (where.x > fDivider && !fMenuBar->Frame().Contains(where))
 		return;
 
-	BRect bounds(Bounds());
+	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
-	fMenuBar->StartMenuBar(0, false, true,
-		&fMenuBar->ConvertFromParent(bounds));
+	fMenuBar->StartMenuBar(0, false, true, &bounds);
 
 	fMenuTaskID = spawn_thread((thread_func)MenuTask, "_m_task_",
 		B_NORMAL_PRIORITY, this);
@@ -275,10 +276,9 @@ void BMenuField::KeyDown(const char *bytes, int32 numBytes)
 		case B_RIGHT_ARROW:
 		case B_DOWN_ARROW:
 		{
-			BRect bounds(Bounds());
+			BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
-			fMenuBar->StartMenuBar(0, true, true,
-				&fMenuBar->ConvertFromParent(bounds));
+			fMenuBar->StartMenuBar(0, true, true, &bounds);
 
 			fSelected = true;
 			fTransition = true;
@@ -547,7 +547,7 @@ void BMenuField::InitMenu(BMenu *menu)
 	int32 index = 0;
 	BMenu *subMenu;
 
-	while (subMenu = menu->SubmenuAt(index++))
+	while ((subMenu = menu->SubmenuAt(index++)) != NULL)
 		InitMenu(subMenu);
 }
 //------------------------------------------------------------------------------
