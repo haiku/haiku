@@ -125,9 +125,7 @@ void ColorSet::SetColors(const ColorSet &cs)
 	inactive_window_tab_text=cs.inactive_window_tab_text;
 }
 
-/*!
-	\brief Prints all color set elements to stdout
-*/
+//! Prints all color set elements to stdout
 void ColorSet::PrintToStream(void)
 {
 	printf("panel_background "); panel_background.PrintToStream();
@@ -163,4 +161,42 @@ void ColorSet::PrintToStream(void)
 
 	printf("inactive_window_tab "); inactive_window_tab.PrintToStream();
 	printf("inactive_window_tab_text "); inactive_window_tab_text.PrintToStream();
+}
+
+/*!
+	\brief Assigns the default system colors to the passed ColorSet object
+	\param The ColorSet object to set to defaults
+*/
+void SetDefaultGUIColors(ColorSet *set)
+{
+#ifdef DEBUG_COLORSET
+printf("Initializing color settings to defaults\n");
+#endif
+	set->panel_background.SetColor(216,216,216);
+	set->panel_text.SetColor(0,0,0);
+	set->document_background.SetColor(255,255,255);
+	set->document_text.SetColor(0,0,0);
+	set->control_background.SetColor(245,245,245);
+	set->control_text.SetColor(0,0,0);
+	set->control_border.SetColor(0,0,0);
+	set->control_highlight.SetColor(115,120,184);
+	set->keyboard_navigation_base.SetColor(170,50,184);
+	set->keyboard_navigation_pulse.SetColor(0,0,0);
+	set->shine.SetColor(255,255,255);
+	set->shadow.SetColor(0,0,0);
+	set->menu_background.SetColor(216,216,216);
+	set->menu_selected_background.SetColor(115,120,184);
+	set->menu_text.SetColor(0,0,0);
+	set->menu_selected_text.SetColor(255,255,255);
+	set->menu_selected_border.SetColor(0,0,0);
+	set->tooltip_background.SetColor(255,255,0);
+	set->tooltip_text.SetColor(0,0,0);
+	set->success.SetColor(0,255,0);
+	set->failure.SetColor(255,0,0);
+	set->window_tab.SetColor(255,203,0);
+
+	// important, but not publically accessible GUI colors
+	set->window_tab_text.SetColor(0,0,0);
+	set->inactive_window_tab.SetColor(232,232,232);
+	set->inactive_window_tab_text.SetColor(80,80,80);
 }

@@ -33,8 +33,9 @@
 #include "ServerWindow.h"
 #include "PortLink.h"
 #include "TokenHandler.h"
+#include "RectUtils.h"
 
-//#define DEBUG_LAYER
+#define DEBUG_LAYER
 
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
@@ -78,6 +79,7 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 	_hidecount=0;
 	_is_dirty=false;
 	_is_updating=false;
+	_regions_invalid=false;
 
 	_level=0;
 	_layerdata=new LayerData;
@@ -519,6 +521,78 @@ bool Layer::IsDirty(void) const
 	return (!_invalid)?true:false;
 }
 
+/*!
+	\brief Forces a repaint if there are invalid areas
+	\param force_update Force an update. False by default.
+*/
+void Layer::UpdateIfNeeded(bool force_update)
+{
+#ifdef DEBUG_LAYER
+printf("Layer: %s: UpdateIfNeeded(%s)\n",_name->String(),
+		force_update?"force update":"don't force update");
+#endif
+	Layer *child;
+	
+	if(IsHidden())
+		return;
+	
+	if(force_update)
+	{
+		if(_invalid)
+			RequestDraw(_invalid->Frame());
+		else
+			RequestDraw();
+	}
+	else
+	{
+		if(_invalid)
+			RequestDraw(_invalid->Frame());
+	}
+
+	for(child=_bottomchild; child!=NULL; child=child->_uppersibling)
+		child->UpdateIfNeeded(force_update);
+	_is_dirty=false;
+}
+
+/*!
+	\brief Marks the layer as needing a region rebuild if intersecting the given rect
+	\param rect The rectangle for checking to see if the layer needs to be rebuilt
+*/
+void Layer::MarkModified(BRect rect)
+{
+#ifdef DEBUG_LAYER
+printf("Layer: %s: MarkModified(%.1f%.1f,%.1f,%.1f)\n",_name->String(),
+		rect.left,rect.top,rect.right,rect.bottom);
+#endif
+	if(TestRectIntersection(Bounds(),rect))
+		_regions_invalid=true;
+	
+	Layer *child;
+	for(child=_bottomchild; child!=NULL; child=child->_uppersibling)
+		child->MarkModified(rect.OffsetByCopy(-child->_frame.left,-child->_frame.top));
+}
+
+/*!
+	\brief Rebuilds the layer's regions and updates the screen as needed
+	\param force Force an update
+*/
+void Layer::UpdateRegions(bool force)
+{
+#ifdef DEBUG_LAYER
+printf("Layer: %s: UpdateRegions(%s)\n",_name->String(),
+		force?"force update":"don't force update");
+#endif
+	if(force)
+	{
+		RebuildRegions(true);
+//		MoveChildren();
+//		InvalidateNewAreas();
+	}
+	
+	if( (_regions_invalid && (_parent==NULL) && _invalid) || force)
+	    UpdateIfNeeded(force);
+}
+
 //! Show the layer. Operates just like the BView call with the same name
 void Layer::Show(void)
 {
@@ -529,14 +603,23 @@ printf("Layer: %s: Show\n",_name->String());
 		return;
 
 	_hidecount--;
-	if(_hidecount==0)
-	{
-		BRegion *reg=new BRegion(ConvertToParent(_visible));
-		_parent->_visible->Exclude(reg);
-		delete reg;
-		_is_dirty=true;
-	}
+
+	if(_hidecount>0)
+		return;
+
+	BRegion *reg=new BRegion(ConvertToParent(_visible));
+	_parent->_visible->Exclude(reg);
+	delete reg;
+	_is_dirty=true;
+	_parent->_is_dirty=true;
 	
+	Layer *sibling;
+	for (sibling=_parent->_bottomchild; sibling!=NULL; sibling=sibling->_uppersibling)
+	{
+		if(TestRectIntersection(sibling->_frame,_frame)) 
+			sibling->MarkModified(_frame.OffsetByCopy(-sibling->_frame.left,-sibling->_frame.top));
+	}
+
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
 		child->Show();
@@ -712,6 +795,7 @@ printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"inc
 				lay->RebuildRegions(true);
 		}
 	}
+	_regions_invalid=false;
 }
 
 //! Prints all relevant layer data to stdout

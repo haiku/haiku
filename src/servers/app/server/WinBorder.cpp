@@ -37,7 +37,7 @@
 #include "WinBorder.h"
 #include "AppServer.h"	// for new_decorator()
 
-//#define DEBUG_WINBORDER
+#define DEBUG_WINBORDER
 //#define DEBUG_WINBORDER_MOUSE
 
 #ifdef DEBUG_WINBORDER
@@ -81,6 +81,8 @@ WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 fl
 	_vresizewin=false;
 
 	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver());
+	_decorator->SetDriver(GetGfxDriver());
+	
 #ifdef DEBUG_WINBORDER
 printf("WinBorder %s:\n",_title->String());
 printf("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom);
@@ -311,20 +313,6 @@ printf("WinBorder %s: MouseUp unimplmented\n",_title->String());
 */
 }
 
-void WinBorder::Draw(BRect update_rect)
-{
-#ifdef DEBUG_WINBORDER
-printf("WinBorder %s: Draw\n",_title->String());
-#endif
-	if(_update && _visible!=NULL)
-		_is_updating=true;
-
-	_decorator->Draw(update_rect);
-
-	if(_update && _visible!=NULL)
-		_is_updating=false;
-}
-
 void WinBorder::RequestDraw(const BRect &r)
 {
 #ifdef DEBUG_WINBORDER
@@ -335,18 +323,10 @@ printf("WinBorder %s: RequestDraw\n",_title->String());
 
 void WinBorder::RequestDraw(void)
 {
-
+#ifdef DEBUG_WINBORDER
 printf("WinBorder %s::RequestDraw\n",_title->String());
-	if(_invalid)
-	{
-//printf("drew something\n");
-//		for(int32 i=0; i<invalid->CountRects();i++)
-//			_decorator->Draw(ConvertToTop(invalid->RectAt(i)));
-			_decorator->Draw();
-		delete _invalid;
-		_invalid=NULL;
-		_is_dirty=false;
-	}
+#endif
+	_decorator->Draw();
 }
 
 void WinBorder::MoveBy(BPoint pt)

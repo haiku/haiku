@@ -28,13 +28,14 @@
 #ifndef COLORSET_H_
 #define COLORSET_H_
 
+#include <Locker.h>
 #include "RGBColor.h"
 
 /*!
 	\class ColorSet ColorSet.h
 	\brief Encapsulates GUI system colors
 */
-class ColorSet
+class ColorSet : public BLocker
 {
 public:
 	ColorSet(void);
@@ -70,13 +71,15 @@ public:
 	failure,
 	shine,
 	shadow,
+	window_tab,
 
 	// Not all of these guys don't exist in InterfaceDefs.h, but we keep 
 	// them as part of the color set anyway - they're important nonetheless
-	window_tab,
 	window_tab_text,
 	inactive_window_tab,
 	inactive_window_tab_text;
 };
+
+void SetDefaultGUIColors(ColorSet *set);
 
 #endif

@@ -72,6 +72,9 @@ public:
 	virtual void RequestDraw(const BRect &r);
 	virtual void RequestDraw(void);
 	bool IsDirty(void) const;
+	void UpdateIfNeeded(bool force_update=false);
+	void MarkModified(BRect rect);
+	void UpdateRegions(bool force=false);
 
 	void Show(void);
 	void Hide(void);
@@ -99,6 +102,7 @@ public:
 protected:
 	friend RootLayer;
 	friend WinBorder;
+
 	
 	BRect _frame;
 
@@ -121,6 +125,7 @@ protected:
 	uint8 _hidecount;
 	bool _is_dirty;
 	bool _is_updating;
+	bool _regions_invalid;
 	LayerData *_layerdata;
 	PortLink *_portlink;
 };

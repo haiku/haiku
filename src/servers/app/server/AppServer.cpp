@@ -27,6 +27,7 @@
 #include <AppDefs.h>
 #include <Entry.h>
 #include "AppServer.h"
+#include "ColorSet.h"
 #include "Desktop.h"
 #include "DisplayDriver.h"
 #include "PortLink.h"
@@ -49,6 +50,9 @@ AppServer *app_server=NULL;
 
 //! Default background color for workspaces
 RGBColor workspace_default_color(51,102,160);
+
+//! System-wide GUI color object
+ColorSet gui_colorset;
 
 /*!
 	\brief Constructor
@@ -91,7 +95,12 @@ AppServer::AppServer(void)
 		printf("Couldn't set fixed to %s, %s %d pt\n",DEFAULT_FIXED_FONT_FAMILY,
 				DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE);
 	fontserver->Unlock();
-
+	
+	// Get the GUI colors here. For now, we'll just set the defaults
+	SetDefaultGUIColors(&gui_colorset);
+	
+	// TODO: load the GUI colors here and set the global set to the values contained therein
+	
 	// Set up the Desktop
 	InitDesktop();
 
@@ -928,10 +937,17 @@ ServerApp *AppServer::FindApp(const char *sig)
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
+	Decorator *dec;
 	if(!app_server->make_decorator)
-		return new DefaultDecorator(rect,wlook,wfeel,wflags);
+		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
+	else
+		dec=app_server->make_decorator(rect,wlook,wfeel,wflags);
+
+	gui_colorset.Lock();
+	dec->SetColors(gui_colorset);
+	gui_colorset.Unlock();
 	
-	return app_server->make_decorator(rect,wlook,wfeel,wflags);
+	return dec;
 }
 
 /*!

@@ -32,6 +32,7 @@
 #include "RGBColor.h"
 
 //#define DEBUG_DECORATOR
+#define USE_VIEW_FILL_HACK
 
 #ifdef DEBUG_DECORATOR
 #include <stdio.h>
@@ -422,6 +423,10 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 void DefaultDecorator::_DrawFrame(BRect rect)
 {
 	// Duh, draws the window frame, I think. ;)
+
+#ifdef USE_VIEW_FILL_HACK
+_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+#endif
 
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;

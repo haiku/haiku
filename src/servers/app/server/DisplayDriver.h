@@ -129,6 +129,7 @@ public:
 	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 	virtual void SetMode(int32 mode);
 	virtual bool DumpToFile(const char *path);
+	virtual ServerBitmap *DumpToBitmap(void);
 
 	virtual float StringWidth(const char *string, int32 length, LayerData *d);
 	virtual float StringHeight(const char *string, int32 length, LayerData *d);
@@ -141,7 +142,10 @@ public:
 	virtual void GetHasGlyphs(const char *string, int32 charcount, bool *hasarray);
 	virtual void GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, 
 			float maxwidth, char **outstrings);
-
+	
+	virtual status_t SetDPMSState(uint32 state);
+	uint32 GetDPMSState(void);
+	uint32 GetDPMSCapabilities(void);
 	uint8 GetDepth(void);
 	uint16 GetHeight(void);
 	uint16 GetWidth(void);
@@ -157,6 +161,8 @@ protected:
 	void _SetWidth(uint16 w);
 	void _SetMode(int32 m);
 	void _SetBytesPerRow(uint32 bpr);
+	void _SetDPMSCapabilities(uint32 caps);
+	void _SetDPMSState(uint32 state);
 	ServerCursor *_GetCursor(void);
 
 private:
@@ -169,6 +175,8 @@ private:
 	bool _is_cursor_hidden;
 	bool _is_cursor_obscured;
 	ServerCursor *_cursor;
+	uint32 _dpms_state;
+	uint32 _dpms_caps;
 };
 
 #endif

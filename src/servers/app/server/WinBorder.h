@@ -49,7 +49,6 @@ public:
 	void MouseDown(int8 *buffer);
 	void MouseMoved(int8 *buffer);
 	void MouseUp(int8 *buffer);
-	void Draw(BRect update);
 	void UpdateColors(void);
 	void UpdateDecorator(void);
 	void UpdateFont(void);

@@ -25,6 +25,7 @@
 //					for the server
 //  
 //------------------------------------------------------------------------------
+#include <Accelerant.h>
 #include "DisplayDriver.h"
 #include "ServerCursor.h"
 
@@ -46,6 +47,8 @@ DisplayDriver::DisplayDriver(void)
 	_is_cursor_hidden=false;
 	_is_cursor_obscured=false;
 	_cursor=NULL;
+	_dpms_caps=0;
+	_dpms_state=B_DPMS_ON;
 }
 
 
@@ -477,6 +480,15 @@ bool DisplayDriver::DumpToFile(const char *path)
 }
 
 /*!
+	\brief Returns a new ServerBitmap containing the contents of the frame buffer
+	\return A new ServerBitmap containing the contents of the frame buffer or NULL if unsuccessful
+*/
+ServerBitmap *DisplayDriver::DumpToBitmap(void)
+{
+	return NULL;
+}
+
+/*!
 	\brief Gets the width of a string in pixels
 	\param string Source null-terminated string
 	\param length Number of characters in the string
@@ -580,6 +592,33 @@ void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasa
 void DisplayDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, 
 	uint32 mode, float maxwidth, char **outstrings)
 {
+}
+
+/*!
+	\brief Sets the DPMS state of the driver
+	\param state The new state for the display. See Accelerant.h
+*/
+status_t DisplayDriver::SetDPMSState(uint32 state)
+{
+	return B_OK;
+}
+
+/*!
+	\brief Returns the current DPMS state
+	\return The current DPMS state
+*/
+uint32 DisplayDriver::GetDPMSState(void)
+{
+	return _dpms_state;
+}
+
+/*!
+	\brief Returns the current DPMS capabilities
+	\return The current DPMS capabilities
+*/
+uint32 DisplayDriver::GetDPMSCapabilities(void)
+{
+	return _dpms_caps;
 }
 
 /*!
@@ -720,6 +759,31 @@ void DisplayDriver::_SetMode(int32 m)
 void DisplayDriver::_SetBytesPerRow(uint32 bpr)
 {
 	_bytes_per_row=bpr;
+}
+
+/*!
+	\brief Internal DPMS value-setting function
+	\param state The new capabilities of the driver
+
+	_SetDPMSState must be called from within any implementation of SetDPMSState. Note that this
+	does not actually change the state itself; it just updates the state variable used
+	to talk with the outside world.
+*/
+void DisplayDriver::_SetDPMSState(uint32 state)
+{
+	_dpms_caps=state;
+}
+
+/*!
+	\brief Internal DPMS value-setting function
+	\param state The new capabilities of the driver
+
+	_SetDPMSCapabilities must be called at the initialization of the driver so that
+	GetDPMSCapabilities returns the proper values.
+*/
+void DisplayDriver::_SetDPMSCapabilities(uint32 caps)
+{
+	_dpms_caps=caps;
 }
 
 /*!

@@ -185,7 +185,10 @@ void ServerWindow::Show(void)
 printf("ServerWindow %s: Show\n",_title->String());
 #endif
 	if(_winborder)
+	{
 		_winborder->Show();
+		_winborder->UpdateRegions(true);
+	}
 }
 
 //! Hides the window's WinBorder
