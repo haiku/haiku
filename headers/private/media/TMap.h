@@ -1,98 +1,155 @@
 #ifndef _MEDIA_T_MAP_H
 #define _MEDIA_T_MAP_H
 
+
+#include "debug.h"
+
 template<class key, class value> class Map
 {
 public:
-	Map() : count(0) {}
+	Map()
+	 :	item_max(INIT_COUNT),
+	 	item_count(0),
+	 	item_iter(-1),
+	 	items((ent **)malloc(sizeof(ent *) * INIT_COUNT))
+	{
+		ASSERT(items);
+	}
 	
+	~Map()
+	{
+	}
+
 	Map(const Map<key, value> &other)
 	{
-		printf("template<class key, class value> class Map copy constructor\n");
-		count = other.count;
-		for (int i = 0; i < count; i++) {
-			list[i].v = other.list[i].v;
-			list[i].k = other.list[i].k;
+		*this = other;
+	}
+
+	Map<key, value> &operator=(const Map<key, value> &other)
+	{
+		MakeEmpty();
+		free(items);
+		item_max = other.item_max;
+	 	item_count = other.item_count;
+		items = (ent **)malloc(sizeof(ent *) * item_max);
+		ASSERT(items);
+	 	for (int i = 0; i < item_count; i++) {
+	 		items[i] = new ent;
+	 		items[i]->k = other.items[i]->k;
+	 		items[i]->v = other.items[i]->v;
+	 	}
+	}
+		
+	bool Insert(const key &k, const value &v)	
+	{
+		if (item_count == item_max) {
+			item_max *= 2;
+			items = (ent **)realloc(items, sizeof(ent *) * item_max);
+			ASSERT(items);
 		}
-	}
-
-	bool Insert(const key &k, const value &v)
-	{
-		value temp;
-		if (count == MAXENT) debugger("template Map out of memory");
-		if (Get(k, &temp)) debugger("template Map inserting duplicate key");
-		list[count].k = k;
-		list[count].v = v;
-		count++;
+		items[item_count] = new ent;
+		items[item_count]->k = k;
+		items[item_count]->v = v;
+		item_count++;
 		return true;
 	}
-
-	bool Get(const key &k, value *v)
+	
+	bool Get(const key &k, value **v)
 	{
-		for (int i = 0; i < count; i++)
-			if (list[i].k == k) {
-				*v = list[i].v;
-				return true;
-			}
+	 	for (int i = 0; i < item_count; i++) {
+	 		if (items[i]->k == k) {
+	 			*v = &items[i]->v;
+	 			return true;
+	 		}
+	 	}
+		return false;
+	}
+
+	bool Remove(const key &k) {
+		for (int i = 0; i < item_count; i++)
+			if (items[i]->k == k)
+				return _Remove(i);
 		return false;
 	}
 	
-	// you can't Remove() while iterating through the map using GetAt()
-	bool GetAt(int32 index, value *v)
+	int Find(const value &v) 
 	{
-		if (index < 0 || index >= count) 
-			return false;
-		*v = list[index].v;
-		return true;
+		for (int i = 0; i < item_count; i++)
+			if (items[i]->v == v)
+				return i;
+		return -1;
 	}
-	
-	bool GetPointer(const key &k, value **v)
+
+	bool Has(const key &k) 
 	{
-		for (int i = 0; i < count; i++)
-			if (list[i].k == k) {
-				*v = &(list[i].v);
+		for (int i = 0; i < item_count; i++)
+			if (items[i]->k == k)
 				return true;
-			}
-		return false;
-	}
-	
-	// you can't Remove() while iterating through the map using GetAt()
-	bool GetPointerAt(int32 index, value **v)
-	{
-		if (index < 0 || index >= count) 
-			return false;
-		*v = &(list[index].v);
-		return true;
-	}
-	
-	// you can't Remove() while iterating through the map using GetAt()
-	bool Remove(const key &k) 
-	{
-		for (int i = 0; i < count; i++)
-			if (list[i].k == k) {
-				count--;
-				if (count > 0) {
-					list[i].v = list[count].v;
-					list[i].k = list[count].k;
-				}
-				return true;
-			}
 		return false;
 	}
 
 	bool IsEmpty()
 	{
-		return count == 0;
+		return item_count == 0;
+	}
+	
+	void MakeEmpty()
+	{
+		if (items != 0) {
+			for (int i = 0; i < item_count; i++) {
+				delete items[i];
+			}
+			item_count = 0;
+		}
+	}
+	
+	void Rewind()
+	{
+		item_iter = -1;
+	}
+
+	bool GetNext(value **v)
+	{
+		item_iter++;
+		return _Get(item_iter, v);
+	}
+	
+	bool RemoveCurrent()
+	{
+		return _Remove(item_iter);
+	}
+
+private:	
+	bool _Get(int32 index, value **v)
+	{
+		if (index < 0 || index >= item_count)
+			return false;
+		*v = &items[index]->v;
+		return true;
+	}
+	
+	bool _Remove(int32 index) 
+	{
+		if (index < 0 || index >= item_count)
+			return false;
+		delete items[index];
+		item_count--;
+		items[index] = items[item_count];
+		if (index == item_iter)
+			item_iter--;
+		return true;
 	}
 
 private:
-	enum { MAXENT = 64 };
+	enum { INIT_COUNT=32 };
+	int item_max;
+	int item_count;
+	int item_iter;
 	struct ent {
 		key k;
 		value v;
 	};
-	ent list[MAXENT];
-	int count;
+	ent **items;
 };
 
 #endif // _MEDIA_T_MAP_H

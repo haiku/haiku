@@ -1,78 +1,126 @@
 #ifndef _MEDIA_T_LIST_H
 #define _MEDIA_T_LIST_H
 
+#include "debug.h"
+
 template<class value> class List
 {
 public:
-	List() : count(0) {}
+	List()
+	 :	item_max(INIT_COUNT),
+	 	item_count(0),
+	 	item_iter(-1),
+	 	items((value **)malloc(sizeof(value *) * INIT_COUNT))
+	{
+		ASSERT(items);
+	}
+	
+	~List()
+	{
+	}
 
 	List(const List<value> &other)
 	{
-		printf("template<class value> class List copy constructor\n");
-		count = other.count;
-		for (int i = 0; i < count; i++)
-			list[i] = other.list[i];
-			hmpt;
-	}
-		
-	void Insert(const value &v)
-	{
-		value temp;
-		if (count == MAXENT) debugger("template List out of memory");
-		list[count] = v;
-		count++;
-	}
-	
-	// you can't Remove() while iterating through the list using GetAt()
-	bool GetAt(int32 index, value *v)
-	{
-		if (index < 0 || index >= count) 
-			return false;
-		*v = list[index];
-		return true;
+		*this = other;
 	}
 
-	bool GetPointerAt(int32 index, value **v)
+	List<value> &operator=(const List<value> &other)
 	{
-		if (index < 0 || index >= count) 
-			return false;
-		*v = &list[index];
+		MakeEmpty();
+		free(items);
+		item_max = other.item_max;
+	 	item_count = other.item_count;
+		items = (value **)malloc(sizeof(value *) * item_max);
+		ASSERT(items);
+	 	for (int i = 0; i < item_count; i++) {
+	 		items[i] = new value;
+	 		*items[i] = *other.items[i];
+	 	}
+	}
+		
+	bool Insert(const value &v)
+	{
+		if (item_count == item_max) {
+			item_max *= 2;
+			items = (value **)realloc(items, sizeof(value *) * item_max);
+			ASSERT(items);
+		}
+		items[item_count] = new value;
+		*items[item_count] = v;
+		item_count++;
 		return true;
 	}
 	
-	// you can't Remove() while iterating through the map using GetAt()
+	bool Get(int32 index, value **v)
+	{
+		if (index < 0 || index >= item_count)
+			return false;
+		*v = items[index];
+		return true;
+	}
+	
 	bool Remove(int32 index) 
 	{
-		if (index < 0 || index >= count) 
+		if (index < 0 || index >= item_count)
 			return false;
-		count--;
-		if (count > 0)
-			list[index] = list[count];
+		delete items[index];
+		item_count--;
+		items[index] = items[item_count];
+		if (index == item_iter)
+			item_iter--;
 		return true;
 	}
 	
 	int Find(const value &v) 
 	{
-		for (int i = 0; i < count; i++)
-			if (list[i] == v)
+		for (int i = 0; i < item_count; i++)
+			if (*items[i] == v)
 				return i;
 		return -1;
 	}
 	
+	int CountItems()
+	{
+		return item_count;
+	}
+	
 	bool IsEmpty()
 	{
-		return count == 0;
+		return item_count == 0;
 	}
 	
 	void MakeEmpty()
 	{
-		count = 0;
+		if (items != 0) {
+			for (int i = 0; i < item_count; i++) {
+				delete items[i];
+			}
+			item_count = 0;
+		}
+	}
+	
+	void Rewind()
+	{
+		item_iter = -1;
+	}
+
+	bool GetNext(value **v)
+	{
+		item_iter++;
+		return Get(item_iter, v);
+	}
+	
+	bool RemoveCurrent()
+	{
+		return Remove(item_iter);
 	}
 
 private:
-	enum { MAXENT = 64 };
-	value list[MAXENT];
-	int count;
+	enum { INIT_COUNT=32 };
+	int item_max;
+	int item_count;
+	int item_iter;
+	value **items;
 };
 
 #endif // _MEDIA_T_LIST_H
