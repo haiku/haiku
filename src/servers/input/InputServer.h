@@ -125,14 +125,6 @@ public:
 	status_t HandleGetSetKeyMap(BMessage*, BMessage*);
 	status_t HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
 
-	status_t HandleFindDevices(BMessage*, BMessage*);
-	status_t HandleWatchDevices(BMessage*, BMessage*);
-	status_t HandleIsDeviceRunning(BMessage*, BMessage*);
-	status_t HandleStartStopDevices(BMessage*, BMessage*);
-	status_t HandleControlDevices(BMessage*, BMessage*);
-	status_t HandleSystemShuttingDown(BMessage*, BMessage*);
-	status_t HandleNodeMonitor(BMessage*);
-	
 	status_t EnqueueDeviceMessage(BMessage*);
 	status_t EnqueueMethodMessage(BMessage*);
 	status_t UnlockMethodQueue(void);
@@ -152,8 +144,9 @@ public:
 	bool SanitizeEvents(BList*);
 	bool MethodizeEvents(BList*, bool);
 
+	static status_t StartStopDevices(const char *name, input_device_type type, bool doStart);
 	static status_t StartStopDevices(BInputServerDevice *isd, bool);
-	status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
+	static status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
 
 	bool DoMouseAcceleration(long*, long*);
 	bool SetMousePos(long*, long*, long, long);
@@ -232,13 +225,15 @@ public:
         inline void _iprint(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
                 fputs(buf, InputServer::sLogFile); fflush(InputServer::sLogFile); }
 	#define PRINT(x)	_iprint x
+	
 #endif
-
+		#define PRINTERR(x)		PRINT(x)
         #define EXIT()          PRINT(("EXIT %s\n", __PRETTY_FUNCTION__))
         #define CALLED()        PRINT(("CALLED %s\n", __PRETTY_FUNCTION__))
 #else
         #define EXIT()          ((void)0)
         #define CALLED()        ((void)0)
+		#define PRINTERR(x)		fprintf(stderr, x)
 #endif
 
 #endif

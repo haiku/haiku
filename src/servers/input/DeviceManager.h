@@ -30,7 +30,7 @@ class IAHandler : public BHandler {
 		
 };
 
-class DeviceManager {
+class DeviceManager : public BLooper {
 	public:
 		DeviceManager();
 		~DeviceManager();

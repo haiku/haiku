@@ -11,6 +11,7 @@
 // Manager for input_server add-ons (devices, filters, methods)
 
 #include <Locker.h>
+#include <Looper.h>
 #include <InputServerDevice.h>
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
@@ -18,14 +19,14 @@
 #include "AddOnMonitorHandler.h"
 #include "TList.h"
 
-class AddOnManager {
+class AddOnManager : public BLooper {
 	public:
 		AddOnManager(bool safeMode);
 		~AddOnManager();
 
 		void		LoadState();
 		void		SaveState();
-
+		void 		MessageReceived(BMessage *message);
 	private:
 		status_t	RegisterAddOn(BEntry &entry);
 		status_t	UnregisterAddOn(BEntry &entry);
@@ -36,6 +37,14 @@ class AddOnManager {
 		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref, image_id addon_image);
 		void		RegisterMethod(BInputServerMethod *ism, const entry_ref &ref, image_id addon_image);
 		
+		status_t HandleFindDevices(BMessage*, BMessage*);
+		status_t HandleWatchDevices(BMessage*, BMessage*);
+		status_t HandleIsDeviceRunning(BMessage*, BMessage*);
+		status_t HandleStartStopDevices(BMessage*, BMessage*);
+		status_t HandleControlDevices(BMessage*, BMessage*);
+		status_t HandleSystemShuttingDown(BMessage*, BMessage*);
+		status_t HandleNodeMonitor(BMessage*);
+	
 	private:
 		struct device_info {
 			entry_ref ref;

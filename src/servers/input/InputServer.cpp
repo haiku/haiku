@@ -132,7 +132,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		
 		fCloneArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
 		if (fCloneArea < B_OK) {
-			PRINT(("clone_area error : %s\n", strerror(fCloneArea)));
+			PRINTERR(("clone_area error : %s\n", strerror(fCloneArea)));
 		}
 
 		fAsPort = create_port(100, "is_as");
@@ -144,7 +144,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	
 		status_t err;
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
-			PRINT(("error when send_data %s\n", strerror(err)));
+			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
 
 #endif
@@ -186,14 +186,14 @@ InputServer::ArgvReceived(int32 argc, char** argv)
 	if (2 == argc) {
 		if (0 == strcmp("-q", argv[1]) ) {
 			// :TODO: Shutdown and restart the InputServer.
-			printf("InputServer::ArgvReceived - Restarting ...\n");
+			PRINT(("InputServer::ArgvReceived - Restarting ...\n"));
 			status_t   quit_status;
 			BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
 			if (B_OK == quit_status) {
 				BMessage   msg  = BMessage(B_QUIT_REQUESTED);
 				msgr.SendMessage(&msg);
 			} else {
-				printf("Unable to send Quit message to running InputServer.");
+				PRINTERR(("Unable to send Quit message to running InputServer."));
 			}
 		}
 	}
@@ -286,7 +286,7 @@ InputServer::LoadSystemKeymap()
 	
 	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
 	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
+		PRINTERR(("error %s\n", strerror(err)));
 		return err;
 	}
 	
@@ -448,34 +448,16 @@ InputServer::MessageReceived(BMessage *message)
 
 		// device looper related
 		case IS_FIND_DEVICES:
-			status = HandleFindDevices(message, &reply);
-			break;
 		case IS_WATCH_DEVICES:
-			status = HandleWatchDevices(message, &reply);
-			break;
 		case IS_IS_DEVICE_RUNNING:
-			status = HandleIsDeviceRunning(message, &reply);
-			break;
 		case IS_START_DEVICE:
-			status = HandleStartStopDevices(message, &reply);
-			break;
 		case IS_STOP_DEVICE:
-			status = HandleStartStopDevices(message, &reply);
-			break;
 		case IS_CONTROL_DEVICES:
-			status = HandleControlDevices(message, &reply);
-			break;
 		case SYSTEM_SHUTTING_DOWN:
-			status = HandleSystemShuttingDown(message, &reply);
-			break;
+			fAddOnManager->PostMessage(message);
+			return;
 		default:
 		{
-			PRINT(("Default message ... \n"));
-			//PRINT_OBJECT(*message);
-			BMessenger app_server("application/x-vnd.Be-APPS", -1, NULL);
-			if (app_server.IsValid()) {
-				//app_server->SendMessage(message);
-			}
 			return;		
 		}
 	}
@@ -507,7 +489,12 @@ InputServer::HandleGetSetMouseType(BMessage* message,
 	int32	type;
 	if (message->FindInt32("mouse_type", &type)==B_OK) {
 		fMouseSettings.SetMouseType(type);
-		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_TYPE_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_POINTING_DEVICE);
+		msg.AddInt32("code", B_MOUSE_TYPE_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);	
+	
 	} else
 		status = reply->AddInt32("mouse_type", 	fMouseSettings.MouseType());
 	return status;
@@ -526,7 +513,11 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
 	int32 factor;
 	if (message->FindInt32("speed", &factor) == B_OK) {
 		fMouseSettings.SetAccelerationFactor(factor);
-		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_ACCELERATION_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_POINTING_DEVICE);
+		msg.AddInt32("code", B_MOUSE_ACCELERATION_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);	
 	} else
 		status = reply->AddInt32("speed", fMouseSettings.AccelerationFactor());
 	return status;
@@ -545,7 +536,11 @@ InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
 	bigtime_t delay;
 	if (message->FindInt64("delay", &delay) == B_OK) {
 		fKeyboardSettings.SetKeyboardRepeatDelay(delay);
-		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_DELAY_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_KEYBOARD_DEVICE);
+		msg.AddInt32("code", B_KEY_REPEAT_DELAY_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
 	} else
 		status = reply->AddInt64("delay", fKeyboardSettings.KeyboardRepeatDelay());
 	return status;
@@ -632,7 +627,10 @@ InputServer::HandleSetModifierKey(BMessage *message,
 		
 		//TODO : unmap the key ?
 		
-		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_KEYBOARD_DEVICE);
+		msg.AddInt32("code", B_KEY_MAP_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
 	}
 	return status;
 }
@@ -647,8 +645,12 @@ InputServer::HandleSetKeyboardLocks(BMessage *message,
                                     BMessage *reply)
 {
 	status_t status = B_ERROR;
-	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK)
-		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_LOCKS_CHANGED, NULL);
+	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK) {
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_KEYBOARD_DEVICE);
+		msg.AddInt32("code", B_KEY_LOCKS_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
+	}
 	
 	return status;
 }
@@ -666,7 +668,11 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message,
 	int32 speed;
 	if (message->FindInt32("speed", &speed) == B_OK) {
 		fMouseSettings.SetMouseSpeed(speed);
-		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_SPEED_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_POINTING_DEVICE);
+		msg.AddInt32("code", B_MOUSE_SPEED_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
 	} else
 		status = reply->AddInt32("speed", fMouseSettings.MouseSpeed());
 	return status;
@@ -743,7 +749,12 @@ InputServer::HandleGetSetMouseMap(BMessage* message,
 	
 	if (message->FindData("mousemap", B_RAW_TYPE, (const void**)&map, &size) == B_OK) {
 		fMouseSettings.SetMapping(*map);
-		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_MAP_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_POINTING_DEVICE);
+		msg.AddInt32("code", B_MOUSE_MAP_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
+	
 	} else {
 		mouse_map 	map;
 		fMouseSettings.Mapping(map);
@@ -777,7 +788,12 @@ InputServer::HandleGetSetClickSpeed(BMessage *message,
 	bigtime_t	click_speed;
 	if (message->FindInt64("speed", &click_speed) == B_OK) {
 		fMouseSettings.SetClickSpeed(click_speed);
-		status = ControlDevices(NULL, B_POINTING_DEVICE, B_CLICK_SPEED_CHANGED, NULL);
+		
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_POINTING_DEVICE);
+		msg.AddInt32("code", B_CLICK_SPEED_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
+	
 	} else
 		status = reply->AddInt64("speed", fMouseSettings.ClickSpeed());
 	return status;
@@ -796,7 +812,11 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
 	int32	key_repeat_rate;
 	if (message->FindInt32("rate", &key_repeat_rate) == B_OK) {
 		fKeyboardSettings.SetKeyboardRepeatRate(key_repeat_rate);
-		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_RATE_CHANGED, NULL);
+	
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_KEYBOARD_DEVICE);
+		msg.AddInt32("code", B_KEY_REPEAT_RATE_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
 	} else
 		status = reply->AddInt32("rate", fKeyboardSettings.KeyboardRepeatRate());
 	return status;
@@ -821,7 +841,10 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
 		if (LoadKeymap()!=B_OK)
 			LoadSystemKeymap();
 		
-		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
+		BMessage msg(IS_CONTROL_DEVICES);
+		msg.AddInt32("type", B_KEYBOARD_DEVICE);
+		msg.AddInt32("code", B_KEY_MAP_CHANGED);
+		status = fAddOnManager->PostMessage(&msg);
 	}
 	return status;
 }
@@ -834,176 +857,6 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
 status_t
 InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
                                            BMessage *)
-{
-	// TODO
-	return B_OK;
-}
-
-
-/*
- *  Method: InputServer::HandleFindDevices()
- *   Descr: 
- */
-status_t
-InputServer::HandleFindDevices(BMessage *message,
-                                     BMessage *reply)
-{
-	const char *name = NULL;
-	message->FindString("device", &name);
-	
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if (!name || strcmp(name, item->mDev.name) == 0) {
-			reply->AddString("device", item->mDev.name);
-			reply->AddInt32("type", item->mDev.type);
-			if (name)
-				return B_OK;	
-		}
-	}
-
-	return B_OK;
-}
-
-
-/*
- *  Method: InputServer::HandleWatchDevices()
- *   Descr: 
- */
-status_t
-InputServer::HandleWatchDevices(BMessage *message,
-                                     BMessage *reply)
-{
-	// TODO
-	return B_OK;
-}
-
-
-/*
- *  Method: InputServer::HandleIsDeviceRunning()
- *   Descr: 
- */
-status_t
-InputServer::HandleIsDeviceRunning(BMessage *message,
-                                     BMessage *reply)
-{
-	const char *name = NULL;
-	if (message->FindString("device", &name)!=B_OK)
-		return B_ERROR;
-	
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if (strcmp(name, item->mDev.name) == 0)
-			return (item->mStarted) ? B_OK : B_ERROR;
-	}
-
-	return B_ERROR;
-}
-
-
-/*
- *  Method: InputServer::HandleStartStopDevices()
- *   Descr: 
- */
-status_t
-InputServer::HandleStartStopDevices(BMessage *message,
-                                     BMessage *reply)
-{
-	const char *name = NULL;
-	int32 type = 0;
-	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
-		return B_ERROR;
-		
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
-			if (!item->mIsd)
-				return B_ERROR;
-				
-			input_device_ref   dev = item->mDev;
-			
-			if (message->what == IS_START_DEVICE) {
-				PRINT(("  Starting: %s\n", dev.name));
-				item->mIsd->Start(dev.name, dev.cookie);
-				item->mStarted = true;
-			} else {
-				PRINT(("  Stopping: %s\n", dev.name));
-				item->mIsd->Stop(dev.name, dev.cookie);
-				item->mStarted = false;
-			}
-			if (name)
-				return B_OK;
-		}
-	}
-
-	if (name)
-		return B_ERROR;
-	else
-		return B_OK;
-}
-
-
-/*
- *  Method: InputServer::HandleControlDevices()
- *   Descr: 
- */
-status_t
-InputServer::HandleControlDevices(BMessage *message,
-                                     BMessage *reply)
-{
-	const char *name = NULL;
-	int32 type = 0;
-	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
-		return B_ERROR;
-	
-	uint32 code = 0;
-	BMessage msg;	
-	if (message->FindInt32("code", (int32*)&code)!=B_OK)
-		return B_ERROR;
-	if (message->FindMessage("message", &msg)!=B_OK)
-		return B_ERROR;
-		
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
-		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (!item)
-			continue;
-			
-		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
-			if (!item->mIsd)
-				return B_ERROR;
-				
-			input_device_ref   dev = item->mDev;
-			
-			item->mIsd->Control(dev.name, dev.cookie, code, &msg);
-			
-			if (name)
-				return B_OK;
-		}
-	}
-
-	if (name)
-		return B_ERROR;
-	else
-		return B_OK;
-	
-}
-
-
-/*
- *  Method: InputServer::HandleSystemShuttingDown()
- *   Descr: 
- */
-status_t
-InputServer::HandleSystemShuttingDown(BMessage *message,
-                                     BMessage *reply)
 {
 	// TODO
 	return B_OK;
@@ -1114,7 +967,7 @@ InputServer::EventLoop()
 	CALLED();
 	fEventLooperPort = create_port(100, "obos_is_event_port");
 	if(fEventLooperPort < 0) {
-		_sPrintf("OBOS InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort));
+		PRINTERR(("OBOS InputServer: create_port error: (0x%x) %s\n", fEventLooperPort, strerror(fEventLooperPort)));
 	} 
 	fISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
 	resume_thread(fISPortThread);
@@ -1510,6 +1363,48 @@ InputServer::MethodizeEvents(BList *,
  *   Descr: 
  */
 status_t 
+InputServer::StartStopDevices(const char *name, input_device_type type, bool doStart)
+{
+	CALLED();
+
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
+			if (!item->mIsd)
+				return B_ERROR;
+				
+			input_device_ref   dev = item->mDev;
+			
+			if (doStart) {
+				PRINT(("  Starting: %s\n", dev.name));
+				item->mIsd->Start(dev.name, dev.cookie);
+				item->mStarted = true;
+			} else {
+				PRINT(("  Stopping: %s\n", dev.name));
+				item->mIsd->Stop(dev.name, dev.cookie);
+				item->mStarted = false;
+			}
+			if (name)
+				return B_OK;
+		}
+	}
+
+	if (name)
+		return B_ERROR;
+	else
+		return B_OK;
+}
+
+
+
+/*
+ *  Method: InputServer::StartStopDevices()
+ *   Descr: 
+ */
+status_t 
 InputServer::StartStopDevices(BInputServerDevice *isd,
                                        bool              doStart)
 {
@@ -1544,37 +1439,32 @@ InputServer::StartStopDevices(BInputServerDevice *isd,
  *   Descr: 
  */
 status_t 
-InputServer::ControlDevices(const char* deviceName,
-                            input_device_type    deviceType,
-                            unsigned long        command,
-                            BMessage*            message)
-{
-	status_t status = B_OK;
-	
-	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
-	{
-		PRINT(("%s Device #%d\n", __PRETTY_FUNCTION__, i));
+InputServer::ControlDevices(const char* name, input_device_type type, uint32 code, BMessage* msg)
+{	
+	CALLED();
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
 		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (NULL != item)
-		{
-			BInputServerDevice* isd = item->mIsd;
+		if (!item)
+			continue;
+			
+		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
+			if (!item->mIsd)
+				return B_ERROR;
+				
 			input_device_ref   dev = item->mDev;
-			if ( (NULL != isd) )
-			{
-				PRINT(("  Controlling: %s\n", dev.name));
-				if (deviceType == dev.type)
-				{
-					// :TODO: Descriminate based on Device Name also.
-					
-					// :TODO: Pass non-NULL Device Name and Cookie.
-					
-					status = isd->Control(NULL /*Name*/, NULL /*Cookie*/, command, message);
-				}
-			}
+			
+			item->mIsd->Control(dev.name, dev.cookie, code, msg);
+			
+			if (name)
+				return B_OK;
 		}
 	}
 
-	return status;
+	if (name)
+		return B_ERROR;
+	else
+		return B_OK;
+	
 }
 
 
@@ -1666,9 +1556,9 @@ InputServer::WatchPort()
 		status_t err = read_port(fEventLooperPort, &code, buffer, length);
 		if(err != length) {
 			if(err >= 0) {
-				PRINT(("InputServer: failed to read full packet (read %lu of %lu)\n", err, length));
+				PRINTERR(("InputServer: failed to read full packet (read %lu of %lu)\n", err, length));
 			} else {
-				PRINT(("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err)));
+				PRINTERR(("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err)));
 			}
 			continue;
 		}
@@ -1676,7 +1566,7 @@ InputServer::WatchPort()
 		BMessage *event = new BMessage;
 	
 		if ((err = event->Unflatten(buffer)) < 0) {
-			PRINT(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
+			PRINTERR(("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err)));
 			delete event;
 		} else {
 			// This is where the message should be processed.	

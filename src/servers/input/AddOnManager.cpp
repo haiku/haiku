@@ -20,12 +20,15 @@
 
 #include "AddOnManager.h"
 #include "InputServer.h"
+#include "InputServerTypes.h"
 
 
 AddOnManager::AddOnManager(bool safeMode)
-	: fLock("add-on manager"),
+	: BLooper("addon_manager"),
+		fLock("add-on manager"),
 		fSafeMode(safeMode)
 {
+	Run();
 }
 
 
@@ -408,3 +411,172 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 }
 
 
+/*
+ *  Method: AddOnManager::MessageReceived()
+ *   Descr: 
+ */
+void
+AddOnManager::MessageReceived(BMessage *message)
+{
+	CALLED();
+	
+	BMessage reply;
+	status_t status = B_OK;
+
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what>>24, message->what>>16, message->what>>8, message->what));
+	
+	switch(message->what)
+	{
+		case IS_FIND_DEVICES:
+			status = HandleFindDevices(message, &reply);
+			break;
+		case IS_WATCH_DEVICES:
+			status = HandleWatchDevices(message, &reply);
+			break;
+		case IS_IS_DEVICE_RUNNING:
+			status = HandleIsDeviceRunning(message, &reply);
+			break;
+		case IS_START_DEVICE:
+			status = HandleStartStopDevices(message, &reply);
+			break;
+		case IS_STOP_DEVICE:
+			status = HandleStartStopDevices(message, &reply);
+			break;
+		case IS_CONTROL_DEVICES:
+			status = HandleControlDevices(message, &reply);
+			break;
+		case SYSTEM_SHUTTING_DOWN:
+			status = HandleSystemShuttingDown(message, &reply);
+			break;
+		default:
+		{
+			return;		
+		}
+	}
+	
+	reply.AddInt32("status", status);
+	message->SendReply(&reply);
+}
+
+
+/*
+ *  Method: AddOnManager::HandleStartStopDevices()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleStartStopDevices(BMessage *message,
+                                     BMessage *reply)
+{
+	const char *name = NULL;
+	int32 type = 0;
+	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+		return B_ERROR;
+		
+	return InputServer::StartStopDevices(name, (input_device_type)type, message->what == IS_START_DEVICE);
+}
+
+
+/*
+ *  Method: AddOnManager::HandleFindDevices()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleFindDevices(BMessage *message,
+                                     BMessage *reply)
+{
+	CALLED();
+	const char *name = NULL;
+	message->FindString("device", &name);
+	
+	for (int i = InputServer::gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if (!name || strcmp(name, item->mDev.name) == 0) {
+			reply->AddString("device", item->mDev.name);
+			reply->AddInt32("type", item->mDev.type);
+			if (name)
+				return B_OK;	
+		}
+	}
+
+	return B_OK;
+}
+
+
+/*
+ *  Method: AddOnManager::HandleWatchDevices()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleWatchDevices(BMessage *message,
+                                     BMessage *reply)
+{
+	// TODO
+	return B_OK;
+}
+
+
+/*
+ *  Method: AddOnManager::HandleIsDeviceRunning()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleIsDeviceRunning(BMessage *message,
+                                     BMessage *reply)
+{
+	const char *name = NULL;
+	if (message->FindString("device", &name)!=B_OK)
+		return B_ERROR;
+	
+	for (int i = InputServer::gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)InputServer::gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if (strcmp(name, item->mDev.name) == 0)
+			return (item->mStarted) ? B_OK : B_ERROR;
+	}
+
+	return B_ERROR;
+}
+
+
+/*
+ *  Method: AddOnManager::HandleControlDevices()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleControlDevices(BMessage *message,
+                                     BMessage *reply)
+{
+	CALLED();
+	const char *name = NULL;
+	int32 type = 0;
+	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+		return B_ERROR;
+	
+	uint32 code = 0;
+	BMessage msg;
+	bool isMessage = true;
+	if (message->FindInt32("code", (int32*)&code)!=B_OK)
+		return B_ERROR;
+	if (message->FindMessage("message", &msg)!=B_OK)
+		isMessage = false;
+		
+	return InputServer::ControlDevices(name, (input_device_type)type, code, isMessage ? &msg : NULL);
+}
+
+
+/*
+ *  Method: AddOnManager::HandleSystemShuttingDown()
+ *   Descr: 
+ */
+status_t
+AddOnManager::HandleSystemShuttingDown(BMessage *message,
+                                     BMessage *reply)
+{
+	// TODO
+	return B_OK;
+}
