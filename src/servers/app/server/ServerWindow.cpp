@@ -2182,6 +2182,13 @@ debugger("STROKERECT");
 			
 			break;
 		}
+		case AS_SYNC:
+		{
+			// TODO: AS_SYNC is a no-op for now, just to get things working
+			fMsgSender->StartMessage(SERVER_TRUE);
+			fMsgSender->Flush();
+			break;
+		}
 		default:
 		{
 			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), code - SERVER_TRUE);
