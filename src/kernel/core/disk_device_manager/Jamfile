@@ -6,8 +6,9 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel fs ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
