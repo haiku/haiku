@@ -8,21 +8,27 @@ SubDirCcFlags -DDEFPATH='\".:/share/awk\"' -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='\
 
 SubDirHdrs [ FDirName $(SUBDIR) intl ] ;
 
-BinCommand gawk :
+local gawk_rsrc = [ FGristFiles gawk.rsrc ] ;
+ResComp $(gawk_rsrc) : [ FGristFiles gawk.rdef ] ;
+
+local common_files =
 	array.c awkgram.c builtin.c ext.c field.c
 	gawkmisc.c getopt.c getopt1.c io.c
 	main.c msg.c node.c random.c re.c
-	regex.c replace.c version.c eval.c profile.c
+	regex.c replace.c version.c
+	;
+
+Objects $(common_files) ;
+
+BinCommand gawk :
+	[ FGristFiles $(common_files:S=.o) ] eval.c profile.c
 	:  libintl.a
-	: gawk.rdef ;
+	: gawk.rsrc ;
 
 BinCommand pgawk :
-	array.c awkgram.c builtin.c ext.c field.c
-	gawkmisc.c getopt.c getopt1.c io.c
-	main.c msg.c node.c random.c re.c
-	regex.c replace.c version.c eval_p.c profile_p.c
+	[ FGristFiles $(common_files:S=.o) ] eval_p.c profile_p.c
 	:  libintl.a
-	: gawk.rdef ;
+	: gawk.rsrc ;
 
 MakeLocate awk : $(OBOS_BIN_DIR) ;
 RelSymLink awk : gawk ;
