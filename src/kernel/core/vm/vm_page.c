@@ -500,7 +500,7 @@ vm_page_allocate_page(int page_state)
 		// secondary queue
 		p = dequeue_page(q_other);
 		if (p == NULL) {
-			// XXX hmm
+			// ToDo: issue "someone" to free up some pages for us, and go into wait state until that's done
 			panic("vm_allocate_page: out of memory! page state = %d\n", page_state);
 		}
 	}
