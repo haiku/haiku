@@ -62,22 +62,44 @@ struct death_entry {
 	uint32				reason;
 };
 
+struct process_session {
+	pid_t				id;
+	struct list			groups;
+};
+
+struct process_group {
+	struct list_link	link;
+	struct process_session *session;
+	pid_t				id;
+	sem_id				dead_child_sem;
+	struct team			*teams;
+};
+
+#define MAX_DEAD_CHILDREN	32
+	// this is a soft limit for the number of dead entries in a team
+
 struct team {
 	struct team		*next;			/* next team in the hash */
 	struct team		*siblings_next;
 	struct team		*parent;
 	struct team		*children;
+	struct team		*group_next;
 	team_id			id;
-	team_id			group_id;
-	team_id			session_id;
+	pid_t			group_id;
+	pid_t			session_id;
+	struct process_group *group;
 	char			name[B_OS_NAME_LENGTH];
 	int				num_threads;	/* number of threads in this team */
 	int				state;			/* current team state, see above */
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		/* semaphore to wait on for dying threads */
-	sem_id			dead_child_sem;	/* wait for dead child entries */
-	struct list		dead_children;
+	struct {
+		sem_id		sem;			/* wait for dead child entries */
+		struct list	list;
+		uint32		count;
+		int32		wait_for_any;	/* count of wait_for_child() that wait for any child */
+	} dead_children;
 	vm_address_space *aspace;
 	vm_address_space *kaspace;
 	addr_t			user_env_base;
