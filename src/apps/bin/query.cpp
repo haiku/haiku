@@ -27,17 +27,19 @@
 bool o_all_volumes = false;       // Query all volumes?
 bool o_escaping = true;       // Escape metacharacters?
 
+extern const char *__progname;
+
 
 void
 usage(void)
 {
-	printf("usage:  query [ -e ] [ -a || -v volume ] expression\n");
-	printf("        -e         don't escape meta-characters\n");
-	printf("        -a         perform the query on all volumes\n");
-	printf("        -v <file>  perform the query on just one volume;\n");
-	printf("                   <file> can be any file on that volume.\n");
-	printf("                   defaults to the current volume.\n");
-	printf(" hint:  query 'name=foo' will find a file named \"foo\"\n");
+	printf("usage: %s [ -e ] [ -a || -v <path-to-volume> ] expression\n"
+		"  -e\t\tdon't escape meta-characters\n"
+		"  -a\t\tperform the query on all volumes\n"
+		"  -v <file>\tperform the query on just one volume; <file> can be any\n"
+		"\t\tfile on that volume. Defaults to the current volume.\n"
+		"  Hint: '%s name=foo' will find files named \"foo\"\n",
+		__progname, __progname);
 	exit(0);
 }
 
@@ -51,7 +53,16 @@ perform_query(BVolume &volume, const char *predicate)
 	query.SetVolume(&volume);
 	query.SetPredicate(predicate);
 
-	if (query.Fetch() != B_OK) {
+	status_t status = query.Fetch();
+	if (status == B_BAD_VALUE) {
+		// the "name=" part may be omitted in our arguments
+		BString string = "name=";
+		string << predicate;
+
+		query.SetPredicate(string.String());
+		status = query.Fetch();
+	}
+	if (status != B_OK) {
 		printf("query: bad query expression\n");
 		return;
 	}
@@ -60,7 +71,7 @@ perform_query(BVolume &volume, const char *predicate)
 	BPath path;
 	while (query.GetNextEntry(&entry) == B_OK) {
 		if (entry.GetPath(&path) < B_OK) {
-			fprintf(stderr, "could not get path for entry\n");
+			fprintf(stderr, "%s: could not get path for entry\n", __progname);
 			continue;
 		}
 
@@ -87,21 +98,19 @@ main(int32 argc, char **argv)
 	int opt;
 	while ((opt = getopt(argc, argv, "eav:")) != -1) {
 		switch(opt) {
-		case 'a':
-			o_all_volumes = true;
-			break;
+			case 'a':
+				o_all_volumes = true;
+				break;
+			case 'e':
+				o_escaping = false;
+				break;
+			case 'v':
+				strncpy(volumePath, optarg, B_FILE_NAME_LENGTH);
+				break;
 
-		case 'e':
-			o_escaping = false;
-			break;
-
-		case 'v':
-			strncpy(volumePath, optarg, B_FILE_NAME_LENGTH);
-			break;
-
-		default:
-			usage();
-			break;
+			default:
+				usage();
+				break;
 		}
 	}
 
@@ -112,13 +121,18 @@ main(int32 argc, char **argv)
 		// and set the query to it.
 		BEntry entry(volumePath);
 		if (entry.InitCheck() != B_OK) {
-			printf("query: %s is not a valid file\n", volumePath);
-			exit(0);
+			fprintf(stderr, "%s: \"%s\" is not a valid file\n", __progname, volumePath);
+			exit(1);
 		}
-		entry.GetVolume(&volume);
+
+		status_t status = entry.GetVolume(&volume);
+		if (status != B_OK) {
+			fprintf(stderr, "%s: could not get volume: %s\n", __progname, strerror(status));
+			exit(1);
+		}
 
 		if (!volume.KnowsQuery())
-			printf("query: volume containing %s is not query-enabled\n", volumePath);
+			fprintf(stderr, "%s: volume containing %s is not query-enabled\n", __progname, volumePath);
 		else
 			perform_query(volume, argv[optind]);
 	} else {	
