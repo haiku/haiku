@@ -197,7 +197,8 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	fFontSizeMenu->AddItem(menuItem= new BMenuItem("10", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",10.0);
 	menuItem->SetMarked(true);
-	
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("11", fontMessage= new BMessage(FONT_SIZE)));
+	fontMessage->AddFloat("size",11.0);
 	fFontSizeMenu->AddItem(menuItem= new BMenuItem("12", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",12.0);
 	fFontSizeMenu->AddItem(menuItem= new BMenuItem("14", fontMessage= new BMessage(FONT_SIZE)));
