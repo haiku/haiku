@@ -10,8 +10,10 @@
 #include <Drivers.h>
 #include <Errors.h>
 
-//#include <Partition.h>
-	// TODO: Move the definitions needed in the kernel to a separate header.
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
@@ -435,7 +437,7 @@ KPartition::SetVolumeID(dev_t volumeID)
 dev_t
 KPartition::VolumeID() const
 {
-	return fPartitionData.id;
+	return fPartitionData.volume;
 }
 
 // Mount
@@ -643,7 +645,7 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 	// set and load new one
 	fDiskSystem = diskSystem;
 	if (fDiskSystem)
-		fDiskSystem->Load();
+		fDiskSystem->Load();	// can't fail, since it's already loaded
 }
 
 // DiskSystem
@@ -701,6 +703,40 @@ void *
 KPartition::ContentCookie() const
 {
 	return fPartitionData.content_cookie;
+}
+
+// Dump
+void
+KPartition::Dump(bool deep, int32 level)
+{
+	if (level < 0 || level > 255)
+		return;
+	char prefix[256];
+	sprintf(prefix, "%*s%*s", (int)level, "", (int)level, "");
+	char path[B_PATH_NAME_LENGTH];
+	GetPath(path);
+	if (level > 0)
+		OUT("%spartition %ld: %s\n", prefix, ID(), path);
+	OUT("%s  offset:            %lld\n", prefix, Offset());
+	OUT("%s  size:              %lld\n", prefix, Size());
+	OUT("%s  block size:        %lu\n", prefix, BlockSize());
+	OUT("%s  child count:       %ld\n", prefix, CountChildren());
+	OUT("%s  index:             %ld\n", prefix, Index());
+	OUT("%s  status:            %lu\n", prefix, Status());
+	OUT("%s  flags:             %lx\n", prefix, Flags());
+	OUT("%s  volume:            %ld\n", prefix, VolumeID());
+	OUT("%s  disk system:       %s\n", prefix,
+		(DiskSystem() ? DiskSystem()->Name() : NULL));
+	OUT("%s  name:              %s\n", prefix, Name());
+	OUT("%s  content name:      %s\n", prefix, ContentName());
+	OUT("%s  type:              %s\n", prefix, Type());
+	OUT("%s  content type:      %s\n", prefix, ContentType());
+	OUT("%s  params:            %s\n", prefix, Parameters());
+	OUT("%s  content params:    %s\n", prefix, ContentParameters());
+	if (deep) {
+		for (int32 i = 0; KPartition *child = ChildAt(i); i++)
+			child->Dump(true, level + 1);
+	}
 }
 
 // _UpdateChildIndices

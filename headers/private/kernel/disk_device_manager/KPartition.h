@@ -149,6 +149,8 @@ public:
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
 
+	virtual void Dump(bool deep, int32 level);
+
 private:
 	void _UpdateChildIndices(int32 index);
 	static int32 _NextID();
