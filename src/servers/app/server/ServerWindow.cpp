@@ -41,14 +41,14 @@
 #include "ServerProtocol.h"
 #include "WinBorder.h"
 #include "Desktop.h"
-#include "Workspace.h"
 #include "TokenHandler.h"
 #include "Utils.h"
 #include "DisplayDriver.h"
 #include "ServerPicture.h"
 #include "CursorManager.h"
+#include "Workspace.h"
 
-//#define DEBUG_SERVERWINDOW
+#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -122,6 +122,8 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport,
 	port_id looperPort, port_id replyport, uint32 index, int32 handlerID)
 {
+	STRACE(("ServerWindow(%s)::ServerWindow()\n",string? string: "NULL"));
+	_app			= winapp;
 	_title			= new BString;
 	if(string)
 		_title->SetTo(string);
@@ -131,18 +133,18 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_feel			= wfeel;
 	_handlertoken	= handlerID;
 	winLooperPort	= looperPort;
-	_workspaces		= index;
+	fWorkspaces		= index;
+	fClientTeamID	= winapp->ClientTeamID();
 	_workspace		= NULL;
 	_token			= win_token_handler.GetToken();
 
 	
 	// _sender is the port to which the app awaits messages from the server
 	_sender			= winport;
-
 	// _receiver is the port to which the app sends messages for the server
 	_receiver		= create_port(30,_title->String());
-	
-	
+
+	ses				= new BSession(_receiver, _sender);
 	
 	// Send a reply to our window - it is expecting _receiver port.
 	
@@ -154,7 +156,6 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_winlink->Flush();
 
 	_winlink->SetPort(winport);
-	
 
 	// Wait for top_view data and create ServerWindow's top most Layer
 	int32			vToken;
@@ -167,31 +168,28 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	pmsg.ReadFromPort(_receiver);
 	if(pmsg.Code() != AS_LAYER_CREATE_ROOT)
 		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received!\n");
-	
+
 	pmsg.Read<int32>(&vToken);
 	pmsg.Read<BRect>(&vFrame);
 	pmsg.Read<uint32>(&vResizeMode);
 	pmsg.Read<uint32>(&vFlags);
 	pmsg.ReadString(&vName);
-			
-	top_layer= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, this);
+
+	top_layer		= new Layer(vFrame, vName, vToken, vResizeMode, vFlags, this);
 	delete vName;
 
-	currentlayer = top_layer;
+	cl = top_layer;
 			
-
 	// Create a WindoBorder object for our ServerWindow.
 	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
+	// NOTE: this MUST be before the monitor thread is spawned!
+	desktop->AddWinBorder(_winborder);
 
 	// Spawn our message-monitoring _monitorthread
 	_monitorthread	= spawn_thread(MonitorWin, _title->String(), B_NORMAL_PRIORITY, this);
 	if(_monitorthread != B_NO_MORE_THREADS && _monitorthread != B_NO_MEMORY)
 		resume_thread(_monitorthread);
-
-
-	// Add window to desktop structure.
-	desktop->AddWinBorder(_winborder);
 
 	STRACE(("ServerWindow %s:\n",_title->String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
@@ -202,22 +200,31 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 //!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
-STRACE(("ServerWindow %s:~ServerWindow()\n",_title->String()));
+STRACE(("*ServerWindow %s:~ServerWindow()\n",_title->String()));
+
+	desktop->fGeneralLock.Lock();
+
 	desktop->RemoveWinBorder(_winborder);
-	
-	if(_applink)
-	{
-		delete _applink;
-		_applink=NULL;
-		delete _title;
-		delete _winlink;
-		delete _winborder;
-		
-		currentlayer		= NULL;
-		if (top_layer)
-			delete top_layer;
+printf("SW(%s) Successfuly removed from the desktop\n", _title->String());
+	if(ses){
+		delete ses;
+		ses = NULL;
 	}
-	kill_thread(_monitorthread);
+	if (_winlink){
+		delete _winlink;
+		_winlink = NULL;
+	}
+	if (_winborder){
+		delete _winborder;
+		_winborder = NULL;
+	}
+	cl		= NULL;
+	if (top_layer)
+		delete top_layer;
+
+	desktop->fGeneralLock.Unlock();
+printf("#ServerWindow(%s) will exit NOW!!!\n", _title->String());
+	delete _title;
 }
 
 /*!
@@ -285,8 +292,26 @@ void ServerWindow::Show(void)
 STRACE(("ServerWindow %s: Show\n",_title->String()));
 	if(_winborder)
 	{
+		desktop->fGeneralLock.Lock();
 		_winborder->Show();
-//		_winborder->SetFocus(true);
+		desktop->fGeneralLock.Unlock();
+
+		RootLayer	*rl		= _winborder->GetRootLayer();
+
+		desktop->fGeneralLock.Lock();
+printf("ServerWindow(%s)::Show() - General lock acquired\n", _winborder->GetName());
+		rl->fMainLock.Lock();
+printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName());
+		int32		wksCount= rl->WorkspaceCount();
+		for(int32 i = 0; i < wksCount; i++){
+			if (fWorkspaces & (0x00000001UL << i))
+				rl->WorkspaceAt(i+1)->SetFrontLayer(_winborder);
+		}
+		desktop->SetFocusWinBorder(_winborder);
+		rl->fMainLock.Unlock();
+printf("ServerWindow(%s)::Show() - Main lock released\n", _winborder->GetName());
+		desktop->fGeneralLock.Unlock();
+printf("ServerWindow(%s)::Show() - General lock released\n", _winborder->GetName());
 	}
 }
 
@@ -294,8 +319,27 @@ STRACE(("ServerWindow %s: Show\n",_title->String()));
 void ServerWindow::Hide(void)
 {
 STRACE(("ServerWindow %s: Hide\n",_title->String()));
-	if(_winborder)
+	if(_winborder){
+		desktop->fGeneralLock.Lock();
 		_winborder->Hide();
+		desktop->fGeneralLock.Unlock();
+
+		RootLayer	*rl		= _winborder->GetRootLayer();
+		Workspace	*ws		= NULL;
+
+		rl->fMainLock.Lock();
+		int32		wksCount= rl->WorkspaceCount();
+		for(int32 i = 0; i < wksCount; i++){
+			ws		= rl->WorkspaceAt(i+1);
+			if ( ws->FrontLayer() == _winborder){
+				ws->SetFrontLayer(_winborder);
+			}
+		}
+
+		if(desktop->FocusWinBorder() == _winborder)
+			desktop->SetFocusWinBorder(_winborder);
+		rl->fMainLock.Unlock();
+	}
 }
 
 /*
@@ -339,30 +383,6 @@ void ServerWindow::Minimize(bool status){
 
 void ServerWindow::Zoom(){
 // TODO: implement;
-}
-
-void ServerWindow::SetLook(int32 look)
-{
-	// TODO: Finish
-	_look=look;
-}
-
-void ServerWindow::SetFeel(int32 feel)
-{
-	// TODO: Finish
-	_feel=feel;
-}
-
-void ServerWindow::SetFlags(int32 flags)
-{
-	// TODO: Finish
-	_flags=flags;
-}
-
-void ServerWindow::SetWorkspaces(int32 workspaces)
-{
-	// TODO: Finish
-	_workspaces=workspaces;
 }
 
 /*!
@@ -502,9 +522,10 @@ bool ServerWindow::IsLocked(void)
 	return _locker.IsLocked();
 }
 
-void ServerWindow::DispatchMessage(PortMessage msg)
+void ServerWindow::DispatchMessage(int32 code)
 {
-	switch(msg.Code())
+	PortMessage msg;
+	switch(code)
 	{
 		//--------- BView Messages -----------------
 		case AS_SET_CURRENT_LAYER:
@@ -515,11 +536,11 @@ void ServerWindow::DispatchMessage(PortMessage msg)
 			
 			Layer *current = FindLayer(top_layer, token);
 			if (current)
-				currentlayer		= current;
+				cl		= current;
 			else // hope this NEVER happens! :-)
 				debugger("Server PANIC: window cannot find Layer with ID\n");
 
-			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", _title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", _title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CREATE:
@@ -532,7 +553,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// the area in which the new layer resides assuming that it is
 			// visible.
 			STRACE(("ServerWindow %s: AS_LAYER_CREATE...\n", _title->String()));
-			Layer		*oldCL = currentlayer;
+			Layer		*oldCL = cl;
 			
 			int32		token;
 			BRect		frame;
@@ -557,7 +578,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			newLayer->_hidden	= hidden;
 			
 				// we set Layer's attributes (BView's state)
-			currentlayer			= newLayer;
+			cl			= newLayer;
 			
 			int32 msgCode;
 			msg.Read<int32>(&msgCode);		// this is AS_LAYER_SET_FONT_STATE
@@ -575,9 +596,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				DispatchMessage(msgCode);
 			}
 			
-			currentlayer			= oldCL;
+			cl			= oldCL;
 			
-			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", _title->String(), currentlayer->_name->String(), name));
+			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", _title->String(), cl->_name->String(), name));
 */
 			break;
 		}
@@ -589,20 +610,20 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// area assuming that the view was visible when removed
 			STRACE(("SW %s: AS_LAYER_DELETE(self)...\n", _title->String()));			
 			Layer		*parent;
-			parent		= currentlayer->_parent;
+			parent		= cl->_parent;
 			
 				// here we remove current layer from list.
-			currentlayer->RemoveSelf();
+			cl->RemoveSelf();
 			// TODO: invalidate the region occupied by this view.
 			//			Should be done in Layer::RemoveChild() though!
-			currentlayer->PruneTree();
+			cl->PruneTree();
 
 			parent->PrintTree();
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", _title->String(), parent->_name->String(), currentlayer->_name->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", _title->String(), parent->_name->String(), cl->_name->String()));
 
-			delete currentlayer;
+			delete cl;
 
-			currentlayer 			= parent;
+			cl 			= parent;
 			break;
 		}
 		case AS_LAYER_SET_STATE:
@@ -613,53 +634,53 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			pattern			patt;
 			int32			clippRegRects;
 
-			msg.Read<BPoint>(&(currentlayer->_layerdata->penlocation));
-			msg.Read<float>(&(currentlayer->_layerdata->pensize));
+			msg.Read<BPoint>(&(cl->_layerdata->penlocation));
+			msg.Read<float>(&(cl->_layerdata->pensize));
 			msg.Read<rgb_color>(&highColor);
 			msg.Read<rgb_color>(&lowColor);
 			msg.Read<rgb_color>(&viewColor);
 			msg.Read<pattern>(&patt);	
-			msg.Read<int8>((int8*)&(currentlayer->_layerdata->draw_mode));
-			msg.Read<BPoint>(&(currentlayer->_layerdata->coordOrigin));
-			msg.Read<int8>((int8*)&(currentlayer->_layerdata->lineJoin));
-			msg.Read<int8>((int8*)&(currentlayer->_layerdata->lineCap));
-			msg.Read<float>(&(currentlayer->_layerdata->miterLimit));
-			msg.Read<int8>((int8*)&(currentlayer->_layerdata->alphaSrcMode));
-			msg.Read<int8>((int8*)&(currentlayer->_layerdata->alphaFncMode));
-			msg.Read<float>(&(currentlayer->_layerdata->scale));
-			msg.Read<bool>(&(currentlayer->_layerdata->fontAliasing));
+			msg.Read<int8>((int8*)&(cl->_layerdata->draw_mode));
+			msg.Read<BPoint>(&(cl->_layerdata->coordOrigin));
+			msg.Read<int8>((int8*)&(cl->_layerdata->lineJoin));
+			msg.Read<int8>((int8*)&(cl->_layerdata->lineCap));
+			msg.Read<float>(&(cl->_layerdata->miterLimit));
+			msg.Read<int8>((int8*)&(cl->_layerdata->alphaSrcMode));
+			msg.Read<int8>((int8*)&(cl->_layerdata->alphaFncMode));
+			msg.Read<float>(&(cl->_layerdata->scale));
+			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
 			msg.Read<int32>(&clippRegRects);
 			
-			currentlayer->_layerdata->patt.Set(*((uint64*)&patt));
-			currentlayer->_layerdata->highcolor.SetColor(highColor);
-			currentlayer->_layerdata->lowcolor.SetColor(lowColor);
-			currentlayer->_layerdata->viewcolor.SetColor(viewColor);
+			cl->_layerdata->patt.Set(*((uint64*)&patt));
+			cl->_layerdata->highcolor.SetColor(highColor);
+			cl->_layerdata->lowcolor.SetColor(lowColor);
+			cl->_layerdata->viewcolor.SetColor(viewColor);
 
 			if(clippRegRects != 0){
-				if(currentlayer->_layerdata->clippReg == NULL)
-					currentlayer->_layerdata->clippReg = new BRegion();
+				if(cl->_layerdata->clippReg == NULL)
+					cl->_layerdata->clippReg = new BRegion();
 				else
-					currentlayer->_layerdata->clippReg->MakeEmpty();
+					cl->_layerdata->clippReg->MakeEmpty();
 
 				BRect		rect;
 				
 				for(int32 i = 0; i < clippRegRects; i++){
 					msg.Read<BRect>(&rect);
-					currentlayer->_layerdata->clippReg->Include(rect);
+					cl->_layerdata->clippReg->Include(rect);
 				}
 
-				currentlayer->RebuildFullRegion();
+				cl->RebuildFullRegion();
 			}
 			else{
-				if (currentlayer->_layerdata->clippReg){
-					delete currentlayer->_layerdata->clippReg;
-					currentlayer->_layerdata->clippReg = NULL;
+				if (cl->_layerdata->clippReg){
+					delete cl->_layerdata->clippReg;
+					cl->_layerdata->clippReg = NULL;
 
-					currentlayer->RebuildFullRegion();
+					cl->RebuildFullRegion();
 				}
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
@@ -673,52 +694,52 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				msg.Read<int32>((int32*)&fontID);
 				// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
 				//   in ServerFont class. DW, could you add one?
-				//currentlayer->_layerdata->font->
+				//cl->_layerdata->font->
 			}
 	
 			if (mask & B_FONT_SIZE){
 				float		size;
 				msg.Read<float>(&size);
-				currentlayer->_layerdata->font.SetSize(size);
+				cl->_layerdata->font.SetSize(size);
 			}
 
 			if (mask & B_FONT_SHEAR){
 				float		shear;
 				msg.Read<float>(&shear);
-				currentlayer->_layerdata->font.SetShear(shear);
+				cl->_layerdata->font.SetShear(shear);
 			}
 
 			if (mask & B_FONT_ROTATION){
 				float		rotation;
 				msg.Read<float>(&rotation);
-				currentlayer->_layerdata->font.SetRotation(rotation);
+				cl->_layerdata->font.SetRotation(rotation);
 			}
 
 			if (mask & B_FONT_SPACING){
 				uint8		spacing;
 				msg.Read<uint8>(&spacing);	// uint8
-				currentlayer->_layerdata->font.SetSpacing(spacing);
+				cl->_layerdata->font.SetSpacing(spacing);
 			}
 
 			if (mask & B_FONT_ENCODING){
 				uint8		encoding;
 				msg.Read<int8>((int8*)&encoding); // uint8
-				currentlayer->_layerdata->font.SetEncoding(encoding);
+				cl->_layerdata->font.SetEncoding(encoding);
 			}
 
 			if (mask & B_FONT_FACE){
 				uint16		face;
 				msg.Read<uint16>(&face);	// uint16
-				currentlayer->_layerdata->font.SetFace(face);
+				cl->_layerdata->font.SetFace(face);
 			}
 	
 			if (mask & B_FONT_FLAGS){
 				uint32		flags;
 				msg.Read<uint32>(&flags); // uint32
-				currentlayer->_layerdata->font.SetFlags(flags);
+				cl->_layerdata->font.SetFlags(flags);
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_STATE:
@@ -728,7 +749,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			rgb_color	hc, lc, vc; // high, low and view colors
 			uint64		patt;		// current pattern as a uint64
 
-			ld			= currentlayer->_layerdata; // now we write fewer characters. :-)
+			ld			= cl->_layerdata; // now we write fewer characters. :-)
 			hc			= ld->highcolor.GetColor32();
 			lc			= ld->lowcolor.GetColor32();
 			vc			= ld->viewcolor.GetColor32();
@@ -771,12 +792,12 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				_winlink->Attach<BRect>(ld->clippReg->RectAt(i));
 			}
 			
-			_winlink->Attach<float>(currentlayer->_frame.left);
-			_winlink->Attach<float>(currentlayer->_frame.top);
-			_winlink->Attach<BRect>(currentlayer->_frame.OffsetToCopy(currentlayer->_boundsLeftTop));
+			_winlink->Attach<float>(cl->_frame.left);
+			_winlink->Attach<float>(cl->_frame.top);
+			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
 			_winlink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_MOVETO:
@@ -786,9 +807,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			msg.Read<float>(&x);
 			msg.Read<float>(&y);
 			
-			currentlayer->MoveBy(x, y);
+			cl->MoveBy(x, y);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZETO:
@@ -800,19 +821,19 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		/* TODO: check for minimum alowed. WinBorder should provide such
 		 *	a method, based on its decorator.
 		 */
-			currentlayer->ResizeBy(newWidth, newHeight);
+			cl->ResizeBy(newWidth, newHeight);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COORD:
 		{
-			_winlink->Attach<float>(currentlayer->_frame.left);
-			_winlink->Attach<float>(currentlayer->_frame.top);
-			_winlink->Attach<BRect>(currentlayer->_frame.OffsetToCopy(currentlayer->_boundsLeftTop));
+			_winlink->Attach<float>(cl->_frame.left);
+			_winlink->Attach<float>(cl->_frame.top);
+			_winlink->Attach<BRect>(cl->_frame.OffsetToCopy(cl->_boundsLeftTop));
 			_winlink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
@@ -822,24 +843,24 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			msg.Read<float>(&x);
 			msg.Read<float>(&y);
 			
-			currentlayer->_layerdata->coordOrigin.Set(x, y);
+			cl->_layerdata->coordOrigin.Set(x, y);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
-			_winlink->Attach<BPoint>(currentlayer->_layerdata->coordOrigin);
+			_winlink->Attach<BPoint>(cl->_layerdata->coordOrigin);
 			_winlink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
-			msg.Read<uint32>(&(currentlayer->_resize_mode));
+			msg.Read<uint32>(&(cl->_resize_mode));
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CURSOR:
@@ -850,28 +871,28 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			cursormanager->SetCursor(token);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			msg.Read<uint32>(&(currentlayer->_flags));
+			msg.Read<uint32>(&(cl->_flags));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_HIDE:
 		{
-			currentlayer->Hide();
+			cl->Hide();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
-			currentlayer->Show();
+			cl->Show();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LINE_MODE:
@@ -884,61 +905,61 @@ TODO:	Figure out what Adi did here and convert to PortMessages
  */
 			msg.Read<int8>(&lineCap);
 			msg.Read<int8>(&lineJoin);
-			msg.Read<float>(&(currentlayer->_layerdata->miterLimit));
+			msg.Read<float>(&(cl->_layerdata->miterLimit));
 			
-			currentlayer->_layerdata->lineCap		= (cap_mode)lineCap;
-			currentlayer->_layerdata->lineJoin	= (join_mode)lineJoin;
+			cl->_layerdata->lineCap		= (cap_mode)lineCap;
+			cl->_layerdata->lineJoin	= (join_mode)lineJoin;
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			_winlink->Attach<int8>((int8)(currentlayer->_layerdata->lineCap));
-			_winlink->Attach<int8>((int8)(currentlayer->_layerdata->lineJoin));
-			_winlink->Attach<float>(currentlayer->_layerdata->miterLimit);
+			_winlink->Attach<int8>((int8)(cl->_layerdata->lineCap));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->lineJoin));
+			_winlink->Attach<float>(cl->_layerdata->miterLimit);
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PUSH_STATE:
 		{
 			LayerData		*ld = new LayerData();
-			ld->prevState	= currentlayer->_layerdata;
-			currentlayer->_layerdata	= ld;
+			ld->prevState	= cl->_layerdata;
+			cl->_layerdata	= ld;
 
-			currentlayer->RebuildFullRegion();
+			cl->RebuildFullRegion();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_POP_STATE:
 		{
-			if (!(currentlayer->_layerdata->prevState)) {
-				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", _title->String(), currentlayer->_name->String()));
+			if (!(cl->_layerdata->prevState)) {
+				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", _title->String(), cl->_name->String()));
 				break;
 			}
 
-			LayerData		*ld = currentlayer->_layerdata;
-			currentlayer->_layerdata	= currentlayer->_layerdata->prevState;
+			LayerData		*ld = cl->_layerdata;
+			cl->_layerdata	= cl->_layerdata->prevState;
 			delete ld;
 
-			currentlayer->RebuildFullRegion();
+			cl->RebuildFullRegion();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			msg.Read<float>(&(currentlayer->_layerdata->scale));
+			msg.Read<float>(&(cl->_layerdata->scale));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), currentlayer->_name->String()));		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
-			LayerData		*ld = currentlayer->_layerdata;
+			LayerData		*ld = cl->_layerdata;
 			float			scale = ld->scale;
 
 			while((ld = ld->prevState))
@@ -947,7 +968,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			_winlink->Attach<float>(scale);
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), currentlayer->_name->String()));		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",_title->String(), cl->_name->String()));		
 			break;
 		}
 		case AS_LAYER_SET_PEN_LOC:
@@ -957,32 +978,32 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			msg.Read<float>(&x);
 			msg.Read<float>(&y);
 			
-			currentlayer->_layerdata->penlocation.Set(x, y);
+			cl->_layerdata->penlocation.Set(x, y);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			_winlink->Attach<BPoint>(currentlayer->_layerdata->penlocation);
+			_winlink->Attach<BPoint>(cl->_layerdata->penlocation);
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			msg.Read<float>(&(currentlayer->_layerdata->pensize));
+			msg.Read<float>(&(cl->_layerdata->pensize));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			_winlink->Attach<float>(currentlayer->_layerdata->pensize);
+			_winlink->Attach<float>(cl->_layerdata->pensize);
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_HIGH_COLOR:
@@ -991,9 +1012,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<rgb_color>(&c);
 			
-			currentlayer->_layerdata->highcolor.SetColor(c);
+			cl->_layerdata->highcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
@@ -1002,9 +1023,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<rgb_color>(&c);
 			
-			currentlayer->_layerdata->lowcolor.SetColor(c);
+			cl->_layerdata->lowcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
@@ -1013,25 +1034,25 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<rgb_color>(&c);
 			
-			currentlayer->_layerdata->viewcolor.SetColor(c);
+			cl->_layerdata->viewcolor.SetColor(c);
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
 		{
 			rgb_color		highColor, lowColor, viewColor;
 			
-			highColor		= currentlayer->_layerdata->highcolor.GetColor32();
-			lowColor		= currentlayer->_layerdata->lowcolor.GetColor32();
-			viewColor		= currentlayer->_layerdata->viewcolor.GetColor32();
+			highColor		= cl->_layerdata->highcolor.GetColor32();
+			lowColor		= cl->_layerdata->lowcolor.GetColor32();
+			viewColor		= cl->_layerdata->viewcolor.GetColor32();
 			
 			_winlink->Attach<rgb_color>(highColor);
 			_winlink->Attach<rgb_color>(lowColor);
 			_winlink->Attach<rgb_color>(viewColor);
 			_winlink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_BLEND_MODE:
@@ -1041,19 +1062,19 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			msg.Read<int8>(&srcAlpha);
 			msg.Read<int8>(&alphaFunc);
 			
-			currentlayer->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
-			currentlayer->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
+			cl->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
+			cl->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			_winlink->Attach<int8>((int8)(currentlayer->_layerdata->alphaSrcMode));
-			_winlink->Attach<int8>((int8)(currentlayer->_layerdata->alphaFncMode));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaSrcMode));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->alphaFncMode));
 			_winlink->Flush();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_DRAW_MODE:
@@ -1062,24 +1083,24 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<int8>(&drawingMode);
 			
-			currentlayer->_layerdata->draw_mode	= (drawing_mode)drawingMode;
+			cl->_layerdata->draw_mode	= (drawing_mode)drawingMode;
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			_winlink->Attach<int8>((int8)(currentlayer->_layerdata->draw_mode));
+			_winlink->Attach<int8>((int8)(cl->_layerdata->draw_mode));
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			msg.Read<bool>(&(currentlayer->_layerdata->fontAliasing));
+			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
@@ -1097,8 +1118,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 				// if we had a picture to clip to, include the FULL visible region(if any) in the area to be redrawn
 				// in other words: invalidate what ever is visible for this layer and his children.
-			if (currentlayer->clipToPicture && currentlayer->_fullVisible.CountRects() > 0){
-				reg.Include(&currentlayer->_fullVisible);
+			if (cl->clipToPicture && cl->_fullVisible.CountRects() > 0){
+				reg.Include(&cl->_fullVisible);
 				redraw		= true;
 			}
 
@@ -1106,12 +1127,12 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
 			for(;;){
-				sp		= static_cast<ServerPicture*>(currentlayer->_serverwin->_app->_piclist->ItemAt(i++));
+				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
 				if (!sp)
 					break;
 					
 				if(sp->GetToken() == pictureToken){
-//					currentlayer->clipToPicture	= sp;
+//					cl->clipToPicture	= sp;
 // TODO: increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
@@ -1120,34 +1141,34 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			i = 0;
 
 				// we have a new picture to clip to, so rebuild our full region
-			if(currentlayer->clipToPicture) {
+			if(cl->clipToPicture) {
 
-				currentlayer->clipToPictureInverse	= false;
+				cl->clipToPictureInverse	= false;
 
-				currentlayer->RebuildFullRegion();
+				cl->RebuildFullRegion();
 			}
 
 				// we need to rebuild the visible region, we may have a valid one.
-			if (currentlayer->_parent && !(currentlayer->_hidden)){
-				currentlayer->_parent->RebuildChildRegions(currentlayer->_full.Frame(), currentlayer);
+			if (cl->_parent && !(cl->_hidden)){
+				cl->_parent->RebuildChildRegions(cl->_full.Frame(), cl);
 			}
 			else{
 					// will this happen? Maybe...
-				currentlayer->RebuildRegions(currentlayer->_full.Frame());
+				cl->RebuildRegions(cl->_full.Frame());
 			}
 
 				// include our full visible region in the region to be redrawn
-			if (!(currentlayer->_hidden) && (currentlayer->_fullVisible.CountRects() > 0)){
-				reg.Include(&(currentlayer->_fullVisible));
+			if (!(cl->_hidden) && (cl->_fullVisible.CountRects() > 0)){
+				reg.Include(&(cl->_fullVisible));
 				redraw		= true;
 			}
 
 				// redraw if: we had OR if we NOW have a picture to clip to.
 			if (redraw){
-				currentlayer->Invalidate(reg);
+				cl->Invalidate(reg);
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
@@ -1163,12 +1184,12 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32			i = 0;
 
 			for(;;){
-				sp		= static_cast<ServerPicture*>(currentlayer->_serverwin->_app->_piclist->ItemAt(i++));
+				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
 				if (!sp)
 					break;
 					
 				if(sp->GetToken() == pictureToken){
-//					currentlayer->clipToPicture	= sp;
+//					cl->clipToPicture	= sp;
 // TODO: increase that picture's reference count.(~ allocate a picture)
 					break;
 				}
@@ -1177,16 +1198,16 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			i = 0;
 			
 				// if a picture has been found...
-			if(currentlayer->clipToPicture) {
+			if(cl->clipToPicture) {
 
-				currentlayer->clipToPictureInverse	= true;
+				cl->clipToPictureInverse	= true;
 
-				currentlayer->RebuildFullRegion();
+				cl->RebuildFullRegion();
 
-				currentlayer->RequestDraw(currentlayer->clipToPicture->Frame());
+				cl->RequestDraw(cl->clipToPicture->Frame());
 			}
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_CLIP_REGION:
@@ -1196,8 +1217,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			LayerData	*ld;
 			int32		noOfRects;
 
-			ld			= currentlayer->_layerdata;
-			reg			= currentlayer->ConvertFromParent(&(currentlayer->_visible));
+			ld			= cl->_layerdata;
+			reg			= cl->ConvertFromParent(&(cl->_visible));
 
 			if(ld->clippReg)
 				reg.IntersectWith(ld->clippReg);
@@ -1215,7 +1236,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			_winlink->Flush();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_CLIP_REGION:
@@ -1224,23 +1245,23 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		noOfRects;
 			BRect		r;
 
-			if(currentlayer->_layerdata->clippReg)
-				currentlayer->_layerdata->clippReg->MakeEmpty();
+			if(cl->_layerdata->clippReg)
+				cl->_layerdata->clippReg->MakeEmpty();
 			else
-				currentlayer->_layerdata->clippReg = new BRegion();
+				cl->_layerdata->clippReg = new BRegion();
 			
 			msg.Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
 				msg.Read<BRect>(&r);
-				currentlayer->_layerdata->clippReg->Include(r);
+				cl->_layerdata->clippReg->Include(r);
 			}
 
-			currentlayer->RebuildFullRegion();
+			cl->RebuildFullRegion();
 
-			currentlayer->RequestDraw(currentlayer->clipToPicture->Frame());
+			cl->RequestDraw(cl->clipToPicture->Frame());
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		
@@ -1251,11 +1272,11 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			
 			msg.Read<BRect>(&invalRect);
 			
-			currentlayer->Invalidate(invalRect);
+			cl->Invalidate(invalRect);
 
-			currentlayer->RequestDraw(invalRect);
+			cl->RequestDraw(invalRect);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
@@ -1272,11 +1293,11 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				invalReg.Include(rect);
 			}
 			
-			currentlayer->Invalidate(invalReg);
+			cl->Invalidate(invalReg);
 
-			currentlayer->RequestDraw(invalReg.Frame());
+			cl->RequestDraw(invalReg.Frame());
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), currentlayer->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 
@@ -1456,11 +1477,11 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		return;
 
 	WindowClipRegion.Set(_winborder->Frame());
-	sibling = _winborder->GetUpperSibling();
+	sibling = _winborder->UpperSibling();
 	while (sibling)
 	{
 		WindowClipRegion.Exclude(sibling->Frame());
-		sibling = sibling->GetUpperSibling();
+		sibling = sibling->UpperSibling();
 	}
 
 	if (!WindowClipRegion.Frame().IsValid())
@@ -1473,7 +1494,8 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	{
 		code = read_from_buffer<int32>(&msgbuffer);
 		view_token = read_from_buffer<int32>(&msgbuffer);
-		layer = desktop->ActiveRootLayer()->FindLayer(view_token);
+//TODO: fix!
+		layer = NULL;//_workspace->GetRoot()->FindLayer(view_token);
 		if (layer)
 		{
 			layerdata = layer->GetLayerData();
@@ -1982,40 +2004,36 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	status_t		stat;
-	PortMessage		msg;
+	bool			quiting = false;
+	int32			code;
 	
-	for(;;)
+	for( ; !quiting; )
 	{
-		stat = msg.ReadFromPort(win->_receiver);
+		code		= 0;
+		win->ses->ReadInt32(&code);
 		
-		if (stat != B_BAD_PORT_ID){
-			switch(msg.Code()){
-				case B_QUIT_REQUESTED:{
-					STRACE(("ServerWindow %s received Quit request\n",win->Title()));
-					// Our BWindow sent us this message when it quit.
-					// We need to ask its ServerApp to delete our monitor
-					win->_applink->SetOpCode(AS_DELETE_WINDOW);
-					win->_applink->Attach<int32>(win->_token);
-					win->_applink->Flush();
-					break;
-				}
-				default:{
-					win->DispatchMessage(msg);
-					break;
-				}
+		switch(code){
+				// this means the client has been killed
+			case 0:{
+				STRACE(("ServerWindow %s received '0' message code\n",win->Title()));
+				quiting = true;
+				delete win;
+				break;
+			}
+			case B_QUIT_REQUESTED:{
+				STRACE(("ServerWindow %s received Quit request\n",win->Title()));
+				quiting = true;
+				delete win;
+				break;
+			}
+			default:{
+				printf("SW(%s): got a message to dispatch...\n",win->Title());
+//				snooze(3000000);
+				win->DispatchMessage(code);
+				break;
 			}
 		}
-		else{
-			exit_thread(1);
-			return 1;
-		}
-	
-		if(msg.Code() == B_QUIT_REQUESTED)
-			break;
 	}
-
-	exit_thread(0);
 	return 0;
 }
 
@@ -2027,11 +2045,12 @@ int32 ServerWindow::MonitorWin(void *data)
 //void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 void ServerWindow::HandleMouseEvent(PortMessage *msg)
 {
-/*	ServerWindow *mousewin=NULL;
+	ServerWindow *mousewin=NULL;
 //	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
-	Layer *root=GetRootLayer(CurrentWorkspace(),ActiveScreen());
+//TODO: resolve
+	Layer *root=NULL;//GetRootLayer(CurrentWorkspace(),ActiveScreen());
 	WinBorder *_winborder;
 	
 	// activeborder is used to remember windows when resizing/moving windows
@@ -2066,10 +2085,11 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read<int64>(&dummy);
 			msg->Read<float>(&x);
 			msg->Read<float>(&y);
-			BPoint pt(x,y);
+//TODO: resolve
+//			BPoint pt(x,y);
 			
 			// If we have clicked on a window, 			
-			active_winborder = _winborder = WindowContainsPoint(pt);
+			active_winborder = _winborder = NULL;
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
@@ -2095,12 +2115,15 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read(&dummy);
 			msg->Read(&x);
 			msg->Read(&y);
-			BPoint pt(x,y);
+//TODO: resolve
+//			BPoint pt(x,y);
 			
-//			set_is_sliding_tab(false);
-//			set_is_moving_window(false);
-//			set_is_resizing_window(false);
-			_winborder	= WindowContainsPoint(pt);
+/*			set_is_sliding_tab(false);
+			set_is_moving_window(false);
+			set_is_resizing_window(false);
+*/
+//TODO: resolve
+			_winborder	= NULL;//WindowContainsPoint(pt);
 			active_winborder=NULL;
 			if(_winborder)
 			{
@@ -2129,29 +2152,28 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read(&dummy);
 			msg->Read(&x);
 			msg->Read(&y);
-//			BPoint pt(x,y);
-//
-//			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
-//			{
-//				active_winborder->MouseMoved((int8*)msg->Buffer());
-//			}
-//			else
-//			{
-//				_winborder = WindowContainsPoint(pt);
-//				if(_winborder)
-//				{
-//					mousewin=_winborder->Window();
-//					_winborder->MouseMoved((int8*)msg->Buffer());
-//				}
-//			}				
-			break;
+/*			BPoint pt(x,y);
+
+			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
+			{
+				active_winborder->MouseMoved((int8*)msg->Buffer());
+			}
+			else
+			{
+				_winborder = WindowContainsPoint(pt);
+				if(_winborder)
+				{
+					mousewin=_winborder->Window();
+					_winborder->MouseMoved((int8*)msg->Buffer());
+				}
+			}				
+*/			break;
 		}
 		default:
 		{
 			break;
 		}
 	}
-*/
 }
 
 /*!
@@ -2181,18 +2203,14 @@ STRACE_KEY(("ServerWindow::HandleKeyEvent unimplemented\n"));
 	
 	If the window belongs to all workspaces, it returns the current workspace
 */
-/*
 Workspace *ServerWindow::GetWorkspace(void)
 {
-	if(_workspace_index==B_ALL_WORKSPACES)
-	{
-		return _workspace->GetScreen()->GetActiveWorkspace();
-		
-	}
+	if(fWorkspaces==B_ALL_WORKSPACES)
+//TODO: resolve
+		return NULL;//fWorkspaces->GetScreen()->GetActiveWorkspace();
 
-	return _workspace;
+	return NULL;
 }
-*/
 
 /*!
 	\brief Assign the window to a particular workspace object

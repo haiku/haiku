@@ -29,6 +29,7 @@
 #include <View.h>
 #include <Message.h>
 #include <AppDefs.h>
+#include <Region.h>
 #include <string.h>
 #include <stdio.h>
 #include "Layer.h"
@@ -39,7 +40,6 @@
 #include "ServerCursor.h"
 #include "CursorManager.h"
 #include "TokenHandler.h"
-#include "RectUtils.h"
 #include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "Desktop.h"
@@ -81,6 +81,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	_lowersibling	= NULL;
 	_topchild		= NULL;
 	_bottomchild	= NULL;
+	fRootLayer		= NULL;
 
 	/* NOW all regions (_visible, _fullVisible, _full) are empty */
 	
@@ -95,9 +96,8 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	_serverwin		= win;
 	_cursor			= NULL;
 	clipToPicture	= NULL;
-
-	//TODO: Fix
-//	fDriver			= GetGfxDriver(ActiveScreen());
+// TODO: modify!
+	fDriver			= desktop->GetDisplayDriver();
 }
 
 //! Destructor frees all allocated heap space
@@ -127,12 +127,19 @@ Layer::~Layer(void)
 	\param before Add the child in front of this layer
 	\param rebuild Flag to fully rebuild all visibility regions
 */
-void Layer::AddChild(Layer *layer, Layer *before)
+void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 {
 	if( layer->_parent != NULL ) {
 		printf("ERROR: AddChild(): Layer already has a _parent\n");
 		return;
 	}
+
+	if (layer->GetRootLayer()){
+		printf("Error: Layer already belongs to a RootLayer!\n");
+		return;
+	}
+	
+	layer->fRootLayer	= rootLayer;
 
 		// attach layer to the tree structure
 	layer->_parent		= this;
@@ -165,24 +172,6 @@ void Layer::AddChild(Layer *layer, Layer *before)
 }
 
 /*!
-	\brief Used in the new Desktop Management code
-*/
-void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
-{
-	// TODO: Document
-	
-	if (layer->GetRootLayer())
-	{
-		printf("Error: Layer already belongs to a RootLayer!\n");
-		return;
-	}
-	
-	layer->fRootLayer	= rootLayer;
-
-	fLayerList.AddItem(layer);
-}
-
-/*!
 	\brief Removes a layer from the child stack
 	\param layer The layer to remove
 	\param rebuild Flag to rebuild all visibility regions
@@ -193,12 +182,12 @@ void Layer::RemoveChild(Layer *layer)
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
 		return;
 	}
-
-	if (!(fLayerList.HasItem(layer)))
-	{
-		printf("Error: Layer is not a child of this RootLayer!\n");
+	if( layer->_parent != this ){
+		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
 		return;
 	}
+
+	fRootLayer	= NULL;
 
 		// cache some things. The rebuilding/redrawing process will need those.
 	Layer*		cachedUpperSibling	= layer->_uppersibling;
@@ -236,9 +225,6 @@ void Layer::RemoveChild(Layer *layer)
 			DoInvalidate( BRegion(invalidRect), cachedUpperSibling );
 		}
 	}
-
-	fRootLayer	= NULL;
-	fLayerList.RemoveItem(layer);
 }
 
 /*!
@@ -255,35 +241,23 @@ void Layer::RemoveSelf()
 	_parent->RemoveChild(this);
 }
 
-/*!
-	\brief Used in the new Desktop Management code
-*/
-bool Layer::HasChild(Layer* layer) const
-{
-	return fLayerList.HasItem(layer);
-}
-
-/*!
-	\brief Used in the new Desktop Management code
-*/
-void Layer::SetRootLayer(RootLayer* rl)
-{
-	fRootLayer	= rl;
+bool Layer::HasChild(Layer* layer) const{
+	for(Layer *lay = VirtualTopChild(); lay; lay = lay->VirtualLowerSibling()){
+		if(lay == layer)
+			return true;
+	}
+	return false;
 }
 
 /*!
 	\brief Finds the first child at a given point.
 	\param pt Point to look for a child
-	\param recursive Flag to look for the bottom-most child
 	\return non-NULL if found, NULL if not
 
 	Find out which child gets hit if we click at a certain spot. Returns NULL
 	if there are no _visible children or if the click does not hit a child layer
-	If recursive==true, then it will continue to call until it reaches a layer
-	which has no children, i.e. a layer that is at the top of its 'branch' in
-	the layer tree
 */
-Layer* Layer::GetLayerAt(const BPoint &pt)
+Layer* Layer::LayerAt(const BPoint &pt)
 {
 	if (_visible.Contains(pt)){
 		return this;
@@ -292,7 +266,7 @@ Layer* Layer::GetLayerAt(const BPoint &pt)
 	if (_fullVisible.Contains(pt)){
 		Layer		*lay = NULL;
 		for ( Layer* child = _bottomchild; child != NULL; child = child->_uppersibling ){
-			if ( (lay = child->GetLayerAt( pt )) )
+			if ( (lay = child->LayerAt( pt )) )
 				return lay;
 		}
 	}
@@ -421,7 +395,15 @@ void Layer::MouseTransit(uint32 transit)
 
 void Layer::DoInvalidate(const BRegion &reg, Layer *start){
 //TODO: REMOVE this! For Test purposes only!
+printf("**********Layer::DoInvalidate()\n");
+	if (GetRootLayer())
+		GetRootLayer()->Draw(GetRootLayer()->Bounds());
+	else{
+		if(dynamic_cast<RootLayer*>(this))
+			Draw(Bounds());
+	}
 	return;
+//----------------
 
 	if (_hidden || !(_fullVisible.Intersects(reg.Frame())) ){
 		printf("SERVER: WARNING: Layer(%s)::DoInvalidate() 1 \n\n", _name->String());
@@ -586,6 +568,12 @@ void Layer::Show(void)
 	
 	_hidden		= false;
 
+//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
+printf("**********Layer::Show()\n");
+		DoInvalidate(BRegion(Bounds()), NULL);
+	return;
+//----------------
+
 		// rebuild layer visible region based on its parent's and those supplied by user
 	if (_parent){
 		_parent->RebuildChildRegions( _full.Frame(), this );
@@ -607,6 +595,12 @@ void Layer::Hide(void)
 		return;
 
 	_hidden			= true;
+
+//TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
+printf("**********Layer::Hide()\n");
+		DoInvalidate(BRegion(Bounds()), NULL);
+	return;
+//----------------
 
 	if (_fullVisible.CountRects() > 0){
 
@@ -1034,7 +1028,12 @@ void Layer::RebuildRegions( const BRect& r )
 }
 
 void Layer::RebuildFullRegion( ){
-	_full.Set( ConvertToTop( _frame ) );
+// TODO: temporary patch?
+	if (_parent && dynamic_cast<RootLayer*>(_parent) ){
+	}
+	else{
+		_full.Set( ConvertToTop( _frame ) );
+	}
 
 	LayerData		*ld;
 
@@ -1255,59 +1254,15 @@ BRect Layer::ConvertFromTop(BRect rect)
 		return(rect);
 }
 
-/*!
-	\brief Makes the layer the backmost layer belonging to its parent
-	
-	This function will do nothing if the Layer has no parent or no siblings. Region 
-	rebuilding is not performed.
-*/
-void Layer::MakeTopChild(void)
-{
-	// Handle redundant and pointless cases
-	if(!_parent || (!_uppersibling && !_lowersibling) || _parent->_topchild==this)
-		return;
-	
-	// Pull ourselves out of the layer tree
-	if(_uppersibling)
-		_uppersibling->_lowersibling=_lowersibling;
-		
-	if(_lowersibling)
-		_lowersibling->_uppersibling=_uppersibling;
-	
-	// Set this layer's upper/lower sib pointers to appropriate values
-	_uppersibling=NULL;
-	_lowersibling=_parent->_topchild;
-	
-	// move former top child down a layer
-	_lowersibling->_uppersibling=this;
-	_parent->_topchild=this;
+RootLayer* Layer::GetRootLayer() const{
+	return fRootLayer;
 }
 
-/*!
-	\brief Makes the layer the frontmost layer belonging to its parent
-	
-	This function will do nothing if the Layer has no parent or no siblings. Region 
-	rebuilding is not performed.
-*/
-void Layer::MakeBottomChild(void)
-{
-	// Handle redundant and pointless cases
-	if(!_parent || (!_uppersibling && !_lowersibling) || _parent->_bottomchild==this)
-		return;
-	
-	// Pull ourselves out of the layer tree
-	if(_uppersibling)
-		_uppersibling->_lowersibling=_lowersibling;
-		
-	if(_lowersibling)
-		_lowersibling->_uppersibling=_uppersibling;
-	
-	// Set this layer's upper/lower sib pointers to appropriate values
-	_uppersibling=_parent->_bottomchild;
-	_lowersibling=NULL;
-	
-	// move former bottom child up a layer
-	_uppersibling->_lowersibling=this;
-	_parent->_bottomchild=this;
-	
+void Layer::SetRootLayer(RootLayer* rl){
+	fRootLayer	= rl;
 }
+
+
+/*
+ @log
+*/

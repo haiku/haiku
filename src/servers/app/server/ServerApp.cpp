@@ -54,7 +54,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-//#define DEBUG_SERVERAPP
+#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>
@@ -70,8 +70,14 @@
 	\param _signature NULL-terminated string which contains the BApplication's
 	MIME _signature.
 */
-ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *signature)
+ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
+		team_id clientTeamID, int32 handlerID, char *signature)
 {
+		// it will be of *very* musch use in correct window order
+	fClientTeamID		= clientTeamID;
+		// what to send a message to the client? Write a BMessage to this port.
+	fClientLooperPort	= clientLooperPort;
+
 	// need to copy the _signature because the message buffer
 	// owns the copy which we are passed as a parameter.
 	_signature=(signature)?signature:"application/x-vnd.unregistered-application";
@@ -85,9 +91,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_applink->SetPort(_sender);
 
 	// Gotta get the team ID so we can ping the application
-	port_info pinfo;
-	get_port_info(_sender,&pinfo);
-	_target_id=pinfo.team;
+	_target_id			= clientTeamID;
 	
 	// _receiver is the port we receive messages from our BApplication
 	_receiver=rcvport;
@@ -102,10 +106,11 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	_lock=create_sem(1,"ServerApp sem");
 
-	// TODO: Fix
+//TODO: resolve
 //	_driver=GetGfxDriver(ActiveScreen());
-
 	_cursorhidden=false;
+
+	Run();
 
 	STRACE(("ServerApp %s:\n",_signature.String()));
 	STRACE(("\tBApp port: %ld\n",_sender));
@@ -115,9 +120,35 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-	STRACE(("ServerApp %s:~ServerApp()\n",_signature.String()));
+	STRACE(("*ServerApp %s:~ServerApp()\n",_signature.String()));
 	int32 i;
-	
+
+	// wait for our ServerWindow threads
+	bool	ready = true;
+	desktop->fLayerLock.Lock();
+	do{
+		ready	= true;
+
+		int32	count = desktop->fWinBorderList.CountItems();
+		for( int32 i = 0; i < count; i++){
+			ServerWindow	*sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
+			if (ClientTeamID() == sw->ClientTeamID()){
+				thread_id		tid = sw->ThreadID();
+				status_t		temp;
+
+				desktop->fLayerLock.Unlock();
+printf("waiting for thread %s\n", sw->Title());
+				wait_for_thread(tid, &temp);
+
+				desktop->fLayerLock.Lock();
+
+				ready		= false;
+				break;
+			}
+		}
+	}while(!ready);
+	desktop->fLayerLock.Unlock();
+/*	
 	ServerWindow *tempwin;
 	for(i=0;i<_winlist->CountItems();i++)
 	{
@@ -127,7 +158,7 @@ ServerApp::~ServerApp(void)
 	}
 	_winlist->MakeEmpty();
 	delete _winlist;
-
+*/
 	ServerBitmap *tempbmp;
 	for(i=0;i<_bmplist->CountItems();i++)
 	{
@@ -153,13 +184,17 @@ ServerApp::~ServerApp(void)
 	if(_appcursor)
 		delete _appcursor;
 
+
+	cursormanager->RemoveAppCursors(_signature.String());
+	delete_sem(_lock);
+	
+	STRACE(("#ServerApp %s:~ServerApp()\n",_signature.String()));
+
 	// Kill the monitor thread if it exists
 	thread_info info;
 	if(get_thread_info(_monitor_thread,&info)==B_OK)
 		kill_thread(_monitor_thread);
 
-	cursormanager->RemoveAppCursors(_signature.String());
-	delete_sem(_lock);
 }
 
 /*!
@@ -220,6 +255,21 @@ void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
 	write_port(_receiver,code, buffer, size);
 }
 
+void ServerApp::SendMessageToClient(const BMessage* msg) const{
+	ssize_t		size;
+	char		*buffer;
+	
+	size		= msg->FlattenedSize();
+	buffer		= new char[size];
+	if (msg->Flatten(buffer, size) == B_OK){
+		write_port(fClientLooperPort, msg->what, buffer, size);
+	}
+	else
+		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", _signature.String());
+
+	delete buffer;
+}
+
 /*!
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
@@ -247,22 +297,23 @@ void ServerApp::SetAppCursor(void)
 	\param data Pointer to the thread's ServerApp object
 	\return Throwaway value - always 0
 */
-int32 ServerApp::MonitorApp(void *data)
+		int32 ServerApp::MonitorApp(void *data)
 {
 	// Message-dispatching loop for the ServerApp
 
-	ServerApp *app=(ServerApp *)data;
-	PortQueue msgqueue(app->_receiver);
-	PortMessage *msg;
+	ServerApp		*app = (ServerApp *)data;
+	PortQueue		msgqueue(app->_receiver);
+	PortMessage		*msg;
+	bool			quiting = false;
 	
-	for(;;)
+	for( ; !quiting; )
 	{
 		if(!msgqueue.MessagesWaiting())
 			msgqueue.GetMessagesFromPort(true);
 		else
 			msgqueue.GetMessagesFromPort(false);
 
-		msg=msgqueue.GetMessageFromQueue();
+		msg		= msgqueue.GetMessageFromQueue();
 		if(!msg)
 			continue;
 					
@@ -271,6 +322,7 @@ int32 ServerApp::MonitorApp(void *data)
 			case AS_QUIT_APP:
 			{
 				STRACE(("ServerApp %s:Server shutdown notification received\n",app->_signature.String()));
+/*
 				// If we are using the real, accelerated version of the
 				// DisplayDriver, we do NOT want the user to be able shut down
 				// the server. The results would NOT be pretty
@@ -281,18 +333,13 @@ int32 ServerApp::MonitorApp(void *data)
 					// ask all apps to quit. This is NOT the same as system
 					// shutdown and will happen only in testing
 					
-					// For now, it seems that we can't seem to try to play nice and tell
-					// an application to quit, so we'll just have to go postal. XD
-
-//						BMessage *shutdown=new BMessage(_QUIT_);
-//						SendMessage(app->_sender,shutdown);
-
-					// DIE! DIE! DIE! :P
-					port_info pi;
-					get_port_info(app->_sender,&pi);
-					kill_team(pi.team);
-					app->PostMessage(B_QUIT_REQUESTED);
+					BMessage 	pleaseQuit(_QUIT_);
+					app->SendMessageToClient(&pleaseQuit);
 				}
+* Adi: I do not agree here! I think this is a reminiscence(?) since the "old" days...
+*/
+				BMessage 	pleaseQuit(_QUIT_);
+				app->SendMessageToClient(&pleaseQuit);
 				break;
 			}
 			
@@ -300,15 +347,19 @@ int32 ServerApp::MonitorApp(void *data)
 			{
 				// Our BApplication sent us this message when it quit.
 				// We need to ask the app_server to delete our monitor
-				port_id serverport=find_port(SERVER_PORT_NAME);
-				if(serverport==B_NAME_NOT_FOUND)
-				{
+				// ADI: No! This is a bad solution. A thead should continue its
+				// execution until its exit point, and this can *very* easily be done
+				quiting		= true;
+				// see... no need to ask the main thread to kill us.
+				// still... it will delete this ServerApp object.
+				port_id		serverport = find_port(SERVER_PORT_NAME);
+				if(serverport == B_NAME_NOT_FOUND){
 					printf("PANIC: ServerApp %s could not find the app_server port!\n",app->_signature.String());
 					break;
 				}
 				app->_applink->SetPort(serverport);
 				app->_applink->SetOpCode(AS_DELETE_APP);
-				app->_applink->Attach(&app->_monitor_thread,sizeof(thread_id));
+				app->_applink->Attach(&app->_monitor_thread, sizeof(thread_id));
 				app->_applink->Flush();
 				break;
 			}
@@ -321,10 +372,8 @@ int32 ServerApp::MonitorApp(void *data)
 		}
 
 		delete msg;
-		
 	} // end for 
-
-	exit_thread(0);
+		// clean exit.
 	return 0;
 }
 
@@ -353,9 +402,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
-			// TODO: move message def to ServerProtocol.h to allow for
-			// complete build compatibility under R5
-/*			ServerWindow *win;
+			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
@@ -366,14 +413,11 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-*/			break;
-
+			break;
 		}
 		case AS_UPDATE_FONTS:
 		{
-			// TODO: move message def to ServerProtocol.h to allow for
-			// complete build compatibility under R5
-/*			ServerWindow *win;
+			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
@@ -384,13 +428,11 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-*/			break;
+			break;
 		}
 		case AS_UPDATE_DECORATOR:
 		{
-			// TODO: move message def to ServerProtocol.h to allow for
-			// complete build compatibility under R5
-/*			ServerWindow *win;
+			ServerWindow *win;
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
 			{
@@ -399,7 +441,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->_winborder->UpdateDecorator();
 				win->Unlock();
 			}
-*/			break;
+			break;
 		}
 		case AS_CREATE_WINDOW:
 		{
@@ -425,7 +467,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			port_id		looperPort;
 			port_id		replyport;
 			char		*title;
-			
+
 			msg->Read<BRect>(&frame);
 			msg->Read<int32>((int32*)&look);
 			msg->Read<int32>((int32*)&feel);
@@ -441,39 +483,16 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 					_signature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
-			ServerWindow *newwin = new ServerWindow(frame, title,
-				look, feel, flags, this, sendPort, looperPort, replyport, wkspaces, token);
-			
-			_winlist->AddItem(newwin);
+			new ServerWindow(frame, title, look, feel, flags, this,
+				sendPort, looperPort, replyport, wkspaces, token);
+			// ServerWindow constructor has added 'newwin' to the Desktop.
+			// We don't have to do anything here...
 
-			STRACE(("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
 			delete title;
 
-			break;
-		}
-		case AS_DELETE_WINDOW:
-		{
-			// Received from a ServerWindow when its window quits
-			
-			// Attached data:
-			// 1) uint32  ServerWindow ID token
-			ServerWindow *w;
-			uint32 winid;
-			msg->Read<uint32>(&winid);
-
-			for(int32 i=0;i<_winlist->CountItems();i++)
-			{
-				w=(ServerWindow*)_winlist->ItemAt(i);
-				if(w->_token==winid)
-				{
-					STRACE(("ServerApp %s: Deleting window %s\n",_signature.String(),w->GetTitle()));
-					_winlist->RemoveItem(w);
-					delete w;
-					break;
-				}
-			}
 			break;
 		}
 		case AS_CREATE_BITMAP:
@@ -601,8 +620,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&workspace);
 			msg->Read<uint32>(&mode);
 			msg->Read<bool>(&stick);
-
-			// TODO: Fix			
+//TODO: Resolve			
 //			SetSpace(workspace,mode,ActiveScreen(),stick);
 
 			break;
@@ -615,8 +633,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
 			msg->Read<int32>(&workspace);
-
-			// TODO: Fix			
+//TODO: Resolve
 //			SetWorkspace(workspace);
 			break;
 		}
@@ -735,13 +752,15 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-			scroll_bar_info sbi=desktop->ScrollBarInfo();
+//TODO: resolve
+//			scroll_bar_info sbi=GetScrollBarInfo();
 
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
 			PortLink link(replyport);
-			link.Attach<scroll_bar_info>(sbi);
+//TODO: resolve
+//			link.Attach<scroll_bar_info>(sbi);
 			link.Flush();
 			break;
 		}
@@ -751,7 +770,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-			desktop->SetScrollBarInfo(sbi);
+//TODO: resolve
+//			SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
@@ -763,7 +783,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&replyport);
 
 			PortLink link(replyport);
-			link.Attach<bool>(desktop->FFMouseInUse());
+//TODO: resolve
+//			link.Attach<bool>(GetFFMouse());
 			link.Flush();
 			break;
 		}
@@ -773,7 +794,8 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-			desktop->SetScrollBarInfo(sbi);
+//TODO: resolve
+//			SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
@@ -782,20 +804,23 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
 			msg->Read<mode_mouse>(&mmode);
-			desktop->SetFFMouseMode(mmode);
+//TODO: resolve
+//			SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-			mode_mouse mmode=desktop->FFMouseMode();
+//TODO: resolve
+//			mode_mouse mmode=GetFFMouseMode();
 			
 			port_id replyport;
 			msg->Read<int32>(&replyport);
 			
 			PortLink link(replyport);
-			link.Attach<mode_mouse>(mmode);
+//TODO: resolve
+//			link.Attach<mode_mouse>(mmode);
 			link.Flush();
 			break;
 		}
@@ -831,3 +856,6 @@ ServerBitmap *ServerApp::_FindBitmap(int32 token)
 	return NULL;
 }
 
+team_id ServerApp::ClientTeamID(){
+	return fClientTeamID;
+}

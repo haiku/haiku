@@ -38,17 +38,17 @@ class DisplayDriver;
 class WinBorder : public Layer
 {
 public:
-							WinBorder(const BRect &r, const char *name, const int32 look, 
-								const int32 feel, const int32 flags, ServerWindow *win);
-	virtual					~WinBorder(void);
-	
+								WinBorder(const BRect &r, const char *name, const int32 look,
+									const int32 feel, const int32 flags, ServerWindow *win);
+	virtual						~WinBorder(void);
+
 	virtual	void				RebuildRegions( const BRect& r );
 	virtual	void				Draw(const BRect &r);
 
 	virtual	void				MoveBy(float x, float y);
 	virtual	void				ResizeBy(float x, float y);
 			bool				HasPoint(BPoint pt) const;
-
+	
 			void				MoveToBack();
 			void				MoveToFront();
 
@@ -80,7 +80,6 @@ public:
 			void				SetMainWinBorder(WinBorder *newMain);	
 
 protected:
-
 			ServerWindow		*_win;
 			//BString				*_title;
 			Decorator			*_decorator;
@@ -105,14 +104,14 @@ protected:
 */
 };
 
-bool is_moving_window(void);
-void set_is_moving_window(bool state);
-bool is_resizing_window(void);
-void set_is_resizing_window(bool state);
-void set_active_winborder(WinBorder *win);
-WinBorder *get_active_winborder(void);
-void set_is_resizing_window(bool state);
-void set_is_sliding_tab(bool state);
-bool is_sliding_tab(void);
+bool		is_moving_window(void);
+void		set_is_moving_window(bool state);
+bool		is_resizing_window(void);
+void		set_is_resizing_window(bool state);
+void		set_active_winborder(WinBorder *win);
+WinBorder*	get_active_winborder(void);
+void		set_is_resizing_window(bool state);
+void		set_is_sliding_tab(bool state);
+bool		is_sliding_tab(void);
 
 #endif

@@ -29,7 +29,6 @@
 
 #include <OS.h>
 #include <String.h>
-#include <ServerBitmap.h>
 #include "FMWList.h"
 
 class AppServer;
@@ -40,22 +39,6 @@ class BList;
 class DisplayDriver;
 class ServerCursor;
 
-
-/*
-class ServerApp{
-public:
-							ServerApp(team_id clientTeamID){
-								fClientTeamID = clientTeamID;
-							}
-	virtual					~ServerApp(){ }
-	team_id					ClientTeamID(){ return fClientTeamID; }
-
-			FMWList			fAppFMWList;
-private:
-			team_id			fClientTeamID;
-};
-*/
-
 /*!
 	\class ServerApp ServerApp.h
 	\brief Counterpart to BApplication within the app_server
@@ -63,48 +46,60 @@ private:
 class ServerApp
 {
 public:
-	ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *signature);
-	~ServerApp(void);
+								ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort,
+									team_id clientTeamID, int32 handlerID, char *signature);
+	virtual						~ServerApp(void);
 
-	bool Run(void);
-	static int32 MonitorApp(void *data);	
-	void Lock(void);
-	void Unlock(void);
-	bool IsLocked(void);
+			bool				Run(void);
+			static				int32 MonitorApp(void *data);	
+			void				Lock(void);
+			void				Unlock(void);
+			bool				IsLocked(void);
 	
 	/*!
 		\brief Determines whether the application is the active one
 		\return true if active, false if not.
 	*/
-	bool IsActive(void) const { return _isactive; }
+			bool				IsActive(void) const { return _isactive; }
 
-	void Activate(bool value);
-	bool PingTarget(void);
+			void				Activate(bool value);
+			bool				PingTarget(void);
 	
-	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
+			void				PostMessage(int32 code, size_t size=0,
+									int8 *buffer=NULL);
+			void				SendMessageToClient( const BMessage* msg ) const;
 
-	void SetAppCursor(void);
-	FMWList *GetFMWList(void) { return &fAppFMWList; }
-	
+			void				SetAppCursor(void);
+
+			team_id				ClientTeamID();
+
+			FMWList				fAppFMWList;
 protected:
 	friend class AppServer;
 	friend class ServerWindow;
-	void _DispatchMessage(PortMessage *msg);
-	ServerBitmap *_FindBitmap(int32 token);
 
-	port_id _sender,_receiver;
-	BString _signature;
-	thread_id _monitor_thread;
-	team_id _target_id;
-	PortLink *_applink;
-	BList *_winlist, *_bmplist, *_piclist;
-	DisplayDriver *_driver;
-	ServerCursor *_appcursor;
-	sem_id _lock;
-	bool _cursorhidden;
-	bool _isactive;
-	int32 _handlertoken;
-	FMWList fAppFMWList;
+			void				_DispatchMessage(PortMessage *msg);
+			ServerBitmap*		_FindBitmap(int32 token);
+
+			port_id				_sender,
+								_receiver,
+								fClientLooperPort;
+
+			BString				_signature;
+			thread_id			_monitor_thread;
+
+			team_id				fClientTeamID;
+
+			team_id				_target_id;
+			PortLink*			_applink;
+			BList				*_winlist,
+								*_bmplist,
+								*_piclist;
+			ServerCursor*		_appcursor;
+			sem_id				_lock;
+			bool				_cursorhidden;
+			bool				_isactive;
+			int32				_handlertoken;
 };
 
 #endif
