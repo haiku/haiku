@@ -222,7 +222,7 @@ void *pool_get(struct pool_ctl *p)
 		ACQUIRE_BENAPHORE(mp->lock);
 
 		if (mp->avail >= p->alloc_size) {
-			rv = mp->ptr;
+			rv = (struct free_blk *)mp->ptr;
 			mp->ptr += p->alloc_size;
 			mp->avail -= p->alloc_size;
 			RELEASE_BENAPHORE(mp->lock);
@@ -249,7 +249,7 @@ void *pool_get(struct pool_ctl *p)
 	ACQUIRE_BENAPHORE(mp->lock);
 
 	if (mp->avail >= p->alloc_size) {
-		rv = mp->ptr;
+		rv = (struct free_blk *)mp->ptr;
 		mp->ptr += p->alloc_size;
 		mp->avail -= p->alloc_size;
 	}
