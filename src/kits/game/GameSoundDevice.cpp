@@ -380,4 +380,3 @@ BGameSoundDevice::AllocateSound()
 	return fSoundCount - kGrowth;
 }
 
-	
