@@ -79,10 +79,10 @@ private:
 class float32_sample
 {
 public:
-	inline operator uint8() { return (int32)(data * 127.0f) + 128; }
-	inline operator int8()  { return (int8)(data * 127.0f); }
-	inline operator int16() { return (int16)(data * 32767.0f); }
-	inline operator int32() { return (int32)(data * 2147483647.0f); }
+	inline operator uint8() { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
+	inline operator int8()  { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
+	inline operator int16() { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
+	inline operator int32() { float32 v; if (data < -1.0f) v = -1.0f; else if (data > 1.0f) v = 1.0f; else v = data; return (int32)(v * 2147483647.0f); }
 	inline operator float() { return data; }
 private:
 	float32 data;
@@ -91,10 +91,10 @@ private:
 class float64_sample
 {
 public:
-	inline operator uint8() { return (int32)(data * 127.0) + 128; }
-	inline operator int8()  { return (int8)(data * 127.0); }
-	inline operator int16() { return (int16)(data * 32767.0); }
-	inline operator int32() { return (int32)(data * 2147483647.0); }
+	inline operator uint8() { int32 v = (int32)(data * 127.0f) + 128; if (v > 255) v = 255; else if (v < 0) v = 0; return v; }
+	inline operator int8()  { int32 v = (int32)(data * 127.0f); if (v > 127) v = 127; else if (v < -127) v = -127; return v; }
+	inline operator int16() { int32 v = (int32)(data * 32767.0f); if (v > 32767) v = 32767; else if (v < -32767) v = -32767; return v; }
+	inline operator int32() { float64 v; if (data < -1.0) v = -1.0; else if (data > 1.0) v = 1.0; else v = data; return (int32)(v * 2147483647.0f); }
 	inline operator float() { return data; }
 private:
 	float64 data;
