@@ -100,6 +100,7 @@ class DataView : public BView {
 
 static const uint32 kMsgBaseType = 'base';
 static const uint32 kMsgUpdateData = 'updt';
+static const uint32 kMsgSetSelection = 'ssel';
 
 // observer notices
 static const uint32 kDataViewCursorPosition = 'curs';

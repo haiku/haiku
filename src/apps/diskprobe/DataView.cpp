@@ -188,6 +188,17 @@ DataView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgSetSelection:
+		{
+			int64 start, end;
+			if (message->FindInt64("start", &start) != B_OK
+				|| message->FindInt64("end", &end) != B_OK)
+				break;
+
+			SetSelection(start, end);
+			break;
+		}
+
 		case B_SELECT_ALL:
 			SetSelection(0, fDataSize - 1);
 			break;
