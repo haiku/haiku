@@ -14,6 +14,7 @@
 
 
 struct file_descriptor;
+struct fs_mount;
 struct vnode;
 
 /** The I/O context of a process/team, holds the fd array */
@@ -43,7 +44,10 @@ struct file_descriptor {
 	int32	type;               /* descriptor type */
 	int32	ref_count;
 	struct fd_ops *ops;
-	struct vnode *vnode;
+	union {
+		struct vnode *vnode;
+		struct fs_mount *mount;
+	} u;
 	void	*cookie;
 	int32	open_mode;
 };
@@ -55,8 +59,9 @@ enum fd_types {
 	FDTYPE_FILE	= 1,
 	FDTYPE_ATTR,
 	FDTYPE_DIR,
-	FDTYPE_ATTRDIR,
+	FDTYPE_ATTR_DIR,
 	FDTYPE_INDEX,
+	FDTYPE_INDEX_DIR,
 	FDTYPE_QUERY,
 	FDTYPE_SOCKET
 };

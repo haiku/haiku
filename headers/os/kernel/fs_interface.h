@@ -119,11 +119,11 @@ typedef struct fs_ops {
 	status_t (*remove_attr)(fs_volume fs, fs_vnode file, const char *name);
 
 	/* index directory & index operations */
-	status_t (*open_index_dir)(fs_volume fs, fs_vnode v, fs_cookie *cookie, int oflags);
-	status_t (*close_index_dir)(fs_volume fs, fs_vnode v, fs_cookie cookie);
-	status_t (*free_index_dir_cookie)(fs_volume fs, fs_vnode v, fs_cookie cookie);
-	status_t (*read_index_dir)(fs_volume fs, fs_vnode v, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_index_dir)(fs_volume fs, fs_vnode v, fs_cookie cookie);
+	status_t (*open_index_dir)(fs_volume fs, fs_cookie *cookie);
+	status_t (*close_index_dir)(fs_volume fs, fs_cookie cookie);
+	status_t (*free_index_dir_cookie)(fs_volume fs, fs_cookie cookie);
+	status_t (*read_index_dir)(fs_volume fs, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*rewind_index_dir)(fs_volume fs, fs_cookie cookie);
 
 	status_t (*create_index)(fs_volume fs, const char *name, uint32 type, int flags);
 	status_t (*remove_index)(fs_volume fs, const char *name);
