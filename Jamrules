@@ -856,10 +856,11 @@ rule LinkSharedOSLibs
 				# XXX: _APP_ and _KERNEL_ should not be needed for ELF.
 				case _APP_ : isfile = true ;
 				case _KERNEL_ : isfile = true ;
-				case *.so     : isfile = true ;
-				case *.a      : isfile = true ;
 				case lib*	: isfile = true ;
 				case *	: isfile = ;
+			}
+			if ! $(isfile) && ( $(i:S) = .so || $(i:S) = .a ) {
+				isfile = true ;
 			}
 		}
 		if $(isfile) {
