@@ -39,7 +39,7 @@
 
 extern FTC_Manager ftmanager; 
 FT_Library ftlib;
-FontServer *fontserver;
+FontServer *fontserver=NULL;
 
 //#define PRINT_FONT_LIST
 
