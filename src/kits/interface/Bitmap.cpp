@@ -1122,11 +1122,11 @@ struct RGB24Reader : public BaseReader<_PixelType> {
 
 	inline void Read(rgb_color_value &color)
 	{
-		const pixel_t &pixel = *pixels;
+		const pixel_t &pixel = *BaseReader<_PixelType>::pixels;
 		color.red = pixel.red;
 		color.green = pixel.green;
 		color.blue = pixel.blue;
-		pixels++;
+		BaseReader<_PixelType>::pixels++;
 	}
 
 	inline void Read(gray_color_value &gray)
@@ -1149,14 +1149,14 @@ struct RGB16Reader : public BaseReader<_PixelType> {
 	{
 		// rg: R[4:0],G[5:3]
 		// gb: G[2:0],B[4:0]
-		const pixel_t &pixel = *pixels;
+		const pixel_t &pixel = *BaseReader<_PixelType>::pixels;
 		color.red = pixel.rg & 0xf8;
 		color.green = ((pixel.rg & 0x07) << 5) & ((pixel.gb & 0xe0) >> 3);
 		color.blue = (pixel.gb & 0x1f) << 3;
 		color.red |= color.red >> 5;
 		color.green |= color.green >> 6;
 		color.blue |= color.blue >> 5;
-		pixels++;
+		BaseReader<_PixelType>::pixels++;
 	}
 
 	inline void Read(gray_color_value &gray)
@@ -1179,14 +1179,14 @@ struct RGB15Reader : public BaseReader<_PixelType> {
 	{
 		// rg: -[0],R[4:0],G[4:3]
 		// gb: G[2:0],B[4:0]
-		const pixel_t &pixel = *pixels;
+		const pixel_t &pixel = *BaseReader<_PixelType>::pixels;
 		color.red = (pixel.rg & 0x7c) << 1;
 		color.green = ((pixel.rg & 0x03) << 6) & ((pixel.gb & 0xe0) >> 2);
 		color.blue = (pixel.gb & 0x1f) << 3;
 		color.red |= color.red >> 5;
 		color.green |= color.green >> 5;
 		color.blue |= color.blue >> 5;
-		pixels++;
+		BaseReader<_PixelType>::pixels++;
 	}
 
 	inline void Read(gray_color_value &gray)
@@ -1206,15 +1206,15 @@ struct CMAP8Reader : public BaseReader<uint8> {
 
 	inline void Read(rgb_color_value &color)
 	{
-		converter.RGB24ColorForIndex(*pixels, color.red, color.green,
+		converter.RGB24ColorForIndex(*BaseReader<uint8>::pixels, color.red, color.green,
 									 color.blue);
-		pixels++;
+		BaseReader<uint8>::pixels++;
 	}
 
 	inline void Read(gray_color_value &gray)
 	{
-		gray = converter.GrayColorForIndex(*pixels);
-		pixels++;
+		gray = converter.GrayColorForIndex(*BaseReader<uint8>::pixels);
+		BaseReader<uint8>::pixels++;
 	}
 
 	const PaletteConverter &converter;
@@ -1228,14 +1228,14 @@ struct Gray8Reader : public BaseReader<uint8> {
 
 	inline void Read(rgb_color_value &color)
 	{
-		color.red = color.green = color.blue = *pixels;
-		pixels++;
+		color.red = color.green = color.blue = *BaseReader<uint8>::pixels;
+		BaseReader<uint8>::pixels++;
 	}
 
 	inline void Read(gray_color_value &gray)
 	{
-		gray = *pixels;
-		pixels++;
+		gray = *BaseReader<uint8>::pixels;
+		BaseReader<uint8>::pixels++;
 	}
 };
 
@@ -1317,22 +1317,22 @@ struct RGB32Writer : public BaseWriter<_PixelType> {
 
 	inline void Write(const rgb_color_value &color)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.red = color.red;
 		pixel.green = color.green;
 		pixel.blue = color.blue;
 		pixel.alpha = 255;
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 
 	inline void Write(const gray_color_value &gray)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.red = gray;
 		pixel.green = gray;
 		pixel.blue = gray;
 		pixel.alpha = 255;
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 };
 
@@ -1346,20 +1346,20 @@ struct RGB24Writer : public BaseWriter<_PixelType> {
 
 	inline void Write(const rgb_color_value &color)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.red = color.red;
 		pixel.green = color.green;
 		pixel.blue = color.blue;
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 
 	inline void Write(const gray_color_value &gray)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.red = gray;
 		pixel.green = gray;
 		pixel.blue = gray;
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 };
 
@@ -1375,18 +1375,18 @@ struct RGB16Writer : public BaseWriter<_PixelType> {
 	{
 		// rg: R[4:0],G[5:3]
 		// gb: G[2:0],B[4:0]
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.rg = (color.red & 0xf8) | (color.green >> 5);
 		pixel.gb = ((color.green & 0x1c) << 3) | (color.blue >> 3);
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 
 	inline void Write(const gray_color_value &gray)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.rg = (gray & 0xf8) | (gray >> 5);
 		pixel.gb = ((gray & 0x1c) << 3) | (gray >> 3);
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 };
 
@@ -1402,18 +1402,18 @@ struct RGB15Writer : public BaseWriter<_PixelType> {
 	{
 		// rg: -[0],R[4:0],G[4:3]
 		// gb: G[2:0],B[4:0]
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.rg = ((color.red & 0xf8) >> 1) | (color.green >> 6);
 		pixel.gb = ((color.green & 0x38) << 2) | (color.blue >> 3);
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 
 	inline void Write(const gray_color_value &gray)
 	{
-		pixel_t &pixel = *pixels;
+		pixel_t &pixel = *BaseWriter<_PixelType>::pixels;
 		pixel.rg = ((gray & 0xf8) >> 1) | (gray >> 6);
 		pixel.gb = ((gray & 0x38) << 2) | (gray >> 3);
-		pixels++;
+		BaseWriter<_PixelType>::pixels++;
 	}
 };
 
@@ -1525,13 +1525,13 @@ set_bits_worker(const void *inData, int32 inLength, int32 inBPR,
 	reader.SetTo(inData);
 	writer.SetTo((char*)outData + outOffset);
 	const char *inEnd = (const char*)inData + inLength
-						- sizeof(Reader::pixel_t);
+						- sizeof(typename Reader::pixel_t);
 	const char *inLastRow = (const char*)inData + inLength
 							- (inBPR - inRowSkip);
 	const char *outEnd = (const char*)outData + outLength
-						 - sizeof(Writer::pixel_t);
+						 - sizeof(typename Writer::pixel_t);
 	char *outRow = (char*)outData + outOffset - outOffset % outBPR;
-	const char *outRowEnd = outRow + rawOutBPR - sizeof(Writer::pixel_t);
+	const char *outRowEnd = outRow + rawOutBPR - sizeof(typename Writer::pixel_t);
 	while ((const char*)reader.pixels <= inEnd
 		   && (const char*)writer.pixels <= outEnd) {
 		// process one row
@@ -1599,7 +1599,7 @@ set_bits_worker_gray1(const void *inData, int32 inLength, int32 inBPR,
 	reader.SetTo(inData);
 	writer.SetTo((char*)outData + outOffset);
 	const char *inEnd = (const char*)inData + inLength
-						- sizeof(Reader::pixel_t);
+						- sizeof(typename Reader::pixel_t);
 	const char *inLastRow = (const char*)inData + inLength
 							- (inBPR - inRowSkip);
 	const char *outEnd = (const char*)outData + outLength - outBPR;
