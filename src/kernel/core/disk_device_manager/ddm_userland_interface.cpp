@@ -1012,6 +1012,7 @@ _kern_supports_setting_partition_content_parameters(partition_id partitionID,
 														       &whileMounted);
 	if (result && _whileMounted)
 		*_whileMounted = whileMounted;
+	return result;
 }
 
 // _kern_supports_initializing_partition
