@@ -394,6 +394,48 @@ error_description(int error)
 		case ENOTSOCK:
 			return "Socket operation on non-socket";
 
+		case EBADMSG:
+			return "Bad message";
+
+		case ECANCELED:
+			return "Operation canceled";
+
+		case EDESTADDRREQ:
+			return "Destination address required";
+
+		case EDQUOT:
+			return "Reserved";
+
+		case EIDRM:
+			return "Identifier removed";
+
+		case EMULTIHOP:
+			return "Reserved";
+
+		case ENODATA:
+			return "No message available";
+
+		case ENOLINK:
+			return "Reserved";
+
+		case ENOSR:
+			return "No STREAM resources";
+
+		case ENOSTR:
+			return "Not a STREAM";
+
+		case ENOTSUP:
+			return "Not supported";
+
+		case EPROTO:
+			return "Protocol error";
+
+		case ETIME:
+			return "STREAM ioctl() timeout";
+
+		case ETXTBSY:
+			return "Text file busy";
+
 		case B_MAIL_NO_DAEMON:
 			return "No mail daemon";
 
