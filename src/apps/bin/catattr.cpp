@@ -1,4 +1,5 @@
 /*
+ * Copyright 2005, Stephan Aßmus, superstippi@yellowbites.com.
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
@@ -67,7 +68,7 @@ dumpRawData(const char *buffer, size_t size)
 
 
 static status_t
-catAttr(const char *attribute, const char *fileName)
+catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 {
 	int fd = open(fileName, O_RDONLY);
 	if (fd < 0)
@@ -79,7 +80,7 @@ catAttr(const char *attribute, const char *fileName)
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
-	if (size > 64 * 1024)
+	if (!keepRaw && size > 64 * 1024)
 		size = 64 * 1024;
 
 	char buffer[size];
@@ -90,6 +91,15 @@ catAttr(const char *attribute, const char *fileName)
 	if (bytesRead != size) {
 		fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
 		return B_ERROR;
+	}
+
+	if (keepRaw) {
+		// TODO: well, this looks a bit slow, and does it even work for
+		// real binary data?!? -> please check
+		for (int32 i = 0; i < info.size; i++) {
+			putchar(buffer[i]);
+		}
+		return B_OK;
 	}
 
 	switch (info.type) {
@@ -152,19 +162,27 @@ main(int argc, char *argv[])
 		program++;
 
 	if (argc > 2) {
-		const char *attr = argv[1];
+		int32 attrNameIndex = 1;
+		bool keepRaw = false;
+
+		// see if user wants to get to the raw data of the attribute
+		if (strcmp(argv[attrNameIndex], "--raw") == 0 ||
+			strcmp(argv[attrNameIndex], "-r") == 0) {
+			attrNameIndex++;
+			keepRaw = true;
+		}
 
 		// Cat the attribute for every file given
-		for (int32 i = 2; i < argc; i++) {
-			status_t status = catAttr(attr, argv[i]);
+		for (int32 i = attrNameIndex + 1; i < argc; i++) {
+			status_t status = catAttr(argv[attrNameIndex], argv[i], keepRaw);
 			if (status != B_OK) {
 				fprintf(stderr, "%s: file \"%s\", attribute \"%s\": %s\n",
-					program, argv[i], attr, strerror(status));
+					program, argv[i], argv[attrNameIndex], strerror(status));
 			}
 		}
 	} else {
 		// Issue usage message
-		fprintf(stderr, "usage: %s attr_name file1 [file2...]\n", program);
+		fprintf(stderr, "usage: %s [--raw|-r] attr_name file1 [file2...]\n", program);
 		// Be's original version -only- returned 1 if the 
 		// amount of parameters was wrong, not if the file
 		// or attribute couldn't be found (!)
