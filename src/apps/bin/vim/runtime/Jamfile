@@ -1,0 +1,38 @@
+SubDir OBOS_TOP src apps bin vim runtime ;
+
+local VIMDIR = [ FDirName $(OBOS_ETC_DIR) vim vim63 ] ;
+
+rule RuntimeFiles 
+{
+
+	local vimRuntimeFiles = [ GLOB $(<) : *.vim *.txt *.info *.ps ] ;
+	
+	for file in $(vimRuntimeFiles:D=)
+	{
+		MakeLocate <etc>$(file) : [ FDirName $(VIMDIR) $(<) ] ;
+		File <etc>$(file) : $(file) ;
+		LocalClean clean : <etc>$(file) ;
+	}
+	
+	SEARCH on $(vimRuntimeFiles:D=) = $(<) ; 
+
+}
+
+RuntimeFiles $(SUBDIR) ;
+RuntimeFiles [ FDirName $(SUBDIR) colors ] ;
+RuntimeFiles [ FDirName $(SUBDIR) compiler ] ;
+RuntimeFiles [ FDirName $(SUBDIR) doc ] ;
+RuntimeFiles [ FDirName $(SUBDIR) ftplugin ] ;
+RuntimeFiles [ FDirName $(SUBDIR) indent ] ;
+RuntimeFiles [ FDirName $(SUBDIR) keymap ] ;
+#RuntimeFiles [ FDirName $(SUBDIR) lang ] ;
+RuntimeFiles [ FDirName $(SUBDIR) macros ] ;
+RuntimeFiles [ FDirName $(SUBDIR) macros hanoi ] ;
+RuntimeFiles [ FDirName $(SUBDIR) macros life ] ;
+RuntimeFiles [ FDirName $(SUBDIR) macros maze ] ;
+RuntimeFiles [ FDirName $(SUBDIR) macros urm ] ;
+RuntimeFiles [ FDirName $(SUBDIR) plugin ] ;
+RuntimeFiles [ FDirName $(SUBDIR) print ] ;
+RuntimeFiles [ FDirName $(SUBDIR) syntax ] ;
+RuntimeFiles [ FDirName $(SUBDIR) tools ] ;
+RuntimeFiles [ FDirName $(SUBDIR) tutor ] ;
