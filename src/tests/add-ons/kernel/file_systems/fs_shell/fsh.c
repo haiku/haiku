@@ -14,22 +14,37 @@
   dbg@be.com
 */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
 #include <sys/time.h>
 
-#include "kprotos.h"
 #include "argv.h"
+#include "external_commands.h"
+#include "kprotos.h"
 #include "tracker.h"
 
 #include <fs_attr.h>
 #include <fs_query.h>
 
+static bool sInteractiveMode = true;
 
-static void do_lat_fs(int argc, char **argv);
+
+static int do_lat_fs(int argc, char **argv);
 static void do_fsh(void);
+
+static void
+print_usage(const char *program)
+{
+   	printf("----------------------------------------------------------------------\n");
+   	printf("Ultra neat-o userland filesystem testing shell thingy\n");
+   	printf("----------------------------------------------------------------------\n");
+   	printf("usage: %s [-n] [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n",
+   		program);
+   	printf("\n");
+}
 
 
 int
@@ -38,20 +53,35 @@ main(int argc, char **argv)
     int        seed;
     char      *disk_name = "big_file";
     myfs_info  *myfs;
+    char *arg;
+    int argi = 1;
     
     if (argv[1] && strcmp(argv[1], "--help") == 0) {
-    	printf("----------------------------------------------------------------------\n");
-    	printf("Ultra neat-o userland filesystem testing shell thingy\n");
-    	printf("----------------------------------------------------------------------\n");
-    	printf("usage: %s [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n", argv[0]);
-    	printf("\n");
+    	print_usage(argv[0]);
     	exit(0);
     }
 
-    if (argv[1] != NULL && !isdigit(argv[1][0]))
-        disk_name = argv[1];
-    else if (argv[1] && isdigit(argv[1][0]))
-        seed = strtoul(argv[1], NULL, 0);
+	// eat options
+	while (argi < argc && argv[argi][0] == '-') {
+		arg = argv[argi++];
+		if (strcmp(arg, "-n") == 0) {
+			sInteractiveMode = false;
+		} else {
+	    	print_usage(argv[0]);
+			exit(1);
+		}
+	}
+
+	if (argi >= argc) {
+    	print_usage(argv[0]);
+		exit(1);
+	}
+	arg = argv[argi];
+
+    if (arg != NULL && !isdigit(arg[0]))
+        disk_name = arg;
+    else if (arg && isdigit(arg[0]))
+        seed = strtoul(arg, NULL, 0);
     else
         seed = getpid() * time(NULL) | 1;
     printf("random seed == 0x%x\n", seed);
@@ -105,7 +135,7 @@ SubTime(struct timeval *a, struct timeval *b, struct timeval *c)
 int cur_fd = -1;
 
 
-static void
+static int
 do_close(int argc, char **argv)
 {
     int err;
@@ -113,9 +143,11 @@ do_close(int argc, char **argv)
     err = sys_close(1, cur_fd);
 /*  printf("close of fd %d returned: %d\n", cur_fd, err); */
     cur_fd = -1;
+
+	return err;
 }
 
-static void
+static int
 do_open(int argc, char **argv)
 {
     char name[64];
@@ -129,13 +161,16 @@ do_open(int argc, char **argv)
         sprintf(name, "/myfs/%s", &argv[1][0]);
 
     cur_fd = sys_open(1, -1, name, O_RDWR, MY_S_IFREG, 0);
-    if (cur_fd < 0)
+    if (cur_fd < 0) {
         printf("error opening %s : %s (%d)\n", name, strerror(cur_fd), cur_fd);
-    else
+    	return cur_fd;
+    } else {
         printf("opened: %s\n", name);
+		return 0;
+    }
 }
 
-static void
+static int
 do_make(int argc, char **argv)
 {
     char name[64];
@@ -153,16 +188,17 @@ do_make(int argc, char **argv)
     cur_fd = sys_open(1, -1, name, O_RDWR|O_CREAT, 0666, 0);
     if (cur_fd < 0) {
         printf("error creating: %s: %s\n", name, strerror(cur_fd));
-        return;
+        return cur_fd;
     }
 
 /*  printf("created: %s (fd %d)\n", name, cur_fd); */
 
+	return 0;
 }
 
 
 
-static void
+static int
 do_mkdir(int argc, char **argv)
 {
     int err;
@@ -176,10 +212,12 @@ do_mkdir(int argc, char **argv)
     err = sys_mkdir(1, -1, name, MY_S_IRWXU);
     if (err)
         printf("mkdir of %s returned: %s (%d)\n", name, strerror(err), err);
+
+	return err;
 }
 
 
-static void
+static int
 do_read_test(int argc, char **argv)
 {
     int    i, err;
@@ -189,7 +227,7 @@ do_read_test(int argc, char **argv)
     
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
     if (argv[1] && isdigit(argv[1][0]))
@@ -198,7 +236,7 @@ do_read_test(int argc, char **argv)
     buff = malloc(len);
     if (buff == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
-        return;
+        return ENOMEM;
     }
 
     for (i = 0; (size_t)i < len; i++)
@@ -215,10 +253,12 @@ do_read_test(int argc, char **argv)
 
 	free(buff);
 	printf("read read %lu bytes and returned %d\n", len, err);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_write_test(int argc, char **argv)
 {
     int    i, err;
@@ -227,7 +267,7 @@ do_write_test(int argc, char **argv)
     
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
     if (argv[1] && isdigit(argv[1][0]))
@@ -236,7 +276,7 @@ do_write_test(int argc, char **argv)
     buff = malloc(len);
     if (buff == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
-        return;
+        return ENOMEM;
     }
 
     for (i = 0; (size_t)i < len; i++)
@@ -246,10 +286,12 @@ do_write_test(int argc, char **argv)
     free(buff);
     
     printf("write wrote %lu bytes and returned %d\n", len, err);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_write_stream(int argc, char **argv)
 {
     size_t amount = 100000;
@@ -259,7 +301,7 @@ do_write_stream(int argc, char **argv)
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
     if (argv[1] && isdigit(argv[1][0]))
@@ -275,10 +317,12 @@ do_write_stream(int argc, char **argv)
 	}
 
     printf("write wrote %d bytes and returned %d\n", length, err);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_read_attr(int argc, char **argv)
 {
     char *attribute,*buffer;
@@ -287,12 +331,12 @@ do_read_attr(int argc, char **argv)
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
 	if (argc < 2) {
         printf("usage: rdattr <attribute name> [bytes to write]\n");
-		return;
+		return EINVAL;
 	}
 
 	attribute = argv[1];
@@ -300,13 +344,13 @@ do_read_attr(int argc, char **argv)
         len = strtoul(argv[2], NULL, 0);
 	if (len < 0) {
 		printf("invalid length for write attribute!\n");
-		return;
+		return EINVAL;
 	}
 
     buffer = malloc(len);
     if (buffer == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
-        return;
+        return ENOMEM;
     }
 
 	for (i = 0; (size_t)i < len; i++)
@@ -319,10 +363,12 @@ do_read_attr(int argc, char **argv)
 
     free(buffer);
     printf("read read %lu bytes and returned %d (%s)\n", len, err, strerror(err));
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_write_attr(int argc, char **argv)
 {
     char *attribute,*buffer;
@@ -331,12 +377,12 @@ do_write_attr(int argc, char **argv)
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
 	if (argc < 2) {
         printf("usage: wrattr <attribute name> [bytes to write]\n");
-		return;
+		return EINVAL;
 	}
 
 	attribute = argv[1];
@@ -344,13 +390,13 @@ do_write_attr(int argc, char **argv)
         len = strtoul(argv[2], NULL, 0);
 	if (len < 0) {
 		printf("invalid length for write attribute!\n");
-		return;
+		return EINVAL;
 	}
 
     buffer = malloc(len);
     if (buffer == NULL) {
         printf("no memory for write buffer of %lu bytes\n", len);
-        return;
+        return ENOMEM;
     }
 
     for (i = 0; (size_t)i < len; i++)
@@ -360,27 +406,31 @@ do_write_attr(int argc, char **argv)
     free(buffer);
 
     printf("write wrote %lu bytes and returned %d\n", len, err);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_remove_attr(int argc, char **argv)
 {
     int err;
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
 	if (argc < 2) {
         printf("usage: rmattr <attribute name>\n");
-		return;
+		return EINVAL;
 	}
 
     err = sys_remove_attr(1, cur_fd, argv[1]);
 
     printf("remove_attr returned %d\n", err);
+
+	return err;
 }
 
 
@@ -411,7 +461,7 @@ mode_bits_to_str(int mode, char *str)
 }
 
 
-static void
+static int
 do_dir(int argc, char **argv)
 {
 	int dirfd, err, max_err = 10;
@@ -429,7 +479,7 @@ do_dir(int argc, char **argv)
 
 	if ((dirfd = sys_opendir(1, -1, dirname, 0)) < 0) {
 		printf("dir: error opening: %s\n", dirname);
-		return;
+		return dirfd;
 	}
 
 	printf("Directory listing for: %s\n", dirname);
@@ -473,52 +523,63 @@ do_dir(int argc, char **argv)
 	printf("%ld files in directory!\n",count);
 
 	sys_closedir(1, dirfd);
+
+	return 0;	// not really correct, but anyway...
 }
 
 
-static void
+static int
 do_ioctl(int argc, char **argv)
 {
 	int fd;
+	int err;
 
 	if (argc < 2) {
 		printf("ioctl: too few arguments\n");
-		return;
+		return EINVAL;
 	}
 
 	if ((fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0)) < 0) {
 	    printf("ioctl: error opening '.'\n");
-	    return;
+	    return fd;
 	}
 
-	if ((sys_ioctl(1, fd, atoi(argv[1]), 0, 0)) < 0) {
+	err = sys_ioctl(1, fd, atoi(argv[1]), 0, 0);
+	if (err < 0) {
 	    printf("ioctl: error!\n");
 	}
 
 	sys_close(1, fd);
+
+	return err;
 }
 
 
-static void
+static int
 do_fcntl(int argc, char **argv)
 {
+	int err;
+
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
 	if (argc < 2) {
 		printf("fcntl: too few arguments\n");
-		return;
+		return EINVAL;
 	}
 
-	if ((sys_ioctl(1, cur_fd, atoi(argv[1]), 0, 0)) < 0) {
+	err = sys_ioctl(1, cur_fd, atoi(argv[1]), 0, 0);
+	if (err < 0) {
 	    printf("fcntl: error!\n");
 	}
+
+	return err;
 }
 
 
-static void
+static int
 do_rmall(int argc, char **argv)
 {
     int               dirfd, err, max_err = 10;
@@ -534,7 +595,7 @@ do_rmall(int argc, char **argv)
 
     if ((dirfd = sys_opendir(1, -1, dirname, 0)) < 0) {
         printf("dir: error opening: %s\n", dirname);
-        return;
+        return dirfd;
     }
 
     while(1) {
@@ -568,10 +629,12 @@ do_rmall(int argc, char **argv)
 	printf("%ld files removed!\n", count);
 
     sys_closedir(1, dirfd);
+
+	return 0;	// not really correct, but anyway...
 }
 
 
-static void
+static int
 do_trunc(int argc, char **argv)
 {
     int             err, new_size;
@@ -581,7 +644,7 @@ do_trunc(int argc, char **argv)
     strcpy(fname, "/myfs/");
     if (argc < 3) {
         printf("usage: trunc fname newsize\n");
-        return;
+        return EINVAL;
     }
     strcat(fname, argv[1]);
     new_size = strtoul(argv[2], NULL, 0);
@@ -591,10 +654,12 @@ do_trunc(int argc, char **argv)
     if (err != 0) {
         printf("truncate to %d bytes failed for %s\n", new_size, fname);
     }
+
+    return err;
 }
 
 
-static void
+static int
 do_seek(int argc, char **argv)
 {
     fs_off_t err;
@@ -602,13 +667,13 @@ do_seek(int argc, char **argv)
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
 
     
     if (argc < 2) {
         printf("usage: seek pos\n");
-        return;
+        return EINVAL;
     }
     pos = strtoul(&argv[1][0], NULL, 0);
 
@@ -616,10 +681,12 @@ do_seek(int argc, char **argv)
     if (err != pos) {
         printf("seek to %Ld failed (%Ld)\n", pos, err);
     }
+
+	return err;
 }
 
 
-static void
+static int
 do_rm(int argc, char **argv)
 {
     int err;
@@ -630,7 +697,7 @@ do_rm(int argc, char **argv)
 
     if (argc < 2) {
         printf("rm: need a file name to remove\n");
-        return;
+        return EINVAL;
     }
 
     sprintf(name, "/myfs/%s", &argv[1][0]);
@@ -638,12 +705,13 @@ do_rm(int argc, char **argv)
     err = sys_unlink(1, -1, name);
     if (err != 0) {
         printf("error removing: %s: %s\n", name, strerror(err));
-        return;
     }
+
+	return err;
 }
 
 
-static void
+static int
 do_rmdir(int argc, char **argv)
 {
     int err;
@@ -654,7 +722,7 @@ do_rmdir(int argc, char **argv)
 
     if (argc < 2) {
         printf("rm: need a file name to remove\n");
-        return;
+        return EINVAL;
     }
 
     sprintf(name, "/myfs/%s", &argv[1][0]);
@@ -662,16 +730,17 @@ do_rmdir(int argc, char **argv)
     err = sys_rmdir(1, -1, name);
     if (err != 0) {
         printf("rmdir: error removing: %s: %s\n", name, strerror(err));
-        return;
     }
+
+	return err;
 }
 
 
-static void
+static int
 do_copy_to_myfs(char *host_file, char *bfile)
 {
     int     bfd, err = 0;
-    char    myfs_name[128];
+    char    myfs_name[1024];
     FILE   *fp;
     size_t  amt;
     static char buff[4 * 1024];
@@ -681,14 +750,14 @@ do_copy_to_myfs(char *host_file, char *bfile)
     fp = fopen(host_file, "rb");
     if (fp == NULL) {
         printf("can't open host file: %s\n", host_file);
-        return;
+        return errno;
     }
         
     if ((bfd = sys_open(1, -1, myfs_name, O_RDWR|O_CREAT,
                         MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
         fclose(fp);
         printf("error opening: %s\n", myfs_name);
-        return;
+        return bfd;
     }
     
     while((amt = fread(buff, 1, sizeof(buff), fp)) == sizeof(buff)) {
@@ -708,14 +777,16 @@ do_copy_to_myfs(char *host_file, char *bfile)
 
     sys_close(1, bfd);
     fclose(fp);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_copy_from_myfs(char *bfile, char *host_file)
 {
     int     bfd,err = 0;
-    char    myfs_name[128];
+    char    myfs_name[1024];
     FILE   *fp;
     size_t  amt;
     static char buff[4 * 1024];
@@ -725,13 +796,13 @@ do_copy_from_myfs(char *bfile, char *host_file)
     fp = fopen(host_file, "wb");
     if (fp == NULL) {
         printf("can't open host file: %s\n", host_file);
-        return;
+        return errno;
     }
         
     if ((bfd = sys_open(1, -1, myfs_name, O_RDONLY, MY_S_IFREG, 0)) < 0) {
         fclose(fp);
         printf("error opening: %s\n", myfs_name);
-        return;
+        return bfd;
     }
     
     while(1) {
@@ -750,10 +821,12 @@ do_copy_from_myfs(char *bfile, char *host_file)
 
     sys_close(1, bfd);
     fclose(fp);
+
+	return (err < 0 ? err : 0);
 }
 
 
-static void
+static int
 do_copy(int argc, char **argv)
 {
     if (cur_fd >= 0)
@@ -761,20 +834,20 @@ do_copy(int argc, char **argv)
 
     if (argc < 3) {
         printf("copy needs two arguments!\n");
-        return;
+        return EINVAL;
     }
     
     if (argv[1][0] == ':' && argv[2][0] != ':') {
-        do_copy_to_myfs(&argv[1][1], &argv[2][0]);
-        return;
+        return do_copy_to_myfs(&argv[1][1], &argv[2][0]);
     }
 
     if (argv[2][0] == ':' && argv[1][0] != ':') {
-        do_copy_from_myfs(&argv[1][0], &argv[2][1]);
-        return;
+        return do_copy_from_myfs(&argv[1][0], &argv[2][1]);
     }
 
     printf("can't copy around inside of the file system (only in and out)\n");
+
+	return EINVAL;
 }
 
 
@@ -901,20 +974,20 @@ copydir(char *fromPath,char *toPath)
 }
 
 
-static void
+static int
 do_copytest(int argc, char **argv)
 {
     char *fromPath = "/boot/apps/internet/mozilla";
 
 	if (argc > 2) {
 		printf("usage: copytest <path>");
-		return;
+		return EINVAL;
 	} else if (argc == 2)
 		fromPath = argv[1];
 	else
 		printf("copying from: %s\n", fromPath);
 
-	copydir(fromPath, "/myfs");
+	return copydir(fromPath, "/myfs");
 }
 
 
@@ -928,7 +1001,7 @@ copydirthread(void *data)
 }
 
 
-static void
+static int
 do_threadtest(int argc, char **argv)
 {
 	char *paths[] = {"/boot/home/mail/pinc - axeld/in", "/boot/home/mail/pinc - axeld/out", NULL};
@@ -940,6 +1013,8 @@ do_threadtest(int argc, char **argv)
 	}
 
 	//do_lat_fs(0,NULL);
+
+	return 0;
 }
 
 
@@ -960,7 +1035,7 @@ copyfilethread(void *data)
 }
 
 
-static void
+static int
 do_threadfiletest(int argc, char **argv)
 {
 	char *paths[] = {":/video/Filme/Wallace & Gromit - A Close Shave.mpg",":/video/Filme/Wallace & Gromit - The Wrong Trousers.mpg",":/stuff/Simpsons/The Simpsons - 13.01 - Treehouse Of Horror XII.mpg",NULL};
@@ -972,10 +1047,12 @@ do_threadfiletest(int argc, char **argv)
 	}
 
 	do_lat_fs(0,NULL);
+
+	return 0;
 }
 
 
-static void
+static int
 do_tracker(int argc, char **argv)
 {
 	static thread_id thread = -1;
@@ -994,6 +1071,8 @@ do_tracker(int argc, char **argv)
 
 		thread = -1;
 	}
+
+	return 0;
 }
 
 
@@ -1034,7 +1113,7 @@ create_remove_thread(void *data)
 }
 
 
-static void
+static int
 do_stattest(int argc, char **argv)
 {
 	thread_id a = spawn_thread(stat_thread, "stat_thread", B_NORMAL_PRIORITY, NULL);
@@ -1056,13 +1135,15 @@ do_stattest(int argc, char **argv)
 	
 	wait_for_thread(a, &status);
 	wait_for_thread(b, &status);
+
+	return 0;
 }
 
 
 //	#pragma mark -
 
 
-static void
+static int
 do_attrtest(int argc, char **argv)
 {
 	int iterations = 10240;
@@ -1073,7 +1154,7 @@ do_attrtest(int argc, char **argv)
 
     if (cur_fd < 0) {
         printf("no file open! (open or create one with open or make)\n");
-        return;
+        return EINVAL;
     }
     if (argc > 1 && isdigit(*argv[1]))
     	iterations = atol(argv[1]);
@@ -1081,7 +1162,7 @@ do_attrtest(int argc, char **argv)
     	maxSize = atol(argv[2]);
     if ((argc > 1 && !isdigit(*argv[1])) || (argc > 2 && !isdigit(*argv[2]))) {
     	printf("usage: attrs [number of iterations] [max attr size]\n");
-    	return;
+    	return EINVAL;
     }
 
 	buffer = malloc(1024);
@@ -1104,10 +1185,12 @@ do_attrtest(int argc, char **argv)
 	}
 
 	free(buffer);
+
+	return 0;
 }
 
 
-static void
+static int
 do_rename(int argc, char **argv)
 {
     int  err;
@@ -1118,7 +1201,7 @@ do_rename(int argc, char **argv)
 
     if (argc < 3) {
         printf("rename needs two arguments!\n");
-        return;
+        return EINVAL;
     }
     
     strcpy(oldname, "/myfs/");
@@ -1130,10 +1213,12 @@ do_rename(int argc, char **argv)
     err = sys_rename(1, -1, oldname, -1, newname);
     if (err)
         printf("rename failed with err: %s\n", strerror(err));
+
+	return err;
 }
 
 
-static void
+static int
 do_symlink(int argc, char **argv)
 {
 	char target[B_PATH_NAME_LENGTH];
@@ -1142,7 +1227,7 @@ do_symlink(int argc, char **argv)
 
 	if (argc < 3) {
 		printf("usage: symlink <source> <target>\n");
-		return;
+		return EINVAL;
 	}
 
 	source = argv[1];
@@ -1153,10 +1238,12 @@ do_symlink(int argc, char **argv)
 	status = sys_symlink(1, source, -1, target);
 	if (status != B_OK)
 		printf("symlink failed with error: %s\n", strerror(status));
+
+	return status;
 }
 
 
-static void
+static int
 do_sync(int argc, char **argv)
 {
     int err;
@@ -1165,6 +1252,8 @@ do_sync(int argc, char **argv)
     
     if (err)
         printf("sync failed with err %s\n", strerror(err));
+
+	return err;
 }
 
 
@@ -1173,7 +1262,7 @@ void *gQueryCookie[MAX_LIVE_QUERIES] = {NULL};
 char *gQueryString[MAX_LIVE_QUERIES] = {NULL};
 
 
-static void
+static int
 do_listqueries(int argc, char **argv)
 {
 	int min, max;
@@ -1193,10 +1282,12 @@ do_listqueries(int argc, char **argv)
 
 		printf("%d. (%p) %s\n", min, gQueryCookie[min], gQueryString[min]);
 	}
+
+	return 0;
 }
 
 
-static void
+static int
 do_stopquery(int argc, char **argv)
 {
 	int err;
@@ -1204,7 +1295,7 @@ do_stopquery(int argc, char **argv)
 
 	if (gQueryCookie == NULL) {
 		printf("no query running (use the 'startquery' command to start a query).\n");
-		return;
+		return EINVAL;
 	}
 
 	if (argc == 2)
@@ -1223,15 +1314,17 @@ do_stopquery(int argc, char **argv)
 		err = sys_close_query(true, -1, "/myfs/.", gQueryCookie[min]);
 		if (err < 0) {
 			printf("could not close query: %s\n", strerror(err));
-			return;
+			return err;
 		}
 		gQueryCookie[min] = NULL;
 		free(gQueryString[min]);
 	}
+
+	return 0;
 }
 
 
-static void
+static int
 do_startquery(int argc, char **argv)
 {
 	char *query;
@@ -1244,27 +1337,29 @@ do_startquery(int argc, char **argv)
 	}
 	if (freeSlot == MAX_LIVE_QUERIES) {
 		printf("All query slots are used, stop some\n");
-		return;
+		return EINVAL;
 	}
 
 	if (argc != 2) {
 		printf("query string expected\n");
-		return;
+		return EINVAL;
 	}
 	query = argv[1];
 
 	err = sys_open_query(true, -1, "/myfs/.", query, B_LIVE_QUERY, freeSlot, freeSlot, &gQueryCookie[freeSlot]);
 	if (err < 0) {
 		printf("could not open query: %s\n", strerror(err));
-		return;
+		return err;
 	}
 
 	printf("query number %d started - use the 'stopquery' command to stop it.\n", freeSlot);
 	gQueryString[freeSlot] = strdup(query);
+
+	return 0;
 }
 
 
-static void
+static int
 do_query(int argc, char **argv)
 {
 	char buffer[2048];
@@ -1276,14 +1371,14 @@ do_query(int argc, char **argv)
 
 	if (argc != 2) {
 		printf("query string expected");
-		return;
+		return EINVAL;
 	}
 	query = argv[1];
 
 	err = sys_open_query(true, -1, "/myfs/.", query, 0, 42, 42, &cookie);
 	if (err < 0) {
 		printf("could not open query: %s\n", strerror(err));
-		return;
+		return EINVAL;
 	}
 	
 	while (true) {
@@ -1305,8 +1400,10 @@ do_query(int argc, char **argv)
 	err = sys_close_query(true, -1, "/myfs/.", cookie);
 	if (err < 0) {
 		printf("could not close query: %s\n", strerror(err));
-		return;
+		return err;
 	}
+
+	return 0;
 }
 
 
@@ -1314,7 +1411,7 @@ do_query(int argc, char **argv)
 #define NUM_READS 16
 #define READ_SIZE 4096
 
-static void
+static int
 do_cio(int argc, char **argv)
 {
     int            i, j, fd;
@@ -1333,7 +1430,7 @@ do_cio(int argc, char **argv)
     fd = sys_open(1, -1, fname, O_RDONLY, MY_S_IFREG, 0);
     if (fd < 0) {
         printf("can't open %s\n", fname);
-        return;
+        return fd;
     }
 
     gettimeofday(&start, NULL);
@@ -1363,40 +1460,47 @@ do_cio(int argc, char **argv)
 
 
     sys_close(1, fd);
+
+
+	return 0;
 }
 
 
-static void
+static int
 mkfile(char *s, int sz)
 {
     int  fd, len;
+    int err = 0;
 	char *buffer;
 
     if ((fd = sys_open(1, -1, s, O_RDWR|O_CREAT,
                        MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
         printf("error creating: %s\n", s);
-        return;
+        return fd;
     }
 
 	buffer = malloc(16 * 1024);
 	if (buffer == NULL)
-		return;
+		return ENOMEM;
 
     len = sz;
     if (sz) {
-        if (sys_write(1, fd, buffer, len) != len)
+    	err = sys_write(1, fd, buffer, len);
+        if (err != len)
             printf("error writing %d bytes to %s\n", sz, s);
     }
     if (sys_close(1, fd) != 0)
         printf("close failed?\n");
 
 	free(buffer);
+
+	return (err < 0 ? err : 0);
 }
 
 #define LAT_FS_ITER   1000
 
 
-static void
+static int
 do_lat_fs(int argc, char **argv)
 {
     int  i, j, iter;
@@ -1423,10 +1527,12 @@ do_lat_fs(int argc, char **argv)
                 printf("lat_fs: failed to remove: %s\n", name);
         }
     }
+
+	return 0;
 }
 
 
-static void
+static int
 do_create(int argc, char **argv)
 {
     int  j, iter = 100, err;
@@ -1450,10 +1556,12 @@ do_create(int argc, char **argv)
         /* printf("CREATING: %s (%5d)\n", name, size); */
         mkfile(name, size);
     }
+
+	return 0;
 }
 
 
-static void
+static int
 do_delete(int argc, char **argv)
 {
     int  j, iter = 100;
@@ -1468,18 +1576,20 @@ do_delete(int argc, char **argv)
         if (sys_unlink(1, -1, name) != 0)
             printf("lat_fs: failed to remove: %s\n", name);
     }
+
+	return 0;
 }
 
 
 #include "additional_commands.c"
 
 
-static void do_help(int argc, char **argv);
+static int do_help(int argc, char **argv);
 
 
 typedef struct cmd_entry {
     char *name;
-    void  (*func)(int argc, char **argv);
+    int  (*func)(int argc, char **argv);
     char *help;
 } cmd_entry;
 
@@ -1533,7 +1643,7 @@ cmd_entry fsh_cmds[] =
 };
 
 
-static void
+static int
 do_help(int argc, char **argv)
 {
     cmd_entry *cmd;
@@ -1542,14 +1652,19 @@ do_help(int argc, char **argv)
     for (cmd = fsh_cmds; cmd->name != NULL; cmd++) {
         printf("%8s - %s\n", cmd->name, cmd->help);
     }
+
+	return 0;
 }
 
 static char *
 getline(char *prompt, char *input, int len)
 {
-    printf("%s", prompt); fflush(stdout);
+	if (sInteractiveMode) {
+	    printf("%s", prompt); fflush(stdout);
 
-    return fgets(input, len, stdin);
+    	return fgets(input, len, stdin);
+	} else
+		return get_external_command(prompt, input, len);
 }
 
 
@@ -1569,7 +1684,7 @@ do_fsh(void)
 #endif
     int   argc, len;
     char *prompt = FS_SHELL_PROMPT ">> ";
-    char  input[512], **argv;
+    char  input[1024], **argv;
     cmd_entry *cmd;
 
     while(getline(prompt, input, sizeof(input)) != NULL) {
@@ -1580,20 +1695,31 @@ do_fsh(void)
         }
 
         len = strlen(&argv[0][0]);
-        
+
         for(cmd=fsh_cmds; cmd->name != NULL; cmd++) {
             if (strncmp(cmd->name, &argv[0][0], len) == 0) {
-                cmd->func(argc, argv);
+                int result = cmd->func(argc, argv);
+
+				if (!sInteractiveMode)
+					reply_to_external_command(result);
+
                 break;
             }
         }
         
         if (strncmp(&argv[0][0], "quit", 4) == 0
-            || strncmp(&argv[0][0], "exit", 4) == 0)
+            || strncmp(&argv[0][0], "exit", 4) == 0) {
+			if (!sInteractiveMode)
+				reply_to_external_command(0);
             break;
+        }
 
-        if (cmd->name == NULL && argv[0][0] != '\0')
+        if (cmd->name == NULL && argv[0][0] != '\0') {
             printf("command `%s' not understood\n", &argv[0][0]);
+
+			if (!sInteractiveMode)
+				reply_to_external_command(EINVAL);
+        }
         
         free(argv);
     }
