@@ -20,10 +20,10 @@ static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
 static status_t pins3_6_read(uint8 *rom, uint32 offset);
-static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size);
-static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size);
+static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab);
+static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static void log_pll(uint32 reg);
-static void	setup_ram_config(uint8* rom);
+static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -117,6 +117,8 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	/* confirmed by comparing cards */
+	uint16 ram_tab = init1 - 0x0010;
 	char* signon_msg   = &(rom[(rom[offset + 24] + (rom[offset + 25] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 40] + (rom[offset + 41] * 256))]);
 	char* product_name = &(rom[(rom[offset + 42] + (rom[offset + 43] * 256))]);
@@ -128,7 +130,7 @@ static status_t pins2_read(uint8 *rom, uint32 offset)
 	LOG(8,("INFO: product name: %s\n", product_name));
 	LOG(8,("INFO: product rev: %s\n", product_rev));
 
-	return coldstart_card(rom, init1, init2, init_size);
+	return coldstart_card(rom, init1, init2, init_size, ram_tab);
 }
 
 static status_t pins3_6_read(uint8 *rom, uint32 offset)
@@ -136,6 +138,8 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 	uint16 init1 = rom[offset + 18] + (rom[offset + 19] * 256);
 	uint16 init2 = rom[offset + 20] + (rom[offset + 21] * 256);
 	uint16 init_size = rom[offset + 22] + (rom[offset + 23] * 256) + 1;
+	/* still confirm!! */
+	uint16 ram_tab = init1 - 0x0010;
 	char* signon_msg   = &(rom[(rom[offset + 30] + (rom[offset + 31] * 256))]);
 	char* vendor_name  = &(rom[(rom[offset + 46] + (rom[offset + 47] * 256))]);
 	char* product_name = &(rom[(rom[offset + 48] + (rom[offset + 49] * 256))]);
@@ -164,10 +168,10 @@ static status_t pins3_6_read(uint8 *rom, uint32 offset)
 		}
 */	}
 
-	return coldstart_card(rom, init1, init2, init_size);
+	return coldstart_card(rom, init1, init2, init_size, ram_tab);
 }
 
-static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size)
+static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 init_size, uint16 ram_tab)
 {
 	status_t result = B_OK;
 	int16 size = init_size;
@@ -212,9 +216,9 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	if (init1 || init2)
 	{
 		if (init1)
-			if (exec_type1_script(rom, init1, &size) != B_OK) result = B_ERROR;
+			if (exec_type1_script(rom, init1, &size, ram_tab) != B_OK) result = B_ERROR;
 		if (init2 && (result == B_OK))
-			if (exec_type1_script(rom, init2, &size) != B_OK) result = B_ERROR;
+			if (exec_type1_script(rom, init2, &size, ram_tab) != B_OK) result = B_ERROR;
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
@@ -234,7 +238,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 
 /* This routine is complete for pre-NV10. It's tested on a Elsa Erazor III with TNT2
  * (NV05), which coldstarts perfectly. */
-static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
+static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
 {
 	status_t result = B_OK;
 	bool end = false;
@@ -322,7 +326,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			//fixme: setup_ram_config is also used on NV11 (at least), which means the
 			//       routine should function differently there!
 			/* always done */
-			setup_ram_config(rom);
+			setup_ram_config(rom, ram_tab);
 			break;
 		case 0x65:
 			*size -= 13;
@@ -709,7 +713,7 @@ static void log_pll(uint32 reg)
 	}
 }
 
-static void	setup_ram_config(uint8* rom)
+static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 {
 	uint32 ram_cfg, data;
 
@@ -719,8 +723,7 @@ static void	setup_ram_config(uint8* rom)
 	ram_cfg = ((NV_REG32(NV32_NVSTRAPINFO2) >> 2) & 0x0000000f);
 	LOG(8,("INFO: ---RAM config strap is $%01x\n", ram_cfg));
 	/* use it as a pointer in a BIOS table for prerecorded RAM configurations */
-	//fixme?: is 0x01a8 indeed fixed or should this adress be gained via pins somehow?
-	ram_cfg = *((uint16*)(&(rom[(0x01a8 + (ram_cfg * 2))])));
+	ram_cfg = *((uint16*)(&(rom[(ram_tab + (ram_cfg * 2))])));
 	/* log info */
 	switch (ram_cfg & 0x00000003)
 	{
