@@ -148,7 +148,7 @@ private:
 	JobQueueVector				*fJobQueues;
 	KDiskDeviceJobFactory		*fJobFactory;
 
-	static KDiskDeviceManager	*fDefaultManager;
+	static KDiskDeviceManager	*sDefaultManager;
 };
 
 } // namespace DiskDevice
