@@ -51,11 +51,8 @@ StyledEditWindow::StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding)
 	
 StyledEditWindow::~StyledEditWindow()
 {
-	if (fSaveMessage)
-		delete fSaveMessage;
-//	if (fPrintSettings)
-//		delete fPrintSettings;
-	
+	delete fSaveMessage;
+	delete fPrintSettings;
 	delete fSavePanel;
 } /***~StyledEditWindow()***/
 	
@@ -1118,13 +1115,13 @@ StyledEditWindow::PageSetup(const char *documentname)
 	BPrintJob printJob(documentname);
 		
 	if (fPrintSettings != NULL) {
-		printJob.SetSettings(fPrintSettings);
-		fPrintSettings = NULL;
+		printJob.SetSettings(new BMessage(*fPrintSettings));
 	}
 	
 	result = printJob.ConfigPage();
 		
 	if (result == B_NO_ERROR) {
+		delete fPrintSettings;
 		fPrintSettings = printJob.Settings();
 	}	
 
@@ -1144,14 +1141,12 @@ StyledEditWindow::Print(const char *documentname)
 	} 
 	
 	BPrintJob printJob(documentname);
-	printJob.SetSettings(fPrintSettings);
-	fPrintSettings = NULL;
+	printJob.SetSettings(new BMessage(*fPrintSettings));
 	result = printJob.ConfigJob();
 	if (result != B_OK) {
 		return;
 	}
 	// information from printJob
-	fPrintSettings = printJob.Settings();
 	BRect paper_rect = printJob.PaperRect();
 	BRect printable_rect = printJob.PrintableRect();	
 	int32 firstPage = printJob.FirstPage();
