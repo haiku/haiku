@@ -315,8 +315,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Rotate +90", MSG_ROTATE_90, ']', 0, 'W', true);	
-	AddItemMenu(pmenu, "Rotate -90", MSG_ROTATE_270, '[', 0, 'W', true);
+	AddItemMenu(pmenu, "Rotate +90°", MSG_ROTATE_90, ']', 0, 'W', true);	
+	AddItemMenu(pmenu, "Rotate -90°", MSG_ROTATE_270, '[', 0, 'W', true);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
