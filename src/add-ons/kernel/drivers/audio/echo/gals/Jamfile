@@ -1,0 +1,34 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio echo gals ;
+
+UsePrivateHeaders media ;
+
+R5KernelAddon echo_gals : kernel drivers bin :
+#	ac97_multi.c
+#	config.c
+	debug.c
+#	ich.c
+#	io.c
+#	util.c
+#	ac97.c
+;
+
+# For OpenBeOS we should be building the driver objects this way.
+#KernelObjects
+#	ac97_multi.c
+#	config.c
+#	debug.c
+#	ich.c
+#	io.c
+#	util.c   
+#	ac97.c
+#	:
+#	-fno-pic -D_KERNEL_MODE
+#	;
+
+# Link to kernel/drivers/dev/audio/multi
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
+	local instDriver = <kernel!drivers!dev!audio!multi>echo_gals ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : echo_gals ;
+}
