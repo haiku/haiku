@@ -50,7 +50,7 @@
 #	define STRACE(x) ;
 #endif
 
-//#define DEBUG_LAYER_REBUILD
+#define DEBUG_LAYER_REBUILD
 #ifdef DEBUG_LAYER_REBUILD
 #	define RBTRACE(x) printf x
 #else
@@ -787,13 +787,13 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	{
 		case B_LAYER_NONE:
 		{
-			RBTRACE(("1) Action B_LAYER_NONE\n"));
+			RBTRACE(("1) Layer(%s): Action B_LAYER_NONE\n", GetName()));
 			oldRegion = fVisible;
 			break;
 		}
 		case B_LAYER_MOVE:
 		{
-			RBTRACE(("1) Action B_LAYER_MOVE\n"));
+			RBTRACE(("1) Layer(%s): Action B_LAYER_MOVE\n", GetName()));
 			oldRegion = fFullVisible;
 			fFrame.OffsetBy(pt.x, pt.y);
 			fFull.OffsetBy(pt.x, pt.y);
@@ -806,14 +806,14 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 		}
 		case B_LAYER_SIMPLE_MOVE:
 		{
-			RBTRACE(("1) Action B_LAYER_SIMPLE_MOVE\n"));
+			RBTRACE(("1) Layer(%s): Action B_LAYER_SIMPLE_MOVE\n", GetName()));
 			fFull.OffsetBy(pt.x, pt.y);
 			
 			break;
 		}
 		case B_LAYER_RESIZE:
 		{
-			RBTRACE(("1) Action B_LAYER_RESIZE\n"));
+			RBTRACE(("1) Layer(%s): Action B_LAYER_RESIZE\n", GetName()));
 			oldRegion	= fVisible;
 			
 			fFrame.right	+= pt.x;
@@ -828,7 +828,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 		}
 		case B_LAYER_MASK_RESIZE:
 		{
-			RBTRACE(("1) Action B_LAYER_MASK_RESIZE\n"));
+			RBTRACE(("1) Layer(%s): Action B_LAYER_MASK_RESIZE\n", GetName()));
 			oldRegion = fVisible;
 			
 			BPoint offset, rSize;
@@ -879,19 +879,8 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 		fFullVisible.MakeEmpty();
 		fVisible = fFull;
 		#ifdef DEBUG_LAYER_REBUILD
-			printf("\n ======= Layer(%s):: RR ****** ======\n", GetName());
+			printf("Layer(%s) real action START\n", GetName());
 			fFull.PrintToStream();
-			fVisible.PrintToStream();
-			printf("\n ======= Layer(%s):: RR ****** END ======\n", GetName());
-		
-			if (!fParent)
-				printf("\t NO parent\n");
-			else
-				printf("\t VALID Parent: %s.\n", fParent->GetName());
-			if (!(fVisible.CountRects() > 0))
-				printf("\t NO visible area!\n");
-			else
-				printf("\t VALID visble area\n");
 		#endif
 		
 		if (fParent && fVisible.CountRects() > 0)
@@ -900,9 +889,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 			if (fParent->fAdFlags & B_LAYER_CHILDREN_DEPENDANT)
 			{
 				#ifdef DEBUG_LAYER_REBUILD
-					printf("\n ======= Layer(%s)::B_LAYER_CHILDREN_DEPENDANT Parent ======\n", GetName());
-					fFull.PrintToStream();
-					fVisible.PrintToStream();
+					printf("   B_LAYER_CHILDREN_DEPENDANT Parent\n");
 				#endif
 				
 				// because we're skipping one level, we need to do out
@@ -912,17 +899,10 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				if (fParent->fParent)
 					fVisible.IntersectWith(&(fParent->fParent->fVisible));
 					
-				#ifdef DEBUG_LAYER_REBUILD
-					fVisible.PrintToStream();
-				#endif
 				// exclude parent's visible area which could be composed by
 				// prior siblings' visible areas.
 				if (fVisible.CountRects() > 0)
 					fVisible.Exclude(&(fParent->fVisible));
-				
-				#ifdef DEBUG_LAYER_REBUILD
-					fVisible.PrintToStream();
-				#endif
 				
 				// we have a final visible area. Include it to our parent's one,
 				// exclude from parent's parent.
@@ -930,27 +910,16 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 				{
 					fParent->fFullVisible.Include(&fVisible);
 						
-					#ifdef DEBUG_LAYER_REBUILD
-						fParent->fFullVisible.PrintToStream();
-					#endif
-					
 					if (fParent->fParent)
 						fParent->fParent->fVisible.Exclude(&fVisible);
-					
-					#ifdef DEBUG_LAYER_REBUILD
-						fParent->fParent->fVisible.PrintToStream();
-					#endif
 				}
-				#ifdef DEBUG_LAYER_REBUILD
-					printf("\n ======= Layer(%s)::B_LAYER_CHILDREN_DEPENDANT Parent END ======\n", GetName());
-				#endif
 			}
 			else
 			{
 				// for 95+% of cases
 				
 				#ifdef DEBUG_LAYER_REBUILD
-					printf("\n ======= Layer(%s):: (!)B_LAYER_CHILDREN_DEPENDANT Parent ======\n", GetName());
+					printf("   (!)B_LAYER_CHILDREN_DEPENDANT Parent\n");
 				#endif
 				
 				// the visible area is the one common with parent's one.
@@ -967,13 +936,22 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	// Rebuild regions for children...
 	for(Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
 		lay->RebuildRegions(reg, newAction, newPt, newOffset);
-	
+
+	#ifdef DEBUG_LAYER_REBUILD
+		printf("\nLayer(%s) ALMOST done regions:\n", GetName());
+		printf("\tVisible Region:\n");
+		fVisible.PrintToStream();
+		printf("\tFull Visible Region:\n");
+		fFullVisible.PrintToStream();
+	#endif
+
 	if(!IsHidden())
 	{
 		switch(action)
 		{
 			case B_LAYER_NONE:
 			{
+				RBTRACE(("2) Layer(%s): Action B_LAYER_NONE\n", GetName()));
 				BRegion r(fVisible);
 				if (oldRegion.CountRects() > 0)
 					r.Exclude(&oldRegion);
@@ -984,6 +962,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 			}
 			case B_LAYER_MOVE:
 			{
+				RBTRACE(("2) Layer(%s): Action B_LAYER_MOVE\n", GetName()));
 				BRegion redrawReg;
 				BRegion	*copyReg = new BRegion();
 				BRegion	screenReg(fRootLayer->Bounds());
@@ -1016,6 +995,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 			}
 			case B_LAYER_RESIZE:
 			{
+				RBTRACE(("2) Layer(%s): Action B_LAYER_RESIZE\n", GetName()));
 				BRegion redrawReg;
 				
 				redrawReg = fVisible;
@@ -1027,6 +1007,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 			}
 			case B_LAYER_MASK_RESIZE:
 			{
+				RBTRACE(("2) Layer(%s): Action B_LAYER_MASK_RESIZE\n", GetName()));
 				BRegion redrawReg;
 				BRegion	*copyReg = new BRegion();
 				
@@ -1053,6 +1034,7 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 			}
 			default:
 			{
+				RBTRACE(("2) Layer(%s): Action default\n", GetName()));
 				break;
 			}
 		}
@@ -1064,23 +1046,13 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	}
 */
 
-	#ifdef DEBUG_LAYER_REBUILD
-	printf("\n ======= Layer(%s)::RR finals ======\n", GetName());
-	oldRegion.PrintToStream();
-	fFull.PrintToStream();
-	fFullVisible.PrintToStream();
-	fVisible.PrintToStream();
-	printf("==========RedrawReg===========\n");
-	fRootLayer->fRedrawReg.PrintToStream();
-	printf("=====================\n");
-	#endif
-	
 	STRACE(("Layer(%s)::RebuildRegions() END\n", GetName()));
 }
 
 void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt)
 {
 	STRACE(("Layer(%s)::StartRebuildRegions() START\n", GetName()));
+	RBTRACE(("\n\nLayer(%s)::StartRebuildRegions() START\n", GetName()));
 	if(!fParent)
 		fFullVisible = fFull;
 	
@@ -1098,14 +1070,11 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 	}
 	
 	#ifdef DEBUG_LAYER_REBUILD
-	printf("\n ===!=== Layer(%s)::SRR finals ===!===\n", GetName());
-	fFull.PrintToStream();
-	fFullVisible.PrintToStream();
-	fVisible.PrintToStream();
-	oldVisible.PrintToStream();
-	printf("=====!=====RedrawReg=====!=====\n");
-	fRootLayer->fRedrawReg.PrintToStream();
-	printf("=====================\n");
+		printf("\nSRR: Layer(%s) ALMOST done regions:\n", GetName());
+		printf("\tVisible Region:\n");
+		fVisible.PrintToStream();
+		printf("\tFull Visible Region:\n");
+		fFullVisible.PrintToStream();
 	#endif
 	
 	BRegion redrawReg(fVisible);
@@ -1118,19 +1087,20 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 		fRootLayer->fRedrawReg.Include(&redrawReg);
 	
 	#ifdef DEBUG_LAYER_REBUILD
-	printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());
-	fRootLayer->fRedrawReg.PrintToStream();
-	printf("\n");
-	printf("Layer(%s)::StartRebuildREgions() ended! Copy Region:\n", GetName());
-	for(int32 k=0; k<fRootLayer->fCopyRegList.CountItems(); k++)
-	{
-		((BRegion*)(fRootLayer->fCopyRegList.ItemAt(k)))->PrintToStream();
-		((BPoint*)(fRootLayer->fCopyList.ItemAt(k)))->PrintToStream();
-	}
-	printf("\n");
+		printf("\nLayer(%s)::StartRebuildRegions() DONE. Results:\n", GetName());
+		printf("\tRedraw Region:\n");
+		fRootLayer->fRedrawReg.PrintToStream();
+		printf("\tCopy Region:\n");
+		for(int32 k=0; k<fRootLayer->fCopyRegList.CountItems(); k++)
+		{
+			((BRegion*)(fRootLayer->fCopyRegList.ItemAt(k)))->PrintToStream();
+			((BPoint*)(fRootLayer->fCopyList.ItemAt(k)))->PrintToStream();
+		}
+		printf("\n");
 	#endif
 
 	STRACE(("Layer(%s)::StartRebuildRegions() END\n", GetName()));
+	RBTRACE(("Layer(%s)::StartRebuildRegions() END\n", GetName()));
 }
 
 //! Moves the layer by specified values, complete with redraw
