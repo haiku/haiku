@@ -114,7 +114,7 @@ static void Perror (FILE *, char *, int);
     {
 	int save = errno;
 
-	if (_res.options & RES_DEBUG) {
+	if (_resolver_configuration.options & RES_DEBUG) {
 		if (getnameinfo(address, address->sa_len, abuf, sizeof(abuf),
 		    pbuf, sizeof(pbuf),
 		    NI_NUMERICHOST|NI_NUMERICSERV|NI_WITHSCOPEID) != 0) {
@@ -134,7 +134,7 @@ static void Perror (FILE *, char *, int);
     {
 	int save = errno;
 
-	if (_res.options & RES_DEBUG) {
+	if (_resolver_configuration.options & RES_DEBUG) {
 		fprintf(file, "res_send: %s: %s\n",
 			string, strerror(error));
 	}
@@ -172,29 +172,29 @@ get_nsaddr(n)
 	size_t n;
 {
 
-	if (!_res.nsaddr_list[n].sin_family) {
+	if (!_resolver_configuration.nsaddr_list[n].sin_family) {
 		/*
-		 * - _res_ext.nsaddr_list[n] holds an address that is larger
+		 * - _resolver_configuration_ext.nsaddr_list[n] holds an address that is larger
 		 *   than struct sockaddr, and
-		 * - user code did not update _res.nsaddr_list[n].
+		 * - user code did not update _resolver_configuration.nsaddr_list[n].
 		 */
-		return (struct sockaddr *)&_res_ext.nsaddr_list[n];
+		return (struct sockaddr *)&_resolver_configuration_ext.nsaddr_list[n];
 	} else {
 		/*
-		 * - user code updated _res.nsaddr_list[n], or
-		 * - _res.nsaddr_list[n] has the same content as
-		 *   _res_ext.nsaddr_list[n].
+		 * - user code updated _resolver_configuration.nsaddr_list[n], or
+		 * - _resolver_configuration.nsaddr_list[n] has the same content as
+		 *   _resolver_configuration_ext.nsaddr_list[n].
 		 */
-		return (struct sockaddr *)&_res.nsaddr_list[n];
+		return (struct sockaddr *)&_resolver_configuration.nsaddr_list[n];
 	}
 }
 #else
-#define get_nsaddr(n)	((struct sockaddr *)&_res.nsaddr_list[(n)])
+#define get_nsaddr(n)	((struct sockaddr *)&_resolver_configuration.nsaddr_list[(n)])
 #endif
 
 /* int
  * res_isourserver(ina)
- *	looks up "ina" in _res.ns_addr_list[]
+ *	looks up "ina" in _resolver_configuration.ns_addr_list[]
  * returns:
  *	0  : not found
  *	>0 : found
@@ -221,7 +221,7 @@ res_isourserver(inp)
 	switch (inp->sin_family) {
 #ifdef INET6
 	case AF_INET6:
-		for (ns = 0; ns < _res.nscount; ns++) {
+		for (ns = 0; ns < _resolver_configuration.nscount; ns++) {
 			srv6 = (struct sockaddr_in6 *)get_nsaddr(ns);
 			if (srv6->sin6_family == in6p->sin6_family &&
 			    srv6->sin6_port == in6p->sin6_port &&
@@ -236,7 +236,7 @@ res_isourserver(inp)
 		break;
 #endif
 	case AF_INET:
-		for (ns = 0; ns < _res.nscount; ns++) {
+		for (ns = 0; ns < _resolver_configuration.nscount; ns++) {
 			srv = (struct sockaddr_in *)get_nsaddr(ns);
 			if (srv->sin_family == inp->sin_family &&
 			    srv->sin_port == inp->sin_port &&
@@ -338,13 +338,13 @@ res_send(buf, buflen, ans, anssiz)
 	register int n;
 	u_int badns;	/* XXX NSMAX can't exceed #/bits in this var */
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
 		/* errno should have been set by res_init() in this case. */
 		return (-1);
 	}
-	DprintQ((_res.options & RES_DEBUG) || (_res.pfcode & RES_PRF_QUERY),
+	DprintQ((_resolver_configuration.options & RES_DEBUG) || (_resolver_configuration.pfcode & RES_PRF_QUERY),
 		(stdout, ";; res_send()\n"), buf, buflen);
-	v_circuit = (_res.options & RES_USEVC) || buflen > PACKETSZ;
+	v_circuit = (_resolver_configuration.options & RES_USEVC) || buflen > PACKETSZ;
 	gotsomewhere = 0;
 	connreset = 0;
 	terrno = ETIMEDOUT;
@@ -353,8 +353,8 @@ res_send(buf, buflen, ans, anssiz)
 	/*
 	 * Send request, RETRY times, or until successful
 	 */
-	for (try = 0; try < _res.retry; try++) {
-	    for (ns = 0; ns < _res.nscount; ns++) {
+	for (try = 0; try < _resolver_configuration.retry; try++) {
+	    for (ns = 0; ns < _resolver_configuration.nscount; ns++) {
 		struct sockaddr *nsap = get_nsaddr(ns);
 		uint32 salen;
 		
@@ -406,7 +406,7 @@ res_send(buf, buflen, ans, anssiz)
 			} while (!done);
 		}
 
-		Dprint((_res.options & RES_DEBUG) &&
+		Dprint((_resolver_configuration.options & RES_DEBUG) &&
 		       getnameinfo(nsap, salen, abuf, sizeof(abuf),
 			   NULL, 0, NI_NUMERICHOST | NI_WITHSCOPEID) == 0,
 		       (stdout, ";; Querying server (# %d) address = %s\n",
@@ -422,7 +422,7 @@ res_send(buf, buflen, ans, anssiz)
 			 * Use virtual circuit;
 			 * at most one attempt per server.
 			 */
-			try = _res.retry;
+			try = _resolver_configuration.retry;
 			truncated = 0;
 			if ((s < 0) || (!vc) || (af != nsap->sa_family)) {
 				if (s >= 0)
@@ -501,7 +501,7 @@ read_len:
 			}
 			resplen = _getshort(ans);
 			if (resplen > anssiz) {
-				Dprint(_res.options & RES_DEBUG,
+				Dprint(_resolver_configuration.options & RES_DEBUG,
 				       (stdout, ";; response truncated\n")
 				       );
 				truncated = 1;
@@ -547,8 +547,8 @@ read_len:
 			 * wait for the correct one.
 			 */
 			if (hp->id != anhp->id) {
-				DprintQ((_res.options & RES_DEBUG) ||
-					(_res.pfcode & RES_PRF_REPLY),
+				DprintQ((_resolver_configuration.options & RES_DEBUG) ||
+					(_resolver_configuration.pfcode & RES_PRF_REPLY),
 					(stdout, ";; old answer (unexpected):\n"),
 					ans, (resplen>anssiz)?anssiz:resplen);
 				goto read_len;
@@ -606,8 +606,8 @@ read_len:
 			 * as we wish to receive answers from the first
 			 * server to respond.
 			 */
-			if (!(_res.options & RES_INSECURE1) &&
-			    (_res.nscount == 1 || (try == 0 && ns == 0))) {
+			if (!(_resolver_configuration.options & RES_INSECURE1) &&
+			    (_resolver_configuration.nscount == 1 || (try == 0 && ns == 0))) {
 				/*
 				 * Connect only if we are sure we won't
 				 * receive a response from another server.
@@ -654,7 +654,7 @@ read_len:
 						goto bad_dg_sock;
 					(void) dup2(s1, s);
 					(void) close(s1);
-					Dprint(_res.options & RES_DEBUG,
+					Dprint(_resolver_configuration.options & RES_DEBUG,
 					       (stdout, ";; new DG socket\n"))
 #endif
 #ifdef IPV6_MINMTU
@@ -680,9 +680,9 @@ read_len:
 			/*
 			 * Wait for reply
 			 */
-			timeout.tv_sec = (_res.retrans << try);
+			timeout.tv_sec = (_resolver_configuration.retrans << try);
 			if (try > 0)
-				timeout.tv_sec /= _res.nscount;
+				timeout.tv_sec /= _resolver_configuration.nscount;
 			if ((long) timeout.tv_sec <= 0)
 				timeout.tv_sec = 1;
 			timeout.tv_usec = 0;
@@ -708,7 +708,7 @@ read_len:
 				/*
 				 * timeout
 				 */
-				Dprint(_res.options & RES_DEBUG,
+				Dprint(_resolver_configuration.options & RES_DEBUG,
 				       (stdout, ";; timeout\n"));
 				gotsomewhere = 1;
 				res_close();
@@ -731,8 +731,8 @@ read_len:
 				 * XXX - potential security hazard could
 				 *	 be detected here.
 				 */
-				DprintQ((_res.options & RES_DEBUG) ||
-					(_res.pfcode & RES_PRF_REPLY),
+				DprintQ((_resolver_configuration.options & RES_DEBUG) ||
+					(_resolver_configuration.pfcode & RES_PRF_REPLY),
 					(stdout, ";; old answer:\n"),
 					ans, (resplen>anssiz)?anssiz:resplen);
 				goto wait;
@@ -744,22 +744,22 @@ read_len:
  * Can other people remove the comment and see if this works for them?
  */
 #if 0//CHECK_SRVR_ADDR
-			if (!(_res.options & RES_INSECURE1) &&
+			if (!(_resolver_configuration.options & RES_INSECURE1) &&
 			    !res_isourserver((struct sockaddr_in *)&from)) {
 				/*
 				 * response from wrong server? ignore it.
 				 * XXX - potential security hazard could
 				 *	 be detected here.
 				 */
-				DprintQ((_res.options & RES_DEBUG) ||
-					(_res.pfcode & RES_PRF_REPLY),
+				DprintQ((_resolver_configuration.options & RES_DEBUG) ||
+					(_resolver_configuration.pfcode & RES_PRF_REPLY),
 					(stdout, ";; not our server:\n"),
 					ans, (resplen>anssiz)?anssiz:resplen);
 
 				goto wait;
 			}
 #endif
-			if (!(_res.options & RES_INSECURE2) &&
+			if (!(_resolver_configuration.options & RES_INSECURE2) &&
 			    !res_queriesmatch(buf, buf + buflen,
 					      ans, ans + anssiz)) {
 				/*
@@ -767,8 +767,8 @@ read_len:
 				 * XXX - potential security hazard could
 				 *	 be detected here.
 				 */
-				DprintQ((_res.options & RES_DEBUG) ||
-					(_res.pfcode & RES_PRF_REPLY),
+				DprintQ((_resolver_configuration.options & RES_DEBUG) ||
+					(_resolver_configuration.pfcode & RES_PRF_REPLY),
 					(stdout, ";; wrong query name:\n"),
 					ans, (resplen>anssiz)?anssiz:resplen);
 				goto wait;
@@ -777,33 +777,33 @@ read_len:
 			if (anhp->rcode == SERVFAIL ||
 			    anhp->rcode == NOTIMP ||
 			    anhp->rcode == REFUSED) {
-				DprintQ(_res.options & RES_DEBUG,
+				DprintQ(_resolver_configuration.options & RES_DEBUG,
 					(stdout, "server rejected query:\n"),
 					ans, (resplen>anssiz)?anssiz:resplen);
 				badns |= (1 << ns);
 				res_close();
 				/* don't retry if called from dig */
-				if (!_res.pfcode)
+				if (!_resolver_configuration.pfcode)
 					goto next_ns;
 			}
-			if (!(_res.options & RES_IGNTC) && anhp->tc) {
+			if (!(_resolver_configuration.options & RES_IGNTC) && anhp->tc) {
 				/*
 				 * get rest of answer;
 				 * use TCP with same server.
 				 */
-				Dprint(_res.options & RES_DEBUG,
+				Dprint(_resolver_configuration.options & RES_DEBUG,
 				       (stdout, ";; truncated answer\n"));
 				v_circuit = 1;
 				res_close();
 				goto same_ns;
 			}
 		} /*if vc/dg*/
-		Dprint((_res.options & RES_DEBUG) ||
-		       ((_res.pfcode & RES_PRF_REPLY) &&
-			(_res.pfcode & RES_PRF_HEAD1)),
+		Dprint((_resolver_configuration.options & RES_DEBUG) ||
+		       ((_resolver_configuration.pfcode & RES_PRF_REPLY) &&
+			(_resolver_configuration.pfcode & RES_PRF_HEAD1)),
 		       (stdout, ";; got answer:\n"));
-		DprintQ((_res.options & RES_DEBUG) ||
-			(_res.pfcode & RES_PRF_REPLY),
+		DprintQ((_resolver_configuration.options & RES_DEBUG) ||
+			(_resolver_configuration.pfcode & RES_PRF_REPLY),
 			(stdout, "%s", ""),
 			ans, (resplen>anssiz)?anssiz:resplen);
 		/*
@@ -814,8 +814,8 @@ read_len:
 		 * or if we haven't been asked to keep a socket open,
 		 * close the socket.
 		 */
-		if ((v_circuit && (!(_res.options & RES_USEVC) || ns != 0)) ||
-		    !(_res.options & RES_STAYOPEN)) {
+		if ((v_circuit && (!(_resolver_configuration.options & RES_USEVC) || ns != 0)) ||
+		    !(_resolver_configuration.options & RES_STAYOPEN)) {
 			res_close();
 		}
 		if (Rhook) {

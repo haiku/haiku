@@ -101,25 +101,25 @@ res_query(name, class, type, answer, anslen)
 
 	hp->rcode = NOERROR;	/* default */
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
 #ifdef DEBUG
-	if (_res.options & RES_DEBUG)
+	if (_resolver_configuration.options & RES_DEBUG)
 		printf(";; res_query(%s, %d, %d)\n", name, class, type);
 #endif
 
 	n = res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
 			buf, sizeof(buf));
-	if (n > 0 && ((_res.options & RES_USE_EDNS0) ||
-	    (_res.options & RES_USE_DNSSEC))) {
+	if (n > 0 && ((_resolver_configuration.options & RES_USE_EDNS0) ||
+	    (_resolver_configuration.options & RES_USE_DNSSEC))) {
 		n = res_opt(n, buf, sizeof(buf), anslen);
 	}
 
 	if (n <= 0) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (_resolver_configuration.options & RES_DEBUG)
 			printf(";; res_query: mkquery failed\n");
 #endif
 		h_errno = NO_RECOVERY;
@@ -128,7 +128,7 @@ res_query(name, class, type, answer, anslen)
 	n = res_send(buf, n, answer, anslen);
 	if (n < 0) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (_resolver_configuration.options & RES_DEBUG)
 			printf(";; res_query: send error\n");
 #endif
 		h_errno = TRY_AGAIN;
@@ -137,7 +137,7 @@ res_query(name, class, type, answer, anslen)
 
 	if (hp->rcode != NOERROR || ntohs(hp->ancount) == 0) {
 #ifdef DEBUG
-		if (_res.options & RES_DEBUG)
+		if (_resolver_configuration.options & RES_DEBUG)
 			printf(";; rcode = %d, ancount=%d\n", hp->rcode,
 			    ntohs(hp->ancount));
 #endif
@@ -182,7 +182,7 @@ res_search(name, class, type, answer, anslen)
 	int trailing_dot, ret, saved_herrno;
 	int got_nodata = 0, got_servfail = 0, tried_as_is = 0;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
@@ -206,7 +206,7 @@ res_search(name, class, type, answer, anslen)
 	 * 'as is'.  The threshold can be set with the "ndots" option.
 	 */
 	saved_herrno = -1;
-	if (dots >= _res.ndots) {
+	if (dots >= _resolver_configuration.ndots) {
 		ret = res_querydomain(name, NULL, class, type, answer, anslen);
 		if (ret > 0)
 			return (ret);
@@ -220,11 +220,11 @@ res_search(name, class, type, answer, anslen)
 	 *	- there is at least one dot, there is no trailing dot,
 	 *	  and RES_DNSRCH is set.
 	 */
-	if ((!dots && (_res.options & RES_DEFNAMES)) ||
-	    (dots && !trailing_dot && (_res.options & RES_DNSRCH))) {
+	if ((!dots && (_resolver_configuration.options & RES_DEFNAMES)) ||
+	    (dots && !trailing_dot && (_resolver_configuration.options & RES_DNSRCH))) {
 		int done = 0;
 
-		for (domain = (const char * const *)_res.dnsrch;
+		for (domain = (const char * const *)_resolver_configuration.dnsrch;
 		     *domain && !done;
 		     domain++) {
 
@@ -273,7 +273,7 @@ res_search(name, class, type, answer, anslen)
 			/* if we got here for some reason other than DNSRCH,
 			 * we only wanted one iteration of the loop, so stop.
 			 */
-			if (!(_res.options & RES_DNSRCH))
+			if (!(_resolver_configuration.options & RES_DNSRCH))
 				done++;
 		}
 	}
@@ -319,12 +319,12 @@ res_querydomain(name, domain, class, type, answer, anslen)
 	const char *longname = nbuf;
 	int n;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
 #ifdef DEBUG
-	if (_res.options & RES_DEBUG)
+	if (_resolver_configuration.options & RES_DEBUG)
 		printf(";; res_querydomain(%s, %s, %d, %d)\n",
 		       name, domain?domain:"<Nil>", class, type);
 #endif
@@ -356,7 +356,7 @@ hostalias(name)
 	static char abuf[MAXDNAME];
 	size_t len;
 
-	if (_res.options & RES_NOALIASES)
+	if (_resolver_configuration.options & RES_NOALIASES)
 		return (NULL);
 	file = getenv("HOSTALIASES");
 //      if (issetugid() != 0 || file == NULL || (fp = fopen(file, "r")) == NULL)

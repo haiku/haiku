@@ -350,7 +350,7 @@ static struct hostent *getanswer(const querybuf *answer,
 			break;
 #else
 			host.h_name = bp;
-			if (_res.options & RES_USE_INET6) {
+			if (_resolver_configuration.options & RES_USE_INET6) {
 				n = strlen(bp) + 1;	/* for the \0 */
 				bp += n;
 				buflen -= n;
@@ -386,7 +386,7 @@ static struct hostent *getanswer(const querybuf *answer,
 
 			if (bp + n >= &hostbuf[sizeof hostbuf]) {
 #ifdef DEBUG
-				if (_res.options & RES_DEBUG)
+				if (_resolver_configuration.options & RES_DEBUG)
 					printf("size (%d) too big\n", n);
 #endif
 				had_error++;
@@ -395,7 +395,7 @@ static struct hostent *getanswer(const querybuf *answer,
 			if (hap >= &h_addr_ptrs[MAXADDRS-1]) {
 				if (!toobig++)
 #ifdef DEBUG
-					if (_res.options & RES_DEBUG)
+					if (_resolver_configuration.options & RES_DEBUG)
 						printf("Too many addresses (%d)\n", MAXADDRS);
 #endif
 				cp += n;
@@ -419,7 +419,7 @@ static struct hostent *getanswer(const querybuf *answer,
 		 * in its return structures - should give it the "best"
 		 * address in that case, not some random one
 		 */
-		if (_res.nsort && haveanswer > 1 && qtype == T_A)
+		if (_resolver_configuration.nsort && haveanswer > 1 && qtype == T_A)
 			addrsort(h_addr_ptrs, haveanswer);
 # endif /*RESOLVSORT*/
 		if (!host.h_name) {
@@ -432,7 +432,7 @@ static struct hostent *getanswer(const querybuf *answer,
 			buflen -= n;
 		}
 #if INET6
-		if (_res.options & RES_USE_INET6)
+		if (_resolver_configuration.options & RES_USE_INET6)
 			map_v4v6_hostent(&host, &bp, &buflen);
 #endif
 		h_errno = NETDB_SUCCESS;
@@ -507,10 +507,10 @@ struct hostent * gethostbyname(const char *name)
 		gethostnamadr = create_sem(1, "gethostnamadr");
 		
 	acquire_sem_etc(gethostnamadr,1, B_CAN_INTERRUPT, 0);
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
 		hp = _gethtbyname2(name, AF_INET);
 #if INET6
-	else if (_res.options & RES_USE_INET6) {
+	else if (_resolver_configuration.options & RES_USE_INET6) {
 		hp = gethostbyname2(name, AF_INET6);
 		if (hp == NULL)
 			hp = gethostbyname2(name, AF_INET);
@@ -533,7 +533,7 @@ struct hostent *gethostbyname2(const char *name, int af)
 	register struct hostent *hp;
 	char lookups[MAXDNSLUS];
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
 		return (_gethtbyname2(name, af));
 
 	switch (af) {
@@ -592,7 +592,7 @@ struct hostent *gethostbyname2(const char *name, int af)
 				h_addr_ptrs[1] = NULL;
 				host.h_addr_list = h_addr_ptrs;
 #if INET6
-				if (_res.options & RES_USE_INET6)
+				if (_resolver_configuration.options & RES_USE_INET6)
 					map_v4v6_hostent(&host, &bp, &len);
 #endif
 				h_errno = NETDB_SUCCESS;
@@ -632,7 +632,7 @@ struct hostent *gethostbyname2(const char *name, int af)
 				break;
 		}
 
-	memcpy(lookups, _res.lookups, sizeof lookups);
+	memcpy(lookups, _resolver_configuration.lookups, sizeof lookups);
 	if (lookups[0] == '\0')
 		strncpy(lookups, "bf", sizeof lookups);
 
@@ -650,7 +650,7 @@ struct hostent *gethostbyname2(const char *name, int af)
 			if ((n = res_search(name, C_IN, type, buf.buf,
 			    sizeof(buf))) < 0) {
 #ifdef DEBUG
-				if (_res.options & RES_DEBUG)
+				if (_resolver_configuration.options & RES_DEBUG)
 					printf("res_search failed\n");
 #endif
 				break;
@@ -679,7 +679,7 @@ struct hostent *gethostbyaddr(const char *addr, int len, int af)
 	struct hostent *res;
 	
 	acquire_sem(gethostnamadr);
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1) {
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1) {
 //printf("gethostbyaddr: calling _gethtbyaddr\n");
 		res = _gethtbyaddr(addr, len, af);
 		release_sem_etc(gethostnamadr,1, B_CAN_INTERRUPT);
@@ -736,7 +736,7 @@ struct hostent *gethostbyaddr(const char *addr, int len, int af)
 		break;
 	}
 
-	memcpy(lookups, _res.lookups, sizeof lookups);
+	memcpy(lookups, _resolver_configuration.lookups, sizeof lookups);
 	if (lookups[0] == '\0')
 		strncpy(lookups, "bf", sizeof lookups);
 
@@ -756,7 +756,7 @@ struct hostent *gethostbyaddr(const char *addr, int len, int af)
 			    sizeof buf.buf);
 			if (n < 0) {
 #ifdef DEBUG
-				if (_res.options & RES_DEBUG)
+				if (_resolver_configuration.options & RES_DEBUG)
 					printf("res_query failed\n");
 #endif
 				break;
@@ -768,7 +768,7 @@ struct hostent *gethostbyaddr(const char *addr, int len, int af)
 			memcpy(host_addr, addr, len);
 			h_addr_ptrs[0] = (char *)host_addr;
 			h_addr_ptrs[1] = NULL;
-			if (af == AF_INET && (_res.options & RES_USE_INET6)) {
+			if (af == AF_INET && (_resolver_configuration.options & RES_USE_INET6)) {
 #ifdef INET6
 				map_v4v6_address((char*)host_addr,
 				    (char*)host_addr);
@@ -844,7 +844,7 @@ struct hostent *_gethtent()
 		af = AF_INET6;
 		len = IN6ADDRSZ;
 	} else if (inet_pton(AF_INET, p, host_addr) > 0) {
-		if (_res.options & RES_USE_INET6) {
+		if (_resolver_configuration.options & RES_USE_INET6) {
 #ifdef INET6
 			map_v4v6_address((char*)host_addr, (char*)host_addr);
 			af = AF_INET6;
@@ -884,7 +884,7 @@ struct hostent *_gethtent()
 			*cp++ = '\0';
 	}
 	*q = NULL;
-	if (_res.options & RES_USE_INET6) {
+	if (_resolver_configuration.options & RES_USE_INET6) {
 #ifdef INET6
 		char *bp = hostbuf;
 		int buflen = sizeof hostbuf;
@@ -901,7 +901,7 @@ struct hostent *_gethtbyname(const char *name)
 	extern struct hostent *_gethtbyname2();
 	struct hostent *hp;
 
-	if (_res.options & RES_USE_INET6) {
+	if (_resolver_configuration.options & RES_USE_INET6) {
 		hp = _gethtbyname2(name, AF_INET6);
 		if (hp)
 			return (hp);
@@ -1149,9 +1149,9 @@ addrsort(ap, num)
 
 	p = ap;
 	for (i = 0; i < num; i++, p++) {
-	    for (j = 0 ; (unsigned)j < _res.nsort; j++)
-		if (_res.sort_list[j].addr.s_addr == 
-		    (((struct in_addr *)(*p))->s_addr & _res.sort_list[j].mask))
+	    for (j = 0 ; (unsigned)j < _resolver_configuration.nsort; j++)
+		if (_resolver_configuration.sort_list[j].addr.s_addr == 
+		    (((struct in_addr *)(*p))->s_addr & _resolver_configuration.sort_list[j].mask))
 			break;
 	    aval[i] = j;
 	    if (needsort == 0 && i > 0 && j < aval[i-1])

@@ -246,10 +246,10 @@ getnetbyaddr(net, net_type)
 	char lookups[MAXDNSLUS];
 	int i;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
 		return(_getnetbyaddr(net, net_type));
 
-	memcpy(lookups, _res.lookups, sizeof lookups);
+	memcpy(lookups, _resolver_configuration.lookups, sizeof lookups);
 	if (lookups[0] == '\0')
 		strncpy(lookups, "bf", sizeof lookups);
 
@@ -313,7 +313,7 @@ getnetbyaddr(net, net_type)
 			    sizeof(buf));
 			if (anslen < 0) {
 #ifdef DEBUG
-				if (_res.options & RES_DEBUG)
+				if (_resolver_configuration.options & RES_DEBUG)
 					printf("res_query failed\n");
 #endif
 				break;
@@ -351,10 +351,10 @@ getnetbyname(net)
 	char lookups[MAXDNSLUS];
 	int i;
 
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
+	if ((_resolver_configuration.options & RES_INIT) == 0 && res_init() == -1)
 		return (_getnetbyname(net));
 
-	memcpy(lookups, _res.lookups, sizeof lookups);
+	memcpy(lookups, _resolver_configuration.lookups, sizeof lookups);
 	if (lookups[0] == '\0')
 		strncpy(lookups, "bf", sizeof lookups);
 
@@ -371,7 +371,7 @@ getnetbyname(net)
 			    sizeof(buf));
 			if (anslen < 0) {
 #ifdef DEBUG
-				if (_res.options & RES_DEBUG)
+				if (_resolver_configuration.options & RES_DEBUG)
 					printf("res_query failed\n");
 #endif
 				break;
