@@ -82,7 +82,7 @@ RefreshWindow::MessageReceived(BMessage* message)
 			float Value = (float)fRefreshSlider->Value() / 10;
 					
 			Message.AddFloat("refresh", Value);
-			
+
 			Messenger.SendMessage(&Message);
 			
 			PostMessage(B_QUIT_REQUESTED);

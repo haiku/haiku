@@ -15,13 +15,13 @@ ScreenDrawView::ScreenDrawView(BRect rect, char *name)
 	: BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)	
 {
 	BScreen screen(B_MAIN_SCREEN_ID);
-	if (!screen->IsValid())
+	if (!screen.IsValid())
 		; //Debugger() ?
 		
-	desktopColor = screen->DesktopColor(current_workspace());
+	desktopColor = screen.DesktopColor(current_workspace());
 
 	display_mode mode;	
-	screen->GetMode(&mode);
+	screen.GetMode(&mode);
 
 	fResolution = mode.virtual_width;
 }
@@ -220,7 +220,7 @@ ScreenDrawView::MessageReceived(BMessage* message)
 			if (!screen.IsValid())
 				break;
 
-			desktopColor = screen->DesktopColor(current_workspace());
+			desktopColor = screen.DesktopColor(current_workspace());
 			
 			Invalidate();
 		}

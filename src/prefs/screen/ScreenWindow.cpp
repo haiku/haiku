@@ -9,7 +9,6 @@
 #include <Screen.h>
 #include <Window.h>
 
-
 #include <math.h>
 #include <cstring>
 #include <cstdlib>
@@ -128,7 +127,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	fResolutionField = new BMenuField(ControlMenuRect, "ResolutionMenu", "Resolution:", fResolutionMenu, true);
 	
-	Marked = fResolutionMenu->FindItem("640 x 480");
+	Marked = fResolutionMenu->ItemAt(0);
 	Marked->SetMarked(true);
 	
 	fResolutionField->SetDivider(55.0);
@@ -251,6 +250,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 		String << fInitialRefreshN;
 		
+		int32 point = String.FindFirst(' ');
 		String.Truncate(4);
 		
 		String << " Hz/Other...";
@@ -415,7 +415,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 		case BUTTON_DEFAULTS_MSG:
 		{	
-			fResolutionMenu->FindItem("640 x 480")->SetMarked(true);
+			fResolutionMenu->ItemAt(0)->SetMarked(true);
 			fColorsMenu->FindItem("8 Bits/Pixel")->SetMarked(true);
 			fRefreshMenu->FindItem("60 Hz")->SetMarked(true);
 			
@@ -572,7 +572,10 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 				fRefreshMenu->Superitem()->SetLabel(String.String());
 			}
-			BScreen screen(B_MAIN_SCREEN_ID);			
+			BScreen screen(B_MAIN_SCREEN_ID);
+			if (!screen.IsValid())
+				break;
+							
 			screen.SetMode(&fInitialMode);
 		
 			break;
@@ -611,9 +614,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 		case MAKE_INITIAL_MSG:
 		{
-			BScreen screen(B_MAIN_SCREEN_ID);		
-			display_mode mode;		
-			
+			BScreen screen(B_MAIN_SCREEN_ID);
+			if (!screen.IsValid())		
+				break;
+				
+			display_mode mode;					
 			screen.GetMode(&mode);
 		
 			fInitialRefreshN = fCustomRefresh;
