@@ -2793,7 +2793,7 @@ fill_area_info(struct vm_area *area, area_info *info, size_t size)
 	info->size = area->size;
 	info->protection = area->protection & B_USER_PROTECTION;
 	info->lock = B_FULL_LOCK;
-	info->team = 1;
+	info->team = area->aspace->id;
 	info->ram_size = area->size;
 	info->copy_count = 0;
 	info->in_count = 0;
