@@ -158,6 +158,7 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 	media_output *output;
 	media_output *outputs;
 	int32 count;
+	status_t rv;
 	
 	count = stack->CountItems();
 	TRACE("PublishOutputs: publishing %ld\n", count);
@@ -185,7 +186,12 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 		outputs[i] = *output;
 	}
 	
-	return QueryServer(SERVER_PUBLISH_OUTPUTS, &request, sizeof(request), &reply, sizeof(reply));
+	rv = QueryServer(SERVER_PUBLISH_OUTPUTS, &request, sizeof(request), &reply, sizeof(reply));
+	
+	if (request.area != -1)
+		delete_area(request.area);
+	
+	return rv;
 }
 
 status_t
@@ -196,6 +202,7 @@ PublishInputs(const media_node & node, Stack<media_input> *stack)
 	media_input *input;
 	media_input *inputs;
 	int32 count;
+	status_t rv;
 	
 	count = stack->CountItems();
 	TRACE("PublishInputs: publishing %ld\n", count);
@@ -223,7 +230,12 @@ PublishInputs(const media_node & node, Stack<media_input> *stack)
 		inputs[i] = *input;
 	}
 	
-	return QueryServer(SERVER_PUBLISH_INPUTS, &request, sizeof(request), &reply, sizeof(reply));
+	rv = QueryServer(SERVER_PUBLISH_INPUTS, &request, sizeof(request), &reply, sizeof(reply));
+
+	if (request.area != -1)
+		delete_area(request.area);
+	
+	return rv;
 }
 
 } } } // namespace BPrivate::media::mediaroster
