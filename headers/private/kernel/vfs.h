@@ -57,7 +57,6 @@ extern "C" {
 status_t vfs_init(struct kernel_args *ka);
 status_t vfs_bootstrap_file_systems(void);
 status_t vfs_mount_boot_file_system(void);
-status_t vfs_register_file_system(const char *name, struct fs_ops *calls);
 void *vfs_new_io_context(void *parent_ioctx);
 int vfs_free_io_context(void *ioctx);
 
