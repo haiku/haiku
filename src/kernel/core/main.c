@@ -215,14 +215,30 @@ main2(void *unused)
 #endif
 	// start the init process
 	{
-		const char *args[] = {"/bin/init", NULL};
+		const char *shellArgs[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript", NULL};
+		const char *initArgs[] = {"/bin/init", NULL};
+		const char **args;
+		int32 argc;
+		thread_id thread;
 
-		thread_id thread = load_image(1, args, NULL);
+		struct stat st;
+		if (stat(shellArgs[1], &st) == 0) {
+			// start Bootscript
+			args = shellArgs;
+			argc = 2;
+		} else {
+			// ToDo: this is only necessary as long as we have the bootdir mechanism
+			// start init
+			args = initArgs;
+			argc = 1;
+		}
+
+		thread = load_image(argc, args, NULL);
 		if (thread >= B_OK) {
 			resume_thread(thread);
-			TRACE(("Init started\n"));
+			TRACE(("Bootscript started\n"));
 		} else
-			dprintf("error starting 'init' error = %ld \n", thread);
+			dprintf("error starting \"%s\" error = %ld \n", args[0], thread);
 	}
 
 	return 0;
