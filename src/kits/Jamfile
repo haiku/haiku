@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kits ;
 
-# Allow if defined allows to run applications without the registrar
+# If defined allows to run applications without the registrar
 # -- for development only, of course.
 if $(RUN_WITHOUT_REGISTRAR) {
 	local defines = [ FDefines RUN_WITHOUT_REGISTRAR ] ;
@@ -27,17 +27,31 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) storage mime ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) storage sniffer ] ;
 
-SharedLibrary openbeos :
+LIBBE_SOURCE = 
 	$(APP_KIT_SOURCE)
 	$(INTERFACE_KIT_SOURCE)
 	$(SUPPORT_KIT_SOURCE)
 	$(STORAGE_KIT_SOURCE)
 ;
 
+SharedLibrary be :
+	$(LIBBE_SOURCE)
+;
+
+SharedLibraryFromObjects openbeos :
+	$(LIBBE_SOURCE:S=.o)
+;
+
+LinkSharedOSLibs libbe.so :
+	libroot.so	# make sure it links against our libroot.so
+	stdc++.r4
+;
+
 LinkSharedOSLibs libopenbeos.so :
 	libbeadapter.so
 	be
-	stdc++.r4 ;
+	stdc++.r4
+;
 
 # The adapter library we need (Storage Kit).
 #
