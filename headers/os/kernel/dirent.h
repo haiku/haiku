@@ -21,11 +21,9 @@ typedef struct dirent {
 	char			d_name[1];
 } dirent_t;
 
-// ToDo: this structure is still incompatible with BeOS
 typedef struct {
 	int				fd;
-	struct dirent  *ent;
-	struct dirent   me;
+	struct dirent	ent;
 } DIR;
 
 #ifndef MAXNAMLEN

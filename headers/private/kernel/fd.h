@@ -73,6 +73,8 @@ void put_fd(struct file_descriptor *);
 void free_fd(struct file_descriptor *);
 static struct io_context *get_current_io_context(bool kernel);
 
+/* The prototypes of the (sys|user)_ functions are currently defined in vfs.h */
+
 
 /* Inlines */
 
