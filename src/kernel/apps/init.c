@@ -35,7 +35,7 @@ main()
 	{
 		team_id pid;
 
-		pid = _kern_create_team("/boot/bin/fortune", "/boot/bin/fortune", NULL, 0, NULL, 0, 5);
+		pid = _kern_create_team("/bin/fortune", "/bin/fortune", NULL, 0, NULL, 0, 5);
 		if (pid >= 0) {
 			int retcode;
 			_kern_wait_for_team(pid, &retcode);
@@ -46,7 +46,7 @@ main()
 	while (1) {
 		team_id pid;
 
-		pid = _kern_create_team("/boot/bin/shell", "/boot/bin/shell", NULL, 0, NULL, 0, 5);
+		pid = _kern_create_team("/bin/shell", "/bin/shell", NULL, 0, NULL, 0, 5);
 		if (pid >= 0) {
 			int retcode;
 			printf("init: spawned shell, pid 0x%lx\n", pid);

@@ -709,42 +709,32 @@ int parse_info(scan_info *info)
 			break;
 
 		case SVO_EXIT :
-			if(scan(info)){
-
+			if (scan(info))
 				err = SHE_SCAN_ERROR;
-
-			} else {
-
+			else
 				err = handle_exit(info);
-
-			}
-         
 			break;
 
 		default:
-			return shell_parse(info->input_line,strlen(info->input_line));
-
+			return shell_parse(info->input_line, strlen(info->input_line));
 	}
 
-	if(err != SHE_NO_ERROR){
-
-		if(err == SHE_SCAN_ERROR) err = info->scan_error;
-		ste_error_to_str(err,err_txt);
-		printf("error :%d:%ld,  %d-%s \n",info->line_no,
-		                                 info->scanner - info->input_line - strlen(info->token),
-		                                 err,
-		                                 err_txt);
-
+	if (err != SHE_NO_ERROR) {
+		if (err == SHE_SCAN_ERROR)
+			err = info->scan_error;
+		ste_error_to_str(err, err_txt);
+		printf("error :%d:%ld,  %d-%s \n", info->line_no,
+			info->scanner - info->input_line - strlen(info->token),
+			err, err_txt);
 	}
 	return err;
 }
 
 
-
-void init_statements(void){
-
-	shell_var_set_text(NAME_VAR_PATH,".:/:/boot:/boot/bin");
-
+void
+init_statements(void)
+{
+	shell_var_set_text(NAME_VAR_PATH, ".:/:/boot:/boot/bin:/boot/beos/bin");
 }
 
 
