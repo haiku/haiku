@@ -31,9 +31,9 @@
 
 // BeAPI Headers
 #include <Application.h>
-#include "InputServerDevice.h"
-#include "InputServerFilter.h"
-#include "InputServerMethod.h"
+#include <InputServerDevice.h>
+#include <InputServerFilter.h>
+#include <InputServerMethod.h>
 #include "AddOnManager.h"
 
 #include <stdlib.h>
@@ -54,10 +54,21 @@ class InputDeviceListItem
 {
 	public:
 	BInputServerDevice* mIsd;    
-	input_device_ref*   mDev;
+	input_device_ref   	mDev;
+	bool 				mStarted;
 
-	InputDeviceListItem(BInputServerDevice* isd, input_device_ref* dev):
-		mIsd(isd), mDev(dev) {};	
+	InputDeviceListItem(BInputServerDevice* isd, input_device_ref dev):
+		mIsd(isd), mDev(dev), mStarted(false) {};	
+};
+
+class _BDeviceAddOn_
+{
+	
+};
+
+class _BMethodAddOn_
+{
+
 };
 
 /*****************************************************************************/
@@ -87,30 +98,29 @@ public:
 	virtual void MessageReceived(BMessage*); 
 
 	void HandleSetMethod(BMessage*);
-	void HandleGetSetMouseType(BMessage*, BMessage*);
-	void HandleGetSetMouseAcceleration(BMessage*, BMessage*);
-	void HandleGetSetKeyRepeatDelay(BMessage*, BMessage*);
-	void HandleGetKeyInfo(BMessage*, BMessage*);
-	void HandleGetModifiers(BMessage*, BMessage*);
-	void HandleSetModifierKey(BMessage*, BMessage*);
-	void HandleSetKeyboardLocks(BMessage*, BMessage*);
-	void HandleGetSetMouseSpeed(BMessage*, BMessage*);
-	void HandleSetMousePosition(BMessage*, BMessage*);
-	void HandleGetSetMouseMap(BMessage*, BMessage*);
-	void HandleGetKeyboardID(BMessage*, BMessage*);
-	void HandleGetClickSpeed(BMessage*, BMessage*);
-	void HandleSetClickSpeed(BMessage*, BMessage*);
-	void HandleGetSetKeyRepeatRate(BMessage*, BMessage*);
-	void HandleGetSetKeyMap(BMessage*, BMessage*);
-	void HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
+	status_t HandleGetSetMouseType(BMessage*, BMessage*);
+	status_t HandleGetSetMouseAcceleration(BMessage*, BMessage*);
+	status_t HandleGetSetKeyRepeatDelay(BMessage*, BMessage*);
+	status_t HandleGetKeyInfo(BMessage*, BMessage*);
+	status_t HandleGetModifiers(BMessage*, BMessage*);
+	status_t HandleSetModifierKey(BMessage*, BMessage*);
+	status_t HandleSetKeyboardLocks(BMessage*, BMessage*);
+	status_t HandleGetSetMouseSpeed(BMessage*, BMessage*);
+	status_t HandleSetMousePosition(BMessage*, BMessage*);
+	status_t HandleGetSetMouseMap(BMessage*, BMessage*);
+	status_t HandleGetKeyboardID(BMessage*, BMessage*);
+	status_t HandleGetSetClickSpeed(BMessage*, BMessage*);
+	status_t HandleGetSetKeyRepeatRate(BMessage*, BMessage*);
+	status_t HandleGetSetKeyMap(BMessage*, BMessage*);
+	status_t HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
 
-	void HandleFindDevices(BMessage*, BMessage*);
-	void HandleWatchDevices(BMessage*, BMessage*);
-	void HandleIsDeviceRunning(BMessage*, BMessage*);
-	void HandleStartStopDevices(BMessage*, BMessage*);
-	void HandleControlDevices(BMessage*, BMessage*);
-	void HandleSystemShuttingDown(BMessage*, BMessage*);
-	void HandleNodeMonitor(BMessage*);
+	status_t HandleFindDevices(BMessage*, BMessage*);
+	status_t HandleWatchDevices(BMessage*, BMessage*);
+	status_t HandleIsDeviceRunning(BMessage*, BMessage*);
+	status_t HandleStartStopDevices(BMessage*, BMessage*);
+	status_t HandleControlDevices(BMessage*, BMessage*);
+	status_t HandleSystemShuttingDown(BMessage*, BMessage*);
+	status_t HandleNodeMonitor(BMessage*);
 	
 	status_t EnqueueDeviceMessage(BMessage*);
 	status_t EnqueueMethodMessage(BMessage*);
@@ -161,7 +171,14 @@ private:
 	bigtime_t		sMouseClickSpeed;
 	int32			sKeyRepeatRate;
 	bigtime_t       sKeyRepeatDelay;
+	int32			sKeyboardLocks;
+	uint16			sKeyboardID;
 	mouse_map		sMouseMap;
+
+	key_info		s_key_info;		// current key info
+	key_map			s_key_map;		// current key_map
+	char			*sChars;		// current keymap chars
+	int32			sCharCount;		// current keymap char count
 	
 	port_id			ISPort;
 	port_id      	EventLooperPort;

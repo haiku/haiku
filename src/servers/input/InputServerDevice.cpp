@@ -32,7 +32,7 @@
 /*****************************************************************************/
 
 
-#include "InputServerDevice.h"
+#include <InputServerDevice.h>
 #include "InputServer.h"
 
 /**
@@ -198,7 +198,7 @@ BInputServerDevice::EnqueueMessage(BMessage *message)
 	}
 	return err;
 	*/
-	return B_OK;
+	return ((InputServer*)be_app)->EnqueueDeviceMessage(message);
 }
 
 

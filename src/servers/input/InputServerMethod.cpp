@@ -31,9 +31,9 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-
-#include "InputServerMethod.h"
-#include "Messenger.h"
+#include <InputServerMethod.h>
+#include <Messenger.h>
+#include "InputServer.h"
 
 /**
  *  Method: BInputServerMethod::BInputServerMethod()
@@ -72,9 +72,7 @@ BInputServerMethod::MethodActivated(bool active)
 status_t
 BInputServerMethod::EnqueueMessage(BMessage *message)
 {
-    status_t dummy;
-
-    return dummy;
+	return ((InputServer*)be_app)->EnqueueMethodMessage(message);
 }
 
 

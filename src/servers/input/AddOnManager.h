@@ -28,21 +28,30 @@ class AddOnManager {
 
 	private:
 		status_t	RegisterAddOn(BEntry &entry);
+		status_t	UnregisterAddOn(BEntry &entry);
 		void		RegisterAddOns();
 
-		void		RegisterDevice(BInputServerDevice *isd, const entry_ref &ref);
-		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref);
-		void		RegisterMethod(BInputServerMethod *ism, const entry_ref &ref);
+		void		RegisterDevice(BInputServerDevice *isd, const entry_ref &ref, image_id addon_image);
+		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref, image_id addon_image);
+		void		RegisterMethod(BInputServerMethod *ism, const entry_ref &ref, image_id addon_image);
 		
 	private:
 		struct device_info {
 			entry_ref ref;
+			_BDeviceAddOn_* addon;
+			image_id addon_image;
+			BInputServerDevice *isd;
 		};
 		struct filter_info {
 			entry_ref ref;
+			image_id addon_image;
+			BInputServerFilter *isf;
 		};
 		struct method_info {
 			entry_ref ref;
+			_BMethodAddOn_* addon;
+			image_id addon_image;
+			BInputServerMethod *ism;
 		};
 
 		BLocker fLock;

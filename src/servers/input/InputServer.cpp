@@ -42,6 +42,7 @@
 #include <Path.h>
 #include <String.h>
 
+
 #if DEBUG>=1
 	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
 	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
@@ -85,9 +86,7 @@ BList InputServer::mInputServerMethodList;
  */
 int main()
 {
-	InputServer	*myInputServer;
-	
-	myInputServer = new InputServer;
+	InputServer	*myInputServer = new InputServer;
 	
 	myInputServer->Run();
 	
@@ -106,7 +105,7 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
 	
 	EventLoop(pointer);
 
-	InitTestDevice();
+//	InitTestDevice();
 	
 	fAddOnManager = new AddOnManager();
 	fAddOnManager->LoadState();
@@ -578,10 +577,10 @@ InputServer::MessageReceived(BMessage *message)
 			HandleGetKeyboardID(message, reply);
 			break;
 		case IS_GET_CLICK_SPEED:
-			HandleGetClickSpeed(message, reply);
+			HandleGetSetClickSpeed(message, reply);
 			break;
 		case IS_SET_CLICK_SPEED:
-			HandleSetClickSpeed(message, reply);
+			HandleGetSetClickSpeed(message, reply);
 			break;
 		case IS_GET_KEY_REPEAT_RATE:
 			HandleGetSetKeyRepeatRate(message, reply);
@@ -658,7 +657,7 @@ InputServer::HandleSetMethod(BMessage *)
  *  Method: InputServer::HandleGetSetMouseType()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetMouseType(BMessage* message,
                                      BMessage* reply)
 {
@@ -667,7 +666,7 @@ InputServer::HandleGetSetMouseType(BMessage* message,
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_TYPE_CHANGED, NULL);
 	else
 		status = reply->AddInt32("mouse_type", sMouseType);
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -675,7 +674,7 @@ InputServer::HandleGetSetMouseType(BMessage* message,
  *  Method: InputServer::HandleGetSetMouseAcceleration()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetMouseAcceleration(BMessage* message,
                                              BMessage* reply)
 {
@@ -684,7 +683,7 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_ACCELERATION_CHANGED, NULL);
 	else
 		status = reply->AddInt32("mouse_acceleration", sMouseAcceleration);
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -692,7 +691,7 @@ InputServer::HandleGetSetMouseAcceleration(BMessage* message,
  *  Method: InputServer::HandleGetSetKeyRepeatDelay()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
                                           BMessage* reply)
 {
@@ -701,7 +700,7 @@ InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_DELAY_CHANGED, NULL);
 	else
 		status = reply->AddInt64("key_repeat_delay", sKeyRepeatDelay);
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -709,10 +708,11 @@ InputServer::HandleGetSetKeyRepeatDelay(BMessage* message,
  *  Method: InputServer::HandleGetKeyInfo()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetKeyInfo(BMessage *message,
                               BMessage *reply)
 {
+	return reply->AddData("key_info", B_ANY_TYPE, &s_key_info, sizeof(s_key_info));
 }
 
 
@@ -720,10 +720,11 @@ InputServer::HandleGetKeyInfo(BMessage *message,
  *  Method: InputServer::HandleGetModifiers()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetModifiers(BMessage *message,
                                 BMessage *reply)
 {
+	return reply->AddInt32("modifiers", s_key_info.modifiers);
 }
 
 
@@ -731,10 +732,21 @@ InputServer::HandleGetModifiers(BMessage *message,
  *  Method: InputServer::HandleSetModifierKey()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleSetModifierKey(BMessage *message,
                                   BMessage *reply)
 {
+	status_t status = B_ERROR;
+	int32 modifier, key;
+	if (message->FindInt32("modifier", &modifier) == B_OK
+		&& message->FindInt32("key", &key) == B_OK) {
+	
+		// TODO : impact the keymap
+	
+		// is SetModifierKey a keymap change ?
+		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
+	}
+	return status;
 }
 
 
@@ -742,9 +754,15 @@ InputServer::HandleSetModifierKey(BMessage *message,
  *  Method: InputServer::HandleSetKeyboardLocks()
  *   Descr: 
  */
-void InputServer::HandleSetKeyboardLocks(BMessage *message,
+status_t
+InputServer::HandleSetKeyboardLocks(BMessage *message,
                                     BMessage *reply)
 {
+	status_t status = B_ERROR;
+	if (message->FindInt32("locks", &sKeyboardLocks) == B_OK)
+		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_LOCKS_CHANGED, NULL);
+	
+	return status;
 }
 
 
@@ -752,7 +770,7 @@ void InputServer::HandleSetKeyboardLocks(BMessage *message,
  *  Method: InputServer::HandleGetSetMouseSpeed()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetMouseSpeed(BMessage* message,
                                       BMessage* reply)
 {
@@ -761,7 +779,7 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message,
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_SPEED_CHANGED, NULL);
 	else
 		status = reply->AddInt32("mouse_speed", sMouseSpeed);
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -769,7 +787,7 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message,
  *  Method: InputServer::HandleSetMousePosition()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 {
 	
@@ -803,6 +821,8 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
       		break;
    			
 		}
+	
+	return B_OK;
 }
 
 
@@ -810,7 +830,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
  *  Method: InputServer::HandleGetMouseMap()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetMouseMap(BMessage* message,
                                     BMessage* reply)
 {
@@ -823,7 +843,7 @@ InputServer::HandleGetSetMouseMap(BMessage* message,
 		status = ControlDevices(NULL, B_POINTING_DEVICE, B_MOUSE_MAP_CHANGED, NULL);
 	} else 
 		status = reply->AddData("mouse_map", B_RAW_TYPE, &sMouseMap, sizeof(sMouseMap) );
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -831,36 +851,28 @@ InputServer::HandleGetSetMouseMap(BMessage* message,
  *  Method: InputServer::HandleGetKeyboardID()
  *   Descr: 
  */
-void
-InputServer::HandleGetKeyboardID(BMessage *,
-                                      BMessage *)
+status_t
+InputServer::HandleGetKeyboardID(BMessage *message,
+                                      BMessage *reply)
 {
+	return reply->AddInt16("id", sKeyboardID);
 }
 
 
 /*
- *  Method: InputServer::HandleGetClickSpeed()
+ *  Method: InputServer::HandleGetSetClickSpeed()
  *   Descr: 
  */
-void
-InputServer::HandleGetClickSpeed(BMessage* message,
-                                      BMessage* reply)
+status_t
+InputServer::HandleGetSetClickSpeed(BMessage *message,
+                                      BMessage *reply)
 {
-	status_t status = reply->AddInt64("mouse_click_speed", sMouseClickSpeed);
-	message->SendReply(status, reply);
-}
-
-/*
- *  Method: InputServer::HandleSetClickSpeed()
- *   Descr: 
- */
-void
-InputServer::HandleSetClickSpeed(BMessage* message,
-                                      BMessage* reply)
-{
-	message->FindInt64("mouse_click_speed", &sMouseClickSpeed);
-	status_t status = ControlDevices(NULL, B_POINTING_DEVICE, B_CLICK_SPEED_CHANGED, NULL);
-	message->SendReply(status, reply);
+	status_t status = B_ERROR;
+	if (message->FindInt64("mouse_click_speed", &sMouseClickSpeed) == B_OK)
+		status = ControlDevices(NULL, B_POINTING_DEVICE, B_CLICK_SPEED_CHANGED, NULL);
+	else
+		status = reply->AddInt64("mouse_click_speed", sMouseClickSpeed);
+	return status;
 }
 
 
@@ -868,7 +880,7 @@ InputServer::HandleSetClickSpeed(BMessage* message,
  *  Method: InputServer::HandleGetSetKeyRepeatRate()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
                                          BMessage* reply)
 {
@@ -877,7 +889,7 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_REPEAT_RATE_CHANGED, NULL);
 	else
 		status = reply->AddInt32("key_repeat_rate", sKeyRepeatRate);
-	message->SendReply(status, reply);
+	return status;
 }
 
 
@@ -885,10 +897,21 @@ InputServer::HandleGetSetKeyRepeatRate(BMessage* message,
  *  Method: InputServer::HandleGetSetKeyMap()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleGetSetKeyMap(BMessage *message,
                                      BMessage *reply)
 {
+	status_t status;
+	if (message->what == IS_GET_KEY_MAP) {
+		status = reply->AddData("keymap", B_ANY_TYPE, &s_key_map, sizeof(s_key_map));
+		if (status == B_OK)
+			status = reply->AddData("key_buffer", B_ANY_TYPE, sChars, sCharCount);
+	} else {
+		// TODO : reload keymap
+		
+		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
+	}
+	return status;
 }
 
 
@@ -896,7 +919,7 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
  *  Method: InputServer::HandleFocusUnfocusIMAwareView()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
                                            BMessage *)
 {
@@ -907,10 +930,11 @@ InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
  *  Method: InputServer::HandleFindDevices()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleFindDevices(BMessage *message,
                                      BMessage *reply)
 {
+	
 }
 
 
@@ -918,7 +942,7 @@ InputServer::HandleFindDevices(BMessage *message,
  *  Method: InputServer::HandleWatchDevices()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleWatchDevices(BMessage *message,
                                      BMessage *reply)
 {
@@ -929,10 +953,11 @@ InputServer::HandleWatchDevices(BMessage *message,
  *  Method: InputServer::HandleIsDeviceRunning()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleIsDeviceRunning(BMessage *message,
                                      BMessage *reply)
 {
+	
 }
 
 
@@ -940,7 +965,7 @@ InputServer::HandleIsDeviceRunning(BMessage *message,
  *  Method: InputServer::HandleStartStopDevices()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleStartStopDevices(BMessage *message,
                                      BMessage *reply)
 {
@@ -951,7 +976,7 @@ InputServer::HandleStartStopDevices(BMessage *message,
  *  Method: InputServer::HandleControlDevices()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleControlDevices(BMessage *message,
                                      BMessage *reply)
 {
@@ -962,10 +987,12 @@ InputServer::HandleControlDevices(BMessage *message,
  *  Method: InputServer::HandleSystemShuttingDown()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleSystemShuttingDown(BMessage *message,
                                      BMessage *reply)
 {
+	status_t status;
+	return status;
 }
 
 
@@ -973,9 +1000,10 @@ InputServer::HandleSystemShuttingDown(BMessage *message,
  *  Method: InputServer::HandleNodeMonitor()
  *   Descr: 
  */
-void
+status_t
 InputServer::HandleNodeMonitor(BMessage *message)
 {
+
 }
 
 
@@ -983,7 +1011,8 @@ InputServer::HandleNodeMonitor(BMessage *message)
  *  Method: InputServer::EnqueueDeviceMessage()
  *   Descr: 
  */
-status_t InputServer::EnqueueDeviceMessage(BMessage *message)
+status_t 
+InputServer::EnqueueDeviceMessage(BMessage *message)
 {
 	//return (write_port(fEventPort, (int32)message, NULL, 0));
 	return (write_port(EventLooperPort, (int32)message, NULL, 0));
@@ -1333,74 +1362,74 @@ const BList* InputServer::GetNextEvents(BList *)
  *          The method returns true if the filters were applied to all
  *          events without error and false otherwise.
  */
-bool InputServer::FilterEvents(BList *eventsToFilter)
+bool
+InputServer::FilterEvents(BList *eventsToFilter)
 {
-	if (NULL != eventsToFilter)
+	if (NULL == eventsToFilter)
+		return false;
+	
+	BInputServerFilter* current_filter;
+	BMessage*           current_event;
+	int32               filter_index  = 0;
+	int32               event_index   = 0;
+
+	while (NULL != (current_filter = (BInputServerFilter*)mInputServerFilterList.ItemAt(filter_index) ) )
 	{
-		BInputServerFilter* current_filter;
-		BMessage*           current_event;
-		int32               filter_index  = 0;
-		int32               event_index   = 0;
-
-		while (NULL != (current_filter = (BInputServerFilter*)mInputServerFilterList.ItemAt(filter_index) ) )
+		// Apply the current filter to all available event messages.
+		//		
+		while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) )
 		{
-			// Apply the current filter to all available event messages.
-			//		
-			while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) )
+			// Storage for new event messages generated by the filter.
+			//
+			BList out_list;
+			
+			// Apply the current filter to the current event message.
+			//
+			filter_result result = current_filter->Filter(current_event, &out_list);
+			if (B_DISPATCH_MESSAGE == result)
 			{
-				// Storage for new event messages generated by the filter.
+				// Use the result in current_message; ignore out_list.
 				//
-				BList out_list;
-				
-				// Apply the current filter to the current event message.
-				//
-				filter_result result = current_filter->Filter(current_event, &out_list);
-				if (B_DISPATCH_MESSAGE == result)
-				{
-					// Use the result in current_message; ignore out_list.
-					//
-					event_index++;
+				event_index++;
 
-					// Free resources associated with items in out_list.
-					//
-					void* out_item; 
-					for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					{
-						delete out_item;
-					}
-				}
-				else if (B_SKIP_MESSAGE == result)
+				// Free resources associated with items in out_list.
+				//
+				void *out_item; 
+				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
 				{
-					// Use the result in out_list (if any); ignore current message.
-					//
-					eventsToFilter->RemoveItem(event_index);
-					eventsToFilter->AddList(&out_list, event_index);
-					event_index += out_list.CountItems();
-					
-					// NOTE: eventsToFilter now owns out_list's items.
+					delete out_item;
 				}
-				else
-				{
-					// Error - Free resources associated with items in out_list and return.
-					//
-					void* out_item;
-					for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					{
-						delete out_item;
-					}
-					return false;
-				}
-				
-				// NOTE: The BList destructor frees out_lists's resources here.
-				//       It does NOT free the resources associated with out_list's
-				//       member items - those should either already be deleted or
-				//       should be owned by eventsToFilter.
 			}
-
+			else if (B_SKIP_MESSAGE == result)
+			{
+				// Use the result in out_list (if any); ignore current message.
+				//
+				eventsToFilter->RemoveItem(event_index);
+				eventsToFilter->AddList(&out_list, event_index);
+				event_index += out_list.CountItems();
+				
+				// NOTE: eventsToFilter now owns out_list's items.
+			}
+			else
+			{
+				// Error - Free resources associated with items in out_list and return.
+				//
+				void* out_item;
+				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
+				{
+					delete out_item;
+				}
+				return false;
+			}
+			
+			// NOTE: The BList destructor frees out_lists's resources here.
+			//       It does NOT free the resources associated with out_list's
+			//       member items - those should either already be deleted or
+			//       should be owned by eventsToFilter.
 		} // while()
-		
+	
 		filter_index++;
-		
+	
 	} // while()
 	
 	return true;	
@@ -1444,15 +1473,17 @@ status_t InputServer::StartStopDevices(const char*       deviceName,
 		if (NULL != item)
 		{
 			BInputServerDevice* isd = item->mIsd;
-			input_device_ref*   dev = item->mDev;
+			input_device_ref   dev = item->mDev;
 			PRINT(("Hey\n"));
-			if ( (NULL != isd) && (NULL != dev) )
+			if ( (NULL != isd) )
 			{
-				PRINT(("  Starting/stopping: %s\n", dev->name));
-				if (deviceType == dev->type)
+				PRINT(("  Starting/stopping: %s\n", dev.name));
+				if (deviceType == dev.type)
 				{
-					if (doStart) isd->Start(dev->name, dev->cookie);
-					else          isd->Stop(dev->name, dev->cookie);
+					if (doStart) 
+						isd->Start(dev.name, dev.cookie);
+					else
+						isd->Stop(dev.name, dev.cookie);
 				}
 			}
 		}
@@ -1481,11 +1512,11 @@ status_t InputServer::ControlDevices(const char* deviceName,
 		if (NULL != item)
 		{
 			BInputServerDevice* isd = item->mIsd;
-			input_device_ref*   dev = item->mDev;
-			if ( (NULL != isd) && (NULL != dev) )
+			input_device_ref   dev = item->mDev;
+			if ( (NULL != isd) )
 			{
-				PRINT(("  Controlling: %s\n", dev->name));
-				if (deviceType == dev->type)
+				PRINT(("  Controlling: %s\n", dev.name));
+				if (deviceType == dev.type)
 				{
 					// :TODO: Descriminate based on Device Name also.
 					
