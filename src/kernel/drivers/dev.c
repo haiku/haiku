@@ -194,14 +194,13 @@ error:
 }
 
 
+/* This is no longer part of the public kernel API, so we just export the symbol */
+int load_driver_symbols(const char *driver_name);
 int
-load_driver_symbols(const char * driver_name)
+load_driver_symbols(const char *driver_name)
 {
-	// phoudoin: currently, elf_load_kspace() keep in memory symbols list with
-	// the image info, and the KDL back trace utility use it.
-	// So we don't have anything more to do here.
-	// TODO: However, in the future, as we may have image symbols list
-	// not loaded anymore in memory, we should do something here then!!! 
+	// This will be globally done for the whole kernel via the settings file.
+	// We don't have to do anything here.
 
 	return B_OK;
 }
