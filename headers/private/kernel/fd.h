@@ -50,6 +50,7 @@ struct file_descriptor {
 	} u;
 	void	*cookie;
 	int32	open_mode;
+	off_t	pos;
 };
 
 
