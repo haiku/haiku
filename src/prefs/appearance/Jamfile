@@ -13,6 +13,7 @@ Preference Appearance :
 	PreviewDriver.cpp
 	RGBColor.cpp
 	ColorWell.cpp
+	ColorWhichItem.cpp
 	ColorSet.cpp
 	ServerCursor.cpp
 	ServerBitmap.cpp

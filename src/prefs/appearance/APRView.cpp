@@ -1,15 +1,37 @@
-/*
-	APRView.cpp:	The Appearance app's color handler
-	
-	Handles all the grunt work. Color settings are stored in a BMessage to
-	allow for easy transition to and from disk. The messy details are in the
-	hard-coded strings to translate the enumerated color_which defines to
-	strings and such, but even those should be easy to maintain.
-*/
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		APRView.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	color handler for the app
+//  
+//	Handles all the grunt work. Color settings are stored in a BMessage to
+//	allow for easy transition to and from disk. The messy details are in the
+//	hard-coded strings to translate the enumerated color_which defines to
+//	strings and such, but even those should be easy to maintain.
+//------------------------------------------------------------------------------
 #include <OS.h>
 #include <Directory.h>
 #include <Alert.h>
-#include <Path.h>
+#include <storage/Path.h>
 #include <Entry.h>
 #include <File.h>
 #include <Screen.h>	// for settings Desktop color
@@ -20,6 +42,8 @@
 #include "defs.h"
 #include "ColorWell.h"
 #include <ColorUtils.h>
+#include <InterfaceDefs.h>
+#include "ColorWhichItem.h"
 
 //#define DEBUG_COLORSET
 
@@ -35,8 +59,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	BRect rect(10,60,110,160);
 
 	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
@@ -71,6 +93,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 
 	// Set up list of color attributes
+	BRect rect(10,60,200,160);
 	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
@@ -80,15 +103,37 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	attrlist->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
-	attrlist->AddItem(new BStringItem("Window Background"));
-	attrlist->AddItem(new BStringItem("Menu Background"));
-	attrlist->AddItem(new BStringItem("Selected Menu Background"));
-	attrlist->AddItem(new BStringItem("Menu Text"));
-	attrlist->AddItem(new BStringItem("Selected Menu Text"));
-	attrlist->AddItem(new BStringItem("Window Tab"));
-	attrlist->AddItem(new BStringItem("Keyboard Navigation"));
-	attrlist->AddItem(new BStringItem("Desktop Color"));
+	attrlist->AddItem(new ColorWhichItem(B_PANEL_BACKGROUND_COLOR));
+#ifndef BUILD_UNDER_R5
+	attrlist->AddItem(new ColorWhichItem(B_PANEL_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_DOCUMENT_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_DOCUMENT_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_CONTROL_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_CONTROL_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_CONTROL_BORDER_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_CONTROL_HIGHLIGHT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_NAVIGATION_BASE_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_NAVIGATION_PULSE_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_SHINE_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_SHADOW_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_BORDER_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_TOOLTIP_BACKGROUND_COLOR));
 	
+	attrlist->AddItem(new ColorWhichItem(B_SUCCESS_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_FAILURE_COLOR));
+#else
+	attrlist->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTION_BACKGROUND_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
+	attrlist->AddItem(new ColorWhichItem(B_KEYBOARD_NAVIGATION_COLOR));
+#endif	
+	attrlist->AddItem(new ColorWhichItem(B_WINDOW_TAB_COLOR));
+
 	picker=new BColorControl(BPoint(scrollview->Frame().right+20,scrollview->Frame().top),B_CELLS_32x8,5.0,"Picker",
 		new BMessage(UPDATE_COLOR));
 	AddChild(picker);
@@ -276,10 +321,11 @@ printf("MSG: Save Request - couldn't find file name\n");
 		case ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI attribute from the list
-			attribute=SelectionToAttribute(attrlist->CurrentSelection());
-			attrstring=SelectionToString(attrlist->CurrentSelection());
+			ColorWhichItem *whichitem=(ColorWhichItem*)attrlist->ItemAt(attrlist->CurrentSelection());
+			if(!whichitem)
+				break;
 			
-			rgb_color col=GetColorFromMessage(&settings,attrstring.String(),0);
+			rgb_color col=GetColorFromMessage(&settings,whichitem->Text(),0);
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
@@ -525,40 +571,6 @@ printf("SaveColorSet: Error in adding item to menu\n");
 	SetColorSetName(name.String());
 }
 
-color_which APRView::SelectionToAttribute(int32 index)
-{
-	// This simply converts the selected index to the appropriate color_which
-	// attribute. A bit of a hack, but it should be relarively easy to maintain
-	switch(index)
-	{	
-		case 0:
-			return B_PANEL_BACKGROUND_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 1:
-			return B_MENU_BACKGROUND_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 2:
-			return B_MENU_SELECTION_BACKGROUND_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 3:
-			return B_MENU_ITEM_TEXT_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 4:
-			return B_MENU_SELECTED_ITEM_TEXT_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 5:
-			return B_WINDOW_TAB_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		case 6:
-			return B_KEYBOARD_NAVIGATION_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-		default:
-			return B_DESKTOP_COLOR;
-			break;	// not necessary, but do it anyway. ;)
-	}
-	
-}
-
 void APRView::SetColorSetName(const char *name)
 {
 	if(!name)
@@ -616,17 +628,14 @@ printf("Color set folder not found. Creating %s\n",SETTINGS_DIR);
 #ifdef DEBUG_COLORSET
 printf("Couldn't open file %s for read\n",path.String());
 #endif
+		SetDefaults();
+		SaveSettings();
 		return;
 	}
 	if(settings.Unflatten(&file)==B_OK)
 	{
 		settings.FindString("name",colorset_name);
 		SetColorSetName(colorset_name->String());
-
-		BScreen screen;
-		rgb_color col=screen.DesktopColor();
-		settings.ReplaceData("DESKTOP",(type_code)'RGBC',
-		&col,sizeof(rgb_color));
 
 		picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
 		colorwell->SetColor(picker->ValueAsColor());
@@ -644,8 +653,82 @@ printf("Error unflattening SystemColors file %s\n",path.String());
 	SetDefaults();
 	SaveSettings();
 #else
-	// TODO:
-	// Write the server query code
+	// We will query the app_server via a bunch of ui_color() calls and then
+	// add the appropriate colors to the message
+	rgb_color col;
+	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
+
+	col=ui_color(whichitem.GetAttribute());
+	settings.AddData("B_PANEL_BACKGROUND_COLOR",(type_code)'RGBC',&col,sizeof(rgb_color));
+
+#ifndef BUILD_UNDER_R5
+	whichitem.SetAttribute();
+	col=ui_color(B_PANEL_TEXT_COLOR);
+	whichitem.SetAttribute(B_PANEL_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	whichitem.SetAttribute(B_DOCUMENT_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_DOCUMENT_TEXT_COLOR);
+	whichitem.SetAttribute(B_DOCUMENT_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_CONTROL_BACKGROUND_COLOR);
+	whichitem.SetAttribute(B_CONTROL_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_CONTROL_TEXT_COLOR);
+	whichitem.SetAttribute(B_CONTROL_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_CONTROL_BORDER_COLOR);
+	whichitem.SetAttribute(B_CONTROL_BORDER_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+	whichitem.SetAttribute(B_CONTROL_HIGHLIGHT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_NAVIGATION_BASE_COLOR);
+	whichitem.SetAttribute(B_NAVIGATION_BASE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_NAVIGATION_PULSE_COLOR);
+	whichitem.SetAttribute(B_NAVIGATION_PULSE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_SHINE_COLOR);
+	whichitem.SetAttribute(B_SHINE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_SHADOW_COLOR);
+	whichitem.SetAttribute(B_SHADOW_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_MENU_SELECTED_BORDER_COLOR);
+	whichitem.SetAttribute(B_MENU_SELECTED_BORDER_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_TOOLTIP_BACKGROUND_COLOR);
+	whichitem.SetAttribute(B_TOOLTIP_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_TOOLTIP_TEXT_COLOR);
+	whichitem.SetAttribute(B_TOOLTIP_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_SUCCESS_COLOR);
+	whichitem.SetAttribute(B_SUCCESS_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_FAILURE_COLOR);
+	whichitem.SetAttribute(B_FAILURE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+#endif
+	col=ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR);
+	whichitem.SetAttribute(B_MENU_SELECTED_ITEM_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_MENU_BACKGROUND_COLOR);
+	whichitem.SetAttribute(B_MENU_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_MENU_SELECTION_BACKGROUND_COLOR);
+	whichitem.SetAttribute(B_MENU_SELECTION_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_MENU_ITEM_TEXT_COLOR);
+	whichitem.SetAttribute(B_MENU_ITEM_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+	col=ui_color(B_WINDOW_TAB_COLOR);
+	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	
 #endif
 }
 
@@ -657,30 +740,108 @@ printf("Initializing color settings to defaults\n");
 	settings.MakeEmpty();
 	settings.AddString("name","Default");
 	colorset_name->SetTo("Default");
-	
+
+	ColorWhichItem whichitem(B_PANEL_BACKGROUND_COLOR);
 	rgb_color col={216,216,216,255};
-	settings.AddData("PANEL_BACKGROUND",(type_code)'RGBC',&col,sizeof(rgb_color));
 
-	SetRGBColor(&col,219,219,219,0);
-	settings.AddData("MENU_BACKGROUND",(type_code)'RGBC',&col,sizeof(rgb_color));
-
-	SetRGBColor(&col,115,120,184);
-	settings.AddData("MENU_SELECTION_BACKGROUND",(type_code)'RGBC',&col,sizeof(rgb_color));
-
+#ifndef BUILD_UNDER_R5
 	SetRGBColor(&col,0,0,0);
-	settings.AddData("MENU_ITEM_TEXT",(type_code)'RGBC',&col,sizeof(rgb_color));
+	whichitem.SetAttribute(B_PANEL_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,255,255,255);
-	settings.AddData("MENU_SELECTED_ITEM_TEXT",(type_code)'RGBC',&col,sizeof(rgb_color));
+	whichitem.SetAttribute(B_DOCUMENT_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
-	SetRGBColor(&col,255,203,0);
-	settings.AddData("WINDOW_TAB",(type_code)'RGBC',&col,sizeof(rgb_color));
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_DOCUMENT_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
-	SetRGBColor(&col,0,0,229);
-	settings.AddData("KEYBOARD_NAVIGATION",(type_code)'RGBC',&col,sizeof(rgb_color));
+	SetRGBColor(&col,245,245,245);
+	whichitem.SetAttribute(B_CONTROL_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_CONTROL_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_CONTROL_BORDER_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,115,120,184);
+	whichitem.SetAttribute(B_CONTROL_HIGHLIGHT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,170,50,184);
+	whichitem.SetAttribute(B_NAVIGATION_BASE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_NAVIGATION_PULSE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,255,255,255);
+	whichitem.SetAttribute(B_SHINE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_SHADOW_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_MENU_SELECTED_BORDER_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,255,255,0);
+	whichitem.SetAttribute(B_TOOLTIP_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_TOOLTIP_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,255,0);
+	whichitem.SetAttribute(B_SUCCESS_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,255,0,0);
+	whichitem.SetAttribute(B_FAILURE_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 	SetRGBColor(&col,51,102,160);
-	settings.AddData("DESKTOP",(type_code)'RGBC',&col,sizeof(rgb_color));
+	whichitem.SetAttribute(B_MENU_SELECTED_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+#else
+	SetRGBColor(&col,51,102,160);
+	whichitem.SetAttribute(B_MENU_SELECTION_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,51,102,160);
+	whichitem.SetAttribute(B_KEYBOARD_NAVIGATION_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+#endif
+
+	whichitem.SetAttribute(B_PANEL_BACKGROUND_COLOR);
+	SetRGBColor(&col,216,216,216);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,216,216,216,0);
+	whichitem.SetAttribute(B_MENU_BACKGROUND_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,0,0,0);
+	whichitem.SetAttribute(B_MENU_ITEM_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,255,255,255);
+	whichitem.SetAttribute(B_MENU_SELECTED_ITEM_TEXT_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
+
+	SetRGBColor(&col,255,203,0);
+	whichitem.SetAttribute(B_WINDOW_TAB_COLOR);
+	settings.AddData(whichitem.Text(),(type_code)'RGBC',&col,sizeof(rgb_color));
 
 //	BString labelstr("Color Set: ");
 //	labelstr+=colorset_name->String();
@@ -769,74 +930,16 @@ printf("NotifyServer: Setting Desktop color to "); PrintRGBColor(col);
 
 rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 index=0)
 {
+	
 	// Simple function to do the dirty work of getting an rgb_color from
 	// a message
 	rgb_color *col,rcolor={0,0,0,0};
 	ssize_t size;
 
+	if(!msg || !name)
+		return rcolor;
+
 	if(msg->FindData(name,(type_code)'RGBC',index,(const void**)&col,&size)==B_OK)
 		rcolor=*col;
 	return rcolor;
-}
-
-const char *APRView::AttributeToString(const color_which &attr)
-{
-	switch(attr)
-	{
-		case B_PANEL_BACKGROUND_COLOR:
-			return "PANEL_BACKGROUND";
-			break;
-		case B_MENU_BACKGROUND_COLOR:
-			return "MENU_BACKGROUND";
-			break;
-		case B_MENU_SELECTION_BACKGROUND_COLOR:
-			return "MENU_SELECTION_BACKGROUND";
-			break;
-		case B_MENU_ITEM_TEXT_COLOR:
-			return "MENU_ITEM_TEXT";
-			break;
-		case B_MENU_SELECTED_ITEM_TEXT_COLOR:
-			return "MENU_SELECTED_ITEM_TEXT";
-			break;
-		case B_WINDOW_TAB_COLOR:
-			return "WINDOW_TAB";
-			break;
-		case B_KEYBOARD_NAVIGATION_COLOR:
-			return "KEYBOARD_NAVIGATION";
-			break;
-		default:
-			return "DESKTOP";
-			break;
-	}
-}
-
-const char *APRView::SelectionToString(int32 index)
-{
-	switch(index)
-	{
-		case 0:
-			return "PANEL_BACKGROUND";
-			break;
-		case 1:
-			return "MENU_BACKGROUND";
-			break;
-		case 2:
-			return "MENU_SELECTION_BACKGROUND";
-			break;
-		case 3:
-			return "MENU_ITEM_TEXT";
-			break;
-		case 4:
-			return "MENU_SELECTED_ITEM_TEXT";
-			break;
-		case 5:
-			return "WINDOW_TAB";
-			break;
-		case 6:
-			return "KEYBOARD_NAVIGATION";
-			break;
-		default:
-			return "DESKTOP";
-			break;
-	}
 }
