@@ -449,7 +449,7 @@ BChannelSlider::DrawThumbFrame(BView *where, const BRect &area)
 
 
 bool
-BChannelSlider::Vertical()
+BChannelSlider::Vertical() const
 {
 	return fVertical;
 }

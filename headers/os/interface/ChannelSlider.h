@@ -149,7 +149,7 @@ virtual	void _Reserved_BChannelSlider_7(void *, ...);
 		void DrawThumbFrame(
 				BView * where,
 				const BRect & area);
-		bool Vertical();
+		bool Vertical() const;
 		void Redraw();
 		void MouseMovedCommon(BPoint , BPoint );
 };
