@@ -31,47 +31,64 @@ typedef int benaphore;
 
 // Networking layer(s) definitions
 typedef struct net_layer net_layer;
+typedef struct net_layer_module_info net_layer_module_info;
 #define NET_LAYER_MODULES_ROOT	"network/layers/"
 
-typedef struct net_layer_module_info {
+struct net_layer_module_info {
 	module_info	info;
 	
 	status_t (*init)(net_layer *me);
 	status_t (*uninit)(net_layer *me);
 	status_t (*enable)(net_layer *me, bool enable);
 	status_t (*control)(net_layer *me, int opcode, ...);
-	status_t (*input_buffer)(net_layer *me, struct net_buffer *buffer);
-	status_t (*output_buffer)(net_layer *me, struct net_buffer *buffer);
-} net_layer_module_info;
+	status_t (*process_input)(net_layer *me, struct net_buffer *buffer);
+	status_t (*process_output)(net_layer *me, struct net_buffer *buffer);
+};
 
 struct net_layer {
-	struct net_layer 				*next;
-	char 							*name;
-	net_layer_module_info 			*module;
-	void 							*cookie;
-	struct net_layer 				**layers_above;
-	struct net_layer				**layers_below;
+	struct net_layer 		*next;
+	char 					*name;
+	char 					*type;		// "frame", "ethernet" "ipv4", "ppp", etc. Joker (*) allowed
+	char					*sub_type;	// joker (*) allowed here too.
+	int						priority;	// negative values reserved for packet sniffing, high value = lesser priority
+	net_layer_module_info 	*module;
+	void 					*cookie;
+	uint32					use_count;	
+	struct net_layer 		**layers_above;
+	struct net_layer		**layers_below;
 };
 
-// Networking attributs
+
+// Networking attributes
+typedef const void *net_attribute_id;
+
+#define NET_ATTRIBUTE_TYPE_MASK 	0xFF		// Up to 256 basic types
+#define NET_ATTRIBUTE_FLAGS_MASK	0xFFFFFF00
 enum {
-	NET_ATTRIBUT_BOOL,
-	NET_ATTRIBUT_BYTE,
-	NET_ATTRIBUT_INT16,
-	NET_ATTRIBUT_INT32,
-	NET_ATTRIBUT_INT64,
-	NET_ATTRIBUT_DATA,
-	NET_ATTRIBUT_STRING,
-	NET_ATTRIBUT_POINTER
+	NET_ATTRIBUTE_BOOL,
+	NET_ATTRIBUTE_BYTE,
+	NET_ATTRIBUTE_INT16,
+	NET_ATTRIBUTE_INT32,
+	NET_ATTRIBUTE_INT64,
+	NET_ATTRIBUTE_DATA,
+	NET_ATTRIBUTE_STRING,
+	NET_ATTRIBUTE_POINTER,
+	NET_ATTRIBUTE_IOVEC
 };
+
 
 // Network stack main module definition
 
 struct net_stack_module_info {
 	module_info	module;
 
+	// Global stack control
 	status_t (*start)(void);
 	status_t (*stop)(void);
+
+	// Attributes IDs atomizer
+	net_attribute_id (*register_attribute_id)(const char *name);
+	
 	
 	/*
 	 * Socket layer
@@ -81,17 +98,18 @@ struct net_stack_module_info {
 	 * Net layers handling
 	 */
 	
-	status_t 	(*register_layer)(const char *name, net_layer_module_info *module, void *cookie, net_layer **me);
+	status_t 	(*register_layer)(const char *name, const char *type, int priority,
+					net_layer_module_info *module, void *cookie, net_layer **layer);
 	status_t 	(*unregister_layer)(net_layer *layer);
 	net_layer *	(*find_layer)(const char *name);
 
-	status_t 	(*add_layer_attribut)(net_layer *layer, const char *name, int type, ...);
-	status_t 	(*remove_layer_attribut)(net_layer *layer, const char *name);
-	status_t 	(*find_layer_attribut)(net_layer *layer, const char *name,
-					int *type, void **attribut, size_t *size);
+	status_t 	(*add_layer_attribute)(net_layer *layer, net_attribute_id id, int type, ...);
+	status_t 	(*remove_layer_attribute)(net_layer *layer, net_attribute_id id);
+	status_t 	(*find_layer_attribute)(net_layer *layer, net_attribute_id id,
+					int *type, void **value, size_t *size);
 	
-	status_t  	(*push_buffer_up)(net_layer *me, net_buffer *buffer);
-	status_t  	(*push_buffer_down)(net_layer *me, net_buffer *buffer);
+	status_t  	(*send_up)(net_layer *me, net_buffer *buffer);
+	status_t  	(*send_down)(net_layer *me, net_buffer *buffer);
 
 	/*
 	 * Buffer(s) support
@@ -116,15 +134,18 @@ struct net_stack_module_info {
 
 	uint32 			(*read_buffer)(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
 	uint32 			(*write_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
-	
-	status_t 		(*add_buffer_attribut)(net_buffer *buffer, const char *name, int type, ...);
-	status_t 		(*remove_buffer_attribut)(net_buffer *buffer, const char *name);
-	status_t 		(*find_buffer_attribut)(net_buffer *buffer, const char *name,
-						int *type, void **attribut, size_t *size);
+
+	// Flags to combine with  
+	#define FROM_BUFFER		0x010000
+	#define NETWORK_ORDER	0x020000	
+	status_t 		(*add_buffer_attribute)(net_buffer *buffer, net_attribute_id id, int type, ...);
+	status_t 		(*remove_buffer_attribute)(net_buffer *buffer, net_attribute_id id);
+	status_t 		(*find_buffer_attribute)(net_buffer *buffer, net_attribute_id id,
+						int *type, void **value, size_t *size);
 	
 	void			(*dump_buffer)(net_buffer *buffer);
 
-	// Buffer queues support
+	// Buffers queues support
 	net_buffer_queue * (*new_buffer_queue)(size_t max_bytes);
 	status_t 		(*delete_buffer_queue)(net_buffer_queue *queue);
 
@@ -142,13 +163,16 @@ struct net_stack_module_info {
 	
 	// Lockers
 	
+	// Misc.
+	void 	(*dump_memory)(const char *prefix, const void *data, uint32 len);
+	
 	// Memory Pools support
 	memory_pool *	(*new_pool)(size_t node_size, uint32 node_count);
 	status_t		(*delete_pool)(memory_pool *pool);
 	void *			(*new_pool_node)(memory_pool *pool);
 	status_t		(*delete_pool_node)(memory_pool *pool, void *node);
 	status_t		(*for_each_pool_node)(memory_pool *pool, pool_iterate_func iterate, void *cookie);
-	
+
 };
 
 #define NET_STACK_MODULE_NAME	"network/stack/v1"

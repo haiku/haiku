@@ -13,8 +13,6 @@
 
 struct net_stack_module_info * g_stack = NULL;
 
-
-
 void my_free(void * ptr, ...)
 {
 	printf("my_free(%p)\n", ptr);
@@ -103,7 +101,7 @@ int main(int argc, char **argv)
 		fflush(stdin);
 		fgetc(stdin);;
 		
-		test_buffer();
+		// test_buffer();
 
 		g_stack->stop();
 	};

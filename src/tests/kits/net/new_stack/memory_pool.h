@@ -18,7 +18,7 @@ typedef struct memory_pool memory_pool;
 // for_each_pool_node() callback prototype:
 typedef status_t (*pool_iterate_func)(memory_pool * pool, void * node, void * cookie);
 
-struct memory_pool_module_info {
+typedef struct {
 	module_info	module;
 
 	memory_pool *	(*new_pool)(size_t node_size, uint32 node_count);
@@ -26,7 +26,7 @@ struct memory_pool_module_info {
 	void *			(*new_pool_node)(memory_pool * pool);
 	status_t		(*delete_pool_node)(memory_pool * pool, void * node);
 	status_t		(*for_each_pool_node)(memory_pool * pool, pool_iterate_func iterate, void * cookie);
-};
+} memory_pool_module_info;
 
 #define MEMORY_POOL_MODULE_NAME	"generic/memory_pool/v1"
 
