@@ -88,6 +88,63 @@ case 3:	teamIDList is not NULL and not empty, signature is not NULL and
 		app(s) with this signature is (are) running =>
 		Should append the team IDs of all running apps with the supplied
 		signature to teamIDList.
+		
+void GetRecentApps(BMessage *refList, int32 maxCount)
+case A1:	refList is NULL; maxCount < 0
+			R5: crashes
+			OBOS: should quietly do nothing.
+case A1:	refList is NULL; maxCount == 0
+			R5: crashes
+			OBOS: should quietly do nothing.
+case A1:	refList is NULL; maxCount > 0
+			R5: crashes
+			OBOS: should quietly do nothing.
+case B1:	refList is valid; maxCount < 0
+			Should return zero recent apps
+case B2:	refList is valid; maxCount == 0
+			Should return zero recent apps
+case B3:	refList is valid; maxCount > 0
+			Should return maxCount apps
+case C1:	Normal function, with the second most recent app being one with a
+			qualifying BEOS:APP_FLAGS attribute, and the most recent app launched
+			being one with no BEOS:APP_FLAGS attribute.
+			The latter application should *not* appear at the top
+			of the recent apps list.
+case C2:	Normal function, with the second most recent app being one with a
+			qualifying BEOS:APP_FLAGS attribute, and the most recent app launched
+			also being one with a qualifying BEOS:APP_FLAGS attribute.
+			The latter application *should* appear at the top of the recent
+			apps list.
+case C3:	Normal function, with the second most recent app being one with a
+			qualifying BEOS:APP_FLAGS attribute, and the most recent app launched
+			being one with a non-qualifying BEOS:APP_FLAGS attribute.
+			The latter application *should* appear at the top of the recent
+			apps list.
+
+void GetRecentDocuments(BMessage *refList, int32 maxCount, const char *fileType,
+                        const char *appSig)
+void GetRecentDocuments(BMessage *refList, int32 maxCount, const char *fileTypes[],
+                        int32 fileTypesCount, const char *appSig)
+case 1:	refList is NULL; all other params are valid.
+		Should quietly do nothing.
+case 3:	refList is non-NULL, maxCount is zero, fileType and appSig are NULL.
+		R5: Returns one recent document.
+		OBOS: Returns an empty message
+case 4:	refList is non-NULL, maxCount is negative, fileType and appSig are NULL.
+		R5: Returns one recent document.
+		OBOS: Returns an empty message
+case 5:	Normal function.
+
+void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
+case 1:	refList is NULL; maxCount is valid, appSig is NULL.
+		Should quietly do nothing.
+case 2:	refList is valid, maxCount is negative, appSig is NULL.
+		R5: Returns one recent document.
+		OBOS: Returns an empty message.
+case 3:	refList is valid, maxCount is zero, appSig is NULL.
+		R5: Returns one recent document.
+		OBOS: Returns an empty message.
+case 4: Normal function
 
 status_t FindApp() const: common cases
 case 1:	uninstalled type mimeType =>
