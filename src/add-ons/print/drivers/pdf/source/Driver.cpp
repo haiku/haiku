@@ -41,22 +41,6 @@ THE SOFTWARE.
 
 static PrinterDriver *instanciate_driver(BNode *spoolDir);
 
-/*  ======== For testing only ================== */
-
-//#include "MessagePrinter.h"
-
-//static MessagePrinter* make_Printer();
-
-/**
- * Static initilizer function
- *
- * @param none
- * @return MessagePrinter* instance 
- */
-//static MessagePrinter* make_Printer() {
-//	return new MessagePrinter();
-//}
-
 //  ======== For testing only ==================
 
 BMessage* 
@@ -87,18 +71,7 @@ config_page(BNode *spoolDir, BMessage *msg)
 
 	pagesetupMsg = new BMessage(*msg);
 	
-	PrinterSettings::Update(spoolDir, msg);
-
-/* ======== For testing only ==================
-	
-	MessagePrinter *mp = make_Printer();
-	if (mp->Print(pagesetupMsg) == B_OK) {
-		(new BAlert("", "config_page:MessagePrinter", "OK"))->Go(); 
-	} else {
-		(new BAlert("", "config_page:MessagePrinter", "ERROR"))->Go(); 
-	}
-	
-  ======== For testing only ================== */ 
+	PrinterSettings::Update(spoolDir, pagesetupMsg);
 
 	// retrieve the printer (spool) name.
 	printerName = NULL;
@@ -109,6 +82,7 @@ config_page(BNode *spoolDir, BMessage *msg)
 	driver = instanciate_driver(spoolDir);
 	if (driver->PageSetup(pagesetupMsg, printerName) == B_OK) {
 		pagesetupMsg->what = 'okok';
+		PrinterSettings::Update(spoolDir, pagesetupMsg);
 	} else {
 		delete pagesetupMsg;
 		pagesetupMsg = NULL;
@@ -133,17 +107,6 @@ config_job(BNode *spoolDir, BMessage *msg)
 
 	PrinterSettings::Update(spoolDir, jobsetupMsg);
 
-/* ======== For testing only ==================
-
-	MessagePrinter *mp = make_Printer();
-	if (mp->Print(jobsetupMsg) == B_OK) {
-		(new BAlert("", "config_job:MessagePrinter", "OK"))->Go(); 
-	} else {
-		(new BAlert("", "config_job:MessagePrinter", "ERROR"))->Go(); 
-	}		
-	
-  ======== For testing only ================== */ 
-
 	// retrieve the printer (spool) name.
 	printerName = NULL;
 	if (spoolDir->ReadAttr("Printer Name", B_STRING_TYPE, 1, buffer, B_ATTR_NAME_LENGTH+1) > 0) {
@@ -152,6 +115,7 @@ config_job(BNode *spoolDir, BMessage *msg)
 	driver = instanciate_driver(spoolDir);
 	if (driver->JobSetup(jobsetupMsg, printerName) == B_OK) {
 		jobsetupMsg->what = 'okok';
+		PrinterSettings::Update(spoolDir, jobsetupMsg);
 	} else {
 		delete jobsetupMsg;
 		jobsetupMsg = NULL;

@@ -62,8 +62,6 @@ static bool InList(const char* list[], const char* name) {
 	return false;
 } 
 
-#include <stdio.h>
-
 // --------------------------------------------------
 // copied from BeUtils.cpp
 void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const char* excludeList[], const char* includeList[]) {
@@ -74,7 +72,6 @@ void AddFields(BMessage* to, const BMessage* from, bool overwrite = true, const 
 	for (int32 i = 0; from->GetInfo(B_ANY_TYPE, i, &name, &type, &count) == B_OK; i ++) {
 		const void* data;
 		ssize_t size;
-
 		if (excludeList && InList(excludeList, name)) continue;
 		if (includeList && !InList(includeList, name)) continue;
 

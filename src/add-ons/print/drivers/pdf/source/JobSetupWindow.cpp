@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include <stdlib.h>
 
 #include "PrinterDriver.h"
-#include "PrinterSettings.h"
 #include "JobSetupWindow.h"
 #include "DocInfoWindow.h"
 
@@ -260,12 +259,6 @@ JobSetupWindow::UpdateJobMessage()
 	fSetupMsg->ReplaceInt32("first_page", from);
 	fSetupMsg->ReplaceInt32("last_page", to);
 	AddFields(fSetupMsg, &fDocInfo);
-
-	// save the settings to the new defaults
-	PrinterSettings ps(fPrinterName.String());
-	if (ps.InitCheck() == B_OK) {
-		ps.WriteSettings(fSetupMsg);
-	}
 }
 
 

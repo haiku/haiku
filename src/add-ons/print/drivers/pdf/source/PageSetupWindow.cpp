@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include "PageSetupWindow.h"
 
 #include "MarginView.h"
-#include "PrinterSettings.h"
 #include "FontsWindow.h"
 #include "AdvancedSettingsWindow.h"
 
@@ -501,12 +500,6 @@ PageSetupWindow::UpdateSetupMessage()
 		} else {
 			fSetupMsg->AddInt32("close_option", i);
 		}
-	}
-
-	// save the settings to the new defaults
-	PrinterSettings ps(fPrinterDirName.String());
-	if (ps.InitCheck() == B_OK) {
-		ps.WriteSettings(fSetupMsg);
 	}
 }
 
