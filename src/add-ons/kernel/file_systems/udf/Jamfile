@@ -35,7 +35,6 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	DiskStructures.cpp
 	Icb.cpp
 	MetadataPartition.cpp
-	PartitionMap.cpp
 	PhysicalPartition.cpp
 	Recognition.cpp
 	SparablePartition.cpp
