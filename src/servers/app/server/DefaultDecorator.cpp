@@ -473,8 +473,10 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	
 	// For quick calculation of gradients for each side. Top is same as left, right is same as
 	// bottom
-	int8 rightindices[borderwidth],leftindices[borderwidth];
-
+//	int8 rightindices[borderwidth],leftindices[borderwidth];
+	int8 *rightindices=new int8[borderwidth],
+		*leftindices=new int8[borderwidth];
+	
 	if(borderwidth==5)
 	{
 		leftindices[0]=2;
@@ -494,31 +496,37 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 		// TODO: figure out border colors for floating window look
 	}
 	
+	// Variables used in each calculation
+	int32 startx,endx,starty,endy,i;
+	bool topcorner,bottomcorner,leftcorner,rightcorner;
+	int8 step,colorindex;
+	BRect r;
+	BPoint start, end;
+	
 	// Right side
 	if(TestRectIntersection(rightborder,invalid))
 	{
 		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
 		// it must be accounted for.
-		int32 startx=(int32) MAX(invalid.left,rightborder.left);
-		int32 endx=(int32) MIN(invalid.right,rightborder.right);
-		
+		startx=(int32) MAX(invalid.left,rightborder.left);
+		endx=(int32) MIN(invalid.right,rightborder.right);
 
 		// We'll need these flags to see if we must include the corners in final line
 		// calculations
-		BRect r(rightborder);
+		r=(rightborder);
 		r.bottom=r.top+borderwidth;
-		bool topcorner=TestRectIntersection(invalid,r);
+		topcorner=TestRectIntersection(invalid,r);
 
 		r=rightborder;
 		r.top=r.bottom-borderwidth;
-		bool bottomcorner=TestRectIntersection(invalid,r);
+		bottomcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
 		
 		// Generate the lines for this side
-		for(int32 i=startx; i<endx; i++)
+		for(i=startx+1; i<=endx; i++)
 		{
-			BPoint start, end;
-			
 			start.x=end.x=i;
 			
 			if(topcorner)
@@ -532,72 +540,189 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 			if(bottomcorner)
 			{
 				end.y=rightborder.bottom-(borderwidth-(i-rightborder.left));
-				end.y=MAX(end.y,invalid.top);
+				end.y=MIN(end.y,invalid.bottom);
 			}
 			else
-				end.y=MAX(end.y-borderwidth,invalid.top);
-			
+				end.y=MIN(end.y-borderwidth,invalid.bottom);
+							
 			// Make the appropriate 
 			points[numlines*2]=start;
 			points[(numlines*2)+1]=end;
-			colors[numlines]=framecolors[rightindices[endx-i]];
-			
+			colors[numlines]=framecolors[rightindices[colorindex]];
+			colorindex+=step;
 			numlines++;
 		}
 	}
-debugger("");
+
+	// Left side
+	if(TestRectIntersection(leftborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		startx=(int32) MAX(invalid.left,leftborder.left);
+		endx=(int32) MIN(invalid.right,leftborder.right);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=leftborder;
+		r.bottom=r.top+borderwidth;
+		topcorner=TestRectIntersection(invalid,r);
+
+		r=leftborder;
+		r.top=r.bottom-borderwidth;
+		bottomcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=startx; i<endx; i++)
+		{
+			start.x=end.x=i;
+			
+			if(topcorner)
+			{
+				start.y=leftborder.top+(i-leftborder.left);
+				start.y=MAX(start.y,invalid.top);
+			}
+			else
+				start.y=MAX(start.y+borderwidth,invalid.top);
+
+			if(bottomcorner)
+			{
+				end.y=leftborder.bottom-(i-leftborder.left);
+				end.y=MIN(end.y,invalid.bottom);
+			}
+			else
+				end.y=MIN(end.y-borderwidth,invalid.bottom);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			colors[numlines]=framecolors[leftindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	// Top side
+	if(TestRectIntersection(topborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		starty=(int32) MAX(invalid.top,topborder.top);
+		endy=(int32) MIN(invalid.bottom,topborder.bottom);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=topborder;
+		r.bottom=r.top+borderwidth;
+		r.right=r.left+borderwidth;
+		leftcorner=TestRectIntersection(invalid,r);
+
+		r=topborder;
+		r.top=r.bottom-borderwidth;
+		r.left=r.right-borderwidth;
+		
+		rightcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=starty; i<endy; i++)
+		{
+			start.y=end.y=i;
+			
+			if(leftcorner)
+			{
+				start.x=topborder.left+(i-topborder.top);
+				start.x=MAX(start.x,invalid.left);
+			}
+			else
+				start.x=MAX(start.x+borderwidth,invalid.left);
+
+			if(rightcorner)
+			{
+				end.x=topborder.right-(i-topborder.top);
+				end.x=MIN(end.x,invalid.right);
+			}
+			else
+				end.x=MIN(end.x-borderwidth,invalid.right);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			
+			// Top side uses the same color order as the left one
+			colors[numlines]=framecolors[leftindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	// Bottom side
+	if(TestRectIntersection(bottomborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		starty=(int32) MAX(invalid.top,bottomborder.top);
+		endy=(int32) MIN(invalid.bottom,bottomborder.bottom);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=bottomborder;
+		r.bottom=r.top+borderwidth;
+		r.right=r.left+borderwidth;
+		leftcorner=TestRectIntersection(invalid,r);
+
+		r=bottomborder;
+		r.top=r.bottom-borderwidth;
+		r.left=r.right-borderwidth;
+		
+		rightcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=starty+1; i<=endy; i++)
+		{
+			start.y=end.y=i;
+			
+			if(leftcorner)
+			{
+				start.x=bottomborder.left+(borderwidth-(i-bottomborder.top));
+				start.x=MAX(start.x,invalid.left);
+			}
+			else
+				start.x=MAX(start.x+borderwidth,invalid.left);
+
+			if(rightcorner)
+			{
+				end.x=bottomborder.right-(borderwidth-(i-bottomborder.top));
+				end.x=MIN(end.x,invalid.right);
+			}
+			else
+				end.x=MIN(end.x-borderwidth,invalid.right);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			
+			// Top side uses the same color order as the left one
+			colors[numlines]=framecolors[rightindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
 	_driver->StrokeLineArray(points,numlines,colors,&_layerdata);
 	
-/*	BRect r=_borderrect;
-
-	_layerdata.highcolor=framecolors[2];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[3];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[4];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[4];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-
-	r.InsetBy(1,1);
-	_layerdata.highcolor=framecolors[0];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[0];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[2];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[2];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
+	delete rightindices;
+	delete leftindices;
 	
-	r.InsetBy(1,1);
-	_layerdata.highcolor=framecolors[1];
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
-
-	r.InsetBy(1,1);
-	_layerdata.highcolor=framecolors[4];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[4];
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[0];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=framecolors[0];
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeRect(_borderrect,&_layerdata,(int8*)&solidhigh);
-	
-	
-	// Draw the resize thumb if we're supposed to
+/*	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
 		r=_resizerect;

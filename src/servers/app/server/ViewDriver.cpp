@@ -1053,15 +1053,12 @@ void ViewDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, 
 //	screenwin->view->Invalidate();
 
 	// for now, just print the data and hope we don't crash
-	printf("ViewDriver::StrokeLineArray(): \n");
-	BPoint *ptindex=pts;
+	int32 ptindex=0;
 	
 	for(int32 i=0; i<numlines; i++)
 	{
-		BPoint pt1=*ptindex;
-		ptindex+=sizeof(BPoint);
-		BPoint pt2=*ptindex;
-		ptindex+=sizeof(BPoint);
+		BPoint pt1=pts[ptindex++];
+		BPoint pt2=pts[ptindex++];
 		rgb_color col=colors[i].GetColor32();
 		
 		drawview->SetHighColor(col);
