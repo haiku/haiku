@@ -184,15 +184,13 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 		uint8 *pi2 = (i/2) * in->linesize[1] + (uint8 *)in->data[1];
 		uint8 *pi3 = (i/2) * in->linesize[2] + (uint8 *)in->data[2];
 
-		for (int j = 0; j < width; j+= 4) {
+		for (int j = 0; j < width; j+= 2) {
 
-			int32 Y, Cb, Cr, Y0, Y1, Y2, Y3, Cr_R, Cr_G, Cb_G, Cb_B, R, G, B;
+			int32 Cb, Cr, Y0, Y1, Cr_R, Cr_G, Cb_G, Cb_B, R, G, B;
 		
-			Y = *(uint32 *)pi1;
-			pi1 += 4;
+			uint32 Y = *(uint16 *)pi1;
+			pi1 += 2;
 			
-			Y3 = (((Y & 0xff000000) >> 24) - 16) * 38142;
-			Y2 = (((Y & 0x00ff0000) >> 16) - 16) * 38142;
 			Y1 = (((Y & 0x0000ff00) >> 8) - 16) * 38142;
 			Y0 = ((Y & 0x000000ff) - 16) * 38142;
 
@@ -222,31 +220,6 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 			if (B < 0) B = 0; else if (B > 255) B = 255;
 			pout[j + 1] = (R << 16) | (G << 8) | B;
 
-			Cb = - 128 + *pi2;
-			Cr = - 128 + *pi3;
-			pi2 ++;
-			pi3 ++;
-
-			Cr_R = Cr * 52298;
-			Cr_G = Cr * -26640;
-			Cb_G = Cb * -12845;
-			Cb_B = Cb * 66493;
-			
-			R = (Y2 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
-			G = (Y2 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
-			B = (Y2 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
-			pout[j + 2] = (R << 16) | (G << 8) | B;
-			
-			R = (Y3 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
-			G = (Y3 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
-			B = (Y3 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
-			pout[j + 3] = (R << 16) | (G << 8) | B;
 		}
 	}
 }
