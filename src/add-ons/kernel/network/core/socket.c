@@ -1124,7 +1124,6 @@ int socket_setsockopt(struct socket *so, int level, int optnum, const void *data
 			case SO_REUSEPORT:
 			case SO_OOBINLINE:
 			case SO_NONBLOCK:
-				break;
 				if (datalen < sizeof(int)) {
 					error = EINVAL;
 					goto bad;
