@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src apps bin bc dc ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) h ] ;
+
+BinCommand dc :
+	dc.c misc.c eval.c stack.c array.c numeric.c string.c
+	: libbc.a ;
+

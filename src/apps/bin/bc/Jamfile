@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src apps bin bc ;
+
+SubInclude OBOS_TOP src apps bin bc lib ;
+SubInclude OBOS_TOP src apps bin bc bc ; 
+SubInclude OBOS_TOP src apps bin bc dc ; 

@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src apps bin bc lib ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) h ] ;
+
+StaticLibrary bc : 
+	getopt.c getopt1.c vfprintf.c number.c
+;
