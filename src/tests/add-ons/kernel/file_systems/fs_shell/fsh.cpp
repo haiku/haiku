@@ -1654,6 +1654,27 @@ do_sync(int argc, char **argv)
 }
 
 
+static int
+do_mkindex(int argc, char **argv)
+{
+	if (argc < 2) {
+		printf("usage: mkindex <index>\n");
+		return FS_EINVAL;
+	}
+
+	struct my_stat st;
+	status_t error = sys_rstat(true, -1, "/myfs", &st, true);
+	if (error == FS_OK) {
+		error = sys_mkindex(true, st.dev, argv[1], B_STRING_TYPE, 0);
+	}
+
+	if (error != FS_OK)
+		printf("Could not create index: %s\n", fs_strerror(error));
+
+	return error;
+}
+
+
 #define MAX_LIVE_QUERIES	10
 void *gQueryCookie[MAX_LIVE_QUERIES] = {NULL};
 char *gQueryString[MAX_LIVE_QUERIES] = {NULL};
@@ -2010,6 +2031,7 @@ static cmd_entry builtin_commands[] =
     { "lat_fs",  do_lat_fs, "simulate what the lmbench test lat_fs does" },
     { "create",  do_create, "create N files. default is 100" },
     { "delete",  do_delete, "delete N files. default is 100" },
+    { "mkindex", do_mkindex, "creates an index (type is currently always string)" },
     { "query",   do_query, "run a query on the file system" },
     { "startquery", do_startquery, "run a live query on the file system (up to 10)" },
     { "stopquery",  do_stopquery, "stops live query N, or all of them if none is specified" },

@@ -2081,6 +2081,36 @@ error1:
 
 
 int
+sys_mkindex(bool kernel, dev_t device, const char *index, int type, int flags)
+{
+	int status = FS_EINVAL;
+	fsystem	*fs = NULL;
+	vnode *root = NULL;
+	nspace *ns;
+
+	LOCK(vnlock);
+	ns = nsidtons(device);
+	if (ns != NULL) {
+		fs = ns->fs;
+		if (fs->ops.create_index != NULL) {
+			status = FS_OK;
+			root = ns->root;
+			root->rcnt++;
+		}
+	}
+	UNLOCK(vnlock);
+
+	if (status == FS_OK) {
+		status = (*fs->ops.create_index)(ns->data, index, type, flags);
+		dec_vnode(root, FALSE);
+	}
+
+	TRACE("sys_mkindex() -- end: %d\n", status);
+	return status;
+}
+
+
+int
 sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie)
 {
 	int		err;

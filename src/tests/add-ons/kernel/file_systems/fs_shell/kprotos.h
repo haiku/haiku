@@ -55,6 +55,8 @@ ssize_t sys_write_attr(bool kernel, int fd, const char *name, int type,
 ssize_t sys_remove_attr(bool kernel, int fd, const char *name);
 int sys_stat_attr(bool kernel, int fd, const char *path, const char *name,
 			my_attr_info *info);
+
+int sys_mkindex(bool kernel, dev_t device, const char *index, int type, int flags);
  
 int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie);
 int sys_close_query(bool kernel, int fd, const char *path, void *cookie);
