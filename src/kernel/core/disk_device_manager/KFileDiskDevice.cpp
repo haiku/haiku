@@ -7,6 +7,7 @@
 
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <devfs.h>
 
 #include <KDiskDeviceUtils.h>
 #include <KFileDiskDevice.h>
@@ -20,21 +21,6 @@
 #define OUT dprintf
 
 static const char *kFileDevicesDir = "/dev/disk/virtual/files";
-
-// TODO: Remove when implemented in the devfs.
-static
-status_t
-devfs_publish_file_device(const char *path, const char *filePath)
-{
-	return B_ERROR;
-}
-
-static
-status_t
-devfs_unpublish_file_device(const char *path)
-{
-	return B_ERROR;
-}
 
 
 // constructor
