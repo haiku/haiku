@@ -25,6 +25,29 @@
 
 #include <string.h>
 
+const char *kInterruptNames[] = {
+	/*  0 */ "Divide Error Exception",
+	/*  1 */ "Debug Exception",
+	/*  2 */ "NMI Interrupt",
+	/*  3 */ "Breakpoint Exception",
+	/*  4 */ "Overflow Exception",
+	/*  5 */ "BOUND Range Exceeded Exception",
+	/*  6 */ "Invalid Opcode Exception",
+	/*  7 */ "Device Not Available Exception",
+	/*  8 */ "Double Fault Exception",
+	/*  9 */ "Coprocessor Segment Overrun",
+	/* 10 */ "Invalid TSS Exception",
+	/* 11 */ "Segment Not Present",
+	/* 12 */ "Stack Fault Exception",
+	/* 13 */ "General Protection Exception",
+	/* 14 */ "Page-Fault Exception",
+	/* 15 */ "-",
+	/* 16 */ "x87 FPU Floating-Point Error",
+	/* 17 */ "Alignment Check Exception",
+	/* 18 */ "Machine-Check Exception",
+	/* 19 */ "SIMD Floating-Point Exception",
+};
+
 #define MAX_ARGS 16
 
 typedef struct {
@@ -248,7 +271,8 @@ i386_handle_trap(struct iframe frame)
 				interrupt_ack(frame.vector); // ack the 8239 (if applicable)
 				ret = int_io_interrupt_handler(frame.vector);
 			} else {
-				panic("i386_handle_trap: unhandled cpu trap 0x%x at ip 0x%x!\n", frame.vector, frame.eip);
+				panic("i386_handle_trap: unhandled trap 0x%x (%s) at ip 0x%x, thread 0x%x!\n",
+					frame.vector, kInterruptNames[frame.vector], frame.eip, thread ? thread->id : -1);
 				ret = B_HANDLED_INTERRUPT;
 			}
 			break;
