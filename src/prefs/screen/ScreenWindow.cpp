@@ -7,20 +7,20 @@
 #include <MenuField.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
-#include <String.h>
 #include <Screen.h>
+#include <String.h>
 #include <Window.h>
 
-#include <cstring>
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
-#include "RefreshWindow.h"
-#include "ScreenWindow.h"
-#include "ScreenDrawView.h"
-#include "ScreenSettings.h"
 #include "AlertWindow.h"
 #include "Constants.h"
+#include "RefreshWindow.h"
+#include "ScreenDrawView.h"
+#include "ScreenSettings.h"
+#include "ScreenWindow.h"
 #include "Utility.h"
 
 static uint32
@@ -36,11 +36,13 @@ colorspace_to_bpp(uint32 colorspace)
 	}
 }
 
+
 static void
 colorspace_to_string(uint32 colorspace, char dest[])
 {
 	sprintf(dest,"%lu Bits/Pixel",colorspace_to_bpp(colorspace));
 }
+
 
 static uint32
 string_to_colorspace(const char* string)
@@ -424,6 +426,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 			} else {
 				fRefreshMenu->ItemAt(0)->SetMarked(true);
 			}
+			
+			BMessage newMessage(UPDATE_DESKTOP_MSG);
+			const char *resolution = fResolutionMenu->FindMarked()->Label();
+			newMessage.AddString("resolution", resolution);
+			PostMessage(&newMessage, fScreenDrawView);
 			CheckApplyEnabled();
 			break;
 		}
@@ -455,6 +462,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
+			
+			BMessage newMessage(UPDATE_DESKTOP_MSG);
+			const char *resolution = fInitialResolution->Label();
+			newMessage.AddString("resolution", resolution);
+			PostMessage(&newMessage, fScreenDrawView);
 			
 			if (message->what == SET_INITIAL_MODE_MSG) {
 				

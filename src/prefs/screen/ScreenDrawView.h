@@ -16,10 +16,6 @@ private:
 	rgb_color desktopColor;
 	int32 fWidth;
 	int32 fHeight;
-#ifdef USE_BITMAPS	
-	BBitmap *fScreen1,
-			*fScreen2;
-#endif
 };
 
 #endif

@@ -1,7 +1,5 @@
-// Screen V0.80 by Rafael Romo for the OpenBeOS Preferences team.
-// web.tiscalinet.it/rockman
-// rockman@tiscalinet.it
-// Additional code by Stefano Ceccherini ( burton666@freemail.it ) 
+// Original author: Rafael Romo
+// Additional code by Stefano Ceccherini, Andrew Bachmann, Sergei Panteleev
 
 #include <Application.h>
 #include <Alert.h>
@@ -9,10 +7,11 @@
 #include <cstdio>
 #include <cstring>
 
+#include "Constants.h"
 #include "ScreenApplication.h"
 #include "ScreenWindow.h"
 #include "ScreenSettings.h"
-#include "Constants.h"
+
 
 ScreenApplication::ScreenApplication()
 	:	BApplication(kAppSignature),
@@ -25,7 +24,7 @@ ScreenApplication::ScreenApplication()
 void
 ScreenApplication::AboutRequested()
 {
-	BAlert *aboutAlert = new BAlert("About", "Screen by Rafael Romo, Stefano Ceccherini\nThe OBOS place to configure your monitor",
+	BAlert *aboutAlert = new BAlert("About", "Screen by the OpenBeOS team",
 		"Ok", NULL, NULL, B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_INFO_ALERT);
 	aboutAlert->SetShortcut(0, B_OK);
 	aboutAlert->Go();
