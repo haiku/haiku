@@ -477,6 +477,9 @@ BParameterWeb::TypeCode() const
 }
 
 
+#define PARAMETER_WEB_FLATTEN_MAGIC		0x01030506
+#define PARAMETER_WEB_FLATTEN_VERSION	0x1
+
 ssize_t
 BParameterWeb::FlattenedSize() const
 {
@@ -535,11 +538,11 @@ BParameterWeb::Flatten(void *buffer,
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being written in the correct byte order.
-	*(reinterpret_cast<int32 *>(CurrentPos)) = 0x01030506;
+	*(reinterpret_cast<int32 *>(CurrentPos)) = PARAMETER_WEB_FLATTEN_MAGIC;
 	CurrentPos += sizeof(int32);
 
 	//QUESTION: Another unknown constant.  This one is different in style than the others though.
-	*(reinterpret_cast<int32 *>(CurrentPos)) = 1;
+	*(reinterpret_cast<int32 *>(CurrentPos)) = PARAMETER_WEB_FLATTEN_VERSION;
 	CurrentPos += sizeof(int32);
 	
 
@@ -620,7 +623,7 @@ BParameterWeb::Unflatten(type_code c,
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being read in the correct byte order.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x010300506)
+	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_MAGIC)
 	{
 		FATAL("BParameterWeb::Unflatten magic 1 wrong\n");
 		return B_BAD_TYPE;
@@ -629,7 +632,7 @@ BParameterWeb::Unflatten(type_code c,
 	
 	//QUESTION: I have no idea where this magic number came from, and i'm not sure that it's
 	//being read in the correct byte order.  THIS SURELY HAS SOME MEANING I'M NOT AWARE OF.
-	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 1)
+	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_VERSION)
 	{
 		FATAL("BParameterWeb::Unflatten magic 2 wrong\n");
 		return B_ERROR;
