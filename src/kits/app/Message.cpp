@@ -113,8 +113,8 @@ public:
 
 	status_t ReadFrom(BDataIO &stream);
 	void ReadFrom(const BMessage &message);
-	status_t WriteTo(BDataIO &stream);
-	void WriteTo(BMessage &message);
+	status_t WriteTo(BDataIO &stream, bool calculateCheckSum = true) const;
+	void WriteTo(BMessage &message) const;
 
 	uint32	CalculateCheckSum() const;
 	uint32	CalculateHeaderSize() const;
@@ -123,6 +123,8 @@ public:
 
 	bool HasTarget() const { return (fFlags & MSG_FLAG_INCL_TARGET); }
 	void SetTarget(int32 token, bool preferred);
+
+	void Dump() const;
 
 private:
 	int32	fMagic;
@@ -223,10 +225,10 @@ BMessage::Header::ReadFrom(BDataIO &stream)
 		return e;
 	}
 
+	fBodySize = flattenedSize - CalculateHeaderSize();
+
 	if (checkSum != checksum_helper.CheckSum())
 		return B_NOT_A_MESSAGE;
-
-	fBodySize = flattenedSize - CalculateHeaderSize();
 
 	return B_OK;
 }
@@ -264,7 +266,7 @@ BMessage::Header::ReadFrom(const BMessage &message)
 
 // WriteTo
 status_t
-BMessage::Header::WriteTo(BDataIO &stream)
+BMessage::Header::WriteTo(BDataIO &stream, bool calculateCheckSum) const
 {
 	status_t err = B_OK;
 	int32 data;
@@ -274,7 +276,7 @@ BMessage::Header::WriteTo(BDataIO &stream)
 	write_helper(&stream, (const void*)&data, sizeof (data), err);
 	if (!err) {
 		// compute checksum
-		data = CalculateCheckSum();
+		data = (calculateCheckSum ? CalculateCheckSum() : 0);
 		write_helper(&stream, (const void*)&data, sizeof (data), err);
 	}
 	if (!err) {
@@ -341,7 +343,7 @@ BMessage::Header::WriteTo(BDataIO &stream)
 
 // WriteTo
 void
-BMessage::Header::WriteTo(BMessage &message)
+BMessage::Header::WriteTo(BMessage &message) const
 {
 	// Make way for the new data
 	message.MakeEmpty();
@@ -376,32 +378,11 @@ BMessage::Header::WriteTo(BMessage &message)
 uint32
 BMessage::Header::CalculateCheckSum() const
 {
-	uchar csBuffer[MSG_HEADER_MAX_SIZE];
-	TChecksumHelper checksum_helper(csBuffer);
-
-	int32 flattenedSize = CalculateHeaderSize() + fBodySize;
-	checksum_helper.Cache(flattenedSize);
-	checksum_helper.Cache(fWhat);
-	checksum_helper.Cache(fFlags);
-	if (fFlags & MSG_FLAG_INCL_TARGET)
-		checksum_helper.Cache(fTargetToken);
-	if (fFlags & MSG_FLAG_INCL_REPLY) {
-		checksum_helper.Cache(fReplyPort);
-		checksum_helper.Cache(fReplyToken);
-		checksum_helper.Cache(fReplyTeam);
-
-		// big flags
-		uint8 bigFlags = (fPreferredTarget ? 1 : 0);
-		checksum_helper.Cache(bigFlags);
-		bigFlags = (fReplyRequired ? 1 : 0);
-		checksum_helper.Cache(bigFlags);
-		bigFlags = (fReplyDone ? 1 : 0);
-		checksum_helper.Cache(bigFlags);
-		bigFlags = (fIsReply ? 1 : 0);
-		checksum_helper.Cache(bigFlags);
-	}
-
-	return checksum_helper.CheckSum();
+	uchar buffer[MSG_HEADER_MAX_SIZE];
+	BMemoryIO stream(buffer, sizeof(buffer));
+	WriteTo(stream, false);
+	int32 size = stream.Position();
+	return _checksum_(buffer + 8, size - 8);
 }
 
 // CalculateHeaderSize
@@ -437,6 +418,25 @@ BMessage::Header::SetTarget(int32 token, bool preferred)
 	fPreferredTarget = preferred;
 }
 
+// Dump
+void
+BMessage::Header::Dump() const
+{
+	printf("BMessage::Header:\n");
+	printf("  magic:            %lx\n", fMagic);
+	printf("  body size:        %ld\n", fBodySize);
+	printf("  what:             %lx\n", fWhat);
+	printf("  flags:            %x\n", fFlags);
+	printf("  target token:     %ld\n", fTargetToken);
+	printf("  reply port:       %ld\n", fReplyPort);
+	printf("  reply token:      %ld\n", fReplyToken);
+	printf("  reply team:       %ld\n", fReplyTeam);
+	printf("  preferred target: %d\n", fPreferredTarget);
+	printf("  reply required:   %d\n", fReplyRequired);
+	printf("  reply done:       %d\n", fReplyDone);
+	printf("  is reply:         %d\n", fIsReply);
+	printf("  swapped:          %d\n", fSwapped);
+}
 
 // #pragma mark -
 
@@ -932,6 +932,10 @@ status_t BMessage::Unflatten(BDataIO* stream)
 {
 	Header header;
 	status_t err = header.ReadFrom(*stream);
+
+if (err) {
+	printf("BMessage::Unflatten(): Reading the header failed: %lx\n", err);
+}
 
 	if (!err)
 	{
@@ -2014,11 +2018,7 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	if (((KMessage::Header*)data)->magic == KMessage::kMessageHeaderMagic) {
 		// a KMessage
 		KMessage::Header *header = (KMessage::Header*)data;
-		header->sender = -1;
 		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
-		header->replyPort = -1;
-		header->replyToken = B_NULL_TOKEN;
-
 	} else if (*(int32*)data == '1BOF' || *(int32*)data == 'FOB1') {
 		// get the header
 		BMemoryIO stream(data, size);
