@@ -1,11 +1,15 @@
 #include "../common.h"
-#include "PropertyConstructionTest1.h"
+#include "PropertyConstructionTest.h"
+#include "PropertyFindMatchTest.h"
+#include "PropertyFlattenTest.h"
 
 Test *PropertyInfoTestSuite()
 {
 	TestSuite *testSuite = new TestSuite();
 	
-	testSuite->addTest(PropertyConstructionTest1::suite());
+	testSuite->addTest(PropertyConstructionTest::suite());
+	testSuite->addTest(PropertyFindMatchTest::suite());
+	testSuite->addTest(PropertyFlattenTest::suite());
 	
 	return(testSuite);
 }

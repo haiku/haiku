@@ -74,7 +74,10 @@ CommonTestLib libapptest.so
 		TargetTester.cpp
 
 		# BPropertyInfo
-		PropertyConstructionTest1.cpp
+		PropertyTestcase.cpp
+		PropertyConstructionTest.cpp
+		PropertyFindMatchTest.cpp
+		PropertyFlattenTest.cpp
 		PropertyInfoTest.cpp
 
 		# BRoster
