@@ -1386,7 +1386,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 	size_t length;
 	char *path;
 
-	if (strlcpy(pathBuffer, basePath, bufferSize) > bufferSize)
+	if (bufferSize == 0 || strlcpy(pathBuffer, basePath, bufferSize - 1) > bufferSize - 1)
 		return B_BUFFER_OVERFLOW;
 
 	status = path_to_vnode(pathBuffer, true, &dir, true);
@@ -1395,7 +1395,6 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 
 	length = strlen(pathBuffer);
 	if (pathBuffer[length - 1] != '/') {
-		// ToDo: bufferSize race condition
 		pathBuffer[length] = '/';
 		length++;
 	}
@@ -1412,7 +1411,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		else
 			length = nextPath - moduleName;
 
-		if (length + 1>= bufferSize) {
+		if (length + 1 >= bufferSize) {
 			status = B_BUFFER_OVERFLOW;
 			goto err;
 		}
