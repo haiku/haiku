@@ -1648,6 +1648,21 @@ vfs_mount_boot_file_system()
 	// make the boot partition (and probably others) available
 	KDiskDeviceManager::CreateDefault();
 
+#if 0
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+
+	status_t status = manager->InitialDeviceScan();
+	if (status != B_OK)
+		panic("KDiskDeviceManager::InitialDeviceScan() failed: %s\n", strerror(status));
+
+	// ToDo: do this for real... (no hacks allowed :))
+	for (;;) {
+		snooze(500000);
+		if (manager->CountJobs() == 0)
+			break;
+	}
+#endif
+
 	file_system_info *bootfs;
 	if ((bootfs = get_file_system("bootfs")) == NULL) {
 		// no bootfs there, yet
@@ -3871,6 +3886,34 @@ status_t
 _user_sync(void)
 {
 	return fs_sync();
+}
+
+
+// ToDo: this might be a temporary syscall, it's used to get the path to an entry_ref
+
+status_t
+_user_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pathLength)
+{
+	char path[B_PATH_NAME_LENGTH + 1];
+	struct vnode *vnode;
+	int status;
+
+	if (!IS_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
+
+	// get the vnode matching the node_ref
+	status = get_vnode(device, inode, &vnode, false);
+	if (status < B_OK)
+		return status;
+
+	status = dir_vnode_to_path(vnode, path, sizeof(path));
+	put_vnode(vnode);
+		// we don't need the vnode anymore
+
+	if (status < B_OK)
+		return status;
+
+	return user_strlcpy(userPath, path, pathLength);
 }
 
 

@@ -91,6 +91,9 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_SEEK:
 			*call_ret = _user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
 			break;
+		case SYSCALL_DIR_NODE_REF_TO_PATH:
+			*call_ret = _user_dir_node_ref_to_path((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (char *)arg3, (size_t)arg4);
+			break;
 		case SYSCALL_OPEN_DIR_ENTRY_REF:
 			*call_ret = _user_open_dir_entry_ref((dev_t)arg0, (ino_t)INT32TOINT64(arg1,arg2), (const char *)arg3);
 			break;
