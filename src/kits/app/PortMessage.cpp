@@ -34,6 +34,7 @@ PortMessage::PortMessage(const int32 &code, const void *buffer, const ssize_t &b
 {
 	_code=code;
 	SetBuffer(buffer,buffersize,copy);
+	is_session_msg=false;
 }
 
 PortMessage::PortMessage(void)
@@ -42,6 +43,7 @@ PortMessage::PortMessage(void)
 	_buffer=NULL;
 	_buffersize=0;
 	_index=NULL;
+	is_session_msg=false;
 }
 
 PortMessage::~PortMessage(void)
@@ -59,6 +61,7 @@ status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout
 	_index=NULL;
 	_buffersize=0;
 
+	is_session_msg=false;
 	if(timeout==B_INFINITE_TIMEOUT)
 	{
 		_buffersize=port_buffer_size(port);
@@ -81,6 +84,7 @@ status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout
 		read_port(port, &_code, _buffer, _buffersize);
 	}
 	_index=_buffer;
+	BSessionWorkaround();
 	
 	return B_OK;
 }
@@ -89,6 +93,7 @@ status_t PortMessage::WriteToPort(const port_id &port)
 {
 	// Check port validity
 	port_info pi;
+	is_session_msg=false;
 	if(get_port_info(port,&pi)!=B_OK)
 		return B_BAD_VALUE;
 	
@@ -138,8 +143,7 @@ status_t PortMessage::Read(void *data, ssize_t size)
 	if(!data || size<1)
 		return B_BAD_VALUE;
 
-	if( !_buffer || 
-		_buffersize<size ||
+	if( !_buffer || _buffersize<size ||
 		((_index+size)>(_buffer+_buffersize)) )
 		return B_NO_MEMORY;
 	
@@ -151,6 +155,20 @@ status_t PortMessage::Read(void *data, ssize_t size)
 
 void PortMessage::Rewind(void)
 {
-	_index=_buffer;
+	_index=(is_session_msg)?_buffer+4:_buffer;
 }
 
+
+void PortMessage::BSessionWorkaround(void)
+{
+	// Do some stuff to work around BSession stupidity with packaging the message code as
+	// the first attachment in the message's data buffer.
+	if(_code==AS_SERVER_SESSION)
+	{
+		is_session_msg=true;
+		_index+=4;
+		_code=*((int32*)_buffer);
+	}
+	else
+		is_session_msg=false;
+}

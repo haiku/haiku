@@ -1,4 +1,3 @@
-#include <malloc.h>
 #include <ServerProtocol.h>
 #include "PortLink.h"
 #include "PortMessage.h"
@@ -12,7 +11,7 @@ PortLink::PortLink(port_id port)
 	fReceivePort=create_port(30,"PortLink reply port");	
 
 	fSendCode=0;
-	fSendBuffer=(char*)malloc(4096);
+	fSendBuffer=new char[4096];
 	fSendPosition=4;
 }
 
@@ -24,8 +23,13 @@ PortLink::PortLink( const PortLink &link )
 	fReceivePort=create_port(30,"PortLink reply port");
 	
 	fSendCode			= 0;
-	fSendBuffer			= (char*)malloc(4096);
+	fSendBuffer=new char[4096];
 	fSendPosition		= 4;
+}
+
+PortLink::~PortLink(void)
+{
+	delete [] fSendBuffer;
 }
 
 void PortLink::SetOpCode( int32 code )
@@ -104,7 +108,8 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE
 	// We got this far, so we apparently have some data
 	msg->SetCode(rcode);
 	msg->SetBuffer(rbuffer,rbuffersize,false);
-
+	msg->BSessionWorkaround();
+	
 	return B_OK;
 }
 
@@ -123,6 +128,6 @@ status_t PortLink::Attach(const void *data, size_t size)
 
 void PortLink::MakeEmpty()
 {
-	fSendPosition	= 4;
+	fSendPosition=4;
 }
 
