@@ -18,6 +18,12 @@ struct disk_super_block;
 struct block_run;
 
 
+struct check_result {
+	int8	type;
+	uint64	missing_blocks;
+};
+
+
 class BlockAllocator {
 	public:
 		BlockAllocator(Volume *volume);
@@ -31,11 +37,11 @@ class BlockAllocator {
 
 		status_t AllocateBlocks(Transaction *transaction,int32 group, uint16 start, uint16 numBlocks, uint16 minimum, block_run &run);
 
-#ifdef DEBUG
+		status_t StartChecking();
+		status_t StopChecking();
+
 		status_t CheckBlockRun(block_run run);
-		status_t CheckInode(Inode *inode);
-		status_t Check(Inode *inode);
-#endif
+		status_t CheckInode(Inode *inode/*, bool fix, check_result &result, uint32 numResults*/);
 
 	private:
 		static status_t initialize(BlockAllocator *);
@@ -43,7 +49,8 @@ class BlockAllocator {
 		Volume			*fVolume;
 		Benaphore		fLock;
 		AllocationGroup	*fGroups;
-		int32			fNumGroups,fBlocksPerGroup;
+		int32			fNumGroups, fBlocksPerGroup;
+		uint32			*fCheckBitmap;
 };
 
 #endif	/* BLOCK_ALLOCATOR_H */
