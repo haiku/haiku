@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Threading routines */
 
@@ -326,7 +326,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, t->id);
 	t->kernel_stack_area = create_area(stack_name, (void **)&t->kernel_stack_base,
-		B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 
 	if (t->kernel_stack_area < 0) {
 		// we're not yet part of a team, so we can just bail out
@@ -382,12 +383,13 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		// the stack will be between USER_STACK_REGION and the main thread stack area
 		// (the user stack of the main thread is created in team_create_team())
 		t->user_stack_base = USER_STACK_REGION;
-		t->user_stack_size = STACK_SIZE;
+		t->user_stack_size = USER_STACK_SIZE;
 
 		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, t->id);
 		t->user_stack_area = create_area_etc(team, stack_name,
 				(void **)&t->user_stack_base, B_BASE_ADDRESS,
-				t->user_stack_size + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+				t->user_stack_size + TLS_SIZE, B_NO_LOCK,
+				B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
 		if (t->user_stack_area < 0) {
 			// great, we have a fully running thread without a stack
 			dprintf("create_thread: unable to create user stack!\n");
@@ -901,7 +903,8 @@ thread_exit(void)
 		thread->kernel_stack_base = sDeathStacks[death_stack].address;
 
 		// we will continue in thread_exit2(), on the new stack
-		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base + KSTACK_SIZE, thread_exit2, &args);
+		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base + KERNEL_STACK_SIZE,
+			thread_exit2, &args);
 	}
 
 	panic("never can get here\n");
@@ -1143,7 +1146,8 @@ thread_init(kernel_args *args)
 		for (i = 0; i < sNumDeathStacks; i++) {
 			sprintf(temp, "death_stack%d", i);
 			sDeathStacks[i].area = create_area(temp, (void **)&sDeathStacks[i].address,
-				B_ANY_KERNEL_ADDRESS, KSTACK_SIZE, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+				B_ANY_KERNEL_ADDRESS, KERNEL_STACK_SIZE, B_FULL_LOCK,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
 			if (sDeathStacks[i].area < 0) {
 				panic("error creating death stacks\n");
 				return sDeathStacks[i].area;
@@ -1367,7 +1371,7 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	info->user_time = thread->user_time;
 	info->kernel_time = thread->kernel_time;
 	info->stack_base = (void *)thread->user_stack_base;
-	info->stack_end = (void *)(thread->user_stack_base + STACK_SIZE);
+	info->stack_end = (void *)(thread->user_stack_base + thread->user_stack_size - 1);
 }
 
 

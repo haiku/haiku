@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Team functions */
 
@@ -821,18 +821,27 @@ team_create_thread_start(void *args)
 
 	// create an initial primary stack area
 
+	// Main stack area layout is currently as follows (starting from 0):
+	//
+	// size							| usage
+	// -----------------------------+--------------------------------
+	// USER_MAIN_THREAD_STACK_SIZE	| actual stack
+	// TLS_SIZE						| TLS data
+	// ENV_SIZE						| environment variables
+	// arguments size				| arguments passed to the team
+
 	// ToDo: make ENV_SIZE variable and put it on the heap?
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
-	sizeLeft = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
+	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
 		get_arguments_data_size(teamArgs->args, teamArgs->arg_count));
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - sizeLeft;
-	t->user_stack_size = MAIN_THREAD_STACK_SIZE;
+	t->user_stack_size = USER_MAIN_THREAD_STACK_SIZE;
 		// the exact location at the end of the user stack area
 
 	sprintf(ustack_name, "%s_main_stack", team->name);
 	t->user_stack_area = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
-		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		B_EXACT_ADDRESS, sizeLeft, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
 	if (t->user_stack_area < 0) {
 		dprintf("team_create_thread_start: could not create default user stack region\n");
 		return t->user_stack_area;
@@ -850,6 +859,8 @@ team_create_thread_start(void *args)
 
 	TRACE(("addr: stack base = 0x%lx, uargs = %p, udest = %p, sizeLeft = %lu\n",
 		t->user_stack_base, uargs, udest, sizeLeft));
+
+	sizeLeft = t->user_stack_base + sizeLeft - (addr_t)udest;
 
 	for (i = 0; i < argCount; i++) {
 		ssize_t length = user_strlcpy(udest, teamArgs->args[i], sizeLeft);
