@@ -12,6 +12,7 @@
 #include "OpenWindow.h"
 
 #include <Application.h>
+#include <Screen.h>
 #include <Autolock.h>
 #include <Alert.h>
 #include <TextView.h>
@@ -107,13 +108,18 @@ Settings::Settings()
 		settings.window_frame.top = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.top);
 		settings.window_frame.right = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.right);
 		settings.window_frame.bottom = B_LENDIAN_TO_HOST_FLOAT(settings.window_frame.bottom);
-		settings.base_type = B_LENDIAN_TO_HOST_INT32(settings.base_type);
-		settings.font_size = B_LENDIAN_TO_HOST_INT32(settings.font_size);
 #endif
+		// check if the window frame is on screen at all
+		BScreen screen;
+		if (screen.Frame().Contains(settings.window_frame.LeftTop())
+			&& settings.window_frame.Width() < screen.Frame().Width()
+			&& settings.window_frame.Height() < screen.Frame().Height())
+			fMessage.ReplaceRect("window_frame", settings.window_frame);
 
-		fMessage.ReplaceRect("window_frame", settings.window_frame);
-		fMessage.ReplaceInt32("base_type", settings.base_type);
-		fMessage.ReplaceFloat("font_size", (float)settings.font_size);
+		if (settings.base_type == kHexBase || settings.base_type == kDecimalBase)
+			fMessage.ReplaceInt32("base_type", B_LENDIAN_TO_HOST_INT32(settings.base_type));
+		if (settings.font_size >= 0 || settings.font_size <= 72)
+			fMessage.ReplaceFloat("font_size", float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
 	}
 }
 
@@ -129,9 +135,18 @@ Settings::~Settings()
 		return;
 
 	disk_probe_settings settings;
+
 	settings.window_frame = fMessage.FindRect("window_frame");
-	settings.base_type = fMessage.FindInt32("base_type");
-	settings.font_size = int32(fMessage.FindFloat("font_size") + 0.5f);
+#if B_HOST_IS_BENDIAN
+	// settings are saved in little endian
+	settings.window_frame.left = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.left);
+	settings.window_frame.top = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.top);
+	settings.window_frame.right = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.right);
+	settings.window_frame.bottom = B_HOST_TO_LENDIAN_FLOAT(settings.window_frame.bottom);
+#endif
+
+	settings.base_type = B_HOST_TO_LENDIAN_INT32(fMessage.FindInt32("base_type"));
+	settings.font_size = B_HOST_TO_LENDIAN_INT32(int32(fMessage.FindFloat("font_size") + 0.5f));
 	settings.unknown = 1;
 		// That's what DiskProbe R5 puts in there
 
