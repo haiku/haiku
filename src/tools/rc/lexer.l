@@ -275,6 +275,7 @@ void init_lexer()
 	}
 
 	yyrestart(yyin);  // necessary for multiple input files
+	yylineno = 1;
 }
 
 //------------------------------------------------------------------------------
