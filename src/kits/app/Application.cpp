@@ -178,8 +178,8 @@ extern const char * const *__libc_argv;
 
 
 // debugging
-//#define DBG(x) x
-#define DBG(x)
+#define DBG(x) x
+//#define DBG(x)
 #define OUT	printf
 
 
@@ -265,6 +265,7 @@ BApplication::operator=(const BApplication &rhs)
 void
 BApplication::InitData(const char *signature, status_t *_error)
 {
+DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
 	if (be_app)
 		debugger("2 BApplication objects were created. Only one is allowed.");
@@ -293,8 +294,13 @@ BApplication::InitData(const char *signature, status_t *_error)
 
 	// get app executable ref
 	entry_ref ref;
-	if (fInitError == B_OK)
+	if (fInitError == B_OK) {
 		fInitError = BPrivate::get_app_ref(&ref);
+		if (fInitError != B_OK) {
+			DBG(OUT("BApplication::InitData(): Failed to get app ref: %s\n",
+				strerror(fInitError)));
+		}
+	}
 
 	// get the BAppFileInfo and extract the information we need
 	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
@@ -311,6 +317,9 @@ BApplication::InitData(const char *signature, status_t *_error)
 				printf("Signature in rsrc doesn't match constructor arg. (%s, %s)\n",
 					signature, appFileSignature);
 			}
+		} else {
+			DBG(OUT("BApplication::InitData(): Failed to get info from: "
+				"BAppFileInfo: %s\n", strerror(fInitError)));
 		}
 	}
 
@@ -351,6 +360,10 @@ BApplication::InitData(const char *signature, status_t *_error)
 		if (!isRegistrar) {
 			fInitError = BRoster::Private().AddApplication(signature, &ref,
 				appFlags, team, thread, fMsgPort, true, NULL, &otherTeam);
+			if (fInitError != B_OK) {
+				DBG(OUT("BApplication::InitData(): Failed to add app: %s\n",
+					strerror(fInitError)));
+			}
 		}
 		if (fInitError == B_ALREADY_RUNNING) {
 			// An instance is already running and we asked for
@@ -444,10 +457,13 @@ BApplication::InitData(const char *signature, status_t *_error)
 
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
-	if (_error)
+	if (_error) {
 		*_error = fInitError;
-	else if (fInitError != B_OK)
+	} else if (fInitError != B_OK) {
+		DBG(OUT("BApplication::InitData() failed: %s\n", strerror(fInitError)));
 		exit(0);
+	}
+DBG(OUT("BApplication::InitData() done\n"));
 }
 
 
