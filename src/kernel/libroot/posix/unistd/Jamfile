@@ -7,7 +7,10 @@ KernelMergeObject posix_unistd.o :
 	<$(SOURCE_GRIST)>conf.c
 	<$(SOURCE_GRIST)>directory.c
 	<$(SOURCE_GRIST)>dup.c
+	<$(SOURCE_GRIST)>exec.c
+	<$(SOURCE_GRIST)>_exit.c
 	<$(SOURCE_GRIST)>fcntl.c
+	<$(SOURCE_GRIST)>fork.c
 	<$(SOURCE_GRIST)>getopt.c
 	<$(SOURCE_GRIST)>hostname.c
 	<$(SOURCE_GRIST)>ioctl.c
