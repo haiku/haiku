@@ -57,7 +57,7 @@ TranslatorRosterTest::~TranslatorRosterTest() {
 CppUnit::Test*
 TranslatorRosterTest::Suite() {
 	/* create our suite */
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite("TranslatorRosterTest Suite");
+	CppUnit::TestSuite *suite = new CppUnit::TestSuite("TranslatorRoster");
 		
 	/* add suckers */
 	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Initialize Test", &TranslatorRosterTest::InitializeTest));
@@ -361,6 +361,7 @@ void TranslatorRosterTest::GetTranslatorInfoTest() {
  * @return B_OK if everything went ok, B_ERROR if not
  */
 void TranslatorRosterTest::GetTranslatorsTest() {
+	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//open image to get a translator for
 	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
@@ -382,11 +383,11 @@ void TranslatorRosterTest::GetTranslatorsTest() {
 	CPPUNIT_ASSERT(roster->GetTranslators(&garbled, NULL, &info, NULL) == B_BAD_VALUE);
 
 	//get translator for garbled data
-	NextSubTest();	
+	NextSubTest();
 	CPPUNIT_ASSERT(roster->GetTranslators(&garbled, NULL, &info, &outCount) == B_NO_TRANSLATOR);
 		
 	//get translator for image
-	NextSubTest();	
+	NextSubTest();
 	CPPUNIT_ASSERT(roster->GetTranslators(&image, NULL, &info, &outCount) == B_OK);
 	
 	NextSubTest();
@@ -403,6 +404,7 @@ void TranslatorRosterTest::GetTranslatorsTest() {
  * @return B_OK if everything went ok, B_ERROR if not
  */
 void TranslatorRosterTest::IdentifyTest() {
+	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//open image to get a translator for
 	BFile image("../src/tests/kits/translation/data/images/image.png", B_READ_ONLY);
 	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
@@ -466,18 +468,31 @@ void TranslatorRosterTest::MakeConfigurationViewTest() {
  * @return B_OK if everything went ok, B_ERROR if not
  */
 void TranslatorRosterTest::TranslateTest() {
+	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	//input
+	NextSubTest();
 	BFile input("../src/tests/kits/translation/data/images/image.jpg", B_READ_ONLY);
+	CPPUNIT_ASSERT(input.InitCheck() == B_OK);
 
 	//temp file for generic format
-	BFile temp("/tmp/TranslatorRosterTest.temp", B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	NextSubTest();
+	BFile temp("/tmp/TranslatorRosterTest.temp",
+		B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	CPPUNIT_ASSERT(temp.InitCheck() == B_OK);
 	
 	//output file
-	BFile output("../src/tests/kits/translation/data/images/image.out.png", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	NextSubTest();
+	BFile output("../src/tests/kits/translation/data/images/image.out.png",
+		B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	CPPUNIT_ASSERT(output.InitCheck() == B_OK);
 	
+	//get default translators
+	NextSubTest();
 	roster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(roster != NULL);
 	
 	//translate to generic
+	NextSubTest();
 	CPPUNIT_ASSERT(roster->Translate(&input, NULL, NULL, &temp, B_TRANSLATOR_BITMAP) == B_OK);
 	
 	//translate to specific
