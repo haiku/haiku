@@ -16,6 +16,8 @@ KernelObjects
 if $(OBOS_ARCH) = x86 {
 	SubInclude OBOS_TOP src kernel apps cpuinfo ;
 }
+
+SubInclude OBOS_TOP src kernel apps consoled ;
 SubInclude OBOS_TOP src kernel apps echo ;
 SubInclude OBOS_TOP src kernel apps filetest ;
 SubInclude OBOS_TOP src kernel apps fortune ;
