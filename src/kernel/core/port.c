@@ -1,4 +1,10 @@
 /* ports for IPC */
+
+/*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
 /*
 ** Copyright 2001, Mark-Jan Bastian. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -189,7 +195,7 @@ create_port(int32 queue_length, const char *name)
 		name = "unnamed port";
 
 	name_len = strlen(name) + 1;
-	name_len = min(name_len, SYS_MAX_OS_NAME_LEN);
+	name_len = min(name_len, B_OS_NAME_LENGTH);
 	temp_name = (char *)malloc(name_len);
 	if (temp_name == NULL)
 		return ENOMEM;
@@ -404,17 +410,32 @@ find_port(const char *port_name)
 }
 
 
+/** Fills the port_info structure with information from the specified
+ *	port.
+ *	The port lock must be held when called.
+ */
+
+static void
+fill_port_info(struct port_entry *port, port_info *info, size_t size)
+{
+	info->port = port->id;
+	info->team = port->owner;
+	info->capacity = port->capacity;
+	info->total_count = ports->total_count;
+	strlcpy(info->name, ports->name, B_OS_NAME_LENGTH);
+	get_sem_count(port->read_sem, &info->queue_count);
+}
+
+
 status_t
 _get_port_info(port_id id, port_info *info, size_t size)
 {
 	int slot;
 	int state;
 
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-	if (info == NULL)
-		return EINVAL;
-	if (id < 0)
+	if (info == NULL || size != sizeof(port_info))
+		return B_BAD_VALUE;
+	if (!ports_active || id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -430,63 +451,49 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	}
 
 	// fill a port_info struct with info
-	info->port			= ports[slot].id;
-//	info->owner 		= ports[slot].owner;
-	strncpy(info->name, ports[slot].name, min(strlen(ports[slot].name),SYS_MAX_OS_NAME_LEN-1));
-	info->capacity		= ports[slot].capacity;
-	get_sem_count(ports[slot].read_sem, &info->queue_count);
-	info->total_count	= ports[slot].total_count;
+	fill_port_info(&ports[slot], info, size);
 
 	RELEASE_PORT_LOCK(ports[slot]);
 	restore_interrupts(state);
-	
-	// from our port_entry
-	return B_NO_ERROR;
+
+	return B_OK;
 }
 
 
 status_t
-_get_next_port_info(team_id team, int32 *cookie, struct port_info *info, size_t size)
+_get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t size)
 {
 	int state;
 	int slot;
-	
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-	if (cookie == NULL)
-		return B_BAD_VALUE;
 
-	if (*cookie == 0) {
-		// return first found
-		slot = 0;
-	} else {
-		// start at index cookie, but check cookie against MAX_PORTS
-		slot = *cookie;
-		if (slot >= MAX_PORTS)
-			return B_BAD_PORT_ID;
-	}
+	if (info == NULL || size != sizeof(port_info) || _cookie == NULL || team < B_OK)
+		return B_BAD_VALUE;
+	if (!ports_active)
+		return B_BAD_PORT_ID;
+
+	slot = *_cookie;
+	if (slot >= MAX_PORTS)
+		return B_BAD_PORT_ID;
+
+	if (team == B_CURRENT_TEAM)
+		team = team_get_current_team_id();
+
+	info->port = -1; // used as found flag
 
 	// spinlock
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
-	
-	info->port = -1; // used as found flag
+
 	while (slot < MAX_PORTS) {
 		GRAB_PORT_LOCK(ports[slot]);
-		if (ports[slot].id != -1)
-			if (ports[slot].owner == team) {
-				// found one!
-				// copy the info
-				info->port			= ports[slot].id;
-//				info->owner 		= ports[slot].owner;
-				strncpy(info->name, ports[slot].name, min(strlen(ports[slot].name),SYS_MAX_OS_NAME_LEN-1));
-				info->capacity		= ports[slot].capacity;
-				get_sem_count(ports[slot].read_sem, &info->queue_count);
-				info->total_count	= ports[slot].total_count;
-				RELEASE_PORT_LOCK(ports[slot]);
-				slot++;
-				break;
-			}
+		if (ports[slot].id != -1 && ports[slot].owner == team) {
+			// found one!
+			fill_port_info(&ports[slot], info, size);
+
+			RELEASE_PORT_LOCK(ports[slot]);
+			slot++;
+			break;
+		}
 		RELEASE_PORT_LOCK(ports[slot]);
 		slot++;
 	}
@@ -495,7 +502,8 @@ _get_next_port_info(team_id team, int32 *cookie, struct port_info *info, size_t 
 
 	if (info->port == -1)
 		return B_BAD_PORT_ID;
-	*cookie = slot;
+
+	*_cookie = slot;
 	return B_NO_ERROR;
 }
 
@@ -516,9 +524,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	int len;
 	int state;
 	
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-	if (id < 0)
+	if (!ports_active || id < 0)
 		return B_BAD_PORT_ID;
 
 	slot = id % MAX_PORTS;
@@ -555,7 +561,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	}
 
 	// once message arrived, read data's length
-	
+
 	// determine tail
 	// read data's head length
 	t = ports[slot].head;
@@ -1039,24 +1045,18 @@ port_test_thread_func(void *arg)
 
 
 port_id
-user_create_port(int32 queue_length, const char *uname)
+user_create_port(int32 queueLength, const char *userName)
 {
-	if(uname != NULL) {
-		char name[SYS_MAX_OS_NAME_LEN];
-		status_t rc;
+	char name[B_OS_NAME_LENGTH];
 
-		if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-			return ERR_VM_BAD_USER_MEMORY;
+	if (userName == NULL)
+		return create_port(queueLength, NULL);
 
-		rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-		if(rc < 0)
-			return rc;
-		name[SYS_MAX_OS_NAME_LEN-1] = 0;
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
 
-		return create_port(queue_length, name);
-	} else {
-		return create_port(queue_length, NULL);
-	}
+	return create_port(queueLength, name);
 }
 
 
@@ -1075,79 +1075,62 @@ user_delete_port(port_id id)
 
 
 port_id
-user_find_port(const char *port_name)
+user_find_port(const char *userName)
 {
-	if (port_name != NULL) {
-		char name[SYS_MAX_OS_NAME_LEN];
-		status_t rc;
+	char name[B_OS_NAME_LENGTH];
 
-		if((addr)port_name >= KERNEL_BASE && (addr)port_name <= KERNEL_TOP)
-			return ERR_VM_BAD_USER_MEMORY;
+	if (userName == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
 
-		rc = user_strncpy(name, port_name, SYS_MAX_OS_NAME_LEN-1);
-		if(rc < 0)
-			return rc;
-		name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-		return find_port(name);
-	} else {
-		return EINVAL;
-	}
+	return find_port(name);
 }
 
 
 status_t
-user_get_port_info(port_id id, struct port_info *uinfo)
+user_get_port_info(port_id id, struct port_info *userInfo)
 {
-	status_t 			res;
-	struct port_info	info;
-	status_t 			rc;
+	struct port_info info;
+	status_t status;
 
-	if (uinfo == NULL)
-		return EINVAL;
-	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userInfo == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
 
-	res = get_port_info(id, &info);
-	// copy to userspace
-	rc = user_memcpy(uinfo, &info, sizeof(struct port_info));
-	if (rc < 0)
-		return rc;
-	return res;
+	status = get_port_info(id, &info);
+
+	// copy back to user space
+	if (status == B_OK && user_memcpy(userInfo, &info, sizeof(struct port_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
 status_t
-user_get_next_port_info(team_id uteam, int32 *ucookie, struct port_info *uinfo)
+user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *userInfo)
 {
-	status_t 			res;
-	struct port_info	info;
-	int32				cookie;
-	status_t 			rc;
+	struct port_info info;
+	status_t status;
+	int32 cookie;
 
-	if (ucookie == NULL)
-		return EINVAL;
-	if (uinfo == NULL)
-		return EINVAL;
-	if ((addr)ucookie >= KERNEL_BASE && (addr)ucookie <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userCookie == NULL || userInfo == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userCookie) || !IS_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
 
-	// copy from userspace
-	rc = user_memcpy(&cookie, ucookie, sizeof(int32));
-	if (rc < 0)
-		return rc;
-	
-	res = get_next_port_info(uteam, &cookie, &info);
-	// copy to userspace
-	rc = user_memcpy(ucookie, &cookie, sizeof(int32));
-	if (rc < 0)
-		return rc;
-	rc = user_memcpy(uinfo,   &info, sizeof(struct port_info));
-	if (rc < 0)
-		return rc;
-	return res;
+	status = get_next_port_info(team, &cookie, &info);
+
+	// copy back to user space
+	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+		|| (status == B_OK && user_memcpy(userInfo, &info, sizeof(struct port_info)) < B_OK))
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
@@ -1166,31 +1149,24 @@ user_port_count(port_id port)
 
 
 status_t
-user_read_port_etc(port_id uport, int32 *umsg_code, void *umsg_buffer,
-	size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
+user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
+	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
-	ssize_t		res;
-	int32		msg_code;
-	status_t	rc;
-	
-	if (umsg_code == NULL)
-		return EINVAL;
-	if (umsg_buffer == NULL)
-		return EINVAL;
+	int32 messageCode;
+	ssize_t	status;
 
-	if((addr)umsg_code >= KERNEL_BASE && (addr)umsg_code <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)umsg_buffer >= KERNEL_BASE && (addr)umsg_buffer <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userCode == NULL || userBuffer == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userCode) || !IS_USER_ADDRESS(userBuffer))
+		return B_BAD_ADDRESS;
 
-	res = read_port_etc(uport, &msg_code, umsg_buffer, ubuffer_size, 
-						uflags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, utimeout);
+	status = read_port_etc(port, &messageCode, userBuffer, bufferSize,
+				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
 
-	rc = user_memcpy(umsg_code, &msg_code, sizeof(int32));
-	if(rc < 0)
-		return rc;
+	if (status == B_OK && user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
 
-	return res;
+	return status;
 }
 
 
@@ -1202,14 +1178,15 @@ user_set_port_owner(port_id port, team_id team)
 
 
 status_t
-user_write_port_etc(port_id uport, int32 umsg_code, void *umsg_buffer,
-	size_t ubuffer_size, uint32 uflags, bigtime_t utimeout)
+user_write_port_etc(port_id port, int32 messageCode, void *userBuffer,
+	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
-	if (umsg_buffer == NULL)
-		return EINVAL;
-	if((addr)umsg_buffer >= KERNEL_BASE && (addr)umsg_buffer <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	return write_port_etc(uport, umsg_code, umsg_buffer, ubuffer_size, 
-		uflags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, utimeout);
+	if (userBuffer == NULL)
+		return B_BAD_VALUE;
+	if (!IS_USER_ADDRESS(userBuffer))
+		return B_BAD_ADDRESS;
+
+	return write_port_etc(port, messageCode, userBuffer, bufferSize, 
+				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
 }
 
