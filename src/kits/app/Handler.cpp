@@ -745,11 +745,6 @@ BHandler::IsWatched() const
 }
 
 
-void BHandler::_ReservedHandler2() {}
-void BHandler::_ReservedHandler3() {}
-void BHandler::_ReservedHandler4() {}
-
-
 void
 BHandler::InitData(const char *name)
 {
@@ -783,6 +778,16 @@ BHandler::SetLooper(BLooper *loop)
 {
 	fLooper = loop;
 }
+
+
+#ifdef __INTEL__
+// binary compatibility with R4.5
+extern "C" void _ReservedHandler1__8BHandler(void) {}
+#endif
+
+void BHandler::_ReservedHandler2() {}
+void BHandler::_ReservedHandler3() {}
+void BHandler::_ReservedHandler4() {}
 
 
 //	#pragma mark -

@@ -25,6 +25,9 @@ char **argv_save;
 	// needed for BeOS compatibility - they are set in the startup code
 	// (have a look at the glue/ directory)
 
+int _data_offset_main_;
+	// this is obviously needed for R4.5 compatiblity
+
 
 void
 initialize_before(image_id imageID, struct uspace_program_args const *args)
