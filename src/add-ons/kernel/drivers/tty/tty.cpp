@@ -15,7 +15,7 @@
 #include <string.h>
 
 
-#define TTY_TRACE
+//#define TTY_TRACE
 #ifdef TTY_TRACE
 #	define TRACE(x) dprintf x
 #else
