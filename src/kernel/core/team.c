@@ -1602,8 +1602,12 @@ _get_team_info(team_id id, team_info *info, size_t size)
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	team = team_get_team_struct_locked(id);
-	if (!team) {
+	if (id == B_CURRENT_TEAM)
+		team = thread_get_current_thread()->team;
+	else
+		team = team_get_team_struct_locked(id);
+
+	if (team == NULL) {
 		rc = B_BAD_TEAM_ID;
 		goto err;
 	}
