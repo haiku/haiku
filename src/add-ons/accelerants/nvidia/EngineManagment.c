@@ -44,6 +44,7 @@ status_t RELEASE_ENGINE(engine_token *et, sync_token *st)
 
 void WAIT_ENGINE_IDLE(void)
 {
+	/*wait for the engine to be totally idle*/
 	nv_acc_wait_idle();
 }
 
