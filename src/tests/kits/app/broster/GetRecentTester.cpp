@@ -7,7 +7,9 @@
 #include <stdio.h>
 
 // System Includes -------------------------------------------------------------
+#include <Directory.h>
 #include <Entry.h>
+#include <File.h>
 #include <fs_attr.h>
 #include <Message.h>
 #include <Node.h>
@@ -23,15 +25,24 @@
 #include "testapps/RecentAppsTestApp.h"
 
 // Local Defines ---------------------------------------------------------------
-status_t check_ref_count(BMessage *refMsg, int32 count);
-status_t set_test_app_attributes(const entry_ref *app, const char *sig, const int32 *flags);
-status_t launch_test_app(RecentAppsTestAppId id, const int32 *flags);
-status_t get_test_app_ref(RecentAppsTestAppId id, entry_ref *ref);
+
+//------------------------------------------------------------------------------
+// Attribute names and types
+//------------------------------------------------------------------------------
 
 const int32 kFlagsType = 'APPF';
 
+const char *kTypeAttr = "BEOS:TYPE";
 const char *kSigAttr = "BEOS:APP_SIG";
 const char *kFlagsAttr = "BEOS:APP_FLAGS";
+
+#ifndef B_MIME_STRING_TYPE
+#define B_MIME_STRING_TYPE 'MIMS'
+#endif
+
+//------------------------------------------------------------------------------
+// BEOS:APP_FLAGS attributes
+//------------------------------------------------------------------------------
 
 const int32 kSingleLaunchFlags = B_SINGLE_LAUNCH;
 const int32 kMultipleLaunchFlags = B_MULTIPLE_LAUNCH;
@@ -67,26 +78,64 @@ const int32 kNonQualifyingFlags[] = {
 	kExclusiveLaunchArgvOnlyBackgroundFlags,
 };
 
+//------------------------------------------------------------------------------
+// Temporary files
+//------------------------------------------------------------------------------
+const char *kTempDirRoot = "/tmp";
+const char *kTempDir = "/tmp/obos-recent-tests";
+
+//const char *kTestType1 = "text/x-vnd.obos-recent-docs-test-type-1";
+//const char *kTestType2 = "text/x-vnd.obos-recent-docs-test-type-2";
+const char *kTestType1 = "text/x-vnd.obos-recent-docs-teste-1-thsdfkj";
+const char *kTestType2 = "text/x-vnd.obos-recent-doce-2-sdlkfjls";
+
 const char *test_types[] = {
-	"text/x-vnd.obos-recent-docs-test-type-1",
-	"text/x-vnd.obos-recent-docs-test-type-2",
-	"obos-test-supertype/x-vnd.obos-recent-docs-test-type-3",
-	"obos-test-supertype/x-vnd.obos-recent-docs-test-type-4",
+	kTestType1,
+	kTestType2,
 };
 
 struct test_doc {
 	const char *name;
 	const char *type;
 } test_docs[] = {
+	{ "first-file-of-type-1", kTestType1 },
+	{ "second-file-of-type-1", kTestType1 },
+	{ "first-file-of-type-2", kTestType2 },
+	{ "second-file-of-type-2", kTestType2 },
 	{ "untyped", NULL },
-	{ "type1a", test_types[0] },
-	{ "type1b", test_types[0] },
-	{ "type2a", test_types[1] },
-	{ "type2b", test_types[1] },
-	{ "type2c", test_types[1] },
-	{ "type3", test_types[2] },
-	{ "type4", test_types[3] },
 };
+
+enum test_doc_index {
+	kTestDocUntyped,
+	kTestDoc1Type1,
+	kTestDoc2Type1,
+	kTestDoc1Type2,
+	kTestDoc2Type2,
+};
+
+const char *test_folders[] = {
+	"test-folder-1",
+	"test-folder-2",
+	"test-folder-3",
+	"test-folder-4",
+};
+
+const char *test_sigs[] = {
+	"application/x-vnd.obos-recent-tests-1-tdfhingo",
+	"imposter/this-is-not-an-app-sig-now?",
+	"application/x-vnd.obos-recent-tests-a3sdfs-thingo",
+	"application/x-vnd.obos-recent-tests-app-sig-4a",
+};
+
+//------------------------------------------------------------------------------
+// Functions
+//------------------------------------------------------------------------------
+
+status_t check_ref_count(BMessage *refMsg, int32 count);
+status_t set_test_app_attributes(const entry_ref *app, const char *sig, const int32 *flags);
+status_t launch_test_app(RecentAppsTestAppId id, const int32 *flags);
+status_t get_test_app_ref(RecentAppsTestAppId id, entry_ref *ref);
+status_t get_test_ref(test_doc_index index, entry_ref *ref);
 
 
 // Globals ---------------------------------------------------------------------
@@ -229,6 +278,30 @@ get_test_app_ref(RecentAppsTestAppId id, entry_ref *ref)
 	if (!err)
 		err = entry.GetRef(ref);
 	return err;
+}
+
+/* \brief Fetches an entry_ref for the given test document
+
+	The file is assumed to reside in the directory specified
+	by \c kTempDir.
+
+	\param leafname the name of the file with no path information
+	\param ref pointer to a pre-allocated entry_ref into which the
+	           result is stored
+*/
+status_t get_test_ref(const char *leafname, entry_ref *ref)
+{
+	BEntry entry;
+
+	status_t err = leafname && ref ? B_OK : B_BAD_VALUE;
+	if (!err) {
+		char path[B_PATH_NAME_LENGTH];
+		sprintf(path, "%s/%s", kTempDir, leafname);
+		err = entry.SetTo(path);
+	}
+	if (!err) 
+		err = entry.GetRef(ref);
+	return err;		
 }
 
 //------------------------------------------------------------------------------
@@ -447,74 +520,35 @@ GetRecentTester::GetRecentAppsTestC3()
 	}
 }
 
-
-/*
-	void GetRecentApps(BMessage *refList, int32 maxCount)
-	@case C4		Application with a valid BEOS:APP_SIG attribute and no
-	                BEOS:APP_FLAGS attribute is launched.
-	@results		Said application should *not* appear at the top
-					of the recent apps list.
-*/
-void
-GetRecentTester::GetRecentAppsTestC4()
-{
-}
-
-/*
-	void GetRecentApps(BMessage *refList, int32 maxCount)
-	@case C5		Application with a valid BEOS:APP_SIG attribute and a
-	                non-qualifying BEOS:APP_FLAGS attribute is launched.
-	@results		Said application should *not* appear at the top
-					of the recent apps list.
-*/
-void
-GetRecentTester::GetRecentAppsTestC5()
-{
-}
-
-/*
-	void GetRecentApps(BMessage *refList, int32 maxCount)
-	@case C6		Application with a valid BEOS:APP_SIG attribute and a
-	                qualifying BEOS:APP_FLAGS attribute is launched.
-	@results		Said application should *not* appear at the top
-					of the recent apps list.
-*/
-void
-GetRecentTester::GetRecentAppsTestC6()
-{
-}
-
-
-
 //------------------------------------------------------------------------------
 // GetRecentDocuments()
 //------------------------------------------------------------------------------
 
-
 /*
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 	                        const char *fileType, const char *appSig)
-	@case A1		refList is NULL; maxCount, fileType and appSig are NULL.
+	@case 1			refList is NULL; all other params are valid
 	@results		Should quietly do nothing.
 */
-void GetRecentTester::GetRecentDocumentsTestA1()
+void GetRecentTester::GetRecentDocumentsTest1()
 {
 // R5 crashes if refList is NULL
 #if !TEST_R5
 	BRoster roster;
 	roster.GetRecentDocuments(NULL, 1);
+	roster.GetRecentDocuments(NULL, 1, &test_types[0], 1, NULL);
 #endif
 }
 
 /*
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 	                        const char *fileType, const char *appSig)
-	@case A2		refList is non-NULL, maxCount is zero, fileType and
+	@case 2			refList is non-NULL, maxCount is zero, fileType and
 	                appSig are NULL.
 	@results		R5: Returns one recent document.
 	                OBOS: Returns an empty message
 */
-void GetRecentTester::GetRecentDocumentsTestA2()
+void GetRecentTester::GetRecentDocumentsTest2()
 {
 	BRoster roster;
 	BMessage msg;
@@ -529,40 +563,590 @@ void GetRecentTester::GetRecentDocumentsTestA2()
 /*
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 	                        const char *fileType, const char *appSig)
-	@case A3		refList is non-NULL, maxCount is negative, fileType and
+	@case 3			refList is non-NULL, maxCount is negative, fileType and
 	                appSig are NULL.
 	@results		R5: Returns one recent document.
 	                OBOS: Returns an empty message
 */
-void GetRecentTester::GetRecentDocumentsTestA3()
+void GetRecentTester::GetRecentDocumentsTest3()
 {
+	BRoster roster;
+	BMessage msg;
+	roster.GetRecentDocuments(&msg, -1);
+#if TEST_R5
+	CHK(check_ref_count(&msg, 1) == B_OK);
+#else
+	CHK(check_ref_count(&msg, 0) == B_OK);
+#endif
 }
 
 /*
 	void GetRecentDocuments(BMessage *refList, int32 maxCount,
 	                        const char *fileType, const char *appSig)
-	@case B1		refList is valid, maxCount is negative, fileType and
-	                appSig are NULL.
+	@case 4			Four recent docs are added, with each pair having matching
+	                app sigs and each pair of docs with-non matching app sigs
+	                having matching file types. Get it?
+	@results		When no app sig and a count of 4 is specified, the four folders
+					in reverse order are returned.
+					When the first app sig and a count of 4 is specified, the two
+					folders that match that sig are returned.
+					When the second app sig and a count of 4 is specified, the two
+					folders that match that sig are returned.
+*/
+void GetRecentTester::GetRecentDocumentsTest4()
+{
+	entry_ref doc1;	// type1, sig1
+	entry_ref doc2;	// type1, sig2
+	entry_ref doc3;	// type2, sig1
+	entry_ref doc4;	// type2, sig2
+	entry_ref doc5;	// untyped, sig3
+	entry_ref recent1;
+	entry_ref recent2;
+	entry_ref recent3;
+	entry_ref recent4;
+	entry_ref recent5;
+	BRoster roster;
+	BMessage msg;
+	
+//	ExecCommand("ls -l ", kTempDir);
+
+	// Add four entries with two different app sigs (note that
+	// docs 0 & 1 and 2 & 3 have matching file types). Then
+	// add an untyped entry with a totally different app sig.
+	CHK(get_test_ref(test_docs[0].name, &doc1) == B_OK);
+	CHK(get_test_ref(test_docs[1].name, &doc2) == B_OK);
+	CHK(get_test_ref(test_docs[2].name, &doc3) == B_OK);
+	CHK(get_test_ref(test_docs[3].name, &doc4) == B_OK);
+	CHK(get_test_ref(test_docs[4].name, &doc5) == B_OK);
+	roster.AddToRecentDocuments(&doc1, test_sigs[0]);
+	roster.AddToRecentDocuments(&doc2, test_sigs[1]);
+	roster.AddToRecentDocuments(&doc3, test_sigs[0]);
+	roster.AddToRecentDocuments(&doc4, test_sigs[1]);
+	roster.AddToRecentDocuments(&doc5, test_sigs[2]);
+
+	// NULL type, NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 5) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(msg.FindRef("refs", 4, &recent5) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc4);
+	CHK(recent3 == doc3);
+	CHK(recent4 == doc2);
+	CHK(recent5 == doc1);
+
+	// type1, NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc2);
+	CHK(recent2 == doc1);
+
+	// type2, NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+
+	// [type1], NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[0], 1, NULL);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc2);
+	CHK(recent2 == doc1);
+
+	// [type2], NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[1], 1, NULL);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+
+	// [type1, type2], NULL sig
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types, 2, NULL);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 4) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc2);
+	CHK(recent4 == doc1);
+
+//----------------------------------------------------------
+
+	// NULL type, sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, NULL, test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc3);
+	CHK(recent2 == doc1);
+
+	// NULL type, sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, NULL, test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc2);
+
+	// NULL type, sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, NULL, test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 1) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(recent1 == doc5);
+
+	// type1, sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[0], test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc3);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// type1, sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[0], test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// type1, sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[0], test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// type2, sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[1], test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc1);
+
+	// type2, sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[1], test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc2);
+
+	// type2, sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types[1], test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc4);
+	CHK(recent3 == doc3);
+
+
+//---------
+
+	// [type1], sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[0], 1, test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc3);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// [type1], sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[0], 1, test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// [type1], sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[0], 1, test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc2);
+	CHK(recent3 == doc1);
+
+	// [type2], sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[1], 1, test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc1);
+
+	// [type2], sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[1], 1, test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc2);
+
+	// [type2], sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, &test_types[1], 1, test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 3) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc4);
+	CHK(recent3 == doc3);
+
+	// [type1, type2], sig1
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types, 2, test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 4) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc2);
+	CHK(recent4 == doc1);
+
+	// [type1, type2], sig2
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types, 2, test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 4) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(recent1 == doc4);
+	CHK(recent2 == doc3);
+	CHK(recent3 == doc2);
+	CHK(recent4 == doc1);
+
+	// [type1, type2], sig3
+	NextSubTest();
+	roster.GetRecentDocuments(&msg, 5, test_types, 2, test_sigs[2]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 5) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(msg.FindRef("refs", 4, &recent5) == B_OK);
+	CHK(recent1 == doc5);
+	CHK(recent2 == doc4);
+	CHK(recent3 == doc3);
+	CHK(recent4 == doc2);
+	CHK(recent5 == doc1);
+}
+
+//------------------------------------------------------------------------------
+// GetRecentFolders()
+//------------------------------------------------------------------------------
+
+/*
+	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
+	@case 1			refList is NULL; maxCount is valid, appSig is NULL.
+	@results		Should quietly do nothing.
+*/
+void GetRecentTester::GetRecentFoldersTest1()
+{
+// R5 crashes if refList is NULL
+#if !TEST_R5
+	BRoster roster;
+	roster.GetRecentFolders(NULL, 1);
+#endif
+}
+
+/*
+	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
+	@case B1		refList is valid, maxCount is negative, appSig is NULL.
 	@results		R5: Returns one recent document.
 	                OBOS: Returns an empty message
 */
-void GetRecentTester::GetRecentDocumentsTestB1()
+void GetRecentTester::GetRecentFoldersTest2()
 {
+	entry_ref folder1;
+	entry_ref folder2;
+	entry_ref recent1;
+	entry_ref recent2;
+	BRoster roster;
+	BMessage msg;
+	
+	CHK(get_test_ref(test_folders[0], &folder1) == B_OK);
+	CHK(get_test_ref(test_folders[1], &folder2) == B_OK);
+	roster.AddToRecentFolders(&folder1, NULL);
+	roster.GetRecentFolders(&msg, -1);
+//	msg.PrintToStream();
+#ifdef TEST_R5
+	CHK(check_ref_count(&msg, 1) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(recent1 == folder1);
+#else 
+	CHK(check_ref_count(&msg, 0) == B_OK);	
+#endif
 }
+
+/*
+	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
+	@case B2		refList is valid, maxCount is zero, appSig is NULL.
+	@results		R5: Returns one recent document.
+	                OBOS: Returns an empty message
+*/
+void GetRecentTester::GetRecentFoldersTest3()
+{
+	entry_ref folder1;
+	entry_ref folder2;
+	entry_ref recent1;
+	entry_ref recent2;
+	BRoster roster;
+	BMessage msg;
+	
+	CHK(get_test_ref(test_folders[0], &folder1) == B_OK);
+	CHK(get_test_ref(test_folders[1], &folder2) == B_OK);
+	roster.AddToRecentFolders(&folder1, NULL);
+	roster.GetRecentFolders(&msg, 0);
+//	msg.PrintToStream();
+#ifdef TEST_R5
+	CHK(check_ref_count(&msg, 1) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(recent1 == folder1);
+#else 
+	CHK(check_ref_count(&msg, 0) == B_OK);	
+#endif
+}
+
+/*
+	void GetRecentFolders(BMessage *refList, int32 maxCount, const char *appSig)
+	@case B3		Four recent folders are added, with each pair having matching
+	                app sigs. 
+	@results		When no app sig and a count of 4 is specified, the four folders
+					in reverse order are returned.
+					When the first app sig and a count of 4 is specified, the two
+					folders that match that sig are returned.
+					When the second app sig and a count of 4 is specified, the two
+					folders that match that sig are returned.
+*/
+void GetRecentTester::GetRecentFoldersTest4()
+{
+	entry_ref folder1;
+	entry_ref folder2;
+	entry_ref folder3;
+	entry_ref folder4;
+	entry_ref recent1;
+	entry_ref recent2;
+	entry_ref recent3;
+	entry_ref recent4;
+	BRoster roster;
+	BMessage msg;
+	
+//	ExecCommand("ls -l ", kTempDir);
+
+	// Add four entries with two different app sigs
+	CHK(get_test_ref(test_folders[0], &folder1) == B_OK);
+	CHK(get_test_ref(test_folders[1], &folder2) == B_OK);
+	CHK(get_test_ref(test_folders[2], &folder3) == B_OK);
+	CHK(get_test_ref(test_folders[3], &folder4) == B_OK);
+	roster.AddToRecentFolders(&folder1, test_sigs[0]);
+	roster.AddToRecentFolders(&folder2, test_sigs[1]);
+	roster.AddToRecentFolders(&folder3, test_sigs[0]);
+	roster.AddToRecentFolders(&folder4, test_sigs[1]);
+
+	NextSubTest();
+	roster.GetRecentFolders(&msg, 4, NULL);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 4) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(msg.FindRef("refs", 2, &recent3) == B_OK);
+	CHK(msg.FindRef("refs", 3, &recent4) == B_OK);
+	CHK(recent1 == folder4);
+	CHK(recent2 == folder3);
+	CHK(recent3 == folder2);
+	CHK(recent4 == folder1);
+
+	NextSubTest();
+	roster.GetRecentFolders(&msg, 4, test_sigs[0]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == folder3);
+	CHK(recent2 == folder1);
+
+	NextSubTest();
+	msg.MakeEmpty();
+	roster.GetRecentFolders(&msg, 4, test_sigs[1]);
+//	msg.PrintToStream();
+	CHK(check_ref_count(&msg, 2) == B_OK);	
+	CHK(msg.FindRef("refs", 0, &recent1) == B_OK);
+	CHK(msg.FindRef("refs", 1, &recent2) == B_OK);
+	CHK(recent1 == folder4);
+	CHK(recent2 == folder2);
+}
+
+
 
 void GetRecentTester::setUp()
 {
-	// Create our test documents and folders
-//	create_test_doc(
+	status_t err = B_OK;
+	BDirectory tempDir;
+
+	// Create our base folder for test entries
+	if (!BEntry(kTempDir).Exists()) {
+		BDirectory rootDir;
+		err = rootDir.SetTo(kTempDirRoot);
+		if (!err)
+			err = rootDir.CreateDirectory(kTempDir, &tempDir);
+		if (!err)
+			err = tempDir.InitCheck();
+		if (err) {
+			printf("WARNING: Unable to create temp directory for BRoster::GetRecent*() tests, error "
+			       "== 0x%lx. It's entirely possible that most of these tests will fail because "
+			       "of this\n", err);
+			return;
+		}
+	}
 	
+	// Create our test documents 
+	if (!err) {
+		int count = sizeof(test_docs) / sizeof(test_doc);
+		for (int i = 0; !err && i < count; i++) {
+			BFile file;
+
+			char filename[B_PATH_NAME_LENGTH];
+			sprintf(filename, "%s/%s", kTempDir, test_docs[i].name);
+			ExecCommand("touch ", filename);
+			err = file.SetTo(filename, B_READ_WRITE);
+
+// For some reason, only the first CreateFile() call works with R5. None
+// work with OBOS...
+/*
+			err = tempDir.CreateFile(test_docs[i].name, &file);
+			if (!err)
+				err = file.InitCheck();
+*/
+
+			// Write its type (if necessary)
+			if (!err && test_docs[i].type) {
+				int len = strlen(test_docs[i].type)+1;
+				ssize_t bytes = file.WriteAttr(kTypeAttr, B_MIME_STRING_TYPE, 0,
+					test_docs[i].type, len);
+				if (bytes >= 0)
+					err = bytes == len ? B_OK : B_FILE_ERROR;
+				else
+					err = bytes;
+			}
+		}
+	}
+	
+	// Create our test folders
+	if (!err) {
+		int count = sizeof(test_folders) / sizeof(char*);
+		for (int i = 0; !err && i < count; i++) {
+
+			// For some reason, only the first CreateFile() call works with R5
+			char dirname[B_PATH_NAME_LENGTH];
+			sprintf(dirname, "%s/%s", kTempDir, test_folders[i]);
+			if (!BEntry(dirname).Exists())
+				ExecCommand("mkdir ", dirname);
+/*
+			err = tempDir.CreateDirectory(test_folders[i], NULL);
+			if (err == B_FILE_EXISTS)
+				err = B_OK;
+*/
+		}
+	}
+	
+	// Let the user know if we hit an error
+	if (err) {
+		printf("WARNING: Error encountered while creating test files and/or folders, error "
+		       "code == 0x%lx. It's entirely possible that most or all of these tests will "
+		       "fail now because of this\n", err);
+	}	
 }
 
 void GetRecentTester::tearDown()
 {
-	// Remove all of our test docs and folders
-//	for (uint i = 0; i < (sizeof(test_docs) / sizeof(test_doc)); i++) {
-//		printf("test_doc[i] == { '%s', '%s' }\n", test_docs[i].name, test_docs[i].type);
-//	}
+	// Remove the folder containing all of our test files
+	if (BEntry(kTempDir).Exists()) 
+		ExecCommand("rm -rf ", kTempDir);
 }
 
 Test* GetRecentTester::Suite()
@@ -580,13 +1164,16 @@ Test* GetRecentTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC1);
 	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC2);
 	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC3);
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC4);
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC5);
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentAppsTestC6);
 
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTestA1);
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTestA2);
-	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTest1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTest2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTest3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentDocumentsTest4);
+
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentFoldersTest1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentFoldersTest2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentFoldersTest3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetRecentTester, GetRecentFoldersTest4);
 
 	return SuiteOfTests;
 }

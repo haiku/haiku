@@ -26,14 +26,6 @@ public:
 	GetRecentTester() {;}
 	GetRecentTester(std::string name) : BTestCase(name) {;}
 
-	// NULL refList, NULL fileType, NULL, appSig
-	void GetRecentDocumentsTestA1();
-	void GetRecentDocumentsTestA2();
-	void GetRecentDocumentsTestA3();
-
-	// valid refList, NULL fileType, NULL, appSig
-	void GetRecentDocumentsTestB1();
-	
 	//-----------------------------
 	// GetRecentApps() 
 	//-----------------------------
@@ -48,21 +40,39 @@ public:
 	void GetRecentAppsTestB2();
 	void GetRecentAppsTestB3();
 	
-	// BEOS:APP_SIG tests
+	// BEOS:APP_FLAGS tests
 	void GetRecentAppsTestC1();
 	void GetRecentAppsTestC2();
 	void GetRecentAppsTestC3();
-	void GetRecentAppsTestC4();
-	void GetRecentAppsTestC5();
-	void GetRecentAppsTestC6();
-	void GetRecentAppsTestC7();
-	void GetRecentAppsTestC8();
-	void GetRecentAppsTestC9();
-	void GetRecentAppsTestC10();
+	
+	//-----------------------------
+	// GetRecentDocs() 
+	//-----------------------------
 
-	// BEOS:APP_FLAGS tests
+	// Invalid params
+	void GetRecentDocumentsTest1();
+	void GetRecentDocumentsTest2();
+	void GetRecentDocumentsTest3();
+
+	// Normal function
+	void GetRecentDocumentsTest4();
 	
+	//-----------------------------
+	// GetRecentFolders() 
+	//-----------------------------
+
+	// Invalid params
+	void GetRecentFoldersTest1();
+	void GetRecentFoldersTest2();
+	void GetRecentFoldersTest3();
+
+	// Normal function
+	void GetRecentFoldersTest4();
 	
+	//-----------------------------
+	// misc 
+	//-----------------------------
+
 	// called for *each* test
 	virtual void setUp();
 	virtual void tearDown();
