@@ -10,6 +10,14 @@
 #include <new>
 #include <stdlib.h>
 
+// I'm not entirely sure if this is such a great idea or not, but
+// I can't find the standard definition of nothrow anywhere (in
+// order to copy it properly here for kernel use), so this will
+// do for the moment so things compile and I can go to bed. :-)
+// ToDo: declare and define this thing properly
+#ifndef nothrow
+#	define nothrow 0
+#endif
 
 // Oh no! C++ in the kernel! Are you nuts?
 //
@@ -30,11 +38,25 @@ operator new(size_t size)
 
 
 inline void *
+operator new(size_t size, const nothrow_t&) throw()
+{
+	return malloc(size);
+}
+
+
+inline void *
 operator new[](size_t size)
 {
 	return malloc(size);
 }
  
+
+inline void *
+operator new[](size_t size, const nothrow_t&) throw()
+{
+	return malloc(size);
+}
+
 
 inline void
 operator delete(void *ptr)
