@@ -13,19 +13,27 @@ using namespace Sniffer;
 
 Rule::Rule()
 	: fPriority(0.0)
+	, fExprList(NULL)
 {
-	// Not implemented
 }
 
-Rule::Rule(const char *rule)
-	: fPriority(0.0)
-{
-	// Parse the rule here ??? 
+Rule::~Rule() {
+	Unset();	
 }
 
-status_t
-Rule::SetTo(const char *rule) {
-	return B_ERROR;	// Not implemented
+void
+Rule::Unset() {
+ 	if (fExprList){
+		delete fExprList;
+		fExprList = NULL;
+	}
+}
+
+void
+Rule::SetTo(double priority, ExprList* list) {
+	Unset();
+	fPriority = priority;
+	fExprList = list;
 }
 
 

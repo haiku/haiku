@@ -9,20 +9,25 @@
 #ifndef _sk_sniffer_rule_h_
 #define _sk_sniffer_rule_h_
 
-#include <List.h>
+#include <vector>
 
 namespace Sniffer {
 
 class Expr;
+typedef std::vector<Expr*> ExprList;
 
 class Rule {
 public:
 	Rule();
-	Rule(const char *rule);
-	status_t SetTo(const char *rule);
+	~Rule();
 private:
-	float fPriority;
-	BList fExprList;
+	friend class Parser;
+
+	void Unset();
+	void SetTo(double priority, ExprList* list);
+
+	double fPriority;
+	ExprList *fExprList;
 };
 
 }
