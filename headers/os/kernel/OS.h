@@ -271,8 +271,22 @@ extern void			exit_thread(status_t status);
 extern status_t		wait_for_thread (thread_id thread, status_t *threadReturnValue);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
-// ToDo: we also need the INTEL static inline here for compatibility (and the _kfind_thread_() function)
+#if __INTEL__ && !_KERNEL_MODE && !_NO_INLINE_ASM
+static inline thread_id
+find_thread(const char *name) {
+	extern thread_id _kfind_thread_(const char *name);
+	if (!name) {
+		thread_id thread;
+		__asm__ __volatile__ ( 
+			"movl	%%fs:4, %%eax \n\t"
+			: "=a"(thread) );
+		return thread;
+	}
+	return _kfind_thread_(name);
+}
+#else
 extern thread_id 	find_thread(const char *name);
+#endif
 
 extern status_t		send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
 extern status_t		receive_data(thread_id *sender, void *buffer, size_t buffer_size);
