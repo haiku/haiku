@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-7/2003
+   Rudolf Cornelissen 10/2002-8/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -81,7 +81,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.03 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.04 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -737,6 +737,18 @@ status_t nv_general_bios_to_powergraphics()
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	nv_crtc_dpms(false, false, false);
 	nv_crtc_cursor_hide();
+
+	/* power-up all nvidia hardware function blocks */
+	/* bit 28: PVIDEO,
+	 * bit 25: CRTC2, (> NV04A)
+	 * bit 24: CRTC1,
+	 * bit 20: framebuffer,
+	 * bit 16: PPMI,
+	 * bit 12: PGRAPH,
+	 * bit  8: PFIFO,
+	 * bit  4: PMEDIA,
+	 * bit  0: TVOUT. (> NV04A) */
+	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
 	/* set card to 'enhanced' mode: (only VGA standard registers used for NeoMagic cards) */
 	/* (keep) card enabled, set plain normal memory usage, no old VGA 'tricks' ... */

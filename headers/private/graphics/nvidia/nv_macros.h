@@ -96,9 +96,13 @@
                                       regBase+0x00680000, 0x00003000);
     pNv->riva.PCRTC0 = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
                                      regBase+0x00600000, 0x00003000);
+
+Set interrupt enable.
+chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 */
 
 /* Nvidia PCI direct registers */
+#define NV32_PWRUPCTRL		0x00000200
 #define NV8_MISCW 			0x000c03c2
 #define NV8_MISCR 			0x000c03cc
 #define NV8_SEQIND			0x000c03c4
@@ -220,64 +224,42 @@
 #define NVGRPHX_MODE		0x05
 #define NVGRPHX_MISC		0x06
 #define NVGRPHX_BITMASK		0x08
+
+/* Nvidia BES (Back End Scaler) registers (>= NV10) */
+#define NVBES_NV10_BUFSEL	0x00008700
+#define NVBES_NV10_GENCTRL	0x00008704
+#define NVBES_NV10_COLKEY	0x00008b00
+/* buffer 0 */
+#define NVBES_NV10_0BUFADR	0x00008900
+#define NVBES_NV10_0MEMMASK	0x00008908
+#define NVBES_NV10_0BRICON	0x00008910
+#define NVBES_NV10_0SAT		0x00008918
+#define NVBES_NV10_0WHAT	0x00008920
+#define NVBES_NV10_0SRCSIZE	0x00008928
+#define NVBES_NV10_0SRCREF	0x00008930
+#define NVBES_NV10_0ISCALH	0x00008938
+#define NVBES_NV10_0ISCALV	0x00008940
+#define NVBES_NV10_0DSTREF	0x00008948
+#define NVBES_NV10_0DSTSIZE	0x00008950
+#define NVBES_NV10_0SRCPTCH	0x00008958
+/* buffer 1 */
+#define NVBES_NV10_1BUFADR	0x00008904
+#define NVBES_NV10_1MEMMASK	0x0000890c
+#define NVBES_NV10_1BRICON	0x00008914
+#define NVBES_NV10_1SAT		0x0000891c
+#define NVBES_NV10_1WHAT	0x00008924
+#define NVBES_NV10_1SRCSIZE	0x0000892c
+#define NVBES_NV10_1SRCREF	0x00008934
+#define NVBES_NV10_1ISCALH	0x0000893c
+#define NVBES_NV10_1ISCALV	0x00008944
+#define NVBES_NV10_1DSTREF	0x0000894c
+#define NVBES_NV10_1DSTSIZE	0x00008954
+#define NVBES_NV10_1SRCPTCH	0x0000895c
+/*
+	    chip->PMC[0x00008140/4] = 0;
+        chip->PMC[0x00001588/4] = 0;
+*/
 //end new.
-
-/* (D)AC (X) (I)ndexed registers (>= G100) */
-#define NVDXI_VREFCTRL        0x18
-#define NVDXI_MULCTRL         0x19
-#define NVDXI_PIXCLKCTRL      0x1A
-#define NVDXI_GENCTRL         0x1D
-#define NVDXI_MISCCTRL        0x1E
-#define NVDXI_PANELMODE       0x1F
-#define NVDXI_MAFCDEL         0x20
-#define NVDXI_GENIOCTRL       0x2A
-#define NVDXI_GENIODATA       0x2B
-#define NVDXI_SYSPLLM         0x2C
-#define NVDXI_SYSPLLN         0x2D
-#define NVDXI_SYSPLLP         0x2E
-#define NVDXI_SYSPLLSTAT      0x2F
-#define NVDXI_ZOOMCTRL        0x38
-#define NVDXI_SENSETEST       0x3A
-#define NVDXI_CRCREML         0x3C
-#define NVDXI_CRCREMH         0x3D
-#define NVDXI_CRCBITSEL       0x3E
-#define NVDXI_COLMSK          0x40
-#define NVDXI_COLKEY          0x42
-#define NVDXI_PIXPLLAM        0x44
-#define NVDXI_PIXPLLAN        0x45
-#define NVDXI_PIXPLLAP        0x46
-#define NVDXI_PIXPLLBM        0x48
-#define NVDXI_PIXPLLBN        0x49
-#define NVDXI_PIXPLLBP        0x4A
-#define NVDXI_PIXPLLCM        0x4C
-#define NVDXI_PIXPLLCN        0x4D
-#define NVDXI_PIXPLLCP        0x4E
-#define NVDXI_PIXPLLSTAT      0x4F
-#define NVDXI_CURCOLEXT       0x60   /*sequential from CURCOL3->15, RGB*/
-
-/* (D)AC (X) (I)ndexed registers (>= G200) */
-#define	NVDXI_KEYOPMODE	   0x51
-#define	NVDXI_COLMSK0RED 	   0x52
-#define	NVDXI_COLMSK0GREEN    0x53
-#define	NVDXI_COLMSK0BLUE 	   0x54
-#define	NVDXI_COLKEY0RED	   0x55
-#define	NVDXI_COLKEY0GREEN    0x56
-#define	NVDXI_COLKEY0BLUE 	   0x57
-
-/* (D)AC (X) (I)ndexed registers (>= G450) */
-#define NVDXI_TVO_IDX         0x87
-#define NVDXI_TVO_DATA        0x88
-#define NVDXI_OUTPUTCONN      0x8A
-#define NVDXI_SYNCCTRL        0x8B
-#define NVDXI_VIDPLLSTAT      0x8C
-#define NVDXI_VIDPLLP         0x8D
-#define NVDXI_VIDPLLM         0x8E
-#define NVDXI_VIDPLLN         0x8F
-#define NVDXI_PWRCTRL         0xA0
-#define NVDXI_PANMODE         0xA2
-
-/* NV 1st CRTC registers */
-#define NVCR1_VCOUNT        0x1E20
 
 /* NV 2nd CRTC registers (>= G400) */
 #define NVCR2_CTL           0x3C10
@@ -336,36 +318,6 @@
 #define NVACC_TEXORG4         0x2CB0 // >= G200 
 #define NVACC_SRCORG          0x2CB4 // >= G200
 #define NVACC_DSTORG          0x2CB8 // >= G200
-
-/*NV BES (Back End Scaler) registers (>= G200) */
-#define NVBES_A1ORG           0x3D00
-#define NVBES_A2ORG           0x3D04
-#define NVBES_B1ORG           0x3D08
-#define NVBES_B2ORG           0x3D0C
-#define NVBES_A1CORG          0x3D10
-#define NVBES_A2CORG          0x3D14
-#define NVBES_B1CORG          0x3D18
-#define NVBES_B2CORG          0x3D1C
-#define NVBES_CTL             0x3D20
-#define NVBES_PITCH           0x3D24
-#define NVBES_HCOORD          0x3D28
-#define NVBES_VCOORD          0x3D2C
-#define NVBES_HISCAL          0x3D30
-#define NVBES_VISCAL          0x3D34
-#define NVBES_HSRCST          0x3D38
-#define NVBES_HSRCEND         0x3D3C
-#define NVBES_LUMACTL         0x3D40
-#define NVBES_V1WGHT          0x3D48
-#define NVBES_V2WGHT          0x3D4C
-#define NVBES_HSRCLST         0x3D50
-#define NVBES_V1SRCLST        0x3D54
-#define NVBES_V2SRCLST        0x3D58
-#define NVBES_A1C3ORG         0x3D60
-#define NVBES_A2C3ORG         0x3D64
-#define NVBES_B1C3ORG         0x3D68
-#define NVBES_B2C3ORG         0x3D6C
-#define NVBES_GLOBCTL         0x3DC0
-#define NVBES_STATUS          0x3DC4
 
 /*MAVEN registers (<= G400) */
 #define NVMAV_PGM            0x3E
@@ -440,38 +392,11 @@
 #define DACW(A,B) (NV_REG32(NVDAC_##A)=B)
 #define DAC2R(A)   (NV_REG32(NVDAC2_##A))
 #define DAC2W(A,B) (NV_REG32(NVDAC2_##A)=B)
-//end new.
-
-/* read and write from the dac index register */
-#define DXIR(A)   (DACW(PALWTADD,NVDXI_##A),DACR(X_DATAREG))
-#define DXIW(A,B) (DACW(PALWTADD,NVDXI_##A),DACW(X_DATAREG,B))
-
-/* read and write from the vga registers */
-#define VGAR(A)   (NV_REG8(NVVGA_##A))
-#define VGAW(A,B) (NV_REG8(NVVGA_##A)=B)
-
-/* read and write from the indexed vga registers */
-#define VGAR_I(A,B)   (VGAW(A##_I,B),VGAR(A##_D))
-#define VGAW_I(A,B,C) (VGAW(A##_I,B),VGAW(A##_D,C))
-
-/* read and write from the powergraphics registers */
-#define ACCR(A)    (NV_REG32(NVACC_##A))
-#define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
-#define ACCGO(A,B) (NV_REG32(NVACC_##A + 0x0100)=B)
 
 /* read and write from the backend scaler registers */
 #define BESR(A)   (NV_REG32(NVBES_##A))
 #define BESW(A,B) (NV_REG32(NVBES_##A)=B)
 
-/* read and write from first CRTC */
-#define CR1R(A)   (NV_REG32(NVCR1_##A))
-#define CR1W(A,B) (NV_REG32(NVCR1_##A)=B)
-
-/* read and write from second CRTC */
-#define CR2R(A)   (NV_REG32(NVCR2_##A))
-#define CR2W(A,B) (NV_REG32(NVCR2_##A)=B)
-
-//new:
 /* read and write from CRTC indexed registers */
 #define CRTCW(A,B)(NV_REG16(NV16_CRTCIND) = ((NVCRTCX_##A) | ((B) << 8)))
 #define CRTCR(A)  (NV_REG8(NV8_CRTCIND) = (NVCRTCX_##A), NV_REG8(NV8_CRTCDAT))
@@ -484,7 +409,7 @@
 #define SEQW(A,B)(NV_REG16(NV16_SEQIND) = ((NVSEQX_##A) | ((B) << 8)))
 #define SEQR(A)  (NV_REG8(NV8_SEQIND) = (NVSEQX_##A), NV_REG8(NV8_SEQDAT))
 
-/* read and write from PCI GRAPHICS indexed registers (>= NM2097) */
+/* read and write from PCI GRAPHICS indexed registers */
 #define GRPHW(A,B)(NV_REG16(NV16_GRPHIND) = ((NVGRPHX_##A) | ((B) << 8)))
 #define GRPHR(A)  (NV_REG8(NV8_GRPHIND) = (NVGRPHX_##A), NV_REG8(NV8_GRPHDAT))
 //end new.
@@ -494,3 +419,12 @@
 #define MAVW(A,B)   (i2c_maven_write(NVMAV_##A ,B))
 #define MAVRW(A)    (i2c_maven_read (NVMAV_##A )|(i2c_maven_read(NVMAV_##A +1)<<8))
 #define MAVWW(A,B)  (i2c_maven_write(NVMAV_##A ,B &0xFF),i2c_maven_write(NVMAV_##A +1,B >>8))
+
+/* read and write from the powergraphics registers */
+#define ACCR(A)    (NV_REG32(NVACC_##A))
+#define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
+#define ACCGO(A,B) (NV_REG32(NVACC_##A + 0x0100)=B)
+
+/* read and write from second CRTC */
+#define CR2R(A)   (NV_REG32(NVCR2_##A))
+#define CR2W(A,B) (NV_REG32(NVCR2_##A)=B)
