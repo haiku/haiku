@@ -86,6 +86,28 @@ ServerFont::~ServerFont(void)
 }
 
 /*! 
+	\brief Returns a copy of the specified font
+	\param The font to copy from.
+	\return A copy of the specified font
+*/
+ServerFont& ServerFont::operator=(const ServerFont& font){
+	fstyle		= font.fstyle;
+	fsize		= font.fsize;
+	frotation	= font.frotation;
+	fshear		= font.fshear;
+	fflags		= font.fflags;
+	fspacing	= font.fspacing;
+	fdirection	= B_FONT_LEFT_TO_RIGHT;
+	fface		= B_REGULAR_FACE;
+	ftruncate	= B_TRUNCATE_END;
+	fencoding	= B_UNICODE_UTF8;
+	fbounds.Set(0,0,0,0);
+	if(fstyle)
+		fstyle->AddDependent();
+	return *this;
+}
+
+/*! 
 	\brief Returns the number of strikes in the font
 	\return The number of strikes in the font
 */
@@ -126,4 +148,7 @@ void ServerFont::Height(font_height *fh)
 	fh->descent=fheight.descent;
 	fh->leading=fheight.leading;
 }
-
+/*
+ @log
+	* added ServerFont::operator=(const ServerFont& font).
+*/
