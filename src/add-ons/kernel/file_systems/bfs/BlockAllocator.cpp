@@ -842,6 +842,8 @@ BlockAllocator::CheckNextNode(check_control *control)
 
 			// check if the inode's name is the same as in the b+tree
 			if (inode->IsRegularNode()) {
+				SimpleLocker locker(inode->SmallDataLock());
+
 				const char *localName = inode->Name();
 				if (localName == NULL || strcmp(localName, name)) {
 					control->errors |= BFS_NAMES_DONT_MATCH;
