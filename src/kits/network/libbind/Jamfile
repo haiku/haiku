@@ -178,7 +178,9 @@ SharedLibrary "bind" :
 LinkSharedOSLibs libbind.so :
 	root 
 	be # BeOS defines syslog in libbe.so
-	libsocket.so ;
+	libsocket.so 
+	libnet.so # for gethostname()
+;
 
 # Installation -- in the test directory for the time being
 OBOSInstallRelSymLink install-networking
