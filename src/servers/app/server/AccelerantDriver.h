@@ -42,10 +42,10 @@
 #include <Accelerant.h>
 #include "DisplayDriver.h"
 #include "PatternHandler.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
-
+//#include <ft2build.h>
+//#include FT_FREETYPE_H
+//#include FT_GLYPH_H
+#include "FontServer.h"
 #if 0
 class VDWindow;
 class RGBColor;

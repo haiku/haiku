@@ -285,8 +285,8 @@ void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 		printf("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspace,(active)?"active":"inactive");
 	#endif
 	_winlink->SetOpCode(AS_WORKSPACE_ACTIVATED);
-	_winlink->Attach(workspace);
-	_winlink->Attach(active);
+	_winlink->Attach<int32>(workspace);
+	_winlink->Attach<bool>(active);
 	_winlink->Flush();
 }
 
@@ -301,8 +301,8 @@ void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
 		printf("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,newone);
 	#endif
 	_winlink->SetOpCode(AS_WORKSPACES_CHANGED);
-	_winlink->Attach(oldone);
-	_winlink->Attach(newone);
+	_winlink->Attach<int32>(oldone);
+	_winlink->Attach<int32>(newone);
 	_winlink->Flush();
 }
 
@@ -316,7 +316,7 @@ void ServerWindow::WindowActivated(bool active)
 		printf("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"active":"inactive");
 	#endif
 	_winlink->SetOpCode(AS_WINDOW_ACTIVATED);
-	_winlink->Attach(active);
+	_winlink->Attach<bool>(active);
 	_winlink->Flush();
 }
 
@@ -331,7 +331,7 @@ void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace
 		printf("ServerWindow %s: ScreenModeChanged\n",_title->String());
 	#endif
 	_winlink->SetOpCode(AS_SCREENMODE_CHANGED);
-	_winlink->Attach(frame);
+	_winlink->Attach<BRect>(frame);
 	_winlink->Attach(&cspace,sizeof(color_space));
 	_winlink->Flush();
 }
@@ -1202,7 +1202,7 @@ int32 ServerWindow::MonitorWin(void *data)
 					// Our BWindow sent us this message when it quit.
 					// We need to ask its ServerApp to delete our monitor
 					win->_applink->SetOpCode(AS_DELETE_WINDOW);
-					win->_applink->Attach((int32)win->_token);
+					win->_applink->Attach<int32>(win->_token);
 					win->_applink->Flush();
 					break;
 				}
@@ -1271,9 +1271,9 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			float x;
 			float y;
 			int64 dummy;
-			msg->Read(&dummy);
-			msg->Read(&x);
-			msg->Read(&y);
+			msg->Read<int64>(&dummy);
+			msg->Read<float>(&x);
+			msg->Read<float>(&y);
 			BPoint pt(x,y);
 			
 			// If we have clicked on a window, 			

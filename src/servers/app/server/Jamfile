@@ -3,8 +3,26 @@ SubDir OBOS_TOP src servers app server ;
 AddResources app_server : app_server.rsrc ;
 
 UseLibraryHeaders png zlib ;
-UsePrivateHeaders app interface ;
+UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseFreeTypeHeaders ;
+
+SharedLibrary appserver :
+	ColorSet.cpp
+	Decorator.cpp
+	DisplayDriver.cpp
+	FontFamily.cpp
+	PatternHandler.cpp
+	RectUtils.cpp
+	RGBColor.cpp
+	ServerBitmap.cpp
+	ServerCursor.cpp
+	ServerFont.cpp
+	SystemPalette.cpp
+;
+
+LinkSharedOSLibs libappserver.so : root be 							  
+	<boot!home!config!lib>libopenbeos.so
+	<boot!home!config!lib>libfreetype.so ;
 
 Server app_server :
 	# Misc. Sources
@@ -13,14 +31,9 @@ Server app_server :
 	bget.c
 	CursorData.cpp
 	TokenHandler.cpp
-	PatternHandler.cpp
 	PicturePlayer.cpp
 
-	ColorSet.cpp
 	PNGDump.cpp
-	RectUtils.cpp
-	RGBColor.cpp
-	SystemPalette.cpp
 	Utils.cpp
 
 	# Manager Classes
@@ -33,21 +46,15 @@ Server app_server :
 	ServerWindow.cpp
 
 	# Font Classes
-	FontFamily.cpp
 	FontServer.cpp
-	ServerFont.cpp
 
 	# Display Classes
 	AccelerantDriver.cpp
-	Decorator.cpp
 	DefaultDecorator.cpp
 	DesktopClasses.cpp
-	DisplayDriver.cpp
 	Layer.cpp
 	RootLayer.cpp
 	ScreenDriver.cpp
-	ServerBitmap.cpp
-	ServerCursor.cpp
 	ServerPicture.cpp
 	ViewDriver.cpp
 	WinBorder.cpp
@@ -56,7 +63,7 @@ Server app_server :
 LINKFLAGS on app_server ?= $(LINKFLAGS) ;
 LINKFLAGS on app_server += -lbe ;
 
-LinkSharedOSLibs app_server : root game translation libz.so libpng.so 
+LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
 							   <boot!home!config!lib>libopenbeos.so 
 							   <boot!home!config!lib>libfreetype.so ;
 

@@ -38,6 +38,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+
 #define RUN_UNDER_R5
 
 #define CLIP_X(a) ( (a < 0) ? 0 : ((a > mDisplayMode.virtual_width-1) ? \

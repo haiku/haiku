@@ -27,18 +27,16 @@
 #include <String.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <Path.h>
+#include <storage/Path.h>	// specified to be able to build under Dano
 #include <File.h>
 #include <Message.h>
 #include <String.h>
 
-#include "FontFamily.h"
 #include "FontServer.h"
+#include "FontFamily.h"
 #include "ServerFont.h"
 #include "ServerConfig.h"
 
-FTC_Manager ftmanager; 
-FT_Library ftlib;
 FontServer *fontserver;
 
 /*!

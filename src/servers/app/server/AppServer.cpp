@@ -45,6 +45,7 @@
 #include "BitmapManager.h"
 #include "CursorManager.h"
 #include "Utils.h"
+#include "FontServer.h"
 
 //#define DEBUG_KEYHANDLING
 
@@ -497,7 +498,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 
 			PortLink *replylink=new PortLink(reply_port);
 			replylink->SetOpCode(AS_SET_SERVER_PORT);
-			replylink->Attach((int32)newapp->_receiver);
+			replylink->Attach<int32>(newapp->_receiver);
 			replylink->Flush();
 
 			delete replylink;
@@ -601,9 +602,9 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			
 			PortLink *replylink=new PortLink(*((port_id*)index));
 			replylink->SetOpCode(AS_GET_SCREEN_MODE);
-			replylink->Attach((int16)_driver->GetWidth());
-			replylink->Attach((int16)_driver->GetHeight());
-			replylink->Attach((int16)_driver->GetDepth());
+			replylink->Attach<int16>(_driver->GetWidth());
+			replylink->Attach<int16>(_driver->GetHeight());
+			replylink->Attach<int16>(_driver->GetDepth());
 			replylink->Flush();
 			delete replylink;
 			break;
@@ -981,7 +982,6 @@ ServerApp *AppServer::FindApp(const char *sig)
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
-debugger("");
 	Decorator *dec=NULL;
 	if(!app_server->make_decorator)
 		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);

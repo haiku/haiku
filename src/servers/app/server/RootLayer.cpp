@@ -76,17 +76,19 @@ void RootLayer::RequestDraw(void)
 	low.type64=0LL;
 	
 	// Redraw the base
-	for(int32 i=0; _invalid->CountRects();i++)
+	if(_invalid)
 	{
-		if(_invalid->RectAt(i).IsValid())
-			_driver->FillRect(_invalid->RectAt(i),_layerdata, (int8*)low.type8);
-		else
-			break;
+		for(int32 i=0; _invalid->CountRects();i++)
+		{
+			if(_invalid->RectAt(i).IsValid())
+				_driver->FillRect(_invalid->RectAt(i),_layerdata, (int8*)low.type8);
+			else
+				break;
+		}
+	
+		delete _invalid;
+		_invalid=NULL;
 	}
-
-	delete _invalid;
-	_invalid=NULL;
-	_is_dirty=false;
 
 	// force redraw of all dirty windows	
 	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
@@ -95,6 +97,7 @@ void RootLayer::RequestDraw(void)
 			lay->RequestDraw(lay->Bounds());
 	}
 
+	_is_dirty=false;
 #ifdef DISPLAYDRIVER_TEST_HACK
 	int8 pattern[8];
 	int8 pattern2[8];

@@ -28,7 +28,8 @@
 #include "ServerFont.h"
 #include FT_CACHE_H
 
-extern FTC_Manager ftmanager;
+FTC_Manager ftmanager; 
+FT_Library ftlib;
 
 /*!
 	\brief Constructor

@@ -38,9 +38,10 @@
 #include <Region.h>
 #include <Font.h>
 #include "DisplayDriver.h"
-#include <ft2build.h>
+//#include <ft2build.h>
 #include <WindowScreen.h>
-#include FT_FREETYPE_H
+//#include FT_FREETYPE_H
+#include "FontServer.h"
 
 class BBitmap;
 class PortLink;

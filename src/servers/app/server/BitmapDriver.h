@@ -38,9 +38,10 @@
 #include <Bitmap.h>
 #include <OS.h>
 #include "DisplayDriver.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#include FT_GLYPH_H
+//#include <ft2build.h>
+//#include FT_FREETYPE_H
+//#include FT_GLYPH_H
+#include "FontServer.h"
 
 class ServerCursor;
 class ServerBitmap;

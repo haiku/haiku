@@ -4,7 +4,7 @@
 #include <Point.h>
 #include <Font.h>
 #include "RGBColor.h"
-#include "FontServer.h"
+//#include "FontServer.h"
 #include "ServerFont.h"
 
 class ServerBitmap;
@@ -24,7 +24,8 @@ public:
 			highcolor.SetColor(0,0,0,255);
 			lowcolor.SetColor(255,255,255,255);
 			viewcolor.SetColor(255,255,255,255);
-			font=fontserver->GetSystemPlain();
+//			font=fontserver->GetSystemPlain();
+			font=NULL;
 			scale=1.0;
 			edelta.space=0;
 			edelta.nonspace=0;
