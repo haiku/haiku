@@ -217,7 +217,8 @@ BApplication::~BApplication()
 	be_roster->RemoveApp(Team());
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
-	be_app_messenger = BMessenger();
+// R5 doesn't uninitialize be_app_messenger.
+//	be_app_messenger = BMessenger();
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(BMessage* data)
@@ -518,7 +519,7 @@ void BApplication::SetPulseRate(bigtime_t rate)
 //------------------------------------------------------------------------------
 status_t BApplication::GetSupportedSuites(BMessage* data)
 {
-	status_t err;
+	status_t err = B_OK;
 	if (!data)
 	{
 		err = B_BAD_VALUE;
@@ -654,15 +655,6 @@ void BApplication::InitData(const char* signature, status_t* error)
 			fMsgPort = appInfo.port;
 		} else
 			appInfo.port = fMsgPort;
-		// Create a B_ARGV_RECEIVED message and send it to ourselves.
-		// Do that even, if we are B_ARGV_ONLY.
-		// TODO: When BLooper::AddMessage() is done, use that instead of
-		// PostMessage().
-		if (__libc_argc > 1) {
-			BMessage argvMessage(B_ARGV_RECEIVED);
-			do_argv(&argvMessage);
-			PostMessage(&argvMessage, this);
-		}
 		// complete the registration
 		fInitError = be_roster->CompleteRegistration(team, thread,
 													 appInfo.port);
@@ -720,7 +712,12 @@ void BApplication::InitData(const char* signature, status_t* error)
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
-	// TODO: create_app_meta_mime()
+	// create meta MIME
+	if (fInitError == B_OK) {
+		BPath path;
+		if (path.SetTo(&ref) == B_OK)
+			create_app_meta_mime(path.Path(), false, true, false);
+	}
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
 	if (error)
