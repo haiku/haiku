@@ -6,7 +6,8 @@
 // 2002, François Revol
 // technical reference:
 // http://bedriven.be-in.org/document/280-serial_port_driver.html
-// please add standard header before putting into the OBOS CVS :)
+// 2004: bedriven is down now, mirror at:
+// http://web.archive.org/web/20040220055400/http://bedriven.be-in.org/document/280-serial_port_driver.html
 
 int main(int argc, char **argv)
 {
