@@ -24,10 +24,79 @@
  */
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
-#include <DataIO.h>
-#include <ByteOrder.h>
-#include <InterfaceDefs.h>
 #include <MediaFormats.h>
-#include "RawFormats.h"
-#include "matroska_reader.h"
+#include "matroska_codecs.h"
+
+#define IS_CODEC(a,b) !memcmp(a, b, strlen(b))
+
+struct bitmap_info_header
+{
+	uint32 size;
+	uint32 width;
+	uint32 height;
+	uint16 planes;
+	uint16 bit_count;
+	uint32 compression;
+	uint32 image_size;
+	uint32 x_pels_per_meter;
+	uint32 y_pels_per_meter;
+	uint32 clr_used;
+	uint32 clr_important;
+} _PACKED;
+
+
+status_t
+GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size)
+{
+	printf("GetAudioFormat: codec '%s', private data size %d\n", codec, private_size);
+	
+	BMediaFormats formats;
+	media_format_description description;
+	
+	if (IS_CODEC(codec, "A_VORBIS")) {
+		description.family = B_MISC_FORMAT_FAMILY;
+		description.u.misc.file_format = 'OggS';
+		description.u.misc.codec = 'vorb';
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_AUDIO;
+
+		format->SetMetaData(private_data, private_size);
+
+		return B_OK;
+	}
+	
+	if (IS_CODEC(codec, "A_AAC/MPEG4/LC/SBR")) {
+	}
+	
+	return B_ERROR;
+}
+
+
+status_t
+GetVideoFormat(media_format *format, const char *codec, void *private_data, int private_size)
+{
+	printf("private_data: codec '%s', private data size %d\n", codec, private_size);
+	
+	BMediaFormats formats;
+	media_format_description description;
+
+	if (IS_CODEC(codec, "V_MS/VFW/FOURCC")) {
+		if (private_size < (int)sizeof(bitmap_info_header)) {
+			return B_ERROR;
+		}
+		const bitmap_info_header *bih = (const bitmap_info_header *)private_data;
+
+		description.family = B_AVI_FORMAT_FAMILY;
+		description.u.avi.codec = bih->compression;
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_VIDEO;
+
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		*(uint32 *)format->user_data = bih->compression; format->user_data[4] = 0;
+
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+

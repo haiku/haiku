@@ -25,5 +25,7 @@
 #ifndef _MATROSKA_CODECS_H
 #define _MATROSKA_CODECS_H
 
+status_t GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size);
+status_t GetVideoFormat(media_format *format, const char *codec, void *private_data, int private_size);
 
 #endif
