@@ -4,6 +4,7 @@ SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR='\"/boot/beos/share/locale\"' ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers ] ;
 
 BinCommand grep :
 	grep.c
