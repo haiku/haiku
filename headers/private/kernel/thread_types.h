@@ -101,8 +101,8 @@ struct team {
 		uint32		count;
 		int32		wait_for_any;	/* count of wait_for_child() that wait for any child */
 	} dead_children;
-	vm_address_space *aspace;
-	vm_address_space *kaspace;
+	struct vm_address_space *aspace;
+	struct vm_address_space *kaspace;
 	addr_t			user_env_base;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
