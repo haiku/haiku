@@ -125,7 +125,7 @@ PrinterDriver::PrintJob
 	msg->Unflatten(fJobFile);
 	// We have to load the settings here for Dano/Zeta because they don't store 
 	// all fields from the message returned by config_job in the job file!
-	PrinterSettings::Update(printerNode, msg);
+	PrinterSettings::Read(printerNode, msg, PrinterSettings::kJobSettings);
 	
 	if (msg->HasInt32("copies")) {
 		copies = msg->FindInt32("copies");

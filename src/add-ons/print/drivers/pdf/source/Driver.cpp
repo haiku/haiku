@@ -71,7 +71,7 @@ config_page(BNode *spoolDir, BMessage *msg)
 
 	pagesetupMsg = new BMessage(*msg);
 	
-	PrinterSettings::Update(spoolDir, pagesetupMsg);
+	PrinterSettings::Read(spoolDir, pagesetupMsg, PrinterSettings::kPageSettings);
 
 	// retrieve the printer (spool) name.
 	printerName = NULL;
@@ -82,7 +82,7 @@ config_page(BNode *spoolDir, BMessage *msg)
 	driver = instanciate_driver(spoolDir);
 	if (driver->PageSetup(pagesetupMsg, printerName) == B_OK) {
 		pagesetupMsg->what = 'okok';
-		PrinterSettings::Update(spoolDir, pagesetupMsg);
+		PrinterSettings::Update(spoolDir, pagesetupMsg, PrinterSettings::kPageSettings);
 	} else {
 		delete pagesetupMsg;
 		pagesetupMsg = NULL;
@@ -105,7 +105,7 @@ config_job(BNode *spoolDir, BMessage *msg)
 
 	jobsetupMsg = new BMessage(*msg);
 
-	PrinterSettings::Update(spoolDir, jobsetupMsg);
+	PrinterSettings::Read(spoolDir, jobsetupMsg, PrinterSettings::kJobSettings);
 
 	// retrieve the printer (spool) name.
 	printerName = NULL;
@@ -115,7 +115,7 @@ config_job(BNode *spoolDir, BMessage *msg)
 	driver = instanciate_driver(spoolDir);
 	if (driver->JobSetup(jobsetupMsg, printerName) == B_OK) {
 		jobsetupMsg->what = 'okok';
-		PrinterSettings::Update(spoolDir, jobsetupMsg);
+		PrinterSettings::Update(spoolDir, jobsetupMsg, PrinterSettings::kJobSettings);
 	} else {
 		delete jobsetupMsg;
 		jobsetupMsg = NULL;
@@ -153,7 +153,7 @@ default_settings(BNode* printer)
 {
 	BMessage *msg = new BMessage();
 
-	PrinterSettings::Update(printer, msg);
+	PrinterSettings::Read(printer, msg, PrinterSettings::kPageSettings);
 	
 	return msg;
 }
