@@ -227,11 +227,12 @@ void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 	
 	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
 	call _SetCursorHidden(true) somewhere within this function to ensure that data is
-	maintained accurately.
+	maintained accurately. Subclasses must include a call to DisplayDriver::HideCursor
+	for proper state tracking.
 */
 void DisplayDriver::HideCursor(void)
 {
-	_SetCursorHidden(true);
+	_is_cursor_hidden=true;
 }
 
 /*!
@@ -275,23 +276,26 @@ void DisplayDriver::InvertRect(BRect r)
 	
 	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
 	call _SetCursorHidden(false) somewhere within this function to ensure that data is
-	maintained accurately.
+	maintained accurately. Subclasses must call DisplayDriver::ShowCursor at some point
+	to ensure proper state tracking.
 */
 void DisplayDriver::ShowCursor(void)
 {
-	_SetCursorHidden(false);
+	_is_cursor_hidden=false;
+	_is_cursor_obscured=false;
 }
 
 /*!
 	\brief Obscures the cursor.
 	
-	Obscure calls are not nestable. Subclasses should call _SetCursorObscured(true) 
-	somewhere within this function to ensure that data is maintained accurately. When the
-	next call to MoveCursorTo() is made, the cursor will be shown again.
+	Obscure calls are not nestable. Subclasses should call DisplayDriver::ObscureCursor
+	somewhere within this function to ensure that data is maintained accurately. A check
+	will be made by the system before the next MoveCursorTo call to show the cursor if
+	it is obscured.
 */
 void DisplayDriver::ObscureCursor(void)
 {
-	_SetCursorObscured(true);
+	_is_cursor_obscured=true;
 }
 
 /*!
@@ -318,30 +322,96 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	_Unlock();
 }
 
-void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+/*!
+	\brief Called for all BView::StrokeArc calls
+	\param Rectangle enclosing the entire arc
+	\param Starting angle for the arc in degrees
+	\param Span of the arc in degrees. Ending angle = angle+span.
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the arc may end up
+	being clipped.
+*/void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeBezier calls.
+	\param 4-element array of BPoints in the order of start, end, and then the two control
+	points. 
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call.
+*/
 void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeEllipse calls
+	\param BRect enclosing the ellipse to be drawn.
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the ellipse may end up
+	being clipped.
+*/
 void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Draws a line. Really.
+	\param Starting point
+	\param Ending point
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+	
+	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
+	a thickness greater than 1 will need to be done.
+*/
 void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokePolygon calls
+	\param Array of BPoints defining the polygon.
+	\param Number of points in the BPoint array.
+	\param Rectangle which contains the polygon
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	The points in the array are not guaranteed to be within the framebuffer's 
+	coordinate range.
+*/
 void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeRect calls
+	\param BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
 void DisplayDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeRoundRect calls
+	\param X radius of the corner arcs
+	\param Y radius of the corner arcs
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the roundrect may end 
+	up being clipped.
+*/
 void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
 }
@@ -350,76 +420,221 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *
 //{
 //}
 
+/*!
+	\brief Called for all BView::StrokeTriangle calls
+	\param Array of 3 BPoints. Always non-NULL.
+	\param BRect enclosing the triangle. While it will definitely enclose the triangle,
+	it may not be within the frame buffer's bounds.
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the triangle may end 
+	up being clipped.
+*/
 void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Draws a series of lines - optimized for speed
+	\param Array of BPoints pairs
+	\param Number of lines to be drawn
+	\param Array of colors for each respective line
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	
+	Data for this call is passed directly from userland - this call is responsible for all
+	checking. All lines are to be processed in the call using the same LayerData settings
+	for each line.
+*/
 void DisplayDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
 }
 
+/*!
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param constant as defined in GraphicsDefs.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
 void DisplayDriver::SetMode(int32 mode)
 {
 }
 
+/*!
+	\brief Dumps the contents of the frame buffer to a file.
+	\param Path and leaf of the file to be created without an extension
+	\return False if unimplemented or unsuccessful. True if otherwise.
+	
+	Subclasses should add an extension based on what kind of file is saved
+*/
 bool DisplayDriver::DumpToFile(const char *path)
 {
 	return false;
 }
 
+/*!
+	\brief Gets the width of a string in pixels
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\return Width of the string in pixels
+	
+	This corresponds to BView::StringWidth.
+*/
 float DisplayDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
 	return 0.0;
 }
 
+/*!
+	\brief Gets the height of a string in pixels
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\return Height of the string in pixels
+	
+	The height calculated in this function does not include any padding - just the
+	precise maximum height of the characters within and does not necessarily equate
+	with a font's height, i.e. the strings 'case' and 'alps' will have different values
+	even when called with all other values equal.
+*/
 float DisplayDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
 	return 0.0;
 }
 
-void DisplayDriver::GetBoundingBoxes(const char *string, int32 count, font_metric_mode mode, escapement_delta *delta, BRect *rectarray)
+/*!
+	\brief Retrieves the bounding box each character in the string
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Metrics mode for either screen or printing
+	\param Optional glyph padding. This value may be NULL.
+	\param Array of BRect objects which will have at least count elements
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+
+	See BFont::GetBoundingBoxes for more details on this function.
+*/
+void DisplayDriver::GetBoundingBoxes(const char *string, int32 count, 
+		font_metric_mode mode, escapement_delta *delta, BRect *rectarray, LayerData *d)
 {
 }
 
-void DisplayDriver::GetEscapements(const char *string, int32 charcount, escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets)
+/*!
+	\brief Retrieves the escapements for each character in the string
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Optional glyph padding. This value may be NULL.
+	\param Array of escapement_delta objects which will have at least charcount elements
+	\param Actual offset values when iterating over the string. This array will also 
+		have at least charcount elements and the values placed therein will reflect 
+		the current kerning/spacing mode.
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	
+	See BFont::GetEscapements for more details on this function.
+*/
+void DisplayDriver::GetEscapements(const char *string, int32 charcount, 
+		escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets, LayerData *d)
 {
 }
 
-void DisplayDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray)
+/*!
+	\brief Retrieves the inset values of each glyph from its escapement values
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Array of edge_info objects which will have at least charcount elements
+	\param Data structure containing any other data necessary for the call. Always non-NULL.
+
+	See BFont::GetEdges for more details on this function.
+*/
+void DisplayDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray, LayerData *d)
 {
 }
 
+/*!
+	\brief Determines whether a font contains a certain string of characters
+	\param Source null-terminated string
+	\param Number of characters in the string
+	\param Array of booleans which will have at least charcount elements
+
+	See BFont::GetHasGlyphs for more details on this function.
+*/
 void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasarray)
 {
 }
 
-void DisplayDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings)
+/*!
+	\brief Truncates an array of strings to a certain width
+	\param Array of null-terminated strings
+	\param Number of strings passed to the function
+	\param Truncation mode
+	\param Maximum width for all strings
+	\param String array provided by the caller into which the truncated strings are
+		to be placed.
+
+	See BFont::GetTruncatedStrings for more details on this function.
+*/
+void DisplayDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, 
+	uint32 mode, float maxwidth, char **outstrings)
 {
 }
 
+/*!
+	\brief Returns the bit depth for the current screen mode
+	\return Current number of bits per pixel
+*/
 uint8 DisplayDriver::GetDepth(void)
 {
 	return _buffer_depth;
 }
 
+/*!
+	\brief Returns the height for the current screen mode
+	\return Height of the screen
+*/
 uint16 DisplayDriver::GetHeight(void)
 {
 	return _buffer_height;
 }
 
+/*!
+	\brief Returns the width for the current screen mode
+	\return Width of the screen
+*/
 uint16 DisplayDriver::GetWidth(void)
 {
 	return _buffer_width;
 }
 
+/*!
+	\brief Returns the screen mode constant in use by the driver
+	\return Current screen mode
+*/
 int32 DisplayDriver::GetMode(void)
 {
 	return _buffer_mode;
 }
 
+/*!
+	\brief Returns whether or not the cursor is currently obscured
+	\return True if obscured, false if not.
+*/
+bool DisplayDriver::IsCursorObscured(bool state)
+{
+	return _is_cursor_obscured;
+}
 
 // Protected Internal Functions
 
+/*!
+	\brief Locks the driver
+	\param Optional timeout specifier
+	\param True if the lock was successful, false if not.
+	
+	The return value need only be checked if a timeout was specified. Each public
+	member function should lock the driver before doing anything else. Functions
+	internal to the driver (protected/private) need not do this.
+*/
 bool DisplayDriver::_Lock(bigtime_t timeout)
 {
 	if(acquire_sem_etc(_lock_sem,1,B_RELATIVE_TIMEOUT,timeout)!=B_NO_ERROR)
@@ -427,46 +642,67 @@ bool DisplayDriver::_Lock(bigtime_t timeout)
 	return true;
 }
 
+/*!
+	\brief Unlocks the driver
+*/
 void DisplayDriver::_Unlock(void)
 {
 	release_sem(_lock_sem);
 }
 
+/*!
+	\brief Internal depth-setting function
+	\param Number of bits per pixel in use
+	
+	_SetDepth must be called from within any implementation of SetMode
+*/
 void DisplayDriver::_SetDepth(uint8 d)
 {
 	_buffer_depth=d;
 }
 
+/*!
+	\brief Internal height-setting function
+	\param Height of the frame buffer
+	
+	_SetHeight must be called from within any implementation of SetMode
+*/
 void DisplayDriver::_SetHeight(uint16 h)
 {
 	_buffer_height=h;
 }
 
+/*!
+	\brief Internal width-setting function
+	\param Width of the frame buffer
+	
+	_SetWidth must be called from within any implementation of SetMode
+*/
 void DisplayDriver::_SetWidth(uint16 w)
 {
 	_buffer_width=w;
 }
 
+/*!
+	\brief Internal mode-setting function.
+	\param Screen mode in use as defined in GraphicsDefs.h
+	
+	_SetMode must be called from within any implementation of SetMode. Note that this
+	does not actually change the screen mode; it just updates the state variable used
+	to talk with the outside world.
+*/
 void DisplayDriver::_SetMode(int32 m)
 {
 	_buffer_mode=m;
 }
 
-void DisplayDriver::_SetCursorHidden(bool state)
-{
-	_is_cursor_hidden=state;
-}
-
-void DisplayDriver::_SetCursorObscured(bool state)
-{
-	_is_cursor_obscured=state;
-}
-
-bool DisplayDriver::_IsCursorObscured(bool state)
-{
-	return _is_cursor_obscured;
-}
-
+/*!
+	\brief Obtains the current cursor for the driver.
+	\return Pointer to the current cursor object.
+	
+	Do NOT delete this pointer - change pointers via SetCursor. This call will be 
+	necessary for blitting the cursor to the screen and other such tasks.
+*/
 ServerCursor *DisplayDriver::_GetCursor(void)
 {
 	return _cursor;
