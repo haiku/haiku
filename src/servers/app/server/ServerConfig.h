@@ -23,9 +23,12 @@
 // Display driver to be used by the server.
 #define DISPLAYDRIVER VIEWDRIVER
 
+// Define this for a quick hack to test some of the drawing functions
+//#define DISPLAYDRIVER_TEST_HACK
+
 // Define this if you want the display driver to emulate the input server.
 // Comment this out if DISPLAYDRIVER is defined as HWDRIVER.
-#define ENABLE_INPUT_SERVER_EMULATION
+//#define ENABLE_INPUT_SERVER_EMULATION
 
 // This is the application signature of our app_server when running as a
 // regular application. When running as the app_server, this is not used.

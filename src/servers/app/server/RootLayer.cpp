@@ -29,6 +29,7 @@
 #include "RootLayer.h"
 #include "Desktop.h"
 #include "PatternHandler.h" // for pattern_union
+#include "ServerConfig.h"
 
 
 /*!
@@ -92,6 +93,40 @@ void RootLayer::RequestDraw(void)
 			lay->RequestDraw(lay->Bounds());
 	}
 
+#ifdef DISPLAYDRIVER_TEST_HACK
+	int8 pattern[8];
+	int8 pattern2[8];
+	memset(pattern,255,8);
+	memset(pattern2,128+32+8+2,8);
+	BRect r1(100,100,1500,1100);
+	BPoint pts[4];
+	pts[0].x = 200;
+	pts[0].y = 200;
+	pts[1].x = 400;
+	pts[1].y = 1000;
+	pts[2].x = 600;
+	pts[2].y = 400;
+	pts[3].x = 1200;
+	pts[3].y = 800;
+
+	_layerdata->highcolor.SetColor(255,0,0,255);
+	_layerdata->lowcolor.SetColor(255,255,255,255);
+	_driver->FillRect(r1,_layerdata,pattern);
+
+	_layerdata->highcolor.SetColor(255,255,0,255);
+	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),_layerdata,pattern);
+
+	_layerdata->highcolor.SetColor(0,0,255,255);
+	_driver->StrokeBezier(pts,_layerdata,pattern);
+	_driver->StrokeArc(BRect(200,300,400,600),30,270,_layerdata,pattern);
+	_driver->StrokeEllipse(BRect(200,700,400,900),_layerdata,pattern);
+	_driver->StrokeRect(BRect(650,1000,750,1090),_layerdata,pattern);
+	_driver->StrokeRoundRect(BRect(200,1000,600,1090),30,40,_layerdata,pattern);
+	_driver->FillArc(BRect(1250,300,1450,600),30,270,_layerdata,pattern);
+//	_driver->FillBezier(pts,_layerdata,pattern);
+	_driver->FillEllipse(BRect(800,300,1200,600),_layerdata,pattern);
+	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,_layerdata,pattern2);
+#endif
 }
 
 /*!

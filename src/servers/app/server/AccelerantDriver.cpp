@@ -1050,15 +1050,15 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 	
-	for (i=0; i<ROUND(yrad); i++)
+	for (i=0; i<=(int)yrad; i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
-		if ( CHECK_Y(r.top+i) )
+		if ( CHECK_Y(r.top+yrad-i) )
 			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.top+i, &pattern);
-		if ( CHECK_Y(r.bottom-i) )
+				r.top+yrad-i, &pattern);
+		if ( CHECK_Y(r.bottom-yrad+i) )
 			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.bottom-i, &pattern);
+				r.bottom-yrad+i, &pattern);
 	}
 	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
 			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
