@@ -772,7 +772,7 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
 	float ry = r.Height()/2;
-	int Rx2 = ROUND(rx*ry);
+	int Rx2 = ROUND(rx*rx);
 	int Ry2 = ROUND(ry*ry);
 	int twoRx2 = 2*Rx2;
 	int twoRy2 = 2*Ry2;
@@ -798,23 +798,23 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	{
 		startQuad = (int)(angle/90)%4+1;
 		endQuad = (int)((angle+span)/90)%4+1;
-		startx = ROUND(.5*r.Width()*cos(angle*M_PI/180));
-		endx = ROUND(.5*r.Width()*cos((angle+span)*M_PI/180));
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
 	}
 	else
 	{
 		endQuad = (int)(angle/90)%4+1;
 		startQuad = (int)((angle+span)/90)%4+1;
-		endx = ROUND(.5*r.Width()*cos(angle*M_PI/180));
-		startx = ROUND(.5*r.Width()*cos((angle+span)*M_PI/180));
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
 	}
 
 	if ( startQuad != endQuad )
 	{
 		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
-		useQuad2 = (endQuad > 2) && ((startQuad < 2) || (startQuad > endQuad));
-		useQuad3 = (endQuad > 3) && ((startQuad < 3) || (startQuad > endQuad));
-		useQuad4 = (endQuad > 4) && ((startQuad < 4) || (startQuad > endQuad));
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
 	}
 	else
 	{
@@ -836,21 +836,21 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	}
 
 	if ( useQuad1 || 
-	     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-	if ( useQuad2 || 
-	     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
-	     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-	if ( useQuad3 || 
-	     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
-	     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-	if ( useQuad4 || 
-	     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
-	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+	if ( useQuad2 || 
+	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+	if ( useQuad3 || 
+	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+	if ( useQuad4 || 
+	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -867,21 +867,21 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		}
 
 		if ( useQuad1 || 
-		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-		if ( useQuad2 || 
-		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
-		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		if ( useQuad3 || 
-		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
-		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		if ( useQuad4 || 
-		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -899,21 +899,21 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 		}
 
 		if ( useQuad1 || 
-		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-		if ( useQuad2 || 
-		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
-		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		if ( useQuad3 || 
-		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
-		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		if ( useQuad4 || 
-		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 	}
 }
 
