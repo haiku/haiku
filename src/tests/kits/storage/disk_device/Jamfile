@@ -3,7 +3,7 @@ SubDir OBOS_TOP src tests kits storage disk_device ;
 #UsePrivateHeaders $(DOT) ;
 #UsePrivateHeaders app ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-#UsePrivateHeaders shared ;
+UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
 SimpleTest DiskDeviceTest
