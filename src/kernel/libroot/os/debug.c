@@ -53,13 +53,20 @@ _setDebugFlag(bool flag)
 	return previous;
 }
 
-	
+
 int
-_debugPrintf(const char * message, ...)
+_debugPrintf(const char *fmt, ...)
 {
-	puts("*** _debugPrintf call - not yet implemented ***");
-	printf("%s\n", message);
-	return 0;
+	va_list ap;
+	int ret;
+
+	// TODO : we need locking here
+
+	va_start(ap, fmt);
+	ret = vfprintf(stdout, fmt, ap);
+	va_end(ap);
+
+	return ret;
 }
 
 
@@ -73,11 +80,16 @@ _sPrintf(const char * message, ...)
 
 
 int
-_xdebugPrintf(const char * message, ...)
+_xdebugPrintf(const char * fmt, ...)
 {
-	puts("*** _xdebugPrintf call - not yet implemented ***");
-	printf("%s\n", message);
-	return 0;
+	va_list ap;
+	int ret;
+	
+	va_start(ap, fmt);
+	ret = vfprintf(stdout, fmt, ap);
+	va_end(ap);
+
+	return ret;
 }
 
 
