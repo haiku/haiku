@@ -57,7 +57,6 @@ struct bootfs_vnode {
 	struct bootfs_vnode *all_next;
 	vnode_id id;
 	char *name;
-	void *redir_vnode;
 	struct bootfs_vnode *parent;
 	struct bootfs_vnode *dir_next;
 	struct bootfs_stream stream;

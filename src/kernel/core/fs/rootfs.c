@@ -48,7 +48,6 @@ struct rootfs_vnode {
 	struct rootfs_vnode *all_next;
 	vnode_id id;
 	char *name;
-	void *redir_vnode;
 	struct rootfs_vnode *parent;
 	struct rootfs_vnode *dir_next;
 	struct rootfs_stream stream;

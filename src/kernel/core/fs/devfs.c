@@ -73,7 +73,6 @@ struct devfs_vnode {
 	struct devfs_vnode *all_next;
 	vnode_id id;
 	char *name;
-	void *redir_vnode;
 	struct devfs_vnode *parent;
 	struct devfs_vnode *dir_next;
 	struct devfs_stream stream;
