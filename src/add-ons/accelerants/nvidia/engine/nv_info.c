@@ -262,6 +262,12 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 		nv_crtc2_cursor_hide();
 	}
 
+	/* make sure AGP mode is OFF (confirmed NV28 getting into trouble otherwise!) */
+	/* note:
+	 * this _must_ be done _after_ the screens where shut-off as no
+	 * (memory) transactions may be in progress during this command. */
+	CFGW(AGPCMD, 0x00000000);
+
 	/* execute BIOS coldstart script(s) */
 	if (init1 || init2)
 	{
@@ -337,6 +343,12 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 //	ACCW(PT_NUMERATOR, 0x00000008);
 	/* set timer denominator to 3 (in b0-15) */
 //	ACCW(PT_DENOMINATR, 0x00000003);
+
+	/* make sure AGP mode is OFF (confirmed NV28 getting into trouble otherwise!) */
+	/* note:
+	 * this _must_ be done _after_ the screens where shut-off as no
+	 * (memory) transactions may be in progress during this command. */
+	CFGW(AGPCMD, 0x00000000);
 
 	/* execute all BIOS coldstart script(s) */
 	if (tabs.InitScriptTablePtr)
