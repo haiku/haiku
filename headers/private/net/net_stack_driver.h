@@ -95,7 +95,7 @@ struct sysctl_args {	// used by NET_STACK_SYSCTL
 };
 
 struct control_net_module_args {	// used by NET_STACK_CONTROL_NET_MODULE
-	char *name;
+	const char *name;
 	uint32 op;
 	void *data;
 	size_t length;
