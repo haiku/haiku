@@ -25,7 +25,8 @@ class DefaultMediaTheme : public BMediaTheme {
 		virtual	BView *MakeViewFor(BParameterWeb *web, const BRect *hintRect = NULL);
 
 	private:
-		BView *MakeViewFor(BParameterGroup *group, const BRect *hintRect = NULL);
+		BView *MakeViewFor(BParameterGroup &group, const BRect &hintRect);
+		BView *MakeSelfHostingViewFor(BParameter &parameter, const BRect &hintRect);
 };
 
 }	// namespace BPrivate
