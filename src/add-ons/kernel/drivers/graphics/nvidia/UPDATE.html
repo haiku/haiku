@@ -4,10 +4,11 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head 0.24, (Rudolf)</h1></p>
+<p><h1>head 0.25, (Rudolf)</h1></p>
 <ul>
 	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver;
-	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the setting to keep the driver working as always; if you modify it a card coldstart might be attempted (in progress).
+	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the setting to keep the driver working as always;
+	<li>Card coldstarts should now be fully operational (if enabled in nv.settings) on pre-NV10 cards with BIOS 'pins' struct V2 and later. Tested successfully on a TNT2. (Still in progress for newer cards).
 </ul>
 <p><h1>nv_driver 0.22, (Rudolf)</h1></p>
 <ul>
@@ -146,7 +147,7 @@ The features below are shutdown because they are possibly dangerous without feed
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>TVout support;
-	<li>Partial card coldstart: setup RAM and CORE speeds (if possible).
+	<li>(Partial) card coldstart: setup RAM and CORE speeds if possible (in progress).
 </ul>
 </p>
 </body>
