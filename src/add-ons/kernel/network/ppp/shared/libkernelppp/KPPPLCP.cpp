@@ -11,6 +11,7 @@
 #include <KPPPOptionHandler.h>
 
 #include <LockerHelper.h>
+#include <KernelExport.h>
 
 #include <netinet/in.h>
 #include <core_funcs.h>
