@@ -133,7 +133,12 @@ struct small_data {
 	uint32		type;
 	uint16		name_size;
 	uint16		data_size;
-	char		name[0];	// name_size long, followed by data
+	
+	#if __MWERKS__
+		char		name[1];	// name_size long, followed by data
+	#else
+		char		name[0];	// name_size long, followed by data
+	#endif
 
 	uint32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
 	uint16 NameSize() const { return BFS_ENDIAN_TO_HOST_INT16(name_size); }
@@ -179,7 +184,7 @@ struct bfs_inode {
 		char 			short_symlink[SHORT_SYMLINK_NAME_LENGTH];
 	};
 	int32		pad[4];
-	small_data	small_data_start[0];
+	small_data	small_data_start[1];
 
 	int32 Magic1() const { return BFS_ENDIAN_TO_HOST_INT32(magic1); }
 	int32 UserID() const { return BFS_ENDIAN_TO_HOST_INT32(uid); }

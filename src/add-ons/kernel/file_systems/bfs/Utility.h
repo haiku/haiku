@@ -16,7 +16,12 @@
 struct sorted_array {
 	public:
 		off_t	count;
-		off_t	values[0];
+		
+		#if __MWERKS__
+			off_t	values[1];
+		#else
+			off_t	values[0];
+		#endif
 
 		inline int32 Find(off_t value) const;
 		void Insert(off_t value);
@@ -149,6 +154,42 @@ template<class Node> struct list {
 		asm volatile("lock; xchg %%eax, (%%edx)"
 			: : "a" (newValue), "d" (value));
 	}
+#elif __POWERPC__ && __MWERKS__ /* GCC has different assembler syntax */
+inline asm int32
+	_atomic_set(volatile int32 *value, int32)
+	{
+		loop:
+			dcbf	r0, r3;
+			lwarx	r0, 0, r3;
+			stwcx.	r4, 0, r3;
+			bc        5, 2, loop
+		mr r3,r5;
+		isync;
+		blr;	
+	}
+	
+inline asm int32
+	_atomic_test_and_set(volatile int32 *value, int32 newValue, int32 testAgainst)
+	{
+		loop:
+			dcbf	r0, r3;
+			lwarx	r0, 0, r3;
+			cmpw	r5, r0;
+			bne		no_dice;
+			stwcx.	r4, 0, r3;
+			bc      5, 2, loop
+			
+		mr 		r3,r0;
+		isync;
+		blr;
+		
+		no_dice:
+			stwcx.	r0, 0, r3;
+			mr 		r3,r0;
+			isync;
+			blr;
+	}
+			
 #else
 #	error The macros _atomic_set(), and _atomic_test_and_set() are not defined for the target processor
 #endif

@@ -5,10 +5,10 @@
 */
 
 
+#include "cpp.h"
 #include "Journal.h"
 #include "Inode.h"
 #include "Debug.h"
-#include "cpp.h"
 
 
 Journal::Journal(Volume *volume)

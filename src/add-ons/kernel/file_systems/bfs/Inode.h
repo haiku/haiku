@@ -297,7 +297,7 @@ CachedBlock::CachedBlock(Volume *volume)
 
 
 inline
-CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty = false)
+CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty)
 	:
 	fVolume(volume),
 	fBlock(NULL)
@@ -307,7 +307,7 @@ CachedBlock::CachedBlock(Volume *volume, off_t block, bool empty = false)
 
 
 inline
-CachedBlock::CachedBlock(Volume *volume, block_run run, bool empty = false)
+CachedBlock::CachedBlock(Volume *volume, block_run run, bool empty)
 	:
 	fVolume(volume),
 	fBlock(NULL)
@@ -350,7 +350,7 @@ CachedBlock::Unset()
 
 
 inline uint8 *
-CachedBlock::SetTo(off_t block, bool empty = false)
+CachedBlock::SetTo(off_t block, bool empty)
 {
 	Unset();
 	fBlockNumber = block;
@@ -360,7 +360,7 @@ CachedBlock::SetTo(off_t block, bool empty = false)
 
 
 inline uint8 *
-CachedBlock::SetTo(block_run run, bool empty = false)
+CachedBlock::SetTo(block_run run, bool empty)
 {
 	return SetTo(fVolume->ToBlock(run), empty);
 }

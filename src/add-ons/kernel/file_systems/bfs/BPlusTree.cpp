@@ -1690,7 +1690,11 @@ TreeIterator::Goto(int8 to)
 
 		nodeOffset = nextOffset;
 	}
-	FATAL(("%s fails\n",__PRETTY_FUNCTION__));
+	#if __MWERKS__
+		FATAL(("TreeIterator::Goto(int8 to) fails\n"));
+	#else
+		FATAL(("%s fails\n",__PRETTY_FUNCTION__));
+	#endif
 	RETURN_ERROR(B_ERROR);
 }
 

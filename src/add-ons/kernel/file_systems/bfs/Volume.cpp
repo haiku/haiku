@@ -20,7 +20,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 Volume::Volume(nspace_id id)
 	:
 	fID(id),

@@ -77,7 +77,7 @@ Uncached::Uncached(Volume *volume)
 }
 
 
-Uncached::Uncached(Volume *volume,off_t block, bool empty = false)
+Uncached::Uncached(Volume *volume,off_t block, bool empty)
 	:
 	fVolume(volume),
 	fBlock(NULL)
@@ -86,7 +86,7 @@ Uncached::Uncached(Volume *volume,off_t block, bool empty = false)
 }
 
 
-Uncached::Uncached(Volume *volume,block_run run,bool empty = false)
+Uncached::Uncached(Volume *volume,block_run run,bool empty)
 	:
 	fVolume(volume),
 	fBlock(NULL)
@@ -110,7 +110,7 @@ Uncached::Unset()
 
 
 uint8 *
-Uncached::SetTo(off_t block, bool empty = false)
+Uncached::SetTo(off_t block, bool empty)
 {
 	Unset();
 	fBlockNumber = block;
@@ -127,7 +127,7 @@ Uncached::SetTo(off_t block, bool empty = false)
 
 
 uint8 *
-Uncached::SetTo(block_run run, bool empty = false)
+Uncached::SetTo(block_run run, bool empty)
 {
 	return SetTo(fVolume->ToBlock(run), empty);
 }
@@ -166,13 +166,13 @@ Cached::Cached(Volume *volume)
 }
 
 
-Cached::Cached(Volume *volume,off_t block,bool empty = false)
+Cached::Cached(Volume *volume,off_t block,bool empty)
 	: CachedBlock(volume, block, empty)
 {
 }
 
 
-Cached::Cached(Volume *volume,block_run run,bool empty = false)
+Cached::Cached(Volume *volume,block_run run,bool empty)
 	: CachedBlock(volume, run, empty)
 {
 }
@@ -211,13 +211,13 @@ Logged::Logged(Volume *volume)
 }
 
 
-Logged::Logged(Volume *volume, off_t block, bool empty = false)
+Logged::Logged(Volume *volume, off_t block, bool empty)
 	: CachedBlock(volume, block, empty)
 {
 }
 
 
-Logged::Logged(Volume *volume, block_run run, bool empty = false)
+Logged::Logged(Volume *volume, block_run run, bool empty)
 	: CachedBlock(volume, run, empty)
 {
 }

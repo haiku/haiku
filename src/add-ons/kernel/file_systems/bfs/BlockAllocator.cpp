@@ -14,6 +14,8 @@
 #include "Stack.h"
 #include "bfs_control.h"
 
+#include <malloc.h>
+
 #ifdef USER
 #	define spawn_kernel_thread spawn_thread
 #endif

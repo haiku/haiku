@@ -1321,13 +1321,13 @@ Expression::ParseEquation(char **expr)
 {
 	skipWhitespace(expr);
 
-	bool not = false;
+	bool _not = false;
 	if (**expr == '!') {
 		skipWhitespace(expr, 1);
 		if (**expr != '(')
 			return NULL;
 		
-		not = true;
+		_not = true;
 	}
 
 	if (**expr == ')') {
@@ -1347,7 +1347,7 @@ Expression::ParseEquation(char **expr)
 		
 		// If the term is negated, we just complement the tree, to get
 		// rid of the not, a.k.a. DeMorgan's Law.
-		if (not)
+		if (_not)
 			term->Complement();
 
 		skipWhitespace(expr, 1);

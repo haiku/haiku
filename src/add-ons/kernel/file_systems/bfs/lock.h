@@ -30,6 +30,10 @@ struct mlock {
 extern _IMPEXP_KERNEL int	new_lock(lock *l, const char *name);
 extern _IMPEXP_KERNEL int	free_lock(lock *l);
 
+#ifdef LOCK
+#undef LOCK
+#endif
+
 #define	LOCK(l)		if (atomic_add(&l.c, -1) <= 0) acquire_sem(l.s);
 #define	UNLOCK(l)	if (atomic_add(&l.c, 1) < 0) release_sem(l.s);
 

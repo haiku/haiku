@@ -10,6 +10,7 @@
 
 
 #include <KernelExport.h>
+#include <stdio.h>
 #include "Utility.h"
 #include "Debug.h"
 
@@ -157,8 +158,15 @@ class RecursiveLock {
 		status_t Unlock()
 		{
 			thread_id thread = find_thread(NULL);
-			if (thread != fOwner)
-				panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
+			if (thread != fOwner) {
+				#if __MWERKS__ && !USER //--- The R5 PowerPC kernel doesn't have panic()
+					char blip[255];
+					sprintf(blip,"RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
+					kernel_debugger(blip);
+				#else
+					panic("RecursiveLock unlocked by %ld, owned by %ld\n", thread, fOwner);
+				#endif
+			}
 
 			if (--fOwnerCount == 0) {
 				fOwner = -1;
@@ -457,10 +465,17 @@ class SimpleLock {
 		{
 			int32 thisThread = find_thread(NULL);
 			int32 current;
-			while ((current = _atomic_test_and_set(&fHolder, thisThread, -1)) != -1) {
+			while (1) {
+				/*if (fHolder == -1) {
+					current = fHolder;
+					fHolder = thisThread;
+				}*/
+				current = _atomic_test_and_set(&fHolder, thisThread, -1);
+				if (current == -1)
+					break;
 				if (current == thisThread)
 					break;
-
+					
 				snooze(time);
 			}
 
