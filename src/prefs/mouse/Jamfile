@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs mouse ;
 
+UsePrivateHeaders input ;
+
 AddResources Mouse : Mouse.rdef ;
 
 Preference Mouse : 
