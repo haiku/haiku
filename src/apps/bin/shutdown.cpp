@@ -154,7 +154,6 @@ class ShutdownWindow : public BWindow
 						~ShutdownWindow();
 		void			MessageReceived(BMessage *msg);
 		bool			QuitRequested();
-		void			Quit();
 	private:
 		SView *fView;
 		thread_id fShutdownThread;
@@ -274,17 +273,6 @@ ShutdownWindow::QuitRequested()
 	return true;
 }
 
-void
-ShutdownWindow::Quit()
-{
-
-	// quit app on window close
-//	be_app->PostMessage(B_QUIT_REQUESTED);
-	
-	// call default Quit()
-	BWindow::Quit();
-}
-
 ShutdownApp::ShutdownApp(thread_id id)
 	:BApplication("application/x-vnd.ShutDown-app")
 {
@@ -382,9 +370,9 @@ int main(int argc, char **argv)
 		
 		if (alert) {
 			status_t err;
-			be_app->LockLooper();
+//			be_app->LockLooper();
 			be_app->PostMessage(B_QUIT_REQUESTED);
-			be_app->UnlockLooper();
+//			be_app->UnlockLooper();
 			
 			wait_for_thread(BApp_thread, &err);
 			snooze(100000);
