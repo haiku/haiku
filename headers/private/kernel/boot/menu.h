@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_BOOT_MENU_H
 #define KERNEL_BOOT_MENU_H
 
@@ -43,8 +43,8 @@ class MenuItem : public DoublyLinkedListLinkImpl<MenuItem> {
 		void SetType(menu_item_type type);
 		menu_item_type Type() const { return fType; }
 
-		void SetData(void *data);
-		void *Data() const { return fData; }
+		void SetData(const void *data);
+		const void *Data() const { return fData; }
 
 		void SetHelpText(const char *text);
 		const char *HelpText() const { return fHelpText; }
@@ -63,7 +63,7 @@ class MenuItem : public DoublyLinkedListLinkImpl<MenuItem> {
 		bool			fIsEnabled;
 		menu_item_type	fType;
 		Menu			*fMenu, *fSubMenu;
-		void			*fData;
+		const void		*fData;
 		const char		*fHelpText;
 };
 

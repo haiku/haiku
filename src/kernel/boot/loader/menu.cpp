@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "menu.h"
@@ -16,6 +16,7 @@
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
+#include <safemode.h>
 
 #include <string.h>
 
@@ -109,7 +110,7 @@ MenuItem::SetEnabled(bool enabled)
 
 
 void
-MenuItem::SetData(void *data)
+MenuItem::SetData(const void *data)
 {
 	fData = data;
 }
@@ -404,8 +405,13 @@ add_safe_mode_menu()
 	MenuItem *item;
 
 	safeMenu->AddItem(item = new MenuItem("Safe mode"));
+	item->SetData(B_SAFEMODE_SAFE_MODE);
 	item->SetType(MENU_ITEM_MARKABLE);
 	safeMenu->AddItem(item = new MenuItem("Disable user add-ons"));
+	item->SetData(B_SAFEMODE_DISABLE_USER_ADD_ONS);
+	item->SetType(MENU_ITEM_MARKABLE);
+	safeMenu->AddItem(item = new MenuItem("Disable IDE DMA"));
+	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
 
 	platform_add_menus(safeMenu);
