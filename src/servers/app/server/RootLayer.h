@@ -43,22 +43,20 @@ class RGBColor;
 class RootLayer : public Layer
 {
 public:
-	RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver);
-	~RootLayer();
-	virtual	void RequestDraw();
-	virtual	void RequestDraw(const BRect &r);
-	virtual void MoveBy(float x, float y);
-	void MoveBy(BPoint pt);
-	void ResizeBy(float x, float y);
-	void ResizeBy(BPoint pt);
-	void SetDriver(DisplayDriver *driver);
-	void SetColor(const RGBColor &col);
-	RGBColor GetColor(void) const;
-	void RebuildRegions(bool recursive=false);
+									RootLayer(BRect rect, const char *layername,
+										DisplayDriver *gfxdriver);
+	virtual							~RootLayer();
+
+	virtual	void					Draw(const BRect &r);
+	virtual	void					MoveBy(float x, float y);
+	virtual	void					ResizeBy(float x, float y);
+
+			void					SetDriver(DisplayDriver *driver);
+
+			void					SetColor(const RGBColor &col);
+			RGBColor				GetColor(void) const;
 private:
-	DisplayDriver *_driver;
-	RGBColor *_bgcolor;
-	bool _isvisible;
+
 };
 
 #endif

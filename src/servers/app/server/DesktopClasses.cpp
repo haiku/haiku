@@ -224,7 +224,7 @@ STRACE_SCREEN(("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces));
 			_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
 			_workspacecount=workspaces;
 			_activeworkspace->GetRoot()->Show();
-			_activeworkspace->GetRoot()->RequestDraw();
+//			_activeworkspace->GetRoot()->RequestDraw();
 		}
 	}
 }

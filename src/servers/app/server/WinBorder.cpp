@@ -97,41 +97,59 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 {
 	// unlike BViews, windows start off as hidden, so we need to tweak the hidecount
 	// assignment made by Layer().
-	_hidden		= true;
-	_mbuttons	= 0;
-	_kmodifiers	= 0;
-	_win		= win;
+	_hidden			= true;
 
+	_mbuttons		= 0;
+	_kmodifiers		= 0;
+	_win			= win;
+	_update			= false;
+	_hresizewin		= false;
+	_vresizewin		= false;
 	_mousepos.Set(0,0);
-	_update		= false;
 
-	_title		= new BString(name);
-	_hresizewin	= false;
-	_vresizewin	= false;
-	_driver		= GetGfxDriver(ActiveScreen());
-	_decorator	= new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
-	_decorator->GetFootprint(_visible);
+	_decorator		= NULL;
 
-	*_full		= *_visible;
-	*_invalid	= *_visible;
-	_frame		= _visible->Frame();
-	
-		// I tend to think it is not needed, so if it isn't, DW, please remove it.
-	_view_token	= border_token_handler.GetToken();
+	if (feel == B_NO_BORDER_WINDOW_LOOK){
+		_full			= _win->top_layer->_full;
+		fDecFull		= NULL;
+		fDecFullVisible	= NULL;
+		fDecVisible		= NULL;
+	}
+	else{
+		_decorator		= new_decorator(r, name, look, feel, flags, fDriver);
+		fDecFull		= new BRegion();
+		fDecVisible		= new BRegion();
+		fDecFullVisible	= fDecVisible;
 
-	_decorator->SetDriver(_driver);
-	_decorator->SetTitle(name);
-	
+		_decorator->GetFootprint( fDecFull );
 
-	STRACE(("WinBorder %s:\n",_title->String()));
-	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
-	STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
+			// our full region is the union between decorator's region and top_layer's region
+		_full			= _win->top_layer->_full;
+		_full.Include( fDecFull );
+	}
+
+		// get a token
+	_view_token		= border_token_handler.GetToken();
+
+STRACE(("WinBorder %s:\n",_title->String()));
+STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
+STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
 
 WinBorder::~WinBorder(void)
 {
-	STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
-	delete _title;
+STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
+	if (_decorator)	{
+		delete _decorator;
+		_decorator		= NULL;
+
+		delete fDecFull;
+		fDecFull		= NULL;
+
+		delete fDecFullVisible; // NOTE: fDecFullVisible == fDecVisible
+		fDecFullVisible	= NULL;
+		fDecVisible		= NULL;
+	}
 }
 
 void WinBorder::MouseDown(int8 *buffer)
@@ -143,93 +161,87 @@ void WinBorder::MouseDown(int8 *buffer)
 	// 4) int32 - modifier keys down
 	// 5) int32 - buttons down
 	// 6) int32 - clicks
-	int8 *index=buffer; index+=sizeof(int64);
-	float x=*((float*)index); index+=sizeof(float);
-	float y=*((float*)index); index+=sizeof(float);
-	int32 modifiers=*((int32*)index); index+=sizeof(int32);
-	int32 buttons=*((int32*)index);
+	int8	*index		= buffer;			index+=sizeof(int64);
+	float	x			= *((float*)index);	index+=sizeof(float);
+	float	y			= *((float*)index);	index+=sizeof(float);
+	int32	modifiers	= *((int32*)index);	index+=sizeof(int32);
+	int32	buttons		= *((int32*)index);
 
 	BPoint pt(x,y);
 
-	_mbuttons=buttons;
-	_kmodifiers=modifiers;
-	click_type click=_decorator->Clicked(pt, _mbuttons, _kmodifiers);
-	_mousepos=pt;
-
-	switch(click)
-	{
-		case CLICK_MOVETOBACK:
-		{
-			STRACE_CLICK(("Click: MoveToBack\n"));
-			MakeTopChild();
-			break;
-		}
-		case CLICK_MOVETOFRONT:
-		{
-			STRACE_CLICK(("Click: MoveToFront\n"));
-			MakeBottomChild();
-			break;
-		}
-		case CLICK_CLOSE:
-		{
-			STRACE_CLICK(("Click: Close\n"));
-			_decorator->SetClose(true);
-			_decorator->DrawClose();
-			break;
-		}
-		case CLICK_ZOOM:
-		{
-			STRACE_CLICK(("Click: Zoom\n"));
-			_decorator->SetZoom(true);
-			_decorator->DrawZoom();
-			break;
-		}
-		case CLICK_MINIMIZE:
-		{
-			STRACE_CLICK(("Click: Minimize\n"));
-			_decorator->SetMinimize(true);
-			_decorator->DrawMinimize();
-			break;
-		}
-		case CLICK_DRAG:
-		{
-			if(buttons==B_PRIMARY_MOUSE_BUTTON)
-			{
-			STRACE_CLICK(("Click: Drag\n"));
-				MakeBottomChild();
-				set_is_moving_window(true);
-			}
-
-			if(buttons==B_SECONDARY_MOUSE_BUTTON)
+		// user clicked on decorator
+	if (fDecFullVisible->Contains(pt)){
+		click_type	click;
+		click		= _decorator->Clicked(pt, buttons, modifiers);
+		
+		switch(click){
+			case CLICK_MOVETOBACK:
 			{
 				STRACE_CLICK(("Click: MoveToBack\n"));
-				MakeTopChild();
+				MoveToBack();
+				break;
 			}
-			break;
-		}
-		case CLICK_SLIDETAB:
-		{
-			STRACE_CLICK(("Click: Slide Tab\n"));
-			set_is_sliding_tab(true);
-			break;
-		}
-		case CLICK_RESIZE:
-		{
-			if(buttons==B_PRIMARY_MOUSE_BUTTON)
+			case CLICK_MOVETOFRONT:
+			{
+				STRACE_CLICK(("Click: MoveToFront\n"));
+				MoveToFront();
+				break;
+			}
+			case CLICK_CLOSE:
+			{
+				STRACE_CLICK(("Click: Close\n"));
+				RemoveSelf();
+				break;
+			}
+			case CLICK_ZOOM:
+			{
+				STRACE_CLICK(("Click: Zoom\n"));
+				// TODO: implement
+				// if (actual_coods != max_zoom_coords)
+				// MoveBy(X, Y);
+				// ResizeBy(X, Y);
+				break;
+			}
+			case CLICK_MINIMIZE:
+			{
+				STRACE_CLICK(("Click: Minimize\n"));
+				if ( !IsHidden() ){
+					Hide();
+				}
+				break;
+			}
+			case CLICK_DRAG:
+			{
+				STRACE_CLICK(("Click: Drag\n"));
+				set_is_moving_window(true);
+				break;
+			}
+			case CLICK_SLIDETAB:
+			{
+				STRACE_CLICK(("Click: Slide Tab\n"));
+				set_is_sliding_tab(true);
+				break;
+			}
+			case CLICK_RESIZE:
 			{
 				STRACE_CLICK(("Click: Resize\n"));
 				set_is_resizing_window(true);
+				break;
 			}
-			break;
+			case CLICK_NONE:
+			default:
+			{
+				break;
+			}
 		}
-		case CLICK_NONE:
-		{
-			break;
-		}
-		default:
-		{
-			break;
-		}
+	}
+		// user clicked in window's area
+	else{
+		/*
+		TODO: implement!!!
+		NOTE: send that message to BViews registered for receiving mouse&keyboard events.
+		SendMouseMessage( B_MOUSE_DOWN );
+		*/
 	}
 }
 
@@ -268,7 +280,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_sliding_tab())
 	{
-		STRACE_CLICK(("ClickMove: Slide Tab\n"));
+STRACE_CLICK(("ClickMove: Slide Tab\n"));
 		float dx=pt.x-_mousepos.x;
 		float dy=pt.y-_mousepos.y;		
 
@@ -279,7 +291,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 			// we can invalidate the proper area.
 			lock_layers();
 			_parent->Invalidate(_decorator->SlideTab(dx,dy));
-			_parent->RequestDraw();
+//			_parent->RequestDraw();
 //			_decorator->DrawTab();
 			unlock_layers();
 		}
@@ -291,7 +303,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 		// We are moving the window. Because speed is of the essence, we need to handle a lot
 		// of stuff which we might otherwise not need to.
 
-		STRACE_CLICK(("ClickMove: Drag\n"));
+STRACE_CLICK(("ClickMove: Drag\n"));
 		float	dx	= pt.x - _mousepos.x,
 				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
@@ -320,7 +332,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 			_decorator->MoveBy(BPoint(dx, dy));
 
 			// 3) quickly move the window
-			_driver->CopyRegion(&reg,reg2.Frame().LeftTop());
+//			_driver->CopyRegion(&reg,reg2.Frame().LeftTop());
 
 			// 4) Invalidate only the areas which we can't redraw directly
 			for(int32 i=0; i<reg2.CountRects();i++)
@@ -342,8 +354,8 @@ void WinBorder::MouseMoved(int8 *buffer)
 			
 			_parent->Invalidate(reg);
 			
-			_parent->RebuildRegions();
-			_parent->RequestDraw();
+//			_parent->RebuildRegions();
+//			_parent->RequestDraw();
 			
 			unlock_layers();
 		}
@@ -352,7 +364,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_resizing_window())
 	{
-		STRACE_CLICK(("ClickMove: Resize\n"));
+STRACE_CLICK(("ClickMove: Resize\n"));
 		float	dx	= pt.x - _mousepos.x,
 				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
@@ -367,10 +379,10 @@ void WinBorder::MouseMoved(int8 *buffer)
 	
 			lock_layers();
 			ResizeBy(dx,dy);
-			_parent->RequestDraw();
+//			_parent->RequestDraw();
 			unlock_layers();
 			_decorator->ResizeBy(dx,dy);
-			_decorator->Draw();
+//			_decorator->Draw();
 		}
 	}
 
@@ -380,8 +392,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 void WinBorder::MouseUp(int8 *buffer)
 {
-	STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
-	
+STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
 	// buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -446,93 +457,325 @@ void WinBorder::MouseUp(int8 *buffer)
 */
 void WinBorder::SetFocus(const bool &active)
 {
-	if(_decorator)
-		_decorator->SetFocus(active);
+	_decorator->SetFocus(active);
 }
 
-void WinBorder::RequestDraw(const BRect &r)
-{
-	STRACE(("WinBorder %s: RequestDraw(BRect)\n",_title->String()));
-	#ifdef DEBUG_WINBORDER
-		PrintToStream();
-	#endif
+void WinBorder::RebuildRegions( const BRect& r ){
+	/* WinBorder is a little bit special. It doesn't have a visible region
+		in witch to do its drawings. Instead the hole visible region is split
+		between decorator and top_layer.
+	 */
 
-	_decorator->Draw(r);
-	delete _invalid;
-	_invalid = NULL;
-}
+		// if we're in the rebuild area, rebuild our v.r.
+	if ( _full.Intersects( r ) ){
+		_visible			= _full;
 
-void WinBorder::RequestDraw(void)
-{
-	STRACE(("WinBorder %s::RequestDraw()\n",_title->String()));
-	#ifdef DEBUG_WINBORDER
-		PrintToStream();
-	#endif
-	
-	if(_invalid)
-	{
-		for(int32 i=0;i<_invalid->CountRects();i++)
-			_decorator->Draw(_invalid->RectAt(i));
-		
-		delete _invalid;
-		_invalid = NULL;
+		if (_parent){
+			_visible.IntersectWith( &(_parent->_visible) );
+				// exclude from parent's visible area.
+			if ( !(_hidden) )
+				_parent->_visible.Exclude( &(_visible) );
+		}
+
+		_fullVisible		= _visible;
 	}
-	else
-		_decorator->Draw();
+	else{
+			// our visible region will stay the same
+
+			// exclude our FULL visible region from parent's visible region.
+		if ( !(_hidden) && _parent )
+			_parent->_visible.Exclude( &(_fullVisible) );
+
+			// we're not in the rebuild area so our children's v.r.s are OK. 
+		return;
+	}
+
+		// rebuild top_layer:
+	if ( _win->top_layer->_full.Intersects( r ) ){
+			// build top_layer's visible region by intersecting its _full with winborder's _visible region.
+		_win->top_layer->_visible		= _win->top_layer->_full;
+		_win->top_layer->_visible.IntersectWith( &(_visible) );
+
+			// then exclude it from winborder's _visible... 
+		_visible.Exclude( &(_win->top_layer->_visible) );
+
+		_win->top_layer->_fullVisible	= _win->top_layer->_visible;
+
+			// Rebuild regions for children...
+		for(Layer *lay = _win->top_layer->_bottomchild; lay != NULL; lay = lay->_uppersibling){
+			if ( !(lay->_hidden) ){
+				lay->RebuildRegions( r );
+			}
+		}
+	}
+	else{
+		_visible.Exclude( &(_win->top_layer->_fullVisible) );
+	}
+
+		// rebuild decorator.
+	if (_decorator){
+		if ( fDecFull->Intersects( r ) ){
+			*fDecVisible			= *fDecFull;
+			fDecVisible->IntersectWith( &(_visible) );
+
+			_visible.Exclude( fDecVisible );
+
+				// !!!! Pointer assignement !!!!
+			fDecFullVisible		= fDecVisible;
+		}
+		else{
+			_visible.Exclude( fDecFullVisible );
+		}
+	}
 }
-/*
-void WinBorder::MoveBy(BPoint pt)
+
+void WinBorder::Draw(const BRect &r)
 {
+		// draw the decorator
+	BRegion			reg(r);
+	if (_decorator){
+		reg.IntersectWith( fDecVisible );
+		if (reg.CountRects() > 0){
+			_decorator->Draw( reg.Frame() );
+		}
+	}
+
+		// draw the top_layer
+	reg.Set( r );
+	reg.IntersectWith( &(_win->top_layer->_visible) );
+	if (reg.CountRects() > 0){
+		_win->top_layer->RequestClientUpdate( reg.Frame() );
+	}
 }
 
 void WinBorder::MoveBy(float x, float y)
 {
-}
+	BRegion		oldFullVisible( _fullVisible );
+//	BPoint		oldFullVisibleOrigin( _fullVisible.Frame().LeftTop() );
 
-void WinBorder::ResizeBy(BPoint pt)
-{
+	_frame.OffsetBy(x, y);
+	_full.OffsetBy(x, y);
+
+	_win->top_layer->_frame.OffsetBy(x, y);
+	_win->top_layer->MoveRegionsBy(x, y);
+
+	if (_decorator){
+			// allow decorator to make its internal calculations.
+		_decorator->MoveBy(x, y);
+
+		fDecFull->OffsetBy(x, y);
+	}
+
+	if ( !_hidden ){
+			// to clear the area occupied on its parent _visible
+		if (_fullVisible.CountRects() > 0){
+			_hidden		= true;
+			_parent->RebuildChildRegions( _fullVisible.Frame(), this );
+			_hidden		= false;
+		}
+		_parent->RebuildChildRegions( _full.Frame(), this );
+	}
+
+		// REDRAWING CODE:
+
+	if ( !(_hidden) )
+	{
+			/* The region(on screen) that will be invalidated.
+			 *	It is composed by:
+			 *		the regions that were visible, and now they aren't +
+			 *		the regions that are now visible, and they were not visible before.
+			 *	(oldFullVisible - _fullVisible) + (_fullVisible - oldFullVisible)
+			 */
+		BRegion			clipReg;
+
+			// first offset the old region so we can do the correct operations.
+		oldFullVisible.OffsetBy(x, y);
+
+			// + (oldFullVisible - _fullVisible)
+		if ( oldFullVisible.CountRects() > 0 ){
+			BRegion		tempReg( oldFullVisible );
+			tempReg.Exclude( &_fullVisible );
+
+			if (tempReg.CountRects() > 0){
+				clipReg.Include( &tempReg );
+			}
+		}
+
+			// + (_fullVisible - oldFullVisible)
+		if ( _fullVisible.CountRects() > 0 ){
+			BRegion		tempReg( _fullVisible );
+			tempReg.Exclude( &oldFullVisible );
+
+			if (tempReg.CountRects() > 0){
+				clipReg.Include( &tempReg );
+			}
+		}
+
+			// there is no point in redrawing what already is visible. So just copy
+			// on-screen pixels to layer's new location.
+		if ( (oldFullVisible.CountRects() > 0) && (_fullVisible.CountRects() > 0) ){
+			BRegion		tempReg( oldFullVisible );
+			tempReg.IntersectWith( &_fullVisible );
+
+			if (tempReg.CountRects() > 0){
+// TODO: when you have such a method in DisplayDriver/Clipper, uncomment!
+				//fDriver->CopyBits( &tempReg, oldFullVisibleOrigin, oldFullVisibleOrigin.OffsetByCopy(x,y) );
+			}
+		}
+
+			// invalidate 'clipReg' so we can see the results of this move.
+		if (clipReg.CountRects() > 0){
+			Invalidate( clipReg );
+		}
+	}
 }
 
 void WinBorder::ResizeBy(float x, float y)
 {
+	BRegion		oldFullVisible( _fullVisible );
+
+	_frame.right	= _frame.right + x;
+	_frame.bottom	= _frame.bottom + y;
+
+	_win->top_layer->ResizeRegionsBy(x, y);
+
+	_full			= _win->top_layer->_full;
+
+	if (_decorator){
+			// allow decorator to make its internal calculations.
+		_decorator->ResizeBy(x, y);
+
+		_decorator->GetFootprint( fDecFull );
+
+		_full.Include( fDecFull );
+	}
+
+	if ( !_hidden ){
+		_parent->RebuildChildRegions( _full.Frame(), this );
+	}
+
+
+		// REDRAWING CODE:
+
+	if ( !(_hidden) )
+	{
+			/* The region(on screen) that will be invalidated.
+			 *	It is composed by:
+			 *		the regions that were visible, and now they aren't +
+			 *		the regions that are now visible, and they were not visible before.
+			 *	(oldFullVisible - _fullVisible) + (_fullVisible - oldFullVisible)
+			 */
+		BRegion			clipReg;
+
+			// + (oldFullVisible - _fullVisible)
+		if ( oldFullVisible.CountRects() > 0 ){
+			BRegion		tempReg( oldFullVisible );
+			tempReg.Exclude( &_fullVisible );
+
+			if (tempReg.CountRects() > 0){
+				clipReg.Include( &tempReg );
+			}
+		}
+
+			// + (_fullVisible - oldFullVisible)
+		if ( _fullVisible.CountRects() > 0 ){
+			BRegion		tempReg( _fullVisible );
+			tempReg.Exclude( &oldFullVisible );
+
+			if (tempReg.CountRects() > 0){
+				clipReg.Include( &tempReg );
+			}
+		}
+
+			// invalidate 'clipReg' so we can see the results of this resize operation.
+		if (clipReg.CountRects() > 0){
+			Invalidate( clipReg );
+		}
+	}
 }
-*/
+
+void WinBorder::MoveToBack(){
+	if (this == _parent->_topchild)
+		return;
+
+	if (_uppersibling){
+		_uppersibling->_lowersibling	= _lowersibling;
+	}
+	else{
+		_parent->_topchild				= _lowersibling;
+	}
+	
+	if (_lowersibling){
+		_lowersibling->_uppersibling	= _uppersibling;
+	}
+	else{
+		_parent->_bottomchild			= _uppersibling;
+	}
+	
+	this->_lowersibling		= _parent->_topchild;
+	this->_uppersibling		= NULL;
+	_parent->_topchild		= this;
+
+		// cache WinBorder's fullVisible region for use later
+	BRegion			cachedFullVisible = _fullVisible;
+		// rebuild only that area the encloses the full visible part of this layer.
+	_parent->RebuildChildRegions(_fullVisible.Frame(), this);
+		// we now have <= fullVisible region, so invalidate the parts that are not common.
+	cachedFullVisible.Exclude(&_fullVisible);
+	Invalidate( cachedFullVisible );
+}
+
+void WinBorder::MoveToFront(){
+	if (this == _parent->_bottomchild)
+		return;
+
+	if (_uppersibling){
+		_uppersibling->_lowersibling	= _lowersibling;
+	}
+	else{
+		_parent->_topchild				= _lowersibling;
+	}
+	
+	if (_lowersibling){
+		_lowersibling->_uppersibling	= _uppersibling;
+	}
+	else{
+		_parent->_bottomchild			= _uppersibling;
+	}
+	
+	this->_lowersibling		= NULL;
+	this->_uppersibling		= _parent->_bottomchild;
+	_parent->_bottomchild	= this;
+
+		// cache WinBorder's fullVisible region for use later
+	BRegion			cachedFullVisible	= _fullVisible;
+		// rebuild the area that this WinBorder will occupy.
+	_parent->RebuildChildRegions(_full.Frame(), this);
+		// make a copy of the fullVisible region because it needs
+		// to be modified for invalidating a minimum area.
+	BRegion			tempFullVisible		= _fullVisible;
+		// invalidate only the difference between the present and
+		// the old fullVisible regions. We only need to update that area.
+	tempFullVisible.Exclude(&cachedFullVisible);
+	Invalidate( tempFullVisible );
+}
+
 void WinBorder::UpdateColors(void)
 {
-	gui_colorset.Lock();
-	_decorator->SetColors(gui_colorset);
-	gui_colorset.Unlock();
-
-	// Tell the decorator to update all visible regions of the window border	
-	if(_visible)
-		for(int32 i=0; i<_visible->CountRects(); i++)
-			_decorator->Draw(_visible->RectAt(i));
+STRACE(("WinBorder %s: UpdateColors unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
-
-	// TODO: Implement
-	
-	// What needs done here is to delete the current decorator and do a lot of the
-	// decorator-related setup done in the constructor. This definitely needs to be
-	// done *after* all the silliness with figuring out the clipping code is taken care of
+STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateFont(void)
 {
-	STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
-
-	// TODO: Implement
-	
-	// What needs done here is to first call _decorator->SetFont(). Following that, 
-	// GetFootprint() will need to be called to obtain changes in the decorator's size due to
-	// changes in the font, whether they are face, size, or whatever. Thus, the WinBorder will
-	// need to do some region-related recalculation, as well.
+STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
 }
 
 void WinBorder::UpdateScreen(void)
 {
-	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
+STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
 }

@@ -44,6 +44,7 @@ class RootLayer;
 class WinBorder;
 class Screen;
 class ServerCursor;
+class DisplayDriver;
 
 /*!
 	\class Layer Layer.h
@@ -56,65 +57,66 @@ class ServerCursor;
 class Layer
 {
 public:
-	Layer(BRect frame, const char *name, int32 token, uint32 resize, 
-			uint32 flags, ServerWindow *win);
-	virtual ~Layer(void);
+								Layer(BRect frame, const char *name, int32 token, uint32 resize, 
+										uint32 flags, ServerWindow *win);
+	virtual						~Layer(void);
 
-	void AddChild(Layer *child, Layer *before=NULL, bool rebuild=true);
-	void RemoveChild(Layer *child, bool rebuild=true);
-	void RemoveSelf(bool rebuild=true);
-	uint32 CountChildren(void);
-	void MakeTopChild(void);
-	void MakeBottomChild(void);
-	Layer *FindLayer(int32 token);
-	Layer *GetChildAt(BPoint pt, bool recursive=false);
-	Layer *GetUpperSibling() { return _uppersibling; }
-	Layer *GetLowerSibling() { return _lowersibling; }
-	PortLink *GetLink(void);
-	const char *GetName(void) { return (_name)?_name->String():NULL; }
-	LayerData *GetLayerData(void) { return _layerdata; }
-	LayerData *GetDrawData(void);
+			void				AddChild(Layer *child, Layer *before=NULL);
+			void				RemoveChild(Layer *child);
+			void				RemoveSelf();
+			uint32				CountChildren(void) const;
+			void				MakeTopChild(void);
+			void				MakeBottomChild(void);
+			Layer*				FindLayer(const int32 token);
+			Layer*				GetLayerAt(const BPoint &pt);
+			Layer*				GetUpperSibling() const { return _uppersibling; }
+			Layer*				GetLowerSibling() const { return _lowersibling; }
+
+			const char*			GetName(void) const { return (_name)?_name->String():NULL; }
+			LayerData*			GetLayerData(void) const { return _layerdata; }
 	
-	void SetLayerCursor(ServerCursor *csr);
-	ServerCursor *GetLayerCursor(void) const;
-	virtual void MouseTransit(uint32 transit);
+			void				SetLayerCursor(ServerCursor *csr);
+			ServerCursor*		GetLayerCursor(void) const;
+	virtual	void				MouseTransit(uint32 transit);
 
-	void Invalidate(const BRect &rect);
-	void Invalidate(BRegion& region);
-	void RebuildRegions(bool include_children=true);
-	virtual void RequestDraw(const BRect &r);
-	virtual void RequestDraw(void);
-	bool IsDirty(void) const;
-	void UpdateIfNeeded(bool force_update=false);
-	void MarkModified(BRect rect);
-	void UpdateRegions(bool force=false);
-
-	void Show(void);
-	void Hide(void);
-	bool IsHidden(void);
-
-	BRect Bounds(void);
-	BRect Frame(void);
-
-			void				DoMoveTo(float x, float y);
-			void				DoResizeTo(float newWidth, float newHeight);
-
-	virtual void MoveBy(float x, float y);
-	void ResizeBy(float x, float y);
-
-	BRect ConvertToParent(BRect rect);
-	BRegion ConvertToParent(BRegion *reg);
-	BRect ConvertFromParent(BRect rect);
-	BRegion ConvertFromParent(BRegion *reg);
-	BRegion ConvertToTop(BRegion *reg);
-	BRect ConvertToTop(BRect rect);
-	BRegion ConvertFromTop(BRegion *reg);
-	BRect ConvertFromTop(BRect rect);
+			void				Invalidate(const BRect &rect);
+			void				Invalidate(const BRegion &region);
+			void				DoInvalidate(const BRegion &reg, Layer *start);
+			
+	virtual	void				RebuildRegions( const BRect& r );
+			void				RebuildChildRegions( const BRect &r, Layer* startFrom );
+			void				RebuildFullRegion(void);
+			void				MoveRegionsBy(float x, float y);
+			void				ResizeRegionsBy(float x, float y);
 	
-	void PrintToStream(void);
-	void PrintNode(void);
-	void PruneTree(void);
-	void PrintTree();
+			void				RequestClientUpdate(const BRect &rect);
+			void				RequestDraw(const BRect &r);
+	virtual	void				Draw(const BRect &r);
+
+			void				Show(void);
+			void				Hide(void);
+			bool				IsHidden(void) const;
+
+			BRect				Bounds(void) const;
+			BRect				Frame(void) const;
+
+	virtual	void				MoveBy(float x, float y);
+	virtual	void				ResizeBy(float x, float y);
+
+			BRect				ConvertToParent(BRect rect);
+			BRegion				ConvertToParent(BRegion *reg);
+			BRect				ConvertFromParent(BRect rect);
+			BRegion				ConvertFromParent(BRegion *reg);
+			BRegion				ConvertToTop(BRegion *reg);
+			BRect				ConvertToTop(BRect rect);
+			BRegion				ConvertFromTop(BRegion *reg);
+			BRect				ConvertFromTop(BRect rect);
+
+			void				PruneTree(void);
+
+			void				PrintToStream(void);
+			void				PrintNode(void);
+			void				PrintTree();
 	
 protected:
 	friend class RootLayer;
@@ -122,28 +124,32 @@ protected:
 	friend class Screen;
 	friend class ServerWindow;
 	
-	BRect		_frame;
-	BPoint		_boundsLeftTop;
-	Layer		*_parent,
-				*_uppersibling,
-				*_lowersibling,
-				*_topchild,
-				*_bottomchild;
-	BRegion		*_visible,
-				*_invalid,
-				*_full;
-	ServerWindow	*_serverwin;
-	BString		*_name;	
-	int32		_view_token;
-	int32		_level;
-	uint32		_flags;
-	uint32		_resize_mode;
-	bool		_hidden;
-	bool		_is_dirty;
-	bool		_is_updating;
-	bool		_regions_invalid;
-	LayerData	*_layerdata;
-	ServerCursor *_cursor;
+			BRect				_frame;
+			BPoint				_boundsLeftTop;
+			Layer				*_parent,
+								*_uppersibling,
+								*_lowersibling,
+								*_topchild,
+								*_bottomchild;
+
+			BRegion				_visible,
+								_fullVisible,
+								_full;
+
+			BRegion				*clipToPicture;
+			bool				clipToPictureInverse;
+
+			ServerWindow		*_serverwin;
+			BString				*_name;	
+			int32				_view_token;
+			int32				_level;
+			uint32				_flags;
+			uint32				_resize_mode;
+			bool				_hidden;
+			bool				_is_updating;
+			LayerData			*_layerdata;
+			ServerCursor		*_cursor;
+			DisplayDriver*		fDriver;
 };
 
 #endif

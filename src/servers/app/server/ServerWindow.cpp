@@ -130,42 +130,60 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_look			= wlook;
 	_feel			= wfeel;
 	_handlertoken	= handlerID;
-	cl				= NULL;
 	winLooperPort	= looperPort;
+	_workspace_index= index;
+	_workspace		= NULL;
+	_token			= win_token_handler.GetToken();
 
-	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
-	// _sender is the monitored window's event port
+		// HAVE messaging working.
+		// _sender is the port to which the app awaits messages from the server
 	_sender			= winport;
-
-	_winlink		= new PortLink(_sender);
-	_applink		= (winapp)? new PortLink(winapp->_receiver) : NULL;
-	
-	// _receiver is the port to which the app sends messages for the server
+		// _receiver is the port to which the app sends messages for the server
 	_receiver		= create_port(30,_title->String());
-
 
 	ses				= new BSession( _receiver, _sender );
 		// Send a reply to our window - it is expecting _receiver port.
 	ses->WriteData( &_receiver, sizeof(port_id) );
 	ses->Sync();
 	
-	top_layer		= NULL;
-	
 
-	_active			= false;
+		// WAIT for top_view data and create ServerWindow's top most Layer
+	int32			vMsg;
+	int32			vToken;
+	BRect			vFrame;
+	uint32			vResizeMode;
+	uint32			vFlags;
+	char*			vName = NULL;
 
-	// Spawn our message monitoring _monitorthread
-	_monitorthread	= spawn_thread( MonitorWin, _title->String(),
-									B_NORMAL_PRIORITY, this );
-	if(_monitorthread != B_NO_MORE_THREADS &&
-		_monitorthread != B_NO_MEMORY)
+	ses->ReadInt32( &vMsg );
+	if (vMsg != AS_LAYER_CREATE_ROOT){
+		debugger("SERVER ERROR: ServerWindow(xxx): NO top_view data received!\n");
+	}
+	ses->ReadInt32( &vToken );
+	ses->ReadRect( &vFrame );
+	ses->ReadUInt32( &vResizeMode );
+	ses->ReadUInt32( &vFlags );
+	vName			= ses->ReadString();
+			
+	top_layer		= new Layer( vFrame, vName, vToken, vResizeMode,
+											vFlags, this );
+	delete vName;
+
+	cl				= top_layer;
+			
+
+		// CREATE a WindoBorder object for our ServerWindow.
+	_winborder		= new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
+
+
+		// SPAWN our message monitoring _monitorthread
+	_monitorthread	= spawn_thread( MonitorWin, _title->String(), B_NORMAL_PRIORITY, this );
+	if(_monitorthread != B_NO_MORE_THREADS && _monitorthread != B_NO_MEMORY)
 		resume_thread( _monitorthread );
 
-	_workspace_index= index;
-	_workspace		= NULL;
-	_token			= win_token_handler.GetToken();
 
+		// ADD window to desktop structure.
 	AddWindowToDesktop(this,index,ActiveScreen());
 STRACE(("ServerWindow %s:\n",_title->String() ));
 STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
@@ -262,7 +280,7 @@ STRACE(("ServerWindow %s: Show\n",_title->String()));
 	{
 		_winborder->Show();
 		_winborder->SetFocus(true);
-		_winborder->UpdateRegions(true);
+//		_winborder->UpdateRegions(true);
 	}
 }
 
@@ -297,7 +315,7 @@ STRACE(("ServerWindow %s: Set Focus to %s\n",_title->String(),value?"true":"fals
 	{
 		_active=value;
 		_winborder->SetFocus(value);
-		_winborder->RequestDraw();
+//		_winborder->RequestDraw();
 	}
 }
 
@@ -473,15 +491,7 @@ void ServerWindow::DispatchMessage( int32 code )
 				// there is no way of setting this, other than manual. :-)
 			newLayer->_hidden	= hidden;
 			
-			// TODO: 'before' Layer support???
-			
-			// TODO: review Layer::AddChild
-				// newLayer's parent will invalidate the area that its new child
-				//    occupies, here in AddChild()
-			cl->AddChild( newLayer );
-			cl->PrintTree();
-			
-				// we set Layer attributes (BView's state)...
+				// we set Layer's attributes (BView's state)
 			cl			= newLayer;
 			
 			int32		msgCode;
@@ -490,8 +500,11 @@ void ServerWindow::DispatchMessage( int32 code )
 
 			ses->ReadInt32( &msgCode );		// this is AS_LAYER_SET_STATE
 			DispatchMessage( msgCode );
+
+				// attach the view to the tree structure.
+			oldCL->AddChild( newLayer );
 			
-				// ... and attach its children.
+				// attach its children.
 			for(int i = 0; i < childCount; i++){
 				ses->ReadInt32( &msgCode );		// this is AS_LAYER_CREATE
 				DispatchMessage( msgCode );
@@ -513,7 +526,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			parent		= cl->_parent;
 			
 				// here we remove current layer from list.
-			cl->RemoveSelf( false );
+			cl->RemoveSelf();
 			// TODO: invalidate the region occupied by this view.
 			//			Should be done in Layer::RemoveChild() though!
 			cl->PruneTree();
@@ -568,11 +581,15 @@ void ServerWindow::DispatchMessage( int32 code )
 					ses->ReadRect( &rect );
 					cl->_layerdata->clippReg->Include( rect );
 				}
+
+				cl->RebuildFullRegion();
 			}
 			else{
 				if ( cl->_layerdata->clippReg ){
 					delete cl->_layerdata->clippReg;
 					cl->_layerdata->clippReg = NULL;
+
+					cl->RebuildFullRegion();
 				}
 			}
 
@@ -703,7 +720,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			ses->ReadFloat( &x );
 			ses->ReadFloat( &y );
 			
-			cl->DoMoveTo(x, y);
+			cl->MoveBy(x, y);
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -717,7 +734,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		/* TODO: check for minimum alowed. WinBorder should provide such
 		 *	a method, based on its decorator.
 		 */
-			cl->DoResizeTo( newWidth, newHeight );
+			cl->ResizeBy( newWidth, newHeight );
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -824,6 +841,8 @@ void ServerWindow::DispatchMessage( int32 code )
 			LayerData		*ld = new LayerData();
 			ld->prevState	= cl->_layerdata;
 			cl->_layerdata	= ld;
+
+			cl->RebuildFullRegion();
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -838,6 +857,8 @@ void ServerWindow::DispatchMessage( int32 code )
 			LayerData		*ld = cl->_layerdata;
 			cl->_layerdata	= cl->_layerdata->prevState;
 			delete ld;
+
+			cl->RebuildFullRegion();
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1004,16 +1025,27 @@ void ServerWindow::DispatchMessage( int32 code )
 			ses->ReadInt32( &pictureToken );
 			ses->ReadPoint( &where );
 
+		
+			BRegion			reg;
+			bool			redraw = false;
+
+				// if we had a picture to clip to, include the FULL visible region(if any) in the area to be redrawn
+				// in other words: invalidate what ever is visible for this layer and his children.
+			if ( cl->clipToPicture && cl->_fullVisible.CountRects() > 0 ){
+				reg.Include( &cl->_fullVisible );
+				redraw		= true;
+			}
+
+				// search for a picture with the specified token.
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
-
 			for(;;){
 				sp		= static_cast<ServerPicture*>(cl->_serverwin->_app->_piclist->ItemAt(i++));
 				if (!sp)
 					break;
 					
 				if( sp->GetToken() == pictureToken ){
-					cl->_layerdata->clippPicture	= sp;
+//					cl->clipToPicture	= sp;
 // TODO: increase that picture's reference count.( ~ allocate a picture )
 					break;
 				}
@@ -1021,14 +1053,34 @@ void ServerWindow::DispatchMessage( int32 code )
 				// avoid compiler warning
 			i = 0;
 
-			cl->_layerdata->clippInverse	= false;
+				// we have a new picture to clip to, so rebuild our full region
+			if( cl->clipToPicture ) {
 
-			/* TODO: modify when you have a function that returns the clipping
-			 *	region composed by: the visible region & local clipping
-			 *	region(across states) & the picture clipping region.
-			 */
-			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
-		
+				cl->clipToPictureInverse	= false;
+
+				cl->RebuildFullRegion();
+			}
+
+				// we need to rebuild the visible region, we may have a valid one.
+			if (cl->_parent && !(cl->_hidden) ){
+				cl->_parent->RebuildChildRegions(cl->_full.Frame(), cl);
+			}
+			else{
+					// will this happen? Maybe...
+				cl->RebuildRegions(cl->_full.Frame());
+			}
+
+				// include our full visible region in the region to be redrawn
+			if ( !(cl->_hidden) && (cl->_fullVisible.CountRects() > 0) ){
+				reg.Include( &(cl->_fullVisible) );
+				redraw		= true;
+			}
+
+				// redraw if: we had OR if we NOW have a picture to clip to.
+			if (redraw){
+				cl->Invalidate( reg );
+			}
+
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
@@ -1050,7 +1102,7 @@ void ServerWindow::DispatchMessage( int32 code )
 					break;
 					
 				if( sp->GetToken() == pictureToken ){
-					cl->_layerdata->clippPicture	= sp;
+//					cl->clipToPicture	= sp;
 // TODO: increase that picture's reference count.( ~ allocate a picture )
 					break;
 				}
@@ -1058,13 +1110,15 @@ void ServerWindow::DispatchMessage( int32 code )
 				// avoid compiler warning
 			i = 0;
 			
-			cl->_layerdata->clippInverse	= true;
+				// if a picture has been found...
+			if( cl->clipToPicture ) {
 
-			/* TODO: modify when you have a function that returns the clipping
-			 *	region composed by: the visible region & local clipping
-			 *	region(across states) & the picture clipping region.
-			 */
-			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
+				cl->clipToPictureInverse	= true;
+
+				cl->RebuildFullRegion();
+
+				cl->RequestDraw( cl->clipToPicture->Frame() );
+			}
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1077,7 +1131,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			int32		noOfRects;
 
 			ld			= cl->_layerdata;
-			reg			= cl->ConvertFromParent( cl->_visible );
+			reg			= cl->ConvertFromParent( &(cl->_visible) );
 
 			if( ld->clippReg )
 				reg.IntersectWith( ld->clippReg );
@@ -1115,12 +1169,10 @@ void ServerWindow::DispatchMessage( int32 code )
 				ses->ReadRect( &r );
 				cl->_layerdata->clippReg->Include( r );
 			}
-			
-			/* TODO: modify when you have a function that returns the clipping
-			 *	region composed by: the visible region & local clipping
-			 *	region(across states) & the picture clipping region.
-			 */
-			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
+
+			cl->RebuildFullRegion();
+
+			cl->RequestDraw( cl->clipToPicture->Frame() );
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
@@ -1166,30 +1218,6 @@ void ServerWindow::DispatchMessage( int32 code )
 	/********** END: BView Messages ***********/
 	
 	/********** BWindow Messages ***********/
-		case AS_LAYER_CREATE_ROOT:
-		{
-			// Received when a window creates its internal top view
-			int32			token;
-			BRect			frame;
-			uint32			resizeMode;
-			uint32			flags;
-			char*			name = NULL;
-			
-			ses->ReadInt32( &token );
-			ses->ReadRect( &frame );
-			ses->ReadInt32( (int32*)&resizeMode );
-			ses->ReadInt32( (int32*)&flags );
-			name			= ses->ReadString();
-			
-			top_layer		= new Layer( frame, name, token, resizeMode,
-											flags, this );
-			cl				= top_layer;
-			
-			STRACE(("ServerWindow %s: Setting currentLayer to: '%s'\n", _title->String(), name ));
-			STRACE(("ServerWindow %s: Message Create_Layer_Root\n",_title->String()));
-			delete name;
-			break;
-		}
 		case AS_LAYER_DELETE_ROOT:
 		{
 			// Received when a window deletes its internal top view
@@ -2150,15 +2178,13 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 
 //-----------------------------------------------------------------------
 
-void ServerWindow::SendMessageToClient( const BMessage* msg ) const
-{
+void ServerWindow::SendMessageToClient( const BMessage* msg ) const{
 	ssize_t		size;
 	char		*buffer;
 	
 	size		= msg->FlattenedSize();
 	buffer		= new char[size];
-	if ( msg->Flatten( buffer, size ) == B_OK )
-	{
+	if ( msg->Flatten( buffer, size ) == B_OK ){
 		write_port( winLooperPort, msg->what, buffer, size );
 	}
 	else

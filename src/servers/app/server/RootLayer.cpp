@@ -52,66 +52,25 @@ RootLayer::RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver
 	: Layer(rect, layername, B_NULL_TOKEN, B_FOLLOW_NONE, 0, NULL)
 {
 	_view_token		= rlayer_token_handler.GetToken();
-	
-	_driver			= gfxdriver;
-	_is_dirty		= true;
-	_bgcolor		= new RGBColor();
-	_invalid->MakeEmpty();
-	_invalid->Include(Bounds());
+
+	fDriver			= gfxdriver;
+
+	_hidden			= false;
 }
 
 //! Frees all allocated heap memory (which happens to be none) ;)
 RootLayer::~RootLayer()
 {
-	delete _bgcolor;
 }
 
 /*!
-	\brief Requests that the layer be drawn on screen
-	\param r The bounding rectangle of the area given in the Layer's coordinates
+	\brief Draws this entire layer on screen
 */
-void RootLayer::RequestDraw(const BRect &r)
+void RootLayer::Draw(const BRect &r)
 {
-	Invalidate(r);
-	RequestDraw();
-}
-
-/*!
-	\brief Requests that the layer be drawn on screen
-*/
-void RootLayer::RequestDraw(void)
-{
-	if(!_is_dirty)
-		return;
-	
-	// Redraw the base
-	if(_invalid)
-	{
-		#ifdef DEBUG_ROOTLAYER
-		printf("ROOTLAYER: ");
-		_invalid->PrintToStream();
-		printf("===========\n");
-		#endif
-		for(int32 i=0; _invalid->CountRects();i++)
-		{
-			if(_invalid->RectAt(i).IsValid())
-				_driver->FillRect(_invalid->RectAt(i),_layerdata, pat_solidlow);
-			else
-				break;
-		}
-	
-		delete _invalid;
-		_invalid=NULL;
-	}
-
-	// force redraw of all dirty windows	
-	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
-	{
-		if(lay->IsDirty())
-			lay->RequestDraw();
-	}
-
-	_is_dirty=false;
+/* THIS method is here because of DisplayDriver testing!
+ *	It SHOULD BE REMOVED as soon as testing is done!!!!
+ */
 
 #ifdef DISPLAYDRIVER_TEST_HACK
 	int8 pattern[8];
@@ -182,7 +141,7 @@ void RootLayer::RequestDraw(void)
 */
 void RootLayer::SetColor(const RGBColor &col)
 {
-	_layerdata->lowcolor=col;
+	_layerdata->viewcolor	= col;
 }
 
 /*!
@@ -191,7 +150,7 @@ void RootLayer::SetColor(const RGBColor &col)
 */
 RGBColor RootLayer::GetColor(void) const
 {	
-	return _layerdata->lowcolor;
+	return _layerdata->viewcolor;
 }
 
 //! Empty function to disable moving the RootLayer
@@ -199,39 +158,21 @@ void RootLayer::MoveBy(float x, float y)
 {
 }
 
-//! Empty function to disable moving the RootLayer
-void RootLayer::MoveBy(BPoint pt)
-{
-}
-
 //! Reimplemented for RootLayer special case
 void RootLayer::ResizeBy(float x, float y)
 {
-	BRect oldframe=_frame;
-	_frame.right+=x;
-	_frame.bottom+=y;
+	_frame.right	+= x;
+	_frame.bottom	+= y;
 
-	// We'll need to rebuild the regions of the child layers
-	// because resizing will affect the visible regions
-	RebuildRegions(true);
-	
-	// If we've gotten bigger, we'll need to repaint the new areas
-	if(x>0)
-	{
-		BRect dx(oldframe.right,oldframe.top, _frame.right, _frame.bottom);
-		Invalidate(dx);
-	}
-	if(y>0)
-	{
-		BRect dy(oldframe.left,oldframe.bottom, _frame.right, _frame.bottom);
-		Invalidate(dy);
-	}
-}
+	_full.Set( _frame ); // NO ConvertTopTop !!!
 
-//! Reimplemented for RootLayer special case
-void RootLayer::ResizeBy(BPoint pt)
-{
-	ResizeBy(pt.x,pt.y);
+		// We need to rebuild ALL regions because the screen is black now,
+		// and ALL views/Layers need redrawing.
+	RebuildRegions( _frame );
+
+		// Invalidate the hole screen, because we've changed resolution
+		// and the screen is black.
+	Invalidate( _frame );
 }
 
 /*!
@@ -240,19 +181,5 @@ void RootLayer::ResizeBy(BPoint pt)
 */
 void RootLayer::SetDriver(DisplayDriver *driver)
 {
-	_driver=driver;
-}
-
-/*!
-	\brief Rebuilds the visible and invalid layers based on the layer hierarchy
-	\param recursive (Defaults to false)
-*/
-void RootLayer::RebuildRegions(bool recursive)
-{
-	// Unlike the other layers, RootLayers can't depend on their parent layer to reset its
-	// visible region, so we have to do it itself.
-	_visible->MakeEmpty();
-	_visible->Include(_full);
-
-	Layer::RebuildRegions(recursive);
+	fDriver		= driver;
 }
