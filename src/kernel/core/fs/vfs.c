@@ -3407,7 +3407,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	mount = find_mount(device);
 	if (mount == NULL) {
 		status = EINVAL;
-		goto error;
+		goto out;
 	}
 
 	if (FS_MOUNT_CALL(mount, read_fs_info))
@@ -3419,7 +3419,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	info->dev = mount->id;
 	info->root = mount->root_vnode->id;
 
-error:
+out:
 	mutex_unlock(&gMountMutex);
 	return status;
 }
@@ -3436,7 +3436,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 	mount = find_mount(device);
 	if (mount == NULL) {
 		status = EINVAL;
-		goto error;
+		goto out;
 	}
 
 	if (FS_MOUNT_CALL(mount, write_fs_info))
@@ -3444,7 +3444,7 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 	else
 		status = EROFS;
 
-error:
+out:
 	mutex_unlock(&gMountMutex);
 	return status;
 }
@@ -3539,6 +3539,26 @@ sys_unmount(const char *path)
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
 	return fs_unmount(pathBuffer, true);
+}
+
+
+status_t
+_kern_read_fs_info(dev_t device, struct fs_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	return fs_read_info(device, info);
+}
+
+
+status_t
+_kern_write_fs_info(dev_t device, const struct fs_info *info, int mask)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	return fs_write_info(device, info, mask);
 }
 
 
@@ -3903,6 +3923,45 @@ user_unmount(const char *userPath)
 		return status;
 
 	return fs_unmount(path, false);
+}
+
+
+status_t
+_user_read_fs_info(dev_t device, struct fs_info *userInfo)
+{
+	struct fs_info info;
+	status_t status;
+
+	if (userInfo == NULL)
+		return B_BAD_VALUE;
+
+	if (!CHECK_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+
+	status = fs_read_info(device, &info);
+	if (status != B_OK)
+		return status;
+
+	if (user_memcpy(userInfo, &info, sizeof(struct fs_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
+}
+
+
+status_t
+_user_write_fs_info(dev_t device, const struct fs_info *userInfo, int mask)
+{
+	struct fs_info info;
+
+	if (userInfo == NULL)
+		return B_BAD_VALUE;
+
+	if (!CHECK_USER_ADDRESS(userInfo)
+		|| user_memcpy(&info, userInfo, sizeof(struct fs_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return fs_write_info(device, &info, mask);
 }
 
 
