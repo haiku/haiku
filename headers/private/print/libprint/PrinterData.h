@@ -33,7 +33,7 @@ public:
 	const string &getComments() const;
 	const string &getTransport() const;
 
-//	void  setDriverName(const char *s) { __driver_name = driver_name; }
+//	void  setDriverName(const char *s) { fDriverName = driver_name; }
 	void  setPrinterName(const char *printer_name);
 	void  setComments(const char *comments);
 
@@ -44,41 +44,41 @@ protected:
 	PrinterData &operator = (const PrinterData &printer_data);
 
 private:
-	string __driver_name;
-	string __printer_name;
-	string __comments;
-	string __transport;
-	BNode  *__node;
+	string fDriverName;
+	string fPrinterName;
+	string fComments;
+	string fTransport;
+	BNode  *fNode;
 };
 
 inline const string &PrinterData::getDriverName() const
 {
-	return __driver_name;
+	return fDriverName;
 }
 
 inline const string &PrinterData::getPrinterName() const
 {
-	return __printer_name;
+	return fPrinterName;
 }
 
 inline const string &PrinterData::getComments() const
 {
-	return __comments;
+	return fComments;
 }
 
 inline const string &PrinterData::getTransport() const
 {
-	return __transport;
+	return fTransport;
 }
 
 inline void PrinterData::setPrinterName(const char *printer_name)
 {
-	__printer_name = printer_name;
+	fPrinterName = printer_name;
 }
 
 inline void PrinterData::setComments(const char *comments)
 {
-	__comments = comments;
+	fComments = comments;
 }
 
 #endif	// __PRINTERDATA_H

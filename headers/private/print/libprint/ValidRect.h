@@ -17,7 +17,7 @@ struct RECT {
 	int bottom;
 };
 
-bool get_valid_rect(BBitmap *bitmap, const rgb_color *palette, RECT *rc);
+bool get_valid_rect(BBitmap *bitmap, RECT *rc);
 
 int color_space2pixel_depth(color_space cs);
 

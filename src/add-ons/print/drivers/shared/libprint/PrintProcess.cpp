@@ -39,26 +39,26 @@ PictureData::~PictureData()
 
 PageData::PageData()
 {
-	__hollow = true;
+	fHollow = true;
 }
 
 PageData::PageData(BFile *file, bool reverse)
 {
-	__file    = file;
-	__reverse = reverse;
-	__picture_count = 0;
-	__rest    = 0;
-	__offset  = 0;
-	__hollow  = false;
+	fFile    = file;
+	fReverse = reverse;
+	fPictureCount = 0;
+	fRest    = 0;
+	fOffset  = 0;
+	fHollow  = false;
 
 	if (reverse) {
-		file->Read(&__picture_count, sizeof(long));
-		DBGMSG(("picture_count = %d\n", (int)__picture_count));
-		__offset = __file->Position();
-		off_t o = __offset;
+		file->Read(&fPictureCount, sizeof(long));
+		DBGMSG(("picture_count = %d\n", (int)fPictureCount));
+		fOffset = fFile->Position();
+		off_t o = fOffset;
 		// seek to start of next page
-		__file->Read(&o, sizeof(o));
-		__file->Seek(o, SEEK_SET);
+		fFile->Read(&o, sizeof(o));
+		fFile->Seek(o, SEEK_SET);
 	}
 }
 
@@ -67,30 +67,30 @@ bool PageData::startEnum()
 	off_t offset;
 	uchar dummy[40];
 
-	if (__hollow)
+	if (fHollow)
 		return false;
 
-	if (__offset == 0) {
-		__file->Read(&__picture_count, sizeof(long));
-		DBGMSG(("picture_count = %d\n", (int)__picture_count));
-		__offset = __file->Position();
+	if (fOffset == 0) {
+		fFile->Read(&fPictureCount, sizeof(long));
+		DBGMSG(("picture_count = %d\n", (int)fPictureCount));
+		fOffset = fFile->Position();
 	} else {
-		__file->Seek(__offset, SEEK_SET);
+		fFile->Seek(fOffset, SEEK_SET);
 	}
 	// skip page header
-	__file->Seek(sizeof(offset) + sizeof(dummy), SEEK_CUR);
+	fFile->Seek(sizeof(offset) + sizeof(dummy), SEEK_CUR);
 
-	__rest = __picture_count;
-	return __picture_count > 0;
+	fRest = fPictureCount;
+	return fPictureCount > 0;
 }
 
 bool PageData::enumObject(PictureData **picture_data)
 {
-	if (__hollow || __picture_count <= 0) {
+	if (fHollow || fPictureCount <= 0) {
 		*picture_data = NULL;
 	} else {
-		*picture_data = new PictureData(__file);
-		if (--__rest > 0) {
+		*picture_data = new PictureData(fFile);
+		if (--fRest > 0) {
 			return true;
 		}
 	}
@@ -113,48 +113,48 @@ SpoolData::SpoolData(
 		if (nup > 1) {
 			for (int page_index = 0; page_index < page_count; page_index++) {
 				if (page_index % nup == 0) {
-					__pages.push_front(new PageData(file, reverse));
-					__it = __pages.begin();
-					__it++;
+					fPages.push_front(new PageData(file, reverse));
+					fIt = fPages.begin();
+					fIt++;
 				} else {
-					__pages.insert(__it, new PageData(file, reverse));
+					fPages.insert(fIt, new PageData(file, reverse));
 				}
 			}
 			page_count = nup - page_count % nup;
 			if (page_count < nup) {
 				while (page_count--) {
-					__pages.insert(__it, new PageData);
+					fPages.insert(fIt, new PageData);
 				}
 			}
 		} else {
 			while (page_count--) {
-				__pages.push_front(new PageData(file, reverse));
+				fPages.push_front(new PageData(file, reverse));
 			}
 		}
 	} else {
 		while (page_count--) {
-			__pages.push_back(new PageData(file, reverse));
+			fPages.push_back(new PageData(file, reverse));
 		}
 	}
 }
 
 SpoolData::~SpoolData()
 {
-	for (__it = __pages.begin(); __it != __pages.end(); __it++) {
-		delete (*__it);
+	for (fIt = fPages.begin(); fIt != fPages.end(); fIt++) {
+		delete (*fIt);
 	}
 }
 
 bool SpoolData::startEnum()
 {
-	__it = __pages.begin();
+	fIt = fPages.begin();
 	return true;
 }
 
 bool SpoolData::enumObject(PageData **page_data)
 {
-	*page_data = *__it++;
-	if (__it == __pages.end()) {
+	*page_data = *fIt++;
+	if (fIt == fPages.end()) {
 		return false;
 	}
 	return true;

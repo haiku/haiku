@@ -17,7 +17,9 @@ class BMessage;
 class PrinterData;
 class PrinterCap;
 
-#define GDF_ROTATE_BAND_BITMAP	0x01
+enum {
+	kGDFRotateBandBitmap = 1
+};
 
 class GraphicsDriver {
 public:
@@ -67,64 +69,64 @@ private:
 	static void rgb32_to_gray(void* src, void* dst, int width);
 	static void cmap8_to_gray(void* src, void* dst, int width);
 
-	uint32           __flags;
-	BMessage         *__msg;
-	BView            *__view;
-	BBitmap          *__bitmap;
-	Transport        *__transport;
-	JobData          *__org_job_data;
-	JobData          *__real_job_data;
-	PrinterData      *__printer_data;
-	const PrinterCap *__printer_cap;
-	SpoolMetaData    *__spool_meta_data;
+	uint32           fFlags;
+	BMessage         *fMsg;
+	BView            *fView;
+	BBitmap          *fBitmap;
+	Transport        *fTransport;
+	JobData          *fOrgJobData;
+	JobData          *fRealJobData;
+	PrinterData      *fPrinterData;
+	const PrinterCap *fPrinterCap;
+	SpoolMetaData    *fSpoolMetaData;
 
-	int __page_width;
-	int __page_height;
-	int __band_width;
-	int __band_height;
-	int __pixel_depth;
-	int __band_count;
-	int __internal_copies;
+	int fPageWidth;
+	int fPageHeight;
+	int fBandWidth;
+	int fBandHeight;
+	int fPixelDepth;
+	int fBandCount;
+	int fInternalCopies;
 };
 
 inline const JobData *GraphicsDriver::getJobData() const
 {
-	return __real_job_data;
+	return fRealJobData;
 }
 
 inline const PrinterData *GraphicsDriver::getPrinterData() const
 {
-	return __printer_data;
+	return fPrinterData;
 }
 
 inline const PrinterCap *GraphicsDriver::getPrinterCap() const
 {
-	return __printer_cap;
+	return fPrinterCap;
 }
 
 inline const SpoolMetaData *GraphicsDriver::getSpoolMetaData() const
 {
-	return __spool_meta_data;
+	return fSpoolMetaData;
 }
 
 inline int GraphicsDriver::getPageWidth() const
 {
-	return __page_width;
+	return fPageWidth;
 }
 
 inline int GraphicsDriver::getPageHeight() const
 {
-	return __page_height;
+	return fPageHeight;
 }
 
 inline int GraphicsDriver::getBandWidth() const
 {
-	return __band_width;
+	return fBandWidth;
 }
 
 inline int GraphicsDriver::getBandHeight() const
 {
-	return __band_height;
+	return fBandHeight;
 }
 
 #endif	/* __GRAPHICSDRIVER_H */

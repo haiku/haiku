@@ -109,12 +109,12 @@ const BRect CANCEL_RECT(
 	CANCEL_V + BUTTON_HEIGHT);
 
 enum MSGS {
-	M_CANCEL = 1,
-	M_OK
+	kMsgCancel = 1,
+	kMsgOK
 };
 
 PageSetupView::PageSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), __job_data(job_data), __printer_data(printer_data), __printer_cap(printer_cap)
+	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fJobData(job_data), fPrinterData(printer_data), fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -137,29 +137,29 @@ void PageSetupView::AttachedToWindow()
 	AddChild(box);
 	box->SetLabel("Orientation");
 
-	__portrait  = new BRadioButton(PORT_RECT, "", PORT_TEXT, NULL);
-	box->AddChild(__portrait);
+	fPortrait  = new BRadioButton(PORT_RECT, "", PORT_TEXT, NULL);
+	box->AddChild(fPortrait);
 
 	BRadioButton *landscape = new BRadioButton(LAND_RECT, "", RAND_TEXT, NULL);
 	box->AddChild(landscape);
 
-	if (JobData::PORTRAIT == __job_data->getOrientation())
-		__portrait->SetValue(B_CONTROL_ON);
+	if (JobData::kPortrait == fJobData->getOrientation())
+		fPortrait->SetValue(B_CONTROL_ON);
 	else
 		landscape->SetValue(B_CONTROL_ON);
 
 	/* paper selection */
 
 	marked = false;
-	__paper = new BPopUpMenu("");
-	__paper->SetRadioMode(true);
-	count = __printer_cap->countCap(PrinterCap::PAPER);
-	PaperCap **paper_cap = (PaperCap **)__printer_cap->enumCap(PrinterCap::PAPER);
+	fPaper = new BPopUpMenu("");
+	fPaper->SetRadioMode(true);
+	count = fPrinterCap->countCap(PrinterCap::kPaper);
+	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
 	while (count--) {
 		item = new BMenuItem((*paper_cap)->label.c_str(), NULL);
-		__paper->AddItem(item);
+		fPaper->AddItem(item);
 		item->SetTarget(this);
-		if ((*paper_cap)->paper == __job_data->getPaper()) {
+		if ((*paper_cap)->paper == fJobData->getPaper()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -167,7 +167,7 @@ void PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(PAPER_RECT, "", PAPER_TEXT, __paper);
+	menufield = new BMenuField(PAPER_RECT, "", PAPER_TEXT, fPaper);
 	AddChild(menufield);
 	float width = StringWidth(PAPER_TEXT) + 7;
 	menufield->SetDivider(width);
@@ -175,15 +175,15 @@ void PageSetupView::AttachedToWindow()
 	/* resolution */
 
 	marked = false;
-	__resolution = new BPopUpMenu("");
-	__resolution->SetRadioMode(true);
-	count = __printer_cap->countCap(PrinterCap::RESOLUTION);
-	ResolutionCap **resolution_cap = (ResolutionCap **)__printer_cap->enumCap(PrinterCap::RESOLUTION);
+	fResolution = new BPopUpMenu("");
+	fResolution->SetRadioMode(true);
+	count = fPrinterCap->countCap(PrinterCap::kResolution);
+	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
 	while (count--) {
 		item = new BMenuItem((*resolution_cap)->label.c_str(), NULL);
-		__resolution->AddItem(item);
+		fResolution->AddItem(item);
 		item->SetTarget(this);
-		if (((*resolution_cap)->xres == __job_data->getXres()) && ((*resolution_cap)->yres == __job_data->getYres())) {
+		if (((*resolution_cap)->xres == fJobData->getXres()) && ((*resolution_cap)->yres == fJobData->getYres())) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -191,18 +191,18 @@ void PageSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(RESOLUTION_RECT, "", RES_TEXT, __resolution);
+	menufield = new BMenuField(RESOLUTION_RECT, "", RES_TEXT, fResolution);
 	AddChild(menufield);
 	menufield->SetDivider(width);
 
 	/* cancel */
 
-	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(M_CANCEL));
+	button = new BButton(CANCEL_RECT, "", CANCEL_TEXT, new BMessage(kMsgCancel));
 	AddChild(button);
 
 	/* ok */
 
-	button = new BButton(OK_RECT, "", OK_TEXT, new BMessage(M_OK));
+	button = new BButton(OK_RECT, "", OK_TEXT, new BMessage(kMsgOK));
 	AddChild(button);
 	button->MakeDefault(true);
 }
@@ -216,10 +216,10 @@ inline void swap(float *e1, float *e2)
 
 bool PageSetupView::UpdateJobData()
 {
-	if (B_CONTROL_ON == __portrait->Value()) {
-		__job_data->setOrientation(JobData::PORTRAIT);
+	if (B_CONTROL_ON == fPortrait->Value()) {
+		fJobData->setOrientation(JobData::kPortrait);
 	} else {
-		__job_data->setOrientation(JobData::LANDSCAPE);
+		fJobData->setOrientation(JobData::kLandscape);
 	}
 
 	BRect paper_rect;
@@ -227,12 +227,12 @@ bool PageSetupView::UpdateJobData()
 
 	int count;
 
-	count = __printer_cap->countCap(PrinterCap::PAPER);
-	PaperCap **paper_cap = (PaperCap **)__printer_cap->enumCap(PrinterCap::PAPER);
-	const char *paper_label = __paper->FindMarked()->Label();
+	count = fPrinterCap->countCap(PrinterCap::kPaper);
+	PaperCap **paper_cap = (PaperCap **)fPrinterCap->enumCap(PrinterCap::kPaper);
+	const char *paper_label = fPaper->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*paper_cap)->label.c_str(), paper_label)) {
-			__job_data->setPaper((*paper_cap)->paper);
+			fJobData->setPaper((*paper_cap)->paper);
 			paper_rect = (*paper_cap)->paper_rect;
 			printable_rect = (*paper_cap)->printable_rect;
 			break;
@@ -240,30 +240,30 @@ bool PageSetupView::UpdateJobData()
 		paper_cap++;
 	}
 
-	count = __printer_cap->countCap(PrinterCap::RESOLUTION);
-	ResolutionCap **resolution_cap = (ResolutionCap **)__printer_cap->enumCap(PrinterCap::RESOLUTION);
-	const char *resolution_label = __resolution->FindMarked()->Label();
+	count = fPrinterCap->countCap(PrinterCap::kResolution);
+	ResolutionCap **resolution_cap = (ResolutionCap **)fPrinterCap->enumCap(PrinterCap::kResolution);
+	const char *resolution_label = fResolution->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*resolution_cap)->label.c_str(), resolution_label)) {
-			__job_data->setXres((*resolution_cap)->xres);
-			__job_data->setYres((*resolution_cap)->yres);
+			fJobData->setXres((*resolution_cap)->xres);
+			fJobData->setYres((*resolution_cap)->yres);
 			break;
 		}
 		resolution_cap++;
 	}
 
-	if (JobData::LANDSCAPE == __job_data->getOrientation()) {
+	if (JobData::kLandscape == fJobData->getOrientation()) {
 		swap(&paper_rect.left, &paper_rect.top);
 		swap(&paper_rect.right, &paper_rect.bottom);
 		swap(&printable_rect.left, &printable_rect.top);
 		swap(&printable_rect.right, &printable_rect.bottom);
 	}
 
-	__job_data->setScaling(100.0);
-	__job_data->setPaperRect(paper_rect);
-	__job_data->setPrintableRect(printable_rect);
+	fJobData->setScaling(100.0);
+	fJobData->setPaperRect(paper_rect);
+	fJobData->setPrintableRect(printable_rect);
 
-	__job_data->save();
+	fJobData->save();
 	return true;
 }
 
@@ -274,7 +274,7 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 		"Page Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	__result = 0;
+	fResult = 0;
 /*
 	ostringstream oss;
 	oss << printer_data->get_printer_name() << " Setup";
@@ -286,7 +286,7 @@ PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const P
 	AddChild(view);
 	Unlock();
 
-	__semaphore = create_sem(0, "PageSetupSem");
+	fSemaphore = create_sem(0, "PageSetupSem");
 }
 
 PageSetupDlg::~PageSetupDlg()
@@ -295,25 +295,25 @@ PageSetupDlg::~PageSetupDlg()
 
 bool PageSetupDlg::QuitRequested()
 {
-	__result = B_ERROR;
-	release_sem(__semaphore);
+	fResult = B_ERROR;
+	release_sem(fSemaphore);
 	return true;
 }
 
 void PageSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-	case M_OK:
+	case kMsgOK:
 		Lock();
 		((PageSetupView *)ChildAt(0))->UpdateJobData();
 		Unlock();
-		__result = B_NO_ERROR;
-		release_sem(__semaphore);
+		fResult = B_NO_ERROR;
+		release_sem(fSemaphore);
 		break;
 
-	case M_CANCEL:
-		__result = B_ERROR;
-		release_sem(__semaphore);
+	case kMsgCancel:
+		fResult = B_ERROR;
+		release_sem(fSemaphore);
 		break;
 
 	default:
@@ -325,9 +325,9 @@ void PageSetupDlg::MessageReceived(BMessage *msg)
 int PageSetupDlg::Go()
 {
 	Show();
-	acquire_sem(__semaphore);
-	delete_sem(__semaphore);
-	int value = __result;
+	acquire_sem(fSemaphore);
+	delete_sem(fSemaphore);
+	int value = fResult;
 	Lock();
 	Quit();
 	return value;

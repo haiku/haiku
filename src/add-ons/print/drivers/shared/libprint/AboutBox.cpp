@@ -18,6 +18,11 @@ using namespace std;
 #define std
 #endif
 
+enum {
+	kMsgOK = 'AbOK'
+};
+
+
 class AboutBoxView : public BView {
 public:
 	AboutBoxView(BRect frame, const char *driver_name, const char *version, const char *copyright);
@@ -25,17 +30,17 @@ public:
 	virtual void AttachedToWindow();
 
 private:
-	string __driver_name;
-	string __version;
-	string __copyright;
+	string fDriverName;
+	string fVersion;
+	string fCopyright;
 };
 
 AboutBoxView::AboutBoxView(BRect rect, const char *driver_name, const char *version, const char *copyright)
 	: BView(rect, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	__driver_name = driver_name;
-	__version     = version;
-	__copyright   = copyright;
+	fDriverName = driver_name;
+	fVersion     = version;
+	fCopyright   = copyright;
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetDrawingMode(B_OP_SELECT);
 }
@@ -43,7 +48,7 @@ AboutBoxView::AboutBoxView(BRect rect, const char *driver_name, const char *vers
 void AboutBoxView::Draw(BRect)
 {
 	SetHighColor(0, 0, 0);
-	DrawString(__driver_name.c_str(), BPoint(10.0f, 16.0f));
+	DrawString(fDriverName.c_str(), BPoint(10.0f, 16.0f));
 	DrawString(" Driver for ");
 	SetHighColor(0, 0, 0xff);
 	DrawString("B");
@@ -51,17 +56,15 @@ void AboutBoxView::Draw(BRect)
 	DrawString("e");
 	SetHighColor(0, 0, 0);
 	DrawString("OS  Version ");
-	DrawString(__version.c_str());
-	DrawString(__copyright.c_str(), BPoint(10.0f, 30.0f));
+	DrawString(fVersion.c_str());
+	DrawString(fCopyright.c_str(), BPoint(10.0f, 30.0f));
 }
-
-#define M_OK 1
 
 void AboutBoxView::AttachedToWindow()
 {
 	BRect rect;
 	rect.Set(110, 50, 175, 55);
-	BButton *button = new BButton(rect, "", "OK", new BMessage(M_OK));
+	BButton *button = new BButton(rect, "", "OK", new BMessage(kMsgOK));
 	AddChild(button);
 	button->MakeDefault(true);
 }
@@ -85,7 +88,7 @@ AboutBoxWindow::AboutBoxWindow(BRect frame, const char *driver_name, const char 
 void AboutBoxWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-	case M_OK:
+	case kMsgOK:
 		be_app->PostMessage(B_QUIT_REQUESTED);
 		break;
 	}

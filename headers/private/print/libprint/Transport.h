@@ -25,10 +25,10 @@ extern "C" {
 
 class TransportException {
 private:
-	string __str;
+	string fWhat;
 public:
-	TransportException(const string &what_arg) : __str(what_arg) {}
-	const char *what() const { return __str.c_str(); }
+	TransportException(const string &what_arg) : fWhat(what_arg) {}
+	const char *what() const { return fWhat.c_str(); }
 };
 
 class Transport {
@@ -45,12 +45,12 @@ protected:
 	Transport &operator = (const Transport &);
 
 private:
-	image_id           __image;
-	PFN_init_transport __init_transport;
-	PFN_exit_transport __exit_transport;
-	BDataIO            *__data_stream;
-	bool               __abort;
-	string             __last_error_string;
+	image_id           fImage;
+	PFN_init_transport fInitTransport;
+	PFN_exit_transport fExitTransport;
+	BDataIO            *fDataStream;
+	bool               fAbort;
+	string             fLastErrorString;
 };
 
 #endif	// __TRANSPORT_H

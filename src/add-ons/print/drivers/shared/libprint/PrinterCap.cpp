@@ -6,7 +6,7 @@
 #include "PrinterCap.h"
 
 PrinterCap::PrinterCap(const PrinterData *printer_data)
-	: __printer_data(printer_data), __printer_id(UNKNOWN_PRINTER)
+	: fPrinterData(printer_data), fPrinterID(kUnknownPrinter)
 {
 }
 
@@ -17,19 +17,19 @@ PrinterCap::~PrinterCap()
 /*
 PrinterCap::PrinterCap(const PrinterCap &printer_cap)
 {
-	__printer_data = printer_cap.__printer_data;
-	__printer_id   = printer_cap.__printer_id;
+	fPrinterData = printer_cap.fPrinterData;
+	fPrinterID   = printer_cap.fPrinterID;
 }
 
 PrinterCap::PrinterCap &operator = (const PrinterCap &printer_cap)
 {
-	__printer_data = printer_cap.__printer_data;
-	__printer_id   = printer_cap.__printer_id;
+	fPrinterData = printer_cap.fPrinterData;
+	fPrinterID   = printer_cap.fPrinterID;
 	return *this;
 }
 */
 
-const BaseCap *PrinterCap::getDefaultCap(CAPID id) const
+const BaseCap *PrinterCap::getDefaultCap(CapID id) const
 {
 	int count = countCap(id);
 	if (count > 0) {

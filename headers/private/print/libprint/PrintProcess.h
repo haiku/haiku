@@ -39,12 +39,12 @@ public:
 	bool enumObject(PictureData **);
 
 private:
-	BFile *__file;
-	bool  __reverse;
-	int   __picture_count;
-	int   __rest;
-	off_t __offset;
-	bool  __hollow;
+	BFile *fFile;
+	bool  fReverse;
+	int   fPictureCount;
+	int   fRest;
+	off_t fOffset;
+	bool  fHollow;
 };
 
 typedef list<PageData *>	PageDataList;
@@ -57,8 +57,8 @@ public:
 	bool enumObject(PageData **);
 
 private:
-	PageDataList __pages;
-	PageDataList::iterator __it;
+	PageDataList fPages;
+	PageDataList::iterator fIt;
 };
 
 #endif	/* __PRINTPROCESS_H */

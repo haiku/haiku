@@ -235,49 +235,49 @@ struct NupCap : public BaseCap {
 	NupCap(const string &s, bool d, int n) : BaseCap(s, d), nup(n) {}
 };
 
-const SurfaceCap rgb32("RGB32", false, B_RGB32);
-const SurfaceCap cmap8("CMAP8", true,  B_CMAP8);
-const SurfaceCap gray8("GRAY8", false, B_GRAY8);
-const SurfaceCap gray1("GRAY1", false, B_GRAY1);
+static const SurfaceCap gRGB32("RGB32", false, B_RGB32);
+static const SurfaceCap gCMAP8("CMAP8", true,  B_CMAP8);
+static const SurfaceCap gGray8("GRAY8", false, B_GRAY8);
+static const SurfaceCap gGray1("GRAY1", false, B_GRAY1);
 
-const NupCap nup1("Normal", true,  1);
-const NupCap nup2("2-up",   false, 2);
-const NupCap nup4("4-up",   false, 4);
-const NupCap nup8("8-up",   false, 8);
-const NupCap nup9("9-up",   false, 9);
-const NupCap nup16("16-up", false, 16);
-const NupCap nup25("25-up", false, 25);
-const NupCap nup32("32-up", false, 32);
-const NupCap nup36("36-up", false, 36);
+static const NupCap gNup1("Normal", true,  1);
+static const NupCap gNup2("2-up",   false, 2);
+static const NupCap gNup4("4-up",   false, 4);
+static const NupCap gNup8("8-up",   false, 8);
+static const NupCap gNup9("9-up",   false, 9);
+static const NupCap gNup16("16-up", false, 16);
+static const NupCap gNup25("25-up", false, 25);
+static const NupCap gNup32("32-up", false, 32);
+static const NupCap gNup36("36-up", false, 36);
 
-const SurfaceCap *surfaces[] = {
-	&rgb32,
-	&cmap8,
-	&gray8,
-	&gray1
+const SurfaceCap *gSurfaces[] = {
+	&gRGB32,
+	&gCMAP8,
+	&gGray8,
+	&gGray1
 };
 
-const NupCap *nups[] = {
-	&nup1,
-	&nup2,
-	&nup4,
-	&nup8,
-	&nup9,
-	&nup16,
-	&nup25,
-	&nup32,
-	&nup36
+const NupCap *gNups[] = {
+	&gNup1,
+	&gNup2,
+	&gNup4,
+	&gNup8,
+	&gNup9,
+	&gNup16,
+	&gNup25,
+	&gNup32,
+	&gNup36
 };
 
 enum {
-	M_RANGE_ALL = 1,
-	M_RANGE_SELECTION,
-	M_CANCEL,
-	M_OK
+	kMsgRangeAll = 'JSdl',
+	kMsgRangeSelection,
+	kMsgCancel,
+	kMsgOK
 };
 
 JobSetupView::JobSetupView(BRect frame, JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), __job_data(job_data), __printer_data(printer_data), __printer_cap(printer_cap)
+	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fJobData(job_data), fPrinterData(printer_data), fPrinterCap(printer_cap)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
@@ -300,24 +300,24 @@ void JobSetupView::AttachedToWindow()
 
 /*
 	// always B_RGB32
-	__surface_type = new BPopUpMenu("");
-	__surface_type->SetRadioMode(true);
+	fSurfaceType = new BPopUpMenu("");
+	fSurfaceType->SetRadioMode(true);
 
-	count = sizeof(surfaces) / sizeof(surfaces[0]);
-	const SurfaceCap **surface_cap = surfaces;
+	count = sizeof(gSurfaces) / sizeof(gSurfaces[0]);
+	const SurfaceCap **surface_cap = gSurfaces;
 	uint32 support_flags;
 	while (count--) {
 		if (bitmaps_support_space((*surface_cap)->surface_type, &support_flags)) {
 			item = new BMenuItem((*surface_cap)->label.c_str(), NULL);
-			__surface_type->AddItem(item);
-			if ((*surface_cap)->surface_type == __job_data->getSurfaceType()) {
+			fSurfaceType->AddItem(item);
+			if ((*surface_cap)->surface_type == fJobData->getSurfaceType()) {
 				item->SetMarked(true);
 				marked = true;
 			}
 		}
 		surface_cap++;
 	}
-	menufield = new BMenuField(bpp_rect, "", "Surface Type", __surface_type);
+	menufield = new BMenuField(bpp_rect, "", "Surface Type", fSurfaceType);
 	box->AddChild(menufield);
 	width = StringWidth("Color") + 10;
 	menufield->SetDivider(width);
@@ -325,15 +325,15 @@ void JobSetupView::AttachedToWindow()
 
 	/* color */
 	marked = false;
-	__color_type = new BPopUpMenu("");
-	__color_type->SetRadioMode(true);
+	fColorType = new BPopUpMenu("");
+	fColorType->SetRadioMode(true);
 
-	count = __printer_cap->countCap(PrinterCap::COLOR);
-	const ColorCap **color_cap = (const ColorCap **)__printer_cap->enumCap(PrinterCap::COLOR);
+	count = fPrinterCap->countCap(PrinterCap::kColor);
+	const ColorCap **color_cap = (const ColorCap **)fPrinterCap->enumCap(PrinterCap::kColor);
 	while (count--) {
 		item = new BMenuItem((*color_cap)->label.c_str(), NULL);
-		__color_type->AddItem(item);
-		if ((*color_cap)->color == __job_data->getColor()) {
+		fColorType->AddItem(item);
+		if ((*color_cap)->color == fJobData->getColor()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -341,18 +341,18 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked && item)
 		item->SetMarked(true);
-	menufield = new BMenuField(bpp_rect, "", "Color", __color_type);
+	menufield = new BMenuField(bpp_rect, "", "Color", fColorType);
 
 	box->AddChild(menufield);
 	width = StringWidth("Color") + 10;
 	menufield->SetDivider(width);
 	
-	__gamma = new BTextControl(gamma_rect, "", "Gamma", "", NULL);
-	box->AddChild(__gamma);
-	__gamma->SetDivider(width);
+	fGamma = new BTextControl(gamma_rect, "", "Gamma", "", NULL);
+	box->AddChild(fGamma);
+	fGamma->SetDivider(width);
 	ostringstream oss3;
-	oss3 << __job_data->getGamma();
-	__gamma->SetText(oss3.str().c_str());
+	oss3 << fJobData->getGamma();
+	fGamma->SetText(oss3.str().c_str());
 
 	/* page range */
 
@@ -360,10 +360,10 @@ void JobSetupView::AttachedToWindow()
 	AddChild(box);
 	box->SetLabel("Page Range");
 
-	__all = new BRadioButton(all_button_rect, "", "All", new BMessage(M_RANGE_ALL));
-	box->AddChild(__all);
+	fAll = new BRadioButton(all_button_rect, "", "All", new BMessage(kMsgRangeAll));
+	box->AddChild(fAll);
 
-	BRadioButton *from = new BRadioButton(selection_rect, "", "", new BMessage(M_RANGE_SELECTION));
+	BRadioButton *from = new BRadioButton(selection_rect, "", "", new BMessage(kMsgRangeSelection));
 	box->AddChild(from);
 
 	from_page = new BTextControl(from_rect, "", "From", "", NULL);
@@ -376,11 +376,11 @@ void JobSetupView::AttachedToWindow()
 	to_page->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
 	to_page->SetDivider(StringWidth("To") + 7);
 
-	int first_page = __job_data->getFirstPage();
-	int last_page  = __job_data->getLastPage();
+	int first_page = fJobData->getFirstPage();
+	int last_page  = fJobData->getLastPage();
 
 	if (first_page <= 1 && last_page <= 0) {
-		__all->SetValue(B_CONTROL_ON);
+		fAll->SetValue(B_CONTROL_ON);
 		from_page->SetEnabled(false);
 		to_page->SetEnabled(false);
 	} else {
@@ -399,20 +399,20 @@ void JobSetupView::AttachedToWindow()
 		to_page->SetText(oss2.str().c_str());
 	}
 
-	__all->SetTarget(this);
+	fAll->SetTarget(this);
 	from->SetTarget(this);
 
 	/* paper source */
 
 	marked = false;
-	__paper_feed = new BPopUpMenu("");
-	__paper_feed->SetRadioMode(true);
-	count = __printer_cap->countCap(PrinterCap::PAPERSOURCE);
-	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)__printer_cap->enumCap(PrinterCap::PAPERSOURCE);
+	fPaperFeed = new BPopUpMenu("");
+	fPaperFeed->SetRadioMode(true);
+	count = fPrinterCap->countCap(PrinterCap::kPaperSource);
+	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
 	while (count--) {
 		item = new BMenuItem((*paper_source_cap)->label.c_str(), NULL);
-		__paper_feed->AddItem(item);
-		if ((*paper_source_cap)->paper_source == __job_data->getPaperSource()) {
+		fPaperFeed->AddItem(item);
+		if ((*paper_source_cap)->paper_source == fJobData->getPaperSource()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -420,7 +420,7 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(paperfeed_rect, "", "Paper Source", __paper_feed);
+	menufield = new BMenuField(paperfeed_rect, "", "Paper Source", fPaperFeed);
 	AddChild(menufield);
 	width = StringWidth("Number of Copies") + 7;
 	menufield->SetDivider(width);
@@ -428,14 +428,14 @@ void JobSetupView::AttachedToWindow()
 	/* Page Per Sheet */
 
 	marked = false;
-	__nup = new BPopUpMenu("");
-	__nup->SetRadioMode(true);
-	count = sizeof(nups) / sizeof(nups[0]);
-	const NupCap **nup_cap = nups;
+	fNup = new BPopUpMenu("");
+	fNup->SetRadioMode(true);
+	count = sizeof(gNups) / sizeof(gNups[0]);
+	const NupCap **nup_cap = gNups;
 	while (count--) {
 		item = new BMenuItem((*nup_cap)->label.c_str(), NULL);
-		__nup->AddItem(item);
-		if ((*nup_cap)->nup == __job_data->getNup()) {
+		fNup->AddItem(item);
+		if ((*nup_cap)->nup == fJobData->getNup()) {
 			item->SetMarked(true);
 			marked = true;
 		}
@@ -443,17 +443,17 @@ void JobSetupView::AttachedToWindow()
 	}
 	if (!marked)
 		item->SetMarked(true);
-	menufield = new BMenuField(nup_rect, "", "Page Per Sheet", __nup);
+	menufield = new BMenuField(nup_rect, "", "Page Per Sheet", fNup);
 	menufield->SetDivider(width);
 	AddChild(menufield);
 
 	/* duplex */
 
-	if (__printer_cap->isSupport(PrinterCap::PRINTSTYLE)) {
-		__duplex = new BCheckBox(duplex_rect, "Duplex", "Duplex", NULL);
-		AddChild(__duplex);
-		if (__job_data->getPrintStyle() != JobData::SIMPLEX) {
-			__duplex->SetValue(B_CONTROL_ON);
+	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
+		fDuplex = new BCheckBox(duplex_rect, "Duplex", "Duplex", NULL);
+		AddChild(fDuplex);
+		if (fJobData->getPrintStyle() != JobData::kSimplex) {
+			fDuplex->SetValue(B_CONTROL_ON);
 		}
 	}
 
@@ -464,33 +464,33 @@ void JobSetupView::AttachedToWindow()
 	copies->SetDivider(width);
 
 	ostringstream oss4;
-	oss4 << __job_data->getCopies();
+	oss4 << fJobData->getCopies();
 	copies->SetText(oss4.str().c_str());
 
 	/* collate */
 
-	__collate = new BCheckBox(collate_rect, "Collate", "Collate", NULL);
-	AddChild(__collate);
-	if (__job_data->getCollate()) {
-		__collate->SetValue(B_CONTROL_ON);
+	fCollate = new BCheckBox(collate_rect, "Collate", "Collate", NULL);
+	AddChild(fCollate);
+	if (fJobData->getCollate()) {
+		fCollate->SetValue(B_CONTROL_ON);
 	}
 
 	/* reverse */
 
-	__reverse = new BCheckBox(reverse_rect, "Reverse", "Reverse", NULL);
-	AddChild(__reverse);
-	if (__job_data->getReverse()) {
-		__reverse->SetValue(B_CONTROL_ON);
+	fReverse = new BCheckBox(reverse_rect, "Reverse", "Reverse", NULL);
+	AddChild(fReverse);
+	if (fJobData->getReverse()) {
+		fReverse->SetValue(B_CONTROL_ON);
 	}
 
 	/* cancel */
 
-	button = new BButton(cancel_rect, "", "Cancel", new BMessage(M_CANCEL));
+	button = new BButton(cancel_rect, "", "Cancel", new BMessage(kMsgCancel));
 	AddChild(button);
 
 	/* ok */
 
-	button = new BButton(ok_rect, "", "OK", new BMessage(M_OK));
+	button = new BButton(ok_rect, "", "OK", new BMessage(kMsgOK));
 	AddChild(button);
 	button->MakeDefault(true);
 }
@@ -498,14 +498,14 @@ void JobSetupView::AttachedToWindow()
 void JobSetupView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-	case M_RANGE_ALL:
+	case kMsgRangeAll:
 		Window()->Lock();
 		from_page->SetEnabled(false);
 		to_page->SetEnabled(false);
 		Window()->Unlock();
 		break;
 
-	case M_RANGE_SELECTION:
+	case kMsgRangeSelection:
 		Window()->Lock();
 		from_page->SetEnabled(true);
 		to_page->SetEnabled(true);
@@ -519,34 +519,34 @@ bool JobSetupView::UpdateJobData()
 	int count;
 
 /*
-	count = sizeof(surfaces) / sizeof(surfaces[0]);
-	const SurfaceCap **surface_cap = surfaces;
-	const char *surface_label = __surface_type->FindMarked()->Label();
+	count = sizeof(gSurfaces) / sizeof(gSurfaces[0]);
+	const SurfaceCap **surface_cap = gSurfaces;
+	const char *surface_label = fSurfaceType->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*surface_cap)->label.c_str(), surface_label)) {
-			__job_data->setSurfaceType((*surface_cap)->surface_type);
+			fJobData->setSurfaceType((*surface_cap)->surface_type);
 			break;
 		}
 		surface_cap++;
 	}
 */
-	count = __printer_cap->countCap(PrinterCap::COLOR);
-	const ColorCap **color_cap = (const ColorCap**)__printer_cap->enumCap(PrinterCap::COLOR);
-	const char *color_label = __color_type->FindMarked()->Label();
+	count = fPrinterCap->countCap(PrinterCap::kColor);
+	const ColorCap **color_cap = (const ColorCap**)fPrinterCap->enumCap(PrinterCap::kColor);
+	const char *color_label = fColorType->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*color_cap)->label.c_str(), color_label)) {
-			__job_data->setColor((*color_cap)->color);
+			fJobData->setColor((*color_cap)->color);
 			break;
 		}
 		color_cap++;
 	}	
 	
-	__job_data->setGamma(atof(__gamma->Text()));
+	fJobData->setGamma(atof(fGamma->Text()));
 
 	int first_page;
 	int last_page;
 
-	if (B_CONTROL_ON == __all->Value()) {
+	if (B_CONTROL_ON == fAll->Value()) {
 		first_page = 1;
 		last_page  = -1;
 	} else {
@@ -554,41 +554,41 @@ bool JobSetupView::UpdateJobData()
 		last_page  = atoi(to_page->Text());
 	}
 
-	__job_data->setFirstPage(first_page);
-	__job_data->setLastPage(last_page);
+	fJobData->setFirstPage(first_page);
+	fJobData->setLastPage(last_page);
 
-	count = __printer_cap->countCap(PrinterCap::PAPERSOURCE);
-	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)__printer_cap->enumCap(PrinterCap::PAPERSOURCE);
-	const char *paper_source_label = __paper_feed->FindMarked()->Label();
+	count = fPrinterCap->countCap(PrinterCap::kPaperSource);
+	const PaperSourceCap **paper_source_cap = (const PaperSourceCap **)fPrinterCap->enumCap(PrinterCap::kPaperSource);
+	const char *paper_source_label = fPaperFeed->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*paper_source_cap)->label.c_str(), paper_source_label)) {
-			__job_data->setPaperSource((*paper_source_cap)->paper_source);
+			fJobData->setPaperSource((*paper_source_cap)->paper_source);
 			break;
 		}
 		paper_source_cap++;
 	}
 
-	count = sizeof(nups) / sizeof(nups[0]);
-	const NupCap **nup_cap = nups;
-	const char *nup_label = __nup->FindMarked()->Label();
+	count = sizeof(gNups) / sizeof(gNups[0]);
+	const NupCap **nup_cap = gNups;
+	const char *nup_label = fNup->FindMarked()->Label();
 	while (count--) {
 		if (!strcmp((*nup_cap)->label.c_str(), nup_label)) {
-			__job_data->setNup((*nup_cap)->nup);
+			fJobData->setNup((*nup_cap)->nup);
 			break;
 		}
 		nup_cap++;
 	}
 
-	if (__printer_cap->isSupport(PrinterCap::PRINTSTYLE)) {
-		__job_data->setPrintStyle((B_CONTROL_ON == __duplex->Value()) ? JobData::DUPLEX : JobData::SIMPLEX);
+	if (fPrinterCap->isSupport(PrinterCap::kPrintStyle)) {
+		fJobData->setPrintStyle((B_CONTROL_ON == fDuplex->Value()) ? JobData::kDuplex : JobData::kSimplex);
 	}
 
-	__job_data->setCopies(atoi(copies->Text()));
+	fJobData->setCopies(atoi(copies->Text()));
 
-	__job_data->setCollate((B_CONTROL_ON == __collate->Value()) ? true : false);
-	__job_data->setReverse((B_CONTROL_ON == __reverse->Value()) ? true : false);
+	fJobData->setCollate((B_CONTROL_ON == fCollate->Value()) ? true : false);
+	fJobData->setReverse((B_CONTROL_ON == fReverse->Value()) ? true : false);
 
-	__job_data->save();
+	fJobData->save();
 	return true;
 }
 
@@ -634,7 +634,7 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const Pri
 		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	__result = 0;
+	fResult = 0;
 /*
 	ostringstream oss;
 	oss << printer_data->get_printer_name() << " Print";
@@ -643,42 +643,42 @@ JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const Pri
 	Lock();
 	JobSetupView *view = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(view);
-	__filter = new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, &PrintKeyFilter);
-	AddCommonFilter(__filter);
+	fFilter = new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, &PrintKeyFilter);
+	AddCommonFilter(fFilter);
 	Unlock();
 
-	__semaphore = create_sem(0, "JobSetupSem");
+	fSemaphore = create_sem(0, "JobSetupSem");
 }
 
 JobSetupDlg::~JobSetupDlg()
 {
 	Lock();
-	RemoveCommonFilter(__filter);
+	RemoveCommonFilter(fFilter);
 	Unlock();
-	delete __filter;
+	delete fFilter;
 }
 
 bool JobSetupDlg::QuitRequested()
 {
-	__result = B_ERROR;
-	release_sem(__semaphore);
+	fResult = B_ERROR;
+	release_sem(fSemaphore);
 	return true;
 }
 
 void JobSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-	case M_OK:
+	case kMsgOK:
 		Lock();
 		((JobSetupView *)ChildAt(0))->UpdateJobData();
 		Unlock();
-		__result = B_NO_ERROR;
-		release_sem(__semaphore);
+		fResult = B_NO_ERROR;
+		release_sem(fSemaphore);
 		break;
 
-	case M_CANCEL:
-		__result = B_ERROR;
-		release_sem(__semaphore);
+	case kMsgCancel:
+		fResult = B_ERROR;
+		release_sem(fSemaphore);
 		break;
 
 	default:
@@ -690,9 +690,9 @@ void JobSetupDlg::MessageReceived(BMessage *msg)
 int JobSetupDlg::Go()
 {
 	Show();
-	acquire_sem(__semaphore);
-	delete_sem(__semaphore);
-	int value = __result;
+	acquire_sem(fSemaphore);
+	delete_sem(fSemaphore);
+	int value = fResult;
 	Lock();
 	Quit();
 	return value;

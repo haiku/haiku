@@ -22,7 +22,7 @@ protected:
 	PreviewWindow &operator = (const PreviewWindow &);
 
 private:
-	long __semaphore;
+	long fSemaphore;
 };
 
 #endif	/* __PREVIEW_H */

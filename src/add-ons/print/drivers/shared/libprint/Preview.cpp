@@ -13,38 +13,38 @@ public:
 	PreviewView(BRect, BBitmap *);
 	void Draw(BRect);
 private:
-	BBitmap *__bitmap;
+	BBitmap *fBitmap;
 };
 
 PreviewView::PreviewView(BRect frame, BBitmap *bitmap)
 	: BView(frame, "preview", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	__bitmap = bitmap;
+	fBitmap = bitmap;
 }
 
 void PreviewView::Draw(BRect)
 {
-	DrawBitmap(__bitmap);
+	DrawBitmap(fBitmap);
 } 
 
 PreviewWindow::PreviewWindow(BRect frame, const char *title, BBitmap *bitmap)
 	: BWindow(frame, title, B_TITLED_WINDOW, 0)
 {
 	AddChild(new PreviewView(Bounds(), bitmap));
-	__semaphore = create_sem(0, "PreviewSem");
+	fSemaphore = create_sem(0, "PreviewSem");
 }
 
 bool PreviewWindow::QuitRequested()
 {
-	release_sem(__semaphore);
+	release_sem(fSemaphore);
 	return true;
 }
 
 int PreviewWindow::Go()
 {
 	Show();
-	acquire_sem(__semaphore);
-	delete_sem(__semaphore);
+	acquire_sem(fSemaphore);
+	delete_sem(fSemaphore);
 	Lock();
 	Quit();
 	return 0;

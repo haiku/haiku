@@ -30,17 +30,17 @@ public:
 	BTextControl *to_page;
 
 private:
-	JobData          *__job_data;
-	PrinterData      *__printer_data;
-	const PrinterCap *__printer_cap;
-	BTextControl     *__gamma;
-	BRadioButton     *__all;
-	BCheckBox        *__collate;
-	BCheckBox        *__reverse;
-	BPopUpMenu       *__color_type;
-	BPopUpMenu       *__paper_feed;
-	BCheckBox        *__duplex;
-	BPopUpMenu       *__nup;
+	JobData          *fJobData;
+	PrinterData      *fPrinterData;
+	const PrinterCap *fPrinterCap;
+	BTextControl     *fGamma;
+	BRadioButton     *fAll;
+	BCheckBox        *fCollate;
+	BCheckBox        *fReverse;
+	BPopUpMenu       *fColorType;
+	BPopUpMenu       *fPaperFeed;
+	BCheckBox        *fDuplex;
+	BPopUpMenu       *fNup;
 };
 
 class JobSetupDlg : public BWindow {
@@ -52,9 +52,9 @@ public:
 	int Go();
 
 private:
-	int  __result;
-	long __semaphore;
-	BMessageFilter *__filter;
+	int  fResult;
+	long fSemaphore;
+	BMessageFilter *fFilter;
 };
 
 #endif	/* __JOBSETUPDLG_H */

@@ -13,7 +13,7 @@
 #include "DbgMsg.h"
 
 UIDriver::UIDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: __msg(msg), __printer_data(printer_data), __printer_cap(printer_cap)
+	: fMsg(msg), fPrinterData(printer_data), fPrinterCap(printer_cap)
 {
 }
 
@@ -23,10 +23,10 @@ UIDriver::~UIDriver()
 
 BMessage *UIDriver::configPage()
 {
-	BMessage *clone_msg = new BMessage(*__msg);
-	JobData *job_data = new JobData(clone_msg, __printer_cap);
+	BMessage *clone_msg = new BMessage(*fMsg);
+	JobData *job_data = new JobData(clone_msg, fPrinterCap);
 
-	if (doPageSetup(job_data,__printer_data, __printer_cap) < 0) {
+	if (doPageSetup(job_data,fPrinterData, fPrinterCap) < 0) {
 		delete clone_msg;
 		clone_msg = NULL;
 	} else {
@@ -39,10 +39,10 @@ BMessage *UIDriver::configPage()
 
 BMessage *UIDriver::configJob()
 {
-	BMessage *clone_msg = new BMessage(*__msg);
-	JobData *job_data = new JobData(clone_msg, __printer_cap);
+	BMessage *clone_msg = new BMessage(*fMsg);
+	JobData *job_data = new JobData(clone_msg, fPrinterCap);
 
-	if (doJobSetup(job_data, __printer_data, __printer_cap) < 0) {
+	if (doJobSetup(job_data, fPrinterData, fPrinterCap) < 0) {
 		delete clone_msg;
 		clone_msg = NULL;
 	} else {

@@ -12,17 +12,17 @@
 
 class SpoolMetaData {
 private:
-	string __description;
-	string __mime_type;
-	string __creation_time;
+	string fDescription;
+	string fMimeType;
+	string fCreationTime;
 
 public:
 	SpoolMetaData(BFile* spool_file);
 	~SpoolMetaData();
 
-	const string& getDescription() const { return __description; }
-	const string& getMimeType() const { return __mime_type; }
-	const string& getCreationTime() const { return __creation_time; }
+	const string& getDescription() const { return fDescription; }
+	const string& getMimeType() const { return fMimeType; }
+	const string& getCreationTime() const { return fCreationTime; }
 };
 
 #endif	/* __SpoolMetaData_H */

@@ -23,12 +23,12 @@ public:
 	bool UpdateJobData();
 
 private:
-	JobData          *__job_data;
-	PrinterData      *__printer_data;
-	const PrinterCap *__printer_cap;
-	BRadioButton     *__portrait;
-	BPopUpMenu       *__paper;
-	BPopUpMenu       *__resolution;
+	JobData          *fJobData;
+	PrinterData      *fPrinterData;
+	const PrinterCap *fPrinterCap;
+	BRadioButton     *fPortrait;
+	BPopUpMenu       *fPaper;
+	BPopUpMenu       *fResolution;
 };
 
 class PageSetupDlg : public BWindow {
@@ -40,9 +40,9 @@ public:
 	int Go();
 
 private:
-	int  __result;
-	long __semaphore;
-	BMessageFilter *__filter;
+	int  fResult;
+	long fSemaphore;
+	BMessageFilter *fFilter;
 };
 
 #endif	/* __PAGESETUPDLG_H */

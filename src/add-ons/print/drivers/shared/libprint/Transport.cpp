@@ -21,7 +21,7 @@ using namespace std;
 #endif
 
 Transport::Transport(const PrinterData *printer_data)
-	: __image(-1), __init_transport(0), __exit_transport(0), __data_stream(0), __abort(false)
+	: fImage(-1), fInitTransport(0), fExitTransport(0), fDataStream(0), fAbort(false)
 {
 	BPath path;
 
@@ -29,45 +29,45 @@ Transport::Transport(const PrinterData *printer_data)
 		path.Append("Print/transport");
 		path.Append(printer_data->getTransport().c_str());
 		DBGMSG(("load_add_on: %s\n", path.Path()));
-		__image = load_add_on(path.Path());
+		fImage = load_add_on(path.Path());
 	}
-	if (__image < 0) {
+	if (fImage < 0) {
 		if (B_OK == find_directory(B_BEOS_ADDONS_DIRECTORY, &path)) {
 			path.Append("Print/transport");
 			path.Append(printer_data->getTransport().c_str());
 			DBGMSG(("load_add_on: %s\n", path.Path()));
-			__image = load_add_on(path.Path());
+			fImage = load_add_on(path.Path());
 		}
 	}
 
-	if (__image < 0) {
+	if (fImage < 0) {
 		set_last_error("cannot load a transport add-on");
 		return;
 	}
 
-	DBGMSG(("image id = %d\n", (int)__image));
+	DBGMSG(("image id = %d\n", (int)fImage));
 
-	get_image_symbol(__image, "init_transport", B_SYMBOL_TYPE_TEXT, (void **)&__init_transport);
-	get_image_symbol(__image, "exit_transport", B_SYMBOL_TYPE_TEXT, (void **)&__exit_transport);
+	get_image_symbol(fImage, "init_transport", B_SYMBOL_TYPE_TEXT, (void **)&fInitTransport);
+	get_image_symbol(fImage, "exit_transport", B_SYMBOL_TYPE_TEXT, (void **)&fExitTransport);
 
-	if (__init_transport == NULL) {
+	if (fInitTransport == NULL) {
 		set_last_error("get_image_symbol failed.");
 		DBGMSG(("init_transport is NULL\n"));
 	}
 
-	if (__exit_transport == NULL) {
+	if (fExitTransport == NULL) {
 		set_last_error("get_image_symbol failed.");
 		DBGMSG(("exit_transport is NULL\n"));
 	}
 
-	if (__init_transport) {
+	if (fInitTransport) {
 		char spool_path[256];
 		printer_data->getPath(spool_path);
 		BMessage *msg = new BMessage('TRIN');
 		msg->AddString("printer_file", spool_path);
-		__data_stream = (*__init_transport)(msg);
+		fDataStream = (*fInitTransport)(msg);
 		delete msg;
-		if (__data_stream == 0) {
+		if (fDataStream == 0) {
 			set_last_error("init_transport failed.");
 		}
 	}
@@ -75,34 +75,34 @@ Transport::Transport(const PrinterData *printer_data)
 
 Transport::~Transport()
 {
-	if (__exit_transport) {
-		(*__exit_transport)();
+	if (fExitTransport) {
+		(*fExitTransport)();
 	}
-	if (__image >= 0) {
-		unload_add_on(__image);
+	if (fImage >= 0) {
+		unload_add_on(fImage);
 	}
 }
 
 bool Transport::check_abort() const
 {
-	return __data_stream == 0;
+	return fDataStream == 0;
 }
 
 const string &Transport::last_error() const
 {
-	return __last_error_string;
+	return fLastErrorString;
 }
 
 void Transport::set_last_error(const char *e)
 {
-	__last_error_string = e;
-	__abort = true;
+	fLastErrorString = e;
+	fAbort = true;
 }
 
 void Transport::write(const void *buffer, size_t size) throw(TransportException)
 {
-	if (__data_stream) {
-		if (size == (size_t)__data_stream->Write(buffer, size)) {
+	if (fDataStream) {
+		if (size == (size_t)fDataStream->Write(buffer, size)) {
 			return;
 		}
 		set_last_error("BDataIO::Write failed.");

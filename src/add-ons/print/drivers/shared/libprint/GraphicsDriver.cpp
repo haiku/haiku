@@ -34,15 +34,19 @@ using namespace std;
 #define std
 #endif
 
+enum {
+	kMaxMemorySize = (4 *1024 *1024)
+};
+
 GraphicsDriver::GraphicsDriver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: __msg(msg), __printer_data(printer_data), __printer_cap(printer_cap)
+	: fMsg(msg), fPrinterData(printer_data), fPrinterCap(printer_cap)
 {
-	__view            = NULL;
-	__bitmap          = NULL;
-	__transport       = NULL;
-	__org_job_data    = NULL;
-	__real_job_data   = NULL;
-	__spool_meta_data = NULL;
+	fView          = NULL;
+	fBitmap        = NULL;
+	fTransport     = NULL;
+	fOrgJobData    = NULL;
+	fRealJobData   = NULL;
+	fSpoolMetaData = NULL;
 }
 
 GraphicsDriver::~GraphicsDriver()
@@ -53,96 +57,94 @@ void GraphicsDriver::setupData(BFile *spool_file, long page_count)
 {
 	BMessage *msg = new BMessage();
 	msg->Unflatten(spool_file);
-	__org_job_data = new JobData(msg, __printer_cap);
+	fOrgJobData = new JobData(msg, fPrinterCap);
 	DUMP_BMESSAGE(msg);
 	delete msg;
 
-	__real_job_data = new JobData(*__org_job_data);
+	fRealJobData = new JobData(*fOrgJobData);
 	BRect rc;
 
-	switch (__org_job_data->getNup()) {
+	switch (fOrgJobData->getNup()) {
 	case 2:
 	case 8:
 	case 32:
 	case 128:
-		rc.left   = __org_job_data->getPrintableRect().top;
-		rc.top    = __org_job_data->getPrintableRect().left;
-		rc.right  = __org_job_data->getPrintableRect().bottom;
-		rc.bottom = __org_job_data->getPrintableRect().right;
-		__real_job_data->setPrintableRect(rc);
-		if (JobData::PORTRAIT == __org_job_data->getOrientation())
-			__real_job_data->setOrientation(JobData::LANDSCAPE);
+		rc.left   = fOrgJobData->getPrintableRect().top;
+		rc.top    = fOrgJobData->getPrintableRect().left;
+		rc.right  = fOrgJobData->getPrintableRect().bottom;
+		rc.bottom = fOrgJobData->getPrintableRect().right;
+		fRealJobData->setPrintableRect(rc);
+		if (JobData::kPortrait == fOrgJobData->getOrientation())
+			fRealJobData->setOrientation(JobData::kLandscape);
 		else
-			__real_job_data->setOrientation(JobData::PORTRAIT);
+			fRealJobData->setOrientation(JobData::kPortrait);
 		break;
 	}
 
-	if (__org_job_data->getCollate() && page_count > 1) {
-		__real_job_data->setCopies(1);
-		__internal_copies = __org_job_data->getCopies();
+	if (fOrgJobData->getCollate() && page_count > 1) {
+		fRealJobData->setCopies(1);
+		fInternalCopies = fOrgJobData->getCopies();
 	} else {
-		__internal_copies = 1;
+		fInternalCopies = 1;
 	}
 	
-	__spool_meta_data = new SpoolMetaData(spool_file);
+	fSpoolMetaData = new SpoolMetaData(spool_file);
 }
 
 void GraphicsDriver::cleanupData()
 {
-	delete __real_job_data;
-	delete __org_job_data;
-	delete __spool_meta_data;
-	__real_job_data   = NULL;
-	__org_job_data    = NULL;
-	__spool_meta_data = NULL;
+	delete fRealJobData;
+	delete fOrgJobData;
+	delete fSpoolMetaData;
+	fRealJobData   = NULL;
+	fOrgJobData    = NULL;
+	fSpoolMetaData = NULL;
 }
-
-#define MAX_MEMORY_SIZE		(4 *1024 *1024)
 
 void GraphicsDriver::setupBitmap()
 {
-	__pixel_depth = color_space2pixel_depth(__org_job_data->getSurfaceType());
+	fPixelDepth = color_space2pixel_depth(fOrgJobData->getSurfaceType());
 
-	__page_width  = (__real_job_data->getPrintableRect().IntegerWidth()  * __org_job_data->getXres() + 71) / 72;
-	__page_height = (__real_job_data->getPrintableRect().IntegerHeight() * __org_job_data->getYres() + 71) / 72;
+	fPageWidth  = (fRealJobData->getPrintableRect().IntegerWidth()  * fOrgJobData->getXres() + 71) / 72;
+	fPageHeight = (fRealJobData->getPrintableRect().IntegerHeight() * fOrgJobData->getYres() + 71) / 72;
 
-	int widthByte = (__page_width * __pixel_depth + 7) / 8;
-	int size = widthByte * __page_height;
+	int widthByte = (fPageWidth * fPixelDepth + 7) / 8;
+	int size = widthByte * fPageHeight;
 
-	if (size < MAX_MEMORY_SIZE) {
-		__band_count  = 0;
-		__band_width  = __page_width;
-		__band_height = __page_height;
+	if (size < kMaxMemorySize) {
+		fBandCount  = 0;
+		fBandWidth  = fPageWidth;
+		fBandHeight = fPageHeight;
 	} else {
-		__band_count  = (size + MAX_MEMORY_SIZE - 1) / MAX_MEMORY_SIZE;
-		if ((JobData::LANDSCAPE == __real_job_data->getOrientation()) && (__flags & GDF_ROTATE_BAND_BITMAP)) {
-			__band_width  = (__page_width + __band_count - 1) / __band_count;
-			__band_height = __page_height;
+		fBandCount  = (size + kMaxMemorySize - 1) / kMaxMemorySize;
+		if ((JobData::kLandscape == fRealJobData->getOrientation()) && (fFlags & kGDFRotateBandBitmap)) {
+			fBandWidth  = (fPageWidth + fBandCount - 1) / fBandCount;
+			fBandHeight = fPageHeight;
 		} else {
-			__band_width  = __page_width;
-			__band_height = (__page_height + __band_count - 1) / __band_count;
+			fBandWidth  = fPageWidth;
+			fBandHeight = (fPageHeight + fBandCount - 1) / fBandCount;
 		}
 	}
 
 	DBGMSG(("****************\n"));
-	DBGMSG(("page_width  = %d\n", __page_width));
-	DBGMSG(("page_height = %d\n", __page_height));
-	DBGMSG(("band_count  = %d\n", __band_count));
-	DBGMSG(("band_height = %d\n", __band_height));
+	DBGMSG(("page_width  = %d\n", fPageWidth));
+	DBGMSG(("page_height = %d\n", fPageHeight));
+	DBGMSG(("band_count  = %d\n", fBandCount));
+	DBGMSG(("band_height = %d\n", fBandHeight));
 	DBGMSG(("****************\n"));
 
 	BRect rect;
-	rect.Set(0, 0, __band_width - 1, __band_height - 1);
-	__bitmap = new BBitmap(rect, __org_job_data->getSurfaceType(), true);
-	__view   = new BView(rect, "", B_FOLLOW_ALL, B_WILL_DRAW);
-	__bitmap->AddChild(__view);
+	rect.Set(0, 0, fBandWidth - 1, fBandHeight - 1);
+	fBitmap = new BBitmap(rect, fOrgJobData->getSurfaceType(), true);
+	fView   = new BView(rect, "", B_FOLLOW_ALL, B_WILL_DRAW);
+	fBitmap->AddChild(fView);
 }
 
 void GraphicsDriver::cleanupBitmap()
 {
-	delete __bitmap;
-	__bitmap = NULL;
-	__view   = NULL;
+	delete fBitmap;
+	fBitmap = NULL;
+	fView   = NULL;
 }
 
 BPoint get_scale(JobData *org_job_data)
@@ -243,7 +245,7 @@ BPoint get_offset(
 		break;
 	case 2:
 		if (index == 1) {
-			if (JobData::PORTRAIT == org_job_data->getOrientation()) {
+			if (JobData::kPortrait == org_job_data->getOrientation()) {
 				offset.x = width;
 			} else {
 				offset.y = height;
@@ -251,7 +253,7 @@ BPoint get_offset(
 		}
 		break;
 	case 8:
-		if (JobData::PORTRAIT == org_job_data->getOrientation()) {
+		if (JobData::kPortrait == org_job_data->getOrientation()) {
 			offset.x = width  * (index / 2);
 			offset.y = height * (index % 2);
 		} else {
@@ -260,7 +262,7 @@ BPoint get_offset(
 		}
 		break;
 	case 32:
-		if (JobData::PORTRAIT == org_job_data->getOrientation()) {
+		if (JobData::kPortrait == org_job_data->getOrientation()) {
 			offset.x = width  * (index / 4);
 			offset.y = height * (index % 4);
 		} else {
@@ -331,27 +333,27 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 	}
 
 	do {
-		__view->SetScale(1.0);
-		__view->SetHighColor(255, 255, 255);
-		__view->ConstrainClippingRegion(NULL);
-		__view->FillRect(__view->Bounds());
+		fView->SetScale(1.0);
+		fView->SetHighColor(255, 255, 255);
+		fView->ConstrainClippingRegion(NULL);
+		fView->FillRect(fView->Bounds());
 
-		BPoint scale = get_scale(__org_job_data);
-		float real_scale = min(scale.x, scale.y) * __org_job_data->getXres() / 72.0f;
-		__view->SetScale(real_scale);
+		BPoint scale = get_scale(fOrgJobData);
+		float real_scale = min(scale.x, scale.y) * fOrgJobData->getXres() / 72.0f;
+		fView->SetScale(real_scale);
 		float x = offset.x / real_scale;
 		float y = offset.y / real_scale;
 		int page_index = 0;
 
 		for (PageDataList::iterator it = pages->begin(); it != pages->end(); it++) {
-			BPoint left_top(get_offset(page_index++, &scale, __org_job_data));
+			BPoint left_top(get_offset(page_index++, &scale, fOrgJobData));
 			left_top.x -= x;
 			left_top.y -= y;
-			BRect clip(__org_job_data->getPrintableRect());
+			BRect clip(fOrgJobData->getPrintableRect());
 			clip.OffsetTo(left_top);
 			BRegion *region = new BRegion();
 			region->Set(clip);
-			__view->ConstrainClippingRegion(region);
+			fView->ConstrainClippingRegion(region);
 			delete region;
 			if ((*it)->startEnum()) {
 				bool more;
@@ -359,37 +361,37 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 					PictureData	*picture_data;
 					more = (*it)->enumObject(&picture_data);
 					BPoint real_offset = left_top + picture_data->point;
-					__view->DrawPicture(picture_data->picture, real_offset);
-					__view->Sync();
+					fView->DrawPicture(picture_data->picture, real_offset);
+					fView->Sync();
 					delete picture_data;
 				} while (more);
 			}
 		}
-		if (!nextBand(__bitmap, &offset)) {
+		if (!nextBand(fBitmap, &offset)) {
 			return false;
 		}
 	} while (offset.x >= 0.0f && offset.y >= 0.0f);
 
 	return true;
 #else	// !USE_PREVIEW_FOR_DEBUG
-	__view->SetScale(1.0);
-	__view->SetHighColor(255, 255, 255);
-	__view->ConstrainClippingRegion(NULL);
-	__view->FillRect(__view->Bounds());
+	fView->SetScale(1.0);
+	fView->SetHighColor(255, 255, 255);
+	fView->ConstrainClippingRegion(NULL);
+	fView->FillRect(fView->Bounds());
 
-	BPoint scale = get_scale(__org_job_data);
-	__view->SetScale(min(scale.x, scale.y));
+	BPoint scale = get_scale(fOrgJobData);
+	fView->SetScale(min(scale.x, scale.y));
 
 	int page_index = 0;
 	PageDataList::iterator it;
 
 	for (it = pages->begin() ; it != pages->end() ; it++) {
-		BPoint left_top(get_offset(page_index, &scale, __org_job_data));
-		BRect clip(__org_job_data->getPrintableRect());
+		BPoint left_top(get_offset(page_index, &scale, fOrgJobData));
+		BRect clip(fOrgJobData->getPrintableRect());
 		clip.OffsetTo(left_top);
 		BRegion *region = new BRegion();
 		region->Set(clip);
-		__view->ConstrainClippingRegion(region);
+		fView->ConstrainClippingRegion(region);
 		delete region;
 		if ((*it)->startEnum()) {
 			bool more;
@@ -397,17 +399,17 @@ bool GraphicsDriver::printPage(PageDataList *pages)
 				PictureData	*picture_data;
 				more = (*it)->enumObject(&picture_data);
 				BPoint real_offset = left_top + picture_data->point;
-				__view->DrawPicture(picture_data->picture, real_offset);
-				__view->Sync();
+				fView->DrawPicture(picture_data->picture, real_offset);
+				fView->Sync();
 				delete picture_data;
 			} while (more);
 		}
 		page_index++;
 	}
 
-	BRect rc(__real_job_data->getPrintableRect());
+	BRect rc(fRealJobData->getPrintableRect());
 	rc.OffsetTo(30.0, 30.0);
-	PreviewWindow *preview = new PreviewWindow(rc, "Preview", __bitmap);
+	PreviewWindow *preview = new PreviewWindow(rc, "Preview", fBitmap);
 	preview->Go();
 #endif	// USE_PREVIEW_FOR_DEBUG
 }
@@ -429,15 +431,15 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 			DBGMSG(("page index = %d\n", page_index));
 			if (!(success = startPage(page_index)))
 				break;
-			nup = __org_job_data->getNup();
+			nup = fOrgJobData->getNup();
 			PageDataList pages;
 			do {
 				more = spool_data->enumObject(&page_data);
 				pages.push_back(page_data);
 			} while (more && --nup);
-			__view->Window()->Lock();
+			fView->Window()->Lock();
 			success = printPage(&pages);
-			__view->Window()->Unlock();
+			fView->Window()->Unlock();
 			if (!success)
 				break;
 			if (!(success = endPage(page_index)))
@@ -448,9 +450,9 @@ bool GraphicsDriver::printDocument(SpoolData *spool_data)
 
 #ifndef USE_PREVIEW_FOR_DEBUG
 	if (success
-		&& __printer_cap->isSupport(PrinterCap::PRINTSTYLE)
-		&& (__org_job_data->getPrintStyle() != JobData::SIMPLEX)
-		&& (((page_index + __org_job_data->getNup() - 1) / __org_job_data->getNup()) % 2))
+		&& fPrinterCap->isSupport(PrinterCap::kPrintStyle)
+		&& (fOrgJobData->getPrintStyle() != JobData::kSimplex)
+		&& (((page_index + fOrgJobData->getNup() - 1) / fOrgJobData->getNup()) % 2))
 	{
 		success = startPage(page_index);
 		if (success) {
@@ -481,17 +483,17 @@ bool GraphicsDriver::printJob(BFile *spool_file)
 		return true;
 	}
 
-	__transport = new Transport(__printer_data);
+	fTransport = new Transport(fPrinterData);
 
-	if (__transport->check_abort()) {
+	if (fTransport->check_abort()) {
 		success = false;
 	} else {
 		setupData(spool_file, pfh.page_count);
 		setupBitmap();
-		SpoolData spool_data(spool_file, pfh.page_count, __org_job_data->getNup(), __org_job_data->getReverse());
+		SpoolData spool_data(spool_file, pfh.page_count, fOrgJobData->getNup(), fOrgJobData->getReverse());
 		success = startDoc();
 		if (success) {
-			while (__internal_copies--) {
+			while (fInternalCopies--) {
 				success = printDocument(&spool_data);
 				if (success == false) {
 					break;
@@ -505,23 +507,23 @@ bool GraphicsDriver::printJob(BFile *spool_file)
 
 	if (success == false) {
 		BAlert *alert;
-		if (__transport->check_abort()) {
-			alert = new BAlert("", __transport->last_error().c_str(), "OK");
+		if (fTransport->check_abort()) {
+			alert = new BAlert("", fTransport->last_error().c_str(), "OK");
 		} else {
 			alert = new BAlert("", "Printer not responding.", "OK");
 		}
 		alert->Go();
 	}
 
-	delete __transport;
-	__transport = NULL;
+	delete fTransport;
+	fTransport = NULL;
 
 	return success;
 }
 
 BMessage *GraphicsDriver::takeJob(BFile* spool_file, uint32 flags)
 {
-	__flags = flags;
+	fFlags = flags;
 	BMessage *msg;
 	if (printJob(spool_file)) {
 		msg = new BMessage('okok');
@@ -558,27 +560,27 @@ bool GraphicsDriver::endDoc(bool)
 
 void GraphicsDriver::writeSpoolData(const void *buffer, size_t size) throw(TransportException)
 {
-	if (__transport) {
-		__transport->write(buffer, size);
+	if (fTransport) {
+		fTransport->write(buffer, size);
 	}
 }
 
 void GraphicsDriver::writeSpoolString(const char *format, ...) throw(TransportException)
 {
-	if (__transport) {
+	if (fTransport) {
 		char buffer[256];
 		va_list	ap;
 		va_start(ap, format);
 		vsprintf(buffer, format, ap);
-		__transport->write(buffer, strlen(buffer));
+		fTransport->write(buffer, strlen(buffer));
 		va_end(ap);
 	}
 }
 
 void GraphicsDriver::writeSpoolChar(char c) throw(TransportException)
 {
-	if (__transport) {
-		__transport->write(&c, 1);
+	if (fTransport) {
+		fTransport->write(&c, 1);
 	}
 }
 

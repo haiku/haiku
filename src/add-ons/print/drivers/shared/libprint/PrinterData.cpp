@@ -29,20 +29,20 @@ PrinterData::~PrinterData()
 /*
 PrinterData::PrinterData(const PrinterData &printer_data)
 {
-	__driver_name  = printer_data.__driver_name;
-	__printer_name = printer_data.__printer_name;
-	__comments     = printer_data.__comments;
-	__transport    = printer_data.__transport;
-	__node         = printer_data.__node;
+	fDriverName  = printer_data.fDriverName;
+	fPrinterName = printer_data.fPrinterName;
+	fComments     = printer_data.fComments;
+	fTransport    = printer_data.fTransport;
+	fNode         = printer_data.fNode;
 }
 
 PrinterData &PrinterData::operator = (const PrinterData &printer_data)
 {
-	__driver_name  = printer_data.__driver_name;
-	__printer_name = printer_data.__printer_name;
-	__comments     = printer_data.__comments;
-	__transport    = printer_data.__transport;
-	__node         = printer_data.__node;
+	fDriverName  = printer_data.fDriverName;
+	fPrinterName = printer_data.fPrinterName;
+	fComments     = printer_data.fComments;
+	fTransport    = printer_data.fTransport;
+	fNode         = printer_data.fNode;
 	return *this;
 }
 */
@@ -51,16 +51,16 @@ void PrinterData::load(BNode *node)
 {
 	char buffer[512];
 
-	__node = node;
+	fNode = node;
 
-	__node->ReadAttr(PD_DRIVER_NAME,  B_STRING_TYPE, 0, buffer, sizeof(buffer));
-	__driver_name = buffer;
-	__node->ReadAttr(PD_PRINTER_NAME, B_STRING_TYPE, 0, buffer, sizeof(buffer));
-	__printer_name = buffer;
-	__node->ReadAttr(PD_COMMENTS,     B_STRING_TYPE, 0, buffer, sizeof(buffer));
-	__comments = buffer;
-	__node->ReadAttr(PD_TRANSPORT,    B_STRING_TYPE, 0, buffer, sizeof(buffer));
-	__transport = buffer;
+	fNode->ReadAttr(PD_DRIVER_NAME,  B_STRING_TYPE, 0, buffer, sizeof(buffer));
+	fDriverName = buffer;
+	fNode->ReadAttr(PD_PRINTER_NAME, B_STRING_TYPE, 0, buffer, sizeof(buffer));
+	fPrinterName = buffer;
+	fNode->ReadAttr(PD_COMMENTS,     B_STRING_TYPE, 0, buffer, sizeof(buffer));
+	fComments = buffer;
+	fNode->ReadAttr(PD_TRANSPORT,    B_STRING_TYPE, 0, buffer, sizeof(buffer));
+	fTransport = buffer;
 }
 
 /*
@@ -70,7 +70,7 @@ void PrinterData::save(BNode *node)
 	if (node == NULL) {
 		BPath path;
 		::find_directory(B_USER_PRINTERS_DIRECTORY, &path, false);
-		path.Append(__printer_name.c_str());
+		path.Append(fPrinterName.c_str());
 		BDirectory base_dir;
 		base_dir.CreateDirectory(path.Path(), &dir);
 		node = &dir;
@@ -83,9 +83,9 @@ void PrinterData::save(BNode *node)
 
 bool PrinterData::getPath(char *buf) const
 {
-	if (__node) {
+	if (fNode) {
 		node_ref nref;
-		__node->GetNodeRef(&nref);
+		fNode->GetNodeRef(&nref);
 		BDirectory dir;
 		dir.SetTo(&nref);
 		BPath path(&dir, NULL);

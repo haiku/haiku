@@ -26,9 +26,9 @@ protected:
 	UIDriver &operator = (const UIDriver &);
 
 private:
-	BMessage         *__msg;
-	PrinterData      *__printer_data;
-	const PrinterCap *__printer_cap;
+	BMessage         *fMsg;
+	PrinterData      *fPrinterData;
+	const PrinterCap *fPrinterCap;
 };
 
 #endif	/* __UIDRIVER_H */

@@ -8,7 +8,6 @@
 
 bool get_valid_line_RGB32(
 	const uchar *bits,
-	const rgb_color *,
 	int width,
 	int *left,
 	int *right)
@@ -44,117 +43,9 @@ bool get_valid_line_RGB32(
 	return true;
 }
 
-bool get_valid_line_CMAP8(
-	const uchar *bits,
-	const rgb_color *palette,
-	int width,
-	int *left,
-	int *right)
-{
-	int i = 0;
-	rgb_color c;
-	const uchar *ptr = bits;
+typedef bool (*PFN_GET_VALID_LINE)(const uchar *, int, int *, int *);
 
-	while (i < *left) {
-		c = palette[*ptr++];
-		if (c.red != 0xff || c.green != 0xff || c.blue != 0xff) {
-			*left = i;
-			break;
-		}
-		i++;
-	}
-
-	if (i == width) {
-		return false;
-	}
-
-	i = width - 1;
-	ptr = bits + width - 1;
-
-	while (i > *right) {
-		c = palette[*ptr--];
-		if (c.red != 0xff || c.green != 0xff || c.blue != 0xff) {
-			*right = i;
-			break;
-		}
-		i--;
-	}
-	return true;
-}
-
-bool get_valid_line_GRAY8(
-	const uchar *bits,
-	const rgb_color *,
-	int width,
-	int *left,
-	int *right)
-{
-	int i = 0;
-	const uchar *ptr = bits;
-
-	while (i < *left) {
-		if (*ptr++) {
-			*left = i;
-			break;
-		}
-		i++;
-	}
-
-	if (i == width) {
-		return false;
-	}
-
-	i = width - 1;
-	ptr = bits + width - 1;
-
-	while (i > *right) {
-		if (*ptr--) {
-			*right = i;
-			break;
-		}
-		i--;
-	}
-	return true;
-}
-
-bool get_valid_line_GRAY1(
-	const uchar *bits,
-	const rgb_color *,
-	int width,
-	int *left,
-	int *right)
-{
-	int i = 0;
-	const uchar *ptr = bits;
-
-	while (i < *left) {
-		if (*ptr++) {
-			*left = i;
-			break;
-		}
-		i += 8;
-	}
-
-	if (i == width) {
-		return false;
-	}
-
-	i = width - 1;
-	ptr = bits + ((width - 1) + 7) / 8;
-
-	while (i > *right) {
-		if (*ptr--) {
-			*right = i;
-			break;
-		}
-		i -= 8;
-	}
-	return true;
-}
-
-typedef bool (*PFN_GET_VALID_LINE)(const uchar *, const rgb_color *, int, int *, int *);
-
-bool get_valid_rect(BBitmap *a_bitmap, const rgb_color *palette, RECT *rc)
+bool get_valid_rect(BBitmap *a_bitmap, RECT *rc)
 {
 	int width  = rc->right  - rc->left + 1;
 	int height = rc->bottom - rc->top  + 1;
@@ -172,17 +63,8 @@ bool get_valid_rect(BBitmap *a_bitmap, const rgb_color *palette, RECT *rc)
 	case B_RGB32_BIG:
 		get_valid_line = get_valid_line_RGB32;
 		break;
-	case B_CMAP8:
-		get_valid_line = get_valid_line_CMAP8;
-		break;
-	case B_GRAY8:
-		get_valid_line = get_valid_line_GRAY8;
-		break;
-	case B_GRAY1:
-		get_valid_line = get_valid_line_GRAY1;
-		break;
 	default:
-		get_valid_line = get_valid_line_GRAY1;
+		return false;
 		break;
 	};
 
@@ -190,7 +72,7 @@ bool get_valid_rect(BBitmap *a_bitmap, const rgb_color *palette, RECT *rc)
 	uchar *ptr = (uchar *)a_bitmap->Bits();
 
 	while (i < height) {
-		if (get_valid_line(ptr, palette, width, &left, &right)) {
+		if (get_valid_line(ptr, width, &left, &right)) {
 			top = i;
 			break;
 		}
@@ -207,7 +89,7 @@ bool get_valid_rect(BBitmap *a_bitmap, const rgb_color *palette, RECT *rc)
 	bool found_boundary = false;
 
 	while (j >= i) {
-		if (get_valid_line(ptr, palette, width, &left, &right)) {
+		if (get_valid_line(ptr, width, &left, &right)) {
 			if (!found_boundary) {
 				bottom = j;
 				found_boundary = true;

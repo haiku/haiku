@@ -9,27 +9,26 @@
 #include "PrinterCap.h"
 #include "DbgMsg.h"
 
-const char *JD_XRES             = "xres";
-const char *JD_YRES             = "yres";
-const char *JD_COPIES           = "copies";
-const char *JD_ORIENTATION      = "orientation";
-const char *JD_SCALING          = "scaling";
-const char *JD_PAPER_RECT       = "paper_rect";
-const char *JD_FIRST_PAGE       = "first_page";
-const char *JD_LAST_PAGE        = "last_page";
-const char *JD_PRINTABLE_RECT   = "printable_rect";
+const char *kJDXRes             = "xres";
+const char *kJDYRes             = "yres";
+const char *kJDCopies           = "copies";
+const char *kJDOrientation      = "orientation";
+const char *kJDScaling          = "scaling";
+const char *kJDPaperRect        = "paper_rect";
+const char *kJDFirstPage        = "first_page";
+const char *kJDLastPage         = "last_page";
+const char *kJDPrintableRect    = "printable_rect";
 
-const char *JD_PAPER            = "JJJJ_paper";
-const char *JD_NUP              = "JJJJ_nup";
-const char *JD_SURFACE_TYPE     = "JJJJ_surface_type";
-const char *JD_GAMMA            = "JJJJ_gamma";
-const char *JD_PAPER_SOURCE     = "JJJJ_paper_source";
-const char *JD_COLLATE          = "JJJJ_collate";
-const char *JD_REVERSE          = "JJJJ_reverse";
-const char *JD_PRINT_STYLE      = "JJJJ_print_style";
-const char *JD_BINDING_LOCATION = "JJJJ_binding_location";
-const char *JD_PAGE_ORDER       = "JJJJ_page_order";
-const char *JD_COLOR            = "JJJJ_color";
+const char *kJDPaper            = "JJJJ_paper";
+const char *kJDNup              = "JJJJ_nup";
+const char *kJDGamma            = "JJJJ_gamma";
+const char *kJDPaperSource      = "JJJJ_paper_source";
+const char *kJDCollate          = "JJJJ_collate";
+const char *kJDReverse          = "JJJJ_reverse";
+const char *kJDPrintStyle       = "JJJJ_print_style";
+const char *kJDBindingLocation  = "JJJJ_binding_location";
+const char *kJDPageOrder        = "JJJJ_page_order";
+const char *kJDColor            = "JJJJ_color";
 
 JobData::JobData(BMessage *msg, const PrinterCap *cap)
 {
@@ -42,281 +41,269 @@ JobData::~JobData()
 
 JobData::JobData(const JobData &job_data)
 {
-	__paper            = job_data.__paper;
-	__xres             = job_data.__xres;
-	__yres             = job_data.__yres;
-	__orientation      = job_data.__orientation;
-	__scaling          = job_data.__scaling;
-	__paper_rect       = job_data.__paper_rect;
-	__printable_rect   = job_data.__printable_rect;
-	__nup              = job_data.__nup;
-	__first_page       = job_data.__first_page;
-	__last_page        = job_data.__last_page;
-	__surface_type     = job_data.__surface_type;
-	__gamma            = job_data.__gamma;
-	__paper_source     = job_data.__paper_source;
-	__copies           = job_data.__copies;
-	__collate          = job_data.__collate;
-	__reverse          = job_data.__reverse;
-	__print_style      = job_data.__print_style;
-	__binding_location = job_data.__binding_location;
-	__page_order       = job_data.__page_order;
-	__msg              = job_data.__msg;
-	__color            = job_data.__color;
+	fPaper            = job_data.fPaper;
+	fXRes             = job_data.fXRes;
+	fYRes             = job_data.fYRes;
+	fOrientation      = job_data.fOrientation;
+	fScaling          = job_data.fScaling;
+	fPaperRect        = job_data.fPaperRect;
+	fPrintableRect    = job_data.fPrintableRect;
+	fNup              = job_data.fNup;
+	fFirstPage        = job_data.fFirstPage;
+	fLastPage         = job_data.fLastPage;
+	fGamma            = job_data.fGamma;
+	fPaperSource      = job_data.fPaperSource;
+	fCopies           = job_data.fCopies;
+	fCollate          = job_data.fCollate;
+	fReverse          = job_data.fReverse;
+	fPrintStyle       = job_data.fPrintStyle;
+	fBindingLocation  = job_data.fBindingLocation;
+	fPageOrder        = job_data.fPageOrder;
+	fMsg              = job_data.fMsg;
+	fColor            = job_data.fColor;
 }
 
 JobData &JobData::operator = (const JobData &job_data)
 {
-	__paper            = job_data.__paper;
-	__xres             = job_data.__xres;
-	__yres             = job_data.__yres;
-	__orientation      = job_data.__orientation;
-	__scaling          = job_data.__scaling;
-	__paper_rect       = job_data.__paper_rect;
-	__printable_rect   = job_data.__printable_rect;
-	__nup              = job_data.__nup;
-	__first_page       = job_data.__first_page;
-	__last_page        = job_data.__last_page;
-	__surface_type     = job_data.__surface_type;
-	__gamma            = job_data.__gamma;
-	__paper_source     = job_data.__paper_source;
-	__copies           = job_data.__copies;
-	__collate          = job_data.__collate;
-	__reverse          = job_data.__reverse;
-	__print_style      = job_data.__print_style;
-	__binding_location = job_data.__binding_location;
-	__page_order       = job_data.__page_order;
-	__msg              = job_data.__msg;
-	__color            = job_data.__color;
+	fPaper            = job_data.fPaper;
+	fXRes             = job_data.fXRes;
+	fYRes             = job_data.fYRes;
+	fOrientation      = job_data.fOrientation;
+	fScaling          = job_data.fScaling;
+	fPaperRect        = job_data.fPaperRect;
+	fPrintableRect    = job_data.fPrintableRect;
+	fNup              = job_data.fNup;
+	fFirstPage        = job_data.fFirstPage;
+	fLastPage         = job_data.fLastPage;
+	fGamma            = job_data.fGamma;
+	fPaperSource      = job_data.fPaperSource;
+	fCopies           = job_data.fCopies;
+	fCollate          = job_data.fCollate;
+	fReverse          = job_data.fReverse;
+	fPrintStyle       = job_data.fPrintStyle;
+	fBindingLocation  = job_data.fBindingLocation;
+	fPageOrder        = job_data.fPageOrder;
+	fMsg              = job_data.fMsg;
+	fColor            = job_data.fColor;
 	return *this;
 }
 
 void JobData::load(BMessage *msg, const PrinterCap *cap)
 {
-	__msg = msg;
+	fMsg = msg;
 
-	if (msg->HasInt32(JD_PAPER))
-		__paper = (PAPER)msg->FindInt32(JD_PAPER);
-	else if (cap->isSupport(PrinterCap::PAPER))
-		__paper = ((const PaperCap *)cap->getDefaultCap(PrinterCap::PAPER))->paper;
+	if (msg->HasInt32(kJDPaper))
+		fPaper = (Paper)msg->FindInt32(kJDPaper);
+	else if (cap->isSupport(PrinterCap::kPaper))
+		fPaper = ((const PaperCap *)cap->getDefaultCap(PrinterCap::kPaper))->paper;
 	else
-		__paper = A4;
+		fPaper = kA4;
 
-	if (msg->HasInt64(JD_XRES)) {
+	if (msg->HasInt64(kJDXRes)) {
 		int64 xres64; 
-		msg->FindInt64(JD_XRES, &xres64);
-		__xres = xres64; 
-	} else if (cap->isSupport(PrinterCap::RESOLUTION)) {
-		__xres = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::RESOLUTION))->xres;
+		msg->FindInt64(kJDXRes, &xres64);
+		fXRes = xres64; 
+	} else if (cap->isSupport(PrinterCap::kResolution)) {
+		fXRes = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::kResolution))->xres;
 	} else {
-		__xres = 300; 
+		fXRes = 300; 
 	}
 
-	if (msg->HasInt64(JD_YRES)) {
+	if (msg->HasInt64(kJDYRes)) {
 		int64 yres64;
-		msg->FindInt64(JD_YRES, &yres64);
-		__yres = yres64;
-	} else if (cap->isSupport(PrinterCap::RESOLUTION)) {
-		__yres = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::RESOLUTION))->yres;
+		msg->FindInt64(kJDYRes, &yres64);
+		fYRes = yres64;
+	} else if (cap->isSupport(PrinterCap::kResolution)) {
+		fYRes = ((const ResolutionCap *)cap->getDefaultCap(PrinterCap::kResolution))->yres;
 	} else {
-		__yres = 300;
+		fYRes = 300;
 	}
 
-	if (msg->HasInt32(JD_ORIENTATION))
-		__orientation = (ORIENTATION)msg->FindInt32(JD_ORIENTATION);
-	else if (cap->isSupport(PrinterCap::ORIENTATION))
-		__orientation = ((const OrientationCap *)cap->getDefaultCap(PrinterCap::ORIENTATION))->orientation;
+	if (msg->HasInt32(kJDOrientation))
+		fOrientation = (Orientation)msg->FindInt32(kJDOrientation);
+	else if (cap->isSupport(PrinterCap::kOrientation))
+		fOrientation = ((const OrientationCap *)cap->getDefaultCap(PrinterCap::kOrientation))->orientation;
 	else
-		__orientation = PORTRAIT;
+		fOrientation = kPortrait;
 
-	if (msg->HasFloat(JD_SCALING))
-		__scaling = msg->FindFloat(JD_SCALING);
+	if (msg->HasFloat(kJDScaling))
+		fScaling = msg->FindFloat(kJDScaling);
 	else
-		__scaling = 100.0f;
+		fScaling = 100.0f;
 
-	if (msg->HasRect(JD_PAPER_RECT)) {
-		__paper_rect = msg->FindRect(JD_PAPER_RECT);
+	if (msg->HasRect(kJDPaperRect)) {
+		fPaperRect = msg->FindRect(kJDPaperRect);
 	}
 
-	if (msg->HasRect(JD_PRINTABLE_RECT)) {
-		__printable_rect = msg->FindRect(JD_PRINTABLE_RECT);
+	if (msg->HasRect(kJDPrintableRect)) {
+		fPrintableRect = msg->FindRect(kJDPrintableRect);
 	}
 
-	if (msg->HasInt32(JD_FIRST_PAGE))
-		__first_page = msg->FindInt32(JD_FIRST_PAGE);
+	if (msg->HasInt32(kJDFirstPage))
+		fFirstPage = msg->FindInt32(kJDFirstPage);
 	else
-		__first_page = 1;
+		fFirstPage = 1;
 
-	if (msg->HasInt32(JD_LAST_PAGE))
-		__last_page = msg->FindInt32(JD_LAST_PAGE);
+	if (msg->HasInt32(kJDLastPage))
+		fLastPage = msg->FindInt32(kJDLastPage);
 	else
-		__last_page = -1;
+		fLastPage = -1;
 
-	if (msg->HasInt32(JD_NUP))
-		__nup = msg->FindInt32(JD_NUP);
+	if (msg->HasInt32(kJDNup))
+		fNup = msg->FindInt32(kJDNup);
 	else
-		__nup = 1;
+		fNup = 1;
 
-	if (msg->HasInt32(JD_SURFACE_TYPE))
-		__surface_type = (color_space)msg->FindInt32(JD_SURFACE_TYPE);
+	if (msg->HasFloat(kJDGamma))
+		fGamma = fMsg->FindFloat(kJDGamma);
 	else
-		__surface_type = B_CMAP8;
+		fGamma = 1.4f;
 
-	if (msg->HasFloat(JD_GAMMA))
-		__gamma = __msg->FindFloat(JD_GAMMA);
+	if (msg->HasInt32(kJDPaperSource))
+		fPaperSource = (PaperSource)fMsg->FindInt32(kJDPaperSource);
+	else if (cap->isSupport(PrinterCap::kPaperSource))
+		fPaperSource = ((const PaperSourceCap *)cap->getDefaultCap(PrinterCap::kPaperSource))->paper_source;
 	else
-		__gamma = 1.4f;
+		fPaperSource = kAuto;
 
-	if (msg->HasInt32(JD_PAPER_SOURCE))
-		__paper_source = (PAPERSOURCE)__msg->FindInt32(JD_PAPER_SOURCE);
-	else if (cap->isSupport(PrinterCap::PAPERSOURCE))
-		__paper_source = ((const PaperSourceCap *)cap->getDefaultCap(PrinterCap::PAPERSOURCE))->paper_source;
+	if (msg->HasInt32(kJDCopies))
+		fCopies = msg->FindInt32(kJDCopies);
 	else
-		__paper_source = AUTO;
+		fCopies = 1;
 
-	if (msg->HasInt32(JD_COPIES))
-		__copies = msg->FindInt32(JD_COPIES);
+	if (msg->HasBool(kJDCollate))
+		fCollate = msg->FindBool(kJDCollate);
 	else
-		__copies = 1;
+		fCollate = false;
 
-	if (msg->HasBool(JD_COLLATE))
-		__collate = msg->FindBool(JD_COLLATE);
+	if (msg->HasBool(kJDReverse))
+		fReverse = msg->FindBool(kJDReverse);
 	else
-		__collate = false;
+		fReverse = false;
 
-	if (msg->HasBool(JD_REVERSE))
-		__reverse = msg->FindBool(JD_REVERSE);
+	if (msg->HasInt32(kJDPrintStyle))
+		fPrintStyle = (PrintStyle)msg->FindInt32(kJDPrintStyle);
+	else if (cap->isSupport(PrinterCap::kPrintStyle))
+		fPrintStyle = ((const PrintStyleCap *)cap->getDefaultCap(PrinterCap::kPrintStyle))->print_style;
 	else
-		__reverse = false;
+		fPrintStyle = kSimplex;
 
-	if (msg->HasInt32(JD_PRINT_STYLE))
-		__print_style = (PRINTSTYLE)msg->FindInt32(JD_PRINT_STYLE);
-	else if (cap->isSupport(PrinterCap::PRINTSTYLE))
-		__print_style = ((const PrintStyleCap *)cap->getDefaultCap(PrinterCap::PRINTSTYLE))->print_style;
+	if (msg->HasInt32(kJDBindingLocation))
+		fBindingLocation = (BindingLocation)msg->FindInt32(kJDBindingLocation);
+	else if (cap->isSupport(PrinterCap::kBindingLocation))
+		fBindingLocation = ((const BindingLocationCap *)cap->getDefaultCap(PrinterCap::kBindingLocation))->binding_location;
 	else
-		__print_style = SIMPLEX;
+		fBindingLocation = kLongEdgeLeft;
 
-	if (msg->HasInt32(JD_BINDING_LOCATION))
-		__binding_location = (BINDINGLOCATION)msg->FindInt32(JD_BINDING_LOCATION);
-	else if (cap->isSupport(PrinterCap::BINDINGLOCATION))
-		__binding_location = ((const BindingLocationCap *)cap->getDefaultCap(PrinterCap::BINDINGLOCATION))->binding_location;
+	if (msg->HasInt32(kJDPageOrder))
+		fPageOrder = (PageOrder)msg->FindInt32(kJDPageOrder);
 	else
-		__binding_location = LONG_EDGE_LEFT;
+		fPageOrder = kAcrossFromLeft;
 
-	if (msg->HasInt32(JD_PAGE_ORDER))
-		__page_order = (PAGEORDER)msg->FindInt32(JD_PAGE_ORDER);
+	if (msg->HasBool(kJDColor))
+		fColor = msg->FindBool(kJDColor);
 	else
-		__page_order = ACROSS_FROM_LEFT;
-
-	if (msg->HasBool(JD_COLOR))
-		__color = msg->FindBool(JD_COLOR);
-	else
-		__color = false;
+		fColor = false;
 }
 
 void JobData::save(BMessage *msg)
 {
 	if (msg == NULL) {
-		msg = __msg;
+		msg = fMsg;
 	}
 
-	if (msg->HasInt32(JD_PAPER))
-		msg->ReplaceInt32(JD_PAPER, __paper);
+	if (msg->HasInt32(kJDPaper))
+		msg->ReplaceInt32(kJDPaper, fPaper);
 	else
-		msg->AddInt32(JD_PAPER, __paper);
+		msg->AddInt32(kJDPaper, fPaper);
 
-	if (msg->HasInt64(JD_XRES))
-		msg->ReplaceInt64(JD_XRES, __xres);
+	if (msg->HasInt64(kJDXRes))
+		msg->ReplaceInt64(kJDXRes, fXRes);
 	else
-		msg->AddInt64(JD_XRES, __xres);
+		msg->AddInt64(kJDXRes, fXRes);
 	
-	if (msg->HasInt64(JD_YRES))
-		msg->ReplaceInt64(JD_YRES, __yres);
+	if (msg->HasInt64(kJDYRes))
+		msg->ReplaceInt64(kJDYRes, fYRes);
 	else
-		msg->AddInt64(JD_YRES, __yres);
+		msg->AddInt64(kJDYRes, fYRes);
 
-	if (msg->HasInt32(JD_ORIENTATION))
-		msg->ReplaceInt32(JD_ORIENTATION, __orientation);
+	if (msg->HasInt32(kJDOrientation))
+		msg->ReplaceInt32(kJDOrientation, fOrientation);
 	else
-		msg->AddInt32(JD_ORIENTATION, __orientation);
+		msg->AddInt32(kJDOrientation, fOrientation);
 
-	if (msg->HasFloat(JD_SCALING))
-		msg->ReplaceFloat(JD_SCALING, __scaling);
+	if (msg->HasFloat(kJDScaling))
+		msg->ReplaceFloat(kJDScaling, fScaling);
 	else
-		msg->AddFloat(JD_SCALING, __scaling);
+		msg->AddFloat(kJDScaling, fScaling);
 
-	if (msg->HasRect(JD_PAPER_RECT))
-		msg->ReplaceRect(JD_PAPER_RECT, __paper_rect);
+	if (msg->HasRect(kJDPaperRect))
+		msg->ReplaceRect(kJDPaperRect, fPaperRect);
 	else
-		msg->AddRect(JD_PAPER_RECT, __paper_rect);
+		msg->AddRect(kJDPaperRect, fPaperRect);
 
-	if (msg->HasRect(JD_PRINTABLE_RECT))
-		msg->ReplaceRect(JD_PRINTABLE_RECT, __printable_rect);
+	if (msg->HasRect(kJDPrintableRect))
+		msg->ReplaceRect(kJDPrintableRect, fPrintableRect);
 	else
-		msg->AddRect(JD_PRINTABLE_RECT, __printable_rect);
+		msg->AddRect(kJDPrintableRect, fPrintableRect);
 
-	if (msg->HasInt32(JD_NUP))
-		msg->ReplaceInt32(JD_NUP, __nup);
+	if (msg->HasInt32(kJDNup))
+		msg->ReplaceInt32(kJDNup, fNup);
 	else
-		msg->AddInt32(JD_NUP, __nup);
+		msg->AddInt32(kJDNup, fNup);
 
-	if (msg->HasInt32(JD_FIRST_PAGE))
-		msg->ReplaceInt32(JD_FIRST_PAGE, __first_page);
+	if (msg->HasInt32(kJDFirstPage))
+		msg->ReplaceInt32(kJDFirstPage, fFirstPage);
 	else
-		msg->AddInt32(JD_FIRST_PAGE, __first_page);
+		msg->AddInt32(kJDFirstPage, fFirstPage);
 
-	if (msg->HasInt32(JD_LAST_PAGE))
-		msg->ReplaceInt32(JD_LAST_PAGE, __last_page);
+	if (msg->HasInt32(kJDLastPage))
+		msg->ReplaceInt32(kJDLastPage, fLastPage);
 	else
-		msg->AddInt32(JD_LAST_PAGE, __last_page);
+		msg->AddInt32(kJDLastPage, fLastPage);
 
-	if (msg->HasInt32(JD_SURFACE_TYPE))
-		msg->ReplaceInt32(JD_SURFACE_TYPE, __surface_type);
+	if (msg->HasFloat(kJDGamma))
+		msg->ReplaceFloat(kJDGamma, fGamma);
 	else
-		msg->AddInt32(JD_SURFACE_TYPE, __surface_type);
+		msg->AddFloat(kJDGamma, fGamma);
 
-	if (msg->HasFloat(JD_GAMMA))
-		msg->ReplaceFloat(JD_GAMMA, __gamma);
+	if (msg->HasInt32(kJDPaperSource))
+		msg->ReplaceInt32(kJDPaperSource, fPaperSource);
 	else
-		msg->AddFloat(JD_GAMMA, __gamma);
+		msg->AddInt32(kJDPaperSource, fPaperSource);
 
-	if (msg->HasInt32(JD_PAPER_SOURCE))
-		msg->ReplaceInt32(JD_PAPER_SOURCE, __paper_source);
+	if (msg->HasInt32(kJDCopies))
+		msg->ReplaceInt32(kJDCopies, fCopies);
 	else
-		msg->AddInt32(JD_PAPER_SOURCE, __paper_source);
+		msg->AddInt32(kJDCopies, fCopies);
 
-	if (msg->HasInt32(JD_COPIES))
-		msg->ReplaceInt32(JD_COPIES, __copies);
+	if (msg->HasBool(kJDCollate))
+		msg->ReplaceBool(kJDCollate, fCollate);
 	else
-		msg->AddInt32(JD_COPIES, __copies);
+		msg->AddBool(kJDCollate, fCollate);
 
-	if (msg->HasBool(JD_COLLATE))
-		msg->ReplaceBool(JD_COLLATE, __collate);
+	if (msg->HasBool(kJDReverse))
+		msg->ReplaceBool(kJDReverse, fReverse);
 	else
-		msg->AddBool(JD_COLLATE, __collate);
+		msg->AddBool(kJDReverse, fReverse);
 
-	if (msg->HasBool(JD_REVERSE))
-		msg->ReplaceBool(JD_REVERSE, __reverse);
+	if (msg->HasInt32(kJDPrintStyle))
+		msg->ReplaceInt32(kJDPrintStyle, fPrintStyle);
 	else
-		msg->AddBool(JD_REVERSE, __reverse);
+		msg->AddInt32(kJDPrintStyle, fPrintStyle);
 
-	if (msg->HasInt32(JD_PRINT_STYLE))
-		msg->ReplaceInt32(JD_PRINT_STYLE, __print_style);
+	if (msg->HasInt32(kJDBindingLocation))
+		msg->ReplaceInt32(kJDBindingLocation, fBindingLocation);
 	else
-		msg->AddInt32(JD_PRINT_STYLE, __print_style);
+		msg->AddInt32(kJDBindingLocation, fBindingLocation);
 
-	if (msg->HasInt32(JD_BINDING_LOCATION))
-		msg->ReplaceInt32(JD_BINDING_LOCATION, __binding_location);
+	if (msg->HasInt32(kJDPageOrder))
+		msg->ReplaceInt32(kJDPageOrder, fPageOrder);
 	else
-		msg->AddInt32(JD_BINDING_LOCATION, __binding_location);
+		msg->AddInt32(kJDPageOrder, fPageOrder);
 
-	if (msg->HasInt32(JD_PAGE_ORDER))
-		msg->ReplaceInt32(JD_PAGE_ORDER, __page_order);
+	if (msg->HasBool(kJDColor))
+		msg->ReplaceBool(kJDColor, fColor);
 	else
-		msg->AddInt32(JD_PAGE_ORDER, __page_order);
-
-	if (msg->HasBool(JD_COLOR))
-		msg->ReplaceBool(JD_COLOR, __color);
-	else
-		msg->AddBool(JD_COLOR, __color);
+		msg->AddBool(kJDColor, fColor);
 }
