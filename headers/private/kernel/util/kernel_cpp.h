@@ -39,6 +39,20 @@ operator new[](size_t size) throw (std::bad_alloc)
 }
  
 
+inline void *
+operator new(size_t size, const std::nothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+inline void *
+operator new[](size_t size, const std::nothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
 inline void
 operator delete(void *ptr) throw ()
 {
