@@ -483,7 +483,7 @@ bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vn
 	Inode *directory = (Inode *)_directory;
 
 	// check access permissions
-	status_t status = directory->CheckPermissions(X_OK);
+	status_t status = directory->CheckPermissions(R_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
