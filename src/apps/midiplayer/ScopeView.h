@@ -40,6 +40,7 @@ public:
 	void SetEnabled(bool flag);
 	void SetHaveFile(bool flag);
 	void SetLoading(bool flag);
+	void SetLiveInput(bool flag);
 
 private:
 
@@ -47,17 +48,21 @@ private:
 
 	static int32 _Thread(void* data);
 	int32 Thread();
-	
+
+	void DrawLoading();
 	void DrawNoFile();
 	void DrawDisabled();
 	void DrawStopped();
 	void DrawPlaying();
 	
+	void DrawText(const char* text);
+
 	bool finished;
 	bool playing;
 	bool enabled;
 	bool haveFile;
 	bool loading;
+	bool liveInput;
 	int32 sampleCount;
 	int16* leftSamples;
 	int16* rightSamples;

@@ -150,13 +150,10 @@ void MidiPlayerWindow::MenusBeginning()
 		delete inputPopUp->RemoveItem(t);
 	}
 
-	bool seenInput = false;
+	// Note: if the selected endpoint no longer exists, then no endpoint is
+	// marked. However, we won't disconnect it until you choose another one.
 
-	if (inputId == -1)
-	{
-		inputOff->SetMarked(true);
-		seenInput = true;
-	}
+	inputOff->SetMarked(inputId == -1);
 	
 	int32 id = 0;
 	BMidiEndpoint* endp;
@@ -170,20 +167,10 @@ void MidiPlayerWindow::MenusBeginning()
 
 			BMenuItem* item = new BMenuItem(endp->Name(), msg);
 			inputPopUp->AddItem(item);
-			
-			if (inputId == id)
-			{
-				item->SetMarked(true);
-				seenInput = true;
-			}
+			item->SetMarked(inputId == id);
 		}
 		
 		endp->Release();
-	}
-	
-	if (!seenInput)  // endpoint no longer exists
-	{
-		inputOff->SetMarked(true);
 	}
 }
 
@@ -556,19 +543,6 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 	int32 newId;
 	if (msg->FindInt32("id", &newId) == B_OK)
 	{
-		if (!instrLoaded)
-		{
-			scopeView->SetLoading(true);
-			scopeView->Invalidate();
-			UpdateIfNeeded();
-		
-			bridge->Init(B_BIG_SYNTH);
-			instrLoaded = true;
-			
-			scopeView->SetLoading(false);
-			scopeView->Invalidate();
-		}
-
 		BMidiProducer* endp;
 		
 		endp = BMidiRoster::FindProducer(inputId);
@@ -583,8 +557,29 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 		endp = BMidiRoster::FindProducer(inputId);
 		if (endp != NULL)
 		{
+			if (!instrLoaded)
+			{
+				scopeView->SetLoading(true);
+				scopeView->Invalidate();
+				UpdateIfNeeded();
+			
+				bridge->Init(B_BIG_SYNTH);
+				instrLoaded = true;
+				
+				scopeView->SetLoading(false);
+				scopeView->Invalidate();
+			}
+
 			endp->Connect(bridge);
 			endp->Release();
+
+			scopeView->SetLiveInput(true);
+			scopeView->Invalidate();
+		}
+		else
+		{
+			scopeView->SetLiveInput(false);
+			scopeView->Invalidate();
 		}
 	}
 }

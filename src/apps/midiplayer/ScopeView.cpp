@@ -37,7 +37,8 @@ ScopeView::ScopeView()
 	enabled = true;
 	haveFile = false;
 	loading = false;
-	
+	liveInput = false;
+
 	sampleCount = (int32) Bounds().Width();
 	leftSamples = new int16[sampleCount];
 	rightSamples = new int16[sampleCount];
@@ -81,7 +82,11 @@ void ScopeView::Draw(BRect updateRect)
 {
 	super::Draw(updateRect);
 
-	if (!haveFile)
+	if (loading)
+	{
+		DrawLoading();
+	}
+	else if (!haveFile && !liveInput)
 	{
 		DrawNoFile();
 	}
@@ -89,13 +94,13 @@ void ScopeView::Draw(BRect updateRect)
 	{
 		DrawDisabled();
 	}
-	else if (!playing)
-	{
-		DrawStopped();
-	}
-	else 
+	else if (playing || liveInput)
 	{
 		DrawPlaying();
+	}
+	else
+	{
+		DrawStopped();
 	}
 }
 
@@ -129,6 +134,13 @@ void ScopeView::SetLoading(bool flag)
 
 //------------------------------------------------------------------------------
 
+void ScopeView::SetLiveInput(bool flag)
+{
+	liveInput = flag;
+}
+
+//------------------------------------------------------------------------------
+
 int32 ScopeView::_Thread(void* data)
 {
 	return ((ScopeView*) data)->Thread();
@@ -144,7 +156,7 @@ int32 ScopeView::Thread()
 
 	while (!finished)
 	{
-		if (enabled && playing && haveFile)
+		if (enabled && (playing || liveInput))
 		{
 			if (LockLooperWithTimeout(50000) == B_OK)
 			{
@@ -159,24 +171,16 @@ int32 ScopeView::Thread()
 
 //------------------------------------------------------------------------------
 
+void ScopeView::DrawLoading()
+{
+	DrawText("Loading instruments...");
+}
+
+//------------------------------------------------------------------------------
+
 void ScopeView::DrawNoFile()
 {
-	const char* string = "Drop MIDI file here";
-
-	font_height height;
-	GetFontHeight(&height);
-
-	float strWidth = StringWidth(string);
-	float strHeight = height.ascent + height.descent;
-
-	float x = (Bounds().Width() - strWidth)/2;
-	float y = height.ascent + (Bounds().Height() - strHeight)/2;
-
-	SetHighColor(255, 255, 255);
-	SetLowColor(ViewColor());
-	SetDrawingMode(B_OP_OVER);
-
-	DrawString(string, BPoint(x, y));
+	DrawText("Drop MIDI file here");
 }
 
 //------------------------------------------------------------------------------
@@ -227,6 +231,26 @@ void ScopeView::DrawPlaying()
 			sx += size;
 		}
 	}
+}
+
+//------------------------------------------------------------------------------
+
+void ScopeView::DrawText(const char* text)
+{
+	font_height height;
+	GetFontHeight(&height);
+
+	float strWidth = StringWidth(text);
+	float strHeight = height.ascent + height.descent;
+
+	float x = (Bounds().Width() - strWidth)/2;
+	float y = height.ascent + (Bounds().Height() - strHeight)/2;
+
+	SetHighColor(255, 255, 255);
+	SetLowColor(ViewColor());
+	SetDrawingMode(B_OP_OVER);
+
+	DrawString(text, BPoint(x, y));
 }
 
 //------------------------------------------------------------------------------
