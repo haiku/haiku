@@ -923,7 +923,6 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
 			BRect updateRect;
 			int32 token;
-			BView *view;
 			
 			msg->FindRect("_rect", &updateRect);
 			msg->FindInt32("_token",&token);
