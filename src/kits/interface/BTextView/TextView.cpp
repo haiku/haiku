@@ -35,14 +35,14 @@
 // to refresh only changed parts of text (currently we often redraw the whole text)
 
 // Known Bugs:
-// - visual artifacts appears when you highlight some text which spans between
-// multiple lines and with mixed sizes/styles (could be something in GetTextRegion())
+// - Line wrapping doesn't work well with multi byte charachters
+// - Andrew reported some issue with beshare in _BWidthBuffer_::HashEscapements() 
+//   (that's why its use is disabled by default), though I couldn't reproduce it
+// - Double buffering doesn't work well (disabled by default too)
 
-// Standard Includes -----------------------------------------------------------
 #include <cstdlib>
 #include <cstdio>
 
-// System Includes -------------------------------------------------------------
 #include <Application.h>
 #include <Beep.h>
 #include <Bitmap.h>
@@ -57,7 +57,6 @@
 #include <TextView.h>
 #include <Window.h>
 
-// Local Includes --------------------------------------------------------------
 #include "InlineInput.h"
 #include "LineBuffer.h"
 #include "StyleBuffer.h"
@@ -65,7 +64,7 @@
 #include "UndoBuffer.h"
 #include "WidthBuffer.h"
 
-// Local Defines ---------------------------------------------------------------
+
 //#define TRACE_TEXTVIEW
 #ifdef TRACE_TEXTVIEW
 	#define CALLED() printf("%s\n", __PRETTY_FUNCTION__)
@@ -74,10 +73,14 @@
 #endif
 
 
+#define USE_WIDTHBUFFER 0
+#define USE_DOUBLEBUFFERING 0
+
+
 struct flattened_text_run {
 	int32	offset;
-	char	family[64];
-	char	style[64];
+	font_family	family;
+	font_style style;
 	float	size;
 	float	shear;		/* typically 90.0 */
 	uint16	face;		/* typically 0 */
@@ -1145,6 +1148,9 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 {
 	CALLED();
 	
+	if (!fEditable)
+		return;
+
 	CancelInputMethod();
 	
 	// do we really need to do anything?
@@ -1423,6 +1429,7 @@ void
 BTextView::Clear()
 {
 	CALLED();
+	
 	delete fUndo;
 	fUndo = new _BClearUndoBuffer_(this);
 	
@@ -1570,7 +1577,12 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 								const rgb_color *inColor)
 {
 	CALLED();
+	
+	if (!fEditable)
+		return;
+
 	CancelInputMethod();
+	
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (fSelStart != fSelEnd)
@@ -1614,6 +1626,9 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 {
 	CALLED();
 	
+	if (!fEditable)
+		return;
+
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (startOffset != endOffset)
@@ -1676,6 +1691,9 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 {
 	CALLED();
 	
+	if (!fEditable)
+		return;
+
 	CancelInputMethod();
 	
 	// pin offsets at reasonable values
@@ -1784,9 +1802,7 @@ BTextView::LineAt(BPoint point) const
 BPoint
 BTextView::PointAt(int32 inOffset, float *outHeight) const
 {
-	// TODO: when alignment is != than B_ALIGN_LEFT,
-	// this function's still a bit broken.
-	// Cleanup.
+	// TODO: Cleanup.
 	
 	CALLED();
 	BPoint result;
@@ -2115,7 +2131,6 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 	if (endLine > numLines - 1)
 		endLine = numLines - 1;
 	
-	// TODO: This looks broken as well. What do we do if there's only one line ?
 	float height = (*fLines)[endLine + 1]->origin - (*fLines)[startLine]->origin;
 				
 	if (endLine == numLines - 1 && (*fText)[fText->Length() - 1] == '\n')
@@ -2751,6 +2766,9 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 						   const text_run_array *inRuns)
 {
 	CALLED();
+	if (!fEditable)
+		return;
+
 	// why add nothing?
 	if (inLength < 1)
 		return;
@@ -3615,13 +3633,15 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 	while ((numChars = fStyles->Iterate(fromOffset, length, fInline, &font, NULL, &ascent, &descent)) != 0) {		
 		maxAscent = max_c(ascent, maxAscent);
 		maxDescent = max_c(descent, maxDescent);
-		
-		// Use _BWidthBuffer_ if possible (TODO: reenable this when it's fixed)
-		if (false && (sWidths != NULL)) {
+
+#if USE_WIDTHBUFFER
+		// Use _BWidthBuffer_ if possible
+		if (sWidths != NULL) {
 			LockWidthBuffer();
 			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
 			UnlockWidthBuffer();
 		} else
+#endif
 			result += font->StringWidth(fText->Text() + fromOffset, numChars);
 		
 		fromOffset += numChars;
@@ -3838,8 +3858,7 @@ void
 BTextView::DrawCaret(int32 offset)
 {
 	CALLED();
-	//long 		lineNum = LineAt(offset);
-	//STELinePtr	line = (*fLines)[lineNum];
+	
 	float lineHeight;
 	BPoint caretPoint = PointAt(offset, &lineHeight);
 	caretPoint.x = min_c(caretPoint.x, fTextRect.right);
@@ -3916,7 +3935,8 @@ BTextView::PerformMouseUp(BPoint where)
 }
 
 
-bool BTextView::PerformMouseMoved(BPoint where, uint32 code)
+bool
+BTextView::PerformMouseMoved(BPoint where, uint32 code)
 {
 	CALLED();
 	return false;
@@ -3936,7 +3956,7 @@ BTextView::TrackMouse(BPoint where, const BMessage *message, bool force)
 	BRegion textRegion;
 	GetTextRegion(fSelStart, fSelEnd, &textRegion);
 	
-	if (AcceptsDrop(message))
+	if (message && AcceptsDrop(message))
 		TrackDrag(where);
 	else if (!textRegion.Contains(where))
 		SetViewCursor(B_CURSOR_I_BEAM, force);
@@ -4000,7 +4020,8 @@ bool
 BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 {
 	CALLED();
-	
+	ASSERT(inMessage);
+
 	void *from = NULL;
 	bool internalDrop = false;
 	if (inMessage->FindPointer("be:originator", &from) == B_OK
@@ -4115,7 +4136,8 @@ BTextView::NewOffscreen(float padding)
 	CALLED();
 	if (fOffscreen != NULL)
 		DeleteOffscreen();
-	
+
+#if USE_DOUBLEBUFFERING
 	BRect bitmapRect(0, 0, fTextRect.Width() + padding, fTextRect.Height());
 	fOffscreen = new BBitmap(bitmapRect, fColorSpace, true, false);
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
@@ -4123,6 +4145,7 @@ BTextView::NewOffscreen(float padding)
 		fOffscreen->AddChild(bufferView);
 		fOffscreen->Unlock();
 	}
+#endif
 }
 
 
@@ -4176,7 +4199,8 @@ BTextView::Deactivate()
 	fActive = false;
 	
 	CancelInputMethod();
-	
+	DeleteOffscreen();
+
 	if (fSelStart != fSelEnd) {
 		if (fSelectable)
 			Highlight(fSelStart, fSelEnd);
