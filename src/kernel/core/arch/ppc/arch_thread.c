@@ -30,6 +30,25 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 }
 
 
+struct thread *
+arch_thread_get_current_thread(void)
+{
+	return NULL;
+}
+
+
+void
+arch_thread_set_current_thread(struct thread *thread)
+{
+}
+
+
+void
+arch_thread_init_tls(struct thread *thread)
+{
+}
+
+
 void
 arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
 {
@@ -52,4 +71,24 @@ void
 arch_thread_enter_uspace(struct thread *thread, addr entry, void *arg1, void *arg2)
 {
 }
+
+
+void
+arch_setup_signal_frame(struct thread *thread, struct sigaction *sa, int sig, int sigMask)
+{
+}
+
+
+int64
+arch_restore_signal_frame(void)
+{
+	return 0;
+}
+
+
+void
+arch_check_syscall_restart(struct thread *thread)
+{
+}
+
 
