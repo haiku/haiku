@@ -116,7 +116,7 @@ DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
 	fWindowCount(0),
-	fWindowPosition(50, 50, 500, 500)
+	fWindowPosition(50, 50, 550, 500)
 {
 	fFilePanel = new BFilePanel();
 

@@ -7,6 +7,7 @@
 #include "ProbeWindow.h"
 #include "OpenWindow.h"
 #include "DiskProbe.h"
+#include "ProbeView.h"
 
 #include <Application.h>
 #include <MenuBar.h>
@@ -68,6 +69,10 @@ ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref, const char *attribute)
 
 	// add our interface widgets
 
+	BRect rect = Bounds();
+	rect.top = menuBar->Bounds().Height() + 1;
+	BView *view = new ProbeView(rect, ref, attribute);
+	AddChild(view);
 }
 
 

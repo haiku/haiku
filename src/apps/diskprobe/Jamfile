@@ -8,6 +8,7 @@ App DiskProbe :
 	DiskProbe.cpp
 	DataEditor.cpp
 	ProbeWindow.cpp
+	ProbeView.cpp
 	OpenWindow.cpp
 	;
 
