@@ -700,7 +700,7 @@ BNode::_SetTo(int fd, const char *path, bool traverse)
 	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open(fd, path, O_RDWR | traverseFlag);
-		if (fFd == B_READ_ONLY_DEVICE || fFd == B_PERMISSION_DENIED) {
+		if (fFd < B_OK) {
 			// opening read-write failed, re-try read-only
 			fFd = _kern_open(fd, path, O_RDONLY | traverseFlag);
 		}
@@ -734,7 +734,7 @@ BNode::_SetTo(const entry_ref *ref, bool traverse)
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
 			O_RDWR | traverseFlag);
-		if (fFd == B_READ_ONLY_DEVICE || fFd == B_PERMISSION_DENIED) {
+		if (fFd < B_OK) {
 			// opening read-write failed, re-try read-only
 			fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
 				O_RDONLY | traverseFlag);
