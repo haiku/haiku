@@ -6,23 +6,29 @@
  *         compatibility reasons.
  ***********************************************************************/
 
-//#include <ByteOrder.h>
 #include <TimeSource.h>
-#include "SoundPlayNode.h"
 #include <string.h>
-#include "debug.h"
-#include "ChannelMixer.h"
-#include "SampleConverter.h"
-#include "SamplingrateConverter.h"
-
 #include <stdlib.h>
 #include <unistd.h>
+#include "SoundPlayNode.h"
+#include "debug.h"
+
+#define DPRINTF 0
+
+#if DPRINTF
+	#undef DPRINTF
+	#define DPRINTF printf
+#else
+	#undef DPRINTF
+	#define DPRINTF if (1) {} else printf
+#endif
 
 _SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format *format, BSoundPlayer *player) : 
 	BMediaNode(name),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
 	mPlayer(player),
+	mInitCheckStatus(B_OK),
 	mOutputEnabled(true),
 	mBufferGroup(NULL),	
 	mFramesSent(0)
@@ -31,24 +37,24 @@ _SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format 
 	mPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	mPreferredFormat.u.raw_audio = *format;
 	
-	printf("Format Info:\n");
-	printf("  frame_rate:     %f\n",mFormat.u.raw_audio.frame_rate);
-	printf("  channel_count:  %ld\n",mFormat.u.raw_audio.channel_count);
-	printf("  byte_order:     %ld (",mFormat.u.raw_audio.byte_order);
+	DPRINTF("Format Info:\n");
+	DPRINTF("  frame_rate:     %f\n",mFormat.u.raw_audio.frame_rate);
+	DPRINTF("  channel_count:  %ld\n",mFormat.u.raw_audio.channel_count);
+	DPRINTF("  byte_order:     %ld (",mFormat.u.raw_audio.byte_order);
 	switch (mFormat.u.raw_audio.byte_order) {
-		case B_MEDIA_BIG_ENDIAN: printf("B_MEDIA_BIG_ENDIAN)\n"); break;
-		case B_MEDIA_LITTLE_ENDIAN: printf("B_MEDIA_LITTLE_ENDIAN)\n"); break;
-		default: printf("unknown)\n"); break;
+		case B_MEDIA_BIG_ENDIAN: DPRINTF("B_MEDIA_BIG_ENDIAN)\n"); break;
+		case B_MEDIA_LITTLE_ENDIAN: DPRINTF("B_MEDIA_LITTLE_ENDIAN)\n"); break;
+		default: DPRINTF("unknown)\n"); break;
 	}
-	printf("  buffer_size:    %ld\n",mFormat.u.raw_audio.buffer_size);
-	printf("  format:         %ld (",mFormat.u.raw_audio.format);
+	DPRINTF("  buffer_size:    %ld\n",mFormat.u.raw_audio.buffer_size);
+	DPRINTF("  format:         %ld (",mFormat.u.raw_audio.format);
 	switch (mFormat.u.raw_audio.format) {
-		case media_raw_audio_format::B_AUDIO_FLOAT: printf("B_AUDIO_FLOAT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_SHORT: printf("B_AUDIO_SHORT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_INT: printf("B_AUDIO_INT)\n"); break;
-		case media_raw_audio_format::B_AUDIO_CHAR: printf("B_AUDIO_CHAR)\n"); break;
-		case media_raw_audio_format::B_AUDIO_UCHAR: printf("B_AUDIO_UCHAR)\n"); break;
-		default: printf("unknown)\n"); break;
+		case media_raw_audio_format::B_AUDIO_FLOAT: DPRINTF("B_AUDIO_FLOAT)\n"); break;
+		case media_raw_audio_format::B_AUDIO_SHORT: DPRINTF("B_AUDIO_SHORT)\n"); break;
+		case media_raw_audio_format::B_AUDIO_INT: DPRINTF("B_AUDIO_INT)\n"); break;
+		case media_raw_audio_format::B_AUDIO_CHAR: DPRINTF("B_AUDIO_CHAR)\n"); break;
+		case media_raw_audio_format::B_AUDIO_UCHAR: DPRINTF("B_AUDIO_UCHAR)\n"); break;
+		default: DPRINTF("unknown)\n"); break;
 	}
 }
 
@@ -636,7 +642,7 @@ _SoundPlayNode::HandleSeek(
 						bool realTimeEvent = false)
 {
 	CALLED();
-	PRINT(("_SoundPlayNode::HandleSeek(t=%lld,d=%li,bd=%lld)\n",event->event_time,event->data,event->bigdata));
+	DPRINTF("_SoundPlayNode::HandleSeek(t=%lld,d=%li,bd=%lld)\n",event->event_time,event->data,event->bigdata);
 	return B_OK;
 }
 						
@@ -682,8 +688,8 @@ _SoundPlayNode::AllocateBuffers()
 	size_t size = mOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(mLatency / BufferDuration() + 1 + 1);
 
-	PRINT(("\tlatency = %Ld, buffer duration = %Ld\n", mLatency, BufferDuration()));
-	PRINT(("\tcreating group of %ld buffers, size = %lu\n", count, size));
+	DPRINTF("\tlatency = %Ld, buffer duration = %Ld\n", mLatency, BufferDuration());
+	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
 	mBufferGroup = new BBufferGroup(size, count);
 }
 
@@ -733,12 +739,10 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 		stamp = mStartTime + bigtime_t(double(mFramesSent) / double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
 	}
 	hdr->start_time = stamp;
-	PRINT(("TimeSource()->Now() : %li\n", TimeSource()->Now()));
-	PRINT(("hdr->start_time : %li\n", hdr->start_time));
-	PRINT(("mFramesSent : %li\n", mFramesSent));
-	PRINT(("mOutput.format.u.raw_audio.frame_rate : %f\n", mOutput.format.u.raw_audio.frame_rate));
+	DPRINTF("TimeSource()->Now() : %li\n", TimeSource()->Now());
+	DPRINTF("hdr->start_time : %li\n", hdr->start_time);
+	DPRINTF("mFramesSent : %li\n", mFramesSent);
+	DPRINTF("mOutput.format.u.raw_audio.frame_rate : %f\n", mOutput.format.u.raw_audio.frame_rate);
 	
 	return buf;
 }
-
-
