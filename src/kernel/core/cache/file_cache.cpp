@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "vnode_store.h"
@@ -465,6 +465,9 @@ extern "C" void
 file_cache_delete(void *_cacheRef)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	if (ref == NULL)
+		return;
 
 	vfs_vnode_release_ref(ref->device);
 	delete ref;
