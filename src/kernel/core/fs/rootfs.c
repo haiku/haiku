@@ -3,24 +3,21 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
+#include <KernelExport.h>
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
-#include <malloc.h>
 #include <lock.h>
 #include <vm.h>
-#include <Errors.h>
-#include <kerrors.h>
-#include <sys/stat.h>
 
-#include <KernelExport.h>
 #include <NodeMonitor.h>
 
+#include <sys/stat.h>
+#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "rootfs.h"
+#include "builtin_fs.h"
 
 
 #define ROOTFS_TRACE 0
@@ -103,18 +100,26 @@ rootfs_vnode_compare_func(void *_v, const void *_key)
 
 
 static struct rootfs_vnode *
-rootfs_create_vnode(struct rootfs *fs)
+rootfs_create_vnode(struct rootfs *fs, const char *name, int type)
 {
-	struct rootfs_vnode *v;
+	struct rootfs_vnode *vnode;
 
-	v = malloc(sizeof(struct rootfs_vnode));
-	if (v == NULL)
+	vnode = malloc(sizeof(struct rootfs_vnode));
+	if (vnode == NULL)
 		return NULL;
 
-	memset(v, 0, sizeof(struct rootfs_vnode));
-	v->id = fs->next_vnode_id++;
+	memset(vnode, 0, sizeof(struct rootfs_vnode));
 
-	return v;
+	vnode->name = strdup(name);
+	if (vnode->name == NULL) {
+		free(vnode);
+		return NULL;
+	}
+
+	vnode->id = fs->next_vnode_id++;
+	vnode->stream.type = type;
+
+	return vnode;
 }
 
 
@@ -279,7 +284,7 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 
 	fs = malloc(sizeof(struct rootfs));
 	if (fs == NULL)
-		return ENOMEM;
+		return B_NO_MEMORY;
 
 	fs->id = id;
 	fs->next_vnode_id = 0;
@@ -291,27 +296,18 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr)&vnode->all_next - (addr)vnode,
 		&rootfs_vnode_compare_func, &rootfs_vnode_hash_func);
 	if (fs->vnode_list_hash == NULL) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err2;
 	}
 
 	// create the root vnode
-	vnode = rootfs_create_vnode(fs);
+	vnode = rootfs_create_vnode(fs, "", STREAM_TYPE_DIR);
 	if (vnode == NULL) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err3;
 	}
-
-	// set it up
 	vnode->parent = vnode;
-	vnode->name = strdup("");
-	if (vnode->name == NULL) {
-		err = ENOMEM;
-		goto err4;
-	}
 
-	vnode->stream.type = STREAM_TYPE_DIR;
-	vnode->stream.dir.dir_head = NULL;
 	fs->root_vnode = vnode;
 	hash_insert(fs->vnode_list_hash, vnode);
 
@@ -320,8 +316,6 @@ rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_
 
 	return 0;
 
-err4:
-	rootfs_delete_vnode(fs, vnode, true);
 err3:
 	hash_uninit(fs->vnode_list_hash);
 err2:
@@ -347,7 +341,7 @@ rootfs_unmount(fs_volume _fs)
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_list_hash, &i);
-	while((v = (struct rootfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
+	while ((v = (struct rootfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
 		rootfs_delete_vnode(fs, v, true);
 	}
 	hash_close(fs->vnode_list_hash, &i, false);
@@ -562,7 +556,6 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 	struct rootfs_vnode *vnode;
-	bool created_vnode = false;
 	status_t status = 0;
 
 	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n", dir, name, perms,*new_vnid, new_vnid));
@@ -576,18 +569,11 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	}
 
 	dprintf("rootfs_create: creating new vnode\n");
-	vnode = rootfs_create_vnode(fs);
+	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_DIR);
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
 	}
-	created_vnode = true;
-	vnode->name = strdup(name);
-	if (vnode->name == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-	vnode->stream.type = STREAM_TYPE_DIR;
 	vnode->parent = dir;
 	rootfs_insert_in_dir(dir, vnode);
 
@@ -601,9 +587,6 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	mutex_unlock(&fs->lock);	
 	return 0;
 
-err1:
-	if (created_vnode)
-		rootfs_delete_vnode(fs, vnode, false);
 err:
 	mutex_unlock(&fs->lock);
 
@@ -762,7 +745,6 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
 	struct rootfs_vnode *vnode;
-	bool created_vnode = false;
 	status_t status = 0;
 
 	TRACE(("rootfs_symlink: dir %p, name = '%s', path = %s\n", dir, name, path));
@@ -776,18 +758,11 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	}
 
 	dprintf("rootfs_create: creating new symlink\n");
-	vnode = rootfs_create_vnode(fs);
+	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_SYMLINK);
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
 		goto err;
 	}
-	created_vnode = true;
-	vnode->name = strdup(name);
-	if (vnode->name == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
-	}
-	vnode->stream.type = STREAM_TYPE_SYMLINK;
 	vnode->parent = dir;
 	rootfs_insert_in_dir(dir, vnode);
 
@@ -795,7 +770,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 
 	vnode->stream.symlink.path = strdup(path);
 	if (vnode->stream.symlink.path == NULL) {
-		status = ENOMEM;
+		status = B_NO_MEMORY;
 		goto err1;
 	}
 	vnode->stream.symlink.length = strlen(path);
@@ -806,8 +781,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	return 0;
 
 err1:
-	if (created_vnode)
-		rootfs_delete_vnode(fs, vnode, false);
+	rootfs_delete_vnode(fs, vnode, false);
 err:
 	mutex_unlock(&fs->lock);
 	return status;
@@ -842,7 +816,7 @@ rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 
 	v1 = rootfs_find_in_dir(olddir, oldname);
 	if (!v1) {
-		err = ERR_VFS_PATH_NOT_FOUND;
+		err = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
 
@@ -852,7 +826,7 @@ rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 		// rename to a different name in the same dir
 		if (v2) {
 			// target node exists
-			err = ERR_VFS_ALREADY_EXISTS;
+			err = B_NAME_IN_USE;
 			goto err;
 		}
 
@@ -867,7 +841,7 @@ rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 			if (!v1->name) {
 				// bad place to be, at least restore
 				v1->name = ptr;
-				err = ENOMEM;
+				err = B_NO_MEMORY;
 				goto err;
 			}
 			free(ptr);
