@@ -55,12 +55,15 @@ main(int argc, char **argv)
 		"",
 		"next monday 3:00",
 		"thursday 4:42",
+		"thursday +4:42",
 		"this thursday 4:42",
 		"42 minutes",
+		"2 weeks",
 		"next 5 minutes",
 		"last 15 minutes",
 		"-15 minutes",
 		"3:33pm GMT",
+		"Mon, June 10th, 1993 10:00:03 am GMT",
 		NULL
 	};
 
@@ -68,7 +71,7 @@ main(int argc, char **argv)
 	time_t now = time(NULL);
 	for (int i = 0; i < 500000; i++) {
 		int flags = 0;
-		time_t result = parsedate_etc(dates[0], now, &flags);
+		parsedate_etc(dates[0], now, &flags);
 	}
 #else
 	// this crashes the R5 version but not ours:
