@@ -15,6 +15,7 @@
 #include <Path.h>
 #include <Entry.h>
 #include <Mime.h>
+#include <NodeInfo.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -63,6 +64,7 @@ class Translator {
 		status_t Indirectly(BFile &input, BFile &output);
 		status_t FindPath(const translation_format *info, BPositionIO &stream,
 					TypeList &typesSeen, TypeList &path, double &pathQuality);
+		status_t GetMimeTypeFromCode(uint32 type, char *mimeType);
 
 	private:
 		BTranslatorRoster *fRoster;
@@ -257,6 +259,17 @@ Translator::Translate()
 
 		// add filetype attribute
 		update_mime_info(fOutputPath.Path(), false, true, false);
+
+		char mimeType[B_ATTR_NAME_LENGTH];
+		BNode node(fOutputPath.Path());
+		BNodeInfo info(&node);
+		if (info.GetType(mimeType) != B_OK || !strcasecmp(mimeType, B_FILE_MIME_TYPE)) {
+			// the Registrar couldn't find a type for this file
+			// so let's use the information we have from the
+			// translator
+			if (GetMimeTypeFromCode(fOutputFormat, mimeType) == B_OK)
+				info.SetType(mimeType);
+		}
 	} else {
 		fprintf(stderr, "%s: translating failed: %s\n",
 			gProgramName, strerror(status));
@@ -437,6 +450,36 @@ Translator::FindPath(const translation_format *format, BPositionIO &stream,
 }
 
 
+status_t
+Translator::GetMimeTypeFromCode(uint32 type, char *mimeType)
+{
+	translator_id *ids = NULL;
+	int32 count;
+	status_t status = fRoster->GetAllTranslators(&ids, &count);
+	if (status != B_OK)
+		return status;
+
+	status = B_NO_TRANSLATOR;
+
+	for (int32 i = 0; i < count; i++) {
+		const translation_format *format = NULL;
+		int32 formatCount = 0;
+		fRoster->GetOutputFormats(ids[i], &format, &formatCount);
+
+		for (int32 j = 0; j < formatCount; j++) {
+			if (type == format[j].type) {
+				strcpy(mimeType, format[j].MIME);
+				status = B_OK;
+				break;
+			}
+		}
+	}
+
+	delete[] ids;
+	return status;
+}
+
+
 //	#pragma mark -
 
 
@@ -596,9 +639,9 @@ TranslateApp::GetTypeCodeForOutputMime(const char *mime)
 		int32 count = 0;
 		fTranslatorRoster->GetOutputFormats(fTranslatorArray[i], &format, &count);
 
-		for (int32 ii = 0; ii < count; ii++) {
-			if (!strcmp(mime, format[ii].MIME))
-				return format[ii].type;
+		for (int32 j = 0; j < count; j++) {
+			if (!strcmp(mime, format[j].MIME))
+				return format[j].type;
 		}
 	}
 
