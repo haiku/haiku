@@ -10,6 +10,7 @@
 
 #include <KDiskDevice.h>
 #include <KDiskDeviceManager.h>
+#include <KDiskDeviceUtils.h>
 
 const char *kTestFileDevice = "/boot/home/tmp/test-file-device";
 
@@ -23,13 +24,21 @@ main()
 	partition_id id = manager->CreateFileDevice(kTestFileDevice);
 	if (id < B_OK)
 		printf("creating the file device failed: %s\n", strerror(id));
-	if (manager->Lock()) {
-		for (int32 cookie = 0;
-			 KDiskDevice *device = manager->NextDevice(&cookie); ) {
+	// wait for scanning jobs to finish
+	for (;;) {
+		if (ManagerLocker locker = manager) {
+			if (manager->CountJobs() == 0)
+				break;
+		}
+	}
+	// print devices
+	for (int32 cookie = 0;
+		 KDiskDevice *device = manager->RegisterNextDevice(&cookie); ) {
+		PartitionRegistrar _(device, true);
+		if (DeviceReadLocker locker = device) {
 			device->Dump();
 			printf("\n");
 		}
-		manager->Unlock();
 	}
 
 //	error = manager->DeleteFileDevice(kTestFileDevice);
