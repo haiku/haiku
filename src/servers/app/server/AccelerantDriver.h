@@ -130,6 +130,14 @@ protected:
 	int card_fd;
 	image_id accelerant_image;
 	GetAccelerantHook accelerant_hook;
+        engine_token *mEngineToken;
+        acquire_engine AcquireEngine;
+        release_engine ReleaseEngine;
+	fill_rectangle accFillRect;
+	invert_rectangle accInvertRect;
+	set_cursor_shape accSetCursorShape;
+	move_cursor accMoveCursor;
+	show_cursor accShowCursor;
 	frame_buffer_config mFrameBufferConfig;
 	int mode_count;
 	display_mode *mode_list;

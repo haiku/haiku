@@ -45,7 +45,6 @@
 #define CHECK_X(a) ( (a >= 0) || (a <= mDisplayMode.virtual_width-1) )
 #define CHECK_Y(a) ( (a >= 0) || (a <= mDisplayMode.virtual_height-1) )
 
-/* TODO: Need to check which functions should move the pen position */
 /* TODO: Add handling of draw modes */
 
 class AccLineCalc
@@ -270,6 +269,14 @@ bool AccelerantDriver::Initialize(void)
 	if ( GetFrameBufferConfig(&mFrameBufferConfig) != B_OK )
 		return false;
 
+	AcquireEngine = (acquire_engine)accelerant_hook(B_ACQUIRE_ENGINE,NULL);
+	ReleaseEngine = (release_engine)accelerant_hook(B_RELEASE_ENGINE,NULL);
+	accFillRect = (fill_rectangle)accelerant_hook(B_FILL_RECTANGLE,NULL);
+	accInvertRect = (invert_rectangle)accelerant_hook(B_INVERT_RECTANGLE,NULL);
+	accSetCursorShape = (set_cursor_shape)accelerant_hook(B_SET_CURSOR_SHAPE,NULL);
+	accMoveCursor = (move_cursor)accelerant_hook(B_MOVE_CURSOR,NULL);
+	accShowCursor = (show_cursor)accelerant_hook(B_SHOW_CURSOR,NULL);
+
 	return true;
 }
 
@@ -305,6 +312,7 @@ void AccelerantDriver::Shutdown(void)
 */
 void AccelerantDriver::CopyBits(BRect src, BRect dest)
 {
+  /* TODO: implement */
 }
 
 /*!
@@ -319,6 +327,7 @@ void AccelerantDriver::CopyBits(BRect src, BRect dest)
 */
 void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d)
 {
+  /* TODO: implement */
 }
 
 /*!
@@ -515,6 +524,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	float oldpensize;
 	BPoint center(xc,yc);
 
+        /* TODO: Fix this */
 	/* This should be optimized later.  It is quick for the filled quadrants, but
 	   is inefficient for the partially filled quadrants.
 	 */
@@ -691,6 +701,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
 	float oldpensize;
 
+        /* TODO: Fix this */
 	_Lock();
 	AccLineCalc line(pts[0], pts[3]);
 	oldpensize = d->pensize;
@@ -971,8 +982,86 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 */
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
-/* Need to add check for possible hardware acceleration of this */
 	_Lock();
+#ifndef DISABLE_HARDWARE_ACCELERATION
+	if ( accFillRect && AcquireEngine && (((uint8)*pat == 0xFF) || (*pat == 0)) )
+	{
+		bool solidColor = true;
+		int i;
+		for (i=1; i<8; i++)
+			if ( pat[i] != pat[i-1] )
+				solidColor = false;
+		if ( solidColor && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
+		{
+			fill_rect_params fillParams;
+			uint32 color=0;
+			fillParams.right = (uint16)r.right;
+			fillParams.left = (uint16)r.left;
+			fillParams.top = (uint16)r.top;
+			fillParams.bottom = (uint16)r.bottom;
+			if ( (uint8)*pat == 0xFF )
+			{
+				switch (mDisplayMode.space)
+				{
+					case B_CMAP8:
+					case B_GRAY8:
+						color = d->highcolor.GetColor8();
+						break;
+					case B_RGB16_BIG:
+					case B_RGB16_LITTLE:
+					case B_RGB15_BIG:
+					case B_RGBA15_BIG:
+					case B_RGB15_LITTLE:
+					case B_RGBA15_LITTLE:
+						color = d->highcolor.GetColor16();
+						break;
+					case B_RGB32_BIG:
+					case B_RGBA32_BIG:
+					case B_RGB32_LITTLE:
+					case B_RGBA32_LITTLE:
+					{
+						rgb_color rgbcolor = d->highcolor.GetColor32();
+						color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
+					}
+						break;
+				}
+			}
+			else
+			{
+				switch (mDisplayMode.space)
+				{
+					case B_CMAP8:
+					case B_GRAY8:
+						color = d->lowcolor.GetColor8();
+						break;
+					case B_RGB16_BIG:
+					case B_RGB16_LITTLE:
+					case B_RGB15_BIG:
+					case B_RGBA15_BIG:
+					case B_RGB15_LITTLE:
+					case B_RGBA15_LITTLE:
+						color = d->lowcolor.GetColor16();
+						break;
+					case B_RGB32_BIG:
+					case B_RGBA32_BIG:
+					case B_RGB32_LITTLE:
+					case B_RGBA32_LITTLE:
+					{
+						rgb_color rgbcolor = d->lowcolor.GetColor32();
+						color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
+					}
+						break;
+				}
+			}
+			accFillRect(mEngineToken, color, &fillParams, 1);
+			if ( ReleaseEngine )
+				ReleaseEngine(mEngineToken,NULL);
+			_Unlock();
+			return;
+		}
+	}
+#endif
+
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
@@ -1202,10 +1291,14 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 */
 void AccelerantDriver::HideCursor(void)
 {
-  /* Need to check for hardware cursor support */
 	_Lock();
 	if(!IsCursorHidden())
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	{
+		if ( accShowCursor )
+			accShowCursor(false);
+		else
+			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	}
 	DisplayDriver::HideCursor();
 	_Unlock();
 }
@@ -1222,16 +1315,23 @@ void AccelerantDriver::HideCursor(void)
 */
 void AccelerantDriver::MoveCursorTo(float x, float y)
 {
-  /* Need to check for hardware cursor support */
+	/* TODO: Add correct handling of obscured cursors */
 	_Lock();
-	if(!IsCursorHidden())
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	if ( accMoveCursor )
+	{
+		accMoveCursor((uint16)x,(uint16)y);
+	}
+	else
+	{
+		if(!IsCursorHidden())
+			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
-	cursorframe.OffsetTo(x,y);
-	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+		cursorframe.OffsetTo(x,y);
+		ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
-	if(!IsCursorHidden())
-		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+		if(!IsCursorHidden())
+			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	}
 	
 	_Unlock();
 }
@@ -1242,9 +1342,20 @@ void AccelerantDriver::MoveCursorTo(float x, float y)
 */
 void AccelerantDriver::InvertRect(BRect r)
 {
-  /* Need to check for hardware support for this */
 	_Lock();
-
+	if ( accInvertRect && AcquireEngine && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
+	{
+		fill_rect_params fillParams;
+		fillParams.right = (uint16)r.right;
+		fillParams.left = (uint16)r.left;
+		fillParams.top = (uint16)r.top;
+		fillParams.bottom = (uint16)r.bottom;
+		accInvertRect(mEngineToken, &fillParams, 1);
+		if ( ReleaseEngine )
+			ReleaseEngine(mEngineToken,NULL);
+		_Unlock();
+		return;
+	}
 	switch (mDisplayMode.space)
 	{
 		case B_RGB32_BIG:
@@ -1258,7 +1369,7 @@ void AccelerantDriver::InvertRect(BRect r)
 			uint32 *index;
 			start = (uint32 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
 			start+=(int32)r.left;
-				
+
 			index = start;
 			for(int32 i=0;i<height;i++)
 			{
@@ -1269,7 +1380,7 @@ void AccelerantDriver::InvertRect(BRect r)
 				index = (uint32 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
 			}
 		}
-			break;
+		break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
 		{
@@ -1279,7 +1390,7 @@ void AccelerantDriver::InvertRect(BRect r)
 			uint16 *index;
 			start = (uint16 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
 			start+=(int32)r.left;
-				
+
 			index = start;
 			for(int32 i=0;i<height;i++)
 			{
@@ -1288,7 +1399,7 @@ void AccelerantDriver::InvertRect(BRect r)
 				index = (uint16 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
 			}
 		}
-			break;
+		break;
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB15_LITTLE:
@@ -1300,7 +1411,7 @@ void AccelerantDriver::InvertRect(BRect r)
 			uint16 *index;
 			start = (uint16 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
 			start+=(int32)r.left;
-				
+
 			index = start;
 			for(int32 i=0;i<height;i++)
 			{
@@ -1310,7 +1421,7 @@ void AccelerantDriver::InvertRect(BRect r)
 				index = (uint16 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
 			}
 		}
-			break;
+		break;
 		case B_CMAP8:
 		case B_GRAY8:
 		{
@@ -1320,7 +1431,7 @@ void AccelerantDriver::InvertRect(BRect r)
 			uint8 *index;
 			start = (uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row;
 			start+=(int32)r.left;
-				
+
 			index = start;
 			for(int32 i=0;i<height;i++)
 			{
@@ -1329,9 +1440,9 @@ void AccelerantDriver::InvertRect(BRect r)
 				index = (uint8 *)index+mFrameBufferConfig.bytes_per_row;
 			}
 		}
-			break;
+		break;
 		default:
-			break;
+		break;
 	}
 	_Unlock();
 }
@@ -1345,10 +1456,14 @@ void AccelerantDriver::InvertRect(BRect r)
 */
 void AccelerantDriver::ShowCursor(void)
 {
-  /* Need to check for hardware cursor support */
 	_Lock();
 	if(IsCursorHidden())
-		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	{
+		if ( accShowCursor )
+			accShowCursor(true);
+		else
+			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	}
 	DisplayDriver::ShowCursor();
 	_Unlock();
 }
@@ -1362,10 +1477,14 @@ void AccelerantDriver::ShowCursor(void)
 */
 void AccelerantDriver::ObscureCursor(void)
 {
-  /* Need to check for hardware cursor support */
 	_Lock();
 	if (!IsCursorHidden() )
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	{
+		if ( accShowCursor )
+			accShowCursor(false);
+		else
+			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	}
 	DisplayDriver::ObscureCursor();
 	_Unlock();
 }
@@ -1380,32 +1499,52 @@ void AccelerantDriver::ObscureCursor(void)
 */
 void AccelerantDriver::SetCursor(ServerCursor *csr)
 {
-  /* Need to check for hardware cursor support */
 	if(!csr)
 		return;
 		
 	_Lock();
+	if ( accSetCursorShape && (csr->BitsPerPixel() == 1) )
+	{
+		/* TODO: Need to fix transparency */
+		if(cursor)
+			delete cursor;
+		cursor=new ServerCursor(csr);
+		cursorframe.right=cursorframe.left+csr->Bounds().Width();
+		cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
+		uint16 width = (uint16)cursor->Bounds().Width();
+		uint16 height = (uint16)cursor->Bounds().Height();
+		uint16 hot_x = (uint16)cursor->GetHotSpot().x;
+		uint16 hot_y = (uint16)cursor->GetHotSpot().y;
+		uint8 *andMask = new uint8[width*height/8];
+		//uint8 *xorMask = new uint8[width*height/8];
+		memset(andMask,(uint8)255,width*height/8);
+		accSetCursorShape(width,height,hot_x,hot_y,andMask,cursor->Bits());
 
-	// erase old if visible
-	if(!IsCursorHidden() && under_cursor)
-		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+		delete[] andMask;
+		//delete[] xorMask;
+	}
+	else
+	{
+		// erase old if visible
+		if(!IsCursorHidden() && under_cursor)
+			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
-	if(cursor)
-		delete cursor;
-	if(under_cursor)
-		delete under_cursor;
+		if(cursor)
+			delete cursor;
+		if(under_cursor)
+			delete under_cursor;
 	
-	cursor=new ServerCursor(csr);
-	under_cursor=new ServerCursor(csr);
+		cursor=new ServerCursor(csr);
+		under_cursor=new ServerCursor(csr);
 	
-	cursorframe.right=cursorframe.left+csr->Bounds().Width();
-	cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
+		cursorframe.right=cursorframe.left+csr->Bounds().Width();
+		cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
 	
-	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+		ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
-	if(!IsCursorHidden())
-		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
-	
+		if(!IsCursorHidden())
+			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	}
 	_Unlock();
 }
 
@@ -1897,7 +2036,6 @@ void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *
 */
 void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
-	/* If this is called from userland, why does it include a layerdata parameter? */
 	_Lock();
 	
 	_Unlock();
@@ -1912,7 +2050,7 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *co
 */
 void AccelerantDriver::SetMode(int32 mode)
 {
-  /* Still needs some work to fine tune color hassles in picking the mode */
+  /* TODO: Still needs some work to fine tune color hassles in picking the mode */
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	int proposed_width, proposed_height, proposed_depth;
 	int i;
@@ -1956,6 +2094,7 @@ void AccelerantDriver::SetMode(int32 mode)
 */
 bool AccelerantDriver::DumpToFile(const char *path)
 {
+        /* TODO: impelement */
 	return false;
 }
 
@@ -2311,6 +2450,7 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pa
 */
 void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 {
+	/* TODO: Add hardware acceleration */
 	int x;
 	if ( x1 > x2 )
 	{
@@ -2366,6 +2506,7 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 */
 void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
 {
+	/* TODO: Add hardware acceleration */
 	int x, y1, y2;
 
 	if ( x1 > x2 )
@@ -2442,7 +2583,7 @@ void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, Patt
 */
 void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
 {
-	/* Need to check for hardware support for this. */
+	/* TODO: Need to check for hardware support for this. */
 	if(!sourcebmp)
 		return;
 
@@ -2571,7 +2712,7 @@ void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRe
 */
 void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect)
 {
-	/* Need to check for hardware support for this. */
+	/* TODO: Need to check for hardware support for this. */
 	if(!destbmp)
 		return;
 
