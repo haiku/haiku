@@ -17,7 +17,7 @@ TimeSourceObject::TimeSourceObject(const media_node &node) :
 {
 	printf("TimeSourceObject::TimeSourceObject enter\n");
 	delete_port(fControlPort);
-	fControlPort = -666;
+	fControlPort = -999666;
 	printf("TimeSourceObject::TimeSourceObject leave\n");
 }
 
