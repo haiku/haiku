@@ -1,16 +1,17 @@
 /*****************************************************************************/
-//               File: R4xTranslator.cpp
-//              Class: BR4xTranslator
+//               File: FuncTranslator.cpp
+//              Class: BFuncTranslator
 //             Author: Michael Wilber, Translation Kit Team
 // Originally Created: 2002-06-11
 //
-// Description: This class is a BTranslator based object for
-//              BeOS R4.0 and R4.5 type translators, aka, the translators
+// Description: This file contains the BTranslator based object for
+//              function based translators, aka, the translators
 //              that don't use the make_nth_translator() mechanism.
 //
 //              This class is used by the OpenBeOS BTranslatorRoster
-//              so that R4x translators, post R4.5 translators and private
-//              BTranslator objects could be accessed in the same way. 
+//              so that function based translators, make_nth_translator()
+//              translators and private BTranslator objects could be
+//              accessed in the same way.  
 //
 //
 // Copyright (c) 2002 OpenBeOS Project
@@ -34,7 +35,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <R4xTranslator.h>
+#include <FuncTranslator.h>
 
 // ---------------------------------------------------------------
 // Constructor
@@ -46,17 +47,17 @@
 // Parameters: kpData, data and function pointers that do all of
 //                     the useful work for this class
 //
-// Postconditions: If kpData is freed before the BR4xTranslator,
-//                 the BR4xTranslator will fail to work and 
+// Postconditions: If kpData is freed before the BFuncTranslator,
+//                 the BFuncTranslator will fail to work and 
 //                 could the computer to crash. kpData may point
 //                 to a translator add-on image, this image
 //                 should not be unloaded before the 
-//                 BR4xTranslator is freed.
+//                 BFuncTranslator is freed.
 //                 
 //
 // Returns:
 // ---------------------------------------------------------------
-BR4xTranslator::BR4xTranslator(const translator_data *kpData) : BTranslator()
+BFuncTranslator::BFuncTranslator(const translator_data *kpData) : BTranslator()
 {
 	fpData = new translator_data;
 	if (fpData) {
@@ -88,7 +89,7 @@ BR4xTranslator::BR4xTranslator(const translator_data *kpData) : BTranslator()
 //
 // Returns:
 // ---------------------------------------------------------------
-BR4xTranslator::~BR4xTranslator()
+BFuncTranslator::~BFuncTranslator()
 {
 	if (fpData) {
 		delete fpData;
@@ -110,7 +111,7 @@ BR4xTranslator::~BR4xTranslator()
 // Returns: NULL if fpData was not allocated successfully,
 //			or the short name of the translator otherwise
 // ---------------------------------------------------------------
-const char *BR4xTranslator::TranslatorName() const
+const char *BFuncTranslator::TranslatorName() const
 {
 	if (fpData)
 		return fpData->translatorName;
@@ -133,7 +134,7 @@ const char *BR4xTranslator::TranslatorName() const
 // Returns: NULL if fpData was not allocated successfully,
 //			or the verbose name of the translator otherwise
 // ---------------------------------------------------------------
-const char *BR4xTranslator::TranslatorInfo() const
+const char *BFuncTranslator::TranslatorInfo() const
 {
 	if (fpData)
 		return fpData->translatorInfo;
@@ -156,7 +157,7 @@ const char *BR4xTranslator::TranslatorInfo() const
 //			or the integer representation of the translator
 //			version otherwise
 // ---------------------------------------------------------------
-int32 BR4xTranslator::TranslatorVersion() const
+int32 BFuncTranslator::TranslatorVersion() const
 {
 	if (fpData)
 		return fpData->translatorVersion;
@@ -181,7 +182,7 @@ int32 BR4xTranslator::TranslatorVersion() const
 //			NULL if fpData is not allocated,
 //			or the list of supported input formats if all is well
 // ---------------------------------------------------------------
-const translation_format *BR4xTranslator::InputFormats(int32 *out_count) const
+const translation_format *BFuncTranslator::InputFormats(int32 *out_count) const
 {
 	if (!out_count)
 		return NULL;
@@ -213,7 +214,7 @@ const translation_format *BR4xTranslator::InputFormats(int32 *out_count) const
 //			NULL if fpData is not allocated,
 //			or the list of supported output formats if all is well
 // ---------------------------------------------------------------
-const translation_format *BR4xTranslator::OutputFormats(int32 *out_count) const
+const translation_format *BFuncTranslator::OutputFormats(int32 *out_count) const
 {
 	if (!out_count)
 		return NULL;
@@ -262,7 +263,7 @@ const translation_format *BR4xTranslator::OutputFormats(int32 *out_count) const
 //			         went wrong
 //          B_NO_TRANSLATOR if it can't
 // ---------------------------------------------------------------
-status_t BR4xTranslator::Identify(BPositionIO *inSource, 
+status_t BFuncTranslator::Identify(BPositionIO *inSource, 
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
@@ -300,7 +301,7 @@ status_t BR4xTranslator::Identify(BPositionIO *inSource,
 //			         went wrong
 //          some other value, if it feels like it
 // ---------------------------------------------------------------
-status_t BR4xTranslator::Translate(BPositionIO *inSource, 
+status_t BFuncTranslator::Translate(BPositionIO *inSource, 
 	const translator_info *inInfo, BMessage *ioExtension, uint32 outType, 
 	BPositionIO *outDestination)
 {
@@ -331,7 +332,7 @@ status_t BR4xTranslator::Translate(BPositionIO *inSource,
 //          anything else, whatever the translator feels like 
 //                         returning
 // ---------------------------------------------------------------
-status_t BR4xTranslator::MakeConfigurationView(BMessage *ioExtension,
+status_t BFuncTranslator::MakeConfigurationView(BMessage *ioExtension,
 	BView **outView, BRect *outExtent)
 {
 	if (fpData && fpData->MakeConfig)
@@ -356,7 +357,7 @@ status_t BR4xTranslator::MakeConfigurationView(BMessage *ioExtension,
 // Returns: B_ERROR, if function is not supported
 //          something else, if it is
 // ---------------------------------------------------------------
-status_t BR4xTranslator::GetConfigurationMessage(BMessage *ioExtension)
+status_t BFuncTranslator::GetConfigurationMessage(BMessage *ioExtension)
 {
 	if (fpData && fpData->GetConfigMessage)
 		return fpData->GetConfigMessage(ioExtension);
