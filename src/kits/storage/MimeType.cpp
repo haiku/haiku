@@ -1111,7 +1111,8 @@ BMimeType::SetSnifferRule(const char *rule)
 status_t
 BMimeType::CheckSnifferRule(const char *rule, BString *parseError)
 {
-	return NOT_IMPLEMENTED;
+	Sniffer::Rule snifferRule;	
+	return Sniffer::parse(rule, &snifferRule, parseError);
 }
 
 // GuessMimeType

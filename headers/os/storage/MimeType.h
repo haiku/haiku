@@ -17,6 +17,9 @@
 #include <File.h>
 #include <Entry.h>
 
+#include <sniffer/Rule.h>
+#include <sniffer/Parser.h>
+
 class BBitmap;
 class BResources;
 class BAppFileInfo;

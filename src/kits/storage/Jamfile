@@ -17,6 +17,12 @@ UsePrivateHeaders storage ;
 UsePublicHeaders storage ;
 UsePublicHeaders [ FDirName add-ons file_system ] ;
 
+# This is something of a hack until we get around to
+# compiling the sniffer code separately into an archive
+# that can just be linked into libstorage.so and the
+# registrar separately.
+SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
+
 SharedLibrary storage :
 	Directory.cpp
 	Entry.cpp
@@ -36,6 +42,8 @@ SharedLibrary storage :
 	ResourceItem.cpp
 	Resources.cpp
 	ResourceStrings.cpp
+	Parser.cpp		# Hack-o-rama
+	Rule.cpp		# Hack-o-rama
 	Statable.cpp
 	SymLink.cpp
 	Volume.cpp
