@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1093,11 +1093,12 @@ thread_init(kernel_args *args)
 		panic("arch_thread_init() failed!\n");
 
 	// create an idle thread for each cpu
-	for (i = 0; i < args->num_cpus; i++) {
-		char temp[64];
-		vm_region *region;
 
-		sprintf(temp, "idle_thread%d", i);
+	for (i = 0; i < args->num_cpus; i++) {
+		area_info info;
+		char temp[64];
+
+		sprintf(temp, "idle thread %d", i);
 		t = create_thread_struct(temp);
 		if (t == NULL) {
 			panic("error creating idle thread struct\n");
@@ -1107,14 +1108,14 @@ thread_init(kernel_args *args)
 		t->priority = B_IDLE_PRIORITY;
 		t->state = B_THREAD_RUNNING;
 		t->next_state = B_THREAD_READY;
-		sprintf(temp, "idle_thread%d_kstack", i);
+		sprintf(temp, "idle thread %d kstack", i);
 		t->kernel_stack_region_id = find_area(temp);
-		region = vm_get_region_by_id(t->kernel_stack_region_id);
-		if (!region)
+
+		if (get_area_info(t->kernel_stack_region_id, &info) != B_OK)
 			panic("error finding idle kstack region\n");
 
-		t->kernel_stack_base = region->base;
-		vm_put_region(region);
+		t->kernel_stack_base = (addr_t)info.address;
+
 		hash_insert(sThreadHash, t);
 		insert_thread_into_team(t->team, t);
 		sIdleThreads[i] = t;
@@ -1124,12 +1125,11 @@ thread_init(kernel_args *args)
 	}
 
 	// create a set of death stacks
+
 	sNumDeathStacks = smp_get_num_cpus();
-	if (sNumDeathStacks > 8*sizeof(sDeathStackBitmap)) {
-		/*
-		 * clamp values for really beefy machines
-		 */
-		sNumDeathStacks = 8*sizeof(sDeathStackBitmap);
+	if (sNumDeathStacks > 8 * sizeof(sDeathStackBitmap)) {
+		// clamp values for really beefy machines
+		sNumDeathStacks = 8 * sizeof(sDeathStackBitmap);
 	}
 	sDeathStackBitmap = 0;
 	sDeathStacks = (struct death_stack *)malloc(sNumDeathStacks * sizeof(struct death_stack));
