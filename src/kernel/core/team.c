@@ -1213,6 +1213,10 @@ get_process_group_locked(struct team *team, pid_t id)
 {
 	struct list *groups = &team->group->session->groups;
 	struct process_group *group = NULL;
+	
+	// ToDo: a process group lasts as long as its last member - and
+	//	that doesn't have to be the process leader. IOW we need
+	//	a separate hash table for those groups without a leader.
 
 	// a short cut when the current team's group is asked for
 	if (team->group->id == id)
@@ -1228,7 +1232,7 @@ get_process_group_locked(struct team *team, pid_t id)
 
 
 static status_t
-register_wait_for_any(struct team *team, thread_id child)
+update_wait_for_any(struct team *team, thread_id child, int32 change)
 {
 	struct process_group *group;
 	cpu_status state;
@@ -1238,7 +1242,7 @@ register_wait_for_any(struct team *team, thread_id child)
 
 	if (child == -1) {
 		// we only wait for children of the current team
-		atomic_add(&team->dead_children.wait_for_any, 1);
+		atomic_add(&team->dead_children.wait_for_any, change);
 		return B_OK;
 	}
 
@@ -1255,16 +1259,30 @@ register_wait_for_any(struct team *team, thread_id child)
 
 	if (group != NULL) {
 		for (team = group->teams; team; team = team->group_next) {
-			atomic_add(&team->dead_children.wait_for_any, 1);
+			atomic_add(&team->dead_children.wait_for_any, change);
 		}
 
-		atomic_add(&group->wait_for_any, 1);
+		atomic_add(&group->wait_for_any, change);
 	}
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
 	return group != NULL ? B_OK : B_BAD_THREAD_ID;
+}
+
+
+static status_t
+unregister_wait_for_any(struct team *team, thread_id child)
+{
+	update_wait_for_any(team, child, -1);
+}
+
+
+static status_t
+register_wait_for_any(struct team *team, thread_id child)
+{
+	update_wait_for_any(team, child, 1);
 }
 
 
@@ -1301,13 +1319,14 @@ get_team_death_entry(struct team *team, thread_id child, struct death_entry *dea
 
 static status_t
 get_death_entry(struct team *team, pid_t child, struct death_entry *death,
-	struct death_entry **_freeDeath)
+	sem_id *_waitSem, struct death_entry **_freeDeath)
 {
 	struct process_group *group;
 	status_t status;
 
 	if (child == -1 || child > 0) {
 		// wait for any children or a specific child of this team to die
+		*_waitSem = team->dead_children.sem;
 		return get_team_death_entry(team, child, death, _freeDeath);
 	} else if (child < 0) {
 		// we wait for all children of the specified process group
@@ -1327,6 +1346,7 @@ get_death_entry(struct team *team, pid_t child, struct death_entry *death,
 		}
 	}
 
+	*_waitSem = group->dead_child_sem;
 	return B_WOULD_BLOCK;
 }
 
@@ -1342,6 +1362,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 	struct team *team = thread_get_current_thread()->team;
 	struct death_entry death, *freeDeath = NULL;
 	status_t status = B_OK;
+	sem_id waitSem;
 	cpu_status state;
 
 	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
@@ -1373,7 +1394,7 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 
-		status = get_death_entry(team, child, &death, &freeDeath);
+		status = get_death_entry(team, child, &death, &waitSem, &freeDeath);
 
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
@@ -1384,23 +1405,30 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 
 		// there was no matching group/child we could wait for
 		if (status == B_BAD_THREAD_ID)
-			return B_BAD_THREAD_ID;
+			goto err;
 
-		if ((flags & WNOHANG) != 0)
-			return B_WOULD_BLOCK;
+		if ((flags & WNOHANG) != 0) {
+			status = B_WOULD_BLOCK;
+			goto err;
+		}
 
-		status = acquire_sem(team->dead_children.sem);
+		status = acquire_sem(waitSem);
 		if (status == B_INTERRUPTED)
-			return B_INTERRUPTED;
+			goto err;
 	}
 
 	free(freeDeath);
 
-	// when we got here, we have a valid death entry
+	// when we got here, we have a valid death entry, and
+	// already got unregistered from the team or group
 	*_returnCode = death.status;
 	*_reason = death.reason;
 
 	return death.thread;
+
+err:
+	unregister_wait_for_any(team, child);
+	return status;
 }
 
 
