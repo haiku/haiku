@@ -12,8 +12,10 @@
 #include <SymLink.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <Entry.h>
 #include <Path.h>
-#include <storage_support.h>
+#include "kernel_interface.h"
+#include "storage_support.h"
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {

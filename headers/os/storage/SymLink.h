@@ -14,7 +14,6 @@
 
 #include <Node.h>
 #include <StorageDefs.h>
-#include "kernel_interface.h"
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
