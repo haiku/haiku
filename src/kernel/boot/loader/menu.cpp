@@ -309,7 +309,9 @@ add_boot_volume_menu(Directory *bootVolume)
 
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new MenuItem("Rescan volumes"));
-	menu->AddItem(item = new MenuItem("Return to main manu"));
+	item->SetType(MENU_ITEM_NO_CHOICE);
+	menu->AddItem(item = new MenuItem("Return to main menu"));
+	item->SetType(MENU_ITEM_NO_CHOICE);
 
 	return menu;
 }
