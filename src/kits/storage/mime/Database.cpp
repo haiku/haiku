@@ -550,9 +550,19 @@ Database::GetAssociatedTypes(const char *extension, BMessage *types)
 	\c entry_ref.
 	
 	This version of GuessMimeType() combines the features of the other
-	versions: First the data of the given file are checked (sniffed).
-	If sniffing fails, the filename is examined for extensions. If this
-	fails, the "application/octet-stream" is returned.
+	versions, plus adds a few tricks of its own:
+	- If the entry is a meta mime entry (i.e. has a \c "META:TYPE" attribute),
+	  the type returned is \c "application/x-vnd.be-meta-mime".
+	- If the entry is a directory, the type returned is
+	  \c "application/x-vnd.be-directory".
+	- If the entry is a symlink, the type returned is
+	  \c "application/x-vnd.be-symlink".
+	- If the entry is a regular file, the file data is sniffed and, the
+	  type returned is the mime type with the matching rule of highest
+	  priority.
+	- If sniffing fails, the filename is checked for known extensions.
+	- If the extension check fails, the type returned is
+	  \c "application/octet-stream".
 	
 	\param ref Pointer to the entry_ref referring to the entry.
 	\param type Pointer to a pre-allocated BString which is set to the
@@ -565,13 +575,41 @@ status_t
 Database::GuessMimeType(const entry_ref *file, BString *result)
 {
 	status_t err = file && result ? B_OK : B_BAD_VALUE;
+
+	BNode node;
+	struct stat statData;
 	if (!err)
-		err = fSnifferRules.GuessMimeType(file, result);
-	if (err == kMimeGuessFailureError)
-		err = fAssociatedTypes.GuessMimeType(file, result);
-	if (err == kMimeGuessFailureError) {
-		result->SetTo(kGenericFileType);
-		err = B_OK;
+		err = node.SetTo(file);
+	if (!err) {
+		attr_info info;
+		if (node.GetAttrInfo(kTypeAttr, &info) == B_OK) {
+			// Check for a META:TYPE attribute
+			result->SetTo(kMetaMimeType);
+			BPath path(file);
+		} else {
+			// See if we have a directory, a symlink, or a vanilla file
+			err = node.GetStat(&statData);
+			if (!err) {
+				if (S_ISDIR(statData.st_mode)) {
+					// Directory
+					result->SetTo(kDirectoryType);		
+				} else if (S_ISLNK(statData.st_mode)) {
+					// Symlink
+					result->SetTo(kSymlinkType);		
+				} else if (S_ISREG(statData.st_mode)) {
+					// Vanilla file: sniff first
+					err = fSnifferRules.GuessMimeType(file, result);
+					// If that fails, check extensions
+					if (err == kMimeGuessFailureError)
+						err = fAssociatedTypes.GuessMimeType(file, result);
+					// If that fails, return the generic file type
+					if (err == kMimeGuessFailureError) {
+						result->SetTo(kGenericFileType);
+						err = B_OK;
+					}
+				}
+			}
+		}
 	}
 	return err;
 }
