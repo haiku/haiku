@@ -10,14 +10,16 @@
 static status_t nv10_nv20_dac2_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
-/* see if an analog VGA monitor is connected to DAC */
+/* see if an analog VGA monitor is connected to connector #2 */
 bool nv_dac2_crt_connected()
 {
 	uint32 output, dac;
 	bool present;
 
 	/* NOTE:
-	 * NV11 can't do this: It will report DAC1 status instead. */
+	 * NV11 can't do this: It will report DAC1 status instead because it HAS no
+	 * actual secondary DAC function. */
+	/* (It DOES have a secondary palette RAM and pixelclock PLL though.) */
 
 	/* save output connector setting */
 	output = DAC2R(OUTPUT);
@@ -46,12 +48,12 @@ bool nv_dac2_crt_connected()
 	if (DAC2R(TSTCTRL) & 0x10000000)
 	{
 		present = true;
-		LOG(4,("DAC2: CRT detected\n"));
+		LOG(4,("DAC2: CRT detected on connector #2\n"));
 	}
 	else
 	{
 		present = false;
-		LOG(4,("DAC2: no CRT detected\n"));
+		LOG(4,("DAC2: no CRT detected on connector #2\n"));
 	}
 
 	/* kill test signal routing

@@ -12,7 +12,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 static status_t g100_g400max_dac_sys_pll_find(
 	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
 
-/* see if an analog VGA monitor is connected to DAC */
+/* see if an analog VGA monitor is connected to connector #1 */
 bool nv_dac_crt_connected(void)
 {
 	uint32 output, dac;
@@ -43,12 +43,12 @@ bool nv_dac_crt_connected(void)
 	if (DACR(TSTCTRL) & 0x10000000)
 	{
 		present = true;
-		LOG(4,("DAC: CRT detected\n"));
+		LOG(4,("DAC: CRT detected on connector #1\n"));
 	}
 	else
 	{
 		present = false;
-		LOG(4,("DAC: no CRT detected\n"));
+		LOG(4,("DAC: no CRT detected on connector #1\n"));
 	}
 
 	/* kill test signal routing */

@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-16 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-17 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1028,8 +1028,8 @@ static status_t nv_general_bios_to_powergraphics()
 	if (si->ps.secondary_head)
 	{
 		/* switch overlay engine to CRTC1 */
-		/* bit 17: GPU FP port #2	(confirmed NV25, NV28, confirmed not on NV34),
-		 * bit 16: GPU FP port #1	(confirmed NV25, NV28, confirmed not on NV34),
+		/* bit 17: GPU FP port #1	(confirmed NV25, NV28, confirmed not on NV34),
+		 * bit 16: GPU FP port #2	(confirmed NV25, NV28, NV34),
 		 * bit 12: overlay engine	(all cards),
 		 * bit  9: TVout chip #2	(confirmed on NV18, NV25, NV28),
 		 * bit  8: TVout chip #1	(all cards),

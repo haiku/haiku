@@ -266,10 +266,6 @@ status_t nv_crtc_set_timing(display_mode target)
 	{
 		uint32 iscale_x, iscale_y;
 
-		/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink) transmitters */
-//fixme: remove once DPMS confirmed OK!
-//		DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
-
 		/* calculate inverse scaling factors used by hardware in 20.12 format */
 		iscale_x = (((1 << 12) * target.timing.h_display) / si->ps.panel1_width);
 		iscale_y = (((1 << 12) * target.timing.v_display) / si->ps.panel1_height);
@@ -443,7 +439,8 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 		/* end synchronous reset if display should be enabled */
 		SEQW(RESET, 0x03);
 
-		if (si->ps.tmds1_active)
+		//'safe mode' test! feedback needed with this 'setting'!
+		if (0)//si->ps.tmds1_active)
 		{
 			/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
@@ -463,7 +460,8 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 	{
 		SEQW(CLKMODE, (temp | 0x20));
 
-		if (si->ps.tmds1_active)
+		//'safe mode' test! feedback needed with this 'setting'!
+		if (0)//si->ps.tmds1_active)
 		{
 			/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
