@@ -158,13 +158,14 @@ void StyledEditWindow::InitWindow(){
 	fMenuBar-> AddItem(menu);
 	
 	menu-> AddItem(menuItem= new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
-	menu-> AddItem(menuItem= new BMenuItem("Open...", new BMessage(MENU_OPEN), 'O'));
+	menu-> AddItem(menuItem= new BMenuItem(new BMenu("Open..."), new BMessage(MENU_OPEN)));
+	menuItem->SetShortcut('O',0);
 	menuItem->SetTarget(be_app);
 	menu-> AddSeparatorItem(); 
 	
 	menu-> AddItem(fSaveItem= new BMenuItem("Save", new BMessage(MENU_SAVE), 'S')); 
 	fSaveItem-> SetEnabled(false); 
-	menu-> AddItem(menuItem= new BMenuItem("Save as...", new BMessage(MENU_SAVEAS)));
+	menu-> AddItem(menuItem= new BMenuItem("Save As...", new BMessage(MENU_SAVEAS)));
 	menuItem-> SetEnabled(true);				
 	
 	menu-> AddItem(fRevertItem= new BMenuItem("Revert to Saved", new BMessage(MENU_REVERT))); 
