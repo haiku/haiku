@@ -188,10 +188,8 @@ BString::Adopt(BString &from, int32 length)
 BString&
 BString::SetTo(char c, int32 count)
 {
-	char *tmp = (char*)malloc(count);
-	memset(tmp, c, count);
-	_DoAssign(tmp, count);
-	free(tmp);
+	_GrowBy(count - Length());
+	memset(_privateData, c, count);
 	
 	return *this;	
 }
@@ -731,7 +729,7 @@ BString&
 BString::ReplaceLast(char replaceThis, char withThis)
 {
 	int32 pos = FindLast(replaceThis, Length());
-	if (pos <= Length())
+	if (pos >= 0)
 		_privateData[pos] = withThis;
 	return *this;
 }
@@ -769,7 +767,21 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 BString&
 BString::ReplaceFirst(const char *replaceThis, const char *withThis)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos = _FindAfter(replaceThis, 0, -1);
+	if (pos >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+	}
+		
 	return *this;
 }
 
@@ -777,7 +789,21 @@ BString::ReplaceFirst(const char *replaceThis, const char *withThis)
 BString&
 BString::ReplaceLast(const char *replaceThis, const char *withThis)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos = _FindBefore(replaceThis, Length(), -1);
+	if (pos >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+	}
+		
 	return *this;
 }
 
@@ -801,15 +827,21 @@ BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplace
 BString&
 BString::IReplaceFirst(char replaceThis, char withThis)
 {
-	//TODO: Implement
+	int32 pos = IFindFirst(replaceThis, 0);
+	if (pos >= 0)
+		_privateData[pos] = withThis;
+
 	return *this;
 }
 
 
 BString&
 BString::IReplaceLast(char replaceThis, char withThis)
-{
-	//TODO: Implement
+{	
+	int32 pos = IFindLast(replaceThis, 0);
+	if (pos >= 0)
+		_privateData[pos] = withThis;
+	
 	return *this;
 }
 
@@ -833,7 +865,21 @@ BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 
 BString&
 BString::IReplaceFirst(const char *replaceThis, const char *withThis)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos = _IFindAfter(replaceThis, 0, -1);
+	if (pos >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+	}
+		
 	return *this;
 }
 
@@ -841,7 +887,21 @@ BString::IReplaceFirst(const char *replaceThis, const char *withThis)
 BString&
 BString::IReplaceLast(const char *replaceThis, const char *withThis)
 {
-	//TODO: Implement
+	if (replaceThis == NULL)
+		return *this;
+	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos = _FindBefore(replaceThis, Length(), -1);
+	if (pos >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+	}
+		
 	return *this;
 }
 
@@ -1183,7 +1243,8 @@ BString::_DoPrepend(const char *str, int32 count)
 int32
 BString::_FindAfter(const char *str, int32 offset, int32) const
 {	
-	assert(str != NULL);
+	if (!str)
+		return 0;
 	
 	if (offset > Length())
 		return B_ERROR;
@@ -1200,7 +1261,9 @@ BString::_FindAfter(const char *str, int32 offset, int32) const
 int32
 BString::_IFindAfter(const char *str, int32 offset, int32 ) const
 {
-	assert(str != NULL);
+	if (!str)
+		return 0;
+
 	if (offset > Length())
 		return B_ERROR;
 
