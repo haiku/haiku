@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.11 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.12 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1061,8 +1061,11 @@ static status_t nv_general_bios_to_powergraphics()
 	 * Double-write action needed on those strange NV11 cards: */
 	/* RESET: don't doublebuffer CRTC access: set programmed values immediately... */
 	CRTCW(BUFFER, 0xff);
-	/* ... and keep fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
-	CRTCW(BUFFER, 0xfb);
+	/* ... and don't use fine pitched CRTC granularity on > NV4 cards (b2 = 1) */
+	/* note:
+	 * the higher-pitched CRTC granularity optimizes use of bandwidth so
+	 * less cards with trouble remain. Confirmed NV15 (GeForce2 Ti500). */
+	CRTCW(BUFFER, 0xff);
 	/* select VGA mode (old VGA register) */
 	CRTCW(MODECTL, 0xc3);
 	/* select graphics mode (old VGA register) */
@@ -1094,8 +1097,11 @@ static status_t nv_general_bios_to_powergraphics()
 		 * Double-write action needed on those strange NV11 cards: */
 		/* RESET: don't doublebuffer CRTC2 access: set programmed values immediately... */
 		CRTC2W(BUFFER, 0xff);
-		/* ... and keep fine pitched CRTC2 granularity (b2 = 0) */
-		CRTC2W(BUFFER, 0xfb);
+		/* ... and don't use fine pitched CRTC granularity on > NV4 cards (b2 = 1) */
+		/* note:
+		 * the higher-pitched CRTC granularity optimizes use of bandwidth so
+		 * less cards with trouble remain. Confirmed NV15 (GeForce2 Ti500). */
+		CRTC2W(BUFFER, 0xff);
 		/* select VGA mode (old VGA register) */
 		CRTC2W(MODECTL, 0xc3);
 		/* select graphics mode (old VGA register) */
@@ -1324,28 +1330,15 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* determine pixel multiple based on CRTC memory pitch constraints:
 	 * -> all NV cards have same granularity constraints on CRTC1 and CRTC2,
 	 *    provided that the CRTC1 and CRTC2 BUFFER register b2 = 0;
+	 * -> we use b2 = 1 because this lowers needed bandwidth on the card. This at
+	 *    least reduces distortions on cards that have not too much of it.
+	 *    (confirmed NV15: GeForce2 Ti500)
 	 *
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	if (0)
+	switch (si->ps.card_arch)
 	{
-		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
-		switch (target->space)
-		{
-			case B_CMAP8: crtc_mask = 0x1f; break;
-			case B_RGB15: crtc_mask = 0x0f; break;
-			case B_RGB16: crtc_mask = 0x0f; break;
-			case B_RGB24: crtc_mask = 0x1f; break;
-			case B_RGB32: crtc_mask = 0x07; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-	}
-	else
-	{
+	case NV04A:
 		/* confirmed for:
 		 * TNT1 always;
 		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
@@ -1368,6 +1361,23 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
+		break;
+	default:
+		/* confirmed for:
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x1f; break;
+			case B_RGB15: crtc_mask = 0x0f; break;
+			case B_RGB16: crtc_mask = 0x0f; break;
+			case B_RGB24: crtc_mask = 0x1f; break;
+			case B_RGB32: crtc_mask = 0x07; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
 	}
 
 	/* set virtual_width limit for accelerated modes */
@@ -1423,25 +1433,9 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	}
 
 	/* set virtual_width limit for unaccelerated modes */
-	if (0)
+	switch (si->ps.card_arch)
 	{
-		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
-		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
-		switch(target->space)
-		{
-			case B_CMAP8: max_crtc_width = 16352; break;
-			case B_RGB15: max_crtc_width =  8176; break;
-			case B_RGB16: max_crtc_width =  8176; break;
-			case B_RGB24: max_crtc_width =  5440; break;
-			case B_RGB32: max_crtc_width =  4088; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-	}
-	else
-	{
+	case NV04A:
 		/* confirmed for:
 		 * TNT1 always;
 		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
@@ -1464,6 +1458,23 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
+		break;
+	default:
+		/* confirmed for:
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
+		switch(target->space)
+		{
+			case B_CMAP8: max_crtc_width = 16352; break;
+			case B_RGB15: max_crtc_width =  8176; break;
+			case B_RGB16: max_crtc_width =  8176; break;
+			case B_RGB24: max_crtc_width =  5440; break;
+			case B_RGB32: max_crtc_width =  4088; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
 	}
 
 	/* check for acc capability, and adjust mode to adhere to hardware constraints */
