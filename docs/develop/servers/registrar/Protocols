@@ -6,8 +6,8 @@ Standard Replies
 
 standard success reply message
 
-reply:		- B_REG_SUCCESS
-			  [ <additional fields> ]
+reply:		B_REG_SUCCESS
+			[ <additional fields> ]
 
 fields:
 - <additional fields>: Request-specific fields.
@@ -16,16 +16,30 @@ fields:
 
 standard error reply message
 
-reply:		- B_REG_ERROR
-			  "error": B_INT32_TYPE
-			  [ "error_description": B_STRING_TYPE ]
-			  [ <additional fields> ]
+reply:		B_REG_ERROR
+			"error": B_INT32_TYPE
+			[ "error_description": B_STRING_TYPE ]
+			[ <additional fields> ]
 
 fields:
 - "error": The error code (a status_t).
 - "error_description": Optional human readable description.
 - <additional fields>: Request-specific fields.
 
+-----------------------------------------------------------------------
+
+standard general result reply message
+
+reply:		B_REG_RESULT
+			"result": B_INT32_TYPE
+			[ "result_description": B_STRING_TYPE ]
+			[ <additional fields> ]
+			  
+fields:
+- "result": The result value (a status_t).
+- "result_description": Optional human readable description.
+- <additional fields>: Request-specific fields.
+ 
 -----------------------------------------------------------------------
 
 
@@ -300,3 +314,122 @@ error reply fields:
   - ...
 
 -----------------------------------------------------------------------
+
+
+MIME Database Requests
+----------------------
+
+install a mime type (BMimeType::Install())
+
+target:		mime manager (BRoster::fMimeMess) 
+message:	B_REG_MIME_INSTALL
+			"type": B_STRING_TYPE
+reply:		standard general result
+
+message fields:
+- "type": The mime type
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_FILE_EXISTS: the type is already installed
+  - ...			
+
+-----------------------------------------------------------------------
+
+remove a mime type (BMimeType::Delete())
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_DELETE
+			"type": B_STRING_TYPE
+reply:		standard general result
+
+message fields:
+- "type": The mime type
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_ENTRY_NOT_FOUND: the type was not found
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
+set a specific attribute of a mime type (BMimeType::Set*()),
+installing if necessary
+
+target:		mime manager (BRoster::fMimeMess) 
+message:	B_REG_MIME_SET_PARAM
+			"type": B_STRING_TYPE
+			"which": B_INT32_TYPE
+			[ additional fields depending upon the "which" field (see below) ]
+			
+reply:		standard general result
+
+message fields:
+- "type": The mime type
+- "which": Which attribute to set. May be one of the following:
+
+    "which"                     additional message fields
+    -------------------------   ----------------------------
+# This is the format that we'll eventually use once we have
+# an OBOS::BBitmap implementation
+#	REG_MIME_ICON:				"icon archive": B_MESSAGE_TYPE,
+#								"icon size": B_INT32_TYPE
+	REG_MIME_ICON:				"icon data": B_RAW_TYPE,
+								"icon size": B_INT32_TYPE
+	REG_MIME_PREFERRED_APP:		"signature": B_STRING_TYPE,
+								"app verb": B_INT32_TYPE
+	REG_MIME_ATTR_INFO:			"attr info": B_MESSAGE_TYPE
+	REG_MIME_FILE_EXTENSIONS:	"extensions": B_STRING_TYPE[]
+	REG_MIME_DESCRIPTION:		"long": B_BOOL_TYPE,
+								"description": B_STRING_TYPE
+	REG_MIME_SNIFFER_RULE:		"sniffer rule": B_STRING_TYPE
+	REG_MIME_APP_HINT:			"app hint": B_REF_TYPE
+	REG_MIME_ICON_FOR_TYPE		"file type": B_STRING_TYPE,
+								"icon": B_RAW_TYPE,
+								"size": B_INT32_TYPE
+	REG_MIME_SUPPORTED_TYPES:	"types": B_STRING_TYPE[]
+	
+reply fields:
+- "result":
+  - B_OK: success
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
+subscribe a BMessenger to the MIME monitor service (BMimeType::StartWatching())
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_START_WATCHING
+			"target": B_MESSENGER_TYPE
+reply:		standard general result
+
+message fields:
+- "target": The BMessenger subscribing to the monitor service
+
+reply fields:
+- "result":
+  - B_OK: success
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
+unsubscribe a BMessenger from the MIME monitor service (BMimeType::StopWatching())
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_STOP_WATCHING
+			"target": B_MESSENGER_TYPE
+reply:		standard general result
+
+message fields:
+- "target": The BMessenger unsubscribing from the monitor service
+
+reply fields:
+- "result":
+  - B_OK: success
+  - B_ENTRY_NOT_FOUND: the given BMessenger was not subscribed to the service
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
