@@ -486,6 +486,14 @@ file_cache_set_size(void *_cacheRef, off_t size)
 
 
 extern "C" status_t
+file_cache_sync(void *_cacheRef)
+{
+	// ToDo: implement me!
+	return B_ERROR;
+}
+
+
+extern "C" status_t
 file_cache_read_pages(void *_cacheRef, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
