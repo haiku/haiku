@@ -31,6 +31,8 @@ SYSCALL0(_kern_null, 0)
 /* VFS calls */
 SYSCALL4(_kern_mount, 1)
 SYSCALL1(_kern_unmount, 2)
+SYSCALL2(_kern_read_fs_info, 66)
+SYSCALL3(_kern_write_fs_info, 67)
 SYSCALL0(_kern_sync, 3)
 SYSCALL5(_kern_dir_node_ref_to_path, 142)
 SYSCALL2(_kern_open, 4)
