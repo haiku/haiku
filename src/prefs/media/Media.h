@@ -9,15 +9,19 @@ Media Header by Sikosis
 #ifndef __MEDIA_H__
 #define __MEDIA_H__
 
-extern const char *APP_SIGNATURE;
+// Constants ------------------------------------------------------------------------------------------------- //
+const char *APP_SIGNATURE = "application/x-vnd.OBOS.Media";  // Application Signature and Title
+
+#include <Application.h>
+#include "MediaWindow.h"
 
 class Media : public BApplication
 {
 	public:
     	Media();
-	    virtual void MessageReceived(BMessage *message);
-	    
+	    	    
 	private:
+		MediaWindow   *mWindow;
 		
 };
 

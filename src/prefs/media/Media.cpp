@@ -7,51 +7,53 @@ Media by Sikosis
 */
 
 // Includes -------------------------------------------------------------------------------------------------- //
-#include <Alert.h>
-#include <Application.h>
-#include <Button.h>
-#include <Deskbar.h>
-#include <Entry.h>
-#include <File.h>
-#include <FilePanel.h>
-#include <ListView.h>
-#include <Path.h>
-#include <Screen.h>
-#include <ScrollView.h>
+#include <StorageKit.h>
+#include <String.h>
 #include <stdio.h>
-#include <string.h>
-#include <TextControl.h>
-#include <Window.h>
-#include <View.h>
-
 #include "Media.h"
-#include "MediaWindows.h"
-#include "MediaViews.h"
-#include "MediaConstants.h"
-// ---------------------------------------------------------------------------------------------------------- //
-
-MediaWindow   *ptrMediaWindow;
 
 // Media -- constructor 
-Media::Media() : BApplication (APP_SIGNATURE)
+Media::Media() 
+: BApplication (APP_SIGNATURE)
 {
-	// Default Window Size - even though we centre the form to the current screen size
-	//BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	BRect rect(32,64,637,442);
 	
-	float FormTopDefault = 0;
-	float FormLeftDefault = 0;
-	float FormWidthDefault = 654;
-	float FormHeightDefault = 392;
-	
-	BRect MediaWindowRect(FormTopDefault,FormLeftDefault,FormLeftDefault+FormWidthDefault,FormTopDefault+FormHeightDefault);
+	BPath path;
+	if(find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(SETTINGS_FILE);
+		BFile file(path.Path(),B_READ_ONLY);
+		if(file.InitCheck()==B_OK) {
+			char buffer[255];
+			ssize_t size = 0;
+			while((size = file.Read(buffer, 255))>0) {
+				int32 i=0;
+				while(buffer[i]=='#') {
+					while(i<size&&buffer[i]!='\n')
+						i++;
+					i++;
+				}
+				int32 a,b,c,d;
+				if(sscanf(&buffer[i], " rect = %i,%i,%i,%i", &a, &b, &c, &d)>0){
+					if(c-a>=int(rect.Width())) {
+						rect.left = a;
+						rect.right = c;
+					}
+					if(d-b>=int(rect.Height())) {
+						rect.top = b;
+						rect.bottom = d;
+					}
+				}
+			}		
+		}
+	}
 
-	ptrMediaWindow = new MediaWindow(MediaWindowRect);
+	mWindow = new MediaWindow(rect);
+	mWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
-
 // Media::MessageReceived -- handles incoming messages
-void Media::MessageReceived (BMessage *message)
+/*void Media::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
@@ -59,7 +61,7 @@ void Media::MessageReceived (BMessage *message)
     	    BApplication::MessageReceived(message); // pass it along ... 
         	break;
     }
-}
+}*/
 // ---------------------------------------------------------------------------------------------------------- //
 
 // Media Main

@@ -8,44 +8,45 @@ MediaViews Header by Sikosis
 
 #ifndef __MEDIAVIEWS_H__
 #define __MEDIAVIEWS_H__
+#include <CheckBox.h>
+#include <View.h>
+#include <MenuItem.h>
 
-#include "Media.h"
-#include "MediaWindows.h"
+const uint32 ML_RESTART_MEDIA_SERVER = 'resr';
+const uint32 ML_SHOW_VOLUME_CONTROL = 'shvc';
+const uint32 ML_ENABLE_REAL_TIME = 'enrt';
+const uint32 ML_DEFAULT_CHANGE = 'dech';
 
-class MediaView : public BView
+class BarView : public BView
 {
 	public:
-    	MediaView(BRect frame);
+    	BarView(BRect frame);
     	virtual	void	Draw(BRect updateRect);	
 };
 
-class IconView : public BView
+class SettingsItem : public BMenuItem
 {
 	public:
-    	IconView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
+		SettingsItem(dormant_node_info *info, BMessage *message, 
+			char shortcut = 0, uint32 modifiers = 0);
+		dormant_node_info *mInfo;
 };
 
-class AvailableViewArea : public BView
+class SettingsView : public BView
 {
 	public:
-    	AvailableViewArea(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
-};
+    	SettingsView(BRect frame, bool isVideo);
+    	void AddNodes(BList &list, bool isInput);
+    	void SetDefault(dormant_node_info &info, bool isInput);
+    	BCheckBox 		*mRealtimeCheckBox;
+    	BCheckBox 		*mVolumeCheckBox;
+    	BMenu 			*mMenu1;
+    	BMenu 			*mMenu2;
+    	BMenu			*mMenu3;
+    	BTextView		*mRestartTextView;
 
-class AudioSettingsView : public BView
-{
-	public:
-    	AudioSettingsView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
-};
-
-class AudioMixerView : public BView
-{
-	public:
-    	AudioMixerView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);	
-};
-
+    private:
+    	bool			mIsVideo;
+};	
 
 #endif
