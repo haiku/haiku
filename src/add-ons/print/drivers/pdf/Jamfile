@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src add-ons print drivers pdf ;
+
+SubInclude OBOS_TOP src add-ons print drivers pdf source ;

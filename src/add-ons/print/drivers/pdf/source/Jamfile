@@ -1,0 +1,39 @@
+SubDir OBOS_TOP src add-ons print drivers pdf source ;
+
+
+Addon 
+	PDF
+	:
+	add-ons/Print
+	:
+	AdvancedSettingsWindow.cpp
+	Bezier.cpp
+	Bookmark.cpp
+	DocInfoWindow.cpp
+	DrawShape.cpp
+	Driver.cpp
+	Fonts.cpp
+	FontsWindow.cpp
+	JobSetupWindow.cpp
+	LinePathBuilder.cpp
+	Link.cpp
+	MarginView.cpp
+	PDFLinePathBuilder.cpp
+	PDFText.cpp
+	PDFWriter.cpp
+	PageSetupWindow.cpp
+	PictureIterator.cpp
+	PrinterDriver.cpp
+	PrinterPrefs.cpp
+	PrinterSettings.cpp
+	PrinterSetupWindow.cpp
+	RegExp.cpp
+	Report.cpp
+	Scanner.cpp
+	StatusWindow.cpp
+	SubPath.cpp
+	Utils.cpp
+	XReferences.cpp	
+	;
+
+LinkSharedOSLibs   PDF : be textencoding translation /boot/home/config/lib/libpdf.so  ;
