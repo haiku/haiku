@@ -73,8 +73,8 @@ void tcp_init(void)
 	tcp_iss = 1;
 	
 	tcb.inp_next = tcb.inp_prev = &tcb;
-	if (max_protohdr < sizeof(struct tcpiphdr))
-		max_protohdr = sizeof(struct tcpiphdr);
+	if (get_max_protohdr() < sizeof(struct tcpiphdr))
+		set_max_protohdr(sizeof(struct tcpiphdr));
 	memset(&tcpstat, 0, sizeof(struct tcpstat));
 		
 	memset(proto, 0, sizeof(struct protosw *) * IPPROTO_MAX);
@@ -238,7 +238,7 @@ void tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
 		if (!m)
 			return;
 		tlen = 0;
-		m->m_data += max_linkhdr;
+		m->m_data += get_max_linkhdr();
 		*mtod(m, struct tcpiphdr*) = *ti;
 		ti = mtod(m, struct tcpiphdr*);
 		flags = TH_ACK;

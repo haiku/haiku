@@ -151,7 +151,7 @@ static struct mbuf *ip_insertoptions(struct mbuf *m, struct mbuf *opt, int *phle
 		n->m_next = m;
 		m = n;
 		m->m_len = optlen + sizeof(struct ip);
-		m->m_data += max_linkhdr;
+		m->m_data += get_max_linkhdr();
 		memcpy(mtod(m, void *), ip, sizeof(struct ip));
 	} else {
 		m->m_data -= optlen;
@@ -965,7 +965,7 @@ static int ipv4_output(struct mbuf *m0, struct mbuf *opt, struct route *ro,
 				ipstat.ips_odropped++;
 				goto sendorfree;
 			}
-			m->m_data += max_linkhdr;
+			m->m_data += get_max_linkhdr();
 			mhip = mtod(m, struct ip*);
 			*mhip = *ip;
 			if (hlen > sizeof(struct ip)) {
