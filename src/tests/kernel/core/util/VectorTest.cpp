@@ -428,7 +428,27 @@ public:
 		return result;
 	}
 
-	Iterator Find(const Value &value, const Iterator &_start = Begin())
+	Iterator Find(const Value &value)
+	{
+		Iterator start(Begin());
+		if (start.fReferenceIterator != fReferenceVector.end()) {
+			for (; start.fReferenceIterator != fReferenceVector.end();
+				 ++start.fReferenceIterator, ++start.fMyIterator) {
+				if (*start.fReferenceIterator == value) {
+					MyIterator myIt = fMyVector.Find(value);
+					CHK(&*myIt == &*start.fMyIterator);
+					return start;
+				}
+			}
+			CHK(fMyVector.Find(value) == fMyVector.End());
+			CHK(start.fMyIterator == fMyVector.End());
+			return start;
+		}
+		CHK(fMyVector.Find(value) == fMyVector.End());
+		return start;
+	}
+
+	Iterator Find(const Value &value, const Iterator &_start)
 	{
 		Iterator start(_start);
 		if (start.fReferenceIterator != fReferenceVector.end()) {
@@ -449,8 +469,27 @@ public:
 		return start;
 	}
 
-	ConstIterator Find(const Value &value,
-					   const ConstIterator &_start = Begin()) const
+	ConstIterator Find(const Value &value) const
+	{
+		ConstIterator start(Begin());
+		if (start.fReferenceIterator != fReferenceVector.end()) {
+			for (; start.fReferenceIterator != fReferenceVector.end();
+				 ++start.fReferenceIterator, ++start.fMyIterator) {
+				if (*start.fReferenceIterator == value) {
+					MyConstIterator myIt = fMyVector.Find(value);
+					CHK(&*myIt == &*start.fMyIterator);
+					return start;
+				}
+			}
+			CHK(fMyVector.Find(value) == fMyVector.End());
+			CHK(start.fMyIterator == fMyVector.End());
+			return start;
+		}
+		CHK(fMyVector.Find(value) == fMyVector.End());
+		return start;
+	}
+
+	ConstIterator Find(const Value &value, const ConstIterator &_start) const
 	{
 		ConstIterator start(_start);
 		if (start.fReferenceIterator != fReferenceVector.end()) {
@@ -831,6 +870,7 @@ GenericFindTest(ValueStrategy strategy, int32 maxNumber)
 	typedef typename ValueStrategy::Value Value;
 	TestVector<Value> v;
 	GenericFill(v, strategy, maxNumber);
+	// find the values in the vector
 	const TestVector<Value> &cv = v;
 	for (int32 i = 0; i < maxNumber; i++) {
 		TestVector<Value>::ConstIterator cit = cv.Begin();
@@ -843,6 +883,14 @@ GenericFindTest(ValueStrategy strategy, int32 maxNumber)
 			cit = cv.Find(cv[i], ++cit);
 			index = v.IndexOf(v[i], index + 1);
 		}
+	}
+	// try to find some random values
+	for (int32 i = 0; i < maxNumber; i++) {
+		Value value = strategy.Generate();
+		TestVector<Value>::Iterator it = v.Find(value);
+		TestVector<Value>::ConstIterator cit = cv.Find(value);
+		if (it != v.End())
+			CHK(&*it == &*cit);
 	}
 }
 
