@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-1/2004.
+	Rudolf Cornelissen 5/2002-4/2004.
 */
 
 /* standard kernel driver stuff */
@@ -483,11 +483,13 @@ static status_t map_device(device_info *di)
 	case 0x0001:
 		/* NM2070 cards */
 		di->regs = (uint32 *)((uint8 *)si->framebuffer + 0x100000);
+ 		si->clone_bugfix_regs = (uint32 *) di->regs;
 		break;
 	case 0x0002:
 	case 0x0003:
 		/* NM2090 and NM2093 cards */
 		di->regs = (uint32 *)((uint8 *)si->framebuffer + 0x200000);
+ 		si->clone_bugfix_regs = (uint32 *) di->regs;
 		break;
 	}
 

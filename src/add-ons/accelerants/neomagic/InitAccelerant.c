@@ -46,16 +46,9 @@ static status_t init_common(int the_fd) {
 	{
 		/* we can't clone as no register area exists! */
 		LOG(2,("InitACC: Can't clone register area, integrated in framebuffer!\n"));
-		switch (si->ps.card_type)
-		{
-		case NM2070:
-			regs = (uint32 *)((uint8 *)si->framebuffer + 0x100000);
-			break;
-		case NM2090:
-		case NM2093:
-			regs = (uint32 *)((uint8 *)si->framebuffer + 0x200000);
-			break;
-		}
+
+		/* the kerneldriver already did some calcs for us */
+		regs = si->clone_bugfix_regs;
 		/* not used */
 		regs2 = 0;
 	}
