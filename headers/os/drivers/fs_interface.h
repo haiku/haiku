@@ -1,14 +1,15 @@
 /* File System Interface Layer Definition
 ** 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
-
 #ifndef _FS_INTERFACE_H
 #define _FS_INTERFACE_H
+
 
 #include <OS.h>
 #include <module.h>
 #include <vfs_types.h>
+
 
 struct dirent;
 struct stat;
@@ -36,6 +37,11 @@ enum write_stat_mask {
 /* passed to write_fs_info() */
 #define	FS_WRITE_FSINFO_NAME	0x0001
 
+struct file_io_vec {
+	off_t	offset;
+	off_t	length;
+};
+
 #define	B_CURRENT_FS_API_VERSION "/v1"
 
 #ifdef __cplusplus
@@ -62,9 +68,12 @@ typedef struct file_system_info {
 	status_t (*remove_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
 
 	/* VM file access */
-	status_t (*can_page)(fs_volume fs, fs_vnode v);
-	ssize_t (*read_pages)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
-	ssize_t (*write_pages)(fs_volume fs, fs_vnode v, iovecs *vecs, off_t pos);
+	bool (*can_page)(fs_volume fs, fs_vnode vnode);
+	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
+
+	/* cache file access */
+	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, struct file_io_vec *vecs, size_t *_count);
 
 	/* common operations */
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
