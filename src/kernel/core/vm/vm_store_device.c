@@ -1,4 +1,7 @@
 /*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -65,7 +68,7 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 {
 	struct device_store *store = (struct device_store *)_store;
 	vm_cache_ref *cache_ref = store->vm.cache->ref;
-	vm_region *region;
+	vm_area *area;
 
 //	dprintf("device_fault: offset 0x%x 0x%x + base_addr 0x%x\n", offset, d->base_addr);
 
@@ -74,15 +77,15 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 	(*aspace->translation_map.ops->lock)(&aspace->translation_map);
 
 	// cycle through all of the regions that map this cache and map the page in
-	for (region = cache_ref->region_list; region != NULL; region = region->cache_next) {
-		// make sure this page in the cache that was faulted on is covered in this region
-		if (offset >= region->cache_offset && (offset - region->cache_offset) < region->size) {
+	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
+		// make sure this page in the cache that was faulted on is covered in this area
+		if (offset >= area->cache_offset && (offset - area->cache_offset) < area->size) {
 //			dprintf("device_fault: mapping paddr 0x%x to vaddr 0x%x\n",
 //				(addr)(d->base_addr + offset),
-//				(addr)(region->base + (offset - region->cache_offset)));
+//				(addr)(area->base + (offset - area->cache_offset)));
 			(*aspace->translation_map.ops->map)(&aspace->translation_map,
-				region->base + (offset - region->cache_offset),
-				store->base_address + offset, region->lock);
+				area->base + (offset - area->cache_offset),
+				store->base_address + offset, area->protection);
 		}
 	}
 

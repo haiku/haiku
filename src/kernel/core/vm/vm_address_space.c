@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -58,7 +58,7 @@ static sem_id aspace_hash_sem;
 static void
 _dump_aspace(vm_address_space *aspace)
 {
-	vm_region *region;
+	vm_area *area;
 
 	dprintf("dump of address space at %p:\n", aspace);
 	dprintf("name: '%s'\n", aspace->name);
@@ -71,14 +71,14 @@ _dump_aspace(vm_address_space *aspace)
 	dprintf("virtual_map.size: 0x%lx\n", aspace->virtual_map.size);
 	dprintf("virtual_map.change_count: 0x%x\n", aspace->virtual_map.change_count);
 	dprintf("virtual_map.sem: 0x%lx\n", aspace->virtual_map.sem);
-	dprintf("virtual_map.region_hint: %p\n", aspace->virtual_map.region_hint);
+	dprintf("virtual_map.region_hint: %p\n", aspace->virtual_map.area_hint);
 	dprintf("virtual_map.region_list:\n");
-	for (region = aspace->virtual_map.region_list; region != NULL; region = region->aspace_next) {
-		dprintf(" region 0x%lx: ", region->id);
-		dprintf("base_addr = 0x%lx ", region->base);
-		dprintf("size = 0x%lx ", region->size);
-		dprintf("name = '%s' ", region->name);
-		dprintf("lock = 0x%x\n", region->lock);
+	for (area = aspace->virtual_map.areas; area != NULL; area = area->aspace_next) {
+		dprintf(" region 0x%lx: ", area->id);
+		dprintf("base_addr = 0x%lx ", area->base);
+		dprintf("size = 0x%lx ", area->size);
+		dprintf("name = '%s' ", area->name);
+		dprintf("protection = 0x%lx\n", area->protection);
 	}
 }
 
@@ -322,8 +322,8 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_add
 	// initialize the virtual map
 	aspace->virtual_map.base = base;
 	aspace->virtual_map.size = size;
-	aspace->virtual_map.region_list = NULL;
-	aspace->virtual_map.region_hint = NULL;
+	aspace->virtual_map.areas = NULL;
+	aspace->virtual_map.area_hint = NULL;
 	aspace->virtual_map.change_count = 0;
 	aspace->virtual_map.sem = create_sem(WRITE_COUNT, "aspacelock");
 	aspace->virtual_map.aspace = aspace;
@@ -366,7 +366,7 @@ vm_aspace_init(void)
 	next_aspace_id = 0;
 	aspace_hash_sem = -1;
 
-	// create the region and address space hash tables
+	// create the area and address space hash tables
 	{
 		vm_address_space *aspace;
 		aspace_table = hash_init(ASPACE_HASH_TABLE_SIZE, (addr_t)&aspace->hash_next - (addr_t)aspace,

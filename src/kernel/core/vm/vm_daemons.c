@@ -25,8 +25,8 @@ static addr_t free_memory_high_water;
 static void
 scan_pages(vm_address_space *aspace, addr_t free_target)
 {
-	vm_region *first_region;
-	vm_region *region;
+	vm_area *firstArea;
+	vm_area *area;
 	vm_page *page;
 	addr_t va;
 	addr_t pa;
@@ -38,30 +38,30 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 
 	acquire_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0, 0);
 
-	first_region = aspace->virtual_map.region_list;
-	while (first_region && (first_region->base + (first_region->size - 1)) < aspace->scan_va)
-		first_region = first_region->aspace_next;
+	firstArea = aspace->virtual_map.areas;
+	while (firstArea && (firstArea->base + (firstArea->size - 1)) < aspace->scan_va)
+		firstArea = firstArea->aspace_next;
 
-	if (!first_region)
-		first_region = aspace->virtual_map.region_list;
+	if (!firstArea)
+		firstArea = aspace->virtual_map.areas;
 
-	if (!first_region) {
+	if (!firstArea) {
 		release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
 		return;
 	}
 
-	region = first_region;
+	area = firstArea;
 	for (;;) {
 		// ignore reserved ranges
-		while (region != NULL && region->id == RESERVED_REGION_ID)
-			region = region->aspace_next;
-		if (region == NULL)
+		while (area != NULL && area->id == RESERVED_REGION_ID)
+			area = area->aspace_next;
+		if (area == NULL)
 			break;
 
-		// scan the pages in this region
-		mutex_lock(&region->cache_ref->lock);
-		if (!region->cache_ref->cache->scan_skip) {
-			for(va = region->base; va < (region->base + region->size); va += B_PAGE_SIZE) {
+		// scan the pages in this area
+		mutex_lock(&area->cache_ref->lock);
+		if (!area->cache_ref->cache->scan_skip) {
+			for(va = area->base; va < (area->base + area->size); va += B_PAGE_SIZE) {
 				aspace->translation_map.ops->lock(&aspace->translation_map);
 				aspace->translation_map.ops->query(&aspace->translation_map, va, &pa, &flags);
 				if ((flags & PAGE_PRESENT) == 0) {
@@ -117,17 +117,17 @@ scan_pages(vm_address_space *aspace, addr_t free_target)
 					break;
 			}
 		}
-		mutex_unlock(&region->cache_ref->lock);
-		// move to the next region, wrapping around and stopping if we get back to the first region
-		region = region->aspace_next ? region->aspace_next : aspace->virtual_map.region_list;
-		if (region == first_region)
+		mutex_unlock(&area->cache_ref->lock);
+		// move to the next area, wrapping around and stopping if we get back to the first area
+		area = area->aspace_next ? area->aspace_next : aspace->virtual_map.areas;
+		if (area == firstArea)
 			break;
 
 		if (quantum == 0)
 			break;
 	}
 
-	aspace->scan_va = region ? (first_region->base + first_region->size) : aspace->virtual_map.base;
+	aspace->scan_va = area ? (firstArea->base + firstArea->size) : aspace->virtual_map.base;
 	release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
 
 //	dprintf("exiting scan_pages\n");
@@ -217,8 +217,8 @@ vm_daemon_init()
 
 	// create a kernel thread to select pages for pageout
 	thread = spawn_kernel_thread(&page_daemon, "page daemon", B_FIRST_REAL_TIME_PRIORITY, NULL);
-	resume_thread(thread);
+	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
-	return 0;
+	return B_OK;
 }
 

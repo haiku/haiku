@@ -1,7 +1,11 @@
 /*
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 
 #include <kernel.h>
 #include <vm.h>
@@ -122,7 +126,7 @@ vm_cache_ref_create(vm_cache *cache)
 
 	ref->cache = cache;
 	mutex_init(&ref->lock, "cache_ref_mutex");
-	ref->region_list = NULL;
+	ref->areas = NULL;
 	ref->ref_count = 0;
 	cache->ref = ref;
 
@@ -352,15 +356,15 @@ vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
 
 
 status_t
-vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region)
+vm_cache_insert_area(vm_cache_ref *cache_ref, vm_area *area)
 {
 	mutex_lock(&cache_ref->lock);
 
-	region->cache_next = cache_ref->region_list;
-	if (region->cache_next)
-		region->cache_next->cache_prev = region;
-	region->cache_prev = NULL;
-	cache_ref->region_list = region;
+	area->cache_next = cache_ref->areas;
+	if (area->cache_next)
+		area->cache_next->cache_prev = area;
+	area->cache_prev = NULL;
+	cache_ref->areas = area;
 
 	mutex_unlock(&cache_ref->lock);
 	return B_OK;
@@ -368,16 +372,16 @@ vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region)
 
 
 status_t
-vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region)
+vm_cache_remove_area(vm_cache_ref *cache_ref, vm_area *area)
 {
 	mutex_lock(&cache_ref->lock);
 
-	if (region->cache_prev)
-		region->cache_prev->cache_next = region->cache_next;
-	if (region->cache_next)
-		region->cache_next->cache_prev = region->cache_prev;
-	if (cache_ref->region_list == region)
-		cache_ref->region_list = region->cache_next;
+	if (area->cache_prev)
+		area->cache_prev->cache_next = area->cache_next;
+	if (area->cache_next)
+		area->cache_next->cache_prev = area->cache_prev;
+	if (cache_ref->areas == area)
+		cache_ref->areas = area->cache_next;
 
 	mutex_unlock(&cache_ref->lock);
 	return B_OK;

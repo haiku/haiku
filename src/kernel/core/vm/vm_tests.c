@@ -1,4 +1,7 @@
 /*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -22,10 +25,10 @@ vm_test(void)
 #if 1
 	dprintf("vm_test 1: creating anonymous region and writing to it\n");
 	{
-		region_id region;
+		area_id region;
 		addr_t region_addr;
 
-		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", (void **)&region_addr,
+		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", (void **)&region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region < 0)
 			panic("vm_test 1: failed to create test region\n");
@@ -34,7 +37,7 @@ vm_test(void)
 		memset((void *)region_addr, 0, B_PAGE_SIZE * 16);
 
 		dprintf("memsetted the region\n");
-		if (vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
+		if (vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
 			panic("vm_test 1: error deleting test region\n");
 		dprintf("deleted the region\n");
 	}
@@ -42,14 +45,14 @@ vm_test(void)
 #if 1
 	dprintf("vm_test 2: creating physical region and writing and reading from it\n");
 	{
-		region_id region;
+		area_id region;
 		area_info info;
 		char *ptr;
 		int i;
 
 		region = vm_map_physical_memory(vm_get_kernel_aspace_id(), "test_physical_region", (void **)&ptr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0xb8000);
-		if(region < 0)
+		if (region < 0)
 			panic("vm_test 2: failed to create test region\n");
 
 		get_area_info(region, &info);
@@ -60,7 +63,7 @@ vm_test(void)
 		for(i=0; i<64; i++) {
 			ptr[i] = 'a';
 		}
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
+		if (vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
 			panic("vm_test 2: error deleting test region\n");
 		dprintf("deleted the region\n");
 	}
@@ -95,36 +98,36 @@ vm_test(void)
 #if 1
 	dprintf("vm_test 4: cloning vidmem and testing if it compares\n");
 	{
-		region_id region, region2;
+		area_id region, region2;
 		area_info info;
 		void *ptr;
 		int rc;
 
 		region = find_area("vid_mem");
-		if(region < 0)
+		if (region < 0)
 			panic("vm_test 4: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
 
-		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem2",
+		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "vid_mem2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if(region2 < 0)
+		if (region2 < 0)
 			panic("vm_test 4: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		get_area_info(region, &info);
 		rc = memcmp(ptr, (void *)info.address, info.size);
-		if(rc != 0)
+		if (rc != 0)
 			panic("vm_test 4: regions are not identical\n");
 		else
 			dprintf("vm_test 4: comparison ok\n");
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region2) < 0)
+		if (vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
 			panic("vm_test 4: error deleting cloned region\n");
 	}
 #endif
 #if 1
 	dprintf("vm_test 5: cloning vidmem in RO and testing if it compares\n");
 	{
-		region_id region, region2;
+		area_id region, region2;
 		area_info info;
 		void *ptr;
 		int rc;
@@ -134,32 +137,32 @@ vm_test(void)
 			panic("vm_test 5: error finding region 'vid_mem'\n");
 		dprintf("vid_mem region = 0x%lx\n", region);
 
-		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "vid_mem3",
+		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "vid_mem3",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA);
-		if(region2 < 0)
+		if (region2 < 0)
 			panic("vm_test 5: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
 		get_area_info(region, &info);
 		rc = memcmp(ptr, (void *)info.address, info.size);
-		if(rc != 0)
+		if (rc != 0)
 			panic("vm_test 5: regions are not identical\n");
 		else
 			dprintf("vm_test 5: comparison ok\n");
 
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region2) < 0)
+		if (vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
 			panic("vm_test 5: error deleting cloned region\n");
 	}
 #endif
 #if 1
 	dprintf("vm_test 6: creating anonymous region, cloning it, and testing if it compares\n");
 	{
-		region_id region, region2;
+		area_id region, region2;
 		void *region_addr;
 		void *ptr;
 		int rc;
 
-		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", &region_addr,
+		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", &region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region < 0)
 			panic("vm_test 6: error creating test region\n");
@@ -169,7 +172,7 @@ vm_test(void)
 
 		dprintf("memsetted the region\n");
 
-		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "test_region2",
+		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "test_region2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_NO_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 6: error cloning test region\n");
@@ -181,10 +184,10 @@ vm_test(void)
 		else
 			dprintf("vm_test 6: comparison ok\n");
 
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
+		if(vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
 			panic("vm_test 6: error deleting test region\n");
 
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region2) < 0)
+		if(vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
 			panic("vm_test 6: error deleting cloned region\n");
 	}
 #endif
@@ -192,7 +195,7 @@ vm_test(void)
 	dprintf("vm_test 7: mmaping a known file a few times and verifying they see the same data\n");
 	{
 		void *ptr, *ptr2;
-		region_id rid, rid2;
+		area_id rid, rid2;
 //		char *blah;
 		int fd;
 
@@ -208,8 +211,8 @@ vm_test(void)
 
 		dprintf("removing regions\n");
 
-		vm_delete_region(vm_get_kernel_aspace_id(), rid);
-		vm_delete_region(vm_get_kernel_aspace_id(), rid2);
+		vm_delete_area(vm_get_kernel_aspace_id(), rid);
+		vm_delete_area(vm_get_kernel_aspace_id(), rid2);
 
 		dprintf("regions deleted\n");
 
@@ -221,14 +224,14 @@ vm_test(void)
 #if 1
 	dprintf("vm_test 8: creating anonymous region, cloning it with private mapping\n");
 	{
-		region_id region, region2;
+		area_id region, region2;
 		void *region_addr;
 		void *ptr;
 		int rc;
 
 		dprintf("vm_test 8: creating test region...\n");
 
-		region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "test_region", &region_addr,
+		region = vm_create_anonymous_area(vm_get_kernel_aspace_id(), "test_region", &region_addr,
 			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE * 16, B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region < 0)
 			panic("vm_test 8: error creating test region\n");
@@ -240,7 +243,7 @@ vm_test(void)
 
 		dprintf("vm_test 8: cloning test region with PRIVATE_MAP\n");
 
-		region2 = vm_clone_region(vm_get_kernel_aspace_id(), "test_region2",
+		region2 = vm_clone_area(vm_get_kernel_aspace_id(), "test_region2",
 			&ptr, B_ANY_KERNEL_ADDRESS, region, REGION_PRIVATE_MAP, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if(region2 < 0)
 			panic("vm_test 8: error cloning test region\n");
@@ -293,10 +296,10 @@ vm_test(void)
 		else
 			panic("vm_test 8: comparison shows not private mapping\n");
 
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region) < 0)
+		if(vm_delete_area(vm_get_kernel_aspace_id(), region) < 0)
 			panic("vm_test 8: error deleting test region\n");
 
-		if(vm_delete_region(vm_get_kernel_aspace_id(), region2) < 0)
+		if(vm_delete_area(vm_get_kernel_aspace_id(), region2) < 0)
 			panic("vm_test 8: error deleting cloned region\n");
 	}
 #endif
@@ -304,7 +307,7 @@ vm_test(void)
 	dprintf("vm_test 9: mmaping a known file a few times, one with private mappings\n");
 	{
 		void *ptr, *ptr2;
-		region_id rid, rid2;
+		area_id rid, rid2;
 		int err;
 
 		dprintf("vm_test 9: mapping /boot/kernel twice\n");
@@ -345,8 +348,8 @@ vm_test(void)
 
 		dprintf("vm_test 9: removing regions\n");
 
-		vm_delete_region(vm_get_kernel_aspace_id(), rid);
-		vm_delete_region(vm_get_kernel_aspace_id(), rid2);
+		vm_delete_area(vm_get_kernel_aspace_id(), rid);
+		vm_delete_area(vm_get_kernel_aspace_id(), rid2);
 
 		dprintf("vm_test 9: regions deleted\n");
 
@@ -384,8 +387,8 @@ vm_test(void)
 
 		dprintf("vm_test 10: remove areas\n");
 
-		vm_delete_region(vm_get_kernel_aspace_id(), a);
-		vm_delete_region(vm_get_kernel_aspace_id(), b);
+		vm_delete_area(vm_get_kernel_aspace_id(), a);
+		vm_delete_area(vm_get_kernel_aspace_id(), b);
 	}
 	dprintf("vm_test 10: passed\n");
 #endif
@@ -414,7 +417,7 @@ vm_test(void)
 
 		dprintf("vm_test 11: remove areas\n");
 
-		vm_delete_region(vm_get_kernel_aspace_id(), a);
+		vm_delete_area(vm_get_kernel_aspace_id(), a);
 	}
 	dprintf("vm_test 11: passed\n");
 #endif

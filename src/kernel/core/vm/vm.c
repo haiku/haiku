@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -59,27 +59,27 @@
 extern vm_address_space *kernel_aspace;
 
 #define REGION_HASH_TABLE_SIZE 1024
-static region_id next_region_id;
-static void *region_table;
-static sem_id region_hash_sem;
+static area_id sNextAreaID;
+static void *sAreaHash;
+static sem_id sAreaHashLock;
 
 static off_t sAvailableMemory;
 static benaphore sAvailableMemoryLock;
 
 // function declarations
-static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);
+static vm_area *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);
 static status_t map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
-	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
+	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_area **_region, const char *region_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
-static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
-static void vm_put_region(vm_region *region);
+static vm_area *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
+static void vm_put_area(vm_area *area);
 
 
 static int
-region_compare(void *_r, const void *key)
+area_compare(void *_r, const void *key)
 {
-	vm_region *r = _r;
-	const region_id *id = key;
+	vm_area *r = _r;
+	const area_id *id = key;
 
 	if (r->id == *id)
 		return 0;
@@ -89,10 +89,10 @@ region_compare(void *_r, const void *key)
 
 
 static uint32
-region_hash(void *_r, const void *key, uint32 range)
+area_hash(void *_r, const void *key, uint32 range)
 {
-	vm_region *r = _r;
-	const region_id *id = key;
+	vm_area *r = _r;
+	const area_id *id = key;
 
 	if (r != NULL)
 		return r->id % range;
@@ -101,31 +101,31 @@ region_hash(void *_r, const void *key, uint32 range)
 }
 
 
-static vm_region *
-vm_get_region_by_id(region_id rid)
+static vm_area *
+vm_get_area(area_id id)
 {
-	vm_region *region;
+	vm_area *area;
 
-	acquire_sem_etc(region_hash_sem, READ_COUNT, 0, 0);
+	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
 
-	region = hash_lookup(region_table, &rid);
-	if (region)
-		atomic_add(&region->ref_count, 1);
+	area = hash_lookup(sAreaHash, &id);
+	if (area)
+		atomic_add(&area->ref_count, 1);
 
-	release_sem_etc(region_hash_sem, READ_COUNT, 0);
+	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
-	return region;
+	return area;
 }
 
 
-static vm_region *
+static vm_area *
 _vm_create_reserved_region_struct(vm_virtual_map *map)
 {
-	vm_region *reserved = malloc(sizeof(vm_region));
+	vm_area *reserved = malloc(sizeof(vm_area));
 	if (reserved == NULL)
 		return NULL;
 
-	memset(reserved, 0, sizeof(vm_region));
+	memset(reserved, 0, sizeof(vm_area));
 	reserved->id = RESERVED_REGION_ID;
 		// this marks it as reserved space
 	reserved->map = map;
@@ -134,58 +134,58 @@ _vm_create_reserved_region_struct(vm_virtual_map *map)
 }
 
 
-static vm_region *
-_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock)
+static vm_area *
+_vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring, uint32 protection)
 {
-	vm_region *region = NULL;
+	vm_area *area = NULL;
 
 	// restrict the area name to B_OS_NAME_LENGTH
 	size_t length = strlen(name) + 1;
 	if (length > B_OS_NAME_LENGTH)
 		length = B_OS_NAME_LENGTH;
 
-	region = (vm_region *)malloc(sizeof(vm_region));
-	if (region == NULL)
+	area = (vm_area *)malloc(sizeof(vm_area));
+	if (area == NULL)
 		return NULL;
 
-	region->name = (char *)malloc(length);
-	if (region->name == NULL) {
-		free(region);
+	area->name = (char *)malloc(length);
+	if (area->name == NULL) {
+		free(area);
 		return NULL;
 	}
-	strlcpy(region->name, name, length);
+	strlcpy(area->name, name, length);
 
-	region->id = atomic_add(&next_region_id, 1);
-	region->base = 0;
-	region->size = 0;
-	region->lock = lock;
-	region->wiring = wiring;
-	region->ref_count = 1;
+	area->id = atomic_add(&sNextAreaID, 1);
+	area->base = 0;
+	area->size = 0;
+	area->protection = protection;
+	area->wiring = wiring;
+	area->ref_count = 1;
 
-	region->cache_ref = NULL;
-	region->cache_offset = 0;
+	area->cache_ref = NULL;
+	area->cache_offset = 0;
 
-	region->aspace = aspace;
-	region->aspace_next = NULL;
-	region->map = &aspace->virtual_map;
-	region->cache_next = region->cache_prev = NULL;
-	region->hash_next = NULL;
+	area->aspace = aspace;
+	area->aspace_next = NULL;
+	area->map = &aspace->virtual_map;
+	area->cache_next = area->cache_prev = NULL;
+	area->hash_next = NULL;
 
-	return region;
+	return area;
 }
 
 
 static status_t
-find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *region)
+find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area)
 {
-	vm_region *next, *last = NULL;
+	vm_area *next, *last = NULL;
 
-	next = map->region_list;
+	next = map->areas;
 	while (next) {
 		if (next->base <= start && next->base + next->size >= start + size) {
-			// this region covers the requested range
+			// this area covers the requested range
 			if (next->id != RESERVED_REGION_ID) {
-				// but it's not reserved space, it's a real region
+				// but it's not reserved space, it's a real area
 				return ERR_VM_NO_REGION_SLOT;
 			}
 
@@ -198,43 +198,43 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *
 		return B_ENTRY_NOT_FOUND;
 
 	// now we have to transfer the requested part of the reserved
-	// range to the new region - and remove, resize or split the old
-	// reserved region.
+	// range to the new area - and remove, resize or split the old
+	// reserved area.
 	
 	if (start == next->base) {
-		// the region starts at the beginning of the reserved range
+		// the area starts at the beginning of the reserved range
 		if (last)
-			last->aspace_next = region;
+			last->aspace_next = area;
 		else
-			map->region_list = region;
+			map->areas = area;
 
 		if (size == next->size) {
-			// the new region fully covers the reversed range
-			region->aspace_next = next->aspace_next;
+			// the new area fully covers the reversed range
+			area->aspace_next = next->aspace_next;
 			free(next);
 		} else {
-			// resize the reserved range behind the region
-			region->aspace_next = next;
+			// resize the reserved range behind the area
+			area->aspace_next = next;
 			next->base += size;
 			next->size -= size;
 		}
 	} else if (start + size == next->base + next->size) {
-		// the region is at the end of the reserved range
-		region->aspace_next = next->aspace_next;
-		next->aspace_next = region;
+		// the area is at the end of the reserved range
+		area->aspace_next = next->aspace_next;
+		next->aspace_next = area;
 
-		// resize the reserved range before the region
+		// resize the reserved range before the area
 		next->size = start - next->base;
 	} else {
-		// the region splits the reserved range into two separate ones
-		// we need a new reserved region to cover this space
-		vm_region *reserved = _vm_create_reserved_region_struct(map);
+		// the area splits the reserved range into two separate ones
+		// we need a new reserved area to cover this space
+		vm_area *reserved = _vm_create_reserved_region_struct(map);
 		if (reserved == NULL)
 			return B_NO_MEMORY;
 
 		reserved->aspace_next = next->aspace_next;
-		region->aspace_next = reserved;
-		next->aspace_next = region;
+		area->aspace_next = reserved;
+		next->aspace_next = area;
 
 		// resize regions
 		reserved->size = next->base + next->size - start - size;
@@ -242,8 +242,8 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *
 		reserved->base = start + size;
 	}
 
-	region->base = start;
-	region->size = size;
+	area->base = start;
+	area->size = size;
 	map->change_count++;
 
 	return B_OK;
@@ -253,44 +253,44 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *
 // must be called with this address space's virtual_map.sem held
 
 static status_t
-find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_region *region)
+find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_area *area)
 {
-	vm_region *last_r = NULL;
-	vm_region *next_r;
+	vm_area *last = NULL;
+	vm_area *next;
 	bool foundspot = false;
 
-	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, region %p\n",
-		map, start, size, end, addr_type, region));
+	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, area %p\n",
+		map, start, size, end, addr_type, area));
 
 	// do some sanity checking
 	if (start < map->base || size == 0 || (end - 1) > (map->base + (map->size - 1)) || start + size > end)
 		return B_BAD_ADDRESS;
 
 	if (addr_type == B_EXACT_ADDRESS) {
-		// search for a reserved region
-		status_t status = find_reserved_region(map, start, size, region);
+		// search for a reserved area
+		status_t status = find_reserved_region(map, start, size, area);
 		if (status == B_OK || status == ERR_VM_NO_REGION_SLOT)
 			return status;
 
-		// there was no reserved region, and the slot doesn't seem to be used already
+		// there was no reserved area, and the slot doesn't seem to be used already
 		// ToDo: this could be further optimized.
 	}
 
 	// walk up to the spot where we should start searching
-	next_r = map->region_list;
-	while (next_r) {
-		if (next_r->base >= start + size) {
+	next = map->areas;
+	while (next) {
+		if (next->base >= start + size) {
 			// we have a winner
 			break;
 		}
-		last_r = next_r;
-		next_r = next_r->aspace_next;
+		last = next;
+		next = next->aspace_next;
 	}
 
 #if 0
-	dprintf("last_r 0x%x, next_r 0x%x\n", last_r, next_r);
-	if(last_r) dprintf("last_r->base 0x%x, last_r->size 0x%x\n", last_r->base, last_r->size);
-	if(next_r) dprintf("next_r->base 0x%x, next_r->size 0x%x\n", next_r->base, next_r->size);
+	dprintf("last 0x%x, next 0x%x\n", last, next);
+	if(last) dprintf("last->base 0x%x, last->size 0x%x\n", last->base, last->size);
+	if(next) dprintf("next->base 0x%x, next->size 0x%x\n", next->base, next->size);
 #endif
 
 	switch (addr_type) {
@@ -298,54 +298,54 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_BASE_ADDRESS:
-			// find a hole big enough for a new region
-			if (!last_r) {
+			// find a hole big enough for a new area
+			if (!last) {
 				// see if we can build it at the beginning of the virtual map
-				if (!next_r || (next_r->base >= map->base + size)) {
+				if (!next || (next->base >= map->base + size)) {
 					foundspot = true;
-					region->base = map->base;
+					area->base = map->base;
 					break;
 				}
-				last_r = next_r;
-				next_r = next_r->aspace_next;
+				last = next;
+				next = next->aspace_next;
 			}
 			// keep walking
-			while (next_r) {
-				if (next_r->base >= last_r->base + last_r->size + size) {
+			while (next) {
+				if (next->base >= last->base + last->size + size) {
 					// we found a spot
 					foundspot = true;
-					region->base = last_r->base + last_r->size;
+					area->base = last->base + last->size;
 					break;
 				}
-				last_r = next_r;
-				next_r = next_r->aspace_next;
+				last = next;
+				next = next->aspace_next;
 			}
-			if ((map->base + (map->size - 1)) >= (last_r->base + last_r->size + (size - 1))) {
+			if ((map->base + (map->size - 1)) >= (last->base + last->size + (size - 1))) {
 				// found a spot
 				foundspot = true;
-				region->base = last_r->base + last_r->size;
+				area->base = last->base + last->size;
 				break;
 			}
 			break;
 		case B_EXACT_ADDRESS:
 			// see if we can create it exactly here
-			if (!last_r) {
-				if (!next_r || (next_r->base >= start + size)) {
+			if (!last) {
+				if (!next || (next->base >= start + size)) {
 					foundspot = true;
-					region->base = start;
+					area->base = start;
 					break;
 				}
 			} else {
-				if (next_r) {
-					if (last_r->base + last_r->size <= start && next_r->base >= start + size) {
+				if (next) {
+					if (last->base + last->size <= start && next->base >= start + size) {
 						foundspot = true;
-						region->base = start;
+						area->base = start;
 						break;
 					}
 				} else {
-					if ((last_r->base + (last_r->size - 1)) <= start - 1) {
+					if ((last->base + (last->size - 1)) <= start - 1) {
 						foundspot = true;
-						region->base = start;
+						area->base = start;
 					}
 				}
 			}
@@ -357,20 +357,20 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 	if (!foundspot)
 		return ERR_VM_NO_REGION_SLOT;
 
-	region->size = size;
-	if (last_r) {
-		region->aspace_next = last_r->aspace_next;
-		last_r->aspace_next = region;
+	area->size = size;
+	if (last) {
+		area->aspace_next = last->aspace_next;
+		last->aspace_next = area;
 	} else {
-		region->aspace_next = map->region_list;
-		map->region_list = region;
+		area->aspace_next = map->areas;
+		map->areas = area;
 	}
 	map->change_count++;
 	return B_OK;
 }
 
 
-/**	This inserts the area/region you pass into the virtual_map of the
+/**	This inserts the area you pass into the virtual_map of the
  *	specified address space.
  *	It will also set the "_address" argument to its base address when
  *	the call succeeds.
@@ -379,7 +379,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 
 static status_t
 insert_area(vm_address_space *addressSpace, void **_address,
-	uint32 addressSpec, addr_t size, vm_region *area)
+	uint32 addressSpec, addr_t size, vm_area *area)
 {
 	addr_t searchBase, searchEnd;
 	status_t status;
@@ -420,23 +420,23 @@ insert_area(vm_address_space *addressSpace, void **_address,
 // a ref to the cache holding this store must be held before entering here
 static status_t
 map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddress,
-	off_t offset, addr_t size, int addressSpec, int wiring, int lock,
-	int mapping, vm_region **_region, const char *region_name)
+	off_t offset, addr_t size, int addressSpec, int wiring, int protection,
+	int mapping, vm_area **_region, const char *areaName)
 {
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
-	vm_region *region;
+	vm_area *area;
 	vm_cache *nu_cache;
 	vm_cache_ref *nu_cache_ref = NULL;
 	vm_store *nu_store;
 
 	int err;
 
-	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addr_type %d, wiring %d, lock %d, _region %p, region_name '%s'\n",
-		aspace, store, *_virtualAddress, offset, size, addressSpec, wiring, lock, _region, region_name));
+	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addr_type %d, wiring %d, protection %d, _region %p, region_name '%s'\n",
+		aspace, store, *_virtualAddress, offset, size, addressSpec, wiring, protection, _region, region_name));
 
-	region = _vm_create_region_struct(aspace, region_name, wiring, lock);
-	if (!region)
+	area = _vm_create_area_struct(aspace, areaName, wiring, protection);
+	if (area == NULL)
 		return B_NO_MEMORY;
 
 	cache = store->cache;
@@ -480,32 +480,32 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 	// check to see if this aspace has entered DELETE state
 	if (aspace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
-		// insert the region, so back out
+		// insert the area, so back out
 		err = ERR_VM_INVALID_ASPACE;
 		goto err1b;
 	}
 
-	err = insert_area(aspace, _virtualAddress, addressSpec, size, region);
+	err = insert_area(aspace, _virtualAddress, addressSpec, size, area);
 	if (err < B_OK)
 		goto err1b;
 
-	// attach the cache to the region
-	region->cache_ref = cache_ref;
-	region->cache_offset = offset;
-	// point the cache back to the region
-	vm_cache_insert_region(cache_ref, region);
+	// attach the cache to the area
+	area->cache_ref = cache_ref;
+	area->cache_offset = offset;
+	// point the cache back to the area
+	vm_cache_insert_area(cache_ref, area);
 
-	// insert the region in the global region hash table
-	acquire_sem_etc(region_hash_sem, WRITE_COUNT, 0 ,0);
-	hash_insert(region_table, region);
-	release_sem_etc(region_hash_sem, WRITE_COUNT, 0);
+	// insert the area in the global area hash table
+	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
+	hash_insert(sAreaHash, area);
+	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
 
-	// grab a ref to the aspace (the region holds this)
+	// grab a ref to the aspace (the area holds this)
 	atomic_add(&aspace->ref_count, 1);
 
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
-	*_region = region;
+	*_region = area;
 	return B_OK;
 
 err1b:
@@ -520,8 +520,8 @@ err1a:
 		vm_cache_release_ref(cache_ref);
 	}
 err:
-	free(region->name);
-	free(region);
+	free(area->name);
+	free(area);
 	return err;
 }
 
@@ -530,7 +530,7 @@ status_t
 vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 {
 	vm_address_space *addressSpace;
-	vm_region *area, *last = NULL;
+	vm_area *area, *last = NULL;
 	status_t status = B_OK;
 
 	addressSpace = vm_get_aspace_by_id(aid);
@@ -542,24 +542,24 @@ vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 	// check to see if this aspace has entered DELETE state
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
-		// insert the region, so back out
+		// insert the area, so back out
 		status = ERR_VM_INVALID_ASPACE;
 		goto out;
 	}
 
-	// search region list and remove any matching reserved ranges
+	// search area list and remove any matching reserved ranges
 
-	area = addressSpace->virtual_map.region_list;
+	area = addressSpace->virtual_map.areas;
 	while (area) {
-		// the region must be completely part of the reserved range
+		// the area must be completely part of the reserved range
 		if (area->id == RESERVED_REGION_ID && area->base >= (addr_t)address
 			&& area->base + area->size <= (addr_t)address + size) {
 			// remove reserved range
-			vm_region *reserved = area;
+			vm_area *reserved = area;
 			if (last)
 				last->aspace_next = reserved->aspace_next;
 			else
-				addressSpace->virtual_map.region_list = reserved->aspace_next;
+				addressSpace->virtual_map.areas = reserved->aspace_next;
 
 			area = reserved->aspace_next;
 			free(reserved);
@@ -581,7 +581,7 @@ status_t
 vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size)
 {
 	vm_address_space *addressSpace;
-	vm_region *area;
+	vm_area *area;
 	status_t status = B_OK;
 
 	addressSpace = vm_get_aspace_by_id(aid);
@@ -599,7 +599,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	// check to see if this aspace has entered DELETE state
 	if (addressSpace->state == VM_ASPACE_STATE_DELETION) {
 		// okay, someone is trying to delete this aspace now, so we can't
-		// insert the region, so back out
+		// insert the area, so back out
 		status = ERR_VM_INVALID_ASPACE;
 		goto err2;
 	}
@@ -608,7 +608,7 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	if (status < B_OK)
 		goto err2;
 
-	// the region is now reserved!
+	// the area is now reserved!
 
 	release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
 	return B_OK;
@@ -622,11 +622,11 @@ err1:
 }
 
 
-region_id
-vm_create_anonymous_region(aspace_id aid, const char *name, void **address, 
-	int addr_type, addr_t size, int wiring, int lock)
+area_id
+vm_create_anonymous_area(aspace_id aid, const char *name, void **address, 
+	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection)
 {
-	vm_region *region;
+	vm_area *area;
 	vm_cache *cache;
 	vm_store *store;
 	vm_address_space *aspace;
@@ -637,7 +637,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 	TRACE(("create_anonymous_region: %s: size 0x%lx\n", name, size));
 
 	/* check parameters */
-	switch (addr_type) {
+	switch (addressSpec) {
 		case B_ANY_ADDRESS:
 		case B_EXACT_ADDRESS:
 		case B_BASE_ADDRESS:
@@ -707,7 +707,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 //	dprintf("create_anonymous_region: calling map_backing store\n");
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, address, 0, size, addr_type, wiring, lock, REGION_NO_PRIVATE_MAP, &region, name);
+	err = map_backing_store(aspace, store, address, 0, size, addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
 	if (err < 0) {
 		vm_put_aspace(aspace);
@@ -741,8 +741,8 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			// every page, which should allocate them
 			addr_t va;
 			// XXX remove
-			for (va = region->base; va < region->base + region->size; va += B_PAGE_SIZE) {
-//				dprintf("mapping wired pages: region 0x%x, cache_ref 0x%x 0x%x\n", region, cache_ref, region->cache_ref);
+			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE) {
+//				dprintf("mapping wired pages: area 0x%x, cache_ref 0x%x 0x%x\n", area, cache_ref, area->cache_ref);
 				vm_soft_fault(va, false, false);
 			}
 			break;
@@ -764,7 +764,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 
 			mutex_lock(&cache_ref->lock);
 			(*aspace->translation_map.ops->lock)(&aspace->translation_map);
-			for (va = region->base; va < region->base + region->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
+			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 				err = (*aspace->translation_map.ops->query)(&aspace->translation_map, va, &pa, &flags);
 				if (err < 0) {
 //					dprintf("vm_create_anonymous_region: error looking up mapping for va 0x%x\n", va);
@@ -793,7 +793,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			mutex_lock(&cache_ref->lock);
 			(*aspace->translation_map.ops->lock)(&aspace->translation_map);
 
-			for (virtualAddress = region->base; virtualAddress < region->base + region->size;
+			for (virtualAddress = area->base; virtualAddress < area->base + area->size;
 					virtualAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
 				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
 				if (page == NULL)
@@ -801,7 +801,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 
 				atomic_add(&page->ref_count, 1);
 				err = (*aspace->translation_map.ops->map)(&aspace->translation_map,
-							virtualAddress, physicalAddress, lock);
+							virtualAddress, physicalAddress, protection);
 				if (err < 0)
 					panic("couldn't map physical page in page run\n");
 
@@ -821,18 +821,18 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 
 //	dprintf("create_anonymous_region: done\n");
 
-	if (region == NULL)
+	if (area == NULL)
 		return B_NO_MEMORY;
 
-	return region->id;
+	return area->id;
 }
 
 
-region_id
+area_id
 vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
-	int addr_type, addr_t size, int lock, addr_t phys_addr)
+	uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr)
 {
-	vm_region *region;
+	vm_area *area;
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
@@ -841,14 +841,14 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %d,"
-		" size = %lu, lock = %d, phys = %p)\n",
-		aid, name, _address, addr_type, size, lock, (void *)phys_addr));
+		" size = %lu, protection = %d, phys = %p)\n",
+		aid, name, _address, addr_type, size, protection, (void *)phys_addr));
 
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
 	// if the physical address is somewhat inside a page,
-	// move the actual region down to align on a page boundary
+	// move the actual area down to align on a page boundary
 	map_offset = phys_addr % B_PAGE_SIZE;
 	size += map_offset;
 	phys_addr -= map_offset;
@@ -865,28 +865,28 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	cache_ref = vm_cache_ref_create(cache);
 	if (cache_ref == NULL)
 		panic("vm_create_null_region: vm_cache_ref_create returned NULL");
-	// tell the page scanner to skip over this region, it's pages are special
+	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, _address, 0, size, addr_type, 0, lock, REGION_NO_PRIVATE_MAP, &region, name);
+	err = map_backing_store(aspace, store, _address, 0, size, addressSpec, 0, protection, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
 	if (err < 0)
 		return err;
 
-	// modify the pointer returned to be offset back into the new region
+	// modify the pointer returned to be offset back into the new area
 	// the same way the physical address in was offset
 	*_address = (void *)((addr_t)*_address + map_offset);
 
-	return region->id;
+	return area->id;
 }
 
 
-region_id
-vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr_t size)
+area_id
+vm_create_null_area(aspace_id aid, char *name, void **address, uint32 addressSpec, addr_t size)
 {
-	vm_region *region;
+	vm_area *area;
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
 	vm_store *store;
@@ -909,17 +909,17 @@ vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, 
 	cache_ref = vm_cache_ref_create(cache);
 	if (cache_ref == NULL)
 		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
-	// tell the page scanner to skip over this region, no pages will be mapped here
+	// tell the page scanner to skip over this area, no pages will be mapped here
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, address, 0, size, addr_type, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &region, name);
+	err = map_backing_store(aspace, store, address, 0, size, addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
 	if (err < 0)
 		return err;
 
-	return region->id;
+	return area->id;
 }
 
 
@@ -963,12 +963,12 @@ vm_create_vnode_cache(void *vnode, void **_cache)
  *	and \a size arguments have to be page aligned.
  */
 
-static region_id
+static area_id
 _vm_map_file(aspace_id aid, char *name, void **_address, uint32 addressSpec,
-	size_t size, int lock, int mapping, const char *path, off_t offset, bool kernel)
+	size_t size, uint32 protection, uint32 mapping, const char *path, off_t offset, bool kernel)
 {
 	vm_cache_ref *cache_ref;
-	vm_region *area;
+	vm_area *area;
 	void *vnode;
 	status_t status;
 
@@ -995,7 +995,7 @@ _vm_map_file(aspace_id aid, char *name, void **_address, uint32 addressSpec,
 	// vfs_get_vnode_from_path(). This puts the ref counts in sync.
 	vm_cache_acquire_ref(cache_ref, false);
 	status = map_backing_store(aspace, cache_ref->cache->store, _address, offset, size,
-					addressSpec, 0, lock, mapping, &area, name);
+					addressSpec, 0, protection, mapping, &area, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
 
@@ -1012,17 +1012,17 @@ err1:
 }
 
 
-region_id
-vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr_t size, int lock, int mapping, const char *path, off_t offset)
+area_id
+vm_map_file(aspace_id aid, char *name, void **address, uint32 addressSpec,
+	addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset)
 {
-	return _vm_map_file(aid, name, address, addr_type, size, lock, mapping, path, offset, true);
+	return _vm_map_file(aid, name, address, addressSpec, size, protection, mapping, path, offset, true);
 }
 
 
-region_id
-_user_vm_map_file(const char *uname, void **uaddress, int addr_type,
-	addr_t size, int lock, int mapping, const char *upath, off_t offset)
+area_id
+_user_vm_map_file(const char *uname, void **uaddress, int addressSpec,
+	addr_t size, int protection, int mapping, const char *upath, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
 	void *address;
@@ -1036,9 +1036,10 @@ _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
 		return B_BAD_ADDRESS;
 
 	// userland created areas can always be accessed by the kernel
-	lock |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+	protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	rc = _vm_map_file(vm_get_current_user_aspace_id(), name, &address, addr_type, size, lock, mapping, path, offset, false);
+	rc = _vm_map_file(vm_get_current_user_aspace_id(), name, &address, addressSpec, size,
+			protection, mapping, path, offset, false);
 	if (rc < 0)
 		return rc;
 
@@ -1049,66 +1050,65 @@ _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
 }
 
 
-region_id
-vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
-	region_id source_region, int mapping, int lock)
+area_id
+vm_clone_area(aspace_id aid, char *name, void **address, uint32 addressSpec,
+	uint32 protection, uint32 mapping, area_id sourceID)
 {
-	vm_region *new_region;
-	vm_region *src_region;
-	int err;
+	vm_area *newArea;
+	vm_area *sourceArea;
+	status_t status;
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	src_region = vm_get_region_by_id(source_region);
-	if (src_region == NULL) {
+	sourceArea = vm_get_area(sourceID);
+	if (sourceArea == NULL) {
 		vm_put_aspace(aspace);
 		return ERR_VM_INVALID_REGION;
 	}
 
-	vm_cache_acquire_ref(src_region->cache_ref, true);
-	err = map_backing_store(aspace, src_region->cache_ref->cache->store, address, src_region->cache_offset, src_region->size,
-		addr_type, src_region->wiring, lock, mapping, &new_region, name);
-	vm_cache_release_ref(src_region->cache_ref);
+	vm_cache_acquire_ref(sourceArea->cache_ref, true);
+	status = map_backing_store(aspace, sourceArea->cache_ref->cache->store, address,
+				sourceArea->cache_offset, sourceArea->size, addressSpec, sourceArea->wiring,
+				protection, mapping, &newArea, name);
+	vm_cache_release_ref(sourceArea->cache_ref);
 
-	// release the ref on the old region
-	vm_put_region(src_region);
-
+	vm_put_area(sourceArea);
 	vm_put_aspace(aspace);
 
-	if (err < 0)
-		return err;
+	if (status < B_OK)
+		return status;
 
-	return new_region->id;
+	return newArea->id;
 }
 
 
 static status_t
-_vm_delete_region(vm_address_space *aspace, region_id rid)
+_vm_delete_area(vm_address_space *aspace, area_id id)
 {
 	status_t status = B_OK;
-	vm_region *region;
+	vm_area *area;
 
-	TRACE(("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid));
+	TRACE(("vm_delete_region: aspace id 0x%lx, area id 0x%lx\n", aspace->id, id));
 
-	region = vm_get_region_by_id(rid);
-	if (region == NULL)
+	area = vm_get_area(id);
+	if (area == NULL)
 		return B_BAD_VALUE;
 
-	if (region->aspace == aspace) {
-		vm_put_region(region);
+	if (area->aspace == aspace) {
+		vm_put_area(area);
 			// next put below will actually delete it
 	} else
 		status = B_NOT_ALLOWED;
 
-	vm_put_region(region);
+	vm_put_area(area);
 	return status;
 }
 
 
 status_t
-vm_delete_region(aspace_id aid, region_id rid)
+vm_delete_area(aspace_id aid, area_id rid)
 {
 	vm_address_space *aspace;
 	status_t err;
@@ -1117,45 +1117,45 @@ vm_delete_region(aspace_id aid, region_id rid)
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	err = _vm_delete_region(aspace, rid);
+	err = _vm_delete_area(aspace, rid);
 	vm_put_aspace(aspace);
 	return err;
 }
 
 
 static void
-_vm_put_region(vm_region *region, bool aspace_locked)
+_vm_put_area(vm_area *area, bool aspace_locked)
 {
-	vm_region *temp, *last = NULL;
+	vm_area *temp, *last = NULL;
 	vm_address_space *aspace;
 	bool removeit = false;
 
 	// we should never get here, but if we do, we can handle it
-	if (region->id == RESERVED_REGION_ID)
+	if (area->id == RESERVED_REGION_ID)
 		return;
 
-	acquire_sem_etc(region_hash_sem, WRITE_COUNT, 0, 0);
-	if (atomic_add(&region->ref_count, -1) == 1) {
-		hash_remove(region_table, region);
+	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0, 0);
+	if (atomic_add(&area->ref_count, -1) == 1) {
+		hash_remove(sAreaHash, area);
 		removeit = true;
 	}
-	release_sem_etc(region_hash_sem, WRITE_COUNT, 0);
+	release_sem_etc(sAreaHashLock, WRITE_COUNT, 0);
 
 	if (!removeit)
 		return;
 
-	aspace = region->aspace;
+	aspace = area->aspace;
 
-	// remove the region from the aspace's virtual map
+	// remove the area from the aspace's virtual map
 	if (!aspace_locked)
 		acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
-	temp = aspace->virtual_map.region_list;
+	temp = aspace->virtual_map.areas;
 	while (temp != NULL) {
-		if (region == temp) {
+		if (area == temp) {
 			if (last != NULL) {
 				last->aspace_next = temp->aspace_next;
 			} else {
-				aspace->virtual_map.region_list = temp->aspace_next;
+				aspace->virtual_map.areas = temp->aspace_next;
 			}
 			aspace->virtual_map.change_count++;
 			break;
@@ -1163,41 +1163,39 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 		last = temp;
 		temp = temp->aspace_next;
 	}
-	if (region == aspace->virtual_map.region_hint)
-		aspace->virtual_map.region_hint = NULL;
+	if (area == aspace->virtual_map.area_hint)
+		aspace->virtual_map.area_hint = NULL;
 	if (!aspace_locked)
 		release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
 	if (temp == NULL)
-		panic("vm_region_release_ref: region not found in aspace's region_list\n");
+		panic("vm_area_release_ref: area not found in aspace's area list\n");
 
-	vm_cache_remove_region(region->cache_ref, region);
-	vm_cache_release_ref(region->cache_ref);
+	vm_cache_remove_area(area->cache_ref, area);
+	vm_cache_release_ref(area->cache_ref);
 
 	(*aspace->translation_map.ops->lock)(&aspace->translation_map);
-	(*aspace->translation_map.ops->unmap)(&aspace->translation_map, region->base,
-		region->base + (region->size - 1));
+	(*aspace->translation_map.ops->unmap)(&aspace->translation_map, area->base,
+		area->base + (area->size - 1));
 	(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 
 	// now we can give up the area's reference to the address space
 	vm_put_aspace(aspace);
 
-	free(region->name);
-	free(region);
-
-	return;
+	free(area->name);
+	free(area);
 }
 
 
 static void
-vm_put_region(vm_region *region)
+vm_put_area(vm_area *area)
 {
-	return _vm_put_region(region, false);
+	return _vm_put_area(area, false);
 }
 
 
 static status_t
-vm_copy_on_write_area(vm_region *area)
+vm_copy_on_write_area(vm_area *area)
 {
 	vm_store *store;
 	vm_cache *upperCache, *lowerCache;
@@ -1233,7 +1231,7 @@ vm_copy_on_write_area(vm_region *area)
 
 	// The area must be readable in the same way it was previously writable
 	protection = B_KERNEL_READ_AREA;
-	if (area->lock & B_READ_AREA)
+	if (area->protection & B_READ_AREA)
 		protection |= B_READ_AREA;
 
 	// we need to hold the cache_ref lock when we want to switch its cache
@@ -1287,13 +1285,13 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 {
 	vm_address_space *addressSpace;
 	vm_cache_ref *cacheRef;
-	vm_region *target, *source;
+	vm_area *target, *source;
 	status_t status;
 
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	if ((source = vm_get_region_by_id(sourceID)) == NULL)
+	if ((source = vm_get_area(sourceID)) == NULL)
 		return B_BAD_VALUE;
 
 	addressSpace = vm_get_aspace_by_id(addressSpaceID);
@@ -1316,7 +1314,7 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 
 	// If the source area is writable, we need to move it one layer up as well
 
-	if ((source->lock & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0)
+	if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0)
 		vm_copy_on_write_area(source);
 
 	// we want to return the ID of the newly created area
@@ -1324,7 +1322,7 @@ vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32
 
 err:
 	vm_put_aspace(addressSpace);
-	vm_put_region(source);
+	vm_put_area(source);
 
 	return status;
 }
@@ -1434,7 +1432,7 @@ static int
 dump_cache_ref(int argc, char **argv)
 {
 	addr_t address;
-	vm_region *region;
+	vm_area *area;
 	vm_cache_ref *cache_ref;
 
 	if (argc < 2) {
@@ -1453,13 +1451,13 @@ dump_cache_ref(int argc, char **argv)
 	dprintf("cache: %p\n", cache_ref->cache);
 	dprintf("lock.holder: %ld\n", cache_ref->lock.holder);
 	dprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
-	dprintf("region_list:\n");
-	for (region = cache_ref->region_list; region != NULL; region = region->cache_next) {
-		dprintf(" region 0x%lx: ", region->id);
-		dprintf("base_addr = 0x%lx ", region->base);
-		dprintf("size = 0x%lx ", region->size);
-		dprintf("name = '%s' ", region->name);
-		dprintf("lock = 0x%x\n", region->lock);
+	dprintf("areas:\n");
+	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
+		dprintf(" area 0x%lx: ", area->id);
+		dprintf("base_addr = 0x%lx ", area->base);
+		dprintf("size = 0x%lx ", area->size);
+		dprintf("name = '%s' ", area->name);
+		dprintf("protection = 0x%lx\n", area->protection);
 	}
 	dprintf("ref_count: %ld\n", cache_ref->ref_count);
 	return 0;
@@ -1535,55 +1533,55 @@ dump_cache(int argc, char **argv)
 
 
 static void
-_dump_region(vm_region *region)
+_dump_area(vm_area *area)
 {
-	dprintf("dump of region at %p:\n", region);
-	dprintf("name: '%s'\n", region->name);
-	dprintf("id: 0x%lx\n", region->id);
-	dprintf("base: 0x%lx\n", region->base);
-	dprintf("size: 0x%lx\n", region->size);
-	dprintf("lock: 0x%x\n", region->lock);
-	dprintf("wiring: 0x%x\n", region->wiring);
-	dprintf("ref_count: %ld\n", region->ref_count);
-	dprintf("cache_ref: %p\n", region->cache_ref);
+	dprintf("dump of area at %p:\n", area);
+	dprintf("name: '%s'\n", area->name);
+	dprintf("id: 0x%lx\n", area->id);
+	dprintf("base: 0x%lx\n", area->base);
+	dprintf("size: 0x%lx\n", area->size);
+	dprintf("protection: 0x%lx\n", area->protection);
+	dprintf("wiring: 0x%lx\n", area->wiring);
+	dprintf("ref_count: %ld\n", area->ref_count);
+	dprintf("cache_ref: %p\n", area->cache_ref);
 	// XXX 64-bit
-	dprintf("cache_offset: 0x%Lx\n", region->cache_offset);
-	dprintf("cache_next: %p\n", region->cache_next);
-	dprintf("cache_prev: %p\n", region->cache_prev);
+	dprintf("cache_offset: 0x%Lx\n", area->cache_offset);
+	dprintf("cache_next: %p\n", area->cache_next);
+	dprintf("cache_prev: %p\n", area->cache_prev);
 }
 
 
 static int
-dump_region(int argc, char **argv)
+dump_area(int argc, char **argv)
 {
 //	int i;
-	vm_region *region;
+	vm_area *area;
 
 	if (argc < 2) {
-		dprintf("region: not enough arguments\n");
+		dprintf("area: not enough arguments\n");
 		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		unsigned long num = strtoul(argv[1], NULL, 16);
-		region_id id = num;
+		area_id id = num;
 
-		region = hash_lookup(region_table, &id);
-		if (region == NULL) {
-			dprintf("invalid region id\n");
+		area = hash_lookup(sAreaHash, &id);
+		if (area == NULL) {
+			dprintf("invalid area id\n");
 		} else {
-			_dump_region(region);
+			_dump_area(area);
 		}
 		return 0;
 	} else {
-		// walk through the region list, looking for the arguments as a name
+		// walk through the area list, looking for the arguments as a name
 		struct hash_iterator iter;
 
-		hash_open(region_table, &iter);
-		while ((region = hash_next(region_table, &iter)) != NULL) {
-			if (region->name != NULL && strcmp(argv[1], region->name) == 0) {
-				_dump_region(region);
+		hash_open(sAreaHash, &iter);
+		while ((area = hash_next(sAreaHash, &iter)) != NULL) {
+			if (area->name != NULL && strcmp(argv[1], area->name) == 0) {
+				_dump_area(area);
 			}
 		}
 	}
@@ -1592,19 +1590,19 @@ dump_region(int argc, char **argv)
 
 
 static int
-dump_region_list(int argc, char **argv)
+dump_area_list(int argc, char **argv)
 {
-	vm_region *region;
+	vm_area *area;
 	struct hash_iterator iter;
 
 	dprintf("addr\t      id  base\t\tsize\t\tprotect\tlock\tname\n");
 
-	hash_open(region_table, &iter);
-	while ((region = hash_next(region_table, &iter)) != NULL) {
-		dprintf("%p %5lx  %p\t%p\t%d\t%d\t%s\n", region, region->id, (void *)region->base,
-			(void *)region->size, region->lock, region->wiring, region->name);
+	hash_open(sAreaHash, &iter);
+	while ((area = hash_next(sAreaHash, &iter)) != NULL) {
+		dprintf("%p %5lx  %p\t%p\t%ld\t%ld\t%s\n", area, area->id, (void *)area->base,
+			(void *)area->size, area->protection, area->wiring, area->name);
 	}
-	hash_close(region_table, &iter, false);
+	hash_close(sAreaHash, &iter, false);
 	return 0;
 }
 
@@ -1612,8 +1610,8 @@ dump_region_list(int argc, char **argv)
 status_t
 vm_delete_areas(struct vm_address_space *aspace)
 {
-	vm_region *area;
-	vm_region *next;
+	vm_area *area;
+	vm_area *next;
 
 	TRACE(("vm_delete_areas: called on aspace 0x%lx\n", aspace->id));
 
@@ -1621,7 +1619,7 @@ vm_delete_areas(struct vm_address_space *aspace)
 
 	// delete all the regions in this aspace
 
-	for (area = aspace->virtual_map.region_list; area; area = next) {
+	for (area = aspace->virtual_map.areas; area; area = next) {
 		next = area->aspace_next;
 
 		if (area->id == RESERVED_REGION_ID) {
@@ -1630,9 +1628,9 @@ vm_delete_areas(struct vm_address_space *aspace)
 			continue;
 		}
 
-		// decrement the ref on this region, may actually push the ref < 0, if there
+		// decrement the ref on this area, may actually push the ref < 0, if there
 		// is a concurrent delete_area() on that specific area, but that's ok here
-		_vm_put_region(area, true);
+		_vm_put_area(area, true);
 	}
 
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
@@ -1646,7 +1644,7 @@ vm_area_for(aspace_id aid, addr_t address)
 {
 	vm_address_space *addressSpace;
 	area_id id = B_ERROR;
-	vm_region *area;
+	vm_area *area;
 
 	addressSpace = vm_get_aspace_by_id(aid);
 	if (addressSpace == NULL)
@@ -1654,7 +1652,7 @@ vm_area_for(aspace_id aid, addr_t address)
 
 	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
 
-	area = addressSpace->virtual_map.region_list;
+	area = addressSpace->virtual_map.areas;
 	for (; area != NULL; area = area->aspace_next) {
 		// ignore reserved space regions
 		if (area->id == RESERVED_REGION_ID)
@@ -1704,17 +1702,17 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 	vm_translation_map *map = &kernel_aspace->translation_map;
 	addr_t end = start + size;
 	addr_t lastEnd = start;
-	vm_region *area;
+	vm_area *area;
 
 	TRACE(("vm_free_unused_boot_loader_range(): asked to free %p - %p\n", (void *)start, (void *)end));
 
 	// The areas are sorted in virtual address space order, so
 	// we just have to find the holes between them that fall
-	// into the region we should dispose
+	// into the area we should dispose
 
 	map->ops->lock(map);
 
-	for (area = kernel_aspace->virtual_map.region_list; area; area = area->aspace_next) {
+	for (area = kernel_aspace->virtual_map.areas; area; area = area->aspace_next) {
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
 
@@ -1737,7 +1735,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 	}
 
 	if (lastEnd < end) {
-		// we can also get rid of some space at the end of the region
+		// we can also get rid of some space at the end of the area
 		TRACE(("free boot range: also remove %p - %p\n", (void *)lastEnd, (void *)end));
 		unmap_and_free_physical_pages(map, lastEnd, end);
 	}
@@ -1768,13 +1766,15 @@ create_preloaded_image_areas(struct preloaded_image *image)
 	memcpy(name, fileName, length);
 	strcpy(name + length, "_text");
 	address = (void *)ROUNDOWN(image->text_region.start, B_PAGE_SIZE);
-	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
-		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	image->text_region.id = create_area(name, &address, B_EXACT_ADDRESS,
+		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	strcpy(name + length, "_data");
 	address = (void *)ROUNDOWN(image->data_region.start, B_PAGE_SIZE);
-	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
-		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	image->data_region.id = create_area(name, &address, B_EXACT_ADDRESS,
+		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 }
 
 
@@ -1860,8 +1860,8 @@ vm_init(kernel_args *args)
 	err = arch_vm_init(args);
 
 	// initialize some globals
-	next_region_id = 0;
-	region_hash_sem = -1;
+	sNextAreaID = 1;
+	sAreaHashLock = -1;
 
 	// map in the new heap and initialize it
 	heap_base = vm_alloc_from_kernel_args(args, HEAP_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -1876,10 +1876,10 @@ vm_init(kernel_args *args)
 	vm_cache_init(args);
 
 	{
-		vm_region *region;
-		region_table = hash_init(REGION_HASH_TABLE_SIZE, (addr_t)&region->hash_next - (addr_t)region,
-			&region_compare, &region_hash);
-		if (region_table == NULL)
+		vm_area *area;
+		sAreaHash = hash_init(REGION_HASH_TABLE_SIZE, (addr_t)&area->hash_next - (addr_t)area,
+			&area_compare, &area_hash);
+		if (sAreaHash == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 
@@ -1924,8 +1924,8 @@ vm_init(kernel_args *args)
 	}
 
 	// add some debugger commands
-	add_debugger_command("regions", &dump_region_list, "Dump a list of all regions");
-	add_debugger_command("region", &dump_region, "Dump info about a particular region");
+	add_debugger_command("areas", &dump_area_list, "Dump a list of all areas");
+	add_debugger_command("area", &dump_area, "Dump info about a particular area");
 	add_debugger_command("cache_ref", &dump_cache_ref, "Dump cache_ref data structure");
 	add_debugger_command("cache", &dump_cache, "Dump cache_ref data structure");
 //	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
@@ -1942,7 +1942,7 @@ vm_init(kernel_args *args)
 status_t
 vm_init_post_sem(kernel_args *args)
 {
-	vm_region *region;
+	vm_area *area;
 
 	// This frees all unused boot loader resources and makes its space available again
 	arch_vm_init_end(args);
@@ -1956,15 +1956,15 @@ vm_init_post_sem(kernel_args *args)
 	arch_vm_translation_map_init_post_sem(args);
 	vm_aspace_init_post_sem();
 
-	for (region = kernel_aspace->virtual_map.region_list; region; region = region->aspace_next) {
-		if (region->id == RESERVED_REGION_ID)
+	for (area = kernel_aspace->virtual_map.areas; area; area = area->aspace_next) {
+		if (area->id == RESERVED_REGION_ID)
 			continue;
 
-		if (region->cache_ref->lock.sem < 0)
-			mutex_init(&region->cache_ref->lock, "cache_ref_mutex");
+		if (area->cache_ref->lock.sem < 0)
+			mutex_init(&area->cache_ref->lock, "cache_ref_mutex");
 	}
 
-	region_hash_sem = create_sem(WRITE_COUNT, "region_hash_sem");
+	sAreaHashLock = create_sem(WRITE_COUNT, "area hash");
 
 	return heap_init_post_sem(args);
 }
@@ -2038,7 +2038,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 {
 	vm_address_space *aspace;
 	vm_virtual_map *map;
-	vm_region *region;
+	vm_area *area;
 	vm_cache_ref *cache_ref;
 	vm_cache_ref *last_cache_ref;
 	vm_cache_ref *top_cache_ref;
@@ -2078,33 +2078,33 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	// Get the area the fault was in
 
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
-	region = vm_virtual_map_lookup(map, address);
-	if (region == NULL) {
+	area = vm_virtual_map_lookup(map, address);
+	if (area == NULL) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("vm_soft_fault: va 0x%lx not covered by region in address space\n", originalAddress);
+		dprintf("vm_soft_fault: va 0x%lx not covered by area in address space\n", originalAddress);
 		return ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
 	}
 
 	// check permissions
-	if (isUser && (region->lock & B_USER_PROTECTION) == 0) {
+	if (isUser && (area->protection & B_USER_PROTECTION) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("user access on kernel region 0x%lx at %p\n", region->id, (void *)originalAddress);
+		dprintf("user access on kernel area 0x%lx at %p\n", area->id, (void *)originalAddress);
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
-	if (isWrite && (region->lock & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
+	if (isWrite && (area->protection & (B_WRITE_AREA | (isUser ? 0 : B_KERNEL_WRITE_AREA))) == 0) {
 		release_sem_etc(map->sem, READ_COUNT, 0);
 		vm_put_aspace(aspace);
-		dprintf("write access attempted on read-only region 0x%lx at %p\n", region->id, (void *)originalAddress);
+		dprintf("write access attempted on read-only area 0x%lx at %p\n", area->id, (void *)originalAddress);
 		return ERR_VM_PF_BAD_PERM; // BAD_PERMISSION
 	}
 
 	// We have the area, it was a valid access, so let's try to resolve the page fault now.
 	// At first, the top most cache from the area is investigated
 
-	top_cache_ref = region->cache_ref;
-	cache_offset = address - region->base + region->cache_offset;
+	top_cache_ref = area->cache_ref;
+	cache_offset = address - area->base + area->cache_offset;
 	vm_cache_acquire_ref(top_cache_ref, true);
 	change_count = map->change_count;
 	release_sem_etc(map->sem, READ_COUNT, 0);
@@ -2285,10 +2285,10 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
 	if (change_count != map->change_count) {
 		// something may have changed, see if the address is still valid
-		region = vm_virtual_map_lookup(map, address);
-		if (region == NULL
-			|| region->cache_ref != top_cache_ref
-			|| (address - region->base + region->cache_offset) != cache_offset) {
+		area = vm_virtual_map_lookup(map, address);
+		if (area == NULL
+			|| area->cache_ref != top_cache_ref
+			|| (address - area->base + area->cache_offset) != cache_offset) {
 			dprintf("vm_soft_fault: address space layout changed effecting ongoing soft fault\n");
 			err = ERR_VM_PF_BAD_ADDRESS; // BAD_ADDRESS
 		}
@@ -2299,14 +2299,14 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		// If the page doesn't reside in the area's cache, we need to make sure it's
 		// mapped in read-only, so that we cannot overwrite someone else's data (copy-on-write)
-		int new_lock = region->lock;
+		uint32 newProtection = area->protection;
 		if (page->cache != top_cache_ref->cache && !isWrite)
-			new_lock &= ~(isUser ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
+			newProtection &= ~(isUser ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
 
 		atomic_add(&page->ref_count, 1);
 		(*aspace->translation_map.ops->lock)(&aspace->translation_map);
 		(*aspace->translation_map.ops->map)(&aspace->translation_map, address,
-			page->ppn * B_PAGE_SIZE, new_lock);
+			page->ppn * B_PAGE_SIZE, newProtection);
 		(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 	}
 
@@ -2331,27 +2331,27 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 }
 
 
-static vm_region *
+static vm_area *
 vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 {
-	vm_region *region;
+	vm_area *area;
 
-	// check the region_list region first
-	region = map->region_hint;
-	if (region && region->base <= address && (region->base + region->size) > address)
-		return region;
+	// check the areas list first
+	area = map->area_hint;
+	if (area && area->base <= address && (area->base + area->size) > address)
+		return area;
 
-	for (region = map->region_list; region != NULL; region = region->aspace_next) {
-		if (region->id == RESERVED_REGION_ID)
+	for (area = map->areas; area != NULL; area = area->aspace_next) {
+		if (area->id == RESERVED_REGION_ID)
 			continue;
 
-		if (region->base <= address && (region->base + region->size) > address)
+		if (area->base <= address && (area->base + area->size) > address)
 			break;
 	}
 
-	if (region)
-		map->region_hint = region;
-	return region;
+	if (area)
+		map->area_hint = area;
+	return area;
 }
 
 
@@ -2544,13 +2544,13 @@ area_id
 find_area(const char *name)
 {
 	struct hash_iterator iterator;
-	vm_region *area;
+	vm_area *area;
 	area_id id = B_NAME_NOT_FOUND;
 
-	acquire_sem_etc(region_hash_sem, READ_COUNT, 0, 0);
-	hash_open(region_table, &iterator);
+	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
+	hash_open(sAreaHash, &iterator);
 
-	while ((area = hash_next(region_table, &iterator)) != NULL) {
+	while ((area = hash_next(sAreaHash, &iterator)) != NULL) {
 		if (area->id == RESERVED_REGION_ID)
 			continue;
 
@@ -2560,21 +2560,21 @@ find_area(const char *name)
 		}
 	}
 
-	hash_close(region_table, &iterator, false);
-	release_sem_etc(region_hash_sem, READ_COUNT, 0);
+	hash_close(sAreaHash, &iterator, false);
+	release_sem_etc(sAreaHashLock, READ_COUNT, 0);
 
 	return id;
 }
 
 
 static void
-fill_area_info(struct vm_region *area, area_info *info, size_t size)
+fill_area_info(struct vm_area *area, area_info *info, size_t size)
 {
 	strlcpy(info->name, area->name, B_OS_NAME_LENGTH);
 	info->area = area->id;
 	info->address = (void *)area->base;
 	info->size = area->size;
-	info->protection = area->lock & B_USER_PROTECTION;
+	info->protection = area->protection & B_USER_PROTECTION;
 	info->lock = B_FULL_LOCK;
 	info->team = 1;
 	info->ram_size = area->size;
@@ -2586,19 +2586,19 @@ fill_area_info(struct vm_region *area, area_info *info, size_t size)
 
 
 status_t
-_get_area_info(area_id area, area_info *info, size_t size)
+_get_area_info(area_id id, area_info *info, size_t size)
 {
-	vm_region *region;
+	vm_area *area;
 
 	if (size != sizeof(area_info) || info == NULL)
 		return B_BAD_VALUE;
 
-	region = vm_get_region_by_id(area);
-	if (region == NULL)
+	area = vm_get_area(id);
+	if (area == NULL)
 		return B_BAD_VALUE;
 
-	fill_area_info(region, info, size);
-	vm_put_region(region);
+	fill_area_info(area, info, size);
+	vm_put_area(area);
 
 	return B_OK;
 }
@@ -2609,7 +2609,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 {
 	addr_t nextBase = *(addr_t *)cookie;
 	vm_address_space *addressSpace;
-	vm_region *area;
+	vm_area *area;
 
 	// we're already through the list
 	if (nextBase == (addr_t)-1)
@@ -2624,7 +2624,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 
 	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
 
-	for (area = addressSpace->virtual_map.region_list; area; area = area->aspace_next) {
+	for (area = addressSpace->virtual_map.areas; area; area = area->aspace_next) {
 		if (area->id == RESERVED_REGION_ID)
 			continue;
 
@@ -2634,7 +2634,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 
 	// make sure this area won't go away
 	if (area != NULL)
-		area = vm_get_region_by_id(area->id);
+		area = vm_get_area(area->id);
 
 	release_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0);
 	vm_put_aspace(addressSpace);
@@ -2647,7 +2647,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 	fill_area_info(area, info, size);
 	*cookie = (int32)(area->base);
 
-	vm_put_region(area);
+	vm_put_area(area);
 
 	return B_OK;
 }
@@ -2665,7 +2665,7 @@ status_t
 resize_area(area_id areaID, size_t newSize)
 {
 	vm_cache_ref *cache;
-	vm_region *area, *current;
+	vm_area *area, *current;
 	status_t status = B_OK;
 	size_t oldSize;
 
@@ -2673,7 +2673,7 @@ resize_area(area_id areaID, size_t newSize)
 	if (newSize & (B_PAGE_SIZE - 1))
 		return B_BAD_VALUE;
 
-	area = vm_get_region_by_id(areaID);
+	area = vm_get_area(areaID);
 	if (area == NULL)
 		return B_BAD_VALUE;
 
@@ -2691,7 +2691,7 @@ resize_area(area_id areaID, size_t newSize)
 	if (oldSize < newSize) {
 		// We need to check if all areas of this cache can be resized
 
-		for (current = cache->region_list; current; current = current->cache_next) {
+		for (current = cache->areas; current; current = current->cache_next) {
 			if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
 				status = B_ERROR;
 				goto out;
@@ -2701,7 +2701,7 @@ resize_area(area_id areaID, size_t newSize)
 
 	// Okay, looks good so far, so let's do it
 
-	for (current = cache->region_list; current; current = current->cache_next) {
+	for (current = cache->areas; current; current = current->cache_next) {
 		if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
 			status = B_ERROR;
 			break;
@@ -2724,14 +2724,14 @@ resize_area(area_id areaID, size_t newSize)
 
 	if (status < B_OK) {
 		// This shouldn't really be possible, but hey, who knows
-		for (current = cache->region_list; current; current = current->cache_next)
+		for (current = cache->areas; current; current = current->cache_next)
 			current->size = oldSize;
 	}
 
 out:
 	mutex_unlock(&cache->lock);
 
-	// ToDo: we must honour the lock restrictions of this region
+	// ToDo: we must honour the lock restrictions of this area
 	return status;
 }
 
@@ -2760,7 +2760,7 @@ area_id
 create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection)
 {
-	return vm_create_anonymous_region(team->aspace->id, (char *)name, address, 
+	return vm_create_anonymous_area(team->aspace->id, (char *)name, address, 
 				addressSpec, size, lock, protection);
 }
 
@@ -2772,7 +2772,7 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	return vm_create_anonymous_region(vm_get_kernel_aspace_id(), (char *)name, _address, 
+	return vm_create_anonymous_area(vm_get_kernel_aspace_id(), (char *)name, _address, 
 				addressSpec, size, lock, protection);
 }
 
@@ -2780,14 +2780,14 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 status_t
 delete_area_etc(struct team *team, area_id area)
 {
-	return vm_delete_region(team->aspace->id, area);
+	return vm_delete_area(team->aspace->id, area);
 }
 
 
 status_t
 delete_area(area_id area)
 {
-	return vm_delete_region(vm_get_kernel_aspace_id(), area);
+	return vm_delete_area(vm_get_kernel_aspace_id(), area);
 }
 
 
@@ -2930,7 +2930,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	area = vm_create_anonymous_region(vm_get_current_user_aspace_id(), (char *)name, &address, 
+	area = vm_create_anonymous_area(vm_get_current_user_aspace_id(), (char *)name, &address, 
 				addressSpec, size, lock, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
@@ -2949,6 +2949,6 @@ _user_delete_area(area_id area)
 	// that you have created yourself from userland.
 	// The documentation to delete_area() explicetly states that this
 	// will be restricted in the future, and so it will.
-	return vm_delete_region(vm_get_current_user_aspace_id(), area);
+	return vm_delete_area(vm_get_current_user_aspace_id(), area);
 }
 
