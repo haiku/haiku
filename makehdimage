@@ -1,0 +1,132 @@
+#!/bin/sh
+
+# path of the checked out Haiku sources
+sourceDir=/boot/home/develop/openbeos/current
+# disk image path, size in MB
+imagePath=/media/haiku.image
+imageSize=40
+# ufs_mount path
+ufsMount=/boot/home/develop/other/userlandfs/generated/distro/ufs_mount/ufs_mount
+
+# build everything needed
+cd $sourceDir
+RUN_WITHOUT_APP_SERVER=1
+jam -q kernel boot_loader config_manager pci isa ide scsi \
+	ide_isa bfs blkman fast_log ide_adapter locked_pool \
+	scsi_periph intel keyboard scsi_dsk scsi_cd libbe.so \
+	rld.so libroot.so init kernel_false consoled \
+	kernel_fortune kernel_true ls df mount unmount \
+	kernel_uname df libnet.so null zero random tty sh ps || exit 1
+
+
+# create the image and the directory structure
+
+dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
+mkbfs $imagePath Haiku
+mkdir -p /haiku
+sync
+$ufsMount obfs $imagePath /haiku || exit 1
+
+cd /haiku
+mkdir -p beos/system/add-ons/kernel/bus_managers
+mkdir -p beos/system/add-ons/kernel/generic
+mkdir -p beos/system/add-ons/kernel/file_systems
+mkdir -p beos/system/add-ons/kernel/partitioning_systems
+mkdir -p beos/system/add-ons/kernel/busses/ide
+mkdir -p beos/system/add-ons/kernel/boot
+mkdir -p beos/system/add-ons/kernel/drivers/bin
+mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
+mkdir -p beos/bin
+mkdir -p beos/system/lib
+mkdir -p beos/system/boot
+mkdir -p beos/etc
+mkdir -p home
+
+
+# modules
+
+cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
+
+for f in bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa \
+		file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter \
+		generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
+	cp $f /haiku/beos/system/add-ons/kernel/$f
+done
+
+for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
+	name=drivers/bin/$(basename $f)
+	cp $name /haiku/beos/system/add-ons/kernel/$name
+done
+
+cd $sourceDir/objects/x86.R1/add-ons/kernel
+
+for f in bus_managers/config_manager bus_managers/pci; do
+	name=$(basename $f)
+	cp $f/$name /haiku/beos/system/add-ons/kernel/$f
+done
+
+# drivers
+for f in drivers/arch/x86/keyboard/keyboard; do
+	cp $f /haiku/beos/system/add-ons/kernel/drivers/bin
+done
+
+cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/dev
+for f in tty random null zero; do
+	cp $f /haiku/beos/system/add-ons/kernel/drivers/bin
+done
+
+
+# kernel
+cp $sourceDir/objects/x86.R1/kernel/kernel /haiku/beos/system/kernel_x86
+
+
+# libs
+cd $sourceDir/distro/x86.R1/beos/system/lib
+cp libbe.so /haiku/beos/system/lib/
+cd $sourceDir/objects/x86.R1/kernel/
+cp rld.so libroot.so /haiku/beos/system/lib/
+cp /system/lib/libstdc++.r4.so /haiku/beos/system/lib/
+
+
+# apps
+cd $sourceDir/objects/x86.R1/kernel
+for f in false fortune ls ps true uname; do
+	cp kernel_$f /haiku/beos/bin/$f
+done
+cp $sourceDir/src/kernel/apps/fortune/fortunes /haiku/beos/etc/
+cp $sourceDir/distro/x86.R1/beos/bin/df /haiku/beos/bin/
+cd /haiku/beos/bin/
+
+
+# boot loader
+cd /haiku/beos/system
+objcopy -O binary $sourceDir/objects/x86.R1/kernel/boot_loader zbeos
+
+
+# boot module links
+cd /haiku/beos/system/add-ons/kernel/boot
+for f in bus_managers/config_manager bus_managers/pci bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
+	ln -fs /boot/beos/system/add-ons/kernel/$f $(basename $f)
+done
+for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
+	ln -fs /boot/beos/system/add-ons/kernel/drivers/bin/$(basename $f) .
+done
+
+
+# driver links
+cd /haiku/beos/system/add-ons/kernel
+for f in drivers/dev/keyboard drivers/dev/null drivers/dev/tty drivers/dev/zero \
+		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
+	relName=$(echo $f | sed -e s@drivers/dev/@@)
+	linkName=bin/$(basename $f)
+	while [ $relName != . ]; do
+		relName=$(dirname $relName)
+		linkName=../$linkName
+	done
+	(cd $(dirname $f); ln -fs $linkName .)
+done
+
+
+cd /
+sync
+unmount /haiku
