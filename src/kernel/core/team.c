@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1010,7 +1010,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 	}
 
 	// create an address space for this team
-	err = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false, &team->aspace);
+	err = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
 	if (err < B_OK)
 		goto err3;
 
@@ -1022,7 +1022,8 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 		threadName = args[0];
 
 	// create a kernel thread, but under the context of the new team
-	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
+	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY,
+				teamArgs, team->id);
 	if (thread < 0) {
 		err = thread;
 		goto err4;
@@ -1204,7 +1205,7 @@ fork_team(void)
 	}
 
 	// create an address space for this team
-	status = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false, &team->aspace);
+	status = vm_create_aspace(team->name, team->id, USER_BASE, USER_SIZE, false, &team->aspace);
 	if (status < B_OK)
 		goto err3;
 

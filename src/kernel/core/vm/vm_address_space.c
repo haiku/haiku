@@ -50,7 +50,6 @@
 vm_address_space *kernel_aspace;
 
 #define ASPACE_HASH_TABLE_SIZE 1024
-static aspace_id next_aspace_id;
 static void *aspace_table;
 static sem_id aspace_hash_sem;
 
@@ -283,10 +282,10 @@ vm_delete_aspace(vm_address_space *aspace)
 
 
 status_t
-vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_address_space **_aspace)
+vm_create_aspace(const char *name, team_id id, addr_t base, addr_t size, bool kernel, vm_address_space **_aspace)
 {
 	vm_address_space *aspace;
-	status_t err;
+	status_t status;
 
 	aspace = (vm_address_space *)malloc(sizeof(vm_address_space));
 	if (aspace == NULL)
@@ -301,7 +300,7 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_add
 	}
 	strcpy(aspace->name, name);
 
-	aspace->id = next_aspace_id++;
+	aspace->id = id;
 	aspace->ref_count = 1;
 	aspace->state = VM_ASPACE_STATE_NORMAL;
 	aspace->fault_count = 0;
@@ -312,11 +311,11 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel, vm_add
 	aspace->last_working_set_adjust = system_time();
 
 	// initialize the corresponding translation map
-	err = arch_vm_translation_map_init_map(&aspace->translation_map, kernel);
-	if (err < B_OK) {
+	status = arch_vm_translation_map_init_map(&aspace->translation_map, kernel);
+	if (status < B_OK) {
 		free(aspace->name);
 		free(aspace);
-		return err;
+		return status;
 	}
 
 	// initialize the virtual map
@@ -363,7 +362,6 @@ vm_aspace_walk_next(struct hash_iterator *i)
 status_t
 vm_aspace_init(void)
 {
-	next_aspace_id = 0;
 	aspace_hash_sem = -1;
 
 	// create the area and address space hash tables
@@ -378,7 +376,7 @@ vm_aspace_init(void)
 	kernel_aspace = NULL;
 
 	// create the initial kernel address space
-	if (vm_create_aspace("kernel_land", KERNEL_BASE, KERNEL_SIZE, true, &kernel_aspace) != B_OK)
+	if (vm_create_aspace("kernel_land", 1, KERNEL_BASE, KERNEL_SIZE, true, &kernel_aspace) != B_OK)
 		panic("vm_init: error creating kernel address space!\n");
 
 	add_debugger_command("aspaces", &dump_aspace_list, "Dump a list of all address spaces");
