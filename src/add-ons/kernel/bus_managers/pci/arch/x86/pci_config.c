@@ -244,5 +244,5 @@ pci_mech2_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, ui
 void *
 pci_ram_address(const void *physical_address_in_system_memory)
 {
-	return 0;
+	return physical_address_in_system_memory;
 }
