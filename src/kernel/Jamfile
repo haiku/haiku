@@ -72,6 +72,7 @@ KernelStaticLibraryObjects libkern.a :
 
 	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>cpuid.o
 	;
 
 KernelLd stage2
@@ -195,6 +196,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>cpuid.o
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
@@ -333,6 +335,7 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!os>time.o
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>cpuid.o
 
 	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
@@ -510,7 +513,19 @@ KernelLd libglue2.o :
 	:
 	no_gcc
 	;
-	
+
+KernelLd cpuinfo :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!cpuinfo>main.o
+	libroot.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/cpuinfo
+	;
+
 KernelLd init :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>init.o
