@@ -164,13 +164,14 @@ KernelLd libglue.o :
 # this one is needed for rld.so only
 KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot>libroot_init.o
-	<$(SOURCE_GRIST)!libroot>syscalls.o
+
+	<$(SOURCE_GRIST)!libroot!os>syscalls.o
+	<$(SOURCE_GRIST)!libroot!os>sem.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
 	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
 	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
-
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 
 	<$(SOURCE_GRIST)!libroot!posix!malloc>arch-specific.o
 	<$(SOURCE_GRIST)!libroot!posix!malloc>heap.o
@@ -292,7 +293,16 @@ KernelLd libroot.so :
 	libglue.o
 
 	<$(SOURCE_GRIST)!libroot>libroot_init.o
-	<$(SOURCE_GRIST)!libroot>syscalls.o
+
+	<$(SOURCE_GRIST)!libroot!os>area.o
+	<$(SOURCE_GRIST)!libroot!os>debug.o
+	<$(SOURCE_GRIST)!libroot!os>port.o
+	<$(SOURCE_GRIST)!libroot!os>sem.o
+	<$(SOURCE_GRIST)!libroot!os>systeminfo.o
+	<$(SOURCE_GRIST)!libroot!os>thread.o
+	<$(SOURCE_GRIST)!libroot!os>team.o
+	<$(SOURCE_GRIST)!libroot!os>syscalls.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 
 	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
@@ -445,15 +455,6 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!math>cabs.o
 	<$(SOURCE_GRIST)!libroot!posix!math>cbrt.o
 	<$(SOURCE_GRIST)!libroot!posix!math>ieee.o
-
-	<$(SOURCE_GRIST)!libroot!os>area.o
-	<$(SOURCE_GRIST)!libroot!os>debug.o
-	<$(SOURCE_GRIST)!libroot!os>port.o
-	<$(SOURCE_GRIST)!libroot!os>sem.o
-	<$(SOURCE_GRIST)!libroot!os>systeminfo.o
-	<$(SOURCE_GRIST)!libroot!os>thread.o
-	<$(SOURCE_GRIST)!libroot!os>team.o
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
 	:
