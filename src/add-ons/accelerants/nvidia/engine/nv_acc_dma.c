@@ -432,10 +432,10 @@ status_t nv_acc_init_dma()
 
 			ACCW(NV10_TIL3PT, 0x2ffff800);
 			ACCW(NV10_TIL3ST, 0x00006000);
+			/* enable some DMA channel (split-up source and dest now or so) */
 			ACCW(NV4X_WHAT1, 0x01000000);
-			ACCW(NV4X_WHAT0, 0x00001200);//1200 DMA instance????(test shutoff in PIO mod)
-//test if trouble:
-//			ACCW(NV4X_WHAT0, 0x00001140);
+			/* DMA instance = $1140 */
+			ACCW(NV4X_WHAT0, 0x00001140);
 			break;
 		case NV30A:
 /*
