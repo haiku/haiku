@@ -117,6 +117,11 @@ SYSCALL1(sys_unregister_image, 115)
 SYSCALL3(sys_get_image_info, 116)
 SYSCALL4(sys_get_next_image_info, 117)
 
+/* node monitor calls */
+SYSCALL6(sys_start_watching, 118)
+SYSCALL6(sys_stop_watching, 119)
+SYSCALL2(sys_stop_notifying, 120)
+
 /* VM calls */
 SYSCALL6(sys_vm_create_anonymous_region, 29)
 SYSCALL6(sys_vm_clone_region, 30)
