@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons kernel bus_managers ide ;
+
+UsePrivateHeaders kernel ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
+
+KernelAddon ide : kernel bus_managers :
+	ata.c
+	atapi.c
+	basic_protocol.c
+	channels.c
+	devices.c
+	dma.c
+	emulation.c
+	ide.c
+	ide_sim.c
+	pio.c
+	queuing.c
+	scsi2ata.c
+	sync.c
+	virtual_memory.c
+	;
+
