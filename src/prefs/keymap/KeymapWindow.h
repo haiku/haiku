@@ -16,9 +16,8 @@
 #ifndef KEYMAP_WINDOW_H
 #define KEYMAP_WINDOW_H
 
-#include <interface/Window.h>
-#include <support/List.h>
-#include <interface/MenuBar.h>
+#include <Window.h>
+#include <MenuBar.h>
 #include "KeymapTextView.h"
 #include "Keymap.h"
 

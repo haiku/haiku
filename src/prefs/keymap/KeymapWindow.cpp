@@ -191,11 +191,10 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	if( currentKeymapItem != NULL )
 		fUserListView->AddItem( currentKeymapItem );
 	// Saved keymaps
-	mapsBox->AddChild( new BScrollView( "systemScrollList", fUserListView,
+	mapsBox->AddChild( new BScrollView( "userScrollList", fUserListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true ));
 	fUserListView->SetSelectionMessage( new BMessage( USER_MAP_SELECTED ));
-	
-	
+		
 	FillSystemMaps();
 	
 	FillUserMaps();
@@ -350,6 +349,17 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 		fCurrentFont(*be_plain_font),
 		fCurrentMap(keymap)
 {
+	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
+	BRect textRect = frameRect;
+	textRect.OffsetTo(B_ORIGIN);
+	textRect.InsetBy(1,1);
+	fTextView = new KeymapTextView(frameRect, "testzone", textRect,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
+	fTextView->MakeEditable(true);
+	fTextView->MakeSelectable(true);
+	
+	AddChild(fTextView);
+
 	BRect keyRect = BRect(11,50,29,68);
 	int32 i = 1;
 	fKeysRect[i] = keyRect;
@@ -705,16 +715,7 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 		
 	fKeysVertical[0x5e] = true;
 	
-	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
-	BRect textRect = frameRect;
-	textRect.OffsetTo(B_ORIGIN);
-	textRect.InsetBy(1,1);
-	fTextView = new KeymapTextView(frameRect, "testzone", textRect,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS);
-	fTextView->MakeEditable(true);
-	fTextView->MakeSelectable(true);
-	fTextView->SetViewColor(255,255,255);
-	AddChild(fTextView);
+	
 	
 }
 
@@ -723,6 +724,7 @@ void
 MapView::AttachedToWindow()
 {
 	SetEventMask(B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
+	fTextView->SetViewColor(255,255,255);
 }
 
 
