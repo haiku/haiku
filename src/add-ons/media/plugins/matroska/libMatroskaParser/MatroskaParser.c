@@ -532,7 +532,7 @@ static ulonglong	readSize(MatroskaFile *mf) {
 
 static inline longlong	readVLSInt(MatroskaFile *mf) {
   static longlong bias[8] = { (1<<6)-1, (1<<13)-1, (1<<20)-1, (1<<27)-1,
-			      (1<<34)-1, (1<<41)-1, (1<<48)-1, (1<<55)-1 };
+			      (1LL<<34)-1, (1LL<<41)-1, (1LL<<48)-1, (1LL<<55)-1 };
 
   int	    m;
   longlong  v = readVLUIntImp(mf,&m);
