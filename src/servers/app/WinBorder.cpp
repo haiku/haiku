@@ -83,9 +83,10 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 {
 	// unlike BViews, windows start off as hidden
 	fHidden			= true;
+	fInUpdate		= false;
 	fServerWin		= win;
 	fClassID		= AS_WINBORDER_CLASS;
-
+cnt = 0;
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
 	fDecorator		= NULL;
@@ -311,7 +312,7 @@ void WinBorder::Draw(const BRect &r)
 			fDecorator->SetFocus(true);
 		else
 			fDecorator->SetFocus(false);
-		fDecorator->Draw(fUpdateReg.Frame());
+		fDecorator->Draw(r);
 	}
 }
 

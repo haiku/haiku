@@ -925,10 +925,17 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_GET_COORD:
 		{
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->fName->String()));
+printf("Adi: %s\n", cl->GetName());
+cl->fFrame.PrintToStream();
+cl->fBoundsLeftTop.PrintToStream();
 			fMsgSender->StartMessage(SERVER_TRUE);
-			fMsgSender->Attach<float>(cl->fFrame.left);
-			fMsgSender->Attach<float>(cl->fFrame.top);
+			BPoint	pt(cl->ConvertFromParent(cl->fFrame.LeftTop()));
+			fMsgSender->Attach<float>(pt.x);
+			fMsgSender->Attach<float>(pt.y);
+//			fMsgSender->Attach<float>(cl->fFrame.left);
+//			fMsgSender->Attach<float>(cl->fFrame.top);
 			fMsgSender->Attach<BRect>(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
+//			fMsgSender->Attach<BRect>(cl->ConvertFromTop(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop)));
 			fMsgSender->Flush();
 
 			break;
@@ -1437,6 +1444,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		{
 			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n",fTitle.String()));
 			Show();
+printf("Adi: %s shown\n", fTitle.String());
 			break;
 		}
 		case AS_HIDE_WINDOW:
@@ -1651,13 +1659,18 @@ void ServerWindow::DispatchGraphicsMessage(int32 code, LinkMsgReader &link)
 {
 	fWinBorder->GetRootLayer()->Lock();
 	BRegion		rreg(cl->fVisible);
-	rreg.IntersectWith(&fWinBorder->yUpdateReg);
-
+	if (fWinBorder->fInUpdate)
+		rreg.IntersectWith(&fWinBorder->yUpdateReg);
+//if (!fWinBorder->yUpdateReg.Frame().IsValid() && fWinBorder->fInUpdate)
+//{
+//	printf("ADi: FRAME INVALID!!!!\n");
+//	fWinBorder->yUpdateReg.PrintToStream();
+//}
 	desktop->GetDisplayDriver()->ConstrainClippingRegion(&rreg);
 //	rgb_color  rrr = cl->fLayerData->viewcolor.GetColor32();
 //	RGBColor c(rand()%255,rand()%255,rand()%255);
 //	desktop->GetDisplayDriver()->FillRect(BRect(0,0,639,479), c);
-
+//	snooze(500000);
 	switch (code)
 	{
 		case AS_LAYER_SET_HIGH_COLOR:

@@ -114,6 +114,7 @@ public:
 	
 	BRect ConvertToParent(BRect rect);
 	BRegion ConvertToParent(BRegion *reg);
+	BPoint ConvertFromParent(BPoint pt);
 	BRect ConvertFromParent(BRect rect);
 	BRegion ConvertFromParent(BRegion *reg);
 	
@@ -147,7 +148,6 @@ public:
 
 	void UpdateStart();
 	void UpdateEnd();
-	bool InUpdate() const { return fInUpdate; }
 	BRegion* ClippingRegion() const { return fClipReg; }
 
 protected:
@@ -177,7 +177,6 @@ protected:
 	BRegion fVisible;
 	BRegion	fFullVisible;
 	BRegion	fFull;
-	BRegion	fUpdateReg;
 	BRegion *fClipReg;
 	
 	BRegion *clipToPicture;
@@ -192,7 +191,6 @@ protected:
 	uint32 fEventMask;
 	uint32 fEventOptions;
 	bool fHidden;
-	bool fInUpdate;
 	bool fIsTopLayer;
 	uint16 fAdFlags;
 	int8 fClassID;
@@ -208,7 +206,7 @@ private:
 	void RequestDraw(const BRegion &reg, Layer *startFrom);
 	ServerWindow *SearchForServerWindow(void);
 
-	void Layer::SendUpdateMsg();
+	void SendUpdateMsg(BRegion &reg);
 	void SendViewMovedMsg(void);
 	void SendViewResizedMsg(void);
 

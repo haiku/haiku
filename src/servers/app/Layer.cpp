@@ -103,7 +103,6 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fHidden			= false;
 	fEventMask		= 0UL;
 	fEventOptions	= 0UL;
-	fInUpdate		= false;
 	fIsTopLayer		= false;
 	fLevel			= -100;
 	
@@ -539,7 +538,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	{
 		// calculate the minimum region/rectangle to be updated with
 		// a single message to the client.
-		fUpdateReg = fFullVisible;
+		BRegion	updateReg(fFullVisible);
 		if (fFlags & B_FULL_UPDATE_ON_RESIZE
 			&& fFrameAction	== B_LAYER_ACTION_RESIZE)
 		{
@@ -547,78 +546,43 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		}
 		else
 		{
-			fUpdateReg.IntersectWith(&reg);
+			updateReg.IntersectWith(&reg);
 		}
-		if (fUpdateReg.CountRects() > 0)
+		if (updateReg.CountRects() > 0)
 		{
+			fOwner->zUpdateReg.Include(&updateReg);			
 			if (!fOwner->fInUpdate)
 			{
-				fOwner->prevInvalid = fUpdateReg;
-				SendUpdateMsg();
-			}
-			else
-			{
-				fOwner->zUpdateReg.Include(&fUpdateReg);
+// TODO: WHAT if 2 or more update requests are sent before we start to processing the first one.
+				fOwner->fUpdateReg = fOwner->zUpdateReg;
+//fOwner->cnt++;
+//if (fOwner->cnt != 1)
+//	debugger("Adi: Not Allowed!");
+				fOwner->zUpdateReg.MakeEmpty();
+				SendUpdateMsg(fOwner->fUpdateReg);
 			}
 		}
 	}
 
 	if (fVisible.CountRects() > 0)
 	{
-		// client side drawing. Send only one UPDATE message!
-		if (HasClient())
+		BRegion	updateReg(fVisible);
+		// calculate the update region
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE
+			&& fFrameAction	== B_LAYER_ACTION_RESIZE)
 		{
-			// calculate the update region
-			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE
-				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
-			{
-				// do nothing
-			}
-			else
-			{
-				fUpdateReg.IntersectWith(&reg);
-			}
-
-			if (fUpdateReg.CountRects() > 0)
-			{
-				// clear background with viewColor.
-				fDriver->ConstrainClippingRegion(&fUpdateReg);
-//				RGBColor c(rand()%255,rand()%255,rand()%255);
-//				fDriver->FillRect(fUpdateReg.Frame(), c);
-				fDriver->FillRect(fUpdateReg.Frame(), fLayerData->viewcolor);
-				fDriver->ConstrainClippingRegion(NULL);
-				fUpdateReg.MakeEmpty();
-			}
+			// do nothing
 		}
 		else
 		{
-			// server drawings are immediate.
-			// No IPC is needed so this is done in place.
-			if (fClassID == AS_WINBORDER_CLASS)
-			{
-				WinBorder	*wb = (WinBorder*)this;
-				wb->zUpdateReg.Include(&reg);
-			}
+			updateReg.IntersectWith(&reg);
+		}
 
-			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE
-				&& fFrameAction	== B_LAYER_ACTION_RESIZE)
-			{
-				// do nothing
-			}
-			else
-			{
-				fUpdateReg.IntersectWith(&reg);
-			}
-
-			if (fUpdateReg.CountRects() > 0)
-			{
-				fDriver->ConstrainClippingRegion(&fUpdateReg);
-				Draw(fUpdateReg.Frame());
-				fDriver->ConstrainClippingRegion(NULL);
-				fUpdateReg.MakeEmpty();
-			}
+		if (updateReg.CountRects() > 0)
+		{
+			fDriver->ConstrainClippingRegion(&updateReg);
+			Draw(updateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
 		}
 	}
 
@@ -646,7 +610,7 @@ void Layer::Draw(const BRect &r)
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
 
 	#ifdef DEBUG_LAYER
-	printf("Layer::Draw: ");
+	printf("Layer(%s)::Draw: ", GetName());
 	r.PrintToStream();
 	#endif	
 	
@@ -660,36 +624,38 @@ void Layer::Draw(const BRect &r)
 void Layer::UpdateStart()
 {
 	// During updates we only want to draw what's in the update region
-	fInUpdate = true;
 	if (fClassID == AS_WINBORDER_CLASS)
 	{
 		// NOTE: don't worry, RooLayer is locked here.
 		WinBorder	*wb = (WinBorder*)this;
-		wb->yUpdateReg = wb->prevInvalid;
+
+		wb->fInUpdate = true;
+// TODO: wb->fUpdateReg seems to be invalid from time to time. Fix that! [See TODO in RequestDraw]
+		wb->yUpdateReg = wb->fUpdateReg;
+		wb->fUpdateReg.MakeEmpty();
+//wb->cnt--;
+//if (wb->cnt != 0)
+//	debugger("Adi2: Not Allowed!");
 	}
-	fClipReg = &fUpdateReg;
 }
 
 void Layer::UpdateEnd()
 {
 	// The usual case. Drawing is permitted in the whole visible area.
-	fUpdateReg.MakeEmpty();
 	if (fClassID == AS_WINBORDER_CLASS)
 	{
 		WinBorder	*wb = (WinBorder*)this;
+
 		wb->yUpdateReg.MakeEmpty();
-		wb->zUpdateReg.Exclude(&wb->prevInvalid);
+
+		wb->fInUpdate = false;
+
 		if (wb->zUpdateReg.CountRects() > 0)
 		{
 			BRegion		reg(wb->zUpdateReg);
 			wb->RequestDraw(reg, NULL);
-			wb->zUpdateReg.MakeEmpty();
 		}
-		else
-			wb->prevInvalid.MakeEmpty();
 	}
-
-	fInUpdate = false;
 }
 
 /*!
@@ -760,7 +726,7 @@ void Layer::RebuildFullRegion(void)
 		fFull.Set(fParent->ConvertToTop(fFrame ));
 	else
 		fFull.Set(fFrame);
-	
+
 	// TODO: restrict to screen coordinates
 	
 	// TODO: Convert to screen coordinates
@@ -1157,7 +1123,9 @@ void Layer::move_layer(float x, float y)
 	if (fClassID == AS_WINBORDER_CLASS)
 	{
 		WinBorder	*wb = (WinBorder*)this;
-		wb->prevInvalid.OffsetBy(x, y);
+		wb->zUpdateReg.OffsetBy(x, y);
+		wb->yUpdateReg.OffsetBy(x, y);
+		wb->fUpdateReg.OffsetBy(x, y);
 	}
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
@@ -1370,6 +1338,12 @@ BRegion Layer::ConvertToParent(BRegion *reg)
 }
 
 //! Converts the passed rectangle from parent coordinates
+BPoint Layer::ConvertFromParent(BPoint pt)
+{
+	return (pt - fFrame.LeftTop());
+}
+
+//! Converts the passed rectangle from parent coordinates
 BRect Layer::ConvertFromParent(BRect rect)
 {
 	return (rect.OffsetByCopy(fFrame.left*-1,fFrame.top*-1));
@@ -1480,16 +1454,15 @@ void Layer::SendViewMovedMsg()
 }
 
 //! Sends an _UPDATE_ message to the client BWindow
-void Layer::SendUpdateMsg()
+void Layer::SendUpdateMsg(BRegion &reg)
 {
 	BMessage msg;
 	msg.what = _UPDATE_;
-	msg.AddRect("_rect", ConvertFromTop(fUpdateReg.Frame()) );
-	msg.AddRect("debug_rect", fUpdateReg.Frame() );
-	msg.AddInt32("_token",fViewToken);
+	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
+	msg.AddRect("debug_rect", reg.Frame() );
+//	msg.AddInt32("_token",fViewToken);
 		
 	fOwner->Window()->SendMessageToClient(&msg);
-	//fServerWin->SendMessageToClient( &msg );
 }
 
 Layer *Layer::VirtualTopChild() const

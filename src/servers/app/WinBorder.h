@@ -114,7 +114,7 @@ protected:
 
 	BRegion	 zUpdateReg;
 	BRegion	 yUpdateReg;
-	BRegion  prevInvalid;
+	BRegion  fUpdateReg;
 
 	int32 fMouseButtons;
 	int32 fKeyModifiers;
@@ -123,7 +123,9 @@ protected:
 	bool fIsClosing;
 	bool fIsMinimizing;
 	bool fIsZooming;
-	
+
+	bool fInUpdate;
+	int cnt;
 	float fMinWidth, fMaxWidth;
 	float fMinHeight, fMaxHeight;
 };
