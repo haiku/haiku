@@ -33,6 +33,7 @@
 #include <NodeMonitor.h>
 #include <Volume.h>
 #include <fs_attr.h>
+#include <PrintJob.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -857,7 +858,8 @@ UpdateLooper::MessageReceived(BMessage *message)
 
 
 ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BMessage *settings)
-	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW)
+	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
+	fPrintSettings(NULL)
 {
 	fEditor.SetTo(*ref, attribute);
 
@@ -1241,6 +1243,51 @@ ProbeView::CheckClipboard()
 
 
 status_t
+ProbeView::PageSetup()
+{
+	BPrintJob printJob(Window()->Title());
+	if (fPrintSettings != NULL)
+		printJob.SetSettings(new BMessage(*fPrintSettings));
+
+	status_t status = printJob.ConfigPage();
+	if (status == B_OK) {
+		// replace the print settings on success
+		delete fPrintSettings;
+		fPrintSettings = printJob.Settings();
+	}
+
+	return status;
+}
+
+
+void
+ProbeView::Print()
+{
+	if (fPrintSettings == NULL && PageSetup() != B_OK)
+		return;
+
+	BPrintJob printJob(Window()->Title());
+	printJob.SetSettings(new BMessage(*fPrintSettings));
+
+	if (printJob.ConfigJob() == B_OK) {
+		BRect rect = printJob.PrintableRect();
+
+		float width, height;
+		fDataView->GetPreferredSize(&width, &height);
+
+		printJob.BeginJob();
+
+		fDataView->SetScale(rect.Width() / width);
+		printJob.DrawView(fDataView, rect, rect.LeftTop());
+		fDataView->SetScale(1.0);
+		printJob.SpoolPage();
+
+		printJob.CommitJob();
+	}
+}
+
+
+status_t
 ProbeView::Save()
 {
 	status_t status = fEditor.Save();
@@ -1342,11 +1389,11 @@ ProbeView::MessageReceived(BMessage *message)
 		}
 
 		case kMsgPrint:
-			puts("print...");
+			Print();
 			break;
 
 		case kMsgPageSetup:
-			puts("page setup...");
+			PageSetup();
 			break;
 
 		case B_NODE_MONITOR:

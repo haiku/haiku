@@ -9,7 +9,7 @@
 #include <SupportDefs.h>
 
 
-static const char *kSignature = "application/x-vnd.OpenBeOS-DiskProbe";
+extern const char *kSignature;
 
 static const uint32 kMsgOpenFilePanel = 'opFp';
 static const uint32 kMsgOpenOpenWindow = 'opOw';

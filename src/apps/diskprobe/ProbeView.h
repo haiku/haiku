@@ -45,6 +45,8 @@ class ProbeView : public BView {
 		void UpdateAttributesMenu(BMenu *menu);
 		void UpdateSelectionMenuItems(int64 start, int64 end);
 		void CheckClipboard();
+		status_t PageSetup();
+		void Print();
 		status_t Save();
 
 		DataEditor		fEditor;
@@ -56,6 +58,7 @@ class ProbeView : public BView {
 		BMenuItem		*fUndoMenuItem, *fRedoMenuItem;
 		BMenuItem		*fNativeMenuItem, *fSwappedMenuItem;
 		BMenuItem		*fSaveMenuItem;
+		BMessage		*fPrintSettings;
 };
 
 #endif	/* PROBE_VIEW_H */
