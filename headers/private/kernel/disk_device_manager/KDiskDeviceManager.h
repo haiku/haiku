@@ -38,20 +38,21 @@ public:
 
 	// manager must be locked
 	KDiskDevice *FindDevice(const char *path);
-	KDiskDevice *FindDevice(partition_id id);
+	KDiskDevice *FindDevice(partition_id id, bool deviceOnly = true);
 	KPartition *FindPartition(const char *path, bool noShadow = false);
 	KPartition *FindPartition(partition_id id, bool noShadow = false);
 	KFileDiskDevice *FindFileDevice(const char *filePath);
 
 	KDiskDevice *RegisterDevice(const char *path);
-	KDiskDevice *RegisterDevice(partition_id id);
+	KDiskDevice *RegisterDevice(partition_id id, bool deviceOnly = true);
 	KDiskDevice *RegisterNextDevice(int32 *cookie);
 	KPartition *RegisterPartition(const char *path, bool noShadow = false);
 	KPartition *RegisterPartition(partition_id id, bool noShadow = false);
 	KFileDiskDevice *RegisterFileDevice(const char *filePath);
 
-	status_t CreateFileDevice(const char *filePath, partition_id *device = 0);
+	partition_id CreateFileDevice(const char *filePath);
 	status_t DeleteFileDevice(const char *filePath);
+	status_t DeleteFileDevice(partition_id id);
 
 	// manager must be locked
 	int32 CountDevices();

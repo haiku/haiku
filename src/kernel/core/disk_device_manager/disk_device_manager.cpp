@@ -105,7 +105,7 @@ disk_device_data *
 get_disk_device(partition_id partitionID)
 {
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
-	KDiskDevice *device = manager->FindDevice(partitionID);
+	KDiskDevice *device = manager->FindDevice(partitionID, false);
 	return (device ? device->DeviceData() : NULL);
 }
 

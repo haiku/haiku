@@ -121,10 +121,18 @@ KDiskDeviceManager::~KDiskDeviceManager()
 	if (fPartitions->Count() > 0) {
 		DBG(OUT("WARNING: There are still %ld unremoved partitions!\n",
 				fPartitions->Count()));
+		for (PartitionMap::Iterator it = fPartitions->Begin();
+			 it != fPartitions->End(); ++it) {
+			DBG(OUT("         partition: %ld\n", it->Value()->ID()));
+		}
 	}
 	if (fObsoletePartitions->Count() > 0) {
 		DBG(OUT("WARNING: There are still %ld obsolete partitions!\n",
 				fObsoletePartitions->Count()));
+		for (PartitionSet::Iterator it = fObsoletePartitions->Begin();
+			 it != fObsoletePartitions->End(); ++it) {
+			DBG(OUT("         partition: %ld\n", (*it)->ID()));
+		}
 	}
 	// remove all disk systems
 	for (int32 cookie = 0;
@@ -214,10 +222,13 @@ KDiskDeviceManager::FindDevice(const char *path)
 
 // FindDevice
 KDiskDevice *
-KDiskDeviceManager::FindDevice(partition_id id)
+KDiskDeviceManager::FindDevice(partition_id id, bool deviceOnly)
 {
-	if (KPartition *partition = FindPartition(id))
-		return partition->Device();
+	if (KPartition *partition = FindPartition(id)) {
+		KDiskDevice *device = partition->Device();
+		if (!deviceOnly || id == device->ID())
+			return device;
+	}
 	return NULL;
 }
 
@@ -283,10 +294,10 @@ KDiskDeviceManager::RegisterDevice(const char *path)
 
 // RegisterDevice
 KDiskDevice *
-KDiskDeviceManager::RegisterDevice(partition_id id)
+KDiskDeviceManager::RegisterDevice(partition_id id, bool deviceOnly)
 {
 	if (ManagerLocker locker = this) {
-		if (KDiskDevice *device = FindDevice(id)) {
+		if (KDiskDevice *device = FindDevice(id, deviceOnly)) {
 			device->Register();
 			return device;
 		}
@@ -349,13 +360,13 @@ KDiskDeviceManager::RegisterFileDevice(const char *filePath)
 }
 
 // CreateFileDevice
-status_t
-KDiskDeviceManager::CreateFileDevice(const char *filePath,
-									 partition_id *deviceID)
+partition_id
+KDiskDeviceManager::CreateFileDevice(const char *filePath)
 {
 	if (!filePath)
 		return B_BAD_VALUE;
 	status_t error = B_ERROR;
+	partition_id deviceID = -1;
 	KFileDiskDevice *device = NULL;
 	if (ManagerLocker locker = this) {
 		// check, if the device does already exist
@@ -374,8 +385,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath,
 			delete device;
 			return error;
 		}
-		if (deviceID)
-			*deviceID = device->ID();
+		deviceID = device->ID();
 		device->Register();
 	}
 	// scan device
@@ -383,7 +393,7 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath,
 		_ScanDevice(device);
 		device->Unregister();
 	}
-	return error;
+	return (error == B_OK ? deviceID : error);
 }
 
 // DeleteFileDevice
@@ -392,6 +402,22 @@ KDiskDeviceManager::DeleteFileDevice(const char *filePath)
 {
 	if (KFileDiskDevice *device = RegisterFileDevice(filePath)) {
 		PartitionRegistrar _(device, true);
+		if (DeviceWriteLocker locker = device) {
+			if (_RemoveDevice(device))
+				return B_OK;
+		}
+	}
+	return B_ERROR;
+}
+
+// DeleteFileDevice
+status_t
+KDiskDeviceManager::DeleteFileDevice(partition_id id)
+{
+	if (KDiskDevice *device = RegisterDevice(id)) {
+		PartitionRegistrar _(device, true);
+		if (!dynamic_cast<KFileDiskDevice*>(device) || id != device->ID())
+			return B_ENTRY_NOT_FOUND;
 		if (DeviceWriteLocker locker = device) {
 			if (_RemoveDevice(device))
 				return B_OK;
