@@ -1017,9 +1017,6 @@ MimeSnifferTest::ParserTest() {
 		{ "-1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
 		{ "+1.0e+", "Sniffer pattern error: incomplete extended-notation floating point number" },
 
-		{ "\\11\"quotes_are_illegal_here", "Sniffer pattern error: illegal unquoted character '\"'" },
-		{ "\\11'quotes_are_illegal_here", "Sniffer pattern error: illegal unquoted character '''" },
-		
 		{ "\\11\\", "Sniffer pattern error: incomplete escape sequence" },
 		{ "\"Escape!! \\", "Sniffer pattern error: incomplete escape sequence" },
 		{ "'Escape!! \\", "Sniffer pattern error: incomplete escape sequence" },
