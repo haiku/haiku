@@ -583,7 +583,7 @@ write(int fd, const void *buffer, size_t bufferSize)
 int
 open(const char *name, int mode, ...)
 {
-	// we always start at the top
+	// we always start at the top (there is no notion of a current directory (yet?))
 	if (name[0] == '/')
 		name++;
 
@@ -601,8 +601,11 @@ open(const char *name, int mode, ...)
 int
 open_from(Directory *directory, const char *name, int mode)
 {
-	if (name[0] == '/')
-		return B_BAD_VALUE;
+	if (name[0] == '/') {
+		// ignore the directory and start from root if we are asked to do that
+		directory = gRoot;
+		name++;
+	}
 
 	Node *node;
 	if (get_node_for_path(directory, name, &node) < B_OK)
