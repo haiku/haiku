@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <fstream>
 #include <string>
-#include <inttypes.h>
 
 #include "arch_config.h"
 
