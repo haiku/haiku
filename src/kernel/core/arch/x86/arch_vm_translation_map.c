@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -240,8 +240,9 @@ put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, uint32 attributes)
 	init_pdentry(e);
 	e->addr = ADDR_SHIFT(pgtable_phys);
 
-	// if the region is user accessible, it's automatically read/write
-	// accessible in kernel space
+	// if the region is user accessible, it's automatically
+	// accessible in kernel space, too (but with the same
+	// protection)
 	e->user = (attributes & B_USER_PROTECTION) != 0;
 	if (e->user)
 		e->rw = (attributes & B_WRITE_AREA) != 0;
