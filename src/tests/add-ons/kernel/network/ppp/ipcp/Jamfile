@@ -7,7 +7,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp ipcp ] ;
 
 
-Addon <userland>ipcp : userland network ppp :
+Addon <userland>ipcp : userland obos_network ppp :
 	ipcp.cpp
 	Protocol.cpp
 ;

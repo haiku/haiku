@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces loopback ] ;
 
-Addon <userland>loopback : userland network interfaces : 
+Addon <userland>loopback : userland obos_network interfaces : 
 	loopback.c
 ;
 

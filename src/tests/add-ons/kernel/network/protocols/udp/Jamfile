@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols udp ] ;
 
-Addon <userland>udp : userland network protocols : 
+Addon <userland>udp : userland obos_network protocols : 
 	udp.c
 ;
 

@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols ipv4 ] ;
 
-Addon <userland>ipv4 : userland network protocols : 
+Addon <userland>ipv4 : userland obos_network protocols : 
 	ipv4.c
 ;
 

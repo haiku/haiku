@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols raw ] ;
 
-Addon <userland>raw : userland network protocols : 
+Addon <userland>raw : userland obos_network protocols : 
 	raw.c
 ;
 

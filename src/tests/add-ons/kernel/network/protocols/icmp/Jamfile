@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols icmp ] ;
 
-Addon <userland>icmp : userland network protocols : 
+Addon <userland>icmp : userland obos_network protocols : 
 	icmp.c
 ;
 

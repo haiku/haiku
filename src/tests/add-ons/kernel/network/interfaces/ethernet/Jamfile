@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network interfaces ethernet ] ;
 
-Addon <userland>ethernet : userland network interfaces : 
+Addon <userland>ethernet : userland obos_network interfaces : 
 	ethernet.c
 ;
 

@@ -7,7 +7,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network ppp pap ] ;
 
 
-Addon <userland>pap : userland network ppp :
+Addon <userland>pap : userland obos_network ppp :
 	pap.cpp
 	Protocol.cpp
 ;
