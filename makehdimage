@@ -142,6 +142,7 @@ if [ $alreadyMounted ]; then
 	ln=ln
 	mkdir=mkdir
 	rm=rm
+	mkindex=mkindex
 else
 	sPrefix=:
 	cd="$fsShellCommand cd"
@@ -150,6 +151,7 @@ else
 	ln="$fsShellCommand ln"
 	mkdir="$fsShellCommand mkdir"
 	rm="$fsShellCommand rm"
+	mkindex="$fsShellCommand mkindex"
 fi
 
 
@@ -169,6 +171,9 @@ $cd $targetDir
 
 echo
 echo "Creating directory structure..."
+
+$mkindex BEOS:APP_SIG
+	# needed to launch apps via signature
 
 $mkdir -p beos/bin
 $mkdir -p beos/etc
