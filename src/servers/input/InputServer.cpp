@@ -1285,8 +1285,6 @@ InputServer::DispatchEvent(BMessage *message)
 			appsvrlink->Attach(repeatcount);
 			appsvrlink->Attach(modifiers);
 			appsvrlink->Attach(utf8data,sizeof(int8)*3);
-			int8 strlength = string.Length()+1;
-			appsvrlink->Attach(strlength);
 			appsvrlink->AttachString(string.String());
 			appsvrlink->Attach(keyarray,sizeof(int8)*16);
 			appsvrlink->Flush();
@@ -1315,8 +1313,6 @@ InputServer::DispatchEvent(BMessage *message)
 			appsvrlink->Attach(asciicode);
 			appsvrlink->Attach(modifiers);
 			appsvrlink->Attach(utf8data,sizeof(int8)*3);
-			int8 strlength = string.Length() + 1;
-			appsvrlink->Attach(strlength);
 			appsvrlink->AttachString(string.String());
 			appsvrlink->Attach(keyarray,sizeof(int8)*16);
 			appsvrlink->Flush();
