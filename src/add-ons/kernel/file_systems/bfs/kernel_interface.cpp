@@ -306,15 +306,17 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 }
 
 
-static status_t
+static bool
 bfs_can_page(fs_volume _fs, fs_vnode _v)
 {
-	return 0;
+	// ToDo: we're obviously not even asked...
+	return false;
 }
 
 
-static ssize_t
-bfs_read_pages(fs_volume _fs, fs_vnode _node, iovecs *vecs, off_t pos)
+static status_t
+bfs_read_pages(fs_volume _fs, fs_vnode _node, off_t pos,
+	const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	Inode *inode = (Inode *)_node;
 
@@ -323,21 +325,24 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, iovecs *vecs, off_t pos)
 
 	ReadLocked locked(inode->Lock());
 
-	for (uint32 i = 0; i < vecs->num; i++) {
+	for (uint32 i = 0; i < count; i++) {
 		if (pos >= inode->Size()) {
-			memset(vecs->vec[i].iov_base, 0, vecs->vec[i].iov_len);
-			pos += vecs->vec[i].iov_len;
+			memset(vecs[i].iov_base, 0, vecs[i].iov_len);
+			pos += vecs[i].iov_len;
+			*_numBytes -= vecs[i].iov_len;
 		} else {
-			uint32 length = vecs->vec[i].iov_len;
+			uint32 length = vecs[i].iov_len;
 			if (length > inode->Size() - pos)
 				length = inode->Size() - pos;
 
-			inode->ReadAt(pos, (uint8 *)vecs->vec[i].iov_base, &length);
+			inode->ReadAt(pos, (uint8 *)vecs[i].iov_base, &length);
 
-			if (length < vecs->vec[i].iov_len)
-				memset((char *)vecs->vec[i].iov_base + length, 0, vecs->vec[i].iov_len - length);
+			if (length < vecs[i].iov_len) {
+				memset((char *)vecs[i].iov_base + length, 0, vecs[i].iov_len - length);
+				*_numBytes -= vecs[i].iov_len - length;
+			}
 
-			pos += vecs->vec[i].iov_len;
+			pos += vecs[i].iov_len;
 		}
 	}
 
@@ -345,8 +350,8 @@ bfs_read_pages(fs_volume _fs, fs_vnode _node, iovecs *vecs, off_t pos)
 }
 
 
-static ssize_t
-bfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static status_t
+bfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
@@ -2001,6 +2006,8 @@ static file_system_info sBeFileSystem = {
 	&bfs_can_page,
 	&bfs_read_pages,
 	&bfs_write_pages,
+	
+	NULL,						// get_file_map()
 
 	&bfs_ioctl,					// ioctl
 	&bfs_fsync,					// sync
