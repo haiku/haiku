@@ -25,7 +25,8 @@ oggReader::oggReader()
 
 oggReader::~oggReader()
 {
-	ogg_sync_destroy(&fSync);
+	TRACE("oggReader::~oggReader\n");
+	ogg_sync_clear(&fSync);
 }
 
       
@@ -38,6 +39,7 @@ oggReader::Copyright()
 status_t
 oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 {
+	TRACE("oggReader::GetPage\n");
 	ogg_sync_pageout(&fSync,page); // clear the buffer
 	int result = 0; 
 	while (result == 0) {
@@ -52,7 +54,7 @@ oggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 			return B_ERROR;
 		}
 		result = ogg_sync_pageout(&fSync,page);
-		if (short_page && (result != 0)) {
+		if (short_page && (result != 1)) {
 			TRACE("oggReader::GetPage: short page not found: error\n");
 			return B_ERROR;
 		}
@@ -147,6 +149,7 @@ oggReader::Sniff(int32 *streamCount)
 void
 oggReader::GetFileFormatInfo(media_file_format *mff)
 {
+	TRACE("oggReader::GetFileFormatInfo\n");
 	mff->capabilities =   media_file_format::B_READABLE
 						| media_file_format::B_KNOWS_ENCODED_VIDEO
 						| media_file_format::B_KNOWS_ENCODED_AUDIO
@@ -192,6 +195,7 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 						 media_format *format, void **infoBuffer, int32 *infoSize)
 {
 	TRACE("oggReader::GetStreamInfo\n");
+	debugger("oggReader::GetStreamInfo");
 //	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
 	*frameCount = -1; // don't know
@@ -209,6 +213,7 @@ oggReader::Seek(void *cookie,
 				int64 *frame, bigtime_t *time)
 {
 	TRACE("oggReader::Seek\n");
+	debugger("oggReader::Seek");
 	BPositionIO * input = dynamic_cast<BPositionIO *>(Source());
 	if (input == 0) {
 		TRACE("oggReader::Seek: not a PositionIO: not seekable\n");
@@ -226,6 +231,8 @@ oggReader::GetNextChunk(void *cookie,
 						void **chunkBuffer, int32 *chunkSize,
 						media_header *mediaHeader)
 {
+	TRACE("oggReader::GetNextChunk");
+	debugger("oggReader::GetNextChunk");
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	while (ogg_stream_packetpeek(stream,NULL) != 1) {
 		ogg_page page;
