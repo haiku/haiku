@@ -95,14 +95,9 @@ relocate_rel(image_t *image, struct Elf32_Rel *rel, int rel_len)
  */
 
 static status_t
-relocate_image(image_t *image)
+arch_relocate_image(image_t *image)
 {
 	status_t status;
-
-	if (image->flags & RFLAG_RELOCATED)
-		return B_OK;
-
-	image->flags |= RFLAG_RELOCATED;
 
 	// deal with the rels first
 	if (image->rel) {
