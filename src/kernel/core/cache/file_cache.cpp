@@ -15,6 +15,7 @@
 #include <vm.h>
 #include <vm_page.h>
 #include <vm_cache.h>
+#include <generic_syscall.h>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -465,6 +466,51 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 }
 
 
+static status_t
+file_cache_control(const char *subsystem, uint32 function, void *buffer, size_t bufferSize)
+{
+	switch (function) {
+		case CACHE_CLEAR:
+			// ToDo: clear the cache
+			dprintf("cache_control: clear cache!\n");
+			break;
+		case CACHE_SET_MODULE:
+		{
+			cache_module_info *module = sCacheModule;
+
+			// unset previous module
+
+			if (sCacheModule != NULL) {
+				sCacheModule = NULL;
+				snooze(100000);	// 0.1 secs
+				put_module(module->info.name);
+			}
+
+			// get new module, if any
+
+			if (buffer == NULL)
+				break;
+
+			char name[B_FILE_NAME_LENGTH];
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_strlcpy(name, (char *)buffer, B_FILE_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+
+			if (strncmp(name, CACHE_MODULES_NAME, strlen(CACHE_MODULES_NAME)))
+				return B_BAD_VALUE;
+
+			dprintf("cache_control: set module %s!\n", name);
+
+			if (get_module(name, (module_info **)&module) == B_OK)
+				sCacheModule = module;
+			break;
+		}
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 //	kernel public API
 
@@ -549,7 +595,7 @@ cache_node_opened(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
 	file_cache_ref *ref = (file_cache_ref *)((vnode_store *)cache->cache->store)->file_cache_ref;
 
 	if (ref != NULL && sCacheModule != NULL)
-		sCacheModule->node_opened(ref->cache->cache->virtual_size, mountID, vnodeID);
+		sCacheModule->node_opened(mountID, vnodeID, ref->cache->cache->virtual_size);
 }
 
 
@@ -569,7 +615,9 @@ cache_node_closed(vm_cache_ref *cache, mount_id mountID, vnode_id vnodeID)
 extern "C" status_t
 file_cache_init(void)
 {
-	// ToDo: get cache module
+	// ToDo: get cache module out of driver settings
+
+	register_generic_syscall(CACHE_SYSCALLS, file_cache_control, 1, 0);
 	return B_OK;
 }
 
