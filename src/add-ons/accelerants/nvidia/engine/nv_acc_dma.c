@@ -866,18 +866,18 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 				/* mind this pittfall:
 				 * Leave some room between where the engine is fetching and where we
 				 * put new commands. Otherwise the engine will crash on heavy loads.
-				 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
-				 * (confirmed on NV11 and NV43 with less than 128 words forced freespace.)
+				 * A crash can be forced best in 640x480x32 mode with BeRoMeter 1.2.6.
+				 * (confirmed on NV11 and NV43 with less than 256 words forced freespace.)
 				 * Note:
 				 * The engine is DMA triggered for fetching chunks every 128 bytes,
 				 * maybe this is the reason for this behaviour.
 				 * Note also:
 				 * it looks like the space that needs to be kept free is coupled
 				 * with the size of the DMA buffer. */
-				if (si->engine.dma.free < 128)
+				if (si->engine.dma.free < 256)
 					si->engine.dma.free = 0;
 				else
-					si->engine.dma.free -= 128;
+					si->engine.dma.free -= 256;
 			}
 		}
 		else
@@ -890,18 +890,18 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 			/* mind this pittfall:
 			 * Leave some room between where the engine is fetching and where we
 			 * put new commands. Otherwise the engine will crash on heavy loads.
-			 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
-			 * (confirmed on NV11 and NV43 with less than 128 words forced freespace.)
+			 * A crash can be forced best in 640x480x32 mode with BeRoMeter 1.2.6.
+			 * (confirmed on NV11 and NV43 with less than 256 words forced freespace.)
 			 * Note:
 			 * The engine is DMA triggered for fetching chunks every 128 bytes,
 			 * maybe this is the reason for this behaviour.
 			 * Note also:
 			 * it looks like the space that needs to be kept free is coupled
 			 * with the size of the DMA buffer. */
-			if (si->engine.dma.free < 128)
+			if (si->engine.dma.free < 256)
 				si->engine.dma.free = 0;
 			else
-				si->engine.dma.free -= 128;
+				si->engine.dma.free -= 256;
 		}
 	}
 
