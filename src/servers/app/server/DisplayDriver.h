@@ -34,6 +34,7 @@
 #include <View.h>
 #include <Font.h>
 #include <Rect.h>
+#include <Locker.h>
 #include "RGBColor.h"
 
 class ServerCursor;
@@ -157,7 +158,7 @@ protected:
 	ServerCursor *_GetCursor(void);
 
 private:
-	sem_id _lock_sem;
+	BLocker *_locker;
 	uint8 _buffer_depth;
 	uint16 _buffer_width;
 	uint16 _buffer_height;

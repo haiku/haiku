@@ -36,7 +36,7 @@
 */
 DisplayDriver::DisplayDriver(void)
 {
-	_lock_sem=create_sem(1,"DisplayDriver Lock");
+	_locker=new BLocker();
 
 	_buffer_depth=0;
 	_buffer_width=0;
@@ -56,7 +56,7 @@ DisplayDriver::DisplayDriver(void)
 */
 DisplayDriver::~DisplayDriver(void)
 {
-	delete_sem(_lock_sem);
+	delete _locker;
 }
 
 /*!
@@ -639,9 +639,10 @@ bool DisplayDriver::IsCursorObscured(bool state)
 */
 bool DisplayDriver::_Lock(bigtime_t timeout)
 {
-	if(acquire_sem_etc(_lock_sem,1,B_RELATIVE_TIMEOUT,timeout)!=B_NO_ERROR)
-		return false;
-	return true;
+	if(timeout==B_INFINITE_TIMEOUT)
+		return _locker->Lock();
+	
+	return (_locker->LockWithTimeout(timeout)==B_OK)?true:false;
 }
 
 /*!
@@ -649,7 +650,7 @@ bool DisplayDriver::_Lock(bigtime_t timeout)
 */
 void DisplayDriver::_Unlock(void)
 {
-	release_sem(_lock_sem);
+	_locker->Unlock();
 }
 
 /*!
