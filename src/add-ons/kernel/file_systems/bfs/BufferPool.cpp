@@ -25,15 +25,19 @@ BufferPool::BufferPool()
 
 BufferPool::~BufferPool()
 {
-	delete_sem(fLock);
 	delete_sem(fFreeBuffers);
-	
+
+	acquire_sem(fLock);
+		// the return value doesn't interest us anymore
+
 	void **buffer = fFirstFree;
 	while (buffer != NULL) {
 		void **nextBuffer = (void **)*buffer;
 		free(buffer);
 		buffer = nextBuffer;
 	}
+
+	delete_sem(fLock);
 }
 
 
