@@ -5,6 +5,13 @@
 
 #include "ClipboardHandler.h"
 
+// bonefish: TODO: Cleanup/reimplement! The ClipboardTree doesn't need to be a
+// tree at all. Strip it off fLeftChild, fRightChild, and fCount and we have a
+// server-side clipboard representation. Simply use a name->clipboard map to
+// manage the clipboards. The clipboard count (which doesn't work at the
+// moment) will be the size of the map.
+
+
 /*!
 	\class ClipboardHandler
 	\brief Handles all clipboard related requests.
