@@ -42,7 +42,7 @@ static status_t init_common(int the_fd) {
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios));
 
 	/* clone register area(s) */
-	if (si->ps.card_type < NM2097)
+	if (si->regs_in_fb)
 	{
 		/* we can't clone as no register area exists! */
 		LOG(2,("InitACC: Can't clone register area, integrated in framebuffer!\n"));
