@@ -618,14 +618,13 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 		}
 		case B_QUIT_REQUESTED:
 		{
+#if DISPLAYDRIVER != HWDRIVER
 			// Attached Data:
 			// none
 			
 			// We've been asked to quit, so (for now) broadcast to all
 			// test apps to quit. This situation will occur only when the server
 			// is compiled as a regular Be application.
-			if(DISPLAYDRIVER== HWDRIVER)
-				break;
 
 			Broadcast(AS_QUIT_APP);
 
@@ -678,6 +677,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			exit_thread(0);
 
 			// we are now clear to exit
+#endif
 			break;
 		}
 		case AS_SET_SYSCURSOR_DEFAULTS:

@@ -380,11 +380,10 @@ int32 ServerApp::MonitorApp(void *data)
 				// If we are using the real, accelerated version of the
 				// DisplayDriver, we do NOT want the user to be able shut down
 				// the server. The results would NOT be pretty
-				if(DISPLAYDRIVER!=HWDRIVER)
-				{
-					BMessage pleaseQuit(B_QUIT_REQUESTED);
-					app->SendMessageToClient(&pleaseQuit);
-				}
+#if DISPLAYDRIVER != HWDRIVER
+				BMessage pleaseQuit(B_QUIT_REQUESTED);
+				app->SendMessageToClient(&pleaseQuit);
+#endif
 				break;
 			}
 			

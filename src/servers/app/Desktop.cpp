@@ -75,62 +75,53 @@ Desktop::~Desktop(void)
 
 }
 
-void Desktop::Init(void)
+
+void
+Desktop::Init(void)
 {
-	DisplayDriver *driver=NULL;
+	DisplayDriver *driver = NULL;
+
+#if DISPLAYDRIVER == HWDRIVER
+	// If we're using the AccelerantDriver for rendering, eventually we will loop through
+	// drivers until one can't initialize in order to support multiple monitors. For now,
+	// we'll just load one and be done with it.
 	
-	switch(DISPLAYDRIVER)
-	{
-		case HWDRIVER:
-		{
-			// If we're using the AccelerantDriver for rendering, eventually we will loop through
-			// drivers until one can't initialize in order to support multiple monitors. For now,
-			// we'll just load one and be done with it.
-			
-			bool initDrivers = true;
-			while(initDrivers)
-			{
-				driver = new AccelerantDriver();
-				AddDriver(driver);
-				initDrivers = false;
-			}
-			break;
-		}
-		case DIRECTDRIVER:
-		{
-			// It would be nice to have this for the default testing driver. Someday....
-			driver = new DirectDriver();
-			AddDriver(driver);
-			break;
-		}
-		case PAINTERDRIVER:
-		{
-			// It would be nice to have this for the default testing driver. Someday....
-			driver = new DisplayDriverPainter();
-			AddDriver(driver);
-			break;
-		}
-		default:
-		{
-			// It would be nice to not ever need this again....
-			driver = new ViewDriver();
-			AddDriver(driver);
-			break;
-		}
+	bool initDrivers = true;
+	while (initDrivers) {
+		driver = new AccelerantDriver();
+		AddDriver(driver);
+		initDrivers = false;
 	}
 
-	if(fScreenList.CountItems()<1)
-	{
+#elif DISPLAYDRIVER == DIRECTDRIVER
+	// It would be nice to have this for the default testing driver. Someday....
+	driver = new DirectDriver();
+	AddDriver(driver);
+
+#elif DISPLAYDRIVER == PAINTERDRIVER
+	// It would be nice to have this for the default testing driver. Someday....
+	driver = new DisplayDriverPainter();
+	AddDriver(driver);
+
+#else
+	// It would be nice to not ever need this again....
+	driver = new ViewDriver();
+	AddDriver(driver);
+#endif
+
+	if (fScreenList.CountItems() < 1) {
 		delete this;
 		return;
 	}
-	
+
 	InitMode();
 
 	SetActiveRootLayerByIndex(0);
 }
 
-void Desktop::AddDriver(DisplayDriver *driver)
+
+void
+Desktop::AddDriver(DisplayDriver *driver)
 {
 	if (driver->Initialize()) {
 		// TODO: be careful of screen initialization - monitor may not support 640x480

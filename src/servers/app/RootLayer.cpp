@@ -1271,151 +1271,148 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			
 			STRACE(("Key Down: 0x%lx\n",scancode));
 			
-			if(DISPLAYDRIVER==HWDRIVER)
+#if DISPLAYDRIVER == HWDRIVER
+			// Check for workspace change or safe video mode
+			if(scancode>0x01 && scancode<0x0e)
 			{
-				// Check for workspace change or safe video mode
-				if(scancode>0x01 && scancode<0x0e)
+				if(scancode==0x0d)
 				{
-					if(scancode==0x0d)
+					if(modifiers & (B_LEFT_COMMAND_KEY |
+						B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
 					{
-						if(modifiers & (B_LEFT_COMMAND_KEY |
-							B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY))
-						{
-							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
-							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
-							if (string)
-								free(string);
-							break;
-						}
+						// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
+						STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+						if (string)
+							free(string);
+						break;
 					}
+				}
+				
+				if(modifiers & B_CONTROL_KEY)
+				{
+					STRACE(("Set Workspace %ld\n",scancode-1));
 					
-					if(modifiers & B_CONTROL_KEY)
-					{
-						STRACE(("Set Workspace %ld\n",scancode-1));
-						
-						//TODO: SetWorkspace in KeyboardEventHandler
-						//SetWorkspace(scancode-2);
-						if (string)
-							free(string);
-						break;
-					}	
-				}
-				
-				// Tab key
-				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
-				{
-					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-					//if(deskbar)
-					//{
-						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-						if (string)
-							free(string);
-						break;
-					//}
-				}
-
-				// PrintScreen
-				if(scancode==0xe)
-				{
-					if(GetDisplayDriver())
-					{
-						char filename[128];
-						BEntry entry;
-						
-						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
-						entry.SetTo(filename);
-						
-						while(entry.Exists())
-						{
-							fScreenShotIndex++;
-							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
-						}
-						fScreenShotIndex++;
-						GetDisplayDriver()->DumpToFile(filename);
-						if (string)
-							free(string);
-						break;
-					}
-				}
+					//TODO: SetWorkspace in KeyboardEventHandler
+					//SetWorkspace(scancode-2);
+					if (string)
+						free(string);
+					break;
+				}	
 			}
-			else
+			
+			// Tab key
+			if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 			{
-				// F12
-				if(scancode>0x1 && scancode<0xe)
+				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+				//if(deskbar)
+				//{
+					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+					if (string)
+						free(string);
+					break;
+				//}
+			}
+
+			// PrintScreen
+			if(scancode==0xe)
+			{
+				if(GetDisplayDriver())
 				{
-					if(scancode==0xd)
+					char filename[128];
+					BEntry entry;
+					
+					sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+					entry.SetTo(filename);
+					
+					while(entry.Exists())
 					{
-						if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
-						{
-							// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
-							STRACE(("Safe Video Mode invoked - code unimplemented\n"));
-							if (string)
-								free(string);
-							break;
-						}
-					}
-					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
-					{
-						STRACE(("Set Workspace %ld\n",scancode-1));
-						//TODO: SetWorkspace in KeyboardEventHandler
-						if (scancode - 1 > 0 && scancode -1 <= fWsCount
-							&& scancode - 2 != fActiveWksIndex)
-						{
-							WinBorder		*exFocus = FocusWinBorder();
-
-							SetActiveWorkspace(scancode-2);
-
-							get_workspace_windows();
-
-							invalidate_layer(this, fFull);
-
-							draw_window_tab(exFocus, FocusWinBorder());
-						}
-						if (string)
-							free(string);
-						break;
-					}	
-				}
-				
-				//Tab
-				if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
-				{
-					STRACE(("Twitcher\n"));
-					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-					//if(deskbar)
-					//{
-						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-						if (string)
-							free(string);
-						break;
-					//}
-				}
-
-				// Pause/Break
-				if(scancode==0x7f)
-				{
-					if(GetDisplayDriver())
-					{
-						char filename[128];
-						BEntry entry;
-						
-						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
-						entry.SetTo(filename);
-						
-						while(entry.Exists())
-						{
-							fScreenShotIndex++;
-							sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
-						}
 						fScreenShotIndex++;
-
-						GetDisplayDriver()->DumpToFile(filename);
-						if (string)
-							free(string);
-						break;
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
 					}
+					fScreenShotIndex++;
+					GetDisplayDriver()->DumpToFile(filename);
+					if (string)
+						free(string);
+					break;
 				}
 			}
+#else	// DISPLAYDRIVER != HWDRIVER
+			// F12
+			if(scancode>0x1 && scancode<0xe)
+			{
+				if(scancode==0xd)
+				{
+					if(modifiers & (B_LEFT_CONTROL_KEY | B_LEFT_SHIFT_KEY | B_LEFT_OPTION_KEY))
+					{
+						// TODO: Set to Safe Mode in KeyboardEventHandler:B_KEY_DOWN. (DisplayDriver API change)
+						STRACE(("Safe Video Mode invoked - code unimplemented\n"));
+						if (string)
+							free(string);
+						break;
+					}
+				}
+				if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
+				{
+					STRACE(("Set Workspace %ld\n",scancode-1));
+					//TODO: SetWorkspace in KeyboardEventHandler
+					if (scancode - 1 > 0 && scancode -1 <= fWsCount
+						&& scancode - 2 != fActiveWksIndex)
+					{
+						WinBorder		*exFocus = FocusWinBorder();
+
+						SetActiveWorkspace(scancode-2);
+
+						get_workspace_windows();
+
+						invalidate_layer(this, fFull);
+
+						draw_window_tab(exFocus, FocusWinBorder());
+					}
+					if (string)
+						free(string);
+					break;
+				}	
+			}
+			
+			//Tab
+			if(scancode==0x26 && (modifiers & B_SHIFT_KEY))
+			{
+				STRACE(("Twitcher\n"));
+				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+				//if(deskbar)
+				//{
+					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+					if (string)
+						free(string);
+					break;
+				//}
+			}
+
+			// Pause/Break
+			if(scancode==0x7f)
+			{
+				if(GetDisplayDriver())
+				{
+					char filename[128];
+					BEntry entry;
+					
+					sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+					entry.SetTo(filename);
+					
+					while(entry.Exists())
+					{
+						fScreenShotIndex++;
+						sprintf(filename,"/boot/home/screen%ld.png",fScreenShotIndex);
+					}
+					fScreenShotIndex++;
+
+					GetDisplayDriver()->DumpToFile(filename);
+					if (string)
+						free(string);
+					break;
+				}
+			}
+#endif	// DISPLAYDRIVER != HWDRIVER
 			
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
@@ -1479,31 +1476,28 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 	
 			STRACE(("Key Up: 0x%lx\n",scancode));
 			
-			if(DISPLAYDRIVER==HWDRIVER)
+#if DISPLAYDRIVER == HWDRIVER
+			// Tab key
+			if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 			{
-				// Tab key
-				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
-				{
-					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-					//if(deskbar)
-					//{
-						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-						break;
-					//}
-				}
+				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+				//if(deskbar)
+				//{
+					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+					break;
+				//}
 			}
-			else
+#else	// DISPLAYDRIVER != HWDRIVER
+			if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
 			{
-				if(scancode==0x26 && (modifiers & B_LEFT_SHIFT_KEY))
-				{
-					//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
-					//if(deskbar)
-					//{
-						printf("Send Twitcher message key to Deskbar - unimplmemented\n");
-						break;
-					//}
-				}
+				//ServerApp *deskbar=app_server->FindApp("application/x-vnd.Be-TSKB");
+				//if(deskbar)
+				//{
+					printf("Send Twitcher message key to Deskbar - unimplmemented\n");
+					break;
+				//}
 			}
+#endif
 
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
