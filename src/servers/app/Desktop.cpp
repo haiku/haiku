@@ -91,6 +91,7 @@ void Desktop::Init(void)
 			{
 				driver = new AccelerantDriver();
 				AddDriver(driver);
+				initDrivers = false;
 			}
 		}
 		case DIRECTDRIVER:
