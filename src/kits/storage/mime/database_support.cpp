@@ -7,6 +7,7 @@
 	Private mime database functions and constants
 */
 
+#include <AppMisc.h>
 #include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -37,8 +38,12 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
-//const std::string kDatabaseDir					= "/boot/home/config/settings/beos_mime";
-const std::string kDatabaseDir 					= "/boot/home/config/settings/obos_mime";
+static const char *sHaikuDBDir	= "/boot/home/config/settings/beos_mime";
+	// when running natively under Haiku
+static const char *sBeOSDBDir	= "/boot/home/config/settings/obos_mime";
+	// when running under BeOS
+const std::string kDatabaseDir
+	= (is_running_on_haiku() ? sHaikuDBDir : sBeOSDBDir);
 const std::string kApplicationDatabaseDir		= kDatabaseDir + "/application";
 
 #define ATTR_PREFIX "META:"
