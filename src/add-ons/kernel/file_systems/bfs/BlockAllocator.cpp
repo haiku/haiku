@@ -120,6 +120,14 @@ AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 		for (int32 i = start % 32;i < 32 && numBlocks;i++, numBlocks--)
 			mask |= 1UL << (i % 32);
 
+#ifdef DEBUG
+/*
+		if (mask & ((uint32 *)fBlock)[block]) {
+			FATAL(("AllocationBlock::Allocate(): some blocks are already allocated, start = %u, numBlocks = %u\n", start, numBlocks));
+			DEBUGGER(("blocks already occupied!"));
+		}
+*/
+#endif
 		((uint32 *)fBlock)[block++] |= mask;
 		start = 0;
 	}
@@ -190,13 +198,19 @@ AllocationGroup::AddFreeRange(int32 start, int32 blocks)
  *	or the volume's used blocks count.
  *	It only does the low-level work of allocating some bits
  *	in the block bitmap.
+ *	Assumes that the block bitmap lock is hold.
  */
 
 status_t
 AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
 {
 	Volume *volume = transaction->GetVolume();
-	uint32 block = start / (volume->BlockSize() << 3);
+
+	// calculate block in the block bitmap and position within
+	uint32 bitsPerBlock = volume->BlockSize() << 3;
+	uint32 block = start / bitsPerBlock;
+	start = start % bitsPerBlock;
+
 	AllocationBlock cached(volume);
 
 	while (length > 0) {
@@ -226,13 +240,19 @@ AllocationGroup::Allocate(Transaction *transaction, uint16 start, int32 length)
  *	or the volume's used blocks count.
  *	It only does the low-level work of freeing some bits
  *	in the block bitmap.
+ *	Assumes that the block bitmap lock is hold.
  */
 
 status_t
 AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 {
 	Volume *volume = transaction->GetVolume();
-	uint32 block = start / (volume->BlockSize() << 3);
+
+	// calculate block in the block bitmap and position within
+	uint32 bitsPerBlock = volume->BlockSize() << 3;
+	uint32 block = start / bitsPerBlock;
+	start = start % bitsPerBlock;
+
 	AllocationBlock cached(volume);
 
 	while (length > 0) {
