@@ -289,6 +289,24 @@ Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
 	_Transform(&a);
 	_Transform(&b);
 
+	// first, try an optimized version
+	float penSize = _Transform(fPenSize);
+	if (penSize == 1.0 &&
+		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+// TODO: fix me
+//		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH &&
+			StraightLine(a, b, fPatternHandler->HighColor().GetColor32())) {
+			SetPenLocation(b);
+			return;
+		} else if (p == B_SOLID_LOW &&
+			StraightLine(a, b, fPatternHandler->LowColor().GetColor32())) {
+			SetPenLocation(b);
+			return;
+		}
+	}
+
+
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
 	path.line_to(b.x, b.y);
@@ -304,6 +322,69 @@ Painter::StrokeLine(BPoint b, const pattern& p)
 {
 	// TODO: move this function elsewhere
 	StrokeLine(fPenLocation, b);
+}
+
+// StraightLine
+bool
+Painter::StraightLine(BPoint a, BPoint b, const rgb_color& c) const
+{
+	if (fBuffer) {
+		if (a.x == b.x) {
+			// vertical
+			uint8* dst = fBuffer->row(0);
+			uint32 bpr = fBuffer->stride();
+			int32 x = (int32)a.x;
+			dst += x * 4;
+			int32 y1 = (int32)min_c(a.y, b.y);
+			int32 y2 = (int32)max_c(a.y, b.y);
+			// draw a line, iterate over clipping boxes
+			fBaseRenderer->first_clip_box();
+			do {
+				if (fBaseRenderer->xmin() <= x &&
+					fBaseRenderer->xmax() >= x) {
+					int32 i = max_c(fBaseRenderer->ymin(), y1);
+					int32 end = min_c(fBaseRenderer->ymax(), y2);
+					uint8* handle = dst + i * bpr;
+					for (; i <= end; i++) {
+						handle[0] = c.blue;
+						handle[1] = c.green;
+						handle[2] = c.red;
+						handle += bpr;
+					}
+				}
+			} while (fBaseRenderer->next_clip_box());
+	
+			return true;
+	
+		} else if (a.y == b.y) {
+			// horizontal
+			uint8* dst = fBuffer->row(0);
+			uint32 bpr = fBuffer->stride();
+			int32 y = (int32)a.y;
+			dst += y * bpr;
+			int32 x1 = (int32)min_c(a.x, b.x);
+			int32 x2 = (int32)max_c(a.x, b.x);
+			// draw a line, iterate over clipping boxes
+			fBaseRenderer->first_clip_box();
+			do {
+				if (fBaseRenderer->ymin() <= y &&
+					fBaseRenderer->ymax() >= y) {
+					int32 i = max_c(fBaseRenderer->xmin(), x1);
+					int32 end = min_c(fBaseRenderer->xmax(), x2);
+					uint8* handle = dst + i * 4;
+					for (; i <= end; i++) {
+						handle[0] = c.blue;
+						handle[1] = c.green;
+						handle[2] = c.red;
+						handle += 4;
+					}
+				}
+			} while (fBaseRenderer->next_clip_box());
+	
+			return true;
+		}
+	}
+	return false;
 }
 
 // #pragma mark -
@@ -409,22 +490,49 @@ void
 Painter::StrokeRect(const BRect& r, const pattern& p) const
 {
 	BPoint a(r.left, r.top);
-	BPoint b(r.right, r.top);
-	BPoint c(r.right, r.bottom);
-	BPoint d(r.left, r.bottom);
+	BPoint b(r.right, r.bottom);
 	_Transform(&a);
 	_Transform(&b);
-	_Transform(&c);
-	_Transform(&d);
+
+	// first, try an optimized version
+	float penSize = _Transform(fPenSize);
+	if (penSize == 1.0 &&
+		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
+// TODO: fix me
+//		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH) {
+			StrokeRect(BRect(a, b),
+					   fPatternHandler->HighColor().GetColor32());
+			return;
+		} else if (p == B_SOLID_LOW) {
+			StrokeRect(BRect(a, b),
+					   fPatternHandler->LowColor().GetColor32());
+			return;
+		}
+	}
 
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
+	path.line_to(b.x, a.y);
 	path.line_to(b.x, b.y);
-	path.line_to(c.x, c.y);
-	path.line_to(d.x, d.y);
+	path.line_to(a.x, b.y);
 	path.close_polygon();
 
 	_StrokePath(path, p);
+}
+
+// StrokeRect
+void
+Painter::StrokeRect(const BRect& r, const rgb_color& c) const
+{
+	StraightLine(BPoint(r.left, r.top),
+				 BPoint(r.right - 1, r.top), c);
+	StraightLine(BPoint(r.right, r.top),
+				 BPoint(r.right, r.bottom - 1), c);
+	StraightLine(BPoint(r.right, r.bottom),
+				 BPoint(r.left + 1, r.bottom), c);
+	StraightLine(BPoint(r.left, r.bottom),
+				 BPoint(r.left, r.top + 1), c);
 }
 
 // FillRect
@@ -432,30 +540,71 @@ void
 Painter::FillRect(const BRect& r, const pattern& p) const
 {
 	BPoint a(r.left, r.top);
-	BPoint b(r.right, r.top);
-	BPoint c(r.right, r.bottom);
-	BPoint d(r.left, r.bottom);
+	BPoint b(r.right, r.bottom);
 	_Transform(&a, false);
 	_Transform(&b, false);
-	_Transform(&c, false);
-	_Transform(&d, false);
+
+	// first, try an optimized version
+	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
+// TODO: fix me
+//		pattern p = *fPatternHandler->GetR5Pattern();
+		if (p == B_SOLID_HIGH) {
+			FillRect(BRect(a, b), fPatternHandler->HighColor().GetColor32());
+			return;
+		} else if (p == B_SOLID_LOW) {
+			FillRect(BRect(a, b), fPatternHandler->LowColor().GetColor32());
+			return;
+		}
+	}
 
 	// account for stricter interpretation of coordinates in AGG
 	// the rectangle ranges from the top-left (.0, .0)
 	// to the bottom-right (.9999, .9999) corner of pixels
 	b.x += 1.0;
-	c.x += 1.0;
-	c.y += 1.0;
-	d.y += 1.0;
+	b.y += 1.0;
 
 	agg::path_storage path;
 	path.move_to(a.x, a.y);
+	path.line_to(b.x, a.y);
 	path.line_to(b.x, b.y);
-	path.line_to(c.x, c.y);
-	path.line_to(d.x, d.y);
+	path.line_to(a.x, b.y);
 	path.close_polygon();
 
 	_FillPath(path, p);
+}
+
+// FillRect
+void
+Painter::FillRect(const BRect& r, const rgb_color& c) const
+{
+	if (fBuffer) {
+		uint8* dst = fBuffer->row(0);
+		uint32 bpr = fBuffer->stride();
+		int32 left = (int32)r.left;
+		int32 top = (int32)r.top;
+		int32 right = (int32)r.right;
+		int32 bottom = (int32)r.bottom;
+		// fill rects, iterate over clipping boxes
+		fBaseRenderer->first_clip_box();
+		do {
+			int32 x1 = max_c(fBaseRenderer->xmin(), left);
+			int32 x2 = min_c(fBaseRenderer->xmax(), right);
+			if (x1 <= x2) {
+				int32 y1 = max_c(fBaseRenderer->ymin(), top);
+				int32 y2 = min_c(fBaseRenderer->ymax(), bottom);
+				uint8* offset = dst + x1 * 4;
+				for (; y1 <= y2; y1++) {
+					uint8* handle = offset + y1 * bpr;
+					for (int32 x = x1; x <= x2; x++) {
+						handle[0] = c.blue;
+						handle[1] = c.green;
+						handle[2] = c.red;
+						handle += 4;
+					}
+				}
+			}
+		} while (fBaseRenderer->next_clip_box());
+	}
 }
 
 // StrokeRoundRect

@@ -382,8 +382,6 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	fDisplayMode.virtual_height = mode.virtual_height;
 	fDisplayMode.space = mode.space;
 
-printf("ViewHWInterface::SetMode(%s)\n", string_for_color_space((color_space)fDisplayMode.space));
-
 	BRect frame(0.0, 0.0,
 				fDisplayMode.virtual_width - 1,
 				fDisplayMode.virtual_height - 1);

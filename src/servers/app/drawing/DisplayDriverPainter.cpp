@@ -32,6 +32,11 @@
 
 #include "DisplayDriverPainter.h"
 
+// TODO: fix invalidation, what about pensize, scale, origin?
+// Painter calls could return the bounding box arround all
+// pixels touched by a drawing operation
+
+
 // constructor
 DisplayDriverPainter::DisplayDriverPainter()
 	: DisplayDriver(),
@@ -487,7 +492,8 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 	if (Lock()) {
 
 		fPainter->SetHighColor(color);
-		fPainter->StrokeLine(start, end);
+		fPainter->SetDrawingMode(B_OP_COPY);
+		fPainter->StrokeLine(start, end, B_SOLID_HIGH);
 
 		BRect r(start, end);
 		fGraphicsCard->Invalidate(r);
@@ -546,15 +552,19 @@ DisplayDriverPainter::StrokePolygon(BPoint *ptlist, int32 numpts,
 }
 
 // StrokeRect
+// 
+// this function is used to draw a one pixel wide rect
 void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	if (Lock()) {
 
-		fPainter->SetHighColor(color);
-		fPainter->StrokeRect(r);
+		fPainter->StrokeRect(r, color.GetColor32());
 
-		fGraphicsCard->Invalidate(r);
+		fGraphicsCard->Invalidate(BRect(r.left, r.top, r.right, r.top));
+		fGraphicsCard->Invalidate(BRect(r.left, r.top + 1, r.left, r.bottom - 1));
+		fGraphicsCard->Invalidate(BRect(r.right, r.top + 1, r.right, r.bottom - 1));
+		fGraphicsCard->Invalidate(BRect(r.left, r.bottom, r.right, r.bottom));
 
 		Unlock();
 	}
