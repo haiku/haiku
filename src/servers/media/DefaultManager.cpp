@@ -8,10 +8,7 @@
 #include <TimeSource.h>
 #include <string.h>
 #include "DefaultManager.h"
-#include "NodeManager.h"
 #include "debug.h"
-
-extern NodeManager *gNodeManager;
 
 /* no locking used in this file, we assume that the caller (NodeManager) does it.
  */
@@ -161,11 +158,7 @@ DefaultManager::RescanThread()
 	// We do not search for the system time source,
 	// it should already exist
 	ASSERT(fSystemTimeSource != -1);
-/*
-//for (int i = 0; i < 10; i++) { // XXX ugly workaround
-	gNodeManager->UpdateNodeConnections(); // XXX ugly workaround
-	snooze(1000000); // XXX ugly workaround
-*/
+
 	if (fPhysicalVideoOut == -1)
 		FindPhysicalVideoOut();
 	if (fPhysicalVideoIn == -1)
@@ -176,7 +169,6 @@ DefaultManager::RescanThread()
 		FindPhysicalAudioIn();
 	if (fAudioMixer == -1)
 		FindAudioMixer();
-//}
 
 	// The normal time source is searched for after the
 	// Physical Audio Out has been created.
@@ -383,6 +375,11 @@ DefaultManager::ConnectMixerToOutput()
 
 	memset(&format, 0, sizeof(format));
 	format.type = B_MEDIA_RAW_AUDIO;
+	format.u.raw_audio.frame_rate = 44100;
+	format.u.raw_audio.channel_count = 2;
+	format.u.raw_audio.format = 0x2;
+
+	//roster->GetFormatFor(input, &format);
 
 	rv = roster->Connect(output.source, input.destination, &format, &output, &input);
 	if (rv != B_OK) {
@@ -404,6 +401,7 @@ DefaultManager::ConnectMixerToOutput()
 finish:
 	roster->ReleaseNode(mixer);
 	roster->ReleaseNode(soundcard);
+	roster->ReleaseNode(timesource);
 	return rv;
 }
 

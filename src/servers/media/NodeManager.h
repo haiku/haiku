@@ -105,8 +105,6 @@ public:
 
 	void CleanupTeam(team_id team);
 	
-	void UpdateNodeConnections();
-	
 private:
 	media_addon_id fNextAddOnID;
 	media_node_id fNextNodeID;

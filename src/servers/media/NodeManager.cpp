@@ -543,28 +543,6 @@ NodeManager::GetLiveNodes(BMessage *msg)
 	return B_OK;
 }
 
-void
-NodeManager::UpdateNodeConnections()
-{
-	// XXX this is only a workaround because the multi_audio
-	// XXX addon does not publish inputs right after creation :(
-	BAutolock lock(fLocker);
-
-	registered_node *rn;
-	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
-	
-		BMessage msg(NODE_PUBLISH_CONNECTIONS);
-		media_node tempnode;
-		tempnode.node = rn->nodeid;
-		tempnode.port = rn->port;
-		tempnode.kind = rn->kinds;
-		msg.AddData("node", B_RAW_TYPE, &tempnode, sizeof(tempnode));
-
-		gAppManager->SendMessage(rn->team, &msg);
-	}
-}
-
-
 /**********************************************************************
  * Registration of BMediaAddOns
  **********************************************************************/

@@ -1554,25 +1554,6 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 			ts->FinishCreate();
 	}
 
-	// XXX XXX XXX 
-	// Calling GetAllOutputs and GetAllInputs here,
-	// followed by PublishOutputs and PublishInputs,
-	// does not work, it is too early, and in some
-	// cases it will deadlock the node control thread.
-	
-	// Posting a message to the roster thread here
-	// is also to early, the multi_audio add-on will
-	// no list any inputs
-	// XXX XXX XXX 
-	
-
-	BMessage msg(NODE_PUBLISH_CONNECTIONS);
-	media_node tempnode;
-	tempnode = node->Node();
-	msg.AddData("node", B_RAW_TYPE, &tempnode, sizeof(tempnode));
-	PostMessage(&msg);
-
-/*	
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
 	// with created, but unconnected nodes.
@@ -1580,12 +1561,13 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 		List<media_output> list;
 		if (B_OK == GetAllOutputs(node->Node(), &list))
 			PublishOutputs(node->Node(), &list);
-	} else if (node->Kinds() & B_BUFFER_CONSUMER) {
+	}
+	if (node->Kinds() & B_BUFFER_CONSUMER) {
 		List<media_input> list;
 		if (B_OK == GetAllInputs(node->Node(), &list))
 			PublishInputs(node->Node(), &list);
 	}
-*/
+
 	BPrivate::media::notifications::NodesCreated(&reply.nodeid, 1);
 /*
 	TRACE("BMediaRoster::RegisterNode: registered node name '%s', id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
@@ -1596,7 +1578,6 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 	TRACE("BMediaRoster::RegisterNode: node fControllableThis  %p\n", node->fControllableThis);
 	TRACE("BMediaRoster::RegisterNode: node fTimeSourceThis    %p\n", node->fTimeSourceThis);
 */	
-
 	return B_OK;
 }
 
@@ -2460,34 +2441,6 @@ BMediaRoster::MessageReceived(BMessage * message)
 			// to detect dead teams. Normal communication uses ports.
 			static BMessage pong('PONG');
 			message->SendReply(&pong, static_cast<BHandler *>(NULL), 2000000);
-			return;
-		}
-		
-		case NODE_PUBLISH_CONNECTIONS:
-		{
-			const void *data;
-			ssize_t numBytes;
-			media_node node;
-
-			printf("NODE_PUBLISH_CONNECTIONS enter\n");
-
-			message->FindData("node", B_RAW_TYPE, &data, &numBytes);
-			node = *(const media_node *)data;
-
-			// register existing inputs and outputs with the
-			// media_server, this allows GetLiveNodes() to work
-			// with created, but unconnected nodes.
-			if (node.kind & B_BUFFER_PRODUCER) {
-				List<media_output> outputlist;
-				if (B_OK == MediaRosterEx(this)->GetAllOutputs(node, &outputlist))
-					MediaRosterEx(this)->PublishOutputs(node, &outputlist);
-			}
-			if (node.kind & B_BUFFER_CONSUMER) {
-				List<media_input> inputlist;
-				if (B_OK == MediaRosterEx(this)->GetAllInputs(node, &inputlist))
-					MediaRosterEx(this)->PublishInputs(node, &inputlist);
-			}
-			printf("NODE_PUBLISH_CONNECTIONS leave\n");
 			return;
 		}
 
