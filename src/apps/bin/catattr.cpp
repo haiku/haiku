@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <ctype.h>
 #include <errno.h>
 
@@ -80,7 +81,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
-	if (!keepRaw && size > 64 * 1024)
+	if (size > 64 * 1024)
 		size = 64 * 1024;
 
 	char* buffer = new char[size];
@@ -97,13 +98,32 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw = false)
 	}
 
 	if (keepRaw) {
-		// TODO: well, this looks a bit slow, and does it even work for
-		// real binary data?!? -> please check
-		for (int32 i = 0; i < info.size; i++) {
-			putchar(buffer[i]);
+		off_t pos = 0;
+		ssize_t written = 0;
+		while (pos < info.size) {
+			// write what we have read so far
+			written = write(STDOUT_FILENO, buffer, bytesRead);
+			// check for write error
+			if (written < bytesRead) {
+				fprintf(stderr, "Could only write %ld bytes to stream!\n", written);
+				if (written > 0)
+					written = B_ERROR;
+				break;
+			}
+			// read next chunk of data at pos
+			pos += bytesRead;
+			bytesRead = fs_read_attr(fd, attribute, info.type, pos, buffer, size);
+			// check for read error
+			if (bytesRead < size && pos + bytesRead < info.size) {
+				fprintf(stderr, "Could only read %ld bytes from attribute!\n", bytesRead);
+				written = B_ERROR;
+				break;
+			}
 		}
 		delete[] buffer;
-		return B_OK;
+		if (written > 0)
+			written = B_OK;
+		return written;
 	}
 
 	switch (info.type) {
