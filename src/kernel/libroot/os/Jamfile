@@ -10,6 +10,7 @@ KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>fs_info.c
 	<$(SOURCE_GRIST)>fs_query.c
 	<$(SOURCE_GRIST)>image.c
+	<$(SOURCE_GRIST)>parsedate.cpp
 	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>sem.c
 	<$(SOURCE_GRIST)>system_info.c
