@@ -36,11 +36,9 @@
 
 class MultiAudioDevice
 {
-protected:
-	virtual ~MultiAudioDevice(void);
 public:
-
 	explicit MultiAudioDevice(const char *name, const char* path);
+	virtual ~MultiAudioDevice(void);
 	
 	virtual status_t InitCheck(void) const;
 

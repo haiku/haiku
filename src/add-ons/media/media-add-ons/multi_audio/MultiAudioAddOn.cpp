@@ -235,8 +235,12 @@ MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry = NULL)
 			BPath path;
 			entry.GetPath(&path);
 			MultiAudioDevice *device = new MultiAudioDevice(path.Path() + strlen(rootPath), path.Path());
-			if(device && device->InitCheck() == B_OK)
-				fDevices.AddItem(device);
+			if (device) {
+				if (device->InitCheck() == B_OK)
+					fDevices.AddItem(device);
+				else
+					delete device;
+			}
 		}
 	}
 	
