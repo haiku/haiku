@@ -447,7 +447,26 @@ BDiskDeviceRoster::GetPartitionWithID(int32 id, BDiskDevice *device,
 status_t
 BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 {
-	return B_ERROR;	// not implemented
+	status_t error = B_OK;
+	// compose request message
+	BMessage request(B_REG_DEVICE_START_WATCHING);
+	if (error == B_OK)
+		error = request.AddMessenger("target", target);
+	if (error == B_OK)
+		error = request.AddInt32("events", (int32)eventMask);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = fManager.SendMessage(&request, &reply);
+	// analyze reply
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+	}
+	return error;
 }
 
 // StopWatching
@@ -460,7 +479,24 @@ BDiskDeviceRoster::StartWatching(BMessenger target, uint32 eventMask)
 status_t
 BDiskDeviceRoster::StopWatching(BMessenger target)
 {
-	return B_ERROR;	// not implemented
+	status_t error = B_OK;
+	// compose request message
+	BMessage request(B_REG_DEVICE_STOP_WATCHING);
+	if (error == B_OK)
+		error = request.AddMessenger("target", target);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = fManager.SendMessage(&request, &reply);
+	// analyze reply
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+	}
+	return error;
 }
 
 // _GetObjectWithID
