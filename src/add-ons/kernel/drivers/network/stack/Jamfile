@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel drivers net stack ;
 
 UsePrivateHeaders net ;
-UsePublicHeaders ;
+UsePublicHeaders drivers kernel ;
 UsePosixHeaders ;
 
 # a) Userland stack version:
@@ -34,7 +34,7 @@ R5KernelAddon net_stack_driver : kernel drivers bin :
 # Link to kernel/drivers/dev/net
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
-	local instDriver = <kernel!drivers!dev!net>stack ;
+	local instDriver = <kernel!drivers!dev!net>net_stack_driver ;
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : net_stack_driver ;
 }
