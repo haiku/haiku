@@ -1475,7 +1475,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			// BroadcastChangedParameter() should be correct, but doesn't work
 			BroadcastChangedParameter(PARAM_GAIN(PARAM(id)));
 			// We trigger a complete ParameterWeb update as workaround
-			// but it will change the fokus from tab 3 to tab 1
+			// but it will change the focus from tab 3 to tab 1
 			update = true;
 		}
 		fCore->Settings()->SaveConnectionSettings(input);
