@@ -342,7 +342,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 	}
 
 	if(count <= 0)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
@@ -463,7 +463,7 @@ int release_sem_etc(sem_id id, int count, int flags)
 		return B_BAD_SEM_ID;
 
 	if(count <= 0)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	state = int_disable_interrupts();
 	GRAB_SEM_LOCK(sems[slot]);
@@ -536,7 +536,7 @@ int get_sem_count(sem_id id, int32* thread_count)
 	if(id < 0)
 		return B_BAD_SEM_ID;
 	if (thread_count == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	slot = id % MAX_SEMS;
 
@@ -568,7 +568,7 @@ int _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	if(id < 0)
 		return B_BAD_SEM_ID;
 	if (info == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	slot = id % MAX_SEMS;
 

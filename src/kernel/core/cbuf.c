@@ -290,12 +290,12 @@ int cbuf_memcpy_to_chain(cbuf *chain, size_t offset, const void *_src, size_t le
 
 	if((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_to_chain: chain at %p not head\n", chain);
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	if(len + offset > chain->total_len) {
 		dprintf("cbuf_memcpy_to_chain: len + offset > size of cbuf chain\n");
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	// find the starting cbuf in the chain to copy to
@@ -343,12 +343,12 @@ int cbuf_user_memcpy_to_chain(cbuf *chain, size_t offset, const void *_src, size
 
 	if((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_to_chain: chain at %p not head\n", chain);
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	if(len + offset > chain->total_len) {
 		dprintf("cbuf_memcpy_to_chain: len + offset > size of cbuf chain\n");
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	// find the starting cbuf in the chain to copy to
@@ -398,12 +398,12 @@ int cbuf_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t len)
 
 	if((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_from_chain: chain at %p not head\n", chain);
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	if(len + offset > chain->total_len) {
 		dprintf("cbuf_memcpy_from_chain: len + offset > size of cbuf chain\n");
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	// find the starting cbuf in the chain to copy from
@@ -452,12 +452,12 @@ int cbuf_user_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t 
 
 	if((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_from_chain: chain at %p not head\n", chain);
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	if(len + offset > chain->total_len) {
 		dprintf("cbuf_memcpy_from_chain: len + offset > size of cbuf chain\n");
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	}
 
 	// find the starting cbuf in the chain to copy from
@@ -615,7 +615,7 @@ cbuf *cbuf_merge_chains(cbuf *chain1, cbuf *chain2)
 size_t cbuf_get_len(cbuf *buf)
 {
 	if(!buf)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	if(buf->flags & CBUF_FLAG_CHAIN_HEAD) {
 		return buf->total_len;
@@ -707,10 +707,8 @@ int cbuf_truncate_head(cbuf *buf, size_t trunc_bytes)
 {
 	cbuf *head = buf;
 
-	if(!buf)
-		return ERR_INVALID_ARGS;
-	if((buf->flags & CBUF_FLAG_CHAIN_HEAD) == 0)
-		return ERR_INVALID_ARGS;
+	if(!buf || (buf->flags & CBUF_FLAG_CHAIN_HEAD) == 0)
+		return EINVAL;
 
 	while(buf && trunc_bytes > 0) {
 		int to_trunc;
@@ -734,10 +732,8 @@ int cbuf_truncate_tail(cbuf *buf, size_t trunc_bytes)
 	size_t buf_offset;
 	cbuf *head = buf;
 
-	if(!buf)
-		return ERR_INVALID_ARGS;
-	if((buf->flags & CBUF_FLAG_CHAIN_HEAD) == 0)
-		return ERR_INVALID_ARGS;
+	if(!buf || (buf->flags & CBUF_FLAG_CHAIN_HEAD) == 0)
+		return EINVAL;
 
 	offset = buf->total_len - trunc_bytes;
 	buf_offset = 0;
