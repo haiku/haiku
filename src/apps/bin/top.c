@@ -5,6 +5,7 @@
  * This source code was published by Be, Inc. in the file gnu_x86.tar.gz for R3,
  * a mirror is at http://linux.inf.elte.hu/ftp/beos/development/gnu/r3.0/
  * needs to link to termcap.
+ * The GPL should apply here, since AFAIK termcap is GPLed.
  */
 
 /*
