@@ -1106,7 +1106,7 @@ PDFWriter::IsTransparentGRAY1(uint8* in, int8 bit)
 
 
 // --------------------------------------------------
-void *
+uint8 *
 PDFWriter::CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
 	uint8	*in;
@@ -1206,7 +1206,7 @@ PDFWriter::AlphaFromRGBA32_BIG(uint8* in)
 
 
 // --------------------------------------------------
-void *
+uint8 *
 PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
 	static bool errorReported = false;
@@ -1606,7 +1606,7 @@ bool
 PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPerRow, int32 pixelFormat, 
 	int32 flags, void *data, int* maskId, int* image)
 {
-	void 	*mask = NULL;
+	uint8 	*mask = NULL;
 	*maskId = -1;
 
 	int32 width = src.IntegerWidth() + 1;

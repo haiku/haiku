@@ -134,8 +134,8 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		inline void ConvertFromGRAY8(uint8* in, uint8* out);
 		inline void ConvertFromGRAY1(uint8* in, uint8* out, int8 bit);
 
-		void		*CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
-		void		*CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
+		uint8		*CreateMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
+		uint8		*CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
 		BBitmap		*ConvertBitmap(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data);
 		bool		GetImages(BRect src, int32 width, int32 height, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data, int* mask, int* image);
 
