@@ -1208,6 +1208,13 @@ _user_port_count(port_id port)
 }
 
 
+status_t
+_user_set_port_owner(port_id port, team_id team)
+{
+	return set_port_owner(port, team);
+}
+
+
 ssize_t
 _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
@@ -1215,9 +1222,9 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	int32 messageCode;
 	ssize_t	status;
 
-	if (userCode == NULL || userBuffer == NULL)
+	if (userCode == NULL || (userBuffer == NULL && bufferSize != 0))
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userCode) || !IS_USER_ADDRESS(userBuffer))
+	if (!IS_USER_ADDRESS(userCode) || (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer)))
 		return B_BAD_ADDRESS;
 
 	status = read_port_etc(port, &messageCode, userBuffer, bufferSize,
@@ -1231,19 +1238,12 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 
 
 status_t
-_user_set_port_owner(port_id port, team_id team)
-{
-	return set_port_owner(port, team);
-}
-
-
-status_t
 _user_write_port_etc(port_id port, int32 messageCode, const void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
-	if (userBuffer == NULL)
+	if (userBuffer == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(userBuffer))
+	if (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
 	return write_port_etc(port, messageCode, userBuffer, bufferSize, 
