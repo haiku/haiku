@@ -620,8 +620,11 @@ vm_translation_map_create(vm_translation_map *new_map, bool kernel)
 	// initialize the new object
 	new_map->ops = &tmap_ops;
 	new_map->map_count = 0;
-	if (recursive_lock_create(&new_map->lock) < 0)
-		return ENOMEM;
+
+	// ToDo: lock creation fails at this point during the boot process!
+	// (it will boot anyway, for now, the return code was wrong previously...)
+	if (recursive_lock_init(&new_map->lock, "vm tm rlock") < 0)
+		dprintf("vm_translation_map_create(): creating lock failed - continuing...");
 
 	new_map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
 	if (new_map == NULL) {
