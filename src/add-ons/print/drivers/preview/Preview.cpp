@@ -58,9 +58,11 @@ status_t PreviewPage::InitCheck() const {
 	return fStatus;
 }
 
-void PreviewPage::Draw(BView* view) {
+void PreviewPage::Draw(BView* view) 
+{
 	ASSERT(fStatus == B_OK);
-	for (int32 i = 0; i < fNumberOfPictures; i ++) {
+	for (int32 i = 0; i < fNumberOfPictures; i ++) 
+	{
 		view->DrawPicture(&fPictures[i], fPoints[i]);
 	}
 }
@@ -159,20 +161,28 @@ void PreviewView::DrawPageFrame(BRect rect) {
 	PopState();
 }
 
-void PreviewView::DrawPage(BRect rect) {
+
+
+void PreviewView::DrawPage(BRect rect) 
+{
 	// constrain clipping region to paper dimensions
 	BRect r(PageRect());
 	r.OffsetBy(kPreviewLeftMargin, kPreviewTopMargin);
 	BRegion clip(r);
-	ConstrainClippingRegion(&clip);
+	ConstrainClippingRegion(&clip);	
 
 	// draw page contents
 	PushState();
-	SetOrigin(kPreviewLeftMargin, kPreviewTopMargin);
+	
+	BRect printRect = fReader.PrintableRect();
+	SetOrigin(kPreviewLeftMargin + printRect.left*ZoomFactor(), 
+		kPreviewTopMargin + printRect.top*ZoomFactor() );
+	
 	SetScale(ZoomFactor());
 	fCachedPage->Draw(this);
 	PopState();
 }
+
 
 void PreviewView::Draw(BRect rect) {
 	if (fReader.InitCheck() == B_OK) {
@@ -305,6 +315,8 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 		// add preview view		
 	r.top = fButtonBarHeight;
 	fPreview = new PreviewView(jobFile, r);
+	
+	
 	fPreviewScroller = new BScrollView("PreviewScroller", fPreview, B_FOLLOW_ALL, 0, true, true, B_FANCY_BORDER);
 	fPreviewScroller->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fPreviewScroller);
