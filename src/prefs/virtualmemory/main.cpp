@@ -37,7 +37,7 @@ VM_pref::VM_pref()
 	
 	FILE *settingsFile =
     	fopen("/boot/home/config/settings/kernel/drivers/virtual_memory", "r");
-   	FILE *ptr;
+// 	FILE *ptr;
     char dummy[80];
     BVolume bootVol;
     BVolumeRoster *vol_rost = new BVolumeRoster();

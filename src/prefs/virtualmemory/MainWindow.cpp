@@ -35,6 +35,13 @@ MainWindow::MainWindow(BRect frame, int physMemVal, int currSwapVal, int minVal,
 	fillColor.green = 102;
 	
 	/**
+	 * Set up variables to help handle font sensitivity
+	 */
+	font_height fontHeightStruct;
+	be_plain_font->GetHeight(&fontHeightStruct);
+	float fontheight=fontHeightStruct.ascent+fontHeightStruct.descent+fontHeightStruct.leading;
+	
+	/**
 	 * This var sets the size of the visible box around the string views and
 	 * the slider.
 	 */
@@ -50,23 +57,27 @@ MainWindow::MainWindow(BRect frame, int physMemVal, int currSwapVal, int minVal,
 	origMemSize = currSwapVal;
 	minSwapVal = minVal;
 	
+	BRect rect(10,10,210,10+fontheight+2);
+	
 	/**
 	 * Set up the "Physical Memory" label.
 	 */
 	sprintf(labels, "Physical Memory: %d MB", physMemVal);
-	physMem = new BStringView(*(new BRect(10, 10, 210, 20)), "PhysicalMemory", labels, B_FOLLOW_ALL, B_WILL_DRAW);
+	physMem = new BStringView(rect, "PhysicalMemory", labels, B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	/**
 	 * Set up the "Current Swap File Size" label.
 	 */
+	rect.OffsetBy(0,rect.Height());
 	sprintf(labels, "Current Swap File Size: %d MB", currSwapVal);
-	currSwap = new BStringView(*(new BRect(10, 25, 210, 35)), "CurrentSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
+	currSwap = new BStringView(rect, "CurrentSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	/**
 	 * Set up the "Requested Swap File Size" label.
 	 */
+	rect.OffsetBy(0,rect.Height());
 	sprintf(labels, "Requested Swap File Size: %d MB", currSwapVal);
-	reqSwap = new BStringView(*(new BRect(10, 40, 210, 50)), "RequestedSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
+	reqSwap = new BStringView(rect, "RequestedSwapSize", labels, B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	/**
 	 * Set up the slider.
