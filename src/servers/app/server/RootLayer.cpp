@@ -59,7 +59,6 @@
 
 //#define DISPLAYDRIVER_TEST_HACK
 
-
 RootLayer::RootLayer(const char *name, int32 workspaceCount, 
 		Desktop *desktop, DisplayDriver *driver)
  : Layer(BRect(0,0,0,0), name, 0, B_FOLLOW_ALL, B_WILL_DRAW, driver)
@@ -77,7 +76,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fActiveWorkspace = NULL;
 	fRows = 0;
 	fColumns = 0;
-	
+
 	// TODO: this should eventually be replaced by a method to convert the monitor
 	// number to an index in the name, i.e. workspace_settings_1 for screen #1
 	ReadWorkspaceData(WORKSPACE_DATA_LIST);

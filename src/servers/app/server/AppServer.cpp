@@ -130,15 +130,14 @@ AppServer::AppServer(void)
 		gui_colorset.SetToDefaults();
 
 	InitDecorators();
+
+	// Create the cursor manager. Object declared in CursorManager.cpp
+	cursormanager= new CursorManager();
 		
 	// Set up the Desktop
 	desktop= new Desktop();
 	desktop->Init();
 
-	// Create the cursor manager. Object declared in CursorManager.cpp
-	cursormanager= new CursorManager();
-	cursormanager->SetCursor(B_CURSOR_DEFAULT);
-	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	bitmapmanager= new BitmapManager();
 

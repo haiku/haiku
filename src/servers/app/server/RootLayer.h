@@ -33,6 +33,7 @@
 
 #include "Layer.h"
 #include "FMWList.h"
+#include "CursorHandler.h"
 
 class RGBColor;
 class Workspace;

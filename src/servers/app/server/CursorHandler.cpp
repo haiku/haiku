@@ -99,6 +99,8 @@ void CursorHandler::MoveTo(const BPoint &pt)
 		return;
 	
 	fCursorPos=pt;
+if (!fSavedData)
+	debugger("NULL savedata\n");
 	fDriver->CopyBitmap(fSavedData,fSavedData->Bounds(),fOldPosition,&(fDriver->fDrawData));
 	fPosition.OffsetTo(fCursorPos.x-fCursor->GetHotSpot().x,
 			fCursorPos.y-fCursor->GetHotSpot().y);

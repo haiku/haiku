@@ -1012,7 +1012,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			link.Read<int32>(&token);
 			
-			cursormanager->SetCursor(token);
+debugger("AS_LAYER_CURSOR: not yet available\n");
+//			cursormanager->SetCursor(token);
 
 			break;
 		}

@@ -40,6 +40,7 @@
 #include "BitmapManager.h"
 #include "BGet++.h"
 #include "CursorManager.h"
+
 #include "Desktop.h"
 #include "DisplayDriver.h"
 #include "FontServer.h"
@@ -268,10 +269,13 @@ void ServerApp::Activate(bool value)
 //! Sets the cursor to the application cursor, if any.
 void ServerApp::SetAppCursor(void)
 {
+debugger("ServerApp::SetAppCursor() not yet available\n");
+/*
 	if(fAppCursor)
 		cursormanager->SetCursor(fAppCursor->ID());
 	else
 		cursormanager->SetCursor(B_CURSOR_DEFAULT);
+*/
 }
 
 /*!
@@ -754,21 +758,24 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n",fSignature.String()));
-			cursormanager->ShowCursor();
+debugger("AS_SHOW_CURSOR: not yet available\n");
+//			cursormanager->ShowCursor();
 			fCursorHidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n",fSignature.String()));
-			cursormanager->HideCursor();
+debugger("AS_HIDE_CURSOR: not yet available\n");
+//			cursormanager->HideCursor();
 			fCursorHidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n",fSignature.String()));
-			cursormanager->ObscureCursor();
+debugger("AS_OBSCURE_CURSOR: not yet available\n");
+//			cursormanager->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -803,7 +810,8 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			cursormanager->AddCursor(fAppCursor);
-			cursormanager->SetCursor(fAppCursor->ID());
+debugger("AS_SET_CURSOR_DATA: not yet available\n");
+//			cursormanager->SetCursor(fAppCursor->ID());
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -822,7 +830,8 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			if(sync)
 				msg.Read<int32>(&replyport);
 			
-			cursormanager->SetCursor(ctoken);
+debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
+//			cursormanager->SetCursor(ctoken);
 			
 			if(sync)
 			{

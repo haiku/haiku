@@ -41,6 +41,46 @@
 
 static Blitter blitter;
 
+int8 default_cursor_data[] = {
+16,1,0,0,
+255,224,	// ***********-----
+128,16,		// *----------*----
+128,16,		// *----------*----
+128,96,		// *--------**-----
+128,16,		// *----------*----
+128,8,		// *-----------*---
+128,8,		// *-----------*---
+128,16,		// *----------*----
+128,32,		// *---------*-----
+144,64,		// *--*-----*------
+144,128,	// *--*----*-------
+105,0,		// -**-*--*--------
+6,0,		// -----**---------
+
+0,0,		// ----------------
+0,0,		// ----------------
+0,0,		// ----------------
+
+// default_cursor mask - black pixels are always opaque
+255,224,
+255,240,
+255,240,
+255,224,
+255,240,
+255,248,
+255,248,
+255,240,
+255,224,
+255,192,
+255,128,
+111,0,
+6,0,
+
+0,0,
+0,0,
+0,0
+};
+
 /*!
 	\brief Sets up internal variables needed by all DisplayDriver subclasses
 	
@@ -51,7 +91,7 @@ DisplayDriver::DisplayDriver(void) :
  fCursorHandler(this)
 {
 	_locker=new BLocker();
-
+	fCursorHandler.SetCursor(new ServerCursor(default_cursor_data));
 //	_is_cursor_hidden=false;
 //	_is_cursor_obscured=false;
 //	_cursor=NULL;
