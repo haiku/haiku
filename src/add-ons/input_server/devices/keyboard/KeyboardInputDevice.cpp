@@ -623,6 +623,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			} else {
 				raw_key_info *raw_kbd = (raw_key_info *)buffer;
 				is_keydown = raw_kbd->is_keydown;
+				timestamp = raw_kbd->timestamp;
 				keycode = raw_kbd->be_keycode;
 			}
 			
