@@ -13,6 +13,7 @@ extern "C" {
 // userland partition representation
 struct user_partition_data {
 	partition_id		id;
+	partition_id		shadow_id;
 	off_t				offset;
 	off_t				size;
 	uint32				block_size;
@@ -65,8 +66,12 @@ struct user_disk_device_job_info {
 // iterating, retrieving device/partition data
 partition_id _kern_get_next_disk_device_id(int32 *cookie,
 										   size_t *neededSize = NULL);
-status_t _kern_get_disk_device_data(partition_id deviceID, bool shadow,
-									user_disk_device_data *buffer,
+partition_id _kern_find_disk_device(const char *filename,
+									size_t *neededSize = NULL);
+partition_id _kern_find_partition(const char *filename,
+								  size_t *neededSize = NULL);
+status_t _kern_get_disk_device_data(partition_id deviceID, bool deviceOnly,
+									bool shadow, user_disk_device_data *buffer,
 									size_t bufferSize, size_t *neededSize);
 status_t _kern_get_partition_data(partition_id partitionID, bool shadow,
 								  user_partition_data *buffer,
@@ -77,6 +82,12 @@ status_t _kern_get_partitionable_spaces(partition_id partitionID, bool shadow,
 										size_t bufferSize, size_t *neededSize);
 	// Pass the partition change counter? If GetPartitionInfo() is only
 	// allowed, when the device is locked, then we wouldn't need it.
+
+partition_id _kern_register_file_device(const char *filename);
+status_t _kern_unregister_file_device(partition_id deviceID,
+									  const char *filename);
+	// Only a valid deviceID or filename need to be passed. The other one
+	// is -1/NULL. If both is given only filename is ignored.
 
 // disk systems
 status_t _kern_get_disk_system_info(disk_system_id id,
@@ -93,12 +104,17 @@ bool validate_partition_operation(uint32 operation, void *parameters);
 	// for kernel internal use. There needs to be something similar for these
 	// functions.
 
-// partition modification
-status_t prepare_disk_device_modifications(partition_id device);
-status_t commit_disk_device_modifications(partition_id device, port_id port,
-										  int32 token, bool completeProgress);
-status_t cancel_disk_device_modifications(partition_id device);
-bool is_disk_device_modified(partition_id device);
+#endif	// 0
+
+// disk device modification
+status_t _kern_prepare_disk_device_modifications(partition_id deviceID);
+status_t _kern_commit_disk_device_modifications(partition_id deviceID,
+												port_id port, int32 token,
+												bool completeProgress);
+status_t _kern_cancel_disk_device_modifications(partition_id deviceID);
+bool _kern_is_disk_device_modified(partition_id deviceID);
+
+#if 0
 
 status_t defragment_partition(partition_id partition);
 status_t repair_partition(partition_id partition, bool checkOnly);
