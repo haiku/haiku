@@ -27,8 +27,6 @@
 // temp. VFS API
 extern Node *get_node_from(int fd);
 
-addr_t gKernelEntry;
-
 
 bool
 is_bootable(Directory *volume)
@@ -66,10 +64,6 @@ load_kernel(stage2_args *args, Directory *volume)
 	}
 
 	puts("kernel loaded successfully");
-
-	gKernelEntry = gKernelArgs.kernel_image.elf_header.e_entry;
-		// ToDo: gKernelEntry is no longer needed
-
 	return B_OK;
 }
 
