@@ -44,7 +44,7 @@ bool FtpClient::ls(string &listing)
 {
 	bool rc = false;
 	string cmd, replystr;
-	int code, codetype, i, numread;
+	int code, codetype, numread;
 	char buf[513];
 	
 	cmd = "TYPE A";
@@ -453,7 +453,7 @@ bool FtpClient::p_sendRequest(const string &cmd)
 	
 	if(m_control != 0)
 	{
-		if(cmd.find("PASS") != -1)
+		if(cmd.find("PASS") != string::npos)
 			printf("PASS <suppressed>  (real password sent)\n");
 		else
 			printf("%s\n", ccmd.c_str());
@@ -607,7 +607,6 @@ bool FtpClient::p_openDataConnection()
 	unsigned short port;
 	BNetAddress addr;
 	int i, code, codetype;
-	char buf[32];
 	bool rc = false;
 	struct sockaddr_in sa;
 	

@@ -43,21 +43,21 @@ VideoConsumer::VideoConsumer(
 	BMediaNode(name),
 	BMediaEventLooper(),
 	BBufferConsumer(B_MEDIA_RAW_VIDEO),
-	mView(view),
-	mWindow(NULL),
 	mStatusLine(statusLine),
 	mInternalID(internal_id),
 	mAddOn(addon),
-	mTimeToFtp(false),
-	mFtpComplete(true),	
-	mRate(1000000),
-	mImageFormat(0),
-	mTranslator(0),
-	mPassiveFtp(true),
 	mConnectionActive(false),
 	mMyLatency(20000),
+	mWindow(NULL),
+	mView(view),
+	mOurBuffers(false),
 	mBuffers(NULL),
-	mOurBuffers(false)
+	mTimeToFtp(false),
+	mFtpComplete(true),
+	mRate(1000000),
+        mImageFormat(0),
+        mTranslator(0),
+        mPassiveFtp(true)
 {
 	FUNCTION("VideoConsumer::VideoConsumer\n");
 
@@ -85,7 +85,6 @@ VideoConsumer::VideoConsumer(
 VideoConsumer::~VideoConsumer()
 {
 	FUNCTION("VideoConsumer::~VideoConsumer\n");
-	status_t status;
 	
 	Quit();
 
@@ -196,6 +195,9 @@ VideoConsumer::RequestCompleted(const media_request_info & info)
 					ERROR("VideoConsumer::RequestCompleted: Not using our buffers!\n");
 			}
 			break;
+		default:
+			ERROR("VideoConsumer::RequestCompleted: Invalid argument\n");
+			break;
 	}
 	return B_OK;
 }
@@ -240,7 +242,7 @@ VideoConsumer::HandleMessage(int32 message, const void * data, size_t size)
 void
 VideoConsumer::BufferReceived(BBuffer * buffer)
 {
-	LOOP("VideoConsumer::Buffer #%d received\n", buffer->ID());
+	LOOP("VideoConsumer::Buffer #%ld received\n", buffer->ID());
 
 	if (RunState() == B_STOPPED)
 	{
@@ -284,7 +286,6 @@ VideoConsumer::CreateBuffers(
 	// create a buffer group
 	uint32 mXSize = with_format.u.raw_video.display.line_width;
 	uint32 mYSize = with_format.u.raw_video.display.line_count;	
-	uint32 mRowBytes = with_format.u.raw_video.display.bytes_per_row;
 	color_space mColorspace = with_format.u.raw_video.display.format;
 	PROGRESS("VideoConsumer::CreateBuffers - Colorspace = %d\n", mColorspace);
 
@@ -317,7 +318,7 @@ VideoConsumer::CreateBuffers(
 		}
 		else 
 		{
-			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING BUFFER: %08x\n", status);
+			ERROR("VideoConsumer::CreateBuffers - ERROR CREATING VIDEO RING BUFFER: %08lx\n", status);
 			return B_ERROR;
 		}	
 	}
@@ -330,7 +331,7 @@ VideoConsumer::CreateBuffers(
 			if (buffList[j] != NULL)
 			{
 				mBufferMap[j] = (uint32) buffList[j];
-				PROGRESS(" j = %d buffer = %08x\n", j, mBufferMap[j]);
+				PROGRESS(" j = %d buffer = %08lx\n", j, mBufferMap[j]);
 			}
 			else
 			{
@@ -350,7 +351,6 @@ void
 VideoConsumer::DeleteBuffers()
 {
 	FUNCTION("VideoConsumer::DeleteBuffers\n");
-	status_t status;
 	
 	if (mBuffers)
 	{

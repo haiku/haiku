@@ -93,9 +93,6 @@ void
 CodyCam::ReadyToRun()
 {
 	/* create the window for the app */
-	uint32 x = WINDOW_SIZE_X;
-	uint32 y = WINDOW_SIZE_Y;
-	
 	fWindow = new VideoWindow(BRect(28, 28, 28 + (WINDOW_SIZE_X-1), 28 + (WINDOW_SIZE_Y-1)),
 								(const char *)"CodyCam", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, &fPort);
 								
@@ -127,8 +124,6 @@ CodyCam::QuitRequested()
 void
 CodyCam::MessageReceived(BMessage *message)
 {
-	status_t status;
-	
 	switch (message->what)
 	{
 		case msg_start:
@@ -368,7 +363,7 @@ static void
 ErrorAlert(const char * message, status_t err)
 {
 	char msg[256];
-	sprintf(msg, "%s\n%s [%x]", message, strerror(err), err);
+	sprintf(msg, "%s\n%s [%lx]", message, strerror(err), err);
 	(new BAlert("", msg, "Quit"))->Go();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 }
@@ -424,9 +419,9 @@ AddTranslationItems( BMenu * intoMenu, uint32 from_type)
 
 VideoWindow::VideoWindow (BRect frame, const char *title, window_type type, uint32 flags, port_id * consumerport) :
 	BWindow(frame,title,type,flags),
+	fPortPtr(consumerport),
 	fView(NULL),
-	fVideoView(NULL),
-	fPortPtr(consumerport)
+	fVideoView(NULL)
 {
 	fFtpInfo.port = 0;
 	fFtpInfo.rate = 0x7fffffff;
@@ -519,7 +514,6 @@ void
 VideoWindow::MessageReceived(BMessage *message)
 {
 	BControl	*p;
-	uint32		index;
 
 	p = NULL;
 	message->FindPointer((const char *)"source",(void **)&p);
@@ -868,7 +862,6 @@ void
 ControlWindow::MessageReceived(BMessage * message) 
 {
 	BParameterWeb * web = NULL;
-	BView * panel = NULL;
 	status_t err;
 	
 	switch (message->what)
