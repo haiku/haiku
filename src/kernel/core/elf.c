@@ -522,7 +522,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader.e_phnum * eheader.e_phentsize);
 	if(pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto error;
 	}
 
@@ -691,7 +691,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 	
 	eheader = (struct Elf32_Ehdr *)kmalloc( sizeof( *eheader ));
 	if( !eheader ) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto error;
 	}
 
@@ -711,7 +711,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 
 	image = create_image_struct();
 	if(!image) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto error1;
 	}
 	image->vnode = vnode;
@@ -720,7 +720,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader->e_phnum * eheader->e_phentsize);
 	if(pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto error2;
 	}
 
@@ -809,7 +809,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 		if(image->regions[0].delta != image->regions[1].delta) {
 			dprintf("could not load binary, fix the region problem!\n");
 			dump_image_info(image);
-			err = ERR_NO_MEMORY;
+			err = ENOMEM;
 			goto error4;
 		}
 	}
