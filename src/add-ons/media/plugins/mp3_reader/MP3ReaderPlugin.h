@@ -3,6 +3,8 @@
 
 #include "ReaderPlugin.h"
 
+struct mp3data;
+
 namespace BPrivate { namespace media {
 
 class mp3Reader : public Reader
@@ -30,7 +32,7 @@ public:
 	status_t	GetNextChunk(void *cookie,
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader);
-									 
+
 	BPositionIO *Source() { return fSeekableSource; }
 
 private:
@@ -53,6 +55,8 @@ private:
 	void		ParseFraunhoferVbrHeader(int64 pos);
 	
 	int64		XingSeekPoint(float percent);
+
+	bool		ResynchronizeStream(mp3data *data);
 	
 private:
 	BPositionIO *	fSeekableSource;

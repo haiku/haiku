@@ -359,19 +359,27 @@ mp3Reader::GetNextChunk(void *cookie,
 	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameRate;
 	mediaHeader->file_pos = data->position;
 
+retry:
 	if (4 != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, 4)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
 		return B_ERROR;
 	}
-	data->position += 4;
-	maxbytes -= 4;
 	
 	int size = GetFrameLength(data->chunkBuffer) - 4;
 	if (size <= 0) {
-		TRACE("mp3Reader::GetNextChunk: invalid frame encountered\n");
-		// try to synchronize again here!
-		return B_ERROR;
+		TRACE("mp3Reader::GetNextChunk: invalid frame encountered at position %Ld, header %02x %02x %02x %02x \n",
+			data->position, (uint8)data->chunkBuffer[0], (uint8)data->chunkBuffer[1], (uint8)data->chunkBuffer[2], (uint8)data->chunkBuffer[3]);
+		if (ResynchronizeStream(data)) {
+			TRACE("mp3Reader::GetNextChunk: synchronized again at position %Ld\n", data->position);
+			goto retry;
+		} else {
+			TRACE("mp3Reader::GetNextChunk: synchronization failed\n");
+			return B_ERROR;
+		}
 	}
+
+	data->position += 4;
+	maxbytes -= 4;
 
 	if (size > maxbytes)
 		size = maxbytes;
@@ -393,6 +401,30 @@ mp3Reader::GetNextChunk(void *cookie,
 	}
 
 	return B_OK;
+}
+
+bool
+mp3Reader::ResynchronizeStream(mp3data *data)
+{
+	// we are at data->position and that's not a valid frame header
+	
+	// XXX this is a hack and needs to be improved
+	
+	const int readmax = 16384;
+	uint8 buffer[readmax];
+	
+	while ((data->position + 100) < fDataSize) {
+		data->position++;
+		int bytes = min_c(fDataSize - data->position, readmax);
+
+		if (bytes != Source()->ReadAt(fDataStart + data->position, buffer, bytes)) {
+			TRACE("mp3Reader::ResynchronizeStream: read error\n");
+			return false;
+		}
+		if (IsValidStream(buffer, bytes))
+			return true;
+	}
+	return false;
 }
 
 
@@ -849,7 +881,7 @@ mp3Reader::GetFrameLength(void *header)
 	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];
 	
 	if (!bitrate || !framerate)
-		return -1;	
+		return -1;
 
 	int length;	
 	if (layer_index == 3) // layer 1
