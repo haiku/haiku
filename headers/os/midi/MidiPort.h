@@ -4,12 +4,10 @@
 
 #include <Midi.h>
 
-class BMidiLocalProducer;
-class BMidiPortConsumer;
-
 class BMidiPort : public BMidi 
 {
 public:
+
 	BMidiPort(const char* name = NULL);
 	~BMidiPort();
 
@@ -42,7 +40,7 @@ public:
 		uchar channel, uchar lsb, uchar msb, uint32 time = B_NOW);
 
 	virtual void SystemExclusive(
-		void* data, size_t dataLength, uint32 time = B_NOW);
+		void* data, size_t length, uint32 time = B_NOW);
 
 	virtual void SystemCommon(
 		uchar status, uchar data0, uchar data2, uint32 time = B_NOW);
@@ -58,38 +56,30 @@ public:
 		int32 n, char* name, size_t bufSize = B_OS_NAME_LENGTH);
 
 private:
-	typedef BMidi _inherited;
+
+	typedef BMidi super;
+
+	friend class BMidiPortGlue;
 
 	virtual void _ReservedMidiPort1();
 	virtual void _ReservedMidiPort2();
 	virtual void _ReservedMidiPort3();
 
 	virtual void Run();
-	friend class BMidiPortConsumer;
-
-//Can I do that?
-//	void Dispatch(
-//		const unsigned char* buffer, size_t size, bigtime_t when);
-
-//	ssize_t Read(void* buffer, size_t numBytes) const;
-//	ssize_t Write(void* buffer, size_t numBytes, uint32 time) const;
 
 	void ScanDevices();
+	void EmptyDeviceList();
 
-	// used to glue us to the new midi kit
-	BMidiProducer*      remote_source;
-	BMidiConsumer*      remote_sink;
-	BMidiLocalProducer* local_source;
-	BMidiPortConsumer*  local_sink;
+	BMidiLocalProducer* localSource;
+	BMidiLocalConsumer* localSink;
+	BMidiProducer* remoteSource;
+	BMidiConsumer* remoteSink;
 		
-	char* fName;
-	status_t fCStatus;
-	BList* _fDevices;
-//	uint8 _m_prev_cmd;
-//	bool _m_enhanced;
-//	uint8 _m_reserved[2];
-	uint8 _reserved[4];
+	char* portName;
+	status_t status;
+	BList* devices;
+
+	uint32 _reserved[1];
 };
 
 #endif // _MIDI_PORT_H
-

@@ -9,6 +9,7 @@
 class BMidiText : public BMidi 
 {
 public:
+
 	BMidiText();
 	virtual ~BMidiText();
 
@@ -35,28 +36,26 @@ public:
 		uchar channel, uchar lsb, uchar msb, uint32 time = B_NOW);
 
 	virtual void SystemExclusive(
-		void* data, size_t dataLength, uint32 time = B_NOW);
+		void* data, size_t length, uint32 time = B_NOW);
 
 	virtual void SystemCommon(
 		uchar status, uchar data1, uchar data2, uint32 time = B_NOW);
 
 	virtual void SystemRealTime(uchar status, uint32 time = B_NOW);
 
-	virtual void TempoChange(int32 beatsPerMinute, uint32 time = B_NOW);
-
- 	virtual void AllNotesOff(bool justChannel = true, uint32 time = B_NOW);
-
 	void ResetTimer(bool start = false);
 
 private:
 
 	virtual void _ReservedMidiText1();
+	virtual void _ReservedMidiText2();
+	virtual void _ReservedMidiText3();
 
 	virtual void Run();
 
 	void WaitAndPrint(uint32 time);
 
-	int32 startTime;
+	uint32 startTime;
 	uint32 _reserved[4];
 };
 

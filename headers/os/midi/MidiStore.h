@@ -1,178 +1,123 @@
+
 #ifndef _MIDI_STORE_H
 #define _MIDI_STORE_H
 
-#ifndef _BE_BUILD_H
 #include <BeBuild.h>
-#endif
 #include <Midi.h>
 
 struct entry_ref;
 
-class BMidiEvent;
 class BFile;
+class BList;
+class BMidiEvent;
 
-/*------------------------------------------------------------*/
-
-class BMidiStore : public BMidi {
+class BMidiStore : public BMidi
+{
 public:
-				BMidiStore();
-virtual			~BMidiStore();
 
-virtual	void	NoteOff(uchar channel, 
-						uchar note, 
-						uchar velocity,
-						uint32 time = B_NOW);
+	BMidiStore();
+	virtual ~BMidiStore();
 
-virtual	void	NoteOn(uchar channel, 
-					   uchar note, 
-					   uchar velocity,
-			    	   uint32 time = B_NOW);
+	virtual void NoteOff(
+		uchar channel, uchar note, uchar velocity, uint32 time = B_NOW);
 
-virtual	void	KeyPressure(uchar channel, 
-							uchar note, 
-							uchar pressure,
-							uint32 time = B_NOW);
+	virtual void NoteOn(
+		uchar channel, uchar note, uchar velocity, uint32 time = B_NOW);
 
-virtual	void	ControlChange(uchar channel, 
-							  uchar controlNumber,
-							  uchar controlValue, 
-							  uint32 time = B_NOW);
+	virtual void KeyPressure(
+		uchar channel, uchar note, uchar pressure, uint32 time = B_NOW);
 
-virtual	void	ProgramChange(uchar channel, 
-								uchar programNumber,
-							  	uint32 time = B_NOW);
+	virtual void ControlChange(
+		uchar channel, uchar controlNumber, uchar controlValue,
+		uint32 time = B_NOW);
 
-virtual	void	ChannelPressure(uchar channel, 
-								uchar pressure, 
-								uint32 time = B_NOW);
+	virtual void ProgramChange(
+		uchar channel, uchar programNumber, uint32 time = B_NOW);
 
-virtual	void	PitchBend(uchar channel, 
-						  uchar lsb, 
-						  uchar msb,
-			    		  uint32 time = B_NOW);
+	virtual void ChannelPressure(
+		uchar channel, uchar pressure, uint32 time = B_NOW);
 
-virtual	void	SystemExclusive(void* data, 
-								size_t dataLength, 
-								uint32 time = B_NOW);
+	virtual void PitchBend(
+		uchar channel, uchar lsb, uchar msb, uint32 time = B_NOW);
 
-virtual	void	SystemCommon(uchar statusByte, 
-							 uchar data1, 
-							 uchar data2,
-							 uint32 time = B_NOW);
+	virtual void SystemExclusive(
+		void* data, size_t length, uint32 time = B_NOW);
 
-virtual	void	SystemRealTime(uchar statusByte, uint32 time = B_NOW);
+	virtual void SystemCommon(
+		uchar status, uchar data1, uchar data2, uint32 time = B_NOW);
 
-virtual	void	TempoChange(int32 bpm, uint32 time = B_NOW);
+	virtual void SystemRealTime(uchar status, uint32 time = B_NOW);
 
-		status_t	Import(const entry_ref *ref);
-		status_t	Export(const entry_ref *ref, int32 format);
+	virtual void TempoChange(int32 beatsPerMinute, uint32 time = B_NOW);
 
-		void	SortEvents(bool force=false);
-		uint32	CountEvents() const;
+	status_t Import(const entry_ref* ref);
+	status_t Export(const entry_ref* ref, int32 format);
 
-		uint32	CurrentEvent() const;
-		void	SetCurrentEvent(uint32 eventNumber);
+	void SortEvents(bool force = false);
+	uint32 CountEvents() const;
 
-		uint32	DeltaOfEvent(uint32 eventNumber) const;
-		uint32	EventAtDelta(uint32 time) const;
+	uint32 CurrentEvent() const;
+	void SetCurrentEvent(uint32 eventNumber);
 
-		uint32	BeginTime() const;
-	
-		void	SetTempo(int32 bpm);
-		int32	Tempo() const;
+	uint32 DeltaOfEvent(uint32 eventNumber) const;
+	uint32 EventAtDelta(uint32 time) const;
+
+	uint32 BeginTime() const;
+		
+	void SetTempo(int32 beatsPerMinute);
+	int32 Tempo() const;
 
 private:
 
-virtual	void		_ReservedMidiStore1();
-virtual	void		_ReservedMidiStore2();
-virtual	void		_ReservedMidiStore3();
+	virtual void _ReservedMidiStore1();
+	virtual void _ReservedMidiStore2();
+	virtual void _ReservedMidiStore3();
 
-virtual	void	Run();
+	virtual void Run();
 
-		void	AddEvent(uint32 time, 
-						 bool inMS, 
-						 uchar type, 
-		   	         	 uchar data1 = 0, 
-						 uchar data2 = 0,
-		   	         	 uchar data3 = 0, 	 
-						 uchar data4 = 0);
+	void AddEvent(BMidiEvent* event);
+	void SprayEvent(const BMidiEvent* event, uint32 time);
+	BMidiEvent* EventAt(int32 index) const;
+	uint32 GetEventTime(const BMidiEvent* event) const;
+	uint32 TicksToMilliseconds(uint32 ticks) const;
+	uint32 MillisecondsToTicks(uint32 ms) const;
 
-		void	AddSystemExclusive(void* data, size_t dataLength);
-	
-		status_t ReadHeader();
-		bool	ReadMT(char*);
-		int32	Read32Bit();
-		int32	EGetC();
-		int32	To32Bit(int32, int32, int32, int32);
-		int32	Read16Bit();
-		int32	To16Bit(int32, int32);
-		bool	ReadTrack();
-		int32	ReadVariNum();
-		void	ChannelMessage(int32, int32, int32);
-		void	MsgInit();
-		void	MsgAdd(int32);
-		void	BiggerMsg();
-		void	MetaEvent(int32);
-		int32	MsgLength();
-		uchar*	Msg();
-		void	BadByte(int32);
-	
-		int32	PutC(int32 c);
-		bool	WriteTrack(int32 track);
-		void	WriteTempoTrack();
-		bool	WriteTrackChunk(int32 whichTrack);
-		void	WriteHeaderChunk(int32 format);
-		bool	WriteMidiEvent(uint32 deltaTime, 
-							   uint32 type, 
-							   uint32 channel, 
-							   uchar* data, 
-							   uint32 size);
-		bool	WriteMetaEvent(uint32 deltaTime, 
-							   uint32 type, 
-							   uchar* data, 
-							   uint32 size);
-		bool	WriteSystemExclusiveEvent(uint32 deltaTime, 
-							    uchar* data, 
-							    uint32 size);
-		void	WriteTempo(uint32 deltaTime, int32 tempo);
-		void	WriteVarLen(uint32 value);
-		void	Write32Bit(uint32 data);
-		void	Write16Bit(ushort data);
-		int32	EPutC(uchar c);
-	
-		uint32	TicksToMilliseconds(uint32 ticks) const;
-		uint32	MillisecondsToTicks(uint32 ms) const;
+	BList* events;
+	int32 currentEvent;
+	uint32 startTime;
+	int32 beatsPerMinute;
+	int16 ticksPerBeat;
+	bool needsSorting;
 
-		BList		*events;
-//		uint32		fNumEvents;
-//		uint32		fEventsSize;
-		uint32		fCurrEvent;
-		bool		fNeedsSorting;
-//		bool		fResetTimer;
-		uint32		fStartTime;
-		BFile*		fFile;
-		short		fDivision;
-		float		fDivisionFactor;
-		int32		fTempo;
-		int32		fCurrTime;
-		int32		fCurrTrack;
-		int32		fNumTracks;
-		
-//		int32		fToBeRead;
-//		int32		fMsgIndex;
-//		int32		fMsgSize;
-//		uchar*		fMsgBuff;
-	
-		int32		fNumBytesWritten;
+	void ReadFourCC(char* fourcc);
+	uint32 Read32Bit();
+	uint16 Read16Bit();
+	uint8 PeekByte();
+	uint8 NextByte();
+	void SkipBytes(uint32 length);
+	uint32 ReadVarLength();
+	void ReadChunk();
+	void ReadTrack();
+	void ReadSystemExclusive();
+	void ReadMetaEvent();
 
-		uchar*		fFileBuffer;
-		int32		fFileBufferMax;
-		int32		fFileBufferSize;
-		int32		fFileBufferIndex;
-		uint32		_reserved[4];
+	void WriteFourCC(char a, char b, char c, char d);
+	void Write32Bit(uint32 val);
+	void Write16Bit(uint16 val);
+	void WriteByte(uint8 val);
+	void WriteVarLength(uint32 val);
+	void WriteTrack();
+	void WriteMetaEvent(BMidiEvent* event);
+
+	BFile* file;
+	uint32 byteCount;
+	uint32 totalTicks;
+	uint16 numTracks;
+	uint16 currTrack;
+	uint16 format;
+
+	uint16 _reserved1[1];
+	uint32 _reserved2[16];
 };
 
-
-/*------------------------------------------------------------*/
-
-#endif
+#endif // _MIDI_STORE_H

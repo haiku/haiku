@@ -8,7 +8,6 @@
 //------------------------------------------------------------------------------
 
 /* System time converted to int milliseconds */
-
 #define B_NOW  ((uint32)(system_time()/1000))
 
 //------------------------------------------------------------------------------
@@ -301,4 +300,3 @@ typedef enum midi_axe
 midi_axe;
 
 #endif // _MIDI_DEFS_H
-
