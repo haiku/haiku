@@ -157,7 +157,7 @@ status_t nv_acc_init_dma()
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
 		ACCW(HT_VALUE_01, 0x00101148); /* instance $1146, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
+		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 		ACCW(HT_VALUE_02, 0x0010114a); /* instance $1147, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
@@ -179,7 +179,7 @@ status_t nv_acc_init_dma()
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
 		ACCW(HT_VALUE_01, 0x80011148); /* instance $1146, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
+		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 		ACCW(HT_VALUE_02, 0x8001114a); /* instance $1147, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
@@ -240,8 +240,8 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
 		ACCW(PR_CTX0_7, 0x00000000); /* extra */
 		ACCW(PR_CTX1_7, 0x00000000); /* extra */
-		/* setup set '5' for cmd NV3_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_8, 0x0208004b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
+		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
+		ACCW(PR_CTX0_8, 0x0208004a); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX1_8, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
 		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
@@ -297,7 +297,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
 		ACCW(PR_CTX2_6, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
 		ACCW(PR_CTX3_6, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
-		/* setup set '5' for cmd NV3_GDI_RECTANGLE_TEXT */
+		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
 		ACCW(PR_CTX0_8, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX1_8, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
 		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
@@ -666,7 +666,7 @@ status_t nv_acc_init_dma()
 	si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
 	si->engine.fifo.handle[3] = NV4_SURFACE; /* NV10_CONTEXT_SURFACES_2D is identical */
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
-	si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
+	si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
 	si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
 	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
 	/* preset no FIFO channels assigned to cmd's */
@@ -775,7 +775,7 @@ status_t nv_acc_init_dma()
 	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
 	nv_acc_fifofree_dma(2);
 	/* set bitmap colordepth (writing 2 32bit words) */
-	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
@@ -806,13 +806,6 @@ static void nv_start_dma(void)
 			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])]) =
 			(si->engine.dma.put << 2);
 	}
-//test:
-for (dummy = 0; dummy < 2; dummy++)
-{
-	LOG(4,("ACC_DMA: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
-		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
-	LOG(4,("ACC_DMA: put $%08x\n", (si->engine.dma.put << 2)));
-}
 }
 
 /* this routine does not check the engine's internal hardware FIFO, but the DMA
@@ -827,7 +820,7 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 	if (si->engine.dma.free < cmd_size)
 	{
 		//test:
-		LOG(4,("ACC_FIFOFREE: level 1; free $%08x, max $%08x, current $%08x\n",
+		LOG(4,("ACC_FIFOFREE: free $%08x, max $%08x, current $%08x\n",
 			si->engine.dma.free, si->engine.dma.max, si->engine.dma.current ));
 
 		/* not enough room left, so instruct DMA engine to reset the buffer when
@@ -908,7 +901,7 @@ void nv_acc_assert_fifo_dma(void)
 		!si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN] ||
 		!si->engine.fifo.ch_ptr[NV4_SURFACE] ||
 		!si->engine.fifo.ch_ptr[NV_IMAGE_BLIT] ||
-		!si->engine.fifo.ch_ptr[NV3_GDI_RECTANGLE_TEXT])
+		!si->engine.fifo.ch_ptr[NV4_GDI_RECTANGLE_TEXT])
 	{
 		uint16 cnt;
 
@@ -929,7 +922,7 @@ void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
 		si->engine.fifo.handle[3] = NV4_SURFACE;
 		si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
-		si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
+		si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
 
 		/* set handle's pointers to their assigned FIFO channels */
 		/* note:
@@ -1035,7 +1028,7 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 	 * wait for room in fifo for bitmap cmd if needed. */
 	nv_acc_fifofree_dma(2);
 	/* now setup color (writing 2 32bit words) */
-	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_COLOR1A, 1);
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
 
 	return B_OK;
@@ -1047,7 +1040,7 @@ status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	 * wait for room in fifo for bitmap cmd if needed. */
 	nv_acc_fifofree_dma(3);
 	/* now setup fill (writing 3 32bit words) */
-	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		((xs << 16) | (ys & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =

@@ -208,7 +208,7 @@ status_t check_acc_capability(uint32 feature)
 	}
 
 	//fixme:
-	if (si->settings.dma_acc && (feature != B_SCREEN_TO_SCREEN_BLIT))
+	if (si->settings.dma_acc && (feature == B_INVERT_RECTANGLE))
 	{
 		LOG(4, ("Acc: Function not setup yet; not exporting hook %s.\n", msg));
 		return B_ERROR;
