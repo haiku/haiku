@@ -290,12 +290,13 @@ out:
 #if USE_WALL
 	{
 		uint32 *wall = address;
+		size -= 20;
+
 		wall[0] = size;
 		wall[1] = 0xabadcafe;
 		wall[2] = 0xabadcafe;
 
 		address = (uint8 *)address + 12;
-		size -= 20;
 
 		wall = (uint32 *)((uint8 *)address + size);
 		wall[0] = 0xabadcafe;
