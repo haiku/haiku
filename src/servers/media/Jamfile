@@ -9,6 +9,7 @@ Server media_server :
 	AppManager.cpp
 	BufferManager.cpp
 	DefaultManager.cpp
+	MMediaFilesManager.cpp
 	NodeManager.cpp
 	NotificationManager.cpp
 	Queue.cpp

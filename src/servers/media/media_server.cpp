@@ -37,6 +37,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
 #include <MediaFormats.h>
 #include <Autolock.h>
 #include <string.h>
+#include "MMediaFilesManager.h"
 #include "NotificationManager.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
@@ -58,6 +59,7 @@ NotificationManager *gNotificationManager;
 BufferManager *gBufferManager;
 AppManager *gAppManager;
 NodeManager *gNodeManager;
+MMediaFilesManager *gMMediaFilesManager;
 
 namespace BPrivate { namespace media {
 	extern team_id team;
@@ -118,6 +120,7 @@ ServerApp::ServerApp()
  	gBufferManager = new BufferManager;
 	gAppManager = new AppManager;
 	gNodeManager = new NodeManager;
+	gMMediaFilesManager = new MMediaFilesManager;
 
 	control_port = create_port(64, MEDIA_SERVER_PORT_NAME);
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
@@ -135,6 +138,7 @@ ServerApp::~ServerApp()
 	delete gBufferManager;
 	delete gAppManager;
 	delete gNodeManager;
+	delete gMMediaFilesManager;
 	delete fLocker;
 	delete_port(control_port);
 	status_t err;
@@ -149,6 +153,7 @@ void ServerApp::ArgvReceived(int32 argc, char **argv)
 			gNodeManager->Dump();
 			gBufferManager->Dump();
 			gNotificationManager->Dump();
+			gMMediaFilesManager->Dump();
 		}
 		if (strstr(argv[arg], "buffer")) {
 			gBufferManager->Dump();
@@ -554,7 +559,117 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			gBufferManager->UnregisterBuffer(cmd->team, cmd->bufferid);
 			break;
 		}
+		
+		case SERVER_REWINDTYPES:
+		{
+			const server_rewindtypes_request *request = reinterpret_cast<const server_rewindtypes_request *>(data);
+			server_rewindtypes_reply reply;
+			
+			BString **types = NULL;
+			
+			rv = gMMediaFilesManager->RewindTypes(
+					&types, &reply.count);
+			if(reply.count>0) {
+				// we create an area here, and pass it to the library, where it will be deleted.
+				char *start_addr;
+				size_t size = ((reply.count * B_MEDIA_NAME_LENGTH) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+				reply.area = create_area("rewind types", reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+				if (reply.area < B_OK) {
+					ERROR("SERVER_REWINDTYPES: failed to create area, error %s\n", strerror(reply.area));
+					reply.count = 0;
+					rv = B_ERROR;
+				} else {
+					for (int32 index = 0; index < reply.count; index++)
+						strncpy(start_addr + B_MEDIA_NAME_LENGTH * index, types[index]->String(), B_MEDIA_NAME_LENGTH);
+				}
+			}
+			
+			delete types;
+			
+			rv = request->SendReply(rv, &reply, sizeof(reply));
+			if (rv != B_OK)
+				delete_area(reply.area); // if we couldn't send the message, delete the area
+			break;
+		}
+		
+		case SERVER_REWINDREFS:
+		{
+			const server_rewindrefs_request *request = reinterpret_cast<const server_rewindrefs_request *>(data);
+			server_rewindrefs_reply reply;
+			
+			BString **items = NULL;
+			
+			rv = gMMediaFilesManager->RewindRefs(request->type,
+					&items, &reply.count);
+			// we create an area here, and pass it to the library, where it will be deleted.
+			if(reply.count>0) {
+				char *start_addr;
+				size_t size = ((reply.count * B_MEDIA_NAME_LENGTH) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+				reply.area = create_area("rewind refs", reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+				if (reply.area < B_OK) {
+					ERROR("SERVER_REWINDREFS: failed to create area, error %s\n", strerror(reply.area));
+					reply.count = 0;
+					rv = B_ERROR;
+				} else {
+					for (int32 index = 0; index < reply.count; index++)
+						strncpy(start_addr + B_MEDIA_NAME_LENGTH * index, items[index]->String(), B_MEDIA_NAME_LENGTH);
+				}
+			}
+			
+			delete items;
 
+			rv = request->SendReply(rv, &reply, sizeof(reply));
+			if (rv != B_OK)
+				delete_area(reply.area); // if we couldn't send the message, delete the area
+			break;
+		}
+		
+		case SERVER_GETREFFOR:
+		{
+			const server_getreffor_request *request = reinterpret_cast<const server_getreffor_request *>(data);
+			server_getreffor_reply reply;
+			entry_ref *ref;
+
+			rv = gMMediaFilesManager->GetRefFor(request->type, request->item, &ref);
+			if(rv==B_OK) {
+				reply.ref = *ref;
+			}
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_SETREFFOR:
+		{
+			const server_setreffor_request *request = reinterpret_cast<const server_setreffor_request *>(data);
+			server_setreffor_reply reply;
+			entry_ref ref = request->ref;
+			
+			rv = gMMediaFilesManager->SetRefFor(request->type, request->item, ref);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_REMOVEREFFOR:
+		{
+			const server_removereffor_request *request = reinterpret_cast<const server_removereffor_request *>(data);
+			server_removereffor_reply reply;
+			entry_ref ref = request->ref;
+			
+			rv = gMMediaFilesManager->RemoveRefFor(request->type, request->item, ref);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_REMOVEITEM:
+		{
+			const server_removeitem_request *request = reinterpret_cast<const server_removeitem_request *>(data);
+			server_removeitem_reply reply;
+
+			rv = gMMediaFilesManager->RemoveItem(request->type, request->item);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
 		default:
 			printf("media_server: received unknown message code %#08lx\n",code);
 	}
