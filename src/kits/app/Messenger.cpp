@@ -350,15 +350,11 @@ status_t
 BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 						bigtime_t timeout) const
 {
-	status_t error = (message ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		// If the reply messenger is invalid use the app messenger.
-		if (!replyTo.IsValid())
-			replyTo = be_app_messenger;
-		error = message->_send_(fPort, fHandlerToken, fPreferredTarget,
-								timeout, false, replyTo);
-	}
-	return error;
+	if (!message)
+		return B_BAD_VALUE;
+
+	return message->_send_(fPort, fHandlerToken, fPreferredTarget,
+		timeout, false, replyTo);
 }
 
 // SendMessage

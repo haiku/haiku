@@ -1899,6 +1899,12 @@ PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 	tmp_msg.fReplyRequired = fReplyRequired;
 	tmp_msg.fReplyTo       = fReplyTo;
 
+	if (!reply_to.IsValid()) {
+		BMessenger::Private(reply_to).SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target, fReplyTo.preferred);
+		if (!reply_to.IsValid())
+			reply_to = be_app_messenger;
+	}
+
 	BMessage* self = const_cast<BMessage*>(this);
 	BMessenger::Private replyToPrivate(reply_to);
 	self->fPreferred         = preferred;
@@ -1925,7 +1931,7 @@ PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 	}
 	self->fPreferred     = tmp_msg.fPreferred;
 	self->fTarget        = tmp_msg.fTarget;
-	self->fReplyRequired = tmp_msg.fReplyRequired;
+	self->fReplyRequired = false; //tmp_msg.fReplyRequired;
 	self->fReplyTo       = tmp_msg.fReplyTo;
 	tmp_msg.init_data();
 PRINT(("BMessage::_send_() done: %lx\n", err));
