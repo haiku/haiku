@@ -9,9 +9,12 @@
 #include "defines.h"
 #include "forwarding_pixfmt.h"
 
+#include "RGBColor.h"
+
 class AGGTextRenderer;
 class BBitmap;
 class BRegion;
+class DrawData;
 class PatternHandler;
 class RenderingBuffer;
 class ServerBitmap;
@@ -27,12 +30,17 @@ class Painter {
 			void				DetachFromBuffer();
 
 			void				ConstrainClipping(const BRegion& region);
+			void				SetDrawData(const DrawData* data);
 
 								// object settings
 			void				SetHighColor(const rgb_color& color);
-			void				SetHighColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+	inline	void				SetHighColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+	inline	void				SetHighColor(const RGBColor& color)
+									{ SetHighColor(color.GetColor32()); }
 			void				SetLowColor(const rgb_color& color);
-			void				SetLowColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+	inline	void				SetLowColor(uint8 r, uint8 g, uint8 b, uint8 a = 255);
+	inline	void				SetLowColor(const RGBColor& color)
+									{ SetLowColor(color.GetColor32()); }
 
 			void				SetScale(float scale);
 			void				SetPenSize(float size);
@@ -178,6 +186,10 @@ class Painter {
 												const pattern& p = B_SOLID_HIGH) const;
 
 			void				InvertRect(		const BRect& r) const;
+
+			BRect				BoundingBox(	const char* utf8String,
+												uint32 length,
+												const BPoint& baseLine) const;
 
 			// MISSING (?):
 /*
