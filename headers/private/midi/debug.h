@@ -1,3 +1,11 @@
+/**
+ * @file debug.h
+ *
+ * Debug macros for the Midi Kit
+ *
+ * @author Matthijs Hollemans
+ * @author Marcus Overhagen
+ */
 
 #ifndef MIDI_DEBUG_H
 #define MIDI_DEBUG_H
