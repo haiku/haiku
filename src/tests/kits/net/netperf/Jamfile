@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src tests kits net netperf ;
 
+Depends netperf : install_netperf_scripts ;
+
 SimpleTest netperf : 
 	netperf.c
 	netsh.c
@@ -11,4 +13,30 @@ SimpleTest netperf :
 	nettest_ipv6.c
 	nettest_dns.c
 	: net
-	;
+;
+
+SimpleTest netserver : 
+	netserver.c
+	netsh.c
+	netlib.c
+	nettest_bsd.c
+	nettest_dlpi.c
+	nettest_unix.c
+	nettest_xti.c
+	nettest_ipv6.c
+	nettest_dns.c
+	: net
+;
+
+OBOSInstall install_netperf_scripts : [ FDirName $(OBOS_TEST_DIR) kits net netperf ] :
+	snapshot_script
+	tcp_range_script
+	tcp_rr_script
+	tcp_stream_script
+	udp_rr_script
+	udp_stream_script
+	packet_byte_script
+	arr_script
+;
+
+

@@ -70,9 +70,9 @@ char	netserver_id[]="\
 #include <stdio.h>
 #include <errno.h>
 #include <signal.h>
-#if !defined(WIN32) && !defined(__VMS)
+#if !defined(WIN32) && !defined(__VMS) && !defined(__BEOS__)
 #include <sys/ipc.h>
-#endif /* !defined(WIN32) && !defined(__VMS) */
+#endif /* !defined(WIN32) && !defined(__VMS) && !defined(__BEOS__) */
 #include <fcntl.h>
 #ifdef WIN32
 #include <time.h>
