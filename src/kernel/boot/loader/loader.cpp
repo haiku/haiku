@@ -65,6 +65,13 @@ load_kernel(stage2_args *args, Directory *volume)
 
 	puts("kernel loaded successfully");
 
+	// init kernel args with loaded image data
+	gKernelArgs.kernel_seg0_addr.start = image.text_region.start;
+	gKernelArgs.kernel_seg0_addr.size = image.text_region.size;
+	gKernelArgs.kernel_seg1_addr.start = image.data_region.start;
+	gKernelArgs.kernel_seg1_addr.size = image.data_region.size;
+	gKernelArgs.kernel_dynamic_section_addr = image.dynamic_section;
+
 	gKernelEntry = image.elf_header.e_entry;
 
 /*	void *cookie;
