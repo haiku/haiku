@@ -1102,7 +1102,7 @@ int socket_setsockopt(struct socket *so, int level, int optnum, const void *data
 	m->m_len = datalen;
 	m0 = m;
 	
-	if (level != SOL_SOCKET) {
+	if (level != (int) SOL_SOCKET) {
 		if (so->so_proto && so->so_proto->pr_ctloutput)
 			return (*so->so_proto->pr_ctloutput)(PRCO_SETOPT, so, level, optnum, &m0);
 		error = ENOPROTOOPT;
@@ -1207,7 +1207,7 @@ int socket_getsockopt(struct socket *so, int level, int optnum, void *data, size
 		return EINVAL;
 	m->m_len = sizeof(int);
 
-	if (level != SOL_SOCKET) {
+	if (level != (int) SOL_SOCKET) {
 		if (so->so_proto && so->so_proto->pr_ctloutput) {
 			return (*so->so_proto->pr_ctloutput)(PRCO_GETOPT, so, level, optnum, &m);
 		} else
