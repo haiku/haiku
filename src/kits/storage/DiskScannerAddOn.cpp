@@ -42,14 +42,13 @@ BDiskScannerPartitionAddOn::~BDiskScannerPartitionAddOn()
 */
 
 /*!	\fn virtual BDiskScannerPartitionAddOn::BDiskScannerParameterEditor *
-		CreateEditor(const session_info *sessionInfo,
-					  const char *parameters) = 0;
+		CreateEditor(const BSession *session, const char *parameters) = 0;
 	\brief Creates and returns an editor for editing partitioning parameters
 		   for a specified session.
 
 	To be implemented by derived classes.
 
-	\param sessionInfo An info about the session to be partitioned.
+	\param session The session to be partitioned.
 	\param parameters Parameters retrieved from the partition module. Should
 		   initially be presented to the user.
 	\return The newly created editor. \c NULL, if an error occurred.
@@ -99,13 +98,13 @@ BDiskScannerFSAddOn::~BDiskScannerFSAddOn()
 */
 
 /*!	\fn virtual BDiskScannerFSAddOn::BDiskScannerParameterEditor *CreateEditor(
-		const partition_info *partitionInfo, const char *parameters) = 0;
+		const BPartition *partition, const char *parameters) = 0;
 	\brief Creates and returns an editor for editing initialization parameters
 		   for a specified partition.
 
 	To be implemented by derived classes.
 
-	\param partitionInfo An info about the partition to be initialized.
+	\param partition The partition to be initialized.
 	\param parameters Parameters retrieved from the kernel FS add-on. Should
 		   initially be presented to the user.
 	\return The newly created editor. \c NULL, if the FS doesn't need any
@@ -156,6 +155,24 @@ BDiskScannerParameterEditor::View()
 	return NULL;
 }
 
+// EditingDone
+/*!	\brief Called when the user finishes editing the parameters.
+
+	To be overridden by derived classes.
+	The base class version returns \c true.
+
+	The method is supposed to check whether the parameters the user set,
+	are valid, and, if so, return \c true. Otherwise an BAlert shall be
+	shown, explaining the problem to the user and \c false being returned
+	-- then the parameter dialog will not be closed.
+
+	\return \c true, if the current parameters are valid, \c false otherwise.
+*/
+bool
+BDiskScannerParameterEditor::EditingDone()
+{
+	return true;
+}
 
 /*!	\brief Returns the edited parameters.
 
