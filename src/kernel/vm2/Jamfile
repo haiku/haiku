@@ -1,10 +1,3 @@
 SubDir OBOS_TOP src kernel vm2 ;
 
-BinCommand vmTest  : error.C area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C  vmInterface.C vpage.C areaPool.C vnodePool.C vpagePool.C vnodeManager.C test.C : root be ; 
-BinCommand simpleTest  : error.C area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C  vmInterface.C vpage.C areaPool.C vnodePool.C vpagePool.C  vnodeManager.C simpleTest.C : root be ; 
-BinCommand testSetup  : error.C area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C  vmInterface.C vpage.C areaPool.C vnodePool.C vpagePool.C  vnodeManager.C simpleTest.C : root be ; 
-BinCommand hashTest  : error.C area.C  areaManager.C cacheManager.C page.C pageManager.C swapFileManager.C  vmInterface.C vpage.C areaPool.C vnodePool.C vpagePool.C  vnodeManager.C hashTest.C : root be ; 
-BinCommand olTest  : error.C olTest.C : root be ; 
-BinCommand pmTest  : error.C pageManager.C pageManTest.C page.C : root be ; 
-
-
+SharedLibrary vm : area.C areaManager.C areaPool.C cacheManager.C error.C page.C pageManager.C swapFileManager.C vmInterface.C vnodeManager.C vnodePool.C vpage.C vpagePool.C ;
