@@ -14,7 +14,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 SimpleTest udf_shell
 	:
 	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-	sysdep.c hexdump.c argv.c 
+	sysdep.c hexdump.c argv.c tracker.cpp
 
 	udf.cpp
 	CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
@@ -31,5 +31,5 @@ SEARCH on [ FGristFiles
 
 SEARCH on [ FGristFiles
 		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-		sysdep.c hexdump.c argv.c
+		sysdep.c hexdump.c argv.c tracker.cpp
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;

@@ -11,7 +11,7 @@ SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SimpleTest iso9660_shell
 	:
 	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-	sysdep.c hexdump.c argv.c
+	sysdep.c hexdump.c argv.c tracker.cpp
 
 	iso.c kernel_interface.c
 	:
@@ -24,5 +24,5 @@ SEARCH on [ FGristFiles
 
 SEARCH on [ FGristFiles
 		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
-		sysdep.c hexdump.c argv.c
+		sysdep.c hexdump.c argv.c tracker.cpp
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
