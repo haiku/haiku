@@ -30,6 +30,7 @@
 /*****************************************************************************/
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include <StorageKit.h>
 #include <SupportKit.h>
