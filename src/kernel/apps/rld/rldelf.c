@@ -1189,7 +1189,7 @@ load_program(char const *path, void **_entry)
 		FATAL(!relocate_success, "troubles relocating\n");
 	}
 
-	init_dependencies(gLoadedImages.head, false);
+	init_dependencies(gLoadedImages.head, true);
 	remap_images();
 		// ToDo: once setup_system_time() is fixed, move this one line higher!
 
