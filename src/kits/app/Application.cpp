@@ -61,10 +61,6 @@
 
 // Local Defines ---------------------------------------------------------------
 
-// Uncomment this to run without the registrar - used only for app_server development!
-#define RUN_WITHOUT_REGISTRAR
-
-
 // Globals ---------------------------------------------------------------------
 BApplication*	be_app = NULL;
 BMessenger		be_app_messenger;
@@ -671,7 +667,8 @@ void BApplication::InitData(const char* signature, status_t* error)
 	// check signature
 	fInitError = check_app_signature(signature);
 	fAppName = signature;
-	bool isRegistrar = (signature && !strcmp(signature, kRegistrarSignature));
+	bool isRegistrar
+		= (signature && !strcasecmp(signature, kRegistrarSignature));
 	// get team and thread
 	team_id team = Team();
 	thread_id thread = BPrivate::main_thread_for(team);
@@ -690,7 +687,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			char appFileSignature[B_MIME_TYPE_LENGTH + 1];
 			// compare the file signature and the supplied signature
 			if (fileInfo.GetSignature(appFileSignature) == B_OK) {
-				if (strcmp(appFileSignature, signature) != 0) {
+				if (strcasecmp(appFileSignature, signature) != 0) {
 					printf("Signature in rsrc doesn't match constructor arg. "
 						   "(%s,%s)\n", signature, appFileSignature);
 				}
@@ -722,7 +719,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 		} else
 			appInfo.port = fMsgPort;
 		// check the signature and correct it, if necessary
-		if (strcmp(appInfo.signature, fAppName))
+		if (strcasecmp(appInfo.signature, fAppName))
 			BRoster::Private().SetSignature(team, fAppName);
 		// complete the registration
 		fInitError = BRoster::Private().CompleteRegistration(team, thread,
@@ -1040,7 +1037,7 @@ static
 const char*
 looper_name_for(const char *signature)
 {
-	if (signature && !strcmp(signature, kRegistrarSignature))
+	if (signature && !strcasecmp(signature, kRegistrarSignature))
 		return kRosterPortName;
 	return "AppLooperPort";
 }
