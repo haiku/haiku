@@ -79,7 +79,7 @@ BChannelSlider::Archive(BMessage *into, bool deep) const
 orientation
 BChannelSlider::Orientation() const
 {
-	return fVertical ? B_VERTICAL : B_HORIZONTAL;
+	return Vertical() ? B_VERTICAL : B_HORIZONTAL;
 }
 
 
@@ -291,7 +291,9 @@ BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed
 	ASSERT(into != NULL);
 		
 	const BBitmap *thumb = ThumbFor(channel, pressed);
-	
+	if (thumb == NULL)
+		return;
+
 	BRect bitmapBounds = thumb->Bounds();
 	where.x -= bitmapBounds.right / 2;
 	where.y -= bitmapBounds.bottom / 2;
@@ -397,6 +399,7 @@ BChannelSlider::InitData()
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// TODO: Set initial values ?
+	// actually, looks like initial values are set on MouseDown()/MouseMoved()
 }
 
 

@@ -142,7 +142,17 @@ BChannelControl::ModificationMessage() const
 status_t
 BChannelControl::Invoke(BMessage *msg)
 {
-	return B_ERROR;
+	bool notify = false;
+	BMessage invokeMessage(InvokeKind(&notify));
+
+	if (msg != NULL)
+		invokeMessage = *msg;
+	else if (Message() != NULL)
+		invokeMessage = *Message();
+	
+	invokeMessage.AddInt32("be:current_channel", fCurrentChannel);
+
+	return BControl::Invoke(&invokeMessage);
 }
 
 
@@ -291,14 +301,14 @@ BChannelControl::SetAllValue(int32 values)
 status_t
 BChannelControl::SetLimitsFor(int32 channel, int32 minimum, int32 maximum)
 {
-	return B_ERROR;
+	return SetLimitsFor(channel, 1, &minimum, &maximum);
 }
 
 
 status_t
 BChannelControl::GetLimitsFor(int32 channel, int32 *minimum, int32 *maximum) const
 {
-	return B_ERROR;
+	return GetLimitsFor(channel, 1, minimum, maximum);
 }
 
 
@@ -306,6 +316,7 @@ status_t
 BChannelControl::SetLimitsFor(int32 fromChannel, int32 channelCount,
 	const int32 *minimum, const int32 *maximum)
 {
+	
 	return B_ERROR;
 }
 
@@ -333,23 +344,31 @@ BChannelControl::GetLimits(int32 *outMinimum, int32 *outMaximum) const
 
 
 status_t
-BChannelControl::SetLimitLabels(const char *min_label, const char *max_label)
+BChannelControl::SetLimitLabels(const char *minLabel, const char *maxLabel)
 {
-	return B_ERROR;
+	if (minLabel != fMinLabel)
+		fMinLabel = minLabel;
+	
+	if (maxLabel != fMaxLabel)
+		fMaxLabel = maxLabel;
+
+	Invalidate();
+
+	return B_OK;
 }
 
 
 const char *
 BChannelControl::MinLimitLabel() const
 {
-	return NULL;
+	return fMinLabel.String();
 }
 
 
 const char *
 BChannelControl::MaxLimitLabel() const
 {
-	return NULL;
+	return fMaxLabel.String();
 }
 
 
@@ -385,7 +404,25 @@ status_t
 BChannelControl::StuffValues(int32 fromChannel, int32 channelCount,
 	const int32 *inValues)
 {
-	return B_ERROR;
+	if (inValues == NULL)
+		return B_BAD_VALUE;
+
+	if (fromChannel < 0 || fromChannel >= fChannelCount
+						|| fromChannel + channelCount >= fChannelCount)
+		return B_BAD_INDEX;
+
+	for (int32 i = 0; i < channelCount; i++) {	
+		if (inValues[i] <= fChannelMax[fromChannel + i] 
+						&& inValues[i] >= fChannelMin[fromChannel + i])
+			fChannelValues[fromChannel + i] = inValues[i];
+		
+	}
+
+	// If the current channel was updated, update also the control value
+	if (fCurrentChannel >= fromChannel && fCurrentChannel <= fromChannel + channelCount)
+		BControl::SetValue(fChannelValues[fCurrentChannel]);
+
+	return B_OK;
 }
 
 
