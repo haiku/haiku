@@ -879,6 +879,15 @@ void RootLayer::SetBGColor(const RGBColor &col)
 	fLayerData->viewcolor	= col;
 }
 
+int32 RootLayer::Buttons(void)
+{
+	Lock();
+	int32 value=fButtons;
+	Unlock();
+	
+	return value;
+}
+
 RGBColor RootLayer::BGColor(void) const
 {
 	return fLayerData->viewcolor;
@@ -919,6 +928,10 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&evt.modifiers);
 			msg.Read<int32>(&evt.buttons);
 			msg.Read<int32>(&evt.clicks);
+			
+			// We'll need this so that GetMouse can query for which buttons
+			// are down.
+			fButtons=evt.buttons;
 			
 			// printf("MOUSE DOWN: at (%f, %f)\n", evt.where.x, evt.where.y);
 			

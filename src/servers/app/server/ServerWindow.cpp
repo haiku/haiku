@@ -2128,9 +2128,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_GET_MOUSE_COORDS:
 		{
-			// TODO: Implement AS_LAYER_MOUSE_COORDS
-			STRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
-			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS\n",fTitle.String()));
+			
 			// Attached Data:
 			// 1) port_id reply port
 			
@@ -2144,8 +2143,12 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			port_id replyport;
 			link.Read<port_id>(&replyport);
 			
+			int32 buttons=desktop->ActiveRootLayer()->Buttons();
+			
 			BPortLink replylink(replyport);
-			replylink.StartMessage(SERVER_FALSE);
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<BPoint>(desktop->GetDisplayDriver()->GetCursorPosition());
+			replylink.Attach<int32>(buttons);
 			replylink.Flush();
 			break;
 		}

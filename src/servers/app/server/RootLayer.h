@@ -96,6 +96,7 @@ public:
 	void SetBGColor(const RGBColor &col);
 	RGBColor BGColor(void) const;
 	
+	int32 Buttons(void);
 	virtual bool HasClient(void) { return false; }
 	
 	void AddWinBorderToWorkspaces(WinBorder *winBorder, uint32 wks);
@@ -157,6 +158,7 @@ private:
 	int32 fScreenXResolution;
 	int32 fScreenYResolution;
 	uint32 fColorSpace;
+	int32 fButtons;
 	
 	BList fWorkspaceList;
 	Workspace *fActiveWorkspace;
