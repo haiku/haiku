@@ -1,17 +1,5 @@
 SubDir OBOS_TOP src add-ons translators bmptranslator ;
 
-rule Translator
-{
-	# Translator <name> : <sources> ;
-	SetupObjectsDir ;
-	Main $(1) : $(2) ;
-
-	# Create output dir path for translator
-	local targetdir;
-	targetdir = [ FDirName $(OBOS_ADDON_DIR) translators ] ;
-	MakeLocate $(1) : $(targetdir) ;
-}
-
 Translator BMPTranslator : BMPMain.cpp BMPTranslator.cpp BMPView.cpp BMPWindow.cpp ;
 
 LinkSharedOSLibs BMPTranslator : be translation ;
