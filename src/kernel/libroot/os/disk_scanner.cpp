@@ -116,7 +116,7 @@ partitionInfo->info.device[0] = '\0';
 			partitionInfo->file_system_short_name[0] = '\0';
 			partitionInfo->file_system_long_name[0] = '\0';
 			partitionInfo->volume_name[0] = '\0';
-			partitionInfo->mounted_at[0] = '\0';
+//			partitionInfo->mounted_at[0] = '\0';
 			partitionInfo->file_system_flags = 0;
 		}
 // NOTE: Where do we get mounted_at from?
