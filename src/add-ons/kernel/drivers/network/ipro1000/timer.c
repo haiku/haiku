@@ -19,31 +19,210 @@
 #include <Errors.h>
 #include <OS.h>
 #include <string.h>
+
+#define DEBUG 1
+
 #include "debug.h"
 #include "timer.h"
 
-timer_id
-create_timer(timer_function func, void *cookie, bigtime_t period, uint32 flags)
+#define MAX_TIMERS 32
+
+struct timer_info
 {
+	timer_id 		id;
+	timer_function	func;
+	void *			cookie;
+	bigtime_t		next_event;
+	bigtime_t		interval;
+	bool			periodic;
+};
+
+static struct timer_info	sTimerData[MAX_TIMERS];
+static int					sTimerCount;
+static timer_id				sTimerNextId;
+static thread_id			sTimerThread;
+static sem_id				sTimerSem;
+static spinlock				sTimerSpinlock;
+
+static int32
+timer_thread(void *cookie)
+{
+	status_t status = 0;
+
+	TRACE("timer_thread enter\n");
+
+	do {
+		bigtime_t timeout;
+		bigtime_t now;
+		cpu_status cpu;
+		timer_function func;
+		void * cookie;
+		int i;
+		int index;
+
+		cpu = disable_interrupts();
+		acquire_spinlock(&sTimerSpinlock);
+
+		now = system_time();
+		cookie = 0;
+		func = 0;
+				
+		// find timer with smallest event time
+		index = -1;
+		timeout = B_INFINITE_TIMEOUT;
+		for (i = 0; i < sTimerCount; i++) {
+			if (sTimerData[i].next_event < timeout) {
+				timeout = sTimerData[i].next_event;
+				index = i;
+			}
+		}
+		
+		TRACE("timer index %d\n", index);
+
+		if (timeout < now) {
+			// timer is ready for execution, load func and cookie
+			ASSERT(index >= 0 && index < sTimerCount);
+			func = sTimerData[index].func;
+			cookie = sTimerData[index].cookie;
+			if (sTimerData[index].periodic) {
+				// periodic timer is ready, update the entry
+				sTimerData[index].next_event += sTimerData[index].interval;
+			} else {
+				// single shot timer is ready, delete the entry
+				if (index != (sTimerCount - 1) && sTimerCount != 1) {
+					memcpy(&sTimerData[index], &sTimerData[sTimerCount - 1], sizeof(struct timer_info));
+				}
+				sTimerCount--;
+			}
+		}
+
+		release_spinlock(&sTimerSpinlock);
+		restore_interrupts(cpu);
+		
+		// execute timer hook
+		if (timeout < now) {
+			ASSERT(func);
+			func(cookie);
+			continue;
+		}
+
+		status = acquire_sem_etc(sTimerSem, 1, B_ABSOLUTE_TIMEOUT, timeout);
+	} while (status == B_OK || status == B_TIMED_OUT);
+
+	TRACE("timer_thread leave\n");
+	
 	return 0;
 }
+
+
+timer_id
+create_timer(timer_function func, void *cookie, bigtime_t interval, uint32 flags)
+{
+	cpu_status cpu;
+	timer_id id;
+	
+	TRACE("create_timer enter\n");
+	
+	if (func == 0)
+		return -1;
+	
+	// Attention: flags are not real flags, as B_PERIODIC_TIMER is 3
+
+	cpu = disable_interrupts();
+	acquire_spinlock(&sTimerSpinlock);
+	
+	if (sTimerCount < MAX_TIMERS) {
+		id = sTimerNextId;
+		sTimerData[sTimerCount].id = id;
+		sTimerData[sTimerCount].func = func;
+		sTimerData[sTimerCount].cookie = cookie;
+		sTimerData[sTimerCount].next_event = (flags == B_ONE_SHOT_ABSOLUTE_TIMER) ? interval : system_time() + interval;
+		sTimerData[sTimerCount].interval = interval;
+		sTimerData[sTimerCount].periodic = flags == B_PERIODIC_TIMER;
+		sTimerNextId++;
+		sTimerCount++;
+	} else {
+		id = -1;
+	}
+	
+	release_spinlock(&sTimerSpinlock);
+	restore_interrupts(cpu);
+	
+	if (id != -1)
+		release_sem_etc(sTimerSem, 1, B_DO_NOT_RESCHEDULE);
+
+	TRACE("create_timer leave\n");
+
+	return id;
+}
+
 
 status_t
 delete_timer(timer_id id)
 {
+	cpu_status cpu;
+	bool deleted;
+	int i;
+
+	TRACE("delete_timer enter\n");
+
+	deleted = false;
+	
+	cpu = disable_interrupts();
+	acquire_spinlock(&sTimerSpinlock);
+	
+	for (i = 0; i < sTimerCount; i++) {
+		if (sTimerData[i].id == id) {
+			if (i != (sTimerCount - 1) && sTimerCount != 1) {
+				memcpy(&sTimerData[i], &sTimerData[sTimerCount - 1], sizeof(struct timer_info));
+			}
+			sTimerCount--;
+			deleted = true;
+			break;
+		}
+	}
+	
+	release_spinlock(&sTimerSpinlock);
+	restore_interrupts(cpu);
+
+	TRACE("delete_timer leave\n");
+	
+	if (!deleted)
+		return B_ERROR;
+		
+	release_sem_etc(sTimerSem, 1, B_DO_NOT_RESCHEDULE);
 	return B_OK;
 }
+
 
 status_t
 initialize_timer(void)
 {
+	sTimerCount = 0;
+	sTimerNextId = 1;
+	sTimerSpinlock = 0;
+	
+	sTimerThread = spawn_kernel_thread(timer_thread, "ipro1000 timer", 80, 0);
+	sTimerSem = create_sem(0, "ipro1000 timer");
+	set_sem_owner(sTimerSem, B_SYSTEM_TEAM);
+	
+	if (sTimerSem < 0 || sTimerThread < 0) {
+		delete_sem(sTimerSem);
+		kill_thread(sTimerThread);
+		return B_ERROR;
+	}
+	
+	resume_thread(sTimerThread);
 	return B_OK;
 }
+
 
 status_t
 terminate_timer(void)
 {
-	return B_OK;
-}
+	status_t thread_return_value;
 
+	delete_sem(sTimerSem);
+	return wait_for_thread(sTimerThread, &thread_return_value);	
+}
 

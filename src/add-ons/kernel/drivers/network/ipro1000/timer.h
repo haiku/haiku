@@ -29,10 +29,12 @@ typedef int32 timer_id;
 
 typedef void (*timer_function)(void *cookie);
 
-// create_timer() cannot be called from interrupt context.
-// flags can be B_ONE_SHOT_ABSOLUTE_TIMER, B_ONE_SHOT_RELATIVE_TIMER or B_PERIODIC_TIMER
+// create_timer() can be called from interrupt context.
+// Only up to 32 concurrent timers are supported.
+// Flags can be one of B_ONE_SHOT_ABSOLUTE_TIMER,
+// B_ONE_SHOT_RELATIVE_TIMER or B_PERIODIC_TIMER.
 
-timer_id	create_timer(timer_function func, void *cookie, bigtime_t period, uint32 flags);
+timer_id	create_timer(timer_function func, void *cookie, bigtime_t interval, uint32 flags);
 status_t	delete_timer(timer_id id);
 
 
