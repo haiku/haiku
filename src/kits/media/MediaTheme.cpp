@@ -4,6 +4,7 @@
  *  DESCR: 
  ***********************************************************************/
 #include <MediaTheme.h>
+#include <StringView.h>
 #include "debug.h"
 
 /*************************************************************
@@ -56,7 +57,7 @@ BMediaTheme::ViewFor(BParameterWeb *web,
 					 BMediaTheme *using_theme)
 {
 	UNIMPLEMENTED();
-	return NULL;
+	return new BStringView(BRect(0,0,200,30), "", "No BMediaTheme, sorry!");
 }
 
 
