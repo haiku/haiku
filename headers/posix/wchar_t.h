@@ -7,7 +7,9 @@
 #ifndef _WCHAR_T_H
 #define _WCHAR_T_H
 
+#if !defined(__cplusplus) || __GNUC__ < 3
 typedef unsigned short wchar_t;
+#endif
 
 #define _WINT_T
 typedef unsigned int wint_t;
