@@ -3,6 +3,8 @@
 
 // ##### Include headers for your tests here #####
 #include "bapplication/ApplicationTest.h"
+#include "bclipboard/ClipboardTest.h"
+#include "bcursor/CursorTest.h"
 #include "bhandler/HandlerTest.h"
 #include "blooper/LooperTest.h"
 #include "bmessagequeue/MessageQueueTest.h"
@@ -17,6 +19,8 @@ BTestSuite* getTestSuite() {
 
 	// ##### Add test suites here #####
 	suite->addTest("BApplication", ApplicationTestSuite());
+	suite->addTest("BClipboard", ClipboardTestSuite());
+	suite->addTest("BCursor", CursorTestSuite());
 	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
