@@ -33,6 +33,7 @@ class DataEditor : public BLocker {
 		//bool IsModified() const { return fIsModified; }
 
 		const char *Attribute() const { return fAttribute; }
+		type_code Type() const { return fType; }
 
 		status_t InitCheck();
 
