@@ -3,9 +3,8 @@ SubDir OBOS_TOP src prefs media ;
 UsePrivateHeaders media ;
 
 Preference Media :
-	MediaPrefsApp.cpp
-	MediaPrefsWindow.cpp
-	MediaPrefsView.cpp
-	MediaPrefsSlider.cpp ;
+	Media.cpp
+	MediaWindow.cpp
+	MediaViews.cpp
 
 LinkSharedOSLibs Media : be libmedia.so ;
