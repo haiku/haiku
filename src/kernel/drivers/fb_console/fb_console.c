@@ -336,13 +336,13 @@ static int console_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 			if(_console_write(((char *)buf) + 2*sizeof(int), &wlen) == 0)
 				err = 0; // we're okay
 			else
-				err = ERR_IO_ERROR;
+				err = EIO;
 			restore_cur();
 			mutex_unlock(&console.lock);
 			break;
 		}
 		default:
-			err = ERR_INVALID_ARGS;
+			err = EINVAL;
 	}
 
 	return err;
