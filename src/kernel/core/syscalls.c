@@ -82,7 +82,7 @@ _user_generic_syscall(const char *userSubsystem, uint32 function,
 {
 	char subsystem[B_FILE_NAME_LENGTH];
 	generic_syscall *syscall;
-	status_t status;
+	status_t status = B_NAME_NOT_FOUND;
 
 	if (!IS_USER_ADDRESS(userSubsystem)
 		|| user_strlcpy(subsystem, userSubsystem, sizeof(subsystem)) < B_OK)
@@ -93,10 +93,8 @@ _user_generic_syscall(const char *userSubsystem, uint32 function,
 	mutex_lock(&sGenericSyscallLock);
 
 	syscall = find_generic_syscall(subsystem);
-	if (syscall == NULL) {
-		status = B_NAME_NOT_FOUND;
+	if (syscall == NULL)
 		goto out;
-	}
 
 	if (function >= B_RESERVED_SYSCALL_BASE) {
 		if (function != B_SYSCALL_INFO) {
