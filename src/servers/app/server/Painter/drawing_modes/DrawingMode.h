@@ -11,6 +11,15 @@
 
 class PatternHandler;
 
+inline void
+blend(uint8* d1, uint8* d2, uint8* d3, uint8* da,
+	  uint8 s1, uint8 s2, uint8 s3, uint8 a)
+{
+	*d1 = (uint8)((((s1 - *d1) * a) + (*d1 << 8)) >> 8);
+	*d2 = (uint8)((((s2 - *d2) * a) + (*d2 << 8)) >> 8);
+	*d3 = (uint8)((((s3 - *d3) * a) + (*d3 << 8)) >> 8);
+}
+
 namespace agg
 {
 	//====================================================DrawingMode
