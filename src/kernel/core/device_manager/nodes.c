@@ -439,6 +439,62 @@ err:
 }
 
 
+static void
+put_level(int32 level)
+{
+	while (level-- > 0)
+		dprintf("   ");
+}
+
+
+static void
+dump_attribute(pnp_node_attr_info *attr, int32 level)
+{
+	if (attr == NULL)
+		return;
+
+	put_level(level + 2);
+	dprintf("\"%s\" : ", attr->attr.name);
+	switch (attr->attr.type) {
+		case B_STRING_TYPE:
+			dprintf("string : \"%s\"", attr->attr.value.string);
+			break;
+		case B_UINT8_TYPE:
+			dprintf("uint8 : %u (%#x)", attr->attr.value.ui8, attr->attr.value.ui8);
+			break;
+		case B_UINT16_TYPE:
+			dprintf("uint16 : %u (%#x)", attr->attr.value.ui16, attr->attr.value.ui16);
+			break;
+		case B_UINT32_TYPE:
+			dprintf("uint32 : %lu (%#lx)", attr->attr.value.ui32, attr->attr.value.ui32);
+			break;
+		case B_UINT64_TYPE:
+			dprintf("uint64 : %Lu (%#Lx)", attr->attr.value.ui64, attr->attr.value.ui64);
+			break;
+		default:
+			dprintf("raw data");
+	}
+	dprintf("\n");
+
+	dump_attribute(attr->next, level);	
+}
+
+
+void
+dump_pnp_node_info(pnp_node_info *node, int32 level)
+{
+	if (node == NULL)
+		return;
+
+	put_level(level);
+	dprintf("(%ld) @%p \"%s\"\n", level, node, node->driver ? node->driver->minfo.name : "---");
+	dump_attribute(node->attributes, level);
+
+	dump_pnp_node_info(node->children, level + 1);
+	dump_pnp_node_info(node->children_next, level);
+}
+
+
 status_t
 nodes_init(void)
 {

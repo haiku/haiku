@@ -140,6 +140,14 @@ device_manager_init(struct kernel_args *args)
 
 	pnp_root_init_root();
 
+	{
+		// dump root node
+		pnp_node_info *node = node_list;
+		while (node && node->parent != NULL)
+			node = node->parent;
+		dump_pnp_node_info(node, 0);
+	}
+
 	// build initial device tree; register all root bus_managers
 
 #if 0

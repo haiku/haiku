@@ -172,6 +172,7 @@ void pnp_remove_node_ref(pnp_node_info *node);
 void pnp_remove_node_ref_nolock(pnp_node_info *node);
 pnp_node_handle pnp_find_device(pnp_node_handle parent, const pnp_node_attr *attrs);
 pnp_node_handle pnp_get_parent(pnp_node_handle node);
+void dump_pnp_node_info(pnp_node_info *node, int32 level);
 
 
 // notifications.c
