@@ -208,7 +208,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 				break;
 
 			ag_shift++;
-			blocks_per_ag++;
+			blocks_per_ag *= 2;
 		} else
 			break;
 	}
