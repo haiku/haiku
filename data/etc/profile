@@ -1,0 +1,85 @@
+#
+# Administrative startup for /bin/sh
+# Place user customizations in /.profile
+#
+
+echo -e "\nWelcome to the Haiku shell.\n"
+
+export PS1="\w>"
+export HISTFILESIZE=50
+
+bind '"\e[2~":paste-from-clipboard'
+bind '"\e[3~":delete-char'
+bind '"\e[4~":end-of-line'
+bind '"\e[5~":history-search-forward'
+bind '"\e[6~":history-search-backward'
+
+#
+# and now we include a few useful things...
+#
+
+#
+# An almost-ksh compatible `whence' command.  This is as hairy as it is 
+# because of the desire to exactly mimic ksh.
+# 
+# This depends somewhat on knowing the format of the output of the bash
+# `builtin type' command.
+#
+# Chet Ramey
+# chet@ins.CWRU.Edu
+#
+whence()
+{
+	local vflag= path=
+
+	if [ "$#" = "0" ] ; then
+		echo "whence: argument expected"
+		return 1
+	fi
+	case "$1" in
+		-v) vflag=1
+		    shift 1
+		    ;;
+		-*) echo "whence: bad option: $1"
+		    return 1
+		    ;;
+		 *) ;;
+	esac
+
+	if [ "$#" = "0" ] ; then
+		echo "whence: bad argument count"
+		return 1
+	fi
+
+	for cmd
+	do
+		if [ "$vflag" ]	 ; then
+			echo $(builtin type $cmd | sed 1q)
+		else
+			path=$(builtin type -path $cmd)
+			if [ "$path" ] ; then
+				echo $path
+			else
+				case "$cmd" in
+					/*) if [ -x "$cmd" ]; then
+						echo "$cmd"
+					    fi
+					    ;;
+					 *) case "$(builtin type -type $cmd)" in
+						"") ;;
+						 *) echo "$cmd"
+						    ;;
+					    esac
+					    ;;
+				esac
+			fi
+		fi
+	done
+	return 0
+}
+
+alias which='whence'
+
+function dir {
+	ls -lF "$@";
+}

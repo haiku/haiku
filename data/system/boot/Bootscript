@@ -1,0 +1,46 @@
+## The system's main boot script.
+
+##
+## Some functions used by the main script
+##
+
+# launch <executable path> [thread to wait for]
+
+launch () {
+	if [ -f "/boot/$1" ]
+	then
+		"/boot/$1" &
+		[ "$2" != "" ] && waitfor "$2"
+		return 1
+	else
+		echo There is no "$1"
+	fi
+	return 0
+}
+
+# launchscript <script path>
+
+launchscript() {
+	if [ -f "/boot/$1" ]
+	then
+		. "/boot/$1"
+	fi
+}
+
+##
+## Main script starts here
+##
+
+# Set up stdin/out/err to nirvana
+
+exec </dev/null
+exec >/dev/null 2>&1
+
+# Set up the environment
+
+SCRIPTS=beos/system/boot
+launchscript $SCRIPTS/SetupEnvironment
+
+# Launch consoled
+
+launch beos/bin/consoled

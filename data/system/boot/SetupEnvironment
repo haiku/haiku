@@ -1,0 +1,72 @@
+#
+# First we set up a bunch of environment variables that we want everyone
+# to inherit
+#
+
+export HOME=/boot/home
+export SHELL=/bin/sh
+export USER=baron
+export GROUP=users
+
+BUILDHOME=/boot/develop
+
+case `uname -m` in
+BePC)
+	BE_HOST_CPU=x86
+	BETOOLS="$BUILDHOME/bin"
+	BELIBRARIES="$BUILDHOME/lib/$BE_HOST_CPU"
+	;;
+BeMac|BeBox)
+	BE_HOST_CPU=ppc
+	BETOOLS="$BUILDHOME/bin"
+	BELIBRARIES="$BUILDHOME/lib/$BE_HOST_CPU"
+	BELIBFILES="glue-noinit.a;init_term_dyn.o;start_dyn.o;libroot.so;libbe.so;libtracker.so;libmedia.so;libnet.so;libnetdev.so;libdevice.so;libmidi.so;libgame.so;libatalk.so;libmail.so"
+	;;
+*)
+	BE_HOST_CPU=unknown
+	BETOOLS="$BUILDHOME/bin"
+esac
+
+BH=$BUILDHOME/headers
+BEINCLUDES="$BH;$BH/be;$BH/be/precompiled;$BH/be/bone;$BH/posix;$BH/cpp;$BH/be/app;$BH/be/device;$BH/be/interface;$BH/be/media;$BH/be/midi;$BH/be/midi2;$BH/be/net;$BH/be/kernel;$BH/be/storage;$BH/be/support;$BH/be/game;$BH/be/opengl;$BH/be/drivers;$BH/gnu;$BH/be/mail;$BH/be/translation;$BH/be/devel;$BH/be/add-ons/graphics;$BH/be/be_apps/Deskbar;$BH/be/be_apps/NetPositive;$BH/be/be_apps/Tracker"
+
+export BUILDHOME
+export BETOOLS
+export BELIBRARIES
+export BELIBFILES
+export BEINCLUDES
+export BE_HOST_CPU
+
+# for the "cc" and "ld" shell scripts
+
+export BE_C_COMPILER=gcc
+export BE_CPLUS_COMPILER="g++"
+export BE_LINKER=ld
+export BE_DEFAULT_C_FLAGS=""
+export BE_DEFAULT_CPLUS_FLAGS=""
+
+export PATH=.:$HOME/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:$BETOOLS
+
+if [ "$SAFEMODE" != "yes" ]
+then
+	export LIBRARY_PATH="%A/lib:$HOME/config/lib:/boot/beos/system/lib"
+	export ADDON_PATH="%A/add-ons:$HOME/config/add-ons:/boot/beos/system/add-ons"
+else
+	export LIBRARY_PATH="%A/lib:/boot/beos/system/lib"
+	export ADDON_PATH="%A/add-ons:/boot/beos/system/add-ons"
+fi
+
+# media kit
+if [ -f $HOME/config/settings/use_old_audio ]
+then
+	export USE_OLD_AUDIO=true
+fi
+
+if [ "$SAFEMODE" != "yes" ]
+then
+	if [ -f $HOME/config/boot/UserSetupEnvironment ]
+	then
+     	. $HOME/config/boot/UserSetupEnvironment
+	fi
+fi
+
