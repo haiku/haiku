@@ -99,7 +99,7 @@ StringAppendTest::PerformTest(void)
 	str1 = new BString("Base");
 	str1->Append("APPENDED", 40);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BaseAPPENDED") == 0);
-	CPPUNIT_ASSERT(str1->Length() == strlen("BaseAPPENDED"));
+	CPPUNIT_ASSERT(str1->Length() == (int32)strlen("BaseAPPENDED"));
 	delete str1;
 	
 	//char ptr is NULL
@@ -115,6 +115,25 @@ StringAppendTest::PerformTest(void)
 	str1->Append('C', 5);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "BaseCCCCC") == 0);
 	delete str1;
+
+	const int32 OUT_OF_MEM_VAL = 2*1000*1000*1000;
+#ifndef TEST_R5
+	//Append(char, int32) with excessive length:
+	NextSubTest();
+	str1 = new BString("Base");
+	str1->Append('C', OUT_OF_MEM_VAL);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "Base") == 0);
+	delete str1;
+#endif
+
+#ifndef TEST_R5
+	//Append(char*, int32) with excessive length:
+	NextSubTest();
+	str1 = new BString("Base");
+	str1->Append("some more text", OUT_OF_MEM_VAL);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "Basesome more text") == 0);
+	delete str1;
+#endif
 }
 
 

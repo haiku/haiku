@@ -17,7 +17,7 @@ StringEscapeTest::~StringEscapeTest()
 void 
 StringEscapeTest::PerformTest(void)
 {
-	BString *string1, *string2;
+	BString *string1;
 	
 	//CharacterEscape(char*, char)
 	NextSubTest();

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2003, OpenBeOS
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -318,6 +318,14 @@ private:
 	void 			_SetUsingAsCString(bool) {}
 	void			_AssertNotUsingAsCString() const {}
 #endif
+
+	char			*_Alloc( int32);
+
+	struct PosVect;
+	void 			_ReplaceAtPositions( const PosVect* positions,
+											   int32 searchLen, 
+											   const char* with,
+											   int32 withLen);
 
 protected:
 	char *_privateData;

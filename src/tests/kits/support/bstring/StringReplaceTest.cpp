@@ -17,7 +17,9 @@ StringReplaceTest::~StringReplaceTest()
 void 
 StringReplaceTest::PerformTest(void)
 {
-	BString *str1, *str2;
+	BString *str1;
+	const int32 sz = 1024*50;
+	char* buf;
 	
 	//&ReplaceFirst(char, char);
 	NextSubTest();
@@ -257,10 +259,79 @@ StringReplaceTest::PerformTest(void)
 	//ReplaceSet(const char*, const char*)
 	NextSubTest();
 	str1 = new BString("abcd abcd abcd");
+	str1->ReplaceSet("abcd ", "");
+	CPPUNIT_ASSERT(strcmp(str1->String(), "") == 0);
+	delete str1;
+#endif
+
+#ifndef TEST_R5
+	//ReplaceSet(const char*, const char*)
+	NextSubTest();
+	str1 = new BString("abcd abcd abcd");
 	str1->ReplaceSet("ad", "da");
 	CPPUNIT_ASSERT(strcmp(str1->String(), "dabcda dabcda dabcda") == 0);
 	delete str1;
 #endif
+
+#ifndef TEST_R5
+	//ReplaceSet(const char*, const char*)
+	NextSubTest();
+	str1 = new BString("abcd abcd abcd");
+	str1->ReplaceSet("ad", "");
+	CPPUNIT_ASSERT(strcmp(str1->String(), "bc bc bc") == 0);
+	delete str1;
+#endif
+
+	// we repeat some test, but this time with a bit of data 
+	// to test the performance:
+
+	// ReplaceSet(const char*, const char*)
+	NextSubTest();
+	str1 = new BString();
+	buf = str1->LockBuffer(sz);
+	memset( buf, 'x', sz);
+	str1->UnlockBuffer( sz);
+	str1->ReplaceSet("x", "y");
+	CPPUNIT_ASSERT(str1->Length() == sz);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString();
+	buf = str1->LockBuffer(sz);
+	memset( buf, 'x', sz);
+	str1->UnlockBuffer( sz);
+	str1->ReplaceSet("x", "");
+	CPPUNIT_ASSERT(str1->Length() == 0);
+	delete str1;
+
+	// ReplaceAll(const char*, const char*)
+	NextSubTest();
+	str1 = new BString();
+	buf = str1->LockBuffer(sz);
+	memset( buf, 'x', sz);
+	str1->UnlockBuffer( sz);
+	str1->ReplaceAll("x", "y");
+	CPPUNIT_ASSERT(str1->Length() == sz);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString();
+	buf = str1->LockBuffer(sz);
+	memset( buf, 'x', sz);
+	str1->UnlockBuffer( sz);
+	str1->ReplaceAll("xx", "y");
+	CPPUNIT_ASSERT(str1->Length() == sz/2);
+	delete str1;
+
+	NextSubTest();
+	str1 = new BString();
+	buf = str1->LockBuffer(sz);
+	memset( buf, 'x', sz);
+	str1->UnlockBuffer( sz);
+	str1->ReplaceSet("xx", "");
+	CPPUNIT_ASSERT(str1->Length() == 0);
+	delete str1;
+
 }
 
 

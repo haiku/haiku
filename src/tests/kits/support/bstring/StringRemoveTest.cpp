@@ -86,11 +86,11 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "a String") == 0);
 	delete string1;
 	
-	//from + length is > Length()
+	//from + length exceeds Length() (R5 fails)
 	NextSubTest();
 	string1 = new BString("a String");
 	string1->Remove(4, 30);
-	CPPUNIT_ASSERT(strcmp(string1->String(), "a String") == 0);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "a St") == 0);
 	delete string1;
 	
 	NextSubTest();
@@ -223,7 +223,7 @@ StringRemoveTest::PerformTest(void)
 	string2 = new BString("string");
 	string2->MoveInto(*string1, 0, 200);
 	CPPUNIT_ASSERT(strcmp(string1->String(), "string") == 0);
-	CPPUNIT_ASSERT(strcmp(string2->String(), "string") == 0);
+	CPPUNIT_ASSERT(strcmp(string2->String(), "") == 0);
 	delete string1;
 	delete string2;
 	
@@ -242,7 +242,7 @@ StringRemoveTest::PerformTest(void)
 	memset(dest, 0, 100);
 	string1->MoveInto(dest, 0, 50);
 	CPPUNIT_ASSERT(strcmp(dest, "some text") == 0);
-	CPPUNIT_ASSERT(strcmp(string1->String(), "some text") == 0);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
 	delete string1;
 }
 

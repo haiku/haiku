@@ -26,18 +26,30 @@ StringInsertTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "StrINSERTEDing") == 0);
 	delete str1;
 	
-	//This test crashes both implementations
-	//NextSubTest();
-	//str1 = new BString("String");
-	//str1->Insert("INSERTED", 10);
-	//CPPUNIT_ASSERT(strcmp(str1->String(), "string") == 0);
-	//delete str1;
+#ifndef TEST_R5
+	// This test crashes R5 and should drop into the debugger in OpenBeOS
+	// (if compiled with DEBUG):
+	NextSubTest();
+	str1 = new BString("String");
+	str1->Insert("INSERTED", 10);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "String") == 0);
+	delete str1;
+#endif
 	
 	NextSubTest();
 	str1 = new BString;
 	str1->Insert("INSERTED", -1);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "NSERTED") == 0);
 	delete str1;
+	
+#ifndef TEST_R5
+	// check limitation of negative values (R5 doesn't):
+	NextSubTest();
+	str1 = new BString;
+	str1->Insert("INSERTED", -142364253);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "") == 0);
+	delete str1;
+#endif
 	
 	//&Insert(const char *, int32 length, int32 pos);
 	NextSubTest();
@@ -46,12 +58,15 @@ StringInsertTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "stINring") == 0);
 	delete str1;
 	
-	//This test crashes both implementations
-	//NextSubTest();
-	//str1 = new BString("string");
-	//str1->Insert("INSERTED", 2, 30);
-	//CPPUNIT_ASSERT(strcmp(str1->String(), "stINring") == 0);
-	//delete str1;
+#ifndef TEST_R5
+	// This test crashes R5 and should drop into the debugger in OpenBeOS
+	// (if compiled with DEBUG):
+	NextSubTest();
+	str1 = new BString("string");
+	str1->Insert("INSERTED", 2, 30);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "string") == 0);
+	delete str1;
+#endif
 	
 	NextSubTest();
 	str1 = new BString("string");
@@ -71,6 +86,13 @@ StringInsertTest::PerformTest(void)
 	str1 = new BString("string");
 	str1->Insert('P', 5, 3);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "strPPPPPing") == 0);
+	delete str1;
+	
+	//Insert(char c, int32 count, int32 pos)
+	NextSubTest();
+	str1 = new BString("string");
+	str1->Insert('P', 5, -2);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "PPPstring") == 0);
 	delete str1;
 	
 	//Insert(BString&)
