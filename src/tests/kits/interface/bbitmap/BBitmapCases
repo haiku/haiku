@@ -1,0 +1,32 @@
+BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
+		bool needsContiguous)
+case 1:	acceptsViews = false, needsContiguous = false, valid bounds,
+		different color spaces =>
+		Bits() should be valid, BitsLength(), BytesPerRow() etc. should return
+		the correct values.
+TODO: ...
+
+void SetBits(const void *data, int32 length, int32 offset,
+			 color_space colorSpace)
+case 1:	overwrite complete bitmap data, offset = 0, different color spaces,
+		no row padding =>
+		Bitmap should contain the correct data.
+case 2:	overwrite complete bitmap data, offset = 0, different color spaces,
+		row padding =>
+		Bitmap should contain the correct data.
+case 3:	overwrite bitmap data partially, offset = 0, different color spaces,
+		no row padding =>
+		Bitmap should contain the correct data.
+case 4:	overwrite bitmap data partially, offset = 0, different color spaces,
+		row padding =>
+		Bitmap should contain the correct data.
+
+status_t ImportBits(const BBitmap *bitmap)
+case 1:	NULL bitmap =>
+		Should return B_BAD_VALUE.
+case 2:	bitmap with different Bounds() =>
+		Should return B_BAD_VALUE.
+case 3:	this and bitmap are properly initialized and have the same bounds,
+		different color spaces =>
+		Should set the data and return B_OK.
+
