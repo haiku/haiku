@@ -529,6 +529,8 @@ ToneProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much, b
 			// that at the moment, so we try to start producing buffers earlier to
 			// compensate.
 			mInternalLatency += how_much;
+			if (mInternalLatency > 50000)
+				mInternalLatency = 50000;
 			SetEventLatency(mLatency + mInternalLatency);
 
 			FPRINTF(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
