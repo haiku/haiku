@@ -9,7 +9,7 @@
 #include <DiskDeviceVisitor.h>
 #include <disk_scanner.h>
 #include <ObjectList.h>
-#include <Point.h>
+#include <Rect.h>
 #include <String.h>
 
 class BDiskDevice;
@@ -47,11 +47,11 @@ public:
 
 	status_t GetPartitioningParameters(const char *partitioningSystem,
 									   BString *parameters,
-									   BPoint dialogCenter = BPoint(-1, -1),
+									   BRect dialogCenter = BRect(),
 									   bool *cancelled = NULL);
 	status_t Partition(const char *partitioningSystem, const char *parameters);
 	status_t Partition(const char *partitioningSystem,
-					   BPoint dialogCenter = BPoint(-1, -1),
+					   BRect dialogCenter = BRect(),
 					   bool *cancelled = NULL);
 
 	static status_t GetPartitioningSystemList(BObjectList<BString> *list);

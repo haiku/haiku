@@ -3,13 +3,19 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <errno.h>
 #include <new.h>
 
 #include <Session.h>
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
+#include <DiskDeviceRoster.h>
+#include <DiskScannerAddOn.h>
 #include <Message.h>
 #include <Partition.h>
+
+#include "AddOnImage.h"
+#include "PartitioningDialog.h"
 
 /*!	\class BSession
 	\brief A BSession object represent a session and provides a lot of
@@ -238,8 +244,8 @@ BSession::PartitionWithID(int32 id)
 		   asked for.
 	\param parameters Pointer to a pre-allocated BString to be set to the
 		   parameters the user has specified.
-	\param dialogCenter The point at which to center the dialog. If omitted,
-		   the dialog is displayed centered to the screen.
+	\param dialogCenter The rectangle over which to center the dialog. If
+		   omitted, the dialog is displayed centered to the screen.
 	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
 		   the dialog has been cancelled by the user, or to \c false
 		   otherwise. May be \c NULL.
@@ -251,10 +257,82 @@ BSession::PartitionWithID(int32 id)
 */
 status_t
 BSession::GetPartitioningParameters(const char *partitioningSystem,
-									BString *parameters, BPoint dialogCenter,
+									BString *parameters, BRect dialogCenter,
 									bool *cancelled)
 {
-	return B_ERROR;	// not implemented
+	status_t error = (partitioningSystem && parameters ? B_OK : B_BAD_VALUE);
+	// get the add-on
+	AddOnImage image;
+	BDiskScannerPartitionAddOn *addOn = NULL;
+	if (error == B_OK) {
+		error = BDiskDeviceRoster::_LoadPartitionAddOn(partitioningSystem,
+													   &image, &addOn);
+	}
+	// open the device
+	int deviceFD = -1;
+	if (error == B_OK) {
+		deviceFD = open(Device()->Path(), O_RDONLY);
+		if (deviceFD < 0)
+			error = errno;
+	}
+	// get the default parameters
+	char *allocatedBuffer = NULL;
+	char localBuffer[256];
+	char *defaultParams = NULL;
+	if (error == B_OK) {
+		// try a small buffer on stack
+		defaultParams = localBuffer;
+		size_t bufferSize = sizeof(localBuffer);
+		size_t actualSize = 0;
+		error = get_partitioning_parameters(deviceFD, Index(),
+											partitioningSystem, defaultParams,
+											bufferSize, &actualSize);
+		if (error == B_OK && actualSize > bufferSize) {
+			// stack buffer was too small, allocate one on the heap
+			allocatedBuffer = new(nothrow) char[actualSize];
+			if (allocatedBuffer) {
+				defaultParams = allocatedBuffer;
+				bufferSize = actualSize;
+				error = get_partitioning_parameters(deviceFD, Index(),
+													partitioningSystem,
+													defaultParams, bufferSize,
+													&actualSize);
+				if (error == B_OK && actualSize > bufferSize)
+					error = B_ERROR;
+			} else
+				error = B_NO_MEMORY;
+		}
+	}
+	// close the device
+	if (deviceFD >= 0)
+		close(deviceFD);
+	// get an editor
+	BDiskScannerParameterEditor *editor = NULL;
+	if (error == B_OK) {
+		editor = addOn->CreateEditor(this, defaultParams);
+		if (!editor)
+			error = B_ERROR;
+	}
+	// create and run the editing dialog
+	PartitioningDialog *dialog = NULL;
+	if (error == B_OK) {
+		dialog = new (nothrow) PartitioningDialog(dialogCenter);
+		if (dialog)
+			error = dialog->Go(editor, cancelled);
+		else
+			error = B_NO_MEMORY;
+	}
+	// get the parameters
+	if (error == B_OK)
+		error = editor->GetParameters(parameters);
+	// cleanup
+	if (allocatedBuffer)
+		delete allocatedBuffer;
+	if (editor)
+		delete editor;
+	if (addOn)
+		delete addOn;
+	return error;
 }
 
 // Partition
@@ -286,8 +364,8 @@ BSession::Partition(const char *partitioningSystem, const char *parameters)
 
 	\param partitioningSystem The partitioning system to be used for
 		   partitioning.
-	\param dialogCenter The point at which to center the dialog. If omitted,
-		   the dialog is displayed centered to the screen.
+	\param dialogCenter The rectangle over which to center the dialog. If
+		   omitted, the dialog is displayed centered to the screen.
 	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
 		   the dialog has been cancelled by the user, or to \c false
 		   otherwise. May be \c NULL.
@@ -299,30 +377,20 @@ BSession::Partition(const char *partitioningSystem, const char *parameters)
 	- another error code
 */
 status_t
-BSession::Partition(const char *partitioningSystem, BPoint dialogCenter,
+BSession::Partition(const char *partitioningSystem, BRect dialogCenter,
 					bool *cancelled)
 {
-	return B_ERROR;	// not implemented
-}
-
-// GetPartitioningSystemList
-/*!	\brief Returns a list of all partitioning systems that can be used for
-		   partitioning.
-
-	The names of the partioning systems are added as BString objects to the
-	supplied list. The caller takes over ownership of the return BString
-	objects and is responsible for deleteing them.
-
-	Any of returned names can be passed to Partition().
-
-	\param list Pointer to a pre-allocated BObjectList the names of the
-		   partitioning systems shall be added to.
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
-status_t
-BSession::GetPartitioningSystemList(BObjectList<BString> *list)
-{
-	return B_ERROR;	// not implemented
+	status_t error = (partitioningSystem ? B_OK : B_BAD_VALUE);
+	// get the parameters
+	BString parameters;
+	if (error == B_OK) {
+		error = GetPartitioningParameters(partitioningSystem, &parameters,
+										  dialogCenter, cancelled);
+	}
+	// do the partitioning
+	if (error == B_OK)
+		error = Partition(partitioningSystem, parameters.String());
+	return error;
 }
 
 // constructor
