@@ -323,7 +323,7 @@ printf("LoadDecorator(): Deleting old decorator\n");
 //		unload_add_on(decorator_id);
 	}
 	decorator_id=addon;
-	decorator=pcreatefunc(SRect(50,50,150,150),WLOOK_TITLED,WFEEL_NORMAL,0);
+	decorator=pcreatefunc(BRect(50,50,150,150),WLOOK_TITLED,WFEEL_NORMAL,0);
 	decorator->SetDriver(driver);
 	decorator->SetFocus(true);
 //	decorator->Draw();

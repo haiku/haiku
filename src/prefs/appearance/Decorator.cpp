@@ -1,7 +1,7 @@
 #include "Decorator.h"
 #include <string.h>
 
-Decorator::Decorator(SRect rect, int32 wlook, int32 wfeel, int32 wflags)
+Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 {
 	close_state=false;
 	minimize_state=false;
@@ -149,7 +149,7 @@ void Decorator::MoveBy(float x, float y)
 {
 }
 
-void Decorator::MoveBy(SPoint pt)
+void Decorator::MoveBy(BPoint pt)
 {
 }
 
@@ -157,11 +157,11 @@ void Decorator::ResizeBy(float x, float y)
 {
 }
 
-void Decorator::ResizeBy(SPoint pt)
+void Decorator::ResizeBy(BPoint pt)
 {
 }
 
-void Decorator::Draw(SRect r)
+void Decorator::Draw(BRect r)
 {
 	_DrawTab(r & tabrect);
 	_DrawFrame(r & frame);
@@ -207,27 +207,27 @@ void Decorator::DrawZoom(void)
 	_DrawZoom(zoomrect);
 }
 
-void Decorator::_DrawClose(SRect r)
+void Decorator::_DrawClose(BRect r)
 {
 }
 
-void Decorator::_DrawFrame(SRect r)
+void Decorator::_DrawFrame(BRect r)
 {
 }
 
-void Decorator::_DrawMinimize(SRect r)
+void Decorator::_DrawMinimize(BRect r)
 {
 }
 
-void Decorator::_DrawTab(SRect r)
+void Decorator::_DrawTab(BRect r)
 {
 }
 
-void Decorator::_DrawTitle(SRect r)
+void Decorator::_DrawTitle(BRect r)
 {
 }
 
-void Decorator::_DrawZoom(SRect r)
+void Decorator::_DrawZoom(BRect r)
 {
 }
 /*
@@ -235,7 +235,7 @@ SRegion Decorator::GetFootprint(void)
 {
 }
 */
-click_type Decorator::Clicked(SPoint pt, int32 buttons, int32 modifiers)
+click_type Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 	return CLICK_NONE;
 }

@@ -1,7 +1,7 @@
 #ifndef LAYERDATA_H_
 #define LAYERDATA_H_
 
-#include "SPoint.h"
+#include <Point.h>
 class ServerBitmap;
 
 class LayerData
@@ -22,7 +22,7 @@ LayerData(void)
 	};
 
 float pensize;
-SPoint penlocation;
+BPoint penlocation;
 int32 drawing_mode;
 ServerBitmap *bitmap_background;
 ServerBitmap *bitmap_overlay;
