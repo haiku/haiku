@@ -4,6 +4,12 @@
    Rudolf Cornelissen 3/2004-7/2004.
 */
 
+/*
+	General note about NeoMagic cards:
+	The Neomagic acceleration engines apparantly contain several faults which is the
+	main reason for the differences in setup for different engines.
+*/
+
 #define MODULE_BIT 0x00080000
 
 #include "nm_std.h"
@@ -19,7 +25,7 @@ invert rectangle
 blit
 */
 
-//fixme: acc setup for NM2070, NM2097 and NM2160 only for now...
+//fixme: still setup for NM2090 and NM2093 cards...
 //fixme: seperate acc routines for different architectures for (marginal) speedup?
 status_t nm_acc_wait_idle()
 {
@@ -256,8 +262,9 @@ status_t nm_acc_setup_rectangle(uint32 color)
 //	so:
 	nm_acc_wait_idle();
 
-	if (si->ps.card_type == NM2070)
+	switch (si->ps.card_type)
 	{
+	case NM2070:
 		/* use ROP GXcopy (b16-19), use linear adressing system, do foreground color (b3) */
 		ACCW(CONTROL, (si->engine.control | 0x000c0008));
 		/* setup color */
@@ -266,13 +273,20 @@ status_t nm_acc_setup_rectangle(uint32 color)
 		else
 			/* swap colorbytes */
 			ACCW(FGCOLOR, (((color & 0xff00) >> 8) | ((color & 0x00ff) << 8)));
-	}
-	else
-	{
+		break;
+	case NM2097:
+	case NM2160:
 		/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
 		ACCW(CONTROL, (si->engine.control | 0x830c0008));
 		/* setup color */
 		ACCW(FGCOLOR, color);
+		break;
+	default: /* NM2200 and later */
+		/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
+		ACCW(CONTROL, (/*si->engine.control |*/ 0x830c0008));
+		/* setup color */
+		ACCW(FGCOLOR, color);
+		break;
 	}
 
 	return B_OK;
@@ -293,15 +307,16 @@ status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	nm_acc_wait_idle();
 
 	/* send command and exexute (warning: order of programming regs is important!) */
-	if (si->ps.card_type == NM2070)
+	switch (si->ps.card_type)
 	{
+	case NM2070:
 		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
 		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
-	}
-	else
-	{
+		break;
+	default: /* NM2097 and later */
 		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+		break;
 	}
 
 	return B_OK;
@@ -316,19 +331,25 @@ status_t nm_acc_setup_rect_invert()
 //	so:
 	nm_acc_wait_idle();
 
-	if (si->ps.card_type == NM2070)
+	switch (si->ps.card_type)
 	{
+	case NM2070:
 		/* use ROP GXinvert (b16-19), use linear adressing system. */
 		/* note:
 		 * although selecting foreground color (b3) should have no influence, NM2070
 		 * thinks otherwise if depth is not 8-bit. In 8-bit depth ROP takes precedence
 		 * over source-select, but in other spaces it's vice-versa (forcing GXcopy!). */
 		ACCW(CONTROL, (si->engine.control | 0x00050000));
-	}
-	else
-	{
+		break;
+	case NM2097:
+	case NM2160:
 		/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
 		ACCW(CONTROL, (si->engine.control | 0x83050008));
+		break;
+	default: /* NM2200 and later */
+		/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
+		ACCW(CONTROL, (/*si->engine.control |*/ 0x83050008));
+		break;
 	}
 	/* reset color (just to be 'safe') */
 	ACCW(FGCOLOR, 0);
@@ -349,15 +370,16 @@ status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	nm_acc_wait_idle();
 
 	/* send command and exexute (warning: order of programming regs is important!) */
-	if (si->ps.card_type == NM2070)
+	switch (si->ps.card_type)
 	{
+	case NM2070:
 		ACCW(2070_XYEXT, (((yl - 1) << 16) | ((xe - xs - 1) & 0x0000ffff)));
 		ACCW(2070_DSTSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
-	}
-	else
-	{
+		break;
+	default: /* NM2097 and later */
 		ACCW(2090_DSTSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(2090_XYEXT, ((yl << 16) | ((xe - xs) & 0x0000ffff)));
+		break;
 	}
 
 	return B_OK;

@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.07 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.08 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -499,7 +499,7 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		*acc_mode = false;
 		break;
 	default:
-		/* NM2230 and later cards support accelerated 24bit modes */
+		/* NM2230 and later cards do support accelerated 24bit modes */
 		break;
 	}
 
