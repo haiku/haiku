@@ -28,10 +28,15 @@ extern status_t platform_init_heap(struct stage2_args *args, void **_base, void 
 extern status_t platform_allocate_region(void **_virtualAddress, size_t size, uint8 protection);
 extern status_t platform_free_region(void *address, size_t size);
 
+/* boot options */
+#define BOOT_OPTION_MENU			1
+#define BOOT_OPTION_DEBUG_OUTPUT	2
+
+extern uint32 platform_boot_options(void);
+
 /* misc functions */
 extern void platform_switch_to_logo(void);
 extern void platform_switch_to_text_mode(void);
-extern bool platform_user_menu_requested(void);
 extern void platform_start_kernel(void);
 
 #ifdef __cplusplus
