@@ -81,6 +81,8 @@ public:
 	int NumberOfPages() const;
 	void ShowNextPage();
 	void ShowPrevPage();
+	void ShowFirstPage();
+	void ShowLastPage();
 	
 	bool CanZoomIn() const;
 	bool CanZoomOut() const;
@@ -89,17 +91,24 @@ public:
 };
 
 class PreviewWindow : public BlockingWindow {
-	BButton *fNext, *fPrev, *fZoomIn, *fZoomOut;
+	BButton *fFirst;
+	BButton *fNext;
+	BButton *fPrev;
+	BButton *fLast;
+	BButton *fZoomIn;
+	BButton *fZoomOut;
 	BStringView* fPageText;
 	PreviewView* fPreview;
 	BScrollView* fPreviewScroller;
 	float fButtonBarHeight;
 	
 	enum {
-		MSG_NEXT_PAGE = 'pwnp',
-		MSG_PREV_PAGE = 'pwpp',
-		MSG_ZOOM_IN = 'pwzi',
-		MSG_ZOOM_OUT = 'pwzo'
+		MSG_FIRST_PAGE = 'pwfp',			
+		MSG_NEXT_PAGE  = 'pwnp',
+		MSG_PREV_PAGE  = 'pwpp',
+		MSG_LAST_PAGE  = 'pwlp',			
+		MSG_ZOOM_IN    = 'pwzi',
+		MSG_ZOOM_OUT   = 'pwzo',
 	};
 
 	void ResizeToPage();

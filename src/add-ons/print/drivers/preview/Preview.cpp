@@ -227,16 +227,32 @@ int PreviewView::NumberOfPages() const {
 
 void PreviewView::ShowNextPage() {
 	if (!ShowsLastPage()) {
-		fPage ++; Invalidate();
+		fPage ++; 
+		Invalidate();
 	}
 }
 
 void PreviewView::ShowPrevPage() {
 	if (!ShowsFirstPage()) {
-		fPage --; Invalidate();
+		fPage --; 
+		Invalidate();
 	}
 }
 	
+void PreviewView::ShowFirstPage() {
+	if (!ShowsFirstPage()) {
+		fPage = 0; 
+		Invalidate();
+	}
+}
+
+void PreviewView::ShowLastPage() {
+	if (!ShowsLastPage()) {
+		fPage = NumberOfPages()-1; 
+		Invalidate();
+	}
+}
+
 bool PreviewView::CanZoomIn() const {
 	return fZoom < 4;
 }
@@ -247,13 +263,15 @@ bool PreviewView::CanZoomOut() const {
 
 void PreviewView::ZoomIn() {
 	if (CanZoomIn()) {
-		fZoom ++; FixScrollbars(); Invalidate();
+		fZoom ++; FixScrollbars(); 
+		Invalidate();
 	}
 }
 
 void PreviewView::ZoomOut() {
 	if (CanZoomOut()) {
-		fZoom --; FixScrollbars(); Invalidate();
+		fZoom --; FixScrollbars(); 
+		Invalidate();
 	}
 }
 
@@ -293,8 +311,8 @@ void PreviewView::FixScrollbars() {
 PreviewWindow::PreviewWindow(BFile* jobFile) 
 	: BlockingWindow(BRect(20, 24, 400, 600), "Preview", B_DOCUMENT_WINDOW, 0)
 {
-	const float kButtonDistance = 30;
-	const float kPageTextDistance = 15;
+	const float kButtonDistance = 15;
+	const float kPageTextDistance = 10;
 	
 	float top = 7;
 	float left = 20;
@@ -305,17 +323,31 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 	r.bottom = r.IntegerHeight() - B_H_SCROLL_BAR_HEIGHT; r.top = 0;
 
 		// add navigation and zoom buttons
+	// largest button first to get its size
 	fPrev = new BButton(BRect(left, top, left+10, top+10), "Prev", "Previous Page", new BMessage(MSG_PREV_PAGE));
 	AddChild(fPrev);
 	fPrev->ResizeToPreferred();
 	width = fPrev->Bounds().Width()+1;
 	height = fPrev->Bounds().Height()+1;
+
+	fFirst = new BButton(BRect(left, top, left+10, top+10), "First", "First Page", new BMessage(MSG_FIRST_PAGE));
+	AddChild(fFirst);
+	fFirst->ResizeTo(width, height);
+	left = fFirst->Frame().right + kButtonDistance;
+
+	// move Previous Page button after First Page button
+	fPrev->MoveTo(left, top);	
 	left = fPrev->Frame().right + kButtonDistance;
 	
 	fNext = new BButton(BRect(left, top, left+10, top+10), "Next", "Next Page", new BMessage(MSG_NEXT_PAGE));
 	AddChild(fNext);
 	fNext->ResizeTo(width, height);
-	left = fNext->Frame().right + kPageTextDistance;
+	left = fNext->Frame().right + kButtonDistance;
+	
+	fLast = new BButton(BRect(left, top, left+10, top+10), "Last", "Last Page", new BMessage(MSG_LAST_PAGE));
+	AddChild(fLast);
+	fLast->ResizeTo(width, height);
+	left = fLast->Frame().right + kPageTextDistance;
 	
 	fPageText = new BStringView(BRect(left, top, left + 100, top + 15), "pageText", "");
 	fPageText->SetAlignment(B_ALIGN_CENTER);
@@ -390,8 +422,10 @@ void PreviewWindow::ResizeToPage() {
 }
 
 void PreviewWindow::UpdateControls() {
+	fFirst->SetEnabled(!fPreview->ShowsFirstPage());
 	fPrev->SetEnabled(!fPreview->ShowsFirstPage());
 	fNext->SetEnabled(!fPreview->ShowsLastPage());
+	fLast->SetEnabled(!fPreview->ShowsLastPage());
 	fZoomIn->SetEnabled(fPreview->CanZoomIn());
 	fZoomOut->SetEnabled(fPreview->CanZoomOut());
 	
@@ -409,13 +443,25 @@ void PreviewWindow::UpdateControls() {
 
 void PreviewWindow::MessageReceived(BMessage* m) {
 	switch (m->what) {
-		case MSG_NEXT_PAGE: fPreview->ShowNextPage();
+		case MSG_FIRST_PAGE: 
+			fPreview->ShowFirstPage();
 			break;
-		case MSG_PREV_PAGE: fPreview->ShowPrevPage();
+		case MSG_NEXT_PAGE: 
+			fPreview->ShowNextPage();
 			break;
-		case MSG_ZOOM_IN: fPreview->ZoomIn(); ResizeToPage();
+		case MSG_PREV_PAGE: 
+			fPreview->ShowPrevPage();
+			break;	
+		case MSG_LAST_PAGE: 
+			fPreview->ShowLastPage();
 			break;
-		case MSG_ZOOM_OUT: fPreview->ZoomOut(); ResizeToPage();
+		case MSG_ZOOM_IN: 
+			fPreview->ZoomIn(); 
+			ResizeToPage();
+			break;
+		case MSG_ZOOM_OUT: 
+			fPreview->ZoomOut(); 
+			ResizeToPage();
 			break;
 		default:
 			inherited::MessageReceived(m); return;
