@@ -34,6 +34,12 @@ status_t acpi_std_ops(int32 op,...) {
 	
 	switch(op) {
 		case B_MODULE_INIT:
+			
+			#ifdef ACPI_DEBUG_OUTPUT
+				AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;
+				AcpiDbgLayer = ACPI_ALL_COMPONENTS;
+			#endif
+			
 			/* Bring up ACPI */
 			Status = AcpiInitializeSubsystem();
 			if (Status != AE_OK) {

@@ -501,15 +501,16 @@ AcpiOsMapMemory (
 {
 
 #ifdef _KERNEL_MODE
-	unsigned page_offset = (unsigned int)ACPI_TO_POINTER(where) % B_PAGE_SIZE;
-	void *map_base = ACPI_TO_POINTER(where) - page_offset;
+	int page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
+	void *map_base = ACPI_PTR_ADD(void,where,0 - page_offset);
+	area_id area;
 	
-    map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
+    area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
 	
-	there += page_offset;
+	*there += page_offset;
 #endif
 
-    return AE_OK;
+    return (area > 0 ? AE_OK : AE_BAD_ADDRESS);
 }
 
 
