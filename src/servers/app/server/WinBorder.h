@@ -72,13 +72,20 @@ protected:
 			BRect				_clientframe;
 			int32				_mbuttons,
 								_kmodifiers;
-			BPoint				_mousepos;
+			BPoint				fLastMousePosition;
 			bool				_update;
 			bool				_hresizewin,_vresizewin;
 
 			BRegion				*fDecFull,
 								*fDecFullVisible,
 								*fDecVisible;
+			
+/*			bool				fIsMoving;
+			bool				fIsResizing;
+			bool				fIsClosing;
+			bool				fIsMinimizing;
+			bool				fIsZooming
+*/
 };
 
 bool		is_moving_window(void);
