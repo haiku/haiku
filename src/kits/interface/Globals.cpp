@@ -42,9 +42,10 @@
 #include <WidthBuffer.h>
 
 // Private definitions not placed in public headers
+#include <input_globals.h>
+
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
-extern status_t _control_input_server_(BMessage *command, BMessage *reply);
 
 using namespace BPrivate;
 
@@ -672,7 +673,7 @@ void __set_window_decor(int32 theme)
 }
 
 
-status_t
+_IMPEXP_BE status_t
 _restore_key_map_()
 {
 	BMessage message('Iskm');
