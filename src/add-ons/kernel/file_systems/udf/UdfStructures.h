@@ -57,21 +57,22 @@ namespace Udf {
 */
 struct charspec {
 public:
+	charspec(uint8 type = 0, const char *info = NULL);
+
 	void dump() const;
 
 	uint8 character_set_type() const { return _character_set_type; } 
 	const char* character_set_info() const { return _character_set_info; }
 	char* character_set_info() { return _character_set_info; }
 	
-	void set_character_set_type(uint8 type) { _character_set_type = type; } 
+	void set_character_set_type(uint8 type) { _character_set_type = type; }
+	void set_character_set_info(const char *info);
 private:
 	uint8 _character_set_type;	//!< to be set to 0 to indicate CS0
 	char _character_set_info[63];	//!< "OSTA Compressed Unicode"
 } __attribute__((packed));
 
-
-extern const charspec kCS0Charspec;
-
+extern const charspec kCs0CharacterSet;
 
 /*! \brief Date and time stamp 
 

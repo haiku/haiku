@@ -14,7 +14,7 @@
 
 #include <string.h>
 
-#include "CS0String.h"
+#include "UdfString.h"
 #include "Utils.h"
 
 using namespace Udf;
@@ -23,7 +23,8 @@ using namespace Udf;
 // Constants
 //----------------------------------------------------------------------
 
-//const charspec kCS0Charspec = { _character_set_type: 0,
+const charspec Udf::kCs0CharacterSet(0, "OSTA Compressed Unicode");
+//const charspec kCs0Charspec = { _character_set_type: 0,
 //                                _character_set_info: "OSTA Compressed Unicode"
 //                                                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
 //                                                    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
@@ -164,6 +165,12 @@ volume_structure_descriptor_header::id_matches(const char *id)
 // charspec
 //----------------------------------------------------------------------
 
+charspec::charspec(uint8 type, const char *info)
+{
+	set_character_set_type(type);
+	set_character_set_info(info);
+}
+
 void
 charspec::dump() const
 {
@@ -172,6 +179,13 @@ charspec::dump() const
 	PRINT(("character_set_info: `%s'\n", character_set_info()));
 }
 
+void
+charspec::set_character_set_info(const char *info)
+{
+	memset(_character_set_info, 0, 63);
+	if (info)
+		strncpy(_character_set_info, info, 63);
+}	
 
 //----------------------------------------------------------------------
 // timestamp
@@ -352,14 +366,14 @@ primary_volume_descriptor::dump() const
 {
 	DUMP_INIT("primary_volume_descriptor");
 	
-	CS0String string;
+	String string;
 	
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                       %ld\n", vds_number()));
 	PRINT(("primary_volume_descriptor_number: %ld\n", primary_volume_descriptor_number()));
 	string = volume_identifier();
-	PRINT(("volume_identifier:                `%s'\n", string.String()));
+	PRINT(("volume_identifier:                `%s'\n", string.Utf8()));
 	PRINT(("volume_sequence_number:           %d\n", volume_sequence_number()));
 	PRINT(("max_volume_sequence_number:       %d\n", max_volume_sequence_number()));
 	PRINT(("interchange_level:                %d\n", interchange_level()));
@@ -367,7 +381,7 @@ primary_volume_descriptor::dump() const
 	PRINT(("character_set_list:               %ld\n", character_set_list()));
 	PRINT(("max_character_set_list:           %ld\n", max_character_set_list()));
 	string = volume_set_identifier();
-	PRINT(("volume_set_identifier:            `%s'\n", string.String()));
+	PRINT(("volume_set_identifier:            `%s'\n", string.Utf8()));
 	PRINT(("descriptor_character_set:\n"));
 	DUMP(descriptor_character_set());
 	PRINT(("explanatory_character_set:\n"));
@@ -463,8 +477,8 @@ logical_volume_descriptor::dump() const
 	PRINT(("vds_number:                %ld\n", vds_number()));
 	PRINT(("character_set:\n"));
 	DUMP(character_set());
-	CS0String string(logical_volume_identifier());
-	PRINT(("logical_volume_identifier: `%s'\n", string.String()));
+	String string(logical_volume_identifier());
+	PRINT(("logical_volume_identifier: `%s'\n", string.Utf8()));
 	PRINT(("logical_block_size:        %ld\n", logical_block_size()));
 	PRINT(("domain_id:\n"));
 	DUMP(domain_id());
