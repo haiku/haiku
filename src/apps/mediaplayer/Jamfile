@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src apps mediaplayer ;
 
-UsePrivateHeaders support ;
-
 AddResources MediaPlayer :
 	MediaPlayer.rdef MediaPlayer.icons.rdef MediaPlayer.version.rdef
 	;
