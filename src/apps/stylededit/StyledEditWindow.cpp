@@ -660,7 +660,15 @@ status_t
 StyledEditWindow::SaveAs()
 {
 	if (fSavePanel == 0) {
-		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), NULL, B_FILE_NODE, false);
+		entry_ref * directory = 0;
+		if (fSaveMessage != 0) {
+			entry_ref dirref;
+			if (fSaveMessage->FindRef("directory", &dirref)) {
+				directory = new entry_ref(dirref);
+			}
+		}
+		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), directory, B_FILE_NODE, false);
+		
 		fSavePanelTextView = 
 		   dynamic_cast<BTextControl*>(fSavePanel->Window()->FindView("text view"));
 		BMenuBar * menuBar =
