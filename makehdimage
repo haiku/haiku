@@ -55,8 +55,8 @@ RUN_WITHOUT_APP_SERVER=1
 
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	true false ls df mount unmount cp mv ps sh mkdir sleep \
-	grep cat less clockconfig du rm date find locate xargs isvolume \
-	shutdown safemode"
+	grep cat less clockconfig du rm date find locate xargs \
+	isvolume shutdown safemode sysinfo kill diff cmp"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
