@@ -60,7 +60,7 @@ translation_format gInputFormats[] = {
 // The output formats that this translator supports.
 translation_format gOutputFormats[] = {
 	{
-		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_TEXT,
 		B_TRANSLATOR_TEXT,
 		TEXT_OUT_QUALITY,
 		TEXT_OUT_CAPABILITY,
@@ -255,6 +255,64 @@ STXTTranslator::OutputFormats(int32 *out_count) const
 	return gOutputFormats;
 }
 
+status_t
+identify_stxt_header(const TranslatorStyledTextStreamHeader &header,
+	BPositionIO *inSource, translator_info *outInfo, uint32 outType)
+{
+	char buffer[20];
+	
+	// Check the TEXT header
+	TranslatorStyledTextTextHeader txtheader;
+	if (inSource->Read(buffer, 16) != 16)
+		return B_NO_TRANSLATOR;
+		
+	memcpy(&txtheader, buffer, 16);
+	if (swap_data(B_UINT32_TYPE, &txtheader, 16,
+		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+		return B_ERROR;
+		
+	if (txtheader.header.magic != 'TEXT' ||
+		txtheader.header.header_size !=
+			sizeof(TranslatorStyledTextTextHeader) ||
+		txtheader.charset != B_UNICODE_UTF8)
+		return B_NO_TRANSLATOR;
+
+	// skip the text data
+	off_t seekresult, pos;
+	pos = header.header.header_size +
+		txtheader.header.header_size +
+		txtheader.header.data_size;
+	seekresult = inSource->Seek(txtheader.header.data_size,
+		SEEK_CUR);
+	if (seekresult < pos)
+		return B_NO_TRANSLATOR;
+
+	// check the STYL header		
+	TranslatorStyledTextStyleHeader stlheader;
+	if (inSource->Read(buffer, 20) != 20)
+		return B_NO_TRANSLATOR;
+	
+	memcpy(&stlheader, buffer, 20);
+	if (swap_data(B_UINT32_TYPE, &stlheader, 20,
+		B_SWAP_BENDIAN_TO_HOST) != B_OK)
+		return B_ERROR;
+		
+	if (stlheader.header.magic != 'STYL' ||
+		stlheader.header.header_size !=
+			sizeof(TranslatorStyledTextStyleHeader))
+		return B_NO_TRANSLATOR;	
+	
+	// return information about the data in the stream
+	outInfo->type = B_STYLED_TEXT_FORMAT;
+	outInfo->group = B_TRANSLATOR_TEXT;
+	outInfo->quality = STXT_IN_QUALITY;
+	outInfo->capability = STXT_IN_CAPABILITY;
+	strcpy(outInfo->name, "Be styled text file");
+	strcpy(outInfo->MIME, "text/x-vnd.Be-stxt");
+	
+	return B_OK;
+}
+
 // ---------------------------------------------------------------
 // Identify
 //
@@ -293,6 +351,34 @@ STXTTranslator::OutputFormats(int32 *out_count) const
 //			no errors found
 // ---------------------------------------------------------------
 status_t
+identify_txt_header(const uint8 *data, int32 nread,
+	BPositionIO *inSource, translator_info *outInfo, uint32 outType)
+{
+	uint8 ch;
+	for (int32 i = 0; i < nread; i++) {
+		ch = data[i];
+		// if any null characters or
+		// control characters (other than a few)
+		// are found, abort, as the data is
+		// probably not plain text
+		if (ch < 32 && ch != '\n' &&
+			ch != '\r' && ch != '\t' &&
+			ch != '\f')
+			return B_NO_TRANSLATOR;
+	}
+
+	// return information about the data in the stream
+	outInfo->type = B_TRANSLATOR_TEXT;
+	outInfo->group = B_TRANSLATOR_TEXT;
+	outInfo->quality = TEXT_IN_QUALITY;
+	outInfo->capability = TEXT_IN_CAPABILITY;
+	strcpy(outInfo->name, "Plain text file");
+	strcpy(outInfo->MIME, "text/plain");
+	
+	return B_OK;
+}
+
+status_t
 STXTTranslator::Identify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
@@ -301,8 +387,33 @@ STXTTranslator::Identify(BPositionIO *inSource,
 		outType = B_TRANSLATOR_TEXT;
 	if (outType != B_TRANSLATOR_TEXT && outType != B_STYLED_TEXT_FORMAT)
 		return B_NO_TRANSLATOR;
+		
+	uint8 buffer[16];
+	status_t nread = 0;
+	// Read in the header to determine
+	// if the data is supported
+	nread = inSource->Read(buffer, 16);
+	if (nread < 0)
+		return nread;
 
-	return B_NO_TRANSLATOR;
+	// read in enough data to fill the stream header
+	if (nread == 16) {
+		TranslatorStyledTextStreamHeader header;
+		memcpy(&header, buffer, 16);
+		if (swap_data(B_UINT32_TYPE, &header, 16, B_SWAP_BENDIAN_TO_HOST)
+			!= B_OK)
+			return B_ERROR;
+		
+		if (header.header.magic == B_STYLED_TEXT_FORMAT && 
+			header.header.header_size == 
+			sizeof(TranslatorStyledTextStreamHeader) &&
+			header.header.data_size == 0 &&
+			header.version == 100)
+			return identify_stxt_header(header, inSource, outInfo, outType);
+	}
+	
+	// if the data is not styled text, check if it is ASCII text
+	return identify_txt_header(buffer, nread, inSource, outInfo, outType);
 }
 
 // ---------------------------------------------------------------
