@@ -13,16 +13,13 @@
 	 	revert = false;
 	 	
 	 	MoveTo((rect.left += 100),(rect.top += 100));
-	 	BRect r = Bounds();
-	 	r.left -= 1;
-	 	r.top -= 1;
-	 	menuView = new BBox(r, "menuView",
-			B_FOLLOW_ALL, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
-		menuView->SetViewColor(219,219,219,255);
+
+	 	menuView = new BBox(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
+						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
+		AddChild(menuView);
+		
 		menuBar = new MenuBar();
 		menuView->AddChild(menuBar);
-		AddChild(menuView);
-		menuView->ResizeTo((Frame().right),(Frame().bottom));
 		defaultButton = new BButton(BRect(10,0,85,20), "Default", "Defaults",
 			new BMessage(MENU_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 		revertButton = new BButton(BRect(95,0,175,20), "Revert", "Revert",
@@ -31,6 +28,8 @@
 		
 		menuView->AddChild(defaultButton);
 		menuView->AddChild(revertButton);
+		
+		menuView->MakeFocus();
 		
 		Update();
 		

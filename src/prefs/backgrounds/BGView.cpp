@@ -92,13 +92,13 @@ uint8 hand_cursor_data[68] =
 };
 
 BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
-	:BView(frame,name,resize,flags),
+	:BBox(frame, name, resize, flags | B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER),
 		fCurrent(NULL),
 		fCurrentInfo(NULL),
 		fPathList(1, true),
 		fImageList(1, true)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	// SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	/* the preview box */
 	

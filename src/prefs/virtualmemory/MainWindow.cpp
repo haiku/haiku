@@ -99,7 +99,7 @@ MainWindow::MainWindow(BRect frame, int physMemVal, int currSwapVal, int minVal,
 	revertButton = new BButton(*(new BRect(95, 138, 170, 158)), "RevertButton", "Revert", new BMessage(REVERT_BUTTON_MSG), B_FOLLOW_ALL, B_WILL_DRAW);
 	revertButton->SetEnabled(false);
 	
-	topLevelView = new BBox(Bounds(), "TopLevelView", B_FOLLOW_ALL, B_WILL_DRAW, B_NO_BORDER);
+	topLevelView = new BBox(Bounds(), "TopLevelView", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
 	topLevelView->AddChild(boxView);
 	topLevelView->AddChild(defaultButton);
 	topLevelView->AddChild(revertButton);

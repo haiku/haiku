@@ -100,7 +100,7 @@ class PreView : public BControl {
 };
 
 
-class BGView : public BView {
+class BGView : public BBox {
 	public:
 		BGView(BRect frame, const char *name, int32 resize, int32 flags);
 		~BGView(void);
