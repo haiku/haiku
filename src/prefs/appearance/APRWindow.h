@@ -8,6 +8,7 @@
 
 class APRView;
 class DecView;
+class CurView;
 
 class APRWindow : public BWindow 
 {
@@ -19,6 +20,7 @@ public:
 	BTabView *tabview;
 	APRView *colors;
 	DecView *decorators;
+	CurView *cursors;
 };
 
 #endif

@@ -2,10 +2,13 @@
 #define DEFS_H_
 
 // If these paths are changed, ensure that they all end in a '/' character
+/*
 #define SETTINGS_DIR "/boot/home/config/settings/app_server/"
 #define COLOR_SET_DIR "/boot/home/config/settings/color_sets/"
+#define CURSOR_SET_DIR "/boot/home/config/settings/cursor_sets/"
 #define DECORATORS_DIR "/boot/home/config/add-ons/decorators/"
 #define COLOR_SETTINGS_NAME "system_colors"
+*/
 
 #define APPLY_SETTINGS 'aply'
 #define REVERT_SETTINGS 'rvrt'

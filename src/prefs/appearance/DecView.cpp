@@ -38,6 +38,7 @@
 #include <ServerProtocol.h>
 #include <File.h>
 #include <stdio.h>
+#include "ServerConfig.h"
 #include "RGBColor.h"
 #include "defs.h"
 #include "PreviewDriver.h"
@@ -178,7 +179,7 @@ void DecView::SaveSettings(void)
 	if(!item)
 		return;
 	
-	BString path(SETTINGS_DIR);
+	BString path(SERVER_SETTINGS_DIR);
 	path+="DecoratorSettings";
 	printf("%s\n",path.String());
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
@@ -193,10 +194,10 @@ void DecView::LoadSettings(void)
 	settings.MakeEmpty();
 
 	BDirectory dir,newdir;
-	if(dir.SetTo(SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
-		create_directory(SETTINGS_DIR,0777);
+	if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
+		create_directory(SERVER_SETTINGS_DIR,0777);
 
-	BString path(SETTINGS_DIR);
+	BString path(SERVER_SETTINGS_DIR);
 	path+="DecoratorSettings";
 	BFile file(path.String(),B_READ_ONLY);
 

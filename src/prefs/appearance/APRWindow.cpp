@@ -2,6 +2,7 @@
 #include "APRWindow.h"
 #include "APRView.h"
 #include "DecView.h"
+#include "CurView.h"
 #include "defs.h"
 
 APRWindow::APRWindow(BRect frame)
@@ -19,6 +20,10 @@ APRWindow::APRWindow(BRect frame)
 	decorators=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
 	tab=new BTab(decorators);
 	tabview->AddTab(decorators,tab);
+
+	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
+	tab=new BTab(cursors);
+	tabview->AddTab(cursors,tab);
 
 	AddChild(tabview);
 	decorators->SetColors(colors->settings);
