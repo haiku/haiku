@@ -1,0 +1,54 @@
+SubDir OBOS_TOP src tests kits interface picture ;
+
+UsePrivateHeaders interface ;
+
+SimpleTest
+	TestPictureApp
+	:
+	PictureTestApp.cpp
+	PictureTestView.cpp
+	TestView.cpp
+	PictureTestWindow.cpp
+	PictureIterator.cpp
+	PicturePrinter.cpp
+	;	
+
+LinkSharedOSLibs
+	TestPictureApp
+	:
+	be
+	root
+	;
+
+
+SimpleTest
+	DumpPrintJob
+	:
+	DumpPrintJob.cpp
+	PictureIterator.cpp
+	PicturePrinter.cpp
+	PrintJobReader.cpp
+	;
+
+LinkSharedOSLibs
+	DumpPrintJob
+	:
+	be
+	root
+	;
+
+SimpleTest
+	Preview
+	:
+	Preview.cpp
+	PictureIterator.cpp
+	PicturePrinter.cpp
+	PrintJobReader.cpp
+	;
+
+LinkSharedOSLibs
+	Preview
+	:
+	be
+	root
+	;
