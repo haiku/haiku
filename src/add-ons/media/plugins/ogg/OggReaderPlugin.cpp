@@ -125,7 +125,13 @@ oggReader::Sniff(int32 *streamCount)
 	off_t current_position = 0;
 	if (fSeekable) {
 		current_position = fSeekable->Seek(0,SEEK_CUR);
-		fSeekable->Seek(0,SEEK_SET);
+		if (current_position < 0) {
+			fSeekable = 0;
+		} else {
+			if (fSeekable->Seek(0,SEEK_SET) < 0) {
+				fSeekable = 0;
+			}
+		}
 	}
 
 	ogg_page page;
@@ -169,7 +175,13 @@ oggReader::Sniff(int32 *streamCount)
 	*streamCount = fStreams.size();
 	if (fSeekable) {
 		fPostSniffPosition = fSeekable->Seek(0,SEEK_CUR);
-		fSeekable->Seek(current_position,SEEK_SET);
+		if (fPostSniffPosition < 0) {
+			fSeekable = 0;
+		} else {
+			if (fSeekable->Seek(current_position,SEEK_SET) < 0) {
+				fSeekable = 0;
+			}
+		}
 	}
 	return B_OK;
 }
@@ -257,8 +269,9 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 		*duration = INT64_MAX;
 	}
 	ogg_packet * packet = &fInitialHeaderPackets[stream->serialno];
-	*infoBuffer = (void*)packet;
-	*infoSize = sizeof(ogg_packet);
+	format->SetMetaData((void*)packet,sizeof(ogg_packet));
+	*infoBuffer = 0;
+	*infoSize = 0;
 	return B_OK;
 }
 
