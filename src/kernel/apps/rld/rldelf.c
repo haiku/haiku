@@ -72,6 +72,8 @@ typedef struct image_t {
 	uint32				flags;
 
 	addr 				entry_point;
+	addr				init_routine;
+	addr				term_routine;
 	addr 				dynamic_ptr; 	// pointer to the dynamic section
 
 	// pointer to symbol participation data structures
@@ -484,6 +486,12 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 		addr     load_address;
 		unsigned addr_specifier;
 
+		// for BeOS compatibility: if we load an old BeOS executable, we
+		// have to relocate it, if possible - we recognize it because the
+		// vmstart is set to 0 (hopefully always)
+		if (fixed && image->regions[i].vmstart == 0)
+			fixed = false;
+
 		sprintf(region_name, "%s:seg_%d(%s)",
 			path, i, (image->regions[i].flags & RFLAG_RW) ? "RW" : "RO");
 
@@ -628,6 +636,12 @@ parse_dynamic_segment(image_t *image)
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;
 				break;
+			case DT_INIT:
+				image->init_routine = (d[i].d_un.d_ptr + image->regions[0].delta);
+				break;
+			case DT_FINI:
+				image->term_routine = (d[i].d_un.d_ptr + image->regions[0].delta);
+				break;
 			default:
 				continue;
 		}
@@ -761,8 +775,8 @@ register_image(image_t *image, const char *path)
 	info.type = image->type;
 	info.sequence = 0;
 	info.init_order = 0;
-	info.init_routine = (void *)image->entry_point;
-	info.term_routine = (void *)image->entry_point;
+	info.init_routine = (void *)image->init_routine;
+	info.term_routine = (void *)image->term_routine;
 	info.device = 0;
 	info.node = 0;
 	strlcpy(info.name, path, sizeof(info.name));
@@ -916,7 +930,7 @@ init_dependencies(image_t *image, bool initHead)
 	}
 
 	for (i = 0; i < slot; i++) {
-		addr _initf = initList[i]->entry_point;
+		addr _initf = initList[i]->init_routine;
 		libinit_f *initf = (libinit_f *)(_initf);
 
 		if (initf)
@@ -1036,8 +1050,8 @@ load_library(char const *path, uint32 flags)
 status_t
 unload_library(image_id imageID)
 {
-	int retval;
-	image_t *iter;
+	status_t status;
+	image_t *image;
 
 	rld_lock();
 		// for now, just do stupid simple global locking
@@ -1046,29 +1060,31 @@ unload_library(image_id imageID)
 	 * we only check images that have been already initialized
 	 */
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		if (iter->id == imageID) {
+	for (image = gLoadedImages.head; image; image = image->next) {
+		if (image->id == imageID) {
 			/*
 			 * do the unloading
 			 */
-			put_image(iter);
+			put_image(image);
 			break;
 		}
 	}
 
-	retval = iter ? B_OK : -1;
+	status = image ? B_OK : B_BAD_IMAGE_ID;
 
-	while ((iter = gDisposableImages.head) != NULL) {
+	while ((image = gDisposableImages.head) != NULL) {
 		// call image fini here...
+		if (image->term_routine)
+			((libinit_f *)image->term_routine)(image->id, gProgramArgs);
 
-		dequeue_image(&gDisposableImages, iter);
-		unmap_image(iter);
+		dequeue_image(&gDisposableImages, image);
+		unmap_image(image);
 
-		delete_image(iter);
+		delete_image(image);
 	}
 
 	rld_unlock();
-	return retval;
+	return status;
 }
 
 

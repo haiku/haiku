@@ -27,5 +27,5 @@ rldmain(void *_args)
 		return -1;
 
 	// call the program entry point (usually _start())
-	return ((int (*)(void *))entry)(args);
+	return ((int (*)(int, void *, void *, void *))entry)(args->argc, args->argv, args->envp, args);
 }
