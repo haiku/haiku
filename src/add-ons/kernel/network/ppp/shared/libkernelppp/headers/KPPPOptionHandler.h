@@ -48,6 +48,8 @@ class KPPPOptionHandler {
 		virtual status_t StackControl(uint32 op, void *data);
 			// called by netstack (forwarded by KPPPInterface)
 		
+		virtual void ProfileChanged();
+		
 		// we want to send a configure request or we received a reply
 		virtual status_t AddToRequest(KPPPConfigurePacket& request) = 0;
 		virtual status_t ParseNak(const KPPPConfigurePacket& nak) = 0;

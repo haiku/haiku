@@ -93,7 +93,28 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 {
 	entry->interface = this;
 	
-	fSettings = dup_driver_settings(settings);
+	if(name) {
+		// load settings from description file
+		char path[B_PATH_NAME_LENGTH];
+		sprintf(path, "pppidf/%s", name);
+			// XXX: TODO: change base path to "/etc/ppp" when settings API supports it
+		
+		void *handle = load_driver_settings(path);
+		if(!handle) {
+			fInitStatus = B_ERROR;
+			return;
+		}
+		
+		fSettings = dup_driver_settings(get_driver_settings(handle));
+		unload_driver_settings(handle);
+	} else
+		fSettings = dup_driver_settings(settings);
+			// use the given settings
+	
+	if(!fSettings) {
+		fInitStatus = B_ERROR;
+		return;
+	}
 	fProfile.LoadSettings(profile, fSettings);
 	
 	// add internal modules
@@ -235,11 +256,12 @@ KPPPInterface::~KPPPInterface()
 			fFirstProtocol = fFirstProtocol->NextProtocol();
 		else
 			delete FirstProtocol();
+				// destructor removes protocol from list
 	}
 	
 	for(int32 index = 0; index < fModules.CountItems(); index++) {
 		put_module(fModules.ItemAt(index));
-		free(fModules.ItemAt(index));
+		delete[] fModules.ItemAt(index);
 	}
 	
 	free_driver_settings(fSettings);
@@ -336,7 +358,8 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			
 			ppp_interface_info *info = (ppp_interface_info*) data;
 			memset(info, 0, sizeof(ppp_interface_info_t));
-			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Name())
+				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			if(Ifnet())
 				info->if_unit = Ifnet()->if_unit;
 			else
@@ -416,6 +439,16 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			
 			ppp_report_request *request = (ppp_report_request*) data;
 			ReportManager().DisableReports(request->type, request->thread);
+		} break;
+		
+		case PPPC_SET_PROFILE: {
+			if(!data)
+				return B_ERROR;
+			
+			driver_settings *profile = (driver_settings*) data;
+			fProfile.LoadSettings(profile, fSettings);
+			
+			UpdateProfile();
 		} break;
 		
 		case PPPC_CONTROL_DEVICE: {
@@ -1155,17 +1188,19 @@ KPPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 	if(!name || strlen(name) > B_FILE_NAME_LENGTH)
 		return false;
 	
-	char *module_name = (char*) malloc(B_PATH_NAME_LENGTH);
+	char *moduleName = new char[B_PATH_NAME_LENGTH];
 	
-	sprintf(module_name, "%s/%s", PPP_MODULES_PATH, name);
+	sprintf(moduleName, "%s/%s", PPP_MODULES_PATH, name);
 	
 	ppp_module_info *module;
-	if(get_module(module_name, (module_info**) &module) != B_OK)
+	if(get_module(moduleName, (module_info**) &module) != B_OK) {
+		delete[] moduleName;
 		return false;
+	}
 	
 	// add the module to the list of loaded modules
 	// for putting them on our destruction
-	fModules.AddItem(module_name);
+	fModules.AddItem(moduleName);
 	
 	return module->add_to(Parent() ? *Parent() : *this, this, parameter, type);
 }
@@ -1191,7 +1226,7 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	// we must pass the basic tests like:
 	// do we have a device?
 	// did we load all modules?
-	if(InitCheck() != B_OK || !Device()) {
+	if(InitCheck() != B_OK) {
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1441,6 +1476,16 @@ KPPPInterface::UnregisterInterface()
 	fIfnet = NULL;
 	
 	return true;
+}
+
+
+// called when profile changes
+void
+KPPPInterface::UpdateProfile()
+{
+	KPPPLayer *layer = FirstProtocol();
+	for(; layer; layer = layer->Next())
+		layer->ProfileChanged();
 }
 
 

@@ -34,6 +34,8 @@ class KPPPLayer {
 		KPPPLayer *Next() const
 			{ return fNext; }
 		
+		virtual void ProfileChanged();
+		
 		virtual bool Up() = 0;
 		virtual bool Down() = 0;
 		

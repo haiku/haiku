@@ -21,7 +21,7 @@ KPPPOptionHandler::KPPPOptionHandler(const char *name, uint8 type,
 	if(name)
 		fName = strdup(name);
 	else
-		fName = strdup("Unknown");
+		fName = NULL;
 }
 
 
@@ -50,7 +50,8 @@ KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 			
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
-			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Name())
+				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->isEnabled = IsEnabled();
 		} break;
 		
@@ -78,4 +79,11 @@ KPPPOptionHandler::StackControl(uint32 op, void *data)
 	}
 	
 	return B_OK;
+}
+
+
+void
+KPPPOptionHandler::ProfileChanged()
+{
+	// do nothing by default
 }

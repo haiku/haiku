@@ -14,11 +14,18 @@
 
 #include <KPPPInterface.h>
 #include <KPPPModule.h>
+#include <KPPPUtils.h>
 #include <LockerHelper.h>
 
 #include "PPPoEDevice.h"
 #include "DiscoveryPacket.h"
 
+
+typedef struct pppoe_query {
+	ifnet *ethernetIfnet;
+	uint32 hostUniq;
+	thread_id receiver;
+} pppoe_query;
 
 #define PPPoE_MODULE_NAME		NETWORK_MODULES_ROOT "ppp/pppoe"
 
@@ -29,7 +36,63 @@ status_t std_ops(int32 op, ...);
 
 static BLocker sLock;
 static TemplateList<PPPoEDevice*> *sDevices;
+static TemplateList<pppoe_query*> *sQueries;
 
+
+static
+void
+SendQueryPacket(pppoe_query *query, DiscoveryPacket& discovery)
+{
+	char data[PPPoE_QUERY_REPORT_SIZE];
+	uint32 position = sizeof(uint32);
+	pppoe_tag *acName = discovery.TagWithType(AC_NAME);
+	
+	if(acName) {
+		if(acName->length >= PPPoE_QUERY_REPORT_SIZE)
+			return;
+		
+		memcpy(data + position, acName->data, acName->length);
+		position += acName->length;
+	}
+	
+	data[position++] = 0;
+	
+	pppoe_tag *tag;
+	for(int32 index = 0; index < discovery.CountTags(); index++) {
+		tag = discovery.TagAt(index);
+		if(tag && tag->type == SERVICE_NAME) {
+			if(position + tag->length >= PPPoE_QUERY_REPORT_SIZE)
+				return;
+			
+			memcpy(data + position, tag->data, tag->length);
+			position += tag->length;
+			data[position++] = 0;
+		}
+	}
+	
+	memcpy(data, &position, sizeof(uint32));
+		// add the total length
+	
+	send_data_with_timeout(query->receiver, PPPoE_QUERY_REPORT, data,
+		PPPoE_QUERY_REPORT_SIZE, 700000);
+}
+
+
+ifnet*
+FindPPPoEInterface(const char *name)
+{
+	if(!name)
+		return NULL;
+	
+	ifnet *current = get_interfaces();
+	for(; current; current = current->if_next) {
+		if(current->if_type == IFT_ETHER && current->if_name
+				&& !strcmp(current->if_name, name))
+			return current;
+	}
+	
+	return NULL;
+}
 
 uint32
 NewHostUniq()
@@ -72,8 +135,35 @@ pppoe_input(struct mbuf *packet)
 	ifnet *sourceIfnet = packet->m_pkthdr.rcvif;
 	complete_pppoe_header *header = mtod(packet, complete_pppoe_header*);
 	PPPoEDevice *device;
+	pppoe_query *query;
 	
 	LockerHelper locker(sLock);
+	
+	if(header->ethernetHeader.ether_type == ETHERTYPE_PPPOEDISC
+			&& header->pppoeHeader.length <= PPPoE_QUERY_REPORT_SIZE) {
+		for(int32 index = 0; index < sDevices->CountItems(); index++) {
+			query = sQueries->ItemAt(index);
+			
+			if(query && query->ethernetIfnet == sourceIfnet) {
+				if(header->pppoeHeader.code == PADO) {
+					DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
+					if(discovery.InitCheck() != B_OK) {
+						dprintf("PPPoE: received corrupted discovery packet!\n");
+						m_freem(packet);
+						return;
+					}
+					
+					pppoe_tag *hostTag = discovery.TagWithType(HOST_UNIQ);
+					if(hostTag && hostTag->length == 4
+							&& *((uint32*)hostTag->data) == query->hostUniq) {
+						SendQueryPacket(query, discovery);
+						m_freem(packet);
+						return;
+					}
+				}
+			}
+		}
+	}
 	
 	for(int32 index = 0; index < sDevices->CountItems(); index++) {
 		device = sDevices->ItemAt(index);
@@ -96,6 +186,7 @@ pppoe_input(struct mbuf *packet)
 				DiscoveryPacket discovery(packet, ETHER_HDR_LEN);
 				if(discovery.InitCheck() != B_OK) {
 					dprintf("PPPoE: received corrupted discovery packet!\n");
+					m_freem(packet);
 					return;
 				}
 				
@@ -145,7 +236,59 @@ static
 status_t
 control(uint32 op, void *data, size_t length)
 {
-	return B_ERROR;
+	switch(op) {
+		case PPPoE_GET_INTERFACES: {
+			int32 position = 0, count = 0;
+			char *names = (char*) data;
+			
+			ifnet *current = get_interfaces();
+			for(; current; current = current->if_next) {
+				if(current->if_type == IFT_ETHER && current->name) {
+					if(position + strlen(current->name) + 1 > length)
+						return B_NO_MEMORY;
+					
+					strcpy(names + position, current->name);
+					position += strlen(current->name) + 1;
+					++count;
+				}
+			}
+			
+			return count;
+		}
+		
+		case PPPoE_QUERY_SERVICES: {
+			// XXX: as all modules are loaded on-demand we must wait for the results
+			
+			if(!data || length != sizeof(pppoe_query_request))
+				return B_ERROR;
+			
+			pppoe_query_request *request = (pppoe_query_request*) data;
+			
+			pppoe_query query;
+			query.ethernetIfnet = FindPPPoEInterface(request->interfaceName);
+			if(!query.ethernetIfnet)
+				return B_BAD_VALUE;
+			
+			query.hostUniq = NewHostUniq();
+			query.receiver = request->receiver;
+			
+			sLock.Lock();
+			sQueries->AddItem(&query);
+			sLock.Unlock();
+			
+			snooze(2000000);
+				// wait two seconds for results
+			
+			sLock.Lock();
+			sQueries->RemoveItem(&query);
+			sLock.Unlock();
+		} break;
+		
+		default:
+			return B_ERROR;
+	}
+	
+	return B_OK;
 }
 
 
@@ -176,9 +319,8 @@ std_ops(int32 op, ...)
 			}
 			
 			set_max_linkhdr(PPPoE_HEADER_SIZE + ETHER_HDR_LEN);
-			
 			sDevices = new TemplateList<PPPoEDevice*>;
-			
+			sQueries = new TemplateList<pppoe_query*>;
 			sEthernet->set_pppoe_receiver(pppoe_input);
 			
 #if DEBUG

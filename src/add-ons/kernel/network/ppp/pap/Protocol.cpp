@@ -120,9 +120,7 @@ PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
 	fRequestID(0),
 	fNextTimeout(0)
 {
-	fUser[0] = fPassword[0] = 0;
-	
-	ParseSettings(Interface().Profile().SettingsFor("authenticator", "pap"));
+	ProfileChanged();
 }
 
 
@@ -138,6 +136,13 @@ PAP::InitCheck() const
 		return B_ERROR;
 	
 	return KPPPProtocol::InitCheck();
+}
+
+
+void
+PAP::ProfileChanged()
+{
+	ParseSettings(Interface().Profile().SettingsFor("authenticator", "pap"));
 }
 
 

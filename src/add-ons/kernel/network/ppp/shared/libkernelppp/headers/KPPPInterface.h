@@ -194,7 +194,7 @@ class KPPPInterface : public KPPPLayer {
 			// saves the returned ifnet structure
 		bool UnregisterInterface();
 		
-		void SetName(const char *name);
+		void UpdateProfile();
 		
 		status_t StackControl(uint32 op, void *data);
 			// stack routes ioctls to interface

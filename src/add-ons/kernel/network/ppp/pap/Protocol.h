@@ -63,6 +63,8 @@ class PAP : public KPPPProtocol {
 		pap_state State() const
 			{ return fState; }
 		
+		virtual void ProfileChanged();
+		
 		virtual bool Up();
 		virtual bool Down();
 		

@@ -41,7 +41,8 @@ KPPPDevice::Control(uint32 op, void *data, size_t length)
 			
 			ppp_device_info *info = (ppp_device_info*) data;
 			memset(info, 0, sizeof(ppp_device_info_t));
-			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Name())
+				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->MTU = MTU();
 			info->inputTransferRate = InputTransferRate();
 			info->outputTransferRate = OutputTransferRate();

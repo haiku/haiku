@@ -187,6 +187,26 @@ KPPPLCP::AdditionalOverhead() const
 }
 
 
+void
+KPPPLCP::ProfileChanged()
+{
+	KPPPLCPExtension *extension;
+	KPPPOptionHandler *handler;
+	
+	for(int32 index = 0; index < CountLCPExtensions(); index++) {
+		extension = LCPExtensionAt(index);
+		if(extension)
+			extension->ProfileChanged();
+	}
+	
+	for(int32 index = 0; index < CountOptionHandlers(); index++) {
+		handler = OptionHandlerAt(index);
+		if(handler)
+			handler->ProfileChanged();
+	}
+}
+
+
 bool
 KPPPLCP::Up()
 {

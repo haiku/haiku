@@ -34,7 +34,7 @@ KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 	if(type)
 		fType = strdup(type);
 	else
-		fType = strdup("Unknown");
+		fType = NULL;
 	
 	const char *sideString = get_parameter_value("side", settings);
 	if(sideString)
@@ -66,8 +66,10 @@ KPPPProtocol::Control(uint32 op, void *data, size_t length)
 			
 			ppp_protocol_info *info = (ppp_protocol_info*) data;
 			memset(info, 0, sizeof(ppp_protocol_info_t));
-			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
-			strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Name())
+				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Type())
+				strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->activationPhase = ActivationPhase();
 			info->addressFamily = AddressFamily();
 			info->flags = Flags();

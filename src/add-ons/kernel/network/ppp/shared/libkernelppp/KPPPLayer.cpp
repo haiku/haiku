@@ -19,8 +19,8 @@
 KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),
 	fOverhead(overhead),
-	fLevel(level),
 	fName(NULL),
+	fLevel(level),
 	fNext(NULL)
 {
 	SetName(name);
@@ -37,6 +37,13 @@ status_t
 KPPPLayer::InitCheck() const
 {
 	return fInitStatus;
+}
+
+
+void
+KPPPLayer::ProfileChanged()
+{
+	// do nothing by default
 }
 
 
@@ -76,5 +83,5 @@ KPPPLayer::SetName(const char *name)
 	if(name)
 		fName = strdup(name);
 	else
-		fName = strdup("Unknown");
+		fName = NULL;
 }

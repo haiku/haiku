@@ -42,7 +42,7 @@ _KPPPAuthenticationHandler::NextAuthenticator(const KPPPProtocol *start,
 	KPPPProtocol *current = start ? start->NextProtocol() : Interface().FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
-		if(!strcasecmp(current->Type(), AUTHENTICATOR_TYPE_STRING)
+		if(current->Type() && !strcasecmp(current->Type(), AUTHENTICATOR_TYPE_STRING)
 				&& current->OptionHandler() && current->Side() == side)
 			return current;
 	}
@@ -136,7 +136,7 @@ _KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 	
 	fPeerAuthenticatorRejected = true;
 	KPPPProtocol *authenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
-	if(authenticator
+	if(authenticator && authenticator->Type()
 			&& !strcasecmp(authenticator->Type(), AUTHENTICATOR_TYPE_STRING)
 			&& authenticator->OptionHandler())
 		fSuggestedPeerAuthenticator = authenticator;
@@ -199,8 +199,8 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	
 	// try to find the requested protocol
 	fLocalAuthenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
-	if(fLocalAuthenticator &&
-			!strcasecmp(fLocalAuthenticator->Type(), AUTHENTICATOR_TYPE_STRING)
+	if(fLocalAuthenticator && fLocalAuthenticator->Type()
+			&& !strcasecmp(fLocalAuthenticator->Type(), AUTHENTICATOR_TYPE_STRING)
 			&& fLocalAuthenticator->OptionHandler())
 		return fLocalAuthenticator->OptionHandler()->ParseRequest(request, index,
 			nak, reject);

@@ -68,6 +68,8 @@ class IPCP : public KPPPProtocol {
 		
 		virtual status_t StackControl(uint32 op, void *data);
 		
+		virtual void ProfileChanged();
+		
 		virtual bool Up();
 		virtual bool Down();
 		

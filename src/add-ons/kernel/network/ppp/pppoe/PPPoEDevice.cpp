@@ -49,6 +49,8 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	fEthernetIfnet(NULL),
 	fSessionID(0),
 	fHostUniq(NewHostUniq()),
+	fACName(NULL),
+	fServiceName(NULL),
 	fAttempts(0),
 	fNextTimeout(0),
 	fState(INITIAL)
@@ -74,14 +76,7 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	fACName = get_parameter_value(PPPoE_AC_NAME_KEY, settings);
 	fServiceName = get_parameter_value(PPPoE_SERVICE_NAME_KEY, settings);
 	
-	ifnet *current = get_interfaces();
-	for(; current; current = current->if_next) {
-		if(current->if_type == IFT_ETHER && current->if_name
-				&& !strcmp(current->if_name, interfaceName)) {
-			fEthernetIfnet = current;
-			break;
-		}
-	}
+	fEthernetIfnet = FindPPPoEInterface(interfaceName);
 	
 #if DEBUG
 	if(!fEthernetIfnet)
@@ -312,6 +307,9 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	
 	locker.UnlockNow();
 	
+	if(!packet)
+		dprintf("PPPoEDevice::Send(): packet is NULL!\n");
+	
 	if(EthernetIfnet()->output(EthernetIfnet(), packet, &destination, NULL) != B_OK) {
 		dprintf("PPPoEDevice::Send(): EthernetIfnet()->output() failed!\n");
 		DownEvent();
@@ -385,6 +383,9 @@ PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
 				DiscoveryPacket reply(PADR);
 				for(int32 index = 0; index < discovery.CountTags(); index++) {
 					tag = discovery.TagAt(index);
+					if(!tag)
+						continue;
+					
 					switch(tag->type) {
 						case SERVICE_NAME:
 							if(!hasServiceName && (!ServiceName()

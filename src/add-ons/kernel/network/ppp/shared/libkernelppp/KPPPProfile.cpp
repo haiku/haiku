@@ -55,6 +55,9 @@ void
 KPPPProfile::LoadSettings(const driver_settings *profile,
 	driver_settings *interfaceSettings)
 {
+	if(fSettings != Interface().Settings())
+		free_driver_settings(fSettings);
+	
 	// -----------------------------
 	// given profile
 	// -----------------------------

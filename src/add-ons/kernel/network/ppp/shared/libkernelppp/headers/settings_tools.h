@@ -12,19 +12,23 @@
 
 
 // TODO: remove this as soon as we get the extended driver_settings API
-driver_settings *dup_driver_settings(const driver_settings *settings);
-void free_driver_settings(driver_settings *settings);
+extern driver_settings *dup_driver_settings(const driver_settings *settings);
+extern void free_driver_settings(driver_settings *settings);
 
-bool equal_driver_settings(const driver_settings *lhs, const driver_settings *rhs);
-bool equal_driver_parameters(const driver_parameter *lhs, const driver_parameter *rhs);
-bool equal_interface_settings(const driver_settings *lhs, const driver_settings *rhs);
+extern bool equal_driver_settings(const driver_settings *lhs,
+	const driver_settings *rhs);
+extern bool equal_driver_parameters(const driver_parameter *lhs,
+	const driver_parameter *rhs);
+extern bool equal_interface_settings(const driver_settings *lhs,
+	const driver_settings *rhs);
 	// this compares only the relevant parts of the interface settings
 
-ppp_side get_side_string_value(const char *sideString, ppp_side unknownValue);
-bool get_boolean_value(const char *string, bool unknownValue);
-const driver_parameter *get_parameter_with_name(const char *name,
+extern ppp_side get_side_string_value(const char *sideString, ppp_side unknownValue);
+extern bool get_boolean_value(const char *string, bool unknownValue);
+extern const driver_parameter *get_parameter_with_name(const char *name,
 	const driver_settings *settings);
-const char *get_settings_value(const char *name, const driver_settings *settings);
+extern const char *get_settings_value(const char *name,
+	const driver_settings *settings);
 
 
 inline

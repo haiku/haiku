@@ -1538,7 +1538,8 @@ KPPPStateMachine::RCREvent(struct mbuf *packet)
 		}
 		
 #if DEBUG
-		dprintf("KPPPSM::RCREvent(): OH=%s\n", optionHandler->Name());
+		dprintf("KPPPSM::RCREvent(): OH=%s\n",
+			optionHandler->Name() ? optionHandler->Name() : "Unknown");
 #endif
 		result = optionHandler->ParseRequest(request, index, nak, reject);
 		

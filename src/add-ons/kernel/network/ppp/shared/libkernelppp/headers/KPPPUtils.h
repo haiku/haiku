@@ -18,7 +18,7 @@ class KPPPProtocol;
 
 
 // helper functions
-bool IsProtocolAllowed(const KPPPProtocol& protocol);
+extern bool IsProtocolAllowed(const KPPPProtocol& protocol);
 
 // the list template does not support iterating over each item :(
 // this template iterates over each item in an indexed list
@@ -35,10 +35,10 @@ ForEachItem(_LIST& list, _FUNCTION function)
 // These are very simple send/receive_data functions with a timeout
 // and there is a race condition beween has_data() and send/receive_data().
 // Timeouts in ms.
-status_t send_data_with_timeout(thread_id thread, int32 code, void *buffer,
+extern status_t send_data_with_timeout(thread_id thread, int32 code, void *buffer,
 	size_t buffer_size, uint32 timeout);
-status_t receive_data_with_timeout(thread_id *sender, int32 *code, void *buffer,
-	size_t buffer_size, uint32 timeout);
+extern status_t receive_data_with_timeout(thread_id *sender, int32 *code,
+	void *buffer, size_t buffer_size, uint32 timeout);
 
 
 #endif

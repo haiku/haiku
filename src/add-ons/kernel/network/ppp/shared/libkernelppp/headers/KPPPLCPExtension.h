@@ -46,6 +46,8 @@ class KPPPLCPExtension {
 		virtual status_t StackControl(uint32 op, void *data);
 			// called by netstack (forwarded by KPPPInterface)
 		
+		virtual void ProfileChanged();
+		
 		virtual status_t Receive(struct mbuf *packet, uint8 code) = 0;
 		
 		virtual void Reset();

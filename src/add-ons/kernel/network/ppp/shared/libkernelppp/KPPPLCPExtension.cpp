@@ -20,7 +20,7 @@ KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code, KPPPInterface& 
 	if(name)
 		fName = strdup(name);
 	else
-		fName = strdup("Unknown");
+		fName = NULL;
 }
 
 
@@ -49,7 +49,8 @@ KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 			
 			ppp_simple_handler_info *info = (ppp_simple_handler_info*) data;
 			memset(info, 0, sizeof(ppp_simple_handler_info_t));
-			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			if(Name())
+				strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->isEnabled = IsEnabled();
 		} break;
 		
@@ -77,6 +78,13 @@ KPPPLCPExtension::StackControl(uint32 op, void *data)
 	}
 	
 	return B_OK;
+}
+
+
+void
+KPPPLCPExtension::ProfileChanged()
+{
+	// do nothing by default
 }
 
 

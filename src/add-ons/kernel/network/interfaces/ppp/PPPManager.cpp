@@ -9,8 +9,11 @@
 
 #include "PPPManager.h"
 #include <PPPControl.h>
+#include <KPPPModule.h>
 #include <KPPPUtils.h>
 #include <settings_tools.h>
+
+#include <net_stack_driver.h>
 
 #include <LockerHelper.h>
 
@@ -272,22 +275,7 @@ PPPManager::CreateInterfaceWithName(const char *name,
 	if(!name)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	char path[B_PATH_NAME_LENGTH];
-	sprintf(path, "pppidf/%s", name);
-		// XXX: TODO: change base path to "/etc/ppp" when settings API supports it
-	
-	void *handle = load_driver_settings(path);
-	if(!handle)
-		return PPP_UNDEFINED_INTERFACE_ID;
-	
-	const driver_settings *settings = get_driver_settings(handle);
-	if(!settings) {
-		unload_driver_settings(handle);
-		return PPP_UNDEFINED_INTERFACE_ID;
-	}
-	
-	ppp_interface_id result = _CreateInterface(name, settings, profile, parentID);
-	unload_driver_settings(handle);
+	ppp_interface_id result = _CreateInterface(name, NULL, profile, parentID);
 	
 	return result;
 }
@@ -422,8 +410,24 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 	// this method is intended for use by userland applications
 	
 	switch(op) {
-//		case PPPC_CONTROL_MODULE: {
-//		} break;
+		case PPPC_CONTROL_MODULE: {
+			if(length < sizeof(control_net_module_args) || !data)
+				return B_ERROR;
+			
+			control_net_module_args *args = (control_net_module_args*) data;
+			if(!args->name)
+				return B_ERROR;
+			
+			char name[B_PATH_NAME_LENGTH];
+			strcpy(name, PPP_MODULES_PATH);
+			strcat(name, args->name);
+			ppp_module_info *module;
+			if(get_module(name, (module_info**) &module) != B_OK
+					|| !module->control)
+				return B_ERROR;
+			
+			return module->control(args->op, args->data, args->length);
+		} break;
 		
 		case PPPC_CREATE_INTERFACE: {
 			if(length < sizeof(ppp_interface_description_info) || !data)
@@ -776,11 +780,11 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 	entry->accessing = 1;
 	entry->deleting = false;
 	fEntries.AddItem(entry);
-		// nothing bad can happen because we are in a locked section here
+		// nothing bad can happen because we are in a locked section
 	
 	new KPPPInterface(name, entry, id, settings, profile,
 		parentEntry ? parentEntry->interface : NULL);
-		// KPPPInterface will add itself to the entry (no need to do it here)
+			// KPPPInterface will add itself to the entry (no need to do it here)
 	if(entry->interface->InitCheck() != B_OK) {
 		delete entry->interface;
 		delete entry;
@@ -788,7 +792,7 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 	}
 	
 	locker.UnlockNow();
-		// it is safe to access the manager from userland
+		// it is safe to access the manager from userland now
 	
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
 			&id, sizeof(ppp_interface_id))) {

@@ -37,20 +37,7 @@ IPCP::IPCP(KPPPInterface& interface, driver_parameter *settings)
 	fTerminateID(0),
 	fNextTimeout(0)
 {
-	// reset configurations
-	memset(&fLocalConfiguration, 0, sizeof(ipcp_configuration));
-	memset(&fPeerConfiguration, 0, sizeof(ipcp_configuration));
-	
-	// reset requests
-	memset(&fLocalRequests, 0, sizeof(ipcp_requests));
-	memset(&fPeerRequests, 0, sizeof(ipcp_requests));
-	
-	// Parse settings:
-	// "Local" and "Peer" describe each side's settings
-	const driver_parameter *profile
-		= Interface().Profile().SettingsFor("protocol", "ipcp");
-	ParseSideRequests(get_parameter_with_name("Local", profile), PPP_LOCAL_SIDE);
-	ParseSideRequests(get_parameter_with_name("Peer", profile), PPP_PEER_SIDE);
+	ProfileChanged();
 }
 
 
@@ -89,6 +76,26 @@ IPCP::StackControl(uint32 op, void *data)
 	}
 	
 	return B_OK;
+}
+
+
+void
+IPCP::ProfileChanged()
+{
+	// reset configurations
+	memset(&fLocalConfiguration, 0, sizeof(ipcp_configuration));
+	memset(&fPeerConfiguration, 0, sizeof(ipcp_configuration));
+	
+	// reset requests
+	memset(&fLocalRequests, 0, sizeof(ipcp_requests));
+	memset(&fPeerRequests, 0, sizeof(ipcp_requests));
+	
+	// Parse settings:
+	// "Local" and "Peer" describe each side's settings
+	const driver_parameter *profile
+		= Interface().Profile().SettingsFor("protocol", "ipcp");
+	ParseSideRequests(get_parameter_with_name("Local", profile), PPP_LOCAL_SIDE);
+	ParseSideRequests(get_parameter_with_name("Peer", profile), PPP_PEER_SIDE);
 }
 
 

@@ -134,6 +134,16 @@ PPPInterface::HasSettings(const driver_settings *settings) const
 }
 
 
+void
+PPPInterface::SetProfile(const driver_settings *profile) const
+{
+	if(InitCheck() != B_OK || !profile)
+		return;
+	
+	Control(PPPC_SET_PROFILE, const_cast<driver_settings*>(profile), 0);
+}
+
+
 bool
 PPPInterface::Up() const
 {
