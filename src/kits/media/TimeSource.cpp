@@ -21,15 +21,19 @@
 
 namespace BPrivate { namespace media {
 
-struct TimeSourceTransmit // sizeof() must be <= 4096
+#define _atomic_read(p) 	atomic_or((p), 0)
+
+#define TS_AREA_SIZE		B_PAGE_SIZE		// must be multiple of page size
+#define TS_INDEX_COUNT 		128				// must be power of two
+
+struct TimeSourceTransmit // sizeof(TimeSourceTransmit) must be <= TS_AREA_SIZE
 {
-	#define INDEX_COUNT 128
 	int32 readindex;
 	int32 writeindex;
 	int32 isrunning;
-	bigtime_t realtime[INDEX_COUNT];
-	bigtime_t perftime[INDEX_COUNT];
-	float drift[INDEX_COUNT];
+	bigtime_t realtime[TS_INDEX_COUNT];
+	bigtime_t perftime[TS_INDEX_COUNT];
+	float drift[TS_INDEX_COUNT];
 };
 
 struct SlaveNodes
@@ -158,7 +162,8 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 //	}
 
 	int32 index;
-	index = atomic_and(&fBuf->readindex, INDEX_COUNT - 1);
+	index = _atomic_read(&fBuf->readindex);
+	index &= (TS_INDEX_COUNT - 1);
 	*real_time = fBuf->realtime[index];
 	*performance_time = fBuf->perftime[index];
 	*drift = fBuf->drift[index];
@@ -288,13 +293,14 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 	}
 
 	int32 index;
-	index = atomic_add(&fBuf->writeindex, 1) & (INDEX_COUNT - 1);
+	index = atomic_add(&fBuf->writeindex, 1);
+	index &= (TS_INDEX_COUNT - 1);
 	fBuf->realtime[index] = real_time;
 	fBuf->perftime[index] = performance_time;
 	fBuf->drift[index] = drift;
 	atomic_add(&fBuf->readindex, 1);
 
-	//printf("BTimeSource::PublishTime timesource %ld, index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), fBuf->readindex, performance_time, real_time, drift);
+//	printf("BTimeSource::PublishTime timesource %ld, write index %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), index, performance_time, real_time, drift);
 }
 
 
@@ -304,6 +310,8 @@ BTimeSource::BroadcastTimeWarp(bigtime_t at_real_time,
 {
 	CALLED();
 	// calls BMediaNode::TimeWarp() of all slaved nodes
+	
+	TRACE("BTimeSource::BroadcastTimeWarp: at_real_time %Ld, new_performance_time %Ld\n", at_real_time, new_performance_time);
 	
 	BAutolock lock(fSlaveNodes->locker);
 
@@ -403,7 +411,7 @@ BTimeSource::FinishCreate()
 	
 	char name[32];
 	sprintf(name, "__timesource_buf_%ld", ID());
-	fArea = create_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	fArea = create_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, TS_AREA_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fArea <= 0) {
 		ERROR("BTimeSource::BTimeSource couldn't create area, node %ld\n", ID());
 		fBuf = NULL;
