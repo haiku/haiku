@@ -22,6 +22,7 @@
 #include <Window.h>
 
 #include "InputServerTypes.h"
+#include "TMListItem.h"
 
 class TMBox : public BBox {
 public:
@@ -31,6 +32,15 @@ public:
 	void Pulse();
 	
 	BListView *fListView;
+};
+
+class TMDescView : public BBox {
+public:
+	TMDescView(BRect bounds);
+	void Draw(BRect bounds);
+	void SetItem(TMListItem *item);
+private:
+	TMListItem *fItem;
 };
 
 class TMWindow : public BWindow 
@@ -48,6 +58,7 @@ private:
 	
 	BButton *fKillApp;
 	TMBox *fBackground;
+	TMDescView *fDescView;
 };
 
 

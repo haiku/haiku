@@ -675,7 +675,6 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				LOG("TeamMonitor called\n");
 				
 				// show the team monitor
-				// argh we don't have one !
 				if (!dev->owner->fTMWindow)
 					dev->owner->fTMWindow = new TMWindow();
 				

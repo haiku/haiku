@@ -24,7 +24,8 @@
 TMListItem::TMListItem(team_info &tinfo) 
 	: BListItem(),
 		fInfo(tinfo),
-		fIcon(BRect(0,0,15,15), B_CMAP8)
+		fIcon(BRect(0,0,15,15), B_CMAP8),
+		fLargeIcon(BRect(0,0,31,31), B_CMAP8)
 {
 	SetHeight(16 + kITEM_MARGIN);
 	
@@ -35,6 +36,7 @@ TMListItem::TMListItem(team_info &tinfo)
 		BNode node(info.name);
 		BNodeInfo nodeInfo(&node);
 		nodeInfo.GetTrackerIcon(&fIcon, B_MINI_ICON);
+		nodeInfo.GetTrackerIcon(&fLargeIcon, B_LARGE_ICON);
 	}
 }
 

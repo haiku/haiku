@@ -30,11 +30,13 @@ public:
 	virtual void Update(BView *owner, const BFont *finfo);
 	const team_info	*GetInfo();
 	
+	const BBitmap *LargeIcon() { return &fLargeIcon; };
+	const BPath *Path() { return &fPath; };
+	bool		IsSystemServer();
 	bool		fFound;
 private:
-	bool		IsSystemServer();
 	team_info	fInfo;
-	BBitmap		fIcon;
+	BBitmap		fIcon, fLargeIcon;
 	BPath		fPath;
 };
 

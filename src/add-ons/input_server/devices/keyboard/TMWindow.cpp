@@ -25,6 +25,10 @@ const uint32 TM_FORCE_REBOOT = 'TMfr';
 const uint32 TM_KILL_APPLICATION = 'TMka';
 const uint32 TM_SELECTED_TEAM = 'TMst';
 
+extern "C" void _kshutdown_(long arg);
+#define SHUTDOWN_HALT 0
+#define SHUTDOWN_REBOOT 1
+
 TMWindow::TMWindow()
 	: BWindow(BRect(0,0,350,300), "Team Monitor", 
 		B_TITLED_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, 
@@ -66,6 +70,12 @@ TMWindow::TMWindow()
 	fBackground->AddChild(fKillApp);
 	fKillApp->SetEnabled(false);
 	
+	rect.top = rect.bottom + 10;
+	rect.bottom = rect.top + 65;
+	rect.right = rect.left + Bounds().right - 10;
+	fDescView = new TMDescView(rect);
+	fBackground->AddChild(fDescView);
+	
 	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
 	BPoint 	pt;
 	pt.x = screenFrame.Width()/2 - Bounds().Width()/2;
@@ -90,6 +100,9 @@ TMWindow::MessageReceived(BMessage *msg)
 {
 	switch(msg->what)
 	{
+		case TM_FORCE_REBOOT:
+			_kshutdown_(SHUTDOWN_REBOOT);
+			break;
 		case TM_KILL_APPLICATION: {
 				TMListItem *item = (TMListItem*)fBackground->fListView->ItemAt(
 					fBackground->fListView->CurrentSelection());
@@ -97,8 +110,12 @@ TMWindow::MessageReceived(BMessage *msg)
 				fKillApp->SetEnabled(false);
 			}
 			break;
-		case TM_SELECTED_TEAM:
-			fKillApp->SetEnabled(true);
+		case TM_SELECTED_TEAM: {
+				fKillApp->SetEnabled(fBackground->fListView->CurrentSelection() >= 0);
+				TMListItem *item = (TMListItem*)fBackground->fListView->ItemAt(
+					fBackground->fListView->CurrentSelection());
+				fDescView->SetItem(item);
+			}
 			break;
 		case TM_CANCEL:
 			Disable();
@@ -126,14 +143,17 @@ TMWindow::Enable()
 {
 	SetPulseRate(1000000);
 	
-	if (IsHidden())
+	if (IsHidden()) {
+		PostMessage(B_PULSE);
 		Show();
+	}
 }
 
 
 void
 TMWindow::Disable()
 {
+	fBackground->fListView->DeselectAll();
 	SetPulseRate(0);
 	Hide();
 }
@@ -200,4 +220,67 @@ TMBox::Pulse()
 	}
 
 	fListView->Invalidate();
+}
+
+
+TMDescView::TMDescView(BRect rect)
+	: BBox(rect, "descview", B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER),
+	fItem(NULL)
+{
+
+
+}
+
+
+void
+TMDescView::Draw(BRect rect)
+{
+	if (fItem) {
+		BRect frame(rect);
+		frame.OffsetBy(2,3);
+		frame.Set(frame.left, frame.top, frame.left+31, frame.top+31);
+		SetDrawingMode(B_OP_OVER);
+		DrawBitmap(fItem->LargeIcon(), frame);
+		SetDrawingMode(B_OP_COPY);
+		
+		BFont		font = be_plain_font;
+		font_height	finfo;
+		font.GetHeight(&finfo);
+		SetFont(&font);
+		MovePenTo(frame.right+9, frame.top - 2 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
+					(finfo.ascent + finfo.descent) - 1);
+		DrawString(fItem->Path()->Path());
+		
+		if (fItem->IsSystemServer()) {
+			MovePenTo(frame.right+9, frame.top + 1 + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) *3 / 4) +
+				(finfo.ascent + finfo.descent) - 1);
+			DrawString("(This team is a component of the BeOS");
+		}
+	} else {
+		BFont		font = be_plain_font;
+		font_height	finfo;
+		font.GetHeight(&finfo);
+		SetFont(&font);
+		BPoint point(rect.left+4, rect.top - 9 + ((rect.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 4) +
+					(finfo.ascent + finfo.descent) - 1);
+		MovePenTo(point);
+		DrawString("Select an application from the list above and click the \"Kill\" button in");
+		
+		point.y += 13;
+		MovePenTo(point);
+		DrawString("order to close it.");
+		
+		point.y += 26;
+		MovePenTo(point);
+		DrawString("Hold CONTROL+ALT+DELETE for 4 seconds to reboot.");
+		
+	}
+}
+
+
+void
+TMDescView::SetItem(TMListItem *item)
+{
+	fItem = item;
+	Invalidate();
 }
