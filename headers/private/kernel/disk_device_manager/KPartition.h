@@ -84,8 +84,8 @@ public:
 	status_t SetType(const char *type);
 	const char *Type() const;
 
-	status_t SetContentType(const char *type);
 	const char *ContentType() const;
+		// ContentType() == DiskSystem()->NamePretty()
 
 	// access to C style partition data
 	partition_data *PartitionData();
@@ -153,6 +153,9 @@ public:
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
 
+	void Changed(uint32 flags);
+	void UninitializeContents(bool logChanges = true);
+
 	virtual void WriteUserData(UserDataWriter &writer,
 							   user_partition_data *data);
 
@@ -170,6 +173,8 @@ protected:
 	KDiskDevice			*fDevice;
 	KPartition			*fParent;
 	KDiskSystem			*fDiskSystem;
+	uint32				fChangeFlags;
+	int32				fChangeCounter;
 	int32				fReferenceCount;
 	bool				fObsolete;
 	static int32		fNextID;

@@ -32,6 +32,8 @@ KPartition::KPartition(partition_id id)
 	  fDevice(NULL),
 	  fParent(NULL),
 	  fDiskSystem(NULL),
+	  fChangeFlags(0),
+	  fChangeCounter(0),
 	  fReferenceCount(0),
 	  fObsolete(false)
 {
@@ -61,7 +63,6 @@ KPartition::~KPartition()
 	free(fPartitionData.name);
 	free(fPartitionData.content_name);
 	free(fPartitionData.type);
-	free(fPartitionData.content_type);
 	free(fPartitionData.parameters);
 	free(fPartitionData.content_parameters);
 }
@@ -386,13 +387,6 @@ KPartition::Type() const
 	return fPartitionData.type;
 }
 
-// SetContentType
-status_t
-KPartition::SetContentType(const char *type)
-{
-	return set_string(fPartitionData.content_type, type);
-}
-
 // ContentType
 const char *
 KPartition::ContentType() const
@@ -432,8 +426,7 @@ KPartition::ID() const
 int32
 KPartition::ChangeCounter() const
 {
-	// not implemented
-	return 0;
+	return fChangeCounter;
 }
 
 // GetPath
@@ -675,6 +668,7 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 {
 	// unload former disk system
 	if (fDiskSystem) {
+		fPartitionData.content_type = NULL;
 		fDiskSystem->Unload();
 		fDiskSystem = NULL;
 	}
@@ -684,6 +678,7 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 		fDiskSystem->Load();	// can't fail, since it's already loaded
 	// update concerned partition flags
 	if (fDiskSystem) {
+		fPartitionData.content_type = fDiskSystem->PrettyName();
 		if (fDiskSystem->IsFileSystem())
 			SetFlags(Flags() | B_PARTITION_FILE_SYSTEM);
 		else
@@ -731,6 +726,43 @@ void *
 KPartition::ContentCookie() const
 {
 	return fPartitionData.content_cookie;
+}
+
+// Changed
+void
+KPartition::Changed(uint32 flags)
+{
+	fChangeFlags |= flags;
+	fChangeCounter++;
+}
+
+// UninitializeContents
+void
+KPartition::UninitializeContents(bool logChanges)
+{
+	if (DiskSystem()) {
+		uint32 flags = B_PARTITION_CHANGED_CONTENT_TYPE
+					   | B_PARTITION_CHANGED_STATUS
+					   | B_PARTITION_CHANGED_FLAGS;
+		if (VolumeID() >= 0) {
+			// TODO: More? Unmounting would be a bit drastical for changes
+			// only on a shadow partition.
+			SetVolumeID(-1);
+			flags |= B_PARTITION_CHANGED_VOLUME;
+		}
+		if (ContentName()) {
+			SetContentName(NULL);
+			flags |= B_PARTITION_CHANGED_CONTENT_NAME;
+		}
+		if (ContentParameters()) {
+			SetContentParameters(NULL);
+			flags |= B_PARTITION_CHANGED_CONTENT_PARAMETERS;
+		}
+		DiskSystem()->FreeContentCookie(this);
+		SetDiskSystem(NULL);
+		if (logChanges)
+			Changed(flags);
+	}
 }
 
 // WriteUserData
