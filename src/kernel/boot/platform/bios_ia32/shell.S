@@ -61,6 +61,7 @@ bfs_start:
 	movl	%cr0, %eax		// set the PE bit of cr0 to switch to protected mode
 	orb		$0x1, %al
 	movl	%eax, %cr0
+
 	.code32
 	.byte	0x66
 	ljmp	$0x8, $_protected_code_segment
@@ -74,6 +75,9 @@ _protected_code_segment:
 
 	mov		$0x10000, %ebp	// setup new stack
 	mov		%ebp, %esp
+
+	movw	%dx, gBootDriveID
+		// save boot device
 
 	call	_start
 
@@ -113,6 +117,11 @@ _a20_done:
 
 //--------------------------------------------------------------
 
+.org 896
+	// since we don't need the above space when the boot loader is
+	// running, it is used as a real mode scratch buffer (as our
+	// boot loader spans over the whole real mode 0x1000 segment)
+
 /* global data table */
 
 gdt:
@@ -140,5 +149,9 @@ gdt:
 gdt_descriptor:
 	.word	0x2f			// 6 entries in the GDT (8 bytes each)
 	.long	gdt
+
+.globl gBootDriveID
+gBootDriveID:
+	.word	0
 
 .org 1024
