@@ -62,3 +62,9 @@ name:
 .align 4; \
 name:
 
+#define SYSCALL10(name, n) \
+.globl name; \
+.type name,@function; \
+.align 4; \
+name:
+
