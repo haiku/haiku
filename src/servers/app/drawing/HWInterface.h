@@ -63,7 +63,7 @@ class HWInterface : public BLocker {
 	// Invalidate is planned to be used for scheduling an area for updating
 			status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
-			status_t			CopyBackToFront(const BRect& frame);
+	virtual	status_t			CopyBackToFront(const BRect& frame);
 
  protected:
 	// implement this in derived classes

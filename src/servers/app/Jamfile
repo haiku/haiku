@@ -102,15 +102,23 @@ Server app_server :
 # link libraries for app_server and libappserver.so
 
 if $(TARGET_PLATFORM) = haiku {
+
 	LinkSharedOSLibs libappserver.so :
 		libroot.so libbe.so libfreetype.so ;
+
 	LinkSharedOSLibs app_server :
 		libroot.so libtranslation.so libz.so libpng.so libbe.so
 		libappserver.so libfreetype.so libtextencoding.so ;
+
 } else {
+
+	LINKFLAGS on app_server ?= $(LINKFLAGS) ;
+	LINKFLAGS on app_server += -lbe ;
+
 	LinkSharedOSLibs libappserver.so :
 		root be <boot!home!config!lib>libopenbeos.so
 		libfreetype.so ;
+
 	LinkSharedOSLibs app_server :
 		root be game translation libz.so libpng.so libappserver.so
 		libpainter.a <boot!home!config!lib>libopenbeos.so 

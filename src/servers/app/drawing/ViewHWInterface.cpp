@@ -261,7 +261,7 @@ STRACE("CardWindow::MessageReceived()\n");
 		case MSG_UPDATE:
 STRACE("MSG_UPDATE\n");
 			// invalidate all areas in the view that need redrawing
-			if (fUpdateLock.LockWithTimeout(0LL) >= B_OK) {
+			if (fUpdateLock.LockWithTimeout(2000LL) >= B_OK) {
 /*				int32 count = fUpdateRegion.CountRects();
 				for (int32 i = 0; i < count; i++) {
 					fView->Invalidate(fUpdateRegion.RectAt(i));
@@ -593,6 +593,17 @@ RenderingBuffer*
 ViewHWInterface::BackBuffer() const
 {
 	return fBackBuffer;
+}
+
+// CopyBackToFront
+status_t
+ViewHWInterface::CopyBackToFront(const BRect& frame)
+{
+	status_t ret = HWInterface::CopyBackToFront(frame);
+// TODO: investigate why this function is called before SetMode() was called!
+	if (fWindow)
+		fWindow->Invalidate(frame);
+	return ret;
 }
 
 // _DrawCursor

@@ -53,6 +53,8 @@ class ViewHWInterface : public HWInterface {
 	virtual	RenderingBuffer*	FrontBuffer() const;
 	virtual	RenderingBuffer*	BackBuffer() const;
 
+	virtual	status_t			CopyBackToFront(const BRect& frame);
+
  protected:
 	virtual	void				_DrawCursor(BRect area) const;
 
