@@ -18,28 +18,32 @@
 
 #include <OS.h>
 #ifdef DEBUG
-#	include <string.h>
+//#	include <string.h>
 #endif
 #include <unistd.h>
 
+
 #define DEBUG_TO_FILE 0
 
-#if DEBUG_TO_FILE
 #	include <stdio.h>
+#if DEBUG_TO_FILE
+//#	include <stdio.h>
+#	include <stdarg.h>
+extern "C" int 	vsprintf(char *s, const char *format, va_list arg);
 #	include <fcntl.h>
 #	define __out dbg_printf		
 	void dbg_printf(const char *format,...);
 	void initialize_debugger(const char *filename);
 #else
 #	ifdef USER 
-#		include <stdio.h> 
+//#		include <stdio.h> 
 #		define __out printf 
 #	else 
-#		include <null.h> 
+//#		include <null.h> 
 #		define __out dprintf
 #	endif
-//#	include <stdio.h>
-//#	include <malloc.h>
+#	include <stdio.h>
+#	include <malloc.h>
 //#	define __out printf
 #endif
 
