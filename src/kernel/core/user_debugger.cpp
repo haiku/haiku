@@ -10,13 +10,14 @@
 #include <debugger.h>
 #include <kernel.h>
 #include <KernelExport.h>
+#include <ksyscalls.h>
 #include <sem.h>
 #include <team.h>
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
 
-#define TRACE_USER_DEBUGGER
+//#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
 #	define TRACE(x) dprintf x
 #else
@@ -256,8 +257,13 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 	message.thread = thread->id;
 	message.team = thread->team->id;
 	message.syscall = syscall;
-// TODO: We need to know the number of args of the syscall at this point.
-//	message.args[16]
+
+	// copy the syscall args
+	if (!(teamDebugFlags & B_TEAM_DEBUG_SYSCALL_FAST_TRACE)
+		&& syscall < (uint32)kSyscallCount) {
+		if (kSyscallInfos[syscall].parameter_size > 0)
+			memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
+	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
 		sizeof(message));
@@ -289,8 +295,13 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	message.end_time = system_time();
 	message.return_value = returnValue;
 	message.syscall = syscall;
-// TODO: We need to know the number of args of the syscall at this point.
-//	message.args[16]
+
+	// copy the syscall args
+	if (!(teamDebugFlags & B_TEAM_DEBUG_SYSCALL_FAST_TRACE)
+		&& syscall < (uint32)kSyscallCount) {
+		if (kSyscallInfos[syscall].parameter_size > 0)
+			memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
+	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_POST_SYSCALL, &message,
 		sizeof(message));
@@ -398,10 +409,6 @@ debug_nub_thread(void *)
 				int32 size = message.read_memory.size;
 				status_t result = B_OK;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_READ_MEMORY: "
-					"reply port: %ld, address: %p, size: %ld\n", nubThread->id,
-					replyPort, address, size));
-
 				// check the parameters
 				if (!IS_USER_ADDRESS(address))
 					result = B_BAD_ADDRESS;
@@ -413,8 +420,14 @@ debug_nub_thread(void *)
 					result = user_memcpy(reply.read_memory.data, address, size);
 				reply.read_memory.error = result;
 
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_READ_MEMORY: "
+					"reply port: %ld, address: %p, size: %ld, result: %lx\n",
+					nubThread->id, replyPort, address, size, result));
+
+				// send only as much data as necessary
+				int32 bytesRead = (result == B_OK ? size : 0);
+				replySize = reply.read_memory.data + bytesRead - (char*)&reply;
 				sendReply = true;
-				replySize = sizeof(debug_nub_read_memory_reply);
 				break;
 			}
 
