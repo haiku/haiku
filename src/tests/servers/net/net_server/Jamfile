@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src tests servers net net_server ;
+
+UsePrivateHeaders net ;
+
+SimpleTest net_server :
+	userland_modules.cpp
+	userland_ipc.c
+	net_server.cpp
+	: be
+;
