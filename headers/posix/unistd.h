@@ -140,35 +140,41 @@ extern int		usleep(unsigned int microSeconds);
 //extern clock_t	clock(void);
 //extern int 		pause(void);
 
-/* access permissions */				
-//extern gid_t	getegid(void);
-//extern uid_t	geteuid(void);
-//extern gid_t	getgid(void);
-//extern int		getgroups(int size, gid_t list[]);
+/* process */
 //extern pid_t	getpgrp(void);
 //extern pid_t	getpid(void);
 //extern pid_t	getppid(void);
-//extern uid_t	getuid(void);
-//extern char		*cuserid(char *s);
 
-//extern int		setgid(gid_t gid);
-//extern int		setpgid(pid_t pid, pid_t pgid);
 //extern pid_t	setsid(void);
-//extern int		setuid(uid_t uid);
+//extern int		setpgid(pid_t pid, pid_t pgid);
 
-//extern char		*getlogin(void);
-//extern int		sethostname(const char *hostName, size_t namelen);
-//extern int		gethostname(char *hostName, size_t namelen);
+/* access permissions */				
+extern gid_t	getegid(void);
+extern uid_t	geteuid(void);
+extern gid_t	getgid(void);
+extern int		getgroups(int groupSize, gid_t groupList[]);
+extern uid_t	getuid(void);
+extern char		*cuserid(char *s);
+
+extern int		setgid(gid_t gid);
+extern int		setuid(uid_t uid);
+
+extern char		*getlogin(void);
+extern int		getlogin_r(char *name, size_t nameSize);
+
+/* host name */
+extern int		sethostname(const char *hostName, size_t nameSize);
+extern int		gethostname(char *hostName, size_t nameSize);
 
 /* tty */
 //extern int		isatty(int fd);
 //extern char		*ttyname(int fd);
-//extern int		ttyname_r(int fd, char *buf, size_t buflen);
+//extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
 //extern char		*ctermid(char *s);
 
 /* misc */
 //extern char 	*crypt(const char *key, const char *salt);
-extern int		getopt(int argc, char *const *argv, const char *shortopts);
+extern int		getopt(int argc, char *const *argv, const char *shortOpts);
 
 /* getopt() related external variables */
 extern char *optarg;
