@@ -91,7 +91,7 @@ extern bool			cancel_timer(timer *t);
 /* kernel threads */
 
 extern thread_id	spawn_kernel_thread(thread_func function, const char *threadName, 
-						long priority, void *arg);
+						int32 priority, void *arg);
 
 
 /*-------------------------------------------------------------*/
