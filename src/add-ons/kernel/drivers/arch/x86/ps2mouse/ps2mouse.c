@@ -65,18 +65,19 @@
 
 #define DEVICE_NAME "input/mouse/ps2/0"
 
-//#define TRACE_PS2MOUSE
-#ifdef TRACE_PS2MOUSE
+#if DEBUG
 	#define TRACE(x) dprintf x
 #else
 	#define TRACE(x)
 #endif
+
 
 #ifdef COMPILE_FOR_R5
 	#include "cbuf_adapter.h"
 #else
 	#include <cbuf.h>
 #endif
+
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -431,10 +432,8 @@ mouse_open(const char *name, uint32 flags, void **cookie)
 	*cookie = NULL;
 	
 	commandByte = get_command_byte();
-	TRACE(("command byte: 0x%x\n", commandByte));
 	commandByte |= PS2_BITS_AUX_INTERRUPT;
 	commandByte &= ~PS2_BITS_MOUSE_DISABLED;
-	TRACE(("command byte: 0x%x\n", commandByte));
 	set_command_byte(commandByte);
 	
 	status = ps2_enable_mouse(true);
@@ -525,6 +524,7 @@ mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 			return EINVAL;
 	}
 }
+
 
 /*
  * function structure used for file-op registration
