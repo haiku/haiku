@@ -89,4 +89,23 @@ Depends MediaKit :
 	wav_reader
 ;
 
+# Pseudo-target to build the input kit only
+NotFile InputKit ;
+Depends InputKit :
+	# Servers
+	input_server
+
+	# Addons
+	<input>keyboard
+	<input>mouse
+
+	# Apps
+	keymap
+
+	# Preferences
+	Keymap
+	Keyboard
+	Mouse	
+;
+
 SubInclude OBOS_TOP src ;
