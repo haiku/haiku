@@ -23,6 +23,8 @@
 */
 
 #include <malloc.h>
+#include <driver_settings.h>
+#include <stdlib.h> // for strtoXX
 #include "agp.h"
 
 typedef struct {
@@ -56,14 +58,30 @@ typedef struct {
 	device_info	di[MAX_DEVICES];				/* device specific stuff */
 } DeviceData;
 
+typedef struct settings { //see comments in agp.settings
+	uint32 max_speed;
+	bool   block_agp;
+	bool   block_sba;
+	bool   block_fw;
+} settings;
+
 /* prototypes for our private functions */
 static bool has_AGP_interface(pci_info *pcii, uint8 *adress);
 static status_t probe_devices(void);
+static void read_settings(void);
+static void check_settings(uint32 *command);
 static void check_capabilities(uint32 agp_stat, uint32 *command);
 
 
 static DeviceData		*pd;
 static pci_module_info	*pci_bus;
+
+static settings current_settings = { //see comments in agp.settings
+	0,          // max_speed
+	false,		// block_agp
+	false,      // block_sba
+	false,      // block_fw
+};
 
 
 status_t init(void)
@@ -93,6 +111,10 @@ status_t init(void)
 		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
+
+	/* parse settings file if there */
+	read_settings();
+
 	return B_OK;
 }
 
@@ -170,6 +192,28 @@ next_device:
 	}
 
 	return B_OK;
+}
+
+static void read_settings(void)
+{
+	void *settings_handle;
+
+	settings_handle  = load_driver_settings ("agp.settings");
+	if (settings_handle != NULL) {
+		const char *item;
+		char       *end;
+		uint32      value;
+
+		item = get_driver_parameter (settings_handle, "max_speed", "0", "0");
+		value = strtoul (item, &end, 0);
+		if (*end == '\0') current_settings.max_speed = value;
+
+		current_settings.block_agp = get_driver_boolean_parameter (settings_handle, "block_agp", false, false);
+		current_settings.block_sba = get_driver_boolean_parameter (settings_handle, "block_sba", false, false);
+		current_settings.block_fw = get_driver_boolean_parameter (settings_handle, "block_fw", false, false);
+
+		unload_driver_settings (settings_handle);
+	}
 }
 
 void uninit(void)
@@ -261,6 +305,8 @@ void enable_agp (uint32 *command)
 	}
 	/* reset all other reserved and currently unused bits */
 	*command &= ~0x00fffce0;
+	/* block features if requested by user in agp.settings file */
+	check_settings(command);
 
 	/* iterate through our device list to find the common capabilities supported */
 	for (count = 0; count < pd->count; count++)
@@ -329,6 +375,80 @@ void enable_agp (uint32 *command)
 			 * this 'sequence' resets the non-writable register bit AGP_rate_rev in our info */
 			pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
 		}
+	}
+}
+
+static void check_settings(uint32 *command)
+{
+	if (current_settings.block_agp)
+	{
+		TRACE("agp_man: blocking all agp modes (agp.settings)\n");
+		*command = 0x00000000;
+		return;
+	}
+	if (current_settings.max_speed != 0)
+	{
+		if (!(*command & AGP_rate_rev))
+		{
+			/* AGP 2.0 scheme applies */
+			switch (current_settings.max_speed)
+			{
+			case 8:
+				TRACE("agp_man: max AGP 8x speed allowed, using max 4x (agp.settings)\n");
+				break;
+			case 4:
+				TRACE("agp_man: max AGP 4x speed allowed (agp.settings)\n");
+				break;
+			case 2:
+				TRACE("agp_man: max AGP 2x speed allowed (agp.settings)\n");
+				*command &= ~AGP_2_4x;
+				break;
+			case 1:
+				TRACE("agp_man: max AGP 1x speed allowed (agp.settings)\n");
+				*command &= ~(AGP_2_4x | AGP_2_2x);
+				break;
+			default:
+				TRACE("agp_man: illegal max AGP speed requested, ignoring (agp.settings)\n");
+				break;
+			}
+		}
+		else
+		{
+			/* AGP 3.0 scheme applies */
+			switch (current_settings.max_speed)
+			{
+			case 8:
+				TRACE("agp_man: max AGP 8x speed allowed (agp.settings)\n");
+				break;
+			case 4:
+				TRACE("agp_man: max AGP 4x speed allowed (agp.settings)\n");
+				*command &= ~AGP_3_8x;
+				break;
+			case 2:
+				TRACE("agp_man: max AGP 2x speed allowed, forcing PCI mode (agp.settings)\n");
+				*command = 0x00000000;
+				return;
+				break;
+			case 1:
+				TRACE("agp_man: max AGP 1x speed allowed, forcing PCI mode (agp.settings)\n");
+				*command = 0x00000000;
+				return;
+				break;
+			default:
+				TRACE("agp_man: illegal max AGP speed requested, ignoring (agp.settings)\n");
+				break;
+			}
+		}
+	}
+	if (current_settings.block_sba)
+	{
+		TRACE("agp_man: blocking SBA (agp.settings)\n");
+		*command &= ~AGP_SBA;
+	}
+	if (current_settings.block_fw)
+	{
+		TRACE("agp_man: blocking FW (agp.settings)\n");
+		*command &= ~AGP_FW;
 	}
 }
 

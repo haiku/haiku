@@ -1,0 +1,12 @@
+# Settings file for the agp busmanager
+#
+# This file should be moved to the directory
+# ~/config/settings/kernel/drivers/
+#
+
+#modifying the settings below will restrict the busmanager in autoselecting the best mode useable:
+
+#max_speed	2		# max AGP speed that may be used (valid are 1,2,4 or 8)
+block_agp		false		# if true blocks use of AGP entirely: so fallback to PCI mode
+block_sba		false		# if true blocks use of 'sideband adressing'
+block_fw		false		# if true blocks use of 'fastwrites'
