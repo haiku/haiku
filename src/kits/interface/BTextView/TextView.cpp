@@ -951,11 +951,42 @@ BTextView::SetText(const char *inText, int32 inLength,
 }
 //------------------------------------------------------------------------------
 void
-BTextView::SetText(BFile *inFile, int32 startOffset, int32 inLength,
+BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 						 const text_run_array *inRuns)
 {
 	CALLED();
-	// TODO:
+	//	TODO: Should probably call _DoDeleteText() here
+	if (fText->Length() > 0)
+		DeleteText(0, fText->Length());
+
+	fText->InsertText(inFile, inOffset, inLength, 0);
+	
+	// update the start offsets of each line below offset
+	fLines->BumpOffset(inLength, LineAt(inOffset) + 1);
+	
+	// update the style runs
+	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
+	
+	if (inRuns != NULL)
+		//SetStyleRange(inOffset, inOffset + inLength, inStyles, false);
+		SetRunArray(inOffset, inOffset + inLength, inRuns);
+	else {
+		// apply nullStyle to inserted text
+		fStyles->SyncNullStyle(inOffset);
+		fStyles->SetStyleRange(inOffset, inOffset + inLength, 
+							  fText->Length(), doAll, NULL, NULL);
+	}
+
+	fSelStart = fSelEnd = 0;	
+
+	// recalc line breaks and draw the text
+	Refresh(0, inLength, true, true);
+
+	// draw the caret
+	if (fActive) {
+		if (!fCaretVisible)
+			InvertCaret();
+	}
 }
 //------------------------------------------------------------------------------
 void

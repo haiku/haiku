@@ -29,11 +29,12 @@
 #include <cstring>
 
 // System Includes -------------------------------------------------------------
-#include "TextGapBuffer.h"
+#include <File.h>
 
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
+#include "TextGapBuffer.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -81,6 +82,41 @@ _BTextGapBuffer_::InsertText(const char *inText, int32 inNumItems,
 	fGapCount -= inNumItems;
 	fGapIndex += inNumItems;
 	fItemCount += inNumItems;
+}
+//------------------------------------------------------------------------------
+void
+_BTextGapBuffer_::InsertText(BFile *file, int32 fileOffset, int32 inNumItems, int32 inAtIndex)
+{
+	off_t fileSize;
+
+	if (file->GetSize(&fileSize) != B_OK
+		|| !file->IsReadable())
+		return;
+	
+	// Clamp the text length to the file size
+	fileSize -= fileOffset;
+
+	if (fileSize < inNumItems)
+		inNumItems = fileSize;
+
+	if (inNumItems < 1)
+		return;
+
+	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
+	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
+		
+	if (inAtIndex != fGapIndex)
+		MoveGapTo(inAtIndex);
+	
+	if (fGapCount < inNumItems)
+		SizeGapTo(inNumItems + fExtraCount);
+	
+	// Finally, read the data and put it into the buffer
+	if (file->ReadAt(fileOffset, fBuffer + fGapIndex, inNumItems) > 0) {
+		fGapCount -= inNumItems;
+		fGapIndex += inNumItems;
+		fItemCount += inNumItems;
+	}
 }
 //------------------------------------------------------------------------------
 void

@@ -39,6 +39,7 @@
 
 // Globals ---------------------------------------------------------------------
 
+class BFile;
 // _BTextGapBuffer_ class ------------------------------------------------------
 class _BTextGapBuffer_ {
 
@@ -47,6 +48,7 @@ public:
 virtual				~_BTextGapBuffer_();
 
 		void		InsertText(const char *inText, int32 inNumItems, int32 inAtIndex);
+		void		InsertText(BFile *file, int32 fileOffset, int32 amount, int32 atIndex);
 		void		RemoveRange(int32 start, int32 end);
 		
 		void		MoveGapTo(int32 toIndex);
