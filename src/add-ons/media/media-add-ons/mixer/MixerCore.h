@@ -37,10 +37,13 @@ public:
 	void SetOutputBufferGroup(BBufferGroup *group);
 	void SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency);
 	void EnableOutput(bool enabled);
-	void Start(bigtime_t time);
-	void Stop();
+	bool Start();
+	bool Stop();
+	
+	void StartMixThread();
+	void StopMixThread();
 
-	bool IsStarted();
+//	bool IsStarted();
 	
 	uint32 OutputChannelCount();
 
@@ -55,7 +58,9 @@ private:
 	BList		*fInputs;
 	MixerOutput	*fOutput;
 	int32		fNextInputID;
-	bool		fRunning;
+	bool		fRunning;		// true = the mix thread is running
+	bool		fStarted;		// true = mix thread should be started of it is not running
+	bool		fOutputEnabled; // true = mix thread should be started of it is not running
 
 	Resampler	**fResampler; // array
 

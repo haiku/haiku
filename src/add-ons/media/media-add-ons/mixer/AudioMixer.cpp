@@ -450,7 +450,7 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = bigtime_t(1.2 * BufferDuration());
+	fInternalLatency = bigtime_t(1.6 * BufferDuration());
 	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
@@ -634,7 +634,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	printf("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
-	fInternalLatency = bigtime_t(1.2 * BufferDuration());
+	fInternalLatency = bigtime_t(1.6 * BufferDuration());
 	printf("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
@@ -778,7 +778,7 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness, bool
 			printf("AudioMixer::HandleEvent: B_START\n");
 			if (RunState() != B_STARTED) {
 				fCore->Lock();
-				fCore->Start(event->event_time);
+				fCore->Start();
 				fCore->Unlock();
 			}
 			break;

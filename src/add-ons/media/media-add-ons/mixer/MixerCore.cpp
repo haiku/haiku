@@ -36,6 +36,8 @@ MixerCore::MixerCore(AudioMixer *node)
 	fOutput(0),
 	fNextInputID(1),
 	fRunning(false),
+	fStarted(false),
+	fOutputEnabled(true),
 	fResampler(0),
 	fMixBuffer(0),
 	fMixBufferFrameRate(0),
@@ -93,6 +95,10 @@ MixerCore::AddOutput(const media_output &output)
 	fOutput = new MixerOutput(this, output);
 	// the output format might have been adjusted inside MixerOutput
 	ApplyOutputFormat();
+	
+	ASSERT(!fRunning);
+	if (fStarted && fOutputEnabled)
+		StartMixThread();
 }
 
 bool
@@ -116,8 +122,13 @@ MixerCore::RemoveOutput()
 	ASSERT_LOCKED();
 	if (!fOutput)
 		return false;
+
+	if (fStarted)
+		StopMixThread();
+
 	delete fOutput;
 	fOutput = 0;
+	fOutputEnabled = true;
 	return true;
 }
 
@@ -169,16 +180,16 @@ MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 {
 	ASSERT_LOCKED();
 	
-	bool wasrunning = fRunning;
+	bool was_started = fStarted;
 
-	if (wasrunning)
+	if (was_started)
 		Stop();
 
 	fOutput->ChangeFormat(format);
 	ApplyOutputFormat();
 
-	if (wasrunning)
-		Start(0);
+	if (was_started)
+		Start();
 }
 
 void
@@ -258,16 +269,55 @@ MixerCore::EnableOutput(bool enabled)
 {
 	ASSERT_LOCKED();
 	printf("MixerCore::EnableOutput %d\n", enabled);
+	fOutputEnabled = enabled;
+
+	if (fRunning && !fOutputEnabled)
+		StopMixThread();
+
+	if (!fRunning && fOutput && fStarted && fOutputEnabled)
+		StartMixThread();
 }
 
-void
-MixerCore::Start(bigtime_t time)
+bool
+MixerCore::Start()
 {
 	ASSERT_LOCKED();
 	printf("MixerCore::Start\n");
-	if (fRunning)
-		return;
+	if (fStarted)
+		return false;
 		
+	fStarted = true;
+	
+	ASSERT(!fRunning);
+	
+	// only start the mix thread if we have an output
+	if (fOutput && fOutputEnabled)
+		StartMixThread();
+
+	return true;
+}
+
+bool
+MixerCore::Stop()
+{
+	ASSERT_LOCKED();
+	printf("MixerCore::Stop\n");
+	if (!fStarted)
+		return false;
+		
+	if (fRunning)
+		StopMixThread();
+
+	fStarted = false;
+	return true;
+}
+
+void
+MixerCore::StartMixThread()
+{
+	ASSERT(fOutputEnabled == true);
+	ASSERT(fRunning == false);
+	ASSERT(fOutput);
 	fRunning = true;
 	fMixThreadWaitSem = create_sem(0, "mix thread wait");
 	fMixThread = spawn_thread(_mix_thread_, "Yeah baby, very shagadelic", 12, this);
@@ -275,13 +325,9 @@ MixerCore::Start(bigtime_t time)
 }
 
 void
-MixerCore::Stop()
+MixerCore::StopMixThread()
 {
-	ASSERT_LOCKED();
-	printf("MixerCore::Stop\n");
-	if (!fRunning)
-		return;
-
+	ASSERT(fRunning == true);
 	ASSERT(fMixThread > 0);
 	ASSERT(fMixThreadWaitSem > 0);
 	
@@ -294,12 +340,14 @@ MixerCore::Stop()
 	fRunning = false;
 }
 
+/*
 bool
 MixerCore::IsStarted()
 {
 	ASSERT_LOCKED();
 	return fRunning;
 }
+*/
 
 int32
 MixerCore::_mix_thread_(void *arg)
@@ -321,14 +369,19 @@ MixerCore::MixThread()
 	// The broken BeOS R5 multiaudio node starts with time 0,
 	// then publishes negative times for about 50ms, publishes 0
 	// again until it finally reaches time values > 0
+	Lock();
 	start = fTimeSource->Now();
+	Unlock();
 	while (start <= 0) {
 		printf("MixerCore: delaying MixThread start, timesource is at %Ld\n", start);
 		snooze(1000);
+		Lock();
 		start = fTimeSource->Now();
+		Unlock();
 	}
 
-	latency = bigtime_t(0.2 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio));
+	Lock();
+	latency = bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio));
 	
 	printf("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
 
@@ -337,6 +390,7 @@ MixerCore::MixThread()
 	int64 temp = frames_for_duration(fMixBufferFrameRate, start	);
 	frame_base = ((temp / fMixBufferFrameCount) + 1) * fMixBufferFrameCount;
 	time_base = duration_for_frames(fMixBufferFrameRate, frame_base);
+	Unlock();
 	
 	printf("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
 	
@@ -344,7 +398,8 @@ MixerCore::MixThread()
 	frame_pos = 0;
 	for (;;) {
 		status_t rv;
-		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, latency + fDownstreamLatency));
+//		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, latency + fDownstreamLatency));
+		rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT, fTimeSource->RealTimeFor(event_time, 0) - latency - fDownstreamLatency);
 		if (rv == B_INTERRUPTED)
 			continue;
 		if (rv != B_TIMED_OUT && rv < B_OK)

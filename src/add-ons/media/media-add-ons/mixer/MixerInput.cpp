@@ -61,9 +61,6 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateMixerChannels()
 
 	SetMixBufferFormat(mixFrameRate, mixFrameCount);
-	UpdateChannelDesignations();
-	UpdateMixerChannels();
-	
 	
 	// XXX a test:
 /*
@@ -95,7 +92,10 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	size_t size;
 	bigtime_t start;
 	
-	ASSERT(fMixBuffer);
+	if (!fMixBuffer) {
+		printf("MixerInput::BufferReceived: dropped incoming buffer as we don't have a mix buffer\n");
+		return;
+	}
 	
 	data = buffer->Data();
 	size = buffer->SizeUsed();
@@ -305,8 +305,6 @@ MixerInput::UpdateMixerChannels()
 	mixer_chan_info *old_mixer_channel_info;
 	uint32 old_mixer_channel_count;
 
-	ASSERT(fMixBuffer);
-	
 	printf("UpdateMixerChannels: enter\n");
 	
 	for (int i = 0; i < fInputChannelCount; i++)
@@ -350,7 +348,7 @@ MixerInput::UpdateMixerChannels()
 		int j;
 		for (j = 0; j < fInputChannelCount; j++) {
 			if (fInputChannelInfo[j].designations & ChannelTypeToChannelMask(fMixerChannelInfo[i].type)) {
-				fMixerChannelInfo[i].buffer_base = &fMixBuffer[j];
+				fMixerChannelInfo[i].buffer_base = fMixBuffer ? &fMixBuffer[j] : 0;
 				break;
 			}
 		}
@@ -389,7 +387,7 @@ MixerInput::GetMixerChannelCount()
 void
 MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain)
 {
-	ASSERT(fMixBuffer);
+	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
 	int32 offset = framepos % fMixBufferFrameCount;
 	if (channel == 0) printf("GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames);
@@ -420,10 +418,25 @@ MixerInput::GetMixerChannelGain(int channel)
 void
 MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 {
+	printf("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld\n", framerate, frames);
+
 	fMixBufferFrameRate = framerate;
 	debugMixBufferFrames = frames;
 
-	printf("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld\n", framerate, frames);
+	// frames and/or framerate can be 0 (if no output is connected)
+	if (framerate == 0 || frames == 0) {
+		if (fMixBuffer) {
+			rtm_free(fMixBuffer);
+			fMixBuffer = 0;
+		}
+		for (int i = 0; i < fInputChannelCount; i++)
+			fInputChannelInfo[i].buffer_base = 0;
+		fMixBufferFrameCount = 0;
+
+		UpdateChannelDesignations();
+		UpdateMixerChannels();
+		return;
+	}
 
 	// make fMixBufferFrameCount an integral multiple of frames,
 	// but at least 3 times duration of our input buffer
@@ -451,4 +464,7 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 
 	for (int i = 0; i < fInputChannelCount; i++)
 		fInputChannelInfo[i].buffer_base = &fMixBuffer[i];
+
+	UpdateChannelDesignations();
+	UpdateMixerChannels();
 }
