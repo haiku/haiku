@@ -57,22 +57,21 @@ ln -v -s ~/config/add-ons/kernel/drivers/bin/ich_ac97 ~/config/add-ons/kernel/dr
 
 kill -9 Media
 kill -9 media_server
-sleep 1
 kill -9 media_addon_server
 kill -9 audio_server
 sleep 1
 
 rescan ich_ac97
+/boot/beos/system/servers/media_server & 
+sleep 5
 
 alert "
 Installation Complete.
 
-Start the Media Server now.
+Please enable Realtime audio and
+select 'AC97 (ICH)' as output and 'None In' as input. 
 
-Enable Realtime audio. 
-Select 'AC97 (ICH)' as output and 'None In' as input. 
-
-Now restart the Media Services.
+Restart the Media Services if required.
 Read the readme file if you experience problems."
 
 /boot/beos/preferences/Media &
