@@ -201,6 +201,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		fSize = 0;
 		fLBA = false;
 	} else {
+		printf("host bus: %4s, interface: %8s\n", fParameters.host_bus, fParameters.interface_type);
 		printf("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector);
