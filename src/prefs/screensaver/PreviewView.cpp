@@ -160,9 +160,16 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 {
 	if (previewData.previewThreadId != 0)
 	{
+	    std::cout << "Ending old thread id=" << previewData.previewThreadId << '\n';
+	    
 		previewData.stopMe = true;
-		snooze( saver->TickSize() );
-		kill_thread( previewData.previewThreadId );
+		// replace :
+		//snooze( saver->TickSize() );
+		//kill_thread( previewData.previewThreadId );
+		// with :
+		suspend_thread( previewData.previewThreadId );
+		resume_thread( previewData.previewThreadId );
+		// end replace
 		previewData.stopMe = false;
 		previewData.previewThreadId = 0;
 	}
@@ -174,18 +181,22 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	
 	if (stopSaver)
 	{
+	    std::cout << "stopping old saver\n";
 		saver->StopSaver();
 		stopSaver = false;
 	}
 	
 	if (stopConfigView)
 	{
+	    std::cout << "stopping config view\n";
 		saver->StopConfig();
 		stopConfigView = false;
 	}
 		
 	if (deleteSaver)
 	{
+	    std::cout << "deleting old saver\n";
+	    
 		delete saver;
 		saver = 0;
 		deleteSaver = false;
@@ -193,6 +204,7 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	
 	if (removeConfigView)
 	{
+	    std::cout << "removing old config view\n";
 		settingsBoxPtr->RemoveChild(configView);
 		delete configView;
 		settingsBoxPtr->Draw(settingsBoxPtr->Bounds());
@@ -201,12 +213,14 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	
 	if (noPreview)
 	{
+	    std::cout << "no preview\n";
 		noPreviewView->RemoveSelf();
 		delete noPreviewView;
 	}
 	
 	if (removePreviewArea)
 	{
+	    std::cout << "removing preview area\n";
 		previewArea->RemoveSelf();
 		delete previewArea;
 		previewArea=new BView (scale2(1,8,1,2,Bounds()),"sampleScreen",B_FOLLOW_NONE,B_WILL_DRAW);
@@ -218,6 +232,7 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 		
 	if (unloadAddon)
 	{
+	    std::cout << "unloading add-on\n";
 		unload_add_on(addonImage);
 		addonImage = 0;
 		unloadAddon = false;
@@ -232,6 +247,8 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	}
 	unloadAddon = true;
 
+    std::cout << "Add-on loaded\n";
+
 	lastOpStatus = get_image_symbol(addonImage, "instantiate_screen_saver", B_SYMBOL_TYPE_TEXT,(void **) &instantiate);
 	if (lastOpStatus != B_OK)
 	{
@@ -241,12 +258,15 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 		return;
 	}
 
+    std::cout << "symbol imported\n";
+
 	saver = instantiate(settingsMsg, addonImage);
 	if (saver == 0)
 	{
 		std::cout << "Saver not instantiated.\n";
 		return;
 	}
+	std::cout << "saver instantiated\n";
 	deleteSaver = true;
 	previewData.saver = saver;
 			
@@ -257,6 +277,8 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	 	return;
 	}
 	
+	std::cout << "InitCheck() says we're a go!\n";
+	
 	lastOpStatus = saver->StartSaver(previewArea, true);
 	if ( lastOpStatus != B_OK )
 	{
@@ -265,6 +287,7 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	}
 	else
 	{
+	    std::cout << "Saver started\n";
 		stopSaver = true;
 		noPreview = false;
 	}
@@ -279,6 +302,8 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 	stopConfigView = true;
 	removeConfigView = true;
 
+    std::cout << "Config view made\n";
+
 	if ( noPreview )
 	{
 		noPreviewView = new BStringView(previewArea->Bounds(), "no_preview", "NO PREVIEW AVAILABLE");
@@ -287,12 +312,14 @@ void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 		noPreviewView->SetAlignment(B_ALIGN_CENTER);
 		noPreviewView->Draw(previewArea->Bounds());
 		previewArea->AddChild(noPreviewView);
+		std::cout << "no preview\n";
 	}
 	else
 	{
 		previewData.previewThreadId = spawn_thread( previewThread, "preview_thread", 50, NULL );
 		resume_thread( previewData.previewThreadId );
 		removePreviewArea = true;
+		std::cout << "Preview thread started\n";
 	}
 		
 } // end PreviewView::LoadNewAddon()
