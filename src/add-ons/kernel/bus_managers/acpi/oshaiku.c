@@ -123,6 +123,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <malloc.h>
 #include <sys/time.h>
 #include <OS.h>
 
@@ -501,12 +502,12 @@ AcpiOsMapMemory (
 	int page_offset = ACPI_TO_INTEGER(where) % B_PAGE_SIZE;
 	void *map_base = ACPI_PTR_ADD(void,where,0L - page_offset);
 	area_id area;
-	
+
     area = map_physical_memory("acpi_physical_mem_area", map_base, ROUNDUP(length + page_offset,B_PAGE_SIZE),B_ANY_KERNEL_BLOCK_ADDRESS,0,there);
-	
+		
 	*there += page_offset;
 	
-	#endif
+#endif
 
     return (area > 0 ? AE_OK : AE_BAD_ADDRESS);
 }
@@ -688,8 +689,10 @@ ACPI_STATUS
 AcpiOsCreateLock (
     ACPI_HANDLE             *OutHandle)
 {
-
-    *OutHandle = (ACPI_HANDLE)memalign(sizeof(spinlock),sizeof(spinlock));
+	
+    *OutHandle = (ACPI_HANDLE)malloc(sizeof(spinlock));
+    *((spinlock *)(*OutHandle)) = 1;
+    
     return AE_OK;
 }
 
@@ -706,15 +709,24 @@ AcpiOsAcquireLock (
     ACPI_HANDLE             Handle,
     UINT32                  Flags)
 {
-	cpu_status cpu;
-		
+	/*cpu_status cpu;
+	
 	if (Flags == ACPI_NOT_ISR)
 		cpu = disable_interrupts();
 		
     acquire_spinlock ((spinlock *)(Handle));
     
     if (Flags == ACPI_NOT_ISR)
-    	restore_interrupts(cpu);
+    	restore_interrupts(cpu);*/
+    	
+    /* Why aren't we using real spinlocks? Well, they seem to cause
+       kernel hangs at boot, at least on Dano. I don't really know
+       why, as they should be equivalent to this. Maybe in sysinit2
+       interrupts are already off, and the double disable interrupts
+       call is hanging the system? I'm not sure how to detect that
+       though. Anyway, this works, even if it's stupid. */
+    	
+    while (atomic_add(((spinlock *)(Handle)),0) <= 0);
 }
 
 
@@ -723,7 +735,7 @@ AcpiOsReleaseLock (
     ACPI_HANDLE             Handle,
     UINT32                  Flags)
 {
-    cpu_status cpu;
+    /*cpu_status cpu;
 		
 	if (Flags == ACPI_NOT_ISR)
 		cpu = disable_interrupts();
@@ -731,7 +743,9 @@ AcpiOsReleaseLock (
     release_spinlock ((spinlock *)(Handle));
     
     if (Flags == ACPI_NOT_ISR)
-    	restore_interrupts(cpu);
+    	restore_interrupts(cpu);*/
+    
+    atomic_add(((spinlock *)(Handle)),1);
 }
 
 
@@ -787,7 +801,7 @@ AcpiOsRemoveInterruptHandler (
 {
 
 #ifdef _KERNEL_MODE
-
+dprintf("AcpiOsRemoveInterruptHandler()\n");
 	remove_io_interrupt_handler(InterruptNumber,(interrupt_handler)ServiceRoutine,NULL);
 		/* Crap. We don't get the Context argument back. */
 	#warning Sketchy code!
@@ -896,7 +910,7 @@ AcpiOsStall (
 
     if (microseconds)
     {
-        snooze (microseconds);
+        spin (microseconds);
     }
     return;
 }

@@ -1,5 +1,6 @@
 #include <ACPI.h>
 #include <KernelExport.h>
+#include <stdio.h>
 
 #include "acpi.h"
 #include "acpixf.h"
