@@ -212,6 +212,7 @@ MixerCore::ApplyOutputFormat()
 		fMixBufferFrameCount *= 2;
 	}
 	fMixBufferChannelCount = format.channel_count;
+	ASSERT(fMixBufferChannelCount == fOutput->GetOutputChannelCount());
 	fMixBufferChannelTypes = new int32 [format.channel_count];
 	
 	for (int i = 0; i < fMixBufferChannelCount; i++)
@@ -453,17 +454,16 @@ MixerCore::MixThread()
 			}
 		}
 		
-		int count = fOutput->GetOutputChannelCount();
-		for (int chan = 0; chan < count; chan++) {
-			int count2 = fOutput->GetOutputChannelSourceCount(chan);
-			for (int i = 0; i < count2; i++) {
+		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
+			int sourcecount = fOutput->GetOutputChannelSourceCount(chan);
+			for (int i = 0; i < sourcecount; i++) {
 				int type;
 				float gain;
 				fOutput->GetMixerChannelInfo(chan, i, &type, &gain);
 				if (type < 0 || type >= MAX_TYPES)
 					continue;
-				int count3 = InputChanInfos[type].CountItems();
-				for (int j = 0; j < count3; j++) {
+				int count = InputChanInfos[type].CountItems();
+				for (int j = 0; j < count; j++) {
 					chan_info *info = InputChanInfos[type].ItemAt(j);
 					chan_info *newinfo = MixChanInfos[chan].Create();
 					newinfo->base = info->base;
@@ -475,12 +475,11 @@ MixerCore::MixThread()
 
 		uint32 dst_sample_offset = fMixBufferChannelCount * sizeof(float);
 		
-		count = fOutput->GetOutputChannelCount();
-		for (int chan = 0; chan < count; chan++) {
+		memset(fMixBuffer, 0, fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
+		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
 			PRINT(5, "MixThread: chan %d has %d sources\n", chan, MixChanInfos[chan].CountItems());
-			ZeroFill(&fMixBuffer[chan], dst_sample_offset, fMixBufferFrameCount);
-			int count2 = MixChanInfos[chan].CountItems();
-			for (int i = 0; i < count2; i++) {
+			int count = MixChanInfos[chan].CountItems();
+			for (int i = 0; i < count; i++) {
 				chan_info *info = MixChanInfos[chan].ItemAt(i);
 				char *dst = (char *)&fMixBuffer[chan];
 				PRINT(5, "MixThread:   base %p, sample-offset %2d, gain %.3f\n", info->base, info->sample_offset, info->gain);
@@ -507,7 +506,7 @@ MixerCore::MixThread()
 										frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio),
 										1.0);
 			}
-			PRINT(4, "send buffer, inframes %ld, outframes %ld\n",fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
+			PRINT(4, "send buffer, inframes %ld, outframes %ld\n", fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 			
 			// swap byte order if necessary
 
