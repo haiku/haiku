@@ -58,9 +58,23 @@ get_type(type_code type)
 			return "Icon";
 
 		default:
-			sprintf(buffer, "'%c%c%c%c'",
-				uint8(type >> 24), uint8(type >> 16), uint8(type >> 8), uint8(type));
+		{
+			int32 missed = 0, shift = 24;
+			uint8 value[4];
+			for (int32 i = 0; i < 4; i++, shift -= 8) {
+				value[i] = uint8(type >> shift);
+				if (value[i] < ' ' || value[i] > 127) {
+					value[i] = '.';
+					missed++;
+				}
+			}
+
+			if (missed < 2)
+				sprintf(buffer, "'%c%c%c%c'", value[0], value[1], value[2], value[3]);
+			else
+				sprintf(buffer, "0x%08lx", type);
 			return buffer;
+		}
 	}
 }
 
@@ -91,7 +105,7 @@ main(int argc, char *argv[])
 			return 0;
 		}
 
-		printf("file %s\n", argv[i]);
+		printf("File: %s\n", argv[i]);
 		printf("  Type         Size                 Name\n");
 		printf("-----------  ---------  -------------------------------\n");
 
