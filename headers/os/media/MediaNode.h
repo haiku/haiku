@@ -111,7 +111,11 @@ struct media_node_attribute
 };
 
 
-namespace BPrivate { namespace media { class TimeSourceObject; class SystemTimeSourceObject; } }
+namespace BPrivate { namespace media {
+	class TimeSourceObject;
+	class SystemTimeSourceObject;
+	class BMediaRosterEx;
+} } // BPrivate::media
 
 
 class BMediaNode
@@ -250,13 +254,11 @@ virtual	status_t RequestCompleted(	/* reserved 0 */
 
 private:
 	friend class BTimeSource;
-	friend class _BTimeSourceP;
 	friend class BMediaRoster;
-	friend class _BMediaRosterP;
-	friend class MNodeManager;
 	friend class BBufferProducer;	//	for getting _mNodeID
 	friend class BPrivate::media::TimeSourceObject;
 	friend class BPrivate::media::SystemTimeSourceObject;
+	friend class BPrivate::media::BMediaRosterEx;
 
 		// Deprecated in 4.1
 		int32 IncrementChangeTag();

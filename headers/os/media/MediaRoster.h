@@ -20,6 +20,11 @@ class BMimeType;
 struct dormant_flavor_info;
 class BMediaAddOn;
 
+namespace BPrivate { namespace media {
+	class DefaultDeleter;
+	class BMediaRosterEx;
+} } // BPrivate::media
+
 class BMediaRoster : public BLooper
 {
 public:
@@ -384,14 +389,8 @@ virtual		status_t _Reserved_MediaRoster_5(void *);
 virtual		status_t _Reserved_MediaRoster_6(void *);
 virtual		status_t _Reserved_MediaRoster_7(void *);
 
-friend class _DefaultDeleter;
-friend class _BMediaRosterP;
-friend class _HostApp;
-friend class MLatentManager;
-friend class BBufferProducer;
-friend class media_node;
-friend class BBuffer;
-friend class BMediaNode;
+friend class BPrivate::media::DefaultDeleter;
+friend class BPrivate::media::BMediaRosterEx;
 
 static	bool _isMediaServer;
 
