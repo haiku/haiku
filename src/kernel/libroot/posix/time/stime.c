@@ -5,13 +5,21 @@
 
 #include <time.h>
 #include <OS.h>
+#include <errno.h>
 
+// ToDo: replace zero by a ROOT_UID when usergroup.c is implemented
 
 int
 stime(const time_t *tp)
 {
-	if (tp == NULL)
-		return B_ERROR;
+	if (tp == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+	if (geteuid() != 0) {
+		errno = EPERM;
+		return -1;
+	}
 	set_real_time_clock(*tp);
 	return B_OK;
 }
