@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs scrollbar ;
 
-#AddResources Time : Time.rsrc ;
+AddResources ScrollBar : ScrollBar.rdef ;
 
 Preference ScrollBar : ScrollBar.cpp ;
 

@@ -20,7 +20,7 @@ int main(int, char**)
 	return 0;
 }
 
-ScrollBarApp::ScrollBarApp():BApplication("application/x-vnd.scrollbarpref")
+ScrollBarApp::ScrollBarApp():BApplication("application/x-vnd.obos.scroll-bar")
 {
 	BWindow* myWindow = new BWindow( BRect(50,50,398,325), "Scroll Bar", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE );
 	BBox* bigBox = new BBox( BRect(0,0,348,275), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER );
@@ -29,16 +29,24 @@ ScrollBarApp::ScrollBarApp():BApplication("application/x-vnd.scrollbarpref")
 	
 	BBox* arrowstyleBox = new BBox( BRect( 12, 7, 169, 119) );
 	arrowstyleBox->SetLabel( "Arrow Style" );
-	BStringView* doubleStringView = new BStringView( BRect(25,20,60,38), "doubleStringView", "Double:" );
+	char * doubleLabel = "Double:";
+	float doubleWidth = mainView->StringWidth(doubleLabel);
+	BStringView* doubleStringView = new BStringView( BRect(25,20,25+doubleWidth,38), "doubleStringView", doubleLabel );
 	BView* doublearrowView = new BView( BRect(24,38,157,58), "doublearrowView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW );
-	BStringView* singleStringView = new BStringView( BRect(25,60,60,87), "singleStringView", "Single:" );
+	char * singleLabel = "Single:";
+	float singleWidth = mainView->StringWidth(singleLabel);
+	BStringView* singleStringView = new BStringView( BRect(25,60,25+singleWidth,87), "singleStringView", singleLabel );
 	BView* singlearrowView = new BView( BRect(24,87,157,107), "singlearrowView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW );
 	
 	BBox* knobtypeBox = new BBox( BRect( 180, 7, 338, 119) );
 	knobtypeBox->SetLabel( "Knob Type" );
-	BStringView* proportionalStringView = new BStringView( BRect(193,20,260,38), "proportionalStringView", "Proportional:" );
+	char * proportionalLabel = "Proportional:";
+	float proportionalWidth = mainView->StringWidth(proportionalLabel);
+	BStringView* proportionalStringView = new BStringView( BRect(193,20,193+proportionalWidth,38), "proportionalStringView", proportionalLabel );
 	BView* proportionalknobView = new BView( BRect(192,38,326,58), "proportionalknobView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW );
-	BStringView* fixedStringView = new BStringView( BRect(193,60,250,87), "fixedStringView", "Fixed:" );
+	char * fixedLabel = "Fixed:";
+	float fixedWidth = mainView->StringWidth(fixedLabel);
+	BStringView* fixedStringView = new BStringView( BRect(193,60,193+fixedWidth,87), "fixedStringView", fixedLabel );
 	BView* fixedknobView = new BView( BRect(192,87,326,107), "fixedknobView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW );
 	
 	
