@@ -59,4 +59,6 @@ const uint32 DISABLE_ITEMS				='DIit';
 const uint32 CHANGE_WINDOW				='CHwi'; 
 const uint32 TEXT_CHANGED				='TEch';
 
+const uint32 SAVE_AS_ENCODING			='SAen';
+
 #endif // CONSTANTS_H

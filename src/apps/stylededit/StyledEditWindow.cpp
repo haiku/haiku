@@ -17,6 +17,7 @@
 #include <Window.h>
 
 //****** Application defined header files************/.
+#include "CharacterSet.h"
 #include "Constants.h"
 #include "ColorMenuItem.h"
 #include "FindWindow.h"
@@ -852,9 +853,25 @@ StyledEditWindow::SaveAs()
    
 		fSavePanelEncodingMenu= new BMenu("Encoding");
 		menuBar->AddItem(fSavePanelEncodingMenu);
+		fSavePanelEncodingMenu->SetRadioMode(true);
+
+		status_t status = B_OK;
+		CharacterSetRoster * roster = CharacterSetRoster::Roster(&status);
+		if (status == B_OK) {
+			for (int id = 0; (id < roster->GetCharacterSetCount()) ; id++) {
+				const CharacterSet * cs = roster->FindCharacterSetByConversionID(id);
+				BString name(cs->GetPrintName());
+				name.Append(" (");
+				name.Append(cs->GetMIMEName());
+				name.Append(")");
+				BMenuItem * item = new BMenuItem(name.String(),new BMessage(SAVE_AS_ENCODING));
+				item->SetTarget(this);
+				fSavePanelEncodingMenu->AddItem(item);
+			}
+		}
 	}
 	
-	// it's own scope allows the lock to be released before Show()
+	// its own scope allows the lock to be released before Show()
 	{
 	// TODO: add encodings
 		BAutolock lock(fSavePanel->Window());

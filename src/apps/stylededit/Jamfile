@@ -4,12 +4,15 @@ AddResources StyledEdit :
 	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
 	;
 
-App StyledEdit : ColorMenuItem.cpp
+App StyledEdit :
+	CharacterSet.cpp
+	ColorMenuItem.cpp
 	FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditView.cpp
-	StyledEditWindow.cpp ;
+	StyledEditWindow.cpp
+	;
 
 LinkSharedOSLibs StyledEdit : be translation tracker ;
 
