@@ -49,6 +49,7 @@ static const uint32 kMsgPositionUpdate = 'poup';
 static const uint32 kMsgLastPosition = 'lpos';
 static const uint32 kMsgFontSize = 'fnts';
 static const uint32 kMsgBlockSize = 'blks';
+static const uint32 kMsgAddBookmark = 'bmrk';
 static const uint32 kMsgPrint = 'prnt';
 static const uint32 kMsgPageSetup = 'pgsp';
 
@@ -705,6 +706,8 @@ HeaderView::MessageReceived(BMessage *message)
 			int32 delta;
 			if (message->FindInt64("position", &position) == B_OK)
 				fPosition = position;
+			else if (message->FindInt64("block", &position) == B_OK)
+				fPosition = position * fBlockSize;
 			else if (message->FindInt32("delta", &delta) == B_OK)
 				fPosition += delta * off_t(fBlockSize);
 			else
@@ -1108,9 +1111,11 @@ ProbeView::AttachedToWindow()
 	UpdateSelectionMenuItems(0, 0);
 	menu->AddSeparatorItem();
 
-	subMenu = new BMenu("Bookmarks");
-	subMenu->AddItem(new BMenuItem("Add", NULL, 'B', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem(subMenu));
+	fBookmarkMenu = new BMenu("Bookmarks");
+	fBookmarkMenu->AddItem(item = new BMenuItem("Add", new BMessage(kMsgAddBookmark),
+		'B', B_COMMAND_KEY));
+	item->SetTarget(this);
+	menu->AddItem(new BMenuItem(fBookmarkMenu));
 	bar->AddItem(menu);
 
 	// "Attributes" menu (it's only visible if the underlying
@@ -1252,6 +1257,77 @@ ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
 	fSwappedMenuItem->SetLabel(buffer);
 	fSwappedMenuItem->SetEnabled(position >= 0 && position < fEditor.FileSize());
 	fSwappedMenuItem->Message()->ReplaceInt64("position", position * fEditor.BlockSize());
+}
+
+
+void
+ProbeView::UpdateBookmarkMenuItems()
+{
+	for (int32 i = 2; i < fBookmarkMenu->CountItems(); i++) {
+		BMenuItem *item = fBookmarkMenu->ItemAt(i);
+		if (item == NULL)
+			break;
+
+		BMessage *message = item->Message();
+		if (message == NULL)
+			break;
+
+		off_t block = message->FindInt64("block");
+
+		char buffer[128];
+		if (fDataView->Base() == kHexBase)
+			snprintf(buffer, sizeof(buffer), "Block 0x%Lx", block);
+		else
+			snprintf(buffer, sizeof(buffer), "Block %Ld (0x%Lx)", block, block);
+
+		item->SetLabel(buffer);
+	}
+}
+
+
+void 
+ProbeView::AddBookmark(off_t position)
+{
+	int32 count = fBookmarkMenu->CountItems();
+
+	if (count == 1) {
+		fBookmarkMenu->AddSeparatorItem();
+		count++;
+	}
+
+	// insert current position as bookmark
+
+	off_t block = position / fEditor.BlockSize();
+
+	off_t bookmark = -1;
+	BMenuItem *item;
+	int32 i;
+	for (i = 2; (item = fBookmarkMenu->ItemAt(i)) != NULL; i++) {
+		BMessage *message = item->Message();
+		if (message != NULL && message->FindInt64("block", &bookmark) == B_OK) {
+			if (block <= bookmark)
+				break;
+		}
+	}
+
+	// the bookmark already exists
+	if (block == bookmark)
+		return;
+
+	char buffer[128];
+	if (fDataView->Base() == kHexBase)
+		snprintf(buffer, sizeof(buffer), "Block 0x%Lx", block);
+	else
+		snprintf(buffer, sizeof(buffer), "Block %Ld (0x%Lx)", block, block);
+
+	BMessage *message;
+	item = new BMenuItem(buffer, message = new BMessage(kMsgPositionUpdate));
+	item->SetTarget(fHeaderView);
+	if (count < 12)
+		item->SetShortcut('0' + count - 2, B_COMMAND_KEY);
+	message->AddInt64("block", block);
+
+	fBookmarkMenu->AddItem(item, i);
 }
 
 
@@ -1406,6 +1482,8 @@ ProbeView::MessageReceived(BMessage *message)
 			fDataView->GetSelection(start, end);
 			UpdateSelectionMenuItems(start, end);
 
+			UpdateBookmarkMenuItems();
+
 			// update the applications settings
 			BMessage update(*message);
 			update.what = kMsgSettingsChanged;
@@ -1441,6 +1519,10 @@ ProbeView::MessageReceived(BMessage *message)
 				fHeaderView->SetTo(fEditor.ViewOffset(), blockSize);
 			break;
 		}
+
+		case kMsgAddBookmark:
+			AddBookmark(fHeaderView->Position());
+			break;
 
 		case kMsgPrint:
 			Print();
