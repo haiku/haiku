@@ -8,6 +8,7 @@ SUPPORT_KIT_SOURCE =
 	Flattenable.cpp
 	List.cpp
 	Locker.cpp
+	PointerList.cpp
 	StopWatch.cpp
 	String.cpp
 	string_helper.cpp
