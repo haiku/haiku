@@ -8,9 +8,7 @@
 <h2 align="center">Unified Nvidia graphics driver for (open)BeOS</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
-You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!<br>
-<br>
-Especially owners of laptops are encouraged to be extra carefull with their internal panels. A refresh setting higher than 60Hz might destroy the panel!</h3>
+You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
 <hr>
 <h2>Supported cards (as far as is known):</h2>
 <ul>
@@ -18,13 +16,13 @@ Especially owners of laptops are encouraged to be extra carefull with their inte
 	<li>TNT 2-M64;
 	<li>Vanta/Aladdin TNT2;
 	<li>GeForce 256;
-	<li>GeForce 2 MX/Ti/GTS/Go (Go only with external monitor);
+	<li>GeForce 2 MX/Ti/GTS/Go;
 	<li>GeForce 2 Integrated GPU (Nforce) (setup RAM amount manually for now);
 	<li>GeForce 3 (Ti);
-	<li>GeForce 4 MX/Ti/Go (Go only with external monitor);
+	<li>GeForce 4 MX/Ti/Go;
 	<li>GeForce 4 Integrated GPU (Nforce 2) (setup RAM amount manually for now);
-	<li>GeForce FX 5200/5600/5700/5800/5900/5950/Go (Go only with external monitor);
-	<li>Quadro (2/4/FX/Go) (Go only with external monitor).
+	<li>GeForce FX 5200/5600/5700/5800/5900/5950/Go;
+	<li>Quadro (2/4/FX/Go).
 </ul>
 <br>
 <hr>
@@ -33,17 +31,15 @@ Especially owners of laptops are encouraged to be extra carefull with their inte
 	<li>Hardware cursor support (on both heads on dualhead cards);
 	<li>Full 2D acceleration;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
-	<li>DPMS support (on both heads on dualhead cards);
+	<li>DPMS support for analog connected screens (on both heads on dualhead cards);
 	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards (overlay follows head in dualhead stretch/switch modes);
-	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now).
+	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
+	<li>DVI and laptop panel (widescreen) support.
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
 	<li>If the driver does not load make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
-	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
-	<li>No DVI support: you have to use a standard VGA cable to connect external flatpanels;
 	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file (driver probably defaults to 1Mb if you don't). If you have overlay trouble, set a slightly smaller amount of RAM than you actually specified in the system BIOS (1Mb less or so);
-	<li>A few cards still might have hardcursor trouble. If you encounter this use the softcursor: select this via the nv.settings file. Make sure you mail me if you still have trouble but also if this version fixed that!;
 	<li>If the driver still seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site). Make sure you mail me if you still have trouble but also if this version fixed that!
 </ul>
 <br>
@@ -130,6 +126,6 @@ With this option you can select which output on your card is the primary output 
 <hr>
 <br>
 <a href="mailto:rag.cornelissen@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on April 22, 2004)</p>
+<p>(Page last updated on May 11, 2004)</p>
 </body>
 </html>

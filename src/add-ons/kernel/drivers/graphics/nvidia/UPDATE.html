@@ -4,16 +4,15 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-23), (Rudolf)</h1></p>
+<p><h1>head (0.10-24), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
-	<li>Added flatpanel(s) refreshrate protection: it(they) is(are) always kept at 62Hz refresh;
+	<li>Added flatpanel(s) refreshrate protection: it(they) is(are) always kept at 62Hz refresh (60Hz shuts off some panels);
 	<li>Added flatpanel specific CRTC modeline and DFP modeline tuning: DVI connected panels work now on both heads (if applicable);
 	<li>Added aspect correction programming for flatpanels: corrects if mode aspect differs too much from panel aspect;
 	<li>Fixed acceleration engine management regarding sync_to_token: no more updating glitches should occur now;
 	<li>Added recognition for GeForce4 MX 4000, GeForceFX 5700LE and GeForceFX 5700VE cards; also modified a few others to be more correct;
-	<li>Added panel(s) native mode(s) to the modelist exported by the driver. You can now set it (them) by just selecting from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example);
 	<li>Implemented virtualized CRTC1/DAC1 and CRTC2/DAC2 access: when one flatpanel is found on a card that panel is always primary output now;
 	<li>Dualhead switch mode is operational with flatpanels now (via the virtualized setup);
 	<li>The user has the option to select the primary output via nv.settings now (via the new 'switchhead' option);
@@ -25,15 +24,19 @@
 	<li>Updated head selection code for register programming: NV11 needs a special treatment (again); NV11 dualhead modes are finally OK now, including switch mode;
 	<li>Updated secondary head specs: they are improved for nview cards (like GeForce4 and FX) in comparison to twinview cards (like GeForce2);
 	<li>Added move_overlay() so overlay (finally) works correctly in virtualscreens;
-	<li>Added blocking of modes above panel (with lowest) native resotution.
+	<li>You can now select upto one more 4:3 aspect, and 6 new 16:10 aspect modes by just selecting them from the Screenprefs app, <strong>except</strong> if you use the native R5 one. Use Dualhead setup instead (for example):
+		<ul>
+			<li>Added standard (4:3 aspect) mode 1400x1050 for panels and analog monitors to the modelist exported by the driver;
+			<li>Added widescreen (16:10 aspect) modes 800x500, 1024x640, 1280x800, 1440x900, 1680x1050 and 1920x1200 for panel(s) to the modelist exported by the driver if only widescreen panel(s) is (are) connected (so also no analog monitors may be connected!);
+			<li>Added blocking of modes above panel (with lowest) native resotution: this includes blocking of all widescreen modes if a non-widescreen (analog) screen is detected.
+		</ul>	
 </ul>
-The 'features' listed below are temporarily(?) shutdown. If your panel does not work with driver 0.10-17, <strong>PLEASE SEND FEEDBACK!</strong> Send me a logfile with full logging enabled as well. <strong>Feedback without accompaning logfiles are of very little use!</strong><br>
 <br>
 <strong>NOTE:</strong><br>
-These features are shutdown because they are possibly dangerous without feedback: No documentation on this exists, so this was setup by me tested on my cards only. Feedback to me will help me gain more info about <strong>IF</strong> we need this, and <strong>IF</strong> it's OK to use it. This will be accomplished by me sending 'tweaked' versions to you with these features enabled one by one, depending on the logfile you send me, <strong>AND</strong> the feedback I get from you about those tweaks working or not!!
+The features below are shutdown because they are possibly dangerous without feedback: No documentation on this exists, so this was setup by me tested on my cards only. Feedback (<strong>logfiles!</strong>) you might send to me might help me gain more info about <strong>IF</strong> we can use (or need) this, and <strong>IF</strong> it's OK to use it. 
 <ul>
-	<li>Added flatpanel LVDS and TMDS transmitters powerup if a panel is detected;
-	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters.
+	<li>Added flatpanel LVDS and TMDS transmitters powerup if a panel is detected (not finished: needs more feedback);
+	<li>Added flatpanel DPMS support for both heads via powerup/powerdown of LVDS and TMDS transmitters (not finished: needs more feedback).
 
 </ul>
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
@@ -113,7 +116,6 @@ These features are shutdown because they are possibly dangerous without feedback
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
-	<li>Add support for internal display panels (laptops);
 	<li>TVout support;
 	<li>Partial card coldstart: setup RAM and CORE speeds (if possible).
 </ul>
