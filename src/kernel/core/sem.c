@@ -656,6 +656,24 @@ get_sem_count(sem_id id, int32 *thread_count)
 }
 
 
+/** Fills the thread_info structure with information from the specified
+ *	thread.
+ *	The thread lock must be held when called.
+ */
+
+static void
+fill_sem_info(struct sem_entry *sem, sem_info *info, size_t size)
+{
+	info->sem = sem->id;
+	info->team = sem->u.used.owner;
+	strlcpy(info->name, sem->u.used.name, sizeof(info->name));
+	info->count = sem->u.used.count;
+	info->latest_holder	= sem->u.used.q.head->id;
+		// ToDo: not sure if this is the latest holder, or the next
+		// holder...
+}
+
+
 /** The underscore is needed for binary compatibility with BeOS.
  *	OS.h contains the following macro:
  *	#define get_sem_info(sem, info)                \
@@ -663,17 +681,18 @@ get_sem_count(sem_id id, int32 *thread_count)
  */
 
 status_t
-_get_sem_info(sem_id id, struct sem_info *info, size_t sz)
+_get_sem_info(sem_id id, struct sem_info *info, size_t size)
 {
+	status_t status = B_OK;
 	int state;
 	int slot;
 
-	if (gSemsActive == false)
+	if (!gSemsActive)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (info == NULL)
-		return EINVAL;
+	if (info == NULL || size != sizeof(sem_info))
+		return B_BAD_VALUE;
 
 	slot = id % MAX_SEMS;
 
@@ -681,23 +700,15 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
 	GRAB_SEM_LOCK(gSems[slot]);
 
 	if (gSems[slot].id != id) {
-		RELEASE_SEM_LOCK(gSems[slot]);
-		restore_interrupts(state);
+		status = B_BAD_SEM_ID;
 		TRACE(("get_sem_info: invalid sem_id %ld\n", id));
-		return B_BAD_SEM_ID;
-	}
-
-	info->sem			= gSems[slot].id;
-	info->team			= gSems[slot].u.used.owner;
-	strncpy(info->name, gSems[slot].u.used.name, SYS_MAX_OS_NAME_LEN-1);
-	info->count			= gSems[slot].u.used.count;
-	info->latest_holder	= gSems[slot].u.used.q.head->id;
-		// XXX not sure if this is correct
+	} else
+		fill_sem_info(&gSems[slot], info, size);
 
 	RELEASE_SEM_LOCK(gSems[slot]);
 	restore_interrupts(state);
 
-	return B_NO_ERROR;
+	return status;
 }
 
 
@@ -708,31 +719,27 @@ _get_sem_info(sem_id id, struct sem_info *info, size_t sz)
  */
 
 status_t
-_get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz)
+_get_next_sem_info(team_id team, int32 *_cookie, struct sem_info *info, size_t size)
 {
 	int state;
 	int slot;
 	bool found = false;
 
-	if (gSemsActive == false)
+	if (!gSemsActive)
 		return B_NO_MORE_SEMS;
-	if (cookie == NULL)
-		return EINVAL;
+	if (_cookie == NULL || info == NULL || size != sizeof(sem_info))
+		return B_BAD_VALUE;
+
+	if (team == B_CURRENT_TEAM)
+		team = team_get_current_team_id();
 	/* prevents gSems[].owner == -1 >= means owned by a port */
-	if (team < 0)
+	if (team < 0 || !team_is_valid(team))
 		return B_BAD_TEAM_ID; 
 
-	if (*cookie == 0) {
-		// return first found
-		slot = 0;
-	}
-	else {
-		// start at index cookie, but check cookie against MAX_SEMS
-		slot = *cookie;
-		if (slot >= MAX_SEMS)
-			return B_BAD_VALUE;
-	}
-	// spinlock
+	slot = *_cookie;
+	if (slot >= MAX_SEMS)
+		return B_BAD_VALUE;
+
 	state = disable_interrupts();
 	GRAB_SEM_LIST_LOCK();
 
@@ -741,14 +748,7 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 			GRAB_SEM_LOCK(gSems[slot]);
 			if (gSems[slot].id != -1 && gSems[slot].u.used.owner == team) {
 				// found one!
-				info->sem			= gSems[slot].id;
-				info->team			= gSems[slot].u.used.owner;
-				strncpy(info->name, gSems[slot].u.used.name,
-						SYS_MAX_OS_NAME_LEN-1);
-				info->count			= gSems[slot].u.used.count;
-				info->latest_holder	= gSems[slot].u.used.q.head->id;
-					// XXX not sure if this is the latest holder, or the next
-					// holder...
+				fill_sem_info(&gSems[slot], info, size);
 
 				RELEASE_SEM_LOCK(gSems[slot]);
 				slot++;
@@ -764,8 +764,9 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 
 	if (!found)
 		return B_BAD_VALUE;
-	*cookie = slot;
-	return B_NO_ERROR;
+
+	*_cookie = slot;
+	return B_OK;
 }
 
 
