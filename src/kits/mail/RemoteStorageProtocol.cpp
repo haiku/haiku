@@ -177,6 +177,9 @@ class UpdateHandler : public BHandler {
 							
 							if (dir == NULL)
 								dir = "";
+								
+							if (!_prot->mailboxes.HasItem(dir))
+								break;
 							
 							{
 								node_ref item_ref;
@@ -314,6 +317,9 @@ void BRemoteMailStorageProtocol::SyncMailbox(const char *mailbox) {
 	BString string;
 	uint32 chain;
 	bool append;
+	
+	if (!mailboxes.HasItem(mailbox))
+		return; // -- Basic Sanity Checking
 	
 	while (folder.GetNextEntry(&entry) == B_OK) {
 		if (!entry.IsFile())
