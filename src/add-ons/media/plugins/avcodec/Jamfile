@@ -4,6 +4,8 @@ UsePrivateHeaders media ;
 
 Addon avcodec : media plugins :
 	avcodec.cpp
+	codectbl.cpp
+	video_util.cpp
 	: 
 	false
 	:  
