@@ -283,3 +283,10 @@ arch_dbg_con_puts(const char *str)
 	}
 }
 
+
+status_t
+arch_dbg_con_init_settings(kernel_args *args)
+{
+	return B_OK;
+}
+
