@@ -108,7 +108,7 @@ void MediaReader::NodeRegistered(void)
 	// now we can do this
 	output.node = Node();
 	output.source.id = 0;
-	output.source.port = output.node.port;
+	output.source.port = output.node.port; // same as ControlPort();
 
 	// creates the parameter web and starts the looper thread
 	AbstractFileInterfaceNode::NodeRegistered();
@@ -412,6 +412,9 @@ status_t MediaReader::SetBufferGroup(
 			return B_NO_INIT;
 		}
 		int32 count = int32(fDownstreamLatency/fBufferPeriod)+2;
+		fprintf(stderr,"  downstream latency = %lld, buffer period = %lld, buffer count = %i\n",
+				fDownstreamLatency,fBufferPeriod,count);
+
 		// allocate the buffers
 		fBufferGroup = new BBufferGroup(output.format.u.multistream.max_chunk_size,count);
 		if (fBufferGroup == 0) {
@@ -519,16 +522,20 @@ void MediaReader::Connect(
 	output.destination = destination;
 	output.format = format;
 	strncpy(io_name,output.name,B_MEDIA_NAME_LENGTH-1);
-	io_name[B_MEDIA_NAME_LENGTH] = '\0';
+	io_name[B_MEDIA_NAME_LENGTH-1] = '\0';
 
 	// determine our downstream latency
 	media_node_id id;
 	FindLatencyFor(output.destination, &fDownstreamLatency, &id);
 
 	// compute the buffer period (must be done before setbuffergroup)
-	fBufferPeriod = int32(8000000 / 1024
+	fBufferPeriod = bigtime_t(1000 * 8000000 / 1024
 	                     * output.format.u.multistream.max_chunk_size
 			             / output.format.u.multistream.max_bit_rate);
+
+	fprintf(stderr,"  max chunk size = %i, max bit rate = %f, buffer period = %i\n",
+			output.format.u.multistream.max_chunk_size,
+			output.format.u.multistream.max_bit_rate,fBufferPeriod);
 
 	// setup the buffers if they aren't setup yet
 	if (fBufferGroup == 0) {
@@ -568,10 +575,10 @@ void MediaReader::Connect(
 	
 		fInternalLatency = end - start;
 		
-		fprintf(stderr,"internal latency from disk read = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency from disk read = %i\n",fInternalLatency);
 	} else {
 		fInternalLatency = 100; // just guess
-		fprintf(stderr,"internal latency guessed = %i\n",fInternalLatency);
+		fprintf(stderr,"  internal latency guessed = %i\n",fInternalLatency);
 	}
 	
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
@@ -688,6 +695,8 @@ void MediaReader::LatencyChanged(
 		fDownstreamLatency = new_latency;
 		SetEventLatency(fDownstreamLatency + fInternalLatency);
 	}
+	// we may have to recompute the number of buffers that we are using
+	// see SetBufferGroup
 }
 
 // -------------------------------------------------------- //
@@ -807,13 +816,17 @@ status_t MediaReader::FillFileBuffer(
 	if (GetCurrentFile() == 0) {
 		fprintf(stderr,"<- B_NO_INIT\n");
 		return B_NO_INIT;
-	}	
+	}
+	fprintf(stderr,"  %i buffer bytes used, %i buffer bytes available\n",
+			buffer->SizeUsed(),buffer->SizeAvailable());
 	off_t position = GetCurrentFile()->Position();
 	ssize_t bytesRead = GetCurrentFile()->Read(buffer->Data(),buffer->SizeAvailable());
 	if (bytesRead < 0) {
 		fprintf(stderr,"<- B_FILE_ERROR\n");
 		return B_FILE_ERROR; // some sort of file related error
 	}
+	fprintf(stderr,"  %i file bytes read at position %i.\n",
+			bytesRead,position);
 	buffer->SetSizeUsed(bytesRead);
 	media_header * header = buffer->Header();
 	header->type = B_MEDIA_MULTISTREAM;
@@ -821,9 +834,7 @@ status_t MediaReader::FillFileBuffer(
 	header->file_pos = position;
 	header->orig_size = bytesRead;
 	header->time_source = TimeSource()->ID();
-	// in our world performance time corresponds to bytes in the file
-	// so the start time of this buffer of bytes is simply its position
-	header->start_time = position;
+	header->start_time = TimeSource()->Now();
 	// nothing more to say?
 	return B_OK;
 }
