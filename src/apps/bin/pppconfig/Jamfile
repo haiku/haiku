@@ -15,7 +15,7 @@ OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: pppconfig ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	pppconfig :
 #	boot home config bin ;
-	boot home Desktop openbeos-networkingkit ;
+	boot home Desktop haiku-networkingkit ;

@@ -11,7 +11,7 @@ OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: ifconfig ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ifconfig :
 #	boot home config bin ;
-	boot home Desktop openbeos-networkingkit ;
+	boot home Desktop haiku-networkingkit ;

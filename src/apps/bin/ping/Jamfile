@@ -11,8 +11,8 @@ OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: ping ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	ping :
 #	boot home config bin ;
-	boot home Desktop openbeos-networkingkit ;
+	boot home Desktop haiku-networkingkit ;
 
