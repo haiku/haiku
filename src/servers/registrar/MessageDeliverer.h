@@ -23,14 +23,17 @@ public:
 	static void DeleteDefault();
 	static MessageDeliverer *Default();
 
-	status_t DeliverMessage(BMessage *message, BMessenger target);
-	status_t DeliverMessage(BMessage *message, port_id port, int32 token);
+	status_t DeliverMessage(BMessage *message, BMessenger target,
+		bigtime_t timeout = B_INFINITE_TIMEOUT);
+	status_t DeliverMessage(BMessage *message, port_id port, int32 token,
+		bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t DeliverMessage(const void *message, int32 messageSize,
-		BMessenger target);
+		BMessenger target, bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t DeliverMessage(const void *message, int32 messageSize,
-		port_id port, int32 token);
+		port_id port, int32 token, bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t DeliverMessage(const void *message, int32 messageSize,
-		const messaging_target *targets, int32 targetCount);
+		const messaging_target *targets, int32 targetCount,
+		bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 private:
 	class Message;
