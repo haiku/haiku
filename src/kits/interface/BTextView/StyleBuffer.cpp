@@ -467,7 +467,7 @@ _BStyleBuffer_::SetStyle(uint32 mode, const BFont *fromFont,
 	if (mode & B_FONT_SHEAR)
 		toFont->SetShear(fromFont->Shear());
 		
-	if (!mode)
+	if (!mode || (mode == B_FONT_ALL))
 		*toColor = *fromColor;
 }
 
