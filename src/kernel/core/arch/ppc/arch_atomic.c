@@ -4,6 +4,8 @@
  */
 
 #include <KernelExport.h>
+
+#include <ktypes.h>
 #include <user_atomic.h>
 
 /*
@@ -105,7 +107,7 @@ user_atomic_set64(vint64 *value, int64 newValue)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;
@@ -129,7 +131,7 @@ user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;
@@ -154,7 +156,7 @@ user_atomic_add64(vint64 *value, int64 addValue)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;
@@ -179,7 +181,7 @@ user_atomic_and64(vint64 *value, int64 andValue)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;
@@ -204,7 +206,7 @@ user_atomic_or64(vint64 *value, int64 orValue)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;
@@ -229,7 +231,7 @@ user_atomic_read64(vint64 *value)
 	int64 oldValue;
 	status = disable_interrupts();
 	acquire_spinlock(&user_lock);
-	if ((addr)value < KERNEL_BASE || (addr)value > (KERNEL_TOP - 8))
+	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
 		goto error;
 	if (user_memcpy(&oldValue, value, 8) < 0)
 		goto error;

@@ -5,6 +5,7 @@
 #ifndef _KERNEL_ARCH_x86_CPU_H
 #define _KERNEL_ARCH_x86_CPU_H
 
+#include <ktypes.h>
 #include <arch/x86/thread_struct.h>
 #include <arch/x86/descriptors.h>
 

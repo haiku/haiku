@@ -5,7 +5,6 @@
 
 #include <SupportDefs.h>
 
-#include <ktypes.h>
 #include <arch_cpu.h>
 #include <syscalls.h>
 
