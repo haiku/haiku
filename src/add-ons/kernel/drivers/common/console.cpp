@@ -228,7 +228,7 @@ erase_screen(struct console_desc *con, erase_screen_mode mode)
 {
 	switch (mode) {
 		case SCREEN_ERASE_WHOLE:
-			con->module->fill_glyph(0, 0, con->columns, con->lines, ' ', con->attr);
+			con->module->clear(con->attr);
 			break;
 		case SCREEN_ERASE_UP:
 			con->module->fill_glyph(0, 0, con->columns, con->y + 1, ' ', con->attr);
@@ -303,6 +303,12 @@ set_scroll_region(struct console_desc *con, int top, int bottom)
 static void
 set_vt100_attributes(struct console_desc *con, int32 *args, int32 argCount)
 {
+	if (argCount == 0) {
+		// that's the default (attributes off)
+		argCount++;
+		args[0] = 0;
+	}
+
 	for (int32 i = 0; i < argCount; i++) {
 		//dprintf("set_vt100_attributes: %ld\n", args[i]);
 		switch (args[i]) {
@@ -454,10 +460,10 @@ process_vt100_command(struct console_desc *con, const char c,
 				break;
 			}
 			case 'K':
-				if (argCount < 0) {
+				if (argCount == 0 || args[0] == 0) {
 					// erase to end of line
 					erase_line(con, LINE_ERASE_RIGHT);
-				} else {
+				} else if (argCount > 0) {
 					if (args[0] == 1)
 						erase_line(con, LINE_ERASE_LEFT);
 					else if (args[0] == 2)
@@ -465,7 +471,7 @@ process_vt100_command(struct console_desc *con, const char c,
 				}
 				break;
 			case 'J':
-				if (argCount < 0) {
+				if (argCount == 0 || args[0] == 0) {
 					// erase to end of screen
 					erase_screen(con, SCREEN_ERASE_DOWN);
 				} else {
@@ -532,6 +538,10 @@ _console_write(struct console_desc *con, const void *buf, size_t len)
 						break;
 					case '\t':
 						tab(con);
+						break;
+					case '\a':
+						// beep
+						dprintf("<BEEP>\n");
 						break;
 					case '\0':
 						break;
@@ -663,7 +673,7 @@ console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	const char *input = (const char *)buffer;
 	dprintf("console_write (%lu bytes): \"", *_length);
-	for (int32 i = 0; i < *_length; i++) {
+	for (uint32 i = 0; i < *_length; i++) {
 		if (input[i] < ' ')
 			dprintf("(%d:0x%x)", input[i], input[i]);
 		else
