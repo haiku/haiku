@@ -11,6 +11,9 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdlib.h>
 
 
 #ifndef HAVE_READ_POS
@@ -22,8 +25,22 @@
 Handle::Handle(int handle, bool takeOwnership)
 	:
 	fHandle(handle),
-	fOwnHandle(takeOwnership)
+	fOwnHandle(takeOwnership),
+	fPath(NULL)
 {
+}
+
+
+Handle::Handle(const char *path)
+	:
+	fOwnHandle(true),
+	fPath(NULL)
+{
+	fHandle = open(path, O_RDONLY);
+	if (fHandle < B_OK)
+		return;
+
+	fPath = strdup(path);
 }
 
 
@@ -38,11 +55,20 @@ Handle::~Handle()
 {
 	if (fOwnHandle)
 		close(fHandle);
+
+	free(fPath);
+}
+
+
+status_t 
+Handle::InitCheck()
+{
+	return fHandle < B_OK ? fHandle : B_OK;
 }
 
 
 void
-Handle::SetHandle(int handle, bool takeOwnership)
+Handle::SetTo(int handle, bool takeOwnership)
 {
 	if (fHandle && fOwnHandle)
 		close(fHandle);
@@ -63,6 +89,18 @@ ssize_t
 Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	return write_pos(fHandle, pos, buffer, bufferSize);
+}
+
+
+status_t 
+Handle::GetName(char *nameBuffer, size_t bufferSize) const
+{
+	if (fPath == NULL)
+		return B_ERROR;
+
+	strncpy(nameBuffer, fPath, bufferSize - 1);
+	nameBuffer[bufferSize - 1] = '\0';
+	return B_OK;
 }
 
 
