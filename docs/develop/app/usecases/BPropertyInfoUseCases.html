@@ -1,5 +1,5 @@
 <HTML>
-<!-- $Id: BPropertyInfoUseCases.html,v 1.1 2002/08/01 03:15:10 jrand Exp $ -->
+<!-- $Id: BPropertyInfoUseCases.html,v 1.2 2002/08/07 05:08:56 jrand Exp $ -->
 <HEAD>
 <TITLE>BPropertyInfo Use Cases and Implementation Details</TITLE>
 </HEAD>
@@ -37,9 +37,34 @@ made it into the BeBook.  For the latest, refer to the
 
 <OL>
 
-<LI><P><B>Construction 1:</B> A BPropertyInfo can be created...</P></LI>
+<LI><P><B>Construction 1:</B> A BPropertyInfo can be created with 0 to 3 construction arguments.
+With no arguments, the BPropertyInfo has no "property_info" or "value_info" structures.  If one
+argument is specified, it must be a pointer to the property_info structure for the BPropertyInfo.
+If two arguments are specified, the first is the property_info pointer and the second is the
+value_info structure.  If three arguments are specified, the first two are the same as indicated
+and the third is a flag which indicates that the BPropertyInfo class should "delete[]" the
+passed in pointers on destruction if true.</P></LI>
 
-<LI><P><B>Destruction:</B> ...</P></LI>
+<LI><P><B>Destruction:</B> On destruction, a BPropertyInfo class does nothing unless the third
+argument (free_on_delete flag) at construction was true.  If this argument was true, the 
+BPropertyInfo class performs a "delete[]" on the pointers passed in at construction time.</P></LI>
+
+<LI><P><B>Properties:</B> The Properties() member function returns the first argument passed in
+at construction time of the BPropertyInfo or NULL if it was constructed with no arguments.</P></LI>
+
+<LI><P><B>Values:</B> The Values() member function returns the second argument passed in
+at construction time of the BPropertyInfo or NULL if it was constructed with one or fewer 
+arguments.</P></LI>
+
+<LI><P><B>Count Properties:</B> The CountProperties() member function returns the number of
+elements in the NULL terminated array of property_info structures passed in as the first argument
+at construction time.  If the BPropertyInfo class was constructed with no arguments, 0 is 
+returned.</P></LI>
+
+<LI><P><B>Count Values:</B> The CountValues() member function returns the number of
+elements in the NULL terminated array of value_info structures passed in as the second argument
+at construction time.  If the BPropertyInfo class was constructed with one or fewer arguments, 0 is 
+returned.</P></LI>
 
 </OL>
 
