@@ -1,6 +1,7 @@
 #include "ReaderPlugin.h"
 
 Reader::Reader()
+ :	fSource(0)
 {
 }
 

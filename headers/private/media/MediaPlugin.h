@@ -1,4 +1,5 @@
-#include <MediaTrack.h>
+#ifndef _MEDIA_PLUGIN_H
+#define _MEDIA_PLUGIN_H
 
 namespace BPrivate { namespace media {
 
@@ -16,3 +17,6 @@ class Reader;
 
 using namespace BPrivate::media;
 
+extern "C" MediaPlugin *instantiate_plugin();
+
+#endif
