@@ -52,8 +52,9 @@ public:
 		printf("      block size:     %lu\n", partition->BlockSize());
 		printf("      index:          %ld\n", partition->Index());
 		printf("      status:         %lu\n", partition->Status());
-		printf("      mountable:      %d\n", partition->IsMountable());
-		printf("      partitionable:  %d\n", partition->IsPartitionable());
+		printf("      file system:    %d\n", partition->ContainsFileSystem());
+		printf("      part. system:   %d\n",
+			   partition->ContainsPartitioningSystem());
 		printf("      device:         %d\n", partition->IsDevice());
 		printf("      read only:      %d\n", partition->IsReadOnly());
 		printf("      mounted:        %d\n", partition->IsMounted());

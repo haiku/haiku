@@ -90,20 +90,20 @@ BPartition::Status() const
 	return (fPartitionData ? fPartitionData->status : 0);
 }
 
-// IsMountable
+// ContainsFileSystem
 bool
-BPartition::IsMountable() const
+BPartition::ContainsFileSystem() const
 {
 	return (fPartitionData
-			&& (fPartitionData->flags & B_PARTITION_MOUNTABLE));
+			&& (fPartitionData->flags & B_PARTITION_FILE_SYSTEM));
 }
 
-// IsPartitionable
+// ContainsPartitioningSystem
 bool
-BPartition::IsPartitionable() const
+BPartition::ContainsPartitioningSystem() const
 {
 	return (fPartitionData
-			&& (fPartitionData->flags & B_PARTITION_PARTITIONABLE));
+			&& (fPartitionData->flags & B_PARTITION_PARTITIONING_SYSTEM));
 }
 
 // IsDevice

@@ -68,8 +68,8 @@ public:
 	
 	void SetFlags(uint32 flags);	// comprises the ones below
 	uint32 Flags() const;
-	bool IsMountable() const;
-	bool IsPartitionable() const;
+	bool ContainsFileSystem() const;
+	bool ContainsPartitioningSystem() const;
 	bool IsReadOnly() const;
 	bool IsMounted() const;
 

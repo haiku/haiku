@@ -483,7 +483,8 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	PartitionMap *map = (PartitionMap*)cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
-	partition->flags |= B_PARTITION_PARTITIONABLE | B_PARTITION_READ_ONLY;
+	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
+						| B_PARTITION_READ_ONLY;
 		// TODO: Update when write functionality is implemented.
 	// (no content_name and content_parameters)
 	partition->content_type = strdup(kPartitionTypeIntel);
@@ -625,7 +626,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	PrimaryPartition *primary = (PrimaryPartition*)partition->cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
-	partition->flags |= B_PARTITION_PARTITIONABLE | B_PARTITION_READ_ONLY;
+	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
+						| B_PARTITION_READ_ONLY;
 		// TODO: Update when write functionality is implemented.
 	// (no content_name and content_parameters)
 	partition->content_type = strdup(kPartitionTypeIntelExtended);

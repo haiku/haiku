@@ -316,7 +316,7 @@ BDiskDeviceRoster::VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
 	if (visitor) {
 		struct MountablePartitionFilter : public PartitionFilter {
 			virtual bool Filter(BPartition *partition)
-				{ return partition->IsMountable(); }
+				{ return partition->ContainsFileSystem(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
 		terminatedEarly
@@ -376,7 +376,7 @@ BDiskDeviceRoster::VisitEachPartitionablePartition(BDiskDeviceVisitor *visitor,
 	if (visitor) {
 		struct PartitionablePartitionFilter : public PartitionFilter {
 			virtual bool Filter(BPartition *partition)
-				{ return partition->IsPartitionable(); }
+				{ return partition->ContainsPartitioningSystem(); }
 		} filter;
 		PartitionFilterVisitor filterVisitor(visitor, &filter);
 		terminatedEarly

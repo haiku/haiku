@@ -305,18 +305,18 @@ KPartition::Flags() const
 	return fPartitionData.flags;
 }
 
-// IsMountable
+// ContainsFileSystem
 bool
-KPartition::IsMountable() const
+KPartition::ContainsFileSystem() const
 {
-	return (fPartitionData.flags & B_PARTITION_MOUNTABLE);
+	return (fPartitionData.flags & B_PARTITION_FILE_SYSTEM);
 }
 
-// IsPartitionable
+// ContainsPartitioningSystem
 bool
-KPartition::IsPartitionable() const
+KPartition::ContainsPartitioningSystem() const
 {
-	return (fPartitionData.flags & B_PARTITION_PARTITIONABLE);
+	return (fPartitionData.flags & B_PARTITION_PARTITIONING_SYSTEM);
 }
 
 // IsReadOnly
@@ -681,9 +681,9 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 	// update concerned partition flags
 	if (fDiskSystem) {
 		if (fDiskSystem->IsFileSystem())
-			SetFlags(Flags() | B_PARTITION_MOUNTABLE);
+			SetFlags(Flags() | B_PARTITION_FILE_SYSTEM);
 		else
-			SetFlags(Flags() | B_PARTITION_PARTITIONABLE);
+			SetFlags(Flags() | B_PARTITION_PARTITIONING_SYSTEM);
 	}
 }
 

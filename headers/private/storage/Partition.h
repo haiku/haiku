@@ -29,8 +29,8 @@ public:
 	int32 Index() const;		// 0 for devices
 	uint32 Status() const;
 	
-	bool IsMountable() const;
-	bool IsPartitionable() const;
+	bool ContainsFileSystem() const;
+	bool ContainsPartitioningSystem() const;
 
 	bool IsDevice() const;
 	bool IsReadOnly() const;

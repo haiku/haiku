@@ -390,7 +390,7 @@ bfs_scan_partition(int fd, partition_data *partition, void *cookie)
 	superBlock = (disk_super_block*)cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
-	partition->flags |= B_PARTITION_MOUNTABLE;
+	partition->flags |= B_PARTITION_FILE_SYSTEM;
 	partition->block_size = superBlock->block_size;
 	partition->content_name = strdup(superBlock->name);
 	partition->content_type = strdup(kPartitionTypeBFS);
