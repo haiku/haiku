@@ -16,20 +16,195 @@
 
 #define GLOBAL(x) .globl x ; x
 
+// this saves us some trouble with relocation (I didn't manage GAS to
+// create 32 bit references to labels)
+#define FAILURE_STRING 0x1d0
+#define DOT_STRING 0x1fc
+
+#define DRIVE_RETRIES 3
+	// when the drive reading fails for some reason, it will
+	// retry this many times until it will report a failure
+
 .text
 .code16
 
 /** This is the entry point when we were written directly to a floppy disk */
 
-floppy_start:
-	ljmp	$0x07c0, $0x0005	// make sure we're on the right segment
-
 	jmp		floppy_start
-		// ToDo: implement the rest of the floppy loader!
 
+sNumSectors:
+	// this location will contain the length of the boot loader as
+	// written by the "makeflop" command in 512 byte blocks
+	.word	0x00c0
+
+floppy_start:
+	cli
+	cld
+
+	// set up the stack to 0x0000:0x9000
+	xor		%ax, %ax
+	mov		%ax, %ss
+	mov		$0x9000, %sp
+
+	push	$0x07c0
+	pop		%ds
+	push	$0x1000
+	pop		%es
+
+	// load the rest of the boot loader to 0x1000:0x0200
+	.code32					// we need to create a 32-bit relocation entry for the linker...
+	.byte	0x67
+	movw	sNumSectors - 0x10000, %di
+	.code16
+	xor		%dh, %dh		// head 0, don't change BIOS boot device
+	mov		$0x2, %cx		// sector 2
+	mov		$0x200, %bx		// to 0x1000:0x0200
+	call	load_sectors
+
+	or		%dl, %dl		// if it's a floppy, turn off its motor
+	jnz		start_loader
+	call	disable_floppy_motor
+
+start_loader:
+	// set our environment and jump to the standard BFS boot block entry point
+	xor		%dx, %dx		// boot device ID and partition offset to 0
+	xor		%eax, %eax
+	ljmp	$0x1000, $0x0200
+
+
+/**	Loads %di sectors from floppy disk, starting at head %dh, sector %cx.
+ *	The data is loaded to %es:%bx. On exit, %es:%bx will point immediately 
+ *	behind the loaded data, so that you can continue to read in data.
+ *	%ax, %cx, %dx, %bp, %di and %si will be clobbered.
+ */
+
+load_sectors:
+	// first, get information about the drive as we intend to read whole tracks
+	push	%bx
+	push	%cx
+	push	%dx
+	push	%di
+	push	%es
+
+	movb	$8, %ah				// get drive parameters - changes a lot of registers
+	int		$0x13
+
+	pop		%es
+	pop		%di
+		// ToDo: store the number of heads somewhere (it's in %dh)
+	pop		%dx
+	and		$63, %cx			// mask out max. sector number (bit 0-5)
+	mov		%cx, %si			// and remember it
+	pop		%cx
+	pop		%bx
+	
+load_track:
+	mov		%di, %ax			// limit the sector count to track boundaries
+	add		%cl, %al
+	dec		%ax
+	cmp		%si, %ax
+	jbe		matches_track_boundary
+	mov		%si, %ax
+matches_track_boundary:
+	inc		%ax					// take the current sector offset into account
+	sub		%cl, %al
+
+	// make sure we don't cross a 64kB address boundary or else the read will fail
+	// (this small piece of knowledge took me some time to accept :))
+	shl		$9, %ax
+	mov		%ax, %bp
+	add		%bx, %bp
+	jnc		respects_boundary
+	xor		%ax, %ax			// only read up to the 64kB boundary
+	sub		%bx, %ax
+respects_boundary:
+	shr		$9, %ax
+	mov		DRIVE_RETRIES, %bp
+
+try_to_read:
+	pusha
+	movb	$2, %ah				// load sectors from drive
+	int		$0x13
+	jnc		read_succeeded
+
+	xor		%ax, %ax
+	int		$0x13				// reset drive
+	popa
+
+	dec		%bp
+	jz		load_failed			// if already retried often enough, bail out
+	jmp		try_to_read
+
+read_succeeded:
+	mov		$DOT_STRING, %si
+	call	print_string
+	popa
+
+	xor		%ah, %ah
+	add		%ax, %cx			// next sector start
+	sub		%ax, %di			// update sectors left to be read
+
+	shl		$9, %ax				// get byte offset
+	add		%ax, %bx			// update target address
+	jnz		check_sector_start
+
+	mov		%es, %ax			// overflow to the next 64kB, %bx is already zero
+	add		$0x1000, %ax
+	mov		%ax, %es
+
+check_sector_start:
+	mov		%si, %ax			// compare the sectors, not the cylinders
+	cmp		%al, %cl
+	jbe		continue_reading
+
+	sub		%si, %cx
+	inc		%dh					// next head
+	cmp		$1, %dh
+		// ToDo: check max. number of heads!
+	jbe		check_sector_start
+
+	xor		%dh, %dh			// next cylinder
+	inc		%ch
+	jmp		check_sector_start
+
+continue_reading:
+	or		%di, %di
+	jnz		load_track
+	ret
+
+load_failed:
+	mov		$FAILURE_STRING, %si
+	call	print_string
+
+	xor		%ax, %ax
+	int		$0x16				// wait for key
+	int		$0x19				// and reboot
+
+disable_floppy_motor:
+	xor		%al, %al
+	mov		$0x3f2, %dx
+	out		%al, %dx
+	ret
+
+print_string:
+	movb	$0x0e, %ah
+	xor		%bx, %bx
+print_char:
+	lodsb
+	orb		%al, %al			// are there still characters left?
+	jz		no_more_chars
+	int		$0x10
+	jmp		print_char
+no_more_chars:
+	ret
 
 floppy_end:
-	.org	0x01fe-floppy_end
+	.org	FAILURE_STRING
+	.string " Loading failed! Press key to reboot.\r\n"
+	.org	DOT_STRING
+	.string	"."
+
+	.org	0x01fe
 	.word	0xaa55
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
