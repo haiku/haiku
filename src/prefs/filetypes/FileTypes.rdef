@@ -5,7 +5,7 @@
 
 resource app_signature "application/x-vnd.obos.file-types";
 
-resource app_flags 0x00000000;
+resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {
 	"types" = "application/x-be-resource",

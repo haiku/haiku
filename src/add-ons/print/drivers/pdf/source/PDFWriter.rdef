@@ -24,7 +24,7 @@ resource app_signature "application/x-vnd.obos.pdfwriter";
    0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
    */
 
-resource app_flags 0x00000000;
+resource app_flags B_SINGLE_LAUNCH;
 
 /* BEOS:FILE_TYPES :
    "types" = "text/plain",

@@ -24,7 +24,7 @@ resource app_signature "application/x-vnd.obos.terminal";
    0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
    */
 
-resource app_flags 0x00000001;
+resource app_flags B_MULTIPLE_LAUNCH;
 
 /* BEOS:FILE_TYPES :
    "types" = "text/plain",
