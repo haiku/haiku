@@ -18,7 +18,7 @@ PluginManager _plugin_manager;
 status_t
 _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
 {
-	printf("_CreateReader enter\n");
+	TRACE("_CreateReader enter\n");
 
 	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
 	if (seekable_source == 0) {
@@ -59,7 +59,7 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 		(*reader)->Setup(seekable_source);
 
 		if (B_OK == (*reader)->Sniff(streamCount)) {
-			printf("_CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
+			TRACE("_CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
 			return B_OK;
 		}
@@ -69,20 +69,20 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 		_plugin_manager.PutPlugin(plugin);
 	}
 
-	printf("_CreateReader leave\n");
+	TRACE("_CreateReader leave\n");
 	return B_MEDIA_NO_HANDLER;
 }
 
 
 status_t
-_CreateDecoder(Decoder **_decoder, const media_format *format)
+_CreateDecoder(Decoder **_decoder, const media_format &format)
 {
-	printf("_CreateDecoder enter\n");
+	TRACE("_CreateDecoder enter\n");
 
 	// get decoder for this format from the server
 	server_get_decoder_for_format_request request;
 	server_get_decoder_for_format_reply reply;
-	request.format = *format;
+	request.format = format;
 	if (B_OK != QueryServer(SERVER_GET_DECODER_FOR_FORMAT, &request, sizeof(request), &reply, sizeof(reply))) {
 		printf("_CreateReader: can't get decoder for format\n");
 		return B_ERROR;
@@ -106,7 +106,7 @@ _CreateDecoder(Decoder **_decoder, const media_format *format)
 		return B_ERROR;
 	}
 
-	printf("_CreateDecoder leave\n");
+	TRACE("_CreateDecoder leave\n");
 
 	return B_OK;
 }
@@ -182,7 +182,7 @@ PluginManager::GetPlugin(const entry_ref &ref)
 	info.usecount = 1;
 	fPluginList->Insert(info);
 	
-	printf("PluginManager: PlugIn %s loaded\n", ref.name);
+	TRACE("PluginManager: PlugIn %s loaded\n", ref.name);
 
 	plugin = info.plugin;
 	
@@ -222,7 +222,7 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 {
 	BPath p(&ref);
 
-	printf("PluginManager: LoadPlugin trying to load %s\n", p.Path());
+	TRACE("PluginManager: LoadPlugin trying to load %s\n", p.Path());
 
 	image_id id;
 	id = load_add_on(p.Path());
