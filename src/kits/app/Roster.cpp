@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -1055,7 +1056,7 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 		err = msg.AddString("app sig", appSig);
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1096,7 +1097,7 @@ BRoster::GetRecentDocuments(BMessage *refList, int32 maxCount,
 		err = msg.AddString("app sig", appSig);
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1132,7 +1133,7 @@ BRoster::GetRecentFolders(BMessage *refList, int32 maxCount,
 		err = msg.AddString("app sig", appSig);
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1165,7 +1166,7 @@ BRoster::GetRecentApps(BMessage *refList, int32 maxCount) const
 	}
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1205,7 +1206,7 @@ BRoster::AddToRecentDocuments(const entry_ref *doc, const char *appSig) const
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1242,7 +1243,7 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 		err = msg.AddString("app sig", (appSig ? appSig : callingAppSig));
 	fMess.SendMessage(&msg, &reply);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1748,7 +1749,7 @@ DBG(OUT("BRoster::xLaunchAppPrivate() done: %s (%lx)\n", strerror(error), error)
 bool
 BRoster::UpdateActiveApp(team_id team) const
 {
-	status_t error = (team >= 0 ? B_OK : B_BAD_TEAM_ID);
+	status_t error = (team >= 0 ? (status_t)B_OK : (status_t)B_BAD_TEAM_ID);
 	// compose the request message
 	BMessage request(B_REG_ACTIVATE_APP);
 	if (error == B_OK)
@@ -2208,7 +2209,7 @@ BRoster::AddToRecentApps(const char *appSig) const
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)
-		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		error = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (error == B_OK)
 		error = reply.FindInt32("result", &result);
 	if (error == B_OK)
@@ -2273,7 +2274,7 @@ BRoster::LoadRecentLists(const char *filename) const
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)
-		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		error = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (error == B_OK)
 		error = reply.FindInt32("result", &result);
 	if (error == B_OK)
@@ -2303,7 +2304,7 @@ BRoster::SaveRecentLists(const char *filename) const
 	// evaluate the reply
 	status_t result;
 	if (error == B_OK)
-		error = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		error = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (error == B_OK)
 		error = reply.FindInt32("result", &result);
 	if (error == B_OK)

@@ -294,7 +294,7 @@ find_directory(directory_which which, BPath *path, bool createIt,
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		dev_t device = -1;
+		dev_t device = (dev_t)-1;
 		if (volume && volume->InitCheck() == B_OK)
 			device = volume->Device();
 		error = find_directory(which, *path, createIt, device);

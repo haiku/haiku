@@ -61,7 +61,7 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 			if (bytes < B_OK)
 				err = bytes;
 			else
-				err = (bytes != len ? B_FILE_ERROR : B_OK);
+				err = (bytes != len ? (status_t)B_FILE_ERROR : (status_t)B_OK);
 		}			
 	}
 	return err;

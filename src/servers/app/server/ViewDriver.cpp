@@ -26,7 +26,7 @@
 //------------------------------------------------------------------------------
 
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <Message.h>
 #include <Region.h>
 #include <Bitmap.h>

@@ -10,6 +10,7 @@
 #include <NodeInfo.h>
 
 #include <new>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <Entry.h>

@@ -39,11 +39,6 @@ public:
 	status_t DeleteSnifferRule(const char *type);
 	
 	void PrintToStream() const;
-private:
-	status_t BuildRuleList();
-	status_t GuessMimeType(BPositionIO *data, BString *type);
-	ssize_t MaxBytesNeeded();
-	status_t ProcessType(const char *type, ssize_t *bytesNeeded);
 
 	struct sniffer_rule {
 		std::string type;							// The mime type that own the rule
@@ -53,6 +48,11 @@ private:
 		sniffer_rule(BPrivate::Storage::Sniffer::Rule *rule = NULL);
 		~sniffer_rule(); 
 	};		
+private:
+	status_t BuildRuleList();
+	status_t GuessMimeType(BPositionIO *data, BString *type);
+	ssize_t MaxBytesNeeded();
+	status_t ProcessType(const char *type, ssize_t *bytesNeeded);
 
 	std::list<sniffer_rule> fRuleList;
 	ssize_t fMaxBytesNeeded;

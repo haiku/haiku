@@ -8,7 +8,7 @@
 */
 
 #include <sniffer/Err.h>
-#include <new.h>
+#include <new>
 
 using namespace BPrivate::Storage::Sniffer;
 
@@ -82,7 +82,7 @@ Err::SetMsg(const char *msg) {
 		fMsg = NULL;
 	} 
 	if (msg) {
-		fMsg = new(nothrow) char[strlen(msg)+1];
+		fMsg = new(std::nothrow) char[strlen(msg)+1];
 		if (fMsg)
 			strcpy(fMsg, msg);
 	}

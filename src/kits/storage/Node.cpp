@@ -26,8 +26,8 @@
 /*! \brief Creates an uninitialized node_ref object.
 */
 node_ref::node_ref()
-		: device(-1),
-		  node(-1)
+		: device((dev_t)-1),
+		  node((ino_t)-1)
 {
 }
 
@@ -36,8 +36,8 @@ node_ref::node_ref()
 	\param ref the node_ref to be copied
 */
 node_ref::node_ref(const node_ref &ref)
-		: device(-1),
-		  node(-1)
+		: device((dev_t)-1),
+		  node((ino_t)-1)
 {
 	*this = ref;
 }

@@ -45,10 +45,10 @@ void *operator new (size_t) __THROW (std::bad_alloc);
 void *operator new[] (size_t) __THROW (std::bad_alloc);
 void operator delete (void *) __THROW(__nothing);
 void operator delete[] (void *) __THROW(__nothing);
-void *operator new (size_t, const nothrow_t&) __THROW(__nothing);
-void *operator new[] (size_t, const nothrow_t&) __THROW(__nothing);
-void operator delete (void *, const nothrow_t&) __THROW(__nothing);
-void operator delete[] (void *, const nothrow_t&) __THROW(__nothing);
+void *operator new (size_t, const std::nothrow_t&) __THROW(__nothing);
+void *operator new[] (size_t, const std::nothrow_t&) __THROW(__nothing);
+void operator delete (void *, const std::nothrow_t&) __THROW(__nothing);
+void operator delete[] (void *, const std::nothrow_t&) __THROW(__nothing);
 
 // default placement versions of operator new
 #ifndef _BUILDING_NEW_CPP_

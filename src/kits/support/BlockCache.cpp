@@ -44,7 +44,7 @@ object_alloc(size_t Size)
 static void
 object_free(void *Data)
 {
-	delete[] Data;
+	delete[] (int8*)Data;
 }
 
 
@@ -108,7 +108,7 @@ BBlockCache::BBlockCache(size_t CacheSize, size_t BlockSize, uint32 Type)
 
 BBlockCache::~BBlockCache()
 {
-	delete[] fCache;
+	delete[] (int8*)fCache;
 }
 
 

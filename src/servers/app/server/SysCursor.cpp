@@ -286,7 +286,7 @@ status_t CursorSet::FindCursor(cursor_which which, BBitmap **cursor, BPoint *hot
 	{
 		bmp=new BBitmap( msg.FindRect("_frame"),
 					(color_space) msg.FindInt32("_cspace"),true );
-		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, &bufferLength);
+		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, (ssize_t*)&bufferLength);
 		memcpy(bmp->Bits(), buffer, bufferLength);
 
 		*cursor=bmp;
@@ -330,7 +330,7 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 	if(tempstr.Compare("cursor")==0)
 	{
 		csr=new ServerCursor(msg.FindRect("_frame"),(color_space) msg.FindInt32("_cspace"),0, hotpt);
-		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, &bufferLength);
+		msg.FindData("_data",B_RAW_TYPE,(const void **)&buffer, (ssize_t*)&bufferLength);
 		memcpy(csr->Bits(), buffer, bufferLength);
 
 		*cursor=csr;

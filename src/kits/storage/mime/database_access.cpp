@@ -260,7 +260,7 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 		char *buffer = NULL;
 		if (otherColorSpace) {
 			// other color space than stored in attribute
-			buffer = new(nothrow) char[attrSize];
+			buffer = new(std::nothrow) char[attrSize];
 			if (!buffer)
 				err = B_NO_MEMORY;
 			if (!err) 
@@ -270,7 +270,7 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 			err = node.ReadAttr(attr.c_str(), attrType, 0, icon->Bits(), attrSize);
 		}
 		if (err >= 0)
-			err = (err == attrSize) ? B_OK : B_FILE_ERROR;
+			err = (err == attrSize) ? (status_t)B_OK : (status_t)B_FILE_ERROR;
 		if (otherColorSpace) {
 			if (!err) {
 				err = icon->ImportBits(buffer, attrSize, B_ANY_BYTES_PER_ROW,
@@ -390,7 +390,7 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 	if (!err) {
 		otherColorSpace = (icon->ColorSpace() != B_CMAP8);
 		if (otherColorSpace) {
-			icon8 = new(nothrow) BBitmap(bounds, B_CMAP8);
+			icon8 = new(std::nothrow) BBitmap(bounds, B_CMAP8);
 			if (!icon8)
 				err = B_NO_MEMORY;
 			if (!err)
@@ -406,7 +406,7 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 	}
 	// Alloc a new data buffer
 	if (!err) {
-		*data = new(nothrow) char[*dataSize];
+		*data = new(std::nothrow) char[*dataSize];
 		if (!*data)
 			err = B_NO_MEMORY;
 	}

@@ -73,8 +73,8 @@ port_id _get_looper_port_(const BLooper* looper);
 bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
 int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
 
-uint32			BLooper::sLooperID = B_ERROR;
-team_id			BLooper::sTeamID = B_ERROR;
+uint32			BLooper::sLooperID = (uint32)B_ERROR;
+team_id			BLooper::sTeamID = (team_id)B_ERROR;
 
 enum
 {
@@ -882,7 +882,7 @@ void BLooper::SetCommonFilterList(BList* filters)
 	{
 		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
 		{
-			delete fCommonFilters->ItemAt(i);
+			delete (BMessageFilter*)fCommonFilters->ItemAt(i);
 		}
 
 		delete fCommonFilters;
@@ -1251,7 +1251,7 @@ DBG(OUT("BLooper::ReadMessageFromPort()\n"));
 
 	if (msgbuffer)
 	{
-		delete[] msgbuffer;
+		delete[] (int8*)msgbuffer;
 	}
 
 DBG(OUT("BLooper::ReadMessageFromPort() done: %p\n", bmsg));

@@ -11,7 +11,7 @@
 #include <Node.h>
 #include <Volume.h>
 
-#include <posix/sys/stat.h>
+#include <sys/stat.h>
 
 #include "fsproto.h"
 #include "kernel_interface.h"

@@ -112,7 +112,7 @@ calculate_checksum(const void *data, uint32 size)
 	const uint8 *current = csData;
 	for (; current < dataEnd; current += 4) {
 		uint32 word = 0;
-		int32 bytes = min(4L, dataEnd - current);
+		int32 bytes = min(4L, (int32)(dataEnd - current));
 		for (int32 i = 0; i < bytes; i++)
 			word = (word << 8) + current[i];
 		checkSum += word;
@@ -1035,12 +1035,12 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		indexSectionSize = align_value(indexSectionSize,
 									   kResourceIndexSectionAlignment);
 		size += indexSectionSize;
-		bufferSize = max(bufferSize, indexSectionSize);
+		bufferSize = max((uint32)bufferSize, indexSectionSize);
 		// unknown section
 		uint32 unknownSectionOffset = size;
 		uint32 unknownSectionSize = kUnknownResourceSectionSize;
 		size += unknownSectionSize;
-		bufferSize = max(bufferSize, unknownSectionSize);
+		bufferSize = max((uint32)bufferSize, unknownSectionSize);
 		// data
 		uint32 dataOffset = size;
 		uint32 dataSize = 0;
@@ -1071,7 +1071,7 @@ ResourceFile::_WriteResources(ResourcesContainer &container)
 		infoTableSize += kResourceInfoSeparatorSize
 						 + kResourceInfoTableEndSize;
 		size += infoTableSize;
-		bufferSize = max(bufferSize, infoTableSize);
+		bufferSize = max((uint32)bufferSize, infoTableSize);
 
 		// write...
 		// set the file size

@@ -151,7 +151,7 @@ watch_node(const node_ref *node, uint32 flags, const BHandler *handler,
 			// subscribe to...
 			// mount watching
 			if (flags & B_WATCH_MOUNT) {
-				error = _kstart_watching_vnode_(-1, -1, 0, port, handlerToken);
+				error = _kstart_watching_vnode_((dev_t)-1, (ino_t)-1, 0, port, handlerToken);
 				flags &= ~B_WATCH_MOUNT;
 			}
 			// node watching

@@ -55,7 +55,7 @@ namespace OpenBeOS {
 	InitCheck() will return \c B_NO_INIT.
 */
 BVolume::BVolume()
-	: fDevice(-1),
+	: fDevice((dev_t)-1),
 	  fCStatus(B_NO_INIT)
 {
 }
@@ -70,7 +70,7 @@ BVolume::BVolume()
 	\param device The device ID of the volume.
 */
 BVolume::BVolume(dev_t device)
-	: fDevice(-1),
+	: fDevice((dev_t)-1),
 	  fCStatus(B_NO_INIT)
 {
 	SetTo(device);
@@ -146,7 +146,7 @@ BVolume::SetTo(dev_t device)
 void
 BVolume::Unset()
 {
-	fDevice = -1;
+	fDevice = (dev_t)-1;
 	fCStatus = B_NO_INIT;
 }
 

@@ -15,7 +15,7 @@
 #include <SupportDefs.h>
 
 #include <list>
-#include <pair.h>
+#include <utility>
 
 struct entry_ref;
 class BMessage;

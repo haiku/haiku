@@ -546,7 +546,7 @@ BPrivate::Storage::rename_attr(FileDescriptor file, const char *oldName,
 	char *data = NULL;
 	if (error == B_OK) {
 		// alloc at least one byte
-		data = new(nothrow) char[max(info.size, 1LL)];
+		data = new(nothrow) char[max(info.size, (off_t)1LL)];
 		if (data == NULL)
 			error = B_NO_MEMORY;		
 	}

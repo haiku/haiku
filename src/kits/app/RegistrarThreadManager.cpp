@@ -84,7 +84,7 @@ RegistrarThreadManager::LaunchThread(RegistrarThread *thread)
 {
 	status_t err = thread ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = fThreadCount < kThreadLimit ? B_OK : B_NO_MORE_THREADS;
+		err = fThreadCount < kThreadLimit ? (status_t)B_OK : (status_t)B_NO_MORE_THREADS;
 
 	if (!err) {
 		fThreads.push_back(thread);

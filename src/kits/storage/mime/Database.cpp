@@ -360,7 +360,7 @@ Database::SetIconForType(const char *type, const char *fileType, const void *dat
 	if (!err)
 		err = node.WriteAttr(attr.c_str(), attrType, 0, data, attrSize);
 	if (err >= 0)
-		err = err == (ssize_t)attrSize ? B_OK : B_FILE_ERROR;
+		err = err == (ssize_t)attrSize ? (status_t)B_OK : (status_t)B_FILE_ERROR;
 	if (!err) {
 		if (fileType) 
 			err = SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType, (which == B_LARGE_ICON), B_META_MIME_MODIFIED);
@@ -381,7 +381,7 @@ Database::SetIconForType(const char *type, const char *fileType, const void *dat
 	\param verb \c app_verb action for which the new preferred application is applicable
 */
 status_t
-Database::SetPreferredApp(const char *type, const char *signature, app_verb verb = B_OPEN)
+Database::SetPreferredApp(const char *type, const char *signature, app_verb verb)
 {
 	DBG(OUT("Database::SetPreferredApp()\n"));	
 	bool didCreate = false;
@@ -767,7 +767,7 @@ Database::StopWatching(BMessenger target)
 	DBG(OUT("Database::StopWatching()\n"));
 	status_t err = target.IsValid() ? B_OK : B_BAD_VALUE;	
 	if (!err)
-		err = fMonitorMessengers.find(target) != fMonitorMessengers.end() ? B_OK : B_ENTRY_NOT_FOUND;
+		err = fMonitorMessengers.find(target) != fMonitorMessengers.end() ? (status_t)B_OK : (status_t)B_ENTRY_NOT_FOUND;
 	if (!err)
 		fMonitorMessengers.erase(target);
 	return err;	
@@ -925,7 +925,7 @@ Database::DeleteIconForType(const char *type, const char *fileType, icon_size wh
 	- "error code": failure
 */
 status_t
-Database::DeletePreferredApp(const char *type, app_verb verb = B_OPEN)
+Database::DeletePreferredApp(const char *type, app_verb verb)
 {
 	status_t err;
 	switch (verb) {

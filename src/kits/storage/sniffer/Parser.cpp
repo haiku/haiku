@@ -15,7 +15,7 @@
 #include <sniffer/RPatternList.h>
 #include <sniffer/Rule.h>
 
-#include <new.h>
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>	// For atol(), atof()
 #include <string.h>
@@ -931,7 +931,7 @@ BPrivate::Storage::Sniffer::tokenTypeToString(TokenType type) {
 //------------------------------------------------------------------------------
 
 Parser::Parser()
-	: fOutOfMemErr(new(nothrow) Err("Sniffer parser error: out of memory", -1))
+	: fOutOfMemErr(new(std::nothrow) Err("Sniffer parser error: out of memory", -1))
 {
 }
 
@@ -958,7 +958,7 @@ Parser::Parse(const char *rule, Rule *result, BString *parseError) {
 		if (parseError)
 			parseError->SetTo(ErrorMessage(err, rule).c_str());
 		delete err;
-		return rule ? B_BAD_MIME_SNIFFER_RULE : B_BAD_VALUE;
+		return rule ? (status_t)B_BAD_MIME_SNIFFER_RULE : (status_t)B_BAD_VALUE;
 	}
 }
 
@@ -1006,7 +1006,7 @@ Parser::ParsePriority() {
 
 std::vector<DisjList*>*
 Parser::ParseConjList() {
-	std::vector<DisjList*> *list = new(nothrow) std::vector<DisjList*>;
+	std::vector<DisjList*> *list = new(std::nothrow) std::vector<DisjList*>;
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());		
 	try {
@@ -1116,7 +1116,7 @@ Parser::ParseRange() {
 
 DisjList*
 Parser::ParsePatternList(Range range) {
-	PatternList *list = new(nothrow) PatternList(range);
+	PatternList *list = new(std::nothrow) PatternList(range);
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());
 	try {		
@@ -1146,7 +1146,7 @@ Parser::ParsePatternList(Range range) {
 
 DisjList*
 Parser::ParseRPatternList() {
-	RPatternList *list = new(nothrow) RPatternList();
+	RPatternList *list = new(std::nothrow) RPatternList();
 	if (!list)
 		ThrowOutOfMemError(stream.Pos());
 	try {
@@ -1181,7 +1181,7 @@ Parser::ParseRPattern() {
 	// Pattern
 	Pattern *pattern = ParsePattern();
 	
-	RPattern *result = new(nothrow) RPattern(range, pattern);
+	RPattern *result = new(std::nothrow) RPattern(range, pattern);
 	if (result) {
 		if (result->InitCheck() == B_OK)
 			return result;
@@ -1211,7 +1211,7 @@ Parser::ParsePattern() {
 		// String (i.e. Mask)
 		const Token *t = stream.Get();
 		if (t->Type() == CharacterString) {
-			Pattern *result = new(nothrow) Pattern(str, t->String());
+			Pattern *result = new(std::nothrow) Pattern(str, t->String());
 			if (!result)
 				ThrowOutOfMemError(t->Pos());
 			if (result->InitCheck() == B_OK) {
@@ -1228,7 +1228,7 @@ Parser::ParsePattern() {
 			ThrowUnexpectedTokenError(CharacterString, t);
 	} else {
 		// No mask specified. 
-		Pattern *result = new(nothrow) Pattern(str);
+		Pattern *result = new(std::nothrow) Pattern(str);
 		if (result) {
 			if (result->InitCheck() == B_OK)
 				return result;

@@ -417,7 +417,7 @@ BFile::WriteAt(off_t location, const void *buffer, size_t size)
 off_t
 BFile::Seek(off_t offset, uint32 seekMode)
 {
-	off_t result = (InitCheck() == B_OK ? B_OK : B_FILE_ERROR);
+	off_t result = (InitCheck() == B_OK ? (off_t)B_OK : (off_t)B_FILE_ERROR);
 	if (result == B_OK)
 		result = BPrivate::Storage::seek(get_fd(), offset, seekMode);
 	return result;
@@ -433,7 +433,7 @@ BFile::Seek(off_t offset, uint32 seekMode)
 off_t
 BFile::Position() const
 {
-	off_t result = (InitCheck() == B_OK ? B_OK : B_FILE_ERROR);
+	off_t result = (InitCheck() == B_OK ? (off_t)B_OK : (off_t)B_FILE_ERROR);
 	if (result == B_OK)
 		result = BPrivate::Storage::get_position(get_fd());
 	return result;

@@ -36,7 +36,7 @@ BQuery::BQuery()
 	  : BEntryList(),
 		fStack(NULL),
 		fPredicate(NULL),
-		fDevice(B_ERROR),
+		fDevice((dev_t)B_ERROR),
 		fLive(false),
 		fPort(B_ERROR),
 		fToken(0),
@@ -71,7 +71,7 @@ BQuery::Clear()
 	delete[] fPredicate;
 	fPredicate = NULL;
 	// reset the other parameters
-	fDevice = B_ERROR;
+	fDevice = (dev_t)B_ERROR;
 	fLive = false;
 	fPort = B_ERROR;
 	fToken = 0;
@@ -344,7 +344,7 @@ BQuery::SetVolume(const BVolume *volume)
 		if (volume->InitCheck() == B_OK)
 			fDevice = volume->Device();
 		else
-			fDevice = B_ERROR;
+			fDevice = (dev_t)B_ERROR;
 	}
 	return error;
 }

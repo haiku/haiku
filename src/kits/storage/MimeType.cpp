@@ -323,7 +323,7 @@ BMimeType::Install()
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -359,7 +359,7 @@ BMimeType::Delete()
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -632,7 +632,7 @@ BMimeType::GetSupportingApps(BMessage *signatures) const
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -706,7 +706,7 @@ BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -782,7 +782,7 @@ BMimeType::SetAttrInfo(const BMessage *info)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -839,7 +839,7 @@ BMimeType::SetFileExtensions(const BMessage *extensions)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -881,7 +881,7 @@ BMimeType::SetShortDescription(const char *description)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -923,7 +923,7 @@ BMimeType::SetLongDescription(const char *description)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -959,7 +959,7 @@ BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1018,7 +1018,7 @@ BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1166,7 +1166,7 @@ BMimeType::SetAppHint(const entry_ref *ref)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1282,13 +1282,13 @@ BMimeType::SetIconForType(const char *type, const BBitmap *icon, icon_size which
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
 		err = result;
 
-	delete [] data;
+	delete [] (int8*)data;
 	return err;
 }
 
@@ -1348,7 +1348,7 @@ BMimeType::SetSnifferRule(const char *rule)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1477,7 +1477,7 @@ BMimeType::GuessMimeType(const entry_ref *file, BMimeType *type)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1515,7 +1515,7 @@ BMimeType::GuessMimeType(const void *buffer, int32 length, BMimeType *type)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1556,7 +1556,7 @@ BMimeType::GuessMimeType(const char *filename, BMimeType *type)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1590,7 +1590,7 @@ BMimeType::StartWatching(BMessenger target)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1619,7 +1619,7 @@ BMimeType::StopWatching(BMessenger target)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1697,7 +1697,7 @@ BMimeType::DeleteIconForType(const char *type, icon_size which)
 // DeletePreferredApp
 //! Deletes the mime type's preferred app for the given verb
 status_t 
-BMimeType::DeletePreferredApp(app_verb verb = B_OPEN)
+BMimeType::DeletePreferredApp(app_verb verb)
 {
 	return SetPreferredApp(NULL, verb);
 }
@@ -1799,7 +1799,7 @@ BMimeType::SetSupportedTypes(const BMessage *types, bool fullSync)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 
@@ -1837,7 +1837,7 @@ BMimeType::GetAssociatedTypes(const char *extension, BMessage *types)
 	if (!err) 
 		err = BRoster::Private().SendTo(&msg, &reply, true);
 	if (!err)
-		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_REPLY;
+		err = reply.what == B_REG_RESULT ? (status_t)B_OK : (status_t)B_BAD_REPLY;
 	if (!err)
 		err = reply.FindInt32("result", &result);
 	if (!err) 

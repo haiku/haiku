@@ -221,14 +221,14 @@ read_mime_attr_message(const char *type, const char *attr, BMessage *msg)
 	if (!err)
 		err = info.type == B_MESSAGE_TYPE ? B_OK : B_BAD_VALUE;
 	if (!err) {		
-		buffer = new(nothrow) char[info.size];
+		buffer = new(std::nothrow) char[info.size];
 		if (!buffer)
 			err = B_NO_MEMORY;
 	}
 	if (!err) 
 		err = node.ReadAttr(attr, B_MESSAGE_TYPE, 0, buffer, info.size);
 	if (err >= 0)
-		err = err == info.size ? B_OK : B_FILE_ERROR;
+		err = err == info.size ? (status_t)B_OK : (status_t)B_FILE_ERROR;
 	if (!err)
 		err = msg->Unflatten(buffer);
 	delete [] buffer;
@@ -247,7 +247,7 @@ read_mime_attr_message(const char *type, const char *attr, BMessage *msg)
 	\param str Pointer to a pre-allocated BString into which the attribute
 			   data stored.
 */
-ssize_t
+status_t
 read_mime_attr_string(const char *type, const char *attr, BString *str)
 {
 	BNode node;
@@ -284,7 +284,7 @@ write_mime_attr(const char *type, const char *attr, const void *data,
 		if (bytes < B_OK)
 			err = bytes;
 		else
-			err = (bytes != (ssize_t)len ? B_FILE_ERROR : B_OK);
+			err = (bytes != (ssize_t)len ? (status_t)B_FILE_ERROR : (status_t)B_OK);
 	}
 	return err;
 }
@@ -317,7 +317,7 @@ write_mime_attr_message(const char *type, const char *attr, const BMessage *msg,
 	if (!err) 
 		err = node.WriteAttr(attr, B_MESSAGE_TYPE, 0, data.Buffer(), data.BufferLength());
 	if (err >= 0)
-		err = err == (ssize_t)data.BufferLength() ? B_OK : B_FILE_ERROR;
+		err = err == (ssize_t)data.BufferLength() ? (ssize_t)B_OK : (ssize_t)B_FILE_ERROR;
 	return err;
 }
 

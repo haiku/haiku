@@ -48,7 +48,7 @@ Pattern::GetErr() const {
 	if (fCStatus == B_OK)
 		return NULL;
 	else
-		return new(nothrow) Err(*fErrorMessage);
+		return new(std::nothrow) Err(*fErrorMessage);
 }
 
 void dumpStr(const std::string &string, const char *label = NULL) {
@@ -157,7 +157,7 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 bool
 Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive) const {
 	off_t len = fString.length();
-	char *buffer = new(nothrow) char[len+1];
+	char *buffer = new(std::nothrow) char[len+1];
 	if (buffer) {
 		ssize_t bytesRead = data->ReadAt(start, buffer, len);
 		// \todo If there are fewer bytes left in the data stream
@@ -218,7 +218,7 @@ Pattern::SetStatus(status_t status, const char *msg) {
 void
 Pattern::SetErrorMessage(const char *msg) {
 	delete fErrorMessage;
-	fErrorMessage = (msg) ? (new(nothrow) Err(msg, -1)) : (NULL);
+	fErrorMessage = (msg) ? (new(std::nothrow) Err(msg, -1)) : (NULL);
 }
 
 

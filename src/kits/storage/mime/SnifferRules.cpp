@@ -160,7 +160,7 @@ SnifferRules::GuessMimeType(const entry_ref *ref, BString *type)
 	// Next read that many bytes (or fewer, if the file isn't
 	// that long) into a buffer
 	if (!err) {
-		buffer = new(nothrow) char[bytes];
+		buffer = new(std::nothrow) char[bytes];
 		if (!buffer)
 			err = B_NO_MEMORY;
 	}		

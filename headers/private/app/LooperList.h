@@ -66,7 +66,6 @@ class BLooperList
 		BLooper*	LooperForName(const char* name);
 		BLooper*	LooperForPort(port_id port);
 
-	private:
 		struct LooperData
 		{
 			LooperData();
@@ -78,6 +77,7 @@ class BLooperList
 			uint32		id;
 		};
 
+	private:
 		static	bool	EmptySlotPred(LooperData& Data);
 		struct FindLooperPred
 		{

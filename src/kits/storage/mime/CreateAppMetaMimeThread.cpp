@@ -82,7 +82,7 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 				err = info.size == 16*16 ? B_OK : B_BAD_VALUE;
 			if (!err) {
 				ssize_t bytes = node.ReadAttr("BEOS:M:STD_ICON", kMiniIconType, 0, miniIcon.Bits(), 16*16);
-				err = bytes == 16*16 ? B_OK : B_FILE_ERROR;
+				err = bytes == 16*16 ? (status_t)B_OK : (status_t)B_FILE_ERROR;
 			}
 			if (!err)
 				err = mime.SetIcon(&miniIcon, B_MINI_ICON);

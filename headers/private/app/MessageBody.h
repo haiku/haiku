@@ -93,6 +93,7 @@ public:
 
 		template<class T1>
 		status_t	AddData(const char* name, const T1& data, type_code type);
+		status_t	AddData(const char* name, type_code type, const void* data, ssize_t numBytes, bool is_fixed_size, int32);
 		status_t	FindData(const char* name, type_code type, int32 index,
 							 const void** data, ssize_t* numBytes) const;
 		template<class T1>

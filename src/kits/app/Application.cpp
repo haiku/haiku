@@ -504,7 +504,7 @@ void BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 					const char *arg = NULL;
 					error = message->FindString("argv", i, &arg);
 					if (error == B_OK && arg) {
-						argv[i] = new(nothrow) char[strlen(arg) + 1];
+						argv[i] = new(std::nothrow) char[strlen(arg) + 1];
 						if (argv[i])
 							strcpy(argv[i], arg);
 						else
