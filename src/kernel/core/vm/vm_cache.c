@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <kernel.h>
@@ -48,7 +48,7 @@ page_compare_func(void *_p, const void *_key)
 	vm_page *page = _p;
 	const struct page_lookup_key *key = _key;
 
-	TRACE(("page_compare_func: p 0x%x, key 0x%x\n", page, key));
+	TRACE(("page_compare_func: page %p, key %p\n", page, key));
 
 	if (page->cache == key->cache && page->offset == key->offset)
 		return 0;
@@ -154,7 +154,7 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 {
 	vm_page *page;
 
-	TRACE(("vm_cache_release_ref: cache_ref 0x%x, ref will be %d\n", cache_ref, cache_ref->ref_count - 1));
+	TRACE(("vm_cache_release_ref: cache_ref %p, ref will be %ld\n", cache_ref, cache_ref->ref_count - 1));
 
 	if (cache_ref == NULL)
 		panic("vm_cache_release_ref: passed NULL\n");
@@ -189,7 +189,7 @@ vm_cache_release_ref(vm_cache_ref *cache_ref)
 		release_spinlock(&page_cache_table_lock);
 		restore_interrupts(state);
 
-		TRACE(("vm_cache_release_ref: freeing page 0x%x\n", oldPage->ppn));
+		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n", oldPage->ppn));
 		vm_page_set_state(oldPage, PAGE_STATE_FREE);
 	}
 
@@ -230,7 +230,7 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 {
 	int state;
 
-	TRACE(("vm_cache_insert_page: cache 0x%x, page 0x%x, offset 0x%x 0x%x\n", cache_ref, page, offset));
+	TRACE(("vm_cache_insert_page: cache_ref %p, page %p, offset %Ld\n", cache_ref, page, offset));
 
 	page->offset = offset;
 
@@ -264,7 +264,7 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 {
 	int state;
 
-	TRACE(("vm_cache_remove_page: cache 0x%x, page 0x%x\n", cache_ref, page));
+	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache_ref, page));
 	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
 	state = disable_interrupts();
@@ -286,6 +286,21 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 			page->cache_next->cache_prev = page->cache_prev;
 	}
 	page->cache = NULL;
+}
+
+
+status_t
+vm_cache_write_modified(vm_cache_ref *ref)
+{
+	status_t status;
+
+	TRACE(("vm_cache_write_modified(ref = %p)\n", ref));
+
+	mutex_lock(&ref->lock);
+	status = vm_page_write_modified(ref->cache);
+	mutex_unlock(&ref->lock);
+
+	return status;
 }
 
 
@@ -318,17 +333,13 @@ vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment)
  */
 
 status_t
-vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
+vm_cache_resize(vm_cache_ref *cacheRef, off_t newSize)
 {
 	vm_cache *cache = cacheRef->cache;
 	status_t status;
-	size_t oldSize;
+	off_t oldSize;
 
 	ASSERT_LOCKED_MUTEX(&cacheRef->lock);
-
-	// ToDo: only cache's with an anonymous memory store should be resizable!
-	if (!cache->temporary)
-		return B_NOT_ALLOWED;
 
 	status = cache->store->ops->commit(cache->store, newSize);
 	if (status != B_OK)
