@@ -30,13 +30,17 @@ main(int argc, char **argv)
 	log_team(LOG_WARNING, "this is a warning (hidden)");
 	log_team(LOG_CRIT, "this is a critical condition (visible)");
 
-	setlogmask(mask);
+	setlogmask_team(mask);
 	syslog(LOG_WARNING, "thread warning (visible)");
+	syslog(LOG_CRIT, "thread critical condition (visible)");
 	syslog(LOG_CRIT, "thread critical condition (visible)");
 
 	setlogmask(LOG_MASK(LOG_WARNING));
 	log_team(LOG_WARNING | LOG_MAIL, "2. this is a warning from the MAIL facility (visible)");
 	log_team(LOG_CRIT, "2. this is a critical condition (visible)");
+	log_team(LOG_CRIT, "2. this is a critical condition (visible)");
+	log_team(LOG_CRIT, "2. this is a critical condition (visible)");
+		// test repeat message suppressing as well
 
 	openlog(NULL, LOG_PERROR, LOG_USER);
 	syslog(LOG_WARNING, "thread/perror warning (visible in stderr as well)");
@@ -44,6 +48,9 @@ main(int argc, char **argv)
 
 	openlog(NULL, LOG_CONS | LOG_PID, LOG_DAEMON);
 	syslog(LOG_WARNING, "thread/cons warning (visible in stderr only when there is no syslog_daemon)");
+
+	openlog("", 0, LOG_DAEMON);
+	syslog(LOG_WARNING, "thread warning without ident (visible)");
 
 	setlogmask(LOG_EMERG);
 	closelog();
