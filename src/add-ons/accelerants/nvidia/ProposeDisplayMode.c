@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-7/2004
+	Rudolf Cornelissen 9/2002-10/2004
 */
 
 #define MODULE_BIT 0x00400000
@@ -77,6 +77,9 @@ static const display_mode mode_list[] = {
 { { 31300, 800, 848, 928, 1008, 500, 501, 504, 518, T_POSITIVE_SYNC}, B_CMAP8, 800, 500, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X500) */
 /* 16:10 panel mode; 655.36k pixels */
 { { 52800, 1024, 1072, 1176, 1328, 640, 641, 644, 663, T_POSITIVE_SYNC}, B_CMAP8, 1024, 640, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X640) */
+/* 16:10 panel-TV mode; 983.04k pixels */
+//fixme: tune modeline to VESA asap!
+{ { 83500, 1280, 1344, 1480, 1680, 768, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X768) */
 /* 16:10 panel mode; 1.024M pixels */
 { { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
 /* 16:10 panel mode; 1.296M pixels */
@@ -230,6 +233,35 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 			return B_ERROR;
 		}
 		break;
+	}
+
+	/* only export widescreen panel-TV modes when an exact resolution match exists,
+	 * to prevent the modelist from becoming too crowded */
+	if (target_aspect > 1.61)
+	{
+		status_t panel_TV_stat = B_ERROR;
+
+		if (si->ps.tmds1_active)
+		{
+			if ((target->timing.h_display == si->ps.p1_timing.h_display) &&
+				(target->timing.v_display == si->ps.p1_timing.v_display))
+			{
+				panel_TV_stat = B_OK;
+			}
+		}
+		if (si->ps.tmds2_active)
+		{
+			if ((target->timing.h_display == si->ps.p2_timing.h_display) &&
+				(target->timing.v_display == si->ps.p2_timing.v_display))
+			{
+				panel_TV_stat = B_OK;
+			}
+		}
+		if (panel_TV_stat != B_OK)
+		{
+			LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
+			return B_ERROR;
+		}
 	}
 
 	/* check if panel(s) can display the requested resolution (if connected) */
