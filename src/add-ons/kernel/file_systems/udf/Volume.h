@@ -25,6 +25,7 @@ extern "C" {
 #include "UdfDebug.h"
 
 #include "DiskStructures.h"
+#include "PartitionMap.h"
 
 namespace UDF {
 
@@ -48,8 +49,7 @@ public:
 	uint32 BlockSize() const { return fBlockSize; }
 	off_t AddressForRelativeBlock(off_t block) { return StartAddress() + block * BlockSize(); }
 	off_t RelativeAddress(off_t address) { return StartAddress() + address; }
-	
-	
+		
 	bool IsReadOnly() const { return fReadOnly; }
 	
 	vnode_id ToVnodeID(off_t block) const { return (vnode_id)block; }	
@@ -59,14 +59,23 @@ private:
 	enum {
 		B_UNINITIALIZED = B_ERRORS_END+1,	//!< Completely uninitialized
 		B_DEVICE_INITIALIZED,				//!< Initialized enough to access underlying device safely
+		B_LOGICAL_VOLUME_INITIALIZED,		//!< Initialized enough to map addresses
 		
 		B_INITIALIZED = B_OK,
 	};
 	
+	off_t _MapAddress(udf_extent_address address);
+	off_t _MapAddress(udf_long_address address);
+	off_t _MapAddress(udf_short_address address);
+	
+	ssize_t _Read(udf_extent_address address, ssize_t length, void *data);
+
 	// Called by Mount(), either directly or indirectly
 	status_t _Identify();
 	status_t _WalkVolumeRecognitionSequence();
-	status_t _WalkVolumeDescriptorSequence(extent_address extent);
+	status_t _WalkAnchorVolumeDescriptorSequences();
+	status_t _WalkVolumeDescriptorSequence(udf_extent_address extent);
+	status_t _InitFileSetDescriptor();
 		
 private:
 	nspace_id fID;
@@ -78,6 +87,9 @@ private:
 	uint32 fBlockSize;
 
 	status_t fInitStatus;
+	
+	udf_logical_descriptor fLogicalVD;
+	PartitionMap fPartitionMap;
 };
 
 };	// namespace UDF
