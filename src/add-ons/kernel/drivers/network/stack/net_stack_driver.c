@@ -78,6 +78,7 @@ typedef struct {
 	uint32			open_flags;		// the open() flags (mostly for storing O_NONBLOCK mode)
 	sem_id			selecters_lock;	// protect the selecters linked-list
 	selecter * 		selecters;		// the select()'ers lists (thread-aware) 
+	notify_select_event_function notify;
 } net_stack_cookie;
 
 #if STAY_LOADED
@@ -135,9 +136,6 @@ device_hooks g_net_stack_driver_hooks =
 };
 
 struct core_module_info * core = NULL;
-
-// by default, assert we can use kernel select() support
-notify_select_event_function g_nse = notify_select_event;
 
 #if STAY_LOADED
 int	g_stay_loaded_fd = -1;
@@ -280,6 +278,7 @@ static status_t net_stack_open(const char *name, uint32 flags, void **cookie)
 	nsc->open_flags = flags;
 	nsc->selecters_lock = create_sem(1, "socket_selecters_lock");
 	nsc->selecters = NULL;
+	nsc->notify = NULL;
 
   	// attach this new net_socket_cookie to file descriptor
 	*cookie = nsc; 
@@ -467,7 +466,7 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 			case NET_STACK_SELECT:
 				/* if we get this opcode, we are using the r5 kernel select() call,
 				 * so we can't use his notify_select_event(), but our own implementation! */
-				g_nse = r5_notify_select_event;
+				nsc->notify = r5_notify_select_event;
 				return net_stack_select(cookie, (args->u.select.ref & 0x0F),
 										args->u.select.ref, args->u.select.sync);
 			case NET_STACK_DESELECT: 
@@ -570,6 +569,10 @@ static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsy
 	if (! nsc->socket)
 		return B_BAD_VALUE;
 	
+	// set notification function if undefined
+	if(nsc->notify == NULL)
+		nsc->notify = notify_select_event;
+	
 	s = (selecter *) malloc(sizeof(selecter));
 	if (! s)
 		return B_NO_MEMORY;
@@ -642,6 +645,9 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
 		free(s);
 	};
 
+	nsc->notify = NULL;
+		// unset notification function
+	
 	if (nsc->selecters == NULL)
 		// selecters list is empty: no need to monitor socket events anymore
 		core->socket_set_event_callback(nsc->socket, NULL, NULL, event);
@@ -679,8 +685,8 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	s = nsc->selecters;
 	while (s) {
 		if (s->event == event)
-			// notify this selecter (thread/event pair)
-			g_nse(s->sync, s->ref);
+			nsc->notify(s->sync, s->ref);
+				// notify this selecter (thread/event pair)
 		s = s->next;
 	};
 	
