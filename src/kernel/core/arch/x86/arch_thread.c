@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -25,6 +25,7 @@
 
 // from arch_interrupts.S
 extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
+extern void i386_restore_frame_from_syscall(struct iframe frame);
 
 
 void
@@ -40,6 +41,32 @@ i386_pop_iframe(struct thread *thread)
 {
 	ASSERT(thread->arch_info.iframe_ptr > 0);
 	thread->arch_info.iframe_ptr--;
+}
+
+
+/**	Returns the current iframe structure of the running thread.
+ *	This function must only be called in a context where it's actually
+ *	sure that such iframe exists; ie. from syscalls, but usually not
+ *	from standard kernel threads.
+ */
+
+static struct iframe *
+i386_get_current_iframe(void)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	ASSERT(thread->arch_info.iframe_ptr >= 0);
+	return thread->arch_info.iframes[thread->arch_info.iframe_ptr - 1];
+}
+
+
+static inline uint32
+get_fs_register(void)
+{
+	uint32 fs;
+
+	asm("movl %%fs,%0" : "=r" (fs));
+	return fs;
 }
 
 
@@ -85,9 +112,9 @@ arch_thread_init_thread_struct(struct thread *t)
 int
 arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
-	unsigned int *kstack = (unsigned int *)t->kernel_stack_base;
-	unsigned int kstack_size = KSTACK_SIZE;
-	unsigned int *kstack_top = kstack + kstack_size / sizeof(unsigned int);
+	addr_t *kstack = (addr_t *)t->kernel_stack_base;
+	addr_t kstack_size = KSTACK_SIZE;
+	addr_t *kstack_top = kstack + kstack_size / sizeof(addr_t);
 	int i;
 
 	TRACE(("arch_thread_initialize_kthread_stack: kstack 0x%p, start_func 0x%p, entry_func 0x%p\n",
@@ -120,7 +147,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (
 
 	// save the stack position
 	t->arch_info.current_stack.esp = kstack_top;
-	t->arch_info.current_stack.ss = (int *)KERNEL_DATA_SEG;
+	t->arch_info.current_stack.ss = (addr_t *)KERNEL_DATA_SEG;
 
 	return 0;
 }
@@ -249,7 +276,7 @@ arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args
 status_t
 arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask)
 {
-	struct iframe *frame = t->arch_info.current_iframe;
+	struct iframe *frame = i386_get_current_iframe();
 	uint32 *stack_ptr = (uint32 *)frame->user_esp;
 	uint32 *code_ptr;
 	uint32 *regs_ptr;
@@ -264,6 +291,7 @@ arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig
 			frame->eax = frame->orig_eax;
 			frame->edx = frame->orig_edx;
 			frame->eip -= 2;
+				// undos the "int $99" syscall interrupt (so that it'll be called again)
 		}
 	}
 
@@ -323,14 +351,12 @@ int64
 arch_restore_signal_frame(void)
 {
 	struct thread *t = thread_get_current_thread();
-	struct iframe *frame;
+	struct iframe *frame = i386_get_current_iframe();
 	uint32 *stack;
 	struct vregs *regs;
-	
+
 	TRACE(("### arch_restore_signal_frame: entry\n"));
-	
-	frame = t->arch_info.current_iframe;
-	
+
 	stack = (uint32 *)frame->user_esp;
 	t->sig_block_mask = stack[0];
 	regs = (struct vregs *)stack[1];
@@ -345,13 +371,13 @@ arch_restore_signal_frame(void)
 	frame->edi = regs->_reserved_2[0];
 	frame->esi = regs->_reserved_2[1];
 	frame->ebp = regs->_reserved_2[2];
-	
+
 	i386_frstor((void *)(&regs->xregs));
-	
+
 	TRACE(("### arch_restore_signal_frame: exit\n"));
-	
+
 	frame->orig_eax = -1;	/* disable syscall checks */
-	
+
 	return (int64)frame->eax | ((int64)frame->edx << 32);
 }
 
@@ -359,7 +385,7 @@ arch_restore_signal_frame(void)
 void
 arch_check_syscall_restart(struct thread *t)
 {
-	struct iframe *frame = t->arch_info.current_iframe;
+	struct iframe *frame = i386_get_current_iframe();
 
 	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR) {
 		frame->eax = frame->orig_eax;
@@ -368,3 +394,45 @@ arch_check_syscall_restart(struct thread *t)
 	}
 }
 
+
+/**	Saves everything needed to restore the frame in the child fork in the
+ *	arch_fork_arg structure to be passed to arch_restore_fork_frame().
+ *	Also makes sure to return the right value.
+ */
+
+void
+arch_store_fork_frame(struct arch_fork_arg *arg)
+{
+	struct iframe *frame = i386_get_current_iframe();
+
+	// we need to copy the threads current iframe
+	arg->iframe = *frame;
+
+	// we also want fork() to return 0 for the child
+	arg->iframe.eax = 0;
+}
+
+
+/** Restores the frame from a forked team as specified by the provided
+ *	arch_fork_arg structure.
+ *	Needs to be called from within the child team, ie. instead of
+ *	arch_thread_enter_uspace() as thread "starter".
+ *	This function does not return to the caller, but will enter userland
+ *	in the child team at the same position where the parent team left of.
+ */
+
+void
+arch_restore_fork_frame(struct arch_fork_arg *arg)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	i386_set_tss_and_kstack(thread->kernel_stack_base + KSTACK_SIZE);
+
+	// set the CPU dependent GDT entry for TLS (set the current %fs register)
+	set_tls_context(thread);
+	
+	// patch up %fs register of the frame
+	arg->iframe.fs = get_fs_register();
+
+	i386_restore_frame_from_syscall(arg->iframe);
+}
