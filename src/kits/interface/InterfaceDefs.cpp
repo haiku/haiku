@@ -128,7 +128,7 @@ set_mouse_type(int32 type)
 	BMessage reply;
 
 	command.AddInt32("mouse_type", type);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
@@ -158,7 +158,7 @@ set_mouse_map(mouse_map *map)
 	BMessage reply;
 	
 	command.AddData("mousemap", B_ANY_TYPE, map, sizeof(mouse_map));
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 _IMPEXP_BE status_t
@@ -182,7 +182,7 @@ set_click_speed(bigtime_t speed)
 	BMessage command(IS_SET_CLICK_SPEED);
 	BMessage reply;
 	command.AddInt64("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
@@ -207,7 +207,7 @@ set_mouse_speed(int32 speed)
 	BMessage command(IS_SET_MOUSE_SPEED);
 	BMessage reply;
 	command.AddInt32("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
@@ -232,7 +232,7 @@ set_mouse_acceleration(int32 speed)
 	BMessage command(IS_SET_MOUSE_ACCELERATION);
 	BMessage reply;
 	command.AddInt32("speed", speed);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
@@ -257,7 +257,7 @@ set_key_repeat_rate(int32 rate)
 	BMessage command(IS_SET_KEY_REPEAT_RATE);
 	BMessage reply;
 	command.AddInt32("rate", rate);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
@@ -282,7 +282,7 @@ set_key_repeat_delay(bigtime_t  delay)
 	BMessage command(IS_SET_KEY_REPEAT_DELAY);
 	BMessage reply;
 	command.AddInt64("delay", delay);
-	return _control_input_server_(&command, &reply) == B_OK;
+	return _control_input_server_(&command, &reply);
 }
 
 
