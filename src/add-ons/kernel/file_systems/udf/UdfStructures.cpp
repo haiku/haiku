@@ -228,7 +228,7 @@ long_address::dump() const
 	DUMP_INIT("long_address");
 	PRINT(("length:   %ld\n", length()));
 	PRINT(("block:    %ld\n", block()));
-	PRINT(("partiton: %d\n", partition()));
+	PRINT(("partition: %d\n", partition()));
 	PRINT(("implementation_use:\n"));
 	DUMP(implementation_use());
 }
