@@ -1,181 +1,585 @@
-/******************************************************************************
-/
-/	File:			NetAddress.cpp
-/
-/   Description:    The Network API.
-/
-/	Copyright 2002, OpenBeOS Project, All Rights Reserved.
-/
-******************************************************************************/
+/*=--------------------------------------------------------------------------=*
+ * NetAddress.cpp -- Implementation of the BNetAddress class.
+ *
+ * Written by S.T. Mansfield (thephantom@mac.com)
+ *
+ * Remarks:
+ *     * In all accessors, address and port are converted from network to
+ *       host byte order.
+ *     * In all mutators, address and port are converted from host to
+ *       network byte order.
+ *     * Michael, no trouts were harmed during the creation of this class.
+ *=--------------------------------------------------------------------------=*
+ * Copyright (c) 2002, The OpenBeOS project.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ *=--------------------------------------------------------------------------=*
+ */
+
 
 #include <string.h>
 #include <netdb.h>
-#include <sys/socket.h>
+#include <arpa/inet.h>  // STM: #include <ByteOrder.h>???
 #include <netinet/in.h>
+
 #include "NetAddress.h"
 
-BNetAddress::BNetAddress(BMessage *archive)
-	:	fStatus(B_OK),
-		fName()
+/*
+ * AF_INET is 2 or 0 depending on whether or not you use the POSIX
+ * headers.  Never never never compare by value, always use the
+ * #defined token.
+ */
+#define CTOR_INIT_LIST \
+    BArchivable( ), \
+    fInitialized( B_NO_INIT ), \
+    fFamily( AF_INET ), \
+    fPort( 0 ), \
+    fAddress( INADDR_ANY )
+
+
+/* BNetAddress
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class constructors that have a direct compliment with one of the SetTo
+ *     methods.
+ *
+ * Input parameters:
+ *     Varies, see the method signature description for the corresponding
+ *     SetTo() method descriptor.
+ */
+
+// This bad boy doubles up as the defalt ctor.
+BNetAddress::BNetAddress( const char* hostname, unsigned short port )
+            : CTOR_INIT_LIST
 {
-	// TODO
-	fStatus = B_ERROR;
+    fInitialized = SetTo( hostname, port );
 }
 
-BNetAddress::~BNetAddress()
+BNetAddress::BNetAddress( const struct sockaddr_in& sa )
+            : CTOR_INIT_LIST
 {
+    fInitialized = SetTo( sa );
 }
 
-status_t BNetAddress::Archive(BMessage *into, bool deep) const
+BNetAddress::BNetAddress( in_addr addr, int port )
+            : CTOR_INIT_LIST
 {
-	// TODO
-	return B_ERROR;
+    fInitialized = SetTo( addr, port );
 }
 
-BArchivable *BNetAddress::Instantiate(BMessage *archive)
+BNetAddress::BNetAddress( uint32 addr, int port )
+            : CTOR_INIT_LIST
 {
-	// TODO
-	return NULL;
+    fInitialized = SetTo( addr, port );
 }
 
-BNetAddress::BNetAddress(const char * hostname, unsigned short port)
-	:	fStatus(B_OK),
-		fName()
+BNetAddress::BNetAddress( const char* hostname, const char* protocol,
+                          const char* service )
+            : CTOR_INIT_LIST
 {
-	fStatus = SetTo(hostname, port);
-}
-
-BNetAddress::BNetAddress(const sockaddr_in & address)
-	:	fStatus(B_OK),
-		fName()
-{
-	fStatus = SetTo(address);
-}
-
-BNetAddress::BNetAddress(in_addr address, int port)
-	:	fStatus(B_OK),
-		fName()
-{
-	fStatus = SetTo(address, port);
-}
-
-BNetAddress::BNetAddress(uint32 address, int port)
-	:	fStatus(B_OK),
-		fName()
-{
-	fStatus = SetTo(address, port);
-}
-
-BNetAddress::BNetAddress(const BNetAddress & address)
-	:	fStatus(B_OK),
-		fName(address.fName)
-{
-}
-
-BNetAddress::BNetAddress(const char * hostname,
-						 const char * protocol,
-						 const char * service)
-	:	fStatus(B_OK),
-		fName()
-{
-	fStatus = SetTo(hostname, protocol, service);
-}
-
-BNetAddress & BNetAddress::operator = (const BNetAddress & address)
-{
-	fName = address.fName;
-	return *this;
-}
-
-status_t BNetAddress::InitCheck() const
-{
-	return fStatus;
+    fInitialized = SetTo( hostname, protocol, service );
 }
 
 
-status_t BNetAddress::SetTo(const char * hostname, const char * protocol,
-							const char * service)
+/* BNetAddress
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class copy ctor.
+ *
+ * Input parameter:
+ *     refparam: Instance to copy.
+ */
+BNetAddress::BNetAddress( const BNetAddress& refparam )
+            : CTOR_INIT_LIST
 {
-	struct hostent *host = gethostbyname(hostname);
-	struct servent *serv = getservbyname(service, protocol);
-
-	if (host != NULL && serv != NULL) {
-		fName.sin_family = host->h_addrtype;
-		fName.sin_port = serv->s_port;
-		fName.sin_addr = *((in_addr *) host->h_addr);
-		return B_OK;
-	}
-	else {
-		fName.sin_family = AF_UNSPEC;
-		fName.sin_port = 0;
-		fName.sin_addr.s_addr = INADDR_ANY;
-		return B_ERROR;
-	}
+    fInitialized = clone( refparam );
 }
 
-status_t BNetAddress::SetTo(const char * hostname, unsigned short port)
-{
-	struct hostent *host;
 
-	if (hostname != NULL && (host = gethostbyname(hostname)) != NULL) {
-		fName.sin_family = host->h_addrtype;
-		fName.sin_port = htons(port);
-		fName.sin_addr = *((in_addr *) host->h_addr);
-		return B_OK;
-	}
-	else {
-		fName.sin_family = AF_UNSPEC;
-		fName.sin_port = 0;
-		fName.sin_addr.s_addr = INADDR_ANY;
-		return B_ERROR;
-	}
+/* BNetAddress
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Ctor to instantiate from serialized data (BMessage).
+ *
+ * Input parameter:
+ *     archive      : Serialized object to instantiate from.
+ */
+BNetAddress::BNetAddress( BMessage* archive )
+            : CTOR_INIT_LIST
+{
+    int8 int8_val;
+    int32 int32_val;
+
+    if ( archive->FindInt8( "bnaddr_family", &int8_val ) != B_OK )
+    {
+        return;
+    }
+    fFamily = int8_val;
+
+    if ( archive->FindInt8( "bnaddr_port", &int8_val ) != B_OK )
+    {
+        return;
+    }
+    fPort = int8_val;
+
+    if ( archive->FindInt32( "bnaddr_addr", &int32_val ) != B_OK )
+    {
+        return;
+    }
+    fAddress = int32_val;
+
+    fInitialized = B_OK;
 }
 
-status_t BNetAddress::SetTo(const sockaddr_in & address)
+
+/* operator=
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class' assignment operator.
+ *
+ * Input parameter:
+ *     refparam     : Instance to assign from.
+ */
+BNetAddress& BNetAddress::operator=( const BNetAddress& refparam )
 {
-	fName = address;
-	return (fName.sin_family != AF_UNSPEC ? B_OK : B_ERROR);
+    if ( clone( refparam ) == B_OK )
+    {
+        return *this;
+    }
 }
 
-status_t BNetAddress::SetTo(in_addr address, int port)
+
+/* ~BNetAddress
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class dtor.
+ */
+BNetAddress::~BNetAddress( void )
 {
-	fName.sin_family = AF_INET;
-	fName.sin_port = port;
-	fName.sin_addr = address;
-	return B_OK;
+    fFamily = fPort = fAddress = 0;
+    fInitialized = B_NO_INIT;
 }
 
-status_t BNetAddress::SetTo(uint32 address, int port)
+
+/* GetAddr
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class accessor.
+ *
+ * Output parameters:
+ *     hostname     : Host name associated with this instance (default: NULL).
+ *                    In this particular implementation, hostname will be an
+ *                    ASCII-fied representation of an IP address.
+ *     port         : Port number associated with this instance
+ *                    (default: NULL).  Will be converted to host byte order
+ *                    here, so it is not necessary to call ntohs() after
+ *                    calling this method.
+ *
+ * Returns:
+ *     B_OK for success, B_NO_INIT if instance was not properly constructed.
+ *
+ * Remarks:
+ *     Hostname and/or port can be NULL; although having them both NULL would
+ *     be a pointless waste of CPU cycles.  ;-)
+ *
+ *     The hostname output parameter can be a variety of things, but it this
+ *     method we convert the IP address to a string.  See the relevant
+ *     documentation about inet_ntoa() for details.
+ *
+ *     Make sure hostname is large enough or you will step on someone
+ *     else's toes.  (Can you say "buffer overflow exploit" boys and girls?)
+ *     You can generally be safe using the MAXHOSTNAMELEN define, which
+ *     defaults to 64 bytes--don't forget to leave room for the NULL!
+ */
+status_t BNetAddress::GetAddr( char* hostname, unsigned short* port ) const
 {
-	fName.sin_family = AF_INET;
-	fName.sin_port = port;
-	fName.sin_addr.s_addr = address;
-	return B_OK;
+    if ( fInitialized != B_OK )
+    {
+        return B_NO_INIT;
+    }
+
+    char* hnBuff;
+    struct in_addr ia;
+
+    ia.s_addr = fAddress;
+
+    if ( port != NULL )
+    {
+        *port = ( unsigned short )ntohs( fPort );
+    }
+
+    if ( hostname != NULL )
+    {
+        hnBuff = inet_ntoa( ia );
+        if ( hnBuff != NULL )
+        {
+            strcpy( hostname, hnBuff );
+        }
+    }
+
+    return B_OK;
 }
 
-status_t BNetAddress::GetAddr(char * hostname = 0, unsigned short * port = 0) const
+
+/* GetAddr
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class accessor.
+ *
+ * Output parameter:
+ *     sa           : sockaddr_in struct to be filled.
+ *
+ * Returns:
+ *     B_OK for success, B_NO_INIT if instance was not properly constructed.
+ *
+ * Remarks:
+ *     This method fills in the sin_addr, sin_family, and sin_port fields of
+ *     the output parameter, all other fields are untouched.  All numeric
+ *     values are in network byte order.
+ */
+status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
 {
-	struct hostent *host = gethostbyaddr((const char *) &fName.sin_addr,
-	    sizeof(fName.sin_addr), fName.sin_family);
-	if (host != NULL) {
-		strcpy(hostname, host->h_name);
-		if (port != 0)
-			*port = ntohs(fName.sin_port);
-		return B_OK;
-	}
-	return B_ERROR;
+    if ( fInitialized != B_OK )
+    {
+        return B_NO_INIT;
+    }
+
+    sa.sin_family = ( uint8 )fFamily;
+    sa.sin_port = ( uint8 )fPort;
+    sa.sin_addr.s_addr = ( in_addr_t )fAddress;
+
+    return B_OK;
 }
 
-status_t BNetAddress::GetAddr(sockaddr_in & address) const
+
+/* GetAddr
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Class accessor.
+ *
+ * Output parameters:
+ *     addr         : in_addr struct to fill.
+ *     port         : optional port number to fill.
+ *
+ * Returns:
+ *     B_OK for success, B_NO_INIT if instance was not properly constructed.
+ *
+ * Remarks:
+ *     Output parameters will be in network byte order, so it is not
+ *     necessary to call htons after calling this method.
+ */
+status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
 {
-	address = fName;
-	return B_OK;
+    if ( fInitialized != B_OK )
+    {
+        return B_NO_INIT;
+    }
+
+    addr.s_addr = fAddress;
+
+    if ( port != NULL )
+    {
+        *port = fPort;
+    }
+
+    return B_OK;
 }
 
-status_t BNetAddress::GetAddr(in_addr & address, unsigned short * port) const
+
+/* InitCheck
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Determine whether or not this instance is properly initialized.
+ *
+ * Returns:
+ *     B_OK if this instance is initialized, B_ERROR if not.
+ */
+status_t BNetAddress::InitCheck( void ) const
 {
-	address = fName.sin_addr;
-	if (port != 0)
-		*port = ntohs(fName.sin_port);
-	return B_OK;
+    return ( fInitialized == B_OK ) ? B_OK : B_ERROR;
 }
+
+
+/* Archive
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Serialize this instance into the passed BMessage parameter.
+ *
+ * Input parameter:
+ *     deep         : [ignored] default==true.
+ *
+ * Output parameter:
+ *     into         : BMessage object to serialize into.
+ *
+ * Returns:
+ *     B_OK/BERROR on success/failure.  Returns B_NO_INIT if instance not
+ *     properly initialized.
+ */
+status_t BNetAddress::Archive( BMessage* into, bool deep ) const
+{
+    if ( fInitialized != B_OK )
+    {
+        return B_NO_INIT;
+    }
+
+    //STM: When storing, should we store some kind of class name too...
+    //STM: Is there any way to deal with a complete failure here?  (into
+    //     not completely filled).
+
+    if ( into->AddInt8( "bnaddr_family", fFamily ) != B_OK )
+    {
+        return B_ERROR;
+    }
+
+    if ( into->AddInt8( "bnaddr_port", fPort ) != B_OK )
+    {
+        return B_ERROR;
+    }
+
+    if ( into->AddInt32( "bnaddr_addr", fAddress ) != B_OK )
+    {
+        return B_ERROR;
+    }
+
+    return B_OK;
+}
+
+
+/* Instantiate
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Un-serialize and instantiate from the passed BMessage parameter.
+ *
+ * Input parameter:
+ *     archive      : Archived BMessage object for (de)serialization.
+ *
+ * Returns:
+ *     NULL if a BNetAddress instance can not be initialized, otherwise
+ *     a new BNetAddress object instantiated from the BMessage parameter.
+ */
+BArchivable* BNetAddress::Instantiate( BMessage* archive )
+{
+    if ( !validate_instantiation( archive, "BNetAddress" ) )
+    {
+        return NULL;
+    }
+
+    BNetAddress* bna = new BNetAddress( archive );
+    if ( bna == NULL )
+    {
+        return NULL;
+    }
+
+    if ( bna->InitCheck( ) != B_OK )
+    {
+        delete bna;
+        return NULL;
+    }
+
+    return bna;
+}
+
+
+/* SetTo
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Set hostname and port network address data.
+ *
+ * Input parameters:
+ *     hostname     : Can be one of three things:
+ *                    1. An ASCII-string representation of an IP address.
+ *                    2. A canonical hostname.
+ *                    3. NULL.  If NULL, then by default the address will be
+ *                       set to INADDR_ANY (0.0.0.0).
+ *     port         : Duh.
+ *
+ * Returns:
+ *     B_OK/B_ERROR for success/failure.
+ */
+status_t BNetAddress::SetTo( const char* hostname, unsigned short port )
+{
+    struct hostent* HostEnt;
+    in_addr_t       ia;
+
+    ia = INADDR_ANY;
+
+    // Try like all git-out to set the address from the given hostname.
+    if ( hostname != NULL )
+    {
+        // See if the string is an ASCII-fied IP address.
+        ia = inet_addr( hostname );
+        if ( ia == INADDR_ANY || ia == ( unsigned long )-1 )
+        {
+            // See if we can resolve the hostname to an IP address.
+            HostEnt = gethostbyname( hostname );
+            if ( HostEnt != NULL )
+            {
+                ia = *( int * )HostEnt->h_addr_list[0];
+            }
+            else
+            {
+                //STM: Print and/or log an error message?
+                return B_ERROR;
+            }
+        }
+    }
+
+    fFamily  = AF_INET;
+    fPort    = htons( port );
+    fAddress = htonl( ia );
+
+    return B_OK;
+}
+
+
+/* SetTo
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Set from passed in socket/address info, our preferred mutator.
+ *
+ * Input parameter:
+ *     sa           : Data specifying the host/client connection.
+ *
+ * Returns:
+ *     B_OK.
+ */
+status_t BNetAddress::SetTo( const struct sockaddr_in& sa )
+{
+    fFamily  = sa.sin_family;
+    fPort    = htons( sa.sin_port );
+    fAddress = htonl( sa.sin_addr.s_addr );
+
+    return B_OK;
+}
+
+
+/* SetTo
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Set from passed in address and port.
+ *
+ * Input parameters:
+ *     addr         : IP address in network form.
+ *     port         : Optional port number.
+ *
+ * Returns:
+ *     B_OK.
+ */
+status_t BNetAddress::SetTo( in_addr addr, int port )
+{
+    fFamily  = AF_INET;
+    fPort    = htons( port );
+    fAddress = htonl( addr.s_addr );
+
+    return B_OK;
+}
+
+
+/* SetTo
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Set from passed in address and port.
+ *
+ * Input parameters:
+ *     addr         : Optional IP address in network form.
+ *     port         : Optional port number.
+ *
+ * Returns:
+ *     B_OK.
+ */
+status_t BNetAddress::SetTo( uint32 addr, int port )
+{
+    fFamily  = AF_INET;
+    fPort    = htons( port );
+    fAddress = htonl( addr );
+
+    return B_OK;
+}
+
+
+/* SetTo
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Set from passed in hostname and protocol/service information.
+ *
+ * Input parameters:
+ *     hostname     : Can be one of three things:
+ *                    1. An ASCII-string representation of an IP address.
+ *                    2. A canonical hostname.
+ *                    3. NULL.  If NULL, then by default the address will be
+ *                       set to INADDR_ANY (0.0.0.0).
+ *     protocol     : Datagram type, typically "TCP" or "UDP"
+ *     service      : The name of the service, such as http, ftp, et al.  This
+ *                    must be one of the official service names listed in
+ *                    /etc/services -- but you already knew that because
+ *                    you're doing network/sockets programming, RIIIGHT???.
+ *
+ * Returns:
+ *     B_OK/B_ERROR on success/failure.
+ *
+ * Remarks:
+ *     The protocol and service input parameters must be one of the official
+ *     types listed in /etc/services.  We use these two parameters to
+ *     determine the port number (see getservbyname(3)).  This method will
+ *     fail if the aforementioned precondition is not met.
+ */
+status_t BNetAddress::SetTo( const char* hostname, const char* protocol,
+                             const char* service )
+{
+    struct servent* ServiceEntry;
+
+    ServiceEntry = getservbyname( service, protocol );
+    if ( ServiceEntry == NULL )
+    {
+        //STM: Print and/or log an error message?
+        return B_ERROR;
+    }
+    endservent( );
+
+    return SetTo( hostname, ServiceEntry->s_port );
+}
+
+
+/* clone
+ *=--------------------------------------------------------------------------=*
+ * Purpose:
+ *     Private copy helper method.
+ *
+ * Input parameter:
+ *     RefParam: Instance to clone.
+ *
+ * Returns:
+ *     B_OK for success, B_NO_INIT if RefParam was not properly constructed.
+ */
+status_t BNetAddress::clone( const BNetAddress& RefParam )
+{
+    if ( !RefParam.fInitialized )
+    {
+        return B_NO_INIT;
+    }
+
+    fFamily  = RefParam.fFamily;
+    fPort    = RefParam.fPort;
+    fAddress = RefParam.fAddress;
+
+    return B_OK;
+}
+
+/*=------------------------------------------------------------------- End -=*/
+
