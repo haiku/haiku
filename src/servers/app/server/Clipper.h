@@ -38,29 +38,29 @@ public:
 	Clipper(DisplayDriver* driver);
 	~Clipper();
 
-	void DrawBitmap(BRegion* clip_reg, BPicture* clip_pic, ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
-	void DrawString(BRegion* clip_reg, BPicture* clip_pic, const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL);
+	void DrawBitmap(BRegion* clip_reg, ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
+	void DrawString(BRegion* clip_reg, const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL);
 
-	void FillArc(BRegion* clip_reg, BPicture* clip_pic, BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void FillBezier(BRegion* clip_reg, BPicture* clip_pic, BPoint *pts, LayerData *d, const Pattern &pat);
-	void FillEllipse(BRegion* clip_reg, BPicture* clip_pic, BRect r, LayerData *d, const Pattern &pat);
-	void FillPolygon(BRegion* clip_reg, BPicture* clip_pic, BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
-	void FillRect(BRegion* clip_reg, BPicture* clip_pic, BRect r, LayerData *d, const Pattern &pat);
-	void FillRegion(BRegion* clip_reg, BPicture* clip_pic, BRegion* r, LayerData *d, const Pattern &pat);
-	void FillRoundRect(BRegion* clip_reg, BPicture* clip_pic, BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-//	void FillShape(BRegion* clip_reg, BPicture* clip_pic, SShape *sh, LayerData *d, const Pattern &pat);
-	void FillTriangle(BRegion* clip_reg, BPicture* clip_pic, BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
+	void FillArc(BRegion* clip_reg, BRect r, float angle, float span, LayerData *d, const Pattern &pat);
+	void FillBezier(BRegion* clip_reg, BPoint *pts, LayerData *d, const Pattern &pat);
+	void FillEllipse(BRegion* clip_reg, BRect r, LayerData *d, const Pattern &pat);
+	void FillPolygon(BRegion* clip_reg, BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
+	void FillRect(BRegion* clip_reg, BRect r, LayerData *d, const Pattern &pat);
+	void FillRegion(BRegion* clip_reg, BRegion* r, LayerData *d, const Pattern &pat);
+	void FillRoundRect(BRegion* clip_reg, BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+//	void FillShape(BRegion* clip_reg, SShape *sh, LayerData *d, const Pattern &pat);
+	void FillTriangle(BRegion* clip_reg, BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 
-	void StrokeArc(BRegion* clip_reg, BPicture* clip_pic, BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	void StrokeBezier(BRegion* clip_reg, BPicture* clip_pic, BPoint *pts, LayerData *d, const Pattern &pat);
-	void StrokeEllipse(BRegion* clip_reg, BPicture* clip_pic, BRect r, LayerData *d, const Pattern &pat);
-	void StrokeLine(BRegion* clip_reg, BPicture* clip_pic, BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	void StrokePolygon(BRegion* clip_reg, BPicture* clip_pic, BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
-	void StrokeRect(BRegion* clip_reg, BPicture* clip_pic, BRect r, LayerData *d, const Pattern &pat);
-	void StrokeRoundRect(BRegion* clip_reg, BPicture* clip_pic, BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
-//	void StrokeShape(BRegion* clip_reg, BPicture* clip_pic, SShape *sh, LayerData *d, const Pattern &pat);
-	void StrokeTriangle(BRegion* clip_reg, BPicture* clip_pic, BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
-	void StrokeLineArray(BRegion* clip_reg, BPicture* clip_pic, BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
+	void StrokeArc(BRegion* clip_reg, BRect r, float angle, float span, LayerData *d, const Pattern &pat);
+	void StrokeBezier(BRegion* clip_reg, BPoint *pts, LayerData *d, const Pattern &pat);
+	void StrokeEllipse(BRegion* clip_reg, BRect r, LayerData *d, const Pattern &pat);
+	void StrokeLine(BRegion* clip_reg, BPoint start, BPoint end, LayerData *d, const Pattern &pat);
+	void StrokePolygon(BRegion* clip_reg, BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
+	void StrokeRect(BRegion* clip_reg, BRect r, LayerData *d, const Pattern &pat);
+	void StrokeRoundRect(BRegion* clip_reg, BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
+//	void StrokeShape(BRegion* clip_reg, SShape *sh, LayerData *d, const Pattern &pat);
+	void StrokeTriangle(BRegion* clip_reg, BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
+	void StrokeLineArray(BRegion* clip_reg, BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 private:
 	DisplayDriver* fDriver;
 };

@@ -27,7 +27,88 @@
 //------------------------------------------------------------------------------
 #include <Accelerant.h>
 #include "DisplayDriver.h"
+#include "LayerData.h"
 #include "ServerCursor.h"
+
+#define CLIP_X(a) ( (a < 0) ? 0 : ((a > _buffer_width-1) ? \
+			_buffer_width-1 : a) )
+#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > _buffer_height-1) ? \
+			_buffer_height-1 : a) )
+#define CHECK_X(a) ( (a >= 0) || (a <= _buffer_width-1) )
+#define CHECK_Y(a) ( (a >= 0) || (a <= _buffer_height-1) )
+
+/* TODO: Add handling of draw modes */
+
+AccLineCalc::AccLineCalc()
+{
+}
+
+AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
+{
+	start=pta;
+	end=ptb;
+	slope=(start.y-end.y)/(start.x-end.x);
+	offset=start.y-(slope * start.x);
+	minx = MIN(start.x,end.x);
+	maxx = MAX(start.x,end.x);
+	miny = MIN(start.y,end.y);
+	maxy = MAX(start.y,end.y);
+}
+
+void AccLineCalc::SetPoints(const BPoint &pta, const BPoint &ptb)
+{
+	start=pta;
+	end=ptb;
+	slope=(start.y-end.y)/(start.x-end.x);
+	offset=start.y-(slope * start.x);
+	minx = MIN(start.x,end.x);
+	maxx = MAX(start.x,end.x);
+	miny = MIN(start.y,end.y);
+	maxy = MAX(start.y,end.y);
+}
+
+void AccLineCalc::Swap(AccLineCalc &from)
+{
+	BPoint pta, ptb;
+	pta = start;
+	ptb = end;
+	SetPoints(from.start,from.end);
+	from.SetPoints(pta,ptb);
+}
+
+float AccLineCalc::GetX(float y)
+{
+	if (start.x == end.x)
+		return start.x;
+	return ( (y-offset)/slope );
+}
+
+float AccLineCalc::MinX()
+{
+	return minx;
+}
+
+float AccLineCalc::MaxX()
+{
+	return maxx;
+}
+
+float AccLineCalc::GetY(float x)
+{
+	if ( start.x == end.x )
+		return start.y;
+	return ( (slope * x) + offset );
+}
+
+float AccLineCalc::MinY()
+{
+	return miny;
+}
+
+float AccLineCalc::MaxY()
+{
+	return maxy;
+}
 
 /*!
 	\brief Sets up internal variables needed by all DisplayDriver subclasses
@@ -150,6 +231,533 @@ void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, Laye
 */
 void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int starty, endy;
+	int xclip, startclip, endclip;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+	float oldpensize;
+	BPoint center(xc,yc);
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  FillEllipse(r,d,pat);
+	  return;
+	}
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+	oldpensize = d->pensize;
+	d->pensize = 1;
+
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+
+	starty = ROUND(ry*sqrt(1-(double)startx*startx/(rx*rx)));
+	endy = ROUND(ry*sqrt(1-(double)endx*endx/(rx*rx)));
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+	if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+	if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+	if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+	if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+	}
+	d->pensize = oldpensize;
+	Unlock();
 }
 
 /*!
@@ -160,9 +768,76 @@ void DisplayDriver::FillArc(BRect r, float angle, float span, LayerData *d, cons
 	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
+	Does not work quite right, need to redo this.
 */
 void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .0002;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+	float oldpensize;
+	bool steep = false;
+
+	Lock();
+	if ( fabs(pts[3].y-pts[0].y) > fabs(pts[3].x-pts[0].x) )
+		steep = true;
+	
+	AccLineCalc line(pts[0], pts[3]);
+	oldpensize = d->pensize;
+	d->pensize = 1;
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+		if ( (x!=lastx) || (y!=lasty) )
+		{
+			if ( steep )
+				StrokeLine(BPoint(x,y),BPoint(line.GetX(y),y),d,pat);
+			else
+				StrokeLine(BPoint(x,y),BPoint(x,line.GetY(x)),d,pat);
+		}
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
+	d->pensize = oldpensize;
+	Unlock();
 }
 
 /*!
@@ -176,6 +851,78 @@ void DisplayDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	if ( CHECK_X(xc) )
+	{
+		if ( CHECK_Y(yc-y) )
+			SetPixel(ROUND(xc),ROUND(yc-y),pattern.GetColor(xc,yc-y));
+		if ( CHECK_Y(yc+y) )
+			SetPixel(ROUND(xc),ROUND(yc+y),pattern.GetColor(xc,yc+y));
+	}
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
+		{
+			if ( CHECK_Y(yc-y) )
+	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+			if ( CHECK_Y(yc+y) )
+		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		}
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
+		{
+			if ( CHECK_Y(yc-y) )
+	                	HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+			if ( CHECK_Y(yc+y) )
+		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		}
+	}
+	Unlock();
 }
 
 /*!
@@ -191,6 +938,128 @@ void DisplayDriver::FillEllipse(BRect r, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
 {
+	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
+	   the y-value of a point not in the segment, split the segment into 2 segments.
+	   Once we have gone through all of the segments, sort them primarily on y-value
+	   and secondarily on x-value.  Step through each y-value in the bounding rectangle
+	   and look for intersections with line segments.  First intersection is start of
+	   horizontal line, second intersection is end of horizontal line.  Continue for
+	   all pairs of intersections.  Watch out for horizontal line segments.
+	*/
+	Lock();
+	if ( !ptlist || (numpts < 3) )
+	{
+		Unlock();
+		return;
+	}
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	BPoint *currentPoint, *nextPoint;
+	BPoint tempNextPoint;
+	BPoint tempCurrentPoint;
+	int currentIndex, bestIndex, i, j, y;
+	AccLineCalc *segmentArray = new AccLineCalc[2*numpts];
+	int numSegments = 0;
+
+	/* Generate the segment list */
+	currentPoint = ptlist;
+	currentIndex = 0;
+	nextPoint = &ptlist[1];
+	while (currentPoint)
+	{
+		if ( numSegments >= 2*numpts )
+		{
+			printf("ERROR: Insufficient memory allocated to segment array\n");
+			delete[] segmentArray;
+			return;
+		}
+
+		for (i=0; i<numpts; i++)
+		{
+			if ( ((ptlist[i].y > currentPoint->y) && (ptlist[i].y < nextPoint->y)) ||
+				((ptlist[i].y < currentPoint->y) && (ptlist[i].y > nextPoint->y)) )
+			{
+				segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
+				tempNextPoint.x = segmentArray[numSegments].GetX(ptlist[i].y);
+				tempNextPoint.y = ptlist[i].y;
+				nextPoint = &tempNextPoint;
+			}
+		}
+
+		segmentArray[numSegments].SetPoints(*currentPoint,*nextPoint);
+		numSegments++;
+		if ( nextPoint == &tempNextPoint )
+		{
+			tempCurrentPoint = tempNextPoint;
+			currentPoint = &tempCurrentPoint;
+			nextPoint = &ptlist[(currentIndex+1)%numpts];
+		}
+		else if ( nextPoint == ptlist )
+		{
+			currentPoint = NULL;
+		}
+		else
+		{
+			currentPoint = nextPoint;
+			currentIndex++;
+			nextPoint = &ptlist[(currentIndex+1)%numpts];
+		}
+	}
+
+	/* Selection sort the segments.  Probably should replace this later. */
+	for (i=0; i<numSegments; i++)
+	{
+		bestIndex = i;
+		for (j=i+1; j<numSegments; j++)
+		{
+			if ( (segmentArray[j].MinY() < segmentArray[bestIndex].MinY()) ||
+				((segmentArray[j].MinY() == segmentArray[bestIndex].MinY()) &&
+				 (segmentArray[j].MinX() < segmentArray[bestIndex].MinX())) )
+				bestIndex = j;
+		}
+		if (bestIndex != i)
+			segmentArray[i].Swap(segmentArray[bestIndex]);
+	}
+
+	/* Draw the lines */
+	for (y=ROUND(rect.top); y<=ROUND(rect.bottom); y++)
+	{
+		if ( CHECK_Y(y) )
+		{
+			i = 0;
+			while (i<numSegments)
+			{
+				if (segmentArray[i].MinY() > y)
+					break;
+				if (segmentArray[i].MaxY() < y)
+				{
+					i++;
+					continue;
+				}
+				if (segmentArray[i].MinY() == segmentArray[i].MaxY())
+				{
+					if ( (segmentArray[i].MinX() < _buffer_width) &&
+						(segmentArray[i].MaxX() >= 0) )
+						HLine(CLIP_X(ROUND(segmentArray[i].MinX())),
+						      CLIP_X(ROUND(segmentArray[i].MaxX())),
+						      y, &pattern);
+					i++;
+				}
+				else
+				{
+					if ( (segmentArray[i].GetX(y) < _buffer_width) &&
+						(segmentArray[i+1].GetX(y) >= 0) )
+						HLine(CLIP_X(ROUND(segmentArray[i].GetX(y))),
+						      CLIP_X(ROUND(segmentArray[i+1].GetX(y))),
+						      y, &pattern);
+					i+=2;
+				}
+			}
+		}
+	}
+	delete[] segmentArray;
+	Unlock();
 }
 
 /*!
@@ -237,6 +1106,28 @@ void DisplayDriver::FillRegion(BRegion *r, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
+	float arc_x;
+	float yrad2 = yrad*yrad;
+	int i;
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+	
+	for (i=0; i<=(int)yrad; i++)
+	{
+		arc_x = xrad*sqrt(1-i*i/yrad2);
+		if ( CHECK_Y(r.top+yrad-i) )
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.top+yrad-i), &pattern);
+		if ( CHECK_Y(r.bottom-yrad+i) )
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.bottom-yrad+i), &pattern);
+	}
+	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
+			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
+
+	Unlock();
 }
 
 //void DisplayDriver::FillShape(SShape *sh, LayerData *d, const Pattern &pat)
@@ -256,6 +1147,108 @@ void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d,
 */
 void DisplayDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
+	if(!pts || !d)
+		return;
+
+	Lock();
+	BPoint first, second, third;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	// Sort points according to their y values and x values (y is primary)
+	if ( (pts[0].y < pts[1].y) ||
+		((pts[0].y == pts[1].y) && (pts[0].x <= pts[1].x)) )
+	{
+		first=pts[0];
+		second=pts[1];
+	}
+	else
+	{
+		first=pts[1];
+		second=pts[0];
+	}
+	
+	if ( (second.y<pts[2].y) ||
+		((second.y == pts[2].y) && (second.x <= pts[2].x)) )
+	{
+		third=pts[2];
+	}
+	else
+	{
+		// second is lower than "third", so we must ensure that this third point
+		// isn't higher than our first point
+		third=second;
+		if ( (first.y<pts[2].y) ||
+			((first.y == pts[2].y) && (first.x <= pts[2].x)) )
+			second=pts[2];
+		else
+		{
+			second=first;
+			first=pts[2];
+		}
+	}
+	
+	// Now that the points are sorted, check to see if they all have the same
+	// y value
+	if(first.y==second.y && second.y==third.y)
+	{
+		BPoint start,end;
+		start.y=first.y;
+		end.y=first.y;
+		start.x=MIN(first.x,MIN(second.x,third.x));
+		end.x=MAX(first.x,MAX(second.x,third.x));
+		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
+			HLine(ROUND(CLIP_X(start.x)), ROUND(CLIP_X(end.x)), ROUND(start.y), &pattern);
+		Unlock();
+		return;
+	}
+
+	int32 i;
+
+	// Special case #1: first and second in the same row
+	if(first.y==second.y)
+	{
+		AccLineCalc lineA(first, third);
+		AccLineCalc lineB(second, third);
+		
+		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
+			HLine(ROUND(CLIP_X(first.x)), ROUND(CLIP_X(second.x)), ROUND(first.y), &pattern);
+		for(i=(int32)first.y+1; i<=third.y; i++)
+			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
+		Unlock();
+		return;
+	}
+	
+	// Special case #2: second and third in the same row
+	if(second.y==third.y)
+	{
+		AccLineCalc lineA(first, second);
+		AccLineCalc lineB(first, third);
+		
+		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
+			HLine(ROUND(CLIP_X(second.x)), ROUND(CLIP_X(third.x)), ROUND(second.y), &pattern);
+		for(i=(int32)first.y; i<third.y; i++)
+			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
+		Unlock();
+		return;
+	}
+	
+	// Normal case.	
+	AccLineCalc lineA(first, second);
+	AccLineCalc lineB(first, third);
+	AccLineCalc lineC(second, third);
+	
+	for(i=(int32)first.y; i<(int32)second.y; i++)
+		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+			HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
+
+	for(i=(int32)second.y; i<=third.y; i++)
+		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+			HLine(ROUND(CLIP_X(lineC.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
+		
+	Unlock();
 }
 
 /*!
@@ -371,6 +1364,160 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 */
 void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+	int thick;
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  StrokeEllipse(r,d,pat);
+	  return;
+	}
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	thick = (int)d->pensize;
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+        /* SetThickPixel does bounds checking, so we don't have to worry about it here */
+	if ( useQuad1 || 
+	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+	if ( useQuad2 || 
+	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+	if ( useQuad3 || 
+	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+	if ( useQuad4 || 
+	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+	}
+	Unlock();
 }
 
 /*!
@@ -384,6 +1531,61 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, co
 */
 void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .0005;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+                /* SetThickPixel does bounds checking, so we don't have to worry about it */
+		if ( (x!=lastx) || (y!=lasty) )
+			SetThickPixel(x,y,ROUND(d->pensize),&pattern);
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
+	Unlock();
 }
 
 /*!
@@ -397,6 +1599,73 @@ void DisplayDriver::StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 {
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int thick;
+
+	Lock();
+	thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+        /* SetThickPixel does bounds checking, so we don't have to worry about it */
+
+	SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+	SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+	SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+	SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		SetThickPixel(ROUND(xc+x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc-y),thick,&pattern);
+		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
+		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
+	}
+	Unlock();
 }
 
 /*!
@@ -411,6 +1680,39 @@ void DisplayDriver::StrokeEllipse(BRect r, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat)
 {
+	int x1 = ROUND(start.x);
+	int y1 = ROUND(start.y);
+	int x2 = ROUND(end.x);
+	int y2 = ROUND(end.y);
+	int dx = x2 - x1;
+	int dy = y2 - y1;
+	int steps, k;
+	double xInc, yInc;
+	double x = x1;
+	double y = y1;
+	int thick;
+
+	Lock();
+	thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	if ( abs(dx) > abs(dy) )
+		steps = abs(dx);
+	else
+		steps = abs(dy);
+	xInc = dx / (double) steps;
+	yInc = dy / (double) steps;
+
+        /* SetThickPixel does bounds checking, so we don't have to worry about it */
+	SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
+	for (k=0; k<steps; k++)
+	{
+		x += xInc;
+		y += yInc;
+		SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
+	}
+	Unlock();
 }
 
 /*!
@@ -426,6 +1728,13 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, const Pat
 */
 void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed)
 {
+	/* Bounds checking is handled by StrokeLine and the functions it uses */
+	Lock();
+	for(int32 i=0; i<(numpts-1); i++)
+		StrokeLine(ptlist[i],ptlist[i+1],d,pat);
+	if(is_closed)
+		StrokeLine(ptlist[numpts-1],ptlist[0],d,pat);
+	Unlock();
 }
 
 /*!
@@ -437,6 +1746,16 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Laye
 */
 void DisplayDriver::StrokeRect(BRect r, LayerData *d, const Pattern &pat)
 {
+	Lock();
+	int thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	HLineThick(ROUND(r.left), ROUND(r.right), ROUND(r.top), thick, &pattern);
+	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
+	HLineThick(ROUND(r.right), ROUND(r.left), ROUND(r.bottom), thick, &pattern);
+	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
+	Unlock();
 }
 
 /*!
@@ -472,6 +1791,34 @@ void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, const Pattern &pat)
 */
 void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
+	float hLeft, hRight;
+	float vTop, vBottom;
+	float bLeft, bRight, bTop, bBottom;
+	Lock();
+	int thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	hLeft = r.left + xrad;
+	hRight = r.right - xrad;
+	vTop = r.top + yrad;
+	vBottom = r.bottom - yrad;
+	bLeft = hLeft + xrad;
+	bRight = hRight -xrad;
+	bTop = vTop + yrad;
+	bBottom = vBottom - yrad;
+	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
+	HLineThick(ROUND(hRight), ROUND(hLeft), ROUND(r.top), thick, &pattern);
+	
+	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
+	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
+
+	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
+	HLineThick(ROUND(hLeft), ROUND(hRight), ROUND(r.bottom), thick, &pattern);
+
+	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
+	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
+	Unlock();
 }
 
 //void DisplayDriver::StrokeShape(SShape *sh, LayerData *d, const Pattern &pat)
@@ -491,6 +1838,12 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *
 */
 void DisplayDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat)
 {
+	/* Bounds checking is handled by StrokeLine and the functions it calls */
+	Lock();
+	StrokeLine(pts[0],pts[1],d,pat);
+	StrokeLine(pts[1],pts[2],d,pat);
+	StrokeLine(pts[2],pts[0],d,pat);
+	Unlock();
 }
 
 /*!
@@ -850,3 +2203,50 @@ ServerCursor *DisplayDriver::_GetCursor(void)
 	return _cursor;
 }
 
+/*!
+	\brief Draws a pixel in the specified color
+	\param x The x coordinate (guaranteed to be in bounds)
+	\param y The y coordinate (guaranteed to be in bounds)
+	\param col The color to draw
+	Must be implemented in subclasses
+*/
+void DisplayDriver::SetPixel(int x, int y, RGBColor col)
+{
+}
+
+/*!
+	\brief Draws a point of a specified thickness
+	\param x The x coordinate (not guaranteed to be in bounds)
+	\param y The y coordinate (not guaranteed to be in bounds)
+	\param thick The thickness of the point
+	\param pat The PatternHandler which detemines pixel colors
+	Must be implemented in subclasses
+*/
+void DisplayDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
+{
+}
+
+/*!
+	\brief Draws a horizontal line
+	\param x1 The first x coordinate (guaranteed to be in bounds)
+	\param x2 The second x coordinate (guaranteed to be in bounds)
+	\param y The y coordinate (guaranteed to be in bounds)
+	\param pat The PatternHandler which detemines pixel colors
+	Must be implemented in subclasses
+*/
+void DisplayDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
+{
+}
+
+/*!
+	\brief Draws a horizontal line
+	\param x1 The first x coordinate (not guaranteed to be in bounds)
+	\param x2 The second x coordinate (not guaranteed to be in bounds)
+	\param y The y coordinate (not guaranteed to be in bounds)
+	\param thick The thickness of the line
+	\param pat The PatternHandler which detemines pixel colors
+	Must be implemented in subclasses
+*/
+void DisplayDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
+{
+}

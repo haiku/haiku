@@ -122,8 +122,23 @@ uint8 RGBColor::GetColor8(void)
 }
 
 /*!
+	\brief Returns the color as the closest 15-bit color
+	\return 15-bit value of the current color plus 1-bit alpha
+*/
+uint16 RGBColor::GetColor15(void)
+{
+	if(update15)
+	{
+		color15=FindClosestColor15(color32);
+		update15=false;
+	}
+	
+	return color15;
+}
+
+/*!
 	\brief Returns the color as the closest 16-bit color
-	\return 16-bit value of the current color, including alpha
+	\return 16-bit value of the current color
 */
 uint16 RGBColor::GetColor16(void)
 {

@@ -28,53 +28,12 @@
 #ifndef _ACCELERANTDRIVER_H_
 #define _ACCELERANTDRIVER_H_
 
-#if 0
-#include <Application.h>
-#include <WindowScreen.h>
-#include <View.h>
-#include <GraphicsCard.h>
-#include <Message.h>
-#include <OS.h>
-#include <Locker.h>
-#include <Region.h>	// for clipping_rect definition
-#include <Bitmap.h>
-#endif
 #include <Accelerant.h>
 #include "DisplayDriver.h"
 #include "PatternHandler.h"
 #include "FontServer.h"
-#if 0
-class VDWindow;
-class RGBColor;
-class PortLink;
-#endif
 class ServerBitmap;
 class ServerCursor;
-
-class AccLineCalc
-{
-public:
-	AccLineCalc();
-	AccLineCalc(const BPoint &pta, const BPoint &ptb);
-	void SetPoints(const BPoint &pta, const BPoint &ptb);
-	float GetX(float y);
-	float GetY(float x);
-	float Slope(void) { return slope; }
-	float Offset(void) { return offset; }
-	float MinX();
-	float MinY();
-	float MaxX();
-	float MaxY();
-	void Swap(AccLineCalc &from);
-private:
-	float slope;
-	float offset;
-	BPoint start, end;
-	float minx;
-	float miny;
-	float maxx;
-	float maxy;
-};
 
 class AccelerantDriver : public DisplayDriver
 {
@@ -90,14 +49,8 @@ public:
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL);
 
-	virtual void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	virtual void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	virtual void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
-	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
 	virtual void FillRect(BRect r, LayerData *d, const Pattern &pat);
-	virtual void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
 //	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void FillTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 
 	virtual void HideCursor(void);
 	virtual void MoveCursorTo(float x, float y);
@@ -106,15 +59,7 @@ public:
 	virtual void ObscureCursor(void);
 	virtual void SetCursor(ServerCursor *csr);
 
-	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
-	virtual void StrokeBezier(BPoint *pts, LayerData *d, const Pattern &pat);
-	virtual void StrokeEllipse(BRect r, LayerData *d, const Pattern &pat);
-	virtual void StrokeLine(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat, bool is_closed=true);
-	virtual void StrokeRect(BRect r, LayerData *d, const Pattern &pat);
-	virtual void StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
 //	virtual void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
-	virtual void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 	virtual void StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d);
 	virtual void SetMode(int32 mode);
 	virtual bool DumpToFile(const char *path);
