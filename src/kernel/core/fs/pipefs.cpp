@@ -1017,7 +1017,7 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/,
 	status_t status = request.Wait((cookie->open_mode & O_NONBLOCK) != 0);
 	inode->RemoveRequest(request);
 
-	if (status == B_TIMED_OUT || B_INTERRUPTED && request.BytesRead() > 0)
+	if ((status == B_TIMED_OUT || status == B_INTERRUPTED) && request.BytesRead() > 0)
 		status = B_OK;
 
 	if (status == B_OK)
