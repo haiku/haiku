@@ -34,22 +34,57 @@
 #include "RosterAppInfo.h"
 #include "TRoster.h"
 
+/*!
+	\class TRoster
+	\brief Implements the application roster.
+
+	This class handles the BRoster requests. For each kind a hook method is
+	implemented to which the registrar looper dispatches the request messages.
+
+	Registered and pre-registered are managed via AppInfoLists.
+	\a fEarlyPreRegisteredApps contains the infos for those application that
+	are pre-registered and currently have no team ID assigned to them yet,
+	whereas the infos of registered and pre-registered applications with a
+	team ID are to be found in \a fRegisteredApps.
+
+	When an application asks whether it is pre-registered or not and there
+	are one or more instances of the application that are pre-registered, but
+	have no team ID assigned yet, the reply to the request has to be
+	postponed until the status of the requesting team is clear. The request
+	message is dequeued from the registrar's message queue and, with
+	additional information (IAPRRequest), added to \a fIAPRRequests for a
+	later reply.
+
+	The field \a fActiveApp identifies the currently active application
+	and \a fLastToken is a counter used to generate unique tokens for
+	pre-registered applications.
+*/
+
 // constructor
+/*!	\brief Creates a new roster.
+
+	The object is completely initialized and ready to handle requests.
+*/
 TRoster::TRoster()
 	   : fRegisteredApps(),
 		 fEarlyPreRegisteredApps(),
 		 fIAPRRequests(),
-		 fActiveApp(-1),
+		 fActiveApp(NULL),
 		 fLastToken(0)
 {
 }
 
 // destructor
+/*!	\brief Frees all resources associated with this object.
+*/
 TRoster::~TRoster()
 {
 }
 
 // HandleAddApplication
+/*!	\brief Handles an AddApplication() request.
+	\param request The request message
+*/
 void
 TRoster::HandleAddApplication(BMessage *request)
 {
@@ -135,7 +170,7 @@ PRINT(("ref: %ld, %lld, %s\n", ref.device, ref.directory, ref.name));
 			if (team >= 0)
 {
 PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info->ref.name));
-				addingSuccess = fRegisteredApps.AddInfo(info);
+				addingSuccess = (AddApp(info) == B_OK);
 }
 			else {
 				token = info->token = _NextToken();
@@ -168,6 +203,9 @@ PRINT(("added ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info
 }
 
 // HandleCompleteRegistration
+/*!	\brief Handles a CompleteRegistration() request.
+	\param request The request message
+*/
 void
 TRoster::HandleCompleteRegistration(BMessage *request)
 {
@@ -218,6 +256,9 @@ TRoster::HandleCompleteRegistration(BMessage *request)
 }
 
 // HandleIsAppPreRegistered
+/*!	\brief Handles an IsAppPreRegistered() request.
+	\param request The request message
+*/
 void
 TRoster::HandleIsAppPreRegistered(BMessage *request)
 {
@@ -227,13 +268,10 @@ TRoster::HandleIsAppPreRegistered(BMessage *request)
 	// get the parameters
 	entry_ref ref;
 	team_id team;
-	thread_id thread;
 	if (request->FindRef("ref", &ref) != B_OK)
 		SET_ERROR(error, B_BAD_VALUE);
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
-	if (request->FindInt32("thread", &thread) != B_OK)
-		thread = -1;
 	// check the parameters
 	// entry_ref
 	if (error == B_OK & !BEntry(&ref).Exists())
@@ -267,6 +305,9 @@ TRoster::HandleIsAppPreRegistered(BMessage *request)
 }
 
 // HandleRemovePreRegApp
+/*!	\brief Handles a RemovePreRegApp() request.
+	\param request The request message
+*/
 void
 TRoster::HandleRemovePreRegApp(BMessage *request)
 {
@@ -300,6 +341,9 @@ TRoster::HandleRemovePreRegApp(BMessage *request)
 }
 
 // HandleRemoveApp
+/*!	\brief Handles a RemoveApp() request.
+	\param request The request message
+*/
 void
 TRoster::HandleRemoveApp(BMessage *request)
 {
@@ -313,9 +357,7 @@ TRoster::HandleRemoveApp(BMessage *request)
 	// remove the app
 	if (error == B_OK) {
 		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team)) {
-			fRegisteredApps.RemoveInfo(info);
-			// Cleanup activities go here (e.g. removing message runners)
-			// ...
+			RemoveApp(info);
 			delete info;
 		} else
 			SET_ERROR(error, B_REG_APP_NOT_REGISTERED);
@@ -334,6 +376,9 @@ TRoster::HandleRemoveApp(BMessage *request)
 }
 
 // HandleSetThreadAndTeam
+/*!	\brief Handles a SetThreadAndTeam() request.
+	\param request The request message
+*/
 void
 TRoster::HandleSetThreadAndTeam(BMessage *request)
 {
@@ -372,8 +417,8 @@ TRoster::HandleSetThreadAndTeam(BMessage *request)
 			if (error == B_OK)
 				SET_ERROR(error, set_port_owner(info->port, team));
 			// add the info to the registered apps list
-			if (error == B_OK && !fRegisteredApps.AddInfo(info))
-				SET_ERROR(error, B_NO_MEMORY);
+			if (error == B_OK)
+				SET_ERROR(error, AddApp(info));
 			// cleanup on failure
 			if (error != B_OK) {
 				if (info->port >= 0)
@@ -405,33 +450,57 @@ TRoster::HandleSetThreadAndTeam(BMessage *request)
 	FUNCTION_END();
 }
 
-// HandleGetRunningAppInfo
+// HandleGetAppInfo
+/*!	\brief Handles a Get{Running,Active,}AppInfo() request.
+	\param request The request message
+*/
 void
-TRoster::HandleGetRunningAppInfo(BMessage *request)
+TRoster::HandleGetAppInfo(BMessage *request)
 {
 	FUNCTION_START();
 
 	status_t error = B_OK;
 	// get the parameters
 	team_id team;
+	entry_ref ref;
+	const char *signature;
+	bool hasTeam = true;
+	bool hasRef = true;
+	bool hasSignature = true;
 	if (request->FindInt32("team", &team) != B_OK)
-		team = -1;
+		hasTeam = false;
+	if (request->FindRef("ref", &ref) != B_OK)
+		hasRef = false;
+	if (request->FindString("signature", &signature) != B_OK)
+		hasSignature = false;
 	// check the parameters
-	// team -- in case no team is supplied, the active team is meant
-	if (error == B_OK && team < 0) {
-		if (fActiveApp >= 0)
-			team = fActiveApp;
-		else
-			error = B_ENTRY_NOT_FOUND;
+	// If neither of those has been supplied, the active application info is
+	// requested. We simple set the team ID.
+	if (error == B_OK && !hasTeam && !hasRef && !hasSignature) {
 	}
 	// get the info
 	RosterAppInfo *info = NULL;
 	if (error == B_OK) {
-		info = fRegisteredApps.InfoFor(team);
-		if (info == NULL)
-			error = B_ENTRY_NOT_FOUND;
-else
-PRINT(("found ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info->ref.name));
+		if (hasTeam) {
+			info = fRegisteredApps.InfoFor(team);
+			if (info == NULL)
+				error = B_BAD_TEAM_ID;
+		} else if (hasRef) {
+			info = fRegisteredApps.InfoFor(&ref);
+			if (info == NULL)
+				error = B_ERROR;
+		} else if (hasSignature) {
+			info = fRegisteredApps.InfoFor(signature);
+			if (info == NULL)
+				error = B_ERROR;
+		} else {
+			// If neither of those has been supplied, the active application
+			// info is requested.
+			if (fActiveApp)
+				info = fActiveApp;
+			else
+				error = B_ERROR;
+		}
 	}
 	// reply to the request
 	if (error == B_OK) {
@@ -447,8 +516,207 @@ PRINT(("found ref: %ld, %lld, %s\n", info->ref.device, info->ref.directory, info
 	FUNCTION_END();
 }
 
+// HandleGetAppList
+/*!	\brief Handles a GetAppList() request.
+	\param request The request message
+*/
+void
+TRoster::HandleGetAppList(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	const char *signature;
+	if (request->FindString("signature", &signature) != B_OK)
+		signature = NULL;
+	// reply to the request
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		// get the list
+		for (int32 i = 0;
+			 RosterAppInfo *info = fRegisteredApps.InfoAt(i);
+			 i++) {
+			if (!signature || !strcmp(signature, info->signature))
+				reply.AddInt32("teams", info->team);
+		}
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+
+	FUNCTION_END();
+}
+
+// HandleActivateApp
+/*!	\brief Handles a ActivateApp() request.
+	\param request The request message
+*/
+void
+TRoster::HandleActivateApp(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	team_id team;
+	if (request->FindInt32("team", &team) != B_OK)
+		error = B_BAD_VALUE;
+	// activate the app
+	if (error == B_OK) {
+		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
+			ActivateApp(info);
+		else
+			error = B_BAD_TEAM_ID;
+	}
+	// reply to the request
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+
+	FUNCTION_END();
+}
+
+// AddApp
+/*!	\brief Add the supplied app info to the list of (pre-)registered apps.
+
+	\param info The app info to be added
+*/
+status_t
+TRoster::AddApp(RosterAppInfo *info)
+{
+	status_t error = (info ? B_OK : B_BAD_VALUE);
+	if (info) {
+		if (fRegisteredApps.AddInfo(info))
+			_AppAdded(info);
+		else
+			error = B_NO_MEMORY;
+	}
+	return error;
+}
+
+// RemoveApp
+/*!	\brief Removes the supplied app info from the list of (pre-)registered
+	apps.
+
+	\param info The app info to be removed
+*/
+void
+TRoster::RemoveApp(RosterAppInfo *info)
+{
+	if (info) {
+		if (fRegisteredApps.RemoveInfo(info)) {
+			info->state = APP_STATE_UNREGISTERED;
+			_AppRemoved(info);
+		}
+	}
+}
+
+// ActivateApp
+/*!	\brief Activates the application identified by \a info.
+
+	The currently activate application is deactivated and the one whose
+	info is supplied is activated. \a info may be \c NULL, which only
+	deactivates the currently active application.
+
+	\param info The info of the app to be activated
+*/
+void
+TRoster::ActivateApp(RosterAppInfo *info)
+{
+	if (info != fActiveApp) {
+		// deactivate the currently active app
+		RosterAppInfo *oldActiveApp = fActiveApp;
+		fActiveApp = NULL;
+		if (oldActiveApp)
+			_AppDeactivated(oldActiveApp);
+		// activate the new app
+		if (info) {
+			info = fActiveApp;
+			_AppActivated(info);
+		}
+	}
+}
+
+
+// _AppAdded
+/*!	\brief Hook method invoked, when an application has been added.
+	\param info The RosterAppInfo of the added application.
+*/
+void
+TRoster::_AppAdded(RosterAppInfo *info)
+{
+}
+
+// _AppRemoved
+/*!	\brief Hook method invoked, when an application has been removed.
+	\param info The RosterAppInfo of the removed application.
+*/
+void
+TRoster::_AppRemoved(RosterAppInfo *info)
+{
+	if (info) {
+		// deactivate the app, if it was the active one
+		if (info == fActiveApp)
+			ActivateApp(NULL);
+	}
+}
+
+// _AppActivated
+/*!	\brief Hook method invoked, when an application has been activated.
+	\param info The RosterAppInfo of the activated application.
+*/
+void
+TRoster::_AppActivated(RosterAppInfo *info)
+{
+	if (info) {
+		if (info->state == APP_STATE_REGISTERED
+			|| info->state == APP_STATE_PRE_REGISTERED) {
+			// send B_APP_ACTIVATED to the app
+			BMessenger messenger(info->team, info->port, 0, true);
+			BMessage message(B_APP_ACTIVATED);
+			message.AddBool("active", true);
+			messenger.SendMessage(&message);
+		}
+	}
+}
+
+// _AppDeactivated
+/*!	\brief Hook method invoked, when an application has been deactivated.
+	\param info The RosterAppInfo of the deactivated application.
+*/
+void
+TRoster::_AppDeactivated(RosterAppInfo *info)
+{
+	if (info) {
+		if (info->state == APP_STATE_REGISTERED
+			|| info->state == APP_STATE_PRE_REGISTERED) {
+			// send B_APP_ACTIVATED to the app
+			BMessenger messenger(info->team, info->port, 0, true);
+			BMessage message(B_APP_ACTIVATED);
+			message.AddBool("active", false);
+			messenger.SendMessage(&message);
+		}
+	}
+}
 
 // _AddMessageAppInfo
+/*!	\brief Adds an app_info to a message.
+
+	The info is added as a flat_app_info to a field "app_info" with the type
+	\c B_REG_APP_INFO_TYPE.
+
+	\param message The message
+	\param info The app_info.
+	\return \c B_OK if everything went fine, an error code otherwise.
+*/
 status_t
 TRoster::_AddMessageAppInfo(BMessage *message, const app_info *info)
 {
@@ -467,6 +735,9 @@ TRoster::_AddMessageAppInfo(BMessage *message, const app_info *info)
 }
 
 // _NextToken
+/*!	\brief Returns the next available token.
+	\return The token.
+*/
 uint32
 TRoster::_NextToken()
 {
@@ -474,6 +745,17 @@ TRoster::_NextToken()
 }
 
 // _ReplyToIAPRRequest
+/*!	\brief Sends a reply message to a IsAppPreRegistered() request.
+
+	The message to be sent is a simple \c B_REG_SUCCESS message containing
+	a "pre-registered" field, that sais whether or not the application is
+	pre-registered. It will be set to \c false, unless an \a info is supplied
+	and the application this info refers to is pre-registered.
+
+	\param request The request message to be replied to
+	\param info The RosterAppInfo of the application in question
+		   (may be \c NULL)
+*/
 void
 TRoster::_ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info)
 {

@@ -58,9 +58,22 @@ public:
 	void HandleRemovePreRegApp(BMessage *request);
 	void HandleRemoveApp(BMessage *request);
 	void HandleSetThreadAndTeam(BMessage *request);
-	void HandleGetRunningAppInfo(BMessage *request);
+	void HandleGetAppInfo(BMessage *request);
+	void HandleGetAppList(BMessage *request);
+	void HandleActivateApp(BMessage *request);
+
+	status_t AddApp(RosterAppInfo *info);
+	void RemoveApp(RosterAppInfo *info);
+	void ActivateApp(RosterAppInfo *info);
 
 private:
+	// hook functions
+	void _AppAdded(RosterAppInfo *info);
+	void _AppRemoved(RosterAppInfo *info);
+	void _AppActivated(RosterAppInfo *info);
+	void _AppDeactivated(RosterAppInfo *info);
+
+	// helper functions
 	static status_t _AddMessageAppInfo(BMessage *message,
 									   const app_info *info);
 	uint32 _NextToken();
@@ -70,7 +83,7 @@ private:
 	AppInfoList		fRegisteredApps;
 	AppInfoList		fEarlyPreRegisteredApps;
 	IAPRRequestMap	fIAPRRequests;
-	team_id			fActiveApp;
+	RosterAppInfo	*fActiveApp;
 	uint32			fLastToken;
 };
 
