@@ -24,53 +24,553 @@
 //	Description:	main manager object for the app_server
 //  
 //------------------------------------------------------------------------------
+#include <AppDefs.h>
 #include "AppServer.h"
+#include "Desktop.h"
+#include "DisplayDriver.h"
+#include "PortLink.h"
+#include "ServerApp.h"
 #include "ServerConfig.h"
+#include "ServerProtocol.h"
 
+/*!
+	\brief Constructor
+	
+	This loads the default fonts, allocates all the major global variables, spawns the main housekeeping
+	threads, loads user preferences for the UI and decorator, and allocates various locks.
+*/
 AppServer::AppServer(void)
 {
+	_mouseport=create_port(100,SERVER_INPUT_PORT);
+	_messageport=create_port(100,SERVER_PORT_NAME);
+
+	_applist=new BList(0);
+	_quitting_server=false;
+	_exit_poller=false;
+
+	// Create the font server and scan the proper directories.
+	fontserver=new FontServer;
+	fontserver->Lock();
+	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
+
+	// TODO: Uncomment when actually put to use. Commented out for speed
+//	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
+//	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
+//	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
+	fontserver->SaveList();
+
+	if(!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE))
+		printf("Couldn't set plain to %s, %s %d pt\n",DEFAULT_PLAIN_FONT_FAMILY,
+				DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE);
+	if(!fontserver->SetSystemBold(DEFAULT_BOLD_FONT_FAMILY,DEFAULT_BOLD_FONT_STYLE,DEFAULT_BOLD_FONT_SIZE))
+		printf("Couldn't set bold to %s, %s %d pt\n",DEFAULT_BOLD_FONT_FAMILY,
+				DEFAULT_BOLD_FONT_STYLE,DEFAULT_BOLD_FONT_SIZE);
+	if(!fontserver->SetSystemFixed(DEFAULT_FIXED_FONT_FAMILY,DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE))
+		printf("Couldn't set fixed to %s, %s %d pt\n",DEFAULT_FIXED_FONT_FAMILY,
+				DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE);
+	fontserver->Unlock();
+
+	// Set up the Desktop
+	InitDesktop();
+
+	// This is necessary to mediate access between the Poller and app_server threads
+	_active_lock=create_sem(1,"app_server_active_sem");
+
+	// This locker is for app_server and Picasso to vy for control of the ServerApp list
+	_applist_lock=create_sem(1,"app_server_applist_sem");
+
+	// This locker is to mediate access to the make_decorator pointer
+	_decor_lock=create_sem(1,"app_server_decor_sem");
+	
+	// Get the driver first - Poller thread utilizes the thing
+	_driver=GetGfxDriver();
+
+	// Spawn our input-polling thread
+	_poller_id=spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);
+	if (_poller_id >= 0)
+		resume_thread(_poller_id);
+
+	// Spawn our thread-monitoring thread
+	_picasso_id = spawn_thread(PicassoThread,"Picasso", B_NORMAL_PRIORITY, this);
+	if (_picasso_id >= 0)
+		resume_thread(_picasso_id);
+
+	_active_app=-1;
+	_p_active_app=NULL;
+
+	make_decorator=NULL;	
 }
 
+/*!
+	\brief Destructor
+	
+	Reached only when the server is asked to shut down in Test mode. Kills all apps, shuts down the 
+	desktop, kills the housekeeping threads, etc.
+*/
 AppServer::~AppServer(void)
 {
+
+	ServerApp *tempapp;
+	int32 i;
+	acquire_sem(_applist_lock);
+	for(i=0;i<_applist->CountItems();i++)
+	{
+		tempapp=(ServerApp *)_applist->ItemAt(i);
+		if(tempapp!=NULL)
+			delete tempapp;
+	}
+	delete _applist;
+	release_sem(_applist_lock);
+
+	ShutdownDesktop();
+
+	// If these threads are still running, kill them - after this, if exit_poller
+	// is deleted, who knows what will happen... These things will just return an
+	// error and fail if the threads have already exited.
+	kill_thread(_poller_id);
+	kill_thread(_picasso_id);
+
+	delete fontserver;
+	
+	make_decorator=NULL;
 }
 
+/*!
+	\brief Thread function for polling and handling input messages
+	\param data Pointer to the app_server to which the thread belongs
+	\return Throwaway value - always 0
+*/
 int32 AppServer::PollerThread(void *data)
 {
+	// This thread handles nothing but input messages for mouse and keyboard
+	AppServer *appserver=(AppServer*)data;
+	int32 msgcode;
+	int8 *msgbuffer=NULL,*index;
+	ssize_t buffersize,bytesread;
+	
+	for(;;)
+	{
+		buffersize=port_buffer_size(appserver->_mouseport);
+		if(buffersize>0)
+			msgbuffer=new int8[buffersize];
+		bytesread=read_port(appserver->_mouseport,&msgcode,msgbuffer,buffersize);
+
+		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
+		{
+			switch(msgcode)
+			{
+				// We don't need to do anything with these two, so just pass them
+				// onto the active application. Eventually, we will end up passing 
+				// them onto the window which is currently under the cursor.
+				case B_MOUSE_DOWN:
+				case B_MOUSE_UP:
+				{
+					if(!msgbuffer)
+						break;
+					// TODO: Uncomment when we have ServerWindow.h
+					//ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					break;
+				}
+				
+				// Process the cursor and then pass it on
+				case B_MOUSE_MOVED:
+				{
+					// Attached data:
+					// 1) int64 - time of mouse click
+					// 2) float - x coordinate of mouse click
+					// 3) float - y coordinate of mouse click
+					// 4) int32 - buttons down
+
+					index=msgbuffer;
+					if(!index)
+						break;
+
+					// Time sent is not necessary for cursor processing.
+					index += sizeof(int64);
+					
+					float tempx=0,tempy=0;
+					tempx=*((float*)index);
+					index+=sizeof(float);
+					tempy=*((float*)index);
+					index+=sizeof(float);
+
+					appserver->_driver->MoveCursorTo(tempx,tempy);
+
+					// TODO: Uncomment when we have ServerWindow.h
+					//ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					break;
+				}
+				case B_KEY_DOWN:
+				case B_KEY_UP:
+				case B_UNMAPPED_KEY_DOWN:
+				case B_UNMAPPED_KEY_UP:
+					appserver->HandleKeyMessage(msgcode,msgbuffer);
+					break;
+				default:
+					printf("Server::Poller received unexpected code %lx\n",msgcode);
+					break;
+			}
+
+		}
+
+		if(buffersize>0)
+			delete msgbuffer;
+
+		if(appserver->_exit_poller)
+			break;
+	}
 	return 0;
 }
 
+/*!
+	\brief Thread function for watching for dead apps
+	\param data Pointer to the app_server to which the thread belongs
+	\return Throwaway value - always 0
+*/
 int32 AppServer::PicassoThread(void *data)
 {
+	int32 i;
+	AppServer *appserver=(AppServer*)data;
+	ServerApp *app;
+	for(;;)
+	{
+		acquire_sem(appserver->_applist_lock);
+		for(i=0;i<appserver->_applist->CountItems(); i++)
+		{
+			app=(ServerApp*)appserver->_applist->ItemAt(i);
+			if(!app)
+			{
+				printf("PANIC: NULL app in app list\n");
+				continue;
+			}
+			app->PingTarget();
+		}
+		release_sem(appserver->_applist_lock);
+		
+		// if poller thread has to exit, so do we - I just was too lazy
+		// to rename the variable name. ;)
+		if(appserver->_exit_poller)
+			break;
+
+		// we do this every other second so as not to suck *too* many CPU cycles
+		snooze(2000000);
+	}
 	return 0;
 }
 
-thread_id AppServer::Run(void)
+//! The call that starts it all...
+void AppServer::Run(void)
 {
-	return 0;
+	MainLoop();
 }
 
+
+//! Main message-monitoring loop for the regular message port - no input messages!
 void AppServer::MainLoop(void)
 {
+	int32 msgcode;
+	int8 *msgbuffer=NULL;
+	ssize_t buffersize,bytesread;
+	
+	for(;;)
+	{
+		buffersize=port_buffer_size(_messageport);
+		if(buffersize>0)
+			msgbuffer=new int8[buffersize];
+		bytesread=read_port(_messageport,&msgcode,msgbuffer,buffersize);
+
+		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
+		{
+			switch(msgcode)
+			{
+				case CREATE_APP:
+				case DELETE_APP:
+				case GET_SCREEN_MODE:
+				case B_QUIT_REQUESTED:
+				case UPDATED_CLIENT_FONTLIST:
+				case QUERY_FONTS_CHANGED:
+					DispatchMessage(msgcode,msgbuffer);
+					break;
+				default:
+				{
+					printf("Server::MainLoop received unexpected code %ld\n",msgcode);
+					break;
+				}
+			}
+
+		}
+
+		if(buffersize>0)
+			delete msgbuffer;
+		if(msgcode==DELETE_APP || msgcode==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER)
+		{
+			if(_quitting_server==true && _applist->CountItems()==0)
+				break;
+		}
+	}
+	// Make sure our polling thread has exited
+	if(find_thread("Poller")!=B_NAME_NOT_FOUND)
+		kill_thread(_poller_id);
 }
 
+/*!
+	\brief Loads the specified decorator and sets the system's decorator to it.
+	\param path Path to the decorator to load
+	\return True if successful, false if not.
+	
+	If the server cannot load the specified decorator, nothing changes.
+*/
 bool AppServer::LoadDecorator(const char *path)
 {
-	return false;
+	// Loads a window decorator based on the supplied path and forces a decorator update.
+	// If it cannot load the specified decorator, it will retain the current one and
+	// return false.
+	
+	create_decorator *pcreatefunc=NULL;
+	get_version *pversionfunc=NULL;
+	status_t stat;
+	image_id addon;
+	
+	addon=load_add_on(path);
+
+	// As of now, we do nothing with decorator versions, but the possibility exists
+	// that the API will change even though I cannot forsee any reason to do so. If
+	// we *did* do anything with decorator versions, the assignment to a global would
+	// go here.
+		
+	// Get the instantiation function
+	stat=get_image_symbol(addon, "instantiate_decorator", B_SYMBOL_TYPE_TEXT, (void**)&pversionfunc);
+	if(stat!=B_OK)
+	{
+		unload_add_on(addon);
+		return false;
+	}
+	acquire_sem(_decor_lock);
+	make_decorator=pcreatefunc;
+	_decorator_id=addon;
+	release_sem(_decor_lock);
+	return true;
 }
 
+/*!
+	\brief Message handling function for all messages sent to the app_server
+	\param code ID of the message sent
+	\param buffer Attachement buffer for the message.
+	
+*/
 void AppServer::DispatchMessage(int32 code, int8 *buffer)
 {
+	int8 *index=buffer;
+	switch(code)
+	{
+		case CREATE_APP:
+		{
+			// Create the ServerApp to node monitor a new BApplication
+			
+			// Attached data:
+			// 1) port_id - port to reply to
+			// 2) port_id - receiver port of a regular app
+			// 3) char * - signature of the regular app
+
+			// Find the necessary data
+			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
+			port_id app_port=*((port_id*)index); index+=sizeof(port_id);
+			char *app_signature=(char *)index;
+			
+			// Create the ServerApp subthread for this app
+			acquire_sem(_applist_lock);
+			
+			port_id r=create_port(DEFAULT_MONITOR_PORT_SIZE,app_signature);
+			if(r==B_NO_MORE_PORTS || r==B_BAD_VALUE)
+			{
+				release_sem(_applist_lock);
+				printf("No more ports left. Time to crash. :)\n");
+				break;
+			}
+			ServerApp *newapp=new ServerApp(app_port,r,app_signature);
+			_applist->AddItem(newapp);
+			
+			release_sem(_applist_lock);
+
+			acquire_sem(_active_lock);
+			_p_active_app=newapp;
+			_active_app=_applist->CountItems()-1;
+
+			PortLink *replylink=new PortLink(reply_port);
+			replylink->SetOpCode(SET_SERVER_PORT);
+			replylink->Attach((int32)newapp->_receiver);
+			replylink->Flush();
+
+			delete replylink;
+
+			release_sem(_active_lock);
+			
+			newapp->Run();
+			break;
+		}
+		case DELETE_APP:
+		{
+			// Delete a ServerApp. Received only from the respective ServerApp when a
+			// BApplication asks it to quit.
+			
+			// Attached Data:
+			// 1) thread_id - thread ID of the ServerApp to be deleted
+			
+			int32 i, appnum=_applist->CountItems();
+			ServerApp *srvapp;
+			thread_id srvapp_id=*((thread_id*)buffer);
+			
+			// Run through the list of apps and nuke the proper one
+			for(i=0;i<appnum;i++)
+			{
+				srvapp=(ServerApp *)_applist->ItemAt(i);
+
+				if(srvapp!=NULL && srvapp->_monitor_thread==srvapp_id)
+				{
+					acquire_sem(_applist_lock);
+					srvapp=(ServerApp *)_applist->RemoveItem(i);
+					if(srvapp)
+					{
+						delete srvapp;
+						srvapp=NULL;
+					}
+					release_sem(_applist_lock);
+					acquire_sem(_active_lock);
+
+					if(_applist->CountItems()==0)
+					{
+						// active==-1 signifies that no other apps are running - NOT good
+						_active_app=-1;
+					}
+					else
+					{
+						// we actually still have apps running, so make a new one active
+						if(_active_app>0)
+							_active_app--;
+						else
+							_active_app=0;
+					}
+					_p_active_app=(_active_app>-1)?(ServerApp*)_applist->ItemAt(_active_app):NULL;
+					release_sem(_active_lock);
+					break;	// jump out of our for() loop
+				}
+
+			}
+			break;
+		}
+		case UPDATED_CLIENT_FONTLIST:
+		{
+			// received when the client-side global font list has been
+			// refreshed
+			fontserver->Lock();
+			fontserver->FontsUpdated();
+			fontserver->Unlock();
+			break;
+		}
+		case QUERY_FONTS_CHANGED:
+		{
+			// Client application is asking if the font list has changed since
+			// the last client-side refresh
+
+			// Attached data:
+			// 1) port_id reply port
+			
+			fontserver->Lock();
+			bool needs_update=fontserver->FontsNeedUpdated();
+			fontserver->Unlock();
+			
+			PortLink *pl=new PortLink(*((port_id*)index));
+			pl->SetOpCode( (needs_update)?SERVER_TRUE:SERVER_FALSE );
+			pl->Flush();
+			delete pl;
+			
+			break;
+		}
+		case GET_SCREEN_MODE:
+		{
+			// Synchronous message call to get the stats on the current screen mode
+			// in the app_server. Simply a hack in place for the Input Server until
+			// BScreens are done.
+			
+			// Attached Data:
+			// 1) port_id - port to reply to
+			
+			// Returned Data:
+			// 1) int32 width
+			// 2) int32 height
+			// 3) int depth
+			
+			PortLink *replylink=new PortLink(*((port_id*)index));
+			replylink->SetOpCode(GET_SCREEN_MODE);
+			replylink->Attach((int16)_driver->GetWidth());
+			replylink->Attach((int16)_driver->GetHeight());
+			replylink->Attach((int16)_driver->GetDepth());
+			replylink->Flush();
+			delete replylink;
+			break;
+		}
+		case B_QUIT_REQUESTED:
+		{
+			// Attached Data:
+			// none
+			
+			// We've been asked to quit, so (for now) broadcast to all
+			// test apps to quit. This situation will occur only when the server
+			// is compiled as a regular Be application.
+			if(DISPLAYDRIVER==HWDRIVER)
+				break;
+			
+			Broadcast(QUIT_APP);
+
+			// So when we delete the last ServerApp, we can exit the server
+			_quitting_server=true;
+			_exit_poller=true;
+			break;
+		}
+		default:
+			// we should never get here.
+			break;
+	}
 }
 
+/*!
+	\brief Send a quick (no attachments) message to all applications
+	
+	Quite useful for notification for things like server shutdown, system 
+	color changes, etc.
+*/
 void AppServer::Broadcast(int32 code)
 {
+	int32 i;
+	ServerApp *app;
+
+	acquire_sem(_applist_lock);
+	for(i=0;i<_applist->CountItems(); i++)
+	{
+		app=(ServerApp*)_applist->ItemAt(i);
+		if(!app)
+			continue;
+		app->PostMessage(code);
+	}
+	release_sem(_applist_lock);
 }
 
+/*!
+	\brief Handles all incoming key messages
+	\param code ID code of the key message
+	\param buffer Attachment buffer of the keyboard message
+*/
 void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 {
+	// TODO: Implement
 }
 
+/*!
+	\brief Entry function to run the entire server
+	\param argc Number of command-line arguments present
+	\param argv String array of the command-line arguments
+	\return -1 if the app_server is already running, 0 if everything's OK.
+*/
 int main( int argc, char** argv )
 {
 	// There can be only one....

@@ -173,6 +173,15 @@ bool ServerApp::PingTarget(void)
 }
 
 /*!
+	\brief Send a message to the ServerApp with no attachments
+	\param code ID code of the message to post
+*/
+void ServerApp::PostMessage(int32 code)
+{
+	write_port(_receiver,code, NULL, 0);
+}
+
+/*!
 	\brief The thread function ServerApps use to monitor messages
 	\param data Pointer to the thread's ServerApp object
 	\return Throwaway value - always 0

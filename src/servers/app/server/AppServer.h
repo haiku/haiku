@@ -27,7 +27,7 @@ public:
 	~AppServer(void);
 	static int32 PollerThread(void *data);
 	static int32 PicassoThread(void *data);
-	thread_id Run(void);
+	void Run(void);
 	void MainLoop(void);
 	bool LoadDecorator(const char *path);
 	void DispatchMessage(int32 code, int8 *buffer);
@@ -38,17 +38,17 @@ public:
 private:
 	friend Decorator *instantiate_decorator(Layer *lay, const char *title, uint32 dflags, uint32 wlook);
 
-	port_id	messageport,mouseport;
-	image_id decorator_id;
-	bool quitting_server;
-	BList *applist;
-	int32 active_app;
-//	ServerApp *p_active_app;
-	thread_id poller_id, picasso_id;
+	port_id	_messageport,_mouseport;
+	image_id _decorator_id;
+	bool _quitting_server;
+	BList *_applist;
+	int32 _active_app;
+	ServerApp *_p_active_app;
+	thread_id _poller_id, _picasso_id;
 
-	BLocker *active_lock, *applist_lock, *decor_lock;
-	bool exit_poller;
-	DisplayDriver *driver;
+	sem_id _active_lock, _applist_lock, _decor_lock;
+	bool _exit_poller;
+	DisplayDriver *_driver;
 };
 
 Decorator *instantiate_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,

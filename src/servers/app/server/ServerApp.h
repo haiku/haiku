@@ -29,10 +29,12 @@
 
 #include <OS.h>
 #include <String.h>
+class AppServer;
 class BMessage;
 class PortLink;
 class BList;
 class DisplayDriver;
+class ServerCursor;
 
 /*!
 	\class ServerApp ServerApp.h
@@ -65,7 +67,9 @@ public:
 	void Activate(bool value) { _isactive=value; }
 	bool PingTarget(void);
 	
+	void PostMessage(int32 code);
 protected:
+	friend AppServer;
 	void DispatchMessage(int32 code, int8 *buffer);
 
 	port_id _sender,_receiver;
