@@ -42,46 +42,71 @@ typedef uint32_t socklen_t;
 #define PF_IMPLINK      AF_IMPLINK
 
 /* Types of socket we can create (eventually) */
+#ifndef BUILDING_R5_LIBNET
+#define	SOCK_STREAM		1
+#define	SOCK_DGRAM		2
+#define	SOCK_RAW		3
+#define SOCK_MISC		255
+#else /* BUILDING_R5_LIBNET */
+/* XXX: HACK: we use socket emulation for libnet.so */
 #define SOCK_DGRAM     10
 #define SOCK_STREAM    11
 #define SOCK_RAW       12
 #define SOCK_MISC     255
+#define	SOCK_NATIVE_STREAM	1
+#define	SOCK_NATIVE_DGRAM	2
+#define	SOCK_NATIVE_RAW		3
+#define SOCK_NATIVE_MISC	255
+#endif /* BUILDING_R5_LIBNET */
 
 /*
  * Option flags per-socket.
  */
-#define SO_DEBUG        0x0001          /* turn on debugging info recording */
-#define SO_ACCEPTCONN   0x0002          /* socket has had listen() */
-#define SO_REUSEADDR    0x0004          /* allow local address reuse */
-#define SO_KEEPALIVE    0x0008          /* keep connections alive */
-#define SO_DONTROUTE    0x0010          /* just use interface addresses */
-#define SO_BROADCAST    0x0020          /* permit sending of broadcast msgs */
-#define SO_USELOOPBACK  0x0040          /* bypass hardware when possible */
-#define SO_LINGER       0x0080          /* linger on close if data present */
-#define SO_OOBINLINE    0x0100          /* leave received OOB data in line */
-#define SO_REUSEPORT    0x0200          /* allow local address & port reuse */
+#define	SOL_SOCKET		0xffffffff		
 
-#define SOL_SOCKET      0xffff
+#define SO_ACCEPTCONN	0x00000001	/* socket has had listen() */
+#define SO_BROADCAST	0x00000002	/* permit sending of broadcast msgs */
+#define	SO_DEBUG		0x00000004	/* turn on debugging info recording */
+#define	SO_DONTROUTE	0x00000008	/* just use interface addresses */
+#define	SO_KEEPALIVE	0x00000010	/* keep connections alive */
+#define SO_OOBINLINE    0x00000020	/* leave received OOB data in line */
+#define	SO_REUSEADDR	0x00000040	/* allow local address reuse */
+#define SO_REUSEPORT	0x00000080	/* allow local address & port reuse */
+#define SO_USELOOPBACK	0x00000100	/* bypass hardware when possible */
+#define SO_LINGER		0x00000200	/* linger on close if data present */
 
 /*
  * Additional options, not kept in so_options.
  */
-#define SO_SNDBUF       0x1001          /* send buffer size */
-#define SO_RCVBUF       0x1002          /* receive buffer size */
-#define SO_SNDLOWAT     0x1003          /* send low-water mark */
-#define SO_RCVLOWAT     0x1004          /* receive low-water mark */
-#define SO_SNDTIMEO     0x1005          /* send timeout */
-#define SO_RCVTIMEO     0x1006          /* receive timeout */
-#define SO_ERROR        0x1007          /* get error status and clear */
-#define SO_TYPE         0x1008          /* get socket type */
-#define SO_NETPROC      0x1020          /* multiplex; network processing */
+#define SO_SNDBUF		0x40000001	/* send buffer size */
+#define SO_SNDLOWAT		0x40000002	/* send low-water mark */
+#define SO_SNDTIMEO		0x40000003	/* send timeout */
+#define SO_RCVBUF		0x40000004	/* receive buffer size */
+#define SO_RCVLOWAT		0x40000005	/* receive low-water mark */
+#define SO_RCVTIMEO		0x40000006	/* receive timeout */
+#define	SO_ERROR		0x40000007	/* get error status and clear */
+#define	SO_TYPE			0x40000008	/* get socket type */
+
+/* not handled by OpenBeOS */
+#define SO_NONBLOCK		0x40000009
+#define SO_BINDTODEVICE	0x4000000a
+
+/* only defined in OpenBeOS */
+#define SO_NETPROC      0x00001020	/* multiplex; network processing */
 
 /*
  * These are the valid values for the "how" field used by shutdown(2).
  */
+#ifndef BUILDING_R5_LIBNET
+#define SHUTDOWN_RECV	0
+#define SHUTDOWN_SEND	1
+#define SHUTDOWN_BOTH	2
+#else // BUILDING_R5_LIBNET
 #define SHUT_RD         1
 #define SHUT_WR         2
 #define SHUT_RDWR       3
+#endif // BUILDING_R5_LIBNET
+
 
 struct linger {
 	int l_onoff;
@@ -188,6 +213,9 @@ struct msghdr {
 #define MSG_DONTWAIT    0x80            /* this message should be nonblocking */
 #define MSG_BCAST       0x100           /* this message rec'd as broadcast */
 #define MSG_MCAST       0x200           /* this message rec'd as multicast */
+/* not defind in OpenBeOS */
+#define	MSG_EOF			0x400			/* data completes connection */
+
 
 struct cmsghdr {
 	uint	cmsg_len;
@@ -196,7 +224,7 @@ struct cmsghdr {
 	/* there now follows uchar[] cmsg_data */
 };
 
-#if 0
+
 #define SIOCSHIWAT      _IOW('s',  0, int)              /* set high watermark */
 #define SIOCGHIWAT      _IOR('s',  1, int)              /* get high watermark */
 #define SIOCSLOWAT      _IOW('s',  2, int)              /* set low watermark */
@@ -233,7 +261,6 @@ struct cmsghdr {
 
 #define SIOCADDMULTI    _IOW('i', 49, struct ifreq)     /* add m'cast addr */
 #define SIOCDELMULTI    _IOW('i', 50, struct ifreq)     /* del m'cast addr */
-#endif
 
 
 #ifndef _KERNEL_MODE
