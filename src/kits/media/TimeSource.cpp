@@ -240,6 +240,13 @@ BTimeSource::HandleMessage(int32 message,
 		case TIMESOURCE_OP:
 		{
 			const time_source_op_info *data = static_cast<const time_source_op_info *>(rawdata);
+
+			status_t result;
+			result = TimeSourceOp(*data, NULL);
+			if (result != B_OK) {
+				ERROR("BTimeSource::HandleMessage: TimeSourceOp failed\n");
+			}
+
 			switch (data->op) {
 				case B_TIMESOURCE_START:
 					DirectStart(data->real_time);
@@ -253,11 +260,6 @@ BTimeSource::HandleMessage(int32 message,
 				case B_TIMESOURCE_SEEK:
 					DirectSeek(data->performance_time, data->real_time);
 					break;
-			}
-			status_t result;
-			result = TimeSourceOp(*data, NULL);
-			if (result != B_OK) {
-				ERROR("BTimeSource::HandleMessage: TimeSourceOp failed\n");
 			}
 			return B_OK;
 		}
