@@ -16,7 +16,7 @@ struct
 	bool			stopMe;
 } previewData;
 
-// viewer thread?
+// viewer thread
 int32 previewThread(void* data)
 {
 	int cycleNumber = 0;
@@ -26,18 +26,30 @@ int32 previewThread(void* data)
 		return 0;
 	}
 	
-	// TODO: implement lood counting
 	int32 loopOnCount = previewData.saver->LoopOnCount();
+	int32 loopOnCounter = 0;
 	int32 loopOffCount = previewData.saver->LoopOffCount();
+	int32 loopOffCounter = 0;
 	
+	if (loopOnCount == 0 && loopOffCount == 0)
+	{
+		// TODO: fill in setup for "normal" loop counting here?
+	}
+	
+	snooze( previewData.saver->TickSize() );
 	while (!previewData.stopMe)
 	{
-		previewData.previewArea->Window()->Lock();
-		previewData.saver->Draw( previewData.previewArea, cycleNumber );
-		previewData.previewArea->Window()->Unlock();
-		previewData.previewArea->Flush();
+		if (previewData.previewArea->Window()->Lock())
+		{
+			if (!previewData.previewArea->IsHidden())
+			{
+				previewData.saver->Draw( previewData.previewArea, cycleNumber );
+			}
+			previewData.previewArea->Window()->Unlock();
+		//		previewData.previewArea->Flush();
+		}
 		snooze( previewData.saver->TickSize() );
-		cycleNumber++;
+		++cycleNumber;
 	}
 } // end previewThread()
 
@@ -62,7 +74,6 @@ PreviewView::PreviewView(BRect frame, const char *name)
   saver (0),
   settingsBoxPtr (0),
   configView (0),
-  messageRunner (0),
   stopSaver (false),
   stopConfigView (false),
   removeConfigView (false),
@@ -122,7 +133,7 @@ PreviewView::~PreviewView()
 		previewArea->RemoveSelf();
 		delete previewArea;
 	}
-		
+	
 } // end PreviewView::~PreviewView()
 
 void PreviewView::Draw(BRect update)
@@ -145,7 +156,7 @@ void PreviewView::Draw(BRect update)
 	FillRect(scale2(5,6,4,5,Bounds()));
 }
 
-void PreviewView::LoadNewAddon(const char* addOnFilename)
+void PreviewView::LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg)
 {
 	if (previewData.previewThreadId != 0)
 	{
@@ -230,7 +241,7 @@ void PreviewView::LoadNewAddon(const char* addOnFilename)
 		return;
 	}
 
-	saver = instantiate(new BMessage, addonImage);
+	saver = instantiate(settingsMsg, addonImage);
 	if (saver == 0)
 	{
 		std::cout << "Saver not instantiated.\n";

@@ -63,6 +63,7 @@ private:
   pwWindow *pwWin;
   BMessenger *pwMessenger;
   
+  BMessage settings;
 };
 
 #endif // _ScreenSaver_H

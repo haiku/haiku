@@ -30,6 +30,7 @@ struct SSListItem
 
 void ScreenSaver::MessageReceived(BMessage *msg)
 {
+  SSListItem* listItem;
   switch(msg->what)
   {
 	case TAB1_CHG:
@@ -53,8 +54,12 @@ void ScreenSaver::MessageReceived(BMessage *msg)
       	break;
     case SAVER_SEL:
    		updateStatus();
-		SelectedAddonFileName = reinterpret_cast<SSListItem*>(AddonList->ItemAt(ListView1->CurrentSelection()))->fileName;
-		previewDisplay->LoadNewAddon(SelectedAddonFileName.String());
+   		listItem = reinterpret_cast<SSListItem*>(AddonList->ItemAt(ListView1->CurrentSelection()));
+		//BString settingsMsgName(listItem->fileName);
+		//settingsMsgName.Prepend("settings_");
+		//BMessage thisModulesSettings;
+		//settingsMsg.FindMessage(settingsMsgName, &thisModulesSettings);
+		previewDisplay->LoadNewAddon(listItem->fileName.String(), &settings);
     	BWindow::MessageReceived(msg);
     	break;
     default:
@@ -213,9 +218,8 @@ void ScreenSaver::SetupForm(void)
   	find_directory(B_USER_SETTINGS_DIRECTORY,&path);
   	path.Append("OBOS_Screen_Saver",true);
   	BFile file(path.Path(),B_READ_ONLY);
-	BMessage msg;
-  	msg.Unflatten(&file);
-	loadSettings (&msg);
+  	settings.Unflatten(&file);
+	loadSettings (&settings);
 	updateStatus();
 }
 

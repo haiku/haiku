@@ -12,18 +12,17 @@ public:
 	PreviewView(BRect frame, const char *name);
 	~PreviewView();
 	void Draw(BRect update); 
-	void LoadNewAddon(const char* addOnFilename);
+	void LoadNewAddon(const char* addOnFilename, BMessage* settingsMsg);
 
 	void SetSettingsBoxPtr( BBox* settingsBox )
 	{ settingsBoxPtr = settingsBox; }
-
+	
 private:	
 	BView *previewArea;
 	BBox *settingsBoxPtr;
 	BView *configView;
 	image_id addonImage;
 	BScreenSaver* saver;
-	BMessageRunner* messageRunner;
 	
 	// to keep track of what to tear down
 	bool stopSaver;
