@@ -15,11 +15,12 @@ send_data_with_timeout(thread_id thread, int32 code, void *buffer,
 	for(tries = 0; tries < timeout; tries++) {
 		if(has_data(thread))
 			snooze(1000);
-		else
-			return send_data(thread, code, buffer, buffer_size);
 	}
 	
-	return B_TIMED_OUT;
+	if(!has_data(thread))
+		return send_data(thread, code, buffer, buffer_size);
+	else
+		return B_TIMED_OUT;
 }
 
 
@@ -30,14 +31,15 @@ receive_data_with_timeout(thread_id *sender, int32 *code, void *buffer,
 	int32 tries;
 	
 	for(tries = 0; tries < timeout; tries++) {
-		if(has_data(find_thread(NULL))) {
+		if(!has_data(find_thread(NULL))) {
 			snooze(1000);
 			continue;
 		}
-		
-		*code = receive_data(sender, buffer, buffer_size);
-		return B_OK;
 	}
 	
-	return B_TIMED_OUT;
+	if(has_data(find_thread(NULL))) {
+		*code = receive_data(sender, buffer, buffer_size);
+		return B_OK;
+	} else
+		return B_TIMED_OUT;
 }

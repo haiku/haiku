@@ -318,7 +318,8 @@ PPPStateMachine::UpFailedEvent()
 				break;
 			}
 			
-			Interface()->Report(PPP_CONNECTION_REPORT, PPP_UP_FAILED, NULL, 0);
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_DEVICE_UP_FAILED,
+				NULL, 0);
 			
 			if(Interface()->Parent())
 				Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
@@ -430,10 +431,10 @@ PPPStateMachine::DownEvent()
 				|| fAuthenticationStatus == PPP_AUTHENTICATING
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
-			Interface()->Report(PPP_CONNECTION_REPORT, PPP_AUTHENTICATION_FAILED,
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_AUTHENTICATION_FAILED,
 				NULL, 0);
 		else
-			Interface()->Report(PPP_CONNECTION_REPORT, PPP_CONNECTION_LOST,
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
 				NULL, 0);
 		
 		if(Interface()->Parent())
@@ -443,11 +444,14 @@ PPPStateMachine::DownEvent()
 		
 		if(Interface()->DoesAutoRedial()) {
 			// TODO:
-			// Redial()
+			// redial if we have been connected
+			// problem: if we are reconfiguring we should redial, too
+//			if(oldState == PPP_OPENED_STATE)
+//				Interface()->Redial();
 		} else if(!Interface()->DoesDialOnDemand())
 			Interface()->Delete();
 	} else {
-		Interface()->Report(PPP_CONNECTION_REPORT, PPP_DOWN_SUCCESSFUL, NULL, 0);
+		Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL, NULL, 0);
 		
 		if(!Interface()->DoesDialOnDemand())
 			Interface()->Delete();
@@ -463,7 +467,7 @@ PPPStateMachine::OpenEvent()
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
-			if(!Interface()->Report(PPP_CONNECTION_REPORT, PPP_GOING_UP, NULL, 0))
+			if(!Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP, NULL, 0))
 				return;
 			
 			if(Interface()->Mode() == PPP_SERVER_MODE) {
@@ -1378,7 +1382,7 @@ PPPStateMachine::BringHandlersUp()
 			if(Interface()->Ifnet())
 				Interface()->Ifnet()->if_flags |= IFF_RUNNING;
 			
-			Interface()->Report(PPP_CONNECTION_REPORT, PPP_UP_SUCCESSFUL, NULL, 0);
+			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL, NULL, 0);
 		} else
 			NewPhase(Phase() + 1);
 	}

@@ -26,8 +26,9 @@
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
 	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
-	fIfnet(NULL), fUpThread(-1), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
-	fDevice(NULL), fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
+	fIfnet(NULL), fUpThread(-1), fRetry(0), fMaxRetries(0), fLinkMTU(1500),
+	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
+	fLock(StateMachine().Locker())
 {
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
@@ -46,7 +47,7 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 	
 	const char *value;
 	
-	value = get_settings_value(PPP_MODE_KEY, fsettings);
+	value = get_settings_value(PPP_MODE_KEY, fSettings);
 	if(!strcasecmp(value, PPP_SERVER_MODE_VALUE))
 		fMode = PPP_SERVER_MODE;
 	else
@@ -456,29 +457,41 @@ PPPInterface::Up()
 				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 			}
 			
-			if(report.code == PPP_GOING_UP) {
+			if(report.code == PPP_REPORT_GOING_UP) {
 				PPP_REPLY(sender, B_OK);
 				continue;
-			} else if(report.code == PPP_UP_SUCCESSFUL) {
+			} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
 				PPP_REPLY(sender, B_OK);
 				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 				return true;
-			} else if(report.code == PPP_DOWN_SUCCESSFUL
-					|| report.code == PPP_UP_ABORTED) {
+			} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
+					|| report.code == PPP_REPORT_UP_ABORTED
+					|| report.code == PPP_REPORT_AUTHENTICATION_FAILED) {
 				PPP_REPLY(sender, B_OK);
 				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 				return false;
-			} else if(report.code == PPP_UP_FAILED) {
+			} else if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
 				// TODO:
-				// if maximum number of retries is reached we return false
-				// otherwise we wait for the next dial-attempt
-			} else if(report.code == PPP_AUTHENTICATION_FAILED) {
-				PPP_REPLY(sender, B_OK);
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return false;
-			} else if(report.code == PPP_CONNECTION_LOST) {
+				// !!! check code (after vacation you sometimes forget things ;) !!!
+				if(fRetry >= fMaxRetries || fUpThread == -1) {
+					PPP_REPLY(sender, B_OK);
+					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					return false;
+				} else {
+					PPP_REPLY(sender, B_OK);
+					continue;
+				}
+			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
 				// TODO:
-				// if autoredial is enabled wait for redial attemts (just continue)
+				// !!! check code (after vacation you sometimes forget things ;) !!!
+				if(DoesAutoRedial()) {
+					PPP_REPLY(sender, B_OK);
+					continue;
+				} else {
+					PPP_REPLY(sender, B_OK);
+					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					return false;
+				}
 			}
 		}
 	} else {

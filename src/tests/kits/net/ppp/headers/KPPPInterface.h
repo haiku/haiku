@@ -138,7 +138,10 @@ class PPPInterface {
 		PPPLCP fLCP;
 		PPPReportManager fReportManager;
 		ifnet *fIfnet;
+		
 		thread_id fUpThread;
+		uint32 fRetry;
+		int32 fMaxRetries;
 		
 		ppp_manager_info *fManager;
 		
