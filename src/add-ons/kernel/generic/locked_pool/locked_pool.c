@@ -1,7 +1,7 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Deadlock-safe allocation of locked memory.
@@ -405,7 +405,7 @@ create_pool(int block_size, int alignment, int next_ofs,
 {
 	locked_pool *pool;
 	status_t res;
-	
+
 	TRACE(("create_pool()\n"));
 
 	pool = (locked_pool *)malloc(sizeof(*pool));
@@ -480,8 +480,10 @@ err:
 }
 
 
-// public: destroy pool
-static void destroy_pool( locked_pool *pool )
+/** public: destroy pool */
+
+static void
+destroy_pool(locked_pool *pool)
 {
 	TRACE(("destroy_pool()\n"));
 
@@ -509,17 +511,17 @@ init_locked_pool(void)
 {
 	status_t res;
 	
-	if ((res = benaphore_init(&locked_pool_ben, "locked_pool_global_list")) < 0)
+	if ((res = benaphore_init(&locked_pool_ben, "locked_pool_global_list")) < B_OK)
 		goto err;
 
-	if ((res = locked_pool_enlarger_sem = create_sem(0, "locked_pool_enlarger")) < 0)
+	if ((res = locked_pool_enlarger_sem = create_sem(0, "locked_pool_enlarger")) < B_OK)
 		goto err2;
 
 	locked_pools = NULL;
 	locked_pool_shutting_down = false;
 
 	if ((res = locked_pool_enlarger_thread = spawn_kernel_thread(enlarger_threadproc,
-					"locked_pool_enlarger", B_NORMAL_PRIORITY, NULL)) < 0)
+					"locked_pool_enlarger", B_NORMAL_PRIORITY, NULL)) < B_OK)
 		goto err3;
 
 	resume_thread(locked_pool_enlarger_thread);
@@ -538,7 +540,7 @@ err:
 /** global uninit, executed before module is unloaded */
 
 static status_t
-uninit_locked_pool()
+uninit_locked_pool(void)
 {
 	int32 retcode;
 	locked_pool_shutting_down = true;
