@@ -55,10 +55,10 @@ case : Several handlers added, then removed
 
 HandlerAt(int32 index) const;
 --------------
-case : No handlers added, check for looper itself
-case : Index out of range (CountHandlers() + 1)
-case : Several handlers added, checked against expected indices
-case : Looper is not locked
+case 1: No handlers added, check for looper itself
+case 2: Index out of range (CountHandlers() + 1)
+case 3: Several handlers added, checked against expected indices
+case 4: Looper is not locked
 
 IndexOf(BHandler* handler) const;
 --------------
@@ -81,7 +81,7 @@ case 3: Delete looper after calling Run()
 
 Quit()
 --------------
-case : Call Quit() on unlocked BLooper
+case 1: Call Quit() on unlocked BLooper
 
 QuitRequested()
 --------------

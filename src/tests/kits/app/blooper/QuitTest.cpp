@@ -21,7 +21,8 @@
 /**
 	Quit()
 	@case	Looper is unlocked
-	@result	
+	@result	Prints message "ERROR - you must Lock a looper before calling
+			Quit(), team=%ld, looper=%s\n"
  */
 void TQuitTest::QuitTest1()
 {
