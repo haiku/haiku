@@ -143,7 +143,7 @@ AddOnManager::RegisterAddOns()
 			ReaderPlugin *rp = dynamic_cast<ReaderPlugin *>(pl);
 			if (rp)
 				RegisterReader(rp, ref);
-	
+
 			DecoderPlugin *dp = dynamic_cast<DecoderPlugin *>(pl);
 			if (dp)
 				RegisterDecoder(dp, ref);
@@ -175,8 +175,10 @@ AddOnManager::RegisterReader(ReaderPlugin *reader, const entry_ref &ref)
 	reader_info info;
 	info.ref = ref;
 
-	if (B_OK != reader->RegisterPlugin())
+	if (B_OK != reader->RegisterPlugin()) {
+		printf("AddOnManager::RegisterReader(): reader->RegisterPlugin() failed!\n");
 		return;
+	}
 
 	fLocker->Lock();
 	fReaderList->Insert(info);
