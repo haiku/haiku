@@ -951,6 +951,7 @@ KDiskDeviceManager::_RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
 		KDiskDeviceJob *job = jobQueue->JobAt(i);
 		fJobs->Remove(job->ID());
 	}
+	fJobQueues->Erase(it);
 	return true;
 }
 
@@ -981,7 +982,7 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 		for (int32 i = jobQueue->ActiveJobIndex();
 			 KDiskDeviceJob *job = jobQueue->JobAt(i); i++) {
 			if (job->Status() != B_DISK_DEVICE_JOB_IN_PROGRESS
-				&& job->Status() == B_DISK_DEVICE_JOB_SCHEDULED) {
+				&& job->Status() != B_DISK_DEVICE_JOB_SCHEDULED) {
 				continue;
 			}
 			KPartition *partition = FindPartition(job->ScopeID());
@@ -992,10 +993,20 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 				shadow->AddFlags(B_PARTITION_BUSY);
 		}
 	}
-	// mark all anscestors of busy partitions descendant busy
+	// mark all anscestors of busy partitions descendant busy and all
+	// descendants busy
 	struct MarkBusyVisitor : KPartitionVisitor {
+		virtual bool VisitPre(KPartition *partition)
+		{
+			// parent busy => child busy
+			if (partition->Parent() && partition->Parent()->IsBusy())
+				partition->Parent()->AddFlags(B_PARTITION_BUSY);
+			return false;
+		}
+
 		virtual bool VisitPost(KPartition *partition)
 		{
+			// child [descendant] busy => parent descendant busy
 			if ((partition->IsBusy() || partition->IsDescendantBusy())
 				&& partition->Parent()) {
 				partition->Parent()->AddFlags(
