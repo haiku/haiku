@@ -36,15 +36,18 @@ StringRemoveTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(string1->String(), "This is a long") == 0);
 	CPPUNIT_ASSERT(string1->Length() == 14);
 	delete string1;
-	
+
+#ifndef TEST_R5	
 	//new length is < 0
-	//commented out as it crashes r5 implementation
-	//NextSubTest();
-	//string1 = new BString("This is a long string");
-	//string1->Truncate(-3);
-	//CPPUNIT_ASSERT(strcmp(string1->String(), "This is a long string") == 0);
-	//CPPUNIT_ASSERT(string1->Length() == 21);
-	//delete string1;	
+	//it crashes r5 implementation, but ours works fine here,
+	//in this case, we ignore the truncation
+	NextSubTest();
+	string1 = new BString("This is a long string");
+	string1->Truncate(-3);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "This is a long string") == 0);
+	CPPUNIT_ASSERT(string1->Length() == 21);
+	delete string1;	
+#endif
 	
 	//new length is > old length
 	NextSubTest();

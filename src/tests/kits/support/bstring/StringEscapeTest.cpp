@@ -46,14 +46,16 @@ StringEscapeTest::PerformTest(void)
 	string1->CharacterEscape("newstring", "esi", '0');
 	CPPUNIT_ASSERT(strcmp(string1->String(), "n0ew0str0ing") == 0);
 	delete string1;
-	
+
+#ifndef TEST_R5	
 	//assigned string is NULL
-	//commented out as it crashes r5 implementation
-	//NextSubTest();
-	//string1 = new BString("something");
-	//string1->CharacterEscape((char*)NULL, "ei", '-');
-	//CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
-	//delete string1;
+	//it crashes r5 implementation, but not ours :)
+	NextSubTest();
+	string1 = new BString("something");
+	string1->CharacterEscape((char*)NULL, "ei", '-');
+	CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
+	delete string1;
+#endif
 	
 	//String was empty
 	NextSubTest();
@@ -96,15 +98,17 @@ StringEscapeTest::PerformTest(void)
 	string1->CharacterDeescape("new/str/ing", '/');
 	CPPUNIT_ASSERT(strcmp(string1->String(), "newstring") == 0);
 	delete string1;	
-	
+
+#ifndef TEST_R5	
 	//assigned string is empty
-	//commented out as it crashes r5 implementation
-	//NextSubTest();
-	//string1 = new BString("pippo");
-	//string1->CharacterDeescape((char*)NULL, '/');
-	//CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
-	//delete string1;
-	
+	//it crashes r5 implementation, but not ours :)
+	NextSubTest();
+	string1 = new BString("pippo");
+	string1->CharacterDeescape((char*)NULL, '/');
+	CPPUNIT_ASSERT(strcmp(string1->String(), "") == 0);
+	delete string1;
+#endif	
+
 	//String doesn't contain character to escape
 	NextSubTest();
 	string1 = new BString("Old");

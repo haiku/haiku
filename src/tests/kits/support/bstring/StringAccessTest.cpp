@@ -37,13 +37,45 @@ StringAccessTest::PerformTest(void)
 	BString string3(s);
 	CPPUNIT_ASSERT(string3.CountChars() == 2);	
 	CPPUNIT_ASSERT(string3.Length() == strlen(string3.String()));
-
+	
+	//An empty string
 	NextSubTest();
 	BString empty;
 	CPPUNIT_ASSERT(strcmp(empty.String(), "") == 0);
 	CPPUNIT_ASSERT(empty.Length() == 0);
 	CPPUNIT_ASSERT(empty.CountChars() == 0);
 
+	//Truncate the string at end so we are left with an invalid
+	//UTF8 character
+	NextSubTest();
+	BString invalid("some text with utf8 characters"B_UTF8_ELLIPSIS);
+	invalid.Truncate(invalid.Length() -1);
+	CPPUNIT_ASSERT(invalid.CountChars() == 31);
+
+	//LockBuffer(int32) and UnlockBuffer(int32)
+	NextSubTest();
+	BString locked("a string");
+	char *ptrstr = locked.LockBuffer(20);
+	CPPUNIT_ASSERT(strcmp(ptrstr, "a string") == 0);
+	strcat(ptrstr, " to be locked");
+	locked.UnlockBuffer();
+	CPPUNIT_ASSERT(strcmp(ptrstr, "a string to be locked") == 0);
+	
+	NextSubTest();
+	BString locked2("some text");
+	char *ptr = locked2.LockBuffer(3);
+	CPPUNIT_ASSERT(strcmp(ptr, "some text") == 0);
+	locked2.UnlockBuffer(4);
+	CPPUNIT_ASSERT(strcmp(locked2.String(), "some") == 0);
+	CPPUNIT_ASSERT(locked2.Length() == 4);
+	
+	NextSubTest();
+	BString emptylocked;
+	ptr = emptylocked.LockBuffer(10);
+	CPPUNIT_ASSERT(strcmp(ptr, "") == 0);
+	strcat(ptr, "pippo");
+	emptylocked.UnlockBuffer();
+	CPPUNIT_ASSERT(strcmp(emptylocked.String(), "pippo") == 0);
 }
 
 
