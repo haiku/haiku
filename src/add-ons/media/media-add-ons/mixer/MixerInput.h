@@ -32,7 +32,7 @@ public:
 	float GetInputChannelGain(int channel);
 
 	// only for use by MixerCore
-	void GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain);
+	bool GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 	int GetMixerChannelType(int channel);
 
 protected:
@@ -72,6 +72,8 @@ private:
 	int32 			fMixBufferFrameRate;
 	uint32			fMixBufferFrameCount;
 	
+	bigtime_t		fLastDataAvailableTime;
+	
 	Resampler		**fResampler; // array
 	rtm_pool		*fRtmPool;
 
@@ -80,17 +82,21 @@ private:
 	int32			debugMixBufferFrames;
 };
 
-inline void
-MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain)
+inline bool
+MixerInput::GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain)
 {
 	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
+	if (time > fLastDataAvailableTime)
+		return false;
+	
 	int32 offset = framepos % fMixBufferFrameCount;
 	if (channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames - 1);
 	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
 	*sample_offset = sizeof(float) * fInputChannelCount;
 	*type = fMixerChannelInfo[channel].type;
 	*gain = fMixerChannelInfo[channel].gain;
+	return true;
 }
 
 inline int

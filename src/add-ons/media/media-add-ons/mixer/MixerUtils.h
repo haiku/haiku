@@ -1,10 +1,16 @@
+#ifndef _MIXER_UTILS_H
+#define _MIXER_UTILS_H
+
+#if DEBUG > 0
+	#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; string_for_channel_mask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08X %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
+#else
+	#define PRINT_CHANNEL_MASK(fmt) ((void)0)
+#endif
 
 void string_for_channel_mask(char *str, uint32 mask);
 void fix_multiaudio_format(media_multi_audio_format *format);
 
 int count_nonzero_bits(uint32 value);
-
-#define PRINT_CHANNEL_MASK(fmt) do { char s[200]; string_for_channel_mask(s, (fmt).u.raw_audio.channel_mask); printf(" channel_mask 0x%08X %s\n", (fmt).u.raw_audio.channel_mask, s); } while (0)
 
 uint32 GetChannelMask(int channel, uint32 all_channel_masks);
 
@@ -27,3 +33,5 @@ uint32 ChannelTypeToChannelMask(int type);
 
 double us_to_s(bigtime_t usecs);
 bigtime_t s_to_us(double secs);
+
+#endif //_MIXER_UTILS_H

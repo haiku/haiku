@@ -435,13 +435,36 @@ MixerCore::MixThread()
 			
 		if (!LockWithTimeout(10000))
 			continue;
+		
+		// no inputs, skip further processing and just send an empty buffer
+		if (fInputs->IsEmpty()) {
+			int size = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
+			BBuffer* buf = fBufferGroup->RequestBuffer(size, 5000);
+			if (buf) {
+				memset(buf->Data(), 0, size);
+				// fill in the buffer header
+				media_header* hdr = buf->Header();
+				hdr->type = B_MEDIA_RAW_AUDIO;
+				hdr->size_used = size;
+				hdr->time_source = fTimeSource->ID();
+				hdr->start_time = event_time;
+				if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {
+					ERROR("MixerCore: SendBuffer failed\n");
+					buf->Recycle();
+				}
+			} else {
+				ERROR("MixerCore: RequestBuffer failed\n");
+			}
+			goto schedule_next_event;
+		}
+
+		int64 cur_framepos;
+		cur_framepos = frame_base + frame_pos;
 			
 		// mix all data from all inputs into the mix buffer
-		ASSERT((frame_base + frame_pos) % fMixBufferFrameCount == 0);
+		ASSERT(cur_framepos % fMixBufferFrameCount == 0);
 
-		PRINT(4, "create new buffer event at %Ld, reading input frames at %Ld\n", event_time, frame_base + frame_pos);
-		
-		int64 cur_framepos = frame_base + frame_pos;
+		PRINT(4, "create new buffer event at %Ld, reading input frames at %Ld\n", event_time, cur_framepos);
 		
 		MixerInput *input;
 		for (int i = 0; (input = Input(i)) != 0; i++) {
@@ -451,7 +474,8 @@ MixerCore::MixThread()
 				const float *base;
 				uint32 sample_offset;
 				float gain;
-				input->GetMixerChannelInfo(chan, cur_framepos, &base, &sample_offset, &type, &gain);
+				if (!input->GetMixerChannelInfo(chan, cur_framepos, event_time, &base, &sample_offset, &type, &gain))
+					continue;
 				if (type < 0 || type >= MAX_TYPES)
 					continue;
 				chan_info *info = InputChanInfos[type].Create();
@@ -480,7 +504,8 @@ MixerCore::MixThread()
 			}
 		}
 
-		uint32 dst_sample_offset = fMixBufferChannelCount * sizeof(float);
+		uint32 dst_sample_offset;
+		dst_sample_offset = fMixBufferChannelCount * sizeof(float);
 		
 		memset(fMixBuffer, 0, fMixBufferChannelCount * fMixBufferFrameCount * sizeof(float));
 		for (int chan = 0; chan < fMixBufferChannelCount; chan++) {
@@ -499,8 +524,8 @@ MixerCore::MixThread()
 		}
 
 		// request a buffer
-		BBuffer* buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 5000);
-
+		BBuffer	*buf;
+		buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 5000);
 		if (buf) {
 		
 			// copy data from mix buffer into output buffer
@@ -539,7 +564,8 @@ MixerCore::MixThread()
 			InputChanInfos[i].MakeEmpty();
 		for (int i = 0; i < fOutput->GetOutputChannelCount(); i++)
 			MixChanInfos[i].MakeEmpty();
-		
+
+schedule_next_event:		
 		// schedule next event
 		frame_pos += fMixBufferFrameCount;
 		event_time = time_base + bigtime_t((1000000LL * frame_pos) / fMixBufferFrameRate);

@@ -24,6 +24,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	fMixBuffer(0),
 	fMixBufferFrameRate(0),
 	fMixBufferFrameCount(0),
+	fLastDataAvailableTime(-1),
 	fResampler(0),
 	fRtmPool(0),
 	fUserOverridesChannelDesignations(false)
@@ -107,6 +108,8 @@ MixerInput::BufferReceived(BBuffer *buffer)
 		ERROR("MixerInput::BufferReceived: buffer with negative start time of %Ld dropped\n", start);
 		return;
 	}
+	
+	fLastDataAvailableTime = start + buffer_duration(fInput.format.u.raw_audio);
 
 	// swap the byte order of this buffer, if necessary
 	if (fInputByteSwap)

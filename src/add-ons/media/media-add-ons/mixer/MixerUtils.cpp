@@ -114,7 +114,7 @@ fix_multiaudio_format(media_multi_audio_format *format)
 			&& int(format->frame_rate + 0.5) == 11025
 			&& format->byte_order == B_MEDIA_BIG_ENDIAN
 			&& format->buffer_size == 548) {
-		printf("### quicktime extractor bug workaround activated, changing buffer size from 548 into 4096\n");
+		ERROR("Mixer: quicktime extractor bug workaround activated, changing buffer size from 548 into 4096\n");
 		format->buffer_size = 4096;
 	}
 }
