@@ -1,12 +1,13 @@
+/*
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Mark-Jan Bastian. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 /* ports for IPC */
 
-/*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-**
-** Copyright 2001, Mark-Jan Bastian. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
 
 #include <OS.h>
 
@@ -64,7 +65,8 @@ static int32 sUsedPorts = 0;
 static struct port_entry *sPorts = NULL;
 static area_id sPortArea = 0;
 static bool sPortsActive = false;
-static port_id sNextPort = 0;
+static port_id sNextPort = 1;
+static int32 sFirstFreeSlot = 1;
 
 static spinlock sPortSpinlock = 0;
 
@@ -293,6 +295,8 @@ delete_owned_ports(team_id owner)
 	int i;
 	int count = 0;
 
+	TRACE(("delete_owned_ports(owner = %ld)\n", owner));
+
 	if (!sPortsActive)
 		return B_BAD_PORT_ID;
 
@@ -378,9 +382,11 @@ create_port(int32 queueLength, const char *name)
 	cpu_status state;
 	char nameBuffer[B_OS_NAME_LENGTH];
 	sem_id readSem, writeSem;
-	port_id returnValue;
+	status_t status;
 	team_id	owner;
-	int i;
+	int32 slot;
+
+	TRACE(("create_port(queueLength = %ld, name = \"%s\")\n", queueLength, name));
 
 	if (!sPortsActive)
 		return B_BAD_PORT_ID;
@@ -392,8 +398,8 @@ create_port(int32 queueLength, const char *name)
 
 	// check early on if there are any free port slots to use
 	if (atomic_add(&sUsedPorts, 1) >= sMaxPorts) {
-		atomic_add(&sUsedPorts, -1);
-		return B_NO_MORE_PORTS;
+		status = B_NO_MORE_PORTS;
+		goto err1;
 	}
 
 	// check & dup name
@@ -404,28 +410,23 @@ create_port(int32 queueLength, const char *name)
 	strlcpy(nameBuffer, name, B_OS_NAME_LENGTH);
 	name = strdup(nameBuffer);
 	if (name == NULL) {
-		atomic_add(&sUsedPorts, -1);
-		return B_NO_MEMORY;
+		status = B_NO_MEMORY;
+		goto err1;
 	}
 
 	// create read sem with owner set to -1
 	// ToDo: should be B_SYSTEM_TEAM
 	readSem = create_sem_etc(0, name, -1);
 	if (readSem < B_OK) {
-		// cleanup
-		free((char *)name);
-		atomic_add(&sUsedPorts, -1);
-		return readSem;
+		status = readSem;
+		goto err2;
 	}
 
 	// create write sem
 	writeSem = create_sem_etc(queueLength, name, -1);
-	if (writeSem < 0) {
-		// cleanup
-		delete_sem(readSem);
-		free((char *)name);
-		atomic_add(&sUsedPorts, -1);
-		return writeSem;
+	if (writeSem < B_OK) {
+		status = writeSem;
+		goto err3;
 	}
 
 	owner = team_get_current_team_id();
@@ -434,17 +435,21 @@ create_port(int32 queueLength, const char *name)
 	GRAB_PORT_LIST_LOCK();
 
 	// find the first empty spot
-	for (i = 0; i < sMaxPorts; i++) {
+	for (slot = 0; slot < sMaxPorts; slot++) {
+		int32 i = (slot + sFirstFreeSlot) % sMaxPorts;
+
 		if (sPorts[i].id == -1) {
+			port_id id;
+
 			// make the port_id be a multiple of the slot it's in
 			if (i >= sNextPort % sMaxPorts)
 				sNextPort += i - sNextPort % sMaxPorts;
 			else
 				sNextPort += sMaxPorts - (sNextPort % sMaxPorts - i);
+			sFirstFreeSlot = slot + 1;
 
 			GRAB_PORT_LOCK(sPorts[i]);
 			sPorts[i].id = sNextPort++;
-			atomic_add(&sUsedPorts, 1);
 			RELEASE_PORT_LIST_LOCK();
 
 			sPorts[i].capacity = queueLength;
@@ -456,33 +461,36 @@ create_port(int32 queueLength, const char *name)
 
 			list_init(&sPorts[i].msg_queue);
 			sPorts[i].total_count = 0;
-			returnValue = sPorts[i].id;
-			
+			id = sPorts[i].id;
+
 			RELEASE_PORT_LOCK(sPorts[i]);
-			goto out;
+			restore_interrupts(state);
+
+			return id;
 		}
 	}
+
+	// not enough ports...
 
 	// ToDo: due to sUsedPorts, this cannot happen anymore - as
 	//		long as sMaxPorts stays constant over the kernel run
 	//		time (which it should be). IOW we could simply panic()
 	//		here.
 
-	// not enough ports...
 	RELEASE_PORT_LIST_LOCK();
-	returnValue = B_NO_MORE_PORTS;
-	dprintf("create_port(): B_NO_MORE_PORTS\n");
-
-	// cleanup
-	delete_sem(writeSem);
-	delete_sem(readSem);
-	free((char *)name);
-	atomic_add(&sUsedPorts, -1);
-
-out:
 	restore_interrupts(state);
 
-	return returnValue;
+	status = B_NO_MORE_PORTS;
+
+	delete_sem(writeSem);
+err3:
+	delete_sem(readSem);
+err2:
+	free((char *)name);
+err1:
+	atomic_add(&sUsedPorts, -1);
+
+	return status;
 }
 
 
@@ -491,6 +499,8 @@ close_port(port_id id)
 {
 	cpu_status state;
 	int slot;
+
+	TRACE(("close_port(id = %ld)\n", id));
 
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
@@ -528,6 +538,8 @@ delete_port(port_id id)
 	port_msg *msg;
 	int slot;
 
+	TRACE(("delete_port(id = %ld)\n", id));
+
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
 
@@ -539,7 +551,8 @@ delete_port(port_id id)
 	if (sPorts[slot].id != id) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		dprintf("delete_port: invalid port_id %ld\n", id);
+
+		TRACE(("delete_port: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 
@@ -552,6 +565,13 @@ delete_port(port_id id)
 	list_move_to_list(&sPorts[slot].msg_queue, &list);
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
+
+	// update the first free slot hint in the array	
+	GRAB_PORT_LIST_LOCK();
+	if (slot < sFirstFreeSlot)
+		sFirstFreeSlot = slot;
+	RELEASE_PORT_LIST_LOCK();
+
 	restore_interrupts(state);
 
 	atomic_add(&sUsedPorts, -1);
@@ -578,6 +598,8 @@ find_port(const char *name)
 	port_id portFound = B_NAME_NOT_FOUND;
 	cpu_status state;
 	int i;
+
+	TRACE(("find_port(name = \"%s\")\n", name));
 
 	if (!sPortsActive)
 		return B_NAME_NOT_FOUND;
@@ -636,6 +658,8 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	cpu_status state;
 	int slot;
 
+	TRACE(("get_port_info(id = %ld)\n", id));
+
 	if (info == NULL || size != sizeof(port_info))
 		return B_BAD_VALUE;
 	if (!sPortsActive || id < 0)
@@ -668,6 +692,8 @@ _get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t
 {
 	cpu_status state;
 	int slot;
+
+	TRACE(("get_next_port_info(team = %ld)\n", team));
 
 	if (info == NULL || size != sizeof(port_info) || _cookie == NULL || team < B_OK)
 		return B_BAD_VALUE;
@@ -1052,6 +1078,8 @@ set_port_owner(port_id id, team_id team)
 {
 	cpu_status state;
 	int slot;
+
+	TRACE(("set_port_owner(id = %ld, team = %ld)\n", id, team));
 
 	if (!sPortsActive || id < 0)
 		return B_BAD_PORT_ID;
