@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src kernel vm2 tests ;
+
+UseHeaders .. ;
+BinCommand vmTest  : test.C : root be libvm.so ; 
+BinCommand olTest  : olTest.C : root be libvm.so ; 
+BinCommand hashTest  : hashTest.C : root be libvm.so ; 
+BinCommand pmTest  : pageManTest.C : root be libvm.so ; 
+BinCommand simpleTest  : simpleTest.C : root be libvm.so ; 
+BinCommand setup  : testSetup.C : root be libvm.so ; 
+BinCommand mmapTest1  : mmapTest1.C : root be libvm.so ; 
+BinCommand mmapTest2  : mmapTest2.C : root be libvm.so ; 
