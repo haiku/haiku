@@ -30,7 +30,7 @@ main()
 {
 	setup_io();
 
-	printf("Welcome to OpenBeOS!\n");
+	printf("Welcome to Haiku!\n");
 
 	{
 		team_id pid;

@@ -43,7 +43,7 @@ main(stage2_args *args)
 	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
 		platform_switch_to_logo();
 
-	puts("Welcome to the OpenBeOS boot loader!");
+	puts("Welcome to the Haiku boot loader!");
 
 	bool mountedAllVolumes = false;
 

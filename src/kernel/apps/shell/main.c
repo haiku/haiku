@@ -80,7 +80,7 @@ main(int argc, char *argv[])
 			exit(0);
 	}
 
-	printf("Welcome to the OpenBeOS shell\n");
+	printf("Welcome to the Haiku shell\n");
 
 	for (;;) {
 		int chars_read;
