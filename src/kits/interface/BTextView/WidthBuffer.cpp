@@ -28,6 +28,8 @@
 
 #include <cstdio>
 
+//#define USE_DANO_WIDTHBUFFER
+
 const uint32 kTableCount = 128;
 
 struct hashed_escapement
@@ -171,10 +173,12 @@ _BWidthBuffer_::FindTable(const BFont *inStyle, int32 *outIndex)
 	int32 tableIndex = -1;
 
 	for (int32 i = 0; i < fItemCount; i++) {
-#if B_BEOS_VERSION_DANO
+	
+#ifdef USE_DANO_WIDTHBUFFER
 		if (*inStyle == fBuffer[i].font) {
 #else
-		if (fontSize == fBuffer[i].fontSize && fontCode == fBuffer[i].fontCode) {
+		if (fontSize == fBuffer[i].fontSize 
+				&& fontCode == fBuffer[i].fontCode) {
 #endif
 			tableIndex = i;
 			break;
@@ -196,12 +200,14 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 {
 	_width_table_ table;
 	hashed_escapement *deltas = new hashed_escapement[kTableCount];
-#if B_BEOS_VERSION_DANO
-	table.font = font;
+
+#if USE_DANO_WIDTHBUFFER
+	table.font = *font;
 #else
 	table.fontSize = font->Size();
 	table.fontCode = font->FamilyAndStyle();
 #endif
+
 	table.hashCount = 0;
 	table.tableCount = kTableCount;
 	table.widths = deltas;
@@ -237,8 +243,8 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 	while ((found = widths[hashed].code) != (uint32)-1) {
 		if (found == value)
 			break;	
-		hashed++;
-		if (hashed >= (uint32)table->tableCount)
+		
+		if (++hashed >= (uint32)table->tableCount)
 			hashed = 0;
 		DEBUG_ONLY(iterations++;)
 	}
@@ -311,44 +317,46 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 				if (++hashed >= (uint32)table->tableCount)
 					hashed = 0;
 			}
+			
 			if (found == (uint32)-1) {
 				// The value is not in the table. Add it.
 				widths[hashed].code = value;
 				widths[hashed].escapement = escapements[charCount];
 				table->hashCount++;
-			}
-			// We always keep some free space in the hash table
-			// TODO: Not sure how much space, currently we double
-			// the current size when hashCount is at least 2/3 of
-			// the total size.
-			if (table->tableCount * 2 / 3 <= table->hashCount) {
-				table->hashCount = 0;
-				int32 newSize = table->tableCount * 2;
-				
-				// Create and initialize a new hash table
-				hashed_escapement *newWidths = new hashed_escapement[newSize];
-				for (int32 x = 0; x < newSize; x++) {
-					newWidths[x].code = (uint32)-1;
-					newWidths[x].escapement = 0;
-				}
-				// Rehash the values, and put them into the new table
-				for (int32 oldPos = 0; oldPos < table->tableCount; oldPos++) {
-					if (widths[oldPos].code != (uint32) -1) {
-						uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
-						while (newWidths[newPos].code != (uint32)-1) {
-							if (++newPos >= (uint32)newSize)
-								newPos = 0;
-						}					
-						newWidths[newPos].code = widths[oldPos].code;
-						newWidths[newPos].escapement = widths[oldPos].escapement;
-						table->hashCount++;
+			
+				// We always keep some free space in the hash table
+				// TODO: Not sure how much space, currently we double
+				// the current size when hashCount is at least 2/3 of
+				// the total size.
+				if (table->tableCount * 2 / 3 <= table->hashCount) {
+					table->hashCount = 0;
+					int32 newSize = table->tableCount * 2;
+					
+					// Create and initialize a new hash table
+					hashed_escapement *newWidths = new hashed_escapement[newSize];
+					for (int32 x = 0; x < newSize; x++) {
+						newWidths[x].code = (uint32)-1;
+						newWidths[x].escapement = 0;
 					}
+					// Rehash the values, and put them into the new table
+					for (int32 oldPos = 0; oldPos < table->tableCount; oldPos++) {
+						if (widths[oldPos].code != (uint32) -1) {
+							uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
+							while (newWidths[newPos].code != (uint32)-1) {
+								if (++newPos >= (uint32)newSize)
+									newPos = 0;
+							}					
+							newWidths[newPos].code = widths[oldPos].code;
+							newWidths[newPos].escapement = widths[oldPos].escapement;
+							table->hashCount++;
+						}
+					}
+					table->tableCount = newSize;
+					
+					// Delete the old table, and put the new pointer into the _width_table_
+					delete[] widths;
+					widths = newWidths;
 				}
-				table->tableCount = newSize;
-				
-				// Delete the old table, and put the new pointer into the _width_table_
-				delete[] widths;
-				widths = newWidths;
 			}
 		}
 		charCount++;
