@@ -882,6 +882,51 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 		//fixme: complete (if possible) ...
 		switch (rom[adress])
 		{
+		case 0x38: /* new */
+			*size -= 1;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			LOG(8,("cmd 'invert current mode'\n"));
+			exec = !exec;
+			if (exec)
+				LOG(8,("INFO: ---Executing following command(s):'\n"));
+			else
+				LOG(8,("INFO: ---Not executing following command(s):'\n"));
+			break;
+		case 0x62: /* new */
+			*size -= 5;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			byte = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'WR idx ISA reg $%02x via $%04x = $%02x'\n", index, reg, byte));
+			if (exec)
+			{
+				safe = ISARB(reg);
+				ISAWW(reg, ((((uint16)byte) << 8) | index));
+				ISAWB(reg, safe);
+			}
+			break;
 		case 0x63:
 			*size -= 1;
 			if (*size < 0)
@@ -1052,7 +1097,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			data2 = *((uint32*)(&(rom[(data + 8)])));
 			data = NV_REG32(reg);
 			data &= and_out;
-			LOG(8,("cmd 'CHK bits AND-out $%08x reg %$08x for $%08x'\n",
+			LOG(8,("cmd 'CHK bits AND-out $%08x reg $%08x for $%08x'\n",
 				and_out, reg, data2));
 			if (data != data2)
 			{
