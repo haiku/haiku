@@ -102,6 +102,7 @@ BufferPool::ReleaseBuffers()
 		free(buffer);
 		buffer = nextBuffer;
 	}
+	fFirstFree = buffer;
 
 	release_sem(fLock);
 }

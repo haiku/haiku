@@ -525,13 +525,16 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 	switch (cmd) {
 		case IOCTL_FILE_UNCACHED_IO:
 		{
+			if (inode == NULL)
+				return B_BAD_VALUE;
+
 			// if the inode is already set up for uncached access, bail out
 			if (inode->Flags() & INODE_NO_CACHE) {
 				FATAL(("File %Ld is already uncached\n", inode->ID()));
 				return B_ERROR;
 			}
-			if (inode != NULL)
-				PRINT(("trying to make access to inode %Ld uncached. Not yet implemented!\n",inode->ID()));
+			
+			PRINT(("uncached access to inode %Ld\n", inode->ID()));
 
 			// ToDo: sync the cache for this file!
 			// Unfortunately, we can't remove any blocks from the cache in BeOS,
@@ -543,7 +546,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 			status_t status = volume->Pool().RequestBuffers(volume->BlockSize());
 			if (status == B_OK)
 				inode->Node()->flags |= INODE_NO_CACHE;
-			return B_ERROR;
+			return status;
 		}
 #ifdef DEBUG
 		case 56742:
