@@ -808,6 +808,9 @@ BMPTranslator::Identify(BPositionIO *inSource,
 			// at the same time
 			return B_BAD_VALUE;
 	}
+	bheaderonly = bdataonly = false;
+		// only allow writing of the entire image
+		// (fix for buggy programs that lie about what they actually need)
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
@@ -2223,6 +2226,9 @@ BMPTranslator::Translate(BPositionIO *inSource,
 			// at the same time
 			return B_BAD_VALUE;
 	}
+	bheaderonly = bdataonly = false;
+		// only allow writing of the entire image
+		// (fix for buggy programs that lie about what they actually need)
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
