@@ -52,6 +52,9 @@
 #include <string.h>
 #include <unistd.h>
 
+// phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
+extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
+
 /* XXX: things from route.c */
 extern char *routename __P((struct sockaddr *));
 extern char *netname __P((struct sockaddr *));
@@ -94,7 +97,8 @@ static void pr_rthdr __P((void));
 static void pr_family __P((int));
 
 int	keyword(char *);
-void	usage(char *);
+void usage(char *);
+void show(int argc, char **argv);
 
 /*
  * Print routing tables.

@@ -50,6 +50,7 @@ void in_getaddr(char *s, int which);
 void in_getprefix(char *plen, int which);
 void status(int link);
 void printif(struct ifreq *ifrm, int ifaliases);
+void usage(void);
 
 /* The commands we recognise... */
 struct _cmd_ {
@@ -90,7 +91,7 @@ const struct afswtch {
 
 const struct afswtch *afp;	/*the address family being set or asked about*/
 
-void usage()
+void usage(void)
 {
 	fprintf(stderr, "OpenBeOS Network Team: ifconfig: version %s\n", version);
 	fprintf(stderr, "usage: ifconfig [ -m ] [ -a ] [ -A ] [ interface ]\n"
@@ -305,7 +306,7 @@ void printif(struct ifreq *ifrm, int ifaliases)
 			err(1, "malloc");
 		if (ioctl(sock, SIOCGIFCONF, &ifc) < 0)
 			err(1, "SIOCGIFCONF");
-		if (ifc.ifc_len + sizeof(ifreq) < len)
+		if ((int) (ifc.ifc_len + sizeof(ifreq)) < len)
 			break;
 		len *= 2;
 	}
@@ -315,12 +316,12 @@ void printif(struct ifreq *ifrm, int ifaliases)
 		ifrp = (struct ifreq *)((caddr_t)ifc.ifc_req + i);
 		memcpy(ifrbuf, ifrp, sizeof(*ifrp));
 		siz = ((struct ifreq *)ifrbuf)->ifr_addr.sa_len;
-		if (siz < sizeof(ifrp->ifr_addr))
+		if (siz < (int) sizeof(ifrp->ifr_addr))
 			siz = sizeof(ifrp->ifr_addr);
 		siz += sizeof(ifrp->ifr_name);
 		i += siz;
 		/* avoid alignment issue */
-		if (sizeof(ifrbuf) < siz)
+		if ((int) sizeof(ifrbuf) < siz)
 			err(1, "ifr too big");
 		memcpy(ifrbuf, ifrp, siz);
 		ifrp = (struct ifreq *)ifrbuf;

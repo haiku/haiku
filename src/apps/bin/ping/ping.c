@@ -150,17 +150,21 @@ int reset_kerninfo;
 #define DEFAULT_BUFSPACE	60*1024 /* default read buffer size */
 int bufspace = DEFAULT_BUFSPACE;
 
-void fill (char *, char *);
-void catcher(), prtsig(), finish(), summary(int);
+void fill(char *, char *);
+void catcher(int);
+void prtsig(int);
+void finish(int);
+void summary(int);
 int compute_in_cksum (u_short *, int);
-void pinger();
+void pinger(void);
 char *pr_addr (in_addr_t);
 int check_icmph (struct ip *);
 void pr_icmph (struct icmp *);
 void pr_pack (char *, int, struct sockaddr_in *);
 void pr_retip (struct ip *);
+void pr_iph(struct ip *ip);
 uint64 qsqrt (uint64);
-void usage();
+void usage(void);
 
 
 static void err(int exitval, char *where)
@@ -339,7 +343,7 @@ int main(int argc, char **argv)
 	if (options & F_FLOOD && options & F_INTERVAL)
 		err(1, "-f and -i options are incompatible");
 
-	if (datalen >= sizeof(uint64))	/* can we time transfer */
+	if (datalen >= (int) sizeof(uint64))	/* can we time transfer */
 		timing = 1;
 	packlen = datalen + MAXIPLEN + MAXICMPLEN;
 	if (!(packet = (u_char *)malloc((u_int)packlen)))
@@ -470,7 +474,7 @@ int main(int argc, char **argv)
 		pinger();
 
 	if ((options & F_FLOOD) == 0)
-		catcher();		/* start things going */
+		catcher(0);		/* start things going */
 
 	fdmasks = _howmany(s+1, NFDBITS) * sizeof(fd_mask);
 	if ((fdmaskp = (fd_set *)malloc(fdmasks)) == NULL)
@@ -509,7 +513,7 @@ int main(int argc, char **argv)
 			break;
 	}
 	free(fdmaskp);
-	finish();
+	finish(0);
 	/* NOTREACHED */
 	exit(0);	/* Make the compiler happy */
 }
@@ -524,7 +528,7 @@ int main(int argc, char **argv)
  * launched exactly at 1-second intervals).  This does not affect the
  * quality of the delay and loss statistics.
  */
-void catcher()
+void catcher(int sig)
 {
 	int waittime;
 	int save_errno = errno;
@@ -551,7 +555,7 @@ void catcher()
  * Print statistics when SIGINFO is received.
  * XXX not race safe
  */
-void prtsig()
+void prtsig(int sig)
 {
 	int save_errno = errno;
 
@@ -567,7 +571,7 @@ void prtsig()
  * of the data portion are used to hold a UNIX "timeval" struct in VAX
  * byte-order, to compute the round-trip time.
  */
-void pinger()
+void pinger(void)
 {
 	struct icmp *icp;
 	int cc;
@@ -701,13 +705,13 @@ void pr_pack(char *buf, int cc, struct sockaddr_in *from)
 			/* check the data */
 			cp = (u_char*)&icp->icmp_data[sizeof(bigtime_t)];
 			dp = &outpack[8 + sizeof(bigtime_t)];
-			for (i = 8 + sizeof(bigtime_t); i < datalen;
+			for (i = 8 + sizeof(bigtime_t); (int) i < datalen;
 			    ++i, ++cp, ++dp) {
 				if (*cp != *dp) {
 	(void)printf("\nwrong data byte #%d should be 0x%x but was 0x%x",
 	    i, *dp, *cp);
 					cp = (u_char*)&icp->icmp_data[0];
-					for (i = 8; i < datalen; ++i, ++cp) {
+					for (i = 8; (int) i < datalen; ++i, ++cp) {
 						if ((i % 32) == 8)
 							(void)printf("\n\t");
 						(void)printf("%x ", *cp);
@@ -777,8 +781,8 @@ void pr_pack(char *buf, int cc, struct sockaddr_in *from)
 			i -= IPOPT_MINOFF;
 			if (i <= 0)
 				continue;
-			if (i == old_rrlen
-			    && cp == (u_char *)buf + sizeof(struct ip) + 2
+			if ((int) i == old_rrlen
+			    && cp == (u_char *) buf + sizeof(struct ip) + 2
 			    && !memcmp(cp, old_rr, i)
 			    && !(options & F_FLOOD)) {
 				(void)printf("\t(same route)");
@@ -904,7 +908,7 @@ void summary(int header)
 
 uint64 qsqrt(uint64 qdev)
 {
-	uint64 y, x = 1;
+	int64 y, x = 1;
 
 	if (!qdev)
 		return(0);
@@ -916,14 +920,14 @@ uint64 qsqrt(uint64 qdev)
 		x /= 2;
 	} while ((x - y) > 1 || (x - y) > -1);
 
-	return(x);
+	return (uint64) x;
 }
 
 /*
  * finish --
  *	Print out statistics, and give up.
  */
-void finish()
+void finish(int sig)
 {
 	(void)signal(SIGINT, SIG_IGN);
 	(void)signal(SIGALRM, SIG_IGN);
@@ -1151,9 +1155,7 @@ pr_icmph(icp)
  * pr_iph --
  *	Print an IP header with options.
  */
-void
-pr_iph(ip)
-	struct ip *ip;
+void pr_iph(struct ip *ip)
 {
 	int hlen;
 	u_char *cp;
@@ -1203,9 +1205,7 @@ pr_addr(a)
  * pr_retip --
  *	Dump some info on a returned (via ICMP) IP packet.
  */
-void
-pr_retip(ip)
-	struct ip *ip;
+void pr_retip(struct ip *ip)
 {
 	int hlen;
 	u_char *cp;
@@ -1241,7 +1241,7 @@ fill(bp, patp)
 
 	if (ii > 0)
 		for (kk = 0;
-		    kk <= MAXPAYLOAD - (8 + sizeof(uint64) + ii);
+		    kk <= (int) (MAXPAYLOAD - (8 + sizeof(uint64) + ii));
 		    kk += ii)
 			for (jj = 0; jj < ii; ++jj)
 				bp[jj + kk] = pat[jj];

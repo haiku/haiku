@@ -62,6 +62,9 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+// phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
+extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
+
 int delete (const char *, const char *);
 void search(in_addr_t addr, void (*action)(struct sockaddr_dl *sdl,
 	struct sockaddr_inarp *sin, struct rt_msghdr *rtm));
@@ -77,6 +80,7 @@ void getsocket (void);
 int rtmsg (int);
 int set (int, char **);
 void usage (void);
+void err(int error, char *msg);
 
 static int pid;
 static int nflag;	/* no reverse dns lookups */

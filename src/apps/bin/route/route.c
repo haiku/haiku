@@ -55,7 +55,8 @@
 
 #include "keywords.h"
 
-int getaddr(int which, char *s, struct hostent **hpp);
+// phoudoin, 20031026: FIXME: sysctl.h is a kernel private header!
+extern int sysctl(int *, uint, void *, size_t *, void *, size_t);
 
 union	sockunion {
 	struct	sockaddr sa;
@@ -95,6 +96,16 @@ void	 mask_addr __P((void));
 //int	 getaddr __P((int, char *, struct hostent **));
 int	 rtmsg __P((int, int));
 int	 x25_makemask __P((void));
+int _getopt(int nargc, char *const *nargv, const char *ostr);
+void usage(char *cp);
+void quit(char *s);
+int getaddr(int which, char *s, struct hostent **hpp);
+char * any_ntoa(const struct sockaddr *sa);
+void set_metric(char *value, int key);
+void flushroutes(int argc, char *argv[]);
+int keyword(char *cp);
+void interfaces(void);
+void inet_makenetandmask(uint32 net, struct sockaddr_in *sin, int bits);
 
 extern void show __P((int, char **));	/* XXX - from show.c */
 
@@ -108,6 +119,8 @@ char *optarg;
 #define BADCH (int)'?'
 #define BADARG (int)':'
 #define EMSG ""
+
+
 
 int _getopt(int nargc, char *const *nargv, const char *ostr)
 {
@@ -262,10 +275,7 @@ main(argc, argv)
  * Purge all entries in the routing tables not
  * associated with network interfaces.
  */
-void
-flushroutes(argc, argv)
-	int argc;
-	char *argv[];
+void flushroutes(int argc, char *argv[])
 {
 	size_t needed;
 	int mib[6], rlen, seqno;
@@ -364,9 +374,7 @@ printf("write gave %d\n", rlen);
 
 static char hexlist[] = "0123456789abcdef";
 
-char *
-any_ntoa(sa)
-	const struct sockaddr *sa;
+char * any_ntoa(const struct sockaddr *sa)
 {
 	static char obuf[240];
 	const char *in = sa->sa_data;
@@ -571,10 +579,7 @@ netname(sa)
 	return (line);
 }
 
-void
-set_metric(value, key)
-	char *value;
-	int key;
+void set_metric(char *value, int key)
 {
 	int flag = 0;
 	u_long noval, *valp = &noval;
@@ -1048,7 +1053,7 @@ short ipx_nullh[] = {0,0,0};
 short ipx_bh[] = {-1,-1,-1};
 
 void
-interfaces()
+interfaces(void)
 {
 	size_t needed;
 	int mib[6];
@@ -1077,7 +1082,7 @@ interfaces()
 }
 
 void
-monitor()
+monitor(void)
 {
 	int n;
 	char msg[2048];
