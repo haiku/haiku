@@ -5,6 +5,10 @@ BinCommand keymap :
 	Keymap.cpp
 	: be ;
 
+Package haiku-inputkit-cvs :
+        keymap :
+        boot home config bin ;
+
 rule MkKeymapComp
 {
 	local binary = $(1) ;
@@ -31,4 +35,6 @@ local keymapFile ;
 for keymapFile in [ FGristFiles $(keymapFiles:D=) ] {
 	local binary = $(keymapFile:BG=keymap) ;
 	MkKeymapComp $(binary) : $(keymapFile) ;
+	Package haiku-inputkit-cvs : $(binary) : boot home config settings Keymap ;
 }
+
