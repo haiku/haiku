@@ -139,13 +139,13 @@ class _IMPEXP_BE BSymLink;
 class _IMPEXP_BE BVolume;
 class _IMPEXP_BE BVolumeRoster;
 
-class _IMPEXP_BE Partition;
-class _IMPEXP_BE Session;
-class _IMPEXP_BE Device;
-class _IMPEXP_BE DeviceList;
-class _IMPEXP_BE TNodeWalker;
-class _IMPEXP_BE TQueryWalker;
-class _IMPEXP_BE TVolWalker;
+//class _IMPEXP_BE Partition;
+//class _IMPEXP_BE Session;
+//class _IMPEXP_BE Device;
+//class _IMPEXP_BE DeviceList;
+//class _IMPEXP_BE TNodeWalker;
+//class _IMPEXP_BE TQueryWalker;
+//class _IMPEXP_BE TVolWalker;
 
 /*app kit */
 struct _IMPEXP_BE app_info;
