@@ -6,12 +6,11 @@
 #define KERNEL_USER_RUNTIME_H_
 
 #include <image.h>
-#include <defines.h>
+#include <OS.h>
 
 #define MAGIC_APP_NAME	"_APP_"
 
-struct rld_export
-{
+struct rld_export {
 	// runtime linker API export
 	image_id (*load_add_on)(char const *path, uint32 flags);
 	status_t (*unload_add_on)(image_id imageID);
@@ -21,10 +20,9 @@ struct rld_export
 		int32 *nameLength, int32 *symbolType, void **_location);
 };
 
-struct uspace_program_args
-{
-	char program_name[SYS_MAX_OS_NAME_LEN];
-	char program_path[SYS_MAX_PATH_LEN];
+struct uspace_program_args {
+	char program_name[B_OS_NAME_LENGTH];
+	char program_path[B_PATH_NAME_LENGTH];
 	int  argc;
 	int  envc;
 	char **argv;
@@ -37,8 +35,5 @@ struct uspace_program_args
 };
 
 typedef void (libinit_f)(unsigned, struct uspace_program_args const *);
-
-//void INIT_BEFORE_CTORS(unsigned, struct uspace_prog_args const *);
-//void INIT_AFTER_CTORS(unsigned, struct uspace_prog_args const *);
 
 #endif	/* KERNEL_USER_RUNTIME_H_ */
