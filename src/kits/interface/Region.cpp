@@ -49,6 +49,7 @@ cleanup_region(BRegion *region)
 }
 
 
+// Sort the given rects by their top value
 void
 sort_rects(clipping_rect *rects, long count)
 {
@@ -56,7 +57,7 @@ sort_rects(clipping_rect *rects, long count)
 	bool again; //flag that tells we changed rects positions
 			
 	if (count == 2) {
-		if (rects[0].left > rects[1].left) {
+		if (rects[0].top > rects[1].top) {
 			clipping_rect tmp = rects[0];
 			rects[0] = rects[1];
 			rects[1] = tmp;
@@ -65,7 +66,7 @@ sort_rects(clipping_rect *rects, long count)
 		do {
 			again = false;
 			for (int c = 1; c < count; c++) {
-				if (rects[c - 1].left > rects[c].left) {
+				if (rects[c - 1].top > rects[c].top) {
 					clipping_rect tmp = rects[c - 1];
 					rects[c - 1] = rects[c];
 					rects[c] = tmp;
@@ -557,7 +558,7 @@ BRegion::PrintToStream() const
 	
 	for (int c = 0; c < count; c++) {
 		clipping_rect *rect = &data[c];
-		printf("data = BRect(l:%ld, t:%ld.0, r:%ld.0, b:%ld.0)\n",
+		printf("data = BRect(l:%ld.0, t:%ld.0, r:%ld.0, b:%ld.0)\n",
 			rect->left, rect->top, rect->right, rect->bottom);
 	}	
 }
