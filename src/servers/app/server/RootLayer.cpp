@@ -33,6 +33,7 @@
 #include "PatternHandler.h" // for pattern_union
 #include "ServerConfig.h"
 #include "TokenHandler.h"
+#include <TokenSpace.h>
 #include <stdio.h>
 
 //! TokenHandler object used to provide IDs for RootLayers(WorkSpaces)

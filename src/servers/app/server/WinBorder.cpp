@@ -29,6 +29,7 @@
 #include <Locker.h>
 #include <Region.h>
 #include <Debug.h>
+#include <TokenSpace.h>
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"
 #include "Decorator.h"
