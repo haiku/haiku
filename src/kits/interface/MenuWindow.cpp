@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Menu.cpp
+//	File Name:		MenuWindow.cpp
 //	Authors:		Marc Flerackers (mflerackers@androme.be)
 //					Stefano Ceccherini (burton666@libero.it)
 //	Description:	BMenuWindow is a custom BWindow for BMenus.
@@ -29,6 +29,7 @@
 #include <Menu.h>
 
 #include <MenuWindow.h>
+
 
 BMenuWindow::BMenuWindow(BRect frame, BMenu *menu)
 	:
