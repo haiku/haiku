@@ -85,6 +85,7 @@ public:
 	void ShowPrevPage();
 	void ShowFirstPage();
 	void ShowLastPage();
+	void ShowFindPage(int page);
 	
 	bool CanZoomIn() const;
 	bool CanZoomOut() const;
@@ -99,9 +100,10 @@ class PreviewWindow : public BlockingWindow {
 	BButton *fLast;
 	BButton *fZoomIn;
 	BButton *fZoomOut;
-	BStringView* fPageText;
-	PreviewView* fPreview;
-	BScrollView* fPreviewScroller;
+	BTextControl *fPageNumber;
+	BStringView *fPageText;
+	PreviewView *fPreview;
+	BScrollView *fPreviewScroller;
 	float fButtonBarHeight;
 	
 	enum {
@@ -109,6 +111,7 @@ class PreviewWindow : public BlockingWindow {
 		MSG_NEXT_PAGE  = 'pwnp',
 		MSG_PREV_PAGE  = 'pwpp',
 		MSG_LAST_PAGE  = 'pwlp',			
+		MSG_FIND_PAGE  = 'pwsp',
 		MSG_ZOOM_IN    = 'pwzi',
 		MSG_ZOOM_OUT   = 'pwzo',
 	};

@@ -29,6 +29,8 @@ THE SOFTWARE.
 
 */
 
+#include <stdlib.h>
+
 #include <Debug.h>
 #include <String.h>
 #include "Utils.h"
@@ -255,6 +257,20 @@ void PreviewView::ShowLastPage() {
 	}
 }
 
+void PreviewView::ShowFindPage(int page) {
+	page --;
+	
+	if (page < 0) {
+		page = 0;
+	} else if (page > (NumberOfPages()-1)) {
+		page = NumberOfPages()-1;
+	}
+	
+	fPage = (int32)page;
+
+	Invalidate();
+}
+
 bool PreviewView::CanZoomIn() const {
 	return fZoom < 4;
 }
@@ -351,11 +367,26 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 	fLast->ResizeTo(width, height);
 	left = fLast->Frame().right + kPageTextDistance;
 	
+	// page number text
+	fPageNumber = new BTextControl(BRect(left, top+3, left+10, top+10), "FindPage", "", "", new BMessage(MSG_FIND_PAGE));
+	fPageNumber->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
+	int num;
+	for (num = 0; num <= 255; num++) {
+		fPageNumber->TextView()->DisallowChar(num);
+	}
+	for (num = 0; num <= 9; num++) {
+		fPageNumber->TextView()->AllowChar('0' + num);
+	}
+	fPageNumber->TextView()-> SetMaxBytes(5);	
+	AddChild(fPageNumber);
+	fPageNumber->ResizeTo(be_plain_font->StringWidth("999999") + 10, height);
+	left = fPageNumber->Frame().right + 5;
+	
+	// number of pages text
 	fPageText = new BStringView(BRect(left, top, left + 100, top + 15), "pageText", "");
-	fPageText->SetAlignment(B_ALIGN_CENTER);
 	AddChild(fPageText);
 		// estimate max. width
-	float pageTextWidth = fPageText->StringWidth("Page 99999 of 99999 Pages");
+	float pageTextWidth = fPageText->StringWidth("of 99999 Pages");
 		// estimate height
 	BFont font;
 	fPageText->GetFont(&font);
@@ -431,17 +462,19 @@ void PreviewWindow::UpdateControls() {
 	fZoomIn->SetEnabled(fPreview->CanZoomIn());
 	fZoomOut->SetEnabled(fPreview->CanZoomOut());
 	
-	BString text("Page ");
-	text << fPreview->CurrentPage() 
-		<< " of " 
+	BString page;
+	page << fPreview->CurrentPage();
+	fPageNumber->SetText(page.String());	
+
+	BString text;  
+	text << "of " 
 		<< fPreview->NumberOfPages();
 	if (fPreview->NumberOfPages() == 1) {
 		text << " Page";
 	} else {
 		text << " Pages";
 	}
-	fPageText->SetText(text.String());
-}
+	fPageText->SetText(text.String());}
 
 void PreviewWindow::MessageReceived(BMessage* m) {
 	switch (m->what) {
@@ -456,6 +489,9 @@ void PreviewWindow::MessageReceived(BMessage* m) {
 			break;	
 		case MSG_LAST_PAGE: 
 			fPreview->ShowLastPage();
+			break;
+		case MSG_FIND_PAGE: 
+			fPreview->ShowFindPage(atoi(fPageNumber->Text())) ;
 			break;
 		case MSG_ZOOM_IN: 
 			fPreview->ZoomIn(); 
