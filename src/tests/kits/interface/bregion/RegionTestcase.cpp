@@ -1,5 +1,5 @@
 /*
-	$Id: RegionTestcase.cpp,v 1.1 2003/08/06 06:46:06 jackburton Exp $
+	$Id: RegionTestcase.cpp,v 1.2 2004/03/31 06:53:40 jackburton Exp $
 	
 	This file implements a base class for all tests of the OpenBeOS
 	BRegion code.
@@ -21,7 +21,7 @@
 RegionTestcase::RegionTestcase(std::string name) :
 	TestCase(name)
 {
-	const int numTestRegions = 5;
+	const int numTestRegions = 8;
 	const int numRectsPerRegion = 3;
 	
 	float theRegions[numTestRegions][numRectsPerRegion][4] = 
@@ -50,6 +50,23 @@ RegionTestcase::RegionTestcase(std::string name) :
 				{-50.0, -50.0, -10.0, -10.0},
 				{-75.0, -40.0, -25.0, -10.0},
 				{-90.0, -120.0, -70.0, -100.0}
+			},
+			{
+				{-50.0, -30.0, 100.0, 120.0},
+				{-140.0, 120.0, 340.0, 905.0},
+				{-90.0, -120.0, 90.0, 120.0}
+			},
+			{
+				// A test to see if our BRegion can handle non integers 
+				// rects coordinates (as R5 do)
+				{10.3, 10.8, 50.2, 50.9},
+				{25.1, 10.7, 75.8, 40.4},
+				{70.6, 100.6, 90.1, 120.3}
+			},
+			{
+				{15.0, 25.0, 75.0, 80.0},
+				{30.0, 15.0, 80.0, 45.0},
+				{60.0, 20.0, 95.0, 225.0}
 			}
 		};
 		
