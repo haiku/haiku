@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -73,9 +73,6 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store, void **v
 	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
 static int vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
-//static int vm_region_acquire_ref(vm_region *region);
-//static void vm_region_release_ref(vm_region *region);
-//static void vm_region_release_ref2(vm_region *region);
 
 
 static int
@@ -110,9 +107,11 @@ vm_get_region_by_id(region_id rid)
 	vm_region *region;
 
 	acquire_sem_etc(region_hash_sem, READ_COUNT, 0, 0);
+
 	region = hash_lookup(region_table, &rid);
-	if(region)
+	if (region)
 		atomic_add(&region->ref_count, 1);
+
 	release_sem_etc(region_hash_sem, READ_COUNT, 0);
 
 	return region;
@@ -507,7 +506,8 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 		off_t old_store_commitment = store->committed_size; // Note what we had
 		off_t commitment = (store->ops->commit)(store, offset + size); // Commit through to the new end
 		if (commitment < offset + size) { // Uh oh - didn't work
-			if (cache->temporary) { // If this is a temporary cache, Check to see if we ran out of space and return error.
+			if (cache->temporary) {
+				// If this is a temporary cache, Check to see if we ran out of space and return error.
 				int state = disable_interrupts();
 				acquire_spinlock(&max_commit_lock);
 
@@ -1597,48 +1597,6 @@ vm_delete_areas(struct vm_address_space *aspace)
 }
 
 
-int
-vm_resize_region(aspace_id aid, region_id rid, size_t newSize)
-{
-	// ToDo: this is broken!
-	vm_cache_ref *myCacheRef;
-	vm_region *myRegion,*current;
-	size_t oldSize;
-	bool failed = false;
-
-	// Steps:
-	//1) Get the vm_cache_ref for the region 
-
-	myRegion = vm_get_region_by_id(rid);
-	if (!myRegion)
-		return B_ERROR;
-
-	myCacheRef = myRegion->cache_ref;
-
-	// 2) Resize all of the regions from the vm_cache_ref (fix them all and fail if they can't be resized)
-
-	oldSize = myRegion->size;
-	for (current = myCacheRef->region_list;current;current = current->cache_next) {
-		if (current->aspace_next->base <= (current->base + newSize)) {
-			failed = true;
-			break;
-		}
-		current->size = newSize;
-	}
-
-	if (failed) { // OH NO! Go back and fix all of the broken ones...
-		for (current = myCacheRef->region_list;current;current = current->cache_next)
-			current->size = oldSize;
-		return B_ERROR;
-	}
-
-	// 3) Update the vm_cache size
-
-	myCacheRef->cache->virtual_size = newSize;
-	return 0;
-}
-
-
 static int32
 vm_thread_dump_max_commit(void *unused)
 {
@@ -2455,9 +2413,68 @@ set_area_protection(area_id area, uint32 newProtection)
 
 
 status_t
-resize_area(area_id area, size_t newSize)
+resize_area(area_id areaID, size_t newSize)
 {
-	// ToDo: implement resize_area()
+	vm_cache_ref *cache;
+	vm_region *area, *current;
+	size_t oldSize;
+	bool failed = false;
+
+	// is newSize a multiple of B_PAGE_SIZE?
+	if (newSize & (B_PAGE_SIZE - 1))
+		return B_BAD_VALUE;
+
+	area = vm_get_region_by_id(areaID);
+	if (area == NULL)
+		return B_BAD_VALUE;
+
+	// Resize all areas of this area's cache
+
+	cache = area->cache_ref;
+	oldSize = area->size;
+
+	// ToDo: we should only allow to resize anonymous memory areas!
+	if (!cache->cache->temporary)
+		return B_NOT_ALLOWED;
+
+	mutex_lock(&cache->lock);
+
+	if (oldSize < newSize) {
+		// We need to check if all areas of this cache can be resized
+
+		for (current = cache->region_list; current; current = current->cache_next) {
+			if (current->aspace_next && current->aspace_next->base <= (current->base + newSize))
+				goto err;
+		}
+	}
+
+	// Okay, looks good so far, so let's do it
+
+	for (current = cache->region_list; current; current = current->cache_next) {
+		if (current->aspace_next && current->aspace_next->base <= (current->base + newSize)) {
+			failed = true;
+			break;
+		}
+
+		current->size = newSize;
+	}
+
+	if (failed) {
+		// This shouldn't really be possible, but hey, who knows
+		for (current = cache->region_list; current; current = current->cache_next)
+			current->size = oldSize;
+
+		goto err;
+	}
+
+	vm_cache_resize(cache, newSize);
+	mutex_unlock(&cache->lock);
+
+	// ToDo: we must honour the lock restrictions of this region
+	return B_OK;
+
+err:
+	mutex_unlock(&cache->lock);
 	return B_ERROR;
 }
 
@@ -2590,8 +2607,7 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 status_t
 _user_resize_area(area_id area, size_t newSize)
 {
-	// ToDo: implement resize_area()
-	return B_ERROR;
+	return resize_area(area, newSize);
 }
 
 
