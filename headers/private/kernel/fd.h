@@ -13,6 +13,8 @@
 //#include <list.h>
 
 
+struct select_sync;
+
 struct fd_ops {
 	ssize_t		(*fd_read) (struct file_descriptor *, off_t pos, void *buffer, size_t *length);
 	ssize_t		(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
