@@ -321,7 +321,10 @@ status_t get_canonical_dir_path(const char *path, char *&result);
 status_t get_app_path(char *buffer);
 
 /*! Returns true if the given entry_ref represents the root directory, false otherwise. */
-bool entry_ref_is_root_dir(entry_ref &ref);
+bool entry_ref_is_root_dir(const entry_ref *ref);
+
+//! Returns true if the given device is the root device, false otherwise
+bool device_is_root_device(dev_t device);
 
 /*! Renames oldPath to newPath, replacing newPath if it exists. */
 status_t rename(const char *oldPath, const char *newPath);

@@ -1126,10 +1126,15 @@ BPrivate::Storage::get_app_path(char *buffer)
 }
 
 bool
-BPrivate::Storage::entry_ref_is_root_dir( entry_ref &ref )
+BPrivate::Storage::entry_ref_is_root_dir( const entry_ref *ref )
 {
-	return ref.directory == 1 && ref.device == 1 && ref.name[0] == '.'
-		   && ref.name[1] == 0;
+	return ref && ref->directory == 1 && ref->device == 1 && ref->name[0] == '.'
+		   && ref->name[1] == 0;
+}
+
+bool
+BPrivate::Storage::device_is_root_device(dev_t device) {
+	return device == 1;
 }
 
 status_t
