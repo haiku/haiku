@@ -19,13 +19,9 @@ wait_for_team(team_id team, status_t *_returnCode)
 
 
 status_t
-_get_team_usage_info(team_id team, int32 who, team_usage_info *ti, size_t size)
+_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size)
 {
-	// size is not yet used, but may if team_usage_info changes
-	(void)size;
-
-	// ToDo: implement _get_team_usage_info
-	return B_ERROR;
+	return _kern_get_team_usage_info(team, who, info, size);
 }
 
 
