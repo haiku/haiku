@@ -56,15 +56,16 @@ static void _dump_port_info(struct port_entry *port);
 #define MAX_QUEUE_LENGTH 4096
 #define PORT_MAX_MESSAGE_SIZE 65536
 
-static struct port_entry *ports = NULL;
-static region_id port_region = 0;
+static struct port_entry *gPorts = NULL;
+static region_id gPortRegion = 0;
 static bool ports_active = false;
 
-static port_id next_port = 0;
+static port_id gNextPort = 0;
 
-static spinlock port_spinlock = 0;
-#define GRAB_PORT_LIST_LOCK() acquire_spinlock(&port_spinlock)
-#define RELEASE_PORT_LIST_LOCK() release_spinlock(&port_spinlock)
+static spinlock gPortSpinlock = 0;
+
+#define GRAB_PORT_LIST_LOCK() acquire_spinlock(&gPortSpinlock)
+#define RELEASE_PORT_LIST_LOCK() release_spinlock(&gPortSpinlock)
 #define GRAB_PORT_LOCK(s) acquire_spinlock(&(s).lock)
 #define RELEASE_PORT_LOCK(s) release_spinlock(&(s).lock)
 
@@ -76,15 +77,15 @@ port_init(kernel_args *ka)
 	int size = sizeof(struct port_entry) * MAX_PORTS;
 
 	// create and initialize semaphore table
-	port_region = create_area("port_table", (void **)&ports, B_ANY_KERNEL_ADDRESS,
+	gPortRegion = create_area("port_table", (void **)&gPorts, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (port_region < 0) {
+	if (gPortRegion < 0) {
 		panic("unable to allocate kernel port table!\n");
 	}
 
-	memset(ports, 0, size);
+	memset(gPorts, 0, size);
 	for (i = 0; i < MAX_PORTS; i++)
-		ports[i].id = -1;
+		gPorts[i].id = -1;
 
 	// add debugger commands
 	add_debugger_command("ports", &dump_port_list, "Dump a list of all active ports");
@@ -102,8 +103,8 @@ dump_port_list(int argc, char **argv)
 	int i;
 
 	for (i = 0; i < MAX_PORTS; i++) {
-		if (ports[i].id >= 0)
-			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &ports[i], ports[i].id, ports[i].name);
+		if (gPorts[i].id >= 0)
+			dprintf("%p\tid: 0x%lx\t\tname: '%s'\n", &gPorts[i], gPorts[i].id, gPorts[i].name);
 	}
 	return 0;
 }
@@ -147,20 +148,20 @@ dump_port_info(int argc, char **argv)
 			return 0;
 		} else {
 			unsigned slot = num % MAX_PORTS;
-			if(ports[slot].id != (int)num) {
+			if(gPorts[slot].id != (int)num) {
 				dprintf("port 0x%lx doesn't exist!\n", num);
 				return 0;
 			}
-			_dump_port_info(&ports[slot]);
+			_dump_port_info(&gPorts[slot]);
 			return 0;
 		}
 	}
 
-	// walk through the ports list, trying to match name
+	// walk through the gPorts list, trying to match name
 	for (i = 0; i < MAX_PORTS; i++) {
-		if (ports[i].name != NULL
-			&& strcmp(argv[1], ports[i].name) == 0) {
-			_dump_port_info(&ports[i]);
+		if (gPorts[i].name != NULL
+			&& strcmp(argv[1], gPorts[i].name) == 0) {
+			_dump_port_info(&gPorts[i]);
 			return 0;
 		}
 	}
@@ -236,35 +237,35 @@ create_port(int32 queue_length, const char *name)
 
 	// find the first empty spot
 	for (i = 0; i < MAX_PORTS; i++) {
-		if(ports[i].id == -1) {
+		if(gPorts[i].id == -1) {
 			// make the port_id be a multiple of the slot it's in
-			if(i >= next_port % MAX_PORTS) {
-				next_port += i - next_port % MAX_PORTS;
+			if(i >= gNextPort % MAX_PORTS) {
+				gNextPort += i - gNextPort % MAX_PORTS;
 			} else {
-				next_port += MAX_PORTS - (next_port % MAX_PORTS - i);
+				gNextPort += MAX_PORTS - (gNextPort % MAX_PORTS - i);
 			}
-			ports[i].id		= next_port++;
-			ports[i].lock	= 0;
-			GRAB_PORT_LOCK(ports[i]);
+			gPorts[i].id		= gNextPort++;
+			gPorts[i].lock	= 0;
+			GRAB_PORT_LOCK(gPorts[i]);
 			RELEASE_PORT_LIST_LOCK();
 
-			ports[i].capacity	= queue_length;
-			ports[i].name 		= temp_name;
+			gPorts[i].capacity	= queue_length;
+			gPorts[i].name 		= temp_name;
 
 			// assign sem
-			ports[i].read_sem	= sem_r;
-			ports[i].write_sem	= sem_w;
-			ports[i].msg_queue	= q;
-			ports[i].head 		= 0;
-			ports[i].tail 		= 0;
-			ports[i].total_count= 0;
-			ports[i].owner 		= owner;
-			retval = ports[i].id;
-			RELEASE_PORT_LOCK(ports[i]);
+			gPorts[i].read_sem	= sem_r;
+			gPorts[i].write_sem	= sem_w;
+			gPorts[i].msg_queue	= q;
+			gPorts[i].head 		= 0;
+			gPorts[i].tail 		= 0;
+			gPorts[i].total_count= 0;
+			gPorts[i].owner 		= owner;
+			retval = gPorts[i].id;
+			RELEASE_PORT_LOCK(gPorts[i]);
 			goto out;
 		}
 	}
-	// not enough ports...
+	// not enough gPorts...
 	RELEASE_PORT_LIST_LOCK();
 	retval = B_NO_MORE_PORTS;
 	dprintf("create_port(): B_NO_MORE_PORTS\n");
@@ -296,19 +297,19 @@ close_port(port_id id)
 
 	// walk through the sem list, trying to match name
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("close_port: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	// mark port to disable writing
-	ports[slot].closed = true;
+	gPorts[slot].closed = true;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
@@ -335,25 +336,25 @@ delete_port(port_id id)
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("delete_port: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	/* mark port as invalid */
-	ports[slot].id	 = -1;
-	old_name 		 = ports[slot].name;
-	q				 = ports[slot].msg_queue;
-	r_sem			 = ports[slot].read_sem;
-	w_sem			 = ports[slot].write_sem;
-	capacity		 = ports[slot].capacity;
-	ports[slot].name = NULL;
+	gPorts[slot].id	 = -1;
+	old_name 		 = gPorts[slot].name;
+	q				 = gPorts[slot].msg_queue;
+	r_sem			 = gPorts[slot].read_sem;
+	w_sem			 = gPorts[slot].write_sem;
+	capacity		 = gPorts[slot].capacity;
+	gPorts[slot].name = NULL;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// delete the cbuf's that are left in the queue (if any)
@@ -386,20 +387,20 @@ find_port(const char *port_name)
 	if (port_name == NULL)
 		return B_BAD_PORT_ID;
 
-	// lock list of ports
+	// lock list of gPorts
 	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
 	// loop over list
 	for (i = 0; i < MAX_PORTS; i++) {
 		// lock every individual port before comparing
-		GRAB_PORT_LOCK(ports[i]);
-		if(strcmp(port_name, ports[i].name) == 0) {
-			ret_val = ports[i].id;
-			RELEASE_PORT_LOCK(ports[i]);
+		GRAB_PORT_LOCK(gPorts[i]);
+		if(strcmp(port_name, gPorts[i].name) == 0) {
+			ret_val = gPorts[i].id;
+			RELEASE_PORT_LOCK(gPorts[i]);
 			break;
 		}
-		RELEASE_PORT_LOCK(ports[i]);
+		RELEASE_PORT_LOCK(gPorts[i]);
 	}
 	
 	RELEASE_PORT_LIST_LOCK();
@@ -420,8 +421,8 @@ fill_port_info(struct port_entry *port, port_info *info, size_t size)
 	info->port = port->id;
 	info->team = port->owner;
 	info->capacity = port->capacity;
-	info->total_count = ports->total_count;
-	strlcpy(info->name, ports->name, B_OS_NAME_LENGTH);
+	info->total_count = gPorts->total_count;
+	strlcpy(info->name, gPorts->name, B_OS_NAME_LENGTH);
 	get_sem_count(port->read_sem, &info->queue_count);
 }
 
@@ -440,19 +441,19 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	// fill a port_info struct with info
-	fill_port_info(&ports[slot], info, size);
+	fill_port_info(&gPorts[slot], info, size);
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	return B_OK;
@@ -484,16 +485,16 @@ _get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t
 	GRAB_PORT_LIST_LOCK();
 
 	while (slot < MAX_PORTS) {
-		GRAB_PORT_LOCK(ports[slot]);
-		if (ports[slot].id != -1 && ports[slot].owner == team) {
+		GRAB_PORT_LOCK(gPorts[slot]);
+		if (gPorts[slot].id != -1 && gPorts[slot].owner == team) {
 			// found one!
-			fill_port_info(&ports[slot], info, size);
+			fill_port_info(&gPorts[slot], info, size);
 
-			RELEASE_PORT_LOCK(ports[slot]);
+			RELEASE_PORT_LOCK(gPorts[slot]);
 			slot++;
 			break;
 		}
-		RELEASE_PORT_LOCK(ports[slot]);
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		slot++;
 	}
 	RELEASE_PORT_LIST_LOCK();
@@ -529,15 +530,15 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// block if no message, 
@@ -546,16 +547,16 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	// XXX - is it a race condition to acquire a sem just after we
 	// unlocked the port ?
 	// XXX: call an acquire_sem which does the release lock, restore int & block the right way
-	res = acquire_sem_etc(ports[slot].read_sem, 1, flags & (B_TIMEOUT | B_CAN_INTERRUPT), timeout);
+	res = acquire_sem_etc(gPorts[slot].read_sem, 1, flags & (B_TIMEOUT | B_CAN_INTERRUPT), timeout);
 
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 	if (res == B_BAD_SEM_ID) {
 		// somebody deleted the port
-		RELEASE_PORT_LOCK(ports[slot]);
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		return B_BAD_PORT_ID;
 	}
 	if (res == B_TIMED_OUT) {
-		RELEASE_PORT_LOCK(ports[slot]);
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		return B_TIMED_OUT;
 	}
 
@@ -563,17 +564,17 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 
 	// determine tail
 	// read data's head length
-	t = ports[slot].head;
+	t = gPorts[slot].head;
 	if (t < 0)
-		panic("port %ld: tail < 0", ports[slot].id);
-	if (t > ports[slot].capacity)
-		panic("port %ld: tail > cap %ld", ports[slot].id, ports[slot].capacity);
-	len = ports[slot].msg_queue[t].data_len;
+		panic("port %ld: tail < 0", gPorts[slot].id);
+	if (t > gPorts[slot].capacity)
+		panic("port %ld: tail > cap %ld", gPorts[slot].id, gPorts[slot].capacity);
+	len = gPorts[slot].msg_queue[t].data_len;
 	
 	// restore readsem
-	release_sem(ports[slot].read_sem);
+	release_sem(gPorts[slot].read_sem);
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	
 	// return length of item at end of queue
 	return len;
@@ -595,21 +596,21 @@ port_count(port_id id)
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("port_count: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 	
-	get_sem_count(ports[slot].read_sem, &count);
+	get_sem_count(gPorts[slot].read_sem, &count);
 	// do not return negative numbers 
 	if (count < 0)
 		count = 0;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// return count of messages (sem_count)
@@ -651,19 +652,19 @@ read_port_etc(port_id id, int32 *msgCode, void *msgBuffer, size_t bufferSize,
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("read_port_etc: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 	// store sem_id in local variable
-	cached_semid = ports[slot].read_sem;
+	cached_semid = gPorts[slot].read_sem;
 
 	// unlock port && enable ints/
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), therefore
@@ -692,28 +693,28 @@ read_port_etc(port_id id, int32 *msgCode, void *msgBuffer, size_t bufferSize,
 	}
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	t = ports[slot].tail;
+	t = gPorts[slot].tail;
 	if (t < 0)
-		panic("port %ld: tail < 0", ports[slot].id);
-	if (t > ports[slot].capacity)
-		panic("port %ld: tail > cap %ld", ports[slot].id, ports[slot].capacity);
+		panic("port %ld: tail < 0", gPorts[slot].id);
+	if (t > gPorts[slot].capacity)
+		panic("port %ld: tail > cap %ld", gPorts[slot].id, gPorts[slot].capacity);
 
-	ports[slot].tail = (ports[slot].tail + 1) % ports[slot].capacity;
+	gPorts[slot].tail = (gPorts[slot].tail + 1) % gPorts[slot].capacity;
 
-	msgStore = ports[slot].msg_queue[t].data_cbuf;
-	code = ports[slot].msg_queue[t].msg_code;
+	msgStore = gPorts[slot].msg_queue[t].data_cbuf;
+	code = gPorts[slot].msg_queue[t].msg_code;
 
 	// mark queue entry unused
-	ports[slot].msg_queue[t].data_cbuf = NULL;
+	gPorts[slot].msg_queue[t].data_cbuf = NULL;
 
 	// check output buffer size
-	size = min(bufferSize, ports[slot].msg_queue[t].data_len);
+	size = min(bufferSize, gPorts[slot].msg_queue[t].data_len);
 
-	cached_semid = ports[slot].write_sem;
+	cached_semid = gPorts[slot].write_sem;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// copy message
@@ -770,26 +771,26 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 		return EINVAL;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("write_port_etc: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
-	if (ports[slot].closed) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].closed) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("write_port_etc: port %ld closed\n", id);
 		return B_BAD_PORT_ID;
 	}
 	
 	// store sem_id in local variable 
-	cached_semid = ports[slot].write_sem;
+	cached_semid = gPorts[slot].write_sem;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 	
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), 
@@ -836,24 +837,24 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 
 	// attach copied message to queue
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	h = ports[slot].head;
+	h = gPorts[slot].head;
 	if (h < 0)
-		panic("port %ld: head < 0", ports[slot].id);
-	if (h >= ports[slot].capacity)
-		panic("port %ld: head > cap %ld", ports[slot].id, ports[slot].capacity);
+		panic("port %ld: head < 0", gPorts[slot].id);
+	if (h >= gPorts[slot].capacity)
+		panic("port %ld: head > cap %ld", gPorts[slot].id, gPorts[slot].capacity);
 
-	ports[slot].msg_queue[h].msg_code	= msgCode;
-	ports[slot].msg_queue[h].data_cbuf	= msgStore;
-	ports[slot].msg_queue[h].data_len	= bufferSize;
-	ports[slot].head = (ports[slot].head + 1) % ports[slot].capacity;
-	ports[slot].total_count++;
+	gPorts[slot].msg_queue[h].msg_code	= msgCode;
+	gPorts[slot].msg_queue[h].data_cbuf	= msgStore;
+	gPorts[slot].msg_queue[h].data_len	= bufferSize;
+	gPorts[slot].head = (gPorts[slot].head + 1) % gPorts[slot].capacity;
+	gPorts[slot].total_count++;
 
 	// store sem_id in local variable 
-	cached_semid = ports[slot].read_sem;
+	cached_semid = gPorts[slot].read_sem;
 
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	// release sem, allowing read (might reschedule)
@@ -876,28 +877,28 @@ set_port_owner(port_id id, team_id team)
 	slot = id % MAX_PORTS;
 
 	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
+	GRAB_PORT_LOCK(gPorts[slot]);
 
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
+	if (gPorts[slot].id != id) {
+		RELEASE_PORT_LOCK(gPorts[slot]);
 		restore_interrupts(state);
 		dprintf("set_port_owner: invalid port_id %ld\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	// transfer ownership to other team
-	ports[slot].owner = team;
+	gPorts[slot].owner = team;
 
 	// unlock port
-	RELEASE_PORT_LOCK(ports[slot]);
+	RELEASE_PORT_LOCK(gPorts[slot]);
 	restore_interrupts(state);
 
 	return B_NO_ERROR;
 }
 
 
-/** this function cycles through the ports table, deleting all
- *	the ports that are owned by the passed team_id
+/** this function cycles through the gPorts table, deleting all
+ *	the gPorts that are owned by the passed team_id
  */
 
 int
@@ -914,8 +915,8 @@ delete_owned_ports(team_id owner)
 	GRAB_PORT_LIST_LOCK();
 
 	for (i = 0; i < MAX_PORTS; i++) {
-		if(ports[i].id != -1 && ports[i].owner == owner) {
-			port_id id = ports[i].id;
+		if(gPorts[i].id != -1 && gPorts[i].owner == owner) {
+			port_id id = gPorts[i].id;
 
 			RELEASE_PORT_LIST_LOCK();
 			restore_interrupts(state);
@@ -1039,7 +1040,7 @@ port_test_thread_func(void *arg)
 
 //	#pragma mark -
 /* 
- *	user level ports
+ *	user level gPorts
  */
 
 
