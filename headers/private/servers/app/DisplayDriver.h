@@ -129,7 +129,8 @@ public:
 	~FBBitmap(void) { }
 	void SetBytesPerRow(const int32 &bpr) { _bytesperrow=bpr; }
 	void SetSpace(const color_space &space) { _space=space; }
-//!!! WARNING !!! - for some reason ServerBitmap adds 1 to the width and height. We do that also.
+	
+	// WARNING: - for some reason ServerBitmap adds 1 to the width and height. We do that also.
 	void SetSize(const int32 &w, const int32 &h) { _width=w+1; _height=h+1; }
 	void SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
 	void SetBitsPerPixel(color_space space,int32 bytesperline) { _HandleSpace(space,bytesperline); }

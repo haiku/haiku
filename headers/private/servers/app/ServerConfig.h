@@ -54,6 +54,9 @@
 // by the various font functions.
 #define SERVER_FONT_LIST "/boot/home/config/settings/app_server/fontlist"
 
+// Flattened list of BMessages containing data for each workspace
+#define WORKSPACE_DATA_LIST "/boot/home/config/settings/app_server/workspace_settings"
+
 // folder used to keep saved color sets for the UI - tab color, etc.
 #define COLOR_SET_DIR "/boot/home/config/settings/color_sets/"
 
