@@ -257,8 +257,8 @@ mount_compare(void *_m, const void *_key)
 }
 
 
-static unsigned int
-mount_hash(void *_m, const void *_key, unsigned int range)
+static uint32
+mount_hash(void *_m, const void *_key, uint32 range)
 {
 	struct fs_mount *mount = _m;
 	const mount_id *id = _key;
@@ -429,22 +429,22 @@ get_file_system(const char *name)
 
 
 static int
-vnode_compare(void *_v, const void *_key)
+vnode_compare(void *_vnode, const void *_key)
 {
-	struct vnode *v = _v;
+	struct vnode *vnode = _vnode;
 	const struct vnode_hash_key *key = _key;
 
-	if (v->mount_id == key->mount_id && v->id == key->vnode_id)
+	if (vnode->mount_id == key->mount_id && vnode->id == key->vnode_id)
 		return 0;
 
 	return -1;
 }
 
 
-static unsigned int
-vnode_hash(void *_v, const void *_key, unsigned int range)
+static uint32
+vnode_hash(void *_vnode, const void *_key, uint32 range)
 {
-	struct vnode *vnode = _v;
+	struct vnode *vnode = _vnode;
 	const struct vnode_hash_key *key = _key;
 
 #define VHASH(mountid, vnodeid) (((uint32)((vnodeid) >> 32) + (uint32)(vnodeid)) ^ (uint32)(mountid))

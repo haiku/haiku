@@ -91,8 +91,8 @@ struct bootfs_cookie {
 #define BOOTFS_HASH_SIZE 16
 
 
-static unsigned int
-bootfs_vnode_hash_func(void *_v, const void *_key, unsigned int range)
+static uint32
+bootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 {
 	struct bootfs_vnode *v = _v;
 	const vnode_id *key = _key;
@@ -840,9 +840,9 @@ bootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 
 	dirent->d_dev = fs->id;
 	dirent->d_ino = cookie->u.dir.ptr->id;
-	dirent->d_reclen = strlen(cookie->u.dir.ptr->name);
+	dirent->d_reclen = strlen(cookie->u.dir.ptr->name) + sizeof(struct dirent);
 
-	if (sizeof(struct dirent) + dirent->d_reclen + 1 > bufferSize) {
+	if (dirent->d_reclen > bufferSize) {
 		status = ENOBUFS;
 		goto err;
 	}

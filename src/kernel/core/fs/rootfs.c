@@ -59,7 +59,7 @@ struct rootfs {
 	mount_id id;
 	mutex lock;
 	vnode_id next_vnode_id;
-	void *vnode_list_hash;
+	hash_table *vnode_list_hash;
 	struct rootfs_vnode *root_vnode;
 };
 
@@ -74,8 +74,8 @@ struct rootfs_cookie {
 #define ROOTFS_HASH_SIZE 16
 
 
-static unsigned int
-rootfs_vnode_hash_func(void *_v, const void *_key, unsigned int range)
+static uint32
+rootfs_vnode_hash_func(void *_v, const void *_key, uint32 range)
 {
 	struct rootfs_vnode *vnode = _v;
 	const vnode_id *key = _key;
@@ -668,10 +668,10 @@ rootfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent
 
 	dirent->d_dev = fs->id;
 	dirent->d_ino = cookie->ptr->id;
-	dirent->d_reclen = strlen(cookie->ptr->name);
+	dirent->d_reclen = strlen(cookie->ptr->name) + sizeof(struct dirent);
 
-	if (sizeof(struct dirent) + dirent->d_reclen + 1 > bufferSize) {
-		status = ERR_VFS_INSUFFICIENT_BUF;
+	if (dirent->d_reclen > bufferSize) {
+		status = ENOBUFS;
 		goto err;
 	}
 
