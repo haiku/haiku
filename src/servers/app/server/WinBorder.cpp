@@ -46,7 +46,7 @@
 // TODO: Document this file completely
 
 // Toggle general function call output
-//#define DEBUG_WINBORDER
+#define DEBUG_WINBORDER
 
 // toggle
 //#define DEBUG_WINBORDER_MOUSE
@@ -344,9 +344,6 @@ void WinBorder::Draw(const BRect &r)
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
 	{
-		fUpdateReg = fVisible;
-		// restrict Decorator drawing to the update region only.
-		fDriver->ConstrainClippingRegion(&fUpdateReg);
 /*
 		fUpdateReg.PrintToStream();
 		RGBColor		c(128, 56, 98);
@@ -355,9 +352,22 @@ void WinBorder::Draw(const BRect &r)
 		snooze(1000000);
 */		
 		fDecorator->Draw(fUpdateReg.Frame());
-		// remove the additional clipping region.
-		fDriver->ConstrainClippingRegion(NULL);
 	}
+	// clear background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
+	// TODO: DO That!
+	// TODO: UNcomment!!!
+// TODO !!! UPDATE  code !!!
+	/*
+	BMessage msg;
+	msg.what = _UPDATE_;
+	msg.AddInt32("_token", fViewToken);
+	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
+
+	// for test purposes only!
+	msg.AddRect("_rect2", reg.Frame());
+
+	fServerWin->SendMessageToClient( &msg );
+*/
 }
 
 void WinBorder::MoveBy(float x, float y)

@@ -277,7 +277,7 @@ void ServerWindow::Show(void)
 	if(!fWinBorder->IsHidden())
 		return;
 
-	STRACE(("ServerWindow %s: Show\n",fTitle.String()));
+	STRACE(("ServerWindow (%s): Show()\n",fTitle.String()));
 	if(fWinBorder)
 	{
 		RootLayer *rl = fWinBorder->GetRootLayer();
@@ -289,9 +289,9 @@ void ServerWindow::Show(void)
 		rl->fMainLock.Lock();
 		STRACE(("ServerWindow(%s)::Show() - Main lock acquired\n", fWinBorder->GetName()));
 
-		// manually set fWinBorder->fHidden to false because Layer's version also calls FullInvalidate.
-		fWinBorder->fHidden=false;
-		
+		// TODO: 'false' couldn't this be made otherwise???
+		fWinBorder->Show(false);
+
 		if ( (fFeel == B_FLOATING_SUBSET_WINDOW_FEEL || fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
 			 && fWinBorder->MainWinBorder() == NULL)
 		{
@@ -318,6 +318,10 @@ void ServerWindow::Show(void)
 		
 		desktop->fGeneralLock.Unlock();
 		STRACE(("ServerWindow(%s)::Show() - General lock released\n", fWinBorder->GetName()));
+	}
+	else
+	{
+		debugger("WARNING: NULL fWinBorder\n");
 	}
 }
 
@@ -1511,13 +1515,13 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_SHOW_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_SHOW\n",fTitle.String()));
+			STRACE(("ServerWindow %s: Message AS_SHOW_WINDOW\n",fTitle.String()));
 			Show();
 			break;
 		}
 		case AS_HIDE_WINDOW:
 		{
-			STRACE(("ServerWindow %s: Message AS_HIDE\n",fTitle.String()));		
+			STRACE(("ServerWindow %s: Message AS_HIDE_WINDOW\n",fTitle.String()));		
 			Hide();
 			break;
 		}

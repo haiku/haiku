@@ -135,8 +135,10 @@ void Layer::AddChild(Layer *layer, ServerWindow *serverWin)
 	// if no RootLayer, there is no need to set any parameters.
 	// they will be set when the root Layer for this tree will be added
 	// to the main tree structure.
-	if (fRootLayer == NULL)
+	if (fRootLayer == NULL){
+		STRACE(("Layer(%s)::AddChild(%s) END\n", GetName(), layer->GetName()));
 		return;
+	}
 
 	// 2) set some fields for this new layer and its children.
 	Layer		*c = layer; //c = short for: current
@@ -415,7 +417,7 @@ void Layer::Redraw(const BRegion& reg, Layer *startFrom)
 	if (pReg->CountRects() > 0)
 		RequestDraw(reg, startFrom);
 	
-	STRACE(("Layer::Redraw ENDED\n"));
+	STRACE(("Layer(%s)::Redraw() ENDED\n", GetName()));
 }
 
 void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
@@ -433,31 +435,12 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		fUpdateReg.IntersectWith(&reg);
 		
 		if (fUpdateReg.CountRects() > 0){
-			if (fServerWin){
-				// clear background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
-				// TODO: DO That!
-				// TODO: UNcomment!!!
-// TODO !!! UPDATE  code !!!
-				/*
-				BMessage msg;
-				msg.what = _UPDATE_;
-				msg.AddInt32("_token", fViewToken);
-				msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
+			fDriver->ConstrainClippingRegion(&fUpdateReg);
+			Draw(fUpdateReg.Frame());
+			fDriver->ConstrainClippingRegion(NULL);
 
-				// for test purposes only!
-				msg.AddRect("_rect2", reg.Frame());
-
-				fServerWin->SendMessageToClient( &msg );
-				*/
-			}
-			else{
-				// NOTE: do not clear background for internal server layers!
-				fDriver->ConstrainClippingRegion(&fUpdateReg);
-				Draw(fUpdateReg.Frame());
-				fDriver->ConstrainClippingRegion(NULL);
-
-				fUpdateReg.MakeEmpty();
-			}
+// TODO: (WARNING!): For the Update code is MUST not be emptied!!!
+			fUpdateReg.MakeEmpty();
 		}
 	}
 
