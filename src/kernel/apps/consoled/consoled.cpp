@@ -1,6 +1,6 @@
 /*
- * Copyright 2004, The Haiku Team. All rights reserved.
- * Distributed under the terms of the Haiku License.
+ * Copyright 2004-2005, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
@@ -9,7 +9,9 @@
 
 #include <OS.h>
 #include <image.h>
-#include <syscalls.h>
+#include <Message.h>
+#include <AppDefs.h>
+#include <TypeConstants.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -18,6 +20,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//#define USE_INPUT_SERVER
+	// define this if consoled should use the input_server to
+	// get to its keyboard input
 
 struct console {
 	int console_fd;
@@ -30,13 +35,74 @@ struct console {
 	sem_id wait_sem;
 };
 
-struct console theconsole;
+
+struct console gConsole;
 
 
 static int32
 keyboard_reader(void *arg)
 {
 	struct console *con = (struct console *)arg;
+
+#ifdef USE_INPUT_SERVER
+	area_id appArea;
+	void *cursorAddr;
+	sem_id cursorSem = 0;	// not initialized?
+	thread_id isThread;
+	port_id isAsPort;
+	port_id isPort;
+
+	appArea = create_area("isCursor", &cursorAddr, B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA);
+
+	int32 arg_c = 1;
+	char **arg_v = (char **)malloc(sizeof(char *) * (arg_c + 1));
+	arg_v[0] = strdup("/system/servers/input_server");
+	arg_v[1] = NULL;
+	isThread = load_image(arg_c, (const char**)arg_v, (const char **)environ);
+	
+	free(arg_v[0]);
+
+	int32 tmpbuf[2] = {cursorSem, appArea};
+	int32 code = 0;
+	send_data(isThread, code, (void *)tmpbuf, sizeof(tmpbuf));
+
+	resume_thread(isThread);
+	setpgid(isThread, 0);
+
+	thread_id sender;
+	code = receive_data(&sender, (void *)tmpbuf, sizeof(tmpbuf)); 
+	isAsPort = tmpbuf[0];
+	isPort = tmpbuf[1];
+	
+	ssize_t	length;
+	status_t err;
+	const char *string;
+
+	for (;;) {
+		length = port_buffer_size(isAsPort);
+		char buffer[length];
+		err = read_port(isAsPort, &code, buffer, length);
+		if(err != length) {
+			if (err > 0)
+				fprintf(stderr, "consoled: failed to read full packet (read %lu of %lu)\n", err, length);
+			else
+				fprintf(stderr, "consoled: read_port error: (0x%lx) %s\n", err, strerror(err));
+			continue;
+		}
+
+		BMessage event;
+		if ((err = event.Unflatten(buffer)) < 0) {
+			fprintf(stderr, "consoled: Unflatten() error: (0x%lx) %s\n", err, strerror(err));
+			continue;
+		}
+
+		if (event.what != B_KEY_DOWN) 
+			continue;
+		event.FindData("bytes", B_STRING_TYPE, (const void**)&string, &length);
+
+		write(con->tty_master_fd, string, length);
+	}
+#else	// USE_INPUT_SERVER
 	char buffer[1024];
 
 	for (;;) {
@@ -46,6 +112,7 @@ keyboard_reader(void *arg)
 
 		write(con->tty_master_fd, buffer, length);
 	}
+#endif	// USE_INPUT_SERVER
 
 	release_sem(con->wait_sem);
 	return 0;
@@ -88,9 +155,11 @@ start_console(struct console *con)
 	if (con->console_fd < 0)
 		return -2;
 
+#ifndef USE_INPUT_SERVER
 	con->keyboard_fd = open("/dev/keyboard", 0);
 	if (con->keyboard_fd < 0)
 		return -3;
+#endif
 
 	dir = opendir("/dev/pt");
 	if (dir != NULL) {
@@ -182,7 +251,7 @@ main(void)
 {
 	int err;
 
-	err = start_console(&theconsole);
+	err = start_console(&gConsole);
 	if (err < 0) {
 		printf("consoled: error %d starting console\n", err);
 		return err;
@@ -192,25 +261,25 @@ main(void)
 	setsid();
 
 	// move our stdin and stdout to the console
-	dup2(theconsole.tty_slave_fd, 0);
-	dup2(theconsole.tty_slave_fd, 1);
-	dup2(theconsole.tty_slave_fd, 2);
+	dup2(gConsole.tty_slave_fd, 0);
+	dup2(gConsole.tty_slave_fd, 1);
+	dup2(gConsole.tty_slave_fd, 2);
 
 	for (;;) {
 		pid_t shell_process;
-		status_t retcode;
+		status_t returnCode;
 		const char *argv[3];
 
 		argv[0] = "/bin/sh";
 		argv[1] = "--login";
-		shell_process = start_process(2, argv, &theconsole);
+		shell_process = start_process(2, argv, &gConsole);
 
-		wait_for_thread(shell_process, &retcode);
+		wait_for_thread(shell_process, &returnCode);
 
 		puts("Restart shell");
 	}
 
-	acquire_sem(theconsole.wait_sem);
+	acquire_sem(gConsole.wait_sem);
 
 	return 0;
 }
