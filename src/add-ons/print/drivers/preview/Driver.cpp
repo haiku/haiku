@@ -1,6 +1,6 @@
 /*
 
-PDF Writer printer driver.
+Preview printer driver.
 
 Copyright (c) 2001 OpenBeOS. 
 
