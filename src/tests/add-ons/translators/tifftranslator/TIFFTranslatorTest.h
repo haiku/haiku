@@ -6,6 +6,9 @@
 #include <TestCase.h>
 #include <TestShell.h>
 
+#define BBT_MIME_STRING  "image/x-be-bitmap"
+#define TIFF_MIME_STRING "image/tiff"
+
 class CppUnit::Test;
 
 class TIFFTranslatorTest : public BTestCase {
