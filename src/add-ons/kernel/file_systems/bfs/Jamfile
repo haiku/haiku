@@ -1,10 +1,9 @@
 SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
 
-{
-	local debug = -g ;
+if $(DEBUG) {
 	local defines = [ FDefines DEBUG ] ;
-	SubDirCcFlags $(defines) $(debug) ;
-	SubDirC++Flags $(defines) $(debug) ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
 }
 
 R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
@@ -22,3 +21,14 @@ R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
 	BufferPool.cpp
 ;
 
+rule InstallBFS
+{
+	Depends install : $(1) ;
+}
+
+actions ignore InstallBFS
+{
+	cp $(1) /boot/home/config/add-ons/kernel/file_systems/
+}
+
+InstallBFS obfs ;
