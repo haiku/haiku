@@ -328,22 +328,20 @@ status_t nv_acc_init_dma()
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located at end of cardRAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
+
+		/* NVM DMA is broken on TNT1, so we use PCI-transfers back to the gfxRAM here */
+		if (si->ps.card_type == NV04)
+		{
+			/* DMA target node is PCI */
+			ACCW(PR_CTX0_C, 0x00023002);
+			/* point at the DMA buffer via main system memory */
+			ACCW(PR_CTX2_C, (ACCR(PR_CTX2_C) +
+				(((uint32)((uint8 *)(si->framebuffer_pci))) & 0xfffff000)));
+		}
 	}
 
 	if (si->ps.card_arch == NV04A)
 	{
-/*
-if(TNT1)
-{
-//cmd buffer DMA update: look at the DMA cmd buffer on cardRAM via main mem...
-  PR_CTX0_C |= 0x00020000; //select NV_DMA_TARGET_NODE_PCI
-  PR_CTX2_C += pNv->FbAddress; //set main mem adress ptr to the buf (workaround!)
-
-//info: pNv->FbAddress = pNv->PciInfo->memBase[1] & 0xff800000;
-//membase[1] is the virtual (high) adress where the buffer is really mapped probably..
-}
-*/
-
 		/* do a explicit engine reset */
 		ACCW(DEBUG0, 0x000001ff);
 
