@@ -1,11 +1,11 @@
 /* 
 **
-** A simple screensaver, displays the text "OpenBeOS" at random locations.
+** A simple screensaver, displays the text "Haiku" at random locations.
 **
-** Version: 2.0
+** Version: 3.0
 **
-** Copyright (c) 2002 Marcus Overhagen. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
+** Copyright (c) 2002, 2005 Marcus Overhagen. All Rights Reserved.
+** This file may be used under the terms of the MIT License.
 */
 
 #include <ScreenSaver.h>
@@ -40,7 +40,7 @@ BScreenSaver *instantiate_screen_saver(BMessage *msg, image_id image)
 
 ScreenSaver::ScreenSaver(BMessage *archive, image_id id) :
 	BScreenSaver(archive, id),
-	fText("OpenBeOS"),
+	fText("Haiku"),
 	fX(0),
 	fY(0)
 {
@@ -49,7 +49,7 @@ ScreenSaver::ScreenSaver(BMessage *archive, image_id id) :
 void 
 ScreenSaver::StartConfig(BView *view) 
 { 
-	view->AddChild(new BStringView(BRect(20,10,200,35), "", "OpenBeOS, by Marcus Overhagen"));
+	view->AddChild(new BStringView(BRect(20,10,200,35), "", "Haiku, by Marcus Overhagen"));
 } 
 
 status_t 
