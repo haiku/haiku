@@ -14,7 +14,7 @@ CommonUnitTest BLockerTester
 	  LockerTestCase.cpp
 	  SemaphoreLockCountTest1.cpp
 	: kits support
-	: libopenbeos.so be stdc++.r4
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4
 	: support
 ;

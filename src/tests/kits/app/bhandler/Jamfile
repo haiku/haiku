@@ -15,7 +15,7 @@ CommonUnitTest BHandlerTester
 	  LockLooperWithTimeoutTest.cpp
 	  UnlockLooperTest.cpp
 	: kits app
-	: libopenbeos.so be stdc++.r4
+	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
 	: be stdc++.r4
 	: app support
 ;

@@ -13,6 +13,6 @@ UnitTest BMessageQueueTester :
 	: kits/app ;
 
 LinkSharedOSLibs BMessageQueueTester :
-	libopenbeos.so
+	<boot!home!config!lib>libopenbeos.so
 	be
 	stdc++.r4 ;
