@@ -49,6 +49,14 @@ if $(DEBUG)
 
 if $(OS) = NT 			{ CCFLAGS += /DNT ; }
 
+### LOCAL CHANGE
+# 
+# Include header caching.
+#
+DEFINES += OPT_HEADER_CACHE_EXT ;
+#
+### LOCAL CHANGE
+
 # Do we know yacc?
 
 if $(YACC) 	{ code += jamgram.y ; }
@@ -64,6 +72,15 @@ if $(YACC) && $(SUFEXE) = ""
 {
 	GenFile jamgram.y jamgramtab.h : yyacc jamgram.yy ;
 }
+
+### LOCAL CHANGE
+# 
+# These files contain locally developed improvements.
+#
+# code primarily not written locally, but grabbed from the net
+code += hcache.c ;
+#
+### LOCAL CHANGE
 
 #
 # How to build the compiled in jambase.
@@ -112,6 +129,12 @@ ALLSOURCE =
 	pathunix.c pathvms.c regexp.c regexp.h rules.c rules.h scan.c
 	scan.h search.c search.h timestamp.c timestamp.h variable.c
 	variable.h yyacc ;
+
+### LOCAL CHANGE
+#
+ALLSOURCE += LOCAL_DIFFERENCES.txt ;
+#
+### LOCAL CHANGE
 
 rule Ball
 {

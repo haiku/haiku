@@ -110,6 +110,10 @@ make(
 	COUNTS counts[1];
 	int status = 0;		/* 1 if anything fails */
 
+#ifdef OPT_HEADER_CACHE_EXT
+	hcache_init();
+#endif
+
 	memset( (char *)counts, 0, sizeof( *counts ) );
 
 	for( i = 0; i < n_targets; i++ )
@@ -132,6 +136,10 @@ make(
 	    if( counts->cantmake )
 		printf( "...can't make %d target(s)...\n", counts->cantmake );
 	}
+
+#ifdef OPT_HEADER_CACHE_EXT
+	hcache_done();
+#endif
 
 	status = counts->cantfind || counts->cantmake;
 

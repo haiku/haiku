@@ -14,6 +14,10 @@
 # include "headers.h"
 # include "newstr.h"
 
+#ifdef OPT_HEADER_CACHE_EXT
+# include "hcache.h"
+#endif
+
 /*
  * headers.c - handle #includes in source files
  *
@@ -35,7 +39,9 @@
  *		just to invoke a rule.
  */
 
+#ifndef OPT_HEADER_CACHE_EXT
 static LIST *headers1( LIST *l, char *file, int rec, regexp *re[] );
+#endif
 
 /*
  * headers() - scan a target for include files and call HDRRULE
@@ -73,7 +79,11 @@ headers( TARGET *t )
 
 	lol_init( &lol );
 	lol_add( &lol, list_new( L0, t->name ) );
+#ifdef OPT_HEADER_CACHE_EXT
+	lol_add( &lol, hcache( t, rec, re, var_get("HDRSCAN") ) );
+#else
 	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
+#endif
 
 	if( lol_get( &lol, 1 ) )
 	    list_free( evaluate_rule( hdrrule->string, &lol, L0 ) );
@@ -90,7 +100,11 @@ headers( TARGET *t )
  * headers1() - using regexp, scan a file and build include LIST
  */
 
+#ifdef OPT_HEADER_CACHE_EXT
+LIST *
+#else
 static LIST *
+#endif
 headers1( 
 	LIST	*l,
 	char	*file,

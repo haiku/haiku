@@ -1218,6 +1218,13 @@ rule SubDir
 	LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	SOURCE_GRIST = [ FGrist $(<[2-]) ] ;
+	## LOCAL CHANGE -- OPT_HEADER_CACHE_EXT.  With the header
+	# cache, we can grist all files found during a header scan
+	# without incurring a performance penalty.
+	#
+	HDRGRIST = $(SOURCE_GRIST) ;
+	#
+	## LOCAL CHANGE
 
 	# Reset per-directory ccflags, hdrs
 
@@ -1311,31 +1318,40 @@ rule FGristFiles
 
 rule FGristSourceFiles
 {
-	# Produce source file name name with grist in it, 
-	# if SOURCE_GRIST is set.
-
-	# Leave header files alone, because they have a global
-	# visibility.
-
-	if ! $(SOURCE_GRIST)
-	{
-	    return $(<) ;
-	}
-	else 
-	{
-	    local _i _o ;
-
-	    for _i in $(<)
-	    {
-		switch $(_i)
-		{
-		case *.h :	_o += $(_i) ;
-		case * : 	_o += $(_i:G=$(SOURCE_GRIST)) ;
-		}
-	    }
-
-	    return $(_o) ;
-	}
+	## LOCAL CHANGE: OPT_HEADER_CACHE_EXT
+	# With header caching, there is no performance penalty to gristing
+	# header files.	 It is also not correct to assume that header
+	# files have global visibility.
+	#
+	# Here we comment out the old version and replace it with the new.
+#	# Produce source file name name with grist in it, 
+#	# if SOURCE_GRIST is set.
+#
+#	# Leave header files alone, because they have a global
+#	# visibility.
+#
+#	if ! $(SOURCE_GRIST)
+#	{
+#	    return $(<) ;
+#	}
+#	else 
+#	{
+#	    local _i _o ;
+#
+#	    for _i in $(<)
+#	    {
+#		switch $(_i)
+#		{
+#		case *.h :	_o += $(_i) ;
+#		case * : 	_o += $(_i:G=$(SOURCE_GRIST)) ;
+#		}
+#	    }
+#
+#	    return $(_o) ;
+#	}
+	return [ FGristFiles $(<) ] ;
+	#
+	## LOCAL CHANGE: end
 }
 
 rule FIsPrefix
