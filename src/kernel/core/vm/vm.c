@@ -1625,12 +1625,12 @@ create_preloaded_image_areas(struct preloaded_image *image)
 	memcpy(name, fileName, length);
 	strcpy(name + length, "_text");
 	address = (void *)ROUNDOWN(image->text_region.start, PAGE_SIZE);
-	image->text = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
+	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
 		PAGE_ALIGN(image->text_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
 	strcpy(name + length, "_data");
 	address = (void *)ROUNDOWN(image->data_region.start, PAGE_SIZE);
-	image->data = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
+	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
 		PAGE_ALIGN(image->data_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 }
 
