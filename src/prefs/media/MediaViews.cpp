@@ -52,9 +52,9 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BRect rect(frame);
-	rect.left += 11;
+	rect.left += 10;
 	rect.top += 12;
-	rect.right -=20;
+	rect.right -=21;
 	rect.bottom = rect.top + 104;
 	BBox *defaultsBox = new BBox(rect, "defaults");
 	defaultsBox->SetLabel(mIsVideo ? "Default Nodes" : "Defaults");

@@ -40,7 +40,7 @@ const uint32 ML_INIT_MEDIA = 'MlIM';
 
 // MediaWindow - Constructor
 MediaWindow::MediaWindow(BRect frame) 
-: BWindow (frame, "Media", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0),
+: BWindow (frame, "Media", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , B_ASYNCHRONOUS_CONTROLS),
 	mCurrentNode(NULL),
 	mParamWeb(NULL),
 	mAlert(NULL)
@@ -166,8 +166,8 @@ void MediaWindow::InitWindow(void)
 	// Create the OutlineView
 	BRect menuRect(bounds.left+14,bounds.top+14,bounds.left+146,bounds.bottom-14);
 	BRect titleRect(menuRect.right+14,menuRect.top,bounds.right-10,menuRect.top+16);
-	BRect availableRect(menuRect.right+14,titleRect.bottom+12,bounds.right-10,bounds.bottom-14);
-	BRect barRect(titleRect.left,titleRect.bottom+10,titleRect.right,titleRect.bottom+11);
+	BRect availableRect(menuRect.right+15,titleRect.bottom+12,bounds.right-14,bounds.bottom-14);
+	BRect barRect(titleRect.left,titleRect.bottom+10,titleRect.right-2,titleRect.bottom+11);
 
 	mListView = new BListView(menuRect,"audio_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	mListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));

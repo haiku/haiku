@@ -124,7 +124,7 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	font_height	finfo;
 	font.GetHeight(&finfo);
 	owner->SetFont(&font);
-	owner->MovePenTo(frame.left+10, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
+	owner->MovePenTo(frame.left+8, frame.top + ((frame.Height() - (finfo.ascent + finfo.descent + finfo.leading)) / 2) +
 					(finfo.ascent + finfo.descent) - 1);
 	owner->DrawString(mLabel);
 }
