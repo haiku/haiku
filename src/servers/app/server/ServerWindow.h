@@ -64,80 +64,87 @@ class Layer;
 class ServerWindow
 {
 public:
-	ServerWindow(BRect rect, const char *string, uint32 wlook, uint32 wfeel,
-				 uint32 wflags, ServerApp *winapp,  port_id winport,
-				 port_id looperPort, uint32 index, int32 handlerID);
-	~ServerWindow(void);
+								ServerWindow(BRect rect, const char *string,
+									uint32 wlook, uint32 wfeel, uint32 wflags,
+									ServerApp *winapp,  port_id winport,
+									port_id looperPort, uint32 index,
+									int32 handlerID);
+								~ServerWindow(void);
 	
-	void ReplaceDecorator(void);
-	void Quit(void);
-	const char *GetTitle(void);
-	ServerApp *GetApp(void);
-	void Show(void);
-	void Hide(void);
-	bool IsHidden(void);
-	void SetFocus(bool value);
-	bool HasFocus(void);
-	void RequestDraw(BRect rect);
-	void RequestDraw(void);
+			void				ReplaceDecorator(void);
+			void				Quit(void);
+			const char*			GetTitle(void);
+			ServerApp*			GetApp(void);
+			void				Show(void);
+			void				Hide(void);
+			bool				IsHidden(void);
+			void				Minimize(bool status);
+			void				Zoom(void);
+			void				SetFocus(bool value);
+			bool				HasFocus(void);
+			void				RequestDraw(BRect rect);
+			void				RequestDraw(void);
 	
-	void WorkspaceActivated(int32 workspace, bool active);
-	void WorkspacesChanged(int32 oldone,int32 newone);
-	void WindowActivated(bool active);
-	void ScreenModeChanged(const BRect frame, const color_space cspace);
+			void				WorkspaceActivated(int32 workspace, bool active);
+			void				WorkspacesChanged(int32 oldone,int32 newone);
+			void				WindowActivated(bool active);
+			void				ScreenModeChanged(const BRect frame, const color_space cspace);
 	
-	void SetFrame(const BRect &rect);
-	BRect Frame(void);
+			void				SetFrame(const BRect &rect);
+			BRect				Frame(void);
 	
-	status_t Lock(void);
-	void Unlock(void);
-	bool IsLocked(void);
+			status_t			Lock(void);
+			void				Unlock(void);
+			bool				IsLocked(void);
 	
-	void DispatchMessage( int32 code );
-	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
-	static int32 MonitorWin(void *data);
-	static void HandleMouseEvent(PortMessage *msg);
-	static void HandleKeyEvent(int32 code, int8 *buffer);
+			void				DispatchMessage( int32 code );
+			void				DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
+	static	int32				MonitorWin(void *data);
+	static	void				HandleMouseEvent(PortMessage *msg);
+	static	void				HandleKeyEvent(int32 code, int8 *buffer);
 	
 	//! Returns the index of the workspaces to which it belongs
-	int32 GetWorkspaceIndex(void) { return _workspace_index; }
-	Workspace *GetWorkspace(void);
-	void SetWorkspace(Workspace *wkspc);
+			int32				GetWorkspaceIndex(void) { return _workspace_index; }
+			Workspace*			GetWorkspace(void);
+			void				SetWorkspace(Workspace *wkspc);
 
 	//! Returns the window's title
-	const char *Title(void) { return _title->String(); }
+			const char*			Title(void) { return _title->String(); }
 	
-	Layer* FindLayer(const Layer* start, int32 token) const;
-	void SendMessageToClient( const BMessage* msg ) const;
+			Layer*				FindLayer(const Layer* start, int32 token) const;
+			void				SendMessageToClient( const BMessage* msg ) const;
+
 protected:	
 	friend class ServerApp;
 	friend class WinBorder;
 	friend class Screen;
 	friend class Layer;
 	
-	BString *_title;
-	int32 _look, _feel, _flags;
-	uint32 _workspace_index;
-	Workspace *_workspace;
-	bool _active;
+			BString				*_title;
+			int32				_look,
+								_feel,
+								_flags;
+			uint32				_workspace_index;
+			Workspace			*_workspace;
+			bool				_active;
 	
-	ServerApp *_app;
-	WinBorder *_winborder;
+			ServerApp			*_app;
+			WinBorder			*_winborder;
 	
-	thread_id _monitorthread;
-	port_id _receiver;	// Messages from window
-	port_id _sender; // Messages to window
-	PortLink *_winlink,*_applink;
-	BLocker _locker;
-	BRect _frame;
-	uint32 _token;
-	int32 _handlertoken;
+			thread_id			_monitorthread;
+			port_id				_receiver;	// Messages from window
+			port_id				_sender; // Messages to window
+			PortLink			*_winlink,
+								*_applink;
+			BLocker				_locker;
+			BRect				_frame;
+			uint32				_token;
+			int32				_handlertoken;
 	
-// ADI:
-	BSession*	ses;
-	port_id		winLooperPort;
-	Layer*		top_layer;
-	Layer*		cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
+			BSession			*ses;
+			port_id				winLooperPort;
+			Layer				*top_layer;
+			Layer				*cl; // short for currentLayer. We'll use it a lot, that's why it's short :-)
 };
 
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);

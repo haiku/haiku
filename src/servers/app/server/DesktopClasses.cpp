@@ -477,10 +477,11 @@ void Screen::SetActiveWindow(ServerWindow *win)
 		Workspace *wksp=win->GetWorkspace();
 		if(wksp->GetScreen()!=this)
 			return;
-		set_active_winborder(win->_winborder);
+//		set_active_winborder(win->_winborder);
 	}
-	else
-		set_active_winborder(NULL);
+	else{
+//		set_active_winborder(NULL);
+	}
 	_activewin=win;
 }
 

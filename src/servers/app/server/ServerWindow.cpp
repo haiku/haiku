@@ -279,8 +279,7 @@ STRACE(("ServerWindow %s: Show\n",_title->String()));
 	if(_winborder)
 	{
 		_winborder->Show();
-		_winborder->SetFocus(true);
-//		_winborder->UpdateRegions(true);
+//		_winborder->SetFocus(true);
 	}
 }
 
@@ -301,6 +300,38 @@ bool ServerWindow::IsHidden(void)
 	if(_winborder)
 		return _winborder->IsHidden();
 	return true;
+}
+
+void ServerWindow::Minimize(bool status){
+	bool		sendMessages = false;
+
+	if (status){
+		if ( !IsHidden() ){
+			Hide();
+			sendMessages	= true;
+		}
+	}
+	else{
+		if ( IsHidden() ){
+			Show();
+			sendMessages	= true;
+		}
+	}
+	
+	if ( sendMessages ){
+		BMessage		msg;
+		msg.what		= B_MINIMIZE;
+		msg.AddInt64("when", real_time_clock_usecs());
+		msg.AddBool("minimize", status );
+
+		SendMessageToClient( &msg );
+		
+// TODO: notify tracker! how???
+	}
+}
+
+void ServerWindow::Zoom(){
+// TODO: implement;
 }
 
 /*!
@@ -2029,10 +2060,10 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read(&y);
 			BPoint pt(x,y);
 			
-			set_is_sliding_tab(false);
+/*			set_is_sliding_tab(false);
 			set_is_moving_window(false);
 			set_is_resizing_window(false);
-			_winborder	= WindowContainsPoint(pt);
+*/			_winborder	= WindowContainsPoint(pt);
 			active_winborder=NULL;
 			if(_winborder)
 			{
@@ -2061,7 +2092,7 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			msg->Read(&dummy);
 			msg->Read(&x);
 			msg->Read(&y);
-			BPoint pt(x,y);
+/*			BPoint pt(x,y);
 
 			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
@@ -2076,7 +2107,7 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 					_winborder->MouseMoved((int8*)msg->Buffer());
 				}
 			}				
-			break;
+*/			break;
 		}
 		default:
 		{
