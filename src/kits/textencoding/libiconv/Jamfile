@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src kits textencoding libiconv ;
 
 SubDirCcFlags
-	-DLIBICONV_PLUG
 	-DLIBDIR="\\\"/boot/home/config/lib\\\""
 	-DENABLE_RELOCATABLE=1
 	-DIN_LIBRARY
