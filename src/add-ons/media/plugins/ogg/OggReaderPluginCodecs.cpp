@@ -132,6 +132,13 @@ GetVorbisCodecStreamInfo(std::vector<ogg_packet> * packets,
 	} else if (info.bitrate_lower > 0) {
 		format->u.encoded_audio.bit_rate = info.bitrate_lower;
 	}
+	if (info.channels == 1) {
+		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
+		*frameCount *= 2;
+		*duration *= 2;
+	} else {
+		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+	}
 	format->u.encoded_audio.frame_size = sizeof(ogg_packet);
 	format->u.encoded_audio.output.frame_rate = (float)info.rate;
 	format->u.encoded_audio.output.channel_count = info.channels;
@@ -207,6 +214,8 @@ GetSpeexCodecStreamInfo(std::vector<ogg_packet> * packets,
 	}
 	if (header->nb_channels == 1) {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
+		*frameCount *= 2;
+		*duration *= 2;
 	} else {
 		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 	}
@@ -215,8 +224,12 @@ GetSpeexCodecStreamInfo(std::vector<ogg_packet> * packets,
 	format->u.encoded_audio.output.channel_count = header->nb_channels;
 	format->u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	format->u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
-	format->u.encoded_audio.output.buffer_size
-	   = AudioBufferSize(&format->u.encoded_audio.output);
+	// allocate buffer, round up to nearest speex output_length size
+	int buffer_size = AudioBufferSize(&format->u.encoded_audio.output);
+	int output_length = header->frame_size * header->nb_channels *
+	                    (format->u.encoded_audio.output.format & 0xf);
+	buffer_size = ((buffer_size - 1) / output_length + 1) * output_length;
+	format->u.encoded_audio.output.buffer_size = buffer_size;
 	return B_OK;
 }
 
