@@ -20,7 +20,7 @@ char *newstrdup(const char *str)
 		return NULL;
 	int len = strlen(str) + 1;
 	char *p = new char[len];
-	memcpy(p,str,len);
+	memcpy(p, str, len);
 	return p;
 }
 

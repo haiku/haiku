@@ -52,7 +52,7 @@ DormantNodeManager::~DormantNodeManager()
 	// force unloading all currently loaded images
 	loaded_addon_info *info;
 	for (fAddonmap->Rewind(); fAddonmap->GetNext(&info); ) {
-		FATAL("Forcing unload of add-on id %ld with usecount %ld\n",info->addon->AddonID(), info->usecount);
+		FATAL("Forcing unload of add-on id %ld with usecount %ld\n", info->addon->AddonID(), info->usecount);
 		UnloadAddon(info->addon, info->image);
 	}
 	
@@ -65,7 +65,7 @@ DormantNodeManager::TryGetAddon(media_addon_id id)
 {
 	loaded_addon_info *info;
 	BMediaAddOn *addon;
-	
+
 	fLock->Lock();
 	if (fAddonmap->Get(id, &info)) {
 		info->usecount += 1;

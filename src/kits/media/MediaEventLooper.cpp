@@ -36,8 +36,8 @@ BMediaEventLooper::BMediaEventLooper(uint32 apiVersion) :
 	fApiVersion(apiVersion)
 {
 	CALLED();
-	fEventQueue.SetCleanupHook(BMediaEventLooper::_CleanUpEntry,this);
-	fRealTimeQueue.SetCleanupHook(BMediaEventLooper::_CleanUpEntry,this);
+	fEventQueue.SetCleanupHook(BMediaEventLooper::_CleanUpEntry, this);
+	fRealTimeQueue.SetCleanupHook(BMediaEventLooper::_CleanUpEntry, this);
 }
 
 /* virtual */ void

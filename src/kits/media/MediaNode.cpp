@@ -80,7 +80,7 @@ media_output::~media_output()
 
 // final & verified
 live_node_info::live_node_info()
-	: hint_point(0.0f,0.0f)
+	: hint_point(0.0f, 0.0f)
 {
 	name[0] = '\0';
 }
