@@ -63,25 +63,13 @@ BitmapStreamTest::Suite()
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite("BitmapStream");
 		
 	/* add suckers */
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Initialize Test", &BitmapStreamTest::InitializeTest));
 	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Constructor Test", &BitmapStreamTest::ConstructorTest));
 	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::DetachBitmap Test", &BitmapStreamTest::DetachBitmapTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Position Test", &BitmapStreamTest::PositionTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::ReadAt Test", &BitmapStreamTest::ReadAtTest));
+	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::ReadWrite Test", &BitmapStreamTest::ReadWriteTest));
 	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Seek Test", &BitmapStreamTest::SeekTest));
 	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::SetSize Test", &BitmapStreamTest::SetSizeTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::WriteAt Test", &BitmapStreamTest::WriteAtTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Size Test", &BitmapStreamTest::SizeTest));					
 
 	return suite;
-}
-
-/**
- * Initializes the test
- */
-void
-BitmapStreamTest::InitializeTest()
-{
 }
 
 /**
@@ -133,12 +121,18 @@ BitmapStreamTest::DetachBitmapTest()
 	NextSubTest();
 	CPPUNIT_ASSERT(pstream->DetachBitmap(NULL) == B_BAD_VALUE);
 	
+	//Attempt double detach
+	NextSubTest();
+	BBitmap *pdbits = NULL;
+	CPPUNIT_ASSERT(pstream->DetachBitmap(&pdbits) == B_ERROR);
+	
 	//make sure that deleting the stream
 	//does not destroy the detached BBitmap
 	NextSubTest();
 	delete pstream;
 	pstream = NULL;
 	CPPUNIT_ASSERT(pbits->IsValid());
+	CPPUNIT_ASSERT(pbits->BitsLength() > 0);
 	
 	//create a new stream using the BBitmap
 	//created by the first stream
@@ -158,29 +152,199 @@ BitmapStreamTest::DetachBitmapTest()
 
 /**
  * Tests:
- * off_t Position() const
+ * ssize_t ReadAt(off_t pos, void *buffer, size_t numBytes)
+ * ssize_t WriteAt(off_t pos, void *buffer, size_t numBytes)
  */
 void
-BitmapStreamTest::PositionTest()
+BitmapStreamTest::ReadWriteTest()
 {
-}
-
-/**
- * Tests:
- * ssize_t ReadAt(off_t pos, void *buffer, size_t *size)
- */
-void
-BitmapStreamTest::ReadAtTest()
-{
+	NextSubTest();
+	BApplication
+		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+	char chbuf[sizeof(TranslatorBitmap)],
+		chheader[sizeof(TranslatorBitmap)], *pch;
+	TranslatorBitmap sheader;
+	BBitmapStream stream;
+	int32 width = 5, height = 5;
+	
+	sheader.magic = B_TRANSLATOR_BITMAP;
+	sheader.bounds.left = 0;
+	sheader.bounds.top = 0;
+	sheader.bounds.right = width - 1;
+	sheader.bounds.bottom = height - 1;
+	sheader.rowBytes = width * 4;
+	sheader.colors = B_RGB32;
+	sheader.dataSize = sheader.rowBytes * height;
+	
+	memcpy(&chheader, &sheader, sizeof(TranslatorBitmap));
+	CPPUNIT_ASSERT(swap_data(B_UINT32_TYPE, &(chheader[0]),
+		sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) == B_OK);
+		
+	// Write header, 1 byte at a time
+	NextSubTest();
+	off_t nPos;
+	for (nPos = 0; nPos < sizeof(TranslatorBitmap); nPos++) {
+		pch = (char *)(&(chheader[0])) + nPos;
+		CPPUNIT_ASSERT(stream.WriteAt(nPos, pch, 1) == 1);
+	}
+	// Check size
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.Size() ==
+		sizeof(TranslatorBitmap) + sheader.dataSize);
+		
+	// Read header, 1 byte at a time
+	NextSubTest();
+	for (nPos = 0; nPos < sizeof(TranslatorBitmap); nPos++) {
+		pch = (char *)(&(chheader[0])) + nPos;
+		CPPUNIT_ASSERT(stream.ReadAt(nPos, &(chbuf[0]), 1) == 1);
+		CPPUNIT_ASSERT(pch[0] == chbuf[0]);
+	}
+	
+	// Write header, all at once
+	NextSubTest();
+	pch = (char *)(&(chheader[0]));
+	CPPUNIT_ASSERT(stream.WriteAt(0, pch,
+		sizeof(TranslatorBitmap)) == sizeof(TranslatorBitmap));
+	// Check size
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.Size() ==
+		sizeof(TranslatorBitmap) + sheader.dataSize);
+		
+	// Read header, all at once
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.ReadAt(0, &(chbuf[0]),
+		sizeof(TranslatorBitmap)) == sizeof(TranslatorBitmap));
+	CPPUNIT_ASSERT(memcmp(pch, &(chbuf[0]), sizeof(TranslatorBitmap)) == 0);
+	
+	// Write bitmap data
+	NextSubTest();
+	int32 bytesLeft = sheader.dataSize;
+	char byt = 0xCF;
+	nPos = sizeof(TranslatorBitmap);
+	while (bytesLeft--)
+		CPPUNIT_ASSERT(stream.WriteAt(nPos++, &byt, 1) == 1);
+	// Check size
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.Size() ==
+		sizeof(TranslatorBitmap) + sheader.dataSize);
+	
+	// Read bitmap data
+	NextSubTest();
+	bytesLeft = sheader.dataSize;
+	nPos = sizeof(TranslatorBitmap);
+	while (bytesLeft--) {
+		CPPUNIT_ASSERT(stream.ReadAt(nPos++, &(chbuf[0]), 1) == 1);
+		CPPUNIT_ASSERT(chbuf[0] == byt);
+	}
+	
+	// Send erroneous and weird data to WriteAt()
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.WriteAt(0, &byt, 0) == 0);
+	CPPUNIT_ASSERT(stream.WriteAt(-1, &byt, 1) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.WriteAt(stream.Size(), &byt, 1) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.WriteAt(stream.Size() + 1, &byt, 1) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.WriteAt(0, NULL, 1) == B_BAD_VALUE);
+	
+	// Send erroneous and weird data to ReadAt()
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.ReadAt(0, &(chbuf[0]), 0) == 0);
+	CPPUNIT_ASSERT(stream.ReadAt(-1, &(chbuf[0]), 1) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.ReadAt(stream.Size(), &(chbuf[0]),
+		 1) == B_ERROR);
+	CPPUNIT_ASSERT(stream.ReadAt(stream.Size() + 1,
+		&(chbuf[0]), 1) == B_ERROR);
+	CPPUNIT_ASSERT(stream.ReadAt(0, NULL, 1) == B_BAD_VALUE);	
 }
 
 /**
  * Tests:
  * off_t Seek(off_t position, uint32 whence)
+ * off_t Position() const
  */
 void
 BitmapStreamTest::SeekTest()
 {
+	BApplication
+		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+	
+	NextSubTest();
+	BFile file("../src/tests/kits/translation/data/images/image.jpg",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(file.InitCheck() == B_OK);
+
+	//translate a file into a BBitmapStream
+	NextSubTest();
+	BBitmapStream stream;
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster->Translate(&file, NULL, NULL, &stream,
+		B_TRANSLATOR_BITMAP) == B_OK);
+	
+	// Test SEEK_END
+	NextSubTest();
+	off_t nPos;
+	nPos = stream.Size();
+	CPPUNIT_ASSERT(stream.Seek(0, SEEK_END) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos = 0;
+	CPPUNIT_ASSERT(stream.Seek(-stream.Size(), SEEK_END) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos = stream.Size() - 15;
+	CPPUNIT_ASSERT(stream.Seek(-15, SEEK_END) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek(1, SEEK_END) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek(-(stream.Size() + 1),
+		SEEK_END) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	// Test SEEK_SET
+	NextSubTest();
+	nPos = 0;
+	CPPUNIT_ASSERT(stream.Seek(0, SEEK_SET) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos = stream.Size();
+	CPPUNIT_ASSERT(stream.Seek(nPos, SEEK_SET) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos /= 2;
+	CPPUNIT_ASSERT(stream.Seek(nPos, SEEK_SET) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek(-1, SEEK_SET) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek(stream.Size() + 1, SEEK_SET) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	// Test SEEK_CUR
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.Seek(-nPos, SEEK_CUR) == 0);
+	CPPUNIT_ASSERT(stream.Position() == 0);
+	
+	nPos = stream.Size();
+	CPPUNIT_ASSERT(stream.Seek(nPos, SEEK_CUR) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos -= 11;
+	CPPUNIT_ASSERT(stream.Seek(-11, SEEK_CUR) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	nPos += 8;
+	CPPUNIT_ASSERT(stream.Seek(8, SEEK_CUR) == nPos);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek(-(stream.Position() + 1),
+		SEEK_CUR) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);
+	
+	CPPUNIT_ASSERT(stream.Seek((stream.Size() - stream.Position()) + 1,
+		SEEK_CUR) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.Position() == nPos);	
 }
 
 /**
@@ -190,22 +354,23 @@ BitmapStreamTest::SeekTest()
 void
 BitmapStreamTest::SetSizeTest()
 {
-}
+	BApplication
+		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+	
+	NextSubTest();
+	BFile file("../src/tests/kits/translation/data/images/image.jpg",
+		B_READ_ONLY);
+	CPPUNIT_ASSERT(file.InitCheck() == B_OK);
 
-/**
- * Tests:
- * ssize_t WriteAt(off_t pos, const void *data, size_t *size)
- */
-void
-BitmapStreamTest::WriteAtTest()
-{
-}
-
-/**
- * Tests:
- * off_t Size() const
- */
-void
-BitmapStreamTest::SizeTest()
-{
+	//translate a file into a BBitmapStream
+	NextSubTest();
+	BBitmapStream stream;
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster->Translate(&file, NULL, NULL, &stream,
+		B_TRANSLATOR_BITMAP) == B_OK);
+	
+	// Send crap to SetSize
+	NextSubTest();
+	CPPUNIT_ASSERT(stream.SetSize(-1) == B_BAD_VALUE);
+	CPPUNIT_ASSERT(stream.SetSize(stream.Size() + 1) == B_BAD_VALUE);
 }

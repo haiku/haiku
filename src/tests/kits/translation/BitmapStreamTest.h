@@ -48,15 +48,11 @@ public:
     static CppUnit::Test *Suite();    
     
     //actual tests
-    void InitializeTest();
 	void ConstructorTest();
 	void DetachBitmapTest();
-	void PositionTest();
-	void ReadAtTest();
+	void ReadWriteTest();
 	void SeekTest();
 	void SetSizeTest();
-	void WriteAtTest();
-	void SizeTest();
 private:
 };
 
