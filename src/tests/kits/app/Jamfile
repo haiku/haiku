@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src tests kits app ;
 
+UsePrivateHeaders app ;
+
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bapplication ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
@@ -89,6 +91,9 @@ CommonTestLib libapptest.so
 		GetAppListTester.cpp
 		IsRunningTester.cpp
 		TeamForTester.cpp
+		
+		# RegistrarThreadManager
+		RegistrarThreadManagerTest.cpp
 
 		# common
 		AppRunner.cpp
