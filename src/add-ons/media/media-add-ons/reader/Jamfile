@@ -3,6 +3,8 @@ SubDir OBOS_TOP src add-ons media media-add-ons reader ;
 UsePrivateHeaders media ;
 
 Addon reader.media_addon : media :
+	../AbstractFileInterfaceNode.cpp
+	../AbstractFileInterfaceAddOn.cpp
 	MediaReader.cpp
 	MediaReaderAddOn.cpp
 ;

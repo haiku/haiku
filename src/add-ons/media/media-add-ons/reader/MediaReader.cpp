@@ -25,6 +25,7 @@
 #include <ParameterWeb.h>
 #include <limits.h>
 
+#include "../AbstractFileInterfaceNode.h"
 #include "MediaReader.h"
 
 #include <stdio.h>
@@ -37,14 +38,9 @@
 MediaReader::~MediaReader(void)
 {
 	fprintf(stderr,"MediaReader::~MediaReader\n");
-	// Stop the BMediaEventLooper thread
-	Quit();
-	if (inputFile != 0) {
-		delete inputFile;
-	}
-	if (bufferGroup != 0) {
-		BBufferGroup * group = bufferGroup;
-		bufferGroup = 0;
+	if (fBufferGroup != 0) {
+		BBufferGroup * group = fBufferGroup;
+		fBufferGroup = 0;
 		delete group;
 	}	
 }
@@ -56,20 +52,14 @@ MediaReader::MediaReader(
 				BMessage * config = 0,
 				BMediaAddOn * addOn = 0)
 	: BMediaNode("MediaReader"),
-	  BBufferProducer(B_MEDIA_MULTISTREAM),
-	  BFileInterface(),
-	  BControllable(),
-	  BMediaEventLooper()
+	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
+	  BBufferProducer(B_MEDIA_MULTISTREAM)
 {
 	fprintf(stderr,"MediaReader::MediaReader\n");
-	// keep our creator around for AddOn calls later
-	mediaReaderAddOn = addOn;
 	// null some fields
-	inputFile = 0;
-	bufferGroup = 0;
-	input_mime_type[0] = '\0';
+	fBufferGroup = 0;	
 	// start enabled
-	outputEnabled = true;
+	fOutputEnabled = true;
 	// don't overwrite available space, and be sure to terminate
 	strncpy(output.name,"MediaReader Output",B_MEDIA_NAME_LENGTH-1);
 	output.name[B_MEDIA_NAME_LENGTH-1] = '\0';
@@ -77,112 +67,18 @@ MediaReader::MediaReader(
 	output.node = media_node::null;     // until registration
 	output.source = media_source::null; // until registration
 	output.destination = media_destination::null;
-	// initialize the parameters
-	if (defaultChunkSize <= 0) {
-		initCheckStatus = B_BAD_VALUE;
-		return;
-	}
-	defaultChunkSizeParam = defaultChunkSize;
-	defaultChunkSizeParamChangeTime = 0;
-	if (defaultBitRate <= 0) {
-		initCheckStatus = B_BAD_VALUE;
-		return;
-	}
-	defaultBitRateParam = defaultBitRate;
-	defaultBitRateParamChangeTime = 0;
-	// From the chunk size and bit rate we compute the buffer period.
-	defaultBufferPeriodParam = int32(8000000/1024*defaultChunkSizeParam/defaultBitRateParam);
-	if (defaultBufferPeriodParam <= 0) {
-		initCheckStatus = B_BAD_VALUE;
-		return;
-	}
-	defaultBufferPeriodParamChangeTime = 0;
-	
-	// this is also our preferred format
-	initCheckStatus = ResetFormat(&output.format);
-}
-
-status_t MediaReader::InitCheck(void) const
-{
-	fprintf(stderr,"MediaReader::InitCheck\n");
-	return initCheckStatus;
-}
-
-status_t MediaReader::GetConfigurationFor(
-				BMessage * into_message)
-{
-	fprintf(stderr,"MediaReader::GetConfigurationFor\n");
-	return B_OK;
+	output.format = *GetFormat();
 }
 
 // -------------------------------------------------------- //
 // implementation of BMediaNode
 // -------------------------------------------------------- //
 
-BMediaAddOn * MediaReader::AddOn(
-				int32 * internal_id) const
-{
-	fprintf(stderr,"MediaReader::AddOn\n");
-	// BeBook says this only gets called if we were in an add-on.
-	if (mediaReaderAddOn != 0) {
-		// If we get a null pointer then we just won't write.
-		if (internal_id != 0) {
-			internal_id = 0;
-		}
-	}
-	return mediaReaderAddOn;
-}
-
-void MediaReader::Start(
-				bigtime_t performance_time)
-{
-	fprintf(stderr,"MediaReader::Start(pt=%i)\n",performance_time);
-	BMediaEventLooper::Start(performance_time);
-}
-
-void MediaReader::Stop(
-				bigtime_t performance_time,
-				bool immediate)
-{
-	fprintf(stderr,"MediaReader::Stop(pt=%i,%s)\n",performance_time,(immediate?"now":"then"));
-	BMediaEventLooper::Stop(performance_time,immediate);
-}
-
-void MediaReader::Seek(
-				bigtime_t media_time,
-				bigtime_t performance_time)
-{
-	fprintf(stderr,"MediaReader::Seek(mt=%i,pt=%i)\n",media_time,performance_time);
-	BMediaEventLooper::Seek(media_time,performance_time);
-}
-
-void MediaReader::SetRunMode(
-				run_mode mode)
-{
-	fprintf(stderr,"MediaReader::SetRunMode(%i)\n",mode);
-	BMediaEventLooper::SetRunMode(mode);
-}
-
-void MediaReader::TimeWarp(
-				bigtime_t at_real_time,
-				bigtime_t to_performance_time)
-{
-	fprintf(stderr,"MediaReader::TimeWarp(rt=%i,pt=%i)\n",at_real_time,to_performance_time);
-	BMediaEventLooper::TimeWarp(at_real_time,to_performance_time);
-}
-
 void MediaReader::Preroll(void)
 {
 	fprintf(stderr,"MediaReader::Preroll\n");
 	// XXX:Performance opportunity
 	BMediaNode::Preroll();
-}
-
-void MediaReader::SetTimeSource(
-				BTimeSource * time_source)
-{
-	fprintf(stderr,"MediaReader::SetTimeSource\n");
-	BMediaNode::SetTimeSource(time_source);
 }
 
 status_t MediaReader::HandleMessage(
@@ -193,171 +89,34 @@ status_t MediaReader::HandleMessage(
 	fprintf(stderr,"MediaReader::HandleMessage\n");
 	status_t status = B_OK;
 	switch (message) {
-		// none for now
-		// maybe seeks later
+		// no special messages for now
 		default:
-			// XXX:FileInterface before BufferProducer or vice versa?
-			status = BFileInterface::HandleMessage(message,data,size);
-			if (status == B_OK) {
-				break;
-			}
 			status = BBufferProducer::HandleMessage(message,data,size);
 			if (status == B_OK) {
 				break;
 			}
-			status = BMediaNode::HandleMessage(message,data,size);
-			if (status == B_OK) {
-				break;
-			}
-			BMediaNode::HandleBadMessage(message,data,size);
-			status = B_ERROR;
+			status = AbstractFileInterfaceNode::HandleMessage(message,data,size);
 			break;
 	}
 	return status;
 }
 
-status_t MediaReader::RequestCompleted(
-				const media_request_info & info)
-{
-	fprintf(stderr,"MediaReader::RequestCompleted\n");
-	return BMediaNode::RequestCompleted(info);
-}
-
-status_t MediaReader::DeleteHook(
-				BMediaNode * node)
-{
-	fprintf(stderr,"MediaReader::DeleteHook\n");
-	return BMediaEventLooper::DeleteHook(node);
-}
-
 void MediaReader::NodeRegistered(void)
 {
 	fprintf(stderr,"MediaReader::NodeRegistered\n");
-	// start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
 	
 	// now we can do this
 	output.node = Node();
 	output.source.id = 0;
 	output.source.port = output.node.port;
-	
-	// and set up our parameter web
-	SetParameterWeb(MakeParameterWeb());
-}
 
-status_t MediaReader::GetNodeAttributes(
-				media_node_attribute * outAttributes,
-				size_t inMaxCount)
-{
-	fprintf(stderr,"MediaReader::GetNodeAttributes\n");
-	return BMediaNode::GetNodeAttributes(outAttributes,inMaxCount);
-}
-
-status_t MediaReader::AddTimer(
-					bigtime_t at_performance_time,
-					int32 cookie)
-{
-	fprintf(stderr,"MediaReader::AddTimer\n");
-	return BMediaEventLooper::AddTimer(at_performance_time,cookie);
-}
-
-// protected:
-
-BParameterWeb * MediaReader::MakeParameterWeb(void)
-{
-	fprintf(stderr,"MediaReader::MakeParameterWeb\n");
-	
-	BParameterWeb * web = new BParameterWeb();
-	BParameterGroup * mainGroup = web->MakeGroup("MediaReader Parameters");
-
-	// these three are related:
-	// DEFAULT_CHUNK_SIZE_PARAM = DEFAULT_BIT_RATE_PARAM / 1024 * DEFAULT_BUFFER_PERIOD_PARAM * 1000
-	BParameterGroup * chunkSizeGroup = mainGroup->MakeGroup("Chunk Size Group");
-	BContinuousParameter * chunkSizeParameter
-	   = chunkSizeGroup->MakeContinuousParameter(
-	     DEFAULT_CHUNK_SIZE_PARAM, B_MEDIA_MULTISTREAM,
-		 "Chunk Size", B_GAIN, "bytes", 1024, 32*1024, 512);
-	chunkSizeParameter->SetResponse(BContinuousParameter::B_LINEAR,1,0);
-	chunkSizeParameter->SetValue(&defaultChunkSizeParam,sizeof(defaultChunkSizeParam),0);
-	
-	BParameterGroup * bitRateGroup = mainGroup->MakeGroup("Bit Rate Group");
-	BContinuousParameter * bitRateParameter
-	   = bitRateGroup->MakeContinuousParameter(
-	     DEFAULT_BIT_RATE_PARAM, B_MEDIA_MULTISTREAM,
-	     "Bit Rate", B_GAIN, "kbits/sec", 1, 320000, 1);
-	bitRateParameter->SetResponse(BContinuousParameter::B_LINEAR,.001,0);
-	bitRateParameter->SetValue(&defaultBitRateParam,sizeof(defaultBitRateParam),0);
-	
-	BParameterGroup * bufferPeriodGroup = mainGroup->MakeGroup("Buffer Period Group");
-	BContinuousParameter * bufferPeriodParameter
-	   = bufferPeriodGroup->MakeContinuousParameter(
-	     DEFAULT_BUFFER_PERIOD_PARAM, B_MEDIA_MULTISTREAM,
-	     "Buffer Period", B_GAIN, "ms", 1, 10000, 1);
-	bufferPeriodParameter->SetResponse(BContinuousParameter::B_LINEAR,1,0);
-	bufferPeriodParameter->SetValue(&defaultBufferPeriodParam,sizeof(defaultBufferPeriodParam),0);
-	
-	return web;
+	// creates the parameter web and starts the looper thread
+	AbstractFileInterfaceNode::NodeRegistered();
 }
 
 // -------------------------------------------------------- //
 // implementation of BFileInterface
 // -------------------------------------------------------- //
-
-status_t MediaReader::GetNextFileFormat(
-				int32 * cookie,
-				media_file_format * out_format)
-{
-	fprintf(stderr,"MediaReader::GetNextFileFormat\n");
-	// let's not crash even if they are stupid
-	if (out_format == 0) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
-	if (cookie != 0) {
-		// it's valid but they already got our 1 file format
-		if (*cookie != 0) {
-			fprintf(stderr,"<- B_ERROR\n");
-			return B_ERROR;
-		}
-		// so next time they won't get the same format again
-		*cookie = 1;
-	}
-	*out_format = GetFileFormat();
-	return B_OK;
-}
-
-void MediaReader::DisposeFileFormatCookie(
-				int32 cookie)
-{
-	fprintf(stderr,"MediaReader::DisposeFileFormatCookie\n");
-	// nothing to do since our cookies are just integers
-}
-
-status_t MediaReader::GetDuration(
-				bigtime_t * out_time)
-{
-	fprintf(stderr,"MediaReader::GetDuration\n");
-	if (out_time == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
-	if (inputFile == 0) {
-		fprintf(stderr,"<- B_NO_INIT\n");
-		return B_NO_INIT;
-	}	
-	return inputFile->GetSize(out_time);
-}
-
-status_t MediaReader::SniffRef(
-				const entry_ref & file,
-				char * out_mime_type,	/* 256 bytes */
-				float * out_quality)
-{
-	fprintf(stderr,"MediaReader::SniffRef\n");
-	return StaticSniffRef(file,out_mime_type,out_quality);
-}
 
 status_t MediaReader::SetRef(
 				const entry_ref & file,
@@ -365,81 +124,29 @@ status_t MediaReader::SetRef(
 				bigtime_t * out_time)
 {
 	fprintf(stderr,"MediaReader::SetRef\n");
-	if (out_time == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashes today thanks
-	}
-	status_t status;
-	input_ref = file;
-	if (inputFile == 0) {
-		inputFile = new BFile(&input_ref,(B_READ_ONLY|(create?B_CREATE_FILE:0)));
-		status = inputFile->InitCheck();
-	} else {
-		status = inputFile->SetTo(&input_ref,(B_READ_ONLY|(create?B_CREATE_FILE:0)));
-	}
+	status_t status = AbstractFileInterfaceNode::SetRef(file,B_READ_ONLY,create,out_time);
 	if (status != B_OK) {
-		fprintf(stderr,"<- failed BFile initialization\n");
+		fprintf(stderr,"AbstractFileInterfaceNode::SetRef returned an error\n");
 		return status;
 	}
-	// cache the input mime type for later
-	inputFile->ReadAttr("BEOS:TYPE",0,0,input_mime_type,B_MIME_TYPE_LENGTH);
-	// respecialize our preferred format based on this file type
-	status = ResetFormat(&output.format);
-	if (status != B_OK) {
-		fprintf(stderr,"<- ResetFormat failed\n");
-		return status;
+	// reset the format, and set the requirements imposed by this file
+	output.format = *GetFormat();
+	AddRequirements(&output.format);
+	// if we are connected we have to re-negotiate the connection
+	if (output.destination != media_destination::null) {
+		fprintf(stderr,"  error connection re-negotiation not implemented");
+		// XXX: implement re-negotiation
 	}
-	// compute the duration and return any error
-	return GetDuration(out_time);
-}
-
-status_t MediaReader::GetRef(
-				entry_ref * out_ref,
-				char * out_mime_type)
-{
-	fprintf(stderr,"MediaReader::GetRef\n");
-	if ((out_ref == 0) || (out_mime_type == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashes today thanks
-	}
-	if (inputFile == 0) {
-		fprintf(stderr,"<- B_NO_INIT\n");
-		return B_NO_INIT; // the input_ref isn't valid yet either
-	}
-	*out_ref = input_ref;
-	// they hopefully allocated enough space (no way to check :-/ )
-	strcpy(out_mime_type,input_mime_type);
-	return B_OK;
-}
-
-// provided for BMediaReaderAddOn
-
-status_t MediaReader::StaticSniffRef(
-				const entry_ref & file,
-				char * out_mime_type,	/* 256 bytes */
-				float * out_quality)
-{
-	fprintf(stderr,"MediaReader::StaticSniffRef\n");
-	if ((out_mime_type == 0) || (out_quality == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
-	BNode node(&file);
-	status_t initCheck = node.InitCheck();
-	if (initCheck != B_OK) {
-		fprintf(stderr,"<- failed BNode::InitCheck()\n");
-		return initCheck;
-	}
-	// they hopefully allocated enough room
-	node.ReadAttr("BEOS:TYPE",0,0,out_mime_type,B_MIME_TYPE_LENGTH);
-	*out_quality = 1.0; // we handle all files perfectly!  we are so amazing!
-	return B_OK;
+	return B_OK;	
 }
 
 // -------------------------------------------------------- //
 // implemention of BBufferProducer
 // -------------------------------------------------------- //
 
+// They are asking us to make the first offering.
+// So, we get a fresh format and then add requirements based
+// on the current file. (if any)
 status_t MediaReader::FormatSuggestionRequested(
 				media_type type,
 				int32 quality,
@@ -454,9 +161,129 @@ status_t MediaReader::FormatSuggestionRequested(
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	return ResetFormat(format);
+	*format = *GetFormat();
+	AddRequirements(format);
+	return B_OK;
 }
 
+/*
+void print_multistream_format(media_multistream_format * format) {
+	fprintf(stderr,"[");
+	switch (format->format) {
+	case media_multistream_format::B_ANY:			fprintf(stderr,"ANY"); break;
+	case media_multistream_format::B_VID:			fprintf(stderr,"VID"); break;
+	case media_multistream_format::B_AVI:			fprintf(stderr,"AVI"); break;
+	case media_multistream_format::B_MPEG1:		fprintf(stderr,"MPEG1"); break;
+	case media_multistream_format::B_MPEG2:		fprintf(stderr,"MPEG2"); break;
+	case media_multistream_format::B_QUICKTIME:	fprintf(stderr,"QUICKTIME"); break;
+	default:			fprintf(stderr,"????"); break;
+	}
+	fprintf(stderr," avg_bit_rate(%f) max_bit_rate(%f)",
+			format->avg_bit_rate,format->max_bit_rate);
+	fprintf(stderr," avg_chunk_size(%i) max_chunk_size(%i)",
+			format->avg_chunk_size,format->max_chunk_size);
+}	
+	
+void print_media_format(media_format * format) {
+	fprintf(stderr,"{");
+	switch (format->type) {
+	case B_MEDIA_NO_TYPE:		fprintf(stderr,"NO_TYPE"); break;		
+	case B_MEDIA_UNKNOWN_TYPE:	fprintf(stderr,"UNKNOWN_TYPE"); break;
+	case B_MEDIA_RAW_AUDIO:		fprintf(stderr,"RAW_AUDIO"); break;
+	case B_MEDIA_RAW_VIDEO:		fprintf(stderr,"RAW_VIDEO"); break;
+	case B_MEDIA_VBL:			fprintf(stderr,"VBL"); break;
+	case B_MEDIA_TIMECODE:		fprintf(stderr,"TIMECODE"); break;
+	case B_MEDIA_MIDI:			fprintf(stderr,"MIDI"); break;
+	case B_MEDIA_TEXT:			fprintf(stderr,"TEXT"); break;
+	case B_MEDIA_HTML:			fprintf(stderr,"HTML"); break;
+	case B_MEDIA_MULTISTREAM:	fprintf(stderr,"MULTISTREAM"); break;
+	case B_MEDIA_PARAMETERS:	fprintf(stderr,"PARAMETERS"); break;
+	case B_MEDIA_ENCODED_AUDIO:	fprintf(stderr,"ENCODED_AUDIO"); break;
+	case B_MEDIA_ENCODED_VIDEO:	fprintf(stderr,"ENCODED_VIDEO"); break;
+	default:					fprintf(stderr,"????"); break;
+	}
+	fprintf(stderr,":");
+	switch (format->type) {
+	case B_MEDIA_RAW_AUDIO:		fprintf(stderr,"RAW_AUDIO"); break;
+	case B_MEDIA_RAW_VIDEO:		fprintf(stderr,"RAW_VIDEO"); break;
+	case B_MEDIA_MULTISTREAM:	print_multistream_format(&format->u.multistream); break;
+	case B_MEDIA_ENCODED_AUDIO:	fprintf(stderr,"ENCODED_AUDIO"); break;
+	case B_MEDIA_ENCODED_VIDEO:	fprintf(stderr,"ENCODED_VIDEO"); break;
+	default:					fprintf(stderr,"????"); break;
+	}
+	fprintf(stderr,"}");
+}*/
+
+bool multistream_format_is_acceptible(
+						const media_multistream_format & producer_format,
+						const media_multistream_format & consumer_format)
+{
+	// first check the format, if necessary
+	if (consumer_format.format != media_multistream_format::B_ANY) {
+		if (consumer_format.format != producer_format.format) {
+			return false;
+		}
+	}
+	// then check the average bit rate
+	if (consumer_format.avg_bit_rate != media_multistream_format::wildcard.avg_bit_rate) {
+		if (consumer_format.avg_bit_rate != producer_format.avg_bit_rate) {
+			// do they have to match exactly?  I don't know.  assume yes.
+			return false;
+		}
+	}
+	// then check the maximum bit rate
+	if (consumer_format.max_bit_rate != media_multistream_format::wildcard.max_bit_rate) {
+		if (consumer_format.max_bit_rate != producer_format.max_bit_rate) {
+			// do they have to match exactly?  I don't know.  assume yes.
+			return false;
+		}
+	}
+	// then check the average chunk size
+	if (consumer_format.avg_chunk_size != media_multistream_format::wildcard.avg_chunk_size) {
+		if (consumer_format.avg_chunk_size != producer_format.avg_chunk_size) {
+			// do they have to match exactly?  I don't know.  assume yes.
+			return false;
+		}
+	}
+	// then check the maximum bit rate
+	if (consumer_format.max_chunk_size != media_multistream_format::wildcard.max_chunk_size) {
+		if (consumer_format.max_chunk_size != producer_format.max_chunk_size) {
+			// do they have to match exactly?  I don't know.  assume yes.
+			return false;
+		}
+	}
+	// should also check format specific fields, and others?
+	return true;
+}						
+
+bool format_is_acceptible(
+						const media_format & producer_format,
+						const media_format & consumer_format)
+{
+	// first check the type, if necessary
+	if (consumer_format.type != B_MEDIA_UNKNOWN_TYPE) {
+		if (consumer_format.type != producer_format.type) {
+			return false;
+		}
+		switch (consumer_format.type) {
+			case B_MEDIA_MULTISTREAM:
+				if (!multistream_format_is_acceptible(producer_format.u.multistream,
+													  consumer_format.u.multistream)) {
+					return false;
+				}
+				break;
+			default:
+				fprintf(stderr,"format_is_acceptible : unimplemented type.\n");
+				break;
+		}
+	}
+	// should also check non-type fields?
+	return true;
+}
+
+// They made an offer to us.  We should make sure that the offer is
+// acceptable, and then we can add any requirements we have on top of
+// that.  We leave wildcards for anything that we don't care about.
 status_t MediaReader::FormatProposal(
 				const media_source & output_source,
 				media_format * format)
@@ -470,14 +297,27 @@ status_t MediaReader::FormatProposal(
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE; // we only have one output so that better be it
 	}
-	if (!format_is_compatible(*format,output.format)) {
+/*	media_format * myFormat = GetFormat();
+	fprintf(stderr,"proposed format: ");
+	print_media_format(format);
+	fprintf(stderr,"\n");
+	fprintf(stderr,"my format: ");
+	print_media_format(myFormat);
+	fprintf(stderr,"\n"); */
+	// Be's format_is_compatible doesn't work.
+//	if (!format_is_compatible(*format,*myFormat)) {
+	if (!format_is_acceptible(*format,*GetFormat())) {
 		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	output.format.SpecializeTo(format);
+	AddRequirements(format);
 	return B_OK;
 }
 
+// Presumably we have already agreed with them that this format is
+// okay.  But just in case, we check the offer. (and complain if it
+// is invalid)  Then as the last thing we do, we get rid of any
+// remaining wilcards.
 status_t MediaReader::FormatChangeRequested(
 				const media_source & source,
 				const media_destination & destination,
@@ -489,12 +329,17 @@ status_t MediaReader::FormatChangeRequested(
 		fprintf(stderr,"<- B_BAD_VALUE\n");
 		return B_BAD_VALUE; // no crashing
 	}
+	if (output.source != source) {
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return B_MEDIA_BAD_SOURCE;
+	}	
 	status_t status = FormatProposal(source,io_format);
-	if (status == B_MEDIA_BAD_FORMAT) {
-		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
-		ResetFormat(io_format);
+	if (status != B_OK) {
+		fprintf(stderr,"  error returned by FormatProposal\n");
+		*io_format = *GetFormat();
+		return status;
 	}
-	return status;
+	return ResolveWildcards(io_format);
 }
 
 status_t MediaReader::GetNextOutput(	/* cookie starts as 0 */
@@ -503,6 +348,11 @@ status_t MediaReader::GetNextOutput(	/* cookie starts as 0 */
 {
 	fprintf(stderr,"MediaReader::GetNextOutput\n");
 	// let's not crash even if they are stupid
+	if (out_output == 0) {
+		// no place to write!
+		fprintf(stderr,"<- B_BAD_VALUE\n");
+		return B_BAD_VALUE;
+	}
 	if (cookie != 0) {
 		// it's valid but they already got our 1 output
 		if (*cookie != 0) {
@@ -511,11 +361,6 @@ status_t MediaReader::GetNextOutput(	/* cookie starts as 0 */
 		}
 		// so next time they won't get the same output again
 		*cookie = 1;
-	}
-	if (out_output == 0) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
 	}
 	*out_output = output;
 	return B_OK;
@@ -538,19 +383,19 @@ status_t MediaReader::SetBufferGroup(
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE; // we only have one output so that better be it
 	}
-	if (bufferGroup != 0) {
-		if (bufferGroup == group) {
+	if (fBufferGroup != 0) {
+		if (fBufferGroup == group) {
 			return B_OK; // time saver
 		}	
-		delete bufferGroup;
+		delete fBufferGroup;
 	}
 	if (group != 0) {
-		bufferGroup = group;
+		fBufferGroup = group;
 	} else {
 		// let's take advantage of this opportunity to recalculate
 		// our downstream latency and ensure that it is up to date
 		media_node_id id;
-		FindLatencyFor(output.destination, &downstreamLatency, &id);
+		FindLatencyFor(output.destination, &fDownstreamLatency, &id);
 		// buffer period gets initialized in Connect() because
 		// that is the first time we get the real values for
 		// chunk size and bit rate, which are used to compute buffer period
@@ -558,20 +403,20 @@ status_t MediaReader::SetBufferGroup(
 		//       but we don't make it, you make it yourself and pass it here.
 		//       not sure why anybody would want to do that since they need
 		//       a connection anyway...
-		if (bufferPeriod <= 0) {
+		if (fBufferPeriod <= 0) {
 			fprintf(stderr,"<- B_NO_INIT");
 			return B_NO_INIT;
 		}
-		int32 count = int32(downstreamLatency/bufferPeriod)+2;
+		int32 count = int32(fDownstreamLatency/fBufferPeriod)+2;
 		// allocate the buffers
-		bufferGroup = new BBufferGroup(output.format.u.multistream.max_chunk_size,count);
-		if (bufferGroup == 0) {
+		fBufferGroup = new BBufferGroup(output.format.u.multistream.max_chunk_size,count);
+		if (fBufferGroup == 0) {
 			fprintf(stderr,"<- B_NO_MEMORY\n");
 			return B_NO_MEMORY;
 		}
-		status_t status = bufferGroup->InitCheck();
+		status_t status = fBufferGroup->InitCheck();
 		if (status != B_OK) {
-			fprintf(stderr,"<- bufferGroup initialization failed\n");
+			fprintf(stderr,"<- fBufferGroup initialization failed\n");
 			return status;
 		}
 	}
@@ -620,6 +465,10 @@ status_t MediaReader::PrepareToConnect(
 		fprintf(stderr,"<- B_BAD_VALUE\n");
 		return B_BAD_VALUE; // no crashes...
 	}
+	if (output.source != what) {
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return B_MEDIA_BAD_SOURCE;
+	}	
 	if (output.destination != media_destination::null) {
 		fprintf(stderr,"<- B_MEDIA_ALREADY_CONNECTED\n");
 		return B_MEDIA_ALREADY_CONNECTED;
@@ -638,7 +487,7 @@ status_t MediaReader::PrepareToConnect(
 	output.destination = where;
 	strncpy(out_name,output.name,B_MEDIA_NAME_LENGTH-1);
 	out_name[B_MEDIA_NAME_LENGTH] = '\0';
-	return ResolveWildcards(&format->u.multistream);
+	return ResolveWildcards(format);
 }
 
 void MediaReader::Connect(
@@ -652,9 +501,15 @@ void MediaReader::Connect(
 	if (error != B_OK) {
 		fprintf(stderr,"<- error already\n");
 		output.destination = media_destination::null;
-		ResetFormat(&output.format);
+		output.format = *GetFormat();
 		return;
 	}
+	if (output.source != source) {
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		output.destination = media_destination::null;
+		output.format = *GetFormat();
+		return;
+	}	
 	
 	// record the agreed upon values
 	output.destination = destination;
@@ -664,24 +519,26 @@ void MediaReader::Connect(
 
 	// determine our downstream latency
 	media_node_id id;
-	FindLatencyFor(output.destination, &downstreamLatency, &id);
+	FindLatencyFor(output.destination, &fDownstreamLatency, &id);
 
 	// compute the buffer period (must be done before setbuffergroup)
-	bufferPeriod = int32(8000000 / 1024
+	fBufferPeriod = int32(8000000 / 1024
 	                     * output.format.u.multistream.max_chunk_size
 			             / output.format.u.multistream.max_bit_rate);
 
 	// setup the buffers if they aren't setup yet
-	if (bufferGroup == 0) {
+	if (fBufferGroup == 0) {
 		status_t status = SetBufferGroup(output.source,0);
 		if (status != B_OK) {
 			fprintf(stderr,"<- SetBufferGroup failed\n");
+			output.destination = media_destination::null;
+			output.format = *GetFormat();
 			return;
 		}
 	}
-	SetBufferDuration(bufferPeriod);
+	SetBufferDuration(fBufferPeriod);
 	
-	if (inputFile != 0) {
+	if (GetCurrentFile() != 0) {
 		bigtime_t start, end;
 		uint8 * data = new uint8[output.format.u.multistream.max_chunk_size]; // <- buffer group buffer size
 		BBuffer * buffer = 0;
@@ -689,12 +546,12 @@ void MediaReader::Connect(
 		{ // timed section
 			start = TimeSource()->RealTime();
 			// first we try to use a real BBuffer
-			buffer = bufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,bufferPeriod);
+			buffer = fBufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,fBufferPeriod);
 			if (buffer != 0) {
 				FillFileBuffer(buffer);
 			} else {
 				// didn't get a real BBuffer, try simulation by just a read from the disk
-				bytesRead = inputFile->Read(data,output.format.u.multistream.max_chunk_size);
+				bytesRead = GetCurrentFile()->Read(data,output.format.u.multistream.max_chunk_size);
 			}
 			end = TimeSource()->RealTime();
 		}
@@ -703,17 +560,17 @@ void MediaReader::Connect(
 		if (buffer != 0) {
 			buffer->Recycle();
 		}
-		inputFile->Seek(-bytesRead,SEEK_CUR); // put it back where we found it
+		GetCurrentFile()->Seek(-bytesRead,SEEK_CUR); // put it back where we found it
 	
-		internalLatency = end - start;
+		fInternalLatency = end - start;
 		
-		fprintf(stderr,"internal latency from disk read = %i\n",internalLatency);
+		fprintf(stderr,"internal latency from disk read = %i\n",fInternalLatency);
 	} else {
-		internalLatency = 100; // just guess
-		fprintf(stderr,"internal latency guessed = %i\n",internalLatency);
+		fInternalLatency = 100; // just guess
+		fprintf(stderr,"internal latency guessed = %i\n",fInternalLatency);
 	}
 	
-	SetEventLatency(downstreamLatency + internalLatency);
+	SetEventLatency(fDownstreamLatency + fInternalLatency);
 	
 	// XXX: do anything else?
 }
@@ -723,15 +580,21 @@ void MediaReader::Disconnect(
 				const media_destination & where)
 {
 	fprintf(stderr,"MediaReader::Disconnect\n");
-	if ((where == output.destination) && (what == output.source)) {
-		output.destination = media_destination::null;
-		ResetFormat(&output.format);
-		if (bufferGroup != 0) {
-			BBufferGroup * group = bufferGroup;
-			bufferGroup = 0;
-			delete group;
-		}	
+	if (output.destination != where) {
+		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+		return;
 	}
+	if (output.source != what) {
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return;
+	}
+	output.destination = media_destination::null;
+	output.format = *GetFormat();
+	if (fBufferGroup != 0) {
+		BBufferGroup * group = fBufferGroup;
+		fBufferGroup = 0;
+		delete group;
+	}	
 }
 
 void MediaReader::LateNoticeReceived(
@@ -749,8 +612,8 @@ void MediaReader::LateNoticeReceived(
 			    // nothing to do
 				break;
 			case B_INCREASE_LATENCY:
-				internalLatency += how_much;
-				SetEventLatency(downstreamLatency + internalLatency);
+				fInternalLatency += how_much;
+				SetEventLatency(fDownstreamLatency + fInternalLatency);
 				break;
 			case B_DECREASE_PRECISION:
 				// What you want us to give you fewer bits or something?
@@ -758,10 +621,10 @@ void MediaReader::LateNoticeReceived(
 			case B_DROP_DATA:
 				// Okay you asked for it, we'll skip ahead in the file!
 				// We'll drop 1 buffer's worth
-				if (inputFile == 0) {
-					fprintf(stderr,"MediaReader::LateNoticeReceived called without an inputFile (!)\n");
+				if (GetCurrentFile() == 0) {
+					fprintf(stderr,"MediaReader::LateNoticeReceived called without an GetCurrentFile() (!)\n");
 				} else {
-					inputFile->Seek(output.format.u.multistream.max_chunk_size,SEEK_CUR);
+					GetCurrentFile()->Seek(output.format.u.multistream.max_chunk_size,SEEK_CUR);
 				}
 				break;
 			default:
@@ -778,9 +641,11 @@ void MediaReader::EnableOutput(
 				int32 * _deprecated_)
 {
 	fprintf(stderr,"MediaReader::EnableOutput\n");
-	if (what == output.source) {
-		outputEnabled = enabled;
+	if (output.source != what) {
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return;
 	}
+	fOutputEnabled = enabled;
 }
 
 status_t MediaReader::SetPlayRate(
@@ -816,176 +681,14 @@ void MediaReader::LatencyChanged(
 {
 	fprintf(stderr,"MediaReader::LatencyChanged\n");
 	if ((output.source == source) && (output.destination == destination)) {
-		downstreamLatency = new_latency;
-		SetEventLatency(downstreamLatency + internalLatency);
+		fDownstreamLatency = new_latency;
+		SetEventLatency(fDownstreamLatency + fInternalLatency);
 	}
-}
-
-// -------------------------------------------------------- //
-// implementation for BControllable
-// -------------------------------------------------------- //
-
-const int32 MediaReader::DEFAULT_CHUNK_SIZE_PARAM = 1;
-const int32 MediaReader::DEFAULT_BIT_RATE_PARAM = 2;
-const int32 MediaReader::DEFAULT_BUFFER_PERIOD_PARAM = 3;
-
-status_t MediaReader::GetParameterValue(
-				int32 id,
-				bigtime_t * last_change,
-				void * value,
-				size_t * ioSize)
-{
-	fprintf(stderr,"MediaReader::GetParameterValue\n");
-	if ((last_change == 0) || (value == 0) || (ioSize == 0)) {
-		return B_BAD_VALUE; // no crashing
-	}	
-	switch (id) {
-		case DEFAULT_CHUNK_SIZE_PARAM:
-			if (*ioSize < sizeof(size_t)) {
-				return B_ERROR; // not enough room
-			}
-			*last_change = defaultChunkSizeParamChangeTime;
-			*((size_t*)value) = defaultChunkSizeParam;
-			*ioSize = sizeof(size_t);
-			break;
-			
-		case DEFAULT_BIT_RATE_PARAM:
-			if (*ioSize < sizeof(float)) {
-				return B_ERROR; // not enough room
-			}
-			*last_change = defaultBitRateParamChangeTime;
-			*((float*)value) = defaultBitRateParam;
-			*ioSize = sizeof(float);
-			break;
-		
-		case DEFAULT_BUFFER_PERIOD_PARAM:
-			if (*ioSize < sizeof(bigtime_t)) {
-				return B_ERROR; // not enough room
-			}
-			*last_change = defaultBufferPeriodParamChangeTime;
-			*((bigtime_t*)value) = defaultBufferPeriodParam;
-			*ioSize = sizeof(bigtime_t);
-			break;
-				
-		default:
-			fprintf(stderr,"MediaReader::GetParameterValue unknown id (%i)\n",id);
-			return B_ERROR;
-	}
-	return B_OK;			
-}
-				
-void MediaReader::SetParameterValue(
-				int32 id,
-				bigtime_t when,
-				const void * value,
-				size_t size)
-{
-	fprintf(stderr,"MediaReader::SetParameterValue\n");
-	switch (id) {
-		case DEFAULT_CHUNK_SIZE_PARAM:
-		case DEFAULT_BIT_RATE_PARAM:
-		case DEFAULT_BUFFER_PERIOD_PARAM:
-			{
-				media_timed_event event(when, BTimedEventQueue::B_PARAMETER,
-										NULL, BTimedEventQueue::B_NO_CLEANUP,
-										size, id, (char*) value, size);
-				EventQueue()->AddEvent(event);
-			}
-			break;
-			
-		default:
-			fprintf(stderr,"MediaReader::SetParameterValue unknown id (%i)\n",id);
-			break;
-	}
-}			
-
-// the default implementation should call the add-on main()
-status_t MediaReader::StartControlPanel(
-				BMessenger * out_messenger)
-{
-	BControllable::StartControlPanel(out_messenger);
 }
 
 // -------------------------------------------------------- //
 // implementation for BMediaEventLooper
 // -------------------------------------------------------- //
-
-void MediaReader::HandleEvent(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent = false)
-{
-	fprintf(stderr,"MediaReader::HandleEvent(");
-	switch (event->type) {
-		case BTimedEventQueue::B_START:
-			fprintf(stderr,"B_START)\n");
-			if (RunState() != B_STARTED) {
-				media_timed_event firstBufferEvent(event->event_time, BTimedEventQueue::B_HANDLE_BUFFER);
-				//this->HandleEvent(&firstBufferEvent, 0, false);
-				EventQueue()->AddEvent(firstBufferEvent);
-			}
-			break;
-		case BTimedEventQueue::B_SEEK:
-			// XXX: argghh.. seek events seem broken when received from
-			//      the usual BMediaEventLooper::Seek() dispatcher :-(
-			fprintf(stderr,"B_SEEK(t=%i,d=%i,bd=%ld))\n",event->event_time,event->data,event->bigdata);
-			if (inputFile != 0) {
-				inputFile->Seek(event->bigdata,SEEK_SET);
-			}
-			break;			
-		case BTimedEventQueue::B_STOP:
-			fprintf(stderr,"B_STOP)\n");
-			// flush the queue so downstreamers don't get any more
-			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
-			break;
-		case BTimedEventQueue::B_HANDLE_BUFFER:
-			fprintf(stderr,"B_HANDLE_BUFFER)\n");
-			if ((RunState() != BMediaEventLooper::B_STARTED)
-			 	   || (output.destination == media_destination::null)) {
-				break;
-			}
-			HandleBuffer(event,lateness,realTimeEvent);
-			break;
-		case BTimedEventQueue::B_DATA_STATUS:
-			fprintf(stderr,"B_DATA_STATUS)\n");
-			SendDataStatus(event->data,output.destination,event->event_time);
-			break;
-		case BTimedEventQueue::B_PARAMETER:
-			fprintf(stderr,"B_PARAMETER)\n");
-			HandleParameter(event,lateness,realTimeEvent);
-			break;
-		default:
-			fprintf(stderr,"%i)\n",event->type);
-			break;
-	}
-}
-
-/* override to clean up custom events you have added to your queue */
-void MediaReader::CleanUpEvent(
-				const media_timed_event *event)
-{
-	return BMediaEventLooper::CleanUpEvent(event);
-}
-		
-/* called from Offline mode to determine the current time of the node */
-/* update your internal information whenever it changes */
-bigtime_t MediaReader::OfflineTime()
-{
-	fprintf(stderr,"MediaReader::OfflineTime\n");
-	if (inputFile == 0) {
-		return 0;
-	} else {
-		return inputFile->Position();
-	}
-}
-
-/* override only if you know what you are doing! */
-/* otherwise much badness could occur */
-/* the actual control loop function: */
-/* 	waits for messages, Pops events off the queue and calls DispatchEvent */
-void MediaReader::ControlLoop() {
-	BMediaEventLooper::ControlLoop();
-}
 
 // protected:
 
@@ -995,311 +698,92 @@ status_t MediaReader::HandleBuffer(
 				bool realTimeEvent = false)
 {
 	fprintf(stderr,"MediaReader::HandleBuffer\n");
+	if (output.destination == media_destination::null) {
+		return B_MEDIA_NOT_CONNECTED;
+	}
 	status_t status = B_OK;
-	BBuffer * buffer = bufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,bufferPeriod);
+	BBuffer * buffer = fBufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,fBufferPeriod);
 	if (buffer != 0) {
 	    status = FillFileBuffer(buffer);
 	    if (status != B_OK) {
 			fprintf(stderr,"MediaReader::HandleEvent got an error from FillFileBuffer.\n");
 			buffer->Recycle();
 		} else {
-			if (outputEnabled) {
+			if (fOutputEnabled) {
 				status = SendBuffer(buffer,output.destination);
-			}
-			if (status != B_OK) {
-				fprintf(stderr,"MediaReader::HandleEvent got an error from SendBuffer.\n");
+				if (status != B_OK) {
+					fprintf(stderr,"MediaReader::HandleEvent got an error from SendBuffer.\n");
+					buffer->Recycle();
+				}
+			} else {
 				buffer->Recycle();
 			}
 		}
 	}
-	bigtime_t nextEventTime = event->event_time+bufferPeriod;
+	bigtime_t nextEventTime = event->event_time+fBufferPeriod;
 	media_timed_event nextBufferEvent(nextEventTime, BTimedEventQueue::B_HANDLE_BUFFER);
 	EventQueue()->AddEvent(nextBufferEvent);
 	return status;
 }
 
-status_t MediaReader::HandleParameter(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent = false)
+status_t MediaReader::HandleDataStatus(
+						const media_timed_event *event,
+						bigtime_t lateness,
+						bool realTimeEvent = false)
 {
-	fprintf(stderr,"MediaReader::HandleParameter\n");
-	status_t status = B_OK;
-	
-	bool chunkSizeUpdated = false, bitRateUpdated = false, bufferPeriodUpdated = false;
-	
-	size_t dataSize = size_t(event->data);
-	int32 param = int32(event->bigdata);
-	
-	switch (param) {
-		case DEFAULT_CHUNK_SIZE_PARAM:
-			if (dataSize < sizeof(size_t)) {
-				fprintf(stderr,"<- B_BAD_VALUE\n",param);
-				status = B_BAD_VALUE;
-			} else {
-				size_t newDefaultChunkSize = *((size_t*)event->user_data);
-				// ignore non positive chunk sizes
-				// XXX: we may decide later that a 0 chunk size means ship the whole file in one chunk (!)
-				if ((newDefaultChunkSize > 0) && (newDefaultChunkSize != defaultChunkSizeParam)) {
-					defaultChunkSizeParam = newDefaultChunkSize;
-					defaultChunkSizeParamChangeTime = TimeSource()->Now();
-					chunkSizeUpdated = true;
-					if (leastRecentlyUpdatedParameter == DEFAULT_CHUNK_SIZE_PARAM) {
-						// Okay we were the least recently updated parameter,
-						// but we just got an update so we are no longer that.
-						// Let's figure out who the new least recently updated
-						// parameter is.  We are going to prefer to compute the
-						// bit rate since you usually don't want to muck with
-						// the buffer period.  However, if you just set the bitrate
-						// then we are stuck with making the buffer period the new
-						// parameter to be computed.
-						if (lastUpdatedParameter == DEFAULT_BIT_RATE_PARAM) {
-							leastRecentlyUpdatedParameter = DEFAULT_BUFFER_PERIOD_PARAM;
-						} else {
-							leastRecentlyUpdatedParameter = DEFAULT_BIT_RATE_PARAM;
-						}
-					}
-					// we just got an update, so we are the new lastUpdatedParameter
-					lastUpdatedParameter = DEFAULT_CHUNK_SIZE_PARAM;
-					// now we have to compute the new value for the leastRecentlyUpdatedParameter
-					// we use the chunk size change time to preserve "simultaneity" information
-					if (leastRecentlyUpdatedParameter == DEFAULT_BUFFER_PERIOD_PARAM) {
-						defaultBufferPeriodParam = MAX(1,int32(8000000/1024*defaultChunkSizeParam/defaultBitRateParam));
-						defaultBufferPeriodParamChangeTime = defaultChunkSizeParamChangeTime;
-						bufferPeriodUpdated = true;
-					} else { // must have been bit rate
-						defaultBitRateParam = MAX(0.001,8000000/1024*defaultChunkSizeParam/defaultBufferPeriodParam);
-						defaultBitRateParamChangeTime = defaultChunkSizeParamChangeTime;
-						bitRateUpdated = true;
-					}
-				}
-			}
-			break;		
-		case DEFAULT_BIT_RATE_PARAM:
-			if (dataSize < sizeof(size_t)) {
-				fprintf(stderr,"<- B_BAD_VALUE\n",param);
-				status = B_BAD_VALUE;
-			} else {
-				float newDefaultBitRate = *((size_t*)event->user_data);
-				// ignore non positive bitrates
-				if ((newDefaultBitRate > 0) && (newDefaultBitRate != defaultBitRateParam)) {
-					defaultBitRateParam = newDefaultBitRate;
-					defaultBitRateParamChangeTime = TimeSource()->Now();
-					bitRateUpdated = true;
-					if (leastRecentlyUpdatedParameter == DEFAULT_BIT_RATE_PARAM) {
-						// Okay we were the least recently updated parameter,
-						// but we just got an update so we are no longer that.
-						// Let's figure out who the new least recently updated
-						// parameter is.  We are going to prefer to compute the
-						// chunk size since you usually don't want to muck with
-						// the buffer period.  However, if you just set the chunk size
-						// then we are stuck with making the buffer period the new
-						// parameter to be computed.
-						if (lastUpdatedParameter == DEFAULT_CHUNK_SIZE_PARAM) {
-							leastRecentlyUpdatedParameter = DEFAULT_BUFFER_PERIOD_PARAM;
-						} else {
-							leastRecentlyUpdatedParameter = DEFAULT_CHUNK_SIZE_PARAM;
-						}
-					}
-					// we just got an update, so we are the new lastUpdatedParameter
-					lastUpdatedParameter = DEFAULT_BIT_RATE_PARAM;
-					// now we have to compute the new value for the leastRecentlyUpdatedParameter
-					// we use the bit rate change time to preserve "simultaneity" information
-					if (leastRecentlyUpdatedParameter == DEFAULT_BUFFER_PERIOD_PARAM) {
-						defaultBufferPeriodParam = MAX(1,int32(8000000/1024*defaultChunkSizeParam/defaultBitRateParam));
-						defaultBufferPeriodParamChangeTime = defaultBitRateParamChangeTime;
-						bufferPeriodUpdated = true;
-					} else { // must have been chunk size
-						defaultChunkSizeParam = MAX(1,int32(1024/8000000*defaultBitRateParam*defaultBufferPeriodParam));
-						defaultChunkSizeParamChangeTime = defaultBitRateParamChangeTime;
-						chunkSizeUpdated = true;
-					}
-				}
-			}
-			break;		
-		case DEFAULT_BUFFER_PERIOD_PARAM:
-			if (dataSize < sizeof(bigtime_t)) {
-				fprintf(stderr,"<- B_BAD_VALUE\n",param);
-				status = B_BAD_VALUE;
-			} else {
-				bigtime_t newBufferPeriod = *((bigtime_t*)event->user_data);
-				// ignore non positive buffer period
-				if ((newBufferPeriod > 0) && (newBufferPeriod != defaultBufferPeriodParam)) {
-					defaultBufferPeriodParam = newBufferPeriod;
-					defaultBufferPeriodParamChangeTime = TimeSource()->Now();
-					bufferPeriodUpdated = true;
-					if (lastUpdatedParameter == DEFAULT_BUFFER_PERIOD_PARAM) {
-						// prefer to update bit rate, unless you just set it
-						if (lastUpdatedParameter == DEFAULT_BIT_RATE_PARAM) {
-							leastRecentlyUpdatedParameter = DEFAULT_CHUNK_SIZE_PARAM;
-						} else {
-							leastRecentlyUpdatedParameter = DEFAULT_BIT_RATE_PARAM;
-						}
-					}
-					// we just got an update, so we are the new lastUpdatedParameter
-					lastUpdatedParameter = DEFAULT_BUFFER_PERIOD_PARAM;
-					// now we have to compute the new value for the leastRecentlyUpdatedParameter
-					// we use the buffer period change time to preserve "simultaneity" information
-					if (leastRecentlyUpdatedParameter == DEFAULT_BIT_RATE_PARAM) {
-						defaultBitRateParam = MAX(0.001,8000000/1024*defaultChunkSizeParam/defaultBufferPeriodParam);
-						defaultBitRateParamChangeTime = defaultBufferPeriodParamChangeTime;
-						bitRateUpdated = true;
-					} else { // must have been chunk size
-						defaultChunkSizeParam = MAX(1,int32(1024/8000000*defaultBitRateParam*defaultBufferPeriodParam));
-						defaultChunkSizeParamChangeTime = defaultBufferPeriodParamChangeTime;
-						chunkSizeUpdated = true;
-					}					
-				}
-			}
-			break;	
-		default:
-			fprintf(stderr,"MediaReader::HandleParameter called with unknown param id (%i)\n",param);
-			status = B_ERROR;
-	}
-	// send updates out for all the parameters that changed
-	// in every case this should be two updates. (if I have not made an error :-) )
-	if (chunkSizeUpdated) {
-		BroadcastNewParameterValue(defaultChunkSizeParamChangeTime,
-								   DEFAULT_CHUNK_SIZE_PARAM,
-								   &defaultChunkSizeParam,
-								   sizeof(defaultChunkSizeParam));
-	}
-	if (bitRateUpdated) {
-		BroadcastNewParameterValue(defaultBitRateParamChangeTime,
-								   DEFAULT_BIT_RATE_PARAM,
-								   &defaultBitRateParam,
-								   sizeof(defaultBitRateParam));
-	}
-	if (bufferPeriodUpdated) {
-		BroadcastNewParameterValue(defaultBufferPeriodParamChangeTime,
-								   DEFAULT_BUFFER_PERIOD_PARAM,
-								   &defaultBufferPeriodParam,
-								   sizeof(defaultBufferPeriodParam));
-	}
-	return status;
+	fprintf(stderr,"MediaReader::HandleDataStatus");
+	return SendDataStatus(event->data,output.destination,event->event_time);
 }
 
 // -------------------------------------------------------- //
 // MediaReader specific functions
 // -------------------------------------------------------- //
 
-status_t MediaReader::GetFlavor(
-				int32 id,
-				const flavor_info ** out_info)
+// static:
+
+flavor_info * MediaReader::GetFlavor(int32 id)
 {
 	fprintf(stderr,"MediaReader::GetFlavor\n");
-	static flavor_info flavorInfo;
-	flavorInfo.name = "MediaReader";
-	flavorInfo.info =
-	     "A MediaReader node reads a file and produces a multistream.";
-	flavorInfo.kinds = B_FILE_INTERFACE | B_BUFFER_PRODUCER | B_CONTROLLABLE;
-	flavorInfo.flavor_flags = B_FLAVOR_IS_LOCAL;
-	flavorInfo.possible_count = INT_MAX;
-	
-	flavorInfo.in_format_count = 0; // no inputs
-	flavorInfo.in_formats = 0;
-
-	flavorInfo.out_format_count = 1; // 1 output
-	flavorInfo.out_formats = &GetFormat();
-
-	flavorInfo.internal_id = id;
-		
-	*out_info = &flavorInfo;
-	return B_OK;
+	static bool initialized = false;
+	static flavor_info * info;
+	if (initialized == false) {
+		info = AbstractFileInterfaceNode::GetFlavor(id);
+		info->name = "OpenBeOS Media Reader";
+		info->info = "The OpenBeOS Media Reader reads a file and produces a multistream.";
+		info->kinds |= B_BUFFER_PRODUCER;
+		info->out_format_count = 1; // 1 output
+		info->out_formats = GetFormat();
+		initialized = true;
+	}
+	return info;
 }
 
-media_format & MediaReader::GetFormat()
+media_format * MediaReader::GetFormat()
 {
 	fprintf(stderr,"MediaReader::GetFormat\n");
-	static media_format format;
-	format.type = B_MEDIA_MULTISTREAM;
-	format.require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	format.deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
-	format.u.multistream = media_multistream_format::wildcard;
-	return format;
+	return AbstractFileInterfaceNode::GetFormat();
 }
 
-media_file_format & MediaReader::GetFileFormat()
+media_file_format * MediaReader::GetFileFormat()
 {
 	fprintf(stderr,"MediaReader::GetFileFormat\n");
-	static media_file_format file_format;
-	file_format.capabilities =
-			    media_file_format::B_READABLE
-			  | media_file_format::B_PERFECTLY_SEEKABLE
-			  | media_file_format::B_IMPERFECTLY_SEEKABLE
-			  | media_file_format::B_KNOWS_ANYTHING;
-	/* I don't know what to initialize this to. (or if I should) */
-	// format.id =
-	file_format.family = B_ANY_FORMAT_FAMILY;
-	file_format.version = 100;
-	strcpy(file_format.mime_type,"");
-	strcpy(file_format.pretty_name,"any media file format");
-	strcpy(file_format.short_name,"any");
-	strcpy(file_format.file_extension,"");
+	static bool initialized = false;
+	static media_file_format * file_format;
+	if (initialized == false) {
+		file_format = AbstractFileInterfaceNode::GetFileFormat();
+		file_format->capabilities |= media_file_format::B_READABLE;
+		initialized = true;
+	}
 	return file_format;
 }
 
-status_t MediaReader::ResetFormat(media_format * format)
-{
-	fprintf(stderr,"MediaReader::ResetFormat\n");
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
-	*format = GetFormat();
-	return ResolveWildcards(&format->u.multistream);
-}
-
-// Here we make some guesses based on the file's mime type
-// It's not our job to fill all the fields but this may help
-// find the right node that does have that job.
-status_t MediaReader::ResolveWildcards(
-				media_multistream_format * multistream_format)
-{
-	fprintf(stderr,"MediaReader::ResolveWildcards\n");
-	if (strcmp("video/x-msvideo",input_mime_type) == 0) {
-		if (multistream_format->format == media_multistream_format::wildcard.format) {
-			multistream_format->format = media_multistream_format::B_AVI;
-		}
-	} else
-	if (strcmp("video/mpeg",input_mime_type) == 0) {
-		if (multistream_format->format == media_multistream_format::wildcard.format) {
-			multistream_format->format = media_multistream_format::B_MPEG1;
-		}
-	} else
-	if (strcmp("video/quicktime",input_mime_type) == 0) {
-		if (multistream_format->format == media_multistream_format::wildcard.format) {
-			multistream_format->format = media_multistream_format::B_QUICKTIME;
-		}
-	} else
-	if (strcmp("audio/x-mpeg",input_mime_type) == 0) {
-		if (multistream_format->format == media_multistream_format::wildcard.format) {
-			multistream_format->format = media_multistream_format::B_MPEG1;
-		}
-	}
-	// the thing that we connect to should really supply these,
-	// but just in case we have some defaults handy!
-	if (multistream_format->max_bit_rate == media_multistream_format::wildcard.max_bit_rate) {
-		multistream_format->max_bit_rate = defaultBitRateParam;
-	}
-	if (multistream_format->max_chunk_size == media_multistream_format::wildcard.max_chunk_size) {
-		multistream_format->max_chunk_size = defaultChunkSizeParam;
-	}
-	// we also default the averages to the maxes
-	if (multistream_format->avg_bit_rate == media_multistream_format::wildcard.avg_bit_rate) {
-		multistream_format->avg_bit_rate = multistream_format->max_bit_rate;
-	}
-	if (multistream_format->avg_chunk_size == media_multistream_format::wildcard.avg_chunk_size) {
-		multistream_format->avg_chunk_size = multistream_format->max_chunk_size;
-	}
-	return B_OK;
-}
+// protected:
 
 status_t MediaReader::GetFilledBuffer(
 				BBuffer ** outBuffer)
 {
 	fprintf(stderr,"MediaReader::GetFilledBuffer\n");
-	BBuffer * buffer = bufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,-1);
+	BBuffer * buffer = fBufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,-1);
 	if (buffer == 0) {
 		// XXX: add a new buffer and get it
 		fprintf(stderr,"MediaReader::GetFilledBuffer needs a new buffer.\n");
@@ -1314,12 +798,12 @@ status_t MediaReader::FillFileBuffer(
 				BBuffer * buffer)
 {
 	fprintf(stderr,"MediaReader::FillFileBuffer\n");
-	if (inputFile == 0) {
+	if (GetCurrentFile() == 0) {
 		fprintf(stderr,"<- B_NO_INIT\n");
 		return B_NO_INIT;
 	}	
-	off_t position = inputFile->Position();
-	ssize_t bytesRead = inputFile->Read(buffer->Data(),buffer->SizeAvailable());
+	off_t position = GetCurrentFile()->Position();
+	ssize_t bytesRead = GetCurrentFile()->Read(buffer->Data(),buffer->SizeAvailable());
 	if (bytesRead < 0) {
 		fprintf(stderr,"<- B_FILE_ERROR\n");
 		return B_FILE_ERROR; // some sort of file related error
