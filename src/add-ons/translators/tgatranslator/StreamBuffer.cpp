@@ -9,7 +9,7 @@
 // read from a BPositionIO object.
 //
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (C) 2003 Michael Wilber
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include <string.h>
 #include "StreamBuffer.h"
 
 #define min(x,y) (((x) < (y)) ? (x) : (y))
