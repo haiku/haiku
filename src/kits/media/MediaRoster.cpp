@@ -786,7 +786,7 @@ BMediaRoster::Connect(const media_source & from,
 	GetNodeFor(NodeIDFor(to.port), &destnode);
 	ReleaseNode(sourcenode);
 	ReleaseNode(destnode);
-
+	
 	// BBufferConsumer::Connected
 	consumer_connected_request request4;
 	consumer_connected_reply reply4;
@@ -2422,8 +2422,25 @@ status_t
 BMediaRoster::GetStartLatencyFor(const media_node & time_source,
 								 bigtime_t * out_latency)
 {
-	UNIMPLEMENTED();
-	*out_latency = 5000;
+	CALLED();
+	if (out_latency == NULL)
+		return B_BAD_VALUE;
+	if (IS_INVALID_NODE(time_source))
+		return B_MEDIA_BAD_NODE;
+	if ((time_source.kind & B_TIME_SOURCE) == 0)
+		return B_MEDIA_BAD_NODE;
+	
+	timesource_get_start_latency_request request;
+	timesource_get_start_latency_reply reply;
+	status_t rv;
+
+	rv = QueryPort(time_source.port, TIMESOURCE_GET_START_LATENCY, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*out_latency = reply.start_latency;
+	
+	printf("BMediaRoster::GetStartLatencyFor timesource %ld has maximum initial latency %Ld\n", time_source.node, *out_latency);
 	return B_OK;
 }
 

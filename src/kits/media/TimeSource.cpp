@@ -235,7 +235,7 @@ BTimeSource::HandleMessage(int32 message,
 						   size_t size)
 {
 	PRINT(4, "BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
-
+	status_t rv;
 	switch (message) {
 		case TIMESOURCE_OP:
 		{
@@ -273,6 +273,15 @@ BTimeSource::HandleMessage(int32 message,
 		{
 			const timesource_remove_slave_node_command *data = static_cast<const timesource_remove_slave_node_command *>(rawdata);
 			DirectRemoveMe(data->node);
+			return B_OK;
+		}
+		
+		case TIMESOURCE_GET_START_LATENCY:
+		{
+			const timesource_get_start_latency_request *request = static_cast<const timesource_get_start_latency_request *>(rawdata);
+			timesource_get_start_latency_reply reply;
+			rv = GetStartLatency(&reply.start_latency);
+			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
 	}
