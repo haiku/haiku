@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef KERNEL_BOOT_PLATFORM_H
 #define KERNEL_BOOT_PLATFORM_H
@@ -35,6 +35,7 @@ extern status_t platform_free_region(void *address, size_t size);
 extern uint32 platform_boot_options(void);
 
 /* misc functions */
+extern status_t platform_init_video(void);
 extern void platform_switch_to_logo(void);
 extern void platform_switch_to_text_mode(void);
 extern void platform_start_kernel(void);
