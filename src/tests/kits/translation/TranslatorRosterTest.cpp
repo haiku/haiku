@@ -291,7 +291,7 @@ void TranslatorRosterTest::GetAllTranslatorsTest() {
 	// no translators
 	NextSubTest();
 	BTranslatorRoster roster;
-	CPPUNINT_ASSERT(
+	CPPUNIT_ASSERT(
 		roster.GetAllTranslators(&translators, &num_translators) == B_NO_ERROR);
 		
 	NextSubTest();
