@@ -55,6 +55,8 @@ int _start(kernel_args *oldka, int cpu);	/* keep compiler happy */
 int
 _start(kernel_args *oldka, int cpu_num)
 {
+	thread_id thread = -1;
+
 	kernel_startup = true;
 
 	if (oldka->kernel_args_size != sizeof(kernel_args)
@@ -123,10 +125,7 @@ _start(kernel_args *oldka, int cpu_num)
 		elf_init(&ka);
 
 		// start a thread to finish initializing the rest of the system
-		{
-			thread_id thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
-			resume_thread(thread);
-		}
+		thread = spawn_kernel_thread(&main2, "main2", B_NORMAL_PRIORITY, NULL);
 
 		smp_wake_up_all_non_boot_cpus();
 		smp_enable_ici(); // ici's were previously being ignored
@@ -142,6 +141,9 @@ _start(kernel_args *oldka, int cpu_num)
 
 	kernel_startup = false;
 	enable_interrupts();
+
+	if (thread >= B_OK)
+		resume_thread(thread);
 
 	TRACE(("main: done... begin idle loop on cpu %d\n", cpu_num));
 	for (;;)
@@ -169,11 +171,6 @@ main2(void *unused)
 	/* bootstrap all the filesystems */
 	TRACE(("Bootstrap file systems\n"));
 	vfs_bootstrap_file_systems();
-
-	// before we bring up the device drivers, we better wait until
-	// interrupts become available, to make sure they'll work as expected
-	while (!are_interrupts_enabled())
-		snooze(10000);
 
 	TRACE(("Init Device Manager\n"));
 	device_manager_init(&ka);
