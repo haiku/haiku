@@ -66,8 +66,8 @@ KeymapWindow::KeymapWindow( BRect frame )
 	// Create the Maps box and contents
 	AddMaps(placeholderView);
 	
-	fMapView = new MapView(BRect(149,29,601,209), "mapView", &fCurrentMap);
-	AddChild(fMapView);
+	fMapView = new MapView(BRect(150,9,600,189), "mapView", &fCurrentMap);
+	placeholderView->AddChild(fMapView);
 	
 	BMenuItem *item = fFontMenu->FindMarked();
 	if (item) {
@@ -725,6 +725,7 @@ MapView::AttachedToWindow()
 {
 	SetEventMask(B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
 	fTextView->SetViewColor(255,255,255);
+	BView::AttachedToWindow();
 }
 
 
