@@ -12,6 +12,7 @@
 #include <smp.h>
 #include <signal.h>
 #include <timer.h>
+#include <user_debugger.h>
 #include <util/list.h>
 #include <arch/thread_struct.h>
 
@@ -111,6 +112,8 @@ struct team {
 	struct list		image_list;
 	struct arch_team arch_info;
 
+	struct team_debug_info debug_info;
+
 	bigtime_t		dead_threads_kernel_time;
 	bigtime_t		dead_threads_user_time;
 };
@@ -166,6 +169,8 @@ struct thread {
 		uint32		reason;
 		struct list	waiters;
 	} exit;
+
+	struct thread_debug_info debug_info;
 
 	// stack
 	area_id			kernel_stack_area;
