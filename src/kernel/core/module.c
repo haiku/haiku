@@ -88,19 +88,20 @@ typedef struct module {
 
 typedef struct module_iterator {
 	const char			**path_stack;
-	int					stack_size;
-	int					stack_current;
+	int32				stack_size;
+	int32				stack_current;
 
 	char				*prefix;
 	DIR					*current_dir;
-	int					status;
-	int					module_offset;
+	status_t			status;
+	int32				module_offset;
 		/* This is used to keep track of which module_info
 		 * within a module we're addressing. */
 	module_image		*module_image;
 	module_info			**current_header;
 	const char			*current_path;
 	const char			*current_module_path;
+	bool				builtin_modules;
 } module_iterator;
 
 
@@ -748,6 +749,15 @@ iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_buffe
 
 	TRACE(("iterator_get_next_module() -- start\n"));
 
+	if (iterator->builtin_modules) {
+		if (sBuiltInModules[iterator->module_offset] != NULL) {
+			*_bufferSize = strlcpy(buffer,
+				sBuiltInModules[iterator->module_offset++]->name, *_bufferSize);
+			return B_OK;
+		} else
+			iterator->builtin_modules = false;
+	}
+
 nextDirectory:
 	if (iterator->current_dir == NULL) {
 		// get next directory path from the stack
@@ -929,32 +939,6 @@ module_init(kernel_args *args)
 }
 
 
-#ifdef DEBUG
-void
-module_test(void)
-{
-	void *cookie;
-
-	dprintf("module_test() - start!\n");
-
-	cookie = open_module_list(NULL);
-	if (cookie == NULL)
-		return;
-
-	while (true) {
-		char name[SYS_MAX_PATH_LEN];
-		size_t size = sizeof(name);
-
-		if (read_next_module_name(cookie, name, &size) < B_OK)
-			break;
-
-		dprintf("module: %s\n", name);
-	}
-	close_module_list(cookie);
-}
-#endif
-
-
 //	#pragma mark -
 //	Exported Kernel API (public part)
 
@@ -989,6 +973,9 @@ open_module_list(const char *prefix)
 		free(iterator);
 		return NULL;
 	}
+
+	// first, we'll traverse over the built-in modules
+	iterator->builtin_modules = true;
 
 	// put all search paths on the stack
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
@@ -1091,34 +1078,33 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
  */
 
 status_t 
-get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
+get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 {
-	hash_iterator *iterator = (hash_iterator *)*cookie;
-	module_image *moduleImage;
+	hash_iterator *iterator = (hash_iterator *)*_cookie;
+	struct module *module;
 	status_t status;
 
 	TRACE(("get_next_loaded_module_name()\n"));
 
-	if (cookie == NULL || buffer == NULL || _bufferSize == NULL)
+	if (_cookie == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
 
 	if (iterator == NULL) {
-		iterator = hash_open(gModuleImagesHash, NULL);
+		iterator = hash_open(gModulesHash, NULL);
 		if (iterator == NULL)
 			return B_NO_MEMORY;
 
-		*(hash_iterator **)cookie = iterator;
+		*(hash_iterator **)_cookie = iterator;
 	}
 
 	recursive_lock_lock(&gModulesLock);
 
-	moduleImage = hash_next(gModuleImagesHash, iterator);
-	if (moduleImage != NULL) {
-		strlcpy(buffer, moduleImage->path, *_bufferSize);
-		*_bufferSize = strlen(moduleImage->path);
+	module = hash_next(gModulesHash, iterator);
+	if (module != NULL) {
+		*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 		status = B_OK;
 	} else {
-		hash_close(gModuleImagesHash, iterator, true);
+		hash_close(gModulesHash, iterator, true);
 		status = B_ENTRY_NOT_FOUND;
 	}
 
