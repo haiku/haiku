@@ -100,8 +100,9 @@ dormant_flavor_info &
 dormant_flavor_info::operator=(const dormant_flavor_info &clone)
 {
 	CALLED();
-	//*this = static_cast<const flavor_info>(clone);
-	*this = (const flavor_info)clone;
+	// call operator=(const flavor_info &clone) to copy the flavor_info base class
+	*this = static_cast<const flavor_info>(clone);
+	// copy the dormant_node_info member variable
 	node_info = clone.node_info;
 	return *this;
 }
@@ -149,6 +150,7 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 		out_formats = 0;
 	}
 	
+	// initialize node_info with default values from dormant_node_info constructor
 	dormant_node_info temp;
 	node_info = temp;
 	
