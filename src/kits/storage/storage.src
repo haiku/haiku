@@ -27,8 +27,10 @@ STORAGE_KIT_SOURCE =
 	storage_support.cpp
 
 	# storage/mime
+	AssociatedTypes.cpp
 	Database.cpp
 	InstalledTypes.cpp
+	SnifferRules.cpp
 	Supertype.cpp
 	SupportingApps.cpp
 	database_access.cpp
