@@ -562,16 +562,23 @@ BMediaRoster::ReleaseNode(const media_node & node)
 BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
+	// MakeTimeSourceFor() returns a BTimeSource object
+	// corresponding to the specified node's time source.
+
 	CALLED();
+	
+	if ((for_node.node == NODE_SYSTEM_TIMESOURCE_ID) && (for_node.kind & B_TIME_SOURCE)) {
+		// special handling for the system time source
+		TRACE("BMediaRoster::MakeTimeSourceFor, asked for system time source\n");
+		return MediaRosterEx(this)->MakeTimeSourceObject(NODE_SYSTEM_TIMESOURCE_ID);
+	}
+
 	if (IS_INVALID_NODE(for_node)) {
-		FATAL("BMediaRoster::MakeTimeSourceFor: for_node invalid\n");
+		FATAL("BMediaRoster::MakeTimeSourceFor: for_node invalid, node %ld, port %ld, kinds 0x%lx\n", for_node.node, for_node.port, for_node.kind);
 		return NULL;
 	}
 
-	printf("BMediaRoster::MakeTimeSourceFor: node %ld enter\n", for_node.node);
-	
-	// MakeTimeSourceFor() returns a BTimeSource object
-	// corresponding to the specified node's time source.
+	TRACE("BMediaRoster::MakeTimeSourceFor: node %ld enter\n", for_node.node);
 	
 	node_get_timesource_request request;
 	node_get_timesource_reply reply;
@@ -586,7 +593,7 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 	
 	source = MediaRosterEx(this)->MakeTimeSourceObject(reply.timesource_id);
 
-	printf("BMediaRoster::MakeTimeSourceFor: node %ld leave\n", for_node.node);
+	TRACE("BMediaRoster::MakeTimeSourceFor: node %ld leave\n", for_node.node);
 
 	return source;
 }
