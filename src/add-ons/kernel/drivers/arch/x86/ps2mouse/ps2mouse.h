@@ -78,9 +78,7 @@
 #define PS2_RES_RESEND           0xFE
 
 // interrupts
-#define INT_BASE                 0x20
 #define INT_PS2_MOUSE            0x0C
-#define INT_CASCADE              0x02
 
 #define PACKET_SIZE              3
 
