@@ -482,10 +482,10 @@ static void detect_panels()
 		if (DACR(FP_TG_CTRL) & 0x00000001) si->ps.p1_timing.flags |= B_POSITIVE_VSYNC;
 		if (DACR(FP_TG_CTRL) & 0x00000010) si->ps.p1_timing.flags |= B_POSITIVE_HSYNC;
 		/* refreshrate:
-		 * fix a DVI or laptop flatpanel to 62Hz refresh!
+		 * fix a DVI or laptop flatpanel to 61Hz refresh!
 		 * (we can't risk getting below 60.0Hz as some panels shut-off then!) */
 		si->ps.p1_timing.pixel_clock =
-			(si->ps.p1_timing.h_total * si->ps.p1_timing.v_total * 62) / 1000;
+			(si->ps.p1_timing.h_total * si->ps.p1_timing.v_total * 61) / 1000;
 	}
 	if (si->ps.tmds2_active)
 	{
@@ -505,10 +505,10 @@ static void detect_panels()
 		if (DAC2R(FP_TG_CTRL) & 0x00000001) si->ps.p2_timing.flags |= B_POSITIVE_VSYNC;
 		if (DAC2R(FP_TG_CTRL) & 0x00000010) si->ps.p2_timing.flags |= B_POSITIVE_HSYNC;
 		/* refreshrate:
-		 * fix a DVI or laptop flatpanel to 62Hz refresh!
+		 * fix a DVI or laptop flatpanel to 61Hz refresh!
 		 * (we can't risk getting below 60.0Hz as some panels shut-off then!) */
 		si->ps.p2_timing.pixel_clock =
-			(si->ps.p2_timing.h_total * si->ps.p2_timing.v_total * 62) / 1000;
+			(si->ps.p2_timing.h_total * si->ps.p2_timing.v_total * 61) / 1000;
 	}
 
 	/* dump some panel configuration registers... */
