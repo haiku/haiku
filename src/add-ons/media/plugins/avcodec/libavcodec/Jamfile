@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src add-ons media plugins avcodec libavcodec ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare -Wpointer-arith ] ;
+
 SubDirCcFlags -fomit-frame-pointer -DPIC ;
 SubDirCcFlags -DHAVE_AV_CONFIG_H=1 ;
 
@@ -78,3 +82,6 @@ StaticLibrary avcodec :
 	xan.c 
 	xvmcvideo.c 
 ;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
