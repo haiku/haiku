@@ -49,6 +49,9 @@
 #define REPLACE_ALL 0x7FFFFFFF
 
 
+const char *B_EMPTY_STRING = "";
+
+
 // helper function, returns minimum of two given values (but clamps to 0):
 static inline int32
 min_clamp0(int32 num1, int32 num2) 
