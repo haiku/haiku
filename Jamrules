@@ -771,20 +771,31 @@ rule StaticLibrary
 	# StaticLibrary <name> : <sources> [ : <target dir> ] ;
 	# Creates a static library from sources.
 	# <name>: Basename of the library, without leading "lib" and trailing ".a".
+	#         Grist is allowed -- it will be re-prepended after constructing
+	#         the complete library name.
 	# <source>: List of source files.
 	# <target dir>: Directory into which the library shall be placed. Defaults
-	#               to the standard directory for static libs.
+	#               to the objects directory for this subdir. If
+	#               STATIC_LIBRARY_DIR is supplied (the literal string)
+	#               the standard directory for static libs is used, otherwise
+	#               the parameter is interpreted as directory path.
 	#
-	local lib = lib$(1)$(SUFLIB) ;
+	local lib = lib$(1:B)$(SUFLIB) ;
+	lib = $(lib:G=$(1:G)) ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Library $(lib) : $(2) ;
 	local targetDir = $(3) ;
-	if ! $(targetDir) {
-		targetDir = $(OBOS_STLIB_DIR) ;
+	if $(targetDir) {
+		if $(targetDir) = STATIC_LIBRARY_DIR {
+			targetDir = $(OBOS_STLIB_DIR) ;
+		}
+		MakeLocate $(lib) : $(targetDir) ;
+	} else {
+		# nothing to do, since the Library rule already located the library
+		# in $(LOCATE_TARGET)
 	}
-	MakeLocate $(lib) : $(targetDir) ;
 
 	# If KEEPOBJS is set, Library doesn't make the library depend on
 	# `lib'.
@@ -837,7 +848,8 @@ rule MergeObject
 rule SharedLibraryFromObjects
 {
 	# SharedLibraryFromObjects <name> : <objects> : <libraries> ;
-	local _lib = lib$(1).so ;
+	local _lib = lib$(1:B).so ;
+	_lib = $(_lib:G=$(1:G)) ;
 	MainFromObjects $(_lib) : $(2) ;
 	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
