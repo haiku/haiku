@@ -48,6 +48,8 @@ public:
 	
 	virtual status_t Control(const char *name, void *cookie,
 							 uint32 command, BMessage *message);
+							 
+	static FILE *sLogFile;	
 private:
 	status_t HandleMonitor(BMessage *message);
 	status_t InitFromSettings(void *cookie, uint32 opcode = 0);
@@ -59,9 +61,7 @@ private:
 	static int32 DeviceWatcher(void *arg);
 	static char *GetShortName(const char *longName);
 	
-	BList fDevices;
-	
-	static FILE *sLogFile;	
+	BList fDevices;	
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();

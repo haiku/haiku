@@ -36,7 +36,8 @@
 
 #define DEBUG 1
 #if DEBUG
-	#define LOG(text) fputs(text, sLogFile); fflush(sLogFile)
+	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
+		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
 #else
 	#define LOG(text)
 #endif
@@ -137,10 +138,7 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 {
 	keyboard_device *device = (keyboard_device *)cookie;
 	
-	char log[128];
-	snprintf(log, 128, "Stop(%s)\n", name);
-
-	LOG(log);
+	LOG("Stop(%s)\n", name);
 	
 	device->active = false;
 	if (device->device_watcher >= 0) {
@@ -156,10 +154,7 @@ status_t
 KeyboardInputDevice::Control(const char *name, void *cookie,
 						  uint32 command, BMessage *message)
 {
-	char log[128];
-	snprintf(log, 128, "Control(%s, code: %lu)\n", name, command);
-
-	LOG(log);
+	LOG("Control(%s, code: %lu)\n", name, command);
 
 	if (command == B_NODE_MONITOR)
 		HandleMonitor(message);
@@ -269,6 +264,13 @@ int32
 KeyboardInputDevice::DeviceWatcher(void *arg)
 {
 	keyboard_device *dev = (keyboard_device *)arg;
+	uint8 buffer[12];
+	
+	while (dev->active) {
+		if (ioctl(dev->fd, kGetNextKey, &buffer) < B_OK)
+			continue;
+		LOG("kGetNextKey : %lx%lx%lx\n", (uint32*)buffer, (uint32*)buffer+1, (uint32*)buffer+2);
+	}
 	
 	return 0;
 }
