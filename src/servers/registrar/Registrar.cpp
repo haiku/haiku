@@ -1,8 +1,5 @@
 // Registrar.cpp
 
-#ifndef DEBUG
-#	define DEBUG 1
-#endif
 #include "Debug.h"
 
 #include <Application.h>
@@ -22,31 +19,33 @@ Registrar::Registrar()
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL)
 {
-FUNCTION_START();
+	FUNCTION_START();
 	// move the following code to ReadyToRun() once it works.
 	fRoster = new TRoster;
 	fClipboardHandler = new ClipboardHandler;
 	AddHandler(fClipboardHandler);
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
+	FUNCTION_END();
 }
 
 // destructor
 Registrar::~Registrar()
 {
-FUNCTION_START();
+	FUNCTION_START();
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
 	delete fClipboardHandler;
 	delete fRoster;
+	FUNCTION_END();
 }
 
 // MessageReceived
 void
 Registrar::MessageReceived(BMessage *message)
 {
-FUNCTION_START();
+	FUNCTION_START();
 	switch (message->what) {
 		case B_REG_GET_MIME_MESSENGER:
 		{
@@ -81,27 +80,34 @@ FUNCTION_START();
 		case B_REG_REMOVE_APP:
 			fRoster->HandleRemoveApp(message);
 			break;
+		case B_REG_SET_THREAD_AND_TEAM:
+			fRoster->HandleSetThreadAndTeam(message);
+			break;
+		case B_REG_GET_RUNNING_APP_INFO:
+			fRoster->HandleGetRunningAppInfo(message);
+			break;
 		default:
 			BApplication::MessageReceived(message);
 			break;
 	}
-FUNCTION_END();
+	FUNCTION_END();
 }
 
 // ReadyToRun
 void
 Registrar::ReadyToRun()
 {
-FUNCTION_START();
+	FUNCTION_START();
 }
 
 // QuitRequested
 bool
 Registrar::QuitRequested()
 {
-FUNCTION_START();
+	FUNCTION_START();
 	// The final registrar must not quit. At least not that easily. ;-)
 	return BApplication::QuitRequested();
+	FUNCTION_END();
 }
 
 
@@ -109,7 +115,7 @@ FUNCTION_START();
 int
 main()
 {
-FUNCTION_START();
+	FUNCTION_START();
 	// rename the main thread
 	rename_thread(find_thread(NULL), kRosterThreadName);
 	// create and run the registrar application
@@ -118,7 +124,7 @@ PRINT(("app->Run()...\n"));
 	app->Run();
 PRINT(("delete app...\n"));
 	delete app;
-FUNCTION_END();
+	FUNCTION_END();
 	return 0;
 }
 
