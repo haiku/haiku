@@ -929,9 +929,46 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 	{
 		LOG(8,("INFO: $%04x ($%02x); ", *adress, rom[*adress]));
 
-		//fixme: complete (if possible) ...
+		/* all commands are here (verified NV11 and NV28) */
 		switch (rom[*adress])
 		{
+		case 0x31: /* new */
+			*size -= (15 + ((*((uint8*)(&(rom[(*adress + 10)])))) << 2));
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			and_out = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			shift = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			size32 = ((*((uint8*)(&(rom[*adress])))) << 2);
+			*adress += 1;
+			reg2 = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			LOG(8,("cmd 'RD 32bit reg $%08x, AND-out = $%08x, shift-right = $%02x,\n",
+				reg, and_out, shift));
+			LOG(8,("INFO: (cont.) RD 32bit data from subtable with size $%04x, at offset (result << 2),\n",
+				size32));
+			LOG(8,("INFO: (cont.) then WR result data to 32bit reg $%08x'\n", reg2));
+			if (*exec && reg2)
+			{
+				data = NV_REG32(reg);
+				data &= and_out;
+				data >>= shift;
+				data2 = *((uint32*)(&(rom[(*adress + (data << 2))])));
+				NV_REG32(reg2) = data2;
+			}
+			*adress += size32;
+			break;
 		case 0x32: /* new */
 			*size -= (11 + ((*((uint8*)(&(rom[(*adress + 6)])))) << 2));
 			if (*size < 0)
