@@ -476,6 +476,12 @@ StringSearchTest::PerformTest(void)
 	i = string1->IFindLast("abc", -10);
 	CPPUNIT_ASSERT(i == B_ERROR);
 	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("abc def ghi");
+	i = string1->IFindLast("abc",4);
+	CPPUNIT_ASSERT(i == 0);
+	delete string1;
 }
 
 
