@@ -68,5 +68,5 @@ SECTIONS
 	PROVIDE (_end = .);
 
 	/* Strip unnecessary stuff */
-	/DISCARD/ : { *(.comment .note .eh_frame) }
+	/DISCARD/ : { *(.comment .note) }
 }
