@@ -26,6 +26,8 @@
 //  
 //------------------------------------------------------------------------------
 #include "AccelerantDriver.h"
+#include "Angle.h"
+#include "FontFamily.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
 #include "LayerData.h"
@@ -36,12 +38,52 @@
 
 #define RUN_UNDER_R5
 
+#define CLIP_X(a) ( (a < 0) ? 0 : ((a > mDisplayMode.virtual_width-1) ? \
+			mDisplayMode.virtual_width-1 : a) )
+#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > mDisplayMode.virtual_height-1) ? \
+			mDisplayMode.virtual_height-1 : a) )
+#define CHECK_X(a) ( (a >= 0) || (a <= mDisplayMode.virtual_width-1) )
+#define CHECK_Y(a) ( (a >= 0) || (a <= mDisplayMode.virtual_height-1) )
+
 /* Stuff to investigate:
    Effect of pensize on fill operations
    Pattern details - start point, rectangles drawn counter-clockwise?
                      Maybe the pattern is always relative to (0,0)
+   Do I need to deal with things that may be clipped entirely?
 */
 /* Need to check which functions should move the pen position */
+
+class AccLineCalc
+{
+public:
+	AccLineCalc(const BPoint &pta, const BPoint &ptb);
+	float GetX(float y);
+	float GetY(float x);
+	float Slope(void) { return slope; }
+	float Offset(void) { return offset; }
+private:
+	float slope;
+	float offset;
+	BPoint start, end;
+};
+
+AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
+{
+	start=pta;
+	end=ptb;
+	slope=(start.y-end.y)/(start.x-end.x);
+	offset=start.y-(slope * start.x);
+}
+
+float AccLineCalc::GetX(float y)
+{
+	return ( (y-offset)/slope );
+}
+
+float AccLineCalc::GetY(float x)
+{
+	return ( (slope * x) + offset );
+}
 
 /*!
 	\brief Sets up internal variables needed by AccelerantDriver
@@ -236,6 +278,150 @@ void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, Laye
 */
 void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
+#if 0
+	if(!string || !d || !d->font)
+		return;
+
+	_Lock();
+
+	pt.y--;	// because of Be's backward compatibility hack
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+	{
+		_Unlock();
+		return;
+	}
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_Matrix rmatrix,smatrix;
+	FT_UInt glyph_index, previous=0;
+	FT_Vector pen,delta,space,nonspace;
+	int16 error=0;
+	int32 strlength,i;
+	Angle rotation(font->Rotation()), shear(font->Shear());
+
+	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
+		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
+
+	// Originally, I thought to do this shear checking here, but it really should be
+	// done in BFont::SetShear()
+	float shearangle=shear.Value();
+	if(shearangle>135)
+		shearangle=135;
+	if(shearangle<45)
+		shearangle=45;
+
+	if(shearangle>90)
+		shear=90+((180-shearangle)*2);
+	else
+		shear=90-(90-shearangle)*2;
+	
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		printf("Couldn't create face object\n");
+		_Unlock();
+		return;
+	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		_Unlock();
+		return;
+	}
+
+	// if we do any transformation, we do a call to FT_Set_Transform() here
+	
+	// First, rotate
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	rmatrix.xy = (FT_Fixed)( rotation.Sine()*0x10000); 
+	rmatrix.yx = (FT_Fixed)(-rotation.Sine()*0x10000); 
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	
+	// Next, shear
+	smatrix.xx = (FT_Fixed)(0x10000); 
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
+	smatrix.yx = (FT_Fixed)(0); 
+	smatrix.yy = (FT_Fixed)(0x10000); 
+
+	//FT_Matrix_Multiply(&rmatrix,&smatrix);
+	FT_Matrix_Multiply(&smatrix,&rmatrix);
+	
+	// Set up the increment value for escapement padding
+	space.x=int32(d->edelta.space * rotation.Cosine()*64);
+	space.y=int32(d->edelta.space * rotation.Sine()*64);
+	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
+	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
+	
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=(int32)pt.x * 64;
+	pen.y=(int32)pt.y * 64;
+	
+	slot=face->glyph;
+
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		//FT_Set_Transform(face,&smatrix,&pen);
+		FT_Set_Transform(face,&rmatrix,&pen);
+
+		// Handle escapement padding option
+		if((uint8)string[i]<=0x20)
+		{
+			pen.x+=space.x;
+			pen.y+=space.y;
+		}
+		else
+		{
+			pen.x+=nonspace.x;
+			pen.y+=nonspace.y;
+		}
+
+	
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+			pen.y+=delta.y;
+		}
+
+		error=FT_Load_Char(face,string[i],
+			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
+
+		if(!error)
+		{
+			if(antialias)
+				BlitGray2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
+			else
+				BlitMono2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,pt.y-(slot->bitmap_top-pt.y)), d);
+		}
+		else
+			printf("Couldn't load character %c\n", string[i]);
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		pen.y+=slot->advance.y;
+		previous=glyph_index;
+	}
+	FT_Done_Face(face);
+	_Unlock();
+#endif
 }
 
 /*!
@@ -251,6 +437,169 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 */
 void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
+  /* Need to add bounds checking code */
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+	int thick;
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  StrokeEllipse(r,d,pat);
+	  return;
+	}
+
+	_Lock();
+	thick = (int)d->pensize;
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+        /*
+	if ( useQuad1 || 
+	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+	if ( useQuad2 || 
+	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+	if ( useQuad3 || 
+	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+	if ( useQuad4 || 
+	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+                */
+	if ( useQuad1 || 
+		(!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) )
+	{
+	        if ( useQuad2 || 
+	                (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) )
+                {
+                        HLine(xc-x, xc+x, yc-y, d, pat);
+                }
+	}
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+	_Unlock();
+
 }
 
 /*!
@@ -349,14 +698,26 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 
 	_Lock();
 
+	if ( (r.bottom < 0) || (r.top > mDisplayMode.virtual_height-1) ||
+		(r.right < 0) || (r.left > mDisplayMode.virtual_width-1) )
+	{
+		_Unlock();
+		return;
+	}
+
         /*
 	SetThickPixel(xc+x,yc-y,thick,d->highcolor);
 	SetThickPixel(xc-x,yc-y,thick,d->highcolor);
 	SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 	SetThickPixel(xc+x,yc+y,thick,d->highcolor);
         */
-	SetPixel(xc,yc-y,d->highcolor);
-	SetPixel(xc,yc+y,d->highcolor);
+	if ( CHECK_X(xc) )
+	{
+		if ( CHECK_Y(yc-y) )
+			SetPixel(xc,yc-y,d->highcolor);
+		if ( CHECK_Y(yc+y) )
+			SetPixel(xc,yc+y,d->highcolor);
+	}
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -378,8 +739,13 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
                 */
-                HLine(xc-x,xc+x,yc-y,d->highcolor);
-                HLine(xc-x,xc+x,yc+y,d->highcolor);
+		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
+		{
+			if ( CHECK_Y(yc-y) )
+	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,d,pat);
+			if ( CHECK_Y(yc+y) )
+		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,d,pat);
+		}
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -402,8 +768,13 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
 		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
                 */
-                HLine(xc-x,xc+x,yc-y,d->highcolor);
-                HLine(xc-x,xc+x,yc+y,d->highcolor);
+		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
+		{
+			if ( CHECK_Y(yc-y) )
+	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,d,pat);
+			if ( CHECK_Y(yc+y) )
+		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,d,pat);
+		}
 	}
 	_Unlock();
 }
@@ -421,6 +792,10 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
 {
+  /* The current plan is to transform the polygon into trianles and rectangles, and
+     use the apporiate commands to draw each part.  Maybe I'll come up with something
+     better later.
+  */
 }
 
 /*!
@@ -439,7 +814,22 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
+		case B_GRAY8:
 			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row;
+				int x,y;
+				uint8 drawcolor = d->highcolor.GetColor8();
+				for (y=(int)r.top; y<=(int)r.bottom; y++)
+				{
+                                        /* If there is no pattern, we could replace this
+                                           loop with a memset.
+                                         */
+					for (x=(int)r.left; x<=r.right; x++)
+					{
+						fb[x] = drawcolor;
+					}
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
@@ -448,6 +838,17 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
+				int x,y;
+				uint16 drawcolor = d->highcolor.GetColor16();
+				for (y=(int)r.top; y<=(int)r.bottom; y++)
+				{
+					for (x=(int)r.left; x<=r.right; x++)
+					{
+						fb[x] = drawcolor;
+					}
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -492,16 +893,26 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	int i;
 
 	_Lock();
+	
+	if ( (r.bottom < 0) || (r.top > mDisplayMode.virtual_height-1) ||
+		(r.right < 0) || (r.left > mDisplayMode.virtual_width-1) )
+	{
+		_Unlock();
+		return;
+	}
 
 	for (i=0; i<ROUND(yrad); i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
-		StrokeLine(BPoint(r.left+xrad-arc_x,r.top+i),
-			BPoint(r.right-xrad+arc_x,r.top+i), d, pat);
-		StrokeLine(BPoint(r.left+xrad-arc_x,r.bottom-i),
-			BPoint(r.right-xrad+arc_x,r.bottom-i), d, pat);
+		if ( CHECK_Y(r.top+i) )
+			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
+				r.top+i, d, pat);
+		if ( CHECK_Y(r.bottom-i) )
+			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
+				r.bottom-i, d, pat);
 	}
-	FillRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad), d, pat);
+	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
+			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
 
 	_Unlock();
 }
@@ -523,6 +934,110 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 */
 void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
+	if(!pts || !d || !pat)
+		return;
+
+	_Lock();
+	BPoint first, second, third;
+
+	// Sort points according to their y values
+	if(pts[0].y < pts[1].y)
+	{
+		first=pts[0];
+		second=pts[1];
+	}
+	else
+	{
+		first=pts[1];
+		second=pts[0];
+	}
+	
+	if(second.y<pts[2].y)
+	{
+		third=pts[2];
+	}
+	else
+	{
+		// second is lower than "third", so we must ensure that this third point
+		// isn't higher than our first point
+		third=second;
+		if(first.y<pts[2].y)
+			second=pts[2];
+		else
+		{
+			second=first;
+			first=pts[2];
+		}
+	}
+	
+	// Now that the points are sorted, check to see if they all have the same
+	// y value
+	if(first.y==second.y && second.y==third.y)
+	{
+		BPoint start,end;
+		start.y=first.y;
+		end.y=first.y;
+		start.x=MIN(first.x,MIN(second.x,third.x));
+		end.x=MAX(first.x,MAX(second.x,third.x));
+		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
+			HLine(CLIP_X(start.x), CLIP_X(end.x), start.y, d, pat);
+		_Unlock();
+		return;
+	}
+
+	int32 i;
+
+	// Special case #1: first and second in the same row
+	if(first.y==second.y)
+	{
+		AccLineCalc lineA(first, third);
+		AccLineCalc lineB(second, third);
+		
+		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
+			HLine(CLIP_X(first.x), CLIP_X(second.x), first.y, d, pat);
+		for(i=int32(first.y+1);i<third.y;i++)
+			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+		_Unlock();
+		return;
+	}
+	
+	// Special case #2: second and third in the same row
+	if(second.y==third.y)
+	{
+		AccLineCalc lineA(first, second);
+		AccLineCalc lineB(first, third);
+		
+		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
+			HLine(CLIP_X(second.x), CLIP_X(third.x), second.y, d, pat);
+		for(i=int32(first.y+1);i<third.y;i++)
+			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+		_Unlock();
+		return;
+	}
+	
+	// Normal case.
+	// Calculate the y deltas for the two lines and we set the maximum for the
+	// first loop to the lesser of the two so that we can change lines.
+	int32 dy1=int32(second.y-first.y),
+		dy2=int32(third.y-first.y),
+		max;
+	max=int32(first.y+MIN(dy1,dy2));
+	
+	AccLineCalc lineA(first, second);
+	AccLineCalc lineB(first, third);
+	AccLineCalc lineC(second, third);
+	
+	for(i=int32(first.y+1);i<max;i++)
+		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+			HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+
+	for(i=max; i<third.y; i++)
+		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
+			HLine(CLIP_X(lineC.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+		
+	_Unlock();
 }
 
 /*!
@@ -621,6 +1136,7 @@ void AccelerantDriver::InvertRect(BRect r)
 			printf("ScreenDriver::15-bit mode unimplemented\n");
 			break;
 		case B_CMAP8:
+		case B_GRAY8:
 			// TODO: Implement
 			printf("ScreenDriver::8-bit mode unimplemented\n");
 			break;
@@ -1083,13 +1599,12 @@ void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, L
 */
 void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
-/* Optimize later with HLine and VLine calls, once they support patterns */
 /* Maybe this should be drawn counterclockwise ? */
 	_Lock();
-	StrokeLine(r.LeftTop(),r.RightTop(),d,pat);
-	StrokeLine(r.RightTop(),r.RightBottom(),d,pat);
-	StrokeLine(r.RightBottom(),r.LeftBottom(),d,pat);
-	StrokeLine(r.LeftTop(),r.LeftBottom(),d,pat);
+	HLine(r.left, r.right, r.top, d, pat);
+	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
+	HLine(r.right, r.left, r.bottom, d, pat);
+	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
 	_Unlock();
 }
 
@@ -1122,14 +1637,14 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	bRight = hRight -xrad;
 	bTop = vTop + yrad;
 	bBottom = vBottom - yrad;
-	StrokeArc(BRect(bRight,r.top,r.right,bTop), 0, 90, d, pat);
-	StrokeLine(BPoint(hRight,r.top),BPoint(hLeft,r.top),d,pat);
+	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
+	HLine(hRight, hLeft, r.top, d, pat);
 	
 	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
 	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
 
 	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
-	StrokeLine(BPoint(hLeft,r.bottom),BPoint(hRight,r.bottom),d,pat);
+	HLine(hLeft, hRight, r.bottom, d, pat);
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
 	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
@@ -1242,7 +1757,75 @@ bool AccelerantDriver::DumpToFile(const char *path)
 */
 float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-	return 0.0;
+		if(!string || !d || !d->font)
+		return 0.0;
+	_Lock();
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_UInt glyph_index, previous=0;
+	FT_Vector pen,delta;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=0;
+	
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+		}
+
+		error=FT_Load_Char(face,string[i],FT_LOAD_MONOCHROME);
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		previous=glyph_index;
+	}
+
+	FT_Done_Face(face);
+
+	returnval=pen.x>>6;
+	_Unlock();
+	return returnval;
 }
 
 /*!
@@ -1259,7 +1842,62 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 */
 float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
-	return 0.0;
+	if(!string || !d || !d->font)
+		return 0.0;
+	_Lock();
+
+	ServerFont *font=d->font;
+	FontStyle *style=font->Style();
+
+	if(!style)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	FT_Face face;
+	FT_GlyphSlot slot;
+	int16 error=0;
+	int32 strlength,i;
+	float returnval=0.0,ascent=0.0,descent=0.0;
+
+	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	if(error)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		_Unlock();
+		return 0.0;
+	}
+
+	slot=face->glyph;
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		FT_Load_Char(face,string[i],FT_LOAD_RENDER);
+		if(slot->metrics.horiBearingY<slot->metrics.height)
+			descent=MAX((slot->metrics.height-slot->metrics.horiBearingY)>>6,descent);
+		else
+			ascent=MAX(slot->bitmap.rows,ascent);
+	}
+	_Unlock();
+
+	FT_Done_Face(face);
+
+	returnval=ascent+descent;
+	_Unlock();
+	return returnval;
 }
 
 /*!
@@ -1342,7 +1980,10 @@ void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
+		case B_GRAY8:
 			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row;
+				fb[x] = col.GetColor8();
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
@@ -1351,6 +1992,8 @@ void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				fb[x] = col.GetColor16();
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -1372,7 +2015,22 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
+		case B_GRAY8:
 			{
+				int i,j;
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row + x-thick/2;
+				uint8 drawcolor = col.GetColor8();
+				for (i=0; i<thick; i++)
+				{
+                                        /* If there is no pattern, we could replace this
+                                           loop with a memset.
+                                         */
+					for (j=0; j<thick; j++)
+					{
+						fb[j] = drawcolor;
+					}
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
@@ -1381,6 +2039,17 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
+				int i,j;
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row) + x-thick/2;
+                                uint16 drawcolor = col.GetColor16();
+				for (i=0; i<thick; i++)
+				{
+					for (j=0; j<thick; j++)
+					{
+						fb[j] = drawcolor;
+					}
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -1405,12 +2074,12 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 	}
 }
 
-/* Need to replace this with one that takes patterns */
-void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor col)
+void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, LayerData *d, int8 *pat)
 {
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
+		case B_GRAY8:
 			{
 			} break;
 		case B_RGB16_BIG:
@@ -1427,7 +2096,7 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor col)
 		case B_RGBA32_LITTLE:
 			{
 				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				rgb_color color = col.GetColor32();
+				rgb_color color = d->highcolor.GetColor32();
 				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 				int x;
 				if ( x1 > x2 )
@@ -1450,10 +2119,8 @@ void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRe
 	if(!sourcebmp)
 		return;
 
-	/* Need to fix this 
-	if(sourcebmp->BitsPerPixel() != fbuffer->gcinfo.bits_per_pixel)
+	if(sourcebmp->BitsPerPixel() != GetDepthFromColorspace(mDisplayMode.space))
 		return;
-		*/
 
 	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
 	// First, clip source rect to destination
@@ -1574,10 +2241,8 @@ void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BR
 	if(!destbmp)
 		return;
 
-	/* Need to fix this
-	if(destbmp->BitsPerPixel() != fbuffer->gcinfo.bits_per_pixel)
+	if(destbmp->BitsPerPixel() != GetDepthFromColorspace(mDisplayMode.space))
 		return;
-		*/
 
 	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
 	// First, clip source rect to destination
@@ -1662,11 +2327,7 @@ int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 	char path[PATH_MAX];
 	DIR *directory;
 	struct dirent *entry;
-#if 0
-  //card_fd = open("/dev/graphics/1002_4755_000400",B_READ_WRITE);
-  card_fd = open("/dev/graphics/nv10_010000",B_READ_WRITE);
-  //card_fd = open("/dev/graphics/stub",B_READ_WRITE);
-#endif
+
 	directory = opendir("/dev/graphics");
 	if ( !directory )
 		return -1;
