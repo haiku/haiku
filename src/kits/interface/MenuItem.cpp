@@ -400,8 +400,6 @@ BMenuItem::Draw()
 	fSuper->MovePenTo(ContentLocation());
 	
 	DrawContent();
-
-	fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
@@ -413,6 +411,8 @@ BMenuItem::Draw()
 		if (Submenu())
 			DrawSubmenuSymbol();
 	}
+
+	fSuper->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));	
 }
 
 
@@ -548,13 +548,14 @@ BMenuItem::Invoke(BMessage *message)
 void
 BMenuItem::Uninstall()
 {
-	if (fSubmenu)
+	if (fSubmenu != NULL)
 		fSubmenu->Uninstall();
 
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	if (0x6c != 0 && fModifiers & B_COMMAND_KEY && fWindow)
+	// TODO: I'm not sure about B_COMMAND_KEY
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
 
 	fWindow = NULL;
@@ -569,7 +570,7 @@ BMenuItem::SetSuper(BMenu *super)
 				
 	fSuper = super;
 
-	if (fSubmenu)
+	if (fSubmenu != NULL)
 		fSubmenu->fSuper = super;
 }
 
