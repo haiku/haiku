@@ -427,6 +427,36 @@ intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
 	return error;
 }
 
+// intel_identify_module
+static
+bool
+intel_identify_module(const char *identifier)
+{
+	return (identifier && !strcmp(identifier, "intel"));
+}
+
+// intel_get_partitioning_params
+static
+status_t
+intel_get_partitioning_params(int deviceFD,
+							  const struct session_info *sessionInfo,
+							  char *buffer, size_t bufferSize,
+							  size_t *actualSize)
+{
+	// not yet supported
+	return B_UNSUPPORTED;
+}
+
+// intel_partition
+static
+status_t
+intel_partition(int deviceFD, const struct session_info *sessionInfo,
+				const char *parameters)
+{
+	// not yet supported
+	return B_UNSUPPORTED;
+}
+
 
 static partition_module_info intel_partition_module = 
 {
@@ -438,6 +468,9 @@ static partition_module_info intel_partition_module =
 	},
 	intel_identify,
 	intel_get_nth_info,
+	intel_identify_module,
+	intel_get_partitioning_params,
+	intel_partition,
 };
 
 _EXPORT partition_module_info *modules[] =
