@@ -1590,7 +1590,7 @@ do_link(int argc, char **argv)
 			// get source leaf
 			char leaf[B_FILE_NAME_LENGTH];
 			error = get_last_path_component(source, leaf, sizeof(leaf));
-			if (error != B_OK) {
+			if (error != FS_OK) {
 				fprintf(stderr, "Failed to get leaf name of source path: %s\n",
 					fs_strerror(error));
 				return error;
