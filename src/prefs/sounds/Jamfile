@@ -8,4 +8,4 @@ Preference Sounds :
 	HWindow.cpp 
 	HEventList.cpp ;
 
-LinkSharedOSLibs Sounds : be media game tracker ;
+LinkSharedOSLibs Sounds : be libmedia.so game tracker ;

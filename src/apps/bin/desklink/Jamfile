@@ -6,6 +6,6 @@ BinCommand desklink :
 	desklink.cpp
 	VolumeSlider.cpp
 	DeskButton.cpp
-	: be media
+	: be libmedia.so
 	;
 
