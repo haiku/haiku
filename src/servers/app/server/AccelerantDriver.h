@@ -41,6 +41,7 @@
 #endif
 #include <Accelerant.h>
 #include "DisplayDriver.h"
+#include "PatternHandler.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
@@ -115,16 +116,11 @@ protected:
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
-	void HLine(int32 x1, int32 x2, int32 y, LayerData *d, int8 *pat);
+	void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
+	void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	void SetPixel(int x, int y, RGBColor col);
-	void SetPixel32(int x, int y, rgb_color col);
-	void SetPixel16(int x, int y, uint16 col);
-	void SetPixel8(int x, int y, uint8 col);
-	void SetThickPixel(int x, int y, int thick, RGBColor col);
-	void SetThickPixel32(int x, int y, int thick, rgb_color col);
-	void SetThickPixel16(int x, int y, int thick, uint16 col);
-	void SetThickPixel8(int x, int y, int thick, uint8 col);
+	void SetThickPixel(int x, int y, int thick, PatternHandler *pat);
 	int OpenGraphicsDevice(int deviceNumber);
 	int GetModeFromResolution(int width, int height, int space);
 	int GetWidthFromMode(int mode);

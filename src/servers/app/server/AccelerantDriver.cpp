@@ -61,10 +61,18 @@ public:
 	float GetY(float x);
 	float Slope(void) { return slope; }
 	float Offset(void) { return offset; }
+	float MinX();
+	float MinY();
+	float MaxX();
+	float MaxY();
 private:
 	float slope;
 	float offset;
 	BPoint start, end;
+	float minx;
+	float miny;
+	float maxx;
+	float maxy;
 };
 
 AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
@@ -73,6 +81,10 @@ AccLineCalc::AccLineCalc(const BPoint &pta, const BPoint &ptb)
 	end=ptb;
 	slope=(start.y-end.y)/(start.x-end.x);
 	offset=start.y-(slope * start.x);
+	minx = MIN(start.x,end.x);
+	maxx = MAX(start.x,end.x);
+	miny = MIN(start.y,end.y);
+	maxy = MAX(start.y,end.y);
 }
 
 float AccLineCalc::GetX(float y)
@@ -80,9 +92,29 @@ float AccLineCalc::GetX(float y)
 	return ( (y-offset)/slope );
 }
 
+float AccLineCalc::MinX()
+{
+	return minx;
+}
+
+float AccLineCalc::MaxX()
+{
+	return maxx;
+}
+
 float AccLineCalc::GetY(float x)
 {
 	return ( (slope * x) + offset );
+}
+
+float AccLineCalc::MinY()
+{
+	return miny;
+}
+
+float AccLineCalc::MaxY()
+{
+	return maxy;
 }
 
 /*!
@@ -437,7 +469,6 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 */
 void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
-  /* Need to add bounds checking code */
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
@@ -455,7 +486,12 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
-	int thick;
+	float oldpensize;
+	BPoint center(xc,yc);
+
+	/* This should be optimized later.  It is quick for the filled quadrants, but
+	   is inefficient for the partially filled quadrants.
+	 */
 
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
@@ -465,7 +501,11 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	}
 
 	_Lock();
-	thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+	oldpensize = d->pensize;
+	d->pensize = 1;
+
 	if ( span > 0 )
 	{
 		startQuad = (int)(angle/90)%4+1;
@@ -507,33 +547,26 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 		}
 	}
 
-        /*
-	if ( useQuad1 || 
-	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+	if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+	if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+	if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-	if ( useQuad2 || 
-	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-	if ( useQuad3 || 
-	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-	if ( useQuad4 || 
-	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-                */
-	if ( useQuad1 || 
-		(!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) )
-	{
-	        if ( useQuad2 || 
-	                (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) )
-                {
-                        HLine(xc-x, xc+x, yc-y, d, pat);
-                }
-	}
+		StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -549,22 +582,26 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 			p += Ry2 + px - py;
 		}
 
-		if ( useQuad1 || 
-		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+		if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		if ( useQuad2 || 
-		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+			StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		if ( useQuad3 || 
-		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+			StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		if ( useQuad4 || 
-		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+			StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -581,23 +618,28 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 			p += Rx2 - py +px;
 		}
 
-		if ( useQuad1 || 
-		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc-x),yc-y,&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+		if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		if ( useQuad2 || 
-		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+			StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		if ( useQuad3 || 
-		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+			StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		if ( useQuad4 || 
-		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+			StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
+		if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
 	}
+	d->pensize = oldpensize;
 	_Unlock();
 
 }
@@ -613,9 +655,6 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 */
 void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
-/* Need to add fill code, this is just a copy of StrokeBezier */
-/* Need to add bounds checking code */
-/* Probably should check to make sure that we have at least 4 points */
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
 	int x, y;
@@ -624,8 +663,12 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	double dt = .001;
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+	float oldpensize;
 
 	_Lock();
+	AccLineCalc line(pts[0], pts[3]);
+	oldpensize = d->pensize;
+	d->pensize = 1;
 
 	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
 	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
@@ -656,7 +699,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 		x = ROUND(X);
 		y = ROUND(Y);
 		if ( (x!=lastx) || (y!=lasty) )
-			SetThickPixel(x,y,d->pensize,d->highcolor);
+			StrokeLine(BPoint(x,y),BPoint(x,line.GetY(x)),d,pat);
 		lastx = x;
 		lasty = y;
 
@@ -667,6 +710,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 		dy += ddy;
 		ddy += dddy;
 	}
+	d->pensize = oldpensize;
 	_Unlock();
 }
 
@@ -681,7 +725,6 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 {
-  /* Need to add bounds checking code */
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
@@ -697,26 +740,15 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 	int py = twoRx2 * y;
 
 	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	if ( (r.bottom < 0) || (r.top > mDisplayMode.virtual_height-1) ||
-		(r.right < 0) || (r.left > mDisplayMode.virtual_width-1) )
-	{
-		_Unlock();
-		return;
-	}
-
-        /*
-	SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-	SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-	SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-	SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-        */
 	if ( CHECK_X(xc) )
 	{
 		if ( CHECK_Y(yc-y) )
-			SetPixel(xc,yc-y,d->highcolor);
+			SetPixel(xc,yc-y,pattern.GetColor(xc,yc-y));
 		if ( CHECK_Y(yc+y) )
-			SetPixel(xc,yc+y,d->highcolor);
+			SetPixel(xc,yc+y,pattern.GetColor(xc,yc+y));
 	}
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
@@ -733,18 +765,12 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Ry2 + px - py;
 		}
 
-                /*
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-                */
 		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
 		{
 			if ( CHECK_Y(yc-y) )
-	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,d,pat);
+	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,&pattern);
 			if ( CHECK_Y(yc+y) )
-		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,d,pat);
+		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,&pattern);
 		}
 	}
 
@@ -762,18 +788,12 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Rx2 - py +px;
 		}
 
-                /*
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
-                */
 		if ( CHECK_X(xc-x) || CHECK_X(xc+x) )
 		{
 			if ( CHECK_Y(yc-y) )
-	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,d,pat);
+	                	HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc-y,&pattern);
 			if ( CHECK_Y(yc+y) )
-		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,d,pat);
+		                HLine(CLIP_X(xc-x),CLIP_X(xc+x),yc+y,&pattern);
 		}
 	}
 	_Unlock();
@@ -792,10 +812,19 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
 {
-  /* The current plan is to transform the polygon into trianles and rectangles, and
-     use the apporiate commands to draw each part.  Maybe I'll come up with something
-     better later.
-  */
+	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
+	   the y-value of a point not in the segment, split the segment into 2 segments.
+	   Once we have gone through all of the segments, sort them primarily on y-value
+	   and secondarily on x-value.  Step through each y-value in the bounding rectangle
+	   and look for intersections with line segments.  First intersection is start of
+	   horizontal line, second intersection is end of horizontal line.  Continue for
+	   all pairs of intersections.  Watch out for horizontal line segments.
+	*/
+	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	_Unlock();
 }
 
 /*!
@@ -808,8 +837,9 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
 /* Need to add check for possible hardware acceleration of this */
-/* Need to deal with pattern */
 	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	switch (mDisplayMode.space)
 	{
@@ -818,15 +848,11 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 			{
 				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row;
 				int x,y;
-				uint8 drawcolor = d->highcolor.GetColor8();
 				for (y=(int)r.top; y<=(int)r.bottom; y++)
 				{
-                                        /* If there is no pattern, we could replace this
-                                           loop with a memset.
-                                         */
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						fb[x] = drawcolor;
+						fb[x] = pattern.GetColor(x,y).GetColor8();
 					}
 					fb += mFrameBufferConfig.bytes_per_row;
 				}
@@ -840,12 +866,11 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 			{
 				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
 				int x,y;
-				uint16 drawcolor = d->highcolor.GetColor16();
 				for (y=(int)r.top; y<=(int)r.bottom; y++)
 				{
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						fb[x] = drawcolor;
+						fb[x] = pattern.GetColor(x,y).GetColor16();
 					}
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
@@ -857,13 +882,13 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 			{
 				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + (int)r.top*mFrameBufferConfig.bytes_per_row);
 				int x,y;
-				rgb_color color = d->highcolor.GetColor32();
-				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				rgb_color color;
 				for (y=(int)r.top; y<=(int)r.bottom; y++)
 				{
 					for (x=(int)r.left; x<=r.right; x++)
 					{
-						fb[x] = drawcolor;
+						color = pattern.GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
@@ -893,23 +918,18 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	int i;
 
 	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 	
-	if ( (r.bottom < 0) || (r.top > mDisplayMode.virtual_height-1) ||
-		(r.right < 0) || (r.left > mDisplayMode.virtual_width-1) )
-	{
-		_Unlock();
-		return;
-	}
-
 	for (i=0; i<ROUND(yrad); i++)
 	{
 		arc_x = xrad*sqrt(1-i*i/yrad2);
 		if ( CHECK_Y(r.top+i) )
 			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.top+i, d, pat);
+				r.top+i, &pattern);
 		if ( CHECK_Y(r.bottom-i) )
 			HLine(CLIP_X(r.left+xrad-arc_x), CLIP_X(r.right-xrad+arc_x),
-				r.bottom-i, d, pat);
+				r.bottom-i, &pattern);
 	}
 	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
 			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
@@ -939,6 +959,8 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 
 	_Lock();
 	BPoint first, second, third;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	// Sort points according to their y values
 	if(pts[0].y < pts[1].y)
@@ -980,7 +1002,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
-			HLine(CLIP_X(start.x), CLIP_X(end.x), start.y, d, pat);
+			HLine(CLIP_X(start.x), CLIP_X(end.x), start.y, &pattern);
 		_Unlock();
 		return;
 	}
@@ -994,10 +1016,10 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		AccLineCalc lineB(second, third);
 		
 		if ( CHECK_Y(first.y) && (CHECK_X(first.x) || CHECK_X(second.x)) )
-			HLine(CLIP_X(first.x), CLIP_X(second.x), first.y, d, pat);
+			HLine(CLIP_X(first.x), CLIP_X(second.x), first.y, &pattern);
 		for(i=int32(first.y+1);i<third.y;i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		_Unlock();
 		return;
 	}
@@ -1009,10 +1031,10 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		AccLineCalc lineB(first, third);
 		
 		if ( CHECK_Y(second.y) && (CHECK_X(second.x) || CHECK_X(third.x)) )
-			HLine(CLIP_X(second.x), CLIP_X(third.x), second.y, d, pat);
+			HLine(CLIP_X(second.x), CLIP_X(third.x), second.y, &pattern);
 		for(i=int32(first.y+1);i<third.y;i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+				HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		_Unlock();
 		return;
 	}
@@ -1031,11 +1053,11 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 	
 	for(i=int32(first.y+1);i<max;i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+			HLine(CLIP_X(lineA.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 
 	for(i=max; i<third.y; i++)
 		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
-			HLine(CLIP_X(lineC.GetX(i)), CLIP_X(lineB.GetX(i)), i, d, pat);
+			HLine(CLIP_X(lineC.GetX(i)), CLIP_X(lineB.GetX(i)), i, &pattern);
 		
 	_Unlock();
 }
@@ -1091,12 +1113,6 @@ void AccelerantDriver::InvertRect(BRect r)
 {
   /* Need to check for hardware support for this */
 	_Lock();
-	if( (r.top < 0) || (r.left < 0) || 
-		(r.right > mDisplayMode.virtual_width-1) || (r.bottom > mDisplayMode.virtual_height-1) )
-	{
-		_Unlock();
-		return;
-	}
 
 	switch (mDisplayMode.space)
 	{
@@ -1231,7 +1247,6 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	being clipped.
 */void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
-  /* Need to add bounds checking code */
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
@@ -1259,6 +1274,9 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	}
 
 	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
 	thick = (int)d->pensize;
 	if ( span > 0 )
 	{
@@ -1301,22 +1319,23 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		}
 	}
 
+        /* SetThickPixel does bounds checking, so we don't have to worry about it here */
 	if ( useQuad1 || 
 	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc-y,thick,&pattern);
 	if ( useQuad2 || 
 	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,&pattern);
 	if ( useQuad3 || 
 	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,&pattern);
 	if ( useQuad4 || 
 	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,&pattern);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -1335,19 +1354,19 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+			SetThickPixel(xc+x,yc-y,thick,&pattern);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+			SetThickPixel(xc-x,yc-y,thick,&pattern);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+			SetThickPixel(xc-x,yc+y,thick,&pattern);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			SetThickPixel(xc+x,yc+y,thick,&pattern);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -1367,19 +1386,19 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if ( useQuad1 || 
 		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+			SetThickPixel(xc+x,yc-y,thick,&pattern);
 		if ( useQuad2 || 
 		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+			SetThickPixel(xc-x,yc-y,thick,&pattern);
 		if ( useQuad3 || 
 		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
 		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+			SetThickPixel(xc-x,yc+y,thick,&pattern);
 		if ( useQuad4 || 
 		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+			SetThickPixel(xc+x,yc+y,thick,&pattern);
 	}
 	_Unlock();
 }
@@ -1395,8 +1414,6 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 */
 void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
-/* Need to add bounds checking code */
-/* Probably should check to make sure that we have at least 4 points */
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
 	int x, y;
@@ -1407,6 +1424,8 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
 
 	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 
 	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
 	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
@@ -1436,8 +1455,9 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	{
 		x = ROUND(X);
 		y = ROUND(Y);
+                /* SetThickPixel does bounds checking, so we don't have to worry about it */
 		if ( (x!=lastx) || (y!=lasty) )
-			SetThickPixel(x,y,d->pensize,d->highcolor);
+			SetThickPixel(x,y,d->pensize,&pattern);
 		lastx = x;
 		lasty = y;
 
@@ -1462,7 +1482,6 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 {
-  /* Need to add bounds checking code */
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
@@ -1480,11 +1499,15 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 
 	_Lock();
 	thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
 
-	SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-	SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-	SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-	SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+        /* SetThickPixel does bounds checking, so we don't have to worry about it */
+
+	SetThickPixel(xc+x,yc-y,thick,&pattern);
+	SetThickPixel(xc-x,yc-y,thick,&pattern);
+	SetThickPixel(xc-x,yc+y,thick,&pattern);
+	SetThickPixel(xc+x,yc+y,thick,&pattern);
 
 	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
 	while (px < py)
@@ -1500,10 +1523,10 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Ry2 + px - py;
 		}
 
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc-y,thick,&pattern);
+		SetThickPixel(xc-x,yc-y,thick,&pattern);
+		SetThickPixel(xc-x,yc+y,thick,&pattern);
+		SetThickPixel(xc+x,yc+y,thick,&pattern);
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -1520,10 +1543,10 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 			p += Rx2 - py +px;
 		}
 
-		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
-		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
-		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc-y,thick,&pattern);
+		SetThickPixel(xc-x,yc-y,thick,&pattern);
+		SetThickPixel(xc-x,yc+y,thick,&pattern);
+		SetThickPixel(xc+x,yc+y,thick,&pattern);
 	}
 	_Unlock();
 }
@@ -1537,6 +1560,7 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 	
 	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
 	a thickness greater than 1 will need to be done.
+	This is capable of handling lines with invalid points.
 */
 void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
@@ -1550,8 +1574,13 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	double xInc, yInc;
 	double x = x1;
 	double y = y1;
+	int thick;
 
 	_Lock();
+	thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
 	if ( abs(dx) > abs(dy) )
 		steps = abs(dx);
 	else
@@ -1559,12 +1588,13 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	xInc = dx / (double) steps;
 	yInc = dy / (double) steps;
 
-	SetPixel(ROUND(x),ROUND(y),d->highcolor);
+        /* SetThickPixel does bounds checking, so we don't have to worry about it */
+	SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
 	for (k=0; k<steps; k++)
 	{
 		x += xInc;
 		y += yInc;
-		SetPixel(ROUND(x),ROUND(y),d->highcolor);
+		SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
 	}
 	_Unlock();
 }
@@ -1582,6 +1612,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 */
 void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
 {
+	/* Bounds checking is handled by StrokeLine and the functions it uses */
 	_Lock();
 	for(int32 i=0; i<(numpts-1); i++)
 		StrokeLine(ptlist[i],ptlist[i+1],d,pat);
@@ -1599,11 +1630,14 @@ void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, L
 */
 void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
-/* Maybe this should be drawn counterclockwise ? */
 	_Lock();
-	HLine(r.left, r.right, r.top, d, pat);
+	int thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	HLineThick(r.left, r.right, r.top, thick, &pattern);
 	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
-	HLine(r.right, r.left, r.bottom, d, pat);
+	HLineThick(r.right, r.left, r.bottom, thick, &pattern);
 	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
 	_Unlock();
 }
@@ -1621,14 +1655,14 @@ void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
-  /* Check to make sure counterclockwise is ok.
-     Check where start point is.
-     This stuff won't matter until patterns are done.
-   */
 	float hLeft, hRight;
 	float vTop, vBottom;
 	float bLeft, bRight, bTop, bBottom;
 	_Lock();
+	int thick = (int)d->pensize;
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
 	hLeft = r.left + xrad;
 	hRight = r.right - xrad;
 	vTop = r.top + yrad;
@@ -1638,13 +1672,13 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	bTop = vTop + yrad;
 	bBottom = vBottom - yrad;
 	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
-	HLine(hRight, hLeft, r.top, d, pat);
+	HLineThick(hRight, hLeft, r.top, thick, &pattern);
 	
 	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
 	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
 
 	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
-	HLine(hLeft, hRight, r.bottom, d, pat);
+	HLineThick(hLeft, hRight, r.bottom, thick, &pattern);
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
 	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
@@ -1668,6 +1702,7 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 */
 void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
+	/* Bounds checking is handled by StrokeLine and the functions it calls */
 	_Lock();
 	StrokeLine(pts[0],pts[1],d,pat);
 	StrokeLine(pts[1],pts[2],d,pat);
@@ -1688,6 +1723,7 @@ void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *
 */
 void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
+	/* If this is called from userland, why does it include a layerdata parameter? */
 }
 
 /*!
@@ -1975,6 +2011,12 @@ void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 string
 {
 }
 
+/*!
+	\brief Draws a pixel in the specified color
+	\param x The x coordinate (guaranteed to be in bounds)
+	\param y The y coordinate (guaranteed to be in bounds)
+	\param col The color to draw
+*/
 void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 {
 	switch (mDisplayMode.space)
@@ -2009,25 +2051,35 @@ void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 	}
 }
 
-/* This will probably need reworked or replaced when we deal with patterns */
-void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
+/*!
+	\brief Draws a point of a specified thickness
+	\param x The x coordinate (not guaranteed to be in bounds)
+	\param y The y coordinate (not guaranteed to be in bounds)
+	\param thick The thickness of the point
+	\param pat The PatternHandler which detemines pixel colors
+*/
+void AccelerantDriver::SetThickPixel(int x, int y, int thick, PatternHandler *pat)
 {
+	if ( (!CHECK_X(x-thick/2) && !CHECK_X(x+thick/2)) ||
+		(!CHECK_Y(y-thick/2) && !CHECK_Y(y+thick/2)) )
+		return;
+	int left, right, top, bottom;
+	left = CLIP_X(x-thick/2);
+	right = CLIP_X(x+thick/2);
+	top = CLIP_Y(y-thick/2);
+	bottom = CLIP_Y(y+thick/2);
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
 			{
-				int i,j;
-				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row + x-thick/2;
-				uint8 drawcolor = col.GetColor8();
-				for (i=0; i<thick; i++)
+				int x,y;
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row;
+				for (y=top; y<=bottom; y++)
 				{
-                                        /* If there is no pattern, we could replace this
-                                           loop with a memset.
-                                         */
-					for (j=0; j<thick; j++)
+					for (x=left; x<=right; x++)
 					{
-						fb[j] = drawcolor;
+						fb[x] = pat->GetColor(x,y).GetColor8();;
 					}
 					fb += mFrameBufferConfig.bytes_per_row;
 				}
@@ -2039,14 +2091,13 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
-				int i,j;
-				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row) + x-thick/2;
-                                uint16 drawcolor = col.GetColor16();
-				for (i=0; i<thick; i++)
+				int x,y;
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				for (y=top; y<=bottom; y++)
 				{
-					for (j=0; j<thick; j++)
+					for (x=left; x<=right; x++)
 					{
-						fb[j] = drawcolor;
+						fb[x] = pat->GetColor(x,y).GetColor16();
 					}
 					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
@@ -2056,15 +2107,15 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 		case B_RGB32_LITTLE:
 		case B_RGBA32_LITTLE:
 			{
-				int i,j;
-				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + (y-thick/2)*mFrameBufferConfig.bytes_per_row) + x-thick/2;
-				rgb_color color = col.GetColor32();
-				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-				for (i=0; i<thick; i++)
+				int x,y;
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + top*mFrameBufferConfig.bytes_per_row);
+				rgb_color color;
+				for (y=top; y<=bottom; y++)
 				{
-					for (j=0; j<thick; j++)
+					for (x=left; x<=right; x++)
 					{
-						fb[j] = drawcolor;
+						color = pat->GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
 				}
@@ -2074,13 +2125,30 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 	}
 }
 
-void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, LayerData *d, int8 *pat)
+/*!
+	\brief Draws a horizontal line
+	\param x1 The first x coordinate (guaranteed to be in bounds)
+	\param x2 The second x coordinate (guaranteed to be in bounds)
+	\param y The y coordinate (guaranteed to be in bounds)
+	\param pat The PatternHandler which detemines pixel colors
+*/
+void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 {
+	int x;
+	if ( x1 > x2 )
+	{
+		x = x2;
+		x2 = x1;
+		x1 = x;
+	}
 	switch (mDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
 			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row;
+				for (x=x1; x<=x2; x++)
+					fb[x] = pat->GetColor(x,y).GetColor8();
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
@@ -2089,6 +2157,9 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, LayerData *d, int8 *pa
 		case B_RGB15_LITTLE:
 		case B_RGBA15_LITTLE:
 			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				for (x=x1; x<=x2; x++)
+					fb[x] = pat->GetColor(x,y).GetColor16();
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -2096,17 +2167,88 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, LayerData *d, int8 *pa
 		case B_RGBA32_LITTLE:
 			{
 				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
-				rgb_color color = d->highcolor.GetColor32();
-				uint32 drawcolor = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-				int x;
-				if ( x1 > x2 )
+				rgb_color color;
+				for (x=x1; x<=x2; x++)
 				{
-					x = x2;
-					x2 = x1;
-					x1 = x;
+					color = pat->GetColor(x,y).GetColor32();
+					fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 				}
-				for (x=x1; x<x2; x++)
-					fb[x] = drawcolor;
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+}
+
+/*!
+	\brief Draws a horizontal line
+	\param x1 The first x coordinate (not guaranteed to be in bounds)
+	\param x2 The second x coordinate (not guaranteed to be in bounds)
+	\param y The y coordinate (not guaranteed to be in bounds)
+	\param thick The thickness of the line
+	\param pat The PatternHandler which detemines pixel colors
+*/
+void AccelerantDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
+{
+	int x, y1, y2;
+
+	if ( x1 > x2 )
+	{
+		x = x2;
+		x2 = x1;
+		x1 = x;
+	}
+	y1 = y-thick/2;
+	y2 = y+thick/2;
+	if ( (x2 < 0) || (x1 >= mDisplayMode.virtual_width) || (!CHECK_Y(y1) && !CHECK_Y(y2)) )
+		return;
+	x1 = CLIP_X(x1);
+	x2 = CLIP_X(x2);
+	y1 = CLIP_Y(y1);
+	y2 = CLIP_Y(y2);
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y1*mFrameBufferConfig.bytes_per_row;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = pat->GetColor(x,y).GetColor8();
+					fb += mFrameBufferConfig.bytes_per_row;
+				}
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+						fb[x] = pat->GetColor(x,y).GetColor16();
+					fb = (uint16 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				rgb_color color;
+				for (y=y1; y<=y2; y++)
+				{
+					for (x=x1; x<=x2; x++)
+					{
+						color = pat->GetColor(x,y).GetColor32();
+						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+					}
+					fb = (uint32 *)((uint8 *)fb + mFrameBufferConfig.bytes_per_row);
+				}
 			} break;
 		default:
 			printf("Error: Unknown color space\n");
