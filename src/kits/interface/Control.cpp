@@ -89,50 +89,51 @@ static property_info prop_list[] =
 };
 
 //------------------------------------------------------------------------------
-BControl::BControl(BRect frame, const char *name, const char *label, BMessage *message,
-					uint32 resizingMode, uint32 flags)
-	:	BView(frame, name, resizingMode, flags),
-		BInvoker(message, NULL),
-		fValue(B_CONTROL_OFF),
-		fEnabled(true),
-		fFocusChanging(false),
-		fTracking(false),
-		fWantsNav(true)
+BControl::BControl(BRect frame, const char *name, const char *label,
+				   BMessage *message, uint32 resizingMode, uint32 flags)
+	:	BView(frame, name, resizingMode, flags)
 {
-	fLabel = strdup(label);
+	InitData(NULL);
+
+	SetLabel(label);
+	SetMessage(message);
 }
 //------------------------------------------------------------------------------
 BControl::~BControl()
 {
 	if (fLabel)
 		free(fLabel);
+
+	SetMessage(NULL);
 }
 //------------------------------------------------------------------------------
-BControl::BControl(BMessage *archive) : BView(archive)
+BControl::BControl(BMessage *archive)
+	:	BView(archive)
 {
-	const char *label;
-
-	if (archive->FindInt32("_val", &fValue) != B_OK)
-		fValue = B_CONTROL_OFF;
-
-	if (archive->FindString("_label", &label) != B_OK)
-		fLabel = NULL;
-	else
-		SetLabel(label);
-
-	if ( archive->FindBool("_disable", &fEnabled) != B_OK)
-		fEnabled = true;
-	else
-		fEnabled = !fEnabled;
-
-	fFocusChanging = false;
-	fTracking = false;
-	fWantsNav = true;
+	InitData(archive);
 
 	BMessage message;
 
 	if (archive->FindMessage("_msg", &message) == B_OK)
 		SetMessage(new BMessage(message));
+
+	const char *label;
+
+	if (archive->FindString("_label", &label) != B_OK)
+		SetLabel(label);
+
+	int32 value;
+
+	if (archive->FindInt32("_val", &value) != B_OK)
+		SetValue(value);
+
+	bool toggle;
+
+	if (archive->FindBool("_disable", &toggle) != B_OK)
+		SetEnabled(!toggle);
+
+	if (archive->FindBool("be:wants_nav", &toggle) != B_OK)
+		fWantsNav = toggle;
 }
 //------------------------------------------------------------------------------
 BArchivable *BControl::Instantiate(BMessage *archive)
@@ -176,21 +177,23 @@ status_t BControl::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BControl::WindowActivated(bool active)
 {
-	if (IsFocus())
-	{
-		Draw(Bounds());
-		Flush();
-	}
-
 	BView::WindowActivated(active);
+
+	if (IsFocus())
+		Draw(Bounds());
 }
 //------------------------------------------------------------------------------
 void BControl::AttachedToWindow()
 {
 	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	{
+		rgb_color color = Parent()->ViewColor();
 
-	if (Target() == NULL)
+		SetViewColor(color);
+		SetLowColor(color);
+	}
+
+	if (!Messenger().IsValid())
 		BInvoker::SetTarget(BMessenger(Window(), NULL));
 
 	BView::AttachedToWindow();
@@ -198,89 +201,90 @@ void BControl::AttachedToWindow()
 //------------------------------------------------------------------------------
 void BControl::MessageReceived(BMessage *message)
 {
-	switch (message->what)
+	bool handled = false;
+	BMessage reply(B_REPLY);
+
+	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY)
 	{
-		case B_CONTROL_INVOKED:
-			Invoke();
-			break;
+		BPropertyInfo propInfo(prop_list);
+		BMessage specifier;
+		int32 index;
+		int32 form;
+		const char *property;
 
-		case B_GET_PROPERTY:
-		case B_SET_PROPERTY:
+		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK)
 		{
-			BPropertyInfo propInfo(prop_list);
-			BMessage specifier;
-			const char *property;
-
-			if (message->GetCurrentSpecifier(NULL, &specifier) != B_OK ||
-				specifier.FindString("property", &property) != B_OK)
-				return;
-
-			switch (propInfo.FindMatch(message, 0, &specifier, specifier.what, property))
+			if (strcmp(property, "Label") == 0)
 			{
-				case B_ERROR:
+				if (message->what == B_GET_PROPERTY)
 				{
-					BView::MessageReceived(message);
-					break;
-				}
-				case 0:
-				{
-					BMessage reply;
-					reply.AddBool("result", fEnabled);
-					reply.AddBool("error", B_OK);
-					message->SendReply(&reply);
-					break;
-				}
-				case 1:
-				{
-					bool enabled;
-					message->FindBool("data", &enabled);
-					SetEnabled(enabled);
-					break;
-				}
-				case 2:
-				{
-					BMessage reply;
 					reply.AddString("result", fLabel);
-					reply.AddBool("error", B_OK);
-					message->SendReply(&reply);
-					break;
+					handled = true;
 				}
-				case 3:
+				else
 				{
 					const char *label;
-					message->FindString("data", &label);
-					SetLabel(label);
-					break;
-				}
-				case 4:
-				{
-					BMessage reply;
-					reply.AddInt32("result", fValue);
-					reply.AddBool("error", B_OK);
-					message->SendReply(&reply);
-					break;
-				}
-				case 5:
-				{
-					int32 value;
-					message->FindInt32("data", &value);
-					SetValue(value);
-					break;
+					
+					if (message->FindString("data", &label) == B_OK)
+					{
+						SetLabel(label);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
 				}
 			}
-
-			break;
-		}
-		default:
-		{
-			BView::MessageReceived(message);
-			break;
+			else if (strcmp(property, "Value") == 0)
+			{
+				if (message->what == B_GET_PROPERTY)
+				{
+					reply.AddInt32("result", fValue);
+					handled = true;
+				}
+				else
+				{
+					int32 value;
+					
+					if (message->FindInt32("data", &value) == B_OK)
+					{
+						SetValue(value);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
+				}
+			}
+			else if (strcmp(property, "Enabled") == 0)
+			{
+				if (message->what == B_GET_PROPERTY)
+				{
+					reply.AddBool("result", fEnabled);
+					handled = true;
+				}
+				else
+				{
+					bool enabled;
+					
+					if (message->FindBool("data", &enabled) == B_OK)
+					{
+						SetEnabled(enabled);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
+				}
+			}
 		}
 	}
+
+	if (handled)
+		message->SendReply(&reply);
+	else
+		BView::MessageReceived(message);
 }
 //------------------------------------------------------------------------------
 void BControl::MakeFocus(bool focused)
 {
+	if (focused == IsFocus())
+		return;
+
 	BView::MakeFocus(focused);
 
  	if(Window())
@@ -294,23 +298,17 @@ void BControl::MakeFocus(bool focused)
 //------------------------------------------------------------------------------
 void BControl::KeyDown(const char *bytes, int32 numBytes)
 {
-	if (numBytes == 1)
+	if (*bytes == B_ENTER || *bytes == B_SPACE)
 	{
-		switch (bytes[0])
-		{
-			case B_ENTER:
-			case B_SPACE:
-				if (Value())
-					SetValue(B_CONTROL_OFF);
-				else
-					SetValue(B_CONTROL_ON);
-				
-				BInvoker::Invoke();
-				break;
+		if (!fEnabled)
+			return;
 
-			default:
-				BView::KeyDown(bytes, numBytes);
-		}
+		if (Value())
+			SetValue(B_CONTROL_OFF);
+		else
+			SetValue(B_CONTROL_ON);
+		
+		Invoke();
 	}
 	else
 		BView::KeyDown(bytes, numBytes);
@@ -338,13 +336,16 @@ void BControl::DetachedFromWindow()
 //------------------------------------------------------------------------------
 void BControl::SetLabel(const char *string)
 {
-	if (strcmp(fLabel, string) == 0)
+	if (fLabel && string && strcmp(fLabel, string) == 0)
 		return;
 
 	if (fLabel)
 		free(fLabel);
 
-	fLabel = strdup(string);
+	if (string)
+		fLabel = strdup(string);
+	else
+		fLabel = NULL;
 
 	Invalidate();
 }
@@ -399,8 +400,7 @@ bool BControl::IsEnabled() const
 //------------------------------------------------------------------------------
 void BControl::GetPreferredSize(float *width, float *height)
 {
-	*width = 1.0f;
-	*height = 1.0f;
+	BView::GetPreferredSize(width, height);
 }
 //------------------------------------------------------------------------------
 void BControl::ResizeToPreferred()
@@ -410,22 +410,35 @@ void BControl::ResizeToPreferred()
 //------------------------------------------------------------------------------
 status_t BControl::Invoke(BMessage *message)
 {
-	if (message)
-	{
-		BMessage copy(*message);
-		copy.AddInt64("when", (int64)system_time());
-		copy.AddPointer("source", this);
-		return BInvoker::Invoke(&copy);
-	}
-	else if ( Message () )
-	{
-		BMessage copy (*Message());
-		copy.AddInt64 ("when", (int64)system_time());
-		copy.AddPointer ("source", this);
-		return BInvoker::Invoke(&copy);
-	}
+	bool notify = false;
+	uint32 kind = InvokeKind(&notify);
 
-	return B_BAD_VALUE;
+	BMessage clone(kind);
+	status_t err = B_BAD_VALUE;
+
+	if (!message && !notify)
+		message = Message();
+		
+	if (!message)
+	{
+		if (!IsWatched())
+			return err;
+	}
+	else
+		clone = *message;
+
+	clone.AddInt64("when", (int64)system_time());
+	clone.AddPointer("source", this);
+	clone.AddInt32("be:value", fValue);
+	clone.AddMessenger("be:sender", BMessenger(this));
+
+	if (message)
+		err = BInvoker::Invoke(&clone);
+
+//	TODO: assynchronous messaging
+//	SendNotices(kind, &clone);
+
+	return err;
 }
 //------------------------------------------------------------------------------
 BHandler *BControl::ResolveSpecifier(BMessage *message, int32 index,
@@ -433,47 +446,20 @@ BHandler *BControl::ResolveSpecifier(BMessage *message, int32 index,
 									 const char *property)
 {
 	BPropertyInfo propInfo(prop_list);
-	BHandler *target = NULL;
 
-	switch (propInfo.FindMatch(message, 0, specifier, what, property))
-	{
-		case B_ERROR:
-			break;
-
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			target = this;
-			break;
-	}
-
-	if (!target)
-		target = BView::ResolveSpecifier(message, index, specifier, what,
-		property);
-
-	return target;
+	if (propInfo.FindMatch(message, 0, specifier, what, property) < B_OK)
+		return BView::ResolveSpecifier(message, index, specifier, what,
+			property);
+	else
+		return this;
 }
 //------------------------------------------------------------------------------
 status_t BControl::GetSupportedSuites(BMessage *message)
 {
-	status_t err;
-
-	if (message == NULL)
-		return B_BAD_VALUE;
-
-	err = message->AddString("suites", "suite/vnd.Be-control");
-
-	if (err != B_OK)
-		return err;
+	message->AddString("suites", "suite/vnd.Be-control");
 	
 	BPropertyInfo prop_info(prop_list);
-	err = message->AddFlat("messages", &prop_info);
-
-	if (err != B_OK)
-		return err;
+	message->AddFlat("messages", &prop_info);
 	
 	return BView::GetSupportedSuites(message);
 }
@@ -490,7 +476,7 @@ void BControl::AllDetached()
 //------------------------------------------------------------------------------
 status_t BControl::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return BView::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 bool BControl::IsFocusChanging() const
@@ -526,7 +512,15 @@ BControl &BControl::operator=(const BControl &)
 //------------------------------------------------------------------------------
 void BControl::InitData(BMessage *data)
 {
+	fLabel = NULL;
+	fValue = B_CONTROL_OFF;
+	fEnabled = true;
+	fFocusChanging = false;
+	fTracking = false;
+	fWantsNav = true;
 
+	if (data && data->HasString("_fname"))
+		SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE);
 }
 //------------------------------------------------------------------------------
 

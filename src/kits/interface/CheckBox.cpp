@@ -28,6 +28,7 @@
 
 // System Includes -------------------------------------------------------------
 #include <CheckBox.h>
+#include <Window.h>
 #include <Errors.h>
 
 // Project Includes ------------------------------------------------------------
@@ -47,7 +48,7 @@ BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 	// Resize to minimum height if needed
 	font_height fh;
 	GetFontHeight(&fh);
-	float minHeight = 6.0f + (float)ceil(fh.ascent + fh.descent);
+	float minHeight = (float)ceil(6.0f + fh.ascent + fh.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
@@ -240,17 +241,50 @@ void BCheckBox::AttachedToWindow()
 void BCheckBox::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
-	{
-		BControl::MouseDown(point);
 		return;
-	}
-
-	SetMouseEventMask(B_POINTER_EVENTS,	B_NO_POINTER_HISTORY |
-					  B_SUSPEND_VIEW_FOCUS);
 
 	fOutlined = true;
-	SetTracking(true);
-	Invalidate();
+	Draw(Bounds());
+	Flush();
+
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
+	{
+		BRect bounds = Bounds();
+		uint32 buttons;
+
+		do
+		{
+			snooze(40000);
+
+			GetMouse(&point, &buttons, true);
+
+			bool inside = bounds.Contains(point);
+
+			if (fOutlined != inside)
+			{
+				fOutlined = inside;
+				Draw(Bounds());
+				Flush();
+			}
+		} while (buttons != 0);
+
+		if (fOutlined)
+		{
+			fOutlined = false;
+			SetValue(!Value());
+			Invoke();
+		}
+		else
+		{
+			Draw(Bounds());
+			Flush();
+		}
+	}
+	else
+	{
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	}
 }
 //------------------------------------------------------------------------------
 void BCheckBox::MessageReceived(BMessage *message)
@@ -270,41 +304,50 @@ void BCheckBox::KeyDown(const char *bytes, int32 numBytes)
 //------------------------------------------------------------------------------
 void BCheckBox::MouseUp(BPoint point)
 {
-	if (IsEnabled() && IsTracking())
-	{
-		fOutlined = false;
-
-		if (Bounds().Contains(point))
-		{
-			if (Value() == B_CONTROL_OFF)
-				SetValue(B_CONTROL_ON);
-			else
-				SetValue(B_CONTROL_OFF);
-	
-			BControl::Invoke();
-		}
-		SetTracking(false);
-	}
-	else
-	{
-		BControl::MouseUp(point);
+	if (!IsTracking())
 		return;
+
+	bool inside = Bounds().Contains(point);
+
+	if (fOutlined != inside)
+	{
+		fOutlined = inside;
+		Draw(Bounds());
+		Flush();
 	}
+
+	if (fOutlined)
+	{
+		if (fOutlined)
+		{
+			fOutlined = false;
+			SetValue(!Value());
+			Invoke();
+		}
+		else
+		{
+			Draw(Bounds());
+			Flush();
+		}
+	}
+
+	SetTracking(false);
 }
 //------------------------------------------------------------------------------
-void BCheckBox::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+void BCheckBox::MouseMoved(BPoint point, uint32 transit,
+						   const BMessage *message)
 {
-	if (IsEnabled() && IsTracking())
-	{
-		if (transit == B_EXITED_VIEW)
-			fOutlined = false;
-		else if (transit == B_ENTERED_VIEW)
-			fOutlined = true;
+	if (!IsTracking())
+		return;
 
-		Invalidate();
+	bool inside = Bounds().Contains(point);
+
+	if (fOutlined != inside)
+	{
+		fOutlined = inside;
+		Draw(Bounds());
+		Flush();
 	}
-	else
-		BControl::MouseMoved(point, transit, message);
 }
 //------------------------------------------------------------------------------
 void BCheckBox::DetachedFromWindow()
@@ -322,8 +365,13 @@ void BCheckBox::GetPreferredSize(float *width, float *height)
 	font_height fh;
 	GetFontHeight(&fh);
 
-	*height = 6.0f + (float)ceil(fh.ascent + fh.descent);
-	*width = 12.0f + (float)ceil(fh.ascent) + (float)ceil(StringWidth(Label()));
+	*height = (float)ceil(6.0f + fh.ascent + fh.descent);
+	*width = 12.0f + fh.ascent;
+	
+	if (Label())
+		*width += StringWidth(Label());
+
+	*width = (float)ceil(*width);
 }
 //------------------------------------------------------------------------------
 void BCheckBox::ResizeToPreferred()
@@ -375,7 +423,7 @@ void BCheckBox::AllDetached()
 //------------------------------------------------------------------------------
 status_t BCheckBox::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return BControl::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 void BCheckBox::_ReservedCheckBox1() {}

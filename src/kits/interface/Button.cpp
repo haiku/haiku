@@ -79,8 +79,8 @@ status_t BButton::Archive(BMessage* archive, bool deep) const
 	if (err != B_OK)
 		return err;
 	
-	if (fDrawAsDefault)
-		err = archive->AddBool("_default", fDrawAsDefault);
+	if (IsDefault())
+		err = archive->AddBool("_default", true);
 
 	return err;
 }
@@ -181,10 +181,7 @@ void BButton::Draw(BRect updateRect)
 			rect.top -= 3;
 			rect.right += 2;
 			rect.bottom += 2;
-			SetDrawingMode(B_OP_INVERT);
-			SetHighColor(0, 0, 0);
-			FillRect(rect);
-			SetDrawingMode(B_OP_COPY);
+			InvertRect(rect);
 		}
 
 		// Label
@@ -275,15 +272,35 @@ void BButton::Draw(BRect updateRect)
 void BButton::MouseDown(BPoint point)
 {
 	if (!IsEnabled())
-	{
-		BControl::MouseDown(point);
 		return;
-	}
-
-	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY | B_SUSPEND_VIEW_FOCUS);
 
 	SetValue(B_CONTROL_ON);
-	SetTracking(true);
+
+	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
+	{
+		BRect bounds = Bounds();
+		uint32 buttons;
+
+		do
+		{
+			snooze(40000);
+
+			GetMouse(&point, &buttons, true);
+
+			bool inside = bounds.Contains(point);
+
+			if ((Value() == B_CONTROL_ON) != inside)
+				SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
+		} while (buttons != 0);
+
+		if (Value() == B_CONTROL_ON)
+			Invoke();
+	}
+	else
+	{
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	}
 }
 //------------------------------------------------------------------------------
 void BButton::AttachedToWindow()
@@ -294,23 +311,15 @@ void BButton::AttachedToWindow()
 		Window()->SetDefaultButton(this);
 }
 //------------------------------------------------------------------------------
-void BButton::KeyDown ( const char *bytes, int32 numBytes )
+void BButton::KeyDown(const char *bytes, int32 numBytes)
 {
-	if (numBytes == 1)
+	if (*bytes == B_ENTER || *bytes == B_SPACE)
 	{
-		switch (bytes[0])
-		{
-			case B_ENTER:
-			case B_SPACE:
-				SetValue(B_CONTROL_ON);
-				snooze(50000);
-				SetValue(B_CONTROL_OFF);
-				Invoke();
-				break;
+		if (!IsEnabled())
+			return;
 
-			default:
-				BControl::KeyDown(bytes, numBytes);
-		}
+		SetValue(B_CONTROL_ON);
+		Invoke();
 	}
 	else
 		BControl::KeyDown(bytes, numBytes);
@@ -318,26 +327,36 @@ void BButton::KeyDown ( const char *bytes, int32 numBytes )
 //------------------------------------------------------------------------------
 void BButton::MakeDefault(bool flag)
 {
-	if (flag == IsDefault())
-		return;
-	
-	fDrawAsDefault = flag;
+	BButton *oldDefault = NULL;
 	BWindow *window = Window();
-		
+	
+	if (window)
+		oldDefault = window->DefaultButton();
+
 	if (flag)
 	{
+		if (fDrawAsDefault && oldDefault == this)
+			return;
+
+		fDrawAsDefault = true;
+
 		ResizeBy(6.0f, 6.0f);
 		MoveBy(-3.0f, -3.0f);
 
-		if (window)
-			window->SetDefaultButton((BButton*)this);
+		if (window && oldDefault != this)
+			window->SetDefaultButton(this);
 	}
 	else
 	{
+		if (!fDrawAsDefault)
+			return;
+
+		fDrawAsDefault = false;
+
 		ResizeBy(-6.0f, -6.0f);
 		MoveBy(3.0f, 3.0f);
-		
-		if (window)
+
+		if (window && oldDefault == this)
 			window->SetDefaultButton(NULL);
 	}
 }
@@ -364,32 +383,24 @@ void BButton::WindowActivated(bool active)
 //------------------------------------------------------------------------------
 void BButton::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
-	if (IsEnabled() && IsTracking())
-	{
-		if (transit == B_EXITED_VIEW)
-			SetValue(B_CONTROL_OFF);
-		else if (transit == B_ENTERED_VIEW)
-			SetValue(B_CONTROL_ON);
-	}
-	else
-		BControl::MouseMoved(point, transit, message);
+	if (!IsTracking())
+		return;
+
+	bool inside = Bounds().Contains(point);
+
+	if ((Value() == B_CONTROL_ON) != inside)
+		SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
 }
 //------------------------------------------------------------------------------
 void BButton::MouseUp(BPoint point)
 {
-	if (IsEnabled() && IsTracking())
-	{
-		if (Bounds().Contains(point))
-		{
-			if ( Value() == B_CONTROL_ON)
-			{
-				SetValue(B_CONTROL_OFF);
-				Invoke();
-			}
-		}
-		
-		SetTracking(false);
-	}
+	if (!IsTracking())
+		return;
+
+	if (Bounds().Contains(point))
+		Invoke();
+	
+	SetTracking(false);
 }
 //------------------------------------------------------------------------------
 void BButton::DetachedFromWindow()
@@ -427,7 +438,14 @@ void BButton::ResizeToPreferred()
 //------------------------------------------------------------------------------
 status_t BButton::Invoke(BMessage *message)
 {
-	return BControl::Invoke(message);
+	Sync();
+	snooze(50000);
+	
+	status_t err = BControl::Invoke(message);
+
+	SetValue(B_CONTROL_OFF);
+
+	return err;
 }
 //------------------------------------------------------------------------------
 void BButton::FrameMoved(BPoint newLocation)
@@ -469,9 +487,8 @@ status_t BButton::GetSupportedSuites(BMessage *message)
 //------------------------------------------------------------------------------
 status_t BButton::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return BControl::Perform(d, arg);
 }
-
 //------------------------------------------------------------------------------
 void BButton::_ReservedButton1() {}
 void BButton::_ReservedButton2() {}
@@ -545,7 +562,10 @@ BRect BButton::DrawDefault(BRect bounds, bool enabled)
 //------------------------------------------------------------------------------
 status_t BButton::Execute()
 {
-	// TODO: Is there a use for this? Maybe visual feedback happens here?
+	if (!IsEnabled())
+		return B_ERROR;
+
+	SetValue(B_CONTROL_ON);
 	return Invoke();
 }
 //------------------------------------------------------------------------------
