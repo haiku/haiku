@@ -370,7 +370,7 @@ bool BLooper::IsMessageWaiting() const
 	int32 count;
 	do
 	{
-		count = port_buffer_size_etc(fMsgPort, B_TIMEOUT, 0);
+		count = port_buffer_size_etc(fMsgPort, B_RELATIVE_TIMEOUT, 0);
 	} while (count == B_INTERRUPTED);
 
 	return count > 0;
@@ -1204,48 +1204,41 @@ DBG(OUT("LOOPER: _task0_() done: thread %ld\n", find_thread(NULL)));
 	return B_OK;
 }
 //------------------------------------------------------------------------------
-void* BLooper::ReadRawFromPort(int32* msgcode, bigtime_t tout)
+
+void *
+BLooper::ReadRawFromPort(int32 *msgCode, bigtime_t timeout)
 {
-DBG(OUT("BLooper::ReadRawFromPort()\n"));
-	int8* msgbuffer = NULL;
-	ssize_t buffersize;
-	ssize_t bytesread;
+	DBG(OUT("BLooper::ReadRawFromPort()\n"));
+	int8 *msgBuffer = NULL;
+	ssize_t bufferSize;
 
-	if (tout == B_INFINITE_TIMEOUT)
-	{
-		buffersize = port_buffer_size(fMsgPort);
-DBG(OUT("BLooper::ReadRawFromPort(): buffersize: %ld\n", buffersize));
-	}
-	else
-	{
-		buffersize = port_buffer_size_etc(fMsgPort, 0, tout);
-		if (buffersize == B_TIMED_OUT || buffersize == B_BAD_PORT_ID ||
-			buffersize == B_WOULD_BLOCK)
-		{
-DBG(OUT("BLooper::ReadRawFromPort() done 1\n"));
-			return NULL;
-		}
+	do {
+		bufferSize = port_buffer_size_etc(fMsgPort, B_RELATIVE_TIMEOUT, timeout);
+	} while (bufferSize == B_INTERRUPTED);
+
+	if (bufferSize < B_OK) {
+		DBG(OUT("BLooper::ReadRawFromPort(): failed: %ld\n", bufferSize));
+		return NULL;
 	}
 
-	if (buffersize > 0)
-		msgbuffer = new int8[buffersize];
+	if (bufferSize > 0)
+		msgBuffer = new int8[bufferSize];
 
-	if (tout == B_INFINITE_TIMEOUT)
-	{
-DBG(OUT("read_port()...\n"));
-		bytesread = read_port(fMsgPort, msgcode, msgbuffer, buffersize);
-DBG(OUT("read_port() done: %ld\n", bytesread));
-DBG(OUT("BLooper::ReadRawFromPort() read: %.4s\n", (char*)msgcode));
+	// we don't want to wait again here, since that can only mean
+	// that someone else has read our message and our bufferSize
+	// is now probably wrong
+	DBG(OUT("read_port()...\n"));
+	bufferSize = read_port_etc(fMsgPort, msgCode, msgBuffer, bufferSize,
+					  B_RELATIVE_TIMEOUT, 0);
+	if (bufferSize < B_OK) {
+		delete[] msgBuffer;
+		return NULL;
 	}
-	else
-	{
-		bytesread = read_port_etc(fMsgPort, msgcode, msgbuffer, buffersize,
-								  B_TIMEOUT, tout);
-	}
-
-DBG(OUT("BLooper::ReadRawFromPort() done: %p\n", msgbuffer));
-	return msgbuffer;
+	DBG(OUT("BLooper::ReadRawFromPort() read: %.4s\n", (char *)msgCode));
+	DBG(OUT("BLooper::ReadRawFromPort() done: %p\n", msgBuffer));
+	return msgBuffer;
 }
+
 //------------------------------------------------------------------------------
 BMessage* BLooper::ReadMessageFromPort(bigtime_t tout)
 {
