@@ -1,7 +1,8 @@
 /* Kernel specific structures and functions
-**
-** Distributed under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _OS_H
 #define _OS_H
 
@@ -213,8 +214,13 @@ typedef struct {
 	bigtime_t		kernel_time;
 } team_usage_info;
 
+enum {
+	B_TEAM_USAGE_SELF		= 0,
+	B_TEAM_USAGE_CHILDREN	= -1,
+};
+
 /* system private, use macros instead */
-extern status_t	_get_team_usage_info(team_id team, int32 who, team_usage_info *tui, size_t size);
+extern status_t	_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
 
 #define get_team_usage_info(team, who, info) \
 			_get_team_usage_info((team), (who), (info), sizeof(*(info)))
@@ -277,15 +283,22 @@ extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 #if __INTEL__ && !_KERNEL_MODE && !_NO_INLINE_ASM
 static inline thread_id
 find_thread(const char *name) {
-	extern thread_id _kfind_thread_(const char *name);
+#	ifndef __HAIKU__
+/* ToDo: this can be removed once we don't need BeOS compatibility of our source files */
+#		define _kern_find_thread _kfind_thread_
+#	endif
+	extern thread_id _kern_find_thread(const char *name);
 	if (!name) {
 		thread_id thread;
 		__asm__ __volatile__ ( 
 			"movl	%%fs:4, %%eax \n\t"
-			: "=a"(thread) );
+			: "=a" (thread));
 		return thread;
 	}
-	return _kfind_thread_(name);
+	return _kern_find_thread(name);
+#	ifndef __HAIKU
+#		undef _kern_find_thread
+#	endif
 }
 #else
 extern thread_id 	find_thread(const char *name);
