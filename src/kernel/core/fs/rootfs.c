@@ -257,6 +257,19 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 }
 
 
+/** You must hold the FS lock when calling this function */
+
+static status_t
+remove_node(struct rootfs *fs, struct rootfs_vnode *directory, struct rootfs_vnode *vnode)
+{
+	rootfs_remove_from_dir(directory, vnode);
+	notify_entry_removed(fs->id, directory->id, vnode->name, vnode->id);
+
+	// schedule this vnode to be removed when it's ref goes to zero
+	return remove_vnode(fs->id, vnode->id);
+}
+
+
 static status_t
 rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, bool isDirectory)
 {
@@ -278,11 +291,7 @@ rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, boo
 	if (status < B_OK)
 		goto err;
 
-	rootfs_remove_from_dir(dir, vnode);
-	notify_listener(B_ENTRY_REMOVED, fs->id, dir->id, 0, vnode->id, name);
-
-	// schedule this vnode to be removed when it's ref goes to zero
-	remove_vnode(fs->id, vnode->id);
+	remove_node(fs, dir, vnode);
 
 err:
 	mutex_unlock(&fs->lock);
@@ -596,7 +605,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int mode, vnod
 	vnode->stream.dir.dir_head = NULL;
 	vnode->stream.dir.jar_head = NULL;
 
-	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
+	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
 	mutex_unlock(&fs->lock);	
 	return B_OK;
@@ -819,7 +828,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 	}
 	vnode->stream.symlink.length = strlen(path);
 
-	notify_listener(B_ENTRY_CREATED, fs->id, dir->id, 0, vnode->id, name);
+	notify_entry_created(fs->id, dir->id, name, vnode->id);
 
 	mutex_unlock(&fs->lock);
 	return B_OK;
@@ -845,74 +854,95 @@ rootfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
 
 
 static status_t
-rootfs_rename(fs_volume _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
+rootfs_rename(fs_volume _fs, fs_vnode _fromDir, const char *fromName, fs_vnode _toDir, const char *toName)
 {
 	struct rootfs *fs = _fs;
-	struct rootfs_vnode *olddir = _olddir;
-	struct rootfs_vnode *newdir = _newdir;
-	struct rootfs_vnode *v1, *v2;
-	status_t err;
+	struct rootfs_vnode *fromDirectory = _fromDir;
+	struct rootfs_vnode *toDirectory = _toDir;
+	struct rootfs_vnode *vnode, *targetVnode, *parent;
+	status_t status;
+	char *nameBuffer = NULL;
 
-	TRACE(("rootfs_rename: olddir %p (0x%Lx), oldname '%s', newdir %p (0x%Lx), newname '%s'\n",
-		olddir, olddir->id, oldname, newdir, newdir->id, newname));
+	TRACE(("rootfs_rename: from %p (0x%Lx), fromName '%s', to %p (0x%Lx), toName '%s'\n",
+		fromDirectory, fromDirectory->id, fromName, toDirectory, toDirectory->id, toName));
 
 	mutex_lock(&fs->lock);
 
-	v1 = rootfs_find_in_dir(olddir, oldname);
-	if (!v1) {
-		err = B_ENTRY_NOT_FOUND;
+	vnode = rootfs_find_in_dir(fromDirectory, fromName);
+	if (vnode != NULL) {
+		status = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
 
-	v2 = rootfs_find_in_dir(newdir, newname);
-
-	if (olddir == newdir) {
-		// rename to a different name in the same dir
-		if (v2) {
-			// target node exists
-			err = B_NAME_IN_USE;
+	// make sure the target not a subdirectory of us
+	parent = toDirectory->parent;
+	while (parent != NULL) {
+		if (parent == vnode) {
+			status = B_BAD_VALUE;
 			goto err;
 		}
 
-		// change the name on this node
-		if (strlen(oldname) >= strlen(newname)) {
-			// reuse the old name buffer
-			strcpy(v1->name, newname);
-		} else {
-			char *ptr = v1->name;
+		parent = parent->parent;
+	}
 
-			v1->name = strdup(newname);
-			if (!v1->name) {
-				// bad place to be, at least restore
-				v1->name = ptr;
-				err = B_NO_MEMORY;
-				goto err;
-			}
-			free(ptr);
+	// we'll reuse the name buffer if possible
+	if (strlen(fromName) >= strlen(toName)) {
+		nameBuffer = strdup(toName);
+		if (nameBuffer == NULL) {
+			status = B_NO_MEMORY;
+			goto err;
+		}
+	}
+
+	targetVnode = rootfs_find_in_dir(toDirectory, toName);
+	if (targetVnode != NULL) {
+		// target node exists, let's see if it is an empty directory
+		if (S_ISDIR(targetVnode->stream.type) && !rootfs_is_dir_empty(targetVnode)) {
+			status = B_NAME_IN_USE;
+			goto err;
+		}
+
+		// so we can cleanly remove it
+		remove_node(fs, toDirectory, targetVnode);
+	}
+
+	if (fromDirectory == toDirectory) {
+		// rename to a different name in the same directory
+
+		// change the name on this node
+		if (nameBuffer == NULL) {
+			// we can just copy it
+			strcpy(vnode->name, toName);
+		} else {
+			free(vnode->name);
+			vnode->name = nameBuffer;
 		}
 
 		/* no need to remove and add it unless the dir is sorting */
 #if 0
 		// remove it from the dir
-		rootfs_remove_from_dir(olddir, v1);
+		rootfs_remove_from_dir(fromDirectory, vnode);
 
 		// add it back to the dir with the new name
-		rootfs_insert_in_dir(newdir, v1);
+		rootfs_insert_in_dir(toDirectory, vnode);
 #endif
 	} else {
-		// different target dir from source
+		// different target directory from source
 
-		rootfs_remove_from_dir(olddir, v1);
-
-		rootfs_insert_in_dir(newdir, v1);
+		rootfs_remove_from_dir(fromDirectory, vnode);
+		rootfs_insert_in_dir(toDirectory, vnode);
 	}
 
-	err = B_OK;
+	notify_entry_moved(fs->id, fromDirectory->id, fromName, toDirectory->id, toName, vnode->id);
+	status = B_OK;
 
 err:
+	if (status != B_OK)
+		free(nameBuffer);
+
 	mutex_unlock(&fs->lock);
 
-	return err;
+	return status;
 }
 
 
@@ -953,27 +983,27 @@ rootfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat, uint3
 	TRACE(("rootfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id, stat));
 
 	// we cannot change the size of anything
-	if (statMask & FS_WRITE_STAT_SIZE)
+	if (statMask & B_STAT_SIZE)
 		return B_BAD_VALUE;
 
 	mutex_lock(&fs->lock);
 
-	if (statMask & FS_WRITE_STAT_MODE)
+	if (statMask & B_STAT_MODE)
 		vnode->stream.type = (vnode->stream.type & ~S_IUMSK) | (stat->st_mode & S_IUMSK);
 
-	if (statMask & FS_WRITE_STAT_UID)
+	if (statMask & B_STAT_UID)
 		vnode->uid = stat->st_uid;
-	if (statMask & FS_WRITE_STAT_GID)
+	if (statMask & B_STAT_GID)
 		vnode->gid = stat->st_gid;
 
-	if (statMask & FS_WRITE_STAT_MTIME)
+	if (statMask & B_STAT_MODIFICATION_TIME)
 		vnode->modification_time = stat->st_mtime;
-	if (statMask & FS_WRITE_STAT_CRTIME) 
+	if (statMask & B_STAT_CREATION_TIME) 
 		vnode->creation_time = stat->st_crtime;
 
 	mutex_unlock(&fs->lock);
 
-	notify_listener(B_STAT_CHANGED, fs->id, 0, 0, vnode->id, NULL);
+	notify_stat_changed(fs->id, vnode->id, statMask);
 	return B_OK;
 }
 
