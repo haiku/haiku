@@ -3911,7 +3911,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 			goto err5;
 		}
 
-		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &root_id);
 		if (err < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//err = ERR_VFS_GENERAL;
@@ -3949,7 +3949,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		mount->covers_vnode = covered_vnode;
 
 		// mount it
-		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &root_id);
 		if (err < 0)
 			goto err6;
 	}
