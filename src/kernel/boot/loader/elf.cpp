@@ -79,7 +79,8 @@ elf_load_image(int fd, preloaded_image *image)
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
-				image->dynamic_section = programHeaders[i].p_vaddr;
+				image->dynamic_section.start = programHeaders[i].p_vaddr;
+				image->dynamic_section.size = programHeaders[i].p_memsz;
 				continue;
 			default:
 				dprintf("unhandled pheader type 0x%lx\n", programHeaders[i].p_type);
@@ -153,7 +154,7 @@ elf_load_image(int fd, preloaded_image *image)
 	}
 
 	// modify the dynamic section by the delta of the regions
-	image->dynamic_section += image->text_region.delta;
+	image->dynamic_section.start += image->text_region.delta;
 
 	free(programHeaders);
 
