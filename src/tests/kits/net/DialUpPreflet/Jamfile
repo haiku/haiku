@@ -1,5 +1,18 @@
 SubDir OBOS_TOP src tests kits net DialUpPreflet ;
 
+# set some additional defines
+{
+	local defines ;
+	
+	if $(LANG_GERMAN) {
+		defines += LANG_GERMAN ;
+	}
+	
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;

@@ -13,8 +13,8 @@
 
 class TextRequestDialog : public BWindow {
 	public:
-		TextRequestDialog(const char *title, const char *request,
-			const char *text = NULL);
+		TextRequestDialog(const char *title, const char *information,
+			const char *request, const char *text = NULL);
 		virtual ~TextRequestDialog();
 		
 		virtual void MessageReceived(BMessage *message);
@@ -23,6 +23,12 @@ class TextRequestDialog : public BWindow {
 		status_t Go(BInvoker *invoker);
 
 	private:
+		void UpdateControls();
+
+	private:
+		BTextView *fTextView;
+			// displays information text
+		BButton *fOKButton;
 		BTextControl *fTextControl;
 		BInvoker *fInvoker;
 };

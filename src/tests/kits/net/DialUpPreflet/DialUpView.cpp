@@ -51,7 +51,7 @@ static const uint32 kMsgConnectButton = 'CONI';
 #ifdef LANG_GERMAN
 static const char *kLabelInterface = "Verbindung: ";
 static const char *kLabelInterfaceName = "Verbindungs-Name: ";
-static const char *kLabelNewInterface = "Neue Verbindung";
+static const char *kLabelNewInterface = "Neue Verbindung Erstellen";
 static const char *kLabelCreateNew = "Neu...";
 static const char *kLabelDeleteCurrent = "Auswahl Löschen";
 static const char *kLabelConnect = "Verbinden";
@@ -60,7 +60,7 @@ static const char *kLabelOK = "OK";
 #else
 static const char *kLabelInterface = "Interface: ";
 static const char *kLabelInterfaceName = "Interface Name: ";
-static const char *kLabelNewInterface = "New Interface";
+static const char *kLabelNewInterface = "Create New Interface";
 static const char *kLabelCreateNew = "Create New...";
 static const char *kLabelDeleteCurrent = "Delete Current";
 static const char *kLabelConnect = "Connect";
@@ -73,20 +73,27 @@ static const char *kLabelOK = "OK";
 static const char *kTextConnecting = "Verbinde...";
 static const char *kTextConnectionEstablished = "Verbindung hergestellt.";
 static const char *kTextNotConnected = "Nicht verbunden.";
+static const char *kTextDeviceUpFailed = "Konnte Verbindung nicht aufbauen.";
 static const char *kTextAuthenticating = "Authentifizierung...";
 static const char *kTextAuthenticationFailed = "Authentifizierung fehlgeschlagen!";
 static const char *kTextConnectionLost = "Verbindung verloren!";
 static const char *kTextCreationError = "Fehler beim Initialisieren!";
-static const char *kTextNoInterfacesFound = "Kein Verbindungen gefunden...";
+static const char *kTextNoInterfacesFound = "Bitte erstellen Sie eine neue "
+											"Verbindung.";
+static const char *kTextChooseInterfaceName = "Bitte denken Sie sich einen neuen "
+											"Namen für diese Verbindung aus.";
 #else
 static const char *kTextConnecting = "Connecting...";
 static const char *kTextConnectionEstablished = "Connection established.";
 static const char *kTextNotConnected = "Not connected.";
+static const char *kTextDeviceUpFailed = "Failed to connect.";
 static const char *kTextAuthenticating = "Authenticating...";
 static const char *kTextAuthenticationFailed = "Authentication failed!";
 static const char *kTextConnectionLost = "Connection lost!";
 static const char *kTextCreationError = "Error creating interface!";
-static const char *kTextNoInterfacesFound = "No interfaces found...";
+static const char *kTextNoInterfacesFound = "Please create a new interface...";
+static const char *kTextChooseInterfaceName = "Please choose a new name for this "
+											"interface.";
 #endif
 
 // error strings for alerts
@@ -230,7 +237,8 @@ DialUpView::MessageReceived(BMessage *message)
 		
 		// -------------------------------------------------
 		case kMsgCreateNew: {
-			(new TextRequestDialog(kLabelNewInterface, kLabelInterfaceName))->Go(
+			(new TextRequestDialog(kLabelNewInterface, kTextChooseInterfaceName,
+					kLabelInterfaceName))->Go(
 				new BInvoker(new BMessage(kMsgFinishCreateNew), this));
 		} break;
 		
@@ -606,6 +614,9 @@ DialUpView::UpdateStatus(int32 code)
 {
 	switch(code) {
 		case PPP_REPORT_UP_ABORTED:
+		case PPP_REPORT_DEVICE_UP_FAILED:
+		case PPP_REPORT_LOCAL_AUTHENTICATION_FAILED:
+		case PPP_REPORT_PEER_AUTHENTICATION_FAILED:
 		case PPP_REPORT_DOWN_SUCCESSFUL:
 		case PPP_REPORT_CONNECTION_LOST: {
 			fConnectButton->SetLabel(kLabelConnect);
@@ -615,7 +626,8 @@ DialUpView::UpdateStatus(int32 code)
 			fConnectButton->SetLabel(kLabelDisconnect);
 	}
 	
-	// maybe the information string must stay
+	// maybe the status string must not be changed (codes that set fKeepLabel to false
+	// should still be handled)
 	if(fKeepLabel && code != PPP_REPORT_GOING_UP && code != PPP_REPORT_UP_SUCCESSFUL)
 		return;
 	
@@ -624,6 +636,7 @@ DialUpView::UpdateStatus(int32 code)
 		return;
 	}
 	
+	// only errors should set fKeepLabel to true
 	switch(code) {
 		case PPP_REPORT_GOING_UP:
 			fKeepLabel = false;
@@ -638,6 +651,11 @@ DialUpView::UpdateStatus(int32 code)
 		case PPP_REPORT_UP_ABORTED:
 		case PPP_REPORT_DOWN_SUCCESSFUL:
 			fStatusView->SetText(kTextNotConnected);
+		break;
+		
+		case PPP_REPORT_DEVICE_UP_FAILED:
+			fKeepLabel = true;
+			fStatusView->SetText(kTextDeviceUpFailed);
 		break;
 		
 		case PPP_REPORT_LOCAL_AUTHENTICATION_REQUESTED:
@@ -704,7 +722,7 @@ void
 DialUpView::LoadInterfaces()
 {
 	fInterfaceMenu->AddSeparatorItem();
-	fInterfaceMenu->AddItem(new BMenuItem(kLabelCreateNew,
+	fInterfaceMenu->AddItem(new BMenuItem(kLabelNewInterface,
 		new BMessage(kMsgCreateNew)));
 	fDeleterItem = new BMenuItem(kLabelDeleteCurrent,
 		new BMessage(kMsgDeleteCurrent));

@@ -10,24 +10,26 @@
 
 #include <Button.h>
 #include <TextControl.h>
+#include <TextView.h>
 
 
 // GUI constants
 static const uint32 kWindowWidth = 250;
-static const uint32 kWindowHeight = 5 + 20 + 10 + 25 + 5;
+static const uint32 kWindowHeight = 10 + 20 + 10 + 25 + 5;
 static const BRect kWindowRect(0, 0, kWindowWidth, kWindowHeight);
 static const uint32 kDefaultButtonWidth = 80;
 
 // message constants
-static const int32 kMsgButton = 'MBTN';
+static const uint32 kMsgButton = 'MBTN';
+static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
 static const char *kLabelOK = "OK";
 static const char *kLabelCancel = "Cancel";
 
 
-TextRequestDialog::TextRequestDialog(const char *title, const char *request,
-		const char *text = NULL)
+TextRequestDialog::TextRequestDialog(const char *title, const char *information,
+		const char *request, const char *text = NULL)
 	: BWindow(kWindowRect, title, B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE, 0),
 	fInvoker(NULL)
 {
@@ -35,8 +37,31 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *request,
 	BView *backgroundView = new BView(rect, "background", B_FOLLOW_ALL_SIDES, 0);
 	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	rect.InsetBy(5, 5);
+	rect.bottom = rect.top;
+		// init
+	
+	if(information) {
+		BRect textRect(rect);
+		textRect.OffsetTo(0, 0);
+		fTextView = new BTextView(rect, "TextView", textRect, B_FOLLOW_NONE,
+			B_WILL_DRAW);
+		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextView->MakeSelectable(false);
+		fTextView->MakeEditable(false);
+		fTextView->SetText(information);
+		float textHeight = fTextView->TextHeight(0, fTextView->CountLines());
+		backgroundView->ResizeBy(0, textHeight + 5);
+		ResizeBy(0, textHeight + 5);
+		fTextView->ResizeBy(0, textHeight - textRect.Height());
+		rect.bottom += textHeight + 5;
+		backgroundView->AddChild(fTextView);
+	} else
+		fTextView = NULL;
+	
+	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
 	fTextControl = new BTextControl(rect, "request", request, text, NULL);
+	fTextControl->SetModificationMessage(new BMessage(kMsgUpdateControls));
 	fTextControl->SetDivider(fTextControl->StringWidth(fTextControl->Label()) + 5);
 	if(text && strlen(text) > 0)
 		fTextControl->TextView()->SelectAll();
@@ -46,19 +71,21 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *request,
 	rect.left = rect.right - kDefaultButtonWidth;
 	BMessage message(kMsgButton);
 	message.AddInt32("which", 1);
-	BButton *okButton = new BButton(rect, "okButton", kLabelOK, new BMessage(message));
+	fOKButton = new BButton(rect, "okButton", kLabelOK, new BMessage(message));
 	rect.right = rect.left - 10;
 	rect.left = rect.right - kDefaultButtonWidth;
 	message.ReplaceInt32("which", 0);
 	BButton *cancelButton = new BButton(rect, "cancelButton", kLabelCancel,
 		new BMessage(message));
-	backgroundView->AddChild(okButton);
 	backgroundView->AddChild(cancelButton);
+	backgroundView->AddChild(fOKButton);
 	backgroundView->AddChild(fTextControl);
 	AddChild(backgroundView);
 	
 	fTextControl->MakeFocus(true);
-	SetDefaultButton(okButton);
+	SetDefaultButton(fOKButton);
+	
+	UpdateControls();
 }
 
 
@@ -87,6 +114,10 @@ TextRequestDialog::MessageReceived(BMessage *message)
 			PostMessage(B_QUIT_REQUESTED);
 		} break;
 		
+		case kMsgUpdateControls:
+			UpdateControls();
+		break;
+		
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -108,4 +139,11 @@ TextRequestDialog::Go(BInvoker *invoker)
 	Show();
 	
 	return B_OK;
+}
+
+
+void
+TextRequestDialog::UpdateControls()
+{
+	fOKButton->SetEnabled(fTextControl->TextView()->TextLength() > 0);
 }

@@ -182,10 +182,11 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	line << word;
 	if(needsEscaping)
 		line << '\"';
-	line << ' ';
 	
-	for(int32 index = 0; parameter.FindString(MDSU_VALUES, index, &name) == B_OK; index++)
+	for(int32 index = 0; parameter.FindString(MDSU_VALUES, index, &name) == B_OK;
+			index++)
 		if(name) {
+			line << ' ';
 			word = name;
 			EscapeWord(word);
 			needsEscaping = word.FindFirst(' ') >= 0;
@@ -194,7 +195,6 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 			line << word;
 			if(needsEscaping)
 				line << '\"';
-			line << ' ';
 		}
 	
 	type_code type;
@@ -202,7 +202,7 @@ WriteParameter(BFile& file, const BMessage& parameter, int32 level)
 	parameter.GetInfo(MDSU_PARAMETERS, &type, &parameterCount);
 	
 	if(parameterCount > 0)
-		line << '{';
+		line << " {";
 	
 	line << '\n';
 	file.Write(line.String(), line.Length());

@@ -36,9 +36,9 @@ static const char *kLabelDevice = "Gerät: ";
 static const char *kLabelNoDevicesFound = "Keine Geräte Gefunden!";
 static const char *kLabelAuthenticator = "Login: ";
 static const char *kLabelNoAuthenticatorsFound = "Keine Login-Methoden gefunden!";
-static const char *kLabelName = "Name: ";
+static const char *kLabelName = "Benutzername: ";
 static const char *kLabelPassword = "Password: ";
-static const char *kLabelSavePassword = "Password Speichern";
+static const char *kLabelSavePassword = "Passwort Speichern";
 static const char *kLabelNone = "Ohne";
 #else
 static const char *kLabelGeneral = "General";
@@ -46,7 +46,7 @@ static const char *kLabelDevice = "Device: ";
 static const char *kLabelNoDevicesFound = "No Devices Found!";
 static const char *kLabelAuthenticator = "Login: ";
 static const char *kLabelNoAuthenticatorsFound = "No Authenticators Found!";
-static const char *kLabelName = "Name: ";
+static const char *kLabelName = "Username: ";
 static const char *kLabelPassword = "Password: ";
 static const char *kLabelSavePassword = "Save Password";
 static const char *kLabelNone = "None";
@@ -473,14 +473,13 @@ GeneralView::Reload()
 		item = fDeviceField->Menu()->ItemAt(0);
 		item->SetMarked(true);
 		item->Message()->FindPointer("Addon", reinterpret_cast<void**>(&fDeviceAddon));
+		fDeviceAddon->LoadSettings(Addon()->Settings(), Addon()->Profile(), true);
 	} else {
 		fDeviceAddon = NULL;
 		item = fDeviceField->Menu()->FindMarked();
 		if(item)
 			item->SetMarked(false);
 	}
-	
-	ReloadDeviceView();
 	
 	if(Addon()->CountAuthenticators() > 0) {
 		BString kernelModule, authenticator;

@@ -30,18 +30,20 @@ static const uint32 kMsgUpdateControls = 'UCTL';
 // labels
 #ifdef LANG_GERMAN
 static const char *kLabelIPCP = "TCP/IP";
-static const char *kLabelEnabled = "Verwenden";
 static const char *kLabelIPAddress = "IP Adresse: ";
 static const char *kLabelPrimaryDNS = "Primärer DNS: ";
 static const char *kLabelSecondaryDNS = "Sekundärer DNS: ";
 static const char *kLabelOptional = "(Optional)";
+static const char *kLabelExtendedOptions = "Erweiterte Optionen:";
+static const char *kLabelEnabled = "TCP/IP-Protokoll Verwenden";
 #else
 static const char *kLabelIPCP = "TCP/IP";
-static const char *kLabelEnabled = "Enabled";
 static const char *kLabelIPAddress = "IP Address: ";
 static const char *kLabelPrimaryDNS = "Primary DNS: ";
 static const char *kLabelSecondaryDNS = "Secondary DNS: ";
 static const char *kLabelOptional = "(Optional)";
+static const char *kLabelExtendedOptions = "Extended Options:";
+static const char *kLabelEnabled = "Enable TCP/IP Protocol";
 #endif
 
 // add-on descriptions
@@ -277,12 +279,6 @@ IPCPView::IPCPView(IPCPAddon *addon, BRect frame)
 {
 	BRect rect = Bounds();
 	rect.InsetBy(10, 10);
-	rect.bottom = rect.top + 15;
-	fIsEnabled = new BCheckBox(rect, "isEnabled", kLabelEnabled,
-		new BMessage(kMsgUpdateControls));
-	rect.left += 15;
-		// indent the other controls to indicate that they depend on this control
-	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
 	BRect optionalRect(rect);
 	rect.right -= 75;
@@ -303,6 +299,13 @@ IPCPView::IPCPView(IPCPAddon *addon, BRect frame)
 	optionalRect.top = rect.top;
 	optionalRect.bottom = optionalRect.top + 15;
 	AddChild(new BStringView(optionalRect, "optional_3", kLabelOptional));
+	rect.top = rect.bottom + 50;
+	rect.bottom = rect.top + 10;
+	AddChild(new BStringView(rect, "expert", kLabelExtendedOptions));
+	rect.top = rect.bottom + 5;
+	rect.bottom = rect.top + 15;
+	fIsEnabled = new BCheckBox(rect, "isEnabled", kLabelEnabled,
+		new BMessage(kMsgUpdateControls));
 	
 	// set divider of text controls
 	float controlWidth = max(max(StringWidth(fIPAddress->Label()),

@@ -17,16 +17,17 @@
 
 
 // message constants
-static const uint32 kMsgUpdateControls = 'UPDC';
+static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
 #ifdef LANG_GERMAN
-static const char *kLabelConnectionOptions = "Verbindungs-Optionen";
-static const char *kLabelDialOnDemand = "Bei Bedarf Automatisch Verbinden";
+static const char *kLabelConnectionOptions = "Optionen";
+static const char *kLabelDialOnDemand = "Automatisch Verbinden Bei Zugriff Auf "
+										"Internet";
 static const char *kLabelAskBeforeDialing = "Vor Dem Verbinden Fragen";
 static const char *kLabelAutoRedial = "Verbindung Automatisch Wiederherstellen";
 #else
-static const char *kLabelConnectionOptions = "Connection Options";
+static const char *kLabelConnectionOptions = "Options";
 static const char *kLabelDialOnDemand = "Connect Automatically When Needed";
 static const char *kLabelAskBeforeDialing = "Ask Before Dialing";
 static const char *kLabelAutoRedial = "Redial Automatically";
@@ -245,10 +246,6 @@ ConnectionOptionsView::MessageReceived(BMessage *message)
 void
 ConnectionOptionsView::UpdateControls()
 {
-	if(fDialOnDemand->Value())
-		fAskBeforeDialing->SetEnabled(true);
-	else
-		fAskBeforeDialing->SetEnabled(false);
-	
+	fAskBeforeDialing->SetEnabled(fDialOnDemand->Value());
 	fAskBeforeDialing->SetValue(fDialOnDemand->Value());
 }

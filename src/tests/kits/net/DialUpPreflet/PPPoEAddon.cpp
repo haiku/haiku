@@ -117,11 +117,12 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	fInterfaceName = fServiceName = "";
 	fSettings = settings;
 	fProfile = profile;
-	if(!settings || !profile || isNew) {
-		if(fPPPoEView)
-			fPPPoEView->Reload();
+	
+	if(fPPPoEView)
+		fPPPoEView->Reload();
+	
+	if(!settings || !profile || isNew)
 		return true;
-	}
 	
 	BMessage device;
 	int32 deviceIndex = 0;
@@ -156,6 +157,9 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	
 	device.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, deviceIndex, &device);
+	
+	if(fPPPoEView)
+		fPPPoEView->Reload();
 	
 	return true;
 }
@@ -305,7 +309,7 @@ PPPoEView::MessageReceived(BMessage *message)
 		} break;
 		
 		case kMsgSelectOther:
-			(new TextRequestDialog("InterfaceName", kRequestInterfaceName,
+			(new TextRequestDialog("InterfaceName", NULL, kRequestInterfaceName,
 				fInterfaceName.String()))->Go(new BInvoker(
 				new BMessage(kMsgFinishSelectOther), this));
 		break;
@@ -378,7 +382,7 @@ PPPoEView::ReloadInterfaces()
 	}
 	
 	// set interface or some default value if nothing was found
-	if(Addon()->InterfaceName())
+	if(Addon()->InterfaceName() && strlen(Addon()->InterfaceName()) > 0)
 		fInterfaceName = Addon()->InterfaceName();
 	else if(count > 0)
 		fInterfaceName = interfaces;
