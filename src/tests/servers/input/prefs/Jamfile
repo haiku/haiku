@@ -10,7 +10,7 @@ if $(COMPILE_FOR_R5) {
 	SubDirC++Flags -DCOMPILE_FOR_R5 ;
 }
 
-Preference KeymapTest :
+SimpleTest KeymapTest :
 	KeymapApplication.cpp
 	KeymapWindow.cpp
 	KeymapListItem.cpp
@@ -37,7 +37,7 @@ SEARCH on [ FGristFiles
 
 AddResources KeyboardTest : Keyboard.rdef ;
 
-Preference KeyboardTest : 
+SimpleTest KeyboardTest : 
 	Keyboard.cpp 
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
@@ -62,7 +62,7 @@ SEARCH on [ FGristFiles
 
 AddResources MouseTest : Mouse.rdef ;
 
-Preference MouseTest : 
+SimpleTest MouseTest : 
 	Mouse.cpp 
 	MouseSettings.cpp 
 	MouseWindow.cpp
@@ -89,7 +89,7 @@ SEARCH on [ FGristFiles
 	]
 	= [ FDirName $(OBOS_TOP) src prefs mouse ] ;
 
-BinCommand keymapTest :
+SimpleTest keymapTest :
 	key_map.cpp
 	Keymap.cpp
 
