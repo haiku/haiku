@@ -46,6 +46,7 @@ public:
 private:
 	void StartPulse();
 	void Open(const entry_ref *pref);
+	void BroadcastToWindows(uint32 what);
 
 	BFilePanel *fpOpenPanel;
 	bool fbPulseStarted;

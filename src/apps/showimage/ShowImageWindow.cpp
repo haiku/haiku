@@ -43,6 +43,7 @@
 #include <Alert.h>
 #include <SupportDefs.h>
 #include <Screen.h>
+#include <Roster.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
@@ -110,7 +111,14 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 
 	SetPulseRate(100000); // every 1/10 second; ShowImageView needs it for marching ants
 
-	Show();
+	if (InitCheck() == B_OK) {
+		fpImageView->FlushToLeftTop();
+		WindowRedimension(fpImageView->GetBitmap());
+		Show();
+	} else {
+		// exit if file could not be opened
+		Quit();
+	}
 }
 
 ShowImageWindow::~ShowImageWindow()
@@ -121,7 +129,7 @@ ShowImageWindow::~ShowImageWindow()
 status_t
 ShowImageWindow::InitCheck()
 {
-	if (!fpRef || !fpImageView)
+	if (!fpRef || !fpImageView || fpImageView->GetBitmap() == NULL)
 		return B_ERROR;
 	else
 		return B_OK;
@@ -149,10 +157,39 @@ ShowImageWindow::UpdateTitle()
 }
 
 void
+ShowImageWindow::UpdateRecentDocumentsMenu()
+{
+	BMenuItem *item;
+	BMessage list, *msg;
+	entry_ref ref;
+	char name[B_FILE_NAME_LENGTH];
+
+	while ((item = fpOpenMenu->RemoveItem((int32)0)) != NULL) {
+		delete item;
+	}
+
+	be_roster->GetRecentDocuments(&list, 20, NULL, APP_SIG);
+	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
+		BEntry entry(&ref);
+		entry.GetName(name);
+		msg = new BMessage(B_REFS_RECEIVED);
+		msg->AddRef("refs", &ref);
+		item =  new BMenuItem(name, msg, 0, 0);
+		fpOpenMenu->AddItem(item);
+		item->SetTarget(be_app, NULL);
+	}
+}
+
+void
 ShowImageWindow::LoadMenus(BMenuBar *pbar)
 {
 	BMenu *pmenu = new BMenu("File");
-	AddItemMenu(pmenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true);
+	fpOpenMenu = new BMenu("Open");
+	pmenu->AddItem(fpOpenMenu);
+	fpOpenMenu->Superitem()->SetTrigger('O');
+	fpOpenMenu->Superitem()->SetMessage(new BMessage(MSG_FILE_OPEN));
+	fpOpenMenu->Superitem()->SetTarget(be_app);
+	fpOpenMenu->Superitem()->SetShortcut('O', 0);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Dia Show", MSG_DIA_SHOW, 0, 0, 'W', true);
 	BMenu* pDelay = new BMenu("Delay");
@@ -193,11 +230,11 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Undo", B_UNDO, 'Z', 0, 'W', false);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Cut", B_CUT, 'X', 0, 'W', false);
-	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', false);
+	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', true);
 	AddItemMenu(pmenu, "Paste", B_PASTE, 'V', 0, 'W', false);
-	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
+	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', false);
+	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', true);
 	pbar->AddItem(pmenu);
 
 	pmenu = fpPageMenu = new BMenu("Page");
@@ -223,6 +260,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
 	pbar->AddItem(pmenu);
+
+	UpdateRecentDocumentsMenu();
 }
 
 BMenuItem *
@@ -260,32 +299,28 @@ ShowImageWindow::AddDelayItem(BMenu *pmenu, char *caption, float value, bool mar
 void
 ShowImageWindow::WindowRedimension(BBitmap *pbitmap)
 {
-	// set the window's min & max size limits
-	// based on document's data bounds
-	float maxWidth = pbitmap->Bounds().Width() + B_V_SCROLL_BAR_WIDTH;
-	float maxHeight = pbitmap->Bounds().Height() + fpBar->Frame().Height() +
-		B_H_SCROLL_BAR_HEIGHT + 1;
-	float minWidth = min(maxWidth, 100.0f);
-	float minHeight = min(maxHeight, 100.0f);
+	BScreen screen;
+	BRect r(pbitmap->Bounds());
+	float width, height;
+	float maxWidth, maxHeight;
+	const float windowBorderWidth = 5;
+	const float windowBorderHeight = 5;
+	
+	if (screen.Frame().right == 0.0) {	
+		return; // invalid screen object
+	}
+	
+	width = r.Width() + B_V_SCROLL_BAR_WIDTH;
+	height = r.Height() + 1 + fpBar->Frame().Height() + B_H_SCROLL_BAR_HEIGHT;
 
-	// adjust the window's current size based on new min/max values	
-	float curWidth = Bounds().Width();
-	float curHeight = Bounds().Height();	
-	if (curWidth < minWidth)
-		curWidth = minWidth;
-	else if (curWidth > maxWidth)
-		curWidth = maxWidth;
-
-	if (curHeight < minHeight)
-		curHeight = minHeight;
-	else if (curHeight > maxHeight)
-		curHeight = maxHeight;
-
-	if (minWidth < 250)
-		minWidth = 250;
-
-	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
-	ResizeTo(curWidth, curHeight);
+	// dimensions so that window does not reach outside of screen	
+	maxWidth = screen.Frame().Width() + 1 - windowBorderWidth - Frame().left;
+	maxHeight = screen.Frame().Height() + 1 - windowBorderHeight - Frame().top;
+	
+	if (width > maxWidth) width = maxWidth;
+	if (height > maxHeight) height = maxHeight;
+	
+	ResizeTo(width, height);
 }
 
 void
@@ -357,12 +392,15 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case B_CUT:
 			break;
 		case B_COPY:
+			fpImageView->CopySelectionToClipboard();
 			break;
 		case B_PASTE:
 			break;
 		case MSG_CLEAR_SELECT:
+			fpImageView->Unselect();
 			break;
 		case MSG_SELECT_ALL:
+			fpImageView->SelectAll();
 			break;
 			
 		case MSG_PAGE_FIRST:
@@ -433,6 +471,10 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			
 		case MSG_FULL_SCREEN:
 			ToggleFullScreen();
+			break;
+		
+		case MSG_UPDATE_RECENT_DOCUMENTS:
+			UpdateRecentDocumentsMenu();
 			break;
 					
 		default:

@@ -41,6 +41,10 @@
 #include <Rect.h>
 #include <SupportDefs.h>
 #include <Directory.h>
+#include <Application.h>
+#include <Roster.h>
+#include <NodeInfo.h>
+#include <Clipboard.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
@@ -115,9 +119,16 @@ ShowImageView::RotatePatterns()
 }
 
 void
+ShowImageView::AnimateSelection(bool a)
+{
+	fAnimateSelection = a;
+}
+
+void
 ShowImageView::Pulse()
 {
-	if (fbHasSelection) {
+	// animate marching ants
+	if (fbHasSelection && fAnimateSelection && Window()->IsActive()) {	
 		RotatePatterns();
 		DrawSelectionBox(fSelectionRect);
 	}
@@ -141,10 +152,12 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fpBitmap = NULL;
 	fDocumentIndex = 1;
 	fDocumentCount = 1;
+	fAnimateSelection = true;
 	fbHasSelection = false;
 	fResizeToViewBounds = false;
 	fDiaShow = false;
 	SetDiaShowDelay(3); // 3 seconds
+	fBeginDrag = false;
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -181,7 +194,8 @@ ShowImageView::IsImage(const entry_ref *pref)
 }
 
 // send message to parent about new image
-void ShowImageView::Notify(const char* status)
+void 
+ShowImageView::Notify(const char* status)
 {
 	BMessage msg(MSG_UPDATE_STATUS);
 	if (status != NULL) {
@@ -193,6 +207,13 @@ void ShowImageView::Notify(const char* status)
 
 	FixupScrollBars();
 	Invalidate();
+}
+
+void
+ShowImageView::AddToRecentDocuments()
+{
+	be_roster->AddToRecentDocuments(&fCurrentRef, APP_SIG);
+	be_app_messenger.SendMessage(MSG_UPDATE_RECENT_DOCUMENTS);
 }
 
 void
@@ -241,6 +262,8 @@ ShowImageView::SetImage(const entry_ref *pref)
 		fDocumentCount = documentCount;
 	else
 		fDocumentCount = 1;
+	
+	AddToRecentDocuments();
 		
 	Notify(info.name);
 }
@@ -259,6 +282,14 @@ BBitmap *
 ShowImageView::GetBitmap()
 {
 	return fpBitmap;
+}
+
+void
+ShowImageView::FlushToLeftTop()
+{
+	BRect rect = AlignBitmap();
+	BPoint p(rect.left, rect.top);
+	ScrollTo(p);
 }
 
 void
@@ -394,9 +425,200 @@ ShowImageView::FrameResized(float /* width */, float /* height */)
 void
 ShowImageView::ConstrainToImage(BPoint &point)
 {
-	point.ConstrainTo(
-		fpBitmap->Bounds()
-	);
+	point.ConstrainTo(fpBitmap->Bounds());
+}
+
+BBitmap*
+ShowImageView::CopySelection(uchar alpha)
+{
+	bool hasAlpha = alpha != 255;
+	
+	if (!fbHasSelection) return NULL;
+	
+	BRect rect(0, 0, fSelectionRect.IntegerWidth(), fSelectionRect.IntegerHeight());
+	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
+	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fpBitmap->ColorSpace(), true);
+	if (bitmap == NULL) return NULL;
+	
+	if (bitmap->Lock()) {
+		bitmap->AddChild(&view);
+		view.DrawBitmap(fpBitmap, fSelectionRect, rect);
+		if (hasAlpha) {
+			view.SetDrawingMode(B_OP_SUBTRACT);
+			view.SetHighColor(0, 0, 0, 255-alpha);
+			view.FillRect(rect, B_SOLID_HIGH);
+		}
+		view.Sync();
+		bitmap->RemoveChild(&view);
+		bitmap->Unlock();
+	}
+	
+	return bitmap;
+}
+
+bool
+ShowImageView::AddSupportedTypes(BMessage* msg, BBitmap* bitmap)
+{
+	bool found = false;
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	if (roster == NULL) return false;
+	
+	BBitmapStream stream(bitmap);
+		
+	translator_info *outInfo;
+	int32 outNumInfo;		
+	if (roster->GetTranslators(&stream, NULL, &outInfo, &outNumInfo) == B_OK) {
+		for (int32 i = 0; i < outNumInfo; i++) {
+			const translation_format *fmts;
+			int32 num_fmts;
+			roster->GetOutputFormats(outInfo[i].translator, &fmts, &num_fmts);
+			for (int32 j = 0; j < num_fmts; j++) {
+				if (strcmp(fmts[j].MIME, "image/x-be-bitmap") != 0) {
+					// needed to send data in message
+ 					msg->AddString("be:types", fmts[j].MIME);
+ 					// needed to pass data via file
+					msg->AddString("be:filetypes", fmts[j].MIME);
+					msg->AddString("be:type_descriptions", fmts[j].name);
+				}
+				found = true;
+			}
+		}
+	}
+	stream.DetachBitmap(&bitmap);
+	return found;
+}
+
+void
+ShowImageView::BeginDrag(BPoint point)
+{
+	// mouse moved?
+	if (!fBeginDrag) return;
+	point = ViewToImage(point);
+	if (point == fFirstPoint) return;
+	fBeginDrag = false;
+	
+	BBitmap* bitmap = CopySelection(128);
+	if (bitmap == NULL) return;
+
+	SetMouseEventMask(B_POINTER_EVENTS);
+	BPoint leftTop(fSelectionRect.left, fSelectionRect.top);
+
+	// fill the drag message
+	BMessage drag(B_SIMPLE_DATA);
+	drag.AddInt32("be:actions", B_COPY_TARGET);
+	drag.AddString("be:clip_name", "Bitmap Clip"); 
+	// XXX undocumented fields
+	drag.AddPoint("be:_source_point", fFirstPoint);
+	drag.AddRect("be:_frame", fSelectionRect);
+	// XXX meaning unknown???
+	// drag.AddInt32("be:_format", e.g.: B_TGA_FORMAT);
+	// drag.AddInt32("be_translator", translator_id);
+	// drag.AddPointer("be:_bitmap_ptr, ?);
+	if (AddSupportedTypes(&drag, bitmap)) {
+		// we also support "Passing Data via File" protocol
+		drag.AddString("be:types", B_FILE_MIME_TYPE);
+		// avoid flickering of dragged bitmap caused by drawing into the window
+		AnimateSelection(false); 
+		// DragMessage takes ownership of bitmap
+		DragMessage(&drag, bitmap, B_OP_ALPHA, fFirstPoint - leftTop);
+	}
+}
+
+bool
+ShowImageView::OutputFormatForType(BBitmap* bitmap, const char* type, translation_format* format)
+{
+	bool found = false;
+
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	if (roster == NULL) return false;
+
+	BBitmapStream stream(bitmap);
+	
+	translator_info *outInfo;
+	int32 outNumInfo;
+	if (roster->GetTranslators(&stream, NULL, &outInfo, &outNumInfo) == B_OK) {		
+		for (int32 i = 0; i < outNumInfo; i++) {
+			const translation_format *fmts;
+			int32 num_fmts;
+			roster->GetOutputFormats(outInfo[i].translator, &fmts, &num_fmts);
+			for (int32 j = 0; j < num_fmts; j++) {
+				if (strcmp(fmts[j].MIME, type) == 0) {
+					*format = fmts[j];
+					found = true; 
+					break;
+				}
+			}
+		}
+	}
+	stream.DetachBitmap(&bitmap);
+	return found;
+}
+
+void
+ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format)
+{
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BBitmapStream stream(bitmap); // destructor deletes bitmap
+	// write data
+	BFile file(dir, name, B_WRITE_ONLY);
+	roster->Translate(&stream, NULL, NULL, &file, format->type);
+	// set mime type
+	BNodeInfo info(&file);
+	if (info.InitCheck() == B_OK) {
+		info.SetType(format->MIME);
+	}
+}
+
+void
+ShowImageView::SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format)
+{
+	BMessage reply(B_MIME_DATA);
+	BBitmapStream stream(bitmap); // destructor deletes bitmap
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	BMallocIO memStream;
+	if (roster->Translate(&stream, NULL, NULL, &memStream, format->type) == B_OK) {
+		reply.AddData(format->MIME, B_MIME_TYPE, memStream.Buffer(), memStream.BufferLength());
+		msg->SendReply(&reply);
+	}
+}
+
+void
+ShowImageView::HandleDrop(BMessage* msg)
+{
+	BMessage data(B_MIME_DATA);
+	entry_ref dirRef;
+	BString name, type;
+	bool saveToFile;
+	bool sendInMessage;
+	BBitmap *bitmap;
+
+	saveToFile = msg->FindString("be:filetypes", &type) == B_OK &&
+				 msg->FindRef("directory", &dirRef) == B_OK &&
+				 msg->FindString("name", &name) == B_OK;
+	
+	sendInMessage = (!saveToFile) && msg->FindString("be:types", &type) == B_OK;
+
+	fprintf(stderr, "HandleDrop saveToFile %s, sendInMessage %s\n",
+		saveToFile ? "yes" : "no",
+		sendInMessage ? "yes" : "no");
+
+	bitmap = CopySelection();
+	if (bitmap == NULL) return;
+
+	translation_format format;
+	if (!OutputFormatForType(bitmap, type.String(), &format)) {
+		delete bitmap;
+		return;
+	}
+
+	if (saveToFile) {
+		BDirectory dir(&dirRef);
+		SaveToFile(&dir, name.String(), bitmap, &format);
+	} else if (sendInMessage) {
+		SendInMessage(msg, bitmap, &format);
+	} else {
+		delete bitmap;
+	}
 }
 
 void
@@ -405,7 +627,8 @@ ShowImageView::MouseDown(BPoint point)
 	point = ViewToImage(point);
 	
 	if (fbHasSelection && fSelectionRect.Contains(point)) {
-		// TODO: start drag and drop
+		// delay drag until mouse is moved
+		fBeginDrag = true; fFirstPoint = point;
 	} else {
 		// begin new selection
 		fMakesSelection = true;
@@ -447,6 +670,8 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
 {
 	if (fMakesSelection) {
 		UpdateSelectionRect(point, false);
+	} else {
+		BeginDrag(point);
 	}
 }
 
@@ -456,13 +681,20 @@ ShowImageView::MouseUp(BPoint point)
 	if (fMakesSelection) {
 		UpdateSelectionRect(point, true);
 		fMakesSelection = false;
+	} else {
+		BeginDrag(point);
 	}
+	//fBeginDrag = false;
+	AnimateSelection(true);
 }
 
 void
 ShowImageView::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
+		case B_COPY_TARGET:
+			HandleDrop(pmsg);
+			break;
 		default:
 			BView::MessageReceived(pmsg);
 			break;
@@ -519,6 +751,53 @@ int32
 ShowImageView::PageCount()
 {
 	return fDocumentCount;
+}
+
+void
+ShowImageView::SelectAll()
+{
+	fbHasSelection = true;
+	fSelectionRect.Set(0, 0, fpBitmap->Bounds().Width(), fpBitmap->Bounds().Height());
+	Invalidate();
+}
+
+void
+ShowImageView::Unselect()
+{
+	if (fbHasSelection) {
+		fbHasSelection = false;
+		Invalidate();
+	}
+}
+
+void
+ShowImageView::CopySelectionToClipboard()
+{
+	if (fbHasSelection && be_clipboard->Lock()) {
+		be_clipboard->Clear();
+		BMessage *clip = NULL;
+		if ((clip = be_clipboard->Data()) != NULL) {
+			BMessage data;
+			BBitmap* bitmap = CopySelection();
+			if (bitmap != NULL) {
+				#if 1
+				// According to BeBook and Becasso, Gobe Productive do the following.
+				// Paste works in Productive, but not in Becasso and original ShowImage.
+				BMessage msg(B_OK); // Becasso uses B_TRANSLATOR_BITMAP, BeBook says its unused
+				bitmap->Archive(&msg);
+				clip->AddMessage("image/x-be-bitmap", &msg);
+				#else
+				// original ShowImage performs this. Paste works with original ShowImage.
+				bitmap->Archive(clip);
+				// original ShowImage uses be:location for insertion point
+				clip->AddPoint("be:location", BPoint(fSelectionRect.left, fSelectionRect.top));
+				#endif
+				delete bitmap;
+				be_clipboard->Commit();
+			}
+		}
+		be_clipboard->Unlock();
+	}
 }
 
 void

@@ -57,6 +57,7 @@ const uint32 MSG_INVERT             = 'mINV';
 const uint32 MSG_DIA_SHOW           = 'mDIA';
 const uint32 MSG_DIA_SHOW_DELAY     = 'mDSD';
 const uint32 MSG_FULL_SCREEN        = 'mFSC';
+const uint32 MSG_UPDATE_RECENT_DOCUMENTS = 'mURD';
 
 extern const char *APP_SIG;
 

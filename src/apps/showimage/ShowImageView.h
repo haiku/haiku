@@ -33,6 +33,7 @@
 #include <Bitmap.h>
 #include <Entry.h>
 #include <String.h>
+#include <TranslatorRoster.h>
 
 class ShowImageView : public BView {
 public:
@@ -45,6 +46,7 @@ public:
 	void SetImage(const entry_ref *pref);
 	void ResizeToViewBounds(bool resize);
 	BBitmap *GetBitmap();
+	void FlushToLeftTop();
 	
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
@@ -58,6 +60,11 @@ public:
 	
 	int32 CurrentPage();
 	int32 PageCount();
+	
+	void SelectAll();
+	void Unselect();
+	
+	void CopySelectionToClipboard();
 	
 	void FirstPage();
 	void LastPage();
@@ -84,7 +91,9 @@ private:
 	};
 	void InitPatterns();
 	void RotatePatterns();
+	void AnimateSelection(bool a);
 	void Notify(const char* status);
+	void AddToRecentDocuments();
 	int32 BytesPerPixel(color_space cs) const;
 	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
 	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
@@ -100,6 +109,13 @@ private:
 	bool ShowNextImage(bool next, bool rewind);
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
+	BBitmap* CopySelection(uchar alpha = 255);
+	bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
+	void BeginDrag(BPoint point);
+	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format);
+	void SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
+	bool OutputFormatForType(BBitmap* bitmap, const char* type, translation_format* format);
+	void HandleDrop(BMessage* msg);
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
 	void DrawSelectionBox(BRect &rect);
@@ -113,8 +129,10 @@ private:
 	float fTop;
 	float fScaleX;
 	float fScaleY;
+	bool fBeginDrag;
 	bool fMakesSelection; // is a selection being made
 	BPoint fFirstPoint;   // first point in image space of selection
+	bool fAnimateSelection; // marching ants
 	bool fbHasSelection;  // is fSelectionRect valid 
 	BRect fSelectionRect; // the selection in image space
 	pattern fPatternUp, fPatternDown, fPatternLeft, fPatternRight;

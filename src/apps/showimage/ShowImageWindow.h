@@ -65,7 +65,8 @@ private:
 		char target, bool enabled);
 
 	BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value, bool marked);
-
+	void UpdateRecentDocumentsMenu();
+	
 	bool ToggleMenuItem(uint32 what);
 			
 	void SaveAs(BMessage *pmsg);
@@ -78,6 +79,7 @@ private:
 
 	BFilePanel *fpSavePanel;
 	BMenuBar *fpBar;
+	BMenu *fpOpenMenu;
 	BMenu *fpPageMenu;
 	entry_ref *fpRef;
 	ShowImageView *fpImageView;

@@ -127,6 +127,10 @@ ShowImageApp::MessageReceived(BMessage *pmsg)
 			// start checking count of open windows
 			StartPulse();
 			break;
+		
+		case MSG_UPDATE_RECENT_DOCUMENTS:
+			BroadcastToWindows(MSG_UPDATE_RECENT_DOCUMENTS);
+			break;
 
 		default:
 			BApplication::MessageReceived(pmsg);
@@ -154,4 +158,15 @@ void
 ShowImageApp::Open(const entry_ref *pref)
 {
 	new ShowImageWindow(pref);
+}
+
+void
+ShowImageApp::BroadcastToWindows(uint32 what)
+{
+	const int32 n = CountWindows();
+	for (int32 i = 0; i < n ; i ++) {
+		// BMessenger checks for us if BWindow is still a valid object
+		BMessenger msgr(WindowAt(i));
+		msgr.SendMessage(what);
+	}
 }
