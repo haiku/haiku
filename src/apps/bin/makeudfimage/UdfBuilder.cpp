@@ -12,7 +12,11 @@
 
 #include "UdfBuilder.h"
 
+#include <Directory.h>
+#include <Entry.h>
+#include <Node.h>
 #include <OS.h>
+#include <Path.h>
 #include <stdio.h>
 #include <string>
 
@@ -35,7 +39,7 @@ static const Udf::entity_id kDomainId(0, "*OSTA UDF Compliant",
 */
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
                        bool doIso, const char *udfVolumeName,
-                       const char *isoVolumeName,
+                       const char *isoVolumeName, const char *rootDirectory,
                        const ProgressListener &listener)
 	: fInitStatus(B_NO_INIT)
 	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE)
@@ -46,10 +50,14 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	, fDoIso(doIso)
 	, fUdfVolumeName(udfVolumeName)
 	, fIsoVolumeName(isoVolumeName)
+	, fRootDirectory(rootDirectory ? rootDirectory : "")
+	, fRootDirectoryName(rootDirectory)
 	, fListener(listener)
 	, fAllocator(blockSize)
 	, fPartitionAllocator(0, 257, fAllocator)
-	, fBuildTime(0)	// set at start of Build()
+	, fStatistics()
+	, fBuildTime(0)		// set at start of Build()
+	, fBuildTimeStamp()	// ditto
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("blockSize: %ld, doUdf: %s, doIso: %s",
 	               blockSize, bool_to_string(doUdf), bool_to_string(doIso)));
@@ -107,6 +115,14 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 			}
 		}
 	}
+	// Check the root directory
+	if (!error) {
+		error = _RootDirectory().InitCheck();
+		if (error) {
+			_PrintError("Error initializing root directory entry: 0x%lx, `%s'",
+			            error, strerror(error));
+		}
+	}
 	
 	if (!error) {
 		fInitStatus = B_OK;
@@ -130,11 +146,10 @@ UdfBuilder::Build()
 		RETURN(error);
 		
 	// Note the time at which we're starting
-	time_t timer = time(&timer);
-//	_SetBuildTime(real_time_clock());
-	_SetBuildTime(timer);
+	fStatistics.Reset();
+	_SetBuildTime(_Stats().StartTime());
 
-	// Variables of particular interest
+	// Udf variables
 	uint16 partitionNumber = 0;
 	Udf::anchor_volume_descriptor anchor256;
 //	Udf::anchor_volume_descriptor anchorN;
@@ -147,9 +162,12 @@ UdfBuilder::Build()
 	Udf::extent_address filesetExtent;
 	Udf::extent_address integrityExtent;
 	Udf::file_set_descriptor fileset;
-	Udf::long_address rootIcbAddress;
-	Udf::extent_address rootIcbExtent;
+	node_data rootNode;
 
+	// Iso variables
+//	Udf::extent_address rootDirentExtent;	
+	
+		
 	_OutputFile().Seek(0, SEEK_SET);		
 	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
 
@@ -158,6 +176,7 @@ UdfBuilder::Build()
 
 	// Reserve the first 32KB and zero them out.
 	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing reserved area");
 		const int reservedAreaSize = 32 * 1024;
 		Udf::extent_address extent(0, reservedAreaSize);
 		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for reserved area");
@@ -224,7 +243,7 @@ UdfBuilder::Build()
 			}
 		}				
 		// Tea
-		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing terminating extended area descriptor");
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing tea descriptor");
 		Udf::volume_structure_descriptor_header tea(0, Udf::kVSDID_TEA, 1);
 		if (!error) {
 			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for tea descriptor");
@@ -564,48 +583,57 @@ UdfBuilder::Build()
 		       fileset.copyright_file_id().size());
 		memset(fileset.abstract_file_id().data, 0,
 		       fileset.abstract_file_id().size());
-		// Allocate space for the root icb
-		_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for root icb");
-		error = _PartitionAllocator().GetNextExtent(_BlockSize(), true, rootIcbAddress,
-		                                            rootIcbExtent);
-		if (!error) {				                                            
-			_PrintUpdate(VERBOSITY_HIGH, "udf: (partition: %d, location: %ld, "
-			             "length: %ld) => (location: %ld, length: %ld)",
-			             rootIcbAddress.partition(), rootIcbAddress.block(),
-			             rootIcbAddress.length(), rootIcbExtent.location(),
-			             rootIcbExtent.length());
-		}	             
-		if (!error) {
-			fileset.root_directory_icb() = rootIcbAddress;
-			fileset.domain_id() = kDomainId;
-			Udf::long_address nullAddress(0, 0, 0, 0);
-			fileset.next_extent() = nullAddress;
-			fileset.system_stream_directory_icb() = nullAddress;
-			memset(fileset.reserved().data, 0,
-			       fileset.reserved().size());
-			fileset.tag().set_id(Udf::TAGID_FILE_SET_DESCRIPTOR);
-			fileset.tag().set_version(3);
-			fileset.tag().set_serial_number(0);
-			fileset.tag().set_location(filesetAddress.block());
-			fileset.tag().set_checksums(fileset);
-			DUMP(fileset);
-			// write fsd				                             
-			ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
-        			                              &fileset, sizeof(fileset));
-			error = check_size_error(bytes, sizeof(fileset));                              
-			if (!error && bytes < ssize_t(_BlockSize())) {
-				ssize_t bytesLeft = _BlockSize() - bytes;
-				bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
-				                             + bytes, bytesLeft);
-				error = check_size_error(bytes, bytesLeft);			                             
-			}
+		Udf::long_address nullAddress(0, 0, 0, 0);
+		fileset.root_directory_icb() = nullAddress;
+		fileset.domain_id() = kDomainId;
+		fileset.next_extent() = nullAddress;
+		fileset.system_stream_directory_icb() = nullAddress;
+		memset(fileset.reserved().data, 0,
+		       fileset.reserved().size());
+		fileset.tag().set_id(Udf::TAGID_FILE_SET_DESCRIPTOR);
+		fileset.tag().set_version(3);
+		fileset.tag().set_serial_number(0);
+		fileset.tag().set_location(filesetAddress.block());
+		fileset.tag().set_checksums(fileset);
+		DUMP(fileset);
+		// write fsd				                             
+		ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
+       			                              &fileset, sizeof(fileset));
+		error = check_size_error(bytes, sizeof(fileset));                              
+		if (!error && bytes < ssize_t(_BlockSize())) {
+			ssize_t bytesLeft = _BlockSize() - bytes;
+			bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
+			                             + bytes, bytesLeft);
+			error = check_size_error(bytes, bytesLeft);			                             
 		}
 	}
 
 	// Build the rest of the image
+	if (!error) {
+		_PrintUpdate(VERBOSITY_LOW, "Building image");
+		error = _ProcessDirectory(_RootDirectory(), "/", rootNode);		
+	}
 
-
-	_PrintUpdate(VERBOSITY_LOW, "Finalizing volume");
+	if (!error)
+		_PrintUpdate(VERBOSITY_LOW, "Finalizing volume");
+		
+	// Rewrite the fsd with the root dir icb		
+	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Finalizing file set descriptor");
+		fileset.root_directory_icb() = rootNode.icbAddress;
+		fileset.tag().set_checksums(fileset);
+		DUMP(fileset);
+		// write fsd				                             
+		ssize_t bytes = _OutputFile().WriteAt(filesetExtent.location() << _BlockShift(),
+       			                              &fileset, sizeof(fileset));
+		error = check_size_error(bytes, sizeof(fileset));                              
+		if (!error && bytes < ssize_t(_BlockSize())) {
+			ssize_t bytesLeft = _BlockSize() - bytes;
+			bytes = _OutputFile().ZeroAt((filesetExtent.location() << _BlockShift())
+			                             + bytes, bytesLeft);
+			error = check_size_error(bytes, bytesLeft);			                             
+		}
+	}
 
 	// Set the final partition length and rewrite the partition descriptor
 	if (!error) {
@@ -644,9 +672,8 @@ UdfBuilder::Build()
 			            error, strerror(error));
 		}
 	}
-		
-	if (!error)
-		_PrintUpdate(VERBOSITY_LOW, "Finished");
+	
+	fListener.OnCompletion(error, _Stats());
 	RETURN(error);
 }
 
@@ -734,3 +761,93 @@ UdfBuilder::_PrintUpdate(VerbosityLevel level, const char *formatString, ...) co
 		fListener.OnUpdate(level, message);	
 }
 
+/*! \brief Processes the given directory and its children.
+
+	\param directory The directory to process.
+	\param path Pathname of the directory with respect to the fileset
+	            in construction.
+	\param node Output parameter into which the icb address and dataspace
+	            information for the processed directory is placed.
+*/
+status_t
+UdfBuilder::_ProcessDirectory(BEntry &_directory, const char *path, node_data &node)
+{
+	DEBUG_INIT_ETC("UdfBuilder", ("path: `%s'", path));
+	status_t error = _directory.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
+	if (!error) {
+		_PrintUpdate(VERBOSITY_MEDIUM, "Adding directory `%s'", path);
+		BDirectory directory(&_directory);
+		error = directory.InitCheck();
+		if (!error) {
+		
+			// Figure out how many file identifier characters we have
+			// for each filesystem
+			_PrintUpdate(VERBOSITY_HIGH, "Gathering statistics");
+			BEntry entry;
+			uint32 udfChars = 0;
+			uint32 count = 0;
+			while (error == B_OK) {
+				error = directory.GetNextEntry(&entry);
+				if (error == B_ENTRY_NOT_FOUND) {
+					error = B_OK;
+					break;
+				}
+				if (!error)
+					error = entry.InitCheck();
+				if (!error) {
+					BPath path;
+					error = entry.GetPath(&path);
+					if (!error)
+						error = path.InitCheck();
+					if (!error) {
+						_PrintUpdate(VERBOSITY_HIGH, "found child: `%s'", path.Leaf());
+						Udf::String name(path.Leaf());
+						udfChars += name.Cs0Length();
+						count++;
+					}
+				}
+			}
+			
+			_PrintUpdate(VERBOSITY_HIGH, "children: %ld", count);
+			_PrintUpdate(VERBOSITY_HIGH, "udf: file id bytes: %ld", udfChars);
+
+			// Reserve iso dir entry space
+			
+			// Reserve udf icb space
+			if (!error) {
+				Udf::long_address icbAddress;
+				Udf::extent_address icbExtent;
+				_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for icb");
+				error = _PartitionAllocator().GetNextExtent(_BlockSize(), true, icbAddress,
+				                                            icbExtent);
+				if (!error) {				                                            
+					_PrintUpdate(VERBOSITY_HIGH, "udf: (partition: %d, location: %ld, "
+					             "length: %ld) => (location: %ld, length: %ld)",
+					             icbAddress.partition(), icbAddress.block(),
+					             icbAddress.length(), icbExtent.location(),
+					             icbExtent.length());
+					node.icbAddress = icbAddress;
+				}
+			}
+			
+			// Reserve udf dir data space
+			
+			// Process attributes
+			
+			// Process children
+			
+				// Process child
+				
+				// Write iso direntry
+				
+				// Write udf fid
+				
+			// Write udf icb
+			
+		}
+	}
+	if (!error) {
+		_Stats().AddDirectory();
+	}
+	RETURN(error);
+}
