@@ -62,21 +62,13 @@ static unsigned int num_death_stacks;
 static unsigned int volatile death_stack_bitmap;
 static sem_id death_stack_sem;
 
-#ifndef NEW_SCHEDULER
-// thread queues
-// Thread priority has a granularity of 2; this means that we have 61 real
-// priority levels: 60 to map BeOS priorities 1-120, plus the idle priority (0).
-static struct thread_queue run_q[(B_MAX_PRIORITY / 2) + 1] = { { NULL, NULL }, };
-#else /* NEW_SCHEDULER */
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
 // the slab allocator is in.
-#endif /* NEW_SCHEDULER */
 struct thread_queue dead_q;
 
 static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
-//static void deliver_signal(struct thread *t, int signal);
 
 
 // insert a thread onto the tail of a queue
@@ -140,33 +132,6 @@ thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 	return t;
 }
 
-#ifndef NEW_SCHEDULER
-struct thread *
-thread_lookat_run_q(int priority)
-{
-	return thread_lookat_queue(&run_q[(priority + 1) >> 1]);
-}
-
-
-void
-thread_enqueue_run_q(struct thread *t)
-{
-	// these shouldn't exist
-	if (t->priority > B_MAX_PRIORITY)
-		t->priority = B_MAX_PRIORITY;
-	else if (t->priority < B_MIN_PRIORITY)
-		t->priority = B_MIN_PRIORITY;
-
-	thread_enqueue(t, &run_q[(t->priority + 1) >> 1]);
-}
-
-
-struct thread *
-thread_dequeue_run_q(int priority)
-{
-	return thread_dequeue(&run_q[(priority + 1) >> 1]);
-}
-#endif /* not NEW_SCHEDULER */
 
 static void
 insert_thread_into_team(struct team *p, struct thread *t)
@@ -482,52 +447,6 @@ thread_resume_thread(thread_id id)
 }
 
 
-#ifndef NEW_SCHEDULER
-status_t
-thread_set_priority(thread_id id, int32 priority)
-{
-	struct thread *t;
-	int retval;
-
-	// make sure the passed in priority is within bounds
-	if (priority > B_MAX_PRIORITY)
-		priority = B_MAX_PRIORITY;
-	if (priority < B_MIN_PRIORITY)
-		priority = B_MIN_PRIORITY;
-
-	t = thread_get_current_thread();
-	if (t->id == id) {
-		// it's ourself, so we know we aren't in a run queue, and we can manipulate
-		// our structure directly
-		t->priority = priority;
-		retval = B_NO_ERROR;
-	} else {
-		int state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		t = thread_get_thread_struct_locked(id);
-		if (t) {
-			if (t->state == B_THREAD_READY && t->priority != priority) {
-				// this thread is in a ready queue right now, so it needs to be reinserted
-				thread_dequeue_id(&run_q[(t->priority + 1) >> 1], t->id);
-				t->priority = priority;
-				thread_enqueue_run_q(t);
-			} else
-				t->priority = priority;
-
-			retval = B_NO_ERROR;
-		} else
-			retval = ERR_INVALID_HANDLE;
-
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-	}
-
-	return retval;
-}
-#endif /* not NEW_SCHEDULER */
-
-
 static const char *
 state_to_text(int state)
 {
@@ -607,11 +526,12 @@ dump_thread_info(int argc, char **argv)
 	// if the argument looks like a hex number, treat it as such
 	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		num = atoul(argv[1]);
-		if(num > vm_get_kernel_aspace()->virtual_map.base) {
+/*		if(num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
 			_dump_thread_info((struct thread *)num);
 			return 0;
 		} else
+*/
 			id = num;
 	}
 
@@ -783,11 +703,6 @@ thread_init(kernel_args *ka)
 	thread_hash = hash_init(15, (addr)&t->all_next - (addr)t,
 		&thread_struct_compare, &thread_struct_hash);
 
-#ifndef NEW_SCHEDULER
-	// zero out the run queues
-	memset(run_q, 0, sizeof(run_q));
-
-#endif /* not NEW_SCHEDULER */
 	// zero out the dead thread structure q
 	memset(&dead_q, 0, sizeof(dead_q));
 
@@ -978,7 +893,7 @@ thread_exit(void)
 		(int)t->return_code);
 
 	// boost our priority to get this over with
-	thread_set_priority(t->id, B_FIRST_REAL_TIME_PRIORITY);
+	t->priority = B_FIRST_REAL_TIME_PRIORITY;
 
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&t->alarm);

@@ -13,9 +13,6 @@ extern "C" {
 #include <arch/thread.h>
 #include <signal.h>
 
-// Uncomment the line below to compile the single-queue scheduler
-//#define NEW_SCHEDULER
-
 void resched(void);
 void start_scheduler(void);
 
@@ -27,13 +24,7 @@ void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
 struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id);
-#ifndef NEW_SCHEDULER
-struct thread *thread_lookat_run_q(int priority);
-#endif /* not NEW_SCHEDULER */
 void thread_enqueue_run_q(struct thread *t);
-#ifndef NEW_SCHEDULER
-struct thread *thread_dequeue_run_q(int priority);
-#endif /* not NEW_SCHEDULER */
 void thread_atkernel_entry(void);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_atkernel_exit(void);

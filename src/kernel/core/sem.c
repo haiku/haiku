@@ -342,7 +342,7 @@ sem_timeout(timer *data)
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
 	remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, B_TIMED_OUT);
-
+	
 	RELEASE_SEM_LOCK(gSems[slot]);
 
 	GRAB_THREAD_LOCK();
@@ -766,10 +766,10 @@ sem_interrupt_thread(struct thread *t)
 
 	if (t->state != B_THREAD_WAITING || t->sem_blocking < 0)
 		return EINVAL;
-	if ((t->sem_flags & B_CAN_INTERRUPT) == 0)
+	if (!(t->sem_flags & B_CAN_INTERRUPT))
 		return ERR_SEM_NOT_INTERRUPTABLE;
 
-	t->next_state = B_THREAD_READY;
+//	t->next_state = B_THREAD_READY;
 	
 	slot = t->sem_blocking % MAX_SEMS;
 
@@ -808,7 +808,7 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 	if (t != t1)
 		return ERR_NOT_FOUND;
 	sem->count += t->sem_acquire_count;
-	t->state = B_THREAD_READY;
+	t->state = t->next_state = B_THREAD_READY;
 	t->sem_errcode = sem_errcode;
 	thread_enqueue(t, queue);
 

@@ -102,13 +102,18 @@ int main(int argc, char **argv)
 	resume_thread(t[1]);
 	resume_thread(t[2]);
 	
+	printf("Snoozing...\n");
 	snooze(100000);
-	
+	printf("Waiting for threads...");
 	sys_wait_on_thread(t[0], NULL);
+	printf("1, ");
 	sys_wait_on_thread(t[1], NULL);
+	printf("2, ");
 	sys_wait_on_thread(t[2], NULL);
 	
+	printf("3.\nDone. Spawning commthread...\n");
 	t[0] = spawn_thread(communication_test, "commthread", B_NORMAL_PRIORITY, (void *)5);
+	printf("Spawned. Starting communication...\n");
 	resume_thread(t[0]);
 	
 	for (i=0; i<5; i++) {

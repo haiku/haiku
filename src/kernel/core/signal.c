@@ -153,8 +153,7 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 				break;
 			case SIGCONT:
 				// Wake up thread if it was suspended
-				if ((t->state == B_THREAD_READY) ||
-						(t->state == B_THREAD_SUSPENDED)) {
+				if (t->state == B_THREAD_SUSPENDED) {
 					t->state = t->next_state = B_THREAD_READY;
 					thread_enqueue_run_q(t);
 				}
@@ -252,9 +251,7 @@ sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 static int32
 alarm_event(timer *t)
 {
-	int tid = *((int *)((void *)t + sizeof(timer)));
-	
-	send_signal_etc(tid, SIGALRM, B_DO_NOT_RESCHEDULE);
+	send_signal_etc(thread_get_current_thread()->id, SIGALRM, B_DO_NOT_RESCHEDULE);
 	
 	return B_INVOKE_SCHEDULER;
 }

@@ -149,7 +149,7 @@ has_data(thread_id thread)
 status_t
 snooze(bigtime_t microseconds)
 {
-	return sys_snooze_until(system_time() + microseconds, B_SYSTEM_TIMEBASE);
+	return sys_snooze_until(sys_system_time() + microseconds, B_SYSTEM_TIMEBASE);
 }
 
 
