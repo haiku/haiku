@@ -81,7 +81,6 @@ status_t nv_crtc_validate_timing(
 
 	return B_OK;
 }
-	
 
 /*set a mode line - inputs are in pixels*/
 status_t nv_crtc_set_timing(display_mode target)
@@ -105,6 +104,22 @@ status_t nv_crtc_set_timing(display_mode target)
 	uint32 linecomp;	/*split screen and vdisp_e interrupt*/
 
 	LOG(4,("CRTC: setting timing\n"));
+
+	/* setup fixed modeline for flatpanel if connected and active */
+	if (si->ps.tmds1_active)
+	{
+		LOG(2,("CRTC: DFP active: tuning modeline\n"));
+
+		/* horizontal timing */
+		target.timing.h_total = target.timing.h_display + 56;
+		target.timing.h_sync_start = target.timing.h_total - 40;
+		target.timing.h_sync_end = target.timing.h_total - 16;
+
+		/* vertical timing */
+		target.timing.v_total = target.timing.v_display + 6;
+		target.timing.v_sync_start = target.timing.v_total - 3;
+		target.timing.v_sync_end = target.timing.v_total - 2;
+	}
 
 	/* Modify parameters as required by standard VGA */
 	htotal = ((target.timing.h_total >> 3) - 5);
@@ -255,20 +270,26 @@ status_t nv_crtc_set_timing(display_mode target)
 		CRTCW(FP_HTIMING, 0);
 		CRTCW(FP_VTIMING, 0);
 
-		/* nVidia cards only support upscaling: NV11 can't scale at all */
-		if ((si->ps.card_arch == NV11) ||
-			(iscale_x > (1 << 12)) || (iscale_y > (1 << 12)))
+		/* nVidia cards support upscaling except on NV11 */
+		if (si->ps.card_arch == NV11)
 		{
-			LOG(2,("CRTC: DFP needs to do scaling\n"));
-
 			/* disable last fetched line limiting */
 			DACW(FP_DEBUG2, 0x00000000);
-			/* inform panel to scale */
-			DACW(FP_TG_CTRL, (DACR(FP_TG_CTRL) | 0x00000100));
+			/* inform panel to scale if needed */
+			if ((iscale_x != (1 << 12)) || (iscale_y != (1 << 12)))
+			{
+				LOG(2,("CRTC: DFP needs to do scaling\n"));
+				DACW(FP_TG_CTRL, (DACR(FP_TG_CTRL) | 0x00000100));
+			}
+			else
+			{
+				LOG(2,("CRTC: no scaling for DFP needed\n"));
+				DACW(FP_TG_CTRL, (DACR(FP_TG_CTRL) & 0xfffffeff));
+			}
 		}
 		else
 		{
-			LOG(2,("CRTC: GPU scales if needed\n"));
+			LOG(2,("CRTC: GPU scales for DFP if needed\n"));
 
 			/* GPU scaling is automatically setup by hardware */
 //fixme: checkout non 4:3 aspect scaling.
