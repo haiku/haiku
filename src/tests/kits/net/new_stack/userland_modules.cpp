@@ -48,7 +48,6 @@ typedef struct module_addon {
 	char * path;
 	image_id addon_image;	// if -1, not loaded in memory currently
 	module_info ** infos;	// valid only when addon_image != -1
-	int32 enumerators;	
 } module_addon;
 
 typedef struct module_list_cookie {
@@ -255,7 +254,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 		};
 		
 		// We've iterate all module names of this module addon. Find another one...
-		atomic_add(&mlc->ma->enumerators, -1);
+		atomic_add(&mlc->ma->ref_count, -1);
 		unload_module_addon(mlc->ma);
 		mlc->ma = NULL;
 		mlc->mi = NULL;
@@ -320,7 +319,7 @@ _EXPORT status_t read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 		            	// WTF it's doing there?!?
 						continue;
 
-					atomic_add(&mlc->ma->enumerators, 1);
+					atomic_add(&mlc->ma->ref_count, 1);
 					// call ourself to enter the module names list iteration at
 					// function begining code...
 					mlc->mi = mlc->ma->infos;
@@ -354,7 +353,7 @@ _EXPORT status_t close_module_list(void *cookie)
 	ASSERT(mlc->prefix);
 
 	if (mlc->ma) {
-		atomic_add(&mlc->ma->enumerators, -1);
+		atomic_add(&mlc->ma->ref_count, -1);
 		unload_module_addon(mlc->ma);
 	};
 
@@ -455,7 +454,6 @@ static module_addon * load_module_addon(const char * path)
 	LOCK_MODULES;
 
 	ma->ref_count = 0;
-	ma->enumerators = 0;
 	ma->keep_loaded = false;
 	ma->path = strdup(path);
 	ma->addon_image = addon_id;
@@ -544,9 +542,6 @@ static status_t unload_module_addon(module_addon * ma)
 	
 	if (!ma)
 		// built-in modules are addon-less, so nothing to do...
-		return B_OK;
-
-	if (ma->enumerators)
 		return B_OK;
 
 	if (ma->keep_loaded) {
