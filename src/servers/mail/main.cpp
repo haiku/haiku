@@ -286,7 +286,7 @@ MailDaemonApp::MessageReceived(BMessage *msg)
 			BMessage *msg, reply('mnuc');
 			reply.AddInt32("num_new_messages",new_messages);
 			
-			while(msg = (BMessage *)fetch_done_respondents.RemoveItem(0L)) {
+			while((msg = (BMessage *)fetch_done_respondents.RemoveItem(0L))) {
 				msg->SendReply(&reply);
 				delete msg;
 			}
@@ -435,7 +435,7 @@ MailDaemonApp::RunChains(BList &list, BMessage *msg)
 		for (int32 i = 0; i < list.CountItems(); i++) {
 			chain = (BMailChain *)list.ItemAt(i);
 
-			if (chain->ID() == id) {
+			if (chain->ID() == (unsigned)id) {
 				chain->RunChain(status, true, false, true);
 				list.RemoveItem(i);	// the chain runner deletes the chain
 				break;
