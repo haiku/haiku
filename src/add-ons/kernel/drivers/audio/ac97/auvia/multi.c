@@ -657,6 +657,11 @@ auvia_get_description(auvia_dev *card, multi_description *data)
 			case VIATECH_8233_AC97_REV_8235:
 				strncpy(data->friendly_name, FRIENDLY_NAME_8235, 32);
 				break;
+			case VIATECH_8233_AC97_REV_8237:
+				strncpy(data->friendly_name, FRIENDLY_NAME_8237, 32);
+				break;
+			default:
+				strncpy(data->friendly_name, FRIENDLY_NAME);
 		}
 	}
 	strcpy(data->vendor_info, AUTHOR);
@@ -1115,4 +1120,3 @@ auvia_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	*num_bytes = 0;				/* tell caller nothing was written */
 	return B_IO_ERROR;
 }
-

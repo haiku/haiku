@@ -57,6 +57,7 @@
 #define VIATECH_8233_AC97_REV_8233		0x30
 #define VIATECH_8233_AC97_REV_8233A		0x40
 #define VIATECH_8233_AC97_REV_8235		0x50
+#define VIATECH_8233_AC97_REV_8237		0x60	//this is the 5.1 Card in the new Athlon64 boards
 
 #define VERSION "Version alpha 2, Copyright (c) 2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "auvia"
@@ -66,6 +67,7 @@
 #define FRIENDLY_NAME_8233 FRIENDLY_NAME" 8233"
 #define FRIENDLY_NAME_8233A FRIENDLY_NAME" 8233A"
 #define FRIENDLY_NAME_8235 FRIENDLY_NAME" 8235"
+#define FRIENDLY_NAME_8237 FRIENDLY_NAME" 8237"
 #define AUTHOR "Jérôme Duval"
 
 #define VIA_TABLE_SIZE	255
