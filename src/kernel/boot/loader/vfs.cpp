@@ -56,8 +56,9 @@ class Descriptor {
 
 list gBootDevices;
 list gPartitions;
-Descriptor *gDescriptors[MAX_VFS_DESCRIPTORS];
 Directory *gRoot;
+static Descriptor *sDescriptors[MAX_VFS_DESCRIPTORS];
+static Node *sBootDevice;
 
 
 Node::Node()
@@ -281,79 +282,104 @@ status_t
 vfs_init(stage2_args *args)
 {
 	list_init(&gBootDevices);
-	list_init(&gPartitions);
-
-	status_t status = platform_get_boot_devices(args, &gBootDevices);
-	if (status < B_OK)
-		return status;
-
-	return B_OK;
-}
-
-
-status_t
-mount_boot_file_systems()
-{
 	list_init_etc(&gPartitions, Partition::LinkOffset());
 
 	gRoot = new RootFileSystem();
 	if (gRoot == NULL)
 		return B_NO_MEMORY;
 
+	return B_OK;
+}
+
+
+/** Gets the boot device, scans all of its partitions, gets the
+ *	boot partition, and mounts its file system.
+ *	Returns the file system's root node or NULL for failure.
+ */
+
+Directory *
+get_boot_file_system(stage2_args *args)
+{
+	Node *device;
+	if (platform_get_boot_device(args, &device) < B_OK)
+		return NULL;
+
+	// add the boot device to the list of devices
+	list_add_item(&gBootDevices, device);
+
+	if (add_partitions_for(device, false) < B_OK)
+		return NULL;
+
+	Partition *partition;
+	if (platform_get_boot_partition(args, &gPartitions, &partition) < B_OK)
+		return NULL;
+
+	Directory *fileSystem;
+	if (partition->Mount(&fileSystem) < B_OK) {
+		// let's remove that partition, so that it is not scanned again
+		// in mount_file_systems()
+		
+		list_remove_item(&gPartitions, partition);
+		delete partition;
+		return NULL;
+	}
+
+	sBootDevice = device;
+	return fileSystem;
+}
+
+
+/** Mounts all file systems recognized on the given device by
+ *	calling the add_partitions_for() function on them.
+ */
+
+status_t
+mount_file_systems(stage2_args *args)
+{
+	// mount other partitions on boot device (if any)
+
+	Partition *partition = NULL;
+	while ((partition = (Partition *)list_get_next_item(&gPartitions, partition)) != NULL) {
+		// remove the partition if it doesn't contain a (known) file system
+		if (partition->Scan(true) != B_OK && !partition->IsFileSystem()) {
+			Partition *last = (Partition *)list_get_prev_item(&gPartitions, partition);
+
+			list_remove_item(&gPartitions, partition);
+			delete partition;
+
+			partition = last;
+		}
+	}
+
+	// add all block devices the platform has for us
+
+	status_t status = platform_add_block_devices(args, &gBootDevices);
+	if (status < B_OK)
+		return status;
+
 	Node *device = NULL, *last = NULL;
 	while ((device = (Node *)list_get_next_item(&gBootDevices, device)) != NULL) {
-		int fd = open_node(device, O_RDONLY);
-		if (fd < B_OK)
+		// don't scan former boot device again
+		if (device == sBootDevice)
 			continue;
 
-#if TRACE_VFS
-		char name[B_FILE_NAME_LENGTH];
-		if (device->GetName(name, sizeof(name)) == B_OK)
-			printf("add partitions for \"%s\"\n", name);
-#endif
+		if (add_partitions_for(device, true) == B_OK) {
+			// ToDo: we can't delete the object here, because it must
+			//	be removed from the list before we know that it was
+			//	deleted.
 
-		status_t status = add_partitions_for(fd);
-		if (status < B_OK)
-			printf("add_partitions_for(%d) failed: %ld\n", fd, status);
-
-		close(fd);
-
-		// ToDo: we can't delete the object here, because it must
-		//	be removed from the list before we know that it was
-		//	deleted.
-
-/*		// if the Release() deletes the object, we need to skip it
-		if (device->Release() > 0) {
-			list_remove_item(&gBootDevices, device);
-			device = last;
-		}
+/*			// if the Release() deletes the object, we need to skip it
+			if (device->Release() > 0) {
+				list_remove_item(&gBootDevices, device);
+				device = last;
+			}
 */
+		}
 		last = device;
 	}
 
 	if (list_is_empty(&gPartitions))
 		return B_ENTRY_NOT_FOUND;
-
-	TRACE(("Found supported file systems:\n"));
-
-	void *cookie;
-	if (gRoot->Open(&cookie, O_RDONLY) == B_OK) {
-		Directory *dir;
-		while (gRoot->GetNextNode(cookie, (Node **)&dir) == B_OK) {
-			char name[B_FILE_NAME_LENGTH];
-			if (dir->GetName(name, sizeof(name)) == B_OK)
-				printf("/%s\n", name);
-
-			void *subCookie;
-			if (dir->Open(&subCookie, O_RDONLY) == B_OK) {
-				while (dir->GetNextEntry(subCookie, name, sizeof(name)) == B_OK)
-					printf("\t%s\n", name);
-
-				dir->Close(subCookie);
-			}
-		}
-		gRoot->Close(cookie);
-	}
 
 	return B_OK;
 }
@@ -369,6 +395,9 @@ get_node_for_path(Directory *directory, const char *pathName, Node **_node)
 		return B_BAD_VALUE;
 
 	strlcpy(path, pathName, sizeof(pathBuffer));
+
+	directory->Acquire();
+		// balance Acquire()/Release() calls
 
 	while (true) {
 		Node *nextNode;
@@ -417,7 +446,7 @@ get_descriptor(int fd)
 	if (fd < 0 || fd >= MAX_VFS_DESCRIPTORS)
 		return NULL;
 
-	return gDescriptors[fd];
+	return sDescriptors[fd];
 }
 
 
@@ -427,8 +456,8 @@ free_descriptor(int fd)
 	if (fd >= MAX_VFS_DESCRIPTORS)
 		return;
 
-	delete gDescriptors[fd];
-	gDescriptors[fd] = NULL;
+	delete sDescriptors[fd];
+	sDescriptors[fd] = NULL;
 }
 
 
@@ -446,7 +475,7 @@ open_node(Node *node, int mode)
 	
 	int fd = 0;
 	for (; fd < MAX_VFS_DESCRIPTORS; fd++) {
-		if (gDescriptors[fd] == NULL)
+		if (sDescriptors[fd] == NULL)
 			break;
 	}
 	if (fd == MAX_VFS_DESCRIPTORS)
@@ -467,24 +496,10 @@ open_node(Node *node, int mode)
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 
-	gDescriptors[fd] = descriptor;
+	sDescriptors[fd] = descriptor;
 
 	return fd;
 }
-
-
-/*
-void *
-mount(void *from, const char *name)
-{
-	ops *op = (ops *)handle;
-
-	if (op->mount != NULL)
-		return op->mount(from, name);
-
-	return NULL;
-}
-*/
 
 
 int
