@@ -271,8 +271,8 @@ BTextView::BTextView(BMessage *archive)
 	
 	ssize_t runSize = 0;
 	const void *flattenedRun = NULL;
+	
 	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRun, &runSize) == B_OK) {
-		
 		text_run_array *runArray = UnflattenRunArray(flattenedRun, (int32 *)&runSize);
 		if (runArray) {
 			SetRunArray(0, TextLength(), runArray);
@@ -540,12 +540,14 @@ BTextView::MouseDown(BPoint where)
 				// new click, select char by char
 				break;			
 		}
+
 		if (shiftDown) {
 			if (mouseOffset > anchor)
 				start = anchor;
 			else
 				end = anchor;
 		}
+
 		Select(start, end);
 		
 		// Should we scroll the view?
@@ -840,11 +842,9 @@ BTextView::MessageReceived(BMessage *message)
 					}	
 					
 					case B_INPUT_METHOD_STOPPED:
-					{
 						delete fInline;
 						fInline = NULL;
 						break;
-					}
 					
 					case B_INPUT_METHOD_CHANGED:
 						HandleInputMethodChanged(message);
@@ -968,13 +968,13 @@ BTextView::GetSupportedSuites(BMessage *data)
 
 	err = data->AddString("suites", "suite/vnd.Be-text-view");
 
-	if (err != B_OK)
+	if (err < B_OK)
 		return err;
 	
 	BPropertyInfo prop_info(sPropertyList);
 	err = data->AddFlat("messages", &prop_info);
 
-	if (err != B_OK)
+	if (err < B_OK)
 		return err;
 	
 	return BView::GetSupportedSuites(data);
@@ -1015,7 +1015,7 @@ BTextView::SetText(const char *inText, const text_run_array *inRuns)
 	if (inText != NULL && len > 0)
 		InsertText(inText, len, 0, inRuns);
 	
-	fSelStart = fSelEnd = 0;	
+	fClickOffset = fSelStart = fSelEnd = 0;	
 
 	// recalc line breaks and draw the text
 	Refresh(0, len, true, true);
@@ -1053,7 +1053,7 @@ BTextView::SetText(const char *inText, int32 inLength,
 	if (inText != NULL && inLength > 0)
 		InsertText(inText, inLength, 0, inRuns);
 	
-	fSelStart = fSelEnd = 0;	
+	fClickOffset = fSelStart = fSelEnd = 0;	
 
 	// recalc line breaks and draw the text
 	Refresh(0, inLength, true, true);
@@ -1289,10 +1289,8 @@ void
 BTextView::GetText(int32 offset, int32 length, char *buffer) const
 {
 	CALLED();
-	if (buffer == NULL)
-		return;
-
-	fText->GetString(offset, length, buffer);
+	if (buffer != NULL)
+		fText->GetString(offset, length, buffer);
 }
 
 
@@ -1412,7 +1410,7 @@ BTextView::Paste(BClipboard *clipboard)
 			const char *text = NULL;
 			ssize_t len = 0;
 					
-			if (clip->FindData("text/plain", B_MIME_TYPE,
+			if (clip->FindData("text/plain", B_MIME_TYPE, 
 					(const void **)&text, &len) == B_OK) {
 				text_run_array *runArray = NULL;
 				ssize_t runLen = 0;
@@ -2047,6 +2045,9 @@ BTextView::CanEndLine(int32 offset)
 }
 
 
+/*! \brief Returns the width of the line at the given index.
+	\param lineNum A line index.
+*/
 float
 BTextView::LineWidth(int32 lineNum) const
 {
@@ -2058,6 +2059,9 @@ BTextView::LineWidth(int32 lineNum) const
 }
 
 
+/*! \brief Returns the height of the line at the given index.
+	\param lineNum A line index.
+*/
 float
 BTextView::LineHeight(int32 lineNum) const
 {
@@ -2066,6 +2070,10 @@ BTextView::LineHeight(int32 lineNum) const
 }
 
 
+/*! \brief Returns the height of the text comprised between the two given lines.
+	\param startLine The index of the starting line.
+	\param endLine The index of the ending line.
+*/
 float
 BTextView::TextHeight(int32 startLine, int32 endLine) const
 {
@@ -2204,7 +2212,6 @@ BTextView::SetTextRect(BRect rect)
 	if (Window() != NULL)
 		Refresh(0, fText->Length(), true, false);
 }
-
 
 
 BRect
@@ -2701,7 +2708,8 @@ BTextView::UnflattenRunArray(const void	*data, int32 *outSize)
 
 	return run_array;
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 						   const text_run_array *inRuns)
@@ -2730,7 +2738,8 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 							  fText->Length(), B_FONT_ALL, NULL, NULL);
 	}
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 {
@@ -2752,7 +2761,11 @@ BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 	// remove any style runs that have been obliterated
 	fStyles->RemoveStyleRange(fromOffset, toOffset);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Undoes the last changes.
+	\param clipboard A clipboard to use for the undo operation.
+*/
 void
 BTextView::Undo(BClipboard *clipboard)
 {
@@ -2760,14 +2773,16 @@ BTextView::Undo(BClipboard *clipboard)
 	if (fUndo)
 		fUndo->Undo(clipboard);
 }
-//------------------------------------------------------------------------------
+
+
 undo_state
 BTextView::UndoState(bool *isRedo) const
 {
 	CALLED();
 	return fUndo == NULL ? B_UNDO_UNAVAILABLE : fUndo->State(isRedo);
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
 								  BPoint *point, BHandler **handler)
@@ -2798,7 +2813,8 @@ BTextView::GetDragParameters(BMessage *drag, BBitmap **bitmap,
 	if (handler != NULL)
 		*handler = NULL;
 }
-//------------------------------------------------------------------------------
+
+
 void BTextView::_ReservedTextView3() {}
 void BTextView::_ReservedTextView4() {}
 void BTextView::_ReservedTextView5() {}
@@ -3029,6 +3045,9 @@ BTextView::HandleDelete()
 }
 
 
+/*! \brief Called when a "Page key" is pressed.
+	\param inPageKey The page key which has been pressed.
+*/
 void
 BTextView::HandlePageKey(uint32 inPageKey)
 {
@@ -3124,6 +3143,10 @@ BTextView::HandlePageKey(uint32 inPageKey)
 }
 
 
+/*! \brief Called when an alphanumeric key is pressed.
+	\param bytes The string or charachter associated with the key.
+	\param numBytes The amount of bytes containes in "bytes".
+*/
 void
 BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 {
@@ -3145,23 +3168,21 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 		refresh = true;
 	}
 	
-/*	if (fAutoindent && numBytes == 1 && *bytes == B_ENTER)
-	{
+	if (fAutoindent && numBytes == 1 && *bytes == B_ENTER) {
 		int32 start, offset;
 		start = offset = OffsetAt(LineAt(fSelStart));
-		const char *text = Text();
 		
-		while (*(text + offset) != '\0' &&
-			*(text + offset) == B_TAB || *(text + offset) == B_SPACE)
+		while (ByteAt(offset) != '\0' &&
+				(ByteAt(offset) == B_TAB || ByteAt(offset) == B_SPACE))
 			offset++;
 
 		if (start != offset)
-			InsertText(text + start, offset - start, fSelStart, NULL);
+			InsertText(Text() + start, offset - start, fSelStart, NULL);
 
 		InsertText(bytes, numBytes, fSelStart, NULL);
 		numBytes += offset - start;
-	}	
-	else*/
+
+	} else
 		InsertText(bytes, numBytes, fSelStart, NULL);
 	
 	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
@@ -3619,13 +3640,14 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 		eraseRect = clipRect;
 	}
-
+	
+	
 	for (long i = startLine; i <= endLine; i++) {
 		long length = (line + 1)->offset - line->offset;
 		// DrawString() chokes if you draw a newline
 		if ((*fText)[(line + 1)->offset - 1] == '\n')
 			length--;	
-		
+
 		MovePenTo(fTextRect.left, line->origin + line->ascent + fTextRect.top);
 
 		if (erase && i >= startEraseLine) {
