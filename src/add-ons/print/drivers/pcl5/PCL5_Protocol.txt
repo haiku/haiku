@@ -82,3 +82,6 @@ End Raster Graphics
 	Esc*rC
 	Esc*rB (old)
 
+Color printing
+
+5colrtef.pdf on page 196

@@ -192,6 +192,8 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 void PCL5Driver::jobStart()
 {
+	// enter PCL5
+	writeSpoolString("\033%%-12345X@PJL ENTER LANGUAGE=PCL\n");
 	// reset
 	writeSpoolString("\033E");
 	// dpi

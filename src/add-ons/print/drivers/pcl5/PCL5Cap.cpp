@@ -68,6 +68,7 @@ const PaperSourceCap autobin("Auto",  true,  JobData::AUTO);
 
 const ResolutionCap dpi300("300dpi",   true, 300,  300);
 const ResolutionCap dpi600("600dpi",  false, 600,  600);
+const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
 
 const PaperCap *papers[] = {
 	&a4,
@@ -85,7 +86,16 @@ const PaperSourceCap *papersources[] = {
 
 const ResolutionCap *resolutions[] = {
 	&dpi300,
-	&dpi600
+	&dpi600,
+	&dpi1200,
+};
+
+const ColorCap color("Color", false, JobData::kCOLOR);
+const ColorCap monochrome("Monochrome", true, JobData::kMONOCHROME);
+
+const ColorCap *colors[] = {
+//	&color,
+	&monochrome
 };
 
 PCL5Cap::PCL5Cap(const PrinterData *printer_data)
@@ -102,6 +112,8 @@ int PCL5Cap::countCap(CAPID capid) const
 		return sizeof(papersources) / sizeof(papersources[0]);
 	case RESOLUTION:
 		return sizeof(resolutions) / sizeof(resolutions[0]);
+	case COLOR:
+		return sizeof(colors) / sizeof(colors[0]);
 	default:
 		return 0;
 	}
@@ -116,6 +128,8 @@ const BaseCap **PCL5Cap::enumCap(CAPID capid) const
 		return (const BaseCap **)papersources;
 	case RESOLUTION:
 		return (const BaseCap **)resolutions;
+	case COLOR:
+		return (const BaseCap **)colors;
 	default:
 		return NULL;
 	}
@@ -127,6 +141,7 @@ bool PCL5Cap::isSupport(CAPID capid) const
 	case PAPER:
 	case PAPERSOURCE:
 	case RESOLUTION:
+	case COLOR:
 		return true;
 	default:
 		return false;

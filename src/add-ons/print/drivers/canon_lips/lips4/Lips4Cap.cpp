@@ -151,6 +151,14 @@ const BindingLocationCap *bindinglocations[] = {
 	&shortedge2
 };
 
+const ColorCap color("Color", false, JobData::kCOLOR);
+const ColorCap monochrome("Monochrome", true, JobData::kMONOCHROME);
+
+const ColorCap *colors[] = {
+	&color,
+	&monochrome
+};
+
 
 int Lips4Cap::countCap(CAPID capid) const
 {
@@ -165,6 +173,8 @@ int Lips4Cap::countCap(CAPID capid) const
 		return sizeof(printstyles) / sizeof(printstyles[0]);
 	case BINDINGLOCATION:
 		return sizeof(bindinglocations) / sizeof(bindinglocations[0]);
+	case COLOR:
+		return sizeof(colors) / sizeof(colors[0]);
 	default:
 		return 0;
 	}
@@ -183,6 +193,8 @@ const BaseCap **Lips4Cap::enumCap(CAPID capid) const
 		return (const BaseCap **)printstyles;
 	case BINDINGLOCATION:
 		return (const BaseCap **)bindinglocations;
+	case COLOR:
+		return (const BaseCap **)colors;
 	default:
 		return NULL;
 	}
@@ -196,6 +208,7 @@ bool Lips4Cap::isSupport(CAPID capid) const
 	case RESOLUTION:
 	case PRINTSTYLE:
 	case BINDINGLOCATION:
+	case COLOR:
 		return true;
 	default:
 		return false;

@@ -92,6 +92,14 @@ const ResolutionCap *resolutions[] = {
 	&dpi300
 };
 
+const ColorCap color("Color", false, JobData::kCOLOR);
+const ColorCap monochrome("Monochrome", true, JobData::kMONOCHROME);
+
+const ColorCap *colors[] = {
+	&color,
+	&monochrome
+};
+
 Lips3Cap::Lips3Cap(const PrinterData *printer_data)
 	: PrinterCap(printer_data)
 {
@@ -106,6 +114,8 @@ int Lips3Cap::countCap(CAPID capid) const
 		return sizeof(papersources) / sizeof(papersources[0]);
 	case RESOLUTION:
 		return sizeof(resolutions) / sizeof(resolutions[0]);
+	case COLOR:
+		return sizeof(colors) / sizeof(colors[0]);
 	default:
 		return 0;
 	}
@@ -120,6 +130,8 @@ const BaseCap **Lips3Cap::enumCap(CAPID capid) const
 		return (const BaseCap **)papersources;
 	case RESOLUTION:
 		return (const BaseCap **)resolutions;
+	case COLOR:
+		return (const BaseCap **)colors;
 	default:
 		return NULL;
 	}
@@ -131,6 +143,7 @@ bool Lips3Cap::isSupport(CAPID capid) const
 	case PAPER:
 	case PAPERSOURCE:
 	case RESOLUTION:
+	case COLOR:
 		return true;
 	default:
 		return false;
