@@ -462,7 +462,7 @@ devfs_publish_device(const char *path, pnp_node_info *node, pnp_devfs_driver_inf
 	status_t status = B_OK;
 	char temp[B_PATH_NAME_LENGTH + 1];
 
-	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, ops));
+	TRACE(("devfs_publish_device: entry path '%s', node %p, info %p, hooks %p\n", path, node, info, ops));
 
 	if (sDeviceFileSystem == NULL) {
 		panic("devfs_publish_device called before devfs mounted\n");
@@ -805,7 +805,7 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 	struct devfs_cookie *cookie;
 	status_t status = 0;
 
-	TRACE(("devfs_open: vnode %p, oflags 0x%x, fs_cookie %p \n", vnode, oflags, _cookie));
+	TRACE(("devfs_open: vnode %p, oflags 0x%x, fs_cookie %p \n", vnode, openMode, _cookie));
 
 	cookie = (struct devfs_cookie *)malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
@@ -1061,11 +1061,11 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *b
 
 
 static bool
-devfs_can_page(fs_volume _fs, fs_vnode _vnode)
+devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
 
-	TRACE(("devfs_canpage: vnode 0x%x\n", vnode));
+	TRACE(("devfs_canpage: vnode %p\n", vnode));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
 		|| vnode->stream.u.dev.node == NULL)
@@ -1076,11 +1076,12 @@ devfs_can_page(fs_volume _fs, fs_vnode _vnode)
 
 
 static status_t
-devfs_read_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_read_page: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", vnode, vecs, pos));
+	TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
 		|| vnode->stream.u.dev.info->read_pages == NULL)
@@ -1089,16 +1090,17 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, s
 	if (vnode->stream.u.dev.part_map)
 		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
 
-	return vnode->stream.u.dev.info->read_pages(vnode->stream.u.dev.node->cookie, pos, vecs, count, _numBytes);
+	return vnode->stream.u.dev.info->read_pages(cookie->u.dev.dcookie, pos, vecs, count, _numBytes);
 }
 
 
 static status_t
-devfs_write_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
-	TRACE(("devfs_write_page: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", vnode, vecs, pos));
+	TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (vnode->stream.type != STREAM_TYPE_DEVICE
 		|| vnode->stream.u.dev.info->write_pages == NULL)
@@ -1107,7 +1109,7 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, off_t pos, const iovec *vecs, 
 	if (vnode->stream.u.dev.part_map)
 		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_numBytes);
 
-	return vnode->stream.u.dev.info->write_pages(vnode->stream.u.dev.node->cookie, pos, vecs, count, _numBytes);
+	return vnode->stream.u.dev.info->write_pages(cookie->u.dev.dcookie, pos, vecs, count, _numBytes);
 }
 
 
