@@ -95,16 +95,16 @@ install_interrupt_handler(long vector, interrupt_handler handler, void *data)
 	io->func = handler;
 	io->data = data;
 
-	/* Make sure our list is init'd or bad things will happen */
-	if (io_vectors[vector].handler_list.next == NULL) {
-		io_vectors[vector].handler_list.next = &io_vectors[vector].handler_list;
-		io_vectors[vector].handler_list.prev = &io_vectors[vector].handler_list;
-	}
-
 	/* Disable the interrupts, get the spinlock for this irq only
 	 * and then insert the handler */
 	state = disable_interrupts();
 	acquire_spinlock(&io_vectors[vector].vector_lock);
+
+	/* Make sure our list is init'd or bad things will happen */ //XXX this should not be needed
+	if (io_vectors[vector].handler_list.next == NULL) {
+		io_vectors[vector].handler_list.next = &io_vectors[vector].handler_list;
+		io_vectors[vector].handler_list.prev = &io_vectors[vector].handler_list;
+	}
 
 	insque(io, &io_vectors[vector].handler_list);
 
@@ -165,7 +165,7 @@ remove_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
 			remque(io);
-			free(io);
+			free(io); // XXX free() should not be called inside a spinlock or with disabled interrupts
 			rv = 0;
 			break;
 		}
@@ -237,7 +237,7 @@ int_io_interrupt_handler(int vector)
 		 *       right.
 		 */
 		for (io = io_vectors[vector].handler_list.next; 
-		     io != &io_vectors[vector].handler_list;
+		     io != &io_vectors[vector].handler_list; //XXX DOES this work for 1 entry?
 		     io = io->next) {
 			if ((ret = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
 				break;

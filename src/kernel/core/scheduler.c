@@ -48,7 +48,7 @@ dump_run_q(int argc, char **argv)
 
 
 void
-thread_enqueue_run_q(struct thread *t)
+thread_enqueue_run_q(struct thread *t) //XXX no locks? is this save?
 {
 	struct thread *curr, *prev;
 	
@@ -93,7 +93,7 @@ thread_set_priority(thread_id id, int32 priority)
 	if (t->id == id) {
 		// it's ourself, so we know we aren't in the run queue, and we can manipulate
 		// our structure directly
-		retval = t->priority;
+		retval = t->priority; //XXX is this really save? can't we get preempted right here?
 		t->priority = priority;
 	} else {
 		int state = disable_interrupts();

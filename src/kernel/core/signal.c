@@ -169,7 +169,7 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 	}
 	
 	if (!(flags & B_DO_NOT_RESCHEDULE))
-		resched();
+		resched(); //XXX really here, while interrupts are disabled?
 	
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -264,7 +264,8 @@ sys_set_alarm(bigtime_t time, uint32 mode)
 	int state;
 	bigtime_t rv = 0;
 	
-	state = disable_interrupts();
+	state = disable_interrupts(); //XXX really here? and what about a spinlock?
+
 	
 	if (t->alarm.period)
 		rv = (bigtime_t)t->alarm.entry.key - system_time();
