@@ -16,7 +16,9 @@
 
 static struct real_time_data sRealTimeDefaults = {
 	0,
-	100000
+	100000,
+	0,
+	0
 };
 static struct real_time_data *sRealTimeData;
 
@@ -41,14 +43,16 @@ __init_time(void)
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->boot_time + system_time()) / 1000000;
+	return (sRealTimeData->boot_time + system_time()
+		+ sRealTimeData->timezone_offset) / 1000000;
 }
 
 
 bigtime_t
 real_time_clock_usecs(void)
 {
-	return sRealTimeData->boot_time + system_time();
+	return sRealTimeData->boot_time + system_time()
+		+ sRealTimeData->timezone_offset;
 }
 
 
@@ -63,7 +67,17 @@ status_t
 set_timezone(char *timezone)
 {
 	// ToDo: set_timezone()
-	return B_ERROR;
+	status_t err;
+	struct tm *tm;
+	time_t t;
+
+	time(&t);
+	tm = localtime(&t);
+
+	if ((err = _kern_set_tzspecs(tm->tm_gmtoff, tm->tm_isdst))<B_OK)
+		return err;
+
+	return B_OK;
 }
 
 
