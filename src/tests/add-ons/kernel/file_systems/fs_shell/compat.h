@@ -56,6 +56,8 @@ typedef struct iovec iovec;
 #include <Drivers.h>         /* for various ioctl structs, etc */
 #endif
 
+#include <fs_attr.h>
+
 #include "errors.h"
 
 
@@ -183,6 +185,42 @@ struct my_stat {
 #define MY_S_IROTH 00004     /* read permission: other */
 #define MY_S_IWOTH 00002     /* write permission: other */
 #define MY_S_IXOTH 00001     /* execute permission: other */
+
+#define MY_O_RDONLY        0   /* read only */
+#define MY_O_WRONLY        1   /* write only */
+#define MY_O_RDWR          2   /* read and write */
+#define MY_O_RWMASK        3   /* Mask to get open mode */
+
+#define MY_O_CLOEXEC       0x0040  /* close fd on exec */
+#define MY_O_NONBLOCK      0x0080  /* non blocking io */
+#define MY_O_EXCL          0x0100  /* exclusive creat */
+#define MY_O_CREAT         0x0200  /* create and open file */
+#define MY_O_TRUNC         0x0400  /* open with truncation */
+#define MY_O_APPEND        0x0800  /* to end of file */
+#define MY_O_NOCTTY        0x1000  /* currently unsupported */
+#define MY_O_NOTRAVERSE    0x2000  /* do not traverse leaf link */
+#define MY_O_ACCMODE       0x0003  /* currently unsupported */
+#define MY_O_TEXT          0x4000  /* CR-LF translation    */
+#define MY_O_BINARY        0x8000  /* no translation   */
+
+#define MY_SEEK_SET 0
+#define MY_SEEK_CUR 1
+#define MY_SEEK_END 2
+ 
+
+#ifdef __BEOS__
+
+typedef attr_info my_attr_info;
+
+#else	// ! __BEOS__
+
+typedef struct my_attr_info
+{
+	uint32		type;
+	fs_off_t	size;
+} my_attr_info;
+
+#endif	// ! __BEOS__
 
 
 #ifndef TRUE
