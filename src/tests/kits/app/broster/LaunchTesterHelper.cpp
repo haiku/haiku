@@ -29,6 +29,40 @@ public:
 	bigtime_t	when;
 };
 
+// Sleeper
+class LaunchContext::Sleeper {
+public:
+	Sleeper() : fMessageCode(0), fSemaphore(-1) {}
+
+	~Sleeper()
+	{
+		delete_sem(fSemaphore);
+	}
+
+	status_t Init(uint32 messageCode)
+	{
+		fMessageCode = messageCode;
+		fSemaphore = create_sem(0, "sleeper sem");
+		return (fSemaphore >= 0 ? B_OK : fSemaphore);
+	}
+
+	uint32 MessageCode() const { return fMessageCode; }
+
+	status_t Sleep(bigtime_t timeout = B_INFINITE_TIMEOUT)
+	{
+		return acquire_sem_etc(fSemaphore, 1, B_RELATIVE_TIMEOUT, timeout);
+	}
+
+	status_t WakeUp()
+	{
+		return release_sem(fSemaphore);
+	}
+
+private:
+	uint32		fMessageCode;
+	sem_id		fSemaphore;
+};
+
 // AppInfo
 class LaunchContext::AppInfo {
 public:
@@ -76,6 +110,7 @@ public:
 		message->message = _message;
 		message->when = system_time();
 		fMessages.AddItem(message);
+		NotifySleepers(_message.what);
 	}
 
 	LaunchContext::Message *RemoveMessage(int32 index)
@@ -88,17 +123,49 @@ public:
 		return (LaunchContext::Message*)fMessages.ItemAt(index);
 	}
 
+	LaunchContext::Message *FindMessage(uint32 messageCode,
+										int32 startIndex = 0) const
+	{
+		LaunchContext::Message *message = NULL;
+		for (int32 i = startIndex; (message = MessageAt(i)) != NULL; i++) {
+			if (message->message.what == messageCode)
+				break;
+		}
+		return message;
+	}
+
+	void AddSleeper(Sleeper *sleeper)
+	{
+		fSleepers.AddItem(sleeper);
+	}
+
+	void RemoveSleeper(Sleeper *sleeper)
+	{
+		fSleepers.RemoveItem(sleeper);
+	}
+
+	void NotifySleepers(uint32 messageCode)
+	{
+		for (int32 i = 0;
+			 Sleeper *sleeper = (Sleeper*)fSleepers.ItemAt(i);
+			 i++) {
+			if (sleeper->MessageCode() == messageCode)
+				sleeper->WakeUp();
+		}
+	}
+
 private:
 	team_id		fTeam;
 	BMessenger	fMessenger;
 	BList		fMessages;
 	bool		fTerminating;
+	BList		fSleepers;
 };
 
 // constructor
-LaunchContext::LaunchContext(LaunchCaller &caller)
-	: fCaller(caller),
-	  fAppInfos(),
+LaunchContext::LaunchContext()
+	: fAppInfos(),
+	  fSleepers(),
 	  fLock(),
 	  fAppThread(B_ERROR),
 	  fTerminator(B_ERROR),
@@ -133,7 +200,8 @@ LaunchContext::~LaunchContext()
 
 // ()
 status_t
-LaunchContext::operator()(const char *type, team_id *team)
+LaunchContext::operator()(LaunchCaller &caller, const char *type,
+						  team_id *team)
 {
 	BMessage message1(MSG_1);
 	BMessage message2(MSG_2);
@@ -142,28 +210,20 @@ LaunchContext::operator()(const char *type, team_id *team)
 	messages.AddItem(&message1);
 	messages.AddItem(&message2);
 	messages.AddItem(&message3);
-	return (*this)(type, &messages, kStandardArgc, kStandardArgv, team);
+	return (*this)(caller, type, &messages, kStandardArgc, kStandardArgv,
+				   team);
 }
 
 // ()
 status_t
-LaunchContext::operator()(const char *type, BList *messages, int32 argc,
-						  const char **argv, team_id *team)
+LaunchContext::operator()(LaunchCaller &caller, const char *type,
+						  BList *messages, int32 argc, const char **argv,
+						  team_id *team)
 {
 	BAutolock _lock(fLock);
-	status_t result = fCaller(type, messages, argc, argv, team);
-	if (result == B_OK) {
-		if (team)
-			CreateAppInfo(*team);
-		else {
-			// Note: Here's a race condition. If Terminate() is called, before
-			// we've received the first message from the test app, then
-			// there's a good chance that we quit the application before
-			// having received any message (or at least not all messages)
-			// from the test app. We wait some time to minimize the chance...
-			snooze(100000);
-		}
-	}
+	status_t result = caller(type, messages, argc, argv, team);
+	if (result == B_OK && team)
+		CreateAppInfo(*team);
 	return result;
 }
 
@@ -173,6 +233,14 @@ LaunchContext::HandleMessage(BMessage *message)
 {
 //printf("LaunchContext::HandleMessage(%6ld: %.4s)\n",
 //message->ReturnAddress().Team(), (char*)&message->what);
+//if (message->what == MSG_MESSAGE_RECEIVED) {
+//	BMessage sentMessage;
+//	message->FindMessage("message", &sentMessage);
+//	team_id sender = -1;
+//	message->FindInt32("sender", &sender);
+//	printf("  <- %6ld: %.4s\n", sender, (char*)&sentMessage.what);
+//}
+
 	BAutolock _lock(fLock);
 	switch (message->what) {
 		case MSG_STARTED:
@@ -184,10 +252,20 @@ LaunchContext::HandleMessage(BMessage *message)
 		case MSG_READY_TO_RUN:
 		{
 			BMessenger messenger = message->ReturnAddress();
-			AppInfo *info = CreateAppInfo(messenger);
-			info->AddMessage(*message);
-			if (fTerminating)
-				TerminateApp(info);
+			// add the message to the respective team's message list
+			// Note: catch messages that have not been sent by us or the
+			// remote team. The R5 registrar seems to send a B_REPLY message
+			// sometimes.
+			team_id sender = -1;
+			if (message->FindInt32("sender", &sender) != B_OK
+				|| sender == be_app->Team()
+				|| sender == messenger.Team()) {
+				AppInfo *info = CreateAppInfo(messenger);
+				info->AddMessage(*message);
+				if (fTerminating)
+					TerminateApp(info);
+			}
+			NotifySleepers(message->what);
 			break;
 		}
 		default:
@@ -252,7 +330,8 @@ LaunchContext::NextMessageFrom(team_id team, int32 &cookie, bigtime_t *time)
 
 // CheckNextMessage
 bool
-LaunchContext::CheckNextMessage(team_id team, int32 &cookie, uint32 what)
+LaunchContext::CheckNextMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, uint32 what)
 {
 	BMessage *message = NextMessageFrom(team, cookie);
 	return (message && message->what == what);
@@ -260,12 +339,13 @@ LaunchContext::CheckNextMessage(team_id team, int32 &cookie, uint32 what)
 
 // CheckArgvMessage
 bool
-LaunchContext::CheckArgvMessage(team_id team, int32 &cookie,
-								const entry_ref *appRef, bool useRef)
+LaunchContext::CheckArgvMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
+								bool useRef)
 {
 	bool result = true;
-	if (fCaller.SupportsArgv()) {
-		result = CheckArgvMessage(team, cookie, appRef, kStandardArgc,
+	if (caller.SupportsArgv()) {
+		result = CheckArgvMessage(caller, team, cookie, appRef, kStandardArgc,
 								  kStandardArgv, useRef);
 	}
 	return result;
@@ -273,18 +353,18 @@ LaunchContext::CheckArgvMessage(team_id team, int32 &cookie,
 
 // CheckArgvMessage
 bool
-LaunchContext::CheckArgvMessage(team_id team, int32 &cookie,
-								const entry_ref *appRef, int32 argc,
-								const char **argv, bool useRef)
+LaunchContext::CheckArgvMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
+								int32 argc, const char **argv, bool useRef)
 {
-	const entry_ref *ref = (useRef ? fCaller.Ref() : NULL);
-	return CheckArgvMessage(team, cookie, appRef, ref , argc, argv);
+	const entry_ref *ref = (useRef ? caller.Ref() : NULL);
+	return CheckArgvMessage(caller, team, cookie, appRef, ref , argc, argv);
 }
 
 // CheckArgvMessage
 bool
-LaunchContext::CheckArgvMessage(team_id team, int32 &cookie,
-								const entry_ref *appRef,
+LaunchContext::CheckArgvMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *appRef,
 								const entry_ref *ref , int32 argc,
 								const char **argv)
 {
@@ -330,62 +410,36 @@ printf("app paths differ: `%s' vs `%s'\n", arg, path.Path());
 	return result;
 }
 
-// RemoveStandardArgvMessage
-bool
-LaunchContext::RemoveStandardArgvMessage(team_id team, const entry_ref *appRef)
-{
-	return RemoveArgvMessage(team, appRef, kStandardArgc, kStandardArgv);
-}
-
-// RemoveArgvMessage
-bool
-LaunchContext::RemoveArgvMessage(team_id team, const entry_ref *appRef,
-								 int32 argc, const char **argv)
-{
-	BAutolock _lock(fLock);
-	bool result = true;
-	if (fCaller.SupportsArgv()) {
-		result = false;
-		int32 cookie = 0;
-		while (BMessage *message = NextMessageFrom(team, cookie)) {
-			if (message->what == MSG_ARGV_RECEIVED) {
-				int32 index = --cookie;
-				result = CheckArgvMessage(team, cookie, appRef, argc, argv);
-				delete AppInfoFor(team)->RemoveMessage(index);
-				break;
-			}
-		}
-	}
-	return result;
-}
-
 // CheckMessageMessages
 bool
-LaunchContext::CheckMessageMessages(team_id team, int32 &cookie)
+LaunchContext::CheckMessageMessages(LaunchCaller &caller, team_id team,
+									int32 &cookie)
 {
 	BAutolock _lock(fLock);
 	bool result = true;
 	for (int32 i = 0; i < 3; i++)
-		result &= CheckMessageMessage(team, cookie, i);
+		result &= CheckMessageMessage(caller, team, cookie, i);
 	return result;
 }
 
 // CheckMessageMessage
 bool
-LaunchContext::CheckMessageMessage(team_id team, int32 &cookie, int32 index)
+LaunchContext::CheckMessageMessage(LaunchCaller &caller, team_id team,
+								   int32 &cookie, int32 index)
 {
 	bool result = true;
-	if (fCaller.SupportsMessages() > index && index < 3) {
+	if (caller.SupportsMessages() > index && index < 3) {
 		uint32 commands[] = { MSG_1, MSG_2, MSG_3 };
 		BMessage message(commands[index]);
-		result = CheckMessageMessage(team, cookie, &message);
+		result = CheckMessageMessage(caller, team, cookie, &message);
 	}
 	return result;
 }
 
 // CheckMessageMessage
 bool
-LaunchContext::CheckMessageMessage(team_id team, int32 &cookie,
+LaunchContext::CheckMessageMessage(LaunchCaller &caller, team_id team,
+								   int32 &cookie,
 								   const BMessage *expectedMessage)
 {
 	BMessage *message = NextMessageFrom(team, cookie);
@@ -400,18 +454,20 @@ LaunchContext::CheckMessageMessage(team_id team, int32 &cookie,
 
 // CheckRefsMessage
 bool
-LaunchContext::CheckRefsMessage(team_id team, int32 &cookie)
+LaunchContext::CheckRefsMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie)
 {
 	bool result = true;
-	if (fCaller.SupportsRefs())
-		result = CheckRefsMessage(team, cookie, fCaller.Ref());
+	if (caller.SupportsRefs())
+		result = CheckRefsMessage(caller, team, cookie, caller.Ref());
 	return result;
 }
 
 // CheckRefsMessage
 bool
-LaunchContext::CheckRefsMessage(team_id team, int32 &cookie,
-								const entry_ref *refs, int32 count)
+LaunchContext::CheckRefsMessage(LaunchCaller &caller, team_id team,
+								int32 &cookie, const entry_ref *refs,
+								int32 count)
 {
 	BMessage *message = NextMessageFrom(team, cookie);
 	bool result = (message && message->what == MSG_REFS_RECEIVED);
@@ -425,25 +481,60 @@ LaunchContext::CheckRefsMessage(team_id team, int32 &cookie,
 	return result;
 }
 
-// RemoveRefsMessage
+// WaitForMessage
 bool
-LaunchContext::RemoveRefsMessage(team_id team)
+LaunchContext::WaitForMessage(uint32 messageCode, bool fromNow,
+							  bigtime_t timeout)
 {
-	BAutolock _lock(fLock);
-	bool result = true;
-	if (fCaller.SupportsRefs()) {
-		result = false;
-		int32 cookie = 0;
-		while (BMessage *message = NextMessageFrom(team, cookie)) {
-			if (message->what == MSG_REFS_RECEIVED) {
-				int32 index = --cookie;
-				result = CheckRefsMessage(team, cookie);
-				delete AppInfoFor(team)->RemoveMessage(index);
-				break;
+	status_t error = B_ERROR;
+	fLock.Lock();
+	error = B_OK;
+	if (fromNow || !FindMessage(messageCode)) {
+		// add sleeper
+		Sleeper *sleeper = new Sleeper;
+		error = sleeper->Init(messageCode);
+		if (error == B_OK) {
+			AddSleeper(sleeper);
+			fLock.Unlock();
+			// sleep
+			error = sleeper->Sleep(timeout);
+			fLock.Lock();
+			// remove sleeper
+			RemoveSleeper(sleeper);
+			delete sleeper;
+		}
+	}
+	fLock.Unlock();
+	return (error == B_OK);
+}
+
+// WaitForMessage
+bool
+LaunchContext::WaitForMessage(team_id team, uint32 messageCode, bool fromNow,
+							  bigtime_t timeout)
+{
+	status_t error = B_ERROR;
+	fLock.Lock();
+	if (AppInfo *info = AppInfoFor(team)) {
+		error = B_OK;
+		if (fromNow || !info->FindMessage(messageCode)) {
+			// add sleeper
+			Sleeper *sleeper = new Sleeper;
+			error = sleeper->Init(messageCode);
+			if (error == B_OK) {
+				info->AddSleeper(sleeper);
+				fLock.Unlock();
+				// sleep
+				error = sleeper->Sleep(timeout);
+				fLock.Lock();
+				// remove sleeper
+				info->RemoveSleeper(sleeper);
+				delete sleeper;
 			}
 		}
 	}
-	return result;
+	fLock.Unlock();
+	return (error == B_OK);
 }
 
 // StandardMessages
@@ -539,6 +630,42 @@ int32
 LaunchContext::TerminatorEntry(void *data)
 {
 	return ((LaunchContext*)data)->Terminator();
+}
+
+// FindMessage
+LaunchContext::Message*
+LaunchContext::FindMessage(uint32 messageCode)
+{
+	BAutolock _lock(fLock);
+	Message *message = NULL;
+	AppInfo *info = NULL;
+	for (int32 i = 0; !message && (info = AppInfoAt(i)) != NULL; i++)
+		message = info->FindMessage(messageCode);
+	return message;
+}
+
+// AddSleeper
+void
+LaunchContext::AddSleeper(Sleeper *sleeper)
+{
+	fSleepers.AddItem(sleeper);
+}
+
+// RemoveSleeper
+void
+LaunchContext::RemoveSleeper(Sleeper *sleeper)
+{
+	fSleepers.RemoveItem(sleeper);
+}
+
+// NotifySleepers
+void
+LaunchContext::NotifySleepers(uint32 messageCode)
+{
+	for (int32 i = 0; Sleeper *sleeper = (Sleeper*)fSleepers.ItemAt(i); i++) {
+		if (sleeper->MessageCode() == messageCode)
+			sleeper->WakeUp();
+	}
 }
 
 

@@ -256,6 +256,67 @@ case 13:mimeType is installed, but has no preferred application,
 case 14:installed type mimeType, preferred app, app type not installed,
 		app has signature, app is trash =>
 		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+case 15:installed type mimeType, preferred app, app type not installed,
+		app has signature, team is NULL =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should install the app type and set the
+		app hint on it.
+
+case 16:launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 17:launch the app two times: B_MULTIPLE_LAUNCH =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					QuitRequested()
+		second app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					QuitRequested()
+case 18:launch the app two times: B_SINGLE_LAUNCH | B_ARGV_ONLY =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					(No second ArgvReceived()!)
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 19:launch the app two times: B_SINGLE_LAUNCH =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					{Message,Argv,Refs}Received()*, QuitRequested()
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 20:launch two apps with the same signature:
+		B_SINGLE_LAUNCH | B_ARGV_ONLY =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 21:launch two apps with the same signature: B_SINGLE_LAUNCH =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					QuitRequested()
+		second app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					QuitRequested()
+case 22:launch the app two times: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					(No second ArgvReceived()!)
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 23:launch the app two times: B_EXCLUSIVE_LAUNCH =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					{Message,Argv,Refs}Received()*, QuitRequested()
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 24:launch two apps with the same signature:
+		B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					(No second ArgvReceived()!)
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 25:launch two apps with the same signature: B_EXCLUSIVE_LAUNCH =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					{Message,Argv,Refs}Received()*, QuitRequested()
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 26:launch two apps with the same signature:
+		first: B_EXCLUSIVE_LAUNCH,
+		second: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY =>
+		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+					QuitRequested()
+		second app:	Launch() fails with B_ALREADY_RUNNING
+case 27:launch two apps with the same signature:
+		first: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		second: B_EXCLUSIVE_LAUNCH =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					(No second ArgvReceived()!)
+		second app:	Launch() fails with B_ALREADY_RUNNING
+
 
 status_t Launch(const char *mimeType, BMessage *initialMsg,
 				team_id *appTeam) const

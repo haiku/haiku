@@ -140,7 +140,8 @@ ref_for_team(team_id team)
 static
 void
 create_app(const char *filename, const char *signature,
-		   bool install = false, bool makeExecutable = true)
+		   bool install = false, bool makeExecutable = true,
+		   uint32 appFlags = B_SINGLE_LAUNCH)
 {
 	BString testApp;
 	CHK(find_test_app("RosterLaunchTestApp1", &testApp) == B_OK);
@@ -152,7 +153,7 @@ create_app(const char *filename, const char *signature,
 	BAppFileInfo appFileInfo;
 	CHK(appFileInfo.SetTo(&file) == B_OK);
 	CHK(appFileInfo.SetSignature(signature) == B_OK);
-	CHK(appFileInfo.SetAppFlags(B_SINGLE_LAUNCH) == B_OK);
+	CHK(appFileInfo.SetAppFlags(appFlags) == B_OK);
 	if (install)
 		CHK(BMimeType(signature).Install() == B_OK);
 	// We write the signature into a separate attribute, just in case we
@@ -270,10 +271,10 @@ static
 void
 CommonLaunchTest1(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	team_id team;
-	CHK(context(uninstalledType, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CHK(context(caller, uninstalledType, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
 }
 
 /*
@@ -284,11 +285,11 @@ static
 void
 CommonLaunchTest2(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	install_type(fileType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_LAUNCH_FAILED_NO_PREFERRED_APP);
+	CHK(context(caller, fileType1, &team) == B_LAUNCH_FAILED_NO_PREFERRED_APP);
 }
 
 /*
@@ -300,11 +301,11 @@ static
 void
 CommonLaunchTest3(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CHK(context(caller, fileType1, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
 }
 
 /*
@@ -318,25 +319,25 @@ static
 void
 CommonLaunchTest4(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -350,25 +351,25 @@ static
 void
 CommonLaunchTest5(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1, true);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -382,25 +383,25 @@ static
 void
 CommonLaunchTest6(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1, true, false);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -414,27 +415,27 @@ static
 void
 CommonLaunchTest7(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	create_app(appFile2, appType1, true);
 	set_file_time(appFile2, time(NULL) + 1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile2) == ref);
 	check_app_type(appType1, appFile2);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -449,7 +450,7 @@ static
 void
 CommonLaunchTest8(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	set_version(appFile1, 1);
@@ -457,20 +458,20 @@ CommonLaunchTest8(LaunchCaller &caller)
 	set_file_time(appFile2, time(NULL) + 1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -484,7 +485,7 @@ static
 void
 CommonLaunchTest9(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	set_version(appFile1, 2);
@@ -493,20 +494,20 @@ CommonLaunchTest9(LaunchCaller &caller)
 	set_file_time(appFile2, time(NULL) + 1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -522,7 +523,7 @@ static
 void
 CommonLaunchTest10(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType2);
 	set_type_app_hint(appType1, appFile1);
@@ -530,21 +531,21 @@ CommonLaunchTest10(LaunchCaller &caller)
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_OK);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
 	CHK(BMimeType(appType2).IsInstalled() == false);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -559,26 +560,26 @@ static
 void
 CommonLaunchTest11(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	set_type_app_hint(appType1, appFile2);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_OK);
+	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -591,24 +592,24 @@ static
 void
 CommonLaunchTest12(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	team_id team;
-	CHK(context(appType1, &team) == B_OK);
+	CHK(context(caller, appType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -623,7 +624,7 @@ static
 void
 CommonLaunchTest13(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	// make sure, the original preferred app for the "text" supertype is
 	// re-installed
@@ -649,20 +650,20 @@ CommonLaunchTest13(LaunchCaller &caller)
 	CHK(BMimeType("text").SetPreferredApp(appType1) == B_OK);
 	install_type(textTestType);
 	team_id team;
-	CHK(context(textTestType, &team) == B_OK);
+	CHK(context(caller, textTestType, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	if (caller.SupportsRefs() && !caller.SupportsArgv())
-		CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -674,12 +675,611 @@ static
 void
 CommonLaunchTest14(LaunchCaller &caller)
 {
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(get_trash_app_file(), appType1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, &team) == B_LAUNCH_FAILED_APP_IN_TRASH);
+	CHK(context(caller, fileType1, &team) == B_LAUNCH_FAILED_APP_IN_TRASH);
+}
+
+/*
+	@case 15		installed type mimeType, preferred app, app type not
+					installed, app has signature, team is NULL
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should install the
+					app type and set the app hint on it.
+*/
+static
+void
+CommonLaunchTest15(LaunchCaller &caller)
+{
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1);
+	install_type(fileType1, appType1);
+	CHK(context(caller, fileType1, NULL) == B_OK);
+	context.WaitForMessage(MSG_STARTED, true);
+	team_id team = context.TeamAt(0);
+	CHK(team >= 0);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	check_app_type(appType1, appFile1);
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 16		launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+*/
+static
+void
+CommonLaunchTest16(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_MULTIPLE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_OK);
+	entry_ref ref2 = ref_for_team(team2);
+	CHK(ref_for_path(appFile1) == ref2);
+	check_app_type(appType1, appFile1);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+	// checks 2
+	cookie = 0;
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller2, team2, cookie));
+	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller2, team2, cookie));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 17		launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								QuitRequested()
+					second app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								QuitRequested()
+*/
+static
+void
+CommonLaunchTest17(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_MULTIPLE_LAUNCH);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_OK);
+	entry_ref ref2 = ref_for_team(team2);
+	CHK(ref_for_path(appFile1) == ref2);
+	check_app_type(appType1, appFile1);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+	// checks 2
+	cookie = 0;
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller2, team2, cookie));
+	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller2, team2, cookie));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 18		launch the app two times: B_SINGLE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+								(No second ArgvReceived()!)
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest18(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_SINGLE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 19		launch the app two times: B_SINGLE_LAUNCH
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								{Message,Argv,Refs}Received()*, QuitRequested()
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest19(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_SINGLE_LAUNCH);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 20		launch two apps with the same signature:
+					B_SINGLE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+					second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+*/
+static
+void
+CommonLaunchTest20(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_SINGLE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_SINGLE_LAUNCH | B_ARGV_ONLY);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_OK);
+	entry_ref ref2 = ref_for_team(team2);
+	CHK(ref_for_path(appFile2) == ref2);
+	check_app_type(appType1, appFile2);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+	// checks 2
+	cookie = 0;
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller2, team2, cookie));
+	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller2, team2, cookie));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 21		launch two apps with the same signature: B_SINGLE_LAUNCH
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								QuitRequested()
+					second app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								QuitRequested()
+*/
+static
+void
+CommonLaunchTest21(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_SINGLE_LAUNCH);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_SINGLE_LAUNCH);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_OK);
+	entry_ref ref2 = ref_for_team(team2);
+	CHK(ref_for_path(appFile2) == ref2);
+	check_app_type(appType1, appFile2);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+	// checks 2
+	cookie = 0;
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller2, team2, cookie));
+	CHK(context.CheckArgvMessage(caller2, team2, cookie, &ref2));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller2, team2, cookie));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller2, team2, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 22		launch the app two times: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+								(No second ArgvReceived()!)
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest22(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 23		launch the app two times: B_EXCLUSIVE_LAUNCH
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								{Message,Argv,Refs}Received()*, QuitRequested()
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest23(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH);
+	install_type(fileType1, appType1);
+	// launch app 1
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 24		launch two apps with the same signature:
+					B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+								(No second ArgvReceived()!)
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest24(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 25		launch two apps with the same signature:
+					B_EXCLUSIVE_LAUNCH
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								{Message,Argv,Refs}Received()*, QuitRequested()
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest25(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	entry_ref ref2 = ref_for_path(appFile2);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref2));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 26		launch two apps with the same signature:
+					first: B_EXCLUSIVE_LAUNCH,
+					second: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY =>
+	@results		first app:	{Message,Argv,Refs}Received()*, ReadyToRun(),
+								{Message,Argv,Refs}Received()*, QuitRequested()
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest26(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	entry_ref ref2 = ref_for_path(appFile2);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
+}
+
+/*
+	@case 27		launch two apps with the same signature:
+					first: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+					second: B_EXCLUSIVE_LAUNCH
+	@results		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+								(No second ArgvReceived()!)
+					second app:	Launch() fails with B_ALREADY_RUNNING
+*/
+static
+void
+CommonLaunchTest27(LaunchCaller &caller)
+{
+	LaunchCaller &caller2 = caller.Clone();
+	LaunchContext context;
+	BRoster roster;
+	// launch app 1
+	create_app(appFile1, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY);
+	install_type(fileType1, appType1);
+	team_id team1;
+	CHK(context(caller, fileType1, &team1) == B_OK);
+	entry_ref ref1 = ref_for_team(team1);
+	CHK(ref_for_path(appFile1) == ref1);
+	check_app_type(appType1, appFile1);
+	context.WaitForMessage(team1, MSG_STARTED);
+	// launch app 2 (greater modification time)
+	CHK(BMimeType(appType1).Delete() == B_OK);
+	create_app(appFile2, appType1, false, true,
+			   B_EXCLUSIVE_LAUNCH);
+	set_file_time(appFile2, time(NULL) + 1);
+	team_id team2;
+	CHK(context(caller2, fileType1, &team2) == B_ALREADY_RUNNING);
+	// checks 1
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team1, cookie));
+	CHK(context.CheckArgvMessage(caller, team1, cookie, &ref1));
+//	if (caller.SupportsRefs() && !caller.SupportsArgv())
+//		CHK(context.CheckRefsMessage(caller, team1, cookie));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
 }
 
 typedef void commonTestFunction(LaunchCaller &caller);
@@ -688,7 +1288,11 @@ static commonTestFunction *commonTestFunctions[] = {
 	CommonLaunchTest4, CommonLaunchTest5, CommonLaunchTest6,
 	CommonLaunchTest7, CommonLaunchTest8, CommonLaunchTest9,
 	CommonLaunchTest10, CommonLaunchTest11, CommonLaunchTest12,
-	CommonLaunchTest13, CommonLaunchTest14
+	CommonLaunchTest13, CommonLaunchTest14, CommonLaunchTest15,
+	CommonLaunchTest16, CommonLaunchTest17, CommonLaunchTest18,
+	CommonLaunchTest19, CommonLaunchTest20, CommonLaunchTest21,
+	CommonLaunchTest22, CommonLaunchTest23, CommonLaunchTest24,
+	CommonLaunchTest25, CommonLaunchTest26, CommonLaunchTest27
 };
 static int32 commonTestFunctionCount
 	= sizeof(commonTestFunctions) / sizeof(commonTestFunction*);
@@ -730,6 +1334,11 @@ public:
 		BRoster roster;
 		return roster.Launch(type, message, team);
 	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new LaunchTypeCaller1;
+	}
 };
 
 /*
@@ -760,25 +1369,25 @@ void LaunchTester::LaunchTestA3()
 void LaunchTester::LaunchTestA4()
 {
 	LaunchTypeCaller1 caller;
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -817,6 +1426,11 @@ public:
 		return roster.Launch(type, messages, team);
 	}
 	virtual int32 SupportsMessages() const { return 1000; }
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new LaunchTypeCaller2;
+	}
 };
 
 /*
@@ -847,25 +1461,25 @@ void LaunchTester::LaunchTestB3()
 void LaunchTester::LaunchTestB4()
 {
 	LaunchTypeCaller2 caller;
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -880,26 +1494,26 @@ void LaunchTester::LaunchTestB4()
 void LaunchTester::LaunchTestB5()
 {
 	LaunchTypeCaller2 caller;
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	team_id team;
 	BList list;
-	CHK(context(fileType1, &list, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, &list, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -941,6 +1555,11 @@ public:
 		return roster.Launch(type, argc, const_cast<char**>(argv), team);
 	}
 	virtual int32 SupportsMessages() const { return 0; }
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new LaunchTypeCaller3;
+	}
 };
 
 /*
@@ -971,24 +1590,24 @@ void LaunchTester::LaunchTestC3()
 void LaunchTester::LaunchTestC4()
 {
 	LaunchTypeCaller3 caller;
-	LaunchContext context(caller);
+	LaunchContext context;
 	BRoster roster;
 	create_app(appFile1, appType1);
 	install_type(fileType1, appType1);
 	team_id team;
-	CHK(context(fileType1, NULL, 0, (const char**)NULL, &team) == B_OK);
+	CHK(context(caller, fileType1, NULL, 0, (const char**)NULL, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 // SimpleFileCaller1
@@ -1008,6 +1627,11 @@ public:
 	virtual bool SupportsRefs() const { return true; }
 	virtual const entry_ref *Ref() const { return &fRef; }
 
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SimpleFileCaller1;
+	}
+
 protected:
 	entry_ref fRef;
 };
@@ -1024,6 +1648,11 @@ public:
 		fRef = create_file(testFile1, type);
 		return roster.Launch(&fRef, message, team);
 	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new FileWithTypeCaller1;
+	}
 };
 
 // SniffFileTypeCaller1
@@ -1038,6 +1667,11 @@ public:
 		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
 		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
 		return roster.Launch(&fRef, message, team);
+	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SniffFileTypeCaller1;
 	}
 };
 
@@ -1086,9 +1720,9 @@ void LaunchTester::LaunchTestD3()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
 	SimpleFileCaller1 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1097,13 +1731,13 @@ void LaunchTester::LaunchTestD3()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1121,12 +1755,12 @@ void LaunchTester::LaunchTestD4()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller1 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1135,13 +1769,13 @@ void LaunchTester::LaunchTestD4()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1162,12 +1796,12 @@ void LaunchTester::LaunchTestD5()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
 	SimpleFileCaller1 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1176,13 +1810,13 @@ void LaunchTester::LaunchTestD5()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1228,12 +1862,12 @@ void LaunchTester::LaunchTestD7()
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
 	entry_ref linkRef(ref_for_path(testLink1));
 	SimpleFileCaller1 caller(linkRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1242,13 +1876,13 @@ void LaunchTester::LaunchTestD7()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1305,12 +1939,12 @@ void LaunchTester::LaunchTestD10()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller1 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
@@ -1318,13 +1952,13 @@ void LaunchTester::LaunchTestD10()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 // SimpleFileCaller2
@@ -1343,6 +1977,11 @@ public:
 	virtual bool SupportsRefs() const { return true; }
 	virtual const entry_ref *Ref() const { return &fRef; }
 
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SimpleFileCaller2;
+	}
+
 protected:
 	entry_ref fRef;
 };
@@ -1357,6 +1996,11 @@ public:
 		fRef = create_file(testFile1, type);
 		return roster.Launch(&fRef, messages, team);
 	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new FileWithTypeCaller2;
+	}
 };
 
 // SniffFileTypeCaller2
@@ -1369,6 +2013,11 @@ public:
 		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
 		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
 		return roster.Launch(&fRef, messages, team);
+	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SniffFileTypeCaller2;
 	}
 };
 
@@ -1418,9 +2067,9 @@ void LaunchTester::LaunchTestE3()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
 	SimpleFileCaller2 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1429,13 +2078,13 @@ void LaunchTester::LaunchTestE3()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1453,12 +2102,12 @@ void LaunchTester::LaunchTestE4()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller2 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1467,13 +2116,13 @@ void LaunchTester::LaunchTestE4()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1494,12 +2143,12 @@ void LaunchTester::LaunchTestE5()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
 	SimpleFileCaller2 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1508,13 +2157,13 @@ void LaunchTester::LaunchTestE5()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1559,12 +2208,12 @@ void LaunchTester::LaunchTestE7()
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
 	entry_ref linkRef(ref_for_path(testLink1));
 	SimpleFileCaller2 caller(linkRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1573,13 +2222,13 @@ void LaunchTester::LaunchTestE7()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1636,12 +2285,12 @@ void LaunchTester::LaunchTestE10()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller2 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, NULL, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
@@ -1649,13 +2298,13 @@ void LaunchTester::LaunchTestE10()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1674,13 +2323,13 @@ void LaunchTester::LaunchTestE11()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller2 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
 	BList list;
-	CHK(context(fileType1, &list, LaunchContext::kStandardArgc,
+	CHK(context(caller, fileType1, &list, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
@@ -1688,13 +2337,13 @@ void LaunchTester::LaunchTestE11()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 // SimpleFileCaller3
@@ -1713,6 +2362,11 @@ public:
 	virtual bool SupportsRefs() const { return true; }
 	virtual const entry_ref *Ref() const { return &fRef; }
 
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SimpleFileCaller3;
+	}
+
 protected:
 	entry_ref fRef;
 };
@@ -1727,6 +2381,11 @@ public:
 		fRef = create_file(testFile1, type);
 		return roster.Launch(&fRef, argc, argv, team);
 	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new FileWithTypeCaller3;
+	}
 };
 
 // SniffFileTypeCaller3
@@ -1739,6 +2398,11 @@ public:
 		fRef = create_file(testFile1, type, NULL, NULL, "UnIQe pAtTeRn");
 		install_type(fileType1, NULL, "1.0 [0] ('UnIQe pAtTeRn')");
 		return roster.Launch(&fRef, argc, argv, team);
+	}
+
+	virtual LaunchCaller *CloneInternal()
+	{
+		return new SniffFileTypeCaller3;
 	}
 };
 
@@ -1788,9 +2452,9 @@ void LaunchTester::LaunchTestF3()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, appType2));
 	SimpleFileCaller3 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1799,13 +2463,13 @@ void LaunchTester::LaunchTestF3()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1823,12 +2487,12 @@ void LaunchTester::LaunchTestF4()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller3 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1837,13 +2501,13 @@ void LaunchTester::LaunchTestF4()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1864,12 +2528,12 @@ void LaunchTester::LaunchTestF5()
 	install_type(fileType1, appType1);
 	entry_ref fileRef(create_file(testFile1, fileType1, NULL, appFile2));
 	SimpleFileCaller3 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1878,13 +2542,13 @@ void LaunchTester::LaunchTestF5()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -1929,12 +2593,12 @@ void LaunchTester::LaunchTestF7()
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
 	entry_ref linkRef(ref_for_path(testLink1));
 	SimpleFileCaller3 caller(linkRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, context.StandardMessages(),
+	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1943,13 +2607,13 @@ void LaunchTester::LaunchTestF7()
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-	CHK(context.CheckArgvMessage(team, cookie, &ref));
-//	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -2006,25 +2670,25 @@ void LaunchTester::LaunchTestF10()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller3 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, NULL, 0, NULL, &team) == B_OK);
+	CHK(context(caller, fileType1, NULL, 0, NULL, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 /*
@@ -2043,25 +2707,25 @@ void LaunchTester::LaunchTestF11()
 	create_app(appFile1, appType1);
 	entry_ref fileRef(create_file(testFile1, NULL, appType1));
 	SimpleFileCaller3 caller(fileRef);
-	LaunchContext context(caller);
+	LaunchContext context;
 	team_id team;
 	BMessage message(MSG_1);
 	BList messages;
 	messages.AddItem(&message);
-	CHK(context(fileType1, NULL, 1, NULL, &team) == B_OK);
+	CHK(context(caller, fileType1, NULL, 1, NULL, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	check_app_type(appType1, appFile1);
 
 	context.Terminate();
 	int32 cookie = 0;
-	CHK(context.CheckNextMessage(team, cookie, MSG_STARTED));
-//	CHK(context.CheckMessageMessages(team, cookie));
-//	CHK(context.CheckArgvMessage(team, cookie, &ref));
-	CHK(context.CheckRefsMessage(team, cookie));
-	CHK(context.CheckNextMessage(team, cookie, MSG_READY_TO_RUN));
-	CHK(context.CheckNextMessage(team, cookie, MSG_QUIT_REQUESTED));
-	CHK(context.CheckNextMessage(team, cookie, MSG_TERMINATED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
 }
 
 

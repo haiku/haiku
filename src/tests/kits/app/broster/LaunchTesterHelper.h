@@ -18,23 +18,40 @@ enum {
 // LaunchCaller
 class LaunchCaller {
 public:
+	LaunchCaller() : fNext(NULL) {}
+	virtual ~LaunchCaller() { if (fNext) delete fNext;}
+
 	virtual status_t operator()(const char *type, BList *messages, int32 argc,
 								const char **argv, team_id *team) = 0;
 	virtual int32 SupportsMessages() const { return 1; }
 	virtual bool SupportsArgv() const { return SupportsMessages() == 0; }
 	virtual bool SupportsRefs() const { return false; }
 	virtual const entry_ref *Ref() const { return NULL; }
+
+	virtual LaunchCaller &Clone()
+	{
+		LaunchCaller *newCaller = CloneInternal();
+		newCaller->fNext = fNext;
+		fNext = newCaller;
+		return *newCaller;
+	}
+
+	virtual LaunchCaller *CloneInternal() = 0;
+
+private:
+	LaunchCaller	*fNext;
 };
 
 // LaunchContext
 class LaunchContext {
 public:
-	LaunchContext(LaunchCaller &caller);
+	LaunchContext();
 	~LaunchContext();
 
-	status_t operator()(const char *type, team_id *team);
-	status_t operator()(const char *type, BList *messages, int32 argc,
-						const char **argv, team_id *team);
+	status_t operator()(LaunchCaller &caller, const char *type, team_id *team);
+	status_t operator()(LaunchCaller &caller, const char *type,
+						BList *messages, int32 argc, const char **argv,
+						team_id *team);
 
 	void HandleMessage(BMessage *message);
 
@@ -44,24 +61,30 @@ public:
 
 	BMessage *NextMessageFrom(team_id team, int32 &cookie,
 							  bigtime_t *time = NULL);
-	bool CheckNextMessage(team_id team, int32 &cookie, uint32 what);
-	bool CheckArgvMessage(team_id team, int32 &cookie,
+	bool CheckNextMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+						  uint32 what);
+	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
 						  const entry_ref *appRef, bool useRef = true);
-	bool CheckArgvMessage(team_id team, int32 &cookie, const entry_ref *appRef,
+	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+						  const entry_ref *appRef,
 						  int32 argc, const char **argv, bool useRef = true);
-	bool CheckArgvMessage(team_id team, int32 &cookie, const entry_ref *appRef,
-						  const entry_ref *ref, int32 argc, const char **argv);
-	bool RemoveStandardArgvMessage(team_id team, const entry_ref *appRef);
-	bool RemoveArgvMessage(team_id team, const entry_ref *appRef, int32 argc,
-						   const char **argv);
-	bool CheckMessageMessages(team_id team, int32 &cookie);
-	bool CheckMessageMessage(team_id team, int32 &cookie, int32 index);
-	bool CheckMessageMessage(team_id team, int32 &cookie,
+	bool CheckArgvMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+						  const entry_ref *appRef, const entry_ref *ref,
+						  int32 argc, const char **argv);
+	bool CheckMessageMessages(LaunchCaller &caller, team_id team,
+							  int32 &cookie);
+	bool CheckMessageMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+							 int32 index);
+	bool CheckMessageMessage(LaunchCaller &caller, team_id team, int32 &cookie,
 							 const BMessage *message);
-	bool CheckRefsMessage(team_id team, int32 &cookie);
-	bool CheckRefsMessage(team_id team, int32 &cookie, const entry_ref *refs,
-						  int32 count = 1);
-	bool RemoveRefsMessage(team_id team);
+	bool CheckRefsMessage(LaunchCaller &caller, team_id team, int32 &cookie);
+	bool CheckRefsMessage(LaunchCaller &caller, team_id team, int32 &cookie,
+						  const entry_ref *refs, int32 count = 1);
+
+	bool WaitForMessage(uint32 messageCode, bool fromNow = false,
+						bigtime_t timeout = B_INFINITE_TIMEOUT);
+	bool WaitForMessage(team_id team, uint32 messageCode, bool fromNow = false,
+						bigtime_t timeout = B_INFINITE_TIMEOUT);
 
 	BList *StandardMessages();
 
@@ -71,6 +94,7 @@ public:
 
 private:
 	class Message;
+	class Sleeper;
 	class AppInfo;
 
 private:
@@ -80,14 +104,19 @@ private:
 	AppInfo *CreateAppInfo(BMessenger messenger);
 	void TerminateApp(AppInfo *info);
 
+	Message *FindMessage(uint32 messageCode);
+	void AddSleeper(Sleeper *sleeper);
+	void RemoveSleeper(Sleeper *sleeper);
+	void NotifySleepers(uint32 messageCode);
+
 	int32 Terminator();
 
 	static int32 AppThreadEntry(void *data);
 	static int32 TerminatorEntry(void *data);
 
 private:
-	LaunchCaller	&fCaller;
 	BList			fAppInfos;
+	BList			fSleepers;
 	mutable BLocker	fLock;
 	thread_id		fAppThread;
 	thread_id		fTerminator;
