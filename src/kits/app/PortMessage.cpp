@@ -128,6 +128,22 @@ void PortMessage::SetBuffer(const void *buffer, const ssize_t &size, const bool 
 	}
 }
 
+status_t PortMessage::Read(bool *data)
+{
+	if(!data)
+		return B_BAD_VALUE;
+
+	if( !_buffer || 
+		_buffersize<sizeof(bool) ||
+		((_index+sizeof(bool))>(_buffer+_buffersize)) )
+		return B_NO_MEMORY;
+	
+	*data=*((bool*)_index);
+	_index+=sizeof(bool);
+	
+	return B_OK;
+}
+
 status_t PortMessage::Read(BPoint *data)
 {
 	if(!data)
