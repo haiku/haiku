@@ -2,18 +2,22 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed 2002,
-   Rudolf Cornelissen 9-12/2002
+   Rudolf Cornelissen 9/2002-4/2003
 */
 
 #define MODULE_BIT 0x00010000
 
 #include "mga_std.h"
 
-static status_t g100_g400max_dac_pix_pll_find(
+static status_t milx_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
+static status_t g100_g400max_dac_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 static status_t g450_g550_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 static status_t g100_g400max_dac_sys_pll_find(
+	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
+static status_t g450_g550_dac_sys_pll_find(
 	float req_sclk,float * calc_sclk,uint8 * m_result,uint8 * n_result,uint8 * p_result);
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
@@ -81,10 +85,59 @@ status_t gx00_dac_mode(int mode,float brightness)
 	if (gx00_dac_palette(r,g,b)!=B_OK) return B_ERROR;
 
 	/*set the mode - also sets VCLK dividor*/
-	DXIW(MULCTRL,mode);
-	DACW(PIXRDMSK,0xff); // apsed, palette addressing not masked
+	if (si->ps.card_type >= G100)
+	{
+		DXIW(MULCTRL, mode);
+		LOG(2,("DAC: mulctrl 0x%02x\n", DXIR(MULCTRL)));
+	}
+	else
+	{
+		/* MIL1/2 differs here (TVP3026DAC) */
+		uint8  miscctrl = 0, latchctrl = 0;
+		uint8  tcolctrl = 0, mulctrl   = 0;
 
-	LOG(2,("DAC: mulctrl=%x, pixrdmsk=%x\n",DXIR(MULCTRL), DACR(PIXRDMSK)));
+		/* set the mode */
+		switch (mode)
+		{ 
+		/* presetting mulctrl for DAC pixelbus_width of 32 */
+		case BPP8:
+			miscctrl=0x00; latchctrl=0x06; tcolctrl=0x80; mulctrl=0x4b;
+			break;
+		case BPP15:
+		    miscctrl=0x20; latchctrl=0x06; tcolctrl=0x04; mulctrl=0x53;
+		    break;
+		case BPP16:
+		    miscctrl=0x20; latchctrl=0x06; tcolctrl=0x05; mulctrl=0x53;
+		    break;
+		case BPP24:
+		    miscctrl=0x20; latchctrl=0x06; tcolctrl=0x1f; mulctrl=0x5b;
+		    break;
+		case BPP32:
+		    miscctrl=0x20; latchctrl=0x07; tcolctrl=0x06; mulctrl=0x5b;
+		    break;
+		case BPP32DIR:
+			miscctrl=0x20; latchctrl=0x07; tcolctrl=0x06; mulctrl=0x5b;
+			break;
+		}
+		
+		/* modify mulctrl if DAC pixelbus_width is 64 */
+		//fixme? do 32bit DACbus MIL 1/2 cards exist? if so, setup via si->ps...
+		if (true) mulctrl += 1;
+
+		DXIW(MISCCTRL, (DXIR(MISCCTRL) & 0x1d) | miscctrl); 
+		DXIW(TVP_LATCHCTRL, latchctrl); 
+		DXIW(TVP_TCOLCTRL, tcolctrl); 
+		DXIW(MULCTRL, mulctrl);
+
+		LOG(2,("DAC: TVP miscctrl 0x%02x, TVP latchctrl 0x%02x\n",
+			DXIR(MISCCTRL), DXIR(TVP_LATCHCTRL)));
+		LOG(2,("DAC: TVP tcolctrl 0x%02x, TVP mulctrl 0x%02x\n",
+			DXIR(TVP_TCOLCTRL), DXIR(MULCTRL)));
+	}
+
+	/* disable palette RAM adressing mask */
+	DACW(PIXRDMSK,0xff);
+	LOG(2,("DAC: pixrdmsk 0x%02x\n", DACR(PIXRDMSK)));
 
 	return B_OK;
 }
@@ -96,10 +149,8 @@ status_t gx00_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 
 	LOG(4,("DAC: setting palette\n"));
 
-	/* clear palwtadd to start programming (LUT index?) */
+	/* clear palwtadd before starting programming (LUT index) */
 	DACW(PALWTADD,0);
-	/* just for safety (specs are somewhat unclear) (LUT color?) */
-	DACW(PALRDADD,0);
 
 	/*loop through all 256 to program DAC*/
 	for (i=0;i<256;i++)
@@ -128,10 +179,6 @@ if (0)
 			LOG(1,("DAC palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
 	}
  }
-	/* reset to LUT start just for safety (LUT index?) */
-	DACW(PALWTADD,0);
-	/* (specs are somewhat unclear) (LUT color?) */
-	DACW(PALRDADD,0);
 
 	return B_OK;
 }
@@ -154,6 +201,7 @@ status_t gx00_dac_set_pix_pll(display_mode target)
 	req_pclk = (target.timing.pixel_clock)/1000.0;
 	LOG(4,("DAC: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
+	/* signal that we actually want to set the mode */
 	result = gx00_dac_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
 	if (result != B_OK)
 	{
@@ -282,14 +330,134 @@ status_t gx00_dac_pix_pll_find
 	switch (si->ps.card_type) {
 		case G550:
 		case G450: return g450_g550_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
-		default:   return g100_g400max_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result);
+		case MIL2:
+		case MIL1: return milx_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result);
+		default:   return g100_g400max_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
 	}
 	return B_ERROR;
 }
 
 /* find nearest valid pixel PLL setting: rewritten by rudolf */
-static status_t g100_g400max_dac_pix_pll_find(
+static status_t milx_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
+{
+	int m = 0, n = 0, p = 0;
+	float error, error_best = 999999999;
+	int best[3]; 
+	float f_vco, max_pclk;
+	float req_pclk = target.timing.pixel_clock/1000.0;
+
+	LOG(4,("DAC: MIL1/MIL2 TVP restrictions apply\n"));
+
+	/* determine the max. pixelclock for the current videomode */
+	switch (target.space)
+	{
+		case B_CMAP8:
+			max_pclk = si->ps.max_dac1_clock_8;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_16;
+			break;
+		case B_RGB24_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_24;
+			break;
+		case B_RGB32_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_32;
+			break;
+		default:
+			/* use fail-safe value */
+			max_pclk = si->ps.max_dac1_clock_32;
+			break;
+	}
+
+	/* Make sure the requested pixelclock is within the PLL's operational limits */
+	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
+	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
+	{
+		LOG(4,("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
+										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
+		req_pclk = (si->ps.min_pixel_vco / 8.0);
+	}
+	/* upper limit is given by pins in combination with current active mode */
+	if (req_pclk > max_pclk)
+	{
+		LOG(4,("DAC: TVP clamping pixclock: requested %fMHz, set to %fMHz\n",
+														req_pclk, (float)max_pclk));
+		req_pclk = max_pclk;
+	}
+
+	/* iterate through all valid PLL postscaler settings */
+	for (p=0x01; p < 0x10; p = p<<1)
+	{
+		/* calculate the needed VCO frequency for this postscaler setting */
+		f_vco = req_pclk * p;
+
+		/* check if this is within range of the VCO specs */
+		if ((f_vco >= si->ps.min_pixel_vco) && (f_vco <= si->ps.max_pixel_vco))
+		{
+			/* iterate trough all valid reference-frequency postscaler settings */
+			for (n = 3; n <= 25; n++)
+			{
+				/* calculate VCO postscaler setting for current setup.. */
+				m = (int)(((f_vco * n) / (8 * si->ps.f_ref)) + 0.5);
+				/* ..and check for validity */
+				if ((m < 3) || (m > 64))	continue;
+
+				/* find error in frequency this setting gives */
+				error = fabs(req_pclk - ((((8 * si->ps.f_ref) / n) * m) / p));
+
+				/* note the setting if best yet */
+				if (error < error_best)
+				{
+					error_best = error;
+					best[0]=m;
+					best[1]=n;
+					best[2]=p;
+				}
+			}
+		}
+	}
+
+	m = best[0];
+	n = best[1];
+	p = best[2];
+
+	f_vco = (((8 * si->ps.f_ref) / n) * m);
+	LOG(2,("DAC: TVP pix VCO frequency found %fMhz\n", f_vco));
+
+	/* setup the scalers programming values for found optimum setting */
+	*calc_pclk = (f_vco / p);
+	*m_result = (65 - m);
+	*n_result = (65 - n);
+
+	switch(p)
+	{
+	case 1:
+		p = 0x00;
+		break;
+	case 2:
+		p = 0x01;
+		break;
+	case 4:
+		p = 0x02;
+		break;
+	case 8:
+		p = 0x03;
+		break;
+	}
+	*p_result = p;
+
+	/* display the found pixelclock values */
+	LOG(2,("DAC: TVP pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
+
+	return B_OK;
+}
+
+/* find nearest valid pixel PLL setting: rewritten by rudolf */
+static status_t g100_g400max_dac_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0, m_max;
 	float error, error_best = 999999999;
@@ -313,6 +481,17 @@ static status_t g100_g400max_dac_pix_pll_find(
 		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
 		m_max = 32;
 		break;
+	}
+
+	/* make sure the pixelPLL and the videoPLL have a little different settings to
+	 * minimize distortions in the outputs due to crosstalk:
+	 * do *not* change the videoPLL setting because it must be exact if TVout is enabled! */
+	/* Note:
+	 * only modify the clock if we are actually going to set the mode */
+	if ((target.flags & DUALHEAD_BITS) && test)
+	{
+		LOG(4,("DAC: dualhead mode active: modified requested pixelclock +1.5%%\n"));
+		req_pclk *= 1.015;
 	}
 
 	/* determine the max. pixelclock for the current videomode */
@@ -343,9 +522,18 @@ static status_t g100_g400max_dac_pix_pll_find(
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
 	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
 		req_pclk = (si->ps.min_pixel_vco / 8.0);
+	}
 	/* upper limit is given by pins in combination with current active mode */
-	if (req_pclk > max_pclk) req_pclk = max_pclk;
+	if (req_pclk > max_pclk)
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+														req_pclk, (float)max_pclk));
+		req_pclk = max_pclk;
+	}
 
 	/* iterate through all valid PLL postscaler settings */
 	for (p=0x01; p < 0x10; p = p<<1)
@@ -466,9 +654,18 @@ static status_t g450_g550_dac_pix_pll_find
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
 	if (req_pclk < (si->ps.min_pixel_vco / 16.0))
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+										req_pclk, (float)(si->ps.min_pixel_vco / 16.0)));
 		req_pclk = (si->ps.min_pixel_vco / 16.0);
+	}
 	/* upper limit is given by pins in combination with current active mode */
-	if (req_pclk > max_pclk) req_pclk = max_pclk;
+	if (req_pclk > max_pclk)
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+														req_pclk, (float)max_pclk));
+		req_pclk = max_pclk;
+	}
 
 	/* iterate through all valid PLL postscaler settings */
 	for (p=0x01; p < 0x20; p = p<<1)
@@ -505,7 +702,7 @@ static status_t g450_g550_dac_pix_pll_find
 
 	/* setup the scalers programming values for found optimum setting */
 	m=best[0] - 1;
-	n=best[1] - 1;
+	n=best[1] - 2;
 	switch(best[2])
 	{
 	case 1:
@@ -526,7 +723,7 @@ static status_t g450_g550_dac_pix_pll_find
 	}
 
 	/* log the closest VCO speed found */
-	f_vco = ((si->ps.f_ref * 2) / (m + 1)) * (n + 1);
+	f_vco = ((si->ps.f_ref * 2) / (m + 1)) * (n + 2);
 	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
 
 	/* now find the filtersetting that matches best with this frequency by testing.
@@ -579,9 +776,18 @@ static status_t g100_g400max_dac_sys_pll_find(
 	/* Make sure the requested systemclock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
 	if (req_sclk < (si->ps.min_system_vco / 8.0))
+	{
+		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+										req_sclk, (float)(si->ps.min_system_vco / 8.0)));
 		req_sclk = (si->ps.min_system_vco / 8.0);
+	}
 	/* upper limit is max_system_vco */
-	if (req_sclk > si->ps.max_system_vco) req_sclk = si->ps.max_system_vco;
+	if (req_sclk > si->ps.max_system_vco)
+	{
+		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+										req_sclk, (float)si->ps.max_system_vco));
+		req_sclk = si->ps.max_system_vco;
+	}
 
 	/* iterate through all valid PLL postscaler settings */
 	for (p=0x01; p < 0x10; p = p<<1)
@@ -666,7 +872,6 @@ status_t gx50_dac_check_sys_pll(uint8 m, uint8 n, uint8 p)
 	uint time = 0, count = 0;
 
 	/* program the new clock */
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0C)|0x01);  /*select the PIXPLL*/
 	DXIW(SYSPLLM, m);
 	DXIW(SYSPLLN, n);
 	DXIW(SYSPLLP, p);
@@ -705,7 +910,6 @@ status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 	*p &= 0x47;
 
 	/* iterate through all possible filtersettings */
-//	DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0x0F)|0x04);  /*disable the PIXPLL*/
 	for (s = 0; s < 8 ;s++)
 	{
 		if (gx50_dac_check_sys_pll(m, n, *p)== B_OK)
@@ -722,7 +926,6 @@ status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 				/* preset first choice setting found */
 				*q = 1;
 				/* we are done */
-//				DXIW(PIXCLKCTRL,DXIR(PIXCLKCTRL)&0x0B);     /*enable the PIXPLL*/
 				return B_OK;
 			}
 			else
@@ -741,7 +944,6 @@ status_t gx50_dac_check_sys_pll_range(uint8 m, uint8 n, uint8 *p, uint8 *q)
 
 	/* return the (last found) backup result, or the original p value */
 	*p = p_backup;	
-//	DXIW(PIXCLKCTRL,DXIR(PIXCLKCTRL)&0x0B);     /*enable the PIXPLL*/
 	/* we found only a non-optimal value */
 	if (*q == 2) return B_OK;
 
@@ -765,9 +967,18 @@ static status_t g450_g550_dac_sys_pll_find(
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_system_vco divided by highest postscaler-factor */
 	if (req_sclk < (si->ps.min_system_vco / 16.0))
+	{
+		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+										req_sclk, (float)(si->ps.min_system_vco / 16.0)));
 		req_sclk = (si->ps.min_system_vco / 16.0);
+	}
 	/* upper limit is max_system_vco */
-	if (req_sclk > si->ps.max_system_vco) req_sclk = si->ps.max_system_vco;
+	if (req_sclk > si->ps.max_system_vco)
+	{
+		LOG(4,("DAC: clamping sysclock: requested %fMHz, set to %fMHz\n",
+										req_sclk, (float)si->ps.max_system_vco));
+		req_sclk = si->ps.max_system_vco;
+	}
 
 	/* iterate through all valid PLL postscaler settings */
 	for (p=0x01; p < 0x20; p = p<<1)
@@ -804,7 +1015,7 @@ static status_t g450_g550_dac_sys_pll_find(
 
 	/* setup the scalers programming values for found optimum setting */
 	m=best[0] - 1;
-	n=best[1] - 1;
+	n=best[1] - 2;
 	switch(best[2])
 	{
 	case 1:
@@ -825,7 +1036,7 @@ static status_t g450_g550_dac_sys_pll_find(
 	}
 
 	/* log the closest VCO speed found */
-	f_vco = ((si->ps.f_ref * 2) / (m + 1)) * (n + 1);
+	f_vco = ((si->ps.f_ref * 2) / (m + 1)) * (n + 2);
 	LOG(2,("DAC: sys VCO frequency found %fMhz\n", f_vco));
 
 	/* now find the filtersetting that matches best with this frequency by testing.

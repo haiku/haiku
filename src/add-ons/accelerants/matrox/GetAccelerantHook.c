@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002
+	Rudolf Cornelissen 10/2002-4/2003
 */
 
 #define MODULE_BIT 0x08000000
@@ -12,7 +12,6 @@
 #include "acc_std.h"
 
 /*
-
 The standard entry point.  Given a uint32 feature identifier, this routine
 returns a pointer to the function that implements the feature.  Some features
 require more information than just the identifier to select the proper
@@ -20,26 +19,30 @@ function.  The extra information (which is specific to the feature) is
 pointed at by the void *data parameter.  By default, no extra information
 is available.  Any extra information available to choose the function will be
 noted on a case by case below.
-
 */
 
-void *	get_accelerant_hook(uint32 feature, void *data) {
-	switch (feature) {
 /*
 These definitions are out of pure lazyness.
 */
 #define CHKO(x) case B_##x: \
 	if (check_overlay_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
+#define CHKA(x) case B_##x: \
+	if (check_acc_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
 #define HOOK(x) case B_##x: return (void *)x
 #define ZERO(x) case B_##x: return (void *)0
 #define HRDC(x) case B_##x: return si->settings.hardcursor? (void *)x: (void *)0; // apsed
 
-/*
-One of either B_INIT_ACCELERANT or B_CLONE_ACCELERANT will be requested and
-subsequently called before any other hook is requested.  All other feature
-hook selections can be predicated on variables assigned during the accelerant
-initialization process.
-*/
+void *	get_accelerant_hook(uint32 feature, void *data)
+{
+	switch (feature)
+	{
+		/*
+		One of either B_INIT_ACCELERANT or B_CLONE_ACCELERANT will be requested and
+		subsequently called before any other hook is requested.  All other feature
+		hook selections can be predicated on variables assigned during the accelerant
+		initialization process.
+		*/
+
 		/* initialization */
 		HOOK(INIT_ACCELERANT);
 		HOOK(CLONE_ACCELERANT);
@@ -67,7 +70,7 @@ initialization process.
 		HOOK(SET_DPMS_MODE);
 
 		/* cursor managment */
-		HRDC(SET_CURSOR_SHAPE); // apsed 
+		HRDC(SET_CURSOR_SHAPE);
 		HRDC(MOVE_CURSOR);
 		HRDC(SHOW_CURSOR);
 
@@ -78,6 +81,13 @@ initialization process.
 		HOOK(WAIT_ENGINE_IDLE);
 		HOOK(GET_SYNC_TOKEN);
 		HOOK(SYNC_TO_TOKEN);
+
+		/*
+		Depending on the engine architecture, you may choose to provide a different
+		function to be used with each bit-depth for example.
+
+		Note: These hooks are re-acquired by the app_server after each mode switch.
+		*/
 
 		/* only export video overlay functions if card is capable of it */
 		CHKO(OVERLAY_COUNT);
@@ -90,31 +100,36 @@ initialization process.
 		CHKO(RELEASE_OVERLAY);
 		CHKO(CONFIGURE_OVERLAY);
 
-/*
-When requesting an acceleration hook, the calling application provides a
-pointer to the display_mode for which the acceleration function will be used.
-Depending on the engine architecture, you may choose to provide a different
-function to be used with each bit-depth.  In the sample driver we return
-the same function all the time.
-*/
-		/* 2D acceleration */
-		HOOK(SCREEN_TO_SCREEN_BLIT);
-		HOOK(FILL_RECTANGLE);
-		HOOK(INVERT_RECTANGLE);
-		HOOK(FILL_SPAN);
-		HOOK(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);//remove for pre R5
+		/*
+		When requesting an acceleration hook, the calling application provides a
+		pointer to the display_mode for which the acceleration function will be used.
+		Depending on the engine architecture, you may choose to provide a different
+		function to be used with each bit-depth.  In the sample driver we return
+		the same function all the time.
 
-        	/*HOOK(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
-		Does the G400 support this? I can only think of using texture mapped rectangles, but these seem to have too many restrictions to do this:( e.g. I would need to blit offscreen, into texture format...	
-		*/        
-#undef HOOK
-#undef ZERO
+		Note: These hooks are re-acquired by the app_server after each mode switch.
+		*/
+
+		/* only export 2D acceleration functions in modes that are capable of it */
+		/* used by the app_server and applications (BWindowScreen) */
+		CHKA(SCREEN_TO_SCREEN_BLIT);
+		CHKA(FILL_RECTANGLE);
+		CHKA(INVERT_RECTANGLE);
+		CHKA(FILL_SPAN);
+		/* not (yet) used by the app_server:
+		 * so just for application use (BWindowScreen) */
+		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
+		//CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
 	}
-/*
-Return a null pointer for any feature we don't understand.
-*/
+
+	/* Return a null pointer for any feature we don't understand. */
 	return 0;
 }
+#undef CHKO
+#undef CHKA
+#undef HOOK
+#undef ZERO
+#undef HRDC
 
 status_t check_overlay_capability(uint32 feature)
 {
@@ -155,21 +170,71 @@ status_t check_overlay_capability(uint32 feature)
 		break;
 	}
 
-	switch(si->ps.card_type)
+	if (si->ps.card_type >= G200)
 	{
-	case G200:
-	case G400:
-	case G400MAX:
-	case G450: 		/* is also G550 in accelerant for now */
-	case G550:		/* not used in accelerant yet */
 		/* export video overlay functions */
 		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
 		return B_OK;
+	}
+
+	/* do not export video overlay functions */
+	LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
+	return B_ERROR;
+}
+
+status_t check_acc_capability(uint32 feature)
+{
+	bool fill = false;
+	char *msg = "";
+
+	/* setup logmessage text */
+	switch (feature)
+	{
+	case B_SCREEN_TO_SCREEN_BLIT:
+		msg = "B_SCREEN_TO_SCREEN_BLIT";
+		break;
+	case B_FILL_RECTANGLE:
+		msg = "B_FILL_RECTANGLE";
+		fill = true;
+		break;
+	case B_INVERT_RECTANGLE:
+		msg = "B_INVERT_RECTANGLE";
+		fill = true;
+		break;
+	case B_FILL_SPAN:
+		msg = "B_FILL_SPAN";
+		fill = true;
+		break;
+	case B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT:
+		msg = "B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT";
+		break;
+	case B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT:
+		msg = "B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT";
 		break;
 	default:
-		/* do not export video overlay functions */
-		LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
-		return B_ERROR;
+		msg = "UNKNOWN";
 		break;
+	}
+
+	/* hardware acceleration is only supported in modes with upto a certain
+	 * memory pitch.. */
+	if (si->acc_mode)
+	{
+		/* see if we support hardware rectangle fills in the current mode:
+		 * the Matrox card's acc engine can adress upto 16Mbyte memory for this cmd! */
+		if (fill &&
+			((si->fbc.bytes_per_row * si->dm.virtual_height) > (16 * 1024 * 1024)))
+		{
+			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
+			return B_ERROR;
+		}
+
+		LOG(4, ("Acc: Exporting hook %s.\n", msg));
+		return B_OK;
+	}
+	else
+	{
+		LOG(4, ("Acc: Not exporting hook %s.\n", msg));
+		return B_ERROR;
 	}
 }

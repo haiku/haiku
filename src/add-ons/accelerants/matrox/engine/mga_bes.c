@@ -1,9 +1,12 @@
 /* G200-G550 Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/11-2002 */
+/* Written by Rudolf Cornelissen 05/2002-04/2003 */
 
 #define MODULE_BIT 0x00000200
 
 #include "mga_std.h"
+
+//fixme: implement: (used for virtual screens!)
+//void move_overlay(uint16 hdisp_start, uint16 vdisp_start);
 
 status_t gx00_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov, int offset)
@@ -29,7 +32,7 @@ status_t gx00_configure_bes
 	/* misc used variables */
 	uint16 temp1, temp2;
 	/* interval representation, used for scaling calculations */
-	uint16 intrep;
+	uint16 intrep, crtc_hstart, crtc_vstart, crtc_hend, crtc_vend;
 	/* inverse scaling factor, used for source positioning */
 	uint32 ifactor;
 	/* used for vertical weight starting value */
@@ -84,6 +87,20 @@ status_t gx00_configure_bes
 	LOG(6,("Overlay: inputbuffer view (zoom) left %d, top %d, width %d, height %d\n",
 		my_ov.h_start, my_ov.v_start, my_ov.width, my_ov.height));
 
+	/* the BES does not respect virtual_workspaces, but adheres to CRTC
+	 * constraints only */
+	crtc_hstart = si->dm.h_display_start;
+	/* make dualhead switch mode with TVout enabled work while we're at it.. */
+	if (si->switched_crtcs)
+	{
+		crtc_hstart += si->dm.timing.h_display;
+	}
+	/* horizontal end is the first position beyond the displayed range on the CRTC */
+	crtc_hend = crtc_hstart + si->dm.timing.h_display;
+	crtc_vstart = si->dm.v_display_start;
+	/* vertical end is the first position beyond the displayed range on the CRTC */
+	crtc_vend = crtc_vstart + si->dm.timing.v_display;
+
 
 	/****************************************
 	 *** setup all edges of output window ***
@@ -93,22 +110,22 @@ status_t gx00_configure_bes
 	hcoordv = 0;
 	/* left edge coordinate of output window, must be inside desktop */
 	/* clipping on the left side */
-	if (ow->h_start < 0)
+	if (ow->h_start < crtc_hstart)
 	{
 		temp1 = 0;
 	}
 	else
 	{
 		/* clipping on the right side */
-		if (ow->h_start >= (si->dm.virtual_width - 1))
+		if (ow->h_start >= (crtc_hend - 1))
 		{
 			/* width < 2 is not allowed */
-			temp1 = (si->dm.virtual_width - 2) & 0x7ff;
+			temp1 = (crtc_hend - crtc_hstart - 2) & 0x7ff;
 		} 
 		else
 		/* no clipping here */
 		{
-			temp1 = (uint16)ow->h_start & 0x7ff;
+			temp1 = (ow->h_start - crtc_hstart) & 0x7ff;
 		}
 	} 
 	hcoordv |= temp1 << 16;
@@ -121,14 +138,14 @@ status_t gx00_configure_bes
 	else 
 	{
 		/* clipping on the right side */
-		if ((ow->h_start + ow->width - 1) > (si->dm.virtual_width - 1))
+		if ((ow->h_start + ow->width - 1) > (crtc_hend - 1))
 		{
-			temp2 = (si->dm.virtual_width - 1) & 0x7ff;
+			temp2 = (crtc_hend - crtc_hstart - 1) & 0x7ff;
 		}
 		else
 		{
 			/* clipping on the left side */
-			if ((ow->h_start + ow->width - 1) < 1)
+			if ((ow->h_start + ow->width - 1) < (crtc_hstart + 1))
 			{
 				/* width < 2 is not allowed */
 				temp2 = 1;
@@ -136,33 +153,33 @@ status_t gx00_configure_bes
 			else
 			/* no clipping here */
 			{
-				temp2 = ((uint16)(ow->h_start + ow->width - 1)) & 0x7ff;
+				temp2 = ((uint16)(ow->h_start + ow->width - crtc_hstart - 1)) & 0x7ff;
 			}
 		}
 	}
 	hcoordv |= temp2 << 0;
-	LOG(4,("Overlay: left-edge output %d, right-edge output %d\n",temp1, temp2));
+	LOG(4,("Overlay: CRTC left-edge output %d, right-edge output %d\n",temp1, temp2));
 
 	/* setup top and bottom edges of output window */
 	vcoordv = 0;
 	/* top edge coordinate of output window, must be inside desktop */
 	/* clipping on the top side */
-	if (ow->v_start < 0)
+	if (ow->v_start < crtc_vstart)
 	{
 		temp1 = 0;
 	}
 	else
 	{
 		/* clipping on the bottom side */
-		if (ow->v_start >= (si->dm.virtual_height - 1))
+		if (ow->v_start >= (crtc_vend - 1))
 		{
 			/* height < 2 is not allowed */
-			temp1 = (si->dm.virtual_height - 2) & 0x7ff;
+			temp1 = (crtc_vend - crtc_vstart - 2) & 0x7ff;
 		} 
 		else
 		/* no clipping here */
 		{
-			temp1 = (uint16)ow->v_start & 0x7ff;
+			temp1 = (ow->v_start - crtc_vstart) & 0x7ff;
 		}
 	} 
 	vcoordv |= temp1 << 16;
@@ -175,14 +192,14 @@ status_t gx00_configure_bes
 	else 
 	{
 		/* clipping on the bottom side */
-		if ((ow->v_start + ow->height - 1) > (si->dm.virtual_height - 1))
+		if ((ow->v_start + ow->height - 1) > (crtc_vend - 1))
 		{
-			temp2 = (si->dm.virtual_height - 1) & 0x7ff;
+			temp2 = (crtc_vend - crtc_vstart - 1) & 0x7ff;
 		}
 		else
 		{
 			/* clipping on the top side */
-			if ((ow->v_start + ow->height - 1) < 1)
+			if ((ow->v_start + ow->height - 1) < (crtc_vstart + 1))
 			{
 				/* height < 2 is not allowed */
 				temp2 = 1;
@@ -190,12 +207,12 @@ status_t gx00_configure_bes
 			else
 			/* no clipping here */
 			{
-				temp2 = ((uint16)(ow->v_start + ow->height - 1)) & 0x7ff;
+				temp2 = ((uint16)(ow->v_start + ow->height - crtc_vstart - 1)) & 0x7ff;
 			}
 		}
 	}
 	vcoordv |= temp2 << 0;
-	LOG(4,("Overlay: top-edge output %d, bottom-edge output %d\n",temp1, temp2));
+	LOG(4,("Overlay: CRTC top-edge output %d, bottom-edge output %d\n",temp1, temp2));
 
 
 	/*********************************************
@@ -274,14 +291,13 @@ status_t gx00_configure_bes
 	 * Note: The input bitmaps slopspace is automatically excluded from the calculations this way! */
 	/* Note also:
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
-
 	hsrcstv = 0;
 	/* check for destination horizontal clipping at left side */
-	if (ow->h_start < 0)
+	if (ow->h_start < crtc_hstart)
 	{
 		/* check if entire destination picture is clipping left:
 		 * (2 pixels will be clamped onscreen at least) */
-		if ((ow->h_start + ow->width - 1) < 1)
+		if ((ow->h_start + ow->width - 1) < (crtc_hstart + 1))
 		{
 			/* increase 'first contributing pixel' with 'fixed value': (total dest. width - 2) */
 			hsrcstv += (ow->width - 2);
@@ -289,7 +305,7 @@ status_t gx00_configure_bes
 		else
 		{
 			/* increase 'first contributing pixel' with actual number of dest. clipping pixels */
-			hsrcstv += (0 - ow->h_start);
+			hsrcstv += (crtc_hstart - ow->h_start);
 		}
 		LOG(4,("Overlay: clipping left...\n"));
 
@@ -314,11 +330,11 @@ status_t gx00_configure_bes
 
 	hsrcendv = 0;
 	/* check for destination horizontal clipping at right side */
-	if ((ow->h_start + ow->width - 1) > (si->dm.virtual_width - 1))
+	if ((ow->h_start + ow->width - 1) > (crtc_hend - 1))
 	{
 		/* check if entire destination picture is clipping right:
 		 * (2 pixels will be clamped onscreen at least) */
-		if (ow->h_start > (si->dm.virtual_width - 2))
+		if (ow->h_start > (crtc_hend - 2))
 		{
 			/* increase 'number of clipping pixels' with 'fixed value': (total dest. width - 2) */
 			hsrcendv += (ow->width - 2);
@@ -326,7 +342,7 @@ status_t gx00_configure_bes
 		else
 		{
 			/* increase 'number of clipping pixels' with actual number of dest. clipping pixels */
-			hsrcendv += ((ow->h_start + ow->width - 1) - (si->dm.virtual_width - 1));
+			hsrcendv += ((ow->h_start + ow->width - 1) - (crtc_hend - 1));
 		}
 		LOG(4,("Overlay: clipping right...\n"));
 
@@ -435,11 +451,11 @@ status_t gx00_configure_bes
 	/* calculate origin adress */
 	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n",a1orgv));
 	/* check for destination vertical clipping at top side */
-	if (ow->v_start < 0)
+	if (ow->v_start < crtc_vstart)
 	{
 		/* check if entire destination picture is clipping at top:
 		 * (2 pixels will be clamped onscreen at least) */
-		if ((ow->v_start + ow->height - 1) < 1)
+		if ((ow->v_start + ow->height - 1) < (crtc_vstart + 1))
 		{
 			/* increase source buffer origin with 'fixed value':
 			 * (integer part of ('total height - 2' of dest. picture in pixels * inverse scaling factor)) *
@@ -452,8 +468,8 @@ status_t gx00_configure_bes
 			/* increase source buffer origin with:
 			 * (integer part of (number of destination picture clipping pixels * inverse scaling factor)) *
 			 * bytes per row source picture */
-			a1orgv += ((((0 - ow->v_start) * ifactor) >> 16) * ob->bytes_per_row);
-			weight = (0 - ow->v_start) * ifactor;
+			a1orgv += ((((crtc_vstart - ow->v_start) * ifactor) >> 16) * ob->bytes_per_row);
+			weight = (crtc_vstart - ow->v_start) * ifactor;
 		}
 		LOG(4,("Overlay: clipping at top...\n"));
 	}

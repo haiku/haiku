@@ -2,7 +2,7 @@
 /* some bits are hacks, where PINS is not known */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10-11/2002
+   Rudolf Cornelissen 10/2002-4/2003
 */
 
 #define MODULE_BIT 0x00002000
@@ -111,52 +111,80 @@ status_t parse_pins ()
 
 status_t pins1_read(uint8 *pins, uint8 length)
 {
-//remove later on here:
-//		float f_ref;				/* PLL reference-oscillator frequency */
-//		uint32 max_system_vco;		/* graphics engine PLL VCO limits */
-//		uint32 min_system_vco;
-//		uint32 max_pixel_vco;		/* dac1 PLL VCO limits */
-//		uint32 min_pixel_vco;
-//		uint32 max_video_vco;		/* dac2, maven PLL VCO limits */
-//		uint32 min_video_vco;
-//		uint32 std_engine_clock;	/* graphics engine clock speed needed */
-//		uint32 std_engine_clock_dh;
-//		uint32 max_dac1_clock;		/* dac1 limits */
-//		uint32 max_dac1_clock_8;	/* dac1 limits correlated to RAMspeed limits */
-//		uint32 max_dac1_clock_16;
-//		uint32 max_dac1_clock_24;
-//		uint32 max_dac1_clock_32;
-//		uint32 max_dac1_clock_32dh;
-//		uint32 max_dac2_clock;		/* dac2 limits */
-//		uint32 max_dac2_clock_8;	/* dac2, maven limits correlated to RAMspeed limits */
-//		uint32 max_dac2_clock_16;
-//		uint32 max_dac2_clock_24;
-//		uint32 max_dac2_clock_32;
-//		uint32 max_dac2_clock_32dh;
-//		bool secondary_head;		/* presence of functions */
-//		bool secondary_tvout;
-//		bool primary_dvi;
-//		bool secondary_dvi;
-//		uint32 memory_size;			/* memory in Mb */
-//		uint32 mctlwtst_reg;		/* memory control waitstate register */
-//		uint32 memrdbk_reg;			/* memory readback register */
-//		uint32 option_reg;			/* option register */
-//		uint32 option2_reg;			/* option2 register */
-//		uint32 option3_reg;			/* option3 register */
-//		uint32 option4_reg;			/* option4 register */
-//		uint8 v3_option2_reg;
-//		uint8 v3_clk_div;			/* pins v3 memory and system clock division factors */
-//		uint8 v3_mem_type;			/* pins v3 memory type info */
-//		uint16 v5_mem_type;			/* pins v5 memory type info */
-//		bool sdram;
-//end remove later on here.
+	if (length != 64)
+	{
+		LOG(8,("INFO: wrong PINS length, expected 64, got %d\n", length));
+		return B_ERROR;
+	}
 
-	//fixme: implement this..
-	return B_ERROR;
+//reset all for test:
+//float:
+	si->ps.f_ref = 0;
+//uint32:
+	si->ps.max_system_vco = 0;
+	si->ps.min_system_vco = 0;
+	si->ps.min_pixel_vco = 0;
+	si->ps.min_video_vco = 0;
+	si->ps.std_engine_clock_dh = 0;
+	si->ps.max_dac1_clock_32 = 0;
+	si->ps.max_dac1_clock_32dh = 0;
+	si->ps.memory_size = 0;
+	si->ps.mctlwtst_reg = 0;
+	si->ps.memrdbk_reg = 0;
+	si->ps.option2_reg = 0;
+	si->ps.option3_reg = 0;
+	si->ps.option4_reg = 0;
+//uint8:
+	si->ps.v3_option2_reg = 0;
+	si->ps.v3_clk_div = 0;
+	si->ps.v3_mem_type = 0;
+//uint16:
+	si->ps.v5_mem_type = 0;
+//bools:
+	si->ps.secondary_head = false;
+	si->ps.secondary_tvout = false;
+	si->ps.primary_dvi = false;
+	si->ps.secondary_dvi = false;
+	si->ps.sdram = true;
+
+//experimental: checkout!
+	si->ps.max_dac1_clock_32 = pins[22];//ramdac
+	si->ps.max_pixel_vco = (pins[25] << 8) | pins[24];//PCLK
+	si->ps.std_engine_clock = (pins[29] << 8) | pins[28];
+	if (((pins[31] << 8) | pins[30]) < si->ps.std_engine_clock)
+		si->ps.std_engine_clock = (pins[31] << 8) | pins[30];
+	if (((pins[33] << 8) | pins[32]) < si->ps.std_engine_clock)
+		si->ps.std_engine_clock = (pins[33] << 8) | pins[32];
+
+//temp. test to see some vals..
+	si->ps.max_video_vco = (pins[27] << 8) | pins[26];//LCLK
+	//feature flags:
+	si->ps.option_reg = (pins[53] << 24) | (pins[52] << 16) | (pins[51] << 8) | pins [50];
+
+	si->ps.max_dac2_clock = (pins[35] << 8) | pins[34];//clkmod
+	si->ps.max_dac2_clock_8 = (pins[37] << 8) | pins[36];//testclk
+	si->ps.max_dac2_clock_16 = (pins[39] << 8) | pins[38];//vgafreq1
+	si->ps.max_dac2_clock_24 = (pins[41] << 8) | pins[40];//vgafreq2
+	si->ps.max_dac2_clock_32 = (pins[55] << 8) | pins[54];//vga clock
+	si->ps.max_dac2_clock_32dh = pins[58];//vid ctrl
+
+	si->ps.max_dac1_clock = (pins[29] << 8) | pins[28];//clkbase
+	si->ps.max_dac1_clock_8 = (pins[31] << 8) | pins[30];//4mb
+	si->ps.max_dac1_clock_16 = (pins[33] << 8) | pins[32];//8mb
+	si->ps.max_dac1_clock_24 = pins[23];//ramdac type
+
+//test! Don't actually use the reported settings for now...
+	return B_OK;
 }
 
 status_t pins2_read(uint8 *pins, uint8 length)
 {
+	if (length != 64)
+	{
+		LOG(8,("INFO: wrong PINS length, expected 64, got %d\n", length));
+		return B_ERROR;
+	}
+
 	LOG(2,("INFO: PINS version 2 details not yet known\n"));
 	return B_ERROR;
 }
@@ -424,18 +452,15 @@ status_t pins5_read(uint8 *pins, uint8 length)
 	}
 
 	/* fill out the shared info si->ps struct */
-	if (pins[4]) m_factor = 8;
+	if (pins[4] == 0x01) m_factor = 8;
+	if (pins[4] >= 0x02) m_factor = 10;
 
 	si->ps.max_system_vco = m_factor * pins[36];
 	si->ps.max_video_vco = m_factor * pins[37];
-	/* pixelVCO multiplier is 10 if pins V5.2 */
-	if (pins[4] == 0x02) si->ps.max_pixel_vco = 10 * pins[38];
-	else si->ps.max_pixel_vco = m_factor * pins[38];
+	si->ps.max_pixel_vco = m_factor * pins[38];
 	si->ps.min_system_vco = m_factor * pins[121];
 	si->ps.min_video_vco = m_factor * pins[122];
-	/* pixelVCO multiplier is 10 if pins V5.2 */
-	if (pins[4] == 0x02) si->ps.min_pixel_vco = 10 * pins[123];
-	else si->ps.min_pixel_vco = m_factor * pins[123];
+	si->ps.min_pixel_vco = m_factor * pins[123];
 
 	if (pins[39] == 0xff) si->ps.max_dac1_clock_8 = si->ps.max_pixel_vco;
 	else si->ps.max_dac1_clock_8 = 4 * pins[39];
@@ -517,6 +542,9 @@ void fake_pins(void)
 
 	switch (si->ps.card_type)
 	{
+		case MIL1:
+			pinsmil1_fake();
+			break;
 		case MIL2:
 			pinsmil2_fake();
 			break;
@@ -541,15 +569,16 @@ void fake_pins(void)
 	}
 
 	/* find out if the card has a maven */
-	if (i2c_maven_probe() == B_OK)
+	si->ps.secondary_tvout = false;
+	si->ps.secondary_head = false;
+	/* only do I2C probe if the card has a chance */
+	if (si->ps.card_type >= G100)
 	{
-		si->ps.secondary_tvout = true;
-		si->ps.secondary_head = true;
-	}
-	else
-	{
-		si->ps.secondary_tvout = false;
-		si->ps.secondary_head = false;
+		if (i2c_maven_probe() == B_OK)
+		{
+			si->ps.secondary_tvout = true;
+			si->ps.secondary_head = true;
+		}
 	}
 
 	/* not used because no coldstart will be attempted */
@@ -567,8 +596,82 @@ void fake_pins(void)
 	si->ps.v5_mem_type = 0;
 }
 
+void pinsmil1_fake(void)
+{
+	/* 'worst case' scenario defaults, overrule-able via mga.settings if needed */
+
+	si->ps.f_ref = 14.31818;
+	/* see MIL1 specs */
+	si->ps.max_system_vco = 220;
+	si->ps.min_system_vco = 110;
+	si->ps.max_pixel_vco = 220;
+	si->ps.min_pixel_vco = 110;
+	/* no specs, assuming these */
+	si->ps.max_video_vco = 0;
+	si->ps.min_video_vco = 0;
+	/* see MIL1 specs */
+	si->ps.max_dac1_clock = 220;
+	si->ps.max_dac1_clock_8 = 220;
+	si->ps.max_dac1_clock_16 = 200;
+	/* 'failsave' values */
+	si->ps.max_dac1_clock_24 = 180;
+	si->ps.max_dac1_clock_32 = 136;
+	si->ps.max_dac1_clock_32dh = 0;
+	/* see specs */
+	si->ps.max_dac2_clock = 0;
+	si->ps.max_dac2_clock_8 = 0;
+	si->ps.max_dac2_clock_16 = 0;
+	si->ps.max_dac2_clock_24 = 0;
+	si->ps.max_dac2_clock_32 = 0;
+	/* 'failsave' value */
+	si->ps.max_dac2_clock_32dh = 0;
+	si->ps.primary_dvi = false;
+	si->ps.secondary_dvi = false;
+	/*  presume 2Mb RAM mounted */
+	//fixme: see if we can get this from OPTION or so...
+	si->ps.memory_size = 2;
+	//fixme: should be overrule-able via mga.settings for MIL1.
+	//fail-safe mode for now:
+	si->ps.sdram = true;
+}
+
 void pinsmil2_fake(void)
 {
+	/* 'worst case' scenario defaults, overrule-able via mga.settings if needed */
+
+	si->ps.f_ref = 14.31818;
+	/* see MIL2 specs */
+	si->ps.max_system_vco = 220;
+	si->ps.min_system_vco = 110;
+	si->ps.max_pixel_vco = 220;
+	si->ps.min_pixel_vco = 110;
+	/* no specs, assuming these */
+	si->ps.max_video_vco = 0;
+	si->ps.min_video_vco = 0;
+	/* see MIL2 specs */
+	si->ps.max_dac1_clock = 220;
+	si->ps.max_dac1_clock_8 = 220;
+	si->ps.max_dac1_clock_16 = 200;
+	/* 'failsave' values */
+	si->ps.max_dac1_clock_24 = 180;
+	si->ps.max_dac1_clock_32 = 136;
+	si->ps.max_dac1_clock_32dh = 0;
+	/* see specs */
+	si->ps.max_dac2_clock = 0;
+	si->ps.max_dac2_clock_8 = 0;
+	si->ps.max_dac2_clock_16 = 0;
+	si->ps.max_dac2_clock_24 = 0;
+	si->ps.max_dac2_clock_32 = 0;
+	/* 'failsave' value */
+	si->ps.max_dac2_clock_32dh = 0;
+	si->ps.primary_dvi = false;
+	si->ps.secondary_dvi = false;
+	/*  presume 4Mb RAM mounted */
+	//fixme: see if we can get this from OPTION or so...
+	si->ps.memory_size = 4;
+	//fixme: should be overrule-able via mga.settings for MIL2.
+	//fail-safe mode for now:
+	si->ps.sdram = true;
 }
 
 void pinsg100_fake(void)
@@ -741,12 +844,12 @@ void pinsg450_fake(void)
 	si->ps.f_ref = 27.000;
 	/* see G450 pins readouts for max ranges, then use a bit smaller ones */
 	/* carefull not to take to high lower limits, and high should be >= 2x low. */
-	si->ps.max_system_vco = 600;
-	si->ps.min_system_vco = 256;
+	si->ps.max_system_vco = 640;
+	si->ps.min_system_vco = 320;
 	si->ps.max_pixel_vco = 640;
 	si->ps.min_pixel_vco = 320;
-	si->ps.max_video_vco = 600;
-	si->ps.min_video_vco = 256;
+	si->ps.max_video_vco = 640;
+	si->ps.min_video_vco = 320;
 	si->ps.max_dac1_clock = 360;
 	si->ps.max_dac1_clock_8 = 360;
 	si->ps.max_dac1_clock_16 = 360;
@@ -786,8 +889,8 @@ void pinsg550_fake(void)
 	si->ps.min_system_vco = 384;
 	si->ps.max_pixel_vco = 960;
 	si->ps.min_pixel_vco = 320;
-	si->ps.max_video_vco = 600;
-	si->ps.min_video_vco = 256;
+	si->ps.max_video_vco = 960;
+	si->ps.min_video_vco = 320;
 	si->ps.max_dac1_clock = 360;
 	si->ps.max_dac1_clock_8 = 360;
 	si->ps.max_dac1_clock_16 = 360;

@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002.
+	Rudolf Cornelissen 10/2002-3/2003.
 */
 
 #define MODULE_BIT 0x00800000
@@ -40,7 +40,8 @@ static status_t init_common(int the_fd) {
 			goto error0;
 	}
 	// LOG is now available, si !NULL
-	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d\n", si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios));
+	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, greensync %d\n",
+		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.greensync));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
@@ -151,8 +152,11 @@ status_t INIT_ACCELERANT(int the_fd) {
 	info in a frame_buffer_config structure to make it convienient to return
 	to the app_server later.
 	*/
-	//don't reserve memory at the start of the fb, because this doesn't work on the G100 (no SRCORG/DSTORG)
-	pointer_reservation = si->settings.hardcursor? 1024: 0; // apsed TODO with G100, see before
+	pointer_reservation = 0;
+	/* MIL 1/2 cards have a seperate buffer for the cursorbitmap inside the DAC */
+	if ((si->ps.card_type >= G100) && si->settings.hardcursor)
+		pointer_reservation = 1024;
+
 	si->fbc.frame_buffer = (void *)((char *)si->framebuffer+pointer_reservation);
 	si->fbc.frame_buffer_dma = (void *)((char *)si->framebuffer_pci+pointer_reservation);
 
@@ -260,6 +264,8 @@ status_t CLONE_ACCELERANT(void *data) {
 	if (result < B_OK) goto error2;
 
 	/* all done */
+	LOG(4,("CLONE_ACCELERANT: cloning was succesfull.\n"));
+
 	result = B_OK;
 	goto error0;
 
@@ -273,7 +279,13 @@ error0:
 	return result;
 }
 
-void UNINIT_ACCELERANT(void) {
+void UNINIT_ACCELERANT(void)
+{
+	if (accelerantIsClone)
+		LOG(4,("UNINIT_ACCELERANT: shutting down clone accelerant.\n"));
+	else
+		LOG(4,("UNINIT_ACCELERANT: shutting down primary accelerant.\n"));
+
 	/*delete benaphore*/
 	DELETE_BEN(si->engine.lock);
 	DELETE_BEN(si->overlay.lock);

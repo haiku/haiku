@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10-12/2002
+   Rudolf Cornelissen 10/2002-4/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -11,7 +11,7 @@
 //#include "mga_init.c" //Nicole's test stuff.
 
 status_t test_ram();
-static status_t mil2_general_powerup (void);
+static status_t mil_general_powerup (void);
 static status_t g100_general_powerup (void);
 static status_t g200_general_powerup (void);
 static status_t g400_general_powerup (void);
@@ -56,17 +56,23 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
+	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.14 running.\n"));
+
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
-	case 0x0519102b: //MGA-2064 Millenium PCI
 	case 0x051a102b: //MGA-1064 Mystic PCI
 		LOG(8,("POWERUP: Unimplemented Matrox device %08x\n",CFGR(DEVID)));
 		return B_ERROR;
+	case 0x0519102b: //MGA-2064 Millenium PCI
+		si->ps.card_type = MIL1;
+		LOG(4,("POWERUP: Detected MGA-2064 Millennium 1\n"));
+		status = mil_general_powerup();
+		break;
 	case 0x051b102b:case 0x051f102b: //MGA-2164 Millenium 2 PCI/AGP
 		si->ps.card_type = MIL2;
 		LOG(4,("POWERUP: Detected MGA-2164 Millennium 2\n"));
-		status = mil2_general_powerup();
+		status = mil_general_powerup();
 		break;
 	case 0x1000102b:case 0x1001102b: //G100
 		si->ps.card_type = G100;
@@ -201,7 +207,7 @@ status_t mga_set_cas_latency()
 			break;
 	case G450:
 	case G550:
-			/* G450 and G550 tune CAS latency via a predefined table at powerup time */			
+			/* fixme: implement this if needed */
 			LOG(4,("INIT: G450/G550 RAM CAS tuning not implemented, aborting.\n"));
 			return B_OK;
 			break;
@@ -220,11 +226,11 @@ status_t mga_set_cas_latency()
 }
 
 static 
-status_t mil2_general_powerup()
+status_t mil_general_powerup()
 {
 	status_t result;
 
-	LOG(4, ("INIT: Millenium II powerup\n"));
+	LOG(4, ("INIT: Millenium I/II powerup\n"));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
 	
 	/* initialize the shared_info PINS struct */
@@ -235,15 +241,9 @@ status_t mil2_general_powerup()
 	dump_pins();
 
 //remove this:
-	// various sensible defaults for MIL2
-	si->ps.sdram = true;
-	si->ps.memory_size = 2; //can override
-	si->ps.memory_size = 4; //can override my mil2
-
-	// apsed TODO MIL2 TVP 3026 may be 135, 175, 220 or 250MHz 
-	// chip on my Millenium2 is TVP3026-250CPCE, 250MHz
-	// rudolf: works in Mhz now
-	si->ps.max_dac1_clock=250; // TVP3026 
+	fake_pins();
+	LOG(2, ("INIT: Using faked PINS for now:\n"));
+	dump_pins();
 //end remove this.
 
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
@@ -254,20 +254,20 @@ status_t mil2_general_powerup()
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 	mil2_dac_init();
 
-//rudolf: sync on green test:
-	/* disable 15bit mode CLUT-overlay function */
-	//enable 'sync on green' option
-//	DXIW(GENCTRL, DXIR(GENCTRL | 0x20));
-	/* enable composite sync instead of Hsync only */
-//	VGAW_I(CRTCEXT,3,(VGAR_I(CRTCEXT,3) | 0x40));      
-//end sync on green test.
+//ok:
+	/* disable overscan, select 0 IRE, select straight-through sync signals from CRTC */
+	DXIW (GENCTRL, (DXIR (GENCTRL) & 0x0c));
+	/* fixme: checkout if we need this sync inverting stuff: already done via CRTC!?!	
+		| (vsync_pos?  0x00:0x02) 
+		| (hsync_pos?  0x00:0x01)); */
+
+	/* 8-bit DAC, enable DAC */
+	DXIW(MISCCTRL, 0x0c);
+//
 
 	VGAW_I(SEQ,1,0x00);
 	/*enable screen*/
-return B_OK;
 
-	// apsed TODO MIL2 taken from G100, avoid DXIR/W DACR/W 
-	//rudolf: G100 version that was here nolonger exists, look at new implementation...
 	return B_OK;
 }
 
@@ -309,7 +309,6 @@ status_t g100_general_powerup()
 	/* disable pixelclock oscillations before switching on CLUT */
 	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
 	/* disable 15bit mode CLUT-overlay function */
-	//fixme: setup b5 later for 'sync on green' option
 	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
 	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
 	DXIW(MISCCTRL,0x1b);
@@ -349,12 +348,12 @@ status_t g100_general_powerup()
 	/* wait 200uS minimum */
 	snooze(250);
 
-	/* reset memory */
+	/* reset memory (MACCESS is a write only register!) */
 	ACCW(MACCESS, 0x00000000);
 	/* select JEDEC reset method */
-	ACCW(MACCESS,ACCR(MACCESS)|0x4000);
+	ACCW(MACCESS, 0x00004000);
 	/* perform actual RAM reset */
-	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
+	ACCW(MACCESS, 0x0000c000);
 	snooze(250);
 	/* start memory refresh */
 	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
@@ -412,7 +411,6 @@ status_t g200_general_powerup()
 	/* disable pixelclock oscillations before switching on CLUT */
 	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
 	/* disable 15bit mode CLUT-overlay function */
-	//fixme: setup b5 later for 'sync on green' option
 	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
 	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
 	DXIW(MISCCTRL,0x1b);
@@ -452,10 +450,10 @@ status_t g200_general_powerup()
 	/* wait 200uS minimum */
 	snooze(250);
 
-	/* reset memory */
+	/* reset memory (MACCESS is a write only register!) */
 	ACCW(MACCESS, 0x00000000);
 	/* perform actual RAM reset */
-	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
+	ACCW(MACCESS, 0x00008000);
 	snooze(250);
 	/* start memory refresh */
 	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
@@ -512,7 +510,6 @@ status_t g400_general_powerup()
 	/* disable pixelclock oscillations before switching on CLUT */
 	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
 	/* disable 15bit mode CLUT-overlay function */
-	//fixme: setup b5 later for 'sync on green' option
 	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
 	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
 	DXIW(MISCCTRL,0x9b);
@@ -553,10 +550,10 @@ status_t g400_general_powerup()
 	/* wait 200uS minimum */
 	snooze(250);
 
-	/* reset memory */
+	/* reset memory (MACCESS is a write only register!) */
 	ACCW(MACCESS, 0x00000000);
 	/* perform actual RAM reset */
-	ACCW(MACCESS,ACCR(MACCESS)|0x8000);
+	ACCW(MACCESS, 0x00008000);
 	snooze(250);
 	/* start memory refresh */
 	CFGW(OPTION,(CFGR(OPTION)&0xffe07fff) | (si->ps.option_reg & 0x001f8000));
@@ -584,9 +581,11 @@ status_t g400_general_powerup()
 static 
 status_t g450_general_powerup()
 {
-	//fixme: check if g450 and g550 powerup should be the same! (DAC outputconnector?)
 	status_t result;
 	uint32 pwr_cas[] = {0, 1, 5, 6, 7, 5, 2, 3};
+
+	/* used for convenience: MACCESS is a write only register! */
+	uint32 maccess = 0x00000000;
 
 	LOG(4, ("INIT: G450/G550 powerup\n"));
 	if (si->settings.logmask & 0x80000000) mga_dump_configuration_space();
@@ -607,8 +606,7 @@ status_t g450_general_powerup()
 	DXIW(OUTPUTCONN,0x00); 
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	gx00_crtc_dpms(0,0,0);
-	//fixme:
-	//g400_crtc2_dpms(0,0,0);
+	g400_crtc2_dpms(0,0,0);
 	gx00_crtc_cursor_hide();
 
 	/* power up everything except DVI electronics (for now) */
@@ -625,7 +623,6 @@ status_t g450_general_powerup()
 	/* disable pixelclock oscillations before switching on CLUT */
 	DXIW(PIXCLKCTRL, (DXIR(PIXCLKCTRL) | 0x04));
 	/* disable 15bit mode CLUT-overlay function */
-	//fixme: setup b5 later for 'sync on green' option
 	DXIW(GENCTRL, DXIR(GENCTRL & 0xfd));
 	/* CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC */
 	DXIW(MISCCTRL,0x9b);
@@ -663,7 +660,8 @@ status_t g450_general_powerup()
 	/* set RAM read tap delays and mode register opcode / streamer flow control */
 	ACCW(MEMRDBK, si->ps.memrdbk_reg);
 	/* b7 v5_mem_type = done by Mark Watson. fixme: still confirm! (unknown bits) */
-	ACCW(MACCESS, ((((uint32)si->ps.v5_mem_type) & 0x80) >> 1));
+	maccess = ((((uint32)si->ps.v5_mem_type) & 0x80) >> 1);
+	ACCW(MACCESS, maccess);
 	/* clear b0-1 and 3, and set b31 in option4: re-enable memory clock */
 	CFGW(OPTION4, ((si->ps.option4_reg & 0x60000004) | 0x80000000));
 	snooze(250);
@@ -675,7 +673,8 @@ status_t g450_general_powerup()
 		if (!(si->ps.v5_mem_type & 0x0100))
 		{
 			/* clear unknown bits */
-			ACCW(MACCESS, 0x00000000);
+			maccess = 0x00000000;
+			ACCW(MACCESS, maccess);
 			/* clear b12: unknown bit */
 			ACCW(MEMRDBK, (si->ps.memrdbk_reg & 0xffffefff));
 		}
@@ -689,8 +688,8 @@ status_t g450_general_powerup()
 	}
 
 	/* create positive flank to generate memory reset */
-	ACCW(MACCESS,ACCR(MACCESS) & 0xffff7fff);
-	ACCW(MACCESS,ACCR(MACCESS) | 0x00008000);
+	ACCW(MACCESS, (maccess & 0xffff7fff));
+	ACCW(MACCESS, (maccess | 0x00008000));
 	snooze(250);
 
 	/* start memory refresh */
@@ -723,6 +722,9 @@ status_t g450_general_powerup()
 
 	/*turn on display one*/
 	gx00_crtc_dpms(1,1,1);
+
+	/* enable 'straight-through' sync outputs on both analog output connectors */
+	DXIW(SYNCCTRL,0x00); 
 
 	return B_OK;
 }
@@ -763,27 +765,62 @@ status_t gx00_general_dac_select(int dac)
 	/*MISCCTRL, clock src,...*/
 	switch(dac)
 	{
+		/* G400 */
 		case DS_CRTC1DAC_CRTC2MAVEN:
-			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
-			CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002); /*external clk*/
-			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77)); 
+			/* connect CRTC1 to pixPLL */
+			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
+			/* connect CRTC2 to vidPLL, connect CRTC1 to internal DAC and
+			 * enable CRTC2 external video timing reset signal.
+			 * (Setting for MAVEN 'master mode' TVout signal generation.) */
+			CR2W(CTL,(CR2R(CTL)&0xffe00779)|0xD0000002);
+			/* disable CRTC1 external video timing reset signal */
+			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0x77));
+			/* select CRTC2 RGB24 MAFC mode: connects CRTC2 to MAVEN DAC */ 
 			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x82);
 			break;
 		case DS_CRTC1MAVEN_CRTC2DAC:
-			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x2); /*external clk*/
-			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20)); /*internal clk*/
+			/* connect CRTC1 to vidPLL */
+			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x2);
+			/* connect CRTC2 to pixPLL and internal DAC and
+			 * disable CRTC2 external video timing reset signal */
+			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20));
+			/* enable CRTC1 external video timing reset signal.
+			 * note: this is nolonger used as G450/G550 cannot do TVout on CRTC1 */
 			VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)|0x88));
+			/* select CRTC1 RGB24 MAFC mode: connects CRTC1 to MAVEN DAC */
 			DXIW(MISCCTRL,(DXIR(MISCCTRL)&0x19)|0x02);
 			break;
+		/* G450/G550 */
 		case DS_CRTC1CON1_CRTC2CON2:
-			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
-			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x0<<20)); /*internal clk - no DAC PTR*/
+			/* connect CRTC1 to pixPLL */
+			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
+			/* connect CRTC2 to vidPLL, connect CRTC1 to DAC1, disable CRTC2
+			 * external video timing reset signal, set CRTC2 progressive scan mode
+			 * and disable TVout mode (b12).
+			 * (Setting for MAVEN 'slave mode' TVout signal generation.) */
+			//fixme: enable timing resets if TVout is used in master mode!
+			//otherwise keep it disabled.
+			CR2W(CTL,(CR2R(CTL)&0x2de00779)|0x6|(0x0<<20));
+			/* connect DAC1 to CON1, CRTC2/'DAC2' to CON2 (monitor mode) */
 			DXIW(OUTPUTCONN,0x09); 
+			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
+			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
+			DXIW(GENIODATA, 0x00);
 			break;
+		//fixme: toggle PLL's below if possible: 
+		//       otherwise toggle PLL's for G400 2nd case?
 		case DS_CRTC1CON2_CRTC2CON1:
-			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1); /*internal clk*/
-			CR2W(CTL,(CR2R(CTL)&0x2fe00779)|0x4|(0x1<<20)); /*internal clk - gets DAC*/
+			/* connect CRTC1 to pixPLL */
+			DXIW(PIXCLKCTRL,(DXIR(PIXCLKCTRL)&0xc)|0x1);
+			/* connect CRTC2 to vidPLL and DAC1, disable CRTC2 external
+			 * video timing reset signal, and set CRTC2 progressive scan mode and
+			 * disable TVout mode (b12). */
+			CR2W(CTL,(CR2R(CTL)&0x2de00779)|0x6|(0x1<<20));
+			/* connect DAC1 to CON2 (monitor mode), CRTC2/'DAC2' to CON1 */
 			DXIW(OUTPUTCONN,0x05); 
+			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
+			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
+			DXIW(GENIODATA, 0x00);
 			break;
 		default:
 			return B_ERROR;
@@ -817,18 +854,229 @@ status_t gx00_general_bios_to_powergraphics()
 	VGAW(MISCW,0x08);
 	/*set only MGA pixel clock in MISC - I don't want to map VGA stuff under this OS*/
 
-	if (si->ps.card_type >= G100) {
+	switch (si->ps.card_type)
+	{
+		case G400:
+		case G400MAX:
+			/* makes CRTC2 stable! Matrox specify 8, but use 4 - grrrr! */
+			DXIW(MAFCDEL,0x02);
+			break;
+		case G450:
+		case G550:
+			/* power up everything except DVI electronics (for now) */
+			DXIW(PWRCTRL,0x1b); 
+			/* enable 'straight-through' sync outputs on both analog output connectors */
+			DXIW(SYNCCTRL,0x00); 
+			break;
+		default:
+			break;
+	}
+
+	if (si->ps.card_type >= G100)
+	{
 		DXIW(MISCCTRL,0x9b);
 		/*CRTC2->MAFC, 8-bit DAC, CLUT enabled, enable DAC*/
 
 		DXIW(MULCTRL,0x4);
 		/*RGBA direct mode*/
-	} else { 
+	}
+	else
+	{ 
 		LOG(8, ("INIT: < G100 DAC powerup badly implemented, MISC 0x%02x\n", VGAR(MISCR)));
 	} // apsed TODO MIL2
 
 	VGAW_I(SEQ,1,0x00);
 	/*enable screen*/
+
+	return B_OK;
+}
+
+/* Check if mode virtual_size adheres to the cards _maximum_ contraints, and modify
+ * virtual_size to the nearest valid maximum for the mode on the card if not so.
+ * Then: check if virtual_width adheres to the cards _multiple_ constraints, and
+ * create mode slopspace if not so.
+ * We use acc multiple constraints here if we expect we can use acceleration, because
+ * acc constraints are worse than CRTC constraints.
+ *
+ * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
+//fixme: seperate heads for real dualhead modes:
+//CRTC1 and 2 constraints differ!
+status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row)
+{
+	/* Note:
+	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
+	 * or 'equals' the acceleration engine memory pitch granularity! */
+
+	uint32 video_pitch;
+	uint32 acc_mask, crtc_mask;
+	uint8 depth = 8;
+
+	/* determine pixel multiple based on 2D/3D engine constraints */
+	switch (si->ps.card_type)
+	{
+	case MIL1:
+	case MIL2:
+		/* see MIL1/2 specs:
+		 * these cards always use a 64bit RAMDAC (TVP3026) and interleaved memory */
+		switch (target->space)
+		{
+			case B_CMAP8: acc_mask = 0x7f; depth =  8; break;
+			case B_RGB15: acc_mask = 0x3f; depth = 16; break;
+			case B_RGB16: acc_mask = 0x3f; depth = 16; break;
+			case B_RGB24: acc_mask = 0x7f; depth = 24; break;
+			case B_RGB32: acc_mask = 0x1f; depth = 32; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
+	default:
+		/* see G100 and up specs:
+		 * these cards can do 2D as long as multiples of 32 are used.
+		 * (Note: don't mix this up with adress linearisation!) */
+		switch (target->space)
+		{
+			case B_CMAP8: depth =  8; break;
+			case B_RGB15: depth = 16; break;
+			case B_RGB16: depth = 16; break;
+			case B_RGB24: depth = 24; break;
+			case B_RGB32: depth = 32; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		acc_mask = 0x1f;
+		break;
+	}
+
+	/* determine pixel multiple based on CRTC memory pitch constraints.
+	 * (Note: Don't mix this up with CRTC timing contraints! Those are
+	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
+	switch (si->ps.card_type)
+	{
+	case MIL1:
+	case MIL2:
+		/* see MIL1/2 specs:
+		 * these cards always use a 64bit RAMDAC and interleaved memory */
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x7f; break;
+			case B_RGB15: crtc_mask = 0x3f; break;
+			case B_RGB16: crtc_mask = 0x3f; break;
+			/* for B_RGB24 crtc_mask 0x7f is worst case scenario (MIL2 constraint) */
+			case B_RGB24: crtc_mask = 0x7f; break; 
+			case B_RGB32: crtc_mask = 0x1f; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		break;
+	default:
+		/* see G100 and up specs */
+		switch (target->space)
+		{
+			case B_CMAP8: crtc_mask = 0x0f; break;
+			case B_RGB15: crtc_mask = 0x07; break;
+			case B_RGB16: crtc_mask = 0x07; break;
+			case B_RGB24: crtc_mask = 0x0f; break; 
+			case B_RGB32: crtc_mask = 0x03; break;
+			default:
+				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+				return B_ERROR;
+		}
+		/* see G400 specs: CRTC2 has different constraints */
+		/* Note:
+		 * set for RGB and B_YCbCr422 modes. Other modes need larger multiples! */
+		if (target->flags & DUALHEAD_BITS)
+		{
+			switch (target->space)
+			{
+				case B_RGB16: crtc_mask = 0x1f; break;
+				case B_RGB32: crtc_mask = 0x0f; break;
+				default:
+					LOG(8,("INIT: illegal DH color space: 0x%08x\n", target->space));
+					return B_ERROR;
+			}
+		}
+		break;
+	}
+
+	/* check if we can setup this mode with acceleration:
+	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
+	si->acc_mode = true;
+	/* check virtual_width */
+	switch (si->ps.card_type)
+	{
+	case MIL1:
+	case MIL2:
+	case G100:
+		/* acc constraint: */
+		if (target->virtual_width > 2048) si->acc_mode = false;
+		break;
+	default:
+		/* G200-G550 */
+		/* acc constraint: */
+		if (target->virtual_width > 4096) si->acc_mode = false;
+		/* for 32bit mode a lower CRTC1 restriction applies! */
+		if ((target->space == B_RGB32_LITTLE) && (target->virtual_width > (4092 & ~acc_mask)))
+			si->acc_mode = false;
+		break;
+	}
+	/* virtual_height */
+	if (target->virtual_height > 2048) si->acc_mode = false;
+
+	/* now check virtual_size based on CRTC constraints,
+	 * making sure virtual_width stays within the 'mask' constraint: which is only
+	 * nessesary because of an extra constraint in MIL1/2 cards that exists here. */
+	{
+		/* virtual_width */
+		//fixme for CRTC2 (identical on all G400+ cards):
+		//16bit mode: max. virtual_width == 16352 (no extra mask needed);
+		//32bit mode: max. virtual_width == 8176 (no extra mask needed);
+		//other colordepths are unsupported on CRTC2.
+		switch(target->space)
+		{
+		case B_CMAP8:
+			if (target->virtual_width > (16368 & ~crtc_mask))
+				target->virtual_width = (16368 & ~crtc_mask);
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			if (target->virtual_width > (8184 & ~crtc_mask))
+				target->virtual_width = (8184 & ~crtc_mask);
+			break;
+		case B_RGB24_LITTLE:
+			if (target->virtual_width > (5456 & ~crtc_mask))
+				target->virtual_width = (5456 & ~crtc_mask);
+			break;
+		case B_RGB32_LITTLE:
+			if (target->virtual_width > (4092 & ~crtc_mask))
+				target->virtual_width = (4092 & ~crtc_mask);
+			break;
+		}
+
+		/* virtual_height: The only constraint here is the cards memory size which is
+		 * checked later on in ProposeMode: virtual_height is adjusted then if needed.
+		 * 'Limiting here' to the variable size that's at least available (uint16). */
+		if (target->virtual_height > 65535) target->virtual_height = 65535;
+	}
+
+	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
+	 * it was confined above, so we can finally calculate safely if we need slopspace
+	 * for this mode... */
+	if (si->acc_mode)
+		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
+	else
+		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);
+
+	LOG(2,("INIT: memory pitch will be set to %d pixels for colorspace 0x%08x\n",
+														video_pitch, target->space)); 
+	if (target->virtual_width != video_pitch)
+		LOG(2,("INIT: effective mode slopspace is %d pixels\n", 
+											(video_pitch - target->virtual_width)));
+
+	/* now calculate bytes_per_row for this mode */
+	*bytes_per_row = video_pitch * (depth >> 3);
 
 	return B_OK;
 }

@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002.
+	Rudolf Cornelissen 10/2002-4/2003.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -87,6 +87,7 @@ typedef struct settings {  // apsed, see comments in mga.settings
 	uint32 memory;
 	bool   usebios;
 	bool   hardcursor;
+	bool   greensync;
 } settings;
 
 /*shared info*/
@@ -136,28 +137,33 @@ typedef struct {
 		uint16	width;		/* Width and height of the cursor shape (always 16!) */
 		uint16	height;
 		bool	is_visible;	/* Is the cursor currently displayed? */
-	}cursor;
+	} cursor;
 
   /*colour lookup table*/
 	uint8	color_data[3 * 256];	/* Colour lookup table - as used by DAC */
 
   /*more display mode stuff*/
-	display_mode dm;		/* current display mode configuration */
+	display_mode dm;		/* current display mode configuration: head1 */
+	display_mode dm2;		/* current display mode configuration: head2 */
+	bool switched_crtcs;	/* dualhead stretch and switch mode info */
+	bool acc_mode;			/* signals (non)accelerated mode */
+	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 
   /*frame buffer config - for BDirectScreen*/
-	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer */
+	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */
+	frame_buffer_config fbc2;	/* bytes_per_row and start of frame buffer: head2 */
 
   /*acceleration engine*/
 	struct {
 		uint32		count;		/* last dwgsync slot used */
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
-	}		engine;
+	} engine;
 
   /* card info - information gathered from PINS (and other sources) */
 	enum
 	{	// card_type in order of date of MGA chip design
-		MILL=0,
+		MIL1 = 0,
 		MYST,
 		MIL2,
 		G100,

@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05/10-2002 */
+/* Written by Rudolf Cornelissen 05-2002/03-2003 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -106,6 +106,9 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					/* check if slopspace is needed: compatible settings choosen for now:
 					 * G200 can do with ~0x0003 while > G200 need ~x0007.
 					 * Optimized settings for G200 could reduce CPU load a tiny little bit there... */
+					/* fixme: update needed for DVDmax support to adhere to CRTC2 constraints:
+					 * case display_mode == B_RGB16: multiple = 32
+					 * case display_mode == B_RGB32: multiple = 16 */
 					if (width == (width & ~0x0007))
 					{
 						si->overlay.myBuffer[offset].width = width;

@@ -27,7 +27,7 @@
 #define MGACFG_AGP_STS      0xf4 // >= MIL2
 #define MGACFG_AGP_CMD      0xf8 // >= MIL2
 
-/*VGA registers - these are byte wide*/
+/* VGA registers - these are byte wide */
 #define MGAVGA_ATTR_I       0x1FC0 // apsed as SEQ
 #define MGAVGA_ATTR_D       0x1FC1 // apsed as SEQ
 #define MGAVGA_MISCW        0x1FC2
@@ -45,7 +45,38 @@
 #define MGAVGA_CRTCEXT_I    0x1FDE
 #define MGAVGA_CRTCEXT_D    0x1FDF
 
-/*DAC registers (>= g100) */
+/* TVP3026 'non-std' DAC registers (>= MIL1) */
+#define MGADAC_TVP_CUROVRWTADD  0x3c04
+#define MGADAC_TVP_CUROVRDATA   0x3c05
+#define MGADAC_TVP_CUROVRRDADD  0x3c07
+#define MGADAC_TVP_DIRCURCTRL   0x3c09
+#define MGADAC_TVP_CURRAMDATA   0x3c0b
+
+/* TVP3026 'non'std' (D)AC (X) (I)ndexed registers (>= MIL1) */
+#define MGADXI_TVP_SILICONREV      0x01
+#define MGADXI_TVP_LATCHCTRL       0x0f
+#define MGADXI_TVP_TCOLCTRL        0x18
+#define MGADXI_TVP_CLOCKSEL        0x1a
+#define MGADXI_TVP_PALPAGE         0x1c
+#define MGADXI_TVP_PLLADDR         0x2c
+#define MGADXI_TVP_PIXPLLDATA      0x2d
+#define MGADXI_TVP_MEMPLLDATA      0x2e
+#define MGADXI_TVP_LOOPLLDATA      0x2f
+#define MGADXI_TVP_COLKEYOL        0x30
+#define MGADXI_TVP_COLKEYOH        0x31
+#define MGADXI_TVP_COLKEYRL        0x32
+#define MGADXI_TVP_COLKEYRH        0x33
+#define MGADXI_TVP_COLKEYGL        0x34
+#define MGADXI_TVP_COLKEYGH        0x35
+#define MGADXI_TVP_COLKEYBL        0x36
+#define MGADXI_TVP_COLKEYBH        0x37
+#define MGADXI_TVP_COLKEYCTRL      0x38
+#define MGADXI_TVP_MEMCLKCTRL      0x39
+#define MGADXI_TVP_TESTMODEDATA    0x3b
+#define MGADXI_TVP_ID              0x3f
+#define MGADXI_TVP_RESET           0xff
+
+/* DAC registers (>= G100) */
 #define MGADAC_PALWTADD     0x3C00
 #define MGADAC_PALDATA      0x3C01
 #define MGADAC_PIXRDMSK     0x3C02
@@ -56,7 +87,7 @@
 #define MGADAC_CURSPOSYL    0x3C0E
 #define MGADAC_CURSPOSYH    0x3C0F
 
-/*(D)AC (X) (I)ndexed registers (>= g100) */
+/* (D)AC (X) (I)ndexed registers (>= G100) */
 #define MGADXI_CURADDL         0x04
 #define MGADXI_CURADDH         0x05
 #define MGADXI_CURCTRL         0x06
@@ -101,7 +132,7 @@
 #define MGADXI_PIXPLLSTAT      0x4F
 #define MGADXI_CURCOLEXT       0x60   /*sequential from CURCOL3->15, RGB*/
 
-/*(D)AC (X) (I)ndexed registers (>= g200) */
+/* (D)AC (X) (I)ndexed registers (>= G200) */
 #define	MGADXI_KEYOPMODE	   0x51
 #define	MGADXI_COLMSK0RED 	   0x52
 #define	MGADXI_COLMSK0GREEN    0x53
@@ -110,7 +141,7 @@
 #define	MGADXI_COLKEY0GREEN    0x56
 #define	MGADXI_COLKEY0BLUE 	   0x57
 
-/*(D)AC (X) (I)ndexed registers (>= g450?) */
+/* (D)AC (X) (I)ndexed registers (>= G450) */
 #define MGADXI_TVO_IDX         0x87
 #define MGADXI_TVO_DATA        0x88
 #define MGADXI_OUTPUTCONN      0x8A
@@ -122,11 +153,10 @@
 #define MGADXI_PWRCTRL         0xA0
 #define MGADXI_PANMODE         0xA2
 
-/*MGA 1st CRTC registers */
+/* MGA 1st CRTC registers */
 #define MGACR1_VCOUNT        0x1E20
-//end rudolf.
 
-/*MGA 2nd CRTC registers >= ?? TODO */
+/* MGA 2nd CRTC registers (>= G400) */
 #define MGACR2_CTL           0x3C10
 #define MGACR2_HPARAM        0x3C14
 #define MGACR2_HSYNC         0x3C18
@@ -134,12 +164,13 @@
 #define MGACR2_VSYNC         0x3C20
 #define MGACR2_PRELOAD       0x3C24
 #define MGACR2_STARTADD0     0x3C28
+#define MGACR2_STARTADD1     0x3C2C
 #define MGACR2_OFFSET        0x3C40
 #define MGACR2_MISC          0x3C44
 #define MGACR2_VCOUNT        0x3C48
 #define MGACR2_DATACTL       0x3C4C
 
-/*MGA ACCeleration registers*/
+/* MGA ACCeleration registers */
 #define MGAACC_DWGCTL          0x1C00
 #define MGAACC_MACCESS         0x1C04
 #define MGAACC_MCTLWTST        0x1C08
@@ -183,7 +214,7 @@
 #define MGAACC_SRCORG          0x2CB4 // >= G200
 #define MGAACC_DSTORG          0x2CB8 // >= G200
 
-/*MGA BES (Back End Scaler) registers >= TODO */
+/*MGA BES (Back End Scaler) registers (>= G200) */
 #define MGABES_A1ORG           0x3D00
 #define MGABES_A2ORG           0x3D04
 #define MGABES_B1ORG           0x3D08
@@ -213,15 +244,34 @@
 #define MGABES_GLOBCTL         0x3DC0
 #define MGABES_STATUS          0x3DC4
 
-/*MAVEN registers >= TODO */
+/*MAVEN registers (<= G400) */
+#define MGAMAV_PGM            0x3E
 #define MGAMAV_PIXPLLM        0x80
 #define MGAMAV_PIXPLLN        0x81
 #define MGAMAV_PIXPLLP        0x82
+#define MGAMAV_GAMMA1         0x83
+#define MGAMAV_GAMMA2         0x84
+#define MGAMAV_GAMMA3         0x85
+#define MGAMAV_GAMMA4         0x86
+#define MGAMAV_GAMMA5         0x87
+#define MGAMAV_GAMMA6         0x88
+#define MGAMAV_GAMMA7         0x89
+#define MGAMAV_GAMMA8         0x8A
+#define MGAMAV_GAMMA9         0x8B
 #define MGAMAV_MONSET         0x8C
 #define MGAMAV_TEST           0x8D
+#define MGAMAV_WREG_0X8E_L    0x8E
+#define MGAMAV_WREG_0X8E_H    0x8F
+#define MGAMAV_HSCALETV       0x90
+#define MGAMAV_TSCALETVL      0x91
+#define MGAMAV_TSCALETVH      0x92
+#define MGAMAV_FFILTER        0x93
 #define MGAMAV_MONEN          0x94
+#define MGAMAV_RESYNC         0x95
 #define MGAMAV_LASTLINEL      0x96
 #define MGAMAV_LASTLINEH      0x97
+#define MGAMAV_WREG_0X98_L    0x98
+#define MGAMAV_WREG_0X98_H    0x99
 #define MGAMAV_HSYNCLENL      0x9A
 #define MGAMAV_HSYNCLENH      0x9B
 #define MGAMAV_HSYNCSTRL      0x9C
@@ -242,56 +292,60 @@
 #define MGAMAV_HVIDRSTH       0xAB
 #define MGAMAV_VVIDRSTL       0xAC
 #define MGAMAV_VVIDRSTH       0xAD
+#define MGAMAV_VSOMETHINGL    0xAE
+#define MGAMAV_VSOMETHINGH    0xAF
 #define MGAMAV_OUTMODE        0xB0
 #define MGAMAV_LOCK           0xB3
 #define MGAMAV_LUMA           0xB9
+#define MGAMAV_VDISPLAYTV     0xBE
 #define MGAMAV_STABLE         0xBF
+#define MGAMAV_HDISPLAYTV     0xC2
+#define MGAMAV_BREG_0XC6      0xC6
 
-/*Macros for convenient accesses to the G400*/
+/* Macros for convenient accesses to the MGA chips */
 
 #define MGA_REG8(r_)  ((vuint8  *)regs)[(r_)]
 #define MGA_REG32(r_) ((vuint32 *)regs)[(r_) >> 2]
 
-/*read and write to PCI config space*/
+/* read and write to PCI config space */
 #define CFGR(A)   (gx00_pci_access.offset=MGACFG_##A, ioctl(fd,GX00_GET_PCI, &gx00_pci_access,sizeof(gx00_pci_access)), gx00_pci_access.value)
 #define CFGW(A,B) (gx00_pci_access.offset=MGACFG_##A, gx00_pci_access.value = B, ioctl(fd,GX00_SET_PCI,&gx00_pci_access,sizeof(gx00_pci_access)))
 
-/*read and write from the dac registers*/
+/* read and write from the dac registers */
 #define DACR(A)   (MGA_REG8(MGADAC_##A))
 #define DACW(A,B) (MGA_REG8(MGADAC_##A)=B)
 
-/*read and write from the dac index register*/
+/* read and write from the dac index register */
 #define DXIR(A)   (DACW(PALWTADD,MGADXI_##A),DACR(X_DATAREG))
 #define DXIW(A,B) (DACW(PALWTADD,MGADXI_##A),DACW(X_DATAREG,B))
 
-/*read and write from the vga registers*/
+/* read and write from the vga registers */
 #define VGAR(A)   (MGA_REG8(MGAVGA_##A))
 #define VGAW(A,B) (MGA_REG8(MGAVGA_##A)=B)
 
-/*read and write from the indexed vga registers*/
+/* read and write from the indexed vga registers */
 #define VGAR_I(A,B)   (VGAW(A##_I,B),VGAR(A##_D))
 #define VGAW_I(A,B,C) (VGAW(A##_I,B),VGAW(A##_D,C))
 
-/*read and write from the powergraphics registers*/
+/* read and write from the powergraphics registers */
 #define ACCR(A)    (MGA_REG32(MGAACC_##A))
 #define ACCW(A,B)  (MGA_REG32(MGAACC_##A)=B)
 #define ACCGO(A,B) (MGA_REG32(MGAACC_##A + 0x0100)=B)
 
-/*read and write from the backend scaler registers*/
+/* read and write from the backend scaler registers */
 #define BESR(A)   (MGA_REG32(MGABES_##A))
 #define BESW(A,B) (MGA_REG32(MGABES_##A)=B)
 
-/*read and write from first CRTC*/
+/* read and write from first CRTC */
 #define CR1R(A)   (MGA_REG32(MGACR1_##A))
 #define CR1W(A,B) (MGA_REG32(MGACR1_##A)=B)
 
-/*read and write from second CRTC*/
+/* read and write from second CRTC */
 #define CR2R(A)   (MGA_REG32(MGACR2_##A))
 #define CR2W(A,B) (MGA_REG32(MGACR2_##A)=B)
 
-/*read and write from maven*/
+/* read and write from maven (<= G400) */
 #define MAVR(A)     (i2c_maven_read (MGAMAV_##A ))
 #define MAVW(A,B)   (i2c_maven_write(MGAMAV_##A ,B))
 #define MAVRW(A)    (i2c_maven_read (MGAMAV_##A )|(i2c_maven_read(MGAMAV_##A +1)<<8))
 #define MAVWW(A,B)  (i2c_maven_write(MGAMAV_##A ,B &0xFF),i2c_maven_write(MGAMAV_##A +1,B >>8))
-#define MAVWWP(A,B) (i2c_maven_write(A ,B &0xFF),i2c_maven_write(A +1,B >>8))

@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 11-12/2002
+   Rudolf Cornelissen 11/2002-4/2003
 */
 
 #define MODULE_BIT 0x00040000
@@ -196,6 +196,30 @@ status_t gx00_crtc_depth(int mode)
 		viddelay = 2<<3; // for 8 to 16Mb of memory
 	} while (0);
 
+	/* setup green_sync if requested */
+	if (si->settings.greensync)
+	{
+		/* enable sync_on_green: ctrl bit polarity was reversed for Gxxx cards! */
+		if (si->ps.card_type <= MIL2)
+			DXIW(GENCTRL, (DXIR(GENCTRL) | 0x20));
+		else
+			DXIW(GENCTRL, (DXIR(GENCTRL) & ~0x20));
+		/* select horizontal _and_ vertical sync */
+		viddelay |= 0x40;
+
+		LOG(4,("CRTC: sync_on_green enabled\n"));
+	}
+	else
+	{
+		/* disable sync_on_green: ctrl bit polarity was reversed for Gxxx cards! */
+		if (si->ps.card_type <= MIL2)
+			DXIW(GENCTRL, (DXIR(GENCTRL) & ~0x20));
+		else
+			DXIW(GENCTRL, (DXIR(GENCTRL) | 0x20));
+
+		LOG(4,("CRTC: sync_on_green disabled\n"));
+	}
+
 	/*set VCLK scaling*/
 	switch(mode)
 	{
@@ -238,16 +262,17 @@ status_t gx00_crtc_dpms_fetch(uint8 * display,uint8 * h,uint8 * v) // MIL2
 	return B_OK;
 }
 
-status_t gx00_crtc_set_display_pitch(uint32 pitch,uint8 bpp) 
+status_t gx00_crtc_set_display_pitch() 
 {
 	uint32 offset;
 
 	LOG(4,("CRTC: setting card pitch (offset between lines)\n"));
 
-	/*figure out offset value hardware needs*/
-	offset = (pitch*bpp)/128;
+	/* figure out offset value hardware needs:
+	 * same for MIL1-G550 cards assuming MIL1/2 uses the TVP3026 64-bits DAC etc. */
+	offset = si->fbc.bytes_per_row / 16;
 
-	LOG(2,("CRTC: offset: 0x%04x\n",offset));
+	LOG(2,("CRTC: offset register: 0x%04x\n",offset));
 		
 	/*program the card!*/
 	VGAW_I(CRTC,0x13,(offset&0xFF));
@@ -267,6 +292,20 @@ status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC: startadd: %x\n",startadd));
 	LOG(2,("CRTC: frameRAM: %x\n",si->framebuffer));
 	LOG(2,("CRTC: framebuffer: %x\n",si->fbc.frame_buffer));
+
+	/* make sure we are in retrace on MIL cards (if possible), because otherwise
+	 * distortions might occur during our reprogramming them (no double buffering) */
+	if (si->ps.card_type < G100)
+	{
+		/* we might have no retraces during setmode! */
+		uint32 timeout = 0;
+		/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
+		while ((!(ACCR(STATUS) & 0x08)) && (timeout < (25000/4)))
+		{
+			snooze(4);
+			timeout++;
+		}
+	}
 
 	/*set standard registers*/
 	VGAW_I(CRTC,0xD,startadd&0xFF);
@@ -389,43 +428,91 @@ status_t gx00_crtc_mem_priority(uint8 colordepth)
 status_t gx00_crtc_cursor_init()
 {
 	int i;
-	uint32 * fb;
-	/* cursor bitmap will be stored at the start of the framebuffer */
-	const uint32 curadd = 0;
 
-	/* set cursor bitmap adress ... */
-	DXIW(CURADDL,curadd >> 10);
-	DXIW(CURADDH,curadd >> 18);
-	/* ... and repeat that: G100 requires other programming order than other cards!?! */
-	DXIW(CURADDL,curadd >> 10);
-	DXIW(CURADDH,curadd >> 18);
+	if (si->ps.card_type >= G100)
+	{
+		uint32 * fb;
+		/* cursor bitmap will be stored at the start of the framebuffer on >= G100 */
+		const uint32 curadd = 0;
+
+		/* set cursor bitmap adress ... */
+		DXIW(CURADDL,curadd >> 10);
+		DXIW(CURADDH,curadd >> 18);
+		/* ... and repeat that: G100 requires other programming order than later cards!?! */
+		DXIW(CURADDL,curadd >> 10);
+		DXIW(CURADDH,curadd >> 18);
+
+		/*set cursor colour*/
+		DXIW(CURCOL0RED,0XFF);
+		DXIW(CURCOL0GREEN,0xFF);
+		DXIW(CURCOL0BLUE,0xFF);
+		DXIW(CURCOL1RED,0);
+		DXIW(CURCOL1GREEN,0);
+		DXIW(CURCOL1BLUE,0);
+		DXIW(CURCOL2RED,0);
+		DXIW(CURCOL2GREEN,0);
+		DXIW(CURCOL2BLUE,0);
+
+		/*clear cursor*/
+		fb = (uint32 *) si->framebuffer + curadd;
+		for (i=0;i<(1024/4);i++)
+		{
+			fb[i]=0;
+		}
+	}
+	else
+	/* <= G100 cards have serial cursor color registers,
+	 * and dedicated cursor bitmap RAM (in TVP3026 DAC)
+	 */
+	{
+		/* select first colorRAM adress */
+		DACW(TVP_CUROVRWTADD,0x00);
+		/* overscan/border color is black, order of colors set is R,G,B */
+		DACW(TVP_CUROVRDATA,0xff);
+		DACW(TVP_CUROVRDATA,0xff);
+		DACW(TVP_CUROVRDATA,0xff);
+		/* set sursor color 0 */
+		DACW(TVP_CUROVRDATA,0xff);
+		DACW(TVP_CUROVRDATA,0xff);
+		DACW(TVP_CUROVRDATA,0xff);
+		/* set sursor color 1 */
+		DACW(TVP_CUROVRDATA,0x00);
+		DACW(TVP_CUROVRDATA,0x00);
+		DACW(TVP_CUROVRDATA,0x00);
+		/* set sursor color 2 */
+		DACW(TVP_CUROVRDATA,0x00);
+		DACW(TVP_CUROVRDATA,0x00);
+		DACW(TVP_CUROVRDATA,0x00);
+
+		/* select first cursor pattern DAC-internal RAM adress, and
+		 * make sure indirect cursor control register is selected as active register */
+		DXIW(CURCTRL,(DXIR(CURCTRL) & 0x73));
+		DACW(PALWTADD,0x00);
+		/* now clear it, auto-incrementing the adress */
+		for(i=0;i<1024;i++)
+		{
+			DACW(TVP_CURRAMDATA,0x00);
+		}
+	}
 
 	/* activate hardware cursor */
 	DXIW(CURCTRL,1);
 
-	/*set cursor colour*/
-	DXIW(CURCOL0RED,0XFF);
-	DXIW(CURCOL0GREEN,0xFF);
-	DXIW(CURCOL0BLUE,0xFF);
-	DXIW(CURCOL1RED,0);
-	DXIW(CURCOL1GREEN,0);
-	DXIW(CURCOL1BLUE,0);
-	DXIW(CURCOL2RED,0);
-	DXIW(CURCOL2GREEN,0);
-	DXIW(CURCOL2BLUE,0);
-
-	/*clear cursor*/
-	fb = (uint32 *) si->framebuffer + curadd;
-	for (i=0;i<(1024/4);i++)
-	{
-		fb[i]=0;
-	}
 	return B_OK;
 }
 
 status_t gx00_crtc_cursor_show()
 {
-	DXIW(CURCTRL,1);
+	if ((si->ps.card_type < G100) && (si->dm.timing.h_total > 2048))
+	{
+		/* MIL1/2 DAC needs to be told if h_total for the active mode gets above 2048 */
+		DXIW(CURCTRL, 0x11);
+	}
+	else
+	{
+		DXIW(CURCTRL, 0x01);
+	}
+
 	return B_OK;
 }
 
@@ -438,19 +525,56 @@ status_t gx00_crtc_cursor_hide()
 /*set up cursor shape*/
 status_t gx00_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
-	uint8 * cursor;
 	int y;
 
-	/*get a pointer to the cursor*/
-	cursor = (uint8*) si->framebuffer;
-
-	/*draw the cursor*/
-	for(y=0;y<16;y++)
+	if(si->ps.card_type >= G100)
 	{
-		cursor[y*16+7]=~*andMask++;
-		cursor[y*16+15]=*xorMask++;
-		cursor[y*16+6]=~*andMask++;
-		cursor[y*16+14]=*xorMask++;
+		uint8 * cursor;
+
+		/*get a pointer to the cursor*/
+		cursor = (uint8*) si->framebuffer;
+
+		/*draw the cursor*/
+		for(y=0;y<16;y++)
+		{
+			cursor[y*16+7]=~*andMask++;
+			cursor[y*16+15]=*xorMask++;
+			cursor[y*16+6]=~*andMask++;
+			cursor[y*16+14]=*xorMask++;
+		}
+	}
+	else
+	/* <= G100 cards have dedicated cursor bitmap RAM (in TVP3026 DAC) */
+	{
+		uint8 curctrl;
+
+		/* disable the cursor to prevent distortions in screen output */
+		curctrl = (DXIR(CURCTRL));
+		DXIW(CURCTRL, (curctrl & 0xfc));
+		/* select first cursor pattern DAC-internal RAM adress for plane 0 */
+		DXIW(CURCTRL, (DXIR(CURCTRL) & ~0x0c));
+		DACW(PALWTADD, 0x00);
+		/* now fill it, partly auto-incrementing the adress */
+		for(y = 0; y < 16; y++)
+		{
+			DACW(PALWTADD, (y * 8));
+			DACW(TVP_CURRAMDATA, ~*andMask++);
+			DACW(TVP_CURRAMDATA, ~*andMask++);
+		}
+		/* select first cursor pattern DAC-internal RAM adress for plane 1 */
+		DXIW(CURCTRL, (DXIR(CURCTRL) | 0x08));
+		DACW(PALWTADD, 0x00);
+		/* now fill it, partly auto-incrementing the adress */
+		for(y = 0; y < 16; y++)
+		{
+			DACW(PALWTADD, y*8);
+			DACW(TVP_CURRAMDATA, *xorMask++);
+			DACW(TVP_CURRAMDATA, *xorMask++);
+		}
+		/* delay restoring the cursor to prevent distortions in screen output */
+		snooze(5);
+		/* restore the cursor */
+		DXIW(CURCTRL, curctrl);
 	}
 
 	return B_OK;
@@ -460,7 +584,6 @@ status_t gx00_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 status_t gx00_crtc_cursor_position(uint16 x ,uint16 y)
 {
 	int i=64;
-//	LOG(4,("DAC: cursor-> %d %d\n",x,y));
 
 	x+=i;
 	y+=i;

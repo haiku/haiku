@@ -4,7 +4,8 @@
 
 	Other authors:
 	Mark Watson,
-	Apsed.
+	Apsed,
+	Rudolf Cornelissen 2/2003.
 */
 
 #define MODULE_BIT 0x40000000
@@ -33,19 +34,27 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
 	}
 }
 
-//Not possible with G400 AFAIK (if anyone knows otherwise then please contact me)
-//void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count) {
-//typedef struct {
-//	uint16	src_left;	/* guaranteed constrained to virtual width and height */
-//	uint16	src_top;
-//	uint16	src_width;	/* 0 to N, where zero means one pixel, one means two pixels, etc. */
-//	uint16	src_height;	/* 0 to M, where zero means one line, one means two lines, etc. */
-//	uint16	dest_left;
-//	uint16	dest_top;
-//	uint16	dest_width;	/* 0 to N, where zero means one pixel, one means two pixels, etc. */
-//	uint16	dest_height;	/* 0 to M, where zero means one line, one means two lines, etc. */
-//} scaled_blit_params;
-//}
+void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count) {
+	int i;
+
+	/*do each blit*/
+	i=0;
+	while (count--)
+	{
+		gx00_acc_video_blit
+		(
+			list[i].src_left,
+			list[i].src_top,
+			list[i].src_width,
+			list[i].src_height,
+			list[i].dest_left,
+			list[i].dest_top,
+			list[i].dest_width,
+			list[i].dest_height
+		);
+		i++;
+	}
+}
 
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count) {
 	int i;
