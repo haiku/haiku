@@ -13,9 +13,6 @@
 #include <unistd.h>
 #include "acc_std.h"
 
-/* defined in ProposeDisplayMode.c */
-extern status_t create_mode_list(void);
-
 static status_t init_common(int the_fd);
 
 /* Initialization code shared between primary and cloned accelerants */

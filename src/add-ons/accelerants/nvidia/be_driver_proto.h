@@ -63,4 +63,6 @@ overlay_token ALLOCATE_OVERLAY(void);
 status_t RELEASE_OVERLAY(overlay_token ot);
 status_t CONFIGURE_OVERLAY(overlay_token ot, const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov);
 
+status_t create_mode_list(void);
+
 #endif

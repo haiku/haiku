@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003
+   Rudolf Cornelissen 12/2003-1/2004
 */
 
 #define MODULE_BIT 0x00010000
