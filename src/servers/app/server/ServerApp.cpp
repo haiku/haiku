@@ -367,19 +367,10 @@ int32 ServerApp::MonitorApp(void *data)
 void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 {
 	LayerData ld;
+	BPortLink replylink;
+	
 	switch(code)
 	{
-		case AS_UPDATED_CLIENT_FONTLIST:
-		{
-			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",fSignature.String()));
-			
-			// received when the client-side global font list has been
-			// refreshed
-			fontserver->Lock();
-			fontserver->FontsUpdated();
-			fontserver->Unlock();
-			break;
-		}
 		case AS_UPDATE_COLORS:
 		{
 			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
@@ -476,7 +467,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 
 			void *sharedmem=fSharedMem->GetBuffer(memsize);
 			
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			if(memsize<1 || sharedmem==NULL)
 			{
 				replylink.StartMessage(SERVER_FALSE);
@@ -633,7 +624,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
 						fSignature.String(),r.left,r.top,r.right,r.bottom));
 
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			if(sbmp)
 			{
 				fBitmapList->AddItem(sbmp);
@@ -669,7 +660,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			msg.Read<int32>(&replyport);
 			
 			ServerBitmap *sbmp=FindBitmap(bmp_id);
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			if(sbmp)
 			{
 				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",fSignature.String(),bmp_id));
@@ -788,7 +779,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			int32 replyport;
 			msg.Read<int32>(&replyport);
 			
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(fCursorHidden ? SERVER_TRUE : SERVER_FALSE);
 			replylink.Flush();
 			break;
@@ -837,7 +828,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			{
 				// the application is expecting a reply, but plans to do literally nothing
 				// with the data, so we'll just reuse the cursor token variable
-				BPortLink replylink(replyport);
+				replylink.SetSendPort(replyport);
 				replylink.StartMessage(SERVER_TRUE);
 				replylink.Flush();
 			}
@@ -862,7 +853,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			cursormanager->AddCursor(fAppCursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<int32>(fAppCursor->ID());
 			replylink.Flush();
@@ -893,7 +884,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport;
 			msg.Read<int32>(&replyport);
 			
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<scroll_bar_info>(sbi);
 			replylink.Flush();
@@ -919,7 +910,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport;
 			msg.Read<int32>(&replyport);
 
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<bool>(desktop->FFMouseInUse());
 			replylink.Flush();
@@ -958,7 +949,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			port_id replyport = -1;
 			msg.Read<int32>(&replyport);
 			
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<mode_mouse>(mmode);
 			replylink.Flush();
@@ -979,10 +970,322 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			color=gui_colorset.AttributeToColor(whichcolor);
 			gui_colorset.Unlock();
 			
-			BPortLink replylink(replyport);
+			replylink.SetSendPort(replyport);
 			replylink.StartMessage(SERVER_TRUE);
 			replylink.Attach<rgb_color>(color.GetColor32());
 			replylink.Flush();
+			break;
+		}
+		case AS_UPDATED_CLIENT_FONTLIST:
+		{
+			STRACE(("ServerApp %s: Acknowledged update of client-side font list\n",fSignature.String()));
+			
+			// received when the client-side global font list has been
+			// refreshed
+			fontserver->Lock();
+			fontserver->FontsUpdated();
+			fontserver->Unlock();
+			break;
+		}
+		case AS_QUERY_FONTS_CHANGED:
+		{
+			// Attached Data:
+			// 1) bool check flag
+			// 2) port_id reply_port
+			
+			// if just checking, just give an answer,
+			// if not and needs updated, 
+			// sync the font list and return true else return false
+			break;
+		}
+		case AS_GET_FAMILY_NAME:
+		{
+			// Attached Data:
+			// 1) int32 the ID of the font family to get
+			// 2) port_id reply port
+			
+			// Returns:
+			// 1) font_family - name of family
+			// 2) uint32 - flags of font family (B_IS_FIXED || B_HAS_TUNED_FONT)
+			int32 famid;
+			port_id replyport;
+			
+			msg.Read<int32>(&famid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontFamily *ffamily=fontserver->GetFamily(famid);
+			if(ffamily)
+			{
+				font_family fam;
+				sprintf(fam,"%s",ffamily->Name());
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach(fam,sizeof(font_family));
+				replylink.Attach<int32>(ffamily->GetFlags());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			break;
+		}
+		case AS_GET_STYLE_NAME:
+		{
+			// Attached Data:
+			// 1) font_family The name of the font family
+			// 2) int32 ID of the style to get
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) font_style - name of the style
+			// 2) uint16 - appropriate face values
+			// 3) uint32 - flags of font style (B_IS_FIXED || B_HAS_TUNED_FONT)
+			
+			int32 styid;
+			port_id replyport;
+			font_family fam;
+			
+			msg.Read(fam,sizeof(font_family));
+			msg.Read<int32>(&styid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(fam,styid);
+			if(fstyle)
+			{
+				font_family sty;
+				sprintf(sty,"%s",fstyle->Name());
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach(sty,sizeof(font_style));
+				replylink.Attach<int32>(fstyle->GetFace());
+				replylink.Attach<int32>(fstyle->GetFlags());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			break;
+		}
+		case AS_GET_FAMILY_AND_STYLE:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) font_family The name of the font family
+			// 2) font_style - name of the style
+			int32 famid, styid;
+			port_id replyport;
+			font_family fam;
+			font_style sty;
+			
+			msg.Read<int32>(&famid);
+			msg.Read<int32>(&styid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+			if(fstyle)
+			{
+				sprintf(fam,"%s",fstyle->Family()->Name());
+				sprintf(sty,"%s",fstyle->Name());
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach(fam,sizeof(font_family));
+				replylink.Attach(sty,sizeof(font_style));
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			break;
+		}
+		case AS_GET_FONT_DIRECTION:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) font_direction direction of font
+/*			int32 famid, styid;
+			port_id replyport;
+			
+			msg.Read<int32>(&famid);
+			msg.Read<int32>(&styid);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+			if(fstyle)
+			{
+				font_direction dir=fstyle->GetDirection();
+				
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<font_direction>(dir);
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+*/			
+			break;
+		}
+		case AS_GET_FONT_BOUNDING_BOX:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) BRect - box holding entire font
+			
+			break;
+		}
+		case AS_GET_TUNED_COUNT:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) int32 - number of font strikes available
+			break;
+		}
+		case AS_GET_TUNED_INFO:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) uint32 - index of the particular font strike
+			// 4) port_id reply port
+			
+			// Returns:
+			// 1) tuned_font_info - info on the strike specified
+			break;
+		}
+		case AS_QUERY_FONT_FIXED:
+		{
+			// Attached Data:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) port_id reply port
+			
+			// Returns:
+			// 1) bool - font is/is not fixed
+			break;
+		}
+		case AS_SET_FAMILY_AND_STYLE:
+		{
+			// Attached Data:
+			// 1) font_family - name of font family to use
+			// 2) font_style - name of style in family
+			// 3) port_id - reply port
+			
+			// Returns:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			break;
+		}
+		case AS_SET_FAMILY_AND_FACE:
+		{
+			// Attached Data:
+			// 1) font_family - name of font family to use
+			// 2) uint16 - font face
+			// 3) port_id - reply port
+			
+			// Returns:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			
+			// TODO: Check R5 for error condition behavior in SET_FAMILY_AND_FACE
+			break;
+		}
+		case AS_COUNT_FONT_FAMILIES:
+		{
+			// Attached Data:
+			// None
+			
+			// Returns:
+			// 1) int32 - # of font families
+			break;
+		}
+		case AS_COUNT_FONT_STYLES:
+		{
+			// Attached Data:
+			// 1) font_family - name of font family
+			
+			// Returns:
+			// 1) int32 - # of font styles
+			break;
+		}
+		case AS_SET_SYSFONT_PLAIN:
+		{
+			// Attached Data:
+			// None
+			
+			// Returns:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - size in points
+			// 4) uint16 - face flags
+			// 5) font_height - height structure
+			
+			// TODO: See if font_height is needed in SET_SYSFONT_XXXX messages
+			break;
+		}
+		case AS_SET_SYSFONT_BOLD:
+		{
+			// Attached Data:
+			// None
+			
+			// Returns:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - size in points
+			// 4) uint16 - face flags
+			// 5) font_height - height structure
+			break;
+		}
+		case AS_SET_SYSFONT_FIXED:
+		{
+			// Attached Data:
+			// None
+			
+			// Returns:
+			// 1) uint16 - family ID
+			// 2) uint16 - style ID
+			// 3) float - size in points
+			// 4) uint16 - face flags
+			// 5) font_height - height structure
 			break;
 		}
 		default:

@@ -137,6 +137,44 @@ void FontServer::RemoveFamily(const char *family)
 	}
 }
 
+const char *FontServer::GetFamilyName(uint16 id) const
+{
+	FontFamily *fam;
+	for(int32 i=0; i<families->CountItems(); i++)
+	{
+		fam=(FontFamily*)families->ItemAt(i);
+		if(fam && fam->GetID()==id)
+			return fam->Name();
+	}
+	return NULL;
+}
+
+const char *FontServer::GetStyleName(const char *family, uint16 id) const
+{
+	FontFamily *fam=_FindFamily(family);
+	FontStyle *sty;
+	for(int32 i=0; i<families->CountItems(); i++)
+	{
+		sty=fam->GetStyle(i);
+		if(sty && sty->GetID()==id)
+			return sty->Name();
+	}
+	return NULL;
+}
+
+FontStyle *FontServer::GetStyle(const char *family, uint16 id) const
+{
+	FontFamily *fam=_FindFamily(family);
+	FontStyle *sty;
+	for(int32 i=0; i<families->CountItems(); i++)
+	{
+		sty=fam->GetStyle(i);
+		if(sty && sty->GetID()==id)
+			return sty;
+	}
+	return NULL;
+}
+
 /*!
 	\brief Protected function which locates a FontFamily object
 	\param name The family to find
@@ -144,7 +182,7 @@ void FontServer::RemoveFamily(const char *family)
 	
 	Do NOT delete the FontFamily returned by this function.
 */
-FontFamily *FontServer::_FindFamily(const char *name)
+FontFamily *FontServer::_FindFamily(const char *name) const
 {
 	if(!init)
 		return NULL;
@@ -189,6 +227,7 @@ status_t FontServer::ScanDirectory(const char *fontspath)
     FT_Error error;
     FT_CharMap charmap;
     FontFamily *family;
+    FontStyle *style;
 
 	stat=dir.SetTo(fontspath);
 	if(stat!=B_OK)
@@ -227,7 +266,7 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 			printf("Font Family: %s\n",face->family_name);
 			#endif
 
-			family=new FontFamily(face->family_name);
+			family=new FontFamily(face->family_name,families->CountItems());
 			families->AddItem(family);
 		}
 		
@@ -242,8 +281,11 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 		#endif
 
 		// Has vertical metrics?
-		family->AddStyle(path.Path(),face);
-		validcount++;
+		style=new FontStyle(path.Path(),face);
+		if(!family->AddStyle(style))
+			delete style;
+		else
+			validcount++;
 
 		FT_Done_Face(face);
 	}	// end for(i<refcount)
@@ -316,7 +358,7 @@ FT_CharMap FontServer::_GetSupportedCharmap(const FT_Face &face)
 */
 void FontServer::SaveList(void)
 {
-	int32 famcount=0, stycount=0,i=0,j=0;
+/*	int32 famcount=0, stycount=0,i=0,j=0;
 	FontFamily *fam;
 	FontStyle *sty;
 	BMessage fontmsg, familymsg('FONT');
@@ -371,22 +413,46 @@ void FontServer::SaveList(void)
 	BFile file(SERVER_FONT_LIST,B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if(file.InitCheck()==B_OK)
 		fontmsg.Flatten(&file);
+*/
 }
 
 /*!
 	\brief Retrieves the FontStyle object
 	\param family The font's family
-	\param face The font's style
+	\param style The font's style
 	\return The FontStyle having those attributes or NULL if not available
 */
-FontStyle *FontServer::GetStyle(font_family family, font_style face)
+FontStyle *FontServer::GetStyle(const char *family, const char *style)
 {
 	FontFamily *ffam=_FindFamily(family);
 
 	if(ffam)
 	{
-		FontStyle *fsty=ffam->GetStyle(face);
+		FontStyle *fsty=ffam->GetStyle(style);
 		return fsty;
+	}
+	return NULL;
+}
+
+/*!
+	\brief Retrieves the FontStyle object
+	\param family ID for the font's family
+	\param style ID of the font's style
+	\return The FontStyle having those attributes or NULL if not available
+*/
+FontStyle *FontServer::GetStyle(const uint16 &familyid, const uint16 &styleid)
+{
+	// TODO: Implement FontServer::GetStyle(id,id)
+	return NULL;
+}
+
+FontFamily *FontServer::GetFamily(const uint16 &familyid)
+{
+	for(int32 i=0; i<families->CountItems(); i++)
+	{
+		FontFamily *fam=(FontFamily*)families->ItemAt(i);
+		if(fam->GetID()==familyid)
+			return fam;
 	}
 	return NULL;
 }
@@ -458,7 +524,8 @@ bool FontServer::SetSystemPlain(const char *family, const char *style, float siz
 	
 	if(plain)
 		delete plain;
-	plain=sty->Instantiate(size);
+	
+	plain=new ServerFont(sty,size);
 	return true;
 }
 
@@ -481,7 +548,8 @@ bool FontServer::SetSystemBold(const char *family, const char *style, float size
 	
 	if(bold)
 		delete bold;
-	bold=sty->Instantiate(size);
+	
+	bold=new ServerFont(sty,size);
 	return true;
 }
 
@@ -504,7 +572,8 @@ bool FontServer::SetSystemFixed(const char *family, const char *style, float siz
 	
 	if(fixed)
 		delete fixed;
-	fixed=sty->Instantiate(size);
+
+	fixed=new ServerFont(sty,size);
 	return true;
 }
 

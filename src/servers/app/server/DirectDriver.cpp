@@ -555,18 +555,7 @@ void DirectDriver::SetDrawData(const DrawData *d, bool set_font_data)
 		if(!sf)
 			return;
 
-		FontStyle *style=d->font.Style();
-
-		if(!style)
-			return;
-		
-		FontFamily *family=(FontFamily *)style->Family();
-		if(!family)
-			return;
-		
-		font_family fontfamily;
-		strcpy(fontfamily,family->Name());
-		font.SetFamilyAndStyle(fontfamily,style->Name());
+		font.SetFamilyAndStyle(sf->GetFamily(),sf->GetStyle());
 		font.SetFlags(sf->Flags());
 		font.SetEncoding(sf->Encoding());
 		font.SetSize(sf->Size());

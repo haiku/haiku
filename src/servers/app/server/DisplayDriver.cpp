@@ -471,14 +471,7 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	BPoint point(pt);
 	
 	const ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return;
-	}
-
+	
 	FT_Face face;
 	FT_GlyphSlot slot;
 	FT_Matrix rmatrix,smatrix;
@@ -506,7 +499,7 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	else
 		shear=90-(90-shearangle)*2;
 	
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
 	if(error)
 	{
 		Unlock();
@@ -3740,13 +3733,6 @@ float DisplayDriver::StringWidth(const char *string, int32 length, const DrawDat
 	Lock();
 
 	const ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return 0.0;
-	}
 	
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -3756,7 +3742,7 @@ float DisplayDriver::StringWidth(const char *string, int32 length, const DrawDat
 	int32 strlength,i;
 	float returnval;
 
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
 	if(error)
 	{
 		Unlock();
@@ -3825,13 +3811,6 @@ float DisplayDriver::StringHeight(const char *string, int32 length, const DrawDa
 	Lock();
 
 	const ServerFont *font=&(d->font);
-	FontStyle *style=font->Style();
-
-	if(!style)
-	{
-		Unlock();
-		return 0.0;
-	}
 
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -3839,7 +3818,7 @@ float DisplayDriver::StringHeight(const char *string, int32 length, const DrawDa
 	int32 strlength,i;
 	float returnval=0.0,ascent=0.0,descent=0.0;
 
-	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
+	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
 	if(error)
 	{
 		Unlock();

@@ -37,11 +37,10 @@ FTC_Manager ftmanager;
 */
 FontStyle::FontStyle(const char *filepath, FT_Face face)
 {
-	name=new BString(face->style_name);
+	fName=face->style_name;
 	cachedface=new CachedFaceRec;
 	cachedface->file_path=filepath;
 	family=NULL;
-	instances=new BList(0);
 	has_bitmaps=(face->num_fixed_sizes>0)?true:false;
 	is_fixedwidth=(face->face_flags & FT_FACE_FLAG_FIXED_WIDTH)?true:false;
 	is_scalable=(face->face_flags & FT_FACE_FLAG_SCALABLE)?true:false;
@@ -49,8 +48,10 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	glyphcount=face->num_glyphs;
 	charmapcount=face->num_charmaps;
 	tunedcount=face->num_fixed_sizes;
-	path=new BString(filepath);
+	fPath=filepath;
 	fbounds.Set(0,0,0,0);
+	fFace=TranslateStyleToFace(face->style_name);
+	fID=0;
 }
 
 /*!
@@ -63,43 +64,16 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 */
 FontStyle::~FontStyle(void)
 {
-	delete name;
-	delete path;
 	delete cachedface;
-	
-	// Mark all instances as Free here
-	int32 index=0;
-
-	ServerFont *fs=(ServerFont*)instances->ItemAt(index);
-
-	while(fs)
-	{
-		fs->fstyle=NULL;
-		index++;
-		fs=(ServerFont*)instances->ItemAt(index);
-	}
-
-	instances->MakeEmpty();
-	delete instances;
 }
 
 /*!
 	\brief Returns the name of the style as a string
 	\return The style's name
 */
-const char *FontStyle::Name(void)
+const char *FontStyle::Name(void) const
 {
-	return name->String();
-}
-
-/*!
-	\brief Returns a handle to the style in question, straight from FreeType's cache
-	\return FreeType face handle or NULL if there was an internal error
-*/
-FT_Face FontStyle::GetFace(void)
-{
-	FT_Face f;
-	return (FTC_Manager_LookupFace(ftmanager,(FTC_FaceID)cachedface,&f)!=0)?f:NULL;
+	return fName.String();
 }
 
 /*!
@@ -108,7 +82,19 @@ FT_Face FontStyle::GetFace(void)
 */
 const char *FontStyle::GetPath(void)
 {
-	return path->String();
+	return fPath.String();
+}
+
+int32 FontStyle::GetFlags(void) const
+{
+	int32 flags=0;
+	if(IsFixedWidth())
+		flags|=B_IS_FIXED;
+	
+	if(TunedCount()>0)
+		flags|=B_HAS_TUNED_FONT;
+	
+	return flags;
 }
 
 /*!
@@ -116,37 +102,79 @@ const char *FontStyle::GetPath(void)
 	\param c An ASCII character
 	\return A Unicode value for the character
 */
+
+// TODO: Re-enable when I understand how the FT2 Cache system changed from
+// 2.1.4 to 2.1.8
+/*
 int16 FontStyle::ConvertToUnicode(uint16 c)
 {
 	FT_Face f;
-	if(FTC_Manager_LookupFace(ftmanager,(FTC_FaceID)cachedface,&f)!=0)
+	if(FTC_Manager_Lookup_Face(ftmanager,cachedface,&f)!=0)
 		return 0;
 	
 	return FT_Get_Char_Index(f,c);
 }
-
-/*!
-	\brief Creates a new ServerFont object for the style, given size, shear, and rotation.
-	\param size character size in points
-	\param rotation rotation in degrees
-	\param shear shear (slant) in degrees. 45 <= shear <= 135. 90 is vertical
-	\return The new ServerFont object
 */
-ServerFont *FontStyle::Instantiate(float size, float rotation, float shear)
+
+uint16 FontStyle::TranslateStyleToFace(const char *name) const
 {
-	ServerFont *f=new ServerFont(this, size, rotation, shear);
-	instances->AddItem(f);
-	return f;
+	// TODO: see how R5 translates font styles to faces for FontStyle::TranslateStyleToFace
+	if(!name)
+		return 0;
+	
+	BString str(name);
+	
+	if(str.ICompare("ultra light")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("thin")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("extra light")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("light")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("roman")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("book")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("regular")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("plain")==0)
+		return B_REGULAR_FACE;
+	if(str.ICompare("medium")==0)
+		return B_REGULAR_FACE;
+	
+	if(str.ICompare("demibold")==0)
+		return B_BOLD_FACE;
+	if(str.ICompare("bold")==0)
+		return B_BOLD_FACE;
+	if(str.ICompare("black")==0)
+		return B_BOLD_FACE;
+	if(str.ICompare("heavy")==0)
+		return B_BOLD_FACE;
+	if(str.ICompare("extra bold")==0)
+		return B_BOLD_FACE;
+	if(str.ICompare("ultra bold")==0)
+		return B_BOLD_FACE;
+	
+	if(str.ICompare("italic")==0)
+		return B_ITALIC_FACE;
+	if(str.ICompare("oblique")==0)
+		return B_BOLD_FACE;
+	
+	return 0;
 }
 
 /*!
 	\brief Constructor
 	\param namestr Name of the family
 */
-FontFamily::FontFamily(const char *namestr)
+FontFamily::FontFamily(const char *namestr, const uint16 &index)
 {
-	name=new BString(namestr);
-	styles=new BList(0);
+	fName=namestr;
+	fID=index;
+	
+	// will stay uninitialized until needed
+	fFlags=-1;
 }
 
 /*!
@@ -158,17 +186,12 @@ FontFamily::FontFamily(const char *namestr)
 */
 FontFamily::~FontFamily(void)
 {
-	delete name;
-	
-	BString *string;
-	for(int32 i=0; i<styles->CountItems(); i++)
+	FontStyle *style;
+	for(int32 i=0; i<fStyles.CountItems(); i++)
 	{
-		string=(BString *)styles->RemoveItem(i);
-		if(string)
-			delete string;
+		style=(FontStyle *)fStyles.RemoveItem(i);
+		delete style;
 	}
-	styles->MakeEmpty();	// should be empty, but just in case...
-	delete styles;
 }
 
 /*!
@@ -177,7 +200,7 @@ FontFamily::~FontFamily(void)
 */
 const char *FontFamily::Name(void)
 {
-	return name->String();
+	return fName.String();
 }
 
 /*!
@@ -185,27 +208,39 @@ const char *FontFamily::Name(void)
 	\param path full path to the style's font file
 	\param face FreeType face handle used to obtain info about the font
 */
-void FontFamily::AddStyle(const char *path,FT_Face face)
+bool FontFamily::AddStyle(FontStyle *style)
 {
-	if(!path)
-		return;
+	if(!style)
+		return false;
 
-	BString style(face->style_name);
 	FontStyle *item;
 
 	// Don't add if it already is in the family.	
-	int32 count=styles->CountItems();
+	int32 count=fStyles.CountItems();
 	for(int32 i=0; i<count; i++)
 	{
-		item=(FontStyle *)styles->ItemAt(i);
-		if(item->name->Compare(face->style_name)==0)
-			return;
+		item=(FontStyle *)fStyles.ItemAt(i);
+		if(item->fName==style->fName)
+			return false;
 	}
-
-	item=new FontStyle(path, face);
-	item->family=this;
-	styles->AddItem(item);
+	
+	style->family=this;
+	
+	if(fStyles.CountItems()>0)
+	{
+		item=(FontStyle *)fStyles.ItemAt(fStyles.CountItems()-1);
+		style->fID=item->fID+1;
+	}
+	else
+		style->fID=0;
+	
+	fStyles.AddItem(style);
 	AddDependent();
+	
+	// force a refresh if a request for font flags is needed
+	fFlags=-1;
+	
+	return true;
 }
 
 /*!
@@ -214,23 +249,42 @@ void FontFamily::AddStyle(const char *path,FT_Face face)
 */
 void FontFamily::RemoveStyle(const char *style)
 {
-	int32 count=styles->CountItems();
+	int32 count=fStyles.CountItems();
 	if(!style || count<1)
 		return;
 
 	FontStyle *fs;
 	for(int32 i=0; i<count; i++)
 	{
-		fs=(FontStyle *)styles->ItemAt(i);
-		if(fs && fs->name->Compare(style)==0)
+		fs=(FontStyle *)fStyles.ItemAt(i);
+		if(fs && fs->fName.Compare(style)==0)
 		{
-			fs=(FontStyle *)styles->RemoveItem(i);
+			fs=(FontStyle *)fStyles.RemoveItem(i);
 			if(fs)
 			{
 				delete fs;
 				RemoveDependent();
+				
+				// force a refresh if a request for font flags is needed
+				fFlags=-1;
 			}
 		}
+	}
+}
+
+/*!
+	\brief Removes a style from the family. The caller is responsible for freeing the object
+	\param style The style to be removed from the family
+*/
+void FontFamily::RemoveStyle(FontStyle *style)
+{
+	if(fStyles.HasItem(style))
+	{
+		fStyles.RemoveItem(style);
+		RemoveDependent();
+		
+		// force a refresh if a request for font flags is needed
+		fFlags=-1;
 	}
 }
 
@@ -240,7 +294,7 @@ void FontFamily::RemoveStyle(const char *style)
 */
 int32 FontFamily::CountStyles(void)
 {
-	return styles->CountItems();
+	return fStyles.CountItems();
 }
 
 /*!
@@ -250,14 +304,16 @@ int32 FontFamily::CountStyles(void)
 */
 bool FontFamily::HasStyle(const char *style)
 {
-	int32 count=styles->CountItems();
+	int32 count=fStyles.CountItems();
+	
 	if(!style || count<1)
 		return false;
+	
 	FontStyle *fs;
 	for(int32 i=0; i<count; i++)
 	{
-		fs=(FontStyle *)styles->ItemAt(i);
-		if(fs && fs->name->Compare(style)==0)
+		fs=(FontStyle *)fStyles.ItemAt(i);
+		if(fs && fs->fName.Compare(style)==0)
 			return true;
 	}
 	return false;
@@ -268,12 +324,9 @@ bool FontFamily::HasStyle(const char *style)
 	\param index list index of the style to be found
 	\return name of the style or NULL if the index is not valid
 */
-const char *FontFamily::GetStyle(int32 index)
+FontStyle *FontFamily::GetStyle(int32 index)
 {
-	FontStyle *fs=(FontStyle*)styles->ItemAt(index);
-	if(!fs)
-		return NULL;
-	return fs->Name();
+	return (FontStyle*)fStyles.ItemAt(index);
 }
 
 /*!
@@ -285,15 +338,38 @@ const char *FontFamily::GetStyle(int32 index)
 */
 FontStyle *FontFamily::GetStyle(const char *style)
 {
-	int32 count=styles->CountItems();
+	int32 count=fStyles.CountItems();
 	if(!style || count<1)
 		return NULL;
 	FontStyle *fs;
 	for(int32 i=0; i<count; i++)
 	{
-		fs=(FontStyle *)styles->ItemAt(i);
-		if(fs && fs->name->Compare(style)==0)
+		fs=(FontStyle *)fStyles.ItemAt(i);
+		if(fs && fs->fName.Compare(style)==0)
 			return fs;
 	}
 	return NULL;
+}
+
+int32 FontFamily::GetFlags(void)
+{
+	if(fFlags==-1)
+	{
+		fFlags=0;
+		
+		for(int32 i=0; i<fStyles.CountItems(); i++)
+		{
+			FontStyle *style=(FontStyle*)fStyles.ItemAt(i);
+			if(style)
+			{
+				if(style->IsFixedWidth())
+					fFlags|=B_IS_FIXED;
+				if(style->TunedCount()>0)
+					fFlags|=B_HAS_TUNED_FONT;
+			}
+		}
+	}
+	
+	return fFlags;
+	
 }

@@ -24,7 +24,6 @@
 //	Description:	Shadow BFont class
 //  
 //------------------------------------------------------------------------------
-#include "FontFamily.h"
 #include "ServerFont.h"
 
 
@@ -141,7 +140,7 @@ int32 ServerFont::CountTuned(void)
 font_file_format ServerFont::FileFormat(void)
 {
 	// TODO: implement
-	return 	B_TRUETYPE_WINDOWS;
+	return B_TRUETYPE_WINDOWS;
 }
 
 /*! 
@@ -151,6 +150,16 @@ font_file_format ServerFont::FileFormat(void)
 BRect ServerFont::BoundingBox(void)
 {
 	return fbounds;
+}
+
+const char *ServerFont::GetStyle(void) const
+{
+	return fstyle->Name();
+}
+
+const char *ServerFont::GetFamily(void) const
+{
+	return fstyle->Family()->Name();
 }
 
 /*! 
@@ -163,7 +172,3 @@ void ServerFont::Height(font_height *fh)
 	fh->descent=fheight.descent;
 	fh->leading=fheight.leading;
 }
-/*
- @log
-	* added ServerFont::operator=(const ServerFont& font).
-*/
