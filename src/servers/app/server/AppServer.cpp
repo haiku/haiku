@@ -210,7 +210,7 @@ int32 AppServer::PollerThread(void *data)
 	for(;;)
 	{
 		if(!mousequeue.MessagesWaiting())
-			mousequeue.GetMessagesFromPort(true);	// wait for a message to come into the port
+			mousequeue.GetMessagesFromPort(true);
 		else
 			mousequeue.GetMessagesFromPort(false);
 
@@ -229,7 +229,6 @@ int32 AppServer::PollerThread(void *data)
 			{
 				if(!msg->Buffer())
 					break;
-//				ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
 				ServerWindow::HandleMouseEvent(msg);
 				break;
 			}
@@ -242,10 +241,15 @@ int32 AppServer::PollerThread(void *data)
 				// 2) float - x coordinate of mouse click
 				// 3) float - y coordinate of mouse click
 				// 4) int32 - buttons down
+				
+				// We're using
 				index=(int8*)msg->Buffer();
 				if(!index)
 					break;
-
+				
+				// Skip past the message code packaged in the BSession-style message
+				index += sizeof(int32);
+				
 				// Time sent is not necessary for cursor processing.
 				index += sizeof(int64);
 				
@@ -258,7 +262,6 @@ int32 AppServer::PollerThread(void *data)
 				if(appserver->_driver)
 				{
 					appserver->_driver->MoveCursorTo(tempx,tempy);
-//					ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
 					ServerWindow::HandleMouseEvent(msg);
 				}
 				break;
@@ -333,20 +336,13 @@ thread_id AppServer::Run(void)
 //! Main message-monitoring loop for the regular message port - no input messages!
 void AppServer::MainLoop(void)
 {
-	int32 msgcode;
-	int8 *msgbuffer=NULL;
-	ssize_t buffersize,bytesread;
+	PortMessage pmsg;
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(_messageport);
-		if(buffersize>0)
-			msgbuffer=new int8[buffersize];
-		bytesread=read_port(_messageport,&msgcode,msgbuffer,buffersize);
-
-		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
+		if(pmsg.ReadFromPort(_messageport)==B_OK)
 		{
-			switch(msgcode)
+			switch(pmsg.Code())
 			{
 				case AS_CREATE_APP:
 				case AS_DELETE_APP:
@@ -354,20 +350,18 @@ void AppServer::MainLoop(void)
 				case B_QUIT_REQUESTED:
 				case AS_UPDATED_CLIENT_FONTLIST:
 				case AS_QUERY_FONTS_CHANGED:
-					DispatchMessage(msgcode,msgbuffer);
+					DispatchMessage(&pmsg);
 					break;
 				default:
 				{
-					printf("Server::MainLoop received unexpected code %ld\n",msgcode);
+					printf("Server::MainLoop received unexpected code %ld\n",pmsg.Code());
 					break;
 				}
 			}
 
 		}
 
-		if(buffersize>0)
-			delete msgbuffer;
-		if(msgcode==AS_DELETE_APP || msgcode==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER)
+		if(pmsg.Code()==AS_DELETE_APP || (pmsg.Code()==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER))
 		{
 			if(_quitting_server==true && _applist->CountItems()==0)
 				break;
@@ -458,25 +452,30 @@ void AppServer::InitDecorators(void)
 	\param buffer Attachement buffer for the message.
 	
 */
-void AppServer::DispatchMessage(int32 code, int8 *buffer)
+void AppServer::DispatchMessage(PortMessage *msg)
 {
-	int8 *index=buffer;
-	switch(code)
+	switch(msg->Code())
 	{
 		case AS_CREATE_APP:
 		{
 			// Create the ServerApp to node monitor a new BApplication
 			
 			// Attached data:
-			// 1) port_id - port to reply to
-			// 2) port_id - receiver port of a regular app
-			// 3) char * - signature of the regular app
+			// 1) port_id - receiver port of a regular app
+			// 2) int32 - handler token of the regular app
+			// 2) char * - signature of the regular app
+			// 3) port_id - port to reply to
 
 			// Find the necessary data
-			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
-			port_id app_port=*((port_id*)index); index+=sizeof(port_id);
-			int32 htoken=*((int32*)index); index+=sizeof(int32);
-			char *app_signature=(char *)index;
+			port_id reply_port;
+			port_id app_port;
+			int32 htoken;
+			char *app_signature;
+
+			msg->Read<int32>(&app_port);
+			msg->Read<int32>(&htoken);
+			msg->ReadString(&app_signature);
+			msg->Read<int32>(&reply_port);
 			
 			// Create the ServerApp subthread for this app
 			acquire_sem(_applist_lock);
@@ -497,13 +496,14 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			_p_active_app=newapp;
 			_active_app=_applist->CountItems()-1;
 
-			PortLink *replylink=new PortLink(reply_port);
-			replylink->SetOpCode(AS_SET_SERVER_PORT);
-			replylink->Attach<int32>(newapp->_receiver);
-			replylink->Flush();
+			PortLink replylink(reply_port);
+			replylink.SetOpCode(AS_SET_SERVER_PORT);
+			replylink.Attach<int32>(newapp->_receiver);
+			replylink.Flush();
 
-			delete replylink;
-
+			// This is necessary because PortLink::ReadString allocates memory
+			delete app_signature;
+			
 			release_sem(_active_lock);
 			
 			newapp->Run();
@@ -519,7 +519,8 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			
 			int32 i, appnum=_applist->CountItems();
 			ServerApp *srvapp;
-			thread_id srvapp_id=*((thread_id*)buffer);
+			thread_id srvapp_id;
+			msg->Read<thread_id>(&srvapp_id);
 			
 			// Run through the list of apps and nuke the proper one
 			for(i=0;i<appnum;i++)
@@ -580,11 +581,12 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			bool needs_update=fontserver->FontsNeedUpdated();
 			fontserver->Unlock();
 			
-			PortLink *pl=new PortLink(*((port_id*)index));
-			pl->SetOpCode( (needs_update)?SERVER_TRUE:SERVER_FALSE );
-			pl->Flush();
-			delete pl;
+			// Seeing how the client merely wants an answer, we'll skip the PortLink
+			// and all its overhead and just write the code to port.
+			port_id replyport;
+			msg->Read<port_id>(&replyport);
 			
+			write_port(replyport, (needs_update)?SERVER_TRUE:SERVER_FALSE, NULL,0);
 			break;
 		}
 		case AS_GET_SCREEN_MODE:
@@ -601,13 +603,15 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			// 2) int32 height
 			// 3) int depth
 			
-			PortLink *replylink=new PortLink(*((port_id*)index));
-			replylink->SetOpCode(AS_GET_SCREEN_MODE);
-			replylink->Attach<int16>(_driver->GetWidth());
-			replylink->Attach<int16>(_driver->GetHeight());
-			replylink->Attach<int16>(_driver->GetDepth());
-			replylink->Flush();
-			delete replylink;
+			port_id replyport;
+			msg->Read<port_id>(&replyport);
+			
+			PortLink replylink(replyport);
+			replylink.SetOpCode(AS_GET_SCREEN_MODE);
+			replylink.Attach<int16>(_driver->GetWidth());
+			replylink.Attach<int16>(_driver->GetHeight());
+			replylink.Attach<int16>(_driver->GetDepth());
+			replylink.Flush();
 			break;
 		}
 		case B_QUIT_REQUESTED:

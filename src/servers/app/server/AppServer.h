@@ -16,6 +16,7 @@ class ServerApp;
 class DisplayDriver;
 class CursorManager;
 class BitmapManager;
+class PortMessage;
 
 /*!
 	\class AppServer AppServer.h
@@ -40,7 +41,7 @@ public:
 	void MainLoop(void);
 	bool LoadDecorator(const char *path);
 	void InitDecorators(void);
-	void DispatchMessage(int32 code, int8 *buffer);
+	void DispatchMessage(PortMessage *msg);
 	void Broadcast(int32 code);
 	void HandleKeyMessage(int32 code, int8 *buffer);
 	ServerApp *FindApp(const char *sig);

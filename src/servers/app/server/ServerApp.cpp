@@ -253,7 +253,7 @@ int32 ServerApp::MonitorApp(void *data)
 	// Message-dispatching loop for the ServerApp
 	int32			msgCode;
 	
-	app->ses = new BSession( app->_receiver, 0L );
+	app->ses=new BSession( app->_receiver, 0L );
 	
 	for(;;)
 	{
@@ -420,12 +420,12 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Allocate a bitmap for an application
 			
 			// Attached Data: 
-			// 1) port_id reply port
-			// 2) BRect bounds
-			// 3) color_space space
-			// 4) int32 bitmap_flags
-			// 5) int32 bytes_per_row
-			// 6) int32 screen_id::id
+			// 1) BRect bounds
+			// 2) color_space space
+			// 3) int32 bitmap_flags
+			// 4) int32 bytes_per_row
+			// 5) int32 screen_id::id
+			// 6) port_id reply port
 			
 			// Reply Code: SERVER_TRUE
 			// Reply Data:
@@ -440,12 +440,12 @@ void ServerApp::_DispatchMessage(int32 code)
 			int32 f,bpr;
 			screen_id s;
 
-			ses->ReadInt32(&replyport);
 			ses->ReadRect(&r);
 			ses->ReadData(&cs,sizeof(color_space));
 			ses->ReadInt32(&f);
 			ses->ReadInt32(&bpr);
 			ses->ReadData(&s,sizeof(screen_id));
+			ses->ReadInt32(&replyport);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
 
@@ -475,16 +475,16 @@ void ServerApp::_DispatchMessage(int32 code)
 			// Delete a bitmap's allocated memory
 
 			// Attached Data:
-			// 1) int32 reply port
-			// 2) int32 token
+			// 1) int32 token
+			// 2) int32 reply port
 		
 			// Reply Code: SERVER_TRUE if successful, 
 			//				SERVER_FALSE if the buffer was already deleted or was not found
 			port_id replyport;
 			int32 bmp_id;
 			
-			ses->ReadInt32(&replyport);
 			ses->ReadInt32(&bmp_id);
+			ses->ReadInt32(&replyport);
 			
 			ServerBitmap *sbmp=_FindBitmap(bmp_id);
 			if(sbmp)
@@ -634,23 +634,23 @@ void ServerApp::_DispatchMessage(int32 code)
 		case AS_CREATE_BCURSOR:
 		{
 			// Attached data:
-			// 1) port_id reply port
-			// 2) 68 bytes of _appcursor data
+			// 1) 68 bytes of _appcursor data
+			// 2) port_id reply port
 			
 			port_id replyport;
 			int8 cdata[68];
 
-			ses->ReadInt32(&replyport);
 			ses->ReadData(cdata,68);
+			ses->ReadInt32(&replyport);
 
 			_appcursor=new ServerCursor(cdata);
 			_appcursor->SetAppSignature(_signature.String());
 			cursormanager->AddCursor(_appcursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			BSession replysession(0,replyport);
-			replysession.WriteInt32(_appcursor->ID());
-			replysession.Sync();
+			PortLink link(replyport);
+			link.Attach<int32>(_appcursor->ID());
+			link.Flush();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
