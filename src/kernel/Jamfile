@@ -53,6 +53,7 @@ KernelLd kernel :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_device_manager.o
 	kernel_disk_device_manager.o
 
 	libbus.a
@@ -62,8 +63,9 @@ KernelLd kernel :
 
 	linkhack.so
 
+	# kernel libroot parts
+	kernel_os_main.o
 	kernel_os_arch_$(OBOS_ARCH).o
-	kernel_device_manager.o
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
@@ -88,6 +90,7 @@ KernelLd kernel.so :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_device_manager.o
 	kernel_disk_device_manager.o
 
 	libbus.a
@@ -97,6 +100,7 @@ KernelLd kernel.so :
 
 	linkhack.so
 
+	# kernel libroot parts
 	kernel_os_main.o
 	kernel_os_arch_$(OBOS_ARCH).o
 
