@@ -10,11 +10,11 @@
 #include <AutoDeleter.h>
 #include <Autolock.h>
 #include <DataIO.h>
-#include <DoublyLinkedList2.h>
 #include <MessagePrivate.h>
 #include <MessengerPrivate.h>
 #include <OS.h>
 #include <TokenSpace.h>
+#include <util/DoublyLinkedList.h>
 
 #include <messaging.h>
 
