@@ -29,7 +29,7 @@ static struct core_module_info *core = NULL;
 static struct protosw *proto[IPPROTO_MAX];
 static struct ifnet *me = NULL;
 
-int loopback_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *sa,
+static int loopback_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *sa,
 			struct rtentry *rt)
 {
 	/* turn it straight back... */
@@ -46,7 +46,7 @@ int loopback_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *sa,
 	return 0;
 }
 
-void loopback_input(struct mbuf *buf)
+static void loopback_input(struct mbuf *buf)
 {
 	if (!buf)
 		return;
@@ -147,6 +147,7 @@ struct kernel_net_module_info device_info = {
 	},
 	loopback_module_init,
 	NULL,
+	NULL
 };
 
 // #pragma mark -
