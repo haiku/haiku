@@ -14,7 +14,7 @@
 #include "net/if.h"
 #include "net/if_dl.h"
 
-#define version           "0.2 pre-alpha"
+#define version           "0.2.1 pre-alpha"
 #define	NEXTARG		0xffffff
 
 /* globals */
@@ -525,24 +525,24 @@ void in_status(int force)
 	putchar('\n');
 }
 /*
-	1  IFF_UP       
-	2  IFF_BROADCAST
-	3  IFF_PROMISC
-	4  IFF_RUNNING     = 0x0008,
-	5  IFF_MULTICAST   = 0x0010,
-	6  IFF_BROADCAST   = 0x0020,
-	7  IFF_POINTOPOINT = 0x0040,
-	8  IFF_NOARP       = 0x0080, 
-	9  IFF_LOOPBACK	= 0x0100,
-	10 IFF_DEBUG       = 0x0200,
-	11 IFF_LINK0       = 0x0400,
-	12 IFF_LINK1       = 0x0800,
-	13 IFF_LINK2       = 0x1000
-	
+	1	IFF_UP          = 0x0001,
+	2	IFF_DOWN        = 0x0002,
+	3	IFF_PROMISC     = 0x0004,
+	4	IFF_RUNNING     = 0x0008,
+	5	IFF_MULTICAST   = 0x0010,
+	6	IFF_BROADCAST   = 0x0020,
+	7	IFF_POINTOPOINT = 0x0040,
+	8	IFF_NOARP       = 0x0080, 
+	9	IFF_LOOPBACK	= 0x0100,
+	10	IFF_DEBUG       = 0x0200,
+	11	IFF_LINK0       = 0x0400,
+	12	IFF_LINK1       = 0x0800,
+	13	IFF_LINK2       = 0x1000,
+	14	IFF_SIMPLEX     = 0x2000
 */
 #define	IFFBITS \
-"\017\1UP\2BROADCAST\3PROMISC\4RUNNING\5MULTICAST\6BROADCAST\7POINTOPOINT\10NOARP\
-\11LOOPBACK\12DEBUG\13SIMPLEX\15LINK0\16LINK1\17LINK2"
+"\017\1UP\2DOWN\3PROMISC\4RUNNING\5MULTICAST\6BROADCAST\7POINTOPOINT\10NOARP\
+\11LOOPBACK\12DEBUG\13LINK0\14LINK1\15LINK2\16SIMPLEX"
 
 
 /*
