@@ -60,7 +60,7 @@ void
 FileTypeApp::RefsReceived(BMessage * message)
 {
 	BList entryList;
-	int32 i;
+	int32 i = 0;
 	entry_ref ref;
 	while (message->FindRef("refs",i++,&ref) == B_OK) {
 		BEntry * entry = new BEntry(&ref,true);
@@ -182,6 +182,31 @@ FileTypeApp::ArgvReceived(int32 argc, const char * argv[], const char * cwd)
 	if (entryList.CountItems() == 0) {
 		PrintUsage(argv[0]);
 		return;
+	}
+	if (entryList.CountItems() == 1) {
+		BEntry * entry = static_cast<BEntry*>(entryList.FirstItem()); 
+		BNode node(entry);
+		if (node.InitCheck() != B_OK) {
+			delete entry;
+			return;
+		}
+		BNodeInfo nodeInfo(&node);
+		if (nodeInfo.InitCheck() != B_OK) {
+			delete entry;
+			return;
+		}
+		char string[MAXPATHLEN];
+		if ((nodeInfo.GetType(string) == B_OK)
+		    && (strcmp(string,"application/x-vnd.Be-elfexecutable") == 0)) {
+		    AppTypeWindow * window = new AppTypeWindow(entry);
+		    if (window->InitCheck() == B_OK) {
+		    	fWindow = window;
+				fArgvOkay = true;
+		    } else {
+		    	printf("Failed to create AppTypeWindow\n");
+		    }
+		    return;
+		}
 	}
 	FileTypeWindow * window = new FileTypeWindow(&entryList);
 	if (window->InitCheck() != B_OK) {
