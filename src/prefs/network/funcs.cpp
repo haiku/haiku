@@ -278,7 +278,7 @@ empty things before setting the new values*/
 		if (GLOBAL[6]== "1") fip_forwarding->SetValue(1); 
 		if (GLOBAL[8]== "1") ftelnet_server->SetValue(1);
 		
-		for (i=0;i<number_of_interfaces;i++){ //Now the interfaces list
+		for (i=0;i<(unsigned)number_of_interfaces;i++){ //Now the interfaces list
 			BString string = INTERFACES[i][3];
 			string<<"->"<<INTERFACES[i][5]<<"->"<<"State(Not implemented yet)";
 			NetListItem *item = new NetListItem(string.String());

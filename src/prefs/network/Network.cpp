@@ -297,29 +297,28 @@ bool NetworkWindow::QuitRequested()
 		int32 result = alert->Go();
 		switch (result){
 			case 0:{
-				be_app->PostMessage(B_QUIT_REQUESTED);
-				return true;
+				// Don't Save
 				break;
 			}
 			case 1:{
+				// Cancel
 				return false;
 				break;				
 			}
 			case 2:{
+				// Save
 				BackupWin *sav = new BackupWin();
 				sav->fparent_window = dynamic_cast <NetworkWindow *> (fview->Window());
 				sav->Flatten_bak();
 				sav->Quit();	
-				be_app->PostMessage(B_QUIT_REQUESTED);
-				return true;						
 				break;
-			}	
+			}
+			default:
+				break;
 		}
 	}
-	else {
-		be_app->PostMessage(B_QUIT_REQUESTED);
-		return true;
-	}						
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
 }
 
 LoginInfo::LoginInfo() : BWindow(BRect(410,200,710,335),"Login Info",B_MODAL_WINDOW,B_NOT_ANCHORED_ON_ACTIVATE | B_NOT_RESIZABLE,B_CURRENT_WORKSPACE)
