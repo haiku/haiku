@@ -66,7 +66,7 @@ struct bootfs_vnode {
 struct bootfs {
 	mount_id id;
 	mutex lock;
-	int next_vnode_id;
+	int32 next_vnode_id;
 	void *vnode_list_hash;
 	struct bootfs_vnode *root_vnode;
 };
@@ -98,8 +98,8 @@ bootfs_vnode_hash_func(void *_v, const void *_key, unsigned int range)
 
 	if (v != NULL)
 		return v->id % range;
-	else
-		return (*key) % range;
+
+	return (*key) % range;
 }
 
 
@@ -109,10 +109,10 @@ bootfs_vnode_compare_func(void *_v, const void *_key)
 	struct bootfs_vnode *v = _v;
 	const vnode_id *key = _key;
 
-	if(v->id == *key)
+	if (v->id == *key)
 		return 0;
-	else
-		return -1;
+
+	return -1;
 }
 
 
@@ -122,14 +122,14 @@ bootfs_create_vnode(struct bootfs *fs, const char *name)
 	struct bootfs_vnode *v;
 
 	v = kmalloc(sizeof(struct bootfs_vnode));
-	if(v == NULL)
+	if (v == NULL)
 		return NULL;
 
 	memset(v, 0, sizeof(struct bootfs_vnode));
-	v->id = fs->next_vnode_id++;
+	v->id = atomic_add(&fs->next_vnode_id, 1);
 
 	v->name = kstrdup(name);
-	if(v->name == NULL) {
+	if (v->name == NULL) {
 		kfree(v);
 		return NULL;
 	}
@@ -545,20 +545,20 @@ bootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *v, bool r)
 
 	TRACE(("bootfs_get_vnode: asking for vnode 0x%Lx, r %d\n", id, r));
 
-	if(!r)
+	if (!r)
 		mutex_lock(&fs->lock);
 
 	*v = hash_lookup(fs->vnode_list_hash, &id);
 
-	if(!r)
+	if (!r)
 		mutex_unlock(&fs->lock);
 
 	TRACE(("bootfs_get_vnode: looked it up at %p\n", *v));
 
-	if(*v)
-		return 0;
-	else
-		return ENOENT;
+	if (*v)
+		return B_OK;
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 
