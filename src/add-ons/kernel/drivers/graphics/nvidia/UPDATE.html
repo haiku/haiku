@@ -6,11 +6,11 @@
 <p><h2>Changes done for each driverversion:</h2></p>
 <p><h1>head (cvs 0.36, Rudolf)</h1></p>
 <ul>
-	<li>Execution of acceleration commands is re-setup. Now it should be possible to use more engine commands than there are FIFO channels for them, by doing on-the-fly reconfiguring. This should be especially usefull when 3D acceleration is going to be setup later on;
+	<li>Execution of acceleration commands (PIO mode) is re-setup. Now it should be possible to use more engine commands than there are FIFO channels for them, by doing on-the-fly reconfiguring. This should be especially usefull when 3D acceleration is going to be setup later on;
 	<li>Added recognition for 20 new cards: Some (new) GeForce 6200, 6600 and 6800 types are now recognized;
 	<li>Modified cursor to be hardware synchronized to the screen's vertical retrace. This fixes the high CPU load on moving the mouse especially while being on the bottom of the screen (all GeForce series cards);
 	<li>Added new acceleration method using DMA command fetching. You can now choose beween (the old) PIO mode and (the new) DMA mode acceleration via a new switch in nv.settings (DMA mode is default). DMA acceleration is say 2-3 times as fast as PIO mode acceleration on systems with relative fast CPU's (above 2Ghz or so). On relative slow CPU's (500Mhz or lower) there is no speedgain left and both methods match about up.<br>
-	Note that on NV40 and higher only DMA mode acceleration currently works ('fix' in progress).
+	<strong>Note please:</strong> On NV40 and higher only DMA mode acceleration currently works.
 </ul>
 <p><h1>nv_driver 0.30, (Rudolf)</h1></p>
 <ul>

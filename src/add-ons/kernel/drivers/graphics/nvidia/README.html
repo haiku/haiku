@@ -21,9 +21,10 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>GeForce 3 (Ti);
 	<li>GeForce 4 MX/Ti/Go;
 	<li>GeForce 4 Integrated GPU (Nforce 2);
-	<li>GeForce FX 5200/5600/5700/5800/5900/5950/Go;
-	<li>Quadro (2/4/FX/Go);
-	<li>Some GeForce PCIe cards.
+	<li>GeForce (4 MX) PCX 4300;
+	<li>GeForce FX/PCX 5200/5300/5600/5700/5750/5800/5900/5950/Go;
+	<li>GeForce FX/PCX 6200/6600/6800/Go;
+	<li>Quadro (2/4/FX/PCX/Go).
 </ul>
 <br>
 <hr>
@@ -33,11 +34,11 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>Full 2D acceleration;
 	<li>Full BWindowScreen support (used for hardware pageflipping, scrolling/panning and acceleration in applications/games);
 	<li>DPMS support for analog connected screens (on both heads on dualhead cards);
-	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards (overlay follows head in dualhead stretch/switch modes);
+	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards, except for GeForce 6200 and 6600 (overlay follows head in dualhead stretch/switch modes);
 	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel (widescreen) support;
 	<li>Basic AGP mode support on AGP cards, using the new (seperate) (open)BeOS AGP busmanager;
-	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6600 and GeForce 6800.
+	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600 and 6800.
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
@@ -156,6 +157,14 @@ Keep this option set to <strong>force_pci false</strong>, unless the graphics ca
 <ul>
 	<li>If you have trouble using AGP mode, you should prefer tweaking the AGP busmanager settings file as it might well enable you to use a 'lesser' AGP mode instead of falling back to PCI mode alltogether. 
 </ul>
+	<li><strong>dma_acc:</strong><br>
+You can select one of two methods for (2D) acceleration here: PIO mode and DMA mode. DMA mode works 2-3 times as fast as PIO mode on modern CPU's (beyond 2Ghz or so), and should still match the PIO mode speed on slower CPU's (below 500Mhz).
+	<ul>
+		<li><strong>false:</strong><br>
+If the default setting does not work as expected, you can try falling back to PIO mode acceleration. Note however that PIO mode is currently not working on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types). Also, chances are that this method of acceleration will be removed in future driverversions (so be sure to let me know if you are having trouble with DMA mode!).
+		<li><strong>true:</strong> (default setting)<br>
+<strong>dma_acc true</strong> enables DMA cmd fetching by the GPU for (2D) acceleration instead of using the old PIO method (which directly programs acceleration commands inside the GPU). The DMA method works (much) faster than PIO mode depending on system CPU speed. Also the DMA method is the only method that works on NV40 and higher GPU's (GeForce 6200, 6600 and 6800 like types) currently.
+	</ul>
 	<li><strong>unhide_fw:</strong><br>
 This option is only used if your card is running in AGP mode. It's a real <strong>tweak</strong> option. It's officially unsupported, and it's unknown if it can do harm to your card or system. It exists because using it <strong>can</strong> speedup unaccelerated graphics <strong>a lot</strong>. Think about video playback or playing quake2 in software rendering mode...
 	<ul>
@@ -177,6 +186,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on November 1, 2004)</p>
+<p>(Page last updated on February 13, 2005)</p>
 </body>
 </html>
