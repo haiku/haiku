@@ -28,10 +28,12 @@
 
 extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
+extern module_info gDeviceForDriversModule;
 
 static module_info *sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
+	&gDeviceForDriversModule,
 	NULL
 };
 
