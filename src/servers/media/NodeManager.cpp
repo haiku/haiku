@@ -949,7 +949,7 @@ NodeManager::Dump()
 	BAutolock lock(fLocker);
 	printf("\n");
 	
-	/* for each addon-id, the addon path map contians an entry_ref
+	/* for each addon-id, the addon path map contains an entry_ref
 	 */
 	printf("NodeManager: addon path map follows:\n");
 	entry_ref *ref;
