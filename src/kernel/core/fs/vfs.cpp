@@ -601,10 +601,12 @@ free_vnode(struct vnode *vnode, bool reenter)
 {
 	ASSERT(vnode->ref_count == 0 && vnode->busy);
 
-	// write back any changes in this vnode's cache (if present)
+	// write back any changes in this vnode's cache -- but only
+	// if the vnode won't be deleted, in which case the changes
+	// will be discarded
 
 	if (vnode->cache && !vnode->delete_me)
-		vm_cache_write_modified((vm_cache_ref *)vnode->cache);
+		vm_cache_write_modified(vnode->cache);
 
 	if (vnode->delete_me)
 		FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
@@ -613,7 +615,7 @@ free_vnode(struct vnode *vnode, bool reenter)
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
-		vm_cache_release_ref((vm_cache_ref *)vnode->cache);
+		vm_cache_release_ref(vnode->cache);
 
 	vnode->cache = NULL;
 
@@ -4376,33 +4378,39 @@ fs_unmount(char *path, uint32 flags, bool kernel)
 	free(mount->fs_name);
 	free(mount);
 
-	return 0;
+	return B_OK;
 }
 
 
 static status_t
-fs_sync(void)
+fs_sync(dev_t device)
 {
-	struct hash_iterator iter;
 	struct fs_mount *mount;
 
-	FUNCTION(("vfs_sync: entry.\n"));
+	mount = get_mount(device);
+	if (mount == NULL)
+		return B_BAD_VALUE;
 
-	/* cycle through and call sync on each mounted fs */
-	recursive_lock_lock(&sMountOpLock);
 	mutex_lock(&sMountMutex);
 
-	hash_open(sMountsTable, &iter);
-	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iter))) {
-		if (FS_MOUNT_CALL(mount, sync))
-			FS_MOUNT_CALL(mount, sync)(mount->cookie);
-	}
-	hash_close(sMountsTable, &iter, false);
+	status_t status = B_OK;
+	if (FS_MOUNT_CALL(mount, sync))
+		status = FS_MOUNT_CALL(mount, sync)(mount->cookie);
 
 	mutex_unlock(&sMountMutex);
-	recursive_lock_unlock(&sMountOpLock);
 
-	return 0;
+	// synchronize all vnodes
+	recursive_lock_lock(&mount->rlock);
+	
+	struct vnode *vnode = NULL;
+	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
+		if (vnode->cache)
+			vm_cache_write_modified(vnode->cache);
+	}
+
+	recursive_lock_unlock(&mount->rlock);
+	put_mount(mount);
+	return status;
 }
 
 
@@ -4603,7 +4611,16 @@ _kern_write_fs_info(dev_t device, const struct fs_info *info, int mask)
 status_t
 _kern_sync(void)
 {
-	return fs_sync();
+	// Note: _kern_sync() is also called from _user_sync()
+	int32 cookie = 0;
+	dev_t device;
+	while ((device = next_dev(&cookie)) >= 0) {
+		status_t status = fs_sync(device);
+		if (status != B_OK && status != B_BAD_VALUE)
+			dprintf("sync: device %ld couldn't sync: %s\n", device, strerror(status));
+	}
+
+	return B_OK;
 }
 
 
@@ -5323,7 +5340,7 @@ _user_next_device(int32 *_userCookie)
 status_t
 _user_sync(void)
 {
-	return fs_sync();
+	return _kern_sync();
 }
 
 
