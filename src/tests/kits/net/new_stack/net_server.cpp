@@ -34,17 +34,17 @@ void my_free2(void * prompt, ...) // void * ptr)
 	free(ptr);
 }
 
-int test_data()
+int test_buffer()
 {
-	net_data 	*data;
-  	char		buffer[128];
+	net_buffer 	*buffer;
+  	char		data[128];
   	size_t		len;
   	char 		*tata;
   	char 		*titi;
   	char 		*toto;
   	char 		*tutu;
 
-  puts("test_data():");
+  puts("test_buffer():");
 	
   tata = (char *) malloc(16);
   strcpy(tata, "0123456789");
@@ -58,22 +58,22 @@ int test_data()
   tutu = (char *) malloc(16);
   strcpy(tutu, "hello there!");
   
-  data = g_stack->new_data();
+  buffer = g_stack->new_buffer();
 
-  g_stack->append_data(data, titi, 6, my_free);
-  g_stack->prepend_data(data, tata, 10, my_free);
-  g_stack->add_data_free_node(data, tutu, (void *) "hello there", my_free2);
-  g_stack->insert_data(data, 5, toto, 26, my_free);
-  g_stack->prepend_data(data, "this is a net_data test: ", 25, NULL);
+  g_stack->add_to_buffer(buffer, BUFFER_END, titi, 6, my_free);
+  g_stack->add_to_buffer(buffer, 0, tata, 10, my_free);
+  g_stack->attach_buffer_free_element(buffer, tutu, (void *) "hello there", my_free2);
+  g_stack->add_to_buffer(buffer, 5, toto, 26, my_free);
+  g_stack->add_to_buffer(buffer, 0, "this is a net_buffer test: ", 27, NULL);
 
-  g_stack->dump_data(data);
+  g_stack->dump_buffer(buffer);
 
-  len = g_stack->copy_from_data(data, 2, buffer, 128);
-  buffer[len] = 0;
+  len = g_stack->read_buffer(buffer, 2, data, sizeof(data));
+  data[len] = 0;
 
-  printf("buffer = [%s]\n", buffer);
+  printf("data = [%s]\n", data);
 
-  g_stack->delete_data(data, false);
+  g_stack->delete_buffer(buffer, false);
 
   return 0;
 }
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 		fflush(stdin);
 		fgetc(stdin);;
 		
-		test_data();
+		test_buffer();
 
 		g_stack->stop();
 	};

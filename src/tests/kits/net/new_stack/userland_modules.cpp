@@ -94,7 +94,7 @@ _EXPORT status_t get_module(const char * name, module_info ** mi)
 	status_t status;
 	module * m;
 	
-	printf("get_module(%s)\n", name);
+	// printf("get_module(%s)\n", name);
 	
 	m = find_loaded_module_by_name(name);
 	if (!m)
@@ -126,7 +126,7 @@ _EXPORT status_t put_module(const char * name)
 {
 	module * m;
 
-	printf("put_module(%s)\n", name);
+	// printf("put_module(%s)\n", name);
 	
 	m = find_loaded_module_by_name(name);
 	if (!m)
