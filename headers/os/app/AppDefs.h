@@ -91,6 +91,8 @@ enum {
 	B_WORKSPACES_CHANGED		= '_WCG',
 	B_WORKSPACE_ACTIVATED		= '_WAC',
 	B_ZOOM						= '_WZM',
+	_COLORS_UPDATED				= '_CLU',	// Currently internal-use only. Later, public as B_COLORS_UPDATED
+	_FONTS_UPDATED				= '_FNU',	// Currently internal-use only. Later, public as B_FONTS_UPDATED
 	_APP_MENU_					= '_AMN',
 	_BROWSER_MENUS_				= '_BRM',
 	_MENU_EVENT_ 				= '_MEV',
