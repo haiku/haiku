@@ -43,6 +43,7 @@ Server app_server :
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ViewDriver.cpp
+	WinBorder.cpp
 ;
 LinkSharedOSLibs app_server : be root game translation 
 							   <boot!home!config!lib>libopenbeos.so 

@@ -39,6 +39,7 @@
 class ServerWindow;
 class PortLink;
 class RootLayer;
+class WinBorder;
 
 /*!
 	\class Layer Layer.h
@@ -46,7 +47,7 @@ class RootLayer;
 	
 	Layers provide all sorts of functionality. They are the shadow class for BViews, 
 	but they also provide the base class for other classes which handle drawing to 
-	the frame buffer, like RootLayer and WindowBorder.
+	the frame buffer, like RootLayer and WinBorder.
 */
 class Layer
 {
@@ -95,6 +96,7 @@ public:
 
 protected:
 	friend RootLayer;
+	friend WinBorder;
 	
 	BRect _frame;
 

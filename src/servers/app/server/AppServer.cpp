@@ -382,7 +382,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			if(r==B_NO_MORE_PORTS || r==B_BAD_VALUE)
 			{
 				release_sem(_applist_lock);
-				printf("No more ports left. Time to crash. :)\n");
+				printf("No more ports left. Time to crash. Have a nice day! :)\n");
 				break;
 			}
 			ServerApp *newapp=new ServerApp(app_port,r,app_signature);
@@ -627,9 +627,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
-			
-			// TODO: Call ServerWindow::HandleKeyEvent when we have ServerWindow.h
-
+			ServerWindow::HandleKeyEvent(code, buffer);
 			break;
 		}
 		case B_KEY_UP:
@@ -705,8 +703,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 			// 4) int32 number of elements in the key state array to follow
 			// 5) int8 state of all keys
 			
-			// TODO: Call ServerWindow::HandleKeyEvent when we have ServerWindow.h
-			
+			ServerWindow::HandleMouseEvent(code,buffer);
 			break;
 		}
 		default:
@@ -747,9 +744,18 @@ ServerApp *AppServer::FindApp(const char *sig)
 	return NULL;
 }
 
+/*!
+	\brief Creates a new decorator instance
+	\param rect Frame size
+	\param title Title string for the "window"
+	\param wlook Window look type. See Window.h
+	\param wfeel Window feel type. See Window.h
+	\param wflags Window flags. See Window.h
+*/
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver)
 {
+	
 	return NULL;
 }
 

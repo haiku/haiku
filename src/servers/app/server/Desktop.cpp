@@ -43,11 +43,18 @@
 namespace desktop_private {
 	int8 *dragmessage;
 	int32 dragmessagesize;
-	sem_id draglock,
+	BLocker draglock,
 			layerlock,
 			workspacelock;
 	BList *screenlist;
 }
+
+void lock_layers(void) { desktop_private::layerlock.Lock(); }
+void unlock_layers(void) { desktop_private::layerlock.Unlock(); }
+void lock_dragdata(void) { desktop_private::draglock.Lock(); }
+void unlock_dragdata(void) { desktop_private::draglock.Unlock(); }
+void lock_workspaces(void) { desktop_private::workspacelock.Lock(); }
+void unlock_workspaces(void) { desktop_private::workspacelock.Unlock(); }
 
 /*!
 	\brief Initializes the desktop for use.

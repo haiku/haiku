@@ -36,19 +36,15 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "ServerProtocol.h"
-// TODO: uncomment this when we have WindowBorder.h
-//#include "WindowBorder.h"
+#include "WinBorder.h"
 #include "Desktop.h"
 #include "TokenHandler.h"
 
 //! Handler to get BWindow tokens from
 TokenHandler win_token_handler;
 
-// defined in WindowBorder.cpp. Locking is not necessary - the only
+// defined in WinBorder.cpp. Locking is not necessary - the only
 // _monitorthread which accesses them is the Poller _monitorthread
-
-// TODO: Uncomment the extern keyword when we have WindowBorder.h
-/* extern */bool is_moving_window,is_resizing_window,is_sliding_tab;
 
 //! Used in window focus management
 ServerWindow *active_serverwindow=NULL;
@@ -64,7 +60,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_title=new BString;
 	_title->SetTo( (string)?string:"Window" );
 
-	// This must happen before the WindowBorder object - it needs this object's _frame
+	// This must happen before the WinBorder object - it needs this object's _frame
 	// to be valid
 	_frame=rect;
 
@@ -73,12 +69,9 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_look=wlook;
 	_feel=wfeel;
 
-//	TODO: uncomment this when we have WindowBorder.h	
-//	_winborder=new WindowBorder(this, _title->String());
-
 	_decorator=new_decorator(_frame,_title->String(),_look,_feel,_flags,GetGfxDriver());
-//	TODO: uncomment this when we have WindowBorder.h	
-//	_winborder->SetDecorator(_decorator);
+
+	_winborder=new WinBorder(_frame,_title->String(),0,wflags,this);
 
 	// _sender is the monitored _app's event port
 	_sender=winport;
@@ -112,7 +105,7 @@ ServerWindow::~ServerWindow(void)
 		delete _title;
 		delete _winlink;
 		delete _decorator;
-//	TODO: uncomment this when we have WindowBorder.h	
+//	TODO: uncomment this when we have WinBorder.h	
 //		delete _winborder;
 	}
 	kill_thread(_monitorthread);
@@ -147,7 +140,7 @@ void ServerWindow::Show(void)
 {
 	if(_winborder)
 	{
-//	TODO: uncomment this when we have WindowBorder.h	
+//	TODO: uncomment this when we have WinBorder.h	
 //		_winborder->ShowLayer();
 		ActivateWindow(this);
 	}
@@ -155,7 +148,7 @@ void ServerWindow::Show(void)
 
 void ServerWindow::Hide(void)
 {
-//	TODO: uncomment this when we have WindowBorder.h	
+//	TODO: uncomment this when we have WinBorder.h	
 //	if(_winborder)
 //		_winborder->HideLayer();
 }
@@ -335,12 +328,12 @@ int32 ServerWindow::MonitorWin(void *data)
 
 void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 {
-	ServerWindow *mousewin=NULL;
+/*	ServerWindow *mousewin=NULL;
 	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
 	Layer *root=GetRootLayer();
-	WindowBorder *_winborder;
+	WinBorder *_winborder;
 	
 	// activeborder is used to remember windows when resizing/moving windows
 	// or sliding a tab
@@ -373,12 +366,11 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			BPoint pt(x,y);
 
 			// If we have clicked on a window, 			
-			_winborder=(WindowBorder*)root->GetChildAt(pt);
+			_winborder=(WinBorder*)root->GetChildAt(pt);
 			if(_winborder)
 			{
-// TODO: Uncomment when we have WindowBorder.h
-//				mousewin=_winborder->Window();
-//				_winborder->MouseDown(pt,buttons,modifiers);
+				mousewin=_winborder->Window();
+				_winborder->MouseDown(pt,buttons,modifiers);
 			}
 			break;
 		}
@@ -399,12 +391,11 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 //			int32 modifiers=*((int32*)index);
 			BPoint pt(x,y);
 			
-			is_moving_window=false;
-			_winborder=(WindowBorder*)root->GetChildAt(pt);
+			set_is_moving_window(false);
+			_winborder=(WinBorder*)root->GetChildAt(pt);
 			if(_winborder)
 			{
-// TODO: Uncomment when we have WindowBorder.h
-//				mousewin=_winborder->Window();
+				mousewin=_winborder->Window();
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
@@ -429,20 +420,18 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			uint32 buttons=*((uint32*)index);
 			BPoint pt(x,y);
 
-			if(is_moving_window || is_resizing_window || is_sliding_tab)
+			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
 				mousewin=active_serverwindow;
-// TODO: Uncomment when we have WindowBorder.h
-//				mousewin->_winborder->MouseMoved(pt,buttons,0);
+				mousewin->_winborder->MouseMoved(pt,buttons,0);
 			}
 			else
 			{
-				_winborder=(WindowBorder*)root->GetChildAt(pt);
+				_winborder=(WinBorder*)root->GetChildAt(pt);
 				if(_winborder)
 				{
-// TODO: Uncomment when we have WindowBorder.h
-//					mousewin=_winborder->Window();
-//					_winborder->MouseMoved(pt,buttons,0);
+					mousewin=_winborder->Window();
+					_winborder->MouseMoved(pt,buttons,0);
 				}
 			}				
 			break;
@@ -452,6 +441,11 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 			break;
 		}
 	}
+*/
+}
+
+void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
+{
 }
 
 void ActivateWindow(ServerWindow *win)

@@ -88,7 +88,6 @@ ServerApp::~ServerApp(void)
 {
 	int32 i;
 	
-	// TODO: Enable this when we have ServerWindow implemented
 	ServerWindow *tempwin;
 	for(i=0;i<_winlist->CountItems();i++)
 	{

@@ -60,4 +60,11 @@ void set_drag_message(int32 size, int8 *flattened);
 int8* get_drag_message(int32 *size);
 void empty_drag_message(void);
 
+void lock_layers(void);
+void unlock_layers(void);
+void lock_dragdata(void);
+void unlock_dragdata(void);
+void lock_workspaces(void);
+void unlock_workspaces(void);
+
 #endif

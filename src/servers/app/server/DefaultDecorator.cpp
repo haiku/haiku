@@ -145,7 +145,7 @@ void DefaultDecorator::MoveBy(BPoint pt)
 BRegion * DefaultDecorator::GetFootprint(void)
 {
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WindowBorder
+	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
 	
 	BRegion *reg=new BRegion(_borderrect);

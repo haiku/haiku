@@ -40,7 +40,7 @@ class BPoint;
 class ServerApp;
 class Decorator;
 class PortLink;
-class WindowBorder;
+class WinBorder;
 
 class ServerWindow
 {
@@ -79,6 +79,8 @@ public:
 
 protected:	
 	friend ServerApp;
+	friend WinBorder;
+	
 	BString *_title;
 	int32 _look, _feel, _flags;
 	int32 _workspace;
@@ -87,7 +89,7 @@ protected:
 	ServerApp *_app;
 	
 	Decorator *_decorator;
-	WindowBorder *_winborder;
+	WinBorder *_winborder;
 	
 	thread_id _monitorthread;
 	port_id _receiver;	// Messages from window
