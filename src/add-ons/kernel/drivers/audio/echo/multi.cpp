@@ -369,7 +369,7 @@ echo_play_inth(void* inthparams)
 	stream->real_time = system_time();
 	stream->frames_count += BUFFER_FRAMES;
 	stream->buffer_cycle = (stream->trigblk 
-		+ stream->blkmod -1) % stream->blkmod;
+		+ stream->blkmod) % stream->blkmod;
 	stream->update_needed = true;
 	release_spinlock(&slock);
 			
@@ -390,7 +390,7 @@ echo_record_inth(void* inthparams)
 	stream->real_time = system_time();
 	stream->frames_count += BUFFER_FRAMES;
 	stream->buffer_cycle = (stream->trigblk 
-		+ stream->blkmod -1) % stream->blkmod;
+		+ stream->blkmod) % stream->blkmod;
 	stream->update_needed = true;
 	release_spinlock(&slock);
 			

@@ -156,7 +156,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		return B_ERROR;
 	}
 
-	PRINT(("VerifyAudioOpen\n"));
+	//PRINT(("VerifyAudioOpen\n"));
 	status = stream->card->pEG->VerifyAudioOpen(stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : VerifyAudioOpen failed\n"));
@@ -216,7 +216,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	
 	stream->buffer = echo_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
 	
-	stream->trigblk = 0;	/* This shouldn't be needed */
+	stream->trigblk = 1;
 	stream->blkmod = stream->bufcount;
 	stream->blksize = stream->bufframes * frame_size;
 	
@@ -265,8 +265,8 @@ echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf,
 static uint32
 echo_stream_curaddr(echo_stream *stream)
 {
-	uint32 addr = *stream->position - (uint32)stream->buffer->phy_base;
-	TRACE(("stream_curaddr %p, phy_base %p\n", addr, (uint32)stream->buffer->phy_base));
+	uint32 addr = B_LENDIAN_TO_HOST_INT32(*stream->position);
+//	TRACE(("stream_curaddr %p, phy_base %p\n", addr));
 	return addr;
 }
 
@@ -368,29 +368,28 @@ int32 echo_int(void *arg)
 			
 	err = card->pEG->ServiceIrq(midiReceived);
 	
-	if(err == ECHOSTATUS_OK) {
-		LIST_FOREACH(stream, &card->streams, next) {
-			if ((stream->use & ECHO_USE_PLAY) == 0 ||
-				(stream->state & ECHO_STATE_STARTED) == 0 ||
-				(stream->inth == NULL))
-					continue;
-			
-			TRACE(("echo_int stream %p\n", stream));
-			curblk = echo_stream_curaddr(stream) / stream->blksize;
-			TRACE(("echo_int at trigblk %lu\n", curblk));
-			TRACE(("echo_int at stream->trigblk %lu\n", stream->trigblk));
-			if (curblk == stream->trigblk) {
-				if(stream->inth)
-					stream->inth(stream->inthparam);
-
-				stream->trigblk++;
-				stream->trigblk %= stream->blkmod;
-			}
-		}
-	
-		return B_HANDLED_INTERRUPT;
-	} else
+	if(err != ECHOSTATUS_OK) {
 		return B_UNHANDLED_INTERRUPT;
+	}
+
+	LIST_FOREACH(stream, &card->streams, next) {
+		if ((stream->state & ECHO_STATE_STARTED) == 0 ||
+			(stream->inth == NULL))
+				continue;
+		
+		TRACE(("echo_int stream %p\n", stream));
+		curblk = echo_stream_curaddr(stream) / stream->blksize;
+		TRACE(("echo_int at trigblk %lu\n", curblk));
+		TRACE(("echo_int at stream->trigblk %lu\n", stream->trigblk));
+		if (curblk == stream->trigblk) {
+			if(stream->inth)
+				stream->inth(stream->inthparam);
+
+			stream->trigblk++;
+		}
+	}
+
+	return B_INVOKE_SCHEDULER;
 }
 
 /* detect presence of our hardware */
