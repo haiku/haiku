@@ -763,6 +763,14 @@ ProbeView::AllAttached()
 
 
 void 
+ProbeView::WindowActivated(bool active)
+{
+	if (active)
+		fDataView->MakeFocus(true);
+}
+
+
+void 
 ProbeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {

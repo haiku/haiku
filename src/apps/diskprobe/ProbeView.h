@@ -27,6 +27,7 @@ class ProbeView : public BView {
 		virtual void DetachedFromWindow();
 		virtual void AttachedToWindow();
 		virtual void AllAttached();
+		virtual void WindowActivated(bool active);
 		virtual void MessageReceived(BMessage *message);
 
 		void AddFileMenuItems(BMenu *menu, int32 index);
