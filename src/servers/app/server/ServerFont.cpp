@@ -25,7 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include "ServerFont.h"
-
+#include "FontServer.h"
 
 /*! 
 	\brief Constructor
@@ -39,34 +39,32 @@
 ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear,
 	uint16 flags, uint8 spacing)
 {
-	fstyle=style;
-	fsize=size;
+	fStyle=style;
+	fSize=size;
 	frotation=rotation;
 	fshear=shear;
-	fflags=flags;
-	fspacing=spacing;
-	fdirection=B_FONT_LEFT_TO_RIGHT;
-	fface=B_REGULAR_FACE;
-	ftruncate=B_TRUNCATE_END;
-	fencoding=B_UNICODE_UTF8;
-	fbounds.Set(0,0,0,0);
-	if(fstyle)
-		fstyle->AddDependent();
+	fFlags=flags;
+	fSpacing=spacing;
+	fDirection=B_FONT_LEFT_TO_RIGHT;
+	fFace=B_REGULAR_FACE;
+	fEncoding=B_UNICODE_UTF8;
+	fBounds.Set(0,0,0,0);
+	if(fStyle)
+		fStyle->AddDependent();
 }
 
 ServerFont::ServerFont(void)
 {
-	fstyle=NULL;
-	fsize=0.0;
+	fStyle=NULL;
+	fSize=0.0;
 	frotation=0.0;
 	fshear=90.0;
-	fflags=0;
-	fspacing=B_STRING_SPACING;
-	fdirection=B_FONT_LEFT_TO_RIGHT;
-	fface=B_REGULAR_FACE;
-	ftruncate=B_TRUNCATE_END;
-	fencoding=B_UNICODE_UTF8;
-	fbounds.Set(0,0,0,0);
+	fFlags=0;
+	fSpacing=B_STRING_SPACING;
+	fDirection=B_FONT_LEFT_TO_RIGHT;
+	fFace=B_REGULAR_FACE;
+	fEncoding=B_UNICODE_UTF8;
+	fBounds.Set(0,0,0,0);
 }
 
 /*! 
@@ -75,19 +73,18 @@ ServerFont::ServerFont(void)
 */
 ServerFont::ServerFont(const ServerFont &font)
 {
-	fstyle=font.fstyle;
-	fsize=font.fsize;
+	fStyle=font.fStyle;
+	fSize=font.fSize;
 	frotation=font.frotation;
 	fshear=font.fshear;
-	fflags=font.fflags;
-	fspacing=font.fspacing;
-	fdirection=font.fdirection;
-	fface=font.fface;
-	ftruncate=font.ftruncate;
-	fencoding=font.fencoding;
-	fbounds.Set(0,0,0,0);
-	if(fstyle)
-		fstyle->AddDependent();
+	fFlags=font.fFlags;
+	fSpacing=font.fSpacing;
+	fDirection=font.fDirection;
+	fFace=font.fFace;
+	fEncoding=font.fEncoding;
+	fBounds.Set(0,0,0,0);
+	if(fStyle)
+		fStyle->AddDependent();
 }
 
 /*! 
@@ -95,8 +92,8 @@ ServerFont::ServerFont(const ServerFont &font)
 */
 ServerFont::~ServerFont(void)
 {
-	if(fstyle)
-		fstyle->RemoveDependent();
+	if(fStyle)
+		fStyle->RemoveDependent();
 }
 
 /*! 
@@ -105,19 +102,18 @@ ServerFont::~ServerFont(void)
 	\return A copy of the specified font
 */
 ServerFont& ServerFont::operator=(const ServerFont& font){
-	fstyle		= font.fstyle;
-	fsize		= font.fsize;
+	fStyle		= font.fStyle;
+	fSize		= font.fSize;
 	frotation	= font.frotation;
 	fshear		= font.fshear;
-	fflags		= font.fflags;
-	fspacing	= font.fspacing;
-	fdirection	= B_FONT_LEFT_TO_RIGHT;
-	fface		= B_REGULAR_FACE;
-	ftruncate	= B_TRUNCATE_END;
-	fencoding	= B_UNICODE_UTF8;
-	fbounds.Set(0,0,0,0);
-	if(fstyle)
-		fstyle->AddDependent();
+	fFlags		= font.fFlags;
+	fSpacing	= font.fSpacing;
+	fDirection	= B_FONT_LEFT_TO_RIGHT;
+	fFace		= B_REGULAR_FACE;
+	fEncoding	= B_UNICODE_UTF8;
+	fBounds.Set(0,0,0,0);
+	if(fStyle)
+		fStyle->AddDependent();
 	return *this;
 }
 
@@ -127,8 +123,8 @@ ServerFont& ServerFont::operator=(const ServerFont& font){
 */
 int32 ServerFont::CountTuned(void)
 {
-	if(fstyle)
-		fstyle->TunedCount();
+	if(fStyle)
+		fStyle->TunedCount();
 
 	return 0;
 }
@@ -139,7 +135,7 @@ int32 ServerFont::CountTuned(void)
 */
 font_file_format ServerFont::FileFormat(void)
 {
-	// TODO: implement
+	// TODO: implement ServerFont::FileFormat
 	return B_TRUETYPE_WINDOWS;
 }
 
@@ -149,17 +145,17 @@ font_file_format ServerFont::FileFormat(void)
 */
 BRect ServerFont::BoundingBox(void)
 {
-	return fbounds;
+	return fBounds;
 }
 
 const char *ServerFont::GetStyle(void) const
 {
-	return fstyle->Name();
+	return fStyle->Name();
 }
 
 const char *ServerFont::GetFamily(void) const
 {
-	return fstyle->Family()->Name();
+	return fStyle->Family()->Name();
 }
 
 /*! 
@@ -168,7 +164,25 @@ const char *ServerFont::GetFamily(void) const
 */
 void ServerFont::Height(font_height *fh)
 {
-	fh->ascent=fheight.ascent;
-	fh->descent=fheight.descent;
-	fh->leading=fheight.leading;
+	if(!fh)
+		return;
+	
+	if(fStyle)
+		*fh=fStyle->GetHeight(fSize);
+}
+
+/*!
+	\brief Sets the ServerFont instance to whatever font is specified
+	\param fontID the combination of family and style ID numbers
+*/
+void ServerFont::SetFamilyAndStyle(const uint32 &fontID)
+{
+	uint16 style = fontID & 0xFFFF;
+	uint16 family = (fontID & 0xFFFF0000) >> 16;
+	
+	fontserver->Lock();
+	FontStyle *sty=fontserver->GetStyle(family,style);
+	fontserver->Unlock();
+	if(sty)
+		fStyle=sty;
 }

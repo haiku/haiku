@@ -528,9 +528,7 @@ void ServerWindow::SetLayerFontState(Layer *layer, LinkMsgReader &link)
 	{
 		uint32		fontID;
 		link.Read<int32>((int32*)&fontID);
-		
-		// TODO: Implement. ServerFont::SetFamilyAndStyle(uint32) is needed
-		//layer->fLayerData->font->
+		layer->fLayerData->font.SetFamilyAndStyle(fontID);
 	}
 
 	if (mask & B_FONT_SIZE)
