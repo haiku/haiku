@@ -7,7 +7,7 @@
 #ifndef _DISK_DEVICE_MANAGER_H
 #define _DISK_DEVICE_MANAGER_H
 
-#include <SupportDefs.h>
+#include <Drivers.h>
 
 // TODO: These don't belong here. partition_id and disk_job_id are
 // public (exposed by the userland API), while disk_system_id is at least
@@ -43,6 +43,7 @@ typedef struct disk_device_data {
 	partition_id	id;				// equal to that of the root partition
 	uint32			flags;
 	char			*path;
+	device_geometry	geometry;
 } disk_device_data;
 
 // C API partitionable space representation
