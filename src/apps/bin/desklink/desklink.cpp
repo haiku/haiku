@@ -218,7 +218,7 @@ MediaReplicant::MouseDown(BPoint point)
 		menu->AddSeparatorItem();
 		menu->AddItem(new BMenuItem("Open MediaPlayer", new BMessage(OPEN_MEDIA_PLAYER)));
 		menu->AddSeparatorItem();
-		BMenuItem *tmpItem = new BMenuItem("Dont beep", new BMessage(TOGGLE_DONT_BEEP));
+		BMenuItem *tmpItem = new BMenuItem("Don't beep", new BMessage(TOGGLE_DONT_BEEP));
 		menu->AddItem(tmpItem);
 		tmpItem->SetMarked(confDontBeep);
 		BMenu *volMenu = new BMenu("Act On");

@@ -137,9 +137,9 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 					p = NULL;
 				}
 				if (p==NULL) {
-					errString = "Could not find the mixer";
+					errString = volumeWhich?"Could not find the soundcard":"Could not find the mixer";
 				} else if(p->Type()!=BParameter::B_CONTINUOUS_PARAMETER) {
-					errString = "Mixer is unknown";
+					errString = volumeWhich?"Soundcard control unknown":"Mixer control unknown";
 				} else {
 			
 					mixerParam = dynamic_cast<BContinuousParameter*>(p);
@@ -163,7 +163,7 @@ VolumeSlider::VolumeSlider(BRect frame, bool dontBeep, int32 volumeWhich)
 				retrying = true;
 				goto retry;
 			}
-			errString = "No Audio output";
+			errString = volumeWhich?"No Audio output":"No Mixer";
 		}
 	} else {
 		if (!retrying) {
