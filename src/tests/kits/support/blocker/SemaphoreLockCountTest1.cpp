@@ -1,5 +1,5 @@
 /*
-	$Id: SemaphoreLockCountTest1.cpp,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: SemaphoreLockCountTest1.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Count Lock Requests" for a semaphore style BLocker.
@@ -22,11 +22,10 @@
 	*/
 
 
-#include "SemaphoreLockCountTest1.h"
-#include "TestSuite.h"
 #include "ThreadedTestCaller.h"
-#include <be/support/Locker.h>
-#include "Locker.h"
+#include "SemaphoreLockCountTest1.h"
+#include "cppunit/TestSuite.h"
+#include <Locker.h>
 
 
 // This constant is used to determine the number of microseconds to
@@ -36,36 +35,36 @@ const bigtime_t SNOOZE_TIME = 100000;
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::SemaphoreLockCountTest1()
+ *  Method:  SemaphoreLockCountTest1::SemaphoreLockCountTest1()
  *   Descr:  This is the constructor for this test class.
  */
 		
-template<class Locker>
-	SemaphoreLockCountTest1<Locker>::SemaphoreLockCountTest1(std::string name) :
-		LockerTestCase<Locker>(name, false)
+
+	SemaphoreLockCountTest1::SemaphoreLockCountTest1(std::string name) :
+		LockerTestCase(name, false)
 {
 	}
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::~SemaphoreLockCountTest1()
+ *  Method:  SemaphoreLockCountTest1::~SemaphoreLockCountTest1()
  *   Descr:  This is the destructor for this test class.
  */
 
-template<class Locker>
-	SemaphoreLockCountTest1<Locker>::~SemaphoreLockCountTest1()
+
+	SemaphoreLockCountTest1::~SemaphoreLockCountTest1()
 {
 	}
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::CheckLockRequests()
+ *  Method:  SemaphoreLockCountTest1::CheckLockRequests()
  *   Descr:  This member function checks the actual number of lock requests
  *           that the BLocker thinks are outstanding versus the number
  *           passed in.  If they match, true is returned.
  */
 	
-template<class Locker> bool SemaphoreLockCountTest1<Locker>::CheckLockRequests(int expected)
+bool SemaphoreLockCountTest1::CheckLockRequests(int expected)
 {
 	int actual = theLocker->CountLockRequests();
 	return(actual == expected);
@@ -73,7 +72,7 @@ template<class Locker> bool SemaphoreLockCountTest1<Locker>::CheckLockRequests(i
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::TestThread1()
+ *  Method:  SemaphoreLockCountTest1::TestThread1()
  *   Descr:  This member function performs the main portion of the test.
  *           It first acquires thread2Lock and thread3Lock.  This ensures
  *           that thread2 and thread3 will block until this thread wants
@@ -85,28 +84,34 @@ template<class Locker> bool SemaphoreLockCountTest1<Locker>::CheckLockRequests(i
  *           the lock count on final time.
  */
 
-template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread1(void)
+void SemaphoreLockCountTest1::TestThread1(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
-	SafetyLock<Locker> theSafetyLock2(&thread2Lock);
-	SafetyLock<Locker> theSafetyLock3(&thread3Lock);
+	SafetyLock theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock2(&thread2Lock);
+	SafetyLock theSafetyLock3(&thread3Lock);
 	
+	NextSubTest();
 	assert(thread2Lock.Lock());
 	assert(thread3Lock.Lock());
 
+	NextSubTest();
 	assert(CheckLockRequests(1));
 	assert(theLocker->Lock());
 	
+	NextSubTest();
 	assert(CheckLockRequests(2));
 	
+	NextSubTest();
 	thread2Lock.Unlock();
 	snooze(SNOOZE_TIME);
 	assert(CheckLockRequests(4));
 	
+	NextSubTest();
 	thread3Lock.Unlock();
 	snooze(SNOOZE_TIME);
 	assert(CheckLockRequests(6));
 	
+	NextSubTest();
 	theLocker->Unlock();
 	snooze(SNOOZE_TIME);
 	assert(CheckLockRequests(3));
@@ -114,7 +119,7 @@ template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread1(void)
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::TestThread2()
+ *  Method:  SemaphoreLockCountTest1::TestThread2()
  *   Descr:  This member function defines the actions of the second thread of
  *           the test.  First it sleeps for a short while and then blocks on
  *           the thread2Lock.  When the first thread releases it, this thread
@@ -123,13 +128,15 @@ template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread1(void)
  *           acquired, the lock count is checked before finishing this thread.
  */
 
-template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread2(void)
+void SemaphoreLockCountTest1::TestThread2(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock1(theLocker);
 	
+	NextSubTest();
 	snooze(SNOOZE_TIME / 10);
 	assert(thread2Lock.Lock());
 	
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
 	assert(theLocker->Lock());
 	int actual = theLocker->CountLockRequests();
@@ -139,7 +146,7 @@ template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread2(void)
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::TestThread3()
+ *  Method:  SemaphoreLockCountTest1::TestThread3()
  *   Descr:  This member function defines the actions of the second thread of
  *           the test.  First it sleeps for a short while and then blocks on
  *           the thread3Lock.  When the first thread releases it, this thread
@@ -148,13 +155,15 @@ template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread2(void)
  *           acquired, the lock count is checked before finishing this thread.
  */
 
-template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread3(void)
+void SemaphoreLockCountTest1::TestThread3(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock1(theLocker);
 	
+	NextSubTest();
 	snooze(SNOOZE_TIME / 10);
 	assert(thread3Lock.Lock());
 	
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
 	assert(theLocker->Lock());
 	int actual = theLocker->CountLockRequests();
@@ -164,23 +173,23 @@ template<class Locker> void SemaphoreLockCountTest1<Locker>::TestThread3(void)
 
 
 /*
- *  Method:  SemaphoreLockCountTest1<Locker>::suite()
+ *  Method:  SemaphoreLockCountTest1::suite()
  *   Descr:  This static member function returns a test caller for performing 
  *           the "SemaphoreLockCountTest1" test.  The test caller
  *           is created as a ThreadedTestCaller (typedef'd as
  *           SemaphoreLockCountTest1Caller) with three independent threads.
  */
 
-template<class Locker> Test *SemaphoreLockCountTest1<Locker>::suite(void)
+CppUnit::Test *SemaphoreLockCountTest1::suite(void)
 {	
-	SemaphoreLockCountTest1<Locker> *theTest = new SemaphoreLockCountTest1<Locker>("");
-	SemaphoreLockCountTest1Caller *threadedTest = new SemaphoreLockCountTest1Caller("", theTest);
-	threadedTest->addThread(":Thread1", &SemaphoreLockCountTest1<Locker>::TestThread1);
-	threadedTest->addThread(":Thread2", &SemaphoreLockCountTest1<Locker>::TestThread2);
-	threadedTest->addThread(":Thread3", &SemaphoreLockCountTest1<Locker>::TestThread3);
+	typedef BThreadedTestCaller <SemaphoreLockCountTest1 >
+		SemaphoreLockCountTest1Caller;
+		
+	SemaphoreLockCountTest1 *theTest = new SemaphoreLockCountTest1("");
+	SemaphoreLockCountTest1Caller *threadedTest = new SemaphoreLockCountTest1Caller("BLocker::Semaphore Lock Count Test", theTest);
+	threadedTest->addThread("A", &SemaphoreLockCountTest1::TestThread1);
+	threadedTest->addThread("B", &SemaphoreLockCountTest1::TestThread2);
+	threadedTest->addThread("C", &SemaphoreLockCountTest1::TestThread3);
 	return(threadedTest);
-	}
+}
 
-
-template class SemaphoreLockCountTest1<BLocker>;
-template class SemaphoreLockCountTest1<OpenBeOS::BLocker>;

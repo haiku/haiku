@@ -3,12 +3,9 @@
 
 #include <cppunit/Exception.h>
 #include <cppunit/TestResult.h>
-#include <kernel/OS.h>
+#include <OS.h>
 #include <signal.h>
 #include <string>
-
-//class ThreadedTestCase;
-class CppUnit::TestResult;
 
 // Pointer to a function that takes no parameters and
 // returns no result. All threads must be implemented

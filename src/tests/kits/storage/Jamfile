@@ -18,6 +18,7 @@ CommonTestLib libstoragetest.so
 		SymLinkTest.cpp
 	: <$(SOURCE_GRIST)>libstorage.so be stdc++.r4
 	: be stdc++.r4
+	:
 	: storage
 ;
 

@@ -223,7 +223,7 @@ NOTFILE r5tests ;
 rule CommonTestLib
 {
 	# CommonUnitTest <target> : <sources> : <obos libraries> 
-	#	: <r5 libraries> : <public headers>;
+	#	: <r5 libraries> : <test libraries> : <public headers>;
 	# Builds a unit test for both OBOS and R5 modules.
 	# <target> The name of the target.
 	# <sources> The list of sources.
@@ -231,13 +231,16 @@ rule CommonTestLib
 	# to LinkSharedOSLibs).
 	# <r5 libraries> A list of link libraries for the R5 tests (as passed
 	# to LinkSharedOSLibs).
+	# <test libraries> A list of link libraries for both OBOS tests and R5 tests
+	# that have a common name (i.e. specify libx.so and the OBOS tests will link
+	# to libx.so and the R5 tests will link to libx_r5.so).
 	# <public headers> A list of public header dirs (as passed to
 	# UsePublicHeaders).
 
 	local testlibdir = [ FDirName $(OBOS_TEST_DIR) lib ] ; #/boot/home/config/lib/obos_tests ;
 
-	TestLib $(1) : $(2) : $(testlibdir) : $(3) : $(5) ;
-	R5TestLib $(1) : $(2) : $(testlibdir) : $(4) ;
+	TestLib $(1) : $(2) : $(testlibdir) : $(3) $(5) : $(6) ;
+	R5TestLib $(1) : $(2) : $(testlibdir) : $(4) [ R5SharedLibraryNames $(5) ] ;
 }
 
 rule TestLib
@@ -446,6 +449,15 @@ rule R5ObjectNames
 	# Moreover each object names gets "_r5" inserted before the object suffix.
 	local objects = $(1:S=)_r5 ;
 	return [ FGristFiles $(objects:S=$(SUFOBJ)) ] ;
+}
+
+rule R5SharedLibraryNames
+{
+	# R5SharedLibraryNames <sources> ;
+	# Returns a list of shared library names given a list of file names. NO
+	# GRISTING IS PERFORMED :-) However, each library names gets "_r5" inserted
+	# before the shared lib suffix.
+	return $(1:S=)_r5.so ;
 }
 
 rule SimpleTest

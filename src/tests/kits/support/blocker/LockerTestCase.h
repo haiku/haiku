@@ -1,5 +1,5 @@
 /*
-	$Id: LockerTestCase.h,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: LockerTestCase.h,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file defines a couple of common classes for testing BLocker
 	functionality.
@@ -10,8 +10,10 @@
 #ifndef LockerTestCase_H
 #define LockerTestCase_H
 
+#include <ThreadedTestCase.h>
+#include <string>
 
-#include "TestCase.h"
+class BLocker;
 
 //
 // The SafetyLock class is a utility class for use in actual tests
@@ -21,20 +23,20 @@
 // deadlocks if one thread in a test has a failure while holding the
 // lock.  It should be used like so:
 //
-// template<class Locker> void myTestClass<Locker>::myTestFunc(void)
+// void myTestClass::myTestFunc(void)
 // {
-//   SafetyLock<Locker> mySafetyLock(theLocker);
+//   SafetyLock mySafetyLock(theLocker);
 //   ...perform tests without worrying about holding the lock on assert...
 //
 
-template<class Locker> class SafetyLock {
+class SafetyLock {
 private:
-	Locker *theLocker;
+	BLocker *theLocker;
 	
 public:
-	SafetyLock(Locker *aLock) {theLocker = aLock;}
+	SafetyLock(BLocker *aLock) {theLocker = aLock;};
 	virtual ~SafetyLock() {if (theLocker != NULL) theLocker->Unlock(); };
-	};
+};
 
 
 //
@@ -45,16 +47,19 @@ public:
 // the lock is sane.
 //
 	
-template<class Locker> class LockerTestCase : public TestCase {
+class LockerTestCase : public BThreadedTestCase {
 	
 protected:
-	Locker *theLocker;
+	BLocker *theLocker;
 
 	void CheckLock(int);
 	
 public:
 	LockerTestCase(std::string name, bool);
 	virtual ~LockerTestCase();
-	};
+};
 	
 #endif
+
+
+

@@ -8,6 +8,8 @@
 #include <TestShell.h>
 #include <ThreadManager.h>
 #include <map>
+#include <vector>
+#include <stdio.h>
 
 class TestResult;
 

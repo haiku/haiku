@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest2.cpp,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: ConcurrencyTest2.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Locking 1", "Locking 2", "Unlocking", "Is Locked",
@@ -12,10 +12,9 @@
 	*/
 
 
-#include "ConcurrencyTest2.h"
-#include "TestSuite.h"
 #include "ThreadedTestCaller.h"
-#include <be/support/Locker.h>
+#include "ConcurrencyTest2.h"
+#include "cppunit/TestSuite.h"
 #include "Locker.h"
 
 
@@ -30,32 +29,32 @@ const int32 MAXLOOP = 10000;
 const bigtime_t SNOOZE_TIME = 200000;
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::ConcurrencyTest2()
+ *  Method:  ConcurrencyTest2::ConcurrencyTest2()
  *   Descr:  This is the only constructor for this test case.  It takes a
  *           test name and a flag to indicate whether to test a benaphore
  *           or semaphore type BLocker.
  */
 		
-template<class Locker>
-	ConcurrencyTest2<Locker>::ConcurrencyTest2(std::string name, bool benaphoreFlag) :
-	LockerTestCase<Locker>(name, benaphoreFlag), lockTestValue(false)
+
+	ConcurrencyTest2::ConcurrencyTest2(std::string name, bool benaphoreFlag) :
+	LockerTestCase(name, benaphoreFlag), lockTestValue(false)
 {
 	}
 
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::~ConcurrencyTest2()
+ *  Method:  ConcurrencyTest2::~ConcurrencyTest2()
  *   Descr:  This is the descriptor for this test case.
  */
 
-template<class Locker>
-	ConcurrencyTest2<Locker>::~ConcurrencyTest2()
+
+	ConcurrencyTest2::~ConcurrencyTest2()
 {
 	}
 	
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::setUp()
+ *  Method:  ConcurrencyTest2::setUp()
  *   Descr:  This member is called before starting the actual test threads
  *           and is used to ensure that the class is initialized for the
  *           testing.  It just sets the "lockTestValue" flag to false.  This
@@ -63,15 +62,15 @@ template<class Locker>
  *           threads.
  */
 	
-template<class Locker> void
-	ConcurrencyTest2<Locker>::setUp(void)
+void
+	ConcurrencyTest2::setUp(void)
 {
 	lockTestValue = false;
 	}
 
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::suite()
+ *  Method:  ConcurrencyTest2::suite()
  *   Descr:  This static member function returns a test suite for performing 
  *           all combinations of "ConcurrencyTest2".  The test suite contains
  *           two instances of the test.  One is performed on a benaphore,
@@ -80,25 +79,27 @@ template<class Locker> void
  *           ConcurrencyTest2Caller) with three independent threads.
  */
 
-template<class Locker> Test *ConcurrencyTest2<Locker>::suite(void)
+CppUnit::Test *ConcurrencyTest2::suite(void)
 {	
-	TestSuite *testSuite = new TestSuite("ConcurrencyTest2");
+	typedef BThreadedTestCaller <ConcurrencyTest2 >
+		ConcurrencyTest2Caller;
+	CppUnit::TestSuite *testSuite = new CppUnit::TestSuite("ConcurrencyTest2");
 	
 	// Make a benaphore based test object, create a ThreadedTestCase for it and add
 	// three threads to it.
-	ConcurrencyTest2<Locker> *theTest = new ConcurrencyTest2<Locker>("Benaphore", true);
-	ConcurrencyTest2Caller *threadedTest1 = new ConcurrencyTest2Caller("", theTest);
-	threadedTest1->addThread(":Thread1", &ConcurrencyTest2<Locker>::AcquireThread);
-	threadedTest1->addThread(":Thread2", &ConcurrencyTest2<Locker>::TimeoutThread);
-	threadedTest1->addThread(":Thread3", &ConcurrencyTest2<Locker>::TimeoutThread);
+	ConcurrencyTest2 *theTest = new ConcurrencyTest2("Benaphore", true);
+	ConcurrencyTest2Caller *threadedTest1 = new ConcurrencyTest2Caller("BLocker::Concurrency Test #2 (benaphore)", theTest);
+	threadedTest1->addThread("Acquire", &ConcurrencyTest2::AcquireThread);
+	threadedTest1->addThread("Timeout1", &ConcurrencyTest2::TimeoutThread);
+	threadedTest1->addThread("Timeout2", &ConcurrencyTest2::TimeoutThread);
 				
 	// Make a semaphore based test object, create a ThreadedTestCase for it and add
 	// three threads to it.					 		
-	theTest = new ConcurrencyTest2<Locker>("Semaphore", false);
-	ConcurrencyTest2Caller *threadedTest2 = new ConcurrencyTest2Caller("", theTest);
-	threadedTest2->addThread(":Thread1", &ConcurrencyTest2<Locker>::AcquireThread);
-	threadedTest2->addThread(":Thread2", &ConcurrencyTest2<Locker>::TimeoutThread);
-	threadedTest2->addThread(":Thread3", &ConcurrencyTest2<Locker>::TimeoutThread);
+	theTest = new ConcurrencyTest2("Semaphore", false);
+	ConcurrencyTest2Caller *threadedTest2 = new ConcurrencyTest2Caller("BLocker::Concurrency Test #2 (semaphore)", theTest);
+	threadedTest2->addThread("Acquire", &ConcurrencyTest2::AcquireThread);
+	threadedTest2->addThread("Timeout1", &ConcurrencyTest2::TimeoutThread);
+	threadedTest2->addThread("Timeout2", &ConcurrencyTest2::TimeoutThread);
 									 		
 	testSuite->addTest(threadedTest1);	
 	testSuite->addTest(threadedTest2);
@@ -107,24 +108,28 @@ template<class Locker> Test *ConcurrencyTest2<Locker>::suite(void)
 	
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::AcquireThread()
+ *  Method:  ConcurrencyTest2::AcquireThread()
  *   Descr:  This member function acquires the lock, sleeps for SNOOZE_TIME,
  *           releases the lock and then launches into the lock loop test.
  */
 
-template<class Locker> void ConcurrencyTest2<Locker>::AcquireThread(void)
+void ConcurrencyTest2::AcquireThread(void)
 {	
-	SafetyLock<Locker> theSafetyLock(theLocker);
+	SafetyLock theSafetyLock(theLocker);
 	
 	assert(theLocker->Lock());
+	NextSubTest();
 	snooze(SNOOZE_TIME);					
+	NextSubTest();
 	theLocker->Unlock();
+	NextSubTest();
 	LockingLoop();
+	NextSubTest();
 	}
 
 	
 /*
- *  Method:  ConcurrencyTest2<Locker>::AcquireLock()
+ *  Method:  ConcurrencyTest2::AcquireLock()
  *   Descr:  This member function is passed the number of times through the
  *           acquisition loop (lockAttempt) and whether or not this is
  *           the first acquisition of the lock within this iteration.
@@ -133,7 +138,7 @@ template<class Locker> void ConcurrencyTest2<Locker>::AcquireThread(void)
  *           both lock acquisition methods on the BLocker.
  */
 	
-template<class Locker> bool ConcurrencyTest2<Locker>::AcquireLock(int lockAttempt,
+bool ConcurrencyTest2::AcquireLock(int lockAttempt,
                                                        bool firstAcquisition)
 {
 	bool timeoutLock;
@@ -154,24 +159,27 @@ template<class Locker> bool ConcurrencyTest2<Locker>::AcquireLock(int lockAttemp
 
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::TimeoutThread()
+ *  Method:  ConcurrencyTest2::TimeoutThread()
  *   Descr:  This member function sleeps for a short time and then attempts to
  *           acquire the lock for SNOOZE_TIME/10 seconds.  This acquisition
  *           should timeout.  Then the locking loop is started.
  */
 
-template<class Locker> void ConcurrencyTest2<Locker>::TimeoutThread(void)
+void ConcurrencyTest2::TimeoutThread(void)
 {
-	SafetyLock<Locker> theSafetyLock(theLocker);
+	SafetyLock theSafetyLock(theLocker);
 	
 	snooze(SNOOZE_TIME/2);
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME/10) == B_TIMED_OUT);
+	NextSubTest();
 	LockingLoop();
+	NextSubTest();
 }
 	
 
 /*
- *  Method:  ConcurrencyTest2<Locker>::TestThread()
+ *  Method:  ConcurrencyTest2::TestThread()
  *   Descr:  This method is the core of the test.  Each of the three threads
  *           run this method to perform the concurrency test.  First, the
  *           SafetyLock class (see LockerTestCase.h) is used to make sure that
@@ -194,12 +202,12 @@ template<class Locker> void ConcurrencyTest2<Locker>::TimeoutThread(void)
  *              - The thread confirms that the lock is no longer held.
  */
 
-template<class Locker> void ConcurrencyTest2<Locker>::LockingLoop(void)
+void ConcurrencyTest2::LockingLoop(void)
 {
 	int i;
-	SafetyLock<Locker> theSafetyLock(theLocker);
+	SafetyLock theSafetyLock(theLocker);
 	
-	for (i = 0; i < MAXLOOP; i++) {
+	for (i = 0; i < MAXLOOP; i++) {	
 		CheckLock(0);
 		assert(AcquireLock(i, true));
 		
@@ -221,5 +229,4 @@ template<class Locker> void ConcurrencyTest2<Locker>::LockingLoop(void)
 }
 
 
-template class ConcurrencyTest2<BLocker>;
-template class ConcurrencyTest2<OpenBeOS::BLocker>;
+

@@ -2,7 +2,7 @@
 #define _beos_threaded_test_case_h_
 
 #include <Locker.h>
-#include <kernel/OS.h>
+#include <OS.h>
 #include <TestCase.h>
 #include <map>
 #include <string>

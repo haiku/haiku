@@ -1,5 +1,5 @@
 /*
-	$Id: ConcurrencyTest2.h,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: ConcurrencyTest2.h,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file defines a classes for performing one test of BLocker
 	functionality.
@@ -12,14 +12,12 @@
 
 
 #include "LockerTestCase.h"
-#include "ThreadedTestCaller.h"
 
-	
-template<class Locker> class ConcurrencyTest2 : public LockerTestCase<Locker> {
+class CppUnit::Test;
+
+class ConcurrencyTest2 : public LockerTestCase {
 	
 private:
-	typedef ThreadedTestCaller <ConcurrencyTest2<Locker> >
-		ConcurrencyTest2Caller;
 	bool lockTestValue;
 
 	void TestThread(void);
@@ -32,7 +30,10 @@ public:
 	void setUp(void);
 	void AcquireThread(void);
 	void TimeoutThread(void);
-	static Test *suite(void);
+	static CppUnit::Test *suite(void);
 	};
 	
 #endif
+
+
+

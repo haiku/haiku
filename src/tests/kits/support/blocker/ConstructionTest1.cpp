@@ -1,5 +1,5 @@
 /*
-	$Id: ConstructionTest1.cpp,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: ConstructionTest1.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BLocker construction
 	functionality.  It checks the "Construction 1", "Construction 2" and
@@ -11,44 +11,43 @@
 
 
 #include "ConstructionTest1.h"
-#include "TestCaller.h"
-#include <be/kernel/OS.h>
-#include <be/support/Locker.h>
-#include "Locker.h"
+#include <cppunit/TestCaller.h>
+#include <OS.h>
+#include <Locker.h>
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::ConstructionTest1()
+ *  Method:  ConstructionTest1::ConstructionTest1()
  *   Descr:  This is the constructor for this class.
  */
 		
-template<class Locker>
-	ConstructionTest1<Locker>::ConstructionTest1(std::string name) :
-		LockerTestCase<Locker>(name, true)
+
+	ConstructionTest1::ConstructionTest1(std::string name) :
+		LockerTestCase(name, true)
 {
 	}
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::~ConstructionTest1()
+ *  Method:  ConstructionTest1::~ConstructionTest1()
  *   Descr:  This is the desctructor for this BLocker test class.
  */
 
-template<class Locker>
-	ConstructionTest1<Locker>::~ConstructionTest1()
+
+	ConstructionTest1::~ConstructionTest1()
 {
 	}
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::NameMatches()
+ *  Method:  ConstructionTest1::NameMatches()
  *   Descr:  This member checks that the semaphore owned by the lock
  *           passed in has the name passed in.
  */
 	
-template<class Locker> bool
-	ConstructionTest1<Locker>::NameMatches(const char *name,
-									       Locker *lockerArg)
+bool
+	ConstructionTest1::NameMatches(const char *name,
+									       BLocker *lockerArg)
 {
 	sem_info theSemInfo;
 	
@@ -58,15 +57,15 @@ template<class Locker> bool
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::IsBenaphore()
+ *  Method:  ConstructionTest1::IsBenaphore()
  *   Descr:  This member attempts to confirm that the BLocker passed in
  *           is a benaphore or a semaphore style locker.  It returns true
  *           if it is a benaphore, false if it is a semaphore.  An
  *           assertion is raised if an error occurs.
  */
 	
-template<class Locker> bool
-	ConstructionTest1<Locker>::IsBenaphore(Locker *lockerArg)
+bool
+	ConstructionTest1::IsBenaphore(BLocker *lockerArg)
 {
 	int32 semCount;
 	
@@ -88,59 +87,60 @@ template<class Locker> bool
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::PerformTest()
+ *  Method:  ConstructionTest1::PerformTest()
  *   Descr:  This member function is used to test each of the constructors
  *           for the BLocker.  The resulting BLocker is tested to show
  *           that the BLocker was constructed correctly.
  */
 
-template<class Locker> void ConstructionTest1<Locker>::PerformTest(void)
+void ConstructionTest1::PerformTest(void)
 {
+	NextSubTest();
 	assert(NameMatches("some BLocker", theLocker));
 	assert(IsBenaphore(theLocker));
 	
-	Locker locker1("test string");
+	NextSubTest();
+	BLocker locker1("test string");
 	assert(NameMatches("test string", &locker1));
 	assert(IsBenaphore(&locker1));
 	
-	Locker locker2(false);
+	NextSubTest();
+	BLocker locker2(false);
 	assert(NameMatches("some BLocker", &locker2));
 	assert(!IsBenaphore(&locker2));
 	
-	Locker locker3(true);
+	NextSubTest();
+	BLocker locker3(true);
 	assert(NameMatches("some BLocker", &locker3));
 	assert(IsBenaphore(&locker3));
 	
-	Locker locker4("test string", false);
+	NextSubTest();
+	BLocker locker4("test string", false);
 	assert(NameMatches("test string", &locker4));
 	assert(!IsBenaphore(&locker4));
 	
-	Locker locker5("test string", true);
+	NextSubTest();
+	BLocker locker5("test string", true);
 	assert(NameMatches("test string", &locker5));
 	assert(IsBenaphore(&locker5));
 }
 
 
 /*
- *  Method:  ConstructionTest1<Locker>::suite()
+ *  Method:  ConstructionTest1::suite()
  *   Descr:  This static member function returns a threaded test caller for
  *           performing "ConstructionTest1".  The threaded test caller
  *           only has a single thread pointint to the PerformTest() member
  *           function of this class.
  */
 
-template<class Locker> Test *ConstructionTest1<Locker>::suite(void)
+CppUnit::Test *ConstructionTest1::suite(void)
 {
-	ConstructionTest1<Locker> *theTest =
-		new ConstructionTest1<Locker>("");
+	typedef CppUnit::TestCaller <ConstructionTest1 >
+		ConstructionTest1Caller;
 		
-	ConstructionTest1Caller *testCaller =
-		new ConstructionTest1Caller("", theTest);
-	
-	testCaller->addThread(":Thread1",
-	                      &ConstructionTest1<Locker>::PerformTest);
-	return(testCaller);
+	return new ConstructionTest1Caller("BLocker::Construction Test", &ConstructionTest1::PerformTest);
 }
 
-template class ConstructionTest1<BLocker>;
-template class ConstructionTest1<OpenBeOS::BLocker>;
+
+

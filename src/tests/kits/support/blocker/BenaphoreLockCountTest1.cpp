@@ -1,5 +1,5 @@
 /*
-	$Id: BenaphoreLockCountTest1.cpp,v 1.2 2002/07/13 22:45:21 bonefish Exp $
+	$Id: BenaphoreLockCountTest1.cpp,v 1.3 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Count Lock Requests" for a benaphore style BLocker.
@@ -22,11 +22,11 @@
 	*/
 
 
+#include <ThreadedTestCaller.h>
 #include "BenaphoreLockCountTest1.h"
-#include "cppunit/TestSuite.h"
-#include "ThreadedTestCaller.h"
-#include <be/support/Locker.h>
-#include "Locker.h"
+#include <cppunit/Test.h>
+#include <cppunit/TestSuite.h>
+#include <Locker.h>
 
 
 // This constant is used to determine the number of microseconds to
@@ -36,36 +36,36 @@ const bigtime_t SNOOZE_TIME = 100000;
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::BenaphoreLockCountTest1()
+ *  Method:  BenaphoreLockCountTest1::BenaphoreLockCountTest1()
  *   Descr:  This is the constructor for this test class.
  */
 		
-template<class Locker>
-	BenaphoreLockCountTest1<Locker>::BenaphoreLockCountTest1(std::string name) :
-		LockerTestCase<Locker>(name, true)
+
+	BenaphoreLockCountTest1::BenaphoreLockCountTest1(std::string name) :
+		LockerTestCase(name, true)
 {
 	}
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::~BenaphoreLockTestCountTest1()
+ *  Method:  BenaphoreLockCountTest1::~BenaphoreLockTestCountTest1()
  *   Descr:  This is the destructor for this test class.
  */
 
-template<class Locker>
-	BenaphoreLockCountTest1<Locker>::~BenaphoreLockCountTest1()
+
+	BenaphoreLockCountTest1::~BenaphoreLockCountTest1()
 {
 	}
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::CheckLockRequests()
+ *  Method:  BenaphoreLockCountTest1::CheckLockRequests()
  *   Descr:  This member function checks the actual number of lock requests
  *           that the BLocker thinks are outstanding versus the number
  *           passed in.  If they match, true is returned.
  */
 	
-template<class Locker> bool BenaphoreLockCountTest1<Locker>::CheckLockRequests(int expected)
+bool BenaphoreLockCountTest1::CheckLockRequests(int expected)
 {
 	int actual = theLocker->CountLockRequests();
 	return(actual == expected);
@@ -73,7 +73,7 @@ template<class Locker> bool BenaphoreLockCountTest1<Locker>::CheckLockRequests(i
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::TestThread1()
+ *  Method:  BenaphoreLockCountTest1::TestThread1()
  *   Descr:  This member function performs the main portion of the test.
  *           It first acquires thread2Lock and thread3Lock.  This ensures
  *           that thread2 and thread3 will block until this thread wants
@@ -85,36 +85,50 @@ template<class Locker> bool BenaphoreLockCountTest1<Locker>::CheckLockRequests(i
  *           the lock count on final time.
  */
 
-template<class Locker> void BenaphoreLockCountTest1<Locker>::TestThread1(void)
+void BenaphoreLockCountTest1::TestThread1(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
-	SafetyLock<Locker> theSafetyLock2(&thread2Lock);
-	SafetyLock<Locker> theSafetyLock3(&thread3Lock);
+	SafetyLock theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock2(&thread2Lock);
+	SafetyLock theSafetyLock3(&thread3Lock);
 	
 	assert(thread2Lock.Lock());
+	NextSubTest();
 	assert(thread3Lock.Lock());
+	NextSubTest();
 
 	assert(CheckLockRequests(0));
+	NextSubTest();
 	assert(theLocker->Lock());
+	NextSubTest();
 	
 	assert(CheckLockRequests(1));
+	NextSubTest();
 	
 	thread2Lock.Unlock();
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	assert(CheckLockRequests(3));
+	NextSubTest();
 	
 	thread3Lock.Unlock();
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	assert(CheckLockRequests(5));
+	NextSubTest();
 	
 	theLocker->Unlock();
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	assert(CheckLockRequests(2));
+	NextSubTest();
 	}
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::TestThread2()
+ *  Method:  BenaphoreLockCountTest1::TestThread2()
  *   Descr:  This member function defines the actions of the second thread of
  *           the test.  First it sleeps for a short while and then blocks on
  *           the thread2Lock.  When the first thread releases it, this thread
@@ -123,23 +137,30 @@ template<class Locker> void BenaphoreLockCountTest1<Locker>::TestThread1(void)
  *           acquired, the lock count is checked before finishing this thread.
  */
 
-template<class Locker> void BenaphoreLockCountTest1<Locker>::TestThread2(void)
+void BenaphoreLockCountTest1::TestThread2(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock1(theLocker);
 	
 	snooze(SNOOZE_TIME / 10);
+	NextSubTest();
 	assert(thread2Lock.Lock());
+	NextSubTest();
 	
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	NextSubTest();
 	assert(theLocker->Lock());
+	NextSubTest();
 	int actual = theLocker->CountLockRequests();
+	NextSubTest();
 	assert((actual == 3) || (actual == 4));
+	NextSubTest();
 	theLocker->Unlock();
+	NextSubTest();
 }
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::TestThread3()
+ *  Method:  BenaphoreLockCountTest1::TestThread3()
  *   Descr:  This member function defines the actions of the second thread of
  *           the test.  First it sleeps for a short while and then blocks on
  *           the thread3Lock.  When the first thread releases it, this thread
@@ -148,39 +169,44 @@ template<class Locker> void BenaphoreLockCountTest1<Locker>::TestThread2(void)
  *           acquired, the lock count is checked before finishing this thread.
  */
 
-template<class Locker> void BenaphoreLockCountTest1<Locker>::TestThread3(void)
+void BenaphoreLockCountTest1::TestThread3(void)
 {
-	SafetyLock<Locker> theSafetyLock1(theLocker);
+	SafetyLock theSafetyLock1(theLocker);
 	
 	snooze(SNOOZE_TIME / 10);
+	NextSubTest();
 	assert(thread3Lock.Lock());
+	NextSubTest();
 	
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	NextSubTest();
 	assert(theLocker->Lock());
+	NextSubTest();
 	int actual = theLocker->CountLockRequests();
+	NextSubTest();
 	assert((actual == 3) || (actual == 4));
+	NextSubTest();
 	theLocker->Unlock();
+	NextSubTest();
 }
 
 
 /*
- *  Method:  BenaphoreLockCountTest1<Locker>::suite()
+ *  Method:  BenaphoreLockCountTest1::suite()
  *   Descr:  This static member function returns a test caller for performing 
  *           the "BenaphoreLockCountTest1" test.  The test caller
  *           is created as a ThreadedTestCaller (typedef'd as
  *           BenaphoreLockCountTest1Caller) with three independent threads.
  */
 
-template<class Locker> Test *BenaphoreLockCountTest1<Locker>::suite(void)
+CppUnit::Test *BenaphoreLockCountTest1::suite(void)
 {	
-	BenaphoreLockCountTest1<Locker> *theTest = new BenaphoreLockCountTest1<Locker>("");
-	BenaphoreLockCountTest1Caller *threadedTest = new BenaphoreLockCountTest1Caller("", theTest);
-	threadedTest->addThread(":Thread1", &BenaphoreLockCountTest1<Locker>::TestThread1);
-	threadedTest->addThread(":Thread2", &BenaphoreLockCountTest1<Locker>::TestThread2);
-	threadedTest->addThread(":Thread3", &BenaphoreLockCountTest1<Locker>::TestThread3);
+	BenaphoreLockCountTest1 *theTest = new BenaphoreLockCountTest1("");
+	BThreadedTestCaller<BenaphoreLockCountTest1> *threadedTest =
+		new BThreadedTestCaller<BenaphoreLockCountTest1>("BLocker::Benaphore Lock Count Test #1", theTest);
+	threadedTest->addThread("A", &BenaphoreLockCountTest1::TestThread1);
+	threadedTest->addThread("B", &BenaphoreLockCountTest1::TestThread2);
+	threadedTest->addThread("C", &BenaphoreLockCountTest1::TestThread3);
 	return(threadedTest);
-	}
+}
 
-
-template class BenaphoreLockCountTest1<BLocker>;
-template class BenaphoreLockCountTest1<OpenBeOS::BLocker>;

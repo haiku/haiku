@@ -1,5 +1,5 @@
 /*
-	$Id: DestructionTest2.cpp,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: DestructionTest2.cpp,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Destruction" and "Locking 4".
@@ -19,11 +19,10 @@
 	*/
 
 
+#include <ThreadedTestCaller.h>
 #include "DestructionTest2.h"
-#include "TestSuite.h"
-#include "ThreadedTestCaller.h"
-#include <be/support/Locker.h>
-#include "Locker.h"
+#include <cppunit/TestSuite.h>
+#include <Locker.h>
 
 // This constant is used to determine the number of microseconds to
 // sleep during major steps of the test.
@@ -32,31 +31,31 @@ const bigtime_t SNOOZE_TIME = 200000;
 
 
 /*
- *  Method:  DestructionTest2<Locker>::DestructionTest2()
+ *  Method:  DestructionTest2::DestructionTest2()
  *   Descr:  This is the only constructor for this test class.
  */
 		
-template<class Locker>
-	DestructionTest2<Locker>::DestructionTest2(std::string name,
+
+	DestructionTest2::DestructionTest2(std::string name,
 											   bool isBenaphore) :
-		LockerTestCase<Locker>(name, isBenaphore)
+		LockerTestCase(name, isBenaphore)
 {
 	}
 
 
 /*
- *  Method:  DestructionTest2<Locker>::~DestructionTest2()
+ *  Method:  DestructionTest2::~DestructionTest2()
  *   Descr:  This is the only destructor for this test class.
  */
 
-template<class Locker>
-	DestructionTest2<Locker>::~DestructionTest2()
+
+	DestructionTest2::~DestructionTest2()
 {
 	}
 	
 
 /*
- *  Method:  DestructionTest2<Locker>::TestThread1()
+ *  Method:  DestructionTest2::TestThread1()
  *   Descr:  This method immediately acquires the lock, sleeps
  *           for SNOOZE_TIME and then releases the lock.  It sleeps
  *           again for SNOOZE_TIME and then tries to re-acquire the
@@ -64,18 +63,23 @@ template<class Locker>
  *           deleted the lock.  This acquisition should fail.
  */
 
-template<class Locker> void DestructionTest2<Locker>::TestThread1(void)
+void DestructionTest2::TestThread1(void)
 {
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME) == B_OK);	
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	theLocker->Unlock();
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME * 10) == B_BAD_SEM_ID);
-	}
+	NextSubTest();
+}
 
 
 /*
- *  Method:  DestructionTest2<Locker>::TestThread2()
+ *  Method:  DestructionTest2::TestThread2()
  *   Descr:  This method sleeps for SNOOZE_TIME/10 and then attempts to acquire
  *           the lock for SNOOZE_TIME/10 seconds.  This acquisition will timeout
  *           because the other thread is holding the lock.  Then it acquires the
@@ -83,15 +87,20 @@ template<class Locker> void DestructionTest2<Locker>::TestThread1(void)
  *           then deletes the lock.  This should wake up the other thread.
  */
 
-template<class Locker> void DestructionTest2<Locker>::TestThread2(void)
+void DestructionTest2::TestThread2(void)
 {
-	Locker *tmpLock;
+	BLocker *tmpLock;
 	
-	snooze(SNOOZE_TIME/10);	
+	snooze(SNOOZE_TIME/10);
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME / 10) == B_TIMED_OUT);
+	NextSubTest();
 	assert(theLocker->LockWithTimeout(SNOOZE_TIME * 10) == B_OK);
+	NextSubTest();
 	snooze(SNOOZE_TIME);	
+	NextSubTest();
 	snooze(SNOOZE_TIME);
+	NextSubTest();
 	tmpLock = theLocker;
 	theLocker = NULL;
 	delete tmpLock;
@@ -99,7 +108,7 @@ template<class Locker> void DestructionTest2<Locker>::TestThread2(void)
 
 
 /*
- *  Method:  DestructionTest2<Locker>::suite()
+ *  Method:  DestructionTest2::suite()
  *   Descr:  This static member function returns a test suite for performing 
  *           all combinations of "DestructionTest2".  The test suite contains
  *           two instances of the test.  One is performed on a benaphore,
@@ -108,28 +117,30 @@ template<class Locker> void DestructionTest2<Locker>::TestThread2(void)
  *           DestructionTest2Caller) with two independent threads.
  */
 
-template<class Locker> Test *DestructionTest2<Locker>::suite(void)
+CppUnit::Test *DestructionTest2::suite(void)
 {	
-	TestSuite *testSuite = new TestSuite("DestructionTest2");
+	typedef BThreadedTestCaller<DestructionTest2> DestructionTest2Caller;
+	CppUnit::TestSuite *testSuite = new CppUnit::TestSuite("DestructionTest2");
 	
 	// Make a benaphore based test object, create a ThreadedTestCase for it and add
 	// two threads to it.
-	DestructionTest2<Locker> *theTest = new DestructionTest2<Locker>("Benaphore", true);
-	DestructionTest2Caller *threadedTest1 = new DestructionTest2Caller("", theTest);
-	threadedTest1->addThread(":Thread1", &DestructionTest2<Locker>::TestThread1);
-	threadedTest1->addThread(":Thread2", &DestructionTest2<Locker>::TestThread2);
+	DestructionTest2 *theTest = new DestructionTest2("Benaphore", true);
+	DestructionTest2Caller *threadedTest1 = new DestructionTest2Caller("BLocker::Destruction Test #2 (benaphore)", theTest);
+	threadedTest1->addThread("A", &DestructionTest2::TestThread1);
+	threadedTest1->addThread("B", &DestructionTest2::TestThread2);
 				
 	// Make a semaphore based test object, create a ThreadedTestCase for it and add
 	// three threads to it.					 		
-	theTest = new DestructionTest2<Locker>("Semaphore", false);
-	DestructionTest2Caller *threadedTest2 = new DestructionTest2Caller("", theTest);
-	threadedTest2->addThread(":Thread1", &DestructionTest2<Locker>::TestThread1);
-	threadedTest2->addThread(":Thread2", &DestructionTest2<Locker>::TestThread2);
+	theTest = new DestructionTest2("Semaphore", false);
+	DestructionTest2Caller *threadedTest2 = new DestructionTest2Caller("BLocker::Destruction Test #2 (semaphore)", theTest);
+	threadedTest2->addThread("A", &DestructionTest2::TestThread1);
+	threadedTest2->addThread("B", &DestructionTest2::TestThread2);
 									 		
 	testSuite->addTest(threadedTest1);	
 	testSuite->addTest(threadedTest2);
 	return(testSuite);
-	}
+}
 
-template class DestructionTest2<BLocker>;
-template class DestructionTest2<OpenBeOS::BLocker>;
+
+
+

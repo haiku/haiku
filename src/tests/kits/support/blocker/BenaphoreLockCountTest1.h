@@ -1,5 +1,5 @@
 /*
-	$Id: BenaphoreLockCountTest1.h,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: BenaphoreLockCountTest1.h,v 1.2 2002/07/18 05:32:00 tylerdauwalder Exp $
 	
 	This file defines a classes for performing one test of BLocker
 	functionality.
@@ -12,18 +12,14 @@
 
 
 #include "LockerTestCase.h"
-#include "ThreadedTestCaller.h"
+#include <string>
 
+class CppUnit::Test;
 	
-template<class Locker> class BenaphoreLockCountTest1 :
-	public LockerTestCase<Locker> {
-	
+class BenaphoreLockCountTest1 : public LockerTestCase {	
 private:
-	typedef ThreadedTestCaller <BenaphoreLockCountTest1<Locker> >
-		BenaphoreLockCountTest1Caller;
-	
-	Locker thread2Lock;
-	Locker thread3Lock;
+	BLocker thread2Lock;
+	BLocker thread3Lock;
 	
 	bool CheckLockRequests(int);
 	
@@ -35,7 +31,10 @@ public:
 	void TestThread3(void);
 	BenaphoreLockCountTest1(std::string);
 	virtual ~BenaphoreLockCountTest1();
-	static Test *suite(void);
-	};
+	static CppUnit::Test *suite(void);
+};
 	
 #endif
+
+
+
