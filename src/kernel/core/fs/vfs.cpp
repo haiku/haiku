@@ -24,6 +24,7 @@
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
+#include <file_cache.h>
 #include <khash.h>
 #include <lock.h>
 #include <kerrors.h>
@@ -52,7 +53,7 @@
 
 #define MAX_SYM_LINKS SYMLINKS_MAX
 
-const static uint32 kMaxUnusedVnodes = 512;
+const static uint32 kMaxUnusedVnodes = 8192;
 	// This is the maximum number of unused vnodes that the system
 	// will keep around.
 	// It may be chosen with respect to the available memory or enhanced
@@ -645,10 +646,10 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 				// there are too many unused vnodes so we free the oldest one
 				// ToDo: evaluate this mechanism
 				vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
-
 				hash_remove(sVnodeTable, vnode);
 				vnode->busy = true;
 				freeNode = true;
+				sUnusedVnodes--;
 			}
 		}
 
@@ -1532,6 +1533,7 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 		return B_NO_MORE_FDS;
 	}
 
+	cache_node_opened(vnode->cache, vnode->device, vnode->id);
 	return fd;
 }
 
@@ -2369,7 +2371,7 @@ vfs_init(kernel_args *args)
 	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vnode lock\n");
 
-	return 0;
+	return file_cache_init();
 }
 
 
