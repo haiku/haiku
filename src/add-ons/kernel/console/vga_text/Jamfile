@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel console vga_text ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon vga_text : kernel console :
+	vga_text.c
+	;
+
