@@ -128,7 +128,7 @@ private:
 	uint16 buffer_height;
 	int32 buffer_mode;
 	drawing_mode drawmode;
-	int32 is_cursor_hidden;
+	bool is_cursor_hidden;
 	bool is_cursor_obscured, cursor_state_changed;
 	BPoint cursor_hotspot;
 };

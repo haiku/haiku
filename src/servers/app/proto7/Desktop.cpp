@@ -145,9 +145,9 @@ printf("init_desktop(%d)\n",workspaces);
 		workspace_count++;
 
 	// Instantiate and initialize display driver
-	gfxdriver=new ViewDriver();
+//	gfxdriver=new ViewDriver();
 //	gfxdriver=new SecondDriver();
-//	gfxdriver=new ScreenDriver();
+	gfxdriver=new ScreenDriver();
 	gfxdriver->Initialize();
 
 	workspacelock=new BLocker();

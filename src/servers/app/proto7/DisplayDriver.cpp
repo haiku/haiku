@@ -13,6 +13,10 @@ DisplayDriver::DisplayDriver(void)
 	buffer_width=0;
 	buffer_height=0;
 	buffer_mode=-1;
+//	drawmode = DRAW_COPY;
+	is_cursor_hidden = false;
+	is_cursor_obscured = false;
+	cursor_state_changed = false;
 }
 
 DisplayDriver::~DisplayDriver(void)
@@ -62,7 +66,7 @@ bool DisplayDriver::DumpToFile(const char *path)
 
 bool DisplayDriver::IsCursorHidden(void)
 {
-	return (is_cursor_hidden>0)?true:false;
+	return is_cursor_hidden;
 }
 
 void DisplayDriver::HideCursor(void)
@@ -131,19 +135,8 @@ void DisplayDriver::SetModeInternal(int32 m)
 
 void DisplayDriver::SetCursorHidden(bool state)
 {
-	if(state)
-	{
-		is_cursor_hidden++;
-		cursor_state_changed=(is_cursor_hidden==1)?true:false;
-	}
-	else
-	{
-		if(is_cursor_hidden>0)
-		{
-			is_cursor_hidden--;
-			cursor_state_changed=(is_cursor_hidden==0)?true:false;
-		}
-	}
+	cursor_state_changed = (is_cursor_hidden != state);
+	is_cursor_hidden = state;
 }
 
 bool DisplayDriver::CursorStateChanged(void)

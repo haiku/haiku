@@ -59,6 +59,7 @@ FrameBuffer::FrameBuffer(const char *title, uint32 space, status_t *st,bool debu
 	port_id serverport=find_port(SERVER_INPUT_PORT);
 	serverlink=new PortLink(serverport);
 	mousepos.Set(0,0);
+	buttons = 0;
 #ifdef DEBUG_SERVER_EMU
 printf("ScreenDriver:: app_server input port: %ld\n",serverlink->GetPort());
 #endif
@@ -294,12 +295,12 @@ bool FrameBuffer::QuitRequested(void)
 	return true;
 }
 
-ScreenDriver::ScreenDriver(void)
+ScreenDriver::ScreenDriver(void) : DisplayDriver()
 {
 	status_t st;
 	fbuffer=new FrameBuffer("OBAppServer",B_8_BIT_640x480,&st,true);
 
-	drawmode=DRAW_COPY;	
+	drawmode = DRAW_COPY;
 
 	// We start without a cursor
 	cursor=NULL;

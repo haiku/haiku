@@ -103,7 +103,6 @@ protected:
 	void SetThickPixel16(int x, int y, int thick, uint16 col);
 	void SetThickPixel8(int x, int y, int thick, uint8 col);
 	FrameBuffer *fbuffer;
-	int hide_cursor;
 	ServerBitmap *cursor, *under_cursor;
 	int32 drawmode;
 	BRect cursorframe;
