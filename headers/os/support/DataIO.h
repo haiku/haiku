@@ -1,18 +1,52 @@
-// Modified BeOS header. Just here to be able to compile and test BFile.
-// To be replaced by the OpenBeOS version to be provided by the IK Team.
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		DataIO.h
+//	Author(s):		Jack Burton (burton666@libero.it)
+//	Description:	Pure virtual BDataIO and BPositioIO classes provide
+//					the protocol for Read()/Write()/Seek().
+//
+//					BMallocIO and BMemoryIO classes implement the protocol,
+//					as does BFile in the Storage Kit.
+//------------------------------------------------------------------------------
 
-#ifndef __sk_data_io_h__
-#define __sk_data_io_h__
+#ifndef	_DATA_IO_H
+#define	_DATA_IO_H
 
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
+#include <BeBuild.h>
 #include <SupportDefs.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
+// Project Includes ------------------------------------------------------------
 
-/*-----------------------------------------------------------------*/
-/*------- BDataIO Class -------------------------------------------*/
+// Local Includes --------------------------------------------------------------
 
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
+
+
+// BDataIO Class ---------------------------------------------------------------
 class BDataIO {
 public:
 					BDataIO();
@@ -21,7 +55,7 @@ virtual				~BDataIO();
 virtual	ssize_t		Read(void *buffer, size_t size) = 0;
 virtual	ssize_t		Write(const void *buffer, size_t size) =0;
 
-/*----- Private or reserved ---------------*/
+// Private or reserved ----------------------
 private:
 
 virtual	void		_ReservedDataIO1();
@@ -29,14 +63,24 @@ virtual	void		_ReservedDataIO2();
 virtual	void		_ReservedDataIO3();
 virtual	void		_ReservedDataIO4();
 
+#if !_PR3_COMPATIBLE_
+virtual	void		_ReservedDataIO5();
+virtual	void		_ReservedDataIO6();
+virtual	void		_ReservedDataIO7();
+virtual	void		_ReservedDataIO8();
+virtual	void		_ReservedDataIO9();
+virtual	void		_ReservedDataIO10();
+virtual	void		_ReservedDataIO11();
+virtual	void		_ReservedDataIO12();
+#endif
+
 					BDataIO(const BDataIO &);
 		BDataIO		&operator=(const BDataIO &);
 
 		int32		_reserved[2];
 };
 
-/*---------------------------------------------------------------------*/
-/*------- BPositionIO Class -------------------------------------------*/
+// BPositionIO Class -----------------------------------------------------------
 
 class BPositionIO : public BDataIO {
 public:
@@ -54,16 +98,66 @@ virtual	off_t		Position() const = 0;
 
 virtual status_t	SetSize(off_t size);
 
-/*----- Private or reserved ---------------*/
+// Private or reserved ----------------------
 private:
 virtual	void		_ReservedPositionIO1();
 virtual	void		_ReservedPositionIO2();
 virtual void		_ReservedPositionIO3();
 virtual void		_ReservedPositionIO4();
 
+#if !_PR3_COMPATIBLE_
+virtual	void		_ReservedPositionIO5();
+virtual	void		_ReservedPositionIO6();
+virtual	void		_ReservedPositionIO7();
+virtual	void		_ReservedPositionIO8();
+virtual	void		_ReservedPositionIO9();
+virtual	void		_ReservedPositionIO10();
+virtual	void		_ReservedPositionIO11();
+virtual	void		_ReservedPositionIO12();
+#endif
+
 		int32		_reserved[2];
 };
 
+// BMallocIO Class -------------------------------------------------------------
+
+class BMallocIO : public BPositionIO {
+public:
+					BMallocIO();
+virtual				~BMallocIO();
+
+virtual	ssize_t		ReadAt(off_t pos, void *buffer, size_t size);
+virtual	ssize_t		WriteAt(off_t pos, const void *buffer, size_t size);
+
+virtual	off_t		Seek(off_t pos, uint32 seek_mode);
+virtual off_t		Position() const;
+virtual status_t	SetSize(off_t size);
+
+		void		SetBlockSize(size_t blocksize);
+
+const	void		*Buffer() const;
+		size_t		BufferLength() const;
+
+// Private or reserved ----------------------
+private:
+
+virtual	void		_ReservedMallocIO1();
+virtual	void		_ReservedMallocIO2();
+
+					BMallocIO(const BMallocIO &);
+		BMallocIO	&operator=(const BMallocIO &);
+
+		status_t	_Resize(off_t size);
+
+		size_t		fBlockSize;
+		size_t		fMallocSize;
+		size_t		fLength;
+		char		*fData;
+		off_t		fPosition;
+		int32		_reserved[1];
+};
+
+// BMemoryIO Class -------------------------------------------------------------
 
 class BMemoryIO : public BPositionIO {
 public:
@@ -79,7 +173,7 @@ virtual off_t		Position() const;
 
 virtual	status_t	SetSize(off_t size);
 
-/*----- Private or reserved ---------------*/
+// Private or reserved ----------------------
 private:
 virtual	void		_ReservedMemoryIO1();
 virtual	void		_ReservedMemoryIO2();
@@ -96,13 +190,14 @@ virtual	void		_ReservedMemoryIO2();
 		int32		_reserved[1];
 };
 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
+//------------------------------------------------------------------------------
 
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif
+#endif // _DATA_IO_H
 
-#include <MallocIO.h>
+/*
+ * $Log $
+ *
+ * $Id  $
+ *
+ */
 
-#endif	// __sk_data_io_h__
