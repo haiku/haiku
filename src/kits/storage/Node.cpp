@@ -10,6 +10,7 @@
 #include <fs_attr.h> // for struct attr_info
 #include <new>
 #include <string.h>
+#include <unistd.h>
 
 #include <Node.h>
 #include <Entry.h>

@@ -5,6 +5,7 @@
 
 #include <errno.h>
 #include <new.h>
+#include <unistd.h>
 
 #include <Session.h>
 #include <DiskDevice.h>
