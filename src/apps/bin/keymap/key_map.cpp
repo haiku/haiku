@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 		        get_ref_for_path(argv[i], &ref);
 		        Keymap keymap;
 		        keymap.LoadSourceFromRef(ref);
-		
+				
 		        keymap.SaveAsHeader(output_ref);
 		        return 0;
             } else 

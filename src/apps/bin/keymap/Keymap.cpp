@@ -381,53 +381,53 @@ const char diaeresisPattern[] = "Diaeresis[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[
 const char tildePattern[] = "Tilde[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
 const char acutetabPattern[] = "AcuteTab[[:space:]]+="
 						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
 						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 const char gravetabPattern[] = "GraveTab[[:space:]]+="
 						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
 						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 const char circumflextabPattern[] = "CircumflexTab[[:space:]]+="
 						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
 						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 const char diaeresistabPattern[] = "DiaeresisTab[[:space:]]+="
 						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
 						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 const char tildetabPattern[] = "TildeTab[[:space:]]+="
 						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
-						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)"
 						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 
 
@@ -702,9 +702,7 @@ const char header_header[] =
 "/*\tHaiku \t*/\n"
 "/*\n"
 " This file is generated automatically. Don't edit ! \n"
-"*/\n";
-
-
+"*/\n\n";
 
 void
 Keymap::SaveAsHeader(entry_ref &ref)
@@ -721,7 +719,7 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	FILE * f = fdopen(fd, "w");
 
 	fprintf(f, "%s", header_header);
-	fprintf(f, "#include <InterfaceDefs.h>\n");
+	fprintf(f, "#include <InterfaceDefs.h>\n\n");
 	fprintf(f, "const key_map sSystemKeymap = {\n");
 	fprintf(f, "\tversion:%ld,\n", fKeys.version);
 	fprintf(f, "\tcaps_key:0x%lx,\n", fKeys.caps_key);
@@ -814,12 +812,14 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	fprintf(f, "\tdieresis_tables:0x%lx,\n", fKeys.dieresis_tables);
 	fprintf(f, "\ttilde_tables:0x%lx,\n", fKeys.tilde_tables);
 	
-	fprintf(f, "};\n");
+	fprintf(f, "};\n\n");
 	
 	fprintf(f, "const char sSystemKeyChars[] = {\n");
 	for (uint32 i=0; i<fCharsSize; i++)
 		fprintf(f, "\t%hhd,\n", fChars[i]);
-	fprintf(f, "};\n");
+	fprintf(f, "};\n\n");
+	
+	fprintf(f, "const uint32 sSystemKeyCharsSize = %ld;\n", fCharsSize);
 }
 
 
