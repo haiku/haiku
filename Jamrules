@@ -388,7 +388,7 @@ rule UserObject
 # Override the default to give "prettier" command lines.
 actions Cc 
 {
-	$(CC) -c "$(2)" $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o "$(1)" ;
+	$(CC) $(CCFLAGS) -c "$(2)" $(CCDEFS) $(CCHDRS) -o "$(1)" ;
 }
 
 actions C++
