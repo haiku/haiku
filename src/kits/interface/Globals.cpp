@@ -454,3 +454,20 @@ bitmaps_support_space(color_space space, uint32 * support_flags)
 {
 	// TODO: Implement
 }
+
+/*!
+	\brief private function used by Tracker to set window decor
+	\param theme The theme to choose
+	
+	- \c 0: BeOS
+	- \c 1: AmigaOS
+	- \c 2: Win95
+	- \c 3: MacOS
+*/
+void __set_window_decor(int32 theme)
+{
+	BAppServerLink link;
+	link.SetOpCode(AS_R5_SET_DECORATOR);
+	link.Attach(theme);
+	link.Flush();
+}
