@@ -10,9 +10,9 @@
 
 /*
 	note:
-	attempting DMA on NV40 and higher because without it I can't get it going ATM.
-	Later on this can become a nv.settings switch, and maybe later we can even
-	forget about non-DMA completely (depends on 3D acceleration attempts).
+	attempting DMA because without it I can't get NV40 and higher going ATM.
+	Maybe later we can forget about the non-DMA version: that depends on
+	3D acceleration attempts).
 */
 
 #define MODULE_BIT 0x00080000
@@ -60,8 +60,8 @@ status_t nv_acc_wait_idle_dma()
 	/* log timeout if we had one */
 	if (cnt == 10000)
 	{
-		err++;
-		LOG(4,("ACC_DMA: wait_idle DMA timeout #%d, engine trouble!\n", err));
+		if (err < 3) err++;
+		LOG(4,("ACC_DMA: wait_idle; DMA timeout #%d, engine trouble!\n", err));
 	}
 
 	/* wait until execution completed */
@@ -704,7 +704,7 @@ status_t nv_acc_init_dma()
 
 	/*** init FIFO via DMA command buffer. ***/
 	/* wait for room in fifo for new FIFO assigment cmds if needed: */
-	nv_acc_fifofree_dma(16);
+	if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
 
 	/* program new FIFO assignments */
 	/* Raster OPeration: */
@@ -753,7 +753,7 @@ status_t nv_acc_init_dma()
 	}
 
 	/* wait for room in fifo for surface setup cmd if needed */
-	nv_acc_fifofree_dma(5);
+	if (nv_acc_fifofree_dma(5) != B_OK) return B_ERROR;
 	/* now setup 2D surface (writing 5 32bit words) */
 	nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 4);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = surf_depth; /* Format */
@@ -767,13 +767,13 @@ status_t nv_acc_init_dma()
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
 
 	/* wait for room in fifo for pattern colordepth setup cmd if needed */
-	nv_acc_fifofree_dma(2);
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
-	nv_acc_fifofree_dma(2);
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set bitmap colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
@@ -864,8 +864,8 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 				/* mind this pittfall (? there might be another reason):
 				 * as the engine is DMA triggered for fetching chunks every 128 bytes,
 				 * we may not touch that much at the end of our free space!
-				 * (confirmed NV11 when it's buffer is full for a longer period of
-				 * time, tested with BeRoMeter 1.2.6.) */
+				 * (confirmed NV11 and NV43 when their buffer is full for a longer
+				 * period of time, tested with BeRoMeter 1.2.6.) */
 				if (si->engine.dma.free < 32)
 					si->engine.dma.free = 0;
 				else
@@ -882,8 +882,8 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 			/* mind this pittfall (? there might be another reason):
 			 * as the engine is DMA triggered for fetching chunks every 128 bytes,
 			 * we may not touch that much at the end of our free space!
-			 * (confirmed NV11 when it's buffer is full for a longer period of
-			 * time, tested with BeRoMeter 1.2.6.) */
+			 * (confirmed NV11 and NV43 when their buffer is full for a longer period
+			 * of time, tested with BeRoMeter 1.2.6.) */
 			if (si->engine.dma.free < 32)
 				si->engine.dma.free = 0;
 			else
@@ -894,9 +894,12 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 	/* log timeout if we had one */
 	if (cnt == 10000)
 	{
-		err++;
-		LOG(4,("ACC_DMA: wait_idle DMA timeout #%d, engine trouble!\n", err));
+		if (err < 3) err++;
+		LOG(4,("ACC_DMA: fifofree; DMA timeout #%d, engine trouble!\n", err));
 	}
+
+	/* we must make the acceleration routines abort or the driver will hang! */
+	if (err >= 3) return B_ERROR;
 
 	return B_OK;
 }
@@ -982,7 +985,7 @@ void nv_acc_assert_fifo_dma(void)
 		}
 
 		/* wait for room in fifo for new FIFO assigment cmds if needed. */
-		nv_acc_fifofree_dma(12);
+		if (nv_acc_fifofree_dma(12) != B_OK) return;
 
 		/* program new FIFO assignments */
 		/* Raster OPeration: */
@@ -1008,7 +1011,7 @@ status_t nv_acc_setup_blit_dma()
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed. */
-	nv_acc_fifofree_dma(7);
+	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
@@ -1019,7 +1022,7 @@ status_t nv_acc_setup_blit_dma()
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed. */
-	nv_acc_fifofree_dma(2);
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
@@ -1034,7 +1037,7 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed. */
-	nv_acc_fifofree_dma(4);
+	if (nv_acc_fifofree_dma(4) != B_OK) return B_ERROR;
 	/* now setup blit (writing 4 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((ys << 16) | xs); /* SourceOrg */
@@ -1055,7 +1058,7 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed. */
-	nv_acc_fifofree_dma(7);
+	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
@@ -1067,14 +1070,14 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 
 	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed. */
-	nv_acc_fifofree_dma(2);
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
 
 	/* setup fill color:
 	 * wait for room in fifo for bitmap cmd if needed. */
-	nv_acc_fifofree_dma(2);
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* now setup color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
@@ -1086,7 +1089,7 @@ status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
 	/* instruct engine what to fill:
 	 * wait for room in fifo for bitmap cmd if needed. */
-	nv_acc_fifofree_dma(3);
+	if (nv_acc_fifofree_dma(3) != B_OK) return B_ERROR;
 	/* now setup fill (writing 3 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
