@@ -12,6 +12,7 @@
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <boot/kernel_args.h>
+#include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
 
@@ -22,7 +23,6 @@
  *	     0x0 - 0x10000	protected mode stack
  *	     0x0 - 0x09000	real mode stack
  *	 0x10000 - ?		code
- *	0x100000			kernel args
  *	0x101000			1st temporary page table (identity maps 0-4 MB)
  *	0x102000			2nd (4-8 MB)
  *	0x110000			boot loader heap (32 kB)
@@ -55,9 +55,6 @@ struct extended_memory {
 };
 
 static const uint32 kDefaultPageFlags = 0x03;	// present, R/W
-
-static kernel_args *ka = (kernel_args *)0x100000;
-	// ToDo: this has to replace the gKernelArgs variable!
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -182,7 +179,7 @@ init_page_directory()
 {
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
-	ka->arch_args.phys_pgdir = (uint32)sPageDirectory;
+	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
 	// clear out the pgdir
 	for (int32 i = 0; i < 1024; i++)
@@ -212,8 +209,8 @@ init_page_directory()
 
 	// Get new page table and clear it out
 	sPageTable = (uint32 *)get_next_physical_page();
-	ka->arch_args.pgtables[0] = (uint32)sPageTable;
-	ka->arch_args.num_pgtables = 1;
+	gKernelArgs.arch_args.pgtables[0] = (uint32)sPageTable;
+	gKernelArgs.arch_args.num_pgtables = 1;
 
 	for (int32 i = 0; i < 1024; i++)
 		sPageTable[i] = 0;
@@ -236,8 +233,8 @@ init_page_directory()
 extern "C" void *
 mmu_allocate(void *virtualAddress, size_t size)
 {
-	printf("requested vaddr: %p, next free vaddr: 0x%lx, size: %ld\n",
-		virtualAddress, sNextVirtualAddress, size);
+	TRACE(("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: %ld\n",
+		virtualAddress, sNextVirtualAddress, size));
 
 	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 		// get number of pages to map
@@ -294,7 +291,7 @@ mmu_init_for_kernel(void)
 
 		// find a new idt
 		idt = (uint32 *)get_next_physical_page();
-		ka->arch_args.phys_idt = (uint32)idt;
+		gKernelArgs.arch_args.phys_idt = (uint32)idt;
 
 		TRACE(("idt at %p\n", idt));
 
@@ -304,17 +301,17 @@ mmu_init_for_kernel(void)
 		}
 
 		// map the idt into virtual space
-		ka->arch_args.vir_idt = (uint32)get_next_virtual_page();
-		map_page(ka->arch_args.vir_idt, (uint32)idt, kDefaultPageFlags);
+		gKernelArgs.arch_args.vir_idt = (uint32)get_next_virtual_page();
+		map_page(gKernelArgs.arch_args.vir_idt, (uint32)idt, kDefaultPageFlags);
 
 		// load the idt
 		idtDescriptor.limit = IDT_LIMIT - 1;
-		idtDescriptor.base = (uint32 *)ka->arch_args.vir_idt;
+		idtDescriptor.base = (uint32 *)gKernelArgs.arch_args.vir_idt;
 
 		asm("lidt	%0;"
 			: : "m" (idtDescriptor));
 
-		TRACE(("idt at virtual address 0x%lx\n", ka->arch_args.vir_idt));
+		TRACE(("idt at virtual address 0x%lx\n", gKernelArgs.arch_args.vir_idt));
 	}
 
 	// set up a new gdt
@@ -324,7 +321,7 @@ mmu_init_for_kernel(void)
 
 		// find a new gdt
 		gdt = (segment_descriptor *)get_next_physical_page();
-		ka->arch_args.phys_gdt = (uint32)gdt;
+		gKernelArgs.arch_args.phys_gdt = (uint32)gdt;
 
 		TRACE(("gdt at %p\n", gdt));
 
@@ -344,24 +341,63 @@ mmu_init_for_kernel(void)
 		// to contain the TSS descriptors, and for TLS (one for every CPU)
 
 		// map the gdt into virtual space
-		ka->arch_args.vir_gdt = (uint32)get_next_virtual_page();
-		map_page(ka->arch_args.vir_gdt, (uint32)gdt, kDefaultPageFlags);
+		gKernelArgs.arch_args.vir_gdt = (uint32)get_next_virtual_page();
+		map_page(gKernelArgs.arch_args.vir_gdt, (uint32)gdt, kDefaultPageFlags);
 
 		// load the GDT
 		gdtDescriptor.limit = GDT_LIMIT - 1;
-		gdtDescriptor.base = (uint32 *)ka->arch_args.vir_gdt;
+		gdtDescriptor.base = (uint32 *)gKernelArgs.arch_args.vir_gdt;
 
 		asm("lgdt	%0;"
 			: : "m" (gdtDescriptor));
 
-		TRACE(("gdt at virtual address %p\n", (void *)ka->arch_args.vir_gdt));
+		TRACE(("gdt at virtual address %p\n", (void *)gKernelArgs.arch_args.vir_gdt));
 	}
+
+	// save the memory we've physically allocated
+	gKernelArgs.physical_allocated_range[0].size = sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
+
+	// save the memory we've virtually allocated (for the kernel and other stuff)
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE;
+	gKernelArgs.virtual_allocated_range[0].size = sNextVirtualAddress - KERNEL_BASE;
+	gKernelArgs.num_virtual_allocated_ranges = 1;
+
+	// sort the address ranges
+	sort_addr_range(gKernelArgs.physical_memory_range, gKernelArgs.num_physical_memory_ranges);
+	sort_addr_range(gKernelArgs.physical_allocated_range, gKernelArgs.num_physical_allocated_ranges);
+	sort_addr_range(gKernelArgs.virtual_allocated_range, gKernelArgs.num_virtual_allocated_ranges);
+
+#ifdef TRACE_MMU
+	{
+		uint32 i;
+
+		dprintf("phys memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_memory_range[i].start, gKernelArgs.physical_memory_range[i].size);
+		}
+
+		dprintf("allocated phys memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.physical_allocated_range[i].start, gKernelArgs.physical_allocated_range[i].size);
+		}
+
+		dprintf("allocated virt memory ranges:\n");
+		for (i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+			dprintf("    base 0x%08lx, length 0x%08lx\n", gKernelArgs.virtual_allocated_range[i].start, gKernelArgs.virtual_allocated_range[i].size);
+		}
+	}
+#endif
 }
 
 
 extern "C" void
 mmu_init(void)
 {
+	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
+	gKernelArgs.physical_allocated_range[0].size = 0;
+	gKernelArgs.num_physical_allocated_ranges = 1;
+		// remember the start of the allocated physical pages
+
 	init_page_directory();
 
 	// Map the page directory into kernel space at 0xffc00000-0xffffffff
@@ -371,13 +407,15 @@ mmu_init(void)
 	sPageDirectory[1023] = (uint32)sPageDirectory | kDefaultPageFlags;
 
 	// also map it on the next vpage
-	ka->arch_args.vir_pgdir = get_next_virtual_page();
-	map_page(ka->arch_args.vir_pgdir, (uint32)sPageDirectory, kDefaultPageFlags);
+	gKernelArgs.arch_args.vir_pgdir = get_next_virtual_page();
+	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory, kDefaultPageFlags);
 
-	// mark memory that we know is used
-	/*ka->physical_allocated_range[0].start = BOOTDIR_ADDR;
-	ka->physical_allocated_range[0].size = sNextPhysicalAddress - BOOTDIR_ADDR;*/
-	ka->num_physical_allocated_ranges = 0;	//1;
+	// map in a kernel stack
+	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, 8192);
+	gKernelArgs.cpu_kstack[0].size = 8192;
+
+	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
+		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
 	extended_memory *extMemoryBlock;
 	uint32 extMemoryCount = get_memory_map(&extMemoryBlock);
@@ -386,7 +424,7 @@ mmu_init(void)
 	if (extMemoryCount > 0) {
 		uint32 i;
 
-		ka->num_physical_memory_ranges = 0;
+		gKernelArgs.num_physical_memory_ranges = 0;
 
 		for (i = 0; i < extMemoryCount; i++) {
 			if (extMemoryBlock[i].type == 1) {
@@ -397,26 +435,26 @@ mmu_init(void)
 				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
 
 				// this is mem we can use
-				if (ka->num_physical_memory_ranges == 0) {
-					ka->physical_memory_range[0].start = (addr_t)extMemoryBlock[i].base_addr;
-					ka->physical_memory_range[0].size = (addr_t)extMemoryBlock[i].length;
-					ka->num_physical_memory_ranges++;
+				if (gKernelArgs.num_physical_memory_ranges == 0) {
+					gKernelArgs.physical_memory_range[0].start = (addr_t)extMemoryBlock[i].base_addr;
+					gKernelArgs.physical_memory_range[0].size = (addr_t)extMemoryBlock[i].length;
+					gKernelArgs.num_physical_memory_ranges++;
 				} else {
 					// we might have to extend the previous hole
-					addr_t previous_end = ka->physical_memory_range[ka->num_physical_memory_ranges - 1].start
-						+ ka->physical_memory_range[ka->num_physical_memory_ranges - 1].size;
+					addr_t previous_end = gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].start
+						+ gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].size;
 
 					if (previous_end <= extMemoryBlock[i].base_addr
 						&& ((extMemoryBlock[i].base_addr - previous_end) < 0x100000)) {
 						// extend the previous buffer
-						ka->physical_memory_range[ka->num_physical_memory_ranges - 1].size +=
+						gKernelArgs.physical_memory_range[gKernelArgs.num_physical_memory_ranges - 1].size +=
 							(extMemoryBlock[i].base_addr - previous_end) +
 							extMemoryBlock[i].length;
 
 						// mark the gap between the two allocated ranges in use
-						ka->physical_allocated_range[ka->num_physical_allocated_ranges].start = previous_end;
-						ka->physical_allocated_range[ka->num_physical_allocated_ranges].size = extMemoryBlock[i].base_addr - previous_end;
-						ka->num_physical_allocated_ranges++;
+						gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = previous_end;
+						gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = extMemoryBlock[i].base_addr - previous_end;
+						gKernelArgs.num_physical_allocated_ranges++;
 					}
 				}
 			}
@@ -426,48 +464,22 @@ mmu_init(void)
 		uint32 memSize = 32 * 1024 * 1024;
 
 		// we dont have an extended map, assume memory is contiguously mapped at 0x0
-		ka->physical_memory_range[0].start = 0;
-		ka->physical_memory_range[0].size = memSize;
-		ka->num_physical_memory_ranges = 1;
+		gKernelArgs.physical_memory_range[0].start = 0;
+		gKernelArgs.physical_memory_range[0].size = memSize;
+		gKernelArgs.num_physical_memory_ranges = 1;
 
 		// mark the bios area allocated
-		ka->physical_allocated_range[ka->num_physical_allocated_ranges].start = 0x9f000; // 640k - 1 page
-		ka->physical_allocated_range[ka->num_physical_allocated_ranges].size = 0x61000;
-		ka->num_physical_allocated_ranges++;
+		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = 0x9f000; // 640k - 1 page
+		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = 0x61000;
+		gKernelArgs.num_physical_allocated_ranges++;
 	}
 
-	// save the memory we've virtually allocated (for the kernel and other stuff)
-	ka->virtual_allocated_range[0].start = KERNEL_BASE;
-	ka->virtual_allocated_range[0].size = sNextVirtualAddress - KERNEL_BASE;
-	ka->num_virtual_allocated_ranges = 1;
+	// ToDo: move me to somewhere else (and fix me while you're at it)
+	gKernelArgs.arch_args.system_time_cv_factor = 1000000;//cv_factor;
+	gKernelArgs.str = NULL;
+	gKernelArgs.num_cpus = 1;
 
-	// sort the address ranges
-	sort_addr_range(ka->physical_memory_range, ka->num_physical_memory_ranges);
-	sort_addr_range(ka->physical_allocated_range, ka->num_physical_allocated_ranges);
-	sort_addr_range(ka->virtual_allocated_range, ka->num_virtual_allocated_ranges);
-
-#if 1
-	{
-		unsigned int i;
-
-		dprintf("phys memory ranges:\n");
-		for (i = 0; i < ka->num_physical_memory_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->physical_memory_range[i].start, ka->physical_memory_range[i].size);
-		}
-
-		dprintf("allocated phys memory ranges:\n");
-		for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->physical_allocated_range[i].start, ka->physical_allocated_range[i].size);
-		}
-
-		dprintf("allocated virt memory ranges:\n");
-		for (i = 0; i < ka->num_virtual_allocated_ranges; i++) {
-			dprintf("    base 0x%08lx, length 0x%08lx\n", ka->virtual_allocated_range[i].start, ka->virtual_allocated_range[i].size);
-		}
-	}
-#endif
-
-	ka->arch_args.page_hole = 0xffc00000;
+	gKernelArgs.arch_args.page_hole = 0xffc00000;
 }
 
 
