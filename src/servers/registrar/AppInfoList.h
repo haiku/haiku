@@ -34,23 +34,18 @@ class entry_ref;
 
 class RosterAppInfo;
 
+// AppInfoList
 class AppInfoList {
+public:
+	class Iterator;
+
 public:
 	AppInfoList();
 	virtual ~AppInfoList();
 
 	bool AddInfo(RosterAppInfo *info);
-
-	RosterAppInfo *RemoveInfo(int32 index);
 	bool RemoveInfo(RosterAppInfo *info);
 
-	int32 IndexOf(RosterAppInfo *info) const;
-	int32 IndexOf(const char *signature) const;
-	int32 IndexOf(team_id team) const;
-	int32 IndexOf(const entry_ref *ref) const;
-	int32 IndexOfToken(uint32 token) const;
-
-	RosterAppInfo *InfoAt(int32 index) const;
 	RosterAppInfo *InfoFor(const char *signature) const;
 	RosterAppInfo *InfoFor(team_id team) const;
 	RosterAppInfo *InfoFor(const entry_ref *ref) const;
@@ -58,8 +53,111 @@ public:
 
 	int32 CountInfos() const;
 
+	Iterator It();
+
+private:
+	RosterAppInfo *RemoveInfo(int32 index);
+
+	RosterAppInfo *InfoAt(int32 index) const;
+
+	int32 IndexOf(RosterAppInfo *info) const;
+	int32 IndexOf(const char *signature) const;
+	int32 IndexOf(team_id team) const;
+	int32 IndexOf(const entry_ref *ref) const;
+	int32 IndexOfToken(uint32 token) const;
+
+private:
+	friend class Iterator;
+
 private:
 	BList	fInfos;
+};
+
+// AppInfoList::Iterator
+class AppInfoList::Iterator {
+public:
+	inline Iterator(const Iterator &it)
+		: fList(it.fList),
+		  fIndex(it.fIndex),
+		  fCount(it.fCount)
+	{
+	}
+
+	inline ~Iterator() {}
+
+	inline bool IsValid() const
+	{
+		return (fIndex >= 0 && fIndex < fCount);
+	}
+
+	inline RosterAppInfo *Remove()
+	{
+		RosterAppInfo *info = fList->RemoveInfo(fIndex);
+		if (info)
+			fCount--;
+		return info;
+	}
+
+	inline Iterator &operator=(const Iterator &it)
+	{
+		fList = it.fList;
+		fIndex = it.fIndex;
+		fCount = it.fCount;
+		return *this;
+	}
+
+	inline Iterator &operator++()
+	{
+		fIndex++;
+		return *this;
+	}
+
+	inline Iterator operator++(int)
+	{
+		return Iterator(fList, fIndex + 1);
+	}
+
+	inline Iterator &operator--()
+	{
+		fIndex--;
+		return *this;
+	}
+
+	inline Iterator operator--(int)
+	{
+		return Iterator(fList, fIndex - 1);
+	}
+
+	inline bool operator==(const Iterator &it) const
+	{
+		return (fList == it.fList && fIndex == it.fIndex);
+	}
+
+	inline bool operator!=(const Iterator &it) const
+	{
+		return !(*this == it);
+	}
+
+	inline RosterAppInfo *operator*() const
+	{
+		return fList->InfoAt(fIndex);
+	}
+
+private:
+	friend class AppInfoList;
+
+private:
+	inline Iterator(AppInfoList *list, int32 index = 0)
+		: fList(list),
+		  fIndex(index),
+		  fCount(list->CountInfos())
+	{
+	}
+
+private:
+	AppInfoList	*fList;
+	int32		fIndex;
+	int32		fCount;
 };
 
 #endif	// APP_INFO_LIST_H

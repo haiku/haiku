@@ -27,13 +27,30 @@
 #include "AppInfoList.h"
 #include "RosterAppInfo.h"
 
+/*!
+	\class AppInfoList
+	\brief A list of RosterAppInfos.
+
+	Features adding/removing of RosterAppInfos and method for finding
+	infos by signature, team ID, entry_ref or token.
+	The method It() returns an iterator, an instance of the basic
+	AppInfoList::Iterator class.
+*/
+
+
 // constructor
+/*!	\brief Creates an empty list.
+*/
 AppInfoList::AppInfoList()
 		   : fInfos()
 {
 }
 
-// constructor
+// destructor
+/*!	\brief Frees all resources associated with this object.
+
+	The RosterAppInfos the list contains are deleted.
+*/
 AppInfoList::~AppInfoList()
 {
 	// delete all infos
@@ -42,6 +59,11 @@ AppInfoList::~AppInfoList()
 }
 
 // AddInfo
+/*!	\brief Adds a RosterAppInfos to the list.
+	\param info The RosterAppInfo to be added
+	\return \c true on success, false if \a info is \c NULL or there's not
+			enough memory for this operation.
+*/
 bool
 AppInfoList::AddInfo(RosterAppInfo *info)
 {
@@ -52,20 +74,128 @@ AppInfoList::AddInfo(RosterAppInfo *info)
 }
 
 // RemoveInfo
-RosterAppInfo *
-AppInfoList::RemoveInfo(int32 index)
-{
-	return (RosterAppInfo*)fInfos.RemoveItem(index);
-}
-
-// RemoveInfo
+/*!	\brief Removes a RosterAppInfos from the list.
+	\param info The RosterAppInfo to be removed
+	\return \c true on success, false if \a info was not in the list.
+*/
 bool
 AppInfoList::RemoveInfo(RosterAppInfo *info)
 {
 	return fInfos.RemoveItem(info);
 }
 
+// InfoFor
+/*!	\brief Returns the RosterAppInfo with the supplied signature.
+
+	If the list contains more than one RosterAppInfo with the given signature,
+	it is undefined, which one is returned.
+
+	\param signature The signature
+	\return A RosterAppInfo with the supplied signature, or \c NULL, if
+			\a signature is \c NULL or the list doesn't contain an info with
+			this signature.
+*/
+RosterAppInfo *
+AppInfoList::InfoFor(const char *signature) const
+{
+	return InfoAt(IndexOf(signature));
+}
+
+// InfoFor
+/*!	\brief Returns the RosterAppInfo with the supplied team ID.
+	\param team The team ID
+	\return A RosterAppInfo with the supplied team ID, or \c NULL, if the list
+			doesn't contain an info with this team ID.
+*/
+RosterAppInfo *
+AppInfoList::InfoFor(team_id team) const
+{
+	return InfoAt(IndexOf(team));
+}
+
+// InfoFor
+/*!	\brief Returns the RosterAppInfo with the supplied entry_ref.
+
+	If the list contains more than one RosterAppInfo with the given entry_ref,
+	it is undefined, which one is returned.
+
+	\param ref The entry_ref
+	\return A RosterAppInfo with the supplied entry_ref, or \c NULL, if
+			\a ref is \c NULL or the list doesn't contain an info with
+			this entry_ref.
+*/
+RosterAppInfo *
+AppInfoList::InfoFor(const entry_ref *ref) const
+{
+	return InfoAt(IndexOf(ref));
+}
+
+// InfoForToken
+/*!	\brief Returns the RosterAppInfo with the supplied token.
+
+	If the list contains more than one RosterAppInfo with the given token,
+	it is undefined, which one is returned.
+
+	\param token The token
+	\return A RosterAppInfo with the supplied token, or \c NULL, if the list
+			doesn't contain an info with the token.
+*/
+RosterAppInfo *
+AppInfoList::InfoForToken(uint32 token) const
+{
+	return InfoAt(IndexOfToken(token));
+}
+
+// CountInfos
+/*!	\brief Returns the number of RosterAppInfos this list contains.
+	\return The number of RosterAppInfos this list contains.
+*/
+int32
+AppInfoList::CountInfos() const
+{
+	return fInfos.CountItems();
+}
+
+// It
+/*!	\brief Returns a list iterator.
+	\return A list iterator.
+*/
+AppInfoList::Iterator
+AppInfoList::It()
+{
+	return Iterator(this, 0);
+}
+
+// RemoveInfo
+/*!	\brief Removes a RosterAppInfo at a given index.
+	\param index The index of the info to be removed
+	\return A pointer to the removed RosterAppInfo, or \c NULL, if the index
+			is out of range.
+*/
+RosterAppInfo *
+AppInfoList::RemoveInfo(int32 index)
+{
+	return (RosterAppInfo*)fInfos.RemoveItem(index);
+}
+
+// InfoAt
+/*!	\brief Returns a RosterAppInfo at a given index.
+	\param index The index of the info to be returned
+	\return A pointer to the RosterAppInfo, or \c NULL, if the index
+			is out of range.
+*/
+RosterAppInfo *
+AppInfoList::InfoAt(int32 index) const
+{
+	return (RosterAppInfo*)fInfos.ItemAt(index);
+}
+
 // IndexOf
+/*!	\brief Returns the list index of the supplied RosterAppInfo.
+	\param info The RosterAppInfo in question
+	\return The index of the supplied info, or -1, if \a info is \c NULL or not
+			contained in the list.
+*/
 int32
 AppInfoList::IndexOf(RosterAppInfo *info) const
 {
@@ -73,17 +203,36 @@ AppInfoList::IndexOf(RosterAppInfo *info) const
 }
 
 // IndexOf
+/*!	\brief Returns the list index of a RosterAppInfo with the supplied
+		   signature.
+
+	If the list contains more than one RosterAppInfo with the given signature,
+	it is undefined, which one is returned.
+
+	\param signature The signature
+	\return The index of the found RosterAppInfo, or -1, if \a signature is
+			\c NULL or the list doesn't contain an info with this signature.
+*/
 int32
 AppInfoList::IndexOf(const char *signature) const
 {
-	for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
-		if (!strcmp(info->signature, signature))
-			return i;
+	if (signature) {
+		for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
+			if (!strcmp(info->signature, signature))
+				return i;
+		}
 	}
 	return -1;
 }
 
 // IndexOf
+/*!	\brief Returns the list index of a RosterAppInfo with the supplied
+		   team ID.
+
+	\param team The team ID
+	\return The index of the found RosterAppInfo, or -1, if the list doesn't
+			contain an info with this team ID.
+*/
 int32
 AppInfoList::IndexOf(team_id team) const
 {
@@ -95,17 +244,36 @@ AppInfoList::IndexOf(team_id team) const
 }
 
 // IndexOf
+/*!	\brief Returns the list index of a RosterAppInfo with the supplied
+		   entry_ref.
+
+	If the list contains more than one RosterAppInfo with the given entry_ref,
+	it is undefined, which one is returned.
+
+	\param ref The entry_ref
+	\return The index of the found RosterAppInfo, or -1, if \a ref is
+			\c NULL or the list doesn't contain an info with this entry_ref.
+*/
 int32
 AppInfoList::IndexOf(const entry_ref *ref) const
 {
-	for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
-		if (info->ref == *ref)
-			return i;
+	if (ref) {
+		for (int32 i = 0; RosterAppInfo *info = InfoAt(i); i++) {
+			if (info->ref == *ref)
+				return i;
+		}
 	}
 	return -1;
 }
 
 // IndexOfToken
+/*!	\brief Returns the list index of a RosterAppInfo with the supplied
+		   token.
+
+	\param token The token
+	\return The index of the found RosterAppInfo, or -1, if the list doesn't
+			contain an info with this token.
+*/
 int32
 AppInfoList::IndexOfToken(uint32 token) const
 {
@@ -114,47 +282,5 @@ AppInfoList::IndexOfToken(uint32 token) const
 			return i;
 	}
 	return -1;
-}
-
-// InfoAt
-RosterAppInfo *
-AppInfoList::InfoAt(int32 index) const
-{
-	return (RosterAppInfo*)fInfos.ItemAt(index);
-}
-
-// InfoFor
-RosterAppInfo *
-AppInfoList::InfoFor(const char *signature) const
-{
-	return InfoAt(IndexOf(signature));
-}
-
-// InfoFor
-RosterAppInfo *
-AppInfoList::InfoFor(team_id team) const
-{
-	return InfoAt(IndexOf(team));
-}
-
-// InfoFor
-RosterAppInfo *
-AppInfoList::InfoFor(const entry_ref *ref) const
-{
-	return InfoAt(IndexOf(ref));
-}
-
-// InfoForToken
-RosterAppInfo *
-AppInfoList::InfoForToken(uint32 token) const
-{
-	return InfoAt(IndexOfToken(token));
-}
-
-// CountInfos
-int32
-AppInfoList::CountInfos() const
-{
-	return fInfos.CountItems();
 }
 
