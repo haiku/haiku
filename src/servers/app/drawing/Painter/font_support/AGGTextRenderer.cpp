@@ -120,7 +120,8 @@ AGGTextRenderer::SetFont(const char* pathToFontFile)
 {
 	if (pathToFontFile) {
 		if (fFontEngine.load_font(pathToFontFile, 0, agg::glyph_ren_outline)) {
-			
+//		if (fFontEngine.load_font(pathToFontFile, 0, agg::glyph_ren_native_gray8)) {			
+
 			return TextRenderer::SetFont(pathToFontFile);
 		} else {
 			fprintf(stderr, "%s : is not a font file or could not be opened\n",
@@ -199,8 +200,9 @@ AGGTextRenderer::RenderString(const char* string,
 							  const Transformable& transform,
 							  BPoint* nextCharPos)
 {
-	fFontEngine.hinting(fHinted);
-	fFontEngine.height((int32)(fPtSize/* * 16.0*/));
+	fFontEngine.hinting(false);
+	fFontEngine.height((int32)(fPtSize));
+	fFontEngine.width((int32)(fPtSize));
 
 	typedef agg::conv_curve<font_manager_type::path_adaptor_type>			conv_font_curve_type;
 //	typedef agg::conv_segmentator<conv_font_curve_type>						conv_font_segm_type;
@@ -310,8 +312,10 @@ AGGTextRenderer::RenderString(const char* string,
 				}
 	
 				// increment pen position
-				advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
-				advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
+//				advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
+//				advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
+				advanceX = glyph->advance_x;
+				advanceY = glyph->advance_y;
 			}
 			++p;
 		}
@@ -334,8 +338,9 @@ BRect
 AGGTextRenderer::Bounds(const char* string, uint32 length,
 						const Transformable& transform)
 {
-	fFontEngine.hinting(fHinted);
-	fFontEngine.height((int32)(fPtSize/* * 16.0*/));
+	fFontEngine.hinting(false);
+	fFontEngine.height((int32)(fPtSize));
+	fFontEngine.width((int32)(fPtSize));
 
 	BRect bounds(0.0, 0.0, -1.0, -1.0);
 
@@ -427,8 +432,8 @@ AGGTextRenderer::Bounds(const char* string, uint32 length,
 							bounds = bounds.IsValid() ? bounds | t : t;
 		
 						// increment pen position
-						advanceX = fHinted ? floorf(glyph->advance_x + 0.5) : glyph->advance_x;
-						advanceY = fHinted ? floorf(glyph->advance_y + 0.5) : glyph->advance_y;
+						advanceX = glyph->advance_x;
+						advanceY = glyph->advance_y;
 					}
 					++p;
 				}

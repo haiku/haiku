@@ -35,6 +35,7 @@ FontManager::FontManager(bool scanFontsInline)
 	if (error)
 		fprintf(stderr, "Could not initialise FreeType library\n");
 
+/*
 	if (scanFontsInline) {
 		_update((void*)this);
 	} else {
@@ -43,7 +44,7 @@ FontManager::FontManager(bool scanFontsInline)
 											 B_LOW_PRIORITY, this);
 		if (fontScanner >= B_OK)
 			resume_thread(fontScanner);
-	}
+	}*/
 	
 	Run();
 }

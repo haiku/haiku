@@ -1134,7 +1134,10 @@ void Layer::move_layer(float x, float y)
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
-	fDriver->CopyRegionList(&fRootLayer->fCopyRegList, &fRootLayer->fCopyList, fRootLayer->fCopyRegList.CountItems(), &fFullVisible);
+	fDriver->CopyRegionList(&fRootLayer->fCopyRegList,
+							&fRootLayer->fCopyList,
+							fRootLayer->fCopyRegList.CountItems(),
+							&fFullVisible);
 	fParent->Redraw(fRootLayer->fRedrawReg, this);
 	
 	EmptyGlobals();

@@ -25,11 +25,19 @@
 //  
 //------------------------------------------------------------------------------
 #include <stdio.h>
+#include <algo.h>
 
 #include "Painter.h"
 #include "RenderingBuffer.h"
 
 #ifdef __HAIKU__
+#define USE_ACCELERANT 1
+#else
+#define USE_ACCELERANT 0
+#endif
+
+
+#if USE_ACCELERANT
   #include "AccelerantHWInterface.h"
 #else
   #include "ViewHWInterface.h"
@@ -46,7 +54,7 @@
 DisplayDriverPainter::DisplayDriverPainter()
 	: DisplayDriver(),
 	  fPainter(new Painter()),
-#ifdef __HAIKU__
+#if USE_ACCELERANT
 	  fGraphicsCard(new AccelerantHWInterface())
 #else
 	  fGraphicsCard(new ViewHWInterface())
@@ -81,25 +89,53 @@ DisplayDriverPainter::Shutdown()
 
 // CopyBits
 void
-DisplayDriverPainter::CopyBits(const BRect &src, const BRect &dest,
+DisplayDriverPainter::CopyBits(const BRect &src, const BRect &dst,
 							   const DrawData *d)
 {
-/*	if(!d)
-		return;
+	if (Lock()) {
+		// TODO: handle clipping to d->clipreg here?
+
+		RenderingBuffer* backBuffer = fGraphicsCard->BackBuffer();
+
+		BRect valid(0, 0, backBuffer->Width() - 1, backBuffer->Height() - 1);
+		if (valid.Intersects(src) && valid.Intersects(dst)) {
+
+			// calculate offset before any clipping
+			int32 xOffset = (int32)(dst.left - src.left);
+			int32 yOffset = (int32)(dst.top - src.top);
+
+			// clip src and dest
+			BRect a = src & valid;
+			BRect b = dst & valid;
+			a = a & b.OffsetByCopy(BPoint(-xOffset, -yOffset));
+			b = b & a.OffsetByCopy(BPoint(xOffset, yOffset));
 	
-	Lock();
+			uint8* bits = (uint8*)backBuffer->Bits();
+			uint32 bpr = backBuffer->BytesPerRow();
 	
-	if(fCursorHandler.IntersectsCursor(dest))
-		fCursorHandler.DriverHide();
-	Blit(src,dest,d);
-	fCursorHandler.DriverShow();
-	Unlock();*/
+			uint32 width = a.IntegerWidth() + 1;
+			uint32 height = a.IntegerHeight() + 1;
+	
+			int32 left = (int32)a.left;
+			int32 top = (int32)a.top;
+	
+			// offset to left top of src rect
+			bits += top * bpr + left * 4;
+	
+			_MoveRect(bits, width, height, bpr, xOffset, yOffset);
+	
+			fGraphicsCard->Invalidate(dst);
+		}
+
+		Unlock();
+	}
 }
 
 // CopyRegion
 void
 DisplayDriverPainter::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
+printf("DisplayDriverPainter::CopyRegion()\n");
 }
 
 // InvertRect
@@ -137,6 +173,102 @@ DisplayDriverPainter::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
 	}
 }
 
+/*
+inline int
+compare_left_right_top_bottom(BRect* a, BRect* b)
+{
+	if (b->right < a->left || b->bottom < a->top)
+		return 1;
+	else
+		return -1;
+	return 0;
+}
+
+inline int
+compare_right_left_top_bottom(BRect* a, BRect* b)
+{
+	if (b->right > a->left || b->bottom < a->top)
+		return 1;
+	else
+		return -1;
+	return 0;
+}
+
+inline int
+compare_left_right_bottom_top(BRect* a, BRect* b)
+{
+	if (b->right < a->left || b->bottom > a->top)
+		return 1;
+	else
+		return -1;
+	return 0;
+}
+
+inline int
+compare_right_left_bottom_top(BRect* a, BRect* b)
+{
+	if (b->right > a->left || b->bottom > a->top)
+		return 1;
+	else
+		return -1;
+	return 0;
+}
+*/
+
+// TODO: the commented out code is completely broken
+// what needs to be done is a topological sort of the rectangles
+// in a given BRegion.
+// For example, let's suppose these rects are in a BRegion:
+//                        ************
+//                        *    B     *
+//      *************     ************
+//      *           *
+//      *     A     ***************
+//      *           *             *
+//      *************             *
+//                  *     C       *
+//                  *             *
+//                  *             *
+//                  ***************
+// When moving stuff from LEFT TO RIGHT, TOP TO BOTTOM, the
+// result of the sort should be C, B, A, ie, you take an unsorted
+// list of rects, and you go look for the one that has no neighbors
+// to the right and to the bottom, that's the first one you want
+// to move. If you move from RIGHT TO LEFT, BOTTOM TO TOP, you
+// go look for the one that has no neighbors to the top and left.
+//
+// Here I draw some rays to illustrate LEFT TO RIGHT, TOP TO BOTTOM:
+//                        ************
+//                        *    B     *
+//      *************     ************
+//      *           *
+//      *     A     ***************-----------------
+//      *           *             *
+//      *************             *
+//                  *     C       *
+//                  *             *
+//                  *             *
+//                  ***************
+//                  |
+//                  |
+//                  |
+//                  |
+// There are no rects in the area defined by the rays to the right
+// and bottom of rect C, so that's the one we want to copy first
+// (for positive x and y offsets). If the sorting of rects can
+// be implemented, the speed-up of the CopyRegionList() function
+// will be about 300% (I tested that) with "in-place" copying.
+//
+// Of course, the usage of the funcion is completely obscure to me.
+// First of all, why is there a list of points? I checked and it
+// is indeed always the same point (the same offset used for all rects).
+// Second, if the Regions provided in the list somehow overlap, then
+// an in-place copy cannot be performed, so this all makes no sense.
+// However during my tests, the usage of the function
+// (from Layer::move_to() btw) was only with a *single* BRegion in
+// the list. Which makes most sense, but it doesn't make sense to pass
+// a BList then.
+
 // used to move windows arround on screen
 //
 // CopyRegionList
@@ -146,14 +278,84 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 {
 	if (!clipReg || !Lock())
 		return;
-
-// This is the same implementation as in DisplayDriverPainter for now
+/*
+// This is the same implementation as in DisplayDriverImpl for now
 
 // since we're not using painter.... this won't do much good, will it?
 //	fPainter->ConstrainClipping(*clipReg);
+//bigtime_t now = system_time();
 
+		BRect updateRect;
+
+		RenderingBuffer* backBuffer = fGraphicsCard->BackBuffer();
+
+		uint8* bits = (uint8*)backBuffer->Bits();
+		uint32 bpr = backBuffer->BytesPerRow();
+
+		// TODO: it's always the same point, no?
+		BPoint offset = *((BPoint*)pList->ItemAt(0));
+
+		// iterate over regions (and points)
+		for (int32 i = 0; i < rCount; i++) {
+			BRegion* region = (BRegion*)list->ItemAt(i);
+
+			// copy rects into a list
+			int32 rectCount = region->CountRects();
+			BList rects(rectCount);
+			for (int32 j = 0; j < rectCount; j++) {
+				BRect* r = new BRect(region->RectAt(j));
+				rects.AddItem((void*)r);
+			}
+			// sort the rects according to offset
+			BRect** first = (BRect**)rects.Items();
+			BRect** behindLast = (BRect**)rects.Items() + rects.CountItems();
+
+			int32 xOffset = (int32)offset.x;
+			int32 yOffset = (int32)offset.y;
+
+			if (xOffset >= 0) {
+				if (yOffset >= 0)
+					sort(first, behindLast, compare_left_right_top_bottom);
+				else
+					sort(first, behindLast, compare_left_right_bottom_top);
+			} else {
+				if (yOffset >= 0)
+					sort(first, behindLast, compare_right_left_top_bottom);
+				else
+					sort(first, behindLast, compare_right_left_bottom_top);
+			}
+
+
+			// iterate over rects in region
+			for (int32 j = 0; j < rectCount; j++) {
+				BRect* r = (BRect*)rects.ItemAt(j);
+
+				uint32 width = r->IntegerWidth() + 1;
+				uint32 height = r->IntegerHeight() + 1;
+
+				int32 left = (int32)r->left;
+				int32 top = (int32)r->top;
+
+// TODO: out of bounds checking!
+//				BPoint offset = *((BPoint*)pList->ItemAt(j % rCount));
+				// keep track of dirty rect
+				r->OffsetBy(offset);
+				updateRect = updateRect.IsValid() ? updateRect | *r : *r;
+
+printf("region: %ld, rect: %ld, offset(%ld, %ld)\n", i, j, xOffset, yOffset);
+
+				// offset to left top of src rect
+				uint8* src = bits + top * bpr + left * 4;
+
+				_MoveRect(src, width, height, bpr, xOffset, yOffset);
+
+				delete r;
+			}
+		}
+
+*/
 	RenderingBuffer* bmp = fGraphicsCard->BackBuffer();
-	
+
 	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Width();
 	BList		rectList;
 	int32		i, k;
@@ -258,6 +460,7 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 		if (void* rectCopy = rectList.ItemAt(i))
 			free(rectCopy);
 	}
+//printf("CopyRegionList(): %lld\n", system_time() - now);
 
 	fGraphicsCard->Invalidate(updateRect);
 
@@ -1034,3 +1237,45 @@ void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 		Unlock();
 	}
 }
+
+// _MoveRect
+void
+DisplayDriverPainter::_MoveRect(uint8* src, uint32 width, uint32 height,
+								uint32 bpr, int32 xOffset, int32 yOffset) const
+{
+	int32 xIncrement;
+	int32 yIncrement;
+
+	if (xOffset > 0) {
+		// copy from right to left
+		xIncrement = -1;
+		src += width * 4;
+	} else {
+		// copy from left to right
+		xIncrement = 1;
+	}
+
+	if (yOffset > 0) {
+		// copy from bottom to top
+		yIncrement = -bpr;
+		src += height * bpr;
+	} else {
+		// copy from top to bottom
+		yIncrement = bpr;
+	}
+
+	uint8* dst = src + yOffset * bpr + xOffset * 4;
+
+	for (uint32 y = 0; y < height; y++) {
+		uint32* srcHandle = (uint32*)src;
+		uint32* dstHandle = (uint32*)dst;
+		for (uint32 x = 0; x < width; x++) {
+			*dstHandle = *srcHandle;
+			srcHandle += xIncrement;
+			dstHandle += xIncrement;
+		}
+		src += yIncrement;
+		dst += yIncrement;
+	}
+}
+

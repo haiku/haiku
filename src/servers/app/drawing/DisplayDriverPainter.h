@@ -281,6 +281,10 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	void				ConstrainClippingRegion(BRegion *reg);
 
  private:
+			void				_MoveRect(uint8* bits,
+										  uint32 width, uint32 height, uint32 bpr,
+										  int32 xOffset, int32 yOffset) const;
+
 			Painter*			fPainter;
 			HWInterface*		fGraphicsCard;
 };

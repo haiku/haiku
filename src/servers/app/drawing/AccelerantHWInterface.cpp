@@ -518,7 +518,7 @@ AccelerantHWInterface::BackBuffer() const
 void
 AccelerantHWInterface::_DrawCursor(BRect area) const
 {
-#if 0
+
 	BRect cf = _CursorFrame();
 	if (cf.IsValid() && area.Intersects(cf)) {
 		// clip to common area
@@ -580,6 +580,6 @@ AccelerantHWInterface::_DrawCursor(BRect area) const
 
 		delete[] buffer;
 	}
-#endif
+
 }
 
