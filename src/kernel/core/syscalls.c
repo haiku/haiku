@@ -180,8 +180,14 @@ _user_socket(int family, int type, int proto)
 int32
 syscall_dispatcher(uint32 call_num, void *args, uint64 *call_ret)
 {
+	bigtime_t startTime;
+
 //	dprintf("syscall_dispatcher: thread 0x%x call 0x%x, arg0 0x%x, arg1 0x%x arg2 0x%x arg3 0x%x arg4 0x%x\n",
 //		thread_get_current_thread_id(), call_num, arg0, arg1, arg2, arg3, arg4);
+
+	user_debug_pre_syscall(call_num, args);
+
+	startTime = system_time();
 
 	switch (call_num) {
 		// the cases are auto-generated
@@ -190,6 +196,8 @@ syscall_dispatcher(uint32 call_num, void *args, uint64 *call_ret)
 		default:
 			*call_ret = -1;
 	}
+
+	user_debug_post_syscall(call_num, args, *call_ret, startTime);
 
 //	dprintf("syscall_dispatcher: done with syscall 0x%x\n", call_num);
 
