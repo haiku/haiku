@@ -13,19 +13,20 @@
 #include <stage2.h>
 #include <string.h>
 #include <stdio.h>
+#include <kqueue.h>
 
 #define NUM_IO_VECTORS 256
 
 struct io_handler {
-	struct io_handler *next;
-	struct io_handler *prev;
-	interrupt_handler func;
-	void *data;
+	struct io_handler	*next;
+	struct io_handler	*prev;
+	interrupt_handler	func;
+	void				*data;
 };
 
 struct io_vector {
-	struct io_handler handler_list;
-	spinlock          vector_lock;
+	struct io_handler	handler_list;
+	spinlock			vector_lock;
 };
 
 static struct io_vector *io_vectors = NULL;

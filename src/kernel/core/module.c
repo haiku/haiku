@@ -1,4 +1,4 @@
-/* Module manager. Uses hash.c */
+/* Module manager */
 
 /*
 ** Copyright 2001, Thomas Kurschel. All rights reserved.
@@ -12,6 +12,7 @@
 #include <arch/cpu.h>
 #include <debug.h>
 #include <khash.h>
+#include <kqueue.h>
 #include <memheap.h>
 #include <elf.h>
 #include <stdio.h>
@@ -78,11 +79,11 @@ typedef enum {
  * by a loaded_module_info structure.
  */
 typedef struct loaded_module {
-	struct loaded_module      *next;
-	struct loaded_module      *prev;
-	module_info              **info;          /* the module_info we use */
-	char                      *path;          /* the full path for the module */
-	int                        ref_cnt;       /* how many ref's to this file */
+	struct loaded_module	*next;
+	struct loaded_module	*prev;
+	module_info				**info;		/* the module_info we use */
+	char					*path;		/* the full path for the module */
+	int						ref_cnt;	/* how many ref's to this file */
 } loaded_module;
 struct loaded_module loaded_modules;
 
@@ -92,16 +93,16 @@ struct loaded_module loaded_modules;
  * the case where we have a single file exporting a number of modules.
  */
 typedef struct module {
-	struct module         *next;
-	struct module         *prev;
-	struct loaded_module  *module;
-	char                  *name;
-	char                  *file;
-	int                    ref_cnt;
-	module_info           *ptr;                /* will only be valid if ref_cnt > 0 */
-	int                    offset;             /* this is the offset in the headers */
-	int                    state;              /* state of module */
-	bool                   keep_loaded;
+	struct module			*next;
+	struct module			*prev;
+	struct loaded_module	*module;
+	char					*name;
+	char					*file;
+	int						ref_cnt;
+	module_info				*ptr;		/* will only be valid if ref_cnt > 0 */
+	int						offset;		/* this is the offset in the headers */
+	int						state;		/* state of module */
+	bool					keep_loaded;
 } module;
 
 /* This is used to provide a list of modules we know about */
@@ -117,55 +118,26 @@ static struct module known_modules;
 
 
 typedef struct module_iterator {
-	char                        *prefix;
-	int                          base_path_id;
-	struct module_dir_iterator  *base_dir;
-	struct module_dir_iterator  *cur_dir;
-	int                          err;
-	int                          module_pos;           /* This is used to keep track of which module_info
-	                                                    * within a module we're addressing. */
-	module_info                **cur_header;
-	char                        *cur_path;
+	char						*prefix;
+	int							base_path_id;
+	struct module_dir_iterator	*base_dir;
+	struct module_dir_iterator	*cur_dir;
+	int							err;
+	int							module_pos;	/* This is used to keep track of which module_info
+											 * within a module we're addressing. */
+	module_info					**cur_header;
+	char						*cur_path;
 } module_iterator;
 
 typedef struct module_dir_iterator {
-	struct module_dir_iterator  *parent_dir;
-	struct module_dir_iterator  *sub_dir;
-	char                        *name;
-	int                          file;
-	int                          hdr_prefix;
+	struct module_dir_iterator	*parent_dir;
+	struct module_dir_iterator	*sub_dir;
+	char						*name;
+	int							file;
+	int							hdr_prefix;
 } module_dir_iterator;
 
 
-/* XXX - These should really be in a header so they are system wide... */
-/* These are GCC only, so we'll need PPC version eventually... */
-struct quehead {
-	struct quehead *qh_link;
-	struct quehead *qh_rlink;
-};
-
-__inline void
-insque(void *a, void *b)
-{
-	struct quehead *element = (struct quehead *)a,
-		 *head = (struct quehead *)b;
-
-	element->qh_link = head->qh_link;
-	element->qh_rlink = head;
-	head->qh_link = element;
-	element->qh_link->qh_rlink = element;
-}
-
-__inline void
-remque(void *a)
-{
-	struct quehead *element = (struct quehead *)a;
-
-	element->qh_link->qh_rlink = element->qh_rlink;
-	element->qh_rlink->qh_link = element->qh_link;
-	element->qh_rlink = 0;
-}
-  
 /* XXX locking scheme: there is a global lock only; having several locks
  * makes trouble if dependent modules get loaded concurrently ->
  * they have to wait for each other, i.e. we need one lock per module;
