@@ -261,24 +261,21 @@ status_t
 OggTobiasSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
                              media_header *mediaHeader)
 {
-	status_t result = GetPacket(&fChunkPacket);
+	status_t result = inherited::GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 	if (result != B_OK) {
-		TRACE("OggTobiasSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
+		TRACE("OggTobiasSeekable::GetNextChunk failed: GetNextChunk = %s\n", strerror(result));
 		return result;
 	}
-	*chunkBuffer = fChunkPacket.packet;
-	*chunkSize = fChunkPacket.bytes;
-	bool keyframe = fChunkPacket.packet[0] & (1 << 3); // ??
+	*chunkSize = ((ogg_packet*)*chunkBuffer)->bytes;
+	*chunkBuffer = ((ogg_packet*)*chunkBuffer)->packet;
+	bool keyframe = ((uint*)chunkBuffer)[0] & (1 << 3); // ??
 	if (fMediaFormat.type == B_MEDIA_ENCODED_VIDEO) {
 		mediaHeader->type = fMediaFormat.type;
-		mediaHeader->start_time = fCurrentTime;
 		mediaHeader->u.encoded_video.field_flags = (keyframe ? B_MEDIA_KEY_FRAME : 0);
 		mediaHeader->u.encoded_video.first_active_line
 		   = fMediaFormat.u.encoded_video.output.first_active;
 		mediaHeader->u.encoded_video.line_count
 		   = fMediaFormat.u.encoded_video.output.display.line_count;
 	}
-	fCurrentFrame++;
-	fCurrentTime = (bigtime_t)(fCurrentFrame * fMicrosecPerFrame);
 	return B_OK;
 }

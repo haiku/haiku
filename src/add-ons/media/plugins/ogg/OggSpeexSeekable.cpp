@@ -185,12 +185,12 @@ status_t
 OggSpeexSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
                              media_header *mediaHeader)
 {
-	status_t result = GetPacket(&fChunkPacket);
+	status_t result = inherited::GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 	if (result != B_OK) {
-		TRACE("OggSpeexSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
+		TRACE("OggSpeexSeekable::GetNextChunk failed: GetNextChunk = %s\n", strerror(result));
 		return result;
 	}
-	*chunkBuffer = fChunkPacket.packet;
-	*chunkSize = fChunkPacket.bytes;
+	*chunkSize = ((ogg_packet*)*chunkBuffer)->bytes;
+	*chunkBuffer = ((ogg_packet*)*chunkBuffer)->packet;
 	return B_OK;
 }

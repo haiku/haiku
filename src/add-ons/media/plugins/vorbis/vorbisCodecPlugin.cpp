@@ -46,7 +46,7 @@ VorbisDecoder::VorbisDecoder()
 	TRACE("VorbisDecoder::VorbisDecoder\n");
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
-	
+	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
 }
@@ -170,8 +170,9 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 
-	bool start = false;
+	bool synced = false;
 	
+	int total_samples = 0;
 	while (out_bytes_needed > 0) {
 		int samples;
 		float **pcm;
@@ -192,9 +193,11 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				TRACE("VorbisDecoder::Decode: chunk not ogg_packet-sized\n");
 				return B_ERROR;
 			}
-			if (!start) {
-				mediaHeader->start_time = mh.start_time;
-				start = true;
+			if (!synced) {
+				if (mh.start_time > 0) {
+					mediaHeader->start_time = mh.start_time - total_samples / fInfo.rate;
+					synced = true;
+				}
 			}
 			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
 			if (vorbis_synthesis(&fBlock,packet)==0) {
@@ -203,6 +206,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		}
 		// reduce samples to the amount of samples we will actually consume
 		samples = min_c(samples,out_bytes_needed/fFrameSize);
+		total_samples += samples;
 #if DECODE_AS_INT16
 		for (int sample = 0; sample < samples ; sample++) {
 			for (int channel = 0; channel < fInfo.channels; channel++) {
@@ -231,6 +235,11 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 	}
 	
 done:
+	if (!synced) {
+		mediaHeader->start_time = fStartTime;
+	}
+	fStartTime = mediaHeader->start_time + total_samples / fInfo.rate;
+
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 
 	if (out_buffer != buffer) {

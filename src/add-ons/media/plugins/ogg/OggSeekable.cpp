@@ -51,6 +51,10 @@ OggSeekable::OggSeekable(long serialno)
 	ogg_stream_init(&fStreamState,serialno);
 	fPosition = 0;
 	fLastPagePosition = 0;
+
+	fCurrentFrame = 0;
+	fCurrentTime = 0;
+	fFirstGranulepos = 0;
 	fFrameRate = 0;
 }
 
@@ -267,6 +271,7 @@ OggSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 status_t
 OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 {
+	status_t status;
 	int64 granulepos;
 	if (seekTo & B_MEDIA_SEEK_TO_TIME) {
 		TRACE("OggSeekable::Seek: seek to time: %lld\n", *time);
@@ -286,7 +291,12 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	// find the first packet with data in it
 	ogg_page page;
 	off_t left = 0;
-	Seek(0, SEEK_SET);
+	BAutolock autolock(fPositionLock);
+	off_t pos = Seek(0, SEEK_SET);
+	if (pos < 0) {
+		TRACE("OggSeekable::Seek: Seek = %s\n", strerror(status));
+		return status;
+	}
 	uint header_packets_left = GetHeaderPackets().size();
 	while (header_packets_left > 0) {
 		status_t status = ReadPage(&page, B_PAGE_SIZE);
@@ -296,6 +306,17 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		}
 		header_packets_left -= ogg_page_packets(&page);
 		left += page.header_len + page.body_len;
+	}
+	TRACE("OggSeekable::Seek: header packets end after = %llu\n", left);
+	pos = Seek(left, SEEK_SET);
+	if (pos < 0) {
+		TRACE("OggSeekable::Seek: Seek2 = %s\n", strerror(status));
+		return status;
+	}
+	status = ReadPage(&page, B_PAGE_SIZE);
+	if (status != B_OK) {
+		TRACE("OggSeekable::Seek: ReadPage2 = %s\n", strerror(status));
+		return status;
 	}
 	if (ogg_page_continued(&page)) {
 		TRACE("OggSeekable::Seek: warning: data packet began in header page!\n");
@@ -318,7 +339,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 			done = true;
 		}
 		do {
-			status_t status = ReadPage(&page, B_PAGE_SIZE);
+			status = ReadPage(&page, B_PAGE_SIZE);
 			if (status != B_OK) {
 				TRACE("OggSeekable::Seek: ReadPage = %s\n", strerror(status));
 				return status;
@@ -350,7 +371,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	if (*frame != 0) {
 		ogg_packet packet;
 		do {
-			status_t status = GetPacket(&packet);
+			status = GetPacket(&packet);
 			if (status != B_OK) {
 				TRACE("OggSeekable::Seek: GetPacket = %s\n", strerror(status));
 				return status;
@@ -423,11 +444,11 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		}*/
 
 
-// the default chunk is an ogg packet
 status_t
 OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
-             media_header *mediaHeader)
+                             media_header *mediaHeader)
 {
+	BAutolock autolock(fPositionLock);
 	mediaHeader->start_time = fCurrentTime;
 	mediaHeader->file_pos = fPosition;
 	status_t result = GetPacket(&fChunkPacket);
@@ -437,7 +458,11 @@ OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	}
 	*chunkBuffer = &fChunkPacket;
 	*chunkSize = sizeof(fChunkPacket);
-	fCurrentFrame++;
+	if (fChunkPacket.granulepos > 0) {
+		fCurrentFrame = fChunkPacket.granulepos - fFirstGranulepos;
+	} else {
+		fCurrentFrame++;
+	}
 	fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
 	return B_OK;
 }

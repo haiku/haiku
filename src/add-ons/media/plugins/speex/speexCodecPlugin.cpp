@@ -51,6 +51,7 @@ SpeexDecoder::SpeexDecoder()
 	fHeader = 0;
 	fStereoState = 0;
 	fSpeexOutputLength = 0;
+	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
 }
@@ -249,8 +250,9 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 	float * out_buffer = static_cast<float *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
 	
-	bool start = false;
+	bool synced = false;
 	
+	int total_samples = 0;
 	while (out_bytes_needed >= fSpeexOutputLength) {
 		// get a new packet
 		void *chunkBuffer;
@@ -264,9 +266,11 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 			TRACE("SpeexDecoder::Decode: GetNextChunk failed\n");
 			return status;
 		}
-		if (!start) {
-			mediaHeader->start_time = mh.start_time;
-			start = true;
+		if (!synced) {
+			if (mh.start_time > 0) {
+				mediaHeader->start_time = mh.start_time - total_samples / fHeader->rate;
+				synced = true;
+			}
 		}
 		speex_bits_read_from(&fBits, (char*)chunkBuffer, chunkSize);
 		for (int frame = 0 ; frame < fHeader->frames_per_packet ; frame++) {
@@ -290,10 +294,16 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 			}
 			out_buffer += fHeader->frame_size * fHeader->nb_channels;
 			out_bytes_needed -= fSpeexOutputLength;
+			total_samples += fHeader->frame_size;
 		}
 	}
 
 done:	
+	if (!synced) {
+		mediaHeader->start_time = fStartTime;
+	}
+	fStartTime = mediaHeader->start_time + total_samples / fHeader->rate;
+
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 
 	if (out_buffer != buffer) {
