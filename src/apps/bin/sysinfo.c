@@ -321,12 +321,13 @@ dump_cpu(system_info *info, int32 cpu)
 		memset(buffer, 0, sizeof(buffer));
 
 		for (i = 0; i < 3; i++) {
-			get_cpuid(&cpuInfo, 0x80000002 + i, cpu);
+			cpuid_info nameInfo;
+			get_cpuid(&nameInfo, 0x80000002 + i, cpu);
 
-			memcpy(name, &cpuInfo.regs.eax, 4);
-			memcpy(name + 4, &cpuInfo.regs.ebx, 4);
-			memcpy(name + 8, &cpuInfo.regs.ecx, 4);
-			memcpy(name + 12, &cpuInfo.regs.edx, 4);
+			memcpy(name, &nameInfo.regs.eax, 4);
+			memcpy(name + 4, &nameInfo.regs.ebx, 4);
+			memcpy(name + 8, &nameInfo.regs.ecx, 4);
+			memcpy(name + 12, &nameInfo.regs.edx, 4);
 			name += 16;
 		}
 
@@ -335,7 +336,15 @@ dump_cpu(system_info *info, int32 cpu)
 		while (name[0] == ' ')
 			name++;
 
-		printf("CPU #%ld: \"%s\"\n", cpu, name);
+		// the BIOS may not have set the processor name
+		if (name[0])
+			printf("CPU #%ld: \"%s\"\n", cpu, name);
+		else {
+			// Intel CPUs don't seem to have the genuine vendor field
+			printf("CPU #%ld: %.12s\n", cpu,
+				(info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86 ?
+					baseInfo.eax_0.vendor_id : cpuInfo.eax_0.vendor_id);
+		}
 	} else {
 		printf("CPU #%ld: %.12s\n", cpu, baseInfo.eax_0.vendor_id);
 		if (max_eax == 0)
@@ -347,7 +356,7 @@ dump_cpu(system_info *info, int32 cpu)
 	print_features(cpuInfo.eax_1.features);
 
 	/* Extended CPUID */
-	if (max_extended_eax >= 1) {
+	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) != B_CPU_INTEL_x86) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
 		print_processor_signature(&cpuInfo, "extended: ");
 
