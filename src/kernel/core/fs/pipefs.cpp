@@ -1026,7 +1026,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 	status_t status;
 
-	if (request == NULL && bytesLeft > 0) {
+	if (request == NULL) {
 		// there is no read matching request pending, so we have to put
 		// our data in a temporary buffer
 
