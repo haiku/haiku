@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers usb ;
 
+SubDirC++Flags -fno-rtti ;
+
 UsePrivateHeaders [ FDirName kernel ] ;
 
 AddResources usb : usb.rdef ;
