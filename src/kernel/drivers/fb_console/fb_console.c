@@ -26,8 +26,7 @@
 #	define TRACE(x) ;
 #endif
 
-
-int fb_console_dev_init(kernel_args *ka);
+status_t fb_console_dev_init(kernel_args *args);
 
 #define WRAP(x, limit) ((x) % (limit))
 	// This version makes the sh4 compiler throw up
@@ -436,30 +435,31 @@ static device_hooks sFrameBufferConsoleHooks = {
 };
 
 
-int
-fb_console_dev_init(kernel_args *ka)
+status_t
+fb_console_dev_init(kernel_args *args)
 {
+	status_t status;
 	int i;
 
-	if (!ka->fb.enabled)
+	if (!args->frame_buffer.enabled)
 		return B_OK;
 
-	TRACE(("fb_console_dev_init: framebuffer found at 0x%lx, x %d, y %d, bit depth %d\n",
-		ka->fb.mapping.start, ka->fb.x_size, ka->fb.y_size, ka->fb.bit_depth));
+	TRACE(("fb_console_dev_init: framebuffer found at 0x%lx, x %ld, y %ld, bit depth %ld\n",
+		args->frame_buffer.physical_buffer.start, args->frame_buffer.width,
+		args->frame_buffer.height, args->frame_buffer.depth));
 
 	memset(&console, 0, sizeof(console));
 
-	if (ka->fb.already_mapped) {
-		console.fb = ka->fb.mapping.start;
-	} else {
-		map_physical_memory("vesa_fb", (void *)ka->fb.mapping.start, ka->fb.mapping.size,
-			B_ANY_KERNEL_ADDRESS, /*B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA*/ 0, (void **)&console.fb);
-	}
+	status = map_physical_memory("vesa_fb", (void *)args->frame_buffer.physical_buffer.start,
+		args->frame_buffer.physical_buffer.size, B_ANY_KERNEL_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, (void **)&console.fb);
+	if (status < B_OK)
+		return status;
 
-	console.fb_x = ka->fb.x_size;
-	console.fb_y = ka->fb.y_size;
-	console.fb_pixel_bytes = ka->fb.bit_depth / 8;
-	console.fb_size = ka->fb.mapping.size;
+	console.fb_x = args->frame_buffer.width;
+	console.fb_y = args->frame_buffer.height;
+	console.fb_pixel_bytes = args->frame_buffer.depth / 8;
+	console.fb_size = args->frame_buffer.physical_buffer.size;
 
 	switch (console.fb_pixel_bytes) {
 		case 1:
