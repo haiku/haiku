@@ -103,12 +103,16 @@ FileTypeView::SetFileType(const char * fileType)
 		delete item;
 	}
 	BMimeType mime(fileType);
-	if (mime.InitCheck() != B_OK) {
-		return;
-	}
 	BMessage applications;
-	if (mime.GetSupportingApps(&applications) != B_OK) {
-		return;
+	if (mime.InitCheck() == B_OK) {
+		if (mime.GetSupportingApps(&applications) != B_OK) {
+			BMimeType super;
+			if (mime.GetSupertype(&super) == B_OK) {
+				if (super.GetSupportingApps(&applications) != B_OK) {
+					applications.MakeEmpty();
+				}
+			}
+		}
 	}
 	int32 subs = 0;
 	if (applications.FindInt32("be:sub", &subs) != B_OK) {
@@ -140,7 +144,8 @@ void
 FileTypeView::SetPreferredApplication(const char * preferredApplication)
 {
 	fPreferredApp.SetTo(preferredApplication);
-	if (preferredApplication == NULL) {
+	if ((preferredApplication == NULL) ||
+        (strlen(preferredApplication) == 0)) {
 		fPreferredAppMenuItemNone->SetMarked(true);
 	} else {
 		for (int i = 0 ; (i < fPreferredAppMenu->CountItems()) ; i++) {
