@@ -27,6 +27,7 @@
 //------------------------------------------------------------------------------
 #include "LayerData.h"
 #include <Layer.h>
+#include <stdio.h>
 
 DrawData::DrawData(void)
 {
@@ -136,6 +137,7 @@ LayerData &LayerData::operator=(const LayerData &from)
 
 	patt=from.patt;
 	draw_mode=from.draw_mode;
+	penlocation=from.penlocation;
 	
 	lineCap=from.lineCap;
 	lineJoin=from.lineJoin;
@@ -168,4 +170,28 @@ LayerData &LayerData::operator=(const LayerData &from)
 	prevState=from.prevState;
 	
 	return *this;
+}
+
+void LayerData::PrintToStream() const{
+	printf("\t Pen Location and Size: (%f, %f) - %f\n", penlocation.x, penlocation.y, pensize);
+	printf("\t HighColor: "); highcolor.PrintToStream();
+	printf("\t LowColor: "); lowcolor.PrintToStream();
+	printf("\t ViewColor "); viewcolor.PrintToStream();
+	printf("\t Pattern: %llu\n", patt.GetInt64());
+	printf("\t DrawMode: %lu\n", (uint32)draw_mode);
+	printf("\t LineCap: %d\t LineJoin: %d\t MiterLimit: %f\n", (int16)lineCap, (int16)lineJoin, miterLimit);
+	printf("\t AlphaSrcMode: %ld\t AlphaFncMode: %ld\n", (int32)alphaSrcMode, (int32)alphaFncMode);
+	printf("\t Scale: %f\n", scale);
+	if (clippReg)
+		clippReg->PrintToStream();
+
+	printf("\t ===== Font Data =====\n");
+	printf("\t FontStyle: CURRENTLY NOT SET\n");
+	printf("\t FontSize: %f\n", font.Size());
+	printf("\t FontShear: %f\n", font.Shear());
+	printf("\t FontRotation: %f\n", font.Rotation());
+	printf("\t FontSpacing: %ld\n", font.Spacing());
+	printf("\t FontEncoding: %ld\n", font.Encoding());
+	printf("\t FontFace: %ld\n", font.Face());
+	printf("\t FontFlags: %lu\n", font.Flags());
 }
