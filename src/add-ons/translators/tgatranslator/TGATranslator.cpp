@@ -416,13 +416,13 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 	
 	// Read in TGA file header
 	TGAFileHeader fileheader;
-	memcpy(&fileheader.idlength, buf, 1);
+	fileheader.idlength = buf[0];
 	
-	memcpy(&fileheader.colormaptype, buf + 1, 1);
+	fileheader.colormaptype = buf[1];
 	if (fileheader.colormaptype > 1)
 		return B_NO_TRANSLATOR;
 		
-	memcpy(&fileheader.imagetype, buf + 2, 1);
+	fileheader.imagetype = buf[2];
 	if ((fileheader.imagetype > 3 && fileheader.imagetype < 9) ||
 		fileheader.imagetype > 11)
 		return B_NO_TRANSLATOR;
@@ -449,7 +449,7 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 		mapspec.length == 0)
 		return B_NO_TRANSLATOR;
 	
-	memcpy(&mapspec.entrysize, buf + 7, 1);
+	mapspec.entrysize = buf[7];
 	if (fileheader.colormaptype == TGA_NO_COLORMAP &&
 		mapspec.entrysize != 0)
 		return B_NO_TRANSLATOR;
@@ -476,7 +476,7 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 	if (imagespec.height == 0)
 		return B_NO_TRANSLATOR;
 	
-	memcpy(&imagespec.depth, buf + 16, 1);
+	imagespec.depth = buf[16];
 	if (imagespec.depth < 1 || imagespec.depth > 32)
 		return B_NO_TRANSLATOR;
 	if ((fileheader.imagetype == TGA_NOCOMP_TRUECOLOR ||
@@ -492,7 +492,7 @@ identify_tga_header(BPositionIO *inSource, translator_info *outInfo,
 		imagespec.depth != 8)
 		return B_NO_TRANSLATOR;
 	
-	memcpy(&imagespec.descriptor, buf + 17, 1);
+	imagespec.descriptor = buf[17];
 	// images ordered from Right to Left (rather than Left to Right)
 	// are not supported
 	if (imagespec.descriptor & TGA_ORIGIN_HORZ_BIT == TGA_ORIGIN_RIGHT)
@@ -866,7 +866,7 @@ copy_rle_packet(uint8 *ptga, uint32 pixel, uint8 count,
 	// copy packet header
 	// (made of type and count)
 	uint8 packethead = (count - 1) | 0x80;
-	memcpy(ptga, &packethead, 1);
+	ptga[0] = packethead;
 	ptga++;
 
 	return pix_bits_to_tga(reinterpret_cast<uint8 *> (&pixel),
@@ -881,7 +881,7 @@ copy_raw_packet(uint8 *ptga, uint8 *praw, uint8 count,
 	// copy packet header
 	// (made of type and count)
 	uint8 packethead = count - 1;
-	memcpy(ptga, &packethead, 1);
+	ptga[0] = packethead;
 	ptga++;
 	
 	return pix_bits_to_tga(praw, ptga, fromspace,
@@ -1262,20 +1262,20 @@ write_tga_headers(BPositionIO *outDestination, TGAFileHeader &fileheader,
 	
 	// Copy TGA headers to buffer to be written out
 	// all at once
-	memcpy(tgaheaders, &outFileheader.idlength, 1);
-	memcpy(tgaheaders + 1, &outFileheader.colormaptype, 1);
-	memcpy(tgaheaders + 2, &outFileheader.imagetype, 1);
+	tgaheaders[0] = outFileheader.idlength;
+	tgaheaders[1] = outFileheader.colormaptype;
+	tgaheaders[2] = outFileheader.imagetype;
 	
 	memcpy(tgaheaders + 3, &outMapspec.firstentry, 2);
 	memcpy(tgaheaders + 5, &outMapspec.length, 2);
-	memcpy(tgaheaders + 7, &outMapspec.entrysize, 1);
+	tgaheaders[7] = outMapspec.entrysize;
 	
 	memcpy(tgaheaders + 8, &outImagespec.xorigin, 2);
 	memcpy(tgaheaders + 10, &outImagespec.yorigin, 2);
 	memcpy(tgaheaders + 12, &outImagespec.width, 2);
 	memcpy(tgaheaders + 14, &outImagespec.height, 2);
-	memcpy(tgaheaders + 16, &outImagespec.depth, 1);
-	memcpy(tgaheaders + 17, &outImagespec.descriptor, 1);
+	tgaheaders[16] = outImagespec.depth;
+	tgaheaders[17] = outImagespec.descriptor;
 	
 	ssize_t written;
 	written = outDestination->Write(tgaheaders, TGA_HEADERS_SIZE);
