@@ -2076,18 +2076,6 @@ emuxki_setup(emuxki_dev * card)
 	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
 	if(IS_AUDIGY2(&card->config)) {
-		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
-			EMU_HCFG_AC3ENABLE_CDSPDIF | EMU_HCFG_AC3ENABLE_GPSPDIF| 
-			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
-	} else if(IS_AUDIGY(&card->config)) {
-		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
-			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
-	} else {
-		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
-			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
-	}
-	
-	if(IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
 			EMU_A_IOCFG_GPOUT0 | emuxki_reg_read_32(&card->config, EMU_A_IOCFG));
 	}
@@ -2163,6 +2151,17 @@ emuxki_setup(emuxki_dev * card)
 
 	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE
 		| EMU_INTE_MUTEENABLE | EMU_INTE_FXDSPENABLE);
+	if(IS_AUDIGY2(&card->config)) {
+		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
+			EMU_HCFG_AC3ENABLE_CDSPDIF | EMU_HCFG_AC3ENABLE_GPSPDIF|
+			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
+	} else if(IS_AUDIGY(&card->config)) {
+		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
+			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
+	} else {
+		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
+			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
+	}
 	
 	PRINT(("init_driver done\n"));
 
@@ -2846,7 +2845,6 @@ void
 uninit_driver(void)
 {
 	int ix, cnt = num_cards;
-	num_cards = 0;
 
 	PRINT(("uninit_driver()\n"));
 	
@@ -2856,6 +2854,7 @@ uninit_driver(void)
 	memset(&cards, 0, sizeof(cards));
 	put_module(mpu401_name);
 	put_module(pci_name);
+	num_cards = 0;
 }
 
 
