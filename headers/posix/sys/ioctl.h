@@ -17,9 +17,7 @@
 extern "C" {
 #endif
 
-
 #include <sys/ioccom.h>
-
 #include <sys/filio.h>
 #include <sys/socket.h>
 
@@ -32,6 +30,10 @@ extern "C" {
    */
   int ioctl(int, ulong, ...);
 #endif /* !_KERNEL_MODE */
+
+#ifdef __cplusplus
+}
+#endif
 
 /** @} */
 #endif /* _SYS_IOCTL_H */
