@@ -4,7 +4,7 @@ UsePrivateHeaders net ;
 
 {
 # Default libs include BeOS R5 libnet.so, something we don't want here!
-LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nostdlib ;
+LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nodefaultlibs ;
 }
 
 Depends libnet.so : install_network_etc_files ;

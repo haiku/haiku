@@ -29,22 +29,9 @@ int _socket_interrupt(void);
 int _netconfig_find(void);
 
 
-/* These should probably be moved to a seperate file as they
- * are unique to the library as a whole...
- */
-
-_EXPORT void _init()
-{
-	h_errno_tls = tls_allocate();
-}
-
-_EXPORT void _fini()
-{
-}
-
-
 _EXPORT void initialize_before(void)
 {
+	h_errno_tls = tls_allocate();
 }
 
 _EXPORT void terminate_after(void)
