@@ -115,9 +115,10 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 
 
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
-#endif
+
 		// attach our line profile to the renderer, it keeps a pointer
 		fOutlineRenderer->profile(fLineProfile);
+#endif
 
 		// the renderer used for filling paths
 		fRenderer = new renderer_type(*fBaseRenderer);
@@ -611,18 +612,43 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 		&& bitmapRect.IsValid() && bitmapRect.Intersects(bitmap->Bounds())
 		&& viewRect.IsValid()) {
 
+		BRect actualBitmapRect = bitmap->Bounds();
+		// compensate for the lefttop offset the actualBitmapRect might have
+// NOTE: I have no clue why this next call gives a wrong result!
+// According to the BeBook, bitmapRect is supposed to be in native
+// bitmap space!
+//		bitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
+		actualBitmapRect.OffsetBy(-actualBitmapRect.left, -actualBitmapRect.top);
+
 		// calculate the scaling
 		double xScale = (viewRect.Width() + 1) / (bitmapRect.Width() + 1);
 		double yScale = (viewRect.Height() + 1) / (bitmapRect.Height() + 1);
 
+		// constrain rect to passed bitmap bounds
+		// and transfer the changes to the viewRect
+		if (bitmapRect.left < actualBitmapRect.left) {
+			float diff = actualBitmapRect.left - bitmapRect.left;
+			viewRect.left += diff * xScale;
+			bitmapRect.left = actualBitmapRect.left;
+		}
+		if (bitmapRect.top < actualBitmapRect.top) {
+			float diff = actualBitmapRect.top - bitmapRect.top;
+			viewRect.top += diff;
+			bitmapRect.top = actualBitmapRect.top;
+		}
+		if (bitmapRect.right > actualBitmapRect.right) {
+			float diff = bitmapRect.right - actualBitmapRect.right;
+			viewRect.right -= diff;
+			bitmapRect.right = actualBitmapRect.right;
+		}
+		if (bitmapRect.bottom > actualBitmapRect.bottom) {
+			float diff = bitmapRect.right - actualBitmapRect.bottom;
+			viewRect.bottom -= diff;
+			bitmapRect.bottom = actualBitmapRect.bottom;
+		}
+
 		float xOffset = viewRect.left - (bitmapRect.left * xScale);
 		float yOffset = viewRect.top - (bitmapRect.top * yScale);
-
-		BRect actualBitmapRect = bitmap->Bounds();
-
-		// constrain rect to passed bitmap bounds
-		bitmapRect = bitmapRect & actualBitmapRect;
-
 
 		// source rendering buffer
 		agg::rendering_buffer srcBuffer;
@@ -632,17 +658,15 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 						 bitmap->BytesPerRow());
 
 		agg::trans_affine srcMatrix;
-		srcMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
+//		srcMatrix *= agg::trans_affine_translation(-actualBitmapRect.left, -actualBitmapRect.top);
 		srcMatrix *= agg::trans_affine_scaling(fScale, fScale);
+		srcMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
 
 		agg::trans_affine imgMatrix;
-// TODO: What about bitmap bounds that have a top-left corner other than B_ORIGIN?!?
-// Ignoring it produces the same result as BView though...
-//		imgMatrix *= agg::trans_affine_translation(actualBitmapRect.left, actualBitmapRect.top);
 		imgMatrix *= agg::trans_affine_scaling(xScale, yScale);
 		imgMatrix *= agg::trans_affine_translation(xOffset, yOffset);
-		imgMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
 		imgMatrix *= agg::trans_affine_scaling(fScale, fScale);
+		imgMatrix *= agg::trans_affine_translation(fOrigin.x, fOrigin.y);
 		imgMatrix.invert();
 		
 		span_alloc_type sa;
@@ -661,7 +685,7 @@ typedef agg::renderer_scanline_aa<renderer_base, span_gen_type> image_renderer_t
 		path.line_to(viewRect.right + 1, viewRect.top);
 		path.line_to(viewRect.right + 1, viewRect.bottom + 1);
 		path.line_to(viewRect.left, viewRect.bottom + 1);
-		path.line_to(viewRect.left, viewRect.top);
+		path.close_polygon();
 
 		agg::conv_transform<agg::path_storage> tr(path, srcMatrix);
 
@@ -936,11 +960,10 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 	fPatternHandler->SetPattern(p);
 
 #if ALIASED_DRAWING
+	float width = fPenSize;
+	_Transform(&width);
 	if (width > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
-
-		float width = fPenSize;
-		_Transform(&width);
 		stroke.width(width);
 
 		fRasterizer->add_path(stroke);
