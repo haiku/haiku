@@ -2,7 +2,7 @@ SubDir OBOS_TOP src kernel core addons bus_managers isa ;
 
 KernelObjects isa.c : -fno-pic -D_KERNEL_MODE ;
 
-KernelLd isa
+KernelLd old_isa
 	:
 	<$(SOURCE_GRIST)>isa.o
 	kernel.so
