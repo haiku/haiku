@@ -36,6 +36,8 @@ public:
 							 media_header *mediaHeader);
 									 
 private:
+	status_t	FindLastPages();
+
 	ogg_sync_state			fSync;
 	BLocker					fSyncLock;
 	serialno_OggTrack_map	fTracks;

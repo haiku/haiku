@@ -89,7 +89,8 @@ retry:
 		return B_ERROR;
 	}
 	long serialno = ogg_page_serialno(&page);
-	if (fTracks.find(serialno) == fTracks.end()) {
+	bool new_serialno = fTracks.find(serialno) == fTracks.end();
+	if (new_serialno) {
 		// this is an unknown serialno
 		if (ogg_page_bos(&page) == 0) {
 			TRACE("OggReader::GetPage: non-bos page with unknown serialno\n");
@@ -140,11 +141,14 @@ retry:
 		}
 		fCookies.push_back(serialno);
 	}
-	status_t status = fTracks[serialno]->AddPage(fPosition, page);
-	if (status != B_OK) {
-		return status;
+	// this check ensures that we only push the initial pages into OggSeekables.
+	if (!fSeekable || new_serialno) {
+		status_t status = fTracks[serialno]->AddPage(fPosition, page);
+		if (status != B_OK) {
+			return status;
+		}
+		fPosition += page.header_len + page.body_len;
 	}
-	fPosition += page.header_len + page.body_len;
 	return page.header_len + page.body_len;
 }
 
@@ -183,6 +187,7 @@ get_seekable(BDataIO * data)
 	return seekable;
 }
 
+
 static BFile *
 get_file(BDataIO * data)
 {
@@ -197,6 +202,7 @@ get_file(BDataIO * data)
 	}
 	return file;
 }
+
 
 status_t
 OggReader::Sniff(int32 *streamCount)
@@ -219,6 +225,12 @@ OggReader::Sniff(int32 *streamCount)
 		ssize_t bytes = ReadPage();
 		if (bytes < 0) {
 			return bytes;
+		}
+	}
+	if (fSeekable) {
+		status_t status = FindLastPages();
+		if (status != B_OK) {
+			return status;
 		}
 	}
 	*streamCount = fCookies.size();
@@ -300,6 +312,81 @@ OggReader::GetNextChunk(void *cookie,
 	return track->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 }
 
+
+status_t
+OggReader::FindLastPages()
+{
+	TRACE("OggReader::FindLastPages\n");
+	status_t result = B_ERROR;
+
+	const int read_size = 256*256;
+
+	ogg_page page;
+	ogg_sync_state sync;
+	ogg_sync_init(&sync);
+
+	off_t right = fSeekable->Seek(0, SEEK_END);
+	off_t left = right;
+	// we assume the common case is that the last pages are near the end
+	uint serial_count = 0;
+	while (serial_count < fCookies.size()) {
+		int offset;
+		while ((offset = ogg_sync_pageseek(&sync, &page)) <= 0) {
+			left += -offset;
+			if (offset == 0) {
+				if (fSeekable->Position() >= right) {
+					if (left == 0) {
+						TRACE("OggReader::FindLastPages: couldn't find some stream's page!!!\n");
+						goto done;
+					}
+					left = max_c(0, left - read_size);
+					result = fSeekable->Seek(left, SEEK_SET);
+					if (result < 0) {
+						goto done;
+					}
+					ogg_sync_reset(&sync);
+					continue;
+				}
+				char * buffer = ogg_sync_buffer(&sync, read_size);
+				ssize_t bytes = fSeekable->Read(buffer, read_size);
+				if (bytes < 0) {
+					TRACE("OggReader::FindLastPages: Read: error\n");
+					result = bytes;
+					goto done;
+				}
+				if (ogg_sync_wrote(&sync, bytes) != 0) {
+					TRACE("OggReader::FindLastPages: ogg_sync_wrote failed?: error\n");
+					goto done;
+				}
+			}
+		}
+		off_t current = left;
+		do {
+			// found a page at "current"
+			long serialno = ogg_page_serialno(&page);
+			OggSeekable * track = dynamic_cast<OggSeekable*>(fTracks[serialno]);
+			if (track == 0) {
+				TRACE("OggReader::FindLastPages: unknown serialno == TODO: chaining?\n");
+			} else {
+				if (track->GetLastPagePosition() == 0) {
+					serial_count++;
+				}
+				track->SetLastPagePosition(current);
+			}
+			current += page.header_len + page.body_len;
+		} while ((current < right) && (ogg_sync_pageout(&sync, &page) == 1));
+		right = left;
+		ogg_sync_reset(&sync);
+	}
+	result = B_OK;
+done:
+	ogg_sync_clear(&sync);
+	return result;
+}
+
+/*
+ * OggReaderPlugin
+ */
 
 Reader *
 OggReaderPlugin::NewReader()

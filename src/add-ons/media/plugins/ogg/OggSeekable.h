@@ -15,6 +15,7 @@ public:
 	// interface for OggReader
 	virtual status_t	GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 						              media_format *format);
+	virtual status_t	Seek(uint32 seekTo, int64 *frame, bigtime_t *time);
 	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 						             media_header *mediaHeader);
 
@@ -26,7 +27,15 @@ public:
 	// reader push input function
 	status_t	AddPage(off_t position, const ogg_page & page);
 
+	void		SetLastPagePosition(off_t position);
+	off_t		GetLastPagePosition();
+private:
+	off_t				fLastPagePosition;
+
 protected:
+	off_t		Seek(off_t position, int32 mode);
+	off_t		Position(void) const;
+	status_t	GetSize(off_t * size);
 	status_t	ReadPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE);
 
 	// subclass pull input function

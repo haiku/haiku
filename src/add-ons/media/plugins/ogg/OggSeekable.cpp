@@ -49,6 +49,8 @@ OggSeekable::OggSeekable(long serialno)
 	TRACE("OggSeekable::OggSeekable\n");
 	ogg_sync_init(&fSync);
 	ogg_stream_init(&fStreamState,serialno);
+	fPosition = 0;
+	fLastPagePosition = 0;
 }
 
 
@@ -86,6 +88,56 @@ OggSeekable::AddPage(off_t position, const ogg_page & page)
 }
 
 
+void
+OggSeekable::SetLastPagePosition(off_t position)
+{
+	fLastPagePosition = max_c(fLastPagePosition, position);
+}
+
+
+off_t
+OggSeekable::GetLastPagePosition()
+{
+	return fLastPagePosition;
+}
+
+
+off_t
+OggSeekable::Seek(off_t position, int32 mode)
+{
+	BAutolock autolock(fPositionLock);
+	off_t result = fPositionIO->Seek(position, mode);
+	if (result >= 0) {
+		fPosition = result;
+		ogg_sync_reset(&fSync);
+		ogg_stream_reset(&fStreamState);
+	}
+	return result;
+}
+
+
+off_t
+OggSeekable::Position(void) const
+{
+	return fPosition;
+}
+
+
+status_t
+OggSeekable::GetSize(off_t * size) 
+{
+	BAutolock autolock(fPositionLock);
+	off_t prior = fPositionIO->Position();
+	off_t result = fPositionIO->Seek(0, SEEK_END);
+	fPositionIO->Seek(prior, SEEK_SET);
+	if (result >= 0) {
+		*size = result;
+		result = B_OK;
+	}
+	return result;
+}
+
+
 status_t
 OggSeekable::ReadPage(ogg_page * page, int read_size)
 {
@@ -98,16 +150,16 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 			char * buffer = ogg_sync_buffer(&fSync, read_size);
 			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
 			if (bytes == 0) {
-				TRACE("OggReader::ReadPageAt: ReadAt: no data\n");
+				TRACE("OggSeekable::ReadPage: ReadAt: no data\n");
 				return B_LAST_BUFFER_ERROR;
 			}
 			if (bytes < 0) {
-				TRACE("OggReader::ReadPageAt: ReadAt: error\n");
+				TRACE("OggSeekable::ReadPage: ReadAt: error\n");
 				return bytes;
 			}
 			fPosition += bytes;
 			if (ogg_sync_wrote(&fSync, bytes) != 0) {
-				TRACE("OggReader::ReadPageAt: ogg_sync_wrote failed?: error\n");
+				TRACE("OggSeekable::ReadPage: ogg_sync_wrote failed?: error\n");
 				return B_ERROR;
 			}
 		}
@@ -120,25 +172,25 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 			char * buffer = ogg_sync_buffer(&fSync, read_size);
 			ssize_t bytes = fPositionIO->ReadAt(fPosition, buffer, read_size);
 			if (bytes == 0) {
-				TRACE("OggReader::ReadPageAt: ReadAt 2: no data\n");
+				TRACE("OggSeekable::ReadPage: ReadAt 2: no data\n");
 				return B_LAST_BUFFER_ERROR;
 			}
 			if (bytes < 0) {
-				TRACE("OggReader::ReadPageAt: ReadAt 2: error\n");
+				TRACE("OggSeekable::ReadPage: ReadAt 2: error\n");
 				return bytes;
 			}
 			fPosition += bytes;
 			if (ogg_sync_wrote(&fSync, bytes) != 0) {
-				TRACE("OggReader::ReadPageAt: ogg_sync_wrote 2 failed?: error\n");
+				TRACE("OggSeekable::ReadPage: ogg_sync_wrote 2 failed?: error\n");
 				return B_ERROR;
 			}
 		}
 		if (result == -1) {
-			TRACE("OggReader::ReadPageAt: ogg_sync_pageout: not synced??\n");
+			TRACE("OggSeekable::ReadPage: ogg_sync_pageout: not synced??\n");
 			return B_ERROR;
 		}
 		if (ogg_page_version(page) != 0) {
-			TRACE("OggReader::GetPageAt: ogg_page_version: error in page encoding??\n");
+			TRACE("OggSeekable::ReadPage: ogg_page_version: error in page encoding??\n");
 #ifdef STRICT_OGG
 			return B_ERROR;
 #endif
@@ -193,6 +245,38 @@ OggSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	*duration = 140000000;
 	*frameCount = 60000;
+	return B_OK;
+}
+
+
+status_t
+OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
+{
+	if (seekTo == B_MEDIA_SEEK_TO_FRAME) {
+		if (*frame != 0) {
+			return B_UNSUPPORTED;
+		}
+	}
+	if (seekTo == B_MEDIA_SEEK_TO_TIME) {
+		if (*time != 0) {
+			return B_UNSUPPORTED;
+		}
+	}
+	off_t result = Seek(0, SEEK_SET);
+	if (result < 0) {
+		return result;
+	}
+
+	for(uint i = 0 ; i < GetHeaderPackets().size() ; i++) {
+		ogg_packet packet;
+		status_t status = GetPacket(&packet);
+		if (status != B_OK) {
+			return status;
+		}
+	}
+
+	*frame = 0;
+	*time = 0;
 	return B_OK;
 }
 

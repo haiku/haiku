@@ -140,8 +140,53 @@ OggSpeexSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
-	*duration = 100000000;
-	*frameCount = 60000;
+
+	// TODO: count the frames in the first page.. somehow.. :-/
+	int64 frames = 0;
+
+	// seek back to the start
+	int64 frame = 0;
+	bigtime_t time = 0;
+	result = Seek(B_MEDIA_SEEK_TO_TIME, &frame, &time);
+	if (result != B_OK) {
+		return result;
+	}
+
+	ogg_page page;
+	// read the first page
+	result = ReadPage(&page);
+	if (result != B_OK) {
+		return result;
+	}
+	int64 first_granulepos = ogg_page_granulepos(&page);
+	if (first_granulepos < 0) {
+		// negative start granulepos indicates that we discard that many frames
+		frames -= first_granulepos;
+		first_granulepos = 0;
+	}
+
+	// read our last page
+	off_t last = Seek(GetLastPagePosition(), SEEK_SET);
+	if (last < 0) {
+		return last;
+	}
+	result = ReadPage(&page);
+	if (result != B_OK) {
+		return result;
+	}
+	int64 last_granulepos = ogg_page_granulepos(&page);
+
+	// seek back to the start
+	result = Seek(B_MEDIA_SEEK_TO_TIME, &frame, &time);
+	if (result != B_OK) {
+		return result;
+	}
+
+	// compute frame count and duration from sample count
+	frames += last_granulepos - first_granulepos;
+	*frameCount = frames;
+	*duration = (1000000LL * frames) / (long long)format->u.encoded_audio.output.frame_rate;
+
 	return B_OK;
 }
 

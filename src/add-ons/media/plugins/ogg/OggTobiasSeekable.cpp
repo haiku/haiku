@@ -188,19 +188,16 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 		if (result != B_OK) {
 			return result;
 		}
-		*frameCount = (bigtime_t)(3 * 3600 * format->u.encoded_video.output.field_rate);
 	} else if (strcmp(header->streamtype, "audio") == 0) {
 		result = get_audio_format(header, format);
 		if (result != B_OK) {
 			return result;
 		}
-		*frameCount = 2000000;
 	} else if (strcmp(header->streamtype, "text") == 0) {
 		result = get_text_format(header, format);
 		if (result != B_OK) {
 			return result;
 		}
-		*frameCount = 2000000;
 	} else {
 		*frameCount = 0;
 		// unknown streamtype
@@ -219,8 +216,59 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	fMediaFormat = *format;
 	fMicrosecPerFrame = header->time_unit / 10.0;
+	
+	// TODO: count the frames in the first page.. somehow.. :-/
+	int64 frames = 0;
+
+	ogg_page page;
+	// read the first page
+	result = ReadPage(&page);
+	if (result != B_OK) {
+		return result;
+	}
+	int64 first_granulepos = ogg_page_granulepos(&page);
+	if (first_granulepos < 0) {
+		// negative start granulepos indicates that we discard that many frames
+		frames -= first_granulepos;
+		first_granulepos = 0;
+	}
+
+	// read our last page
+	off_t last = inherited::Seek(GetLastPagePosition(), SEEK_SET);
+	if (last < 0) {
+		return last;
+	}
+	result = ReadPage(&page);
+	if (result != B_OK) {
+		return result;
+	}
+	int64 last_granulepos = ogg_page_granulepos(&page);
+
+	// seek back to the start
+	int64 frame = 0;
+	bigtime_t time = 0;
+	result = Seek(B_MEDIA_SEEK_TO_TIME, &frame, &time);
+	if (result != B_OK) {
+		return result;
+	}
+
+	// compute frame count and duration from sample count
+	frames += last_granulepos - first_granulepos;
+	*frameCount = frames;
 	*duration = (bigtime_t)(*frameCount * fMicrosecPerFrame);
 	return B_OK;
+}
+
+
+status_t
+OggTobiasSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
+{
+	status_t status = inherited::Seek(seekTo, frame, time);
+	if (status == B_OK) {
+		fCurrentFrame = *frame;
+		fCurrentTime = *time;
+	}
+	return status;
 }
 
 
