@@ -56,7 +56,7 @@ printf("~WinDecorator()\n");
 
 click_type WinDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-	if(closerect.Contains(pt))
+	if(_closerect.Contains(pt))
 	{
 
 #ifdef DEBUG_DECOR
@@ -66,7 +66,7 @@ printf("WinDecorator():Clicked() - Close\n");
 		return CLICK_CLOSE;
 	}
 
-	if(zoomrect.Contains(pt))
+	if(_zoomrect.Contains(pt))
 	{
 
 #ifdef DEBUG_DECOR
@@ -77,7 +77,7 @@ printf("WinDecorator():Clicked() - Zoom\n");
 	}
 	
 	// Clicking in the tab?
-	if(tabrect.Contains(pt))
+	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
@@ -86,7 +86,7 @@ printf("WinDecorator():Clicked() - Zoom\n");
 	}
 
 	// We got this far, so user is clicking on the border?
-	BRect srect(frame);
+	BRect srect(_frame);
 	srect.top+=19;
 	BRect clientrect(srect.InsetByCopy(3,3));
 	if(srect.Contains(pt) && !clientrect.Contains(pt))
@@ -109,25 +109,25 @@ void WinDecorator::_DoLayout(void)
 #ifdef DEBUG_DECOR
 printf("WinDecorator()::_DoLayout()\n");
 #endif
-	tabrect=frame;
-	borderrect=frame;
+	_tabrect=_frame;
+	_borderrect=_frame;
 
-	borderrect.top+=19;
+	_borderrect.top+=19;
 	
-	tabrect.bottom=tabrect.top+18;
+	_tabrect.bottom=_tabrect.top+18;
 
-	zoomrect=tabrect;
-	zoomrect.top+=4;
-	zoomrect.right-=4;
-	zoomrect.bottom-=4;
-	zoomrect.left=zoomrect.right-10;
-	zoomrect.bottom=zoomrect.top+10;
+	_zoomrect=_tabrect;
+	_zoomrect.top+=4;
+	_zoomrect.right-=4;
+	_zoomrect.bottom-=4;
+	_zoomrect.left=_zoomrect.right-10;
+	_zoomrect.bottom=_zoomrect.top+10;
 	
-	closerect=zoomrect;
-	zoomrect.OffsetBy(0-zoomrect.Width()-4,0);
+	_closerect=_zoomrect;
+	_zoomrect.OffsetBy(0-_zoomrect.Width()-4,0);
 	
-	minimizerect=zoomrect;
-	minimizerect.OffsetBy(0-zoomrect.Width()-2,0);
+	_minimizerect=_zoomrect;
+	_minimizerect.OffsetBy(0-_zoomrect.Width()-2,0);
 }
 
 void WinDecorator::MoveBy(float x, float y)
@@ -138,12 +138,12 @@ void WinDecorator::MoveBy(float x, float y)
 void WinDecorator::MoveBy(BPoint pt)
 {
 	// Move all internal rectangles the appropriate amount
-	frame.OffsetBy(pt);
-	closerect.OffsetBy(pt);
-	tabrect.OffsetBy(pt);
-	borderrect.OffsetBy(pt);
-	zoomrect.OffsetBy(pt);
-	minimizerect.OffsetBy(pt);
+	_frame.OffsetBy(pt);
+	_closerect.OffsetBy(pt);
+	_tabrect.OffsetBy(pt);
+	_borderrect.OffsetBy(pt);
+	_zoomrect.OffsetBy(pt);
+	_minimizerect.OffsetBy(pt);
 }
 /*
 SRegion * WinDecorator::GetFootprint(void)
@@ -152,8 +152,8 @@ SRegion * WinDecorator::GetFootprint(void)
 	// relative to the layer. This is most often used to set a WindowBorder
 	// object's visible region.
 	
-	SRegion *reg=new SRegion(borderrect);
-	reg->Include(tabrect);
+	SRegion *reg=new SRegion(_borderrect);
+	reg->Include(_tabrect);
 	return reg;
 }
 */
@@ -164,13 +164,13 @@ void WinDecorator::_DrawTitle(BRect r)
 	// the client side.
 /*	if(title)
 	{
-		driver->SetDrawingMode(B_OP_OVER);
-		rgb_color tmpcol=driver->HighColor();
-		driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
-		driver->DrawString((char *)string,strlen(string),
-			BPoint(frame.left+textoffset,closerect.bottom-1));
-		driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
-		driver->SetDrawingMode(B_OP_COPY);
+		_driver->SetDrawingMode(B_OP_OVER);
+		rgb_color tmpcol=_driver->HighColor();
+		_driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
+		_driver->DrawString((char *)string,strlen(string),
+			BPoint(_frame.left+textoffset,_closerect.bottom-1));
+		_driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
+		_driver->SetDrawingMode(B_OP_COPY);
 	}
 */
 }
@@ -200,10 +200,10 @@ printf("WinDecorator::Draw(): "); update.PrintToStream();
 	// Draw the top view's client area - just a hack :)
 	RGBColor blue(100,100,255);
 
-	layerdata.highcolor=blue;
+	_layerdata.highcolor=blue;
 
-	if(borderrect.Intersects(update))
-		driver->FillRect(borderrect,&layerdata,(int8*)&solidhigh);
+	if(_borderrect.Intersects(update))
+		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	
 	_DrawFrame(update);
 	_DrawTab(update);
@@ -218,9 +218,9 @@ printf("WinDecorator::Draw()\n");
 	// Draw the top view's client area - just a hack :)
 	RGBColor blue(100,100,255);
 
-	layerdata.highcolor=blue;
+	_layerdata.highcolor=blue;
 
-	driver->FillRect(borderrect,&layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	DrawFrame();
 
 	DrawTab();
@@ -231,8 +231,8 @@ void WinDecorator::_DrawZoom(BRect r)
 	DrawBlendedRect(r,GetZoom());
 
 	// Draw the Zoom box
-	layerdata.highcolor=textcol;
-	driver->StrokeRect(r.InsetByCopy(2,2),&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=textcol;
+	_driver->StrokeRect(r.InsetByCopy(2,2),&_layerdata,(int8*)&solidhigh);
 }
 
 void WinDecorator::_DrawClose(BRect r)
@@ -241,11 +241,11 @@ void WinDecorator::_DrawClose(BRect r)
 	DrawBlendedRect(r,GetClose());
 	
 	// Draw the X
-	layerdata.highcolor=textcol;
-	driver->StrokeLine(BPoint(closerect.left+2,closerect.top+2),BPoint(closerect.right-2,
-		closerect.bottom-2),&layerdata,(int8*)&solidhigh);
-	driver->StrokeLine(BPoint(closerect.right-2,closerect.top+2),BPoint(closerect.left+2,
-		closerect.bottom-2),&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=textcol;
+	_driver->StrokeLine(BPoint(_closerect.left+2,_closerect.top+2),BPoint(_closerect.right-2,
+		_closerect.bottom-2),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(BPoint(_closerect.right-2,_closerect.top+2),BPoint(_closerect.left+2,
+		_closerect.bottom-2),&_layerdata,(int8*)&solidhigh);
 }
 
 void WinDecorator::_DrawMinimize(BRect r)
@@ -253,31 +253,31 @@ void WinDecorator::_DrawMinimize(BRect r)
 	// Just like DrawZoom, but for a Minimize button
 	DrawBlendedRect(r,GetMinimize());
 
-	layerdata.highcolor=textcol;
-	driver->StrokeLine(BPoint(minimizerect.left+2,minimizerect.bottom-2),BPoint(minimizerect.right-2,
-		minimizerect.bottom-2),&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=textcol;
+	_driver->StrokeLine(BPoint(_minimizerect.left+2,_minimizerect.bottom-2),BPoint(_minimizerect.right-2,
+		_minimizerect.bottom-2),&_layerdata,(int8*)&solidhigh);
 }
 
 void WinDecorator::_DrawTab(BRect r)
 {
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
-	if(look==WLOOK_NO_BORDER)
+	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
-	layerdata.highcolor=frame_lowcol;
-	driver->StrokeRect(tabrect,&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowcol;
+	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
 
 //	UpdateTitle(layer->name->String());
 
-	layerdata.highcolor=tab_lowcol;
-	driver->FillRect(tabrect.InsetByCopy(1,1),&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=tab_lowcol;
+	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
 
 	// Draw the buttons if we're supposed to	
-	if(!(flags & NOT_CLOSABLE))
-		_DrawClose(closerect);
-	if(!(flags & NOT_ZOOMABLE))
-		_DrawZoom(zoomrect);
+	if(!(_flags & B_NOT_CLOSABLE))
+		_DrawClose(_closerect);
+	if(!(_flags & B_NOT_ZOOMABLE))
+		_DrawZoom(_zoomrect);
 }
 
 void WinDecorator::DrawBlendedRect(BRect r, bool down)
@@ -316,77 +316,77 @@ void WinDecorator::DrawBlendedRect(BRect r, bool down)
 		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
-		layerdata.highcolor=tmpcol;
-		driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),&layerdata,(int8*)&solidhigh);
+		_layerdata.highcolor=tmpcol;
+		_driver->StrokeLine(BPoint(r.left,r.top+i),
+			BPoint(r.left+i,r.top),&_layerdata,(int8*)&solidhigh);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)));
 
-		layerdata.highcolor=tmpcol;
-		driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),&layerdata,(int8*)&solidhigh);
+		_layerdata.highcolor=tmpcol;
+		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
+			BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);
 
 	}
 
-//	layerdata.highcolor=startcol;
-//	driver->FillRect(r,&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_lowcol;
-	driver->StrokeRect(r,&layerdata,(int8*)&solidhigh);
+//	_layerdata.highcolor=startcol;
+//	_driver->FillRect(r,&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowcol;
+	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 }
 
 void WinDecorator::_DrawFrame(BRect rect)
 {
-	if(look==WLOOK_NO_BORDER)
+	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
-	BRect r=borderrect;
+	BRect r=_borderrect;
 	
-	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_lowcol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_midcol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowcol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowercol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowercol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
 
 	r.InsetBy(1,1);
-	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_midcol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_highercol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_highercol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_midcol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_midcol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
 	
 	r.InsetBy(1,1);
-	layerdata.highcolor=frame_highcol;
-	driver->StrokeRect(r,&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_highcol;
+	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 
 	r.InsetBy(1,1);
-	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_lowercol;
-	driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&layerdata,(int8*)&solidhigh);
-	layerdata.highcolor=frame_highercol;
-	driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowercol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_lowercol;
+	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_highercol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
+		&_layerdata,(int8*)&solidhigh);
+	_layerdata.highcolor=frame_highercol;
+	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
+		&_layerdata,(int8*)&solidhigh);
 }
 
 extern "C" float get_decorator_version(void)

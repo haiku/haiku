@@ -19,64 +19,48 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		ColorSet.h
+//	File Name:		ServerCursor.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for encapsulating GUI system colors
-//					
+//	Description:	Glorified ServerBitmap used for cursor work.
 //  
 //------------------------------------------------------------------------------
-#ifndef COLORSET_H_
-#define COLORSET_H_
+#ifndef SERVERCURSOR_H_
+#define SERVERCURSOR_H_
 
-#include "RGBColor.h"
+#include <Point.h>
+#include "ServerBitmap.h"
+
+class ServerApp;
+class CursorManager;
 
 /*!
-	\class ColorSet ColorSet.h
-	\brief Encapsulates GUI system colors
+	\class ServerCursor ServerCursor.h
+	\brief Class to handle all cursor capabilities for the system
+	
+	Although descended from ServerBitmaps, ServerCursors are not handled by
+	the BitmapManager - they are allocated like any other object. Unlike BeOS 
+	R5, cursors can be any size or color space, and this class accomodates and
+	expands the R5 API.
 */
-class ColorSet
+class ServerCursor : public ServerBitmap
 {
 public:
-	ColorSet(void);
-	ColorSet(const ColorSet &cs);
-	ColorSet & operator=(const ColorSet &cs);
-	void SetColors(const ColorSet &cs);
-	void PrintToStream(void);
+	ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hotspot, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID);
+	ServerCursor(int8 *data);
+	ServerCursor(const ServerCursor *cursor);
+	~ServerCursor(void);
 	
-	RGBColor panel_background,
-	panel_text,
-
-	document_background,
-	document_text,
-
-	control_background,
-	control_text,
-	control_highlight,
-	control_border,
-
-	tooltip_background,
-	tooltip_text,
-
-	menu_background,
-	menu_selected_background,
-	menu_text,
-	menu_selected_text,
-	menu_selected_border,
-
-	keyboard_navigation_base,
-	keyboard_navigation_pulse,
+	//! Returns the cursor's hot spot
+	BPoint GetHotSpot(void);
+	void SetHotSpot(BPoint pt);
+	const char *GetAppSignature(void) { return _app_signature; }
+private:
+	friend ServerApp;
+	friend CursorManager;
 	
-	success,
-	failure,
-	shine,
-	shadow,
-
-	// Not all of these guys don't exist in InterfaceDefs.h, but we keep 
-	// them as part of the color set anyway - they're important nonetheless
-	window_tab,
-	window_tab_text,
-	inactive_window_tab,
-	inactive_window_tab_text;
+	BPoint _hotspot;
+	char *_app_signature;
+	int32 _token;
 };
 
 #endif
