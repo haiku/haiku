@@ -83,6 +83,8 @@
 #	define BVTRACE ;
 #endif
 
+#define MAX_ATTACHMENT_SIZE 49152
+
 inline rgb_color _get_rgb_color( uint32 color );
 inline uint32 _get_uint32_color( rgb_color c );
 inline rgb_color _set_static_rgb_color( uint8 r, uint8 g, uint8 b, uint8 a=255 );
@@ -2508,11 +2510,18 @@ void BView::StrokePolygon(const BPoint* ptArray, int32 numPts, BRect bounds,
 		BPolygon pol(ptArray,numPts);
 		pol.MapTo(pol.Frame(),bounds);
 		
-		owner->fLink->StartMessage( AS_STROKE_POLYGON );
-		owner->fLink->Attach<BRect>(pol.Frame());
-		owner->fLink->Attach<int8>( closed );
-		owner->fLink->Attach<int32>( pol.fCount );
-		owner->fLink->Attach(pol.fPts,pol.fCount * sizeof(BPoint) );
+		if(pol.fCount * sizeof(BPoint) < MAX_ATTACHMENT_SIZE)
+		{
+			owner->fLink->StartMessage( AS_STROKE_POLYGON );
+			owner->fLink->Attach<BRect>(pol.Frame());
+			owner->fLink->Attach<bool>( closed );
+			owner->fLink->Attach<int32>( pol.fCount );
+			owner->fLink->Attach(pol.fPts,pol.fCount * sizeof(BPoint) );
+		}
+		else
+		{
+			// TODO: send via an area
+		}
 	}
 }
 
@@ -2533,9 +2542,16 @@ void BView::FillPolygon(const BPolygon* aPolygon,pattern p)
 		if ( _is_new_pattern( fState->patt, p ) )
 			SetPattern( p );
 		
-		owner->fLink->StartMessage( AS_FILL_POLYGON );
-		owner->fLink->Attach<int32>( aPolygon->fCount );
-		owner->fLink->Attach(aPolygon->fPts,aPolygon->fCount * sizeof(BPoint) );
+		if(aPolygon->fCount * sizeof(BPoint) < MAX_ATTACHMENT_SIZE)
+		{
+			owner->fLink->StartMessage( AS_FILL_POLYGON );
+			owner->fLink->Attach<int32>( aPolygon->fCount );
+			owner->fLink->Attach(aPolygon->fPts,aPolygon->fCount * sizeof(BPoint) );
+		}
+		else
+		{
+			// TODO: send via an area
+		}
 	}
 }
 
@@ -2648,11 +2664,18 @@ void BView::FillRegion(BRegion* a_region, pattern p)
 		
 		int32			rectsNo = a_region->CountRects();
 		
-		owner->fLink->StartMessage( AS_FILL_REGION );
-		owner->fLink->Attach<int32>( rectsNo );
-
-		for (int32 i = 0; i<rectsNo; i++)
-			owner->fLink->Attach<BRect>( a_region->RectAt(i) );
+		if(rectsNo*sizeof(BRect) < MAX_ATTACHMENT_SIZE)
+		{
+			owner->fLink->StartMessage( AS_FILL_REGION );
+			owner->fLink->Attach<int32>( rectsNo );
+	
+			for (int32 i = 0; i<rectsNo; i++)
+				owner->fLink->Attach<BRect>( a_region->RectAt(i) );
+		}
+		else
+		{
+			// TODO: send via area
+		}
 	}
 }
 
@@ -2820,13 +2843,20 @@ void BView::StrokeShape(BShape* shape, pattern p)
 		
 		if ( _is_new_pattern( fState->patt, p ) )
 			SetPattern( p );
-	
-		owner->fLink->StartMessage( AS_STROKE_SHAPE );
-		owner->fLink->Attach<BRect>( shape->Bounds() );
-		owner->fLink->Attach<int32>( sd->opCount );
-		owner->fLink->Attach<int32>( sd->ptCount );
-		owner->fLink->Attach( sd->opList, sd->opCount );
-		owner->fLink->Attach( sd->ptList, sd->ptCount );
+		
+		if( (sd->opCount*sizeof(uint32))+(sd->ptCount*sizeof(BPoint)) < MAX_ATTACHMENT_SIZE )
+		{
+			owner->fLink->StartMessage( AS_STROKE_SHAPE );
+			owner->fLink->Attach<BRect>( shape->Bounds() );
+			owner->fLink->Attach<int32>( sd->opCount );
+			owner->fLink->Attach<int32>( sd->ptCount );
+			owner->fLink->Attach( sd->opList, sd->opCount );
+			owner->fLink->Attach( sd->ptList, sd->ptCount );
+		}
+		else
+		{
+			// TODO: send via an area
+		}
 	}
 }
 
@@ -2848,12 +2878,19 @@ void BView::FillShape(BShape* shape, pattern p)
 		if ( _is_new_pattern( fState->patt, p ) )
 			SetPattern( p );
 		
-		owner->fLink->StartMessage( AS_FILL_SHAPE );
-		owner->fLink->Attach<BRect>( shape->Bounds() );
-		owner->fLink->Attach<int32>( sd->opCount );
-		owner->fLink->Attach<int32>( sd->ptCount );
-		owner->fLink->Attach( sd->opList, sd->opCount );
-		owner->fLink->Attach( sd->ptList, sd->ptCount );
+		if( (sd->opCount*sizeof(uint32))+(sd->ptCount*sizeof(BPoint)) < MAX_ATTACHMENT_SIZE )
+		{
+			owner->fLink->StartMessage( AS_FILL_SHAPE );
+			owner->fLink->Attach<BRect>( shape->Bounds() );
+			owner->fLink->Attach<int32>( sd->opCount );
+			owner->fLink->Attach<int32>( sd->ptCount );
+			owner->fLink->Attach( sd->opList, sd->opCount );
+			owner->fLink->Attach( sd->ptList, sd->ptCount );
+		}
+		else
+		{
+			// TODO: send via an area
+		}
 	}
 }
 
