@@ -18,7 +18,9 @@ static struct real_time_data sRealTimeDefaults = {
 	0,
 	100000,
 	0,
-	0
+	false,
+	"",
+	true
 };
 static struct real_time_data *sRealTimeData;
 
@@ -86,4 +88,14 @@ set_alarm(bigtime_t when, uint32 flags)
 {
 	// ToDo: set_alarm()
 	return B_ERROR;
+}
+
+
+void
+_get_tzfilename(char* filename, size_t length)
+{
+	if (filename == NULL)
+		return;
+
+	strlcpy(filename, sRealTimeData->tzfilename, length);
 }
