@@ -45,6 +45,7 @@
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <RegistrarDefs.h>
+#include <Resources.h>
 #include <Roster.h>
 #include <RosterPrivate.h>
 #include <Window.h>
@@ -225,6 +226,7 @@ BApplication::BApplication(const char* signature, status_t* error)
 BApplication::~BApplication()
 {
 	// tell all loopers(usualy windows) to quit. Also, wait for them.
+	// TODO: I think this should be done in QuitRequested()
 	BWindow*	window = NULL;
 	BList		looperList;
 	{
@@ -297,22 +299,15 @@ thread_id BApplication::Run()
 {
 	AssertLocked();
 
-	if (fRunCalled)
-	{
-		// Not allowed to call Run() more than once
-		// TODO: test
-		// find out what message is actually here
-		debugger("");
-	}
+	if (fRunCalled)	
+		debugger("BApplication::Run was already called. Can only be called once.");
 
 	// Note: We need a local variable too (for the return value), since
 	// fTaskID is cleared by Quit().
 	thread_id thread = fTaskID = find_thread(NULL);
 
-	if (fMsgPort == B_NO_MORE_PORTS || fMsgPort == B_BAD_VALUE)
-	{
+	if (fMsgPort < 0)
 		return fMsgPort;
-	}
 
 	fRunCalled = true;
 
@@ -521,7 +516,47 @@ status_t BApplication::GetAppInfo(app_info* info) const
 //------------------------------------------------------------------------------
 BResources* BApplication::AppResources()
 {
-	return NULL;	// not implemented
+	entry_ref ref;
+	bool found = false;
+	
+	if (!_app_resources_lock.Lock())
+		return NULL;
+	
+	// BApplication caches its resources, so check
+	// if it already happened.
+	if (_app_resources != NULL) {
+		_app_resources_lock.Unlock();
+		return _app_resources;
+	}
+	
+	// App is already running. Get its entry ref with
+	// GetRunningAppInfo()
+	app_info appInfo;
+	if (be_app && be_roster->GetRunningAppInfo(be_app->Team(), &appInfo) == B_OK) {
+		ref = appInfo.ref;
+		found = true;
+	
+	} else
+		// Run() hasn't been called yet
+		found = BPrivate::get_app_ref(&ref) == B_OK;
+	
+
+	
+	if (found) {
+		BFile file(&ref, B_READ_ONLY);
+		if (file.InitCheck() == B_OK) {
+			BResources *resources = new BResources();
+			if (resources->SetTo(&file, false) != B_OK) {
+				delete resources;
+				resources = NULL;
+			} else
+				_app_resources = resources;			
+		}
+	}
+	
+	_app_resources_lock.Unlock();
+	
+	return _app_resources;
 }
 //------------------------------------------------------------------------------
 void BApplication::DispatchMessage(BMessage* message, BHandler* handler)
@@ -941,7 +976,7 @@ void BApplication::do_argv(BMessage* message)
 //------------------------------------------------------------------------------
 uint32 BApplication::InitialWorkspace()
 {
-	return 0;	// not implemented
+	return fInitialWorkspace;
 }
 //------------------------------------------------------------------------------
 int32 BApplication::count_windows(bool incl_menus) const
