@@ -25,17 +25,110 @@
 //					contain bitmap data.
 //------------------------------------------------------------------------------
 
+#include <algobase.h>
 #include <limits.h>
 #include <new>
 #include <stdlib.h>
 
 #include <Bitmap.h>
 #include <InterfaceDefs.h>
+#include <Locker.h>
+#include <OS.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
+// TODO: system palette -- hard-coded for now, when the app server is ready
+// we should use system_colors() or BScreen::ColorMap().
+const rgb_color kSystemPalette[] = {
+ {   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
+ {  24,  24,  24, 255 }, {  32,  32,  32, 255 }, {  40,  40,  40, 255 },
+ {  48,  48,  48, 255 }, {  56,  56,  56, 255 }, {  64,  64,  64, 255 },
+ {  72,  72,  72, 255 }, {  80,  80,  80, 255 }, {  88,  88,  88, 255 },
+ {  96,  96,  96, 255 }, { 104, 104, 104, 255 }, { 112, 112, 112, 255 },
+ { 120, 120, 120, 255 }, { 128, 128, 128, 255 }, { 136, 136, 136, 255 },
+ { 144, 144, 144, 255 }, { 152, 152, 152, 255 }, { 160, 160, 160, 255 },
+ { 168, 168, 168, 255 }, { 176, 176, 176, 255 }, { 184, 184, 184, 255 },
+ { 192, 192, 192, 255 }, { 200, 200, 200, 255 }, { 208, 208, 208, 255 },
+ { 216, 216, 216, 255 }, { 224, 224, 224, 255 }, { 232, 232, 232, 255 },
+ { 240, 240, 240, 255 }, { 248, 248, 248, 255 }, {   0,   0, 255, 255 },
+ {   0,   0, 229, 255 }, {   0,   0, 204, 255 }, {   0,   0, 179, 255 },
+ {   0,   0, 154, 255 }, {   0,   0, 129, 255 }, {   0,   0, 105, 255 },
+ {   0,   0,  80, 255 }, {   0,   0,  55, 255 }, {   0,   0,  30, 255 },
+ { 255,   0,   0, 255 }, { 228,   0,   0, 255 }, { 203,   0,   0, 255 },
+ { 178,   0,   0, 255 }, { 153,   0,   0, 255 }, { 128,   0,   0, 255 },
+ { 105,   0,   0, 255 }, {  80,   0,   0, 255 }, {  55,   0,   0, 255 },
+ {  30,   0,   0, 255 }, {   0, 255,   0, 255 }, {   0, 228,   0, 255 },
+ {   0, 203,   0, 255 }, {   0, 178,   0, 255 }, {   0, 153,   0, 255 },
+ {   0, 128,   0, 255 }, {   0, 105,   0, 255 }, {   0,  80,   0, 255 },
+ {   0,  55,   0, 255 }, {   0,  30,   0, 255 }, {   0, 152,  51, 255 },
+ { 255, 255, 255, 255 }, { 203, 255, 255, 255 }, { 203, 255, 203, 255 },
+ { 203, 255, 152, 255 }, { 203, 255, 102, 255 }, { 203, 255,  51, 255 },
+ { 203, 255,   0, 255 }, { 152, 255, 255, 255 }, { 152, 255, 203, 255 },
+ { 152, 255, 152, 255 }, { 152, 255, 102, 255 }, { 152, 255,  51, 255 },
+ { 152, 255,   0, 255 }, { 102, 255, 255, 255 }, { 102, 255, 203, 255 },
+ { 102, 255, 152, 255 }, { 102, 255, 102, 255 }, { 102, 255,  51, 255 },
+ { 102, 255,   0, 255 }, {  51, 255, 255, 255 }, {  51, 255, 203, 255 },
+ {  51, 255, 152, 255 }, {  51, 255, 102, 255 }, {  51, 255,  51, 255 },
+ {  51, 255,   0, 255 }, { 255, 152, 255, 255 }, { 255, 152, 203, 255 },
+ { 255, 152, 152, 255 }, { 255, 152, 102, 255 }, { 255, 152,  51, 255 },
+ { 255, 152,   0, 255 }, {   0, 102, 255, 255 }, {   0, 102, 203, 255 },
+ { 203, 203, 255, 255 }, { 203, 203, 203, 255 }, { 203, 203, 152, 255 },
+ { 203, 203, 102, 255 }, { 203, 203,  51, 255 }, { 203, 203,   0, 255 },
+ { 152, 203, 255, 255 }, { 152, 203, 203, 255 }, { 152, 203, 152, 255 },
+ { 152, 203, 102, 255 }, { 152, 203,  51, 255 }, { 152, 203,   0, 255 },
+ { 102, 203, 255, 255 }, { 102, 203, 203, 255 }, { 102, 203, 152, 255 },
+ { 102, 203, 102, 255 }, { 102, 203,  51, 255 }, { 102, 203,   0, 255 },
+ {  51, 203, 255, 255 }, {  51, 203, 203, 255 }, {  51, 203, 152, 255 },
+ {  51, 203, 102, 255 }, {  51, 203,  51, 255 }, {  51, 203,   0, 255 },
+ { 255, 102, 255, 255 }, { 255, 102, 203, 255 }, { 255, 102, 152, 255 },
+ { 255, 102, 102, 255 }, { 255, 102,  51, 255 }, { 255, 102,   0, 255 },
+ {   0, 102, 152, 255 }, {   0, 102, 102, 255 }, { 203, 152, 255, 255 },
+ { 203, 152, 203, 255 }, { 203, 152, 152, 255 }, { 203, 152, 102, 255 },
+ { 203, 152,  51, 255 }, { 203, 152,   0, 255 }, { 152, 152, 255, 255 },
+ { 152, 152, 203, 255 }, { 152, 152, 152, 255 }, { 152, 152, 102, 255 },
+ { 152, 152,  51, 255 }, { 152, 152,   0, 255 }, { 102, 152, 255, 255 },
+ { 102, 152, 203, 255 }, { 102, 152, 152, 255 }, { 102, 152, 102, 255 },
+ { 102, 152,  51, 255 }, { 102, 152,   0, 255 }, {  51, 152, 255, 255 },
+ {  51, 152, 203, 255 }, {  51, 152, 152, 255 }, {  51, 152, 102, 255 },
+ {  51, 152,  51, 255 }, {  51, 152,   0, 255 }, { 230, 134,   0, 255 },
+ { 255,  51, 203, 255 }, { 255,  51, 152, 255 }, { 255,  51, 102, 255 },
+ { 255,  51,  51, 255 }, { 255,  51,   0, 255 }, {   0, 102,  51, 255 },
+ {   0, 102,   0, 255 }, { 203, 102, 255, 255 }, { 203, 102, 203, 255 },
+ { 203, 102, 152, 255 }, { 203, 102, 102, 255 }, { 203, 102,  51, 255 },
+ { 203, 102,   0, 255 }, { 152, 102, 255, 255 }, { 152, 102, 203, 255 },
+ { 152, 102, 152, 255 }, { 152, 102, 102, 255 }, { 152, 102,  51, 255 },
+ { 152, 102,   0, 255 }, { 102, 102, 255, 255 }, { 102, 102, 203, 255 },
+ { 102, 102, 152, 255 }, { 102, 102, 102, 255 }, { 102, 102,  51, 255 },
+ { 102, 102,   0, 255 }, {  51, 102, 255, 255 }, {  51, 102, 203, 255 },
+ {  51, 102, 152, 255 }, {  51, 102, 102, 255 }, {  51, 102,  51, 255 },
+ {  51, 102,   0, 255 }, { 255,   0, 255, 255 }, { 255,   0, 203, 255 },
+ { 255,   0, 152, 255 }, { 255,   0, 102, 255 }, { 255,   0,  51, 255 },
+ { 255, 175,  19, 255 }, {   0,  51, 255, 255 }, {   0,  51, 203, 255 },
+ { 203,  51, 255, 255 }, { 203,  51, 203, 255 }, { 203,  51, 152, 255 },
+ { 203,  51, 102, 255 }, { 203,  51,  51, 255 }, { 203,  51,   0, 255 },
+ { 152,  51, 255, 255 }, { 152,  51, 203, 255 }, { 152,  51, 152, 255 },
+ { 152,  51, 102, 255 }, { 152,  51,  51, 255 }, { 152,  51,   0, 255 },
+ { 102,  51, 255, 255 }, { 102,  51, 203, 255 }, { 102,  51, 152, 255 },
+ { 102,  51, 102, 255 }, { 102,  51,  51, 255 }, { 102,  51,   0, 255 },
+ {  51,  51, 255, 255 }, {  51,  51, 203, 255 }, {  51,  51, 152, 255 },
+ {  51,  51, 102, 255 }, {  51,  51,  51, 255 }, {  51,  51,   0, 255 },
+ { 255, 203, 102, 255 }, { 255, 203, 152, 255 }, { 255, 203, 203, 255 },
+ { 255, 203, 255, 255 }, {   0,  51, 152, 255 }, {   0,  51, 102, 255 },
+ {   0,  51,  51, 255 }, {   0,  51,   0, 255 }, { 203,   0, 255, 255 },
+ { 203,   0, 203, 255 }, { 203,   0, 152, 255 }, { 203,   0, 102, 255 },
+ { 203,   0,  51, 255 }, { 255, 227,  70, 255 }, { 152,   0, 255, 255 },
+ { 152,   0, 203, 255 }, { 152,   0, 152, 255 }, { 152,   0, 102, 255 },
+ { 152,   0,  51, 255 }, { 152,   0,   0, 255 }, { 102,   0, 255, 255 },
+ { 102,   0, 203, 255 }, { 102,   0, 152, 255 }, { 102,   0, 102, 255 },
+ { 102,   0,  51, 255 }, { 102,   0,   0, 255 }, {  51,   0, 255, 255 },
+ {  51,   0, 203, 255 }, {  51,   0, 152, 255 }, {  51,   0, 102, 255 },
+ {  51,   0,  51, 255 }, {  51,   0,   0, 255 }, { 255, 203,  51, 255 },
+ { 255, 203,   0, 255 }, { 255, 255,   0, 255 }, { 255, 255,  51, 255 },
+ { 255, 255, 102, 255 }, { 255, 255, 152, 255 }, { 255, 255, 203, 255 },
+ { 255, 255, 255, 255 }
+};
 
 // is_supported
 static inline
@@ -50,36 +143,47 @@ is_supported(color_space colorSpace)
 		case B_RGB16:		case B_RGB15:		case B_RGBA15:
 		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
 		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
-			result = true;
-			break;
-		// unsupported
-		case B_NO_COLOR_SPACE:
 		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
 		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
-		case B_YUV9: case B_YUV12:
 		case B_UVL24: case B_UVL32: case B_UVLA32:
 		case B_LAB24: case B_LAB32: case B_LABA32:
 		case B_HSI24: case B_HSI32: case B_HSIA32:
 		case B_HSV24: case B_HSV32: case B_HSVA32:
 		case B_HLS24: case B_HLS32: case B_HLSA32:
 		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
+			result = true;
+			break;
+		// unsupported
+		case B_NO_COLOR_SPACE:
+		case B_YUV9: case B_YUV12:
 			break;
 	}
 	return result;
 }
 
 
-// get_bytes_per_row
+// get_raw_bytes_per_row
 static inline
 int32
-get_bytes_per_row(color_space colorSpace, int32 width)
+get_raw_bytes_per_row(color_space colorSpace, int32 width)
 {
 	int32 bpr = 0;
 	switch (colorSpace) {
 		// supported
-		case B_RGB32:		case B_RGBA32:		case B_RGB24:
-		case B_RGB32_BIG:	case B_RGBA32_BIG:	case B_RGB24_BIG:
+		case B_RGB32: case B_RGBA32:
+		case B_RGB32_BIG: case B_RGBA32_BIG:
+		case B_UVL32: case B_UVLA32:
+		case B_LAB32: case B_LABA32:
+		case B_HSI32: case B_HSIA32:
+		case B_HSV32: case B_HSVA32:
+		case B_HLS32: case B_HLSA32:
+		case B_CMY32: case B_CMYA32: case B_CMYK32:
 			bpr = 4 * width;
+			break;
+		case B_RGB24: case B_RGB24_BIG:
+		case B_UVL24: case B_LAB24: case B_HSI24:
+		case B_HSV24: case B_HLS24: case B_CMY24:
+			bpr = 3 * width;
 			break;
 		case B_RGB16:		case B_RGB15:		case B_RGBA15:
 		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
@@ -91,19 +195,34 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 		case B_GRAY1:
 			bpr = (width + 7) / 8;
 			break;
+		case B_YCbCr422: case B_YUV422:
+			bpr = (width + 3) / 4 * 8;
+			break;
+		case B_YCbCr411: case B_YUV411:
+			bpr = (width + 3) / 4 * 6;
+			break;
+		case B_YCbCr444: case B_YUV444:
+			bpr = (width + 3) / 4 * 12;
+			break;
+		case B_YCbCr420: case B_YUV420:
+			bpr = (width + 3) / 4 * 6;
+			break;
 		// unsupported
 		case B_NO_COLOR_SPACE:
-		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
-		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
 		case B_YUV9: case B_YUV12:
-		case B_UVL24: case B_UVL32: case B_UVLA32:
-		case B_LAB24: case B_LAB32: case B_LABA32:
-		case B_HSI24: case B_HSI32: case B_HSIA32:
-		case B_HSV24: case B_HSV32: case B_HSVA32:
-		case B_HLS24: case B_HLS32: case B_HLSA32:
-		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
 			break;
 	}
+	return bpr;
+}
+
+// get_bytes_per_row
+static inline
+int32
+get_bytes_per_row(color_space colorSpace, int32 width)
+{
+	int32 bpr = get_raw_bytes_per_row(colorSpace, width);
+	// align to int32
+	bpr = (bpr + 3) & 0x7ffffffc;
 	return bpr;
 }
 
@@ -137,6 +256,11 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 		   + (((767 - rmean) * bd * bd) >> 8);
 }
 
+// bit_mask, inverse_bit_mask
+static inline int32 bit_mask(int32 bit)			{ return (1 << bit); }
+static inline int32 inverse_bit_mask(int32 bit)	{ return ~bit_mask(bit); }
+
+
 //////////////////////
 // PaletteConverter //
 //////////////////////
@@ -147,9 +271,14 @@ namespace BPrivate {
 
 class PaletteConverter {
 public:
+	PaletteConverter();
 	PaletteConverter(const rgb_color *palette);
 	PaletteConverter(const color_map *colorMap);
 	~PaletteConverter();
+
+	status_t SetTo(const rgb_color *palette);
+	status_t SetTo(const color_map *colorMap);
+	status_t InitCheck() const;
 
 	inline uint8 IndexForRGB15(uint16 rgb) const;
 	inline uint8 IndexForRGB15(uint8 red, uint8 green, uint8 blue) const;
@@ -157,17 +286,20 @@ public:
 	inline uint8 IndexForRGB16(uint8 red, uint8 green, uint8 blue) const;
 	inline uint8 IndexForRGB24(uint32 rgb) const;
 	inline uint8 IndexForRGB24(uint8 red, uint8 green, uint8 blue) const;
-	inline uint8 IndexForGrey(uint8 grey) const;
+	inline uint8 IndexForGray(uint8 gray) const;
 
 	inline const rgb_color &RGBColorForIndex(uint8 index) const;
 	inline uint16 RGB15ColorForIndex(uint8 index) const;
 	inline uint16 RGB16ColorForIndex(uint8 index) const;
 	inline uint32 RGB24ColorForIndex(uint8 index) const;
-	inline uint8 GreyColorForIndex(uint8 index) const;
+	inline void RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
+								   uint8 &blue) const;
+	inline uint8 GrayColorForIndex(uint8 index) const;
 
 private:
 	const color_map	*fColorMap;
 	color_map		*fOwnColorMap;
+	status_t		fCStatus;
 };
 
 }	// namespace BPrivate
@@ -175,13 +307,53 @@ private:
 using BPrivate::PaletteConverter;
 
 // constructor
+PaletteConverter::PaletteConverter()
+	: fColorMap(NULL),
+	  fOwnColorMap(NULL),
+	  fCStatus(B_NO_INIT)
+{
+}
+
+// constructor
 PaletteConverter::PaletteConverter(const rgb_color *palette)
 	: fColorMap(NULL),
-	  fOwnColorMap(NULL)
+	  fOwnColorMap(NULL),
+	  fCStatus(B_NO_INIT)
 {
-	fOwnColorMap = new(nothrow) color_map;
-	fColorMap = fOwnColorMap;
-	if (fOwnColorMap && palette) {
+	SetTo(palette);
+}
+
+// constructor
+PaletteConverter::PaletteConverter(const color_map *colorMap)
+	: fColorMap(NULL),
+	  fOwnColorMap(NULL),
+	  fCStatus(B_NO_INIT)
+{
+	SetTo(colorMap);
+}
+
+// destructor
+PaletteConverter::~PaletteConverter()
+{
+	delete fOwnColorMap;
+}
+
+// SetTo
+status_t
+PaletteConverter::SetTo(const rgb_color *palette)
+{
+	// cleanup
+	SetTo((const color_map*)NULL);
+	status_t error = (palette ? B_OK : B_BAD_VALUE);
+	// alloc color map
+	if (error == B_OK) {
+		fOwnColorMap = new(nothrow) color_map;
+		if (fOwnColorMap == NULL)
+			error = B_NO_MEMORY;
+	}
+	// init color map
+	if (error == B_OK) {
+		fColorMap = fOwnColorMap;
 		// init color list
 		memcpy(fOwnColorMap->color_list, palette, sizeof(rgb_color) * 256);
 		// init index map
@@ -209,19 +381,30 @@ PaletteConverter::PaletteConverter(const rgb_color *palette)
 		}
 		// no need to init inversion map
 	}
+	fCStatus = error;
+	return error;
 }
 
-// constructor
-PaletteConverter::PaletteConverter(const color_map *colorMap)
-	: fColorMap(colorMap),
-	  fOwnColorMap(NULL)
+// SetTo
+status_t
+PaletteConverter::SetTo(const color_map *colorMap)
 {
+	// cleanup
+	if (fOwnColorMap) {
+		delete fOwnColorMap;
+		fOwnColorMap = NULL;
+	}
+	// set
+	fColorMap = colorMap;
+	fCStatus = (fColorMap ? B_OK : B_BAD_VALUE);
+	return fCStatus;
 }
 
-// destructor
-PaletteConverter::~PaletteConverter()
+// InitCheck
+status_t
+PaletteConverter::InitCheck() const
 {
-	delete fOwnColorMap;
+	return fCStatus;
 }
 
 // IndexForRGB15
@@ -278,12 +461,12 @@ PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
 								| (blue >> 3)];
 }
 
-// IndexForGrey
+// IndexForGray
 inline
 uint8
-PaletteConverter::IndexForGrey(uint8 grey) const
+PaletteConverter::IndexForGray(uint8 gray) const
 {
-	return IndexForRGB24(grey, grey, grey);
+	return IndexForRGB24(gray, gray, gray);
 }
 
 // RGBColorForIndex
@@ -325,13 +508,42 @@ PaletteConverter::RGB24ColorForIndex(uint8 index) const
 	return (color.red << 24) | (color.green << 16) | (color.blue >> 8);
 }
 
-// GreyColorForIndex
+// RGB24ColorForIndex
+inline
+void
+PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
+									 uint8 &blue) const
+{
+	const rgb_color &color = fColorMap->color_list[index];
+	red = color.red;
+	green = color.green;
+	blue = color.blue;
+}
+
+// GrayColorForIndex
 inline
 uint8
-PaletteConverter::GreyColorForIndex(uint8 index) const
+PaletteConverter::GrayColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
 	return brightness_for(color.red, color.green, color.blue);
+}
+
+// TODO: Remove these and palette_converter() when BScreen is available.
+static BLocker			gPaletteConverterLock;
+static PaletteConverter	gPaletteConverter;
+
+// palette_converter
+static
+const PaletteConverter*
+palette_converter()
+{
+	if (gPaletteConverterLock.Lock()) {
+		if (gPaletteConverter.InitCheck() != B_OK)
+			gPaletteConverter.SetTo(kSystemPalette);
+		gPaletteConverterLock.Unlock();
+	}
+	return &gPaletteConverter;
 }
 
 
@@ -501,11 +713,860 @@ BBitmap::Bounds() const
 	return fBounds;
 }
 
+
+struct rgb32_pixel {
+	uint8 blue;
+	uint8 green;
+	uint8 red;
+	uint8 alpha;
+};
+
+struct rgb32_big_pixel {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+	uint8 alpha;
+};
+
+struct rgb24_pixel {
+	uint8 blue;
+	uint8 green;
+	uint8 red;
+};
+
+struct rgb24_big_pixel {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+};
+
+struct rgb16_pixel {
+	uint8 gb;	// G[2:0],B[4:0]
+	uint8 rg;	// 16: R[4:0],G[5:3]
+				// 15: -[0],R[4:0],G[4:3]
+};
+
+struct rgb16_big_pixel {
+	uint8 rg;	// 16: R[4:0],G[5:3]
+				// 15: -[0],R[4:0],G[4:3]
+	uint8 gb;	// G[2:0],B[4:0]
+};
+
+
+struct rgb_color_value {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+};
+
+typedef uint8 gray_color_value;
+
+// BaseReader
+template<typename _PixelType>
+struct BaseReader {
+	typedef _PixelType		pixel_t;
+
+	BaseReader(const void *data) : pixels((const pixel_t*)data) {}
+
+	inline void SetTo(const void *data) { pixels = (const pixel_t*)data; }
+
+	inline void NextRow(int32 skip)
+	{
+		pixels = (const pixel_t*)((const char*)pixels + skip);
+	}
+
+	const pixel_t *pixels;
+};
+
+// RGB24Reader
+template<typename _PixelType>
+struct RGB24Reader : public BaseReader<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB24Reader(const void *data) : BaseReader<_PixelType>(data) {}
+
+	inline void Read(rgb_color_value &color)
+	{
+		const pixel_t &pixel = *pixels;
+		color.red = pixel.red;
+		color.green = pixel.green;
+		color.blue = pixel.blue;
+		pixels++;
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		rgb_color_value color;
+		Read(color);
+		gray = brightness_for(color.red, color.green, color.blue);
+	}
+};
+
+// RGB16Reader
+template<typename _PixelType>
+struct RGB16Reader : public BaseReader<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB16Reader(const void *data) : BaseReader<_PixelType>(data) {}
+
+	inline void Read(rgb_color_value &color)
+	{
+		// rg: R[4:0],G[5:3]
+		// gb: G[2:0],B[4:0]
+		const pixel_t &pixel = *pixels;
+		color.red = pixel.rg & 0xf8;
+		color.green = ((pixel.rg & 0x07) << 5) & ((pixel.gb & 0xe0) >> 3);
+		color.blue = (pixel.gb & 0x1f) << 3;
+		color.red |= color.red >> 5;
+		color.green |= color.green >> 6;
+		color.blue |= color.blue >> 5;
+		pixels++;
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		rgb_color_value color;
+		Read(color);
+		gray = brightness_for(color.red, color.green, color.blue);
+	}
+};
+
+// RGB15Reader
+template<typename _PixelType>
+struct RGB15Reader : public BaseReader<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB15Reader(const void *data) : BaseReader<_PixelType>(data) {}
+
+	inline void Read(rgb_color_value &color)
+	{
+		// rg: -[0],R[4:0],G[4:3]
+		// gb: G[2:0],B[4:0]
+		const pixel_t &pixel = *pixels;
+		color.red = (pixel.rg & 0x7c) << 1;
+		color.green = ((pixel.rg & 0x03) << 6) & ((pixel.gb & 0xe0) >> 2);
+		color.blue = (pixel.gb & 0x1f) << 3;
+		color.red |= color.red >> 5;
+		color.green |= color.green >> 5;
+		color.blue |= color.blue >> 5;
+		pixels++;
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		rgb_color_value color;
+		Read(color);
+		gray = brightness_for(color.red, color.green, color.blue);
+	}
+};
+
+// CMAP8Reader
+struct CMAP8Reader : public BaseReader<uint8> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	CMAP8Reader(const void *data, const PaletteConverter &converter)
+		: BaseReader<uint8>(data), converter(converter) {}
+
+	inline void Read(rgb_color_value &color)
+	{
+		converter.RGB24ColorForIndex(*pixels, color.red, color.green,
+									 color.blue);
+		pixels++;
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		gray = converter.GrayColorForIndex(*pixels);
+		pixels++;
+	}
+
+	const PaletteConverter &converter;
+};
+
+// Gray8Reader
+struct Gray8Reader : public BaseReader<uint8> {
+	typedef gray_color_value	preferred_color_value_t;
+
+	Gray8Reader(const void *data) : BaseReader<uint8>(data) {}
+
+	inline void Read(rgb_color_value &color)
+	{
+		color.red = color.green = color.blue = *pixels;
+		pixels++;
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		gray = *pixels;
+		pixels++;
+	}
+};
+
+// Gray1Reader
+struct Gray1Reader : public BaseReader<uint8> {
+	typedef gray_color_value	preferred_color_value_t;
+
+	Gray1Reader(const void *data) : BaseReader<uint8>(data), bit(7) {}
+
+	inline void SetTo(const void *data)
+	{
+		pixels = (const pixel_t*)data;
+		bit = 7;
+	}
+
+	inline void NextRow(int32 skip)
+	{
+		if (bit == 7)
+			pixels = (const pixel_t*)((const char*)pixels + skip);
+		else {
+			pixels = (const pixel_t*)((const char*)pixels + skip + 1);
+			bit = 7;
+		}
+	}
+
+	inline void Read(rgb_color_value &color)
+	{
+		if (*pixels & bit_mask(bit))
+			color.red = color.green = color.blue = 255;
+		else
+			color.red = color.green = color.blue = 0;
+		bit--;
+		if (bit == -1) {
+			pixels++;
+			bit = 7;
+		}
+	}
+
+	inline void Read(gray_color_value &gray)
+	{
+		if (*pixels & bit_mask(bit))
+			gray = 255;
+		else
+			gray = 0;
+		bit--;
+		if (bit == -1) {
+			pixels++;
+			bit = 7;
+		}
+	}
+
+	int32 bit;
+};
+
+// BaseWriter
+template<typename _PixelType>
+struct BaseWriter {
+	typedef _PixelType		pixel_t;
+
+	BaseWriter(void *data) : pixels((pixel_t*)data) {}
+
+	inline void SetTo(void *data) { pixels = (pixel_t*)data; }
+
+	pixel_t *pixels;
+};
+
+
+// RGB32Writer
+template<typename _PixelType>
+struct RGB32Writer : public BaseWriter<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB32Writer(void *data) : BaseWriter<_PixelType>(data) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.red = color.red;
+		pixel.green = color.green;
+		pixel.blue = color.blue;
+		pixel.alpha = 255;
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.red = gray;
+		pixel.green = gray;
+		pixel.blue = gray;
+		pixel.alpha = 255;
+		pixels++;
+	}
+};
+
+// RGB24Writer
+template<typename _PixelType>
+struct RGB24Writer : public BaseWriter<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB24Writer(void *data) : BaseWriter<_PixelType>(data) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.red = color.red;
+		pixel.green = color.green;
+		pixel.blue = color.blue;
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.red = gray;
+		pixel.green = gray;
+		pixel.blue = gray;
+		pixels++;
+	}
+};
+
+// RGB16Writer
+template<typename _PixelType>
+struct RGB16Writer : public BaseWriter<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB16Writer(void *data) : BaseWriter<_PixelType>(data) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		// rg: R[4:0],G[5:3]
+		// gb: G[2:0],B[4:0]
+		pixel_t &pixel = *pixels;
+		pixel.rg = (color.red & 0xf8) | (color.green >> 5);
+		pixel.gb = ((color.green & 0x1c) << 3) | (color.blue >> 3);
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.rg = (gray & 0xf8) | (gray >> 5);
+		pixel.gb = ((gray & 0x1c) << 3) | (gray >> 3);
+		pixels++;
+	}
+};
+
+// RGB15Writer
+template<typename _PixelType>
+struct RGB15Writer : public BaseWriter<_PixelType> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	RGB15Writer(void *data) : BaseWriter<_PixelType>(data) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		// rg: -[0],R[4:0],G[4:3]
+		// gb: G[2:0],B[4:0]
+		pixel_t &pixel = *pixels;
+		pixel.rg = ((color.red & 0xf8) >> 1) | (color.green >> 6);
+		pixel.gb = ((color.green & 0x38) << 2) | (color.blue >> 3);
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		pixel_t &pixel = *pixels;
+		pixel.rg = ((gray & 0xf8) >> 1) | (gray >> 6);
+		pixel.gb = ((gray & 0x38) << 2) | (gray >> 3);
+		pixels++;
+	}
+};
+
+// CMAP8Writer
+struct CMAP8Writer : public BaseWriter<uint8> {
+	typedef rgb_color_value	preferred_color_value_t;
+
+	CMAP8Writer(void *data, const PaletteConverter &converter)
+		: BaseWriter<uint8>(data), converter(converter) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		*pixels = converter.IndexForRGB24(color.red, color.green, color.blue);
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		*pixels = converter.IndexForGray(gray);
+		pixels++;
+	}
+
+	const PaletteConverter &converter;
+};
+
+// Gray8Writer
+struct Gray8Writer : public BaseWriter<uint8> {
+	typedef gray_color_value	preferred_color_value_t;
+
+	Gray8Writer(void *data) : BaseWriter<uint8>(data) {}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		*pixels = brightness_for(color.red, color.green, color.blue);
+		pixels++;
+	}
+
+	inline void Write(const gray_color_value &gray)
+	{
+		*pixels = gray;
+		pixels++;
+	}
+};
+
+// Gray1Writer
+struct Gray1Writer : public BaseWriter<uint8> {
+	typedef gray_color_value	preferred_color_value_t;
+
+	Gray1Writer(void *data) : BaseWriter<uint8>(data), bit(7) {}
+
+	inline void SetTo(void *data) { pixels = (pixel_t*)data; bit = 7; }
+
+	inline void Write(const gray_color_value &gray)
+	{
+		*pixels = (*pixels & inverse_bit_mask(bit))
+				  | (gray & 0x80) >> (7 - bit);
+		bit--;
+		if (bit == -1) {
+			pixels++;
+			bit = 7;
+		}
+	}
+
+	inline void Write(const rgb_color_value &color)
+	{
+		Write(brightness_for(color.red, color.green, color.blue));
+	}
+
+	int32 bit;
+};
+
+// set_bits_worker
+template<typename Reader, typename Writer, typename color_value_t>
+static
+status_t
+set_bits_worker(const void *inData, int32 inLength, int32 inBPR,
+				int32 inRowSkip, void *outData, int32 outLength,
+				int32 outOffset, int32 outBPR, int32 rawOutBPR,
+				Reader _reader, Writer _writer)
+{
+	status_t error = B_OK;
+	Reader reader(_reader);
+	Writer writer(_writer);
+	reader.SetTo(inData);
+	writer.SetTo((char*)outData + outOffset);
+	const char *inEnd = (const char*)inData + inLength
+						- sizeof(Reader::pixel_t);
+	const char *inLastRow = (const char*)inData + inLength
+							- (inBPR - inRowSkip);
+	const char *outEnd = (const char*)outData + outLength
+						 - sizeof(Writer::pixel_t);
+	char *outRow = (char*)outData + outOffset - outOffset % outBPR;
+	const char *outRowEnd = outRow + rawOutBPR - sizeof(Writer::pixel_t);
+	while ((const char*)reader.pixels <= inEnd
+		   && (const char*)writer.pixels <= outEnd) {
+		// process one row
+		if ((const char*)reader.pixels <= inLastRow) {
+			// at least a complete row left
+			while ((const char*)writer.pixels <= outRowEnd) {
+				color_value_t color;
+				reader.Read(color);
+				writer.Write(color);
+			}
+		} else {
+			// no complete row left
+			// but maybe the complete end of the first row
+			while ((const char*)reader.pixels <= inEnd
+				   && (const char*)writer.pixels <= outRowEnd) {
+				color_value_t color;
+				reader.Read(color);
+				writer.Write(color);
+			}
+		}
+		// must be here, not in the if-branch (end of first row)
+		outRow += outBPR;
+		outRowEnd += outBPR;
+		reader.NextRow(inRowSkip);
+		writer.SetTo(outRow);
+	}
+	return error;
+}
+
+// set_bits_worker_gray1
+template<typename Reader, typename Writer, typename color_value_t>
+static
+status_t
+set_bits_worker_gray1(const void *inData, int32 inLength, int32 inBPR,
+					  int32 inRowSkip, void *outData, int32 outLength,
+					  int32 outOffset, int32 outBPR, int32 width,
+					  Reader _reader, Writer _writer)
+{
+	status_t error = B_OK;
+	Reader reader(_reader);
+	Writer writer(_writer);
+	reader.SetTo(inData);
+	writer.SetTo((char*)outData + outOffset);
+	const char *inEnd = (const char*)inData + inLength
+						- sizeof(Reader::pixel_t);
+	const char *inLastRow = (const char*)inData + inLength
+							- (inBPR - inRowSkip);
+	const char *outEnd = (const char*)outData + outLength - outBPR;
+	char *outRow = (char*)outData + outOffset - outOffset % outBPR;
+	int32 x = max(0L, width - ((char*)outData + outOffset - outRow) * 8) - 1;
+	while ((const char*)reader.pixels <= inEnd
+		   && (const char*)writer.pixels <= outEnd) {
+		// process one row
+		if ((const char*)reader.pixels <= inLastRow) {
+			// at least a complete row left
+			while (x >= 0) {
+				color_value_t color;
+				reader.Read(color);
+				writer.Write(color);
+				x--;
+			}
+		} else {
+			// no complete row left
+			// but maybe the complete end of the first row
+			while ((const char*)reader.pixels <= inEnd && x >= 0) {
+				color_value_t color;
+				reader.Read(color);
+				writer.Write(color);
+				x--;
+			}
+		}
+		// must be here, not in the if-branch (end of first row)
+		x = width - 1;
+		outRow += outBPR;
+		reader.NextRow(inRowSkip);
+		writer.SetTo(outRow);
+	}
+	return error;
+}
+
+// set_bits
+template<typename Reader>
+static
+status_t
+set_bits(const void *inData, int32 inLength, int32 inBPR, int32 inRowSkip,
+		 void *outData, int32 outLength, int32 outOffset, int32 outBPR,
+		 int32 rawOutBPR, color_space outColorSpace, int32 width,
+		 Reader reader, const PaletteConverter &paletteConverter)
+{
+	status_t error = B_OK;
+	switch (outColorSpace) {
+		// supported
+		case B_RGB32: case B_RGBA32:
+		{
+			typedef RGB32Writer<rgb32_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB32_BIG: case B_RGBA32_BIG:
+		{
+			typedef RGB32Writer<rgb32_big_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB24:
+		{
+			typedef RGB24Writer<rgb24_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB24_BIG:
+		{
+			typedef RGB24Writer<rgb24_big_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB16:
+		{
+			typedef RGB16Writer<rgb16_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB16_BIG:
+		{
+			typedef RGB16Writer<rgb16_big_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB15: case B_RGBA15:
+		{
+			typedef RGB15Writer<rgb16_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_RGB15_BIG: case B_RGBA15_BIG:
+		{
+			typedef RGB15Writer<rgb16_big_pixel> Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_CMAP8:
+		{
+			typedef CMAP8Writer Writer;
+			typedef typename Reader::preferred_color_value_t color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader,
+				Writer(outData, paletteConverter));
+			break;
+		}
+		case B_GRAY8:
+		{
+			typedef Gray8Writer Writer;
+			typedef gray_color_value color_value_t;
+			error = set_bits_worker<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, rawOutBPR, reader, Writer(outData));
+			break;
+		}
+		case B_GRAY1:
+		{
+			typedef Gray1Writer Writer;
+			typedef gray_color_value color_value_t;
+			error = set_bits_worker_gray1<Reader, Writer, color_value_t>(
+				inData, inLength, inBPR, inRowSkip, outData, outLength,
+				outOffset, outBPR, width, reader, Writer(outData));
+			break;
+		}
+		// unsupported
+		case B_NO_COLOR_SPACE:
+		case B_YUV9: case B_YUV12:
+		case B_UVL32: case B_UVLA32:
+		case B_LAB32: case B_LABA32:
+		case B_HSI32: case B_HSIA32:
+		case B_HSV32: case B_HSVA32:
+		case B_HLS32: case B_HLSA32:
+		case B_CMY32: case B_CMYA32: case B_CMYK32:
+		case B_UVL24: case B_LAB24: case B_HSI24:
+		case B_HSV24: case B_HLS24: case B_CMY24:
+		case B_YCbCr422: case B_YUV422:
+		case B_YCbCr411: case B_YUV411:
+		case B_YCbCr444: case B_YUV444:
+		case B_YCbCr420: case B_YUV420:
+		default:
+			error = B_BAD_VALUE;
+			break;
+	}
+	return error;
+}
+
 // SetBits
 void
 BBitmap::SetBits(const void *data, int32 length, int32 offset,
 				 color_space colorSpace)
 {
+	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
+	// check params
+	if (error == B_OK && (data == NULL || offset > fSize || length < 0))
+		error = B_BAD_VALUE;
+	int32 width = 0;
+	if (error == B_OK)
+		width = fBounds.IntegerWidth() + 1;
+	int32 inBPR = -1;
+	// tweaks to mimic R5 behavior
+	if (error == B_OK) {
+		// B_RGB32 means actually unpadded B_RGB24_BIG
+		if (colorSpace == B_RGB32) {
+			colorSpace = B_RGB24_BIG;
+			inBPR = width * 3;
+		// If in color space is B_CMAP8, but the bitmap's is another one,
+		// ignore source data row padding.
+		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8)
+			inBPR = width;
+	}
+	// call the sane method, which does the actual work
+	if (error == B_OK)
+		error = ImportBits(data, length, inBPR, offset, colorSpace);
+}
+
+// ImportBits
+status_t
+BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
+					color_space colorSpace)
+{
+	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
+	// check params 
+	if (error == B_OK && (data == NULL || offset > fSize || length < 0))
+		error = B_BAD_VALUE;
+	// get BPR
+	int32 width = 0;
+	int32 inRowSkip = 0;
+	if (error == B_OK) {
+		width = fBounds.IntegerWidth() + 1;
+		if (bpr < 0)
+			bpr = get_bytes_per_row(colorSpace, width);
+		inRowSkip = bpr - get_raw_bytes_per_row(colorSpace, width);
+		if (inRowSkip < 0)
+			error = B_BAD_VALUE;
+	}
+	if (error != B_OK) {
+		// catch error case
+	} else if (colorSpace == fColorSpace && bpr == fBytesPerRow) {
+		length = min(length, fSize - offset);
+		memcpy((char*)fBasePtr + offset, data, length);
+	} else {
+		// TODO: Retrieve color map from BScreen, when available:
+		// PaletteConverter paletteConverter(BScreen().ColorMap());
+		const PaletteConverter &paletteConverter = *palette_converter();
+		int32 rawOutBPR = get_raw_bytes_per_row(fColorSpace, width);
+		switch (colorSpace) {
+			// supported
+			case B_RGB32: case B_RGBA32:
+			{
+				typedef RGB24Reader<rgb32_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB32_BIG: case B_RGBA32_BIG:
+			{
+				typedef RGB24Reader<rgb32_big_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB24:
+			{
+				typedef RGB24Reader<rgb24_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB24_BIG:
+			{
+				typedef RGB24Reader<rgb24_big_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB16:
+			{
+				typedef RGB16Reader<rgb16_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB16_BIG:
+			{
+				typedef RGB16Reader<rgb16_big_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB15: case B_RGBA15:
+			{
+				typedef RGB15Reader<rgb16_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_RGB15_BIG: case B_RGBA15_BIG:
+			{
+				typedef RGB15Reader<rgb16_big_pixel> Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_CMAP8:
+			{
+				typedef CMAP8Reader Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data, paletteConverter),
+					paletteConverter);
+				break;
+			}
+			case B_GRAY8:
+			{
+				typedef Gray8Reader Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			case B_GRAY1:
+			{
+				typedef Gray1Reader Reader;
+				error = set_bits<Reader>(data, length, bpr, inRowSkip,
+					fBasePtr, fSize, offset, fBytesPerRow, rawOutBPR,
+					fColorSpace, width, Reader(data), paletteConverter);
+				break;
+			}
+			// unsupported
+			case B_NO_COLOR_SPACE:
+			case B_YUV9: case B_YUV12:
+			case B_UVL32: case B_UVLA32:
+			case B_LAB32: case B_LABA32:
+			case B_HSI32: case B_HSIA32:
+			case B_HSV32: case B_HSVA32:
+			case B_HLS32: case B_HLSA32:
+			case B_CMY32: case B_CMYA32: case B_CMYK32:
+			case B_UVL24: case B_LAB24: case B_HSI24:
+			case B_HSV24: case B_HLS24: case B_CMY24:
+			case B_YCbCr422: case B_YUV422:
+			case B_YCbCr411: case B_YUV411:
+			case B_YCbCr444: case B_YUV444:
+			case B_YCbCr420: case B_YUV420:
+			default:
+				error = B_BAD_VALUE;
+				break;
+		}
+	}
+	return error;
+}
+
+// ImportBits
+status_t
+BBitmap::ImportBits(const BBitmap *bitmap)
+{
+	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
+	// check param
+	if (error == B_OK && bitmap == NULL)
+		error = B_BAD_VALUE;
+	if (error == B_OK && bitmap->InitCheck() != B_OK)
+		error = B_BAD_VALUE;
+	if (error == B_OK && bitmap->Bounds() != fBounds)
+		error = B_BAD_VALUE;
+	// set bits
+	if (error == B_OK) {
+		error = ImportBits(bitmap->Bits(), bitmap->BitsLength(),
+						   bitmap->BytesPerRow(), 0, bitmap->ColorSpace());
+	}
+	return error;
 }
 
 // GetOverlayRestrictions
@@ -607,51 +1668,6 @@ BBitmap::get_shared_pointer() const
 	return NULL;	// not implemented
 }
 
-// set_bits
-void
-BBitmap::set_bits(long offset, char *data, long length)
-{
-}
-
-// set_bits_24
-void
-BBitmap::set_bits_24(long offset, char *data, long length)
-{
-}
-
-// set_bits_24_local_gray
-void
-BBitmap::set_bits_24_local_gray(long offset, char *data, long length)
-{
-}
-
-// set_bits_24_local_256
-void
-BBitmap::set_bits_24_local_256(long offset, uchar *data, long length)
-{
-}
-
-// set_bits_24_24
-void
-BBitmap::set_bits_24_24(long offset, char *data, long length,
-						bool bigEndianDest)
-{
-}
-
-// set_bits_8_24
-void
-BBitmap::set_bits_8_24(long offset, char *data, long length,
-					   bool bigEndianDest)
-{
-}
-
-// set_bits_gray_24
-void
-BBitmap::set_bits_gray_24(long offset, char *data, long length,
-						  bool bigEndianDest)
-{
-}
-
 // get_server_token
 int32
 BBitmap::get_server_token() const
@@ -682,7 +1698,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	}
 	// allocate the bitmap buffer
 	if (error == B_OK) {
-		int32 size = bytesPerRow * (bounds.IntegerWidth() + 1);
+		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
 		fBasePtr = malloc(size);
 		if (fBasePtr) {
 			fSize = size;
