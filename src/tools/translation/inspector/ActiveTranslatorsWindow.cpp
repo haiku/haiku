@@ -47,7 +47,6 @@ ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name,
 	: BWindow(rect, name, B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BRect rctframe = Bounds();
-	rctframe.InsetBy(5, 5);
 	rctframe.right -= B_V_SCROLL_BAR_WIDTH;
 	
 	fpListView = new BOutlineListView(rctframe, "translators_list",
