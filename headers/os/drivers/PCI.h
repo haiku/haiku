@@ -172,23 +172,23 @@ struct pci_module_info {
 	offsets in PCI configuration space to the elements of header type 0x01 (PCI-to-PCI bridge)
 --- */
 
-#define PCI_primary_bus								0x18
-#define PCI_secondary_bus							0x19
-#define PCI_subordinate_bus							0x1A
-#define PCI_secondary_latency						0x1B	
-#define PCI_io_base									0x1C
-#define PCI_io_limit								0x1D
-#define PCI_secondary_status						0x1E
-#define PCI_memory_base								0x20
-#define PCI_memory_limit							0x22
-#define PCI_prefetchable_memory_base				0x24
-#define PCI_prefetchable_memory_limit				0x26
+#define PCI_primary_bus								0x18 /* (1 byte) */
+#define PCI_secondary_bus							0x19 /* (1 byte) */
+#define PCI_subordinate_bus							0x1A /* (1 byte) */
+#define PCI_secondary_latency						0x1B /* (1 byte) latency of secondary bus */	
+#define PCI_io_base									0x1C /* (1 byte) io base address register for 2ndry bus*/
+#define PCI_io_limit								0x1D /* (1 byte) */
+#define PCI_secondary_status						0x1E /* (2 bytes) */
+#define PCI_memory_base								0x20 /* (2 bytes) */
+#define PCI_memory_limit							0x22 /* (2 bytes) */
+#define PCI_prefetchable_memory_base				0x24 /* (2 bytes) */
+#define PCI_prefetchable_memory_limit				0x26 /* (2 bytes) */
 #define PCI_prefetchable_memory_base_upper32		0x28
 #define PCI_prefetchable_memory_limit_upper32		0x2C
-#define PCI_io_base_upper16							0x30
-#define PCI_io_limit_upper16						0x32
+#define PCI_io_base_upper16							0x30 /* (2 bytes) */
+#define PCI_io_limit_upper16						0x32 /* (2 bytes) */
 #define PCI_bridge_rom_base							0x38
-#define PCI_bridge_control							0x3E																		
+#define PCI_bridge_control							0x3E /* (1 byte) */																		
 
 
 
