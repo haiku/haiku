@@ -427,8 +427,8 @@ team_create_team2(void *args)
 		// the exact location at the end of the user stack region
 
 	sprintf(ustack_name, "%s_primary_stack", team->name);
-	t->user_stack_region_id = vm_create_anonymous_region(team->_aspace_id, ustack_name, (void **)&t->user_stack_base,
-		REGION_ADDR_EXACT_ADDRESS, totalSize, REGION_WIRING_LAZY, LOCK_RW);
+	t->user_stack_region_id = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
+		B_EXACT_ADDRESS, totalSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (t->user_stack_region_id < 0) {
 		panic("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;

@@ -366,9 +366,9 @@ create_thread(const char *name, team_id teamID, thread_func entry, void *args1, 
 
 		while (t->user_stack_base < mainThreadStackBase) {
 			sprintf(stack_name, "%s_stack%ld", team->name, t->id);
-			t->user_stack_region_id = vm_create_anonymous_region(team->_aspace_id, stack_name,
-				(void **)&t->user_stack_base,
-				REGION_ADDR_EXACT_ADDRESS, STACK_SIZE + TLS_SIZE, REGION_WIRING_LAZY, LOCK_RW);
+			t->user_stack_region_id = create_area_etc(team, stack_name,
+				(void **)&t->user_stack_base, B_EXACT_ADDRESS,
+				STACK_SIZE + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 			if (t->user_stack_region_id >= 0)
 				break;
 
@@ -730,7 +730,7 @@ thread_exit(void)
 	if (team->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
 		t->user_stack_region_id = -1;
-		vm_delete_region(team->_aspace_id, rid);
+		delete_area_etc(team, rid);
 	}
 
 	if (team != team_get_kernel_team()) {

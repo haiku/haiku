@@ -18,8 +18,10 @@
 #define POOL_ALLOC_SZ 4 * 1024
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (POOL_ALLOC_SZ) - 1) & ~((POOL_ALLOC_SZ) - 1))
 
+
 #ifdef WALK_POOL_LIST
-void walk_pool_list(struct pool_ctl *p)
+void
+walk_pool_list(struct pool_ctl *p)
 {
 	struct pool_mem *pb = p->list;
 
@@ -32,7 +34,8 @@ void walk_pool_list(struct pool_ctl *p)
 }
 #endif
 
-void pool_debug_walk(struct pool_ctl *p)
+void
+pool_debug_walk(struct pool_ctl *p)
 {
 	struct free_blk *ptr;
 	int i = 1;	
@@ -58,13 +61,17 @@ void pool_debug_walk(struct pool_ctl *p)
 	#endif
 }
 
-void pool_debug(struct pool_ctl *p, char *name)
+
+void
+pool_debug(struct pool_ctl *p, char *name)
 {
 	p->debug = 1;
 	strlcpy(p->name, name, POOL_DEBUG_NAME_SZ);
 }
 
-static struct pool_mem *get_mem_block(struct pool_ctl *pool)
+
+static struct pool_mem *
+get_mem_block(struct pool_ctl *pool)
 {
 	struct pool_mem *block;
 
@@ -74,12 +81,10 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 
 	memset(block, 0, sizeof(*block));
 
-	block->aid = vm_create_anonymous_region(vm_get_kernel_aspace_id(),
-	                    "some pool block",
-						(void**)&block->base_addr,
-						REGION_ADDR_ANY_ADDRESS, pool->block_size,
-						REGION_WIRING_WIRED_CONTIG, 
-						LOCK_KERNEL|LOCK_RW);
+	// ToDo: B_CONTIGUOUS for what???
+	block->aid = create_area("some pool block", (void **)&block->base_addr,
+		B_ANY_KERNEL_ADDRESS, pool->block_size, B_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (block->aid < 0) {
 		free(block);
 		return NULL;
@@ -113,15 +118,16 @@ static struct pool_mem *get_mem_block(struct pool_ctl *pool)
 		return block;
 	}
 	UNINIT_BENAPHORE(block->lock);
-	
-	vm_delete_region(vm_get_kernel_aspace_id(), block->aid);
+
+	delete_area(block->aid);
 	free(block);
 
 	return NULL;
 }
 
 
-int32 pool_init(struct pool_ctl **_newPool, size_t size)
+int32
+pool_init(struct pool_ctl **_newPool, size_t size)
 {
 	struct pool_ctl *pool = NULL;
 	
@@ -175,7 +181,8 @@ int32 pool_init(struct pool_ctl **_newPool, size_t size)
 }
 
 
-void *pool_get(struct pool_ctl *p)
+void *
+pool_get(struct pool_ctl *p)
 {
 	/* ok, so now we look for a suitable block... */
 	struct pool_mem *mp = p->list;
@@ -260,7 +267,8 @@ void *pool_get(struct pool_ctl *p)
 }
 
 
-void pool_put(struct pool_ctl *p, void *ptr)
+void
+pool_put(struct pool_ctl *p, void *ptr)
 {
 	#if POOL_USES_BENAPHORES
 		ACQUIRE_BENAPHORE(p->lock);
@@ -292,7 +300,8 @@ void pool_put(struct pool_ctl *p, void *ptr)
 }
 
 
-void pool_destroy(struct pool_ctl *p)
+void
+pool_destroy(struct pool_ctl *p)
 {
 	struct pool_mem *mp,*temp;
 
@@ -304,7 +313,7 @@ void pool_destroy(struct pool_ctl *p)
 
 	mp = p->list;
 	while (mp != NULL) {
-		vm_delete_region(vm_get_kernel_aspace_id(), mp->aid);
+		delete_area(mp->aid);
 		temp = mp;
 		mp = mp->next;
 		UNINIT_BENAPHORE(mp->lock);
