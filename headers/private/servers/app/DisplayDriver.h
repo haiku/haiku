@@ -180,7 +180,9 @@ public:
 	void GetMode(display_mode *mode);
 	
 	// Font-related calls
-	void DrawString(const char *string, const int32 &length, const BPoint &pt, const DrawData *d);
+	
+	// DrawData is NOT const because this call updates the pen position in the passed DrawData
+	void DrawString(const char *string, const int32 &length, const BPoint &pt, DrawData *d);
 	void DrawString(const char *string, const int32 &length, const BPoint &pt, const RGBColor &color, escapement_delta *delta=NULL);
 
 	float StringWidth(const char *string, int32 length, const DrawData *d);
