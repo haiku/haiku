@@ -2,7 +2,7 @@ SubDir OBOS_TOP src libs png ;
 
 UseLibraryHeaders zlib ;
 
-SharedLibrary png : 
+local shared_files = 
 	png.c
 	pngerror.c
 	pnggccrd.c
@@ -20,25 +20,10 @@ SharedLibrary png :
 	pngwrite.c
 	pngwtran.c
 	pngwutil.c
-: z ;
-
-StaticLibrary png : 
-	png.c
-	pngerror.c
-	pnggccrd.c
-	pngget.c
-	pngmem.c
-	pngpread.c
-	pngread.c
-	pngrio.c
-	pngrtran.c
-	pngrutil.c
-	pngset.c
-	pngtrans.c
-	pngvcrd.c
-	pngwio.c
-	pngwrite.c
-	pngwtran.c
-	pngwutil.c
-: STATIC_LIBRARY_DIR
 ;
+
+Objects $(shared_files) ;
+
+SharedLibrary png : [ FGristFiles $(shared_files:S=.o) ] : z ;
+
+StaticLibrary png : [ FGristFiles $(shared_files:S=.o) ] : STATIC_LIBRARY_DIR ;

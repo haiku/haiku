@@ -2,7 +2,7 @@ SubDir OBOS_TOP src libs zlib ;
 
 UseLibraryHeaders zlib ;
 
-SharedLibrary z : 
+local shared_files =
 	adler32.c
 	compress.c
 	crc32.c
@@ -17,19 +17,9 @@ SharedLibrary z :
 	zutil.c
 ;
 
-StaticLibrary z : 
-	adler32.c
-	compress.c
-	crc32.c
-	deflate.c
-	gzio.c
-	infback.c
-	inffast.c
-	inflate.c
-	inftrees.c
-	trees.c
-	uncompr.c
-	zutil.c
-: STATIC_LIBRARY_DIR
-;
+Objects $(shared_files) ;
+
+SharedLibrary z : [ FGristFiles $(shared_files:S=.o) ] ;
+
+StaticLibrary z : [ FGristFiles $(shared_files:S=.o) ] : STATIC_LIBRARY_DIR ;
 
