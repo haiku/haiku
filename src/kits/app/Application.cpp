@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, inc.
+//	Copyright (c) 2001-2005, Haiku, inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -186,7 +186,7 @@ extern const char * const *__libc_argv;
 // prototypes of helper functions
 static const char* looper_name_for(const char *signature);
 static status_t check_app_signature(const char *signature);
-static void fill_argv_message(BMessage *message);
+static void fill_argv_message(BMessage &message);
 
 
 BApplication::BApplication(const char *signature)
@@ -375,7 +375,7 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
 					// create an B_ARGV_RECEIVED message
 					BMessage argvMessage(B_ARGV_RECEIVED);
-					fill_argv_message(&argvMessage);
+					fill_argv_message(argvMessage);
 
 					// replace the first argv string with the path of the
 					// other application
@@ -398,7 +398,7 @@ DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 
 			if (__libc_argc > 1) {
 				BMessage argvMessage(B_ARGV_RECEIVED);
-				fill_argv_message(&argvMessage);
+				fill_argv_message(argvMessage);
 				PostMessage(&argvMessage, this);
 			}
 			// send a B_READY_TO_RUN message as well
@@ -1188,43 +1188,43 @@ BApplication::quit_all_windows(bool force)
 void
 BApplication::do_argv(BMessage *message)
 {
-	// TODO: Consider renaming this function to something 
-	// a bit more descriptive, like "handle_argv_message()", 
-	// or "HandleArgvMessage()" 
+	// TODO: Consider renaming this function to something
+	// a bit more descriptive, like "handle_argv_message()",
+	// or "HandleArgvMessage()"
 
-	ASSERT(message != NULL); 
+	ASSERT(message != NULL);
 
-	// build the argv vector 
-	status_t error = B_OK; 
-	int32 argc; 
-	char **argv = NULL; 
-	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) { 
-		argv = new char*[argc]; 
-		for (int32 i = 0; i < argc; i++) 
-			argv[i] = NULL; 
-        
-		// copy the arguments 
-		for (int32 i = 0; error == B_OK && i < argc; i++) { 
-			const char *arg = NULL; 
-			error = message->FindString("argv", i, &arg); 
-			if (error == B_OK && arg) { 
-				argv[i] = strdup(arg); 
-				if (argv[i] == NULL) 
-					error = B_NO_MEMORY; 
-			} 
-		} 
-	} 
+	// build the argv vector
+	status_t error = B_OK;
+	int32 argc = 0;
+	char **argv = NULL;
+	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) {
+		// allocate a NULL terminated array
+		argv = new char*[argc + 1];
+		argv[argc] = NULL;
 
-	// call the hook 
-	if (error == B_OK) 
-		ArgvReceived(argc, argv); 
+		// copy the arguments
+		for (int32 i = 0; error == B_OK && i < argc; i++) {
+			const char *arg = NULL;
+			error = message->FindString("argv", i, &arg);
+			if (error == B_OK && arg) {
+				argv[i] = strdup(arg);
+				if (argv[i] == NULL)
+					error = B_NO_MEMORY;
+			}
+		}
+	}
 
-	// cleanup 
-	if (argv) { 
-		for (int32 i = 0; i < argc; i++) 
-			free(argv[i]); 
-		delete[] argv; 
-	} 
+	// call the hook
+	if (error == B_OK && argc > 0)
+		ArgvReceived(argc, argv);
+
+	// cleanup
+	if (argv) {
+		for (int32 i = 0; i < argc; i++)
+			free(argv[i]);
+		delete[] argv;
+	}
 }
 
 
@@ -1332,7 +1332,7 @@ check_app_signature(const char *signature)
 */
 
 static
-const char*
+const char *
 looper_name_for(const char *signature)
 {
 	if (signature && !strcasecmp(signature, kRegistrarSignature))
@@ -1345,26 +1345,25 @@ looper_name_for(const char *signature)
 /*!	\brief Fills the passed BMessage with B_ARGV_RECEIVED infos.
 */
 
-static void 
-fill_argv_message(BMessage *message)
-{ 
-	if (message) { 
-    	message->what = B_ARGV_RECEIVED; 
+static
+void
+fill_argv_message(BMessage &message)
+{
+   	message.what = B_ARGV_RECEIVED;
 
-		int32 argc = __libc_argc; 
-		const char * const *argv = __libc_argv; 
+	int32 argc = __libc_argc;
+	const char * const *argv = __libc_argv;
 
-		// add argc 
-		message->AddInt32("argc", argc); 
+	// add argc
+	message.AddInt32("argc", argc);
 
-		// add argv 
-		for (int32 i = 0; i < argc; i++) 
-			message->AddString("argv", argv[i]); 
+	// add argv
+	for (int32 i = 0; i < argc; i++)
+		message.AddString("argv", argv[i]);
 
-		// add current working directory        
-		char cwd[B_PATH_NAME_LENGTH]; 
-		if (getcwd(cwd, B_PATH_NAME_LENGTH)) 
-			message->AddString("cwd", cwd); 
-	} 
-} 
- 
+	// add current working directory
+	char cwd[B_PATH_NAME_LENGTH];
+	if (getcwd(cwd, B_PATH_NAME_LENGTH))
+		message.AddString("cwd", cwd);
+}
+
