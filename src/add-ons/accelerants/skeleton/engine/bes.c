@@ -237,6 +237,7 @@ static void eng_bes_calc_move_overlay(move_overlay_info *moi)
 	/* calculate inputbitmap origin adress */
 	moi->a1orgv = (uint32)((vuint32 *)si->overlay.ob.buffer);
 	moi->a1orgv -= (uint32)((vuint32 *)si->framebuffer);
+	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 
 	/* Setup vertical source start: first (sub)pixel contributing to output picture. */
 	/* Note:
@@ -286,7 +287,6 @@ static void eng_bes_calc_move_overlay(move_overlay_info *moi)
 	/* AND below is probably required by hardware. */
 	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
 	moi->a1orgv &= 0xfffffff0;
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 }
 
 static void eng_bes_program_move_overlay(move_overlay_info moi)
