@@ -35,7 +35,6 @@
 #include <MenuWindow.h>
 
 #include <stdio.h>
-#define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 
 #ifndef COMPILE_FOR_R5
 menu_info BMenu::sMenuInfo;
@@ -239,7 +238,6 @@ BMenu::Archive(BMessage *data, bool deep) const
 void
 BMenu::AttachedToWindow()
 {
-	CALLED();
 	BView::AttachedToWindow();
 
 	LayoutItems(0);
@@ -249,7 +247,6 @@ BMenu::AttachedToWindow()
 void
 BMenu::DetachedFromWindow()
 {
-	CALLED();
 	BView::DetachedFromWindow();
 }
 
@@ -292,7 +289,8 @@ BMenu::AddItem(BMenuItem *item, BRect frame)
 {
 	if (!item)
 		return false;
-		
+	
+	frame.PrintToStream();	
 	item->fBounds = frame;
 	
 	return AddItem(item, CountItems());
@@ -690,7 +688,6 @@ BMenu::GetPreferredSize(float *width, float *height)
 void
 BMenu::ResizeToPreferred()
 {
-	CALLED();
 	BView::ResizeToPreferred();
 }
 
@@ -698,7 +695,6 @@ BMenu::ResizeToPreferred()
 void
 BMenu::FrameMoved(BPoint new_position)
 {
-	CALLED();
 	BView::FrameMoved(new_position);
 }
 
@@ -706,7 +702,6 @@ BMenu::FrameMoved(BPoint new_position)
 void
 BMenu::FrameResized(float new_width, float new_height)
 {
-	CALLED();
 	BView::FrameResized(new_width, new_height);
 }
 
@@ -799,7 +794,6 @@ BMenu::Perform(perform_code d, void *arg)
 void
 BMenu::MakeFocus(bool focused)
 {
-	CALLED();
 	BView::MakeFocus(focused);
 }
 
@@ -807,7 +801,6 @@ BMenu::MakeFocus(bool focused)
 void
 BMenu::AllAttached()
 {
-	CALLED();
 	BView::AllAttached();
 }
 
@@ -815,7 +808,6 @@ BMenu::AllAttached()
 void
 BMenu::AllDetached()
 {
-	CALLED();
 	BView::AllDetached();
 }
 
@@ -850,7 +842,6 @@ BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		fRedrawAfterSticky(true),
 		fAttachAborted(false)
 {
-	CALLED();
 	InitData(NULL);
 }
 
@@ -903,7 +894,6 @@ BMenu::GetItemMargins(float *left, float *top, float *right,
 menu_layout
 BMenu::Layout() const
 {
-	CALLED();
 	return fLayout;
 }
 
@@ -911,7 +901,6 @@ BMenu::Layout() const
 void
 BMenu::Show()
 {
-	CALLED();
 	Show(false);
 }
 
@@ -919,7 +908,6 @@ BMenu::Show()
 void
 BMenu::Show(bool selectFirst)
 {
-	CALLED();
 	_show(selectFirst);
 }
 
@@ -927,7 +915,6 @@ BMenu::Show(bool selectFirst)
 void
 BMenu::Hide()
 {
-	CALLED();
 	_hide();
 }
 
@@ -935,7 +922,6 @@ BMenu::Hide()
 BMenuItem *
 BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 {
-	CALLED();
 	if (IsStickyPrefOn())
 		openAnyway = false;
 		
@@ -947,7 +933,7 @@ BMenu::Track(bool openAnyway, BRect *clickToOpenRect)
 	}
 	
 	int action;
-	return BMenu::_track(&action, -1);
+	return _track(&action, -1);
 }
 
 
@@ -984,7 +970,6 @@ BMenu::DrawBackground(BRect update)
 void
 BMenu::SetTrackingHook(menu_tracking_hook func, void *state)
 {
-	CALLED();
 }
 
 
@@ -1031,7 +1016,6 @@ BMenu::InitData(BMessage *data)
 bool
 BMenu::_show(bool selectFirstItem)
 {
-	CALLED();
 	BPoint point = ScreenLocation();
 
 	BWindow *window = new BMenuWindow(BRect(point.x, point.y,
@@ -1046,7 +1030,6 @@ BMenu::_show(bool selectFirstItem)
 void
 BMenu::_hide()
 {
-	CALLED();
 	BWindow *window = Window();
 
 	if (window) {
@@ -1060,42 +1043,35 @@ BMenu::_hide()
 BMenuItem *
 BMenu::_track(int *action, long start)
 {
-	CALLED();
+	// TODO: Take Sticky mode into account
 	BPoint location;
 	ulong buttons;
-	BMenuItem *item = NULL;
-			
+	BMenuItem *item = NULL;	
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
-			if (OverSuper(location)) {
-				UnlockLooper();
-				break;
-			}
-			
+					
 			item = HitTestItems(location);
-			 
+			if (item == NULL) {
+				UnlockLooper();
+				break;		
+			}
+				 
 			if (item && fSelected != item) {
-				SelectItem(item);
-				/*if (fSelected)
-					fSelected->Select(false);
-				fSelected = item;
-				item->Select(true);
-				*/
-				Invalidate();
-				Window()->UpdateIfNeeded();
+				SelectItem(item);						
 			}
 			
+			Draw(Bounds());
 			UnlockLooper();
-		}
+		}	
 		snooze(50000);
 	} while (buttons != 0);
 	
 	if (action != NULL) {
-		if (item != NULL) 
-			*action = 5;
-		else
+		if (buttons != 0)
 			*action = 0;
+		else 
+			*action = 5;
 	}
 	
 	return item;
@@ -1205,7 +1181,6 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 BRect
 BMenu::Bump(BRect current, BPoint extent, int32 index) const
 {
-	CALLED();
 	return BRect();
 }
 
@@ -1213,7 +1188,6 @@ BMenu::Bump(BRect current, BPoint extent, int32 index) const
 BPoint
 BMenu::ItemLocInRect(BRect frame) const
 {
-	CALLED();
 	return BPoint();
 }
 
@@ -1221,7 +1195,6 @@ BMenu::ItemLocInRect(BRect frame) const
 BRect
 BMenu::CalcFrame(BPoint where, bool *scrollOn)
 {
-	CALLED();
 	return BRect();
 }
 
@@ -1229,7 +1202,6 @@ BMenu::CalcFrame(BPoint where, bool *scrollOn)
 bool
 BMenu::ScrollMenu(BRect bounds, BPoint loc, bool *fast)
 {
-	CALLED();
 	return false;
 }
 
@@ -1237,7 +1209,6 @@ BMenu::ScrollMenu(BRect bounds, BPoint loc, bool *fast)
 void
 BMenu::ScrollIntoView(BMenuItem *item)
 {
-	CALLED();
 }
 
 
@@ -1256,7 +1227,6 @@ BMenu::DrawItems(BRect updateRect)
 int
 BMenu::State(BMenuItem **item) const
 {
-	CALLED();
 	return 0;
 }
 
@@ -1264,7 +1234,6 @@ BMenu::State(BMenuItem **item) const
 void
 BMenu::InvokeItem(BMenuItem *item, bool now)
 {
-	CALLED();
 	if (item->Submenu())
 		item->Submenu()->Show();
 	else if (IsRadioMode())
@@ -1277,8 +1246,6 @@ BMenu::InvokeItem(BMenuItem *item, bool now)
 bool
 BMenu::OverSuper(BPoint loc)
 {
-	CALLED();
-	
 	ConvertToScreen(&loc);
 	
 	if (!Supermenu())
@@ -1291,7 +1258,6 @@ BMenu::OverSuper(BPoint loc)
 bool
 BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 {
-	CALLED();
 	// TODO: we assume that loc is in screen coords
 	if (!item->Submenu())
 		return false;
@@ -1303,7 +1269,6 @@ BMenu::OverSubmenu(BMenuItem *item, BPoint loc)
 BMenuWindow	*
 BMenu::MenuWindow()
 {
-	CALLED();
 	return fCachedMenuWindow;
 }
 
@@ -1311,7 +1276,6 @@ BMenu::MenuWindow()
 void
 BMenu::DeleteMenuWindow()
 {
-	CALLED();
 	delete fCachedMenuWindow;
 	fCachedMenuWindow = NULL;
 }
@@ -1335,7 +1299,6 @@ BMenu::HitTestItems(BPoint where, BPoint slop) const
 BRect
 BMenu::Superbounds() const
 {
-	CALLED();
 	if (fSuper)
 		return fSuper->Bounds();
 		
@@ -1346,7 +1309,6 @@ BMenu::Superbounds() const
 void
 BMenu::CacheFontInfo()
 {
-	CALLED();
 	font_height fh;
 	GetFontHeight(&fh);
 	fAscent = fh.ascent;
@@ -1358,7 +1320,6 @@ BMenu::CacheFontInfo()
 void
 BMenu::ItemMarked(BMenuItem *item)
 {
-	CALLED();
 	if (IsRadioMode()) {
 		for (int32 i = 0; i < CountItems(); i++)
 			if (ItemAt(i) != item)
@@ -1373,7 +1334,6 @@ BMenu::ItemMarked(BMenuItem *item)
 void
 BMenu::Install(BWindow *target)
 {
-	CALLED();
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->Install(target);
 }
@@ -1382,7 +1342,6 @@ BMenu::Install(BWindow *target)
 void
 BMenu::Uninstall()
 {
-	CALLED();
 	for (int32 i = 0; i < CountItems(); i++)
 		ItemAt(i)->Uninstall();
 }
@@ -1391,14 +1350,12 @@ BMenu::Uninstall()
 void
 BMenu::SelectItem(BMenuItem *m, uint32 showSubmenu,bool selectFirstItem)
 {
-	CALLED();
 }
 
 
 BMenuItem *
 BMenu::CurrentSelection() const
 {
-	CALLED();
 	return fSelected;
 }
 
@@ -1406,7 +1363,6 @@ BMenu::CurrentSelection() const
 bool 
 BMenu::SelectNextItem(BMenuItem *item, bool forward)
 {
-	CALLED();
 	return false;
 }
 
@@ -1414,7 +1370,6 @@ BMenu::SelectNextItem(BMenuItem *item, bool forward)
 BMenuItem *
 BMenu::NextItem(BMenuItem *item, bool forward) const
 {
-	CALLED();
 	return NULL;
 }
 
@@ -1422,7 +1377,6 @@ BMenu::NextItem(BMenuItem *item, bool forward) const
 bool 
 BMenu::IsItemVisible(BMenuItem *item) const
 {
-	CALLED();
 	return false;
 }
 
@@ -1430,7 +1384,6 @@ BMenu::IsItemVisible(BMenuItem *item) const
 void 
 BMenu::SetIgnoreHidden(bool on)
 {
-	CALLED();
 	fIgnoreHidden = on;
 }
 
@@ -1452,14 +1405,12 @@ BMenu::IsStickyMode() const
 void
 BMenu::CalcTriggers()
 {
-	CALLED();
 }
 
 
 const char *
 BMenu::ChooseTrigger(const char *title, BList *chars)
 {
-	CALLED();
 	return NULL;
 }
 
@@ -1467,7 +1418,6 @@ BMenu::ChooseTrigger(const char *title, BList *chars)
 void
 BMenu::UpdateWindowViewSize(bool upWind)
 {
-	CALLED();
 }
 
 
@@ -1481,7 +1431,6 @@ BMenu::IsStickyPrefOn()
 void
 BMenu::RedrawAfterSticky(BRect bounds)
 {
-	CALLED();
 }
 
 
