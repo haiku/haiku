@@ -236,7 +236,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 	// walk up to the spot where we should start searching
 	next_r = map->region_list;
 	while (next_r) {
-		if(next_r->base >= start + size) {
+		if (next_r->base >= start + size) {
 			// we have a winner
 			break;
 		}
@@ -253,6 +253,8 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 	switch (addr_type) {
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+		case B_BASE_ADDRESS:
 			// find a hole big enough for a new region
 			if (!last_r) {
 				// see if we can build it at the beginning of the virtual map
@@ -286,7 +288,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 		case B_EXACT_KERNEL_ADDRESS:
 			// see if we can create it exactly here
 			if (!last_r) {
-				if(!next_r || (next_r->base >= start + size)) {
+				if (!next_r || (next_r->base >= start + size)) {
 					foundspot = true;
 					region->base = start;
 					break;
@@ -428,11 +430,13 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 		switch (addr_type) {
 			case B_EXACT_ADDRESS:
 			case B_EXACT_KERNEL_ADDRESS:
+			case B_BASE_ADDRESS:
 				search_addr = (addr_t)*vaddr;
 				search_end = (addr_t)*vaddr + size;
 				break;
 			case B_ANY_ADDRESS:
 			case B_ANY_KERNEL_ADDRESS:
+			case B_ANY_KERNEL_BLOCK_ADDRESS:
 				search_addr = aspace->virtual_map.base;
 				search_end = aspace->virtual_map.base + (aspace->virtual_map.size - 1);
 				break;
@@ -473,7 +477,7 @@ err1b:
 	vm_cache_release_ref(cache_ref);
 	goto err;
 err1a:
-	if(nu_cache_ref) {
+	if (nu_cache_ref) {
 		// had never acquired it's initial ref, so acquire and then release it
 		// this should clean up all the objects it references
 		vm_cache_acquire_ref(cache_ref, true);
@@ -503,14 +507,9 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 	switch (addr_type) {
 		case B_ANY_ADDRESS:
 		case B_EXACT_ADDRESS:
-		//case B_BASE_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
-			break;
 		case B_BASE_ADDRESS:
-			dprintf("create_area: B_BASE_ADDRESS demanded (switch to B_ANY_ADDRESS)!\n");
-			addr_type = B_ANY_ADDRESS;
+		case B_ANY_KERNEL_ADDRESS:
+		case B_EXACT_KERNEL_ADDRESS:
 			break;
 
 		default:
@@ -525,7 +524,8 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		case B_ALREADY_WIRED:
 			break;
 		case B_LOMEM:
-			dprintf("B_LOMEM is not yet supported!\n");
+		//case B_SLOWMEM:
+			dprintf("B_LOMEM/SLOWMEM is not yet supported!\n");
 			wiring = B_FULL_LOCK;
 			break;
 		default:
@@ -673,7 +673,9 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		return ENOMEM;
 }
 
-region_id vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
+
+region_id
+vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	int addr_type, addr_t size, int lock, addr_t phys_addr)
 {
 	vm_region *region;
@@ -701,13 +703,13 @@ region_id vm_map_physical_memory(aspace_id aid, const char *name, void **_addres
 
 	// create an device store object
 	store = vm_store_create_device(phys_addr);
-	if(store == NULL)
+	if (store == NULL)
 		panic("vm_create_null_region: vm_store_create_device returned NULL");
 	cache = vm_cache_create(store);
-	if(cache == NULL)
+	if (cache == NULL)
 		panic("vm_create_null_region: vm_cache_create returned NULL");
 	cache_ref = vm_cache_ref_create(cache);
-	if(cache_ref == NULL)
+	if (cache_ref == NULL)
 		panic("vm_create_null_region: vm_cache_ref_create returned NULL");
 	// tell the page scanner to skip over this region, it's pages are special
 	cache->scan_skip = 1;
