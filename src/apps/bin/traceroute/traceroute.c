@@ -219,8 +219,6 @@
 #include <netinet/udp.h>
 #include <sys/select.h>
 
-#define howmany(x, y) _howmany(x, y)
-
 #include <arpa/inet.h>
 
 #include <ctype.h>
@@ -696,7 +694,7 @@ wait_for_reply(sock, from, sent)
 	size_t fromlen = sizeof (*from);
 	fd_set *fdsp;
 
-	fdsn = howmany(sock+1, NFDBITS) * sizeof(fd_mask);
+	fdsn = _howmany(sock+1, NFDBITS) * sizeof(fd_mask);
 	if ((fdsp = (fd_set *)malloc(fdsn)) == NULL)
 		err(1, "malloc");
 	memset(fdsp, 0, fdsn);

@@ -69,13 +69,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <ctype.h>
-//#include <err.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/select.h>
-
-#define howmany(x, y) _howmany(x, y)
 
 #define	DEFDATALEN	(64 - 8)		/* default data length */
 #define	MAXIPLEN	60
@@ -475,7 +472,7 @@ int main(int argc, char **argv)
 	if ((options & F_FLOOD) == 0)
 		catcher();		/* start things going */
 
-	fdmasks = howmany(s+1, NFDBITS) * sizeof(fd_mask);
+	fdmasks = _howmany(s+1, NFDBITS) * sizeof(fd_mask);
 	if ((fdmaskp = (fd_set *)malloc(fdmasks)) == NULL)
 		err(1, "malloc");
 
