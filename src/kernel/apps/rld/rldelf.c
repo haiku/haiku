@@ -55,7 +55,7 @@ enum {
 	RFLAG_RW					= 0x0001,
 	RFLAG_ANON					= 0x0002,
 
-	RFLAG_SORTED				= 0x0400,	// also means `initialized'
+	RFLAG_INITIALIZED			= 0x0400,
 	RFLAG_SYMBOLIC				= 0x0800,
 	RFLAG_RELOCATED				= 0x1000,
 	RFLAG_PROTECTED				= 0x2000,
@@ -154,10 +154,10 @@ static struct uspace_program_args const *gProgramArgs;
 
 #ifdef TRACE_RLD
 
-#define	FATAL(x,y...) \
+#define	FATAL(x,err,y...) \
 	if (x) { \
 		dprintf("rld.so: " y); \
-		_kern_exit_team(0); \
+		_kern_loading_app_failed(err); \
 	}
 
 void
@@ -175,10 +175,10 @@ dprintf(const char *format, ...)
 }
 #else
 
-#define	FATAL(x,y...) \
+#define	FATAL(x,err,y...) \
 	if (x) { \
 		printf("rld.so: " y); \
-		_kern_exit_team(0); \
+		_kern_loading_app_failed(err); \
 	}
 
 #endif
@@ -389,7 +389,8 @@ count_regions(char const *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, "unhandled pheader type 0x%lx\n", pheaders[i].p_type);
+				FATAL(true, B_BAD_DATA, "unhandled pheader type 0x%lx\n",
+					pheaders[i].p_type);
 				break;
 		}
 	}
@@ -541,7 +542,8 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, "unhandled pheader type 0x%lx\n", pheader[i].p_type);
+				FATAL(true, B_BAD_DATA, "unhandled pheader type 0x%lx\n",
+					pheader[i].p_type);
 				break;
 		}
 	}
@@ -914,6 +916,17 @@ register_image(image_t *image, int fd, const char *path)
 }
 
 
+static void
+relocate_image(image_t *image)
+{
+	status_t status = arch_relocate_image(image);
+
+	FATAL(status < B_OK, status, "troubles relocating\n");
+
+	_kern_image_relocated(image->id);
+}
+
+
 static const char *
 search_path_for_type(image_type type)
 {
@@ -1116,6 +1129,7 @@ load_container(char const *name, image_type type, const char *rpath)
 	bool dynamic_success;
 	image_t *found;
 	image_t *image;
+	status_t status;
 
 	struct Elf32_Ehdr eheader;
 
@@ -1133,34 +1147,40 @@ load_container(char const *name, image_type type, const char *rpath)
 
 	// Try to load explicit image path first
 	fd = open_container(path, type, rpath);
-	FATAL((fd < 0), "cannot open file %s\n", path);
+	FATAL((fd < 0), fd, "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
-	FATAL((len != sizeof(eheader)), "troubles reading ELF header\n");
+	FATAL((len != sizeof(eheader)), B_BAD_DATA,
+		"troubles reading ELF header\n");
 
-	if (parse_elf_header(&eheader, &pheaderSize, &sheaderSize) < B_OK) {
-		FATAL(1, "incorrect ELF header\n");
-	}
+	status = parse_elf_header(&eheader, &pheaderSize, &sheaderSize);
+	FATAL((status < B_OK), status, "incorrect ELF header\n");
+
 	// ToDo: what to do about this restriction??
-	FATAL((pheaderSize > (int)sizeof(ph_buff)), "cannot handle Program headers bigger than %lu\n", (long unsigned)sizeof(ph_buff));
+	FATAL((pheaderSize > (int)sizeof(ph_buff)), B_UNSUPPORTED,
+		"cannot handle Program headers bigger than %lu\n",
+		(long unsigned)sizeof(ph_buff));
 
 	len = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
-	FATAL((len != pheaderSize), "troubles reading Program headers\n");
+	FATAL((len != pheaderSize), B_BAD_DATA,
+		"troubles reading Program headers\n");
 
 	num_regions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	FATAL((num_regions <= 0), "troubles parsing Program headers, num_regions= %d\n", num_regions);
+	FATAL((num_regions <= 0), B_BAD_DATA,
+		"troubles parsing Program headers, num_regions= %d\n", num_regions);
 
 	image = create_image(name, path, num_regions);
-	FATAL((!image), "failed to allocate image_t control block\n");
+	FATAL((!image), B_NO_MEMORY, "failed to allocate image_t control block\n");
 
 	parse_program_headers(image, ph_buff, eheader.e_phnum, eheader.e_phentsize);
-	FATAL(!assert_dynamic_loadable(image), "dynamic segment must be loadable (implementation restriction)\n");
+	FATAL(!assert_dynamic_loadable(image), B_UNSUPPORTED,
+		"dynamic segment must be loadable (implementation restriction)\n");
 
 	map_success = map_image(fd, path, image, type == B_APP_IMAGE);
-	FATAL(!map_success, "troubles reading image\n");
+	FATAL(!map_success, B_ERROR, "troubles reading image\n");
 
 	dynamic_success = parse_dynamic_segment(image);
-	FATAL(!dynamic_success, "troubles handling dynamic section\n");
+	FATAL(!dynamic_success, B_BAD_DATA, "troubles handling dynamic section\n");
 
 	image->entry_point = eheader.e_entry + image->regions[0].delta;
 	image->type = type;
@@ -1205,7 +1225,7 @@ load_dependencies(image_t *image)
 	rpath = find_dt_rpath(image);
 
 	image->needed = rldalloc(image->num_needed * sizeof(image_t *));
-	FATAL((!image->needed), "failed to allocate needed struct\n");
+	FATAL((!image->needed), B_NO_MEMORY, "failed to allocate needed struct\n");
 	memset(image->needed, 0, image->num_needed * sizeof(image_t *));
 
 	for (i = 0, j = 0; d[i].d_tag != DT_NULL; i++) {
@@ -1225,25 +1245,58 @@ load_dependencies(image_t *image)
 		}
 	}
 
-	FATAL((j != image->num_needed), "Internal error at load_dependencies()");
+	FATAL((j != image->num_needed), B_ERROR,
+		"Internal error at load_dependencies()");
 
 	return;
 }
 
 
 static uint32
-topological_sort(image_t *image, uint32 slot, image_t **initList)
+topological_sort(image_t *image, uint32 slot, image_t **initList,
+	uint32 sortFlag)
 {
 	uint32 i;
 
-	image->flags |= RFLAG_SORTED; /* make sure we don't visit this one */
-	for (i = 0; i < image->num_needed; i++) {
-		if (!(image->needed[i]->flags & RFLAG_SORTED))
-			slot = topological_sort(image->needed[i], slot, initList);
-	}
+	if (image->flags & sortFlag)
+		return slot;
+
+	image->flags |= sortFlag; /* make sure we don't visit this one */
+	for (i = 0; i < image->num_needed; i++)
+		slot = topological_sort(image->needed[i], slot, initList, sortFlag);
 
 	initList[slot] = image;
 	return slot + 1;
+}
+
+
+static unsigned
+get_sorted_image_list(image_t *image, image_t ***_list, uint32 sortFlag)
+{
+	image_t **list;
+
+	list = rldalloc(gLoadedImageCount * sizeof(image_t *));
+	FATAL((!list), B_NO_MEMORY, "memory shortage in get_sorted_image_list()");
+	memset(list, 0, gLoadedImageCount * sizeof(image_t *));
+
+	*_list = list;
+	return topological_sort(image, 0, list, sortFlag);
+}
+
+
+static void
+relocate_dependencies(image_t *image)
+{
+	unsigned i;
+	unsigned count;
+	image_t **list;
+
+	count = get_sorted_image_list(image, &list, RFLAG_RELOCATED);
+
+	for (i = 0; i < count; i++)
+		relocate_image(list[i]);
+
+	rldfree(list);
 }
 
 
@@ -1251,27 +1304,18 @@ static void
 init_dependencies(image_t *image, bool initHead)
 {
 	unsigned i;
-	unsigned slot;
+	unsigned count;
 	image_t **initList;
 
-	initList = rldalloc(gLoadedImageCount * sizeof(image_t *));
-	FATAL((!initList), "memory shortage in init_dependencies()");
-	memset(initList, 0, gLoadedImageCount * sizeof(image_t *));
+	count = get_sorted_image_list(image, &initList, RFLAG_INITIALIZED);
 
-	image->flags |= RFLAG_SORTED; /* make sure we don't visit this one */
-	slot = 0;
-	for (i = 0; i < image->num_needed; i++) {
-		if (!(image->needed[i]->flags & RFLAG_SORTED))
-			slot = topological_sort(image->needed[i], slot, initList);
+	if (!initHead) {
+		// this removes the "calling" image
+		image->flags &= ~RFLAG_INITIALIZED;
+		initList[--count] = NULL;
 	}
 
-	if (initHead) {
-		// this adds the init function of the "calling" image
-		initList[slot] = image;
-		slot += 1;
-	}
-
-	for (i = 0; i < slot; i++) {
+	for (i = 0; i < count; i++) {
 		addr_t _initf = initList[i]->init_routine;
 		libinit_f *initf = (libinit_f *)(_initf);
 
@@ -1309,10 +1353,8 @@ put_image(image_t *image)
  *
  *	+ load_program()
  *	+ load_library()
- *	+ load_addon()
  *	+ unload_program()
  *	+ unload_library()
- *	+ unload_addon()
  *	+ dynamic_symbol()
  */
 
@@ -1333,10 +1375,7 @@ load_program(char const *path, void **_entry)
 		load_dependencies(iter);
 	}
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		status_t status = relocate_image(iter);
-		FATAL(status < B_OK, "troubles relocating\n");
-	}
+	relocate_dependencies(image);
 
 	init_dependencies(gLoadedImages.head, true);
 	remap_images();
@@ -1379,10 +1418,7 @@ load_library(char const *path, uint32 flags, bool addOn)
 		load_dependencies(iter);
 	}
 
-	for (iter = gLoadedImages.head; iter; iter = iter->next) {
-		status_t status = relocate_image(iter);
-		FATAL(status < B_OK, "troubles relocating\n");
-	}
+	relocate_dependencies(image);
 
 	remap_images();
 	init_dependencies(image, true);
@@ -1527,7 +1563,7 @@ rldelf_init(struct uspace_program_args const *_args)
 {
 	gProgramArgs = _args;
 
-	rld_sem = create_sem(1, "rld_lock\n");
+	rld_sem = create_sem(1, "rld_lock");
 	rld_sem_owner = -1;
 	rld_sem_count = 0;
 }
