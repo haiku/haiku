@@ -24,6 +24,7 @@ public:
 private:
 	status_t _ProcessArguments(int argc, char *argv[]);
 	void _PrintHelp();
+	void _PrintTitle();
 	
 	VerbosityLevel fVerbosityLevel;
 	uint32 fBlockSize;

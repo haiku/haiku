@@ -75,6 +75,7 @@ Shell::_ProcessArguments(int argc, char *argv[]) {
 	{
 		std::string &arg = *i;
 		if (arg == "--help") {
+			_PrintTitle();
 			RETURN(B_ERROR);
 		} else if (arg == "-v0" || arg == "--quiet") {
 			fVerbosityLevel = VERBOSITY_NONE;
@@ -133,5 +134,12 @@ Shell::_PrintHelp() {
 	printf("VALID ARGUMENTS:\n");
 	printf("  --help:   Displays this help text\n");
 	printf("  --quiet:  Turns off console output\n");
+	printf("\n");
+}
+
+void
+Shell::_PrintTitle() {
+	printf("makeudfimage v1.0.0 beta 1\n");
+	printf("Copyright © 2004 Tyler Dauwalder\n");
 	printf("\n");
 }
