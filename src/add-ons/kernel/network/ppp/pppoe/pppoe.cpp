@@ -35,7 +35,7 @@ static int32 sHostUniq = 0;
 status_t std_ops(int32 op, ...);
 
 static BLocker sLock;
-static List<PPPoEDevice*> *sDevices;
+static TemplateList<PPPoEDevice*> *sDevices;
 
 
 uint32
@@ -174,7 +174,7 @@ std_ops(int32 op, ...)
 				return B_ERROR;
 			}
 			
-			sDevices = new List<PPPoEDevice*>;
+			sDevices = new TemplateList<PPPoEDevice*>;
 			
 			sEthernet->set_pppoe_receiver(pppoe_input);
 			

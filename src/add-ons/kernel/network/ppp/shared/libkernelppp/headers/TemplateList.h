@@ -1,4 +1,4 @@
-// List.h
+// TemplateList.h
 //
 // Copyright (c) 2003, Ingo Weinhold (bonefish@cs.tu-berlin.de)
 //
@@ -25,8 +25,8 @@
 // dealings in this Software without prior written authorization of the
 // copyright holder.
 
-#ifndef LIST_H
-#define LIST_H
+#ifndef TEMPLATE_LIST_H
+#define TEMPLATE_LIST_H
 
 #ifdef _KERNEL_MODE
 	#include <kernel_cpp.h>
@@ -46,15 +46,15 @@ public:
 };
 
 /*!
-	\class List
+	\class TemplateList
 	\brief A generic list implementation.
 */
 template<typename ITEM,
 		 typename DEFAULT_ITEM_SUPPLIER = DefaultDefaultItemCreator<ITEM> >
-class List {
+class TemplateList {
 public:
 	typedef ITEM					item_t;
-	typedef List					list_t;
+	typedef TemplateList			list_t;
 
 private:
 	static item_t					sDefaultItem;
@@ -62,8 +62,8 @@ private:
 	static const size_t				kMaximalChunkSize = 1024 * 1024;
 
 public:
-	List(size_t chunkSize = kDefaultChunkSize);
-	~List();
+	TemplateList(size_t chunkSize = kDefaultChunkSize);
+	~TemplateList();
 
 	inline const item_t &GetDefaultItem() const;
 	inline item_t &GetDefaultItem();
@@ -106,13 +106,13 @@ private:
 
 // sDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
-	List<ITEM, DEFAULT_ITEM_SUPPLIER>::sDefaultItem(
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t
+	TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::sDefaultItem(
 		DEFAULT_ITEM_SUPPLIER::GetItem());
 
 // constructor
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::List(size_t chunkSize)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::TemplateList(size_t chunkSize)
 	: fCapacity(0),
 	  fChunkSize(chunkSize),
 	  fItemCount(0),
@@ -125,7 +125,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::List(size_t chunkSize)
 
 // destructor
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::~List()
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::~TemplateList()
 {
 	MakeEmpty();
 	free(fItems);
@@ -134,8 +134,8 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::~List()
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
+const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 {
 	return sDefaultItem;
 }
@@ -143,8 +143,8 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem() const
 // GetDefaultItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem()
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem()
 {
 	return sDefaultItem;
 }
@@ -153,7 +153,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::GetDefaultItem()
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 inline
 void
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::_MoveItems(item_t* items, int32 offset, int32 count)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::_MoveItems(item_t* items, int32 offset, int32 count)
 {
 	if (count > 0 && offset != 0)
 		memmove(items + offset, items, count * sizeof(item_t));
@@ -162,7 +162,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::_MoveItems(item_t* items, int32 offset, int32
 // AddItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item, int32 index)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item, int32 index)
 {
 	bool result = (index >= 0 && index <= fItemCount
 				   && _Resize(fItemCount + 1));
@@ -176,7 +176,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item, int32 index)
 // AddItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item)
 {
 	bool result = true;
 	if ((int32)fCapacity > fItemCount) {
@@ -194,7 +194,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddItem(const item_t &item)
 // AddList
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list, int32 index)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list, int32 index)
 {
 	bool result = (list && index >= 0 && index <= fItemCount);
 	if (result && list->fItemCount > 0) {
@@ -212,7 +212,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list, int32 index)
 // AddList
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list)
 {
 	bool result = (list);
 	if (result && list->fItemCount > 0) {
@@ -231,7 +231,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::AddList(list_t *list)
 // RemoveItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(const item_t &item)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(const item_t &item)
 {
 	int32 index = IndexOf(item);
 	bool result = (index >= 0);
@@ -243,7 +243,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(const item_t &item)
 // RemoveItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(int32 index)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(int32 index)
 {
 	if (index >= 0 && index < fItemCount) {
 		fItems[index].~item_t();
@@ -257,7 +257,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::RemoveItem(int32 index)
 // ReplaceItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::ReplaceItem(int32 index, const item_t &item)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ReplaceItem(int32 index, const item_t &item)
 {
 	if (index >= 0 && index < fItemCount) {
 		fItems[index] = item;
@@ -269,7 +269,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::ReplaceItem(int32 index, const item_t &item)
 // MoveItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::MoveItem(int32 oldIndex, int32 newIndex)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::MoveItem(int32 oldIndex, int32 newIndex)
 {
 	if (oldIndex >= 0 && oldIndex < fItemCount
 		&& newIndex >= 0 && newIndex <= fItemCount) {
@@ -290,7 +290,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::MoveItem(int32 oldIndex, int32 newIndex)
 // MakeEmpty
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 void
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::MakeEmpty()
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::MakeEmpty()
 {
 	for (int32 i = 0; i < fItemCount; i++)
 		fItems[i].~item_t();
@@ -300,7 +300,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::MakeEmpty()
 // CountItems
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 int32
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::CountItems() const
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::CountItems() const
 {
 	return fItemCount;
 }
@@ -308,15 +308,15 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::CountItems() const
 // IsEmpty
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::IsEmpty() const
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::IsEmpty() const
 {
 	return (fItemCount == 0);
 }
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
+const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 {
 	if (index >= 0 && index < fItemCount)
 		return fItems[index];
@@ -325,8 +325,8 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index) const
 
 // ItemAt
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t &
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 {
 	if (index >= 0 && index < fItemCount)
 		return fItems[index];
@@ -335,8 +335,8 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::ItemAt(int32 index)
 
 // Items
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
-const List<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::Items() const
+const TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::item_t *
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::Items() const
 {
 	return fItems;
 }
@@ -344,7 +344,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::Items() const
 // IndexOf
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 int32
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::IndexOf(const item_t &item) const
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::IndexOf(const item_t &item) const
 {
 	for (int32 i = 0; i < fItemCount; i++) {
 		if (fItems[i] == item)
@@ -356,7 +356,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::IndexOf(const item_t &item) const
 // HasItem
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::HasItem(const item_t &item) const
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::HasItem(const item_t &item) const
 {
 	return (IndexOf(item) >= 0);
 }
@@ -364,7 +364,7 @@ List<ITEM, DEFAULT_ITEM_SUPPLIER>::HasItem(const item_t &item) const
 // _Resize
 template<typename ITEM, typename DEFAULT_ITEM_SUPPLIER>
 bool
-List<ITEM, DEFAULT_ITEM_SUPPLIER>::_Resize(size_t count)
+TemplateList<ITEM, DEFAULT_ITEM_SUPPLIER>::_Resize(size_t count)
 {
 	bool result = true;
 	// calculate the new capacity

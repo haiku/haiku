@@ -22,7 +22,7 @@
 #include <KPPPStateMachine.h>
 #endif
 
-#include <List.h>
+#include <TemplateList.h>
 #include <LockerHelper.h>
 
 class PPPDevice;
@@ -221,7 +221,7 @@ class PPPInterface : public PPPLayer {
 		uint32 fMRU, fInterfaceMTU, fHeaderLength;
 		
 		PPPInterface *fParent;
-		List<PPPInterface*> fChildren;
+		TemplateList<PPPInterface*> fChildren;
 		bool fIsMultilink;
 		
 		bool fAutoRedial, fDialOnDemand;
@@ -232,7 +232,7 @@ class PPPInterface : public PPPLayer {
 		
 		PPPDevice *fDevice;
 		PPPProtocol *fFirstProtocol;
-		List<char*> fModules;
+		TemplateList<char*> fModules;
 		
 		PPPStateMachine fStateMachine;
 		PPPLCP fLCP;

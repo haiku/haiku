@@ -8,7 +8,7 @@
 #ifndef _K_PPP_LCP__H
 #define _K_PPP_LCP__H
 
-#include <List.h>
+#include <TemplateList.h>
 
 #ifndef _K_PPP_PROTOCOL__H
 #include <KPPPProtocol.h>
@@ -86,8 +86,8 @@ class PPPLCP : public PPPProtocol {
 	private:
 		PPPStateMachine& fStateMachine;
 		
-		List<PPPOptionHandler*> fOptionHandlers;
-		List<PPPLCPExtension*> fLCPExtensions;
+		TemplateList<PPPOptionHandler*> fOptionHandlers;
+		TemplateList<PPPLCPExtension*> fLCPExtensions;
 		
 		PPPProtocol *fTarget;
 };

@@ -10,7 +10,7 @@
 
 #include "PPPoE.h"
 
-#include <List.h>
+#include <TemplateList.h>
 
 
 enum PPPoE_TAG_TYPE {
@@ -74,7 +74,7 @@ class DiscoveryPacket {
 	private:
 		uint8 fCode;
 		uint16 fSessionID;
-		List<pppoe_tag*> fTags;
+		TemplateList<pppoe_tag*> fTags;
 		status_t fInitStatus;
 };
 

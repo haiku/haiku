@@ -46,6 +46,7 @@ enum ppp_manager_report_codes {
 
 
 enum ppp_connection_report_codes {
+	// the interface id is added to the following reports
 	PPP_REPORT_GOING_UP = 0,
 	PPP_REPORT_UP_SUCCESSFUL = 1,
 	PPP_REPORT_DOWN_SUCCESSFUL = 2,

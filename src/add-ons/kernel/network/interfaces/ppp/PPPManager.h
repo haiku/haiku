@@ -67,7 +67,7 @@ class PPPManager {
 	private:
 		BLocker fLock, fReportLock;
 		PPPReportManager fReportManager;
-		List<ppp_interface_entry*> fEntries;
+		TemplateList<ppp_interface_entry*> fEntries;
 		interface_id fNextID;
 		thread_id fDeleterThread, fPulseTimer;
 };

@@ -119,7 +119,8 @@ PPPStateMachine::NewPhase(ppp_phase next)
 		if(Interface().Ifnet())
 			Interface().Ifnet()->if_flags |= IFF_UP | IFF_RUNNING;
 		
-		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL, NULL, 0);
+		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL,
+			&fInterface.fID, sizeof(interface_id));
 	}
 }
 
@@ -245,7 +246,8 @@ PPPStateMachine::LocalAuthenticationAccepted(const char *name)
 		fLocalAuthenticationName = NULL;
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, NULL, 0);
+		PPP_REPORT_LOCAL_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
+		sizeof(interface_id));
 }
 
 
@@ -302,7 +304,8 @@ PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 		fPeerAuthenticationName = NULL;
 	
 	Interface().Report(PPP_CONNECTION_REPORT,
-		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, NULL, 0);
+		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, &fInterface.fID,
+		sizeof(interface_id));
 }
 
 
@@ -525,19 +528,13 @@ PPPStateMachine::UpFailedEvent()
 	
 	switch(State()) {
 		case PPP_STARTING_STATE:
-#if DEBUG
-			printf("PPPSM::UpFailedEvent(): Reporting...\n");
-#endif
 			Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DEVICE_UP_FAILED,
-				NULL, 0);
+				&fInterface.fID, sizeof(interface_id));
 			if(Interface().Parent())
 				Interface().Parent()->StateMachine().UpFailedEvent(Interface());
 			
 			NewPhase(PPP_DOWN_PHASE);
 				// tell DownEvent() that it should not create a connection-lost-report
-#if DEBUG
-			printf("PPPSM::UpFailedEvent(): Calling DownEvent()\n");
-#endif
 			DownEvent();
 		break;
 		
@@ -676,11 +673,13 @@ PPPStateMachine::DownEvent()
 		if(fLocalAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fLocalAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
-				PPP_REPORT_LOCAL_AUTHENTICATION_FAILED, NULL, 0);
+				PPP_REPORT_LOCAL_AUTHENTICATION_FAILED, &fInterface.fID,
+				sizeof(interface_id));
 		else if(fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface().Report(PPP_CONNECTION_REPORT,
-				PPP_REPORT_PEER_AUTHENTICATION_FAILED, NULL, 0);
+				PPP_REPORT_PEER_AUTHENTICATION_FAILED, &fInterface.fID,
+				sizeof(interface_id));
 		else {
 			// if we are going up and lost connection the redial attempt becomes
 			// a dial retry which is managed by the main thread in Interface::Up()
@@ -690,7 +689,7 @@ PPPStateMachine::DownEvent()
 			// test if UpFailedEvent() was not called
 			if(oldPhase != PPP_DOWN_PHASE)
 				Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
-					NULL, 0);
+					&fInterface.fID, sizeof(interface_id));
 		}
 		
 		if(Interface().Parent())
@@ -704,7 +703,8 @@ PPPStateMachine::DownEvent()
 		} else if(!Interface().DoesDialOnDemand())
 			Interface().Delete();
 	} else {
-		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL, NULL, 0);
+		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_DOWN_SUCCESSFUL,
+			&fInterface.fID, sizeof(interface_id));
 		
 		if(!Interface().DoesDialOnDemand())
 			Interface().Delete();
@@ -731,7 +731,8 @@ PPPStateMachine::OpenEvent()
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
-			if(!Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP, NULL, 0))
+			if(!Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_GOING_UP,
+					&fInterface.fID, sizeof(interface_id)))
 				return;
 			
 			if(Interface().Mode() == PPP_SERVER_MODE) {

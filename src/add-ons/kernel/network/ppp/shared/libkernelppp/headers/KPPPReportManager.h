@@ -13,7 +13,7 @@
 #include <KPPPDefs.h>
 #include <PPPReportDefs.h>
 
-#include <List.h>
+#include <TemplateList.h>
 
 
 #define PPP_REPLY(sender, value) send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
@@ -32,7 +32,7 @@ class PPPReportManager {
 
 	private:
 		BLocker& fLock;
-		List<ppp_report_request*> fReportRequests;
+		TemplateList<ppp_report_request*> fReportRequests;
 };
 
 

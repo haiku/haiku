@@ -216,7 +216,7 @@ PPPInterface::~PPPInterface()
 		fLock.Unlock();
 	}
 	
-	Report(PPP_DESTRUCTION_REPORT, 0, NULL, 0);
+	Report(PPP_DESTRUCTION_REPORT, 0, &fID, sizeof(interface_id));
 		// tell all listeners that we are being destroyed
 	
 	int32 tmp;
@@ -1564,7 +1564,9 @@ redial_thread(void *data)
 	// we try to receive data instead of snooze, so we can quit on destruction
 	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK) {
 		*info.thread = -1;
-		info.interface->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_ABORTED, NULL, 0);
+		interface_id id = info.interface->ID();
+		info.interface->Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_ABORTED,
+			&id, sizeof(interface_id));
 		return B_OK;
 	}
 	

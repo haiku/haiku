@@ -8,7 +8,7 @@
 #ifndef _K_PPP_CONFIGURE_PACKET__H
 #define _K_PPP_CONFIGURE_PACKET__H
 
-#include <List.h>
+#include <TemplateList.h>
 
 struct mbuf;
 
@@ -53,7 +53,7 @@ class PPPConfigurePacket {
 
 	private:
 		uint8 fCode, fID;
-		List<ppp_configure_item*> fItems;
+		TemplateList<ppp_configure_item*> fItems;
 };
 
 
