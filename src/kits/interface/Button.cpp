@@ -86,7 +86,7 @@ status_t BButton::Archive(BMessage* archive, bool deep) const
 	return err;
 }
 //------------------------------------------------------------------------------
-void HButton::Draw(BRect updateRect)
+void BButton::Draw(BRect updateRect)
 {
 	font_height fh;
 	GetFontHeight(&fh);
@@ -465,7 +465,7 @@ BButton &BButton::operator=(const BButton &)
 	return *this;
 }
 //------------------------------------------------------------------------------
-BRect HButton::DrawDefault(BRect bounds, bool enabled)
+BRect BButton::DrawDefault(BRect bounds, bool enabled)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
