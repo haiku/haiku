@@ -215,7 +215,7 @@ vnode_ops fs_entry =  {
 #define BFS_IO_SIZE	65536
 
 // ToDo: has to change to "bfs" later
-#ifdef COMPILE_FOR_R5
+#ifdef BFS_REPLACEMENT 
 #	define BFS_NAME	"bfs"
 #else
 #	define BFS_NAME "obfs"
