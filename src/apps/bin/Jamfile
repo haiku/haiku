@@ -17,6 +17,7 @@ StdBinCommands
 	listimage.c
 	listport.c
 	listsem.c
+	mount.c
 	prio.c
 	ps.c
 	renice.c
