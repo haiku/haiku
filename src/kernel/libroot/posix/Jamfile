@@ -29,7 +29,6 @@ SubInclude OBOS_TOP src kernel libroot posix stdio ;
 SubInclude OBOS_TOP src kernel libroot posix stdlib ;
 SubInclude OBOS_TOP src kernel libroot posix string ;
 SubInclude OBOS_TOP src kernel libroot posix sys ;
-SubInclude OBOS_TOP src kernel libroot posix termios ;
 SubInclude OBOS_TOP src kernel libroot posix time ;
 SubInclude OBOS_TOP src kernel libroot posix unistd ;
 
