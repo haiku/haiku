@@ -1181,12 +1181,12 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 	if(set_font_data)
 	{
 		BFont font;
-		ServerFont *sf=d->font;
+		ServerFont *sf=&(d->font);
 
 		if(!sf)
 			return;
 
-		FontStyle *style=d->font->Style();
+		FontStyle *style=d->font.Style();
 
 		if(!style)
 			return;
@@ -1210,11 +1210,11 @@ void ViewDriver::SetLayerData(LayerData *d, bool set_font_data)
 
 float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d )
 		return 0.0;
 	screenwin->Lock();
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)
@@ -1274,11 +1274,11 @@ float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 
 float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d )
 		return 0.0;
 	screenwin->Lock();
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)
@@ -1324,13 +1324,13 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d )
 		return;
 	screenwin->Lock();
 
 	pt.y--;	// because of Be's backward compatibility hack
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)

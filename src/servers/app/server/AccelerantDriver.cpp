@@ -349,14 +349,14 @@ void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, Laye
 */
 void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d)
 		return;
 
 	Lock();
 
 	pt.y--;	// because of Be's backward compatibility hack
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)
@@ -2479,11 +2479,11 @@ bool AccelerantDriver::DumpToFile(const char *path)
 */
 float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d)
 		return 0.0;
 	Lock();
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)
@@ -2564,11 +2564,11 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 */
 float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
-	if(!string || !d || !d->font)
+	if(!string || !d)
 		return 0.0;
 	Lock();
 
-	ServerFont *font=d->font;
+	ServerFont *font=&(d->font);
 	FontStyle *style=font->Style();
 
 	if(!style)
