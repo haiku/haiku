@@ -1,11 +1,11 @@
-/* POSIX signals handling routines
-** 
+/* 
 ** Copyright 2002, Angelo Mottola, a.mottola@libero.it. All rights reserved.
 ** Copyright 2002-2004, The Haiku Team. All rights reserved.
 **
 ** Distributed under the terms of the Haiku License.
 */
 
+/* POSIX signals handling routines */
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -82,11 +82,12 @@ handle_signals(struct thread *thread, int state)
 					case SIGKILL:
 					case SIGKILLTHR:
 					default:
-						if (!(thread->return_flags & THREAD_RETURN_EXIT))
-							thread->return_flags |= THREAD_RETURN_INTERRUPTED;
+						if (thread->exit.reason != THREAD_RETURN_EXIT)
+							thread->exit.reason = THREAD_RETURN_INTERRUPTED;
+
 						RELEASE_THREAD_LOCK();
 						restore_interrupts(state);
-						
+
 						// ToDo: when we have more than a thread per process,
 						// it can likely happen (for any thread other than the first)
 						// that here, interrupts are still disabled.
