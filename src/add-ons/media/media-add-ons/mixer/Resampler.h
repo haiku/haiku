@@ -1,6 +1,5 @@
 #ifndef _RESAMPLER_H
 #define _RESAMPLER_H
-#include <stdio.h>
 /* Copyright (C) 2003 Marcus Overhagen
  * Released under terms of the MIT license.
  *
