@@ -156,6 +156,11 @@ main2(void *unused)
 	TRACE(("Init modules\n"));
 	module_init(&ka);
 
+	vm_free_kernel_args(&ka);
+		// module_init() is supposed to be the last user of the kernel args
+		// Note: don't confuse the kernel_args structure (which is never freed)
+		// with the kernel args ranges it contains (and which are freed here).
+
 	/* bootstrap all the filesystems */
 	TRACE(("Bootstrap file systems\n"));
 	vfs_bootstrap_file_systems();
