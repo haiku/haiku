@@ -24,6 +24,7 @@ public:
 	// Test functions
 	//------------------------------------------------------------
 	void ShutdownTest();
+	void ThreadLimitTest();
 private:
 	BTestApp	*fApplication;
 };

@@ -19,8 +19,10 @@ RegistrarThreadManagerTest::Suite() {
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
 	typedef CppUnit::TestCaller<RegistrarThreadManagerTest> TC;
 		
-	suite->addTest( new TC("RegistrarThreadManager::Shutdown test",
+	suite->addTest( new TC("RegistrarThreadManager::Shutdown Test",
 						   &RegistrarThreadManagerTest::ShutdownTest) );
+	suite->addTest( new TC("RegistrarThreadManager::Thread Limit Test",
+						   &RegistrarThreadManagerTest::ThreadLimitTest) );
 
 					   
 	return suite;
@@ -217,3 +219,92 @@ RegistrarThreadManagerTest::ShutdownTest()
 #endif	// !TEST_R5
 }
 
+void
+RegistrarThreadManagerTest::ThreadLimitTest()
+{
+#if TEST_R5
+	Outputf("(no tests performed for R5 version)\n");
+#else
+	NextSubTest();
+	status_t err = B_OK;
+	RegistrarThreadManager manager;
+	CHK(fApplication && fApplication->InitCheck() == B_OK);
+	BMessenger managerMessenger(NULL, fApplication, &err);
+	CHK(err == B_OK && managerMessenger.IsValid());
+	
+	const uint termThreads = 2;
+	
+	// This test is only useful if the thread limit of the manager
+	// class is > kTermThreads
+	CHK(termThreads < RegistrarThreadManager::kThreadLimit);
+	
+	// Launch some terminating threads
+	uint i;
+	for (i = 0; i < termThreads; i++) {
+		NextSubTest();
+		char name[1024];
+		sprintf(name, "terminating #%d", i);
+		RegistrarThread *thread = new TerminatingThread(name, B_NORMAL_PRIORITY, managerMessenger);
+		CHK(thread != NULL);
+		CHK(thread->InitCheck() == B_OK);
+		CHK(manager.LaunchThread(thread) == B_OK);
+	}
+	
+	// Now fill up the manager with non-terminating threads
+	for (; i < RegistrarThreadManager::kThreadLimit; i++) {
+		NextSubTest();
+		char name[1024];
+		sprintf(name, "nice #%d", i);
+		RegistrarThread *thread = new WellBehavedInfiniteThread(name, B_NORMAL_PRIORITY, managerMessenger);
+		CHK(thread != NULL);
+		CHK(thread->InitCheck() == B_OK);
+		CHK(manager.LaunchThread(thread) == B_OK);
+	}
+	CHK(manager.ThreadCount() == RegistrarThreadManager::kThreadLimit);
+	
+	// Now try to launch just one more...
+	NextSubTest();
+	{
+		char *name = "hopeless thread";
+		RegistrarThread *thread = new WellBehavedInfiniteThread(name, B_NORMAL_PRIORITY, managerMessenger);
+		CHK(thread != NULL);
+		CHK(thread->InitCheck() == B_OK);
+		CHK(manager.LaunchThread(thread) == B_NO_MORE_THREADS);
+		delete thread;
+	}
+	
+	// Now wait a little bit for our terminating threads to quit,
+	// cleanup after them, and make sure we can now launch that
+	// many threads again
+	NextSubTest();
+	snooze(500000);
+	manager.CleanupThreads();
+	
+	for (i = 0; i < termThreads; i++) {
+		NextSubTest();
+		char name[1024];
+		sprintf(name, "2nd round nice #%d", i);
+		RegistrarThread *thread = new TerminatingThread(name, B_NORMAL_PRIORITY, managerMessenger);
+		CHK(thread != NULL);
+		CHK(thread->InitCheck() == B_OK);
+		CHK(manager.LaunchThread(thread) == B_OK);
+	}
+	
+	// Now try once more to launch just one more...
+	NextSubTest();
+	{
+		char *name = "hopeless thread";
+		RegistrarThread *thread = new WellBehavedInfiniteThread(name, B_NORMAL_PRIORITY, managerMessenger);
+		CHK(thread != NULL);
+		CHK(thread->InitCheck() == B_OK);
+		CHK(manager.LaunchThread(thread) == B_NO_MORE_THREADS);
+		delete thread;
+	}
+	
+	// Cleanup
+	NextSubTest();
+	manager.ShutdownThreads();
+	snooze(500000);
+
+#endif	// !TEST_R5
+}
