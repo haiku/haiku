@@ -97,7 +97,10 @@ resattr=$sourceDir/objects/${arch}.R1/tools/resattr/resattr
 fsShellCommand=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/fs_shell/fs_shell_command
 bfsShell=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/bfs/bfs_shell/bfs_shell
 
-export RUN_WITHOUT_APP_SERVER=1
+if [ x$RUN_WITHOUT_APP_SERVER != x ]; then
+	# define only, if not already set
+	export RUN_WITHOUT_APP_SERVER=1
+fi
 export TARGET_PLATFORM=haiku
 
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
