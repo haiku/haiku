@@ -32,6 +32,9 @@
 	#define DEBUG 0
 #endif
 
+#undef TRACE
+#undef ASSERT
+
 #if DEBUG > 0
 	#define TRACE(a) 	debug_printf a
 	#define ASSERT(a)	if (a) {} else TRACE(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
