@@ -198,10 +198,18 @@ list_remove_tail_item(struct list *list)
 void
 list_move_to_list(struct list *sourceList, struct list *targetList)
 {
+	if (list_is_empty(sourceList)) {
+		targetList->link.next = targetList->link.prev = &targetList->link;
+		return;
+	}
+
 	*targetList = *sourceList;
+
+	// correct link pointers to this list
 	targetList->link.next->prev = &targetList->link;
 	targetList->link.prev->next = &targetList->link;
 
+	// empty source list
 	sourceList->link.next = sourceList->link.prev = &sourceList->link;
 }
 
