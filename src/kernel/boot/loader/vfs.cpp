@@ -113,6 +113,13 @@ Node::Size() const
 }
 
 
+ino_t
+Node::Inode() const
+{
+	return 0;
+}
+
+
 status_t 
 Node::Acquire()
 {
@@ -247,6 +254,7 @@ Descriptor::Stat(struct stat &stat)
 {
 	stat.st_mode = fNode->Type();
 	stat.st_size = fNode->Size();
+	stat.st_ino = fNode->Inode();
 
 	return B_OK;
 }
