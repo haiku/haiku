@@ -1,1 +1,9 @@
 SubDir OBOS_TOP src add-ons disk_scanner partition ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+Addon <gui>intel : disk_scanner : intel.cpp : false
+	: <boot!home!config!lib>libdiskdevice.so be ;
+AbsSymLink <boot!home!config!add-ons!disk_scanner!partition>intel : <gui>intel
+	: /boot/home/config/add-ons/disk_scanner/partition ;
