@@ -36,7 +36,7 @@ else
 	imagePath=$1
 fi
 imageSize=40
-#imageSize=80
+
 # ufs_mount path
 ufsMount=ufs_mount
 
@@ -66,7 +66,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	renice rmattr addattr listdev pwd chmod chown chgrp dd \
 	tee md5sum catattr query lsindex mkindex roster listimage \
 	quit open translate setvolume waitfor uname iroster keymap \
-	strace rmdir"
+	strace rmdir error"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so"
@@ -207,7 +207,7 @@ cd $targetDir/beos/bin
 echo "Installing scripts and data files..."
 cd $sourceDir
 cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
-cp data/etc/profile $targetDir/beos/etc/
+cp data/etc/profile data/etc/termcap $targetDir/beos/etc/
 cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
 cp -R distro/x86.R1/beos/etc $targetDir/beos/
 cp data/settings/kernel/drivers/kernel $targetDir/home/config/settings/kernel/drivers/
