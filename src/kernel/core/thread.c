@@ -159,7 +159,7 @@ create_thread_struct(const char *name)
 	t->id = atomic_add(&sNextThreadID, 1);
 	t->team = NULL;
 	t->cpu = NULL;
-	t->sem_blocking = -1;
+	t->sem.blocking = -1;
 	t->fault_handler = 0;
 	t->page_faults_allowed = 1;
 	t->kernel_stack_region_id = -1;
@@ -440,10 +440,10 @@ _dump_thread_info(struct thread *t)
 		dprintf("\n");
 	dprintf("sig_pending:  0x%lx\n", t->sig_pending);
 	dprintf("in_kernel:    %d\n", t->in_kernel);
-	dprintf("sem_blocking: 0x%lx\n", t->sem_blocking);
-	dprintf("sem_count:    0x%x\n", t->sem_count);
-	dprintf("sem_errcode:  0x%x\n", t->sem_errcode);
-	dprintf("sem_flags:    0x%x\n", t->sem_flags);
+	dprintf("sem.blocking: 0x%lx\n", t->sem.blocking);
+	dprintf("sem.count:    0x%x\n", t->sem.count);
+	dprintf("sem.acquire_status: 0x%x\n", t->sem.acquire_status);
+	dprintf("sem.flags:    0x%x\n", t->sem.flags);
 	dprintf("fault_handler: %p\n", (void *)t->fault_handler);
 	dprintf("args:         %p %p\n", t->args1, t->args2);
 	dprintf("entry:        %p\n", (void *)t->entry);
@@ -1280,9 +1280,9 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
 
 	if (thread->state == B_THREAD_WAITING) {
-		if (thread->sem_blocking == sSnoozeSem)
+		if (thread->sem.blocking == sSnoozeSem)
 			info->state = B_THREAD_ASLEEP;
-		else if (thread->sem_blocking == thread->msg.read_sem)
+		else if (thread->sem.blocking == thread->msg.read_sem)
 			info->state = B_THREAD_RECEIVING;
 		else
 			info->state = B_THREAD_WAITING;
@@ -1290,7 +1290,7 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 		info->state = thread->state;
 
 	info->priority = thread->priority;
-	info->sem = thread->sem_blocking;
+	info->sem = thread->sem.blocking;
 	info->user_time = thread->user_time;
 	info->kernel_time = thread->kernel_time;
 	info->stack_base = (void *)thread->user_stack_base;
