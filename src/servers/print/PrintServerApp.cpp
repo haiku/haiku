@@ -14,7 +14,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2001, 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -112,7 +112,8 @@ PrintServerApp::PrintServerApp(status_t* err)
 	fSelectedIconLarge(NULL),
 	fReferences(0),
 	fHasReferences(0),
-	fUseConfigWindow(true)
+	fUseConfigWindow(true),
+	fFolder(NULL)
 {
 	fSettings = Settings::GetSettings();
 	LoadSettings();
@@ -151,6 +152,8 @@ bool PrintServerApp::QuitRequested()
 		
 	bool rc = Inherited::QuitRequested();
 	if (rc) {		
+		delete fFolder; fFolder = NULL;
+#if 0
 			// Find directory containing printer definition nodes
 		BPath path;
 		if (::find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
@@ -162,6 +165,7 @@ bool PrintServerApp::QuitRequested()
 				::watch_node(&nref, B_STOP_WATCHING, be_app_messenger);
 			}
 		}
+#endif
 
 			// Release all printers
 		Printer* printer;
@@ -195,18 +199,28 @@ void PrintServerApp::Release() {
 }
 
 void PrintServerApp::RegisterPrinter(BDirectory* printer) {
-	BString transport, address, connection;
+	BString transport, address, connection, state;
 	
-	printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport);
-	printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address);
-	printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection);
+	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK &&
+		printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address) == B_OK &&
+		printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK &&
+		printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK &&
+		state == "free") {
 	
- 	BAutolock lock(gLock);
-	if (lock.IsLocked()) {
-		Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
-	 	Printer* p = new Printer(printer, r);
-	 	AddHandler(p);
-	 	Acquire();
+ 		BAutolock lock(gLock);
+		if (lock.IsLocked()) {
+				// check if printer is already registered
+			node_ref node;
+			Printer* p;
+			if (printer->GetNodeRef(&node) != B_OK) return;
+			p = Printer::Find(&node);
+			if (p != NULL) return;
+				// register new printer
+			Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
+		 	p = new Printer(printer, r);
+		 	AddHandler(p);
+		 	Acquire();
+		}
 	}
 }
 
@@ -224,20 +238,29 @@ void PrintServerApp::NotifyPrinterDeletion(Printer* printer) {
 	}
 }
 
-void PrintServerApp::HandleRemovedPrinter(BMessage* msg) {
-	int32 opcode;
-	dev_t device;
-	ino_t node;
-	Printer* printer;
-	if (msg->FindInt32("opcode", &opcode) == B_OK && opcode == B_ENTRY_REMOVED &&
-		msg->FindInt32("device", &device) == B_OK &&
-		msg->FindInt64("node", &node) == B_OK &&
-		(printer = Printer::Find(device, node)) != NULL) {
+
+void PrintServerApp::EntryCreated(node_ref* node, entry_ref* entry) {
+	BEntry printer(entry);
+	if (printer.InitCheck() == B_OK && printer.IsDirectory()) {
+		BDirectory dir(&printer);
+		if (dir.InitCheck() == B_OK) RegisterPrinter(&dir);
+	}
+}
+
+void PrintServerApp::EntryRemoved(node_ref* node) {
+	Printer* printer = Printer::Find(node);
+	if (printer) {
 		if (printer == fDefaultPrinter) fDefaultPrinter = NULL;
 		UnregisterPrinter(printer);
 	}
 }
 
+void PrintServerApp::AttributeChanged(node_ref* node) {
+	BDirectory printer(node);
+	if (printer.InitCheck() == B_OK) {
+		RegisterPrinter(&printer);
+	}
+}
 
 // ---------------------------------------------------------------
 // SetupPrinterList
@@ -280,7 +303,11 @@ status_t PrintServerApp::SetupPrinterList()
 					}
 				}
 			}
-			
+		
+		
+			fFolder = new FolderWatcher(this, dir, true);
+			fFolder->SetListener(this);
+#if 0			
 				// If we scanned all entries successfully
 			node_ref nref;
 			if (rc == B_ENTRY_NOT_FOUND &&
@@ -288,6 +315,7 @@ status_t PrintServerApp::SetupPrinterList()
 					// Get node to watch
 				rc = ::watch_node(&nref, B_WATCH_DIRECTORY, be_app_messenger);
 			}
+#endif
 		}
 	}
 	
@@ -327,10 +355,6 @@ PrintServerApp::MessageReceived(BMessage* msg)
 		case B_COUNT_PROPERTIES:
 		case B_EXECUTE_PROPERTY:
 			HandleScriptingCommand(msg);
-			break;
-
-		case B_NODE_MONITOR:
-			HandleRemovedPrinter(msg);
 			break;
 		
 		default:
@@ -378,7 +402,6 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				// Store the settings in its attributes
 			printer.WriteAttr(PSRV_PRINTER_ATTR_PRT_NAME, B_STRING_TYPE, 0, printerName, 	::strlen(printerName)+1);
 			printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,	::strlen(driverName)+1);
-			printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", 		::strlen("free")+1);
 			printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,::strlen(transportName)+1);
 			printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0, transportPath,::strlen(transportPath)+1);
 			printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,	::strlen(connection)+1);
@@ -399,7 +422,7 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 								entry.Remove();
 							}
 						} else {
-							RegisterPrinter(&printer);
+							printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", 		::strlen("free")+1);
 						}
 					}
 					

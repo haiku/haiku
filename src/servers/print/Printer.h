@@ -14,7 +14,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2001, 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -55,6 +55,14 @@ class Printer;
 	// OpenTracker shared sources
 #include "ObjectList.h"
 
+class SpoolFolder : public Folder {
+protected:
+	void Notify(Job* job, int kind);
+	
+public:
+	SpoolFolder(BLocker* locker, BLooper* looper, const BDirectory& spoolDir);
+};
+
 /*****************************************************************************/
 // Printer
 //
@@ -71,7 +79,7 @@ public:
 
 		// Static helper functions
 	static Printer* Find(const BString& name);
-	static Printer* Find(dev_t device, ino_t node);
+	static Printer* Find(node_ref* node);
 	static Printer* At(int32 idx);
 	static void Remove(Printer* printer);
 	static int32 CountPrinters();
@@ -102,11 +110,11 @@ private:
 	status_t LoadPrinterAddon(image_id& id);
 	void AddCurrentPrinter(BMessage* m);
 
-	Folder fPrinter;           // the printer spooling directory
 	Resource* fResource;       // the resource required for processing a print job
+	SpoolFolder fPrinter;           // the printer spooling directory
 	bool fSinglePrintThread;   // is printer add-on allowed to process multiple print job at once
 	Job* fJob;                 // the next job to process
-	vint32 fProcessing;        // the current number of processing threads
+	vint32 fProcessing;        // the current nmber of processing threads
 	bool fAbort;	           // stop processing
 	
 	static BObjectList<Printer> sPrinters;

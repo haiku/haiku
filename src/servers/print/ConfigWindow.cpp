@@ -30,12 +30,15 @@
 /*****************************************************************************/
 
 
+#include "pr_server.h"
 #include "Printer.h"
 #include "PrintServerApp.h"
 #include "ConfigWindow.h"
 #include "BeUtils.h"
 
 // posix
+#include <limits.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -43,6 +46,65 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Window.h>
+
+static const float a0_width = 2380.0;
+static const float a0_height = 3368.0;
+static const float a1_width = 1684.0;
+static const float a1_height = 2380.0;
+static const float a2_width = 1190.0;
+static const float a2_height = 1684.0;
+static const float a3_width = 842.0;
+static const float a3_height = 1190.0;
+static const float a4_width = 595.0;
+static const float a4_height = 842.0;
+static const float a5_width = 421.0;
+static const float a5_height = 595.0;
+static const float a6_width = 297.0;
+static const float a6_height = 421.0;
+static const float b5_width = 501.0;
+static const float b5_height = 709.0;
+static const float letter_width = 612.0;
+static const float letter_height = 792.0;
+static const float legal_width  = 612.0;
+static const float legal_height  = 1008.0;
+static const float ledger_width = 1224.0;
+static const float ledger_height = 792.0;
+static const float p11x17_width = 792.0;
+static const float p11x17_height = 1224.0;
+
+static struct PageFormat
+{
+	char  *label;
+	float width;
+	float height;
+} pageFormat[] = 
+{
+	{"Letter", letter_width, letter_height },
+	{"Legal",  legal_width,  legal_height  },
+	{"Ledger", ledger_width, ledger_height  },
+	{"p11x17", p11x17_width, p11x17_height  },
+	{"A0",     a0_width,     a0_height     },
+	{"A1",     a1_width,     a1_height     },
+	{"A2",     a2_width,     a2_height     },
+	{"A3",     a3_width,     a3_height     },
+	{"A4",     a4_width,     a4_height     },
+	{"A5",     a5_width,     a5_height     },
+	{"A6",     a6_width,     a6_height     },
+	{"B5",     b5_width,     b5_height     },
+};
+
+static void GetPageFormat(float w, float h, BString& label) {
+	w = floor(w + 0.5); h = floor(h + 0.5);
+	for (int i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
+		struct PageFormat& pf = pageFormat[i];
+		if (pf.width == w && pf.height == h || pf.width == h && pf.height == w) {
+			label = pf.label; return;
+		}
+	}
+	
+	float unit = 72.0; // currently inc[h]es only
+	label << (w / unit) << "x" << (h / unit) << " in.";
+}
 
 ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMessage* settings, AutoReply* sender)
 	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup", 
@@ -81,8 +143,10 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	r.OffsetTo(left, top);
 	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
 		// add description to button
-	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, top + fPageSetup->Bounds().Height()/2-5);
+	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, top + 5);
 	AddStringView(panel, r, "Setup page format");
+	r.OffsetBy(0, 10);
+	fPageFormatText = AddStringView(panel, r, "");
 	top += fPageSetup->Bounds().Height() + 5;
 	
 		// page selection button
@@ -91,8 +155,10 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 		r.OffsetTo(left, top);
 		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
 			// add description to button
-		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top + fJobSetup->Bounds().Width()/2-5);
+		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top + 5);
 		AddStringView(panel, r, "Setup print job");
+		r.OffsetBy(0, 10);
+		fJobSetupText = AddStringView(panel, r, "");
 		top += fJobSetup->Bounds().Height() + 5;
 	}
 	top += 5;
@@ -266,11 +332,13 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame, const 
 	return button;
 }
 
-void ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text) {
+BStringView* ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text) {
+	// frame.bottom = frame.top ;
 	BStringView* string = new BStringView(frame, "", text);
 	string->SetViewColor(panel->ViewColor());
 	string->SetLowColor(panel->ViewColor());
  	panel->AddChild(string);
+ 	return string;
 }
 
 void ConfigWindow::PrinterForMimeType() {
@@ -347,8 +415,12 @@ void ConfigWindow::UpdateSettings(bool read) {
 void ConfigWindow::UpdateUI() {
 	if (fCurrentPrinter == NULL) {
 		fPageSetup->SetEnabled(false);
-		if (fJobSetup) fJobSetup->SetEnabled(false);
+		if (fJobSetup) {
+			fJobSetup->SetEnabled(false);
+			fJobSetupText->SetText("Undefined job settings");
+		}
 		fOk->SetEnabled(false);
+		fPageFormatText->SetText("Undefined paper format");
 	} else {	
 		fPageSetup->SetEnabled(true);
 	
@@ -357,6 +429,43 @@ void ConfigWindow::UpdateUI() {
 		}
 		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
 			fKind == kPageSetup && !fPageSettings.IsEmpty());
+		
+			// display information about page format	
+		BRect paperRect;
+		BString pageFormat;
+		if (fPageSettings.FindRect(PSRV_FIELD_PAPER_RECT, &paperRect) == B_OK) {
+			GetPageFormat(paperRect.Width(), paperRect.Height(), pageFormat);
+			
+			int32 orientation = 0;
+			fPageSettings.FindInt32(PSRV_FIELD_ORIENTATION, &orientation);
+			if (orientation == 0) pageFormat << ", Portrait";
+			else pageFormat << ", Landscape";
+		} else {
+			pageFormat << "Undefined paper format";
+		}
+		fPageFormatText->SetText(pageFormat.String());
+		
+			// display information about job
+		if (fKind == kJobSetup) {
+			BString job;
+			int32 first, last, copies;
+			if (fJobSettings.FindInt32(PSRV_FIELD_FIRST_PAGE, &first) == B_OK &&
+				fJobSettings.FindInt32(PSRV_FIELD_LAST_PAGE, &last) == B_OK) {
+				if (first >= 1 && first <= last && last != INT_MAX) { 
+					job << "From page " << first << " to " << last;
+				} else {
+					job << "All pages";
+				}
+				int32 copies;
+				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies) == B_OK && copies > 1) {
+					job << ", " << copies << " copies";
+				}
+			} else {
+				job << "Undefined job settings";
+			}
+			
+			fJobSetupText->SetText(job.String());
+		}
 	}
 }
 

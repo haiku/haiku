@@ -65,7 +65,7 @@ public:
 
 private:
 	BPictureButton* AddPictureButton(BView* panel, BRect frame, const char* name, const char* on, const char* off, uint32 what);
-	void AddStringView(BView* panel, BRect frame, const char* text);
+	BStringView* AddStringView(BView* panel, BRect frame, const char* text);
 	void PrinterForMimeType();
 	void SetupPrintersMenu(BMenu* menu);
 	void UpdateAppSettings(const char* mime, const char* printer);
@@ -90,6 +90,8 @@ private:
 	BPictureButton*    fPageSetup;
 	BPictureButton*    fJobSetup;
 	BButton*    fOk;
+	BStringView* fPageFormatText;
+	BStringView* fJobSetupText;
 };
 
 #endif

@@ -14,7 +14,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2001 OpenBeOS Project
+// Copyright (c) 2001, 2002 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -40,6 +40,7 @@
 
 #include "ResourceManager.h"
 #include "Settings.h"
+#include "FolderWatcher.h"
 
 class PrintServerApp;
 
@@ -57,7 +58,7 @@ extern BLocker* gLock;
 // Application class for print_server.
 /*****************************************************************************/
 class Printer;
-class PrintServerApp : public BApplication
+class PrintServerApp : public BApplication, public FolderListener
 {
 	typedef BApplication Inherited;
 public:
@@ -93,8 +94,11 @@ private:
 
 	void     RegisterPrinter(BDirectory* node);
 	void     UnregisterPrinter(Printer* printer);
-	void     HandleRemovedPrinter(BMessage* msg);
-	
+	// FolderListener
+	void     EntryCreated(node_ref* node, entry_ref* entry);
+	void     EntryRemoved(node_ref* node);
+	void     AttributeChanged(node_ref* node);
+		
 	status_t StoreDefaultPrinter();
 	status_t RetrieveDefaultPrinter();
 	
@@ -109,6 +113,7 @@ private:
 	sem_id   fHasReferences;
 	Settings*fSettings;
 	bool     fUseConfigWindow;
+	FolderWatcher* fFolder;
 	
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 	static status_t async_thread(void* data);

@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src servers print shared ;
+
+UsePrivateHeaders shared interface print ;
+
+StaticLibrary 
+	print
+	: 
+	BeUtils.cpp
+	FolderWatcher.cpp
+	Jobs.cpp
+	;

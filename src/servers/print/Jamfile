@@ -1,7 +1,10 @@
 SubDir OBOS_TOP src servers print ;
 
-UsePrivateHeaders interface ;
-UsePrivateHeaders shared ;
+SubInclude OBOS_TOP src servers print shared ;
+
+SubDir OBOS_TOP src servers print ;
+
+UsePrivateHeaders shared interface print ;
 
 AddResources
 	print_server
@@ -18,8 +21,6 @@ Server
 	Printer.Scripting.cpp
 	Printer.cpp
 	ResourceManager.cpp
-	Jobs.cpp
-	BeUtils.cpp
 	Settings.cpp
 	ConfigWindow.cpp
 	;
@@ -29,5 +30,6 @@ LinkSharedOSLibs
 	: 
 	be 
 	root
-	translation 
+	translation
+	libprint.a
 	;

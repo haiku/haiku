@@ -55,6 +55,23 @@
 #include <StorageKit.h>
 #include <SupportDefs.h>
 
+
+SpoolFolder::SpoolFolder(BLocker*locker, BLooper* looper, const BDirectory& spoolDir)
+	: Folder(locker, looper, spoolDir) 
+{
+}
+
+
+// Notify print_server that there is a job file waiting for printing
+void SpoolFolder::Notify(Job* job, int kind)
+{
+	if ((kind == kJobAdded || kind == kJobAttrChanged) &&
+		job->IsValid() && job->IsWaiting()) {
+		be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);
+	}	
+}
+
+
 // ---------------------------------------------------------------
 typedef BMessage* (*config_func_t)(BNode*, const BMessage*);
 typedef BMessage* (*take_job_func_t)(BFile*, BNode*, const BMessage*);
@@ -90,14 +107,14 @@ Printer* Printer::Find(const BString& name)
 	return NULL;
 }
 
-Printer* Printer::Find(dev_t dev, ino_t node)
+Printer* Printer::Find(node_ref* node)
 {
+	node_ref n;
 		// Look in list to find printer definition
 	for (int32 idx=0; idx < sPrinters.CountItems(); idx++) {
 		Printer* printer = sPrinters.ItemAt(idx);
-		node_ref ref;
-		printer->SpoolDir()->GetNodeRef(&ref);
-		if (ref.device == dev && ref.node == node) return printer;
+		printer->SpoolDir()->GetNodeRef(&n);
+		if (n == *node) return printer;
 	}
 	
 		// None found, so return NULL
@@ -132,7 +149,7 @@ int32 Printer::CountPrinters()
 // ---------------------------------------------------------------
 Printer::Printer(const BDirectory* node, Resource* res)
 	: Inherited(B_EMPTY_STRING),
-	fPrinter(*node),
+	fPrinter(gLock, be_app, *node),
 	fResource(res),
 	fSinglePrintThread(true),
 	fJob(NULL),
