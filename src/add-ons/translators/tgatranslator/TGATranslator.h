@@ -124,6 +124,8 @@ struct TGAImageSpec {
 #define TGA_DESC_BITS76		0xc0
 #define TGA_DESC_ALPHABITS	0x0f
 
+#define TGA_RLE_PACKET_TYPE_BIT 0x80
+
 #define TGA_HEADERS_SIZE 18
 
 class TGATranslator : public BTranslator {
