@@ -20,6 +20,7 @@
 #include <StringView.h>
 #include <Slider.h>
 #include <Bitmap.h>
+#include <Button.h>
 #include <Box.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -34,6 +35,7 @@
 #include <Volume.h>
 #include <fs_attr.h>
 #include <PrintJob.h>
+#include <Beep.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -52,6 +54,10 @@ static const uint32 kMsgBlockSize = 'blks';
 static const uint32 kMsgAddBookmark = 'bmrk';
 static const uint32 kMsgPrint = 'prnt';
 static const uint32 kMsgPageSetup = 'pgsp';
+
+static const uint32 kMsgFind = 'find';
+static const uint32 kMsgFindWindow = 'fndw';
+static const uint32 kMsgStopFind = 'sfnd';
 
 
 class IconView : public BView {
@@ -112,7 +118,8 @@ class HeaderView : public BView, public BInvoker {
 
 		base_type Base() const { return fBase; }
 		void SetBase(base_type);
-		
+
+		off_t CursorOffset() const { return fOffset; }
 		off_t Position() const { return fPosition; }
 		uint32 BlockSize() const { return fBlockSize; }
 		void SetTo(off_t position, uint32 blockSize);
@@ -140,6 +147,7 @@ class HeaderView : public BView, public BInvoker {
 		BStringView		*fFileOffsetView;
 		PositionSlider	*fPositionSlider;
 		IconView		*fIconView;
+		BButton			*fStopButton;
 };
 
 
@@ -155,16 +163,21 @@ class TypeMenuItem : public BMenuItem {
 };
 
 
-class UpdateLooper : public BLooper {
+class EditorLooper : public BLooper {
 	public:
-		UpdateLooper(const char *name, DataEditor &editor, BMessenger messenger);
-		virtual ~UpdateLooper();
+		EditorLooper(const char *name, DataEditor &editor, BMessenger messenger);
+		virtual ~EditorLooper();
 
 		virtual void MessageReceived(BMessage *message);
 
+		bool FindIsRunning() const { return !fQuitFind; }
+		void Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger progressMonitor);
+		void QuitFind();
+
 	private:
-		DataEditor	&fEditor;
-		BMessenger	fMessenger;
+		DataEditor		&fEditor;
+		BMessenger		fMessenger;
+		volatile bool	fQuitFind;
 };
 
 
@@ -412,12 +425,20 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	fIconView = new IconView(BRect(10, 10, 41, 41), ref, editor.IsDevice());
 	AddChild(fIconView);
 
+	BRect rect = Bounds();
+	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
+						new BMessage(kMsgStopFind));
+	fStopButton->ResizeToPreferred();
+	fStopButton->MoveTo(rect.right - 5 - fStopButton->Bounds().Width(), 5);
+	fStopButton->Hide();
+	AddChild(fStopButton);
+
 	BFont boldFont = *be_bold_font;
 	boldFont.SetSize(10.0);
 	BFont plainFont = *be_plain_font;
 	plainFont.SetSize(10.0);
 
-	BStringView *stringView = new BStringView(BRect(50, 6, frame.right, 20),
+	BStringView *stringView = new BStringView(BRect(50, 6, rect.right, 20),
 		B_EMPTY_STRING, editor.IsAttribute() ? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
@@ -430,9 +451,9 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 		string.Prepend(fAttribute);
 		string.Append(")");
 	}
-	BRect rect = stringView->Frame();
+	rect = stringView->Frame();
 	rect.left = rect.right;
-	rect.right = frame.right;
+	rect.right = fStopButton->Frame().left - 1;
 	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String());
 	fPathView->SetFont(&plainFont);
 	AddChild(fPathView);
@@ -543,6 +564,7 @@ HeaderView::AttachedToWindow()
 {
 	SetTarget(Window());
 
+	fStopButton->SetTarget(Parent());
 	fPositionControl->SetTarget(this);
 	fPositionSlider->SetTarget(this);
 }
@@ -698,6 +720,30 @@ HeaderView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgDataEditorFindProgress:
+		{
+			bool state;
+			if (message->FindBool("running", &state) == B_OK && fFileSize > fBlockSize) {
+				fPositionSlider->SetEnabled(!state);
+				if (state)
+					fStopButton->Show();
+				else
+					fStopButton->Hide();
+			}
+
+			off_t position;
+			if (message->FindInt64("position", &position) != B_OK)
+				break;
+
+			fPosition = (position / fBlockSize) * fBlockSize;
+				// round to block size
+
+			// update views
+			UpdatePositionViews();
+			fPositionSlider->SetPosition(fPosition);
+			break;
+		}
+
 		case kMsgPositionUpdate:
 		{
 			fLastPosition = fPosition;
@@ -815,25 +861,28 @@ TypeMenuItem::DrawContent()
  *	That way, simple offset changes will not stop the main
  *	looper from operating. Therefore, all offset updates
  *	for the editor will go through this looper.
+ *
+ *	Also, it will run the find action in the editor.
  */
 
-UpdateLooper::UpdateLooper(const char *name, DataEditor &editor, BMessenger target)
+EditorLooper::EditorLooper(const char *name, DataEditor &editor, BMessenger target)
 	: BLooper(name),
 	fEditor(editor),
-	fMessenger(target)
+	fMessenger(target),
+	fQuitFind(true)
 {
 	fEditor.StartWatching(this);
 }
 
 
-UpdateLooper::~UpdateLooper()
+EditorLooper::~EditorLooper()
 {
 	fEditor.StopWatching(this);
 }
 
 
 void
-UpdateLooper::MessageReceived(BMessage *message)
+EditorLooper::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgPositionUpdate:
@@ -874,10 +923,63 @@ UpdateLooper::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgFind:
+		{
+			BMessenger progressMonitor;
+			message->FindMessenger("progress_monitor", &progressMonitor);
+
+			off_t startAt = 0;
+			message->FindInt64("start", &startAt);
+
+			ssize_t dataSize;
+			const uint8 *data;
+			if (message->FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) == B_OK)
+				Find(startAt, data, dataSize, progressMonitor);
+		}
+
 		default:
 			BLooper::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize, BMessenger progressMonitor)
+{
+	fQuitFind = false;
+
+	BAutolock locker(fEditor);
+
+	bigtime_t startTime = system_time();
+
+	off_t foundAt = fEditor.Find(startAt, data, dataSize, true, progressMonitor, &fQuitFind);
+	if (foundAt >= B_OK) {
+		fEditor.SetViewOffset(foundAt);
+
+		// select the part in our target
+		BMessage message(kMsgSetSelection);
+		message.AddInt64("start", foundAt - fEditor.ViewOffset());
+		message.AddInt64("end", foundAt + dataSize - 1 - fEditor.ViewOffset());
+		fMessenger.SendMessage(&message);
+	} else if (foundAt == B_ENTRY_NOT_FOUND) {
+		if (system_time() > startTime + 8000000LL) {
+			// If the user had to wait more than 8 seconds for the result,
+			// we are trying to please him with a requester...
+			(new BAlert("DiskProbe request",
+				"Could not find pattern", "Ok", NULL, NULL,
+				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+		} else
+			beep();
+	}
+}
+
+
+void
+EditorLooper::QuitFind()
+{
+	fQuitFind = true;
+		// this will cleanly stop the find process
 }
 
 
@@ -886,7 +988,8 @@ UpdateLooper::MessageReceived(BMessage *message)
 
 ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BMessage *settings)
 	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
-	fPrintSettings(NULL)
+	fPrintSettings(NULL),
+	fLastSearch(NULL)
 {
 	fEditor.SetTo(*ref, attribute);
 
@@ -945,9 +1048,11 @@ ProbeView::UpdateSizeLimits()
 void 
 ProbeView::DetachedFromWindow()
 {
-	if (fUpdateLooper->Lock())
-		fUpdateLooper->Quit();
-	fUpdateLooper = NULL;
+	fEditorLooper->QuitFind();
+
+	if (fEditorLooper->Lock())
+		fEditorLooper->Quit();
+	fEditorLooper = NULL;
 
 	fEditor.StopWatching(this);
 	fDataView->StopWatching(fHeaderView, kDataViewCursorPosition);
@@ -1037,8 +1142,8 @@ ProbeView::AddPrintMenuItems(BMenu *menu, int32 index)
 void 
 ProbeView::AttachedToWindow()
 {
-	fUpdateLooper = new UpdateLooper(fEditor.Ref().name, fEditor, BMessenger(fDataView));
-	fUpdateLooper->Run();
+	fEditorLooper = new EditorLooper(fEditor.Ref().name, fEditor, BMessenger(fDataView));
+	fEditorLooper->Run();
 
 	fEditor.StartWatching(this);
 	fDataView->StartWatching(fHeaderView, kDataViewCursorPosition);
@@ -1086,8 +1191,12 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A', B_COMMAND_KEY));
 	item->SetTarget(fDataView);
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS, NULL, 'F', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Find Again", NULL, 'G', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(kMsgFindWindow), 'F', B_COMMAND_KEY));
+	item->SetTarget(this);
+	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find Again", new BMessage(kMsgFind),
+		'G', B_COMMAND_KEY));
+	fFindAgainMenuItem->SetEnabled(false);
+	fFindAgainMenuItem->SetTarget(this);
 	bar->AddItem(menu);
 
 	// "Block" menu
@@ -1216,7 +1325,7 @@ ProbeView::AttachedToWindow()
 void
 ProbeView::AllAttached()
 {
-	fHeaderView->SetTarget(fUpdateLooper);
+	fHeaderView->SetTarget(fEditorLooper);
 }
 
 
@@ -1439,6 +1548,8 @@ ProbeView::Save()
 bool
 ProbeView::QuitRequested()
 {
+	fEditorLooper->QuitFind();
+
 	if (!fEditor.IsModified())
 		return true;
 
@@ -1546,6 +1657,49 @@ ProbeView::MessageReceived(BMessage *message)
 
 		case kMsgPageSetup:
 			PageSetup();
+			break;
+
+		case kMsgFindWindow:
+		{
+			fEditorLooper->QuitFind();
+
+			// ToDo: open find window
+			message->AddData("data", B_RAW_TYPE, "test", 4);
+			message->what = kMsgFind;
+			//break;
+		}
+
+		case kMsgFind:
+		{
+			const uint8 *data;
+			ssize_t size;
+			if (message->FindData("data", B_RAW_TYPE, (const void **)&data, &size) != B_OK) {
+				// search again for last pattern
+				BMessage *itemMessage = fFindAgainMenuItem->Message();
+				if (itemMessage == NULL
+					|| itemMessage->FindData("data", B_RAW_TYPE, (const void **)&data, &size) != B_OK) {
+					// this shouldn't ever happen, but well...
+					beep();
+					break;
+				}
+			} else {
+				// remember the search pattern
+				fFindAgainMenuItem->SetMessage(new BMessage(*message));
+				fFindAgainMenuItem->SetEnabled(true);
+			}
+
+			int32 start, end;
+			fDataView->GetSelection(start, end);
+
+			BMessage find(*message);
+			find.AddInt64("start", fHeaderView->Position() + start + 1);
+			find.AddMessenger("progress_monitor", BMessenger(fHeaderView));
+			fEditorLooper->PostMessage(&find);
+			break;
+		}
+
+		case kMsgStopFind:
+			fEditorLooper->QuitFind();
 			break;
 
 		case B_NODE_MONITOR:

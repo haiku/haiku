@@ -18,7 +18,7 @@ class BMenuItem;
 
 class HeaderView;
 class DataView;
-class UpdateLooper;
+class EditorLooper;
 
 
 class ProbeView : public BView {
@@ -52,7 +52,7 @@ class ProbeView : public BView {
 		status_t Save();
 
 		DataEditor		fEditor;
-		UpdateLooper	*fUpdateLooper;
+		EditorLooper	*fEditorLooper;
 		HeaderView		*fHeaderView;
 		DataView		*fDataView;
 		BScrollView		*fScrollView;
@@ -62,6 +62,10 @@ class ProbeView : public BView {
 		BMenuItem		*fSaveMenuItem;
 		BMessage		*fPrintSettings;
 		BMenu			*fBookmarkMenu;
+
+		BMenuItem		*fFindAgainMenuItem;
+		const uint8		*fLastSearch;
+		size_t			fLastSearchSize;
 };
 
 #endif	/* PROBE_VIEW_H */

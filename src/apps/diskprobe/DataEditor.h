@@ -65,12 +65,16 @@ class DataEditor : public BLocker {
 		size_t BlockSize() const { return fBlockSize; }
 
 		status_t UpdateIfNeeded(bool *_updated = NULL);
+		status_t ForceUpdate();
 		status_t GetViewBuffer(const uint8 **_buffer);
 
 		status_t StartWatching(BMessenger target);
 		status_t StartWatching(BHandler *handler, BLooper *looper = NULL);
 		void StopWatching(BMessenger target);
 		void StopWatching(BHandler *handler, BLooper *looper = NULL);
+
+		off_t Find(off_t startPosition, const uint8 *data, size_t dataSize, bool cyclic,
+					BMessenger progressMessenger, volatile bool *stop = NULL);
 
 		BFile &File() { return fFile; }
 		const entry_ref &Ref() const { return fRef; }
@@ -112,5 +116,7 @@ class DataEditor : public BLocker {
 static const uint32 kMsgDataEditorStateChange = 'deSC';
 static const uint32 kMsgDataEditorUpdate = 'deUp';
 static const uint32 kMsgDataEditorParameterChange = 'dePC';
+
+static const uint32 kMsgDataEditorFindProgress = 'deFP';
 
 #endif	/* DATA_EDITOR_H */

@@ -383,6 +383,8 @@ DataEditor::SetTo(entry_ref &ref, const char *attribute)
 status_t 
 DataEditor::SetTo(BEntry &entry, const char *attribute)
 {
+	fSize = 0;
+
 	struct stat stat;
 	stat.st_mode = 0;
 
@@ -510,6 +512,9 @@ DataEditor::AddChange(DataChange *change)
 status_t
 DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 {
+	if (IsReadOnly())
+		return B_NOT_ALLOWED;
+
 	BAutolock locker(this);
 
 	if (offset >= fSize)
@@ -533,6 +538,9 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 status_t
 DataEditor::Remove(off_t offset, off_t length)
 {
+	if (IsReadOnly())
+		return B_NOT_ALLOWED;
+
 	BAutolock locker(this);
 
 	// not yet implemented
@@ -545,6 +553,9 @@ DataEditor::Remove(off_t offset, off_t length)
 status_t
 DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 {
+	if (IsReadOnly())
+		return B_NOT_ALLOWED;
+
 	BAutolock locker(this);
 
 	// not yet implemented
@@ -926,6 +937,21 @@ DataEditor::UpdateIfNeeded(bool *_updated = NULL)
 }
 
 
+status_t 
+DataEditor::ForceUpdate()
+{
+	status_t status = B_OK;
+
+	if (fView == NULL)
+		status = SetViewOffset(fViewOffset);
+
+	if (status == B_OK)
+		status = Update();
+
+	return status;
+}
+
+
 status_t
 DataEditor::GetViewBuffer(const uint8 **_buffer)
 {
@@ -938,6 +964,130 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 
 	*_buffer = fView + fViewOffset - fRealViewOffset;
 	return B_OK;
+}
+
+
+off_t 
+DataEditor::Find(off_t startPosition, const uint8 *data, size_t dataSize,
+	bool cyclic, BMessenger progressMonitor, volatile bool *stop)
+{
+	if (data == NULL || dataSize == 0)
+		return B_BAD_VALUE;
+
+	if (startPosition < 0)
+		startPosition = 0;
+
+	BAutolock locker(this);
+
+	bool savedIsReadOnly = fIsReadOnly;
+	fIsReadOnly = true;
+	off_t savedOffset = fViewOffset;
+	off_t position = (startPosition / fRealViewSize) * fRealViewSize;
+	size_t firstByte = startPosition % fRealViewSize;
+	size_t matchLastOffset = 0;
+	off_t foundAt = B_ENTRY_NOT_FOUND;
+	bool noStop = false;
+	if (stop == NULL)
+		stop = &noStop;
+
+	// start progress monitor
+	{
+		BMessage progress(kMsgDataEditorFindProgress);
+		progress.AddBool("running", true);
+		progressMonitor.SendMessage(&progress);
+	}
+
+	bigtime_t lastReport = 0;
+
+	off_t blocks = fSize;
+	if (!cyclic)
+		blocks -= position;
+	blocks = (blocks + fRealViewSize - 1) / fRealViewSize;
+
+	for (; blocks-- > 0 && !*stop; position += fRealViewSize) {
+		if (position > fSize)
+			position = 0;
+
+		SetViewOffset(position, false);
+		if (fNeedsUpdate)
+			Update();
+
+		bigtime_t current = system_time();
+		if (lastReport + 500000LL < current) {
+			// report the progress two times a second
+			BMessage progress(kMsgDataEditorFindProgress);
+			progress.AddInt64("position", position);
+			progressMonitor.SendMessage(&progress);
+
+			lastReport = current;
+		}
+
+		// search for data in current block
+
+		if (matchLastOffset != 0) {
+			// we had a partial match in the previous block, let's
+			// check if it is a whole match
+			if (!memcmp(fView, data + matchLastOffset, dataSize - matchLastOffset)) {
+				matchLastOffset = 0;
+				break;
+			}
+
+			foundAt = B_ENTRY_NOT_FOUND;
+			matchLastOffset = 0;
+		}
+
+		for (size_t i = firstByte; i < fRealViewSize; i++) {
+			if (position + i + dataSize > fSize)
+				break;
+
+			if (fView[i] == data[0]) {
+				// one byte matches, compare the rest
+				size_t size = dataSize - 1;
+				size_t offset = i + 1;
+
+				if (offset + size > fRealViewSize)
+					size = fRealViewSize - offset;
+
+				if (size == 0 || !memcmp(fView + offset, data + 1, size)) {
+					foundAt = position + i;
+
+					if (size != dataSize - 1) {
+						// only a partial match, we have to check the start
+						// of the next block
+						matchLastOffset = size + 1;
+					}
+					break;
+				}
+			}
+		}
+
+		if (foundAt >= 0 && matchLastOffset == 0)
+			break;
+
+		firstByte = 0;
+	}
+
+	fIsReadOnly = savedIsReadOnly;
+
+	if (foundAt >= 0 && matchLastOffset != 0)
+		foundAt = B_ENTRY_NOT_FOUND;
+
+	// stop progress monitor
+	{
+		BMessage progress(kMsgDataEditorFindProgress);
+		progress.AddBool("running", false);
+		progress.AddInt64("position", foundAt >= 0 ? foundAt : savedOffset);
+		progressMonitor.SendMessage(&progress);
+	}
+
+	SetViewOffset(savedOffset, false);
+		// this is to ensure that we're sending an update when
+		// we're set to the found data offset
+
+	if (foundAt < 0 && *stop)
+		return B_INTERRUPTED;
+
+	return foundAt;
 }
 
 
