@@ -289,21 +289,19 @@ static void find_devices(void)
 	return;
 }
 
-#if SHOW_DEBUG
+#if DEBUG
 static void dump_ether_details(struct mbuf *buf)
 {
 	struct ether_header *eth = mtod(buf, struct ether_header *);
-
-	printf("Ethernet packet from ");
-	print_ether_addr(&eth->src);
-	printf(" to ");
-	print_ether_addr(&eth->dest);
-
+	
+	printf("Ethernet packet from %s", ether_sprintf(eth->ether_shost));
+	printf(" to %s", ether_sprintf(eth->ether_dhost));
+	
 	if (buf->m_flags & M_BCAST)
 		printf(" BCAST");
-
+	
 	printf(" proto ");
-	switch (eth->type) {
+	switch (eth->ether_type) {
 		case ETHER_ARP:
 			printf("ARP\n");
 			break;
@@ -316,8 +314,16 @@ static void dump_ether_details(struct mbuf *buf)
 		case ETHER_IPV6:
 			printf("IPv6\n");
 			break;
+		case ETHER_PPPOE_DISC:
+			printf("PPPoE Discovery\n");
+			break;
+		
+		case ETHER_PPPOE_SESS:
+			printf("PPPoE Session\n");
+			break;
+		
 		default:
-			printf("unknown (%04x)\n", eth->type);
+			printf("unknown (%04x)\n", eth->ether_type);
 	}
 }
 #endif
@@ -343,8 +349,8 @@ int32 ether_input(void *data)
 		if (eth->ether_dhost[0] & 1)
 			m->m_flags |= M_MCAST;
 		
-#if SHOW_DEBUG	
-		dump_ether_details(buf);
+#if DEBUG	
+		dump_ether_details(m);
 #endif
 		// as PPPoE needs the ethernet header we process it before m_adj
 		if(eth->ether_type == ETHERTYPE_PPPOEDISC

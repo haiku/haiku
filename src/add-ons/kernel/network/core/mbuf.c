@@ -304,16 +304,16 @@ void m_copydata(struct mbuf *m, int off, int len, caddr_t cp)
 	uint count = 0;
 
 	if (off < 0) {
-		printf("m_copydata: off %d < 0", off);
+		printf("m_copydata: off %d < 0\n", off);
 		return;
 	}
 	if (len < 0) {
-		printf("m_copydata: len %d < 0", len);
+		printf("m_copydata: len %d < 0\n", len);
 		return;
 	}	
 	while (off > 0) {
 		if (m == NULL) {
-			printf("m_copydata: null mbuf in skip");
+			printf("m_copydata: null mbuf in skip\n");
 			return;
 		}
 		if (off < (int) m->m_len)
@@ -323,7 +323,7 @@ void m_copydata(struct mbuf *m, int off, int len, caddr_t cp)
 	}
 	while (len > 0) {
 		if (m == NULL) {
-			printf("m_copydata: null mbuf");
+			printf("m_copydata: null mbuf\n");
 			return;
 		}
 		count = min((int) m->m_len - off, len);
