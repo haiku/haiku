@@ -65,7 +65,7 @@ OggStream::~OggStream()
 status_t
 OggStream::AddPage(off_t position, const ogg_page & page)
 {
-	TRACE("OggStream::AddPage\n");
+//	TRACE("OggStream::AddPage\n");
 	BAutolock autolock(fSyncLock);
 	char * buffer;
 	// copy the header to our local sync

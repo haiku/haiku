@@ -24,7 +24,7 @@ public:
 	virtual		~OggStream();
 
 	// reader push input function
-	status_t	AddPage(off_t position, const ogg_page & page);
+	virtual status_t	AddPage(off_t position, const ogg_page & page);
 
 protected:
 	// subclass pull input function

@@ -17,8 +17,12 @@ public:
 	virtual status_t	GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 						              media_header *mediaHeader);
 
+	// reader push input function
+	virtual status_t	AddPage(off_t position, const ogg_page & page);
+
 private:
 	media_format	fMediaFormat;
+	double			fMicrosecPerFrame;
 };
 
 } } // namespace BPrivate::media
