@@ -149,6 +149,7 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		void		ClipChar(BFont* font, const char* unicode, const char *utf8, int16 size, float width);
 		bool   		EmbedFont(const char* n);
 		status_t	DeclareFonts();
+		void        RecordFont(const char* family, const char* style, float size);
 
 		// BPicture playback handlers
 		void		Op(int number);
@@ -325,6 +326,8 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		XRefDests       *fXRefDests;
 		font_encoding   fFontSearchOrder[no_of_cjk_encodings];
 		TextLine        fTextLine;
+		TList<UsedFont> fUsedFonts;
+		UserDefinedEncodings fUserDefinedEncodings;
 		
 		enum 
 		{
@@ -361,8 +364,10 @@ class PDFWriter : public PrinterDriver, public PictureIterator
 		
 		bool StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 type);
 
+		void GetFontName(BFont *font, char *fontname);
 		void GetFontName(BFont *font, char *fontname, bool &embed, font_encoding encoding);
 		int FindFont(char *fontname, bool embed, font_encoding encoding);
+		void MakeUserDefinedEncoding(uint16 unicode, uint8 &enc, uint8 &index);
 
 		// alpha transparency
 		Transparency* FindTransparency(uint8 alpha);

@@ -162,15 +162,48 @@ find_in_cid_tables(uint16 unicode, font_encoding &encoding, uint16 &index, font_
 
 
 // --------------------------------------------------
+void
+PDFWriter::MakeUserDefinedEncoding(uint16 unicode, uint8 &enc, uint8 &index) {
+	if (fUserDefinedEncodings.Get(unicode, enc, index)) {
+		BString s("user");
+		s << (int)enc;
+		PDF_encoding_set_char(fPdf, s.String(), (int)index, NULL, (int)unicode);
+	}
+}
+
+// --------------------------------------------------
+void
+PDFWriter::RecordFont(const char* family, const char* style, float size) {
+	const int32 n = fUsedFonts.CountItems();
+	for (int32 i = 0; i < n; i ++) {
+		if (fUsedFonts.ItemAt(i)->Equals(family, style, size)) return;
+	}
+	
+	UsedFont* font;
+	font = new UsedFont(family, style, size);
+	fUsedFonts.AddItem(font);
+	
+	REPORT(kInfo, -1, "Used font: \"%s\" \"%s\" %f", family, style, size);
+}
+
+// --------------------------------------------------
 void 
-PDFWriter::GetFontName(BFont *font, char *fontname, bool &embed, font_encoding encoding) 
+PDFWriter::GetFontName(BFont *font, char *fontname) 
 {
 	font_family family;
 	font_style  style;
 
 	font->GetFamilyAndStyle(&family, &style);
-
 	strcat(strcat(strcpy(fontname, family), "-"), style);
+
+	RecordFont(family, style, font->Size());
+}
+
+// --------------------------------------------------
+void 
+PDFWriter::GetFontName(BFont *font, char *fontname, bool &embed, font_encoding encoding) 
+{
+	GetFontName(font, fontname);
 
 	switch (encoding) {
 		case japanese_encoding:
@@ -181,7 +214,6 @@ PDFWriter::GetFontName(BFont *font, char *fontname, bool &embed, font_encoding e
 			strcpy(fontname, "STSong-Light"); return;
 		case korean_encoding:
 			strcpy(fontname, "HYGoThic-Medium"); return;
-			return;
 		default:;
 	}
 }
@@ -231,12 +263,24 @@ PDFWriter::FindFont(char* fontName, bool embed, font_encoding encoding)
 	
 	if (embed) embed = EmbedFont(fontName);
 
-	REPORT(kDebug, fPage, "Create new font");
-	int font = PDF_findfont(fPdf, fontName, encoding_names[encoding], embed);
+	BString s;
+	char user_defined[80];
+	const char* encoding_name;
+	if (encoding < user_defined_encoding_start) {	
+		encoding_name = encoding_names[encoding];
+	} else {
+		s = "user";
+		s << (int)(encoding - user_defined_encoding_start);
+		encoding_name = s.String();
+	}
+	REPORT(kDebug, fPage, "Create new font, %sembed, encoding %s", embed ? "" : "do not ", encoding_name);
+	int font = PDF_findfont(fPdf, fontName, encoding_name, embed);
 	if (font != -1) {
 		REPORT(kDebug, fPage, "font created");
 		cache = new Font(fontName, font, encoding);
 		fFontCache.AddItem(cache);
+	} else {
+		REPORT(kError, fPage, "Could not create font '%s'", fontName);
 	}
 	return font;
 }
@@ -334,43 +378,66 @@ PDFWriter::DrawChar(uint16 unicode, const char* utf8, int16 size)
 	// try to convert from utf8 to MacRoman encoding schema...
 	int32 srcLen  = size;
 	int32 destLen = 1;
-	char dest[2] = "\0"; 
+	char dest[3] = "\0\0"; 
 	int32 state = 0; 
 	bool embed = true;
 	font_encoding encoding = macroman_encoding;	
+	char 	fontName[B_FONT_FAMILY_LENGTH+B_FONT_STYLE_LENGTH+1];
 	
 	if (convert_from_utf8(B_MAC_ROMAN_CONVERSION, utf8, &srcLen, dest, &destLen, &state, 0) != B_OK || dest[0] == 0 ) {
 		// could not convert to MacRoman
 		uint8         enc;
 		uint16        index;
 		font_encoding fenc;
+
+		GetFontName(&fState->beFont, fontName);
+		embed = EmbedFont(fontName);
 		
-		// is code point in the Adobe Glyph List? 
+		REPORT(kDebug, -1, "find_encoding unicode %d\n", (int)unicode);
 		if (find_encoding(unicode, enc, index)) {
-			// LOG((fLog, "encoding for %x -> %d %d\n", unicode, (int)enc, (int)index));
-			// use one of the user defined encodings
+			// is code point in the Adobe Glyph List?
+			// Note if rendering the glyphs only would be desired, we could always use
+			// the second method below (MakeUserDefinedEncoding), but extracting text
+			// from the generated PDF would be almost impossible (OCR!)
+			REPORT(kDebug, -1, "encoding for %x -> %d %d", unicode, (int)enc, (int)index);
+			// use one of the user pre-defined encodings
 			if (fState->beFont.FileFormat() == B_TRUETYPE_WINDOWS) {
 				encoding = font_encoding(enc + tt_encoding0);
 			} else {
 				encoding = font_encoding(enc + t1_encoding0);
 			}
 			*dest = index;
+		} else if (embed) {
+			// if the font is embedded, create a user defined encoding at runtime
+			uint8 index;
+			MakeUserDefinedEncoding(unicode, enc, index);
+			*dest = index;
+			encoding = font_encoding(user_defined_encoding_start + enc);
 		} else if (find_in_cid_tables(unicode, fenc, index, fFontSearchOrder)) {
-			// LOG((fLog, "cid table %d index = %d\n", (int)enc, (int)index));
+			// font is not embedded use one of the CJK fonts for substitution
+			REPORT(kDebug, -1, "cid table %d index = %d", (int)fenc, (int)index);
 			dest[0] = unicode / 256; 
 			dest[1] = unicode % 256; 
 			destLen = 2;
 			encoding = fenc;
 			embed = false;
 		} else {
-			// LOG((fLog, "encoding for %x not found!\n", unicode));
+			static bool found = false;
+			REPORT(kDebug, -1, "encoding for %x not found!", (int)unicode);
+			if (!found) {
+				found = true;
+				REPORT(kError, fPage, "Could not find an encoding for character with unicode %d! Message is not repeated for other unicode values.", (int)unicode);
+			}
 			*dest = 0; // paint a box (is 0 a box in MacRoman) or
 			return; // simply skip character 
 		}
-	} 
-	// else LOG((fLog, "macroman srcLen=%d destLen=%d dest= %d %d!\n", srcLen, destLen, (int)dest[0], (int)dest[1]));
-
-	char 	fontName[B_FONT_FAMILY_LENGTH+B_FONT_STYLE_LENGTH+1];
+	} else {
+		REPORT(kDebug, -1, "macroman srcLen=%d destLen=%d dest= %d %d!", srcLen, destLen, (int)dest[0], (int)dest[1]);
+	}
+	
+	// Note we have to build the user defined encoding before it is used in PDF_find_font!
+	if (!MakesPDF()) return;
+	
 	int		font;
 
 	GetFontName(&fState->beFont, fontName, embed, encoding);
@@ -500,12 +567,10 @@ PDFWriter::DrawString(char *string, float escapement_nospace, float escapement_s
 
 		float w = font.StringWidth(c, s);
 
-		if (MakesPDF()) {
-			if (IsClipping()) {
-				ClipChar(&font, (char*)u, c, s, w);
-			} else {
-				DrawChar(u[0]*256+u[1], c, s);		
-			}
+		if (MakesPDF() && IsClipping()) {
+			ClipChar(&font, (char*)u, c, s, w);
+		} else {
+			DrawChar(u[0]*256+u[1], c, s);		
 		}
 				
 		// position of next character

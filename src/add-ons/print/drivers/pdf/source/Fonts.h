@@ -59,7 +59,8 @@ enum font_encoding
 	korean_encoding,
 	first_cjk_encoding  = japanese_encoding,
 	no_of_cjk_encodings = korean_encoding - first_cjk_encoding + 1,
-	invalid_encoding, 
+	invalid_encoding = korean_encoding + 1,
+	user_defined_encoding_start
 };
 
 
@@ -131,6 +132,41 @@ public:
 	void        SetDefaultCJKOrder();
 	bool        SetCJKOrder(int i, font_encoding  enc, bool  active);
 	bool        GetCJKOrder(int i, font_encoding& enc, bool& active) const;
+};
+
+class UsedFont {
+private:
+	BString fFamily;
+	BString fStyle;
+	float   fSize;
+
+public:
+	UsedFont(const char* family, const char* style, float size) : fFamily(family), fStyle(style), fSize(size) {}
+	
+	const char* GetFamily() const { return fFamily.String(); }
+	const char* GetStyle() const { return fStyle.String(); }
+	float GetSize() const { return fSize; }
+
+	bool Equals(const char* family, const char* style, float size) const { return strcmp(GetFamily(), family) == 0 && strcmp(GetStyle(), style) == 0 && fSize == size; }
+};
+
+
+class UserDefinedEncodings {
+public:
+	UserDefinedEncodings();
+	// returns true if new encoding and index pair
+	bool Get(uint16 unicode, uint8 &encoding, uint8 &index);
+
+private:
+	bool IsUsed(uint16 unicode) const { return (fUsedMask[unicode / 8] & (1 << (unicode % 8))) != 0; }
+	void SetUsed(uint16 unicode) { fUsedMask[unicode / 8] |= 1 << (unicode % 8); }
+	
+	uint8 fUsedMask[65536/8]; // exists an encoding and index for this code point?
+	uint8 fEncoding[65536];   // the encoding for each code point
+	uint8 fIndex[65536];      // the index for each code point
+	
+	uint8 fCurrentEncoding;
+	uint8 fCurrentIndex;
 };
 
 #endif // FONTS_H

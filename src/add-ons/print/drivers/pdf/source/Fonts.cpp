@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include <malloc.h>
 #include <StorageKit.h>
 #include "Fonts.h"
-
+#include "Report.h"
 
 // FontFile
 
@@ -277,7 +277,8 @@ Fonts::LookupFontFiles(BPath path)
 										
 		if (entry.GetSize(&size) != B_OK)
 			size = 1024*1024*1024;
-					
+		
+		REPORT(kDebug, -1, "Installed font %s -> %s", fn, name.Path());			
 		fFontFiles.AddItem(new FontFile(fn, name.Path(), size, ft, size < 100*1024));
 	}	// while dir.GetNextEntry()...	
 
@@ -532,3 +533,28 @@ static status_t psf_get_fontname(const char * path, char * fontname, size_t fn_s
 	return status;
 }
 
+// Implementation of UserDefinedEncodings
+
+UserDefinedEncodings::UserDefinedEncodings()
+	: fCurrentEncoding(0)
+	, fCurrentIndex(0)
+{
+	memset(fUsedMask, 0, sizeof(fUsedMask));
+	memset(fEncoding, 0, sizeof(fEncoding));
+	memset(fIndex, 0, sizeof(fIndex));
+}
+
+bool UserDefinedEncodings::Get(uint16 unicode, uint8 &encoding, uint8 &index) {
+	bool missing = !IsUsed(unicode);
+	if (missing) {
+		SetUsed(unicode);
+		fEncoding[unicode] = fCurrentEncoding; fIndex[unicode] = fCurrentIndex;
+		if (fCurrentIndex == 255) {
+			fCurrentIndex = 0; fCurrentEncoding ++;
+		} else {
+			fCurrentIndex ++;
+		}
+	}
+	encoding = fEncoding[unicode]; index = fIndex[unicode];
+	return missing;
+}
