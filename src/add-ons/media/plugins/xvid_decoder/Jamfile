@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons media plugins xvid_decoder ;
+
+UsePrivateHeaders media ;
+
+Addon xvid_decoder : media plugins :
+	xvidDecoderPlugin.cpp
+	: 
+	false
+	:  
+	libxvidcore.a
+;
+
+LinkSharedOSLibs xvid_decoder : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins xvid_decoder xvidcore ;

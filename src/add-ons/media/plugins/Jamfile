@@ -5,3 +5,4 @@ SubInclude OBOS_TOP src add-ons media plugins wav_reader ;
 
 SubInclude OBOS_TOP src add-ons media plugins mp3_decoder ;
 SubInclude OBOS_TOP src add-ons media plugins raw_decoder ;
+SubInclude OBOS_TOP src add-ons media plugins xvid_decoder ;
