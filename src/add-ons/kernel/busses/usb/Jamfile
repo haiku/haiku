@@ -2,8 +2,12 @@ SubDir OBOS_TOP src add-ons kernel busses usb ;
 
 AddResources uhci : uhci.rdef ;
 
+UsePrivateHeaders [ FDirName kernel ] ; 
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel bus_managers usb ] ;
+
 R5KernelAddon uhci : [ FDirName kernel busses usb ] :
-	uhci.c
-	util.c
+	uhci.cpp
+	uhci_rh.cpp
 	;
 
+LinkSharedOSLibs uhci : libusb.a ;
