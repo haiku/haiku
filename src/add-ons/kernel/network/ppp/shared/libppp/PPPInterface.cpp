@@ -8,12 +8,12 @@
 #include "PPPInterface.h"
 
 #include <unistd.h>
-#include <net_stack_driver.h>
+#include "_libppputils.h"
 
 
 PPPInterface::PPPInterface(interface_id ID = PPP_UNDEFINED_INTERFACE_ID)
 {
-	fFD = open("/dev/net/stack", O_RDWR);
+	fFD = open(get_stack_driver_path(), O_RDWR);
 	
 	SetTo(ID);
 }
@@ -21,7 +21,7 @@ PPPInterface::PPPInterface(interface_id ID = PPP_UNDEFINED_INTERFACE_ID)
 
 PPPInterface::PPPInterface(const PPPInterface& copy)
 {
-	fFD = open("/dev/net/stack", O_RDWR);
+	fFD = open(get_stack_driver_path(), O_RDWR);
 	
 	SetTo(copy.ID());
 }

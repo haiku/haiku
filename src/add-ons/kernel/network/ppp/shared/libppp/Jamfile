@@ -11,6 +11,7 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 StaticLibrary ppp :
 	settings_tools.cpp
 	
+	_libppputils.cpp
 	PPPInterface.cpp
 	PPPManager.cpp
 ;

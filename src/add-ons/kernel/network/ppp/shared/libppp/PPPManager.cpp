@@ -8,14 +8,14 @@
 #include "PPPManager.h"
 #include "PPPInterface.h"
 
-#include <net_stack_driver.h>
 #include <settings_tools.h>
 #include <unistd.h>
+#include "_libppputils.h"
 
 
 PPPManager::PPPManager()
 {
-	fFD = open("/dev/net/stack", O_RDWR);
+	fFD = open(get_stack_driver_path(), O_RDWR);
 }
 
 
