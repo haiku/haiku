@@ -76,7 +76,7 @@ This option is disabled by default (preceded by a '#').<br>
 <li><strong>block_sba:</strong> (set to 'false' by default)<br>
 		If set to 'true' this option blocks use of sideband adressing if at least one of the devices on the bus is pre-AGP3.0. Sideband adressing speeds up AGP transfers a bit because it's a seperate (low-speed) communications 'channel' that's used alongside the main transfer channel concurrently. So this enables 'full-duplex' communications, while disabling SBA forces the hardware to use 'half-duplex' communications. SBA is a requirement for AGP3 compliance, so if AGP3 is in effect, this setting is ignored.
 <li><strong>block_fw:</strong> (set to 'false' by default)<br>
-		If set to 'true' this option blocks use of PCI fastwrites. PCI fastwrites work in the same speed AGP transfers work. This means PCI fastwrites are faster in AGP4x mode than they are in AGP2x mode (for instance). PCI fastwrites are used whenever the system initializes transfers to the graphicscard, while 'standard PCI' or AGP transfers are used if the graphicscard's acceleration engine initializes transfers to or from the system.<br>
+		If set to 'true' this option blocks use of PCI fastwrites. PCI fastwrites work in the same speed AGP transfers work. This means PCI fastwrites are faster in AGP4x mode than they are in AGP2x mode (for instance). PCI fastwrites are used whenever the system initiates transfers to the graphicscard, while 'standard PCI' or AGP transfers are used if the graphicscard's acceleration engine initiates transfers to or from the system.<br>
 This means that PCI FW is the only AGP 'feature' that has an effect on the graphics speed on BeOS as it is currently. The use of AGP transfers require graphicsdriver support, and these type of transfers are 'officially' targeted specific for hardware accelerated 3D (which we do not yet have).<br>
 <strong>Note:</strong><br>
 PCI FW support was first introduced with the AGP2.0 specification: that is, devices that support upto and including AGP4X mode are candidates to have this feature.
@@ -84,6 +84,6 @@ PCI FW support was first introduced with the AGP2.0 specification: that is, devi
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on July 18, 2004)</p>
+<p>(Page last updated on July 19, 2004)</p>
 </body>
 </html>
