@@ -50,6 +50,7 @@ CommonTestLib libapptest.so
 		RemoveCommonFilterTest.cpp
 		LooperSizeTest.cpp
 		SetCommonFilterListTest.cpp
+		QuitTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp

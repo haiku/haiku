@@ -524,7 +524,7 @@ DBG(OUT("BLooper::Quit()\n"));
 			name = "no-name";
 		}
 		printf("ERROR - you must Lock a looper before calling Quit(), "
-			   "team=%ld, looper=%s", Team(), name);
+			   "team=%ld, looper=%s\n", Team(), name);
 	}
 
 	// Try to lock
@@ -580,7 +580,7 @@ message.AddInt32("testfield", 42);
 err = PostMessage(&message);
 DBG(OUT("  ... done: %lx\n", err));
 
-		// There's a possibility that PostMessage() will return B_WILL_BLOCK
+		// There's a possibility that PostMessage() will return B_WOULD_BLOCK
 		// because the port is full, so we'll wait a bit and re-post until
 		// we won't block.
 		while (err == B_WOULD_BLOCK)
@@ -853,11 +853,8 @@ void BLooper::SetCommonFilterList(BList* filters)
 	// becomes problematic when the loopers are destroyed: the last looper
 	// destroyed will have a problem when it tries to delete a filter list that
 	// has already been deleted.  In R5, this results in a general protection
-	// fault; here it ends in a segment violation.
-	// TODO: Fix
-	//		 by checking first filter in list for ownership issues.  Go to
-	//		 debugger with something like  "A MessageFilter can only be used
-	//		 once." and return with out setting the list.
+	// fault.  We fix this by checking the filter list for ownership issues.
+
 	if (!IsLocked())
 	{
 		debugger("Owning Looper must be locked before calling "
