@@ -762,20 +762,21 @@ resolve_volume_root_to_mount_point(struct vnode *vnode)
 
 
 /**	\brief Gets the directory path and leaf name for a given path.
+ *
+ *	The supplied \a path is transformed to refer to the directory part of
+ *	the entry identified by the original path, and into the buffer \a filename
+ *	the leaf name of the original entry is written.
+ *	Neither the returned path nor the leaf name can be expected to be
+ *	canonical.
+ *
+ *	\param path The path to be analyzed. Must be able to store at least one
+ *		   additional character.
+ *	\param filename The buffer into which the leaf name will be written.
+ *		   Must be of size B_FILE_NAME_LENGTH at least.
+ *	\return \c B_OK, if everything went fine, \c B_NAME_TOO_LONG, if the leaf
+ *		   name is longer than \c B_FILE_NAME_LENGTH.
+ */
 
-	The supplied \a path is transformed to refer to the directory part of
-	the entry identified by the original path, and into the buffer \a filename
-	the leaf name of the original entry is written.
-	Neither the returned path nor the leaf name can be expected to be
-	canonical.
-
-	\param path The path to be analyzed. Must be able to store at least one
-		   additional character.
-	\param filename The buffer into which the leaf name will be written.
-		   Must be of size B_FILE_NAME_LENGTH at least.
-	\return \c B_OK, if everything went fine, \c B_NAME_TOO_LONG, if the leaf
-		   name is longer than \c B_FILE_NAME_LENGTH.
-*/
 static status_t
 get_dir_path_and_leaf(char *path, char *filename)
 {
@@ -1124,10 +1125,11 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
  *	It might be a good idea, though, to check if the returned path exists
  *	in the calling function (it's not done here because of efficiency)
  */
+
 static status_t
 dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
-FUNCTION(("dir_vnode_to_path(%p, %p, %lu\n)", vnode, buffer, bufferSize));
+	FUNCTION(("dir_vnode_to_path(%p, %p, %lu\n)", vnode, buffer, bufferSize));
 
 	/* this implementation is currently bound to SYS_MAX_PATH_LEN */
 	char path[SYS_MAX_PATH_LEN];
@@ -1256,7 +1258,7 @@ FUNCTION(("dir_vnode_to_path(%p, %p, %lu\n)", vnode, buffer, bufferSize));
 	if (path[insert] == '\0')
 		path[--insert] = '/';
 
-PRINT(("  path is: %s\n", path + insert));
+	PRINT(("  path is: %s\n", path + insert));
 
 	// copy the path to the output buffer
 	length = sizeof(path) - insert;
@@ -1772,6 +1774,38 @@ vfs_get_file_map(void *_vnode, off_t offset, size_t size, file_io_vec *vecs, siz
 }
 
 
+/**	Closes all file descriptors of the specified I/O context that
+ *	don't have the O_CLOEXEC flag set.
+ */
+
+void
+vfs_exec_io_context(void *_context)
+{
+	struct io_context *context = (struct io_context *)_context;
+	uint32 i;
+
+
+	for (i = 0; i < context->table_size; i++) {
+		mutex_lock(&context->io_mutex);
+
+		struct file_descriptor *descriptor = context->fds[i];
+		bool remove = false;
+
+		if (descriptor != NULL && (descriptor->open_mode & O_CLOEXEC) != 0) {
+			context->fds[i] = NULL;
+			context->num_used_fds--;
+
+			remove = true;
+		}
+
+		mutex_unlock(&context->io_mutex);
+
+		if (remove)
+			put_fd(descriptor);
+	}
+}
+
+
 /** Sets up a new io_control structure, and inherits the properties
  *	of the parent io_control if it is given.
  */
@@ -1779,7 +1813,7 @@ vfs_get_file_map(void *_vnode, off_t offset, size_t size, file_io_vec *vecs, siz
 void *
 vfs_new_io_context(void *_parentContext)
 {
-	size_t table_size;
+	size_t tableSize;
 	struct io_context *context;
 	struct io_context *parentContext;
 
@@ -1791,17 +1825,17 @@ vfs_new_io_context(void *_parentContext)
 
 	parentContext = (struct io_context *)_parentContext;
 	if (parentContext)
-		table_size = parentContext->table_size;
+		tableSize = parentContext->table_size;
 	else
-		table_size = DEFAULT_FD_TABLE_SIZE;
+		tableSize = DEFAULT_FD_TABLE_SIZE;
 
-	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * table_size);
+	context->fds = (file_descriptor **)malloc(sizeof(struct file_descriptor *) * tableSize);
 	if (context->fds == NULL) {
 		free(context);
 		return NULL;
 	}
 
-	memset(context->fds, 0, sizeof(struct file_descriptor *) * table_size);
+	memset(context->fds, 0, sizeof(struct file_descriptor *) * tableSize);
 
 	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
 		free(context->fds);
@@ -1820,7 +1854,7 @@ vfs_new_io_context(void *_parentContext)
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
 
-		for (i = 0; i < table_size; i++) {
+		for (i = 0; i < tableSize; i++) {
 			if (parentContext->fds[i] && (parentContext->fds[i]->open_mode & O_CLOEXEC) == 0) {
 				context->fds[i] = parentContext->fds[i];
 				atomic_add(&context->fds[i]->ref_count, 1);
@@ -1835,7 +1869,7 @@ vfs_new_io_context(void *_parentContext)
 			inc_vnode_ref_count(context->cwd);
 	}
 
-	context->table_size = table_size;
+	context->table_size = tableSize;
 
 	list_init(&context->node_monitors);
 	context->max_monitors = MAX_NODE_MONITORS;
