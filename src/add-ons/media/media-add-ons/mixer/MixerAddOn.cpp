@@ -1,13 +1,20 @@
 // MixerAddOn.cpp
 //
 // David Shipman, 2002
-// allows AudioMixer to be used as an addon 
+// Marcus Overhagen, 2003
 //
+// Allows AudioMixer to be used as an addon.
+// The add-on will request to be auto-started,
+// if this happens, it will try to connect 
+// itself to the default audio output.
+
+#include <MediaRoster.h>
+#include <MediaNode.h>
+#include <cstring>
+#include <cstdio>
 
 #include "AudioMixer.h"
 #include "MixerAddOn.h"
-#include <cstring>
-#include <cstdlib>
 
 // instantiation function
 extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image) {
@@ -18,66 +25,153 @@ extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image) {
 // ctor/dtor
 // -------------------------------------------------------- //
 
-AudioMixerAddon::~AudioMixerAddon() {}
-AudioMixerAddon::AudioMixerAddon(image_id image) :
-	BMediaAddOn(image) {}
-	
-// -------------------------------------------------------- //
-// BMediaAddOn impl
-// -------------------------------------------------------- //
+AudioMixerAddon::AudioMixerAddon(image_id image)
+ :	BMediaAddOn(image),
+ 	fFormat(new media_format),
+ 	fInfo(new flavor_info)
+{
+	// Init media_format
+	memset(fFormat, 0, sizeof(*fFormat));
+	fFormat->type = B_MEDIA_RAW_AUDIO;
+	fFormat->u.raw_audio = media_raw_audio_format::wildcard;
 
-status_t AudioMixerAddon::InitCheck(
-	const char** out_failure_text) {
-	return B_OK;
-}
-	
-int32 AudioMixerAddon::CountFlavors() {
-
-	return 1;
-}
-
-status_t AudioMixerAddon::GetFlavorAt(
-	int32 n,
-	const flavor_info** out_info) {
-	if(n)
-		return B_ERROR;
-	
-	flavor_info* fInfo = new flavor_info;
-	fInfo->internal_id = n;
+	// Init flavor_info
+	fInfo->internal_id = 0;
 	fInfo->name = "AudioMixer";
 	fInfo->info = "AudioMixer media addon";
 	fInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
 	fInfo->flavor_flags = 0;	// 0 = global or local instantiation allowed, no restrictions
 	fInfo->possible_count = 0;	// 0 = infinite
-	
-	media_format* fFormat = new media_format;
-	fFormat->type = B_MEDIA_RAW_AUDIO;
-	fFormat->u.raw_audio = media_raw_audio_format::wildcard;
-	
 	fInfo->in_format_count = 1;
 	fInfo->in_formats = fFormat;
-	
 	fInfo->out_format_count = 1;
 	fInfo->out_formats = fFormat;
+}
+
+AudioMixerAddon::~AudioMixerAddon()
+{
+	delete fFormat;
+	delete fInfo;
+}
+
+// -------------------------------------------------------- //
+// BMediaAddOn impl
+// -------------------------------------------------------- //
+
+status_t
+AudioMixerAddon::InitCheck(const char** out_failure_text)
+{
+	return B_OK;
+}
+
+int32
+AudioMixerAddon::CountFlavors()
+{
+	return 1;
+}
+
+status_t
+AudioMixerAddon::GetFlavorAt(int32 n, const flavor_info** out_info)
+{
+	// only the 0th flavor exists
+	if (n != 0)
+		return B_ERROR;
 	
 	*out_info = fInfo;
 	return B_OK;
 }
 
-BMediaNode* AudioMixerAddon::InstantiateNodeFor(
-	const flavor_info* info,
-	BMessage* config,
-	status_t* out_error) {
-
-	return new AudioMixer(this);	
+BMediaNode *
+AudioMixerAddon::InstantiateNodeFor(const flavor_info* info, BMessage* config,
+									status_t* out_error)
+{
+	return new AudioMixer(this);
 }
 
-status_t AudioMixerAddon::GetConfigurationFor(
-	BMediaNode* your_node,
-	BMessage* into_message) {
-	
+status_t
+AudioMixerAddon::GetConfigurationFor(BMediaNode* your_node,	BMessage* into_message)
+{
 	// no config yet
 	return B_ERROR;
 }
 
-// end
+bool
+AudioMixerAddon::WantsAutoStart()
+{
+	// yes, please kick me
+	return true;
+}
+
+status_t
+AudioMixerAddon::AutoStart(int in_index, BMediaNode ** out_node,
+						   int32 * out_internal_id,	bool * out_has_more)
+{
+	*out_has_more = false;
+
+	if (in_index != 0)
+		return B_ERROR;
+
+	*out_internal_id = 0;
+	*out_node = new AudioMixer(this);
+	
+	// The mixer has been created.
+	// We now try to connect it with the default audio output.
+
+	if (ConnectToOutput(*out_node) != B_OK) {
+		printf("AudioMixerAddon::AutoStart: failed to ConnectToOutput()\n");
+		// cleanup
+		// return B_ERROR;
+	}
+	
+	return B_OK;
+}
+
+status_t
+AudioMixerAddon::ConnectToOutput(BMediaNode *node)
+{
+	BMediaRoster 		*roster;
+	media_node 			mixer;
+	media_node 			soundcard;
+	media_input 		input;
+	media_output 		output;
+	int32 				count;
+	status_t 			rv;
+	
+	roster = BMediaRoster::Roster();
+	mixer = node->Node();
+	
+	// XXX this connects to *any* physical output, but not the default logical input
+
+	rv = roster->GetAudioOutput(&soundcard);
+	if (rv < B_OK) {
+		printf("AudioMixerAddon::AutoStart: failed to find soundcard (physical audio output)\n");
+		return B_ERROR;
+	}
+
+	// we now have the mixer and soundcard nodes,
+	// find a free input/output and connect them
+
+	rv = roster->GetFreeOutputsFor(mixer, &output, 1, &count, B_MEDIA_RAW_AUDIO);
+	if (rv < B_OK || count != 1) {
+		printf("AudioMixerAddon::AutoStart: can't find free mixer output\n");
+		return B_ERROR;
+	}
+
+	rv = roster->GetFreeInputsFor(soundcard, &input, 1, &count, B_MEDIA_RAW_AUDIO);
+	if (rv < B_OK || count != 1) {
+		printf("AudioMixerAddon::AutoStart: can't find free soundcard input\n");
+		return B_ERROR;
+	}
+
+	media_format format;
+	memset(&format, 0, sizeof(format));
+	format.type = B_MEDIA_RAW_AUDIO;
+
+	rv = roster->Connect(output.source, input.destination, &format, &output, &input);
+	if (rv < B_OK) {
+		printf("AudioMixerAddon::AutoStart: connect failed\n");
+		return B_ERROR;
+	}
+	
+	return B_OK;
+}

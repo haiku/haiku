@@ -34,12 +34,18 @@ virtual	status_t GetConfigurationFor(
 				BMediaNode * your_node,
 				BMessage * into_message);
 
-virtual	bool WantsAutoStart() { return false; }
+virtual	bool WantsAutoStart();
 virtual	status_t AutoStart(
-				int in_count,
+				int in_index,
 				BMediaNode ** out_node,
 				int32 * out_internal_id,
-				bool * out_has_more) { return B_OK; }
+				bool * out_has_more);
+private:
+	status_t ConnectToOutput(BMediaNode *node);
+				
+private:
+	media_format 	*fFormat;
+	flavor_info		*fInfo;
 };
 
 #endif /*__AudioMixerAddOn_H_*/
