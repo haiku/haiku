@@ -10,11 +10,13 @@ Author: Sikosis
 
 // Includes ------------------------------------------------------------------------------------------ //
 #include <Application.h>
+#include <List.h>
+#include <ListView.h>
 #include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <stdio.h>
-#include <string.h>
+#include <String.h>
 #include <TabView.h>
 #include <Window.h>
 #include <View.h>
@@ -61,10 +63,17 @@ void ResourceUsageWindow::InitWindow(void)
 {
 	BRect r;
 	BRect rtab;
-	r = Bounds(); // the whole view
+	BRect rlist;
+	r = Bounds();
     rtab = Bounds();
-    
-	rtab.InsetBy(0,10);
+    rtab.top += 10;
+    rlist = Bounds();
+    rlist.top += 44;
+    rlist.left += 12;
+    rlist.right -= 12;
+    rlist.bottom -= 12;
+        
+	// Create the TabView and Tabs
 	tabView = new BTabView(rtab,"resource_usage_tabview");
 	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	rtab = tabView->Bounds();
@@ -82,9 +91,28 @@ void ResourceUsageWindow::InitWindow(void)
 	tabView->AddTab(new MemoryRangeView(r), tab);
 	tab->SetLabel("Memory Range");
 	
+	// Create the ListViews
+	BListView *IRQListView;
+	BListView *DMAListView;
+	
+	IRQListView = new BListView(rlist, "IRQListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+						B_WILL_DRAW | B_NAVIGABLE);
+	DMAListView = new BListView(rlist, "DMAListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
+						B_WILL_DRAW | B_NAVIGABLE);
+						
+	BString tmp;
+	tmp.SetTo("0       Timer");
+	Lock();
+	IRQListView->AddItem(new BStringItem(tmp.String()));
+	Unlock();
+
 	// Create the Views
 	AddChild(ptrResourceUsageView = new ResourceUsageView(r));
 	ptrResourceUsageView->AddChild(tabView);
+	AddChild(IRQListView);
+	
+	IRQListView->MakeFocus();
+	DMAListView->Hide();
 }
 // -------------------------------------------------------------------------------------------------- //
 
