@@ -32,6 +32,7 @@ namespace BPrivate { namespace media {
 class BMediaRosterEx : public BMediaRoster
 {
 public:
+	BMediaRosterEx(status_t * out_error);
 	status_t SaveNodeConfiguration(BMediaNode *node);
 	status_t LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BMessage *out_msg);
 
