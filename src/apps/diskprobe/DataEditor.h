@@ -13,6 +13,7 @@
 
 
 class DataChange;
+class StateWatcher;
 
 class DataEditor : public BLocker {
 	public:
@@ -26,10 +27,12 @@ class DataEditor : public BLocker {
 		status_t SetTo(entry_ref &ref, const char *attribute = NULL);
 		status_t SetTo(BEntry &entry, const char *attribute = NULL);
 
+		status_t Save();
+
 		bool IsReadOnly() const { return fIsReadOnly; }
 		bool IsDevice() const { return fIsDevice; }
 		bool IsAttribute() const { return fAttribute != NULL; }
-		//bool IsModified() const { return fIsModified; }
+		bool IsModified() const { return fLastChange != fFirstChange; }
 
 		const char *Attribute() const { return fAttribute; }
 		type_code Type() const { return fType; }
@@ -73,12 +76,14 @@ class DataEditor : public BLocker {
 		const entry_ref &Ref() const { return fRef; }
 
 	private:
+		friend class StateWatcher;
+
 		void SendNotices(uint32 what, BMessage *message = NULL);
 		void SendNotices(DataChange *change);
 		status_t Update();
 		void AddChange(DataChange *change);
 		void ApplyChanges();
-		bool RemoveRedos();
+		void RemoveRedos();
 
 		BObjectList<BMessenger> fObservers;
 

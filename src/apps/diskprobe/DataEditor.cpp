@@ -15,6 +15,18 @@
 #include <unistd.h>
 
 
+class StateWatcher {
+	public:
+		StateWatcher(DataEditor &editor);
+		~StateWatcher();
+
+	private:
+		DataEditor	&fEditor;
+		bool		fCouldUndo;
+		bool		fCouldRedo;
+		bool		fWasModified;
+};
+
 class DataChange {
 	public:
 		virtual ~DataChange();
@@ -42,6 +54,36 @@ class ReplaceChange : public DataChange {
 		size_t	fSize;
 		off_t	fOffset;
 };
+
+
+//---------------------
+
+
+StateWatcher::StateWatcher(DataEditor &editor)
+	:
+	fEditor(editor)
+{
+	fCouldUndo = editor.CanUndo();
+	fCouldRedo = editor.CanRedo();
+	fWasModified = editor.IsModified();
+}
+
+
+StateWatcher::~StateWatcher()
+{
+	BMessage update;
+	if (fCouldRedo != fEditor.CanRedo())
+		update.AddBool("can_redo", fEditor.CanRedo());
+	if (fCouldUndo != fEditor.CanUndo())
+		update.AddBool("can_undo", fEditor.CanUndo());
+	if (fWasModified != fEditor.IsModified())
+		update.AddBool("modified", fEditor.IsModified());
+
+	fEditor.SendNotices(kMsgDataEditorStateChange, &update);
+}
+
+
+//	#pragma mark -
 
 
 DataChange::~DataChange()
@@ -272,34 +314,30 @@ DataEditor::InitCheck()
 }
 
 
-void 
+void
 DataEditor::AddChange(DataChange *change)
 {
 	if (change == NULL)
 		return;
 
-	bool removed = RemoveRedos();
-	bool changed = !CanUndo();
+	StateWatcher watcher(*this);
+		// update state observers
+
+	RemoveRedos();
 
 	fChanges.AddItem(change);
 	fLastChange = change;
 
 	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
+	// ToDo: try to join changes
 
 	// update observers
 
 	SendNotices(fLastChange);
-
-	BMessage update;
-	if (removed)
-		update.AddBool("can_redo", false);
-	if (changed)
-		update.AddBool("can_undo", true);
-	SendNotices(kMsgDataEditorStateChange, &update);
 }
 
 
-status_t 
+status_t
 DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 {
 	BAutolock locker(this);
@@ -322,29 +360,31 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 }
 
 
-status_t 
+status_t
 DataEditor::Remove(off_t offset, off_t length)
 {
 	BAutolock locker(this);
 
 	// not yet implemented
+	// ToDo: this needs some changes to the whole change mechanism
 
 	return B_ERROR;
 }
 
 
-status_t 
+status_t
 DataEditor::Insert(off_t offset, const uint8 *text, size_t length)
 {
 	BAutolock locker(this);
 
 	// not yet implemented
+	// ToDo: this needs some changes to the whole change mechanism
 
 	return B_ERROR;
 }
 
 
-void 
+void
 DataEditor::ApplyChanges()
 {
 	if (fLastChange == NULL)
@@ -359,28 +399,33 @@ DataEditor::ApplyChanges()
 }
 
 
+status_t
+DataEditor::Save()
+{
+	// collect ranges of data we need to write
+
+	// read in data and apply changes, write it back to disk
+}
+
+
 /** This method will be called by DataEditor::AddChange()
  *	immediately before a change is applied.
  *	It removes all pending redo nodes from the list that would
  *	come after the current change.
  */
 
-bool
+void
 DataEditor::RemoveRedos()
 {
 	if (fLastChange == NULL)
-		return false;
+		return;
 
 	int32 start = fChanges.IndexOf(fLastChange) + 1;
-	bool removed = false;
 
 	for (int32 i = fChanges.CountItems(); i-- > start; ) {
 		DataChange *change = fChanges.RemoveItemAt(i);
 		delete change;
-		removed = true;
 	}
-
-	return removed;
 }
 
 
@@ -392,7 +437,9 @@ DataEditor::Undo()
 	if (!CanUndo())
 		return B_ERROR;
 
-	bool couldRedo = CanRedo();
+	StateWatcher watcher(*this);
+		// update state observers
+
 	DataChange *undoChange = fLastChange;
 
 	int32 index = fChanges.IndexOf(undoChange);
@@ -406,13 +453,6 @@ DataEditor::Undo()
 	// update observers
 	SendNotices(undoChange);
 
-	BMessage update;
-	if (!couldRedo)
-		update.AddBool("can_redo", true);
-	if (!CanUndo())
-		update.AddBool("can_undo", false);
-	SendNotices(kMsgDataEditorStateChange, &update);
-
 	return B_OK;
 }
 
@@ -425,7 +465,8 @@ DataEditor::Redo()
 	if (!CanRedo())
 		return B_ERROR;
 
-	bool couldUndo = CanUndo();
+	StateWatcher watcher(*this);
+		// update state observers
 
 	int32 index = fChanges.IndexOf(fLastChange);
 	fLastChange = fChanges.ItemAt(index + 1);
@@ -434,13 +475,6 @@ DataEditor::Redo()
 
 	// update observers
 	SendNotices(fLastChange);
-
-	BMessage update;
-	if (!CanRedo())
-		update.AddBool("can_redo", false);
-	if (!couldUndo)
-		update.AddBool("can_undo", true);
-	SendNotices(kMsgDataEditorStateChange, &update);
 
 	return B_OK;
 }
