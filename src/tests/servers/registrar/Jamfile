@@ -4,6 +4,6 @@ UsePublicHeaders app ;
 
 SimpleTest RegistrarTest1
 	: RegistrarTest1.cpp
-	: <boot!home!config!lib>libopenbeos.so
+	: <boot!home!config!lib>libopenbeos.so be
 ;
 
