@@ -201,6 +201,7 @@ RecentApps::Print()
 	{
 		printf("%d: '%s'\n", counter++, item->c_str());
 	}
+	return B_OK;
 }
 
 // Save

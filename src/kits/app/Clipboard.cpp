@@ -200,6 +200,7 @@ BClipboard::BClipboard(const BClipboard &)
 BClipboard & BClipboard::operator=(const BClipboard &)
 {
   /* This is private, and I don't use it, so I'm not going to implement it */
+	return *this;
 }
 //------------------------------------------------------------------------------
 void BClipboard::_ReservedClipboard1()
