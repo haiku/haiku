@@ -24,6 +24,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) posix ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix locale ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdio ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix stdlib ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) posix string ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix sys ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix time ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) posix unistd ] ;
@@ -76,6 +77,33 @@ KernelMergeObject kernel_posix.o :
 	<$(SOURCE_GRIST)>truncate.c
 	<$(SOURCE_GRIST)>usergroup.c
 	<$(SOURCE_GRIST)>write.c
+	# string
+	memchr.c
+	memcmp.c
+	memcpy.c
+	memmove.c
+	memset.c
+	strcasecmp.c
+	strcasestr.c
+	strcat.c
+	strchr.c
+	strcmp.c
+	strcpy.c
+	strcspn.c
+	strdup.c
+	strerror.c
+	strlcat.c
+	strlcpy.c
+	strlen.c
+	strncat.c
+	strncmp.c
+	strncpy.c
+	strnlen.c
+	strpbrk.c
+	strrchr.c
+	strspn.c
+	strstr.c
+	strtok.c
 
 	: -fno-pic
 	;
