@@ -871,7 +871,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	bool end = false;
 	bool exec = true;
 	uint8 index, byte, byte2, safe;
-	uint32 reg, data, data2, and_out, or_in, safe32;
+	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
 
@@ -882,6 +882,55 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 		//fixme: complete (if possible) ...
 		switch (rom[adress])
 		{
+		case 0x37: /* new */
+			*size -= 11;
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			adress += 1;
+			reg = *((uint32*)(&(rom[adress])));
+			adress += 4;
+			byte2 = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			reg2 = *((uint16*)(&(rom[adress])));
+			adress += 2;
+			index = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			and_out2 = *((uint8*)(&(rom[adress])));
+			adress += 1;
+			LOG(8,("cmd 'RD 32bit reg $%08x, rotate-right = $%02x, AND-out lsb = $%02x,\n",
+				reg, byte2, and_out));
+			LOG(8,("INFO: (cont.) RD 8bit ISA reg $%02x via $%04x, AND-out = $%02x, OR-in lsb result 32bit, WR-bk'\n",
+				index, reg2, and_out2));
+			if (exec)
+			{
+				data = NV_REG32(reg);
+				if (byte2 < 0x80)
+				{
+					data >>= byte2;
+				}
+				else
+				{
+					data <<= (0x0100 - byte2);
+				}
+				data &= and_out;
+				safe = ISARB(reg2);
+				ISAWB(reg2, index);
+				byte = ISARB(reg2 + 1);
+				byte &= (uint8)and_out2;
+				byte |= (uint8)data;
+				ISAWB((reg2 + 1), byte);
+				ISAWB(reg2, safe);
+			}
+			break;
 		case 0x38: /* new */
 			*size -= 1;
 			if (*size < 0)
