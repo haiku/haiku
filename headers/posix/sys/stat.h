@@ -102,9 +102,16 @@ extern int    mkfifo(const char *path, mode_t mode);
 extern mode_t umask(mode_t cmask);
 
 // This achieves backwards compatibility with R5
+#if 0
 #define stat(fd, st) _stat(fd, st, sizeof(struct stat))
 #define fstat(fd, st) _fstat(fd, st, sizeof(struct stat))
 #define lstat(fd, st) _lstat(fd, st, sizeof(struct stat))
+#else
+// ... and this fixes the build for R5 for now
+extern int    stat(const char *path, struct stat *st);
+extern int    fstat(int fd, struct stat *st);
+extern int    lstat(const char *path, struct stat *st);
+#endif
 
 #ifdef __cplusplus
 }
