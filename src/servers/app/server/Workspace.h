@@ -67,7 +67,7 @@ public:
 			WinBorder*			GoToLowerItem();
 			bool				GoToItem(WinBorder* layer);
 
-			WinBorder*			SearchLayerUnderPoint(BPoint pt);
+			WinBorder*			SearchWinBorder(BPoint pt);
 			void				Invalidate();
 
 			void				SetLocalSpace(const uint32 colorspace);

@@ -246,10 +246,10 @@ STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(
 
 	if (previousFocus != FocusLayer()){
 		if (previousFocus)
-			previousFocus->SetFocus(false);
+			previousFocus->HighlightDecorator(false);
 
 		if (FocusLayer()){
-			FocusLayer()->SetFocus(true);
+			FocusLayer()->HighlightDecorator(true);
 		}
 
 // TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
@@ -332,8 +332,8 @@ bool Workspace::GoToItem(WinBorder* layer){
 	return false;
 }
 //---------------------------------------------------------------------------
-WinBorder* Workspace::SearchLayerUnderPoint(BPoint pt){
-// TODO: implement correctly one you have clipping code working
+WinBorder* Workspace::SearchWinBorder(BPoint pt){
+// TODO: implement correctly once you have clipping code working
 // For the moment, take windows from front to back and see in witch one 'pt' falls
 	WinBorder		*target = NULL;
 	opLock.Lock();
@@ -354,7 +354,7 @@ void Workspace::Invalidate(){
 //TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
 	opLock.Lock();
 	if(fOwner->ActiveWorkspace() == this)
-		fOwner->DoInvalidate(BRegion(fOwner->Bounds()), NULL);
+		fOwner->FullInvalidate(fOwner->Bounds());
 	opLock.Unlock();
 //----------------
 }
@@ -408,7 +408,7 @@ void Workspace::RemoveItem(ListData* item){
 	item->lowerItem	= NULL;
 	
 	if (fFocusItem == item){
-		fFocusItem->layerPtr->SetFocus(false);
+		fFocusItem->layerPtr->HighlightDecorator(false);
 		fFocusItem = NULL;
 	}
 	if (fFrontItem == item)
