@@ -5,19 +5,24 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <interface/Input.h>
 #include <support/List.h>
 
-static void list_devices()
+static int list_devices()
 {
 	BList list;
 	BInputDevice *device;
 	int i, n;
+	status_t err;
 
 	printf("         name                  type         state \n");
 	printf("--------------------------------------------------\n");
 
-	get_input_devices(&list);
+	if ((err = get_input_devices(&list))!=B_OK) {
+		fprintf(stderr, "error while get_input_devices: %s\n", strerror(err));
+		return -1;
+	}
 
 	n = list.CountItems();
 	if (n == 0) {
@@ -33,6 +38,8 @@ static void list_devices()
 			device->Type() == B_KEYBOARD_DEVICE ? "B_KEYBOARD_DEVICE" : "B_UNDEFINED_DEVICE",
 			device->IsRunning() ? "running" : "stopped");
 	}
+
+	return 0;
 }
 
 static void start_device(const char *name)
@@ -79,7 +86,7 @@ int main(int argc, char *argv[])
 	const char *name;
 
 	if (argc <= 1) {
-		list_devices();
+		return list_devices();
 	}
 	else {
 		for (i = 1; i < argc; i++) {
