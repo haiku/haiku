@@ -9,6 +9,7 @@
 //
 // Author
 //   Ithamar R. Adema
+//   Michael Pfeiffer
 //
 // This application and all source files used in its construction, except 
 // where noted, are licensed under the MIT License, and have been written 
@@ -34,7 +35,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
+
+#include <Messenger.h>
+#include <Roster.h>
+#include <String.h>
+
 #include "BeUtils.h"
+
 
 // ---------------------------------------------------------------
 // TestForAddonExistence
@@ -58,4 +65,28 @@ status_t TestForAddonExistence(const char* name, directory_which which, const ch
 	}
 	
 	return err;
+}
+
+// Implementation of AutoReply
+
+AutoReply::AutoReply(BMessage* sender, uint32 what)
+	: fSender(sender)
+	, fReply(what) 
+{
+}
+
+AutoReply::~AutoReply() {
+	fSender->SendReply(&fReply);
+	delete fSender;
+}
+
+bool MimeTypeForSender(BMessage* sender, BString& mime) {
+	BMessenger msgr = sender->ReturnAddress();
+	team_id team = msgr.Team();
+	app_info info;
+	if (be_roster->GetRunningAppInfo(team, &info) == B_OK) {
+		mime = info.signature;
+		return true;
+	}
+	return false;
 }

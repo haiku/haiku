@@ -72,4 +72,19 @@ public:
 	}
 };
 
+// Automatically send a reply to sender on destruction of object
+// and delete sender
+class AutoReply {
+	BMessage* fSender;
+	BMessage  fReply;
+	
+public:
+	AutoReply(BMessage* sender, uint32 what);
+	~AutoReply();
+	void SetReply(BMessage* m) { fReply = *m; }
+};
+
+// mimetype from sender
+bool MimeTypeForSender(BMessage* sender, BString& mime);
+
 #endif
