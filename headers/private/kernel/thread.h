@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -60,7 +63,7 @@ team_id team_get_kernel_team_id(void);
 team_id team_get_current_team_id(void);
 char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
-struct team *team_get_team_struct(team_id id);
+bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
 
 // used in syscalls.c
