@@ -1,90 +1,50 @@
 SubDir OBOS_TOP src kernel ;
 
 KernelStaticLibraryObjects libkern.a :
-	<$(SOURCE_GRIST)!libc!locale>ctype.o
+	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
 
-	<$(SOURCE_GRIST)!libc!stdio>kvsprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
 
-	<$(SOURCE_GRIST)!libc!stdlib>assert.o
-	<$(SOURCE_GRIST)!libc!stdlib>atoi.o
-	<$(SOURCE_GRIST)!libc!stdlib>bsearch.o
-	<$(SOURCE_GRIST)!libc!stdlib>heapsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>merge.o
-	<$(SOURCE_GRIST)!libc!stdlib>multibyte.o
-	<$(SOURCE_GRIST)!libc!stdlib>qsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>rand.o
-	<$(SOURCE_GRIST)!libc!stdlib>random.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>merge.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>multibyte.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
 
-	<$(SOURCE_GRIST)!libc!string>memchr.o
-	<$(SOURCE_GRIST)!libc!string>memcmp.o
-	<$(SOURCE_GRIST)!libc!string>memcpy.o
-	<$(SOURCE_GRIST)!libc!string>memmove.o
-	<$(SOURCE_GRIST)!libc!string>memset.o
-	<$(SOURCE_GRIST)!libc!string>strcasecmp.o
-	<$(SOURCE_GRIST)!libc!string>strcasestr.o
-	<$(SOURCE_GRIST)!libc!string>strcat.o
-	<$(SOURCE_GRIST)!libc!string>strchr.o
-	<$(SOURCE_GRIST)!libc!string>strcmp.o
-	<$(SOURCE_GRIST)!libc!string>strcpy.o
-	<$(SOURCE_GRIST)!libc!string>strcspn.o
-	<$(SOURCE_GRIST)!libc!string>strdup.o
-	<$(SOURCE_GRIST)!libc!string>strerror.o
-	<$(SOURCE_GRIST)!libc!string>strlcat.o
-	<$(SOURCE_GRIST)!libc!string>strlcpy.o
-	<$(SOURCE_GRIST)!libc!string>strlen.o
-	<$(SOURCE_GRIST)!libc!string>strncat.o
-	<$(SOURCE_GRIST)!libc!string>strncmp.o
-	<$(SOURCE_GRIST)!libc!string>strncpy.o
-	<$(SOURCE_GRIST)!libc!string>strnicmp.o
-	<$(SOURCE_GRIST)!libc!string>strnlen.o
-	<$(SOURCE_GRIST)!libc!string>strpbrk.o
-	<$(SOURCE_GRIST)!libc!string>strrchr.o
-	<$(SOURCE_GRIST)!libc!string>strspn.o
-	<$(SOURCE_GRIST)!libc!string>strstr.o
-	<$(SOURCE_GRIST)!libc!string>strtok.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcasecmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcasestr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcspn.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strdup.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strerror.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnicmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strpbrk.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strspn.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strstr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strtok.o
 
-	<$(SOURCE_GRIST)!libc!system>rlimit.o
-	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
-	;
-
-KernelStaticLibraryObjects libm.a :
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>fabs.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>frexp.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>isinf.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>ldexp.o
-
-	<$(SOURCE_GRIST)!libm!common>atan2.o 
-	<$(SOURCE_GRIST)!libm!common>sincos.o
-	<$(SOURCE_GRIST)!libm!common>tan.o
-
-	<$(SOURCE_GRIST)!libm!common_source>acosh.o
-	<$(SOURCE_GRIST)!libm!common_source>asincos.o 
-	<$(SOURCE_GRIST)!libm!common_source>asinh.o 
-	<$(SOURCE_GRIST)!libm!common_source>atan.o
-	<$(SOURCE_GRIST)!libm!common_source>atanh.o 
-	<$(SOURCE_GRIST)!libm!common_source>cosh.o 
-	<$(SOURCE_GRIST)!libm!common_source>erf.o
-	<$(SOURCE_GRIST)!libm!common_source>exp.o 
-	<$(SOURCE_GRIST)!libm!common_source>exp__E.o 
-	<$(SOURCE_GRIST)!libm!common_source>expm1.o 
-	<$(SOURCE_GRIST)!libm!common_source>floor.o 
-	<$(SOURCE_GRIST)!libm!common_source>fmod.o
-	<$(SOURCE_GRIST)!libm!common_source>gamma.o 
-	<$(SOURCE_GRIST)!libm!common_source>j0.o 
-	<$(SOURCE_GRIST)!libm!common_source>j1.o 
-	<$(SOURCE_GRIST)!libm!common_source>jn.o
-	<$(SOURCE_GRIST)!libm!common_source>lgamma.o 
-	<$(SOURCE_GRIST)!libm!common_source>log.o
-	<$(SOURCE_GRIST)!libm!common_source>log10.o 
-	<$(SOURCE_GRIST)!libm!common_source>log1p.o
-	<$(SOURCE_GRIST)!libm!common_source>log__L.o 
-	<$(SOURCE_GRIST)!libm!common_source>pow.o 
-	<$(SOURCE_GRIST)!libm!common_source>sinh.o 
-	<$(SOURCE_GRIST)!libm!common_source>tanh.o
-
-	<$(SOURCE_GRIST)!libm!ieee>cabs.o
-	<$(SOURCE_GRIST)!libm!ieee>cbrt.o
-	<$(SOURCE_GRIST)!libm!ieee>support.o
+	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 	;
 
 KernelLd stage2
@@ -201,317 +161,299 @@ KernelLd libglue.o :
 	no_gcc
 	;
 
-KernelLd libm.so
-	:
-	libglue.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>fabs.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>frexp.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>isinf.o
-	<$(SOURCE_GRIST)!libm!arch!$(OBOS_ARCH)>ldexp.o
-
-	<$(SOURCE_GRIST)!libm!common>atan2.o 
-	<$(SOURCE_GRIST)!libm!common>sincos.o
-	<$(SOURCE_GRIST)!libm!common>tan.o
-
-	<$(SOURCE_GRIST)!libm!common_source>acosh.o
-	<$(SOURCE_GRIST)!libm!common_source>asincos.o 
-	<$(SOURCE_GRIST)!libm!common_source>asinh.o 
-	<$(SOURCE_GRIST)!libm!common_source>atan.o
-	<$(SOURCE_GRIST)!libm!common_source>atanh.o 
-	<$(SOURCE_GRIST)!libm!common_source>cosh.o 
-	<$(SOURCE_GRIST)!libm!common_source>erf.o
-	<$(SOURCE_GRIST)!libm!common_source>exp.o 
-	<$(SOURCE_GRIST)!libm!common_source>exp__E.o 
-	<$(SOURCE_GRIST)!libm!common_source>expm1.o 
-	<$(SOURCE_GRIST)!libm!common_source>floor.o 
-	<$(SOURCE_GRIST)!libm!common_source>fmod.o
-	<$(SOURCE_GRIST)!libm!common_source>gamma.o 
-	<$(SOURCE_GRIST)!libm!common_source>j0.o 
-	<$(SOURCE_GRIST)!libm!common_source>j1.o 
-	<$(SOURCE_GRIST)!libm!common_source>jn.o
-	<$(SOURCE_GRIST)!libm!common_source>lgamma.o 
-	<$(SOURCE_GRIST)!libm!common_source>log.o
-	<$(SOURCE_GRIST)!libm!common_source>log10.o 
-	<$(SOURCE_GRIST)!libm!common_source>log1p.o
-	<$(SOURCE_GRIST)!libm!common_source>log__L.o 
-	<$(SOURCE_GRIST)!libm!common_source>pow.o 
-	<$(SOURCE_GRIST)!libm!common_source>sinh.o 
-	<$(SOURCE_GRIST)!libm!common_source>tanh.o
-
-	<$(SOURCE_GRIST)!libm!ieee>cabs.o
-	<$(SOURCE_GRIST)!libm!ieee>cbrt.o
-	<$(SOURCE_GRIST)!libm!ieee>support.o
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
-	:
-	-shared -soname libm.so 
-	:
-	no_gcc
-	:
-	lib/libm.so
-	;
-
+# this one is needed for rld.so only
 KernelStaticLibraryObjects libc.a :
-	<$(SOURCE_GRIST)!libc>nulibc_init.o
-	<$(SOURCE_GRIST)!libc>errno.o
+	<$(SOURCE_GRIST)!libroot>libroot_init.o
+	<$(SOURCE_GRIST)!libroot>syscalls.o
 
-	<$(SOURCE_GRIST)!libc!hoard>arch-specific.o
-	<$(SOURCE_GRIST)!libc!hoard>heap.o
-	<$(SOURCE_GRIST)!libc!hoard>processheap.o
-	<$(SOURCE_GRIST)!libc!hoard>superblock.o
-	<$(SOURCE_GRIST)!libc!hoard>threadheap.o
-	<$(SOURCE_GRIST)!libc!hoard>wrapper.o
+	<$(SOURCE_GRIST)!libroot!posix>errno.o
+	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
+	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
 
-	<$(SOURCE_GRIST)!libc!locale>ctype.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 
-	<$(SOURCE_GRIST)!libc!stdio>fclose.o
-	<$(SOURCE_GRIST)!libc!stdio>feof.o
- 	<$(SOURCE_GRIST)!libc!stdio>fflush.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgetc.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgetln.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgets.o
-	<$(SOURCE_GRIST)!libc!stdio>findfp.o
-	<$(SOURCE_GRIST)!libc!stdio>flags.o
-	<$(SOURCE_GRIST)!libc!stdio>flockfile.o
- 	<$(SOURCE_GRIST)!libc!stdio>fopen.o
- 	<$(SOURCE_GRIST)!libc!stdio>fprintf.o
- 	<$(SOURCE_GRIST)!libc!stdio>fputc.o
- 	<$(SOURCE_GRIST)!libc!stdio>fputs.o
-	<$(SOURCE_GRIST)!libc!stdio>fread.o
-	<$(SOURCE_GRIST)!libc!stdio>fwrite.o
- 	<$(SOURCE_GRIST)!libc!stdio>fvwrite.o
-	<$(SOURCE_GRIST)!libc!stdio>fwalk.o
-	<$(SOURCE_GRIST)!libc!stdio>getc.o
-	<$(SOURCE_GRIST)!libc!stdio>getchar.o
- 	<$(SOURCE_GRIST)!libc!stdio>gets.o
-	<$(SOURCE_GRIST)!libc!stdio>getw.o
-	<$(SOURCE_GRIST)!libc!stdio>makebuf.o
-	<$(SOURCE_GRIST)!libc!stdio>printf.o
-	<$(SOURCE_GRIST)!libc!stdio>putc.o
-	<$(SOURCE_GRIST)!libc!stdio>putchar.o
-	<$(SOURCE_GRIST)!libc!stdio>puts.o
-	<$(SOURCE_GRIST)!libc!stdio>putw.o
-	<$(SOURCE_GRIST)!libc!stdio>refill.o
-	<$(SOURCE_GRIST)!libc!stdio>rget.o
-	<$(SOURCE_GRIST)!libc!stdio>sscanf.o
- 	<$(SOURCE_GRIST)!libc!stdio>sprintf.o
- 	<$(SOURCE_GRIST)!libc!stdio>stdio.o
-	<$(SOURCE_GRIST)!libc!stdio>ungetc.o
-	<$(SOURCE_GRIST)!libc!stdio>vfprintf.o
-	<$(SOURCE_GRIST)!libc!stdio>vfscanf.o
-	<$(SOURCE_GRIST)!libc!stdio>vscanf.o
- 	<$(SOURCE_GRIST)!libc!stdio>vsprintf.o
-	<$(SOURCE_GRIST)!libc!stdio>wbuf.o
-	<$(SOURCE_GRIST)!libc!stdio>wsetup.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>arch-specific.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>heap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>processheap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>superblock.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>threadheap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>wrapper.o
 
-	<$(SOURCE_GRIST)!libc!stdlib>assert.o
-	<$(SOURCE_GRIST)!libc!stdlib>atoi.o
-	<$(SOURCE_GRIST)!libc!stdlib>bsearch.o
-	<$(SOURCE_GRIST)!libc!stdlib>env.o
-	<$(SOURCE_GRIST)!libc!stdlib>heapsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>merge.o
-	<$(SOURCE_GRIST)!libc!stdlib>multibyte.o
-	<$(SOURCE_GRIST)!libc!stdlib>qsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>radixsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>rand.o
-	<$(SOURCE_GRIST)!libc!stdlib>random.o
-	<$(SOURCE_GRIST)!libc!stdlib>realpath.o
-	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
-	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
+	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
 
-	<$(SOURCE_GRIST)!libc!string>memchr.o
-	<$(SOURCE_GRIST)!libc!string>memcmp.o
-	<$(SOURCE_GRIST)!libc!string>memcpy.o
-	<$(SOURCE_GRIST)!libc!string>memmove.o
-	<$(SOURCE_GRIST)!libc!string>memset.o
-	<$(SOURCE_GRIST)!libc!string>strcasecmp.o
-	<$(SOURCE_GRIST)!libc!string>strcasestr.o
-	<$(SOURCE_GRIST)!libc!string>strcat.o
-	<$(SOURCE_GRIST)!libc!string>strchr.o
-	<$(SOURCE_GRIST)!libc!string>strcmp.o
-	<$(SOURCE_GRIST)!libc!string>strcpy.o
-	<$(SOURCE_GRIST)!libc!string>strcspn.o
-	<$(SOURCE_GRIST)!libc!string>strdup.o
-	<$(SOURCE_GRIST)!libc!string>strerror.o
-	<$(SOURCE_GRIST)!libc!string>strlcat.o
-	<$(SOURCE_GRIST)!libc!string>strlcpy.o
-	<$(SOURCE_GRIST)!libc!string>strlen.o
-	<$(SOURCE_GRIST)!libc!string>strncat.o
-	<$(SOURCE_GRIST)!libc!string>strncmp.o
-	<$(SOURCE_GRIST)!libc!string>strncpy.o
-	<$(SOURCE_GRIST)!libc!string>strnicmp.o
-	<$(SOURCE_GRIST)!libc!string>strnlen.o
-	<$(SOURCE_GRIST)!libc!string>strpbrk.o
-	<$(SOURCE_GRIST)!libc!string>strrchr.o
-	<$(SOURCE_GRIST)!libc!string>strspn.o
-	<$(SOURCE_GRIST)!libc!string>strstr.o
-	<$(SOURCE_GRIST)!libc!string>strtok.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fclose.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>feof.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fflush.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgetc.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgetln.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgets.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>findfp.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>flags.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>flockfile.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fopen.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fprintf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fputc.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fputs.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fread.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fwrite.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fvwrite.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fwalk.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getchar.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>gets.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getw.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>makebuf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>printf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putchar.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>puts.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putw.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>refill.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>rget.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>sscanf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>sprintf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>stdio.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>ungetc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vfprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vfscanf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vscanf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>vsprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>wbuf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
 
-	<$(SOURCE_GRIST)!libc!system>dlfcn.o
-	<$(SOURCE_GRIST)!libc!system>rlimit.o
-	<$(SOURCE_GRIST)!libc!system>syscalls.o
-	<$(SOURCE_GRIST)!libc!system>wrappers.o
-	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>merge.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>multibyte.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>radixsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>realpath.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoq.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtouq.o
 
-	<$(SOURCE_GRIST)!libc!sys>chmod.o
-	<$(SOURCE_GRIST)!libc!sys>stat.o
-	<$(SOURCE_GRIST)!libc!sys>mkdir.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcasecmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcasestr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcspn.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strdup.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strerror.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnicmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strpbrk.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strspn.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strstr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strtok.o
 
-	<$(SOURCE_GRIST)!libc!unistd>access.o
-	<$(SOURCE_GRIST)!libc!unistd>chown.o
-	<$(SOURCE_GRIST)!libc!unistd>close.o
-	<$(SOURCE_GRIST)!libc!unistd>dup.o
-	<$(SOURCE_GRIST)!libc!unistd>dup2.o
-	<$(SOURCE_GRIST)!libc!unistd>getopt.o
-	<$(SOURCE_GRIST)!libc!unistd>lseek.o
-	<$(SOURCE_GRIST)!libc!unistd>open.o
-	<$(SOURCE_GRIST)!libc!unistd>directory.o
-	<$(SOURCE_GRIST)!libc!unistd>link.o
-	<$(SOURCE_GRIST)!libc!unistd>read.o
-	<$(SOURCE_GRIST)!libc!unistd>write.o
-	<$(SOURCE_GRIST)!libc!unistd>sleep.o
-	<$(SOURCE_GRIST)!libc!unistd>usleep.o
-	<$(SOURCE_GRIST)!libc!unistd>truncate.o
-	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
-	<$(SOURCE_GRIST)!libc!unistd>mount.o
-	<$(SOURCE_GRIST)!libc!unistd>conf.o
-	;
+	<$(SOURCE_GRIST)!libroot!posix!sys>chmod.o
+	<$(SOURCE_GRIST)!libroot!posix!sys>stat.o
+	<$(SOURCE_GRIST)!libroot!posix!sys>mkdir.o
 
-KernelLd libc.so :
-	libglue.o
-
-	<$(SOURCE_GRIST)!libc>nulibc_init.o
-	<$(SOURCE_GRIST)!libc>errno.o
-
-	<$(SOURCE_GRIST)!libc!hoard>arch-specific.o
-	<$(SOURCE_GRIST)!libc!hoard>heap.o
-	<$(SOURCE_GRIST)!libc!hoard>processheap.o
-	<$(SOURCE_GRIST)!libc!hoard>superblock.o
-	<$(SOURCE_GRIST)!libc!hoard>threadheap.o
-	<$(SOURCE_GRIST)!libc!hoard>wrapper.o
-	
-	<$(SOURCE_GRIST)!libc!locale>ctype.o
-
-	<$(SOURCE_GRIST)!libc!stdio>fclose.o
-	<$(SOURCE_GRIST)!libc!stdio>feof.o
- 	<$(SOURCE_GRIST)!libc!stdio>fflush.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgetc.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgetln.o
- 	<$(SOURCE_GRIST)!libc!stdio>fgets.o
-	<$(SOURCE_GRIST)!libc!stdio>findfp.o
-	<$(SOURCE_GRIST)!libc!stdio>flags.o
-	<$(SOURCE_GRIST)!libc!stdio>flockfile.o
- 	<$(SOURCE_GRIST)!libc!stdio>fopen.o
- 	<$(SOURCE_GRIST)!libc!stdio>fprintf.o
- 	<$(SOURCE_GRIST)!libc!stdio>fputc.o
- 	<$(SOURCE_GRIST)!libc!stdio>fputs.o
-	<$(SOURCE_GRIST)!libc!stdio>fread.o
-	<$(SOURCE_GRIST)!libc!stdio>fwrite.o
- 	<$(SOURCE_GRIST)!libc!stdio>fvwrite.o
-	<$(SOURCE_GRIST)!libc!stdio>fwalk.o
-	<$(SOURCE_GRIST)!libc!stdio>getc.o
-	<$(SOURCE_GRIST)!libc!stdio>getchar.o
-	<$(SOURCE_GRIST)!libc!stdio>gets.o
-	<$(SOURCE_GRIST)!libc!stdio>getw.o
-	<$(SOURCE_GRIST)!libc!stdio>makebuf.o
-	<$(SOURCE_GRIST)!libc!stdio>printf.o
-	<$(SOURCE_GRIST)!libc!stdio>putc.o
-	<$(SOURCE_GRIST)!libc!stdio>putchar.o
-	<$(SOURCE_GRIST)!libc!stdio>puts.o
-	<$(SOURCE_GRIST)!libc!stdio>putw.o
-	<$(SOURCE_GRIST)!libc!stdio>refill.o
-	<$(SOURCE_GRIST)!libc!stdio>rget.o
-	<$(SOURCE_GRIST)!libc!stdio>sscanf.o
- 	<$(SOURCE_GRIST)!libc!stdio>sprintf.o
- 	<$(SOURCE_GRIST)!libc!stdio>stdio.o
-	<$(SOURCE_GRIST)!libc!stdio>ungetc.o
-	<$(SOURCE_GRIST)!libc!stdio>vfprintf.o
-	<$(SOURCE_GRIST)!libc!stdio>vfscanf.o
-	<$(SOURCE_GRIST)!libc!stdio>vscanf.o
- 	<$(SOURCE_GRIST)!libc!stdio>vsprintf.o
-	<$(SOURCE_GRIST)!libc!stdio>wbuf.o
-	<$(SOURCE_GRIST)!libc!stdio>wsetup.o
-
-	<$(SOURCE_GRIST)!libc!stdlib>assert.o
-	<$(SOURCE_GRIST)!libc!stdlib>atoi.o
-	<$(SOURCE_GRIST)!libc!stdlib>bsearch.o
-	<$(SOURCE_GRIST)!libc!stdlib>env.o
-	<$(SOURCE_GRIST)!libc!stdlib>heapsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>merge.o
-	<$(SOURCE_GRIST)!libc!stdlib>multibyte.o
-	<$(SOURCE_GRIST)!libc!stdlib>qsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>radixsort.o
-	<$(SOURCE_GRIST)!libc!stdlib>rand.o
-	<$(SOURCE_GRIST)!libc!stdlib>random.o
-	<$(SOURCE_GRIST)!libc!stdlib>realpath.o
-	<$(SOURCE_GRIST)!libc!stdlib>strtoq.o
-	<$(SOURCE_GRIST)!libc!stdlib>strtouq.o
-
-	<$(SOURCE_GRIST)!libc!string>memchr.o
-	<$(SOURCE_GRIST)!libc!string>memcmp.o
-	<$(SOURCE_GRIST)!libc!string>memcpy.o
-	<$(SOURCE_GRIST)!libc!string>memmove.o
-	<$(SOURCE_GRIST)!libc!string>memset.o
-	<$(SOURCE_GRIST)!libc!string>strcat.o
-	<$(SOURCE_GRIST)!libc!string>strchr.o
-	<$(SOURCE_GRIST)!libc!string>strcmp.o
-	<$(SOURCE_GRIST)!libc!string>strcpy.o
-	<$(SOURCE_GRIST)!libc!string>strerror.o
-	<$(SOURCE_GRIST)!libc!string>strlcat.o
-	<$(SOURCE_GRIST)!libc!string>strlcpy.o
-	<$(SOURCE_GRIST)!libc!string>strlen.o
-	<$(SOURCE_GRIST)!libc!string>strncat.o
-	<$(SOURCE_GRIST)!libc!string>strncmp.o
-	<$(SOURCE_GRIST)!libc!string>strncpy.o
-	<$(SOURCE_GRIST)!libc!string>strnicmp.o
-	<$(SOURCE_GRIST)!libc!string>strnlen.o
-	<$(SOURCE_GRIST)!libc!string>strpbrk.o
-	<$(SOURCE_GRIST)!libc!string>strrchr.o
-	<$(SOURCE_GRIST)!libc!string>strspn.o
-	<$(SOURCE_GRIST)!libc!string>strstr.o
-	<$(SOURCE_GRIST)!libc!string>strtok.o
-
-	<$(SOURCE_GRIST)!libc!system>dlfcn.o
-	<$(SOURCE_GRIST)!libc!system>rlimit.o
-	<$(SOURCE_GRIST)!libc!system>syscalls.o
-	<$(SOURCE_GRIST)!libc!system>wrappers.o
-	<$(SOURCE_GRIST)!libc!system!arch!$(OBOS_ARCH)>atomic.o
-
-	<$(SOURCE_GRIST)!libc!sys>chmod.o
-	<$(SOURCE_GRIST)!libc!sys>stat.o
-	<$(SOURCE_GRIST)!libc!sys>mkdir.o
-
-	<$(SOURCE_GRIST)!libc!unistd>access.o
-	<$(SOURCE_GRIST)!libc!unistd>chown.o
-	<$(SOURCE_GRIST)!libc!unistd>close.o
-	<$(SOURCE_GRIST)!libc!unistd>dup.o
-	<$(SOURCE_GRIST)!libc!unistd>dup2.o
-	<$(SOURCE_GRIST)!libc!unistd>getopt.o
-	<$(SOURCE_GRIST)!libc!unistd>lseek.o
-	<$(SOURCE_GRIST)!libc!unistd>open.o
-	<$(SOURCE_GRIST)!libc!unistd>directory.o
-	<$(SOURCE_GRIST)!libc!unistd>link.o
-	<$(SOURCE_GRIST)!libc!unistd>read.o
-	<$(SOURCE_GRIST)!libc!unistd>write.o
-	<$(SOURCE_GRIST)!libc!unistd>sleep.o
-	<$(SOURCE_GRIST)!libc!unistd>usleep.o
-	<$(SOURCE_GRIST)!libc!unistd>truncate.o
-	<$(SOURCE_GRIST)!libc!unistd>ioctl.o
-	<$(SOURCE_GRIST)!libc!unistd>mount.o
-	<$(SOURCE_GRIST)!libc!unistd>conf.o
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
-	:
-	-shared -soname libc.so
-	:
-	no_gcc
-	:
-	lib/libc.so
+	<$(SOURCE_GRIST)!libroot!posix!unistd>access.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>chown.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>close.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>dup.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>dup2.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>getopt.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>lseek.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>directory.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>link.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>read.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>write.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>sleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>usleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>truncate.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>ioctl.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>mount.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>conf.o
 	;
 
 KernelLd libroot.so :
 	libglue.o
-	<$(SOURCE_GRIST)!libroot>libroot.o
+
+	<$(SOURCE_GRIST)!libroot>libroot_init.o
+	<$(SOURCE_GRIST)!libroot>syscalls.o
+
+	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
+	<$(SOURCE_GRIST)!libroot!posix>errno.o
+	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
+
+	<$(SOURCE_GRIST)!libroot!posix!malloc>arch-specific.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>heap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>processheap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>superblock.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>threadheap.o
+	<$(SOURCE_GRIST)!libroot!posix!malloc>wrapper.o
+	
+	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
+
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fclose.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>feof.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fflush.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgetc.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgetln.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fgets.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>findfp.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>flags.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>flockfile.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fopen.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fprintf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fputc.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fputs.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fread.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fwrite.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>fvwrite.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>fwalk.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getchar.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>gets.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>getw.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>makebuf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>printf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putchar.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>puts.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>putw.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>refill.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>rget.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>sscanf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>sprintf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>stdio.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>ungetc.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vfprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vfscanf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>vscanf.o
+ 	<$(SOURCE_GRIST)!libroot!posix!stdio>vsprintf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>wbuf.o
+	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
+
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>merge.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>multibyte.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>radixsort.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>realpath.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoq.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtouq.o
+
+	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memmove.o
+	<$(SOURCE_GRIST)!libroot!posix!string>memset.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strerror.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncat.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strncpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnicmp.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strnlen.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strpbrk.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strspn.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strstr.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strtok.o
+
+	<$(SOURCE_GRIST)!libroot!posix!sys>chmod.o
+	<$(SOURCE_GRIST)!libroot!posix!sys>stat.o
+	<$(SOURCE_GRIST)!libroot!posix!sys>mkdir.o
+	<$(SOURCE_GRIST)!libroot!posix!sys>sysctl.o
+
+	<$(SOURCE_GRIST)!libroot!posix!unistd>access.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>chown.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>close.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>dup.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>dup2.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>getopt.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>lseek.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>directory.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>link.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>read.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>write.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>sleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>usleep.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>truncate.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>ioctl.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>mount.o
+	<$(SOURCE_GRIST)!libroot!posix!unistd>conf.o
+
+	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>fabs.o
+	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>frexp.o
+	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>isinf.o
+	<$(SOURCE_GRIST)!libroot!posix!math!arch!$(OBOS_ARCH)>ldexp.o
+
+	<$(SOURCE_GRIST)!libroot!posix!math>atan2.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>sincos.o
+	<$(SOURCE_GRIST)!libroot!posix!math>tan.o
+	<$(SOURCE_GRIST)!libroot!posix!math>acosh.o
+	<$(SOURCE_GRIST)!libroot!posix!math>asincos.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>asinh.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>atan.o
+	<$(SOURCE_GRIST)!libroot!posix!math>atanh.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>cosh.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>erf.o
+	<$(SOURCE_GRIST)!libroot!posix!math>exp.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>exp__E.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>expm1.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>floor.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>fmod.o
+	<$(SOURCE_GRIST)!libroot!posix!math>gamma.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>j0.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>j1.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>jn.o
+	<$(SOURCE_GRIST)!libroot!posix!math>lgamma.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>log.o
+	<$(SOURCE_GRIST)!libroot!posix!math>log10.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>log1p.o
+	<$(SOURCE_GRIST)!libroot!posix!math>log__L.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>pow.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>sinh.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>tanh.o
+	<$(SOURCE_GRIST)!libroot!posix!math>cabs.o
+	<$(SOURCE_GRIST)!libroot!posix!math>cbrt.o
+	<$(SOURCE_GRIST)!libroot!posix!math>ieee.o
+
+	<$(SOURCE_GRIST)!libroot!os>area.o
+	<$(SOURCE_GRIST)!libroot!os>debug.o
+	<$(SOURCE_GRIST)!libroot!os>port.o
+	<$(SOURCE_GRIST)!libroot!os>sem.o
+	<$(SOURCE_GRIST)!libroot!os>systeminfo.o
+	<$(SOURCE_GRIST)!libroot!os>thread.o
+	<$(SOURCE_GRIST)!libroot!os>team.o
+	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
 	:
@@ -534,8 +476,7 @@ KernelLd libglue2.o :
 KernelLd init :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>init.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -547,8 +488,7 @@ KernelLd init :
 KernelLd false :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>false_main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -560,8 +500,7 @@ KernelLd false :
 KernelLd true :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>true_main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -573,8 +512,7 @@ KernelLd true :
 KernelLd fibo :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps>fibo_main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -586,8 +524,7 @@ KernelLd fibo :
 KernelLd fortune :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!fortune>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -601,8 +538,7 @@ KernelConfigSection etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
 KernelLd ls :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!ls>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -614,8 +550,7 @@ KernelLd ls :
 KernelLd symlink :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!symlink>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -636,8 +571,7 @@ KernelLd obos_shell :
 	<$(SOURCE_GRIST)!apps!shell>shell_vars.o
 	<$(SOURCE_GRIST)!apps!shell>statements.o
 	<$(SOURCE_GRIST)!apps!shell>shell_history.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -666,8 +600,7 @@ KernelLd rld.so :
 KernelLd testapp :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!testapp>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -679,8 +612,7 @@ KernelLd testapp :
 KernelLd hostname :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!hostname>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -692,8 +624,7 @@ KernelLd hostname :
 KernelLd filetest :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!filetest>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -705,8 +636,7 @@ KernelLd filetest :
 KernelLd envtest :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!envtest>main.o
-	libc.so
-	libm.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
@@ -734,52 +664,51 @@ KernelLd envtest :
 
 KernelLd ps :
 	libglue2.o
-        <$(SOURCE_GRIST)!apps!ps>main.o
-        libc.so
-        libroot.so
-        :
+	<$(SOURCE_GRIST)!apps!ps>main.o
+	libroot.so
+	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/ps
-        ; 
+	:
+	:
+	:
+	bin/ps
+	; 
 
 KernelLd echo :
 	libglue2.o
-        <$(SOURCE_GRIST)!apps!echo>main.o
-        libc.so
-        :
+	<$(SOURCE_GRIST)!apps!echo>main.o
+	libroot.so
+	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/echo
-        ; 
+	:
+	:
+	:
+	bin/echo
+	; 
 
 KernelLd uname :
-        libglue2.o
-        <$(SOURCE_GRIST)!apps!uname>main.o
-        libc.so
-        :
-        $(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/uname
-        ;
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!uname>main.o
+	libroot.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/uname
+	;
 
 KernelLd pwd :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!pwd>main.o
-	libc.so
+	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-        :
-        :
-        :
-        bin/pwd
-        ;
+	:
+	:
+	:
+	bin/pwd
+	;
 
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 
@@ -795,7 +724,5 @@ SubInclude OBOS_TOP src kernel core ;
 SubInclude OBOS_TOP src kernel drivers ;
 SubInclude OBOS_TOP src kernel global ;
 SubInclude OBOS_TOP src kernel glue ;
-SubInclude OBOS_TOP src kernel libc ;
-SubInclude OBOS_TOP src kernel libm ;
 SubInclude OBOS_TOP src kernel apps ;
 SubInclude OBOS_TOP src kernel libroot ;
