@@ -13,6 +13,7 @@ public:
 	// Test functions
 	//------------------------------------------------------------
 	void ScannerTest();
+	void ParserEngineTest();
 
 	//------------------------------------------------------------
 	// Helper functions

@@ -5,7 +5,11 @@
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
 #include <sniffer/Parser.h>
+#include <MimeType.h>
+#include <String.h>		// BString
 #include <TestUtils.h>
+
+using namespace Sniffer;
 
 // Suite
 CppUnit::Test*
@@ -15,16 +19,19 @@ ParserTest::Suite() {
 		
 	suite->addTest( new TC("Mime Sniffer Parser::Scanner Test",
 						   &ParserTest::ScannerTest) );		
+	suite->addTest( new TC("Mime Sniffer Parser::Parser Test",
+						   &ParserTest::ParserEngineTest) );		
 						   
 	return suite;
 }		
 
-// ParserRuleTest
+// Scanner Test
 void
 ParserTest::ScannerTest() {
-#if !TEST_R5
+#if TEST_R5
+	Outputf("(no tests actually performed for R5 version)\n");
+#else	// TEST_R5
 
-	using namespace Sniffer;
 
 	// tests:
 	// Internal TokenStream and CharStream classes
@@ -589,8 +596,159 @@ ParserTest::ScannerTest() {
 		CHK(stream.IsEmpty());
 //		cout << endl;
 	}
-#else	// !TEST_R5
-	Outputf("(no tests actually performed for R5 version)\n");
 #endif	// !TEST_R5
 }
+
+// Parser Test
+void
+ParserTest::ParserEngineTest() {
+#if TEST_R5
+	Outputf("(no tests actually performed for R5 version)\n");
+#else	// TEST_R5
+	// test a couple of valid and invalid rules
+	struct test_case {
+		const char	*rule;
+		const char	*error;	// NULL, if valid
+	} testCases[] = {
+		// valid rules
+		{ "1.0 (\"ABCD\")", NULL },
+		{ "1.0 ('ABCD')", NULL },
+		{ "  1.0 ('ABCD')  ", NULL },
+		{ "0.8 [0:3] ('ABCDEFG' | 'abcdefghij')", NULL },
+		{ "0.5([10]'ABCD'|[17]'abcd'|[13]'EFGH')", NULL } ,
+		{ "0.5  \n   [0:3]  \t ('ABCD' \n | 'abcd' | 'EFGH')", NULL },
+		{ "0.8 [  0  :  3  ] ('ABCDEFG' | 'abcdefghij')", NULL },
+		{ "0.8 [0:3] ('ABCDEFG' & 'abcdefg')", NULL },
+		{ "1.0 ('ABCD') | ('EFGH')", NULL },
+		{ "1.0 [0:3] ('ABCD') | [2:4] ('EFGH')", NULL },
+		{ "0.8 [0:3] (\\077Mkl0x34 & 'abcdefgh')", NULL },
+		{ "0.8 [0:3] (\\077034 & 'abcd')", NULL },
+		{ "0.8 [0:3] (\\077\\034 & 'ab')", NULL },
+		{ "0.8 [0:3] (\\77\\034 & 'ab')", NULL },
+		{ "0.8 [0:3] (\\7 & 'a')", NULL },
+		{ "0.8 [0:3] (\"\\17\" & 'a')", NULL },
+		{ "0.8 [0:3] ('\\17' & 'a')", NULL },
+		{ "0.8 [0:3] (\\g & 'a')", NULL },
+		{ "0.8 [0:3] (\\g&\\b)", NULL },
+		{ "0.8 [0:3] (\\g\\&b & 'abc')", NULL },
+		{ "0.8 [0:3] (0x3457 & 'ab')", NULL },
+		{ "0.8 [0:3] (0xA4b7 & 'ab')", NULL },
+		{ "0.8 [0:3] ('ab\"' & 'abc')", NULL },
+		{ "0.8 [0:3] (\"ab\\\"\" & 'abc')", NULL },
+		{ "0.8 [0:3] (\"ab\\A\" & 'abc')", NULL },
+		{ "0.8 [0:3] (\"ab'\" & 'abc')", NULL },
+		{ "0.8 [0:3] (\"ab\\\\\" & 'abc')", NULL },
+		{ "0.8 [-5:-3] (\"abc\" & 'abc')", NULL },
+		{ "0.8 [5:3] (\"abc\" & 'abc')", NULL },
+		{ "1.2 ('ABCD')", NULL },
+		{ ".2 ('ABCD')", NULL },
+		{ "0. ('ABCD')", NULL },
+		{ "-1 ('ABCD')", NULL },
+		{ "+1 ('ABCD')", NULL },
+//		{ "1E25 ('ABCD')", NULL },
+//		{ "1e25 ('ABCD')", NULL },
+		// invalid rules
+		{ "0.0 ('')", "Sniffer pattern error: illegal empty pattern" },
+		{ "('ABCD')", "Sniffer pattern error: match level expected" },
+		{ "[0:3] ('ABCD')", "Sniffer pattern error: match level expected" },
+		{ "0.8 [0:3] ( | 'abcdefghij')",
+		  "Sniffer pattern error: missing pattern" },
+		{ "0.8 [0:3] ('ABCDEFG' | )",
+		  "Sniffer pattern error: missing pattern" },
+		{ "[0:3] ('ABCD')", "Sniffer pattern error: match level expected" },
+		{ "1.0 (ABCD')", "Sniffer pattern error: misplaced single quote" },
+		{ "1.0 ('ABCD)", "Sniffer pattern error: unterminated rule" },
+		{ "1.0 (ABCD)", "Sniffer pattern error: missing pattern" },
+		{ "1.0 (ABCD 'ABCD')", "Sniffer pattern error: missing pattern" },
+		{ "1.0 'ABCD')", "Sniffer pattern error: missing pattern" },
+		{ "1.0 ('ABCD'", "Sniffer pattern error: unterminated rule" },
+		{ "1.0 'ABCD'", "Sniffer pattern error: missing sniff pattern" },
+		{ "0.5 [0:3] ('ABCD' | 'abcd' | [13] 'EFGH')", 
+		  "Sniffer pattern error: missing pattern" },
+		{ "0.5('ABCD'|'abcd'|[13]'EFGH')",
+		  "Sniffer pattern error: missing pattern" },
+		{ "0.5[0:3]([10]'ABCD'|[17]'abcd'|[13]'EFGH')",
+		  "Sniffer pattern error: missing pattern" },
+		{ "0.8 [0x10:3] ('ABCDEFG' | 'abcdefghij')",
+		  "Sniffer pattern error: pattern offset expected" },
+		{ "0.8 [0:A] ('ABCDEFG' | 'abcdefghij')",
+		  "Sniffer pattern error: pattern range end expected" },
+		{ "0.8 [0:3] ('ABCDEFG' & 'abcdefghij')",
+		  "Sniffer pattern error: pattern and mask lengths do not match" },
+		{ "0.8 [0:3] ('ABCDEFG' & 'abcdefg' & 'xyzwmno')",
+		  "Sniffer pattern error: unterminated rule" },
+		{ "0.8 [0:3] (\\g&b & 'a')", "Sniffer pattern error: missing mask" },
+		{ "0.8 [0:3] (\\19 & 'a')",
+		  "Sniffer pattern error: pattern and mask lengths do not match" },
+		{ "0.8 [0:3] (0x345 & 'ab')",
+		  "Sniffer pattern error: bad hex literal" },
+		{ "0.8 [0:3] (0x3457M & 'abc')",
+		  "Sniffer pattern error: expecting '|' or '&'" },
+		{ "0.8 [0:3] (0x3457\\7 & 'abc')",
+		  "Sniffer pattern error: expecting '|' or '&'" },
+		{ "1E-25 ('ABCD')", "Sniffer pattern error: missing pattern" },
+	};
+	const int testCaseCount = sizeof(testCases) / sizeof(test_case);
+	BMimeType type;
+	for (int32 i = 0; i < testCaseCount; i++) {
+		NextSubTest();
+		test_case &testCase = testCases[i];
+//		cout << endl << testCase.rule << endl;
+		BString parseError;
+		status_t error = BMimeType::CheckSnifferRule(testCase.rule,
+													 &parseError);
+		if (testCase.error == NULL) {
+if (error != B_OK)
+cout << "error: " << parseError.String() << endl;
+			CHK(error == B_OK);
+		} else {
+			// This really isn't doing a proper test at the moment,
+			// but it's more convenient this way while I'm developing...
+			if (error) {
+				cout << endl << parseError.String() << endl;
+				CHK(error == B_BAD_MIME_SNIFFER_RULE);
+				CHK(parseError.FindLast(testCase.error) >= 0);
+			}
+		}
+	}
+
+/*
+	struct test_case {
+		const char *rule;
+		int thingThatMakesTheDamnTestNotCrash;
+	} testCases[] = {
+		{ "1.0", 0 },
+		{ "[]", 0 }
+	};
+
+	const int testCaseCount = sizeof(testCases) / sizeof(test_case);
+	for (int i = 0; i < testCaseCount; i++) {
+		cout << i << endl;
+		NextSubTest();
+
+		Parser parser;
+		Rule rule;
+		BString str;
+		
+		status_t err = RES(parser.Parse(testCases[i].rule, &rule, &str));
+		if (err)
+			cout << "Error: " << str.String() << endl;;
+	}
+	cout << "DONE!" << endl;
+
+*/
+
+#endif	// !TEST_R5
+}
+
+
+
+
+
+
+
+
+
+
+
 
