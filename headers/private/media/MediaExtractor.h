@@ -7,6 +7,15 @@
 namespace BPrivate {
 namespace media {
 
+struct stream_info
+{
+	status_t		status;
+	void *			cookie;
+	void *			infoBuffer;
+	int32			infoBufferSize;
+	media_format	encodedFormat;
+};
+
 class MediaExtractor
 {
 public:
@@ -33,7 +42,18 @@ public:
 								 media_header *mediaHeader);
 
 	status_t		CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci);
+
+
+private:
+	status_t		fErr;
+
+	BDataIO			*fSource;
+	Reader			*fReader;
 	
+	stream_info *	fStreamInfo;
+	int32			fStreamCount;
+
+	media_file_format fMff;
 };
 
 }; // namespace media

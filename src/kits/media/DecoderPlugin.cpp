@@ -15,14 +15,14 @@ status_t
 Decoder::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 					  media_header *mediaHeader)
 {
-	return fReader->GetNextChunk(fReaderCookie, chunkBuffer, chunkSize, mediaHeader);
+	return fExtractor->GetNextChunk(fStream, chunkBuffer, chunkSize, mediaHeader);
 }
 
 void
-Decoder::Setup(Reader *reader, void *readerCookie)
+Decoder::Setup(MediaExtractor *extractor, int32 stream)
 {
-	fReader = reader;
-	fReaderCookie = readerCookie;
+	fExtractor = extractor;
+	fStream = stream;
 }
 
 DecoderPlugin::DecoderPlugin()

@@ -1,7 +1,10 @@
+#ifndef _DECODER_PLUGIN_H
+#define _DECODER_PLUGIN_H
+
 #include <MediaTrack.h>
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
-#include "ReaderPlugin.h"
+#include "MediaExtractor.h"
 
 namespace BPrivate { namespace media {
 
@@ -26,9 +29,11 @@ public:
 									 media_header *mediaHeader);
 
 private:
-	void				Setup(Reader *reader, void *readerCookie);
-	Reader *			fReader;
-	void *				fReaderCookie;
+	friend class MediaExtractor;
+	
+	void				Setup(MediaExtractor *extractor, int32 stream);
+	MediaExtractor *	fExtractor;
+	int32				fStream;
 };
 
 
@@ -46,3 +51,5 @@ public:
 } } // namespace BPrivate::media
 
 using namespace BPrivate::media;
+
+#endif
