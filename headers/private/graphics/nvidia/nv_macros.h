@@ -566,7 +566,9 @@
 /* Nvidia specific registers: */
 #define NVCRTCX_REPAINT0	0x19
 #define NVCRTCX_REPAINT1	0x1a
+#define NVCRTCX_FIFO		0x1b
 #define NVCRTCX_LOCK		0x1f
+#define NVCRTCX_FIFO_LWM	0x20
 #define NVCRTCX_BUFFER		0x21
 #define NVCRTCX_LSR			0x25
 #define NVCRTCX_PIXEL		0x28
