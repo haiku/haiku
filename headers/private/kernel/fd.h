@@ -7,7 +7,6 @@
 
 #include <sem.h>
 #include <lock.h>
-#include <atomic.h>
 #include <memheap.h>
 #include <sys/stat.h>
 //#include <list.h>
