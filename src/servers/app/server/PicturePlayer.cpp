@@ -125,7 +125,8 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 		return B_ERROR;
 	
 	int16 op;
-	int32 size;
+	int32 size=fData.Seek(0,SEEK_END);
+	fData.Seek(0,SEEK_SET);
 	off_t pos;
 	fldata=*d;
 	
