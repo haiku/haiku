@@ -13,10 +13,10 @@
 #include "lock.h"
 
 #define FLO "floppy: "
-#if DEBUG > 0
-#define DPRINT(x...) dprintf(FLO x)
+#if defined(DEBUG) && DEBUG > 0
+#	define TRACE(x...) dprintf(FLO x)
 #else
-#define DPRINT(x...)
+#	define TRACE(x...)
 #endif
 
 #define MOTOR_TIMEOUT 5000000		// 5 seconds
@@ -212,4 +212,4 @@ extern status_t query_media(floppy_t *flp, bool forceupdate);
 
 extern ssize_t read_sectors(floppy_t *flp, int lba, int num_sectors);
 
-#endif
+#endif	/* _FLOPPY_H */

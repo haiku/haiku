@@ -98,16 +98,20 @@ typedef struct floppy_cookie {
 } floppy_cookie;
 
 
-void motor_off_daemon(void *t, int tim);
+static int motor_off_daemon(void *t, int tim);
 
-status_t init_hardware(void)
+
+status_t
+init_hardware(void)
 {
-	DPRINT("init_hardware()\n");
+	TRACE("init_hardware()\n");
 	/* assume there is always one */
 	return B_OK;
 }
 
-status_t init_driver(void)
+
+status_t
+init_driver(void)
 {
 	status_t err;
 	unsigned int i, j;
@@ -115,7 +119,7 @@ status_t init_driver(void)
 	uint64 cmcookie = 0;
 	struct device_info info;
 	
-	DPRINT("init_driver()\n");
+	TRACE("init_driver()\n");
 	if ((err = get_module(B_ISA_MODULE_NAME, (module_info **)&isa)) < B_OK) {
 		dprintf(FLO "no isa module!\n");
 		return err;
@@ -183,7 +187,8 @@ status_t init_driver(void)
 			dprintf(FLO "controller doesn't have any io ??\n");
 			goto config_error;
 		}
-		dprintf(FLO "controller at 0x%04lx, irq %ld, dma %ld\n", master->iobase, master->irq, master->dma);
+		dprintf(FLO "controller at 0x%04lx, irq %ld, dma %ld\n",
+			master->iobase, master->irq, master->dma);
 		//master->dma = -1; // XXX: DEBUG: disable DMA
 		/* allocate resources */
 		master->completion = create_sem(0, "floppy interrupt");
@@ -194,7 +199,9 @@ status_t init_driver(void)
 		//	goto config_error;
 		
 		/* 20K should hold a full cylinder XXX: B_LOMEM for DMA ! */
-		master->buffer_area = create_area("floppy cylinder buffer", &(master->buffer), B_ANY_KERNEL_ADDRESS, CYL_BUFFER_SIZE, B_FULL_LOCK, B_READ_AREA|B_WRITE_AREA);
+		master->buffer_area = create_area("floppy cylinder buffer", (void **)&master->buffer,
+									B_ANY_KERNEL_ADDRESS, CYL_BUFFER_SIZE,
+									B_FULL_LOCK, B_READ_AREA|B_WRITE_AREA);
 		if (master->buffer_area < B_OK)
 			goto config_error2;
 		master->slock = 0;
@@ -204,7 +211,7 @@ status_t init_driver(void)
 
 		flops = count_floppies(master); /* actually a bitmap */
 		flops = MAX(flops, 1); /* XXX: assume at least one */
-		DPRINT("drives found: 0x%01x\n", flops);
+		TRACE("drives found: 0x%01x\n", flops);
 		for (i = 0; current < MAX_FLOPPIES && i < 4; i++) {
 			if ((flops & (1 << i)) == 0)
 				continue;
@@ -249,12 +256,12 @@ config_ok:
 		if (floppies[i].iobase) {
 #ifdef FIRST_ONE_NO_NUMBER
 			if (!i)
-				sprintf(floppy_dev_name[i], OLD_DEV_FORMAT, i);
+				strcpy(floppy_dev_name[i], OLD_DEV_FORMAT);
 			else
 #endif
 			sprintf(floppy_dev_name[i], DEV_FORMAT, i);
 			dev_names[j++] = floppy_dev_name[i];
-			DPRINT("names[%d] = %s\n", j-1, dev_names[j-1]);
+			TRACE("names[%d] = %s\n", j-1, dev_names[j-1]);
 		} else
 			strcpy(floppy_dev_name[i], "");
 	}
@@ -271,16 +278,18 @@ config_ok:
 	return B_OK;
 }
 
-void uninit_driver(void)
+
+void
+uninit_driver(void)
 {
 	int i;
-	DPRINT("uninit_driver()\n");
+	TRACE("uninit_driver()\n");
 	unregister_kernel_daemon(motor_off_daemon, floppies);
 	for (i = 0; i < MAX_FLOPPIES; i++) {
 		if (floppies[i].iobase)
 			turn_off_motor(&floppies[i]);
 	}
-	DPRINT("dealocating...\n");
+	TRACE("deallocating...\n");
 	for (i = 0; i < MAX_FLOPPIES; i++) {
 		if (floppies[i].iobase) {
 			if (floppies[i].master == &(floppies[i])) {
@@ -291,29 +300,35 @@ void uninit_driver(void)
 			}
 		}
 	}
-	DPRINT("uninit done\n");
+	TRACE("uninit done\n");
 	put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
 	put_module(B_ISA_MODULE_NAME);
 }
 
-const char **publish_devices(void)
+
+const char **
+publish_devices(void)
 {
 	if (dev_names[0] == NULL)
 		return NULL;
 	return dev_names;
 }
 
-device_hooks *find_device(const char *name)
+
+device_hooks *
+find_device(const char *name)
 {
 	(void)name;
 	return &floppy_hooks;
 }
 
-status_t flo_open(const char *name, uint32 flags, floppy_cookie **cookie)
+
+static status_t
+flo_open(const char *name, uint32 flags, floppy_cookie **cookie)
 {
 	int i;
 	status_t err;
-	DPRINT("open(%s)\n", name);
+	TRACE("open(%s)\n", name);
 	if (flags & O_NONBLOCK)
 		return EINVAL;
 	for (i = 0; i < MAX_FLOPPIES; i++) {
@@ -332,32 +347,39 @@ status_t flo_open(const char *name, uint32 flags, floppy_cookie **cookie)
 	return B_OK;
 }
 
-status_t flo_close(floppy_cookie *cookie)
+
+static status_t
+flo_close(floppy_cookie *cookie)
 {
-	DPRINT("close()\n");
+	TRACE("close()\n");
 	cookie->flp = NULL;
 	return B_OK;
 }
 
-status_t flo_free(floppy_cookie *cookie)
+
+static status_t
+flo_free(floppy_cookie *cookie)
 {
-	DPRINT("free()\n");
+	TRACE("free()\n");
 	free(cookie);
 	return B_OK;
 }
 
-status_t flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
+
+static status_t
+flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
 {
 	status_t err;
 	size_t len = *numbytes;
 	size_t bytes_read = 0;
 	int sectsize = SECTOR_SIZE;
 	int cylsize = TRACK_SIZE; /* hmm, badly named, it's actually track_size (a cylinder has 2 tracks, one per head) */
-	device_geometry *geom = NULL;
+	const device_geometry *geom = NULL;
 	ssize_t disk_size = 0;
 	
 	if (cookie->flp->geometry)
-		geom = &(cookie->flp->geometry->g);
+		geom = &cookie->flp->geometry->g;
+
 	if (geom) {
 		sectsize = geom->bytes_per_sector;
 		cylsize = sectsize * geom->sectors_per_track/* * geom->head_count*/;
@@ -381,13 +403,13 @@ status_t flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *num
 		if (*numbytes == 0)
 			return B_OK;
 	}
-	
+
 	// handle partial first block
-	if((position % SECTOR_SIZE) != 0) {
+	if ((position % SECTOR_SIZE) != 0) {
 		size_t toread;
-		DPRINT("read: begin %Ld, %ld\n", position, bytes_read);
+		TRACE("read: begin %Ld, %ld\n", position, bytes_read);
 		err = read_sectors(cookie->flp, position / sectsize, 1);
-		DPRINT("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %d sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -400,12 +422,12 @@ status_t flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *num
 		position += toread;
 	}
 	// read the middle blocks
-	while(len >= sectsize) {
-		DPRINT("read: middle %Ld, %ld, %ld\n", position, bytes_read, len);
+	while (len >= sectsize) {
+		TRACE("read: middle %Ld, %ld, %ld\n", position, bytes_read, len);
 
 		// try to read as many sectors as we can
 		err = read_sectors(cookie->flp, position / sectsize, len / sectsize);
-		DPRINT("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %d sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -416,11 +438,11 @@ status_t flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *num
 		position += err * sectsize;
 	}
 	// handle partial last block
-	if(len > 0 && (len % sectsize) != 0) {
-		DPRINT("read: end %Ld, %ld %ld\n", position, bytes_read, len);
+	if (len > 0 && (len % sectsize) != 0) {
+		TRACE("read: end %Ld, %ld %ld\n", position, bytes_read, len);
 
 		err = read_sectors(cookie->flp, position / sectsize, 1);
-		DPRINT("PIO READ got %d sect\n", err);
+		TRACE("PIO READ got %d sect\n", err);
 		if (err <= 0) {
 			*numbytes = 0;
 			return err;
@@ -434,20 +456,24 @@ status_t flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *num
 	return B_OK;
 }
 
-status_t flo_write(floppy_cookie *cookie, off_t position, const void *data, size_t *numbytes)
+
+static status_t
+flo_write(floppy_cookie *cookie, off_t position, const void *data, size_t *numbytes)
 {
 	*numbytes = 0;
 	return B_ERROR;
 }
 
-status_t flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
+
+static status_t
+flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 {
 	device_geometry *geom;
 	status_t err;
 	floppy_t *flp = cookie->flp;
 	switch (op) {
 	case B_GET_ICON:
-		DPRINT("control(B_GET_ICON, %d)\n", ((device_icon *)data)->icon_size);
+		TRACE("control(B_GET_ICON, %d)\n", ((device_icon *)data)->icon_size);
 		if (((device_icon *)data)->icon_size == 16) { /* mini icon */
 			memcpy(((device_icon *)data)->icon_data, floppy_mini_icon, (16*16));
 			return B_OK;
@@ -458,11 +484,11 @@ status_t flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 		}
 		return EINVAL;
 	case B_GET_BIOS_DRIVE_ID:
-		DPRINT("control(B_GET_BIOS_DRIVE_ID)\n");
+		TRACE("control(B_GET_BIOS_DRIVE_ID)\n");
 		*(uint8 *)data = 0;
 		return B_OK;
 	case B_GET_DEVICE_SIZE:
-		DPRINT("control(B_GET_DEVICE_SIZE)\n");
+		TRACE("control(B_GET_DEVICE_SIZE)\n");
 		err = query_media(cookie->flp, true);
 		*(size_t *)data = (flp->bgeom.bytes_per_sector)
 						* (flp->bgeom.sectors_per_track)
@@ -471,7 +497,7 @@ status_t flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 		return B_OK;
 	case B_GET_GEOMETRY:
 	case B_GET_BIOS_GEOMETRY:
-		DPRINT("control(B_GET_(BIOS)_GEOMETRY)\n");
+		TRACE("control(B_GET_(BIOS)_GEOMETRY)\n");
 		err = query_media(cookie->flp, false);
 		geom = (device_geometry *)data;
 		geom->bytes_per_sector = flp->bgeom.bytes_per_sector;
@@ -484,21 +510,23 @@ status_t flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 		geom->write_once = false;
 		return B_OK;
 	case B_GET_MEDIA_STATUS:
-		DPRINT("control(B_GET_MEDIA_STATUS)\n");
+		TRACE("control(B_GET_MEDIA_STATUS)\n");
 		err = query_media(cookie->flp, false);
 		*(status_t *)data = err;
 		return B_OK;
 	}
-	DPRINT("control(%ld)\n", op);
+	TRACE("control(%ld)\n", op);
 	return EINVAL;
 }
 
-void motor_off_daemon(void *t, int tim)
+
+static int
+motor_off_daemon(void *t, int tim)
 {
 	int i;
 	for (i = 0; i < MAX_FLOPPIES; i++) {
 		if (floppies[i].iobase && !floppies[i].pending_cmd && floppies[i].motor_timeout > 0) {
-			DPRINT("floppies[%d].motor_timeout = %ld\n", i, floppies[i].motor_timeout);
+			TRACE("floppies[%d].motor_timeout = %ld\n", i, floppies[i].motor_timeout);
 			if (atomic_add(&floppies[i].motor_timeout, -500000) <= 500000) {
 				dprintf("turning off motor for drive %d\n", floppies[i].drive_num);
 				turn_off_motor(&floppies[i]);
@@ -506,7 +534,9 @@ void motor_off_daemon(void *t, int tim)
 			}
 		}
 	}
+	return 0;
 }
+
 
 device_hooks floppy_hooks = {
 	(device_open_hook)flo_open,

@@ -8,32 +8,44 @@
 #include <Drivers.h>
 #include "floppy.h"
 
+
 /* VERY verbose... */
 //#define DEBUG_LOWLEVEL
 
-// debug
-void PRINT_SR0(uint8 sr0)
+#if defined(DEBUG) && DEBUG > 0
+#	define PRINT_SR0(x) print_sr0(x)
+#else
+#	define PRINT_SR0(x) ;
+#endif
+
+
+#if defined(DEBUG) && DEBUG > 0
+static void
+print_sr0(uint8 sr0)
 {
 	const char *result = "ok";
 	switch (sr0 & FDC_SR0_IC) {
-	case 0x80:
-		result = "invalid";
-		break;
-	case 0x40:
-		result = "abterm";
-		break;
-	case 0xc0:
-		result = "drvchngd";
-		break;
+		case 0x80:
+			result = "invalid";
+			break;
+		case 0x40:
+			result = "abterm";
+			break;
+		case 0xc0:
+			result = "drvchngd";
+			break;
 	}
-		
-	DPRINT("sr0: ds %d, hs %d, ec %d, se %d, %s\n", (sr0 & FDC_SR0_DS), !!(sr0 & FDC_SR0_HS), !!(sr0 & FDC_SR0_EC), !!(sr0 & FDC_SR0_SE), result);
-}
 
-void write_reg(floppy_t *flp, floppy_reg_selector selector, uint8 data)
+	TRACE("sr0: ds %d, hs %d, ec %d, se %d, %s\n", (sr0 & FDC_SR0_DS), !!(sr0 & FDC_SR0_HS), !!(sr0 & FDC_SR0_EC), !!(sr0 & FDC_SR0_SE), result);
+}
+#endif
+
+
+void
+write_reg(floppy_t *flp, floppy_reg_selector selector, uint8 data)
 {
 #ifdef DEBUG_LOWLEVEL
-	DPRINT("write to 0x%lx, data 0x%x\n", flp->iobase + selector, data);
+	TRACE("write to 0x%lx, data 0x%x\n", flp->iobase + selector, data);
 #endif
 	flp->isa->write_io_8(flp->iobase + selector, data);
 }
@@ -43,17 +55,19 @@ uint8 read_reg(floppy_t *flp, floppy_reg_selector selector)
 	uint8 data;
 	data = flp->isa->read_io_8(flp->iobase + selector);
 #ifdef DEBUG_LOWLEVEL
-	DPRINT("read from 0x%lx = 0x%x\n", flp->iobase + selector, data);
+	TRACE("read from 0x%lx = 0x%x\n", flp->iobase + selector, data);
 #endif
 	return data;
 }
 
-void reset_controller(floppy_t *master)
+
+void
+reset_controller(floppy_t *master)
 {
 	uint8 command[4]; /* for SPECIFY & CONFIGURE */
 	uint8 result[1]; /* for SPECIFY */
 	
-	DPRINT("reset_controller()\n");
+	TRACE("reset_controller()\n");
 	LOCK(master->ben);
 	
 	//master->pending_cmd = CMD_RESET;
@@ -84,8 +98,10 @@ void reset_controller(floppy_t *master)
 	UNLOCK(master->ben);
 }
 
+
 /* returns a bitmap of the present drives */
-int count_floppies(floppy_t *master)
+int
+count_floppies(floppy_t *master)
 {
 	int i, err;
 	int flops = 0;
@@ -100,13 +116,13 @@ int count_floppies(floppy_t *master)
 	
 	for (i = 0; i < MAX_DRIVES_PER_CTRL; i++) {
 		master->drive_num = i; /* fake */
-		DPRINT("DETECTING DRIVE %d...\n", i);
+		TRACE("DETECTING DRIVE %d...\n", i);
 		turn_on_motor(master);
 		drive_select(master);
 		err = recalibrate_drive(master);
 		if (err == 0)
 			flops |= 1 << i;
-		DPRINT("DRIVE %d %s\n", i, err?"NOT here":"is here");
+		TRACE("DRIVE %d %s\n", i, err?"NOT here":"is here");
 		drive_deselect(master);
 		//snooze(50000);
 		//turn_off_motor(master);
@@ -118,12 +134,14 @@ int count_floppies(floppy_t *master)
 	return flops;
 }
 
+
 /* selects the drive until deselect(), takes the benaphore */
-void drive_select(floppy_t *flp)
+void
+drive_select(floppy_t *flp)
 {
 	cpu_status st;
 	uint8 reg;
-	DPRINT("drive_select(%d)\n", flp->drive_num);
+	TRACE("drive_select(%d)\n", flp->drive_num);
 	LOCK(flp->master->ben);
 	
 	/* must be atomic to not change motor states! */
@@ -147,19 +165,23 @@ void drive_select(floppy_t *flp)
 	flp->master->current = flp->drive_num;
 }
 
-void drive_deselect(floppy_t *flp)
+
+void
+drive_deselect(floppy_t *flp)
 {
 	UNLOCK(flp->master->ben);
-	DPRINT("drive_deselect(%d)\n", flp->drive_num);
+	TRACE("drive_deselect(%d)\n", flp->drive_num);
 }
 
-void turn_on_motor(floppy_t *flp)
+
+void
+turn_on_motor(floppy_t *flp)
 {
 	cpu_status st;
 	uint8 reg;
 	bool do_snooze = false;
 	
-	DPRINT("turn_on_motor(%d)\n", flp->drive_num);
+	TRACE("turn_on_motor(%d)\n", flp->drive_num);
 	flp->motor_timeout = MOTOR_TIMEOUT;
 	
 	/* must be atomic to not deselect a drive! */
@@ -181,10 +203,12 @@ void turn_on_motor(floppy_t *flp)
 		snooze(MOTOR_SPINUP_DELAY);
 }
 
-void turn_off_motor(floppy_t *flp)
+
+void
+turn_off_motor(floppy_t *flp)
 {
 	cpu_status st;
-	DPRINT("turn_off_motor(%d)\n", flp->drive_num);
+	TRACE("turn_off_motor(%d)\n", flp->drive_num);
 	
 	/* must be atomic to not deselect a drive! */
 	st = disable_interrupts();
@@ -199,12 +223,16 @@ void turn_off_motor(floppy_t *flp)
 	restore_interrupts(st);
 }
 
-void wait_for_rqm(floppy_t *flp)
+
+void
+wait_for_rqm(floppy_t *flp)
 {
-	while((read_reg(flp, MAIN_STATUS) & 0x80) == 0);
+	while ((read_reg(flp, MAIN_STATUS) & 0x80) == 0);
 }
 
-int send_command(floppy_t *flp, const uint8 *data, int len)
+
+int
+send_command(floppy_t *flp, const uint8 *data, int len)
 {
 	int i, status;
 	
@@ -227,20 +255,22 @@ int send_command(floppy_t *flp, const uint8 *data, int len)
 		write_reg(flp, DATA, data[i]);
 	}
 #ifdef DEBUG_LOWLEVEL
-	DPRINT("sent %d B\n", i);
+	TRACE("sent %d B\n", i);
 #endif
 	return i;
 }
 
-int wait_result(floppy_t *flp) {
+
+int
+wait_result(floppy_t *flp) {
 	status_t err;
 
-	{ int32 c; get_sem_count(flp->completion, &c); DPRINT("SEM< %ld\n", c); }
+	{ int32 c; get_sem_count(flp->completion, &c); TRACE("SEM< %ld\n", c); }
 	
 	if ((err = acquire_sem_etc(flp->completion, 1, B_TIMEOUT, FLOPPY_CMD_TIMEOUT)) < B_OK) {
 		if (err == B_TIMED_OUT) {
 			cpu_status st;
-			DPRINT("timed out! faking intr !!\n");
+			TRACE("timed out! faking intr !!\n");
 			st = disable_interrupts();
 			flo_intr(flp);
 			restore_interrupts(st);
@@ -248,11 +278,13 @@ int wait_result(floppy_t *flp) {
 		}
 		return -1;
 	}
-	{ int32 c; get_sem_count(flp->completion, &c); DPRINT("SEM> %ld\n", c); }
+	{ int32 c; get_sem_count(flp->completion, &c); TRACE("SEM> %ld\n", c); }
 	return 0;
 }
 
-int read_result(floppy_t *flp, uint8 *data, int len)
+
+int
+read_result(floppy_t *flp, uint8 *data, int len)
 {
 	int i, status;
 	
@@ -266,47 +298,52 @@ int read_result(floppy_t *flp, uint8 *data, int len)
 	}
 	//flp->master->need_reset = 1;
 #ifdef DEBUG_LOWLEVEL
-	DPRINT("read %d B\n", i);
+	TRACE("read %d B\n", i);
 #endif
 	return i;
 }
 
-int wait_til_ready(floppy_t *flp)
+
+int
+wait_til_ready(floppy_t *flp)
 {
 	int i, status;
 	
 	for (i = 0; i < 1000; i++)
 		if ((status = read_reg(flp, MAIN_STATUS)) & 0x80)
 			return status;
-	DPRINT("timeout waiting for %d !\n", flp->drive_num);
+	TRACE("timeout waiting for %d !\n", flp->drive_num);
 	return -1;
 }
 
-int has_drive_changed(floppy_t *flp)
+#if 0
+static int
+has_drive_changed(floppy_t *flp)
 {
 	return !!(read_reg(flp, DIGITAL_IN) & 0x80);
 }
+#endif
 
-status_t query_media(floppy_t *flp, bool forceupdate)
+status_t
+query_media(floppy_t *flp, bool forceupdate)
 {
 	status_t err = B_OK;
 	uint8 command[4];
 	uint8 result[7];
 	const floppy_geometry *geom = NULL;
 
-	
-	DPRINT("query_media(%d, %s)\n", flp->drive_num, forceupdate?"true":"false");
-	
+	TRACE("query_media(%d, %s)\n", flp->drive_num, forceupdate?"true":"false");
+
 	turn_on_motor(flp);
 	drive_select(flp);
-	
+
 	if (read_reg(flp, DIGITAL_IN) & 0x80) {/* media changed */
 		flp->status = FLOP_MEDIA_CHANGED;
-		DPRINT("media changed\n");
+		TRACE("media changed\n");
 	}
 	if (err || (flp->status < FLOP_MEDIA_UNREADABLE) || forceupdate) {
 		geom = supported_geometries;
-		DPRINT("querying format [err %08lx, st %d, fu %s]\n", err, flp->status, forceupdate?"t":"f");
+		TRACE("querying format [err %08lx, st %d, fu %s]\n", err, flp->status, forceupdate?"t":"f");
 
 		/* zero the current geometry */
 		flp->geometry = 0;
@@ -322,11 +359,11 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 		send_command(flp, command, 2);
 		
 		read_result(flp, result, 1);
-		DPRINT("sense_drive(%d): wp %d, trk0 %d, hd %d, drivesel %d\n", flp->drive_num, !!(result[0]&0x40), !!(result[0]&0x10), !!(result[0]&0x04), (result[0]&0x03));
+		TRACE("sense_drive(%d): wp %d, trk0 %d, hd %d, drivesel %d\n", flp->drive_num, !!(result[0]&0x40), !!(result[0]&0x10), !!(result[0]&0x04), (result[0]&0x03));
 		flp->bgeom.read_only = !!(result[0]&0x40);
 		
 		for (; geom->numsectors; geom++) {
-			DPRINT("trying geometry %s\n", geom->name);
+			TRACE("trying geometry %s\n", geom->name);
 			
 			/* apply geometry parameters */
 			if (flp->master->data_rate != geom->data_rate) {
@@ -339,7 +376,7 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			command[1] = (flp->drive_num & 0x03) | 0x00; // drive | head 0
 			command[2] = 0x00; // track 0
 			
-			DPRINT("SEEK at track 0 head 0\n");
+			TRACE("SEEK at track 0 head 0\n");
 			send_command(flp, command, 3);
 			if (wait_result(flp) < 0)
 				continue;
@@ -352,23 +389,23 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			
 			//read_result(flp, result, 2); // read the result
 			PRINT_SR0(flp->result[0]);
-			DPRINT("track is %d\n", flp->result[1]);
+			TRACE("track is %d\n", flp->result[1]);
 			if (flp->result[0] & FDC_SR0_IC)
 				continue;
 			
 			command[0] = 0x0a | ((geom->flags&FL_MFM)?0x40:0); // read track id
 			command[1] = (flp->drive_num & 0x03) | 0x00; // drive | head 0
 			
-			DPRINT("READ_TRACK_ID\n");
+			TRACE("READ_TRACK_ID\n");
 			send_command(flp, command, 2);
 			if (wait_result(flp) < 0)
 				continue;
 			
 			//read_result(flp, result, 7);
 			PRINT_SR0(flp->result[0]);
-			DPRINT("sr1: %02x\n", flp->result[1]);
-			DPRINT("sr2: %02x\n", flp->result[2]);
-			DPRINT("read id: track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
+			TRACE("sr1: %02x\n", flp->result[1]);
+			TRACE("sr2: %02x\n", flp->result[2]);
+			TRACE("read id: track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
 			if (flp->result[0] & FDC_SR0_IC)
 				continue;
 			
@@ -377,7 +414,7 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			command[1] = (flp->drive_num & 0x03) | 0x04; // drive | head 1
 			command[2] = 0x02; // track 2
 			
-			DPRINT("SEEK at track 2 head 1\n");
+			TRACE("SEEK at track 2 head 1\n");
 			send_command(flp, command, 3);
 			if (wait_result(flp) < 0)
 				continue;
@@ -387,14 +424,14 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			
 			//read_result(flp, result, 2); // read the result
 			PRINT_SR0(flp->result[0]);
-			DPRINT("track is %d\n", flp->result[1]);
+			TRACE("track is %d\n", flp->result[1]);
 			if (flp->result[0] & FDC_SR0_IC)
 				continue;
 			
 			command[0] = 0x0a | ((geom->flags&FL_MFM)?0x40:0); // read track id
 			command[1] = (flp->drive_num & 0x03) | 0x00; // drive | head 0
 			
-			DPRINT("READ_TRACK_ID\n");
+			TRACE("READ_TRACK_ID\n");
 			send_command(flp, command, 2);
 			if (wait_result(flp) < 0)
 				continue;
@@ -403,9 +440,9 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			
 			//read_result(flp, result, 7);
 			PRINT_SR0(flp->result[0]);
-			DPRINT("sr1: %02x\n", flp->result[1]);
-			DPRINT("sr2: %02x\n", flp->result[2]);
-			DPRINT("read id: track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
+			TRACE("sr1: %02x\n", flp->result[1]);
+			TRACE("sr2: %02x\n", flp->result[2]);
+			TRACE("read id: track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
 			if (flp->result[0] & FDC_SR0_IC)
 				continue;
 
@@ -425,7 +462,7 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 			flp->status = FLOP_NO_MEDIA;
 		}
 	}
-	
+
 	switch (flp->status) {
 	case FLOP_NO_MEDIA:
 		err = B_DEV_NO_MEDIA;
@@ -446,17 +483,18 @@ status_t query_media(floppy_t *flp, bool forceupdate)
 	return err;
 }
 
-int recalibrate_drive(floppy_t *flp)
+
+int
+recalibrate_drive(floppy_t *flp)
 {
 	int retry;
 	
-	DPRINT("recalibrate_drive(%d)\n", flp->drive_num);
+	TRACE("recalibrate_drive(%d)\n", flp->drive_num);
 	
 	turn_on_motor(flp);
 	
 	for(retry = 0; retry < 1; retry++) {
 		uint8 command[2] = { 7, 0 }; // recalibrate command
-		uint8 result[2];
 
 		command[1] = flp->drive_num & 0x03;
 		// send the recalibrate command
@@ -471,10 +509,10 @@ int recalibrate_drive(floppy_t *flp)
 		// read the result
 		//read_result(flp, result, sizeof(result));
 		if (flp->result[0] & 0xd0) {
-			DPRINT("recalibration failed\n");
+			TRACE("recalibration failed\n");
 			return 2;
 		} if (flp->result[1] != 0) {
-			DPRINT("drive is at cylinder %d, didn't make it to 0\n", result[1]);
+			TRACE("drive is at cylinder %d, didn't make it to 0\n", result[1]);
 			if (retry > 3)
 				return 1;
 		} else {
@@ -483,11 +521,13 @@ int recalibrate_drive(floppy_t *flp)
 		}
 	}
 
-	DPRINT("recalibration done\n");
+	TRACE("recalibration done\n");
 	return 0;
 }
 
-int32 flo_intr(void *arg)
+
+int32
+flo_intr(void *arg)
 {
 	int i;
 	int len;
@@ -505,7 +545,7 @@ int32 flo_intr(void *arg)
 		uint8 msr;
 		int got = 0;
 		msr = read_reg(flp, MAIN_STATUS);
-		//DPRINT("got irq for %d! MSR=%02x\n", flp->drive_num, msr);
+		//TRACE("got irq for %d! MSR=%02x\n", flp->drive_num, msr);
 		if ((((flp->pending_cmd & CMD_SWITCH_MASK) == CMD_READD) ||
 			((flp->pending_cmd & CMD_SWITCH_MASK) == CMD_READTRK)) && ((msr & 0x60) == 0x60)) {
 											/* non DMA xfer(data) & need read */
@@ -515,7 +555,7 @@ int32 flo_intr(void *arg)
 			len = read_result(flp, flp->result, 2);
 			PRINT_SR0(flp->result[0]);*/
 			
-			//DPRINT("READi\n");
+			//TRACE("READi\n");
 //			while ((msr & 0x60) == 0x60 /*&& (got < 256)*/) {
 			while ((msr & 0xF0) == 0xF0 && (master->buffer_index < CYL_BUFFER_SIZE)) {
 				master->buffer[master->buffer_index++] = read_reg(flp, DATA);
@@ -524,16 +564,16 @@ int32 flo_intr(void *arg)
 				got++;
 //				spin(10);
 /*				if (got < 30)
-					DPRINT("%02x", msr);
+					TRACE("%02x", msr);
 				else
 					spin(15);*/
 			//	if (got > 255)
 			//	break;
 			}
-//			DPRINT("intr: READ %d\n", got);
+//			TRACE("intr: READ %d\n", got);
 		} else if (((flp->pending_cmd & CMD_SWITCH_MASK) == CMD_WRITED) && ((msr & 0x60) == 0x20)) {
 											/* non DMA xfer(data) & need write */
-			DPRINT("WRITEi\n");
+			TRACE("WRITEi\n");
 			
 		} else {
 			len = 8;
@@ -542,11 +582,11 @@ int32 flo_intr(void *arg)
 //			else
 //				len = 0;
 			if (len < 0) {
-				DPRINT("buggy interrupt from %d !\n", flp->drive_num);
+				TRACE("buggy interrupt from %d !\n", flp->drive_num);
 			} else if (len < 1) { /* must pool the interrupt reason */
 				uint8 command[1] = { CMD_SENSEI };
 				for (i = 0; i < 4; i++) { /* might have to issue 4 SENSEI */
-					DPRINT("intr: %dth SENSEI\n", i+1);
+					TRACE("intr: %dth SENSEI\n", i+1);
 					if (send_command(flp, command, 1) < 1)
 						break;
 					len = read_result(flp, flp->result, 2);
@@ -558,7 +598,7 @@ int32 flo_intr(void *arg)
 						break;
 				}
 			} else
-				DPRINT("RES(%d) %02x %02x %02x %02x\n", len, flp->result[0], flp->result[1], flp->result[2], flp->result[3]);
+				TRACE("RES(%d) %02x %02x %02x %02x\n", len, flp->result[0], flp->result[1], flp->result[2], flp->result[3]);
 			/* only do that for !READ && !WRITE */
 			flp->pending_cmd = 0;
 			release_sem_etc(flp->completion, 1, B_DO_NOT_RESCHEDULE);
@@ -569,12 +609,13 @@ int32 flo_intr(void *arg)
 	release_spinlock(&master->slock);
 
 	if (err == B_UNHANDLED_INTERRUPT)
-		DPRINT("unhandled irq!\n");
+		TRACE("unhandled irq!\n");
 	return err;
 }
 
 
-void floppy_dump_reg(floppy_t *flp) {
+void
+floppy_dump_reg(floppy_t *flp) {
 	uint8 command[1] = { 0x0e }; // dumpreg command
 	//uint8 result[10];
 	uint8 *result = flp->result;
@@ -595,7 +636,9 @@ void floppy_dump_reg(floppy_t *flp) {
 		(result[8] & 0x20) >> 5, (result[8] & 0x10) >> 4, result[8] & 0x0f, result[9]);
 }
 
-static void fill_command_from_lba(floppy_t *flp, floppy_command *cmd, int lba)
+
+static void
+fill_command_from_lba(floppy_t *flp, floppy_command *cmd, int lba)
 {
 	cmd->cylinder = lba / (flp->bgeom.sectors_per_track * flp->bgeom.head_count);
 	cmd->head = (lba / flp->bgeom.sectors_per_track) % flp->bgeom.head_count;
@@ -603,13 +646,17 @@ static void fill_command_from_lba(floppy_t *flp, floppy_command *cmd, int lba)
 	cmd->drive = (flp->drive_num & 0x3) | (cmd->head << 2) | 0x80; /* Implied Seek */
 }
 
+
 /* does NOT check for valid track number */
-ssize_t pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
+ssize_t
+pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
 {
 	ssize_t transfered = 0;
 	floppy_command cmd;
+#if 0
 	uint8 cmd2[8];
 	uint8 result[4];
+#endif
 	//floppy_result res;
 	
 	if (flp->status < FLOP_MEDIA_FORMAT_FOUND)
@@ -636,11 +683,10 @@ ssize_t pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
 		return EINVAL;
 	}
 	//num_sectors = 1;
-	
+
 #if 0
-	
 	/* first issue sense interrupt, to find the current track */
-	DPRINT("track check: SENSEI\n");
+	TRACE("track check: SENSEI\n");
 	cmd2[0] = CMD_SENSEI;
 	send_command(flp, cmd2, 1);
 	read_result(flp, result, 2);
@@ -652,7 +698,7 @@ ssize_t pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
 		cmd2[1] = (flp->drive_num & 0x3) | (cmd.head << 2);
 		cmd2[2] = cmd.cylinder; // track 0
 		
-		DPRINT("SEEK at track %d head %d\n", cmd.cylinder, cmd.head);
+		TRACE("SEEK at track %d head %d\n", cmd.cylinder, cmd.head);
 		send_command(flp, cmd2, 3);
 		if (wait_result(flp) < 0)
 			return ENXIO;
@@ -666,15 +712,14 @@ ssize_t pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
 	
 	send_command(flp, (uint8 *)&cmd, sizeof(cmd));
 
-
 	if (wait_result(flp) < 0) {
 		drive_deselect(flp);
 		return ENXIO;
 	}
 	PRINT_SR0(flp->result[0]);
-	DPRINT("sr1: %02x\n", flp->result[1]);
-	DPRINT("sr2: %02x\n", flp->result[2]);
-	DPRINT("@ track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
+	TRACE("sr1: %02x\n", flp->result[1]);
+	TRACE("sr2: %02x\n", flp->result[2]);
+	TRACE("@ track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
 	switch (flp->result[0] & FDC_SR0_IC) {
 	case 0x80:
 		transfered = EINVAL;
@@ -700,18 +745,24 @@ ssize_t pio_read_sectors(floppy_t *flp, /*void *buf,*/ int lba, int num_sectors)
 	return num_sectors;//transfered;
 }
 
-ssize_t pio_write_sectors(floppy_t *flp, /*const void *buf,*/ int lba, int num_sectors)
+
+ssize_t
+pio_write_sectors(floppy_t *flp, /*const void *buf,*/ int lba, int num_sectors)
 {
 	return -1;
 }
 
+
 /* does NOT check for valid track number */
-ssize_t pio_read_track(floppy_t *flp, /*void *buf,*/ int lba)
+ssize_t
+pio_read_track(floppy_t *flp, /*void *buf,*/ int lba)
 {
 	ssize_t transfered = 0;
 	floppy_command cmd;
+#if 0
 	uint8 cmd2[8];
 	uint8 result[4];
+#endif
 	int tries = 0;
 	
 	if (flp->status < FLOP_MEDIA_FORMAT_FOUND)
@@ -738,9 +789,8 @@ retry_track:
 	dprintf(FLO "pio_read_track(%d, %d={%d,%d,%d}) try %d\n", flp->drive_num, lba, cmd.cylinder, cmd.head, cmd.sector, tries);
 	
 #if 0
-	
 	/* first issue sense interrupt, to find the current track */
-	DPRINT("track check: SENSEI\n");
+	TRACE("track check: SENSEI\n");
 	cmd2[0] = CMD_SENSEI;
 	send_command(flp, cmd2, 1);
 	read_result(flp, result, 2);
@@ -752,12 +802,11 @@ retry_track:
 		cmd2[1] = (flp->drive_num & 0x3) | (cmd.head << 2);
 		cmd2[2] = cmd.cylinder; // track 0
 		
-		DPRINT("SEEK at track %d head %d\n", cmd.cylinder, cmd.head);
+		TRACE("SEEK at track %d head %d\n", cmd.cylinder, cmd.head);
 		send_command(flp, cmd2, 3);
 		if (wait_result(flp) < 0)
 			return ENXIO;
 	}
-
 #endif
 
 	flp->master->avail = 0;
@@ -765,21 +814,22 @@ retry_track:
 	
 	send_command(flp, (uint8 *)&cmd, sizeof(cmd));
 
-
 	if (wait_result(flp) < 0) {
 		drive_deselect(flp);
 		return ENXIO;
 	}
+
 	PRINT_SR0(flp->result[0]);
-	DPRINT("sr1: %02x\n", flp->result[1]);
-	DPRINT("sr2: %02x\n", flp->result[2]);
-	DPRINT("@ track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
+	TRACE("sr1: %02x\n", flp->result[1]);
+	TRACE("sr2: %02x\n", flp->result[2]);
+	TRACE("@ track %d, head %d, sec %d, bps %d\n", flp->result[3], flp->result[4], flp->result[5], flp->result[6]);
+
 	switch (flp->result[0] & FDC_SR0_IC) {
 	case 0x80:
 		transfered = EINVAL;
 		break;
 	case 0x40:
-		dprintf(FLO "sr1: %02x\n", flp->result[1]);
+		TRACE(FLO "sr1: %02x\n", flp->result[1]);
 		if (flp->result[1] != 0x80) {/* End Of Track is not really an error, actually it means it worked :) */
 			if (/*(flp->result[1] == 0x10) && */tries < 3) { /* overrun */
 				tries++;
@@ -807,7 +857,8 @@ retry_track:
 }
 
 
-ssize_t read_sectors(floppy_t *flp, int lba, int num_sectors)
+ssize_t
+read_sectors(floppy_t *flp, int lba, int num_sectors)
 {
 	ssize_t transfered = 0;
 	//return pio_read_sectors(flp, lba, num_sectors);
