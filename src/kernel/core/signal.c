@@ -87,6 +87,10 @@ handle_signals(struct thread *thread, int state)
 				}
 			}
 
+			// ToDo: it's not safe to call arch_setup_signal_frame with
+			//		interrupts disabled since it writes to the user stack
+			//		and may page fault.
+
 			// User defined signal handler
 			dprintf("### Setting up custom signal handler frame...\n");
 			arch_setup_signal_frame(thread, handler, sig, thread->sig_block_mask);
@@ -94,8 +98,7 @@ handle_signals(struct thread *thread, int state)
 			if (handler->sa_flags & SA_ONESHOT)
 				handler->sa_handler = SIG_DFL;
 			if (!(handler->sa_flags & SA_NOMASK))
-				thread->sig_block_mask |= (handler->sa_mask | (1L << sig)) & BLOCKABLE_SIGS;
-				// ToDo: is that really (1L << sig) and not (1L << (sig-1)) ???
+				thread->sig_block_mask |= (handler->sa_mask | (1L << (sig - 1))) & BLOCKABLE_SIGS;
 
 			return global_resched;
 		} else
@@ -190,6 +193,8 @@ send_signal_etc(pid_t threadID, uint signal, uint32 flags)
 int
 send_signal(pid_t threadID, uint signal)
 {
+	// The BeBook states that this function wouldn't be exported
+	// for drivers, but, of course, it's wrong.
 	return send_signal_etc(threadID, signal, 0);
 }
 
