@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-6/2004
+   Rudolf Cornelissen 4/2003-11/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -8,8 +8,6 @@
 #include "nm_std.h"
 
 /* Adjust passed parameters to a valid mode line */
-//fixme: the order of the sync edges should also be checked,
-//just like the sync signal's min. pulse length...
 status_t nm_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
@@ -35,6 +33,9 @@ status_t nm_crtc_validate_timing(
 
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
+
+	/* if hor. total does not adhere to max. blanking pulse width, decrease it! */
+	if (*ht > (*hd_e + 0x1f8)) *ht = (*hd_e + 0x1f8);
 
 	/* make sure sync pulse is not during display */
 	if (*hs_e > (*ht - 8)) *hs_e = (*ht - 8);
@@ -67,6 +68,9 @@ status_t nm_crtc_validate_timing(
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
+
+	/* if vert. total does not adhere to max. blanking pulse width, decrease it! */
+	if (*vt > (*vd_e + 0xff)) *vt = (*vd_e + 0xff);
 
 	/* make sure sync pulse is not during display */
 	if (*vs_e > (*vt - 1)) *vs_e = (*vt - 1);

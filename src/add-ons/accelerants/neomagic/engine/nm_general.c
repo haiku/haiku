@@ -32,11 +32,11 @@ static void nm_dump_configuration_space (void)
 	DUMP_CFG (NM_INDEX, 0);
 	DUMP_CFG (NM_DATA,  0);
 	DUMP_CFG (SUBSYSIDW, 0);
-	DUMP_CFG (OPTION2,   G100);
+	DUMP_CFG (OPTION2,   0);
 	DUMP_CFG (OPTION3,   0);
 	DUMP_CFG (OPTION4,   0);
-	DUMP_CFG (PM_IDENT,  G100);
-	DUMP_CFG (PM_CSR,    G100);
+	DUMP_CFG (PM_IDENT,  0);
+	DUMP_CFG (PM_CSR,    0);
 	DUMP_CFG (AGP_IDENT, 0);
 	DUMP_CFG (AGP_STS,   0);
 	DUMP_CFG (AGP_CMD,   0);
@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.09 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.10 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
