@@ -254,7 +254,7 @@ reset_termios(struct termios &termios)
 	memset(&termios, 0, sizeof(struct termios));
 
 	termios.c_iflag = 0;
-	termios.c_oflag = OPOST;
+	termios.c_oflag = 0;
 	termios.c_cflag = B19200 | CS8 | CREAD | HUPCL;
 		// enable receiver, hang up on last close
 	termios.c_lflag = 0;
@@ -277,7 +277,9 @@ reset_tty(struct tty *tty, int32 index)
 
 	tty->open_count = 0;
 	tty->index = index;
+
 	tty->pgrp_id = 0;
+		// this value prevents any signal of being sent
 
 	tty->lock.sem = tty->read_sem = tty->write_sem = -1;
 		// the semaphores are only created when the TTY is actually in use
@@ -296,9 +298,68 @@ tty_output_getc(struct tty *tty, int *_c)
 }
 
 
+/**	Processes the input character and puts it into the TTY's input buffer.
+ *	Depending on the termios flags set, signals may be sent, the input
+ *	character changed or removed, etc.
+ */
+
 static void
 tty_input_putc_locked(struct tty *tty, int c)
 {
+	tcflag_t flags = tty->termios.c_iflag;
+
+	// process signals if needed
+
+	if ((tty->termios.c_lflag & ISIG) != 0) {
+		// enable signals, process INTR, QUIT, and SUSP
+		int signal = -1;
+
+		if (c == tty->termios.c_cc[VINTR])
+			signal = SIGINT;
+		else if (c == tty->termios.c_cc[VQUIT])
+			signal = SIGQUIT;
+		else if (c == tty->termios.c_cc[VSUSP])
+			// ToDo: what to do here?
+			signal = -1;
+
+		// do we need to deliver a signal?
+		if (signal != -1) {
+			// we may have to flush the input buffer
+			if ((tty->termios.c_lflag & NOFLSH) == 0)
+				clear_line_buffer(tty->input_buffer);
+
+			if (tty->pgrp_id != 0)
+				send_signal(-tty->pgrp_id, signal);
+			return;
+		}
+	}
+
+	// process special canonical input characters
+
+	if ((tty->termios.c_lflag & ICANON) != 0) {
+		// canonical mode, process ERASE and KILL
+		if (c == tty->termios.c_cc[VERASE]) {
+			// ToDo: erase one character
+			return;
+		} else if (c == tty->termios.c_cc[VKILL]) {
+			// ToDo: erase line
+			return;
+		}
+	}
+
+	// character conversions
+
+	if (c == '\n' && (flags & INLCR) != 0) {
+		// map NL to CR
+		c = '\r';
+	} else if (c == '\r') {
+		if (flags & IGNCR)	// ignore CR
+			return;
+		if (flags & ICRNL)	// map CR to NL
+			c = '\n';
+	} if (flags & ISTRIP)	// strip the highest bit
+		c &= 0x7f;
+
 	line_buffer_putc(tty->input_buffer, c);
 }
 
@@ -312,10 +373,20 @@ tty_input_putc(struct tty *tty, int c)
 
 	MutexLocker locker(&tty->lock);
 
+	bool wasEmpty = line_buffer_readable(tty->input_buffer) == 0;
+
 	tty_input_putc_locked(tty, c);
 
+	// If the buffer was empty before, we can now start other readers on it.
+	// We assume that most of the time more than one character will be written
+	// using this function, so we don't want to reschedule after every character
+	if (wasEmpty)
+		release_sem_etc(tty->read_sem, 1, B_DO_NOT_RESCHEDULE);
+
+	// We only wrote one char - we give others the opportunity
+	// to write if there is still space left in the buffer
 	if (line_buffer_writable(tty->input_buffer))
-		release_sem(tty->write_sem);
+		release_sem_etc(tty->write_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -434,32 +505,33 @@ tty_input_read(struct tty *tty, void *buffer, size_t *_length, uint32 mode)
 {
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
 	size_t length = *_length;
-	size_t bytesLeft = length;
+	ssize_t bytesRead = 0;
 
 	if (length == 0)
 		return B_OK;
 
 	ReaderLocker locker(tty);
 
-	while (bytesLeft > 0) {
+	while (bytesRead == 0) {
 		status_t status = locker.AcquireReader(dontBlock);
 		if (status != B_OK) {
-			*_length -= bytesLeft;
+			*_length = 0;
 			return status;
 		}
 
-		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer, bytesLeft);
+		// ToDo: add support for ICANON mode
+
+		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer, length);
 		if (bytesRead < B_OK) {
 			*_length = 0;
 			locker.ReportRead(0);
 
 			return bytesRead;
 		}
-
-		bytesLeft -= bytesRead;
-
-		locker.ReportRead(bytesRead);
 	}
+
+	locker.ReportRead(bytesRead);
+	*_length = bytesRead;
 
 	return B_OK;
 }
