@@ -345,7 +345,7 @@ void AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what) {
 		BDirectory dir(addonPath.Path());
 		if (dir.InitCheck() != B_OK) continue;
 		BEntry entry;
-		while (dir.GetNextEntry(&entry) == B_OK) {
+		while (dir.GetNextEntry(&entry, true) == B_OK) {
 			if (!entry.IsFile()) continue;
 
 			BNode node(&entry);
