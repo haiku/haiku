@@ -5,10 +5,16 @@
 
 #include <unistd.h>
 #include <syscalls.h>
-
+#include <errno.h>
 
 int
 usleep(unsigned useconds)
 {
-	return snooze_until(system_time() + (bigtime_t)(useconds), B_SYSTEM_TIMEBASE);
+	int err;
+	err = snooze_until(system_time() + (bigtime_t)(useconds), B_SYSTEM_TIMEBASE);
+	if (err < 0) {
+		errno = err;
+		return -1;
+	}
+	return 0;
 }
