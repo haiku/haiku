@@ -103,30 +103,30 @@ SettingsView::SettingsView(BRect rect, MouseSettings &settings)
 
 	// Create the "Double-click speed slider...
 	frame.Set(166, 11, 328, 50);
-	dcSpeedSlider = new BSlider(frame, "double_click_speed", "Double-click speed", 
+	fClickSpeedSlider = new BSlider(frame, "double_click_speed", "Double-click speed", 
 		new BMessage(SLIDER_DOUBLE_CLICK_SPEED), 0, 1000);
-	dcSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	dcSpeedSlider->SetHashMarkCount(5);
-	dcSpeedSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(dcSpeedSlider);
+	fClickSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fClickSpeedSlider->SetHashMarkCount(5);
+	fClickSpeedSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fClickSpeedSlider);
 
 	// Create the "Mouse Speed" slider...
 	frame.Set(166,76,328,125);
-	mouseSpeedSlider = new BSlider(frame, "mouse_speed", "Mouse Speed", 
+	fMouseSpeedSlider = new BSlider(frame, "mouse_speed", "Mouse Speed", 
 		new BMessage(SLIDER_MOUSE_SPEED), 0, 1000);
-	mouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	mouseSpeedSlider->SetHashMarkCount(7);
-	mouseSpeedSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(mouseSpeedSlider);
+	fMouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fMouseSpeedSlider->SetHashMarkCount(7);
+	fMouseSpeedSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fMouseSpeedSlider);
 
 	// Create the "Mouse Acceleration" slider...
 	frame.Set(166, 141, 328, 190);
-	mouseAccSlider = new BSlider(frame, "mouse_acceleration", "Mouse Acceleration", 
+	fAccelerationSlider = new BSlider(frame, "mouse_acceleration", "Mouse Acceleration", 
 		new BMessage(SLIDER_MOUSE_ACC), 0, 1000);
-	mouseAccSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
-	mouseAccSlider->SetHashMarkCount(5);
-	mouseAccSlider->SetLimitLabels("Slow", "Fast");
-	AddChild(mouseAccSlider);
+	fAccelerationSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
+	fAccelerationSlider->SetHashMarkCount(5);
+	fAccelerationSlider->SetLimitLabels("Slow", "Fast");
+	AddChild(fAccelerationSlider);
 
 	// Create the "Double-click test area" text box...
 	frame = Bounds();
@@ -213,15 +213,15 @@ SettingsView::UpdateFromSettings()
 {
 	int32 value = int32(fSettings.ClickSpeed() / 1000);
 		// slow = 1000000, fast = 0
-	dcSpeedSlider->SetValue(value);
+	fClickSpeedSlider->SetValue(value);
 
 	value = int32((log(fSettings.MouseSpeed() / 8192) / log(2)) * 1000 / 6);  
 		// slow = 8192, fast = 524287
-	mouseSpeedSlider->SetValue(value);
+	fMouseSpeedSlider->SetValue(value);
 
 	value = int32(sqrt(fSettings.AccelerationFactor() / 16384) * 1000 / 4);
 		// slow = 0, fast = 262144
-	mouseAccSlider->SetValue(value);
+	fAccelerationSlider->SetValue(value);
 
 	BMenuItem *item = fTypeMenu->ItemAt(fSettings.MouseType() - 1);
 	if (item != NULL)

@@ -48,7 +48,7 @@ class SettingsView : public BBox {
 
 		BPopUpMenu	*fTypeMenu, *fFocusMenu;
 		MouseView	*fMouseView;
-		BSlider		*dcSpeedSlider, *mouseSpeedSlider, *mouseAccSlider;
+		BSlider		*fClickSpeedSlider, *fMouseSpeedSlider, *fAccelerationSlider;
 
 		BBitmap 	*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
 };
