@@ -356,7 +356,7 @@ rule UsePublicHeaders
 	local headers ;
 
 	for i in $(list) {
-		headers += [ FDirName $(OBOS_TOP) headers obos public $(i) ] ;
+		headers += [ FDirName $(OBOS_TOP) headers $(i) ] ;
 	}
 
 	UseHeaders $(headers) : $(targets) ;
@@ -377,7 +377,7 @@ rule UsePrivateHeaders
 	local headers ;
 
 	for i in $(list) {
-		headers += [ FDirName $(OBOS_TOP) headers obos private $(i) ] ;
+		headers += [ FDirName $(OBOS_TOP) headers private $(i) ] ;
 	}
 
 	UseHeaders $(headers) : $(targets) ;
@@ -416,12 +416,23 @@ rule UseCppUnitHeaders
 
 rule UseArchHeaders
 {
-	# usage: UseArchHeaders <arch>
+	# usage: UseArchHeaders <arch> : [ <sources_or_objects> ] ;
 	# <arch> specifies the architecture (e.g. x86).
+	# <sources_or_objects> Source or object files.
+	local headers = [ FDirName $(OBOS_TOP) headers private kernel arch $(1) ] ;
+	local targets = $(2) ;
 	local opt = -D$(OBOS_TARGET_DEFINE) ;
-	SubDirCcFlags $(opt)  ;
-	SubDirC++Flags $(opt)  ;
-	SubDirHdrs [ FDirName $(OBOS_TOP) headers obos private kernel arch $(1) ] ;
+
+	if $(targets) {
+		ObjectCcFlags $(targets) : $(opt)  ;
+		ObjectC++Flags $(targets) : $(opt)  ;
+		ObjectHdrs $(targets) : $(headers) ;
+	} else {
+		SubDirCcFlags $(opt)  ;
+		SubDirC++Flags $(opt)  ;
+		SubDirHdrs $(headers) ;
+	}
+
 }
 
 #-------------------------------------------------------------------------------
@@ -533,6 +544,7 @@ rule SetupKernel
 	local _objs = $(1:S=$(SUFOBJ)) ;
 
 	UsePublicHeaders kernel ;
+	UsePublicHeaders [ FDirName os kernel ] ;
 	UsePrivateHeaders kernel ;
 	UseArchHeaders $(OBOS_ARCH) ;
 
