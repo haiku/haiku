@@ -1448,9 +1448,7 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 	BPositionIO *outDestination)
 {
 	TranslatorBitmap bitsHeader;
-	bool bheaderonly, bdataonly, brle;
-	bheaderonly = settings.SetGetHeaderOnly();
-	bdataonly = settings.SetGetDataOnly();
+	bool bheaderonly = false, bdataonly = false, brle;
 	brle = settings.SetGetRLE();
 		
 	status_t result;
@@ -2380,9 +2378,7 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 	TGAFileHeader fileheader;
 	TGAColorMapSpec mapspec;
 	TGAImageSpec imagespec;
-	bool bheaderonly, bdataonly;
-	bheaderonly = settings.SetGetHeaderOnly();
-	bdataonly = settings.SetGetDataOnly();
+	bool bheaderonly = false, bdataonly = false;
 
 	status_t result;
 	result = identify_tga_header(inSource, NULL, amtread, read,
