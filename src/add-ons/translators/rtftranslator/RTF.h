@@ -11,8 +11,8 @@
 #include <List.h>
 #include <String.h>
 #include <GraphicsDefs.h>
+#include <BufferIO.h>
 
-class BDataIO;
 
 namespace RTF {
 
@@ -33,14 +33,14 @@ enum group_destination {
 
 class Parser {
 	public:
-		Parser(BDataIO &stream);
+		Parser(BPositionIO &stream);
 
 		status_t Identify();
 		status_t Parse(RTF::Header &header);
 
 	private:
-		BDataIO	&fStream;
-		bool	fIdentified;
+		BBufferIO	fStream;
+		bool		fIdentified;
 };
 
 
@@ -52,6 +52,7 @@ class Element {
 		void SetParent(Group *parent);
 		Group *Parent() const;
 
+		virtual bool IsDefinitionDelimiter();
 		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t) = 0;
 		virtual void PrintToStream(int32 level = 0);
 
@@ -69,6 +70,7 @@ class Group : public Element {
 		uint32 CountElements() const;
 		Element *ElementAt(uint32 index) const;
 
+		Element *FindDefinitionStart(int32 index, int32 *_startIndex = NULL) const;
 		Command *FindDefinition(const char *name, int32 index = 0) const;
 		Group *FindGroup(const char *name) const;
 
@@ -110,6 +112,7 @@ class Text : public Element {
 		const char *String() const;
 		uint32 Length() const;
 
+		virtual bool IsDefinitionDelimiter();
 		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
 
 	private:

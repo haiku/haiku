@@ -14,6 +14,17 @@
 #include <ctype.h>
 
 
+static const char *kDestinationControlWords[] = {
+	"aftncn", "aftnsep", "aftnsepc", "annotation", "atnauthor", "atndate",
+	"atnicn", "atnid", "atnparent", "atnref", "atntime", "atrfend",
+	"atrfstart", "author", "background", "bkmkend", "buptim", "colortbl",
+	"comment", "creatim", "do", "doccomm", "docvar", "fonttbl", "footer",
+	"footerf", "footerl", "footerr", "footnote", "ftncn", "ftnsep",
+	"ftnsepc", "header", "headerf", "headerl", "headerr", "info",
+	"keywords", "operator", "pict", "printim", "private1", "revtim",
+	"rxe", "stylesheet", "subject", "tc", "title", "txe", "xe",
+};
+
 static char read_char(BDataIO &stream, bool endOfFileAllowed = false) throw (status_t);
 static int32 parse_integer(char first, BDataIO &stream, char &_last) throw (status_t);
 
@@ -68,6 +79,13 @@ out:
 }
 
 
+static int
+string_array_compare(const char *key, const char **array)
+{
+	return strcmp(key, array[0]);
+}
+
+
 static void
 dump(Element &element, int32 level = 0)
 {
@@ -98,9 +116,9 @@ dump(Element &element, int32 level = 0)
 //	#pragma mark -
 
 
-Parser::Parser(BDataIO &stream)
+Parser::Parser(BPositionIO &stream)
 	:
-	fStream(stream),
+	fStream(&stream, 65536, false),
 	fIdentified(false)
 {
 }
@@ -140,6 +158,10 @@ Parser::Parse(Header &header)
 
 		while (true) {
 			Element *element = NULL;
+
+			// we'll just ignore the end of the stream
+			if (parent == NULL)
+				return B_OK;
 
 			switch (c) {
 				case '{':
@@ -221,6 +243,13 @@ Element::Parent() const
 }
 
 
+bool
+Element::IsDefinitionDelimiter()
+{
+	return false;
+}
+
+
 void
 Element::PrintToStream(int32 level)
 {
@@ -233,7 +262,7 @@ Element::PrintToStream(int32 level)
 
 Group::Group()
 	:
-	fDestination(OTHER_DESTINATION)
+	fDestination(TEXT_DESTINATION)
 {
 }
 
@@ -289,8 +318,8 @@ Group::ElementAt(uint32 index) const
 }
 
 
-Command *
-Group::FindDefinition(const char *name, int32 index) const
+Element *
+Group::FindDefinitionStart(int32 index, int32 *_startIndex) const
 {
 	if (index < 0)
 		return NULL;
@@ -298,14 +327,34 @@ Group::FindDefinition(const char *name, int32 index) const
 	Element *element;
 	int32 number = 0;
 	for (uint32 i = 0; (element = ElementAt(i)) != NULL; i++) {
-		if (Text *text = dynamic_cast<Text *>(element)) {
-			// the ';' indicates the next definition
-			if (!strcmp(text->String(), ";"))
-				number++;
-		} else if (Command *command = dynamic_cast<Command *>(element)) {
-			if (command != NULL
-				&& !strcmp(name, command->Name())
-				&& number == index)
+		if (number == index) {
+			if (_startIndex)
+				*_startIndex = i;
+			return element;
+		}
+
+		if (element->IsDefinitionDelimiter())
+			number++;
+	}
+
+	return NULL;
+}
+
+
+Command *
+Group::FindDefinition(const char *name, int32 index) const
+{
+	int32 startIndex;
+	Element *element = FindDefinitionStart(index, &startIndex);
+	if (element == NULL)
+		return NULL;
+
+	for (uint32 i = startIndex; (element = ElementAt(i)) != NULL; i++) {
+		if (element->IsDefinitionDelimiter())
+			break;
+
+		if (Command *command = dynamic_cast<Command *>(element)) {
+			if (command != NULL && !strcmp(name, command->Name()))
 				return command;
 		}
 	}
@@ -347,25 +396,21 @@ void
 Group::DetermineDestination()
 {
 	const char *name = Name();
-	if (name == NULL) {
-		fDestination = TEXT_DESTINATION;
+	if (name == NULL)
 		return;
-	}
 
 	if (!strcmp(name, "*")) {
 		fDestination = COMMENT_DESTINATION;
 		return;
 	}
 
-	const char *texts[] = {"rtf", "sect", "par"};
-	for (uint32 i = 0; i < sizeof(texts) / sizeof(texts[0]); i++) {
-		if (!strcmp(name, texts[i])) {
-			fDestination = TEXT_DESTINATION;
-			return;
-		}
-	}
+	// binary search for destination control words
 
-	fDestination = OTHER_DESTINATION;
+	if (bsearch(name, kDestinationControlWords,
+			sizeof(kDestinationControlWords) / sizeof(kDestinationControlWords[0]),
+			sizeof(kDestinationControlWords[0]),
+			(int (*)(const void *, const void *))string_array_compare) != NULL)
+		fDestination = OTHER_DESTINATION;
 }
 
 
@@ -461,23 +506,51 @@ Text::~Text()
 }
 
 
+bool
+Text::IsDefinitionDelimiter()
+{
+	return fText == ";";
+}
+
+
 void
 Text::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 {
 	char c = first;
 	if (c == '\0')
 		c = read_char(stream);
-	
-	fText = "";
+
+	if (c == ';') {
+		// definition delimiter
+		fText.SetTo(";");
+		last = read_char(stream);
+		return;
+	}
+
+	const size_t kBufferSteps = 1;
+	size_t maxSize = kBufferSteps;
+	char *text = fText.LockBuffer(maxSize);
+	if (text == NULL)
+		throw (status_t)B_NO_MEMORY;
+
+	size_t position = 0;
 
 	while (true) {
-		if (c == '\\' || c == '}')
+		if (c == '\\' || c == '}' || c == '{' || c == ';')
 			break;
 
-		// ToDo: this is horribly inefficient with BStrings
-		fText.Append(c, 1);
+		if (position >= maxSize) {
+			fText.UnlockBuffer(position);
+			text = fText.LockBuffer(maxSize += kBufferSteps);
+			if (text == NULL)
+				throw (status_t)B_NO_MEMORY;
+		}
+
+		text[position++] = c;
+
 		c = read_char(stream);
 	}
+	fText.UnlockBuffer(position);
 
 	// ToDo: add support for different charsets - right now, only ASCII is supported!
 	//	To achieve this, we should just translate everything into UTF-8 here
