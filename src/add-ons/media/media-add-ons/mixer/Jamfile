@@ -6,6 +6,7 @@ Addon mixer.media_addon : media :
 	AudioMixer.cpp
 	MixerAddOn.cpp
 	FillMixBuffer.cpp
+	Resampler.cpp
 ;
 
 LinkSharedOSLibs mixer.media_addon : be media ;
