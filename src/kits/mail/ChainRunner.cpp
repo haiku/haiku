@@ -16,6 +16,7 @@
 #include <Directory.h>
 #include <Application.h>
 #include <Locker.h>
+#include <MessageQueue.h>
 #include <MessageFilter.h>
 
 #include <stdio.h>
@@ -335,7 +336,7 @@ BMailChainRunner::MessageReceived(BMessage *msg)
 		case 'INIT':
 			if (init_addons() == B_OK)
 				break;
-		case 'STOP': {
+		case B_QUIT_REQUESTED: {
 			
 			CallCallbacksFor(chain_cb, B_OK);
 				// who knows what the code was?
@@ -539,7 +540,13 @@ BMailChainRunner::get_messages(BStringList *list)
 void
 BMailChainRunner::Stop()
 {
-	PostMessage('STOP');
+	BMessageQueue *looper_queue = MessageQueue();
+	looper_queue->Lock();
+	BMessage *msg;
+	while (msg = looper_queue->NextMessage()) delete msg; //-- Ensure STOP makes the front of the queue
+ 	
+	PostMessage(B_QUIT_REQUESTED);
+	looper_queue->Unlock();
 }
 
 

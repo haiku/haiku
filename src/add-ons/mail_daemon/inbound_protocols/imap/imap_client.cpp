@@ -958,7 +958,9 @@ IMAP4Client::ReceiveLine(BString &out)
 		}
 	}else{
 		// Log an error somewhere instead
+		runner->Stop();
 		runner->ShowError("IMAP Timeout.");
+		return B_TIMED_OUT;
 	}
 	PRINT(("S:%s\n",out.String()));
 	return len;
@@ -1120,7 +1122,9 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 		}
 	}else{
 		// Log an error somewhere instead
+		runner->Stop();
 		runner->ShowError("IMAP Timeout.");
+		return B_TIMED_OUT;
 	}
 	return answer;
 }
