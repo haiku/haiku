@@ -11,16 +11,16 @@
 class BSession {
 
 public:
-				BSession(port_id receivePort, port_id sendPort, bool isPortLink = false);
-				BSession(int32, char *);
-				BSession( const BSession &ses );
-virtual			~BSession();
+		BSession(port_id receivePort, port_id sendPort, bool isPortLink = false);
+		BSession(int32, char *);
+		BSession( const BSession &ses );
+		virtual	~BSession();
 		void	SetSendPort( port_id port );
 		void	SetRecvPort( port_id port );
 		port_id GetSendPort(void) const { return fSendPort; }
 		port_id GetRecvPort(void) const { return fReceivePort; }
 		bool	DropInputBuffer();
-
+		void SetMsgCode(int32 code);
 		char*		ReadString();
 		status_t	ReadBool( bool *b );
 		status_t	ReadInt8( int8 *i );
@@ -66,7 +66,6 @@ virtual			~BSession();
 		status_t	Sync();
 		void		Close();
 private:
-friend class PortLink;
 
 		port_id	fSendPort;
 		port_id	fReceivePort;
@@ -80,6 +79,5 @@ friend class PortLink;
 		int32	fReceivePosition;
 };
 
-//extern _IMPEXP_BE _BSession_ *main_session;
 
 #endif

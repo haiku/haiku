@@ -37,6 +37,7 @@
 // Project Includes ------------------------------------------------------------
 #include <Session.h>
 #include <OS.h>
+#include <PortLink.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -44,11 +45,10 @@
 
 // Globals ---------------------------------------------------------------------
 
-//class PortLink;
 
 namespace BPrivate {
 
-class BAppServerLink : public BSession
+class BAppServerLink : public PortLink
 {
 public:
 	BAppServerLink(void);
