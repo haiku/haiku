@@ -297,9 +297,13 @@ extern const entity_id kMetadataPartitionMapId;
 extern const entity_id kSparablePartitionMapId;
 extern const entity_id kVirtualPartitionMapId;
 extern const entity_id kImplementationId;
-extern const entity_id kPartitionContentsId;
+extern const entity_id kPartitionContentsId1xx;
+extern const entity_id kPartitionContentsId2xx;
 extern const entity_id kUdfId;
-extern const entity_id kLogicalVolumeInfoId;
+extern const entity_id kLogicalVolumeInfoId150;
+extern const entity_id kLogicalVolumeInfoId201;
+extern const entity_id kDomainId150;
+extern const entity_id kDomainId201;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -563,7 +567,7 @@ private:
 
 	See also: ECMA 167 1/7.2, UDF 2.01 2.2.1, UDF 2.01 2.3.1
 */
-struct descriptor_tag  {
+struct descriptor_tag {
 public:
 	void dump() const;	
 
@@ -1464,6 +1468,10 @@ enum {
 	INTEGRITY_CLOSED = 1,
 };
 
+/*! \brief Highest currently supported UDF read revision.
+*/
+#define UDF_MAX_READ_REVISION 0x0201
+
 //----------------------------------------------------------------------
 // ECMA-167 Part 4
 //----------------------------------------------------------------------
@@ -1939,6 +1947,9 @@ enum permissions {
 */
 struct file_icb_entry {
 	void dump() const;
+	uint32 descriptor_size() const { return sizeof(*this)+extended_attributes_length()
+	                                 +allocation_descriptors_length(); }
+	const char* descriptor_name() const { return "file_icb_entry"; }
 
 	// get functions
 	descriptor_tag & tag() { return _tag; }
@@ -2003,8 +2014,20 @@ struct file_icb_entry {
 	void set_extended_attributes_length(uint32 length) { _extended_attributes_length = B_HOST_TO_LENDIAN_INT32(length); }
 	void set_allocation_descriptors_length(uint32 length) { _allocation_descriptors_length = B_HOST_TO_LENDIAN_INT32(length); }
 
+	// extended_file_icb_entry compatability functions
+	timestamp& creation_date_and_time() { return _attribute_date_and_time; }
+	const timestamp& creation_date_and_time() const { return _attribute_date_and_time; }
+	
+	
+	void set_object_size(uint64 size) { }
+	void set_reserved(uint32 reserved) { }
+	long_address& stream_directory_icb() { return _dummy_stream_directory_icb; }
+	const long_address& stream_directory_icb() const { return _dummy_stream_directory_icb; }
+
+
 private:
 	static const uint32 _descriptor_length = 176;
+	static long_address _dummy_stream_directory_icb;
 	uint8* _end() { return reinterpret_cast<uint8*>(this)+_descriptor_length; }
 	const uint8* _end() const { return reinterpret_cast<const uint8*>(this)+_descriptor_length; }
 
@@ -2057,6 +2080,7 @@ struct extended_file_icb_entry {
 	void dump() const;
 	uint32 descriptor_size() const { return sizeof(*this)+extended_attributes_length()
 	                                 +allocation_descriptors_length(); }
+	const char* descriptor_name() const { return "extended_file_icb_entry"; }
 
 	// get functions
 	descriptor_tag & tag() { return _tag; }
