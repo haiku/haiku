@@ -7,6 +7,7 @@
 #include <InterfaceDefs.h>
 #include <Roster.h>
 #include <Entry.h>
+#include <String.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,7 @@ main(int argc, char **argv)
 		progName = strrchr(progName, '/') + 1;
 
 	if (argc < 2)
-		fprintf(stderr,"usage: %s <file or application signature> ...\n", progName);
+		fprintf(stderr,"usage: %s <file or url or application signature> ...\n", progName);
 
 	BRoster roster;
 
@@ -44,6 +45,14 @@ main(int argc, char **argv)
 		} else if (!strncasecmp("application/", *argv, 12)) {
 			// maybe it's an application-mimetype?
 			rc = roster.Launch(*argv);
+		} else if (strstr(*argv, "://")) {
+			BString mimetype = "application/x-vnd.Be.URL.";
+			BString arg(*argv);
+			mimetype.Append(arg, arg.FindFirst("://"));
+			char *args[2] = { *argv, NULL };
+			rc = roster.Launch(mimetype.String(), 1, args);
+			if (rc == B_ALREADY_RUNNING)
+				rc = B_OK;
 		} else if (rc == B_OK)
 			rc = B_ENTRY_NOT_FOUND;
 

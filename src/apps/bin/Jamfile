@@ -8,6 +8,7 @@ StdBinCommands
 	driveinfo.c
 #	echo.c
 	eject.c
+	finddir.c
 	hd.c
 	isvolume.cpp
 	listarea.c
