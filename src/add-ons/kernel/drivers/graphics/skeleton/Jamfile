@@ -9,7 +9,7 @@ R5KernelAddon skel.driver : kernel drivers bin :
 
 Package haiku-skeleton-cvs :
 	README.html UPDATE.html ;
-Package openbeos-skeleton-cvs :
+Package haiku-skeleton-cvs :
 	skel.driver : 
 	boot home config add-ons kernel drivers bin ;
 Package haiku-skeleton-cvs :
@@ -26,4 +26,3 @@ Package haiku-skeleton-cvs :
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : skel.driver ;
 }
-
