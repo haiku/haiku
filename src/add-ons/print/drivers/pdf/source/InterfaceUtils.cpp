@@ -73,11 +73,17 @@ HWindow::MessageReceived(BMessage* msg)
 static const char* 
 kAbout =
 "PDF Writer for BeOS\n"
-"© 2001-2003 OpenBeOS\n"
+"© 2001-2004 Haiku\n"
 "\n"
-"\tPhilippe Houdoin - Project Leader\n"
-"\tSimon Gauvin - GUI Design\n"
-"\tMichael Pfeiffer - PDF Generation, Configuration, Interactive Features\n"
+"Philippe Houdoin\n"
+"\tProject Leader\n\n"
+"Simon Gauvin\n"
+"\tGUI Design\n\n"
+"Michael Pfeiffer\n"
+"\tPDF Generation\n"
+"\tConfiguration\n"
+"\tInteractive Features\n"
+"\t" B_UTF8_ELLIPSIS
 ;
 
 void
@@ -86,17 +92,26 @@ HWindow::AboutRequested()
 	BAlert *about = new BAlert("About PDF Writer", kAbout, "Cool");
 	BTextView *v = about->TextView();
 	if (v) {
-		rgb_color red = {255, 0, 51, 255};
-		rgb_color blue = {0, 102, 255, 255};
+		// Colors grab with Magnify on BeOS R5 deskbar logo
+		rgb_color red = {203, 0, 51, 255};		
+		rgb_color blue = {0, 51, 152, 255};
 
 		v->SetStylable(true);
-		char *text = (char*)v->Text();
+		char *text = (char*) v->Text();
 		char *s = text;
+
+		// set first line 18pt bold
+		s = strchr(text, '\n');
+		BFont bold(be_bold_font);
+		bold.SetSize(20);
+		v->SetFontAndColor(0, s-text, &bold);
+
 		// set all Be in blue and red
-		while ((s = strstr(s, "Be")) != NULL) {
+		s = text;
+		while ((s = strstr(s, "BeOS")) != NULL) {
 			int32 i = s - text;
-			v->SetFontAndColor(i, i+1, NULL, 0, &blue);
-			v->SetFontAndColor(i+1, i+2, NULL, 0, &red);
+			v->SetFontAndColor(i, i+2, NULL, 0, &blue);
+			v->SetFontAndColor(i+2, i+4, NULL, 0, &red);
 			s += 2;
 		}
 		// first text line 
