@@ -4,7 +4,7 @@
 
 
 NetworkSetupAddOn::NetworkSetupAddOn()
-	: fIsDirty(false), fProfile(NULL)
+	: is_dirty(false), profile(NULL)
 {
 }
 
@@ -32,9 +32,9 @@ status_t NetworkSetupAddOn::Revert()
 }
 
 
-status_t NetworkSetupAddOn::SetProfile(NetworkProfile *new_profile)
+status_t NetworkSetupAddOn::ProfileChanged(NetworkSetupProfile *new_profile)
 {
-	fProfile = new_profile;
+	profile = new_profile;
 	return B_OK;
 }
 

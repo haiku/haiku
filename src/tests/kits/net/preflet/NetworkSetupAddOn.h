@@ -3,33 +3,32 @@
 
 #include <View.h>
 
-class NetworkProfile;
+class NetworkSetupProfile;
 
 class NetworkSetupAddOn {
 	public:
 		NetworkSetupAddOn();
 		virtual ~NetworkSetupAddOn();
 		
-		virtual BView *		CreateView(BRect *bounds);
-		virtual status_t	Save(); 
-		virtual status_t	Revert();
+		virtual BView *			CreateView(BRect *bounds);
+		virtual status_t		Save(); 
+		virtual status_t		Revert();
 		
-		virtual const char *Name();
+		virtual const char *	Name();
 
-
-		status_t			SetProfile(NetworkProfile *new_profile);
-		NetworkProfile * 	Profile();		
-		bool 				IsDirty();
-		void 				SetDirty(bool dirty = true);
+		status_t				ProfileChanged(NetworkSetupProfile *new_profile);
+		NetworkSetupProfile * 	Profile();		
+		bool 					IsDirty();
+		void 					SetDirty(bool dirty = true);
 		
 	private:
-		bool 				fIsDirty;
-		NetworkProfile *	fProfile;
+		bool 					is_dirty;
+		NetworkSetupProfile *	profile;
 };
 
-inline bool 			NetworkSetupAddOn::IsDirty() { return fIsDirty; };
-inline void 			NetworkSetupAddOn::SetDirty(bool dirty) { fIsDirty = dirty; };
-inline NetworkProfile * NetworkSetupAddOn::Profile() { return fProfile; };
+inline bool 					NetworkSetupAddOn::IsDirty() { return is_dirty; };
+inline void 					NetworkSetupAddOn::SetDirty(bool dirty) { is_dirty = dirty; };
+inline NetworkSetupProfile * 	NetworkSetupAddOn::Profile() { return profile; };
 
 extern "C" {
 
