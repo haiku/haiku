@@ -57,10 +57,9 @@ prepare_output()
 		if (sLog >= 0)
 			close(sLog);
 
-		// get path
+		// get path (and create it if necessary)
 		BPath base;
-		find_directory(/*B_COMMON_LOG_DIRECTORY*/B_COMMON_TEMP_DIRECTORY, &base);
-			// ToDo: change to correct "which" parameter!
+		find_directory(B_COMMON_LOG_DIRECTORY, &base, true);
 
 		BPath syslog(base);
 		syslog.Append("syslog");
