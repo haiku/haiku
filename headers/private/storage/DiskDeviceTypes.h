@@ -6,36 +6,44 @@
 #ifndef _DISK_DEVICE_TYPES_H
 #define _DISK_DEVICE_TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Device Types
 
-const char *kDeviceTypeFloppyDisk	= "Floppy Disk Media";
-const char *kDeviceTypeHardDisk		= "Hard Disk Media";
-const char *kDeviceTypeOptical		= "Optical Media";
+extern const char *kDeviceTypeFloppyDisk;
+extern const char *kDeviceTypeHardDisk;
+extern const char *kDeviceTypeOptical;
 
 // Partition types
 
-const char *kPartitionTypeUnrecognized	= "Unrecognized";
+extern const char *kPartitionTypeUnrecognized;
 
-const char *kPartitionTypeMultisession	= "Multisession Storage Device";
+extern const char *kPartitionTypeMultisession;
 
-const char *kPartitionTypeCDDA			= "Compact Disc Audio Session";
+extern const char *kPartitionTypeCDDA;
 
-const char *kPartitionTypeAmiga			= "Amiga Partition Map";
-const char *kPartitionTypeApple			= "Apple Partition Map";
-const char *kPartitionTypeIntel			= "Intel Partition Map";
+extern const char *kPartitionTypeAmiga;
+extern const char *kPartitionTypeApple;
+extern const char *kPartitionTypeIntel;
 
-const char *kPartitionTypeIntelPrimary	= "Intel Primary Partition";
-const char *kPartitionTypeIntelExtended	= "Intel Extended Partition";
-const char *kPartitionTypeIntelLogical	= "Intel Logical Partition";
+extern const char *kPartitionTypeIntelPrimary;
+extern const char *kPartitionTypeIntelExtended;
+extern const char *kPartitionTypeIntelLogical;
 
-const char *kPartitionTypeAmigaFFS		= "AmigaFFS Filesystem";
-const char *kPartitionTypeBFS			= "BFS Filesystem";
-const char *kPartitionTypeEXT2			= "EXT2 Filesystem";
-const char *kPartitionTypeEXT3			= "EXT3 Filesystem";
-const char *kPartitionTypeFAT12			= "FAT12 Filesystem";
-const char *kPartitionTypeFAT32			= "FAT32 Filesystem";
-const char *kPartitionTypeISO9660		= "ISO9660 Filesystem";
-const char *kPartitionTypeReiser		= "Reiser Filesystem";
-const char *kPartitionTypeUDF			= "UDF Filesystem";
+extern const char *kPartitionTypeAmigaFFS;
+extern const char *kPartitionTypeBFS;
+extern const char *kPartitionTypeEXT2;
+extern const char *kPartitionTypeEXT3;
+extern const char *kPartitionTypeFAT12;
+extern const char *kPartitionTypeFAT32;
+extern const char *kPartitionTypeISO9660;
+extern const char *kPartitionTypeReiser;
+extern const char *kPartitionTypeUDF;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // _DISK_DEVICE_TYPES_H
