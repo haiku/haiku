@@ -44,6 +44,8 @@ struct bitmap_info_header
 	uint32 clr_important;
 } _PACKED;
 
+#include "ogg/ogg.h"
+#include <vector>
 
 status_t
 GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size)
@@ -60,7 +62,47 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 		if (B_OK != formats.GetFormatFor(description, format)) 
 			format->type = B_MEDIA_ENCODED_AUDIO;
 
-		format->SetMetaData(private_data, private_size);
+		uint8_t * data_bytes = (uint8_t*)private_data;
+		int packet_count = data_bytes[0] + 1;
+		if (packet_count != 3) {
+			return B_ERROR;
+		}
+
+		int info_packet_size = data_bytes[1];
+		int comment_packet_size = data_bytes[2];
+		int codebook_packet_size = private_size - info_packet_size - comment_packet_size - 3;
+
+		static uint8_t * vorbis_bytes = new uint8_t[private_size - 3];
+		memcpy(vorbis_bytes, &(data_bytes[3]), private_size - 3);
+
+		ogg_packet packet;
+		static std::vector<ogg_packet> header_packets;
+
+		packet.b_o_s = 1;
+		packet.e_o_s = 0;
+		packet.granulepos = 0;
+		packet.packetno = 0;
+		packet.packet = &(vorbis_bytes[0]);
+		packet.bytes = info_packet_size;
+		header_packets.push_back(packet);
+
+		packet.b_o_s = 0;
+		packet.e_o_s = 0;
+		packet.granulepos = 0;
+		packet.packetno = 1;
+		packet.packet = &(vorbis_bytes[info_packet_size]);
+		packet.bytes = comment_packet_size;
+		header_packets.push_back(packet);
+
+		packet.b_o_s = 0;
+		packet.e_o_s = 0;
+		packet.granulepos = 0;
+		packet.packetno = 2;
+		packet.packet = &(vorbis_bytes[info_packet_size+comment_packet_size]);
+		packet.bytes = codebook_packet_size;
+		header_packets.push_back(packet);
+
+		format->SetMetaData(&header_packets, sizeof(header_packets));
 
 		return B_OK;
 	}

@@ -91,7 +91,7 @@ static char  *strdup(const char *src) {
 }
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__BEOS___)
 static void  strlcpy(char *dst,const char *src,unsigned size) {
   unsigned  i;
 

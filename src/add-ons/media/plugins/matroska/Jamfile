@@ -4,6 +4,7 @@ UsePrivateHeaders media ;
 
 # SubDirHdrs [ FDirName $(SUBDIR) libmatroska ] ;
 SubDirHdrs [ FDirName $(SUBDIR) libMatroskaParser ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ogg libogg ] ;
 
 Addon matroska : media plugins :
 	matroska_codecs.cpp
