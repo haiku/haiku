@@ -15,6 +15,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
+#include <kernel.h>
 
 #include <string.h>
 
@@ -113,7 +114,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 {
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
 
-	if (virtualAddress < KERNEL_BASE || virtualAddress >= (KERNEL_BASE + 4096*1024))
+	if (virtualAddress < KERNEL_BASE || virtualAddress >= sMaxVirtualAddress)
 		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
