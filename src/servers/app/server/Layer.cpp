@@ -685,12 +685,7 @@ void Layer::Show(bool invalidate)
 	fHidden	= false;
 	
 	if(invalidate)
-	{
-		if(fParent)
-			fParent->FullInvalidate( BRegion(fFull) );
-		else
-			FullInvalidate( BRegion(fFull) );
-	}
+		GetRootLayer()->GoInvalidate(this, fFull);
 }
 
 /*!
@@ -706,12 +701,7 @@ void Layer::Hide(bool invalidate)
 	fHidden	= true;
 	
 	if(invalidate)
-	{
-		if(fParent)
-			fParent->FullInvalidate( BRegion(fFullVisible) );
-		else
-			FullInvalidate( BRegion(fFullVisible) );
-	}
+		GetRootLayer()->GoInvalidate(this, fFullVisible);
 }
 
 //! Returns true if the layer is hidden

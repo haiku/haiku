@@ -115,6 +115,8 @@ public:
 	void Unlock() { fAllRegionsLock.Unlock(); }
 	bool IsLocked() { return fAllRegionsLock.IsLocked(); }
 	void RunThread();
+	void GoInvalidate(const Layer *layer, const BRegion &region);
+	void GoRedraw(const Layer *layer, const BRegion &region);
 
 	// Debug methods
 	void PrintToStream(void);
@@ -129,6 +131,9 @@ private:
 
 			void			show_winBorder(WinBorder* winBorder);
 			void			hide_winBorder(WinBorder* winBorder);
+
+			void			invalidate_layer(Layer *layer, const BRegion &region);
+			void			redraw_layer(Layer *layer, const BRegion &region);
 
 	Desktop *fDesktop;
 	BMessage *fDragMessage;

@@ -139,7 +139,7 @@ int32 RootLayer::WorkingThread(void *data)
 	// first make sure we are actualy visible
 	oneRootLayer->Lock();
 	oneRootLayer->RebuildFullRegion();
-	oneRootLayer->FullInvalidate(oneRootLayer->Bounds());
+	oneRootLayer->invalidate_layer(oneRootLayer, oneRootLayer->Bounds());
 	oneRootLayer->Unlock();
 	
 	for(;;)
@@ -181,16 +181,34 @@ int32 RootLayer::WorkingThread(void *data)
 
 			case AS_ROOTLAYER_SHOW_WINBORDER:
 			{
-					WinBorder	*winBorder = NULL;
-					messageQueue.Read<WinBorder*>(&winBorder);
-					oneRootLayer->show_winBorder(winBorder);
+				WinBorder	*winBorder = NULL;
+				messageQueue.Read<WinBorder*>(&winBorder);
+				oneRootLayer->show_winBorder(winBorder);
 				break;
 			}
 			case AS_ROOTLAYER_HIDE_WINBORDER:
 			{
-					WinBorder	*winBorder = NULL;
-					messageQueue.Read<WinBorder*>(&winBorder);
-					oneRootLayer->hide_winBorder(winBorder);
+				WinBorder	*winBorder = NULL;
+				messageQueue.Read<WinBorder*>(&winBorder);
+				oneRootLayer->hide_winBorder(winBorder);
+				break;
+			}
+			case AS_ROOTLAYER_DO_INVALIDATE:
+			{
+				BRegion		invalidRegion;
+				Layer		*layer = NULL;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.ReadRegion(&invalidRegion);
+				oneRootLayer->invalidate_layer(layer, invalidRegion);
+				break;
+			}
+			case AS_ROOTLAYER_DO_REDRAW:
+			{
+				BRegion		redrawRegion;
+				Layer		*layer = NULL;
+				messageQueue.Read<Layer*>(&layer);
+				messageQueue.ReadRegion(&redrawRegion);
+				oneRootLayer->redraw_layer(layer, redrawRegion);
 				break;
 			}
 			default:
@@ -206,6 +224,43 @@ int32 RootLayer::WorkingThread(void *data)
 	}
 	return 0;
 }
+
+void RootLayer::GoInvalidate(const Layer *layer, const BRegion &region)
+{
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(AS_ROOTLAYER_DO_INVALIDATE);
+	msg.Attach<const Layer*>(layer);
+	msg.AttachRegion(region);
+	msg.Flush();
+}
+
+void RootLayer::invalidate_layer(Layer *layer, const BRegion &region)
+{
+	// NOTE: our thread (WorkingThread) is locked here.
+
+	if (layer->fParent)
+		layer = layer->fParent;
+
+	layer->FullInvalidate(region);
+}
+
+void RootLayer::GoRedraw(const Layer *layer, const BRegion &region)
+{
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(AS_ROOTLAYER_DO_REDRAW);
+	msg.Attach<const Layer*>(layer);
+	msg.AttachRegion(region);
+	msg.Flush();
+}
+
+void RootLayer::redraw_layer(Layer *layer, const BRegion &region)
+{
+	// NOTE: our thread (WorkingThread) is locked here.
+
+	layer->Invalidate(region);
+}
+
+
 
 void RootLayer::MoveBy(float x, float y)
 {
@@ -1616,7 +1671,6 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 				ws->SearchAndSetNewFocus(winBorder);
 			else{
 				// TODO: RootLayer or Desktop class should take care of invalidating
-//				ws->Invalidate();
 			}
 		}
 	}

@@ -590,7 +590,9 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		printf("ServerWindow %s received unexpected code - message offset %ld before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
 		return;
 	}
-	
+
+	RootLayer		*myRootLayer = fWinBorder->GetRootLayer();
+
 	switch(code)
 	{
 		//--------- BView Messages -----------------
@@ -741,8 +743,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			cl->AddChild(newLayer, this);
 
 			if (!(newLayer->IsHidden())){
-				// cl is the parent of newLayer, so this call is OK.
-				cl->FullInvalidate(BRegion(newLayer->fFull));
+				myRootLayer->GoInvalidate(newLayer, newLayer->fFull);
 			}
 
 			break;
@@ -762,7 +763,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			cl->RemoveSelf();
 			cl->PruneTree();
 			
-			parent->Invalidate(cl->Frame());
+			if (parent)
+				myRootLayer->GoInvalidate(parent, BRegion(cl->Frame()));
 			
 			#ifdef DEBUG_SERVERWINDOW
 			parent->PrintTree();
@@ -1073,7 +1075,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			cl->fLayerData->viewcolor.SetColor(c);
 			
-			cl->Invalidate(cl->fVisible);
+			myRootLayer->GoRedraw(cl, cl->fVisible);
 			
 			break;
 		}
@@ -1215,7 +1217,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			
 			// redraw if we previously had or if we have acquired a picture to clip to.
 			if (redraw)
-				cl->Invalidate(reg);
+				myRootLayer->GoRedraw(cl, reg);
 
 			break;
 		}
@@ -1321,12 +1323,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 			cl->RebuildFullRegion();
 			if (!(cl->IsHidden()))
-			{
-				if (cl->fParent)
-					cl->fParent->FullInvalidate(BRegion(cl->fFull));
-				else
-					cl->FullInvalidate(BRegion(cl->fFull));
-			}
+				myRootLayer->GoInvalidate(cl, cl->fFull);
 
 			break;
 		}
@@ -1338,8 +1335,8 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			BRect		invalRect;
 			
 			link.Read<BRect>(&invalRect);
-			
-			cl->Invalidate(invalRect);
+
+			myRootLayer->GoRedraw(cl, BRegion(invalRect));			
 			
 			break;
 		}
@@ -1360,7 +1357,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 				invalReg.Include(rect);
 			}
 			
-			cl->Invalidate(invalReg);
+			myRootLayer->GoRedraw(cl, invalReg);
 
 			break;
 		}
@@ -2191,17 +2188,32 @@ int32 ServerWindow::MonitorWin(void *data)
 			{
 				// this means the client has been killed
 				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
+				RootLayer		*myRootLayer = win->fWinBorder->GetRootLayer();
+
 				quitting = true;
-				
+
+				// we are preparing to delete a ServerWindow, RootLayer should be aware
+				// of that and stop for a moment.
+				// also we must wait a bit for the associated WinBorder to become hidden
+				while(1)
+				{
+					myRootLayer->Lock();
+					if (win->IsHidden())
+						break;
+					else
+						myRootLayer->Unlock();
+				}
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				delete win;
+				myRootLayer->Unlock();
+
+				exit_thread(0);
 				break;
 			}
 			case B_QUIT_REQUESTED:
 			{
 				STRACE(("ServerWindow %s received Quit request\n",win->Title()));
-				quitting = true;
-				delete win;
+				win->Quit();
 				break;
 			}
 			default:
