@@ -1,10 +1,5 @@
 SubDir OBOS_TOP src kernel core util ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;
-	# that's a temporary inconvenience until we have a glibc based stdio.h
-	# you don't have to understand it, you just have to live with it :-)
-	# send your complaints to: axeld@pinc-software.de
-
 KernelStaticLibrary libkernel_util : 
 	<$(SOURCE_GRIST)>list.c
 	<$(SOURCE_GRIST)>kernel_cpp.cpp

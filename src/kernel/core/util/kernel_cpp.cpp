@@ -6,7 +6,7 @@
 
 #if _KERNEL_MODE
 
-#include "kernel_cpp.h"
+#include "util/kernel_cpp.h"
 
 const nothrow_t std::nothrow = {};
 
