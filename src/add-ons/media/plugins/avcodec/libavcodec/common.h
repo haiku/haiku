@@ -211,9 +211,13 @@ inline void dprintf(const char* fmt,...) {}
 #    else
 
 #        ifdef DEBUG
-#            define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
+#            if defined(__BEOS__)
+#                define dprintf(fmt,args...) printf(fmt, ## args)
+#            else
+#                define dprintf(fmt,...) printf(fmt, __VA_ARGS__)
+#            endif
 #        else
-#            if defined(CONFIG_BEOS)
+#            if defined(__BEOS__)
 #                define dprintf(fmt...)
 #            else
 #                define dprintf(fmt,...)
