@@ -1,10 +1,12 @@
 /*
  * PCL6Cap.cpp
  * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
+ * COpyright 2003-2005 Michael Pfeiffer.
  */
 
-#include "PrinterData.h"
 #include "PCL6Cap.h"
+#include "PCL6Config.h"
+#include "PrinterData.h"
 
 #define TO72DPI(a)	(a * 72.0f / 600.0f)
 
@@ -150,8 +152,11 @@ const PrintStyleCap duplex("Duplex", false, JobData::kDuplex);
 
 const ProtocolClassCap pc1_1("PCL 6 Protocol Class 1.1", true, kProtocolClass1_1, 
 "Protocol Class 1.1\n"
-"* No compression\n"
-"* RLE compression (not implemented yet)");
+"* No compression"
+#if ENABLE_RLE_COMPRESSION
+"\n* RLE compression"
+#endif
+);
 const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, kProtocolClass2_0, 
 "Protocol Class 2.0\n"
 "* Additonal Paper Source: Third Cassette\n"
@@ -159,7 +164,10 @@ const ProtocolClassCap pc2_0("PCL 6 Protocol Class 2.0", false, kProtocolClass2_
 const ProtocolClassCap pc2_1("PCL 6 Protocol Class 2.1", false, kProtocolClass2_1, 
 "Protocol Class 2.1\n"
 "* Additional Paper Format: B5\n"
-"* Delta Row Compression");
+#if ENABLE_DELTA_ROW_COMPRESSION
+"* Delta Row Compression"
+#endif
+);
 const ProtocolClassCap pc3_0("PCL 6 Protocol Class 3.0", false, kProtocolClass3_0, 
 "Protocol Class 3.0");
 

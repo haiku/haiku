@@ -9,14 +9,15 @@
 #include <File.h>
 #include <memory>
 
-#include "PCL6.h"
 
 #include "DbgMsg.h"
 #include "DeltaRowCompression.h"
 #include "Halftone.h"
 #include "JobData.h"
 #include "PackBits.h"
+#include "PCL6.h"
 #include "PCL6Cap.h"
+#include "PCL6Config.h"
 #include "PrinterData.h"
 #include "PCL6Rasterizer.h"
 #include "UIDriver.h"
@@ -27,23 +28,6 @@ using namespace std;
 #else 
 #define std
 #endif
-
-// Compression method configuration
-// Set to 0 to disable compression and to 1 to enable compression
-// Note compression takes place only if it takes less space than uncompressed data!
-
-// Run-Length-Encoding Compression
-// DO NOT ENABLE HP_M2TIFF_Compress seems to be broken!!!
-#define ENABLE_RLE_COMPRESSION       0
-
-// Delta Row Compression
-#define ENABLE_DELTA_ROW_COMPRESSION 1
-
-// Color depth for color printing.
-// Use either 1 or 8.
-// If 1 bit depth is used, the class Halftone is used for dithering
-// otherwise dithering is not performed.
-#define COLOR_DEPTH 1
 
 // DeltaRowStreamCompressor writes the delta row directly to the 
 // in the contructor specified stream.
@@ -195,11 +179,10 @@ void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int 
 #endif
 
 #if ENABLE_RLE_COMPRESSION
-	HP_UInt32 compressedSize = 0;
-	HP_M2TIFF_CalcCompression((HP_pCharHuge)buffer, outSize, &compressedSize);
-	if (compressedSize < (uint32)dataSize) {
+	int rleSize = pack_bits_size(buffer, outSize);
+	if (rleSize < dataSize) {
 		compressionMethod = PCL6Writer::kRLECompression;
-		dataSize = compressedSize;
+		dataSize = rleSize;
 	}
 #endif
 	
@@ -212,10 +195,10 @@ void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int 
 
 	endRasterGraphics();
 	
-#if 0
+#if DISPLAY_COMPRESSION_STATISTICS
 	fprintf(stderr, "Out Size       %d %2.2f\n", (int)outSize, 100.0);
 #if ENABLE_RLE_COMPRESSION
-	fprintf(stderr, "RLE Size       %d %2.2f\n", (int)compressedSize, 100.0 * compressedSize / outSize);
+	fprintf(stderr, "RLE Size       %d %2.2f\n", (int)rleSize, 100.0 * rleSize / outSize);
 #endif
 #if ENABLE_DELTA_ROW_COMPRESSION
 	fprintf(stderr, "Delta Row Size %d %2.2f\n", (int)deltaRowSize, 100.0 * deltaRowSize / outSize);
@@ -310,8 +293,10 @@ void PCL6Driver::rasterGraphics(
 	// write data
 	if (compressionMethod == PCL6Writer::kRLECompression) {
 		// use RLE compression
-		// uint32 compressedSize = 0;
-		// HP_M2TIFF_Compress(fStream, 0, (HP_pCharHuge)buffer, bufferSize, &compressedSize);
+		uchar *outBuffer = new uchar[dataSize];
+		pack_bits(outBuffer, buffer, bufferSize);
+		fWriter->Append(outBuffer, dataSize);
+		delete outBuffer;
 		return;
 	} else if (compressionMethod == PCL6Writer::kDeltaRowCompression) {
 		// use delta row compression
