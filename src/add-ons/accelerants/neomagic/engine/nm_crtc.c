@@ -469,13 +469,20 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	LOG(2,("CRTC: frameRAM: $%08x\n",si->framebuffer));
 	LOG(2,("CRTC: framebuffer: $%08x\n",si->fbc.frame_buffer));
 
-	/* make sure we are in retrace, because otherwise distortions might occur
-	 * during our reprogramming them (no double buffering) (verified on NM2160) */
+	/* make sure we _just_ left retrace, because otherwise distortions might occur
+	 * during our reprogramming (no double buffering) (verified on NM2160) */
 
 	/* we might have no retraces during setmode! So:
 	 * wait 25mS max. for retrace to occur (refresh > 40Hz) */
 	//fixme? move this function to the kernel driver... is much 'faster'.
 	while ((!(ISARB(INSTAT1) & 0x08)) && (timeout < (25000/4)))
+	{
+		snooze(4);
+		timeout++;
+	}
+	/* now wait until retrace ends (with timeout) */
+	timeout = 0;
+	while ((ISARB(INSTAT1) & 0x08) && (timeout < (25000/4)))
 	{
 		snooze(4);
 		timeout++;

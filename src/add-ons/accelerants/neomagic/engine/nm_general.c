@@ -419,7 +419,7 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 			/* Note for NM2070 only:
 			 * The following depths have bandwidth trouble (pixel noise) with the
 			 * 'official' crtc_masks (used as defaults below). Masks of 0x1f are
-			 * needed (confirmed 15 and 16 bit spaces) to prevent this from occuring. */
+			 * needed (confirmed 15 and 16 bit spaces) to minimize this. */
 			//fixme: doublecheck for NM2090 and NM2093: correct code if needed!
 			case B_RGB15: crtc_mask = 0x1f; depth = 16; break;
 			case B_RGB16: crtc_mask = 0x1f; depth = 16; break;
@@ -525,7 +525,8 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				case B_CMAP8: acc_mask = 0x07; break;
 				/* Note:
 				 * The following depths have actual acc_masks of 0x03. 0x1f is used
-				 * because on lower acc_masks bandwidth trouble arises (pixel noise). */
+				 * because on lower acc_masks more bandwidth trouble arises.
+				 * (pixel noise) */
 				//fixme: doublecheck for NM2090 and NM2093: correct code if needed!
 				case B_RGB15: acc_mask = 0x1f; break;
 				case B_RGB16: acc_mask = 0x1f; break;
