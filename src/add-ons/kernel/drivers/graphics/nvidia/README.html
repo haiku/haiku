@@ -22,7 +22,8 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>GeForce 4 MX/Ti/Go;
 	<li>GeForce 4 Integrated GPU (Nforce 2);
 	<li>GeForce FX 5200/5600/5700/5800/5900/5950/Go;
-	<li>Quadro (2/4/FX/Go).
+	<li>Quadro (2/4/FX/Go);
+	<li>Some GeForce PCIe cards.
 </ul>
 <br>
 <hr>
@@ -35,7 +36,8 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>B_YCbCr422 hardware overlay support on both TNT and GeForce series cards (overlay follows head in dualhead stretch/switch modes);
 	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel (widescreen) support;
-	<li>Basic AGP mode support on AGP cards, using the new (seperate) (open)BeOS AGP busmanager.
+	<li>Basic AGP mode support on AGP cards, using the new (seperate) (open)BeOS AGP busmanager;
+	<li>Coldstart support for analog connected screens on most cards except TNT1 and GeForce 6800.
 </ul>
 <strong>Known limitations:</strong> 
 <ul>
@@ -100,8 +102,10 @@ To make things look even more complex the driver might actually use the BIOS to 
 	</ul>
 	<strong>Notes:</strong>
  	<ul>
- 		<li>On driverversion 0.23 and before usebios had no effect at all. The cards were never coldstarted.
-		<li>Coldstarting is more likely to succeed on TNT and older GeForce cards than it is on newer cards.
+ 		<li>On driverversion 0.23 and before usebios had no effect at all. The cards were never coldstarted;
+		<li>Coldstarting should work on most cards except TNT1 and GeForce 6800 starting with driverversion 0.29;
+		<li>Coldstarting will not yet work with laptop- and DVI panels;
+		<li>Coldstarting should fix the 'bandwidth trouble' existing on some GeForce2 cards.
  	</ul> 
 	<li><strong>memory:</strong> (disabled by default)<br>
 		This option enables you to override the 'memory amount autodetection' of the driver. If autodetection is working incorrect, you can manually set the amount this way. You could also lower the amount of RAM to a lower value than actually there to test with for instance overlay use in applications. So this option is probably mostly of interest to developers. Specify the RAM amount in Mb (use only 'whole' numbers!).<br>
@@ -173,6 +177,6 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on August 26, 2004)</p>
+<p>(Page last updated on October 23, 2004)</p>
 </body>
 </html>
