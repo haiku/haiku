@@ -583,7 +583,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 		break;
 	}
 
-	PRINT(("get_vnode: tried to lookup vnode, got 0x%p\n", vnode));
+	PRINT(("get_vnode: tried to lookup vnode, got %p\n", vnode));
 
 	if (vnode) {
 		inc_vnode_ref_count(vnode);
@@ -628,7 +628,7 @@ get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter
 
 	mutex_unlock(&gVnodeMutex);
 
-	PRINT(("get_vnode: returning 0x%p\n", vnode));
+	PRINT(("get_vnode: returning %p\n", vnode));
 
 	*_vnode = vnode;
 	return B_OK;
@@ -702,15 +702,15 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink, stru
 		char *nextPath;
 		int type;
 
-		PRINT(("path_to_vnode: top of loop. p = %p, *p = %c, p = '%s'\n", path, *path, path));
+		PRINT(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
 
 		// done?
-		if (*path == '\0')
+		if (path[0] == '\0')
 			break;
 
 		// walk to find the next path component ("path" will point to a single
 		// path component), and filter out multiple slashes
-		for (nextPath = path + 1;*nextPath != '\0' && *nextPath != '/';nextPath++);
+		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/'; nextPath++);
 
 		if (*nextPath == '/') {
 			*nextPath = '\0';
@@ -839,7 +839,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 {
 	struct vnode *start;
 
-	FUNCTION(("path_to_vnode(path = %s)\n", path));
+	FUNCTION(("path_to_vnode(path = \"%s\")\n", path));
 
 	if (!path)
 		return EINVAL;
@@ -1900,7 +1900,7 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 	int status;
 
 	status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
 	// file is opened, create a fd
@@ -2229,11 +2229,11 @@ dir_open(char *path, bool kernel)
 	FUNCTION(("dir_open: path = '%s', kernel %d\n", path, kernel));
 
 	status = path_to_vnode(path, true, &vnode, kernel);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
-	status = open_dir_vnode(vnode,kernel);
-	if (status < 0)
+	status = open_dir_vnode(vnode, kernel);
+	if (status < B_OK)
 		put_vnode(vnode);
 
 	return status;
