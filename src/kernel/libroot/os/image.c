@@ -16,6 +16,14 @@ void __init__image(struct uspace_program_args const *);
 static struct rld_export const *gRuntimeLinker;
 
 
+thread_id
+load_image(int32 argc, const char **argv, const char **environ)
+{
+	// ToDo: implement this!
+	return B_ERROR;
+}
+
+
 image_id
 load_add_on(char const *name)
 {
