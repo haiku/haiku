@@ -637,10 +637,8 @@ dprintf(const char *format,...)
 	va_end(args);
 }
 
-extern "C" int user_memcpy(void *to, const void *from, size_t size);
-extern "C" int user_strlcpy(char *to, const char *from, size_t size);
-
 // user_memcpy
+extern "C"
 int
 user_memcpy(void *to, const void *from, size_t size)
 {
@@ -650,6 +648,16 @@ user_memcpy(void *to, const void *from, size_t size)
 	while (size--)
 		*tmp++ = *s++;
 
+	return 0;
+}
+
+//user_strcpy
+extern "C"
+int
+user_strcpy(char *to, const char *from)
+{
+	while ((*to++ = *from++) != '\0')
+		;
 	return 0;
 }
 
@@ -663,6 +671,7 @@ user_memcpy(void *to, const void *from, size_t size)
 	
 	\return strlen(\a from).
 */
+extern "C"
 int
 user_strlcpy(char *to, const char *from, size_t size)
 {
