@@ -88,7 +88,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku-OS Neomagic Accelerant 0.11 running.\n"));
+	LOG(1,("POWERUP: Haiku Neomagic Accelerant 0.11 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))

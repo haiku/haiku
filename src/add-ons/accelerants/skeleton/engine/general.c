@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku-OS skeleton Accelerant 0.01 running.\n"));
+	LOG(1,("POWERUP: Haiku skeleton Accelerant 0.01 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
