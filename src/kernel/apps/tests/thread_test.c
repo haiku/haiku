@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 		my_test->current_val = &current_val;
 		my_test->thread_mult = i + 1;
 
-		t[i] = spawn_thread(counter_thread, "counter", THREAD_MEDIUM_PRIORITY, my_test);
+		t[i] = spawn_thread(counter_thread, "counter", B_NORMAL_PRIORITY, my_test);
 		if (t[i] > 0) {
 			resume_thread(t[i]);
 			expected *= (i + 1);

@@ -254,6 +254,7 @@ typedef enum {
 	B_THREAD_WAITING
 } thread_state;
 
+/*
 #define THREAD_IDLE_PRIORITY 0
 
 #define THREAD_NUM_PRIORITY_LEVELS 64
@@ -272,6 +273,10 @@ typedef enum {
 
 #define THREAD_RT_LOW_PRIORITY    THREAD_MIN_RT_PRIORITY
 #define THREAD_RT_HIGH_PRIORITY   THREAD_MAX_RT_PRIORITY
+*/
+
+#define B_IDLE_PRIORITY						0
+#define B_LOWEST_ACTIVE_PRIORITY			1
 
 #define B_LOW_PRIORITY						5
 #define B_NORMAL_PRIORITY					10
@@ -280,6 +285,10 @@ typedef enum {
 #define	B_REAL_TIME_DISPLAY_PRIORITY		100
 #define	B_URGENT_PRIORITY					110
 #define B_REAL_TIME_PRIORITY				120
+
+#define B_FIRST_REAL_TIME_PRIORITY			B_REAL_TIME_DISPLAY_PRIORITY
+#define B_MIN_PRIORITY						B_IDLE_PRIORITY
+#define B_MAX_PRIORITY						B_REAL_TIME_PRIORITY
 
 /** information on a thread
  * @note the thread can be in any state

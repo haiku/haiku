@@ -263,13 +263,13 @@ int vm_page_init_postthread(kernel_args *ka)
 
 	// create a kernel thread to clear out pages
 	tid = thread_create_kernel_thread("page scrubber", &page_scrubber, NULL);
-	thread_set_priority(tid, THREAD_LOWEST_PRIORITY);
+	thread_set_priority(tid, B_LOWEST_ACTIVE_PRIORITY);
 	thread_resume_thread(tid);
 
 	modified_pages_available = create_sem(0, "modified_pages_avail_sem");
 #if 0
 	// create a kernel thread to schedule modified pages to write
-	tid = thread_create_kernel_thread("pageout daemon", &pageout_daemon, THREAD_MIN_RT_PRIORITY + 1);
+	tid = thread_create_kernel_thread("pageout daemon", &pageout_daemon, B_FIRST_REAL_TIME_PRIORITY + 1);
 	thread_resume_thread(tid);
 #endif
 	return 0;

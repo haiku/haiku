@@ -248,7 +248,7 @@ int delete_sem_etc(sem_id id, int return_code)
 
 	// free any threads waiting for this semaphore
 	while ((t = thread_dequeue(&sems[slot].q)) != NULL) {
-		t->state = THREAD_STATE_READY;
+		t->state = B_THREAD_READY;
 		t->sem_errcode = B_BAD_SEM_ID;
 		t->sem_deleted_retcode = return_code;
 		t->sem_count = 0;
@@ -370,7 +370,7 @@ int acquire_sem_etc(sem_id id, int count, int flags, bigtime_t timeout)
 			goto err;
 		}
 
-		t->next_state = THREAD_STATE_WAITING;
+		t->next_state = B_THREAD_WAITING;
 		t->sem_flags = flags;
 		t->sem_blocking = id;
 		t->sem_acquire_count = count;
@@ -485,7 +485,7 @@ int release_sem_etc(sem_id id, int count, int flags)
 				// release this thread
 				t = thread_dequeue(&sems[slot].q);
 				thread_enqueue(t, &release_queue);
-				t->state = THREAD_STATE_READY;
+				t->state = B_THREAD_READY;
 				released_threads++;
 				t->sem_count = 0;
 				t->sem_deleted_retcode = 0;
@@ -505,7 +505,7 @@ int release_sem_etc(sem_id id, int count, int flags)
 		while ((t = thread_dequeue(&release_queue)) != NULL) {
 			// temporarily place thread in a run queue with high priority to boost it up
 			priority = t->priority;
-			t->priority = t->priority >= THREAD_HIGH_PRIORITY ? t->priority : THREAD_HIGH_PRIORITY;
+			t->priority = t->priority >= B_FIRST_REAL_TIME_PRIORITY ? t->priority : B_FIRST_REAL_TIME_PRIORITY;
 			thread_enqueue_run_q(t);
 			t->priority = priority;
 		}
@@ -691,7 +691,7 @@ int sem_interrupt_thread(struct thread *t)
 
 //	dprintf("sem_interrupt_thread: called on thread %p (%d), blocked on sem 0x%x\n", t, t->id, t->sem_blocking);
 
-	if (t->state != THREAD_STATE_WAITING || t->sem_blocking < 0)
+	if (t->state != B_THREAD_WAITING || t->sem_blocking < 0)
 		return EINVAL;
 	if ((t->sem_flags & B_CAN_INTERRUPT) == 0)
 		return ERR_SEM_NOT_INTERRUPTABLE;
@@ -729,7 +729,7 @@ static int remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struc
 	if(t != t1)
 		return ERR_NOT_FOUND;
 	sem->count += t->sem_acquire_count;
-	t->state = THREAD_STATE_READY;
+	t->state = B_THREAD_READY;
 	t->sem_errcode = sem_errcode;
 	thread_enqueue(t, queue);
 
@@ -740,7 +740,7 @@ static int remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struc
 		t->sem_count -= delta;
 		if(t->sem_count <= 0) {
 			t = thread_dequeue(&sem->q);
-			t->state = THREAD_STATE_READY;
+			t->state = B_THREAD_READY;
 			thread_enqueue(t, queue);
 		}
 		sem->count -= delta;

@@ -22,26 +22,6 @@ extern "C" {
 #include <smp.h>
 #include <arch/thread_struct.h>
 
-
-#define THREAD_IDLE_PRIORITY 0
-
-#define THREAD_NUM_PRIORITY_LEVELS 64
-#define THREAD_MIN_PRIORITY    (THREAD_IDLE_PRIORITY + 1)
-#define THREAD_MAX_PRIORITY    (THREAD_NUM_PRIORITY_LEVELS - THREAD_NUM_RT_PRIORITY_LEVELS - 1)
-
-#define THREAD_NUM_RT_PRIORITY_LEVELS 16
-#define THREAD_MIN_RT_PRIORITY (THREAD_MAX_PRIORITY + 1)
-#define THREAD_MAX_RT_PRIORITY (THREAD_NUM_PRIORITY_LEVELS - 1)
-
-#define THREAD_LOWEST_PRIORITY    THREAD_MIN_PRIORITY
-#define THREAD_LOW_PRIORITY       12
-#define THREAD_MEDIUM_PRIORITY    24
-#define THREAD_HIGH_PRIORITY      36
-#define THREAD_HIGHEST_PRIORITY   THREAD_MAX_PRIORITY
-
-#define THREAD_RT_LOW_PRIORITY    THREAD_MIN_RT_PRIORITY
-#define THREAD_RT_HIGH_PRIORITY   THREAD_MAX_RT_PRIORITY
-
 extern spinlock_t thread_spinlock;
 #define GRAB_THREAD_LOCK()    acquire_spinlock(&thread_spinlock)
 #define RELEASE_THREAD_LOCK() release_spinlock(&thread_spinlock)
@@ -55,12 +35,12 @@ extern spinlock_t team_spinlock;
 #define RELEASE_TEAM_LOCK() release_spinlock(&team_spinlock)
 
 enum {
-	THREAD_STATE_READY = 0,   // ready to run
-	THREAD_STATE_RUNNING, // running right now somewhere
-	THREAD_STATE_WAITING, // blocked on something
-	THREAD_STATE_SUSPENDED, // suspended, not in queue
-	THREAD_STATE_FREE_ON_RESCHED, // free the thread structure upon reschedule
-	THREAD_STATE_BIRTH	// thread is being created
+//	THREAD_STATE_READY = 0,   // ready to run
+//	THREAD_STATE_RUNNING, // running right now somewhere
+//	THREAD_STATE_WAITING, // blocked on something
+//	THREAD_STATE_SUSPENDED, // suspended, not in queue
+	THREAD_STATE_FREE_ON_RESCHED=7, // free the thread structure upon reschedule
+//	THREAD_STATE_BIRTH	// thread is being created
 };
 
 enum {

@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 		int i;
 
 		for(i=0; i<10; i++) {
-			tids[i] = spawn_thread(&test_thread, "foo", THREAD_MEDIUM_PRIORITY, (void *)i);
+			tids[i] = spawn_thread(&test_thread, "foo", B_NORMAL_PRIORITY, (void *)i);
 			resume_thread(tids[i]);
 		}
 
@@ -369,7 +369,7 @@ int main(int argc, char **argv)
 
 			t = sys_system_time();
 
-			id = spawn_thread(&dummy_thread, "testthread", THREAD_MEDIUM_PRIORITY, NULL);
+			id = spawn_thread(&dummy_thread, "testthread", B_NORMAL_PRIORITY, NULL);
 			if (id > 0)
 				resume_thread(id);
 
@@ -386,19 +386,19 @@ int main(int argc, char **argv)
 
 		printf("spawning a few floating point crunchers\n");
 
-		id = spawn_thread(&fpu_cruncher_thread, "fpu thread0", THREAD_MEDIUM_PRIORITY, &f[0]);
+		id = spawn_thread(&fpu_cruncher_thread, "fpu thread0", B_NORMAL_PRIORITY, &f[0]);
 		resume_thread(id);
 
-		id = spawn_thread(&fpu_cruncher_thread, "fpu thread1", THREAD_MEDIUM_PRIORITY, &f[1]);
+		id = spawn_thread(&fpu_cruncher_thread, "fpu thread1", B_NORMAL_PRIORITY, &f[1]);
 		resume_thread(id);
 
-		id = spawn_thread(&fpu_cruncher_thread, "fpu thread2", THREAD_MEDIUM_PRIORITY, &f[2]);
+		id = spawn_thread(&fpu_cruncher_thread, "fpu thread2", B_NORMAL_PRIORITY, &f[2]);
 		resume_thread(id);
 
-		id = spawn_thread(&fpu_cruncher_thread, "fpu thread3", THREAD_MEDIUM_PRIORITY, &f[3]);
+		id = spawn_thread(&fpu_cruncher_thread, "fpu thread3", B_NORMAL_PRIORITY, &f[3]);
 		resume_thread(id);
 
-		id = spawn_thread(&fpu_cruncher_thread, "fpu thread4", THREAD_MEDIUM_PRIORITY, &f[4]);
+		id = spawn_thread(&fpu_cruncher_thread, "fpu thread4", B_NORMAL_PRIORITY, &f[4]);
 		resume_thread(id);
 
 		getchar();
@@ -452,7 +452,7 @@ static void port_test(void)
 	printf("porttest: res=%d, %s\n", res, res == ETIMEDOUT ? "ok" : "BAD");
 
 	printf("porttest: spawning thread for port 1\n");
-	t = spawn_thread(port_test_thread_func, "port_test", THREAD_MEDIUM_PRIORITY, NULL);
+	t = spawn_thread(port_test_thread_func, "port_test", B_NORMAL_PRIORITY, NULL);
 	// resume thread
 	resume_thread(t);
 

@@ -41,7 +41,7 @@ struct team_arg {
 
 // team list
 static void *team_hash = NULL;
-static team_id next_team_id = 0;
+static team_id next_team_id = 1;
 static struct team *kernel_team = NULL;
 
 spinlock_t team_spinlock = 0;
@@ -673,6 +673,7 @@ _get_team_info(team_id id, team_info *info, size_t size)
 		goto err;
 	}
 	// XXX- Set more informations for team_info
+	memset(info, 0, sizeof(team_info));
 	info->team = team->id;
 	info->thread_count = team->num_threads;
 	// XXX- make this to return real argc/argv
@@ -738,9 +739,10 @@ _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 		if (slot >= next_team_id)
 			goto err;
 	}
-	while (!(team = team_get_team_struct_locked(slot)) && (slot < next_team_id))
+	while ((slot < next_team_id) && !(team = team_get_team_struct_locked(slot)))
 		slot++;
 	if (team) {
+		memset(info, 0, sizeof(team_info));
 		// XXX- Set more informations for team_info
 		info->team = team->id;
 		info->thread_count = team->num_threads;

@@ -103,12 +103,12 @@ resched(void)
 //	dprintf("top of thread_resched: cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread());
 
 	switch(old_thread->next_state) {
-		case THREAD_STATE_RUNNING:
-		case THREAD_STATE_READY:
+		case B_THREAD_RUNNING:
+		case B_THREAD_READY:
 //			dprintf("enqueueing thread 0x%x into run q. pri = %d\n", old_thread, old_thread->priority);
 			thread_enqueue_run_q(old_thread);
 			break;
-		case THREAD_STATE_SUSPENDED:
+		case B_THREAD_SUSPENDED:
 			dprintf("suspending thread 0x%x\n", old_thread->id);
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
@@ -123,14 +123,14 @@ resched(void)
 	old_thread->state = old_thread->next_state;
 
 	// search the real-time queue
-	for(i = THREAD_MAX_RT_PRIORITY; i >= THREAD_MIN_RT_PRIORITY; i--) {
+	for(i = B_MAX_PRIORITY; i >= B_FIRST_REAL_TIME_PRIORITY; i-=2) {
 		next_thread = thread_dequeue_run_q(i);
 		if(next_thread)
 			goto found_thread;
 	}
 
 	// search the regular queue
-	for(i = THREAD_MAX_PRIORITY; i > THREAD_IDLE_PRIORITY; i--) {
+	for(i = B_FIRST_REAL_TIME_PRIORITY - 1; i >= B_LOWEST_ACTIVE_PRIORITY; i-=2) {
 		next_thread = thread_lookat_run_q(i);
 		if(next_thread != NULL) {
 			// skip it sometimes
@@ -148,15 +148,15 @@ resched(void)
 			if(next_thread == NULL)
 				panic("next_thread == NULL! last_thread_pri = %d\n", last_thread_pri);
 		} else {
-			next_thread = thread_dequeue_run_q(THREAD_IDLE_PRIORITY);
+			next_thread = thread_dequeue_run_q(B_IDLE_PRIORITY);
 			if(next_thread == NULL)
 				panic("next_thread == NULL! no idle priorities!\n");
 		}
 	}
 
 found_thread:
-	next_thread->state = THREAD_STATE_RUNNING;
-	next_thread->next_state = THREAD_STATE_READY;
+	next_thread->state = B_THREAD_RUNNING;
+	next_thread->next_state = B_THREAD_READY;
 	
 	if ((next_thread != old_thread) || (old_thread->cpu->info.preempted)) {
 		// XXX calculate quantum

@@ -46,7 +46,7 @@ spinlock_t thread_spinlock = 0;
 // thread list
 static struct thread *idle_threads[MAX_BOOT_CPUS];
 static void *thread_hash = NULL;
-static thread_id next_thread_id = 0;
+static thread_id next_thread_id = 1;
 
 static sem_id snooze_sem = -1;
 
@@ -62,14 +62,13 @@ static unsigned int volatile death_stack_bitmap;
 static sem_id death_stack_sem;
 
 // thread queues
-static struct thread_queue run_q[THREAD_NUM_PRIORITY_LEVELS] = { { NULL, NULL }, };
+// Thread priority has a granularity of 2; this means that we have 61 real
+// priority levels: 60 to map BeOS priorities 1-120, plus the idle priority (0).
+static struct thread_queue run_q[(B_MAX_PRIORITY / 2) + 1] = { { NULL, NULL }, };
 struct thread_queue dead_q;
 
 static void thread_entry(void);
 static struct thread *thread_get_thread_struct_locked(thread_id id);
-/* XXX - not currently used, so commented out
-static struct team *team_get_team_struct(team_id id);
- */
 static void thread_kthread_exit(void);
 static void deliver_signal(struct thread *t, int signal);
 
@@ -129,23 +128,23 @@ struct thread *thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 
 struct thread *thread_lookat_run_q(int priority)
 {
-	return thread_lookat_queue(&run_q[priority]);
+	return thread_lookat_queue(&run_q[(priority + 1) >> 1]);
 }
 
 void thread_enqueue_run_q(struct thread *t)
 {
 	// these shouldn't exist
-	if(t->priority > THREAD_MAX_PRIORITY)
-		t->priority = THREAD_MAX_PRIORITY;
-	if(t->priority < 0)
-		t->priority = 0;
+	if(t->priority > B_MAX_PRIORITY)
+		t->priority = B_MAX_PRIORITY;
+	if(t->priority < B_MIN_PRIORITY)
+		t->priority = B_MIN_PRIORITY;
 
-	thread_enqueue(t, &run_q[t->priority]);
+	thread_enqueue(t, &run_q[(t->priority + 1) >> 1]);
 }
 
 struct thread *thread_dequeue_run_q(int priority)
 {
-	return thread_dequeue(&run_q[priority]);
+	return thread_dequeue(&run_q[(priority + 1) >> 1]);
 }
 
 static void insert_thread_into_team(struct team *p, struct thread *t)
@@ -307,9 +306,10 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 	if(t == NULL)
 		return ENOMEM;
 
-	t->priority = priority == -1 ? THREAD_MEDIUM_PRIORITY : priority;
-	t->state = THREAD_STATE_BIRTH;
-	t->next_state = THREAD_STATE_SUSPENDED;
+	t->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
+//	t->state = THREAD_STATE_BIRTH;
+	t->state = B_THREAD_SUSPENDED;	// Is this right?
+	t->next_state = B_THREAD_SUSPENDED;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -377,7 +377,7 @@ static thread_id _create_thread(const char *name, team_id pid, addr entry, void 
 		arch_thread_initialize_kthread_stack(t, &_create_user_thread_kentry, &thread_entry, &thread_kthread_exit);
 	}
 
-	t->state = THREAD_STATE_SUSPENDED;
+	t->state = B_THREAD_SUSPENDED;
 
 	return t->id;
 }
@@ -439,7 +439,7 @@ int thread_suspend_thread(thread_id id)
 			t->pending_signals |= SIG_SUSPEND;
 			retval = B_NO_ERROR;
 		} else {
-			t->next_state = THREAD_STATE_SUSPENDED;
+			t->next_state = B_THREAD_SUSPENDED;
 			global_resched = true;
 			retval = B_NO_ERROR;
 		}
@@ -467,9 +467,9 @@ int thread_resume_thread(thread_id id)
 	GRAB_THREAD_LOCK();
 
 	t = thread_get_thread_struct_locked(id);
-	if(t != NULL && t->state == THREAD_STATE_SUSPENDED) {
-		t->state = THREAD_STATE_READY;
-		t->next_state = THREAD_STATE_READY;
+	if(t != NULL && t->state == B_THREAD_SUSPENDED) {
+		t->state = B_THREAD_READY;
+		t->next_state = B_THREAD_READY;
 
 		thread_enqueue_run_q(t);
 		retval = B_NO_ERROR;
@@ -489,10 +489,10 @@ int thread_set_priority(thread_id id, int priority)
 	int retval;
 
 	// make sure the passed in priority is within bounds
-	if(priority > THREAD_MAX_PRIORITY)
-		priority = THREAD_MAX_PRIORITY;
-	if(priority < THREAD_MIN_PRIORITY)
-		priority = THREAD_MIN_PRIORITY;
+	if(priority > B_MAX_PRIORITY)
+		priority = B_MAX_PRIORITY;
+	if(priority < B_MIN_PRIORITY)
+		priority = B_MIN_PRIORITY;
 
 	t = thread_get_current_thread();
 	if(t->id == id) {
@@ -506,9 +506,9 @@ int thread_set_priority(thread_id id, int priority)
 
 		t = thread_get_thread_struct_locked(id);
 		if(t) {
-			if(t->state == THREAD_STATE_READY && t->priority != priority) {
+			if(t->state == B_THREAD_READY && t->priority != priority) {
 				// this thread is in a ready queue right now, so it needs to be reinserted
-				thread_dequeue_id(&run_q[t->priority], t->id);
+				thread_dequeue_id(&run_q[(t->priority + 1) >> 1], t->id);
 				t->priority = priority;
 				thread_enqueue_run_q(t);
 			} else {
@@ -529,18 +529,16 @@ int thread_set_priority(thread_id id, int priority)
 static const char *state_to_text(int state)
 {
 	switch(state) {
-		case THREAD_STATE_READY:
+		case B_THREAD_READY:
 			return "READY";
-		case THREAD_STATE_RUNNING:
+		case B_THREAD_RUNNING:
 			return "RUNNING";
-		case THREAD_STATE_WAITING:
+		case B_THREAD_WAITING:
 			return "WAITING";
-		case THREAD_STATE_SUSPENDED:
+		case B_THREAD_SUSPENDED:
 			return "SUSPEND";
 		case THREAD_STATE_FREE_ON_RESCHED:
 			return "DEATH";
-		case THREAD_STATE_BIRTH:
-			return "BIRTH";
 		default:
 			return "UNKNOWN";
 	}
@@ -795,9 +793,9 @@ int thread_init(kernel_args *ka)
 			return ENOMEM;
 		}
 		t->team = team_get_kernel_team();
-		t->priority = THREAD_IDLE_PRIORITY;
-		t->state = THREAD_STATE_RUNNING;
-		t->next_state = THREAD_STATE_READY;
+		t->priority = B_IDLE_PRIORITY;
+		t->state = B_THREAD_RUNNING;
+		t->next_state = B_THREAD_READY;
 		sprintf(temp, "idle_thread%d_kstack", i);
 		t->kernel_stack_region_id = vm_find_region_by_name(vm_get_kernel_aspace_id(), temp);
 		region = vm_get_region_by_id(t->kernel_stack_region_id);
@@ -939,7 +937,7 @@ void thread_exit(int retcode)
 	dprintf("thread 0x%x exiting w/return code 0x%x\n", t->id, retcode);
 
 	// boost our priority to get this over with
-	thread_set_priority(t->id, THREAD_HIGH_PRIORITY);
+	thread_set_priority(t->id, B_FIRST_REAL_TIME_PRIORITY);
 
 	// delete the user stack region first
 	if(p->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
@@ -1193,13 +1191,13 @@ static void deliver_signal(struct thread *t, int signal)
 		case SIG_KILL:
 			t->pending_signals |= SIG_KILL;
 			switch(t->state) {
-				case THREAD_STATE_SUSPENDED:
-					t->state = THREAD_STATE_READY;
-					t->next_state = THREAD_STATE_READY;
+				case B_THREAD_SUSPENDED:
+					t->state = B_THREAD_READY;
+					t->next_state = B_THREAD_READY;
 
 					thread_enqueue_run_q(t);
 					break;
-				case THREAD_STATE_WAITING:
+				case B_THREAD_WAITING:
 					sem_interrupt_thread(t);
 					break;
 				default:
@@ -1227,7 +1225,7 @@ static void _check_for_thread_sigs(struct thread *t, int state)
 	}
 	if(t->pending_signals & SIG_SUSPEND) {
 		t->pending_signals &= ~SIG_SUSPEND;
-		t->next_state = THREAD_STATE_SUSPENDED;
+		t->next_state = B_THREAD_SUSPENDED;
 		// XXX will probably want to delay this
 		resched();
 	}
@@ -1304,7 +1302,7 @@ user_get_thread_info(thread_id id, thread_info *info)
 	if (rc != B_OK)
 		return rc;
 	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
 	if (rc2 < 0)
 		return rc2;
 	
@@ -1331,8 +1329,13 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	info->team = t->team->id;
 	strncpy(info->name, t->name, B_OS_NAME_LENGTH);
 	info->name[B_OS_NAME_LENGTH - 1] = '\0';
-	// XXX- Fix me
-	info->state = t->state;
+	if (t->state == B_THREAD_WAITING) {
+		if (t->sem_blocking == snooze_sem)
+			info->state = B_THREAD_ASLEEP;
+		else
+			info->state = B_THREAD_WAITING;
+	} else
+		info->state = t->state;
 	info->priority = t->priority;
 	info->sem = t->sem_blocking;
 	info->user_time = t->user_time;
@@ -1364,7 +1367,7 @@ user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info)
 	if (rc2 < 0)
 		return rc2;
 	
-	rc = _get_next_thread_info(team, &kcookie, &kinfo, sizeof(team_info));
+	rc = _get_next_thread_info(team, &kcookie, &kinfo, sizeof(thread_info));
 	if (rc != B_OK)
 		return rc;
 	
@@ -1372,7 +1375,7 @@ user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info)
 	if (rc2 < 0)
 		return rc2;
 	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	rc2 = user_memcpy(info, &kinfo, sizeof(thread_info));
 	if (rc2 < 0)
 		return rc2;
 	
@@ -1405,15 +1408,22 @@ _get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size
 		if (slot >= next_thread_id)
 			goto err;
 	}
-	while (!(t = thread_get_thread_struct_locked(slot)) && (t->team->id != tid) && (slot < next_thread_id))
+	
+	while ((slot < next_thread_id) && (!(t = thread_get_thread_struct_locked(slot)) || (t->team->id != tid)))
 		slot++;
-	if (t) {
+			
+	if ((t) && (t->team->id == tid)) {
 		info->thread = t->id;
 		info->team = t->team->id;
 		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
 		info->name[B_OS_NAME_LENGTH - 1] = '\0';
-		// XXX- Fix me
-		info->state = t->state;
+		if (t->state == B_THREAD_WAITING) {
+			if (t->sem_blocking == snooze_sem)
+				info->state = B_THREAD_ASLEEP;
+			else
+				info->state = B_THREAD_WAITING;
+		} else
+			info->state = t->state;
 		info->priority = t->priority;
 		info->sem = t->sem_blocking;
 		info->user_time = t->user_time;
