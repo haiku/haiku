@@ -2,12 +2,16 @@
 /* Author:
    Rudolf Cornelissen 8/2003-12/2004.
 
-   This code was possible thanks to the Linux NV driver.
+   This code was possible thanks to:
+    - the Linux XFree86 NV driver,
+    - the Linux UtahGLX 3D driver.
 */
 
 #define MODULE_BIT 0x00080000
 
 #include "nv_std.h"
+
+static void nv_init_for_3D(void);
 
 /*acceleration notes*/
 
@@ -645,6 +649,8 @@ status_t nv_acc_init()
 		ACCW(NV10_PIPEADR, 0x00000040);
 		ACCW(NV10_PIPEDAT, 0x00000008);
 
+		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
+		 * probably auto-incremented! */
 		ACCW(NV10_PIPEADR, 0x00000200);
 		for (cnt = 0; cnt < (3 * 16); cnt++) ACCW(NV10_PIPEDAT, 0x00000000);
 
@@ -687,8 +693,40 @@ status_t nv_acc_init()
 		for (cnt = 0; cnt < 4; cnt++) ACCW(NV10_PIPEDAT, 0x00000000);
 	}
 
+	/* setup 3D specifics */
+	nv_init_for_3D();
+
+	/*** setup acceleration engine command shortcuts (so via fifo) ***/
+	/* (b31 = 1 selects 'config' function?) */
+	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
+	ACCW(FIFO_00802000, 0x80000001); /* Clip */
+	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
+	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used or 3D only?) */
+	ACCW(FIFO_00808000, 0x80000011); /* Blit */
+	ACCW(FIFO_0080a000, 0x80000012); /* Bitmap */
+	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used or 3D only?) */
+	ACCW(FIFO_0080e000, 0x80000014); /* Textured Triangle (3D only) */
+
+	/* do first actual acceleration engine command:
+	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
+	 * wait for room in fifo for clipping cmd if needed.
+	 * (fifo holds 256 32bit words: count those, not bytes) */
+	while (((NV_REG16(NV16_CLP_FIFOFREE)) >> 2) < 2)
+	{
+		/* snooze a bit so I do not hammer the bus */
+		snooze (10); 
+	}
+	/* now setup clipping (writing 2 32bit words) */
+	ACCW(CLP_TOPLEFT, 0x00000000);
+	ACCW(CLP_WIDHEIGHT, 0x80008000);
+
+	return B_OK;
+}
+
+static void nv_init_for_3D(void)
+{
 	/* setup PGRAPH unknown registers and modify (pre-cleared) pipe stuff for 3D use */
-//	if (si->ps.card_arch >= NV10A)
+	//if (si->ps.card_arch >= NV10A)
 	if (0)
 	{
 		/* setup unknown PGRAPH stuff */
@@ -747,34 +785,185 @@ status_t nv_acc_init()
 		ACCW(PGWHAT_2A, 0x00000000);
 
 		/* setup window clipping */
-//
+		/* b0-11 = min; b16-27 = max.
+		 * note:
+		 * probably two's complement values, so setting to max range here:
+		 * which would be -2048 upto/including +2047. */
+		/* horizontal */
+		ACCW(WINCLIP_H_0, 0x07ff0800);
+		ACCW(WINCLIP_H_1, 0x07ff0800);
+		ACCW(WINCLIP_H_2, 0x07ff0800);
+		ACCW(WINCLIP_H_3, 0x07ff0800);
+		ACCW(WINCLIP_H_4, 0x07ff0800);
+		ACCW(WINCLIP_H_5, 0x07ff0800);
+		ACCW(WINCLIP_H_6, 0x07ff0800);
+		ACCW(WINCLIP_H_7, 0x07ff0800);
+		/* vertical */
+		ACCW(WINCLIP_V_0, 0x07ff0800);
+		ACCW(WINCLIP_V_1, 0x07ff0800);
+		ACCW(WINCLIP_V_2, 0x07ff0800);
+		ACCW(WINCLIP_V_3, 0x07ff0800);
+		ACCW(WINCLIP_V_4, 0x07ff0800);
+		ACCW(WINCLIP_V_5, 0x07ff0800);
+		ACCW(WINCLIP_V_6, 0x07ff0800);
+		ACCW(WINCLIP_V_7, 0x07ff0800);
+
+		/* setup (initialize) pipe */
+		/* set eyetype to local, lightning etc. is off */
+		ACCW(NV10_XFMOD0, 0x10000000);
+		/* disable all lights */
+		ACCW(NV10_XFMOD1, 0x00000000);
+
+		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
+		 * probably auto-incremented! */
+		/* (pipe adress = b2-16, pipe data = b0-31) */
+		ACCW(NV10_PIPEADR, 0x00006740);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006750);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+		ACCW(NV10_PIPEDAT, 0x40000000);
+
+		ACCW(NV10_PIPEADR, 0x00006760);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006770);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006780);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000067a0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006ab0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006ac0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006c10);
+		ACCW(NV10_PIPEDAT, 0xbf800000);
+
+		ACCW(NV10_PIPEADR, 0x00007030);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007040);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007050);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007060);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007070);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007080);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00007090);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x000070a0);
+		ACCW(NV10_PIPEDAT, 0x7149f2ca);
+
+		ACCW(NV10_PIPEADR, 0x00006a80);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x00006aa0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00000040);
+		ACCW(NV10_PIPEDAT, 0x00000005);
+
+		ACCW(NV10_PIPEADR, 0x00006400);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x4b7fffff);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006410);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006420);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x00006430);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064c0);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+		ACCW(NV10_PIPEDAT, 0x477fffff);
+		ACCW(NV10_PIPEDAT, 0x3f800000);
+
+		ACCW(NV10_PIPEADR, 0x000064d0);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0xc5000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064e0);
+		ACCW(NV10_PIPEDAT, 0xc4fff000);
+		ACCW(NV10_PIPEDAT, 0xc4fff000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		ACCW(NV10_PIPEADR, 0x000064f0);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+		ACCW(NV10_PIPEDAT, 0x00000000);
+
+		/* turn lightning on */
+		ACCW(NV10_XFMOD0, 0x30000000);
+		/* set light 1 to infinite type, other lights remain off */
+		ACCW(NV10_XFMOD1, 0x00000004);
+
+		/* Z-buffer state is:
+		 * initialized, set to: 'fixed point' (integer?); Z-buffer; 16bits depth */
+		/* note:
+		 * other options possible are: floating point; 24bits depth; W-buffer(?) */
+		ACCW(GLOB_STAT_0, 0x10000000);
+		/* set DMA instance 2 and 3 to be invalid */
+		ACCW(GLOB_STAT_1, 0x00000000);
 	}
-
-	/*** setup acceleration engine command shortcuts (so via fifo) ***/
-	/* (b31 = 1 selects 'config' function?) */
-	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
-	ACCW(FIFO_00802000, 0x80000001); /* Clip */
-	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
-	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used or 3D only?) */
-	ACCW(FIFO_00808000, 0x80000011); /* Blit */
-	ACCW(FIFO_0080a000, 0x80000012); /* Bitmap */
-	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used or 3D only?) */
-	ACCW(FIFO_0080e000, 0x80000014); /* Textured Triangle (3D only) */
-
-	/* do first actual acceleration engine command:
-	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
-	 * wait for room in fifo for clipping cmd if needed.
-	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_CLP_FIFOFREE)) >> 2) < 2)
-	{
-		/* snooze a bit so I do not hammer the bus */
-		snooze (10); 
-	}
-	/* now setup clipping (writing 2 32bit words) */
-	ACCW(CLP_TOPLEFT, 0x00000000);
-	ACCW(CLP_WIDHEIGHT, 0x80008000);
-
-	return B_OK;
 }
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
