@@ -731,8 +731,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	delete name;
 
 	// there is no way of setting this, other than manually :-)
-printf("Layer (%s) hidden : %d?\n", fTitle.String(), hidden);
-	newLayer->fHidden = (hidden == 0)? false: true;
+	newLayer->fHidden = hidden;
 
 	int32 dummyMsg;
 			
@@ -1667,6 +1666,18 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			break;
 		}
+		case AS_WINDOW_MOVE:
+		{
+			float xMoveBy;
+			float yMoveBy;
+			
+			fSession->ReadFloat(&xMoveBy);
+			fSession->ReadFloat(&yMoveBy);
+
+			fWinBorder->MoveBy(xMoveBy, yMoveBy);
+
+			break;
+		}
 		case B_MINIMIZE:
 		{
 			// TODO: Implement
@@ -1683,18 +1694,6 @@ void ServerWindow::DispatchMessage(int32 code)
 		{
 			// TODO: Implement
 			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fTitle.String()));
-			break;
-		}
-		case B_WINDOW_MOVE_TO:
-		{
-			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Move_To unimplemented\n",fTitle.String()));
-			break;
-		}
-		case B_WINDOW_MOVE_BY:
-		{
-			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Move_By unimplemented\n",fTitle.String()));
 			break;
 		}
 		default:

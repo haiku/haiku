@@ -347,7 +347,7 @@ void WinBorder::Draw(const BRect &r)
 	if(fDecorator)
 	{
 /*
-		fUpdateReg.PrintToStream();
+		//fUpdateReg.PrintToStream();
 		RGBColor		c(128, 56, 98);
 		//fDriver->FillRect(r, c);
 		fDriver->FillRect(fUpdateReg.Frame(), c);

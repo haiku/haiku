@@ -432,8 +432,8 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 	if (fVisible.CountRects() > 0)
 	{
 		fUpdateReg = fVisible;
-		if (!(fFlags & B_FULL_UPDATE_ON_RESIZE))
-			fUpdateReg.IntersectWith(&reg);
+		if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+		else { fUpdateReg.IntersectWith(&reg); }
 		
 		if (fUpdateReg.CountRects() > 0){
 			fDriver->ConstrainClippingRegion(&fUpdateReg);
@@ -451,7 +451,14 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			redraw = true;
 
 		if (redraw && !(lay->IsHidden()))
-			lay->RequestDraw(reg, NULL);
+		{
+			// no need to go deeper if not even the FullVisible region intersects
+			// Update one.
+			BRegion common(lay->fFullVisible);
+			common.IntersectWith(&reg);
+			if (common.CountRects() > 0)
+				lay->RequestDraw(reg, NULL);
+		}
 	}
 }
 
@@ -460,10 +467,11 @@ void Layer::Draw(const BRect &r)
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
 	
 	STRACE(("Layer::Draw() Called\n"));
-	
-	// RGBColor	col(152,102,51);
-	// DRIVER->FillRect_(r, 1, col, &fUpdateReg);
-	//snooze(1000000);
+/*
+	RGBColor	col(152,102,51);
+	fDriver->FillRect(fUpdateReg.Frame(), col);
+	snooze(1000000);
+*/
 	fDriver->FillRect(r, fLayerData->viewcolor);
 	
 	// empty HOOK function.
