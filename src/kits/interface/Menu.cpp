@@ -1,3 +1,32 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		Menu.cpp
+//	Author:			Marc Flerackers (mflerackers@androme.be)
+//	Description:	BMenu display a menu of selectable items.
+//------------------------------------------------------------------------------
+
+// Standard Includes -----------------------------------------------------------
+
+// System Includes -------------------------------------------------------------
 #include "Menu.h"
 #include "MenuItem.h"
 #include "Window.h"
@@ -6,6 +35,14 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
+
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
+
+// Globals ---------------------------------------------------------------------
 
 static property_info prop_list[] =
 {
@@ -54,6 +91,7 @@ static property_info prop_list[] =
 		"specifier off the stack." },
 	0
 };
+
 //------------------------------------------------------------------------------
 class BMenuWindow : public BWindow
 {
@@ -84,6 +122,7 @@ public:
 private:
 	BMenu *fMenu;
 };
+
 //------------------------------------------------------------------------------
 BMenu::BMenu(const char *name, menu_layout layout)
 	:	BView(BRect(), name, B_FOLLOW_LEFT | B_FOLLOW_TOP,
