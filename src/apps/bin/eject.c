@@ -56,6 +56,7 @@ int main(int argc, char **argv)
 	}
 	if (device == NULL)
 		return do_eject(operation, "/dev/disk/floppy/raw");
+	return 0;
 }
 static int do_eject(char operation, char *device)
 {
