@@ -57,6 +57,7 @@ StdBinCommands
 	ffm.cpp
 	iroster.cpp
 	listattr.cpp
+	mkindex.cpp
 	modifiers.cpp
 	open.cpp
 	play.cpp
