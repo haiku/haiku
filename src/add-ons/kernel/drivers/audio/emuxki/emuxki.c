@@ -2052,7 +2052,6 @@ emuxki_setup(emuxki_dev * card)
 
 	emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_LOCKSOUNDCACHE | EMU_HCFG_LOCKTANKCACHE_MASK| 
 		EMU_HCFG_MUTEBUTTONENABLE);
-	emuxki_reg_write_32(&card->config, EMU_INTE, EMU_INTE_SAMPLERATER | EMU_INTE_PCIERRENABLE);
 	
 	dump_hardware_regs(&card->config);
 	
@@ -2087,8 +2086,6 @@ emuxki_setup(emuxki_dev * card)
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
 	}
-	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE 
-		| EMU_INTE_MUTEENABLE | EMU_INTE_FXDSPENABLE);
 	
 	if(IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
@@ -2159,8 +2156,13 @@ emuxki_setup(emuxki_dev * card)
 		card->play_mode = 4;	// mode 4.0
 	}
 	
+	emuxki_reg_write_32(&card->config, EMU_INTE, EMU_INTE_SAMPLERATER | EMU_INTE_PCIERRENABLE);
+	
 	PRINT(("installing interrupt : %x\n", card->config.irq));
 	install_io_interrupt_handler(card->config.irq, emuxki_int, card, 0);
+
+	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE
+		| EMU_INTE_MUTEENABLE | EMU_INTE_FXDSPENABLE);
 	
 	PRINT(("init_driver done\n"));
 
@@ -2779,7 +2781,6 @@ emuxki_shutdown(emuxki_dev *card)
 	uint32       i;
 
 	PRINT(("shutdown(%p)\n", card));
-	remove_io_interrupt_handler(card->config.irq, emuxki_int, card);
 	
 	emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_LOCKSOUNDCACHE |
 		  EMU_HCFG_LOCKTANKCACHE_MASK | EMU_HCFG_MUTEBUTTONENABLE);
@@ -2803,6 +2804,8 @@ emuxki_shutdown(emuxki_dev *card)
 		emuxki_chan_write(&card->config, i, EMU_CHAN_PTRX, 0);
 		emuxki_chan_write(&card->config, i, EMU_CHAN_CPF, 0);
 	}
+
+	remove_io_interrupt_handler(card->config.irq, emuxki_int, card);
 	
 	/*
 	 * deallocate Emu10k1 caches and recording buffers Again it will be
