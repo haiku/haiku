@@ -25,7 +25,7 @@
 #include <BeBuild.h>
 #include <Locker.h>
 
-/* The OpenBeOS implementation of the BBLockCache.
+/* The OpenBeOS implementation of the BBlockCache.
  * A class used to manage a pool of memory blocks.
  */
 
