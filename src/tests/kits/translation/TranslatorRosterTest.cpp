@@ -37,10 +37,15 @@
 #include <File.h>
 #include <Application.h>
 
+/* cppunit framework */
+#include <cppunit/Test.h>
+#include <cppunit/TestCaller.h>
+#include <cppunit/TestSuite.h>
+
 /**
- * Default constructor - no work
+ * TestCase constructor - no work
  */
-TranslatorRosterTest::TranslatorRosterTest() {
+TranslatorRosterTest::TranslatorRosterTest(std::string name) : BTestCase(name) {
 }
 
 /**
@@ -49,147 +54,82 @@ TranslatorRosterTest::TranslatorRosterTest() {
 TranslatorRosterTest::~TranslatorRosterTest() {
 }
 
+CppUnit::Test*
+TranslatorRosterTest::Suite() {
+	/* create our suite */
+	CppUnit::TestSuite *suite = new CppUnit::TestSuite("TranslatorRosterTest Suite");
+		
+	/* add suckers */
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Initialize Test", &TranslatorRosterTest::InitializeTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Constructor Test", &TranslatorRosterTest::ConstructorTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Default Test", &TranslatorRosterTest::DefaultTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Instantiate Test", &TranslatorRosterTest::InstantiateTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Version Test", &TranslatorRosterTest::VersionTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::AddTranslators Test", &TranslatorRosterTest::AddTranslatorsTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Archive Test", &TranslatorRosterTest::ArchiveTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetAllTranslators Test", &TranslatorRosterTest::GetAllTranslatorsTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetConfigurationMessage Test", &TranslatorRosterTest::GetConfigurationMessageTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetInputFormats Test", &TranslatorRosterTest::GetInputFormatsTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetOutputFormats Test", &TranslatorRosterTest::GetOutputFormatsTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetTranslatorInfo Test", &TranslatorRosterTest::GetTranslatorInfoTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::GetTranslators Test", &TranslatorRosterTest::GetTranslatorsTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Identify Test", &TranslatorRosterTest::IdentifyTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::MakeConfigurationView Test", &TranslatorRosterTest::MakeConfigurationViewTest));
+	suite->addTest(new CppUnit::TestCaller<TranslatorRosterTest>("TranslatorRosterTest::Translate Test", &TranslatorRosterTest::TranslateTest));			
+
+	return suite;
+}
+
 /**
- * Initializes the test
- *
- * @return B_OK if initialization went ok, B_ERROR if not
+ * Tries to aquire the default roster
  */
-status_t TranslatorRosterTest::Initialize() {
+void TranslatorRosterTest::InitializeTest() {
 	//aquire default roster
 	roster = BTranslatorRoster::Default();
-	if(roster == NULL) {
-		Debug("Failed to create aquire default TranslatorRoster\n");
-		return B_ERROR;		
-	}
+	CPPUNIT_ASSERT(roster != NULL);
 	
 	//print version information
-	if(verbose && roster != NULL) {
-		int32 outCurVersion;
-		int32 outMinVersion;
-		long inAppVersion;
-		const char* info = roster->Version(&outCurVersion, &outMinVersion, inAppVersion);
-		printf("Default TranslatorRoster aquired. Version: %s\n", info);
-	}
-
-	return B_OK;
+	int32 outCurVersion;
+	int32 outMinVersion;
+	long inAppVersion;
+	const char* info = roster->Version(&outCurVersion, &outMinVersion, inAppVersion);
+	printf("Default TranslatorRoster aquired. Version: %s\n", info);
 }
 
 /**
- * Initializes the tests.
- * This will test ALL methods in BTranslatorRoster.
- *
- * @return B_OK if the whole test went ok, B_ERROR if not
+ * Construct roster using different kinds of constructors
  */
-status_t TranslatorRosterTest::Perform() {
-	if(ConstructorTest() != B_OK) {
-		Debug("ERROR: ConstructorTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(DefaultTest() != B_OK) {
-		Debug("ERROR: DefaultTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(InstantiateTest() != B_OK) {
-		Debug("ERROR: InstantiateTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(VersionTest() != B_OK) {
-		Debug("ERROR: VersionTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(AddTranslatorsTest() != B_OK) {
-		Debug("ERROR: AddTranslatorsTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(ArchiveTest() != B_OK) {
-		Debug("ERROR: ArchiveTest did not complete successfully\n");
-		return B_ERROR;
-	}	
-	if(GetAllTranslatorsTest() != B_OK) {
-		Debug("ERROR: GetAllTranslatorsTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(GetConfigurationMessageTest() != B_OK) {
-		Debug("ERROR: GetConfigurationMessageTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(GetInputFormatsTest() != B_OK) {
-		Debug("ERROR: GetInputFormatsTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(GetOutputFormatsTest() != B_OK) {
-		Debug("ERROR: GetOutputFormatsTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(GetTranslatorInfoTest() != B_OK) {
-		Debug("ERROR: GetTranslatorInfoTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(GetTranslatorsTest() != B_OK) {
-		Debug("ERROR: GetTranslatorsTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(IdentifyTest() != B_OK) {
-		Debug("ERROR: IdentifyTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	if(MakeConfigurationViewTest() != B_OK) {
-		Debug("ERROR: MakeConfigurationViewTest did not complete successfully\n");
-		return B_ERROR;
-	}		
-	if(TranslateTest() != B_OK) {
-		Debug("ERROR: TranslateTest did not complete successfully\n");
-		return B_ERROR;
-	}
-	
-	return B_OK;
-}
-/**
- * Tests:
- * BTranslatorRoster()
- * BTranslatorRoster(BMessage *model)
- * 
- * @return B_OK if everything went ok, B_ERROR if not
- */
-status_t TranslatorRosterTest::ConstructorTest() {
+void TranslatorRosterTest::ConstructorTest() {
 	//shared instance of TranslatorRoster
-	BTranslatorRoster* translator_roster;	
+	BTranslatorRoster* translator_roster;
 
 	//Create TranslatorRoster using noargs constructor
 	translator_roster = new BTranslatorRoster();
-	if(translator_roster == NULL) {
-		Debug("Could not create noargs BTranalatorRoster");
-		return B_ERROR;
-	}
+
+	CPPUNIT_ASSERT(translator_roster != NULL);
+
 	delete translator_roster;
 	
 	//Create TranslatorRoster using BMessage constructor
+	NextSubTest();
 	BMessage translator_message;
 	translator_message.AddString("be:translator_path", "/boot/home/config/add-ons/Translators");
 	translator_roster = new BTranslatorRoster(&translator_message);
-	if(translator_roster == NULL) {
-		Debug("Could not create BMessage BTranalatorRoster");
-		return B_ERROR;
-	}
+
+	CPPUNIT_ASSERT(translator_roster != NULL);
+
 	delete translator_roster;
-	
-	return B_OK;
 }
 
 /**
  * Tests:
  * BTranslatorRoster *Default()
- * 
- * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::DefaultTest() {
+void TranslatorRosterTest::DefaultTest() {
 	//already done in Initialize - added for completeness sake
 	BTranslatorRoster* translator_roster = BTranslatorRoster::Default();
-	if(translator_roster == NULL) {
-		Debug("Unable to aquire default TranslatorRoster");
-		return B_ERROR;
-	}
-	return B_OK;
+
+	CPPUNIT_ASSERT(translator_roster != NULL);
 }
 
 /**
@@ -198,7 +138,7 @@ status_t TranslatorRosterTest::DefaultTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::InstantiateTest() {
+void TranslatorRosterTest::InstantiateTest() {
 	//shared instance of TranslatorRoster
 	BTranslatorRoster* translator_roster = NULL;
 
@@ -207,25 +147,21 @@ status_t TranslatorRosterTest::InstantiateTest() {
 	
 	//create BTranslator using empty message (must return NULL)
 	translator_roster = (BTranslatorRoster*) BTranslatorRoster::Instantiate(&translator_message);
-	if(translator_roster != NULL) {
-		Debug("Expected NULL when instantiating roster from invalid BMessage\n");
+	CPPUNIT_ASSERT(translator_roster == NULL);
+
+	if(translator_roster != NULL){
 		delete translator_roster;
-		return B_ERROR;
 	}
 	
 	//create roster from message
-	/*translator_message.AddString("be:translator_path", "/boot/home/config/add-ons/Translators/");
+	/*
+	translator_message.AddString("be:translator_path", "/boot/home/config/add-ons/Translators/");
 	translator_roster = (BTranslatorRoster*) BTranslatorRoster::Instantiate(&translator_message);
-	if(translator_roster == NULL) {
-		Debug("Could not instantiate BTranslatorRoster from archived default\n");
-		printf("===== BMessage =====\n");
-		translator_message.PrintToStream();
-		printf("===== BMessage =====\n");
-		return B_ERROR;
-	}
+
+	CPPUNIT_ASSERT(translator_roster != NULL);
+
 	delete translator_roster;
 	*/
-	return B_OK;
 }
 
 /**
@@ -234,16 +170,13 @@ status_t TranslatorRosterTest::InstantiateTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::VersionTest() {
+void TranslatorRosterTest::VersionTest() {
 	int32 outCurVersion;
 	int32 outMinVersion;
 	long inAppVersion;
 	const char* info = roster->Version(&outCurVersion, &outMinVersion, inAppVersion);
-	if(info == NULL) {
-		Debug("Unable to obtain version information");
-		return B_ERROR;
-	}
-	return B_OK;
+
+	CPPUNIT_ASSERT(info != NULL);
 }
 
 /**
@@ -252,46 +185,38 @@ status_t TranslatorRosterTest::VersionTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::AddTranslatorsTest() {
+void TranslatorRosterTest::AddTranslatorsTest() {
 	//create basic translatorroster
 	BTranslatorRoster* translator_roster = new BTranslatorRoster();
 	
 	//load wrong path (generate parse error)
 	/*
-	if(translator_roster->AddTranslators("?") != B_BAD_VALUE) {
-		Debug("Expected B_BAD_VALUE when loading wrong path\n");
-		return B_ERROR;	
-	}
+	CPPUNIT_ASSERT(translator_roster->AddTranslators("?") == B_BAD_VALUE);
 	*/
 	
 	//load correct path
-	if(translator_roster->AddTranslators("/boot/home/config/add-ons/Translators/:/system/add-ons/Translators/") != B_OK) {
-		Debug("Expected B_OK when loading addons from correct path\n");
-		return B_ERROR;
-	}
+	CPPUNIT_ASSERT(translator_roster->AddTranslators("/boot/home/config/add-ons/Translators/:/system/add-ons/Translators/") == B_OK);
 
+	NextSubTest();
 	int32 num_translators;
 	translator_id* translators;
 	translator_roster->GetAllTranslators(&translators, &num_translators);
-	if(num_translators <= 0) {
-		Debug("Unable to load translators, or no translators installed");
-		return B_ERROR;
-	}
+	
+	CPPUNIT_ASSERT(num_translators > 0);
+	
 	delete [] translators;
 	
 	//delete and create new, this time don't specify path
+	NextSubTest();
 	delete translator_roster;
 	translator_roster = new BTranslatorRoster();
 	translator_roster->AddTranslators();	
 	translator_roster->GetAllTranslators(&translators, &num_translators);
-	if(num_translators <= 0) {
-		Debug("Unable to load translators, or no translators installed");
-		return B_ERROR;
-	}
+	
+	CPPUNIT_ASSERT(num_translators > 0);
+	
 	delete [] translators;
 	delete translator_roster;
-		
-	return B_OK;
 }
 
 /**
@@ -300,17 +225,15 @@ status_t TranslatorRosterTest::AddTranslatorsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::ArchiveTest() {
+void TranslatorRosterTest::ArchiveTest() {
 	//archive default, and count entries (must be more than 1!)
 	BMessage translator_message;
+	roster = BTranslatorRoster::Default();
 	roster->Archive(&translator_message);
-	uint32 type;
+	uint32 type;	
 	int32 count;
-	if(translator_message.GetInfo("be:translator_path", &type, &count)) {
-		Debug("Unable to retrieve archived information");
-		return B_ERROR;
-	}
-	return B_OK;	
+
+	CPPUNIT_ASSERT(translator_message.GetInfo("be:translator_path", &type, &count) == B_OK);
 }
 
 /**
@@ -319,17 +242,15 @@ status_t TranslatorRosterTest::ArchiveTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetAllTranslatorsTest() {
+void TranslatorRosterTest::GetAllTranslatorsTest() {
 	int32 num_translators;
 	translator_id* translators;
+	roster = BTranslatorRoster::Default();	
 	roster->GetAllTranslators(&translators, &num_translators);
-	if(num_translators <= 0) {
-		Debug("Unable to load translators, or no translators installed");
-		return B_ERROR;
-	}
+
+	CPPUNIT_ASSERT(num_translators > 0);
+
 	delete [] translators;
-		
-	return B_OK;
 }
 
 /**
@@ -338,8 +259,10 @@ status_t TranslatorRosterTest::GetAllTranslatorsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetConfigurationMessageTest() {
+void TranslatorRosterTest::GetConfigurationMessageTest() {
 	BMessage translator_message;
+	roster = BTranslatorRoster::Default();
+
 
 	//get id for a translator (just use the first one)
 	unsigned long translatorid;
@@ -350,23 +273,15 @@ status_t TranslatorRosterTest::GetConfigurationMessageTest() {
 	delete [] translators;
 	
 	//get conf for invalid translator
-	if(roster->GetConfigurationMessage(-1, &translator_message) != B_NO_TRANSLATOR) {
-		Debug("Expected B_ERROR when supplying wrong translator for GetConfigurationMessage\n");
-		return B_ERROR;
-	}
+	CPPUNIT_ASSERT(roster->GetConfigurationMessage(-1, &translator_message) == B_NO_TRANSLATOR);
 	
 	//get conf for invalid ioExtension (BMessage)
-	if(roster->GetConfigurationMessage(translatorid, NULL) != B_BAD_VALUE) {
-		Debug("Expected B_BAD_VALUE when supplying wrong ioExtension for GetConfigurationMessage\n");
-		return B_ERROR;
-	}
+	NextSubTest();
+	CPPUNIT_ASSERT(roster->GetConfigurationMessage(translatorid, NULL) == B_BAD_VALUE);
 	
 	//get config for actual translator
-	if(roster->GetConfigurationMessage(translatorid, &translator_message) != B_OK) {
-		Debug("Could not get configuration for translator\n");
-		return B_ERROR;
-	}
-	return B_OK;
+	NextSubTest();
+	CPPUNIT_ASSERT(roster->GetConfigurationMessage(translatorid, &translator_message) == B_OK);
 }
 
 /**
@@ -375,26 +290,21 @@ status_t TranslatorRosterTest::GetConfigurationMessageTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetInputFormatsTest() {
+void TranslatorRosterTest::GetInputFormatsTest() {
 	translator_id* translators;
 	int32 num_translators;
+	roster = BTranslatorRoster::Default();	
 	roster->GetAllTranslators(&translators, &num_translators);
-	if(num_translators <= 0) {
-		Debug("Unable to load translators, or no translators installed");
-		return B_ERROR;
-	}
+	CPPUNIT_ASSERT(num_translators > 0);
 	
+	NextSubTest();
 	for (int32 i=0;i<num_translators;i++) {
 		const translation_format *fmts;
 		int32 num_fmts;
 		roster->GetInputFormats(translators[i], &fmts, &num_fmts);
-		if(num_fmts < 0) {
-			Debug("Found translator accepting less than 0 input formats");
-			return B_ERROR;
-		}
+		CPPUNIT_ASSERT(num_fmts >= 0);
 	}
 	delete [] translators;
-	return B_OK;
 }
 
 /**
@@ -403,27 +313,21 @@ status_t TranslatorRosterTest::GetInputFormatsTest() {
  * 
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetOutputFormatsTest() {
+void TranslatorRosterTest::GetOutputFormatsTest() {
 	translator_id* translators;
 	int32 num_translators;
+	roster = BTranslatorRoster::Default();	
 	roster->GetAllTranslators(&translators, &num_translators);
-	if(num_translators <= 0) {
-		Debug("Unable to load translators, or no translators installed");
-		return B_ERROR;
-	}
+	CPPUNIT_ASSERT(num_translators > 0);
 	
+	NextSubTest();
 	for (int32 i=0;i<num_translators;i++) {
 		const translation_format *fmts;
 		int32 num_fmts;
 		roster->GetOutputFormats(translators[i], &fmts, &num_fmts);
-		if(num_fmts < 0) {
-			Debug("Found translator accepting less than 0 output formats");
-			return B_ERROR;
-		}
-		
+		CPPUNIT_ASSERT(num_fmts >= 0);		
 	}
 	delete [] translators;
-	return B_OK;
 }
 
 /**
@@ -432,27 +336,22 @@ status_t TranslatorRosterTest::GetOutputFormatsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetTranslatorInfoTest() {
+void TranslatorRosterTest::GetTranslatorInfoTest() {
 	translator_id* translators;
 	int32 num_translators;
+	roster = BTranslatorRoster::Default();
 	roster->GetAllTranslators(&translators, &num_translators);	
 	for (int32 i=0;i<num_translators;i++) {
 		const char* outName;
 		const char* outInfo;
 		int32 outVersion;
-		if(roster->GetTranslatorInfo(-1, &outName, &outInfo, &outVersion) != B_NO_TRANSLATOR) {
-			Debug("Expected B_NO_TRANSLATOR when supplying wrong id");
-			return B_ERROR;
-		}
 		
-		if(roster->GetTranslatorInfo(translators[i], &outName, &outInfo, &outVersion) != B_OK) {
-			Debug("Unable to get Translator info");
-			return B_ERROR;
-		}
-		//printf("Translator info:\nName: %s\nInfo: %s\nVersion: %ld\n", outName, outInfo, outVersion);		
+		CPPUNIT_ASSERT(roster->GetTranslatorInfo(-1, &outName, &outInfo, &outVersion) == B_NO_TRANSLATOR);
+		
+		NextSubTest();
+		CPPUNIT_ASSERT(roster->GetTranslatorInfo(translators[i], &outName, &outInfo, &outVersion) == B_OK);
 	}	
 	delete [] translators;	
-	return B_OK;
 }
 
 /**
@@ -461,51 +360,40 @@ status_t TranslatorRosterTest::GetTranslatorInfoTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::GetTranslatorsTest() {
+void TranslatorRosterTest::GetTranslatorsTest() {
 	//open image to get a translator for
 	BFile image("./data/images/image.png", B_READ_ONLY);
+	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
+
+	NextSubTest();
 	BFile garbled("./data/garbled_data", B_READ_ONLY);
+	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
 	translator_info* info;
 	int32 outCount;
-	
+	roster = BTranslatorRoster::Default();
+
 	//get translator, specifying wrong args
-	if(roster->GetTranslators(&garbled, NULL, NULL, &outCount) != B_BAD_VALUE) {
-		Debug("Expected B_BAD_VALUE when getting translator using illegal arguments");
-		return B_ERROR;
-	}
-	
+	NextSubTest();
+	CPPUNIT_ASSERT(roster->GetTranslators(&garbled, NULL, NULL, &outCount) == B_BAD_VALUE);
+
 	//get translator, specifying wrong args
-	if(roster->GetTranslators(&garbled, NULL, &info, NULL) != B_BAD_VALUE) {
-		Debug("Expected B_BAD_VALUE when getting translator using illegal arguments");
-		return B_ERROR;
-	}
-	
+	NextSubTest();
+	CPPUNIT_ASSERT(roster->GetTranslators(&garbled, NULL, &info, NULL) == B_BAD_VALUE);
+
 	//get translator for garbled data
-	if(roster->GetTranslators(&garbled, NULL, &info, &outCount) != B_NO_TRANSLATOR) {
-		Debug("Expected B_NO_TRANSLATOR when getting translator for garbled data");
-		return B_ERROR;
-	}
+	NextSubTest();	
+	CPPUNIT_ASSERT(roster->GetTranslators(&garbled, NULL, &info, &outCount) == B_NO_TRANSLATOR);
 		
 	//get translator for image
-	if(roster->GetTranslators(&image, NULL, &info, &outCount) != B_OK) {
-		Debug("Expected B_OK when getting translator for image");
-		return B_ERROR;
-	}
+	NextSubTest();	
+	CPPUNIT_ASSERT(roster->GetTranslators(&image, NULL, &info, &outCount) == B_OK);
 	
-	if(outCount <= 0) {
-		Debug("Unable to find translator for image data");
-		return B_ERROR;
-	} 
-	//else {
-	//iterate through all translators
-	//for(int32 i=0; i<outCount;i++) {
-	//	printf("Found translator:\nType: %ld\nid: %ld\nGroup: %ld\nQuality: %f\nCapability: %f\nName: %s\nMIME: %s\n", info->type, info->translator, info->group, info->quality, info->capability, info->name, info->MIME);
-	//}		
-	//}
+	NextSubTest();
+
+	CPPUNIT_ASSERT(outCount > 0);
+
 	delete [] info;
-	
-	return B_OK;
 }
 
 /**
@@ -514,31 +402,33 @@ status_t TranslatorRosterTest::GetTranslatorsTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::IdentifyTest() {
+void TranslatorRosterTest::IdentifyTest() {
 	//open image to get a translator for
 	BFile image("./data/images/image.png", B_READ_ONLY);
+	CPPUNIT_ASSERT(image.InitCheck() == B_OK);
+
+	//NextSubTest();
 	BFile garbled("./data/garbled_data", B_READ_ONLY);
+	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
-	translator_info* info;
+	translator_info* info = new translator_info;
+	roster = BTranslatorRoster::Default();
 	
 	//get translator, specifying wrong args
-	if(roster->Identify(&garbled, NULL, NULL) != B_BAD_VALUE) {
-		Debug("Expected B_BAD_VALUE when getting translator using illegal arguments");
-		return B_ERROR;
-	}
+	NextSubTest();	
+	CPPUNIT_ASSERT(roster->Identify(&garbled, NULL, NULL) == B_BAD_VALUE);
 	
 	//get translator for garbled data
-	if(roster->Identify(&garbled, NULL, info) != B_NO_TRANSLATOR) {
-		Debug("Expected B_NO_TRANSLATOR when getting translator for garbled data");
-		return B_ERROR;
-	}
-		
+	NextSubTest();	
+	CPPUNIT_ASSERT(roster->Identify(&garbled, NULL, info) == B_NO_TRANSLATOR);
+	
 	//get translator for image
-	if(roster->Identify(&image, NULL, info) != B_OK) {
-		Debug("Expected B_OK when getting translator for image");
-		return B_ERROR;
-	}
-	return B_OK;
+	NextSubTest();
+	delete info;
+	info = new translator_info;
+	CPPUNIT_ASSERT(roster->Identify(&image, NULL, info) == B_OK);
+	
+	delete info;
 }
 
 /**
@@ -547,25 +437,25 @@ status_t TranslatorRosterTest::IdentifyTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::MakeConfigurationViewTest() {
+void TranslatorRosterTest::MakeConfigurationViewTest() {
 	//create invalid rect - if it is valid after the
 	//MakeConfigurationView call the test has succeded
+	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	BRect extent(-1, -1, -1, -1);
 	
 	//create config view
 	BView* view;
 	translator_id* translators;
 	int32 num_translators;
+	roster = BTranslatorRoster::Default();
 	roster->GetAllTranslators(&translators, &num_translators);	
 	roster->MakeConfigurationView(translators[0], NULL, &view, &extent);
 
 	//check validity
-	bool success = (extent.IsValid()) ? B_OK : B_ERROR;
+	CPPUNIT_ASSERT(extent.IsValid() == true);
 
 	//clean up after ourselves
 	delete [] translators;
-	
-	return success;
 }
 
 /**
@@ -575,7 +465,7 @@ status_t TranslatorRosterTest::MakeConfigurationViewTest() {
  *
  * @return B_OK if everything went ok, B_ERROR if not
  */
-status_t TranslatorRosterTest::TranslateTest() {
+void TranslatorRosterTest::TranslateTest() {
 	//input
 	BFile input("./data/images/image.jpg", B_READ_ONLY);
 
@@ -585,38 +475,24 @@ status_t TranslatorRosterTest::TranslateTest() {
 	//output file
 	BFile output("./data/images/image.out.png", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	
+	roster = BTranslatorRoster::Default();
+	
 	//translate to generic
-	if(roster->Translate(&input, NULL, NULL, &temp, B_TRANSLATOR_BITMAP) != B_OK) {
-		Debug("Could not translate image to generic format");
-		return B_ERROR;
-	}
+	CPPUNIT_ASSERT(roster->Translate(&input, NULL, NULL, &temp, B_TRANSLATOR_BITMAP) == B_OK);
 	
 	//translate to specific
-	if(roster->Translate(&temp, NULL, NULL, &output, B_PNG_FORMAT) != B_OK) {
-		Debug("Could not translate generic image to specific format");
-		return B_ERROR;
-	}
-	return B_OK;
-}
-
-/**
- * Prints debug information to stdout, if verbose is set to true
- */
-void TranslatorRosterTest::Debug(char* string) {
-	if(verbose) {
-		printf(string);
-	}
+	NextSubTest();	
+	CPPUNIT_ASSERT(roster->Translate(&temp, NULL, NULL, &output, B_PNG_FORMAT) == B_OK);
 }
 
 int main() {
 	//needed by MakeConfigurationView
-	BApplication app("application/x-vnd.OpenBeOS-translationkit_translatorrostertest");
 	TranslatorRosterTest test;
-	test.setVerbose(true);
-	test.Initialize();
-	if(test.Perform() != B_OK) {
-		printf("Tests did not complete successfully\n");
-	} else {
-		printf("All tests completed without errors\n");
-	}
+	test.InitializeTest();
+	test.ConstructorTest();
+	test.DefaultTest();
+	test.InstantiateTest();
+	test.VersionTest();
+	test.AddTranslatorsTest();
+	test.ArchiveTest();
 }

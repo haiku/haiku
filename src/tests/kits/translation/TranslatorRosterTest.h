@@ -33,40 +33,37 @@
 #ifndef __TRANSLATOR_ROSTER_TEST
 #define __TRANSLATOR_ROSTER_TEST
 
+/** CppUnit support */
+#include <TestCase.h>
 #include <TranslatorRoster.h>
 
-class TranslatorRosterTest {
+class TranslatorRosterTest : public BTestCase {
 public:
-    TranslatorRosterTest();
+	TranslatorRosterTest(std::string name = "");
     ~TranslatorRosterTest();
-    
-    status_t Initialize();
-    status_t Perform();
-    inline void setVerbose(bool verbose) { this->verbose = verbose; };
-    
-    //actual tests
-	status_t ConstructorTest();
-	status_t DefaultTest();
-	status_t InstantiateTest();
-	status_t VersionTest();
-	status_t AddTranslatorsTest();
-	status_t ArchiveTest();
-	status_t GetAllTranslatorsTest();
-	status_t GetConfigurationMessageTest();
-	status_t GetInputFormatsTest();
-	status_t GetOutputFormatsTest();
-	status_t GetTranslatorInfoTest();
-	status_t GetTranslatorsTest();
-	status_t IdentifyTest();
-	status_t MakeConfigurationViewTest();
-	status_t TranslateTest();
-private:
-	void Debug(char* string);
 
+	/* cppunit suite function prototype */    
+    static CppUnit::Test* Suite();
+
+    /* actual tests */
+    void InitializeTest();
+	void ConstructorTest();
+	void DefaultTest();
+	void InstantiateTest();
+	void VersionTest();
+	void AddTranslatorsTest();
+	void ArchiveTest();
+	void GetAllTranslatorsTest();
+	void GetConfigurationMessageTest();
+	void GetInputFormatsTest();
+	void GetOutputFormatsTest();
+	void GetTranslatorInfoTest();
+	void GetTranslatorsTest();
+	void IdentifyTest();
+	void MakeConfigurationViewTest();
+	void TranslateTest();
+private:
 	/** default roster used when performing tests */
     BTranslatorRoster* roster;
-    
-    /** Whether or not to output test info */
-    bool verbose;
 };
 #endif
