@@ -11,6 +11,8 @@ public:
 	
 	media_output & MediaOutput();
 	
+	void ChangeFormat(const media_multi_audio_format &format);
+	
 private:
 	MixerCore *fCore;
 	media_output fOutput;

@@ -22,3 +22,13 @@ MixerOutput::MediaOutput()
 {
 	return fOutput;
 }
+
+void
+MixerOutput::ChangeFormat(const media_multi_audio_format &format)
+{
+	fOutput.format.u.raw_audio = format;
+	fix_multiaudio_format(&fOutput.format.u.raw_audio);
+	
+	PRINT_OUTPUT("MixerOutput::ChangeFormat", fOutput);
+	PRINT_CHANNEL_MASK(fOutput.format);
+}
