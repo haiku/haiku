@@ -174,9 +174,10 @@ public:
 		// send a B_QUIT_REQUESTED message to each team
 		for (int32 i = 0; i < count; i++) {
 			team_id team = (team_id)teamList.ItemAt(i);
-			BMessenger messenger(NULL, team);
+			status_t error = B_OK;
+			BMessenger messenger(NULL, team, &error);
 			if (messenger.IsValid()) {
-				status_t error = messenger.SendMessage(B_QUIT_REQUESTED);
+				error = messenger.SendMessage(B_QUIT_REQUESTED);
 				if (error != B_OK) {
 					printf("quit: failed to deliver the B_QUIT_REQUESTED "
 						   "message to team %ld\n", team);
@@ -185,6 +186,7 @@ public:
 			} else {
 				printf("quit: failed to create a messenger for team %ld\n",
 					   team);
+				printf("      %s\n", strerror(error));
 			}
 		}
 	}
