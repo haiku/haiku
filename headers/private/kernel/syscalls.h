@@ -186,9 +186,9 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
 
 // time functions
 extern status_t		_kern_set_real_time_clock(uint32 time);
-extern status_t		_kern_set_tzspecs(int32 timezone_offset, bool dst_observed);
-extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool is_gmt);
-extern status_t		_kern_get_tzfilename(char *filename, size_t length, bool *is_gmt);
+extern status_t		_kern_set_timezone(int32 timezoneOffset, bool daylightSavingTime);
+extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool isGMT);
+extern status_t		_kern_get_tzfilename(char *filename, size_t length, bool *_isGMT);
 
 extern bigtime_t	_kern_system_time();
 extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
