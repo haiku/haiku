@@ -13,6 +13,8 @@
 #include <View.h>
 #include <Rect.h>
 #include <File.h>
+#include <DataIO.h>
+#include <BMPTranslator.h>
 
 // Suite
 CppUnit::Test *
@@ -28,6 +30,9 @@ BMPTranslatorTest::Suite()
 	suite->addTest(
 		new TC("BMPTranslator BTranslatorBasicTest",
 			&BMPTranslatorTest::BTranslatorBasicTest));
+	suite->addTest(
+		new TC("BMPTranslator BTranslatorIdentifyErrorTest",
+			&BMPTranslatorTest::BTranslatorIdentifyErrorTest));
 	suite->addTest(
 		new TC("BMPTranslator BTranslatorIdentifyTest",
 			&BMPTranslatorTest::BTranslatorIdentifyTest));
@@ -209,25 +214,85 @@ BMPTranslatorTest::BTranslatorBasicTest()
 }
 
 void
+BMPTranslatorTest::BTranslatorIdentifyErrorTest()
+{
+	// . Make sure the add_on loads
+	NextSubTest();
+	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
+	image_id image = load_add_on(path);
+	CPPUNIT_ASSERT(image >= 0);
+	
+	// . Load in function to make the object
+	NextSubTest();
+	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
+	status_t err = get_image_symbol(image, "make_nth_translator",
+		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
+	CPPUNIT_ASSERT(!err);
+
+	// . Make sure the function returns a pointer to a BTranslator
+	NextSubTest();
+	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
+	CPPUNIT_ASSERT(ptran);
+	
+	// . Make sure the function only returns one BTranslator
+	NextSubTest();
+	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
+	
+	// empty
+	NextSubTest();
+	translator_info outinfo;
+	BMallocIO mallempty;
+	CPPUNIT_ASSERT(ptran->Identify(&mallempty, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	// weird, non-image data
+	NextSubTest();
+	const char *strmonkey = "monkey monkey monkey";
+	BMemoryIO memmonkey(strmonkey, strlen(strmonkey));
+	CPPUNIT_ASSERT(ptran->Identify(&memmonkey, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	// abreviated BMPFileHeader
+	NextSubTest();
+	BMPFileHeader fheader;
+	fheader.magic = 'MB';
+	fheader.fileSize = 128;
+	BMallocIO mallabrev;
+	CPPUNIT_ASSERT(mallabrev.Write(&fheader.magic, sizeof(uint16)) == sizeof(uint16));
+	CPPUNIT_ASSERT(mallabrev.Write(&fheader.fileSize, sizeof(uint32)) == sizeof(uint32));
+	CPPUNIT_ASSERT(ptran->Identify(&mallabrev, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	
+	// Write out the MS and OS/2 headers with various fields being corrupt, only one 
+	// corrupt field at a time, also do abrev test for MS header and OS/2 header	
+	
+	// . Release should return NULL because Release has been called
+	// as many times as it has been acquired
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->Release() == NULL);
+	
+	// . Unload Add-on
+	NextSubTest();
+	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+}
+
+void
 test_outinfo(translator_info &info, bool isbmp)
 {
 	if (isbmp) {
-		CPPUNIT_ASSERT(outinfo.type == B_BMP_FORMAT);
-		CPPUNIT_ASSERT(strcmp(outinfo.MIME, BMP_MIME_STRING) == 0);
+		CPPUNIT_ASSERT(info.type == B_BMP_FORMAT);
+		CPPUNIT_ASSERT(strcmp(info.MIME, BMP_MIME_STRING) == 0);
 	} else {
-		CPPUNIT_ASSERT(outinfo.type == B_TRANSLATOR_BITMAP);
-		CPPUNIT_ASSERT(strcmp(outinfo.MIME, BITS_MIME_STRING) == 0);
+		CPPUNIT_ASSERT(info.type == B_TRANSLATOR_BITMAP);
+		CPPUNIT_ASSERT(strcmp(info.MIME, BITS_MIME_STRING) == 0);
 	}
-	CPPUNIT_ASSERT(outinfo.name);
-	CPPUNIT_ASSERT(outinfo.group == B_TRANSLATOR_BITMAP);
-	CPPUNIT_ASSERT(outinfo.quality > 0 && outinfo.quality <= 1);
-	CPPUNIT_ASSERT(outinfo.capability > 0 && outinfo.capability <= 1);
+	CPPUNIT_ASSERT(info.name);
+	CPPUNIT_ASSERT(info.group == B_TRANSLATOR_BITMAP);
+	CPPUNIT_ASSERT(info.quality > 0 && info.quality <= 1);
+	CPPUNIT_ASSERT(info.capability > 0 && info.capability <= 1);
 }
 
 void
 BMPTranslatorTest::BTranslatorIdentifyTest()
 {
-// . Make sure the add_on loads
+	// . Make sure the add_on loads
 	NextSubTest();
 	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
 	image_id image = load_add_on(path);
@@ -284,7 +349,7 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 		strcat(imagepath, testimages[i]);
 		int32 pathlen = strlen(imagepath);
 		bool isbmp;
-		if (imagefile[pathlen - 1] == 'p')
+		if (imagepath[pathlen - 1] == 'p')
 			isbmp = true;
 		else
 			isbmp = false;
@@ -295,38 +360,45 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 		////////// No hints or io extension
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, 0) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		///////////// empty io extension
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, 0) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &emptymsg, &outinfo, B_BMP_FORMAT) == B_OK);
 		test_outinfo(outinfo, isbmp);
 		
 		///////////// with "correct" hint
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		if (isbmp) {
 			hintformat.type = B_BMP_FORMAT;
 			strcpy(hintformat.MIME, BMP_MIME_STRING);
@@ -345,6 +417,7 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		if (isbmp) {
 			hintformat.type = B_BMP_FORMAT;
 			strcpy(hintformat.MIME, BMP_MIME_STRING);
@@ -363,6 +436,7 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 		
 		NextSubTest();
 		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
 		if (isbmp) {
 			hintformat.type = B_BMP_FORMAT;
 			strcpy(hintformat.MIME, BMP_MIME_STRING);
@@ -378,6 +452,87 @@ BMPTranslatorTest::BTranslatorIdentifyTest()
 		
 		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
 		test_outinfo(outinfo, isbmp);
+		
+		///////////// with misleading hint (the hint is probably ignored anyway)
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		hintformat.type = B_WAV_FORMAT;
+		strcpy(hintformat.MIME, "audio/wav");
+		strcpy(hintformat.name, "WAV Audio");
+		hintformat.group = B_TRANSLATOR_SOUND;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		hintformat.type = B_WAV_FORMAT;
+		strcpy(hintformat.MIME, "audio/wav");
+		strcpy(hintformat.name, "WAV Audio");
+		hintformat.group = B_TRANSLATOR_SOUND;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		hintformat.type = B_WAV_FORMAT;
+		strcpy(hintformat.MIME, "audio/wav");
+		strcpy(hintformat.name, "WAV Audio");
+		hintformat.group = B_TRANSLATOR_SOUND;
+		hintformat.quality = 0.5;
+		hintformat.capability = 0.5;
+		
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, &hintformat, NULL, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		// ioExtension Tests
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		BMessage msgheaderonly;
+		msgheaderonly.AddBool(B_TRANSLATOR_EXT_HEADER_ONLY, true);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgheaderonly, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		BMessage msgdataonly;
+		msgdataonly.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, true);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, 0) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, B_BMP_FORMAT) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgdataonly, &outinfo, B_TRANSLATOR_BITMAP) == B_OK);
+		test_outinfo(outinfo, isbmp);
+		
+		NextSubTest();
+		memset(&outinfo, 0, sizeof(outinfo));
+		imagefile.Seek(0, SEEK_SET);
+		BMessage msgbothonly;
+		msgbothonly.AddBool(B_TRANSLATOR_EXT_HEADER_ONLY, true);
+		msgbothonly.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, true);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, 0) == B_BAD_VALUE);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, B_BMP_FORMAT) == B_BAD_VALUE);
+		imagefile.Seek(0, SEEK_SET);
+		CPPUNIT_ASSERT(ptran->Identify(&imagefile, NULL, &msgbothonly, &outinfo, B_TRANSLATOR_BITMAP) == B_BAD_VALUE);
 	}	
 	
 	// . Release should return NULL because Release has been called
