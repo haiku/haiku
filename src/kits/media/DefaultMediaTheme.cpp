@@ -19,12 +19,23 @@
 #include <CheckBox.h>
 #include <TabView.h>
 #include <MenuField.h>
+#include <MessageFilter.h>
 
 
 using namespace BPrivate;
 
 
 namespace BPrivate {
+
+class GroupView : public BView {
+	public:
+		GroupView(BRect frame, const char *name);
+		virtual ~GroupView();
+
+		virtual void AttachedToWindow();
+
+	private:
+};
 
 class SeparatorView : public BView {
 	public:
@@ -49,7 +60,40 @@ class TitleView : public BView {
 		const char *fTitle;
 };
 
+class MessageFilter : public BMessageFilter {
+	public:
+		static MessageFilter *FilterFor(BView *view, BParameter &parameter);
+
+	protected:
+		MessageFilter();
+};
+
+class ContinuousMessageFilter : public MessageFilter {
+	public:
+		ContinuousMessageFilter(BControl *control, BContinuousParameter &parameter);
+		virtual ~ContinuousMessageFilter();
+
+		virtual filter_result Filter(BMessage *message, BHandler **target);
+
+	private:
+		BContinuousParameter	&fParameter;
+};
+
+class DiscreteMessageFilter : public MessageFilter {
+	public:
+		DiscreteMessageFilter(BControl *control, BDiscreteParameter &parameter);
+		virtual ~DiscreteMessageFilter();
+
+		virtual filter_result Filter(BMessage *message, BHandler **target);
+
+	private:
+		BDiscreteParameter	&fParameter;
+};
+
 }	// namespace BPrivate
+
+
+const uint32 kMsgParameterChanged = '_mPC';
 
 
 static bool 
@@ -68,6 +112,36 @@ parameter_should_be_hidden(BParameter &parameter)
 	}
 
 	return false;
+}
+
+
+//	#pragma mark -
+
+
+GroupView::GroupView(BRect frame, const char *name)
+	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	// ToDo: show scroll bars if necessary!
+}
+
+
+GroupView::~GroupView()
+{
+}
+
+
+void 
+GroupView::AttachedToWindow()
+{
+	for (int32 i = CountChildren(); i-- > 0;) {
+		BControl *control = dynamic_cast<BControl *>(ChildAt(i));
+		if (control == NULL)
+			continue;
+
+		control->SetTarget(control);
+	}
 }
 
 
@@ -137,9 +211,6 @@ TitleView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(80, 20, 20);
 	DrawString(fTitle, BPoint(rect.left, rect.bottom - 8));
-
-	//SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-	//StrokeLine(BPoint(rect.left, rect.bottom), BPoint(rect.right, rect.bottom));
 }
 
 
@@ -155,6 +226,167 @@ TitleView::GetPreferredSize(float *_width, float *_height)
 
 		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading + 8;
 	}
+}
+
+
+//	#pragma mark -
+
+
+MessageFilter::MessageFilter()
+	: BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE)
+{
+}
+
+
+MessageFilter *
+MessageFilter::FilterFor(BView *view, BParameter &parameter)
+{
+	BControl *control = dynamic_cast<BControl *>(view);
+	if (control == NULL)
+		return NULL;
+
+	switch (parameter.Type()) {
+		case BParameter::B_CONTINUOUS_PARAMETER:
+			return new ContinuousMessageFilter(control, static_cast<BContinuousParameter &>(parameter));
+
+		case BParameter::B_DISCRETE_PARAMETER:
+			return new DiscreteMessageFilter(control, static_cast<BDiscreteParameter &>(parameter));
+	}
+
+	return NULL;
+}
+
+
+//	#pragma mark -
+
+
+ContinuousMessageFilter::ContinuousMessageFilter(BControl *control, BContinuousParameter &parameter)
+	: MessageFilter(),
+	fParameter(parameter)
+{
+	// initialize view for us
+	control->SetMessage(new BMessage(kMsgParameterChanged));
+
+	// set initial value
+	// ToDo: response support!
+
+	float value[fParameter.CountChannels()];
+	size_t size = sizeof(value);
+	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
+		ERROR("Could not get parameter value for %p\n", &parameter);
+		return;
+	}
+
+	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
+		slider->SetValue((int32)value[0]);
+		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
+	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
+		for (int32 i = 0; i < fParameter.CountChannels(); i++)
+			slider->SetValueFor(i, (int32)value[i]);
+
+		slider->SetModificationMessage(new BMessage(kMsgParameterChanged));
+	} else
+		printf("unknown discrete parameter view\n");
+}
+
+
+ContinuousMessageFilter::~ContinuousMessageFilter()
+{
+}
+
+
+filter_result 
+ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
+{
+	BControl *control;
+
+	if (message->what != kMsgParameterChanged
+		|| (control = dynamic_cast<BControl *>(*target)) == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	// update view
+	// ToDo: support for response!
+
+	float value[fParameter.CountChannels()];
+
+	if (BSlider *slider = dynamic_cast<BSlider *>(control)) {
+		value[0] = (float)slider->Value();
+	} else if (BChannelSlider *slider = dynamic_cast<BChannelSlider *>(control)) {
+		for (int32 i = 0; i < fParameter.CountChannels(); i++)
+			value[i] = (float)slider->ValueFor(i);
+	}
+
+	printf("update view %s, %ld channels\n", control->Name(), fParameter.CountChannels());
+
+	if (fParameter.SetValue((void *)value, sizeof(value), system_time()) < B_OK) {
+		ERROR("Could not set parameter value for %p\n", &fParameter);
+		return B_DISPATCH_MESSAGE;
+	}
+
+	return B_SKIP_MESSAGE;
+}
+
+
+//	#pragma mark -
+
+
+DiscreteMessageFilter::DiscreteMessageFilter(BControl *control, BDiscreteParameter &parameter)
+	: MessageFilter(),
+	fParameter(parameter)
+{
+	// initialize view for us
+	control->SetMessage(new BMessage(kMsgParameterChanged));
+
+	// set initial value
+
+	size_t size = sizeof(int32);
+	int32 value;
+	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
+		ERROR("Could not get parameter value for %p\n", &parameter);
+		return;
+	}
+
+	if (BCheckBox *checkBox = dynamic_cast<BCheckBox *>(control)) {
+		checkBox->SetValue(value);
+	} else if (BOptionPopUp *popUp = dynamic_cast<BOptionPopUp *>(control)) {
+		popUp->SelectOptionFor(value);
+	} else
+		printf("unknown discrete parameter view\n");
+}
+
+
+DiscreteMessageFilter::~DiscreteMessageFilter()
+{
+}
+
+
+filter_result 
+DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
+{
+	BControl *control;
+
+	if (message->what != kMsgParameterChanged
+		|| (control = dynamic_cast<BControl *>(*target)) == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	// update view
+
+	int32 value = 0;
+
+	if (BCheckBox *checkBox = dynamic_cast<BCheckBox *>(control)) {
+		value = checkBox->Value();
+	} else if (BOptionPopUp *popUp = dynamic_cast<BOptionPopUp *>(control)) {
+		popUp->SelectedOption(NULL, &value);
+	}
+
+	printf("update view %s, value = %ld\n", control->Name(), value);
+
+	if (fParameter.SetValue((void *)&value, sizeof(value), system_time()) < B_OK) {
+		ERROR("Could not set parameter value for %p\n", &fParameter);
+		return B_DISPATCH_MESSAGE;
+	}
+
+	return B_SKIP_MESSAGE;
 }
 
 
@@ -251,8 +483,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		return NULL;
 
 	BRect rect(hintRect);
-	BView *view = new BView(rect, group.Name(), B_FOLLOW_NONE, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BView *view = new GroupView(rect, group.Name());
 
 	// Create the parameter views - but don't add them yet
 
@@ -415,7 +646,9 @@ DefaultMediaTheme::MakeSelfHostingViewFor(BParameter &parameter, const BRect &hi
 		return NULL;
 	}
 
-	// ToDo: create message filters for this view!
+	MessageFilter *filter = MessageFilter::FilterFor(view, parameter);
+	if (filter != NULL)
+		view->AddFilter(filter);
 
 	return view;
 }
