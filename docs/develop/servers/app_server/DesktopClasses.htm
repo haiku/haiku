@@ -1,0 +1,259 @@
+<HTML>
+<HEAD>
+<TITLE>DesktopClasses.htm</TITLE>
+<style type="text/css">
+  <!--
+	.Default {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 12pt}
+	.OBOS-Function-Def {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 16pt}
+	.OBOS-Title {background-color: rgb(255,255,255); color: rgb(0,128,0); font-family: 'Dutch801 Rm BT'; font-size: 24pt}
+	.Text-Background {background-color: rgb(255,255,255)}
+	.GR-Default {}
+	.Body {margin: 0px}
+	.Footer {margin: 0px}
+	.Header {margin: 0px}
+	.WP-Default {text-align: left; text-indent: 0px; margin-left: 0px; margin-right: 0px}
+  -->
+</style>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV class="sheet" id="Sheet 1">
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">Screen class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">Workspace class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">RootLayer class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><BR>
+The Screen class handles all infrastructure needed for each monitor/video card pair. The Workspace class holds data and supplies the infrastructure for drawing the screen.</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><BR>
+Member Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=616 HEIGHT=264 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=227 HEIGHT=32>
+			<P class="Body" style="margin: 0px">Screen(DisplayDriver *gfxmodule, uint8 workspaces)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=32>
+			<P class="Body" style="margin: 0px">~Screen(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void AddWorkspace(int32 index=-1)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Delete Workspace(int32 index)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 CountWorkspaces(void)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetWorkspaceCount(int32 count)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">int32 CurrentWorkspace(void)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetWorkspace(int32 workspace)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Activate(bool active=true)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">DisplayDriver *GetDriver(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=32>
+			<P class="Body" style="margin: 0px">status_t SetSpace(int32 index, int32 res, bool stick=true)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void AddWindow(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void RemoveWindow(ServerWindow *win)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">ServerWindow *ActiveWindow(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=32>
+			<P class="Body" style="margin: 0px">void SetActiveWindow(ServerWindow *win)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=32>
+			<P class="Body" style="margin: 0px">Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=227 HEIGHT=17>
+			<P class="Body" style="margin: 0px">bool IsInitialized(void)</P>
+			</TD>
+		<TD WIDTH=235 HEIGHT=17>
+			<P class="Body" style="margin: 0px">Workspace *GetActiveWorkspace(void)</P>
+			</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">Screen(DisplayDriver *gfxmodule, uint8 workspaces)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) Set driver pointer to gfxmodule</P>
+<P class="Body" style="margin: 0px">2) If driver pointer is non-NULL and driver-&gt;Initialize() is true, set initialized flag to true</P>
+<P class="Body" style="margin: 0px">3) If initialized, create and populate workspace list</P>
+<P class="Body" style="margin: 0px">4) Clear all workspaces</P>
+<P class="Body" style="margin: 0px"><BR>
+~Screen(void)</P>
+<P class="Body" style="margin: 0px">void AddWorkspace(int32 index=-1)</P>
+<P class="Body" style="margin: 0px">void Delete Workspace(int32 index)</P>
+<P class="Body" style="margin: 0px">int32 CountWorkspaces(void)</P>
+<P class="Body" style="margin: 0px">void SetWorkspaceCount(int32 count)</P>
+<P class="Body" style="margin: 0px">int32 CurrentWorkspace(void)</P>
+<P class="Body" style="margin: 0px">void SetWorkspace(int32 workspace)</P>
+<P class="Body" style="margin: 0px">void Activate(bool active=true)</P>
+<P class="Body" style="margin: 0px">DisplayDriver *GetDriver(void)</P>
+<P class="Body" style="margin: 0px">status_t SetSpace(int32 index, int32 res, bool stick=true)</P>
+<P class="Body" style="margin: 0px">void AddWindow(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE)</P>
+<P class="Body" style="margin: 0px">void RemoveWindow(ServerWindow *win)</P>
+<P class="Body" style="margin: 0px">ServerWindow *ActiveWindow(void)</P>
+<P class="Body" style="margin: 0px">void SetActiveWindow(ServerWindow *win)</P>
+<P class="Body" style="margin: 0px">Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE)</P>
+<P class="Body" style="margin: 0px">bool IsInitialized(void)</P>
+<P class="Body" style="margin: 0px">Workspace *GetActiveWorkspace(void)</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px">Workspace class members</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=620 HEIGHT=69 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">Workspace(void)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">~Workspace(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetBGColor(const RGBColor &amp;c)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">RGBColor BGColor(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">RootLayer *GetRoot(void)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			&nbsp;
+		</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+Workspace(void)</P>
+<P class="Body" style="margin: 0px">~Workspace(void)</P>
+<P class="Body" style="margin: 0px">void SetBGColor(const RGBColor &amp;c)</P>
+<P class="Body" style="margin: 0px">RGBColor BGColor(void)</P>
+<P class="Body" style="margin: 0px">RootLayer *GetRoot(void)</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px">RootLayer class members</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=618 HEIGHT=91 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=231 HEIGHT=17>
+			<P class="Body" style="margin: 0px">RootLayer(BRect frame, const char *name)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">~RootLayer(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=231 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void RequestDraw(const BRect &amp;r)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void MoveBy(float x, float y)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=231 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void MoveBy(BPoint pt)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void SetDriver(DisplayDriver *d)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=231 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void RebuildRegions(bool recursive=false)</P>
+			</TD>
+		<TD WIDTH=232 HEIGHT=17>
+			&nbsp;
+		</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">RootLayer(BRect frame, const char *name)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) passes B_FOLLOW_NONE to Layer constructor</P>
+<P class="Body" style="margin: 0px">2) set level to 0</P>
+<P class="Body" style="margin: 0px">3) set the background color to the color for the workspace set in the system preferences</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">~RootLayer(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Does nothing.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void RequestDraw(const BRect &amp;r)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Requests that the layer be drawn on screen. The rectangle passed is in the layer's own coordinates.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) call the display driver's FillRect on the rectangle, filling with the layer's background color</P>
+<P class="Body" style="margin: 0px">2) recurse through each child and call its RequestDraw() function if it intersects the child's frame</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void MoveBy(BPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void MoveBy(float x, float y)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Made empty so that the root layer cannot be moved</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void SetDriver(DisplayDriver *d)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Assigns a particular display driver object to the root layer if non-NULL.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void RebuildRegions(bool recursive=false)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Rebuilds the visible and invalid layers based on the layer hierarchy. Used to update the regions after a call to remove or add a child layer is made or when a layer is hidden or shown.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) get the frame</P>
+<P class="Body" style="margin: 0px">2) set full and visible regions to frame</P>
+<P class="Body" style="margin: 0px">3) iterate through each child and exclude its full region from the visible region if the child is visible.</P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
+</DIV>
+</BODY>
+</HTML>

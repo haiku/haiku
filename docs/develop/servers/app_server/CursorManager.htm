@@ -29,57 +29,81 @@
 Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=634 HEIGHT=156 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=620 HEIGHT=178 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
-		<TD WIDTH=216 HEIGHT=17>
+		<TD WIDTH=215 HEIGHT=17>
 			<P class="Body" style="margin: 0px">CursorManager(void)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=250 HEIGHT=17>
 			<P class="Body" style="margin: 0px">~CursorManager(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=216 HEIGHT=17>
+		<TD WIDTH=215 HEIGHT=17>
 			<P class="Body" style="margin: 0px">int32 AddCursor(ServerCursor *c)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=250 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void DeleteCursor(int32 token)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=216 HEIGHT=17>
+		<TD WIDTH=215 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void RemoveAppCursors(ServerApp *a)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=250 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void ShowCursor(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=216 HEIGHT=17>
+		<TD WIDTH=215 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void HideCursor(void)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=250 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void ObscureCursor(void)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=216 HEIGHT=17>
+		<TD WIDTH=215 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void SetCursor(int32 token)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=250 HEIGHT=17>
 			<P class="Body" style="margin: 0px">ServerCursor *GetCursor(cursor_which which)</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=216 HEIGHT=32>
+		<TD WIDTH=215 HEIGHT=32>
 			<P class="Body" style="margin: 0px">void SetCursor(cursor_which which)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=32>
+		<TD WIDTH=250 HEIGHT=32>
 			<P class="Body" style="margin: 0px">void ChangeCursor(cursor_which which,</P>
 			<P class="Body" style="margin: 0px">int32 token)</P>
 			</TD>
 	</TR>
+	<TR>
+		<TD WIDTH=215 HEIGHT=17>
+			<P class="Body" style="margin: 0px">cursor_which GetCursorWhich(void)</P>
+			</TD>
+		<TD WIDTH=250 HEIGHT=17>
+			&nbsp;
+		</TD>
+	</TR>
 </TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+Enumerated Types:</P>
+<P class="Body" style="margin: 0px"><BR>
+cursor_which {</P>
+<P class="Body" style="margin: 0px">	CURSOR_ARROW</P>
+<P class="Body" style="margin: 0px">	CURSOR_TEXT</P>
+<P class="Body" style="margin: 0px">	CURSOR_MOVE</P>
+<P class="Body" style="margin: 0px">	CURSOR_DRAG</P>
+<P class="Body" style="margin: 0px">	CURSOR_RESIZE</P>
+<P class="Body" style="margin: 0px">	CURSOR_RESIZE_NW</P>
+<P class="Body" style="margin: 0px">	CURSOR_RESIZE_SE</P>
+<P class="Body" style="margin: 0px">	CURSOR_RESIZE_NS</P>
+<P class="Body" style="margin: 0px">	CURSOR_RESIZE_EW</P>
+<P class="Body" style="margin: 0px">	CURSOR_OTHER</P>
+<P class="Body" style="margin: 0px">}</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <HR>
@@ -146,11 +170,13 @@ These set the current cursor for the graphics driver to the passed cursor, eithe
 <P class="Body" style="margin: 0px"><BR>
 Token version:</P>
 <P class="Body" style="margin: 0px">2) Find the cursor in the cursor list and call the graphics driver if non-NULL</P>
+<P class="Body" style="margin: 0px">3) Iterate through list of system cursor tokens and see if there's a match. If so, set the internal cursor_which to the match.</P>
 <P class="Body" style="margin: 0px"><BR>
 cursor_which version:</P>
 <P class="Body" style="margin: 0px">2) determine which cursor to use via a switch statement and call the graphics driver with the internal pointer for the appropriate cursor</P>
+<P class="Body" style="margin: 0px">3) set the internal cursor_which to the one passed to the function</P>
 <P class="Body" style="margin: 0px"><BR>
-3) Release cursor lock</P>
+4) Release cursor lock</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">ServerCursor *GetCursor(cursor_which which)</span></P>
@@ -172,6 +198,16 @@ Calling ChangeCursor will allow a user to change a system cursor's appearance. N
 <P class="Body" style="margin: 0px">3) Look up the pointer for the system cursor in question and check to see if it is active. If active, then set the local active flag to true. Set the system cursor pointer to the one looked up.</P>
 <P class="Body" style="margin: 0px">4) If active flag is true, call SetCursor()</P>
 <P class="Body" style="margin: 0px">5) Release cursor lock</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">cursor_which GetCursorWhich(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the current cursor_which attribute which describes the currently active cursor. If the active cursor is not a system cursor, it will return CURSOR_OTHER.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Acquire cursor lock</P>
+<P class="Body" style="margin: 0px">2) Create a local cursor_which and assign it the value of the CursorManager's cursor_which</P>
+<P class="Body" style="margin: 0px">3) Release cursor lock</P>
+<P class="Body" style="margin: 0px">4) Return the local copy</P>
 <DIV class="layer" id="Layer 1">
 	</DIV>
 </DIV>
