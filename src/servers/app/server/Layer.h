@@ -12,11 +12,11 @@
 
 enum
 {
-	B_LAYER_NONE		= 0x00001000UL,
-	B_LAYER_MOVE		= 0x00002000UL,
-	B_LAYER_SIMPLE_MOVE	= 0x00004000UL,
-	B_LAYER_RESIZE		= 0x00008000UL,
-	B_LAYER_MASK_RESIZE	= 0x00010000UL,
+	B_LAYER_NONE		= 0x1U,
+	B_LAYER_MOVE		= 0x2U,
+	B_LAYER_SIMPLE_MOVE	= 0x3U,
+	B_LAYER_RESIZE		= 0x4U,
+	B_LAYER_MASK_RESIZE	= 0x5U,
 };
 
 enum
@@ -157,6 +157,7 @@ protected:
 	bool fIsTopLayer;
 	uint16 fAdFlags;
 	int8 fClassID;
+	bool fFrameAction;
 	
 	DisplayDriver *fDriver;
 	LayerData *fLayerData;

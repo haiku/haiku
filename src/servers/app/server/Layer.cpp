@@ -65,6 +65,7 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fFlags			= flags;
 	fAdFlags		= 0;
 	fClassID		= AS_LAYER_CLASS;
+	fFrameAction	= B_LAYER_NONE;
 	fResizeMode		= resize;
 	fHidden			= false;
 	
@@ -456,7 +457,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 				// calculate the minimum region/rectangle to be updated with
 				// a single message to the client.
 				fUpdateReg = fFullVisible;
-				if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+				if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
 				else { fUpdateReg.IntersectWith(&reg); }
 
 				if (fUpdateReg.CountRects() > 0)
@@ -486,7 +487,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 		else
 		{
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
 			else { fUpdateReg.IntersectWith(&reg); }
 
 			if (fUpdateReg.CountRects() > 0)
@@ -1015,6 +1016,8 @@ void Layer::MoveBy(float x, float y)
 		return;
 	}
 	
+	fFrameAction = B_LAYER_MOVE;
+	
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
@@ -1023,6 +1026,8 @@ void Layer::MoveBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
+	
+	fFrameAction = B_LAYER_NONE;
 	
 	STRACE(("Layer(%s)::MoveBy() END\n", GetName()));
 }
@@ -1116,6 +1121,8 @@ void Layer::ResizeBy(float x, float y)
 		return;
 	}
 	
+	fFrameAction = B_LAYER_RESIZE;
+	
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame());
 	rect.right += x;
@@ -1127,6 +1134,8 @@ void Layer::ResizeBy(float x, float y)
 	fParent->Redraw(gRedrawReg, this);
 	
 	EmptyGlobals();
+
+	fFrameAction = B_LAYER_NONE;
 	
 	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
