@@ -12,6 +12,7 @@ class PortMessage;
 
 class PortLink
 {
+public:
 	class ReplyData
 	{
 		public:
@@ -21,7 +22,6 @@ class PortLink
 		ssize_t buffersize;
 		int8 *buffer;
 	};
-public:
 	PortLink(port_id port);
 	PortLink(const PortLink &link);
 	~PortLink(void);
