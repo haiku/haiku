@@ -3,6 +3,9 @@
 
 
 struct ifnet;
+struct uio;
+
+int uiomove(char *cp, int n, struct uio *uio);
 
 void in_if_detach(struct ifnet *ifp);
 	// this removes all IP related references for this interface (route, address)
