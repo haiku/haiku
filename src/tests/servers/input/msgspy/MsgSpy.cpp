@@ -116,7 +116,8 @@ const char* MsgSpy::MapWhatToString(uint32 w)
 		case B_MOUSE_DOWN:					s = "B_MOUSE_DOWN";					break;
 		case B_MOUSE_UP:					s = "B_MOUSE_UP";					break;
 		case B_MOUSE_MOVED:					s = "B_MOUSE_MOVED";				break;
-		
+		case B_MOUSE_WHEEL_CHANGED:				s = "B_MOUSE_WHEEL_CHANGED";			break;
+
 		// Keyboard device event messages.
 		case B_KEY_DOWN:					s = "B_KEY_DOWN";					break;
 		case B_UNMAPPED_KEY_DOWN:			s = "B_UNMAPPED_KEY_DOWN";			break;
@@ -124,6 +125,7 @@ const char* MsgSpy::MapWhatToString(uint32 w)
 		case B_UNMAPPED_KEY_UP:				s = "B_UNMAPPED_KEY_UP";			break;
 		case B_MODIFIERS_CHANGED:			s = "B_MODIFIERS_CHANGED";			break;
 		
+		case B_INPUT_METHOD_EVENT:			s = "B_INPUT_METHOD_EVENT";			break;
 		default:							s = "UNKNOWN_MESSAGE";				break;
 	}
 	return s;
