@@ -27,7 +27,9 @@
 #include "argv.h"
 #include "external_commands.h"
 #include "kprotos.h"
+#include "path_util.h"
 #include "tracker.h"
+#include "xcp.h"
 
 #include <fs_attr.h>
 #include <fs_query.h>
@@ -37,6 +39,7 @@ static bool sInteractiveMode = true;
 
 static int do_lat_fs(int argc, char **argv);
 static void do_fsh(void);
+static int remove_entry(int dir, const char *entry, bool recursive, bool force);
 
 static void
 print_usage(const char *program)
@@ -95,6 +98,7 @@ main(int argc, char **argv)
 
     do_fsh();
 
+	sys_chdir(1, -1, "/");
     if (sys_unmount(1, -1, "/myfs") != 0) {
         printf("could not un-mount /myfs\n");
         return 5;
@@ -163,7 +167,7 @@ do_open(int argc, char **argv)
     else
         sprintf(name, "/myfs/%s", &argv[1][0]);
 
-    cur_fd = sys_open(1, -1, name, O_RDWR, MY_S_IFREG, 0);
+    cur_fd = sys_open(1, -1, name, MY_O_RDWR, MY_S_IFREG, 0);
     if (cur_fd < 0) {
         printf("error opening %s : %s (%d)\n", name, fs_strerror(cur_fd), cur_fd);
     	return cur_fd;
@@ -188,7 +192,7 @@ do_make(int argc, char **argv)
     else
         strcpy(name, &argv[1][0]);
 
-    cur_fd = sys_open(1, -1, name, O_RDWR|O_CREAT, 0666, 0);
+    cur_fd = sys_open(1, -1, name, MY_O_RDWR | MY_O_CREAT, 0666, 0);
     if (cur_fd < 0) {
         printf("error creating: %s: %s\n", name, fs_strerror(cur_fd));
         return cur_fd;
@@ -437,6 +441,56 @@ do_remove_attr(int argc, char **argv)
 }
 
 
+static int
+do_list_attr(int argc, char **argv)
+{
+	if (argc < 2 && cur_fd < 0) {
+		fprintf(stderr, "Must specify a file!\n");
+		return FS_EINVAL;
+	}
+
+	// open attr dir
+	int attrDir = -1;
+	if (argc >= 2) {
+		attrDir = sys_open_attr_dir(true, -1, argv[1]);
+	} else if (cur_fd >= 0) {
+		attrDir = sys_open_attr_dir(true, cur_fd, NULL);
+	} else {
+		fprintf(stderr, "Must specify a file!\n");
+		return FS_EINVAL;
+	}
+	if (attrDir < 0) {
+		fprintf(stderr, "Failed to open attribute directory: %s\n",
+			fs_strerror(attrDir));
+		return attrDir;
+	}
+
+	printf("  Type        Size                  Name\n");
+	printf("----------  --------  --------------------------------\n");
+
+	// iterate through the attributes
+	char entryBuffer[sizeof(my_dirent) + B_ATTR_NAME_LENGTH];
+	my_dirent *entry = (my_dirent *)entryBuffer;
+	while (sys_readdir(true, attrDir, entry, sizeof(entryBuffer), 1) > 0) {
+		// stat the attribute
+		my_attr_info info;
+		int error = sys_stat_attr(true, attrDir, NULL, entry->d_name, &info);
+		if (error == FS_OK) {
+			printf("0x%08lx  %8lld  %32s\n", info.type, (long long)info.size,
+				entry->d_name);
+		} else {
+			fprintf(stderr, "Failed to stat attribute `%s': %s\n",
+				entry->d_name, fs_strerror(error));
+		}
+	}
+
+	// close the attr dir
+	sys_closedir(true, attrDir);
+
+	return FS_OK;
+}
+
+
 static void
 mode_bits_to_str(int mode, char *str)
 {
@@ -465,6 +519,35 @@ mode_bits_to_str(int mode, char *str)
 
 
 static int
+do_chdir(int argc, char **argv)
+{
+	if (argc <= 1) {
+		fprintf(stderr, "No directory specified!\n");
+		return FS_EINVAL;
+	}
+
+	// change dir
+	const char *dir = argv[1];
+	int error = 0;
+	if (dir[0] == ':') {
+		// host environment
+		if (chdir(dir + 1) < 0)
+			error = from_platform_error(errno);
+	} else {
+		// emulated environment
+		error = sys_chdir(1, -1, dir);
+	}
+		
+	if (error != 0) {
+		fprintf(stderr, "Failed to cd into `%s': %s\n", argv[1],
+			fs_strerror(error));
+	}
+
+	return error;
+}
+
+
+static int
 do_dir(int argc, char **argv)
 {
 	int dirfd, err, max_err = 10;
@@ -476,9 +559,10 @@ do_dir(int argc, char **argv)
 	char mode_str[16];
 
 	dent = (struct my_dirent *)buff;
-	strcpy(dirname, "/myfs/");
 	if (argc > 1)
-		strcat(dirname, &argv[1][0]);
+		strcpy(dirname, &argv[1][0]);
+	else
+		strcpy(dirname, ".");
 
 	if ((dirfd = sys_opendir(1, -1, dirname, 0)) < 0) {
 		printf("dir: error opening: %s\n", dirname);
@@ -503,7 +587,7 @@ do_dir(int argc, char **argv)
 		if (err == 0)
 			break;
 
-		err = sys_rstat(1, dirfd, dent->d_name, &st, 1);
+		err = sys_rstat(1, dirfd, dent->d_name, &st, false);
 		if (err != 0) {
 			// may happen for unresolvable links
 			printf("stat failed for: %s (%Ld)\n", dent->d_name, dent->d_ino);
@@ -515,8 +599,24 @@ do_dir(int argc, char **argv)
 
 		mode_bits_to_str(st.mode, mode_str);
 
-		printf("%12Ld %s %6d %6d %12Ld %s %s\n", st.ino, mode_str,
+		printf("%12Ld %s %6d %6d %12Ld %s %s", st.ino, mode_str,
 			st.uid, st.gid, st.size, time_buf, dent->d_name);
+
+		// if the entry is a symlink, print its target
+		if (MY_S_ISLNK(st.mode)) {
+			char linkTo[B_PATH_NAME_LENGTH];
+			ssize_t bytesRead = sys_readlink(true, dirfd, dent->d_name, linkTo,
+					sizeof(linkTo) - 1);
+			if (bytesRead >= 0) {
+				linkTo[bytesRead] = '\0';
+				printf(" -> %s", linkTo);
+			} else {
+				printf(" -> (%s)", fs_strerror(bytesRead));
+			}
+		}
+
+		printf("\n");
+
 		count++;
 	}
 
@@ -544,7 +644,7 @@ do_ioctl(int argc, char **argv)
 		return FS_EINVAL;
 	}
 
-	if ((fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0)) < 0) {
+	if ((fd = sys_open(1, -1, "/myfs/.", MY_O_RDONLY, S_IFREG, 0)) < 0) {
 	    printf("ioctl: error opening '.'\n");
 	    return fd;
 	}
@@ -682,7 +782,7 @@ do_seek(int argc, char **argv)
     }
     pos = strtoul(&argv[1][0], NULL, 0);
 
-    err = sys_lseek(1, cur_fd, pos, SEEK_SET);
+    err = sys_lseek(1, cur_fd, pos, MY_SEEK_SET);
     if (err != pos) {
         printf("seek to %Ld failed (%Ld)\n", pos, err);
     }
@@ -691,28 +791,144 @@ do_seek(int argc, char **argv)
 }
 
 
+int
+remove_dir_contents(int parentDir, const char *name, bool force)
+{
+	// open the dir
+	int dir = sys_opendir(true, parentDir, name, true);
+	if (dir < 0) {
+		fprintf(stderr, "Failed to open dir `%s': %s\n", name,
+			fs_strerror(dir));
+		return dir;
+	}
+
+	status_t error = FS_OK;
+
+	// iterate through the entries
+	ssize_t numRead;
+	char buffer[sizeof(my_dirent) + B_FILE_NAME_LENGTH];
+	my_dirent *entry = (my_dirent*)buffer;
+	while ((numRead = sys_readdir(true, dir, entry, sizeof(buffer), 1)) > 0) {
+		// skip "." and ".."
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+			continue;
+
+		error = remove_entry(dir, entry->d_name, true, force);
+		if (error != FS_OK)
+			break;
+	}
+
+	if (numRead < 0) {
+		fprintf(stderr, "Error while reading directory `%s': %s\n", name,
+			fs_strerror(numRead));
+		return numRead;
+	}
+
+	// close
+	sys_closedir(true, dir);
+
+	return error;
+}
+
+
+static int
+remove_entry(int dir, const char *entry, bool recursive, bool force)
+{
+	// stat the file
+	struct my_stat st;
+	status_t error = sys_rstat(true, dir, entry, &st, false);
+	if (error != FS_OK) {
+		if (force && error == FS_ENTRY_NOT_FOUND)
+			return FS_OK;
+
+		fprintf(stderr, "Failed to remove `%s': %s\n", entry,
+			fs_strerror(error));
+		return error;
+	}
+
+	if (MY_S_ISDIR(st.mode)) {
+		if (!recursive) {
+			fprintf(stderr, "`%s' is a directory.\n", entry);
+				// TODO: get the full path
+			return FS_EISDIR;
+		}
+
+		// remove the contents
+		error = remove_dir_contents(dir, entry, force);
+		if (error != FS_OK)
+			return error;
+
+		// remove the directory
+		error = sys_rmdir(true, dir, entry);
+		if (error != FS_OK) {
+			fprintf(stderr, "Failed to remove directory `%s': %s\n", entry,
+				fs_strerror(error));
+			return error;
+		}
+	} else {
+		// remove the entry
+		error = sys_unlink(true, dir, entry);
+		if (error != FS_OK) {
+			fprintf(stderr, "Failed to remove entry `%s': %s\n", entry,
+				fs_strerror(error));
+			return error;
+		}
+	}
+
+	return FS_OK;
+}
+
+
 static int
 do_rm(int argc, char **argv)
 {
-    int err;
-    char name[256];
-
     if (cur_fd >= 0)
         do_close(0, NULL);
 
-    if (argc < 2) {
-        printf("rm: need a file name to remove\n");
-        return FS_EINVAL;
-    }
+	bool recursive = false;
+	bool force = false;
 
-    sprintf(name, "/myfs/%s", &argv[1][0]);
-    
-    err = sys_unlink(1, -1, name);
-    if (err != 0) {
-        printf("error removing: %s: %s\n", name, fs_strerror(err));
-    }
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
 
-	return err;
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Invalid option `-'\n");
+			return FS_EINVAL;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'f':
+					force = true;
+					break;
+				case 'r':
+					recursive = true;
+					break;
+				default:
+					fprintf(stderr, "Unknown option `-%c'\n", arg[i]);
+					return FS_EINVAL;
+			}
+		}
+	}
+	
+	// check params
+	if (argi >= argc) {
+		fprintf(stderr, "Usage: %s [ -r ] <file>...\n", argv[0]);
+		return FS_EINVAL;
+	}
+
+	// remove loop
+	for (; argi < argc; argi++) {
+		status_t error = remove_entry(-1, argv[argi], recursive, force);
+		if (error != FS_OK)
+			return error;
+	}
+
+	return FS_OK;
 }
 
 
@@ -758,7 +974,7 @@ do_copy_to_myfs(char *host_file, char *bfile)
         return from_platform_error(errno);
     }
         
-    if ((bfd = sys_open(1, -1, myfs_name, O_RDWR|O_CREAT,
+    if ((bfd = sys_open(1, -1, myfs_name, MY_O_RDWR|MY_O_CREAT,
                         MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
         fclose(fp);
         printf("error opening: %s\n", myfs_name);
@@ -804,7 +1020,7 @@ do_copy_from_myfs(char *bfile, char *host_file)
         return from_platform_error(errno);
     }
         
-    if ((bfd = sys_open(1, -1, myfs_name, O_RDONLY, MY_S_IFREG, 0)) < 0) {
+    if ((bfd = sys_open(1, -1, myfs_name, MY_O_RDONLY, MY_S_IFREG, 0)) < 0) {
         fclose(fp);
         printf("error opening: %s\n", myfs_name);
         return bfd;
@@ -917,7 +1133,7 @@ copydir(char *fromPath,char *toPath)
 			}
 
 			sprintf(myfs_name, "%s/%s", toPath, dirent->d_name);
-			if ((bfd = sys_open(1, -1, myfs_name, O_RDWR|O_CREAT,
+			if ((bfd = sys_open(1, -1, myfs_name, MY_O_RDWR|MY_O_CREAT,
 								MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
 		        close(fd);
 		        printf("error opening: %s\n", myfs_name);
@@ -1110,8 +1326,10 @@ create_remove_thread(void *data)
 
 	while (sRunStatTest) {
 		int fd;
-		if ((fd = sys_open(1, -1, sStatTestFile, O_RDWR | O_CREAT, S_IFREG | S_IRWXU, 0)) >= 0)
+		if ((fd = sys_open(1, -1, sStatTestFile, MY_O_RDWR | MY_O_CREAT,
+				S_IFREG | S_IRWXU, 0)) >= 0) {
 			sys_close(1, fd);
+		}
 
 		snooze(10000);
 		sys_unlink(1, -1, sStatTestFile);
@@ -1226,27 +1444,101 @@ do_rename(int argc, char **argv)
 
 
 static int
-do_symlink(int argc, char **argv)
+do_link(int argc, char **argv)
 {
-	char target[B_PATH_NAME_LENGTH];
-	char *source;
-	status_t status;
+	bool force = false;
+	bool symbolic = false;
 
-	if (argc < 3) {
-		printf("usage: symlink <source> <target>\n");
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Invalid option `-'\n");
+			return FS_EINVAL;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'f':
+					force = true;
+					break;
+				case 's':
+					symbolic = true;
+					break;
+				default:
+					fprintf(stderr, "Unknown option `-%c'\n", arg[i]);
+					return FS_EINVAL;
+			}
+		}
+	}
+
+	if (argc - argi != 2) {
+		printf("usage: %s [Options] <source> <target>\n", argv[0]);
 		return FS_EINVAL;
 	}
 
-	source = argv[1];
+	const char *source = argv[argi];
+	const char *target = argv[argi + 1];
 
-	strcpy(target, "/myfs/");
-	strcpy(target + 6, argv[2]);
+	// check, if the the target is an existing directory
+	struct my_stat st;
+	char targetBuffer[B_PATH_NAME_LENGTH];
+	status_t error = sys_rstat(true, -1, target, &st, true);
+	if (error == FS_OK) {
+		if (MY_S_ISDIR(st.mode)) {
+			// get source leaf
+			char leaf[B_FILE_NAME_LENGTH];
+			error = get_last_path_component(source, leaf, sizeof(leaf));
+			if (error != B_OK) {
+				fprintf(stderr, "Failed to get leaf name of source path: %s\n",
+					fs_strerror(error));
+				return error;
+			}
 
-	status = sys_symlink(1, source, -1, target);
-	if (status != FS_OK)
-		printf("symlink failed with error: %s\n", fs_strerror(status));
+			// compose a new path
+			int len = strlen(target) + 1 + strlen(leaf);
+			if (len > (int)sizeof(targetBuffer)) {
+				fprintf(stderr, "Resulting target path is too long.\n");
+				return FS_EINVAL;
+			}
+			
+			strcpy(targetBuffer, target);
+			strcat(targetBuffer, "/");
+			strcat(targetBuffer, leaf);
+			target = targetBuffer;
+		}
+	}
 
-	return status;
+	// check, if the target exists
+	error = sys_rstat(true, -1, target, &st, true);
+	if (error == FS_OK) {
+		if (!force) {
+			fprintf(stderr, "Can't create link. `%s' is in the way.", target);
+			return FS_FILE_EXISTS;
+		}
+
+		// unlink the entry
+		error = sys_unlink(true, -1, target);
+		if (error != FS_OK) {
+			fprintf(stderr, "Failed to remove `%s' to make way for link: "
+				"%s\n", target, fs_strerror(error));
+			return error;
+		}
+	}
+
+	// finally create the link
+	if (symbolic)
+		error = sys_symlink(1, source, -1, target);
+	else
+		error = sys_link(1, -1, source, -1, target);
+	if (error != FS_OK)
+		printf("Failed to create link: %s\n", fs_strerror(error));
+
+	return error;
 }
 
 
@@ -1434,7 +1726,7 @@ do_cio(int argc, char **argv)
     else
         strcat(fname, &argv[1][0]);
     
-    fd = sys_open(1, -1, fname, O_RDONLY, MY_S_IFREG, 0);
+    fd = sys_open(1, -1, fname, MY_O_RDONLY, MY_S_IFREG, 0);
     if (fd < 0) {
         printf("can't open %s\n", fname);
         return fd;
@@ -1452,7 +1744,7 @@ do_cio(int argc, char **argv)
 		}
 
 		pos = 0;
-		if (sys_lseek(1, fd, pos, SEEK_SET) != pos) {
+		if (sys_lseek(1, fd, pos, MY_SEEK_SET) != pos) {
 			perror("cio lseek");
 			break;
 		}
@@ -1480,7 +1772,7 @@ mkfile(char *s, int sz)
     int err = 0;
 	char *buffer;
 
-    if ((fd = sys_open(1, -1, s, O_RDWR|O_CREAT,
+    if ((fd = sys_open(1, -1, s, MY_O_RDWR|MY_O_CREAT,
                        MY_S_IFREG|MY_S_IRWXU, 0)) < 0) {
         printf("error creating: %s\n", s);
         return fd;
@@ -1593,6 +1885,7 @@ static int do_help(int argc, char **argv);
 
 static cmd_entry builtin_commands[] =
 {
+    { "cd",      do_chdir, "change current directory" },
     { "ls",      do_dir, "print a directory listing" },
     { "dir",     do_dir, "print a directory listing (same as ls)" },
     { "open",    do_open, "open an existing file for read/write access" },
@@ -1614,6 +1907,7 @@ static cmd_entry builtin_commands[] =
     { "wrattr",  do_write_attr, "write attribute \"name\" to the current file (N bytes [256])." },
     { "rdattr",  do_read_attr, "read attribute \"name\" from the current file (N bytes [256])." },
     { "rmattr",  do_remove_attr, "remove attribute \"name\" from the current file." },
+    { "listattr", do_list_attr, "lists all attributes of the given or current file." },
     { "attrs",   do_attrtest, "writes random attributes [a-z] up to 1023 bytes, N [10240] iterations." },
     { "lat_fs",  do_lat_fs, "simulate what the lmbench test lat_fs does" },
     { "create",  do_create, "create N files. default is 100" },
@@ -1630,7 +1924,9 @@ static cmd_entry builtin_commands[] =
     { "tracker", do_tracker, "starts a Tracker like background thread that will listen to fs updates" },
     { "cio",	 do_cio, "does a I/O speed test" },
     { "stattest", do_stattest, "does an \"early\"/\"late\" stat test for files that are created or deleted" },
-    { "symlink", do_symlink, "creates the specified symlink on the device" },
+    { "link", do_link, "creates the specified [sym]link on the device" },
+    { "ln", do_link, "creates the specified [sym]link on the device" },
+    { "xcp",	 do_xcp, "similar to shell cp, can copy in, out, within, and outside the FS, supports attributes." },
 
     { NULL, NULL }
 };
@@ -1745,7 +2041,4 @@ do_fsh(void)
     if (cur_fd != -1)
         do_close(0, NULL);
 }
-
-
-
 
