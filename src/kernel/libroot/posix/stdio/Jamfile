@@ -33,6 +33,7 @@ KernelMergeObject posix_stdio.o :
 	<$(SOURCE_GRIST)>rewind.c
 	<$(SOURCE_GRIST)>rget.c
 	<$(SOURCE_GRIST)>scanf.c
+ 	<$(SOURCE_GRIST)>snprintf.c
 	<$(SOURCE_GRIST)>sscanf.c
  	<$(SOURCE_GRIST)>sprintf.c
  	<$(SOURCE_GRIST)>stdio.c
