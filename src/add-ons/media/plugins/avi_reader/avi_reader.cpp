@@ -165,7 +165,8 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 			// a raw PCM format
 			description.family = B_BEOS_FORMAT_FAMILY;
 			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-			formats.GetFormatFor(description, format);
+			if (B_OK != formats.GetFormatFor(description, format)) 
+				format->type = B_MEDIA_RAW_AUDIO;
 			format->u.raw_audio.frame_rate = audio_format->frames_per_sec;
 			format->u.raw_audio.channel_count = audio_format->channels;
 			if (audio_format->bits_per_sample <= 8)
@@ -187,7 +188,8 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 			// some encoded format
 			description.family = B_WAV_FORMAT_FAMILY;
 			description.u.wav.codec = audio_format->format_tag;
-			formats.GetFormatFor(description, format);
+			if (B_OK != formats.GetFormatFor(description, format)) 
+				format->type = B_MEDIA_ENCODED_AUDIO;
 			format->u.encoded_audio.output.frame_rate = audio_format->frames_per_sec;
 			format->u.encoded_audio.output.channel_count = audio_format->channels;
 		}
@@ -209,7 +211,10 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 		description.family = B_AVI_FORMAT_FAMILY;
 		description.u.avi.codec = 0;
-		formats.GetFormatFor(description, format);
+		if (B_OK != formats.GetFormatFor(description, format)) 
+			format->type = B_MEDIA_ENCODED_VIDEO;
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		strncpy((char*)format->user_data, "DivX", 4);
 
 		return B_OK;
 	}

@@ -228,7 +228,7 @@ OpenDMLFile::OdmlReadIndexInfo(int stream_index)
 	TRACE("base_offset %Ld\n", chunk_index_header.base_offset);
 
 	data->index_base_offset = chunk_index_header.base_offset;
-	data->index_entry_start = entry->start + sizeof(chunk_index_header) + 8;
+	data->index_entry_start = entry->start + sizeof(chunk_index_header) + 8; // skip 8 bytes (chunk id + chunk size)
 	data->index_entry_size = chunk_index_header.longs_per_entry * 4;
 	data->index_entry_count = chunk_index_header.entries_used;
 	data->index_entry_pos = 0;
@@ -312,19 +312,23 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 
 		avi_standard_index_entry *entry = (avi_standard_index_entry *)(data->index_chunk + data->index_chunk_entry_pos * data->index_entry_size);
 		
-		TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%x, offset %lu, length %lu\n",
-			 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
+//		TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%x, offset %lu, length %lu\n",
+//			 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
 
 		data->index_chunk_entry_pos++;		
 		data->index_entry_pos++;
 			 
 		int real_stream_index = ((entry->chunk_id & 0xff) - '0') * 10 + ((entry->chunk_id >> 8) & 0xff) - '0';
 
-		TRACE("OpenDMLFile::AviGetNextChunkInfo: real_stream_index %d %d %d\n", real_stream_index, ((entry->chunk_id & 0xff) - '0'), ((entry->chunk_id >> 8) & 0xff) - '0');
+//		TRACE("OpenDMLFile::AviGetNextChunkInfo: real_stream_index %d %d %d\n", real_stream_index, ((entry->chunk_id & 0xff) - '0'), ((entry->chunk_id >> 8) & 0xff) - '0');
 			 
 		if (real_stream_index == stream_index) {		
+
+			TRACE("OpenDMLFile::AviGetNextChunkInfo: stream %d, chunk_id "FOURCC_FORMAT" (0x%08x), flags 0x%x, offset %lu, length %lu\n",
+				 stream_index, FOURCC_PARAM(entry->chunk_id), entry->chunk_id, entry->flags, entry->chunk_offset, entry->chunk_length);
+
 			*keyframe = entry->flags & AVIIF_KEYFRAME;
-			*start = data->index_base_offset + entry->chunk_offset + 8;
+			*start = data->index_base_offset + entry->chunk_offset + 8;  // skip 8 bytes (chunk id + chunk size)
 			*size = entry->chunk_length;
 			return true;
 		}
