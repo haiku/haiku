@@ -8,6 +8,23 @@
 #include <OS.h>
 
 #include <KPPPUtils.h>
+#include <KPPPInterface.h>
+
+
+bool
+IsProtocolAllowed(const PPPProtocol& protocol)
+{
+	if(protocol.ProtocolNumber() == PPP_LCP_PROTOCOL)
+		return true;
+	else if(protocol.Interface().State() != PPP_OPENED_STATE)
+		return false;
+	else if(protocol.Interface().Phase() > PPP_AUTHENTICATION_PHASE
+			|| (protocol.Interface().Phase() >= PPP_ESTABLISHMENT_PHASE
+				&& protocol.Flags() & PPP_ALWAYS_ALLOWED))
+		return true;
+	else
+		return false;
+}
 
 
 // These are very simple send/receive_data functions with a timeout

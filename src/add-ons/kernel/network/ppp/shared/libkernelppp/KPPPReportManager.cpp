@@ -10,8 +10,6 @@
 
 #include <KPPPUtils.h>
 
-#include <new.h>
-
 
 PPPReportManager::PPPReportManager(BLocker& lock)
 	: fLock(lock)

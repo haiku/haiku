@@ -8,8 +8,9 @@
 #ifndef _K_PPP_CONFIGURE_PACKET__H
 #define _K_PPP_CONFIGURE_PACKET__H
 
-#include <mbuf.h>
 #include <List.h>
+
+struct mbuf;
 
 
 typedef struct ppp_configure_item {

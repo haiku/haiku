@@ -12,24 +12,13 @@
 #include <KPPPDefs.h>
 #endif
 
+#include <OS.h>
+
+class PPPProtocol;
+
 
 // helper functions
-template<class T>
-inline
-bool
-is_handler_allowed(T& handler, ppp_state state, ppp_phase phase)
-{
-	if(handler.Protocol() == PPP_LCP_PROTOCOL)
-		return true;
-	else if(state != PPP_OPENED_STATE)
-		return false;
-	else if(phase > PPP_AUTHENTICATION_PHASE
-			|| (phase >= PPP_ESTABLISHMENT_PHASE
-				&& handler.Flags() & PPP_ALWAYS_ALLOWED))
-		return true;
-	else
-		return false;
-}
+bool IsProtocolAllowed(const PPPProtocol& protocol);
 
 // the list template does not support iterating over each item :(
 // this template iterates over each item in an indexed list

@@ -9,34 +9,38 @@
 #define _K_PPP_PROTOCOL__H
 
 #include <KPPPDefs.h>
+#include <KPPPLayer.h>
 
 class PPPInterface;
 class PPPOptionHandler;
 
 
-class PPPProtocol {
-	public:
-		PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
-			int32 addressFamily, PPPInterface& interface,
+class PPPProtocol : public PPPLayer {
+	protected:
+		// PPPProtocol must be subclassed
+		PPPProtocol(const char *name, ppp_phase activationPhase,
+			uint16 protocolNumber, ppp_level level, int32 addressFamily,
+			uint32 overhead, PPPInterface& interface,
 			driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
 			const char *type = NULL, PPPOptionHandler *optionHandler = NULL);
+
+	public:
 		virtual ~PPPProtocol();
-		
-		virtual status_t InitCheck() const;
-		
-		const char *Name() const
-			{ return fName; }
-		
-		ppp_phase Phase() const
-			{ return fPhase; }
 		
 		PPPInterface& Interface() const
 			{ return fInterface; }
 		driver_parameter *Settings() const
 			{ return fSettings; }
 		
-		uint16 Protocol() const
-			{ return fProtocol; }
+		ppp_phase ActivationPhase() const
+			{ return fActivationPhase; }
+		
+		uint32 Overhead() const
+			{ return fOverhead; }
+				// only useful for encapsulation protocols
+		
+		uint16 ProtocolNumber() const
+			{ return fProtocolNumber; }
 		int32 AddressFamily() const
 			{ return fAddressFamily; }
 				// negative values and values > 0xFF are ignored
@@ -46,11 +50,15 @@ class PPPProtocol {
 			{ return fSide; }
 				// which side this protocol works for
 		
-		// extensions
 		const char *Type() const
 			{ return fType; }
 		PPPOptionHandler *OptionHandler() const
 			{ return fOptionHandler; }
+		
+		void SetNextProtocol(PPPProtocol *protocol)
+			{ fNextProtocol = protocol; SetNext(protocol); }
+		PPPProtocol *NextProtocol() const
+			{ return fNextProtocol; }
 		
 		void SetEnabled(bool enabled = true);
 		bool IsEnabled() const
@@ -67,39 +75,41 @@ class PPPProtocol {
 		virtual bool Down() = 0;
 			// if DialOnDemand is supported check for DialOnDemand settings change
 		bool IsUp() const
-			{ return fConnectionStatus == PPP_ESTABLISHED_PHASE; }
+			{ return fConnectionPhase == PPP_ESTABLISHED_PHASE; }
 		bool IsDown() const
-			{ return fConnectionStatus == PPP_DOWN_PHASE; }
+			{ return fConnectionPhase == PPP_DOWN_PHASE; }
 		bool IsGoingUp() const
-			{ return fConnectionStatus == PPP_ESTABLISHMENT_PHASE; }
+			{ return fConnectionPhase == PPP_ESTABLISHMENT_PHASE; }
 		bool IsGoingDown() const
-			{ return fConnectionStatus == PPP_TERMINATION_PHASE; }
+			{ return fConnectionPhase == PPP_TERMINATION_PHASE; }
 		
-		virtual status_t Send(struct mbuf *packet) = 0;
-		virtual status_t Receive(struct mbuf *packet, uint16 protocol) = 0;
+		virtual bool IsAllowedToSend() const;
 		
-		virtual void Pulse();
+		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber) = 0;
+		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber) = 0;
 
 	protected:
 		void SetUpRequested(bool requested = true)
 			{ fUpRequested = requested; }
 		
+		// Report that we are going up/down
+		// (from now on, the Up() process can be aborted).
 		void UpStarted();
 		void DownStarted();
 		
+		// report up/down events
 		void UpFailedEvent();
 		void UpEvent();
 		void DownEvent();
-			// report up/down events
 
 	protected:
+		uint32 fOverhead;
 		ppp_side fSide;
-		status_t fInitStatus;
 
 	private:
-		char *fName;
-		ppp_phase fPhase;
-		uint16 fProtocol;
+		ppp_phase fActivationPhase;
+		ppp_level fLevel;
+		uint16 fProtocolNumber;
 		int32 fAddressFamily;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
@@ -107,9 +117,10 @@ class PPPProtocol {
 		char *fType;
 		PPPOptionHandler *fOptionHandler;
 		
+		PPPProtocol *fNextProtocol;
 		bool fEnabled;
 		bool fUpRequested;
-		ppp_phase fConnectionStatus;
+		ppp_phase fConnectionPhase;
 };
 
 

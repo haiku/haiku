@@ -22,7 +22,6 @@
 #include <KPPPStateMachine.h>
 #endif
 
-class PPPEncapsulator;
 class PPPLCPExtension;
 class PPPOptionHandler;
 
@@ -65,12 +64,12 @@ class PPPLCP : public PPPProtocol {
 		PPPLCPExtension *LCPExtensionAt(int32 index) const;
 		PPPLCPExtension *LCPExtensionFor(uint8 code, int32 *start = NULL) const;
 		
-		PPPEncapsulator *Target() const
-			{ return fTarget; }
-		void SetTarget(PPPEncapsulator *target)
+		void SetTarget(PPPProtocol *target)
 			{ fTarget = target; }
-			// if target != all packtes will be passed to the encapsulator
+			// if target != NULL all packtes will be passed to the protocol
 			// instead of the interface/device
+		PPPProtocol *Target() const
+			{ return fTarget; }
 		
 		uint32 AdditionalOverhead() const;
 			// the overhead caused by the target, the device, and the interface
@@ -78,8 +77,9 @@ class PPPLCP : public PPPProtocol {
 		virtual bool Up();
 		virtual bool Down();
 		
-		virtual status_t Send(struct mbuf *packet);
-		virtual status_t Receive(struct mbuf *packet, uint16 protocol);
+		virtual status_t Send(struct mbuf *packet,
+			uint16 protocolNumber = PPP_LCP_PROTOCOL);
+		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
 		
 		virtual void Pulse();
 
@@ -89,7 +89,7 @@ class PPPLCP : public PPPProtocol {
 		List<PPPOptionHandler*> fOptionHandlers;
 		List<PPPLCPExtension*> fLCPExtensions;
 		
-		PPPEncapsulator *fTarget;
+		PPPProtocol *fTarget;
 };
 
 

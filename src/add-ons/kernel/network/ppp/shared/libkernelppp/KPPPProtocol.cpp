@@ -6,34 +6,31 @@
 //---------------------------------------------------------------------
 
 #include <KPPPInterface.h>
-#include <KPPPOptionHandler.h>
-
+#include <KPPPUtils.h>
 #include <PPPControl.h>
 #include "settings_tools.h"
 
 #include <cstring>
 
 
-PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
-		int32 addressFamily, PPPInterface& interface,
+PPPProtocol::PPPProtocol(const char *name, ppp_phase activationPhase,
+		uint16 protocolNumber, ppp_level level, int32 addressFamily,
+		uint32 overhead, PPPInterface& interface,
 		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
 		const char *type = NULL, PPPOptionHandler *optionHandler = NULL)
-	: fPhase(phase),
-	fProtocol(protocol),
+	: PPPLayer(name, level),
+	fActivationPhase(activationPhase),
+	fProtocolNumber(protocolNumber),
 	fAddressFamily(addressFamily),
 	fInterface(interface),
 	fSettings(settings),
 	fFlags(flags),
 	fOptionHandler(optionHandler),
+	fNextProtocol(NULL),
 	fEnabled(true),
 	fUpRequested(true),
-	fConnectionStatus(PPP_DOWN_PHASE)
+	fConnectionPhase(PPP_DOWN_PHASE)
 {
-	if(name)
-		fName = strdup(name);
-	else
-		fName = strdup("Unknown");
-	
 	if(type)
 		fType = strdup(type);
 	else
@@ -49,36 +46,15 @@ PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 			fSide = PPP_PEER_SIDE;
 	}
 	
-	fInitStatus = interface.AddProtocol(this) ? B_OK : B_ERROR;
+	fInitStatus = interface.AddProtocol(this) && fInitStatus == B_OK ? B_OK : B_ERROR;
 }
 
 
 PPPProtocol::~PPPProtocol()
 {
-	free(fName);
-	free(fType);
-	
 	Interface().RemoveProtocol(this);
-}
-
-
-status_t
-PPPProtocol::InitCheck() const
-{
-	return fInitStatus;
-}
-
-
-void
-PPPProtocol::SetEnabled(bool enabled = true)
-{
-	fEnabled = enabled;
 	
-	if(!enabled) {
-		if(IsUp() || IsGoingUp())
-			Down();
-	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface().IsUp())
-		Up();
+	free(fType);
 }
 
 
@@ -86,26 +62,28 @@ status_t
 PPPProtocol::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
-		case PPPC_GET_HANDLER_INFO: {
-			if(length < sizeof(ppp_handler_info_t) || !data)
+		case PPPC_GET_PROTOCOL_INFO: {
+			if(length < sizeof(ppp_protocol_info_t) || !data)
 				return B_ERROR;
 			
-			ppp_handler_info *info = (ppp_handler_info*) data;
-			memset(info, 0, sizeof(ppp_handler_info_t));
+			ppp_protocol_info *info = (ppp_protocol_info*) data;
+			memset(info, 0, sizeof(ppp_protocol_info_t));
 			strncpy(info->name, Name(), PPP_HANDLER_NAME_LENGTH_LIMIT);
+			strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 			info->settings = Settings();
-			info->phase = Phase();
+			info->activationPhase = ActivationPhase();
 			info->addressFamily = AddressFamily();
 			info->flags = Flags();
 			info->side = Side();
-			info->protocol = Protocol();
+			info->level = Level();
+			info->overhead = Overhead();
+			info->connectionPhase = fConnectionPhase;
+			info->protocolNumber = ProtocolNumber();
 			info->isEnabled = IsEnabled();
 			info->isUpRequested = IsUpRequested();
-			info->connectionStatus = fConnectionStatus;
-			strncpy(info->type, Type(), PPP_HANDLER_NAME_LENGTH_LIMIT);
 		} break;
 		
-		case PPPC_SET_ENABLED:
+		case PPPC_ENABLE:
 			if(length < sizeof(uint32) || !data)
 				return B_ERROR;
 			
@@ -133,30 +111,43 @@ PPPProtocol::StackControl(uint32 op, void *data)
 
 
 void
-PPPProtocol::Pulse()
+PPPProtocol::SetEnabled(bool enabled = true)
 {
-	// do nothing by default
+	fEnabled = enabled;
+	
+	if(!enabled) {
+		if(IsUp() || IsGoingUp())
+			Down();
+	} else if(!IsUp() && !IsGoingUp() && IsUpRequested() && Interface().IsUp())
+		Up();
+}
+
+
+bool
+PPPProtocol::IsAllowedToSend() const
+{
+	return IsEnabled() && IsUp() && IsProtocolAllowed(*this);
 }
 
 
 void
 PPPProtocol::UpStarted()
 {
-	fConnectionStatus = PPP_ESTABLISHMENT_PHASE;
+	fConnectionPhase = PPP_ESTABLISHMENT_PHASE;
 }
 
 
 void
 PPPProtocol::DownStarted()
 {
-	fConnectionStatus = PPP_TERMINATION_PHASE;
+	fConnectionPhase = PPP_TERMINATION_PHASE;
 }
 
 
 void
 PPPProtocol::UpFailedEvent()
 {
-	fConnectionStatus = PPP_DOWN_PHASE;
+	fConnectionPhase = PPP_DOWN_PHASE;
 	
 	Interface().StateMachine().UpFailedEvent(this);
 }
@@ -165,7 +156,7 @@ PPPProtocol::UpFailedEvent()
 void
 PPPProtocol::UpEvent()
 {
-	fConnectionStatus = PPP_ESTABLISHED_PHASE;
+	fConnectionPhase = PPP_ESTABLISHED_PHASE;
 	
 	Interface().StateMachine().UpEvent(this);
 }
@@ -174,7 +165,7 @@ PPPProtocol::UpEvent()
 void
 PPPProtocol::DownEvent()
 {
-	fConnectionStatus = PPP_DOWN_PHASE;
+	fConnectionPhase = PPP_DOWN_PHASE;
 	
 	Interface().StateMachine().DownEvent(this);
 }

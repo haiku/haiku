@@ -56,7 +56,7 @@ PPPLCPExtension::Control(uint32 op, void *data, size_t length)
 			info->isEnabled = IsEnabled();
 		} break;
 		
-		case PPPC_SET_ENABLED:
+		case PPPC_ENABLE:
 			if(length < sizeof(uint32) || !data)
 				return B_ERROR;
 			

@@ -18,9 +18,12 @@ class PPPConfigurePacket;
 
 
 class PPPOptionHandler {
-	public:
+	protected:
+		// PPPOptionHandler must be subclassed
 		PPPOptionHandler(const char *name, uint8 type, PPPInterface& interface,
 			driver_parameter *settings);
+
+	public:
 		virtual ~PPPOptionHandler();
 		
 		virtual status_t InitCheck() const;

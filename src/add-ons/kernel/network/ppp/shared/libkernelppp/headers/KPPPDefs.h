@@ -17,6 +17,9 @@ typedef uint32 interface_id;
 #define PPP_PULSE_RATE						500000
 
 
+extern struct core_module_info *core;
+
+
 // module key types (used when loading a module)
 enum ppp_module_key_type {
 	PPP_UNDEFINED_KEY_TYPE = -1,

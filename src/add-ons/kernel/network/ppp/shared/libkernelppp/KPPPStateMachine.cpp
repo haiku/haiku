@@ -10,12 +10,11 @@
 #include <KPPPInterface.h>
 #include <KPPPConfigurePacket.h>
 #include <KPPPDevice.h>
-#include <KPPPEncapsulator.h>
 #include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 
 #include <net/if.h>
-#include <mbuf.h>
+#include <core_funcs.h>
 
 
 #define PPP_STATE_MACHINE_TIMEOUT			3000000
@@ -119,7 +118,6 @@ PPPStateMachine::Reconfigure()
 	NewPhase(PPP_ESTABLISHMENT_PHASE);
 	
 	DownProtocols();
-	DownEncapsulators();
 	ResetLCPHandlers();
 	
 	locker.UnlockNow();
@@ -331,7 +329,7 @@ PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
 	if((protocol->Flags() & PPP_NOT_IMPORTANT) == 0) {
 		if(Interface().Mode() == PPP_CLIENT_MODE) {
-			// pretend we lost connection:
+			// pretend we lost connection
 			if(Interface().IsMultilink() && !Interface().Parent())
 				for(int32 index = 0; index < Interface().CountChildren(); index++)
 					Interface().ChildAt(index)->StateMachine().CloseEvent();
@@ -352,48 +350,12 @@ PPPStateMachine::UpEvent(PPPProtocol *protocol)
 	LockerHelper locker(fLock);
 	
 	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
-		BringHandlersUp();
+		BringProtocolsUp();
 }
 
 
 void
 PPPStateMachine::DownEvent(PPPProtocol *protocol)
-{
-}
-
-
-void
-PPPStateMachine::UpFailedEvent(PPPEncapsulator *encapsulator)
-{
-	if((encapsulator->Flags() & PPP_NOT_IMPORTANT) == 0) {
-		if(Interface().Mode() == PPP_CLIENT_MODE) {
-			// pretend we lost connection:
-			if(Interface().IsMultilink() && !Interface().Parent())
-				for(int32 index = 0; index < Interface().CountChildren(); index++)
-					Interface().ChildAt(index)->StateMachine().CloseEvent();
-			else if(Interface().Device())
-				Interface().Device()->Down();
-			else
-				CloseEvent();
-					// just to be on the secure side ;)
-		} else
-			CloseEvent();
-	}
-}
-
-
-void
-PPPStateMachine::UpEvent(PPPEncapsulator *encapsulator)
-{
-	LockerHelper locker(fLock);
-	
-	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
-		BringHandlersUp();
-}
-
-
-void
-PPPStateMachine::DownEvent(PPPEncapsulator *encapsulator)
 {
 }
 
@@ -566,7 +528,6 @@ PPPStateMachine::DownEvent()
 	NewPhase(PPP_DOWN_PHASE);
 	
 	DownProtocols();
-	DownEncapsulators();
 	
 	fLocalAuthenticationStatus = PPP_NOT_AUTHENTICATED;
 	fPeerAuthenticationStatus = PPP_NOT_AUTHENTICATED;
@@ -916,10 +877,10 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 	
 	// let the option handlers parse this ack
 	PPPConfigurePacket ack(packet);
-	PPPOptionHandler *handler;
+	PPPOptionHandler *optionHandler;
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
-		handler = LCP().OptionHandlerAt(index);
-		if(handler->ParseAck(ack) != B_OK) {
+		optionHandler = LCP().OptionHandlerAt(index);
+		if(optionHandler->ParseAck(ack) != B_OK) {
 			m_freem(packet);
 			locker.UnlockNow();
 			CloseEvent();
@@ -991,19 +952,19 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 	
 	// let the option handlers parse this nak/reject
 	PPPConfigurePacket nak_reject(packet);
-	PPPOptionHandler *handler;
+	PPPOptionHandler *optionHandler;
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
-		handler = LCP().OptionHandlerAt(index);
+		optionHandler = LCP().OptionHandlerAt(index);
 		
 		if(nak_reject.Code() == PPP_CONFIGURE_NAK) {
-			if(handler->ParseNak(nak_reject) != B_OK) {
+			if(optionHandler->ParseNak(nak_reject) != B_OK) {
 				m_freem(packet);
 				locker.UnlockNow();
 				CloseEvent();
 				return;
 			}
 		} else if(nak_reject.Code() == PPP_CONFIGURE_REJECT) {
-			if(handler->ParseReject(nak_reject) != B_OK) {
+			if(optionHandler->ParseReject(nak_reject) != B_OK) {
 				m_freem(packet);
 				locker.UnlockNow();
 				CloseEvent();
@@ -1156,7 +1117,7 @@ PPPStateMachine::RTAEvent(struct mbuf *packet)
 
 // receive unknown code
 void
-PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol,
+PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 	uint8 code = PPP_PROTOCOL_REJECT)
 {
 	LockerHelper locker(fLock);
@@ -1170,7 +1131,7 @@ PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol,
 		
 		default:
 			locker.UnlockNow();
-			SendCodeReject(packet, protocol, code);
+			SendCodeReject(packet, protocolNumber, code);
 	}
 }
 
@@ -1332,17 +1293,17 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 	// each handler should add unacceptable values for each item
 	status_t result;
 		// the return value of ParseRequest()
-	PPPOptionHandler *handler;
+	PPPOptionHandler *optionHandler;
 	for(int32 index = 0; index < request.CountItems(); index++) {
-		handler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
+		optionHandler = LCP().OptionHandlerFor(request.ItemAt(index)->type);
 		
-		if(!handler || !handler->IsEnabled()) {
+		if(!optionHandler || !optionHandler->IsEnabled()) {
 			// unhandled items should be added to the reject
 			reject.AddItem(request.ItemAt(index));
 			continue;
 		}
 		
-		result = handler->ParseRequest(request, index, nak, reject);
+		result = optionHandler->ParseRequest(request, index, nak, reject);
 		
 		if(result == PPP_UNHANDLED) {
 			// unhandled items should be added to the reject
@@ -1361,9 +1322,9 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 	// If we sent too many naks we should not append additional values.
 	if(fNakCounter > 0) {
 		for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
-			handler = LCP().OptionHandlerAt(index);
-			if(handler && handler->IsEnabled()) {
-				result = handler->ParseRequest(request, request.CountItems(),
+			optionHandler = LCP().OptionHandlerAt(index);
+			if(optionHandler && optionHandler->IsEnabled()) {
+				result = optionHandler->ParseRequest(request, request.CountItems(),
 					nak, reject);
 				
 				if(result != B_OK) {
@@ -1411,12 +1372,12 @@ PPPStateMachine::RXJEvent(struct mbuf *packet)
 		}
 		
 		// find the LCP extension and disable it
-		PPPLCPExtension *extension;
+		PPPLCPExtension *lcpExtension;
 		for(int32 index = 0; index < LCP().CountLCPExtensions(); index++) {
-			extension = LCP().LCPExtensionAt(index);
+			lcpExtension = LCP().LCPExtensionAt(index);
 			
-			if(extension->Code() == rejectedCode)
-				extension->SetEnabled(false);
+			if(lcpExtension->Code() == rejectedCode)
+				lcpExtension->SetEnabled(false);
 		}
 		
 		m_freem(packet);
@@ -1431,23 +1392,12 @@ PPPStateMachine::RXJEvent(struct mbuf *packet)
 			return;
 		}
 		
-		// disable protocols and encapsulators with the rejected protocl number
-		int32 index;
-		PPPProtocol *protocol_handler;
-		PPPEncapsulator *encapsulator_handler = Interface().FirstEncapsulator();
-		
-		for(index = 0; index < Interface().CountProtocols(); index++) {
-			protocol_handler = Interface().ProtocolAt(index);
-			if(protocol_handler && protocol_handler->Protocol() == rejected)
-				protocol_handler->SetEnabled(false);
+		// disable protocols with the rejected protocol number
+		PPPProtocol *protocol = Interface().FirstProtocol();
+		for(; protocol; protocol = protocol->NextProtocol()) {
+			if(protocol->ProtocolNumber() == rejected)
+				protocol->SetEnabled(false);
 					// disable protocol
-		}
-		
-		for(; encapsulator_handler;
-				encapsulator_handler = encapsulator_handler->Next()) {
-			if(encapsulator_handler->Protocol() == rejected)
-				encapsulator_handler->SetEnabled(false);
-					// disable encapsulator
 		}
 		
 		RXJGoodEvent(packet);
@@ -1487,16 +1437,15 @@ PPPStateMachine::ThisLayerUp()
 	
 	locker.UnlockNow();
 	
-	BringHandlersUp();
+	BringProtocolsUp();
 }
 
 
 void
 PPPStateMachine::ThisLayerDown()
 {
-	// PPPProtocol/Encapsulator::Down() should block if needed.
+	// PPPProtocol::Down() should block if needed.
 	DownProtocols();
-	DownEncapsulators();
 }
 
 
@@ -1653,7 +1602,7 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 
 
 bool
-PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code)
+PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code)
 {
 	if(!packet)
 		return false;
@@ -1687,9 +1636,9 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code
 	else
 		reject->length = htons(packet->m_len);
 	
-	protocol = htons(protocol);
+	protocolNumber = htons(protocolNumber);
 	if(code == PPP_PROTOCOL_REJECT)
-		memcpy(&reject->data, &protocol, sizeof(protocol));
+		memcpy(&reject->data, &protocolNumber, sizeof(protocolNumber));
 	
 	return LCP().Send(packet) == B_OK;
 }
@@ -1716,9 +1665,9 @@ PPPStateMachine::SendEchoReply(struct mbuf *request)
 }
 
 
-// methods for bringing protocols/encapsulators up
+// methods for bringing protocols up
 void
-PPPStateMachine::BringHandlersUp()
+PPPStateMachine::BringProtocolsUp()
 {
 	// use a simple check for phase changes (e.g., caused by CloseEvent())
 	while(Phase() <= PPP_ESTABLISHED_PHASE && Phase() >= PPP_AUTHENTICATION_PHASE) {
@@ -1750,29 +1699,13 @@ PPPStateMachine::BringPhaseUp()
 		return 0;
 	
 	uint32 count = 0;
-	PPPProtocol *protocol_handler;
-	PPPEncapsulator *encapsulator_handler = Interface().FirstEncapsulator();
-	
-	for(int32 index = 0; index < Interface().CountProtocols(); index++) {
-		protocol_handler = Interface().ProtocolAt(index);
-		if(protocol_handler && protocol_handler->IsEnabled()
-				&& protocol_handler->Phase() == Phase()) {
-			if(protocol_handler->IsUpRequested()) {
+	PPPProtocol *protocol = Interface().FirstProtocol();
+	for(; protocol; protocol = protocol->NextProtocol()) {
+		if(protocol->IsEnabled() && protocol->ActivationPhase() == Phase()) {
+			if(protocol->IsUpRequested()) {
 				++count;
-				protocol_handler->Up();
-			} else if(protocol_handler->IsGoingUp())
-				++count;
-		}
-	}
-	
-	for(; encapsulator_handler;
-			encapsulator_handler = encapsulator_handler->Next()) {
-		if(encapsulator_handler && encapsulator_handler->IsEnabled()
-				&& encapsulator_handler->Phase() == Phase()) {
-			if(encapsulator_handler->IsUpRequested()) {
-				++count;
-				encapsulator_handler->Up();
-			} else if(encapsulator_handler->IsGoingUp())
+				protocol->Up();
+			} else if(protocol->IsGoingUp())
 				++count;
 		}
 	}
@@ -1784,21 +1717,11 @@ PPPStateMachine::BringPhaseUp()
 void
 PPPStateMachine::DownProtocols()
 {
-	for(int32 index = 0; index < Interface().CountProtocols(); index++)
-		if(Interface().ProtocolAt(index)->IsEnabled())
-			Interface().ProtocolAt(index)->Down();
-}
-
-
-void
-PPPStateMachine::DownEncapsulators()
-{
-	PPPEncapsulator *encapsulator_handler = Interface().FirstEncapsulator();
+	PPPProtocol *protocol = Interface().FirstProtocol();
 	
-	for(; encapsulator_handler;
-			encapsulator_handler = encapsulator_handler->Next())
-		if(encapsulator_handler->IsEnabled())
-			encapsulator_handler->Down();
+	for(; protocol; protocol = protocol->NextProtocol())
+		if(protocol->IsEnabled())
+			protocol->Down();
 }
 
 

@@ -8,39 +8,26 @@
 #include <KPPPDevice.h>
 
 #include <net/if.h>
-#include <mbuf.h>
+#include <core_funcs.h>
 
 #include <PPPControl.h>
 
 
 PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 		driver_parameter *settings)
-	: fMTU(1500),
-	fIsUp(false),
+	: PPPLayer(name, PPP_DEVICE_LEVEL),
+	fMTU(1500),
 	fInterface(interface),
-	fSettings(settings)
+	fSettings(settings),
+	fIsUp(false)
 {
-	if(name)
-		fName = strdup(name);
-	else
-		fName = strdup("Unknown");
-	
-	fInitStatus = interface.SetDevice(this) ? B_OK : B_ERROR;
+	fInitStatus = interface.SetDevice(this) && fInitStatus == B_OK ? B_OK : B_ERROR;
 }
 
 
 PPPDevice::~PPPDevice()
 {
-	free(fName);
-	
 	Interface().SetDevice(NULL);
-}
-
-
-status_t
-PPPDevice::InitCheck() const
-{
-	return fInitStatus;
 }
 
 
@@ -60,6 +47,7 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 			info->inputTransferRate = InputTransferRate();
 			info->outputTransferRate = OutputTransferRate();
 			info->outputBytesCount = CountOutputBytes();
+			info->isUp = IsUp();
 		} break;
 		
 		default:
@@ -70,15 +58,22 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 }
 
 
-status_t
-PPPDevice::PassToInterface(struct mbuf *packet)
+bool
+PPPDevice::IsAllowedToSend() const
 {
-	if(!Interface().InQueue())
-		return B_ERROR;
-	
-	IFQ_ENQUEUE(Interface().InQueue(), packet);
-	
-	return B_OK;
+	return true;
+		// our connection status will be reported in Send()
+}
+
+
+status_t
+PPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
+{
+	// let the interface handle the packet
+	if(protocolNumber == 0)
+		return Interface().ReceiveFromDevice(packet);
+	else
+		return Interface().Receive(packet, protocolNumber);
 }
 
 

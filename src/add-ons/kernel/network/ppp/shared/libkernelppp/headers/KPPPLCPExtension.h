@@ -16,9 +16,12 @@
 
 
 class PPPLCPExtension {
-	public:
+	protected:
+		// PPPLCPExtension must be subclassed
 		PPPLCPExtension(const char *name, uint8 code, PPPInterface& interface,
 			driver_parameter *settings);
+
+	public:
 		virtual ~PPPLCPExtension();
 		
 		virtual status_t InitCheck() const;

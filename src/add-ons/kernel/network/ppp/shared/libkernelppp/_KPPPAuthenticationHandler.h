@@ -15,7 +15,7 @@ class _PPPAuthenticationHandler : public PPPOptionHandler {
 	public:
 		_PPPAuthenticationHandler(PPPInterface& interface);
 		
-		int32 NextAuthenticator(int32 start, ppp_side side);
+		PPPProtocol *NextAuthenticator(const PPPProtocol *start, ppp_side side) const;
 		
 		virtual status_t AddToRequest(PPPConfigurePacket& request);
 		virtual status_t ParseNak(const PPPConfigurePacket& nak);
@@ -29,7 +29,8 @@ class _PPPAuthenticationHandler : public PPPOptionHandler {
 		virtual void Reset();
 
 	private:
-		int32 fLocalIndex, fPeerIndex, fSuggestedLocalIndex, fSuggestedPeerIndex;
+		PPPProtocol *fLocalAuthenticator, *fPeerAuthenticator,
+			*fSuggestedLocalAuthenticator, *fSuggestedPeerAuthenticator;
 		bool fPeerAuthenticatorRejected;
 };
 

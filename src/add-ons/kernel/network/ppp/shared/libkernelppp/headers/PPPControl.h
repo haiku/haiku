@@ -22,7 +22,6 @@
 #define PPP_INTERFACE_OPS_START				PPP_OPS_START + PPP_RESERVE_OPS_COUNT
 #define PPP_DEVICE_OPS_START				PPP_OPS_START + 2 * PPP_RESERVE_OPS_COUNT
 #define PPP_PROTOCOL_OPS_START				PPP_OPS_START + 3 * PPP_RESERVE_OPS_COUNT
-#define PPP_ENCAPSULATOR_OPS_START			PPP_OPS_START + 4 * PPP_RESERVE_OPS_COUNT
 #define PPP_OPTION_HANDLER_OPS_START		PPP_OPS_START + 5 * PPP_RESERVE_OPS_COUNT
 #define PPP_LCP_EXTENSION_OPS_START			PPP_OPS_START + 6 * PPP_RESERVE_OPS_COUNT
 #define PPP_COMMON_OPS_START				PPP_OPS_START + 10 * PPP_RESERVE_OPS_COUNT
@@ -45,7 +44,6 @@ enum ppp_control_ops {
 	// handler access
 	PPPC_CONTROL_DEVICE,
 	PPPC_CONTROL_PROTOCOL,
-	PPPC_CONTROL_ENCAPSULATOR,
 	PPPC_CONTROL_OPTION_HANDLER,
 	PPPC_CONTROL_LCP_EXTENSION,
 	PPPC_CONTROL_CHILD,
@@ -57,10 +55,13 @@ enum ppp_control_ops {
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
+	// PPPProtocol
+	PPPC_GET_PROTOCOL_INFO = PPP_PROTOCOL_OPS_START,
+	// -----------------------------------------------------
+	
+	// -----------------------------------------------------
 	// Common/mixed ops
-	PPPC_GET_HANDLER_INFO = PPP_COMMON_OPS_START,
-		// PPPProtocol and PPPEncapsulator
-	PPPC_SET_ENABLED,
+	PPPC_ENABLE,
 	PPPC_GET_SIMPLE_HANDLER_INFO,
 		// PPPOptionHandler and PPPLCPExtension
 	// -----------------------------------------------------
@@ -71,7 +72,7 @@ enum ppp_control_ops {
 
 typedef struct ppp_control_info {
 	uint32 index;
-		// index of interface/protocol/encapsulator/etc.
+		// index of interface/protocol/etc.
 	uint32 op;
 		// the Control()/ioctl() opcode
 	void *data;
@@ -97,8 +98,7 @@ typedef struct ppp_interface_info {
 	ppp_pfc_state localPFCState, peerPFCState;
 	uint8 pfcOptions;
 	
-	uint32 protocolsCount, encapsulatorsCount, optionHandlersCount,
-		LCPExtensionsCount, childrenCount;
+	uint32 protocolsCount, optionHandlersCount, LCPExtensionsCount, childrenCount;
 	uint32 MRU, interfaceMTU;
 	
 	uint32 dialRetry, dialRetriesLimit;
@@ -118,9 +118,9 @@ typedef struct ppp_device_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
 	const driver_parameter *settings;
-	
 	uint32 MTU;
 	uint32 inputTransferRate, outputTransferRate, outputBytesCount;
+	bool isUp;
 } ppp_device_info;
 typedef struct ppp_device_info_t {
 	ppp_device_info info;
@@ -128,39 +128,32 @@ typedef struct ppp_device_info_t {
 } ppp_device_info_t;
 
 
-typedef struct ppp_handler_info {
+typedef struct ppp_protocol_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+	char type[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
-	// general
 	const driver_parameter *settings;
-	
-	ppp_phase phase;
+	ppp_phase activationPhase;
 	int32 addressFamily, flags;
 	ppp_side side;
-	uint16 protocol;
+	ppp_level level;
+	uint32 overhead;
 	
-	bool isEnabled;
-	
-	// only protocol and encapsulator
-	bool isUpRequested;
-	ppp_phase connectionStatus;
+	ppp_phase connectionPhase;
 		// there are four possible states:
 		// PPP_ESTABLISHED_PHASE	-		IsUp() == true
 		// PPP_DOWN_PHASE			-		IsDown() == true
 		// PPP_ESTABLISHMENT_PHASE	-		IsGoingUp() == true
 		// PPP_TERMINATION_PHASE	-		IsGoingDown() == true
 	
-	// only protocol
-	char type[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
-	
-	// only encapsulator
-	ppp_encapsulation_level level;
-	uint32 overhead;
-} ppp_handler_info;
-typedef struct ppp_handler_info_t {
-	ppp_handler_info info;
-	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_handler_info)];
-} ppp_handler_info_t;
+	uint16 protocolNumber;
+	bool isEnabled;
+	bool isUpRequested;
+} ppp_protocol_info;
+typedef struct ppp_protocol_info_t {
+	ppp_protocol_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_protocol_info)];
+} ppp_protocol_info_t;
 
 
 typedef struct ppp_simple_handler_info {

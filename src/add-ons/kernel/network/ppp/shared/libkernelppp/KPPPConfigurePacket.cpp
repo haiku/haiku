@@ -8,6 +8,8 @@
 #include <KPPPConfigurePacket.h>
 #include <KPPPInterface.h>
 
+#include <core_funcs.h>
+
 
 PPPConfigurePacket::PPPConfigurePacket(uint8 code)
 	: fCode(code)

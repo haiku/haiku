@@ -10,7 +10,6 @@
 
 #include <KPPPDefs.h>
 
-class PPPEncapsulator;
 class PPPProtocol;
 
 #ifndef _K_PPP_INTERFACE__H
@@ -84,11 +83,6 @@ class PPPStateMachine {
 		void UpEvent(PPPProtocol *protocol);
 		void DownEvent(PPPProtocol *protocol);
 		
-		// encapsulator events
-		void UpFailedEvent(PPPEncapsulator *encapsulator);
-		void UpEvent(PPPEncapsulator *encapsulator);
-		void DownEvent(PPPEncapsulator *encapsulator);
-		
 		// device events
 		bool TLSNotify();
 		bool TLFNotify();
@@ -115,7 +109,7 @@ class PPPStateMachine {
 		void RCNEvent(struct mbuf *packet);
 		void RTREvent(struct mbuf *packet);
 		void RTAEvent(struct mbuf *packet);
-		void RUCEvent(struct mbuf *packet, uint16 protocol,
+		void RUCEvent(struct mbuf *packet, uint16 protocolNumber,
 			uint8 code = PPP_PROTOCOL_REJECT);
 		void RXJGoodEvent(struct mbuf *packet);
 		void RXJBadEvent(struct mbuf *packet);
@@ -139,14 +133,13 @@ class PPPStateMachine {
 		bool SendConfigureNak(struct mbuf *packet);
 		bool SendTerminateRequest();
 		bool SendTerminateAck(struct mbuf *request = NULL);
-		bool SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code);
+		bool SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code);
 		bool SendEchoReply(struct mbuf *request);
 		
-		void BringHandlersUp();
+		void BringProtocolsUp();
 		uint32 BringPhaseUp();
 		
 		void DownProtocols();
-		void DownEncapsulators();
 		void ResetLCPHandlers();
 
 	private:

@@ -9,22 +9,21 @@
 #define _K_PPP_DEVICE__H
 
 #include <KPPPDefs.h>
+#include <KPPPLayer.h>
 
 #ifndef _K_PPP_INTERFACE__H
 #include <KPPPInterface.h>
 #endif
 
 
-class PPPDevice {
-	public:
+class PPPDevice : public PPPLayer {
+	protected:
+		// PPPDevice must be subclassed
 		PPPDevice(const char *name, PPPInterface& interface,
 			driver_parameter *settings);
+
+	public:
 		virtual ~PPPDevice();
-		
-		virtual status_t InitCheck() const;
-		
-		const char *Name() const
-			{ return fName; }
 		
 		PPPInterface& Interface() const
 			{ return fInterface; }
@@ -37,9 +36,9 @@ class PPPDevice {
 			{ return fMTU; }
 		
 		// these calls must not block
-		virtual void Up() = 0;
-		virtual void Down() = 0;
-		virtual void Listen() = 0;
+		virtual bool Up() = 0;
+		virtual bool Down() = 0;
+		virtual bool Listen() = 0;
 		bool IsUp() const
 			{ return fIsUp; }
 		
@@ -51,13 +50,14 @@ class PPPDevice {
 		virtual uint32 CountOutputBytes() const = 0;
 			// how many bytes are waiting to be sent?
 		
-		virtual status_t Send(struct mbuf *packet) = 0;
-			// This should enqueue the packet and return immediately.
+		virtual bool IsAllowedToSend() const;
+			// always returns true
+		
+		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber) = 0;
+			// This should enqueue the packet and return immediately (never block).
 			// The device is responsible for freeing the packet.
-		status_t PassToInterface(struct mbuf *packet);
-			// This will pass the packet to the interface's queue.
-			// Do not call Interface::ReceiveFromDevice directly
-			// if this can block a Send()!
+		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+			// this method is never used
 		
 		virtual void Pulse();
 
@@ -79,13 +79,13 @@ class PPPDevice {
 	protected:
 		uint32 fMTU;
 			// always hold this value up-to-date!
-		bool fIsUp;
-		status_t fInitStatus;
 
 	private:
 		char *fName;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
+		
+		bool fIsUp;
 };
 
 

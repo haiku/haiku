@@ -10,7 +10,7 @@
 // void (KernelExport.h) and once with int (stdio.h).
 #include <cstdio>
 #include <cstring>
-#include <new.h>
+#include <core_funcs.h>
 
 // now our headers...
 #include <KPPPInterface.h>
@@ -18,7 +18,6 @@
 // our other classes
 #include <PPPControl.h>
 #include <KPPPDevice.h>
-#include <KPPPEncapsulator.h>
 #include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 #include <KPPPModule.h>
@@ -37,6 +36,11 @@
 #include "_KPPPPFCHandler.h"
 
 
+#ifdef _KERNEL_MODE
+#define spawn_thread spawn_kernel_thread
+#endif
+
+
 // TODO:
 // - implement timers with support for settings next time instead of receiving timer
 //    events periodically
@@ -52,13 +56,13 @@ typedef struct redial_info {
 status_t redial_thread(void *data);
 
 // other functions
-status_t in_queue_thread(void *data);
 status_t interface_deleter_thread(void *data);
 
 
 PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		PPPInterface *parent = NULL)
-	: fID(ID),
+	: PPPLayer("PPPInterface", PPP_INTERFACE_LEVEL),
+	fID(ID),
 	fSettings(dup_driver_settings(settings)),
 	fStateMachine(*this),
 	fLCP(*this),
@@ -78,7 +82,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	fPeerPFCState(PPP_PFC_DISABLED),
 	fPFCOptions(0),
 	fDevice(NULL),
-	fFirstEncapsulator(NULL),
+	fFirstProtocol(NULL),
 	fLock(StateMachine().Locker()),
 	fDeleteCounter(0)
 {
@@ -105,13 +109,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	fRedialDelay = 1000;
 		// 1s delay between lost connection and redial
 	
-	// set up queue
-	fInQueue = start_ifq();
-	fInQueueThread = spawn_thread(in_queue_thread, "PPPInterface: in_queue_thread",
-		B_NORMAL_PRIORITY, this);
-	resume_thread(fInQueueThread);
-	
-	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
+	if(get_module(PPP_INTERFACE_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
 	
 	// are we a multilink subinterface?
@@ -166,7 +164,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		// auto redial is disabled by default
 	
 	// load all protocols and the device
-	if(LoadModules(fSettings, 0, fSettings->parameter_count))
+	if(LoadModules(fSettings, 0, fSettings->parameter_count) && fInitStatus == B_OK)
 		fInitStatus = B_OK;
 	else
 		fInitStatus = B_ERROR;
@@ -181,7 +179,7 @@ PPPInterface::~PPPInterface()
 	UnregisterInterface();
 	
 	if(fManager)
-		fManager->remove_interface(ID());
+		fManager->RemoveInterface(ID());
 	
 	// Call Down() until we get a lock on an interface that is down.
 	// This lock is not released until we are actually deleted.
@@ -197,9 +195,6 @@ PPPInterface::~PPPInterface()
 		// tell all listeners that we are being destroyed
 	
 	int32 tmp;
-	stop_ifq(InQueue());
-	wait_for_thread(fInQueueThread, &tmp);
-	
 	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
 		// tell thread that we are being destroyed (200ms timeout)
 	wait_for_thread(fRedialThread, &tmp);
@@ -212,8 +207,8 @@ PPPInterface::~PPPInterface()
 	while(CountProtocols())
 		delete ProtocolAt(0);
 	
-	while(FirstEncapsulator())
-		delete FirstEncapsulator();
+	while(FirstProtocol())
+		delete FirstProtocol();
 	
 	for(int32 index = 0; index < fModules.CountItems(); index++) {
 		put_module(fModules.ItemAt(index));
@@ -226,7 +221,7 @@ PPPInterface::~PPPInterface()
 		Parent()->RemoveChild(this);
 	
 	if(fManager)
-		put_module(PPP_MANAGER_MODULE_NAME);
+		put_module(PPP_INTERFACE_MODULE_NAME);
 }
 
 
@@ -238,7 +233,7 @@ PPPInterface::Delete()
 			// only one thread should delete us!
 	
 	if(fManager)
-		fManager->delete_interface(ID());
+		fManager->DeleteInterface(ID());
 			// This will mark us for deletion.
 			// Any subsequent calls to delete_interface() will do nothing.
 	else {
@@ -254,7 +249,10 @@ PPPInterface::Delete()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fSettings || !fManager || fInitStatus != B_OK)
+	if(fInitStatus != B_OK)
+		return fInitStatus;
+	
+	if(!fSettings || !fManager)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
@@ -306,7 +304,6 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			info->peerPFCState = PeerPFCState();
 			info->pfcOptions = PFCOptions();
 			info->protocolsCount = CountProtocols();
-			info->encapsulatorsCount = CountEncapsulators();
 			info->optionHandlersCount = LCP().CountOptionHandlers();
 			info->LCPExtensionsCount = 0;
 			info->childrenCount = CountChildren();
@@ -379,25 +376,11 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 				return B_ERROR;
 			
 			ppp_control_info *control = (ppp_control_info*) data;
-			PPPProtocol *protocol_handler = ProtocolAt(control->index);
-			if(!protocol_handler)
+			PPPProtocol *protocol = ProtocolAt(control->index);
+			if(!protocol)
 				return B_BAD_INDEX;
 			
-			return protocol_handler->Control(control->op, control->data,
-				control->length);
-		} break;
-		
-		case PPPC_CONTROL_ENCAPSULATOR: {
-			if(length < sizeof(ppp_control_info) || !data)
-				return B_ERROR;
-			
-			ppp_control_info *control = (ppp_control_info*) data;
-			PPPEncapsulator *encapsulator_handler = EncapsulatorAt(control->index);
-			if(!encapsulator_handler)
-				return B_BAD_INDEX;
-			
-			return encapsulator_handler->Control(control->op, control->data,
-				control->length);
+			return protocol->Control(control->op, control->data, control->length);
 		} break;
 		
 		case PPPC_CONTROL_OPTION_HANDLER: {
@@ -405,11 +388,11 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 				return B_ERROR;
 			
 			ppp_control_info *control = (ppp_control_info*) data;
-			PPPOptionHandler *option_handler = LCP().OptionHandlerAt(control->index);
-			if(!option_handler)
+			PPPOptionHandler *optionHandler = LCP().OptionHandlerAt(control->index);
+			if(!optionHandler)
 				return B_BAD_INDEX;
 			
-			return option_handler->Control(control->op, control->data,
+			return optionHandler->Control(control->op, control->data,
 				control->length);
 		} break;
 		
@@ -418,11 +401,11 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 				return B_ERROR;
 			
 			ppp_control_info *control = (ppp_control_info*) data;
-			PPPLCPExtension *extension_handler = LCP().LCPExtensionAt(control->index);
-			if(!extension_handler)
+			PPPLCPExtension *lcpExtension = LCP().LCPExtensionAt(control->index);
+			if(!lcpExtension)
 				return B_BAD_INDEX;
 			
-			return extension_handler->Control(control->op, control->data,
+			return lcpExtension->Control(control->op, control->data,
 				control->length);
 		} break;
 		
@@ -466,6 +449,7 @@ PPPInterface::SetDevice(PPPDevice *device)
 		Down();
 	
 	fDevice = device;
+	SetNext(device);
 	
 	fMRU = fDevice->MTU() - 2;
 	
@@ -479,19 +463,52 @@ PPPInterface::SetDevice(PPPDevice *device)
 bool
 PPPInterface::AddProtocol(PPPProtocol *protocol)
 {
-	if(!protocol)
+	// Find instert position after the last protocol
+	// with the same level.
+	
+	if(!protocol || protocol->Level() == PPP_INTERFACE_LEVEL)
 		return false;
 	
 	LockerHelper locker(fLock);
 	
 	if(Phase() != PPP_DOWN_PHASE)
 		return false;
-			// a running connection may not change and there may only be
-			// one authenticator protocol for each protocol number
+			// a running connection may not change
 	
-	fProtocols.AddItem(protocol);
+	PPPProtocol *current = fFirstProtocol, *previous = NULL;
 	
-	if(IsUp() || Phase() >= protocol->Phase())
+	while(current) {
+		if(current->Level() < protocol->Level())
+			break;
+		
+		previous = current;
+		current = current->NextProtocol();
+	}
+	
+	if(!current) {
+		if(!previous)
+			fFirstProtocol = protocol;
+		else
+			previous->SetNextProtocol(protocol);
+		
+		// set up the last protocol in the chain
+		protocol->SetNextProtocol(NULL);
+			// this also sets next to NULL
+		protocol->SetNext(this);
+			// we need to set us as the next layer
+	} else {
+		protocol->SetNextProtocol(current);
+		
+		if(!previous)
+			fFirstProtocol = protocol;
+		else
+			previous->SetNextProtocol(protocol);
+	}
+	
+	if(protocol->Level() < PPP_PROTOCOL_LEVEL)
+		CalculateInterfaceMTU();
+	
+	if(IsUp() || Phase() >= protocol->ActivationPhase())
 		protocol->Up();
 	
 	return true;
@@ -507,128 +524,23 @@ PPPInterface::RemoveProtocol(PPPProtocol *protocol)
 		return false;
 			// a running connection may not change
 	
-	if(!fProtocols.HasItem(protocol))
-		return false;
-	
-	if(IsUp() || Phase() >= protocol->Phase())
-		protocol->Down();
-	
-	return fProtocols.RemoveItem(protocol);
-}
-
-
-PPPProtocol*
-PPPInterface::ProtocolAt(int32 index) const
-{
-	PPPProtocol *protocol = fProtocols.ItemAt(index);
-	
-	if(protocol == fProtocols.GetDefaultItem())
-		return NULL;
-	
-	return protocol;
-}
-
-
-PPPProtocol*
-PPPInterface::ProtocolFor(uint16 protocol, int32 *start = NULL) const
-{
-	// The iteration style in this method is strange C/C++.
-	// Explanation: I use this style because it makes extending all XXXFor
-	// methods simpler as that they look very similar, now.
-	
-	int32 index = start ? *start : 0;
-	
-	if(index < 0)
-		return NULL;
-	
-	PPPProtocol *current = ProtocolAt(index);
-	
-	for(; current; current = ProtocolAt(++index)) {
-		if(current->Protocol() == protocol
-				|| (current->Flags() & PPP_INCLUDES_NCP
-					&& current->Protocol() & 0x7FFF == protocol & 0x7FFF)) {
-			if(start)
-				*start = index;
-			return current;
-		}
-	}
-	
-	return NULL;
-}
-
-
-bool
-PPPInterface::AddEncapsulator(PPPEncapsulator *encapsulator)
-{
-	// Find instert position after the last encapsulator
-	// with the same level.
-	
-	if(!encapsulator)
-		return false;
-	
-	LockerHelper locker(fLock);
-	
-	if(Phase() != PPP_DOWN_PHASE)
-		return false;
-			// a running connection may not change
-	
-	PPPEncapsulator *current = fFirstEncapsulator, *previous = NULL;
+	PPPProtocol *current = fFirstProtocol, *previous = NULL;
 	
 	while(current) {
-		if(current->Level() < encapsulator->Level())
-			break;
-		
-		previous = current;
-		current = current->Next();
-	}
-	
-	if(!current) {
-		if(!previous)
-			fFirstEncapsulator = encapsulator;
-		else
-			previous->SetNext(encapsulator);
-		
-		encapsulator->SetNext(NULL);
-	} else {
-		encapsulator->SetNext(current);
-		
-		if(!previous)
-			fFirstEncapsulator = encapsulator;
-		else
-			previous->SetNext(encapsulator);
-	}
-	
-	CalculateInterfaceMTU();
-	
-	if(IsUp())
-		encapsulator->Up();
-	
-	return true;
-}
-
-
-bool
-PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
-{
-	LockerHelper locker(fLock);
-	
-	if(Phase() != PPP_DOWN_PHASE)
-		return false;
-			// a running connection may not change
-	
-	PPPEncapsulator *current = fFirstEncapsulator, *previous = NULL;
-	
-	while(current) {
-		if(current == encapsulator) {
-			if(IsUp())
-				encapsulator->Down();
+		if(current == protocol) {
+			if(!protocol->IsDown())
+				protocol->Down();
 			
-			if(previous)
-				previous->SetNext(current->Next());
-			else
-				fFirstEncapsulator = current->Next();
+			if(previous) {
+				previous->SetNextProtocol(current->NextProtocol());
+				
+				// set us as next layer if needed
+				if(!previous->Next())
+					previous->SetNext(this);
+			} else
+				fFirstProtocol = current->NextProtocol();
 			
-			current->SetNext(NULL);
+			current->SetNextProtocol(NULL);
 			
 			CalculateInterfaceMTU();
 			
@@ -636,7 +548,7 @@ PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
 		}
 		
 		previous = current;
-		current = current->Next();
+		current = current->NextProtocol();
 	}
 	
 	return false;
@@ -644,39 +556,39 @@ PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
 
 
 int32
-PPPInterface::CountEncapsulators() const
+PPPInterface::CountProtocols() const
 {
-	PPPEncapsulator *encapsulator = FirstEncapsulator();
+	PPPProtocol *protocol = FirstProtocol();
 	int32 count = 0;
-	for(; encapsulator; encapsulator = encapsulator->Next())
+	for(; protocol; protocol = protocol->NextProtocol())
 		++count;
 	
 	return count;
 }
 
 
-PPPEncapsulator*
-PPPInterface::EncapsulatorAt(int32 index) const
+PPPProtocol*
+PPPInterface::ProtocolAt(int32 index) const
 {
-	PPPEncapsulator *encapsulator = FirstEncapsulator();
+	PPPProtocol *protocol = FirstProtocol();
 	int32 currentIndex = 0;
-	for(; encapsulator; encapsulator = encapsulator->Next(), ++currentIndex)
+	for(; protocol; protocol = protocol->NextProtocol(), ++currentIndex)
 		if(currentIndex == index)
-			return encapsulator;
+			return protocol;
 	
 	return NULL;
 }
 
 
-PPPEncapsulator*
-PPPInterface::EncapsulatorFor(uint16 protocol, PPPEncapsulator *start = NULL) const
+PPPProtocol*
+PPPInterface::ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) const
 {
-	PPPEncapsulator *current = start ? start : fFirstEncapsulator;
+	PPPProtocol *current = start ? start : FirstProtocol();
 	
-	for(; current; current = current->Next()) {
-		if(current->Protocol() == protocol
+	for(; current; current = current->NextProtocol()) {
+		if(current->ProtocolNumber() == protocolNumber
 				|| (current->Flags() & PPP_INCLUDES_NCP
-					&& current->Protocol() & 0x7FFF == protocol & 0x7FFF))
+					&& current->ProtocolNumber() & 0x7FFF == protocolNumber & 0x7FFF))
 			return current;
 	}
 	
@@ -1065,7 +977,7 @@ PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 	if(IsMultilink() && !Parent()) {
 		// main interfaces only load the multilink module
 		// and create a child using their settings
-		fManager->create_interface(settings, ID());
+		fManager->CreateInterface(settings, ID());
 		return true;
 	}
 	
@@ -1123,150 +1035,15 @@ PPPInterface::LoadModule(const char *name, driver_parameter *parameter,
 }
 
 
-status_t
-PPPInterface::Send(struct mbuf *packet, uint16 protocol)
+bool
+PPPInterface::IsAllowedToSend() const
 {
-	if(!packet)
-		return B_ERROR;
-	
-	// we must pass the basic tests!
-	if(InitCheck() != B_OK) {
-		m_freem(packet);
-		return B_ERROR;
-	}
-	
-	// test whether are going down
-	if(Phase() == PPP_TERMINATION_PHASE) {
-		m_freem(packet);
-		return B_ERROR;
-	}
-	
-	// go up if DialOnDemand enabled and we are down
-	if(DoesDialOnDemand() && Phase() == PPP_DOWN_PHASE)
-		Up();
-	
-	// find the protocol handler for the current protocol number
-	int32 index = 0;
-	PPPProtocol *sending_protocol = ProtocolFor(protocol, &index);
-	while(sending_protocol && !sending_protocol->IsEnabled())
-		sending_protocol = ProtocolFor(protocol, &(++index));
-	
-	// Check if we must encapsulate the packet.
-	// We do not necessarily need a handler for 'protocol'.
-	// In such a case we still encapsulate the packet.
-	// Protocols which have the PPP_ALWAYS_ALLOWED flag set are never
-	// encapsulated.
-	if(sending_protocol && sending_protocol->Flags() & PPP_ALWAYS_ALLOWED
-			&& is_handler_allowed(*sending_protocol, State(), Phase())) {
-		fIdleSince = real_time_clock();
-		return SendToDevice(packet, protocol);
-	}
-	
-	// try the same for the encapsulator handler
-	PPPEncapsulator *sending_encapsulator = EncapsulatorFor(protocol);
-	while(sending_encapsulator && sending_encapsulator->Next()
-			&& !sending_encapsulator->IsEnabled())
-		sending_encapsulator = sending_encapsulator->Next() ?
-			EncapsulatorFor(protocol, sending_encapsulator->Next()) : NULL;
-	
-	if(sending_encapsulator && sending_encapsulator->Flags() & PPP_ALWAYS_ALLOWED
-			&& is_handler_allowed(*sending_encapsulator, State(), Phase())) {
-		fIdleSince = real_time_clock();
-		return SendToDevice(packet, protocol);
-	}
-	
-	// never send normal protocols when we are not up
-	if(!IsUp()) {
-		m_freem(packet);
-		return B_ERROR;
-	}
-	
-	fIdleSince = real_time_clock();
-	
-	// send to next up encapsulator
-	if(!fFirstEncapsulator)
-		return SendToDevice(packet, protocol);
-	
-	if(!fFirstEncapsulator->IsEnabled())
-		return fFirstEncapsulator->SendToNext(packet, protocol);
-	
-	if(is_handler_allowed(*fFirstEncapsulator, State(), Phase()))
-		return fFirstEncapsulator->Send(packet, protocol);
-	
-	m_freem(packet);
-	return B_ERROR;
+	return true;
 }
 
 
 status_t
-PPPInterface::Receive(struct mbuf *packet, uint16 protocol)
-{
-	if(!packet)
-		return B_ERROR;
-	
-	int32 result = PPP_REJECTED;
-		// assume we have no handler
-	
-	// Set our interface as the receiver.
-	// The real netstack protocols (IP, IPX, etc.) might get confused if our
-	// interface is a main interface and at the same time is not registered
-	// because then there is no receiver interface.
-	// PPP NCPs should be aware of that!
-	if(packet->m_flags & M_PKTHDR && Ifnet() != NULL)
-		packet->m_pkthdr.rcvif = Ifnet();
-	
-	// Find handler and let it parse the packet.
-	// The handler does need not be up because if we are a server
-	// the handler might be upped by this packet.
-	PPPEncapsulator *encapsulator_handler = EncapsulatorFor(protocol);
-	for(; encapsulator_handler;
-			encapsulator_handler =
-				encapsulator_handler->Next() ?
-					EncapsulatorFor(protocol, encapsulator_handler->Next()) : NULL) {
-		if(!encapsulator_handler->IsEnabled()
-				|| !is_handler_allowed(*encapsulator_handler, State(), Phase()))
-			continue;
-				// skip handler if disabled or not allowed
-		
-		result = encapsulator_handler->Receive(packet, protocol);
-		if(result == PPP_UNHANDLED)
-			continue;
-		
-		return result;
-	}
-	
-	// no encapsulator handler could be found; try a protocol handler
-	int32 index = 0;
-	PPPProtocol *protocol_handler = ProtocolFor(protocol, &index);
-	for(; protocol_handler; protocol_handler = ProtocolFor(protocol, &(++index))) {
-		if(!protocol_handler->IsEnabled()
-				|| !is_handler_allowed(*protocol_handler, State(), Phase()))
-			continue;
-				// skip handler if disabled or not allowed
-		
-		result = protocol_handler->Receive(packet, protocol);
-		if(result == PPP_UNHANDLED)
-			continue;
-		
-		return result;
-	}
-	
-	// maybe the parent interface can handle the packet
-	if(Parent())
-		return Parent()->Receive(packet, protocol);
-	
-	if(result == PPP_UNHANDLED) {
-		m_freem(packet);
-		return PPP_DISCARDED;
-	} else {
-		StateMachine().RUCEvent(packet, protocol);
-		return PPP_REJECTED;
-	}
-}
-
-
-status_t
-PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
+PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(!packet)
 		return B_ERROR;
@@ -1295,27 +1072,27 @@ PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 	}
 	
 	// find the protocol handler for the current protocol number
-	int32 index = 0;
-	PPPProtocol *sending_protocol = ProtocolFor(protocol, &index);
-	while(sending_protocol && !sending_protocol->IsEnabled())
-		sending_protocol = ProtocolFor(protocol, &(++index));
+	PPPProtocol *protocol = ProtocolFor(protocolNumber);
+	while(protocol && !protocol->IsEnabled())
+		protocol = protocol->NextProtocol() ?
+			ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL;
 	
 	// make sure that protocol is allowed to send and everything is up
-	if(!Device()->IsUp() || !sending_protocol || !sending_protocol->IsEnabled()
-			|| !is_handler_allowed(*sending_protocol, State(), Phase())){
+	if(!Device()->IsUp() || !protocol || !protocol->IsEnabled()
+			|| !IsProtocolAllowed(*protocol)){
 		m_freem(packet);
 		return B_ERROR;
 	}
 	
 	// encode in ppp frame and consider using PFC
-	if(UseLocalPFC() && protocol & 0xFF00 == 0) {
+	if(UseLocalPFC() && protocolNumber & 0xFF00 == 0) {
 		M_PREPEND(packet, 1);
 		
 		if(packet == NULL)
 			return B_ERROR;
 		
 		uint8 *header = mtod(packet, uint8*);
-		*header = protocol & 0xFF;
+		*header = protocolNumber & 0xFF;
 	} else {
 		M_PREPEND(packet, 2);
 		
@@ -1323,9 +1100,9 @@ PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 			return B_ERROR;
 		
 		// set protocol (the only header field)
-		protocol = htons(protocol);
+		protocolNumber = htons(protocolNumber);
 		uint16 *header = mtod(packet, uint16*);
-		*header = protocol;
+		*header = protocolNumber;
 	}
 	
 	fIdleSince = real_time_clock();
@@ -1339,11 +1116,61 @@ PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 			return B_ERROR;
 		}
 		
-		return Device()->Send(packet);
+		return SendToNext(packet, 0);
+			// this is normally the device, but there can be something inbetween
 	} else {
-		// the multilink encapsulator should have sent it to some child interface
+		// the multilink protocol should have sent it to some child interface
 		m_freem(packet);
 		return B_ERROR;
+	}
+}
+
+
+status_t
+PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
+{
+	if(!packet)
+		return B_ERROR;
+	
+	int32 result = PPP_REJECTED;
+		// assume we have no handler
+	
+	// Set our interface as the receiver.
+	// The real netstack protocols (IP, IPX, etc.) might get confused if our
+	// interface is a main interface and at the same time is not registered
+	// because then there is no receiver interface.
+	// PPP NCPs should be aware of that!
+	if(packet->m_flags & M_PKTHDR && Ifnet() != NULL)
+		packet->m_pkthdr.rcvif = Ifnet();
+	
+	// Find handler and let it parse the packet.
+	// The handler does need not be up because if we are a server
+	// the handler might be upped by this packet.
+	PPPProtocol *protocol = ProtocolFor(protocolNumber);
+	for(; protocol;
+			protocol = protocol->NextProtocol() ?
+				ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL) {
+		if(!protocol->IsEnabled() || !IsProtocolAllowed(*protocol))
+			continue;
+				// skip handler if disabled or not allowed
+		
+		result = protocol->Receive(packet, protocolNumber);
+		if(result == PPP_UNHANDLED)
+			continue;
+		
+		return result;
+	}
+	
+	// maybe the parent interface can handle the packet
+	if(Parent())
+		return Parent()->Receive(packet, protocolNumber);
+	
+	if(result == PPP_UNHANDLED) {
+		m_freem(packet);
+		return PPP_DISCARDED;
+	} else {
+		StateMachine().RUCEvent(packet, protocolNumber);
+		return PPP_REJECTED;
 	}
 }
 
@@ -1360,15 +1187,15 @@ PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 	}
 	
 	// decode ppp frame and recognize PFC
-	uint16 protocol = *mtod(packet, uint8*);
-	if(protocol == 0)
+	uint16 protocolNumber = *mtod(packet, uint8*);
+	if(protocolNumber == 0)
 		m_adj(packet, 1);
 	else {
-		protocol = ntohs(*mtod(packet, uint16*));
+		protocolNumber = ntohs(*mtod(packet, uint16*));
 		m_adj(packet, 2);
 	}
 	
-	return Receive(packet, protocol);
+	return Receive(packet, protocolNumber);
 }
 
 
@@ -1389,12 +1216,9 @@ PPPInterface::Pulse()
 	if(Device())
 		Device()->Pulse();
 	
-	for(int32 index = 0; index < CountProtocols(); index++)
-		ProtocolAt(index)->Pulse();
-	
-	PPPEncapsulator *encapsulator = fFirstEncapsulator;
-	for(; encapsulator; encapsulator = encapsulator->Next())
-		encapsulator->Pulse();
+	PPPProtocol *protocol = FirstProtocol();
+	for(; protocol; protocol = protocol->NextProtocol())
+		protocol->Pulse();
 }
 
 
@@ -1418,7 +1242,7 @@ PPPInterface::RegisterInterface()
 	if(!fManager)
 		return false;
 	
-	fIfnet = fManager->register_interface(ID());
+	fIfnet = fManager->RegisterInterface(ID());
 	
 	if(!fIfnet)
 		return false;
@@ -1445,7 +1269,7 @@ PPPInterface::UnregisterInterface()
 	if(!fManager)
 		return false;
 	
-	fManager->unregister_interface(ID());
+	fManager->UnregisterInterface(ID());
 	fIfnet = NULL;
 	
 	return true;
@@ -1457,7 +1281,7 @@ status_t
 PPPInterface::StackControl(uint32 op, void *data)
 {
 	// TODO:
-	// implement when writing ppp_manager module
+	// implement when writing ppp interface module
 	
 	switch(op) {
 		default:
@@ -1500,16 +1324,15 @@ PPPInterface::StackControlEachHandler(uint32 op, void *data)
 {
 	status_t result = B_BAD_VALUE, tmp;
 	
-	PPPEncapsulator *encapsulator = FirstEncapsulator();
-	for(; encapsulator; encapsulator = encapsulator->Next()) {
-		tmp = encapsulator->StackControl(op, data);
+	PPPProtocol *protocol = FirstProtocol();
+	for(; protocol; protocol = protocol->NextProtocol()) {
+		tmp = protocol->StackControl(op, data);
 		if(tmp == B_OK && result == B_BAD_VALUE)
 			result = B_OK;
 		else if(tmp != B_BAD_VALUE)
 			result = tmp;
 	}
 	
-	ForEachItem(fProtocols, CallStackControl<PPPProtocol>(op, data, result));
 	ForEachItem(LCP().fLCPExtensions,
 		CallStackControl<PPPLCPExtension>(op, data, result));
 	ForEachItem(LCP().fOptionHandlers,
@@ -1525,9 +1348,11 @@ PPPInterface::CalculateInterfaceMTU()
 	fInterfaceMTU = fMRU;
 	
 	// sum all headers (the protocol field is not counted)
-	PPPEncapsulator *encapsulator = fFirstEncapsulator;
-	for(; encapsulator; encapsulator = encapsulator->Next())
-		fHeaderLength += encapsulator->Overhead();
+	PPPProtocol *protocol = FirstProtocol();
+	for(; protocol; protocol = protocol->NextProtocol()) {
+		if(protocol->Level() < PPP_PROTOCOL_LEVEL)
+			fHeaderLength += protocol->Overhead();
+	}
 	
 	fInterfaceMTU -= fHeaderLength;
 	
@@ -1603,38 +1428,12 @@ redial_thread(void *data)
 }
 
 
-status_t
-in_queue_thread(void *data)
-{
-	PPPInterface *interface = (PPPInterface*) data;
-	struct ifq *queue = interface->InQueue();
-	struct mbuf *packet;
-	status_t error;
-	
-	while(true) {
-		error = acquire_sem_etc(queue->pop, 1, B_CAN_INTERRUPT | B_DO_NOT_RESCHEDULE, 0);
-		
-		if(error == B_INTERRUPTED)
-			continue;
-		else if(error != B_NO_ERROR)
-			break;
-		
-		IFQ_DEQUEUE(queue, packet);
-		
-		if(packet)
-			interface->ReceiveFromDevice(packet);
-	}
-	
-	return B_ERROR;
-}
-
-
 // ----------------------------------
 // Function: interface_deleter_thread
 // ----------------------------------
 // The destructor is private, so this thread function cannot delete our interface.
 // To solve this problem we create a 'fake' class PPPManager (friend of PPPInterface)
-// which is only defined here (the real class is defined in the ppp_manager module).
+// which is only defined here (the real class is defined in the ppp interface module).
 class PPPManager {
 	public:
 		PPPManager(PPPInterface *interface)

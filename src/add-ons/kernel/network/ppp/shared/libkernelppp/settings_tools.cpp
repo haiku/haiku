@@ -107,7 +107,7 @@ get_side_string_value(const char *sideString, ppp_side unknownValue)
 
 
 bool
-get_string_value(const char *string, bool unknownValue)
+get_boolean_value(const char *string, bool unknownValue)
 {
 	if(!string)
 		return unknownValue;

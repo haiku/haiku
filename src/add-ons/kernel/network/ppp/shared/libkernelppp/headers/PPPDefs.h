@@ -41,16 +41,16 @@ enum {
 	// B_ERROR means that the packet is corrupted
 	// B_OK means the packet was handled correctly
 	
-	// return values for PPPProtocol and PPPEncapsulator (and PPPOptionHandler)
+	// return values for PPPProtocol
 	PPP_UNHANDLED = PPP_ERROR_BASE,
-		// The packet does not belong to this handler.
+		// The packet does not belong to this protocol.
 		// Do not delete the packet when you return this!
 	
 	// return values of PPPInterface::Receive()
 	PPP_DISCARDED,
 		// packet was silently discarded
 	PPP_REJECTED,
-		// a protocol-reject
+		// a protocol-reject was sent
 	
 	PPP_NO_CONNECTION
 		// could not send a packet because device is not connected
@@ -75,7 +75,7 @@ enum ppp_pfc_state {
 		// not used for peer state
 };
 
-// protocol and encapsulator flags
+// protocol flags
 enum {
 	PPP_NO_FLAGS = 0x00,
 	PPP_ALWAYS_ALLOWED = 0x01,
@@ -112,11 +112,15 @@ enum ppp_phase {
 };
 
 // this defines the order in which the packets get encapsulated
-enum ppp_encapsulation_level {
+enum ppp_level {
 	PPP_DEVICE_LEVEL = 0,
+	PPP_INTERFACE_LEVEL = 1,
+		// only used by PPPInterface
 	PPP_MULTILINK_LEVEL = 2,
 	PPP_ENCRYPTION_LEVEL = 5,
-	PPP_COMPRESSION_LEVEL = 10
+	PPP_COMPRESSION_LEVEL = 10,
+	PPP_PROTOCOL_LEVEL = 1000
+		// highest level possible; use for protocols that do not encapsulate
 };
 
 // we can be a ppp client or a ppp server interface
@@ -125,7 +129,7 @@ enum ppp_mode {
 	PPP_SERVER_MODE
 };
 
-// which side the protocol/encapsulator works for
+// which side the protocol works for
 enum ppp_side {
 	PPP_NO_SIDE,
 	PPP_LOCAL_SIDE,

@@ -7,20 +7,19 @@
 
 #include <KPPPInterface.h>
 #include <KPPPDevice.h>
-#include <KPPPEncapsulator.h>
 #include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 
 #include <LockerHelper.h>
 
 #include <netinet/in.h>
-#include <mbuf.h>
+#include <core_funcs.h>
 #include <sys/socket.h>
 
 
 PPPLCP::PPPLCP(PPPInterface& interface)
-	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL,
-		AF_UNSPEC, interface, NULL, PPP_ALWAYS_ALLOWED),
+	: PPPProtocol("LCP", PPP_ESTABLISHMENT_PHASE, PPP_LCP_PROTOCOL, PPP_PROTOCOL_LEVEL,
+		AF_UNSPEC, 0, interface, NULL, PPP_ALWAYS_ALLOWED),
 	fStateMachine(interface.StateMachine()),
 	fTarget(NULL)
 {
@@ -37,44 +36,44 @@ PPPLCP::~PPPLCP()
 
 
 bool
-PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
+PPPLCP::AddOptionHandler(PPPOptionHandler *optionHandler)
 {
-	if(!handler)
+	if(!optionHandler)
 		return false;
 	
 	LockerHelper locker(StateMachine().Locker());
 	
-	if(Phase() != PPP_DOWN_PHASE || OptionHandlerFor(handler->Type()))
+	if(Interface().Phase() != PPP_DOWN_PHASE || OptionHandlerFor(optionHandler->Type()))
 		return false;
 			// a running connection may not change and there may only be
 			// one handler per option type
 	
-	return fOptionHandlers.AddItem(handler);
+	return fOptionHandlers.AddItem(optionHandler);
 }
 
 
 bool
-PPPLCP::RemoveOptionHandler(PPPOptionHandler *handler)
+PPPLCP::RemoveOptionHandler(PPPOptionHandler *optionHandler)
 {
 	LockerHelper locker(StateMachine().Locker());
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
-	return fOptionHandlers.RemoveItem(handler);
+	return fOptionHandlers.RemoveItem(optionHandler);
 }
 
 
 PPPOptionHandler*
 PPPLCP::OptionHandlerAt(int32 index) const
 {
-	PPPOptionHandler *handler = fOptionHandlers.ItemAt(index);
+	PPPOptionHandler *optionHandler = fOptionHandlers.ItemAt(index);
 	
-	if(handler == fOptionHandlers.GetDefaultItem())
+	if(optionHandler == fOptionHandlers.GetDefaultItem())
 		return NULL;
 	
-	return handler;
+	return optionHandler;
 }
 
 
@@ -105,43 +104,43 @@ PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 
 
 bool
-PPPLCP::AddLCPExtension(PPPLCPExtension *extension)
+PPPLCP::AddLCPExtension(PPPLCPExtension *lcpExtension)
 {
-	if(!extension)
+	if(!lcpExtension)
 		return false;
 	
 	LockerHelper locker(StateMachine().Locker());
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
-	return fLCPExtensions.AddItem(extension);
+	return fLCPExtensions.AddItem(lcpExtension);
 }
 
 
 bool
-PPPLCP::RemoveLCPExtension(PPPLCPExtension *extension)
+PPPLCP::RemoveLCPExtension(PPPLCPExtension *lcpExtension)
 {
 	LockerHelper locker(StateMachine().Locker());
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if(Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
-	return fLCPExtensions.RemoveItem(extension);
+	return fLCPExtensions.RemoveItem(lcpExtension);
 }
 
 
 PPPLCPExtension*
 PPPLCP::LCPExtensionAt(int32 index) const
 {
-	PPPLCPExtension *extension = fLCPExtensions.ItemAt(index);
+	PPPLCPExtension *lcpExtension = fLCPExtensions.ItemAt(index);
 	
-	if(extension == fLCPExtensions.GetDefaultItem())
+	if(lcpExtension == fLCPExtensions.GetDefaultItem())
 		return NULL;
 	
-	return extension;
+	return lcpExtension;
 }
 
 
@@ -198,7 +197,7 @@ PPPLCP::Down()
 
 
 status_t
-PPPLCP::Send(struct mbuf *packet)
+PPPLCP::Send(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);
@@ -208,12 +207,12 @@ PPPLCP::Send(struct mbuf *packet)
 
 
 status_t
-PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
+PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
 	if(!packet)
 		return B_ERROR;
 	
-	if(protocol != PPP_LCP_PROTOCOL)
+	if(protocolNumber != PPP_LCP_PROTOCOL)
 		return PPP_UNHANDLED;
 	
 	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
@@ -288,12 +287,12 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 	// Try to find LCP extensions that can handle this code.
 	// We must duplicate the packet in order to ask all handlers.
 	int32 index = 0;
-	PPPLCPExtension *extension = LCPExtensionFor(data->code, &index);
-	for(; extension; extension = LCPExtensionFor(data->code, &(++index))) {
-		if(!extension->IsEnabled())
+	PPPLCPExtension *lcpExtension = LCPExtensionFor(data->code, &index);
+	for(; lcpExtension; lcpExtension = LCPExtensionFor(data->code, &(++index))) {
+		if(!lcpExtension->IsEnabled())
 			continue;
 		
-		result = extension->Receive(packet, data->code);
+		result = lcpExtension->Receive(packet, data->code);
 		
 		// check return value and return it on error
 		if(result == B_OK)

@@ -27,14 +27,13 @@
 
 class PPPDevice;
 class PPPProtocol;
-class PPPEncapsulator;
 class PPPOptionHandler;
 
-struct ppp_manager_info;
+struct ppp_interface_module_info;
 struct ppp_module_info;
 
 
-class PPPInterface {
+class PPPInterface : public PPPLayer {
 		friend class PPPStateMachine;
 		friend class PPPManager;
 
@@ -51,7 +50,7 @@ class PPPInterface {
 	public:
 		void Delete();
 		
-		status_t InitCheck() const;
+		virtual status_t InitCheck() const;
 		
 		interface_id ID() const
 			{ return fID; }
@@ -66,9 +65,6 @@ class PPPInterface {
 		
 		struct ifnet *Ifnet() const
 			{ return fIfnet; }
-		
-		struct ifq *InQueue() const
-			{ return fInQueue; }
 		
 		// delays
 		uint32 DialRetryDelay() const
@@ -90,9 +86,9 @@ class PPPInterface {
 			{ return SetMRU(interfaceMTU - fHeaderLength); }
 		uint32 InterfaceMTU() const
 			{ return fInterfaceMTU; }
-				// this is the MRU including encapsulator overhead
+				// this is the MRU including protocol overhead
 		
-		status_t Control(uint32 op, void *data, size_t length);
+		virtual status_t Control(uint32 op, void *data, size_t length);
 		
 		bool SetDevice(PPPDevice *device);
 		PPPDevice *Device() const
@@ -100,21 +96,11 @@ class PPPInterface {
 		
 		bool AddProtocol(PPPProtocol *protocol);
 		bool RemoveProtocol(PPPProtocol *protocol);
-		int32 CountProtocols() const
-			{ return fProtocols.CountItems(); }
+		int32 CountProtocols() const;
 		PPPProtocol *ProtocolAt(int32 index) const;
-		PPPProtocol *ProtocolFor(uint16 protocol, int32 *start = NULL) const;
-		int32 IndexOfProtocol(PPPProtocol *protocol) const
-			{ return fProtocols.IndexOf(protocol); }
-		
-		bool AddEncapsulator(PPPEncapsulator *encapsulator);
-		bool RemoveEncapsulator(PPPEncapsulator *encapsulator);
-		int32 CountEncapsulators() const;
-		PPPEncapsulator *EncapsulatorAt(int32 index) const;
-		PPPEncapsulator *FirstEncapsulator() const
-			{ return fFirstEncapsulator; }
-		PPPEncapsulator *EncapsulatorFor(uint16 protocol,
-			PPPEncapsulator *start = NULL) const;
+		PPPProtocol *FirstProtocol() const
+			{ return fFirstProtocol; }
+		PPPProtocol *ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) const;
 		
 		// multilink methods
 		bool AddChild(PPPInterface *child);
@@ -158,9 +144,9 @@ class PPPInterface {
 		bool UseLocalPFC() const
 			{ return LocalPFCState() & PPP_PFC_ACCEPTED; }
 		
-		bool Up();
+		virtual bool Up();
 			// in server mode Up() listens for an incoming connection
-		bool Down();
+		virtual bool Down();
 		bool IsUp() const;
 		
 		PPPReportManager& ReportManager()
@@ -174,10 +160,13 @@ class PPPInterface {
 		bool LoadModule(const char *name, driver_parameter *parameter,
 			ppp_module_key_type type);
 		
-		status_t Send(struct mbuf *packet, uint16 protocol);
-		status_t Receive(struct mbuf *packet, uint16 protocol);
+		virtual bool IsAllowedToSend() const;
+			// always returns true
 		
-		status_t SendToDevice(struct mbuf *packet, uint16 protocol);
+		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber);
+			// sends the packet to the next handler (normally the device)
+		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber);
+		
 		status_t ReceiveFromDevice(struct mbuf *packet);
 			// This is called by the receive-thread.
 			// Only call this if it does not block Send() or
@@ -215,14 +204,13 @@ class PPPInterface {
 		PPPReportManager fReportManager;
 		struct ifnet *fIfnet;
 		
-		thread_id fUpThread, fInQueueThread;
-		struct ifq *fInQueue;
+		thread_id fUpThread;
 		
 		thread_id fRedialThread;
 		uint32 fDialRetry, fDialRetriesLimit;
 		uint32 fDialRetryDelay, fRedialDelay;
 		
-		ppp_manager_info *fManager;
+		ppp_interface_module_info *fManager;
 		
 		uint32 fIdleSince, fDisconnectAfterIdleSince;
 		uint32 fMRU, fInterfaceMTU, fHeaderLength;
@@ -238,13 +226,10 @@ class PPPInterface {
 		uint8 fPFCOptions;
 		
 		PPPDevice *fDevice;
-		PPPEncapsulator *fFirstEncapsulator;
-		List<PPPProtocol*> fProtocols;
+		PPPProtocol *fFirstProtocol;
 		List<char*> fModules;
 		
 		BLocker& fLock;
-		
-		status_t fInitStatus;
 		int32 fDeleteCounter;
 };
 
