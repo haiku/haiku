@@ -141,6 +141,27 @@ hash_remove(struct hash_table *table, void *_element)
 
 
 void *
+hash_remove_first(struct hash_table *table, uint32 *_cookie)
+{
+	uint32 index;
+
+	for (index = _cookie ? *_cookie : 0; index < table->table_size; index++) {
+		void *element = table->table[index];
+		if (element != NULL) {
+			// remove the first element we find
+			table->table[index] = (struct hash_element *)NEXT(table, element);
+			table->num_elements--;
+			if (_cookie)
+				*_cookie = index;
+			return element;
+		}
+	}
+
+	return NULL;
+}
+
+
+void *
 hash_find(struct hash_table *table, void *searchedElement)
 {
 	uint32 hash = table->hash_func(searchedElement, NULL, table->table_size);
