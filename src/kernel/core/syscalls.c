@@ -31,6 +31,7 @@
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 #include <user_atomic.h>
+#include <safemode.h>
 
 
 static inline
@@ -38,14 +39,6 @@ int
 _user_null()
 {
 	return 0;
-}
-
-// 
-static inline
-bigtime_t
-_user_system_time()
-{
-	return system_time();
 }
 
 // map to the arch specific call
