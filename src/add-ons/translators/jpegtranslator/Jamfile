@@ -3,6 +3,8 @@ SubDir OBOS_TOP src add-ons translators jpegtranslator ;
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) libjpeg ] ;
 
+SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
+
 Translator JPEGTranslator :
 
 	# JPEGTranslator
