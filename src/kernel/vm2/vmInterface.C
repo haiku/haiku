@@ -133,7 +133,9 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
 	int retVal;
+	error ("vmInterface::createArea: Creating an area!\n");
 	retVal = getAM()->createArea(AreaName,pageCount,address,addType,state,protect);
+	error ("vmInterface::createArea: Done creating an area!\n");
 	return retVal;
 	}
 
@@ -145,7 +147,9 @@ void vmInterface::freeArea(int area)
 status_t vmInterface::getAreaInfo(int Area,area_info *dest)
 	{
 	status_t retVal;
+	error ("vmInterface::getAreaInfo: Getting info about an area!\n");
 	retVal = getAM()->getAreaInfo(Area,dest);
+	error ("vmInterface::getAreaInfo: Done getting info about an area!\n");
 	return retVal;
 	}
 

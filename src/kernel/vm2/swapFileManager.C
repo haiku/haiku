@@ -16,26 +16,6 @@ swapFileManager::swapFileManager(void)
 	lockFreeList=create_sem(1,"SwapFile Free List Semaphore"); // Should have team name in it.
 }
 
-void swapFileManager::write_block(vnode &node,void *loc,unsigned long size)
-	{
-	//error ("swapFileManager::write_block: writing, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
-	if (-1==lseek(node.fd,node.offset,SEEK_SET))
-		error ("seek failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
-	if (-1==write(node.fd,loc,size))
-		error ("Write failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
-	node.valid=true;
-	//error ("swapFileManager::write_block: done, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
-	}
-
-void swapFileManager::read_block(vnode &node,void *loc,unsigned long size)
-	{
-	if (node.valid==false)
-		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
-	//error ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d into %x\n",node.fd, node.offset,loc);
-	lseek(node.fd,node.offset,SEEK_SET);
-	read(node.fd,loc,size);
-	}
-
 vnode &swapFileManager::findNode(void)
 	{
 	//error ("swapFileManager::findNode: Entering findNode \n");
@@ -43,10 +23,10 @@ vnode &swapFileManager::findNode(void)
 	//error ("swapFileManager::findNode: Finding a new node for you, Master: ");
 	vnode *newNode;
 	//error ("locking in sfm\n");
-	Lock();
+	lock();
 	newNode=reinterpret_cast<vnode *>(swapFileFreeList.next());
 	//error ("unlocking in sfm\n");
-	Unlock();
+	unlock();
 	if (!newNode)
 		{
 		newNode=new (vmBlock->vnodePool->get()) vnode;
@@ -63,15 +43,14 @@ vnode &swapFileManager::findNode(void)
 
 void swapFileManager::freeVNode(vnode &v)
 	{
-	v.count--;
-	if (v.count==0)
+	if ( atomic_add(&v.count,-1)==1)
 		{
 	//error ("locking in sfm\n");
-		Lock();
+		lock();
 		//error ("swapFileManager::freeNode: Starting Freeing a new node for you, Master: offset:%d\n",v.offset);
 		v.valid=false;
 		swapFileFreeList.add(&v);
 	//error ("unlocking in sfm\n");
-		Unlock();
+		unlock();
 		}
 	}

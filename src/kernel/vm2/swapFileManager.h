@@ -18,7 +18,8 @@ class swapFileManager {
 	void freeVNode(vnode &); // Free a node
 	void write_block(vnode &node,void *loc,unsigned long size);
 	void read_block(vnode &node,void *loc,unsigned long size);
-	void Lock() {acquire_sem(lockFreeList);}
-	void Unlock() {release_sem(lockFreeList);}
+	void lock() {acquire_sem(lockFreeList);}
+	void unlock() {release_sem(lockFreeList);}
+	int getFD(void) {return swapFile;}
 };
 #endif

@@ -71,8 +71,8 @@ area *areaManager::findAreaLock(void *address)
 area *areaManager::findArea(char *address)
 {
 	error ("Finding area by string\n");
-	lock();
 	area *retVal=NULL;
+	lock();
 	for (struct node *cur=areas.rock;cur && !retVal;cur=cur->next)
 		{
 		area *myArea=(area *)cur;
@@ -125,13 +125,13 @@ bool areaManager::fault(void *fault_address, bool writeError) // true = OK, fals
 	area *myArea;
 	bool retVal;
 	error ("Faulting \n");
-	lock();
+// 	lock(); // Normally this should occur, but since we will be locked when we read/write anyway...
 	myArea=findArea(fault_address);
 	if (myArea)
 		retVal= myArea->fault(fault_address,writeError);	
 	else
 		retVal= false;
-	unlock();
+//	unlock();
 	return retVal;
 }
 
@@ -185,11 +185,13 @@ char areaManager::getByte(unsigned long address)
 {
 	area *myArea;
 	int retVal;
+	lock();
 	myArea=findArea((void *)address);
 	if (myArea)
 		retVal=myArea->getByte(address);	
 	else
 		retVal= 0;
+	unlock();
 	return retVal;
 }
 
@@ -197,28 +199,34 @@ int areaManager::getInt(unsigned long address)
 {
 	area *myArea;
 	int retVal;
+	lock();
 	myArea=findArea((void *)address);
 	if (myArea)
 		retVal=myArea->getInt(address);	
 	else
 		retVal= 0;
+	unlock();
 	return retVal;
 }
 
 void areaManager::setByte(unsigned long address,char value)
 {
 	area *myArea;
+	lock();
 	myArea=findArea((void *)address);
 	if (myArea)
 		myArea->setByte(address,value);	
+	unlock();
 }
 
 void areaManager::setInt(unsigned long address,int value)
 {
 	area *myArea;
+	lock();
 	myArea=findArea((void *)address);
 	if (myArea)
 		myArea->setInt(address,value);	
+	unlock();
 }
 
 void areaManager::pager(int desperation)
@@ -275,3 +283,24 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	unlock();
 	return addr;
 	}
+
+status_t areaManager::munmap(void *addr,size_t len)
+		{
+		// Note that this is broken for any and all munmaps that are not full area in size. This is an all or nothing game...
+		status_t retVal=B_OK;
+		lock();
+		area *myArea=findArea(addr);
+		if (myArea)
+			{
+			removeArea(myArea);
+			myArea->freeArea();
+			vmBlock->areaPool->put(myArea);
+			}
+		else
+			{
+			error ("areaManager::munmap: unable to find requested area\n");
+			retVal=B_ERROR;
+			}
+		unlock();
+		return retVal;
+		}

@@ -2,18 +2,35 @@
 #include "vnodePool.h"
 #include "vmHeaderBlock.h"
 #include "areaManager.h"
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
-	extern vmHeaderBlock *vmBlock;
+extern vmHeaderBlock *vmBlock;
 
 void vpage::flush(void)
 	{
 	if (protection==writable && dirty)
-		vmBlock->swapMan->write_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
+		{
+		//error (vpage::write_block: writing, backingNode->fd = %d, backingNode->offset = %d, address = %x\n",backingNode->fd, backingNode->offset,loc);
+		if (-1==lseek(backingNode->fd,backingNode->offset,SEEK_SET))
+			error ("vpage::flush:seek failed, fd = %d, errno = %d, %s\n",backingNode->fd,errno,strerror(errno));
+		if (-1==write(backingNode->fd,(void *)start_address,PAGE_SIZE))
+			error ("vpage::flush: failed, fd = %d, errno = %d, %s\n",backingNode->fd,errno,strerror(errno));
+		backingNode->valid=true;
+		//error ("vpage::write_block: done, backingNode->fd = %d, backingNode->offset = %d, address = %x\n",backingNode->fd, backingNode->offset,loc);
+		}
 	}
 
 void vpage::refresh(void)
 	{
-		vmBlock->swapMan->read_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
+	if (backingNode->valid==false)
+		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
+	//error ("vpage::refresh: reading, backingNode->fd = %d, backingNode->offset = %d into %x\n",backingNode->fd, backingNode->offset,loc);
+	if (-1==lseek(backingNode->fd,backingNode->offset,SEEK_SET))
+		error ("vpage::refresh: seek failed, fd = %d, errno = %d, %s\n",backingNode->fd,errno,strerror(errno));
+	if (-1==read(backingNode->fd,(void *)start_address,PAGE_SIZE))
+		error ("vpage::refresh: failed, fd = %d, errno = %d, %s\n",backingNode->fd,errno,strerror(errno));
 	}
 
 vpage::vpage(void)
@@ -50,7 +67,7 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 			atomic_add(&(physMem->count),1);
 		physPage=physMem;
 		}
-	dirty=(physPage!=NULL);
+	dirty=false;
 	//error ("vpage::vpage: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 
@@ -61,8 +78,13 @@ void vpage::cleanup(void)
 	if (backingNode)
 		{
 		if (backingNode->fd)
-			vmBlock->swapMan->freeVNode(*backingNode);
-		vmBlock->vnodePool->put(backingNode);
+			if (backingNode->fd==vmBlock->swapMan->getFD())
+				vmBlock->swapMan->freeVNode(*backingNode);
+			else
+				{
+				if ( atomic_add(&(backingNode->count),-1)==1)
+					vmBlock->vnodePool->put(backingNode);
+				}
 		}
 	}
 
@@ -75,24 +97,21 @@ void vpage::setProtection(protectType prot)
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
 	error ("vpage::fault: virtual address = %lx, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
-	if (writeError)
+	if (writeError && physPage)
 		{
-		if (physPage)
+		dirty=true;
+		if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
 			{
-			dirty=true;
-			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
-				{
-				page *newPhysPage=vmBlock->pageMan->getPage();
-				if (!newPhysPage) // No room at the inn
-					return false;
-				memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
-				physPage=newPhysPage;
-				protection=writable;
-				backingNode=&(vmBlock->swapMan->findNode()); // Need new backing store for this node, since it was copied, the original is no good...
-				// Update the architecture specific stuff here...
-				}
-			return true; 
+			page *newPhysPage=vmBlock->pageMan->getPage();
+			if (!newPhysPage) // No room at the inn
+				return false;
+			memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
+			physPage=newPhysPage;
+			protection=writable;
+			backingNode=&(vmBlock->swapMan->findNode()); // Need new backing store for this node, since it was copied, the original is no good...
+			// Update the architecture specific stuff here...
 			}
+		return true; 
 		}
 	physPage=vmBlock->pageMan->getPage();
 	if (!physPage) // No room at the inn
@@ -102,7 +121,7 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 	// This refresh is unneeded if the data was never written out... 
 	dump();
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	dirty=true;
+	dirty=false;
 	error ("vpage::fault: Refreshed\n");
 	dump();
 	error ("vpage::fault: exiting\n");

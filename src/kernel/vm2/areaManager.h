@@ -87,25 +87,10 @@ class areaManager // One of these per process
 		int createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) ;
 		void pager(int desperation);
 		void saver(void);
-		void lock() 
-			{
-			static long lockCount=0;
-			if (!((lockCount++)%200)) 	
-				error ("locking\n"); 
-			acquire_sem(myLock);
-			}
-		void unlock() {/*error ("unlocking\n");*/release_sem(myLock);}
+		void lock() { acquire_sem(myLock); }
+		void unlock() {release_sem(myLock);}
 		void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset);
-		status_t munmap(void *addr,size_t len)
-		{
-		// Note that this is broken for any and all munmaps that are not full area in size. This is an all or nothing game...
-		status_t retVal=B_OK;
-		lock();
-		int area=findArea(addr)->getAreaID();
-		if (area) freeArea(area);	
-		unlock();
-		return retVal;
-		}
+		status_t munmap(void *addr,size_t len);
 		int cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable);
 		
 		bool fault(void *fault_address, bool writeError); // true = OK, false = panic.

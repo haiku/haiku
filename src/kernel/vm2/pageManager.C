@@ -54,7 +54,7 @@ page *pageManager::getPage(void)
 			release_sem(cleanLock);
 			//error ("pageManager::getPage:unlocked clean\n");
 			} // This could fail if someone swooped in and stole our page.
-		else if (unused.count())
+		if (!ret && unused.count())
 			{
 			//error ("pageManager::getPage:Checking unused\n");
 			acquire_sem(unusedLock);
@@ -76,7 +76,7 @@ page *pageManager::getPage(void)
 
 void pageManager::freePage(page *toFree)
 	{
-	error ("Inside freePage; old value = %d",toFree->count);
+	error ("pageManager::freePage; old value = %d\n",toFree->count);
 	if (atomic_add(&(toFree->count),-1)==1) // atomic_add returns the *PREVIOUS* value. So we need to check to see if the one we are wasting was the last one.
 		{
 		acquire_sem(inUseLock);
@@ -86,25 +86,28 @@ void pageManager::freePage(page *toFree)
 		unused.add(toFree);
 		release_sem(unusedLock);
 		}
-	error (" new value = %d, page = %x\n",toFree->count,toFree->getAddress());
+	error ("pageManager::freePage:new value = %d, page = %x\n",toFree->count,toFree->getAddress());
 	}
 
 void pageManager::cleaner(void)
 	{
 	while (1)
 		{
+		snooze(250000);	
 		if (unused.count())
 			{
 			//error ("pageManager::cleaner: About to vacuum a page\n");
 			acquire_sem(unusedLock);
 			page *first=(page *)unused.next();   
 			release_sem(unusedLock);
-			first->zero();
-			acquire_sem(cleanLock);
-			clean.add(first);
-			release_sem(cleanLock);
+			if (first)
+				{
+				first->zero();
+				acquire_sem(cleanLock);
+				clean.add(first);
+				release_sem(cleanLock);
+				}
 			//error ("pageManager::cleaner: All done with vacuum a page\n");
-			snooze(125000);	
 			}
 		}
 	}
@@ -119,13 +122,16 @@ int pageManager::desperation(void)
 void pageManager::dump(void)
 {
 	error ("Dumping the unused list\n");
+	acquire_sem(unusedLock);
 	for (struct node *cur=unused.rock;cur;)
 		{
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
 		}
+	release_sem(unusedLock);
 	error ("Dumping the clean list\n");
+	acquire_sem(cleanLock);
 	for (struct node *cur=clean.rock;cur;)
 		{
 		page *thisPage=(page *)cur;
@@ -133,10 +139,13 @@ void pageManager::dump(void)
 		cur=cur->next;
 		}
 	error ("Dumping the inuse list\n");
+	release_sem(cleanLock);
+	acquire_sem(inUseLock);
 	for (struct node *cur=inUse.rock;cur;)
 		{
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
 		}
+	release_sem(inUseLock);
 }

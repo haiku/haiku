@@ -71,6 +71,7 @@ struct loopTestParameters
 
 int32 loopTest(void *parameters)
 	{
+	try{
 	error ("Starting Loop Test!\n");
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int area1;
@@ -86,6 +87,12 @@ int32 loopTest(void *parameters)
 		snooze(params->loopSnooze);
 		}
 	}
+	catch (...)
+	{
+		error ("Exception thrown!\n");
+		exit(1);
+	}
+	}
 
 int32 getInfoTest(void *parameters)
 	{
@@ -93,6 +100,7 @@ int32 getInfoTest(void *parameters)
 	area_info ai;	
 	int area1;
 
+	try{
 	while (1)
 		{
 		snooze(params->initialSnooze);
@@ -117,9 +125,16 @@ int32 getInfoTest(void *parameters)
 		snooze(params->loopSnooze);
 		}
 	}
+	catch (...)
+	{
+		error ("Exception thrown!\n");
+		exit(1);
+	}
+	}
 
 int32 mmapTest (void *parameters)
 	{
+	try{
 	void *map;
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int size=params->areaSize; // Note that this is in bytes, not in pages
@@ -145,13 +160,19 @@ int32 mmapTest (void *parameters)
 		error ("Closed file, fd = %d\n",fd);
 		}
 	}
+	catch (...)
+	{
+		error ("Exception thrown!\n");
+		exit(1);
+	}
+	}
 
 int32 cloneTest (void *parameters)
 	{
 	loopTestParameters *params=((loopTestParameters *)parameters);
 	int area1,area2;
 	void *cloneAddr=NULL;
-
+	try {
 	while (1)
 		{
 		snooze(params->initialSnooze);
@@ -170,6 +191,12 @@ int32 cloneTest (void *parameters)
 		snooze(params->loopSnooze);
 		}
 	}
+	catch (...)
+	{
+		error ("Exception thrown!\n");
+		exit(1);
+	}
+	}
 
 int main(int argc,char **argv)
 {
@@ -184,8 +211,8 @@ int main(int argc,char **argv)
 	resume_thread(loop2=spawn_thread(loopTest,"area test 2",0,&area2Params));
 	resume_thread(loop3=spawn_thread(loopTest,"area test 3",0,&area3Params));
 	resume_thread(info1=spawn_thread(getInfoTest,"info test 1",0,&info1Params));
-	resume_thread(mmap1=spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
-	resume_thread(clone1=spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
+	//resume_thread(mmap1=spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
+	//resume_thread(clone1=spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
 
 	snooze(1000000000);
 
