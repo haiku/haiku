@@ -47,15 +47,8 @@ public:
 	void *Buffer(void) { return _buffer; }
 	ssize_t BufferSize(void) { return _buffersize; }
 	
-	status_t Read(int64 *data);
-	status_t Read(bool *data);
-	status_t Read(BPoint *data);
-	status_t Read(BRect *data);
-	status_t Read(float *data);
-	status_t Read(int *data);
-	status_t Read(long *data);
-	status_t Read(double *data);
 	status_t Read(void *data, ssize_t size);
+	template <class Type> status_t Read(Type *data);
 
 	void Rewind(void);
 	

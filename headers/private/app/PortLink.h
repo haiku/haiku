@@ -35,13 +35,7 @@ public:
 	status_t FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT);
 	
 	status_t Attach(const void *data, size_t size);
-	status_t Attach(int32 data);
-	status_t Attach(int16 data);
-	status_t Attach(int8 data);
-	status_t Attach(float data);
-	status_t Attach(bool data);
-	status_t Attach(BRect data);
-	status_t Attach(BPoint data);
+	template <class Type> status_t Attach(Type data);
 	void MakeEmpty(void);
 protected:	
 	void FlattenData(int8 **buffer,int32 *size);

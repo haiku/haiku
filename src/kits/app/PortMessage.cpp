@@ -128,130 +128,20 @@ void PortMessage::SetBuffer(const void *buffer, const ssize_t &size, const bool 
 	}
 }
 
-status_t PortMessage::Read(int64 *data)
+template <class Type> status_t PortMessage::Read(Type *data)
 {
+	int32 size = sizeof(Type);
+
 	if(!data)
 		return B_BAD_VALUE;
 
 	if( !_buffer || 
-		_buffersize<sizeof(int64) ||
-		((_index+sizeof(int64))>(_buffer+_buffersize)) )
+		(_buffersize < size) ||
+		(_index+size > _buffer+_buffersize) )
 		return B_NO_MEMORY;
 	
-	*data=*((int64*)_index);
-	_index+=sizeof(bool);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(bool *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(bool) ||
-		((_index+sizeof(bool))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((bool*)_index);
-	_index+=sizeof(bool);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(BPoint *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(BPoint) ||
-		((_index+sizeof(BPoint))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((BPoint*)_index);
-	_index+=sizeof(BPoint);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(BRect *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(BRect) ||
-		((_index+sizeof(BRect))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((BRect*)_index);
-	_index+=sizeof(BRect);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(float *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(float) ||
-		((_index+sizeof(float))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((float*)_index);
-	_index+=sizeof(float);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(int *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(int) ||
-		((_index+sizeof(int))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((int*)_index);
-	_index+=sizeof(int);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(long *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(long) ||
-		((_index+sizeof(long))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((long*)_index);
-	_index+=sizeof(long);
-	
-	return B_OK;
-}
-
-status_t PortMessage::Read(double *data)
-{
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		_buffersize<sizeof(double) ||
-		((_index+sizeof(double))>(_buffer+_buffersize)) )
-		return B_NO_MEMORY;
-	
-	*data=*((double*)_index);
-	_index+=sizeof(double);
+	*data=*((Type*)_index);
+	_index+=size;
 	
 	return B_OK;
 }
