@@ -255,6 +255,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>exit.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>merge.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>multibyte.o
@@ -399,6 +400,7 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>exit.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>merge.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>multibyte.o

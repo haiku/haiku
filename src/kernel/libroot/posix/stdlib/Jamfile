@@ -5,6 +5,7 @@ KernelObjects
 	<$(SOURCE_GRIST)>atoi.c 
 	<$(SOURCE_GRIST)>bsearch.c
 	<$(SOURCE_GRIST)>env.c
+	<$(SOURCE_GRIST)>exit.c
 	<$(SOURCE_GRIST)>heapsort.c 
 	<$(SOURCE_GRIST)>merge.c
 	<$(SOURCE_GRIST)>multibyte.c 
