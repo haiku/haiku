@@ -26,10 +26,10 @@
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
 
-StyledEditWindow::StyledEditWindow(BRect frame, int32 id)
+StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame,"untitled",B_DOCUMENT_WINDOW,0)
 {
-	InitWindow();
+	InitWindow(encoding);
 	BString unTitled;
 	unTitled.SetTo("Untitled ");
 	unTitled << id;
@@ -38,10 +38,10 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id)
 	Show();
 } /***StyledEditWindow()***/
 
-StyledEditWindow::StyledEditWindow(BRect frame, entry_ref *ref)
+StyledEditWindow::StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding)
 	: BWindow(frame,"untitled",B_DOCUMENT_WINDOW,0)
 {
-	InitWindow();
+	InitWindow(encoding);
 	OpenFile(ref);
 	Show();
 } /***StyledEditWindow()***/
@@ -57,7 +57,7 @@ StyledEditWindow::~StyledEditWindow()
 } /***~StyledEditWindow()***/
 	
 void
-StyledEditWindow::InitWindow()
+StyledEditWindow::InitWindow(uint32 encoding)
 {
 	fPrintSettings= NULL;
 	fSaveMessage= NULL;
@@ -105,7 +105,7 @@ StyledEditWindow::InitWindow()
 	fTextView= new StyledEditView(viewFrame, textBounds, this);
 	fTextView->SetDoesUndo(true);
 	fTextView->SetStylable(true);
-	
+	fTextView->SetEncoding(encoding);
 	
 	fScrollView= new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0, true, true, B_PLAIN_BORDER);
 	AddChild(fScrollView);
@@ -279,7 +279,6 @@ StyledEditWindow::InitWindow()
 	
 	fSavePanel = 0; // build lazily
 	fSavePanelEncodingMenu = 0; // build lazily
-	fSaveAsEncoding = 0; // default UTF-8
 }  /***StyledEditWindow::Initwindow()***/
 
 void
@@ -612,7 +611,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			void * ptr;
 			if (message->FindPointer("source",&ptr) == B_OK) {
 				if (fSavePanelEncodingMenu != 0) {
-					fSaveAsEncoding = (uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr);
+					fTextView->SetEncoding((uint32)fSavePanelEncodingMenu->IndexOf((BMenuItem*)ptr));
 				}
 			}
 		break;
@@ -819,7 +818,7 @@ StyledEditWindow::Save(BMessage *message)
 	if(err!= B_OK)
 		return err;
 	
-	err= fTextView->WriteStyledEditFile(&file,fSaveAsEncoding);
+	err= fTextView->WriteStyledEditFile(&file);
 	if(err != B_OK)
 		return err;
 
@@ -872,13 +871,16 @@ StyledEditWindow::SaveAs()
 			for (int index = 0; (index < roster->GetCharacterSetCount()) ; index++) {
 				const CharacterSet * cs = roster->GetCharacterSet(index);
 				BString name(cs->GetPrintName());
-				name.Append(" (");
-				name.Append(cs->GetMIMEName());
-				name.Append(")");
+				const char * mime = cs->GetMIMEName();
+				if (mime) {
+					name.Append(" (");
+					name.Append(mime);
+					name.Append(")");
+				}
 				BMenuItem * item = new BMenuItem(name.String(),new BMessage(SAVE_AS_ENCODING));
 				item->SetTarget(this);
 				fSavePanelEncodingMenu->AddItem(item);
-				if (index == fSaveAsEncoding) {
+				if (index == fTextView->GetEncoding()) {
 					item->SetMarked(true);
 				}
 			}
@@ -887,7 +889,6 @@ StyledEditWindow::SaveAs()
 	
 	// its own scope allows the lock to be released before Show()
 	{
-	// TODO: add encodings
 		BAutolock lock(fSavePanel->Window());
 		if (lock.IsLocked()) {
 			fSavePanelTextView->SetText(Title());

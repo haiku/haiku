@@ -15,8 +15,8 @@ class StyledEditWindow
 	: public BWindow
 {
 public:
-					StyledEditWindow(BRect frame, int32 id);
-					StyledEditWindow(BRect frame, entry_ref *ref);
+					StyledEditWindow(BRect frame, int32 id, uint32 encoding = 0);
+					StyledEditWindow(BRect frame, entry_ref *ref, uint32 encoding = 0);
 					~StyledEditWindow();
 	
 	virtual void	Quit();
@@ -32,7 +32,7 @@ public:
 	void			SearchAllWindows(BString find, BString replace, bool casesens);
 
 private: 
-	void			InitWindow();
+	void			InitWindow(uint32 encoding = 0);
 	bool			Search(BString searchfor, bool casesens, bool wrap, bool backsearch);
 	void			FindSelection();
 	bool			Replace(BString findthis, BString replacewith, bool casesens, bool wrap, bool backsearch);
@@ -97,8 +97,6 @@ private:
 	BFilePanel		*fSavePanel;
 	BTextControl	*fSavePanelTextView;
 	BMenu			*fSavePanelEncodingMenu;
-	
-	uint32			fSaveAsEncoding;
 		
 };
 

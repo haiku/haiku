@@ -18,6 +18,7 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *hand
 	fHandler= handler;
 	fMessenger= new BMessenger(handler);
 	fSuppressChanges = false;
+	fEncoding = 0;
 }/***StyledEditView()***/
 
 StyledEditView::~StyledEditView(){
@@ -60,10 +61,28 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 	status_t result = B_OK;
 	fSuppressChanges = true;	
 	result = BTranslationUtils::GetStyledText(stream, this, NULL);
-	
+			
 	BNode * node = dynamic_cast<BNode*>(stream);
 	if (node != 0) {
 		ssize_t bytesRead;
+		// decode encoding
+		int32 encoding;
+		bytesRead = node->ReadAttr("be:encoding",0,0,&encoding,sizeof(encoding));
+		if (bytesRead > 0) {
+			CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
+			if (result != B_OK) {
+				return result;
+			}
+			if (encoding == 65535) {
+				fEncoding = 0;
+			} else {
+				const CharacterSet * cs = roster->FindCharacterSetByConversionID(encoding);
+				if (cs != 0) {
+					fEncoding = cs->GetFontID();			
+				}
+			}
+		}
+		
 		// restore alignment
 		alignment align;
 		bytesRead = node->ReadAttr("alignment",0,0,&align,sizeof(align));
@@ -91,14 +110,14 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 }
 
 status_t
-StyledEditView::WriteStyledEditFile(BFile * file, uint32 charSet)
+StyledEditView::WriteStyledEditFile(BFile * file)
 {
 	status_t result = B_OK;
 	result = BTranslationUtils::WriteStyledEditFile(this,file);
 	if (result != B_OK) {
 		return result;
 	}
-	if (charSet == 0) {
+	if (fEncoding == 0) {
 		int32 encoding = 65535;
 		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&encoding,sizeof(encoding));
 	} else {
@@ -114,7 +133,7 @@ StyledEditView::WriteStyledEditFile(BFile * file, uint32 charSet)
 		if (result != B_OK) {
 			return result;
 		}
-		uint32 id = roster->GetCharacterSet(charSet)->GetConversionID();
+		uint32 id = roster->FindCharacterSetByFontID(fEncoding)->GetConversionID();
 		const char * outText = Text();
 		int32 sourceLength = TextLength();
 		int32 state = 0;
@@ -161,7 +180,20 @@ StyledEditView::Select(int32 start, int32 finish)
 	BTextView::Select(start, finish);
 }
 
-void StyledEditView::InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs)
+void
+StyledEditView::SetEncoding(uint32 encoding)
+{
+	fEncoding = encoding;
+}
+
+uint32
+StyledEditView::GetEncoding() const
+{
+	return fEncoding;
+}
+
+void
+StyledEditView::InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs)
 {
 	if (!fSuppressChanges)
 		fMessenger-> SendMessage(new BMessage(TEXT_CHANGED));
@@ -170,7 +202,8 @@ void StyledEditView::InsertText(const char *text, int32 length, int32 offset, co
 	
 }/****StyledEditView::InsertText()***/
 
-void StyledEditView::DeleteText(int32 start, int32 finish)
+void
+StyledEditView::DeleteText(int32 start, int32 finish)
 {
 	if (!fSuppressChanges)
 		fMessenger-> SendMessage(new BMessage(TEXT_CHANGED));

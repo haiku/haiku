@@ -1,6 +1,8 @@
 
 #include <Autolock.h>
 #include <Path.h>
+#include <MenuItem.h>
+#include "CharacterSet.h"
 #include "Constants.h"
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
@@ -16,10 +18,31 @@ StyledEditApp::StyledEditApp()
 	BMenuBar * menuBar =
 	   dynamic_cast<BMenuBar*>(fOpenPanel->Window()->FindView("MenuBar"));
 	   
+	fOpenAsEncoding = 0;
 	fOpenPanelEncodingMenu= new BMenu("Encoding");
 	menuBar->AddItem(fOpenPanelEncodingMenu);
+	fOpenPanelEncodingMenu->SetRadioMode(true);
 
-	// TODO: add encodings
+	status_t status = B_OK;
+	CharacterSetRoster * roster = CharacterSetRoster::Roster(&status);
+	if (status == B_OK) {
+		for (int index = 0; (index < roster->GetCharacterSetCount()) ; index++) {
+			const CharacterSet * cs = roster->GetCharacterSet(index);
+			BString name(cs->GetPrintName());
+			const char * mime = cs->GetMIMEName();
+			if (mime) {
+				name.Append(" (");
+				name.Append(mime);
+				name.Append(")");
+			}
+			BMenuItem * item = new BMenuItem(name.String(),new BMessage(OPEN_AS_ENCODING));
+			item->SetTarget(this);
+			fOpenPanelEncodingMenu->AddItem(item);
+			if (index == fOpenAsEncoding) {
+				item->SetMarked(true);
+			}
+		}
+	}
 	
 	fWindowCount= 0;
 	fNext_Untitled_Window= 1;
@@ -63,6 +86,14 @@ StyledEditApp::MessageReceived(BMessage *message)
 		case B_SILENT_RELAUNCH:
 			OpenDocument();
 		break;
+		case OPEN_AS_ENCODING:
+			void * ptr;
+			if (message->FindPointer("source",&ptr) == B_OK) {
+				if (fOpenPanelEncodingMenu != 0) {
+					fOpenAsEncoding = (uint32)fOpenPanelEncodingMenu->IndexOf((BMenuItem*)ptr);
+				}
+			}
+		break;
 		default:
 			BApplication::MessageReceived(message);
 		break;
@@ -72,7 +103,7 @@ StyledEditApp::MessageReceived(BMessage *message)
 void
 StyledEditApp::OpenDocument()
 {
-	new StyledEditWindow(windowRect,fNext_Untitled_Window++);
+	new StyledEditWindow(windowRect,fNext_Untitled_Window++,fOpenAsEncoding);
 	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }
@@ -80,7 +111,7 @@ StyledEditApp::OpenDocument()
 void
 StyledEditApp::OpenDocument(entry_ref * ref)
 {
-	new StyledEditWindow(windowRect,ref);
+	new StyledEditWindow(windowRect,ref,fOpenAsEncoding);
 	windowRect.OffsetBy(15,15); // TODO: wrap around screen
 	fWindowCount++;
 }

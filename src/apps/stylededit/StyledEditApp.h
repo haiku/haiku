@@ -28,6 +28,7 @@ public:
 private:
 	BFilePanel		*fOpenPanel;
 	BMenu			*fOpenPanelEncodingMenu;
+	uint32			fOpenAsEncoding;
 	int32			fWindowCount;
 	int32			fNext_Untitled_Window;
 		
