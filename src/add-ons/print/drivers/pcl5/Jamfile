@@ -1,16 +1,15 @@
-SubDir OBOS_TOP src add-ons print drivers pcl6 ;
+SubDir OBOS_TOP src add-ons print drivers pcl5 ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print drivers canon_lips
 					  libprint ] ;
 
-AddResources PCL6\ Compatible : PCL6.rsrc ;
+AddResources PCL5\ Compatible : PCL5.rsrc ;
 
-Addon PCL6\ Compatible : print :
-	PCL6Entry.cpp
-	PCL6.cpp
-	PCL6Cap.cpp
-	jetlib.cpp
+Addon PCL5\ Compatible : print :
+	PCL5Entry.cpp
+	PCL5.cpp
+	PCL5Cap.cpp
 ;
 
-LinkSharedOSLibs PCL6\ Compatible : be stdc++.r4 libprint.a ;
+LinkSharedOSLibs PCL5\ Compatible : be stdc++.r4 libprint.a ;
 
