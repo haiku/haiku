@@ -6,7 +6,7 @@
 #include "BBView.h"
 #include "MsgConsts.h"
 
-#define APPLICATION "Application"
+#define APPLICATION "BezierBounds"
 #define VERSION "1.0"
 
 class AppWindow : public BWindow {

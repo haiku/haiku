@@ -92,7 +92,7 @@ void AppWindow::AboutRequested() {
 		about->Go();
 }
 
-App::App() : BApplication("application/x-vnd.myapplication") {
+App::App() : BApplication("application/x-vnd.obos.BezierBounds") {
 	BRect aRect;
 	// set up a rectangle and instantiate a new window
 	aRect.Set(100, 80, 410, 380);

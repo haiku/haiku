@@ -15,9 +15,7 @@ AppWindow::AppWindow(BRect aRect)
 	menubar = new BMenuBar(rect, "menu_bar");
 	BMenu *menu; 
 
-	menu = new BMenu("Game");
-	menu->AddItem(new BMenuItem("New", new BMessage(MENU_APP_NEW), 'N'));
-	menu->AddSeparatorItem();
+	menu = new BMenu("Test");
 	menu->AddItem(new BMenuItem("About ...", new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q')); 
@@ -94,7 +92,7 @@ void AppWindow::AboutRequested() {
 		about->Go();
 }
 
-App::App() : BApplication("application/x-vnd.myapplication") {
+App::App() : BApplication("application/x-vnd.obos.LinePathBuilder") {
 	BRect aRect;
 	// set up a rectangle and instantiate a new window
 	aRect.Set(100, 80, 410, 380);
