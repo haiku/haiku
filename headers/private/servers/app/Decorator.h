@@ -36,6 +36,7 @@
 #include "ColorSet.h"
 
 class DisplayDriver;
+class ServerFont;
 
 typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 	CLICK_TAB, CLICK_DRAG, CLICK_MOVETOBACK, CLICK_MOVETOFRONT, CLICK_SLIDETAB,
@@ -54,6 +55,7 @@ public:
 	void SetDriver(DisplayDriver *driver);
 	void SetFlags(int32 wflags);
 	void SetFeel(int32 wfeel);
+	void SetFont(ServerFont *font);
 	void SetLook(int32 wlook);
 	
 	void SetClose(bool is_down);

@@ -54,8 +54,14 @@
 // folder used to keep saved color sets for the UI - tab color, etc.
 #define COLOR_SET_DIR "/boot/home/config/settings/color_sets/"
 
+// folder used to keep saved cursor sets for the system
+#define CURSOR_SET_DIR "/boot/home/config/settings/cursor_sets/"
+
 // name of the file containing the current UI color settings
 #define COLOR_SETTINGS_NAME "system_colors"
+
+// name of the file containing the current system cursor settings
+#define CURSOR_SETTINGS_NAME "system_cursors"
 
 // name of the file containing the config data for the desktop
 #define WORKSPACE_SETTINGS_NAME "workspace_data"
