@@ -737,39 +737,6 @@ read_port_etc(port_id id, int32 *msgCode, void *msgBuffer, size_t bufferSize,
 
 
 status_t
-set_port_owner(port_id id, team_id team)
-{
-	int slot;
-	int state;
-
-	if (ports_active == false
-		|| id < 0)
-		return B_BAD_PORT_ID;
-
-	slot = id % MAX_PORTS;
-
-	state = disable_interrupts();
-	GRAB_PORT_LOCK(ports[slot]);
-
-	if (ports[slot].id != id) {
-		RELEASE_PORT_LOCK(ports[slot]);
-		restore_interrupts(state);
-		dprintf("set_port_owner: invalid port_id %ld\n", id);
-		return B_BAD_PORT_ID;
-	}
-
-	// transfer ownership to other team
-	ports[slot].owner = team;
-
-	// unlock port
-	RELEASE_PORT_LOCK(ports[slot]);
-	restore_interrupts(state);
-
-	return B_NO_ERROR;
-}
-
-
-status_t
 write_port(port_id id, int32 msgCode, const void *msgBuffer, size_t bufferSize)
 {
 	return write_port_etc(id, msgCode, msgBuffer, bufferSize, 0, 0);
@@ -786,7 +753,6 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 	sem_id cached_semid;
 	int h;
 	cbuf *msgStore;
-	int32 c1, c2;
 	bool userCopy = (flags & PORT_FLAG_USE_USER_MEMCPY) > 0;
 
 	if (ports_active == false
@@ -887,10 +853,6 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 	RELEASE_PORT_LOCK(ports[slot]);
 	restore_interrupts(state);
 
-	// ToDo: what is this needed for?
-	get_sem_count(ports[slot].read_sem, &c1);
-	get_sem_count(ports[slot].write_sem, &c2);
-
 	// release sem, allowing read (might reschedule)
 	release_sem(cached_semid);
 
@@ -898,8 +860,42 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 }
 
 
-/* this function cycles through the ports table, deleting all the ports that are owned by
-   the passed team_id */
+status_t
+set_port_owner(port_id id, team_id team)
+{
+	int slot;
+	int state;
+
+	if (ports_active == false
+		|| id < 0)
+		return B_BAD_PORT_ID;
+
+	slot = id % MAX_PORTS;
+
+	state = disable_interrupts();
+	GRAB_PORT_LOCK(ports[slot]);
+
+	if (ports[slot].id != id) {
+		RELEASE_PORT_LOCK(ports[slot]);
+		restore_interrupts(state);
+		dprintf("set_port_owner: invalid port_id %ld\n", id);
+		return B_BAD_PORT_ID;
+	}
+
+	// transfer ownership to other team
+	ports[slot].owner = team;
+
+	// unlock port
+	RELEASE_PORT_LOCK(ports[slot]);
+	restore_interrupts(state);
+
+	return B_NO_ERROR;
+}
+
+
+/** this function cycles through the ports table, deleting all
+ *	the ports that are owned by the passed team_id
+ */
 
 int
 delete_owned_ports(team_id owner)
