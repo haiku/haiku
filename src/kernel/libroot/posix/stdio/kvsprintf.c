@@ -63,7 +63,9 @@ static int skip_atoi(const char **s)
 #define SPECIAL	32		/* 0x */
 #define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
-static unsigned long long do_div(unsigned long long *n, unsigned base) 
+
+static unsigned long long 
+do_div(unsigned long long *n, unsigned base) 
 { 
 	unsigned long long res;
 	res = (*n) %  (unsigned long long)base;
@@ -73,11 +75,12 @@ static unsigned long long do_div(unsigned long long *n, unsigned base)
 	return res;
 }
 
-static char * number(char * str, long long num, unsigned base, int size, int precision
-	,int type)
+
+static char *
+number(char *str, long long num, unsigned base, int size, int precision, int type)
 {
-	char c,sign,tmp[66];
 	const char *digits="0123456789abcdefghijklmnopqrstuvwxyz";
+	char c, sign, tmp[66];
 	int i;
 
 	if (type & LARGE)
@@ -86,6 +89,7 @@ static char * number(char * str, long long num, unsigned base, int size, int pre
 		type &= ~ZEROPAD;
 	if (base < 2 || base > 36)
 		return 0;
+
 	c = (type & ZEROPAD) ? '0' : ' ';
 	sign = 0;
 	if (type & SIGN) {
@@ -109,25 +113,30 @@ static char * number(char * str, long long num, unsigned base, int size, int pre
 	}
 	i = 0;
 	if (num == 0)
-		tmp[i++]='0';
+		tmp[i++] = '0';
 	else while (num != 0)
-		tmp[i++] = digits[do_div(&num,base)];
+		tmp[i++] = digits[do_div(&num, base)];
+
 	if (i > precision)
 		precision = i;
 	size -= precision;
-	if (!(type&(ZEROPAD+LEFT)))
-		while(size-->0)
+
+	if (!(type&(ZEROPAD + LEFT))) {
+		while (size-- > 0)
 			*str++ = ' ';
+	}
 	if (sign)
 		*str++ = sign;
+
 	if (type & SPECIAL) {
-		if (base==8)
+		if (base == 8)
 			*str++ = '0';
-		else if (base==16) {
+		else if (base == 16) {
 			*str++ = '0';
 			*str++ = digits[33];
 		}
 	}
+
 	if (!(type & LEFT))
 		while (size-- > 0)
 			*str++ = c;
@@ -137,44 +146,46 @@ static char * number(char * str, long long num, unsigned base, int size, int pre
 		*str++ = tmp[i];
 	while (size-- > 0)
 		*str++ = ' ';
+
 	return str;
 }
 
-/* Forward decl. needed for IP address printing stuff... */
-int sprintf(char * buf, const char *fmt, ...);
 
-int vsprintf(char *buf, const char *fmt, va_list args)
+/* Forward decl. needed for IP address printing stuff... */
+int sprintf(char *buf, const char *fmt, ...);
+
+
+int 
+vsprintf(char *buf, const char *fmt, va_list args)
 {
 	int len;
 	unsigned long long num;
 	int i, base;
 	char * str;
 	const char *s;
-
-	int flags;		/* flags to number() */
-
+	int flags;			/* flags to number() */
 	int field_width;	/* width of output field */
-	int precision;		/* min. # of digits for integers; max
-				   number of chars for from string */
+	int precision;		
+		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
-	for (str=buf ; *fmt ; ++fmt) {
+	for (str = buf; *fmt; ++fmt) {
 		if (*fmt != '%') {
 			*str++ = *fmt;
 			continue;
 		}
-			
+
 		/* process flags */
 		flags = 0;
-		repeat:
-			++fmt;		/* this also skips first '%' */
-			switch (*fmt) {
-				case '-': flags |= LEFT; goto repeat;
-				case '+': flags |= PLUS; goto repeat;
-				case ' ': flags |= SPACE; goto repeat;
-				case '#': flags |= SPECIAL; goto repeat;
-				case '0': flags |= ZEROPAD; goto repeat;
-				}
+	repeat:
+		++fmt;		/* this also skips first '%' */
+		switch (*fmt) {
+			case '-': flags |= LEFT; goto repeat;
+			case '+': flags |= PLUS; goto repeat;
+			case ' ': flags |= SPACE; goto repeat;
+			case '#': flags |= SPECIAL; goto repeat;
+			case '0': flags |= ZEROPAD; goto repeat;
+		}
 		
 		/* get field width */
 		field_width = -1;
@@ -290,6 +301,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				--fmt;
 			continue;
 		}
+
 		if (qualifier == 'L')
 			num = va_arg(args, unsigned long long);
 		else if (qualifier == 'l') {
@@ -304,20 +316,25 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			num = va_arg(args, int);
 		else
 			num = va_arg(args, unsigned int);
+
 		str = number(str, num, base, field_width, precision, flags);
 	}
+
 	*str = '\0';
-	return str-buf;
+	return str - buf;
 }
 
-int sprintf(char * buf, const char *fmt, ...)
+
+int 
+sprintf(char *buffer, const char *format, ...)
 {
 	va_list args;
 	int i;
 
-	va_start(args, fmt);
-	i=vsprintf(buf,fmt,args);
+	va_start(args, format);
+	i = vsprintf(buffer, format, args);
 	va_end(args);
+
 	return i;
 }
 
