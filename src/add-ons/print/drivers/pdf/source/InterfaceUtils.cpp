@@ -100,7 +100,7 @@ HWindow::AboutRequested()
 		char *text = (char*) v->Text();
 		char *s = text;
 
-		// set first line 18pt bold
+		// set first line 20pt bold
 		s = strchr(text, '\n');
 		BFont bold(be_bold_font);
 		bold.SetSize(20);
