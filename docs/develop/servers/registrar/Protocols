@@ -317,7 +317,7 @@ activate an app (BRoster::ActivateApp())
 
 target:		roster
 message:	B_REG_ACTIVATE_APP
-			"team":	B_INT32_TYPE ]
+			"team":	B_INT32_TYPE
 reply:		standard success
 on error:	- B_NO_REPLY (fatal)
 			- standard error
@@ -331,6 +331,30 @@ error reply fields:
     invalid value.
   - B_BAD_TEAM_ID: The supplied team ID does not identify a registered
     application.
+  - ...
+
+-----------------------------------------------------------------------
+
+broadcast a message (BRoster::Broadcast())
+
+target:		roster
+message:	B_REG_ACTIVATE_APP
+			"team":			B_INT32_TYPE
+			"message":		B_MESSAGE_TYPE
+			"reply_target":	B_MESSENGER_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The requesting team.
+- "message": The message to be broadcast.
+- "reply_target": The reply target for the message.
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
   - ...
 
 -----------------------------------------------------------------------
@@ -547,6 +571,10 @@ message:	B_REG_MIME_UPDATE_THREAD_FINISHED
 reply:		none (message should be sent asynchronously)
 
 -----------------------------------------------------------------------
+
+
+Message Runner Requests
+-----------------------
 
 message runner registration (BMessageRunner::InitData())
 
