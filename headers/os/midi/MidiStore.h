@@ -121,13 +121,14 @@ private:
 
 	uint16 _reserved1[1];
 
+	bool* instruments;
 	synth_file_hook hookFunc;
 	int32 hookArg;
 	bool looping;
 	bool paused;
 	bool finished;
 	
-	uint32 _reserved2[13];
+	uint32 _reserved2[12];
 };
 
 #endif // _MIDI_STORE_H

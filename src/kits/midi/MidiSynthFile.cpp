@@ -24,6 +24,9 @@
 #include "debug.h"
 #include "MidiStore.h"
 #include "MidiSynthFile.h"
+#include "SoftSynth.h"
+
+using namespace BPrivate;
 
 // -----------------------------------------------------------------------------
 
@@ -52,10 +55,20 @@ status_t BMidiSynthFile::LoadFile(const entry_ref* midi_entry_ref)
 	EnableInput(true, false);
 	store->finished = true;
 
-	// TODO: figure out which instruments are used by the MIDI file,
-	// and load them one-by-one (add a method in BMidiStore for this).
+	status_t err = store->Import(midi_entry_ref);
 
-	return store->Import(midi_entry_ref);
+	if (err == B_OK)
+	{
+		for (int t = 0; t < 128; ++t)
+		{
+			if (store->instruments[t])
+			{
+				be_synth->synth->LoadInstrument(t);
+			}
+		}
+	}
+	
+	return err;
 }
 
 // -----------------------------------------------------------------------------
@@ -130,10 +143,17 @@ int32 BMidiSynthFile::Seek()
 status_t BMidiSynthFile::GetPatches(
 	int16* pArray768, int16* pReturnedCount) const
 {
-	// TODO: when loading of instruments in LoadFile() has been
-	// implemented, we can finish this function too.
+	int16 count = 0;
+	
+	for (int t = 0; t < 128; ++t)
+	{
+		if (store->instruments[t])
+		{
+			pArray768[count++] = t;
+		}
+	}
 
-	*pReturnedCount = 0;
+	*pReturnedCount = count;
 	return B_OK;
 }
 

@@ -84,6 +84,7 @@ BMidiStore::BMidiStore()
 	looping = false;
 	paused = false;
 	finished = false;
+	instruments = new bool[128];
 }
 
 //------------------------------------------------------------------------------
@@ -95,6 +96,7 @@ BMidiStore::~BMidiStore()
 		delete EventAt(t);
 	}
 	delete events;
+	delete[] instruments;
 }
 
 //------------------------------------------------------------------------------
@@ -248,6 +250,8 @@ void BMidiStore::TempoChange(int32 beatsPerMinute, uint32 time)
 
 status_t BMidiStore::Import(const entry_ref* ref)
 {
+	memset(instruments, 0, 128 * sizeof(bool));
+
 	try
 	{
 		file = new BFile(ref, B_READ_ONLY);
@@ -861,6 +865,11 @@ void BMidiStore::ReadTrack()
 				event->byte1 = status;
 				event->byte2 = data1;
 				AddEvent(event);
+
+				if ((status & 0xF0) == B_PROGRAM_CHANGE)
+				{
+					instruments[data1] = true;
+				}
 				break;
 
 			case 0xF0:
