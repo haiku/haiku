@@ -209,10 +209,6 @@ enum {
 
 /*---- new error codes that can be mapped to POSIX errors ----*/
 #define	B_BUFFER_OVERFLOW	EOVERFLOW
-#define	B_NOT_SUPPORTED		EOPNOTSUPP
-	/* there is also B_UNSUPPORTED - but it maps to a different error code;
-	 * should we remove this one again?
-	 */
 #define B_TOO_MANY_ARGS		E2BIG
 #define	B_FILE_TOO_LARGE	EFBIG
 #define B_RESULT_NOT_REPRESENTABLE	ERANGE
