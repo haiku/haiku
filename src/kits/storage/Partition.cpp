@@ -387,7 +387,7 @@ status_t
 BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	const char *parameters)
 {
-	if (!fPartitionData || IsMounted())
+	if (!fPartitionData || IsMounted() || !ContainsFileSystem())
 		return B_BAD_VALUE;
 
 	// get the partition path
@@ -398,38 +398,14 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 
 	// create a mount point, if none is given
 	bool deleteMountPoint = false;
-	BString mountPointPath;
+	BPath mountPointPath;
 	if (!mountPoint) {
-		// get the volume name
-		const char *volumeName = ContentName();
-		if (volumeName || strlen(volumeName) == 0)
-			volumeName = Name();
-		if (!volumeName || strlen(volumeName) == 0)
-			volumeName = "unnamed volume";
+		// get a unique mount point
+		error = get_unique_partition_mount_point(this, &mountPointPath);
+		if (error != B_OK)
+			return error;
 
-		// construct a path name from the volume name
-		// replace '/'s and prepend a '/'
-		mountPointPath = volumeName;
-		mountPointPath.ReplaceAll('/', '-');
-		mountPointPath.Insert("/", 0);
-
-		// make the name unique
-		BString basePath(mountPointPath);
-		int counter = 1;
-		while (true) {
-			BEntry entry;
-			error = entry.SetTo(mountPointPath.String());
-			if (error != B_OK)
-				return error;
-
-			if (!entry.Exists())
-				break;
-			mountPointPath = basePath;
-			mountPointPath << counter;
-			counter++;
-		}
-
-		mountPoint = mountPointPath.String();
+		mountPoint = mountPointPath.Path();
 
 		// create the directory
 		if (mkdir(mountPoint, S_IRWXU | S_IRWXG | S_IRWXO) < 0)
