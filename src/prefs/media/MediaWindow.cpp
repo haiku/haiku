@@ -12,6 +12,8 @@ Media - MediaWindow by Sikosis
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <ListView.h>
+#include <OutlineListView.h>
 #include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
@@ -19,6 +21,7 @@ Media - MediaWindow by Sikosis
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <StringView.h>
 #include <TextView.h>
 #include <TextControl.h>
 #include <Window.h>
@@ -64,8 +67,32 @@ void MediaWindow::InitWindow(void)
 	BRect r;
 	r = Bounds(); // the whole view
 	
+	// Create the OutlineView
+	BRect outlinerect(r.left+12,r.top+12,r.left+146,r.bottom-10);
+	BOutlineListView *outline;
+	BListItem 		 *topmenu;
+	BListItem 		 *submenu;
+	BScrollView 	 *outlinesv;
+
+	outline = new BOutlineListView(outlinerect,"audio_list", B_MULTIPLE_SELECTION_LIST);
+	outline->AddItem(topmenu = new BStringItem("Audio Settings"));
+	outline->AddUnder(submenu = new BStringItem("Audio Mixer"), topmenu);
+	outline->AddUnder(new BStringItem("None In"), submenu);
+	outline->AddUnder(new BStringItem("None Out"), submenu);
+	outline->AddItem(topmenu = new BStringItem("Video Settings"));
+	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);
+	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
+	
+	// Setup the OutlineView 
+	outlinesv->SetBorderHighlighted(true);
+	outline->SetHighColor(0,0,0,0);
+	outline->SetLowColor(255,255,255,0);
+	
 	// Create the Views	
 	AddChild(ptrMediaView = new MediaView(r));
+	
+	// Add Child(ren)
+	ptrMediaView->AddChild(outlinesv);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
