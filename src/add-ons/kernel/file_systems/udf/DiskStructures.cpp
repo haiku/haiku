@@ -38,6 +38,66 @@ const char* Udf::kVSDID_ECMA167_3 	= "NSR03";
 const char* Udf::kVSDID_ECMA168		= "CDW02";
 
 //----------------------------------------------------------------------
+// Helper functions
+//----------------------------------------------------------------------
+
+const char *Udf::udf_tag_id_to_string(udf_tag_id id)
+{
+	switch (id) {
+		case TAGID_UNDEFINED:
+			return "undefined";
+
+		case TAGID_PRIMARY_VOLUME_DESCRIPTOR:
+			return "primary volume descriptor";			
+		case TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER:
+			return "anchor volume descriptor pointer";
+		case TAGID_VOLUME_DESCRIPTOR_POINTER:
+			return "volume descriptor pointer";
+		case TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR:
+			return "implementation use volume descriptor";
+		case TAGID_PARTITION_DESCRIPTOR:
+			return "partition descriptor";
+		case TAGID_LOGICAL_VOLUME_DESCRIPTOR:
+			return "logical volume descriptor";
+		case TAGID_UNALLOCATED_SPACE_DESCRIPTOR:
+			return "unallocated space descriptor";
+		case TAGID_TERMINATING_DESCRIPTOR:
+			return "terminating descriptor";
+		case TAGID_LOGICAL_VOLUME_INTEGRITY_DESCRIPTOR:
+			return "logical volume integrity descriptor";
+
+		case TAGID_FILE_SET_DESCRIPTOR:
+			return "file set descriptor";
+		case TAGID_FILE_IDENTIFIER_DESCRIPTOR:
+			return "file identifier descriptor";
+		case TAGID_ALLOCATION_EXTENT_DESCRIPTOR:
+			return "allocation extent descriptor";
+		case TAGID_INDIRECT_ENTRY:
+			return "indirect entry";
+		case TAGID_TERMINAL_ENTRY:
+			return "terminal entry";
+		case TAGID_FILE_ENTRY:
+			return "file entry";
+		case TAGID_EXTENDED_ATTRIBUTE_HEADER_DESCRIPTOR:
+			return "extended attribute header descriptor";
+		case TAGID_UNALLOCATED_SPACE_ENTRY:
+			return "unallocated space entry";
+		case TAGID_SPACE_BITMAP_DESCRIPTOR:
+			return "space bitmap descriptor";
+		case TAGID_PARTITION_INTEGRITY_ENTRY:
+			return "partition integrity entry";
+		case TAGID_EXTENDED_FILE_ENTRY:
+			return "extended file entry";
+
+		default:
+			if (TAGID_CUSTOM_START <= id && id <= TAGID_CUSTOM_END)
+				return "custom";
+			return "reserved";	
+	}
+}
+
+
+//----------------------------------------------------------------------
 // udf_volume_structure_descriptor_header
 //----------------------------------------------------------------------
 
@@ -137,7 +197,7 @@ void
 udf_tag::dump() const
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_descriptor_tag");
-	PRINT(("id:            %d\n", id()));
+	PRINT(("id:            %d (%s)\n", id(), udf_tag_id_to_string(udf_tag_id(id()))));
 	PRINT(("version:       %d\n", version()));
 	PRINT(("checksum:      %d\n", checksum()));
 	PRINT(("serial_number: %d\n", serial_number()));

@@ -493,6 +493,8 @@ enum udf_tag_id {
 	TAGID_EXTENDED_FILE_ENTRY,
 };
 
+const char *udf_tag_id_to_string(udf_tag_id id);
+
 /*! \brief Primary volume descriptor
 */
 struct udf_primary_descriptor {
