@@ -18,7 +18,7 @@
 #include "BPlusTree.h"
 #include "Index.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 #include <AppDefs.h>

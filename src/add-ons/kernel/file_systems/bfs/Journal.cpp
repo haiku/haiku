@@ -9,7 +9,7 @@
 #include "Inode.h"
 #include "Debug.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 
 Journal::Journal(Volume *volume)

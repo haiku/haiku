@@ -14,7 +14,7 @@
 #include "Utility.h"
 #include "Stack.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <TypeConstants.h>
 
 #include <string.h>

@@ -8,7 +8,7 @@
 #include "Utility.h"
 #include "Debug.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include <stdlib.h>
 #include <string.h>

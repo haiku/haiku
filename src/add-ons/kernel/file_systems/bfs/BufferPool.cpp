@@ -8,7 +8,7 @@
 #include "BufferPool.h"
 #include "Debug.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 
 const uint32 kNumBuffers = 8;

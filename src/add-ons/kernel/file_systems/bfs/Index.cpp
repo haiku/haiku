@@ -11,7 +11,7 @@
 #include "Inode.h"
 #include "BPlusTree.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <TypeConstants.h>
 
 // B_MIME_STRING_TYPE is defined in storage/Mime.h, but we

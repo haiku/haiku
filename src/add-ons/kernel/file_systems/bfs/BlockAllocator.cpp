@@ -13,7 +13,7 @@
 #include "Stack.h"
 #include "bfs_control.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <stdlib.h>
 
 #ifdef USER

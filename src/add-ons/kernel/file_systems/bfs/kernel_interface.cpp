@@ -13,7 +13,7 @@
 #include "Query.h"
 #include "bfs_control.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <stdio.h>

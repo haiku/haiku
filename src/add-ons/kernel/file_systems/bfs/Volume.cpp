@@ -11,7 +11,7 @@
 #include "Inode.h"
 #include "Query.h"
 
-#include <kernel_cpp.h>
+#include <util/kernel_cpp.h>
 #include <KernelExport.h>
 #include <fs_volume.h>
 
