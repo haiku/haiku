@@ -19,6 +19,8 @@
 #include <stdio.h>
 
 
+void reboot(void);
+
 static struct tss **sTSS;
 static int *sIsTSSLoaded;
 
@@ -206,6 +208,15 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr_t *fault_handler)
 error:
 	*fault_handler = 0;
 	return B_BAD_ADDRESS;
+}
+
+
+status_t
+arch_cpu_shutdown(bool _reboot)
+{
+	// we can't do anything else, yet
+	reboot();
+	return B_OK;
 }
 
 
