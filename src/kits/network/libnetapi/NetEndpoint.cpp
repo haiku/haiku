@@ -16,7 +16,7 @@
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "NetEndpoint.h"
+#include <NetEndpoint.h>
 
 BNetEndpoint::BNetEndpoint(int protocol)
 	:	fStatus(B_OK),

@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ByteOrder.h>
-#include "NetBuffer.h"
+#include <NetBuffer.h>
 
 BNetBuffer::BNetBuffer(size_t size)
 	:	fStatus(B_OK),

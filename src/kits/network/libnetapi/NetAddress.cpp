@@ -37,8 +37,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>  // STM: #include <ByteOrder.h>???
 #include <netinet/in.h>
-
-#include "NetAddress.h"
+#include <NetAddress.h>
 
 /*
  * AF_INET is 2 or 0 depending on whether or not you use the POSIX

@@ -1,6 +1,5 @@
 #include <size_t.h>
-
-#include "NetDebug.h"
+#include <NetDebug.h>
 
 void BNetDebug::Enable(bool) {
 }
