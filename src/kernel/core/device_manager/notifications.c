@@ -47,15 +47,17 @@ pnp_notify_probe_by_module(pnp_node_info *node, const char *consumer_name)
 	if (consumer->probe == NULL) {
 		dprintf("Driver %s has no probe hook\n", consumer_name);
 		res = B_ERROR;
-	} else
+	} else {
 		res = consumer->probe(node);
+		TRACE(("Driver %s probe returned: %s\n", consumer_name, strerror(res)));
+	}
 
 	put_module(consumer_name);
 
 exit:
 #ifdef TRACE_NOTIFICATIONS
 	if (res != B_OK)
-		dprintf("%s\n", strerror(res));
+		dprintf("notify_probe_by_module: %s\n", strerror(res));
 #endif
 
 	return res;

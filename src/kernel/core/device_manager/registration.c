@@ -454,7 +454,7 @@ pnp_probe_waiting_children_nolock(pnp_node_info *node)
 	if (--node->defer_probing > 0 && node->unprobed_children != 0)
 		return;
 
-	TRACE(("execute deferred probing of parent %p", node));
+	TRACE(("execute deferred probing of parent %p\n", node));
 
 	while (node->unprobed_children) {
 		pnp_node_info *child = node->unprobed_children;
@@ -475,6 +475,8 @@ pnp_probe_waiting_children_nolock(pnp_node_info *node)
 		// this is not necessary anymore
 		pnp_remove_node_ref(node);
 	}
+
+	TRACE((".. done.\n"));
 }
 
 
