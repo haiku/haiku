@@ -1432,17 +1432,30 @@ rule OBOSInstallRelSymLink
 #-------------------------------------------------------------------------------
 rule FObjectsDir
 {
-	# FObjectsDir
+	# FObjectsDir <subdir tokens>
+	#
+	# Returns the output directory for object files the specified
+	# subdirectory.
+	#
+	# <subdir tokens>: The tokens of the subdir relative to the top.
+	#
+
+	return [ FDirName $(OBOS_OBJECT_TARGET) $(1[2-]) ] ;
+}
+
+rule FCurrentObjectsDir
+{
+	# FCurrentObjectsDir
 	#
 	# Returns the output directory for object files for the current
 	# subdirectory.
 
-	return [ FDirName $(OBOS_OBJECT_TARGET) $(SUBDIR_TOKENS[2-]) ] ;
+	return [ FObjectsDir $(SUBDIR_TOKENS) ] ;
 }
 
 rule SetupObjectsDir
 {
-	LOCATE_TARGET = [ FObjectsDir ] ;
+	LOCATE_TARGET = [ FCurrentObjectsDir ] ;
 	LOCATE_SOURCE = $(LOCATE_TARGET) ;
 	SEARCH_SOURCE = [ Filter $(SEARCH_SOURCE) : $(LOCATE_TARGET) ]
 					$(LOCATE_TARGET) ;
