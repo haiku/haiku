@@ -1,0 +1,26 @@
+SubDir OBOS_TOP src add-ons print transports ipp ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+
+Addon ipp
+	: Print
+	: Ipp.cpp
+	  IppSetupDlg.cpp
+	  IppTransport.cpp
+	  HttpURLConnection.cpp
+	  IppContent.cpp
+	  IppURLConnection.cpp
+	  URL.cpp
+	  Socket.o
+	  SocketStream2.o
+	  DbgMsg.o
+;
+
+ObjectReferences
+	<src!add-ons!print!transports!shared>Socket.o
+	<src!add-ons!print!transports!shared>SocketStream2.o
+	<src!add-ons!print!transports!shared>DbgMsg.o
+;
+
+LinkSharedOSLibs ipp : be stdc++.r4 ;
+

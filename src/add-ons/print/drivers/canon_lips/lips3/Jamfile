@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src add-ons print drivers canon_lips lips3 ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print drivers canon_lips
+					  libprint ] ;
+
+AddResources Canon\ LIPS3\ Compatible : Lips3.rsrc ;
+
+Addon Canon\ LIPS3\ Compatible : Print :
+	Lips3Entry.cpp
+	Lips3.cpp
+	Lips3Cap.cpp
+	Compress3.cpp
+;
+
+LinkSharedOSLibs Canon\ LIPS3\ Compatible : be stdc++.r4 libprint.a ;
+

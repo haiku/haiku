@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src add-ons print transports lpr ;
+
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+
+Addon lpr
+	: Print
+	: Lpr.cpp
+	  LprSetupDlg.cpp
+	  LprTransport.cpp
+	  LpsClient.cpp
+	  Socket.o
+	  SocketStream2.o
+	  DbgMsg.o
+;
+
+ObjectReferences
+	<src!add-ons!print!transports!shared>Socket.o
+	<src!add-ons!print!transports!shared>SocketStream2.o
+	<src!add-ons!print!transports!shared>DbgMsg.o
+;
+
+LinkSharedOSLibs lpr : be stdc++.r4 ;
+

@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src add-ons print transports shared ;
+
+SetupObjectsDir ;
+
+Objects
+	DbgMsg.cpp
+	Socket.cpp
+	SocketStream1.cpp
+	SocketStream2.cpp
+;
+
