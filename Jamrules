@@ -945,16 +945,6 @@ rule LinkSharedOSLibs
 	}
 }
 
-rule LinkStaticOSLibs
-{
-	# LinkStaticOSLibs <name> : <libs> ;
-	
-	for i in $(>)
-	{
-		LINKLIBS on $(<) = $(LINKLIBS) -l $(i) ;
-	}
-}
-
 rule AddResources
 {
 	# AddResources <name> : <resourcefiles> ;
