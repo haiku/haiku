@@ -348,9 +348,12 @@ static status_t map_device(device_info *di)
 	case 0x0002:
 	case 0x0003:
 		/* NM2070, NM2090 and NM2093 have no seperate register area's,
-		 * so do nothing here. */
+		 * so do nothing here except notify accelerant. */
+		si->regs_in_fb = true;
 		break;
 	default:
+		/* we map the registers seperately from the framebuffer */
+		si->regs_in_fb = false;
 		/* work out a name for the register mapping */
 		sprintf(buffer, DEVICE_FORMAT " regs",
 			di->pcii.vendor_id, di->pcii.device_id,
