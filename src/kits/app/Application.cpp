@@ -54,6 +54,7 @@
 // Project Includes ------------------------------------------------------------
 #include <AppServerLink.h>
 #include <LooperList.h>
+#include <MenuWindow.h>
 #include <ObjectLocker.h>
 #include <PortLink.h>
 #include <PrivateScreen.h>
@@ -175,10 +176,6 @@ sPropertyInfo[] = {
 extern const int __libc_argc;
 extern const char * const *__libc_argv;
 
-class BMenuWindow : public BWindow {
-};
-
-//------------------------------------------------------------------------------
 
 // debugging
 //#define DBG(x) x
