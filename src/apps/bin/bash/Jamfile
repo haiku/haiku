@@ -17,7 +17,7 @@ BinCommand mksignames :
 
 SEARCH on [ FGristFiles mksignames.c ] = [ FDirName $(SUBDIR) support ] ;
 
-MakeLocate mksyntax mksignames : [ FObjectsDir ] ;
+MakeLocate mksyntax mksignames : [ FCurrentObjectsDir ] ;
 
 rule MkSyntaxExt
 {
