@@ -488,6 +488,7 @@
 #define NVDAC_GENCTRL		0x00680600
 #define NVDAC_TSTCTRL		0x00680608
 #define NVDAC_TSTDATA		0x00680610
+#define NVDAC_TV_SETUP		0x00680700
 /* (flatpanel registers: confirmed for TNT2 and up) */
 #define NVDAC_FP_VDISPEND	0x00680800
 #define NVDAC_FP_VTOTAL		0x00680804
@@ -517,6 +518,7 @@
 #define NVDAC2_PIXPLLC2		0x0068057c
 #define NVDAC2_GENCTRL		0x00682600
 #define NVDAC2_TSTCTRL		0x00682608
+#define NVDAC2_TV_SETUP		0x00682700 //verify!!!
 /* (flatpanel registers) */
 #define NVDAC2_FP_VDISPEND	0x00682800
 #define NVDAC2_FP_VTOTAL	0x00682804
@@ -579,6 +581,7 @@
 #define NVCRTCX_LCD			0x33
 #define NVCRTCX_RMA			0x38
 #define NVCRTCX_INTERLACE	0x39
+#define NVCRTCX_TREG		0x3d
 #define NVCRTCX_EXTRA		0x41
 #define NVCRTCX_OWNER		0x44
 #define NVCRTCX_FP_HTIMING	0x53
