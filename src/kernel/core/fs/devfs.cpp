@@ -6,6 +6,8 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include "IOScheduler.h"
+
 #include <SupportDefs.h>
 #include <KernelExport.h>
 #include <Drivers.h>
@@ -62,6 +64,7 @@ struct devfs_stream {
 			void *ident;
 			device_hooks *ops;
 			struct devfs_part_map *part_map;
+			IOScheduler *scheduler;
 		} dev;
 		struct stream_symlink {
 			char *path;
@@ -320,31 +323,28 @@ devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v,
 
 
 static status_t
-devfs_set_partition( struct devfs *fs, struct devfs_vnode *v, 
-	struct devfs_cookie *cookie, void *buf, size_t len)
+devfs_set_partition(struct devfs *fs, struct devfs_vnode *vnode,
+	struct devfs_cookie *cookie, partition_info &info, size_t length)
 {
-	struct devfs_part_map *part_map;
 	struct devfs_vnode *part_node;
-	int res;
-	char part_name[30];
+	status_t status;
 
-	partition_info info = *(partition_info *)buf;
-
-	if (v->stream.type != STREAM_TYPE_DEVICE)
-		return EINVAL;
+	if (length != sizeof(partition_info)
+		|| vnode->stream.type != STREAM_TYPE_DEVICE)
+		return B_BAD_VALUE;
 
 	// we don't support nested partitions
-	if (v->stream.u.dev.part_map)
-		return EINVAL;
+	if (vnode->stream.u.dev.part_map)
+		return B_BAD_VALUE;
 
 	// reduce checks to a minimum - things like negative offsets could be useful
 	if (info.size < 0)
-		return EINVAL;
+		return B_BAD_VALUE;
 
 	// create partition map
-	part_map = (struct devfs_part_map *)malloc(sizeof(*part_map));
-	if (!part_map)
-		return ENOMEM;
+	struct devfs_part_map *part_map = (struct devfs_part_map *)malloc(sizeof(*part_map));
+	if (part_map == NULL)
+		return B_NO_MEMORY;
 
 	part_map->offset = info.offset;
 	part_map->size = info.size;
@@ -352,58 +352,74 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	part_map->session = info.session;
 	part_map->partition = info.partition;
 
-	sprintf(part_name, "%li_%li", info.session, info.partition);
+	char name[30];
+	sprintf(name, "%li_%li", info.session, info.partition);
 
 	mutex_lock(&sDeviceFileSystem->lock);
 
 	// you cannot change a partition once set
-	if (devfs_find_in_dir( v->parent, part_name)) {
-		res = EINVAL;
+	if (devfs_find_in_dir(vnode->parent, name)) {
+		status = B_BAD_VALUE;
 		goto err1;
 	}
 
 	// increase reference count of raw device - 
 	// the partition device really needs it 
 	// (at least to resolve its name on GET_PARTITION_INFO)
-	res = get_vnode(fs->id, v->id, (fs_vnode *)&part_map->raw_vnode);
-	if (res < 0)
+	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&part_map->raw_vnode);
+	if (status < B_OK)
 		goto err1;
 
-	// now create the partition node	
-	part_node = devfs_create_vnode(fs, part_name);
-
+	// now create the partition vnode
+	part_node = devfs_create_vnode(fs, name);
 	if (part_node == NULL) {
-		res = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto err2;
 	}
 
 	part_node->stream.type = STREAM_TYPE_DEVICE;
-	part_node->stream.u.dev.ident = v->stream.u.dev.ident;
-	part_node->stream.u.dev.ops = v->stream.u.dev.ops;
+	part_node->stream.u.dev.ident = vnode->stream.u.dev.ident;
+	part_node->stream.u.dev.ops = vnode->stream.u.dev.ops;
 	part_node->stream.u.dev.part_map = part_map;
+	part_node->stream.u.dev.scheduler = vnode->stream.u.dev.scheduler;
 
 	hash_insert(fs->vnode_list_hash, part_node);
 
-	devfs_insert_in_dir(v->parent, part_node);
+	devfs_insert_in_dir(vnode->parent, part_node);
 
 	mutex_unlock(&sDeviceFileSystem->lock);
 
 	TRACE(("SET_PARTITION: Added partition\n"));
-
-	return B_NO_ERROR;
+	return B_OK;
 
 err1:
 	mutex_unlock(&sDeviceFileSystem->lock);
 
 	free(part_map);
-	return res;
+	return status;
 		
 err2:
 	mutex_unlock(&sDeviceFileSystem->lock);
 
-	put_vnode(fs->id, v->id);
+	put_vnode(fs->id, vnode->id);
 	free(part_map);
-	return res;
+	return status;
+}
+
+
+static inline void
+translate_partition_access(devfs_part_map *map, off_t &offset, size_t &size)
+{
+	if (offset < 0)
+		offset = 0;
+
+	if (offset > map->size) {
+		size = 0;
+		return;
+	}
+
+	size = min_c(size, map->size - offset);
+	offset += map->offset;
 }
 
 
@@ -702,13 +718,12 @@ devfs_fsync(fs_volume _fs, fs_vnode _v)
 }
 
 
-static ssize_t
+static status_t
 devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	void *buffer, size_t *_length)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
-	struct devfs_part_map *part_map;
 
 	TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n", vnode, cookie, pos, _length));
 
@@ -718,16 +733,21 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	//if (cookie->stream->type != STREAM_TYPE_DEVICE)
 	//	return EINVAL;
 
-	part_map = vnode->stream.u.dev.part_map;
-	if (part_map) {
-		if (pos < 0)
-			pos = 0;
+	if (vnode->stream.u.dev.part_map)
+		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
 
-		if (pos > part_map->size)
-			return 0;
+	if (*_length == 0)
+		return B_OK;
 
-		*_length = min_c(*_length, part_map->size - pos);
-		pos += part_map->offset;
+	// if this device has an I/O scheduler attached, the request must go through it
+	if (IOScheduler *scheduler = vnode->stream.u.dev.scheduler) {
+		IORequest request(cookie->u.dev.dcookie, pos, buffer, *_length);
+
+		status_t status = scheduler->Process(request);
+		if (status == B_OK)
+			*_length = request.Size();
+
+		return status;
 	}
 
 	// pass the call through to the device
@@ -735,7 +755,7 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 }
 
 
-static ssize_t
+static status_t
 devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 	const void *buffer, size_t *_length)
 {
@@ -744,26 +764,26 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 	TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n", vnode, cookie, pos, _length));
 
-	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
-		struct devfs_part_map *part_map = vnode->stream.u.dev.part_map;
-		int written;
+	if (vnode->stream.type != STREAM_TYPE_DEVICE)
+		return B_BAD_VALUE;
 
-		if (part_map) {
-			if (pos < 0)
-				pos = 0;
+	if (vnode->stream.u.dev.part_map)
+		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
 
-			if (pos > part_map->size)
-				return 0;
+	if (*_length == 0)
+		return B_OK;
 
-			*_length = min_c(*_length, part_map->size - pos);
-			pos += part_map->offset;
-		}
+	if (IOScheduler *scheduler = vnode->stream.u.dev.scheduler) {
+		IORequest request(cookie->u.dev.dcookie, pos, buffer, *_length);
 
-		written = vnode->stream.u.dev.ops->write(cookie->u.dev.dcookie, pos, buffer, _length);
-		return written;
+		status_t status = scheduler->Process(request);
+		if (status == B_OK)
+			*_length = request.Size();
+
+		return status;
 	}
 
-	return B_BAD_VALUE;
+	return vnode->stream.u.dev.ops->write(cookie->u.dev.dcookie, pos, buffer, _length);
 }
 
 
@@ -875,10 +895,10 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op, void *b
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		switch (op) {
 			case B_GET_PARTITION_INFO:
-				return devfs_get_partition_info(fs, vnode, cookie, buffer, length);
+				return devfs_get_partition_info(fs, vnode, cookie, (partition_info *)buffer, length);
 
 			case B_SET_PARTITION:
-				return devfs_set_partition(fs, vnode, cookie, buffer, length);
+				return devfs_set_partition(fs, vnode, cookie, *(partition_info *)buffer, length);
 		}
 
 		return vnode->stream.u.dev.ops->control(cookie->u.dev.dcookie, op, buffer, length);
@@ -1353,28 +1373,22 @@ devfs_publish_partition(const char *path, const partition_info *info)
 extern "C" status_t
 devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 {
-	int err = 0;
-	int i, last;
+	status_t status = B_OK;
 	char temp[B_PATH_NAME_LENGTH + 1];
 	struct devfs_vnode *dir;
 	struct devfs_vnode *v;
-	bool at_leaf;
 
 	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, ops));
 
-	if (ops == NULL || path == NULL) {
-		panic("devfs_publish_device called with NULL pointer!\n");
-		return B_BAD_VALUE;
-	}
-
-	if (ops->open == NULL || ops->close == NULL
-		|| ops->read == NULL || ops->write == NULL)
-		return B_BAD_VALUE;
-
-	if (!sDeviceFileSystem) {
+	if (sDeviceFileSystem == NULL) {
 		panic("devfs_publish_device called before devfs mounted\n");
 		return B_ERROR;
 	}
+
+	if (ops == NULL || path == NULL || path[0] == '/'
+		|| ops->open == NULL || ops->close == NULL
+		|| ops->read == NULL || ops->write == NULL)
+		return B_BAD_VALUE;
 
 	// copy the path over to a temp buffer so we can munge it
 	strlcpy(temp, path, B_PATH_NAME_LENGTH);
@@ -1385,13 +1399,14 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 	// parse the path passed in, stripping out '/'
 	dir = sDeviceFileSystem->root_vnode;
 	v = NULL;
-	i = 0;
-	last = 0;
-	at_leaf = false;
+	int32 i = 0, last = 0;
+	bool atLeaf = false;
+	bool isDisk = false;
+
 	for (;;) {
-		if(temp[i] == 0) {
-			at_leaf = true; // we'll be done after this one
-		} else if(temp[i] == '/') {
+		if (temp[i] == 0) {
+			atLeaf = true; // we'll be done after this one
+		} else if (temp[i] == '/') {
 			temp[i] = 0;
 			i++;
 		} else {
@@ -1404,7 +1419,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 		// we have a path component
 		v = devfs_find_in_dir(dir, &temp[last]);
 		if (v) {
-			if (!at_leaf) {
+			if (!atLeaf) {
 				// we are not at the leaf of the path, so as long as
 				// this is a dir we're okay
 				if (v->stream.type == STREAM_TYPE_DIR) {
@@ -1416,41 +1431,49 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 			// we are at the leaf and hit another node
 			// or we aren't but hit a non-dir node.
 			// we're screwed
-			err = B_FILE_EXISTS;
-			goto err;
+			status = B_FILE_EXISTS;
+			goto out;
 		} else {
 			v = devfs_create_vnode(sDeviceFileSystem, &temp[last]);
 			if (!v) {
-				err = ENOMEM;
-				goto err;
+				status = B_NO_MEMORY;
+				goto out;
 			}
 		}
 
 		// set up the new vnode
-		if (at_leaf) {
+		if (atLeaf) {
 			// this is the last component
 			v->stream.type = STREAM_TYPE_DEVICE;
 			v->stream.u.dev.ident = ident;
 			v->stream.u.dev.ops = ops;
+
+			// every raw disk gets an I/O scheduler object attached
+			if (isDisk && !strcmp(&temp[last], "raw")) 
+				v->stream.u.dev.scheduler = new IOScheduler(path, ops);
 		} else {
 			// this is a dir
 			v->stream.type = STREAM_TYPE_DIR;
 			v->stream.u.dir.dir_head = NULL;
 			v->stream.u.dir.jar_head = NULL;
+
+			// mark disk devices - they might get an I/O scheduler
+			if (last == 0 && !strcmp(temp, "disk"))
+				isDisk = true;
 		}
 
 		hash_insert(sDeviceFileSystem->vnode_list_hash, v);
 
 		devfs_insert_in_dir(dir, v);
 
-		if (at_leaf)
+		if (atLeaf)
 			break;
 		last = i;
 		dir = v;
 	}
 
-err:
+out:
 	mutex_unlock(&sDeviceFileSystem->lock);
-	return err;
+	return status;
 }
 
