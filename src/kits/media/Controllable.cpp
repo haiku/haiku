@@ -132,7 +132,7 @@ BControllable::SetParameterWeb(BParameterWeb *web)
 status_t
 BControllable::HandleMessage(int32 message, const void *data, size_t size)
 {
-	INFO("BControllable::HandleMessage %#lx, node %ld\n", message, ID());
+	PRINT(4, "BControllable::HandleMessage %#lx, node %ld\n", message, ID());
 
 	status_t rv;
 	switch (message) {
@@ -151,7 +151,7 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 				// large data transfer, clone area
 				area = clone_area("get parameter data clone", &data, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (area < B_OK) {
-					FATAL("CONTROLLABLE_GET_PARAMETER_DATA cloning area failed\n");
+					ERROR("CONTROLLABLE_GET_PARAMETER_DATA cloning area failed\n");
 					request->SendReply(B_NO_MEMORY, &reply, sizeof(reply));
 					return B_OK;
 				}
@@ -172,14 +172,14 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 			const void *data;
 			
 			if (request->area == -1) {
-				// small data transfer uses buffer in reply
+				// small data transfer uses buffer in request
 				area = -1;
 				data = request->rawdata;
 			} else {
 				// large data transfer, clone area
 				area = clone_area("set parameter data clone", (void **)&data, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (area < B_OK) {
-					FATAL("CONTROLLABLE_SET_PARAMETER_DATA cloning area failed\n");
+					ERROR("CONTROLLABLE_SET_PARAMETER_DATA cloning area failed\n");
 					request->SendReply(B_NO_MEMORY, &reply, sizeof(reply));
 					return B_OK;
 				}
@@ -205,14 +205,14 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 				area_id area;
 				area = clone_area("cloned parameter web", &buffer, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (area < B_OK) {
-					FATAL("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB clone_area failed\n");
+					ERROR("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB clone_area failed\n");
 					rv = B_ERROR;
 				} else {
 					reply.code = fWeb->TypeCode();
 					reply.size = fWeb->FlattenedSize();
 					rv = fWeb->Flatten(buffer, reply.size);
 					if (rv != B_OK) {
-						FATAL("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB Flatten failed\n");
+						ERROR("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB Flatten failed\n");
 					} else {
 						printf("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB %ld bytes, 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",
 							reply.size, ((uint32*)buffer)[0], ((uint32*)buffer)[1], ((uint32*)buffer)[2], ((uint32*)buffer)[3]);

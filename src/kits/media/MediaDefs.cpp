@@ -511,7 +511,7 @@ multistream_format_specialize(media_multistream_format *format, const media_mult
 			break;
 
 		default:
-			FATAL("media_format::SpecializeTo can't specialize media_multistream_format of format %d\n", format->format);
+			ERROR("media_format::SpecializeTo can't specialize media_multistream_format of format %d\n", format->format);
 	}
 }
 
@@ -587,7 +587,7 @@ media_format::SpecializeTo(const media_format *otherFormat)
 {
 	CALLED();
 	if (type == 0 && otherFormat->type == 0) {
-		FATAL("media_format::SpecializeTo can't specialize wildcard to other wildcard format\n");
+		ERROR("media_format::SpecializeTo can't specialize wildcard to other wildcard format\n");
 		return;
 	}
 		
@@ -616,7 +616,7 @@ media_format::SpecializeTo(const media_format *otherFormat)
 			return;
 		
 		default:
-			FATAL("media_format::SpecializeTo can't specialize format type %d\n", type);
+			ERROR("media_format::SpecializeTo can't specialize format type %d\n", type);
 	}
 }
 

@@ -245,7 +245,7 @@ NotificationManager::CleanupTeam(team_id team)
 	}
 	
 	if (debugcount != 0)
-		FATAL("NotificationManager::CleanupTeam: removed  %d notifications for team %ld\n", debugcount, team);
+		ERROR("NotificationManager::CleanupTeam: removed  %d notifications for team %ld\n", debugcount, team);
 
 	fLocker->Unlock();
 }

@@ -80,7 +80,7 @@ DormantNodeManager::~DormantNodeManager()
 	// force unloading all currently loaded images
 	loaded_addon_info *info;
 	for (fAddonmap->Rewind(); fAddonmap->GetNext(&info); ) {
-		FATAL("Forcing unload of add-on id %ld with usecount %ld\n", info->addon->AddonID(), info->usecount);
+		ERROR("Forcing unload of add-on id %ld with usecount %ld\n", info->addon->AddonID(), info->usecount);
 		UnloadAddon(info->addon, info->image);
 	}
 	
@@ -124,7 +124,7 @@ DormantNodeManager::GetAddon(media_addon_id id)
 	// ok, it's not loaded, try to get the path
 	BPath path;
 	if (B_OK != FindAddonPath(&path, id)) {
-		FATAL("DormantNodeManager::GetAddon: can't find path for add-on %ld\n",id);
+		ERROR("DormantNodeManager::GetAddon: can't find path for add-on %ld\n",id);
 		return NULL;
 	}
 	
@@ -132,7 +132,7 @@ DormantNodeManager::GetAddon(media_addon_id id)
 	BMediaAddOn *newaddon;
 	image_id image;
 	if (B_OK != LoadAddon(&newaddon, &image, path.Path(), id)) {
-		FATAL("DormantNodeManager::GetAddon: can't load add-on %ld from path %s\n",id, path.Path());
+		ERROR("DormantNodeManager::GetAddon: can't load add-on %ld from path %s\n",id, path.Path());
 		return NULL;
 	}
 	
@@ -180,7 +180,7 @@ DormantNodeManager::PutAddon(media_addon_id id)
 	
 	fLock->Lock();
 	if (!fAddonmap->Get(id, &info)) {
-		FATAL("DormantNodeManager::PutAddon: failed to find add-on %ld\n",id);
+		ERROR("DormantNodeManager::PutAddon: failed to find add-on %ld\n",id);
 		fLock->Unlock();
 		return;
 	}
@@ -212,26 +212,26 @@ DormantNodeManager::RegisterAddon(const char *path)
 	
 	rv = get_ref_for_path(path, &tempref);
 	if (rv != B_OK) {
-		FATAL("DormantNodeManager::RegisterAddon failed, couldn't get ref for path %s\n",path);
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't get ref for path %s\n",path);
 		return 0;
 	}
 	msg.ref = tempref;
 	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK) {
-		FATAL("DormantNodeManager::RegisterAddon failed, couldn't find media server\n");
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't find media server\n");
 		return 0;
 	}
 	msg.reply_port = _PortPool->GetPort();
 	rv = write_port(port, SERVER_REGISTER_MEDIAADDON, &msg, sizeof(msg));
 	if (rv != B_OK) {
 		_PortPool->PutPort(msg.reply_port);
-		FATAL("DormantNodeManager::RegisterAddon failed, couldn't talk to media server\n");
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to media server\n");
 		return 0;
 	}
 	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
 	_PortPool->PutPort(msg.reply_port);
 	if (rv < B_OK) {
-		FATAL("DormantNodeManager::RegisterAddon failed, couldn't talk to media server (2)\n");
+		ERROR("DormantNodeManager::RegisterAddon failed, couldn't talk to media server (2)\n");
 		return 0;
 	}
 
@@ -297,20 +297,20 @@ DormantNodeManager::LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const 
 	
 	image = load_add_on(path);
 	if (image < B_OK) {
-		FATAL("DormantNodeManager::LoadAddon: loading failed, error %lx (%s), path %s\n", image, strerror(image), path);
+		ERROR("DormantNodeManager::LoadAddon: loading failed, error %lx (%s), path %s\n", image, strerror(image), path);
 		return B_ERROR;
 	}
 	
 	rv = get_image_symbol(image, "make_media_addon", B_SYMBOL_TYPE_TEXT, (void**)&make_addon);
 	if (rv < B_OK) {
-		FATAL("DormantNodeManager::LoadAddon: loading failed, function not found, error %lx (%s)\n", rv, strerror(rv));
+		ERROR("DormantNodeManager::LoadAddon: loading failed, function not found, error %lx (%s)\n", rv, strerror(rv));
 		unload_add_on(image);
 		return B_ERROR;
 	}
 	
 	addon = make_addon(image);
 	if (addon == 0) {
-		FATAL("DormantNodeManager::LoadAddon: creating BMediaAddOn failed\n");
+		ERROR("DormantNodeManager::LoadAddon: creating BMediaAddOn failed\n");
 		unload_add_on(image);
 		return B_ERROR;
 	}

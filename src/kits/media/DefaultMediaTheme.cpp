@@ -56,7 +56,7 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 			break;
 
 		default:
-			FATAL("BMediaTheme: Don't know parameter type: 0x%lx\n", parameter->Type());
+			ERROR("BMediaTheme: Don't know parameter type: 0x%lx\n", parameter->Type());
 	}
 	return NULL;
 }

@@ -70,7 +70,7 @@ DefaultManager::Set(node_type type, const media_node *node, const dormant_node_i
 		
 		default:
 		{
-			FATAL("DefaultManager::Set Error: called with unknown type %d\n", type);
+			ERROR("DefaultManager::Set Error: called with unknown type %d\n", type);
 			return B_ERROR;
 		}
 	}
@@ -131,7 +131,7 @@ DefaultManager::Get(media_node_id *nodeid, char *input_name, int32 *inputid, nod
 
 		default:
 		{
-			FATAL("DefaultManager::Get Error: called with unknown type %d\n", type);
+			ERROR("DefaultManager::Get Error: called with unknown type %d\n", type);
 			return B_ERROR;
 		}
 	}
@@ -182,9 +182,9 @@ DefaultManager::RescanThread()
 	if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
 		fMixerConnected = B_OK == ConnectMixerToOutput();
 		if (!fMixerConnected)
-			FATAL("DefaultManager: failed to connect mixer and soundcard\n");
+			ERROR("DefaultManager: failed to connect mixer and soundcard\n");
 	} else {
-		FATAL("DefaultManager: Did not try to connect mixer and soundcard\n");
+		ERROR("DefaultManager: Did not try to connect mixer and soundcard\n");
 	}
 
 	printf("DefaultManager::RescanThread() leave\n");
@@ -417,7 +417,7 @@ DefaultManager::ConnectMixerToOutput()
 			case 0:
 				printf("DefaultManager: Trying connect in native format\n");
 				if (B_OK != roster->GetFormatFor(input, &format)) {
-					FATAL("DefaultManager: GetFormatFor failed\n");
+					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
 				}
 				break;
@@ -456,7 +456,7 @@ DefaultManager::ConnectMixerToOutput()
 			break;
 	}
 	if (rv != B_OK) {
-		FATAL("DefaultManager: connect failed\n");
+		ERROR("DefaultManager: connect failed\n");
 		goto finish;
 	}
 

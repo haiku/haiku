@@ -85,6 +85,6 @@ SystemTimeSourceObject::SystemTimeSourceObject(const media_node &node)
 /* virtual */ status_t
 SystemTimeSourceObject::DeleteHook(BMediaNode * node)
 {
-	FATAL("SystemTimeSourceObject::DeleteHook called\n");
+	ERROR("SystemTimeSourceObject::DeleteHook called\n");
 	return B_ERROR;
 }

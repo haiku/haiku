@@ -147,8 +147,7 @@ void _SoundPlayNode::SetTimeSource(BTimeSource *timeSource)
 void
 _SoundPlayNode::SetRunMode(run_mode mode)
 {
-	CALLED();
-	PRINT(("_SoundPlayNode::SetRunMode mode:%i\n", mode));
+	TRACE("_SoundPlayNode::SetRunMode mode:%i\n", mode);
 	BMediaNode::SetRunMode(mode);
 }
 
@@ -627,8 +626,7 @@ _SoundPlayNode::HandleDataStatus(
 						bigtime_t lateness,
 						bool realTimeEvent = false)
 {
-	CALLED();
-	PRINT(("_SoundPlayNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness));
+	TRACE("_SoundPlayNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness);
 	switch(event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;

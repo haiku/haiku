@@ -162,7 +162,7 @@ BBufferProducer::HandleMessage(int32 message,
 							   const void *data,
 							   size_t size)
 {
-	INFO("BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	PRINT(4, "BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	status_t rv;
 	switch (message) {
 		case PRODUCER_SET_RUN_MODE_DELAY:
@@ -199,6 +199,7 @@ BBufferProducer::HandleMessage(int32 message,
 			const producer_prepare_to_connect_request *request = static_cast<const producer_prepare_to_connect_request *>(data);
 			producer_prepare_to_connect_reply reply;
 			reply.format = request->format;
+			reply.out_source = request->source;
 			memcpy(reply.name, request->name, B_MEDIA_NAME_LENGTH);
 			rv = PrepareToConnect(request->source, request->destination, &reply.format, &reply.out_source, reply.name);
 			request->SendReply(rv, &reply, sizeof(reply));

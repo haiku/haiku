@@ -80,7 +80,7 @@ BTimeSource::SnoozeUntil(bigtime_t performance_time,
 bigtime_t
 BTimeSource::Now()
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::Now()\n");
 	return PerformanceTimeFor(RealTime());
 }
 
@@ -88,7 +88,7 @@ BTimeSource::Now()
 bigtime_t
 BTimeSource::PerformanceTimeFor(bigtime_t real_time)
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::PerformanceTimeFor()\n");
 	bigtime_t last_perf_time; 
 	bigtime_t last_real_time; 
 	float last_drift; 
@@ -104,7 +104,7 @@ bigtime_t
 BTimeSource::RealTimeFor(bigtime_t performance_time,
 						 bigtime_t with_latency)
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::RealTimeFor()\n");
 
 	if (fIsRealtime) {
 		return performance_time - with_latency;
@@ -124,7 +124,7 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 bool
 BTimeSource::IsRunning()
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::IsRunning()\n");
 
 	bool isrunning;
 	
@@ -143,7 +143,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 					 bigtime_t *real_time,
 					 float *drift)
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::GetTime()\n");
 
 	if (fIsRealtime) {
 		*performance_time = *real_time = system_time();
@@ -151,7 +151,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 		return B_OK;
 	}
 //	if (fBuf == 0) {
-//		FATAL("BTimeSource::GetTime: fBuf == 0, name %s, id %ld\n",Name(),ID());
+//		PRINT(1, "BTimeSource::GetTime: fBuf == 0, name %s, id %ld\n",Name(),ID());
 //		*performance_time = *real_time = system_time();
 //		*drift = 1.0f;
 //		return B_OK;
@@ -178,7 +178,7 @@ BTimeSource::GetTime(bigtime_t *performance_time,
 bigtime_t
 BTimeSource::RealTime()
 {
-	CALLED();
+	PRINT(8, "CALLED BTimeSource::RealTime()\n");
 	return system_time();
 }
 
@@ -209,7 +209,7 @@ BTimeSource::BTimeSource() :
 //	printf("##### BTimeSource::BTimeSource() name %s, id %ld\n", Name(), ID());
 
 	if (fSlaveNodes == NULL) {
-		FATAL("Error: BTimeSource::BTimeSource() fSlaveNodes == NULL\n");
+		ERROR("BTimeSource::BTimeSource() fSlaveNodes == NULL\n");
 		return;
 	}
 
@@ -229,7 +229,7 @@ BTimeSource::HandleMessage(int32 message,
 						   const void *rawdata,
 						   size_t size)
 {
-	INFO("BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	PRINT(4, "BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
 
 	switch (message) {
 		case TIMESOURCE_OP:
@@ -252,7 +252,7 @@ BTimeSource::HandleMessage(int32 message,
 			status_t result;
 			result = TimeSourceOp(*data, NULL);
 			if (result != B_OK) {
-				FATAL("BTimeSource::HandleMessage: TimeSourceOp failed\n");
+				ERROR("BTimeSource::HandleMessage: TimeSourceOp failed\n");
 			}
 			return B_OK;
 		}
@@ -282,7 +282,7 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 {
 	TRACE_TIMESOURCE("BTimeSource::PublishTime timesource %ld, perf %16Ld, real %16Ld, drift %2.2f\n", ID(), performance_time, real_time, drift);
 	if (0 == fBuf) {
-		FATAL("BTimeSource::PublishTime timesource %ld, fBuf = NULL\n", ID());
+		ERROR("BTimeSource::PublishTime timesource %ld, fBuf = NULL\n", ID());
 		fStarted = true;
 		return;
 	}
@@ -383,13 +383,13 @@ BTimeSource::BTimeSource(media_node_id id) :
 	sprintf(name, "__timesource_buf_%ld", id);
 	area = find_area(name);
 	if (area <= 0) {
-		FATAL("BTimeSource::BTimeSource couldn't find area, node %ld\n", id);
+		ERROR("BTimeSource::BTimeSource couldn't find area, node %ld\n", id);
 		return;
 	}
 	sprintf(name, "__cloned_timesource_buf_%ld", id);
 	fArea = clone_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
 	if (fArea <= 0) {
-		FATAL("BTimeSource::BTimeSource couldn't clone area, node %ld\n", id);
+		ERROR("BTimeSource::BTimeSource couldn't clone area, node %ld\n", id);
 		return;
 	}
 }
@@ -405,7 +405,7 @@ BTimeSource::FinishCreate()
 	sprintf(name, "__timesource_buf_%ld", ID());
 	fArea = create_area(name, reinterpret_cast<void **>(const_cast<BPrivate::media::TimeSourceTransmit **>(&fBuf)), B_ANY_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (fArea <= 0) {
-		FATAL("BTimeSource::BTimeSource couldn't create area, node %ld\n", ID());
+		ERROR("BTimeSource::BTimeSource couldn't create area, node %ld\n", ID());
 		fBuf = NULL;
 		return;
 	}
@@ -457,7 +457,7 @@ BTimeSource::DirectAddMe(const media_node &node)
 	BAutolock lock(fSlaveNodes->locker);
 
 	if (fSlaveNodes->count == SLAVE_NODES_COUNT) {
-		FATAL("BTimeSource::DirectAddMe out of slave node slots\n");
+		ERROR("BTimeSource::DirectAddMe out of slave node slots\n");
 		return;
 	}
 	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
@@ -476,7 +476,7 @@ BTimeSource::DirectAddMe(const media_node &node)
 			return;
 		}
 	}
-	FATAL("BTimeSource::DirectAddMe failed\n");
+	ERROR("BTimeSource::DirectAddMe failed\n");
 }
 
 void
@@ -488,7 +488,7 @@ BTimeSource::DirectRemoveMe(const media_node &node)
 	BAutolock lock(fSlaveNodes->locker);
 
 	if (fSlaveNodes->count == 0) {
-		FATAL("BTimeSource::DirectRemoveMe no slots used\n");
+		ERROR("BTimeSource::DirectRemoveMe no slots used\n");
 		return;
 	}
 	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
@@ -507,7 +507,7 @@ BTimeSource::DirectRemoveMe(const media_node &node)
 			return;
 		}
 	}
-	FATAL("BTimeSource::DirectRemoveMe failed\n");
+	ERROR("BTimeSource::DirectRemoveMe failed\n");
 }
 
 void

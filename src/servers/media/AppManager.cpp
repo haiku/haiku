@@ -75,7 +75,7 @@ status_t AppManager::RegisterTeam(team_id team, BMessenger messenger)
 	BAutolock lock(fLocker);
 	TRACE("AppManager::RegisterTeam %ld\n", team);
 	if (HasTeam(team)) {
-		FATAL("Erorr: AppManager::RegisterTeam: team %ld already registered\n", team);
+		ERROR("AppManager::RegisterTeam: team %ld already registered\n", team);
 		return B_ERROR;
 	}
 	App app;
@@ -126,12 +126,12 @@ void AppManager::RestartAddonServer()
 		restart_tries = 0;
 	}
 	if (restart_tries < 5) {
-		FATAL("AppManager: Restarting media_addon_server...\n");
+		PRINT(1, "AppManager: Restarting media_addon_server...\n");
 		// XXX fixme. We should wait until it is *really* gone
 		snooze(5000000);
 		StartAddonServer();
 	} else {
-		FATAL("AppManager: media_addon_server crashed too often, not restarted\n");
+		PRINT(1, "AppManager: media_addon_server crashed too often, not restarted\n");
 	}
 }
 

@@ -171,7 +171,7 @@ BMediaNode::Release()
 		TRACE("BMediaNode::Release() saving node %ld configuration\n", fNodeID);
 		MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(this);
 		if (DeleteHook(this) != B_OK) {
-			FATAL("BMediaNode::Release(): DeleteHook failed\n");
+			ERROR("BMediaNode::Release(): DeleteHook failed\n");
 			return Acquire();
 		}
 		return NULL;
@@ -227,7 +227,7 @@ BMediaNode::RunMode() const
 BTimeSource *
 BMediaNode::TimeSource() const
 {
-	CALLED();
+	PRINT(7, "CALLED BMediaNode::TimeSource()\n");
 	
 	// return the currently assigned time source
 	if (fTimeSource != 0)
@@ -249,7 +249,7 @@ BMediaNode::TimeSource() const
 	ASSERT(fTimeSource == self->fTimeSource);
 
 	if (fTimeSource == 0) {
-		FATAL("BMediaNode::TimeSource: Error, MakeTimeSourceFor failed\n");
+		ERROR("BMediaNode::TimeSource: MakeTimeSourceFor failed\n");
 	} else {
 		ASSERT(fTimeSourceID == fTimeSource->ID());
 		fTimeSource->AddMe(self);
@@ -264,7 +264,7 @@ BMediaNode::TimeSource() const
 /* virtual */ port_id
 BMediaNode::ControlPort() const
 {
-	CALLED();
+	PRINT(7, "CALLED BMediaNode::ControlPort()\n");
 	return fControlPort;
 }
 
@@ -291,7 +291,7 @@ BMediaNode::ReportError(node_error what,
 		case BMediaNode::B_NODE_IN_DISTRESS:
 			break;
 		default:
-			FATAL("BMediaNode::ReportError: invalid what!\n");
+			ERROR("BMediaNode::ReportError: invalid what!\n");
 			return B_BAD_VALUE;
 	}
 	
@@ -345,8 +345,8 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 						   uint32 flags,
 						   void *_reserved_)
 {
-	CALLED();
-	ASSERT(this != 0);
+	PRINT(6, "CALLED BMediaNode::WaitForMessage()\n");
+
 	// This function waits until either real time specified by 
 	// waitUntil or a message is received on the control port.
 	// The flags are currently unused and should be 0. 
@@ -358,14 +358,14 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	size = read_port_etc(ControlPort(), &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size <= 0) {
 		if (size != B_TIMED_OUT)
-			FATAL("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
+			ERROR("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
 		return size; // returns the error code
 	}
 
-	TRACE("BMediaNode::WaitForMessage %#lx, node %ld, this %p\n", message, fNodeID, this);
+	PRINT(7, "BMediaNode::WaitForMessage %#lx, node %ld, this %p\n", message, fNodeID, this);
 
 	if (message > NODE_MESSAGE_START && message < NODE_MESSAGE_END) {
-		INFO("BMediaNode::WaitForMessage calling BMediaNode\n");
+		PRINT(4, "BMediaNode::WaitForMessage calling BMediaNode\n");
 		if (B_OK == BMediaNode::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -373,7 +373,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > PRODUCER_MESSAGE_START && message < PRODUCER_MESSAGE_END) {
 		if (!fProducerThis)
 			fProducerThis = dynamic_cast<BBufferProducer *>(this);
-		INFO("BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
+		PRINT(4, "BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
 		if (fProducerThis && B_OK == fProducerThis->BBufferProducer::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -381,7 +381,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > CONSUMER_MESSAGE_START && message < CONSUMER_MESSAGE_END) {
 		if (!fConsumerThis)
 			fConsumerThis = dynamic_cast<BBufferConsumer *>(this);
-		INFO("BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
+		PRINT(4, "BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
 		if (fConsumerThis && B_OK == fConsumerThis->BBufferConsumer::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -389,7 +389,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > FILEINTERFACE_MESSAGE_START && message < FILEINTERFACE_MESSAGE_END) {
 		if (!fFileInterfaceThis)
 			fFileInterfaceThis = dynamic_cast<BFileInterface *>(this);
-		INFO("BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
+		PRINT(4, "BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
 		if (fFileInterfaceThis && B_OK == fFileInterfaceThis->BFileInterface::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -397,7 +397,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
 		if (!fControllableThis)
 			fControllableThis = dynamic_cast<BControllable *>(this);
-		INFO("BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
+		PRINT(4, "BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
 		if (fControllableThis && B_OK == fControllableThis->BControllable::HandleMessage(message, data, size))
 			return B_OK;
 	}
@@ -405,12 +405,12 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > TIMESOURCE_MESSAGE_START && message < TIMESOURCE_MESSAGE_END) {
 		if (!fTimeSourceThis)
 			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
-		INFO("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
+		PRINT(4, "BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
 		if (fTimeSourceThis && B_OK == fTimeSourceThis->BTimeSource::HandleMessage(message, data, size))
 			return B_OK;
 	}
 
-	INFO("BMediaNode::WaitForMessage calling default\n");
+	PRINT(4, "BMediaNode::WaitForMessage calling default\n");
 	if (B_OK == HandleMessage(message, data, size))
 		return B_OK;
 
@@ -520,7 +520,7 @@ BMediaNode::HandleMessage(int32 message,
 						  const void *data,
 						  size_t size)
 {
-	INFO("BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	PRINT(4, "BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	switch (message) {
 		case NODE_FINAL_RELEASE:
 		{
@@ -646,7 +646,7 @@ BMediaNode::HandleBadMessage(int32 code,
 
 	TRACE("BMediaNode::HandleBadMessage: code %#08lx, buffer %p, size %ld\n", code, buffer, size);
 	if (code < NODE_MESSAGE_START || code > TIMESOURCE_MESSAGE_END) {
-		FATAL("BMediaNode::HandleBadMessage: unknown code!\n");
+		ERROR("BMediaNode::HandleBadMessage: unknown code!\n");
 	} else {
 		/* All messages targeted to nodes should be handled here,
 		 * messages targetted to the wrong node should be handled

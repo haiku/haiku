@@ -109,15 +109,15 @@ NodeManager::UnregisterNode(media_addon_id *addonid, int32 *flavorid, media_node
 	TRACE("NodeManager::UnregisterNode enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::UnregisterNode: Error: couldn't finde node %ld (team %ld)\n", nodeid, team);
+		ERROR("NodeManager::UnregisterNode: couldn't finde node %ld (team %ld)\n", nodeid, team);
 		return B_ERROR;
 	}
 	if (rn->team != team) {
-		FATAL("!!! NodeManager::UnregisterNode: Error: team %ld tried to unregister node %ld, but it was instantiated by team %ld\n", team, nodeid, rn->team);
+		ERROR("NodeManager::UnregisterNode: team %ld tried to unregister node %ld, but it was instantiated by team %ld\n", team, nodeid, rn->team);
 		return B_ERROR;
 	}
 	if (rn->globalrefcount != 1) {
-		FATAL("!!! NodeManager::UnregisterNode: Error: node %ld, team %ld, globalrefcount %ld\n", nodeid, team, rn->globalrefcount);
+		ERROR("NodeManager::UnregisterNode: node %ld, team %ld has globalrefcount %ld (should be 1)\n", nodeid, team, rn->globalrefcount);
 		//return B_ERROR;
 	}
 	*addonid = rn->addon_id;
@@ -138,7 +138,7 @@ NodeManager::IncrementGlobalRefCount(media_node_id nodeid, team_id team)
 	TRACE("NodeManager::IncrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::IncrementGlobalRefCount: Error: node %ld not found\n", nodeid);
+		ERROR("NodeManager::IncrementGlobalRefCount: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
@@ -167,7 +167,7 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 	TRACE("NodeManager::DecrementGlobalRefCount enter: node %ld, team %ld\n", nodeid, team);
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld not found\n", nodeid);
+		ERROR("NodeManager::DecrementGlobalRefCount: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	int32 *count;
@@ -184,7 +184,7 @@ NodeManager::DecrementGlobalRefCount(media_node_id nodeid, team_id team)
 			team = addon_server_team; //redirect!
 			// the count variable was already redirected in if() statement above.
 		} else {
-			FATAL("!!! NodeManager::DecrementGlobalRefCount: Error: node %ld has no team %ld references\n", nodeid, team);
+			ERROR("NodeManager::DecrementGlobalRefCount: node %ld has no team %ld references\n", nodeid, team);
 			return B_ERROR;
 		}
 	}
@@ -216,12 +216,12 @@ NodeManager::SetNodeCreator(media_node_id nodeid, team_id creator)
 
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("NodeManager::SetNodeCreator: Error: node %ld not found\n", nodeid);
+		ERROR("NodeManager::SetNodeCreator: node %ld not found\n", nodeid);
 		return B_ERROR;
 	}
 	
 	if (rn->creator != -1) {
-		FATAL("NodeManager::SetNodeCreator: Error: node %ld is already assigned creator %ld\n", nodeid, rn->creator);
+		ERROR("NodeManager::SetNodeCreator: node %ld is already assigned creator %ld\n", nodeid, rn->creator);
 		return B_ERROR;
 	}
 	
@@ -240,14 +240,14 @@ NodeManager::FinalReleaseNode(media_node_id nodeid)
 	TRACE("NodeManager::FinalReleaseNode enter: node %ld\n", nodeid);
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("NodeManager::FinalReleaseNode: Error: node %ld not found\n", nodeid);
+		ERROR("NodeManager::FinalReleaseNode: node %ld not found\n", nodeid);
 		return;
 	}
 
 	node_final_release_command cmd;
 	rv = SendToPort(rn->port, NODE_FINAL_RELEASE, &cmd, sizeof(cmd));
 	if (rv != B_OK) {
-		FATAL("NodeManager::FinalReleaseNode: Error: can't send command to node %ld\n", nodeid);
+		ERROR("NodeManager::FinalReleaseNode: can't send command to node %ld\n", nodeid);
 		return;
 	}
 }
@@ -262,13 +262,13 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 	TRACE("NodeManager::GetCloneForId enter: node %ld team %ld\n", nodeid, team);
 
 	if (B_OK != IncrementGlobalRefCount(nodeid, team)) {
-		FATAL("!!! NodeManager::GetCloneForId: Error: couldn't increment ref count, node %ld team %ld\n", nodeid, team);
+		ERROR("NodeManager::GetCloneForId: couldn't increment ref count, node %ld team %ld\n", nodeid, team);
 		return B_ERROR;
 	}
 
 	b = fRegisteredNodeMap->Get(nodeid, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::GetCloneForId: Error: node %ld not found\n", nodeid);
+		ERROR("NodeManager::GetCloneForId: node %ld not found\n", nodeid);
 		DecrementGlobalRefCount(nodeid, team);
 		return B_ERROR;
 	}
@@ -297,7 +297,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 	
 	status = GetDefaultNode(&id, input_name, input_id, type);
 	if (status != B_OK) {
-		FATAL("NodeManager::GetClone Error: couldn't GetDefaultNode, team %ld, type %d (%s)\n", team, type, get_node_type(type));
+		ERROR("NodeManager::GetClone: couldn't GetDefaultNode, team %ld, type %d (%s)\n", team, type, get_node_type(type));
 		*node = media_node::null;
 		return status;
 	}
@@ -305,7 +305,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 
 	status = GetCloneForId(node, id, team);
 	if (status != B_OK) {
-		FATAL("NodeManager::GetClone Error: couldn't GetCloneForId, id %ld, team %ld, type %d (%s)\n", id, team, type, get_node_type(type));
+		ERROR("NodeManager::GetClone: couldn't GetCloneForId, id %ld, team %ld, type %d (%s)\n", id, team, type, get_node_type(type));
 		*node = media_node::null;
 		return status;
 	}
@@ -323,7 +323,7 @@ NodeManager::ReleaseNode(const media_node &node, team_id team)
 	BAutolock lock(fLocker);
 	TRACE("NodeManager::ReleaseNode enter: node %ld team %ld\n", node.node, team);
 	if (B_OK != DecrementGlobalRefCount(node.node, team)) {
-		FATAL("!!! NodeManager::ReleaseNode: Error: couldn't decrement node %ld team %ld ref count\n", node.node, team);
+		ERROR("NodeManager::ReleaseNode: couldn't decrement node %ld team %ld ref count\n", node.node, team);
 	}
 	TRACE("NodeManager::ReleaseNode leave: node %ld team %ld\n", node.node, team);
 	return B_OK;
@@ -338,7 +338,7 @@ NodeManager::PublishInputs(const media_node &node, const media_input *inputs, in
 	bool b;
 	b = fRegisteredNodeMap->Get(node.node, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::PublishInputs: Error: node %ld not found\n", node.node);
+		ERROR("NodeManager::PublishInputs: node %ld not found\n", node.node);
 		return B_ERROR;
 	}
 	rn->inputlist.MakeEmpty();
@@ -356,7 +356,7 @@ NodeManager::PublishOutputs(const media_node &node, const media_output *outputs,
 	bool b;
 	b = fRegisteredNodeMap->Get(node.node, &rn);
 	if (!b) {
-		FATAL("!!! NodeManager::PublishOutputs: Error: node %ld not found\n", node.node);
+		ERROR("NodeManager::PublishOutputs: node %ld not found\n", node.node);
 		return B_ERROR;
 	}
 	rn->outputlist.MakeEmpty();
@@ -394,7 +394,7 @@ NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
 			}
 		}
 	}
-	FATAL("!!! NodeManager::FindNodeId failed, port %ld\n", port);
+	ERROR("NodeManager::FindNodeId failed, port %ld\n", port);
 	return B_ERROR;
 }
 
@@ -419,7 +419,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 			return B_OK;
 		}
 	}
-	FATAL("!!! NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
+	ERROR("NodeManager::GetDormantNodeInfo failed, node %ld\n", node.node);
 	return B_ERROR;
 }
 
@@ -439,7 +439,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 			return B_OK;
 		}
 	}
-	FATAL("!!! NodeManager::GetLiveNodeInfo failed, node %ld\n", node.node);
+	ERROR("NodeManager::GetLiveNodeInfo failed, node %ld\n", node.node);
 	return B_ERROR;
 }
 
@@ -605,7 +605,7 @@ NodeManager::AddDormantFlavorInfo(const dormant_flavor_info &dfi)
 		if (dafi->AddonID != dfi.node_info.addon || dafi->AddonFlavorID != dfi.node_info.flavor_id)
 			continue;
 		if (dafi->InfoValid) {
-			FATAL("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld does already exist\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id);
+			ERROR("NodeManager::AddDormantFlavorInfo, addon-id %ld, flavor-id %ld does already exist\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id);
 		}
 		TRACE("NodeManager::AddDormantFlavorInfo, updating addon-id %ld, flavor-id %ld\n", dafi->Info.node_info.addon, dafi->Info.node_info.flavor_id);
 		dafi->MaxInstancesCount = dfi.possible_count > 0 ? dfi.possible_count : 0x7fffffff;
@@ -669,7 +669,7 @@ NodeManager::IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 			continue;
 
 		if (dafi->GlobalInstancesCount >= dafi->MaxInstancesCount) {
-			FATAL("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld maximum (or more) instances already exist\n", addonid, flavorid);
+			ERROR("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld maximum (or more) instances already exist\n", addonid, flavorid);
 			return B_ERROR; // maximum (or more) instances already exist
 		}
 			
@@ -685,7 +685,7 @@ NodeManager::IncrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 		dafi->GlobalInstancesCount += 1;
 		return B_OK;
 	}
-	FATAL("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
+	ERROR("NodeManager::IncrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
 	return B_ERROR;
 }
 
@@ -703,7 +703,7 @@ NodeManager::DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 		int32 *count;
 		b = dafi->TeamInstancesCount.Get(team, &count);
 		if (!b) {
-			FATAL("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld team %ld has no references\n", addonid, flavorid, team);
+			ERROR("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld team %ld has no references\n", addonid, flavorid, team);
 			return B_ERROR;
 		}
 		*count -= 1;
@@ -715,7 +715,7 @@ NodeManager::DecrementAddonFlavorInstancesCount(media_addon_id addonid, int32 fl
 			dafi->GlobalInstancesCount -= 1;
 		return B_OK;
 	}
-	FATAL("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
+	ERROR("NodeManager::DecrementAddonFlavorInstancesCount addonid %ld, flavorid %ld not found\n", addonid, flavorid);
 	return B_ERROR;
 }
 
@@ -851,7 +851,7 @@ NodeManager::CleanupTeam(team_id team)
 
 	fDefaultManager->CleanupTeam(team);
 
-	FATAL("NodeManager::CleanupTeam: team %ld\n", team);
+	PRINT(1, "NodeManager::CleanupTeam: team %ld\n", team);
 
 	// XXX send notifications after removing nodes
 	
@@ -867,7 +867,7 @@ NodeManager::CleanupTeam(team_id team)
 		}
 		// if the team hosting this node is gone, remove node from database
 		if (rn->team == team) {
-			FATAL("NodeManager::CleanupTeam: removing node id %ld, team %ld\n", rn->nodeid, team);
+			PRINT(1, "NodeManager::CleanupTeam: removing node id %ld, team %ld\n", rn->nodeid, team);
 			fRegisteredNodeMap->RemoveCurrent();
 			continue;
 		}
@@ -877,14 +877,14 @@ NodeManager::CleanupTeam(team_id team)
 		for (rn->teamrefcount.Rewind(); rn->teamrefcount.GetNext(&prefcount); ) {
 			rn->teamrefcount.GetCurrentKey(&pteam);
 			if (*pteam == team) {
-				FATAL("NodeManager::CleanupTeam: removing %ld refs from node id %ld, team %ld\n", *prefcount, rn->nodeid, team);
+				PRINT(1, "NodeManager::CleanupTeam: removing %ld refs from node id %ld, team %ld\n", *prefcount, rn->nodeid, team);
 				rn->teamrefcount.RemoveCurrent();
 				break;
 			}
 		}
 		// if the team refcount is now empty, also remove the node
 		if (rn->teamrefcount.IsEmpty()) {
-			FATAL("NodeManager::CleanupTeam: removing node id %ld that has no teams\n", rn->nodeid);
+			PRINT(1, "NodeManager::CleanupTeam: removing node id %ld that has no teams\n", rn->nodeid);
 			fRegisteredNodeMap->RemoveCurrent();
 		}
 	}
@@ -896,7 +896,7 @@ NodeManager::CleanupTeam(team_id team)
 		int32 *count;
 		b = dafi->TeamInstancesCount.Get(team, &count);
 		if (b) {
-			FATAL("NodeManager::CleanupTeam: removing %ld instances from addon %ld, flavor %ld\n", *count, dafi->AddonID, dafi->AddonFlavorID);
+			PRINT(1, "NodeManager::CleanupTeam: removing %ld instances from addon %ld, flavor %ld\n", *count, dafi->AddonID, dafi->AddonFlavorID);
 			dafi->GlobalInstancesCount -= *count;
 			if (dafi->GlobalInstancesCount < 0)		// avoid underflow
 				dafi->GlobalInstancesCount = 0;

@@ -145,7 +145,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 			BMediaAddOn *addon;
 			addon = _DormantNodeManager->GetAddon(command->addonid);
 			if (!addon) {
-				FATAL("rescan flavors: Can't find a addon object for id %d\n",(int)command->addonid);
+				ERROR("rescan flavors: Can't find a addon object for id %d\n",(int)command->addonid);
 				break;
 			}
 			ScanAddOnFlavors(addon);
@@ -154,7 +154,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 		}
 
 		default:
-			FATAL("media_addon_server: received unknown message code %#08lx\n",code);
+			ERROR("media_addon_server: received unknown message code %#08lx\n",code);
 	}
 }
 
@@ -187,7 +187,7 @@ MediaAddonServer::ReadyToRun()
 	request.team = BPrivate::media::team;
 	result = QueryServer(SERVER_REGISTER_ADDONSERVER, &request, sizeof(request), &reply, sizeof(reply));
 	if (result != B_OK) {
-		FATAL("Communication with server failed. Terminating.\n");
+		ERROR("Communication with server failed. Terminating.\n");
 		PostMessage(B_QUIT_REQUESTED);
 		return;
 	}
@@ -254,7 +254,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	
 	port = find_port(MEDIA_SERVER_PORT_NAME);
 	if (port <= B_OK) {
-		FATAL("couldn't find media_server port\n");
+		ERROR("couldn't find media_server port\n");
 		return;
 	}
 	
@@ -276,7 +276,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 		const flavor_info *info;
 		TRACE("flavor %d:\n",i);
 		if (B_OK != addon->GetFlavorAt(i, &info)) {
-			FATAL("MediaAddonServer::ScanAddOnFlavors GetFlavorAt failed for index %d!\n", i);
+			ERROR("MediaAddonServer::ScanAddOnFlavors GetFlavorAt failed for index %d!\n", i);
 			continue;
 		}
 		
@@ -310,7 +310,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 
 		rv = write_port(port, SERVER_REGISTER_DORMANT_NODE, msg, msgsize);
 		if (rv != B_OK) {
-			FATAL("MediaAddonServer::ScanAddOnFlavors: couldn't register dormant node\n");
+			ERROR("MediaAddonServer::ScanAddOnFlavors: couldn't register dormant node\n");
 		}
 
 		free(msg);
@@ -332,7 +332,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 
 	id = _DormantNodeManager->RegisterAddon(path);
 	if (id <= 0) {
-		FATAL("MediaAddonServer::AddOnAdded: failed to register add-on %s\n", path);
+		ERROR("MediaAddonServer::AddOnAdded: failed to register add-on %s\n", path);
 		return;
 	}
 	
@@ -340,7 +340,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
-		FATAL("MediaAddonServer::AddOnAdded: failed to get add-on %s\n", path);
+		ERROR("MediaAddonServer::AddOnAdded: failed to get add-on %s\n", path);
 		_DormantNodeManager->UnregisterAddon(id);
 		return;
 	}
@@ -371,7 +371,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	info->wants_autostart = addon->WantsAutoStart();
 	
 	if (info->wants_autostart)
-		FATAL("#### add-on %ld WantsAutoStart!\n", id);
+		TRACE("add-on %ld WantsAutoStart!\n", id);
 
 	// During startup, first all add-ons are loaded, then all
 	// nodes (flavors) representing physical inputs and outputs
@@ -417,7 +417,7 @@ MediaAddonServer::InstantiatePhysialInputsAndOutputs(AddOnInfo *info)
 	for (int i = 0; i < count; i++) {
 		const flavor_info *flavorinfo;
 		if (B_OK != info->addon->GetFlavorAt(i, &flavorinfo)) {
-			FATAL("MediaAddonServer::InstantiatePhysialInputsAndOutputs GetFlavorAt failed for index %d!\n", i);
+			ERROR("MediaAddonServer::InstantiatePhysialInputsAndOutputs GetFlavorAt failed for index %d!\n", i);
 			continue;
 		}
 		if (flavorinfo->kinds & (B_PHYSICAL_INPUT | B_PHYSICAL_OUTPUT)) {
@@ -487,14 +487,14 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 	// XXX locking?
 	
 	if (!filemap->Get(file_node, &tempid)) {
-		FATAL("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
+		ERROR("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
 		return;
 	}
 	id = *tempid; // tempid pointer is invalid after Removing() it from the map
 	filemap->Remove(file_node);
 	
 	if (!infomap->Get(id, &info)) {
-		FATAL("MediaAddonServer::AddOnRemoved: couldn't get addon info for add-on %ld\n", id);
+		ERROR("MediaAddonServer::AddOnRemoved: couldn't get addon info for add-on %ld\n", id);
 		oldflavorcount = 1000;
 	} else {
 		oldflavorcount = info->flavor_count; //same reason as above
@@ -503,7 +503,7 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 		PutAddonIfPossible(info);
 	
 		if (info->addon) {
-			FATAL("MediaAddonServer::AddOnRemoved: couldn't unload addon %ld since flavors are in use\n", id);
+			ERROR("MediaAddonServer::AddOnRemoved: couldn't unload addon %ld since flavors are in use\n", id);
 		}
 	}
 

@@ -135,7 +135,8 @@ media_buffer_id
 BBuffer::ID()
 {
 	CALLED();
-	return fBufferID;
+	return fMediaHeader.buffer;
+	//return fBufferID;
 }
 
 
@@ -199,7 +200,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	server_get_shared_buffer_area_request area_request;
 	server_get_shared_buffer_area_reply area_reply;
 	if (QueryServer(SERVER_GET_SHARED_BUFFER_AREA, &area_request, sizeof(area_request), &area_reply, sizeof(area_reply)) != B_OK) {
-		FATAL("BBuffer::BBuffer: SERVER_GET_SHARED_BUFFER_AREA failed\n");
+		ERROR("BBuffer::BBuffer: SERVER_GET_SHARED_BUFFER_AREA failed\n");
 		return;
 	}
 	
@@ -207,7 +208,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	
 	fBufferList = _shared_buffer_list::Clone(area_reply.area);
 	if (fBufferList == NULL) {
-		FATAL("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
+		ERROR("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
 		return;
 	}
 
@@ -226,7 +227,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	// the area_id of the cached area is passed back to us, and we clone it.
 
 	if (QueryServer(SERVER_REGISTER_BUFFER, &request, sizeof(request), &reply, sizeof(reply)) != B_OK) {
-		FATAL("BBuffer::BBuffer: failed to register buffer with media_server\n");
+		ERROR("BBuffer::BBuffer: failed to register buffer with media_server\n");
 		return;
 	}
 
@@ -244,13 +245,14 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, reply.info.area);
 	if (fArea <= B_OK) {
 		// XXX should unregister buffer here
-		FATAL("BBuffer::BBuffer: buffer cloning failed\n");
+		ERROR("BBuffer::BBuffer: buffer cloning failed\n");
 		fData = 0;
 		return;
 	}
 
 	fData = (char *)fData + fOffset;
 	fMediaHeader.size_used = 0;
+	fMediaHeader.buffer = fBufferID;
 }
 
 
@@ -282,7 +284,7 @@ BBuffer::SetHeader(const media_header *header)
 {
 	CALLED();
 	fMediaHeader = *header;
-	fMediaHeader.buffer = fBufferID;
+//	fMediaHeader.buffer = fBufferID;
 }
 
 

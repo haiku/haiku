@@ -572,7 +572,7 @@ _event_queue_imp::CleanupEvent(media_timed_event *event)
 		if (fCleanupHook)
 			(*fCleanupHook)(event,fCleanupHookContext);
 	} else {
-		FATAL("BTimedEventQueue cleanup unhandled! type = %ld, cleanup = %ld\n", event->type, event->cleanup);
+		ERROR("BTimedEventQueue cleanup unhandled! type = %ld, cleanup = %ld\n", event->type, event->cleanup);
 	}
 }
 

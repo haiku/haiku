@@ -20,7 +20,7 @@
 #ifdef DEBUG
 #	undef DEBUG
 #endif
-#define DEBUG 3
+//#define DEBUG 3
 
 #include "debug.h"
 
@@ -530,13 +530,13 @@ BParameterWeb::Flatten(void *buffer, ssize_t size) const
 	for (int32 i = 0; i < count; i++) {
 		BParameterGroup *group = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
 		if (group == NULL) {
-			FATAL("BParameterWeb::Flatten(): group is NULL\n");
+			ERROR("BParameterWeb::Flatten(): group is NULL\n");
 			continue;
 		}
 
 		ssize_t groupSize = group->FlattenedSize();
 		if (groupSize > size_left(size, bufferStart, buffer)) {
-			FATAL("BParameterWeb::Flatten(): buffer too small\n");
+			ERROR("BParameterWeb::Flatten(): buffer too small\n");
 			return B_BAD_VALUE;
 		}
 
@@ -567,12 +567,12 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 	CALLED();
 
 	if (!AllowsTypeCode(code)) {
-		FATAL("BParameterWeb::Unflatten(): wrong type code\n");
+		ERROR("BParameterWeb::Unflatten(): wrong type code\n");
 		return B_BAD_TYPE;
 	}
 
 	if (buffer == NULL) {
-		FATAL("BParameterWeb::Unflatten(): NULL buffer pointer\n");
+		ERROR("BParameterWeb::Unflatten(): NULL buffer pointer\n");
 		return B_NO_INIT;
 	}
 
@@ -580,7 +580,7 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 	// signature field, the mystery field, the group count, and the Node, then there is a problem
 	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(int32) + sizeof(ssize_t) + sizeof(media_node)) )
 	{
-		FATAL("BParameterWeb::Unflatten(): size to small\n");
+		ERROR("BParameterWeb::Unflatten(): size to small\n");
 		return B_ERROR;
 	}
 
@@ -600,7 +600,7 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 	// information - but it doesn't seem to have another purpose	
 	int32 version = read_from_buffer_swap32<int32>(&buffer, isSwapped);
 	if (version != kCurrentParameterWebVersion) {
-		FATAL("BParameterWeb::Unflatten(): wrong version %ld (%lx)?!\n", version, version);
+		ERROR("BParameterWeb::Unflatten(): wrong version %ld (%lx)?!\n", version, version);
 		return B_ERROR;
 	}
 
@@ -632,14 +632,14 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 	for (int32 i = 0; i < count; i++) {
 		ssize_t groupSize = read_from_buffer_swap32<ssize_t>(&buffer, isSwapped);
 		if (groupSize > size_left(size, bufferStart, buffer)) {
-			FATAL("BParameterWeb::Unflatten(): buffer too small\n");
+			ERROR("BParameterWeb::Unflatten(): buffer too small\n");
 			return B_BAD_DATA;
 		}
 
 		BParameterGroup *group = new BParameterGroup(this, "unnamed");
 		status_t status = group->Unflatten(group->TypeCode(), buffer, groupSize);
 		if (status < B_OK) {
-			FATAL("BParameterWeb::Unflatten(): unflatten group failed\n");
+			ERROR("BParameterWeb::Unflatten(): unflatten group failed\n");
 			delete group;
 			return status;
 		}
@@ -965,7 +965,7 @@ BParameterGroup::Flatten(void *buffer, ssize_t size) const
 	CALLED();
 
 	if (buffer == NULL) {
-		FATAL("BParameterGroup::Flatten buffer is NULL\n");
+		ERROR("BParameterGroup::Flatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
@@ -976,7 +976,7 @@ BParameterGroup::Flatten(void *buffer, ssize_t size) const
 	// BParameterGroup::FlattenedSize, not by a descendent's override of this method.
 	ssize_t actualSize = BParameterGroup::FlattenedSize();
 	if (size < actualSize) {
-		FATAL("BParameterGroup::Flatten size to small\n");
+		ERROR("BParameterGroup::Flatten size to small\n");
 		return B_NO_MEMORY;
 	}
 
@@ -994,7 +994,7 @@ BParameterGroup::Flatten(void *buffer, ssize_t size) const
 	for (int32 i = 0; i < count; i++) {
 		BParameter *parameter = static_cast<BParameter *>(mControls->ItemAt(i));
 		if (parameter == NULL) {
-			FATAL("BParameterGroup::Flatten(): NULL parameter\n");
+			ERROR("BParameterGroup::Flatten(): NULL parameter\n");
 			continue;
 		}
 
@@ -1020,7 +1020,7 @@ BParameterGroup::Flatten(void *buffer, ssize_t size) const
 	for (int32 i = 0; i < count; i++) {
 		BParameterGroup *group = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
 		if (group == NULL) {
-			FATAL("BParameterGroup::Flatten(): NULL group\n");
+			ERROR("BParameterGroup::Flatten(): NULL group\n");
 			continue;
 		}
 
@@ -1057,19 +1057,19 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 	CALLED();
 
 	if (!AllowsTypeCode(code)) {
-		FATAL("BParameterGroup::Unflatten() wrong type code\n");
+		ERROR("BParameterGroup::Unflatten() wrong type code\n");
 		return B_BAD_TYPE;
 	}
 
 	if (buffer == NULL) {
-		FATAL("BParameterGroup::Unflatten() buffer is NULL\n");
+		ERROR("BParameterGroup::Unflatten() buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	// if the buffer is smaller than the size needed to read the
 	// signature field, then there is a problem
 	if (size < static_cast<ssize_t>(sizeof(int32))) {
-		FATAL("BParameterGroup::Unflatten() size to small\n");
+		ERROR("BParameterGroup::Unflatten() size to small\n");
 		return B_ERROR;
 	}
 
@@ -1156,13 +1156,13 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 		BParameter *parameter = MakeControl(mediaType);
 		if (parameter == NULL) {
-			FATAL("BParameterGroup::Unflatten(): MakeControl() failed\n");
+			ERROR("BParameterGroup::Unflatten(): MakeControl() failed\n");
 			return B_ERROR;
 		}
 
 		status_t status = parameter->Unflatten(parameter->TypeCode(), buffer, parameterSize);
 		if (status < B_OK) {
-			FATAL("BParameterGroup::Unflatten(): parameter->Unflatten() failed\n");
+			ERROR("BParameterGroup::Unflatten(): parameter->Unflatten() failed\n");
 			delete parameter;
 			return status;
 		}
@@ -1197,13 +1197,13 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 		BParameterGroup *group = new BParameterGroup(mWeb, "sub-unnamed");
 		if (group == NULL) {
-			FATAL("BParameterGroup::Unflatten(): MakeGroup() failed\n");
+			ERROR("BParameterGroup::Unflatten(): MakeGroup() failed\n");
 			return B_ERROR;
 		}
 
 		status_t status = group->Unflatten(type, buffer, groupSize);
 		if (status != B_OK) {
-			FATAL("BParameterGroup::Unflatten(): group->Unflatten() failed\n");
+			ERROR("BParameterGroup::Unflatten(): group->Unflatten() failed\n");
 			delete group;
 			return status;
 		}
@@ -1253,7 +1253,7 @@ BParameterGroup::MakeControl(int32 type)
 			return new BContinuousParameter(-1, B_MEDIA_UNKNOWN_TYPE, mWeb, "continuousParameter", B_GENERIC,"",0,100,1);
 
 		default:
-			FATAL("BParameterGroup::MakeControl unknown type %ld\n", type);
+			ERROR("BParameterGroup::MakeControl unknown type %ld\n", type);
 			return NULL;
 	}
 }
@@ -1347,13 +1347,13 @@ BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 		return B_NO_MEMORY;
 		
 	if (mWeb == 0) {
-		FATAL("BParameter::GetValue: no parent BParameterWeb\n");
+		ERROR("BParameter::GetValue: no parent BParameterWeb\n");
 		return B_NO_INIT;
 	}
 	
 	node = mWeb->Node();
 	if (IS_INVALID_NODE(node)) {
-		FATAL("BParameter::GetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
+		ERROR("BParameter::GetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
 		return B_NO_INIT;
 	}
 	
@@ -1361,7 +1361,7 @@ BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 		// create an area if large data needs to be transfered
 		area = create_area("get parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(*ioSize), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (area < B_OK) {
-			FATAL("BParameter::GetValue can't create area of %ld bytes\n", *ioSize);
+			ERROR("BParameter::GetValue can't create area of %ld bytes\n", *ioSize);
 			return B_NO_MEMORY;
 		}
 	} else {
@@ -1384,7 +1384,7 @@ BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 		if (when != 0)
 			*when = reply.last_change;
 	} else
-		FATAL("BParameter::GetValue querying node failed\n");
+		ERROR("BParameter::GetValue querying node failed\n");
 
 	if (area != -1)
 		delete_area(area);
@@ -1411,13 +1411,13 @@ BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 		return B_NO_MEMORY;
 		
 	if (mWeb == 0) {
-		FATAL("BParameter::SetValue: no parent BParameterWeb\n");
+		ERROR("BParameter::SetValue: no parent BParameterWeb\n");
 		return B_NO_INIT;
 	}
 	
 	node = mWeb->Node();
 	if (IS_INVALID_NODE(node)) {
-		FATAL("BParameter::SetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
+		ERROR("BParameter::SetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
 		return B_NO_INIT;
 	}
 	
@@ -1425,7 +1425,7 @@ BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 		// create an area if large data needs to be transfered
 		area = create_area("set parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(size), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (area < B_OK) {
-			FATAL("BParameter::SetValue can't create area of %ld bytes\n", size);
+			ERROR("BParameter::SetValue can't create area of %ld bytes\n", size);
 			return B_NO_MEMORY;
 		}
 	} else {
@@ -1441,7 +1441,7 @@ BParameter::SetValue(const void *buffer, size_t size, bigtime_t when)
 
 	rv = QueryPort(node.port, CONTROLLABLE_SET_PARAMETER_DATA, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK)
-		FATAL("BParameter::SetValue querying node failed\n");
+		ERROR("BParameter::SetValue querying node failed\n");
 
 	if (area != -1)
 		delete_area(area);
@@ -1620,7 +1620,7 @@ BParameter::Flatten(void *buffer, ssize_t size) const
 	CALLED();
 
 	if (buffer == NULL) {
-		FATAL("BParameter::Flatten buffer is NULL\n");
+		ERROR("BParameter::Flatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
@@ -1628,7 +1628,7 @@ BParameter::Flatten(void *buffer, ssize_t size) const
 	// BParameter::FlattenedSize(), not by a descendent's override of this method.
 	ssize_t actualSize = BParameter::FlattenedSize();
 	if (size < actualSize) {
-		FATAL("BParameter::Flatten(): size too small\n");
+		ERROR("BParameter::Flatten(): size too small\n");
 		return B_NO_MEMORY;
 	}
 
@@ -1679,19 +1679,19 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	CALLED();
 
 	if (!AllowsTypeCode(code)) {
-		FATAL("BParameter::Unflatten(): wrong type code\n");
+		ERROR("BParameter::Unflatten(): wrong type code\n");
 		return B_BAD_TYPE;
 	}
 
 	if (buffer == NULL) {
-		FATAL("BParameter::Unflatten(): buffer is NULL\n");
+		ERROR("BParameter::Unflatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	// if the buffer is smaller than the size needed to read the
 	// signature and struct size fields, then there is a problem
 	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
-		FATAL("BParameter::Unflatten() size too small\n");
+		ERROR("BParameter::Unflatten() size too small\n");
 		return B_BAD_VALUE;
 	}
 
@@ -1705,13 +1705,13 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	else if (magic == kParameterMagic)
 		mSwapDetected = false;
 	else {
-		FATAL("BParameter::Unflatten(): bad magic\n");
+		ERROR("BParameter::Unflatten(): bad magic\n");
 		return B_BAD_TYPE;
 	}
 
 	ssize_t parameterSize = read_from_buffer_swap32<ssize_t>(&buffer, mSwapDetected);
 	if (parameterSize > size) {
-		FATAL("BParameter::Unflatten(): buffer too small (%ld > %ld)\n", parameterSize, size);
+		ERROR("BParameter::Unflatten(): buffer too small (%ld > %ld)\n", parameterSize, size);
 		return B_BAD_VALUE;
 	}
 
@@ -1730,7 +1730,7 @@ BParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	//TOTAL: 27 bytes
 	const ssize_t MinFlattenedParamSize(27);
 	if (parameterSize < MinFlattenedParamSize) {
-		FATAL("BParameter::Unflatten out of memory (2)\n");
+		ERROR("BParameter::Unflatten out of memory (2)\n");
 		return B_ERROR;
 	}
 
@@ -1846,7 +1846,7 @@ BParameter::FixRefs(BList &old, BList &updated)
 		if (index >= 0)
 			items[i] = updated.ItemAt(index);
 		else {
-			FATAL("BParameter::FixRefs(): No mapping found for input");
+			ERROR("BParameter::FixRefs(): No mapping found for input");
 			items[i] = NULL;
 		}
 	}
@@ -1868,7 +1868,7 @@ BParameter::FixRefs(BList &old, BList &updated)
 		if (index >= 0)
 			items[i] = updated.ItemAt(index);
 		else {
-			FATAL("BParameter::FixRefs(): No mapping found for output");
+			ERROR("BParameter::FixRefs(): No mapping found for output");
 			items[i] = NULL;
 		}
 	}
@@ -1954,19 +1954,19 @@ BContinuousParameter::Flatten(void *buffer, ssize_t size) const
 	CALLED();
 
 	if (buffer == NULL) {
-		FATAL("BContinuousParameter::Flatten(): buffer is NULL\n");
+		ERROR("BContinuousParameter::Flatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	ssize_t parameterSize = BParameter::FlattenedSize();
 	if (size < (parameterSize + kAdditionalContinuousParameterSize)) {
-		FATAL("BContinuousParameter::Flatten(): size to small\n");
+		ERROR("BContinuousParameter::Flatten(): size to small\n");
 		return B_NO_MEMORY;
 	}
 
 	status_t status = BParameter::Flatten(buffer, size);
 	if (status != B_OK) {
-		FATAL("BContinuousParameter::Flatten(): BParameter::Flatten() failed\n");
+		ERROR("BContinuousParameter::Flatten(): BParameter::Flatten() failed\n");
 		return status;
 	}
 
@@ -1994,25 +1994,25 @@ BContinuousParameter::Unflatten(type_code code, const void *buffer, ssize_t size
 	// as early as possible.
 
 	if (!AllowsTypeCode(code)) {
-		FATAL("BContinuousParameter::Unflatten wrong type code\n");
+		ERROR("BContinuousParameter::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
 	}
 
 	if (buffer == NULL) {
-		FATAL("BContinuousParameter::Unflatten buffer is NULL\n");
+		ERROR("BContinuousParameter::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	// if the buffer is smaller than the size needed to read the
 	// signature and struct size fields, then there is a problem
 	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
-		FATAL("BContinuousParameter::Unflatten size too small\n");
+		ERROR("BContinuousParameter::Unflatten size too small\n");
 		return B_ERROR;
 	}
 
 	status_t status = BParameter::Unflatten(code, buffer, size);
 	if (status != B_OK) {
-		FATAL("BContinuousParameter::Unflatten(): BParameter::Unflatten failed\n");
+		ERROR("BContinuousParameter::Unflatten(): BParameter::Unflatten failed\n");
 		return status;
 	}
 
@@ -2020,7 +2020,7 @@ BContinuousParameter::Unflatten(type_code code, const void *buffer, ssize_t size
 	skip_in_buffer(&buffer, parameterSize);
 
 	if (size < (parameterSize + kAdditionalContinuousParameterSize)) {
-		FATAL("BContinuousParameter::Unflatten(): buffer too small\n");
+		ERROR("BContinuousParameter::Unflatten(): buffer too small\n");
 		return B_BAD_VALUE;
 	}
 
@@ -2206,20 +2206,20 @@ BDiscreteParameter::Flatten(void *buffer, ssize_t size) const
 	CALLED();
 
 	if (buffer == NULL) {
-		FATAL("BDiscreteParameter::Flatten(): buffer is NULL\n");
+		ERROR("BDiscreteParameter::Flatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	ssize_t parameterSize = BParameter::FlattenedSize();
 
 	if (size < FlattenedSize()) {
-		FATAL("BDiscreteParameter::Flatten(): size too small\n");
+		ERROR("BDiscreteParameter::Flatten(): size too small\n");
 		return B_NO_MEMORY;
 	}
 
 	status_t status = BParameter::Flatten(buffer, size);
 	if (status != B_OK) {
-		FATAL("BDiscreteParameter::Flatten(): BParameter::Flatten failed\n");
+		ERROR("BDiscreteParameter::Flatten(): BParameter::Flatten failed\n");
 		return status;
 	}
 
@@ -2247,19 +2247,19 @@ BDiscreteParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	CALLED();
 
 	if (!AllowsTypeCode(code)) {
-		FATAL("BDiscreteParameter::Unflatten(): bad type code\n");
+		ERROR("BDiscreteParameter::Unflatten(): bad type code\n");
 		return B_BAD_TYPE;
 	}
 
 	if (buffer == NULL) {
-		FATAL("BDiscreteParameter::Unflatten(): buffer is NULL\n");
+		ERROR("BDiscreteParameter::Unflatten(): buffer is NULL\n");
 		return B_NO_INIT;
 	}
 
 	// if the buffer is smaller than the size needed to read the
 	// signature and struct size fields, then there is a problem
 	if (size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t))) {
-		FATAL("BDiscreteParameter::Unflatten(): size too small\n");
+		ERROR("BDiscreteParameter::Unflatten(): size too small\n");
 		return B_ERROR;
 	}
 
@@ -2267,7 +2267,7 @@ BDiscreteParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 
 	status_t status = BParameter::Unflatten(code, buffer, size);
 	if (status != B_OK) {
-		FATAL("BDiscreteParameter::Unflatten(): BParameter::Unflatten failed\n");
+		ERROR("BDiscreteParameter::Unflatten(): BParameter::Unflatten failed\n");
 		return status;
 	}
 
@@ -2275,7 +2275,7 @@ BDiscreteParameter::Unflatten(type_code code, const void *buffer, ssize_t size)
 	skip_in_buffer(&buffer, parameterSize);
 
 	if (size < (parameterSize + kAdditionalDiscreteParameterSize)) {
-		FATAL("BDiscreteParameter::Unflatten(): buffer too small\n");
+		ERROR("BDiscreteParameter::Unflatten(): buffer too small\n");
 		return B_BAD_VALUE;
 	}
 

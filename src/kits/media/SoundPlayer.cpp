@@ -610,9 +610,9 @@ BSoundPlayer::Init(
 		fmt.buffer_size = 4096;
 		
 	if (fmt.channel_count != 1 && fmt.channel_count != 2)
-		FATAL("BSoundPlayer: not a 1 or 2 channel audio format\n");
+		ERROR("BSoundPlayer: not a 1 or 2 channel audio format\n");
 	if (fmt.frame_rate <= 0.0f)
-		FATAL("BSoundPlayer: framerate must be > 0\n");
+		ERROR("BSoundPlayer: framerate must be > 0\n");
 
 	_m_bufsize = fmt.buffer_size;
 	_m_buf = new char[_m_bufsize];

@@ -41,7 +41,7 @@ BufferManager::RegisterBuffer(team_id teamid, media_buffer_id bufferid,
 	
 	buffer_info *info;
 	if (!fBufferInfoMap->Get(bufferid, &info)) {
-		FATAL("failed to register buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
+		ERROR("failed to register buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
 		return B_ERROR;
 	}
 	
@@ -66,7 +66,7 @@ BufferManager::RegisterBuffer(team_id teamid, size_t size, int32 flags, size_t o
 
 	newarea = clone_area("media_server cloned buffer", &adr, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, area);
 	if (newarea <= B_OK) {
-		FATAL("RegisterBuffer: failed to clone buffer! error = %#lx, team = %ld, areaid = %ld, offset = %ld, size = %ld\n", newarea, teamid, area, offset, size);
+		ERROR("RegisterBuffer: failed to clone buffer! error = %#lx, team = %ld, areaid = %ld, offset = %ld, size = %ld\n", newarea, teamid, area, offset, size);
 		return B_ERROR;
 	}
 
@@ -98,18 +98,18 @@ BufferManager::UnregisterBuffer(team_id teamid, media_buffer_id bufferid)
 	int index;
 	
 	if (!fBufferInfoMap->Get(bufferid, &info)) {
-		FATAL("UnregisterBuffer: failed to unregister buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
+		ERROR("UnregisterBuffer: failed to unregister buffer! team = %ld, bufferid = %ld\n", teamid, bufferid);
 		return B_ERROR;
 	}
 
 	index = info->teams.Find(teamid);
 	if (index < 0) {
-		FATAL("UnregisterBuffer: failed to find team = %ld belonging to bufferid = %ld\n", teamid, bufferid);
+		ERROR("UnregisterBuffer: failed to find team = %ld belonging to bufferid = %ld\n", teamid, bufferid);
 		return B_ERROR;
 	}
 	
 	if (!info->teams.Remove(index)) {
-		FATAL("UnregisterBuffer: failed to remove team = %ld from bufferid = %ld\n", teamid, bufferid);
+		ERROR("UnregisterBuffer: failed to remove team = %ld from bufferid = %ld\n", teamid, bufferid);
 		return B_ERROR;
 	}
 	TRACE("UnregisterBuffer: team = %ld removed from bufferid = %ld\n", teamid, bufferid);
@@ -117,7 +117,7 @@ BufferManager::UnregisterBuffer(team_id teamid, media_buffer_id bufferid)
 	if (info->teams.IsEmpty()) {
 	
 		if (!fBufferInfoMap->Remove(bufferid)) {
-			FATAL("UnregisterBuffer: failed to remove bufferid = %ld\n", bufferid);
+			ERROR("UnregisterBuffer: failed to remove bufferid = %ld\n", bufferid);
 			return B_ERROR;
 		}
 	
@@ -139,12 +139,12 @@ BufferManager::CleanupTeam(team_id team)
 		team_id *otherteam;
 		for (info->teams.Rewind(); info->teams.GetNext(&otherteam); ) {
 			if (team == *otherteam) {
-				FATAL("BufferManager::CleanupTeam: removing team %ld from buffer id %ld\n", team, info->id);
+				PRINT(1, "BufferManager::CleanupTeam: removing team %ld from buffer id %ld\n", team, info->id);
 				info->teams.RemoveCurrent();
 			}
 		}
 		if (info->teams.IsEmpty()) {
-			FATAL("BufferManager::CleanupTeam: removing buffer id %ld that has no teams\n", info->id);
+			PRINT(1, "BufferManager::CleanupTeam: removing buffer id %ld that has no teams\n", info->id);
 			fBufferInfoMap->RemoveCurrent(); 
 		}
 	}

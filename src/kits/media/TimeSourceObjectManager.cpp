@@ -40,11 +40,11 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 	// force unloading all currently loaded 
 	BTimeSource **pts;
 	for (fMap->Rewind(); fMap->GetNext(&pts); ) {
-		FATAL("Forcing release of TimeSource id %ld...\n", (*pts)->ID());
+		PRINT(1, "Forcing release of TimeSource id %ld...\n", (*pts)->ID());
 		int debugcnt = 0;
 		while ((*pts)->Release() != NULL)
 			debugcnt++;
-		FATAL("Forcing release of TimeSource done, released %d times\n", debugcnt);
+		PRINT(1, "Forcing release of TimeSource done, released %d times\n", debugcnt);
 	}
 	
 	delete fMap;
@@ -112,7 +112,7 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	
 	rv = BMediaRoster::Roster()->GetNodeFor(node.node, &clone);
 	if (rv != B_OK) {
-		FATAL("TimeSourceObjectManager::GetTimeSource, GetNodeFor %ld failed\n", node.node);
+		ERROR("TimeSourceObjectManager::GetTimeSource, GetNodeFor %ld failed\n", node.node);
 		return NULL;
 	}
 		
@@ -143,13 +143,13 @@ TimeSourceObjectManager::ObjectDeleted(BTimeSource *timesource)
 	bool b;
 	b = fMap->Remove(timesource->ID());
 	if (!b) {
-		FATAL("TimeSourceObjectManager::ObjectDeleted, Remove failed\n");
+		ERROR("TimeSourceObjectManager::ObjectDeleted, Remove failed\n");
 	}
 	
 	status_t rv;
 	rv = BMediaRoster::Roster()->ReleaseNode(timesource->Node());
 	if (rv != B_OK) {
-		FATAL("TimeSourceObjectManager::ObjectDeleted, ReleaseNode failed\n");
+		ERROR("TimeSourceObjectManager::ObjectDeleted, ReleaseNode failed\n");
 	}
 }
 

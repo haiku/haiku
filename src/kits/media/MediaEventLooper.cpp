@@ -313,7 +313,7 @@ BMediaEventLooper::Priority() const
 int32
 BMediaEventLooper::RunState() const
 {
-	CALLED();
+	PRINT(6, "CALLED BMediaEventLooper::RunState()\n");
 	return fRunState;
 }
 
@@ -348,8 +348,8 @@ BMediaEventLooper::SetPriority(int32 priority)
 	CALLED();
 
 	// clamp to a valid value
-	if (priority < 1)
-		priority = 1;
+	if (priority < 5)
+		priority = 5;
 		
 	if (priority > 120)
 		priority = 120;
@@ -453,7 +453,7 @@ BMediaEventLooper::DispatchEvent(const media_timed_event *event,
 								 bigtime_t lateness,
 								 bool realTimeEvent)
 {
-	CALLED();
+	PRINT(6, "CALLED BMediaEventLooper::DispatchEvent()\n");
 
 	HandleEvent(event,lateness,realTimeEvent);
 
@@ -501,7 +501,7 @@ BMediaEventLooper::_ControlThreadStart(void *arg)
 BMediaEventLooper::_CleanUpEntry(const media_timed_event *event,
 								 void *context)
 {
-	CALLED();
+	PRINT(6, "CALLED BMediaEventLooper::_CleanUpEntry()\n");
 	((BMediaEventLooper *)context)->_DispatchCleanUp(event);
 }
 
@@ -509,7 +509,7 @@ BMediaEventLooper::_CleanUpEntry(const media_timed_event *event,
 void
 BMediaEventLooper::_DispatchCleanUp(const media_timed_event *event)
 {
-	CALLED();
+	PRINT(6, "CALLED BMediaEventLooper::_DispatchCleanUp()\n");
 
 	// this function to clean up after custom events you've created 
 	if (event->cleanup >= BTimedEventQueue::B_USER_CLEANUP) 

@@ -356,7 +356,7 @@ BBufferConsumer::HandleMessage(int32 message,
 							   const void *data,
 							   size_t size)
 {
-	INFO("BBufferConsumer::HandleMessage %#lx, node %ld\n", message, ID());
+	PRINT(4, "BBufferConsumer::HandleMessage %#lx, node %ld\n", message, ID());
 	status_t rv;
 	switch (message) {
 		case CONSUMER_ACCEPT_FORMAT:
