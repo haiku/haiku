@@ -1,0 +1,304 @@
+// database_support.cpp
+
+#include <DataIO.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <Message.h>
+#include <Node.h>
+#include <Path.h>
+#include <storage_support.h>
+#include <TypeConstants.h>
+
+#include <fs_attr.h>	// For struct attr_info
+#include <new>			// For new(nothrow)
+#include <stdio.h>
+#include <string>
+
+#include "mime/database_support.h"
+
+//#define DBG(x) x
+#define DBG(x)
+#define OUT printf
+
+// icon types (which really ought to be publicly or semi-publicly declared somewhere...)
+enum {
+	B_MINI_ICON_TYPE	= 'MICN',
+	B_LARGE_ICON_TYPE	= 'ICON',
+};
+
+namespace BPrivate {
+namespace Storage {
+namespace Mime {
+
+//const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/beos_mime";
+const std::string kDatabaseDir = "/boot/home/config/settings/obos_mime";
+
+#define ATTR_PREFIX "META:"
+#define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
+#define LARGE_ICON_ATTR_PREFIX ATTR_PREFIX "L:"
+
+const char *kMiniIconAttrPrefix	= MINI_ICON_ATTR_PREFIX;
+const char *kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX; 
+
+// attribute names
+const char *kFileTypeAttr			= "BEOS:TYPE";
+const char *kTypeAttr				= ATTR_PREFIX "TYPE";
+const char *kAppHintAttr			= ATTR_PREFIX "PPATH";
+const char *kAttrInfoAttr			= ATTR_PREFIX "ATTR_INFO";
+const char *kShortDescriptionAttr	= ATTR_PREFIX "S:DESC";
+const char *kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
+const char *kFileExtensionsAttr	= ATTR_PREFIX "EXTENS";
+const char *kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
+const char *kLargeIconAttr		= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
+const char *kSnifferRuleAttr		= ATTR_PREFIX "SNIFF_RULE";
+const char *kSupportedTypesAttr	= ATTR_PREFIX "FILE_TYPES";
+
+// attribute data types (as used in the R5 database)
+const int32 kFileTypeType			= 'MIMS';	// B_MIME_STRING_TYPE
+const int32 kTypeType				= B_STRING_TYPE;
+const int32 kAppHintType			= 'MPTH';
+const int32 kAttrInfoType			= B_MESSAGE_TYPE;
+const int32 kShortDescriptionType	= 'MSDC';
+const int32 kLongDescriptionType	= 'MLDC';
+const int32 kFileExtensionsType	= B_MESSAGE_TYPE;
+const int32 kMiniIconType			= B_MINI_ICON_TYPE;
+const int32 kLargeIconType		= B_LARGE_ICON_TYPE;
+const int32 kPreferredAppType		= 'MSIG';
+const int32 kSnifferRuleType		= B_STRING_TYPE;
+const int32 kSupportedTypesType	= B_MESSAGE_TYPE;
+
+
+
+// type_to_filename
+//! Converts the given MIME type to an absolute path in the MIME database.
+std::string
+type_to_filename(const char *type)
+{
+	return kDatabaseDir + "/" + BPrivate::Storage::to_lower(type);
+}
+
+// open_type
+/*! \brief Opens a BNode on the given type, failing if the type has no
+           corresponding file in the database.
+	\param type The MIME type to open
+	\param result Pointer to a pre-allocated BNode into which
+	              is opened on the given MIME type
+*/
+status_t
+open_type(const char *type, BNode *result)
+{
+	status_t err = (type && result ? B_OK : B_BAD_VALUE);
+	if (!err) 
+		err = result->SetTo(type_to_filename(type).c_str());		 
+	return err;
+}
+
+// open_or_create_type
+/*! \brief Opens a BNode on the given type, creating a node of the
+	       appropriate flavor if necessary.
+	
+	All MIME types are converted to lowercase for use in the filesystem.
+	\param type The MIME type to open
+	\param result Pointer to a pre-allocated BNode into which
+	              is opened on the given MIME type
+*/
+status_t
+open_or_create_type(const char *type, BNode *result, bool *didCreate)
+{
+	if (didCreate)
+		*didCreate = false;
+	std::string filename;
+	std::string typeLower = BPrivate::Storage::to_lower(type);
+	status_t err = (type && result ? B_OK : B_BAD_VALUE);
+	if (!err) {
+		filename = type_to_filename(type);
+		err = result->SetTo(filename.c_str());		 
+	}
+	if (err == B_ENTRY_NOT_FOUND) {
+		// Figure out what type of node we need to create
+		// + Supertype == directory
+		// + Non-supertype == file
+		int32 pos = typeLower.find_first_of('/');
+		if (pos == std::string::npos) {
+			// Supertype == directory				
+			BDirectory parent(kDatabaseDir.c_str());
+			err = parent.InitCheck();
+			if (!err)
+				err = parent.CreateDirectory(typeLower.c_str(), NULL);
+		} else {
+			// Non-supertype == file
+			std::string super(typeLower, 0, pos);
+			std::string sub(typeLower, pos+1);
+			BDirectory parent((kDatabaseDir + "/" + super).c_str());
+			err = parent.InitCheck();
+			if (!err)
+				err = parent.CreateFile(sub.c_str(), NULL);
+		}
+		// Now try opening again
+		err = result->SetTo(filename.c_str());
+		if (!err && didCreate)
+			*didCreate = true;
+	}
+	return err;	
+}
+
+// read_mime_attr
+/*! \brief Reads up to \c len bytes of the given data from the given attribute
+	       for the given MIME type.
+	
+	If no entry for the given type exists in the database, the function fails,
+	and the contents of \c data are undefined.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param data Pointer to a memory buffer into which the data should be copied
+	\param len The maximum number of bytes to read
+	\param datatype The expected data type
+	\return If successful, the number of bytes read is returned, otherwise, an
+	        error code is returned.
+*/
+ssize_t
+read_mime_attr(const char *type, const char *attr, void *data,
+	size_t len, type_code datatype)
+{
+	BNode node;
+	ssize_t err = (type && attr && data ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = open_type(type, &node);	
+	if (!err) 
+		err = node.ReadAttr(attr, datatype, 0, data, len);
+	return err;
+}
+
+// read_mime_attr_message
+/*! \brief Reads a flattened BMessage from the given attribute of the given
+	MIME type.
+	
+	If no entry for the given type exists in the database, or if the data
+	stored in the attribute is not a flattened BMessage, the function fails
+	and the contents of \c msg are undefined.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param data Pointer to a pre-allocated BMessage into which the attribute
+			    data is unflattened.
+*/
+status_t
+read_mime_attr_message(const char *type, const char *attr, BMessage *msg)
+{
+	BNode node;
+	attr_info info;
+	char *buffer = NULL;
+	ssize_t err = (type && attr && msg ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = open_type(type, &node);
+	if (!err)
+		err = node.GetAttrInfo(attr, &info);
+	if (!err)
+		err = info.type == B_MESSAGE_TYPE ? B_OK : B_BAD_VALUE;
+	if (!err) {		
+		buffer = new(nothrow) char[info.size];
+		if (!buffer)
+			err = B_NO_MEMORY;
+	}
+	if (!err) 
+		err = node.ReadAttr(attr, B_MESSAGE_TYPE, 0, buffer, info.size);
+	if (err >= 0)
+		err = err == info.size ? B_OK : B_FILE_ERROR;
+	if (!err)
+		err = msg->Unflatten(buffer);
+	delete [] buffer;
+	return err;
+}
+
+// write_mime_attr
+/*! \brief Writes \c len bytes of the given data to the given attribute
+	       for the given MIME type.
+	
+	If no entry for the given type exists in the database, it is created.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param data Pointer to the data to write
+	\param len The number of bytes to write
+	\param datatype The data type of the given data
+*/
+status_t
+write_mime_attr(const char *type, const char *attr, const void *data,
+	size_t len, type_code datatype, bool *didCreate)
+{
+	BNode node;
+	status_t err = (type && attr && data ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = open_or_create_type(type, &node, didCreate);	
+	if (!err) {
+		ssize_t bytes = node.WriteAttr(attr, datatype, 0, data, len);
+		if (bytes < B_OK)
+			err = bytes;
+		else
+			err = (bytes != len ? B_FILE_ERROR : B_OK);
+	}
+	return err;
+}
+
+// write_mime_attr_message
+/*! \brief Flattens the given \c BMessage and writes it to the given attribute
+	       of the given MIME type.
+	
+	If no entry for the given type exists in the database, it is created.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param msg The BMessage to flatten and write
+*/
+status_t
+write_mime_attr_message(const char *type, const char *attr, const BMessage *msg, bool *didCreate)
+{
+	BNode node;
+	BMallocIO data;
+	ssize_t bytes;
+	ssize_t err = (type && attr && msg ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = data.SetSize(msg->FlattenedSize());
+	if (!err)
+		err = msg->Flatten(&data, &bytes);
+	if (!err)
+		err = bytes == msg->FlattenedSize() ? B_OK : B_ERROR;
+	if (!err)
+		err = open_or_create_type(type, &node, didCreate);	
+	if (!err) 
+		err = node.WriteAttr(attr, B_MESSAGE_TYPE, 0, data.Buffer(), data.BufferLength());
+	if (err >= 0)
+		err = err == data.BufferLength() ? B_OK : B_FILE_ERROR;
+	return err;
+}
+
+// delete_attribute
+//! Deletes the given attribute for the given type
+/*!
+	\param type The mime type
+	\param attr The attribute name
+	\return
+    - B_OK: success
+    - B_ENTRY_NOT_FOUND: no such type or attribute
+    - "error code": failure
+*/
+status_t
+delete_attribute(const char *type, const char *attr)
+{
+	status_t err = type ? B_OK : B_BAD_VALUE;
+	BNode node;
+	if (!err)
+		err = open_type(type, &node);
+	if (!err)
+		err = node.RemoveAttr(attr);
+	return err;
+}
+
+
+
+} // namespace Mime
+} // namespace Storage
+} // namespace BPrivate
+

@@ -4,7 +4,7 @@
 #define MIME_MANAGER_H
 
 #include <Looper.h>
-#include <MimeDatabase.h>
+#include <mime/Database.h>
 
 class MIMEManager : public BLooper {
 public:
@@ -16,7 +16,7 @@ private:
 	void HandleSetParam(BMessage *message);
 	void HandleDeleteParam(BMessage *message);
 	
-	BPrivate::MimeDatabase fMimeDatabase;
+	BPrivate::Storage::Mime::Database fDatabase;
 };
 
 #endif	// MIME_MANAGER_H

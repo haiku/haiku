@@ -24,15 +24,16 @@ UsePublicHeaders [ FDirName add-ons file_system ] ;
 # that can just be linked into libstorage.so and the
 # registrar separately.
 SEARCH_SOURCE += [ FDirName $(SUBDIR) sniffer ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
 SharedLibrary storage :
+	# storage
 	Directory.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
 	FindDirectory.cpp
 	Mime.cpp
-	MimeDatabase.cpp
 	MimeType.cpp
 	Node.cpp
 	#NodeInfo.cpp
@@ -45,21 +46,30 @@ SharedLibrary storage :
 	ResourceItem.cpp
 	Resources.cpp
 	ResourceStrings.cpp
-	Err.cpp			# Hack-o-rama
-	DisjList.cpp			# Hack-o-rama
-	Pattern.cpp		# Hack-o-rama
-	PatternList.cpp		# Hack-o-rama
-	Parser.cpp		# Hack-o-rama
-	Range.cpp		# Hack-o-rama
-	RPattern.cpp		# Hack-o-rama
-	RPatternList.cpp		# Hack-o-rama
-	Rule.cpp		# Hack-o-rama
 	Statable.cpp
 	SymLink.cpp
 	Volume.cpp
 	VolumeRoster.cpp
 	kernel_interface.POSIX.cpp
 	storage_support.cpp
+	
+	# storage/sniffer
+	Err.cpp				
+	DisjList.cpp		
+	Pattern.cpp			
+	PatternList.cpp		
+	Parser.cpp			
+	Range.cpp			
+	RPattern.cpp		
+	RPatternList.cpp	
+	Rule.cpp			
+
+	# storage/mime
+	Database.cpp
+	InstalledTypes.cpp
+	Supertype.cpp
+	database_access.cpp
+	database_support.cpp
 ;
 LinkSharedOSLibs libstorage.so :
 	libopenbeos.so

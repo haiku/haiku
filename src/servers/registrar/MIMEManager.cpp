@@ -23,7 +23,7 @@
 */
 MIMEManager::MIMEManager()
 		   : BLooper("main_mime")
-		   , fMimeDatabase()
+		   , fDatabase()
 {
 }
 
@@ -61,8 +61,8 @@ MIMEManager::MessageReceived(BMessage *message)
 			err = message->FindMessenger("target", &messenger);
 			if (!err) {
 				err = message->what == B_REG_MIME_START_WATCHING 
-					    ? fMimeDatabase.StartWatching(messenger)
-					      : fMimeDatabase.StopWatching(messenger);
+					    ? fDatabase.StartWatching(messenger)
+					      : fDatabase.StopWatching(messenger);
 			}
 			
 			reply.what = B_REG_RESULT;
@@ -78,10 +78,40 @@ MIMEManager::MessageReceived(BMessage *message)
 			err = message->FindString("type", &type);
 			if (!err)
 				err = message->what == B_REG_MIME_INSTALL
-					    ? fMimeDatabase.Install(type)
-					      : fMimeDatabase.Delete(type);
+					    ? fDatabase.Install(type)
+					      : fDatabase.Delete(type);
+					      
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
+			message->SendReply(&reply, this);				
+			break;
+		}
+		
+		case B_REG_MIME_GET_INSTALLED_TYPES:
+		{
+			BMessage types;
+			const char *supertype;
+			err = message->FindString("supertype", &supertype);
+			if (err == B_NAME_NOT_FOUND) 
+				err = fDatabase.GetInstalledTypes(&types);
+			else if (!err) 
+				err = fDatabase.GetInstalledTypes(supertype, &types);
+				
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			reply.AddMessage("types", &types);
+			message->SendReply(&reply, this);				
+			break;
+		}
+		
+		case B_REG_MIME_GET_INSTALLED_SUPERTYPES:
+		{
+			BMessage types;
+			err = fDatabase.GetInstalledSupertypes(&types);
+				
+			reply.what = B_REG_RESULT;
+			reply.AddInt32("result", err);
+			reply.AddMessage("types", &types);
 			message->SendReply(&reply, this);				
 			break;
 		}
@@ -112,7 +142,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 				entry_ref ref;
 				err = message->FindRef("app hint", &ref);
 				if (!err)
-					err = fMimeDatabase.SetAppHint(type, &ref);
+					err = fDatabase.SetAppHint(type, &ref);
 				break;
 			}
 		
@@ -121,7 +151,7 @@ MIMEManager::HandleSetParam(BMessage *message)
 				BMessage info;
 				err = message->FindMessage("attr info", &info);
 				if (!err)
-					err = fMimeDatabase.SetAttrInfo(type, &info);
+					err = fDatabase.SetAttrInfo(type, &info);
 				break;
 			}
 		
@@ -134,8 +164,8 @@ MIMEManager::HandleSetParam(BMessage *message)
 					err = message->FindString("description", &description);
 				if (!err) 
 					err = (isLong
-						     ? fMimeDatabase.SetLongDescription(type, description)
-						       : fMimeDatabase.SetShortDescription(type, description));
+						     ? fDatabase.SetLongDescription(type, description)
+						       : fDatabase.SetShortDescription(type, description));
 				break;
 			}
 			
@@ -144,11 +174,10 @@ MIMEManager::HandleSetParam(BMessage *message)
 				BMessage extensions;
 				err = message->FindMessage("extensions", &extensions);
 				if (!err)
-					err = fMimeDatabase.SetFileExtensions(type, &extensions);
+					err = fDatabase.SetFileExtensions(type, &extensions);
 				break;
 			}
 		
-				
 			case B_REG_MIME_ICON:
 			case B_REG_MIME_ICON_FOR_TYPE:
 			{
@@ -163,11 +192,11 @@ MIMEManager::HandleSetParam(BMessage *message)
 					if (!err)
 						err = message->FindString("file type", &fileType);
 					if (!err)
-						err = fMimeDatabase.SetIconForType(type, fileType, data,
+						err = fDatabase.SetIconForType(type, fileType, data,
 								dataSize, (icon_size)size);				
 				} else {
 					if (!err) 
-						err = fMimeDatabase.SetIcon(type, data, dataSize,
+						err = fDatabase.SetIcon(type, data, dataSize,
 								(icon_size)size);
 				}
 				break;
@@ -182,10 +211,19 @@ MIMEManager::HandleSetParam(BMessage *message)
 				if (!err)
 					err = message->FindInt32("app verb", &verb);
 				if (!err)
-					err = fMimeDatabase.SetPreferredApp(type, signature, (app_verb)verb);			
+					err = fDatabase.SetPreferredApp(type, signature, (app_verb)verb);			
 				break;
 			}			
 				
+			case B_REG_MIME_SUPPORTED_TYPES:
+			{
+				BMessage types;
+				err = message->FindMessage("types", &types);
+				if (!err)
+					err = fDatabase.SetSupportedTypes(type, &types);
+				break;
+			}
+		
 			default:
 				err = B_BAD_VALUE;
 				break;				
@@ -214,11 +252,11 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 	if (!err) {
 		switch (which) {
 			case B_REG_MIME_APP_HINT:
-				err = fMimeDatabase.DeleteAppHint(type);
+				err = fDatabase.DeleteAppHint(type);
 				break;
 
 			case B_REG_MIME_ATTR_INFO:
-				err = fMimeDatabase.DeleteAttrInfo(type);
+				err = fDatabase.DeleteAttrInfo(type);
 				break;
 		
 			case B_REG_MIME_DESCRIPTION:
@@ -227,13 +265,13 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 				err = message->FindBool("long", &isLong);
 				if (!err) 
 					err = isLong
-						    ? fMimeDatabase.DeleteLongDescription(type)
-						      : fMimeDatabase.DeleteShortDescription(type);
+						    ? fDatabase.DeleteLongDescription(type)
+						      : fDatabase.DeleteShortDescription(type);
 				break;
 			}
 			
 			case B_REG_MIME_FILE_EXTENSIONS:
-				err = fMimeDatabase.DeleteFileExtensions(type);
+				err = fDatabase.DeleteFileExtensions(type);
 				break;			
 
 			case B_REG_MIME_ICON:
@@ -246,10 +284,10 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 					if (!err)
 						err = message->FindString("file type", &fileType);
 					if (!err)
-						err = fMimeDatabase.DeleteIconForType(type, fileType, (icon_size)size);
+						err = fDatabase.DeleteIconForType(type, fileType, (icon_size)size);
 				} else {
 					if (!err) 
-						err = fMimeDatabase.DeleteIcon(type, (icon_size)size);
+						err = fDatabase.DeleteIcon(type, (icon_size)size);
 				}
 				break;
 			}
@@ -259,12 +297,16 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 				int32 verb;
 				err = message->FindInt32("app verb", &verb);
 				if (!err)
-					err = fMimeDatabase.DeletePreferredApp(type, (app_verb)verb);
+					err = fDatabase.DeletePreferredApp(type, (app_verb)verb);
 				break;
 			}
 			
 			case B_REG_MIME_SNIFFER_RULE:
-				err = fMimeDatabase.DeleteSnifferRule(type);
+				err = fDatabase.DeleteSnifferRule(type);
+				break;			
+
+			case B_REG_MIME_SUPPORTED_TYPES:
+				err = fDatabase.DeleteSupportedTypes(type);
 				break;			
 
 			default:

@@ -6,18 +6,19 @@
 	\file MimeType.cpp
 	BMimeType implementation.
 */
-#include <MimeType.h>
+#include "MimeType.h"
+
 #include <Bitmap.h>
+#include <mime/database_access.h>	
+#include <sniffer/Rule.h>
+#include <sniffer/Parser.h>
+
 #include <ctype.h>			// For tolower()
 #include <new.h>			// For new(nothrow)
 #include <stdio.h>			// For printf()
 #include <string.h>			// For strncpy()
-#include <MimeDatabase.h>	
 #include <RegistrarDefs.h>
 #include <Roster.h>			// For _send_to_roster_()
-
-#include <sniffer/Rule.h>
-#include <sniffer/Parser.h>
 
 // Private helper functions
 bool isValidMimeChar(const char ch);
@@ -27,6 +28,7 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
+using namespace BPrivate::Storage::Mime;
 
 const char *B_PEF_APP_MIME_TYPE		= "application/x-be-executable";
 const char *B_PE_APP_MIME_TYPE		= "application/x-vnd.be-peexecutable";
@@ -43,7 +45,6 @@ const char *B_APP_MIME_TYPE			= B_ELF_APP_MIME_TYPE;
 BMimeType::BMimeType()
 	: fType(NULL)
 	, fCStatus(B_NO_INIT)
-	, fMimeDatabase(new(nothrow) BPrivate::MimeDatabase())
 {
 }
 
@@ -57,7 +58,6 @@ BMimeType::BMimeType()
 BMimeType::BMimeType(const char *mimeType)
 	: fType(NULL)
 	, fCStatus(B_NO_INIT)
-	, fMimeDatabase(new(nothrow) BPrivate::MimeDatabase())
 {
 	SetTo(mimeType);
 }
@@ -68,7 +68,6 @@ BMimeType::BMimeType(const char *mimeType)
 BMimeType::~BMimeType()
 {
 	Unset();
-	delete fMimeDatabase;
 }
 
 // SetTo
@@ -98,8 +97,6 @@ BMimeType::SetTo(const char *mimeType)
 {
 	if (!mimeType || !BMimeType::IsValid(mimeType)) {
 		fCStatus = B_BAD_VALUE;
-	} else if (!fMimeDatabase) {
-		fCStatus = B_NO_MEMORY;
 	} else {
 		Unset();
 		fType = new(nothrow) char[strlen(mimeType)+1];
@@ -193,7 +190,7 @@ BMimeType::IsSupertypeOnly() const
 bool
 BMimeType::IsInstalled() const
 {
-	return InitCheck() == B_OK && fMimeDatabase->IsInstalled(Type());
+	return InitCheck() == B_OK && is_installed(Type());
 }
 
 // GetSupertype
@@ -388,7 +385,10 @@ BMimeType::Delete()
 status_t
 BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 {
-	return fMimeDatabase->GetIcon(Type(), icon, size);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_icon(Type(), icon, size);
+	return err;
 }
 
 // GetPreferredApp
@@ -414,7 +414,10 @@ BMimeType::GetIcon(BBitmap *icon, icon_size size) const
 status_t
 BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 {
-	return fMimeDatabase->GetPreferredApp(Type(), signature, verb);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_preferred_app(Type(), signature, verb);
+	return err;
 }
 
 // GetAttrInfo
@@ -470,7 +473,10 @@ BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 status_t
 BMimeType::GetAttrInfo(BMessage *info) const
 {
-	return fMimeDatabase->GetAttrInfo(Type(), info);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_attr_info(Type(), info);
+	return err;
 }
 
 // GetFileExtensions
@@ -504,7 +510,10 @@ BMimeType::GetAttrInfo(BMessage *info) const
 status_t
 BMimeType::GetFileExtensions(BMessage *extensions) const
 {
-	return fMimeDatabase->GetFileExtensions(Type(), extensions);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_file_extensions(Type(), extensions);
+	return err;
 }
 
 // GetShortDescription
@@ -523,7 +532,10 @@ BMimeType::GetFileExtensions(BMessage *extensions) const
 status_t
 BMimeType::GetShortDescription(char *description) const
 {
-	return fMimeDatabase->GetShortDescription(Type(), description);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_short_description(Type(), description);
+	return err;
 }
 
 // GetLongDescription
@@ -542,7 +554,10 @@ BMimeType::GetShortDescription(char *description) const
 status_t
 BMimeType::GetLongDescription(char *description) const
 {
-	return fMimeDatabase->GetLongDescription(Type(), description);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_long_description(Type(), description);
+	return err;
 }
 
 // GetSupportingApps
@@ -908,9 +923,26 @@ BMimeType::SetLongDescription(const char *description)
 	- "error code": Failure
 */
 status_t
-BMimeType::GetInstalledSupertypes(BMessage *super_types)
+BMimeType::GetInstalledSupertypes(BMessage *supertypes)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = supertypes ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_GET_INSTALLED_SUPERTYPES);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindMessage("types", supertypes);
+	return err;	
 }
 
 // GetInstalledTypes
@@ -929,7 +961,7 @@ BMimeType::GetInstalledSupertypes(BMessage *super_types)
 status_t
 BMimeType::GetInstalledTypes(BMessage *types)
 {
-	return NOT_IMPLEMENTED;
+	return GetInstalledTypes(NULL, types);
 }
 
 // GetInstalledTypes
@@ -948,9 +980,28 @@ BMimeType::GetInstalledTypes(BMessage *types)
 	- "error code": Failure		
 */
 status_t
-BMimeType::GetInstalledTypes(const char *super_type, BMessage *subtypes)
+BMimeType::GetInstalledTypes(const char *supertype, BMessage *types)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = types ? B_OK : B_BAD_VALUE;
+
+	BMessage msg(B_REG_MIME_GET_INSTALLED_TYPES);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err && supertype)
+		err = msg.AddString("supertype", supertype);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;
+	if (!err)
+		err = reply.FindMessage("types", types);
+	return err;	
 }
 
 // GetWildcardApps
@@ -1050,7 +1101,10 @@ bool isValidMimeChar(const char ch)
 status_t
 BMimeType::GetAppHint(entry_ref *ref) const
 {
-	return fMimeDatabase->GetAppHint(Type(), ref);
+	status_t err = InitCheck();
+	if (!err)
+		err = get_app_hint(Type(), ref);
+	return err;
 }
 
 // SetAppHint
@@ -1136,7 +1190,7 @@ BMimeType::GetIconForType(const char *type, BBitmap *icon, icon_size which) cons
 	if (type) {
 		err = BMimeType::IsValid(type) ? B_OK : B_BAD_VALUE;
 		if (!err)
-			err = fMimeDatabase->GetIconForType(Type(), type, icon, which);
+			err = get_icon_for_type(Type(), type, icon, which);
 	} else
 		err = GetIcon(icon, which);
 	return err;
@@ -1191,7 +1245,7 @@ BMimeType::SetIconForType(const char *type, const BBitmap *icon, icon_size which
 		err = msg.AddInt32("which", (type ? B_REG_MIME_ICON_FOR_TYPE : B_REG_MIME_ICON));
 	if (icon) {
 		if (!err)
-			err = BPrivate::MimeDatabase::GetIconData(icon, which, &data, &dataSize);
+			err = get_icon_data(icon, which, &data, &dataSize);
 		if (!err)
 			err = msg.AddData("icon data", B_RAW_TYPE, data, dataSize);
 	}
@@ -1470,20 +1524,12 @@ BMimeType::SetType(const char *mimeType)
 	SetTo(mimeType);
 }
 
-// DeleteIcon
-//! Deletes the mime type's icon of given size
-status_t
-BMimeType::DeleteIcon(icon_size which)
-{
-	return SetIcon(NULL, which);
-}
-
-// DeletePreferredApp
-//! Deletes the mime type's preferred app for the given verb
+// DeleteAppHint
+//! Deletes the mime type's application hint
 status_t 
-BMimeType::DeletePreferredApp(app_verb verb = B_OPEN)
+BMimeType::DeleteAppHint()
 {
-	return SetPreferredApp(NULL, verb);
+	return SetAppHint(NULL);
 }
 
 // DeleteAttrInfo
@@ -1492,14 +1538,6 @@ status_t
 BMimeType::DeleteAttrInfo()
 {
 	return SetAttrInfo(NULL);
-}
-
-// DeleteFileExtensions
-//! Deletes the mime type's associated file extensions
-status_t 
-BMimeType::DeleteFileExtensions()
-{
-	return SetFileExtensions(NULL);
 }
 
 // DeleteShortDescription
@@ -1518,12 +1556,20 @@ BMimeType::DeleteLongDescription()
 	return SetLongDescription(NULL);
 }
 
-// DeleteSnifferRule
-//! Deletes the mime type's sniffer rule
+// DeleteFileExtensions
+//! Deletes the mime type's associated file extensions
 status_t 
-BMimeType::DeleteSnifferRule()
+BMimeType::DeleteFileExtensions()
 {
-	return SetSnifferRule(NULL);
+	return SetFileExtensions(NULL);
+}
+
+// DeleteIcon
+//! Deletes the mime type's icon of given size
+status_t
+BMimeType::DeleteIcon(icon_size which)
+{
+	return SetIcon(NULL, which);
 }
 
 // DeleteIconForType
@@ -1534,12 +1580,28 @@ BMimeType::DeleteIconForType(const char *type, icon_size which)
 	return SetIconForType(type, NULL, which);
 }
 
-// DeleteAppHint
-//! Deletes the mime type's application hint
+// DeletePreferredApp
+//! Deletes the mime type's preferred app for the given verb
 status_t 
-BMimeType::DeleteAppHint()
+BMimeType::DeletePreferredApp(app_verb verb = B_OPEN)
 {
-	return SetAppHint(NULL);
+	return SetPreferredApp(NULL, verb);
+}
+
+// DeleteSnifferRule
+//! Deletes the mime type's sniffer rule
+status_t 
+BMimeType::DeleteSnifferRule()
+{
+	return SetSnifferRule(NULL);
+}
+
+// DeleteSupportedTypes
+//! Deletes the mime type's supported types
+status_t
+BMimeType::DeleteSupportedTypes()
+{
+	return SetSupportedTypes(NULL);
 }
 
 void BMimeType::_ReservedMimeType1() {}
@@ -1560,6 +1622,42 @@ BMimeType::operator=(const BMimeType &)
 */
 BMimeType::BMimeType(const BMimeType &)
 {
+}
+
+status_t
+BMimeType::GetSupportedTypes(BMessage *types)
+{
+	status_t err = InitCheck();
+	if (!err)
+		err = get_supported_types(Type(), types);
+	return err;
+}
+
+status_t
+BMimeType::SetSupportedTypes(const BMessage *types)
+{
+	status_t err = InitCheck();	
+
+	BMessage msg(types ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_SUPPORTED_TYPES);
+	if (!err && types) 
+		err = msg.AddMessage("types", types);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // Returns a lowercase version of str in result. Result must

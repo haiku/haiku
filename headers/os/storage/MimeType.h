@@ -57,6 +57,7 @@ enum {
 	B_MIME_TYPE_CREATED				= 0x00000100,
 	B_MIME_TYPE_DELETED				= 0x00000200,
 	B_SNIFFER_RULE_CHANGED			= 0x00000400,
+	B_SUPPORTED_TYPES_CHANGED		= 0x00000800,
 
 	B_EVERYTHING_CHANGED			= (int)0xFFFFFFFF
 };
@@ -121,9 +122,9 @@ public:
 	status_t SetShortDescription(const char *description);
 	status_t SetLongDescription(const char *description);
 
-	static status_t GetInstalledSupertypes(BMessage *super_types);
+	static status_t GetInstalledSupertypes(BMessage *supertypes);
 	static status_t GetInstalledTypes(BMessage *types);
-	static status_t GetInstalledTypes(const char *super_type,
+	static status_t GetInstalledTypes(const char *supertype,
 									  BMessage *subtypes);
 	static status_t GetWildcardApps(BMessage *wild_ones);
 	static bool IsValid(const char *mimeType);
@@ -156,15 +157,16 @@ public:
 	status_t SetType(const char *mimeType);
 
 	/* Brand new Delete() methods */
-	status_t DeleteIcon(icon_size size);
-	status_t DeletePreferredApp(app_verb verb = B_OPEN);
+	status_t DeleteAppHint();
 	status_t DeleteAttrInfo();
-	status_t DeleteFileExtensions();
 	status_t DeleteShortDescription();
 	status_t DeleteLongDescription();
-	status_t DeleteSnifferRule();
+	status_t DeleteFileExtensions();
+	status_t DeleteIcon(icon_size size);
 	status_t DeleteIconForType(const char *type, icon_size which);
-	status_t DeleteAppHint();
+	status_t DeletePreferredApp(app_verb verb = B_OPEN);
+	status_t DeleteSnifferRule();
+	status_t DeleteSupportedTypes();
 
 private:
 	BMimeType(const char *mimeType, const char *mimePath);
@@ -192,24 +194,24 @@ private:
 	BMimeType &operator=(const BMimeType &);
 	BMimeType(const BMimeType &);
 
-/*
-	void InitData(const char *type);
-	void InitData(const char *type);
-	status_t OpenFile(bool create_file = false, dev_t dev = -1) const;
-	status_t CloseFile() const;
+
+//	void InitData(const char *type);
+//	void InitData(const char *type);
+//	status_t OpenFile(bool create_file = false, dev_t dev = -1) const;
+//	status_t CloseFile() const;
 	status_t GetSupportedTypes(BMessage *types);
 	status_t SetSupportedTypes(const BMessage *types);
-	void MimeChanged(int32 w, const char *type = NULL,
-					 bool large = true) const;
-*/
+//	void MimeChanged(int32 w, const char *type = NULL,
+//					 bool large = true) const;
 
-	char					*fType;
-	BFile					*fMeta;
-	BPrivate::MimeDatabase	*fMimeDatabase;			// Was: "void *_unused;"
-	entry_ref				fRef;
-	int						fWhere;
-	status_t				fCStatus;
-	uint32					_reserved[3];
+
+	char		*fType;
+	BFile		*fMeta;
+	void		*_unused;
+	entry_ref	fRef;
+	int			fWhere;
+	status_t	fCStatus;
+	uint32		_reserved[3];
 };
 
 
