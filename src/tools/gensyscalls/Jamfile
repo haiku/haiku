@@ -46,7 +46,7 @@ MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src kernel libroot os ] ;
 MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src kernel core ] ;
 MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src kernel core ] ;
 MakeLocate <syscalls>syscall_table.h : [ FObjectsDir src kernel core ] ;
-MakeLocate <syscalls>strace_syscalls.h : [ FObjectsDir src apps bin strace ] ;
+MakeLocate <syscalls>strace_syscalls.h : [ FObjectsDir src bin strace ] ;
 
 Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;
 
