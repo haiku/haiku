@@ -1,33 +1,36 @@
 SubDir OBOS_TOP src kernel libroot posix unistd ;
 
 KernelMergeObject posix_unistd.o :
-	<$(SOURCE_GRIST)>access.c
-	<$(SOURCE_GRIST)>chown.c
-	<$(SOURCE_GRIST)>close.c
-	<$(SOURCE_GRIST)>conf.c
-	<$(SOURCE_GRIST)>directory.c
-	<$(SOURCE_GRIST)>dup.c
-	<$(SOURCE_GRIST)>exec.c
-	<$(SOURCE_GRIST)>_exit.c
-	<$(SOURCE_GRIST)>fcntl.c
-	<$(SOURCE_GRIST)>fork.c
-	<$(SOURCE_GRIST)>getopt.c
-	<$(SOURCE_GRIST)>hostname.c
-	<$(SOURCE_GRIST)>ioctl.c
-	<$(SOURCE_GRIST)>link.c
-	<$(SOURCE_GRIST)>lseek.c
-	<$(SOURCE_GRIST)>mount.c
-	<$(SOURCE_GRIST)>open.c
-	<$(SOURCE_GRIST)>pipe.c
-	<$(SOURCE_GRIST)>process.c
-	<$(SOURCE_GRIST)>read.c
-	<$(SOURCE_GRIST)>sleep.c
-	<$(SOURCE_GRIST)>sync.c
-	<$(SOURCE_GRIST)>terminal.c
-	<$(SOURCE_GRIST)>truncate.c
-	<$(SOURCE_GRIST)>ttyname.c
-	<$(SOURCE_GRIST)>usergroup.c
-	<$(SOURCE_GRIST)>usleep.c
-	<$(SOURCE_GRIST)>write.c
+	access.c
+	alarm.c
+	chown.c
+	close.c
+	conf.c
+	directory.c
+	dup.c
+	exec.c
+	_exit.c
+	fcntl.c
+	fork.c
+	getopt.c
+	hostname.c
+	ioctl.c
+	link.c
+	lseek.c
+	mount.c
+	open.c
+	pipe.c
+	process.c
+	read.c
+	sbrk.c
+	sleep.c
+	sync.c
+	terminal.c
+	truncate.c
+	ttyname.c
+	ualarm.c
+	usergroup.c
+	usleep.c
+	write.c
 	: -fPIC -DPIC
 	;
