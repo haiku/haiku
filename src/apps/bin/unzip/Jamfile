@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src apps bin unzip ;
 
-BinCommand unzip :
-	unzip.c
+StaticLibrary unzip :
 	crc32.c
 	crctab.c
 	crypt.c
@@ -15,11 +14,16 @@ BinCommand unzip :
 	match.c
 	process.c
 	ttyio.c
-	unreduce.c
-	unshrink.c
 	zipinfo.c
 	beos.c
 	beosmain.cpp
+;
+
+BinCommand unzip :
+	unzip.c
+	unreduce.c
+	unshrink.c
+	: libunzip.a
 ;
 
 LinkSharedOSLibs unzip : be ;
@@ -38,23 +42,8 @@ LinkSharedOSLibs funzip : be ;
 
 BinCommand unzipsfx :
 	unzip.c
-	crc32.c
-	crctab.c
-	crypt.c
-	extract.c
-	fileio.c
-	globals.c
-	inflate.c
-	match.c
-	process.c
-	ttyio.c
-	beos.c
-	beosmain.cpp
 	sfxdefs.c
-	envargs.c
-	zipinfo.c
-	list.c
-	explode.c
+	: libunzip.a
 ;
 
 LinkSharedOSLibs unzipsfx : be ;
