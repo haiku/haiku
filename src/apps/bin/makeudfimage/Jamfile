@@ -12,7 +12,9 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
 BinCommand makeudfimage 
 	: makeudfimage.cpp
 	  Allocator.cpp
+	  Attribute.cpp
 	  ConsoleListener.cpp
+	  OutputFile.cpp
 	  Shell.cpp
 	  UdfBuilder.cpp
 
@@ -23,6 +25,7 @@ BinCommand makeudfimage
 	  Utils.cpp
 
 	: stdc++.r4
+	  be
 	
 ;
 
