@@ -1,7 +1,8 @@
 /* File System Interface Layer Definition
-** 
-** Distributed under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FS_INTERFACE_H
 #define _FS_INTERFACE_H
 
@@ -56,7 +57,7 @@ typedef struct file_system_info {
 	struct module_info	module_info;
 
 	/* general operations */
-	status_t (*mount)(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *_rootVnodeID);
+	status_t (*mount)(mount_id id, const char *device, uint32 flags, const char *args, fs_volume *_fs, vnode_id *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
 	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
