@@ -85,6 +85,7 @@ struct vnode {
 	uint8			remove : 1;
 	uint8			busy : 1;
 	uint8			unpublished : 1;
+	struct advisory_locking	*advisory_locking;
 };
 
 struct vnode_hash_key {
@@ -111,6 +112,19 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
+struct advisory_locking {
+	struct mutex	mutex;
+	sem_id			wait_sem;
+	struct list		locks;
+};
+
+struct advisory_lock {
+	list_link		link;
+	team_id			team;
+	off_t			offset;
+	off_t			length;
+	bool			shared;
+};
 
 static mutex sFileSystemsMutex;
 
@@ -812,6 +826,272 @@ put_vnode(struct vnode *vnode)
 }
 
 
+static status_t
+create_advisory_locking(struct vnode *vnode)
+{
+	status_t status;
+
+	struct advisory_locking *locking = (struct advisory_locking *)malloc(sizeof(struct advisory_locking));
+	if (locking == NULL)
+		return B_NO_MEMORY;
+
+	locking->wait_sem = create_sem(0, "advisory lock");
+	if (locking->wait_sem < B_OK) {
+		status = locking->wait_sem;
+		goto err1;
+	}
+
+	status = mutex_init(&locking->mutex, "advisory locking");
+	if (status < B_OK)
+		goto err2;
+
+	list_init(&locking->locks);
+	vnode->advisory_locking = locking;
+	return B_OK;
+
+err2:
+	delete_sem(locking->wait_sem);
+err1:
+	free(locking);
+	return status;
+}
+
+
+static inline void
+put_advisory_locking(struct advisory_locking *locking)
+{
+	mutex_unlock(&locking->mutex);
+}
+
+
+static struct advisory_locking *
+get_advisory_locking(struct vnode *vnode)
+{
+	mutex_lock(&sVnodeMutex);
+
+	struct advisory_locking *locking = vnode->advisory_locking;
+	if (locking != NULL)
+		mutex_lock(&locking->mutex);
+
+	mutex_unlock(&sVnodeMutex);
+	return locking;
+}
+
+
+static status_t
+get_advisory_lock(struct vnode *vnode, struct flock *flock)
+{
+	return B_ERROR;
+}
+
+
+/**	Removes the specified lock, or all locks of the calling team
+ *	if \a flock is NULL.
+ */
+
+static status_t
+release_advisory_lock(struct vnode *vnode, struct flock *flock)
+{
+	FUNCTION(("release_advisory_lock(vnode = %p, flock = %p)\n", vnode, flock));
+
+	struct advisory_locking *locking = get_advisory_locking(vnode);
+	if (locking == NULL)
+		return flock != NULL ? B_BAD_VALUE : B_OK;
+
+	team_id team = team_get_current_team_id();
+
+	// find matching lock entry
+
+	status_t status = B_BAD_VALUE;
+	struct advisory_lock *lock = NULL;
+	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+		if (lock->team == team && (flock == NULL || (flock != NULL
+			&& lock->offset == flock->l_start
+			&& lock->length == flock->l_len))) {
+			// we found our lock, free it
+			list_remove_item(&locking->locks, lock);
+			free(lock);
+			status = B_OK;
+			break;
+		}
+	}
+
+	bool removeLocking = list_is_empty(&locking->locks);
+	release_sem_etc(locking->wait_sem, 1, B_RELEASE_ALL);
+
+	put_advisory_locking(locking);
+
+	if (status < B_OK)
+		return status;
+
+	if (removeLocking) {
+		// we can remove the whole advisory locking structure; it's no longer used
+		mutex_lock(&sVnodeMutex);
+		locking = vnode->advisory_locking;
+		if (locking != NULL)
+			mutex_lock(&locking->mutex);
+
+		// the locking could have been changed in the mean time
+		if (list_is_empty(&locking->locks))
+			vnode->advisory_locking = NULL;
+		else {
+			removeLocking = false;
+			mutex_unlock(&locking->mutex);
+		}
+
+		mutex_unlock(&sVnodeMutex);
+	}
+	if (removeLocking) {
+		// we've detached the locking from the vnode, so we can safely delete it
+		mutex_destroy(&locking->mutex);
+		delete_sem(locking->wait_sem);
+		free(locking);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+acquire_advisory_lock(struct vnode *vnode, struct flock *flock, bool wait)
+{
+	FUNCTION(("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
+		vnode, flock, wait ? "yes" : "no"));
+
+	bool shared = flock->l_type == F_RDLCK;
+	status_t status = B_OK;
+
+restart:
+	// if this vnode has an advisory_locking structure attached,
+	// lock that one and search for any colliding lock
+	struct advisory_locking *locking = get_advisory_locking(vnode);
+	sem_id waitForLock = -1;
+
+	if (locking != NULL) {
+		// test for collisions
+		struct advisory_lock *lock = NULL;
+		while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+			if (lock->offset <= flock->l_start + flock->l_len
+				&& lock->offset + lock->length > flock->l_start) {
+				// locks do overlap
+				if (!shared || !lock->shared) {
+					// we need to wait
+					waitForLock = locking->wait_sem;
+					break;
+				}
+			}
+		}
+
+		put_advisory_locking(locking);
+	}
+
+	// wait for the lock if we have to, or else return immediately
+
+	if (waitForLock >= B_OK) {
+		if (!wait)
+			status = B_PERMISSION_DENIED;
+		else {
+			// ToDo: this is the standard condvar problem; there is a big race
+			//	condition here: between here and the put_advisory_locking() call
+			//	above, a release could already have happened!
+			status = acquire_sem_etc(waitForLock, 1, B_CAN_INTERRUPT, 0);
+			if (status == B_OK) {
+				// see if we're still colliding
+				goto restart;
+			}
+		}
+	}
+
+	if (status < B_OK)
+		return status;
+
+	// install new lock
+
+	mutex_lock(&sVnodeMutex);
+
+	locking = vnode->advisory_locking;
+	if (locking == NULL) {
+		status = create_advisory_locking(vnode);
+		locking = vnode->advisory_locking;
+	}
+
+	if (locking != NULL)
+		mutex_lock(&locking->mutex);
+
+	mutex_unlock(&sVnodeMutex);
+
+	if (status < B_OK)
+		return status;
+
+	struct advisory_lock *lock = (struct advisory_lock *)malloc(sizeof(struct advisory_lock));
+	if (lock == NULL) {
+		if (waitForLock >= B_OK)
+			release_sem_etc(waitForLock, 1, B_RELEASE_ALL);
+		mutex_unlock(&locking->mutex);
+		return B_NO_MEMORY;
+	}
+
+	lock->team = team_get_current_team_id();
+	// values must already be normalized when getting here
+	lock->offset = flock->l_start;
+	lock->length = flock->l_len;
+	lock->shared = shared;
+
+	list_add_item(&locking->locks, lock);
+	mutex_unlock(&locking->mutex);
+
+	return status;
+}
+
+
+static status_t
+normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
+{
+	switch (flock->l_whence) {
+		case SEEK_SET:
+			break;
+		case SEEK_CUR:
+			flock->l_start += descriptor->pos;
+			break;
+		case SEEK_END:
+		{
+			struct vnode *vnode = descriptor->u.vnode;
+			struct stat stat;
+			status_t status;
+
+			if (FS_CALL(vnode, read_stat) == NULL)
+				return EOPNOTSUPP;
+
+			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+			if (status < B_OK)
+				return status;
+
+			flock->l_start += stat.st_size;
+			break;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+
+	if (flock->l_start < 0)
+		flock->l_start = 0;
+	if (flock->l_len == 0)
+		flock->l_len = OFF_MAX;
+
+	// don't let the offset and length overflow
+	if (flock->l_start > 0 && OFF_MAX - flock->l_start < flock->l_len)
+		flock->l_len = OFF_MAX - flock->l_start;
+
+	if (flock->l_len < 0) {
+		// a negative length reverses the region
+		flock->l_start += flock->l_len;
+		flock->l_len = -flock->l_len;
+	}
+
+	return B_OK;
+}
+
+
 /**	\brief Resolves a mount point vnode to the volume root vnode it is covered
  *		   by.
  *
@@ -823,6 +1103,7 @@ put_vnode(struct vnode *vnode)
  *	\return The volume root vnode the vnode cover is covered by, if it is
  *			indeed a mount point, or \c NULL otherwise.
  */
+
 static struct vnode *
 resolve_mount_point_to_volume_root(struct vnode *vnode)
 {
@@ -862,6 +1143,7 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
  *	- \c B_OK, if everything went fine,
  *	- another error code, if something went wrong.
  */
+
 status_t
 resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
 	mount_id *resolvedMountID, vnode_id *resolvedNodeID)
@@ -2771,14 +3053,19 @@ static status_t
 file_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
+	status_t status = B_OK;
 
 	FUNCTION(("file_close(descriptor = %p)\n", descriptor));
 
 	cache_node_closed(vnode, FDTYPE_FILE, vnode->cache, vnode->device, vnode->id);
 	if (FS_CALL(vnode, close))
-		return FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		status = FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
 
-	return B_OK;
+	if (status == B_OK) {
+		// remove all outstanding locks for this team
+		release_advisory_lock(vnode, NULL);
+	}
+	return status;
 }
 
 
@@ -3110,6 +3397,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
+	struct flock flock;
 	status_t status;
 
 	FUNCTION(("common_fcntl(fd = %d, op = %d, argument = %lx, %s)\n",
@@ -3119,15 +3407,22 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
+	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
+		if (descriptor->type != FDTYPE_FILE)
+			return B_BAD_VALUE;
+		if (user_memcpy(&flock, (struct flock *)argument, sizeof(struct flock)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
 	switch (op) {
 		case F_SETFD:
 			// Set file descriptor flags
 
 			// O_CLOEXEC is the only flag available at this time
 			if (argument == FD_CLOEXEC)
-				descriptor->open_mode |= O_CLOEXEC;
+				atomic_or(&descriptor->open_mode, O_CLOEXEC);
 			else
-				descriptor->open_mode &= O_CLOEXEC;
+				atomic_and(&descriptor->open_mode, O_CLOEXEC);
 
 			status = B_OK;
 			break;
@@ -3163,7 +3458,33 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				atomic_add(&descriptor->ref_count, 1);
 			break;
 
-		// ToDo: add support for more ops
+		case F_GETLK:
+			status = get_advisory_lock(descriptor->u.vnode, &flock);
+			if (status == B_OK) {
+				// copy back flock structure
+				status = user_memcpy((struct flock *)argument, &flock, sizeof(struct flock));
+			}
+			break;
+
+		case F_SETLK:
+		case F_SETLKW:
+			status = normalize_flock(descriptor, &flock);
+			if (status < B_OK)
+				break;
+
+			if (flock.l_type == F_UNLCK)
+				status = release_advisory_lock(descriptor->u.vnode, &flock);
+			else {
+				// the open mode must match the lock type
+				if ((descriptor->open_mode & O_RWMASK) == O_RDONLY && flock.l_type == F_WRLCK
+					|| (descriptor->open_mode & O_RWMASK) == O_WRONLY && flock.l_type == F_RDLCK)
+					status = B_FILE_ERROR;
+				else
+					status = acquire_advisory_lock(descriptor->u.vnode, &flock, op == F_SETLKW);
+			}
+			break;
+
+		// ToDo: add support for more ops?
 
 		default:
 			status = B_BAD_VALUE;
