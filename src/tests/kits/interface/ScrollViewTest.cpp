@@ -141,14 +141,24 @@ KnobWindow::KnobWindow(bool horiz, bool vert)
 	}
 
 	BView *view = new BView(frame, "main view", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(200, 200, 21);
+	BScrollView *scroller = new BScrollView("scroller", view, B_FOLLOW_ALL, 0, horiz, vert);
+	AddChild(scroller);
+
+	// check the SetTarget() functionality
+
+	BView *outer = new BView(frame, "main view", B_FOLLOW_ALL, B_WILL_DRAW);
+	outer->SetViewColor(200, 200, 21);
 	BView *inner = new BView(frame.OffsetToCopy(B_ORIGIN).InsetBySelf(3, 3),
 						"inner", B_FOLLOW_ALL, B_WILL_DRAW);
 	inner->SetViewColor(200, 42, 42);
-	view->AddChild(inner);
+	outer->AddChild(inner);
 
-	BScrollView *scroller = new BScrollView("scroller", view, B_FOLLOW_ALL, 0, horiz, vert);
-	AddChild(scroller);
+	scroller->RemoveChild(view);
+		// works with and without it
+
+	scroller->SetTarget(NULL);
+	scroller->SetTarget(outer);
+	delete view;
 
 	gNumWindows++;
 }
