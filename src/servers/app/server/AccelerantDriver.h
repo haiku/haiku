@@ -51,6 +51,31 @@ class PortLink;
 class ServerBitmap;
 class ServerCursor;
 
+class AccLineCalc
+{
+public:
+	AccLineCalc();
+	AccLineCalc(const BPoint &pta, const BPoint &ptb);
+	void SetPoints(const BPoint &pta, const BPoint &ptb);
+	float GetX(float y);
+	float GetY(float x);
+	float Slope(void) { return slope; }
+	float Offset(void) { return offset; }
+	float MinX();
+	float MinY();
+	float MaxX();
+	float MaxY();
+	void Swap(AccLineCalc &from);
+private:
+	float slope;
+	float offset;
+	BPoint start, end;
+	float minx;
+	float miny;
+	float maxx;
+	float maxy;
+};
+
 class AccelerantDriver : public DisplayDriver
 {
 public:

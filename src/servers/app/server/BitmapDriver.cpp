@@ -26,6 +26,7 @@
 //  
 //------------------------------------------------------------------------------
 #include "Angle.h"
+#include "AccelerantDriver.h"
 #include "PatternHandler.h"
 #include "BitmapDriver.h"
 #include "ServerProtocol.h"
@@ -207,6 +208,533 @@ void BitmapDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, La
 */
 void BitmapDriver::FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat)
 {
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int starty, endy;
+	int xclip, startclip, endclip;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+	float oldpensize;
+	BPoint center(xc,yc);
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  FillEllipse(r,d,pat);
+	  return;
+	}
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+	oldpensize = d->pensize;
+	d->pensize = 1;
+
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+
+	starty = ROUND(ry*sqrt(1-(double)startx*startx/(rx*rx)));
+	endy = ROUND(ry*sqrt(1-(double)endx*endx/(rx*rx)));
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+	if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+	if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+	if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+	if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+		HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+	if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
+	if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+		if ( useQuad2 && CHECK_Y(yc-y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc-y),&pattern);
+		if ( useQuad3 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc-x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc-x)),ROUND(yc+y),&pattern);
+		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
+			HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+xclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(ROUND(CLIP_X(xc-xclip)),ROUND(CLIP_X(xc)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(ROUND(CLIP_X(xc)),ROUND(CLIP_X(xc+xclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+x)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(ROUND(CLIP_X(xc+endclip)),ROUND(CLIP_X(xc+startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(ROUND(CLIP_X(xc-endclip)),ROUND(CLIP_X(xc-startclip)),ROUND(yc-y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(ROUND(CLIP_X(xc-startclip)),ROUND(CLIP_X(xc-endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(ROUND(CLIP_X(xc+startclip)),ROUND(CLIP_X(xc+endclip)),ROUND(yc+y),&pattern);
+					}
+				}
+			}
+		}
+	}
+	d->pensize = oldpensize;
+	Unlock();
 }
 
 /*!
@@ -220,6 +748,72 @@ void BitmapDriver::FillArc(BRect r, float angle, float span, LayerData *d, const
 */
 void BitmapDriver::FillBezier(BPoint *pts, LayerData *d, const Pattern &pat)
 {
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .0002;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+	float oldpensize;
+	bool steep = false;
+
+	Lock();
+	if ( fabs(pts[3].y-pts[0].y) > fabs(pts[3].x-pts[0].x) )
+		steep = true;
+	
+	AccLineCalc line(pts[0], pts[3]);
+	oldpensize = d->pensize;
+	d->pensize = 1;
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+		if ( (x!=lastx) || (y!=lasty) )
+		{
+			if ( steep )
+				StrokeLine(BPoint(x,y),BPoint(line.GetX(y),y),d,pat);
+			else
+				StrokeLine(BPoint(x,y),BPoint(x,line.GetY(x)),d,pat);
+		}
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
+	d->pensize = oldpensize;
+	Unlock();
 }
 
 /*!
@@ -320,6 +914,22 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, const Pattern &pat)
 }
 
 /*!
+	\brief Called for all BView::FillPolygon calls
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	The points in the array are not guaranteed to be within the framebuffer's 
+	coordinate range.
+*/
+void BitmapDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat)
+{
+}
+
+
+/*!
 	\brief Called for all BView::FillRect calls
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
@@ -352,8 +962,28 @@ void BitmapDriver::FillRect(BRect r, LayerData *d, const Pattern &pat)
 */
 void BitmapDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat)
 {
-	printf("BitmapDriver::FillRoundRect unimplemented\n");
-	StrokeRoundRect(r,xrad,yrad,d,pat);
+	float arc_x;
+	float yrad2 = yrad*yrad;
+	int i;
+
+	Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+	
+	for (i=0; i<=(int)yrad; i++)
+	{
+		arc_x = xrad*sqrt(1-i*i/yrad2);
+		if ( CHECK_Y(r.top+yrad-i) )
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.top+yrad-i), &pattern);
+		if ( CHECK_Y(r.bottom-yrad+i) )
+			HLine(ROUND(CLIP_X(r.left+xrad-arc_x)), ROUND(CLIP_X(r.right-xrad+arc_x)),
+				ROUND(r.bottom-yrad+i), &pattern);
+	}
+	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
+			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
+
+	Unlock();
 }
 
 /*!
@@ -1225,24 +1855,6 @@ void BitmapDriver::SetCursor(ServerCursor *csr)
 	// Nothing is done with cursor for this, so even the inherited versions need not be called.
 }
 
-void BitmapDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)
-{
-	// TODO: Implement and substitute Line() calls with HLine calls as appropriate
-	// elsewhere in the driver
-	
-	switch(_target->BitsPerPixel())
-	{
-		case 32:
-		case 24:
-			break;
-		case 16:
-		case 15:
-			break;
-		default:
-			break;
-	}
-}
-
 // This function is intended to eventually take care of most of the heavy lifting for
 // DrawBitmap in 32-bit mode, with others coming later. Right now, it is *just* used for
 // the 
@@ -2090,4 +2702,60 @@ rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d
 	}
 	Unlock();
 	return returncolor;
+}
+
+/*!
+	\brief Draws a horizontal line
+	\param x1 The first x coordinate (guaranteed to be in bounds)
+	\param x2 The second x coordinate (guaranteed to be in bounds)
+	\param y The y coordinate (guaranteed to be in bounds)
+	\param pat The PatternHandler which detemines pixel colors
+*/
+void BitmapDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
+{
+/*	// TODO: Finish porting over from AccelerantDriver
+	int x;
+	if ( x1 > x2 )
+	{
+		x = x2;
+		x2 = x1;
+		x1 = x;
+	}
+	switch (mDisplayMode.space)
+	{
+		case B_CMAP8:
+		case B_GRAY8:
+			{
+				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row;
+				for (x=x1; x<=x2; x++)
+					fb[x] = pat->GetColor(x,y).GetColor8();
+			} break;
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			{
+				uint16 *fb = (uint16 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				for (x=x1; x<=x2; x++)
+					fb[x] = pat->GetColor(x,y).GetColor16();
+			} break;
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+			{
+				uint32 *fb = (uint32 *)((uint8 *)mFrameBufferConfig.frame_buffer + y*mFrameBufferConfig.bytes_per_row);
+				rgb_color color;
+				for (x=x1; x<=x2; x++)
+				{
+					color = pat->GetColor(x,y).GetColor32();
+					fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+				}
+			} break;
+		default:
+			printf("Error: Unknown color space\n");
+	}
+*/
 }

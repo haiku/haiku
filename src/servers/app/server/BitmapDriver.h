@@ -82,7 +82,7 @@ public:
 	virtual void FillArc(BRect r, float angle, float span, LayerData *d, const Pattern &pat);
 	virtual void FillBezier(BPoint *pts, LayerData *d, const Pattern &pat);
 	virtual void FillEllipse(BRect r, LayerData *d, const Pattern &pat);
-//	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
+	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, const Pattern &pat);
 	virtual void FillRect(BRect r, LayerData *d, const Pattern &pat);
 	virtual void FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, const Pattern &pat);
 //	virtual void FillShape(SShape *sh, LayerData *d, const Pattern &pat);
@@ -116,7 +116,7 @@ protected:
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, const Pattern &pat);
-	void HLine(int32 x1, int32 x2, int32 y, RGBColor color);
+	void HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat);
 	void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	void SetPixel(int x, int y, RGBColor col);
