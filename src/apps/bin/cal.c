@@ -153,12 +153,16 @@ main(argc, argv)
 	year  = 0;
 	switch(argc) {
 	case 2:
-		if ((month = atoi(*argv++)) < 1 || month > 12)
+		if ((month = atoi(*argv++)) < 1 || month > 12) {
 			(void)fprintf(stderr,"illegal month value: use 1-12\n");
+			exit(1);
+		}
 		/* FALLTHROUGH */
 	case 1:
-		if ((year = atoi(*argv)) < 1 || year > 9999)
+		if ((year = atoi(*argv)) < 1 || year > 9999) {
 			(void)fprintf(stderr,"illegal year value: use 1-9999\n");
+			exit(1);
+		}
 		break;
 	case 0:
 		(void)time(&now);
