@@ -26,12 +26,12 @@
 #include <ctype.h>
 
 
-struct debugger_command {
+typedef struct debugger_command {
 	struct debugger_command *next;
 	int (*func)(int, char **);
 	const char *name;
 	const char *description;
-};
+} debugger_command;
 
 int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
 
@@ -51,6 +51,30 @@ static int cur_line = 0;
 static char *args[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
+
+
+static debugger_command *
+find_command(char *name)
+{
+	debugger_command *command;
+	int length;
+
+	// search command by full name
+
+	for (command = sCommands; command != NULL; command = command->next) {
+		if (strcmp(name, command->name) == 0)
+			return command;
+	}
+
+	// if it couldn't be found, search for a partial match
+
+	length = strlen(name);
+
+	for (command = sCommands; command != NULL; command = command->next) {
+		if (strncmp(name, command->name, length) == 0)
+			return command;
+	}
+}
 
 
 static int
@@ -222,15 +246,8 @@ kernel_debugger_loop(void)
 
 		debugger_on_cpu = smp_get_current_cpu();
 
-		if (argc > 0) {
-			// search command by name
-			cmd = sCommands;
-			while (cmd != NULL) {
-				if (strcmp(args[0], cmd->name) == 0)
-					break;
-				cmd = cmd->next;
-			}
-		}
+		if (argc > 0)
+			cmd = find_command(args[0]);
 
 		if (cmd == NULL)
 			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
@@ -290,20 +307,28 @@ static int
 cmd_reboot(int argc, char **argv)
 {
 	reboot();
-	return 0;  // I'll be really suprised if this line ever run! ;-)
+	return 0;
+		// I'll be really suprised if this line ever run! ;-)
 }
 
 
 static int
 cmd_help(int argc, char **argv)
 {
-	struct debugger_command *cmd;
+	debugger_command *command, *specified = NULL;
 
-	dprintf("debugger commands:\n");
-	cmd = sCommands;
-	while (cmd != NULL) {
-		dprintf(" %-32s\t\t%s\n", cmd->name, cmd->description ? cmd->description : "");
-		cmd = cmd->next;
+	if (argc > 1) {
+		// only print out the help of the specified command (and all of its aliases)
+		specified = find_command(argv[1]);
+		dprintf("debugger command for \"%s\" and aliases:\n", specified->name);
+	} else
+		dprintf("debugger commands:\n");
+
+	for (command = sCommands; command != NULL; command = command->next) {
+		if (specified && command->func != specified->func)
+			continue;
+
+		dprintf(" %-20s\t\t%s\n", command->name, command->description ? command->description : "-");
 	}
 
 	return 0;
@@ -320,8 +345,6 @@ cmd_continue(int argc, char **argv)
 int
 dbg_init(kernel_args *ka)
 {
-	sCommands = NULL;
-
 	return arch_dbg_con_init(ka);
 }
 
