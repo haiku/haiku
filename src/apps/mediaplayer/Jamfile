@@ -8,6 +8,8 @@ AddResources MediaPlayer :
 
 App MediaPlayer :
 	MediaPlayerApp.cpp
+	MediaPlayerView.cpp
+	MediaPlayerWindow.cpp
 	;
 
 LinkSharedOSLibs MediaPlayer : be media tracker ;
