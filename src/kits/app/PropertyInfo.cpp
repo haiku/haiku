@@ -82,31 +82,41 @@ int32 BPropertyInfo::FindMatch(BMessage *msg, int32 index, BMessage *spec,
 {
 	int32 property_index = 0;
 
-	while (fPropInfo[property_index].name)
-	{
+	while ((fPropInfo != NULL) && (fPropInfo[property_index].name)) {
 		property_info *propInfo = fPropInfo + property_index;
 
-		if (strcmp(propInfo->name, prop) == 0)
-		{
+		if (strcmp(propInfo->name, prop) == 0) {
 			int32 specifier_index = 0;
+			bool wildcardSpecifier = (propInfo->specifiers[0] == 0);
+			bool wildcardCommand = (propInfo->commands[0] == 0);
+			bool foundSpecifier = false;
+			bool foundCommand = false;
 
-			for (int32 i = 0; i < 10 && propInfo->specifiers[i] != 0; i++)
-			{
-				if (propInfo->specifiers[i] == form)
-				{
-					for (int32 j = 0; j < 10 && propInfo->commands[j] != 0; j++)
-					{
-						if (propInfo->commands[j] == msg->what)
-						{
-							if (data)
-								*((uint32*)data) = propInfo->extra_data;
-							return property_index;
-						}
-					}
+			for (int32 i = 0; i < 10 && propInfo->specifiers[i] != 0; i++) {
+				if (propInfo->specifiers[i] == form) {
+					foundSpecifier = true;
+					break;
 				}
 			}
+			
+			for (int32 j = 0; j < 10 && propInfo->commands[j] != 0; j++) {
+				if (propInfo->commands[j] == msg->what) {
+					foundCommand = true;
+					break;
+				}
+			}
+			
+			if (((index == 0) &&
+				 (wildcardSpecifier || foundSpecifier) &&
+				 (wildcardCommand || foundCommand)) ||
+				((index != 0) &&
+				 (wildcardSpecifier || foundSpecifier) &&
+				 (wildcardCommand))) {
+				if (data)
+					*((uint32*)data) = propInfo->extra_data;
+				return property_index;
+			}
 		}
-
 		property_index++;
 	}
 
@@ -311,7 +321,7 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 		uint16	*wrdPtr;
 	};
 
-	charPtr = (char*)buffer;
+	charPtr = ((char*)(buffer))+1;
 
 	fPropCount = *(intPtr++);
 	int32 flags = *(intPtr++);
@@ -369,14 +379,14 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 
 	if (flags & 2)
 	{
-		fValueCount = (int16)*(intPtr++);
+		fValueCount = (int16)*(wrdPtr++);
 
 		fValueInfo = new value_info[fValueCount + 1];
 		memset(fValueInfo, 0, (fValueCount + 1) * sizeof(value_info));
 
 		for (int32 vi = 0; vi < fValueCount; vi++)
 		{
-			fValueInfo[vi].kind = (value_kind)*(wrdPtr++);
+			fValueInfo[vi].kind = (value_kind)*(intPtr++);
 			fValueInfo[vi].value = *(intPtr++);
 
 			fValueInfo[vi].name = strdup(charPtr);
@@ -389,7 +399,7 @@ status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 			}
 			else
 				charPtr++;
-
+			
 			fValueInfo[vi].extra_data = *(intPtr++);
 		}
 	}
