@@ -136,21 +136,19 @@ struct protosw {
 
 
 /* Network stack defines... */
-#ifdef _KERNEL_MODE
-  struct protosw *protocols;
+// struct protosw *protocols;
 
-  enum {
+enum {
 	NET_LAYER1 = 1,
 	NET_LAYER2,
 	NET_LAYER3,
 	NET_LAYER4
-  };
+ };
 
 //XXX conflicts with src/add-ons/kernel/network/core/core.c:69
-//  void add_protosw     (struct protosw *prt[], int); 
-  void add_protocol    (struct protosw *, int);
-  void remove_protocol (struct protosw *);
-#endif
+//  void add_protosw     (struct protosw *prt[], int);
+void add_protocol    (struct protosw *, int);
+void remove_protocol (struct protosw *);
 
 struct protosw *pffindproto(int domain, int protocol, int type);
 struct protosw *pffindtype(int domain, int type);
