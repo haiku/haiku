@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src apps pulse ;
+
+App Pulse : BottomPrefsView.cpp
+	ConfigView.cpp
+	CPUButton.cpp
+	DeskbarPulseView.cpp
+	MiniPulseView.cpp
+	NormalPulseView.cpp
+	Prefs.cpp
+	PrefsWindow.cpp
+	ProgressBar.cpp
+	PulseApp.cpp
+	PulseView.cpp
+	PulseWindow.cpp ;
+
+LinkSharedOSLibs Pulse : be ;
+
+AddResources Pulse : Pulse.rsrc ;
