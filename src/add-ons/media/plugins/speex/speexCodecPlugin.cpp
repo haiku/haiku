@@ -256,7 +256,6 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 	mediaHeader->start_time = fStartTime;
 	//TRACE("SpeexDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 
-//	debugger("SpeexDecoder::Decode");
 	while (out_bytes_needed >= fSpeexOutputLength) {
 		// get a new packet
 		void *chunkBuffer;
@@ -292,11 +291,11 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 			if (fHeader->nb_channels == 2) {
 				speex_decode_stereo(out_buffer, fHeader->frame_size, fStereoState);
 			}
-			for (int i = 0 ; i < fHeader->frame_size ; i++) {
+			for (int i = 0 ; i < fHeader->frame_size * fHeader->nb_channels ; i++) {
 				out_buffer[i] /= 32000.0;
 			}
-			out_buffer += fHeader->frame_size;
-			out_bytes_needed -= fHeader->frame_size*sizeof(float);
+			out_buffer += fHeader->frame_size * fHeader->nb_channels;
+			out_bytes_needed -= fSpeexOutputLength;
 		}
 	}
 
