@@ -18,6 +18,7 @@ bool nv_dac_crt_connected(void)
 	uint32 output, dac;
 	bool present;
 
+//fixme? checkout NV11...
 	/* save output connector setting */
 	output = DACR(OUTPUT);
 	/* save DAC state */

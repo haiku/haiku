@@ -52,6 +52,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	status_t result;
 	uint32 startadd,startadd_right;
 	bool display, h, v;
+	bool crt1, crt2, cross;
 
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
@@ -184,26 +185,30 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*work out where the "right" screen starts*/
 		startadd_right = startadd + (target.timing.h_display * (colour_depth1 >> 3));
 
-		/* set the outputs if possible */
-		if (si->ps.secondary_head)
+		/* detect which connectors have a CRT connected */
+		crt1 = nv_dac_crt_connected();
+		crt2 = nv_dac2_crt_connected();
+		/* connect outputs 'straight-through' */
+		if (crt1)
 		{
-			/* fixme: test... (do also for singlehead modes!) */
-			nv_dac_crt_connected();
-			nv_dac2_crt_connected();
-
-			switch (target.flags & DUALHEAD_BITS)
-			{
-			case DUALHEAD_ON:
-			case DUALHEAD_CLONE:
-				/* connect outputs straight-through */
-				nv_general_output_select(false);
-				break;
-			case DUALHEAD_SWITCH:
-				/* cross-connect outputs */
-				nv_general_output_select(true);
-				break;
-			}
+			/* connector1 is used as primary output */
+			cross = false;
 		}
+		else
+		{
+			if (crt2)
+				/* connector2 is used as primary output */
+				cross = true;
+			else
+				/* no CRT detected: assume connector1 is used as primary output */
+				cross = false;
+		}
+		/* set output connectors assignment if possible */
+		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
+			/* invert output assignment in switch mode */
+			nv_general_output_select(!cross);
+		else
+			nv_general_output_select(cross);
 
 		/* Tell card what memory to display */
 		switch (target.flags & DUALHEAD_BITS)
@@ -264,8 +269,30 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the timing */
 		nv_crtc_set_timing(target);
 
-		/* connect outputs straight-through */
-		if (si->ps.secondary_head) nv_general_output_select(false);
+		/* connect output */
+		if (si->ps.secondary_head)
+		{
+			/* detect which connectors have a CRT connected */
+			crt1 = nv_dac_crt_connected();
+			crt2 = nv_dac2_crt_connected();
+			/* connect outputs 'straight-through' */
+			if (crt1)
+			{
+				/* connector1 is used as primary output */
+				cross = false;
+			}
+			else
+			{
+				if (crt2)
+					/* connector2 is used as primary output */
+					cross = true;
+				else
+					/* no CRT detected: assume connector1 is used as primary output */
+					cross = false;
+			}
+			/* set output connectors assignment if possible */
+			nv_general_output_select(cross);
+		}
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
