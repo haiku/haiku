@@ -256,7 +256,7 @@ public:
 			<< "(void)syscall;" << endl
 			<< "(void)handler;" << endl;
 
-		int32 chunkSize = (fSyscallCount + 19) / 20;
+		int chunkSize = (fSyscallCount + 19) / 20;
 		
 		// iterate through the syscalls
 		for (int i = 0; i < fSyscallCount; i++) {
@@ -276,8 +276,8 @@ public:
 			file << "\t// " << syscall.name << endl;
 
 			// create the return type handler
-			file << "\thandler = new TypeHandlerImpl<" << syscall.return_type
-				<< ">();" << endl;
+			file << "\thandler = TypeHandlerFactory<" << syscall.return_type
+				<< ">::Create();" << endl;
 
 			// create the syscall
 			file << "\tsyscall = new Syscall(\"" << syscall.name << "\", "
@@ -285,13 +285,13 @@ public:
 			file << "\tsyscalls.push_back(syscall);" << endl;
 
 			// add the parameters
-			for (int32 k = 0; k < syscall.parameter_count; k++) {
+			for (int k = 0; k < syscall.parameter_count; k++) {
 				const gensyscall_parameter_info &parameter
 					= syscall.parameters[k];
 
 				// create the parameter type handler
-				file << "\thandler = new TypeHandlerImpl<"
-					<< parameter.type << ">();" << endl;
+				file << "\thandler = TypeHandlerFactory<"
+					<< parameter.type << ">::Create();" << endl;
 
 				// add the parameter
 				file << "\tsyscall->AddParameter(\"" << parameter.name << "\", "
