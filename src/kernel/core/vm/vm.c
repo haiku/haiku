@@ -1190,9 +1190,41 @@ vm_delete_area(aspace_id aid, area_id rid)
 
 
 static void
-_vm_put_area(vm_area *area, bool aspace_locked)
+remove_area_from_virtual_map(vm_address_space *addressSpace, vm_area *area, bool locked)
 {
 	vm_area *temp, *last = NULL;
+
+	if (!locked)
+		acquire_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
+	temp = addressSpace->virtual_map.areas;
+	while (temp != NULL) {
+		if (area == temp) {
+			if (last != NULL) {
+				last->aspace_next = temp->aspace_next;
+			} else {
+				addressSpace->virtual_map.areas = temp->aspace_next;
+			}
+			addressSpace->virtual_map.change_count++;
+			break;
+		}
+		last = temp;
+		temp = temp->aspace_next;
+	}
+	if (area == addressSpace->virtual_map.area_hint)
+		addressSpace->virtual_map.area_hint = NULL;
+
+	if (!locked)
+		release_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0);
+
+	if (temp == NULL)
+		panic("vm_area_release_ref: area not found in aspace's area list\n");
+}
+
+
+static void
+_vm_put_area(vm_area *area, bool aspaceLocked)
+{
 	vm_address_space *aspace;
 	bool removeit = false;
 
@@ -1212,30 +1244,7 @@ _vm_put_area(vm_area *area, bool aspace_locked)
 
 	aspace = area->aspace;
 
-	// remove the area from the aspace's virtual map
-	if (!aspace_locked)
-		acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
-	temp = aspace->virtual_map.areas;
-	while (temp != NULL) {
-		if (area == temp) {
-			if (last != NULL) {
-				last->aspace_next = temp->aspace_next;
-			} else {
-				aspace->virtual_map.areas = temp->aspace_next;
-			}
-			aspace->virtual_map.change_count++;
-			break;
-		}
-		last = temp;
-		temp = temp->aspace_next;
-	}
-	if (area == aspace->virtual_map.area_hint)
-		aspace->virtual_map.area_hint = NULL;
-	if (!aspace_locked)
-		release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
-
-	if (temp == NULL)
-		panic("vm_area_release_ref: area not found in aspace's area list\n");
+	remove_area_from_virtual_map(aspace, area, aspaceLocked);
 
 	vm_cache_remove_area(area->cache_ref, area);
 	vm_cache_release_ref(area->cache_ref);
@@ -2943,6 +2952,93 @@ out:
 }
 
 
+/**	Transfers the specified area to a new team. The caller must be the owner
+ *	of the area (not yet enforced).
+ *	If the transfer fails for whatever reason, the area may have been relocated
+ *	in the owning team, or even deleted if the relocation failed.
+ *	This function is currently not exported to the kernel namespace, but is
+ *	only accessible using the _kern_transfer_area() syscall.
+ */
+
+static status_t
+transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
+{
+	vm_address_space *sourceAddressSpace, *targetAddressSpace;
+	vm_translation_map *map;
+	vm_area *area;
+	status_t status;
+
+	area = vm_get_area(id);
+	if (area == NULL)
+		return B_BAD_VALUE;
+
+	// ToDo: check if the current team owns the area
+
+	status = team_get_address_space(target, &targetAddressSpace);
+	if (status != B_OK)
+		goto err1;
+
+	sourceAddressSpace = area->aspace;
+	remove_area_from_virtual_map(sourceAddressSpace, area, false);
+
+	// unmap the area in the source address space
+	map = &sourceAddressSpace->translation_map;
+	map->ops->lock(map);
+	map->ops->unmap(map, area->base, area->base + (area->size - 1));
+	map->ops->unlock(map);
+
+	// insert the area into the target address space
+
+	acquire_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+	// check to see if this aspace has entered DELETE state
+	if (targetAddressSpace->state == VM_ASPACE_STATE_DELETION) {
+		// okay, someone is trying to delete this aspace now, so we can't
+		// insert the area, so back out
+		status = B_BAD_TEAM_ID;
+		goto err2;
+	}
+
+	status = insert_area(targetAddressSpace, _address, addressSpec, area->size, area);
+	if (status < B_OK)
+		goto err2;
+
+	// The area was successfully transferred to the new team when we got here
+	area->aspace = targetAddressSpace;
+
+	release_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
+
+	vm_put_aspace(sourceAddressSpace);
+		// we keep the reference of the target address space for the
+		// area, so we only have to put the one from the source
+	vm_put_area(area);
+
+	return B_OK;
+
+err2:
+	release_sem_etc(targetAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
+	vm_put_aspace(targetAddressSpace);
+
+	// insert the area again into the source address space
+	acquire_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
+	// check to see if this aspace has entered DELETE state
+	if (sourceAddressSpace->state == VM_ASPACE_STATE_DELETION
+		|| insert_area(sourceAddressSpace, _address, B_ANY_ADDRESS, area->size, area) != B_OK) {
+		// We can't insert the area anymore - we have to delete it manually
+		vm_cache_remove_area(area->cache_ref, area);
+		vm_cache_release_ref(area->cache_ref);
+		free(area->name);
+		free(area);
+		area = NULL;
+	}
+	release_sem_etc(sourceAddressSpace->virtual_map.sem, WRITE_COUNT, 0);
+
+err1:
+	if (area != NULL)
+		vm_put_area(area);
+	return status;
+}
+
+
 area_id
 map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 	uint32 addressSpec, uint32 protection, void **_virtualAddress)
@@ -3085,6 +3181,34 @@ status_t
 _user_resize_area(area_id area, size_t newSize)
 {
 	return resize_area(area, newSize);
+}
+
+
+status_t
+_user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_id target)
+{
+	status_t status;
+	void *address;
+
+	// filter out some unavailable values (for userland)
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			return B_BAD_VALUE;
+	}
+
+	if (!IS_USER_ADDRESS(userAddress)
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status = transfer_area(area, &address, addressSpec, target);
+	if (status < B_OK)
+		return status;
+
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
