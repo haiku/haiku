@@ -131,6 +131,10 @@ const rgb_color kSystemPalette[] = {
 };
 
 // is_supported
+/*!	\brief Returns whether or not a color space is supported by BBitmap.
+	\param colorSpace The color space in question.
+	\return \c true, if \a colorSpace is supported, \c false otherwise.
+*/
 static inline
 bool
 is_supported(color_space colorSpace)
@@ -161,8 +165,15 @@ is_supported(color_space colorSpace)
 	return result;
 }
 
-
 // get_raw_bytes_per_row
+/*!	\brief Returns the number of bytes per row needed to store the actual
+		   bitmap data (not including any padding) given a color space and a
+		   row width.
+	\param colorSpace The color space.
+	\param width The width.
+	\return The number of bytes per row needed to store data for a row, or
+			0, if the color space is not supported.
+*/
 static inline
 int32
 get_raw_bytes_per_row(color_space colorSpace, int32 width)
@@ -216,6 +227,13 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 }
 
 // get_bytes_per_row
+/*!	\brief Returns the number of bytes per row needed to store the bitmap
+		   data (including any padding) given a color space and a row width.
+	\param colorSpace The color space.
+	\param width The width.
+	\return The number of bytes per row needed to store data for a row, or
+			0, if the color space is not supported.
+*/
 static inline
 int32
 get_bytes_per_row(color_space colorSpace, int32 width)
@@ -227,6 +245,13 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 }
 
 // brightness_for
+/*!	\brief Returns the brightness of an RGB 24 color.
+	\param red Value of the red component.
+	\param green Value of the green component.
+	\param blue Value of the blue component.
+	\return The brightness for the supplied RGB color as a value between 0
+			and 255.
+*/
 static inline
 uint8
 brightness_for(uint8 red, uint8 green, uint8 blue)
@@ -238,6 +263,19 @@ brightness_for(uint8 red, uint8 green, uint8 blue)
 }
 
 // color_distance
+/*!	\brief Returns the "distance" between two RGB colors.
+
+	This functions defines an metric on the RGB color space. The distance
+	between two colors is 0, if and only if the colors are equal.
+
+	\param red1 Red component of the first color.
+	\param green1 Green component of the first color.
+	\param blue1 Blue component of the first color.
+	\param red2 Red component of the second color.
+	\param green2 Green component of the second color.
+	\param blue2 Blue component of the second color.
+	\return The distance between the given colors.
+*/
 static inline
 unsigned
 color_distance(uint8 red1, uint8 green1, uint8 blue1,
@@ -267,8 +305,8 @@ static inline int32 inverse_bit_mask(int32 bit)	{ return ~bit_mask(bit); }
 
 namespace BPrivate {
 
-// helper class for palette color <-> linear color conversion
-
+/*!	\brief Helper class for conversion between RGB and palette colors.
+*/
 class PaletteConverter {
 public:
 	PaletteConverter();
@@ -307,6 +345,8 @@ private:
 using BPrivate::PaletteConverter;
 
 // constructor
+/*!	\brief Creates an uninitialized PaletteConverter.
+*/
 PaletteConverter::PaletteConverter()
 	: fColorMap(NULL),
 	  fOwnColorMap(NULL),
@@ -315,6 +355,10 @@ PaletteConverter::PaletteConverter()
 }
 
 // constructor
+/*!	\brief Creates a PaletteConverter and initializes it to the supplied
+		   palette.
+	\param palette The palette being a 256 entry rgb_color array.
+*/
 PaletteConverter::PaletteConverter(const rgb_color *palette)
 	: fColorMap(NULL),
 	  fOwnColorMap(NULL),
@@ -324,6 +368,10 @@ PaletteConverter::PaletteConverter(const rgb_color *palette)
 }
 
 // constructor
+/*!	\brief Creates a PaletteConverter and initializes it to the supplied
+		   color map.
+	\param colorMap The completely initialized color map.
+*/
 PaletteConverter::PaletteConverter(const color_map *colorMap)
 	: fColorMap(NULL),
 	  fOwnColorMap(NULL),
@@ -333,12 +381,18 @@ PaletteConverter::PaletteConverter(const color_map *colorMap)
 }
 
 // destructor
+/*!	\brief Frees all resources associated with this object.
+*/
 PaletteConverter::~PaletteConverter()
 {
 	delete fOwnColorMap;
 }
 
 // SetTo
+/*!	\brief Initializes the converter to the supplied palette.
+	\param palette The palette being a 256 entry rgb_color array.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 status_t
 PaletteConverter::SetTo(const rgb_color *palette)
 {
@@ -386,6 +440,10 @@ PaletteConverter::SetTo(const rgb_color *palette)
 }
 
 // SetTo
+/*!	\brief Initializes the converter to the supplied color map.
+	\param colorMap The completely initialized color map.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 status_t
 PaletteConverter::SetTo(const color_map *colorMap)
 {
@@ -401,6 +459,11 @@ PaletteConverter::SetTo(const color_map *colorMap)
 }
 
 // InitCheck
+/*!	\brief Returns the result of the last initialization via constructor or
+		   SetTo().
+	\return \c B_OK, if the converter is properly initialized, an error code
+			otherwise.
+*/
 status_t
 PaletteConverter::InitCheck() const
 {
@@ -408,6 +471,13 @@ PaletteConverter::InitCheck() const
 }
 
 // IndexForRGB15
+/*!	\brief Returns the palette color index closest to a given RGB 15 color.
+
+	The object must be properly initialized.
+
+	\param rgb The RGB 15 color value (R[14:10]G[9:5]B[4:0]).
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB15(uint16 rgb) const
@@ -416,6 +486,15 @@ PaletteConverter::IndexForRGB15(uint16 rgb) const
 }
 
 // IndexForRGB15
+/*!	\brief Returns the palette color index closest to a given RGB 15 color.
+
+	The object must be properly initialized.
+
+	\param red Red component of the color (R[4:0]).
+	\param green Green component of the color (G[4:0]).
+	\param blue Blue component of the color (B[4:0]).
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB15(uint8 red, uint8 green, uint8 blue) const
@@ -425,6 +504,13 @@ PaletteConverter::IndexForRGB15(uint8 red, uint8 green, uint8 blue) const
 }
 
 // IndexForRGB16
+/*!	\brief Returns the palette color index closest to a given RGB 16 color.
+
+	The object must be properly initialized.
+
+	\param rgb The RGB 16 color value (R[15:11]G[10:5]B[4:0]).
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB16(uint16 rgb) const
@@ -433,6 +519,15 @@ PaletteConverter::IndexForRGB16(uint16 rgb) const
 }
 
 // IndexForRGB16
+/*!	\brief Returns the palette color index closest to a given RGB 16 color.
+
+	The object must be properly initialized.
+
+	\param red Red component of the color (R[4:0]).
+	\param green Green component of the color (G[5:0]).
+	\param blue Blue component of the color (B[4:0]).
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB16(uint8 red, uint8 green, uint8 blue) const
@@ -442,6 +537,13 @@ PaletteConverter::IndexForRGB16(uint8 red, uint8 green, uint8 blue) const
 }
 
 // IndexForRGB24
+/*!	\brief Returns the palette color index closest to a given RGB 32 color.
+
+	The object must be properly initialized.
+
+	\param rgb The RGB 32 color value (R[31:24]G[23:16]B[15:8]).
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB24(uint32 rgb) const
@@ -452,6 +554,15 @@ PaletteConverter::IndexForRGB24(uint32 rgb) const
 }
 
 // IndexForRGB24
+/*!	\brief Returns the palette color index closest to a given RGB 24 color.
+
+	The object must be properly initialized.
+
+	\param red Red component of the color.
+	\param green Green component of the color.
+	\param blue Blue component of the color.
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
@@ -462,6 +573,13 @@ PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
 }
 
 // IndexForGray
+/*!	\brief Returns the palette color index closest to a given Gray 8 color.
+
+	The object must be properly initialized.
+
+	\param gray The Gray 8 color value.
+	\return The palette color index for the supplied color.
+*/
 inline
 uint8
 PaletteConverter::IndexForGray(uint8 gray) const
@@ -470,6 +588,13 @@ PaletteConverter::IndexForGray(uint8 gray) const
 }
 
 // RGBColorForIndex
+/*!	\brief Returns the RGB color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\return The color for the supplied palette color index.
+*/
 inline
 const rgb_color &
 PaletteConverter::RGBColorForIndex(uint8 index) const
@@ -478,6 +603,14 @@ PaletteConverter::RGBColorForIndex(uint8 index) const
 }
 
 // RGB15ColorForIndex
+/*!	\brief Returns the RGB 15 color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\return The color for the supplied palette color index
+			(R[14:10]G[9:5]B[4:0]).
+*/
 inline
 uint16
 PaletteConverter::RGB15ColorForIndex(uint8 index) const
@@ -489,6 +622,14 @@ PaletteConverter::RGB15ColorForIndex(uint8 index) const
 }
 
 // RGB16ColorForIndex
+/*!	\brief Returns the RGB 16 color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\return The color for the supplied palette color index
+			(R[15:11]G[10:5]B[4:0]).
+*/
 inline
 uint16
 PaletteConverter::RGB16ColorForIndex(uint8 index) const
@@ -500,6 +641,14 @@ PaletteConverter::RGB16ColorForIndex(uint8 index) const
 }
 
 // RGB24ColorForIndex
+/*!	\brief Returns the RGB 24 color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\return The color for the supplied palette color index
+			(R[31:24]G[23:16]B[15:8]).
+*/
 inline
 uint32
 PaletteConverter::RGB24ColorForIndex(uint8 index) const
@@ -509,6 +658,18 @@ PaletteConverter::RGB24ColorForIndex(uint8 index) const
 }
 
 // RGB24ColorForIndex
+/*!	\brief Returns the RGB 24 color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\param red Reference to the variable the red component shall be stored
+		   into.
+	\param green Reference to the variable the green component shall be stored
+		   into.
+	\param blue Reference to the variable the blue component shall be stored
+		   into.
+*/
 inline
 void
 PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
@@ -521,6 +682,13 @@ PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
 }
 
 // GrayColorForIndex
+/*!	\brief Returns the Gray 8 color for a given palette color index.
+
+	The object must be properly initialized.
+
+	\param index The palette color index.
+	\return The color for the supplied palette color index.
+*/
 inline
 uint8
 PaletteConverter::GrayColorForIndex(uint8 index) const
@@ -534,6 +702,9 @@ static BLocker			gPaletteConverterLock;
 static PaletteConverter	gPaletteConverter;
 
 // palette_converter
+/*!	\brief Returns a PaletteConverter using the system color palette.
+	\return A PaletteConverter.
+*/
 static
 const PaletteConverter*
 palette_converter()
@@ -552,6 +723,15 @@ palette_converter()
 /////////////
 
 // constructor
+/*!	\brief Creates and initializes a BBitmap.
+	\param bounds The bitmap dimensions.
+	\param flags Creation flags.
+	\param colorSpace The bitmap's color space.
+	\param bytesPerRow The number of bytes per row the bitmap should use.
+		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
+		   value.
+	\param screenID ???
+*/
 BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 				 int32 bytesPerRow, screen_id screenID)
 	: fBasePtr(NULL),
@@ -571,6 +751,15 @@ BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
 }
 
 // constructor
+/*!	\brief Creates and initializes a BBitmap.
+	\param bounds The bitmap dimensions.
+	\param colorSpace The bitmap's color space.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
 BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 				 bool needsContiguous)
 	: fBasePtr(NULL),
@@ -593,6 +782,14 @@ BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
 }
 
 // constructor
+/*!	\brief Creates a BBitmap as a clone of another bitmap.
+	\param source The source bitmap.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
 BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 				 bool needsContiguous)
 	: fBasePtr(NULL),
@@ -619,6 +816,8 @@ BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
 }
 
 // destructor
+/*!	\brief Frees all resources associated with this object.
+*/
 BBitmap::~BBitmap()
 {
 	if (fBasePtr)
@@ -626,11 +825,25 @@ BBitmap::~BBitmap()
 }
 
 // unarchiving constructor
+/*!	\brief Unarchives a bitmap from a BMessage.
+
+	Implements BFlattenable.
+
+	\param data The archive.
+*/
 BBitmap::BBitmap(BMessage *data)
 {
 }
 
 // Instantiate
+/*!	\brief Instantiates a BBitmap from an archive.
+
+	Implements BFlattenable.
+
+	\param data The archive.
+	\return A bitmap reconstructed from the archive or \c NULL, if an error
+			occured.
+*/
 BArchivable *
 BBitmap::Instantiate(BMessage *data)
 {
@@ -638,6 +851,15 @@ BBitmap::Instantiate(BMessage *data)
 }
 
 // Archive
+/*!	\brief Archives the BBitmap object.
+
+	Implements BFlattenable.
+
+	\param data The archive.
+	\param deep \c true, if child object shall be archived as well, \c false
+		   otherwise.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 status_t
 BBitmap::Archive(BMessage *data, bool deep) const
 {
@@ -645,6 +867,10 @@ BBitmap::Archive(BMessage *data, bool deep) const
 }
 
 // InitCheck
+/*!	\brief Returns the result from the construction.
+	\return \c B_OK, if the object is properly initialized, an error code
+			otherwise.
+*/
 status_t
 BBitmap::InitCheck() const
 {
@@ -652,6 +878,9 @@ BBitmap::InitCheck() const
 }
 
 // IsValid
+/*!	\brief Returns whether or not the BBitmap object is valid.
+	\return \c true, if the object is properly initialized, \c false otherwise.
+*/
 bool
 BBitmap::IsValid() const
 {
@@ -659,6 +888,8 @@ BBitmap::IsValid() const
 }
 
 // LockBits
+/*! \brief ???
+*/
 status_t
 BBitmap::LockBits(uint32 *state)
 {
@@ -666,12 +897,17 @@ BBitmap::LockBits(uint32 *state)
 }
 
 // UnlockBits
+/*! \brief ???
+*/
 void
 BBitmap::UnlockBits()
 {
 }
 
 // Area
+/*! \brief Returns the ID of the area the bitmap data reside in.
+	\return The ID of the area the bitmap data reside in.
+*/
 area_id
 BBitmap::Area() const
 {
@@ -679,6 +915,9 @@ BBitmap::Area() const
 }
 
 // Bits
+/*!	\brief Returns the pointer to the bitmap data.
+	\return The pointer to the bitmap data.
+*/
 void *
 BBitmap::Bits() const
 {
@@ -686,6 +925,9 @@ BBitmap::Bits() const
 }
 
 // BitsLength
+/*!	\brief Returns the size of the bitmap data.
+	\return The size of the bitmap data.
+*/
 int32
 BBitmap::BitsLength() const
 {
@@ -693,6 +935,9 @@ BBitmap::BitsLength() const
 }
 
 // BytesPerRow
+/*!	\brief Returns the number of bytes used to store a row of bitmap data.
+	\return The number of bytes used to store a row of bitmap data.
+*/
 int32
 BBitmap::BytesPerRow() const
 {
@@ -700,6 +945,9 @@ BBitmap::BytesPerRow() const
 }
 
 // ColorSpace
+/*!	\brief Returns the bitmap's color space.
+	\return The bitmap's color space.
+*/
 color_space
 BBitmap::ColorSpace() const
 {
@@ -707,12 +955,17 @@ BBitmap::ColorSpace() const
 }
 
 // Bounds
+/*!	\brief Returns the bitmap's dimensions.
+	\return The bitmap's dimensions.
+*/
 BRect
 BBitmap::Bounds() const
 {
 	return fBounds;
 }
 
+////////////////////////////////////////
+// structures defining the pixel layout
 
 struct rgb32_pixel {
 	uint8 blue;
@@ -752,6 +1005,8 @@ struct rgb16_big_pixel {
 	uint8 gb;	// G[2:0],B[4:0]
 };
 
+////////////////////////////////////////////////////////
+// types defining what is needed to store a color value
 
 struct rgb_color_value {
 	uint8 red;
@@ -760,6 +1015,9 @@ struct rgb_color_value {
 };
 
 typedef uint8 gray_color_value;
+
+////////////////////////////////////////////////////////////////////
+// Reader classes being able to read pixels of certain color spaces
 
 // BaseReader
 template<typename _PixelType>
@@ -953,6 +1211,10 @@ struct Gray1Reader : public BaseReader<uint8> {
 	int32 bit;
 };
 
+
+////////////////////////////////////////////////////////////////////
+// Writer classes being able to read pixels of certain color spaces
+
 // BaseWriter
 template<typename _PixelType>
 struct BaseWriter {
@@ -1140,7 +1402,32 @@ struct Gray1Writer : public BaseWriter<uint8> {
 	int32 bit;
 };
 
+
 // set_bits_worker
+/*!	\brief Worker function that reads bitmap data from one buffer and writes
+		   it (converted) to another one.
+	\param Reader The pixel reader class.
+	\param Writer The pixel writer class.
+	\param color_value_t The color value type used to transport a pixel from
+		   the reader to the writer.
+	\param inData A pointer to the buffer to be read.
+	\param inLength The length (in bytes) of the "in" buffer.
+	\param inBPR The number of bytes per row in the "in" buffer.
+	\param inRowSkip The number of bytes per row in the "in" buffer serving as
+		   padding.
+	\param outData A pointer to the buffer to be written to.
+	\param outLength The length (in bytes) of the "out" buffer.
+	\param outOffset The offset (in bytes) relative to \a outData from which
+		   the function shall start writing.
+	\param outBPR The number of bytes per row in the "out" buffer.
+	\param rawOutBPR The number of bytes per row in the "out" buffer actually
+		   containing bitmap data (i.e. not including the padding).
+	\param _reader A reader object. The pointer to the data doesn't need to
+		   be initialized.
+	\param _writer A writer object. The pointer to the data doesn't need to
+		   be initialized.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 template<typename Reader, typename Writer, typename color_value_t>
 static
 status_t
@@ -1192,6 +1479,29 @@ set_bits_worker(const void *inData, int32 inLength, int32 inBPR,
 }
 
 // set_bits_worker_gray1
+/*!	\brief Worker function that reads bitmap data from one buffer and writes
+		   it (converted) to another one, which uses color space \c B_GRAY1.
+	\param Reader The pixel reader class.
+	\param Writer The pixel writer class.
+	\param color_value_t The color value type used to transport a pixel from
+		   the reader to the writer.
+	\param inData A pointer to the buffer to be read.
+	\param inLength The length (in bytes) of the "in" buffer.
+	\param inBPR The number of bytes per row in the "in" buffer.
+	\param inRowSkip The number of bytes per row in the "in" buffer serving as
+		   padding.
+	\param outData A pointer to the buffer to be written to.
+	\param outLength The length (in bytes) of the "out" buffer.
+	\param outOffset The offset (in bytes) relative to \a outData from which
+		   the function shall start writing.
+	\param outBPR The number of bytes per row in the "out" buffer.
+	\param width The number of pixels per row in "in" and "out" data.
+	\param _reader A reader object. The pointer to the data doesn't need to
+		   be initialized.
+	\param _writer A writer object. The pointer to the data doesn't need to
+		   be initialized.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 template<typename Reader, typename Writer, typename color_value_t>
 static
 status_t
@@ -1243,6 +1553,29 @@ set_bits_worker_gray1(const void *inData, int32 inLength, int32 inBPR,
 }
 
 // set_bits
+/*!	\brief Helper function that reads bitmap data from one buffer and writes
+		   it (converted) to another one.
+	\param Reader The pixel reader class.
+	\param inData A pointer to the buffer to be read.
+	\param inLength The length (in bytes) of the "in" buffer.
+	\param inBPR The number of bytes per row in the "in" buffer.
+	\param inRowSkip The number of bytes per row in the "in" buffer serving as
+		   padding.
+	\param outData A pointer to the buffer to be written to.
+	\param outLength The length (in bytes) of the "out" buffer.
+	\param outOffset The offset (in bytes) relative to \a outData from which
+		   the function shall start writing.
+	\param outBPR The number of bytes per row in the "out" buffer.
+	\param rawOutBPR The number of bytes per row in the "out" buffer actually
+		   containing bitmap data (i.e. not including the padding).
+	\param outColorSpace Color space of the target buffer.
+	\param width The number of pixels per row in "in" and "out" data.
+	\param reader A reader object. The pointer to the data doesn't need to
+		   be initialized.
+	\param paletteConverter Reference to a PaletteConverter to be used, if
+		   a conversion from or to \c B_CMAP8 has to be done.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
 template<typename Reader>
 static
 status_t
@@ -1377,6 +1710,30 @@ set_bits(const void *inData, int32 inLength, int32 inBPR, int32 inRowSkip,
 }
 
 // SetBits
+/*!	\brief Assigns data to the bitmap.
+
+	Data are directly written into the bitmap's data buffer, being converted
+	beforehand, if necessary. Some conversions work rather unintuitively:
+	- \c B_RGB32: The source buffer is supposed to contain \c B_RGB24_BIG
+	  data without padding at the end of the rows.
+	- \c B_RGB32: The source buffer is supposed to contain \c B_CMAP8
+	  data without padding at the end of the rows.
+	- other color spaces: The source buffer is supposed to contain data
+	  according to the specified color space being rowwise padded to int32.
+
+	The currently supported source/target color spaces are
+	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
+
+	\note As this methods is apparently a bit strange to use, OBOS introduces
+		  ImportBits() methods, which are recommended to be used instead.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param offset The offset (in bytes) relative to beginning of the bitmap
+		   data specifying the position at which the source data shall be
+		   written.
+	\param colorSpace Color space of the source data.
+*/
 void
 BBitmap::SetBits(const void *data, int32 length, int32 offset,
 				 color_space colorSpace)
@@ -1406,6 +1763,30 @@ BBitmap::SetBits(const void *data, int32 length, int32 offset,
 }
 
 // ImportBits
+/*!	\brief Assigns data to the bitmap.
+
+	Data are directly written into the bitmap's data buffer, being converted
+	beforehand, if necessary. Unlike for SetBits(), the meaning of
+	\a colorSpace is exactly the expected one here, i.e. the source buffer
+	is supposed to contain data of that color space. \a bpr specifies how
+	many bytes the source contains per row. \c B_ANY_BYTES_PER_ROW can be
+	supplied, if standard padding to int32 is used.
+
+	The currently supported source/target color spaces are
+	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
+
+	\param data The data to be copied.
+	\param length The length in bytes of the data to be copied.
+	\param bpr The number of bytes per row in the source data.
+	\param offset The offset (in bytes) relative to beginning of the bitmap
+		   data specifying the position at which the source data shall be
+		   written.
+	\param colorSpace Color space of the source data.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a data, invalid \a bpr or \a offset, or
+	  unsupported \a colorSpace.
+*/
 status_t
 BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 					color_space colorSpace)
@@ -1550,6 +1931,20 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 }
 
 // ImportBits
+/*!	\briefly Assigns another bitmap's data to this bitmap.
+
+	The supplied bitmap must have the exactly same dimensions as this bitmap.
+	Its data are converted to the color space of this bitmap.
+
+	The currently supported source/target color spaces are
+	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
+
+	\param bitmap The source bitmap.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a bitmap, or \a bitmap has other dimensions,
+	  or the conversion from or to one of the color spaces is not supported.
+*/
 status_t
 BBitmap::ImportBits(const BBitmap *bitmap)
 {
@@ -1570,6 +1965,8 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 }
 
 // GetOverlayRestrictions
+/*!	\brief ???
+*/
 status_t
 BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 {
@@ -1577,12 +1974,22 @@ BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 }
 
 // AddChild
+/*!	\brief Adds a BView to the bitmap's view hierarchy.
+
+	The bitmap must accept views and the supplied view must not be child of
+	another parent.
+
+	\param view The view to be added.
+*/
 void
 BBitmap::AddChild(BView *view)
 {
 }
 
 // RemoveChild
+/*!	\brief Removes a BView from the bitmap's view hierarchy.
+	\param view The view to be removed.
+*/
 bool
 BBitmap::RemoveChild(BView *view)
 {
@@ -1590,6 +1997,9 @@ BBitmap::RemoveChild(BView *view)
 }
 
 // CountChildren
+/*!	\brief Returns the number of BViews currently belonging to the bitmap.
+	\return The number of BViews currently belonging to the bitmap.
+*/
 int32
 BBitmap::CountChildren() const
 {
@@ -1597,20 +2007,35 @@ BBitmap::CountChildren() const
 }
 
 // ChildAt
-BView *
+/*!	\brief Returns the BView at a certain index in the bitmap's list of views.
+	\param index The index of the BView to be returned.
+	\return The BView at index \a index or \c NULL, if the index is out of
+			range.
+*/
+BView*
 BBitmap::ChildAt(int32 index) const
 {
 	return NULL;	// not implemented
 }
 
 // FindView
-BView *
+/*!	\brief Returns a bitmap's BView with a certain name.
+	\param name The name of the BView to be returned.
+	\return The BView with the name \a name or \c NULL, if the bitmap doesn't
+	know a view with that name.
+*/
+BView*
 BBitmap::FindView(const char *viewName) const
 {
 	return NULL;	// not implemented
 }
 
 // FindView
+/*!	\brief Returns a bitmap's BView at a certain location.
+	\param point The location.
+	\return The BView with located at \a point or \c NULL, if the bitmap
+	doesn't know a view at this location.
+*/
 BView *
 BBitmap::FindView(BPoint point) const
 {
@@ -1618,6 +2043,13 @@ BBitmap::FindView(BPoint point) const
 }
 
 // Lock
+/*!	\brief Locks the off-screen window that belongs to the bitmap.
+
+	The bitmap must accept views, if locking should work.
+
+	\return \c true, if the lock was acquired successfully, \c false
+			otherwise.
+*/
 bool
 BBitmap::Lock()
 {
@@ -1625,12 +2057,22 @@ BBitmap::Lock()
 }
 
 // Unlock
+/*!	\brief Unlocks the off-screen window that belongs to the bitmap.
+
+	The bitmap must accept views, if locking should work.
+*/
 void
 BBitmap::Unlock()
 {
 }
 
 // IsLocked
+/*!	\brief Returns whether or not the bitmap's off-screen window is locked.
+
+	The bitmap must accept views, if locking should work.
+
+	\return \c true, if the caller owns a lock , \c false otherwise.
+*/
 bool
 BBitmap::IsLocked() const
 {
@@ -1638,6 +2080,8 @@ BBitmap::IsLocked() const
 }
 
 // Perform
+/*!	\brief ???
+*/
 status_t
 BBitmap::Perform(perform_code d, void *arg)
 {
@@ -1650,11 +2094,15 @@ void BBitmap::_ReservedBitmap2() {}
 void BBitmap::_ReservedBitmap3() {}
 
 // copy constructor
+/*!	\brief Privatized copy constructor to prevent usage.
+*/
 BBitmap::BBitmap(const BBitmap &)
 {
 }
 
 // =
+/*!	\brief Privatized assignment operator to prevent usage.
+*/
 BBitmap &
 BBitmap::operator=(const BBitmap &)
 {
@@ -1662,6 +2110,8 @@ BBitmap::operator=(const BBitmap &)
 }
 
 // get_shared_pointer
+/*!	\brief ???
+*/
 char *
 BBitmap::get_shared_pointer() const
 {
@@ -1669,6 +2119,8 @@ BBitmap::get_shared_pointer() const
 }
 
 // get_server_token
+/*!	\brief ???
+*/
 int32
 BBitmap::get_server_token() const
 {
@@ -1676,6 +2128,15 @@ BBitmap::get_server_token() const
 }
 
 // InitObject
+/*!	\brief Initializes the bitmap.
+	\param bounds The bitmap dimensions.
+	\param colorSpace The bitmap's color space.
+	\param flags Creation flags.
+	\param bytesPerRow The number of bytes per row the bitmap should use.
+		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
+		   value.
+	\param screenID ???
+*/
 void
 BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 					int32 bytesPerRow, screen_id screenID)
@@ -1718,6 +2179,8 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 }
 
 // AssertPtr
+/*!	\brief ???
+*/
 void
 BBitmap::AssertPtr()
 {
