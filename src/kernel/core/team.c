@@ -179,18 +179,18 @@ kfree_strings_array(char **strings, int strc)
  */
 
 static int
-user_copy_strings_array(char **strings, int strc, char ***kstrings)
+user_copy_strings_array(char **userStrings, int strc, char ***kstrings)
 {
 	char **lstrings;
 	int err;
 	int cnt;
 	char *source;
-	char buf[SYS_THREAD_STRING_LENGTH_MAX];
+	char buffer[SYS_THREAD_STRING_LENGTH_MAX];
 
 	*kstrings = NULL;
 
-	if ((addr)strings >= KERNEL_BASE && (addr)strings <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!IS_USER_ADDRESS(userStrings))
+		return B_BAD_ADDRESS;
 
 	lstrings = (char **)malloc((strc + 1) * sizeof(char *));
 	if (lstrings == NULL)
@@ -199,21 +199,20 @@ user_copy_strings_array(char **strings, int strc, char ***kstrings)
 	// scan all strings and copy to kernel space
 
 	for (cnt = 0; cnt < strc; cnt++) {
-		err = user_memcpy(&source, &(strings[cnt]), sizeof(char *));
-		if(err < 0)
+		err = user_memcpy(&source, &(userStrings[cnt]), sizeof(char *));
+		if (err < 0)
 			goto error;
 
-		if ((addr)source >= KERNEL_BASE && (addr)source <= KERNEL_TOP){
-			err = ERR_VM_BAD_USER_MEMORY;
+		if (!IS_USER_ADDRESS(source)) {
+			err = B_BAD_ADDRESS;
 			goto error;
 		}
 
-		err = user_strncpy(buf, source, SYS_THREAD_STRING_LENGTH_MAX - 1);
+		err = user_strlcpy(buffer, source, SYS_THREAD_STRING_LENGTH_MAX);
 		if (err < 0)
 			goto error;
-		buf[SYS_THREAD_STRING_LENGTH_MAX - 1] = 0;
 
-		lstrings[cnt] = strdup(buf);
+		lstrings[cnt] = strdup(buffer);
 		if (lstrings[cnt] == NULL){
 			err = ENOMEM;
 			goto error;
@@ -260,21 +259,27 @@ wait_for_team(team_id id, status_t *_returnCode)
 }
 
 
-struct team *
-team_get_team_struct(team_id id)
+/** Quick check to see if we have a valid team ID.
+ */
+
+bool
+team_is_valid(team_id id)
 {
-	struct team *p;
+	struct team *team;
 	int state;
+
+	if (id <= 0)
+		return false;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	p = team_get_team_struct_locked(id);
+	team = team_get_team_struct_locked(id);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	return p;
+	return team != NULL;
 }
 
 
@@ -349,15 +354,13 @@ team_get_current_team_id(void)
 static struct team *
 create_team_struct(const char *name, bool kernel)
 {
-	struct team *team;
-
-	team = (struct team *)malloc(sizeof(struct team));
+	struct team *team = (struct team *)malloc(sizeof(struct team));
 	if (team == NULL)
-		goto error;
+		return NULL;
 
+	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = atomic_add(&next_team_id, 1);
-	strncpy(&team->name[0], name, SYS_MAX_OS_NAME_LEN-1);
-	team->name[SYS_MAX_OS_NAME_LEN-1] = 0;
+	strlcpy(team->name, name, B_OS_NAME_LENGTH);
 	team->num_threads = 0;
 	team->io_context = NULL;
 	team->_aspace_id = -1;
@@ -373,13 +376,12 @@ create_team_struct(const char *name, bool kernel)
 	list_init(&team->image_list);
 
 	if (arch_team_init_team_struct(team, kernel) < 0)
-		goto error1;
+		goto error;
 
 	return team;
 
-error1:
-	free(team);
 error:
+	free(team);
 	return NULL;
 }
 
@@ -630,7 +632,7 @@ team_kill_team(team_id id)
 
 /** Fills the team_info structure with information from the specified
  *	team.
- *	Team lock must be hold when called.
+ *	The team lock must be held when called.
  */
 
 static status_t
@@ -667,10 +669,10 @@ _get_team_info(team_id id, team_info *info, size_t size)
 	int state;
 	status_t rc = B_OK;
 	struct team *team;
-	
+
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	
+
 	team = team_get_team_struct_locked(id);
 	if (!team) {
 		rc = B_BAD_TEAM_ID;
@@ -861,7 +863,7 @@ user_team_create_team(const char *userPath, const char *userName,
 	char **userArgs, int argCount, char **userEnv, int envCount, int priority)
 {
 	char path[SYS_MAX_PATH_LEN];
-	char name[SYS_MAX_OS_NAME_LEN];
+	char name[B_OS_NAME_LENGTH];
 	char **args = NULL;
 	char **env = NULL;
 	int rc;
@@ -884,7 +886,7 @@ user_team_create_team(const char *userPath, const char *userName,
 	}
 	if (user_copy_strings_array(userEnv, envCount, &env) < B_OK
 		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK
-		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK) {
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK) {
 		rc = B_BAD_ADDRESS;
 		goto error;
 	}
