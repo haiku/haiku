@@ -128,24 +128,6 @@ void PortMessage::SetBuffer(const void *buffer, const ssize_t &size, const bool 
 	}
 }
 
-template <class Type> status_t PortMessage::Read(Type *data)
-{
-	int32 size = sizeof(Type);
-
-	if(!data)
-		return B_BAD_VALUE;
-
-	if( !_buffer || 
-		(_buffersize < size) ||
-		(_index+size > _buffer+_buffersize) )
-		return B_NO_MEMORY;
-	
-	*data=*((Type*)_index);
-	_index+=size;
-	
-	return B_OK;
-}
-
 status_t PortMessage::Read(void *data, ssize_t size)
 {
 	if(!data || size<1)

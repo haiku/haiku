@@ -420,8 +420,8 @@ void BApplication::SetCursor(const BCursor* cursor, bool sync)
 	// TODO: add sync support - working on updating FlushWithReply --DW
 	PortLink *link=new PortLink(fServerTo);
 	link->SetOpCode(AS_SET_CURSOR_BCURSOR);
-	link->Attach(sync);
-	link->Attach(cursor->m_serverToken);
+	link->Attach<bool>(sync);
+	link->Attach<int32>(cursor->m_serverToken);
 	link->Flush();
 	delete link;
 }
@@ -757,8 +757,8 @@ void BApplication::InitData(const char* signature, status_t* error)
 			
 			PortLink *link=new PortLink(fServerFrom);
 			link->SetOpCode(AS_CREATE_APP);
-			link->Attach((int32)fServerTo);
-			link->Attach(_get_object_token_(this));
+			link->Attach<int32>((int32)fServerTo);
+			link->Attach<int32>(_get_object_token_(this));
 			link->Attach((char*)signature,strlen(signature)+1);
 			status_t replyerr=link->FlushWithReply(&replydata);
 			if(replyerr==B_OK)
@@ -801,8 +801,8 @@ void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 {
 	PortLink *link=new PortLink(fServerTo);
 	link->SetOpCode(AS_BEGIN_RECT_TRACKING);
-	link->Attach(r);
-	link->Attach(trackWhole);
+	link->Attach<BRect>(r);
+	link->Attach<int32>(trackWhole);
 	link->Flush();
 	delete link;
 }

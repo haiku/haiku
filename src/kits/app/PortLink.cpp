@@ -44,23 +44,6 @@
 #endif
 
 /*!
-	\class PortLinkData PortLink.cpp
-	\brief Internal data storage class
-	
-	PortLinkData objects serve to hold attached data whilst it is waiting to be Flattened() 
-	and then Flushed(). There is no need for this to be used outside the PortLink class. 
-*/
-class PortLinkData
-{
-public:
-	PortLinkData(void);
-	~PortLinkData(void);
-	status_t Set(const void *data, size_t size);
-	char *buffer;
-	size_t buffersize;
-};
-
-/*!
 	\brief Constructor
 	\param port A valid target port_id 
 */
@@ -533,30 +516,6 @@ printf("\tAttach(): Couldn't assign data to PortLinkData object\n");
 		return B_ERROR;
 	}
 
-	return B_OK;
-}
-
-template <class Type> status_t PortLink::Attach(Type data)
-{
-	int32 size=sizeof(Type);
-
-#ifdef CAPACITY_CHECKING
-	if(bufferlength+size>capacity)
-		return B_NO_MEMORY;
-#endif
-	
-	// create a new storage object and stash the data
-	PortLinkData *pld=new PortLinkData;
-	if(pld->Set(&data,size)==B_OK)
-	{
-		attachlist->AddItem(pld);
-		bufferlength+=size;
-	}
-	else
-	{
-		delete pld;
-		return B_ERROR;
-	}
 	return B_OK;
 }
 
