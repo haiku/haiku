@@ -124,13 +124,17 @@ send_syslog_message(syslog_context *context, int priority, const char *text, va_
 		return;
 	}
 
+	// adopt facility from openlog() if not yet set
+	if (SYSLOG_FACILITY(priority) == 0)
+		priority |= context->facility;
+
 	char buffer[2048];
 	syslog_message &message = *(syslog_message *)&buffer[0];
 
 	message.from = find_thread(NULL);
 	message.when = real_time_clock();
 	message.options = options;
-	message.priority = priority | context->facility;
+	message.priority = priority;
 	strcpy(message.ident, context->ident);
 
 	int length = vsnprintf(message.message, sizeof(buffer) - sizeof(syslog_message), text, args);
