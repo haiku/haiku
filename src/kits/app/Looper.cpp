@@ -131,7 +131,12 @@ BLooper::~BLooper()
 	}
 
 	Lock();
-	kill_thread(fTaskID);
+// bonefish: Killing the looper thread doesn't work very well with
+// BApplication. In fact here it doesn't work too well either. When the
+// looper thread encounters a _QUIT_ message it deletes the BLooper object
+// and thus commits suicide at this point. That is, the following cleanup
+// isn't done.
+//	kill_thread(fTaskID);
 	delete fQueue;
 	delete_sem(fLockSem);
 	delete_port(fMsgPort);
@@ -230,7 +235,13 @@ DBG(OUT("BLooper::DispatchMessage(%.4s)\n", (char*)&message->what));
 			// Can't call Quit() to do this, because of the slight chance
 			// another thread with have us locked between now and then.
 			fTerminating = true;
-			delete this;
+// bonefish: Now it works straight forward: The thread running here is
+// the looper thread, so after returning from DispatchMessage() it will
+// quit the dispatching loop, and delete the object in _task0_(), directly
+// before dying. Even better, this solution is BApplication friendly as
+// Quit() doesn't delete the application object.
+// TODO: Remove this.
+//			delete this;
 			break;
 		}
 
@@ -478,11 +489,18 @@ DBG(OUT("BLooper::Quit()\n"));
 
 DBG(OUT("  is locked\n"));
 
-	if (!fRunCalled || find_thread(NULL) == fTaskID)
+	if (!fRunCalled)
 	{
-DBG(OUT("  Run() has not been called yet or we are the looper thread\n"));
+DBG(OUT("  Run() has not been called yet\n"));
 		fTerminating = true;
 		delete this;
+	} 
+	else if (find_thread(NULL) == fTaskID)
+	{
+DBG(OUT("  We are the looper thread\n"));
+		fTerminating = true;
+		delete this;
+		exit_thread(0);
 	}
 	else
 	{
