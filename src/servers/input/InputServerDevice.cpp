@@ -229,10 +229,8 @@ BInputServerDevice::StartMonitoringDevice(const char *device)
 {
 	CALLED();
 	PRINT(("StartMonitoringDevice %s\n", device));
-	
-    status_t status = B_OK;
 
-    return status;
+    return InputServer::gDeviceManager.StartMonitoringDevice(fOwner, device);
 }
 
 
@@ -244,9 +242,7 @@ status_t
 BInputServerDevice::StopMonitoringDevice(const char *device)
 {
     CALLED();
-    status_t status = B_OK;
-
-    return status;
+    return InputServer::gDeviceManager.StopMonitoringDevice(fOwner, device);
 }
 
 /**

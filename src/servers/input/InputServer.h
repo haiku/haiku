@@ -35,6 +35,7 @@
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
 #include "AddOnManager.h"
+#include "DeviceManager.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -168,6 +169,8 @@ public:
 	
 	static BList   gInputMethodList;
 	static BLocker gInputMethodListLocker;
+	
+	static DeviceManager	gDeviceManager;
 	
 private:
 	/*void InitTestDevice();

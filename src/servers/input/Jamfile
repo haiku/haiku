@@ -17,6 +17,7 @@ Server input_server :
 	InputServerMethod.cpp
 
 	AddOnManager.cpp
+	DeviceManager.cpp
 
 	# storage
 	AddOnMonitor.cpp

@@ -73,6 +73,8 @@ BLocker InputServer::gInputFilterListLocker;
 BList   InputServer::gInputMethodList;
 BLocker InputServer::gInputMethodListLocker;
 
+DeviceManager InputServer::gDeviceManager;
+
 /*BList InputServer::mInputServerDeviceList;
 BList InputServer::mInputServerFilterList;
 BList InputServer::mInputServerMethodList;*/
@@ -103,6 +105,8 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
 	EventLoop(pointer);
 
 //	InitTestDevice();
+
+	gDeviceManager.LoadState();
 	
 	fAddOnManager = new AddOnManager();
 	fAddOnManager->LoadState();
@@ -484,6 +488,7 @@ InputServer::QuitRequested(void)
 {
 	CALLED();
 	fAddOnManager->SaveState();
+	gDeviceManager.SaveState();
 	
 	kill_thread(ISPortThread);
 	delete_port(EventLooperPort);
