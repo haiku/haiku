@@ -1,5 +1,5 @@
 /*
-	APRView.cpp:	The Appearance app's bulky boy
+	APRView.cpp:	The Appearance app's color handler
 	
 	Handles all the grunt work. Color settings are stored in a BMessage to
 	allow for easy transition to and from disk. The messy details are in the
@@ -9,19 +9,10 @@
 #include <OS.h>
 #include "APRView.h"
 #include "PortLink.h"
+#include "defs.h"
 #include <Directory.h>
 #include <File.h>
 #include <stdio.h>
-
-#define SETTINGS_DIR "/boot/home/config/settings/app_server/"
-
-#define APPLY_SETTINGS 'aply'
-#define REVERT_SETTINGS 'rvrt'
-#define DEFAULT_SETTINGS 'dflt'
-#define TRY_SETTINGS 'trys'
-
-#define ATTRIBUTE_CHOSEN 'atch'
-#define UPDATE_COLOR 'upcl'
 
 void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255);
 void PrintRGBColor(rgb_color col);
@@ -63,8 +54,8 @@ APRView::APRView(BRect frame, const char *name, int32 resize, int32 flags)
 	AddChild(colorview);
 
 	cvrect.Set(0,0,50,25);
-	cvrect.OffsetBy(picker->Frame().left,
-		picker->Frame().bottom+20);
+	cvrect.OffsetBy(scrollview->Frame().right+20,
+		scrollview->Frame().bottom-cvrect.Height());
 
 	defaults=new BButton(cvrect,"DefaultsButton","Defaults",
 		new BMessage(DEFAULT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,

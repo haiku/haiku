@@ -26,7 +26,7 @@ public:
 	void SetDefaults(void);
 	void NotifyServer(void);
 	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
-
+protected:
 	BColorControl *picker;
 	BButton *apply,*revert,*defaults,*try_settings;
 	BListView *attrlist;
