@@ -53,7 +53,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 status_t
 get_sem_count(sem_id sem, int32 *count)
 {
-	return sys_sem_get_count(sem, count);
+	return sys_get_sem_count(sem, count);
 }
 
 

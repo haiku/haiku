@@ -41,7 +41,7 @@ open(const char *path, int oflags, ...)
 	if (oflags & O_CREAT)
 		status = _kern_create(path, oflags, perms);
 	else
-		status = _kern_open(path, oflags);
+		status = _kern_open(-1, path, oflags);
 
 	if (status < 0) {
 		errno = status;

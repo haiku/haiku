@@ -12,7 +12,7 @@
 int
 remove(const char *path)
 {
-	int status = _kern_unlink(path);
+	int status = _kern_unlink(-1, path);
 	if (status < B_OK) {
 		errno = status;
 		return -1;

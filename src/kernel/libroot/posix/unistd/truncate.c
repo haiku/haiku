@@ -26,7 +26,8 @@ truncate(const char *path, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = _kern_write_path_stat(path, true, &stat, sizeof(struct stat), FS_WRITE_STAT_SIZE);
+	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -39,7 +40,8 @@ ftruncate(int fd, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = _kern_write_stat(fd, &stat, sizeof(struct stat), FS_WRITE_STAT_SIZE);
+	status = _kern_write_stat(fd, NULL, false, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }

@@ -20,7 +20,7 @@
 int
 mkdir(const char *path, mode_t mode)
 {
-	status_t status = _kern_create_dir(path, mode);
+	status_t status = _kern_create_dir(-1, path, mode);
 
 	RETURN_AND_SET_ERRNO(status);
 }

@@ -38,8 +38,8 @@ status_t _user_get_team_info(team_id id, team_info *info);
 status_t _user_get_next_team_info(int32 *cookie, team_info *info);
 
 // ToDo: please move the "env" setter/getter out of the kernel!
-int user_setenv(const char *name, const char *value, int overwrite);
-int user_getenv(const char *name, char **value);
+int _user_setenv(const char *name, const char *value, int overwrite);
+int _user_getenv(const char *name, char **value);
 
 #ifdef __cplusplus
 }

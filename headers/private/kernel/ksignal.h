@@ -12,8 +12,8 @@
 extern int handle_signals(struct thread *t, int state);
 
 
-extern int user_send_signal(pid_t tid, uint sig);
-extern int user_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-extern bigtime_t user_set_alarm(bigtime_t time, uint32 mode);
+extern int _user_send_signal(pid_t tid, uint sig);
+extern int _user_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+extern bigtime_t _user_set_alarm(bigtime_t time, uint32 mode);
 
 #endif	/* _KERNEL_SIGNAL_H */

@@ -108,7 +108,7 @@ extern "C" {
 #endif
 
 #ifdef _KERNEL_MODE
-int user_sysctl(int *, uint, void *, size_t *, void *, size_t);
+int _user_sysctl(int *, uint, void *, size_t *, void *, size_t);
 #endif
 
 int sysctl(int *, uint, void *, size_t *, void *, size_t);

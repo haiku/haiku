@@ -1083,7 +1083,7 @@ vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
 
 
 region_id
-user_vm_map_file(char *uname, void **uaddress, int addr_type,
+_user_vm_map_file(const char *uname, void **uaddress, int addr_type,
 	addr_t size, int lock, int mapping, const char *upath, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];

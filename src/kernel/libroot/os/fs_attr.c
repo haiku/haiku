@@ -80,7 +80,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
-	status = _kern_read_stat(attr, &stat, sizeof(struct stat));
+	status = _kern_read_stat(attr, NULL, false, &stat, sizeof(struct stat));
 	if (status == B_OK) {
 		attrInfo->type = stat.st_type;
 		attrInfo->size = stat.st_size;

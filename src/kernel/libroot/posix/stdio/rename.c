@@ -12,7 +12,7 @@
 int
 rename(const char *from, const char *to)
 {
-	int status = _kern_rename(from, to);
+	int status = _kern_rename(-1, from, -1, to);
 	if (status < B_OK) {
 		errno = status;
 		return -1;

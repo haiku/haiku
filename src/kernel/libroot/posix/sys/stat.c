@@ -56,7 +56,7 @@ lstat(const char *path, struct stat *stat)
 int
 _stat(const char *path, struct stat *stat, size_t statSize)
 {
-	int status = _kern_read_path_stat(path, true, stat, statSize);
+	int status = _kern_read_stat(-1, path, true, stat, statSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -65,7 +65,7 @@ _stat(const char *path, struct stat *stat, size_t statSize)
 int
 _lstat(const char *path, struct stat *stat, size_t statSize)
 {
-	int status = _kern_read_path_stat(path, false, stat, statSize);
+	int status = _kern_read_stat(-1, path, false, stat, statSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -74,7 +74,7 @@ _lstat(const char *path, struct stat *stat, size_t statSize)
 int
 _fstat(int fd, struct stat *stat, size_t statSize)
 {
-	int status = _kern_read_stat(fd, stat, statSize);
+	int status = _kern_read_stat(fd, NULL, false, stat, statSize);
 
 	RETURN_AND_SET_ERRNO(status);
 }

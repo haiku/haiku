@@ -67,7 +67,7 @@ int user_memset(void *s, char c, size_t count);
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
-region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
+region_id _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
 			addr size, int lock, int mapping, const char *upath, off_t offset);
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);

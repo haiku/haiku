@@ -29,7 +29,7 @@ opendir(const char *path)
 {
 	DIR *dir;
 
-	int fd = _kern_open_dir(path);
+	int fd = _kern_open_dir(-1, path);
 	if (fd < 0) {
 		errno = fd;
 		return NULL;
