@@ -89,6 +89,8 @@ struct fs_mount {
 	mount_id		id;
 	void			*cookie;
 	char			*mount_point;
+	char			*device_name;
+	char			*fs_name;
 	recursive_lock	rlock;
 	struct vnode	*root_vnode;
 	struct vnode	*covers_vnode;
@@ -3063,15 +3065,24 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		goto err1;
 	}
 
+	mount->fs_name = strdup(fsName);
+	if (mount->fs_name == NULL) {
+		err = B_NO_MEMORY;
+		goto err2;
+	}
+
+	mount->device_name = strdup(device);
+		// "device" can be NULL
+
 	mount->fs = get_file_system(fsName);
 	if (mount->fs == NULL) {
 		err = ENODEV;
-		goto err2;
+		goto err3;
 	}
 
 	err = recursive_lock_init(&mount->rlock, "mount rlock");
 	if (err < B_OK)
-		goto err3;
+		goto err4;
 
 	mount->id = sNextMountID++;
 	mount->unmounting = false;
@@ -3087,25 +3098,25 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		// we haven't mounted anything yet
 		if (strcmp(path, "/") != 0) {
 			err = B_ERROR;
-			goto err4;
+			goto err5;
 		}
 
 		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//err = ERR_VFS_GENERAL;
-			goto err4;
+			goto err5;
 		}
 
 		mount->covers_vnode = NULL; // this is the root mount
 	} else {
 		err = path_to_vnode(path, true, &covered_vnode, kernel);
 		if (err < 0)
-			goto err4;
+			goto err5;
 
 		if (!covered_vnode) {
 			err = B_ERROR;
-			goto err4;
+			goto err5;
 		}
 
 		// XXX insert check to make sure covered_vnode is a DIR, or maybe it's okay for it not to be
@@ -3113,7 +3124,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		if (covered_vnode != sRoot
 			&& covered_vnode->mount->root_vnode == covered_vnode) {
 			err = ERR_VFS_ALREADY_MOUNTPOINT;
-			goto err4;
+			goto err5;
 		}
 
 		mount->covers_vnode = covered_vnode;
@@ -3121,12 +3132,12 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		// mount it
 		err = FS_MOUNT_CALL(mount, mount)(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0)
-			goto err5;
+			goto err6;
 	}
 
 	err = get_vnode(mount->id, root_id, &mount->root_vnode, 0);
 	if (err < 0)
-		goto err6;
+		goto err7;
 
 	// XXX may be a race here
 	if (mount->covers_vnode)
@@ -3139,19 +3150,22 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	return B_OK;
 
-err6:
+err7:
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
-err5:
+err6:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
-err4:
+err5:
 	mutex_lock(&sMountMutex);
 	hash_remove(sMountsTable, mount);
 	mutex_unlock(&sMountMutex);
 
 	recursive_lock_destroy(&mount->rlock);
-err3:
+err4:
 	put_file_system(mount->fs);
+	free(mount->device_name);
+err3:
+	free(mount->fs_name);
 err2:
 	free(mount->mount_point);
 err1:
@@ -3212,7 +3226,8 @@ fs_unmount(char *path, bool kernel)
 	}
 
 	/* we can safely continue, mark all of the vnodes busy and this mount
-	structure in unmounting state */
+	 * structure in unmounting state
+	 */
 	while ((vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode)) != NULL) {
 		if (vnode != mount->root_vnode)
 			vnode->busy = true;
@@ -3246,6 +3261,8 @@ fs_unmount(char *path, bool kernel)
 	// release the file system
 	put_file_system(mount->fs);
 
+	free(mount->device_name);
+	free(mount->fs_name);
 	free(mount->mount_point);
 	free(mount);
 
@@ -3297,14 +3314,19 @@ fs_read_info(dev_t device, struct fs_info *info)
 		goto out;
 	}
 
+	// fill in info the file system doesn't (have to) know about
+	info->dev = mount->id;
+	info->root = mount->root_vnode->id;
+	strlcpy(info->fsh_name, mount->fs_name, sizeof(info->fsh_name));
+	if (mount->device_name != NULL)
+		strlcpy(info->device_name, mount->device_name, sizeof(info->device_name));
+	else
+		info->device_name[0] = '\0';
+
 	if (FS_MOUNT_CALL(mount, read_fs_info))
 		status = FS_MOUNT_CALL(mount, read_fs_info)(mount->cookie, info);
 	else
 		status = EOPNOTSUPP;
-
-	// fill in other info the file system doesn't (have to) know about
-	info->dev = mount->id;
-	info->root = mount->root_vnode->id;
 
 out:
 	mutex_unlock(&sMountMutex);
