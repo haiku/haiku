@@ -1827,11 +1827,36 @@ vm_create_aspace(const char *name, addr_t base, addr_t size, bool kernel)
 }
 
 
-int
+status_t
+vm_delete_areas(struct vm_address_space *aspace)
+{
+	vm_region *area;
+	vm_region *next;
+
+	TRACE(("vm_delete_areas: called on aspace 0x%lx\n", aspace->id));
+
+	// delete all the regions in this aspace
+
+	for (area = aspace->virtual_map.region_list; area; area = next) {
+		next = area->aspace_next;
+
+		if (area->id == RESERVED_REGION_ID) {
+			// just remove it
+			free(area);
+			continue;
+		}
+
+		// decrement the ref on this region, may actually push the ref < 0, but that's okay
+		_vm_put_region(area, true);
+	}
+
+	return B_OK;
+}
+
+
+status_t
 vm_delete_aspace(aspace_id aid)
 {
-	vm_region *region;
-	vm_region *next;
 	vm_address_space *aspace;
 
 	aspace = vm_get_aspace_by_id(aid);
@@ -1851,21 +1876,7 @@ vm_delete_aspace(aspace_id aid)
 	}
 	aspace->state = VM_ASPACE_STATE_DELETION;
 
-	// delete all the regions in this aspace
-	region = aspace->virtual_map.region_list;
-	while (region) {
-		next = region->aspace_next;
-		
-		if (region->id == RESERVED_REGION_ID) {
-			// just remove it
-			free(region);
-			region = next;
-			continue;
-		}
-		// decrement the ref on this region, may actually push the ref < 0, but that's okay
-		_vm_put_region(region, true);
-		region = next;
-	}
+	vm_delete_areas(aspace);
 
 	// unlock
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
@@ -1990,7 +2001,7 @@ create_preloaded_image_areas(struct preloaded_image *image)
 }
 
 
-int
+status_t
 vm_init(kernel_args *ka)
 {
 	int err = 0;
@@ -2105,7 +2116,7 @@ vm_init(kernel_args *ka)
 }
 
 
-int
+status_t
 vm_init_postsem(kernel_args *ka)
 {
 	vm_region *region;
@@ -2129,7 +2140,7 @@ vm_init_postsem(kernel_args *ka)
 }
 
 
-int
+status_t
 vm_init_postthread(kernel_args *ka)
 {
 	vm_page_init_postthread(ka);
