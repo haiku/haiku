@@ -40,7 +40,7 @@ private:
 	size_t			fMailDropSize;
 	BList			sizes;
         
-        #ifdef POPSSL
+        #ifdef USESSL
                 SSL_CTX *ctx;
                 SSL *ssl;
                 BIO *sbio;
