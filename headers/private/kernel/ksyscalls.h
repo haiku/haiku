@@ -150,6 +150,7 @@ enum {
 	SYSCALL_SET_REAL_TIME_CLOCK,
 	SYSCALL_DEBUG_OUTPUT,
 	SYSCALL_GET_SYSTEM_INFO,		/* 140 */
+	SYSCALL_RENAME_THREAD
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);

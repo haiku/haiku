@@ -295,6 +295,9 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_RESUME_THREAD:
 			*call_ret = _user_resume_thread((thread_id)arg0);
 			break;
+		case SYSCALL_RENAME_THREAD:
+			*call_ret = _user_rename_thread((thread_id)arg0, (const char *)arg1);
+			break;
 		case SYSCALL_SEND_DATA:
 			*call_ret = _user_send_data((thread_id)arg0, (int32)arg1, (const void *)arg2, (size_t)arg3);
 			break;

@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
@@ -80,8 +80,7 @@ find_thread(const char *name)
 status_t
 rename_thread(thread_id thread, const char *name)
 {
-	// ToDo: rename_thread not implemented
-	return B_ERROR;
+	return _kern_rename_thread(thread, name);
 }
 
 

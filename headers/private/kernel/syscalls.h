@@ -51,6 +51,7 @@ extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *), const ch
 extern thread_id	_kern_find_thread(const char *name);
 extern status_t		_kern_suspend_thread(thread_id thread);
 extern status_t		_kern_resume_thread(thread_id thread);
+extern status_t		_kern_rename_thread(thread_id thread, const char *newName);
 extern status_t		_kern_set_thread_priority(thread_id thread, int32 newPriority);
 extern status_t		_kern_kill_thread(thread_id thread);
 extern void			_kern_exit_thread(status_t returnValue);
