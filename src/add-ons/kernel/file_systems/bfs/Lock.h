@@ -149,20 +149,32 @@ class Locker {
 #ifdef FAST_LOCK
 class ReadWriteLock {
 	public:
-		ReadWriteLock(const char *name = "bfs r/w lock")
+		ReadWriteLock(const char *name)
 			:
-			fSemaphore(create_sem(0, name)),
-			fCount(MAX_READERS),
 			fWriteLock()
 		{
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
+			Initialize(name);
+		}
+
+		ReadWriteLock()
+			:
+			fWriteLock()
+		{
 		}
 
 		~ReadWriteLock()
 		{
 			delete_sem(fSemaphore);
+		}
+
+		status_t Initialize(const char *name = "bfs r/w lock")
+		{
+			fSemaphore = create_sem(0, name);
+			fCount = MAX_READERS;
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
+			return fSemaphore;
 		}
 
 		status_t InitCheck()
@@ -226,18 +238,27 @@ class ReadWriteLock {
 #else	// FAST_LOCK
 class ReadWriteLock {
 	public:
-		ReadWriteLock(const char *name = "bfs r/w lock")
-			:
-			fSemaphore(create_sem(MAX_READERS, name))
+		ReadWriteLock(const char *name)
 		{
-#ifndef USER
-			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
-#endif
+			Initialize(name);
+		}
+
+		ReadWriteLock()
+		{
 		}
 
 		~ReadWriteLock()
 		{
 			delete_sem(fSemaphore);
+		}
+
+		status_t Initialize(const char *name = "bfs r/w lock")
+		{
+			fSemaphore = create_sem(MAX_READERS, name);
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
+			return fSemaphore;
 		}
 
 		status_t InitCheck()
