@@ -73,6 +73,10 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 				strcpy(out_description->u.meta.description, "audiocodec/vorbis");
 				break;
 	
+			case 'Spee':
+				strcpy(out_description->u.meta.description, "audiocodec/speex");
+				break;
+	
 			default:
 				return B_ERROR;
 		}
@@ -82,6 +86,10 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 				
 			case B_MPEG_FORMAT_FAMILY:
 				strcpy(out_description->u.meta.description, "videocodec/mpeg");
+				break;
+	
+			case 'DX50':
+				strcpy(out_description->u.meta.description, "videocodec/mpeg4");
 				break;
 	
 			default:
