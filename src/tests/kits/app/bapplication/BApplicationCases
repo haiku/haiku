@@ -1,0 +1,22 @@
+BApplication(const char *signature)
+case 1:	signature is NULL =>
+		Should print error message and quit.
+case 2:	signature is no valid MIME string =>
+		Should print error message and quit.
+case 3:	signature is a valid MIME string, but doesn't have the "application"
+		supertype =>
+		Should print error message and quit.
+case 4:	signature is a valid MIME string with "application" supertype,
+		but a different one than in the app attributes/resources =>
+		Should print warning message and continue.
+		InitCheck() should return B_OK.
+case 5:	signature is a valid MIME string with "application" supertype,
+		and the same as in the app attributes/resources =>
+		Shouldn't print anything at all and continue.
+		InitCheck() should return B_OK.
+
+BApplication(const char *signature, status_t *error)
+cases similar to those of BApplication(const char *), if error is NULL,
+otherwise error is set to the same value as returned by InitCheck()
+
+

@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src tests kits app ;
 
 # Let Jam know where to find some of our source files
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bapplication ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
@@ -8,6 +9,11 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
 
 CommonTestLib libapptest.so
 	: AppKitTestAddon.cpp
+
+		# BApplication
+		ApplicationTest.cpp
+		AppRunner.cpp
+		BApplicationTester.cpp
 
 		# BHandler
 		HandlerTest.cpp
@@ -68,6 +74,7 @@ CommonTestLib libapptest.so
 	: app support
 ;
 
+SubInclude OBOS_TOP src tests kits app bapplication ;
 #SubInclude OBOS_TOP src tests kits app bhandler ;
 #SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
