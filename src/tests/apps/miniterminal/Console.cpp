@@ -498,7 +498,7 @@ Console::Write(const void *buf, size_t len)
 						break;
 					case '\a':
 						// beep
-						printf("<BEEP>\n");
+						//printf("<BEEP>\n");
 						break;
 					case '\0':
 						break;

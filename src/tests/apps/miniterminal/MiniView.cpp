@@ -16,6 +16,7 @@
 
 #include <OS.h>
 #include <image.h>
+#include <Message.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -63,63 +64,11 @@ Setenv(const char *var, const char *value)
 	environ [++envindex] = NULL;
 }
 
-static int32
-ConsoleWriter(void *arg)
-{
-	char buf[1024];
-	ssize_t len;
-	MiniView *view = (MiniView *)arg;
-	
-	for (;;) {
-		len = read(view->fMasterFD, buf, sizeof(buf));
-		if (len < 0)
-			break;
-		
-		view->fConsole->Write(buf, len);
-	}
-	
-	return 0;
-}
-
-static int32
-ExecuteShell(void *arg)
-{
-	MiniView *view = (MiniView *)arg;
-	
-	for (;;) {
-		const char *argv[3];
-		argv[0] = "/bin/sh";
-		argv[1] = "--login";
-		argv[2] = NULL;
-		
-		int saved_stdin = dup(0);
-		int saved_stdout = dup(1);
-		int saved_stderr = dup(2);
-		
-		dup2(view->fSlaveFD, 0);
-		dup2(view->fSlaveFD, 1);
-		dup2(view->fSlaveFD, 2);
-		
-		thread_id shell = load_image(2, argv, (const char **)environ);
-		setpgid(shell, 0);
-		
-		status_t return_code;
-		wait_for_thread(shell, &return_code);
-		
-		dup2(saved_stdin, 0);
-		dup2(saved_stdout, 1);
-		dup2(saved_stderr, 2);
-		close(saved_stdin);
-		close(saved_stdout);
-		close(saved_stderr);
-	}
-	
-	return B_OK;
-}
-
 MiniView::MiniView(BRect frame)
 	:	ViewBuffer(frame)
 {
+	// we need a message filter so that we get B_TAB keydowns
+	AddFilter(new BMessageFilter(B_KEY_DOWN, &MiniView::MessageFilter));
 }
 
 MiniView::~MiniView()
@@ -290,12 +239,12 @@ MiniView::KeyDown(const char *bytes, int32 numBytes)
 status_t
 MiniView::SpawnThreads()
 {
-	fConsoleWriter = spawn_thread(&ConsoleWriter, "console writer", B_URGENT_DISPLAY_PRIORITY, this);
+	fConsoleWriter = spawn_thread(&MiniView::ConsoleWriter, "console writer", B_URGENT_DISPLAY_PRIORITY, this);
 	if (fConsoleWriter < 0)
 		return B_ERROR;
 	TRACE(("console writer thread is: %d\n", fConsoleWriter));
 	
-	fShellProcess = spawn_thread(&ExecuteShell, "shell process", B_URGENT_DISPLAY_PRIORITY, this);
+	fShellProcess = spawn_thread(&MiniView::ExecuteShell, "shell process", B_URGENT_DISPLAY_PRIORITY, this);
 	if (fShellProcess < 0)
 		return B_ERROR;
 	TRACE(("shell process thread is: %d\n", fShellProcess));
@@ -303,4 +252,74 @@ MiniView::SpawnThreads()
 	resume_thread(fConsoleWriter);
 	resume_thread(fShellProcess);
 	return B_OK;
+}
+
+int32
+MiniView::ConsoleWriter(void *arg)
+{
+	char buf[1024];
+	ssize_t len;
+	MiniView *view = (MiniView *)arg;
+	
+	for (;;) {
+		len = read(view->fMasterFD, buf, sizeof(buf));
+		if (len < 0)
+			break;
+		
+		view->fConsole->Write(buf, len);
+	}
+	
+	return 0;
+}
+
+int32
+MiniView::ExecuteShell(void *arg)
+{
+	MiniView *view = (MiniView *)arg;
+	
+	for (;;) {
+		const char *argv[3];
+		argv[0] = "/bin/sh";
+		argv[1] = "--login";
+		argv[2] = NULL;
+		
+		int saved_stdin = dup(0);
+		int saved_stdout = dup(1);
+		int saved_stderr = dup(2);
+		
+		dup2(view->fSlaveFD, 0);
+		dup2(view->fSlaveFD, 1);
+		dup2(view->fSlaveFD, 2);
+		
+		thread_id shell = load_image(2, argv, (const char **)environ);
+		setpgid(shell, 0);
+		
+		status_t return_code;
+		wait_for_thread(shell, &return_code);
+		
+		dup2(saved_stdin, 0);
+		dup2(saved_stdout, 1);
+		dup2(saved_stderr, 2);
+		close(saved_stdin);
+		close(saved_stdout);
+		close(saved_stderr);
+	}
+	
+	return B_OK;
+}
+
+filter_result
+MiniView::MessageFilter(BMessage *message, BHandler **target, BMessageFilter *filter)
+{
+	MiniView *view = (MiniView *)(*target);
+	
+	int32 raw_char;
+	message->FindInt32("raw_char", &raw_char);
+	if (raw_char == B_TAB) {
+		char bytes[2] = { B_TAB, 0 };
+		view->KeyDown(bytes, 1);
+		return B_SKIP_MESSAGE;
+	}
+	
+	return B_DISPATCH_MESSAGE;
 }

@@ -12,7 +12,7 @@
 MiniApp::MiniApp()
 	:	BApplication("application/x-vnd.Haiku.MiniTerminal")
 {
-	fWindow = new MiniWin(BRect(50, 50, 630, 435));
+	fWindow = new MiniWin(BRect(50, 50, 630, 435).OffsetToCopy(640, 480));
 	fWindow->Show();
 }
 
