@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src apps bin pc ;
+
+BinCommand pc :
+	pc.c
+;
+

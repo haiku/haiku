@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src apps bin mkdos ;
+
+BinCommand mkdos :
+	mkdos.cpp
+	: be
+;
+

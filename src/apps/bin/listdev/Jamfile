@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src apps bin listdev ;
+
+BinCommand listdev :
+	cm_wrapper.c
+	listdev.c
+;
+

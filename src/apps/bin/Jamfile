@@ -26,4 +26,7 @@ StdBinCommands
 ;
 
 #SubInclude OBOS_TOP src apps bin gnu ;
+SubInclude OBOS_TOP src apps bin listdev ;
+SubInclude OBOS_TOP src apps bin mkdos ;
+SubInclude OBOS_TOP src apps bin pc ;
 
