@@ -1,16 +1,18 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Semaphore code */
+
 
 #include <OS.h>
 
 #include <sem.h>
+#include <kernel.h>
 #include <smp.h>
 #include <int.h>
 #include <arch/int.h>
@@ -22,8 +24,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define TRACE_SEM 0
-#if TRACE_SEM
+//#define TRACE_SEM
+#ifdef TRACE_SEM
 #	define TRACE(x) dprintf x
 #	define TRACE_BLOCK(x) dprintf x
 #else

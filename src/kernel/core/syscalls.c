@@ -11,8 +11,8 @@
 #include <int.h>
 #include <debug.h>
 #include <vfs.h>
+#include <vm.h>
 #include <thread.h>
-#include <OS.h>
 #include <sem.h>
 #include <port.h>
 #include <cpu.h>

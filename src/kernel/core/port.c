@@ -12,6 +12,7 @@
 #include <OS.h>
 
 #include <port.h>
+#include <kernel.h>
 #include <sem.h>
 #include <team.h>
 #include <util/list.h>

@@ -21,6 +21,10 @@
 #include <syscalls.h>
 #include <syscall_process_info.h>
 #include <tls.h>
+#include <defines.h>
+#include <kernel.h>
+#include <vm.h>
+#include <vfs.h>
 
 #include <sys/wait.h>
 #include <string.h>

@@ -11,7 +11,6 @@
 #include <arch/real_time_clock.h>
 #include <real_time_clock.h>
 #include <real_time_data.h>
-#include <vm_types.h>
 
 #include <stdlib.h>
 

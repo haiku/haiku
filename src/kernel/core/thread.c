@@ -23,6 +23,7 @@
 #include <ksignal.h>
 #include <syscalls.h>
 #include <tls.h>
+#include <vfs.h>
 
 #include <sys/resource.h>
 #include <string.h>

@@ -1,12 +1,15 @@
-/* User Runtime Loader support in the kernel
-** 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/* User Runtime Loader support in the kernel */
 
 
 #include <KernelExport.h>
+#include <kernel.h>
 #include <kimage.h>
+#include <lock.h>
 #include <thread.h>
 #include <team.h>
 

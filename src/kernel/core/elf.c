@@ -894,7 +894,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 	TRACE(("looking up %p\n", (void *)address));
 
 	mutex_lock(&sImageMutex);
-	
+
 	image = find_image_at_address(address);
 		// get image that may contain the address
 
