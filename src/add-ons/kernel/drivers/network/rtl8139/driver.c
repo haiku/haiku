@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Niels S. Reedijk
+//	Copyright (c) 2003, Niels Sascha Reedijk
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -20,6 +20,13 @@
 //	DEALINGS IN THE SOFTWARE.
 
 // Parts of the code: Copyright (c) 1998 Be, Inc. All Rights Reserved
+
+/*
+	I'd like to thank the following people that have assisted me in one way
+	or another in writing this driver:
+	- Marcus Overhagen: This driver is here because of your help
+	Thanks adamk, instaner, maximov and ilzu for your feedback.
+*/
 
 /* ++++++++++
 	driver.c
@@ -180,6 +187,7 @@ typedef struct rtl8139_properties
 	ether_address_t address;		/* holds the MAC address */
 	sem_id 		lock;				/* lock this structure: still interrupt */
 	sem_id		input_wait;			/* locked until there is a packet to be read */
+	sem_id		output_wait;		/* locked if there are already four packets in the wait */
 	uint8		nonblocking;		/* determines if the card blocks on read requests */
 } rtl8139_properties_t;
 
@@ -206,7 +214,6 @@ static status_t close_hook( void * );
 	void rtl8139_init_registers( rtl8139_properties_t *data )
 	{
 		data->reg_base = data->pcii->u.h0.base_registers[0];
-		//TRACE( "NIELX@@: registers %lu\n" , data->reg_base );
 	}
 #else /* PPC */
 	#include <ByteOrder.h>
@@ -400,6 +407,8 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	set_sem_owner( data->lock , B_SYSTEM_TEAM );
 	data->input_wait = create_sem( 0 , "rtl8139_nielx read wait" );
 	set_sem_owner( data->input_wait , B_SYSTEM_TEAM );
+	data->output_wait = create_sem( 1 , "rtl8139_nielx write wait" );
+	set_sem_owner( data->output_wait , B_SYSTEM_TEAM );
 	
 	//Set up the cookie
 	data->pcii = m_devices[data->device_id];
@@ -700,9 +709,9 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	TRACE( "rtl8139_nielx write_hook()\n" );
 	
 	acquire_sem( data->lock );
+	acquire_sem_etc( data->output_wait , 1 , B_CAN_INTERRUPT , 0 );
 	
 	//Get spinlock
-	WRITE_16( IMR , 0 );
 	former = lock();
 	
 	if ( data->writes == 4 )
@@ -752,10 +761,7 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	data->queued_packets++;
 	
 	unlock( former );
-	WRITE_16( IMR ,
-		ReceiveOk | ReceiveError | TransmitOk | TransmitError | 
-		ReceiveOverflow | ReceiveUnderflow | ReceiveFIFOOverrun |
-		TimeOut | SystemError );
+
 	release_sem_etc( data->lock , 1 , B_DO_NOT_RESCHEDULE );
 
 	//Done
@@ -841,15 +847,12 @@ rtl8139_interrupt( void *cookie )
 	cpu_status status;
 	
 	status = lock();
-	WRITE_16( IMR , 0 ); //Disable interrupts
 	
 	for (;;)
 	{
 		isr_contents = READ_16( ISR );
 		if ( isr_contents == 0 )
 			break;
-		else
-			WRITE_16( ISR , isr_contents );
 			
 		TRACE( "NIELX INTERRUPT: %u \n" , isr_contents );
 		if( isr_contents & ReceiveOk )
@@ -903,6 +906,7 @@ rtl8139_interrupt( void *cookie )
 					data->writes--;
 					data->finished_packets++;
 					checks--;
+					release_sem_etc( data->output_wait , 1 , B_DO_NOT_RESCHEDULE );
 					//update next transmitid
 					continue;
 				}
@@ -950,13 +954,8 @@ rtl8139_interrupt( void *cookie )
 			//
 			;
 		}
+		WRITE_16( ISR , isr_contents );
 	}
-	
-	//Re-enable interrupts
-	WRITE_16( IMR , 
-		ReceiveOk | ReceiveError | TransmitOk | TransmitError | 
-		ReceiveOverflow | ReceiveUnderflow | ReceiveFIFOOverrun |
-		TimeOut | SystemError );	
 	
 	unlock( status );
 	
