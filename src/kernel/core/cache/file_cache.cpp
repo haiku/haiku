@@ -166,6 +166,7 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 
 		totalSize += size;
 	}
+
 	return B_OK;
 }
 
@@ -173,7 +174,7 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 static status_t
 read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
 {
-	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu\n", ref, offset, bufferSize));
+	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu, buffer = %p, bufferSize = %lu\n", ref, offset, size, (void *)buffer, bufferSize));
 
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
@@ -382,7 +383,7 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 
 			vm_put_physical_page(virtualAddress);
 
-			bufferBase += B_PAGE_SIZE;
+			bufferBase += B_PAGE_SIZE - pageOffset;
 			pageOffset = 0;
 
 			if (bytesLeft <= B_PAGE_SIZE) {
