@@ -11,14 +11,15 @@
 #include "KScanPartitionJob.h"
 
 // debugging
-//#define DBG(x)
-#define DBG(x) x
+#define DBG(x)
+//#define DBG(x) x
 #define OUT printf
 
 // constructor
 KScanPartitionJob::KScanPartitionJob(partition_id partitionID)
 	: KDiskDeviceJob(B_DISK_DEVICE_JOB_SCAN, partitionID)
 {
+	SetDescription("scanning partition");
 }
 
 // destructor
