@@ -34,14 +34,14 @@ class PPPStateMachine {
 		PPPStateMachine& operator= (const PPPStateMachine& copy);
 
 	public:
-		PPPInterface *Interface() const
+		PPPInterface& Interface() const
 			{ return fInterface; }
 		PPPLCP& LCP() const
 			{ return fLCP; }
 		
-		PPP_STATE State() const
+		ppp_state State() const
 			{ return fState; }
-		PPP_PHASE Phase() const
+		ppp_phase Phase() const
 			{ return fPhase; }
 		
 		uint8 NextID();
@@ -63,7 +63,7 @@ class PPPStateMachine {
 		void AuthenticationDenied(const char *name);
 		const char *AuthenticationName() const
 			{ return fAuthenticationName; }
-		PPP_AUTHENTICATION_STATUS AuthenticationStatus() const
+		ppp_authentication_status AuthenticationStatus() const
 			{ return fAuthenticationStatus; }
 		
 		void PeerAuthenticationRequested();
@@ -71,13 +71,13 @@ class PPPStateMachine {
 		void PeerAuthenticationDenied(const char *name);
 		const char *PeerAuthenticationName() const
 			{ return fPeerAuthenticationName; }
-		PPP_AUTHENTICATION_STATUS PeerAuthenticationStatus() const
+		ppp_authentication_status PeerAuthenticationStatus() const
 			{ return fPeerAuthenticationStatus; }
 		
 		// sub-interface events
-		void UpFailedEvent(PPPInterface *interface);
-		void UpEvent(PPPInterface *interface);
-		void DownEvent(PPPInterface *interface);
+		void UpFailedEvent(PPPInterface& interface);
+		void UpEvent(PPPInterface& interface);
+		void DownEvent(PPPInterface& interface);
 		
 		// protocol events
 		void UpFailedEvent(PPPProtocol *protocol);
@@ -101,8 +101,8 @@ class PPPStateMachine {
 			{ return fLock; }
 		
 		// private StateMachine methods
-		void NewState(PPP_STATE next);
-		void NewPhase(PPP_PHASE next);
+		void NewState(ppp_state next);
+		void NewPhase(ppp_phase next);
 		
 		// private events
 		void OpenEvent();
@@ -127,7 +127,7 @@ class PPPStateMachine {
 		void RXJEvent(struct mbuf *packet);
 		
 		// actions
-		void IllegalEvent(PPP_EVENT event);
+		void IllegalEvent(ppp_event event);
 		void ThisLayerUp();
 		void ThisLayerDown();
 		void ThisLayerStarted();
@@ -147,19 +147,19 @@ class PPPStateMachine {
 		
 		void DownProtocols();
 		void DownEncapsulators();
-		void ResetOptionHandlers();
+		void ResetLCPHandlers();
 
 	private:
-		PPPInterface *fInterface;
+		PPPInterface& fInterface;
 		PPPLCP& fLCP;
 		
-		PPP_PHASE fPhase;
-		PPP_STATE fState;
+		ppp_phase fPhase;
+		ppp_state fState;
 		
 		vint32 fID;
 		uint32 fMagicNumber;
 		
-		PPP_AUTHENTICATION_STATUS fAuthenticationStatus,
+		ppp_authentication_status fAuthenticationStatus,
 			fPeerAuthenticationStatus;
 		char *fAuthenticationName, *fPeerAuthenticationName;
 		

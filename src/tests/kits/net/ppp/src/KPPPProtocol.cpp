@@ -12,12 +12,14 @@
 #include <cstring>
 
 
-PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
+PPPProtocol::PPPProtocol(const char *name, ppp_phase phase, uint16 protocol,
 		int32 addressFamily, PPPInterface& interface,
-		driver_parameter *settings, int32 flags = PPP_NO_FLAGS)
+		driver_parameter *settings, int32 flags = PPP_NO_FLAGS,
+		ppp_authenticator_type authenticatorType = PPP_NO_AUTHENTICATOR)
 	: fPhase(phase), fProtocol(protocol), fAddressFamily(addressFamily),
 	fInterface(interface), fSettings(settings), fFlags(flags),
-	fEnabled(true), fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
+	fAuthenticatorType(authenticatorType), fEnabled(true),
+	fUpRequested(true), fConnectionStatus(PPP_DOWN_PHASE)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -25,7 +27,11 @@ PPPProtocol::PPPProtocol(const char *name, PPP_PHASE phase, uint16 protocol,
 	} else
 		strcpy(fName, "???");
 	
-	interface.AddProtocol(this);
+	if(authenticatorType != PPP_NO_AUTHENTICATOR)
+		SetEnabled(false);
+			// only the active authenticator should be enabled
+	
+	fInitStatus = interface.AddProtocol(this) ? B_OK : B_ERROR;
 }
 
 
@@ -41,7 +47,7 @@ PPPProtocol::InitCheck() const
 	if(!Settings())
 		return B_ERROR;
 	
-	return B_OK;
+	return fInitStatus;
 }
 
 
@@ -77,6 +83,7 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 			info->isEnabled = IsEnabled();
 			info->isUpRequested = IsUpRequested();
 			info->connectionStatus = fConnectionStatus;
+			info->authenticatorType = AuthenticatorType();
 		} break;
 		
 		case PPPC_SET_ENABLED:
@@ -90,6 +97,13 @@ PPPProtocol::Control(uint32 op, void *data, size_t length)
 			return PPP_UNHANDLED;
 	}
 	
+	return B_OK;
+}
+
+
+status_t
+PPPProtocol::SetupDialOnDemand()
+{
 	return B_OK;
 }
 

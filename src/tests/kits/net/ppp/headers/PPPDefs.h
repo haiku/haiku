@@ -80,7 +80,7 @@ enum {
 };
 
 // phase when the protocol is brought up
-enum PPP_PHASE {
+enum ppp_phase {
 	// the following may be used by protocols
 	PPP_AUTHENTICATION_PHASE = 15,
 	PPP_NCP_PHASE = 20,
@@ -99,20 +99,27 @@ enum PPP_PHASE {
 };
 
 // this defines the order in which the packets get encapsulated
-enum PPP_ENCAPSULATION_LEVEL {
+enum ppp_encapsulation_level {
 	PPP_MULTILINK_LEVEL = 0,
 	PPP_ENCRYPTION_LEVEL = 5,
 	PPP_COMPRESSION_LEVEL = 10
 };
 
 // we can be a ppp client or a ppp server interface
-enum PPP_MODE {
+enum ppp_mode {
 	PPP_CLIENT_MODE = 0,
 	PPP_SERVER_MODE
 };
 
+// PPPProtocol serves as authenticator
+enum ppp_authenticator_type {
+	PPP_NO_AUTHENTICATOR = 0,
+	PPP_LOCAL_AUTHENTICATOR,
+	PPP_PEER_AUTHENTICATOR
+};
+
 // authentication status
-enum PPP_AUTHENTICATION_STATUS {
+enum ppp_authentication_status {
 	PPP_AUTHENTICATION_FAILED = -1,
 	PPP_NOT_AUTHENTICATED = 0,
 	PPP_AUTHENTICATION_SUCCESSFUL = 1,
@@ -120,7 +127,7 @@ enum PPP_AUTHENTICATION_STATUS {
 };
 
 // PPP states as defined in RFC 1661
-enum PPP_STATE {
+enum ppp_state {
 	PPP_INITIAL_STATE,
 	PPP_STARTING_STATE,
 	PPP_CLOSED_STATE,

@@ -20,7 +20,7 @@ PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& int
 	} else
 		strcpy(fName, "???");
 	
-	interface.LCP().AddLCPExtension(this);
+	fInitStatus = interface.LCP().AddLCPExtension(this) ? B_OK : B_ERROR;
 }
 
 
@@ -36,7 +36,7 @@ PPPLCPExtension::InitCheck() const
 	if(!Settings())
 		return B_ERROR;
 	
-	return B_OK;
+	return fInitStatus;
 }
 
 

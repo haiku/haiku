@@ -83,6 +83,7 @@ class PPPDevice {
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
+		status_t fInitStatus;
 };
 
 

@@ -56,12 +56,14 @@ class PPPLCP : public PPPProtocol {
 		int32 CountOptionHandlers() const
 			{ return fOptionHandlers.CountItems(); }
 		PPPOptionHandler *OptionHandlerAt(int32 index) const;
+		PPPOptionHandler *OptionHandlerFor(uint8 type, int32 *start = NULL) const;
 		
 		bool AddLCPExtension(PPPLCPExtension *extension);
 		bool RemoveLCPExtension(PPPLCPExtension *extension);
 		int32 CountLCPExtensions() const
 			{ return fLCPExtensions.CountItems(); }
 		PPPLCPExtension *LCPExtensionAt(int32 index) const;
+		PPPLCPExtension *LCPExtensionFor(uint8 code, int32 *start = NULL) const;
 		
 		PPPEncapsulator *Target() const
 			{ return fTarget; }

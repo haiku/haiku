@@ -45,7 +45,6 @@ class PPPConfigurePacket {
 		int32 CountItems() const
 			{ return fItems.CountItems(); }
 		ppp_configure_item *ItemAt(int32 index) const;
-		bool HasItemWithType(uint8 type) const;
 		ppp_configure_item *ItemWithType(uint8 type) const;
 		
 		struct mbuf *ToMbuf(uint32 reserve = 0);

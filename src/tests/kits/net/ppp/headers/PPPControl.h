@@ -25,7 +25,7 @@
 #define PPP_USER_OPS_START					PPP_OPS_START + 32 * PPP_RESERVE_OPS_COUNT
 
 
-enum PPP_CONTROL_OPS {
+enum ppp_control_ops {
 	// -----------------------------------------------------
 	// PPPInterface
 	PPPC_GET_INTERFACE_INFO = PPP_INTERFACE_OPS_START,
@@ -50,7 +50,6 @@ enum PPP_CONTROL_OPS {
 	// -----------------------------------------------------
 	// PPPDevice
 	PPPC_GET_DEVICE_INFO = PPP_DEVICE_OPS_START,
-	PPPC_SET_MTU,
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
@@ -86,12 +85,11 @@ typedef struct ppp_control_info {
 
 typedef struct ppp_interface_info {
 	const driver_settings *settings;
-	struct ifnet *ifnet;
 	
-	PPP_MODE mode;
-	PPP_STATE state;
-	PPP_PHASE phase;
-	PPP_AUTHENTICATION_STATUS authenticationStatus, peerAuthenticationStatus;
+	ppp_mode mode;
+	ppp_state state;
+	ppp_phase phase;
+	ppp_authentication_status authenticationStatus, peerAuthenticationStatus;
 	
 	uint32 protocolsCount, encapsulatorsCount, optionHandlersCount,
 		LCPExtensionsCount, childrenCount;
@@ -128,7 +126,7 @@ typedef struct ppp_handler_info {
 	// general
 	const driver_parameter *settings;
 	
-	PPP_PHASE phase;
+	ppp_phase phase;
 	int32 addressFamily, flags;
 	uint16 protocol;
 	
@@ -136,15 +134,18 @@ typedef struct ppp_handler_info {
 	
 	// only protocol and encapsulator
 	bool isUpRequested;
-	PPP_PHASE connectionStatus;
+	ppp_phase connectionStatus;
 		// there are four possible states:
 		// PPP_ESTABLISHED_PHASE	-		IsUp() == true
 		// PPP_DOWN_PHASE			-		IsDown() == true
 		// PPP_ESTABLISHMENT_PHASE	-		IsGoingUp() == true
 		// PPP_TERMINATION_PHASE	-		IsGoingDown() == true
 	
+	// only protocol
+	ppp_authenticator_type authenticatorType;
+	
 	// only encapsulator
-	PPP_ENCAPSULATION_LEVEL level;
+	ppp_encapsulation_level level;
 	uint32 overhead;
 } ppp_handler_info;
 typedef struct ppp_handler_info_t {

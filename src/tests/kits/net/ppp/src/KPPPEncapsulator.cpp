@@ -11,8 +11,8 @@
 #include <PPPControl.h>
 
 
-PPPEncapsulator::PPPEncapsulator(const char *name, PPP_PHASE phase,
-		PPP_ENCAPSULATION_LEVEL level, uint16 protocol,
+PPPEncapsulator::PPPEncapsulator(const char *name, ppp_phase phase,
+		ppp_encapsulation_level level, uint16 protocol,
 		int32 addressFamily, uint32 overhead,
 		PPPInterface& interface, driver_parameter *settings,
 		int32 flags = PPP_NO_FLAGS)
@@ -27,7 +27,7 @@ PPPEncapsulator::PPPEncapsulator(const char *name, PPP_PHASE phase,
 	} else
 		strcpy(fName, "???");
 	
-	interface.AddEncapsulator(this);
+	fInitStatus = interface.AddEncapsulator(this) ? B_OK : B_ERROR;
 }
 
 
@@ -43,7 +43,7 @@ PPPEncapsulator::InitCheck() const
 	if(!Settings())
 		return B_ERROR;
 	
-	return B_OK;
+	return fInitStatus;
 }
 
 

@@ -18,7 +18,7 @@ typedef uint32 interface_id;
 
 
 // module key types (used when loading a module)
-enum PPP_MODULE_KEY_TYPE {
+enum ppp_module_key_type {
 	PPP_UNDEFINED_KEY_TYPE = -1,
 	PPP_LOAD_MODULE_TYPE = 0,
 	PPP_DEVICE_TYPE,
@@ -29,7 +29,7 @@ enum PPP_MODULE_KEY_TYPE {
 };
 
 // PPP events as defined in RFC 1661 (with one exception: PPP_UP_FAILED_EVENT)
-enum PPP_EVENT {
+enum ppp_event {
 	PPP_UP_FAILED_EVENT,
 	PPP_UP_EVENT,
 	PPP_DOWN_EVENT,
@@ -51,7 +51,7 @@ enum PPP_EVENT {
 
 // LCP protocol codes as defined in RFC 1661
 // ToDo: add LCP extensions
-enum PPP_LCP_CODE {
+enum ppp_lcp_code {
 	PPP_CONFIGURE_REQUEST = 1,
 	PPP_CONFIGURE_ACK = 2,
 	PPP_CONFIGURE_NAK = 3,

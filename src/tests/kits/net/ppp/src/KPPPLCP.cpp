@@ -46,9 +46,10 @@ PPPLCP::AddOptionHandler(PPPOptionHandler *handler)
 	
 	LockerHelper locker(StateMachine().Locker());
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if(Phase() != PPP_DOWN_PHASE || OptionHandlerFor(handler->Type()))
 		return false;
-			// a running connection may not change
+			// a running connection may not change and there may only be
+			// one handler per option type
 	
 	return fOptionHandlers.AddItem(handler);
 }
@@ -76,6 +77,32 @@ PPPLCP::OptionHandlerAt(int32 index) const
 		return NULL;
 	
 	return handler;
+}
+
+
+PPPOptionHandler*
+PPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
+{
+	// The iteration style in this method is strange C/C++.
+	// Explanation: I use this style because it makes extending all XXXFor
+	// methods simpler as that they look very similar, now.
+	
+	int32 index = start ? *start : 0;
+	
+	if(index < 0)
+		return NULL;
+	
+	PPPOptionHandler *current = OptionHandlerAt(index);
+	
+	for(; current; current = OptionHandlerAt(++index)) {
+		if(current->Type() == type) {
+			if(start)
+				*start = index;
+			return current;
+		}
+	}
+	
+	return NULL;
 }
 
 
@@ -117,6 +144,32 @@ PPPLCP::LCPExtensionAt(int32 index) const
 		return NULL;
 	
 	return extension;
+}
+
+
+PPPLCPExtension*
+PPPLCP::LCPExtensionFor(uint8 code, int32 *start = NULL) const
+{
+	// The iteration style in this method is strange C/C++.
+	// Explanation: I use this style because it makes extending all XXXFor
+	// methods simpler as that they look very similar, now.
+	
+	int32 index = start ? *start : 0;
+	
+	if(index < 0)
+		return NULL;
+	
+	PPPLCPExtension *current = LCPExtensionAt(index);
+	
+	for(; current; current = LCPExtensionAt(++index)) {
+		if(current->Code() == code) {
+			if(start)
+				*start = index;
+			return current;
+		}
+	}
+	
+	return NULL;
 }
 
 
@@ -165,14 +218,21 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 	if(protocol != PPP_LCP_PROTOCOL)
 		return PPP_UNHANDLED;
 	
+	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
+	
+	// adjust length (remove padding)
+	int32 length = packet->m_len;
+	if(packet->m_flags & M_PKTHDR)
+		length = packet->m_pkthdr.len;
+	if(length - ntohs(data->length) != 0)
+		m_adj(packet, length);
+	
 	struct mbuf *copy = m_gethdr(MT_DATA);
 	if(copy) {
 		copy->m_data += AdditionalOverhead();
 		copy->m_len = packet->m_len;
 		memcpy(copy->m_data, packet->m_data, copy->m_len);
 	}
-	
-	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	
 	if(ntohs(data->length) < 4)
 		return B_ERROR;
@@ -220,50 +280,38 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 			handled = false;
 	}
 	
-	if(!copy)
-		return handled ? B_OK : B_ERROR;
-	
 	packet = copy;
-	copy = NULL;
+	
+	if(!packet)
+		return handled ? B_OK : B_ERROR;
 	
 	status_t result = B_OK;
 	
 	// Try to find LCP extensions that can handle this code.
 	// We must duplicate the packet in order to ask all handlers.
-	PPPLCPExtension *extension;
-	for(int32 index = 0; index < CountLCPExtensions(); index++) {
-		extension = LCPExtensionAt(index);
-		if(extension->IsEnabled() && extension->Code() == data->code) {
-			if(!copy) {
-				copy = m_gethdr(MT_DATA);
-				if(!copy)
-					return B_ERROR;
-				
-				copy->m_data += AdditionalOverhead();
-				copy->m_len = packet->m_len;
-				memcpy(copy->m_data, packet->m_data, copy->m_len);
-			}
-			
-			result = extension->Receive(copy, data->code);
-			
-			if(result == B_OK) {
-				copy = NULL;
-				handled = true;
-			} else if(result != PPP_UNHANDLED)
-				return result;
+	int32 index = 0;
+	PPPLCPExtension *extension = LCPExtensionFor(data->code, &index);
+	for(; extension; extension = LCPExtensionFor(data->code, &(++index))) {
+		if(!extension->IsEnabled())
+			continue;
+		
+		result = extension->Receive(packet, data->code);
+		
+		// check return value and return it on error
+		if(result == B_OK)
+			handled = true;
+		else if(result != PPP_UNHANDLED) {
+			m_freem(packet);
+			return result;
 		}
 	}
-	
-	if(copy)
-		m_freem(copy);
 	
 	if(!handled) {
 		StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
 		return PPP_REJECTED;
 	}
 	
-	if(packet)
-		m_freem(packet);
+	m_freem(packet);
 	
 	return result;
 }

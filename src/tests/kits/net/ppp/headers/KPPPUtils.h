@@ -17,7 +17,7 @@
 template<class T>
 inline
 bool
-is_handler_allowed(T& handler, PPP_STATE state, PPP_PHASE phase)
+is_handler_allowed(T& handler, ppp_state state, ppp_phase phase)
 {
 	if(handler.Protocol() == PPP_LCP_PROTOCOL)
 		return true;

@@ -19,7 +19,7 @@ class PPPConfigurePacket;
 
 class PPPOptionHandler {
 	public:
-		PPPOptionHandler(const char *name, PPPInterface& interface,
+		PPPOptionHandler(const char *name, uint8 type, PPPInterface& interface,
 			driver_parameter *settings);
 		virtual ~PPPOptionHandler();
 		
@@ -27,6 +27,9 @@ class PPPOptionHandler {
 		
 		const char *Name() const
 			{ return fName; }
+		
+		uint8 Type() const
+			{ return fType; }
 		
 		PPPInterface& Interface() const
 			{ return fInterface; }
@@ -62,10 +65,12 @@ class PPPOptionHandler {
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
+		uint8 fType;
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
 		
 		bool fEnabled;
+		status_t fInitStatus;
 };
 
 

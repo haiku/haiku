@@ -107,21 +107,6 @@ PPPConfigurePacket::ItemAt(int32 index) const
 }
 
 
-bool
-PPPConfigurePacket::HasItemWithType(uint8 type) const
-{
-	ppp_configure_item *item;
-	
-	for(int32 index; index < CountItems(); index++) {
-		item = ItemAt(index);
-		if(item && item->type == type)
-			return true;
-	}
-	
-	return false;
-}
-
-
 ppp_configure_item*
 PPPConfigurePacket::ItemWithType(uint8 type) const
 {

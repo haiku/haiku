@@ -17,8 +17,8 @@
 
 class PPPEncapsulator {
 	public:
-		PPPEncapsulator(const char *name, PPP_PHASE phase,
-			PPP_ENCAPSULATION_LEVEL level, uint16 protocol,
+		PPPEncapsulator(const char *name, ppp_phase phase,
+			ppp_encapsulation_level level, uint16 protocol,
 			int32 addressFamily, uint32 overhead,
 			PPPInterface& interface, driver_parameter *settings,
 			int32 flags = PPP_NO_FLAGS);
@@ -29,10 +29,10 @@ class PPPEncapsulator {
 		const char *Name() const
 			{ return fName; }
 		
-		PPP_PHASE Phase() const
+		ppp_phase Phase() const
 			{ return fPhase; }
 		
-		PPP_ENCAPSULATION_LEVEL Level() const
+		ppp_encapsulation_level Level() const
 			{ return fLevel; }
 		uint32 Overhead() const
 			{ return fOverhead; }
@@ -102,8 +102,8 @@ class PPPEncapsulator {
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
-		PPP_PHASE fPhase;
-		PPP_ENCAPSULATION_LEVEL fLevel;
+		ppp_phase fPhase;
+		ppp_encapsulation_level fLevel;
 		uint16 fProtocol;
 		int32 fAddressFamily;
 		PPPInterface& fInterface;
@@ -114,7 +114,8 @@ class PPPEncapsulator {
 		
 		bool fEnabled;
 		bool fUpRequested;
-		PPP_PHASE fConnectionStatus;
+		ppp_phase fConnectionStatus;
+		status_t fInitStatus;
 };
 
 

@@ -40,6 +40,7 @@
 typedef struct redial_info {
 	PPPInterface *interface;
 	thread_id *thread;
+	uint32 delay;
 } redial_info;
 
 status_t redial_thread(void *data);
@@ -54,9 +55,16 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	: fID(ID), fSettings(dup_driver_settings(settings)),
 	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
 	fIfnet(NULL), fUpThread(-1), fRedialThread(-1), fDialRetry(0),
-	fDialRetriesLimit(0), fIdleSince(0), fMRU(1500), fDevice(NULL),
+	fDialRetriesLimit(0), fIdleSince(0), fMRU(1500), fInterfaceMTU(1498),
+	fHeaderLength(2), fAutoRedial(false), fDialOnDemand(false), fDevice(NULL),
 	fFirstEncapsulator(NULL), fLock(StateMachine().Locker()), fDeleteCounter(0)
 {
+	// set up dial delays
+	fDialRetryDelay = 3000;
+		// 3s delay between each new attempt to redial
+	fRedialDelay = 1000;
+		// 1s delay between lost connection and redial
+	
 	// set up queue
 	fInQueue = start_ifq();
 	fInQueueThread = spawn_thread(in_queue_thread, "PPPInterface: in_queue_thread",
@@ -78,7 +86,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	
 	if(!fSettings) {
 		fMode = PPP_CLIENT_MODE;
-		fDisconnectAfterIdleSince = 0;
+		fInitStatus = B_ERROR;
 		return;
 	}
 	
@@ -89,7 +97,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	if(!value)
 		fDisconnectAfterIdleSince = 0;
 	else
-		fDisconnectAfterIdleSince = atoi(value) * 1000000;
+		fDisconnectAfterIdleSince = atoi(value) * 1000;
 	
 	if(fDisconnectAfterIdleSince < 0)
 		fDisconnectAfterIdleSince = 0;
@@ -152,6 +160,8 @@ PPPInterface::~PPPInterface()
 	stop_ifq(InQueue());
 	wait_for_thread(fInQueueThread, &tmp);
 	
+	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
+		// tell thread that we are being destroyed (200ms timeout)
 	wait_for_thread(fRedialThread, &tmp);
 	
 	while(CountChildren())
@@ -240,7 +250,6 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			ppp_interface_info *info = (ppp_interface_info*) data;
 			memset(info, 0, sizeof(ppp_interface_info_t));
 			info->settings = Settings();
-			info->ifnet = Ifnet();
 			info->mode = Mode();
 			info->state = State();
 			info->phase = Phase();
@@ -413,9 +422,12 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	
 	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_DOWN_PHASE)
+	if(Phase() != PPP_DOWN_PHASE
+			|| (protocol->AuthenticatorType() != PPP_NO_AUTHENTICATOR
+				&& ProtocolFor(protocol->Protocol())))
 		return false;
-			// a running connection may not change
+			// a running connection may not change and there may only be
+			// one authenticator protocol for each protocol number
 	
 	fProtocols.AddItem(protocol);
 	
@@ -461,8 +473,8 @@ PPPProtocol*
 PPPInterface::ProtocolFor(uint16 protocol, int32 *start = NULL) const
 {
 	// The iteration style in this method is strange C/C++.
-	// Explanation: I use this style because it makes extending ProtocolFor
-	// and EncapsulatorFor simpler as that they look very similar, now.
+	// Explanation: I use this style because it makes extending all XXXFor
+	// methods simpler as that they look very similar, now.
 	
 	int32 index = start ? *start : 0;
 	
@@ -674,19 +686,34 @@ PPPInterface::SetAutoRedial(bool autoredial = true)
 void
 PPPInterface::SetDialOnDemand(bool dialondemand = true)
 {
+	// All protocols must check if DialOnDemand was enabled/disabled after this
+	// interface went down. This is the only situation where a change is relevant.
+	
+	// only clients support DialOnDemand
 	if(Mode() != PPP_CLIENT_MODE)
 		return;
 	
 	LockerHelper locker(fLock);
 	
+	if(DoesDialOnDemand() && !dialondemand && State() != PPP_OPENED_STATE) {
+		// as long as the protocols were not configured we can just delete us
+		Delete();
+		return;
+	}
+	
 	fDialOnDemand = dialondemand;
 	
 	// check if we need to register/unregister
-	if(!Ifnet() && fDialOnDemand)
+	if(fDialOnDemand) {
 		RegisterInterface();
-	else if(Ifnet() && !fDialOnDemand && Phase() == PPP_DOWN_PHASE) {
+		if(Ifnet())
+			Ifnet()->if_flags |= IFF_RUNNING;
+	} else if(!fDialOnDemand && Phase() < PPP_ESTABLISHED_PHASE) {
 		UnregisterInterface();
-		Delete();
+		
+		// if we are already down we must delete us
+		if(Phase() == PPP_DOWN_PHASE)
+			Delete();
 	}
 }
 
@@ -925,7 +952,7 @@ PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 		return false;
 			// a running connection may not change
 	
-	PPP_MODULE_KEY_TYPE type;
+	ppp_module_key_type type;
 		// which type key was used for loading this module?
 	
 	const char *name = NULL;
@@ -982,7 +1009,7 @@ PPPInterface::LoadModules(driver_settings *settings, int32 start, int32 count)
 
 bool
 PPPInterface::LoadModule(const char *name, driver_parameter *parameter,
-	PPP_MODULE_KEY_TYPE type)
+	ppp_module_key_type type)
 {
 	if(Phase() != PPP_DOWN_PHASE)
 		return false;
@@ -1042,7 +1069,7 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocol)
 	// encapsulated.
 	if(sending_protocol && sending_protocol->Flags() & PPP_ALWAYS_ALLOWED
 			&& is_handler_allowed(*sending_protocol, State(), Phase())) {
-		fIdleSince = system_time();
+		fIdleSince = real_time_clock();
 		return SendToDevice(packet, protocol);
 	}
 	
@@ -1055,7 +1082,7 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocol)
 	
 	if(sending_encapsulator && sending_encapsulator->Flags() & PPP_ALWAYS_ALLOWED
 			&& is_handler_allowed(*sending_encapsulator, State(), Phase())) {
-		fIdleSince = system_time();
+		fIdleSince = real_time_clock();
 		return SendToDevice(packet, protocol);
 	}
 	
@@ -1065,7 +1092,7 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocol)
 		return B_ERROR;
 	}
 	
-	fIdleSince = system_time();
+	fIdleSince = real_time_clock();
 	
 	// send to next up encapsulator
 	if(!fFirstEncapsulator)
@@ -1202,7 +1229,7 @@ PPPInterface::SendToDevice(struct mbuf *packet, uint16 protocol)
 	uint16 *header = mtod(packet, uint16*);
 	*header = protocol;
 	
-	fIdleSince = system_time();
+	fIdleSince = real_time_clock();
 	
 	// pass to device/children
 	if(!IsMultilink() || Parent()) {
@@ -1252,7 +1279,7 @@ PPPInterface::Pulse()
 	
 	// check our idle time and disconnect if needed
 	if(fDisconnectAfterIdleSince > 0 && fIdleSince != 0
-			&& fIdleSince - system_time() >= fDisconnectAfterIdleSince) {
+			&& fIdleSince - real_time_clock() >= fDisconnectAfterIdleSince) {
 		StateMachine().CloseEvent();
 		return;
 	}
@@ -1276,6 +1303,8 @@ PPPInterface::RegisterInterface()
 		return true;
 			// we are already registered
 	
+	LockerHelper locker(fLock);
+	
 	if(InitCheck() != B_OK)
 		return false;
 			// we cannot register if something is wrong
@@ -1293,6 +1322,7 @@ PPPInterface::RegisterInterface()
 		return false;
 	
 	CalculateBaudRate();
+	SetupDialOnDemand();
 	
 	return true;
 }
@@ -1304,6 +1334,8 @@ PPPInterface::UnregisterInterface()
 	if(!fIfnet)
 		return true;
 			// we are already unregistered
+	
+	LockerHelper locker(fLock);
 	
 	// only MainInterfaces get an ifnet
 	if(IsMultilink() && Parent())
@@ -1361,8 +1393,30 @@ PPPInterface::CalculateBaudRate()
 }
 
 
+bool
+PPPInterface::SetupDialOnDemand()
+{
+	LockerHelper locker(fLock);
+	
+	if(State() == PPP_OPENED_STATE)
+		return true;
+	
+	bool result = true;
+	
+	PPPProtocol *protocol;
+	for(int32 index = 0; index < CountProtocols(); index++) {
+		protocol = ProtocolAt(index);
+		if(protocol && protocol->IsEnabled())
+			if(protocol->SetupDialOnDemand() != B_OK)
+				result = false;
+	}
+	
+	return result;
+}
+
+
 void
-PPPInterface::Redial()
+PPPInterface::Redial(uint32 delay)
 {
 	if(fRedialThread != -1)
 		return;
@@ -1371,6 +1425,7 @@ PPPInterface::Redial()
 	redial_info info;
 	info.interface = this;
 	info.thread = &fRedialThread;
+	info.delay = delay;
 	
 	fRedialThread = spawn_thread(redial_thread, "PPPInterface: redial_thread",
 		B_NORMAL_PRIORITY, NULL);
@@ -1386,8 +1441,13 @@ redial_thread(void *data)
 {
 	redial_info info;
 	thread_id sender;
+	int32 code;
 	
 	receive_data(&sender, &info, sizeof(redial_info));
+	
+	// we try to receive data instead of snooze, so we can quit on destruction
+	if(receive_data_with_timeout(&sender, &code, NULL, 0, info.delay) == B_OK)
+		return B_OK;
 	
 	info.interface->Up();
 	*info.thread = -1;

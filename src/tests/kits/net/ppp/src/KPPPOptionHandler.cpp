@@ -10,9 +10,9 @@
 #include <PPPControl.h>
 
 
-PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface& interface,
-		driver_parameter *settings)
-	: fInterface(interface), fSettings(settings), fEnabled(true)
+PPPOptionHandler::PPPOptionHandler(const char *name, uint8 type,
+		PPPInterface& interface, driver_parameter *settings)
+	: fType(type), fInterface(interface), fSettings(settings), fEnabled(true)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -20,7 +20,7 @@ PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface& interface,
 	} else
 		strcpy(fName, "???");
 	
-	interface.LCP().AddOptionHandler(this);
+	fInitStatus = interface.LCP().AddOptionHandler(this) ? B_OK : B_ERROR;
 }
 
 
@@ -36,7 +36,7 @@ PPPOptionHandler::InitCheck() const
 	if(!Settings())
 		return B_ERROR;
 	
-	return B_OK;
+	return fInitStatus;
 }
 
 

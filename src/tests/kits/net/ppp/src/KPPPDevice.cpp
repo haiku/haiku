@@ -23,7 +23,7 @@ PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 	} else
 		strcpy(fName, "???");
 	
-	interface.SetDevice(this);
+	fInitStatus = interface.SetDevice(this) ? B_OK : B_ERROR;
 }
 
 
@@ -39,7 +39,7 @@ PPPDevice::InitCheck() const
 	if(!Settings())
 		return B_ERROR;
 	
-	return B_OK;
+	return fInitStatus;
 }
 
 
@@ -61,13 +61,6 @@ PPPDevice::Control(uint32 op, void *data, size_t length)
 			info->outputTransferRate = OutputTransferRate();
 			info->outputBytesCount = CountOutputBytes();
 		} break;
-		
-		case PPPC_SET_MTU:
-			if(length < sizeof(uint32) || !data)
-				return B_ERROR;
-			
-			return SetMTU(*((uint32*)data)) ? B_OK : B_ERROR;
-		break;
 		
 		default:
 			return PPP_UNHANDLED;

@@ -68,16 +68,24 @@ class PPPInterface {
 		struct ifq *InQueue() const
 			{ return fInQueue; }
 		
+		// delays
+		uint32 DialRetryDelay() const
+			{ return fDialRetryDelay; }
+		uint32 RedialDelay() const
+			{ return fRedialDelay; }
+		
 		// idle handling
-		bigtime_t IdleSince() const
+		uint32 IdleSince() const
 			{ return fIdleSince; }
-		bigtime_t DisconnectAfterIdleSince() const
+		uint32 DisconnectAfterIdleSince() const
 			{ return fDisconnectAfterIdleSince; }
 		
 		void SetMRU(uint32 MRU);
 		uint32 MRU() const
 			{ return fMRU; }
 				// this is the smallest MRU that we and the peer have
+		void SetInterfaceMTU(uint32 interfaceMTU)
+			{ SetMRU(interfaceMTU - fHeaderLength); }
 		uint32 InterfaceMTU() const
 			{ return fInterfaceMTU; }
 				// this is the MRU including encapsulator overhead
@@ -125,12 +133,12 @@ class PPPInterface {
 		bool DoesDialOnDemand() const
 			{ return fDialOnDemand; }
 		
-		PPP_MODE Mode() const
+		ppp_mode Mode() const
 			{ return fMode; }
 			// client or server mode?
-		PPP_STATE State() const
+		ppp_state State() const
 			{ return fStateMachine.State(); }
-		PPP_PHASE Phase() const
+		ppp_phase Phase() const
 			{ return fStateMachine.Phase(); }
 		
 		bool Up();
@@ -140,14 +148,14 @@ class PPPInterface {
 		
 		PPPReportManager& ReportManager()
 			{ return fReportManager; }
-		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
+		bool Report(ppp_report_type type, int32 code, void *data, int32 length)
 			{ return fReportManager.Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
 		bool LoadModules(driver_settings *settings,
 			int32 start, int32 count);
 		bool LoadModule(const char *name, driver_parameter *parameter,
-			PPP_MODULE_KEY_TYPE type);
+			ppp_module_key_type type);
 		
 		status_t Send(struct mbuf *packet, uint16 protocol);
 		status_t Receive(struct mbuf *packet, uint16 protocol);
@@ -170,7 +178,9 @@ class PPPInterface {
 		void CalculateInterfaceMTU();
 		void CalculateBaudRate();
 		
-		void Redial();
+		bool SetupDialOnDemand();
+		
+		void Redial(uint32 delay);
 		
 		// multilink methods
 		void SetParent(PPPInterface *parent)
@@ -190,10 +200,11 @@ class PPPInterface {
 		
 		thread_id fRedialThread;
 		uint32 fDialRetry, fDialRetriesLimit;
+		uint32 fDialRetryDelay, fRedialDelay;
 		
 		ppp_manager_info *fManager;
 		
-		bigtime_t fIdleSince, fDisconnectAfterIdleSince;
+		uint32 fIdleSince, fDisconnectAfterIdleSince;
 		uint32 fMRU, fInterfaceMTU, fHeaderLength;
 		
 		PPPInterface *fParent;
@@ -204,7 +215,7 @@ class PPPInterface {
 		
 		vint32 fAccesing;
 		
-		PPP_MODE fMode;
+		ppp_mode fMode;
 		
 		PPPDevice *fDevice;
 		PPPEncapsulator *fFirstEncapsulator;

@@ -17,7 +17,7 @@
 	// the code of receive_data() must have this value
 
 // report flags
-enum PPP_REPORT_FLAGS {
+enum ppp_report_flags {
 	PPP_WAIT_FOR_REPLY = 0x1,
 	PPP_REMOVE_AFTER_REPORT = 0x2,
 	PPP_NO_REPLY_TIMEOUT = 0x4
@@ -25,7 +25,7 @@ enum PPP_REPORT_FLAGS {
 
 // report types
 // the first 16 report types are reserved for the interface manager
-enum PPP_REPORT_TYPE {
+enum ppp_report_type {
 	PPP_ALL_REPORTS = -1,
 		// used only when disabling reports
 	PPP_DESTRUCTION_REPORT = 16,
@@ -35,7 +35,7 @@ enum PPP_REPORT_TYPE {
 };
 
 // report codes (type-specific)
-enum PPP_CONNECTION_REPORT_CODES {
+enum ppp_connection_report_codes {
 	PPP_REPORT_GOING_UP = 0,
 	PPP_REPORT_UP_SUCCESSFUL = 1,
 	PPP_REPORT_DOWN_SUCCESSFUL = 2,
@@ -57,7 +57,7 @@ typedef struct ppp_report_packet {
 
 
 typedef struct ppp_report_request {
-	PPP_REPORT_TYPE type;
+	ppp_report_type type;
 	thread_id thread;
 	int32 flags;
 } ppp_report_request;

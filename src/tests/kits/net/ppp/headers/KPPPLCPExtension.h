@@ -54,6 +54,7 @@ class PPPLCPExtension {
 		uint8 fCode;
 		
 		bool fEnabled;
+		status_t fInitStatus;
 };
 
 

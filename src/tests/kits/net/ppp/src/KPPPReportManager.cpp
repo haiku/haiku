@@ -27,7 +27,7 @@ PPPReportManager::~PPPReportManager()
 
 
 void
-PPPReportManager::EnableReports(PPP_REPORT_TYPE type, thread_id thread,
+PPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 	int32 flags = PPP_NO_FLAGS)
 {
 	LockerHelper locker(fLock);
@@ -42,7 +42,7 @@ PPPReportManager::EnableReports(PPP_REPORT_TYPE type, thread_id thread,
 
 
 void
-PPPReportManager::DisableReports(PPP_REPORT_TYPE type, thread_id thread)
+PPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
@@ -61,7 +61,7 @@ PPPReportManager::DisableReports(PPP_REPORT_TYPE type, thread_id thread)
 
 
 bool
-PPPReportManager::DoesReport(PPP_REPORT_TYPE type, thread_id thread)
+PPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 {
 	LockerHelper locker(fLock);
 	
@@ -79,7 +79,7 @@ PPPReportManager::DoesReport(PPP_REPORT_TYPE type, thread_id thread)
 
 
 bool
-PPPReportManager::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
+PPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {
 	if(length > PPP_REPORT_DATA_LIMIT)
 		return false;

@@ -23,11 +23,11 @@ class PPPReportManager {
 		PPPReportManager(BLocker& lock);
 		~PPPReportManager();
 		
-		void EnableReports(PPP_REPORT_TYPE type, thread_id thread,
+		void EnableReports(ppp_report_type type, thread_id thread,
 				int32 flags = PPP_NO_FLAGS);
-		void DisableReports(PPP_REPORT_TYPE type, thread_id thread);
-		bool DoesReport(PPP_REPORT_TYPE type, thread_id thread);
-		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length);
+		void DisableReports(ppp_report_type type, thread_id thread);
+		bool DoesReport(ppp_report_type type, thread_id thread);
+		bool Report(ppp_report_type type, int32 code, void *data, int32 length);
 			// returns false if reply was bad (or an error occured)
 
 	private:

@@ -17,7 +17,7 @@
 	// create_interface() returns this value on failure
 
 // this allows you to ask for specific interface_ids
-enum PPP_INTERFACE_FILTER {
+enum ppp_interface_filter {
 	PPP_ALL_INTERFACES,
 	PPP_REGISTERED_INTERFACES,
 	PPP_UNREGISTERED_INTERFACES
@@ -40,7 +40,7 @@ typedef struct ppp_manager_info {
 	status_t (*control)(interface_id ID, uint32 op, void *data, size_t length);
 	
 	status_t (*get_interfaces)(interface_id **interfaces, uint32 *count,
-		PPP_INTERFACE_FILTER filter = PPP_REGISTERED_INTERFACES);
+		ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
 		// the user is responsible for free()'ing the interface_id array
 } ppp_manager_info;
 
