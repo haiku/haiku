@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src servers registrar ;
 
 UsePrivateHeaders app ;
+UsePrivateHeaders kernel ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
@@ -16,6 +17,7 @@ local registrar_sources =
 	MessageEvent.cpp
 	MessageHandler.cpp
 	MessageRunnerManager.cpp
+	MessagingService.cpp
 	MIMEManager.cpp
 	PriorityMessageQueue.cpp
 	RecentApps.cpp
@@ -28,9 +30,14 @@ local registrar_sources =
 	WatchingService.cpp
 ;
 
+local registrar_r5_sources = 
+	R5Compatibility.cpp
+;
+
 Server obos_registrar
  	:
 	$(registrar_sources)
+	$(registrar_r5_sources)
 	:
 	<boot!home!config!lib>libopenbeos.so
 	stdc++.r4
