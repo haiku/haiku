@@ -49,7 +49,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -309,6 +309,15 @@ void ServerWindow::Show(void)
 					ws->BringToFrontANormalWindow(fWinBorder);
 					ws->SearchAndSetNewFront(fWinBorder);
 					ws->SetFocusLayer(fWinBorder);
+// TODO: this is UGLY.
+// Normaly you have to easy pass a "FullInvalidate". But in this case, WinBorder
+// is children dependant, so we CANOT rely on ANY region (full, fullVisible, visible)
+//   You have to figure out a way to do this 'internaly', I mean add support in
+// Layer::FullInvalidate or Layer::[Start]RebuildRegions()
+
+// What we are doinf here is BAD. We pass a rectangle instead of a region. Some areas may
+// ger redrawed while there is no need for that!!!
+					fWinBorder->fParent->FullInvalidate(fWinBorder->fFull.Frame());
 				}
 			}
 		}
@@ -722,7 +731,8 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 	delete name;
 
 	// there is no way of setting this, other than manually :-)
-	newLayer->fHidden = hidden;
+printf("Layer (%s) hidden : %d?\n", fTitle.String(), hidden);
+	newLayer->fHidden = (hidden == 0)? false: true;
 
 	int32 dummyMsg;
 			

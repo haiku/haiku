@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Workspace.cpp
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Author:			Adi Oanca <adioanca@mymail.ro>
 //	Description:	Tracks workspaces
 //  
 //------------------------------------------------------------------------------
@@ -251,17 +251,8 @@ STRACE(("\n@Workspace(%ld)::SetFOCUSLayer( %s )\n", ID(), layer? layer->GetName(
 		if (FocusLayer()){
 			FocusLayer()->HighlightDecorator(true);
 		}
-
-// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
-STRACESTREAM();
-		Invalidate();
 	}
-	else{
-		// Do nothing!
-	}
-
 STRACE(("\n#Workspace(%ld)::SetFOCUSLayer( %s ) ENDED\n", ID(), layer? layer->GetName(): "NULL"));
-
 	return FocusLayer();
 }
 //---------------------------------------------------------------------------
@@ -277,7 +268,7 @@ STRACE(("\n@Workspace(%ld)::SetFrontLayer( %s )\n", ID(), layer? layer->GetName(
 
 	SearchAndSetNewFront(layer);
 STRACESTREAM();
-// TODO: there had to be a Invalidate() vresion witch takes a BRegion parameter
+// TODO: remove???
 	Invalidate();
 
  	return fFrontItem? fFrontItem->layerPtr: NULL;;
@@ -337,7 +328,7 @@ WinBorder* Workspace::SearchWinBorder(BPoint pt){
 // For the moment, take windows from front to back and see in witch one 'pt' falls
 	WinBorder		*target = NULL;
 	opLock.Lock();
-	STRACE(("Searching (%f,%f) in...\n", pt.x, pt.y));
+
 	for( WinBorder *wb = GoToBottomItem(); wb; wb = GoToUpperItem()){
 //		wb->PrintToStream();
 		if (!wb->IsHidden() && wb->HasPoint(pt)){

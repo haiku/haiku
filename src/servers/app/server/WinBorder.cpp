@@ -46,7 +46,7 @@
 // TODO: Document this file completely
 
 // Toggle general function call output
-#define DEBUG_WINBORDER
+//#define DEBUG_WINBORDER
 
 // toggle
 //#define DEBUG_WINBORDER_MOUSE
@@ -112,7 +112,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 WinBorder::~WinBorder(void)
 {
-	STRACE(("WinBorder(%s):~WinBorder()\n",GetName()));
+	STRACE(("WinBorder(%s)::~WinBorder()\n",GetName()));
 	if (fDecorator)	
 	{
 		delete fDecorator;
@@ -122,7 +122,7 @@ WinBorder::~WinBorder(void)
 
 void WinBorder::RebuildFullRegion(void)
 {
-	STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
+	STRACE(("WinBorder(%s)::RebuildFullRegion()\n",GetName()));
 
 	fFull.MakeEmpty();
 

@@ -14,7 +14,7 @@
 #include "LayerData.h"
 #include <stdio.h>
 
-#define DEBUG_LAYER
+//#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
 #	define STRACE(x) printf x
 #else
@@ -439,7 +439,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			Draw(fUpdateReg.Frame());
 			fDriver->ConstrainClippingRegion(NULL);
 
-// TODO: (WARNING!): For the Update code is MUST not be emptied!!!
+// TODO: (WARNING!): For the Update code is MUST NOT be emptied!!!
 			fUpdateReg.MakeEmpty();
 		}
 	}
@@ -677,31 +677,69 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 	{
 		fFullVisible.MakeEmpty();
 		fVisible = fFull;
-		if (fParent && fVisible.CountRects() >0){
+#ifdef DEBUG_LAYER_REBUILD
+	printf("\n ======= Layer(%s):: RR ****** ======\n", GetName());
+	fFull.PrintToStream();
+	fVisible.PrintToStream();
+	printf("\n ======= Layer(%s):: RR ****** END ======\n", GetName());
+
+	if (!fParent)
+		printf("\t NO parent\n");
+	else
+		printf("\t VALID Parent: %s.\n", fParent->GetName());
+	if (!(fVisible.CountRects() > 0))
+		printf("\t NO visible area!\n");
+	else
+		printf("\t VALID visble area\n");
+#endif
+
+		if (fParent && fVisible.CountRects() > 0){
 			// not the usual case, but support fot this is needed.
 			if (fParent->fAdFlags & B_LAYER_CHILDREN_DEPENDANT){
+#ifdef DEBUG_LAYER_REBUILD
+	printf("\n ======= Layer(%s)::B_LAYER_CHILDREN_DEPENDANT Parent ======\n", GetName());
+	fFull.PrintToStream();
+	fVisible.PrintToStream();
+#endif
+
 				// because we're skipping one level, we need to do out
 				// parent business as well.
 
 				// our visible area is relative to our parent's parent.
 				if (fParent->fParent)
 					fVisible.IntersectWith(&(fParent->fParent->fVisible));
-
+#ifdef DEBUG_LAYER_REBUILD
+	fVisible.PrintToStream();
+#endif
 				// exclude parent's visible area which could be composed by
 				// prior siblings' visible areas.
 				if (fVisible.CountRects() > 0)
 					fVisible.Exclude(&(fParent->fVisible));
-
+#ifdef DEBUG_LAYER_REBUILD
+	fVisible.PrintToStream();
+#endif
 				// we have a final visible area. Include it to our parent's one,
 				// exclude from parent's parent.
 				if (fVisible.CountRects() > 0){
 					fParent->fFullVisible.Include(&fVisible);
+#ifdef DEBUG_LAYER_REBUILD
+	fParent->fFullVisible.PrintToStream();
+#endif
 					if (fParent->fParent)
 						fParent->fParent->fVisible.Exclude(&fVisible);
+#ifdef DEBUG_LAYER_REBUILD
+	fParent->fParent->fVisible.PrintToStream();
+#endif
 				}
+#ifdef DEBUG_LAYER_REBUILD
+	printf("\n ======= Layer(%s)::B_LAYER_CHILDREN_DEPENDANT Parent END ======\n", GetName());
+#endif
 			}
 			// for 95+% of cases
 			else{
+#ifdef DEBUG_LAYER_REBUILD
+	printf("\n ======= Layer(%s):: (!)B_LAYER_CHILDREN_DEPENDANT Parent ======\n", GetName());
+#endif
 				// the visible area is the one common with parent's one.
 				fVisible.IntersectWith(&(fParent->fVisible));
 				// exclude from parent's visible area. we're the owners now.
