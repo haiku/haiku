@@ -81,7 +81,7 @@ public:
 	status_t Resize(off_t size, bool resizeContents = true);
 
 	bool CanMove(BObjectList<BPartition> *unmovableDescendants,
-				 bool *whileMounted = NULL) const;
+				 BObjectList<BPartition> *movableOnlyIfUnmounted) const;
 	status_t ValidateMove(off_t *newOffset, bool force = false) const;
 	status_t Move(off_t newOffset, bool force = false);
 

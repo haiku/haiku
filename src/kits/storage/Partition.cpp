@@ -27,6 +27,33 @@
 	(\see IsEmpty()).
 */
 
+// AutoDeleter
+/*!	\brief Helper class deleting objects automatically.
+*/
+template<typename C>
+class AutoDeleter {
+public:
+	inline AutoDeleter(C *data = NULL, bool array = false)
+		: fData(data), fArray(array) {}
+
+	inline ~AutoDeleter()
+	{
+		if (fArray)
+			delete[] fData;
+		else
+			delete fData;
+	}
+
+	inline void SetTo(C *data, bool array = false)
+	{
+		fData = data;
+		fArray = array;
+	}
+
+	C		*fData;
+	bool	fArray;
+};
+
 // constructor
 BPartition::BPartition()
 	: fDevice(NULL),
@@ -479,38 +506,51 @@ BPartition::Resize(off_t size, bool resizeContents)
 // CanMove
 bool
 BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
-					bool *whileMounted) const
+					BObjectList<BPartition> *movableOnlyIfUnmounted) const
 {
 	// check parameters
-	if (!unmovableDescendants || !fPartitionData || IsDevice() || !Parent()
-		|| !_IsShadow()) {
+	if (!unmovableDescendants || !movableOnlyIfUnmounted || !fPartitionData
+		|| IsDevice() || !Parent() || !_IsShadow()) {
 		return false;
 	}
-	// count descendants and allocate a partition_id array large enough
+	// count descendants and allocate partition_id arrays large enough
 	int32 descendantCount = _CountDescendants();
-	partition_id *descendants = NULL;
+	partition_id *unmovableIDs = NULL;
+	partition_id *needUnmountingIDs = NULL;
+	AutoDeleter<partition_id> deleter1;
+	AutoDeleter<partition_id> deleter2;
 	if (descendantCount > 0) {
-		descendants = new(nothrow) partition_id[descendantCount];
-		if (!descendants)
+		// allocate arrays
+		unmovableIDs = new(nothrow) partition_id[descendantCount];
+		needUnmountingIDs = new(nothrow) partition_id[descendantCount];
+		deleter1.SetTo(unmovableIDs, true);
+		deleter2.SetTo(needUnmountingIDs, true);
+		if (!unmovableIDs || !needUnmountingIDs)
 			return false;
-		for (int32 i = 0; i < descendantCount; i++)
-			descendants[i] = -1;
-	}
-	// get the info
-	bool result = _kern_supports_moving_partition(_ShadowID(), descendants,
-						descendantCount, whileMounted);
-	if (result) {
-		// find BPartition objects for returned IDs
-		for (int32 i = 0; i < descendantCount && descendants[i] != -1; i++) {
-			BPartition *descendant = FindDescendant(descendants[i]);
-			if (!descendant || !unmovableDescendants->AddItem(descendant)) {
-				result = false;
-				break;
-			}
+		// init arrays
+		for (int32 i = 0; i < descendantCount; i++) {
+			unmovableIDs[i] = -1;
+			needUnmountingIDs[i] = -1;
 		}
 	}
-	// cleanup and return
-	delete[] descendants;
+	// get the info
+	bool result = _kern_supports_moving_partition(_ShadowID(), unmovableIDs,
+						needUnmountingIDs, descendantCount);
+	if (result) {
+		// find unmovable BPartition objects for returned IDs
+		for (int32 i = 0; i < descendantCount && unmovableIDs[i] != -1; i++) {
+			BPartition *descendant = FindDescendant(unmovableIDs[i]);
+			if (!descendant || !unmovableDescendants->AddItem(descendant))
+				return false;
+		}
+		// find BPartition objects needing to be unmounted for returned IDs
+		for (int32 i = 0; i < descendantCount && needUnmountingIDs[i] != -1;
+			 i++) {
+			BPartition *descendant = FindDescendant(needUnmountingIDs[i]);
+			if (!descendant || !movableOnlyIfUnmounted->AddItem(descendant))
+				return false;
+		}
+	}
 	return result;
 }
 
