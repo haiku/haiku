@@ -9,7 +9,7 @@
 #include <int.h>
 #include <vm.h>
 #include <lock.h>
-#include <drivers.h>
+#include <Drivers.h>
 #include <Errors.h>
 #include <devfs.h>
 

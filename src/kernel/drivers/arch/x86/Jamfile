@@ -1,5 +1,3 @@
 SubDir OBOS_TOP src kernel drivers arch x86 ;
 
 SubInclude OBOS_TOP src kernel drivers arch x86 console ;
-SubInclude OBOS_TOP src kernel drivers arch x86 keyboard ;
-SubInclude OBOS_TOP src kernel drivers arch x86 ps2mouse ;

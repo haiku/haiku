@@ -2,15 +2,14 @@ SubDir OBOS_TOP src kernel drivers ;
 
 KernelStaticLibrary libdrivers : 
 	<$(SOURCE_GRIST)>dev.c 
-	<$(SOURCE_GRIST)>devs.c
+#	<$(SOURCE_GRIST)>devs.c
+
 	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/console/console.c
-	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/keyboard/keyboard.c
-	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/ps2mouse/ps2mouse.c
 
 	<$(SOURCE_GRIST)>fb_console/fb_console.c
 	:
 	-fno-pic -Wno-unused
 	;
 
-#SubInclude OBOS_TOP src kernel drivers arch ;
+SubInclude OBOS_TOP src kernel drivers arch ;
 #SubInclude OBOS_TOP src kernel drivers common ;

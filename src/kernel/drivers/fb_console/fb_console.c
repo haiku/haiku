@@ -10,7 +10,7 @@
 #include <vm.h>
 #include <lock.h>
 #include <devfs.h>
-#include <drivers.h>
+#include <Drivers.h>
 #include <Errors.h>
 
 #include <arch/cpu.h>

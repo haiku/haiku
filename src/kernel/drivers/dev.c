@@ -12,8 +12,14 @@
 #include <elf.h>
 #include <Errors.h>
 #include <devfs.h>
-#include <drivers.h>
+#include <Drivers.h>
 #include <memheap.h>
+
+#ifdef ARCH_x86
+#include <arch/x86/console_dev.h>
+#endif
+
+#include <fb_console.h>
 
 #include <stdio.h>
 
@@ -47,6 +53,14 @@ int dev_init(kernel_args *ka)
 			sys_close(fd);
 		}
 	}
+
+	/* now run the oddballs we have, consoles at present */
+	/* XXX - these are x86 and may not be applicable to all platforms */
+#ifdef ARCH_x86
+	console_dev_init(ka);
+#endif
+
+	fb_console_dev_init(ka);
 
 	return 0;
 }

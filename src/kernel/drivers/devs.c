@@ -6,9 +6,6 @@
 #include <devs.h>
 
 #ifdef ARCH_x86
-#include <arch/x86/console_dev.h>
-#include <arch/x86/keyboard.h>
-#include <arch/x86/ps2mouse.h>
 #endif
 #ifdef ARCH_sh4
 #include <kernel/dev/arch/sh4/maple/maple_bus.h>
@@ -22,8 +19,8 @@ int devs_init(kernel_args *ka)
 {
 
 #ifdef ARCH_x86
-	keyboard_dev_init(ka);
-	console_dev_init(ka);
+//	keyboard_dev_init(ka);
+//	console_dev_init(ka);
 #endif
 
 #ifdef ARCH_sh4
