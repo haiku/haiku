@@ -20,12 +20,21 @@ typedef bool (*partition_identify_hook)(int deviceFD,
 typedef status_t (*partition_get_nth_info_hook)(int deviceFD,
 	const struct session_info *session, const uchar *block, int32 index,
 	struct extended_partition_info *partitionInfo);
+typedef bool (*partition_identify_module_hook)(const char *identifier);
+typedef status_t (*partition_get_partitioning_params_hook)(int deviceFD,
+	const struct session_info *sessionInfo, char *buffer, size_t bufferSize,
+	size_t *actualSize);
+typedef status_t (*partition_partition_hook)(int deviceFD,
+	const struct session_info *sessionInfo, const char *parameters);
 
 typedef struct partition_module_info {
-	module_info					module;
+	module_info								module;
 
-	partition_identify_hook		identify;
-	partition_get_nth_info_hook	get_nth_info;
+	partition_identify_hook					identify;
+	partition_get_nth_info_hook				get_nth_info;
+	partition_identify_module_hook			identify_module;
+	partition_get_partitioning_params_hook	get_partitioning_params;
+	partition_partition_hook				partition;
 } partition_module_info;
 
 /*
@@ -37,7 +46,7 @@ typedef struct partition_module_info {
 
 	params:
 	deviceFD: a device FD
-	sessionInfo: a complete info about the session the partition resides on
+	sessionInfo: a complete info about the session the partitions reside on
 	block: the first block of the session
 
 
@@ -65,6 +74,58 @@ typedef struct partition_module_info {
 
 	Returns B_OK, if successful, B_ENTRY_NOT_FOUND, if the index is out of
 	range.
+
+
+	identify_module():
+	-----------------
+
+	Returns whether the module knows the supplied identifier. The module to
+	be used to partition a session is identified by this identifier.
+
+	params:
+	identifier: the identifier
+
+	Returns true, if the module knows the identifier, false otherwise.
+
+
+	get_partitioning_params():
+	-------------------------
+
+	Returns parameters for partitioning the supplied session.
+	If the session is already partitioned using this module, then the
+	parameters describing the current layout will be returned, otherwise
+	default values.
+
+	If the supplied buffer is too small for the parameters, the function
+	returns B_OK, but doesn't fill in the buffer; the required buffer
+	size is returned in actualSize. If the buffer is large enough,
+	actualSize is set to the actually used size. The size includes the
+	terminating null.
+
+	params:
+	deviceFD: a device FD
+	sessionInfo: a complete info about the session to be partitioned
+	buffer: pointer to a pre-allocated buffer of size bufferSize
+	bufferSize: the size of buffer
+	actualSize: pointer to a pre-allocated size_t to be set to the
+				actually needed buffer size
+
+	Returns B_OK, if the parameters could be returned successfully or the
+	buffer is too small, an error code otherwise.
+
+
+	partition():
+	-----------
+
+	Partitions the specified session of the device according to the supplied
+	parameters.
+
+	params:
+	deviceFD: a device FD
+	sessionInfo: a complete info about the session to be partitioned
+	parameters: the parameters for partitioning
+
+	Returns B_OK, if everything went fine, an error code otherwise.
 */
 
 #endif _PARTSCAN_PARTITION_H
