@@ -28,17 +28,26 @@ const charspec kCS0Charspec = { character_set_type: 0,
 // udf_tag
 //----------------------------------------------------------------------
 
-/*! \brief Calculates the tag's CRC and verifies the tag's location on
-	the medium.
+/*! \brief Calculates the tag's CRC, verifies the tag's checksum, and
+	verifies the tag's location on the medium.
 	
 	\todo Calc the CRC.
 */
 status_t 
 descriptor_tag::init_check(off_t diskLocation)
 {
-	if (diskLocation == (off_t)location)
-		return B_OK;
-	else
-		return B_NO_INIT;
+	status_t err = (diskLocation == (off_t)location) ? B_OK : B_NO_INIT;
+	// checksum
+	if (!err) {
+		uint32 sum = 0;
+		for (int i = 0; i <= 3; i++)
+			sum += ((uint8*)this)[i];
+		for (int i = 5; i <= 15; i++)
+			sum += ((uint8*)this)[i];
+		err = sum % 256 == checksum ? B_OK : B_NO_INIT;
+	}
+	
+	return err;
+	
 }
 
