@@ -46,7 +46,6 @@ struct port_entry {
 	sem_id		write_sem;
 	int32		total_count;
 	struct list	msg_queue;
-	bool		closed;
 };
 
 // internal API
@@ -476,7 +475,7 @@ close_port(port_id id)
 	}
 
 	// mark port to disable writing
-	sPorts[slot].closed = true;
+	sPorts[slot].capacity = 0;
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
@@ -611,10 +610,10 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	state = disable_interrupts();
 	GRAB_PORT_LOCK(sPorts[slot]);
 
-	if (sPorts[slot].id != id) {
+	if (sPorts[slot].id != id || sPorts[slot].capacity == 0) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
-		dprintf("get_port_info: invalid port_id %ld\n", id);
+		TRACE(("get_port_info: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
 
@@ -654,7 +653,7 @@ _get_next_port_info(team_id team, int32 *_cookie, struct port_info *info, size_t
 
 	while (slot < gMaxPorts) {
 		GRAB_PORT_LOCK(sPorts[slot]);
-		if (sPorts[slot].id != -1 && sPorts[slot].owner == team) {
+		if (sPorts[slot].id != -1 && sPorts[slot].capacity != 0 && sPorts[slot].owner == team) {
 			// found one!
 			fill_port_info(&sPorts[slot], info, size);
 
@@ -938,7 +937,7 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 		return B_BAD_PORT_ID;
 	}
 
-	if (sPorts[slot].closed) {
+	if (sPorts[slot].capacity == 0) {
 		RELEASE_PORT_LOCK(sPorts[slot]);
 		restore_interrupts(state);
 		TRACE(("write_port_etc: port %ld closed\n", id));
