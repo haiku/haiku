@@ -395,7 +395,10 @@ BApplication::InitData(const char *signature, status_t *_error)
 			fInitError = B_ERROR;
 		}
 	}
-#endif	// ifdef RUN_WITHOUT_REGISTRAR
+#else
+	// We need to have ReadyToRun called even when we're not using the registrar
+	PostMessage(B_READY_TO_RUN, this);
+#endif	// ifndef RUN_WITHOUT_REGISTRAR
 
 	// TODO: Not completely sure about the order, but this should be close.
 
