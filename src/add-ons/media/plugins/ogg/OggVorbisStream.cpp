@@ -189,9 +189,8 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 
 	// compute frame count and duration from sample count
-	int64 samples = 1000000;
-	*frameCount = samples;
-	*duration = (1000000LL * samples) / (long long)format->u.encoded_audio.output.frame_rate;
+	*duration = 5 * 60 * 1000000;
+	*frameCount = *duration * (long long)format->u.encoded_audio.output.frame_rate;
 
 	return B_OK;
 }
