@@ -41,6 +41,7 @@ StdBinCommands
 StdBinCommands
 	chop.c
 #	clear.c
+	csplit.c
 	driveinfo.c
 	echo.c
 	eject.c
