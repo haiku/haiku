@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.08-3, Rudolf)</h1></p>
+<p><h1>head (0.08-4, Rudolf)</h1></p>
 <ul>
 	<li>Fixed GeForceFX 5600 monitor 'refresh out of range' / shutoff fault. nVidia changed the pixelPLL for the NV31 (fix is a hack for now due to missing specs);
 	<li>Fixed acceleration engine restrictions code to adhere to GeForceFX 5600 restrictions: those are still NV20 style for this card;
@@ -12,7 +12,8 @@
 	<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
 	<li>BWindowScreen R3-style function update for acceleration and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants;
 	<li>Now only programming options head select register on dualhead cards. This fixes driver hanging on integrated GeForce2 cards (ID 0x01a0), and maybe also on some other cards;
-	<li>Expanded modelist to include suggested modes above 1600x1200 upto 2048x1536 resolution (if a card supports them): Done by Andrew Bachmann.
+	<li>Expanded modelist to include suggested modes above 1600x1200 upto 2048x1536 resolution (if a card supports them): Done by Andrew Bachmann;
+	<li>Added card recognition for GeForceFX 5700, FX 5950 and some other (older) cards.
 </ul>
 <p><h1>nv_driver 0.07 (Rudolf)</h1></p>
 <ul>
