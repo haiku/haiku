@@ -493,7 +493,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 		/* end synchronous reset because display should be enabled */
 		SEQW(RESET, 0x03);
 
-		if (si->ps.tmds1_active)
+		if (si->ps.tmds1_active && !si->ps.laptop)
 		{
 			/* restore original panelsync and panel-enable */
 			uint32 panelsync = 0x00000000;
@@ -523,7 +523,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 		/* turn screen off */
 		SEQW(CLKMODE, (temp | 0x20));
 
-		if (si->ps.tmds1_active)
+		if (si->ps.tmds1_active && !si->ps.laptop)
 		{
 			/* shutoff panelsync and disable panel */
 			DACW(FP_TG_CTRL, ((DACR(FP_TG_CTRL) & 0xcfffffcc) | 0x20000022));
