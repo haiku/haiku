@@ -23,10 +23,10 @@
 #include <string.h>
 
 
-/**	Print a line on stderr consisting of the text in S, a colon,
+/**	Print a line on stderr consisting of the text in \a s, a colon,
  *	a space, a message describing the meaning of the contents of
  *	`errno' and a newline.
- *	If S is NULL or "", the colon and space are omitted.
+ *	If \a s is NULL or "", the colon and space are omitted.
  */
 
 void
@@ -35,11 +35,17 @@ perror(const char *s)
 	const char *colon;
 	char buffer[1024];
 
+	// ToDo: we should not change the orientation of the stream
+	// (wide char support is currently disabled, so this doesn't matter yet)
+
 	if (s == NULL || *s == '\0')
 		s = colon = "";
 	else
 		colon = ": ";
 
-	fprintf(stderr, "%s%s%s\n", s, colon, strerror_r(errno, buffer, sizeof(buffer)));
+	if (strerror_r(errno, buffer, sizeof(buffer)) != 0)
+		sprintf("Unknown error %ld", errno);
+
+	fprintf(stderr, "%s%s%s\n", s, colon, buffer);
 }
 
