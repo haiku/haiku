@@ -11,6 +11,8 @@
 static status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
 static status_t nv_general_bios_to_powergraphics(void);
+static status_t nv_general_setup_agp(void);
+static void nv_general_list_AGP_caps(agp_info ai);
 
 static void nv_dump_configuration_space (void)
 {
@@ -80,7 +82,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.12 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.14 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1135,145 +1137,279 @@ static status_t nv_general_bios_to_powergraphics()
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
 	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
 
-	/* check for card's AGP capabilities... */
-	agp_ident = CFGR(AGPREF);
-
-	if ((agp_ident & 0x00ff0000) && ((agp_ident & 0x000000ff) == 0x02))
-	{
-		LOG(4,("INIT: card is AGP type, supporting specification %d.%d\n",
-			((agp_ident & 0x00f00000) >> 20), ((agp_ident & 0x000f0000) >> 16)));
-
-		/*  ... list them... */
-		agp_1x = agp_2x = agp_4x = agp3_4x = agp3_8x = false;
-		agp_stat = CFGR(AGPSTAT);
-		/* the mainboard and graphicscard determine AGP version used on power-up/reset */
-		if (!(agp_stat & 0x00000008))
-		{
-			/* AGP 2.0 scheme applies */
-			if (agp_stat & 0x00000001)
-			{
-				LOG(4,("INIT: AGP 2.0 1x mode is available\n"));
-				agp_1x = true;
-			}
-			if (agp_stat & 0x00000002)
-			{
-				LOG(4,("INIT: AGP 2.0 2x mode is available\n"));
-				agp_2x = true;
-			}
-			if (agp_stat & 0x00000004)
-			{
-				LOG(4,("INIT: AGP 2.0 4x mode is available\n"));
-				agp_4x = true;
-			}
-		}
-		else
-		{
-			/* AGP 3.0 scheme applies */
-			if (agp_stat & 0x00000001)
-			{
-				LOG(4,("INIT: AGP 3.0 4x mode is available\n"));
-				agp3_4x = true;
-			}
-			if (agp_stat & 0x00000002)
-			{
-				LOG(4,("INIT: AGP 3.0 8x mode is available\n"));
-				agp3_8x = true;
-			}
-		}
-		if (agp_stat & 0x00000010) LOG(4,("INIT: fastwrite transfers are supported\n"));
-		if (agp_stat & 0x00000200) LOG(4,("INIT: sideband adressing is supported\n"));
-		LOG(4,("INIT: %d outstanding AGP requests can be handled.\n", ((agp_stat & 0xff000000) >> 24)));
-
-		/* ... and activate them. */
-		//fixme: only if specified by user in nv.settings!?!
-		//fixme: create and contact AGP_GART kernel driver for activating mainboard!
-		if (0)
-		{
-			LOG(4,("INIT: enabling AGP\n"));
-
-			/* select highest AGP mode */
-			//fixme: from nv.settings !?! for now: testing 4x
-			agp_speed = 4;
-			if (!(agp_stat & 0x00000008))
-			{
-				/* AGP 2.0 scheme applies */
-				switch (agp_speed)
-				{
-				case 4:
-					if (agp_4x)
-					{
-						LOG(4,("INIT: using AGP 2.0 4x mode\n"));
-						/* select 4x mode */
-						agp_cmd = 0x00000004;
-						break;
-					}
-				case 2:
-					if (agp_2x)
-					{
-						LOG(4,("INIT: using AGP 2.0 2x mode\n"));
-						/* select 2x mode */
-						agp_cmd = 0x00000002;
-						break;
-					}
-				case 1:
-				default:
-					LOG(4,("INIT: using AGP 2.0 1x mode\n"));
-					/* select 1x mode */
-					agp_cmd = 0x00000001;
-					break;
-				}
-			}
-			else
-			{
-				/* AGP 3.0 scheme applies */
-				switch (agp_speed)
-				{
-				case 8:
-					if (agp3_8x)
-					{
-						LOG(4,("INIT: using AGP 3.0 8x mode\n"));
-						/* select 8x mode */
-						agp_cmd = 0x00000002;
-						break;
-					}
-				case 4:
-				default:
-					LOG(4,("INIT: using AGP 3.0 4x mode\n"));
-					/* select 4x mode */
-					agp_cmd = 0x00000001;
-					break;
-				}
-			}
-
-			/* activate sideband adressing if supported */
-			if (agp_stat & 0x00000200) agp_cmd |= 0x00000200;
-
-			/* activate fast writes if supported */
-			//fixme: curious: while mainboard AGP should be disabled still ATM,
-			//activating this stops the card from working! (Thomas saw this also..)
-			//if (agp_stat & 0x00000010) agp_cmd |= 0x00000010;
-
-			/* set request depth: using maximum */
-			agp_cmd |= (agp_stat & 0xff000000);
-
-			/* enable AGP use */
-			agp_cmd |= 0x00000100;
-		}
-		else
-		{
-			LOG(1,("INIT: using card in PCI mode\n"));
-			/* make sure AGP is disabled */
-			agp_cmd = 0;
-		}
-		CFGW(AGPCMD, agp_cmd);
-
-		LOG(4,("INIT: AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
-	}
+	/* setup AGP */
+	nv_general_setup_agp();
 
 	/* turn screen one on */
 	head1_dpms(true, true, true);
 
 	return B_OK;
+}
+
+static status_t nv_general_setup_agp(void)
+{
+	char path[MAXPATHLEN];
+	int agp_fd;
+	agp_info ai_card, ai_bridge;
+	uint8 rq_depth_card, rq_depth_bridge;
+
+	/* check for card's AGP capabilities and list them */
+	ai_card.config.agp_cap_id = CFGR(AGPREF);
+	ai_card.config.agp_stat = CFGR(AGPSTAT);
+	ai_card.config.agp_cmd = CFGR(AGPCMD);
+
+	if ((ai_card.config.agp_cap_id & 0x00ff0000) && ((ai_card.config.agp_cap_id & AGP_id_mask) == AGP_id))
+	{
+		LOG(4,("INIT: graphicscard is AGP type, supporting specification %d.%d;\n",
+			((ai_card.config.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
+			((ai_card.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
+
+		nv_general_list_AGP_caps(ai_card);
+
+		/* check for motherboard AGP host bridge */
+		/* open the BeOS AGP kernel driver, the permissions aren't important */
+		strcpy(path, "/dev/graphics/agp/1");
+		agp_fd = open(path, B_READ_WRITE);
+		if (agp_fd < 0)
+		{
+			LOG(4,("INIT: cannot open AGP host bridge driver, aborting!\n"));
+			/* program card for PCI access */
+			CFGW(AGPCMD, 0x00000000);
+
+			return B_ERROR;
+		}
+
+		/* get host bridge info */
+		ioctl(agp_fd, GET_CONFIG, &ai_bridge); 
+
+		LOG(4,("INIT: AGP host bridge found, vendorID $%04x, deviceID $%04x\n",
+			ai_bridge.dev.vendor_id, ai_bridge.dev.device_id));
+		if (ai_bridge.status != B_OK)
+		{
+			LOG(4,("INIT: host bridge failed to respond correctly, aborting AGP setup!\n"));
+			/* close host bridge driver */
+//			close(agp_fd);
+			/* program card for PCI access */
+			CFGW(AGPCMD, 0x00000000);
+
+			return B_ERROR;
+		}
+
+		/* list host bridge capabilities */
+		LOG(4,("INIT: host bridge supports specification %d.%d;\n",
+			((ai_bridge.config.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
+			((ai_bridge.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
+		nv_general_list_AGP_caps(ai_bridge);
+
+		//fixme: abort if specified by user in nv.settings!
+		if (0)
+		{
+			/* user specified not to use AGP */
+			LOG(4,("INIT: forcing PCI mode (specified in nv.settings).\n"));
+			/* close host bridge driver */
+//			close(agp_fd);
+			/* program card for PCI access */
+			CFGW(AGPCMD, 0x00000000);
+
+			return B_OK;
+		}
+
+		/* find out shared AGP capabilities of card and host bridge */
+		if ((ai_card.config.agp_stat & AGP_rate_rev) !=
+			(ai_bridge.config.agp_stat & AGP_rate_rev))
+		{
+			LOG(4,("INIT: compatibility problem detected, aborting AGP setup!\n"));
+			/* close host bridge driver */
+//			close(agp_fd);
+			/* program card for PCI access */
+			CFGW(AGPCMD, 0x00000000);
+
+			return B_ERROR;
+		}
+
+		/* both card and bridge are set to the same standard */
+		/* (which is as it should be!) */
+		LOG(4,("INIT: enabling AGP\n"));
+
+		/* select highest AGP mode */
+		if (!(ai_bridge.config.agp_stat & AGP_rate_rev))
+		{
+			/* AGP 2.0 scheme applies */
+			if ((ai_card.config.agp_stat & AGP_2_4x) &&
+				(ai_bridge.config.agp_stat & AGP_2_4x))
+			{
+				LOG(4,("INIT: using AGP 2.0 4x mode\n"));
+				ai_card.config.agp_cmd = AGP_2_4x;
+				ai_bridge.config.agp_cmd = AGP_2_4x;
+			}
+			else
+			{
+				if ((ai_card.config.agp_stat & AGP_2_2x) &&
+					(ai_bridge.config.agp_stat & AGP_2_2x))
+				{
+					LOG(4,("INIT: using AGP 2.0 2x mode\n"));
+					ai_card.config.agp_cmd = AGP_2_2x;
+					ai_bridge.config.agp_cmd = AGP_2_2x;
+				}
+				else
+				{
+					LOG(4,("INIT: using AGP 2.0 1x mode\n"));
+					ai_card.config.agp_cmd = AGP_2_1x;
+					ai_bridge.config.agp_cmd = AGP_2_1x;
+				}
+			}
+		}
+		else
+		{
+			/* AGP 3.0 scheme applies */
+			if ((ai_card.config.agp_stat & AGP_3_8x) &&
+				(ai_bridge.config.agp_stat & AGP_3_8x))
+			{
+				LOG(4,("INIT: using AGP 3.0 8x mode\n"));
+				ai_card.config.agp_cmd = AGP_3_8x;
+				ai_bridge.config.agp_cmd = AGP_3_8x;
+			}
+			else
+			{
+				LOG(4,("INIT: using AGP 3.0 4x mode\n"));
+				ai_card.config.agp_cmd = AGP_3_4x;
+				ai_bridge.config.agp_cmd = AGP_3_4x;
+			}
+		}
+
+		/* activate sideband adressing if possible */
+		if ((ai_card.config.agp_stat & AGP_SBA) &&
+			(ai_bridge.config.agp_stat & AGP_SBA))
+		{
+			LOG(4,("INIT: enabling sideband adressing (SBA)\n"));
+			ai_card.config.agp_cmd |= AGP_SBA;
+			ai_bridge.config.agp_cmd |= AGP_SBA;
+		}
+
+		/* activate fast writes if possible */
+		if ((ai_card.config.agp_stat & AGP_FW) &&
+			(ai_bridge.config.agp_stat & AGP_FW))
+		{
+			LOG(4,("INIT: enabling fast writes (FW)\n"));
+			ai_card.config.agp_cmd |= AGP_FW;
+			ai_bridge.config.agp_cmd |= AGP_FW;
+		}
+
+		/* setup maximum request depth supported */
+		/* note:
+		 * this is writable only in the graphics card */
+		rq_depth_card = ((ai_card.config.agp_stat & AGP_RQ) >> AGP_RQ_shift);
+		rq_depth_bridge = ((ai_bridge.config.agp_stat & AGP_RQ) >> AGP_RQ_shift);
+		if (rq_depth_card < rq_depth_bridge)
+		{
+			ai_card.config.agp_cmd |= (rq_depth_card << AGP_RQ_shift);
+			LOG(4,("INIT: max. AGP queued request depth will be set to %d\n",
+				(rq_depth_card + 1)));
+		}
+		else
+		{
+			ai_card.config.agp_cmd |= (rq_depth_bridge << AGP_RQ_shift);
+			LOG(4,("INIT: max. AGP queued request depth will be set to %d\n",
+				(rq_depth_bridge + 1)));
+		}
+
+		/* set the enable AGP bits */
+		ai_card.config.agp_cmd |= AGP_enable;
+		ai_bridge.config.agp_cmd |= AGP_enable;
+
+		/* finally program both the host bridge and the graphics card! */
+		/* note:
+		 * the AGP standard defines that the host bridge should be enabled first. */
+		ioctl(agp_fd, SET_CONFIG, &ai_bridge);
+		CFGW(AGPCMD, ai_card.config.agp_cmd);
+
+		LOG(4,("INIT: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
+
+		/* close host bridge driver */
+//		close(agp_fd);
+	}
+	else
+	{
+		LOG(4,("INIT: graphicscard is PCI type.\n"));
+	}
+}
+
+static void nv_general_list_AGP_caps(agp_info ai)
+{
+	/*
+		list capabilities
+	 */
+	/* the mainboard and graphicscard determine AGP version used on power-up/reset */
+	if (!(ai.config.agp_stat & AGP_rate_rev))
+	{
+		/* AGP 2.0 scheme applies */
+		if (ai.config.agp_stat & AGP_2_1x)
+		{
+			LOG(4,("INIT: AGP 2.0 1x mode is available\n"));
+		}
+		if (ai.config.agp_stat & AGP_2_2x)
+		{
+			LOG(4,("INIT: AGP 2.0 2x mode is available\n"));
+		}
+		if (ai.config.agp_stat & AGP_2_4x)
+		{
+			LOG(4,("INIT: AGP 2.0 4x mode is available\n"));
+		}
+	}
+	else
+	{
+		/* AGP 3.0 scheme applies */
+		if (ai.config.agp_stat & AGP_3_4x)
+		{
+			LOG(4,("INIT: AGP 3.0 4x mode is available\n"));
+		}
+		if (ai.config.agp_stat & AGP_3_8x)
+			{
+			LOG(4,("INIT: AGP 3.0 8x mode is available\n"));
+		}
+	}
+	if (ai.config.agp_stat & AGP_FW) LOG(4,("INIT: fastwrite transfers are supported\n"));
+	if (ai.config.agp_stat & AGP_SBA) LOG(4,("INIT: sideband adressing is supported\n"));
+	LOG(4,("INIT: %d queued AGP requests can be handled.\n",
+		(((ai.config.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1)));
+
+	/*
+		list current settings
+	 */
+	LOG(4,("INIT: listing current active settings:\n"));
+	/* the mainboard and graphicscard determine AGP version used on power-up/reset */
+	if (!(ai.config.agp_stat & AGP_rate_rev))
+	{
+		/* AGP 2.0 scheme applies */
+		if (ai.config.agp_cmd & AGP_2_1x)
+		{
+			LOG(4,("INIT: AGP 2.0 1x mode is set\n"));
+		}
+		if (ai.config.agp_cmd & AGP_2_2x)
+		{
+			LOG(4,("INIT: AGP 2.0 2x mode is set\n"));
+		}
+		if (ai.config.agp_cmd & AGP_2_4x)
+		{
+			LOG(4,("INIT: AGP 2.0 4x mode is set\n"));
+		}
+	}
+	else
+	{
+		/* AGP 3.0 scheme applies */
+		if (ai.config.agp_cmd & AGP_3_4x)
+		{
+			LOG(4,("INIT: AGP 3.0 4x mode is set\n"));
+		}
+		if (ai.config.agp_cmd & AGP_3_8x)
+			{
+			LOG(4,("INIT: AGP 3.0 8x mode is set\n"));
+		}
+	}
+	if (ai.config.agp_cmd & AGP_FW) LOG(4,("INIT: fastwrite transfers are enabled\n"));
+	if (ai.config.agp_cmd & AGP_SBA) LOG(4,("INIT: sideband adressing is enabled\n"));
+	LOG(4,("INIT: max. AGP queued request depth is set to %d.\n",
+		(((ai.config.agp_cmd & AGP_RQ) >> AGP_RQ_shift) + 1)));
 }
 
 /* Check if mode virtual_size adheres to the cards _maximum_ contraints, and modify
