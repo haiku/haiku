@@ -1053,7 +1053,7 @@ thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 
 
 status_t
-thread_init(kernel_args *ka)
+thread_init(kernel_args *args)
 {
 	struct thread *t;
 	unsigned int i;
@@ -1074,8 +1074,11 @@ thread_init(kernel_args *ka)
 		return sSnoozeSem;
 	}
 
+	if (arch_thread_init(args) < B_OK)
+		panic("arch_thread_init() failed!\n");
+
 	// create an idle thread for each cpu
-	for (i = 0; i < ka->num_cpus; i++) {
+	for (i = 0; i < args->num_cpus; i++) {
 		char temp[64];
 		vm_region *region;
 
