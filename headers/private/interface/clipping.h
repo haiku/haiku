@@ -42,6 +42,7 @@ sect_rect(clipping_rect r1, clipping_rect r2)
 	return rect;
 }
 
+
 static inline void
 offset_rect(clipping_rect &rect, int32 x, int32 y)
 {
@@ -105,7 +106,8 @@ valid_rect(clipping_rect rect)
 static inline bool
 rects_intersect(clipping_rect rectA, clipping_rect rectB)
 {
-	return valid_rect(sect_rect(rectA, rectB));
+	return !(rectA.left > rectB.right || rectA.top > rectB.bottom
+			|| rectA.right < rectB.left || rectA.bottom < rectB.top);
 }
 
 
