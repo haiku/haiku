@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -41,6 +41,7 @@
 #include "RGBColor.h"
 #include <Region.h>
 #include "PatternHandler.h"
+#include "CursorHandler.h"
 #include "DisplaySupport.h"
 #include "LayerData.h"
 #include "ServerBitmap.h"
@@ -216,6 +217,7 @@ public:
 protected:
 friend class Layer;
 friend class WinBorder;
+friend CursorHandler;
 
 	ServerCursor *_GetCursor(void);
 	virtual void HLinePatternThick(int32 x1, int32 x2, int32 y);
@@ -262,19 +264,21 @@ friend class WinBorder;
 	int fLineThickness;
 	
 	BLocker *_locker;
-	bool _is_cursor_hidden;
-	bool _is_cursor_obscured;
+//	bool _is_cursor_hidden;
+//	bool _is_cursor_obscured;
 
-	ServerCursor *_cursor;
-	UtilityBitmap *_cursorsave;
+//	ServerCursor *_cursor;
+//	UtilityBitmap *_cursorsave;
 
-	uint32 _dpms_state;
-	uint32 _dpms_caps;
-	accelerant_device_info _acc_device_info;
-	display_mode _displaymode;
+	uint32 fDPMSState;
+	uint32 fDPMSCaps;
+	accelerant_device_info fAccDeviceInfo;
+	display_mode fDisplayMode;
 	
-	BRect oldcursorframe, cursorframe, saveframe;
-	DrawData _drawdata;
+	CursorHandler *fCursorHandler;
+	
+//	BRect oldcursorframe, cursorframe, saveframe;
+	DrawData fDrawData;
 };
 
 #endif

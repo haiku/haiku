@@ -1,3 +1,30 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, Haiku, Inc.
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		DisplaySupport.h
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Gabe Yoder <gyoder@stny.rr.com>
+//	Description:	Support classes for the DisplayDriver class
+//  
+//------------------------------------------------------------------------------
 #ifndef DDRIVER_SUPPORT_H_
 #define DDRIVER_SUPPORT_H_
 
@@ -117,12 +144,12 @@ class FBBitmap : public ServerBitmap
 public:
 	FBBitmap(void) : ServerBitmap(BRect(0,0,0,0),B_NO_COLOR_SPACE,0) { }
 	~FBBitmap(void) { }
-	void SetBytesPerRow(const int32 &bpr) { _bytesperrow=bpr; }
-	void SetSpace(const color_space &space) { _space=space; }
+	void SetBytesPerRow(const int32 &bpr) { fBytesPerRow=bpr; }
+	void SetSpace(const color_space &space) { fSpace=space; }
 	
 	// WARNING: - for some reason ServerBitmap adds 1 to the width and height. We do that also.
-	void SetSize(const int32 &w, const int32 &h) { _width=w+1; _height=h+1; }
-	void SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
+	void SetSize(const int32 &w, const int32 &h) { fWidth=w+1; fHeight=h+1; }
+	void SetBuffer(void *ptr) { fBuffer=(uint8*)ptr; }
 	void SetBitsPerPixel(color_space space,int32 bytesperline) { _HandleSpace(space,bytesperline); }
 	void ShallowCopy(const FBBitmap *from)
 	{

@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -50,7 +50,7 @@ public:
 								DrawData(const DrawData &data);
 	virtual						~DrawData(void);
 			DrawData& operator=(const DrawData &from);
-	// uncomment when needed. Also implement it! :-)
+			// TODO: uncomment and implement DrawData::PrintToStream when needed.
 //	virtual	void				PrintToStream() const;
 
 			BPoint				penlocation;

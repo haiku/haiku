@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -55,38 +55,38 @@ public:
 		- \c B_ERROR if the buffer is not allocated in an area
 		- area_id for the buffer
 	*/
-	area_id Area(void) const { return _area; }
+	area_id Area(void) const { return fArea; }
 	
 	// Returns the offset of the bitmap in its area
-	int32 AreaOffset(void) { return _offset; }
+	int32 AreaOffset(void) { return fOffset; }
 	
 	//! Returns the bitmap's buffer
-	uint8 *Bits(void) const { return _buffer; }
+	uint8 *Bits(void) const { return fBuffer; }
 	uint32 BitsLength(void) const;
 
 	//! Returns the size of the bitmap
-	BRect Bounds() const { return BRect(0,0,_width-1,_height-1); };
+	BRect Bounds() const { return BRect(0,0,fWidth-1,fHeight-1); };
 	
 	//! Returns the number of bytes in each row, including padding
-	int32 BytesPerRow(void) const { return _bytesperrow; };
+	int32 BytesPerRow(void) const { return fBytesPerRow; };
 	
 	//! Returns the pixel color depth
-	uint8 BitsPerPixel(void) const { return _bpp; } 
+	uint8 BitsPerPixel(void) const { return fBitsPerPixel; } 
 	
 	//! Returns the color space of the bitmap
-	color_space ColorSpace(void) const { return _space; }
+	color_space ColorSpace(void) const { return fSpace; }
 	
 	//! Returns the width of the bitmap
-	int32 Width(void) const { return _width; }
+	int32 Width(void) const { return fWidth; }
 	
 	//! Returns the height of the bitmap
-	int32 Height(void) const { return _height; }
+	int32 Height(void) const { return fHeight; }
 
 	//! Returns whether the bitmap is valid
-	bool InitCheck(void) const { return _initialized; }
+	bool InitCheck(void) const { return fInitialized; }
 
 	//! Returns the identifier token for the bitmap
-	int32 Token(void) const { return _token; }
+	int32 Token(void) const { return fToken; }
 	
 	//! Does a shallow copy of the bitmap passed to it
 	void ShallowCopy(const ServerBitmap *from)
@@ -94,17 +94,17 @@ public:
 		if(!from)
 			return;
 		
-		_initialized=from->_initialized;
-		_area=from->_area;
-		_buffer=from->_buffer;
-		_width=from->_width;
-		_height=from->_height;
-		_bytesperrow=from->_bytesperrow;
-		_space=from->_space;
-		_flags=from->_flags;
-		_bpp=from->_bpp;
-		_token=from->_token;
-		_offset=from->_offset;
+		fInitialized=from->fInitialized;
+		fArea=from->fArea;
+		fBuffer=from->fBuffer;
+		fWidth=from->fWidth;
+		fHeight=from->fHeight;
+		fBytesPerRow=from->fBytesPerRow;
+		fSpace=from->fSpace;
+		fFlags=from->fFlags;
+		fBitsPerPixel=from->fBitsPerPixel;
+		fToken=from->fToken;
+		fOffset=from->fOffset;
 	}
 	
 protected:
@@ -112,26 +112,26 @@ protected:
 	friend class PicturePlayer;
 
 	//! Internal function used by the BitmapManager.
-	void _SetArea(area_id ID) { _area=ID; }
+	void _SetArea(area_id ID) { fArea=ID; }
 	
 	//! Internal function used by the BitmapManager.
-	void _SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
+	void _SetBuffer(void *ptr) { fBuffer=(uint8*)ptr; }
 	void _AllocateBuffer(void);
 	void _FreeBuffer(void);
 	
 	void _HandleSpace(color_space space, int32 bytesperline=-1);
 
-	bool _initialized;
-	area_id _area;
-	uint8 *_buffer;
+	bool fInitialized;
+	area_id fArea;
+	uint8 *fBuffer;
 
-	int32 _width,_height;
-	int32 _bytesperrow;
-	color_space _space;
-	int32 _flags;
-	int _bpp;
-	int32 _token;
-	int32 _offset;
+	int32 fWidth,fHeight;
+	int32 fBytesPerRow;
+	color_space fSpace;
+	int32 fFlags;
+	int fBitsPerPixel;
+	int32 fToken;
+	int32 fOffset;
 };
 
 class UtilityBitmap : public ServerBitmap

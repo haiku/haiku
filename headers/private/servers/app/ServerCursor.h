@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -52,19 +52,18 @@ public:
 	~ServerCursor(void);
 	
 	//! Returns the cursor's hot spot
-	BPoint GetHotSpot(void) { return _hotspot; }
+	BPoint GetHotSpot(void) { return fHotSpot; }
 	void SetHotSpot(BPoint pt);
-	const char *GetAppSignature(void) { return _app_signature.String(); }
+	const char *GetAppSignature(void) { return fAppSignature.String(); }
 	void SetAppSignature(const char *signature);
 	
 	//! Returns the cursor's ID
-	int32 ID(void) { return _token; }
+	int32 ID(void) { return fToken; }
 private:
 	friend class CursorManager;
 	
-	BPoint _hotspot;
-	BString _app_signature;
-	int32 _token;
+	BPoint fHotSpot;
+	BString fAppSignature;
 };
 
 #endif

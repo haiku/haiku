@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -47,6 +47,9 @@ public:
 		
 	IPoint &operator=(const IPoint &p);
 	IPoint &operator=(const BPoint &p);
+	
+	BPoint AsBPoint(void);
+	
 	void Set(int32 X, int32 Y);
 	
 	void ConstrainTo(BRect r);
@@ -112,5 +115,9 @@ inline void IPoint::Set(int32 X, int32 Y)
 	y = Y;
 }
 //------------------------------------------------------------------------------
+inline BPoint IPoint::AsBPoint(void)
+{
+	return BPoint(x,y);
+}
 
 #endif

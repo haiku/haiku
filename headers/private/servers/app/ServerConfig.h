@@ -44,7 +44,7 @@
 
 // This is the application signature of our app_server when running as a
 // regular application. When running as the app_server, this is not used.
-#define SERVER_SIGNATURE "application/x-vnd.OpenBeOS-app-server"
+#define SERVER_SIGNATURE "application/x-vnd.haiku-app-server"
 
 // Directory for all app_server-related settings. Must include ending slash.
 #define SERVER_SETTINGS_DIR "/boot/home/config/settings/app_server/"
