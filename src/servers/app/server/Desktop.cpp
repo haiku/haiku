@@ -453,17 +453,18 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			
 			BPoint pt(x, y);
 			if (fMouseTarget){
+				fActiveScreen->DDriver()->HideCursor();
+				fActiveScreen->DDriver()->MoveCursorTo(x,y);
 				fMouseTarget->MouseMoved(pt, buttons);
+				fActiveScreen->DDriver()->ShowCursor();
 			}
 			else{
 				WinBorder *target	= ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
 				if(target)
 					target->MouseMoved(pt, buttons);
-			}
 
-			// We need this so that we can see the cursor on the screen
-			if(fActiveScreen)
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
+			}
 
 			break;
 		}
