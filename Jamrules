@@ -307,11 +307,14 @@ actions C++
 
 rule App
 {
-	# App <name> : <sources> ;
+	# App <name> : <sources> : <libraries> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
-	Main $(<) : $(>) ;
-	MakeLocate $(<) : $(OBOS_APPS_DIR) ;
+	Main $(1) : $(2) ;
+	MakeLocate $(1) : $(OBOS_APPS_DIR) ;
+	LinkSharedOSLibs $(1) : $(3) ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
+						-Xlinker -soname=_APP_ ;
 }
 
 rule BinCommand
@@ -322,6 +325,8 @@ rule BinCommand
 	Main $(1) : $(2) ;
 	MakeLocate $(1) : $(OBOS_BIN_DIR) ;
 	LinkSharedOSLibs $(1) : $(3) ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
+						-Xlinker -soname=_APP_ ;
 }
 
 rule StdBinCommands
@@ -342,21 +347,27 @@ rule StdBinCommands
 
 rule Preference
 {
-	# Preference <name> : <sources> ;
+	# Preference <name> : <sources> : <libraries> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
-	Main $(<) : $(>) ;
-	MakeLocate $(<) : $(OBOS_PREFS_DIR) ;
+	Main $(1) : $(2) ;
+	MakeLocate $(1) : $(OBOS_PREFS_DIR) ;
+	LinkSharedOSLibs $(1) : $(3) ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
+						-Xlinker -soname=_APP_ ;
 }
 
 rule Server
 {
-	# Server <name> : <sources> ;
+	# Server <name> : <sources> : <libraries> ;
 	
 	SetupIncludes ;
 	SetupObjectsDir ;
-	Main $(<) : $(>) ;
-	MakeLocate $(<) : $(OBOS_SERVER_DIR) ;
+	Main $(1) : $(2) ;
+	MakeLocate $(1) : $(OBOS_SERVER_DIR) ;
+	LinkSharedOSLibs $(1) : $(3) ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
+						-Xlinker -soname=_APP_ ;
 }
 
 # test pseudo targets
@@ -698,10 +709,11 @@ rule R5KernelAddon
 
 rule Translator
 {
-	# Translator <name> : <sources> ;
+	# Translator <name> : <sources> : <libraries> ;
 	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(1) : $(2) ;
+	LinkSharedOSLibs $(1) : $(3) ;
 
 	# Create output dir path for translator
 	local targetdir;
@@ -821,6 +833,7 @@ rule LinkSharedOSLibs
 		} else {
 			switch $(i:B)
 			{
+				# XXX: _APP_ and _KERNEL_ should not be needed for ELF.
 				case _APP_ : isfile = true ;
 				case _KERNEL_ : isfile = true ;
 				case *.so     : isfile = true ;
