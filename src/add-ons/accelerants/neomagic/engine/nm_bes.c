@@ -455,8 +455,8 @@ status_t mn_configure_bes
 	{
 		/* PCI card */
 		LOG(4,("Overlay: accelerant is programming BES\n"));
-		/* unlock card overlay sequencer registers */
-		PCIGRPHW(GENLOCK, 0x20);
+		/* unlock card overlay sequencer registers (b5 = 1) */
+		PCIGRPHW(GENLOCK, (PCIGRPHR(GENLOCK) | 0x20));
 		/* destination rectangle */
 		PCIGRPHW(HDCOORD1L, ((bi.hcoordv >> 16) & 0xff));
 		PCIGRPHW(HDCOORD2L, (bi.hcoordv & 0xff));

@@ -34,6 +34,7 @@
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
 #define KISAGRPHW(A,B)(isa_bus->write_io_16(NMISA16_GRPHIND, ((NMGRPHX_##A) | ((B) << 8))))
+#define KISAGRPHR(A)  (isa_bus->write_io_8(NMISA8_GRPHIND, (NMGRPHX_##A)), isa_bus->read_io_8(NMISA8_GRPHDAT))
 #define KISASEQW(A,B)(isa_bus->write_io_16(NMISA16_SEQIND, ((NMSEQX_##A) | ((B) << 8))))
 
 #define MAX_DEVICES	  8
@@ -900,9 +901,14 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 
 void drv_program_bes_ISA(mn_bes_data *bes)
 {
+	uint8 temp;
+
 	/* ISA card */
-	/* unlock card overlay sequencer registers */
-	KISAGRPHW(GENLOCK, 0x20);
+	/* unlock card overlay sequencer registers (b5 = 1) */
+	temp = (KISAGRPHR(GENLOCK) | 0x20);
+	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	snooze(10);
+	KISAGRPHW(GENLOCK, temp);
 	/* destination rectangle */
 	KISAGRPHW(HDCOORD1L, ((bes->hcoordv >> 16) & 0xff));
 	KISAGRPHW(HDCOORD2L, (bes->hcoordv & 0xff));

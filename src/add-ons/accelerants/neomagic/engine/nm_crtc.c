@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-6/2003
+   Rudolf Cornelissen 4/2003-8/2003
 */
 
 #define MODULE_BIT 0x00040000
@@ -82,9 +82,6 @@ status_t mn_crtc_validate_timing(
 /* set a mode line */
 status_t mn_crtc_set_timing(display_mode target, bool crt_only)
 {
-	uint8 hsync_pos = (target.timing.flags & B_POSITIVE_HSYNC);
-	uint8 vsync_pos = (target.timing.flags & B_POSITIVE_VSYNC);
-
 	uint8 temp;
 
 	uint32 htotal;		/*total horizontal total VCLKs*/
@@ -204,17 +201,33 @@ status_t mn_crtc_set_timing(display_mode target, bool crt_only)
 			));
 
 		/* setup HSYNC & VSYNC polarity */
+		LOG(2,("CRTC: sync polarity: "));
 		temp = ISARB(MISCR);
-		if (vsync_pos) temp &= ~0x80;
-		else temp |= 0x80;
-		if (hsync_pos) temp &= ~0x40;
-		else temp |= 0x40;
+		if (target.timing.flags & B_POSITIVE_HSYNC)
+		{
+			LOG(2,("H:pos "));
+			temp &= ~0x40;
+		}
+		else
+		{
+			LOG(2,("H:neg "));
+			temp |= 0x40;
+		}
+		if (target.timing.flags & B_POSITIVE_VSYNC)
+		{
+			LOG(2,("V:pos "));
+			temp &= ~0x80;
+		}
+		else
+		{
+			LOG(2,("V:neg "));
+			temp |= 0x80;
+		}
 		/* we need to wait a bit or the card will mess-up it's register values.. */
 		snooze(10);
 		ISAWB(MISCW, temp);
 
-		LOG(2,("CRTC: HSYNC/VSYNC polarity: %x %x, MISC reg readback: $%02x\n",
-			hsync_pos, vsync_pos, ISARB(MISCR)));
+		LOG(2,(", MISC reg readback: $%02x\n", ISARB(MISCR)));
 	}
 	else
 	{

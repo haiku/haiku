@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-6/2003
+   Rudolf Cornelissen 4/2003-8/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -47,7 +47,7 @@ status_t mn_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.04 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.05 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -170,7 +170,8 @@ status_t nm_general_powerup()
     ISAGRPHW(GRPHXLOCK, 0x26);
 
 	/* unlock cards CRTC registers */
-	ISAGRPHW(GENLOCK, 0x00);
+//don't touch: most cards get into trouble on this!
+//	ISAGRPHW(GENLOCK, 0x00);
 
 	/* initialize the shared_info struct */
 	set_specs();
