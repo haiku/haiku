@@ -811,7 +811,7 @@ bootfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf,
 
 
 static bool
-bootfs_can_page(fs_volume _fs, fs_vnode _v)
+bootfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie cookie)
 {
 	struct bootfs_vnode *v = _v;
 
@@ -825,7 +825,7 @@ bootfs_can_page(fs_volume _fs, fs_vnode _v)
 
 
 static status_t
-bootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+bootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct bootfs_vnode *v = _v;
 	unsigned int i;
@@ -836,6 +836,7 @@ bootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size
 		if (pos >= v->stream.u.file.len) {
 			memset(vecs[i].iov_base, 0, vecs[i].iov_len);
 			pos += vecs[i].iov_len;
+			*_numBytes -= vecs[i].iov_len;
 		} else {
 			unsigned int copy_len;
 
@@ -845,7 +846,7 @@ bootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size
 
 			if (copy_len < vecs[i].iov_len) {
 				memset((char *)vecs[i].iov_base + copy_len, 0, vecs[i].iov_len - copy_len);
-				*_numBytes = v->stream.u.file.len - pos;
+				*_numBytes -= v->stream.u.file.len - copy_len;
 			}
 
 			pos += vecs[i].iov_len;
@@ -857,7 +858,7 @@ bootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size
 
 
 static status_t
-bootfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+bootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	TRACE(("bootfs_writepage: fs_cookie %p vnode %p, vecs %p, pos %Ld \n", _fs, _v, vecs, pos));
 
@@ -971,7 +972,7 @@ file_system_info gBootFileSystem = {
 	&bootfs_can_page,
 	&bootfs_read_pages,
 	&bootfs_write_pages,
-	
+
 	NULL,	// get_file_map()
 
 	/* common */
