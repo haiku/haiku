@@ -33,3 +33,8 @@
 
 // Method Replicant
 #define IS_SET_METHOD					'MRsm'
+#define IS_METHOD_REGISTER				'MRmr'
+#define IS_METHOD_UPDATE_NAME			'MRun'
+#define IS_METHOD_UPDATE_ICON			'MRui'
+#define IS_METHOD_UPDATE_MENU			'MRum'
+#define IS_METHOD_UPDATE_METHOD			'MRu!'
