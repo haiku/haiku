@@ -6,6 +6,7 @@ Addon avcodec : media plugins :
  	avcodec.cpp
  	codectbl.cpp
 	gfx_conv_c.cpp
+	gfx_conv_c_lookup.cpp
 #	gfx_conv_mmx.cpp
  	gfx_util.cpp
 	: 

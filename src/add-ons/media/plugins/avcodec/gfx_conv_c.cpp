@@ -173,6 +173,9 @@ void gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 	gfx_conv_null_c(in, out, width, height);
 }
 
+// the lookup table based versio in gfx_conv_c_lookup.cpp is faster!
+#if 0
+
 // Macro to limit the signed a into range 0-255, first one seems to be fastest
 #define SATURATE(a) if (0xffffff00 & (uint32)a) { if (a < 0) a = 0; else a = 255; }
 // #define SATURATE(a) if (0xffffff00 & (uint32)a) { if (0x80000000 & (uint32)a) a = 0; else a = 0xff; }
@@ -180,7 +183,7 @@ void gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 // #define SATURATE(a) if (a < 0) a = 0; else if (a & 0xffffff00) a = 255;
 // #define SATURATE(a) if (a < 0) a = 0; if (a & 0xffffff00) a = 255;
 
-void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
+void gfx_conv_YCbCr420p_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
 {
 	uint32 poutInc = 2 * out->linesize[0];
 	uint32 *poutEven = (uint32 *)out->data[0];
@@ -263,3 +266,5 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 		memset((height - 1) * out->linesize[0] + (uint8 *)out->data[0], 0, width * 4);
 	}
 }
+
+#endif

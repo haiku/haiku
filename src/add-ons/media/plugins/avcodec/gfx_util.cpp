@@ -64,7 +64,7 @@ gfx_convert_func resolve_colorspace(color_space colorSpace, PixelFormat pixelFor
 				#endif
 				{
 					TRACE("resolve_colorspace: gfx_conv_yuv420p_rgb32_c\n");
-					return gfx_conv_yuv420p_rgb32_c;
+					return gfx_conv_YCbCr420p_RGB32_c;
 				}
 			}
 			
