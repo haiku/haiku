@@ -1,6 +1,6 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -17,32 +17,13 @@ char *__progname = NULL;
 
 char _single_threaded = true;
 	// determines if I/O locking needed; needed for BeOS compatibility
+
+int __libc_argc;
+char **__libc_argv;
 thread_id __main_thread_id;
 char **argv_save;
-	// needed for BeOS compatibility - they are set in the original
-	// BeOS startup code, but they won't be initialized when the
-	// OpenBeOS startup code is used.
-
-
-// ToDo: these functions are defined in libgcc - this one is included in
-//		libroot.so in BeOS, but we probably don't want to do that.
-//		Since we don't yet have libgcc at all, it's defined here for now
-//		so that BeOS executables will find them.
-//		Remove them later!
-
-
-void __deregister_frame_info(void);
-void
-__deregister_frame_info(void)
-{
-}
-
-
-void __register_frame_info(void);
-void
-__register_frame_info(void)
-{
-}
+	// needed for BeOS compatibility - they are set in the startup code
+	// (have a look at the glue/ directory)
 
 
 void
