@@ -2147,7 +2147,22 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 					address, fault_address);
 			}
 		} else {
-			dprintf("vm_page_fault: killing team 0x%lx, ip 0x%lx\n", thread_get_current_thread()->team->id, fault_address);
+#if 1
+			// ToDo: remove me once we have proper userland debugging support (and tools)
+			vm_address_space *aspace = vm_get_current_user_aspace();
+			vm_virtual_map *map = &aspace->virtual_map;
+			vm_area *area;
+
+			acquire_sem_etc(map->sem, READ_COUNT, 0, 0);
+			area = vm_virtual_map_lookup(map, fault_address);
+
+			dprintf("vm_page_fault: killing team 0x%lx, ip %#lx (\"%s\" +%#lx)\n",
+				thread_get_current_thread()->team->id, fault_address,
+				area ? area->name : "???", fault_address - (area ? area->base : 0x0));
+
+			release_sem_etc(map->sem, READ_COUNT, 0);
+			vm_put_aspace(aspace);
+#endif
 			kill_team(team_get_current_team_id());
 		}
 	}
