@@ -111,8 +111,8 @@ public:
 	status_t FindApp(entry_ref *ref, entry_ref *app) const;
 
 	/* Launching, activating, and broadcasting to apps */
-	status_t Broadcast(BMessage *msg) const;
-	status_t Broadcast(BMessage *msg, BMessenger replyTo) const;
+	status_t Broadcast(BMessage *message) const;
+	status_t Broadcast(BMessage *message, BMessenger replyTo) const;
 	status_t StartWatching(BMessenger target,
 		uint32 eventMask = B_REQUEST_LAUNCHED | B_REQUEST_QUIT) const;
 	status_t StopWatching(BMessenger target) const;
