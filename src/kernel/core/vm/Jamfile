@@ -2,6 +2,7 @@ SubDir OBOS_TOP src kernel core vm ;
 
 KernelMergeObject kernel_vm.o :
 	vm.c
+	vm_address_space.c
 	vm_cache.c
 	vm_daemons.c
 	vm_page.c
@@ -10,5 +11,5 @@ KernelMergeObject kernel_vm.o :
 	vm_store_null.c
 	vm_tests.c
 
-	: -fno-pic -Wno-unused -D_KERNEL_MODE=1
+	: -fno-pic -Wno-unused
 	;
