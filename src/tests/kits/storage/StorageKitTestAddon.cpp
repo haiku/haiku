@@ -16,6 +16,7 @@
 #include "ResourcesTest.h"
 #include "ResourceStringsTest.h"
 #include "SymLinkTest.h"
+#include "VolumeTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Storage");
@@ -33,6 +34,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BResources", ResourcesTest::Suite());
 	suite->addTest("BResourceStrings", ResourceStringsTest::Suite());
 	suite->addTest("BSymLink", SymLinkTest::Suite());
+	suite->addTest("BVolume", VolumeTest::Suite());
 	suite->addTest("FindDirectory", FindDirectoryTest::Suite());
 	suite->addTest("MimeSniffer", MimeSnifferTest::Suite());
 	
