@@ -31,6 +31,10 @@
 #include "PatternHandler.h" // for pattern_union
 #include "ServerConfig.h"
 
+#ifdef DISPLAYDRIVER_TEST_HACK
+#include <stdio.h>
+#endif
+
 
 /*!
 	\brief Sets up internal variables needed by the RootLayer
@@ -96,6 +100,7 @@ void RootLayer::RequestDraw(void)
 	}
 
 #ifdef DISPLAYDRIVER_TEST_HACK
+	/* Note to self, commented out tests appear to work correctly */
 	int8 pattern[8];
 	int8 pattern2[8];
 	memset(pattern,255,8);
@@ -106,9 +111,11 @@ void RootLayer::RequestDraw(void)
 	pts[0].y = 200;
 	pts[1].x = 400;
 	pts[1].y = 1000;
-	pts[2].x = 600;
-	pts[2].y = 400;
-	pts[3].x = 1200;
+	//pts[2].x = 600;
+	pts[2].x = 100;
+	pts[2].y = 100;
+	//pts[3].x = 1200;
+	pts[3].x = 200;
 	pts[3].y = 800;
 	BPoint triangle[3];
 	BRect triangleRect(100,100,400,300);
@@ -135,26 +142,66 @@ void RootLayer::RequestDraw(void)
 
 	_layerdata->highcolor.SetColor(255,0,0,255);
 	_layerdata->lowcolor.SetColor(255,255,255,255);
+	printf("FillRect big red\n");
 	_driver->FillRect(r1,_layerdata,pattern);
+	getchar();
 
+	/*
 	_layerdata->highcolor.SetColor(255,255,0,255);
+	printf("StrokeLine yellow\n");
 	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),_layerdata,pattern);
-
+	getchar();
 	_layerdata->highcolor.SetColor(0,0,255,255);
+	printf("StrokeBezier blue\n");
 	_driver->StrokeBezier(pts,_layerdata,pattern);
+	getchar();
+	printf("StrokeArc blue\n");
 	_driver->StrokeArc(BRect(200,300,400,600),30,270,_layerdata,pattern);
+	getchar();
+	printf("StrokeEllipse blue\n");
 	_driver->StrokeEllipse(BRect(200,700,400,900),_layerdata,pattern);
+	getchar();
+	printf("StrokeRect blue\n");
 	_driver->StrokeRect(BRect(650,1000,750,1090),_layerdata,pattern);
+	getchar();
+	printf("StrokeRoundRect blue\n");
 	_driver->StrokeRoundRect(BRect(200,1000,600,1090),30,40,_layerdata,pattern);
-//	_driver->StrokePolygon(polygon,6,polygonRect,_layerdata,pattern);
-//	_driver->StrokeTriangle(triangle,triangleRect,_layerdata,pattern);
+	getchar();
+	printf("StrokePolygon blue\n");
+	_driver->StrokePolygon(polygon,6,polygonRect,_layerdata,pattern);
+	getchar();
+	printf("StrokeTriangle blue\n");
+	_driver->StrokeTriangle(triangle,triangleRect,_layerdata,pattern);
+	getchar();
+	_layerdata->highcolor.SetColor(0,255,0,255);
+	printf("FillArc green\n");
+	_driver->FillArc(BRect(250,300,450,600),30,270,_layerdata,pattern);
+	getchar();
+	*/
 	_layerdata->highcolor.SetColor(255,0,255,255);
-	_driver->FillArc(BRect(1250,300,1450,600),30,270,_layerdata,pattern);
-//	_driver->FillBezier(pts,_layerdata,pattern);
+	printf("FillBezier magenta\n");
+	_driver->FillBezier(pts,_layerdata,pattern);
+	getchar();
+	_layerdata->highcolor.SetColor(0,0,255,255);
+	printf("StrokeBezier blue\n");
+	_driver->StrokeBezier(pts,_layerdata,pattern);
+	getchar();
+	/*
+	_layerdata->highcolor.SetColor(255,0,255,255);
+	printf("FillEllipse magenta\n");
 	_driver->FillEllipse(BRect(800,300,1200,600),_layerdata,pattern);
+	getchar();
+	printf("FillRoundRect striped\n");
 	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,_layerdata,pattern2);
+	getchar();
+	printf("FillPolygon magenta\n");
 	_driver->FillPolygon(polygon,6,polygonRect,_layerdata,pattern);
-//	_driver->FillTriangle(triangle,triangleRect,_layerdata,pattern);
+	getchar();
+	_layerdata->highcolor.SetColor(255,255,0,255);
+	printf("FillTriangle yellow\n");
+	_driver->FillTriangle(triangle,triangleRect,_layerdata,pattern);
+	getchar();
+	*/
 #endif
 }
 
