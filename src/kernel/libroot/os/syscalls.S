@@ -124,6 +124,9 @@ SYSCALL6(sys_start_watching, 118)
 SYSCALL6(sys_stop_watching, 119)
 SYSCALL2(sys_stop_notifying, 120)
 
+/* time calls */
+SYSCALL1(_kern_set_real_time_clock, 138)
+
 /* VM calls */
 SYSCALL6(_kern_create_area, 29)
 SYSCALL5(_kern_clone_area, 30)

@@ -4,6 +4,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <kernel.h>
 #include <ksyscalls.h>
 #include <syscalls.h>
@@ -24,6 +25,7 @@
 #include <ksocket.h>
 #include <kimage.h>
 #include <ksignal.h>
+#include <real_time_clock.h>
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 #include <user_atomic.h>
@@ -47,12 +49,14 @@
 #define arg14 (((uint32 *)arg_buffer)[14])
 #define arg15 (((uint32 *)arg_buffer)[15])
 
-int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
+
+int
+syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 {
 //	dprintf("syscall_dispatcher: thread 0x%x call 0x%x, arg0 0x%x, arg1 0x%x arg2 0x%x arg3 0x%x arg4 0x%x\n",
 //		thread_get_current_thread_id(), call_num, arg0, arg1, arg2, arg3, arg4);
 
-	switch(call_num) {
+	switch (call_num) {
 		case SYSCALL_NULL:
 			*call_ret = 0;
 			break;
@@ -402,6 +406,12 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			                        (size_t *)arg3, (void *)arg4, 
 			                        (size_t)arg5);
 			break;
+
+		// time calls
+		case SYSCALL_SET_REAL_TIME_CLOCK:
+			_user_set_real_time_clock((uint32)arg0);
+			break;
+
 /* removed until net code has goneback into build
 		case SYSCALL_SOCKET:
 			*call_ret = socket((int)arg0, (int)arg1, (int)arg2, false);

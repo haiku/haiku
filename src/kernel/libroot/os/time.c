@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -19,7 +19,7 @@ real_time_clock(void)
 void
 set_real_time_clock(uint32 secs)
 {
-	// ToDo: set_real_time_clock()
+	_kern_set_real_time_clock(secs);
 }
 
 
