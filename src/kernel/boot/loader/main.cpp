@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -34,14 +34,15 @@ main(stage2_args *args)
 
 	TRACE(("boot(): heap initialized...\n"));
 
+	platform_init_video();
+	if ((platform_boot_options() & (BOOT_OPTION_DEBUG_OUTPUT | BOOT_OPTION_MENU)) == 0)
+		platform_switch_to_logo();
+
 	// the main platform dependent initialisation
 	// has already taken place at this point.
 
 	if (vfs_init(args) < B_OK)
 		panic("Could not initialize VFS!\n");
-
-	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
-		platform_switch_to_logo();
 
 	puts("Welcome to the Haiku boot loader!");
 
