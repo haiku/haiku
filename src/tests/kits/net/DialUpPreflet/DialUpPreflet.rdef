@@ -2,7 +2,7 @@
 	DialUpPreflet.rdef
 */
 
-resource app_signature "application/x-haiku.dial-up-preflet";
+resource app_signature "application/x-vnd.haiku.dial-up-preflet";
 
 /* BEOS:APP_FLAGS :
    00000000 = 							   SINGLE LAUNCH
