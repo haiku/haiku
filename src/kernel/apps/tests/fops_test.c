@@ -5,6 +5,7 @@
 #include <ktypes.h>
 #include <resource.h>
 #include <Errors.h>
+#include <errno.h>
 #include <OS.h>
 #include <stdlib.h>
 
