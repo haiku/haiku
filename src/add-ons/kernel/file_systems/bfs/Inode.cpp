@@ -226,22 +226,8 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 
 	fTree = NULL;
 	fCache = NULL;
-
-	if (IsFile())
-		SetFileCache(file_cache_create(fVolume->ID(), ID(), Size(), fVolume->Device()));
 }
 
-
-/*
-Inode::Inode(CachedBlock *cached)
-	:
-	fLock()
-{
-	PRINT(("Inode::Inode(cached = %p) @ %p\n", cached, this));
-
-	Initialize();
-}
-*/
 
 Inode::~Inode()
 {
@@ -1837,6 +1823,7 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 	if (status < B_OK)
 		return status;
 
+	file_cache_set_size(FileCache(), size);
 	return WriteBack(transaction);
 }
 
@@ -2083,7 +2070,7 @@ status_t
 Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 mode,
 	int openMode, uint32 type, off_t *_id, Inode **_inode)
 {
-	FUNCTION();
+	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
 
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
 	Volume *volume = transaction.GetVolume();
@@ -2245,6 +2232,9 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 		FATAL(("new_vnode() failed with: %s\n", strerror(status)));
 		DIE(("new_vnode() failed for inode!"));
 	}
+
+	if (inode->IsFile())
+		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(), inode->Size(), volume->Device()));
 
 	if (_id != NULL)
 		*_id = inode->ID();
