@@ -57,6 +57,101 @@ BMessenger		be_app_messenger;
 BResources*	BApplication::_app_resources = NULL;
 BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 
+property_info gApplicationPropInfo[] =
+{
+        {
+                "Window",
+                        {},
+                        {B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
+                        NULL, 0,
+                        {},
+                        {},
+                        {}
+        },
+        {
+                "Window",
+                        {},
+                        {B_NAME_SPECIFIER},
+                        NULL, 1,
+                        {},
+                        {},
+                        {}
+        },
+        {
+                "Looper",
+                        {},
+                        {B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
+                        NULL, 2,
+                        {},
+                        {},
+                        {}
+        },
+        {
+                "Looper",
+                        {},
+                        {B_ID_SPECIFIER},
+                        NULL, 3,
+                        {},
+                        {},
+                        {}
+        },
+        {
+                "Looper",
+                        {},
+                        {B_NAME_SPECIFIER},
+                        NULL, 4,
+                        {},
+                        {},
+                        {}
+        },
+        {
+                "Name",
+                        {B_GET_PROPERTY},
+                        {B_DIRECT_SPECIFIER},
+                        NULL, 5,
+                        {B_STRING_TYPE},
+                        {},
+                        {}
+        },
+        {
+                "Window",
+                        {B_COUNT_PROPERTIES},
+                        {B_DIRECT_SPECIFIER},
+                        NULL, 5,
+                        {B_INT32_TYPE},
+                        {},
+                        {}
+        },
+        {
+                "Loopers",
+                        {B_GET_PROPERTY},
+                        {B_DIRECT_SPECIFIER},
+                        NULL, 5,
+                        {B_MESSENGER_TYPE},
+                        {},
+                        {}
+        },
+        {
+                "Windows",
+                        {B_GET_PROPERTY},
+                        {B_DIRECT_SPECIFIER},
+                        NULL, 5,
+                        {B_MESSENGER_TYPE},
+                        {},
+                        {}
+        },
+        {
+                "Looper",
+                        {B_COUNT_PROPERTIES},
+                        {B_DIRECT_SPECIFIER},
+                        NULL, 5,
+                        {B_INT32_TYPE},
+                        {},
+                        {}
+        },
+        {}
+};
+
 // argc/argv
 extern const int __libc_argc;
 extern const char * const *__libc_argv;
@@ -384,7 +479,27 @@ void BApplication::SetPulseRate(bigtime_t rate)
 //------------------------------------------------------------------------------
 status_t BApplication::GetSupportedSuites(BMessage* data)
 {
-	return NOT_IMPLEMENTED;
+	status_t err;
+	if (!data)
+	{
+		err = B_BAD_VALUE;
+	}
+
+	if (!err)
+	{
+		err = data->AddString("Suites", "suite/vnd.Be-application");
+		if (!err)
+		{
+			BPropertyInfo PropertyInfo(gApplicationPropInfo);
+			err = data->AddFlat("message", &PropertyInfo);
+			if (!err)
+			{
+				err = BHandler::GetSupportedSuites(data);
+			}
+		}
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t BApplication::Perform(perform_code d, void* arg)

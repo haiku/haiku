@@ -93,7 +93,7 @@ team_id			BLooper::sTeamID = B_ERROR;
 static property_info gLooperPropInfo[] =
 {
 	{
-		"Handler",
+		"Handler"
 			{},
 			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
 			// TODO: what is the extra_data for?
@@ -103,7 +103,7 @@ static property_info gLooperPropInfo[] =
 			{}
 	},
 	{
-		"Handlers",
+		"Handlers"
 			{B_GET_PROPERTY},
 			{B_DIRECT_SPECIFIER},
 			NULL, 0,
@@ -112,7 +112,7 @@ static property_info gLooperPropInfo[] =
 			{}
 	},
 	{
-		"Handler",
+		"Handler"
 			{B_COUNT_PROPERTIES},
 			{B_DIRECT_SPECIFIER},
 			NULL, 0,
@@ -673,9 +673,22 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 									BMessage* specifier, int32 form,
 									const char* property)
 {
+/**
+	@note	When I was first dumping the results of GetSupportedSuites() from
+			various classes, the use of the extra_data field was quite
+			mysterious to me.  Then I dumped BApplication and compared the
+			result against the BeBook's docs for scripting BApplication.  A
+			bunch of it isn't documented, but what is tipped me to the idea
+			that the extra_data is being used as a quick and dirty way to tell
+			what scripting "command" has been sent, e.g., for easy use in a
+			switch statement.  Would certainly be a lot faster than a bunch of
+			string comparisons -- which wouldn't tell the whole story anyway,
+			because of the same name being used for multiple properties.
+ */
 	// Straight from the BeBook
 	BPropertyInfo PropertyInfo(gLooperPropInfo);
-	if (PropertyInfo.FindMatch(msg, index, specifier, form, property) >= 0)
+	uint32 data;
+	if (PropertyInfo.FindMatch(msg, index, specifier, form, property, &data) >= 0)
 	{
 		return this;
 	}
