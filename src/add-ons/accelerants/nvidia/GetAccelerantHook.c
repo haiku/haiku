@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-8/2003
+	Rudolf Cornelissen 10/2002-9/2003
 */
 
 #define MODULE_BIT 0x08000000
@@ -118,8 +118,8 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		CHKA(FILL_SPAN);
 		/* not (yet) used by the app_server:
 		 * so just for application use (BWindowScreen) */
-		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
-		//CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
+//		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
+//		CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
 	}
 
 	/* Return a null pointer for any feature we don't understand. */
@@ -185,7 +185,6 @@ status_t check_overlay_capability(uint32 feature)
 
 status_t check_acc_capability(uint32 feature)
 {
-	bool fill = false;
 	char *msg = "";
 
 	/* setup logmessage text */
@@ -196,15 +195,12 @@ status_t check_acc_capability(uint32 feature)
 		break;
 	case B_FILL_RECTANGLE:
 		msg = "B_FILL_RECTANGLE";
-		fill = true;
 		break;
 	case B_INVERT_RECTANGLE:
 		msg = "B_INVERT_RECTANGLE";
-		fill = true;
 		break;
 	case B_FILL_SPAN:
 		msg = "B_FILL_SPAN";
-		fill = true;
 		break;
 	case B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT:
 		msg = "B_SCREEN_TO_SCREEN_TRANSPARENT_BLIT";
@@ -221,15 +217,6 @@ status_t check_acc_capability(uint32 feature)
 	 * memory pitch.. */
 	if (si->acc_mode)
 	{
-		/* see if we support hardware rectangle fills in the current mode:
-		 * the Matrox card's acc engine can adress upto 16Mbyte memory for this cmd! */
-		if (fill &&
-			((si->fbc.bytes_per_row * si->dm.virtual_height) > (16 * 1024 * 1024)))
-		{
-			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
-			return B_ERROR;
-		}
-
 		LOG(4, ("Acc: Exporting hook %s.\n", msg));
 		return B_OK;
 	}

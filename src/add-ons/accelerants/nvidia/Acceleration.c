@@ -3,21 +3,20 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Mark Watson,
-	Apsed,
-	Rudolf Cornelissen 2/2003.
+	Rudolf Cornelissen 9/2003.
 */
 
 #define MODULE_BIT 0x40000000
-
-// apsed, TODO ?? change interface of nv_acc_* and use NV pseudo DMA
 
 #include "acc_std.h"
 
 void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
 	int i;
 
-	/*do each blit*/
+	/* init acc engine for blit function */
+	nv_acc_setup_blit();
+
+	/* do each blit */
 	i=0;
 	while (count--)
 	{
@@ -37,7 +36,7 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
 void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params *list, uint32 count) {
 	int i;
 
-	/*do each blit*/
+	/* do each blit */
 	i=0;
 	while (count--)
 	{
@@ -59,7 +58,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params 
 void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colour, blit_params *list, uint32 count) {
 	int i;
 
-	/*do each blit*/
+	/* do each blit */
 	i=0;
 	while (count--)
 	{
@@ -80,7 +79,10 @@ void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colo
 void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list, uint32 count) {
 	int i;
 
-	/*draw each rectangle*/
+	/* init acc engine for fill function */
+	nv_acc_setup_rectangle(colorIndex);
+
+	/* draw each rectangle */
 	i=0;
 	while (count--)
 	{
@@ -89,8 +91,7 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 			list[i].left,
 			(list[i].right)+1,
 			list[i].top,
-			(list[i].bottom-list[i].top)+1,
-			colorIndex
+			(list[i].bottom-list[i].top)+1
 		);
 		i++;
 	}
@@ -99,7 +100,10 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 	int i;
 
-	/*draw each rectangle*/
+	/* init acc engine for invert function */
+	nv_acc_setup_rect_invert();
+
+	/* invert each rectangle */
 	i=0;
 	while (count--)
 	{
@@ -108,8 +112,7 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 			list[i].left,
 			(list[i].right)+1,
 			list[i].top,
-			(list[i].bottom-list[i].top)+1,
-			0
+			(list[i].bottom-list[i].top)+1
 		);
 		i++;
 	}
@@ -118,7 +121,10 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count) {
 	int i;
 
-	/*draw each span*/
+	/* init acc engine for fill function */
+	nv_acc_setup_rectangle(colorIndex);
+
+	/* draw each span */
 	i=0;
 	while (count--)
 	{
@@ -127,8 +133,7 @@ void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count) 
 			list[i+1],
 			list[i+2]+1,
 			list[i],
-			1,
-			colorIndex
+			1
 		);
 		i+=3;
 	}

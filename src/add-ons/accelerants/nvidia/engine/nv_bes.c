@@ -1,5 +1,5 @@
 /* Nvidia GeForce Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-08/2003 */
+/* Written by Rudolf Cornelissen 05/2002-10/2003 */
 
 #define MODULE_BIT 0x00000200
 
@@ -7,6 +7,24 @@
 
 //fixme: implement: (used for virtual screens!)
 //void move_overlay(uint16 hdisp_start, uint16 vdisp_start);
+
+status_t nv_bes_init()
+{
+	/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
+	BESW(NV10_INTE, 0x00000000);
+	/* shut off GeForce4MX MPEG2 decoder */
+	BESW(DEC_GENCTRL, 0x00000000);
+	/* setup BES memory-range mask */
+	BESW(NV10_0MEMMASK, ((si->ps.memory_size << 20) - 1));
+	/* unknown, but needed */
+	BESW(NV10_0WHAT, 0x00000000);
+
+	/* setup brightness, contrast and saturation to be 'neutral' */
+	BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
+	BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
+
+	return B_OK;
+}
 
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov, int offset)
@@ -441,25 +459,14 @@ status_t nv_configure_bes
 	 *** sync to BES (Back End Scaler) ***
 	 *************************************/
 
-//fixme if needed... (doesn't look like it)
-	/* Make sure reprogramming the BES completes before the next retrace occurs,
-	 * to prevent register-update glitches (double buffer feature). */
-
-//	LOG(3,("Overlay: starting register programming beyond Vcount %d\n", CR1R(VCOUNT)));
-	/* Even at 1600x1200x90Hz, a single line still takes about 9uS to complete:
-	 * this resolution will generate about 180Mhz pixelclock while we can do
-	 * upto 360Mhz. So snooze about 4uS to prevent bus-congestion... 
-	 * Appr. 200 lines time will provide enough room even on a 100Mhz CPU if it's
-	 * screen is set to the highest refreshrate/resolution possible. */
-//	while (CR1R(VCOUNT) > (si->dm.timing.v_total - 200)) snooze(4);
+	/* Done in card hardware:
+	 * double buffered registers + trigger if programming complete feature. */
 
 
 	/**************************************
 	 *** actually program the registers ***
 	 **************************************/
 
-	/* shut off GeForce4MX MPEG2 decoder */
-	BESW(DEC_GENCTRL, 0x00000000);
 	/* We only use buffer buffer 0: select it. (0x01 = buffer 0, 0x10 = buffer 1) */
 	BESW(NV10_BUFSEL, 0x00000001);  
 	/* setup buffer origin: GeForce uses subpixel precise clipping on left and top! (12.4 values) */
@@ -478,10 +485,6 @@ status_t nv_configure_bes
 		(((vcoordv & 0x0000ffff) - ((vcoordv & 0xffff0000) >> 16) + 1) << 16) |
 		((hcoordv & 0x0000ffff) - ((hcoordv & 0xffff0000) >> 16) + 1)
 		));
-	/* setup BES memory-range mask */
-	BESW(NV10_0MEMMASK, ((si->ps.memory_size << 20) - 1));
-	/* unknown, but needed */
-	BESW(NV10_0WHAT, 0x00000000);
 	/* setup horizontal scaling */
 	BESW(NV10_0ISCALH, (hiscalv << 4));
 	/* setup vertical scaling */
@@ -525,18 +528,6 @@ status_t nv_configure_bes
 			));
 		break;
 	}
-
-	/*************************
-	 *** setup misc. stuff ***
-	 *************************/
-
-	/* setup brightness, contrast and saturation to be 'neutral' */
-	BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
-	BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
-
-	/* on a 500Mhz P3 CPU just logging a line costs 400uS (18-19 vcounts at 1024x768x60Hz)!
-	 * programming the registers above actually costs 180uS here */
-//	LOG(3,("Overlay: completed at Vcount %d\n", CR1R(VCOUNT)));
 
 	return B_OK;
 }

@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-7/2003
+	Rudolf Cornelissen 11/2002-10/2003
 */
 
 #define MODULE_BIT 0x00200000
@@ -386,12 +386,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //	if (target.flags & DUALHEAD_BITS) g400_crtc2_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
-	si->dm.virtual_height += 1;//for clipping!
-//	nv_acc_init();
-	si->dm.virtual_height -= 1;
-
-	/* clear line at bottom of screen (for maven) if dualhead mode */
-//	nv_acc_rectangle(0,si->dm.virtual_width+1,si->dm.virtual_height,1,0);
+	nv_acc_init();
+	/* set up overlay unit for this mode */
+	if (si->ps.card_arch > NV04A) nv_bes_init();
 
 	MSG(("SETMODE: booted since %f mS\n", system_time()/1000.0));
 

@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-8/2003
+   Rudolf Cornelissen 10/2002-10/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -81,7 +81,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.05 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.06 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -212,13 +212,27 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 500 GoGL (NV17)\n"));
 		status = nvxx_general_powerup();
 		break;
-	//fixme: three IDs below correct??
+	case 0x017d10de: /* Nvidia unknown 4 Go */
+		si->ps.card_type = NV17;
+		si->ps.card_arch = NV10A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown 4 Go (NV17)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x018010de: /* Nvidia GeForce4 MX 440 AGP8X */
 	case 0x018110de: /* Nvidia GeForce4 MX 440SE AGP8X */
 	case 0x018210de: /* Nvidia GeForce4 MX 420 AGP8X */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x018610de: /* Nvidia GeForce4 448 Go */
+	case 0x018710de: /* Nvidia GeForce4 488 Go */
+		si->ps.card_type = NV18;
+		si->ps.card_arch = NV10A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV18)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x018810de: /* Nvidia Quadro4 580 XGL */
@@ -298,6 +312,13 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV28)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x028c10de: /* Nvidia unknown 4 Go */
+		si->ps.card_type = NV28;
+		si->ps.card_arch = NV20A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown 4 Go (NV28)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
 		si->ps.card_type = NV20;
 		si->ps.card_arch = NV20A;
@@ -325,11 +346,30 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x031610de: /* Nvidia unknown FX Go */
+	case 0x031710de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x031a10de: /* Nvidia GeForce FX 5600 Go */
 		si->ps.card_type = NV31;
 		si->ps.card_arch = NV30A;
 		si->ps.laptop = true;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 Go (NV31)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x031b10de: /* Nvidia unknown FX Go */
+	case 0x031c10de: /* Nvidia unknown FX Go */
+	case 0x031d10de: /* Nvidia unknown FX Go */
+	case 0x031e10de: /* Nvidia unknown FX Go */
+	case 0x031f10de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV31;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x032110de: /* Nvidia GeForce FX 5200 Ultra */
@@ -339,10 +379,31 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x032410de: /* Nvidia GeForce FX 5200 Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x032610de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x032b10de: /* Nvidia Quadro FX 500 */
 		si->ps.card_type = NV34;
 		si->ps.card_arch = NV30A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro FX 500 (NV34)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x032e10de: /* Nvidia unknown FX Go */
+		si->ps.card_type = NV34;
+		si->ps.card_arch = NV30A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x033010de: /* Nvidia GeForce FX 5900 Ultra */
@@ -718,14 +779,8 @@ status_t nv_general_dac_select(int dac)
 	return B_OK;
 }
 
-/*busy wait until retrace!*/
-status_t nv_general_wait_retrace()
-{
-//	while (!(ACCR(STATUS)&0x8));
-	return B_OK;
-}
-
-/* basic change of card state from VGA to powergraphics -> should work from BIOS init state*/
+/* basic change of card state from VGA to enhanced mode:
+ * Should work from VGA BIOS POST init state. */
 static 
 status_t nv_general_bios_to_powergraphics()
 {
@@ -733,10 +788,15 @@ status_t nv_general_bios_to_powergraphics()
 
 	/* unlock card registers for R/W access */
 	CRTCW(LOCK, 0x57);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	nv_crtc_dpms(false, false, false);
 	nv_crtc_cursor_hide();
+
+	/* let acc engine make power off/power on cycle to start 'fresh' */
+	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	snooze(1000);
 
 	/* power-up all nvidia hardware function blocks */
 	/* bit 28: OVERLAY ENGINE (BES),
@@ -750,43 +810,13 @@ status_t nv_general_bios_to_powergraphics()
 	 * bit  0: TVOUT. (> NV04A) */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
-	/* switch overlay engine to head 1 */
-	//fixme: add other function blocks...
-	NV_REG32(NV32_FUNCSEL) |= 0x00001000;
-	NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
-
-	/* set card to 'enhanced' mode: (only VGA standard registers used for NeoMagic cards) */
-	/* (keep) card enabled, set plain normal memory usage, no old VGA 'tricks' ... */
-//	CRTCW(MODECTL, 0xc3);
-	/* ... plain sequential memory use, more than 64Kb RAM installed,
-	 * switch to graphics mode ... */
-//	SEQW(MEMMODE, 0x0e);
-	/* ... disable bitplane tweaking ... */
-//	GRPHW(ENSETRESET, 0x00);
-	/* ... no logical function tweaking with display data, no data rotation ... */
-//	GRPHW(DATAROTATE, 0x00);
-	/* ... reset read map select to plane 0 ... */
-//	GRPHW(READMAPSEL, 0x00);
-	/* ... set standard mode ... */
-//	GRPHW(MODE, 0x00);
-	/* ... ISA framebuffer mapping is 64Kb window, switch to graphics mode (again),
-	 * select standard adressing ... */
-//	GRPHW(MISC, 0x05);
-	/* ... disable bit masking ... */
-//	GRPHW(BITMASK, 0xff);
-	/* ... attributes are in color, switch to graphics mode (again) ... */
-//	ATBW(MODECTL, 0x01);
-	/* ... set overscan color to black ... */
-//	ATBW(OSCANCOLOR, 0x00);
-	/* ... enable all color planes ... */
-//	ATBW(COLPLANE_EN, 0x0f);
-	/* ... reset horizontal pixelpanning ... */
-//	ATBW(HORPIXPAN, 0x00);
-	/* ...  and reset colorpalette groupselect bits. */
-//	ATBW(COLSEL, 0x00);
-
-	/* setup sequencer clocking mode */
-//	SEQW(CLKMODE, 0x21);
+	if (si->ps.card_arch >= NV10A)
+	{ 
+		/* switch overlay engine to head 1 */
+		//fixme: add other function blocks...
+		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
+	}
 
 	/* enable 'enhanced mode', enable Vsync & Hsync,
 	 * set DAC palette to 8-bit width, disable large screen */
@@ -819,64 +849,46 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	uint8 depth = 8;
 
 	/* determine pixel multiple based on 2D/3D engine constraints */
-	switch (si->ps.card_type)
+	switch (si->ps.card_arch)
 	{
-//	case MIL2:
-		/* see MIL1/2 specs:
-		 * these cards always use a 64bit RAMDAC (TVP3026) and interleaved memory */
-/*		switch (target->space)
+	case NV20A:
+		/* confirmed for:
+		 * GeForce4 Ti4200 */
+		switch (target->space)
 		{
-			case B_CMAP8: acc_mask = 0x7f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x3f; depth = 16; break;
-			case B_RGB16: acc_mask = 0x3f; depth = 16; break;
-			case B_RGB24: acc_mask = 0x7f; depth = 24; break;
-			case B_RGB32: acc_mask = 0x1f; depth = 32; break;
+			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
+			case B_RGB15: acc_mask = 0x1f; depth = 16; break;
+			case B_RGB16: acc_mask = 0x1f; depth = 16; break;
+			case B_RGB24: acc_mask = 0x3f; depth = 24; break;
+			case B_RGB32: acc_mask = 0x0f; depth = 32; break;
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
 		break;
-*/	default:
-		/* see G100 and up specs:
-		 * these cards can do 2D as long as multiples of 32 are used.
-		 * (Note: don't mix this up with adress linearisation!) */
+	default:
+		/* confirmed for:
+		 * TNT1, TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
 		switch (target->space)
 		{
-			case B_CMAP8: depth =  8; break;
-			case B_RGB15: depth = 16; break;
-			case B_RGB16: depth = 16; break;
-			case B_RGB24: depth = 24; break;
-			case B_RGB32: depth = 32; break;
+			case B_CMAP8: acc_mask = 0x0f; depth =  8; break;
+			case B_RGB15: acc_mask = 0x07; depth = 16; break;
+			case B_RGB16: acc_mask = 0x07; depth = 16; break;
+			case B_RGB24: acc_mask = 0x0f; depth = 24; break;
+			case B_RGB32: acc_mask = 0x03; depth = 32; break;
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
-		acc_mask = 0x1f;
 		break;
 	}
 
 	/* determine pixel multiple based on CRTC memory pitch constraints.
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	switch (si->ps.card_type)
+	switch (si->ps.card_arch)
 	{
-//	case MIL2:
-		/* see MIL1/2 specs:
-		 * these cards always use a 64bit RAMDAC and interleaved memory */
-/*		switch (target->space)
-		{
-			case B_CMAP8: crtc_mask = 0x7f; break;
-			case B_RGB15: crtc_mask = 0x3f; break;
-			case B_RGB16: crtc_mask = 0x3f; break;
-*/			/* for B_RGB24 crtc_mask 0x7f is worst case scenario (MIL2 constraint) */
-/*			case B_RGB24: crtc_mask = 0x7f; break; 
-			case B_RGB32: crtc_mask = 0x1f; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-*/	default:
+	default:
 		/* all NV cards */
 		switch (target->space)
 		{
@@ -889,10 +901,10 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
 		}
+//fixme for NV..
 		/* see G400 specs: CRTC2 has different constraints */
 		/* Note:
 		 * set for RGB and B_YCbCr422 modes. Other modes need larger multiples! */
-//fixme..
 		if (target->flags & DUALHEAD_BITS)
 		{
 			switch (target->space)
@@ -904,6 +916,7 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 					return B_ERROR;
 			}
 		}
+//end fixme.
 		break;
 	}
 
@@ -911,19 +924,73 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
 	si->acc_mode = true;
 	/* check virtual_width */
-	switch (si->ps.card_type)
+	switch (si->ps.card_arch)
 	{
+	case NV04A:
+		/* confirmed for:
+		 * TNT1, TNT2, TNT2-M64 */
+		switch(target->space)
+		{
+		case B_CMAP8:
+			if (target->virtual_width > 8176) si->acc_mode = false;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			if (target->virtual_width > 4088) si->acc_mode = false;
+			break;
+		case B_RGB24_LITTLE:
+			if (target->virtual_width > 2720) si->acc_mode = false;
+			break;
+		case B_RGB32_LITTLE:
+			if (target->virtual_width > 2044) si->acc_mode = false;
+			break;
+		}
+		break;
+	case NV20A:
+		/* confirmed for:
+		 * GeForce4 Ti4200 */
+		switch(target->space)
+		{
+		case B_CMAP8:
+			if (target->virtual_width > 16320) si->acc_mode = false;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			if (target->virtual_width > 8160) si->acc_mode = false;
+			break;
+		case B_RGB24_LITTLE:
+			if (target->virtual_width > 5440) si->acc_mode = false;
+			break;
+		case B_RGB32_LITTLE:
+			if (target->virtual_width > 4080) si->acc_mode = false;
+			break;
+		}
+		break;
 	default:
-		/* G200-G550 */
-		/* acc constraint: */
-		if (target->virtual_width > 4096) si->acc_mode = false;
-		/* for 32bit mode a lower CRTC1 restriction applies! */
-		if ((target->space == B_RGB32_LITTLE) && (target->virtual_width > (4092 & ~acc_mask)))
-			si->acc_mode = false;
+		/* confirmed for:
+		 * GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 */
+		switch(target->space)
+		{
+		case B_CMAP8:
+			if (target->virtual_width > 16368) si->acc_mode = false;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			if (target->virtual_width > 8184) si->acc_mode = false;
+			break;
+		case B_RGB24_LITTLE:
+			if (target->virtual_width > 5456) si->acc_mode = false;
+			break;
+		case B_RGB32_LITTLE:
+			if (target->virtual_width > 4092) si->acc_mode = false;
+			break;
+		}
 		break;
 	}
 	/* virtual_height */
-	if (target->virtual_height > 2048) si->acc_mode = false;
+	/* (NV cards can even do more than this(?)...
+	 *  but 4096 is confirmed on all cards at max. accelerated width.) */
+	if (target->virtual_height > 4096) si->acc_mode = false;
 
 	/* now check NV virtual_size based on CRTC constraints */
 	{
@@ -955,9 +1022,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 		 * 'Limiting here' to the variable size that's at least available (uint16). */
 		if (target->virtual_height > 65535) target->virtual_height = 65535;
 	}
-
-//temp disabled:
-si->acc_mode = false;
 
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace

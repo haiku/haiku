@@ -99,9 +99,12 @@ status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v);
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);
 status_t nv_acc_init();
-status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
-status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl,uint32 col);
+status_t nv_acc_setup_blit();
 status_t nv_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
+status_t nv_acc_setup_rectangle(uint32 color);
+status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
+status_t nv_acc_setup_rect_invert();
+status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
 status_t nv_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
 status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
@@ -109,6 +112,7 @@ status_t nv_acc_wait_idle();
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
+status_t nv_bes_init();
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t nv_release_bes();

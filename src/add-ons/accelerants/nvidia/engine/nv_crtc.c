@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-8/2003
+   Rudolf Cornelissen 11/2002-9/2003
 */
 
 #define MODULE_BIT 0x00040000
@@ -51,6 +51,7 @@ status_t nv_crtc_validate_timing(
 
 /*vertical*/
 	/* confine to required number of bits, taking logic into account */
+	//fixme if needed: on GeForce cards there are 12 instead of 11 bits...
 	if (*vd_e > (0x7ff - 2)) *vd_e = (0x7ff - 2);
 	if (*vs_s > (0x7ff - 1)) *vs_s = (0x7ff - 1);
 	if (*vs_e >  0x7ff     ) *vs_e =  0x7ff     ;
@@ -184,6 +185,19 @@ status_t nv_crtc_set_timing(display_mode target)
 			//| ((linecomp & 0x400) >> 3)	
 			));
 
+		/* more vertical extended regs (on GeForce cards only) */
+		if (si->ps.card_arch >= NV10A)
+		{ 
+			CRTCW(EXTRA,
+				(
+			 	((vtotal & 0x800) >> (11 - 0)) |
+				((vdisp_e & 0x800) >> (11 - 2)) |
+				((vsync_s & 0x800) >> (11 - 4)) |
+				((vblnk_s & 0x800) >> (11 - 6))
+				//fixme: do we miss another linecomp bit!?!
+				));
+		}
+
 		/* setup 'large screen' mode */
 		if (target.timing.h_display >= 1280)
 			CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xfb));
@@ -217,6 +231,10 @@ status_t nv_crtc_set_timing(display_mode target)
 
 		LOG(2,(", MISC reg readback: $%02x\n", NV_REG8(NV8_MISCR)));
 	}
+
+	/* always disable interlaced operation */
+	/* (interlace is only supported on upto and including NV15 except for NV11) */
+	CRTCW(INTERLACE, 0xff);
 
 	return B_OK;
 }

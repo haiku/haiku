@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/08-2003 */
+/* Written by Rudolf Cornelissen 05-2002/09-2003 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -441,8 +441,9 @@ status_t GET_OVERLAY_CONSTRAINTS
 			oc->v_scale.min = 0.125;
 			break;
 		}
-		oc->h_scale.max = 16384/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
-		oc->v_scale.max = 16384/(float)ob->height;
+		/* found spec on the net for GF256-GF4. Still needs confirmation... */
+		oc->h_scale.max = 8.0;
+		oc->v_scale.max = 8.0;
 
 		return B_OK;
 	}

@@ -33,9 +33,9 @@
 #define NVCFG_CFG_15	0x70 //unknown if used
 #define NVCFG_CFG_16	0x74 //unknown if used
 #define NVCFG_CFG_17	0x78 //unknown if used
-#define NVCFG_GF2IGPU	0x7c
+#define NVCFG_GF2IGPU	0x7c //wrong...
 #define NVCFG_CFG_19	0x80 //unknown if used
-#define NVCFG_GF4MXIGPU	0x84
+#define NVCFG_GF4MXIGPU	0x84 //wrong...
 #define NVCFG_CFG_21	0x88 //unknown if used
 #define NVCFG_CFG_22	0x8c //unknown if used
 #define NVCFG_CFG_23	0x90 //unknown if used
@@ -78,12 +78,8 @@
        pNv->riva.PRAMDAC = pNv->riva.PRAMDAC0;
        pNv->riva.PDIO = pNv->riva.PDIO0;
     }
-*/
-    /*
-     * These registers are read/write as 8 bit values.  Probably have to map
-     * sparse on alpha.
-     */
-/*    pNv->riva.PCIO0 = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
+
+    pNv->riva.PCIO0 = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
                                            pNv->PciTag, regBase+0x00601000,
                                            0x00003000);
     pNv->riva.PDIO0 = (U008 *)xf86MapPciMem(pScrn->scrnIndex, mmioFlags,
@@ -97,9 +93,369 @@
     pNv->riva.PCRTC0 = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
                                      regBase+0x00600000, 0x00003000);
 
-Set interrupt enable.
-chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
+    pNv->riva.FIFO    = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00800000, 0x00010000);
+
+    pNv->riva.PFIFO   = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00002000, 0x00002000);
+
+    pNv->riva.PFB     = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00100000, 0x00001000);
+
+    pNv->riva.PMC     = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00000000, 0x00009000);
+
+    pNv->riva.PTIMER  = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00009000, 0x00001000);
+
+    pNv->riva.PRAMIN = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                     regBase+0x00710000, 0x00010000);
+
+    pNv->riva.PGRAPH  = xf86MapPciMem(pScrn->scrnIndex, mmioFlags, pNv->PciTag,
+                                      regBase+0x00400000, 0x00002000);
 */
+
+/* used NV INT registers for vblank */
+#define NV32_MAIN_INTE		0x00000140
+#define NV32_CRTC_INTS		0x00600100
+#define NV32_CRTC_INTE		0x00600140
+
+/* NV ACCeleration registers */
+/* engine initialisation registers */
+#define NVACC_FORMATS		0x00400618
+#define NVACC_OFFSET0		0x00400640
+#define NVACC_OFFSET1		0x00400644
+#define NVACC_OFFSET2		0x00400648
+#define NVACC_OFFSET3		0x0040064c
+#define NVACC_OFFSET4		0x00400650
+#define NVACC_OFFSET5		0x00400654
+#define NVACC_BBASE0		0x00400658
+#define NVACC_BBASE1		0x0040065c
+#define NVACC_BBASE2		0x00400660
+#define NVACC_BBASE3		0x00400664
+#define NVACC_NV10_BBASE4	0x00400668
+#define NVACC_NV10_BBASE5	0x0040066c
+#define NVACC_PITCH0		0x00400670
+#define NVACC_PITCH1		0x00400674
+#define NVACC_PITCH2		0x00400678
+#define NVACC_PITCH3		0x0040067c
+#define NVACC_PITCH4		0x00400680
+#define NVACC_BLIMIT0		0x00400684
+#define NVACC_BLIMIT1		0x00400688
+#define NVACC_BLIMIT2		0x0040068c
+#define NVACC_BLIMIT3		0x00400690
+#define NVACC_NV10_BLIMIT4	0x00400694
+#define NVACC_NV10_BLIMIT5	0x00400698
+#define NVACC_BPIXEL		0x00400724
+#define NVACC_NV20_OFFSET0	0x00400820
+#define NVACC_NV20_OFFSET1	0x00400824
+#define NVACC_NV20_OFFSET2	0x00400828
+#define NVACC_NV20_OFFSET3	0x0040082c
+#define NVACC_STRD_FMT		0x00400830
+#define NVACC_NV20_PITCH0	0x00400850
+#define NVACC_NV20_PITCH1	0x00400854
+#define NVACC_NV20_PITCH2	0x00400858
+#define NVACC_NV20_PITCH3	0x0040085c
+#define NVACC_NV20_BLIMIT6	0x00400864
+#define NVACC_NV20_BLIMIT7	0x00400868
+#define NVACC_NV20_BLIMIT8	0x0040086c
+#define NVACC_NV20_BLIMIT9	0x00400870
+#define NVACC_NV30_WHAT		0x00400890
+
+/* specials */
+#define	NVACC_DEBUG0 		0x00400080
+#define	NVACC_DEBUG1 		0x00400084
+#define	NVACC_DEBUG2		0x00400088
+#define	NVACC_DEBUG3		0x0040008c
+#define	NVACC_NV10_DEBUG4 	0x00400090
+#define NVACC_ACC_INTS		0x00400100
+#define NVACC_ACC_INTE		0x00400140
+#define NVACC_NV10_CTX_CTRL	0x00400144
+#define NVACC_STATUS		0x00400700
+#define NVACC_NV04_SURF_TYP	0x0040070c
+#define NVACC_NV10_SURF_TYP	0x00400710
+#define NVACC_NV04_ACC_STAT	0x00400710
+#define NVACC_NV10_ACC_STAT	0x00400714
+#define NVACC_FIFO_EN		0x00400720
+#define NVACC_PAT_SHP		0x00400810
+#define NVACC_NV10_XFMOD0	0x00400f40
+#define NVACC_NV10_XFMOD1	0x00400f44
+#define NVACC_NV10_PIPEADR	0x00400f50
+#define NVACC_NV10_PIPEDAT	0x00400f54
+/* PGRAPH cache registers */
+#define	NVACC_CACHE1_1		0x00400160
+#define	NVACC_CACHE1_2		0x00400180
+#define	NVACC_CACHE1_3		0x004001a0
+#define	NVACC_CACHE1_4		0x004001c0
+#define	NVACC_CACHE1_5		0x004001e0
+#define	NVACC_CACHE2_1		0x00400164
+#define	NVACC_CACHE2_2		0x00400184
+#define	NVACC_CACHE2_3		0x004001a4
+#define	NVACC_CACHE2_4		0x004001c4
+#define	NVACC_CACHE2_5		0x004001e4
+#define	NVACC_CACHE3_1		0x00400168
+#define	NVACC_CACHE3_2		0x00400188
+#define	NVACC_CACHE3_3		0x004001a8
+#define	NVACC_CACHE3_4		0x004001c8
+#define	NVACC_CACHE3_5		0x004001e8
+#define	NVACC_CACHE4_1		0x0040016c
+#define	NVACC_CACHE4_2		0x0040018c
+#define	NVACC_CACHE4_3		0x004001ac
+#define	NVACC_CACHE4_4		0x004001cc
+#define	NVACC_CACHE4_5		0x004001ec
+#define	NVACC_NV10_CACHE5_1	0x00400170
+#define	NVACC_NV04_CTX_CTRL	0x00400170
+#define	NVACC_CACHE5_2		0x00400190
+#define	NVACC_CACHE5_3		0x004001b0
+#define	NVACC_CACHE5_4		0x004001d0
+#define	NVACC_CACHE5_5		0x004001f0
+#define	NVACC_NV10_CACHE6_1	0x00400174
+#define	NVACC_CACHE6_2		0x00400194
+#define	NVACC_CACHE6_3		0x004001b4
+#define	NVACC_CACHE6_4		0x004001d4
+#define	NVACC_CACHE6_5		0x004001f4
+#define	NVACC_NV10_CACHE7_1	0x00400178
+#define	NVACC_CACHE7_2		0x00400198
+#define	NVACC_CACHE7_3		0x004001b8
+#define	NVACC_CACHE7_4		0x004001d8
+#define	NVACC_CACHE7_5		0x004001f8
+#define	NVACC_NV10_CACHE8_1	0x0040017c
+#define	NVACC_CACHE8_2		0x0040019c
+#define	NVACC_CACHE8_3		0x004001bc
+#define	NVACC_CACHE8_4		0x004001dc
+#define	NVACC_CACHE8_5		0x004001fc
+#define	NVACC_NV10_CTX_SW1	0x0040014c
+#define	NVACC_NV10_CTX_SW2	0x00400150
+#define	NVACC_NV10_CTX_SW3	0x00400154
+#define	NVACC_NV10_CTX_SW4	0x00400158
+#define	NVACC_NV10_CTX_SW5	0x0040015c
+/* engine tile registers src */
+#define NVACC_NV20_FBWHAT0	0x00100200
+#define NVACC_NV20_FBWHAT1	0x00100204
+#define NVACC_NV10_FBTIL0AD	0x00100240
+#define NVACC_NV10_FBTIL0ED	0x00100244
+#define NVACC_NV10_FBTIL0PT	0x00100248
+#define NVACC_NV10_FBTIL0ST	0x0010024c
+#define NVACC_NV10_FBTIL1AD	0x00100250
+#define NVACC_NV10_FBTIL1ED	0x00100254
+#define NVACC_NV10_FBTIL1PT	0x00100258
+#define NVACC_NV10_FBTIL1ST	0x0010025c
+#define NVACC_NV10_FBTIL2AD	0x00100260
+#define NVACC_NV10_FBTIL2ED	0x00100264
+#define NVACC_NV10_FBTIL2PT	0x00100268
+#define NVACC_NV10_FBTIL2ST	0x0010026c
+#define NVACC_NV10_FBTIL3AD	0x00100270
+#define NVACC_NV10_FBTIL3ED	0x00100274
+#define NVACC_NV10_FBTIL3PT	0x00100278
+#define NVACC_NV10_FBTIL3ST	0x0010027c
+#define NVACC_NV10_FBTIL4AD	0x00100280
+#define NVACC_NV10_FBTIL4ED	0x00100284
+#define NVACC_NV10_FBTIL4PT	0x00100288
+#define NVACC_NV10_FBTIL4ST	0x0010028c
+#define NVACC_NV10_FBTIL5AD	0x00100290
+#define NVACC_NV10_FBTIL5ED	0x00100294
+#define NVACC_NV10_FBTIL5PT	0x00100298
+#define NVACC_NV10_FBTIL5ST	0x0010029c
+#define NVACC_NV10_FBTIL6AD	0x001002a0
+#define NVACC_NV10_FBTIL6ED	0x001002a4
+#define NVACC_NV10_FBTIL6PT	0x001002a8
+#define NVACC_NV10_FBTIL6ST	0x001002ac
+#define NVACC_NV10_FBTIL7AD	0x001002b0
+#define NVACC_NV10_FBTIL7ED	0x001002b4
+#define NVACC_NV10_FBTIL7PT	0x001002b8
+#define NVACC_NV10_FBTIL7ST	0x001002bc
+/* engine tile registers dst */
+#define NVACC_NV20_WHAT0	0x004009a4
+#define NVACC_NV20_WHAT1	0x004009a8
+#define NVACC_NV10_TIL0AD	0x00400b00
+#define NVACC_NV10_TIL0ED	0x00400b04
+#define NVACC_NV10_TIL0PT	0x00400b08
+#define NVACC_NV10_TIL0ST	0x00400b0c
+#define NVACC_NV10_TIL1AD	0x00400b10
+#define NVACC_NV10_TIL1ED	0x00400b14
+#define NVACC_NV10_TIL1PT	0x00400b18
+#define NVACC_NV10_TIL1ST	0x00400b1c
+#define NVACC_NV10_TIL2AD	0x00400b20
+#define NVACC_NV10_TIL2ED	0x00400b24
+#define NVACC_NV10_TIL2PT	0x00400b28
+#define NVACC_NV10_TIL2ST	0x00400b2c
+#define NVACC_NV10_TIL3AD	0x00400b30
+#define NVACC_NV10_TIL3ED	0x00400b34
+#define NVACC_NV10_TIL3PT	0x00400b38
+#define NVACC_NV10_TIL3ST	0x00400b3c
+#define NVACC_NV10_TIL4AD	0x00400b40
+#define NVACC_NV10_TIL4ED	0x00400b44
+#define NVACC_NV10_TIL4PT	0x00400b48
+#define NVACC_NV10_TIL4ST	0x00400b4c
+#define NVACC_NV10_TIL5AD	0x00400b50
+#define NVACC_NV10_TIL5ED	0x00400b54
+#define NVACC_NV10_TIL5PT	0x00400b58
+#define NVACC_NV10_TIL5ST	0x00400b5c
+#define NVACC_NV10_TIL6AD	0x00400b60
+#define NVACC_NV10_TIL6ED	0x00400b64
+#define NVACC_NV10_TIL6PT	0x00400b68
+#define NVACC_NV10_TIL6ST	0x00400b6c
+#define NVACC_NV10_TIL7AD	0x00400b70
+#define NVACC_NV10_TIL7ED	0x00400b74
+#define NVACC_NV10_TIL7PT	0x00400b78
+#define NVACC_NV10_TIL7ST	0x00400b7c
+/* cache setup registers */
+#define NVACC_PF_INTSTAT	0x00002100
+#define NVACC_PF_INTEN		0x00002140
+#define NVACC_PF_RAMHT		0x00002210
+#define NVACC_PF_RAMFC		0x00002214
+#define NVACC_PF_RAMRO		0x00002218
+#define NVACC_PF_CACHES		0x00002500
+#define NVACC_PF_SIZE		0x0000250c
+#define NVACC_PF_CACH0_PSH0	0x00003000
+#define NVACC_PF_CACH0_PUL0	0x00003050
+#define NVACC_PF_CACH0_PUL1	0x00003054
+#define NVACC_PF_CACH1_PSH0	0x00003200
+#define NVACC_PF_CACH1_PSH1	0x00003204
+#define NVACC_PF_CACH1_DMAI	0x0000322c
+#define NVACC_PF_CACH1_PUL0	0x00003250
+#define NVACC_PF_CACH1_PUL1 0x00003254
+#define NVACC_PF_CACH1_HASH	0x00003258
+/* Ptimer registers */
+#define NVACC_PT_INTSTAT	0x00009100
+#define NVACC_PT_INTEN		0x00009140
+#define NVACC_PT_NUMERATOR	0x00009200
+#define NVACC_PT_DENOMINATR	0x00009210
+/* used PRAMIN registers */
+#define NVACC_PR_CTX0_R		0x00711400
+#define NVACC_PR_CTX1_R		0x00711404
+#define NVACC_PR_CTX2_R		0x00711408
+#define NVACC_PR_CTX3_R		0x0071140c
+#define NVACC_PR_CTX0_0		0x00711420
+#define NVACC_PR_CTX1_0		0x00711424
+#define NVACC_PR_CTX2_0		0x00711428
+#define NVACC_PR_CTX3_0		0x0071142c
+#define NVACC_PR_CTX0_1		0x00711430
+#define NVACC_PR_CTX1_1		0x00711434
+#define NVACC_PR_CTX2_1		0x00711438
+#define NVACC_PR_CTX3_1		0x0071143c
+#define NVACC_PR_CTX0_2		0x00711440
+#define NVACC_PR_CTX1_2		0x00711444
+#define NVACC_PR_CTX2_2		0x00711448
+#define NVACC_PR_CTX3_2		0x0071144c
+#define NVACC_PR_CTX0_3		0x00711450
+#define NVACC_PR_CTX1_3		0x00711454
+#define NVACC_PR_CTX2_3		0x00711458
+#define NVACC_PR_CTX3_3		0x0071145c
+#define NVACC_PR_CTX0_4		0x00711460
+#define NVACC_PR_CTX1_4		0x00711464
+#define NVACC_PR_CTX2_4		0x00711468
+#define NVACC_PR_CTX3_4		0x0071146c
+#define NVACC_PR_CTX0_5		0x00711470
+#define NVACC_PR_CTX1_5		0x00711474
+#define NVACC_PR_CTX2_5		0x00711478
+#define NVACC_PR_CTX3_5		0x0071147c
+#define NVACC_PR_CTX0_6		0x00711480
+#define NVACC_PR_CTX1_6		0x00711484
+#define NVACC_PR_CTX2_6		0x00711488
+#define NVACC_PR_CTX3_6		0x0071148c
+#define NVACC_PR_CTX0_7		0x00711490
+#define NVACC_PR_CTX1_7		0x00711494
+#define NVACC_PR_CTX2_7		0x00711498
+#define NVACC_PR_CTX3_7		0x0071149c
+#define NVACC_PR_CTX0_8		0x007114a0
+#define NVACC_PR_CTX1_8		0x007114a4
+#define NVACC_PR_CTX2_8		0x007114a8
+#define NVACC_PR_CTX3_8		0x007114ac
+#define NVACC_PR_CTX0_9		0x007114b0
+#define NVACC_PR_CTX1_9		0x007114b4
+#define NVACC_PR_CTX2_9		0x007114b8
+#define NVACC_PR_CTX3_9		0x007114bc
+#define NVACC_PR_CTX0_A		0x007114c0
+#define NVACC_PR_CTX1_A		0x007114c4 /* not used */
+#define NVACC_PR_CTX2_A		0x007114c8
+#define NVACC_PR_CTX3_A		0x007114cc
+#define NVACC_PR_CTX0_B		0x007114d0
+#define NVACC_PR_CTX1_B		0x007114d4
+#define NVACC_PR_CTX2_B		0x007114d8
+#define NVACC_PR_CTX3_B		0x007114dc
+#define NVACC_PR_CTX0_C		0x007114e0
+#define NVACC_PR_CTX1_C		0x007114e4
+#define NVACC_PR_CTX2_C		0x007114e8
+#define NVACC_PR_CTX3_C		0x007114ec
+#define NVACC_PR_CTX0_D		0x007114f0
+#define NVACC_PR_CTX1_D		0x007114f4
+#define NVACC_PR_CTX2_D		0x007114f8
+#define NVACC_PR_CTX3_D		0x007114fc
+#define NVACC_PR_CTX0_E		0x00711500
+#define NVACC_PR_CTX1_E		0x00711504
+#define NVACC_PR_CTX2_E		0x00711508
+#define NVACC_PR_CTX3_E		0x0071150c
+/* used RAMHT registers (hash-table(?)) */
+#define NVACC_HT_HANDL_00	0x00710000
+#define NVACC_HT_VALUE_00	0x00710004
+#define NVACC_HT_HANDL_01	0x00710008
+#define NVACC_HT_VALUE_01	0x0071000c
+#define NVACC_HT_HANDL_02	0x00710010
+#define NVACC_HT_VALUE_02	0x00710014
+#define NVACC_HT_HANDL_03	0x00710018
+#define NVACC_HT_VALUE_03	0x0071001c
+#define NVACC_HT_HANDL_04	0x00710020
+#define NVACC_HT_VALUE_04	0x00710024
+#define NVACC_HT_HANDL_05	0x00710028
+#define NVACC_HT_VALUE_05	0x0071002c
+#define NVACC_HT_HANDL_06	0x00710030
+#define NVACC_HT_VALUE_06	0x00710034
+#define NVACC_HT_HANDL_10	0x00710080
+#define NVACC_HT_VALUE_10	0x00710084
+#define NVACC_HT_HANDL_11	0x00710088
+#define NVACC_HT_VALUE_11	0x0071008c
+#define NVACC_HT_HANDL_12	0x00710090
+#define NVACC_HT_VALUE_12	0x00710094
+#define NVACC_HT_HANDL_13	0x00710098
+#define NVACC_HT_VALUE_13	0x0071009c
+#define NVACC_HT_HANDL_14	0x007100a0
+#define NVACC_HT_VALUE_14	0x007100a4
+#define NVACC_HT_HANDL_15	0x007100a8
+#define NVACC_HT_VALUE_15	0x007100ac
+#define NVACC_HT_HANDL_16	0x007100b0
+#define NVACC_HT_VALUE_16	0x007100b4
+#define NVACC_HT_HANDL_17	0x007100b8
+#define NVACC_HT_VALUE_17	0x007100bc
+
+/* acc engine fifo setup registers (for function_register 'mappings') */
+#define	NVACC_FIFO_00800000	0x00800000
+#define	NVACC_FIFO_00802000	0x00802000
+#define	NVACC_FIFO_00804000	0x00804000
+#define	NVACC_FIFO_00806000	0x00806000
+#define	NVACC_FIFO_00808000	0x00808000
+#define	NVACC_FIFO_0080a000	0x0080a000
+#define	NVACC_FIFO_0080c000	0x0080c000
+#define	NVACC_FIFO_0080e000	0x0080e000
+
+/* ROP3 registers (Raster OPeration) */
+#define NV16_ROP_FIFOFREE	0x00800010 /* little endian */
+#define NVACC_ROP_ROP3		0x00800300 /* 'mapped' from 0x00420300 */
+
+/* clip registers */
+#define NV16_CLP_FIFOFREE	0x00802010 /* little endian */
+#define NVACC_CLP_TOPLEFT	0x00802300 /* 'mapped' from 0x00450300 */
+#define NVACC_CLP_WIDHEIGHT	0x00802304 /* 'mapped' from 0x00450304 */
+
+/* pattern registers */
+#define NV16_PAT_FIFOFREE	0x00804010 /* little endian */
+#define NVACC_PAT_SHAPE		0x00804308 /* 'mapped' from 0x00460308 */
+#define NVACC_PAT_COLOR0	0x00804310 /* 'mapped' from 0x00460310 */
+#define NVACC_PAT_COLOR1	0x00804314 /* 'mapped' from 0x00460314 */
+#define NVACC_PAT_MONO1		0x00804318 /* 'mapped' from 0x00460318 */
+#define NVACC_PAT_MONO2		0x0080431c /* 'mapped' from 0x0046031c */
+
+/* blit registers */
+#define NV16_BLT_FIFOFREE	0x00808010 /* little endian */
+#define NVACC_BLT_TOPLFTSRC	0x00808300 /* 'mapped' from 0x00500300 */
+#define NVACC_BLT_TOPLFTDST	0x00808304 /* 'mapped' from 0x00500304 */
+#define NVACC_BLT_SIZE		0x00808308 /* 'mapped' from 0x00500308 */
+
+/* used bitmap registers */
+#define NV16_BMP_FIFOFREE	0x0080a010 /* little endian */
+#define NVACC_BMP_COLOR1A	0x0080a3fc /* 'mapped' from 0x006b03fc */
+#define NVACC_BMP_UCRECTL_0	0x0080a400 /* 'mapped' from 0x006b0400 */
+#define NVACC_BMP_UCRECSZ_0	0x0080a404 /* 'mapped' from 0x006b0404 */
 
 /* Nvidia PCI direct registers */
 #define NV32_PWRUPCTRL		0x00000200
@@ -114,6 +470,7 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 
 /* bootstrap info registers */
 #define NV32_NV4STRAPINFO	0x00100000
+#define NV32_PFB_CONFIG_0	0x00100200
 #define NV32_NV10STRAPINFO	0x0010020c
 #define NV32_NVSTRAPINFO2	0x00101000
 
@@ -203,6 +560,8 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NVCRTCX_CURCTL2		0x2f
 #define NVCRTCX_CURCTL1		0x30
 #define NVCRTCX_CURCTL0		0x31
+#define NVCRTCX_INTERLACE	0x39
+#define NVCRTCX_EXTRA		0x41
 
 /* Nvidia ATTRIBUTE indexed registers */
 /* VGA standard registers: */
@@ -228,6 +587,7 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NVGRPHX_BITMASK		0x08
 
 /* Nvidia BES (Back End Scaler) registers (>= NV10) */
+#define NVBES_NV10_INTE		0x00008140
 #define NVBES_NV10_BUFSEL	0x00008700
 #define NVBES_NV10_GENCTRL	0x00008704
 #define NVBES_NV10_COLKEY	0x00008b00
@@ -260,11 +620,6 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 /* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
 #define NVBES_DEC_GENCTRL	0x00001588
 
-/*
-	    chip->PMC[0x00008140/4] = 0;
-*/
-//end new.
-
 /* NV 2nd CRTC registers (>= G400) */
 #define NVCR2_CTL           0x3C10
 #define NVCR2_HPARAM        0x3C14
@@ -278,50 +633,6 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define NVCR2_MISC          0x3C44
 #define NVCR2_VCOUNT        0x3C48
 #define NVCR2_DATACTL       0x3C4C
-
-/* NV ACCeleration registers */
-#define NVACC_DWGCTL          0x1C00
-#define NVACC_MACCESS         0x1C04
-#define NVACC_MCTLWTST        0x1C08
-#define NVACC_ZORG            0x1C0C
-#define NVACC_PLNWT           0x1C1C
-#define NVACC_BCOL            0x1C20
-#define NVACC_FCOL            0x1C24
-#define NVACC_XYSTRT          0x1C40
-#define NVACC_XYEND           0x1C44
-#define NVACC_SGN             0x1C58
-#define NVACC_LEN             0x1C5C
-#define NVACC_AR0             0x1C60
-#define NVACC_AR3             0x1C6C
-#define NVACC_AR5             0x1C74
-#define NVACC_CXBNDRY         0x1C80
-#define NVACC_FXBNDRY         0x1C84
-#define NVACC_YDSTLEN         0x1C88
-#define NVACC_PITCH           0x1C8C
-#define NVACC_YDST            0x1C90
-#define NVACC_YDSTORG         0x1C94
-#define NVACC_YTOP            0x1C98
-#define NVACC_YBOT            0x1C9C
-#define NVACC_CXLEFT          0x1CA0
-#define NVACC_CXRIGHT         0x1CA4
-#define NVACC_FXLEFT          0x1CA8
-#define NVACC_FXRIGHT         0x1CAC
-#define NVACC_STATUS          0x1E14
-#define NVACC_ICLEAR          0x1E18 /* required for interrupt stuff */
-#define NVACC_IEN             0x1E1C /* required for interrupt stuff */
-#define NVACC_RST             0x1E40
-#define NVACC_MEMRDBK         0x1E44
-#define NVACC_OPMODE          0x1E54
-#define NVACC_PRIMADDRESS     0x1E58
-#define NVACC_PRIMEND         0x1E5C
-#define NVACC_TEXORG          0x2C24 // >= G100 
-#define NVACC_DWGSYNC         0x2C4C // >= G200
-#define NVACC_TEXORG1         0x2CA4 // >= G200
-#define NVACC_TEXORG2         0x2CA8 // >= G200 
-#define NVACC_TEXORG3         0x2CAC // >= G200 
-#define NVACC_TEXORG4         0x2CB0 // >= G200 
-#define NVACC_SRCORG          0x2CB4 // >= G200
-#define NVACC_DSTORG          0x2CB8 // >= G200
 
 /*MAVEN registers (<= G400) */
 #define NVMAV_PGM            0x3E
@@ -416,6 +727,10 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 /* read and write from PCI GRAPHICS indexed registers */
 #define GRPHW(A,B)(NV_REG16(NV16_GRPHIND) = ((NVGRPHX_##A) | ((B) << 8)))
 #define GRPHR(A)  (NV_REG8(NV8_GRPHIND) = (NVGRPHX_##A), NV_REG8(NV8_GRPHDAT))
+
+/* read and write from the acceleration engine registers */
+#define ACCR(A)    (NV_REG32(NVACC_##A))
+#define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
 //end new.
 
 /* read and write from maven (<= G400) */
@@ -423,11 +738,6 @@ chip->PMC[0x00000140/4]  = chip->EnableIRQ & 0x01;
 #define MAVW(A,B)   (i2c_maven_write(NVMAV_##A ,B))
 #define MAVRW(A)    (i2c_maven_read (NVMAV_##A )|(i2c_maven_read(NVMAV_##A +1)<<8))
 #define MAVWW(A,B)  (i2c_maven_write(NVMAV_##A ,B &0xFF),i2c_maven_write(NVMAV_##A +1,B >>8))
-
-/* read and write from the powergraphics registers */
-#define ACCR(A)    (NV_REG32(NVACC_##A))
-#define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
-#define ACCGO(A,B) (NV_REG32(NVACC_##A + 0x0100)=B)
 
 /* read and write from second CRTC */
 #define CR2R(A)   (NV_REG32(NVCR2_##A))

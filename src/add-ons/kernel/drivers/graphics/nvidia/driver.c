@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-7/2003.
+	Rudolf Cornelissen 3/2002-10/2003.
 */
 
 /* standard kernel driver stuff */
@@ -131,10 +131,12 @@ static uint16 nvidia_device_list[] = {
 	0x0178, /* Nvidia Quadro4 500 XGL/550 XGL */
 	0x017a, /* Nvidia Quadro4 200 NVS/400 NVS */
 	0x017c, /* Nvidia Quadro4 500 GoGL */
-	//fixme: three IDs below correct??
+	0x017d, /* Nvidia unknown 4 Go */
 	0x0180, /* Nvidia GeForce4 MX 440 AGP8X */
 	0x0181, /* Nvidia GeForce4 MX 440SE AGP8X */
 	0x0182, /* Nvidia GeForce4 MX 420 AGP8X */
+	0x0186, /* Nvidia GeForce4 448 Go */
+	0x0187, /* Nvidia GeForce4 488 Go */
 	0x0188, /* Nvidia Quadro4 580 XGL */
 	0x018a, /* Nvidia Quadro4 280 NVS */
 	0x018b, /* Nvidia Quadro4 380 XGL */
@@ -156,6 +158,7 @@ static uint16 nvidia_device_list[] = {
 	0x0286, /* Nvidia GeForce4 4200 Go */
 	0x0288, /* Nvidia Quadro4 980 XGL */
 	0x0289, /* Nvidia Quadro4 780 XGL */
+	0x028c, /* Nvidia unknown 4 Go */
 	0x02a0, /* Nvidia GeForce3 Integrated GPU */
 	0x0301, /* Nvidia GeForce FX 5800 Ultra */
 	0x0302, /* Nvidia GeForce FX 5800 */
@@ -163,10 +166,20 @@ static uint16 nvidia_device_list[] = {
 	0x0309, /* Nvidia Quadro FX 1000 */
 	0x0311, /* Nvidia GeForce FX 5600 Ultra */
 	0x0312, /* Nvidia GeForce FX 5600 */
+	0x0316, /* Nvidia unknown FX Go */
+	0x0317, /* Nvidia unknown FX Go */
 	0x031a, /* Nvidia GeForce FX 5600 Go */
+	0x031b, /* Nvidia unknown FX Go */
+	0x031c, /* Nvidia unknown FX Go */
+	0x031d, /* Nvidia unknown FX Go */
+	0x031e, /* Nvidia unknown FX Go */
+	0x031f, /* Nvidia unknown FX Go */
 	0x0321, /* Nvidia GeForce FX 5200 Ultra */
 	0x0322, /* Nvidia GeForce FX 5200 */
+	0x0324, /* Nvidia GeForce FX 5200 Go */
+	0x0326, /* Nvidia unknown FX Go */
 	0x032b, /* Nvidia Quadro FX 500 */
+	0x032e, /* Nvidia unknown FX Go */
 	0x0330, /* Nvidia GeForce FX 5900 Ultra */
 	0x0331, /* Nvidia GeForce FX 5900 */
 	0x0338, /* Nvidia Quadro FX 3000 */
@@ -229,31 +242,37 @@ static void dumprom (void *rom, size_t size)
 	close (fd);
 }
 
-/*return 1, is interrupt has occured*/
+/* return 1 if vblank interrupt has occured */
 int caused_vbi(vuint32 * regs)
 {
-//	return (ACCR(STATUS)&0x20);
-//temp:
-return 0;
+	return (NV_REG32(NV32_CRTC_INTS) & 0x00000001);
 }
 
-/*clear the interrupt*/
+/* clear the vblank interrupt */
 void clear_vbi(vuint32 * regs)
 {
-//	ACCW(ICLEAR,0x20);
+	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
 }
 
 void enable_vbi(vuint32 * regs)
 {
-//	ACCW(IEN,ACCR(IEN)|0x20);
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+	/* enable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC_INTE) |= 0x00000001;
+	/* enable nVidia interrupt system hardware (b0-1) */
+	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
 }
 
 void disable_vbi(vuint32 * regs)
 {
-//	ACCW(IEN,(ACCR(IEN)&~0x20));
-//	ACCW(ICLEAR,0x20);
+	/* disable nVidia interrupt source vblank */
+	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
+	/* clear the vblank interrupt */
+	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+	/* disable nVidia interrupt system hardware (b0-1) */
+	NV_REG32(NV32_MAIN_INTE) = 0x00000000;
 }
-
 
 /*
 	init_hardware() - Returns B_OK if one is
