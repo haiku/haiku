@@ -60,6 +60,7 @@ Server app_server :
 	ServerWindow.cpp
 
 	# DisplayDriver Classes
+	drawing/fake_input_server.cpp
 	# Clipper.cpp
 	drawing/AccelerantDriver.cpp
 	drawing/BitmapDriver.cpp
