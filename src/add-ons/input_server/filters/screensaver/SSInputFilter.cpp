@@ -20,7 +20,7 @@ int32 threadFunc (void *data) {
 	return B_OK; // Should never get here...
 }
 
-SSISFilter::SSISFilter() : current(CENTER),enabled(false),frameNum(0) {
+SSISFilter::SSISFilter() : current(NONE),enabled(false),frameNum(0) {
 	pref.LoadSettings();	
 	blank=pref.GetBlankCorner();
 	keep=pref.GetNeverBlankCorner();
@@ -83,7 +83,7 @@ filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
 		else if (bottomRight.Contains(pos)) 
 			Cornered(DOWNRIGHT);
 		else {
-			Cornered(CENTER);
+			Cornered(NONE);
 			Banish();
 			}
 		}
