@@ -9,4 +9,5 @@ SubInclude OBOS_TOP src add-ons print ;
 SubInclude OBOS_TOP src add-ons translators ;
 SubInclude OBOS_TOP src add-ons decorators ;
 SubInclude OBOS_TOP src add-ons tracker ;
+SubInclude OBOS_TOP src add-ons screen_savers ;
 
