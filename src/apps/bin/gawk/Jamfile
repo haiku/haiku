@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src apps bin gawk ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
 SubDirCcFlags -DDEFPATH='\".:/share/awk\"' -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='\"/share/locale\"' ;
 
 SubDirHdrs [ FDirName $(SUBDIR) intl ] ;
@@ -27,3 +31,5 @@ RelSymLink igawk : gawk ;
 
 SubInclude OBOS_TOP src apps bin gawk intl ;
 
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;

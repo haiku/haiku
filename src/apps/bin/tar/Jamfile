@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src apps bin tar ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
 SubInclude OBOS_TOP src apps bin tar lib ;
 SubInclude OBOS_TOP src apps bin tar src ;
 
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
