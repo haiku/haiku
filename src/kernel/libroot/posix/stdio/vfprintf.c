@@ -416,11 +416,13 @@ reswitch:	switch (ch) {
 			}
 			width = n;
 			goto reswitch;
-#ifdef FLOATING_POINT
 		case 'L':
-			flags |= LONGDBL;
-			goto rflag;
+			flags |= QUADINT
+#ifdef FLOATING_POINT
+				| LONGDBL
 #endif
+				;
+			goto rflag;
 		case 'h':
 			flags |= SHORTINT;
 			goto rflag;
@@ -898,18 +900,20 @@ reswitch:	switch (ch) {
 		case 'L':
 			flags |= QUADINT
 #ifdef FLOATING_POINT
-			LONGDBL
+				| LONGDBL
 #endif
-			;
+				;
 			goto rflag;
 		case 'h':
 			flags |= SHORTINT;
 			goto rflag;
 		case 'l':
-			if (flags & LONGINT)
+			if (*fmt == 'l') {
+				fmt++;
 				flags |= QUADINT;
-			else
+			} else
 				flags |= LONGINT;
+
 			goto rflag;
 		case 'q':
 			flags |= QUADINT;
