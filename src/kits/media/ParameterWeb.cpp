@@ -703,7 +703,7 @@ BParameterGroup::BParameterGroup(BParameterWeb *web, const char *name)
 	mFlags(0)
 {
 	CALLED();
-	TRACE("\tweb = %p, name = \"%s\"\n", web, name);
+	TRACE("BParameterGroup: web = %p, name = \"%s\"\n", web, name);
 
 	mName = strndup(name, 256);
 
@@ -2108,7 +2108,7 @@ status_t
 BDiscreteParameter::AddItem(int32 value, const char *name)
 {
 	CALLED();
-	TRACE("\tthis = %p, value = %ld, name = \"%s\"\n", this, value, name);
+	//TRACE("\tthis = %p, value = %ld, name = \"%s\"\n", this, value, name);
 	ASSERT(mValues != NULL);
 	ASSERT(mSelections != NULL);
 
