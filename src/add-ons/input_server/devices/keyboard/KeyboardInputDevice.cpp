@@ -39,7 +39,7 @@
 		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
 	#define LOG_ERR(text...) LOG(text)
 #else
-	#define LOG(text)
+	#define LOG(text...)
 	#define LOG_ERR(text...) fprintf(stderr, text)
 #endif
 
@@ -401,7 +401,7 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 			LOG_ERR("error when get_key_repeat_rate\n");
 		else
 			if (ioctl(device->fd, kSetKeyRepeatRate, &device->settings.key_repeat_rate)!=B_OK)
-				LOG_ERR("error when kSetKeyRepeatRate, fd:%li\n", device->fd);
+				LOG_ERR("error when kSetKeyRepeatRate, fd:%d\n", device->fd);
 	}
 	
 	if (opcode == 0 
@@ -411,7 +411,7 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 			LOG_ERR("error when get_key_repeat_delay\n");
 		else
 			if (ioctl(device->fd, kSetKeyRepeatDelay, &device->settings.key_repeat_delay)!=B_OK)
-				LOG_ERR("error when kSetKeyRepeatDelay, fd:%li\n", device->fd);
+				LOG_ERR("error when kSetKeyRepeatDelay, fd:%d\n", device->fd);
 	}
 	
 	if (opcode == 0 
