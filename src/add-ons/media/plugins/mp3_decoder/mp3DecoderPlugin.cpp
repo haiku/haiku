@@ -107,8 +107,10 @@ status_t
 mp3Decoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
+	status_t last_err = B_LAST_BUFFER_ERROR;
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
+	int32	out_bytes = 0;
 	
 	mediaHeader->start_time = fStartTime;
 	//TRACE("mp3Decoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
@@ -120,6 +122,7 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			fResidualBuffer += bytes;
 			fResidualBytes -= bytes;
 			out_buffer += bytes;
+			out_bytes += bytes;
 			out_bytes_needed -= bytes;
 			
 			fStartTime += (1000000LL * (bytes / fFrameSize)) / fFrameRate;
@@ -128,14 +131,14 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			continue;
 		}
 		
-		if (B_OK != DecodeNextChunk())
+		last_err = DecodeNextChunk();
+		if (last_err != B_OK)
 			break;
 	}
 
-	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
+	*frameCount = out_bytes / fFrameSize;
 
-	// XXX this doesn't guarantee that we always return B_LAST_BUFFER_ERROR bofore returning B_ERROR
-	return (out_bytes_needed == 0) ? B_OK : (out_bytes_needed == fOutputBufferSize) ? B_ERROR : B_LAST_BUFFER_ERROR;
+	return (out_bytes > 0) ? B_OK : last_err;
 }
 
 status_t
@@ -144,10 +147,11 @@ mp3Decoder::DecodeNextChunk()
 	void *chunkBuffer;
 	int32 chunkSize;
 	media_header mh;
-	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
-		TRACE("mp3Decoder::Decode: GetNextChunk failed\n");
-		return B_ERROR;
-	}
+	status_t err;
+
+	err = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
+	if (err != B_OK)
+		return err;
 	
 	fStartTime = mh.start_time;
 

@@ -349,17 +349,16 @@ WavReader::GetNextChunk(void *cookie,
 						media_header *mediaHeader)
 {
 	wavdata *data = reinterpret_cast<wavdata *>(cookie);
-	status_t result = B_OK;
 
 	mediaHeader->start_time = (((8 * data->position) / data->bitsperframe) * 1000000LL) / data->fps;
 	mediaHeader->file_pos = fDataStart + data->position;
 
 	int64 maxreadsize = data->datasize - data->position;
 	int32 readsize = data->buffersize;
-	if (maxreadsize < readsize) {
+	if (maxreadsize < readsize)
 		readsize = maxreadsize;
-		result = B_LAST_BUFFER_ERROR;
-	}
+	if (readsize == 0)
+		return B_LAST_BUFFER_ERROR;
 		
 	if (readsize != Source()->ReadAt(fDataStart + data->position, data->buffer, readsize)) {
 		TRACE("WavReader::GetNextChunk: unexpected read error\n");
@@ -371,7 +370,7 @@ WavReader::GetNextChunk(void *cookie,
 	data->position += readsize;
 	*chunkBuffer = data->buffer;
 	*chunkSize = readsize;
-	return result;
+	return B_OK;
 }
 
 

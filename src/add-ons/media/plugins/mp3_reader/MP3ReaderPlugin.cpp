@@ -232,19 +232,14 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 	data->framePosition = 0;
 	data->framesPerFrame = frame_sample_count_table[layer_index];
 
-//	BMediaFormats formats;
 	media_format_description description;
 	description.family = B_MPEG_FORMAT_FAMILY;
 	description.u.mpeg.id = b_mpeg_id_table[mpeg_version_index][layer_index];
-//	formats.GetFormatFor(description, &data->format);
+	BMediaFormats formats;
+	formats.GetFormatFor(description, &data->format);
 
-	_get_format_for_description(&data->format, description);
-	
-//	data->format.u.encoded_audio.encoding = media_encoded_audio_format::B_ANY;
 	data->format.u.encoded_audio.bit_rate = bit_rate;
 	data->format.u.encoded_audio.frame_size = frame_size;
-//	data->format.u.encoded_audio.output.frame_rate = data->frameRate;
-//	data->format.u.encoded_audio.output.channel_count = 2;
 
 	// store the cookie
 	*cookie = data;
@@ -354,7 +349,7 @@ mp3Reader::GetNextChunk(void *cookie,
 	
 	int64 maxbytes = fDataSize - data->position;
 	if (maxbytes < 4)
-		return B_ERROR;
+		return B_LAST_BUFFER_ERROR;
 
 	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameRate;
 	mediaHeader->file_pos = data->position;
@@ -383,6 +378,8 @@ retry:
 
 	if (size > maxbytes)
 		size = maxbytes;
+	if (size == 0)
+		return B_LAST_BUFFER_ERROR;
 		
 	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer + 4, size)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");

@@ -67,8 +67,11 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 {
 	void *chunkBuffer;
 	int32 chunkSize;
-	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader))
-		return B_ERROR;
+	status_t err;
+
+	err = GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader);
+	if (err != B_OK)
+		return err;
 	
 	memcpy(buffer, chunkBuffer, chunkSize);
 	*frameCount = chunkSize / fFrameSize;

@@ -3,6 +3,7 @@
 #include "debug.h"
 #include <stdio.h>
 #include <string.h>
+#include <Autolock.h>
 
 MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 {
@@ -147,6 +148,11 @@ MediaExtractor::GetNextChunk(int32 stream,
 {
 	//CALLED();
 	// get buffered chunk
+	
+	// XXX until this is done in a single extractor thread,
+	// XXX make calls to GetNextChunk thread save
+	static BLocker locker;
+	BAutolock lock(locker);
 	
 	// XXX this should be done in a different thread, and double buffered for each stream
 	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer, chunkSize, mediaHeader);
