@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 ps2mouse ;
 
+UsePrivateHeaders input ;
+
 KernelObjects
 	ps2mouse.c
 	:

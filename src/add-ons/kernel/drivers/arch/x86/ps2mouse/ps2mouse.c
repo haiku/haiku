@@ -55,6 +55,8 @@
 
 #include <string.h>
 
+#include <kb_mouse_driver.h>
+
 #include "ps2mouse.h"
 
 #define DEVICE_NAME "input/mouse/ps2/0"
@@ -67,7 +69,7 @@
 #endif
 
 #ifdef COMPILE_FOR_R5
-	 #include "cbuf_adapter.h"
+	#include "cbuf_adapter.h"
 #else
 	#include <cbuf.h>
 #endif
@@ -79,10 +81,11 @@ static isa_module_info *sIsa = NULL;
 static sem_id sMouseSem;
 static int32 sSync;
 static cbuf *sMouseChain;
+
 static bigtime_t sLastClickTime;
 static bigtime_t sClickSpeed;
-static uint32 sClickCount;
-static uint32 sButtonsState;
+static int32 sClickCount;
+static int sButtonsState;
 
 /////////////////////////////////////////////////////////////////////////
 // ps2 protocol stuff
@@ -247,11 +250,11 @@ ps2_enable_mouse(bool enable)
 /** Converts a packet received by the mouse to a "movement".
  */  
 static void
-packet_to_movement(uint8 packet[], mouse_movement *movement)
+packet_to_movement(uint8 packet[], mouse_pos *pos)
 {
-	uint32 buttons = packet[0] & 7;
-	int32 xDelta = ((packet[0] & 0x10) ? 0xFFFFFF00 : 0) | packet[1];
-	int32 yDelta = ((packet[0] & 0x20) ? 0xFFFFFF00 : 0) | packet[2];
+	int buttons = packet[0] & 7;
+	int xDelta = ((packet[0] & 0x10) ? 0xFFFFFF00 : 0) | packet[1];
+	int yDelta = ((packet[0] & 0x20) ? 0xFFFFFF00 : 0) | packet[2];
   	bigtime_t currentTime = system_time();
 	
   	if (buttons != 0) {
@@ -266,13 +269,13 @@ packet_to_movement(uint8 packet[], mouse_movement *movement)
   	sLastClickTime = currentTime;
   	sButtonsState = buttons;
   	
-  	if (movement) {
-		movement->xdelta = xDelta;
-		movement->ydelta = yDelta;
-		movement->buttons = buttons;
-		movement->click_count = sClickCount;
-		movement->mouse_mods = 0;
-		movement->mouse_time = currentTime;
+  	if (pos) {
+		pos->xdelta = xDelta;
+		pos->ydelta = yDelta;
+		pos->buttons = buttons;
+		pos->clicks = sClickCount;
+		pos->modifiers = 0;
+		pos->time = currentTime;
 	}
 }
 
@@ -280,7 +283,7 @@ packet_to_movement(uint8 packet[], mouse_movement *movement)
 /** Read a mouse event from the mouse events chain buffer.
  */
 static status_t
-ps2_mouse_read(mouse_movement *movement)
+ps2_mouse_read(mouse_pos *pos)
 {
 	status_t status;
 	uint8 packet[PS2_PACKET_SIZE];
@@ -296,7 +299,7 @@ ps2_mouse_read(mouse_movement *movement)
 		return status;
 	}
 	
-  	packet_to_movement(packet, movement);
+  	packet_to_movement(packet, pos);
   		
 	return B_OK;		
 }
@@ -393,14 +396,6 @@ mouse_freecookie(void * cookie)
 }
 
 
-/** Gets a mouse data packet.
- *	Parameters:
- *	cookie, ignored
- *	buf, pointer to a buffer that accepts the data
- *	pos, ignored
- *	len, buffer size, must be at least the size of the data packet
- */
-
 static status_t
 mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
@@ -420,18 +415,18 @@ mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 static status_t 
 mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 {
-	mouse_movement *movement = (mouse_movement *)buf;
+	mouse_pos *pos = (mouse_pos *)buf;
 	switch (op) {
-		case MOUSE_GET_EVENTS_COUNT:
+		case MS_NUM_EVENTS:
 		{
 			int32 count;
 			TRACE(("PS2_GET_EVENT_COUNT\n"));
 			get_sem_count(sMouseSem, &count);
 			return count;
 		}
-		case MOUSE_GET_MOVEMENTS:
+		case MS_READ:
 			TRACE(("PS2_GET_MOUSE_MOVEMENTS\n"));	
-			return ps2_mouse_read(movement);
+			return ps2_mouse_read(pos);
 		
 		default:
 			TRACE(("unknown opcode: %ld\n", op));
