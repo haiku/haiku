@@ -52,7 +52,7 @@ DrawData::DrawData(void)
 	if(fontserver)
 		font=*(fontserver->GetSystemPlain());
 	
-	clippReg=NULL;
+	clipReg=NULL;
 
 	edelta.space=0;
 	edelta.nonspace=0;
@@ -60,8 +60,8 @@ DrawData::DrawData(void)
 
 DrawData::~DrawData(void)
 {
-	if (clippReg)
-		delete clippReg;
+	if (clipReg)
+		delete clipReg;
 }
 
 DrawData::DrawData(const DrawData &data)
@@ -90,12 +90,12 @@ DrawData &DrawData::operator=(const DrawData &from)
 	fontAliasing=from.fontAliasing;
 	font=from.font;
 	
-	if(from.clippReg)
+	if(from.clipReg)
 	{
-		if(clippReg)
-			*clippReg=*(from.clippReg);
+		if(clipReg)
+			*clipReg=*(from.clipReg);
 		else
-			clippReg=new BRegion(*(from.clippReg));
+			clipReg=new BRegion(*(from.clipReg));
 	}
 	
 	edelta=from.edelta;
@@ -150,12 +150,12 @@ LayerData &LayerData::operator=(const LayerData &from)
 	fontAliasing=from.fontAliasing;
 	font=from.font;
 	
-	if(from.clippReg)
+	if(from.clipReg)
 	{
-		if(clippReg)
-			*clippReg=*(from.clippReg);
+		if(clipReg)
+			*clipReg=*(from.clipReg);
 		else
-			clippReg=new BRegion(*(from.clippReg));
+			clipReg=new BRegion(*(from.clipReg));
 	}
 	
 	edelta=from.edelta;
@@ -182,8 +182,8 @@ void LayerData::PrintToStream() const{
 	printf("\t LineCap: %d\t LineJoin: %d\t MiterLimit: %f\n", (int16)lineCap, (int16)lineJoin, miterLimit);
 	printf("\t AlphaSrcMode: %ld\t AlphaFncMode: %ld\n", (int32)alphaSrcMode, (int32)alphaFncMode);
 	printf("\t Scale: %f\n", scale);
-	if (clippReg)
-		clippReg->PrintToStream();
+	if (clipReg)
+		clipReg->PrintToStream();
 
 	printf("\t ===== Font Data =====\n");
 	printf("\t FontStyle: CURRENTLY NOT SET\n");

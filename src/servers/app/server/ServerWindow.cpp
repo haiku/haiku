@@ -595,7 +595,7 @@ void ServerWindow::SetLayerState(Layer *layer){
 					lowColor,
 					viewColor;
 	pattern			patt;
-	int32			clippRegRects;
+	int32			clipRegRects;
 
 	fSession->ReadPoint(		&(layer->_layerdata->penlocation));
 	fSession->ReadFloat(		&(layer->_layerdata->pensize));
@@ -612,30 +612,30 @@ void ServerWindow::SetLayerState(Layer *layer){
 	fSession->ReadInt8((int8*)	&(layer->_layerdata->alphaFncMode));
 	fSession->ReadFloat(		&(layer->_layerdata->scale));
 	fSession->ReadBool(			&(layer->_layerdata->fontAliasing));
-	fSession->ReadInt32(		&clippRegRects);
+	fSession->ReadInt32(		&clipRegRects);
 
 	layer->_layerdata->patt.Set(*((uint64*)&patt));
 	layer->_layerdata->highcolor.SetColor(highColor);
 	layer->_layerdata->lowcolor.SetColor(lowColor);
 	layer->_layerdata->viewcolor.SetColor(viewColor);
 
-	if(clippRegRects != 0){
-		if(layer->_layerdata->clippReg == NULL)
-			layer->_layerdata->clippReg = new BRegion();
+	if(clipRegRects != 0){
+		if(layer->_layerdata->clipReg == NULL)
+			layer->_layerdata->clipReg = new BRegion();
 		else
-			layer->_layerdata->clippReg->MakeEmpty();
+			layer->_layerdata->clipReg->MakeEmpty();
 
 		BRect		rect;
 				
-		for(int32 i = 0; i < clippRegRects; i++){
+		for(int32 i = 0; i < clipRegRects; i++){
 			fSession->ReadRect(&rect);
-			layer->_layerdata->clippReg->Include(rect);
+			layer->_layerdata->clipReg->Include(rect);
 		}
 	}
 	else{
-		if (layer->_layerdata->clippReg){
-			delete layer->_layerdata->clippReg;
-			layer->_layerdata->clippReg = NULL;
+		if (layer->_layerdata->clipReg){
+			delete layer->_layerdata->clipReg;
+			layer->_layerdata->clipReg = NULL;
 		}
 	}
 STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(), layer->_name->String()));
@@ -890,13 +890,13 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->WriteFloat(ld->fontAliasing);
 			
 			int32		noOfRects = 0;
-			if (ld->clippReg)
-				noOfRects = ld->clippReg->CountRects();
+			if (ld->clipReg)
+				noOfRects = ld->clipReg->CountRects();
 
 			fSession->WriteInt32(noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
-				fSession->WriteRect(ld->clippReg->RectAt(i));
+				fSession->WriteRect(ld->clipReg->RectAt(i));
 			}
 			
 			fSession->WriteFloat(cl->_frame.left);
@@ -1331,12 +1331,12 @@ void ServerWindow::DispatchMessage(int32 code)
 			ld			= cl->_layerdata;
 			reg			= cl->ConvertFromParent(&(cl->_visible));
 
-			if(ld->clippReg)
-				reg.IntersectWith(ld->clippReg);
+			if(ld->clipReg)
+				reg.IntersectWith(ld->clipReg);
 
 			while((ld = ld->prevState))
-				if(ld->clippReg)
-					reg.IntersectWith(ld->clippReg);
+				if(ld->clipReg)
+					reg.IntersectWith(ld->clipReg);
 
 			noOfRects	= reg.CountRects();
 			fSession->WriteInt32(noOfRects);
@@ -1356,16 +1356,16 @@ void ServerWindow::DispatchMessage(int32 code)
 			int32		noOfRects;
 			BRect		r;
 
-			if(cl->_layerdata->clippReg)
-				cl->_layerdata->clippReg->MakeEmpty();
+			if(cl->_layerdata->clipReg)
+				cl->_layerdata->clipReg->MakeEmpty();
 			else
-				cl->_layerdata->clippReg = new BRegion();
+				cl->_layerdata->clipReg = new BRegion();
 			
 			fSession->ReadInt32(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
 				fSession->ReadRect(&r);
-				cl->_layerdata->clippReg->Include(r);
+				cl->_layerdata->clipReg->Include(r);
 			}
 
 			cl->RebuildFullRegion();

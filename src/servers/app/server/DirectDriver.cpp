@@ -475,14 +475,14 @@ void DirectDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 	Unlock();
 }
 
-void DirectDriver::StrokeSolidLine(const BPoint &start, const BPoint &end,const RGBColor &color)
+void DirectDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
 {
 	Lock();
 	framebuffer->Lock();
 	drawview->SetHighColor(color.GetColor32());
-	drawview->StrokeLine(start,end);
+	drawview->StrokeLine(BPoint(x1,y1),BPoint(x2,y2));
 	drawview->Sync();
-	screenwin->rectpipe.PutRect(BRect(start,end));
+	screenwin->rectpipe.PutRect(BRect(x1,y1,x2,y2));
 	framebuffer->Unlock();
 	Unlock();
 }

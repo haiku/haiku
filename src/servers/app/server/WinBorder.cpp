@@ -140,8 +140,8 @@ void WinBorder::RebuildFullRegion(void){
 	ld			= topLayer->_layerdata;
 	do{
 			// clip to user region
-		if(ld->clippReg)
-			topLayerFull.IntersectWith( ld->clippReg );
+		if(ld->clipReg)
+			topLayerFull.IntersectWith( ld->clipReg );
 	} while( (ld = ld->prevState) );
 
 		// clip to user picture region

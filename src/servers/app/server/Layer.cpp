@@ -600,8 +600,8 @@ void Layer::RebuildFullRegion( ){
 	ld			= _layerdata;
 	do{
 			// clip to user region
-		if(ld->clippReg)
-			_full.IntersectWith( ld->clippReg );
+		if(ld->clipReg)
+			_full.IntersectWith( ld->clipReg );
 	} while( (ld = ld->prevState) );
 
 		// clip to user picture region

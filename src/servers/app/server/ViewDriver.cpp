@@ -706,7 +706,7 @@ void ViewDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const
 	screenwin->Unlock();
 }
 
-void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color)
+void ViewDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
 {
 	if(!is_initialized)
 		return;
@@ -714,9 +714,9 @@ void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, const R
 	screenwin->Lock();
 	framebuffer->Lock();
 	drawview->SetHighColor(color.GetColor32());
-	drawview->StrokeLine(start,end);
+	drawview->StrokeLine(BPoint(x1,y1),BPoint(x2,y2));
 	drawview->Sync();
-	screenwin->view->Invalidate(BRect(start,end));
+	screenwin->view->Invalidate(BRect(x1,y1,x2,y2));
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
