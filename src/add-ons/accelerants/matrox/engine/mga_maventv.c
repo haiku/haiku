@@ -1,6 +1,6 @@
 /* Authors:
    Mark Watson 2000,
-   Rudolf Cornelissen 1/2003-3/2003
+   Rudolf Cornelissen 1/2003-12/2003
 
    Thanx to Petr Vandrovec for writing matroxfb.
 */
@@ -20,9 +20,6 @@ typedef struct {
 	float chroma_subcarrier;
 } gx50_maven_timing;
 
-//fixme: setup fixed CRTC2 modes for all modes and block other modes:
-// 		- 640x480, 800x600, 1024x768 NTSC and PAL overscan compensated modes (desktop)
-// 		- 640x480, 720x480 NTSC and 768x576, 720x576 non-overscan compensated modes (video)
 //fixme: try to implement 'fast' and 'slow' settings for all modes,
 //       so buffer duplication or skipping won't be neccesary for realtime video.
 //fixme: try to setup the CRTC2 in interlaced mode for the video modes on <= G400MAX cards.
@@ -694,9 +691,189 @@ int maventv_init(display_mode target)
 
 		MAVW(LOCK, 0x01);
 		MAVW(OUTMODE, 0x08);
+
+		/* set high contrast/brightness range for TVout */
+		/* Note:
+		 * b4-5 have contrast/brightness function during TVout, while these bits
+		 * are used to set sync polarity in a serial fashion during monitor modes.
+		 * Setting both these bits here will 'increase' the sync polarity offset
+		 * by one! */
 		MAVW(LUMA, 0x78);
+		/* We just made a sync polarity programming step for monitor modes, so:
+		 * note the offset from 'reset position' we will have now */
+		si->maven_syncpol_offset += 1;
+		if (si->maven_syncpol_offset > 3) si->maven_syncpol_offset = 0;
+
+		//unknown regs:
 		MAVW(STABLE, 0x02);
 		MAVW(MONEN, 0xB3);
+
+		/* modify mode to center and size correctly on TV */
+		{
+			int diff;
+			float uscan_fact;
+			bool tweak = false; /* needed for NTSC VCD mode */
+
+			if (!(tv_target.flags & TV_VIDEO)) /* Desktop modes */
+			{
+				LOG(4,("MAVENTV: setting underscanning ('downscaled') desktop mode\n"));
+
+				/* adapt mode to underscan correctly */
+				if ((tv_target.timing.h_display < 704) && ((tv_target.flags & TV_BITS) == TV_PAL))
+				{
+					/* can't be higher because of scaling limitations in MAVEN! */
+					uscan_fact = 0.77;
+				}
+				else
+				{
+					/* optimal setting for desktop modes.. */
+					uscan_fact = 0.80;
+				}
+				/* horizontal */
+				tv_target.timing.h_total = (tv_target.timing.h_display / uscan_fact);
+				/* adhere to CRTC constraints */
+				tv_target.timing.h_total &= ~0x0007;
+				/* vertical */
+				tv_target.timing.v_total = (tv_target.timing.v_display / uscan_fact);
+
+				/* now do vertical centering */
+				if ((tv_target.flags & TV_BITS) == TV_PAL)
+				{
+					diff = tv_target.timing.v_total - tv_target.timing.v_display;
+					tv_target.timing.v_sync_start = tv_target.timing.v_display + ((diff * 7) / 20);
+					/* sync all the way 'to the end' to prevent vertical overscanning
+					 * rubbish on top of screen due to MAVEN hardware design fault */
+					tv_target.timing.v_sync_end = tv_target.timing.v_total;
+				}
+				else
+				{
+					diff = tv_target.timing.v_total - tv_target.timing.v_display;
+					tv_target.timing.v_sync_start = tv_target.timing.v_display + ((diff * 5) / 20);
+					/* sync all the way 'to the end' to prevent vertical overscanning
+					 * rubbish on top of screen due to MAVEN hardware design fault */
+					tv_target.timing.v_sync_end = tv_target.timing.v_total;
+				}
+			}
+			else /* Video modes */
+			{
+				uint16 mode =
+					(((tv_target.flags & TV_BITS) << (14 - 9)) | tv_target.timing.h_display);
+
+				LOG(4,("MAVENTV: setting overscanning ('unscaled') video mode\n"));
+
+				/* adapt standard modes to be displayed 1:1 */
+				switch (mode)
+				{
+				case ((TV_NTSC << (14 - 9)) | 640): /* NTSC VCD mode */
+					/* horizontal: adhere to CRTC granularity (8) */
+					/* Note: h_total = 704 has no PLL match! */
+					tv_target.timing.h_total = 696;
+					/* because this 'low' horizontal resolution cannot be scaled up
+					 * for overscanning use (MAVEN restriction) we need to do some
+					 * tweaking to get a mode we can work with that still has the
+					 * correct aspect ratio.
+					 * This mode has just a little bit horizontal overscanning. */
+					tweak = true;
+					break;
+				case ((TV_NTSC << (14 - 9)) | 720): /* NTSC DVD mode */
+					/* horizontal: adhere to CRTC granularity (8) */
+					tv_target.timing.h_total = 784;
+					break;
+				case ((TV_PAL << (14 - 9)) | 768): /* PAL VCD mode */
+					/* horizontal: adhere to CRTC granularity (8) */
+					tv_target.timing.h_total = 832;
+					break;
+				case ((TV_PAL << (14 - 9)) | 720): /* PAL DVD mode */
+					/* horizontal: adhere to CRTC granularity (8) */
+					tv_target.timing.h_total = 784;
+					break;
+				default:
+					/* non-standard mode: just hope for he best. */
+					break;
+				}
+
+				/* now do vertical centering and clipping */
+				if ((tv_target.flags & TV_BITS) == TV_PAL)
+				{
+					/* defined by the PAL standard */
+					tv_target.timing.v_total = m_timing.v_total;
+					/* we need to center the image on TV vertically.
+					 * note that 576 is the maximum supported resolution for the PAL standard,
+					 * this is already overscanning by approx 8-10% */
+					diff = 576 - tv_target.timing.v_display;
+					/* if we cannot display the current vertical resolution fully, clip it */
+					if (diff < 0)
+					{
+						tv_target.timing.v_display = 576;
+						diff = 0;
+					}
+					/* now center the image on TV */
+					tv_target.timing.v_sync_start = tv_target.timing.v_display + (diff / 2);
+					/* sync all the way 'to the end' to prevent vertical overscanning
+					 * rubbish on top of screen due to MAVEN hardware design fault */
+					/* note: probably invisible in these Video modes */
+					tv_target.timing.v_sync_end = tv_target.timing.v_total;
+				}
+				else
+				{
+					/* defined by the NTSC standard */
+					tv_target.timing.v_total = m_timing.v_total;
+					/* NTSC VCD mode needs to be scaled down vertically to get correct
+					 * aspect ratio... */
+					if (tweak) tv_target.timing.v_total += 32;
+					/* we need to center the image on TV vertically.
+					 * note that 480 is the maximum supported resolution for the NTSC standard,
+					 * this is already overscanning by approx 8-10% */
+					diff = 480 - tv_target.timing.v_display;
+					/* if we cannot display the current vertical resolution fully, clip it */
+					if (diff < 0)
+					{
+						tv_target.timing.v_display = 480;
+						diff = 0;
+					}
+					/* now center the image on TV */
+					tv_target.timing.v_sync_start = tv_target.timing.v_display + (diff / 2);
+					/* ...NTSC VCD mode needs to be moved up to center the tweaked mode
+					 * correcty... */
+					if (tweak) tv_target.timing.v_sync_start += 9;
+					/* sync all the way 'to the end' to prevent vertical overscanning
+					 * rubbish on top of screen due to MAVEN hardware design fault */
+					/* note: might be visible in the NTSC VCD Video mode */
+					tv_target.timing.v_sync_end = tv_target.timing.v_total;
+				}
+			}
+
+			/* finally do horizontal centering */
+			if ((tv_target.flags & TV_BITS) == TV_PAL)
+			{
+				diff = tv_target.timing.h_total - tv_target.timing.h_display;
+				tv_target.timing.h_sync_start = tv_target.timing.h_display - 0 + (diff / 2);
+				/* keep adhering to CRTC constraints */
+				tv_target.timing.h_sync_start &= ~0x0007;
+				tv_target.timing.h_sync_end = tv_target.timing.h_sync_start + 16;
+			}
+			else
+			{
+				diff = tv_target.timing.h_total - tv_target.timing.h_display;
+				tv_target.timing.h_sync_start = tv_target.timing.h_display - 16 + (diff / 2);
+				/* ...and finally the NTSC VCD mode needs to be moved to the right to
+				 * center the tweaked mode correctly. */
+				if (tweak) tv_target.timing.h_sync_start -= 16;
+				/* keep adhering to CRTC constraints */
+				tv_target.timing.h_sync_start &= ~0x0007;
+				tv_target.timing.h_sync_end = tv_target.timing.h_sync_start + 16;
+			}
+		}
+
+		/* tune crtc delay */
+		if ((tv_target.timing.h_display >= 1000) && (((tv_target.flags & TV_BITS) != TV_PAL)))
+		{
+			si->crtc_delay += 1;
+		}
+		else
+		{
+			si->crtc_delay -= 3;
+		}
 
 		/* setup video PLL */
 		g100_g400max_maventv_vid_pll_find(
@@ -767,13 +944,11 @@ int maventv_init(display_mode target)
 			int index;
 
 			/* calc hor scale-back factor from input to output picture (in 1.7 format)
-			 * the MAVEN has 736 pixels fixed visible? outputline length for TVout */ 
-			//fixme: shouldn't this be 768 (= PAL 1:1 output 4:3 ratio format)?!?
+			 * the MAVEN has 736 pixels fixed total outputline length for TVout */ 
 			h_scale_tv = (736 << 7) / tv_target.timing.h_total;//should be PLL corrected
 			LOG(4,("MAVENTV: horizontal scale-back factor is: %f\n", (h_scale_tv / 128.0)));
 
 			/* limit values to MAVEN capabilities (scale-back factor is 0.5-1.0) */
-			//fixme: how about lowres upscaling?
 			if (h_scale_tv > 0x80)
 			{
 				h_scale_tv = 0x80;
@@ -912,9 +1087,19 @@ int maventv_init(display_mode target)
 		MAVW(GAMMA9, 0xC8);	/* 200 */
 
 		/* set flickerfilter */
-		/* OFF: is dependant on MAVEN chip version(?): MGA_TVO_B = $40, else $00.
-		 * ON : always set $a2. */
-		MAVW(FFILTER, 0xa2);
+		if (!(tv_target.flags & TV_VIDEO))
+		{
+			/* Desktop modes (those are scaled): filter on to prevent artifacts */
+			MAVW(FFILTER, 0xa2);
+			LOG(4,("MAVENTV: enabling flicker filter\n"));
+		}
+		else
+		{
+			/* Video modes (those are unscaled): filter off to increase sharpness */
+			//fixme? OFF is dependant on MAVEN version(?): MGA_TVO_B = $40, else $00.
+			MAVW(FFILTER, 0x00);
+			LOG(4,("MAVENTV: disabling flicker filter\n"));
+		}
 
 		/* 0x10 or anything ored with it */
 		//fixme? linux uses 0x14...

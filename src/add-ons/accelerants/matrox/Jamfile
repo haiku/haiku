@@ -21,6 +21,10 @@ Addon mga.accelerant : accelerants :
 	: false : libmatrox_engine.a
 ;
 
+Package openbeos-matrox-1.0 :
+	mga.accelerant :
+	boot home config add-ons accelerants ;
+
 Depends mga.accelerant : mga.driver ;
 
 SubInclude OBOS_TOP src add-ons accelerants matrox engine ;

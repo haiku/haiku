@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2003.
+	Rudolf Cornelissen 10/2002-12/2003.
 */
 
 #define MODULE_BIT 0x00800000
@@ -75,7 +75,7 @@ error0:
 	return result;
 }
 
-/* Clean up code shared between primary and cloned accelrants */
+/* Clean up code shared between primary and cloned accelerants */
 static void uninit_common(void) {
 	/* release the memory mapped registers */
 	delete_area(regs_area);
@@ -115,7 +115,10 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* bail out if the common initialization failed */
 	if (result != B_OK) goto error0;
 	// LOG now available: !NULL si
-	
+
+	/* signal CRTC2 DPMS on G450/G550 which connector to program (before powerup) */
+	si->crossed_conns = false;
+
 	/* call the device specific init code */
 	result = gx00_general_powerup();
 
@@ -235,11 +238,23 @@ status_t CLONE_ACCELERANT(void *data) {
 	char path[MAXPATHLEN];
 
 	/* the data is the device name */
-	strcpy(path, "/dev");
+	/* Note: the R4 graphics driver kit is in error here (missing trailing '/') */
+	strcpy(path, "/dev/");
 	strcat(path, (const char *)data);
 	/* open the device, the permissions aren't important */
 	fd = open(path, B_READ_WRITE);
-	if (fd < 0) {
+	if (fd < 0)
+	{
+		/* we can't use LOG because we didn't get the shared_info struct.. */
+		char     fname[64];
+		FILE    *myhand = NULL;
+
+		sprintf (fname, "/boot/home/" DRIVER_PREFIX ".accelerant.0.log");
+		myhand=fopen(fname,"a+");
+		fprintf(myhand, "CLONE_ACCELERANT: couldn't open kerneldriver %s! Aborting.\n", path);
+		fclose(myhand);
+
+		/* abort with resultcode from open attempt on kerneldriver */
 		result = fd;
 		goto error0;
 	}
@@ -282,13 +297,18 @@ error0:
 void UNINIT_ACCELERANT(void)
 {
 	if (accelerantIsClone)
+	{
 		LOG(4,("UNINIT_ACCELERANT: shutting down clone accelerant.\n"));
+	}
 	else
+	{
 		LOG(4,("UNINIT_ACCELERANT: shutting down primary accelerant.\n"));
 
-	/*delete benaphore*/
-	DELETE_BEN(si->engine.lock);
-	DELETE_BEN(si->overlay.lock);
+		/* delete benaphores ONLY if we are the primary accelerant */
+		DELETE_BEN(si->engine.lock);
+		DELETE_BEN(si->overlay.lock);
+	}
+
 	/* free our mode list area */
 	delete_area(my_mode_list_area);
 	/* paranoia */

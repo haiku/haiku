@@ -2,7 +2,7 @@
 
    Authors:
    Mark Watson 6/2000,
-   Rudolf Cornelissen 12/2002 - 4/2003
+   Rudolf Cornelissen 12/2002 - 12/2003
 */
 
 #define MODULE_BIT 0x00020000
@@ -157,39 +157,140 @@ status_t g400_crtc2_depth(int mode)
 	return B_OK;
 }
 
-status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v)
+status_t g400_crtc2_dpms(bool display, bool h, bool v)
 {
-	if (display & h & v)
-	{
-		/* enable CRTC2 and don't touch the rest */
-		CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
-	}
-	else
-	{
-		/* disable CRTC2 and don't touch the rest */
-		CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
-	}
+	LOG(4,("CRTC2: setting DPMS: "));
 
-	if (si->ps.card_type >= G450)
+	if (si->ps.card_type <= G400MAX)
 	{
-		//fixme:
-		/* setup monitor mode DPMS: G450 and later fully support this on CRTC2 */
-		//for now:
-		//enable 'straight-through' sync outputs on both analog output connectors...
-		DXIW(SYNCCTRL,0x00); 
-	}
+		if (display && h && v)
+		{
+			/* enable CRTC2 and don't touch the rest */
+			CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
+			LOG(4,("display on, hsync enabled, vsync enabled\n"));
+		}
+		else
+		{
+			/* disable CRTC2 and don't touch the rest */
+			CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
+			LOG(4,("display off, hsync disabled, vsync disabled\n"));
+		}
 
-	/* On <= G400MAX dualhead cards we always need to send a 'copy' to the MAVEN */
-	if (si->ps.secondary_head) gx00_maven_dpms(display, h, v);
+		/* On <= G400MAX dualhead cards we always need to send a 'copy' to the MAVEN */
+		if (si->ps.secondary_head) gx00_maven_dpms(display, h, v);
+	}
+	else /* G450/G550 */
+	{
+		/* set HD15 and DVI-A sync pol. to be fixed 'straight through' from the CRTCs,
+		 * and preset enabled sync signals on both connectors.
+		 * (polarities and primary DPMS are done via other registers.) */
+		uint8 temp = 0x00;
+
+		if (display)
+		{
+			/* enable CRTC2 and don't touch the rest */
+			CR2W(CTL, ((CR2R(CTL) & 0xFFF0177E) | 0x01));
+			LOG(4,("display on, "));
+		}
+		else
+		{
+			/* disable CRTC2 and don't touch the rest */
+			CR2W(CTL, (CR2R(CTL) & 0xFFF0177E));
+			LOG(4,("display off, "));
+		}
+
+		if (si->crossed_conns)
+		{
+			if (h)
+			{
+				/* enable DVI-A hsync */
+				temp &= ~0x01;
+				LOG(4,("hsync enabled, "));
+			}
+			else
+			{
+				/* disable DVI-A hsync */
+				temp |= 0x01;
+				LOG(4,("hsync disabled, "));
+			}
+			if (v)
+			{
+				/* enable DVI-A vsync */
+				temp &= ~0x02;
+				LOG(4,("vsync enabled\n"));
+			}
+			else
+			{
+				/* disable DVI-A vsync */
+				temp |= 0x02;
+				LOG(4,("vsync disabled\n"));
+			}
+		}
+		else
+		{
+			if (h)
+			{
+				/* enable HD15 hsync */
+				temp &= ~0x10;
+				LOG(4,("hsync enabled, "));
+			}
+			else
+			{
+				/* disable HD15 hsync */
+				temp |= 0x10;
+				LOG(4,("hsync disabled, "));
+			}
+			if (v)
+			{
+				/* enable HD15 vsync */
+				temp &= ~0x20;
+				LOG(4,("vsync enabled\n"));
+			}
+			else
+			{
+				/* disable HD15 vsync */
+				temp |= 0x20;
+				LOG(4,("vsync disabled\n"));
+			}
+		}
+		/* program new syncs */
+		DXIW(SYNCCTRL, temp);
+	}
 
 	return B_OK;
 }
 
-status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v)
+status_t g400_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	*display=CR2R(CTL)&1;
+	*display = (CR2R(CTL) & 0x00000001);
 
-	*h=*v=1; /*h/vsync always enabled on second CRTC, does not support other*/
+	if ((si->ps.card_type <= G400MAX))
+	{
+		/* no full DPMS support: display controls all signals */
+		*h = *v = *display;
+	}
+	else
+	{
+		/* G450 and G550 have full DPMS support on CRTC2 */
+		if (si->crossed_conns)
+		{
+			*h = !(DXIR(SYNCCTRL) & 0x01);
+			*v = !(DXIR(SYNCCTRL) & 0x02);
+		}
+		else
+		{
+			*h = !(DXIR(SYNCCTRL) & 0x10);
+			*v = !(DXIR(SYNCCTRL) & 0x20);
+		}
+	}
+
+	LOG(4,("CTRC2: fetched DPMS state: "));
+	if (*display) LOG(4,("display on, "));
+	else LOG(4,("display off, "));
+	if (*h) LOG(4,("hsync enabled, "));
+	else LOG(4,("hsync disabled, "));
+	if (*v) LOG(4,("vsync enabled\n"));
+	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }

@@ -7,6 +7,16 @@ R5KernelAddon mga.driver : kernel drivers bin :
 	driver.c
 ;
 
+Package openbeos-matrox-1.0 :
+	mga.driver : 
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-matrox-1.0 :
+	<kernel!drivers!dev!graphics>mga.driver :
+	boot home config add-ons kernel drivers dev graphics ;
+Package openbeos-matrox-1.0 :
+	mga.settings :
+	boot home config settings kernel drivers ;
+
 # Link to kernel/drivers/dev/graphics
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;

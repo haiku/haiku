@@ -4,7 +4,7 @@ status_t mga_set_cas_latency();
 status_t gx50_general_output_select();
 status_t gx00_general_dac_select(int);
 status_t gx00_general_wait_retrace();
-status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row);
+status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 //status_t gx00_general_bios_to_powergraphics();
 
 /* apsed: logging macros */
@@ -62,7 +62,8 @@ status_t mil2_dac_init(void);
 status_t mil2_dac_set_pix_pll(float f_vco,int bpp);
 
 /*MAVEN functions*/
-status_t gx00_maven_dpms(uint8,uint8,uint8);
+status_t gx00_maven_clrline();
+status_t gx00_maven_dpms(bool display, bool h, bool v);
 status_t gx00_maven_set_timing(display_mode target);
 status_t gx00_maven_mode(int,float);
 
@@ -83,17 +84,13 @@ status_t gx00_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 );
-status_t gx00_crtc_set_timing(
-	uint16 hd_e,uint16 hs_s,uint16 hs_e,uint16 ht,
-	uint16 vd_e,uint16 vs_s,uint16 vs_e,uint16 vt,
-	uint8 hsync_pos,uint8 vsync_pos
-);
+status_t gx00_crtc_set_timing(display_mode target);
 status_t gx00_crtc_depth(int mode);
 status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp); 
 status_t gx00_crtc_set_display_pitch();
 
-status_t gx00_crtc_dpms(uint8,uint8,uint8);
-status_t gx00_crtc_dpms_fetch(uint8*,uint8*,uint8*);
+status_t gx00_crtc_dpms(bool display,bool h,bool v);
+status_t gx00_crtc_dpms_fetch(bool *display, bool *h, bool *v);
 status_t gx00_crtc_mem_priority(uint8);
 
 status_t gx00_crtc_cursor_init(); /*Yes, cursor follows CRTC1 - not the DAC!*/
@@ -109,8 +106,8 @@ status_t g400_crtc2_depth(int mode);
 status_t g400_crtc2_set_display_pitch(); 
 status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
 
-status_t g400_crtc2_dpms(uint8 display,uint8 h,uint8 v);
-status_t g400_crtc2_dpms_fetch(uint8 * display,uint8 * h,uint8 * v);
+status_t g400_crtc2_dpms(bool display, bool h, bool v);
+status_t g400_crtc2_dpms_fetch(bool *display, bool *h, bool *v);
 
 /*acceleration functions*/
 status_t check_acc_capability(uint32 feature);

@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 11/2002-4/2003
+   Rudolf Cornelissen 11/2002-12/2003
 */
 
 #define MODULE_BIT 0x00040000
@@ -15,82 +15,65 @@ status_t gx00_crtc_validate_timing(
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 )
 {
-/*horizontal*/
-	/*make all parameters multiples of 8 and confine to required number of bits*/
-	*hd_e&=0x7F8;
-	*hs_s&=0xFF8;
-	*hs_e&=0xFF8;
-	*ht  &=0xFF8;
+/* horizontal */
+	/* make all parameters multiples of 8 */
+	*hd_e &= 0x0ff8; /* 2048 is a valid value for this item! */
+	*hs_s &= 0x0ff8;
+	*hs_e &= 0x0ff8;
+	*ht   &= 0x0ff8;
 
-	/*confine to a reasonable width*/
-	if (*hd_e<640) *hd_e=640;
-	if (*hd_e>2048) *hd_e=2048;
+	/* confine to required number of bits, taking logic into account */
+	if (*hd_e > ((0x00ff + 1) << 3)) *hd_e = ((0x00ff + 1) << 3);
+	if (*hs_s > ((0x01ff - 1) << 3)) *hs_s = ((0x01ff - 1) << 3);
+	if (*hs_e > ( 0x01ff      << 3)) *hs_e = ( 0x01ff      << 3);
+	if (*ht   > ((0x01ff + 5) << 3)) *ht   = ((0x01ff + 5) << 3);
 
-	/*if horizontal total does not leave room for a sensible sync pulse, increase it!*/
-	if (*ht<(*hd_e+80)) *ht=*hd_e+80;
+	/* NOTE: keep horizontal timing at multiples of 8! */
+	/* confine to a reasonable width */
+	if (*hd_e < 640) *hd_e = 640;
+	if (*hd_e > 2048) *hd_e = 2048;
 
-	/*make sure sync pulse is not during display*/
-	if (*hs_e>(*ht-0x8)) *hs_e=*ht-0x8;
-	if (*hs_s<(*hd_e+0x8)) *hs_e=*hd_e+0x8;
+	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
+	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
 
-	/*correct sync pulse if it is too long*/
-	if (*hs_e>(*hs_s+0xF8)) *hs_e=*hs_s+0xF8;
+	/* make sure sync pulse is not during display */
+	if (*hs_e > (*ht - 8)) *hs_e = (*ht - 8);
+	if (*hs_s < (*hd_e + 8)) *hs_s = (*hd_e + 8);
 
-	/*fail if they are now outside required number of bits*/
-	if (
-		*hd_e!=(*hd_e&0x7F8) ||
-		*hs_s!=(*hs_s&0xFF8) ||
-		*hs_e!=(*hs_e&0xFF8) ||
-		*ht  !=(*ht  &0xFF8)
-	)
-	{
-		LOG(8,("CRTC:Horizontal timing fell out of bits\n"));
-		return B_ERROR;
-	}
+	/* correct sync pulse if it is too long:
+	 * there are only 5 bits available to save this in the card registers! */
+	if (*hs_e > (*hs_s + 0xf8)) *hs_e = (*hs_s + 0xf8);
 
 /*vertical*/
-	/*squish to required number of bits*/
-	*vd_e&=0x7FF;
-	*vs_s&=0xFFF;
-	*vs_e&=0xFFF;
-	*vt  &=0xFFF;
+	/* confine to required number of bits, taking logic into account */
+	if (*vd_e >  0x7ff     ) *vd_e =  0x7ff     ; /* linecomp max value = 0x7ff! */
+	if (*vs_s > (0xfff - 1)) *vs_s = (0xfff - 1);
+	if (*vs_e >  0xfff     ) *vs_e =  0xfff     ;
+	if (*vt   > (0xfff + 2)) *vt   = (0xfff + 2);
 
-	/*confine to a reasonable height*/
-	if (*vd_e<400) *vd_e=400;
-	if (*vd_e>2048) *vd_e=2048;
+	/* confine to a reasonable height */
+	if (*vd_e < 480) *vd_e = 480;
+	if (*vd_e > 2047) *vd_e = 2047;
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
-	if (*vt<(*vd_e+3)) *vt=*vd_e+3;
+	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
 
-	/*make sure sync pulse if not during display*/
-	if (*vs_e>(*vt-1)) *vs_e=*vt-1;
-	if (*vs_s<(*vd_e+1)) *vs_s=*vd_e+1;
+	/* make sure sync pulse is not during display */
+	if (*vs_e > (*vt - 1)) *vs_e = (*vt - 1);
+	if (*vs_s < (*vd_e + 1)) *vs_s = (*vd_e + 1);
 
-	/*correct sync pulse if it is too long*/
-	if (*vs_e>(*vs_s+0xF)) *vs_e=*vs_s+0xF;
+	/* correct sync pulse if it is too long:
+	 * there are only 4 bits available to save this in the card registers! */
+	if (*vs_e > (*vs_s + 0x0f)) *vs_e = (*vs_s + 0x0f);
 
-	/*fail if now outside required number of bits*/
-	if (
-		*vd_e!=(*vd_e&0x7FF) ||
-		*vs_s!=(*vs_s&0xFFF) ||
-		*vs_e!=(*vs_e&0xFFF) ||
-		*vt  !=(*vt  &0xFFF)
-	)
-	{
-		LOG(8,("CRTC:Vertical timing fell out of bits\n"));
-		return B_ERROR;
-	}
 	return B_OK;
 }
-	
 
-/*set a mode line - inputs are in pixels*/
-status_t gx00_crtc_set_timing(
-	uint16 hd_e,uint16 hs_s,uint16 hs_e,uint16 ht,
-	uint16 vd_e,uint16 vs_s,uint16 vs_e,uint16 vt,
-	uint8 hsync_pos,uint8 vsync_pos
-)
+/* set a mode line - inputs are in pixels */
+status_t gx00_crtc_set_timing(display_mode target)
 {
+	uint8 temp;
+
 	uint32 htotal;		/*total horizontal total VCLKs*/
 	uint32 hdisp_e;            /*end of horizontal display (begins at 0)*/
 	uint32 hsync_s;            /*begin of horizontal sync pulse*/
@@ -109,23 +92,25 @@ status_t gx00_crtc_set_timing(
 
 	LOG(4,("CRTC: setting timing\n"));
 
-	/* Modify parameters as required by the G400/G200 */
-	htotal = ((ht >> 3) - 5);
-	hdisp_e = ((hd_e >> 3) -1);	//so: timing - 8
-	hblnk_s = hdisp_e;			//so: timing - 8
-	hblnk_e = (htotal + 4);		//so: timing - 8
-	hsync_s = (hs_s >> 3);
-	hsync_e = (hs_e >> 3);
+	/* Modify parameters as required by standard VGA */
+	htotal = ((target.timing.h_total >> 3) - 5);
+	hdisp_e = ((target.timing.h_display >> 3) - 1);
+	hblnk_s = hdisp_e;
+	hblnk_e = (htotal + 4);
+	hsync_s = (target.timing.h_sync_start >> 3);
+	hsync_e = (target.timing.h_sync_end >> 3);
 
-	vtotal=vt-2;
-	vdisp_e=vd_e-1;
-	vsync_s=vs_s-1;
-	vsync_e=vs_e-1;
-	vblnk_s=vdisp_e;
-	vblnk_e=vtotal+1;
+	vtotal = target.timing.v_total - 2;
+	vdisp_e = target.timing.v_display - 1;
+	vblnk_s = vdisp_e;
+	vblnk_e = (vtotal + 1);
+	vsync_s = target.timing.v_sync_start - 1; /* Matrox */
+	vsync_e = target.timing.v_sync_end - 1; /* Matrox */
 
-	linecomp=256; /*should display half the screen!*/
-	
+	/* We use the Matrox linecomp INT function to detect the
+	 * vertical retrace at the earliest possible moment.. */
+	linecomp = target.timing.v_display;
+
 	/*log the mode I am setting*/
 	LOG(2,("CRTC:\n\tHTOT:%x\n\tHDISPEND:%x\n\tHBLNKS:%x\n\tHBLNKE:%x\n\tHSYNCS:%x\n\tHSYNCE:%x\n\t",htotal,hdisp_e,hblnk_s,hblnk_e,hsync_s,hsync_e));
 	LOG(2,("VTOT:%x\n\tVDISPEND:%x\n\tVBLNKS:%x\n\tVBLNKE:%x\n\tVSYNCS:%x\n\tVSYNCE:%x\n",vtotal,vdisp_e,vblnk_s,vblnk_e,vsync_s,vsync_e));
@@ -133,55 +118,79 @@ status_t gx00_crtc_set_timing(
 	/*actually program the card! Note linecomp is programmed to vblnk_s for VBI*/
 	/*horizontal - VGA regs*/
 
-	VGAW_I(CRTC,0,htotal&0xFF);
-	VGAW_I(CRTC,1,hdisp_e&0xFF);
-	VGAW_I(CRTC,2,hblnk_s&0xFF);
-	VGAW_I(CRTC,3,(hblnk_e&0x1F)|0x80);
-	VGAW_I(CRTC,4,hsync_s&0xFF);
-	VGAW_I(CRTC,5,(hsync_e&0x1F)|((hblnk_e&0x20)<<2));
+	VGAW_I(CRTC, 0x00, (htotal & 0x0ff));
+	VGAW_I(CRTC, 0x01, (hdisp_e & 0x0ff));
+	VGAW_I(CRTC, 0x02, (hblnk_s & 0x0ff));
+	/* b7 should be set for compatibility reasons */
+	VGAW_I(CRTC, 0x03, ((hblnk_e & 0x01f) | 0x80));
+	VGAW_I(CRTC, 0x04, (hsync_s & 0x0ff));
+	VGAW_I(CRTC, 0x05, (hsync_e & 0x01f) | ((hblnk_e & 0x020) << 2));
 	
 	/*vertical - VGA regs*/
-	VGAW_I(CRTC,6,vtotal&0xFF);
-	VGAW_I(CRTC,7,
+	VGAW_I(CRTC, 0x06, (vtotal & 0x0ff));
+	VGAW_I(CRTC, 0x07,
 	(
-		((vtotal&0x100)>>(8-0)) |((vtotal&0x200)>>(9-5))|
-		((vdisp_e&0x100)>>(8-1))|((vdisp_e&0x200)>>(9-6))|
-		((vsync_s&0x100)>>(8-2))|((vsync_s&0x200)>>(9-7))|
-		((vblnk_s&0x100)>>(8-3))|((linecomp&0x100)>>(8-4))
+		((vtotal & 0x100) >> (8 - 0)) | ((vtotal & 0x200) >> (9 - 5)) |
+		((vdisp_e & 0x100) >> (8 - 1)) | ((vdisp_e & 0x200) >> (9 - 6)) |
+		((vsync_s & 0x100) >> (8 - 2)) | ((vsync_s & 0x200) >> (9 - 7)) |
+		((vblnk_s & 0x100) >> (8 - 3)) | ((linecomp & 0x100) >> (8 - 4))
 	));
-	VGAW_I(CRTC,0x8,0x00);
-	VGAW_I(CRTC,0x9,((vblnk_s&0x200)>>(9-5))|((linecomp&0x200)>>(9-6)));
-	VGAW_I(CRTC,0x10,vsync_s&0xFF);
-	VGAW_I(CRTC,0x11,((VGAR_I(CRTC,0x11))&0xF0)|(vsync_e&0xF));
-	VGAW_I(CRTC,0x12,vdisp_e&0xFF);
-	VGAW_I(CRTC,0x15,vblnk_s&0xFF);
-	VGAW_I(CRTC,0x16,vblnk_e&0xFF);
-	VGAW_I(CRTC,0x18,linecomp&0xFF);
+	VGAW_I(CRTC, 0x08, 0x00);
+	VGAW_I(CRTC, 0x09, ((vblnk_s & 0x200) >> (9 - 5)) | ((linecomp & 0x200) >> (9 - 6)));
+	VGAW_I(CRTC, 0x10, (vsync_s & 0x0ff));
+	VGAW_I(CRTC, 0x11, (((VGAR_I(CRTC, 0x11)) & 0xf0) | (vsync_e & 0x00f)));
+	VGAW_I(CRTC, 0x12, (vdisp_e & 0x0ff));
+	VGAW_I(CRTC, 0x15, (vblnk_s & 0x0ff));
+	VGAW_I(CRTC, 0x16, (vblnk_e & 0x0ff));
+	VGAW_I(CRTC, 0x18, (linecomp & 0x0ff));
 
 	/* horizontal - extended regs */
 	/* do not touch external sync reset inputs: used for TVout */
-	VGAW_I(CRTCEXT,1,
+	VGAW_I(CRTCEXT, 1,
 	(
-		((htotal&0x100)>>8)|
-		((hblnk_s&0x100)>>7)|
-		((hsync_s&0x100)>>6)|
-		(hblnk_e&0x40)|
-		(VGAR_I(CRTCEXT,1)&0xb8)
+		((htotal & 0x100) >> (8 - 0)) |
+		((hblnk_s & 0x100) >> (8 - 1)) |
+		((hsync_s & 0x100) >> (8 - 2)) |
+		((hblnk_e & 0x040) >> (6 - 6)) |
+		(VGAR_I(CRTCEXT, 1) & 0xb8)
 	));
 
 	/*vertical - extended regs*/
-	VGAW_I(CRTCEXT,2,
+	VGAW_I(CRTCEXT, 2,
 	(
-	 	((vtotal&0xC00)>>10)|
-		((vdisp_e&0x400)>>8)|
-		((vblnk_s&0xC00)>>7)|
-		((vsync_s&0xC00)>>5)|
-		((linecomp&0x400)>>3)
+	 	((vtotal & 0xc00) >> (10 - 0)) |
+		((vdisp_e & 0x400) >> (10 - 2)) |
+		((vblnk_s & 0xc00) >> (10 - 3)) |
+		((vsync_s & 0xc00) >> (10 - 5)) |
+		((linecomp & 0x400) >> (10 - 7))
 	));
 
-	/*set up HSYNC & VSYNC polarity*/
-	VGAW(MISCW,(VGAR(MISCR)&0x3F)|((!vsync_pos)<<7)|((!hsync_pos)<<6));
-	LOG(2,("HSYNC/VSYNC pol:%x %x MISC dump:%x\n",hsync_pos,vsync_pos,VGAR(MISCR)));
+	/* setup HSYNC & VSYNC polarity */
+	LOG(2,("CRTC: sync polarity: "));
+	temp = VGAR(MISCR);
+	if (target.timing.flags & B_POSITIVE_HSYNC)
+	{
+		LOG(2,("H:pos "));
+		temp &= ~0x40;
+	}
+	else
+	{
+		LOG(2,("H:neg "));
+		temp |= 0x40;
+	}
+	if (target.timing.flags & B_POSITIVE_VSYNC)
+	{
+		LOG(2,("V:pos "));
+		temp &= ~0x80;
+	}
+	else
+	{
+		LOG(2,("V:neg "));
+		temp |= 0x80;
+	}
+	VGAW(MISCW, temp);
+
+	LOG(2,(", MISC reg readback: $%02x\n", VGAR(MISCR)));
 
 	return B_OK;
 }
@@ -239,12 +248,41 @@ status_t gx00_crtc_depth(int mode)
 	return B_OK;
 }
 
-status_t gx00_crtc_dpms(uint8 display,uint8 h,uint8 v) // MIL2
+status_t gx00_crtc_dpms(bool display, bool h, bool v) // MIL2
 {
-	LOG(4,("gx00_crtc_dpms (%d,%d,%d)\n", display,h,v));
-	VGAW_I(SEQ,1,(!display)<<5);
-	VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0xCF)|((!v)<<5))|((!h)<<4);
-	
+	LOG(4,("CRTC: setting DPMS: "));
+
+	if (display)
+	{
+		VGAW_I(SEQ,1, 0x00);
+		LOG(4,("display on, "));
+	}
+	else
+	{
+		VGAW_I(SEQ,1, 0x20);
+		LOG(4,("display off, "));
+	}
+	if (h)
+	{
+		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xef));
+		LOG(4,("hsync enabled, "));
+	}
+	else
+	{
+		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x10));
+		LOG(4,("hsync disabled, "));
+	}
+	if (v)
+	{
+		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) & 0xdf));
+		LOG(4,("vsync enabled\n"));
+	}
+	else
+	{
+		VGAW_I(CRTCEXT, 1, (VGAR_I(CRTCEXT, 1) | 0x20));
+		LOG(4,("vsync disabled\n"));
+	}
+
 	/* set some required fixed values for proper MGA mode initialisation */
 	VGAW_I(CRTC,0x17,0xC3);
 	VGAW_I(CRTC,0x14,0x00);
@@ -252,13 +290,20 @@ status_t gx00_crtc_dpms(uint8 display,uint8 h,uint8 v) // MIL2
 	return B_OK;
 }
 
-status_t gx00_crtc_dpms_fetch(uint8 * display,uint8 * h,uint8 * v) // MIL2
+status_t gx00_crtc_dpms_fetch(bool *display, bool *h, bool *v) // MIL2
 {
-	*display=!((VGAR_I(SEQ,1)&0x20)>>5);
-	*h=!((VGAR_I(CRTCEXT,1)&0x10)>>4);
-	*v=!((VGAR_I(CRTCEXT,1)&0x20)>>5);
+	*display=!(VGAR_I(SEQ, 1) & 0x20);
+	*h=!(VGAR_I(CRTCEXT, 1) & 0x10);
+	*v=!(VGAR_I(CRTCEXT, 1) & 0x20);
 
-	LOG(4,("gx00_crtc_dpms_fetch (%d,%d,%d)\n", *display,*h,*v));
+	LOG(4,("CTRC: fetched DPMS state: "));
+	if (*display) LOG(4,("display on, "));
+	else LOG(4,("display off, "));
+	if (*h) LOG(4,("hsync enabled, "));
+	else LOG(4,("hsync disabled, "));
+	if (*v) LOG(4,("vsync enabled\n"));
+	else LOG(4,("vsync disabled\n"));
+
 	return B_OK;
 }
 

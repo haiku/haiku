@@ -20,6 +20,8 @@ status_t GET_DISPLAY_MODE(display_mode *current_mode)
 	/* check for NULL pointer */
 	if (current_mode == NULL) return B_ERROR;
 
+	LOG(4, ("GET_DISPLAY_MODE: returning current mode\n"));
+
 	*current_mode = si->dm;
 	return B_OK;
 }

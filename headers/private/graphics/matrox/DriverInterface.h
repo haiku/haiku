@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-4/2003.
+	Rudolf Cornelissen 10/2002-12/2003.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -51,6 +51,7 @@ typedef struct {
 #define TV_PAL (1<<9)
 #define TV_NTSC (2<<9)
 #define TV_CAPABLE (1<<11)
+#define TV_VIDEO (1<<12)
 
 #define SKD_MOVE_CURSOR    0x00000001
 #define SKD_PROGRAM_CLUT   0x00000002
@@ -158,6 +159,9 @@ typedef struct {
 		uint32		count;		/* last dwgsync slot used */
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
+		uint32 src_dst;			/* G100 pre SRCORG/DSTORG registers */
+		uint8 y_lin;			/* MIL1/2 adress linearisation does not always work */
+		uint8 depth;
 	} engine;
 
   /* card info - information gathered from PINS (and other sources) */
@@ -221,13 +225,20 @@ typedef struct {
 		uint16 v5_mem_type;			/* pins v5 memory type info */
 	} ps;
 
-  /*mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb)*/
+	/* mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb) */
 	uint8 rom_mirror[32768];
 
-  /*CRTC delay -> used in timing for MAVEN, depending on which CRTC is driving it*/
+	/* CRTC delay -> used in timing for MAVEN, depending on which CRTC is driving it */
 	uint8 crtc_delay;
 
-  /* apsed: some configuration settings from ~/config/settings/kernel/drivers/mga.settings if exists */
+	/* MAVEN sync polarity offset from 'reset' situation: MAVEN sync polarity setup
+	 * works in a serial fashion without readback or handy reset options! */
+	uint8 maven_syncpol_offset;
+
+	/* On G450/G550 we need this info for secondary head DPMS functionality */
+	bool crossed_conns;
+
+	/* apsed: some configuration settings from ~/config/settings/kernel/drivers/mga.settings if exists */
 	settings settings;
 
 	struct

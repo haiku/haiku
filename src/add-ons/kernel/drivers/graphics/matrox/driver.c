@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002.
+	Rudolf Cornelissen 3/2002-11/2003.
 */
 
 /* standard kernel driver stuff */
@@ -688,6 +688,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	    (di->pcii.u.h0.interrupt_line == 0xff) || /* no IRQ assigned */
 	    (di->pcii.u.h0.interrupt_line <= 0x02))   /* system IRQ assigned */
 	{
+		/* we are aborting! */
+		/* Note: the R4 graphics driver kit lacks this statement!! */
+		result = B_ERROR;
 		/* interrupt does not exist so exit without installing our handler */
 		goto delete_the_sem;
 	}

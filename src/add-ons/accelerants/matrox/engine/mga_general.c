@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-4/2003
+   Rudolf Cornelissen 10/2002-12/2003
 */
 
 #define MODULE_BIT 0x00008000
@@ -56,7 +56,7 @@ status_t gx00_general_powerup()
 	status_t status;
 	uint32 card_class;
 
-	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.14 running.\n"));
+	LOG(1,("POWERUP: Matrox (open)BeOS Accelerant 0.15 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -292,7 +292,7 @@ status_t g100_general_powerup()
 	/*power up the PLLs,LUT,DAC*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	gx00_crtc_dpms(0,0,0);
+	gx00_crtc_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 	/* G100 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
@@ -368,7 +368,7 @@ status_t g100_general_powerup()
 	VGAW_I(CRTC,0x11,0);
 
 	/*turn on display one*/
-	gx00_crtc_dpms(1,1,1);
+	gx00_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -394,7 +394,7 @@ status_t g200_general_powerup()
 	/*power up the PLLs,LUT,DAC*/
 	LOG(2,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	gx00_crtc_dpms(0,0,0);
+	gx00_crtc_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 	/* G200 SGRAM and SDRAM use external pix and dac refs, do *not* activate internals!
 	 * (this would create electrical shortcuts,
@@ -468,7 +468,7 @@ status_t g200_general_powerup()
 	VGAW_I(CRTC,0x11,0);
 
 	/*turn on display one*/
-	gx00_crtc_dpms(1,1,1);
+	gx00_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -491,11 +491,19 @@ status_t g400_general_powerup()
 	/* if the user doesn't want a coldstart OR the BIOS pins info could not be found warmstart */
 	if (si->settings.usebios || (result != B_OK)) return gx00_general_bios_to_powergraphics();
 
+	/* reset MAVEN so we know the sync polarity is at reset situation (Hpos, Vpos) */
+	if (si->ps.secondary_tvout)
+	{
+		ACCW(RST, 0x00000002);
+		snooze(1000);
+		ACCW(RST, 0x00000000);
+	}
+
 	/*power up the PLLs,LUT,DAC*/
 	LOG(4,("INIT: PLL/LUT/DAC powerup\n"));
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	gx00_crtc_dpms(0,0,0);
-	g400_crtc2_dpms(0,0,0);
+	gx00_crtc_dpms(false, false, false);
+	g400_crtc2_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 
 	/* set voltage reference - not using DAC reference block */
@@ -573,7 +581,7 @@ status_t g400_general_powerup()
 	}
 
 	/*turn on display one*/
-	gx00_crtc_dpms(1,1,1);
+	gx00_crtc_dpms(true, true, true);
 
 	return B_OK;
 }
@@ -605,8 +613,8 @@ status_t g450_general_powerup()
 	/* disable outputs */
 	DXIW(OUTPUTCONN,0x00); 
 	/* turn off both displays and the hardcursor (also disables transfers) */
-	gx00_crtc_dpms(0,0,0);
-	g400_crtc2_dpms(0,0,0);
+	gx00_crtc_dpms(false, false, false);
+	g400_crtc2_dpms(false, false, false);
 	gx00_crtc_cursor_hide();
 
 	/* power up everything except DVI electronics (for now) */
@@ -721,7 +729,7 @@ status_t g450_general_powerup()
 	gx50_general_output_select();
 
 	/*turn on display one*/
-	gx00_crtc_dpms(1,1,1);
+	gx00_crtc_dpms(true, true, true);
 
 	/* enable 'straight-through' sync outputs on both analog output connectors */
 	DXIW(SYNCCTRL,0x00); 
@@ -806,6 +814,8 @@ status_t gx00_general_dac_select(int dac)
 			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
 			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
 			DXIW(GENIODATA, 0x00);
+			/* signal CRTC2 DPMS which connector to program */
+			si->crossed_conns = false;
 			break;
 		//fixme: toggle PLL's below if possible: 
 		//       otherwise toggle PLL's for G400 2nd case?
@@ -821,17 +831,12 @@ status_t gx00_general_dac_select(int dac)
 			/* Select 1.5 Volt MAVEN DAC ref. for monitor mode */
 			DXIW(GENIOCTRL, DXIR(GENIOCTRL) & ~0x40);
 			DXIW(GENIODATA, 0x00);
+			/* signal CRTC2 DPMS which connector to program */
+			si->crossed_conns = true;
 			break;
 		default:
 			return B_ERROR;
 	}
-	return B_OK;
-}
-
-/*busy wait until retrace!*/
-status_t gx00_general_wait_retrace()
-{
-	while (!(ACCR(STATUS)&0x8));
 	return B_OK;
 }
 
@@ -858,6 +863,13 @@ status_t gx00_general_bios_to_powergraphics()
 	{
 		case G400:
 		case G400MAX:
+			/* reset MAVEN so we know the sync polarity is at reset situation (Hpos, Vpos) */
+			if (si->ps.secondary_tvout)
+			{
+				ACCW(RST, 0x00000002);
+				snooze(1000);
+				ACCW(RST, 0x00000000);
+			}
 			/* makes CRTC2 stable! Matrox specify 8, but use 4 - grrrr! */
 			DXIW(MAFCDEL,0x02);
 			break;
@@ -901,7 +913,7 @@ status_t gx00_general_bios_to_powergraphics()
  * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
 //fixme: seperate heads for real dualhead modes:
 //CRTC1 and 2 constraints differ!
-status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row)
+status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
 {
 	/* Note:
 	 * This routine assumes that the CRTC memory pitch granularity is 'smaller than',
@@ -1003,7 +1015,7 @@ status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per
 
 	/* check if we can setup this mode with acceleration:
 	 * Max sizes need to adhere to both the acceleration engine _and_ the CRTC constraints! */
-	si->acc_mode = true;
+	*acc_mode = true;
 	/* check virtual_width */
 	switch (si->ps.card_type)
 	{
@@ -1011,19 +1023,19 @@ status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per
 	case MIL2:
 	case G100:
 		/* acc constraint: */
-		if (target->virtual_width > 2048) si->acc_mode = false;
+		if (target->virtual_width > 2048) *acc_mode = false;
 		break;
 	default:
 		/* G200-G550 */
 		/* acc constraint: */
-		if (target->virtual_width > 4096) si->acc_mode = false;
+		if (target->virtual_width > 4096) *acc_mode = false;
 		/* for 32bit mode a lower CRTC1 restriction applies! */
 		if ((target->space == B_RGB32_LITTLE) && (target->virtual_width > (4092 & ~acc_mask)))
-			si->acc_mode = false;
+			*acc_mode = false;
 		break;
 	}
 	/* virtual_height */
-	if (target->virtual_height > 2048) si->acc_mode = false;
+	if (target->virtual_height > 2048) *acc_mode = false;
 
 	/* now check virtual_size based on CRTC constraints,
 	 * making sure virtual_width stays within the 'mask' constraint: which is only
@@ -1064,7 +1076,7 @@ status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per
 	/* OK, now we know that virtual_width is valid, and it's needing no slopspace if
 	 * it was confined above, so we can finally calculate safely if we need slopspace
 	 * for this mode... */
-	if (si->acc_mode)
+	if (*acc_mode)
 		video_pitch = ((target->virtual_width + acc_mask) & ~acc_mask);
 	else
 		video_pitch = ((target->virtual_width + crtc_mask) & ~crtc_mask);

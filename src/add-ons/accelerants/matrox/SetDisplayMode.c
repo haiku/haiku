@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-4/2003
+	Rudolf Cornelissen 11/2002-12/2003
 */
 
 #define MODULE_BIT 0x00200000
@@ -50,10 +50,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	uint8 colour_depth1 = 32;
 	status_t result;
 	uint32 startadd,startadd_right;
-// apsed TODO startadd is 19 bits if < g200
-
-	uint8 display,h,v;
-	si->switched_crtcs = false;
+	bool display, h, v;
 
 	/* Adjust mode to valid one and fail if invalid */
 	target /*= bounds*/ = *mode_to_set;
@@ -78,19 +75,23 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	}
 	LOG(1, ("SETMODE: (CONT.) validated command modeflags: $%08x\n", target.flags));
 
+	/* overlay engine, cursor and MOVE_DISPLAY need to know the status even when
+	 * in singlehead mode */
+	si->switched_crtcs = false;
+
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
 
 	/* find current DPMS state, then turn off screen(s) */
-	gx00_crtc_dpms_fetch(&display,&h,&v);
-	gx00_crtc_dpms(0,0,0);
-	if (si->ps.secondary_head) g400_crtc2_dpms(0,0,0);
+	gx00_crtc_dpms_fetch(&display, &h, &v);
+	gx00_crtc_dpms(false, false, false);
+	if (si->ps.secondary_head) g400_crtc2_dpms(false, false, false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = si->fbc.frame_buffer - si->framebuffer;
 
 	/* calculate and set new mode bytes_per_row */
-	gx00_general_validate_pic_size (&target, &si->fbc.bytes_per_row);
+	gx00_general_validate_pic_size (&target, &si->fbc.bytes_per_row, &si->acc_mode);
 
 	/*Perform the very long mode switch!*/
 	if (target.flags & DUALHEAD_BITS) /*if some dualhead mode*/
@@ -169,15 +170,16 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* calculate needed MAVEN-CRTC delay: formula valid for straight-through CRTC's */
 		si->crtc_delay = 44 + 0 * (colour_depth2 == 16);
 
-		/* setup vertical timing adjust for crtc1 and crtc2 for straight-through CRTC's */
-		/* (extra "blanking" line for MAVEN) */
-		target2.timing.v_display++;
-
 		/* set the outputs */
 		switch (si->ps.card_type)
 		{
 		case G400:
 		case G400MAX:
+			/* setup vertical timing adjust for crtc connected to the MAVEN:
+			 * assuming connected straight through. */
+			/* (extra "blanking" line for MAVEN hardware design fault) */
+			target2.timing.v_display++;
+
 			switch (target.flags & DUALHEAD_BITS)
 			{
 			case DUALHEAD_ON:
@@ -203,17 +205,15 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 					si->switched_crtcs = false;
 					/* re-calculate MAVEN-CRTC delay: formula valid for crossed CRTC's */
 					si->crtc_delay = 17 + 4 * (colour_depth1 == 16);
-					/* re-setup vertical timing adjust for crtc1 and crtc2 for crossed CRTC's */
-					/* (extra "blanking" line for MAVEN) */
+					/* re-setup vertical timing adjust for crtc connected to the MAVEN:
+					 * cross connected. */
+					/* (extra "blanking" line for MAVEN hardware design fault) */
 					target.timing.v_display++;
 					target2.timing.v_display--;
 				}
 				break;
 			}
 			break;
-		//fixme: 
-		//setup crtc_delay and vertical timing adjust for G450(?)/G550, 
-		//and remove the '+1' in crtc2 vertical timing(?)
 		case G450:
 		case G550:
 			if (!si->ps.primary_dvi)
@@ -313,28 +313,12 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		}
 
 		/* set the timing */
-		result = gx00_crtc_set_timing /*crtc1*/
-		(
-			target.timing.h_display,
-			target.timing.h_sync_start,
-			target.timing.h_sync_end,
-			target.timing.h_total,
-			target.timing.v_display,
-			target.timing.v_sync_start,
-			target.timing.v_sync_end,
-			target.timing.v_total,
-			target.timing.flags&B_POSITIVE_HSYNC,
-			target.timing.flags&B_POSITIVE_VSYNC
-		);
+		gx00_crtc_set_timing(target);
 		/* we do not need to setup CRTC2 here for a head that's in TVout mode */
 		if (!(target2.flags & TV_BITS))	result = g400_crtc2_set_timing(target2);
 
 		/* TVout support: setup CRTC2 and it's pixelclock */
-		if (si->ps.secondary_tvout && (target2.flags & TV_BITS))
-		{
-			si->crtc_delay += 5;
-			maventv_init(target2);
-		}
+		if (si->ps.secondary_tvout && (target2.flags & TV_BITS)) maventv_init(target2);
 	}
 	else /* single head mode */
 	{
@@ -389,21 +373,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		default:
 			break;
 		}
-		
+
 		/* set the timing */
-		result = gx00_crtc_set_timing /*crtc1*/
-		(
-			target.timing.h_display,
-			target.timing.h_sync_start,
-			target.timing.h_sync_end,
-			target.timing.h_total,
-			target.timing.v_display,
-			target.timing.v_sync_start,
-			target.timing.v_sync_end,
-			target.timing.v_total,
-			target.timing.flags&B_POSITIVE_HSYNC,
-			target.timing.flags&B_POSITIVE_VSYNC
-		);
+		gx00_crtc_set_timing(target);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
@@ -412,17 +384,17 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	si->dm = target;
 
 	/* turn screen one on */
-	gx00_crtc_dpms(display,h,v);
+	gx00_crtc_dpms(display, h, v);
 	/* turn screen two on if a dualhead mode is active */
-	if (target.flags & DUALHEAD_BITS) g400_crtc2_dpms(display,h,v);
+	if (target.flags & DUALHEAD_BITS) g400_crtc2_dpms(display, h, v);
 
 	/* set up acceleration for this mode */
-	si->dm.virtual_height += 1;//for clipping!
 	gx00_acc_init();
-	si->dm.virtual_height -= 1;
 
-	/* clear line at bottom of screen (for maven) if dualhead mode */
-	gx00_acc_rectangle(0,si->dm.virtual_width+1,si->dm.virtual_height,1,0);
+	/* clear line at bottom of screen if dualhead mode:
+	 * MAVEN hardware design fault 'fix'. */
+	if ((target.flags & DUALHEAD_BITS) && (si->ps.card_type <= G400MAX))
+		gx00_maven_clrline();
 
 	MSG(("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
@@ -574,40 +546,88 @@ void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags
 	gx00_dac_palette(r,g,b);
 }
 
-
-/* masks for DPMS control bits */
-enum {
-	H_SYNC_OFF = 0x01,
-	V_SYNC_OFF = 0x02,
-	DISPLAY_OFF = 0x04,
-	BITSMASK = H_SYNC_OFF | V_SYNC_OFF | DISPLAY_OFF
-};
-
 /* Put the display into one of the Display Power Management modes. */
 status_t SET_DPMS_MODE(uint32 dpms_flags) {
 	interrupt_enable(false);
 
 	LOG(4,("SET_DPMS_MODE: 0x%08x\n", dpms_flags));
 	
-	if (si->dm.flags&DUALHEAD_BITS) /*dualhead*/
+	if (si->dm.flags & DUALHEAD_BITS) /* dualhead */
 	{
 		switch(dpms_flags) 
 		{
 		case B_DPMS_ON:	/* H: on, V: on */
-			gx00_crtc_dpms(1,1,1);
-			if (si->ps.secondary_head) g400_crtc2_dpms(1,1,1);
+			gx00_crtc_dpms(true, true, true);
+			if (si->ps.secondary_head) g400_crtc2_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
-			gx00_crtc_dpms(0,0,1);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,0,1);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, false, true);
+			}
+			if (si->ps.secondary_head)
+			{
+				if ((si->dm.flags & TV_BITS) && (si->ps.card_type > G400MAX))
+				{
+					/* keep display enabled in TVout modes for G450 and G550! */
+					g400_crtc2_dpms(true, false, true);
+				}
+				else
+				{
+					g400_crtc2_dpms(false, false, true);
+				}
+			}
 			break;
 		case B_DPMS_SUSPEND:
-			gx00_crtc_dpms(0,1,0);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,1,0);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, true, false);
+			}
+			if (si->ps.secondary_head)
+			{
+				if ((si->dm.flags & TV_BITS) && (si->ps.card_type > G400MAX))
+				{
+					/* keep display enabled in TVout modes for G450 and G550! */
+					g400_crtc2_dpms(true, true, false);
+				}
+				else
+				{
+					g400_crtc2_dpms(false, true, false);
+				}
+			}
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
-			gx00_crtc_dpms(0,0,0);
-			if (si->ps.secondary_head) g400_crtc2_dpms(0,0,0);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, false, false);
+			}
+			if (si->ps.secondary_head)
+			{
+				if ((si->dm.flags & TV_BITS) && (si->ps.card_type > G400MAX))
+				{
+					/* keep display enabled in TVout modes for G450 and G550! */
+					g400_crtc2_dpms(true, false, false);
+				}
+				else
+				{
+					g400_crtc2_dpms(false, false, false);
+				}
+			}
 			break;
 		default:
 			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
@@ -615,24 +635,48 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 			return B_ERROR;
 		}
 	}
-	else /*singlehead*/
+	else /* singlehead */
 	{
 		switch(dpms_flags) 
 		{
 		case B_DPMS_ON:	/* H: on, V: on */
-			gx00_crtc_dpms(1,1,1);
+			gx00_crtc_dpms(true, true, true);
 			break;
 		case B_DPMS_STAND_BY:
-			gx00_crtc_dpms(0,0,1);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, false, true);
+			}
 			break;
 		case B_DPMS_SUSPEND:
-			gx00_crtc_dpms(0,1,0);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, true, false);
+			}
 			break;
 		case B_DPMS_OFF: /* H: off, V: off, display off */
-			gx00_crtc_dpms(0,0,0);
+			if (si->settings.greensync)
+			{
+				/* blank screen, but keep sync running */
+				gx00_crtc_dpms(false, true, true);
+			}
+			else
+			{
+				gx00_crtc_dpms(false, false, false);
+			}
 			break;
 		default:
-			LOG(8,("SET: Invalid DPMS settings (DH) 0x%08x\n", dpms_flags));
+			LOG(8,("SET: Invalid DPMS settings (SH) 0x%08x\n", dpms_flags));
 			interrupt_enable(true);
 			return B_ERROR;
 		}
@@ -641,29 +685,34 @@ status_t SET_DPMS_MODE(uint32 dpms_flags) {
 	return B_OK;
 }
 
-/*
-	Report device DPMS capabilities.
-*/
-uint32 DPMS_CAPABILITIES(void) {
-	return 	B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND|B_DPMS_OFF;
+/* Report device DPMS capabilities. */
+uint32 DPMS_CAPABILITIES(void)
+{
+	if (si->settings.greensync)
+		/* we can blank the screen on CRTC1, G400 CRTC2 does not support intermediate
+		 * modes anyway. */
+		//fixme: G450/G550 support full DPMS on CRTC2...
+		return 	B_DPMS_ON | B_DPMS_OFF;
+	else
+		/* normally CRTC1 supports full DPMS (and on G450/G550 CRTC2 also).. */
+		return 	B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF;
 }
 
-
-/*
-	Return the current DPMS mode.
-*/
+/* Return the current DPMS mode. */
 uint32 DPMS_MODE(void) {
-	uint8 display,h,v;
-	
+	bool display, h, v;
+
 	interrupt_enable(false);
-	gx00_crtc_dpms_fetch(&display,&h,&v);
+	gx00_crtc_dpms_fetch(&display, &h, &v);
 	interrupt_enable(true);
 
-	if (display&h&v)
+	if (display && h && v)
 		return B_DPMS_ON;
-	else if(v)
+	else if (si->settings.greensync)
+		return B_DPMS_OFF;
+	else if (v)
 		return B_DPMS_STAND_BY;
-	else if(h)
+	else if (h)
 		return B_DPMS_SUSPEND;
 	else
 		return B_DPMS_OFF;

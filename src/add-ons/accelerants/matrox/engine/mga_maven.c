@@ -2,7 +2,7 @@
 
 /* Authors:
    Mark Watson 6/2000,
-   Rudolf Cornelissen 1/2003-4/2003
+   Rudolf Cornelissen 1/2003-12/2003
 
    Thanx to Petr Vandrovec for writing matroxfb.
 */
@@ -14,12 +14,67 @@
 status_t g450_g550_maven_set_vid_pll(display_mode target);
 status_t g100_g400max_maven_set_vid_pll(display_mode target);
 
-status_t gx00_maven_dpms(uint8 display,uint8 h,uint8 v)
+/* This routine blanks the first 'line' below the screen used if there's memory left
+ * to place it in. This will prevent overscanning rubbish on the MAVEN DAC, but only
+ * if no screen using virtual height is setup.
+ * In the rare event the mode and overlay use up so much RAM there's not enough room
+ * left for one blank line, you will get overscanning rubbish from the overlay as it
+ * will overwrite the blank line placed here.
+ * This 'rectangle fill' is done in software because not all modes are supported by
+ * the acc engine.
+ * This function exists to partly overcome a G400 MAVEN hardware design fault, which
+ * influences output in both monitor and TVout modes. The fault is that the MAVEN
+ * keeps repeatedly displaying the last 8 pixels fetched from memory until fetching
+ * restarts after a vertical retrace.
+ * In order to let the maven fetch black pixels, an extra line has to be added to its
+ * CRTC timing. This line needs to be entirely filled black, so with zeros. This line
+ * will be displayed as last visible line, and the last 8 pixels of it will be
+ * repeated during vertical retrace.
+ * Note that the overscanning rubbish can be suppressed in TVout modes by extending
+ * the vertical sync pulse all the way 'to the end'. */
+status_t gx00_maven_clrline()
+{
+	uint32 x, screensize, pointer_reservation;
+	uint8* adr;
+
+	/* this function is nolonger needed on G450/G550 cards */
+	if (si->ps.card_type > G400MAX) return B_OK;
+
+	/* checkout space needed for hardcursor (if any) */
+	pointer_reservation = 0;
+	/* MIL 1/2 cards have a seperate buffer for the cursorbitmap inside the DAC */
+	if ((si->ps.card_type >= G100) && si->settings.hardcursor) pointer_reservation = 1024;
+
+	/* calculate actual screensize */
+	screensize = si->fbc.bytes_per_row * si->dm.virtual_height;
+
+	/* check if there's room left for a full blank line following the actual screen */
+	if ((screensize + si->fbc.bytes_per_row + pointer_reservation) <=
+		(si->ps.memory_size * 1024 * 1024))
+	{
+		LOG(4,("MAVEN: clearing line directly below screen\n"));
+
+		/* calculate first adress beyond actual screen */
+		adr = (uint8*)si->fbc.frame_buffer;
+		adr += screensize;
+		/* clear the line */
+		for (x = 0; x < si->fbc.bytes_per_row; x++)
+		{
+			*(adr + x) = 0x00;
+		}
+	}
+	else
+		LOG(4,("MAVEN: not clearing line directly below screen: no memory left\n"));
+
+	return B_OK;
+}
+
+status_t gx00_maven_dpms(bool display, bool h, bool v)
 {
 	/* this function is nolonger needed on G450/G550 cards */
 	if (si->ps.card_type > G400MAX) return B_OK;
 
-	if (display & h & v)
+	if (display && h && v)
 	{
 		/* turn on screen */
 		if (!(si->dm.flags & TV_BITS))
@@ -56,6 +111,8 @@ status_t gx00_maven_dpms(uint8 display,uint8 h,uint8 v)
 /*set a mode line - inputs are in pixels/scanlines*/
 status_t gx00_maven_set_timing(display_mode target)
 {
+	uint8 temp, cnt, offset, loop;
+
 	/* this function is nolonger needed on G450/G550 cards */
 	if (si->ps.card_type > G400MAX) return B_OK;
 
@@ -87,19 +144,65 @@ status_t gx00_maven_set_timing(display_mode target)
 	MAVWW(HVIDRSTL, (target.timing.h_total - si->crtc_delay));
 	MAVWW(VVIDRSTL, (target.timing.v_total - 2));
 
+	/* setup HSYNC & VSYNC polarity */
+	LOG(2,("MAVEN: sync polarity: "));
+	temp = MAVR(LUMA);
+
+	/* find out which offset from the 'reset position' we need */
+	switch (((target.timing.flags & B_POSITIVE_HSYNC) >> (29 - 0)) |
+			((target.timing.flags & B_POSITIVE_VSYNC) >> (30 - 1)))
+	{
+	case 0:
+		/* H neg, V neg */
+		LOG(2,("H:neg V:neg\n"));
+		offset = 2;
+		break;
+	case 1:
+		/* H pos, V neg */
+		LOG(2,("H:pos V:neg\n"));
+		offset = 3;
+		break;
+	case 2:
+		/* H neg, V pos */
+		LOG(2,("H:neg V:pos\n"));
+		offset = 1;
+		break;
+	case 3:
+	default:
+		/* H pos, V pos */
+		LOG(2,("H:pos V:pos\n"));
+		offset = 0;
+		break;
+	}
+	/* calculate the number of steps we need to make from the current 'position' */
+	cnt = 0;
+	if ((offset - ((int)si->maven_syncpol_offset)) < 0) cnt = 4;
+	cnt += offset - si->maven_syncpol_offset;
+	/* note the offset from 'reset position' we will have now */
+	si->maven_syncpol_offset = offset;
+
+	/* program the maven: */
+	/* make sure pulse bit is reset */
+	temp &= ~0x20;
+	MAVW(LUMA, temp);
+	snooze(5);
+	/* enable maven sync polarity programming */
+	temp |= 0x10;
+	MAVW(LUMA, temp);
+	snooze(5);
+	/* pulse sync programming bit until we have the polarities we want */
+	for (loop = 0; loop < cnt; loop++)
+	{
+		MAVW(LUMA, (temp | 0x20));
+		snooze(5);
+		MAVW(LUMA, (temp & ~0x20));
+		snooze(5);
+	}
+	/* disable maven sync polarity programming and reset pulse bit */
+	MAVW(LUMA, (temp & ~0x30));
+
 	return B_OK;
 }
-
-//not used:
-/*
-void gx00_maven_delay(int number)
-{
-	// this function is nolonger needed on G450/G550 cards 
-	if (si->ps.card_type > G400MAX) return;
-
-	MAVWW(HVIDRSTL,(si->dm.timing.h_total-number));
-}
-*/
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
 status_t gx00_maven_mode(int mode,float brightness)
@@ -109,11 +212,16 @@ status_t gx00_maven_mode(int mode,float brightness)
 	/* this function is nolonger needed on G450/G550 cards */
 	if (si->ps.card_type > G400MAX) return B_OK;
 
-	/*set luma to a suitable value for brightness*/
-	/*assuming 1A is a sensible value*/
-	luma = (uint8)(0x1a * brightness);
-	MAVW(LUMA,luma);
-	LOG(4,("MAVEN: LUMA setting - %x\n",luma));
+	/* set luma to a suitable value for brightness */
+	/* assuming 0x0a is a sensible value */
+	/* fixme:
+	 * it looks like b6 and/or b7 determine the luma: just two values possible. */
+	/* NOTE: b4 and b5 have another function, don't set! (sync polarity programming) */
+	luma = (uint8)(0x0a * brightness);
+	if (luma > 0x0f) luma = 0x0f;
+
+	MAVW(LUMA, luma);
+	LOG(4,("MAVEN: LUMA setting - %x\n", luma));
 
 	return B_OK;
 }

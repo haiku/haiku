@@ -4,7 +4,7 @@
 
 	Other authors for MGA driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-4/2003
+	Rudolf Cornelissen 9/2002-12/2003
 */
 
 #define MODULE_BIT 0x00400000
@@ -74,9 +74,10 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 {
 	status_t status = B_OK;
 	float pix_clock_found;
-	uint8 m,n,p;
+	uint8 m,n,p, bpp;
 	status_t result;
 	uint32 max_vclk, row_bytes, pointer_reservation;
+	bool acc_mode;
 	double target_refresh = ((double)target->timing.pixel_clock * 1000.0) /
 			(
 				(double)target->timing.h_total * 
@@ -164,7 +165,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		target->virtual_height = target->timing.v_display;
 
 	/* nail virtual size and 'subsequently' calculate rowbytes */
-	result = gx00_general_validate_pic_size (target, &row_bytes);
+	result = gx00_general_validate_pic_size (target, &row_bytes, &acc_mode);
 	if (result == B_ERROR)
 	{
 		LOG(4, ("PROPOSEMODE: could not validate virtual picture size, aborted.\n"));
@@ -292,7 +293,8 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	 * mode (fixed), and all modes support DPMS (fixed);
 	 * We support scrolling and panning in every mode, so we 'send a signal' to
 	 * BWindowScreen.CanControlFrameBuffer() by setting B_SCROLL.  */
-	//fixme: secondary head does not support DPMS...
+	/* BTW: B_PARALLEL_ACCESS in combination with a hardcursor enables
+	 * BDirectWindow windowed modes. */
 	target->flags |= (B_PARALLEL_ACCESS | B_8_BIT_DAC | B_DPMS | B_SCROLL);
 
 	/* determine the 'would be' max. pixelclock for the second DAC for the current videomode if dualhead were activated */
@@ -300,33 +302,64 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 	{
 		case B_CMAP8:
 			max_vclk = si->ps.max_dac2_clock_8;
+			bpp = 1;
 			break;
 		case B_RGB15_LITTLE:
 		case B_RGB16_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_16;
+			bpp = 2;
 			break;
 		case B_RGB24_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_24;
+			bpp = 3;
 			break;
 		case B_RGB32_LITTLE:
 			max_vclk = si->ps.max_dac2_clock_32dh;
+			bpp = 4;
 			break;
 		default:
 			/* use fail-safe value */
 			max_vclk = si->ps.max_dac2_clock_32dh;
+			bpp = 4;
 			break;
 	}
 
 	/* set DUALHEAD_CAPABLE if suitable */
 	//fixme: update for independant secondary head use! (reserve fixed memory then)
 	if (si->ps.secondary_head &&
-		(((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
-	 		/* note: extra line for maven vblank included here! */
-			(row_bytes * (target->virtual_height + 1) * 2)) &&
 	 	((target->space == B_RGB16_LITTLE) || (target->space == B_RGB32_LITTLE)) &&
 	 	(target->timing.pixel_clock <= (max_vclk * 1000)))
 	{
-		target->flags |= DUALHEAD_CAPABLE;
+		/* extra line for G400 MAVEN vblank design fault workaround needed! */
+		uint16 vblank_fix = 0;
+		if (si->ps.card_type <= G400MAX) vblank_fix = 1;
+
+		switch (target->flags & DUALHEAD_BITS)
+		{
+		case DUALHEAD_ON:
+		case DUALHEAD_SWITCH:
+			if ((((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix))) &&
+			 	((row_bytes / bpp) >= (target->timing.h_display * 2)))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		case DUALHEAD_CLONE:
+			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix)))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		case DUALHEAD_OFF:
+			if (((si->ps.memory_size * 1024 * 1024) - pointer_reservation) >=
+					(row_bytes * (target->virtual_height + vblank_fix) * 2))
+			{
+				target->flags |= DUALHEAD_CAPABLE;
+			}
+			break;
+		}
 	}
 
 	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */

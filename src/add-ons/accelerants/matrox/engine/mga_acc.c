@@ -1,7 +1,7 @@
 /* MGA Acceleration functions */
 /* Authors:
    Mark Watson 2/2000,
-   Rudolf Cornelissen 10/2002-4/2003.
+   Rudolf Cornelissen 10/2002-11/2003.
 */
 
 #define MODULE_BIT 0x00080000
@@ -17,27 +17,23 @@ invert rectangle
 blit
 */
 
-/* G100 pre SRCORG/DSTORG registers */
-static uint32 src_dst;
-/* MIL1/2 adress linearisation does not always work */
-static uint8 y_lin;
-static uint8 depth;
-
 /* needed by MIL 1/2 because of adress linearisation constraints */
 #define ACCW_YDSTLEN(dst, len) do { \
-	if (y_lin) { \
-		ACCW(YDST,((dst)* (si->fbc.bytes_per_row / (depth >> 3))) >> 5); \
+	if (si->engine.y_lin) { \
+		ACCW(YDST,((dst)* (si->fbc.bytes_per_row / (si->engine.depth >> 3))) >> 5); \
 		ACCW(LEN,len); \
 	} else ACCW(YDSTLEN,((dst)<<16)|(len)); \
 } while (0)
 
 status_t gx00_acc_wait_idle()
 {
-	volatile int i;
-	while (ACCR(STATUS)&(1<<16))
+	/* wait until engine completely idle */
+	while (ACCR(STATUS) & 0x00010000)
 	{
-		for (i=0;i<10000;i++); /*spin in place so I do not hammer the bus*/
-	};
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100); 
+	}
+
 	return B_OK;
 }
 
@@ -55,9 +51,9 @@ status_t gx00_acc_init()
 	}
 
 	/* preset using hardware adress linearisation */
-	y_lin = 0x00;
+	si->engine.y_lin = 0x00;
 	/* reset depth */
-	depth = 0;
+	si->engine.depth = 0;
 
 	/* cleanup bitblt */
 	ACCW(OPMODE,0);
@@ -70,15 +66,15 @@ status_t gx00_acc_init()
 	{
 	case B_CMAP8:
 		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x00));
-		depth = 8;
+		si->engine.depth = 8;
 		break;
 	case B_RGB15_LITTLE:case B_RGB16_LITTLE:
 		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x01)); 
-		depth = 16;
+		si->engine.depth = 16;
 		break;
 	case B_RGB32_LITTLE:case B_RGBA32_LITTLE:
 		ACCW(MACCESS, ((maccess & 0xfffffffc) | 0x02));
-		depth = 32;
+		si->engine.depth = 32;
 		break;
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
@@ -89,7 +85,7 @@ status_t gx00_acc_init()
 	switch (si->ps.card_type)
 	{
 	case MIL1:
-		switch (si->fbc.bytes_per_row / (depth >> 3))
+		switch (si->fbc.bytes_per_row / (si->engine.depth >> 3))
 		{
 			case 640:
 			case 768:
@@ -105,14 +101,15 @@ status_t gx00_acc_init()
 				break;
 			default:
 				/* we are using software adress linearisation */
-				y_lin = 0x01;
+				si->engine.y_lin = 0x01;
 				LOG(8,("ACC: using software adress linearisation\n"));
 				break;
 		}
-		ACCW(PITCH, (y_lin << 15) | ((si->fbc.bytes_per_row / (depth >> 3)) & 0x0FFF));
+		ACCW(PITCH, (si->engine.y_lin << 15) |
+					((si->fbc.bytes_per_row / (si->engine.depth >> 3)) & 0x0FFF));
 		break;
 	case MIL2:
-		switch (si->fbc.bytes_per_row / (depth >> 3))
+		switch (si->fbc.bytes_per_row / (si->engine.depth >> 3))
 		{
 			case 512:
 			case 640:
@@ -131,22 +128,23 @@ status_t gx00_acc_init()
 				break;
 			default:
 				/* we are using software adress linearisation */
-				y_lin = 0x01;
+				si->engine.y_lin = 0x01;
 				LOG(8,("ACC: using software adress linearisation\n"));
 				break;
 		}
-		ACCW(PITCH, (y_lin << 15) | ((si->fbc.bytes_per_row / (depth >> 3)) & 0x0FFF));
+		ACCW(PITCH, (si->engine.y_lin << 15) |
+					((si->fbc.bytes_per_row / (si->engine.depth >> 3)) & 0x0FFF));
 		break;
 	case G100:
 		/* always using hardware adress linearisation, because 2D/3D
 		 * engine works on every pitch multiple of 32 */
-		ACCW(PITCH, ((si->fbc.bytes_per_row / (depth >> 3)) & 0x0FFF));
+		ACCW(PITCH, ((si->fbc.bytes_per_row / (si->engine.depth >> 3)) & 0x0FFF));
 		break;
 	default:
 		/* G200 and up are equal.. */
 		/* always using hardware adress linearisation, because 2D/3D
 		 * engine works on every pitch multiple of 32 */
-		ACCW(PITCH, ((si->fbc.bytes_per_row / (depth >> 3)) & 0x1FFF));
+		ACCW(PITCH, ((si->fbc.bytes_per_row / (si->engine.depth >> 3)) & 0x1FFF));
 		break;
 	}
 
@@ -163,8 +161,8 @@ status_t gx00_acc_init()
 	}
 
 	/* init YDSTORG - apsed, if not inited, BitBlts may fails on <= G200 */
-	src_dst = 0;
-	ACCW(YDSTORG, src_dst);
+	si->engine.src_dst = 0;
+	ACCW(YDSTORG, si->engine.src_dst);
 
 	/* <= G100 uses this register as SRCORG/DSTORG replacement, but
 	 * MIL 1/2 does not need framebuffer space for the hardcursor! */
@@ -173,32 +171,32 @@ status_t gx00_acc_init()
 		switch (si->dm.space)
 		{
 			case B_CMAP8:
-				src_dst = 1024 / 1;
+				si->engine.src_dst = 1024 / 1;
 				break;
 			case B_RGB15_LITTLE:
 			case B_RGB16_LITTLE:
-				src_dst = 1024 / 2;
+				si->engine.src_dst = 1024 / 2;
 				break;
 			case B_RGB32_LITTLE:
-				src_dst =  1024 / 4;
+				si->engine.src_dst =  1024 / 4;
 				break;
 			default:
 				LOG(8,("ACC: G100 hardcursor not supported for current colorspace\n"));
 				return B_ERROR;
 		}		
 	}
-	ACCW(YDSTORG,src_dst);
+	ACCW(YDSTORG, si->engine.src_dst);
 
 	/* clipping */
 	/* i.e. highest and lowest X pixel adresses */
-	ACCW(CXBNDRY,(((si->fbc.bytes_per_row / (depth >> 3)) - 1) << 16) | (0));
+	ACCW(CXBNDRY,(((si->fbc.bytes_per_row / (si->engine.depth >> 3)) - 1) << 16) | (0));
 
 	/* Y pixel addresses must be linear */
 	/* lowest adress */
-	ACCW(YTOP, 0 + src_dst);
+	ACCW(YTOP, 0 + si->engine.src_dst);
 	/* highest adress */
 	ACCW(YBOT,((si->dm.virtual_height - 1) *
-		(si->fbc.bytes_per_row / (depth >> 3))) + src_dst);
+		(si->fbc.bytes_per_row / (si->engine.depth >> 3))) + si->engine.src_dst);
 
 	return B_OK;
 }
@@ -211,12 +209,12 @@ status_t gx00_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h
 	uint32 b_start,b_end;
 
 	/*find where the top,bottom and offset are*/
-	offset = (si->fbc.bytes_per_row / (depth >> 3));
+	offset = (si->fbc.bytes_per_row / (si->engine.depth >> 3));
 
-	t_end = t_start = xs + (offset*ys) + src_dst;
+	t_end = t_start = xs + (offset*ys) + si->engine.src_dst;
 	t_end += w;
 
-	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
+	b_end = b_start = xs + (offset*(ys+h)) + si->engine.src_dst;
 	b_end +=w;
 
 	/* sgnzero bit _must_ be '0' before accessing SGN! */
@@ -280,12 +278,12 @@ status_t gx00_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint1
 	return B_ERROR;
 
 	/*find where the top,bottom and offset are*/
-	offset = (si->fbc.bytes_per_row / (depth >> 3));
+	offset = (si->fbc.bytes_per_row / (si->engine.depth >> 3));
 
-	t_end = t_start = xs + (offset*ys) + src_dst;
+	t_end = t_start = xs + (offset*ys) + si->engine.src_dst;
 	t_end += w;
 
-	b_end = b_start = xs + (offset*(ys+h)) + src_dst;
+	b_end = b_start = xs + (offset*(ys+h)) + si->engine.src_dst;
 	b_end +=w;
 
 	/* sgnzero bit _must_ be '0' before accessing SGN! */
