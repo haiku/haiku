@@ -421,7 +421,10 @@ i386_handle_debug_exception(struct iframe *frame)
 		// enable interrupts and notify the debugger
 		enable_interrupts();
 
-		user_debug_break_or_watchpoint_hit(watchpoint);
+		if (watchpoint)
+			user_debug_watchpoint_hit();
+		else
+			user_debug_breakpoint_hit(false);
 		
 	} else if (dr6 & X86_DR6_BD) {
 		// general detect exception
@@ -467,7 +470,7 @@ i386_handle_breakpoint_exception(struct iframe *frame)
 {
 	enable_interrupts();
 
-	user_debug_break_or_watchpoint_hit(false);
+	user_debug_breakpoint_hit(true);
 
 	return B_HANDLED_INTERRUPT;
 }
