@@ -57,7 +57,9 @@ CursorManager::CursorManager(void)
 	AddCursor(cdrag);
 	_dragcsr=cdrag;
 
-	_movecsr=NULL;
+	ServerCursor *cmove=new ServerCursor(default_move_data);
+	AddCursor(cmove);
+	_movecsr=cmove;
 
 	ServerCursor *cresize=new ServerCursor(default_resize_data);
 	AddCursor(cresize);
