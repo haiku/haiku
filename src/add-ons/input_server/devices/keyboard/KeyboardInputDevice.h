@@ -31,11 +31,8 @@
 #include <InputServerDevice.h>
 #include <List.h>
 #include <stdio.h>
+#include "kb_mouse_driver.h"
 
-typedef struct {
-	bigtime_t       key_repeat_delay;
-	int32           key_repeat_rate;
-} kb_settings;
 
 class KeyboardInputDevice : public BInputServerDevice {
 public:

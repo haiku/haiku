@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src add-ons input_server devices keyboard ;
 
+UsePrivateHeaders input ;
+
 Addon <input>keyboard : input_server/devices : 
 	KeyboardInputDevice.cpp
 	Keymap.cpp
