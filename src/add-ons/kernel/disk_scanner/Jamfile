@@ -6,6 +6,6 @@ R5KernelAddon disk_scanner : kernel disk_scanner :
 	disk_scanner.c
 ;
 
-SubInclude OBOS_TOP src add-ons kernel disk_scanner fs ;
+#SubInclude OBOS_TOP src add-ons kernel disk_scanner fs ;
 SubInclude OBOS_TOP src add-ons kernel disk_scanner partition ;
 SubInclude OBOS_TOP src add-ons kernel disk_scanner session ;
