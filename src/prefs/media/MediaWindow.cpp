@@ -53,13 +53,13 @@ MediaWindow::MediaWindow(BRect frame)
 MediaWindow::~MediaWindow()
 {
 	for(int i=0; i<mAudioOutputs.CountItems(); i++)
-		delete mAudioOutputs.ItemAt(i);
+		delete static_cast<dormant_node_info *>(mAudioOutputs.ItemAt(i));
 	for(int i=0; i<mAudioInputs.CountItems(); i++)
-		delete mAudioInputs.ItemAt(i);
+		delete static_cast<dormant_node_info *>(mAudioInputs.ItemAt(i));
 	for(int i=0; i<mVideoOutputs.CountItems(); i++)
-		delete mVideoOutputs.ItemAt(i);
+		delete static_cast<dormant_node_info *>(mVideoOutputs.ItemAt(i));
 	for(int i=0; i<mVideoInputs.CountItems(); i++)
-		delete mVideoInputs.ItemAt(i);
+		delete static_cast<dormant_node_info *>(mVideoInputs.ItemAt(i));
 	
 	BMediaRoster *roster = BMediaRoster::Roster();
 	if(roster && mCurrentNode)
@@ -247,15 +247,15 @@ MediaWindow::InitMedia(bool first)
 	
 	void *listItem;
 	while((listItem = mListView->RemoveItem((int32)0)))
-		delete listItem;
+		delete static_cast<MediaListItem *>(listItem);
 	while((listItem = mAudioOutputs.RemoveItem((int32)0)))
-		delete listItem;
+		delete static_cast<dormant_node_info *>(listItem);
 	while((listItem = mAudioInputs.RemoveItem((int32)0)))
-		delete listItem;
+		delete static_cast<dormant_node_info *>(listItem);
 	while((listItem = mVideoOutputs.RemoveItem((int32)0)))
-		delete listItem;
+		delete static_cast<dormant_node_info *>(listItem);
 	while((listItem = mVideoInputs.RemoveItem((int32)0)))
-		delete listItem;
+		delete static_cast<dormant_node_info *>(listItem);
 		
 	MediaListItem    *item, *mixer, *audio, *video;
 

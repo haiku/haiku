@@ -162,7 +162,7 @@ SettingsView::AddNodes(BList &list, bool isInput)
 	BMenu *menu = isInput ? mMenu1 : mMenu2;
 	void *item;
 	while ((item = menu->RemoveItem((int32)0)) != NULL)
-		delete item;
+		delete static_cast<dormant_node_info *>(item);
 
 	BMessage message(ML_DEFAULT_CHANGE);
 	message.AddBool("isVideo", mIsVideo);
