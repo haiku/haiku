@@ -86,6 +86,7 @@ public:
 	// transport-related methods
 	status_t				OpenTransport();
 	status_t				CloseTransport();
+	bool                    PrintToFileCanceled();
 
 	// accessors
 	inline BFile			*JobFile()		{ return fJobFile; }

@@ -122,6 +122,9 @@ PrinterDriver::PrintJob
 	if (OpenTransport() != B_OK) {
 		return B_ERROR;
 	}
+	if (PrintToFileCanceled()) {
+		return B_OK;
+	}
 
 	// read print file header	
 	fJobFile->Seek(0, SEEK_SET);
@@ -382,13 +385,6 @@ PrinterDriver::OpenTransport()
 	
 	delete msg;
 	delete path;
-
-	// The BeOS "Print To File" transport returns a non-NULL BDataIO *
-	// even after user filepanel cancellation! 
-	BFile* file = dynamic_cast<BFile*>(fTransport);
-	if (file && file->InitCheck() != B_OK)
-		// Quietly return
-		return B_ERROR;
 	
 	if (fTransport == 0) {
 		BAlert *alert = new BAlert("Uh oh!", "Couldn't open transport.", "OK");
@@ -397,6 +393,17 @@ PrinterDriver::OpenTransport()
 	}
 	
 	return B_OK;
+}
+
+
+// --------------------------------------------------
+bool
+PrinterDriver::PrintToFileCanceled()
+{ 
+	// The BeOS "Print To File" transport returns a non-NULL BDataIO *
+	// even after user filepanel cancellation! 
+	BFile* file = dynamic_cast<BFile*>(fTransport);
+	return file && file->InitCheck() != B_OK;
 }
 
 
