@@ -3,7 +3,7 @@ SubDir OBOS_TOP src add-ons mail_daemon system_filters parser ;
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-Addon Message\ Parser : mail_daemon inbound_filters :
+Addon Message\ Parser : mail_daemon system_filters :
 	filter.cpp ;
 
 LinkSharedOSLibs Message\ Parser :
