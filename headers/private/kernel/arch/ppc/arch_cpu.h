@@ -59,7 +59,14 @@ struct iframe {
 	uint32 r0;
 };
 
-#define MSR_IP	(1L << 6)
+enum machine_state {
+	MSR_PRIVILEGE_LEVEL				= 1L << 14,		// PR
+	MSR_FP_AVAILABLE				= 1L << 13,		// FP
+	MSR_MACHINE_CHECK_ENABLED		= 1L << 12,		// ME
+	MSR_EXCEPTION_PREFIX			= 1L << 6,		// IP
+	MSR_INST_ADDRESS_TRANSLATION	= 1L << 5,		// IR
+	MSR_DATA_ADDRESS_TRANSLATION	= 1L << 4,		// DR
+};
 
 struct block_address_translation;
 
@@ -83,6 +90,18 @@ extern void set_dbat1(struct block_address_translation *bat);
 extern void set_dbat2(struct block_address_translation *bat);
 extern void set_dbat3(struct block_address_translation *bat);
 
+extern void get_ibat0(struct block_address_translation *bat);
+extern void get_ibat1(struct block_address_translation *bat);
+extern void get_ibat2(struct block_address_translation *bat);
+extern void get_ibat3(struct block_address_translation *bat);
+extern void get_dbat0(struct block_address_translation *bat);
+extern void get_dbat1(struct block_address_translation *bat);
+extern void get_dbat2(struct block_address_translation *bat);
+extern void get_dbat3(struct block_address_translation *bat);
+
+extern void reset_ibats(void);
+extern void reset_dbats(void);
+
 //extern void sethid0(unsigned int val);
 //extern unsigned int getl2cr(void);
 //extern void setl2cr(unsigned int val);
@@ -96,5 +115,6 @@ extern void ppc_context_switch(void **_oldStackPointer, void *newStackPointer);
 
 #define eieio()	asm volatile("eieio")
 #define isync() asm volatile("isync")
+#define tlbsync() asm volatile("tlbsync")
 
 #endif	/* _KERNEL_ARCH_PPC_CPU_H */

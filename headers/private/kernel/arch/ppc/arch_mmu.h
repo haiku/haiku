@@ -9,6 +9,8 @@
 #include <SupportDefs.h>
 #include <string.h>
 
+#include <arch_cpu.h>
+
 
 /*** BAT - block address translation ***/
 
@@ -48,6 +50,11 @@ struct block_address_translation {
 	uint32	_reserved1 : 1;
 	uint32	protection : 2;
 
+	block_address_translation()
+	{
+		Clear();
+	}
+
 	void SetVirtualAddress(void *address)
 	{
 		page_index = uint32(address) >> 17;
@@ -71,6 +78,21 @@ struct segment_descriptor {
 	uint32	no_execute_protection : 1;
 	uint32	_reserved : 4;
 	uint32	virtual_segment_id : 24;
+
+	segment_descriptor()
+	{
+		Clear();
+	}
+
+	segment_descriptor(uint32 value)
+	{
+		*((uint32 *)this) = value;
+	}
+
+	void Clear()
+	{
+		memset((void *)this, 0, sizeof(segment_descriptor));
+	}
 };
 
 
@@ -110,5 +132,18 @@ struct page_table_entry_group {
 
 extern void ppc_get_page_table(page_table_entry_group **_pageTable, size_t *_size);
 extern void ppc_set_page_table(page_table_entry_group *pageTable, size_t size);
+
+static inline segment_descriptor
+ppc_get_segment_register(void *virtualAddress)
+{
+	return (segment_descriptor)get_sr(virtualAddress);
+}
+
+
+static inline void
+ppc_set_segment_register(void *virtualAddress, segment_descriptor segment)
+{
+	set_sr(virtualAddress, *(uint32 *)&segment);
+}
 
 #endif	/* _KERNEL_ARCH_PPC_MMU_H */
