@@ -57,19 +57,18 @@ public:
 	// dtor should be private, but ie. ObjectList requires a public dtor!
 	virtual ~Object() { };
 
-	// thread-safe as long as thread that calls acquire has already
+	// thread-safe as long as thread that calls Acquire has already
 	// a reference to the object
-	void Acquire() { 
+	void Acquire() {
 		atomic_add(&fRefCount, 1);
 	}
 
-	bool Release() { 
-		atomic_add(&fRefCount, -1);
-		if (fRefCount == 0) { 
-			delete this; return true; 
-		} else { 
-			return false; 
-		} 
+	bool Release() {
+		if (atomic_add(&fRefCount, -1) == 1) {
+			delete this; return true;
+		} else {
+			return false;
+		}
 	}
 };
 
