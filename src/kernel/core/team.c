@@ -669,7 +669,6 @@ create_team_struct(const char *name, bool kernel)
 	team->state = TEAM_STATE_BIRTH;
 	team->pending_signals = 0;
 	team->death_sem = -1;
-	team->user_env_base = 0;
 
 	team->dead_threads_kernel_time = 0;
 	team->dead_threads_user_time = 0;
@@ -878,7 +877,7 @@ team_create_thread_start(void *args)
 	// ENV_SIZE						| environment variables
 	// arguments size				| arguments passed to the team
 
-	// ToDo: make ENV_SIZE variable and put it on the heap?
+	// ToDo: ENV_SIZE is a) limited, and b) not used after libroot copied it to the heap
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
 	sizeLeft = PAGE_ALIGN(USER_MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
@@ -923,9 +922,8 @@ team_create_thread_start(void *args)
 	}
 	uargs[argCount] = NULL;
 
-	team->user_env_base = t->user_stack_base + t->user_stack_size + TLS_SIZE;
-	uenv = (char **)team->user_env_base;
-	udest = (char *)team->user_env_base + ENV_SIZE - 1;
+	uenv = (char **)(t->user_stack_base + t->user_stack_size + TLS_SIZE);
+	udest = (char *)uenv + ENV_SIZE - 1;
 		// the environment variables are copied from back to front
 
 	TRACE(("team_create_thread_start: envc: %ld, env: %p\n", teamArgs->env_count, (void *)teamArgs->env));
@@ -1260,7 +1258,6 @@ fork_team(void)
 	forkArgs->user_local_storage = parentThread->user_local_storage;
 	arch_store_fork_frame(&forkArgs->arch_info);
 
-	team->user_env_base = parentTeam->user_env_base;
 	// ToDo: copy image list
 
 	// create a kernel thread under the context of the new team
@@ -1858,136 +1855,6 @@ getsid(pid_t process)
 
 
 //	#pragma mark -
-//	syscalls
-
-
-int
-sys_setenv(const char *name, const char *value, int overwrite)
-{
-	char var[SYS_THREAD_STRING_LENGTH_MAX];
-//	int state;
-	addr_t env_space;
-	char **envp;
-	int envc;
-	bool var_exists = false;
-	int var_pos = 0;
-	int name_size;
-	int rc = 0;
-	int i;
-	char *p;
-
-	// ToDo: please put me out of the kernel into libroot.so!
-
-	TRACE(("sys_setenv: entry (name=%s, value=%s)\n", name, value));
-
-	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
-		return -1;
-
-	env_space = thread_get_current_thread()->team->user_env_base;
-
-	// ToDo: this is totally broken!
-	// (temporary fix is to do this with interrupts enabled)
-
-//	state = disable_interrupts();
-//	GRAB_TEAM_LOCK();
-
-	strcpy(var, name);
-	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
-	name_size = strlen(var);
-	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
-
-	envp = (char **)env_space;
-	for (envc = 0; envp[envc]; envc++) {
-		if (!strncmp(envp[envc], var, name_size)) {
-			var_exists = true;
-			var_pos = envc;
-		}
-	}
-	if (!var_exists)
-		var_pos = envc;
-
-	TRACE(("sys_setenv: variable does%s exist\n", var_exists ? "" : " not"));
-
-	if ((!var_exists) || (var_exists && overwrite)) {
-		// XXX- make a better allocator
-		if (var_exists) {
-			if (strlen(var) <= strlen(envp[var_pos])) {
-				strcpy(envp[var_pos], var);
-			} else {
-				for (p = (char *)env_space + ENV_SIZE - 1, i = 0; envp[i]; i++)
-					if (envp[i] < p)
-						p = envp[i];
-				p -= (strlen(var) + 1);
-				if (p < (char *)env_space + (envc * sizeof(char *))) {
-					rc = -1;
-				} else {
-					envp[var_pos] = p;
-					strcpy(envp[var_pos], var);
-				}
-			}
-		}
-		else {
-			for (p = (char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
-				if (envp[i] < p)
-					p = envp[i];
-			p -= (strlen(var) + 1);
-			if (p < (char *)env_space + ((envc + 1) * sizeof(char *))) {
-				rc = -1;
-			} else {
-				envp[envc] = p;
-				strcpy(envp[envc], var);
-				envp[envc + 1] = NULL;
-			}
-		}
-	}
-	TRACE(("sys_setenv: variable set.\n"));
-
-//	RELEASE_TEAM_LOCK();
-//	restore_interrupts(state);
-
-	return rc;
-}
-
-
-int
-sys_getenv(const char *name, char **value)
-{
-	char **envp;
-	char *p;
-//	int state;
-	int i;
-	int len = strlen(name);
-	int rc = -1;
-
-	// ToDo: please put me out of the kernel into libroot.so!
-
-	// ToDo: this is totally broken!
-	// (temporary fix is to do this with interrupts enabled)
-
-	envp = (char **)thread_get_current_thread()->team->user_env_base;
-
-//	state = disable_interrupts();
-//	GRAB_TEAM_LOCK();
-
-	for (i = 0; envp[i]; i++) {
-		if (!strncmp(envp[i], name, len)) {
-			p = envp[i] + len;
-			if (*p == '=') {
-				*value = (p + 1);
-				rc = 0;
-				break;
-			}
-		}
-	}
-
-//	RELEASE_TEAM_LOCK();
-//	restore_interrupts(state);
-	
-	return rc;
-}
-
-
-//	#pragma mark -
 //	User syscalls
 
 
@@ -2367,44 +2234,5 @@ _user_get_team_usage_info(team_id team, int32 who, team_usage_info *userInfo, si
 		return B_BAD_ADDRESS;
 
 	return status;
-}
-
-
-int
-_user_getenv(const char *userName, char **_userValue)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char *value;
-	int rc;
-
-	if (!IS_USER_ADDRESS(userName)
-		|| !IS_USER_ADDRESS(_userValue)
-		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
-		return B_BAD_ADDRESS;
-
-	rc = sys_getenv(name, &value);
-	if (rc < 0)
-		return rc;
-
-	if (user_memcpy(_userValue, &value, sizeof(char *)) < B_OK)
-		return B_BAD_ADDRESS;
-
-	return rc;
-}
-
-
-int
-_user_setenv(const char *userName, const char *userValue, int overwrite)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char value[SYS_THREAD_STRING_LENGTH_MAX];
-
-	if (!IS_USER_ADDRESS(userName)
-		|| !IS_USER_ADDRESS(userValue)
-		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK
-		|| user_strlcpy(value, userValue, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
-		return B_BAD_ADDRESS;
-
-	return sys_setenv(name, value, overwrite);
 }
 
