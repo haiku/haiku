@@ -121,7 +121,7 @@ int timer_set_event(bigtime_t relative_time, timer_mode mode, struct timer_event
 	int curr_cpu;
 
 	if(event == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	if(relative_time < 0)
 		relative_time = 0;
@@ -196,7 +196,7 @@ done:
 		release_spinlock(&timer_spinlock[curr_cpu]);
 	}
 
-	return (foundit ? 0 : ERR_GENERAL);
+	return (foundit ? 0 : B_ERROR);
 }
 
 int local_timer_cancel_event(struct timer_event *event)
@@ -257,7 +257,7 @@ done:
 	}
 	int_restore_interrupts(state);
 
-	return (foundit ? 0 : ERR_GENERAL);
+	return (foundit ? 0 : B_ERROR);
 }
 
 void spin(bigtime_t microseconds)
