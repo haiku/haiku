@@ -1480,14 +1480,24 @@ status_t BWindow::RemoveFromSubset(BWindow* window){
 	
 	int32		rCode;
 
-	Lock();
-	session->WriteInt32( AS_REM_FROM_SUBSET );
-	session->WriteInt32( _get_object_token_(window) );
-	session->Sync();
-	session->ReadInt32( &rCode );
-	Unlock();
+	if (window->Feel() == B_NORMAL_WINDOW_FEEL &&
+			(fFeel == B_MODAL_SUBSET_WINDOW_FEEL ||
+				fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)){
 
-	return rCode == SERVER_TRUE? B_OK : B_ERROR;
+		team_id		team = Team();
+
+		Lock();
+		session->WriteInt32( AS_REM_FROM_SUBSET );
+		session->WriteInt32( _get_object_token_(window) );
+		session->WriteData( &team, sizeof(team_id) );
+		session->Sync();
+		session->ReadInt32( &rCode );
+		Unlock();
+
+		return rCode == SERVER_TRUE? B_OK : B_ERROR;
+	}
+
+	return B_ERROR;
 }
 
 //------------------------------------------------------------------------------
