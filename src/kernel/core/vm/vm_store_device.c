@@ -1,10 +1,10 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -54,7 +54,7 @@ static status_t
 device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	// no place to write, this will cause the page daemon to skip this store
-	return 0;
+	return B_OK;
 }
 
 /** this fault handler should take over the page fault routine and map the page in
@@ -63,14 +63,12 @@ device_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t cou
  *	released after this handler is done
  */
 
-static int
+static status_t
 device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t offset)
 {
 	struct device_store *store = (struct device_store *)_store;
 	vm_cache_ref *cache_ref = store->vm.cache->ref;
 	vm_area *area;
-
-//	dprintf("device_fault: offset 0x%x 0x%x + base_addr 0x%x\n", offset, d->base_addr);
 
 	// figure out which page needs to be mapped where
 	mutex_lock(&cache_ref->lock);
@@ -80,9 +78,6 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 	for (area = cache_ref->areas; area != NULL; area = area->cache_next) {
 		// make sure this page in the cache that was faulted on is covered in this area
 		if (offset >= area->cache_offset && (offset - area->cache_offset) < area->size) {
-//			dprintf("device_fault: mapping paddr 0x%x to vaddr 0x%x\n",
-//				(addr)(d->base_addr + offset),
-//				(addr)(area->base + (offset - area->cache_offset)));
 			(*aspace->translation_map.ops->map)(&aspace->translation_map,
 				area->base + (offset - area->cache_offset),
 				store->base_address + offset, area->protection);
@@ -92,9 +87,7 @@ device_fault(struct vm_store *_store, struct vm_address_space *aspace, off_t off
 	(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 	mutex_unlock(&cache_ref->lock);
 
-//	dprintf("device_fault: done\n");
-
-	return 0;
+	return B_OK;
 }
 
 

@@ -5,8 +5,6 @@
 
 
 #include <vm_store_null.h>
-#include <kerrors.h>
-
 #include <stdlib.h>
 
 
@@ -46,11 +44,11 @@ null_write(struct vm_store *store, off_t offset, const iovec *vecs, size_t count
 }
 
 
-static int
+static status_t
 null_fault(struct vm_store *store, struct vm_address_space *aspace, off_t offset)
 {
 	/* we can't fault on this region, that's pretty much the point of the null store object */
-	return ERR_VM_PF_FATAL;
+	return B_BAD_ADDRESS;
 }
 
 
