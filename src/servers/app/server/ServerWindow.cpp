@@ -200,7 +200,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 //!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
-STRACE(("*ServerWindow %s:~ServerWindow()\n",_title->String()));
+STRACE(("*ServerWindow (%s):~ServerWindow()\n",_title->String()));
 
 	desktop->fGeneralLock.Lock();
 
@@ -317,6 +317,7 @@ printf("ServerWindow(%s)::Show() - Main lock acquired\n", _winborder->GetName())
 		for(int32 i = 0; i < wksCount; i++){
 			if (fWorkspaces & (0x00000001UL << i)){
 				Workspace		*ws = rl->WorkspaceAt(i+1);
+				ws->BringToFrontANormalWindow(_winborder);
 				ws->SearchAndSetNewFront(_winborder);
 				ws->SetFocusLayer(_winborder);
 			}
@@ -352,16 +353,16 @@ printf("ServerWindow(%s)::Hide() - Main lock acquired\n", _winborder->GetName())
 		int32		wksCount= rl->WorkspaceCount();
 		for(int32 i = 0; i < wksCount; i++){
 			ws		= rl->WorkspaceAt(i+1);
-			if ( ws->FrontLayer() == _winborder){
-				if(ws->FocusLayer() == _winborder){
-						// do not redraw! just set the new front.
-					ws->SearchAndSetNewFront(_winborder);
-						// redraw also
+			if (ws->FrontLayer() == _winborder){
+				ws->HideSubsetWindows(_winborder);
+				ws->SetFocusLayer(ws->FrontLayer());
+			}
+			else{
+				if (ws->FocusLayer() == _winborder){
 					ws->SetFocusLayer(_winborder);
 				}
 				else{
-						// redraw also
-					ws->SetFrontLayer(_winborder);
+					ws->Invalidate();
 				}
 			}
 		}
@@ -1412,6 +1413,24 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_REM_FROM_SUBSET:
 		{
+			WinBorder	*wb;
+			int32		mainToken;
+			team_id		teamID;
+			
+			ses->ReadInt32(&mainToken);
+			ses->ReadData(&teamID, sizeof(team_id));
+			
+			wb			= desktop->FindWinBorderByServerWindowTokenAndTeamID(mainToken, teamID);
+			if(wb){
+				ses->WriteInt32(SERVER_TRUE);
+				ses->Sync();
+				
+				_winborder->RemoveFromSubsetOf(wb);
+			}
+			else{
+				ses->WriteInt32(SERVER_FALSE);
+				ses->Sync();
+			}
 			// TODO: Implement
 			STRACE(("ServerWindow %s: Message Remove_From_Subset unimplemented\n",_title->String()));
 			break;

@@ -425,14 +425,23 @@ void Desktop::SaveWorkspaceData(void){
 //---------------------------------------------------------------------------
 void Desktop::RemoveSubsetWindow(WinBorder* wb){
 	WinBorder		*winBorder = NULL;
+
+	fLayerLock.Lock();
 	int32			count = fWinBorderList.CountItems();
 	for(int32 i=0; i < count; i++){
 		winBorder	= static_cast<WinBorder*>(fWinBorderList.ItemAt(i));
 		if (winBorder->_level == B_NORMAL_FEEL)
 			winBorder->Window()->fWinFMWList.RemoveItem(wb);
 	}
-	
+	fLayerLock.Unlock();
+
 	RootLayer		*rl = winBorder->GetRootLayer();
+
+	if (!fGeneralLock.IsLocked())
+		debugger("Desktop::RemoveWinBorder() - fGeneralLock must be locked!\n");
+	if (!(rl->fMainLock.IsLocked()))
+		debugger("Desktop::RemoveWinBorder() - fMainLock must be locked!\n");
+		
 	int32			countWKs = rl->WorkspaceCount();
 	for (int32 i=0; i < countWKs; i++){
 		rl->WorkspaceAt(i+1)->RemoveLayerPtr(wb);

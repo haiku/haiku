@@ -27,6 +27,7 @@ public:
 
 			bool				AddLayerPtr(WinBorder* layer);
 			bool				RemoveLayerPtr(WinBorder* layer);
+			bool				HideSubsetWindows(WinBorder* layer);
 			WinBorder*			SetFocusLayer(WinBorder* layer);
 			WinBorder*			FocusLayer() const;
 			WinBorder*			SetFrontLayer(WinBorder* layer);
@@ -60,6 +61,7 @@ public:
 // .... private :-) - do not use!
 			void				SearchAndSetNewFront(WinBorder* preferred);
 			void				SearchAndSetNewFocus(WinBorder* preferred);
+			void				BringToFrontANormalWindow(WinBorder* layer);
 
 			ListData*			HasItem(ListData* item);
 			ListData*			HasItem(WinBorder* layer);

@@ -102,7 +102,7 @@ STRACE(("\n*AddLayerPtr(%s) -", layer->GetName()));
 bool Workspace::RemoveLayerPtr(WinBorder* layer){
 	if (!layer)
 		return false;
-STRACE(("\n#Workspace(%ld)::RemoveLayerPtr(%s)\n", ID(), layer->GetName()));
+STRACE(("\n*Workspace(%ld)::RemoveLayerPtr(%s)\n", ID(), layer->GetName()));
 STRACE(("BEFORE ANY opperation:\n"));
 STRACESTREAM();
 		// search to see if this workspace has WinBorder's pointer in its list
@@ -110,53 +110,99 @@ STRACESTREAM();
 
 	opLock.Lock();
 	if ((item = HasItem(layer))){
-		ListData	*nextItem = NULL;
-		bool		wasFront, wasFocus;
+		ListData	*nextItem	= NULL;
+		bool		wasFront	= false;
+		bool		wasFocus	= false;
+		
+		wasFront	= FrontLayer() == layer;
+		wasFocus	= FocusLayer() == layer;
 
 			// prepare to set new front/focus if this layer was front/focus
 		nextItem	= item->upperItem;
-		wasFront	= fFrontItem? fFrontItem->layerPtr == layer: false;
-		wasFocus	= fFocusItem? fFocusItem->layerPtr == layer: false;
 
-			// remove any floating window our window may have
-		ListData	*listItem = item->lowerItem;
-		while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
-							|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL))
-		{		// *carefully* remove the item from the list
-			ListData	*itemX = listItem;
-			listItem	= listItem->lowerItem;
-			RemoveItem(itemX);
+		if (wasFront)
+			SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
+
+			// remove some windows.
+		if (item && item->layerPtr->_level == B_NORMAL_FEEL)
+		{
+			ListData	*listItem = item->lowerItem;
+			while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
+								|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL
+								|| listItem->layerPtr->_level == B_MODAL_SUBSET_FEEL))
+			{
+					// *carefuly* remove the item from the list
+				ListData	*itemX = listItem;
+				listItem	= listItem->lowerItem;
+				RemoveItem(itemX);
+				delete itemX;
+			}
 		}
-
-			// remove from workspace's list
+		
 		RemoveItem(item);
-
+		delete item;
+STRACESTREAM();		
 		opLock.Unlock();
 
 			// reset some internal variables
 		layer->SetMainWinBorder(NULL);
 		// its RootLayer is set to NULL by Layer::RemoveChild(layer);
+
 printf("Layer %s found and removed from Workspace No %ld\n", layer->GetName(), ID());
-		if (wasFront){
-			if(wasFocus){
-				SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
-				SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
-			}
-			else
-				SetFrontLayer(nextItem? nextItem->layerPtr: NULL);
-		}
 
-		if (wasFocus && !wasFront)
+		if (wasFocus)
 			SetFocusLayer(nextItem? nextItem->layerPtr: NULL);
-STRACE(("AFTER opperations...\n"));
-STRACESTREAM();
+		else
+			Invalidate();
 
-			// delete item struct, we no longer need that
-		delete item;
 		return true;
 	}
 	else{
 printf("Layer %s NOT found in Workspace No %ld\n", layer->GetName(), ID());
+		opLock.Unlock();
+		return false;
+	}
+}
+//---------------------------------------------------------------------------
+bool Workspace::HideSubsetWindows(WinBorder* layer){
+	if (!layer)
+		return false;
+
+		// search to see if this workspace has WinBorder's pointer in its list
+	ListData	*item = NULL;
+
+	opLock.Lock();
+	if ((item = HasItem(layer))){
+		ListData	*nextItem = NULL;
+
+			// prepare to set new front/focus if this layer was front/focus
+		nextItem	= item->upperItem;
+
+		SearchAndSetNewFront(nextItem? nextItem->layerPtr: NULL);
+			// we don't care bout focus in this method!!!
+		//SearchAndSetNewFocus(nextItem? nextItem->layerPtr: NULL);
+
+			// remove some windows.
+		if (item && item->layerPtr->_level == B_NORMAL_FEEL)
+		{
+			ListData	*listItem = item->lowerItem;
+			while(listItem && (listItem->layerPtr->_level == B_FLOATING_SUBSET_FEEL
+								|| listItem->layerPtr->_level == B_FLOATING_APP_FEEL
+								|| listItem->layerPtr->_level == B_MODAL_SUBSET_FEEL))
+			{
+					// *carefuly* remove the item from the list
+				ListData	*itemX = listItem;
+				listItem	= listItem->lowerItem;
+				RemoveItem(itemX);
+				delete itemX;
+			}
+		}
+		
+		opLock.Unlock();
+
+		return true;
+	}
+	else{
 		opLock.Unlock();
 		return false;
 	}
@@ -280,8 +326,10 @@ printf("%s - SELECTED!\n", wb->GetName());
 //---------------------------------------------------------------------------
 void Workspace::Invalidate(){
 //TODO: *****!*!*!*!*!*!*!**!***REMOVE this! For Test purposes only!
+	opLock.Lock();
 	if(fOwner->ActiveWorkspace() == this)
 		fOwner->DoInvalidate(BRegion(fOwner->Bounds()), NULL);
+	opLock.Unlock();
 //----------------
 }
 //---------------------------------------------------------------------------
@@ -376,7 +424,9 @@ ListData* Workspace::HasItem(WinBorder* layer){
 ListData* Workspace::FindPlace(ListData* pref){
 		// if we received a NULL value, we stil have to give 'front' state to some window...
 	if (!pref)
-		pref = fBottomItem;
+		pref	= HasItem(fBottomItem);
+	else
+		pref	= HasItem(pref);
 
 	ListData	*item = NULL;
 
@@ -385,7 +435,7 @@ ListData* Workspace::FindPlace(ListData* pref){
 	while(pref && item->lowerItem != pref && (pref->upperItem || pref->lowerItem)){
 		if ( !(item->layerPtr->Window()->Flags() & B_AVOID_FRONT) && !(item->layerPtr->IsHidden()) )
 			break;
-
+printf("item: %s - pref: %s\n", item->layerPtr->GetName(), pref->layerPtr->GetName());
 		if (item == fTopItem)
 			item = fBottomItem;
 		else
@@ -519,8 +569,6 @@ STRACE(("#WS(%ld)::SASNF(%s) ENDED 1\n", ID(), preferred? preferred->GetName(): 
 		return;
 	}
 
-//	ListData		*exFocusItem = fFocusItem;
-
 		// properly place this 'preferred' WinBorder.
 	ListData		*lastInserted;
 	lastInserted	= FindPlace(HasItem(preferred));
@@ -553,18 +601,6 @@ STRACE((" NORMAL Window '%s' -", preferred? preferred->GetName(): "NULL"));
 				// if they are in the same team...
 			if (preferred->Window()->ClientTeamID() == fFrontItem->layerPtr->Window()->ClientTeamID()){
 STRACE((" SAME TeamID\n"));
-/*
-				{
-					int32		exFeel = exFocusItem? exFocusItem->layerPtr->Window()->Feel() : 0;
-					if (exFocusItem &&
-						 (exFeel == B_FLOATING_SUBSET_WINDOW_FEEL || exFeel == B_MODAL_SUBSET_WINDOW_FEEL)
-					{
-						if ( !(fFocusItem->layerPtr->Window()->fWinFMWList.HasItem(exFocusItem->layerPtr)) ){
-							
-						}
-					}
-				}
-*/
 					// collect subset windows that are common to application's windows...
 					// NOTE: A subset window *can* be added to more than just one window.
 				FMWList	commonFMW;
@@ -593,8 +629,9 @@ STRACE((" SAME TeamID\n"));
 							listItem	= listItem->lowerItem;
 							RemoveItem(item);
 						}
-						else
+						else{
 							listItem	= listItem->lowerItem;
+						}
 					}
 						// ALSO collect application's floating and modal windows,
 						// for reinsertion, later.
@@ -619,7 +656,8 @@ STRACE((" SAME TeamID\n"));
 				count	= preferred->Window()->fWinFMWList.CountItems();
 				for (i=0; i<count; i++){
 					void	*item = preferred->Window()->fWinFMWList.ItemAt(i);
-					if (commonFMW.HasItem(item)){ }
+					if (commonFMW.HasItem(item)){
+					}
 					else
 						finalFMWList.AddItem(item);
 				}
@@ -931,7 +969,7 @@ STRACE((" MODAL ALL/SYSTEM FIRST Window '%s'\n", preferred? preferred->GetName()
 
 	ListData	*exFrontItem	= fFrontItem;
 	ListData	*newFrontItem	= NULL;
-	if(preferred){
+	if(preferred && fBottomItem){
 		int32		feel = fBottomItem->layerPtr->Window()->Feel();
 
 			// if preferred is one of these *don't* give front state to it!
@@ -979,9 +1017,7 @@ STRACESTREAM();
  */
 //---------------------------------------------------------------------------
 void Workspace::SearchAndSetNewFocus(WinBorder* preferred){
-// TODO: remove!
-//	return;
-
+STRACE(("*WS(%ld)::SASNFocus(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
 	opLock.Lock();
 
 	if(!preferred)
@@ -1051,6 +1087,38 @@ void Workspace::SearchAndSetNewFocus(WinBorder* preferred){
 	}
 	
 	opLock.Unlock();
+}
+//---------------------------------------------------------------------------
+void Workspace::BringToFrontANormalWindow(WinBorder* layer){
+	switch (layer->Window()->Feel()){
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+		case B_MODAL_SUBSET_WINDOW_FEEL:{
+			SearchAndSetNewFront(layer->MainWinBorder());
+			break;
+		}
+		case B_FLOATING_APP_WINDOW_FEEL:
+		case B_MODAL_APP_WINDOW_FEEL:{
+			opLock.Lock();
+			ListData	*item	= fBottomItem;
+			team_id		tid		= layer->Window()->ClientTeamID();
+			while(item){
+				if(item->layerPtr->Window()->ClientTeamID() == tid
+					&& item->layerPtr->Window()->Feel() == B_NORMAL_WINDOW_FEEL)
+				{
+					break;
+				}
+				item	= item->upperItem;
+			}
+			if(item){
+				SearchAndSetNewFront(item->layerPtr);
+			}
+			opLock.Unlock();
+			break;
+		}
+		default:{
+			// in case of MODAL/FLOATING_ALL or _NORMAL_ or SYSTEM_FIRST/LAST do nothing!
+		}
+	}
 }
 /* The method moves a window to the back of its subset.
  */

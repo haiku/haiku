@@ -52,6 +52,8 @@ printf("*RootLayer(%s)::Draw(r)\n", GetName());
 	if (!desktop->fGeneralLock.IsLocked())
 		printf("\n\n\tWARNING: desktop->fGeneralLock MUST be locked!!!\n\n");
 
+// NOTE: in case you have problems - ActiveWorkspace()->opLock was acquired in Workspace::Invalidate()!!!
+
 	RGBColor		c(51,102,152);
 
 	fDriver->FillRect(Bounds(), c);

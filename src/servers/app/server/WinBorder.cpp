@@ -754,6 +754,12 @@ printf("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), 
 }
 //---------------------------------------------------------------------------
 void WinBorder::RemoveFromSubsetOf(WinBorder* main){
+	RootLayer		*rl = main->GetRootLayer();
+
+	desktop->fGeneralLock.Lock();
+printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName());
+	rl->fMainLock.Lock();
+printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName());
 		// remove from main window's subset list.
 	if(main->Window()->fWinFMWList.RemoveItem(this)){
 		int32	count = main->GetRootLayer()->WorkspaceCount();
@@ -766,8 +772,12 @@ void WinBorder::RemoveFromSubsetOf(WinBorder* main){
 			}
 		}
 	}
-	
 	fMainWinBorder	= NULL;
+
+	rl->fMainLock.Unlock();
+printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName());
+	desktop->fGeneralLock.Unlock();
+printf("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName());
 }
 //---------------------------------------------------------------------------
 void WinBorder::PrintToStream(){
