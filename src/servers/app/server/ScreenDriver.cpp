@@ -104,10 +104,11 @@ FrameBuffer::FrameBuffer(const char *title, uint32 space, status_t *st,bool debu
 	mousepos.Set(0,0);
 	buttons=0;
 
-#ifdef ENABLE_INPUT_SERVER_EMULATION
 	// View exists to poll for the mouse
 	view=new BView(Bounds(),"view",0,0);
 	AddChild(view);
+	view->GetMouse(&mousepos,&buttons);
+#ifdef ENABLE_INPUT_SERVER_EMULATION
 	monitor_thread=spawn_thread(MouseMonitor,"mousemonitor",B_NORMAL_PRIORITY,this);
 	resume_thread(monitor_thread);
 #endif
@@ -454,6 +455,9 @@ int32 FrameBuffer::MouseMonitor(void *data)
 	
 	fb->Lock();
 	PortLink *link=new PortLink(fb->serverlink->GetPort());
+	fb->view->GetMouse(&mousepos,&buttons);
+	oldpos=mousepos;
+	oldbuttons=buttons;
 	fb->Unlock();
 
 	while(1)
