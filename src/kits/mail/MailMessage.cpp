@@ -735,18 +735,13 @@ BEmailMessage::RenderToRFC822(BPositionIO *file)
 	message_id << system_time();
 	message_id << "-BeMail@";
 
-	#if BONE
-		utsname uinfo;
-		uname(&uinfo);
-		message_id << uinfo.nodename;
-	#else
-		char host[255];
-		gethostname(host,255);
-		message_id << host;
-	#endif
+	char host[255];
+	gethostname(host,255);
+	message_id << host;
 
 	message_id << ">";
-	SetHeaderField("Message-ID", message_id.String());
+	
+	SetHeaderField("Message-Id", message_id.String());
 
 	status_t err = BMailComponent::RenderToRFC822(file);
 	if (err < B_OK)
