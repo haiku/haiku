@@ -94,8 +94,10 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 		return status;
 
 	// ToDo: this is a work-around for buggy device drivers!
-	if (size > fileVecs[0].length)
+	if (size > fileVecs[0].length) {
+		dprintf("warning: device driver %p doesn't respect total length in read_pages() call!\n", ref->device);
 		size = fileVecs[0].length;
+	}
 
 	ASSERT(size <= fileVecs[0].length);
 
@@ -343,7 +345,8 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 		*_size = size;
 	}
 
-	size_t bytesLeft = size;
+	size_t bytesLeft = size, lastLeft = size;
+	off_t lastOffset = offset;
 
 	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
 		// check if this page is already in memory
@@ -364,8 +367,8 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 			// it is, so let's satisfy in the first part of the request
 			if (bufferBase != buffer) {
 				size_t requestSize = buffer - (addr_t)bufferBase;
-				if ((doWrite && write_to_cache(ref, offset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
-					|| (!doWrite && read_from_cache(ref, offset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
+				if ((doWrite && write_to_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
+					|| (!doWrite && read_from_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
 					vm_put_physical_page(virtualAddress);
 					return B_IO_ERROR;
 				}
@@ -386,6 +389,10 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 				// we've read the last page, so we're done!
 				return B_OK;
 			}
+
+			// prepare a potential gap request
+			lastOffset = offset + B_PAGE_SIZE;
+			lastLeft = bytesLeft - B_PAGE_SIZE;
 		}
 
 		if (bytesLeft <= B_PAGE_SIZE)
@@ -395,11 +402,14 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 		bytesLeft -= B_PAGE_SIZE;
 	}
 
-	// fill the last remainding bytes of the request
-	if (doWrite)
-		return write_to_cache(ref, offset, bytesLeft, bufferBase, bytesLeft);
+	// fill the last remainding bytes of the request (either write or read)
+	
+	lastOffset += pageOffset;
 
-	return read_from_cache(ref, offset, bytesLeft, bufferBase, bytesLeft);
+	if (doWrite)
+		return write_to_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
+
+	return read_from_cache(ref, lastOffset, lastLeft, bufferBase, lastLeft);
 }
 
 
