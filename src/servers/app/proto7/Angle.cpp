@@ -1,7 +1,7 @@
 #include "Angle.h"
 
 #ifndef ANGLE_PI
-	#define ANGLE_PI 3.14159268979323846
+	#define ANGLE_PI 3.14159265358979323846
 #endif
 
 bool tables_initialized=false;
