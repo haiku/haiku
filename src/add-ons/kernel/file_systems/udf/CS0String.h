@@ -25,11 +25,13 @@ namespace Udf {
 class CS0String {
 public:
 	CS0String();
+	CS0String(const char *cs0);
 	CS0String(const char *cs0, uint32 length);
 	template <uint32 length>	
 		CS0String(const array<char, length> &cs0);		
 	~CS0String();
 	
+	void SetTo(const char *cs0);
 	void SetTo(const char *cs0, uint32 length);
 	template <uint32 length>
 		void SetTo(const array<char, length> &cs0);

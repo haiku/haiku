@@ -35,6 +35,12 @@ CS0String::CS0String()
 {
 }
 
+CS0String::CS0String(const char *cs0)
+	: fUtf8String(NULL)
+{
+	SetTo(cs0);
+}
+
 CS0String::CS0String(const char *cs0, uint32 length)
 	: fUtf8String(NULL)
 {
@@ -46,6 +52,12 @@ CS0String::~CS0String()
 	DEBUG_INIT(CF_HELPER | CF_HIGH_VOLUME, "CS0String");	
 
 	_Clear();
+}
+
+void
+CS0String::SetTo(const char *cs0)
+{
+	SetTo(cs0, strlen(cs0)+1);
 }
 
 void
