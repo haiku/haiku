@@ -361,6 +361,40 @@ team_get_current_team_id(void)
 }
 
 
+status_t
+team_get_address_space(team_id id, vm_address_space **_addressSpace)
+{
+	cpu_status state;
+	struct team *team;
+	status_t status;
+
+	// ToDo: we need to do something about B_SYSTEM_TEAM vs. its real ID (1)
+	if (id == 1) {
+		// we're the kernel team, so we don't have to go through all
+		// the hassle (locking and hash lookup)
+		atomic_add(&kernel_team->kaspace->ref_count, 1);
+		*_addressSpace = kernel_team->kaspace;
+		return B_OK;
+	}
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = team_get_team_struct_locked(id);
+	if (team != NULL) {
+		atomic_add(&team->aspace->ref_count, 1);
+		*_addressSpace = team->aspace;
+		status = B_OK;
+	} else
+		status = B_BAD_VALUE;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	return status;
+}
+
+
 static struct team *
 create_team_struct(const char *name, bool kernel)
 {
@@ -453,8 +487,7 @@ team_delete_team(struct team *team)
 
 	// free team resources
 
-	ASSERT(team->aspace->ref_count == 1);
-	vm_put_aspace(team->aspace);
+	vm_delete_aspace(team->aspace);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
@@ -660,7 +693,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	}
 
 	// create a new io_context for this team
-	team->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
+	team->io_context = vfs_new_io_context(parent->io_context);
 	if (!team->io_context) {
 		err = B_NO_MEMORY;
 		goto err2;
@@ -718,7 +751,7 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 	struct team_arg *teamArgs;
 	status_t status;
 
-	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld\n", path, argCount, envCount));
+	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld)\n", path, argCount, envCount));
 
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
@@ -739,6 +772,7 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 		return B_NO_MEMORY;
 
 	// ToDo: remove team resources if there are any left
+	// alarm, signals
 
 	vm_delete_areas(team->aspace);
 	delete_owned_ports(team->id);
@@ -754,6 +788,111 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 	
 	// we'll never make it here
 	return B_ERROR;
+}
+
+
+static thread_id
+fork_team(void)
+{
+	struct team *forkedTeam = thread_get_current_thread()->team, *team;
+	struct thread *forkedThread = thread_get_current_thread(), *thread;
+	struct area_info info;
+	cpu_status state;
+	status_t status;
+	int32 cookie;
+	team_id pid;
+
+	TRACE(("fork_team()\n"));
+
+	if (forkedTeam == team_get_kernel_team())
+		return B_NOT_ALLOWED;
+
+	dprintf("fork() is not yet implemented!\n");
+
+	// create a new team
+	// ToDo: this is very similar to team_create_team() - maybe we can do something about it :)
+
+	team = create_team_struct(forkedTeam->name, false);
+	if (team == NULL)
+		return B_NO_MEMORY;
+
+	pid = team->id;
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	hash_insert(team_hash, team);
+	insert_team_into_parent(forkedTeam, team);
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	// create a new io_context for this team
+	team->io_context = vfs_new_io_context(forkedTeam->io_context);
+	if (!team->io_context) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	// create an address space for this team
+	status = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false, &team->aspace);
+	if (status < B_OK)
+		goto err3;
+
+	// copy all areas of the team
+	// ToDo: should be able to handle stack areas differently (ie. don't have them copy-on-write)
+	// ToDo: all stacks of other threads than the current one could be left out
+
+	cookie = 0;
+	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		void *address;
+		status = vm_copy_area(team->aspace->id, info.name, &address, B_CLONE_ADDRESS,
+					info.protection, info.area);
+		if (status < B_OK)
+			break;
+	}
+
+	if (status < B_OK)
+		goto err4;
+
+/*
+	// cut the path from the main thread name
+	threadName = strrchr(name, '/');
+	if (threadName != NULL)
+		threadName++;
+	else
+		threadName = name;
+*/
+/*
+	// create a kernel thread, but under the context of the new team
+	tid = spawn_kernel_thread_etc(team_create_team2, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
+	if (tid < 0) {
+		err = tid;
+		goto err4;
+	}
+
+	resume_thread(tid);
+*/
+	return pid;
+
+err4:
+	vm_put_aspace(team->aspace);
+err3:
+	vfs_free_io_context(team->io_context);
+err2:
+	//free_team_arg(teamArgs);
+	// remove the team structure from the team hash table and delete the team structure
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	remove_team_from_parent(forkedTeam, team);
+	hash_remove(team_hash, team);
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+	delete_team_struct(team);
+
+	return status;
 }
 
 
@@ -1092,8 +1231,7 @@ _user_exec(const char *userPath, int32 argCount, char * const *userArgs,
 thread_id
 _user_fork(void)
 {
-	dprintf("fork() is not yet implemented!\n");
-	return B_ERROR;
+	return fork_team();
 }
 
 
