@@ -1178,7 +1178,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	// ToDo: should we better test for a change in the last_modified time only?
 	if (cookie->last_size != inode->Size()
 		&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
-		notify_listener(B_STAT_CHANGED,volume->ID(),0,0,inode->ID(),NULL);
+		notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
 		cookie->last_size = inode->Size();
 		cookie->last_notification = system_time();
 	}
@@ -1187,7 +1187,8 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	// It's done here and not in Inode::WriteAt() so that it won't
 	// add to the duration of a transaction - it might even be a
 	// good idea to offload those calls to another thread
-	volume->WriteCachedBlocksIfNecessary();
+	if ((inode->Flags() & INODE_NO_CACHE) == 0)
+		volume->WriteCachedBlocksIfNecessary();
 
 	return status;
 }
