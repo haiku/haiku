@@ -35,6 +35,7 @@
 #include <List.h>
 
 // Project Includes ------------------------------------------------------------
+#include "InputServerTypes.h"
 
 // Local Includes --------------------------------------------------------------
 
@@ -77,7 +78,7 @@ void PrintDevices()
 //------------------------------------------------------------------------------
 BInputDevice *find_input_device(const char *name)
 {
-	BMessage command('Ifdv');
+	BMessage command(IS_FIND_DEVICES);
 	BMessage reply;
 
 	command.AddString("device", name);
@@ -104,7 +105,7 @@ status_t get_input_devices(BList *list)
 {
 	list->MakeEmpty();
 
-	BMessage command('Ifdv');
+	BMessage command(IS_FIND_DEVICES);
 	BMessage reply;
 
 	status_t err = _control_input_server_(&command, &reply);
@@ -132,7 +133,7 @@ status_t get_input_devices(BList *list)
 //------------------------------------------------------------------------------
 status_t watch_input_devices(BMessenger target, bool start)
 {
-	BMessage command('Iwdv');
+	BMessage command(IS_WATCH_DEVICES);
 	BMessage reply;
 
 	command.AddMessenger("target", target);
@@ -162,7 +163,7 @@ bool BInputDevice::IsRunning() const
 	if (!fName)
 		return false;
 
-	BMessage command('Idvr');
+	BMessage command(IS_IS_DEVICE_RUNNING);
 	BMessage reply;
 
 	command.AddString("device", fName);
@@ -175,7 +176,7 @@ status_t BInputDevice::Start()
 	if (!fName)
 		return B_ERROR;
 
-	BMessage command('Istd');
+	BMessage command(IS_START_DEVICE);
 	BMessage reply;
 
 	command.AddString("device", fName);
@@ -188,7 +189,7 @@ status_t BInputDevice::Stop()
 	if (!fName)
 		return B_ERROR;
 
-	BMessage command('Ispd');
+	BMessage command(IS_STOP_DEVICE);
 	BMessage reply;
 
 	command.AddString("device", fName);
@@ -201,7 +202,7 @@ status_t BInputDevice::Control(uint32 code, BMessage *message)
 	if (!fName)
 		return B_ERROR;
 
-	BMessage command('Icnd');
+	BMessage command(IS_CONTROL_DEVICES);
 	BMessage reply;
 
 	command.AddString("device", fName);
@@ -220,7 +221,7 @@ status_t BInputDevice::Control(uint32 code, BMessage *message)
 //------------------------------------------------------------------------------
 status_t BInputDevice::Start(input_device_type type)
 {
-	BMessage command('Istd');
+	BMessage command(IS_START_DEVICE);
 	BMessage reply;
 
 	command.AddInt32("type", type);
@@ -230,7 +231,7 @@ status_t BInputDevice::Start(input_device_type type)
 //------------------------------------------------------------------------------
 status_t BInputDevice::Stop(input_device_type type)
 {
-	BMessage command('Ispd');
+	BMessage command(IS_STOP_DEVICE);
 	BMessage reply;
 
 	command.AddInt32("type", type);
@@ -241,7 +242,7 @@ status_t BInputDevice::Stop(input_device_type type)
 status_t BInputDevice::Control(input_device_type type, uint32 code,
 									  BMessage *message)
 {
-	BMessage command('Icnd');
+	BMessage command(IS_CONTROL_DEVICES);
 	BMessage reply;
 
 	command.AddInt32("type", type);
