@@ -1,6 +1,17 @@
 #ifndef __CLIPPING_H
 #define __CLIPPING_H
 
+#include <Region.h>
+#include <SupportDefs.h>
+
+
+/*	Some methods to manipulate clipping_rects.
+	basically you can do almost everything you do with
+	BRects, just that clipping_rects can only have integer
+	coordinates (a thing that makes these perfect for drawing
+	calculations).
+*/
+
 static inline clipping_rect
 union_rect(clipping_rect r1, clipping_rect r2)
 {
@@ -80,5 +91,27 @@ valid_rect(clipping_rect rect)
 		return true;
 	return false;
 }
+
+
+static inline bool
+rects_intersects(clipping_rect rectA, clipping_rect rectB)
+{
+	return valid_rect(sect_rect(rectA, rectB));
+}
+
+
+static inline int32
+rect_width(clipping_rect rect)
+{
+	return rect.right - rect.left;
+}
+
+
+static inline int32
+rect_height(clipping_rect rect)
+{
+	return rect.bottom - rect.top;
+}
+
 
 #endif // __CLIPPING_H
