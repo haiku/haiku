@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src tests kits media notificationtest ;
+
+SimpleTest NotificationTest
+	: main.cpp
+	: media be root
+;
+
