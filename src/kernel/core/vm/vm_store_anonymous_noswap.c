@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 
-#define TRACE_VM
+//#define TRACE_VM
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
 #else
