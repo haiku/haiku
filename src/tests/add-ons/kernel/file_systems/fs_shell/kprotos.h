@@ -1,5 +1,14 @@
+#ifndef KPROTOS_H
+#define KPROTOS_H
+
+#include "myfs.h"
+
 #define my_stat stat
 #define my_dirent dirent
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int sys_symlink(bool kernel, const char *oldpath, int nfd,
 			const char *newpath);
@@ -51,3 +60,9 @@ int sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct di
 int init_vnode_layer(void);
 void *install_file_system(vnode_ops *ops, const char *name,
                           bool fixed, image_id aid);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif	/* KPROTOS_H */

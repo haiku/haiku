@@ -1,6 +1,11 @@
 #ifndef _LOCK_H
 #define _LOCK_H
 
+#ifdef __cplusplus
+extern "C" {
+//#	define lock fsh_lock
+#endif
+
 typedef struct lock lock;
 typedef struct mlock mlock;
 
@@ -25,4 +30,8 @@ extern int  free_mlock(mlock *l);
 #define     LOCKM(l,cnt)    acquire_sem_etc(l.s, cnt, 0, 0.0)
 #define     UNLOCKM(l,cnt)  release_sem_etc(l.s, cnt, 0)
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif	/* _LOCK_H */
