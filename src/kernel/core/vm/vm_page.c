@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -17,6 +20,14 @@
 
 #include <string.h>
 #include <stdlib.h>
+
+//#define TRACE_VM_PAGE
+#ifdef TRACE_VM_PAGE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 typedef struct page_queue {
 	vm_page *head;
@@ -43,7 +54,7 @@ static int dump_page(int argc, char **argv);
 static int dump_page_queue(int argc, char **argv);
 static int dump_page_stats(int argc, char **argv);
 static int dump_free_page_table(int argc, char **argv);
-static int vm_page_set_state_nolock(vm_page *page, int page_state);
+static status_t vm_page_set_state_nolock(vm_page *page, int page_state);
 static void clear_page(addr_t pa);
 static int32 page_scrubber(void *);
 
@@ -193,12 +204,12 @@ static int pageout_daemon()
 #endif
 
 
-int
+status_t
 vm_page_init(kernel_args *ka)
 {
 	unsigned int i;
 
-	dprintf("vm_page_init: entry\n");
+	TRACE(("vm_page_init: entry\n"));
 
 	page_lock = 0;
 
@@ -220,19 +231,20 @@ vm_page_init(kernel_args *ka)
 	{
 		unsigned int last_phys_page = 0;
 
-		physical_page_offset = ka->physical_memory_range[0].start / PAGE_SIZE;
+		physical_page_offset = ka->physical_memory_range[0].start / B_PAGE_SIZE;
 		for (i = 0; i<ka->num_physical_memory_ranges; i++) {
-			last_phys_page = (ka->physical_memory_range[i].start + ka->physical_memory_range[i].size) / PAGE_SIZE - 1;
+			last_phys_page = (ka->physical_memory_range[i].start + ka->physical_memory_range[i].size) / B_PAGE_SIZE - 1;
 		}
-		dprintf("first phys page = 0x%lx, last 0x%x\n", physical_page_offset, last_phys_page);
+		TRACE(("first phys page = 0x%lx, last 0x%x\n", physical_page_offset, last_phys_page));
 		num_pages = last_phys_page - physical_page_offset;
 	}
 
 	// map in the new free page table
-	all_pages = (vm_page *)vm_alloc_from_ka_struct(ka, num_pages * sizeof(vm_page), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	all_pages = (vm_page *)vm_alloc_from_kernel_args(ka, num_pages * sizeof(vm_page),
+					B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
-	dprintf("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
-		all_pages, num_pages, (unsigned int)(num_pages * sizeof(vm_page)));
+	TRACE(("vm_init: putting free_page_table @ %p, # ents %d (size 0x%x)\n",
+		all_pages, num_pages, (unsigned int)(num_pages * sizeof(vm_page))));
 
 	// initialize the free page table
 	for (i = 0; i < num_pages - 1; i++) {
@@ -243,25 +255,25 @@ vm_page_init(kernel_args *ka)
 		enqueue_page(&page_free_queue, &all_pages[i]);
 	}
 
-	dprintf("initialized table\n");
+	TRACE(("initialized table\n"));
 
 	// mark some of the page ranges inuse
 	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
-		vm_mark_page_range_inuse(ka->physical_allocated_range[i].start / PAGE_SIZE,
-			ka->physical_allocated_range[i].size / PAGE_SIZE);
+		vm_mark_page_range_inuse(ka->physical_allocated_range[i].start / B_PAGE_SIZE,
+			ka->physical_allocated_range[i].size / B_PAGE_SIZE);
 	}
 
 	// set the global max_commit variable
-	vm_increase_max_commit(num_pages*PAGE_SIZE);
+	vm_increase_max_commit(num_pages * B_PAGE_SIZE);
 
-	dprintf("vm_page_init: exit\n");
+	TRACE(("vm_page_init: exit\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
-int
-vm_page_init2(kernel_args *ka)
+status_t
+vm_page_init_post_area(kernel_args *args)
 {
 	void *null;
 
@@ -274,12 +286,12 @@ vm_page_init2(kernel_args *ka)
 	add_debugger_command("page", &dump_page, "Dump page info");
 	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
 
-	return 0;
+	return B_OK;
 }
 
 
-int
-vm_page_init_postthread(kernel_args *ka)
+status_t
+vm_page_init_post_thread(kernel_args *args)
 {
 	thread_id thread;
 
@@ -293,7 +305,7 @@ vm_page_init_postthread(kernel_args *ka)
 	tid = thread_create_kernel_thread("pageout daemon", &pageout_daemon, B_FIRST_REAL_TIME_PRIORITY + 1);
 	thread_resume_thread(tid);
 #endif
-	return 0;
+	return B_OK;
 }
 
 
@@ -308,7 +320,7 @@ page_scrubber(void *unused)
 
 	(void)(unused);
 
-	dprintf("page_scrubber starting...\n");
+	TRACE(("page_scrubber starting...\n"));
 
 	for (;;) {
 		snooze(100000); // 100ms
@@ -329,7 +341,7 @@ page_scrubber(void *unused)
 			scrub_count = i;
 
 			for (i = 0; i < scrub_count; i++) {
-				clear_page(page[i]->ppn * PAGE_SIZE);
+				clear_page(page[i]->ppn * B_PAGE_SIZE);
 			}
 
 			state = disable_interrupts();
@@ -358,43 +370,42 @@ clear_page(addr_t pa)
 
 	vm_get_physical_page(pa, &va, PHYSICAL_PAGE_CAN_WAIT);
 
-	memset((void *)va, 0, PAGE_SIZE);
+	memset((void *)va, 0, B_PAGE_SIZE);
 
 	vm_put_physical_page(va);
 }
 
 
-int
+status_t
 vm_mark_page_inuse(addr_t page)
 {
 	return vm_mark_page_range_inuse(page, 1);
 }
 
 
-int
-vm_mark_page_range_inuse(addr_t start_page, addr_t len)
+status_t
+vm_mark_page_range_inuse(addr_t start_page, addr_t length)
 {
+	cpu_status state;
 	vm_page *page;
 	addr_t i;
-	int state;
 
-	// XXX remove
-	dprintf("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n", start_page, len);
+	TRACE(("vm_mark_page_range_inuse: start 0x%lx, len 0x%lx\n", start_page, length));
 
 	if (physical_page_offset > start_page) {
 		dprintf("vm_mark_page_range_inuse: start page %ld is before free list\n", start_page);
-		return EINVAL;
+		return B_BAD_VALUE;
 	}
 	start_page -= physical_page_offset;
-	if (start_page + len >= num_pages) {
+	if (start_page + length >= num_pages) {
 		dprintf("vm_mark_page_range_inuse: range would extend past free list\n");
-		return EINVAL;
+		return B_BAD_VALUE;
 	}
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
-	for (i = 0; i < len; i++) {
+	for (i = 0; i < length; i++) {
 		page = &all_pages[start_page + i];
 		switch (page->state) {
 			case PAGE_STATE_FREE:
@@ -417,7 +428,7 @@ vm_mark_page_range_inuse(addr_t start_page, addr_t len)
 	release_spinlock(&page_lock);
 	restore_interrupts(state);
 
-	return i;
+	return B_OK;
 }
 
 
@@ -463,7 +474,7 @@ out:
 
 	if (p != NULL && page_state == PAGE_STATE_CLEAR
 		&& (old_page_state == PAGE_STATE_FREE || old_page_state == PAGE_STATE_UNUSED))
-		clear_page(p->ppn * PAGE_SIZE);
+		clear_page(p->ppn * B_PAGE_SIZE);
 
 	return p;
 }
@@ -515,7 +526,7 @@ vm_page_allocate_page(int page_state)
 
 	// if needed take the page from the free queue and zero it out
 	if (page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE)
-		clear_page(p->ppn * PAGE_SIZE);
+		clear_page(p->ppn * B_PAGE_SIZE);
 
 	return p;
 }
@@ -582,7 +593,7 @@ vm_lookup_page(addr_t page_num)
 }
 
 
-static int
+static status_t
 vm_page_set_state_nolock(vm_page *page, int page_state)
 {
 	page_queue *from_q = NULL;
@@ -632,23 +643,24 @@ vm_page_set_state_nolock(vm_page *page, int page_state)
 	move_page_to_queue(from_q, to_q, page);
 	page->state = page_state;
 
-	return 0;
+	return B_OK;
 }
 
 
-int
+status_t
 vm_page_set_state(vm_page *page, int page_state)
 {
-	int err;
-	int state = disable_interrupts();
+	status_t status;
+
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
-	err = vm_page_set_state_nolock(page, page_state);
+	status = vm_page_set_state_nolock(page, page_state);
 
 	release_spinlock(&page_lock);
 	restore_interrupts(state);
 
-	return err;
+	return status;
 }
 
 
@@ -801,7 +813,7 @@ static int dump_free_page_table(int argc, char **argv)
 
 
 static addr_t
-vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)
+vm_alloc_virtual_from_kernel_args(kernel_args *ka, size_t size)
 {
 	addr_t spot = 0;
 	uint32 i;
@@ -863,7 +875,7 @@ is_page_in_phys_range(kernel_args *ka, addr_t paddr)
 
 
 static addr_t
-vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
+vm_alloc_physical_page_from_kernel_args(kernel_args *ka)
 {
 	uint32 i;
 
@@ -880,8 +892,8 @@ vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
 		// see if the next physical page fits in the memory block
 		if (is_page_in_phys_range(ka, next_page)) {
 			// we got one!
-			ka->physical_allocated_range[i].size += PAGE_SIZE;
-			return ((ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size - PAGE_SIZE) / PAGE_SIZE);
+			ka->physical_allocated_range[i].size += B_PAGE_SIZE;
+			return ((ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size - B_PAGE_SIZE) / B_PAGE_SIZE);
 		}
 	}
 
@@ -894,24 +906,25 @@ vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
  */
 
 addr_t
-vm_alloc_from_ka_struct(kernel_args *ka, unsigned int size, int lock)
+vm_alloc_from_kernel_args(kernel_args *args, size_t size, uint32 lock)
 {
-	addr_t vspot, pspot;
+	addr_t virtualBase, physicalAddress;
 	uint32 i;
 
 	// find the vaddr to allocate at
-	vspot = vm_alloc_vspace_from_ka_struct(ka, size);
-	//dprintf("alloc_from_ka_struct: vaddr 0x%lx\n", vspot);
+	virtualBase = vm_alloc_virtual_from_kernel_args(args, size);
+	//dprintf("alloc_from_ka_struct: vaddr 0x%lx\n", virtualAddress);
 
 	// map the pages
 	for (i = 0; i < PAGE_ALIGN(size) / B_PAGE_SIZE; i++) {
-		pspot = vm_alloc_ppage_from_kernel_struct(ka);
-		//dprintf("alloc_from_ka_struct: paddr 0x%lx\n", pspot);
-		if (pspot == 0)
+		physicalAddress = vm_alloc_physical_page_from_kernel_args(args);
+		//dprintf("alloc_from_ka_struct: paddr 0x%lx\n", physicalAddress);
+
+		if (physicalAddress == 0)
 			panic("error allocating page from ka_struct!\n");
-		vm_translation_map_quick_map(ka, vspot + i*PAGE_SIZE,
-			pspot * PAGE_SIZE, lock, &vm_alloc_ppage_from_kernel_struct);
+		arch_vm_translation_map_early_map(args, virtualBase + i * B_PAGE_SIZE,
+			physicalAddress * B_PAGE_SIZE, lock, &vm_alloc_physical_page_from_kernel_args);
 	}
 
-	return vspot;
+	return virtualBase;
 }
