@@ -14,6 +14,8 @@ ColorMenuItem::ColorMenuItem(const char	*label, rgb_color color,BMessage *messag
 void ColorMenuItem::DrawContent(){
 	
 		BMenu *menu= Menu();
+		rgb_color menuColor = menu->HighColor();
 		menu->SetHighColor(fItemColor);
 		BMenuItem::DrawContent();
+		menu->SetHighColor(menuColor);
 }
