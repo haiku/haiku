@@ -7,6 +7,7 @@
 
 
 #include <SupportDefs.h>
+#include <util/kernel_cpp.h>
 
 
 #ifdef __cplusplus
@@ -49,7 +50,7 @@ class List {
 			fLink.prev = &(item->*LinkMember);
 		}
 
-		void Remove(Item *item)
+		static void Remove(Item *item)
 		{
 			(item->*LinkMember).next->prev = (item->*LinkMember).prev;
 			(item->*LinkMember).prev->next = (item->*LinkMember).next;
@@ -103,11 +104,11 @@ class Iterator {
 		typedef List<Item, LinkMember> ListType;
 
 		Iterator() : fCurrent(NULL) {}
-		Iterator(ListType *list) : fList(list), fCurrent(list->Head()) {}
+		Iterator(ListType &list) : fList(list), fCurrent(list.Head()) {}
 
 		Item *Next()
 		{
-			if (fCurrent == &fList->fLink)
+			if (fCurrent == &fList.fLink)
 				return NULL;
 
 			Link *current = fCurrent;
@@ -117,8 +118,8 @@ class Iterator {
 		}
 
 	private:
-		ListType *fList;
-		Link *fCurrent;
+		ListType	&fList;
+		Link		*fCurrent;
 };
 
 }	// namespace DoublyLinked
