@@ -3,28 +3,9 @@
 //#include <stdlib.h> -- when exit() is implemented
 #include <string.h>
 
+#include "cpuinfo.h"
 #include "flag_arrays.c"
 
-
-void AMD_identify (cpuid_info *);
-void AMD_features (cpuid_info *);
-void AMD_TLB_cache (cpuid_info *);
-void Cyrix_identify (cpuid_info *);
-void Cyrix_features (cpuid_info *);
-void Cyrix_TLB_cache (cpuid_info *);
-void Intel_identify (cpuid_info *);
-void Intel_features (cpuid_info *);
-void Intel_TLB_cache (cpuid_info *);
-
-const char *Intel_brand_string (int, int);
-void dump_regs (cpuid_info *, const char *, uint32, uint32);
-char getoption (char *optstr);
-void opt_identify (cpuid_info *, int);
-void opt_features (cpuid_info *, int);
-void opt_TLB_cache (cpuid_info *, int);
-void opt_dump_calls (cpuid_info *, uint32);
-void print_regs (cpuid_info *);
-void usage (void);
 
 
 
@@ -60,9 +41,14 @@ getoption(char *optstr)
 int
 main(int argc, char *argv[])
 {
+	// this program prints out everything you would ever want to know about
+	// your computer's processor, or your money back, in full (30 days, no hassle)
+	//
 	// technical reference:
-	// "Intel Processor Identification and the CPUID Instruction"
-	// (ftp://download.intel.com/design/Xeon/applnots/24161821.pdf)
+	//    "Intel Processor Identification and the CPUID Instruction"
+	//    (ftp://download.intel.com/design/Xeon/applnots/24161821.pdf)
+	
+	const char *no_support = "Sorry, your processor does not support this feature\n";
 	
 	char   option = 0;
 	int    vendor_tag;
@@ -79,24 +65,36 @@ main(int argc, char *argv[])
 	
 	// get initial info (max_level and vendor_tag)
 	get_cpuid(info, 0, 0);
-	max_level = info->eax_0.max_eax;
-	if (max_level < 1) {
-		printf("\nSorry, your computer does not seem to support the CPUID instruction\n");
-		return 1;
-	}
-	
+	max_level  = info->eax_0.max_eax;
 	vendor_tag = info->regs.ebx;
+	
 	switch (option) {
 		case 'i':
-			opt_identify(info, vendor_tag);
+			printf("CPU identification:\n\n");
+			if (max_level < 1)
+				printf(no_support);
+			else
+				opt_identify(info, vendor_tag);
 			break;
+		
 		case 'f':
-			opt_features(info, vendor_tag);
+			printf("Supported processor features:\n\n");
+			if (max_level < 1)
+				printf(no_support);
+			else
+				opt_features(info, vendor_tag);
 			break;
+		
 		case 't':
-			opt_TLB_cache(info, vendor_tag);
+			printf("TLB and cache information:\n\n");
+			if (max_level < 2)
+				printf(no_support);
+			else
+				opt_TLB_cache(info, vendor_tag);
 			break;
+		
 		case 'd':
+			printf("CPUID instruction call dump:\n\n");
 			opt_dump_calls(info, max_level);
 			break;
 	}
@@ -108,13 +106,15 @@ main(int argc, char *argv[])
 void
 opt_identify(cpuid_info *info, int vendor_tag)
 {
+	// gosh, these CPU manufacturers have really outdone
+	// themselves on creating cutesy vendorID strings, no?
+	// (that was sarcasm, btw...)
+	
 	char vendorID[12+1] = {0};
 	
 	// the 'vendorid' field of the info struct is not null terminated,
 	// so it is copied into a properly terminated local string buffer
 	memcpy(vendorID, info->eax_0.vendorid, 12);
-	
-	printf("\nCPU identification:\n");
 	printf("%12s '%s'\n",  "Vendor ID:", vendorID);
 	
 	switch (vendor_tag) {
@@ -154,7 +154,7 @@ opt_features(cpuid_info *info, int vendor_tag)
 
 void
 opt_TLB_cache(cpuid_info *info, int vendor_tag)
-{
+{	
 	switch (vendor_tag) {
 		case 'uneG':  // "GenuineIntel"
 			Intel_TLB_cache(info);
@@ -179,6 +179,10 @@ opt_TLB_cache(cpuid_info *info, int vendor_tag)
 void
 Intel_identify(cpuid_info *info)
 {
+	// the code for this function looks very boring and tedious
+	// (that's because it's very boring and tedious)
+	// but I think it's correct anyway (there's always that possibility!)
+	
 	int type, family, model, sig;
 	
 	get_cpuid(info, 1, 0);
@@ -203,6 +207,11 @@ Intel_identify(cpuid_info *info)
 	else if (family == 6)  printf("Pentium Pro");
 	else if (family == 15) printf("Pentium 4");
 	printf("'\n");
+	
+	if (family == 15) {
+		int efamily = (info->regs.eax >> 20) & 0xff;
+		printf("Extended family: %d\n", efamily);
+	}
 		
 	printf("%12s %2d '", "Model:", model);
 	switch (family) {
@@ -300,7 +309,8 @@ Intel_brand_string(int id, int processor_signature)
 void
 Intel_features(cpuid_info *info)
 {
-	// 
+	// for each bit set in the features flag, print out the
+	// corresponding index in the flags array (too easy!)
 	
 	int i;
 	int fflags;
@@ -308,7 +318,6 @@ Intel_features(cpuid_info *info)
 	get_cpuid(info, 1, 0);
 	fflags = info->eax_1.features;
 	
-	printf("\nSupported processor features:\n");
 	for (i = 0; i < 32; ++i)
 		if (fflags & (1<<i))
 			printf("   %s\n", Intel_feature_flags[i]);
@@ -318,10 +327,149 @@ Intel_features(cpuid_info *info)
 
 
 void
+insert (int *a, int elem, int max_index)
+	{
+	// inserts a new element into an ordered integer array
+	// using (what else) the trusty old binary search algorithm...
+	// assumes the array has sufficient space to do this
+	// (i.e. it's the caller's problem to check for bounds overflow)
+	
+	int i;
+	int lo = 0;
+	int hi = max_index;
+	int mid;
+
+	// find insert index (will end up in lo)
+	while (lo < hi) {
+		mid = (lo + hi) / 2;
+		if (elem < a[mid])
+			hi = mid;
+		else
+			lo = mid + 1;
+	}
+
+	// bump up the max index (to make room for the new element)
+	hi = max_index + 1;
+	
+	// move up all the items after the insert point by one
+	for (i = hi; i > lo; --i)
+		a[i] = a[i-1];
+	
+	// insert the new guy
+	a[lo] = elem;
+	}
+
+
+void
 Intel_TLB_cache(cpuid_info *info)
 {
-	//get_cpuid(info, 2, 0);
-	printf("\nnot just yet...\n");
+	// displays technical info for the CPU's various instruction and data pipeline caches
+	// and the TLBs (Translation Lookaside Buffers).
+	//
+	// The method for extracting and displaying this info might be less than obvious,
+	// so here's an explanation:
+	//
+	// The TLB/Cache info is stored in a global table. Each entry is uniquely identified
+	// by a descriptor byte. Additionally, each entry is catagorized according to the
+	// cache type. A textual string contains the information to display.
+	//
+	// To retrieve the CPUs capabilities, the pass loop repeatedly (maybe) calls
+	// get_cpuid() which fills the registers. Each register is a 4-byte datum,
+	// capable of holding up to 4 descriptor bytes. The descriptor bytes are extracted
+	// (thru shifting and masking) and then inserted into a slot array. The slot array
+	// stores indexes into the table. Since descriptor bytes are not indexes themselves,
+	// an index array is created and used to convert them. The slot array is filled so
+	// as to keep the indexes in sorted order -- this guarantees than all entries for
+	// a particular cache type will display together.
+	//
+	// After the pass loop is finished, the slot array contains the indexes of all the
+	// table entries that apply to the host processor. Displaying the info merely a matter
+	// of spinning thru the slot array and printing the text. The output is organized by
+	// the cache types -- this technique *only* works because the TLB/Cache table has been
+	// carefully arranged in that order.
+	
+	#define BIT_31_MASK (1 << 31)
+	
+	int    pass, matches;       // counters
+	uint32 reg;                 // value of an individual register (eax, ebx, ecx, edx)
+	uint8  db;                  // descriptor byte
+	int    indexOf[256] = {0};  // converts descriptor bytes to table indexes
+	int    slot[256] = {0};     // indexes into the TLB/Cache table (for entries found)
+	
+	tlbc_info *tab = Intel_TLB_Cache_Table;
+	int   tabsize  = sizeof Intel_TLB_Cache_Table / sizeof(Intel_TLB_Cache_Table[0]);
+
+	// fill the index conversion array
+	int i = 0;
+	int n = 0;
+
+	while (n < tabsize)
+		indexOf[tab[n++].descriptor] = i++;
+
+	
+	// pass loop: insert relevant table indexes into the slots array
+	i = 0;
+	for (pass = 0; ; ++pass) {
+		get_cpuid(info, 2, 0);
+		
+		// low byte of eax register holds maximum iterations
+		reg = info->regs.eax;
+		if (pass >= (reg & 0xff))
+			break;
+		
+		reg >>= 8; // skip low byte
+		while ((db = (reg & 0xff)))
+			insert(slot, indexOf[db], i++),
+			reg >>= 8;
+		
+		reg = info->regs.ebx;  // ebx
+		if ((reg & BIT_31_MASK) == 0)
+			while ((db = (reg & 0xff)))
+				insert(slot, indexOf[db], i++),
+				reg >>= 8;
+
+		reg = info->regs.ecx;  // ecx
+		if ((reg & BIT_31_MASK) == 0)
+			while ((db = (reg & 0xff)))
+				insert(slot, indexOf[db], i++),
+				reg >>= 8;
+
+		reg = info->regs.edx;  // edx
+		if ((reg & BIT_31_MASK) == 0)
+			while ((db = (reg & 0xff)))
+				insert(slot, indexOf[db], i++),
+				reg >>= 8;
+	}
+
+
+	// reset slot index for output loop
+	i = 0;
+	
+	// eeiuw! an icky macro (but it really does prevent much repetitive code)	
+	#define display_matching_entries(type_name,type_code) \
+		printf(type_name ":\n"); \
+		matches = 0; \
+		while (tab[n = slot[i]].cache_type == type_code) { \
+			printf("   %s\n", tab[n].text); \
+			++matches; \
+			++i; \
+		} \
+		if (matches == 0) \
+			printf("   None\n")
+	
+	// at long last... output the data
+	display_matching_entries("Instruction TLB", Inst_TLB);
+	display_matching_entries("Data TLB", Data_TLB);
+	display_matching_entries("L1 Instruction Cache", L1_Inst_Cache);
+	display_matching_entries("L1 Data Cache", L1_Data_Cache);
+	display_matching_entries("L2 Cache", L2_Cache);
+	
+	if (tab[slot[i]].cache_type == No_L2_Or_L3)
+		// no need to print the text on this one, just skip it
+		++i;
+	
+	display_matching_entries("L3 Cache", L3_Cache);
+	display_matching_entries("Trace Cache", Trace_Cache);
 }
 
 
@@ -388,9 +536,10 @@ Cyrix_TLB_cache(cpuid_info *info)
 void
 opt_dump_calls(cpuid_info *info, uint32 max_level)
 {
+	// dumps the registers for standard (and if supported) extended
+	// calls to the CPUID instruction
+
 	uint32 max_extended;
-	
-	printf("CPUID instruction call dump:\n");
 
 	dump_regs(info, "Standard Calls", 0, max_level);
 
@@ -407,9 +556,11 @@ opt_dump_calls(cpuid_info *info, uint32 max_level)
 void
 dump_regs(cpuid_info *info, const char *heading, uint32 min_level, uint32 max_level)
 {
+	// gosh, it's so perty (in a text-based output kind of way)
+	
 	uint32 i;
 	
-	printf("\n%s (max eax level = %lx)\n", heading, max_level);
+	printf("%s (max eax level = %lx)\n", heading, max_level);
 	printf("----------------------------------------------\n");
 	printf("  Input  |   Output\n");
 	printf("----------------------------------------------\n");
@@ -424,12 +575,17 @@ dump_regs(cpuid_info *info, const char *heading, uint32 min_level, uint32 max_le
 		       info->regs.ecx,
 		       info->regs.edx);
 	}
+	printf("\n");
 }
 
 
 void
 print_regs(cpuid_info *info)
 {
+	// this function either prints the contents of all the
+	// registers as a single character string, or it does
+	// something else entirely (you decide)
+	
 	int i;
 	char s[17] = {0};
 	
