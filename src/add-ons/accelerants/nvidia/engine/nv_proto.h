@@ -31,7 +31,6 @@ void fake_pins(void);
 void dump_pins(void);
 
 /* DAC functions */
-/* see if an analog VGA monitor is connected to DAC */
 bool nv_dac_crt_connected(void);
 status_t nv_dac_mode(int,float);
 status_t nv_dac_palette(uint8*,uint8*,uint8*);
