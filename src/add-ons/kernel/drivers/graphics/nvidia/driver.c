@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-9/2004.
+	Rudolf Cornelissen 3/2002-12/2004.
 */
 
 /* standard kernel driver stuff */
@@ -115,10 +115,13 @@ static uint16 nvidia_device_list[] = {
 	0x0042, /* Nvidia GeForce FX 6800LE */
 	0x0043, /* Nvidia unknown FX */
 	0x0045, /* Nvidia GeForce FX 6800 GT */
+	0x004d, /* Nvidia Quadro FX 4400 */
 	0x004e, /* Nvidia Quadro FX 4000 */
 	0x00a0, /* Nvidia Aladdin TNT2 */
 	0x00c0,	/* Nvidia unknown FX */
 	0x00c1,	/* Nvidia unknown FX */
+	0x00c2, /* Nvidia unknown FX */
+	0x00f1, /* Nvidia GeForce FX 6600 GT AGP */
 	0x00f8,	/* Nvidia Quadro FX 3400 PCIe(?) */
 	0x00f9,	/* Nvidia GeForce PCX 6800 PCIe */
 	0x00fa,	/* Nvidia GeForce PCX 5750 PCIe */
@@ -136,7 +139,10 @@ static uint16 nvidia_device_list[] = {
 	0x0113, /* Nvidia Quadro2 MXR/EX/Go */
 	0x0140, /* Nvidia GeForce FX 6600 GT */
 	0x0141, /* Nvidia GeForce FX 6600 */
+	0x0144, /* Nvidia GeForce FX 6600 Go */
 	0x0145, /* Nvidia GeForce FX 6610 XL */
+	0x0146, /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
+	0x0148, /* Nvidia GeForce FX 6600 Go */
 	0x014e, /* Nvidia Quadro FX 540 */
 	0x0150, /* Nvidia GeForce2 GTS/Pro */
 	0x0151, /* Nvidia GeForce2 Ti DDR */
@@ -165,6 +171,7 @@ static uint16 nvidia_device_list[] = {
 	0x0189,	/* Nvidia GeForce4 MX AGP8X */
 	0x018a, /* Nvidia Quadro4 280 NVS AGP8X */
 	0x018b, /* Nvidia Quadro4 380 XGL */
+	0x018c, /* Nvidia Quadro4 NVS 50 PCI */
 	0x01a0, /* Nvidia GeForce2 Integrated GPU */
 	0x01f0, /* Nvidia GeForce4 MX Integrated GPU */
 	0x0200, /* Nvidia GeForce3 */
@@ -239,17 +246,13 @@ static uint16 nvidia_device_list[] = {
 /*
 	not yet included nVidia ID's that are unknown, but used apparantly:
 	0x0049 //nv40
-	0x00c2 //nv41
 	0x00c8 //nv41
 	0x00c9 //nv41
 	0x00cc //nv41
 	0x00ce //nv41
 	0x0142 //nv43
 	0x0143 //nv43
-	0x0144 //nv43
-	0x0146 //nv43
 	0x0147 //nv43
-	0x0148 //nv43
 	0x0149 //nv43
 	0x014b //nv43
 	0x014c //nv43
