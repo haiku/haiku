@@ -71,6 +71,8 @@ struct TMessengerInitPolicy : public ArrayTypeBase<BMessenger>
 	private:
 		static BLooper sLooper;
 };
+// bonefish: TODO: Sorry, but this sucks. Just loading the App Kit test add-on
+// will already create a BLooper.
 BLooper TMessengerInitPolicy::sLooper;
 
 struct TMessengerAssertPolicy
