@@ -1,3 +1,20 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 keyboard ;
 
-KernelObjects keyboard.c : -fno-pic -D_KERNEL_MODE ;
+KernelObjects
+	keyboard.c
+	:
+	-fno-pic -D_KERNEL_MODE
+	;
+
+KernelLd keyboard :
+	<$(SOURCE_GRIST)>keyboard.o
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	drivers/dev/keyboard
+	; 
+
