@@ -126,7 +126,7 @@ void Socket::open()
 				cin.sin_port   = htons(__localPort);
 				if (::bind(__sock, (sockaddr *)&cin, sizeof(cin)) != 0) {
 					sprintf(__error_msg, "bind failed. errno = %d", errno);
-					::closesocket(__sock);
+					::close(__sock);
 					__sock = -1;
 					__error = true;
 				}
@@ -134,7 +134,7 @@ void Socket::open()
 			sin.sin_port = htons(__port);
 			if (::connect(__sock, (sockaddr *)&(sin), sizeof(sin)) != 0) {
 				sprintf(__error_msg, "connect failed. errno = %d", errno);
-				::closesocket(__sock);
+				::close(__sock);
 				__sock = -1;
 				__error = true;
 			}
@@ -146,7 +146,7 @@ void Socket::close()
 {
 	if (__sock != -1) {
 		::shutdown(__sock, 2);
-		::closesocket(__sock);
+		::close(__sock);
 		__sock = -1;
 	}
 }
