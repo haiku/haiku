@@ -60,10 +60,18 @@ status_t get_nth_partition_info(int deviceFD, int32 sessionIndex,
 								extended_partition_info *partitionInfo);
 
 // partitioning
+status_t get_partitioning_parameters(int deviceFD, int32 sessionIndex,
+									 const char *identifier, char *buffer,
+									 size_t bufferSize, size_t *actualSize);
 status_t partition_session(int deviceFD, int32 sessionIndex,
 						   const char *identifier, const char *parameters);
 
 // initialization
+status_t get_fs_initialization_parameters(int deviceFD, int32 sessionIndex,
+										  int32 partitionIndex,
+										  const char *fileSystem, char *buffer,
+										  size_t bufferSize,
+										  size_t *actualSize);
 // TODO: Move to <unistd.h>. It fits better there.
 status_t initialize_volume(const char *where, const char *fileSystem, 
 						   const char *volumeName, const char *parameters);
