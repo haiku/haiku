@@ -138,7 +138,7 @@ void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
 {
 	Lock();
-
+	
 	FBBitmap		frameBuffer;
 	FBBitmap		*bmp = &frameBuffer;
 	
@@ -300,7 +300,7 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect 
 void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)
 {
 	Lock();
-
+	
 	FBBitmap		frameBuffer;
 	FBBitmap		*bmp = &frameBuffer;
 	
@@ -310,7 +310,9 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 		return;
 	}
 	
-
+	fCursorHandler->DriverHide();
+	
+	
 	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Bounds().IntegerWidth();
 	BList		rectList;
 	int32		i, k;
@@ -318,95 +320,98 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 	int32		Bwidth		= bmp->Bounds().IntegerWidth() + 1;
 	int32		Bheight		= bmp->Bounds().IntegerHeight() + 1;
 
-  for(k=0; k < rCount; k++)
-  {
-	BRegion		*reg = (BRegion*)list->ItemAt(k);
-
-	int32		rectCount = reg->CountRects();
-	for(i=0; i < rectCount; i++){
-		BRect		r		= reg->RectAt(i);
-		uint8		*rectCopy;
-		uint8		*srcAddress;
-		uint8		*destAddress;
-		int32		firstRow, lastRow;
-		int32		firstCol, lastCol;
-		int32		copyLength;
-		int32		copyRows;
-
-		firstRow	= (int32)(r.top < 0? 0: r.top);
-		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-		firstCol	= (int32)(r.left < 0? 0: r.left);
-		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-		copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-		copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-
-		rectCopy	= (uint8*)malloc(copyLength * copyRows * bytesPerPixel);
-
-		srcAddress	= bitmapBits
-							+ (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
-		destAddress	= rectCopy;
-
-		for (int32 j = 0; j < copyRows; j++){
-			uint8		*destRowAddress	= destAddress + (j * copyLength * bytesPerPixel);
-			uint8		*srcRowAddress	= srcAddress + (j * Bwidth * bytesPerPixel);
-			memcpy(destRowAddress, srcRowAddress, copyLength * bytesPerPixel );
+	for(k=0; k < rCount; k++)
+	{
+		BRegion		*reg = (BRegion*)list->ItemAt(k);
+		
+		int32		rectCount = reg->CountRects();
+		for(i=0; i < rectCount; i++)
+		{
+			BRect		r		= reg->RectAt(i);
+			uint8		*rectCopy;
+			uint8		*srcAddress;
+			uint8		*destAddress;
+			int32		firstRow, lastRow;
+			int32		firstCol, lastCol;
+			int32		copyLength;
+			int32		copyRows;
+	
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			rectCopy	= (uint8*)malloc(copyLength * copyRows * bytesPerPixel);
+	
+			srcAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+			destAddress	= rectCopy;
+	
+			for (int32 j = 0; j < copyRows; j++)
+			{
+				uint8		*destRowAddress	= destAddress + (j * copyLength * bytesPerPixel);
+				uint8		*srcRowAddress	= srcAddress + (j * Bwidth * bytesPerPixel);
+				memcpy(destRowAddress, srcRowAddress, copyLength * bytesPerPixel );
+			}
+		
+			rectList.AddItem(rectCopy);
 		}
-
-		rectList.AddItem(rectCopy);
 	}
-  }
 
 	int32		item = 0;
-  for(k=0; k < rCount; k++)
-  {
-	BRegion		*reg = (BRegion*)list->ItemAt(k);
-
-	int32		rectCount = reg->CountRects();
-	for(i=0; i < rectCount; i++){
-		BRect		r		= reg->RectAt(i);
-		uint8		*rectCopy;
-		uint8		*srcAddress;
-		uint8		*destAddress;
-		int32		firstRow, lastRow;
-		int32		firstCol, lastCol;
-		int32		copyLength, copyLength2;
-		int32		copyRows, copyRows2;
-
-		firstRow	= (int32)(r.top < 0? 0: r.top);
-		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-		firstCol	= (int32)(r.left < 0? 0: r.left);
-		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-		copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-		copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-
-		rectCopy	= (uint8*)rectList.ItemAt(item++);
-
-		srcAddress	= rectCopy;
-
-		r.Set(firstCol, firstRow, lastCol, lastRow);
-		r.OffsetBy( *((BPoint*)pList->ItemAt(k%rCount)) );
-		firstRow	= (int32)(r.top < 0? 0: r.top);
-		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
-		firstCol	= (int32)(r.left < 0? 0: r.left);
-		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
-		copyLength2	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
-		copyRows2	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
-
-		destAddress	= bitmapBits
-							+ (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
-
-		int32		minLength	= copyLength < copyLength2? copyLength: copyLength2;
-		int32		minRows		= copyRows < copyRows2? copyRows: copyRows2;
-
-		for (int32 j = 0; j < minRows; j++){
-			uint8		*destRowAddress	= destAddress + (j * Bwidth * bytesPerPixel);
-			uint8		*srcRowAddress	= srcAddress + (j * copyLength * bytesPerPixel);
-			memcpy(destRowAddress, srcRowAddress, minLength * bytesPerPixel );
+	for(k=0; k < rCount; k++)
+	{
+		BRegion		*reg = (BRegion*)list->ItemAt(k);
+	
+		int32		rectCount = reg->CountRects();
+		for(i=0; i < rectCount; i++)
+		{
+			BRect		r		= reg->RectAt(i);
+			uint8		*rectCopy;
+			uint8		*srcAddress;
+			uint8		*destAddress;
+			int32		firstRow, lastRow;
+			int32		firstCol, lastCol;
+			int32		copyLength, copyLength2;
+			int32		copyRows, copyRows2;
+	
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			rectCopy	= (uint8*)rectList.ItemAt(item++);
+	
+			srcAddress	= rectCopy;
+	
+			r.Set(firstCol, firstRow, lastCol, lastRow);
+			r.OffsetBy( *((BPoint*)pList->ItemAt(k%rCount)) );
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength2	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows2	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			destAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+	
+			int32		minLength	= copyLength < copyLength2? copyLength: copyLength2;
+			int32		minRows		= copyRows < copyRows2? copyRows: copyRows2;
+	
+			for (int32 j = 0; j < minRows; j++)
+			{
+				uint8		*destRowAddress	= destAddress + (j * Bwidth * bytesPerPixel);
+				uint8		*srcRowAddress	= srcAddress + (j * copyLength * bytesPerPixel);
+				memcpy(destRowAddress, srcRowAddress, minLength * bytesPerPixel );
+			}
 		}
 	}
-  }
 
-	for(i=0; i < rectList.CountItems(); i++){
+	for(i=0; i < rectList.CountItems(); i++)
+	{
 		void		*rectCopy;
 		rectCopy	= rectList.ItemAt(i);
 		if (rectCopy)
@@ -414,6 +419,8 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 	}
 	rectList.MakeEmpty();
 
+	fCursorHandler->DriverShow();
+	
 	BRect		inval(bmp->Bounds());
 	ReleaseBuffer();
 	Unlock();
@@ -451,8 +458,14 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 	
 	Lock();
 	
-	// TODO: Test for cursor intersection in DisplayDriver::DrawString
-	fCursorHandler->DriverHide();
+	// TODO: properly calculate intersecting rectangle with cursor in DisplayDriver::DrawString
+	
+	// Rough guesstimate for size
+	BRect intersection(pt.x,pt.x,pt.y,pt.y);
+	intersection.top-=d->font.Size()*1.5;
+	intersection.right+=d->font.Size()*1.5*length;
+	if(fCursorHandler->IntersectsCursor(intersection))
+		fCursorHandler->DriverHide();
 	
 	BPoint point(pt);
 	
@@ -864,8 +877,9 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  FillEllipse(r,color);
-	  return;
+		FillEllipse(r,color);
+		fCursorHandler->DriverShow();
+		return;
 	}
 
 	Lock();
@@ -1229,8 +1243,9 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  FillEllipse(r,d);
-	  return;
+		FillEllipse(r,d);
+		fCursorHandler->DriverShow();
+		return;
 	}
 
 	Lock();
@@ -1932,6 +1947,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 		{
 			printf("ERROR: Insufficient memory allocated to segment array\n");
 			delete[] segmentArray;
+			fCursorHandler->DriverShow();
 			Unlock();
 			return;
 		}
@@ -2110,10 +2126,8 @@ void DisplayDriver::FillRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
 	if(fCursorHandler->IntersectsCursor(r))
-	{
-		debugger("");
 		fCursorHandler->DriverHide();
-	}
+	
 	FillSolidRect(r,color);
 	fCursorHandler->DriverShow();
 	Unlock();
@@ -2364,6 +2378,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		start.x=MIN(first.x,MIN(second.x,third.x));
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		StrokeSolidLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), color);
+		fCursorHandler->DriverShow();
 		return;
 	}
 
@@ -2378,6 +2393,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		StrokeSolidLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), color);
 		for(i=(int32)first.y+1; i<=third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
+		fCursorHandler->DriverShow();
 		return;
 	}
 	
@@ -2390,6 +2406,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 		StrokeSolidLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), color);
 		for(i=(int32)first.y; i<third.y; i++)
 			StrokeSolidLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
+		fCursorHandler->DriverShow();
 		return;
 	}
 	
@@ -2430,6 +2447,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 		// For now, cop out and use FillPolygon
 		// Need to investigate if Triangle specific code would save processing time
 		FillPolygon(pts,3,bounds,d);
+		fCursorHandler->DriverShow();
 	}
 	else
 	{
@@ -2478,6 +2496,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			start.x=MIN(first.x,MIN(second.x,third.x));
 			end.x=MAX(first.x,MAX(second.x,third.x));
 			StrokePatternLine(ROUND(start.x), ROUND(start.y), ROUND(end.x), ROUND(start.y), d);
+			fCursorHandler->DriverShow();
 			return;
 		}
 
@@ -2492,6 +2511,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			StrokePatternLine(ROUND(first.x), ROUND(first.y), ROUND(second.x), ROUND(first.y), d);
 			for(i=(int32)first.y+1; i<=third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
+			fCursorHandler->DriverShow();
 			return;
 		}
 	
@@ -2504,6 +2524,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 			StrokePatternLine(ROUND(second.x), ROUND(second.y), ROUND(third.x), ROUND(second.y), d);
 			for(i=(int32)first.y; i<third.y; i++)
 				StrokePatternLine(ROUND(lineA.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
+			fCursorHandler->DriverShow();
 			return;
 		}
 	
@@ -2660,8 +2681,9 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  StrokeEllipse(r,color);
-	  return;
+		StrokeEllipse(r,color);
+		fCursorHandler->DriverShow();
+		return;
 	}
 
 	if ( span > 0 )
@@ -2827,8 +2849,9 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  StrokeEllipse(r,d);
-	  return;
+		StrokeEllipse(r,d);
+		fCursorHandler->DriverShow();
+		return;
 	}
 
 	if ( span > 0 )

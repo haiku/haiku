@@ -13,6 +13,7 @@ SharedLibrary appserver :
 	BGet++.cpp
 	BitmapManager.cpp
 	ColorSet.cpp
+	CursorHandler.cpp
 	Decorator.cpp
 	DisplayDriver.cpp
 	DisplaySupport.cpp

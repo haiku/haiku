@@ -199,7 +199,7 @@ void CursorHandler::DriverHide(void)
 {
 	if(fDriverHidden)
 		return;
-	
+		
 	fDriverHidden=true;
 	
 	if(!fCursor)
