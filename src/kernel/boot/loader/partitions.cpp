@@ -211,53 +211,85 @@ Partition::Scan(bool mountFileSystems)
 	
 	TRACE(("Partition::Scan()\n"));
 
+	const partition_module_info *bestModule = NULL;
+	void *bestCookie = NULL;
+	float bestPriority = -1;
+
 	for (int32 i = 0; i < sNumPartitionModules; i++) {
 		const partition_module_info *module = sPartitionModules[i];
-		void *cookie;
+		void *cookie = NULL;
 		NodeOpener opener(this, O_RDONLY);
 
 		TRACE(("check for partitioning_system: %s\n", module->pretty_name));
 
-		if (module->identify_partition(opener.Descriptor(), this, &cookie) <= 0.0)
+		float priority
+			= module->identify_partition(opener.Descriptor(), this, &cookie);
+		if (priority < 0.0)
 			continue;
 
-		status_t status = module->scan_partition(opener.Descriptor(), this, cookie);
-		module->free_identify_partition_cookie(this, cookie);
-
-		if (status == B_OK) {
-			fIsPartitioningSystem = true;
-
-			// now that we've found something, check our children
-			// out as well!
-
-			NodeIterator iterator = fChildren.GetIterator();
-			Partition *child = NULL;
-
-			while ((child = (Partition *)iterator.Next()) != NULL) {
-				TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
-					child, child->offset, child->size, child->Parent()));
-
-				child->Scan(mountFileSystems);
-
-				if (!mountFileSystems || child->IsFileSystem()) {
-					// move the partitions containing file systems to the partition list
-					fChildren.Remove(child);
-					gPartitions.Add(child);
-				}
-			}
-
-			// remove all unused children (we keep only file systems)
-
-			while ((child = (Partition *)fChildren.Head()) != NULL) {
-				fChildren.Remove(child);
-				delete child;
-			}
-
-			// remember the module name that identified us
-			fModuleName = module->module.name;
-
-			return B_OK;
+		if (priority <= bestPriority) {
+			// the disk system recognized the partition worse than the currently
+			// best one
+			module->free_identify_partition_cookie(this, cookie);
+			continue;
 		}
+
+		// a new winner, replace the previous one
+		if (bestModule)
+			bestModule->free_identify_partition_cookie(this, bestCookie);
+		bestModule = module;
+		bestCookie = cookie;
+		bestPriority = priority;
+	}
+
+	// now let the best matching disk system scan the partition
+	if (bestModule) {
+		NodeOpener opener(this, O_RDONLY);
+		status_t status = bestModule->scan_partition(opener.Descriptor(), this,
+			bestCookie);
+		bestModule->free_identify_partition_cookie(this, bestCookie);
+
+		if (status != B_OK) {
+			dprintf("Partitioning module `%s' recognized the partition, but "
+				"failed to scan it\n", bestModule->pretty_name);
+			return status;
+		}
+
+		fIsPartitioningSystem = true;
+
+		content_type = bestModule->pretty_name;
+		flags |= B_PARTITION_PARTITIONING_SYSTEM;
+
+		// now that we've found something, check our children
+		// out as well!
+
+		NodeIterator iterator = fChildren.GetIterator();
+		Partition *child = NULL;
+
+		while ((child = (Partition *)iterator.Next()) != NULL) {
+			TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
+				child, child->offset, child->size, child->Parent()));
+
+			child->Scan(mountFileSystems);
+
+			if (!mountFileSystems || child->IsFileSystem()) {
+				// move the partitions containing file systems to the partition list
+				fChildren.Remove(child);
+				gPartitions.Add(child);
+			}
+		}
+
+		// remove all unused children (we keep only file systems)
+
+		while ((child = (Partition *)fChildren.Head()) != NULL) {
+			fChildren.Remove(child);
+			delete child;
+		}
+
+		// remember the module name that identified us
+		fModuleName = bestModule->module.name;
+
+		return B_OK;
 	}
 
 	// scan for file systems
