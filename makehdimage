@@ -17,8 +17,14 @@
 
 # path of the checked out Haiku sources
 sourceDir=.
+alreadyMounted=
+targetDir=/haiku
+
 # disk image path, size in MB
-if [ "$1" == "" ]; then
+if [ -d "$1" ]; then
+	alreadyMounted=true
+	targetDir=$1
+elif [ "$1" == "" ]; then
 	imagePath=$sourceDir/haiku.image
 else
 	imagePath=$1
@@ -33,13 +39,17 @@ cd $sourceDir
 sourceDir=`pwd`
 	# we accept relative source directories as well
 
-echo "Building $imageSize MB image at $imagePath..."
+if [ $alreadyMounted ]; then
+	echo "Building binaries and copy them to $targetDir"
+else
+	echo "Building $imageSize MB image at $imagePath..."
+fi
 
 RUN_WITHOUT_APP_SERVER=1
 
-BEOS_BIN="touch sync ln listattr listsem listport du rm date \
+BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	true false ls df mount unmount cp mv ps sh mkdir sleep \
-	grep cat less clockconfig"
+	grep cat less clockconfig du rm date"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
@@ -48,18 +58,21 @@ jam -q kernel boot_loader config_manager pci isa ide scsi \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB \
-	kernel_uname libnet.so null zero random \<driver\>tty || exit 1
+	kernel_uname libnet.so null zero random \<driver\>tty \
+	|| exit 1
 
 
 # create the image and the directory structure
 
-dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
-mkbfs $imagePath Haiku
-mkdir -p /haiku
-sync
-$ufsMount obfs $imagePath /haiku || exit 1
+if [ ! $alreadyMounted ]; then
+	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
+	mkbfs $imagePath Haiku
+	mkdir -p $targetDir
+	sync
+	$ufsMount obfs $imagePath $targetDir || exit 1
+fi
 
-cd /haiku
+cd $targetDir
 mkdir -p beos/system/add-ons/kernel/bus_managers
 mkdir -p beos/system/add-ons/kernel/generic
 mkdir -p beos/system/add-ons/kernel/file_systems
@@ -82,66 +95,66 @@ cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
 for f in bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa \
 		file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter \
 		generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
-	cp $f /haiku/beos/system/add-ons/kernel/$f
+	cp $f $targetDir/beos/system/add-ons/kernel/$f
 done
 
 for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
 	name=drivers/bin/$(basename $f)
-	cp $name /haiku/beos/system/add-ons/kernel/$name
+	cp $name $targetDir/beos/system/add-ons/kernel/$name
 done
 
 cd $sourceDir/objects/x86.R1/add-ons/kernel
 
 for f in bus_managers/config_manager bus_managers/pci; do
 	name=$(basename $f)
-	cp $f/$name /haiku/beos/system/add-ons/kernel/$f
+	cp $f/$name $targetDir/beos/system/add-ons/kernel/$f
 done
 
 # drivers
 for f in drivers/arch/x86/keyboard/keyboard; do
-	cp $f /haiku/beos/system/add-ons/kernel/drivers/bin
+	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
 cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/dev
 for f in tty random null zero; do
-	cp $f /haiku/beos/system/add-ons/kernel/drivers/bin
+	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
 
 # kernel
-cp $sourceDir/objects/x86.R1/kernel/kernel /haiku/beos/system/kernel_x86
+cp $sourceDir/objects/x86.R1/kernel/kernel $targetDir/beos/system/kernel_x86
 
 
 # libs
 cd $sourceDir/distro/x86.R1/beos/system/lib
-cp $BEOS_SYSTEM_LIB /haiku/beos/system/lib/
+cp $BEOS_SYSTEM_LIB $targetDir/beos/system/lib/
 cd $sourceDir/objects/x86.R1/kernel/
-cp rld.so libroot.so /haiku/beos/system/lib/
+cp rld.so libroot.so $targetDir/beos/system/lib/
 
 
 # apps
 cd $sourceDir/objects/x86.R1/kernel
 for f in fortune uname; do
-	cp kernel_$f /haiku/beos/bin/$f
+	cp kernel_$f $targetDir/beos/bin/$f
 done
 
 cd $sourceDir/distro/x86.R1/beos/bin
-cp ../apps/consoled $BEOS_BIN /haiku/beos/bin/
+cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
 
 
 # scripts and data files
 cd $sourceDir
-cp data/system/boot/Bootscript data/system/boot/SetupEnvironment /haiku/beos/system/boot/
-cp data/etc/profile /haiku/beos/etc/
-cp src/kernel/apps/fortune/fortunes /haiku/beos/etc/
+cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
+cp data/etc/profile $targetDir/beos/etc/
+cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
 
 # boot loader
-cd /haiku/beos/system
+cd $targetDir/beos/system
 objcopy -O binary $sourceDir/objects/x86.R1/kernel/boot_loader zbeos
 
 
 # boot module links
-cd /haiku/beos/system/add-ons/kernel/boot
+cd $targetDir/beos/system/add-ons/kernel/boot
 for f in bus_managers/config_manager bus_managers/pci bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
 	ln -fs /boot/beos/system/add-ons/kernel/$f $(basename $f)
 done
@@ -151,7 +164,7 @@ done
 
 
 # driver links
-cd /haiku/beos/system/add-ons/kernel
+cd $targetDir/beos/system/add-ons/kernel
 for f in drivers/dev/keyboard drivers/dev/null drivers/dev/tty drivers/dev/zero \
 		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
@@ -166,6 +179,8 @@ done
 
 cd $previousDir
 sync
-unmount /haiku
-rmdir /haiku
 
+if [ ! $alreadyMounted ]; then
+	unmount $targetDir
+	rmdir $targetDir
+fi
