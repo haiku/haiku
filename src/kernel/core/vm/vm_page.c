@@ -16,7 +16,7 @@
 #include <smp.h>
 #include <OS.h>
 #include <Errors.h>
-#include <boot/stage2.h>
+#include <boot/kernel_args.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -113,6 +113,7 @@ static void move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *pa
 }
 
 
+#if 0
 static int pageout_daemon()
 {
 	int state;
@@ -188,6 +189,7 @@ static int pageout_daemon()
 		vm_cache_release_ref(page->cache_ref);
 	}
 }
+#endif
 
 int vm_page_init(kernel_args *ka)
 {
@@ -211,13 +213,13 @@ int vm_page_init(kernel_args *ka)
 	page_active_queue.tail = NULL;
 	page_active_queue.count = 0;
 
-	// calculate the size of memory by looking at the phys_mem_range array
+	// calculate the size of memory by looking at the physical_memory_range array
 	{
 		unsigned int last_phys_page = 0;
 
-		physical_page_offset = ka->phys_mem_range[0].start / PAGE_SIZE;
-		for (i = 0; i<ka->num_phys_mem_ranges; i++) {
-			last_phys_page = (ka->phys_mem_range[i].start + ka->phys_mem_range[i].size) / PAGE_SIZE - 1;
+		physical_page_offset = ka->physical_memory_range[0].start / PAGE_SIZE;
+		for (i = 0; i<ka->num_physical_memory_ranges; i++) {
+			last_phys_page = (ka->physical_memory_range[i].start + ka->physical_memory_range[i].size) / PAGE_SIZE - 1;
 		}
 		dprintf("first phys page = 0x%lx, last 0x%x\n", physical_page_offset, last_phys_page);
 		num_pages = last_phys_page - physical_page_offset;
@@ -241,9 +243,9 @@ int vm_page_init(kernel_args *ka)
 	dprintf("initialized table\n");
 
 	// mark some of the page ranges inuse
-	for(i = 0; i < ka->num_phys_alloc_ranges; i++) {
-		vm_mark_page_range_inuse(ka->phys_alloc_range[i].start / PAGE_SIZE,
-			ka->phys_alloc_range[i].size / PAGE_SIZE);
+	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
+		vm_mark_page_range_inuse(ka->physical_allocated_range[i].start / PAGE_SIZE,
+			ka->physical_allocated_range[i].size / PAGE_SIZE);
 	}
 
 	// set the global max_commit variable
@@ -777,31 +779,32 @@ static addr vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)
 
 	size = PAGE_ALIGN(size);
 	// find a slot in the virtual allocation addr range
-	for(i=1; i<ka->num_virt_alloc_ranges; i++) {
+	for (i = 1; i < ka->num_virtual_allocated_ranges; i++) {
 		last_valloc_entry = i;
 		// check to see if the space between this one and the last is big enough
-		if(ka->virt_alloc_range[i].start -
-			(ka->virt_alloc_range[i-1].start + ka->virt_alloc_range[i-1].size) >= size) {
-
-			spot = ka->virt_alloc_range[i-1].start + ka->virt_alloc_range[i-1].size;
-			ka->virt_alloc_range[i-1].size += size;
+		if (ka->virtual_allocated_range[i].start 
+			- (ka->virtual_allocated_range[i-1].start 
+				+ ka->virtual_allocated_range[i-1].size) >= size) {
+			spot = ka->virtual_allocated_range[i-1].start + ka->virtual_allocated_range[i-1].size;
+			ka->virtual_allocated_range[i-1].size += size;
 			goto out;
 		}
 	}
-	if(spot == 0) {
+	if (spot == 0) {
 		// we hadn't found one between allocation ranges. this is ok.
 		// see if there's a gap after the last one
-		if(ka->virt_alloc_range[last_valloc_entry].start + ka->virt_alloc_range[last_valloc_entry].size + size <=
-			KERNEL_BASE + (KERNEL_SIZE - 1)) {
-			spot = ka->virt_alloc_range[last_valloc_entry].start + ka->virt_alloc_range[last_valloc_entry].size;
-			ka->virt_alloc_range[last_valloc_entry].size += size;
+		if (ka->virtual_allocated_range[last_valloc_entry].start 
+				+ ka->virtual_allocated_range[last_valloc_entry].size + size 
+			<= KERNEL_BASE + (KERNEL_SIZE - 1)) {
+			spot = ka->virtual_allocated_range[last_valloc_entry].start + ka->virtual_allocated_range[last_valloc_entry].size;
+			ka->virtual_allocated_range[last_valloc_entry].size += size;
 			goto out;
 		}
 		// see if there's a gap before the first one
-		if(ka->virt_alloc_range[0].start > KERNEL_BASE) {
-			if(ka->virt_alloc_range[0].start - KERNEL_BASE >= size) {
-				ka->virt_alloc_range[0].start -= size;
-				spot = ka->virt_alloc_range[0].start;
+		if (ka->virtual_allocated_range[0].start > KERNEL_BASE) {
+			if (ka->virtual_allocated_range[0].start - KERNEL_BASE >= size) {
+				ka->virtual_allocated_range[0].start -= size;
+				spot = ka->virtual_allocated_range[0].start;
 				goto out;
 			}
 		}
@@ -816,9 +819,10 @@ static bool is_page_in_phys_range(kernel_args *ka, addr paddr)
 {
 	unsigned int i;
 
-	for(i=0; i<ka->num_phys_mem_ranges; i++) {
-		if(paddr >= ka->phys_mem_range[i].start &&
-			paddr < ka->phys_mem_range[i].start + ka->phys_mem_range[i].size) {
+	for (i = 0; i < ka->num_physical_memory_ranges; i++) {
+		if (paddr >= ka->physical_memory_range[i].start 
+			&& paddr < ka->physical_memory_range[i].start 
+						+ ka->physical_memory_range[i].size) {
 			return true;
 		}
 	}
@@ -829,21 +833,21 @@ static addr vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
 {
 	unsigned int i;
 
-	for(i=0; i<ka->num_phys_alloc_ranges; i++) {
+	for (i = 0; i < ka->num_physical_allocated_ranges; i++) {
 		addr next_page;
 
-		next_page = ka->phys_alloc_range[i].start + ka->phys_alloc_range[i].size;
+		next_page = ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size;
 		// see if the page after the next allocated paddr run can be allocated
-		if(i + 1 < ka->num_phys_alloc_ranges && ka->phys_alloc_range[i+1].size != 0) {
+		if (i + 1 < ka->num_physical_allocated_ranges && ka->physical_allocated_range[i+1].size != 0) {
 			// see if the next page will collide with the next allocated range
-			if(next_page >= ka->phys_alloc_range[i+1].start)
+			if (next_page >= ka->physical_allocated_range[i+1].start)
 				continue;
 		}
 		// see if the next physical page fits in the memory block
-		if(is_page_in_phys_range(ka, next_page)) {
+		if (is_page_in_phys_range(ka, next_page)) {
 			// we got one!
-			ka->phys_alloc_range[i].size += PAGE_SIZE;
-			return ((ka->phys_alloc_range[i].start + ka->phys_alloc_range[i].size - PAGE_SIZE) / PAGE_SIZE);
+			ka->physical_allocated_range[i].size += PAGE_SIZE;
+			return ((ka->physical_allocated_range[i].start + ka->physical_allocated_range[i].size - PAGE_SIZE) / PAGE_SIZE);
 		}
 	}
 
