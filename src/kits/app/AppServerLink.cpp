@@ -49,7 +49,7 @@ BAppServerLink::BAppServerLink(void)
 	if (be_app)
 	{
 		be_app->Lock();
-		SetSendPort(be_app->fServerTo);
+		SetSendPort(be_app->fServerFrom);
 	}
 	receiver=create_port(100,"AppServerLink reply port");
 	SetReplyPort(receiver);

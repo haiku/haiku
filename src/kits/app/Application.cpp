@@ -740,11 +740,14 @@ void BApplication::InitData(const char* signature, status_t* error)
 	// check signature
 	fInitError = check_app_signature(signature);
 	fAppName = signature;
+
+#ifndef RUN_WITHOUT_REGISTRAR
 	bool isRegistrar
 		= (signature && !strcasecmp(signature, kRegistrarSignature));
 	// get team and thread
 	team_id team = Team();
 	thread_id thread = BPrivate::main_thread_for(team);
+#endif
 	// get app executable ref
 	entry_ref ref;
 	if (fInitError == B_OK)
@@ -849,7 +852,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 #endif	// ifdef RUN_WITHOUT_REGISTRAR
 
 	// TODO: Not completely sure about the order, but this should be close.
-
+	
 	// An app_server connection is necessary for a lot of stuff, so get that first.
 	if (fInitError == B_OK)
 		connect_to_app_server();
@@ -956,7 +959,7 @@ void BApplication::connect_to_app_server()
 			// 3) team_id - team identification field
 			// 4) int32 - handler ID token of the app
 			// 5) char * - signature of the regular app
-			BPortLink link(fServerFrom);
+			BPortLink link(fServerFrom,fServerTo);
 			int32 code=SERVER_FALSE;
 			
 			link.StartMessage(AS_CREATE_APP);
@@ -968,10 +971,10 @@ void BApplication::connect_to_app_server()
 			link.Flush();
 			link.GetNextReply(&code);
 
-			// Reply code: AS_CREATE_APP
+			// Reply code: AS_SET_SERVER_PORT
 			// Reply data:
 			//	1) port_id server-side application port (fServerFrom value)
-			if(code==AS_CREATE_APP)
+			if(code==AS_SET_SERVER_PORT)
 				link.Read<port_id>(&fServerFrom);
 		
 		} else

@@ -59,7 +59,7 @@
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
-//#define DEBUG_WIN
+#define DEBUG_WIN
 #ifdef DEBUG_WIN
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -2182,12 +2182,12 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
 	}
 
 	STRACE(("BWindow::InitData(): contacting app_server...\n"));
-		// let app_server to know that a window has been created.
 
-	fLink = new BPortLink(be_app->fServerTo, receive_port);
-
-		// HERE we are in BApplication's thread, so for locking we use be_app variable
-		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
+	// let app_server to know that a window has been created.
+	fLink = new BPortLink(be_app->fServerFrom, receive_port);
+	
+	// HERE we are in BApplication's thread, so for locking we use be_app variable
+	// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	bool locked = false;
 	if ( !(be_app->IsLocked()) )
 	{
@@ -2195,8 +2195,8 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
 		locked = true; 
 	}
 	
- 	STRACE(("be_app->fServerTo is %ld\n", be_app->fServerTo));
- 
+ 	STRACE(("be_app->fServerTo is %ld\n", be_app->fServerFrom));
+	
  	status_t err;
  	fLink->StartMessage(AS_CREATE_WINDOW);
  	fLink->Attach<BRect>( fFrame );
@@ -2206,9 +2206,7 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
  	fLink->Attach<uint32>( workspace );
  	fLink->Attach<int32>( _get_object_token_(this) );
  	fLink->Attach<port_id>( receive_port );
- 	fLink->Attach<port_id>( fMsgPort );
  	fLink->AttachString( title );
- 	fLink->Attach<port_id>(receive_port);
  	fLink->Flush();
  
  	send_port = -1;
