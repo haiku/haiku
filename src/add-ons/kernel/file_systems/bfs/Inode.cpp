@@ -2054,15 +2054,19 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 		index.InsertLastModified(transaction, inode);
 	}
 
+	// Everything worked well until this point, we have a fully
+	// initialized inode, and we want to keep it
+	allocator.Keep();
+
+	// We hold the volume lock to make sure that bfs_read_vnode()
+	// won't succeed in the meantime (between the call right
+	// above and below)!
+
 	if ((status = new_vnode(volume->ID(), inode->ID(), inode)) != B_OK) {
 		// this is a really fatal error, and we can't recover from that
 		FATAL(("new_vnode() failed with: %s\n", strerror(status)));
 		DIE(("new_vnode() failed for inode!"));
 	}
-
-	// Everything worked well until this point, we have a fully
-	// initialized inode, and we want to keep it
-	allocator.Keep();
 
 	if (_id != NULL)
 		*_id = inode->ID();

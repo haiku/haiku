@@ -360,6 +360,10 @@ bfs_sync(void *_ns)
  *	construction, in which case it waits for that action to be completed,
  *	and uses the inode object from the construction instead of creating
  *	a new one.
+ *	ToDo: Must not be called without the volume lock being held. Actually,
+ *	this might even happen with the BDirectory(node_ref *) constructor
+ *	(at least I think so, I haven't tested it yet), so we should better
+ *	test this. Fortunately, we can easily solve the issue with our kernel.
  */
 
 static int
@@ -528,6 +532,10 @@ bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vn
 		PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
 	}
+
+	RecursiveLocker locker(volume->Lock());
+		// we have to hold the volume lock in order to not
+		// interfere with new_vnode() here
 
 	Inode *inode;
 	if ((status = get_vnode(volume->ID(), *_vnodeID, (void **)&inode)) != B_OK) {
