@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src add-ons screen_savers slideshowsaver ;
+
+ScreenSaver SlideShowSaver :
+	# LiveSettings
+	LiveSetting.cpp
+	LiveSettings.cpp
+
+	# SlideShowSaver classes
+	SlideShowSaver.cpp
+	SlideShowConfigView.cpp ;
+
+LinkSharedOSLibs SlideShowSaver : be screensaver tracker translation ;
+
+Package haiku-screensavers-cvs :
+	SlideShowSaver :
+	boot home config add-ons screen_savers ;
+
+
