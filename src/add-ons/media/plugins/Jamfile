@@ -6,6 +6,7 @@ SubInclude OBOS_TOP src add-ons media plugins avi_reader ;
 SubInclude OBOS_TOP src add-ons media plugins mp3_reader ;
 SubInclude OBOS_TOP src add-ons media plugins wav_reader ;
 
+SubInclude OBOS_TOP src add-ons media plugins musepack ;
 SubInclude OBOS_TOP src add-ons media plugins ogg ;
 
 SubInclude OBOS_TOP src add-ons media plugins mp3_decoder ;
