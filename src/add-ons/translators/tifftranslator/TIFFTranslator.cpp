@@ -394,46 +394,68 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 		// Copy fields useful to TIFFTranslator
 		dtls.width			= ifd.GetUint(TAG_IMAGE_WIDTH);
 		dtls.height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
-		dtls.compression	= ifd.GetUint(TAG_COMPRESSION);
 		dtls.interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
 		
+		if (!ifd.HasField(TAG_COMPRESSION))
+			dtls.compression = COMPRESSION_NONE;
+		else
+			dtls.compression = ifd.GetUint(TAG_COMPRESSION);
 		if (dtls.compression != COMPRESSION_NONE &&
 			dtls.compression != COMPRESSION_PACKBITS)
 			return B_NO_TRANSLATOR;
 		
-		// Currently, only uncompressed 
-		// RGB or CMYK images are supported
-		if (dtls.interpretation == PHOTO_RGB) {
-			if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 3)
-				return B_NO_TRANSLATOR;
-			if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 3 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8)
-				return B_NO_TRANSLATOR;
+		// Currently, only some 
+		// bilevel, RGB or CMYK images are supported
+		switch (dtls.interpretation) {
+			// Bilevel images
+			case PHOTO_WHITEZERO:
+			case PHOTO_BLACKZERO:
+				// default value for samples per pixel is 1
+				if (ifd.HasField(TAG_SAMPLES_PER_PIXEL) &&
+					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
+					return B_NO_TRANSLATOR;
+				// default value for bits per sample is 1
+				if (ifd.HasField(TAG_BITS_PER_SAMPLE) &&
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) != 1)
+					return B_NO_TRANSLATOR;
+					
+				dtls.imageType = TIFF_BILEVEL;
+				break;
 				
-			dtls.imageType = TIFF_RGB;
-			
-		} else if (dtls.interpretation == PHOTO_SEPARATED) {
-			// CMYK (default ink set)
-			// is the only ink set supported
-			if (ifd.HasField(TAG_INK_SET) &&
-				ifd.GetUint(TAG_INK_SET) != INK_SET_CMYK)
-				return B_NO_TRANSLATOR;
+			case PHOTO_RGB:
+				if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 3)
+					return B_NO_TRANSLATOR;
+				if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 3 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8)
+					return B_NO_TRANSLATOR;
 				
-			if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 4)
-				return B_NO_TRANSLATOR;
-			if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 4 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8 ||
-				ifd.GetUint(TAG_BITS_PER_SAMPLE, 4) != 8)
-				return B_NO_TRANSLATOR;
+				dtls.imageType = TIFF_RGB;
+				break;
 				
-			dtls.imageType = TIFF_CMYK;
-			
-		} else
-			return B_NO_TRANSLATOR;
+			case PHOTO_SEPARATED:
+				// CMYK (default ink set)
+				// is the only ink set supported
+				if (ifd.HasField(TAG_INK_SET) &&
+					ifd.GetUint(TAG_INK_SET) != INK_SET_CMYK)
+					return B_NO_TRANSLATOR;
+				
+				if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 4)
+					return B_NO_TRANSLATOR;
+				if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 4 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 1) != 8 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 2) != 8 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 3) != 8 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE, 4) != 8)
+					return B_NO_TRANSLATOR;
+				
+				dtls.imageType = TIFF_CMYK;
+					break;
+					
+			default:
+				return B_NO_TRANSLATOR;
+		}
 		
 		if (!ifd.HasField(TAG_ROWS_PER_STRIP))
 			dtls.rowsPerStrip = DEFAULT_ROWS_PER_STRIP;
@@ -633,11 +655,35 @@ TIFFTranslator::Identify(BPositionIO *inSource,
 }
 
 void
-tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, uint16 type)
+tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, TiffDetails &details)
 {
 	uint8 *ptiffend = ptiff + tifflen;
 	
-	switch (type) {
+	switch (details.imageType) {
+		case TIFF_BILEVEL:
+		{
+			uint8 black[3] = { 0x00, 0x00, 0x00 },
+				white[3] = { 0xFF, 0xFF, 0xFF };
+			uint8 *colors[2];
+			if (details.interpretation == PHOTO_WHITEZERO) {
+				colors[0] = white;
+				colors[1] = black;
+			} else {
+				colors[0] = black;
+				colors[1] = white;
+			}
+			
+			for (uint32 i = 0; i < details.width; i++) {
+				uint8 eightbits = (ptiff + (i / 8))[0];
+				uint8 abit;
+				abit = (eightbits >> (7 - (i % 8))) & 1;
+				
+				memcpy(pbits + (i * 4), colors[abit], 3);
+			}		
+			
+			break;
+		}
+			
 		case TIFF_RGB:
 			while (ptiff < ptiffend) {
 				pbits[2] = ptiff[0];
@@ -754,6 +800,10 @@ translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		uint32 inbufferlen, outbufferlen;
 		outbufferlen = 4 * details.width;
 		switch (details.imageType) {
+			case TIFF_BILEVEL:
+				inbufferlen = (details.width / 8) +
+					((details.width % 8) ? 1 : 0);
+				break;
 			case TIFF_RGB:
 				inbufferlen = 3 * details.width;
 				break;
@@ -811,8 +861,7 @@ translate_from_tiff(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 				}
 					
 				read += ret;
-				tiff_to_bits(inbuffer, inbufferlen, outbuffer,
-					details.imageType);
+				tiff_to_bits(inbuffer, inbufferlen, outbuffer, details);
 				outDestination->Write(outbuffer, outbufferlen);
 			}
 			// If while loop was broken...
