@@ -71,4 +71,6 @@ virtual void		_ReservedPositionIO4();
 }
 #endif
 
+#include <MallocIO.h>
+
 #endif	// __sk_data_io_h__
