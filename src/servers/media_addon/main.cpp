@@ -69,9 +69,9 @@ MediaAddonServer::~MediaAddonServer()
 	wait_for_thread(control_thread,&err);
 
 	// unregister all media add-ons
-	media_addon_id id;
-	for (int32 index = 0; filemap->GetAt(index,&id); index++)
-		_DormantNodeManager->UnregisterAddon(id);
+	media_addon_id *id;
+	for (filemap->Rewind(); filemap->GetNext(&id); )
+		_DormantNodeManager->UnregisterAddon(*id);
 	
 	delete filemap;
 	delete flavorcountmap;
@@ -184,7 +184,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	addon_id = addon->AddonID();
 	
 	// update the cached flavor count, get oldflavorcount and newflavorcount
-	b = flavorcountmap->GetPointer(addon->AddonID(), &flavorcount);
+	b = flavorcountmap->Get(addon->AddonID(), &flavorcount);
 	ASSERT(b);
 	oldflavorcount = *flavorcount;
 	newflavorcount = addon->CountFlavors();
@@ -325,14 +325,17 @@ flavor 0:
 void
 MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
-	media_addon_id id;
-	if (!filemap->Get(file_node,&id)) {
+	media_addon_id *id;
+	
+	// XXX locking?
+	
+	if (!filemap->Get(file_node, &id)) {
 		FATAL("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
 		return;
 	}
 	filemap->Remove(file_node);
-	flavorcountmap->Remove(id);
-	_DormantNodeManager->UnregisterAddon(id);
+	flavorcountmap->Remove(*id);
+	_DormantNodeManager->UnregisterAddon(*id);
 }
 
 void 

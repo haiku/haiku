@@ -64,7 +64,7 @@ status_t SendToServer(BMessage *msg)
 	return rv;
 }
 
-
+/*
 status_t QueryServer(BMessage *request, BMessage *reply)
 {
 	status_t rv;
@@ -74,7 +74,7 @@ status_t QueryServer(BMessage *request, BMessage *reply)
 	return rv;
 }
 
-
+*/
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size)
 {

@@ -12,7 +12,7 @@
 #include <String.h>
 #include <TimeSource.h>
 #include "debug.h"
-#include "TStack.h"
+#include "TList.h"
 #include "PortPool.h"
 #include "SystemTimeSource.h"
 #include "ServerInterface.h"
@@ -45,10 +45,10 @@ namespace BPrivate { namespace media { namespace mediaroster {
 
 status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
 status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);
-status_t GetAllOutputs(const media_node & node, Stack<media_output> *stack);
-status_t GetAllInputs(const media_node & node, Stack<media_input> *stack);
-status_t PublishOutputs(const media_node & node, Stack<media_output> *stack);
-status_t PublishInputs(const media_node & node, Stack<media_input> *stack);
+status_t GetAllOutputs(const media_node & node, List<media_output> *list);
+status_t GetAllInputs(const media_node & node, List<media_input> *list);
+status_t PublishOutputs(const media_node & node, List<media_output> *list);
+status_t PublishInputs(const media_node & node, List<media_input> *list);
 
 status_t
 GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
@@ -95,7 +95,7 @@ SetNode(node_type type, const media_node *node, const dormant_node_info *info, c
 }
 
 status_t
-GetAllOutputs(const media_node & node, Stack<media_output> *stack)
+GetAllOutputs(const media_node & node, List<media_output> *list)
 {
 	int32 cookie;
 	status_t rv;
@@ -103,6 +103,7 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 	
 	result = B_OK;
 	cookie = 0;
+	list->MakeEmpty();
 	for (;;) {
 		producer_get_next_output_request request;
 		producer_get_next_output_reply reply;
@@ -111,8 +112,8 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 		if (rv != B_OK)
 			break;
 		cookie = reply.cookie;
-		if (!stack->Push(reply.output)) {
-			FATAL("GetAllOutputs: stack->Push failed\n");
+		if (!list->Insert(reply.output)) {
+			FATAL("GetAllOutputs: list->Insert failed\n");
 			result = B_ERROR;
 		}
 	}
@@ -125,7 +126,7 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 }
 
 status_t
-GetAllInputs(const media_node & node, Stack<media_input> *stack)
+GetAllInputs(const media_node & node, List<media_input> *list)
 {
 	int32 cookie;
 	status_t rv;
@@ -133,6 +134,7 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 	
 	result = B_OK;
 	cookie = 0;
+	list->MakeEmpty();
 	for (;;) {
 		consumer_get_next_input_request request;
 		consumer_get_next_input_reply reply;
@@ -141,8 +143,8 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 		if (rv != B_OK)
 			break;
 		cookie = reply.cookie;
-		if (!stack->Push(reply.input)) {
-			FATAL("GetAllInputs: stack->Push failed\n");
+		if (!list->Insert(reply.input)) {
+			FATAL("GetAllInputs: list->Insert failed\n");
 			result = B_ERROR;
 		}
 	}
@@ -155,7 +157,7 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 }
 
 status_t
-PublishOutputs(const media_node & node, Stack<media_output> *stack)
+PublishOutputs(const media_node & node, List<media_output> *list)
 {
 	server_publish_outputs_request request;
 	server_publish_outputs_reply reply;
@@ -164,7 +166,7 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 	int32 count;
 	status_t rv;
 	
-	count = stack->CountItems();
+	count = list->CountItems();
 	TRACE("PublishOutputs: publishing %ld\n", count);
 	
 	request.node = node;
@@ -183,10 +185,11 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 		request.area = -1;
 		outputs = request.outputs;
 	}
-	TRACE("PublishOutputs: area %#lx\n", request.area);
+	TRACE("PublishOutputs: area %ld\n", request.area);
 	
-	for (int32 i = 0; i != count; i++) {
-		stack->GetPointerAt(i, &output);
+	int i;
+	for (i = 0, list->Rewind(); list->GetNext(&output); i++) {
+		ASSERT(i < count);
 		outputs[i] = *output;
 	}
 	
@@ -199,7 +202,7 @@ PublishOutputs(const media_node & node, Stack<media_output> *stack)
 }
 
 status_t
-PublishInputs(const media_node & node, Stack<media_input> *stack)
+PublishInputs(const media_node & node, List<media_input> *list)
 {
 	server_publish_inputs_request request;
 	server_publish_inputs_reply reply;
@@ -208,7 +211,7 @@ PublishInputs(const media_node & node, Stack<media_input> *stack)
 	int32 count;
 	status_t rv;
 	
-	count = stack->CountItems();
+	count = list->CountItems();
 	TRACE("PublishInputs: publishing %ld\n", count);
 	
 	request.node = node;
@@ -227,10 +230,11 @@ PublishInputs(const media_node & node, Stack<media_input> *stack)
 		request.area = -1;
 		inputs = request.inputs;
 	}
-	TRACE("PublishInputs: area %#lx\n", request.area);
+	TRACE("PublishInputs: area %ld\n", request.area);
 	
-	for (int32 i = 0; i != count; i++) {
-		stack->GetPointerAt(i, &input);
+	int i;
+	for (i = 0, list->Rewind(); list->GetNext(&input); i++) {
+		ASSERT(i < count);
 		inputs[i] = *input;
 	}
 	
@@ -571,12 +575,12 @@ BMediaRoster::Connect(const media_source & from,
 	
 	// XXX register connection with server
 	// XXX we should just send a notification, instead of republishing all endpoints
-	Stack<media_output> outstack;
-	Stack<media_input> instack;
-	if (B_OK == GetAllOutputs(out_output->node , &outstack))
-		PublishOutputs(out_output->node , &outstack);
-	if (B_OK == GetAllInputs(out_input->node , &instack))
-		PublishInputs(out_input->node, &instack);
+	List<media_output> outlist;
+	List<media_input> inlist;
+	if (B_OK == GetAllOutputs(out_output->node , &outlist))
+		PublishOutputs(out_output->node , &outlist);
+	if (B_OK == GetAllInputs(out_input->node , &inlist))
+		PublishInputs(out_input->node, &inlist);
 
 
 	// XXX if (mute) BBufferProducer::EnableOutput(false)
@@ -633,18 +637,18 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 
 	// XXX unregister connection with server
 	// XXX we should just send a notification, instead of republishing all endpoints
-	Stack<media_output> outstack;
-	Stack<media_input> instack;
+	List<media_output> outlist;
+	List<media_input> inlist;
 	media_node sourcenode; 
 	media_node destnode;
 	if (B_OK == GetNodeFor(source_nodeid, &sourcenode)) {
-		if (B_OK == GetAllOutputs(sourcenode , &outstack))
-			PublishOutputs(sourcenode , &outstack);
+		if (B_OK == GetAllOutputs(sourcenode , &outlist))
+			PublishOutputs(sourcenode , &outlist);
 		ReleaseNode(sourcenode);
 	} else FATAL("BMediaRoster::Disconnect: source GetNodeFor failed\n");
 	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
-		if (B_OK == GetAllInputs(destnode , &instack))
-			PublishInputs(destnode, &instack);
+		if (B_OK == GetAllInputs(destnode , &inlist))
+			PublishInputs(destnode, &inlist);
 		ReleaseNode(destnode);
 	} else FATAL("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
 	
@@ -963,17 +967,18 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 	if (out_free_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_input> stack;
+	List<media_input> list;
 	media_input *input;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &stack);
+	rv = GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != input->format.type)
 			continue; // media_type used, but doesn't match
 		if (input->source != media_source::null)
@@ -985,7 +990,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &stack);
+	PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1002,17 +1007,18 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 	if (out_active_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_input> stack;
+	List<media_input> list;
 	media_input *input;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &stack);
+	rv = GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
 		if (input->source == media_source::null)
 			continue; // consumer source not connected
 		out_active_inputs[i] = *input;
@@ -1022,7 +1028,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &stack);
+	PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1039,17 +1045,18 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 	if (out_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_input> stack;
+	List<media_input> list;
 	media_input *input;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllInputs(node, &stack);
+	rv = GetAllInputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&input); i++) {
 		out_inputs[i] = *input;
 		*out_total_count += 1;
 		buf_num_inputs -= 1;
@@ -1057,7 +1064,7 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishInputs(node, &stack);
+	PublishInputs(node, &list);
 	return B_OK;
 }
 
@@ -1075,17 +1082,18 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 	if (out_free_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_output> stack;
+	List<media_output> list;
 	media_output *output;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &stack);
+	rv = GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
 		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != output->format.type)
 			continue; // media_type used, but doesn't match
 		if (output->destination != media_destination::null)
@@ -1097,7 +1105,7 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &stack);
+	PublishOutputs(node, &list);
 	return B_OK;
 }
 
@@ -1114,17 +1122,18 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 	if (out_active_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_output> stack;
+	List<media_output> list;
 	media_output *output;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &stack);
+	rv = GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
 		if (output->destination == media_destination::null)
 			continue; // producer destination not connected
 		out_active_outputs[i] = *output;
@@ -1134,7 +1143,7 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &stack);
+	PublishOutputs(node, &list);
 	return B_OK;
 }
 
@@ -1151,17 +1160,18 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 	if (out_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
-	Stack<media_output> stack;
+	List<media_output> list;
 	media_output *output;
 	status_t rv;
 
 	*out_total_count = 0;
 
-	rv = GetAllOutputs(node, &stack);
+	rv = GetAllOutputs(node, &list);
 	if (B_OK != rv)
 		return rv;
 
-	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+	int32 i;
+	for (i = 0, list.Rewind(); list.GetNext(&output); i++) {
 		out_outputs[i] = *output;
 		*out_total_count += 1;
 		buf_num_outputs -= 1;
@@ -1169,7 +1179,7 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 			break;
 	}
 	
-	PublishOutputs(node, &stack);
+	PublishOutputs(node, &list);
 	return B_OK;
 }
 

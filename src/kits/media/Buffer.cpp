@@ -5,18 +5,14 @@
  ***********************************************************************/
 #include <MediaDefs.h>
 #include <Buffer.h>
-#include <Message.h>
 #include "SharedBufferList.h"
 #include "debug.h"
-#include "ServerInterface.h"
+#include "DataExchange.h"
 
-static team_id CurrentTeam();
-team_id CurrentTeam()
-{
-	thread_info info;
-	get_thread_info(find_thread(NULL),&info);
-	return info.team;
-}
+namespace BPrivate { namespace media {
+	extern team_id team;
+} } // BPrivate::media
+using namespace BPrivate::media;
 
 /*************************************************************
  * public struct buffer_clone_info
@@ -173,28 +169,26 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 		return;
 
 	// ask media_server to get the area_id of the shared buffer list
-	area_id id;
-	BMessage request(MEDIA_SERVER_GET_SHARED_BUFFER_AREA);
-	BMessage reply;
-
-	if (QueryServer(&request, &reply) != B_OK)
+	server_get_shared_buffer_area_request area_request;
+	server_get_shared_buffer_area_reply area_reply;
+	if (QueryServer(SERVER_GET_SHARED_BUFFER_AREA, &area_request, sizeof(area_request), &area_reply, sizeof(area_reply)) != B_OK) {
+		FATAL("BBuffer::BBuffer: SERVER_GET_SHARED_BUFFER_AREA failed\n");
 		return;
-
-	id = reply.FindInt32("area");
-
-	fBufferList = _shared_buffer_list::Clone(id);
-	if (fBufferList == NULL)
+	}
+	
+	ASSERT(area_reply.area > 0);
+	
+	fBufferList = _shared_buffer_list::Clone(area_reply.area);
+	if (fBufferList == NULL) {
+		FATAL("BBuffer::BBuffer: _shared_buffer_list::Clone() failed\n");
 		return;
+	}
 
-
-	BMessage response;
-	BMessage create(MEDIA_SERVER_REGISTER_BUFFER);
-	create.AddInt32("team",CurrentTeam());
-	create.AddInt32("area",info.area);
-	create.AddInt32("offset",info.offset);
-	create.AddInt32("size",info.size);
-	create.AddInt32("flags",info.flags);
-	create.AddInt32("buffer",info.buffer);
+	server_register_buffer_request request;
+	server_register_buffer_reply reply;
+	
+	request.team = team;
+	request.info = info;
 
 	// ask media_server to register this buffer, 
 	// either identified by "buffer" or by area information.
@@ -204,19 +198,25 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	// until the last buffer has been unregistered
 	// the area_id of the cached area is passed back to us, and we clone it.
 
-	if (QueryServer(&create, &response) != B_OK)
+	if (QueryServer(SERVER_REGISTER_BUFFER, &request, sizeof(request), &reply, sizeof(reply)) != B_OK) {
+		FATAL("BBuffer::BBuffer: failed to register buffer with media_server\n");
 		return;
+	}
+
+	ASSERT(reply.info.buffer > 0);
+	ASSERT(reply.info.area > 0);
+	ASSERT(reply.info.size > 0);
 
 	// the response from media server contains enough information
 	// to clone the memory for this buffer
-	fBufferID = response.FindInt32("buffer");
-	fSize = response.FindInt32("size");
-	fFlags = response.FindInt32("flags");
-	fOffset = response.FindInt32("offset");
-	id = response.FindInt32("area");
-
-	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,B_READ_AREA | B_WRITE_AREA,id);
+	fBufferID = reply.info.buffer;
+	fSize = reply.info.size;
+	fFlags = reply.info.flags;
+	fOffset = reply.info.offset;
+	
+	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, reply.info.area);
 	if (fArea <= B_OK) {
+		// XXX should unregister buffer here
 		FATAL("BBuffer::BBuffer: buffer cloning failed\n");
 		fData = 0;
 		return;
@@ -236,18 +236,16 @@ BBuffer::~BBuffer()
 	}
 	// unmap the Data
 	if (fData != NULL) {
-		BMessage unregister(MEDIA_SERVER_UNREGISTER_BUFFER);
-		BMessage response;
-		unregister.AddInt32("team",(int32)CurrentTeam());
-		unregister.AddInt32("buffer",fBufferID);
+
+		delete_area(fArea);
 
 		// ask media_server to unregister the buffer
 		// when the last clone of this buffer is gone,
 		// media_server will also remove it's cached area
-
-		QueryServer(&unregister, &response);
-		
-		delete_area(fArea);
+		server_unregister_buffer_command cmd;
+		cmd.team = team;
+		cmd.bufferid = fBufferID;
+		SendToServer(SERVER_UNREGISTER_BUFFER, &cmd, sizeof(cmd));
 	}
 }
 

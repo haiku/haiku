@@ -51,7 +51,7 @@ DormantNodeManager::~DormantNodeManager()
 
 	// force unloading all currently loaded images
 	loaded_addon_info *info;
-	for (int32 index = 0; fAddonmap->GetPointerAt(index,&info); index++) {
+	for (fAddonmap->Rewind(); fAddonmap->GetNext(&info); ) {
 		FATAL("Forcing unload of add-on id %ld with usecount %ld\n",info->addon->AddonID(), info->usecount);
 		UnloadAddon(info->addon, info->image);
 	}
@@ -67,7 +67,7 @@ DormantNodeManager::TryGetAddon(media_addon_id id)
 	BMediaAddOn *addon;
 	
 	fLock->Lock();
-	if (fAddonmap->GetPointer(id,&info)) {
+	if (fAddonmap->Get(id, &info)) {
 		info->usecount += 1;
 		addon = info->addon;
 		ASSERT(id == addon->AddonID());
@@ -142,7 +142,7 @@ DormantNodeManager::PutAddon(media_addon_id id)
 	TRACE("DormantNodeManager::PutAddon, id %ld\n",id);
 	
 	fLock->Lock();
-	if (!fAddonmap->GetPointer(id, &info)) {
+	if (!fAddonmap->Get(id, &info)) {
 		FATAL("DormantNodeManager::PutAddon: failed to find add-on %ld\n",id);
 		fLock->Unlock();
 		return;
@@ -260,13 +260,13 @@ DormantNodeManager::LoadAddon(BMediaAddOn **newaddon, image_id *newimage, const 
 	
 	image = load_add_on(path);
 	if (image < B_OK) {
-		FATAL("DormantNodeManager::LoadAddon: loading failed %lx (%s), path %s\n", image, strerror(image), path);
+		FATAL("DormantNodeManager::LoadAddon: loading failed, error %lx (%s), path %s\n", image, strerror(image), path);
 		return B_ERROR;
 	}
 	
 	rv = get_image_symbol(image, "make_media_addon", B_SYMBOL_TYPE_TEXT, (void**)&make_addon);
 	if (rv < B_OK) {
-		FATAL("DormantNodeManager::LoadAddon: loading failed, function not found %lx %s\n", rv, strerror(rv));
+		FATAL("DormantNodeManager::LoadAddon: loading failed, function not found, error %lx (%s)\n", rv, strerror(rv));
 		unload_add_on(image);
 		return B_ERROR;
 	}

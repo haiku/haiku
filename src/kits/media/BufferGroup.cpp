@@ -5,10 +5,9 @@
  ***********************************************************************/
 #include <BufferGroup.h>
 #include <Buffer.h>
-#include <Message.h>
 #include "debug.h"
 #include "SharedBufferList.h"
-#include "ServerInterface.h"
+#include "DataExchange.h"
 
 /*************************************************************
  * private BBufferGroup
@@ -18,7 +17,6 @@ status_t
 BBufferGroup::InitBufferGroup()
 {
 	CALLED();
-	area_id id;
 	
 	// some defaults
 	fBufferList = 0;
@@ -30,24 +28,29 @@ BBufferGroup::InitBufferGroup()
 	// create the reclaim semaphore
 	fReclaimSem = create_sem(0,"buffer reclaim sem");
 	if (fReclaimSem < B_OK) {
+		FATAL("BBufferGroup::InitBufferGroup: couldn't create fReclaimSem\n");
 		fInitError = (status_t)fReclaimSem;
 		return fInitError;
 	}
 
 	// ask media_server to get the area_id of the shared buffer list
-	BMessage request(MEDIA_SERVER_GET_SHARED_BUFFER_AREA);
-	BMessage reply;
-
-	fInitError = QueryServer(&request, &reply);
-	if (fInitError != B_OK)
-		return fInitError;
-
-	id = reply.FindInt32("area");
-	
-	fBufferList = _shared_buffer_list::Clone(id);
-	if (fBufferList == NULL)
+	server_get_shared_buffer_area_request area_request;
+	server_get_shared_buffer_area_reply area_reply;
+	if (QueryServer(SERVER_GET_SHARED_BUFFER_AREA, &area_request, sizeof(area_request), &area_reply, sizeof(area_reply)) != B_OK) {
+		FATAL("BBufferGroup::InitBufferGroup: SERVER_GET_SHARED_BUFFER_AREA failed\n");
 		fInitError = B_ERROR;
+		return fInitError;
+	}
+	ASSERT(area_reply.area > 0);
 
+	fBufferList = _shared_buffer_list::Clone(area_reply.area);
+	if (fBufferList == NULL) {
+		FATAL("BBufferGroup::InitBufferGroup: _shared_buffer_list::Clone failed\n");
+		fInitError = B_ERROR;
+		return fInitError;
+	}
+
+	fInitError = B_OK;
 	return fInitError;
 }
 
