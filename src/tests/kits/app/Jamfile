@@ -105,6 +105,7 @@ CommonTestLib libapptest.so
 		LaunchTester.cpp
 		LaunchTesterHelper.cpp
 		RecentAppsTestApp.cpp
+		RosterWatchingTester.cpp
 		TeamForTester.cpp
 		
 		# RegistrarThreadManager

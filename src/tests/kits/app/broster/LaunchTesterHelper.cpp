@@ -312,6 +312,18 @@ LaunchContext::Terminate()
 	wait_for_thread(fTerminator, &dummy);
 }
 
+// TerminateApp
+void
+LaunchContext::TerminateApp(team_id team, bool wait)
+{
+	fLock.Lock();
+	if (AppInfo *info = AppInfoFor(team))
+		TerminateApp(info);
+	fLock.Unlock();
+	if (wait)
+		WaitForMessage(team, MSG_TERMINATED);
+}
+
 // TeamAt
 team_id
 LaunchContext::TeamAt(int32 index) const
@@ -321,6 +333,50 @@ LaunchContext::TeamAt(int32 index) const
 	if (AppInfo *info = AppInfoAt(index))
 		team = info->Team();
 	return team;
+}
+
+// AppMessengerFor
+BMessenger
+LaunchContext::AppMessengerFor(team_id team) const
+{
+	BAutolock _lock(fLock);
+	BMessenger result;
+	if (AppInfo *info = AppInfoFor(team)) {
+		// We need to do some hacking.
+		BMessenger messenger;
+		struct fake_messenger {
+			port_id	fPort;
+			int32	fHandlerToken;
+			team_id	fTeam;
+			int32	extra0;
+			int32	extra1;
+			bool	fPreferredTarget;
+			bool	extra2;
+			bool	extra3;
+			bool	extra4;
+		} &fake = *(fake_messenger*)&messenger;
+		status_t error = B_OK;
+		fake.fTeam = team;
+		// find app looper port
+		bool found = false;
+		int32 cookie = 0;
+		port_info info;
+		while (error == B_OK && !found) {
+			error = get_next_port_info(fake.fTeam, &cookie, &info);
+			found = (error == B_OK
+					 && (!strcmp("AppLooperPort", info.name)
+					 	 || !strcmp("rAppLooperPort", info.name)));
+		}
+		// init messenger
+		if (error == B_OK) {
+			fake.fPort = info.port;
+			fake.fHandlerToken = 0;
+			fake.fPreferredTarget = true;
+		}
+		if (error == B_OK)
+			result = messenger;
+	}
+	return result;
 }
 
 // NextMessageFrom
@@ -342,11 +398,6 @@ LaunchContext::CheckNextMessage(LaunchCaller &caller, team_id team,
 								int32 &cookie, uint32 what)
 {
 	BMessage *message = NextMessageFrom(team, cookie);
-if (!message)
-printf("LaunchContext::CheckNextMessage(): no more messages\n");
-else if (message->what != what)
-printf("LaunchContext::CheckNextMessage(): %.4s vs %.4s\n",
-(char*)&message->what, (char*)&what);
 	return (message && message->what == what);
 }
 
@@ -563,13 +614,13 @@ LaunchContext::WaitForMessage(uint32 messageCode, bool fromNow,
 // WaitForMessage
 bool
 LaunchContext::WaitForMessage(team_id team, uint32 messageCode, bool fromNow,
-							  bigtime_t timeout)
+							  bigtime_t timeout, int32 startIndex)
 {
 	status_t error = B_ERROR;
 	fLock.Lock();
 	if (AppInfo *info = AppInfoFor(team)) {
 		error = B_OK;
-		if (fromNow || !info->FindMessage(messageCode)) {
+		if (fromNow || !info->FindMessage(messageCode, startIndex)) {
 			// add sleeper
 			Sleeper *sleeper = new Sleeper;
 			error = sleeper->Init(messageCode);

@@ -6,6 +6,7 @@
 #include "GetRecentTester.h"
 #include "IsRunningTester.h"
 #include "LaunchTester.h"
+#include "RosterWatchingTester.h"
 #include "TeamForTester.h"
 
 CppUnit::Test* RosterTestSuite()
@@ -19,6 +20,7 @@ CppUnit::Test* RosterTestSuite()
 	testSuite->addTest(GetRecentTester::Suite());
 	testSuite->addTest(IsRunningTester::Suite());
 	testSuite->addTest(LaunchTester::Suite());
+	testSuite->addTest(RosterWatchingTester::Suite());
 	testSuite->addTest(TeamForTester::Suite());
 
 	return testSuite;

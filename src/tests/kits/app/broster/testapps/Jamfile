@@ -73,3 +73,4 @@ SimpleBRosterTestApp RecentAppsTestEmptyApp.cpp RecentAppsTestApp.cpp ;
 SimpleBRosterTestApp RecentAppsTestControlApp.cpp RecentAppsTestApp.cpp ;
 SimpleBRosterTestApp RosterBroadcastTestApp1.cpp ;
 SimpleBRosterTestApp RosterLaunchTestApp1.cpp ;
+SimpleBRosterTestApp RosterWatchingTestApp1.cpp ;

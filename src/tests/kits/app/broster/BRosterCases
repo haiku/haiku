@@ -582,4 +582,16 @@ case 3:	valid message, several apps, one is B_ARGV_ONLY, invalid replyTo =>
 		B_ARGV_ONLY) apps.
 		Replies go to the roster!
 
+status_t StartWatching(BMessenger target, uint32 eventMask) const
+status_t StopWatching(BMessenger target) const
+case 1:	{Start,Stop}Watching() with invalid messenger or invalid flags,
+		StopWatching() non-watching messenger =>
+		Should return B_OK/B_BAD_VALUE.
+case 2:	several apps, several watchers, different eventMasks =>
+		Should return B_OK...
+		Watching ends, when target has become invalid and the next watching
+		message is tried to be sent.
+case 3:	call StartWatching() twice, second time with different mask =>
+		Should return B_OK. The second call simply overrides the first one.
+TODO: Watching app activation.
 

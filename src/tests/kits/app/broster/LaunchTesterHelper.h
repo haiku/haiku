@@ -50,8 +50,11 @@ public:
 	void HandleMessage(BMessage *message);
 
 	void Terminate();
+	void TerminateApp(team_id team, bool wait = true);
 
 	team_id TeamAt(int32 index) const;
+
+	BMessenger AppMessengerFor(team_id team) const;
 
 	BMessage *NextMessageFrom(team_id team, int32 &cookie,
 							  bigtime_t *time = NULL);
@@ -88,7 +91,8 @@ public:
 	bool WaitForMessage(uint32 messageCode, bool fromNow = false,
 						bigtime_t timeout = B_INFINITE_TIMEOUT);
 	bool WaitForMessage(team_id team, uint32 messageCode, bool fromNow = false,
-						bigtime_t timeout = B_INFINITE_TIMEOUT);
+						bigtime_t timeout = B_INFINITE_TIMEOUT,
+						int32 startIndex = 0);
 
 	BList *StandardMessages();
 
