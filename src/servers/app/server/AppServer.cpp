@@ -462,12 +462,10 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			// 2) team_id - app's team ID
 			// 3) int32 - handler token of the regular app
 			// 4) char * - signature of the regular app
-			// 5) port_id - port to reply to
 
 			// Find the necessary data
 			team_id	clientTeamID=-1;
 			port_id	clientLooperPort=-1;
-			port_id reply_port=-1;		// TODO: deprecated
 			port_id app_port=-1;
 			int32 htoken=B_NULL_TOKEN;
 			char *app_signature=NULL;
@@ -477,7 +475,6 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			msg.Read<team_id>(&clientTeamID);
 			msg.Read<int32>(&htoken);
 			msg.ReadString(&app_signature);
-			msg.Read<int32>(&reply_port);
 			
 			// Create the ServerApp subthread for this app
 			acquire_sem(fAppListLock);
@@ -498,7 +495,7 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 			
 			release_sem(fAppListLock);
 
-			BPortLink replylink(reply_port);
+			BPortLink replylink(app_port);
 			replylink.StartMessage(AS_SET_SERVER_PORT);
 			replylink.Attach<int32>(newapp->fMessagePort);
 			replylink.Flush();

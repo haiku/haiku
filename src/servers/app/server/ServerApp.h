@@ -86,6 +86,8 @@ protected:
 	
 	port_id	fClientAppPort,
 			fMessagePort,
+			// TODO: find out why there is both the app port and the looper port. Do 
+			// we really need both?
 			fClientLooperPort;
 	
 	BString fSignature;

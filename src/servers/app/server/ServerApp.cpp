@@ -52,7 +52,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-//#define DEBUG_SERVERAPP
+#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>
@@ -330,7 +330,7 @@ void ServerApp::SetAppCursor(void)
 int32 ServerApp::MonitorApp(void *data)
 {
 	// Message-dispatching loop for the ServerApp
-
+	
 	ServerApp *app = (ServerApp *)data;
 	BPortLink msgqueue(-1, app->fMessagePort);
 	bool quitting = false;
@@ -362,13 +362,6 @@ int32 ServerApp::MonitorApp(void *data)
 				{
 					BMessage pleaseQuit(B_QUIT_REQUESTED);
 					app->SendMessageToClient(&pleaseQuit);
-// TODO: I do not understand why we nee this? delete.
-//   When BApplications receives B_QUIT_REQUESTED, it asks its BWindow(s) if it can
-// safely quit. If all respond with 'true' then, each one that 'agrees' will send
-// a AS_DELETE_WINDOW message to the server couterpart thread (ServerWindow). Curently,
-// it always quits on this message.
-// DW, I left this text here for you to see it. After you read, please remove it. Thanks.
-//					app->WindowBroadcast(AS_QUIT_APP);
 				}
 				break;
 			}
@@ -515,7 +508,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			port_id looperPort = -1;
 			char *title = NULL;
 			port_id replyport = -1;
-
+			
 			msg.Read<BRect>(&frame);
 			msg.Read<int32>((int32*)&look);
 			msg.Read<int32>((int32*)&feel);
@@ -527,7 +520,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			msg.ReadString(&title);
 
 			//TODO: deprecate - just use sendPort
-			msg.Read<port_id>(&replyport); 
+//			msg.Read<port_id>(&replyport); 
 
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
