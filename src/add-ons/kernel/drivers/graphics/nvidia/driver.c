@@ -515,19 +515,35 @@ static status_t map_device(device_info *di)
 	 * however the actual ROM content (so the used part) is intact (confirmed). */
 	//set_pci(NVCFG_ROMSHADOW, 4, 0);
 
-	/* enable ROM decoding - this is defined in the PCI standard */
+	/* get ROM memory mapped base adress - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
-	tmpUlong |= 0x00000001;
-	set_pci(PCI_rom_base, 4, tmpUlong);
+	if (tmpUlong)
+	{
+		/* ROM was assigned an adress, so enable ROM decoding - see PCI standard */
+		tmpUlong |= 0x00000001;
+		set_pci(PCI_rom_base, 4, tmpUlong);
 
-	rom_area = map_physical_memory(
-		buffer,
-		(void *)di->pcii.u.h0.rom_base_pci,
-		di->pcii.u.h0.rom_size,
-		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
-		(void **)&(rom_temp)
-	);
+		rom_area = map_physical_memory(
+			buffer,
+			(void *)di->pcii.u.h0.rom_base_pci,
+			di->pcii.u.h0.rom_size,
+			B_ANY_KERNEL_ADDRESS,
+			B_READ_AREA,
+			(void **)&(rom_temp)
+		);
+	}
+	else
+	{
+		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
+		rom_area = map_physical_memory(
+			buffer,
+			(void *)0x000c0000,
+			65536,
+			B_ANY_KERNEL_ADDRESS,
+			B_READ_AREA,
+			(void **)&(rom_temp)
+		);
+	}
 
 	/* if mapping ROM to vmem failed then clean up and pass on error */
 	if (rom_area < 0) {
