@@ -58,7 +58,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <alloca.h>
-#include <R4xTranslator.h>
+#include <FuncTranslator.h>
 
 struct translation_format;
 
