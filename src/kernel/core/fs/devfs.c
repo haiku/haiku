@@ -98,7 +98,7 @@ struct devfs_cookie {
 };
 
 /* the one and only allowed devfs instance */
-static struct devfs *gDeviceFileSystem = NULL;
+static struct devfs *sDeviceFileSystem = NULL;
 
 static status_t pnp_devfs_open(void *_device, uint32 flags, void **_deviceCookie);
 
@@ -351,7 +351,7 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 
 	sprintf(part_name, "%li_%li", info.session, info.partition);
 
-	mutex_lock(&gDeviceFileSystem->lock);
+	mutex_lock(&sDeviceFileSystem->lock);
 
 	// you cannot change a partition once set
 	if (devfs_find_in_dir( v->parent, part_name)) {
@@ -383,20 +383,20 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 
 	devfs_insert_in_dir(v->parent, part_node);
 
-	mutex_unlock(&gDeviceFileSystem->lock);
+	mutex_unlock(&sDeviceFileSystem->lock);
 
 	TRACE(("SET_PARTITION: Added partition\n"));
 
 	return B_NO_ERROR;
 
 err1:
-	mutex_unlock(&gDeviceFileSystem->lock);
+	mutex_unlock(&sDeviceFileSystem->lock);
 
 	free(part_map);
 	return res;
 		
 err2:
-	mutex_unlock(&gDeviceFileSystem->lock);
+	mutex_unlock(&sDeviceFileSystem->lock);
 
 	put_vnode(fs->id, v->id);
 	free(part_map);
@@ -416,7 +416,7 @@ devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id
 
 	TRACE(("devfs_mount: entry\n"));
 
-	if (gDeviceFileSystem) {
+	if (sDeviceFileSystem) {
 		dprintf("double mount of devfs attempted\n");
 		err = B_ERROR;
 		goto err;
@@ -464,7 +464,7 @@ devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id
 	*root_vnid = v->id;
 	*_fs = fs;
 
-	gDeviceFileSystem = fs;
+	sDeviceFileSystem = fs;
 
 	return 0;
 
@@ -1022,7 +1022,7 @@ devfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 
 
 static status_t
-devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
+devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, uint32 statMask)
 {
 #ifdef TRACE_DEVFS
 	struct devfs_vnode *v = _v;
@@ -1034,7 +1034,29 @@ devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_m
 }
 
 
-static struct fs_ops devfs_ops = {
+static status_t
+devfs_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return B_OK;
+
+		case B_MODULE_UNINIT:
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+file_system_info gDeviceFileSystem = {
+	{
+		"file_systems/devfs" B_CURRENT_FS_API_VERSION,
+		0,
+		devfs_std_ops,
+	},
+
 	&devfs_mount,
 	&devfs_unmount,
 	NULL,
@@ -1273,7 +1295,7 @@ pnp_devfs_device_removed(pnp_node_handle node, void *cookie)
 
 
 static status_t
-std_ops(int32 op, ...)
+pnp_devfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
@@ -1293,7 +1315,7 @@ pnp_driver_info gDeviceForDriversModule = {
 	{
 		PNP_DEVFS_MODULE_NAME,
 		0 /*B_KEEP_LOADED*/,
-		std_ops
+		pnp_devfs_std_ops
 	},
 
 	NULL,
@@ -1304,15 +1326,6 @@ pnp_driver_info gDeviceForDriversModule = {
 
 
 //	#pragma mark -
-
-
-status_t
-bootstrap_devfs(void)
-{
-	TRACE(("bootstrap_devfs: entry\n"));
-
-	return vfs_register_file_system("devfs", &devfs_ops);
-}
 
 
 status_t
@@ -1336,7 +1349,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 		|| ops->read == NULL || ops->write == NULL)
 		return B_BAD_VALUE;
 
-	if (!gDeviceFileSystem) {
+	if (!sDeviceFileSystem) {
 		panic("devfs_publish_device called before devfs mounted\n");
 		return B_ERROR;
 	}
@@ -1344,11 +1357,11 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 	// copy the path over to a temp buffer so we can munge it
 	strlcpy(temp, path, B_PATH_NAME_LENGTH);
 
-	mutex_lock(&gDeviceFileSystem->lock);
+	mutex_lock(&sDeviceFileSystem->lock);
 
 	// create the path leading to the device
 	// parse the path passed in, stripping out '/'
-	dir = gDeviceFileSystem->root_vnode;
+	dir = sDeviceFileSystem->root_vnode;
 	v = NULL;
 	i = 0;
 	last = 0;
@@ -1384,7 +1397,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 			err = B_FILE_EXISTS;
 			goto err;
 		} else {
-			v = devfs_create_vnode(gDeviceFileSystem, &temp[last]);
+			v = devfs_create_vnode(sDeviceFileSystem, &temp[last]);
 			if (!v) {
 				err = ENOMEM;
 				goto err;
@@ -1404,7 +1417,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 			v->stream.u.dir.jar_head = NULL;
 		}
 
-		hash_insert(gDeviceFileSystem->vnode_list_hash, v);
+		hash_insert(sDeviceFileSystem->vnode_list_hash, v);
 
 		devfs_insert_in_dir(dir, v);
 
@@ -1415,7 +1428,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 	}
 
 err:
-	mutex_unlock(&gDeviceFileSystem->lock);
+	mutex_unlock(&sDeviceFileSystem->lock);
 	return err;
 }
 
