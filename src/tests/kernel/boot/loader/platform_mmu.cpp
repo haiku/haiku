@@ -5,12 +5,17 @@
 
 
 #include <boot/platform.h>
+
 #include <stdlib.h>
+#include <stdio.h>
 
 
 status_t
 platform_allocate_region(void **_address, size_t size, uint8 protection)
 {
+	printf("platform_allocate_region(address = %p, size = %lu, protection = %u)\n",
+		*_address, size, protection);
+
 	void *address = malloc(size);
 	if (address == NULL)
 		return B_NO_MEMORY;
