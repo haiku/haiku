@@ -6,13 +6,24 @@
 #include <OS.h>
 
 #include "KPartition.h"
+#include "RWLocker.h"
+
+// disk device flags
+// TODO: move to another header (must be accessible from userland API impl.)
+enum {
+	B_DISK_DEVICE_REMOVABLE		= 0x01,
+	B_DISK_DEVICE_HAS_MEDIA		= 0x02,
+};
 
 namespace BPrivate {
 namespace DiskDevice {
 
 class KDiskDevice : public KPartition {
+public:
 	KDiskDevice(partition_id id = -1);
 	virtual ~KDiskDevice();
+
+	status_t InitCheck() const;
 
 	// A read lock owner can be sure that the device (incl. all of its
 	// partitions won't be changed).
@@ -25,12 +36,17 @@ class KDiskDevice : public KPartition {
 	bool WriteLock();
 	void WriteUnlock();
 
+	virtual void SetID(partition_id id);
+
 	void SetDeviceFlags(uint32 flags);	// comprises the ones below
 	uint32 DeviceFlags() const;
 	bool IsRemovable() const;
 	bool HasMedia() const;
 
 	status_t SetPath(const char *path);
+		// TODO: Remove this method or make it private. Once initialized the
+		// path must not be changed.
+	const char *Path() const;
 	virtual status_t GetPath(char *path) const;
 
 	// File descriptor: Set only from a kernel thread, valid only for
@@ -46,6 +62,13 @@ class KDiskDevice : public KPartition {
 
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;
+
+private:
+	disk_device_data	fDeviceData;
+	RWLocker			fLocker;
+	int					fFD;
+	status_t			fMediaStatus;
+	team_id				fShadowOwner;
 };
 
 } // namespace DiskDevice
