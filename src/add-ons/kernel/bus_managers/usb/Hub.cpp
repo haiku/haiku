@@ -25,9 +25,16 @@ Hub::Hub(  BusManager *bus , Device *parent , usb_device_descriptor &desc , int8
    : Device ( bus , parent , desc , devicenum , lowspeed )
 {
 	dprintf( "USB Hub is being initialised\n" );
-	m_initok = false; // We're not yet ready!
 	size_t actual_length;
 
+	if ( m_initok == false )
+	{
+		dprintf( "Hub::Hub() Device failed to initialize\n" );
+		return;
+	}
+	
+	//Set to false again for the hub init.
+	m_initok = false; 
 	
 	if( m_device_descriptor.device_subclass != 0 || m_device_descriptor.device_protocol != 0 )
 	{

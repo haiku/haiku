@@ -30,6 +30,9 @@ int32 usb_explore_thread( void *data )
 {
 	Hub *roothub = (Hub *)data;
 	
+	if ( roothub == 0 )
+		return B_ERROR;
+	
 	while (true )
 	{
 		//Go to the hubs
@@ -40,9 +43,8 @@ int32 usb_explore_thread( void *data )
 }
 
 
-BusManager::BusManager( host_controller_info *info )
+BusManager::BusManager()
 {
-	hcpointer = info;
 	m_initok = false; 
 	m_roothub = 0;
 	
@@ -56,15 +58,9 @@ BusManager::BusManager( host_controller_info *info )
 	memset( &m_devicemap , false , 128 );
 	
 	// Set up the default pipes
-	m_defaultPipe = new ControlPipe( this , 0 , Default , NormalSpeed , 0 );
-	m_defaultLowSpeedPipe = new ControlPipe( this , 0 , Default , LowSpeed , 0 );
+	m_defaultPipe = new ControlPipe( this , 0 , Pipe::Default , Pipe::NormalSpeed , 0 );
+	m_defaultLowSpeedPipe = new ControlPipe( this , 0 , Pipe::Default , Pipe::LowSpeed , 0 );
 	
-	// Set up the new root hub
-	AllocateNewDevice( 0 , false );
-	
-	if( m_roothub == 0 )
-		return;
-		
 	// Start the 'explore thread'
 	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
 	                     B_LOW_PRIORITY , (void *)m_roothub );
@@ -75,7 +71,6 @@ BusManager::BusManager( host_controller_info *info )
 
 BusManager::~BusManager()
 {
-	put_module( hcpointer->info.name );
 }
 
 status_t BusManager::InitCheck()
@@ -118,7 +113,7 @@ Device * BusManager::AllocateNewDevice( Device *parent , bool lowspeed )
 	}
 	
 	//Create a temporary pipe
-	ControlPipe pipe( this , devicenum , Default , LowSpeed , 0 );
+	ControlPipe pipe( this , devicenum , Pipe::Default , Pipe::LowSpeed , 0 );
 	
 	//3. Get the device descriptor
 	// Just retrieve the first 8 bytes of the descriptor -> minimum supported
@@ -173,3 +168,18 @@ int8 BusManager::AllocateAddress()
 	return devicenum;
 }
 
+status_t BusManager::Start()
+{
+	if ( InitCheck() != B_OK )
+		return InitCheck();
+	
+	// Start the 'explore thread'
+	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
+	                     B_LOW_PRIORITY , (void *)m_roothub );
+	resume_thread( m_explore_thread );
+}
+
+status_t BusManager::SubmitTransfer( Transfer &t )
+{
+	return B_ERROR;
+};

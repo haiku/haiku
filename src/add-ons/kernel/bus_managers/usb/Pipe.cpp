@@ -23,26 +23,23 @@
 
 Pipe::Pipe( Device *dev , Direction &dir , uint8 &endpointaddress )
 {
-	d = new usb_pipe_t;
-	
-	d->direction = dir;
+	m_direction = dir;
 	m_device = dev;
-	
-	if ( m_device != NULL ) //Default pipe
-	{
-		d->deviceid = dev->m_devicenum;
-		if ( dev->m_lowspeed == true ) 
-			d->speed = LowSpeed;
-		else
-			d->speed = NormalSpeed; 
-		m_bus = m_device->m_bus;
-	}
-	d->endpoint = endpointaddress;
+	m_endpoint = endpointaddress;
+	if ( m_device != NULL )
+		m_bus = m_device->GetBusManager();
 }
 
 Pipe::~Pipe()
 {
-	delete d;
+}
+
+int8 Pipe::GetDeviceAddress()
+{
+	if ( m_device == NULL )
+		return -1;
+	else
+		return m_device->GetAddress();
 }
 
 ControlPipe::ControlPipe( Device *dev , Direction dir , uint8 endpointaddress )
@@ -51,12 +48,23 @@ ControlPipe::ControlPipe( Device *dev , Direction dir , uint8 endpointaddress )
 	
 }	          
 
-ControlPipe::ControlPipe( BusManager *bus , int8 dev_id , Direction dir , Speed speed , uint8 endpointaddress )
+ControlPipe::ControlPipe( BusManager *bus , int8 dev_address , Direction dir , Speed speed , uint8 endpointaddress )
 			: Pipe( NULL , dir , endpointaddress )
 {
 	m_bus = bus;
-	d->deviceid = dev_id;
-	d->speed = speed;
+	m_deviceaddress = dev_address;
+	if ( speed == LowSpeed )
+		m_lowspeed = true;
+	else
+		m_lowspeed = false;
+}
+
+int8 ControlPipe::GetDeviceAddress()
+{
+	if ( m_device == NULL )
+		return m_deviceaddress;
+	else
+		return m_device->GetAddress();
 }
 
 status_t ControlPipe::SendRequest( uint8 request_type , uint8 request , uint16 value ,
@@ -83,13 +91,13 @@ status_t ControlPipe::SendControlMessage( usb_request_data *command , void *data
 	                             bigtime_t timeout )
 {
 	// this method should build an usb packet (new class) with the needed data
-	Transfer transfer( *this );
+	Transfer transfer( this );
 	
 	transfer.SetRequestData( command );
 	transfer.SetBuffer( (uint8 *)data );
 	transfer.SetBufferLength( data_length );
 	transfer.SetActualLength( actual_length );
 	
-	status_t retval = m_bus->hcpointer->SubmitPacket( transfer.GetData() );
+	status_t retval = m_bus->SubmitTransfer( transfer );
 	return retval;
 }

@@ -4,12 +4,17 @@ UsePrivateHeaders [ FDirName kernel ] ;
 
 AddResources usb : usb.rdef ;
 
-R5KernelAddon usb : [ FDirName kernel bus_managers ] :
-	usb.cpp
+R5KernelStaticLibrary usb :
 	Stack.cpp
 	Device.cpp
 	Hub.cpp
 	BusManager.cpp
 	Transfer.cpp
 	Pipe.cpp
+	;	
+
+R5KernelAddon usb : [ FDirName kernel bus_managers ] :
+	usb.cpp
 	;
+
+LinkSharedOSLibs usb : libusb.a ;

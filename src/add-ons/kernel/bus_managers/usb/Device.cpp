@@ -50,7 +50,7 @@ Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc ,
 	m_maxpacketin[0] = m_maxpacketout[0] = m_device_descriptor.max_packet_size_0; 
 	m_device_descriptor = desc;
 	m_lowspeed = lowspeed;
-	m_defaultPipe = new ControlPipe( this , Default , 0 );
+	m_defaultPipe = new ControlPipe( this , Pipe::Default , 0 );
 		
 	//4. Get the device descriptor
 	// We already have a part of it, but we want it all
@@ -65,7 +65,6 @@ Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc ,
 	
 	dprintf( "usb Device %d: Vendor id: %d , Product id: %d\n" , devicenum ,
 	         m_device_descriptor.vendor_id , m_device_descriptor.product_id );
-		
 	
 	// 4. Get the configurations
 	m_configurations = (usb_configuration_descriptor *)malloc( m_device_descriptor.num_configurations * sizeof (usb_configuration_descriptor) );
@@ -90,13 +89,15 @@ Device::Device( BusManager *bus , Device *parent , usb_device_descriptor &desc ,
 	SetConfiguration( 0 );
 	
 	//6. TODO: Find drivers for the device
+	
+	m_initok = true;
 }
 
 //Returns the length that was copied (index gives the number of the config)
 int16 Device::GetDescriptor( uint8 descriptor_type , uint16 index , 
                                 void *buffer , size_t size )
 {
-	size_t actual_length;
+	size_t actual_length = 0;
 	m_defaultPipe->SendRequest(USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD , //Type
 	             USB_REQUEST_GET_DESCRIPTOR ,					//Request
 	             ( descriptor_type << 8 ) | index ,				//Value
@@ -124,4 +125,5 @@ status_t Device::SetConfiguration( uint8 value )
 
 	//Set current configuration
 	m_current_configuration = m_configurations + value;
+	return B_OK;
 }

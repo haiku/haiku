@@ -39,13 +39,18 @@ Loading/unloading the module
 static int32
 bus_std_ops(int32 op, ...)
 {
+	Stack *stack;
 	switch(op) {
 		case B_MODULE_INIT:
+			#ifdef USB_DEBUG
+			set_dprintf_enabled( true ); 
+			load_driver_symbols( "usb" );
+			#endif
 			TRACE(("usb_nielx: bus module: init\n"));
-			data = new Stack();
-			if( data->InitCheck() != B_OK )
+			stack = new Stack();
+			if( stack->InitCheck() != B_OK )
 			{
-				delete data;
+				delete stack;
 				return ENODEV;
 			}
 			break;

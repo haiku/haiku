@@ -21,38 +21,31 @@
 
 #include "usb_p.h"
 
-Transfer::Transfer( Pipe &pipe )
+Transfer::Transfer( Pipe *pipe )
 {
-	d = new usb_transfer_t;
-	d->pipe = pipe.d;
+	m_pipe = pipe;
 }
 
 Transfer::~Transfer()
 {
-	delete d;
 }
 
 void Transfer::SetRequestData( usb_request_data *data )
 {
-	d->request = data;
+	m_request = data;
 }
 
 void Transfer::SetBuffer( uint8 *buffer )
 {
-	d->buffer = buffer;
+	m_buffer = buffer;
 }
 
-void Transfer::SetBufferLength( int16 length )
+void Transfer::SetBufferLength( size_t length )
 {
-	d->bufferlength = length;
+	m_bufferlength = length;
 }
 
 void Transfer::SetActualLength( size_t *actual_length )
 {
-	d->actual_length = actual_length;
+	m_actual_length = actual_length;
 };
-
-usb_transfer_t * Transfer::GetData()
-{
-	return d;
-}

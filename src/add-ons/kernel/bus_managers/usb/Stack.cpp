@@ -29,12 +29,15 @@
 Stack::Stack()
 {
 	//Init the master lock
-	m_master = create_sem( 0 , "usb master lock" );
+	m_master = create_sem( 1 , "usb master lock" );
 	set_sem_owner( m_master , B_SYSTEM_TEAM );
 	
 	//Create the data lock
-	m_datalock = create_sem( 0 , "usb data lock" );
+	m_datalock = create_sem( 1 , "usb data lock" );
 	set_sem_owner( m_datalock , B_SYSTEM_TEAM );
+
+	//Set the global "data" variable to this
+	data = this;
 
 	//Initialise the memory chunks: create 8, 16 and 32 byte-heaps
 	//NOTE: This is probably the most ugly code you will see in the
@@ -44,7 +47,7 @@ Stack::Stack()
 	
 	// 8-byte heap
 	m_areafreecount[0] = 0;
-	m_areas[0] = AllocArea( &m_logical[0] , &m_physical[0] , B_PAGE_SIZE ,
+	m_areas[0] = AllocateArea( &m_logical[0] , &m_physical[0] , B_PAGE_SIZE ,
 	                        "8-byte chunk area" );
 	if ( m_areas[0] < B_OK )
 	{
@@ -56,17 +59,17 @@ Stack::Stack()
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/8 ; i++ )
 	{
-		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[0] + 8 * i);
-		chunk->physical = (void *)((uint32)m_physical[0] + 8 * i);
+		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[0] + 8 * i);
+		chunk->physical = (void *)((addr_t)m_physical[0] + 8 * i);
 		if ( i != B_PAGE_SIZE / 8 - 1 )
-			chunk->next_item = (void *)((uint32)m_logical[0] + 8 * ( i + 1 ) );
+			chunk->next_item = (void *)((addr_t)m_logical[0] + 8 * ( i + 1 ) );
 		else
 			chunk->next_item = NULL;
 	}
 	
 	// 16-byte heap
 	m_areafreecount[1] = 0;
-	m_areas[1] = AllocArea( &m_logical[1] , &m_physical[1] , B_PAGE_SIZE ,
+	m_areas[1] = AllocateArea( &m_logical[1] , &m_physical[1] , B_PAGE_SIZE ,
 	                        "16-byte chunk area" );
 	if ( m_areas[1] < B_OK )
 	{
@@ -78,17 +81,17 @@ Stack::Stack()
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/16 ; i++ )
 	{
-		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[1] + 16 * i);
-		chunk->physical = (void *)((uint32)m_physical[1] + 16 * i);
+		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[1] + 16 * i);
+		chunk->physical = (void *)((addr_t)m_physical[1] + 16 * i);
 		if ( i != B_PAGE_SIZE / 16 - 1 )
-			chunk->next_item = (void *)((uint32)m_logical[1] + 16 * ( i + 1 ));
+			chunk->next_item = (void *)((addr_t)m_logical[1] + 16 * ( i + 1 ));
 		else
 			chunk->next_item = NULL;
 	}
 
 	// 32-byte heap
 	m_areafreecount[2] = 0;
-	m_areas[2] = AllocArea( &m_logical[2] , &m_physical[2] , B_PAGE_SIZE ,
+	m_areas[2] = AllocateArea( &m_logical[2] , &m_physical[2] , B_PAGE_SIZE ,
 	                        "32-byte chunk area" );
 	if ( m_areas[2] < B_OK )
 	{
@@ -100,13 +103,14 @@ Stack::Stack()
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/32 ; i++ )
 	{
-		memory_chunk *chunk = (memory_chunk *)((uint32)m_logical[2] + 32 * i);
-		chunk->physical = (void *)((uint32)m_physical[2] + 32 * i);
+		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[2] + 32 * i);
+		chunk->physical = (void *)((addr_t)m_physical[2] + 32 * i);
 		if ( i != B_PAGE_SIZE / 32 - 1 )
-			chunk->next_item = (void *)((uint32)m_logical[2] + 32 * ( i + 1 ));
+			chunk->next_item = (void *)((addr_t)m_logical[2] + 32 * ( i + 1 ));
 		else
 			chunk->next_item = NULL;
 	}
+	
 	
 	//Check for host controller modules
 	void *list = open_module_list( "busses/usb" );
@@ -119,7 +123,8 @@ Stack::Stack()
 		host_controller_info *module = 0;
 		if ( get_module( modulename , (module_info **)&module ) != B_OK )
 			continue;
-		m_busmodules.Insert( new BusManager( module ) , 0 );
+		if ( module->add_to( *this) != B_OK )
+			continue;
 		dprintf( "USB: module %s successfully loaded\n" , modulename );
 	}
 	
@@ -155,6 +160,12 @@ void Stack::Unlock()
 	release_sem( m_master );
 }
 
+void Stack::AddBusManager( BusManager *bus )
+{
+	m_busmodules.PushBack( bus );
+}
+
+
 status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 {
 	Lock();
@@ -188,6 +199,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 	else
 		m_8_listhead = chunk->next_item;
 	Unlock();
+	dprintf( "USB Stack: allocated a new chunk with size %u\n" , size );
 	return B_OK;
 }
 
@@ -217,7 +229,7 @@ status_t Stack::FreeChunk( void *log , void *phy , uint8 size )
 	return B_OK;
 }
 
-area_id Stack::AllocArea( void **log , void **phy , size_t size , const char *name )
+area_id Stack::AllocateArea( void **log , void **phy , size_t size , const char *name )
 {
 	physical_entry pe;
 	void * logadr;
