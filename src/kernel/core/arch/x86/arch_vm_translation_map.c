@@ -240,14 +240,15 @@ put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, uint32 attributes)
 	init_pdentry(e);
 	e->addr = ADDR_SHIFT(pgtable_phys);
 
-	// if the region is user accessible, it's automatically
-	// accessible in kernel space, too (but with the same
-	// protection)
-	e->user = (attributes & B_USER_PROTECTION) != 0;
-	if (e->user)
-		e->rw = (attributes & B_WRITE_AREA) != 0;
-	else
-		e->rw = (attributes & B_KERNEL_WRITE_AREA) != 0;
+	// ToDo: we ignore the attributes of the page table - for compatibility
+	//	with BeOS we allow having user accessible areas in the kernel address
+	//	space. This is currently being used by some drivers, mainly for the
+	//	frame buffer. Our current real time data implementation makes use of
+	//	this fact, too.
+	//	We might want to get rid of this possibility one day, especially if
+	//	we intend to port it to a platform that does not support this.
+	e->user = 1;
+	e->rw = 1;
 	e->present = 1;
 }
 
@@ -258,6 +259,10 @@ put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, uint32 attributes)
 	// put it in the pgtable
 	init_ptentry(e);
 	e->addr = ADDR_SHIFT(pgtable_phys);
+
+	// if the page is user accessible, it's automatically
+	// accessible in kernel space, too (but with the same
+	// protection)
 	e->user = (attributes & B_USER_PROTECTION) != 0;
 	if (e->user)
 		e->rw = (attributes & B_WRITE_AREA) != 0;
@@ -807,7 +812,7 @@ arch_vm_translation_map_init(kernel_args *args)
 
 	TRACE(("vm_translation_map_init: done\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -816,6 +821,8 @@ arch_vm_translation_map_init_post_sem(kernel_args *args)
 {
 	mutex_init(&iospace_mutex, "iospace_mutex");
 	iospace_full_sem = create_sem(1, "iospace_full_sem");
+
+	return iospace_full_sem >= B_OK ? B_OK : iospace_full_sem;
 }
 
 
