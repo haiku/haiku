@@ -20,6 +20,7 @@ KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),
 	fOverhead(overhead),
 	fLevel(level),
+	fName(NULL),
 	fNext(NULL)
 {
 	SetName(name);

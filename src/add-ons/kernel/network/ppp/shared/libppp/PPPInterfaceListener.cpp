@@ -14,7 +14,8 @@
 #include <LockerHelper.h>
 
 
-#define REPORT_FLAGS		PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
+#define REPORT_FLAGS		PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT \
+							| PPP_ALLOW_ANY_REPLY_THREAD
 
 #define QUIT_REPORT_THREAD	'QUIT'
 
@@ -69,7 +70,11 @@ PPPInterfaceListenerThread::Run()
 				message.AddInt32("interface", static_cast<int32>(*interfaceID));
 			}
 			
-			messenger.SendMessage(&message);
+			// We might cause a dead-lock. Thus, abort if we cannot get the lock.
+			BHandler *noHandler = NULL;
+				// needed to tell compiler which version of SendMessage we want
+			if(messenger.SendMessage(&message, noHandler, 100000) != B_OK)
+				send_data(sender, B_OK, NULL, 0);
 		}
 	}
 	
@@ -141,17 +146,23 @@ PPPInterfaceListener::SetTarget(BHandler *target)
 }
 
 
-void
+bool
 PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 {
 	StopWatchingInterfaces();
 	
 	// enable reports
 	PPPInterface interface(ID);
-	interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS);
+	if(interface.InitCheck() != B_OK)
+		return false;
+	
+	if(!interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS))
+		return false;
 	
 	fDoesWatch = true;
 	fWatchingInterface = ID;
+	
+	return true;
 }
 
 
@@ -184,20 +195,28 @@ PPPInterfaceListener::WatchAllInterfaces()
 void
 PPPInterfaceListener::StopWatchingInterfaces()
 {
-	// disable reports
-	int32 count;
-	PPPInterface interface;
-	ppp_interface_id *interfaceList;
-	
-	interfaceList = Manager().Interfaces(&count);
-	if(!interfaceList)
+	if(!fDoesWatch)
 		return;
 	
-	for(int32 index = 0; index < count; index++) {
-		interface.SetTo(interfaceList[index]);
+	if(fWatchingInterface == PPP_UNDEFINED_INTERFACE_ID) {
+		// disable all reports
+		int32 count;
+		PPPInterface interface;
+		ppp_interface_id *interfaceList;
+		
+		interfaceList = Manager().Interfaces(&count);
+		if(!interfaceList)
+			return;
+		
+		for(int32 index = 0; index < count; index++) {
+			interface.SetTo(interfaceList[index]);
+			interface.DisableReports(PPP_ALL_REPORTS, fReportThread);
+		}
+		delete interfaceList;
+	} else {
+		PPPInterface interface(fWatchingInterface);
 		interface.DisableReports(PPP_ALL_REPORTS, fReportThread);
 	}
-	delete interfaceList;
 	
 	fDoesWatch = false;
 	fWatchingInterface = PPP_UNDEFINED_INTERFACE_ID;

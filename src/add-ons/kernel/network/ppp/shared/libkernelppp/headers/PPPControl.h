@@ -33,7 +33,8 @@
 enum ppp_control_ops {
 	// -----------------------------------------------------
 	// PPPManager (the PPP interface module)
-	PPPC_CREATE_INTERFACE = PPP_OPS_START,
+	PPPC_CONTROL_MODULE = PPP_OPS_START,
+	PPPC_CREATE_INTERFACE,
 	PPPC_CREATE_INTERFACE_WITH_NAME,
 	PPPC_DELETE_INTERFACE,
 	PPPC_BRING_INTERFACE_UP,

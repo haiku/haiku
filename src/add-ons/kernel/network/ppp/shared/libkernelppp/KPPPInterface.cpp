@@ -62,7 +62,6 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		const driver_settings *profile, KPPPInterface *parent = NULL)
 	: KPPPLayer(name, PPP_INTERFACE_LEVEL, 2),
 	fID(ID),
-	fSettings(dup_driver_settings(settings)),
 	fIfnet(NULL),
 	fUpThread(-1),
 	fOpenEventThread(-1),
@@ -94,6 +93,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 {
 	entry->interface = this;
 	
+	fSettings = dup_driver_settings(settings);
 	fProfile.LoadSettings(profile, fSettings);
 	
 	// add internal modules
@@ -659,18 +659,12 @@ KPPPProtocol*
 KPPPInterface::ProtocolFor(uint16 protocolNumber, KPPPProtocol *start = NULL) const
 {
 #if DEBUG
-	dprintf("KPPPInterface: ProtocolFor(%X), p&=%X\n", protocolNumber,
-		protocolNumber & 0x7FFF);
+	dprintf("KPPPInterface: ProtocolFor(%X)\n", protocolNumber);
 #endif
 	
 	KPPPProtocol *current = start ? start : FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
-#if DEBUG
-		dprintf("KPPPInterface: ProtocolFor(): c=%X, c&=%X\n", current->ProtocolNumber(),
-			current->ProtocolNumber() & 0x7FFF);
-#endif
-		
 		if(current->ProtocolNumber() == protocolNumber
 				|| (current->Flags() & PPP_INCLUDES_NCP
 					&& (current->ProtocolNumber() & 0x7FFF)
@@ -1022,6 +1016,8 @@ KPPPInterface::Down()
 	
 	if(InitCheck() != B_OK)
 		return false;
+	else if(State() == PPP_INITIAL_STATE && Phase() == PPP_DOWN_PHASE)
+		return true;
 	
 	send_data_with_timeout(fRedialThread, 0, NULL, 0, 200);
 		// the redial thread should be notified that the user wants to disconnect

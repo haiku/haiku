@@ -63,7 +63,7 @@ class PPPoEDevice : public KPPPDevice {
 		uint8 fPeer[6];
 		uint16 fSessionID;
 		uint32 fHostUniq;
-		char *fACName, *fServiceName;
+		const char *fACName, *fServiceName;
 		
 		uint32 fAttempts;
 		bigtime_t fNextTimeout;

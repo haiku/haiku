@@ -83,13 +83,13 @@ KPPPProfile::LoadSettings(const driver_settings *profile,
 	if(name) {
 		sprintf(path, "pppidf/profile/%s", name);
 		void *handle = load_driver_settings(path);
-		fSettings = dup_driver_settings(get_driver_settings(handle));
-		
-		if(handle)
+		if(handle) {
+			fSettings = dup_driver_settings(get_driver_settings(handle));
 			unload_driver_settings(handle);
-		
-		if(fSettings)
-			return;
+			
+			if(fSettings)
+				return;
+		}
 	}
 	
 	// -----------------------------
@@ -99,7 +99,7 @@ KPPPProfile::LoadSettings(const driver_settings *profile,
 }
 
 
-/*!	\brief Finds a parameter with name \a type that has a value of \a name.
+/*!	\brief Finds a parameter for a module of type \a type and name \a name.
 	
 	This method is intended for modules.
 	
@@ -123,7 +123,7 @@ KPPPProfile::SettingsFor(const char *type, const char *name) const
 			if(name) {
 				for(int32 valueIndex = 0; valueIndex < parameter->value_count;
 						valueIndex++)
-					if(!strcasecmp(parameter->values[index], name))
+					if(!strcasecmp(parameter->values[valueIndex], name))
 						return parameter;
 			} else
 				return parameter;

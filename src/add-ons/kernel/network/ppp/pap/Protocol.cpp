@@ -28,8 +28,8 @@
 typedef struct authentication_item {
 	uint8 type;
 	uint8 length;
-	uint16 protocolNumber _PACKED;
-} authentication_item;
+	uint16 protocolNumber;
+} _PACKED authentication_item;
 
 
 PAPHandler::PAPHandler(PAP& owner, KPPPInterface& interface)

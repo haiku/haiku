@@ -216,6 +216,10 @@ KPPPStateMachine::LocalAuthenticationRequested()
 	
 	LockerHelper locker(fLock);
 	
+	Interface().Report(PPP_CONNECTION_REPORT,
+		PPP_REPORT_LOCAL_AUTHENTICATION_REQUESTED, &fInterface.fID,
+		sizeof(ppp_interface_id));
+	
 	fLocalAuthenticationStatus = PPP_AUTHENTICATING;
 	free(fLocalAuthenticationName);
 	fLocalAuthenticationName = NULL;
@@ -273,6 +277,10 @@ KPPPStateMachine::PeerAuthenticationRequested()
 #endif
 	
 	LockerHelper locker(fLock);
+	
+	Interface().Report(PPP_CONNECTION_REPORT,
+		PPP_REPORT_PEER_AUTHENTICATION_REQUESTED, &fInterface.fID,
+		sizeof(ppp_interface_id));
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATING;
 	free(fPeerAuthenticationName);
@@ -615,7 +623,7 @@ KPPPStateMachine::DownEvent()
 	
 	if(Interface().Device() && Interface().Device()->IsUp())
 		return;
-			// it is not our device that went up...
+			// it is not our device that went down...
 	
 	Interface().CalculateBaudRate();
 	
@@ -1459,11 +1467,15 @@ KPPPStateMachine::TimerEvent()
 		dprintf("KPPPSM: TimerEvent()\n");
 #endif
 	
-	LockerHelper locker(fLock);
-	if(fNextTimeout == 0 || fNextTimeout > system_time())
+	// We might cause a dead-lock. Thus, abort if we cannot get the lock.
+	if(fLock.LockWithTimeout(100000) != B_OK)
 		return;
+	if(fNextTimeout == 0 || fNextTimeout > system_time()) {
+		fLock.Unlock();
+		return;
+	}
 	fNextTimeout = 0;
-	locker.UnlockNow();
+	fLock.Unlock();
 	
 	switch(State()) {
 		case PPP_CLOSING_STATE:

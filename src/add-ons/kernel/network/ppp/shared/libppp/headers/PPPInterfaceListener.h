@@ -40,7 +40,7 @@ class PPPInterfaceListener {
 		const PPPManager& Manager() const
 			{ return fManager; }
 		
-		void WatchInterface(ppp_interface_id ID);
+		bool WatchInterface(ppp_interface_id ID);
 		void WatchAllInterfaces();
 		void StopWatchingInterfaces();
 		

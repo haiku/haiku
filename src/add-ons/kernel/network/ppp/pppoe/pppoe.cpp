@@ -141,13 +141,21 @@ add_to(KPPPInterface& mainInterface, KPPPInterface *subInterface,
 }
 
 
+static
+status_t
+control(uint32 op, void *data, size_t length)
+{
+	return B_ERROR;
+}
+
+
 static ppp_module_info pppoe_module = {
 	{
 		PPPoE_MODULE_NAME,
 		0,
 		std_ops
 	},
-	NULL,
+	control,
 	add_to
 };
 
@@ -166,6 +174,8 @@ std_ops(int32 op, ...)
 				put_module(NET_CORE_MODULE_NAME);
 				return B_ERROR;
 			}
+			
+			set_max_linkhdr(PPPoE_HEADER_SIZE + ETHER_HDR_LEN);
 			
 			sDevices = new TemplateList<PPPoEDevice*>;
 			

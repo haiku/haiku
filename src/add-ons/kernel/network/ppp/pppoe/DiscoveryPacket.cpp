@@ -42,7 +42,7 @@ DiscoveryPacket::DiscoveryPacket(struct mbuf *packet, uint32 start = 0)
 		tag = (pppoe_tag*) (header->data + position);
 		position += ntohs(tag->length) + 4;
 		
-		AddTag(ntohs(tag->type), ntohs(tag->length), tag->data);
+		AddTag(ntohs(tag->type), tag->data, ntohs(tag->length));
 	}
 	
 	fInitStatus = B_OK;
@@ -57,7 +57,7 @@ DiscoveryPacket::~DiscoveryPacket()
 
 
 bool
-DiscoveryPacket::AddTag(uint16 type, uint16 length, void *data, int32 index = -1)
+DiscoveryPacket::AddTag(uint16 type, const void *data, uint16 length, int32 index = -1)
 {
 	pppoe_tag *add = (pppoe_tag*) malloc(length + 4);
 	add->type = type;

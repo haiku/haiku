@@ -308,11 +308,18 @@ PPPManager::DeleteInterface(ppp_interface_id ID)
 	if(!entry)
 		return false;
 	
-	++entry->accessing;
+	if(entry->deleting)
+		return true;
+			// this check prevents a dead-lock
 	
-	locker.UnlockNow();
-	entry->interface->Down();
 	entry->deleting = true;
+	++entry->accessing;
+	locker.UnlockNow();
+	
+	// bring interface down if needed
+	if(entry->interface->State() != PPP_INITIAL_STATE
+			|| entry->interface->Phase() != PPP_DOWN_PHASE)
+		entry->interface->Down();
 	
 	--entry->accessing;
 	
@@ -415,6 +422,9 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 	// this method is intended for use by userland applications
 	
 	switch(op) {
+//		case PPPC_CONTROL_MODULE: {
+//		} break;
+		
 		case PPPC_CREATE_INTERFACE: {
 			if(length < sizeof(ppp_interface_description_info) || !data)
 				return B_ERROR;
@@ -462,6 +472,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 				return B_BAD_INDEX;
 			
 			++entry->accessing;
+			locker.UnlockNow();
 			
 			return bring_interface_up(entry);
 		} break;
@@ -477,6 +488,7 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 				return B_BAD_INDEX;
 			
 			++entry->accessing;
+			locker.UnlockNow();
 			
 			return bring_interface_down(entry);
 		} break;
@@ -485,14 +497,9 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			if(length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;
 			
-			LockerHelper locker(fLock);
-			
 			ppp_control_info *control = (ppp_control_info*) data;
-			ppp_interface_entry *entry = EntryFor(control->index);
-			if(!entry || entry->deleting)
-				return B_BAD_INDEX;
 			
-			return entry->interface->Control(control->op, control->data,
+			return ControlInterface(control->index, control->op, control->data,
 				control->length);
 		} break;
 		
@@ -524,6 +531,8 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 				= (ppp_interface_description_info*) data;
 			if(!info->u.settings)
 				return B_ERROR;
+			
+			LockerHelper locker(fLock);
 			
 			ppp_interface_entry *entry = EntryFor(info->u.settings);
 			if(entry)
@@ -568,11 +577,16 @@ PPPManager::ControlInterface(ppp_interface_id ID, uint32 op, void *data, size_t 
 	
 	LockerHelper locker(fLock);
 	
+	status_t result = B_BAD_INDEX;
 	ppp_interface_entry *entry = EntryFor(ID);
-	if(entry && !entry->deleting)
-		return entry->interface->Control(op, data, length);
+	if(entry && !entry->deleting) {
+		++entry->accessing;
+		locker.UnlockNow();
+		result = entry->interface->Control(op, data, length);
+		--entry->accessing;
+	}
 	
-	return B_BAD_INDEX;
+	return result;
 }
 
 

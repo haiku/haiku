@@ -23,8 +23,8 @@
 typedef struct ip_item {
 	uint8 type;
 	uint8 length;
-	in_addr_t address _PACKED;
-} ip_item;
+	in_addr_t address;
+} _PACKED ip_item;
 
 
 enum ipcp_configure_item_codes {

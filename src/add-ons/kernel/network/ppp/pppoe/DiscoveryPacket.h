@@ -61,7 +61,7 @@ class DiscoveryPacket {
 		uint16 SessionID() const
 			{ return fSessionID; }
 		
-		bool AddTag(uint16 type, uint16 length, void *data, int32 index = -1);
+		bool AddTag(uint16 type, const void *data, uint16 length, int32 index = -1);
 		bool RemoveTag(pppoe_tag *tag);
 		int32 CountTags() const
 			{ return fTags.CountItems(); }

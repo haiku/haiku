@@ -49,8 +49,6 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	fEthernetIfnet(NULL),
 	fSessionID(0),
 	fHostUniq(NewHostUniq()),
-	fACName(NULL),
-	fServiceName(NULL),
 	fAttempts(0),
 	fNextTimeout(0),
 	fState(INITIAL)
@@ -72,17 +70,14 @@ PPPoEDevice::PPPoEDevice(KPPPInterface& interface, driver_parameter *settings)
 	const char *interfaceName = get_parameter_value(PPPoE_INTERFACE_KEY, settings);
 	if(!interfaceName)
 		return;
-#if DEBUG
-	dprintf("PPPoEDevice::ctor: interfaceName: %s\n", interfaceName);
-#endif
+	
+	fACName = get_parameter_value(PPPoE_AC_NAME_KEY, settings);
+	fServiceName = get_parameter_value(PPPoE_SERVICE_NAME_KEY, settings);
 	
 	ifnet *current = get_interfaces();
 	for(; current; current = current->if_next) {
 		if(current->if_type == IFT_ETHER && current->if_name
 				&& !strcmp(current->if_name, interfaceName)) {
-#if DEBUG
-			dprintf("PPPoEDevice::ctor: found ethernet interface\n");
-#endif
 			fEthernetIfnet = current;
 			break;
 		}
@@ -104,9 +99,6 @@ PPPoEDevice::~PPPoEDevice()
 #endif
 	
 	remove_device(this);
-	
-	free(fACName);
-	free(fServiceName);
 }
 
 
@@ -147,12 +139,12 @@ PPPoEDevice::Up()
 	
 	// create PADI
 	DiscoveryPacket discovery(PADI);
-	if(fServiceName)
-		discovery.AddTag(SERVICE_NAME, strlen(fServiceName), fServiceName);
+	if(ServiceName())
+		discovery.AddTag(SERVICE_NAME, ServiceName(), strlen(ServiceName()));
 	else
-		discovery.AddTag(SERVICE_NAME, 0, NULL);
-	discovery.AddTag(HOST_UNIQ, sizeof(fHostUniq), &fHostUniq);
-	discovery.AddTag(END_OF_LIST, 0, NULL);
+		discovery.AddTag(SERVICE_NAME, NULL, 0);
+	discovery.AddTag(HOST_UNIQ, &fHostUniq, sizeof(fHostUniq));
+	discovery.AddTag(END_OF_LIST, NULL, 0);
 	
 	// set up PPP header
 	struct mbuf *packet = discovery.ToMbuf(MTU());
@@ -220,7 +212,7 @@ PPPoEDevice::Down()
 	
 	// create PADT
 	DiscoveryPacket discovery(PADT, SessionID());
-	discovery.AddTag(END_OF_LIST, 0, NULL);
+	discovery.AddTag(END_OF_LIST, NULL, 0);
 	
 	struct mbuf *packet = discovery.ToMbuf(MTU());
 	if(!packet) {
@@ -388,23 +380,35 @@ PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
 					return B_OK;
 				}
 				
-				bool hasServiceName = false;
+				bool hasServiceName = false, hasACName = false;
 				pppoe_tag *tag;
 				DiscoveryPacket reply(PADR);
 				for(int32 index = 0; index < discovery.CountTags(); index++) {
 					tag = discovery.TagAt(index);
 					switch(tag->type) {
 						case SERVICE_NAME:
-							if(!hasServiceName && (!fServiceName
-									|| !memcmp(tag->data, fServiceName, tag->length))) {
+							if(!hasServiceName && (!ServiceName()
+									|| (strlen(ServiceName()) == tag->length)
+										&& !memcmp(tag->data, ServiceName(),
+											tag->length))) {
 								hasServiceName = true;
-								reply.AddTag(tag->type, tag->length, tag->data);
+								reply.AddTag(tag->type, tag->data, tag->length);
+							}
+						break;
+						
+						case AC_NAME:
+							if(!hasACName && (!ACName()
+									|| (strlen(ACName()) == tag->length)
+										&& !memcmp(tag->data, ACName(),
+											tag->length))) {
+								hasACName = true;
+								reply.AddTag(tag->type, tag->data, tag->length);
 							}
 						break;
 						
 						case AC_COOKIE:
 						case RELAY_SESSION_ID:
-							reply.AddTag(tag->type, tag->length, tag->data);
+							reply.AddTag(tag->type, tag->data, tag->length);
 						break;
 						
 						case SERVICE_NAME_ERROR:
@@ -424,8 +428,8 @@ PPPoEDevice::Receive(struct mbuf *packet, uint16 protocolNumber = 0)
 					return B_ERROR;
 				}
 				
-				reply.AddTag(HOST_UNIQ, sizeof(fHostUniq), &fHostUniq);
-				reply.AddTag(END_OF_LIST, 0, NULL);
+				reply.AddTag(HOST_UNIQ, &fHostUniq, sizeof(fHostUniq));
+				reply.AddTag(END_OF_LIST, NULL, 0);
 				struct mbuf *replyPacket = reply.ToMbuf(MTU());
 				if(!replyPacket) {
 					m_freem(packet);
