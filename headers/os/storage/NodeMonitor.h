@@ -48,7 +48,7 @@ enum {
  * API exported.
  */
 
-#ifdef __cplusplus
+#if defined(__cplusplus) && !defined(_KERNEL_MODE)
 
 // these are only needed for the function exports
 #include <Node.h>
@@ -66,6 +66,6 @@ extern status_t watch_node(const node_ref *node, uint32 flags,
 extern status_t stop_watching(BMessenger target);
 extern status_t stop_watching(const BHandler *handler, const BLooper *looper = NULL);
 
-#endif	/* __cplusplus */
+#endif	/* __cplusplus && !_KERNEL_MODE */
 
 #endif	/* _NODE_MONITOR_H*/
