@@ -364,6 +364,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			uint32		wkspaces;
 			int32		token;
 			port_id		sendPort;
+			port_id		looperPort;
 			char		*title;
 			
 			ses->ReadRect( &frame );
@@ -373,6 +374,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			ses->ReadInt32( (int32*)&wkspaces );
 			ses->ReadInt32( &token );
 			ses->ReadData( &sendPort, sizeof(port_id) );
+			ses->ReadData( &looperPort, sizeof(port_id) );
 			title		= ses->ReadString();
 
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
@@ -380,7 +382,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 
 				// ServerWindow constructor will reply with port_id of a newly created port
 			ServerWindow *newwin	= new ServerWindow( frame, title,
-				look, feel, flags, this, sendPort, wkspaces, token);
+				look, feel, flags, this, sendPort, looperPort, wkspaces, token);
 			_winlist->AddItem( newwin );
 			//AddWindowToDesktop( newwin, workspace, ActiveScreen() );
 			
