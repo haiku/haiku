@@ -27,7 +27,10 @@ enum {
 	ETHER_ADDMULTI,							/* add multicast addr */
 	ETHER_REMMULTI,							/* rem multicast addr */
 	ETHER_SETPROMISC,						/* set promiscuous */
-	ETHER_GETFRAMESIZE						/* get frame size */
+	ETHER_GETFRAMESIZE,						/* get frame size */
+	ETHER_ADDTIMESTAMP,						/* (try to) add timestamps to packets (BONE ext) */
+	ETHER_HASIOVECS,						/* does the driver implement readv/writev ? (BONE ext) (bool *) */
+	ETHER_GETIFTYPE							/* get the IFT_ type of the interface (int *) */
 };
 
 
