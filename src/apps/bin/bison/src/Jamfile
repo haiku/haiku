@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin bison src ;
 
-SubDirCcFlags -DHAVE_CONFIG_H   -DPKGDATADIR=\'\"/share\"\' -DLOCALEDIR=\'\"/share/locale\"\' ;
+SubDirCcFlags -DHAVE_CONFIG_H   -DPKGDATADIR=\'\"/etc\"\' -DLOCALEDIR=\'\"/etc/locale\"\' ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

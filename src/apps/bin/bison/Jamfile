@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src apps bin bison ;
 
+SubInclude OBOS_TOP src apps bin bison data ;
 SubInclude OBOS_TOP src apps bin bison lib ;
-SubInclude OBOS_TOP src apps bin bison src ; 
+SubInclude OBOS_TOP src apps bin bison src ;
