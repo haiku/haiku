@@ -124,8 +124,9 @@ BMPTranslator::BMPTranslator()
 {
 	strcpy(fName, "BMP Images");
 	sprintf(fInfo, "BMP image translator v%d.%d.%d %s",
-		BMP_TRANSLATOR_VERSION / 100, (BMP_TRANSLATOR_VERSION / 10) % 10,
-		BMP_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(BMP_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((BMP_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(BMP_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------

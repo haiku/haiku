@@ -41,7 +41,7 @@
 #define BMP_RLE8_COMPRESS 1
 #define BMP_RLE4_COMPRESS 2
 
-#define BMP_TRANSLATOR_VERSION 100
+#define BMP_TRANSLATOR_VERSION 0x100
 #define BMP_IN_QUALITY 1.0
 	// high in quality becuase this code supports all BMP features
 #define BMP_IN_CAPABILITY 0.8

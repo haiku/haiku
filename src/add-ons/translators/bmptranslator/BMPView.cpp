@@ -102,17 +102,11 @@ BMPView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		BMP_TRANSLATOR_VERSION / 100, (BMP_TRANSLATOR_VERSION / 10) % 10,
-		BMP_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(BMP_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((BMP_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(BMP_TRANSLATOR_VERSION & 0xf), __DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
-/*	char copyright[] = "© 2002 OpenBeOS Project";
-	DrawString(copyright, BPoint(xbold, yplain * 2 + ybold));
-	
-	char becopyright[] = "Portions Copyright 1991-1999, Be Incorporated.";
-	DrawString(becopyright, BPoint(xbold, yplain * 4 + ybold));
-	char allrights[] = "All rights reserved.";
-	DrawString(allrights, BPoint(xbold, yplain * 5 + ybold));
-*/	
+
 	char writtenby[] = "Written by the OBOS Translation Kit Team";
 	DrawString(writtenby, BPoint(xbold, yplain * 7 + ybold));
 }
