@@ -696,6 +696,8 @@ _kern_validate_move_partition(partition_id partitionID, off_t *newOffset,
 status_t
 _kern_validate_set_partition_name(partition_id partitionID, char *name)
 {
+	if (!name)
+		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -720,6 +722,8 @@ _kern_validate_set_partition_name(partition_id partitionID, char *name)
 status_t
 _kern_validate_set_partition_content_name(partition_id partitionID, char *name)
 {
+	if (!name)
+		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -772,7 +776,7 @@ _kern_validate_initialize_partition(partition_id partitionID,
 									const char *diskSystemName, char *name,
 									const char *parameters)
 {
-	if (!diskSystemName)
+	if (!diskSystemName || !name)
 		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
@@ -920,5 +924,105 @@ _kern_is_disk_device_modified(partition_id device)
 {
 	// not implemented
 	return false;
+}
+
+// _kern_defragment_partition
+status_t
+_kern_defragment_partition(partition_id partition)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_repair_partition
+status_t
+_kern_repair_partition(partition_id partition, bool checkOnly)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_resize_partition
+status_t
+_kern_resize_partition(partition_id partition, off_t size, bool resizeContents)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_move_partition
+status_t
+_kern_move_partition(partition_id partition, off_t newOffset, bool force)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_set_partition_name
+status_t
+_kern_set_partition_name(partition_id partition, const char *name)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_set_partition_content_name
+status_t
+_kern_set_partition_content_name(partition_id partition, const char *name)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_set_partition_type
+status_t
+_kern_set_partition_type(partition_id partition, const char *type)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_set_partition_parameters
+status_t
+_kern_set_partition_parameters(partition_id partition, const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_set_partition_content_parameters
+status_t
+_kern_set_partition_content_parameters(partition_id partition,
+									   const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_initialize_partition
+status_t
+_kern_initialize_partition(partition_id partition, const char *diskSystem,
+						   const char *name, const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_create_child_partition
+status_t
+_kern_create_child_partition(partition_id partition, off_t offset, off_t size,
+							 const char *type, const char *parameters,
+							 partition_id *child)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// _kern_delete_partition
+status_t
+_kern_delete_partition(partition_id partition)
+{
+	// not implemented
+	return B_ERROR;
 }
 

@@ -145,26 +145,29 @@ status_t _kern_commit_disk_device_modifications(partition_id deviceID,
 status_t _kern_cancel_disk_device_modifications(partition_id deviceID);
 bool _kern_is_disk_device_modified(partition_id deviceID);
 
-#if 0
+status_t _kern_defragment_partition(partition_id partition);
+status_t _kern_repair_partition(partition_id partition, bool checkOnly);
+status_t _kern_resize_partition(partition_id partition, off_t size,
+								bool resizeContents);
+status_t _kern_move_partition(partition_id partition, off_t newOffset,
+							  bool force);
+status_t _kern_set_partition_name(partition_id partition, const char *name);
+status_t _kern_set_partition_content_name(partition_id partition,
+										  const char *name);
+status_t _kern_set_partition_type(partition_id partition, const char *type);
+status_t _kern_set_partition_parameters(partition_id partition,
+										const char *parameters);
+status_t _kern_set_partition_content_parameters(partition_id partition,
+												const char *parameters);
+status_t _kern_initialize_partition(partition_id partition,
+									const char *diskSystem, const char *name,
+									const char *parameters);
+status_t _kern_create_child_partition(partition_id partition, off_t offset,
+								off_t size, const char *type,
+								const char *parameters, partition_id *child);
+status_t _kern_delete_partition(partition_id partition);
 
-status_t defragment_partition(partition_id partition);
-status_t repair_partition(partition_id partition, bool checkOnly);
-status_t resize_partition(partition_id partition, off_t size);
-status_t move_partition(partition_id partition, off_t offset);
-status_t set_partition_parameters(partition_id partition,
-								  const char *parameters,
-								  const char *contentParameters);
-status_t initialize_partition(partition_id partition, const char *diskSystem,
-							  const char *parameters);
-	// Note: There is also fs_initialize_volume(), which is not compatible
-	// with this function, for it is more general with respect to how the
-	// volume to be initialized is specified (though this might be solved
-	// by providing an API for registering files as disk devices), and more
-	// specific regarding the other parameters (flags and volumeName).
-status_t create_child_partition(partition_id partition, off_t offset,
-								off_t size, const char *parameters,
-								partition_id *child);
-status_t delete_partition(partition_id partition);
+#if 0
 
 // jobs
 status_t get_next_disk_device_job_info(user_disk_device_job_info *info,
