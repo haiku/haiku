@@ -250,6 +250,36 @@ draw_menu(Menu *menu)
 }
 
 
+static int32
+first_selectable_item(Menu *menu)
+{
+	int32 index = -1;
+	MenuItem *item;
+
+	while ((item = menu->ItemAt(++index)) != NULL) {
+		if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
+			break;
+	}
+
+	return index;
+}
+
+
+static int32
+last_selectable_item(Menu *menu)
+{
+	int32 index = menu->CountItems();
+	MenuItem *item;
+
+	while ((item = menu->ItemAt(--index)) != NULL) {
+		if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
+			break;
+	}
+
+	return index;
+}
+
+
 static void
 run_menu(Menu *menu)
 {
@@ -283,7 +313,7 @@ run_menu(Menu *menu)
 							break;
 					}
 					if (selected < 0)
-						selected = menu->CountItems() - 1;
+						selected = last_selectable_item(menu);
 					break;
 				case BIOS_KEY_DOWN:
 					while ((item = menu->ItemAt(++selected)) != NULL) {
@@ -291,7 +321,7 @@ run_menu(Menu *menu)
 							break;
 					}
 					if (selected >= menu->CountItems())
-						selected = 0;
+						selected = first_selectable_item(menu);
 					break;
 				case BIOS_KEY_PAGE_UP:
 					selected -= menu_height() - 1;
@@ -428,9 +458,12 @@ void
 platform_run_menu(Menu *menu)
 {
 	platform_switch_to_text_mode();
+	serial_disable();
+		// no serial output while we're playing on the console
 
 	run_menu(menu);
 
+	serial_enable();
 	platform_switch_to_logo();
 }
 
