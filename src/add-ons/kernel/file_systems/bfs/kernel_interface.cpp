@@ -1280,7 +1280,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 	if (status == B_OK)
 		transaction.Done();
 
-	if ((inode->Flags() & INODE_NO_CACHE) == 0) {
+	if (status == B_OK && (inode->Flags() & INODE_NO_CACHE) == 0) {
 		// uncached files don't cause notifications during access, and
 		// never want to write back any cached blocks
 
