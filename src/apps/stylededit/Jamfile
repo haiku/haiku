@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src apps stylededit ;
 
 AddResources StyledEdit :
-	StyledEdit.rsrc
+	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
 	;
 
 App StyledEdit : ColorMenuItem.cpp

@@ -12,7 +12,7 @@
          system version will be set for you. (it will)
    */            
 
-resource(1, "BEOS:APP_VERSION") #'APPV' array {
+resource app_version {
 	/* major, middle, and minor version */
 	(uint32) 1, (uint32) 0, (uint32) 0,
 	
@@ -30,8 +30,8 @@ resource(1, "BEOS:APP_VERSION") #'APPV' array {
 	   missing as well. */
 	   
 	/*-from start quote to end quote,the next line must be this long-*/
-	"R1.0.0d1","                                                      ",
-	
+	"R1.0.0d1                                                       ",
+
 	/* long info : Note that this must be exactly 256 characters, so if
 	   you add to the string, take away from the spaces.  If you use
 	   all the spaces up you must account for the extra null that is
@@ -40,9 +40,9 @@ resource(1, "BEOS:APP_VERSION") #'APPV' array {
 	   QuickRes.  BEOS:APP_VERSION should be 340 bytes long. */
 	   
 	/*-from start quote to end quote,the next line must be this long-*/
-	"OpenBeOS 1.0.0d1 ©2002 OpenBeOS Project.","                     ",
-	"                                                               ",
-	"                                                               ",
+	"OpenBeOS 1.0.0d1 ©2002 OpenBeOS Project                        "
+	"                                                                "
+	"                                                                "
 	"                                                               "
 	/*--lines that don't have a comma in them should be this long--*/
 	
