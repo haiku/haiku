@@ -62,5 +62,6 @@ const uint32 TEXT_CHANGED				='TEch';
 // file panel constants
 const uint32 OPEN_AS_ENCODING			='FPoe';
 const uint32 SAVE_AS_ENCODING			='FPse';
+const uint32 SAVE_THEN_QUIT				='FPsq';
 
 #endif // CONSTANTS_H

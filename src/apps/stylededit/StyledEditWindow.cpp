@@ -303,6 +303,12 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		case B_SAVE_REQUESTED:
 			Save(message);
 		break;
+		case SAVE_THEN_QUIT:
+			if (Save(message) == B_OK) {
+				BAutolock lock(this);
+				Quit();
+			}
+		break;		
 		case MENU_REVERT:
 			RevertToSaved();
 		break;
@@ -764,10 +770,10 @@ StyledEditWindow::QuitRequested()
 
 	BAlert *saveAlert;
 	BString alertText;
-	alertText.SetTo("Save changes to the document ");
+	alertText.SetTo("Save changes to the document \"");
 	alertText<< Title();
-	alertText<<"? ";
-	saveAlert= new BAlert("savealert",alertText.String(), "Cancel", "Don't save","Save",
+	alertText<<"\"? ";
+	saveAlert= new BAlert("savealert",alertText.String(), "Cancel", "Don't Save","Save",
 		B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
 	saveAlert->SetShortcut(0, B_ESCAPE);
 	saveAlert->SetShortcut(1,'d');
@@ -779,9 +785,11 @@ StyledEditWindow::QuitRequested()
 	} else if(buttonIndex==1) { // "don't save": just close the window
 		return true;
 	} else if(!fSaveMessage) { //save as
-		return SaveAs();
+		BMessage * message = new BMessage(SAVE_THEN_QUIT);
+		SaveAs(message);
+		return false;
 	} else {
-		return (Save(fSaveMessage) == B_OK);
+		return (Save() == B_OK);
 	}
 			
 }/***QuitRequested()***/
@@ -862,7 +870,7 @@ StyledEditWindow::Save(BMessage *message)
 } /***Save()***/
 
 status_t
-StyledEditWindow::SaveAs()
+StyledEditWindow::SaveAs(BMessage *message)
 {
 	if (fSavePanel == 0) {
 		entry_ref * directory = 0;
@@ -910,6 +918,9 @@ StyledEditWindow::SaveAs()
 		if (lock.IsLocked()) {
 			fSavePanelTextView->SetText(Title());
 		}
+	}
+	if (message != 0) {
+		fSavePanel->SetMessage(message);
 	}
 	fSavePanel->Show();
 	return B_OK;

@@ -24,8 +24,8 @@ public:
 	virtual void 	MessageReceived(BMessage *message);
 	virtual void	MenusBeginning();
 	
-	status_t 		Save(BMessage *message);
-	status_t		SaveAs();
+	status_t 		Save(BMessage *message = 0);
+	status_t		SaveAs(BMessage *message = 0);
 	void			OpenFile(entry_ref *ref); 
 	status_t		PageSetup(const char *documentname);
 	void			Print(const char *documentname);
