@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src add-ons print transports shared ;
 
-UsePrivateHeaders net ;
-
 SetupObjectsDir ;
+
+ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET ;
 
 Objects
 	DbgMsg.cpp
@@ -10,4 +10,5 @@ Objects
 	SocketStream1.cpp
 	SocketStream2.cpp
 ;
+
 

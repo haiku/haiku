@@ -2,8 +2,6 @@ SubDir OBOS_TOP src add-ons print transports lpr ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
-UsePrivateHeaders net ;
-
 Addon LPR
 	: print transport
 	: Lpr.cpp
@@ -21,5 +19,5 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs LPR : be net stdc++.r4 ;
+LinkSharedOSLibs LPR : be libsocket.so libbind.so stdc++.r4 ;
 

@@ -2,10 +2,14 @@
 // Y.Takagi
 
 #ifdef WIN32
-#include <winsock.h>
+  #include <winsock.h>
 #else
-#include <net/socket.h>
-#include <net/netdb.h>
+  #include <net/socket.h>
+  #include <net/netdb.h>
+  #ifdef HAVE_ARPA_INET
+	// inet_addr() is not defined in netdb.h anymore under BONE & sooner
+    #include <arpa/inet.h>	
+  #endif
 #endif	// WIN32
 
 #include <cstdio>

@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src add-ons print transports ipp ;
 
-UsePrivateHeaders net ;
-
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
 Addon IPP
@@ -24,5 +22,5 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs IPP : be net stdc++.r4  ;
+LinkSharedOSLibs IPP : be libsocket.so libbind.so stdc++.r4  ;
 
