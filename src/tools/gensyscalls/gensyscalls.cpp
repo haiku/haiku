@@ -15,18 +15,20 @@ extern "C" gensyscall_syscall_info *gensyscall_get_infos(int *count);
 // usage
 const char *kUsage =
 "Usage: gensyscalls [ -c <calls> ] [ -d <dispatcher> ] [ -n <numbers> ]\n"
+"                   [ -t <table> ] [ -s <strace> ]\n"
 "\n"
-"The command generates a piece of assembly source file that defines the\n"
-"actual syscalls and a piece of C source (cases of a switch statement) for"
-"the kernel syscall dispatcher. Either file is to be included from a"
-"respective skeleton source file.\n"
+"The command is able to generate several syscalls related source files.\n"
 "\n"
 "  <calls>                - Output: The assembly source file implementing the\n"
-"                           actual syscalls."
+"                           actual syscalls.\n"
 "  <dispatcher>           - Output: The C source file to be included by the\n"
 "                           syscall dispatcher source file.\n"
 "  <numbers>              - Output: The C/assembly include files defining the\n"
-"                           syscall numbers.\n";
+"                           syscall numbers.\n"
+"  <table>                - Output: A C source file containing an array with\n"
+"                           infos about the syscalls\n"
+"  <strace>               - Output: A C source file for strace support.\n"
+;
 
 // print_usage
 static
@@ -50,6 +52,8 @@ public:
 		const char *syscallsFile = NULL;
 		const char *dispatcherFile = NULL;
 		const char *numbersFile = NULL;
+		const char *tableFile = NULL;
+		const char *straceFile = NULL;
 		for (int argi = 1; argi < argc; argi++) {
 			string arg(argv[argi]);
 			if (arg == "-h" || arg == "--help") {
@@ -73,6 +77,18 @@ public:
 					return 1;
 				}
 				numbersFile = argv[++argi];
+			} else if (arg == "-t") {
+				if (argi + 1 >= argc) {
+					print_usage(true);
+					return 1;
+				}
+				tableFile = argv[++argi];
+			} else if (arg == "-s") {
+				if (argi + 1 >= argc) {
+					print_usage(true);
+					return 1;
+				}
+				straceFile = argv[++argi];
 			} else {
 				print_usage(true);
 				return 1;
@@ -80,7 +96,8 @@ public:
 		}
 		fSyscallInfos = gensyscall_get_infos(&fSyscallCount);
 		_UpdateSyscallInfos();
-		if (!syscallsFile && !dispatcherFile && !numbersFile) {
+		if (!syscallsFile && !dispatcherFile && !numbersFile && !tableFile
+			&& !straceFile) {
 			printf("Found %d syscalls.\n", fSyscallCount);
 			return 0;
 		}
@@ -91,6 +108,10 @@ public:
 			_WriteDispatcherFile(dispatcherFile);
 		if (numbersFile)
 			_WriteNumbersFile(numbersFile);
+		if (tableFile)
+			_WriteTableFile(tableFile);
+		if (straceFile)
+			_WriteSTraceFile(straceFile);
 		return 0;
 	}
 
@@ -182,6 +203,107 @@ public:
 				defineName += toupper(name[k]);
 			file << "#define SYSCALL_" << defineName << " " << i << endl;
 		}
+	}
+
+	void _WriteTableFile(const char *filename)
+	{
+		// open the syscall table output file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw IOException(string("Failed to open `") + filename + "'.");
+
+		// output syscall count
+		file << "const int kSyscallCount = " << fSyscallCount << ";" << endl;
+		file << endl;
+
+		// syscall infos array preamble
+		file << "const syscall_info kSyscallInfos[] = {" << endl;
+
+		// the syscall infos
+		for (int i = 0; i < fSyscallCount; i++) {
+			const gensyscall_syscall_info &syscall = fSyscallInfos[i];
+
+			// get the parameter size
+			int paramSize = 0;
+			if (syscall.parameter_count > 0) {
+				const gensyscall_parameter_info &lastParam
+					= syscall.parameters[syscall.parameter_count - 1];
+				paramSize = lastParam.offset + lastParam.actual_size;
+			}
+
+			// output the info for the syscall
+			file << "\t{ " << syscall.kernel_name << ", "
+				<< paramSize << " }," << endl;
+		}
+
+		// syscall infos array end
+		file << "};" << endl;
+	}
+
+	void _WriteSTraceFile(const char *filename)
+	{
+		// open the syscall table output file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw IOException(string("Failed to open `") + filename + "'.");
+
+		// the file defines a single function get_syscalls
+		file << "void" << endl
+			<< "GET_SYSCALLS(vector<Syscall*> &syscalls)" << endl
+			<< "{" << endl
+			<< "\tSyscall *syscall;" << endl
+			<< "\tTypeHandler *handler;" << endl
+			<< "(void)syscall;" << endl
+			<< "(void)handler;" << endl;
+
+		int32 chunkSize = (fSyscallCount + 19) / 20;
+		
+		// iterate through the syscalls
+		for (int i = 0; i < fSyscallCount; i++) {
+			const gensyscall_syscall_info &syscall = fSyscallInfos[i];
+
+			if (i % chunkSize == 0) {
+				// chunk end
+				file << endl;
+				if (i > 0)
+					file << "#endif" << endl;
+				// chunk begin
+				file << "#ifdef SYSCALLS_CHUNK_" << (i / chunkSize) << endl;
+			}
+
+			// spacing, comment
+			file << endl;
+			file << "\t// " << syscall.name << endl;
+
+			// create the return type handler
+			file << "\thandler = new TypeHandlerImpl<" << syscall.return_type
+				<< ">();" << endl;
+
+			// create the syscall
+			file << "\tsyscall = new Syscall(\"" << syscall.name << "\", "
+				<< "handler);" << endl;
+			file << "\tsyscalls.push_back(syscall);" << endl;
+
+			// add the parameters
+			for (int32 k = 0; k < syscall.parameter_count; k++) {
+				const gensyscall_parameter_info &parameter
+					= syscall.parameters[k];
+
+				// create the parameter type handler
+				file << "\thandler = new TypeHandlerImpl<"
+					<< parameter.type << ">();" << endl;
+
+				// add the parameter
+				file << "\tsyscall->AddParameter(\"" << parameter.name << "\", "
+					<< parameter.offset << ", handler);" << endl;
+			}
+		}
+
+		// last syscall chunk end
+		file << "#endif" << endl;
+
+		// function end
+		file << "}" << endl;
 	}
 
 	static string _GetPointerType(const char *type)
