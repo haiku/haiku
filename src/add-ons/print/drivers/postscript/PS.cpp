@@ -228,8 +228,14 @@ void PSDriver::jobStart()
 	writeSpoolString("%%%%Title: %s\n", getSpoolMetaData()->getDescription().c_str());	
 	writeSpoolString("%%%%Creator: %s\n", getSpoolMetaData()->getMimeType().c_str());
 	writeSpoolString("%%%%CreationDate: %s", getSpoolMetaData()->getCreationTime().c_str());
+	writeSpoolString("%%%%DocumentMedia: Plain %d %d white 0 ( )\n", getJobData()->getPaperRect().IntegerWidth(), getJobData()->getPaperRect().IntegerHeight());
 	writeSpoolString("%%%%Pages: (atend)\n");	
 	writeSpoolString("%%%%EndComments\n");
+	
+	writeSpoolString("%%%%BeginDefaults\n");
+	writeSpoolString("%%%%PageMedia: Plain\n");
+	writeSpoolString("%%%%EndDefaults\n");
+	
 	// setup CTM
 	writeSpoolString("%%%%BeginSetup\n");
 	// move origin from bottom left to top left
