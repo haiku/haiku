@@ -126,7 +126,7 @@ private:
 	};
 	void InitPatterns();
 	void RotatePatterns();
-	bool HasSelection() { return fbHasSelection; }
+	bool HasSelection() { return fHasSelection; }
 	void SetHasSelection(bool bHasSelection);
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
@@ -203,7 +203,7 @@ private:
 	bool fMakesSelection; // is a selection being made
 	BPoint fFirstPoint;   // first point in image space of selection
 	bool fAnimateSelection; // marching ants
-	bool fbHasSelection;  // is fSelectionRect valid 
+	bool fHasSelection;  // is fSelectionRect valid 
 	BRect fSelectionRect; // the current location of the selection rectangle
 	BRect fCopyFromRect;
 		// the portion of the background bitmap the selection is made from

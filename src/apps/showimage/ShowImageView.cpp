@@ -188,7 +188,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fDocumentIndex = 1;
 	fDocumentCount = 1;
 	fAnimateSelection = true;
-	fbHasSelection = false;
+	fHasSelection = false;
 	fShrinkToBounds = false;
 	fZoomToBounds = false;
 	fHasBorder = true;
@@ -1020,10 +1020,8 @@ ShowImageView::MoveImage()
 	fFirstPoint = point;
 	ScrollRestrictedBy(delta.x, delta.y);
 	// in case we miss MouseUp
-	if ((GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0) {
+	if ((GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0)
 		fMovesImage = false;
-		Invalidate();
-	}
 }
 
 uint32
@@ -1167,12 +1165,12 @@ ShowImageView::MouseDown(BPoint position)
 		SetMouseEventMask(B_POINTER_EVENTS);
 		fMovesImage = true;
 		fFirstPoint = ConvertToScreen(position);
-		Invalidate();
 	}
 }
 
 void
-ShowImageView::UpdateSelectionRect(BPoint point, bool final) {
+ShowImageView::UpdateSelectionRect(BPoint point, bool final)
+{
 	BRect oldSelection = fCopyFromRect;
 	point = ViewToImage(point);
 	ConstrainToImage(point);
@@ -1182,10 +1180,9 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final) {
 	fCopyFromRect.bottom = max(fFirstPoint.y, point.y);
 	fSelectionRect = fCopyFromRect;
 	if (final) {
-		// selection must contain a few pixels
-		if ((fCopyFromRect.Width()+1.0) * (fCopyFromRect.Height()+1.0) < 1) {
+		// selection must be at least 2 pixels wide or 2 pixels tall
+		if (fCopyFromRect.Width() < 1.0 && fCopyFromRect.Height() < 1.0)
 			SetHasSelection(false);
-		}
 	}
 	if (oldSelection != fCopyFromRect || !HasSelection()) {
 		BRect updateRect;
@@ -1214,10 +1211,8 @@ ShowImageView::MouseUp(BPoint point)
 		fMakesSelection = false;
 	} else if (fMovesImage) {
 		MoveImage();
-		if (fMovesImage) {
+		if (fMovesImage)
 			fMovesImage = false;
-			Invalidate();
-		}
 	}
 	AnimateSelection(true);
 }
@@ -1543,10 +1538,10 @@ void
 ShowImageView::SetHasSelection(bool bHasSelection)
 {
 	DeleteSelBitmap();
-	fbHasSelection = bHasSelection;
+	fHasSelection = bHasSelection;
 	
 	BMessage msg(MSG_SELECTION);
-	msg.AddBool("has_selection", fbHasSelection);
+	msg.AddBool("has_selection", fHasSelection);
 	BMessenger msgr(Window());
 	msgr.SendMessage(&msg);
 }
