@@ -83,7 +83,7 @@ jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	$BEOS_BIN $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS \
 	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA \
 	kernel_uname libnet.so dprintf null zero random \<driver\>tty \
-	\<driver\>config \
+	\<driver\>config timezone_files \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
 # create the image and the directory structure
@@ -198,7 +198,7 @@ cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos
 cp data/etc/profile $targetDir/beos/etc/
 cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
 cp -R distro/x86.R1/beos/etc $targetDir/beos/
-cp -R data/settings $targetDir/home/config/
+cp data/settings/kernel/drivers/kernel $targetDir/home/config/settings/kernel/drivers/
 ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir//home/config/settings/timezone
 
 
