@@ -3,6 +3,7 @@ SubDir OBOS_TOP src tests kernel boot loader ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
+UsePrivateHeaders [ FDirName shared ] ;
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
 
 # we need to redefine certain calls in the boot loader so that
