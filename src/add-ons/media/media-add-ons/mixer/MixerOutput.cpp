@@ -120,7 +120,7 @@ MixerOutput::AssignDefaultSources()
 		// we have only one phycial output channel, and use it as a mix of
 		// left, right, rear-left, rear-right, center and sub
 		TRACE("AssignDefaultSources: 1 channel setup\n");
-		fOutputChannelInfo[0].source_count = 6;
+		fOutputChannelInfo[0].source_count = 1;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
 		fOutputChannelInfo[0].source_gain[1] = 1.0;
@@ -133,11 +133,13 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[0].source_type[4] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[0].source_gain[5] = 0.6;
 		fOutputChannelInfo[0].source_type[5] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[0].source_gain[6] = 1.0;
+		fOutputChannelInfo[0].source_type[6] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 	} else if (count == 2 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT)) {
 		// we have have two phycial output channels
 		TRACE("AssignDefaultSources: 2 channel setup\n");
 		// left channel:
-		fOutputChannelInfo[0].source_count = 4;
+		fOutputChannelInfo[0].source_count = 5;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
 		fOutputChannelInfo[0].source_gain[1] = 0.8;
@@ -146,8 +148,10 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[0].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[0].source_gain[3] = 0.6;
 		fOutputChannelInfo[0].source_type[3] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[0].source_gain[4] = 1.0;
+		fOutputChannelInfo[0].source_type[4] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// right channel:
-		fOutputChannelInfo[1].source_count = 4;
+		fOutputChannelInfo[1].source_count = 5;
 		fOutputChannelInfo[1].source_gain[0] = 1.0;
 		fOutputChannelInfo[1].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_RIGHT);
 		fOutputChannelInfo[1].source_gain[1] = 0.8;
@@ -156,70 +160,102 @@ MixerOutput::AssignDefaultSources()
 		fOutputChannelInfo[1].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[1].source_gain[3] = 0.6;
 		fOutputChannelInfo[1].source_type[3] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[1].source_gain[4] = 1.0;
+		fOutputChannelInfo[1].source_type[4] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 	} else if (count == 4 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT)) {
 		TRACE("AssignDefaultSources: 4 channel setup\n");
 		// left channel:
-		fOutputChannelInfo[0].source_count = 3;
+		fOutputChannelInfo[0].source_count = 4;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
 		fOutputChannelInfo[0].source_gain[1] = 0.7;
 		fOutputChannelInfo[0].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[0].source_gain[2] = 0.6;
 		fOutputChannelInfo[0].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[0].source_gain[3] = 1.0;
+		fOutputChannelInfo[0].source_type[3] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// right channel:
-		fOutputChannelInfo[1].source_count = 3;
+		fOutputChannelInfo[1].source_count = 4;
 		fOutputChannelInfo[1].source_gain[0] = 1.0;
 		fOutputChannelInfo[1].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_RIGHT);
 		fOutputChannelInfo[1].source_gain[1] = 0.7;
 		fOutputChannelInfo[1].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[1].source_gain[2] = 0.6;
 		fOutputChannelInfo[1].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[1].source_gain[3] = 1.0;
+		fOutputChannelInfo[1].source_type[3] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// rear-left channel:
-		fOutputChannelInfo[2].source_count = 2;
+		fOutputChannelInfo[2].source_count = 3;
 		fOutputChannelInfo[2].source_gain[0] = 1.0;
 		fOutputChannelInfo[2].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_REARLEFT);
 		fOutputChannelInfo[2].source_gain[1] = 0.6;
 		fOutputChannelInfo[2].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[2].source_gain[2] = 0.9;
+		fOutputChannelInfo[2].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// rear-right channel:
-		fOutputChannelInfo[3].source_count = 2;
+		fOutputChannelInfo[3].source_count = 3;
 		fOutputChannelInfo[3].source_gain[0] = 1.0;
 		fOutputChannelInfo[3].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_REARRIGHT);
 		fOutputChannelInfo[3].source_gain[1] = 0.6;
 		fOutputChannelInfo[3].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[3].source_gain[2] = 0.9;
+		fOutputChannelInfo[3].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 	} else if (count == 5 && mask == (B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT | B_CHANNEL_CENTER)) {
 		TRACE("AssignDefaultSources: 5 channel setup\n");
 		// left channel:
-		fOutputChannelInfo[0].source_count = 2;
+		fOutputChannelInfo[0].source_count = 3;
 		fOutputChannelInfo[0].source_gain[0] = 1.0;
 		fOutputChannelInfo[0].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_LEFT);
 		fOutputChannelInfo[0].source_gain[1] = 0.6;
 		fOutputChannelInfo[0].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[0].source_gain[2] = 1.0;
+		fOutputChannelInfo[0].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// right channel:
-		fOutputChannelInfo[1].source_count = 2;
+		fOutputChannelInfo[1].source_count = 3;
 		fOutputChannelInfo[1].source_gain[0] = 1.0;
 		fOutputChannelInfo[1].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_RIGHT);
 		fOutputChannelInfo[1].source_gain[1] = 0.6;
 		fOutputChannelInfo[1].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[1].source_gain[2] = 1.0;
+		fOutputChannelInfo[1].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// rear-left channel:
-		fOutputChannelInfo[2].source_count = 2;
+		fOutputChannelInfo[2].source_count = 3;
 		fOutputChannelInfo[2].source_gain[0] = 1.0;
 		fOutputChannelInfo[2].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_REARLEFT);
 		fOutputChannelInfo[2].source_gain[1] = 0.6;
 		fOutputChannelInfo[2].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[2].source_gain[2] = 0.9;
+		fOutputChannelInfo[2].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// rear-right channel:
-		fOutputChannelInfo[3].source_count = 2;
+		fOutputChannelInfo[3].source_count = 3;
 		fOutputChannelInfo[3].source_gain[0] = 1.0;
 		fOutputChannelInfo[3].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_REARRIGHT);
 		fOutputChannelInfo[3].source_gain[1] = 0.6;
 		fOutputChannelInfo[3].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[3].source_gain[2] = 0.9;
+		fOutputChannelInfo[3].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 		// center channel:
-		fOutputChannelInfo[4].source_count = 2;
+		fOutputChannelInfo[4].source_count = 3;
 		fOutputChannelInfo[4].source_gain[0] = 1.0;
 		fOutputChannelInfo[4].source_type[0] = ChannelMaskToChannelType(B_CHANNEL_CENTER);
 		fOutputChannelInfo[4].source_gain[1] = 0.5;
 		fOutputChannelInfo[4].source_type[1] = ChannelMaskToChannelType(B_CHANNEL_SUB);
+		fOutputChannelInfo[4].source_gain[2] = 0.8;
+		fOutputChannelInfo[4].source_type[2] = ChannelMaskToChannelType(B_CHANNEL_MONO);
 	} else {
-		TRACE("AssignDefaultSources: no default setup\n");
+		TRACE("AssignDefaultSources: no default setup, adding mono channel to first two channels\n");
+		if (count >= 1) {
+			// this is not a left channel, but we add the mono channel anyway
+			fOutputChannelInfo[0].source_gain[fOutputChannelInfo[0].source_count] = 1.0;
+			fOutputChannelInfo[0].source_type[fOutputChannelInfo[0].source_count] = ChannelMaskToChannelType(B_CHANNEL_MONO);
+			fOutputChannelInfo[0].source_count++;
+		}
+		if (count >= 2) {
+			// this is not a right channel, but we add the mono channel anyway
+			fOutputChannelInfo[1].source_gain[fOutputChannelInfo[1].source_count] = 1.0;
+			fOutputChannelInfo[1].source_type[fOutputChannelInfo[1].source_count] = ChannelMaskToChannelType(B_CHANNEL_MONO);
+			fOutputChannelInfo[1].source_count++;
+		}
 	}
 
 	for (int i = 0; i < fOutputChannelCount; i++) {

@@ -6,6 +6,7 @@
 #include "MixerUtils.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
+#include "MixerCore.h"
 #include "debug.h"
 
 const char *StringForFormat(char *str, const media_format & format);
@@ -31,13 +32,15 @@ StringForChannelMask(char *str, uint32 mask)
 	DECODE(B_CHANNEL_BACK_CENTER, "Back-Center");
 	DECODE(B_CHANNEL_SIDE_LEFT, "Side-Left");
 	DECODE(B_CHANNEL_SIDE_RIGHT, "Side-Right");
-	DECODE(B_CHANNEL_TOP_CENTER, "Top-Center");
+// XXX disabled for mono workaround
+//	DECODE(B_CHANNEL_TOP_CENTER, "Top-Center");
 	DECODE(B_CHANNEL_TOP_FRONT_LEFT, "Top-Front-Left");
 	DECODE(B_CHANNEL_TOP_FRONT_CENTER, "Top-Front-Center");
 	DECODE(B_CHANNEL_TOP_FRONT_RIGHT, "Top-Front-Right");
 	DECODE(B_CHANNEL_TOP_BACK_LEFT, "Top-Back-Left");
 	DECODE(B_CHANNEL_TOP_BACK_CENTER, "Top-Back-Center");
 	DECODE(B_CHANNEL_TOP_BACK_RIGHT, "Top-Back-Right");
+	DECODE(B_CHANNEL_MONO, "Mono");
 	#undef DECODE
 	if (mask)
 		sprintf(str + strlen(str), "0x%08X", mask);

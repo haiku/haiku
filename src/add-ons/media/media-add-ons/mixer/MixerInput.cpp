@@ -311,13 +311,13 @@ MixerInput::UpdateInputChannelDestinationMask()
 			
 		case 2:
 			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
 			}
 			break;
 			
 		default:
 			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_MONO;
 			}
 			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
 				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;

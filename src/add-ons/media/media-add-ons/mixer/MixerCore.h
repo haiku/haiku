@@ -9,8 +9,11 @@ class MixerOutput;
 class Resampler;
 
 // The number of "enum media_multi_channels" types from MediaDefs.h
-// XXX should be 18, currently limited to 9
-#define MAX_CHANNEL_TYPES	9
+// XXX should be 18, but limited to 12 here
+#define MAX_CHANNEL_TYPES	12
+// XXX using a dedicated mono channel, this should be channel type 31
+//     but for now we redefine type 12 
+#define B_CHANNEL_MONO		B_CHANNEL_TOP_CENTER
 
 class MixerCore
 {
