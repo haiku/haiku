@@ -26,6 +26,8 @@
 //  
 //------------------------------------------------------------------------------
 #include <View.h>
+#include "DisplayDriver.h"
+#include "Layer.h"
 #include "RootLayer.h"
 #include "Desktop.h"
 #include "PatternHandler.h" // for pattern_union

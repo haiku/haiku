@@ -29,6 +29,9 @@
 
 #include <OS.h>
 #include <String.h>
+
+#include <Session.h>
+
 class AppServer;
 class BMessage;
 class PortLink;
@@ -86,6 +89,8 @@ protected:
 	bool _cursorhidden;
 	bool _isactive;
 	int32 _handlertoken;
+// ADI:
+	BSession		*ses;
 };
 
 #endif

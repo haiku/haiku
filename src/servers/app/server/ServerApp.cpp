@@ -28,6 +28,9 @@
 #include <List.h>
 #include <String.h>
 #include <PortLink.h>
+
+#include <Session.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <ScrollBar.h>
@@ -136,6 +139,10 @@ ServerApp::~ServerApp(void)
 	_piclist->MakeEmpty();
 	delete _piclist;
 
+// ADI:
+	delete	ses;
+	ses		= NULL;
+
 	delete _applink;
 	_applink=NULL;
 	if(_appcursor)
@@ -218,27 +225,14 @@ int32 ServerApp::MonitorApp(void *data)
 	ServerApp *app=(ServerApp *)data;
 
 	// Message-dispatching loop for the ServerApp
-	int32 msgcode;
-	int8 *msgbuffer=NULL;
-	ssize_t buffersize,bytesread;
+	int32			msgCode;
+	
+	app->ses = new BSession( app->_receiver, 0L );
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(app->_receiver);
-		
-		if(buffersize>0)
-		{
-			// buffers are PortLink messages. Allocate necessary buffer and
-			// we'll cast it as a BMessage.
-			msgbuffer=new int8[buffersize];
-			bytesread=read_port(app->_receiver,&msgcode,msgbuffer,buffersize);
-		}
-		else
-			bytesread=read_port(app->_receiver,&msgcode,NULL,0);
-		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
-		{
-			switch(msgcode)
-			{
+		if ( app->ses->ReadInt32( &msgCode ) != B_BAD_PORT_ID ){
+			switch (msgCode){
 				case AS_QUIT_APP:
 				{
 					#ifdef DEBUG_SERVERAPP
@@ -268,7 +262,7 @@ int32 ServerApp::MonitorApp(void *data)
 					}
 					break;
 				}
-
+				
 				case B_QUIT_REQUESTED:
 				{
 					// Our BApplication sent us this message when it quit.
@@ -287,19 +281,15 @@ int32 ServerApp::MonitorApp(void *data)
 				}
 				default:
 				{
-					app->_DispatchMessage(msgcode, msgbuffer);
+					#ifdef DEBUG_SERVERAPP
+						printf("ServerApp %s: Got a Message to dispatch\n",app->_signature.String());
+					#endif
+					app->_DispatchMessage(msgCode, NULL);
 					break;
 				}
-			}
-
-		}
-	
-		if(buffersize>0)
-			delete msgbuffer;
-
-		if(msgcode==B_QUIT_REQUESTED)
-			break;
-	}
+			} // switch
+		} // if 
+	} // for 
 
 	exit_thread(0);
 	return 0;
@@ -335,48 +325,51 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// Create the ServerWindow to node monitor a new OBWindow
 			
 			// Attached data:
-			// 1) port_id reply port
 			// 2) BRect window frame
 			// 3) uint32 window look
 			// 4) uint32 window feel
 			// 5) uint32 window flags
-			// 6) port_id window's message port
-			// 7) uint32 workspace index
-			// 8) int32 BHandler token of the window
+			// 6) uint32 workspace index
+			// 7) int32 BHandler token of the window
+			// 8) port_id window's message port
 			// 9) const char * title
 
-			// Find the necessary data
-			port_id reply_port=*((port_id*)index); index+=sizeof(port_id);
-			BRect rect=*((BRect*)index); index+=sizeof(BRect);
+			BRect		frame;
+			uint32		look;
+			uint32		feel;
+			uint32		flags;
+			uint32		wkspaces;
+			int32		token;
+			port_id		sendPort;
+			char		*title;
+			
+			ses->ReadRect( &frame );
+			ses->ReadInt32( (int32*)&look );
+			ses->ReadInt32( (int32*)&feel );
+			ses->ReadInt32( (int32*)&flags );
+			ses->ReadInt32( (int32*)&wkspaces );
+			ses->ReadInt32( &token );
+			ses->ReadData( &sendPort, sizeof(port_id) );
+			title		= ses->ReadString();
 
-			uint32 winlook=*((uint32*)index); index+=sizeof(uint32);
-			uint32 winfeel=*((uint32*)index); index+=sizeof(uint32);
-			uint32 winflags=*((uint32*)index); index+=sizeof(uint32);
+			#ifdef DEBUG_SERVERAPP
+				printf("ServerApp %s: Got 'New Window' message, trying to do smething...\n");
+			#endif
 
-			port_id win_port=*((port_id*)index); index+=sizeof(port_id);
-			int32 htoken=*((int32*)index); index+=sizeof(int32);
-			uint32 workspace=*((uint32*)index); index+=sizeof(uint32);
-
-			// Create the ServerWindow object for this window
-			ServerWindow *newwin=new ServerWindow(rect,(const char *)index,
-				winlook, winfeel, winflags,this,win_port,workspace,htoken);
-			_winlist->AddItem(newwin);
-			AddWindowToDesktop(newwin,workspace,ActiveScreen());
+				// ServerWindow constructor will reply with port_id of a newly created port
+			ServerWindow *newwin	= new ServerWindow( frame, title,
+				look, feel, flags, this, sendPort, wkspaces, token);
+			_winlist->AddItem( newwin );
+			//AddWindowToDesktop( newwin, workspace, ActiveScreen() );
+			
 
 			#ifdef DEBUG_SERVERAPP
 				printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					_signature.String(),(const char *)index,rect.left,rect.top,rect.right,rect.bottom);
+					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom);
 			#endif
+			
+			delete	title;
 
-			// Window looper is waiting for our reply. Send back the
-			// ServerWindow's message port
-			PortLink *replylink=new PortLink(reply_port);
-			replylink->SetOpCode(AS_SET_SERVER_PORT);
-			replylink->Attach<int32>(newwin->_receiver);
-			replylink->Attach<int32>(newwin->_token);
-			replylink->Flush();
-
-			delete replylink;
 			break;
 		}
 		case AS_DELETE_WINDOW:

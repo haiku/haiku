@@ -32,11 +32,13 @@
 #include <Menu.h>
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
+//#include "WinBorder.h"
 
 class ServerWindow;
 class Screen;
 class DisplayDriver;
 class Layer;
+class WinBorder;
 
 void InitDesktop(void);
 void ShutdownDesktop(void);
@@ -57,6 +59,7 @@ status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick=true);
 
 void AddWindowToDesktop(ServerWindow *win, int32 workspace, screen_id screen);
 void RemoveWindowFromDesktop(ServerWindow *win);
+WinBorder* WindowContainsPoint( BPoint pt );
 ServerWindow *GetActiveWindow(void);
 void SetActiveWindow(ServerWindow *win);
 Layer *GetRootLayer(int32 workspace, screen_id screen);

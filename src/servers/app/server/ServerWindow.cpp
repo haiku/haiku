@@ -32,6 +32,7 @@
 #include <PortLink.h>
 #include "AppServer.h"
 #include "Layer.h"
+#include "RootLayer.h"
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "ServerProtocol.h"
@@ -40,6 +41,7 @@
 #include "DesktopClasses.h"
 #include "TokenHandler.h"
 #include "Utils.h"
+#include "DisplayDriver.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
@@ -109,12 +111,18 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 
 	// _sender is the monitored window's event port
 	_sender=winport;
-	_winlink=new PortLink(_sender);
 
+	_winlink=new PortLink(_sender);
 	_applink= (winapp)? new PortLink(winapp->_receiver) : NULL;
 	
 	// _receiver is the port to which the app sends messages for the server
 	_receiver=create_port(30,_title->String());
+
+
+	ses		= new BSession( _receiver, _sender );
+		// Send a reply to our window - it is expecting _receiver port.
+	ses->WriteData( &_receiver, sizeof(port_id) );
+	ses->Sync();
 	
 	_active=false;
 
@@ -151,6 +159,10 @@ ServerWindow::~ServerWindow(void)
 		delete _title;
 		delete _winlink;
 		delete _winborder;
+		
+
+		delete	ses;
+		ses		= NULL;
 	}
 	kill_thread(_monitorthread);
 }
@@ -390,9 +402,9 @@ bool ServerWindow::IsLocked(void)
 	return _locker.IsLocked();
 }
 
-void ServerWindow::DispatchMessage(PortMessage *msg)
+void ServerWindow::DispatchMessage( int32 code )
 {
-	switch(msg->Code())
+	switch( code )
 	{
 		case AS_LAYER_CREATE:
 		{
@@ -459,6 +471,9 @@ void ServerWindow::DispatchMessage(PortMessage *msg)
 		}
 		case AS_SHOW_WINDOW:
 		{
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message AS_SHOW\n",_title->String());
+			#endif
 			Show();
 			break;
 		}
@@ -629,7 +644,7 @@ void ServerWindow::DispatchMessage(PortMessage *msg)
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(),msg->Code()-SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %lx\n",_title->String(), code - SERVER_TRUE);
 			break;
 		}
 	}
@@ -1181,23 +1196,17 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 */
 int32 ServerWindow::MonitorWin(void *data)
 {
-	ServerWindow *win=(ServerWindow *)data;
-	PortMessage msg;
-	int32 msgstat;
-	
-	int8 *msgbuffer=NULL;
-	ssize_t buffersize;
+	ServerWindow 	*win = (ServerWindow *)data;
+	status_t		rv;
+	int32			code;
 	
 	for(;;)
 	{
-		msgstat=msg.ReadFromPort(win->_receiver);
+		rv = win->ses->ReadInt32( &code );
 		
-		if(msgstat==B_OK)
-		{
-			switch(msg.Code())
-			{
-				case B_QUIT_REQUESTED:
-				{
+		if ( rv != B_BAD_PORT_ID ){
+			switch( code ){
+				case B_QUIT_REQUESTED:{
 					#ifdef DEBUG_SERVERWINDOW
 						printf("ServerWindow %s received Quit request\n",win->Title());
 					#endif
@@ -1208,20 +1217,18 @@ int32 ServerWindow::MonitorWin(void *data)
 					win->_applink->Flush();
 					break;
 				}
-				case AS_BEGIN_UPDATE:
-				{
-					win->DispatchGraphicsMessage(buffersize,msgbuffer);
+				default:{
+					win->DispatchMessage( code );
 					break;
 				}
-				default:
-//					win->DispatchMessage(msgcode,msgbuffer);
-					win->DispatchMessage(&msg);
-					break;
 			}
-
+		}
+		else{
+			exit_thread(1);
+			return 1;
 		}
 	
-		if(msg.Code()==B_QUIT_REQUESTED)
+		if( code == B_QUIT_REQUESTED )
 			break;
 	}
 
@@ -1279,11 +1286,10 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			BPoint pt(x,y);
 			
 			// If we have clicked on a window, 			
-			active_winborder=_winborder=(WinBorder*)root->GetChildAt(pt);
+			active_winborder = _winborder = WindowContainsPoint(pt);
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
-//				_winborder->MouseDown(buffer);
 				_winborder->MouseDown((int8*)msg->Buffer());
 			}
 			break;
@@ -1311,7 +1317,7 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 			set_is_sliding_tab(false);
 			set_is_moving_window(false);
 			set_is_resizing_window(false);
-			_winborder=(WinBorder*)root->GetChildAt(pt);
+			_winborder	= WindowContainsPoint(pt);
 			active_winborder=NULL;
 			if(_winborder)
 			{
@@ -1319,7 +1325,6 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
-//				_winborder->MouseUp(buffer);
 				_winborder->MouseUp((int8*)msg->Buffer());
 			}
 			break;
@@ -1345,16 +1350,14 @@ void ServerWindow::HandleMouseEvent(PortMessage *msg)
 
 			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
-//				active_winborder->MouseMoved(buffer);
 				active_winborder->MouseMoved((int8*)msg->Buffer());
 			}
 			else
 			{
-				_winborder=(WinBorder*)root->GetChildAt(pt);
+				_winborder = WindowContainsPoint(pt);
 				if(_winborder)
 				{
 					mousewin=_winborder->Window();
-//					_winborder->MouseMoved(buffer);
 					_winborder->MouseMoved((int8*)msg->Buffer());
 				}
 			}				

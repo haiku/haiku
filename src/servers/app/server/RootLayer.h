@@ -28,8 +28,9 @@
 #ifndef _ROOTLAYER_H_
 #define _ROOTLAYER_H_
 
-#include "DisplayDriver.h"
-#include "Layer.h"
+class DisplayDriver;
+class RGBColor;
+class Layer;
 
 /*!
 	\class RootLayer RootLayer.h

@@ -470,10 +470,10 @@ bool Layer::IsDirty(void) const
 */
 void Layer::UpdateIfNeeded(bool force_update)
 {
-	Layer *child;
-	
 	if(IsHidden())
 		return;
+
+	Layer *child;
 	
 	if(force_update)
 	{
@@ -535,27 +535,33 @@ void Layer::Show(void)
 	if(_hidecount>0)
 		return;
 
-	BRegion *reg=new BRegion(ConvertToParent(_visible));
-	_parent->_visible->Exclude(reg);
-	delete reg;
+	if( _parent ){
+		BRegion *reg=new BRegion(ConvertToParent(_visible));
+		_parent->_visible->Exclude(reg);
+		delete reg;
+		_parent->_is_dirty=true;
+	}
 	_is_dirty=true;
-	_parent->_is_dirty=true;
-	
-	Layer *sibling;
-	for (sibling=_parent->_bottomchild; sibling!=NULL; sibling=sibling->_uppersibling)
-	{
-		if(TestRectIntersection(sibling->_frame,_frame)) 
-			sibling->MarkModified(_frame.OffsetByCopy(-sibling->_frame.left,-sibling->_frame.top));
+
+	if( _parent ){
+		Layer *sibling;
+		for (sibling=_parent->_bottomchild; sibling!=NULL; sibling=sibling->_uppersibling)
+		{
+			if(TestRectIntersection(sibling->_frame,_frame)) 
+				sibling->MarkModified(_frame.OffsetByCopy(-sibling->_frame.left,-sibling->_frame.top));
+		}
 	}
 
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
 		child->Show();
 
-	if(_parent)
+	if(_parent){
 		_parent->RebuildRegions(true);
+		_parent->UpdateIfNeeded();
+	}
 	
-	_parent->UpdateIfNeeded();
+	UpdateIfNeeded();
 }
 
 //! Hide the layer. Operates just like the BView call with the same name

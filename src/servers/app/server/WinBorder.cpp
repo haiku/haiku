@@ -41,7 +41,7 @@
 
 //#define DEBUG_WINBORDER
 //#define DEBUG_WINBORDER_MOUSE
-//#define DEBUG_WINBORDER_CLICK
+#define DEBUG_WINBORDER_CLICK
 
 #ifdef DEBUG_WINBORDER
 #include <stdio.h>
@@ -84,8 +84,6 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_mbuttons=0;
 	_kmodifiers=0;
 	_win=win;
-	if(_win)
-		_frame=_win->_frame;
 
 	_mousepos.Set(0,0);
 	_update=false;
@@ -95,6 +93,13 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_vresizewin=false;
 	_driver=GetGfxDriver(ActiveScreen());
 	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
+		// WinBorder must also include the right/left/top/bottom Decorator'
+		//   rects - given by _decorator::GetBorderRect() - to be able to draw the borders
+	_frame		= _decorator->GetBorderRect();
+	_visible->Set( _frame );
+	_full->Set( _frame );
+	_invalid->Set( _frame );
+
 	_decorator->SetDriver(_driver);
 	_decorator->SetTitle(name);
 	
@@ -296,23 +301,28 @@ printf("ClickMove: Drag\n");
 		{
 			BRect oldmoveframe=_win->_frame;
 			_clientframe.OffsetBy(pt);
-	
+
 			_win->Lock();
 			_win->_frame.OffsetBy(dx,dy);
 			_win->Unlock();
-			
+
 			lock_layers();
 			BRegion *reg=_decorator->GetFootprint();
-			_driver->CopyRegion(reg,_win->_frame.LeftTop());
-			
-			BRegion reg2(oldmoveframe);
-			MoveBy(dx,dy);
+		// TODO: we get an error here!!! - this method is untested
+			//_driver->CopyRegion(reg,_win->_frame.LeftTop());
+
 			_decorator->MoveBy(BPoint(dx, dy));
+
+			MoveBy(dx,dy);
+			
+				// ADI: what do those do???
+			BRegion reg2(oldmoveframe);			
 			reg->OffsetBy((int32)dx, (int32)dy);
 			reg2.Exclude(reg);
+			
 			_parent->RebuildRegions();
 			_parent->RequestDraw();
-			
+
 			delete reg;
 			unlock_layers();
 		}

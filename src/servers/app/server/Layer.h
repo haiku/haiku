@@ -35,11 +35,13 @@
 #include <OS.h>
 #include <Locker.h>
 #include "LayerData.h"
+#include "DesktopClasses.h"
 
 class ServerWindow;
 class PortLink;
 class RootLayer;
 class WinBorder;
+class Screen;
 
 /*!
 	\class Layer Layer.h
@@ -106,6 +108,7 @@ public:
 protected:
 	friend class RootLayer;
 	friend class WinBorder;
+	friend class Screen;
 
 	
 	BRect _frame;

@@ -33,7 +33,11 @@
 #include "TokenHandler.h"
 #include "ServerWindow.h"
 #include "WinBorder.h"
+#include "RootLayer.h"
 #include "Desktop.h"
+#include "DisplayDriver.h"
+#include "Decorator.h"
+
 
 //#define DEBUG_WORKSPACE
 //#define DEBUG_SCREEN
@@ -442,6 +446,26 @@ printf("Screen::RemoveWindow(%s)\n",win?win->GetTitle():"NULL");
 		return;
 	
 	win->_winborder->RemoveSelf();
+}
+/*!
+	\brief Returns the WinBorder taht contains the point
+	\param	The point
+	\return The WinBorder that contains the point
+*/
+WinBorder* Screen::GetWindowAt( BPoint pt ){
+	WinBorder	*wb;
+	Layer 	*rl = GetRootLayer();
+	Layer	*child;
+	for(child = rl->_bottomchild; child!=NULL; child = child->_uppersibling)
+	{
+		if(child->_hidecount>0)
+			continue;
+		wb		= dynamic_cast<WinBorder*>( child );
+		if (wb)
+			if(wb->GetDecorator()->GetFootprint()->Contains(pt))
+				return wb;
+	}
+	return NULL;
 }
 
 /*!

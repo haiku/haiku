@@ -37,6 +37,8 @@
 
 #define USE_VIEW_FILL_HACK
 
+//#define DEBUG_DECORATOR
+
 #ifdef DEBUG_DECORATOR
 #include <stdio.h>
 #endif
@@ -171,16 +173,7 @@ printf("DefaultDecorator: Do Layout\n");
 #endif
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
-	
-	// Current version simply makes everything fit inside the rect
-	// instead of building around it. This will change.
-	
-	_tabrect=_frame;
-	_resizerect=_frame;
-	_borderrect=_frame;
-	_closerect=_frame;
 
-	
 	switch(GetLook())
 	{
 		case B_FLOATING_WINDOW_LOOK:
@@ -194,11 +187,98 @@ printf("DefaultDecorator: Do Layout\n");
 		case B_BORDERED_WINDOW_LOOK:
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
-			borderwidth=5;
+			borderwidth = 5;
 			break;
 		default:
-			borderwidth=0;
+			borderwidth = 0;
 	}
+	
+	// Current version simply makes everything fit inside the rect
+	// instead of building around it. This will change.
+
+	// IT did :-)
+		// distance from one item of the tab bar to another. In this case the text and close/zoom rects
+	textoffset = (_look==B_FLOATING_WINDOW_LOOK) ? 7 : 10;
+	
+		// calculate or tab rect
+	_tabrect.Set( 	_frame.left - borderwidth,
+					_frame.top - borderwidth - 19.0,
+					((_frame.right - _frame.left) < 35.0 ?
+							_frame.left + 35.0 : _frame.right) + borderwidth,
+					_frame.top - (borderwidth-1) );
+
+		// make it text width sensitive
+	if(strlen(GetTitle())>1)
+	{
+		if(_driver)
+			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+		else
+			titlepixelwidth=10;
+		
+		int32	tabLength	= 	14 + // _closerect width
+								textoffset + titlepixelwidth + textoffset +
+								14 + // _zoomrect width
+								8; // margins
+		int32	tabWidth	= (int32)_tabrect.Width();
+		if ( tabLength < tabWidth )
+			_tabrect.right	= _tabrect.left + tabLength;
+	}
+	else
+		_tabrect.right		= _tabrect.left + _tabrect.Width()/2;
+
+		// calculate left/top/right/bottom borders
+	if ( borderwidth != 0 ){
+		_borderrect		= _frame.InsetByCopy( -borderwidth, -borderwidth );
+		leftborder.Set( _borderrect.left, _frame.top - borderwidth,
+						_frame.left, _frame.bottom + borderwidth );
+		rightborder.Set( _frame.right, _frame.top - borderwidth,
+						 _borderrect.right, _frame.bottom + borderwidth );
+		topborder.Set( 	_borderrect.left, _borderrect.top,
+						_borderrect.right, _frame.top );
+		bottomborder.Set( _borderrect.left, _frame.bottom,
+						  _borderrect.right, _borderrect.bottom );
+	}
+	else{
+			// no border ... (?) useful when displaying windows that are just images
+		_borderrect	= _frame;
+		leftborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		rightborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		topborder.Set( 0.0, 0.0, -1.0, -1.0 );
+		bottomborder.Set( 0.0, 0.0, -1.0, -1.0 );						
+	}
+
+		// calculate resize rect
+	_resizerect.Set(	_borderrect.right - 19.0, _borderrect.bottom - 19.0,
+						_borderrect.right, _borderrect.bottom);
+
+		// format tab rect for a floating window - make te rect smaller
+	if ( _look == B_FLOATING_WINDOW_LOOK ){
+		_tabrect.InsetBy( 0, 2 );
+		_tabrect.OffsetBy( 0, 2 );
+	}	
+
+		// calulate close rect based on the tab rectangle
+	_closerect.Set(	_tabrect.left + 4.0, _tabrect.top + 4.0,
+					_tabrect.left + 4.0 + 13.0, _tabrect.top + 4.0 + 13.0 );
+					
+		// calulate zoom rect based on the tab rectangle
+	_zoomrect.Set(  _tabrect.right - 4.0 - 13.0, _tabrect.top + 4.0,
+					_tabrect.right - 4.0, _tabrect.top + 4.0 + 13.0 );
+
+		// fromat close and zoom rects for a floating window - make rectangles smaller
+	if ( _look == B_FLOATING_WINDOW_LOOK ){
+		_closerect.InsetBy( 1, 1 );
+		_zoomrect.InsetBy( 1, 1 );
+		_closerect.OffsetBy( 0, -2 );
+		_zoomrect.OffsetBy( 0, -2 );
+	}
+// Old version...
+/*	
+	_tabrect=_frame;
+	_resizerect=_frame;
+	_borderrect=_frame;
+	_closerect=_frame;
+	
 
 	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 
@@ -249,7 +329,7 @@ printf("DefaultDecorator: Do Layout\n");
 	_zoomrect.bottom-=4;
 	_zoomrect.left=_zoomrect.right-10;
 	_zoomrect.bottom=_zoomrect.top+10;
-	
+*/	
 }
 
 void DefaultDecorator::MoveBy(float x, float y)
@@ -269,6 +349,13 @@ printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
 	_resizerect.OffsetBy(pt);
 	_borderrect.OffsetBy(pt);
 	_zoomrect.OffsetBy(pt);
+	
+	leftborder.OffsetBy(pt);
+	rightborder.OffsetBy(pt);
+	topborder.OffsetBy(pt);
+	bottomborder.OffsetBy(pt);
+
+	Draw( _borderrect );	
 }
 
 BRegion * DefaultDecorator::GetFootprint(void)
@@ -287,13 +374,15 @@ printf("DefaultDecorator: Get Footprint\n");
 
 void DefaultDecorator::_DrawTitle(BRect r)
 {
+printf("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
 	_layerdata.highcolor=_colors->window_tab_text;
 	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 
-	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset));
-	BString titlestr=GetTitle();
+	int32 titlecount=_ClipTitle((_zoomrect.left-textoffset)-(_closerect.right+textoffset));
+	BString titlestr( GetTitle() );
+	
 	if(titlecount<titlestr.CountChars())
 	{
 		titlestr.Truncate(titlecount-1);
@@ -301,7 +390,7 @@ void DefaultDecorator::_DrawTitle(BRect r)
 		titlecount+=2;
 	}
 	_driver->DrawString(titlestr.String(),titlecount,
-		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+		BPoint(_closerect.right+textoffset,_closerect.bottom-1),&_layerdata);
 }
 
 void DefaultDecorator::_SetFocus(void)
@@ -311,14 +400,20 @@ void DefaultDecorator::_SetFocus(void)
 	
 	if(GetFocus())
 	{
-		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
+// ADI: a temporary hack - the colors were TOO dark
+//		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+//		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
+		button_highcol.SetColor( RGBColor( 255, 255, 0 ) );
+		button_lowcol.SetColor( RGBColor( 234, 181, 0) );
 		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
-		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
+// ADI: a temporary hack - the colors were TOO dark
+//		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+//		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
+		button_highcol.SetColor( RGBColor(234, 181, 0) );
+		button_lowcol.SetColor( RGBColor( 255, 255, 0 ) );
 		textcol=_colors->inactive_window_tab_text;
 	}
 }
@@ -331,16 +426,14 @@ printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,up
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
-	_DrawTab(update);
-
 	// Draw the top view's client area - just a hack :)
 	_layerdata.highcolor=_colors->document_background;
-
+/*
 	if(_borderrect.Intersects(update))
 		_driver->FillRect(_borderrect & update,&_layerdata,pat_solidhigh);
-	
+*/	
 	_DrawFrame(update);
-
+	_DrawTab(update);
 }
 
 void DefaultDecorator::Draw(void)
@@ -360,24 +453,31 @@ void DefaultDecorator::Draw(void)
 
 void DefaultDecorator::_DrawZoom(BRect r)
 {
+printf("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
-	BRect zr=r;
-	zr.left+=zr.Width()/3;
-	zr.top+=zr.Height()/3;
-
-	DrawBlendedRect(zr,GetZoom());
-	DrawBlendedRect(zr.OffsetToCopy(r.LeftTop()),GetZoom());
+	BRect zr( r );
+	
+	zr.left		+= 3.0;
+	zr.top		+= 3.0;
+	DrawBlendedRect( zr, GetZoom() );
+	
+	zr			= r;
+	zr.right	-= 5.0;
+	zr.bottom	-= 5.0;
+	DrawBlendedRect( zr, GetZoom() );
 }
 
 void DefaultDecorator::_DrawClose(BRect r)
 {
+printf("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 	// Just like DrawZoom, but for a close button
-	DrawBlendedRect(r,GetClose());
+	DrawBlendedRect( r, GetClose());
 }
 
 void DefaultDecorator::_DrawTab(BRect r)
 {
+printf("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
@@ -385,8 +485,30 @@ void DefaultDecorator::_DrawTab(BRect r)
 	
 	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
 	_driver->FillRect(_tabrect,&_layerdata,pat_solidhigh);
-	_layerdata.highcolor=framecolors[3];
-	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,pat_solidhigh);
+	
+	_layerdata.highcolor=framecolors[2];
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),&_layerdata,pat_solidhigh);
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),&_layerdata,pat_solidhigh);
+	_layerdata.highcolor=framecolors[4];
+	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),&_layerdata,pat_solidhigh);
+	_layerdata.highcolor=framecolors[1];	
+	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom ),
+						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
+						 &_layerdata,pat_solidhigh);
+	
+	_layerdata.highcolor = RGBColor( 255, 255, 0 );
+	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1),
+						 BPoint( _tabrect.left + 1, _tabrect.bottom),
+						 &_layerdata, pat_solidhigh);
+	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1),
+						 BPoint( _tabrect.right - 1, _tabrect.top + 1),
+						 &_layerdata, pat_solidhigh);
+
+	_layerdata.highcolor = RGBColor( 175, 123, 0 );						 
+	_driver->StrokeLine( BPoint( _tabrect.right - 1, _tabrect.top + 2),
+						 BPoint( _tabrect.right - 1, _tabrect.bottom),
+						 &_layerdata, pat_solidhigh);
+
 
 	_DrawTitle(_tabrect);
 
@@ -408,7 +530,28 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 	// Note that it is not part of the Decorator API - it's specific
 	// to just the DefaultDecorator. Called by DrawZoom and DrawClose
 
-	// Actually just draws a blended square
+	_layerdata.highcolor = RGBColor( 175, 123, 0 );						 
+	_driver->StrokeLine( r.LeftTop(),
+						 BPoint( r.left, r.bottom - 1 ),
+						 &_layerdata, pat_solidhigh);
+	_driver->StrokeLine( r.LeftTop(),
+						 BPoint( r.right - 1, r.top ),
+						 &_layerdata, pat_solidhigh);
+	_driver->StrokeLine( BPoint( r.right - 1, r.top + 2),
+						 BPoint( r.right - 1, r.bottom - 1),
+						 &_layerdata, pat_solidhigh);
+	_driver->StrokeLine( BPoint( r.left + 2, r.bottom -1),
+						 BPoint( r.right - 2, r.bottom - 1),
+						 &_layerdata, pat_solidhigh);
+
+	_layerdata.highcolor = RGBColor( 255, 255, 0 );
+	_driver->StrokeRect( BRect( r.left + 1, r.top + 1,
+								r.right, r.bottom),
+						 &_layerdata, pat_solidhigh);
+	
+	r.InsetBy( 2, 2 );
+	
+	
 	int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 
 	rgb_color tmpcol,halfcol, startcol, endcol;
@@ -449,13 +592,7 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
 			BPoint(r.left+i,r.top+steps),&_layerdata,pat_solidhigh);
-
 	}
-
-//	_layerdata.highcolor=startcol;
-//	_driver->FillRect(r,&_layerdata,pat_solidhigh);
-	_layerdata.highcolor=framecolors[3];
-	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 }
 
 void DefaultDecorator::_DrawFrame(BRect invalid)
@@ -465,11 +602,12 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
+	_driver->FillRect(_frame,&_layerdata,pat_solidhigh);
 	#endif
 
-	if(!borderwidth)
+	if(!borderwidth){
 		return;
+	}
 	
 	// Data specifically for the StrokeLineArray call.
 	int32 numlines=0, maxlines=20;
@@ -523,7 +661,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// Right side
 	if(TestRectIntersection(rightborder,invalid))
 	{
-		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
 		// it must be accounted for.
 		startx=(int32) MAX(invalid.left,rightborder.left);
@@ -574,7 +711,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// Left side
 	if(TestRectIntersection(leftborder,invalid))
 	{
-		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
 		// it must be accounted for.
 		startx=(int32) MAX(invalid.left,leftborder.left);
@@ -625,7 +761,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// Top side
 	if(TestRectIntersection(topborder,invalid))
 	{
-		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
 		// it must be accounted for.
 		starty=(int32) MAX(invalid.top,topborder.top);
@@ -681,7 +816,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// Bottom side
 	if(TestRectIntersection(bottomborder,invalid))
 	{
-		
 		// We may not have to redraw the entire width of the frame itself. Rare case, but
 		// it must be accounted for.
 		starty=(int32) MAX(invalid.top,bottomborder.top);
@@ -743,7 +877,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
 		r=_resizerect;
-
 //		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 		
 		// This code is strictly for B_DOCUMENT_WINDOW looks
@@ -813,10 +946,10 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 		}
 		else
 		{
-			_layerdata.highcolor=framecolors[4];
-			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
+			_layerdata.highcolor=framecolors[2];
+			_driver->StrokeLine(BPoint(r.right-4,r.top),BPoint(r.right-2,r.top),
 				&_layerdata,pat_solidhigh);
-			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
+			_driver->StrokeLine(BPoint(r.left,r.bottom-4),BPoint(r.left,r.bottom-2),
 				&_layerdata,pat_solidhigh);
 		}
 	}

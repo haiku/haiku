@@ -33,12 +33,14 @@
 #include <GraphicsDefs.h>
 #include <GraphicsCard.h>
 #include <Window.h>	// for workspace defs
-#include "RootLayer.h"
 
 class DisplayDriver;
 class ServerWindow;
 class RGBColor;
 class Screen;
+class WinBorder;
+class RootLayer;
+class Layer;
 
 /*!
 	\class Workspace DesktopClasses.h
@@ -103,9 +105,10 @@ public:
 	status_t SetSpace(int32 index, int32 res,bool stick=true);
 	void AddWindow(ServerWindow *win, int32 workspace=B_CURRENT_WORKSPACE);
 	void RemoveWindow(ServerWindow *win);
+	WinBorder* GetWindowAt( BPoint pt );
 	ServerWindow *ActiveWindow(void);
 	void SetActiveWindow(ServerWindow *win);
-	Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE);
+	Layer* GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE);
 	bool IsInitialized(void);
 	Workspace *GetWorkspace(int32 index);
 	Workspace *GetActiveWorkspace(void);

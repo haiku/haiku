@@ -462,6 +462,23 @@ printf("Desktop: AddWindowToDesktop(%s,%ld,%ld)\n",win?win->GetTitle():"NULL",
 	desktop_private::workspacelock.Unlock();
 }
 
+WinBorder* WindowContainsPoint( BPoint pt ){
+#ifdef DEBUG_DESKTOP
+printf("Desktop: WindowContainsPoint(%s,%f,%f)\n",win?win->GetTitle():"NULL",
+	pt.x, pt.y);
+#endif
+	WinBorder		*wb;
+
+	desktop_private::workspacelock.Lock();
+	desktop_private::layerlock.Lock();
+
+	wb = desktop_private::activescreen->GetWindowAt( pt );
+	
+	desktop_private::layerlock.Unlock();
+	desktop_private::workspacelock.Unlock();
+	
+	return wb;
+}
 /*!
 	\brief Removes a window from the desktop
 	\param win Window to remove

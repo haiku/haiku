@@ -36,6 +36,8 @@
 #include <Window.h>
 #include <PortMessage.h>
 
+#include <Session.h>
+
 class BString;
 class BMessenger;
 class BPoint;
@@ -85,7 +87,7 @@ public:
 	void Unlock(void);
 	bool IsLocked(void);
 	
-	void DispatchMessage(PortMessage *msg);
+	void DispatchMessage( int32 code );
 	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static int32 MonitorWin(void *data);
 	static void HandleMouseEvent(PortMessage *msg);
@@ -120,6 +122,9 @@ protected:
 	BRect _frame;
 	uint32 _token;
 	int32 _handlertoken;
+	
+// ADI:
+	BSession	*ses;	
 };
 
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);

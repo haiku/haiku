@@ -30,6 +30,9 @@
 #include <Directory.h>
 #include <PortMessage.h>
 #include <PortLink.h>
+
+#include <Session.h>
+
 #include <File.h>
 #include <Message.h>
 #include "AppServer.h"
@@ -88,10 +91,10 @@ AppServer::AppServer(void)
 	// Used for testing purposes
 
 	// TODO: Uncomment when actually put to use. Commented out for speed
-//	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
+	fontserver->ScanDirectory("/boot/beos/etc/fonts/ttfonts/");
 //	fontserver->ScanDirectory("/boot/beos/etc/fonts/PS-Type1/");
-	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
-	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
+//	fontserver->ScanDirectory("/boot/home/config/fonts/ttfonts/");
+//	fontserver->ScanDirectory("/boot/home/config/fonts/psfonts/");
 	fontserver->SaveList();
 
 	if(!fontserver->SetSystemPlain(DEFAULT_PLAIN_FONT_FAMILY,DEFAULT_PLAIN_FONT_STYLE,DEFAULT_PLAIN_FONT_SIZE))
@@ -641,6 +644,10 @@ void AppServer::Broadcast(int32 code)
 {
 	int32 i;
 	ServerApp *app;
+	
+	int32		buffer[2];
+	buffer[0]	= 8; // 4 for buffer size + 4 for our message
+	buffer[1]	= AS_QUIT_APP;
 
 	acquire_sem(_applist_lock);
 	for(i=0;i<_applist->CountItems(); i++)
@@ -648,7 +655,8 @@ void AppServer::Broadcast(int32 code)
 		app=(ServerApp*)_applist->ItemAt(i);
 		if(!app)
 			continue;
-		app->PostMessage(code);
+		//app->PostMessage(code);
+		app->PostMessage(AS_SESSION_MSG, 2*sizeof(int32), (int8*)&buffer);
 	}
 	release_sem(_applist_lock);
 }

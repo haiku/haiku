@@ -29,6 +29,8 @@
 #include "Decorator.h"
 #include "DisplayDriver.h"
 
+#include <stdio.h>
+
 /*!
 	\brief Constructor
 	\param rect Size of client area
@@ -48,12 +50,20 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_title_string=new BString;
 	_driver=NULL;
 	
-	_closerect.Set(0,0,1,1);
-	_zoomrect.Set(0,0,1,1);
-	_minimizerect.Set(0,0,1,1);
-	_resizerect.Set(0,0,1,1);
+		/// xxx.Set(0,0,1,1) produces a rectangle 2 pixels wide, that
+		// WILL be drawn on screen. We so not want that... so...
+		// [ A BRect when instantiated is made invalid, so, no need for: ]
+/*	_closerect.Set( 0, 0, -1, -1);
+	_zoomrect.Set( 0, 0, -1, -1);
+	_minimizerect.Set( 0, 0, -1, -1);
+	_resizerect.Set( 0, 0, -1, -1);
+*/
 	_frame=rect;
-	_tabrect.Set(rect.left,rect.top,rect.right, rect.top+((rect.bottom-rect.top)/4));
+		// !!! rect rectangle MUST remain intact - it is top_view's area !!!
+		// Decorator drawing MUST be done arround that area !!!
+	//_tabrect.Set(rect.left,rect.top,rect.right, rect.top+((rect.bottom-rect.top)/4));
+		// [ A BRect when instantiated is made invalid, so, no need for: ]	
+/*	_tabrect.Set( 0, 0, -1, -1 ); */
 
 	_look=wlook;
 	_feel=wfeel;
@@ -261,6 +271,24 @@ const char *Decorator::GetTitle(void)
 }
 
 /*!
+	\brief Returns the decorator's border rectangle
+	\return the decorator's border rectangle
+*/
+
+BRect Decorator::GetBorderRect(void){
+	return _borderrect;
+}
+
+/*!
+	\brief Returns the decorator's tab rectangle
+	\return the decorator's tab rectangle
+*/
+
+BRect Decorator::GetTabRect(void){
+	return _tabrect;
+}
+
+/*!
 	\brief Changes the focus value of the decorator
 	\param is_active True if active, false if not
 	
@@ -284,13 +312,15 @@ int32 Decorator::_ClipTitle(float width)
 	{
 		int32 strlength=_title_string->CountChars();
 		float pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
-	
+//		printf("Initial width = %f\n", width );
+//		printf("DEC: strlen = %ld\t pixwidth = %f\n", strlength, pixwidth);
 		while(strlength>=0)
 		{
 			if(pixwidth<width)
 				break;
 			strlength--;
 			pixwidth=_driver->StringWidth(_title_string->String(),strlength,&_layerdata);
+//			printf("DEC: strlen = %ld\t pixwidth = %f\n", strlength, pixwidth);			
 		}
 		
 		return strlength;
