@@ -17,13 +17,17 @@ panic(const char *format, ...)
 {
 	va_list list;
 
+	platform_switch_to_text_mode();
+
 	puts("*** PANIC ***");
 
 	va_start(list, format);
 	vprintf(format, list);
 	va_end(list);
 
-	for (;;) ;
+	// ToDo: add "press key to reboot" functionality
+	for (;;)
+		asm("hlt");
 }
 
 
