@@ -34,6 +34,7 @@ private:
 	std::string fOutputFile;
 	std::string fUdfVolumeName;
 	uint16 fUdfRevision;
+	bool fTruncate;
 };
 
 

@@ -43,7 +43,8 @@ public:
 	UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	           const char *udfVolumeName, uint16 udfRevision, bool doIso,
 	           const char *isoVolumeName,
-	           const char *rootDirectory, const ProgressListener &listener);
+	           const char *rootDirectory, const ProgressListener &listener,
+	           bool truncate);
 	status_t InitCheck() const;
 	status_t Build();
 private:

@@ -79,9 +79,9 @@ block_for_offset(off_t pos, std::list<Udf::long_address> &dataSpace, uint32 bloc
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
                        const char *udfVolumeName, uint16 udfRevision, bool doIso, 
                        const char *isoVolumeName, const char *rootDirectory,
-                       const ProgressListener &listener)
+                       const ProgressListener &listener, bool truncate)
 	: fInitStatus(B_NO_INIT)
-	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE)// | B_ERASE_FILE)
+	, fOutputFile(outputFile, B_READ_WRITE | B_CREATE_FILE | (truncate ? B_ERASE_FILE : 0))
 	, fOutputFilename(outputFile)
 	, fBlockSize(blockSize)
 	, fBlockShift(0)
