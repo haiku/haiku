@@ -9,6 +9,7 @@
 #include <Drivers.h>
 #include <Errors.h>
 #include <util/kernel_cpp.h>
+#include <devfs.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
@@ -70,9 +71,11 @@ KPhysicalPartition::Open(int flags, int *fd)
 status_t
 KPhysicalPartition::PublishDevice()
 {
-// ToDo!
-	return B_ERROR;
-#if 0
+	char path[B_PATH_NAME_LENGTH];
+	status_t error = GetPath(path);
+	if (error != B_OK)
+		return error;
+
 	// prepare a partition_info
 	partition_info info;
 	info.offset = Offset();
@@ -80,42 +83,23 @@ KPhysicalPartition::PublishDevice()
 	info.logical_block_size = BlockSize();
 	info.session = 0;
 	info.partition = ID();
-	if (strlen(Device()->Path()) >= 256)
+	if (strlcpy(info.device, Device()->Path(), B_PATH_NAME_LENGTH) > B_PATH_NAME_LENGTH)
 		return B_NAME_TOO_LONG;
-	strcpy(info.device, Device()->Path());
-	// get the entry path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
-	if (error != B_OK)
-		return error;
-	// create the entry
-	int fd = creat(path, 0666);
-	if (fd < 0)
-		return errno;
-	// set the partition info
-	error = B_OK;
-	if (ioctl(fd, B_SET_PARTITION, &info) < 0)
-		error = errno;
-	close(fd);
-	return error;
-#endif
+
+	return devfs_publish_partition(path, &info);
 }
 
 // UnpublishDevice
 status_t
 KPhysicalPartition::UnpublishDevice()
 {
-#if 0
 	// get the entry path
 	char path[B_PATH_NAME_LENGTH];
 	status_t error = GetPath(path);
 	if (error != B_OK)
 		return error;
-	// remove the entry
-	if (remove(path) < 0)
-		return errno;
-#endif
-	return B_OK;
+
+	return devfs_unpublish_partition(path);
 }
 
 // Mount
