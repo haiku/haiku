@@ -3,3 +3,4 @@ SubDir OBOS_TOP src add-ons kernel file_systems ;
 SubInclude OBOS_TOP src add-ons kernel file_systems dos ;
 SubInclude OBOS_TOP src add-ons kernel file_systems bfs ;
 SubInclude OBOS_TOP src add-ons kernel file_systems iso9660 ;
+SubInclude OBOS_TOP src add-ons kernel file_systems udf ;
