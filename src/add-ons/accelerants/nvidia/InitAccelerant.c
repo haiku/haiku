@@ -97,7 +97,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	int pointer_reservation; //mem reserved for pointer
 	int cnt; 				 //used for iteration through the overlay buffers
 
-	if (1) {
+	if (0) {
 		time_t now = time (NULL);
 		// LOG not available from here to next LOG: NULL si
 		MSG(("INIT_ACCELERANT: %s", ctime (&now)));

@@ -91,7 +91,7 @@ status_t nv_crtc2_set_timing(display_mode target)
 
 	LOG(4,("CRTC2: setting timing\n"));
 
-	/* setup fixed modeline for flatpanel if connected and active */
+	/* setup tuned internal modeline for flatpanel if connected and active */
 	if (si->ps.tmds2_active)
 	{
 		LOG(2,("CRTC2: DFP active: tuning modeline\n"));

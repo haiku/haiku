@@ -11,9 +11,6 @@
 
 #include "acc_std.h"
 
-static void add_panel1_mode(display_mode p2, display_mode** dst);
-static void add_panel2_mode(display_mode p2, display_mode** dst);
-
 #define	T_POSITIVE_SYNC	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 /* mode flags will be setup as status info by PROPOSEMODE! */
 #define MODE_FLAGS 0
@@ -22,31 +19,41 @@ static void add_panel2_mode(display_mode p2, display_mode** dst);
 /*some monitors only handle a fixed set of modes*/
 #include "valid_mode_list"
 
-/*Standard VESA modes*/
+/* Standard VESA modes,
+ * plus panel specific resolution modes which are internally modified during run-time depending on the requirements of the actual
+ * panel connected. The modes as listed here, should timing-wise be as compatible with analog (CRT) monitors as can be... */
 static const display_mode mode_list[] = {
+/* 4:3 modes; 307.2k pixels */
 { { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
 { { 27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
 { { 30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
 { { 31500, 640, 664, 704, 832, 480, 489, 492, 520, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(640X480X8.Z1) */
 { { 31500, 640, 656, 720, 840, 480, 481, 484, 500, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(640X480X8.Z1) */
 { { 36000, 640, 696, 752, 832, 480, 481, 484, 509, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(640X480X8.Z1) */
+/* 4:3 modes; 480k pixels */
 { { 36000, 800, 824, 896, 1024, 600, 601, 603, 625, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@56Hz_(800X600) from Be, Inc. driver + XFree86 */
 { { 38100, 800, 832, 960, 1088, 600, 602, 606, 620, 0}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* SVGA_800X600X56HzNI */
 { { 40000, 800, 840, 968, 1056, 600, 601, 605, 628, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X600X8.Z1) + XFree86 */
 { { 49500, 800, 816, 896, 1056, 600, 601, 604, 625, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(800X600X8.Z1) + XFree86 */
 { { 50000, 800, 856, 976, 1040, 600, 637, 643, 666, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(800X600X8.Z1) + XFree86 */
 { { 56250, 800, 832, 896, 1048, 600, 601, 604, 631, T_POSITIVE_SYNC}, B_CMAP8, 800, 600, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(800X600X8.Z1) + XFree86 */
+/* 4:3 modes; 786.432k pixels */
 { { 65000, 1024, 1048, 1184, 1344, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X768X8.Z1) + XFree86 */
 { { 75000, 1024, 1048, 1184, 1328, 768, 771, 777, 806, 0}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70-72Hz_(1024X768X8.Z1) + XFree86 */
 { { 78750, 1024, 1040, 1136, 1312, 768, 769, 772, 800, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1024X768X8.Z1) + XFree86 */
 { { 94500, 1024, 1072, 1168, 1376, 768, 769, 772, 808, T_POSITIVE_SYNC}, B_CMAP8, 1024, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1024X768X8.Z1) + XFree86 */
+/* 4:3 modes; 995.328k pixels */
 { { 94200, 1152, 1184, 1280, 1472, 864, 865, 868, 914, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 { { 97800, 1152, 1216, 1344, 1552, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@70Hz_(1152X864X8.Z1) */
 { { 108000, 1152, 1216, 1344, 1600, 864, 865, 868, 900, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1152X864X8.Z1) + XFree86 */
 { { 121500, 1152, 1216, 1344, 1568, 864, 865, 868, 911, T_POSITIVE_SYNC}, B_CMAP8, 1152, 864, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1152X864X8.Z1) */
+/* 5:4 modes; 1.311M pixels */
 { { 108000, 1280, 1328, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X1024) from Be, Inc. driver + XFree86 */
 { { 135000, 1280, 1296, 1440, 1688, 1024, 1025, 1028, 1066, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1280X1024X8.Z1) + XFree86 */
 { { 157500, 1280, 1344, 1504, 1728, 1024, 1025, 1028, 1072, T_POSITIVE_SYNC}, B_CMAP8, 1280, 1024, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@85Hz_(1280X1024X8.Z1) + XFree86 */
+/* 4:3 panel mode; 1.47M pixels */
+{ { 122600, 1400, 1488, 1640, 1880, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1400, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1400X1050) */
+/* 4:3 modes; 1.92M pixels */
 { { 162000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1600X1200X8.Z1) + XFree86 */
 /* identical lines to above one, apart from refreshrate.. */
 { { 175500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@65Hz_(1600X1200X8.Z1) + XFree86 */
@@ -55,13 +62,29 @@ static const display_mode mode_list[] = {
 { { 216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) */
 { { 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS},  /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) + XFree86 */
 /* end identical lines. */
+/* 4:3 modes; 2.408M pixels */
 { { 204750, 1792, 1920, 2120, 2448, 1344, 1345, 1348, 1394, B_POSITIVE_VSYNC}, B_CMAP8, 1792, 1344, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1792X1344) from Be, Inc. driver + XFree86 */
 { { 261000, 1792, 1888, 2104, 2456, 1344, 1345, 1348, 1417, B_POSITIVE_VSYNC}, B_CMAP8, 1792, 1344, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1792X1344) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 2.584M pixels */
 { { 218250, 1856, 1952, 2176, 2528, 1392, 1393, 1396, 1439, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1856X1392) from Be, Inc. driver + XFree86 */
 { { 288000, 1856, 1984, 2208, 2560, 1392, 1393, 1396, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1856, 1392, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1856X1392) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 2.765M pixels */
 { { 234000, 1920, 2048, 2256, 2600, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1440) from Be, Inc. driver + XFree86 */
 { { 297000, 1920, 2064, 2288, 2640, 1440, 1441, 1444, 1500, B_POSITIVE_VSYNC}, B_CMAP8, 1920, 1440, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@75Hz_(1920X1440) from Be, Inc. driver + XFree86 */
+/* 4:3 modes; 3.146M pixels */
 { { 266950, 2048, 2200, 2424, 2800, 1536, 1537, 1540, 1589, B_POSITIVE_VSYNC}, B_CMAP8, 2048, 1536, 0, 0, MODE_FLAGS}, /* From XFree86 posting @60Hz + XFree86 */
+/* 16:10 panel mode; 400k pixels */
+{ { 31300, 800, 848, 928, 1008, 500, 501, 504, 518, T_POSITIVE_SYNC}, B_CMAP8, 800, 500, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(800X500) */
+/* 16:10 panel mode; 655.36k pixels */
+{ { 52800, 1024, 1072, 1176, 1328, 640, 641, 644, 663, T_POSITIVE_SYNC}, B_CMAP8, 1024, 640, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X640) */
+/* 16:10 panel mode; 1.024M pixels */
+{ { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
+/* 16:10 panel mode; 1.296M pixels */
+{ { 106500, 1440, 1520, 1672, 1904, 900, 901, 904, 932, T_POSITIVE_SYNC}, B_CMAP8, 1440, 900, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1440X900) */
+/* 16:10 panel mode; 1.764M pixels */
+{ { 147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, T_POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
+/* 16:10 panel mode; 2.304M pixels */
+{ { 193200, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, T_POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 };
 
 /*
@@ -86,7 +109,7 @@ returns:
 status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const display_mode *high) 
 {
 	status_t status = B_OK;
-	float pix_clock_found;
+	float pix_clock_found, target_aspect;
 	uint8 m,n,p, bpp;
 	status_t result;
 	uint32 max_vclk, row_bytes, pointer_reservation;
@@ -171,13 +194,51 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		return result;
 	}
 
-	/* check if panel(s) can display the requested mode (if connected) */
+	/* check if all connected output devices can display the requested mode's aspect: */
+	/* calculate display mode aspect */
+	target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
+	/* NOTE:
+	 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
+	switch (si->ps.monitors)
+	{
+	case 0x01: /* digital panel on head 1, nothing on head 2 */
+		if (si->ps.panel1_aspect < (target_aspect - 0.10))
+		{
+			LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
+			return B_ERROR;
+		}
+		break;
+	case 0x10: /* nothing on head 1, digital panel on head 2 */
+		if (si->ps.panel2_aspect < (target_aspect - 0.10))
+		{
+			LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
+			return B_ERROR;
+		}
+		break;
+	case 0x11: /* digital panels on both heads */
+		if ((si->ps.panel1_aspect < (target_aspect - 0.10)) ||
+			(si->ps.panel2_aspect < (target_aspect - 0.10)))
+		{
+			LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
+			return B_ERROR;
+		}
+		break;
+	default: /* at least one analog monitor is connected, or nothing detected at all */
+		if (target_aspect > 1.34)
+		{
+			LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
+			return B_ERROR;
+		}
+		break;
+	}
+
+	/* check if panel(s) can display the requested resolution (if connected) */
 	if (si->ps.tmds1_active)
 	{
 		if ((target->timing.h_display > si->ps.p1_timing.h_display) ||
 			(target->timing.v_display > si->ps.p1_timing.v_display))
 		{
-			LOG(4, ("PROPOSEMODE: panel1 can't display requested mode, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: panel1 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
@@ -186,7 +247,7 @@ status_t PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, con
 		if ((target->timing.h_display > si->ps.p2_timing.h_display) ||
 			(target->timing.v_display > si->ps.p2_timing.v_display))
 		{
-			LOG(4, ("PROPOSEMODE: panel2 can't display requested mode, aborted.\n"));
+			LOG(4, ("PROPOSEMODE: panel2 can't display requested resolution, aborted.\n"));
 			return B_ERROR;
 		}
 	}
@@ -454,14 +515,8 @@ status_t create_mode_list(void)
 
 	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
 
-	/* see if there are panels connected and get their native modelines */
-	bool pan1 = false, pan2 = false, pan1_added = false, pan2_added = false;
-	display_mode p1, p2;
-	get_panel_modes(&p1, &p2, &pan1, &pan2);
-
 	/* figure out how big the list could be, and adjust up to nearest multiple of B_PAGE_SIZE */
-	/* note: two extra modes might be added for flatpanels */
-	max_size = ((((MODE_COUNT + 2) * 4) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
+	max_size = (((MODE_COUNT * 4) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
 	/* create an area to hold the info */
 	si->mode_area = my_mode_list_area =
 		create_area("NV accelerant mode info", (void **)&my_mode_list, B_ANY_ADDRESS, max_size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
@@ -473,48 +528,6 @@ status_t create_mode_list(void)
 	si->mode_count = 0;
 	for (i = 0; i < MODE_COUNT; i++)
 	{
-		/* add flatpanel 1 native mode if it's found and when it's time */
-		if (pan1 && !pan1_added)
-		{
-			/* only add modelines we don't already have (panels use VESA modelines) */
-			if ((src->timing.h_display == p1.timing.h_display) &&
-				(src->timing.v_display == p1.timing.v_display))
-			{
-				pan1_added = true;
-			}
-			else
-			{
-				/* place panel mode before same H-res mode from src list in dst list so
-				 * widescreen panels are listed in order of total resolution (HxV) */
-				if (src->timing.h_display >= p1.timing.h_display)
-				{
-					add_panel1_mode(p1, &dst);
-					pan1_added = true;
-				}
-			}
-		}
-
-		/* add flatpanel 2 native mode if it's found and when it's time */
-		if (pan2 && !pan2_added)
-		{
-			/* only add modelines we don't already have (panels use VESA modelines) */
-			if ((src->timing.h_display == p2.timing.h_display) &&
-				(src->timing.v_display == p2.timing.v_display))
-			{
-				pan2_added = true;
-			}
-			else
-			{
-				/* place panel mode before same H-res mode from src list in dst list so
-				 * widescreen panels are listed in order of total resolution (HxV) */
-				if (src->timing.h_display >= p2.timing.h_display)
-				{
-					add_panel2_mode(p2, &dst);
-					pan2_added = true;
-				}
-			}
-		}
-
 		/* set ranges for acceptable values */
 		low = high = *src;
 		/* range is 6.25% of default clock: arbitrarily picked */ 
@@ -545,84 +558,9 @@ status_t create_mode_list(void)
 				si->mode_count++;
 			}
 		}
-
 		/* advance to next mode */
 		src++;
 	}
 
-	/* (sort and) add flatpanel native mode(s) that are not added while we did
-	 * reach the end of the src list */
-	if (pan1 && pan2 && !pan1_added && !pan2_added)
-	{
-		/* sort in total resolution order */
-		if ((p2.timing.h_display * p2.timing.v_display) <
-			(p1.timing.h_display * p1.timing.v_display))
-		{
-			display_mode temp = p1;
-			p1 = p2;
-			p2 = temp;
-		}
-	}
-	if (pan1 && !pan1_added) add_panel1_mode(p1, &dst);
-	if (pan2 && !pan2_added) add_panel2_mode(p2, &dst);
-
 	return B_OK;
-}
-
-static void add_panel1_mode(display_mode p1, display_mode** dst)
-{
-	uint32 j, pix_clk_range;
-	display_mode low, high;
-	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
-
-	/* set ranges for acceptable values */
-	low = high = p1;
-	/* range is 6.25% of default clock: arbitrarily picked */ 
-	pix_clk_range = low.timing.pixel_clock >> 5;
-	low.timing.pixel_clock -= pix_clk_range;
-	high.timing.pixel_clock += pix_clk_range;
-	/* do it once for each depth we want to support */
-	for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
-	{
-		/* set target values */
-		**dst = p1;
-		/* poke the specific space */
-		(*dst)->space = low.space = high.space = spaces[j];
-		/* ask for a compatible mode */
-		if (PROPOSE_DISPLAY_MODE(*dst, &low, &high) == B_OK)
-		{
-			/* count it, and move on to next mode */
-			(*dst)++;
-			si->mode_count++;
-		}
-	}
-}
-
-static void add_panel2_mode(display_mode p2, display_mode** dst)
-{
-	uint32 j, pix_clk_range;
-	display_mode low, high;
-	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
-
-	/* set ranges for acceptable values */
-	low = high = p2;
-	/* range is 6.25% of default clock: arbitrarily picked */ 
-	pix_clk_range = low.timing.pixel_clock >> 5;
-	low.timing.pixel_clock -= pix_clk_range;
-	high.timing.pixel_clock += pix_clk_range;
-	/* do it once for each depth we want to support */
-	for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
-	{
-		/* set target values */
-		**dst = p2;
-		/* poke the specific space */
-		(*dst)->space = low.space = high.space = spaces[j];
-		/* ask for a compatible mode */
-		if (PROPOSE_DISPLAY_MODE(*dst, &low, &high) == B_OK)
-		{
-			/* count it, and move on to next mode */
-			(*dst)++;
-			si->mode_count++;
-		}
-	}
 }
