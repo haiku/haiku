@@ -8,7 +8,7 @@
 #include <bits/types.h>
 
 #define _GLIBCPP_USE_THREADS
-//#define _GLIBCPP_USE_WCHAR_T
+#define _GLIBCPP_USE_WCHAR_T
 
 #define _IO_MTSAFE_IO
 
@@ -41,13 +41,13 @@ typedef unsigned int wint_t;
    not glibc) */
 #ifndef __c_mbstate_t_defined
 # define __c_mbstate_t_defined	1
-/*# ifdef _GLIBCPP_USE_WCHAR_T*/
+# ifdef _GLIBCPP_USE_WCHAR_T
 typedef struct
 {
   int count;
   wint_t value;
 } __c_mbstate_t;
-/*# endif*/
+# endif
 #endif
 #undef __need_mbstate_t
 
