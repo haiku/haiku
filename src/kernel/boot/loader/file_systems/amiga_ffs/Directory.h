@@ -39,6 +39,8 @@ class Directory : public ::Directory {
 	private:
 		Volume			&fVolume;
 		DirectoryBlock	fNode;
+
+		typedef ::Directory _inherited;
 };
 
 }	// namespace FFS

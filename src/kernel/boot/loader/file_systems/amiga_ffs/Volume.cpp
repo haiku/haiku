@@ -44,7 +44,7 @@ Volume::Volume(boot::Partition *partition)
 			return;
 		default:
 			// unsupported file system
-			printf("amiga_ffs: unsupported: %08lx\n", fType);
+			//printf("amiga_ffs: unsupported: %08lx\n", fType);
 			return;
 	}
 

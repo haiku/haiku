@@ -55,6 +55,8 @@ Directory::InitCheck()
 status_t 
 Directory::Open(void **_cookie, int mode)
 {
+	_inherited::Open(_cookie, mode);
+
 	HashIterator *iterator = new HashIterator(fVolume.Device(), fNode);
 	if (iterator == NULL)
 		return B_NO_MEMORY;
@@ -72,6 +74,8 @@ Directory::Open(void **_cookie, int mode)
 status_t 
 Directory::Close(void *cookie)
 {
+	_inherited::Close(cookie);
+
 	delete (HashIterator *)cookie;
 	return B_OK;
 }

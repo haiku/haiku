@@ -39,6 +39,8 @@ class Directory : public ::Directory {
 	private:
 		Stream		fStream;
 		BPlusTree	fTree;
+
+		typedef ::Directory _inherited;
 };
 
 }	// namespace BFS
