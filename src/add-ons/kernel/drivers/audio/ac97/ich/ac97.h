@@ -165,11 +165,11 @@ enum ac97_capability {
 	CAP_PCM_RATE_16000		= 0x0000000002000000ULL,
 	CAP_PCM_RATE_22050		= 0x0000000004000000ULL,
 	CAP_PCM_RATE_24000		= 0x0000000008000000ULL,
-	CAP_PCM_RATE_32000		= 0x00000000100000000ULL,
-	CAP_PCM_RATE_44100		= 0x00000000200000000ULL,
-	CAP_PCM_RATE_48000		= 0x00000000400000000ULL,
-	CAP_PCM_RATE_88200		= 0x00000000800000000ULL,
-	CAP_PCM_RATE_96000		= 0x00000001000000000ULL,
+	CAP_PCM_RATE_32000		= 0x0000000010000000ULL,
+	CAP_PCM_RATE_44100		= 0x0000000020000000ULL,
+	CAP_PCM_RATE_48000		= 0x0000000040000000ULL,
+	CAP_PCM_RATE_88200		= 0x0000000080000000ULL,
+	CAP_PCM_RATE_96000		= 0x0000000100000000ULL,
 	CAP_PCM_RATE_MASK		= ( CAP_PCM_RATE_CONTINUOUS | CAP_PCM_RATE_8000 | CAP_PCM_RATE_11025 |
 								CAP_PCM_RATE_12000 | CAP_PCM_RATE_16000 | CAP_PCM_RATE_22050 |
 								CAP_PCM_RATE_24000 | CAP_PCM_RATE_32000 | CAP_PCM_RATE_44100 |
@@ -181,8 +181,8 @@ struct ac97_dev;
 typedef struct ac97_dev ac97_dev;
 
 typedef void	(* codec_init)(ac97_dev * dev);
-typedef	uint16	(* codec_reg_read)(void * /*cookie*/, uint8 /*reg*/);
-typedef	void	(* codec_reg_write)(void * /*cookie*/, uint8 /*reg*/, uint16 /*value*/);
+typedef	uint16	(* codec_reg_read)(void * cookie, uint8 reg);
+typedef	void	(* codec_reg_write)(void * cookie, uint8 reg, uint16 value);
 typedef bool	(* codec_set_rate)(ac97_dev *dev, uint8 reg, uint32 rate);
 typedef bool	(* codec_get_rate)(ac97_dev *dev, uint8 reg, uint32 *rate);
 
