@@ -160,9 +160,12 @@ MIMEManager::MessageReceived(BMessage *message)
 				if (!err)
 					err = fDatabase.GuessMimeType(&ref, &str);
 				else if (err == B_NAME_NOT_FOUND) {
-//					err = message->FindData("file ref", &ref);
-//					if (!err)
-//						err = fDatabase.GuessMimeType(data, length, &str);
+					const void *data;
+					int32 dataSize;
+					err = message->FindData("data", B_RAW_TYPE, &data,
+						&dataSize);
+					if (!err)
+						err = fDatabase.GuessMimeType(data, dataSize, &str);
 				}
 			}
 			if (!err)
