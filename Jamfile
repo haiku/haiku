@@ -19,6 +19,7 @@ Depends NetworkingKit :
 	sis900 rtl8139
 	
 	# PPP devices:
+	modem
 	pppoe
 	# PPP protocols:
 	ipcp
