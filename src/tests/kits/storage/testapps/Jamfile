@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src tests kits storage testapps ;
 
+SimpleTest <test>clipboard : clipboard.cpp : be net ;
 SimpleTest dump_mime_types : dump_mime_types.cpp : be net ;
