@@ -14,10 +14,10 @@
 #include <LockerHelper.h>
 
 
-#define REPORT_FLAGS		PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT \
-							| PPP_ALLOW_ANY_REPLY_THREAD
+static const uint32 kReportFlags = PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
+							| PPP_ALLOW_ANY_REPLY_THREAD;
 
-#define QUIT_REPORT_THREAD	'QUIT'
+static const uint32 kCodeQuitReportThread = 'QUIT';
 
 
 class PPPInterfaceListenerThread {
@@ -46,7 +46,7 @@ PPPInterfaceListenerThread::Run()
 	while(true) {
 		code = receive_data(&sender, &packet, sizeof(packet));
 		
-		if(code == QUIT_REPORT_THREAD)
+		if(code == kCodeQuitReportThread)
 			break;
 		else if(code != PPP_REPORT_CODE)
 			continue;
@@ -121,7 +121,7 @@ PPPInterfaceListener::~PPPInterfaceListener()
 	Manager().DisableReports(PPP_ALL_REPORTS, fReportThread);
 	
 	// tell thread to quit
-	send_data(fReportThread, QUIT_REPORT_THREAD, NULL, 0);
+	send_data(fReportThread, kCodeQuitReportThread, NULL, 0);
 	int32 tmp;
 	wait_for_thread(fReportThread, &tmp);
 }
@@ -156,7 +156,7 @@ PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 	if(interface.InitCheck() != B_OK)
 		return false;
 	
-	if(!interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS))
+	if(!interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, kReportFlags))
 		return false;
 	
 	fDoesWatch = true;
@@ -182,7 +182,7 @@ PPPInterfaceListener::WatchAllInterfaces()
 	
 	for(int32 index = 0; index < count; index++) {
 		interface.SetTo(interfaceList[index]);
-		interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, REPORT_FLAGS);
+		interface.EnableReports(PPP_CONNECTION_REPORT, fReportThread, kReportFlags);
 	}
 	delete interfaceList;
 	
@@ -231,5 +231,5 @@ PPPInterfaceListener::Construct()
 	resume_thread(fReportThread);
 	
 	// enable manager reports
-	Manager().EnableReports(PPP_MANAGER_REPORT, fReportThread, REPORT_FLAGS);
+	Manager().EnableReports(PPP_MANAGER_REPORT, fReportThread, kReportFlags);
 }

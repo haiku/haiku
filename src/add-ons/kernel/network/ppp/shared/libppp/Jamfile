@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel network ppp shared libppp ;
 
 UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers net ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 

@@ -98,9 +98,9 @@ typedef struct ppp_interface_description_info {
 	} u;
 		//!< Different values for describing an interface.
 	const driver_settings *profile;
-		//!< 
+		//!< An optional profile. If \a profile == NULL the default profile is used.
 	ppp_interface_id interface;
-		//!< the found/created interface
+		//!< The id of the found/created interface.
 } ppp_interface_description_info;
 
 
@@ -109,11 +109,11 @@ typedef struct ppp_get_interfaces_info {
 	ppp_interface_id *interfaces;
 		//!< The interface ids will be written to this pointer's target.
 	int32 count;
-		//!< \a Interface has \a count entries.
+		//!< The \a interfaces field has enough space for \a count entries.
 	ppp_interface_filter filter;
 		//!< Only interfaces that match this filter will be returned
 	int32 resultCount;
-		//!< The number of saved interfaces.
+		//!< The number of entries that the \a interfaces field contains.
 } ppp_get_interfaces_info;
 
 
@@ -124,7 +124,7 @@ typedef struct ppp_control_info {
 	uint32 op;
 		//!< The Control()/ioctl() opcode. This can be any value from ppp_control_ops.
 	void *data;
-		//!< Additional data may be specified.
+		//!< Additional data may be specified here.
 	size_t length;
 		//!< The length should always be set.
 } ppp_control_info;

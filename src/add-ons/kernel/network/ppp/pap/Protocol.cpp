@@ -17,13 +17,12 @@
 #include <sys/sockio.h>
 
 
-#define PAP_TIMEOUT			3000000
+static const bigtime_t kPAPTimeout = 3000000;
 	// 3 seconds
 
-
 // PAPHandler
-#define AUTHENTICATION_TYPE				0x3
-#define AUTHENTICATOR_TYPE_STRING		"Authenticator"
+static const uint8 kAuthenticationType = 0x3;
+static const char *kAuthenticatorTypeString = "Authenticator";
 
 typedef struct authentication_item {
 	uint8 type;
@@ -33,7 +32,7 @@ typedef struct authentication_item {
 
 
 PAPHandler::PAPHandler(PAP& owner, KPPPInterface& interface)
-	: KPPPOptionHandler("PAP", AUTHENTICATION_TYPE, interface, NULL),
+	: KPPPOptionHandler("PAP", kAuthenticationType, interface, NULL),
 	fOwner(owner)
 {
 }
@@ -47,7 +46,7 @@ PAPHandler::AddToRequest(KPPPConfigurePacket& request)
 		return B_OK;
 	
 	authentication_item item;
-	item.type = AUTHENTICATION_TYPE;
+	item.type = kAuthenticationType;
 	item.length = sizeof(item);
 	item.protocolNumber = htons(PAP_PROTOCOL);
 	
@@ -88,7 +87,7 @@ PAPHandler::ParseRequest(const KPPPConfigurePacket& request,
 	
 	// we merely check if the values are correct
 	authentication_item *item = (authentication_item*) request.ItemAt(index);
-	if(item->type != AUTHENTICATION_TYPE
+	if(item->type != kAuthenticationType
 			|| item->length != 4 || ntohs(item->protocolNumber) != PAP_PROTOCOL)
 		return B_ERROR;
 	
@@ -113,7 +112,7 @@ PAPHandler::Reset()
 PAP::PAP(KPPPInterface& interface, driver_parameter *settings)
 	: KPPPProtocol("PAP", PPP_AUTHENTICATION_PHASE, PAP_PROTOCOL, PPP_PROTOCOL_LEVEL,
 		AF_INET, 0, interface, settings, PPP_ALWAYS_ALLOWED,
-		AUTHENTICATOR_TYPE_STRING, new PAPHandler(*this, interface)),
+		kAuthenticatorTypeString, new PAPHandler(*this, interface)),
 	fState(INITIAL),
 	fID(system_time() & 0xFF),
 	fMaxRequest(3),
@@ -165,7 +164,7 @@ PAP::Up()
 			} else if(Side() == PPP_PEER_SIDE) {
 				NewState(WAITING_FOR_REQ);
 				InitializeRestartCount();
-				fNextTimeout = system_time() + PAP_TIMEOUT;
+				fNextTimeout = system_time() + kPAPTimeout;
 			} else {
 				UpFailedEvent();
 				return false;
@@ -381,7 +380,7 @@ PAP::TOGoodEvent()
 		break;
 		
 		case WAITING_FOR_REQ:
-			fNextTimeout = system_time() + PAP_TIMEOUT;
+			fNextTimeout = system_time() + kPAPTimeout;
 		break;
 		
 		default:
@@ -541,7 +540,7 @@ PAP::SendRequest()
 	
 	LockerHelper locker(fLock);
 	--fRequestCounter;
-	fNextTimeout = system_time() + PAP_TIMEOUT;
+	fNextTimeout = system_time() + kPAPTimeout;
 	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);

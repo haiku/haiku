@@ -19,7 +19,7 @@
 #include <sys/sockio.h>
 
 
-#define IPCP_STATE_MACHINE_TIMEOUT			3000000
+static const bigtime_t kIPCPStateMachineTimeout = 3000000;
 	// 3 seconds
 
 
@@ -1194,7 +1194,7 @@ IPCP::SendConfigureRequest()
 	
 	LockerHelper locker(fLock);
 	--fRequestCounter;
-	fNextTimeout = system_time() + IPCP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + kIPCPStateMachineTimeout;
 	locker.UnlockNow();
 	
 	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
@@ -1343,7 +1343,7 @@ IPCP::SendTerminateRequest()
 	
 	LockerHelper locker(fLock);
 	--fTerminateCounter;
-	fNextTimeout = system_time() + IPCP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + kIPCPStateMachineTimeout;
 	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);

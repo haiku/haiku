@@ -14,7 +14,7 @@
 #include <malloc.h>
 
 
-static char *sSkipInterfaceParameters[] = {
+static const char *sSkipInterfaceParameters[] = {
 	PPP_ASK_BEFORE_DIALING_KEY,
 	PPP_DISONNECT_AFTER_IDLE_SINCE_KEY,
 	PPP_DIAL_RETRIES_LIMIT_KEY,
@@ -24,9 +24,6 @@ static char *sSkipInterfaceParameters[] = {
 	PPP_REDIAL_DELAY_KEY,
 	NULL
 };
-
-static void copy_parameter(const driver_parameter *from, driver_parameter *to);
-static void free_driver_parameter(driver_parameter *parameter);
 
 
 driver_settings*
@@ -40,27 +37,87 @@ dup_driver_settings(const driver_settings *dup)
 	ret->parameter_count = dup->parameter_count;
 	
 	if(ret->parameter_count > 0)
-		ret->parameters =
-			(driver_parameter*) malloc(ret->parameter_count * sizeof(driver_parameter));
+		ret->parameters = (driver_parameter*)
+			malloc(ret->parameter_count * sizeof(driver_parameter));
 	else
 		ret->parameters = NULL;
 	
 	for(int32 index = 0; index < ret->parameter_count; index++)
-		copy_parameter(&dup->parameters[index], &ret->parameters[index]);
+		copy_driver_parameter(&dup->parameters[index], &ret->parameters[index]);
 	
 	return ret;
 }
 
 
-static
 void
-copy_parameter(const driver_parameter *from, driver_parameter *to)
+free_driver_settings(driver_settings *settings)
 {
-	to->name = strdup(from->name);
-	to->value_count = from->value_count;
+	if(!settings)
+		return;
 	
-	if(to->value_count > 0)
-		to->values = (char**) malloc(to->value_count * sizeof(char*));
+	for(int32 index = 0; index < settings->parameter_count; index++)
+		free_driver_parameter_fields(&settings->parameters[index]);
+	
+	free(settings->parameters);
+	free(settings);
+}
+
+
+void
+free_driver_parameter_fields(driver_parameter *parameter)
+{
+	free(parameter->name);
+	
+	for(int32 index = 0; index < parameter->value_count; index++)
+		free(parameter->values[index]);
+	
+	free(parameter->values);
+	
+	for(int32 index = 0; index < parameter->parameter_count; index++)
+		free_driver_parameter_fields(&parameter->parameters[index]);
+	
+	free(parameter->parameters);
+}
+
+
+driver_settings*
+new_driver_settings()
+{
+	driver_settings *settings = (driver_settings*) malloc(sizeof(driver_settings));
+	memset(settings, 0, sizeof(driver_settings));
+	
+	return settings;
+}
+
+
+driver_parameter*
+new_driver_parameter(const char *name)
+{
+	driver_parameter *parameter = (driver_parameter*) malloc(sizeof(driver_parameter));
+	memset(parameter, 0, sizeof(driver_parameter));
+	
+	set_driver_parameter_name(name, parameter);
+	
+	return parameter;
+}
+
+
+bool
+copy_driver_parameter(const driver_parameter *from, driver_parameter *to)
+{
+	if(!from || !to)
+		return false;
+	
+	free_driver_parameter_fields(to);
+	
+	if(from->name)
+		to->name = strdup(from->name);
+	else
+		to->name = NULL;
+	
+	to->value_count = from->value_count;
+	if(from->value_count > 0)
+		to->values = (char**) malloc(from->value_count * sizeof(char*));
 	else
 		to->values = NULL;
 	
@@ -76,39 +133,75 @@ copy_parameter(const driver_parameter *from, driver_parameter *to)
 		to->parameters = NULL;
 	
 	for(int32 index = 0; index < to->parameter_count; index++)
-		copy_parameter(&from->parameters[index], &to->parameters[index]);
+		copy_driver_parameter(&from->parameters[index], &to->parameters[index]);
+	
+	return true;
 }
 
 
-void
-free_driver_settings(driver_settings *settings)
+bool
+set_driver_parameter_name(const char *name, driver_parameter *parameter)
 {
-	if(!settings)
-		return;
+	if(!parameter)
+		return false;
 	
-	for(int32 index = 0; index < settings->parameter_count; index++)
-		free_driver_parameter(&settings->parameters[index]);
-	
-	free(settings->parameters);
-	free(settings);
-}
-
-
-static
-void
-free_driver_parameter(driver_parameter *parameter)
-{
 	free(parameter->name);
 	
-	for(int32 index = 0; index < parameter->value_count; index++)
-		free(parameter->values[index]);
+	if(name)
+		parameter->name = strdup(name);
+	else
+		parameter->name = NULL;
 	
-	free(parameter->values);
+	return true;
+}
+
+
+bool
+add_driver_parameter_value(const char *value, driver_parameter *to)
+{
+	if(!value || !to)
+		return false;
 	
-	for(int32 index = 0; index < parameter->parameter_count; index++)
-		free_driver_parameter(&parameter->parameters[index]);
+	int32 oldCount = to->value_count;
+	char **old = to->values;
 	
-	free(parameter->parameters);
+	to->values = (char**) malloc(to->value_count + 1 * sizeof(char*));
+	
+	if(!to->values) {
+		to->values = old;
+		return false;
+	}
+	
+	to->value_count++;
+	memcpy(to->values, old, oldCount * sizeof(char*));
+	to->values[oldCount] = strdup(value);
+	
+	return true;
+}
+
+
+bool
+add_driver_parameter(driver_parameter *add, driver_settings *to)
+{
+	if(!add || !to)
+		return false;
+	
+	int32 oldCount = to->parameter_count;
+	driver_parameter *old = to->parameters;
+	
+	to->parameters =
+		(driver_parameter*) malloc(to->parameter_count + 1 * sizeof(driver_parameter));
+	
+	if(!to->parameters) {
+		to->parameters = old;
+		return false;
+	}
+	
+	to->parameter_count++;
+	memcpy(to->parameters, old, oldCount * sizeof(driver_parameter));
+	memcpy(to->parameters + oldCount, add, sizeof(driver_parameter));
+	
+	return true;
 }
 
 

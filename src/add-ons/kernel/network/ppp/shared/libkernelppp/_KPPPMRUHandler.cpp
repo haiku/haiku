@@ -13,7 +13,7 @@
 #include <netinet/in.h>
 
 
-#define MRU_TYPE				0x1
+static const uint8 kMRUType = 0x1;
 
 typedef struct mru_item {
 	uint8 type;
@@ -25,7 +25,7 @@ status_t ParseRequestedItem(mru_item *item, KPPPInterface& interface);
 
 
 _KPPPMRUHandler::_KPPPMRUHandler(KPPPInterface& interface)
-	: KPPPOptionHandler("MRU Handler", MRU_TYPE, interface, NULL)
+	: KPPPOptionHandler("MRU Handler", kMRUType, interface, NULL)
 {
 	Reset();
 }
@@ -39,7 +39,7 @@ _KPPPMRUHandler::AddToRequest(KPPPConfigurePacket& request)
 	
 	// add MRU request
 	mru_item item;
-	item.type = MRU_TYPE;
+	item.type = kMRUType;
 	item.length = 4;
 	item.MRU = htons(fLocalMRU);
 	return request.AddItem((ppp_configure_item*) &item) ? B_OK : B_ERROR;
@@ -49,7 +49,7 @@ _KPPPMRUHandler::AddToRequest(KPPPConfigurePacket& request)
 status_t
 _KPPPMRUHandler::ParseNak(const KPPPConfigurePacket& nak)
 {
-	mru_item *item = (mru_item*) nak.ItemWithType(MRU_TYPE);
+	mru_item *item = (mru_item*) nak.ItemWithType(kMRUType);
 	if(!item || item->length != 4)
 		return B_OK;
 	
@@ -64,7 +64,7 @@ _KPPPMRUHandler::ParseNak(const KPPPConfigurePacket& nak)
 status_t
 _KPPPMRUHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
-	if(reject.ItemWithType(MRU_TYPE))
+	if(reject.ItemWithType(kMRUType))
 		return B_ERROR;
 	
 	return B_OK;
@@ -75,7 +75,7 @@ status_t
 _KPPPMRUHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	uint16 MRU = 1500;
-	mru_item *item = (mru_item*) ack.ItemWithType(MRU_TYPE);
+	mru_item *item = (mru_item*) ack.ItemWithType(kMRUType);
 	
 	if(item)
 		MRU = ntohs(item->MRU);
@@ -103,7 +103,7 @@ _KPPPMRUHandler::ParseRequest(const KPPPConfigurePacket& request,
 status_t
 _KPPPMRUHandler::SendingAck(const KPPPConfigurePacket& ack)
 {
-	return ParseRequestedItem((mru_item*) ack.ItemWithType(MRU_TYPE), Interface());
+	return ParseRequestedItem((mru_item*) ack.ItemWithType(kMRUType), Interface());
 }
 
 

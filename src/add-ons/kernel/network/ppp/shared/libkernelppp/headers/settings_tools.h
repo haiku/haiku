@@ -14,6 +14,14 @@
 // TODO: remove this as soon as we get the extended driver_settings API
 extern driver_settings *dup_driver_settings(const driver_settings *settings);
 extern void free_driver_settings(driver_settings *settings);
+extern void free_driver_parameter_fields(driver_parameter *parameter);
+
+extern driver_settings *new_driver_settings();
+extern driver_parameter *new_driver_parameter(const char *name);
+extern bool copy_driver_parameter(const driver_parameter *from, driver_parameter *to);
+extern bool set_driver_parameter_name(const char *name, driver_parameter *parameter);
+extern bool add_driver_parameter_value(const char *value, driver_parameter *to);
+extern bool add_driver_parameter(driver_parameter *add, driver_settings *to);
 
 extern bool equal_driver_settings(const driver_settings *lhs,
 	const driver_settings *rhs);
@@ -32,11 +40,25 @@ extern const char *get_settings_value(const char *name,
 
 
 inline
+bool
+add_driver_parameter(driver_parameter *add, driver_parameter *to)
+{
+	if(!to)
+		return false;
+	
+	return add_driver_parameter(add, (driver_settings*) &to->parameter_count);
+}
+
+
+inline
 const driver_parameter*
 get_parameter_with_name(const char *name, const driver_parameter *parameters)
 {
+	if(!parameters)
+		return NULL;
+	
 	return get_parameter_with_name(name,
-		parameters ? (driver_settings*) &parameters->parameter_count : NULL);
+		(driver_settings*) &parameters->parameter_count);
 }
 
 
@@ -44,8 +66,10 @@ inline
 const char*
 get_parameter_value(const char *name, const driver_parameter *parameters)
 {
-	return get_settings_value(name,
-		parameters ? (driver_settings*) &parameters->parameter_count : NULL);
+	if(parameters)
+		return NULL;
+	
+	return get_settings_value(name, (driver_settings*) &parameters->parameter_count);
 }
 
 

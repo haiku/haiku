@@ -13,8 +13,8 @@
 #include <netinet/in.h>
 
 
-#define AUTHENTICATION_TYPE				0x3
-#define AUTHENTICATOR_TYPE_STRING		"Authenticator"
+static const uint8 kAuthenticationType = 0x3;
+static const char *kAuthenticatorTypeString = "Authenticator";
 
 typedef struct authentication_item {
 	uint8 type;
@@ -24,7 +24,7 @@ typedef struct authentication_item {
 
 
 _KPPPAuthenticationHandler::_KPPPAuthenticationHandler(KPPPInterface& interface)
-	: KPPPOptionHandler("Authentication Handler", AUTHENTICATION_TYPE, interface, NULL),
+	: KPPPOptionHandler("Authentication Handler", kAuthenticationType, interface, NULL),
 	fLocalAuthenticator(NULL),
 	fPeerAuthenticator(NULL),
 	fSuggestedLocalAuthenticator(NULL),
@@ -42,7 +42,7 @@ _KPPPAuthenticationHandler::NextAuthenticator(const KPPPProtocol *start,
 	KPPPProtocol *current = start ? start->NextProtocol() : Interface().FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
-		if(current->Type() && !strcasecmp(current->Type(), AUTHENTICATOR_TYPE_STRING)
+		if(current->Type() && !strcasecmp(current->Type(), kAuthenticatorTypeString)
 				&& current->OptionHandler() && current->Side() == side)
 			return current;
 	}
@@ -115,7 +115,7 @@ _KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 	// The authenticator's OptionHandler is not notified.
 	
 	authentication_item *item =
-		(authentication_item*) nak.ItemWithType(AUTHENTICATION_TYPE);
+		(authentication_item*) nak.ItemWithType(kAuthenticationType);
 	
 	if(!item)
 		return B_OK;
@@ -137,7 +137,7 @@ _KPPPAuthenticationHandler::ParseNak(const KPPPConfigurePacket& nak)
 	fPeerAuthenticatorRejected = true;
 	KPPPProtocol *authenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
 	if(authenticator && authenticator->Type()
-			&& !strcasecmp(authenticator->Type(), AUTHENTICATOR_TYPE_STRING)
+			&& !strcasecmp(authenticator->Type(), kAuthenticatorTypeString)
 			&& authenticator->OptionHandler())
 		fSuggestedPeerAuthenticator = authenticator;
 	else
@@ -151,7 +151,7 @@ status_t
 _KPPPAuthenticationHandler::ParseReject(const KPPPConfigurePacket& reject)
 {
 	// an authentication request must not be rejected!
-	if(reject.ItemWithType(AUTHENTICATION_TYPE))
+	if(reject.ItemWithType(kAuthenticationType))
 		return B_ERROR;
 	
 	return B_OK;
@@ -162,7 +162,7 @@ status_t
 _KPPPAuthenticationHandler::ParseAck(const KPPPConfigurePacket& ack)
 {
 	authentication_item *item =
-		(authentication_item*) ack.ItemWithType(AUTHENTICATION_TYPE);
+		(authentication_item*) ack.ItemWithType(kAuthenticationType);
 	
 	if(!item) {
 		if(fPeerAuthenticator)
@@ -200,7 +200,7 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	// try to find the requested protocol
 	fLocalAuthenticator = Interface().ProtocolFor(ntohs(item->protocolNumber));
 	if(fLocalAuthenticator && fLocalAuthenticator->Type()
-			&& !strcasecmp(fLocalAuthenticator->Type(), AUTHENTICATOR_TYPE_STRING)
+			&& !strcasecmp(fLocalAuthenticator->Type(), kAuthenticatorTypeString)
 			&& fLocalAuthenticator->OptionHandler())
 		return fLocalAuthenticator->OptionHandler()->ParseRequest(request, index,
 			nak, reject);
@@ -225,7 +225,7 @@ _KPPPAuthenticationHandler::ParseRequest(const KPPPConfigurePacket& request,
 	
 	// nak this authenticator and suggest an alternative
 	authentication_item suggestion;
-	suggestion.type = AUTHENTICATION_TYPE;
+	suggestion.type = kAuthenticationType;
 	suggestion.length = 4;
 	suggestion.protocolNumber = htons(nextAuthenticator->ProtocolNumber());
 	return nak.AddItem((ppp_configure_item*) &suggestion) ? B_OK : B_ERROR;
@@ -238,7 +238,7 @@ _KPPPAuthenticationHandler::SendingAck(const KPPPConfigurePacket& ack)
 	// do not insist on authenticating our side of the link ;)
 	
 	authentication_item *item =
-		(authentication_item*) ack.ItemWithType(AUTHENTICATION_TYPE);
+		(authentication_item*) ack.ItemWithType(kAuthenticationType);
 	
 	if(!item)
 		return B_OK;

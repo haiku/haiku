@@ -19,7 +19,7 @@
 #include <core_funcs.h>
 
 
-#define PPP_STATE_MACHINE_TIMEOUT			3000000
+static const bigtime_t kPPPStateMachineTimeout = 3000000;
 	// 3 seconds
 
 
@@ -265,6 +265,8 @@ KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 		fLocalAuthenticationName = strdup(name);
 	else
 		fLocalAuthenticationName = NULL;
+	
+	// the report will be sent in DownEvent()
 }
 
 
@@ -329,6 +331,8 @@ KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 		fPeerAuthenticationName = NULL;
 	
 	CloseEvent();
+	
+	// the report will be sent in DownEvent()
 }
 
 
@@ -1762,7 +1766,7 @@ KPPPStateMachine::SendConfigureRequest()
 	
 	LockerHelper locker(fLock);
 	--fRequestCounter;
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + kPPPStateMachineTimeout;
 	locker.UnlockNow();
 	
 	KPPPConfigurePacket request(PPP_CONFIGURE_REQUEST);
@@ -1843,7 +1847,7 @@ KPPPStateMachine::SendTerminateRequest()
 	
 	LockerHelper locker(fLock);
 	--fTerminateCounter;
-	fNextTimeout = system_time() + PPP_STATE_MACHINE_TIMEOUT;
+	fNextTimeout = system_time() + kPPPStateMachineTimeout;
 	locker.UnlockNow();
 	
 	struct mbuf *packet = m_gethdr(MT_DATA);
