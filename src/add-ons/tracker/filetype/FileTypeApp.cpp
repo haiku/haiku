@@ -233,7 +233,7 @@ BFilePanel *
 FileTypeApp::OpenPanel()
 {
 	if (fOpenPanel == 0) {
-		fOpenPanel = new BFilePanel(B_OPEN_PANEL);
+		fOpenPanel = new BFilePanel(B_OPEN_PANEL,NULL,NULL,B_FILE_NODE|B_DIRECTORY_NODE);
 	}
 	return fOpenPanel;
 }

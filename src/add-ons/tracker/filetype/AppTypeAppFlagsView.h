@@ -20,7 +20,7 @@ private:
 	BRadioButton	* fAppFlagsMultipleRadioButton;
 	BRadioButton	* fAppFlagsExclusiveRadioButton;
 	BCheckBox		* fAppFlagsArgvOnlyCheckBox;
-	BCheckBox		* fAppFlagsBackOnlyCheckBox;
+	BCheckBox		* fAppFlagsBackgroundCheckBox;
 };
 
 #endif // APP_TYPE_APP_FLAGS_VIEW_H

@@ -2,6 +2,7 @@
 #define APP_TYPE_SUPPORTED_TYPES_VIEW_H
 
 #include <Box.h>
+#include <Button.h>
 #include <Menu.h>
 #include <MenuField.h>
 #include <MenuItem.h>
