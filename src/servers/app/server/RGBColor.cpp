@@ -107,7 +107,7 @@ RGBColor::RGBColor(void)
 	\brief Returns the color as the closest 8-bit color in the palette
 	\return The palette index for the current color
 */
-uint8 RGBColor::GetColor8(void)
+uint8 RGBColor::GetColor8(void) const
 {
 	return color8;
 }
@@ -116,7 +116,7 @@ uint8 RGBColor::GetColor8(void)
 	\brief Returns the color as the closest 16-bit color
 	\return 16-bit value of the current color, including alpha
 */
-uint16 RGBColor::GetColor16(void)
+uint16 RGBColor::GetColor16(void) const
 {
 	return color16;
 }
@@ -125,7 +125,7 @@ uint16 RGBColor::GetColor16(void)
 	\brief Returns the color as a 32-bit color
 	\return current color, including alpha
 */
-rgb_color RGBColor::GetColor32(void)
+rgb_color RGBColor::GetColor32(void) const
 {
 	return color32;
 }
@@ -240,7 +240,7 @@ RGBColor & RGBColor::operator=(const rgb_color &col)
 	If the position passed to this function is invalid, the starting
 	color will be returned.
 */
-RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
+RGBColor RGBColor::MakeBlendColor(const RGBColor &color, const float &position)
 {
 	rgb_color col=color32;
 	rgb_color col2=color.color32;

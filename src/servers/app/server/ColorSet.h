@@ -42,7 +42,7 @@ public:
 	ColorSet(const ColorSet &cs);
 	ColorSet & operator=(const ColorSet &cs);
 	void SetColors(const ColorSet &cs);
-	void PrintToStream(void);
+	void PrintToStream(void) const;
 	
 	RGBColor panel_background,
 	panel_text,
@@ -81,5 +81,7 @@ public:
 };
 
 void SetDefaultGUIColors(ColorSet *set);
+bool LoadGUIColors(ColorSet *set);
+void SaveGUIColors(const ColorSet &set);
 
 #endif

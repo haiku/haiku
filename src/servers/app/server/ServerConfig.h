@@ -26,7 +26,7 @@
 #define HWDRIVER 3
 
 // Display driver to be used by the server.
-#define DISPLAYDRIVER SCREENDRIVER
+#define DISPLAYDRIVER VIEWDRIVER
 
 // Uncomment this if the DisplayDriver should only rely on drawing functions implemented
 // in software even though hardware-accelerated functions are available
@@ -43,7 +43,7 @@
 // regular application. When running as the app_server, this is not used.
 #define SERVER_SIGNATURE "application/x-vnd.obe-OBAppServer"
 
-// Directory for all app_server-related settings.
+// Directory for all app_server-related settings. Must include ending slash.
 #define SERVER_SETTINGS_DIR "/boot/home/config/settings/app_server/"
 
 // Flattened list of usable fonts maintained by the server. The file is a

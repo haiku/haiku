@@ -98,10 +98,11 @@ AppServer::AppServer(void)
 				DEFAULT_FIXED_FONT_STYLE,DEFAULT_FIXED_FONT_SIZE);
 	fontserver->Unlock();
 	
-	// Get the GUI colors here. For now, we'll just set the defaults
-	SetDefaultGUIColors(&gui_colorset);
 	
-	// TODO: load the GUI colors here and set the global set to the values contained therein
+	// Load the GUI colors here and set the global set to the values contained therein. If this
+	// is not possible, set colors to the defaults
+	if(!LoadGUIColors(&gui_colorset))
+		SetDefaultGUIColors(&gui_colorset);
 	
 	// Set up the Desktop
 	InitDesktop();

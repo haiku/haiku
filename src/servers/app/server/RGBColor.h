@@ -51,9 +51,9 @@ public:
 	
 	void PrintToStream(void) const;
 	
-	uint8 GetColor8(void);
-	uint16 GetColor16(void);
-	rgb_color GetColor32(void);
+	uint8 GetColor8(void) const;
+	uint16 GetColor16(void) const;
+	rgb_color GetColor32(void) const;
 	
 	void SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255);
 	void SetColor(int r, int g, int b, int a=255);
@@ -62,7 +62,7 @@ public:
 	void SetColor(const rgb_color &color);
 	void SetColor(const RGBColor &col);
 	
-	RGBColor MakeBlendColor(RGBColor color, float position);
+	RGBColor MakeBlendColor(const RGBColor &color, const float &position);
 	
 	RGBColor & operator=(const RGBColor &col);
 	RGBColor & operator=(const rgb_color &col);
