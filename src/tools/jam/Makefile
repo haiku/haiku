@@ -4,6 +4,7 @@ CC = cc
 CFLAGS =
 EXENAME = ./jam0
 TARGET = -o $(EXENAME)
+HOST_SYSTEM=$(shell uname)
 
 # Special flavors - uncomment appropriate lines
 
@@ -50,8 +51,10 @@ TARGET = -o $(EXENAME)
 # QNX rtp (neutrino)
 #CC = gcc
 
-# BeOS
-LINKLIBS = -lnet
+# BeOS (R5 only, actually, but who cares)
+ifeq ($(HOST_SYSTEM), BeOS)
+	LINKLIBS = -lnet
+endif
 
 SOURCES = \
 	builtins.c \
