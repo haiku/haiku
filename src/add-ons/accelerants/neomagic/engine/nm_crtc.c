@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-4/2004
+   Rudolf Cornelissen 4/2003-5/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -105,7 +105,7 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 	/* modify visible sceensize if needed */
 	/* (note that MOVE_CURSOR checks for a panning/scrolling mode itself,
 	 *  the display_mode as placed in si->dm may _not_ be modified!) */
-	if (!(crt_only))
+	if (!crt_only)
 	{
 		if (target.timing.h_display > si->ps.panel_width)
 		{
@@ -117,6 +117,10 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 			target.timing.v_display = si->ps.panel_height;
 			LOG(4, ("CRTC: req. height > panel height: setting scrolling mode\n"));
 		}
+
+		/* modify sync polarities (needed to maintain correct panel centering):
+		 * both polarities must be same (confirmed NM2160) */
+		target.timing.flags |= (B_POSITIVE_HSYNC | B_POSITIVE_VSYNC);
 	}
 
 	/* Modify parameters as required by standard VGA */
@@ -199,35 +203,6 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 				((vsync_s & 0x400) >> (10 - 3))/*|
 				((linecomp&0x400)>>3)*/
 			));
-
-		/* setup HSYNC & VSYNC polarity */
-		LOG(2,("CRTC: sync polarity: "));
-		temp = ISARB(MISCR);
-		if (target.timing.flags & B_POSITIVE_HSYNC)
-		{
-			LOG(2,("H:pos "));
-			temp &= ~0x40;
-		}
-		else
-		{
-			LOG(2,("H:neg "));
-			temp |= 0x40;
-		}
-		if (target.timing.flags & B_POSITIVE_VSYNC)
-		{
-			LOG(2,("V:pos "));
-			temp &= ~0x80;
-		}
-		else
-		{
-			LOG(2,("V:neg "));
-			temp |= 0x80;
-		}
-		/* we need to wait a bit or the card will mess-up it's register values.. */
-		snooze(10);
-		ISAWB(MISCW, temp);
-
-		LOG(2,(", MISC reg readback: $%02x\n", ISARB(MISCR)));
 	}
 	else
 	{
@@ -285,6 +260,34 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 			));
 		}
 	}
+
+	/* setup HSYNC & VSYNC polarity */
+	LOG(2,("CRTC: sync polarity: "));
+	temp = ISARB(MISCR);
+	if (target.timing.flags & B_POSITIVE_HSYNC)
+	{
+		LOG(2,("H:pos "));
+		temp &= ~0x40;
+	}
+	else
+	{
+		LOG(2,("H:neg "));
+		temp |= 0x40;
+	}
+	if (target.timing.flags & B_POSITIVE_VSYNC)
+	{
+		LOG(2,("V:pos "));
+		temp &= ~0x80;
+	}
+	else
+	{
+		LOG(2,("V:neg "));
+		temp |= 0x80;
+	}
+	/* we need to wait a bit or the card will mess-up it's register values.. */
+	snooze(10);
+	ISAWB(MISCW, temp);
+	LOG(2,(", MISC reg readback: $%02x\n", ISARB(MISCR)));
 
 	/* program 'fixed' mode if needed */
 	if (si->ps.card_type != NM2070)
