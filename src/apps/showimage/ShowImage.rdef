@@ -48,7 +48,7 @@ resource app_version {
 	internal = 0,
 	
 	short_info = "Show Image",
-	long_info = "OpenBeOS - ShowImage\nFernando Francisco de Oliveira"
+	long_info = "OpenBeOS - ShowImage"
 };
 
 resource large_icon array {

@@ -757,7 +757,7 @@ Scaler::Dither(int32 fromRow, int32 toRow)
 	dest = GetDestImage();
 
 	ASSERT(src->ColorSpace() == B_RGB32 || src->ColorSpace() == B_RGBA32);
-	ASSERT(dest->ColorSpce() == B_CMAP8);
+	ASSERT(dest->ColorSpace() == B_CMAP8);
 	ASSERT(src->Bounds().IntegerWidth() == dest->Bounds().IntegerWidth());
 	ASSERT(src->Bounds().IntegerHeight() == dest->Bounds().IntegerHeight());
 	

@@ -28,4 +28,4 @@
 
 #include "ShowImageConstants.h"
 
-extern const char *APP_SIG		= "application/x-vnd.FFO-ShowImage";
+extern const char *APP_SIG		= "application/x-vnd.obos.showimage";
