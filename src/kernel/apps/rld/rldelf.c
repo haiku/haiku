@@ -260,7 +260,7 @@ count_regions(char const *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, "unhandled pheader type 0x%x\n", pheaders[i].p_type);
+				FATAL(true, "unhandled pheader type 0x%lx\n", pheaders[i].p_type);
 				break;
 		}
 	}
@@ -406,7 +406,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 				/* we don't use it */
 				break;
 			default:
-				FATAL(true, "unhandled pheader type 0x%x\n", pheaders[i].p_type);
+				FATAL(true, "unhandled pheader type 0x%lx\n", pheaders[i].p_type);
 				break;
 		}
 	}
