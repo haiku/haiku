@@ -1,12 +1,14 @@
-/* Module manager */
-
 /*
-** Copyright 2002-2004, Haiku Inc.. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+/* The Module manager
+ * Manages kernel add-ons and their exported modules.
+ */
 
 
 #include <kmodule.h>
@@ -273,7 +275,7 @@ load_module_image(const char *path, module_image **_moduleImage)
 
 	if (get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
 			(void **)&moduleImage->info) != B_OK) {
-		FATAL(("load_module_image: Failed to load %s due to lack of 'modules' symbol\n", path));
+		TRACE(("load_module_image: Failed to load \"%s\" due to lack of 'modules' symbol\n", path));
 		status = B_BAD_TYPE;
 		goto err1;
 	}
@@ -314,11 +316,15 @@ unload_module_image(module_image *moduleImage, const char *path)
 {
 	TRACE(("unload_module_image(image = %p, path = %s)\n", moduleImage, path));
 
+	recursive_lock_lock(&sModulesLock);
+
 	if (moduleImage == NULL) {
 		// if no image was specified, lookup it up in the hash table
 		moduleImage = (module_image *)hash_lookup(sModuleImagesHash, path);
-		if (moduleImage == NULL)
+		if (moduleImage == NULL) {
+			recursive_lock_unlock(&sModulesLock);
 			return B_ENTRY_NOT_FOUND;
+		}
 	}
 
 	if (moduleImage->ref_count != 0) {
@@ -326,7 +332,6 @@ unload_module_image(module_image *moduleImage, const char *path)
 		return B_ERROR;
 	}
 
-	recursive_lock_lock(&sModulesLock);
 	hash_remove(sModuleImagesHash, moduleImage);
 	recursive_lock_unlock(&sModulesLock);
 
@@ -1053,6 +1058,49 @@ dump_modules(int argc, char **argv)
 
 //	#pragma mark -
 //	Exported Kernel API (private part)
+
+
+/**	Unloads a module in case it's not in use. This is the counterpart
+ *	to load_module().
+ */
+
+status_t
+unload_module(const char *path)
+{
+	struct module_image *moduleImage;
+
+	recursive_lock_lock(&sModulesLock);
+	moduleImage = (module_image *)hash_lookup(sModuleImagesHash, path);
+	recursive_lock_unlock(&sModulesLock);
+
+	if (moduleImage == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	put_module_image(moduleImage);
+	return B_OK;
+}
+
+
+/**	Unlike get_module(), this function lets you specify the add-on to
+ *	be loaded by path.
+ *	However, you must not use the exported modules without having called
+ *	get_module() on them. When you're done with the NULL terminated
+ *	\a modules array, you have to call unload_module(), no matter if
+ *	you're actually using any of the modules or not - of course, the
+ *	add-on won't be unloaded until the last put_module().
+ */
+
+status_t
+load_module(const char *path, module_info ***_modules)
+{
+	module_image *moduleImage;
+	status_t status = get_module_image(path, &moduleImage);
+	if (status != B_OK)
+		return status;
+
+	*_modules = moduleImage->info;
+	return B_OK;
+}
 
 
 /** Setup the module structures and data for use - must be called
