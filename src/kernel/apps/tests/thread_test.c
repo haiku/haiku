@@ -28,6 +28,7 @@ static int counter_thread(void *data)
 	release_sem(tt->the_lock);
 	
 	free(data);
+	return 0;
 }
 
 int main(int argc, char **argv)
