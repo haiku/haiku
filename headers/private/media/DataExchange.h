@@ -32,7 +32,7 @@ status_t QueryServer(int32 msgcode, request_data *request, int requestsize, repl
 status_t SendToAddonServer(int32 msgcode, command_data *msg, int size);
 status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
-// Raw data based data exchange with the media_server
+// Raw data based data exchange with any (media node control-) port
 status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size);
 status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
@@ -154,6 +154,8 @@ enum {
 	FILEINTERFACE_MESSAGE_END,
 	CONTROLLABLE_MESSAGE_START = 0x600,
 	CONTROLLABLE_GET_PARAMETER_WEB,
+	CONTROLLABLE_GET_PARAMETER_DATA,
+	CONTROLLABLE_SET_PARAMETER_DATA,
 	CONTROLLABLE_MESSAGE_END,
 	TIMESOURCE_MESSAGE_START = 0x700,
 	
@@ -873,5 +875,22 @@ struct controllable_get_parameter_web_reply : public reply_data
 	type_code code;
 	int32 size; // = -1: parameter web data too large, = 0: no p.w., > 0: flattened p.w. data
 };
+
+#define MAX_PARAMETER_DATA (B_MEDIA_MESSAGE_SIZE - 100)
+
+struct controllable_get_parameter_data_request : public request_data
+{
+	int32 parameter_id;
+	size_t requestsize;
+	area_id area; //if area != -1, data is to large and must be passed in area
+};
+
+struct controllable_get_parameter_data_reply : public reply_data
+{
+	bigtime_t last_change;
+	char rawdata[MAX_PARAMETER_DATA];
+	size_t size;
+};
+
 
 #endif // _DATA_EXCHANGE_H
