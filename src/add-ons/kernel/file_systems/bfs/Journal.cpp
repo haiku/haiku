@@ -49,10 +49,10 @@ Journal::InitCheck()
 
 
 status_t
-Journal::CheckLogEntry(int32 count,off_t *array)
+Journal::CheckLogEntry(int32 count, off_t *array)
 {
 	// ToDo: check log entry integrity (block numbers and entry size)
-	PRINT(("Log entry has %ld entries (%Ld)\n", count));
+	PRINT(("Log entry has %ld entries (%Ld)\n", count, array[0]));
 	return B_OK;
 }
 
@@ -303,7 +303,7 @@ Journal::WriteLogEntry()
 	fVolume->SuperBlock().log_end = logPosition;
 	fVolume->LogEnd() = logPosition;
 
-	fVolume->WriteSuperBlock();
+	return fVolume->WriteSuperBlock();
 }
 
 

@@ -454,8 +454,8 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 		int32 bytes = run.length << blockShift;
 #ifdef DEBUG
-		if (bytes > length)
-			DEBUGGER("bytes greater than length");
+		if ((uint32)bytes > length)
+			DEBUGGER(("bytes greater than length"));
 #endif
 		length -= bytes;
 		bytesRead += bytes;

@@ -793,7 +793,7 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 	}
 
 	if (mask & WSTAT_MODE) {
-		PRINT(("original mode = %ld, stat->st_mode = %ld\n", node->mode, stat->st_mode));
+		PRINT(("original mode = %ld, stat->st_mode = %d\n", node->mode, stat->st_mode));
 		node->mode = node->mode & ~S_IUMSK | stat->st_mode & S_IUMSK;
 	}
 
@@ -824,7 +824,7 @@ int
 bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 	vnode_id *vnodeID, void **_cookie)
 {
-	FUNCTION_START(("name = \"%s\", perms = %ld, omode = %ld\n", name, mode, omode));
+	FUNCTION_START(("name = \"%s\", perms = %d, omode = %d\n", name, mode, omode));
 
 	if (_ns == NULL || _directory == NULL || _cookie == NULL
 		|| name == NULL || *name == '\0')
@@ -1419,7 +1419,7 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *bufferSize)
 int 
 bfs_mkdir(void *_ns, void *_directory, const char *name, int mode)
 {
-	FUNCTION_START(("name = \"%s\", perms = %ld\n", name, mode));
+	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
 	if (_ns == NULL || _directory == NULL
 		|| name == NULL || *name == '\0')
@@ -1880,7 +1880,7 @@ bfs_read_indexdir(void *_ns, void *_cookie, long *num, struct dirent *dirent, si
 int 
 bfs_create_index(void *_ns, const char *name, int type, int flags)
 {
-	FUNCTION_START(("name = \"%s\", type = %ld, flags = %ld\n", name, type, flags));
+	FUNCTION_START(("name = \"%s\", type = %d, flags = %d\n", name, type, flags));
 	if (_ns == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 

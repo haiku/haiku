@@ -120,7 +120,7 @@ void
 AllocationBlock::Allocate(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
-	ASSERT(start + numBlocks <= fNumBits);
+	ASSERT(uint32(start + numBlocks) <= fNumBits);
 
 	if (uint32(start + numBlocks) > fNumBits) {
 		FATAL(("Allocation::Allocate(): tried to allocate too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
@@ -151,7 +151,7 @@ void
 AllocationBlock::Free(uint16 start, uint16 numBlocks)
 {
 	ASSERT(start < fNumBits);
-	ASSERT(start + numBlocks <= fNumBits);
+	ASSERT(uint32(start + numBlocks) <= fNumBits);
 
 	if (uint32(start + numBlocks) > fNumBits) {
 		FATAL(("Allocation::Free(): tried to free too many blocks: %u (numBlocks = %lu)!\n", numBlocks, fNumBits));
@@ -302,6 +302,7 @@ AllocationGroup::Free(Transaction *transaction, uint16 start, int32 length)
 		start = 0;
 		block++;
 	}
+	return B_OK;
 }
 
 

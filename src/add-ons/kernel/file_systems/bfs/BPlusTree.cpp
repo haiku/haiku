@@ -1613,7 +1613,7 @@ BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 				*_value = node->Values()[keyIndex];
 
 #ifdef DEBUG
-			if (levels != fHeader->max_number_of_levels)
+			if (levels != (int32)fHeader->max_number_of_levels)
 				DEBUGGER(("levels don't match"));
 #endif
 			return status;

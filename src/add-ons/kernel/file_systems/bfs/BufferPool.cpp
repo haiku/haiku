@@ -115,6 +115,7 @@ BufferPool::ReleaseBuffers()
 	fFirstFree = buffer;
 
 	release_sem(fLock);
+	return B_OK;
 }
 
 
