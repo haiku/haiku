@@ -2,15 +2,14 @@ SubDir OBOS_TOP src kits network libnetapi ;
 
 UsePrivateHeaders net ;
 
+SubDirC++Flags -DBUILDING_R5_LIBNET ;
+
 SharedLibrary netapi :
 #	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp
-;
-
-LinkSharedOSLibs libnetapi.so :
-	be libsocket.so libbind.so
+	: be libnet.so
 ;
 
 # Installation -- in the test directory for the time being
