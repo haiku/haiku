@@ -9,6 +9,12 @@
 #include <boot/stage2.h>
 #include <boot/platform.h>
 
+#include <string.h>
+
+
+// ToDo: the kernel_args heap chunks need to be remembered in the kernel_args
+//	structure, so that unneeded memory can be freed in the kernel again.
+
 
 static const size_t kChunkSize = 16384;
 
@@ -57,6 +63,27 @@ kernel_args_malloc(size_t size)
 	sFree = kChunkSize - size;
 
 	return block;
+}
+
+
+/** Convenience function that copies strdup() functions for the
+ *	kernel args heap.
+ */
+
+extern "C" char *
+kernel_args_strdup(const char *string)
+{
+	if (string == NULL || string[0] == '\0')
+		return NULL;
+
+	size_t length = strlen(string) + 1;
+
+	char *target = (char *)kernel_args_malloc(length);
+	if (target == NULL)
+		return NULL;
+
+	memcpy(target, string, length);
+	return target;
 }
 
 
