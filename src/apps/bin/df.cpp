@@ -20,11 +20,12 @@ void	PrintUsageInfo	(void);
 void	PrintFlagSupport (uint32 dev_flags, uint32 test_flag, char * flag_descr, bool verbose);
 void	PrintMountPoint (dev_t dev_num, bool verbose);
 void	PrintType (const char * fsh_name);
-void	PrintBlocks (int64 blocks);
+void	PrintBlocks (int64 blocks, int64 blocksize, bool human);
 
 int	main (int32 argc, char **argv)
 {
 	bool verbose	=	false;
+	bool human	=	false;
 
 	if (argc > 1)	
 	{
@@ -40,6 +41,11 @@ int	main (int32 argc, char **argv)
 		if (option == "--verbose")
 		{
 			verbose	=	true;
+		}
+		
+		if (option == "--human" || option == "-h")
+		{
+			human =		true;
 		}
 	}
 
@@ -94,8 +100,8 @@ int	main (int32 argc, char **argv)
 				{
 					PrintMountPoint (info.dev, verbose);
 					PrintType(info.fsh_name);
-					PrintBlocks(info.total_blocks);
-					PrintBlocks(info.free_blocks);
+					PrintBlocks(info.total_blocks, info.block_size, human);
+					PrintBlocks(info.free_blocks, info.block_size, human);
 
 					PrintFlagSupport (info.flags, B_FS_HAS_QUERY, "Q", verbose);
 					PrintFlagSupport (info.flags, B_FS_HAS_ATTR, "A", verbose);
@@ -120,7 +126,8 @@ int	main (int32 argc, char **argv)
 
 void PrintUsageInfo (void)
 {
-	printf ("usage: df [--verbose | --help]\n"
+	printf ("usage: df [--verbose | --help | --human | -h]\n"
+			"  -h = --human = human readable (KB by default)\n"
 			"  flags:\n"
 			"   Q: has query\n"
 			"   A: has attribute\n"
@@ -187,10 +194,29 @@ void PrintType (const char * fsh_name)
 	printf("%s", type.String());
 }
 
-void PrintBlocks (int64 blocks)
+void PrintBlocks (int64 blocks, int64 blocksize, bool human)
 {
 	char * temp	=	new char [1024];
-	sprintf(temp, "%Ld", blocks);
+	if (!human)
+		sprintf(temp, "%lld", blocks * (blocksize / 1024));
+	else {
+		if (blocks < 1024) {
+			sprintf(temp, "%lld" /*" B"*/, blocks);
+		} else {
+			double fblocks = ((double)blocks) * (blocksize / 1024);
+			if (fblocks < 1024) {
+				sprintf(temp, "%.1LfK", fblocks);
+			} else {
+				fblocks = (((double)blocks) / 1024) * (blocksize / 1024);;
+				if (fblocks < 1024) {
+					sprintf(temp, "%.1LfM", fblocks);
+				} else {
+					fblocks = (((double)blocks) / (1024*1024)) * (blocksize / 1024);
+					sprintf(temp, "%.1LfG", fblocks);
+				}
+			}
+		}
+	}
 	
 	BString		type	=	"         ";
 	type.Insert(temp, 8 - strlen(temp));
