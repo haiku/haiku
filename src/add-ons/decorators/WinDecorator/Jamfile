@@ -1,14 +1,11 @@
 SubDir OBOS_TOP src add-ons decorators WinDecorator ;
 
+UseFreeTypeHeaders ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app server ] ;
+UsePrivateHeaders [ FDirName servers app ] ;
+
 Addon WinDecorator : decorators :
 	WinDecorator.cpp
-	ColorSet.cpp
-	Decorator.cpp
-	DisplayDriver.cpp
-	RGBColor.cpp
-	SystemPalette.cpp
-	ServerBitmap.cpp
-	ServerCursor.cpp
+	: false
+	: be libopenbeos.so libappserver.so
 ;
-
-LinkSharedOSLibs WinDecorator : be libopenbeos.so ;
