@@ -1,51 +1,39 @@
-//===========================================================================
-// ABOUT ////////////////////////////////////////////////////////////////////
-//===========================================================================
-
-// DESCRIPTION: BeOS' command line "beep" command
-// AUTHOR: Mahmoud Al Gammal
-// STARTED: MON, SPT 23th, 2002
-// LAST MODIFIED: MON, SPT 23th, 2002
-
-//===========================================================================
-// END ABOUT ////////////////////////////////////////////////////////////////
-//===========================================================================
-
-//====================//
-
-//===========================================================================
-// INCLUDE //////////////////////////////////////////////////////////////////
-//===========================================================================
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        beep.cpp
+//  Author:      Mahmoud Al Gammal 
+//  Description: BeOS' command line "beep" command
+//  Created : Monday, September 23, 2002
+//
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include <Beep.h>
-#include <iostream>
+#include <stdio.h>
 
-//===========================================================================
-// END INCLUDE //////////////////////////////////////////////////////////////
-//===========================================================================
-
-//====================//
-
-//===========================================================================
-// MAIN /////////////////////////////////////////////////////////////////////
-//===========================================================================
-
-int main( int argc, char* argv[] ) {
+int
+main( int argc, char* argv[] )
+{
 
 	// "beep" can only take a single optional event name
-	if( argc > 2 ) {
-		cout << "usage: beep [ eventname ]\n"
-				"Event names are found in the Sounds preferences panel."
-			 << std::endl;
-				
+	if (argc > 2) {
+		fprintf(stdout,"usage: beep [ eventname ]\n");
+		fprintf(stdout,"Event names are found in the Sounds preferences panel.\n");
+		fflush(stdout);		
 		return B_OK;
 	}
 	
 	// if no event name is specified, play the default "Beep" event
-	if( argc == 1 ) return beep();
-	else return system_beep( argv[1] );
+	if (argc == 1) {
+		return beep();
+	}	else {
+		return system_beep(argv[1]);
+	}
 }
 
-//===========================================================================
-// END MAIN /////////////////////////////////////////////////////////////////
-//===========================================================================
+// beep.c

@@ -2,6 +2,7 @@ SubDir OBOS_TOP src apps bin ;
 
 StdBinCommands
 		alert.cpp
+		beep.cpp
 		clipboard.cpp
 		shutdown.cpp
 		clipboard.cpp
@@ -16,7 +17,6 @@ StdBinCommands
 
 StdBinCommands
 		roster.cpp
-		beep.cpp
 		catattr.cpp
 	: be stdc++.r4 ;
 
