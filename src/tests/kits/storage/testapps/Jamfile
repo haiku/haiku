@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src tests kits storage testapps ;
+
+SimpleTest dump_mime_types : dump_mime_types.cpp : be net ;

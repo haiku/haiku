@@ -43,4 +43,5 @@ CommonTestLib libstoragetest.so
 }
 
 SubInclude OBOS_TOP src tests kits storage disk_device ;
+SubInclude OBOS_TOP src tests kits storage testapps ;
 SubInclude OBOS_TOP src tests kits storage virtualdrive ;
