@@ -970,6 +970,16 @@ static status_t
 get_vnode_name(struct vnode *vnode, struct vnode *parent,
 	char *name, size_t nameSize)
 {
+	VNodePutter vnodePutter;
+
+	// See if vnode is the root of a mount and move to the covered
+	// vnode so we get the underlying file system
+	if (vnode->mount->root_vnode == vnode && vnode->mount->covers_vnode != NULL) {
+		vnode = vnode->mount->covers_vnode;
+		inc_vnode_ref_count(vnode);
+		vnodePutter.SetTo(vnode);
+	}
+
 	if (FS_CALL(vnode, get_vnode_name)) {
 		// The FS supports getting the name of a vnode.
 		return FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,
@@ -990,7 +1000,7 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 				parent->private_node, cookie, dirent, sizeof(buffer), &num);
 			if (status < B_OK)
 				break;
-			
+
 			if (vnode->id == dirent->d_ino)
 				// found correct entry!
 				if (strlcpy(name, dirent->d_name, nameSize) >= nameSize)
@@ -1417,29 +1427,25 @@ vfs_vnode_release_ref(void *vnode)
 }
 
 
+/** This is currently called from file_cache_create() only.
+ *	It's probably a temporary solution as long as devfs requires that
+ *	fs_read_pages()/fs_write_pages() are called with the standard
+ *	open cookie and not with a device cookie.
+ *	If that's done differently, remove this call; it has no other
+ *	purpose.
+ */
+
 extern "C" status_t
-vfs_get_vnode_cache(void *_vnode, void **_cache)
+vfs_get_cookie_from_fd(int fd, void **_cookie)
 {
-	struct vnode *vnode = (struct vnode *)_vnode;
+	struct file_descriptor *descriptor;
 
-	if (vnode->cache != NULL) {
-		*_cache = vnode->cache;
-		return B_OK;
-	}
+	descriptor = get_fd(get_current_io_context(true), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
 
-	mutex_lock(&sVnodeMutex);
-
-	status_t status = B_OK;
-	// The cache could have been created in the meantime
-	if (vnode->cache == NULL)
-		status = vm_create_vnode_cache(vnode, (void **)&vnode->cache);
-
-	if (status == B_OK)
-		*_cache = vnode->cache;
-
-	mutex_unlock(&sVnodeMutex);
-
-	return status;
+	*_cookie = descriptor->cookie;
+	return B_OK;
 }
 
 
@@ -1478,7 +1484,17 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 extern "C" status_t
 vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 {
-	return get_vnode(mountID, vnodeID, (struct vnode **)_vnode, true);
+	// ToDo: this currently doesn't use the sVnodeMutex lock - that's
+	//	because it's only called from file_cache_create() with that
+	//	lock held anyway (as it should be called from fs_read_vnode()).
+	//	Find a better solution!
+	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode == NULL)
+		return B_ERROR;
+
+	*_vnode = vnode;
+	return B_OK;
+	//return get_vnode(mountID, vnodeID, (struct vnode **)_vnode, true);
 }
 
 
@@ -1570,39 +1586,75 @@ vfs_put_vnode_ptr(void *_vnode)
 }
 
 
-bool
-vfs_can_page(void *_vnode)
+extern "C" bool
+vfs_can_page(void *_vnode, void *cookie)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
 	FUNCTION(("vfs_canpage: vnode 0x%p\n", vnode));
 
 	if (FS_CALL(vnode, can_page))
-		return FS_CALL(vnode, can_page)(vnode->mount->cookie, vnode->private_node);
+		return FS_CALL(vnode, can_page)(vnode->mount->cookie, vnode->private_node, cookie);
 
 	return false;
 }
 
 
-status_t
-vfs_read_pages(void *_vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+extern "C" status_t
+vfs_read_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	FUNCTION(("vfs_readpage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
+	FUNCTION(("vfs_read_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node, pos, vecs, count, _numBytes);
+	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node, cookie, pos, vecs, count, _numBytes);
+}
+
+
+extern "C" status_t
+vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	FUNCTION(("vfs_write_pages: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
+
+	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node, cookie, pos, vecs, count, _numBytes);
+}
+
+
+extern "C" status_t
+vfs_get_vnode_cache(void *_vnode, void **_cache)
+{
+	struct vnode *vnode = (struct vnode *)_vnode;
+
+	if (vnode->cache != NULL) {
+		*_cache = vnode->cache;
+		return B_OK;
+	}
+
+	mutex_lock(&sVnodeMutex);
+
+	status_t status = B_OK;
+	// The cache could have been created in the meantime
+	if (vnode->cache == NULL)
+		status = vm_create_vnode_cache(vnode, (void **)&vnode->cache);
+
+	if (status == B_OK)
+		*_cache = vnode->cache;
+
+	mutex_unlock(&sVnodeMutex);
+	return status;
 }
 
 
 status_t
-vfs_write_pages(void *_vnode, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
+vfs_get_file_map(void *_vnode, off_t offset, size_t size, file_io_vec *vecs, size_t *_count)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	FUNCTION(("vfs_writepage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
+	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, pos %Ld, size = %lu\n", vnode, vecs, pos, size));
 
-	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node, pos, vecs, count, _numBytes);
+	return FS_CALL(vnode, get_file_map)(vnode->mount->cookie, vnode->private_node, offset, size, vecs, _count);
 }
 
 
@@ -4455,7 +4507,8 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 
 	// append the leaf name
 	if (leaf) {
-		if (strlcat(path, "/", sizeof(path)) >= sizeof(path)
+		// insert a directory separator if this is not the file system root
+		if ((strcmp(path, "/") && strlcat(path, "/", sizeof(path)) >= sizeof(path))
 			|| strlcat(path, leaf, sizeof(path)) >= sizeof(path)) {
 			return B_NAME_TOO_LONG;
 		}
