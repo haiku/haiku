@@ -47,10 +47,9 @@
 // ****************************************************************************
 
 #include "CEchoGals.h"
-#include <stdarg.h>
-#include <RealtimeAlloc.h>
-#include <OS.h>
-#include <Alert.h>
+#include <KernelExport.h>
+#include "queue.h"
+#include "util.h"
 
 /****************************************************************************
 
@@ -66,18 +65,78 @@
 //===========================================================================
 
 DWORD gdwAllocNonPagedCount = 0;
-rtm_pool * echo_pool = 0;
+
+typedef struct _echo_mem {
+	LIST_ENTRY(_echo_mem) next;
+	void	*log_base;
+	void	*phy_base;
+	area_id area;
+	size_t	size;
+} echo_mem;
+
+LIST_HEAD(, _echo_mem) mems;
+
+
+static echo_mem *
+echo_mem_new(size_t size)
+{
+	echo_mem *mem = NULL;
+
+	if ((mem = (echo_mem*)malloc(sizeof(*mem))) == NULL)
+		return (NULL);
+
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "echo buffer");
+	mem->size = size;
+	if (mem->area < B_OK) {
+		free(mem);
+		return NULL;
+	}
+	return mem;
+}
+
+static void
+echo_mem_delete(echo_mem *mem)
+{
+	if(mem->area > B_OK)
+		delete_area(mem->area);
+	free(mem);
+}
+
+echo_mem *
+echo_mem_alloc(size_t size)
+{
+	echo_mem *mem = NULL;
+	
+	mem = echo_mem_new(size);
+	if (mem == NULL)
+		return (NULL);
+
+	LIST_INSERT_HEAD(&mems, mem, next);
+
+	return mem;
+}
+
+void
+echo_mem_free(void *ptr)
+{
+	echo_mem 		*mem = NULL;
+	
+	LIST_FOREACH(mem, &mems, next) {
+		if (mem->log_base != ptr)
+			continue;
+		LIST_REMOVE(mem, next);
+		
+		echo_mem_delete(mem);
+		break;
+	}
+}
+
 
 void OsAllocateInit()
 {
 	gdwAllocNonPagedCount = 0;
-	rtm_create_pool(&echo_pool,0xFFFF, ECHO_POOL_TAG);
-	if ( NULL == echo_pool )
-	{
-		ECHO_DEBUGPRINTF( ("OsAllocateInit : Failed to create the pool\n") );
-		ECHO_DEBUGBREAK();
-		return;
-	}
+	/* Init mems list */
+	LIST_INIT(&mems);
 
 }	// OsAllocateInit
 
@@ -108,11 +167,15 @@ ECHOSTATUS OsAllocateNonPaged
     PPVOID	ppMemAddr				// Where to return memory ptr
 )
 {
-	*ppMemAddr = rtm_alloc( echo_pool, dwByteCt );
-
+	
+	
+	echo_mem * mem = echo_mem_alloc( dwByteCt );
+	if(mem)
+		*ppMemAddr = mem->log_base;
+	
 	if ( NULL == *ppMemAddr )
 	{
-		ECHO_DEBUGPRINTF( ("OsAllocateNonPaged : Failed on %d bytes\n",
+		ECHO_DEBUGPRINTF( ("OsAllocateNonPaged : Failed on %ld bytes\n",
 								 dwByteCt) );
 		ECHO_DEBUGBREAK();				 
 		return ECHOSTATUS_NO_MEM;
@@ -121,7 +184,7 @@ ECHOSTATUS OsAllocateNonPaged
 	OsZeroMemory( *ppMemAddr, dwByteCt );
 	
 	gdwAllocNonPagedCount++;
-	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %d\n",gdwAllocNonPagedCount));
+	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %ld\n",gdwAllocNonPagedCount));
 	
 	return ECHOSTATUS_OK;
 	
@@ -142,10 +205,10 @@ ECHOSTATUS OsFreeNonPaged
     PVOID	pMemAddr
 )
 {
-	rtm_free( pMemAddr );
+	echo_mem_free( pMemAddr );
 
 	gdwAllocNonPagedCount--;
-	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %d\n",gdwAllocNonPagedCount));
+	ECHO_DEBUGPRINTF(("gdwAllocNonPagedCount %ld\n",gdwAllocNonPagedCount));
 
 	return ECHOSTATUS_OK;
 
@@ -281,21 +344,17 @@ ECHOSTATUS COsSupport::OsPageAllocate
 	PPHYS_ADDR	pPhysicalPageAddr		// Where to return the physical PCI address
 )
 {
-	PHYSICAL_ADDRESS		LogicalAddress;
-
-	*ppPageAddr = rtm_alloc ( echo_pool, dwPageCt );
+	
+	echo_mem *mem = echo_mem_alloc ( dwPageCt * B_PAGE_SIZE );
+	if(mem)
+		*ppPageAddr = mem->log_base;
 	
 	if (NULL != *ppPageAddr)
 	{
-		physical_entry PhysTemp;
-		
-		get_memory_map(ppPageAddr, dwPageCt, &PhysTemp, 1);
-		
-		PhysTemp = MmGetPhysicalAddress(*ppPageAddr); // XXX: ?
-		*pPhysicalPageAddr = PhysTemp.address;
+		*pPhysicalPageAddr = (PHYS_ADDR) mem->phy_base;
 	}
 
-	OsZeroMemory( *ppPageAddr, dwPageCt * PAGE_SIZE );
+	OsZeroMemory( *ppPageAddr, dwPageCt * B_PAGE_SIZE );
 	
 	return ECHOSTATUS_OK;
 
@@ -316,12 +375,10 @@ ECHOSTATUS COsSupport::OsPageFree
 		PHYS_ADDR	PhysicalPageAddr		// Physical PCI addr
 )
 {
-	PHYSICAL_ADDRESS		LogicalAddress;
-
 	if (NULL == pPageAddr)
 		return ECHOSTATUS_OK;
 	
-	rtm_free(pPageAddr);	
+	echo_mem_free (pPageAddr);	
 
 	return ECHOSTATUS_OK;
 
@@ -340,8 +397,8 @@ void COsSupport::EchoErrorMsg
 	PCHAR pszTitle
 )
 {
-	BAlert alert(pszTitle,pszMsg,"Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_STOP_ALERT);
-	alert.Go();
+	//BAlert alert(pszTitle,pszMsg,"Ok",NULL,NULL,B_WIDTH_AS_USUAL,B_STOP_ALERT);
+	//alert.Go();
 }	// void COsSupport::EchoErrorMsg( PCHAR )
 
 
@@ -355,10 +412,8 @@ void COsSupport::EchoErrorMsg
 PVOID COsSupport::operator new( size_t Size )
 {
 	PVOID 		pMemory;
-	
-	// it's probably better to not rtm alloc this
-	// but it does need to be resident	
-	pMemory = rtm_alloc(NULL,Size);
+
+	pMemory = malloc(Size);
 	
 	if ( NULL == pMemory )
 	{
@@ -378,13 +433,6 @@ PVOID COsSupport::operator new( size_t Size )
 
 VOID COsSupport::operator delete( PVOID pVoid )
 {
-	status_t status;
-	status = rtm_free(pVoid);
-	
-	if (status != B_OK) {
-		ECHO_DEBUGPRINTF(("COsSupport::operator delete "
-								"memory free failed\n"));
-	}
-	
+	free(pVoid);	
 }	// VOID COsSupport::operator delete( PVOID pVoid )
 

@@ -252,8 +252,7 @@ typedef struct tMIXER_MULTI_FUNCTION
 //
 //	Use this macro to size the data structure
 //
-#define	ComputeMixerMultiFunctionSize(Ct)	\
-	( sizeof( MIXER_MULTI_FUNCTION ) + ( sizeof( MIXER_FUNCTION ) * ( Ct - 1 ) ) )
+#define	ComputeMixerMultiFunctionSize(Ct)	( sizeof( MIXER_MULTI_FUNCTION ) + ( sizeof( MIXER_FUNCTION ) * ( Ct - 1 ) ) )
 
 
 //
@@ -293,7 +292,7 @@ typedef struct tMIXER_NOTIFY
 
 	WORD			wBusOut;			// For monitor & output pipe notifies only
 	WORD			wParameter;		// One of the above MXN_*
-	
+
 } MIXER_NOTIFY, *PMIXER_NOTIFY;
 
 

@@ -163,7 +163,7 @@ DWORD CLaylaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 	if ( ( dwNewSampleRate < 8000 ) ||
 		  ( dwNewSampleRate > 50000 ) )
 	{
-		ECHO_DEBUGPRINTF( ( "SetSampleRate: Layla sample rate %d out of range, "
+		ECHO_DEBUGPRINTF( ( "SetSampleRate: Layla sample rate %ld out of range, "
 								  "no change made\n",
 								  dwNewSampleRate) );
 		return 0xffffffff;
@@ -176,7 +176,7 @@ DWORD CLaylaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 	
 	ClearHandshake();
 	SendVector( DSP_VC_SET_LAYLA_SAMPLE_RATE );
-	ECHO_DEBUGPRINTF( ( "SetSampleRate: Layla sample rate changed to %d\n",
+	ECHO_DEBUGPRINTF( ( "SetSampleRate: Layla sample rate changed to %ld\n",
 							  dwNewSampleRate ) );
 	return( dwNewSampleRate );
 }	// DWORD CLaylaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
@@ -191,8 +191,8 @@ DWORD CLaylaDspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 ECHOSTATUS CLaylaDspCommObject::SetInputClock(WORD wClock)
 {
 	BOOL			bSetRate;
-	BOOL			bWriteControlReg;
-	DWORD			dwSampleRate;
+	//BOOL			bWriteControlReg;
+	//DWORD			dwSampleRate;
 	WORD			wNewClock;
 
 	ECHO_DEBUGPRINTF( ( "CLaylaDspCommObject::SetInputClock:\n" ) );
@@ -237,7 +237,7 @@ ECHOSTATUS CLaylaDspCommObject::SetInputClock(WORD wClock)
 			break;
 
 		default :
-			ECHO_DEBUGPRINTF(("Input clock 0x%x not supported for Layla24\n"));
+			ECHO_DEBUGPRINTF(("Input clock 0x%x not supported for Layla24\n", wClock));
 			ECHO_DEBUGBREAK();
 				return ECHOSTATUS_CLOCK_NOT_SUPPORTED;
 
@@ -337,7 +337,7 @@ ECHOSTATUS CLaylaDspCommObject::SetBusInGain( WORD wBusIn, int iGain)
 
 ECHOSTATUS CLaylaDspCommObject::GetBusInGain( WORD wBusIn, int &iGain)
 {
-	ECHOSTATUS Status;
+	//ECHOSTATUS Status;
 	
 	if (wBusIn > m_wNumBussesIn)
 		return ECHOSTATUS_INVALID_CHANNEL;

@@ -36,7 +36,6 @@
 //		SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE SOFTWARE.
 //
 // ****************************************************************************
-
 #include "CEchoGals.h"
 #include "CDarla24DspCommObject.h"
 
@@ -201,7 +200,7 @@ DWORD CDarla24DspCommObject::SetSampleRate( DWORD dwNewSampleRate )
 	SendVector( DSP_VC_SET_GD_AUDIO_STATE );
 
 	ECHO_DEBUGPRINTF( ("CDarla24DspCommObject::SetSampleRate: 0x%lx "
-							 "clocks %s\n", dwNewSampleRate) );
+							 "clocks %d\n", dwNewSampleRate, bClock ) );
 
 	return GetSampleRate();
 	

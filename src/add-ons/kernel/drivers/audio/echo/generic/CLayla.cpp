@@ -278,7 +278,7 @@ ECHOSTATUS CLayla::QueryAudioSampleRate
 			 " and <= 50,000 Hz\n") );
 		return ECHOSTATUS_BAD_FORMAT;
 	}	
-	ECHO_DEBUGPRINTF( ( "CLayla::QueryAudioSampleRate() %d Hz OK\n",
+	ECHO_DEBUGPRINTF( ( "CLayla::QueryAudioSampleRate() %ld Hz OK\n",
 							  dwSampleRate ) );
 	return ECHOSTATUS_OK;
 

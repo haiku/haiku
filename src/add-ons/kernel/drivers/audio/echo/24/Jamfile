@@ -1,34 +1,90 @@
 SubDir OBOS_TOP src add-ons kernel drivers audio echo 24 ;
 
-UsePrivateHeaders media ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic DSP ;
+SubDirHdrs $(OBOS_TOP) src add-ons kernel drivers audio echo generic ASIC ;
 
-R5KernelAddon echo_24 : kernel drivers bin :
-#	ac97_multi.c
-#	config.c
-#	debug.c
-#	ich.c
-#	io.c
-#	util.c
-#	ac97.c
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+
+# set some additional defines
+{
+	SubDirCcFlags -DECHO_BEOS -DECHO24_FAMILY ;
+	SubDirC++Flags -DECHO_BEOS -DECHO24_FAMILY ;
+}
+
+R5KernelAddon echo24 : kernel drivers bin :
+	kernel_cpp.cpp
+	debug.c
+	echo.cpp
+	multi.cpp
+	util.c
+	CChannelMask.cpp
+	CDaffyDuck.cpp
+	CDspCommObject.cpp
+	CEchoGals.cpp
+	CEchoGals_info.cpp
+	CEchoGals_midi.cpp
+	CEchoGals_mixer.cpp
+	CEchoGals_power.cpp
+	CEchoGals_transport.cpp
+#	CEchoGals_WDM.cpp
+	CGina24.cpp
+	CGina24DspCommObject.cpp
+	CLayla24.cpp
+	CLayla24DspCommObject.cpp
+	CLineLevel.cpp
+	CMia.cpp
+	CMiaDspCommObject.cpp
+	CMidiInQ.cpp
+	CMona.cpp
+	CMonaDspCommObject.cpp
+	CMonitorCtrl.cpp
+	CPipeOutCtrl.cpp
+	OsSupportBeOS.cpp
 ;
 
-# For OpenBeOS we should be building the driver objects this way.
-#KernelObjects
-#	ac97_multi.c
-#	config.c
-#	debug.c
-#	ich.c
-#	io.c
-#	util.c   
-#	ac97.c
-#	:
-#	-fno-pic -D_KERNEL_MODE
-#	;
+SEARCH on [ FGristFiles
+	CChannelMask.cpp
+	CDaffyDuck.cpp
+	CDspCommObject.cpp
+	CEchoGals.cpp
+	CEchoGals_info.cpp
+	CEchoGals_midi.cpp
+	CEchoGals_mixer.cpp
+	CEchoGals_power.cpp
+	CEchoGals_transport.cpp
+	CEchoGals_WDM.cpp
+	CGina24.cpp
+	CGina24DspCommObject.cpp
+	CLayla24.cpp
+	CLayla24DspCommObject.cpp
+	CLineLevel.cpp
+	CMia.cpp
+	CMiaDspCommObject.cpp
+	CMidiInQ.cpp
+	CMona.cpp
+	CMonaDspCommObject.cpp
+	CMonitorCtrl.cpp
+	CPipeOutCtrl.cpp
+	OsSupportBeOS.cpp
+	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo generic ] ;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
+
+SEARCH on [ FGristFiles
+		debug.c
+		echo.cpp
+		multi.cpp
+		util.c
+	] = [ FDirName $(OBOS_TOP) src add-ons kernel drivers audio echo ] ;
 
 # Link to kernel/drivers/dev/audio/multi
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
-	local instDriver = <kernel!drivers!dev!audio!multi>echo_24 ;
+	local instDriver = <kernel!drivers!dev!audio!multi>echo24 ;
 	MakeLocate $(instDriver) : $(dir) ;
-	RelSymLink $(instDriver) : echo_24 ;
+	RelSymLink $(instDriver) : echo24 ;
 }

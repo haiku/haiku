@@ -40,7 +40,7 @@
 
 #include "CEchoGals.h"
 
-#pragma optimize("",off)
+//#pragma optimize("",off)
 
 
 /******************************************************************************

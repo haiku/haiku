@@ -42,34 +42,28 @@
 //
 // ****************************************************************************
 
-#ifdef _DEBUG
-#pragma optimize("",off)
-#endif
+//#ifdef _DEBUG
+//#pragma optimize("",off)
+//#endif
 
 //	Prevent problems with multiple includes
 #ifndef _ECHOOSSUPPORTBEOS_
 #define _ECHOOSSUPPORTBEOS_
 
-extern "C"
-{
-#include <stdio.h>
-#include <endian.h>
-
-#ifdef _DEBUG
-
 #include <KernelExport.h>
+#include <SupportDefs.h>
+#include <ByteOrder.h>
+#include "debug.h"
 
-extern "C" 
-{
+#include <stdio.h>
+#include <string.h>
+#include "util/kernel_cpp.h"
 
+#if DEBUG > 0
 // BeOS debug printf macro
-//#define ECHO_DEBUGPRINTF( strings ) DbgPrint##strings
-#define ECHO_DEBUGPRINTF( strings ) dprintf##strings
-//#define ECHO_DEBUGBREAK()
+#define ECHO_DEBUGPRINTF( strings ) TRACE(strings)
 #define ECHO_DEBUGBREAK()			kernel_debugger("echo driver debug break");
 #define ECHO_DEBUG
-
-}	
 
 #else
 
@@ -82,14 +76,27 @@ extern "C"
 //	Specify OS specific types
 //
 typedef void **			PPVOID;
-typedef signed char		INT8;
+typedef int8			INT8;
 typedef int32			INT32;
-typedef int32			WORD;
-typedef int64			DWORD;
+typedef uint16			WORD;
+typedef uint16 *		PWORD;
+typedef uint32			DWORD;
+typedef uint32 *		PDWORD;
 typedef void *			PVOID;
+#define VOID			void
+typedef int8			BYTE;
+typedef int8 *			PBYTE;
+typedef unsigned long	ULONG;
+typedef signed long long		LONGLONG;
 typedef unsigned long long		ULONGLONG;
 typedef unsigned long long *	PULONGLONG;
+typedef char			CHAR;
 typedef char *			PCHAR;
+typedef	bool			BOOL;
+typedef bool			BOOLEAN;
+#define CONST			const
+
+#define PAGE_SIZE		B_PAGE_SIZE
 
 //
 // Return Status Values
@@ -100,19 +107,13 @@ typedef unsigned long	ECHOSTATUS;
 //
 //	Define generic byte swapping functions
 //
-#ifdef BIG_ENDIAN
-#include <ByteOrder.h>
-WORD B_HOST_TO_LENDIAN( WORD in ) { return B_HOST_TO_LENDIAN_INT32(in); }
-DWORD B_HOST_TO_LENDIAN( DWORD in ) { return B_HOST_TO_LENDIAN_INT64(in); }
-#define	SWAP(x)	B_HOST_TO_LENDIAN( x )
-#else
-#define	SWAP(x)	x
-#endif
+#define SWAP(x)	B_HOST_TO_LENDIAN_INT32(x)
+
 //
 //	Define what a physical address is on this OS
 //
-typedef	unsigned long	PHYS_ADDR;			// Define physical addr type
-typedef	unsigned long *	PPHYS_ADDR;			// Define physical addr pointer type
+typedef	uint32		PHYS_ADDR;			// Define physical addr type
+typedef	uint32 *	PPHYS_ADDR;		// Define physical addr pointer type
 
 //
 //	Global Memory Management Functions
@@ -263,7 +264,7 @@ public:
 	//	Overload new & delete so memory for this object is allocated 
 	//	from non-paged memory.
 	//
-	PVOID operator new( size_t Size );
+	PVOID	operator new( size_t Size );
 	VOID	operator delete( PVOID pVoid ); 
 
 protected:
@@ -275,7 +276,7 @@ private:
 	// Define data here.
 	//
 
-	KIRQL					m_IrqlCurrent;		// Old IRQ level
+	//KIRQL					m_IrqlCurrent;		// Old IRQ level
 	bigtime_t			m_ullStartTime;	// All system time relative to this time
 	class CPtrQueue *	m_pPtrQue;			// Store read only ptrs so they
 													// can be unmapped
