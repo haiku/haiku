@@ -183,7 +183,7 @@ test(Surface& s, uint32 width, uint32 height, BBitmap* testBitmap)
 	font.SetRotation(8.0);
 //	font.SetFamilyAndStyle(1);
 
-	s.SetFont(font);
+	s.SetFont(&font);
 	s.SetHighColor(91, 105, 98, 120);
 	s.SetDrawingMode(B_OP_OVER);
 	s.DrawString(string1, stringLocation1);
@@ -210,7 +210,7 @@ test(Surface& s, uint32 width, uint32 height, BBitmap* testBitmap)
 //	s.DrawString("Hello Nurse!", stringLocation2);
 
 	// bitmap drawing
-	BRect testBitmapCrop(bitmap->Bounds());
+	BRect testBitmapCrop(testBitmap->Bounds());
 	testBitmapCrop.left += 20.0;
 	BRect testBitmapDestRect(testBitmapCrop);
 	testBitmapDestRect.OffsetBy(50, 20);
@@ -315,10 +315,10 @@ main(int argc, char **argv)
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-//		painterNow += test(painter, width, height, testBitmap);
+		painterNow += test(painter, width, height, testBitmap);
 //		painterNow += test_lines(painter, width, height);
 //		painterNow += test_straight_lines(painter, width, height);
-		painterNow += test_ellipses(painter, width, height);
+//		painterNow += test_ellipses(painter, width, height);
 	}
 
 fprintf(stdout, " %lld µsecs\n", painterNow / iterations);
@@ -341,10 +341,10 @@ fprintf(stdout, " %lld µsecs\n", painterNow / iterations);
 		// reset bitmap contents
 		memset(bitmap->Bits(), 255, bitmap->BitsLength());
 		// run test
-//		viewNow += test(*view, width, height, testBitmap, );
+		viewNow += test(*view, width, height, testBitmap);
 //		viewNow += test_lines(*view, width, height);
 //		viewNow += test_straight_lines(*view, width, height);
-		viewNow += test_ellipses(*view, width, height);
+//		viewNow += test_ellipses(*view, width, height);
 	}
 
 	bitmap->Unlock();
