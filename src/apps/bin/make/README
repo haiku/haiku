@@ -1,0 +1,37 @@
+GNU make 3.80
+ftp://ftp.gnu.org/gnu/make/make-3.80.tar.gz
+
+--- make-3.80/dir.c     Fri Oct  4 02:13:42 2002
++++ make/dir.c  Sun Jun 20 17:35:56 2004
+@@ -20,6 +20,7 @@
+
+ #include "make.h"
+ #include "hash.h"
++#include "glob.h"
+
+ #ifdef HAVE_DIRENT_H
+ # include <dirent.h>
+
+--- make-3.80/glob/glob.c       Sat Jan 22 05:43:03 2000
++++ make/glob/glob.c    Sun Jun 20 17:41:46 2004
+@@ -175,7 +175,7 @@
+ # define strcoll       strcmp
+ #endif
+
+-#if !defined HAVE_MEMPCPY && __GLIBC__ - 0 == 2 && __GLIBC_MINOR__ >= 1
++#if !defined __BEOS__ && !defined HAVE_MEMPCPY && __GLIBC__ - 0 == 2 && __GLIBC_MINOR__ >= 1
+ # define HAVE_MEMPCPY  1
+ # undef  mempcpy
+ # define mempcpy(Dest, Src, Len) __mempcpy (Dest, Src, Len)
+
+--- make-3.80/glob/glob.h       Sat Jan 22 05:43:03 2000
++++ make/glob/glob.h    Sun Jun 20 17:40:22 2004
+@@ -24,7 +24,7 @@
+
+ #undef __ptr_t
+ #if defined __cplusplus || (defined __STDC__ && __STDC__) || defined WINDOWS32
+-# if !defined __GLIBC__ || !defined __P
++# if !defined __GLIBC__ || !defined __P || !defined __PMT
+ #  undef __P
+ #  undef __PMT
+ #  define __P(protos)  protos

@@ -1,0 +1,34 @@
+SubDir OBOS_TOP src apps bin make ;
+
+SubDirHdrs [ FDirName $(SUBDIR) glob ] ;
+
+SubDirCcFlags -DHAVE_CONFIG_H ;
+
+BinCommand make :
+	ar.c
+	arscan.c
+	commands.c
+	default.c
+	dir.c
+	expand.c
+	file.c
+	function.c
+	getloadavg.c
+	getopt.c
+	getopt1.c
+	hash.c
+	implicit.c
+	job.c
+	main.c
+	misc.c
+	read.c
+	remake.c
+	remote-stub.c
+	rule.c
+	signame.c
+	variable.c
+	version.c
+	vpath.c
+: libglob.a ;
+
+SubInclude OBOS_TOP src apps bin make glob ;
