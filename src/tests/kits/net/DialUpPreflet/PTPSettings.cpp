@@ -17,15 +17,22 @@
 
 #include <Directory.h>
 #include <File.h>
+#include <driver_settings.h>
 
 
 PTPSettings::PTPSettings()
 {
+	void *handle = load_driver_settings("ptpnet.settings");
+	const char *name = get_driver_parameter(handle, "default", NULL, NULL);
+	fDefaultInterface = name ? strdup(name) : NULL;
+	unload_driver_settings(handle);
 }
 
 
 PTPSettings::~PTPSettings()
 {
+	free(fDefaultInterface);
+	
 	// free known add-on types (these should free their known add-on types, etc.)
 	DialUpAddon *addon;
 	for(int32 index = 0;
@@ -37,14 +44,46 @@ PTPSettings::~PTPSettings()
 
 
 bool
+PTPSettings::SetDefaultInterface(const char *name)
+{
+	// load current settings and replace value of "default" with <name>
+	BMessage settings;
+	if(!ReadMessageDriverSettings("ptpnet.settings", &settings))
+		return false;
+	
+	BMessage parameter;
+	int32 index = 0;
+	if(FindMessageParameter("default", settings, &parameter, &index))
+		settings.RemoveData(MDSU_PARAMETERS, index);
+	
+	parameter.MakeEmpty();
+	if(name) {
+		parameter.AddString(MDSU_VALUES, name);
+		settings.AddMessage(MDSU_PARAMETERS, &parameter);
+	}
+	
+	BFile file(PTP_SETTINGS_PATH, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if(file.InitCheck() != B_OK)
+		return false;
+	
+	if(WriteMessageDriverSettings(file, settings)) {
+		free(fDefaultInterface);
+		fDefaultInterface = name ? strdup(name) : NULL;
+		return true;
+	} else
+		return false;
+}
+
+
+bool
 PTPSettings::GetPTPDirectories(BDirectory *settingsDirectory,
 	BDirectory *profileDirectory) const
 {
 	if(settingsDirectory) {
-		BDirectory settings(PPP_INTERFACE_SETTINGS_PATH);
+		BDirectory settings(PTP_INTERFACE_SETTINGS_PATH);
 		if(settings.InitCheck() != B_OK) {
-			create_directory(PPP_INTERFACE_SETTINGS_PATH, 0750);
-			settings.SetTo(PPP_INTERFACE_SETTINGS_PATH);
+			create_directory(PTP_INTERFACE_SETTINGS_PATH, 0750);
+			settings.SetTo(PTP_INTERFACE_SETTINGS_PATH);
 			if(settings.InitCheck() != B_OK)
 				return false;
 		}
@@ -53,10 +92,10 @@ PTPSettings::GetPTPDirectories(BDirectory *settingsDirectory,
 	}
 	
 	if(profileDirectory) {
-		BDirectory profile(PPP_INTERFACE_SETTINGS_PATH "/profile");
+		BDirectory profile(PTP_INTERFACE_SETTINGS_PATH "/profile");
 		if(profile.InitCheck() != B_OK) {
-			create_directory(PPP_INTERFACE_SETTINGS_PATH "/profile", 0750);
-			profile.SetTo(PPP_INTERFACE_SETTINGS_PATH "/profile");
+			create_directory(PTP_INTERFACE_SETTINGS_PATH "/profile", 0750);
+			profile.SetTo(PTP_INTERFACE_SETTINGS_PATH "/profile");
 			if(profile.InitCheck() != B_OK)
 				return false;
 		}
@@ -81,11 +120,11 @@ PTPSettings::LoadSettings(const char *interfaceName, bool isNew)
 		*profilePointer = interfaceName ? &fProfile : NULL;
 	
 	if(interfaceName && !isNew) {
-		BString name("pppidf/");
+		BString name("ptpnet/");
 		name << fCurrent;
 		if(!ReadMessageDriverSettings(name.String(), &fSettings))
 			return false;
-		name = "pppidf/profile/";
+		name = "ptpnet/profile/";
 		name << fCurrent;
 		if(!ReadMessageDriverSettings(name.String(), &fProfile))
 			profilePointer = settingsPointer;
@@ -151,6 +190,11 @@ PTPSettings::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempor
 		addons.AddItem(addon, insertIndex);
 	}
 	
+	// prepare for next release with support different PTP types
+	BMessage parameter;
+	parameter.AddString(MDSU_NAME, "PTPType");
+	parameter.AddString(MDSU_VALUES, "ppp");
+	settings->AddMessage(MDSU_PARAMETERS, &parameter);
 	settings->AddString("InterfaceName", fCurrent);
 	
 	for(int32 index = 0; index < addons.CountItems(); index++)

@@ -3,12 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	TODO:
-	- finish |[ ] "Default" | interface handling
-	- if no interface is default a newly created one becomes default
-*/
-
 #include "DialUpView.h"
 #include "DialUpAddon.h"
 
@@ -48,6 +42,7 @@ static const uint32 kMsgFinishCreateNew = 'FNEW';
 static const uint32 kMsgDeleteCurrent = 'DELI';
 static const uint32 kMsgSelectInterface = 'SELI';
 static const uint32 kMsgConnectButton = 'CONI';
+static const uint32 kMsgUpdateDefaultInterface = 'UPDT';
 
 // labels
 #ifdef LANG_GERMAN
@@ -158,7 +153,8 @@ DialUpView::DialUpView(BRect frame)
 	rect.bottom -= 2;
 	rect.left = rect.right + 5;
 	rect.right = bounds.right - 5;
-	fDefaultInterface = new BCheckBox(rect, "Default", kLabelDefaultInterface, NULL);
+	fDefaultInterface = new BCheckBox(rect, "Default", kLabelDefaultInterface,
+		new BMessage(kMsgUpdateDefaultInterface));
 	rect.left = bounds.left + 5;
 	rect.top = rect.bottom + 12;
 	rect.bottom = bounds.bottom
@@ -266,6 +262,12 @@ DialUpView::MessageReceived(BMessage *message)
 				fCurrentItem->SetMarked(true);
 			
 			UpdateControls();
+			
+			// a newly created interface is set to default if there is no default one
+			if(!fSettings.DefaultInterface()) {
+				fDefaultInterface->SetValue(true);
+				fSettings.SetDefaultInterface(name);
+			}
 		} break;
 		// -------------------------------------------------
 		
@@ -273,13 +275,17 @@ DialUpView::MessageReceived(BMessage *message)
 			if(!fCurrentItem)
 				return;
 			
+			const char *name = fCurrentItem->Message()->FindString("name");
+			if(fSettings.DefaultInterface() && !strcmp(fSettings.DefaultInterface(),
+					name))
+				fSettings.SetDefaultInterface(NULL);
 			fInterfaceMenu->RemoveItem(fCurrentItem);
 			BDirectory settings, profile;
 			fSettings.GetPTPDirectories(&settings, &profile);
 			BEntry entry;
-			settings.FindEntry(fCurrentItem->Label(), &entry);
+			settings.FindEntry(name, &entry);
 			entry.Remove();
-			profile.FindEntry(fCurrentItem->Label(), &entry);
+			profile.FindEntry(name, &entry);
 			entry.Remove();
 			delete fCurrentItem;
 			fCurrentItem = NULL;
@@ -308,6 +314,10 @@ DialUpView::MessageReceived(BMessage *message)
 			resume_thread(fUpDownThread);
 		} break;
 		
+		case kMsgUpdateDefaultInterface:
+			UpdateDefaultInterface();
+		break;
+		
 		default:
 			BView::MessageReceived(message);
 	}
@@ -324,16 +334,18 @@ DialUpView::UpDownThread()
 	driver_settings *temporaryProfile = MessageToDriverSettings(profile);
 	
 	PPPInterface interface;
-	if(fWatching == PPP_UNDEFINED_INTERFACE_ID) {
-		interface = fListener.Manager().InterfaceWithName(fCurrentItem->Label());
-		if(interface.InitCheck() != B_OK)
-			interface = fListener.Manager().CreateInterfaceWithName(
-				fCurrentItem->Label(), temporaryProfile);
-	} else {
-		interface = fWatching;
-		interface.SetProfile(temporaryProfile);
-	}
+	ppp_interface_info_t info;
 	
+	// if going up: delete interface in order for the settings change to take effect
+	interface = fListener.Manager().InterfaceWithName(
+		fCurrentItem->Message()->FindString("name"));
+	interface.GetInterfaceInfo(&info);
+	if(interface.InitCheck() == B_OK && info.info.phase == PPP_DOWN_PHASE)
+		fListener.Manager().DeleteInterface(interface.ID());
+	
+	interface = fListener.Manager().CreateInterfaceWithName(
+		fCurrentItem->Message()->FindString("name"));
+	interface.SetProfile(temporaryProfile);
 	free_driver_settings(temporaryProfile);
 	
 	if(interface.InitCheck() != B_OK) {
@@ -343,7 +355,6 @@ DialUpView::UpDownThread()
 		return;
 	}
 	
-	ppp_interface_info_t info;
 	interface.GetInterfaceInfo(&info);
 	if(info.info.phase == PPP_DOWN_PHASE)
 		interface.Up();
@@ -381,7 +392,7 @@ DialUpView::HandleReportMessage(BMessage *message)
 		
 		ppp_interface_info_t info;
 		interface.GetInterfaceInfo(&info);
-		if(strcasecmp(info.info.name, fCurrentItem->Label()))
+		if(strcasecmp(info.info.name, fCurrentItem->Message()->FindString("name")))
 			return;
 		
 		WatchInterface(id);
@@ -394,7 +405,8 @@ DialUpView::HandleReportMessage(BMessage *message)
 		if(fWatching == PPP_UNDEFINED_INTERFACE_ID)
 			return;
 		
-		WatchInterface(fListener.Manager().InterfaceWithName(fCurrentItem->Label()));
+		WatchInterface(fListener.Manager().InterfaceWithName(
+			fCurrentItem->Message()->FindString("name")));
 	}
 }
 
@@ -573,13 +585,18 @@ DialUpView::LoadInterfaces()
 void
 DialUpView::AddInterface(const char *name, bool isNew = false)
 {
-	if(fInterfaceMenu->FindItem(name)) {
+	if(FindInterface(name)) {
 		(new BAlert(kErrorTitle, kErrorInterfaceExists, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		return;
 	}
 	
-	BMenuItem *item = new BMenuItem(name, new BMessage(kMsgSelectInterface));
+	BMessage *message = new BMessage(kMsgSelectInterface);
+	message->AddString("name", name);
+	BString label(name);
+	if(fSettings.DefaultInterface() && label == fSettings.DefaultInterface())
+		label << " (" << kLabelDefaultInterface << ")";
+	BMenuItem *item = new BMenuItem(label.String(), message);
 	item->SetTarget(this);
 	int32 index = FindNextMenuInsertionIndex(fInterfaceMenu, name);
 	if(index > CountInterfaces())
@@ -617,9 +634,14 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 			return;
 		}
 		
+		const char *name = fCurrentItem->Message() ?
+			fCurrentItem->Message()->FindString("name") : NULL;
+		fDefaultInterface->SetValue(fSettings.DefaultInterface() && name
+			&& !strcmp(fSettings.DefaultInterface(), name));
 		fCurrentItem->SetMarked(true);
 		fDeleterItem->SetEnabled(true);
-		WatchInterface(fListener.Manager().InterfaceWithName(fCurrentItem->Label()));
+		fInterfaceMenu->Superitem()->SetLabel(name);
+		WatchInterface(fListener.Manager().InterfaceWithName(name));
 	}
 	
 	UpdateControls();
@@ -627,11 +649,13 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 	if(!fCurrentItem)
 		fSettings.LoadSettings(NULL, false);
 			// tell modules to unload all settings
-	else if(!isNew && !fSettings.LoadSettings(fCurrentItem->Label(), false)) {
+	else if(!isNew && !fSettings.LoadSettings(
+			fCurrentItem->Message()->FindString("name"), false)) {
 		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
-		fSettings.LoadSettings(fCurrentItem->Label(), true);
-	} else if(isNew && !fSettings.LoadSettings(fCurrentItem->Label(), true))
+		fSettings.LoadSettings(fCurrentItem->Message()->FindString("name"), true);
+	} else if(isNew && !fSettings.LoadSettings(
+			fCurrentItem->Message()->FindString("name"), true))
 		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
 			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 }
@@ -644,6 +668,23 @@ DialUpView::CountInterfaces() const
 }
 
 
+BMenuItem*
+DialUpView::FindInterface(const char *name)
+{
+	if(!name)
+		return NULL;
+	
+	BMenuItem *item;
+	for(int32 index = 0; index < fInterfaceMenu->CountItems(); index++) {
+		item = fInterfaceMenu->ItemAt(index);
+		if(item && !strcmp(item->Message()->FindString("name"), name))
+			return item;
+	}
+	
+	return NULL;
+}
+
+
 void
 DialUpView::UpdateControls()
 {
@@ -652,21 +693,47 @@ DialUpView::UpdateControls()
 		fStringView->Hide();
 		fCreateNewButton->Hide();
 		fTabView->Show();
+		fDefaultInterface->Show();
 		fConnectButton->SetEnabled(true);
 	} else if(!fTabView->IsHidden() && CountInterfaces() == 0) {
 		fDeleterItem->SetEnabled(false);
 		fInterfaceMenu->SetRadioMode(false);
 		fInterfaceMenu->Superitem()->SetLabel(kLabelCreateNew);
 		fTabView->Hide();
+		fDefaultInterface->Hide();
 		fStringView->Show();
 		fCreateNewButton->Show();
 		fConnectButton->SetEnabled(false);
 	}
 	
+	// move default checkbox next to interface menu (its size might have changed)
 	float width = fInterfaceMenu->StringWidth(fMenuField->Label())
 		+ fInterfaceMenu->StringWidth(fInterfaceMenu->Superitem()->Label()) + 30;
 	if(width > kInterfaceFieldWidth)
 		width = kInterfaceFieldWidth;
 	fDefaultInterface->MoveTo(fMenuField->Frame().left + width,
 		fDefaultInterface->Frame().top);
+}
+
+
+void
+DialUpView::UpdateDefaultInterface()
+{
+	const char *name = fCurrentItem->Message()->FindString("name");
+	BMenuItem *defaultItem = FindInterface(fSettings.DefaultInterface());
+	if(fDefaultInterface->Value()) {
+		if(!fSettings.SetDefaultInterface(name)) {
+			fDefaultInterface->SetValue(0);
+			return;
+		}
+		if(defaultItem)
+			defaultItem->SetLabel(defaultItem->Message()->FindString("name"));
+		
+		BString label(name);
+		label << " (" << kLabelDefaultInterface << ")";
+		fCurrentItem->SetLabel(label.String());
+	} else {
+		fSettings.SetDefaultInterface(NULL);
+		fCurrentItem->SetLabel(name);
+	}
 }

@@ -20,6 +20,10 @@ class PTPSettings {
 		const BString& CurrentInterface() const
 			{ return fCurrent; }
 		
+		bool SetDefaultInterface(const char *name);
+		const char *DefaultInterface() const
+			{ return fDefaultInterface; }
+		
 		bool GetPTPDirectories(BDirectory *settingsDirectory,
 			BDirectory *profileDirectory) const;
 		
@@ -34,6 +38,7 @@ class PTPSettings {
 	private:
 		BMessage fAddons, fSettings, fProfile;
 		BString fCurrent;
+		char *fDefaultInterface;
 };
 
 

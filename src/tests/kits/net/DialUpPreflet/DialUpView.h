@@ -38,8 +38,10 @@ class DialUpView : public BView {
 		void AddInterface(const char *name, bool isNew = false);
 		void SelectInterface(int32 index, bool isNew = false);
 		int32 CountInterfaces() const;
+		BMenuItem *FindInterface(const char *name);
 		
 		void UpdateControls();
+		void UpdateDefaultInterface();
 
 	private:
 		PPPInterfaceListener fListener;
