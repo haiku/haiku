@@ -127,8 +127,10 @@ find_image_at_address(addr_t address)
 	// get image that may contain the address
 
 	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		if (address >= image->text_region.start
-			&& address <= (image->text_region.start + image->text_region.size))
+		if ((address >= image->text_region.start
+				&& address <= (image->text_region.start + image->text_region.size))
+			|| (address >= image->data_region.start
+				&& address <= (image->data_region.start + image->data_region.size)))
 			break;
 	}
 
@@ -1354,8 +1356,8 @@ load_kernel_add_on(const char *path)
 		goto error5;
 
 	// We needed to read in the contents of the "text" area, but
-	// now we can protect it read-only
-	set_area_protection(image->text_region.id, B_KERNEL_READ_AREA);
+	// now we can protect it read-only/execute
+	set_area_protection(image->text_region.id, B_KERNEL_READ_AREA | B_KERNEL_EXECUTE_AREA);
 
 	// ToDo: this should be enabled by kernel settings!
 	if (1)
