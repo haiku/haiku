@@ -15,6 +15,16 @@
 // use it inline in tests if necessary.
 status_t DecodeResult(status_t result);
 
+// First parameter is equal to the second or third
+template<typename A, typename B, typename C>
+static
+inline
+bool
+Equals(const A &a, const B &b, const C &c)
+{
+	return (a == b || a == c);
+}
+
 // Returns a string version of the given integer
 std::string IntToStr(int i);
 
