@@ -351,7 +351,7 @@ reply fields:
 - "result":
   - B_OK: success
   - B_ENTRY_NOT_FOUND: the type was not found
-  - (error code): failure			
+  - (other error code): failure			
 
 -----------------------------------------------------------------------
 
@@ -425,7 +425,7 @@ reply fields:
 - "result":
   - B_OK: success
   - B_ENTRY_NOT_FOUND: no such attribute exists, or the type is not installed
-  - (error code): failure			
+  - (other error code): failure			
 
 -----------------------------------------------------------------------
 
@@ -460,7 +460,58 @@ reply fields:
 - "result":
   - B_OK: success
   - B_ENTRY_NOT_FOUND: the given BMessenger was not subscribed to the service
-  - (error code): failure			
+  - (other error code): failure			
 
 -----------------------------------------------------------------------
+
+perform an update_mime_info() call asynchronously
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_UPDATE_MIME_INFO_ASYNC
+			"entry": B_REF_TYPE
+			"recursive": B_BOOLEAN_TYPE
+			"force": B_BOOLEAN_TYPE
+reply:		standard general result
+
+message fields:
+- "entry": The base entry to update.
+- "recursive": If true and "entry" is a directory, update all entries below 
+               "entry" in the hierarchy.
+- "force": If true, also update entries for which a BEOS:TYPE attribute
+           already exists.
+
+reply fields:
+- "result":
+  - B_OK: The asynchronous update_mime_info() call has been successfully
+          started (and may still be running).
+  - (error code): failure
+
+-----------------------------------------------------------------------
+
+notify the mime manager to clean up after a now completed asynchronous
+call to update_mime_info() or create_app_meta_mime()
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_ASYNC_THREAD_FINISHED
+			"thread id": B_INT32_TYPE
+reply:		standard general result
+
+message fields:
+- "thread id": The thread id of the now finished asynchronous process.
+
+reply fields:
+- "result": 
+  - B_OK: All related data successfully deallocated
+  - B_ENTRY_NOT_FOUND: No such thread found in the list of asychronous threads
+  - (other error code): failure
+
+
+
+
+
+
+
+
+
+
 
