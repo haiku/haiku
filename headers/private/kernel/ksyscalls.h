@@ -121,6 +121,8 @@ enum {
 	SYSCALL_REMOVE_INDEX,
 	SYSCALL_SEND_SIGNAL,			/* 110 */
 	SYSCALL_SET_ALARM,
+	SYSCALL_SELECT,
+	SYSCALL_POLL,
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);
