@@ -1,5 +1,5 @@
 /*
-	pppinit.rdef
+	ppp_up.rdef
 */
 
 resource app_signature "application/x-vnd.haiku.ppp_up";

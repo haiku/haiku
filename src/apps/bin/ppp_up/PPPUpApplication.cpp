@@ -1,35 +1,42 @@
-/* -----------------------------------------------------------------------
- * Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
- * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------- */
+/*
+ * Copyright 2004, Waldemar Kornewald <Waldemar.Kornewald@web.de>
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <Application.h>
 #include <Window.h>
 
 #include "DialUpView.h"
 #include "ConnectionWindow.h"
+#include <KPPPUtils.h>
+#include <PPPReportDefs.h>
 
 
 static const char *kSignature = "application/x-vnd.haiku.ppp_up";
 
 extern "C" _EXPORT BView *instantiate_deskbar_item();
+
+
+class PPPUpApplication : public BApplication {
+	public:
+		PPPUpApplication(const char *name, ppp_interface_id id,
+			thread_id replyThread);
+		
+		virtual void ReadyToRun();
+		
+		const char *Name() const
+			{ return fName; }
+		ppp_interface_id ID() const
+			{ return fID; }
+		thread_id ReplyThread() const
+			{ return fReplyThread; }
+
+	private:
+		const char *fName;
+		ppp_interface_id fID;
+		thread_id fReplyThread;
+		ConnectionWindow *fWindow;
+};
 
 
 BView*
@@ -44,29 +51,79 @@ static
 status_t
 report_thread(void *data)
 {
-	// TODO: add replicant when we finished connecting
+	PPPUpApplication *app = static_cast<PPPUpApplication*>(data);
+	
+	// Send reply. From now on we will receive report messages.
+	send_data(app->ReplyThread(), 0, NULL, 0);
+	
+	// get messages and open connection window when we receive a GOING_UP report
+	thread_id sender, me = find_thread(NULL);
+	int32 reportCode;
+	ppp_interface_id id;
+	ppp_report_packet report;
+	ConnectionWindow *window = NULL;
+	while(true) {
+		reportCode = receive_data(&sender, &report, sizeof(report));
+		if(reportCode == PPP_RESPONSE_TEST_CODE) {
+			if(!window || window->ResponseTest())
+				PPP_REPLY(sender, B_OK);
+			else
+				PPP_REPLY(sender, B_ERROR);
+			continue;
+		} else if(reportCode != PPP_REPORT_CODE)
+			continue;
+		
+		if(report.type == PPP_DESTRUCTION_REPORT) {
+			id = PPP_UNDEFINED_INTERFACE_ID;
+			PPP_REPLY(sender, B_OK);
+		} else if(report.type != PPP_CONNECTION_REPORT) {
+			PPP_REPLY(sender, B_OK);
+			continue;
+		} else if(report.length == sizeof(ppp_interface_id))
+			memcpy(&id, report.data, sizeof(ppp_interface_id));
+		else
+			id = PPP_UNDEFINED_INTERFACE_ID;
+		
+		// notify window
+		if(window && (report.type == PPP_DESTRUCTION_REPORT
+				|| report.type == PPP_CONNECTION_REPORT)) {
+			BMessage message;
+			message.AddInt32("code", report.type == PPP_DESTRUCTION_REPORT
+				? PPP_REPORT_DOWN_SUCCESSFUL : report.code);
+			message.AddInt32("interface", id);
+			window->UpdateStatus(message);
+		}
+		
+		if(report.code == PPP_REPORT_GOING_UP) {
+			// TODO:
+			// create connection window (it will send the reply for us) (DONE?)
+			BRect rect(150, 50, 450, 435);
+			if(!window) {
+				window = new ConnectionWindow(rect, app->Name(), app->ID(), me);
+				window->Show();
+			}
+			
+			window->RequestReply();
+			// wait for reply from window and forward it to the kernel
+			thread_id tmp;
+			PPP_REPLY(sender, receive_data(&tmp, NULL, 0));
+
+//			PPP_REPLY(sender, B_OK);
+				// TODO: remove this when finished with above
+		} else {
+			if(report.code == PPP_REPORT_UP_SUCCESSFUL)
+				; // TODO: add deskbar replicant
+			
+			PPP_REPLY(sender, PPP_OK_DISABLE_REPORTS);
+		}
+	}
 	
 	return B_OK;
 }
 
 
-class PPPUpApplication : public BApplication {
-	public:
-		PPPUpApplication(const char *name, ppp_interface_id id,
-			thread_id replyThread);
-		
-		virtual void ReadyToRun();
-
-	private:
-		const char *fName;
-		ppp_interface_id fID;
-		thread_id fReplyThread;
-		ConnectionWindow *fWindow;
-};
-
-
 int
-main(const char *argv[], int argc)
+main(int argc, const char *argv[])
 {
 	if(argc != 2)
 		return -1;
@@ -78,9 +135,7 @@ main(const char *argv[], int argc)
 	receive_data(&replyThread, &id, sizeof(id));
 	
 	new PPPUpApplication(name, id, replyThread);
-	
 	be_app->Run();
-	
 	delete be_app;
 	
 	return 0;
@@ -92,8 +147,7 @@ PPPUpApplication::PPPUpApplication(const char *name, ppp_interface_id id,
 	: BApplication(kSignature),
 	fName(name),
 	fID(id),
-	fReplyThread(replyThread),
-	fWindow(NULL)
+	fReplyThread(replyThread)
 {
 }
 
@@ -101,6 +155,9 @@ PPPUpApplication::PPPUpApplication(const char *name, ppp_interface_id id,
 void
 PPPUpApplication::ReadyToRun()
 {
-	// TODO: create report message thread (which in turn sends the reply)
-	// TODO: create connection window
+	// Create report message thread (which in turn sends the reply and creates
+	// the connection window). (DONE?)
+	thread_id reportThread = spawn_thread(report_thread, "ppp_up: report_thread",
+		B_NORMAL_PRIORITY, this);
+	resume_thread(reportThread);
 }

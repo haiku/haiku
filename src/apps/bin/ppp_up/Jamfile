@@ -10,7 +10,17 @@ AddResources ppp_up : ppp_up.rdef ;
 BinCommand ppp_up :
 	ConnectionView.cpp
 	ConnectionWindow.cpp
+	PPPUpAddon.cpp
 	PPPUpApplication.cpp
 ;
 
-LinkSharedOSLibs ppp_up : libdunview.a libppp.a be ;
+LinkSharedOSLibs ppp_up : libptpnet.a libppp.a be ;
+
+# Installation
+OBOSInstall install-networking
+	: /boot/beos/bin
+	: ppp_up ;
+
+Package haiku-networkingkit-cvs :
+	ppp_up :
+	boot beos bin ;

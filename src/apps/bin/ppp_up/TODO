@@ -1,7 +1,6 @@
-If has temporary profile:
-Open connection window and request password.
-
 Add Deskbar replicant.
 
+I hope it is not too annoying that the user cannot select an alternative interface for connecting. The problem lies in the stack's concept that everything is an add-on. We cannot know if the connection-initiating packet type is supported by the alternative interface (or, we could, but we would have to load (and write) many add-ons that understand how the stack modules work).
+This problem is minimised by showing the device view which allows changing the phone number for modems, for example.
 
-What if preflet changes profile while connecting?
+Add some indicator to the add-ons message that says we are ppp_up, not the preflet.
