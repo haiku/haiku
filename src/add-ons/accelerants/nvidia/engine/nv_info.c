@@ -2512,6 +2512,7 @@ static void pinsnv30_arch_fake(void)
 	{
 	case NV31:
 	case NV36:
+	case NV40:
 		/* we have a extended PLL */
 		si->ps.ext_pll = true;
 		break;
