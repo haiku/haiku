@@ -8,62 +8,20 @@
 
 #include <OS.h>
 
+#include "fs_shell_command.h"
 #include "fs_shell_command_beos.h"
 
-static void
-add_char(char *&buffer, int &bufferSize, char c)
-{
-	if (bufferSize <= 0) {
-		fprintf(stderr, "Command line too long\n");
-		exit(1);
-	}
-
-	*buffer = c;
-	buffer++;
-	bufferSize--;
-}
-
-
-static void
-prepare_command_string(const char *const *argv, int argc, char *buffer,
-		int bufferSize)
-{
-	for (int argi = 0; argi < argc; argi++) {
-		const char *arg = argv[argi];
-
-		if (argi > 0)
-			add_char(buffer, bufferSize, ' ');
-
-		while (*arg) {
-			if (strchr("", *arg))
-				add_char(buffer, bufferSize, '\\');
-			add_char(buffer, bufferSize, *arg);
-			arg++;
-		}
-	}
-
-	add_char(buffer, bufferSize, '\0');
-}
-
-
 int
-main(int argc, const char *const *argv)
+send_external_command(const char *command, int *result)
 {
-	if (argc < 2) {
-		fprintf(stderr, "No command given.\n");
-		exit(1);
-	}
-
-	// prepare the command string
 	external_command_message message;
-	prepare_command_string(argv + 1, argc - 1, message.command,
-		sizeof(message.command));
+	strncpy(message.command, command, sizeof(message.command));
 
 	// find the command port
 	port_id commandPort = find_port(kFSShellCommandPort);
 	if (commandPort < 0) {
 		fprintf(stderr, "Couldn't find fs_shell command port.\n");
-		exit(1);
+		return commandPort;
 	}
 
 	// create a reply port
@@ -71,7 +29,7 @@ main(int argc, const char *const *argv)
 	if (replyPort < 0) {
 		fprintf(stderr, "Failed to create a reply port: %s\n",
 			strerror(replyPort));
-		exit(1);
+		return replyPort;
 	}
 	message.reply_port = replyPort;
 
@@ -83,7 +41,7 @@ main(int argc, const char *const *argv)
 
 	if (error != B_OK) {
 		fprintf(stderr, "Failed to send command: %s\n", strerror(error));
-		exit(1);
+		return error;
 	}
 
 	// wait for the reply
@@ -97,16 +55,10 @@ main(int argc, const char *const *argv)
 	if (bytesRead < 0) {
 		fprintf(stderr, "Failed to read reply from fs_shell: %s\n",
 			strerror(bytesRead));
-		exit(1);
+		return bytesRead;
 	}
 
-	// evaluate result
-	if (reply.error != B_OK) {
-		fprintf(stderr, "Command failed: %s\n", strerror(reply.error));
-		fprintf(stderr, "Command was:\n  %s\n", message.command);
-		exit(1);
-	}
-
+	*result = reply.error;
 	return 0;
 }
 
