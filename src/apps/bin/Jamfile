@@ -35,7 +35,7 @@ StdBinCommands
 	
 StdBinCommands
 	installsound.cpp
-	: be media ;
+	: be libmedia.so ;
 	
 StdBinCommands
 	catattr.cpp

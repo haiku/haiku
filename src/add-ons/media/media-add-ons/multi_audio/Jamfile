@@ -6,4 +6,4 @@ Addon multi_audio.media_addon : media :
 	MultiAudioNode.cpp
 ;
 
-LinkSharedOSLibs multi_audio.media_addon : be media ;
+LinkSharedOSLibs multi_audio.media_addon : be libmedia.so ;
