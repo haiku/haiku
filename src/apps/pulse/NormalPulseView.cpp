@@ -186,10 +186,8 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 			strcpy(processor, "Pentium III");
 			break;
 		case B_CPU_INTEL_PENTIUM_IV:
+		case B_CPU_INTEL_PENTIUM_IV_MODEL2:
 			strcpy(processor, "Pentium IV");
-			break;
-		case B_CPU_INTEL_PENTIUM_XEON:
-			strcpy(processor, "Pentium Xeon");
 			break;
 		case B_CPU_AMD_K5_MODEL0:
 		case B_CPU_AMD_K5_MODEL1:
