@@ -7,7 +7,7 @@
 
 #include "nm_std.h"
 
-void set_nm2070(void)
+static void set_nm2070(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -27,7 +27,7 @@ void set_nm2070(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2090_nm2093(void)
+static void set_nm2090_nm2093(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -46,7 +46,7 @@ void set_nm2090_nm2093(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2097(void)
+static void set_nm2097(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -65,7 +65,7 @@ void set_nm2097(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2160(void)
+static void set_nm2160(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -84,7 +84,7 @@ void set_nm2160(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2200(void)
+static void set_nm2200(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -103,7 +103,7 @@ void set_nm2200(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2230(void)
+static void set_nm2230(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -122,7 +122,7 @@ void set_nm2230(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2360(void)
+static void set_nm2360(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;
@@ -141,7 +141,7 @@ void set_nm2360(void)
 	si->ps.std_engine_clock = 0;
 }
 
-void set_nm2380(void)
+static void set_nm2380(void)
 {
 	/* setup cardspecs */
 	si->ps.f_ref = 14.31818;

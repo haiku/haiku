@@ -244,18 +244,18 @@ static void dumprom (void *rom, size_t size)
 }
 
 /* return 1 if vblank interrupt has occured */
-int caused_vbi(vuint32 * regs)
+static int caused_vbi(vuint32 * regs)
 {
 	return (NV_REG32(NV32_CRTC_INTS) & 0x00000001);
 }
 
 /* clear the vblank interrupt */
-void clear_vbi(vuint32 * regs)
+static void clear_vbi(vuint32 * regs)
 {
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
 }
 
-void enable_vbi(vuint32 * regs)
+static void enable_vbi(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
 	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
@@ -265,7 +265,7 @@ void enable_vbi(vuint32 * regs)
 	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
 }
 
-void disable_vbi(vuint32 * regs)
+static void disable_vbi(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
 	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;

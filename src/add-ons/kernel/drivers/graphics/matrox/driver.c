@@ -137,23 +137,23 @@ static void dumprom (void *rom, size_t size)
 }
 
 /*return 1, is interrupt has occured*/
-int caused_vbi(vuint32 * regs)
+static int caused_vbi(vuint32 * regs)
 {
 	return (ACCR(STATUS)&0x20);
 }
 
 /*clear the interrupt*/
-void clear_vbi(vuint32 * regs)
+static void clear_vbi(vuint32 * regs)
 {
 	ACCW(ICLEAR,0x20);
 }
 
-void enable_vbi(vuint32 * regs)
+static void enable_vbi(vuint32 * regs)
 {
 	ACCW(IEN,ACCR(IEN)|0x20);
 }
 
-void disable_vbi(vuint32 * regs)
+static void disable_vbi(vuint32 * regs)
 {
 	ACCW(IEN,(ACCR(IEN)&~0x20));
 	ACCW(ICLEAR,0x20);
