@@ -23,12 +23,21 @@
 // - maybe some protocols must go down instead of being reset -> add flag for this
 
 
-PPPInterface::PPPInterface(driver_settings *settings)
+PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
-	FSM(*this), LCP(*this), fIfnet(NULL), fLinkMTU(0),
-	fAccessing(0), fDevice(NULL), fFirstEncapsulator(NULL),
-	fGeneralLock(FSM().Locker())
+	FiniteStateMachine(*this), LCP(*this), fIfnet(NULL), fLinkMTU(1500),
+	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
+	fGeneralLock(FiniteStateMachine().Locker())
 {
+	// are we a multilink subinterface?
+	if(parent && parent->IsMultilink()) {
+		fParent = parent;
+		fIsMultilink = true;
+	} else {
+		fParent = NULL;
+		fIsMultilink = false;
+	}
+	
 	if(!fSettings)
 		return;
 	
@@ -58,8 +67,6 @@ PPPInterface::PPPInterface(driver_settings *settings)
 	
 	// load all protocols and the device
 	LoadModules(fSettings, 0, fSettings->parameter_count);
-	
-	FSM().LeaveConstructionPhase();
 }
 
 
@@ -69,9 +76,6 @@ PPPInterface::~PPPInterface()
 	// remove our iface, so that nobody will access it:
 	//  go down if up
 	//  unregister from ppp_manager
-	
-	FSM().EnterDestructionPhase();
-	
 	// destroy and remove:
 	// device
 	// protocols
@@ -85,8 +89,14 @@ PPPInterface::~PPPInterface()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fDevice
-		|| !fSettings)
+	if(!fSettings)
+		return B_ERROR;
+	
+	// sub-interfaces should have a device
+	if(IsMultilink()) {
+		if(Parent() && !fDevice)
+			return B_ERROR;
+	} else if(!fDevice)
 		return B_ERROR;
 	
 	return B_OK;
@@ -103,6 +113,10 @@ PPPInterface::RegisterInterface()
 	if(!InitCheck())
 		return false;
 			// we cannot register if something is wrong
+	
+	// only MainInterfaces get an ifnet
+	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
+		return true;
 	
 	ppp_manager_info *manager;
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &manager) != B_OK)
@@ -127,6 +141,10 @@ PPPInterface::UnregisterInterface()
 		return true;
 			// we are already unregistered
 	
+	// only MainInterfaces get an ifnet
+	if(IsMultilink() && Parent())
+		return true;
+	
 	ppp_manager_info *manager;
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &manager) != B_OK)
 		return false;
@@ -143,8 +161,11 @@ PPPInterface::UnregisterInterface()
 void
 PPPInterface::SetLinkMTU(uint32 linkMTU)
 {
-	if(linkMTU < fLinkMTU && linkMTU > 234)
-		fLinkMTU = linkMTU;
+	LockerHelper locker(fLock);
+	
+	fLinkMTU = linkMTU;
+	
+	CalculateMRU();
 }
 
 
@@ -174,7 +195,13 @@ PPPInterface::SetDevice(PPPDevice *device)
 	if(!device)
 		return false;
 	
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	if(IsMultilink() && !Parent())
+		return false;
+			// main interfaces do not have devices
+	
+	LockerHelper locker(fLock);
+	
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -195,7 +222,9 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 	if(!protocol)
 		return false;
 	
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	LockerHelper locker(fLock);
+	
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -209,7 +238,9 @@ PPPInterface::AddProtocol(PPPProtocol *protocol)
 bool
 PPPInterface::RemoveProtocol(PPPProtocol *protocol)
 {
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	LockerHelper locker(fLock);
+	
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -258,7 +289,9 @@ PPPInterface::AddEncapsulator(PPPEncapsulator *encapsulator)
 	if(!encapsulator)
 		return false;
 	
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	LockerHelper locker(fLock);
+	
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -300,7 +333,9 @@ PPPInterface::AddEncapsulator(PPPEncapsulator *encapsulator)
 bool
 PPPInterface::RemoveEncapsulator(PPPEncapsulator *encapsulator)
 {
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	LockerHelper locker(fLock);
+	
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -346,39 +381,34 @@ PPPInterface::EncapsulatorFor(uint16 protocol,
 
 
 bool
-PPPInterface::AddOptionHandler(PPPOptionHandler *handler)
+PPPInterface::AddChild(PPPInterface *child)
 {
-	if(!handler)
-		return false
+	LockerHelper locker(fLock);
 	
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	if(fChildren.HasItem(child) || !fChildren.AddItem(child))
 		return false;
-			// a running connection may not change
 	
-	fOptionHandlers.AddItem(handler);
+	child->SetParent(this);
+	
+	CalculateMRU();
+	
+	return true;
 }
 
 
 bool
-PPPInterface::RemoveOptionHandler(PPPOptionHandler *handler)
+PPPInterface::RemoveChild(PPPInterface *child)
 {
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	LockerHelper locker(fLock);
+	
+	if(!fChildren.RemoveItem(child))
 		return false;
-			// a running connection may not change
 	
-	return fOptionHandlers.RemoveItem(handler);
-}
-
-
-PPPOptionHandler*
-PPPInterface::OptionHandlerAt(int32 index) const
-{
-	PPPOptionHandler *handler = fOptionHandlers.ItemAt(index);
+	child->SetParent(NULL);
 	
-	if(handler == fOptionHandlers.DefaultItem())
-		return NULL;
+	CalculateMRU();
 	
-	return handler;
+	return true;
 }
 
 
@@ -419,7 +449,7 @@ PPPInterface::Up()
 	// instead of waiting for state change we should wait until
 	// all retries are done
 	
-	if(!InitCheck() || Phase() != PPP_CTOR_DTOR_PHASE)
+	if(!InitCheck() || Phase() != PPP_DOWN_PHASE)
 		return false;
 	
 	if(IsUp())
@@ -441,7 +471,7 @@ PPPInterface::Down()
 	// instead of waiting for state change we should wait until
 	// all retries are done
 	
-	if(!InitCheck() || Phase() != PPP_CTOR_DTOR_PHASE)
+	if(!InitCheck())
 		return false;
 	
 	// TODO:
@@ -455,6 +485,10 @@ bool
 PPPInterface::IsUp() const
 {
 	LockerHelper locker(fGeneralLock);
+	
+	
+	
+	// set running flag if successful
 	if(Ifnet())
 		return Ifnet()->if_flags & IFF_RUNNING;
 	
@@ -489,12 +523,36 @@ bool
 PPPInterface::LoadModules(const driver_settings *settings,
 	int32 start, int32 count)
 {
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
 	int32 type;
 		// which type key was used for loading this module?
+	
+	const char *name = NULL;
+	
+	// multilink handling
+	for(int32 i = start;
+		i < settings->parameter_count && i < start + count;
+		i++) {
+		if(!strcasecmp(settings->parameters[i].name, PPP_MULTILINK_KEY)
+			&& settings->parameters[i].value_count > 0) {
+			if(!LoadModule(settings->parameters[i].value[0],
+				parameters[i].parameters, PPP_MULTILINK_TYPE))
+				return false;
+			break;
+		}
+		
+	}
+	
+	// are we a multilink main interface?
+	if(IsMultilink() && !Parent()) {
+		// main interfaces only load the multilink module
+		// and create a child using their settings
+		AddChild(new PPPInterface(settings, this));
+		return true;
+	}
 	
 	for(int32 i = start;
 		i < settings->parameter_count && i < start + count;
@@ -502,7 +560,7 @@ PPPInterface::LoadModules(const driver_settings *settings,
 		
 		type = -1;
 		
-		const char *name = settings->parameters[i].name;
+		name = settings->parameters[i].name;
 		
 		if(!strcasecmp(name, PPP_LOAD_MODULE_KEY))
 			type = PPP_LOAD_MODULE_TYPE;
@@ -531,7 +589,7 @@ bool
 PPPInterface::LoadModule(const char *name, const driver_parameter *parameter,
 	int32 type)
 {
-	if(Phase() != PPP_CTOR_DTOR_PHASE)
+	if(Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
 	
@@ -546,7 +604,7 @@ PPPInterface::LoadModule(const char *name, const driver_parameter *parameter,
 	if(get_module(module_name, (module_info**) &module) != B_OK)
 		return false;
 	
-	if(!module->add_to(this, parameter, type))
+	if(!module->add_to(Parent()?Parent():this, this, parameter, type))
 		return false;
 	
 	// add the module to the list of loaded modules
@@ -619,16 +677,22 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 	// the handler might be upped by this packet.
 	PPPEncapsulator *encapsulator_handler = EncapsulatorFor(protocol);
 	for(; encapsulator_handler;
-		encapsulator_handler = EncapsulatorFor(protocol, encapsulator_handler)) {
+		encapsulator_handler = EncapsulatorFor(protocol, encapsulator_handler->Next())) {
 		if(!encapsulator_handler->IsEnabled()) {
-			// disabled handlers should not be used
-			result = PPP_REJECTED;
+			if(!encapsulator_handler->Next())
+				break;
+			
 			continue;
+				// disabled handlers should not be used
 		}
 		
 		result = encapsulator_handler->Receive(packet, protocol);
-		if(result == PPP_UNHANDLED)
+		if(result == PPP_UNHANDLED) {
+			if(!encapsulator_handler->Next())
+				break;
+			
 			continue;
+		}
 		
 		return result;
 	}
@@ -653,14 +717,15 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 		return result;
 	}
 	
-	// packet is unhandled
-	m_free(packet);
+	// maybe the parent interface can handle it
+	if(Parent())
+		return Parent->Receive(packet, protocol);
 	
 	if(result == PPP_UNHANDLED)
+		m_free(packet);
 		return PPP_DISCARDED;
 	else {
-		// TODO:
-		// send protocol-reject!
+		FiniteStateMachine()->RUCEvent(packet, protocol);
 		return PPP_REJECTED;
 	}
 }
@@ -675,7 +740,7 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 		return B_ERROR;
 	
 	// we must pass the basic tests like:
-	// do we have a device?
+	// do we have a device (as main interface)?
 	// did we load all modules?
 	if(InitCheck() != B_OK) {
 		m_free(packet);
@@ -689,8 +754,10 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	}
 	
 	// go up if DialOnDemand enabled and we are down
-	if(DoesDialOnDemand() && Phase() == PPP_DOWN_PHASE)
+	if(DoesDialOnDemand() && (Phase() == PPP_DOWN_PHASE
+		|| Phase() == PPP_ESTABLISHMENT_PHASE))
 		Up();
+			// Up() waits until it is done
 	
 	// check if protocol is allowed and everything is up
 	PPPProtocol *sending_protocol = ProtocolFor(protocol);
@@ -712,20 +779,26 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	if(packet == NULL)
 		return B_ERROR;
 	
-	// check if packet is too big
-	if((packet->m_flags & M_PKTHDR && packet->m_pkt_hdr.len > LinkMTU())
-		|| packet->m_len > LinkMTU()) {
-		m_free(packet);
-		return B_ERROR;
-	}
-	
 	// set protocol (the only header field)
 	protocol = htons(protocol);
 	uint16 *header = mtod(packet, uint16*);
 	*header = protocol;
 	
-	// pass to device
-	return Device()->Send(packet);
+	// pass to device/children
+	if(!IsMultilink() || Parent()) {
+		// check if packet is too big for device
+		if((packet->m_flags & M_PKTHDR && packet->m_pkt_hdr.len > LinkMTU())
+			|| packet->m_len > LinkMTU()) {
+			m_free(packet);
+			return B_ERROR;
+		}
+		
+		return Device()->Send(packet);
+	} else {
+		// the multilink encapsulator should have sent it to some child interface
+		m_free(packet);
+		return B_ERROR;
+	}
 }
 
 
@@ -755,7 +828,7 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 		
 		if(!packet->m_pkthdr.rcvif) {
 			m_free(packet);
-			return false;
+			return B_ERROR;
 		}
 	}
 	
@@ -778,6 +851,13 @@ PPPInterface::CalculateMRU()
 	}
 	
 	fMRU -= fHeaderLength;
+	
+	if(Parent())
+		Parent()->CalculateMRU();
+	
+	for(int32 i = 0; i < fChildren.CountItems(); i++)
+		fMRU += fChildren.ItemAt(i)->MRU();
+			// add our subinterfaces' MRU (so we have the MRRU)
 	
 	if(Ifnet()) {
 		Ifnet()->if_mtu = fMRU;

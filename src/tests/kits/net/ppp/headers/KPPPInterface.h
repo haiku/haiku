@@ -5,7 +5,7 @@
 
 #include "KPPPDefs.h"
 
-#include "KPPPFSM.h"
+#include "KPPPFiniteStateMachine.h"
 #include "KPPPLCP.h"
 
 #include "List.h"
@@ -24,7 +24,7 @@ class PPPInterface {
 		PPPInterface& operator= (const PPPInterface& copy);
 
 	public:
-		PPPInterface(driver_settings *settings);
+		PPPInterface(driver_settings *settings, PPPInterface *parent = NULL);
 		~PPPInterface();
 		
 		status_t InitCheck() const;
@@ -32,8 +32,10 @@ class PPPInterface {
 		driver_settings* Settings()
 			{ return fSettings; }
 		
-		PPPFSM& FSM() const
-			{ return fFSM; }
+		PPPFiniteStateMachine& FiniteStateMachine() const
+			{ return fFiniteStateMachine; }
+		PPPLCP& LCP() const
+			{ return fLCP; }
 		
 		bool RegisterInterface();
 			// adds us to the manager module and
@@ -69,11 +71,15 @@ class PPPInterface {
 		PPPEncapsulator *EncapsulatorFor(uint16 protocol,
 			PPPEncapsulator start = NULL) const;
 		
-		bool AddOptionHandler(PPPOptionHandler *handler);
-		bool RemoveOptionHandler(PPPOptionHandler *handler);
-		int32 CountOptionHandlers() const
-			{ return fOptionHandlers.CountItems(); }
-		PPPOptionHandler *OptionHandlerAt(int32 index) const;
+		// multilink methods
+		void AddChild(PPPInterface *child);
+		void RemoveChild(PPPInterface *child);
+		int32 CountChildren() const
+			{ return fChildren.CountItems(); }
+		PPPInterface *Parent() const
+			{ return fParent; }
+		bool IsMultilink() const
+			{ return fIsMultilink; }
 		
 		void SetAutoRedial(bool autoredial = true);
 		bool DoesAutoRedial() const
@@ -87,9 +93,9 @@ class PPPInterface {
 			{ return fMode; }
 			// client or server mode?
 		PPP_STATE State() const
-			{ return FSM().State(); }
+			{ return FiniteStateMachine().State(); }
 		PPP_PHASE Phase() const
-			{ return FSM().Phase(); }
+			{ return FiniteStateMachine().Phase(); }
 		
 		bool Up();
 			// in server mode Up() listens for an incoming connection
@@ -97,7 +103,7 @@ class PPPInterface {
 		bool IsUp() const;
 		
 /*		void EnableReports(PPP_REPORT type, thread_id thread,
-				PPP_REPORT_FLAGS flags);
+				int32 flags);
 		void DisableReports(PPP_REPORT type, thread_id thread);
 		bool DoesReport(PPP_REPORT type, thread_id thread); */
 		
@@ -110,21 +116,30 @@ class PPPInterface {
 		
 		status_t SendToDevice(mbuf *packet, uint16 protocol);
 		status_t ReceiveFromDevice(mbuf *packet);
+			// This is called by the receive-thread.
+			// Only call this if it does not block Send() or
+			// SendToDevice()!
 
 	private:
-		PPPLCP& LCP() const
-			{ return fLCP; }
 		void CalculateMRU();
+		
+		// multilink methods
+		void SetParent(PPPInterface *parent)
+			{ fParent = parent; }
 		
 //		void Report(PPP_REPORT type, int32 code, void *data, int32 length);
 
 	private:
 		driver_parameter *fSettings;
-		PPPFSM fFSM;
+		PPPFiniteStateMachine fFiniteStateMachine;
 		PPPLCP fLCP;
 		ifnet *fIfnet;
 		
 		uint32 fLinkMTU, fMRU, fHeaderLength;
+		
+		PPPInterface *fParent;
+		List<PPPInterface*> fChildren;
+		bool fIsMultilink;
 		
 		bool fAutoRedial, fDialOnDemand;
 		
@@ -134,9 +149,7 @@ class PPPInterface {
 		
 		PPPDevice *fDevice;
 		PPPEncapsulator *fFirstEncapsulator;
-		
 		List<PPPProtocol*> fProtocols;
-		List<PPPOptionHandler*> fOptionHandlers;
 		List<ppp_module_info*> fModules;
 		
 		BLocker& fGeneralLock;

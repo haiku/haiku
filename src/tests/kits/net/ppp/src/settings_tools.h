@@ -1,6 +1,8 @@
 #ifndef _SETTINGS_TOOLS__H
 #define _SETTINGS_TOOLS__H
 
+// remove this as soon as we get the extended driver_settings API
+
 struct driver_settings;
 struct driver_parameter;
 
@@ -19,6 +21,8 @@ void add_parameter(const driver_parameter *from, driver_parameter *to)
 
 bool get_boolean_value(const char *string, bool unknownValue);
 const char *get_settings_value(const char *name, const driver_settings *settings);
+const char *get_parameter_value(const char *name, const driver_parameter *parameters)
+	{ get_settings_value(name, (driver_settings*) &parameter->parameter_count); }
 
 
 #endif

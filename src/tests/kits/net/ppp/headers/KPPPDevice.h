@@ -34,11 +34,32 @@ class PPPDevice {
 		bool IsUp() const
 			{ return fIsUp; }
 		
+		// The biggest of the two tranfer rates will be set in ifnet.
+		// These methods should return default values when disconnected.
+		virtual uint32 InputTransferRate() const = 0;
+		virtual uint32 OutputTransferRate() const = 0;
+		
+		virtual uint32 CountOutputBytes() const = 0;
+			// how many bytes are waiting to be sent?
+		
 		virtual status_t Send(mbuf *packet) = 0;
+			// this should enqueue the packet and return immediately
+		status_t PassToInterface(mbuf *packet);
+			// This will pass the packet to the interface's queue.
+			// Do not call Interface::ReceiveFromDevice directly
+			// if this can block a Send()!
 
 	protected:
-		void SetUp(bool isUp);
-			// report up/down events
+		// Report that we are going up/down
+		// (from now on, the Up() process can be aborted).
+		// Abort if false is returned!
+		bool UpStarted();
+		bool DownStarted();
+		
+		// report up/down events
+		void UpEvent();
+		void UpFailedEvent();
+		void DownEvent();
 
 	protected:
 		bool fIsUp;

@@ -13,6 +13,7 @@
 #define PPP_DEVICE_KEY				"Device"
 #define PPP_AUTHENTICATOR_KEY		"Authenticator"
 #define PPP_PEER_AUTHENTICATOR_KEY	"Peer-Authenticator"
+#define PPP_MULTILINK_KEY			"Multilink-Protocol"
 
 // settings values
 #define PPP_CLIENT_MODE_VALUE		"Client"
@@ -27,21 +28,26 @@
 
 #define PPP_ERROR_BASE				B_ERRORS_END
 
-// return values for Receive methods in addition to B_ERROR and B_OK
+// return values for Send()/Receive() methods in addition to B_ERROR and B_OK
+// PPP_UNHANDLED is also used by PPPOptionHandler
 enum {
 	// B_ERROR means that the packet is corrupted
 	// B_OK means the packet was handled correctly
 	
-	// return values for PPPProtocol and PPPEncapsulator
+	// return values for PPPProtocol and PPPEncapsulator (and PPPOptionHandler)
 	PPP_UNHANDLED = PPP_ERROR_BASE,
 		// The packet does not belong to this handler.
 		// Do not delete the packet when you return this!
+		// For PPPOptionHandler: the item is unrecognized
 	
 	// return values of PPPInterface::Receive()
 	PPP_DISCARDED,
 		// packet was silently discarded
 	PPP_REJECTED,
 		// a protocol-reject
+	
+	PPP_NO_CONNECTION
+		// could not send a packet because device is not connected
 };
 
 // module key types (used when loading a module)
@@ -50,14 +56,15 @@ enum {
 	PPP_DEVICE_TYPE,
 	PPP_PROTOCOL_TYPE,
 	PPP_AUTHENTICATOR_TYPE,
-	PPP_PEER_AUTHENTICATOR_TYPE
+	PPP_PEER_AUTHENTICATOR_TYPE,
+	PPP_MULTILINK_TYPE
 };
 
 // protocol and encapsulator flags
 enum {
 	PPP_NO_FLAGS = 0x00,
 	PPP_ALWAYS_ALLOWED = 0x01,
-		// protocol may send/receive while we are authenticating
+		// protocol may send/receive in PPP_ESTABLISHMENT_PHASE
 	PPP_NEEDS_DOWN = 0x02
 		// protocol needs a Down() in addition to a Reset() to
 		// terminate the connection properly (losing the connection
@@ -75,8 +82,6 @@ enum PPP_PHASE {
 		// the normal protocols like IP (i.e., IPCP)
 	
 	// the following must not be used by protocols!
-	PPP_CTOR_DTOR_PHASE = -1,
-		// set on construction/destruction of the interface
 	PPP_DOWN_PHASE = 0,
 	PPP_TERMINATION_PHASE = 1,
 		// this is the selected phase when we are GOING down

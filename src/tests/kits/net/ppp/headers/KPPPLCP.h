@@ -25,10 +25,24 @@ class PPPLCP : public PPPProtocol {
 		PPPLCP& operator= (const PPPLCP& copy);
 
 	public:
+		PPPFiniteStateMachine& FiniteStateMachine() const
+			{ return Interface()->FiniteStateMachine(); }
 		
+		bool AddOptionHandler(PPPOptionHandler *handler);
+		bool RemoveOptionHandler(PPPOptionHandler *handler);
+		int32 CountOptionHandlers() const
+			{ return fOptionHandlers.CountItems(); }
+		PPPOptionHandler *OptionHandlerAt(int32 index) const;
+		
+		void SetTarget(PPPEncapsulator *target)
+			{ fTarget = target; }
+			// if target != all packtes will be passed to the encapsulator
+			// instead of the interface/device
 
 	private:
+		List<PPPOptionHandler*> fOptionHandlers;
 		
+		PPPEncapsulator *fTarget;
 };
 
 
