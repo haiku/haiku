@@ -332,7 +332,7 @@ AudioMixer::Connected(const media_source &producer, const media_destination &whe
 	// workaround for a crashing bug in RealPlayer.  to be proper, RealPlayer's
 	// BBufferProducer::PrepareToConnect() should have removed all wildcards.
 	if (out_input->format.u.raw_audio.frame_rate == 0) {
-		fprintf(stderr, "WARNING: Producer (port %ld, id %ld) connected with frame_rate=0\n", producer.port, producer.id);
+		fprintf(stderr, "Audio Mixer Warning: Producer (port %ld, id %ld) connected with frame_rate=0\n", producer.port, producer.id);
 		MixerOutput *output = fCore->Output();
 		float frame_rate = output ? output->MediaOutput().format.u.raw_audio.frame_rate : 44100.0f;
 		out_input->format.u.raw_audio.frame_rate = frame_rate;
