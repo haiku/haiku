@@ -46,10 +46,12 @@
 #include <StorageDefs.h>
 
 // Project Includes ------------------------------------------------------------
+#include <View.h>
 
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
+class PortLink;
 
 // Globals ---------------------------------------------------------------------
 
@@ -464,10 +466,10 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 		float			fMaxWindWidth;				// used		// changed from: float			fMaxWindV;
 		BRect			fFrame;						// used
 		window_look		fLook;						// used
-		_view_attr_		*fCurDrawViewState;
+		ViewAttr		*fCurDrawViewState;
 		window_feel		fFeel;						// used
 		int32			fLastViewToken;
-		uint32			fUnused1;					// changed from: _CEventPort_* 	fEventPort;
+		PortLink		*fServerLink;				// changed from: _CEventPort_* 	fEventPort;
 		BMessageRunner	*fPulseRunner;				// used
 		BRect			fCurrentFrame;
 
