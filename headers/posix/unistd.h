@@ -1,15 +1,13 @@
-#ifndef _UNISTD_H_
-#define _UNISTD_H_
 /* 
 ** Distributed under the terms of the Haiku License.
 */
+#ifndef _UNISTD_H_
+#define _UNISTD_H_
+
 
 #include <null.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /* access modes */
 #define R_OK	4
@@ -22,6 +20,9 @@ extern "C" {
 #define STDOUT_FILENO	1
 #define STDERR_FILENO	2
 
+/* POSIX version support */
+#define _POSIX_VERSION			(199009L)
+
 /* pathconf() constants */
 #define _PC_CHOWN_RESTRICTED	1
 #define _PC_MAX_CANON			2
@@ -31,12 +32,12 @@ extern "C" {
 #define _PC_PATH_MAX			6
 #define _PC_PIPE_BUF			7
 #define _PC_VDISABLE			8
+#define _PC_LINK_MAX			25
 #define _POSIX_CHOWN_RESTRICTED	9
 #define _POSIX_JOB_CONTROL		10
 #define _POSIX_NO_TRUNC			11
 #define _POSIX_SAVED_IDS		12
 #define _POSIX_VDISABLE			((cc_t) - 2)
-#define _POSIX_VERSION			(199009L)
 
 /* sysconf() constants */
 #define _SC_ARG_MAX				15
@@ -49,7 +50,6 @@ extern "C" {
 #define _SC_STREAM_MAX			22
 #define _SC_TZNAME_MAX			23
 #define _SC_VERSION				24
-#define _PC_LINK_MAX			25
 
 /* lseek() constants */
 #ifndef SEEK_SET
@@ -62,6 +62,10 @@ extern "C" {
 #	define SEEK_END 2
 #endif
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* file functions */
 extern int		access(const char *path, int accessMode);
