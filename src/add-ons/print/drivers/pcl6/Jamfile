@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src add-ons print drivers pcl6 ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print drivers canon_lips
-					  libprint ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
 
 AddResources PCL6\ Compatible : PCL6.rsrc ;
 

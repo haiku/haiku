@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src add-ons print drivers postscript ;
 
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print drivers canon_lips
-					  libprint ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
 
 AddResources PS\ Compatible : PS.rsrc ;
 
