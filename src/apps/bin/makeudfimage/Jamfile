@@ -15,6 +15,7 @@ BinCommand makeudfimage
 	  Attribute.cpp
 	  ConsoleListener.cpp
 	  OutputFile.cpp
+	  PhysicalPartitionAllocator.cpp
 	  Shell.cpp
 	  UdfBuilder.cpp
 
