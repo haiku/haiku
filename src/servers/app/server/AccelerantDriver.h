@@ -98,9 +98,14 @@ public:
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
 
-	virtual void GetBoundingBoxes(const char *string, int32 count, font_metric_mode mode, escapement_delta *delta, BRect *rectarray);
-	virtual void GetEscapements(const char *string, int32 charcount, escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets);
-	virtual void GetEdges(const char *string, int32 charcount, edge_info *edgearray);
+	virtual void GetBoundingBoxes(const char *string, int32 count, 
+		font_metric_mode mode, escapement_delta *delta, 
+		BRect *rectarray, LayerData *d);
+	virtual void GetEscapements(const char *string, int32 charcount, 
+		escapement_delta *delta, escapement_delta *escapements, 
+		escapement_delta *offsets, LayerData *d);
+	virtual void GetEdges(const char *string, int32 charcount, 
+		edge_info *edgearray, LayerData *dw);
 	virtual void GetHasGlyphs(const char *string, int32 charcount, bool *hasarray);
 	virtual void GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings);
 protected:

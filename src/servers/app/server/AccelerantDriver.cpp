@@ -113,7 +113,7 @@ printf("BAR 2\n");
 	  continue;
 printf("BAR 3\n");
 	accelerant_image = load_add_on(path);
-printf("image_id %d\n",accelerant_image);
+printf("image_id %lu\n",accelerant_image);
 	if (accelerant_image >= 0)
 	{
 printf("BAR 4\n");
@@ -197,8 +197,8 @@ void AccelerantDriver::Shutdown(void)
 
 /*!
 	\brief Called for all BView::CopyBits calls
-	\param Source rectangle.
-	\param Destination rectangle.
+	\param src Source rectangle.
+	\param rect Destination rectangle.
 	
 	Bounds checking must be done in this call. If the destination is not the same size 
 	as the source, the source should be scaled to fit.
@@ -209,11 +209,11 @@ void AccelerantDriver::CopyBits(BRect src, BRect dest)
 
 /*!
 	\brief Called for all BView::DrawBitmap calls
-	\param Bitmap to be drawn. It will always be non-NULL and valid. The color 
+	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
 	space is not guaranteed to match.
-	\param Source rectangle
-	\param Destination rectangle. Source will be scaled to fit if not the same size.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param src Source rectangle
+	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	
 	Bounds checking must be done in this call.
 */
@@ -223,14 +223,15 @@ void AccelerantDriver::DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, Laye
 
 /*!
 	\brief Utilizes the font engine to draw a string to the frame buffer
-	\param String to be drawn. Always non-NULL.
-	\param Number of characters in the string to draw. Always greater than 0. If greater
+	\param string String to be drawn. Always non-NULL.
+	\param length Number of characters in the string to draw. Always greater than 0. If greater
 	than the number of characters in the string, draw the entire string.
-	\param Point at which the baseline starts. Characters are to be drawn 1 pixel above
+	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
 	this for backwards compatibility. While the point itself is guaranteed to be inside
 	the frame buffers coordinate range, the clipping of each individual glyph must be
 	performed by the driver itself.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param delta Extra character padding
 */
 void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
@@ -238,11 +239,11 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 
 /*!
 	\brief Called for all BView::FillArc calls
-	\param Rectangle enclosing the entire arc
-	\param Starting angle for the arc in degrees
-	\param Span of the arc in degrees. Ending angle = angle+span.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
@@ -253,10 +254,10 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 
 /*!
 	\brief Called for all BView::FillBezier calls.
-	\param 4-element array of BPoints in the order of start, end, and then the two control
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
 	points. 
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
 */
@@ -267,8 +268,8 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param BRect enclosing the ellipse to be drawn.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the ellipse may end up
 	being clipped.
@@ -279,11 +280,11 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::FillPolygon calls
-	\param Array of BPoints defining the polygon.
-	\param Number of points in the BPoint array.
-	\param Rectangle which contains the polygon
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	The points in the array are not guaranteed to be within the framebuffer's 
 	coordinate range.
@@ -294,9 +295,9 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 
 /*!
 	\brief Called for all BView::FillRect calls
-	\param BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 */
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
@@ -305,10 +306,11 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 
 /*!
 	\brief Called for all BView::FillRoundRect calls
+	\param r Rectangle to fill
 	\param X radius of the corner arcs
 	\param Y radius of the corner arcs
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the roundrect may end 
 	up being clipped.
@@ -323,11 +325,11 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 
 /*!
 	\brief Called for all BView::FillTriangle calls
-	\param Array of 3 BPoints. Always non-NULL.
-	\param BRect enclosing the triangle. While it will definitely enclose the triangle,
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
 	it may not be within the frame buffer's bounds.
-	\param Data structure containing any other data necessary for the call. Always non-NULL.
-	\param 8-byte array containing the pattern to use. Always non-NULL.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call because only part of the triangle may end 
 	up being clipped.
@@ -350,6 +352,8 @@ void AccelerantDriver::HideCursor(void)
 
 /*!
 	\brief Moves the cursor to the given point.
+	\param x Cursor's new x coordinate
+	\param y Cursor's new y coordinate
 
 	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
 	range, but the cursor data itself will need to be clipped. A check to see if the 
@@ -362,7 +366,7 @@ void AccelerantDriver::MoveCursorTo(float x, float y)
 
 /*!
 	\brief Inverts the colors in the rectangle.
-	\param Rectangle of the area to be inverted. Guaranteed to be within bounds.
+	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
 */
 void AccelerantDriver::InvertRect(BRect r)
 {
@@ -394,7 +398,7 @@ void AccelerantDriver::ObscureCursor(void)
 
 /*!
 	\brief Changes the cursor.
-	\param The new cursor. Guaranteed to be non-NULL.
+	\param cursor The new cursor. Guaranteed to be non-NULL.
 	
 	The driver does not take ownership of the given cursor. Subclasses should make
 	a copy of the cursor passed to it. The default version of this function hides the
@@ -404,30 +408,97 @@ void AccelerantDriver::SetCursor(ServerCursor *cursor)
 {
 }
 
-void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+/*!
+	\brief Called for all BView::StrokeArc calls
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the arc may end up
+	being clipped.
+*/void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeBezier calls.
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
+	points. 
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call.
+*/
 void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeEllipse calls
+	\param r BRect enclosing the ellipse to be drawn.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the ellipse may end up
+	being clipped.
+*/
 void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Draws a line. Really.
+	\param start Starting point
+	\param end Ending point
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	
+	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
+	a thickness greater than 1 will need to be done.
+*/
 void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokePolygon calls
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	The points in the array are not guaranteed to be within the framebuffer's 
+	coordinate range.
+*/
 void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
 void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Called for all BView::StrokeRoundRect calls
+	\param r The rect itself
+	\param xrad X radius of the corner arcs
+	\param yrad Y radius of the corner arcs
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the roundrect may end 
+	up being clipped.
+*/
 void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
 }
@@ -436,53 +507,162 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 //{
 //}
 
+/*!
+	\brief Called for all BView::StrokeTriangle calls
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
+	it may not be within the frame buffer's bounds.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the triangle may end 
+	up being clipped.
+*/
 void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
 }
 
+/*!
+	\brief Draws a series of lines - optimized for speed
+	\param pts Array of BPoints pairs
+	\param numlines Number of lines to be drawn
+	\param colors Array of colors for each respective line
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	
+	Data for this call is passed directly from userland - this call is responsible for all
+	checking. All lines are to be processed in the call using the same LayerData settings
+	for each line.
+*/
 void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
 }
 
+/*!
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode constant as defined in GraphicsDefs.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
 void AccelerantDriver::SetMode(int32 mode)
 {
 }
 
+/*!
+	\brief Dumps the contents of the frame buffer to a file.
+	\param path Path and leaf of the file to be created without an extension
+	\return False if unimplemented or unsuccessful. True if otherwise.
+	
+	Subclasses should add an extension based on what kind of file is saved
+*/
 bool AccelerantDriver::DumpToFile(const char *path)
 {
 	return false;
 }
 
+/*!
+	\brief Gets the width of a string in pixels
+	\param string Source null-terminated string
+	\param length Number of characters in the string
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\return Width of the string in pixels
+	
+	This corresponds to BView::StringWidth.
+*/
 float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
 	return 0.0;
 }
 
+/*!
+	\brief Gets the height of a string in pixels
+	\param string Source null-terminated string
+	\param length Number of characters in the string
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\return Height of the string in pixels
+	
+	The height calculated in this function does not include any padding - just the
+	precise maximum height of the characters within and does not necessarily equate
+	with a font's height, i.e. the strings 'case' and 'alps' will have different values
+	even when called with all other values equal.
+*/
 float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
 	return 0.0;
 }
 
-void AccelerantDriver::GetBoundingBoxes(const char *string, int32 count, font_metric_mode mode, escapement_delta *delta, BRect *rectarray)
+/*!
+	\brief Retrieves the bounding box each character in the string
+	\param string Source null-terminated string
+	\param count Number of characters in the string
+	\param mode Metrics mode for either screen or printing
+	\param delta Optional glyph padding. This value may be NULL.
+	\param rectarray Array of BRect objects which will have at least count elements
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+
+	See BFont::GetBoundingBoxes for more details on this function.
+*/
+void AccelerantDriver::GetBoundingBoxes(const char *string, int32 count, 
+		font_metric_mode mode, escapement_delta *delta, BRect *rectarray, LayerData *d)
 {
 }
 
-void AccelerantDriver::GetEscapements(const char *string, int32 charcount, escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets)
+/*!
+	\brief Retrieves the escapements for each character in the string
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param delta Optional glyph padding. This value may be NULL.
+	\param escapements Array of escapement_delta objects which will have at least charcount elements
+	\param offsets Actual offset values when iterating over the string. This array will also 
+		have at least charcount elements and the values placed therein will reflect 
+		the current kerning/spacing mode.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	
+	See BFont::GetEscapements for more details on this function.
+*/
+void AccelerantDriver::GetEscapements(const char *string, int32 charcount, 
+		escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets, LayerData *d)
 {
 }
 
-void AccelerantDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray)
+/*!
+	\brief Retrieves the inset values of each glyph from its escapement values
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param edgearray Array of edge_info objects which will have at least charcount elements
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+
+	See BFont::GetEdges for more details on this function.
+*/
+void AccelerantDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray, LayerData *d)
 {
 }
 
+/*!
+	\brief Determines whether a font contains a certain string of characters
+	\param string Source null-terminated string
+	\param charcount Number of characters in the string
+	\param hasarray Array of booleans which will have at least charcount elements
+
+	See BFont::GetHasGlyphs for more details on this function.
+*/
 void AccelerantDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasarray)
 {
 }
 
-void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, uint32 mode, float maxwidth, char **outstrings)
+/*!
+	\brief Truncates an array of strings to a certain width
+	\param instrings Array of null-terminated strings
+	\param stringcount Number of strings passed to the function
+	\param mode Truncation mode
+	\param maxwidth Maximum width for all strings
+	\param outstrings String array provided by the caller into which the truncated strings are
+		to be placed.
+
+	See BFont::GetTruncatedStrings for more details on this function.
+*/
+void AccelerantDriver::GetTruncatedStrings( const char **instrings, int32 stringcount, 
+	uint32 mode, float maxwidth, char **outstrings)
 {
 }
-
-
-// Protected Internal Functions
 
