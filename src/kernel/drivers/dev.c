@@ -17,7 +17,10 @@
 
 #include <stdio.h>
 
+/* These are mainly here to allow testing and this needs to be revisited */
 const char *device_paths[] = {
+	"/boot/addons/drivers/dev",
+	"/boot/addons/drivers/dev/audio",	
 	"/boot/addons/drivers/dev/misc",
 	"/boot/addons/drivers/dev/net",
 	NULL
@@ -31,7 +34,6 @@ int dev_init(kernel_args *ka)
 	dprintf("dev_init: entry\n");
 
 	for (ptr = device_paths; (*ptr); ptr++) {	
-dprintf("DEV: looking at directory %s\n", *ptr);
 		fd = sys_open(*ptr, STREAM_TYPE_DIR, 0);
 		if(fd >= 0) {
 			ssize_t len;
@@ -53,7 +55,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 {
 	image_id id;
 	status_t (*init_hardware)(void);
-	const char **(*publish_devices)(void);
+	const char **(*publish_devices)(void) = NULL;
 	device_hooks *(*find_device)(const char *);
 	void (*bootstrap)();
 	char path[SYS_MAX_PATH_LEN];
@@ -68,7 +70,7 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 	
 	init_hardware = (void*)elf_lookup_symbol(id, "init_hardware");
 	if (init_hardware) {
-//		dprintf("DEV: found init_hardware in %s\n", name);
+		dprintf("DEV: found init_hardware in %s\n", name);
 		if (init_hardware() != 0) {
 			dprintf("DEV: %s: init_hardware failed :(\n", name);
 			elf_unload_kspace(path);
@@ -79,23 +81,25 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 //		dprintf("DEV: %s: found publish_devices\n", name);	
 		devfs_paths = publish_devices();
 //		dprintf("DEV: %s: publish_devices = %p\n", name, (char*)devfs_paths);
-		for (; *devfs_paths; devfs_paths++) {
-			dprintf("DEV: %s: wants to be known as %s\n", name, *devfs_paths);
-		}
+//		for (; *devfs_paths; devfs_paths++) {
+//			dprintf("DEV: %s: wants to be known as %s\n", name, *devfs_paths);
+//		}
 		find_device = (void*)elf_lookup_symbol(id, "find_device");
 		if (!find_device) {
 			elf_unload_kspace(path);
-			return EFTYPE;
+			dprintf("failed to find the find_device symbol!\n");
+			return EINVAL; /* should be EFTYPE */
 		}
 		/* Should really cycle through these... */
 		devfs_paths = publish_devices();
 		for (; *devfs_paths; devfs_paths++) {
 			hooks = find_device(*devfs_paths);
+			dprintf("publishing %s\n", *devfs_paths);
 			if (hooks)
 				devfs_publish_device(*devfs_paths, NULL, hooks);
 		}
 	} else
-		return EFTYPE;
+		return EINVAL; /* should be FTYPE */
 		
 	return id;
 }

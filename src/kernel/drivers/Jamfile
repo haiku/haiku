@@ -3,8 +3,6 @@ SubDir OBOS_TOP src kernel drivers ;
 KernelStaticLibrary libdrivers : 
 	<$(SOURCE_GRIST)>dev.c 
 	<$(SOURCE_GRIST)>devs.c
-	<$(SOURCE_GRIST)>common/null.c
-	<$(SOURCE_GRIST)>common/zero.c
 	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/console/console.c
 	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/keyboard/keyboard.c
 	<$(SOURCE_GRIST)>arch/$(OBOS_ARCH)/ps2mouse/ps2mouse.c
