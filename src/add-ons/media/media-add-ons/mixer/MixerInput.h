@@ -24,8 +24,8 @@ public:
 	// The physical input channels
 	uint32	GetInputChannelCount();
 	int		GetInputChannelType(int channel);
-//	void	SetInputChannelGain(int channel, float gain);
-//	float	GetInputChannelGain(int channel);
+	void	SetInputChannelGain(int channel, float gain);
+	float	GetInputChannelGain(int channel);
 
 	// The destinations for each channel
 	void 	AddInputChannelDestination(int channel, int destination_type);

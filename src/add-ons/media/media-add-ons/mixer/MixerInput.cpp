@@ -267,7 +267,6 @@ MixerInput::GetInputChannelType(int channel)
 	return GetChannelType(channel, fInputChannelMask);
 }
 
-/*
 void
 MixerInput::SetInputChannelGain(int channel, float gain)
 {
@@ -288,7 +287,6 @@ MixerInput::GetInputChannelGain(int channel)
 		return 0.0f;
 	return fInputChannelInfo[channel].gain;
 }
-*/
 
 void
 MixerInput::UpdateInputChannelDestinationMask()

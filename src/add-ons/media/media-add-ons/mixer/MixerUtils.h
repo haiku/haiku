@@ -9,6 +9,7 @@
 
 template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 template<class t> const t & min(const t &t1, const t &t2) { return (t1 < t2) ?  t1 : t2; }
+template<class t> const t abs(const t t1) { return (t1 < 0) ?  - t1 : t1; }
 
 void fix_multiaudio_format(media_multi_audio_format *format);
 

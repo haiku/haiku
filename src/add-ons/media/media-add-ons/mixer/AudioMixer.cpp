@@ -23,6 +23,13 @@
 #define VERSION_STRING	"0.1 alpha 1"
 #define BUILD_STRING	__DATE__ " " __TIME__
 
+// the range of the gain sliders (in dB)
+#define DB_MAX	18.0
+#define DB_MIN	-60.0
+// when using non linear sliders, we use a power function with
+#define DB_EXPONENT_POSITIVE 1.4	// for dB values > 0
+#define DB_EXPONENT_NEGATIVE 1.8	// for dB values < 0
+
 #define USE_MEDIA_FORMAT_WORKAROUND 1
 
 #if USE_MEDIA_FORMAT_WORKAROUND
@@ -945,12 +952,50 @@ AudioMixer::CreateBufferGroup()
 	return new BBufferGroup(size, count);
 }
 
+float
+AudioMixer::dB_to_Gain(float db)
+{
+	TRACE("dB_to_Gain: dB in: %01.2f ", db);
+	if (fCore->Settings()->NonLinearGainSlider()) {
+		if (db > 0) {
+			db = db * (pow(abs(DB_MAX), (1.0 / DB_EXPONENT_POSITIVE)) / abs(DB_MAX));
+			db = pow(db, DB_EXPONENT_POSITIVE);
+		} else {
+			db = -db;
+			db = db * (pow(abs(DB_MIN), (1.0 / DB_EXPONENT_NEGATIVE)) / abs(DB_MIN));
+			db = pow(db, DB_EXPONENT_NEGATIVE);
+			db = -db;
+		}
+	}
+	TRACE("dB out: %01.2f\n", db);
+	return pow(10.0, db / 20.0);
+}
+
+float
+AudioMixer::Gain_to_dB(float gain)
+{
+	float db;
+	db = 20.0 * log10(gain);
+	if (fCore->Settings()->NonLinearGainSlider()) {
+		if (db > 0) {
+			db = pow(db, (1.0 / DB_EXPONENT_POSITIVE));
+			db = db * (abs(DB_MAX) / pow(abs(DB_MAX), (1.0 / DB_EXPONENT_POSITIVE)));
+		} else {
+			db = -db;
+			db = pow(db, (1.0 / DB_EXPONENT_NEGATIVE));
+			db = db * (abs(DB_MIN) / pow(abs(DB_MIN), (1.0 / DB_EXPONENT_NEGATIVE)));
+			db = -db;
+		}
+	}
+	return db;
+}
+
 //
 // BControllable methods
 //
 
-#define DB_TO_GAIN(db)			(pow(10.0, (db) / 20.0))
-#define GAIN_TO_DB(gain)		(20.0 * log10(gain))
+#define DB_TO_GAIN(db)			dB_to_Gain((db))
+#define GAIN_TO_DB(gain)		Gain_to_dB((gain))
 #define PERCENT_TO_GAIN(pct)	((pct) / 100.0)
 #define GAIN_TO_PERCENT(gain)	((gain)  * 100.0)
 
@@ -1087,11 +1132,21 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
-				goto err;
-			*ioSize = input->GetMixerChannelCount() * sizeof(float);
-			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetMixerChannelGain(chan));
+			if (fCore->Settings()->InputGainControls() == 0) {
+				// Physical input channels
+				if (*ioSize < input->GetInputChannelCount() * sizeof(float))
+					goto err;
+				*ioSize = input->GetInputChannelCount() * sizeof(float);
+				for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+					static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetInputChannelGain(chan));
+			} else {
+				// Virtual output channels
+				if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
+					goto err;
+				*ioSize = input->GetMixerChannelCount() * sizeof(float);
+				for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+					static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetMixerChannelGain(chan));
+			}
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (*ioSize < sizeof(int32))
@@ -1229,10 +1284,19 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (size < input->GetMixerChannelCount() * sizeof(float))
-				goto err;
-			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-				input->SetMixerChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+			if (fCore->Settings()->InputGainControls() == 0) {
+				// Physical input channels
+				if (size < input->GetInputChannelCount() * sizeof(float))
+					goto err;
+				for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+					input->SetInputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+			} else {
+				// Virtual output channels
+				if (size < input->GetMixerChannelCount() * sizeof(float))
+					goto err;
+				for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+					input->SetMixerChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+			}
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (size != sizeof(int32))
@@ -1293,7 +1357,7 @@ AudioMixer::UpdateParameterWeb()
 	} else {
 		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
-		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.1)
+		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
 									   ->SetChannelCount(out->GetOutputChannelCount()); 
 		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
@@ -1305,8 +1369,15 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
 		// XXX the gain control is ugly once you have more than two channels,
 		//     as you don't know what channel each slider controls. Tooltips might help...
-		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.1) 
-									   ->SetChannelCount(in->GetMixerChannelCount()); 
+		if (fCore->Settings()->InputGainControls() == 0) {
+			// Physical input channels
+			group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
+										   ->SetChannelCount(in->GetInputChannelCount()); 
+		} else {
+			// Virtual output channels
+			group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
+										   ->SetChannelCount(in->GetMixerChannelCount()); 
+		}
 		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
 	

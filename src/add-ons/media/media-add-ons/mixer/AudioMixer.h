@@ -50,6 +50,9 @@ class AudioMixer :
 		void				HandleInputBuffer(BBuffer *buffer, bigtime_t lateness);
 		
 		BBufferGroup *		CreateBufferGroup();
+		
+		float				dB_to_Gain(float db);
+		float				Gain_to_dB(float gain);
 					
 	// BMediaNode methods
 
