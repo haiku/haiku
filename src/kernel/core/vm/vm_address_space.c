@@ -238,10 +238,10 @@ vm_get_current_user_aspace_id(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	if (thread)
+	if (thread != NULL && thread->team->aspace != NULL)
 		return thread->team->aspace->id;
 
-	return -1;
+	return B_ERROR;
 }
 
 
