@@ -74,6 +74,10 @@ PLATFORM_DEFAULT_HEADERS = $(HDRS) ;
 CCFLAGS += -nostdinc ;
 C++FLAGS += -nostdinc ;
 
+# Allow compiling unit tests on Zeta. Instead of fixing the PostMessage() 
+# issues, they deprecated that nice function. This will enable it again:
+C++FLAGS += -D_ZETA_USING_DEPRECATED_API_=1 ;
+
 # Determine if we're building on PPC or x86
 # Determine mimetype of executable
 # Cross compiling can come later
