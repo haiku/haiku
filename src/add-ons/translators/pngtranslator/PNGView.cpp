@@ -153,8 +153,8 @@ PNGView::Draw(BRect area)
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
 		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(PNG_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(PNG_TRANSLATOR_VERSION)),
 		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	

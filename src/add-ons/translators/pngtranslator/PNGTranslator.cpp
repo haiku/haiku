@@ -294,6 +294,9 @@ status_t
 PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 	BPositionIO *outDestination)
 {
+	if (identify_png_header(inSource, NULL) != B_OK)
+		return B_NO_TRANSLATOR;
+
 	status_t result = B_ERROR;
 		// if a libpng errors before this is set
 		// to a different value, the above is what
@@ -489,7 +492,6 @@ PNGTranslator::translate_from_png(BPositionIO *inSource, uint32 outType,
 	else {
 		// Translate from PNG to PNG
 		translate_direct_copy(inSource, outDestination);
-		
 		return B_OK;
 	}
 }
