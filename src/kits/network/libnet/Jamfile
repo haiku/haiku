@@ -2,6 +2,11 @@ SubDir OBOS_TOP src kits network libnet ;
 
 UsePrivateHeaders net ;
 
+{
+# Default libs include BeOS R5 libnet.so, something we don't want here!
+LINKFLAGS on libnet.so = [ on libnet.so return $(LINKFLAGS) ] -nostdlib ;
+}
+
 SharedLibrary net :
 	socket.c
 	select.c 
@@ -42,9 +47,7 @@ SharedLibrary net :
 	res_random.c
 	res_send.c
 	sethostent.c
-;
-
-LinkSharedOSLibs libnet.so :
+		: root
 ;
 
 # Installation -- in the test directory for the time being
