@@ -24,10 +24,6 @@ KernelLd pci :
 	$(OBOS_TOP)/src/kernel/ldscripts/$(OBOS_ARCH)/add-on.ld
 	:
 	-Bdynamic -shared
-	:
-	:
-#	add-ons/kernel/bus_managers/pci
-	addons/kernel/pci
 	;
 
 # pci_info.cpp currently needs pcihdr.h so we make its path available
