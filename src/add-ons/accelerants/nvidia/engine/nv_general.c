@@ -1180,7 +1180,7 @@ static status_t nv_general_bios_to_powergraphics()
 
 		/* ... and activate them. */
 		//fixme: only if specified by user in nv.settings!?!
-		//fixme: probably won't work if the MB glue chipset wasn't inited also
+		//fixme: create and contact AGP_GART kernel driver for activating mainboard!
 		if (0)
 		{
 			LOG(4,("INIT: enabling AGP\n"));
@@ -1243,7 +1243,9 @@ static status_t nv_general_bios_to_powergraphics()
 			if (agp_stat & 0x00000200) agp_cmd |= 0x00000200;
 
 			/* activate fast writes if supported */
-			if (agp_stat & 0x00000010) agp_cmd |= 0x00000010;
+			//fixme: curious: while mainboard AGP should be disabled still ATM,
+			//activating this stops the card from working! (Thomas saw this also..)
+			//if (agp_stat & 0x00000010) agp_cmd |= 0x00000010;
 
 			/* set request depth: using maximum */
 			agp_cmd |= (agp_stat & 0xff000000);
