@@ -1,0 +1,91 @@
+SubDir OBOS_TOP src apps bin vim src ;
+
+SubDirHdrs [ FDirName $(SUBDIR) proto ] ;
+SubDirHdrs [ FDirName $(SUBDIR) ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H -DFEAT_GUI_BEOS ;
+	SubDirC++Flags -DHAVE_CONFIG_H -DFEAT_GUI_BEOS ;
+}
+
+BinCommand vim :
+	buffer.c
+	charset.c
+	diff.c
+	digraph.c
+	edit.c
+	eval.c
+	ex_cmds.c
+	ex_cmds2.c
+	ex_docmd.c
+	ex_eval.c
+	ex_getln.c
+	fileio.c
+	fold.c
+	getchar.c
+	if_cscope.c
+	if_xcmdsrv.c
+	main.c
+	mark.c
+	memfile.c
+	memline.c
+	menu.c
+	message.c
+	misc1.c
+	misc2.c
+	move.c
+	mbyte.c
+	normal.c
+	ops.c
+	option.c
+	os_unix.c
+	quickfix.c
+	regexp.c
+	screen.c
+	search.c
+	syntax.c
+	tag.c
+	term.c
+	ui.c
+	undo.c
+	window.c
+	gui.c
+	gui_beos.cc
+	pty.c
+	os_beos.c
+	version.c
+	pathdef.c
+	: be libtermcap.a
+	: vim.rdef ;
+
+SEARCH on [ FGristFiles pathdef.c ] = [ FDirName $(SUBDIR) auto ] ;
+
+{
+	MakeLocate vi : $(OBOS_BIN_DIR) ;
+	RelSymLink vi : vim ;
+	MakeLocate view : $(OBOS_BIN_DIR) ;
+	RelSymLink view : vim ;
+	MakeLocate gvim : $(OBOS_BIN_DIR) ;
+	RelSymLink gvim : vim ;
+	MakeLocate gview : $(OBOS_BIN_DIR) ;
+	RelSymLink gview : vim ;
+	MakeLocate eview : $(OBOS_BIN_DIR) ;
+	RelSymLink eview : vim ;
+	MakeLocate evim : $(OBOS_BIN_DIR) ;
+	RelSymLink evim : vim ;
+	MakeLocate ex : $(OBOS_BIN_DIR) ;
+	RelSymLink ex : vim ;
+	MakeLocate rview : $(OBOS_BIN_DIR) ;
+	RelSymLink rview : vim ;
+	MakeLocate rgvim : $(OBOS_BIN_DIR) ;
+	RelSymLink rgvim : vim ;
+	MakeLocate rgview : $(OBOS_BIN_DIR) ;
+	RelSymLink rgview : vim ;
+	MakeLocate rvim : $(OBOS_BIN_DIR) ;
+	RelSymLink rvim : vim ;
+	MakeLocate vimdiff : $(OBOS_BIN_DIR) ;
+	RelSymLink vimdiff : vim ;
+	MakeLocate gvimdiff : $(OBOS_BIN_DIR) ;
+	RelSymLink gvimdiff : vim ;
+}	

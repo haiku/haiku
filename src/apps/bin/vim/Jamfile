@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src apps bin vim ;
+
+SubInclude OBOS_TOP src apps bin vim src ;
+
