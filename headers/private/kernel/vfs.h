@@ -87,6 +87,10 @@ status_t vfs_get_module_path(const char *basePath, const char *moduleName, char 
 status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 			bool kernel);
 
+/* service call for the node monitor */
+status_t resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
+	mount_id *resolvedMountID, vnode_id *resolvedNodeID);
+
 /* calls the syscall dispatcher should use for user file I/O */
 status_t _user_mount(const char *path, const char *device, const char *fs_name,
 			uint32 flags, const char *args);

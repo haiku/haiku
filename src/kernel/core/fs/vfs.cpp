@@ -110,24 +110,6 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
-// RecursiveLockLocking
-class RecursiveLockLocking {
-public:
-	inline bool Lock(recursive_lock *lockable)
-	{
-		recursive_lock_lock(lockable);
-		return true;
-	}
-
-	inline void Unlock(recursive_lock *lockable)
-	{
-		recursive_lock_unlock(lockable);
-	}
-};
-
-// RecursiveLocker
-typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
-
 
 static mutex sFileSystemsMutex;
 
@@ -837,7 +819,6 @@ put_vnode(struct vnode *vnode)
  *	\return The volume root vnode the vnode cover is covered by, if it is
  *			indeed a mount point, or \c NULL otherwise.
  */
-
 static struct vnode *
 resolve_mount_point_to_volume_root(struct vnode *vnode)
 {
@@ -854,6 +835,54 @@ resolve_mount_point_to_volume_root(struct vnode *vnode)
 	recursive_lock_unlock(&sMountOpLock);
 
 	return volumeRoot;
+}
+
+
+/**	\brief Resolves a mount point vnode to the volume root vnode it is covered
+ *		   by.
+ *
+ *	Given an arbitrary vnode (identified by mount and node ID), the function
+ *	checks, whether the node is covered by the root of a volume. If it is the
+ *	function returns the mount and node ID of the volume root node. Otherwise
+ *	it simply returns the supplied mount and node ID.
+ *
+ *	In case of error (e.g. the supplied node could not be found) the variables
+ *	for storing the resolved mount and node ID remain untouched and an error
+ *	code is returned.
+ *
+ *	\param mountID The mount ID of the vnode in question.
+ *	\param nodeID The node ID of the vnode in question.
+ *	\param resolvedMountID Pointer to storage for the resolved mount ID.
+ *	\param resolvedNodeID Pointer to storage for the resolved node ID.
+ *	\return
+ *	- \c B_OK, if everything went fine,
+ *	- another error code, if something went wrong.
+ */
+status_t
+resolve_mount_point_to_volume_root(mount_id mountID, vnode_id nodeID,
+	mount_id *resolvedMountID, vnode_id *resolvedNodeID)
+{
+	// get the node
+	struct vnode *node;
+	status_t error = get_vnode(mountID, nodeID, &node, false);
+	if (error != B_OK)
+		return error;
+
+
+	// resolve the node
+	struct vnode *resolvedNode = resolve_mount_point_to_volume_root(node);
+	if (resolvedNode) {
+		put_vnode(node);
+		node = resolvedNode;
+	}
+
+	// set the return values
+	*resolvedMountID = node->device;
+	*resolvedNodeID = node->id;
+
+	put_vnode(node);
+
+	return B_OK;
 }
 
 
