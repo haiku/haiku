@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <KernelExport.h>
 #include <kernel.h>
@@ -19,15 +20,19 @@
 
 #include <string.h>
 
-#define TRACE_HEAP 0
-#if TRACE_HEAP
+//#define TRACE_HEAP
+#ifdef TRACE_HEAP
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
 /* prevent freeing pointers that were not allocated by kmalloc or are already freeed */
-#define PARANOID_POINTER_CHECK 1
+#ifdef DEBUG
+#	define PARANOID_POINTER_CHECK 1
+#else
+#	define PARANOID_POINTER_CHECK 0
+#endif
 /* initialize newly allocated memory with something non zero */  
 #define PARANOID_KMALLOC 1
 /* check if freed pointers are already freed, and fill freed memory with 0xdeadbeef */  
