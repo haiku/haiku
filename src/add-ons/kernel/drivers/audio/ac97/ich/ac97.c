@@ -97,11 +97,11 @@ void default_init(void);
 void ad1886_init(void);
 
 void default_amp_enable(bool);
-void cirrus_amp_enable(bool);
+void cs4299_amp_enable(bool);
 
 codec_ops default_ops = { default_init, default_amp_enable };
-codec_ops ad1868_ops = { ad1886_init, default_amp_enable };
-codec_ops cirrus_ops = { default_init, cirrus_amp_enable };
+codec_ops ad1886_ops = { ad1886_init, default_amp_enable };
+codec_ops cs4299_ops = { default_init, cs4299_amp_enable };
 
 codec_table codecs[] = 
 {
@@ -115,9 +115,9 @@ codec_table codecs[] =
 	{ 0x43525914, 0xffffffff, &default_ops, "Cirrus Logic CS4297B" },
 	{ 0x43525923, 0xffffffff, &default_ops, "Cirrus Logic CS4294C" },
 	{ 0x4352592b, 0xffffffff, &default_ops, "Cirrus Logic CS4298C" },
-	{ 0x43525931, 0xffffffff, &cirrus_ops,  "Cirrus Logic CS4299A" },
-	{ 0x43525933, 0xffffffff, &cirrus_ops,  "Cirrus Logic CS4299C" },
-	{ 0x43525934, 0xffffffff, &cirrus_ops,  "Cirrus Logic CS4299D" },
+	{ 0x43525931, 0xffffffff, &cs4299_ops,  "Cirrus Logic CS4299A" },
+	{ 0x43525933, 0xffffffff, &cs4299_ops,  "Cirrus Logic CS4299C" },
+	{ 0x43525934, 0xffffffff, &cs4299_ops,  "Cirrus Logic CS4299D" },
 	{ 0x43525941, 0xffffffff, &default_ops, "Cirrus Logic CS4201A" },
 	{ 0x43525951, 0xffffffff, &default_ops, "Cirrus Logic CS4205A" },
 	{ 0x43525961, 0xffffffff, &default_ops, "Cirrus Logic CS4291A" },
@@ -145,7 +145,7 @@ codec_table codecs[] =
 	{ 0x41445340, 0xffffffff, &default_ops, "Analog Devices AD1881 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445348, 0xffffffff, &default_ops, "Analog Devices AD1881A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445360, 0xffffffff, &default_ops, "Analog Devices AD1885 SoundMAX"B_UTF8_REGISTERED },
-	{ 0x41445361, 0xffffffff, &ad1868_ops,  "Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445361, 0xffffffff, &ad1886_ops,  "Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445362, 0xffffffff, &default_ops, "Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445363, 0xffffffff, &default_ops, "Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445371, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
@@ -265,9 +265,9 @@ void default_amp_enable(bool yesno)
 	LOG(("powerdown register is = %#04x\n",ich_codec_read(config->codecoffset + AC97_POWERDOWN)));
 }
 
-void cirrus_amp_enable(bool yesno)
+void cs4299_amp_enable(bool yesno)
 {
-	LOG(("cirrus_amp_enable\n"));
+	LOG(("cs4299_amp_enable\n"));
 	if (yesno)
 		ich_codec_write(config->codecoffset + 0x68, 0x8004);
 	else
