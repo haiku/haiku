@@ -1,0 +1,91 @@
+/* This file is included in fs_shell:fsh.c
+ * Insert your implementation of additional commands in here
+ *
+ * Format:
+ *
+ * static void
+ * function(int argc, char **argv)
+ * {
+ * }
+ *
+ */
+
+
+#include "bfs_control.h"
+
+
+static void
+do_chkbfs(int argc, char **argv)
+{
+	struct check_control result;
+	off_t files = 0, directories = 0, indices = 0, attributeDirectories = 0, attributes = 0;
+	int counter = 0;
+
+	int fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0);
+	if (fd < 0) {
+	    printf("chkbfs: error opening '.'\n");
+	    return;
+	}
+
+	memset(&result, 0, sizeof(result));
+	result.flags = argc > 1 ? BFS_FIX_BITMAP_ERRORS : 0;
+	if (argc > 2) {
+		printf("will fix any severe errors!\n");
+		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
+	}
+
+	// start checking
+	if ((sys_ioctl(1, fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result))) < 0) {
+	    printf("chkbfs: error starting!\n");
+	}
+
+	// check all files and report errors
+	while (sys_ioctl(1, fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == B_OK) {
+		if (++counter % 50 == 0)
+			printf("  %7ld nodes processed\x1b[1A\n", counter);
+
+		if (result.errors) {
+			printf("%s (inode = %Ld)", result.name, result.inode);
+			if (result.errors & BFS_MISSING_BLOCKS)
+				printf(", some blocks weren't allocated");
+			if (result.errors & BFS_BLOCKS_ALREADY_SET)
+				printf(", has blocks already set");
+			if (result.errors & BFS_INVALID_BLOCK_RUN)
+				printf(", has invalid block run(s)");
+			if (result.errors & BFS_COULD_NOT_OPEN)
+				printf(", could not be opened");
+			if (result.errors & BFS_WRONG_TYPE)
+				printf(", has wrong type");
+			if (result.errors & BFS_NAMES_DONT_MATCH)
+				printf(", names don't match");
+			putchar('\n');
+		}
+		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
+			indices++;
+		else if (result.mode & S_ATTR_DIR)
+			attributeDirectories++;
+		else if (result.mode & S_ATTR)
+			attributes++;
+		else if (result.mode & S_IFDIR)
+			directories++;
+		else
+			files++;
+	}
+	if (result.status != B_ENTRY_NOT_FOUND)
+		printf("chkbfs: error occured during scan: %s\n", strerror(result.status));
+
+	// stop checking
+	if ((sys_ioctl(1, fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result))) < 0) {
+	    printf("chkbfs: error stopping!\n");
+	}
+
+	printf("checked %ld nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
+		counter, result.stats.missing, result.stats.already_set, result.stats.freed);
+	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. dirs\t%Ld\n\tindices\t\t%Ld\n",
+		files, directories, attributes, attributeDirectories, indices);
+	if (result.flags & BFS_FIX_BITMAP_ERRORS)
+		printf("errors have been fixed\n");
+
+	sys_close(1, fd);
+}
+
