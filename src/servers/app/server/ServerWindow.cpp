@@ -34,7 +34,6 @@
 #include <Message.h>
 #include <GraphicsDefs.h>
 #include <PortLink.h>
-#include <Session.h>
 #include "Desktop.h"
 #include "AppServer.h"
 #include "Layer.h"

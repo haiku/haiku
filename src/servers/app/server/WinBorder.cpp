@@ -29,7 +29,6 @@
 #include <String.h>
 #include <Locker.h>
 #include <Debug.h>
-#include <TokenSpace.h>
 #include "PortLink.h"
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"

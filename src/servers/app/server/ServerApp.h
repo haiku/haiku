@@ -103,6 +103,7 @@ protected:
 	bool fCursorHidden;
 	bool fIsActive;
 	int32 fHandlerToken;
+	area_id fSharedMem;
 };
 
 #endif

@@ -98,10 +98,18 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	fBitmapList=new BList(0);
 	fPictureList=new BList(0);
 	fIsActive=false;
+	
+	char *dummy;
+	fSharedMem=create_area("rw_shared_area",(void**)&dummy,B_ANY_ADDRESS,4096,B_NO_LOCK,
+			B_READ_AREA|B_WRITE_AREA);
+	
+	if(fSharedMem<0)
+		printf("PANIC: Couldn't create shared app_server area!\n");
 
 	ServerCursor *defaultc=cursormanager->GetCursor(B_CURSOR_DEFAULT);
 	
 	fAppCursor=(defaultc)?new ServerCursor(defaultc):NULL;
+	fAppCursor->SetOwningTeam(fClientTeamID);
 	fLockSem=create_sem(1,"ServerApp sem");
 
 	// Does this even belong here any more? --DW
@@ -148,7 +156,7 @@ ServerApp::~ServerApp(void)
 		delete fAppCursor;
 
 
-	cursormanager->RemoveAppCursors(fSignature.String());
+	cursormanager->RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
@@ -157,6 +165,7 @@ ServerApp::~ServerApp(void)
 	thread_info info;
 	if(get_thread_info(fMonitorThreadID,&info)==B_OK)
 		kill_thread(fMonitorThreadID);
+	delete_area(fSharedMem);
 }
 
 /*!
@@ -367,7 +376,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
-			// Eventually we will have windows which will notify their children of changes in 
+			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
 			// system colors
 			
 /*			STRACE(("ServerApp %s: Received global UI color update notification\n",fSignature.String()));
@@ -386,7 +395,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 		}
 		case AS_UPDATE_FONTS:
 		{
-			// Eventually we will have windows which will notify their children of changes in 
+			// NOTE: R2: Eventually we will have windows which will notify their children of changes in 
 			// system fonts
 			
 /*			STRACE(("ServerApp %s: Received global font update notification\n",fSignature.String()));
@@ -402,6 +411,20 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 				win->Unlock();
 			}
 */			break;
+		}
+		case AS_ACQUIRE_SERVERMEM:
+		{
+			// Received from a ServerMemIO object requesting operating memory
+			// Attached Data:
+			// 1) size_t requested size
+			
+			// TODO: Implement AS_ACQUIRE_SERVERMEM
+			break;
+		}
+		case AS_RELEASE_SERVERMEM:
+		{
+			// TODO: Implement AS_RELEASE_SERVERMEM
+			break;
 		}
 		case AS_UPDATE_DECORATOR:
 		{
@@ -683,6 +706,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 				cursormanager->DeleteCursor(fAppCursor->ID());
 
 			fAppCursor=new ServerCursor(cdata);
+			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			cursormanager->AddCursor(fAppCursor);
 			cursormanager->SetCursor(fAppCursor->ID());
@@ -730,6 +754,7 @@ void ServerApp::_DispatchMessage(int32 code, BPortLink& msg)
 			msg.Read<int32>(&replyport);
 
 			fAppCursor=new ServerCursor(cdata);
+			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			cursormanager->AddCursor(fAppCursor);
 			

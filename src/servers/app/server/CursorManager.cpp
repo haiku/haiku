@@ -153,23 +153,18 @@ void CursorManager::DeleteCursor(int32 token)
 	\brief Removes and deletes all of an application's cursors
 	\param signature Signature to which the cursors belong
 */
-void CursorManager::RemoveAppCursors(const char *signature)
+void CursorManager::RemoveAppCursors(team_id team)
 {
-	// OPTIMIZATION: For an optimization, it perhaps may be wise down 
-	// the road to replace the ServerCursor's app signature with a 
-	// pointer to its application and compare ServerApp pointers instead.
 	Lock();
 
 	ServerCursor *temp;
 	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
 		temp=(ServerCursor*)fCursorList->ItemAt(i);
-		if(temp && temp->GetAppSignature() && 
-			strcmp(signature, temp->GetAppSignature())==0)
+		if(temp && temp->OwningTeam()==team)
 		{
 			fCursorList->RemoveItem(i);
 			delete temp;
-			break;
 		}
 	}
 	Unlock();

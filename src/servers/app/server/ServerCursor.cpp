@@ -40,6 +40,7 @@ ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hots
 {
 	fHotSpot=hotspot;
 	fHotSpot.ConstrainTo(Bounds());
+	fOwningTeam=-1;
 
 	_AllocateBuffer();
 }
@@ -59,6 +60,7 @@ ServerCursor::ServerCursor(int8 *data)
 	if(data)
 	{	
 		fInitialized=true;
+		fOwningTeam=-1;
 		uint32 black=0xFF000000,
 			white=0xFFFFFFFF,
 			*bmppos;
@@ -113,6 +115,7 @@ ServerCursor::ServerCursor(const ServerCursor *cursor)
 {
 	_AllocateBuffer();
 	fInitialized=true;
+	fOwningTeam=-1;
 
 	if(cursor)
 	{	

@@ -50,7 +50,7 @@ public:
 	~CursorManager(void);
 	int32 AddCursor(ServerCursor *sc);
 	void DeleteCursor(int32 token);
-	void RemoveAppCursors(const char *signature);
+	void RemoveAppCursors(team_id team);
 	void ShowCursor(void);
 	void HideCursor(void);
 	void ObscureCursor(void);
