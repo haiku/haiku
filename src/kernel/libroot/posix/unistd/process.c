@@ -1,25 +1,32 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
-#include <unistd.h>
 #include <syscalls.h>
+#include <syscall_process_info.h>
+
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
+
+
+#define RETURN_AND_SET_ERRNO(err) \
+	if (err < 0) { \
+		errno = err; \
+		return -1; \
+	} \
+	return err;
 
 
 extern thread_id __main_thread_id;
 
 
-// ToDo: implement the process ID functions for real!
-
-
 pid_t 
 getpgrp(void)
 {
-	return 0;
+	return getpgid(__main_thread_id);
 }
 
 
@@ -34,21 +41,43 @@ getpid(void)
 pid_t 
 getppid(void)
 {
-	return 0;
+	return _kern_process_info(0, PARENT_ID);
+		// this is not supposed to return an error value
+}
+
+
+pid_t
+getsid(pid_t process)
+{
+	pid_t session = _kern_process_info(process, SESSION_ID);
+
+	RETURN_AND_SET_ERRNO(session);
+}
+
+
+pid_t
+getpgid(pid_t process)
+{
+	pid_t group = _kern_process_info(process, GROUP_ID);
+
+	RETURN_AND_SET_ERRNO(group);
 }
 
 
 int 
-setpgid(pid_t pid, pid_t pgid)
+setpgid(pid_t process, pid_t group)
 {
-	return 0;
+	status_t status = _kern_setpgid(process, group);
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
 pid_t 
 setsid(void)
 {
-	return EPERM;
-}
+	status_t status = _kern_setsid();
 
+	RETURN_AND_SET_ERRNO(status);
+}
 
