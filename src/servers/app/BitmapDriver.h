@@ -73,7 +73,7 @@ public:
 	ServerBitmap *GetTarget(void) const { return fTarget; }
 	
 	// Settings functions
-	virtual void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, DrawData *d);
+//	virtual void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
 	virtual void SetMode(const int32 &mode);
 	virtual void SetMode(const display_mode &mode);

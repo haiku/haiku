@@ -529,9 +529,9 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 	}
 }
 
-
+/*
 void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source, 
-	const BRect &dest, DrawData *d)
+	const BRect &dest, const DrawData *d)
 {
 	// Another internal function called from other functions.
 	
@@ -656,7 +656,7 @@ void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source,
 			break;
 		}
 	}
-}
+}*/
 
 
 bool BitmapDriver::AcquireBuffer(FBBitmap *fbmp)

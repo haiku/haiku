@@ -106,7 +106,7 @@ public:
 	virtual	void				Shutdown(void); // You never know when you'll need this
 	
 	// Drawing functions
-	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
+//	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
 	virtual	void				InvertRect(const BRect &r);
 

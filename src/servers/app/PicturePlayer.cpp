@@ -43,8 +43,7 @@ PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
 
 PicturePlayer::~PicturePlayer()
 {
-	if(clipreg)
-		delete clipreg;
+	delete clipreg;
 }
 
 int16 PicturePlayer::GetOp()
@@ -255,7 +254,13 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				ServerBitmap sbmp(BRect(0,0,width-1,height-1), (color_space)pixelFormat, flags, bytesPerRow);
 				sbmp._AllocateBuffer();
 				GetData(sbmp.Bits(), size - (fData.Position() - pos));
-				fdriver->DrawBitmap(&sbmp,src,dest,&fldata);
+				// TODO: what clipping region is DrawBitmap expecting?
+				// It appears to be in screen space. What space is clipreg in?
+				// We might pass a NULL pointer here, which would crash
+				// in DrawBitmap(), but I think this whole thing needs
+				// fixing...
+				fdriver->DrawBitmap(clipreg,
+									&sbmp,src,dest,&fldata);
 				sbmp._FreeBuffer();
 				break;
 			}

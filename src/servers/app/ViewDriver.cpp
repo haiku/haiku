@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,6 @@
 #include <Screen.h>
 #include <TranslatorRoster.h>
 
-#include "Angle.h"
 #include "PortLink.h"
 #include "RectUtils.h"
 #include "ServerProtocol.h"
@@ -595,14 +594,14 @@ void ViewDriver::SetMode(const display_mode &mode)
 	screenwin->Unlock();
 }
 
-
+/*
 void ViewDriver::DrawBitmap(ServerBitmap *bitmap, const BRect &src, const BRect &dest, const DrawData *d)
 {
 	if(!is_initialized)
 		return;
 		
 STRACE(("ViewDriver:: DrawBitmap unimplemented()\n"));
-}
+}*/
 
 bool ViewDriver::DumpToFile(const char *path)
 {

@@ -163,7 +163,7 @@ void DirectDriver::Shutdown(void)
 	if(fSavedScreenMode.space!=fCurrentScreenMode.space)
 		BScreen().SetMode(&fSavedScreenMode);
 }
-
+/*
 void DirectDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
 {
 	STRACE(("DirectDriver::DrawBitmap\n"));
@@ -190,7 +190,7 @@ void DirectDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &
 	screenwin->rectpipe.PutRect(dest);
 	Unlock();
 	delete mediator;
-}
+}*/
 
 void DirectDriver::InvertRect(const BRect &r)
 {

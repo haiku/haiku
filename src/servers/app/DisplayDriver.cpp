@@ -120,9 +120,18 @@ void DisplayDriver::CopyBits(const BRect &src, const BRect &dest, const DrawData
 	\param src Source region
 	\param lefttop Offset to which the region will be copied
 */
-void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
+void
+DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
 	// TODO: Implement DisplayDriver;:CopyRegion
+}
+
+/*!
+	\brief Inverts the colors in the rectangle.
+	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
+*/
+void DisplayDriver::InvertRect(const BRect &r)
+{
 }
 
 /*!
@@ -134,9 +143,15 @@ void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
-
-void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+void
+DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
+						  const BRect &source, const BRect &dest,
+						  const DrawData *d)
 {
+	// TODO: make sure we all mean the same region -> see PicturePlayer line 257
+	if (!region)
+		return;
+
 	Lock();
 	
 	FBBitmap		frameBuffer;
@@ -278,8 +293,8 @@ void DisplayDriver::DrawBitmap(BRegion *region, ServerBitmap *bitmap, const BRec
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 */
 
-void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
-{
+//void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d)
+//{
 /*	Lock();
 
 	FBBitmap		frameBuffer;
@@ -296,7 +311,7 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect 
 	
 	Invalidate(dest);
 */
-}
+//}
 
 void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)
 {
@@ -432,414 +447,6 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 //	ConstrainClippingRegion(NULL);
 }
 
-void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, const RGBColor &color, escapement_delta *delta)
-{
-	DrawData d;
-	d.highcolor=color;
-	
-	if(delta)
-		d.edelta=*delta;
-	DrawString(string,length,pt,&d);
-}
-
-/*!
-	\brief Utilizes the font engine to draw a string to the frame buffer
-	\param string String to be drawn. Always non-NULL.
-	\param length Number of characters in the string to draw. Always greater than 0. If greater
-	than the number of characters in the string, draw the entire string.
-	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
-	this for backwards compatibility. While the point itself is guaranteed to be inside
-	the frame buffers coordinate range, the clipping of each individual glyph must be
-	performed by the driver itself.
-	\param d Data structure containing any other data necessary for the call. Always non-NULL.
-*/
-void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, DrawData *d)
-{
-	if(!string || !d)
-		return;
-	
-	Lock();
-	
-	// TODO: properly calculate intersecting rectangle with cursor in DisplayDriver::DrawString
-	
-	// Rough guesstimate for size
-	BRect intersection(pt.x,pt.x,pt.y,pt.y);
-	intersection.top-=d->font.Size()*1.5;
-	intersection.right+=d->font.Size()*1.5*length;
-	if(fCursorHandler.IntersectsCursor(intersection))
-		fCursorHandler.DriverHide();
-	
-	BPoint point(pt);
-	
-	const ServerFont *font=&(d->font);
-	
-	FT_Face face;
-	FT_GlyphSlot slot;
-	FT_Matrix rmatrix,smatrix;
-	FT_UInt glyph_index=0, previous=0;
-	FT_Vector pen,delta,space,nonspace;
-	int16 error=0;
-	int32 strlength,i;
-	Angle rotation(font->Rotation()), shear(font->Shear());
-	
-	bool antialias=true;
-	
-	if(font->Size()<18 && (font->Flags()& B_DISABLE_ANTIALIASING==1))
-		antialias=false;
-
-	// Originally, I thought to do this shear checking here, but it really should be
-	// done in BFont::SetShear()
-	float shearangle=shear.Value();
-	if(shearangle>135)
-		shearangle=135;
-	if(shearangle<45)
-		shearangle=45;
-
-	if(shearangle>90)
-		shear=90+((180-shearangle)*2);
-	else
-		shear=90-(90-shearangle)*2;
-	
-	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
-	if(error)
-	{
-		Unlock();
-		return;
-	}
-
-	slot=face->glyph;
-
-	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
-	
-	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
-	if(error)
-	{
-		Unlock();
-		return;
-	}
-
-	// if we do any transformation, we do a call to FT_Set_Transform() here
-	
-	// First, rotate
-	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
-	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
-	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
-	
-	// Next, shear
-	smatrix.xx = (FT_Fixed)(0x10000); 
-	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
-	smatrix.yx = (FT_Fixed)(0); 
-	smatrix.yy = (FT_Fixed)(0x10000); 
-
-	FT_Matrix_Multiply(&rmatrix,&smatrix);
-	
-	// Set up the increment value for escapement padding
-	space.x=int32(d->edelta.space * rotation.Cosine()*64);
-	space.y=int32(d->edelta.space * rotation.Sine()*64);
-	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
-	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
-	
-	// set the pen position in 26.6 cartesian space coordinates
-	pen.x=(int32)point.x * 64;
-	pen.y=(int32)point.y * 64;
-	
-	slot=face->glyph;
-
-	
-	strlength=strlen(string);
-	if(length<strlength)
-		strlength=length;
-
-	for(i=0;i<strlength;i++)
-	{
-		FT_Set_Transform(face,&smatrix,&pen);
-
-		// Handle escapement padding option
-		if((uint8)string[i]<=0x20)
-		{
-			pen.x+=space.x;
-			pen.y+=space.y;
-		}
-		else
-		{
-			pen.x+=nonspace.x;
-			pen.y+=nonspace.y;
-		}
-
-	
-		// get kerning and move pen
-		if(use_kerning && previous && glyph_index)
-		{
-			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
-			pen.x+=delta.x;
-			pen.y+=delta.y;
-		}
-
-		error=FT_Load_Char(face,string[i],
-			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
-
-		if(!error)
-		{
-			if(antialias)
-				BlitGray2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
-			else
-				BlitMono2RGB32(&slot->bitmap,
-					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
-		}
-
-		// increment pen position
-		pen.x+=slot->advance.x;
-		pen.y+=slot->advance.y;
-		previous=glyph_index;
-	}
-
-	// TODO: implement calculation of invalid rectangle in DisplayDriver::DrawString properly
-	BRect r;
-	r.left=MIN(point.x,pen.x>>6);
-	r.right=MAX(point.x,pen.x>>6);
-	r.top=point.y-face->height;
-	r.bottom=point.y+face->height;
-	
-	fCursorHandler.DriverShow();
-	Invalidate(r);
-	
-	// Update the caller's pen position
-	d->penlocation.x=pen.x / 64;
-	d->penlocation.y=pen.y / 64;
-	
-	FT_Done_Face(face);
-
-	Unlock();
-
-}
-
-void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
-{
-	rgb_color color=d->highcolor.GetColor32();
-	
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer, *destbuffer;
-	FBBitmap framebuffer;
-	
-	if(!AcquireBuffer(&framebuffer))
-	{
-		printf("ERROR: Couldn't acquire framebuffer in BlitMono2RGB32\n");
-		return;
-	}
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex, *destindex, *rowptr, value;
-	
-	// increment values for the index pointers
-	int32 srcinc=src->pitch, destinc=framebuffer.BytesPerRow();
-	
-	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
-	int32 x=(int32)pt.x,y=(int32)pt.y;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		srcbuffer+=srcinc * (0-y);
-		srcheight-=srcinc;
-		destbuffer+=destinc * (0-y);
-	}
-
-	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
-	}
-
-	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		srcbuffer+=(0-x)>>3;
-		srcwidth-=0-x;
-		destbuffer+=(0-x)*4;
-	}
-	
-	// starting point in destination bitmap
-	destbuffer=(uint8*)framebuffer.Bits()+int32( (pt.y*framebuffer.BytesPerRow())+(pt.x*4) );
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			for(k=0; k<8; k++)
-			{
-				value=*(srcindex+j) & (1 << (7-k));
-				if(value)
-				{
-					rowptr[0]=color.blue;
-					rowptr[1]=color.green;
-					rowptr[2]=color.red;
-					rowptr[3]=color.alpha;
-				}
-
-				rowptr+=4;
-			}
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-	ReleaseBuffer();
-}
-
-void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
-{
-	// pointers to the top left corner of the area to be copied in each bitmap
-	uint8 *srcbuffer=NULL, *destbuffer=NULL;
-	FBBitmap framebuffer;
-	
-	if(!AcquireBuffer(&framebuffer))
-	{
-		printf("Couldn't acquire framebuffer in DisplayDriver::BlitGray2RGB32\n");
-		return;
-	}
-	
-	// index pointers which are incremented during the course of the blit
-	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
-	
-	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
-
-	rstep=float(highcolor.red-lowcolor.red)/255.0;
-	gstep=float(highcolor.green-lowcolor.green)/255.0;
-	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
-	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
-	
-	// increment values for the index pointers
-	int32 x=(int32)pt.x,
-		y=(int32)pt.y,
-		srcinc=src->pitch,
-//		destinc=dest->BytesPerRow(),
-		destinc=framebuffer.BytesPerRow(),
-		srcwidth=src->width,
-		srcheight=src->rows,
-		incval=0;
-	
-	int16 i,j;
-	
-	// starting point in source bitmap
-	srcbuffer=(uint8*)src->buffer;
-
-	// starting point in destination bitmap
-	destbuffer=(uint8*)framebuffer.Bits()+(y*framebuffer.BytesPerRow()+(x*4));
-
-
-	if(y<0)
-	{
-		if(y<pt.y)
-			y++;
-		
-		incval=0-y;
-		
-		srcbuffer+=incval * srcinc;
-		srcheight-=incval;
-		destbuffer+=incval * destinc;
-	}
-
-	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
-	{
-		if(y>pt.y)
-			y--;
-		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
-	}
-
-	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
-	{
-		if(x>pt.x)
-			x--;
-		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
-	}
-	
-	if(x<0)
-	{
-		if(x<pt.x)
-			x++;
-		incval=0-x;
-		srcbuffer+=incval;
-		srcwidth-=incval;
-		destbuffer+=incval*4;
-	}
-
-	int32 value;
-
-	srcindex=srcbuffer;
-	destindex=destbuffer;
-
-	for(i=0; i<srcheight; i++)
-	{
-		rowptr=destindex;		
-
-		for(j=0;j<srcwidth;j++)
-		{
-			value=*(srcindex+j) ^ 255;
-
-			if(value!=255)
-			{
-				if(d->draw_mode==B_OP_COPY)
-				{
-					rowptr[0]=uint8(highcolor.blue-(value*bstep));
-					rowptr[1]=uint8(highcolor.green-(value*gstep));
-					rowptr[2]=uint8(highcolor.red-(value*rstep));
-					rowptr[3]=255;
-				}
-				else
-					if(d->draw_mode==B_OP_OVER)
-					{
-						if(highcolor.alpha>127)
-						{
-							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
-							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
-							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
-							rowptr[3]=255;
-						}
-					}
-			}
-			rowptr+=4;
-
-		}
-		
-		srcindex+=srcinc;
-		destindex+=destinc;
-	}
-	ReleaseBuffer();
-}
-
-bool DisplayDriver::AcquireBuffer(FBBitmap *bmp)
-{
-	return false;
-}
-
-void DisplayDriver::ReleaseBuffer(void)
-{
-}
-
-void DisplayDriver::Invalidate(const BRect &r)
-{
-}
 
 /*!
 	\brief Called for all BView::FillArc calls
@@ -848,7 +455,7 @@ void DisplayDriver::Invalidate(const BRect &r)
 	\param span Span of the arc in degrees. Ending angle = angle+span.
 	\param color The color of the arc
 */
-void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
+/*void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
 {
 	if(fCursorHandler.IntersectsCursor(r))
 		fCursorHandler.DriverHide();
@@ -1204,7 +811,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::FillArc calls
@@ -1574,7 +1181,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 	Invalidate(r);
 	Unlock();
 }
-
+/*
 void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
 {
 	Lock();
@@ -1589,7 +1196,7 @@ void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
 	fCursorHandler.DriverShow();
 	Unlock();
 }
-
+*/
 /*!
 	\brief Called for all BView::FillBezier calls.
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control
@@ -1610,12 +1217,12 @@ void DisplayDriver::FillBezier(BPoint *pts, const DrawData *d)
 	fCursorHandler.DriverShow();
 	Unlock();
 }
-
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
 	\param color The color of the ellipse
 */
+/*
 void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
 {
 	float xc = (r.left+r.right)/2;
@@ -1679,7 +1286,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
 	Invalidate(r);
 	Unlock();
 }
-
+*/
 /*!
 	\brief Called for all BView::FillEllipse calls
 	\param r BRect enclosing the ellipse to be drawn.
@@ -1759,16 +1366,17 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 	\param numpts Number of points in the BPoint array.
 	\param color  The color of the polygon
 */
+/*
 void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color)
 {
-	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
-	   the y-value of a point not in the segment, split the segment into 2 segments.
-	   Once we have gone through all of the segments, sort them primarily on y-value
-	   and secondarily on x-value.  Step through each y-value in the bounding rectangle
-	   and look for intersections with line segments.  First intersection is start of
-	   horizontal line, second intersection is end of horizontal line.  Continue for
-	   all pairs of intersections.  Watch out for horizontal line segments.
-	*/
+	// Here's the plan.  Record all line segments in polygon.  If a line segments crosses
+	// the y-value of a point not in the segment, split the segment into 2 segments.
+	// Once we have gone through all of the segments, sort them primarily on y-value
+	// and secondarily on x-value.  Step through each y-value in the bounding rectangle
+	// and look for intersections with line segments.  First intersection is start of
+	// horizontal line, second intersection is end of horizontal line.  Continue for
+	// all pairs of intersections.  Watch out for horizontal line segments.
+	
 	if ( !ptlist || (numpts < 3) )
 		return;
 
@@ -1897,7 +1505,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 	Invalidate(bounds);
 	Unlock();
 
-}
+}*/
 
 /*!
 	\brief Called for all BView::FillPolygon calls
@@ -1907,14 +1515,13 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bound
 */
 void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const DrawData *d)
 {
-	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
-	   the y-value of a point not in the segment, split the segment into 2 segments.
-	   Once we have gone through all of the segments, sort them primarily on y-value
-	   and secondarily on x-value.  Step through each y-value in the bounding rectangle
-	   and look for intersections with line segments.  First intersection is start of
-	   horizontal line, second intersection is end of horizontal line.  Continue for
-	   all pairs of intersections.  Watch out for horizontal line segments.
-	*/
+	// Here's the plan.  Record all line segments in polygon.  If a line segments crosses
+	// the y-value of a point not in the segment, split the segment into 2 segments.
+	// Once we have gone through all of the segments, sort them primarily on y-value
+	// and secondarily on x-value.  Step through each y-value in the bounding rectangle
+	// and look for intersections with line segments.  First intersection is start of
+	// horizontal line, second intersection is end of horizontal line.  Continue for
+	// all pairs of intersections.  Watch out for horizontal line segments.
 	if ( !ptlist || (numpts < 3) )
 		return;
 
@@ -2171,7 +1778,7 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 	\param r BRegion to be filled
 	\param color The color used to fill the region
 */
-void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
+/*void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
@@ -2187,7 +1794,7 @@ void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Convenience function for server use
@@ -2230,7 +1837,7 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 	Unlock();
 }
 
-void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
+/*void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
 {
 	float arc_x;
 	float yrad2 = yrad*yrad;
@@ -2250,7 +1857,7 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::FillRoundRect calls
@@ -2323,7 +1930,7 @@ void DisplayDriver::FillShape(const BRect &bounds, const int32 &opcount, const i
 	printf("DisplayDriver::FillShape unimplemented\n");
 }
 
-void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
+/*void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
 {
 	if ( !pts )
 		return;
@@ -2427,7 +2034,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColo
 	Invalidate(bounds);
 	
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::FillTriangle calls
@@ -2551,114 +2158,6 @@ void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawDat
 	Unlock();
 }
 
-/*!
-	\brief Hides the cursor.
-	
-	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(true) somewhere within this function to ensure that data is
-	maintained accurately. Subclasses must include a call to DisplayDriver::HideCursor
-	for proper state tracking.
-*/
-void DisplayDriver::HideCursor(void)
-{
-	Lock();
-	fCursorHandler.Hide();	
-	Unlock();
-}
-
-/*!
-	\brief Returns whether the cursor is visible or not.
-	\return true if hidden or obscured, false if not.
-
-*/
-bool DisplayDriver::IsCursorHidden(void)
-{
-	Lock();
-	bool value=fCursorHandler.IsHidden();
-	Unlock();
-
-	return value;
-}
-
-/*!
-	\brief Moves the cursor to the given point.
-
-	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
-	range, but the cursor data itself will need to be clipped. A check to see if the 
-	cursor is obscured should be made and if so, a call to _SetCursorObscured(false) 
-	should be made the cursor in addition to displaying at the passed coordinates.
-*/
-void DisplayDriver::MoveCursorTo(const float &x, const float &y)
-{
-	Lock();
-	fCursorHandler.MoveTo(BPoint(x,y));
-	Unlock();
-}
-
-/*!
-	\brief Inverts the colors in the rectangle.
-	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
-*/
-void DisplayDriver::InvertRect(const BRect &r)
-{
-}
-
-//! Returns the cursor's current position
-BPoint DisplayDriver::GetCursorPosition(void)
-{
-	Lock();
-	BPoint value=fCursorHandler.GetPosition();
-	Unlock();
-	
-	return value;
-}
-
-
-/*!
-	\brief Shows the cursor.
-	
-	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(false) somewhere within this function to ensure that data is
-	maintained accurately. Subclasses must call DisplayDriver::ShowCursor at some point
-	to ensure proper state tracking.
-*/
-void DisplayDriver::ShowCursor(void)
-{
-	Lock();
-	fCursorHandler.Show();
-	Unlock();
-}
-
-/*!
-	\brief Obscures the cursor.
-	
-	Obscure calls are not nestable. Subclasses should call DisplayDriver::ObscureCursor
-	somewhere within this function to ensure that data is maintained accurately. A check
-	will be made by the system before the next MoveCursorTo call to show the cursor if
-	it is obscured.
-*/
-void DisplayDriver::ObscureCursor(void)
-{
-	Lock();
-	fCursorHandler.Obscure();	
-	Unlock();
-
-}
-
-/*!
-	\brief Changes the cursor.
-	\param cursor The new cursor. Guaranteed to be non-NULL.
-	
-	The driver does not take ownership of the given cursor. Subclasses should make
-	a copy of the cursor passed to it. The default version of this function hides the
-	cursory, replaces it, and shows the cursor if previously visible.
-*/
-void DisplayDriver::SetCursor(ServerCursor *cursor)
-{
-	Lock();
-	fCursorHandler.SetCursor(cursor);
-	Unlock();
-}
 
 /*!
 	\brief Called for all BView::StrokeArc calls
@@ -2669,7 +2168,7 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 
 	This is inefficient and should probably be reworked
 */
-void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
+/*void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -2827,7 +2326,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::StrokeArc calls
@@ -3003,7 +2502,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 	\param pts 4-element array of BPoints in the order of start, end, and then the two control points. 
 	\param color draw color
 */
-void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
+/*void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
 {
 	int i, numLines;
 
@@ -3020,7 +2519,7 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
 	fCursorHandler.DriverShow();
 	Invalidate(curve.Frame());
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::StrokeBezier calls.
@@ -3051,7 +2550,7 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const DrawData *d)
 	\param r BRect enclosing the ellipse to be drawn.
 	\param color The color of the ellipse
 */
-void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
+/*void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 {
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
@@ -3120,7 +2619,7 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::StrokeEllipse calls
@@ -3334,7 +2833,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const Dra
 	\param end Ending point
 	\param setPixel Pixel drawing function which handles things like size and pattern.
 */
-void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDriver* driver, SetPixelFuncType setPixel)
+/*void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDriver* driver, SetPixelFuncType setPixel)
 {
 	// TODO: What's this particular StrokeLine call for?
 	
@@ -3364,7 +2863,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDr
 		(driver->*setPixel)(ROUND(x),ROUND(y));
 	}
 	Invalidate(BRect(start,end));
-}
+}*/
 
 void DisplayDriver::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
@@ -3378,7 +2877,7 @@ void DisplayDriver::StrokePoint(const BPoint& pt, const DrawData *d)
 	Invalidate(BRect(pt,pt));
 }
 
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color, bool is_closed)
+/*void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color, bool is_closed)
 {
 	if(!ptlist)
 		return;
@@ -3395,7 +2894,7 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bou
 	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::StrokePolygon calls
@@ -3463,7 +2962,7 @@ void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
+/*void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
@@ -3476,7 +2975,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
 	fCursorHandler.DriverShow();
 	Invalidate(r.Frame());
 	Unlock();
-}
+}*/
 
 void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 {
@@ -3493,7 +2992,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 	Unlock();
 }
 
-void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
+/*void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
 {
 	int hLeft, hRight;
 	int vTop, vBottom;
@@ -3527,7 +3026,7 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	fCursorHandler.DriverShow();
 	Invalidate(r);
 	Unlock();
-}
+}*/
 
 /*!
 	\brief Called for all BView::StrokeRoundRect calls
@@ -3585,7 +3084,7 @@ void DisplayDriver::StrokeShape(const BRect &bounds, const int32 &opcount, const
 	\param pts Array of 3 BPoints. Always non-NULL.
 	\param color The color of the lines
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
+/*void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
 {
 	Lock();
 	if(fCursorHandler.IntersectsCursor(bounds))
@@ -3598,7 +3097,7 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBCo
 	fCursorHandler.DriverShow();
 	Invalidate(bounds);
 	Unlock();
-}
+}*/
 
 void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawData *d)
 {
@@ -3615,108 +3114,191 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawD
 	Unlock();
 }
 
-/*!
-	\brief Draws a series of lines - optimized for speed
-	\param numlines Number of lines to be drawn
-	\param linedata Array of LineArrayData objects
-	\param d current DrawData settings
-*/
-void DisplayDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d)
+
+void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, const RGBColor &color, escapement_delta *delta)
 {
-	if(!d || !linedata)
+	DrawData d;
+	d.highcolor=color;
+	
+	if(delta)
+		d.edelta=*delta;
+	DrawString(string,length,pt,&d);
+}
+
+/*!
+	\brief Utilizes the font engine to draw a string to the frame buffer
+	\param string String to be drawn. Always non-NULL.
+	\param length Number of characters in the string to draw. Always greater than 0. If greater
+	than the number of characters in the string, draw the entire string.
+	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
+	this for backwards compatibility. While the point itself is guaranteed to be inside
+	the frame buffers coordinate range, the clipping of each individual glyph must be
+	performed by the driver itself.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+*/
+void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, DrawData *d)
+{
+	if(!string || !d)
 		return;
 	
-	const LineArrayData *dataindex=linedata;
-	BRect r(0,0,0,0);
-	DrawData drawdata;
-
 	Lock();
 	
-	fCursorHandler.DriverHide();
+	// TODO: properly calculate intersecting rectangle with cursor in DisplayDriver::DrawString
 	
-	drawdata = *d;
+	// Rough guesstimate for size
+	BRect intersection(pt.x,pt.x,pt.y,pt.y);
+	intersection.top-=d->font.Size()*1.5;
+	intersection.right+=d->font.Size()*1.5*length;
+	if(fCursorHandler.IntersectsCursor(intersection))
+		fCursorHandler.DriverHide();
 	
-	r.Set(linedata->pt1.x,linedata->pt1.y,linedata->pt1.x,linedata->pt1.y);
+	BPoint point(pt);
 	
-	for (int32 i=0; i<numlines; i++)
+	const ServerFont *font=&(d->font);
+	
+	FT_Face face;
+	FT_GlyphSlot slot;
+	FT_Matrix rmatrix,smatrix;
+	FT_UInt glyph_index=0, previous=0;
+	FT_Vector pen,delta,space,nonspace;
+	int16 error=0;
+	int32 strlength,i;
+	Angle rotation(font->Rotation()), shear(font->Shear());
+	
+	bool antialias=true;
+	
+	if(font->Size()<18 && (font->Flags()& B_DISABLE_ANTIALIASING==1))
+		antialias=false;
+
+	// Originally, I thought to do this shear checking here, but it really should be
+	// done in BFont::SetShear()
+	float shearangle=shear.Value();
+	if(shearangle>135)
+		shearangle=135;
+	if(shearangle<45)
+		shearangle=45;
+
+	if(shearangle>90)
+		shear=90+((180-shearangle)*2);
+	else
+		shear=90-(90-shearangle)*2;
+	
+	error=FT_New_Face(ftlib, font->GetPath(), 0, &face);
+	if(error)
 	{
-		dataindex=(const LineArrayData*) &linedata[i];
-		drawdata.highcolor = dataindex->color;
-		
-		// Keep track of the invalid region
-		if (dataindex->pt1.x < r.left)
-			r.left = dataindex->pt1.x;
-		if (dataindex->pt1.y < r.top)
-			r.top = dataindex->pt1.y;
-		if (dataindex->pt1.x > r.right)
-			r.right = dataindex->pt1.x;
-		if (dataindex->pt1.y > r.bottom)
-			r.bottom = dataindex->pt1.y;
-		
-		if (dataindex->pt2.x < r.left)
-			r.left = dataindex->pt2.x;
-		if (dataindex->pt2.y < r.top)
-			r.top = dataindex->pt2.y;
-		if (dataindex->pt2.x > r.right)
-			r.right = dataindex->pt2.x;
-		if (dataindex->pt2.y > r.bottom)
-			r.bottom = dataindex->pt2.y;
-		
-		StrokeLine(dataindex->pt1,dataindex->pt2,&drawdata);
+		Unlock();
+		return;
 	}
+
+	slot=face->glyph;
+
+	bool use_kerning=FT_HAS_KERNING(face) && font->Spacing()==B_STRING_SPACING;
 	
-	Invalidate(r);
+	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
+	if(error)
+	{
+		Unlock();
+		return;
+	}
+
+	// if we do any transformation, we do a call to FT_Set_Transform() here
+	
+	// First, rotate
+	rmatrix.xx = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	rmatrix.xy = (FT_Fixed)(-rotation.Sine()*0x10000); 
+	rmatrix.yx = (FT_Fixed)( rotation.Sine()*0x10000); 
+	rmatrix.yy = (FT_Fixed)( rotation.Cosine()*0x10000); 
+	
+	// Next, shear
+	smatrix.xx = (FT_Fixed)(0x10000); 
+	smatrix.xy = (FT_Fixed)(-shear.Cosine()*0x10000); 
+	smatrix.yx = (FT_Fixed)(0); 
+	smatrix.yy = (FT_Fixed)(0x10000); 
+
+	FT_Matrix_Multiply(&rmatrix,&smatrix);
+	
+	// Set up the increment value for escapement padding
+	space.x=int32(d->edelta.space * rotation.Cosine()*64);
+	space.y=int32(d->edelta.space * rotation.Sine()*64);
+	nonspace.x=int32(d->edelta.nonspace * rotation.Cosine()*64);
+	nonspace.y=int32(d->edelta.nonspace * rotation.Sine()*64);
+	
+	// set the pen position in 26.6 cartesian space coordinates
+	pen.x=(int32)point.x * 64;
+	pen.y=(int32)point.y * 64;
+	
+	slot=face->glyph;
+
+	
+	strlength=strlen(string);
+	if(length<strlength)
+		strlength=length;
+
+	for(i=0;i<strlength;i++)
+	{
+		FT_Set_Transform(face,&smatrix,&pen);
+
+		// Handle escapement padding option
+		if((uint8)string[i]<=0x20)
+		{
+			pen.x+=space.x;
+			pen.y+=space.y;
+		}
+		else
+		{
+			pen.x+=nonspace.x;
+			pen.y+=nonspace.y;
+		}
+
+	
+		// get kerning and move pen
+		if(use_kerning && previous && glyph_index)
+		{
+			FT_Get_Kerning(face, previous, glyph_index,ft_kerning_default, &delta);
+			pen.x+=delta.x;
+			pen.y+=delta.y;
+		}
+
+		error=FT_Load_Char(face,string[i],
+			((antialias)?FT_LOAD_RENDER:FT_LOAD_RENDER | FT_LOAD_MONOCHROME) );
+
+		if(!error)
+		{
+			if(antialias)
+				BlitGray2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
+			else
+				BlitMono2RGB32(&slot->bitmap,
+					BPoint(slot->bitmap_left,point.y-(slot->bitmap_top-point.y)), d);
+		}
+
+		// increment pen position
+		pen.x+=slot->advance.x;
+		pen.y+=slot->advance.y;
+		previous=glyph_index;
+	}
+
+	// TODO: implement calculation of invalid rectangle in DisplayDriver::DrawString properly
+	BRect r;
+	r.left=MIN(point.x,pen.x>>6);
+	r.right=MAX(point.x,pen.x>>6);
+	r.top=point.y-face->height;
+	r.bottom=point.y+face->height;
 	
 	fCursorHandler.DriverShow();
+	Invalidate(r);
 	
+	// Update the caller's pen position
+	d->penlocation.x=pen.x / 64;
+	d->penlocation.y=pen.y / 64;
+	
+	FT_Done_Face(face);
+
 	Unlock();
+
 }
 
-/*
-	\brief Sets the screen mode to specified resolution and color depth.
-	\param mode Data structure as defined in Screen.h
-	
-	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
-	to update the state variables kept internally by the DisplayDriver class.
-*/
-void DisplayDriver::SetMode(const display_mode &mode)
-{
-}
 
-/*!
-	\brief Sets the attributes in mode to reflect the current display mode
-	\param mode Structure to receive the current display mode's status
-*/
-void DisplayDriver::GetMode(display_mode *mode)
-{
-	if(!mode)
-		return;
-	
-	Lock();
-	*mode=fDisplayMode;
-	Unlock();
-}
-
-/*!
-	\brief Dumps the contents of the frame buffer to a file.
-	\param path Path and leaf of the file to be created without an extension
-	\return False if unimplemented or unsuccessful. True if otherwise.
-	
-	Subclasses should add an extension based on what kind of file is saved
-*/
-bool DisplayDriver::DumpToFile(const char *path)
-{
-	return false;
-}
-
-/*!
-	\brief Returns a new ServerBitmap containing the contents of the frame buffer
-	\return A new ServerBitmap containing the contents of the frame buffer or NULL if unsuccessful
-*/
-ServerBitmap *DisplayDriver::DumpToBitmap(void)
-{
-	return NULL;
-}
 
 /*!
 	\brief Gets the width of a string in pixels
@@ -3938,6 +3520,106 @@ void DisplayDriver::GetTruncatedStrings(const char **instrings,const int32 &stri
 }
 
 /*!
+	\brief Hides the cursor.
+	
+	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
+	call _SetCursorHidden(true) somewhere within this function to ensure that data is
+	maintained accurately. Subclasses must include a call to DisplayDriver::HideCursor
+	for proper state tracking.
+*/
+void DisplayDriver::HideCursor(void)
+{
+	Lock();
+	fCursorHandler.Hide();	
+	Unlock();
+}
+
+/*!
+	\brief Returns whether the cursor is visible or not.
+	\return true if hidden or obscured, false if not.
+
+*/
+bool DisplayDriver::IsCursorHidden(void)
+{
+	Lock();
+	bool value=fCursorHandler.IsHidden();
+	Unlock();
+
+	return value;
+}
+
+/*!
+	\brief Moves the cursor to the given point.
+
+	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
+	range, but the cursor data itself will need to be clipped. A check to see if the 
+	cursor is obscured should be made and if so, a call to _SetCursorObscured(false) 
+	should be made the cursor in addition to displaying at the passed coordinates.
+*/
+void DisplayDriver::MoveCursorTo(const float &x, const float &y)
+{
+	Lock();
+	fCursorHandler.MoveTo(BPoint(x,y));
+	Unlock();
+}
+
+/*!
+	\brief Shows the cursor.
+	
+	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
+	call _SetCursorHidden(false) somewhere within this function to ensure that data is
+	maintained accurately. Subclasses must call DisplayDriver::ShowCursor at some point
+	to ensure proper state tracking.
+*/
+void DisplayDriver::ShowCursor(void)
+{
+	Lock();
+	fCursorHandler.Show();
+	Unlock();
+}
+
+/*!
+	\brief Obscures the cursor.
+	
+	Obscure calls are not nestable. Subclasses should call DisplayDriver::ObscureCursor
+	somewhere within this function to ensure that data is maintained accurately. A check
+	will be made by the system before the next MoveCursorTo call to show the cursor if
+	it is obscured.
+*/
+void DisplayDriver::ObscureCursor(void)
+{
+	Lock();
+	fCursorHandler.Obscure();	
+	Unlock();
+
+}
+
+/*!
+	\brief Changes the cursor.
+	\param cursor The new cursor. Guaranteed to be non-NULL.
+	
+	The driver does not take ownership of the given cursor. Subclasses should make
+	a copy of the cursor passed to it. The default version of this function hides the
+	cursory, replaces it, and shows the cursor if previously visible.
+*/
+void DisplayDriver::SetCursor(ServerCursor *cursor)
+{
+	Lock();
+	fCursorHandler.SetCursor(cursor);
+	Unlock();
+}
+
+//! Returns the cursor's current position
+BPoint DisplayDriver::GetCursorPosition(void)
+{
+	Lock();
+	BPoint value=fCursorHandler.GetPosition();
+	Unlock();
+	
+	return value;
+}
+
+/*!
 	\brief Returns whether or not the cursor is currently obscured
 	\return True if obscured, false if not.
 */
@@ -3976,6 +3658,110 @@ void DisplayDriver::Unlock(void)
 {
 	_locker->Unlock();
 }
+
+/*
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode Data structure as defined in Screen.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
+void DisplayDriver::SetMode(const display_mode &mode)
+{
+}
+
+/*!
+	\brief Sets the attributes in mode to reflect the current display mode
+	\param mode Structure to receive the current display mode's status
+*/
+void DisplayDriver::GetMode(display_mode *mode)
+{
+	if(!mode)
+		return;
+	
+	Lock();
+	*mode=fDisplayMode;
+	Unlock();
+}
+
+/*!
+	\brief Dumps the contents of the frame buffer to a file.
+	\param path Path and leaf of the file to be created without an extension
+	\return False if unimplemented or unsuccessful. True if otherwise.
+	
+	Subclasses should add an extension based on what kind of file is saved
+*/
+bool DisplayDriver::DumpToFile(const char *path)
+{
+	return false;
+}
+
+/*!
+	\brief Returns a new ServerBitmap containing the contents of the frame buffer
+	\return A new ServerBitmap containing the contents of the frame buffer or NULL if unsuccessful
+*/
+ServerBitmap *DisplayDriver::DumpToBitmap(void)
+{
+	return NULL;
+}
+
+/*!
+	\brief Draws a series of lines - optimized for speed
+	\param numlines Number of lines to be drawn
+	\param linedata Array of LineArrayData objects
+	\param d current DrawData settings
+*/
+void DisplayDriver::StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d)
+{
+	if(!d || !linedata)
+		return;
+	
+	const LineArrayData *dataindex=linedata;
+	BRect r(0,0,0,0);
+	DrawData drawdata;
+
+	Lock();
+	
+	fCursorHandler.DriverHide();
+	
+	drawdata = *d;
+	
+	r.Set(linedata->pt1.x,linedata->pt1.y,linedata->pt1.x,linedata->pt1.y);
+	
+	for (int32 i=0; i<numlines; i++)
+	{
+		dataindex=(const LineArrayData*) &linedata[i];
+		drawdata.highcolor = dataindex->color;
+		
+		// Keep track of the invalid region
+		if (dataindex->pt1.x < r.left)
+			r.left = dataindex->pt1.x;
+		if (dataindex->pt1.y < r.top)
+			r.top = dataindex->pt1.y;
+		if (dataindex->pt1.x > r.right)
+			r.right = dataindex->pt1.x;
+		if (dataindex->pt1.y > r.bottom)
+			r.bottom = dataindex->pt1.y;
+		
+		if (dataindex->pt2.x < r.left)
+			r.left = dataindex->pt2.x;
+		if (dataindex->pt2.y < r.top)
+			r.top = dataindex->pt2.y;
+		if (dataindex->pt2.x > r.right)
+			r.right = dataindex->pt2.x;
+		if (dataindex->pt2.y > r.bottom)
+			r.bottom = dataindex->pt2.y;
+		
+		StrokeLine(dataindex->pt1,dataindex->pt2,&drawdata);
+	}
+	
+	Invalidate(r);
+	
+	fCursorHandler.DriverShow();
+	
+	Unlock();
+}
+
 
 /*!
 	\brief Sets the driver's Display Power Management System state
@@ -4135,18 +3921,13 @@ ServerCursor *DisplayDriver::_GetCursor(void)
 	return c;
 }
 
-/*!
-	\brief Draws a pixel in the specified color
-	\param x The x coordinate (guaranteed to be in bounds)
-	\param y The y coordinate (guaranteed to be in bounds)
-	\param col The color to draw
-	Must be implemented in subclasses
-*/
-/*
-void DisplayDriver::SetPixel(int x, int y, RGBColor col)
+void DisplayDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 {
 }
-*/
+
+void DisplayDriver::VLinePatternThick(int32 x1, int32 x2, int32 y)
+{
+}
 
 /*!
 	\brief Draws a point of a specified thickness
@@ -4173,44 +3954,233 @@ void DisplayDriver::SetThickPatternPixel(int x, int y)
 	\param pat The PatternHandler which detemines pixel colors
 	Must be implemented in subclasses
 */
-/*
-void DisplayDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
-{
-}
-*/
 
-/*!
-	\brief Draws a horizontal line
-	\param x1 The first x coordinate (not guaranteed to be in bounds)
-	\param x2 The second x coordinate (not guaranteed to be in bounds)
-	\param y The y coordinate (not guaranteed to be in bounds)
-	\param thick The thickness of the line
-	\param pat The PatternHandler which detemines pixel colors
-	Must be implemented in subclasses
-*/
-/*
-void DisplayDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
+void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
 {
-}
-*/
+	rgb_color color=d->highcolor.GetColor32();
+	
+	// pointers to the top left corner of the area to be copied in each bitmap
+	uint8 *srcbuffer, *destbuffer;
+	FBBitmap framebuffer;
+	
+	if(!AcquireBuffer(&framebuffer))
+	{
+		printf("ERROR: Couldn't acquire framebuffer in BlitMono2RGB32\n");
+		return;
+	}
+	
+	// index pointers which are incremented during the course of the blit
+	uint8 *srcindex, *destindex, *rowptr, value;
+	
+	// increment values for the index pointers
+	int32 srcinc=src->pitch, destinc=framebuffer.BytesPerRow();
+	
+	int16 i,j,k, srcwidth=src->pitch, srcheight=src->rows;
+	int32 x=(int32)pt.x,y=(int32)pt.y;
+	
+	// starting point in source bitmap
+	srcbuffer=(uint8*)src->buffer;
 
-void DisplayDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
+	if(y<0)
+	{
+		if(y<pt.y)
+			y++;
+		srcbuffer+=srcinc * (0-y);
+		srcheight-=srcinc;
+		destbuffer+=destinc * (0-y);
+	}
+
+	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
+	{
+		if(y>pt.y)
+			y--;
+		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
+	}
+
+	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
+	{
+		if(x>pt.x)
+			x--;
+		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
+	}
+	
+	if(x<0)
+	{
+		if(x<pt.x)
+			x++;
+		srcbuffer+=(0-x)>>3;
+		srcwidth-=0-x;
+		destbuffer+=(0-x)*4;
+	}
+	
+	// starting point in destination bitmap
+	destbuffer=(uint8*)framebuffer.Bits()+int32( (pt.y*framebuffer.BytesPerRow())+(pt.x*4) );
+
+	srcindex=srcbuffer;
+	destindex=destbuffer;
+
+	for(i=0; i<srcheight; i++)
+	{
+		rowptr=destindex;		
+
+		for(j=0;j<srcwidth;j++)
+		{
+			for(k=0; k<8; k++)
+			{
+				value=*(srcindex+j) & (1 << (7-k));
+				if(value)
+				{
+					rowptr[0]=color.blue;
+					rowptr[1]=color.green;
+					rowptr[2]=color.red;
+					rowptr[3]=color.alpha;
+				}
+
+				rowptr+=4;
+			}
+
+		}
+		
+		srcindex+=srcinc;
+		destindex+=destinc;
+	}
+	ReleaseBuffer();
+}
+
+void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d)
+{
+	// pointers to the top left corner of the area to be copied in each bitmap
+	uint8 *srcbuffer=NULL, *destbuffer=NULL;
+	FBBitmap framebuffer;
+	
+	if(!AcquireBuffer(&framebuffer))
+	{
+		printf("Couldn't acquire framebuffer in DisplayDriver::BlitGray2RGB32\n");
+		return;
+	}
+	
+	// index pointers which are incremented during the course of the blit
+	uint8 *srcindex=NULL, *destindex=NULL, *rowptr=NULL;
+	
+	rgb_color highcolor=d->highcolor.GetColor32(), lowcolor=d->lowcolor.GetColor32();	float rstep,gstep,bstep,astep;
+
+	rstep=float(highcolor.red-lowcolor.red)/255.0;
+	gstep=float(highcolor.green-lowcolor.green)/255.0;
+	bstep=float(highcolor.blue-lowcolor.blue)/255.0;
+	astep=float(highcolor.alpha-lowcolor.alpha)/255.0;
+	
+	// increment values for the index pointers
+	int32 x=(int32)pt.x,
+		y=(int32)pt.y,
+		srcinc=src->pitch,
+//		destinc=dest->BytesPerRow(),
+		destinc=framebuffer.BytesPerRow(),
+		srcwidth=src->width,
+		srcheight=src->rows,
+		incval=0;
+	
+	int16 i,j;
+	
+	// starting point in source bitmap
+	srcbuffer=(uint8*)src->buffer;
+
+	// starting point in destination bitmap
+	destbuffer=(uint8*)framebuffer.Bits()+(y*framebuffer.BytesPerRow()+(x*4));
+
+
+	if(y<0)
+	{
+		if(y<pt.y)
+			y++;
+		
+		incval=0-y;
+		
+		srcbuffer+=incval * srcinc;
+		srcheight-=incval;
+		destbuffer+=incval * destinc;
+	}
+
+	if(y+srcheight>framebuffer.Bounds().IntegerHeight())
+	{
+		if(y>pt.y)
+			y--;
+		srcheight-=(y+srcheight-1)-framebuffer.Bounds().IntegerHeight();
+	}
+
+	if(x+srcwidth>framebuffer.Bounds().IntegerWidth())
+	{
+		if(x>pt.x)
+			x--;
+		srcwidth-=(x+srcwidth-1)-framebuffer.Bounds().IntegerWidth();
+	}
+	
+	if(x<0)
+	{
+		if(x<pt.x)
+			x++;
+		incval=0-x;
+		srcbuffer+=incval;
+		srcwidth-=incval;
+		destbuffer+=incval*4;
+	}
+
+	int32 value;
+
+	srcindex=srcbuffer;
+	destindex=destbuffer;
+
+	for(i=0; i<srcheight; i++)
+	{
+		rowptr=destindex;		
+
+		for(j=0;j<srcwidth;j++)
+		{
+			value=*(srcindex+j) ^ 255;
+
+			if(value!=255)
+			{
+				if(d->draw_mode==B_OP_COPY)
+				{
+					rowptr[0]=uint8(highcolor.blue-(value*bstep));
+					rowptr[1]=uint8(highcolor.green-(value*gstep));
+					rowptr[2]=uint8(highcolor.red-(value*rstep));
+					rowptr[3]=255;
+				}
+				else
+					if(d->draw_mode==B_OP_OVER)
+					{
+						if(highcolor.alpha>127)
+						{
+							rowptr[0]=uint8(highcolor.blue-(value*(float(highcolor.blue-rowptr[0])/255.0)));
+							rowptr[1]=uint8(highcolor.green-(value*(float(highcolor.green-rowptr[1])/255.0)));
+							rowptr[2]=uint8(highcolor.red-(value*(float(highcolor.red-rowptr[2])/255.0)));
+							rowptr[3]=255;
+						}
+					}
+			}
+			rowptr+=4;
+
+		}
+		
+		srcindex+=srcinc;
+		destindex+=destinc;
+	}
+	ReleaseBuffer();
+}
+
+bool DisplayDriver::AcquireBuffer(FBBitmap *bmp)
+{
+	return false;
+}
+
+void DisplayDriver::ReleaseBuffer(void)
 {
 }
 
-void DisplayDriver::VLinePatternThick(int32 x1, int32 x2, int32 y)
+void DisplayDriver::Invalidate(const BRect &r)
 {
 }
 
-/*
-void DisplayDriver::FillSolidRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-}
-
-void DisplayDriver::FillPatternRect(int32 left, int32 top, int32 right, int32 bottom)
-{
-}
-*/
 void DisplayDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 {
 }

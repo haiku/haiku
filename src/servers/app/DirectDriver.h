@@ -123,7 +123,7 @@ public:
 	virtual	bool Initialize(void);
 	virtual	void Shutdown(void);
 	
-	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
+//	void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, const DrawData *d);
 
 	virtual	void InvertRect(const BRect &r);
 
