@@ -1412,10 +1412,44 @@ ShowImageView::PageCount()
 }
 
 void
+ShowImageView::AddWhiteRect(BRect &rect)
+{
+	// Paint white rectangle, using rect, into the background image
+	BView view(fBitmap->Bounds(), NULL, B_FOLLOW_NONE, B_WILL_DRAW);
+	BBitmap *bitmap = new BBitmap(fBitmap->Bounds(), fBitmap->ColorSpace(), true);
+	if (bitmap == NULL)
+		return;
+
+	if (bitmap->Lock()) {
+		bitmap->AddChild(&view);
+		view.DrawBitmap(fBitmap, fBitmap->Bounds());
+		
+		view.FillRect(rect, B_SOLID_LOW);
+			// draw white rect
+		
+		view.Sync();
+		bitmap->RemoveChild(&view);
+		bitmap->Unlock();
+		
+		DeleteBitmap();
+		fBitmap = bitmap;
+	} else
+		delete bitmap;
+}
+
+void
 ShowImageView::Cut()
 {
+	BRect rect = fSelectionRect;
+	bool bCutBackground = (fSelBitmap) ? false : true;
+	
 	CopySelectionToClipboard();
 	ClearSelection();
+	
+	if (bCutBackground)
+		// If the user hasn't dragged the selection,
+		// paint a white rectangle where the selection was
+		AddWhiteRect(rect);
 }
 
 void

@@ -129,6 +129,7 @@ private:
 	void AnimateSelection(bool a);
 	void Notify(const char* status);
 	void AddToRecentDocuments();
+	void AddWhiteRect(BRect &rect);
 	void GetSelMergeRects(BRect &srcBits, BRect &destRect);
 	void MergeSelection();
 	void DeleteScaler();
