@@ -1449,6 +1449,7 @@ translate_from_bmpnpal_to_bits(BPositionIO *inSource,
 	}
 
 	// perform the actual translation
+	memset(bitsRowData, 0xff, bitsRowBytes);
 	ssize_t rd = inSource->Read(bmpRowData, bmpRowBytes);
 	while (rd == bmpRowBytes) {
 		uint8 *pBitsPixel = bitsRowData;
@@ -1553,8 +1554,7 @@ translate_from_bmppal_to_bits(BPositionIO *inSource,
 		delete[] bmpRowData;
 		return B_ERROR;
 	}
-	for (int32 i = 3; i < bitsRowBytes; i += 4)
-		bitsRowData[i] = 0xff;
+	memset(bitsRowData, 0xff, bitsRowBytes);
 	ssize_t rd = inSource->Read(bmpRowData, bmpRowBytes);
 	while (rd == bmpRowBytes) {
 		for (uint32 i = 0; i < msheader.width; i++) {
@@ -1609,7 +1609,7 @@ void
 pixelcpy(uint8 *dest, uint32 pixel, uint32 count)
 {
 	for (uint32 i = 0; i < count; i++) {
-		memcpy(dest, &pixel, 4);
+		memcpy(dest, &pixel, 3);
 		dest += 4;
 	}
 }
@@ -1663,6 +1663,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 	uint8 *bitsRowData = new uint8[bitsRowBytes];
 	if (!bitsRowData)
 		return B_ERROR;
+	memset(bitsRowData, 0xff, bitsRowBytes);
 	uint32 bmppixcol = 0, bmppixrow = 0;
 	uint32 defaultcolor = 0;
 	memcpy(&defaultcolor, palette, 4);
@@ -1695,7 +1696,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 			for (uint8 i = 0; i < count; i++) {
 				index = (indices >> (bitsPerPixel * ((pixelsPerByte - 1) - 
 					(i % pixelsPerByte)))) & mask;
-				memcpy(bitsRowData + (bmppixcol*4), palette + (index*4), 4);
+				memcpy(bitsRowData + (bmppixcol*4), palette + (index*4), 3);
 				bmppixcol++;
 			}
 		// special code
@@ -1826,7 +1827,7 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 							(bitsPerPixel * ((pixelsPerByte - 1) - 
 								(i % pixelsPerByte)))) & mask;
 						memcpy(bitsRowData + (bmppixcol * 4),
-							palette + (index * 4), 4);
+							palette + (index * 4), 3);
 						bmppixcol++;
 					}
 
