@@ -12,7 +12,7 @@
 #include <smp.h>
 #include <signal.h>
 #include <timer.h>
-#include <list.h>
+#include <util/list.h>
 #include <arch/thread_struct.h>
 
 

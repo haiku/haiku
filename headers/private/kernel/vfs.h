@@ -13,7 +13,7 @@
 #include <dirent.h>
 #include <fs_interface.h>
 #include <lock.h>
-#include <list.h>
+#include <util/list.h>
 
 #define DEFAULT_FD_TABLE_SIZE	128
 #define MAX_FD_TABLE_SIZE		2048
