@@ -37,15 +37,23 @@ typedef status_t (*disk_scanner_get_nth_partition_info_hook)(int deviceFD,
 	struct partition_module_info **partitionModule);
 typedef status_t (*disk_scanner_get_partition_fs_info_hook)(int deviceFD,
 	struct extended_partition_info *partitionInfo);
+typedef status_t (*disk_scanner_get_partitioning_params_hook)(int deviceFD,
+	const struct session_info *sessionInfo, const char *identifier,
+	char *buffer, size_t bufferSize, size_t *actualSize);
+typedef status_t (*disk_scanner_partition_hook)(int deviceFD,
+	const struct session_info *sessionInfo, const char *identifier,
+	const char *parameters);
 
 typedef struct disk_scanner_module_info {
-	module_info								module;
+	module_info									module;
 
 	disk_scanner_get_session_module_hook		get_session_module;
 	disk_scanner_get_partition_module_hook		get_partition_module;
 	disk_scanner_get_nth_session_info_hook		get_nth_session_info;
 	disk_scanner_get_nth_partition_info_hook	get_nth_partition_info;
 	disk_scanner_get_partition_fs_info_hook		get_partition_fs_info;
+	disk_scanner_get_partitioning_params_hook	get_partitioning_params;
+	disk_scanner_partition_hook					partition;
 } disk_scanner_module_info;
 
 /*
@@ -94,12 +102,25 @@ typedef struct disk_scanner_module_info {
 	deviceFD: a device FD
 	index: the session index
 	sessionInfo: the session info
+	sessionModule: pointer to session_module_info*
 
 	The function first checks, whether the device is one that usually has
 	sessions (a CD). If so, it tries to find a suitable module and delegates
 	the work to that module. Otherwise, it is assumed, that the device does
 	not have sessions and for index == 0 the info is filled out with data
 	for a "virtual" session, i.e. one that spans the whole device.
+
+	If sessionModule is NULL, it is ignored. Otherwise, if it points to a
+	NULL pointer, then a pointer to the module that has been recognized to
+	handle the session layout is returned therein (NULL in case of a
+	a device other than a CD). If it points to a non-NULL pointer, the
+	referred to session module is used get the session info. The caller is
+	responsible to put_module() the module returned in sessionModule.
+	To sum it up, the feature can be used to avoid recognizing and
+	re- and unloading the respective module when iterating through the
+	sessions of a device -- before the first call *sessionModule is to be
+	initialized to NULL, after the last call, put_module() has to be invoked,
+	if *sessionModule is not NULL.
 
 	Returns B_OK, if successful, B_ENTRY_NOT_FOUND, if no suitable session
 	module could be found or if the session index is out of range.
@@ -125,11 +146,24 @@ typedef struct disk_scanner_module_info {
 	sessionInfo: a complete info about the session the partition resides on
 	partitionIndex: partition index
 	partitionInfo: the partition info to be filled in
+	partitionModule: pointer to partition_module_info*
 
 	The function first tries to find a suitable partition module and to
 	delagate the work to that module. If no module could be found, for
 	partition index == 0 the info is filled out with data for a "virtual"
 	partition, i.e. one that spans the whole session.
+
+	If partitionModule is NULL, it is ignored. Otherwise, if it points to a
+	NULL pointer, then a pointer to the module that has been recognized to
+	handle the partition layout is returned therein (NULL in case none
+	could be found). If it points to a non-NULL pointer, the referred to
+	partition module is used get the partition info. The caller is
+	responsible to put_module() the module returned in partitionModule.
+	To sum it up, the feature can be used to avoid recognizing and
+	re- and unloading the respective module when iterating through the
+	partitions of a session -- before the first call *partitionModule is to
+	be initialized to NULL, after the last call, put_module() has to be
+	invoked, if *partitionModule is not NULL.
 
 	Returns B_OK, if successful, B_ENTRY_NOT_FOUND, if the index is out of
 	range.
@@ -156,6 +190,47 @@ typedef struct disk_scanner_module_info {
 
 	Returns B_OK, if successful (i.e. the FS was recognized),
 	B_ENTRY_NOT_FOUND, if no suitable module could be found.
+
+
+	get_partitioning_params():
+	-------------------------
+
+	Returns parameters for partitioning the supplied session.
+	If the session is already partitioned using the specified module, then
+	the parameters describing the current layout will be returned, otherwise
+	default values.
+
+	If the supplied buffer is too small for the parameters, the function
+	returns B_OK, but doesn't fill in the buffer; the required buffer
+	size is returned in actualSize. If the buffer is large enough,
+	actualSize is set to the actually used size. The size includes the
+	terminating null.
+
+	params:
+	deviceFD: a device FD
+	sessionInfo: a complete info about the session to be partitioned
+	identifier: identifies the partition module to be used
+	buffer: pointer to a pre-allocated buffer of size bufferSize
+	bufferSize: the size of buffer
+	actualSize: pointer to a pre-allocated size_t to be set to the
+				actually needed buffer size
+
+	Returns B_OK, if the parameters could be returned successfully or the
+	buffer is too small, an error code otherwise.
+
+
+	partition():
+	-----------
+
+	Partitions the specified session of the device using the partition module
+	identified by an identifier and according to the supplied parameters.
+
+	deviceFD: a device FD
+	sessionInfo: a complete info about the session the partitions reside on
+	identifier: identifies the partition module to be used
+	parameters: the parameters for partitioning
+
+	Returns B_OK, if everything went fine, an error code otherwise.
 */
 
 #endif	// _DISKSCANNER_H
