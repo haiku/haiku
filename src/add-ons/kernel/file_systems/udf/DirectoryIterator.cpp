@@ -29,6 +29,10 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
+	PRINT(("fPosition:          %Ld\n", fPosition));
+	PRINT(("Parent()->Length(): %Ld\n", Parent()->Length()));
+
+
 	status_t error = B_OK;
 	if (fAtBeginning) {
 		sprintf(name, ".");
@@ -37,8 +41,8 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 		fAtBeginning = false;
 	} else {
 
-	if (uint64(fPosition) >= Parent()->Length())
-		return B_ENTRY_NOT_FOUND;
+	if (uint64(fPosition) >= Parent()->Length()) 
+		RETURN(B_ENTRY_NOT_FOUND);
 
 	uint8 data[kMaxFileIdSize];
 	file_id_descriptor *entry = reinterpret_cast<file_id_descriptor*>(data);
