@@ -36,9 +36,10 @@
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 
+#include <ClipboardPrivate.h>
+
 // Globals ---------------------------------------------------------------------
-BClipboard *be_clipboard;
-	// ToDo: this has to be initialized!
+BClipboard *be_clipboard = NULL;
 
 
 BClipboard::BClipboard(const char *name, bool transient)
@@ -50,7 +51,6 @@ BClipboard::BClipboard(const char *name, bool transient)
 
 	fData = new BMessage();
 	fCount = 0;
-	fSystemCount = 0;
 
 	BMessage message(B_REG_GET_CLIPBOARD_MESSENGER), reply;
 	if (BRoster::Private().SendTo(&message, &reply, false) == B_OK
@@ -78,18 +78,33 @@ BClipboard::Name() const
 	return (const char *)fName;
 }
 
+/*!	\brief Returns the (locally cached) number of commits to the clipboard.
 
+	The returned value is the number of successful Commit() invocations for
+	the clipboard represented by this object, either invoked on this object
+	or another (even from another application). This method returns a locally
+	cached value, which might already be obsolete. For an up-to-date value
+	SystemCount() can be invoked.
+
+	\return The number of commits to the clipboard.
+*/
 uint32
 BClipboard::LocalCount() const
 {
-	/* fSystemCount contains the total number of writes to the clipboard.
-	 * fCount contains the number of writes to the clipboard done by this
-	 * BClipboard.
-	 */
-	return fSystemCount;
+	return fCount;
 }
 
+/*!	\brief Returns the number of commits to the clipboard.
 
+	The returned value is the number of successful Commit() invocations for
+	the clipboard represented by this object, either invoked on this object
+	or another (even from another application). This method retrieves the
+	value directly from the system service managing the clipboards, so it is
+	more expensive, but more up-to-date than LocalCount(), which returns a
+	locally cached value.
+	
+	\return The number of commits to the clipboard.
+*/
 uint32
 BClipboard::SystemCount() const
 {
@@ -258,7 +273,7 @@ BClipboard::DownloadFromSystem(bool force)
 		&& fClipHandler.SendMessage(&message, &reply) == B_OK
 		&& reply.FindMessage("data", fData) == B_OK
 		&& reply.FindMessenger("data source", &fDataSource) == B_OK
-		&& reply.FindInt32("count", (int32 *)&fSystemCount) == B_OK)
+		&& reply.FindInt32("count", (int32 *)&fCount) == B_OK)
 		return B_OK;
 
 	return B_ERROR;
@@ -273,10 +288,19 @@ BClipboard::UploadToSystem()
 		&& message.AddMessage("data", fData) == B_OK
 		&& message.AddMessenger("data source", be_app_messenger) == B_OK
 		&& fClipHandler.SendMessage(&message, &reply) == B_OK
-		&& reply.FindInt32("count", (int32 *)&fSystemCount) == B_OK) {
-		fCount++;
+		&& reply.FindInt32("count", (int32 *)&fCount) == B_OK) {
 		return B_OK;
 	}
 	return B_ERROR;
 }
 
+// init_clipboard
+/*!	\brief Initializes the global \c be_clipboard.
+
+	Invoked at libbe initialization time.
+*/
+void
+BPrivate::init_clipboard()
+{
+	be_clipboard = new BClipboard(NULL);
+}

@@ -85,12 +85,12 @@ private:
 		status_t	DownloadFromSystem(bool force = false);
 		status_t	UploadToSystem();
 
-		uint32		fCount;
+		uint32		_reserved0;
 		BMessage	*fData;
 		BLocker		fLock;
 		BMessenger	fClipHandler;
 		BMessenger	fDataSource;
-		uint32		fSystemCount;
+		uint32		fCount;
 		char		*fName;
 		uint32		_reserved[4];
 };
