@@ -108,6 +108,7 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	LoadSettings();
 
 	BString path(ConvertIndexToPath(0L));
+	
 	if(LoadDecorator(path.String()))
 	{
 		driver->FillRect(preview_bounds,&ldata);
@@ -150,7 +151,7 @@ void DecView::MessageReceived(BMessage *msg)
 		}
 		case DECORATOR_CHOSEN:
 		{
-
+			
 			STRACE(("MSG: Decorator Chosen - #%ld\n",declist->CurrentSelection()));
 			bool success=false;
 

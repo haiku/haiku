@@ -75,12 +75,18 @@ public:
 	void SetMode(const display_mode &mode);
 	
 	BView *View(void) { return (BView*)view; };
+	virtual bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
+	virtual void Unlock(void);
+
 protected:
 	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
 	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
 	virtual void StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d);
 	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
+
+	virtual bool AcquireBuffer(FBBitmap *bmp);
+	virtual void ReleaseBuffer(void);
 
 	BBitmap *framebuffer;
 	BView *drawview;

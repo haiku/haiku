@@ -58,6 +58,8 @@
 #include "PreviewDriver.h"
 #include "LayerData.h"
 #include "ColorSet.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 BRect preview_bounds(0,0,150,150);;
 
@@ -212,3 +214,32 @@ void PreviewDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
 	view->viewbmp->Unlock();
 }
 
+bool PreviewDriver::AcquireBuffer(FBBitmap *bmp)
+{
+	if(!bmp)
+		return false;
+
+	view->viewbmp->Lock();
+	bmp->SetBuffer(view->viewbmp->Bits());
+	bmp->SetSpace(view->viewbmp->ColorSpace());
+	bmp->SetBytesPerRow(view->viewbmp->BytesPerRow());
+	bmp->SetSize(view->viewbmp->Bounds().IntegerWidth(),
+			view->viewbmp->Bounds().IntegerHeight());
+	bmp->SetBitsPerPixel(view->viewbmp->ColorSpace(),view->viewbmp->BytesPerRow());
+	
+	return true;
+}
+
+void PreviewDriver::ReleaseBuffer(void)
+{
+	view->viewbmp->Unlock();
+}
+bool PreviewDriver::Lock(bigtime_t timeout=B_INFINITE_TIMEOUT)
+{
+	return view->viewbmp->Lock();
+}
+
+void PreviewDriver::Unlock(void)
+{
+	view->viewbmp->Unlock();
+}
