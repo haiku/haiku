@@ -335,6 +335,9 @@ cbuf_memcpy_to_chain(cbuf *chain, size_t offset, const void *_source, size_t len
 	char *source = (char *)_source;
 	int bufferOffset;
 
+	if (chain == NULL)
+		return B_BAD_VALUE;
+
 	if ((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_to_chain: chain at %p not head\n", chain);
 		return B_BAD_VALUE;
@@ -393,6 +396,9 @@ cbuf_user_memcpy_to_chain(cbuf *chain, size_t offset, const void *_source, size_
 	char *source = (char *)_source;
 	int bufferOffset;
 	int err;
+
+	if (chain == NULL)
+		return B_BAD_VALUE;
 
 	if ((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_to_chain: chain at %p not head\n", chain);
@@ -454,6 +460,9 @@ cbuf_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t length)
 	char *dest = (char *)_dest;
 	int bufferOffset;
 
+	if (chain == NULL)
+		return B_BAD_VALUE;
+
 	if ((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_from_chain: chain at %p not head\n", chain);
 		return B_BAD_VALUE;
@@ -511,6 +520,9 @@ cbuf_user_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t leng
 	char *dest = (char *)_dest;
 	int bufferOffset;
 	int err;
+
+	if (chain == NULL)
+		return B_BAD_VALUE;
 
 	if ((chain->flags & CBUF_FLAG_CHAIN_HEAD) == 0) {
 		dprintf("cbuf_memcpy_from_chain: chain at %p not head\n", chain);
