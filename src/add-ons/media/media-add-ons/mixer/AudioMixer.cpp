@@ -196,7 +196,12 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 		return;
 	}
 
-//	printf("buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
+	//printf("buffer received at %12Ld, should arrive at %12Ld, delta %12Ld\n", TimeSource()->Now(), buffer->Header()->start_time, TimeSource()->Now() - buffer->Header()->start_time);
+
+//	HandleInputBuffer(buffer, 0);
+//	buffer->Recycle();
+//	return;
+
 
 	// to receive the buffer at the right time,
 	// push it through the event looper
@@ -223,6 +228,8 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 		}
 	}
 */
+
+//	printf("Received buffer with lateness %Ld\n", lateness);
 	
 	fCore->Lock();
 	fCore->BufferReceived(buffer, lateness);
@@ -610,6 +617,15 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 {
 	printf("AudioMixer::Connect\n");
 
+	fCore->Lock();
+	// are we still connected?
+	if (fCore->Output() == 0) {
+		fCore->Unlock();
+		ERROR("AudioMixer::Connect: no longer connected\n");
+		return;
+	}
+	fCore->Unlock();
+
 	if (error != B_OK) {
 		// if an error occured, remove output from core
 		printf("AudioMixer::Connect failed with error 0x%08lX, removing connction\n", error);
@@ -618,7 +634,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 		fCore->Unlock();
 		return;
 	}
-	
+
 	// if the connection has no name, we set it now
 	if (strlen(io_name) == 0)
 		strcpy(io_name, "Mixer Output");
