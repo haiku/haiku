@@ -70,7 +70,7 @@ switch $(TARGET_CPU) {
 		} else {
 			OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
 		}
-		DEFINES += D__POWERPC__ ;
+		DEFINES += __POWERPC__ ;
 	}
 	case x86 :
 	{
