@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci ;
 
 UsePrivateHeaders [ FDirName kernel ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;
 
 KernelMergeObject pci_bus_manager.o : 
 	kernel_cpp.cpp
