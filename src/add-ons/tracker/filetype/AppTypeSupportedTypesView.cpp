@@ -1,32 +1,48 @@
 #include <AppTypeSupportedTypesView.h>
+#include <SupportDefs.h>
 
 AppTypeSupportedTypesView::AppTypeSupportedTypesView(BRect viewFrame)
 	: BView(viewFrame, "AppTypeSupportedTypesView", B_FOLLOW_ALL,
 	        B_FRAME_EVENTS|B_WILL_DRAW)
 {
-	float width = 0, height = 0;
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+	float lineHeight = fontHeight.ascent+fontHeight.descent+fontHeight.leading;
 	SetViewColor( ui_color(B_PANEL_BACKGROUND_COLOR) );
 	
-	fSupportedTypesBox = new BBox(Bounds(),"box",
-	                              B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
-	fSupportedTypesBox->SetLabel("Supported Types:");
-	AddChild(fSupportedTypesBox);
+	fBox = new BBox(Bounds(),"box",B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP);
+	fBox->SetLabel("Supported Types:");
+	AddChild(fBox);
 	
 	const char * addButtonLabel = "Add...";
-	float addButtonStringWidth = StringWidth(addButtonLabel);
-	BRect addButtonFrame = fSupportedTypesBox->Bounds();
-	addButtonFrame.top = 10;
-	addButtonFrame.left = 10;
-	addButtonFrame.right -= 10;
-	fSupportedTypesAddButton = new BButton(addButtonFrame,
-	                                       addButtonLabel,
-	                                       addButtonLabel,NULL);
-	fSupportedTypesBox->AddChild(fSupportedTypesAddButton);
-	fSupportedTypesAddButton->GetPreferredSize(&width,&height);
-	fSupportedTypesAddButton->ResizeTo(width,height);
-	float leftWidth = width;
+	fAddButton = new BButton(Bounds(),addButtonLabel,addButtonLabel,NULL);
+	float addButtonWidth = 0, addButtonHeight = 0;
+	fAddButton->GetPreferredSize(&addButtonWidth,&addButtonHeight);
+
+	const char * removeButtonLabel = "Remove";
+	fRemoveButton = new BButton(Bounds(),removeButtonLabel,removeButtonLabel,NULL);
+	float removeButtonWidth = 0, removeButtonHeight = 0;
+	fRemoveButton->GetPreferredSize(&removeButtonWidth,&removeButtonHeight);
 	
+	float buttonWidth = max_c(addButtonWidth,removeButtonWidth);
+	float buttonHeight = max_c(addButtonHeight,removeButtonHeight);
+	fRemoveButton->ResizeTo(buttonWidth,buttonHeight);
+	fAddButton->ResizeTo(buttonWidth,buttonHeight);
 	
+	fBox->AddChild(fAddButton);
+	fAddButton->MoveTo(fBox->Bounds().Width() - 60 - fAddButton->Bounds().Width(),14);
+	fBox->AddChild(fRemoveButton);
+	fRemoveButton->MoveTo(fAddButton->Frame().left,fAddButton->Frame().bottom);
+	
+	fListView = new BListView(Bounds(),"listview");
+	fListView->ResizeTo(fAddButton->Frame().left - 20 - B_V_SCROLL_BAR_WIDTH,
+	                    max_c(1*lineHeight,2*buttonHeight - 2));
+	fListView->MoveTo(12,fAddButton->Frame().top+2);
+	fScrollView = new BScrollView("scrollview",fListView,B_FOLLOW_ALL,
+	                              B_FRAME_EVENTS|B_WILL_DRAW,false,true);
+	fBox->AddChild(fScrollView);
+	fBox->ResizeTo(Bounds().Width(),fScrollView->Frame().bottom+8);
+	ResizeTo(fBox->Bounds().Width(),fBox->Bounds().Height());
 }
 
 AppTypeSupportedTypesView::~AppTypeSupportedTypesView()

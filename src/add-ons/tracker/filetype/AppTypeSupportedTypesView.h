@@ -3,13 +3,8 @@
 
 #include <Box.h>
 #include <Button.h>
-#include <Menu.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <String.h>
-#include <StringView.h>
-#include <TextControl.h>
-#include <TextView.h>
+#include <ListView.h>
+#include <ScrollView.h>
 #include <View.h>
 
 class AppTypeSupportedTypesView : public BView {
@@ -20,11 +15,11 @@ public:
 	bool IsClean() const;
 private:
 	
-	BBox			* fSupportedTypesBox;
-	BListView		* fSupportedTypesListView;
-	BScrollView		* fSupportedTypesScrollView;
-	BButton			* fSupportedTypesAddButton;
-	BButton			* fSupportedTypesRemoveButton;
+	BBox			* fBox;
+	BListView		* fListView;
+	BScrollView		* fScrollView;
+	BButton			* fAddButton;
+	BButton			* fRemoveButton;
 };
 
 #endif // APP_TYPE_SUPPORTED_TYPES_VIEW_H
