@@ -497,10 +497,10 @@
 #define NV16_CRTC2IND		0x006033d4
 #define NV8_CRTC2DAT		0x006033d5
 #define NV8_2INSTAT1		0x006033da//verify!!!
-#define NV32_NV10FB2STADD32	0x00602800//verify!!!
+#define NV32_NV10FB2STADD32	0x00602800
 #define NV32_RASTER2		0x00602808//verify!!!
-#define NV32_NV10CUR2ADD32	0x0060280c//verify!!!
-#define NV32_2CURCONF		0x00602810//verify!!!
+#define NV32_NV10CUR2ADD32	0x0060280c
+#define NV32_2CURCONF		0x00602810
 #define NV32_2FUNCSEL		0x00602860
 
 /* Nvidia DAC direct registers (standard VGA palette RAM registers) */
