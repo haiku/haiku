@@ -1521,7 +1521,7 @@ BMimeType::StopWatching(BMessenger target)
 status_t
 BMimeType::SetType(const char *mimeType)
 {
-	SetTo(mimeType);
+	return SetTo(mimeType);
 }
 
 // DeleteAppHint
