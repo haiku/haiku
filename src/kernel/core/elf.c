@@ -955,13 +955,13 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 						symbolName = SYMNAME(image, symbol);
 
 						if (exactMatch)
-							goto loop_end;
+							goto symbol_found;
 					}
 				}
 			}
-		loop_end:
 		}
 	}
+symbol_found:
 
 	if (symbolFound != NULL) {
 		if (_symbolName)
