@@ -158,7 +158,9 @@ extern int			_kern_open_query(dev_t device, const char *query,
 
 // file descriptor functions
 extern ssize_t		_kern_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+extern ssize_t		_kern_readv(int fd, off_t pos, const iovec *vecs, size_t count);
 extern ssize_t		_kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
+extern ssize_t		_kern_writev(int fd, off_t pos, const iovec *vecs, size_t count);
 extern status_t		_kern_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t		_kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t		_kern_rewind_dir(int fd);

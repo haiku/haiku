@@ -141,7 +141,9 @@ int _user_open_query(dev_t device, const char *query, uint32 flags,
 
 /* fd user prototypes (implementation located in fd.c)  */
 extern ssize_t _user_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+extern ssize_t _user_readv(int fd, off_t pos, const iovec *vecs, size_t count);
 extern ssize_t _user_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
+extern ssize_t _user_writev(int fd, off_t pos, const iovec *vecs, size_t count);
 extern status_t _user_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t _user_rewind_dir(int fd);
