@@ -3935,7 +3935,7 @@ query_open(dev_t device, const char *query, uint32 flags,
 	fs_cookie cookie;
 	status_t status;
 
-	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", mountID, query, kernel));
+	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device, query, kernel));
 
 	mount = get_mount(device);
 	if (mount == NULL)
