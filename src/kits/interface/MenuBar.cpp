@@ -324,37 +324,38 @@ BMenuBar::StartMenuBar(int32 menuIndex, bool sticky, bool showMenu,
 							BRect *specialRect)
 {
 	BWindow *window = Window();
-	if (!window) 
+	if (window == NULL) 
 		debugger("MenuBar must be added to a window before it can be used.");
 	
 	BAutolock lock(window);	
-	if (lock.IsLocked()) {
-		fPrevFocusToken = -1;
-		fTracking = true;
+	if (!lock.IsLocked())
+		return;
 		
-		window->MenusBeginning();
+	fPrevFocusToken = -1;
+	fTracking = true;
 		
-		fMenuSem = create_sem(0, "window close sem");
-		_set_menu_sem_(window, fMenuSem);
-		
-		fTrackingPID = spawn_thread(TrackTask, "menu_tracking", B_NORMAL_PRIORITY, NULL);
-		if (fTrackingPID >= 0) {
-			menubar_data data;	
-			data.menuBar = this;
-			data.menuIndex = menuIndex;
-			data.sticky = sticky;
-			data.showMenu = showMenu;
-			data.useRect = specialRect != NULL;
-			if (data.useRect)
-				data.rect = *specialRect;
-				
-			send_data(fTrackingPID, 0, &data, sizeof(data));
-			resume_thread(fTrackingPID);
-		
-		} else {
-			_set_menu_sem_(window, B_NO_MORE_SEMS);
-			delete_sem(fMenuSem);
-		}
+	window->MenusBeginning();
+	
+	fMenuSem = create_sem(0, "window close sem");
+	_set_menu_sem_(window, fMenuSem);
+	
+	fTrackingPID = spawn_thread(TrackTask, "menu_tracking", B_NORMAL_PRIORITY, NULL);
+	if (fTrackingPID >= 0) {
+		menubar_data data;	
+		data.menuBar = this;
+		data.menuIndex = menuIndex;
+		data.sticky = sticky;
+		data.showMenu = showMenu;
+		data.useRect = specialRect != NULL;
+		if (data.useRect)
+			data.rect = *specialRect;
+			
+		send_data(fTrackingPID, 0, &data, sizeof(data));
+		resume_thread(fTrackingPID);
+	
+	} else {
+		_set_menu_sem_(window, B_NO_MORE_SEMS);
+		delete_sem(fMenuSem);
 	}
 }
 
@@ -397,43 +398,65 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 	// Cleanup
 	BMenuItem *resultItem = NULL;
 	BWindow *window = Window();
-	if (window->LockWithTimeout(200000) == B_OK) {
+	int localAction;
+	bool exitLoop = false;
+	do {
+		if (window->LockLooperWithTimeout(200000) < B_OK)
+			break;
+		
 		BPoint where;
 		ulong buttons;
-		do {
-			snooze(40000);
-			GetMouse(&where, &buttons);
-			BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
-			if (menuItem) {
-				SelectItem(menuItem);
-				BMenu *menu = menuItem->Submenu();
-				// TODO: Actually, this test shouldn't be needed, as
-				// all BMenuBar's BMenuItems are BMenus.
-				if (menu) {
-					if (IsStickyPrefOn())
-						menu->SetStickyMode(true);
-					do {
-						snooze(40000);
-						GetMouse(&where, &buttons);
-						
-						// If we aren't over this BMenu anymore, exit the tracking loop.
-						BMenuItem *testItem = HitTestItems(where, B_ORIGIN);
-						if (testItem != NULL && testItem != menuItem)
-							break;
-					
-						resultItem = menu->_track((int *)action, startIndex);
-						
-						// "action" is "5" when the BMenu is closed.
-					} while (*action != 5);
-				}
-				SelectItem(NULL);
-				Invalidate();	
-			}			
-		} while (buttons != 0);
+		GetMouse(&where, &buttons);
 		
-		window->Unlock();
-	}
+		BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
+		if (menuItem != NULL) {
+			SelectItem(menuItem);
+			BMenu *menu = menuItem->Submenu();
+			// TODO: Actually, this test shouldn't be needed, as
+			// all BMenuBar's BMenuItems are BMenus.
+			if (menu != NULL) {
+				if (IsStickyPrefOn())
+					menu->SetStickyMode(true);
+				do {
+					snooze(40000);
+					GetMouse(&where, &buttons);
+					
+					// If we aren't over this BMenu anymore, exit the tracking loop.
+					BMenuItem *testItem = HitTestItems(where, B_ORIGIN);
+					if (testItem != NULL && testItem != menuItem)
+						break;
+				
+					// No need to keep the window locked for the
+					// whole time, as BMenu::_track() does its own locking.
+					window->Unlock();
+					
+					resultItem = menu->_track(&localAction, startIndex);
+					
+					if (window->LockLooperWithTimeout(200000) < B_OK)
+						break;
+						
+					// the returned action is "5" when the BMenu is closed.
+				} while (localAction != 5);
+			}
+			
+			if (window->IsLocked()) {
+				SelectItem(NULL);
+				Invalidate();
+			}
+		}
+		
+		if (window->IsLocked())
+			window->Unlock();
+			
+		snooze(40000);
+		if (buttons == 0)
+			exitLoop = true;
+				
+	} while (!exitLoop);
 	
+	if (action != NULL)
+		*action = static_cast<int>(localAction);
+		
 	if (resultItem != NULL)
 		resultItem->Invoke();
 	
@@ -445,9 +468,9 @@ void
 BMenuBar::StealFocus()
 {
 	BWindow *window = Window();
-	if (window && window->Lock()) {
+	if (window != NULL && window->Lock()) {
 		BView *focus = window->CurrentFocus();
-		if (focus)
+		if (focus != NULL)
 			fPrevFocusToken = _get_object_token_(focus);
 		MakeFocus();
 		window->Unlock();
@@ -459,7 +482,7 @@ void
 BMenuBar::RestoreFocus()
 {
 	BWindow *window = Window();
-	if (window && window->Lock()) {
+	if (window != NULL && window->Lock()) {
 		BHandler *handler = NULL;
 		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
 				(void **)&handler, NULL) == B_OK) {
