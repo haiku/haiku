@@ -1330,8 +1330,16 @@ int thread_wait_on_thread(thread_id id, int *retcode)
 	rc = acquire_sem(sem);
 
 	/* This thread died the way it should, dont ripple a non-error up */
-	if (rc == B_BAD_SEM_ID)
+	if (rc == B_BAD_SEM_ID) {
 		rc = B_NO_ERROR;
+		
+		if (retcode) {
+			t = thread_get_current_thread();
+			dprintf("thread_wait_on_thread: thread %d got return code 0x%x\n",
+				t->id, t->sem_deleted_retcode);
+			*retcode = t->sem_deleted_retcode;
+		}
+	}
 
 	return rc;
 }
