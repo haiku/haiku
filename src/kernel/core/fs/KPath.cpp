@@ -91,6 +91,7 @@ KPath::SetPath(const char *path)
 			return B_BUFFER_OVERFLOW;
 		memcpy(fBuffer, path, len + 1);
 		fPathLength = len;
+		_ChopTrailingSlashes();
 	} else {
 		fBuffer[0] = '\0';
 		fPathLength = 0;
@@ -144,32 +145,65 @@ KPath::UnlockBuffer()
 		fPathLength--;
 		fBuffer[fPathLength] = '\0';
 	}
+	_ChopTrailingSlashes();
+}
+
+// Leaf
+const char *
+KPath::Leaf() const
+{
+	if (!fBuffer)
+		return NULL;
+	// only "/" has trailing slashes -- then we have to return the complete
+	// buffer, as we have to do in case there are no slashes at all
+	if (fPathLength != 1 || fBuffer[0] != '/') {
+		for (int32 i = fPathLength - 1; i >= 0; i--) {
+			if (fBuffer[i] == '/')
+				return fBuffer + i + 1;
+		}
+	}
+	return fBuffer;
+}
+
+// ReplaceLeaf
+status_t
+KPath::ReplaceLeaf(const char *newLeaf)
+{
+	const char *leaf = Leaf();
+	if (!leaf)
+		return B_NO_INIT;
+	int32 leafIndex = leaf - fBuffer;
+	// chop off the current leaf (don't replace "/", though)
+	if (leafIndex != 0 || fBuffer[leafIndex - 1]) {
+		fBuffer[leafIndex] = '\0';
+		fPathLength = leafIndex;
+		_ChopTrailingSlashes();
+	}
+	// if a leaf was given, append it
+	if (newLeaf)
+		return Append(newLeaf);
+	return B_OK;
 }
 
 // Append
 status_t
-KPath::Append(const char *component)
+KPath::Append(const char *component, bool isComponent)
 {
 	// check initialization and parameter
 	if (!fBuffer)
 		return B_NO_INIT;
 	if (!component)
 		return B_BAD_VALUE;
-	// get componentn length
+	if (fPathLength == 0)
+		return SetPath(component);
+	// get component length
 	int32 componentLen = strlen(component);
 	if (componentLen < 1)
 		return B_OK;
 	// if our current path is empty, we just copy the supplied one
-	if (fPathLength == 0) {
-		if (componentLen >= fBufferSize)
-			return B_BUFFER_OVERFLOW;
-		memcpy(fBuffer, component, componentLen + 1);
-		fPathLength = componentLen;
-		return B_OK;
-	}
 	// compute the result path len
-	bool insertSlash = (fBuffer[fPathLength - 1] != '/'
-		&& component[0] != '/');
+	bool insertSlash = isComponent && fBuffer[fPathLength - 1] != '/'
+		&& component[0] != '/';
 	int32 resultPathLen = fPathLength + componentLen + (insertSlash ? 1 : 0);
 	if (resultPathLen >= fBufferSize)
 		return B_BUFFER_OVERFLOW;
@@ -229,5 +263,15 @@ bool
 KPath::operator!=(const char* path) const
 {
 	return !(*this == path);
+}
+
+// _ChopTrailingSlashes
+void
+KPath::_ChopTrailingSlashes()
+{
+	if (fBuffer) {
+		while (fPathLength > 1 && fBuffer[fPathLength - 1] == '/')
+			fBuffer[--fPathLength] = '\0';
+	}
 }
 

@@ -22,14 +22,17 @@ public:
 	status_t InitCheck() const;
 
 	status_t SetPath(const char *path);
-	const char* Path() const;
+	const char *Path() const;
 	int32 Length() const;
 
 	int32 BufferSize() const;
 	char *LockBuffer();
 	void UnlockBuffer();
 
-	status_t Append(const char *component);
+	const char *Leaf() const;
+	status_t ReplaceLeaf(const char *newLeaf);
+
+	status_t Append(const char *toAppend, bool isComponent = true);
 
 	KPath& operator=(const KPath& other);
 	KPath& operator=(const char* path);
@@ -40,6 +43,8 @@ public:
 	bool operator!=(const char* path) const;
 
 private:
+	void _ChopTrailingSlashes();
+
 	char*	fBuffer;
 	int32	fBufferSize;
 	int32	fPathLength;
