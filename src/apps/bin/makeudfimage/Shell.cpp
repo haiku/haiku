@@ -24,7 +24,7 @@ Shell::Shell()
 	: fVerbosityLevel(VERBOSITY_HIGH)
 	, fBlockSize(2048)
 	, fDoUdf(true)
-	, fDoIso(false)
+	, fDoIso(true)
 {
 }
 
@@ -80,6 +80,8 @@ Shell::_ProcessArgument(std::string arg, int argc, char *argv[]) {
 	} else if (arg == "-v1") {
 		fVerbosityLevel = VERBOSITY_LOW;
 	} else if (arg == "-v2") {
+		fVerbosityLevel = VERBOSITY_MEDIUM;
+	} else if (arg == "-v3") {
 		fVerbosityLevel = VERBOSITY_HIGH;
 	} else {
 		printf("ERROR: invalid argument `%s'\n", arg.c_str());
@@ -97,6 +99,7 @@ Shell::_PrintHelp() {
 	printf("  --help:   Displays this help text\n");
 	printf("  -v0:      Sets verbosity level to 0 (silent)\n"); 
 	printf("  -v1:      Sets verbosity level to 1 (low)\n"); 
-	printf("  -v2:      Sets verbosity level to 2 (high, *default*)\n");
+	printf("  -v2:      Sets verbosity level to 2 (medium)\n"); 
+	printf("  -v3:      Sets verbosity level to 3 (high, *default*)\n");
 	printf("\n");
 }
