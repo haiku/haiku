@@ -116,6 +116,75 @@ KernelMergeObject posix_gnu_libio.o :
 	-fPIC -DPIC
 	;
 
+# use this to build a standalone libio.so
+# using libio.so, haiku's version of libstdc++.r4.so can be tested under R5.
+#SharedLibrary io.so :
+#	<$(SOURCE_GRIST)>clearerr.c
+#	<$(SOURCE_GRIST)>clearerr_u.c
+#	<$(SOURCE_GRIST)>fcloseall.c
+#	<$(SOURCE_GRIST)>feof.c
+#	<$(SOURCE_GRIST)>feof_u.c
+#	<$(SOURCE_GRIST)>ferror.c
+#	<$(SOURCE_GRIST)>ferror_u.c
+#	<$(SOURCE_GRIST)>fileno.c
+#	<$(SOURCE_GRIST)>filedoalloc.c
+#	<$(SOURCE_GRIST)>fileops.c
+#	<$(SOURCE_GRIST)>flockfile.c
+#	<$(SOURCE_GRIST)>fputc.c
+#	<$(SOURCE_GRIST)>fputc_u.c
+#	<$(SOURCE_GRIST)>fseek.c
+#	<$(SOURCE_GRIST)>fseeko.c
+#	<$(SOURCE_GRIST)>ftello.c
+#	<$(SOURCE_GRIST)>fwide.c
+#	<$(SOURCE_GRIST)>genops.c
+#	<$(SOURCE_GRIST)>getc.c
+#	<$(SOURCE_GRIST)>getc_u.c
+#	<$(SOURCE_GRIST)>getchar.c
+#	<$(SOURCE_GRIST)>getchar_u.c
+#	<$(SOURCE_GRIST)>iofclose.c
+#	<$(SOURCE_GRIST)>iofdopen.c
+#	<$(SOURCE_GRIST)>iofflush.c
+#	<$(SOURCE_GRIST)>iofgets.c
+#	<$(SOURCE_GRIST)>iofgets_u.c
+#	<$(SOURCE_GRIST)>iofopen.c
+#	<$(SOURCE_GRIST)>iofputs.c
+#	<$(SOURCE_GRIST)>iofputs_u.c
+#	<$(SOURCE_GRIST)>iofread.c
+#	<$(SOURCE_GRIST)>iofread_u.c
+#	<$(SOURCE_GRIST)>ioftell.c
+#	<$(SOURCE_GRIST)>iofwrite.c
+#	<$(SOURCE_GRIST)>iofwrite_u.c
+#	<$(SOURCE_GRIST)>iofwide.c
+#	<$(SOURCE_GRIST)>iogetdelim.c
+#	<$(SOURCE_GRIST)>iogetline.c
+#	<$(SOURCE_GRIST)>iogets.c
+#	<$(SOURCE_GRIST)>iopadn.c
+#	<$(SOURCE_GRIST)>iopopen.c
+#	<$(SOURCE_GRIST)>ioputs.c
+#	<$(SOURCE_GRIST)>ioseekoff.c
+#	<$(SOURCE_GRIST)>ioseekpos.c
+#	<$(SOURCE_GRIST)>iosetbuffer.c
+#	<$(SOURCE_GRIST)>iosetvbuf.c
+#	<$(SOURCE_GRIST)>ioungetc.c
+#	<$(SOURCE_GRIST)>iovdprintf.c
+#	<$(SOURCE_GRIST)>iovsprintf.c
+#	<$(SOURCE_GRIST)>iovsscanf.c
+#	<$(SOURCE_GRIST)>peekc.c
+#	<$(SOURCE_GRIST)>putc.c
+#	<$(SOURCE_GRIST)>putc_u.c
+#	<$(SOURCE_GRIST)>putchar.c
+#	<$(SOURCE_GRIST)>putchar_u.c
+#	<$(SOURCE_GRIST)>rewind.c
+#	<$(SOURCE_GRIST)>setbuf.c
+#	<$(SOURCE_GRIST)>setlinebuf.c
+#	<$(SOURCE_GRIST)>stdfiles.c
+#	<$(SOURCE_GRIST)>stdio.c
+#	<$(SOURCE_GRIST)>strops.c
+#	<$(SOURCE_GRIST)>vasprintf.c
+#	<$(SOURCE_GRIST)>vscanf.c
+#	<$(SOURCE_GRIST)>vsnprintf.c
+#	<$(SOURCE_GRIST)>wfile_stubs.c ;
+
 #KernelMergeObject kernel_posix_stdio.o :
 #	<$(SOURCE_GRIST)>kvsprintf.c
 #	:
