@@ -15,12 +15,13 @@
 #include <arch/cpu.h>
 #include <sys/stat.h>
 
-#include <bootfs.h>
-
 #include <bootdir.h>
 
 #include <string.h>
 #include <stdio.h>
+
+#include "bootfs.h"
+
 
 #define BOOTFS_TRACE 1
 

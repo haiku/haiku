@@ -14,10 +14,11 @@
 #include <kerrors.h>
 #include <sys/stat.h>
 
-#include <rootfs.h>
-
 #include <string.h>
 #include <stdio.h>
+
+#include "rootfs.h"
+
 
 #define ROOTFS_TRACE 1
 

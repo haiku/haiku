@@ -24,9 +24,6 @@
 #include <memheap.h>
 #include <arch/cpu.h>
 #include <elf.h>
-#include <rootfs.h>
-#include <bootfs.h>
-#include <devfs.h>
 #include <Errors.h>
 #include <kerrors.h>
 #include <atomic.h>
@@ -34,7 +31,9 @@
 
 #include <OS.h>
 
-#include <rootfs.h>
+#include <devfs.h>
+#include "rootfs.h"
+#include "bootfs.h"
 
 #include <string.h>
 #include <stdio.h>
