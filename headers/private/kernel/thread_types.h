@@ -76,6 +76,8 @@ struct team {
 	struct arch_team arch_info;
 };
 
+typedef int32 (*thread_entry_func)(thread_func, void *);
+
 struct thread {
 	struct thread	*all_next;
 	struct thread	*team_next;
@@ -114,7 +116,7 @@ struct thread {
 	int32			page_faults_allowed;
 		/* this field may only stay in debug builds in the future */
 
-	thread_func		entry;
+	thread_entry_func entry;
 	void			*args1, *args2;
 	struct team		*team;
 	status_t		return_code;

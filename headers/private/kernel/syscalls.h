@@ -54,7 +54,7 @@ int    sys_get_next_sem_info(team_id team, uint32 *cookie,
 			struct sem_info *info, size_t size);
 int    sys_set_sem_owner(sem_id id, team_id proc);
 
-/* thread syscalls */
+/* team & thread syscalls */
 
 extern void			_kern_exit(int returnCode);
 extern team_id		_kern_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
@@ -62,11 +62,6 @@ extern status_t		_kern_kill_team(team_id team);
 extern team_id		_kern_get_current_team();
 extern status_t		_kern_wait_for_team(team_id team, status_t *_returnCode);
 
-// XXX: We should decide to either keep the first parameter of the syscall like
-// it is (this is what is actually passed) and adjust _user_spawn_thread() to
-// do the same or change _kern_spawn_thread() and cast in spawn_thread().
-// The magically changing of parameter types between _kern_spawn_thread()
-// and _user_spawn_thread() is definitely ugly.
 extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *),
 						const char *name, int32 priority, void *data1, void *data2);
 extern thread_id	_kern_find_thread(const char *name);
