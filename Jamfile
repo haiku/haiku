@@ -11,11 +11,19 @@ Depends NetworkingKit :
 	net_stack_driver net_server_driver
 	core
 	ethernet loopback ppp
-	pppoe
 	raw ipv4 icmp udp tcp
 	libnet.so libnetapi.so
 	ping ifconfig route traceroute arp pppconfig
+	
+	# network drivers:
 	sis900 rtl8139
+	
+	# PPP devices:
+	pppoe
+	# PPP protocols:
+	ipcp
+	# PPP authenticators:
+	pap
 ;
 
 # Pseudo-target to build the media stuffs only
