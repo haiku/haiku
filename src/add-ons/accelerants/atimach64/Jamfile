@@ -1,0 +1,21 @@
+SubDir OBOS_TOP src add-ons accelerants atimach64 ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics atimach64 ] ;
+
+Addon atimach64.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GlobalData.c
+	GetModeInfo.c
+	InitAccelerant.c
+	Mach64.c
+	Mach64fifo.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+;
+
+Depends atimach64.accelerant : atimach64.driver ;
+
