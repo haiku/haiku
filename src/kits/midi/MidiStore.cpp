@@ -8,8 +8,6 @@
 #include <List.h>
 
 //-----------------------------------------------
-//#define DEBUG
-//-----------------------------------------------
 
 //-----------------------------------------------
 //-----------------------------------------------
@@ -162,7 +160,7 @@ status_t status = B_NO_ERROR;
 	char mtrk[4];
 		if (ReadMT(mtrk) == false)
 		{
-			PRINT("Error while reading MTrk\n");
+			PRINT(("Error while reading MTrk\n"));
 			status = B_BAD_MIDI_DATA;
 			break;
 		}

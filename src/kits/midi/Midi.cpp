@@ -12,8 +12,6 @@
 #include "debug.h"
 #include "MidiEvent.h"
 
-#define DEBUG
-
 //-----------------------------------------------
 
 #define MSG_CODE_PROCESS_EVENT 1
