@@ -44,7 +44,7 @@
 
 ActiveTranslatorsWindow::ActiveTranslatorsWindow(BRect rect, const char *name,
 	BList *plist)
-	: BWindow(rect, name, B_DOCUMENT_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	: BWindow(rect, name, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BRect rctframe = Bounds();
 	rctframe.right -= B_V_SCROLL_BAR_WIDTH;
