@@ -94,8 +94,9 @@ bool _kern_supports_resizing_partition(partition_id partitionID,
 									   bool *canResizeContents,
 									   bool *whileMounted);
 bool _kern_supports_moving_partition(partition_id partitionID,
-									 partition_id *buffer, size_t bufferSize,
-									 bool *whileMounted);
+									 partition_id *unmovable,
+									 partition_id *needUnmounting,
+									 size_t bufferSize);
 bool _kern_supports_setting_partition_name(partition_id partitionID);
 bool _kern_supports_setting_partition_content_name(partition_id partitionID,
 												   bool *whileMounted);

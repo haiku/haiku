@@ -32,26 +32,34 @@ check_shadow_partition(const KPartition *partition)
 // get_unmovable_descendants
 static
 bool
-get_unmovable_descendants(KPartition *partition, partition_id *&buffer,
-						  size_t &bufferSize, bool &whileMounted)
+get_unmovable_descendants(KPartition *partition, partition_id *&unmovable,
+						  size_t &unmovableSize, partition_id *&needUnmounting,
+						  size_t &needUnmountingSize)
 {
 	// check parameters
-	if (!partition || !buffer || bufferSize == 0)
+	if (!partition || !unmovable || !needUnmounting || unmovableSize == 0
+		|| needUnmountingSize) {
 		return false;
+	}
 	// check partition
 	KDiskSystem *diskSystem = partition->DiskSystem();
-	if (!diskSystem || diskSystem->SupportsMoving(partition, &whileMounted)) {
-		buffer[0] = partition->ID();
-		bufferSize--;
+	bool isNoOp = true;
+	bool supports = (diskSystem
+					 && diskSystem->SupportsMoving(partition, &isNoOp));
+	if (supports) {
+		unmovable[0] = partition->ID();
+		unmovableSize--;
+	}
+	if (supports && !isNoOp && diskSystem->IsFileSystem()) {
+		needUnmounting[0] = partition->ID();
+		needUnmountingSize--;
 	}
 	// check child partitions
 	for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++) {
-		bool whileChildMounted = false;
-		if (!get_unmovable_descendants(child, buffer, bufferSize,
-									   whileChildMounted)) {
+		if (!get_unmovable_descendants(child, unmovable, unmovableSize,
+									   needUnmounting, needUnmountingSize)) {
 			return false;
 		}
-		whileMounted &= whileChildMounted;
 	}
 	return true;
 }
@@ -377,14 +385,13 @@ _kern_supports_resizing_partition(partition_id partitionID,
 
 // _kern_supports_moving_partition
 bool
-_kern_supports_moving_partition(partition_id partitionID, partition_id *buffer,
-								size_t bufferSize, bool *whileMounted)
+_kern_supports_moving_partition(partition_id partitionID,
+								partition_id *unmovable,
+								partition_id *needUnmounting,
+								size_t bufferSize)
 {
-	if (!buffer && bufferSize > 0)
+	if ((!unmovable || needUnmounting) && bufferSize > 0)
 		return false;
-	bool _whileMounted;
-	if (!whileMounted)
-		_whileMounted = &_whileMounted;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -403,9 +410,10 @@ _kern_supports_moving_partition(partition_id partitionID, partition_id *buffer,
 	if (!result)
 		return false;
 	// check the movability of the descendants' contents
-	*whileMounted = true;
-	if (!get_unmovable_descendants(partition, buffer, bufferSize,
-								   *whileMounted)) {
+	size_t unmovableSize = bufferSize; 
+	size_t needUnmountingSize = bufferSize; 
+	if (!get_unmovable_descendants(partition, unmovable, unmovableSize,
+								   needUnmounting, needUnmountingSize)) {
 		return false;
 	}
 	return result;
