@@ -6,104 +6,81 @@
 //
 //	Description:	BVolume class
 // ----------------------------------------------------------------------
-
+/*!
+	\file Volume.h
+	BVolume interface declarations.
+*/
 #ifndef _VOLUME_H
 #define _VOLUME_H
 
-#ifndef _BE_BUILD_H
-#include <BeBuild.h>
-#endif
 #include <sys/types.h>
 
-#ifndef _FS_INFO_H
 #include <fs_info.h>
-#endif
-#ifndef _STORAGE_DEFS_H
-#include <StorageDefs.h>
-#endif
-#ifndef _MIME_H
 #include <Mime.h>
-#endif
-#ifndef _SUPPORT_DEFS_H
+#include <StorageDefs.h>
 #include <SupportDefs.h>
-#endif
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
 #endif
 
-
-class	BDirectory;
-class	BBitmap;
+class BDirectory;
+class BBitmap;
 
 class BVolume {
-	public:
-							BVolume(void);
-							BVolume(dev_t dev);
-							BVolume(const BVolume& vol);
+public:
+	BVolume();
+	BVolume(dev_t dev);
+	BVolume(const BVolume &vol);
+	virtual ~BVolume();
 
-		virtual				~BVolume(void);
+	status_t InitCheck() const;
+	status_t SetTo(dev_t dev);
+	void Unset();
 
-		status_t			InitCheck(void) const;
+	dev_t Device() const;
 
-		status_t			SetTo(dev_t dev);
-		void				Unset(void);
+	status_t GetRootDirectory(BDirectory *directory) const;
 
-		dev_t				Device(void) const;
+	off_t Capacity() const;
+	off_t FreeBytes() const;
 
-		status_t			GetRootDirectory(BDirectory* dir) const;
+	status_t GetName(char *name) const;
+	status_t SetName(const char *name);
 
-		off_t				Capacity(void) const;
-		off_t				FreeBytes(void) const;
+	status_t GetIcon(BBitmap *icon, icon_size which) const;
 
-		status_t			GetName(char* name) const;
-		status_t			SetName(const char* name);
+	bool IsRemovable() const;
+	bool IsReadOnly() const;
+	bool IsPersistent() const;
+	bool IsShared() const;
+	bool KnowsMime() const;
+	bool KnowsAttr() const;
+	bool KnowsQuery() const;
 
-		status_t			GetIcon(
-								BBitmap*	icon,
-								icon_size	which) const;
-		
-		bool				IsRemovable(void) const;
-		bool				IsReadOnly(void) const;
-		bool				IsPersistent(void) const;
-		bool				IsShared(void) const;
-		bool				KnowsMime(void) const;
-		bool				KnowsAttr(void) const;
-		bool				KnowsQuery(void) const;
-		
-		bool				operator==(const BVolume& vol) const;
-		bool				operator!=(const BVolume& vol) const;
-		BVolume&			operator=(const BVolume& vol);
+	bool operator==(const BVolume &volume) const;
+	bool operator!=(const BVolume &volume) const;
+	BVolume &operator=(const BVolume &volume);
 
-	private:
+private:
+//	friend class BVolumeRoster;
 
-	friend class BVolumeRoster;
+	virtual void _ReservedVolume1();
+	virtual void _ReservedVolume2();
+	virtual void _ReservedVolume3();
+	virtual void _ReservedVolume4();
+	virtual void _ReservedVolume5();
+	virtual void _ReservedVolume6();
+	virtual void _ReservedVolume7();
+	virtual void _ReservedVolume8();
 
-	virtual	void			_TurnUpTheVolume1();
-	virtual	void			_TurnUpTheVolume2();
-	
-	#if !_PR3_COMPATIBLE_
-	virtual	void			_TurnUpTheVolume3();
-	virtual	void			_TurnUpTheVolume4();
-	virtual	void			_TurnUpTheVolume5();
-	virtual	void			_TurnUpTheVolume6();
-	virtual	void			_TurnUpTheVolume7();
-	virtual	void			_TurnUpTheVolume8();
-	#endif
-
-		dev_t				fDev;
-		status_t			fCStatus;
-
-	#if !_PR3_COMPATIBLE_
-		int32				_reserved[8];
-	#endif
+	dev_t		fDevice;
+	status_t	fCStatus;
+	int32		_reserved[8];
 };
 
-
 #ifdef USE_OPENBEOS_NAMESPACE
-}
+}	// namespace OpenBeOS
 #endif
 
 #endif	// _VOLUME_H
-
-
