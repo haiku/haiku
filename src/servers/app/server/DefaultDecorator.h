@@ -33,16 +33,17 @@
 class DefaultDecorator: public Decorator
 {
 public:
-	DefaultDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
-	~DefaultDecorator(void);
+							DefaultDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
+	virtual					~DefaultDecorator(void);
 	
-	virtual void MoveBy(float x, float y);
-	virtual void MoveBy(BPoint pt);
-	virtual void Draw(BRect r);
-	virtual void Draw(void);
-	virtual void GetFootprint(BRegion *region);
-	virtual BRect SlideTab(float dx, float dy);
-	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
+	virtual	void			MoveBy(float x, float y);
+	virtual	void			MoveBy(BPoint pt);
+	virtual	void			Draw(BRect r);
+	virtual	void			Draw(void);
+	virtual	void			GetFootprint(BRegion *region);
+	virtual	BRect			SlideTab(float dx, float dy);
+	virtual	click_type		Clicked(BPoint pt, int32 buttons, int32 modifiers);
+
 protected:
 	virtual void _DrawClose(BRect r);
 	virtual void _DrawFrame(BRect r);
