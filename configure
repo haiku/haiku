@@ -145,7 +145,7 @@ cat << EOF > build/Timezones
 
 EOF
 
-timezones=`echo src/data/etc/timezones/* | sed -e s@src/data/etc/timezones/CVS@@`
+timezones=`echo src/data/etc/timezones/* | sed -e s@src/data/etc/timezones/.svn@@`
 for f in ${timezones}; 
 do 
 
