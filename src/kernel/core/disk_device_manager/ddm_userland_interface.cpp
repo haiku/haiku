@@ -697,8 +697,6 @@ _kern_supports_resizing_partition(partition_id partitionID,
 								  int32 changeCounter, bool *canResizeContents,
 								  bool *whileMounted)
 {
-	if (!canResizeContents)
-		return false;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -724,8 +722,10 @@ _kern_supports_resizing_partition(partition_id partitionID,
 		return false;
 	// get the child disk system
 	KDiskSystem *childDiskSystem = partition->DiskSystem();
-	*canResizeContents = (childDiskSystem
-		&& childDiskSystem->SupportsResizing(partition, whileMounted));
+	if (canResizeContents) {
+		*canResizeContents = (childDiskSystem
+			&& childDiskSystem->SupportsResizing(partition, whileMounted));
+	}
 // TODO: Currently we report that we cannot resize the contents, if the
 // partition's disk system is unknown. I found this more logical. It doesn't
 // really matter, though, since the API user can check for this situation.

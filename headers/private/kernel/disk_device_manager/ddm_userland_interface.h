@@ -17,6 +17,7 @@ struct user_partition_data {
 	partition_id		shadow_id;
 	off_t				offset;
 	off_t				size;
+	off_t				content_size;
 	uint32				block_size;
 	uint32				status;
 	uint32				flags;
@@ -55,7 +56,7 @@ struct user_disk_device_job_info {
 	disk_job_id		id;
 	uint32			type;
 	partition_id	partition;
-	char			desription[256];
+	char			description[256];
 };
 
 // iterating, retrieving device/partition data
