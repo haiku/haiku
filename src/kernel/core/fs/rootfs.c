@@ -232,7 +232,7 @@ static int
 rootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id *root_vnid)
 {
 	struct rootfs *fs;
-	struct rootfs_vnode *v;
+	struct rootfs_vnode *vnode;
 	int err;
 
 	TRACE(("rootfs_mount: entry\n"));
@@ -248,39 +248,40 @@ rootfs_mount(fs_id id, const char *device, void *args, fs_cookie *_fs, vnode_id 
 	if (err < 0)
 		goto err1;
 
-	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr)&v->all_next - (addr)v,
+	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr)&vnode->all_next - (addr)vnode,
 		&rootfs_vnode_compare_func, &rootfs_vnode_hash_func);
 	if (fs->vnode_list_hash == NULL) {
 		err = ENOMEM;
 		goto err2;
 	}
 
-	// create a vnode
-	v = rootfs_create_vnode(fs);
-	if (v == NULL) {
+	// create the root vnode
+	vnode = rootfs_create_vnode(fs);
+	if (vnode == NULL) {
 		err = ENOMEM;
 		goto err3;
 	}
 
 	// set it up
-	v->parent = v;
-	v->name = kstrdup("");
-	if (v->name == NULL) {
+	vnode->parent = vnode;
+	vnode->name = kstrdup("");
+	if (vnode->name == NULL) {
 		err = ENOMEM;
 		goto err4;
 	}
 
-	v->stream.dir.dir_head = NULL;
-	fs->root_vnode = v;
-	hash_insert(fs->vnode_list_hash, v);
+	vnode->stream.type = STREAM_TYPE_DIR;
+	vnode->stream.dir.dir_head = NULL;
+	fs->root_vnode = vnode;
+	hash_insert(fs->vnode_list_hash, vnode);
 
-	*root_vnid = v->id;
+	*root_vnid = vnode->id;
 	*_fs = fs;
 
 	return 0;
 
 err4:
-	rootfs_delete_vnode(fs, v, true);
+	rootfs_delete_vnode(fs, vnode, true);
 err3:
 	hash_uninit(fs->vnode_list_hash);
 err2:
