@@ -12,6 +12,9 @@
 #include <stdio.h>		// For printf()
 #include <string.h>		// For strncpy()
 
+#include <sniffer/Rule.h>
+#include <sniffer/Parser.h>
+
 // Private helper functions
 bool isValidMimeChar(const char ch);
 status_t toLower(const char *str, char *result);
