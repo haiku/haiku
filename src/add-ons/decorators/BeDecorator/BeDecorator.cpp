@@ -1,3 +1,30 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		BeDecorator.cpp
+//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	Decorator in the style of BeOS R5
+//  
+//------------------------------------------------------------------------------
+#include <Rect.h>
 #include "DisplayDriver.h"
 #include <View.h>
 #include "LayerData.h"
@@ -5,26 +32,25 @@
 #include "BeDecorator.h"
 #include "RGBColor.h"
 
-//#define DEBUG_DECOR
+//#define DEBUG_DECORATOR
 
-#ifdef DEBUG_DECOR
+
+#define USE_VIEW_FILL_HACK
+
+#ifdef DEBUG_DECORATOR
 #include <stdio.h>
 #endif
 
 BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
  : Decorator(rect,wlook,wfeel,wflags)
 {
-#ifdef DEBUG_DECOR
-printf("BeDecorator()\n");
-#endif
 	taboffset=0;
+	titlepixelwidth=0;
+
+	_SetFocus();
 
 	// These hard-coded assignments will go bye-bye when the system _colors 
 	// API is implemented
-
-	// commented these out because they are taken care of by the SetFocus() call
-	SetFocus(false);
-
 	frame_highercol.SetColor(216,216,216);
 	frame_lowercol.SetColor(110,110,110);
 
@@ -41,55 +67,85 @@ printf("BeDecorator()\n");
 	solidhigh=0xFFFFFFFFFFFFFFFFLL;
 	solidlow=0;
 
-	tab_highcol=_colors->window_tab;
-	tab_lowcol=_colors->window_tab;
+//	tab_highcol=_colors->window_tab;
+//	tab_lowcol=_colors->window_tab;
+
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator:\n");
+printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
+#endif
 }
 
 BeDecorator::~BeDecorator(void)
 {
-#ifdef DEBUG_DECOR
-printf("~BeDecorator()\n");
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: ~BeDecorator()\n");
 #endif
 }
 
 click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-	if(_closerect.Contains(pt))
-	{
-
-#ifdef DEBUG_DECOR
-printf("BeDecorator():Clicked() - Close\n");
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: Clicked\n");
+printf("\tPoint: (%.1f,%.1f)\n",pt.x,pt.y);
+printf("\tButtons:\n");
+if(buttons==0)
+	printf("\t\tNone\n");
+else
+{
+	if(buttons & B_PRIMARY_MOUSE_BUTTON)
+		printf("\t\tPrimary\n");
+	if(buttons & B_SECONDARY_MOUSE_BUTTON)
+		printf("\t\tSecondary\n");
+	if(buttons & B_TERTIARY_MOUSE_BUTTON)
+		printf("\t\tTertiary\n");
+}
+printf("\tModifiers:\n");
+if(modifiers==0)
+	printf("\t\tNone\n");
+else
+{
+	if(modifiers & B_CAPS_LOCK)
+		printf("\t\tCaps Lock\n");
+	if(modifiers & B_NUM_LOCK)
+		printf("\t\tNum Lock\n");
+	if(modifiers & B_SCROLL_LOCK)
+		printf("\t\tScroll Lock\n");
+	if(modifiers & B_LEFT_COMMAND_KEY)
+		printf("\t\t Left Command\n");
+	if(modifiers & B_RIGHT_COMMAND_KEY)
+		printf("\t\t Right Command\n");
+	if(modifiers & B_LEFT_CONTROL_KEY)
+		printf("\t\tLeft Control\n");
+	if(modifiers & B_RIGHT_CONTROL_KEY)
+		printf("\t\tRight Control\n");
+	if(modifiers & B_LEFT_OPTION_KEY)
+		printf("\t\tLeft Option\n");
+	if(modifiers & B_RIGHT_OPTION_KEY)
+		printf("\t\tRight Option\n");
+	if(modifiers & B_LEFT_SHIFT_KEY)
+		printf("\t\tLeft Shift\n");
+	if(modifiers & B_RIGHT_SHIFT_KEY)
+		printf("\t\tRight Shift\n");
+	if(modifiers & B_MENU_KEY)
+		printf("\t\tMenu\n");
+}
 #endif
-
+	if(_closerect.Contains(pt))
 		return CLICK_CLOSE;
-	}
 
 	if(_zoomrect.Contains(pt))
-	{
-
-#ifdef DEBUG_DECOR
-printf("BeDecorator():Clicked() - Zoom\n");
-#endif
-
 		return CLICK_ZOOM;
-	}
 	
 	if(_resizerect.Contains(pt) && _look==B_DOCUMENT_WINDOW_LOOK)
-	{
-
-#ifdef DEBUG_DECOR
-printf("BeDecorator():Clicked() - Resize thumb\n");
-#endif
-
 		return CLICK_RESIZE;
-	}
 
 	// Clicking in the tab?
 	if(_tabrect.Contains(pt))
 	{
 		// Here's part of our window management stuff
-		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
-			return CLICK_MOVETOFRONT;
+//		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
+//			return CLICK_MOVETOFRONT;
 		if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			return CLICK_MOVETOBACK;
 		return CLICK_DRAG;
@@ -101,9 +157,6 @@ printf("BeDecorator():Clicked() - Resize thumb\n");
 	BRect clientrect(brect.InsetByCopy(3,3));
 	if(brect.Contains(pt) && !clientrect.Contains(pt))
 	{
-#ifdef DEBUG_DECOR
-printf("BeDecorator():Clicked() - Drag\n");
-#endif		
 		if(_resizerect.Contains(pt))
 			return CLICK_RESIZE;
 		
@@ -111,27 +164,27 @@ printf("BeDecorator():Clicked() - Drag\n");
 	}
 
 	// Guess user didn't click anything
-#ifdef DEBUG_DECOR
-printf("BeDecorator():Clicked()\n");
-#endif
 	return CLICK_NONE;
 }
 
 void BeDecorator::_DoLayout(void)
 {
+//debugger("");
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: Do Layout\n");
+#endif
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
 	
 	// Current version simply makes everything fit inside the rect
 	// instead of building around it. This will change.
 	
-#ifdef DEBUG_DECOR
-printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
-#endif
 	_tabrect=_frame;
 	_resizerect=_frame;
 	_borderrect=_frame;
 	_closerect=_frame;
+
+	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 
 	_closerect.left+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
 	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
@@ -144,16 +197,18 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	_resizerect.left=_resizerect.right-18;
 	
 	_tabrect.bottom=_tabrect.top+18;
-/*	if(GetTitle())
+	if(strlen(GetTitle())>1)
 	{
-		float titlewidth=_closerect.right
-			+_driver->StringWidth(layer->name->String(),
-			layer->name->Length())
-			+35;
-		_tabrect.right=(titlewidth<_frame.right -1)?titlewidth:_frame.right;
+		if(_driver)
+			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+		else
+			titlepixelwidth=10;
+		
+		if(_closerect.right+textoffset+titlepixelwidth+35< _frame.Width()-1)
+			_tabrect.right=_tabrect.left+titlepixelwidth;
 	}
 	else
-*/		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
+		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
 
 	if(_look==B_FLOATING_WINDOW_LOOK)
 		_tabrect.top+=4;
@@ -165,7 +220,6 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	_zoomrect.left=_zoomrect.right-10;
 	_zoomrect.bottom=_zoomrect.top+10;
 	
-	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 }
 
 void BeDecorator::MoveBy(float x, float y)
@@ -175,6 +229,9 @@ void BeDecorator::MoveBy(float x, float y)
 
 void BeDecorator::MoveBy(BPoint pt)
 {
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
+#endif
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -183,31 +240,38 @@ void BeDecorator::MoveBy(BPoint pt)
 	_borderrect.OffsetBy(pt);
 	_zoomrect.OffsetBy(pt);
 }
-/*
-SRegion * BeDecorator::GetFootprint(void)
+
+BRegion * BeDecorator::GetFootprint(void)
 {
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: Get Footprint\n");
+#endif
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WindowBorder
+	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
 	
-	SRegion *reg=new SRegion(_borderrect);
+	BRegion *reg=new BRegion(_borderrect);
 	reg->Include(_tabrect);
 	return reg;
 }
-*/
 
 void BeDecorator::_DrawTitle(BRect r)
 {
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-/*	_driver->SetDrawingMode(B_OP_OVER);
-	rgb_color tmpcol=_driver->HighColor();
-	_driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
-	_driver->DrawString((char *)string,strlen(string),
-		BPoint(_closerect.right+textoffset,_closerect.bottom-1));
-	_driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
-	_driver->SetDrawingMode(B_OP_COPY);
-*/
+	_layerdata.highcolor=_colors->window_tab_text;
+	_layerdata.lowcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+
+	int32 titlecount=_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset));
+	BString titlestr=GetTitle();
+	if(titlecount<titlestr.CountChars())
+	{
+		titlestr.Truncate(titlecount-1);
+		titlestr+="...";
+		titlecount+=2;
+	}
+	_driver->DrawString(titlestr.String(),titlecount,
+		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
 }
 
 void BeDecorator::_SetFocus(void)
@@ -217,36 +281,30 @@ void BeDecorator::_SetFocus(void)
 	
 	if(GetFocus())
 	{
-//		tab_highcol.SetColor(255,236,33);
-//		tab_lowcol.SetColor(234,181,0);
-		tab_highcol=_colors->window_tab;
-		tab_lowcol=_colors->window_tab;
-
-		button_highcol.SetColor(255,255,0);
-		button_lowcol.SetColor(255,203,0);
+		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_DARKEN_2_TINT));
+		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-		tab_highcol.SetColor(235,235,235);
-		tab_lowcol.SetColor(160,160,160);
-
-		button_highcol.SetColor(229,229,229);
-		button_lowcol.SetColor(153,153,153);
+		button_highcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_LIGHTEN_2_TINT));
+		button_lowcol.SetColor(tint_color(_colors->inactive_window_tab.GetColor32(),B_DARKEN_2_TINT));
+		textcol=_colors->inactive_window_tab_text;
 	}
-
 }
 
 void BeDecorator::Draw(BRect update)
 {
+#ifdef DEBUG_DECORATOR
+printf("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
+#endif
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
 	_DrawTab(update);
 
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
-
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
 
 	if(_borderrect.Intersects(update))
 		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
@@ -260,9 +318,7 @@ void BeDecorator::Draw(void)
 	// things
 
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
-
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
 
 	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	DrawFrame();
@@ -296,19 +352,23 @@ void BeDecorator::_DrawTab(BRect r)
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
+	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
+	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
 	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,(int8*)&solidhigh);
 
-//	UpdateTitle(layer->name->String());
-
-	_layerdata.highcolor=_colors->window_tab;
-	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
+	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
 	if(!(_flags & B_NOT_CLOSABLE))
 		_DrawClose(_closerect);
 	if(!(_flags & B_NOT_ZOOMABLE))
 		_DrawZoom(_zoomrect);
+}
+
+void BeDecorator::_SetColors(void)
+{
+	_SetFocus();
 }
 
 void BeDecorator::DrawBlendedRect(BRect r, bool down)
@@ -370,6 +430,10 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 void BeDecorator::_DrawFrame(BRect rect)
 {
 	// Duh, draws the window frame, I think. ;)
+
+#ifdef USE_VIEW_FILL_HACK
+_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+#endif
 
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;

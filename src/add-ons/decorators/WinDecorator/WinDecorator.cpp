@@ -19,11 +19,6 @@ printf("WinDecorator()\n");
 #endif
 	taboffset=0;
 
-	// These hard-coded assignments will go bye-bye when the system colors 
-	// API is implemented
-	tab_highcol.SetColor(100,100,255);
-	tab_lowcol.SetColor(40,0,255);
-
 	button_highercol.SetColor(255,255,255);
 	button_lowercol.SetColor(0,0,0);
 	
@@ -34,8 +29,6 @@ printf("WinDecorator()\n");
 	frame_highercol.SetColor(216,216,216);
 	frame_lowercol.SetColor(110,110,110);
 
-	textcol.SetColor(0,0,0);
-	
 	frame_highcol=frame_lowercol.MakeBlendColor(frame_highercol,0.75);
 	frame_midcol=frame_lowercol.MakeBlendColor(frame_highercol,0.5);
 	frame_lowcol=frame_lowercol.MakeBlendColor(frame_highercol,0.25);
@@ -182,13 +175,17 @@ void WinDecorator::_SetFocus(void)
 	
 	if(GetFocus())
 	{
-		tab_highcol.SetColor(100,100,255);
-		tab_lowcol.SetColor(40,0,255);
+//		tab_highcol.SetColor(100,100,255);
+//		tab_lowcol.SetColor(40,0,255);
+		tab_highcol=_colors->window_tab;
+		textcol=_colors->window_tab_text;
 	}
 	else
 	{
-		tab_highcol.SetColor(220,220,220);
-		tab_lowcol.SetColor(128,128,128);
+//		tab_highcol.SetColor(220,220,220);
+//		tab_lowcol.SetColor(128,128,128);
+		tab_highcol=_colors->inactive_window_tab;
+		textcol=_colors->inactive_window_tab_text;
 	}
 }
 
@@ -198,9 +195,11 @@ void WinDecorator::Draw(BRect update)
 printf("WinDecorator::Draw(): "); update.PrintToStream();
 #endif
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
+//	RGBColor blue(100,100,255);
+//	_layerdata.highcolor=blue;
 
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
+	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 
 	if(_borderrect.Intersects(update))
 		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
@@ -216,9 +215,11 @@ printf("WinDecorator::Draw()\n");
 #endif
 
 	// Draw the top view's client area - just a hack :)
-	RGBColor blue(100,100,255);
+//	RGBColor blue(100,100,255);
+//	_layerdata.highcolor=blue;
 
-	_layerdata.highcolor=blue;
+	_layerdata.highcolor=_colors->document_background;
+	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 
 	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 	DrawFrame();
@@ -270,7 +271,7 @@ void WinDecorator::_DrawTab(BRect r)
 
 //	UpdateTitle(layer->name->String());
 
-	_layerdata.highcolor=tab_lowcol;
+	_layerdata.highcolor=tab_highcol;
 	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
 
 	// Draw the buttons if we're supposed to	
@@ -334,6 +335,11 @@ void WinDecorator::DrawBlendedRect(BRect r, bool down)
 //	_driver->FillRect(r,&_layerdata,(int8*)&solidhigh);
 	_layerdata.highcolor=frame_lowcol;
 	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+}
+
+void WinDecorator::_SetColors(void)
+{
+	_SetFocus();
 }
 
 void WinDecorator::_DrawFrame(BRect rect)

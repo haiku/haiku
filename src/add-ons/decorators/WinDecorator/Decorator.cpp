@@ -44,9 +44,10 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_close_state=false;
 	_minimize_state=false;
 	_zoom_state=false;
-	_title_string=new BString;
+	_has_focus=false;
+	_title_string=new BString("");
 	_driver=NULL;
-
+	
 	_closerect.Set(0,0,1,1);
 	_zoomrect.Set(0,0,1,1);
 	_minimizerect.Set(0,0,1,1);
@@ -83,8 +84,8 @@ Decorator::~Decorator(void)
 */
 void Decorator::SetColors(const ColorSet &cset)
 {
-	if(_colors)
-		_colors->SetColors(cset);
+	_colors->SetColors(cset);
+	_SetColors();
 }
 
 /*!
@@ -232,6 +233,7 @@ int32 Decorator::GetFlags(void)
 void Decorator::SetTitle(const char *string)
 {
 	_title_string->SetTo(string);
+	_DoLayout();
 }
 
 /*!
@@ -330,7 +332,7 @@ void Decorator::MoveBy(BPoint pt)
 	necessarily reflect _tabrect offset by the amount given - few people want to 
 	slide a tab right off the window - that would be a Bad Thing (TM).
 */
-BRect Decorator::SlideTab(float dx, float dy=0)
+BRect Decorator::SlideTab(float dx, float dy)
 {
 	return BRect(0,0,0,0);
 }
@@ -483,6 +485,16 @@ void Decorator::_DrawTitle(BRect r)
 	to check the update rectangle.
 */
 void Decorator::_DrawZoom(BRect r)
+{
+}
+
+/*!
+	\brief Hook function for when the color set is updated
+	
+	This function is called after the decorator's color set is updated. Quite useful 
+	if the decorator uses colors based on those in the system.
+*/
+void Decorator::_SetColors(void)
 {
 }
 
