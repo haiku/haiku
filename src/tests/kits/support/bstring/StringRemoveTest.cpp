@@ -95,6 +95,152 @@ StringRemoveTest::PerformTest(void)
 	string1->Remove(-3, 5);
 	CPPUNIT_ASSERT(strcmp(string1->String(), "ing") == 0);
 	delete string1;
+	
+	//RemoveFirst(BString&)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("first");
+	string1->RemoveFirst(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), " second first") == 0);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("noway");
+	string1->RemoveFirst(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	delete string2;
+	
+	//RemoveLast(Bstring&)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("first");
+	string1->RemoveLast(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second ") == 0);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("noway");
+	string1->RemoveLast(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	delete string2;
+	
+	//RemoveAll(BString&)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("first");
+	string1->RemoveAll(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), " second ") == 0);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string2 = new BString("noway");
+	string1->RemoveAll(*string2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	delete string2;
+	
+	//RemoveFirst(const char*)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveFirst("first");
+	CPPUNIT_ASSERT(strcmp(string1->String(), " second first") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveFirst("noway");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveFirst((char*)NULL);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	
+	//RemoveLast(const char*)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveLast("first");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second ") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveLast("noway");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	
+	//RemoveAll(const char*)
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveAll("first");
+	CPPUNIT_ASSERT(strcmp(string1->String(), " second ") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("first second first");
+	string1->RemoveAll("noway");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "first second first") == 0);
+	delete string1;
+	
+	//RemoveSet(const char*)
+	NextSubTest();
+	string1 = new BString("a sentence with (3) (642) numbers (2) in it");
+	string1->RemoveSet("()3624 ");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "asentencewithnumbersinit") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("a string");
+	string1->RemoveSet("1345");
+	CPPUNIT_ASSERT(strcmp(string1->String(), "a string") == 0);
+	delete string1;
+	
+	//MoveInto(BString &into, int32, int32)
+	NextSubTest();
+	string1 = new BString("some text");
+	string2 = new BString("string");
+	string2->MoveInto(*string1, 3, 2);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "in") == 0);
+	CPPUNIT_ASSERT(strcmp(string2->String(), "strg") == 0);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("some text");
+	string2 = new BString("string");
+	string2->MoveInto(*string1, 0, 200);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "string") == 0);
+	CPPUNIT_ASSERT(strcmp(string2->String(), "string") == 0);
+	delete string1;
+	delete string2;
+	
+	//MoveInto(char *, int32, int32)
+	NextSubTest();
+	char dest[100];
+	memset(dest, 0, 100);
+	string1 = new BString("some text");
+	string1->MoveInto(dest, 3, 2);
+	CPPUNIT_ASSERT(strcmp(dest, "e ") == 0);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "somtext") == 0);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("some text");
+	memset(dest, 0, 100);
+	string1->MoveInto(dest, 0, 50);
+	CPPUNIT_ASSERT(strcmp(dest, "some text") == 0);
+	CPPUNIT_ASSERT(strcmp(string1->String(), "some text") == 0);
+	delete string1;
 }
 
 

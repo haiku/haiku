@@ -73,7 +73,46 @@ StringInsertTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "strPPPPPing") == 0);
 	delete str1;
 	
+	//Insert(BString&)
+	NextSubTest();
+	str1 = new BString("string");
+	str2 = new BString("INSERTED");
+	str1->Insert(*str2, 0);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "INSERTEDstring") == 0);
+	delete str1;
+	delete str2;
 	
+	NextSubTest();
+	str1 = new BString("string");
+	str1->Insert(*str1, 0);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "string") == 0);
+	delete str1;
+	
+	NextSubTest();
+	str1 = new BString;
+	str2 = new BString("INSERTED");
+	str1->Insert(*str2, -1);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "NSERTED") == 0);
+	delete str1;
+	delete str2;
+	
+	//&Insert(BString &, int32 length, int32 pos);
+	NextSubTest();
+	str1 = new BString("string");
+	str2 = new BString("INSERTED");
+	str1->Insert(*str2, 2, 2);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "stINring") == 0);
+	delete str1;
+	delete str2;
+		
+	//&Insert(BString&, int32 fromOffset, int32 length, int32 pos);
+	NextSubTest();
+	str1 = new BString("string");
+	str2 = new BString("INSERTED");
+	str1->Insert(*str2, 4, 30, 2);
+	CPPUNIT_ASSERT(strcmp(str1->String(), "stRTEDring") == 0);
+	delete str1;
+	delete str2;
 }
 
 

@@ -11,6 +11,7 @@
 #include "StringInsertTest.h"
 #include "StringEscapeTest.h"
 #include "StringRemoveTest.h"
+#include "StringCompareTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -26,6 +27,7 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringInsertTest::suite());
 	testSuite->addTest(StringEscapeTest::suite());
 	testSuite->addTest(StringRemoveTest::suite());
+	testSuite->addTest(StringCompareTest::suite());
 	
 	return(testSuite);
 }
