@@ -79,7 +79,7 @@ TGAView::TGAView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 // Destructor
 //
-// Releases the TGATranslator settings
+// Releases the translator settings
 //
 // Preconditions:
 //

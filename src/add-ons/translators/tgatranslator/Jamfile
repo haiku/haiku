@@ -1,13 +1,16 @@
 SubDir OBOS_TOP src add-ons translators tgatranslator ;
 
-# Include BaseTranslator code from TGATranslator directory
+# Include BaseTranslator code from shared directory
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
 
 Translator TGATranslator :
+	# shared classes
 	BaseTranslator.cpp
 	TranslatorSettings.cpp
 	TranslatorWindow.cpp
 	StreamBuffer.cpp
+
+	# TGATranslator classes
 	TGAMain.cpp
 	TGATranslator.cpp
 	TGAView.cpp ;
