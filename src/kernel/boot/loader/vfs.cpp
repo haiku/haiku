@@ -4,12 +4,16 @@
 */
 
 
+#include "Partition.h"
+#include "RootFileSystem.h"
+
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
 #include <util/kernel_cpp.h>
 
 #include <unistd.h>
+#include <string.h>
 #include <fcntl.h>
 
 
@@ -22,6 +26,8 @@ class Descriptor {
 		ssize_t Read(void *buffer, size_t bufferSize);
 		ssize_t WriteAt(off_t pos, const void *buffer, size_t bufferSize);
 		ssize_t Write(const void *buffer, size_t bufferSize);
+
+		status_t Stat(struct stat &stat);
 
 		off_t Offset() const { return fOffset; }
 		int32 RefCount() const { return fRefCount; }
@@ -41,6 +47,7 @@ class Descriptor {
 list gBootDevices;
 list gPartitions;
 Descriptor *gDescriptors[MAX_VFS_DESCRIPTORS];
+Directory *gRoot;
 
 
 Node::Node()
@@ -59,13 +66,51 @@ Node::~Node()
 status_t
 Node::Open(void **_cookie, int mode)
 {
-	return B_OK;
+	return Acquire();
 }
 
 
 status_t
 Node::Close(void *cookie)
 {
+	return Release();
+}
+
+
+status_t 
+Node::GetName(char *nameBuffer, size_t bufferSize) const
+{
+	return B_ERROR;
+}
+
+
+int32 
+Node::Type() const
+{
+	return 0;
+}
+
+
+off_t 
+Node::Size() const
+{
+	return 0LL;
+}
+
+
+status_t 
+Node::Acquire()
+{
+	fRefCount++;
+	return B_OK;
+}
+
+status_t 
+Node::Release()
+{
+	if (--fRefCount == 0)
+		delete this;
+
 	return B_OK;
 }
 
@@ -90,6 +135,44 @@ ssize_t
 ConsoleNode::Write(const void *buffer, size_t bufferSize)
 {
 	return WriteAt(NULL, -1, buffer, bufferSize);
+}
+
+
+//	#pragma mark -
+
+
+Directory::Directory()
+	: Node()
+{
+}
+
+
+ssize_t 
+Directory::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
+ssize_t 
+Directory::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
+int32 
+Directory::Type() const
+{
+	return S_IFDIR;
+}
+
+
+status_t 
+Directory::AddNode(Node */*node*/)
+{
+	// just don't do anything
+	return B_ERROR;
 }
 
 
@@ -147,6 +230,16 @@ Descriptor::WriteAt(off_t pos, const void *buffer, size_t bufferSize)
 }
 
 
+status_t 
+Descriptor::Stat(struct stat &stat)
+{
+	stat.st_mode = fNode->Type();
+	stat.st_size = fNode->Size();
+
+	return B_OK;
+}
+
+
 status_t
 Descriptor::Acquire()
 {
@@ -158,7 +251,7 @@ Descriptor::Acquire()
 status_t
 Descriptor::Release()
 {
-	if (--fRefCount == 1) {
+	if (--fRefCount == 0) {
 		status_t status = fNode->Close(fCookie);
 		if (status != B_OK)
 			return status;
@@ -250,6 +343,12 @@ vfs_init(stage2_args *args)
 status_t
 mount_boot_file_systems()
 {
+	list_init_etc(&gPartitions, Partition::NextOffset());
+
+	gRoot = new RootFileSystem();
+	if (gRoot == NULL)
+		return B_NO_MEMORY;
+
 	Node *device = NULL;
 	while ((device = (Node *)list_get_next_item(&gBootDevices, (void *)device)) != NULL) {
 		int fd = open_node(device, O_RDONLY);
@@ -360,3 +459,16 @@ close(int fd)
 	return status;
 }
 
+
+int
+fstat(int fd, struct stat *stat)
+{
+	if (stat == NULL)
+		return B_BAD_VALUE;
+
+	Descriptor *descriptor = get_descriptor(fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	return descriptor->Stat(*stat);
+}
