@@ -52,9 +52,6 @@ public:
 			edelta.nonspace	= 0;
 			
 			prevState		= NULL;
-			clippPicture	= NULL;
-			clippInverse	= false;
-			fVisibleRegion	= NULL;
 		}
 	~LayerData(void)
 		{
@@ -69,12 +66,6 @@ public:
 					
 					TODO: tell 'image' we're finished with it! :-)
 				*/
-			}
-			if (clippPicture){
-				/* same as for 'image'
-				
-					TODO: tell 'clippPicture' we're finished with it
-				 */
 			}
 			if (prevState){
 				delete prevState;
@@ -115,10 +106,6 @@ public:
 	
 		// used for the state stack
 	LayerData		*prevState;
-	
-	ServerPicture	*clippPicture;
-	bool			clippInverse;
-	BRegion			*fVisibleRegion;
 };
 #endif
 
