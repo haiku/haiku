@@ -496,7 +496,7 @@ PrintServerApp::HandleSpooledJobs()
 	}
 }
 
-static const char* kPrinterData = "printer_data";
+// static const char* kPrinterData = "printer_data";
 
 // ---------------------------------------------------------------
 // RetrieveDefaultPrinter()
