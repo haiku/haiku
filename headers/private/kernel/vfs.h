@@ -44,7 +44,7 @@ int vfs_setrlimit(int resource, const struct rlimit * rlp);
 
 // ToDo: for now; this prototype should be in os/drivers/Drivers.h
 //	or similar places.
-extern status_t notify_select_event(struct selectsync *sync, uint32 ref);
+extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
 
 /* calls needed by fs internals */
 int vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *v);
@@ -89,7 +89,7 @@ int sys_access(const char *path, int mode);
 int sys_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
 int sys_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
 int sys_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
-	bigtime_t timeout, sigset_t *sigMask);
+	bigtime_t timeout, const sigset_t *sigMask);
 int sys_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
 int sys_open_attr_dir(int fd, const char *path);
 int sys_create_attr(int fd, const char *name, uint32 type, int openMode);
@@ -129,7 +129,7 @@ int user_access(const char *path, int mode);
 int user_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
 int user_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
 int user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
-	bigtime_t timeout, sigset_t *sigMask);
+	bigtime_t timeout, const sigset_t *sigMask);
 int user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
 int user_open_attr_dir(int fd, const char *path);
 int user_create_attr(int fd, const char *name, uint32 type, int openMode);
