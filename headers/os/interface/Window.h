@@ -420,7 +420,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		void		activateView( BView *aView, bool active );
 
 		void		drawAllViews(BView* aView);
-		void		drawView(BView* aView, BRect area);
+		void		DoUpdate(BView* aView, BRect& area);
 
 		// Debug
 		void		PrintToStream() const;
