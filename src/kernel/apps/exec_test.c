@@ -12,7 +12,7 @@
 #include <errno.h>
 
 
-void
+static void
 print_process_info(const char *text)
 {
 	puts(text);
