@@ -16,10 +16,13 @@ int32 			api_version = B_CUR_DRIVER_API_VERSION;
 sem_id			drv_sem;
 char *			drv_path[MAX_DEVICES + 1];
 audio_drv_t *	drv_data[MAX_DEVICES];
+int				drv_open_count[MAX_DEVICES];
+void *			drv_cookie[MAX_DEVICES];
 int				drv_count;
 
 pci_module_info *pcimodule;
 
+extern driver_info_t driver_info;
 
 status_t
 init_hardware(void)
@@ -53,25 +56,25 @@ init_driver(void)
 //			pciinfo->vendor_id, pciinfo->device_id, pciinfo->bus, pciinfo->device, pciinfo->function,
 //			pciinfo->revision, pciinfo->class_api, pciinfo->class_sub, pciinfo->class_base);
 			
-		for (devindex = 0; driver_info.table[devindex].vendor != 0; devindex++) {
-			if (driver_info.table[devindex].vendor != -1 && driver_info.table[devindex].vendor != pciinfo->vendor_id)
+		for (devindex = 0; driver_info.id_table[devindex].vendor != 0; devindex++) {
+			if (driver_info.id_table[devindex].vendor != -1 && driver_info.id_table[devindex].vendor != pciinfo->vendor_id)
 				continue;
-			if (driver_info.table[devindex].device != -1 && driver_info.table[devindex].device != pciinfo->device_id)
+			if (driver_info.id_table[devindex].device != -1 && driver_info.id_table[devindex].device != pciinfo->device_id)
 				continue;
-			if (driver_info.table[devindex].revision != -1 && driver_info.table[devindex].revision != pciinfo->revision)
+			if (driver_info.id_table[devindex].revision != -1 && driver_info.id_table[devindex].revision != pciinfo->revision)
 				continue;
-			if (driver_info.table[devindex].class != -1 && driver_info.table[devindex].class != pciinfo->class_base)
+			if (driver_info.id_table[devindex].class != -1 && driver_info.id_table[devindex].class != pciinfo->class_base)
 				continue;
-			if (driver_info.table[devindex].subclass != -1 && driver_info.table[devindex].subclass != pciinfo->class_sub)
+			if (driver_info.id_table[devindex].subclass != -1 && driver_info.id_table[devindex].subclass != pciinfo->class_sub)
 				continue;
 			if (pciinfo->header_type == 0) {
-				if (driver_info.table[devindex].subsystem_vendor != -1 && driver_info.table[devindex].subsystem_vendor != pciinfo->u.h0.subsystem_vendor_id)
+				if (driver_info.id_table[devindex].subsystem_vendor != -1 && driver_info.id_table[devindex].subsystem_vendor != pciinfo->u.h0.subsystem_vendor_id)
 					continue;
-				if (driver_info.table[devindex].subsystem_device != -1 && driver_info.table[devindex].subsystem_device != pciinfo->u.h0.subsystem_id)
+				if (driver_info.id_table[devindex].subsystem_device != -1 && driver_info.id_table[devindex].subsystem_device != pciinfo->u.h0.subsystem_id)
 					continue;
 			}
 
-			dprintf("found device '%s'\n", driver_info.table[devindex].name);
+			dprintf("found device '%s'\n", driver_info.id_table[devindex].name);
 			
 			drv_path[drv_count] = (char *) malloc(strlen(driver_info.basename) + 5);
 			sprintf(drv_path[drv_count], "%s/%d", driver_info.basename, drv_count + 1);
@@ -81,10 +84,9 @@ init_driver(void)
 			drv_data[drv_count]->bus		= pciinfo->bus;
 			drv_data[drv_count]->device		= pciinfo->device;
 			drv_data[drv_count]->function	= pciinfo->function;
-			drv_data[drv_count]->name		= driver_info.table[devindex].name;
-			drv_data[drv_count]->flags		= driver_info.table[devindex].flags;
-			drv_data[drv_count]->open_count	= 0;
-			drv_data[drv_count]->cookie		= malloc(driver_info.cookie_size);
+			drv_data[drv_count]->name		= driver_info.id_table[devindex].name;
+			drv_data[drv_count]->param		= driver_info.id_table[devindex].param;
+			drv_open_count[drv_count]		= 0;
 
 			drv_count++;
 			break;
@@ -106,7 +108,6 @@ uninit_driver(void)
 	
 	for (i = 0; i < drv_count; i++) {
 		free(drv_path[i]);
-		free(drv_data[i]->cookie);
 		free(drv_data[i]);
 	}
 	delete_sem(drv_sem);
@@ -130,13 +131,12 @@ ich_open(const char *name, uint32 flags, void** cookie)
 	}
 	*cookie = (void *) index;
 	
-	if (drv_data[index]->open_count == 0) {
-		memset(drv_data[index]->cookie, 0, driver_info.cookie_size);
-		res = driver_info.attach(drv_data[index]);
-		drv_data[index]->open_count = (res == B_OK) ? 1 : 0;
+	if (drv_open_count[index] == 0) {
+		res = driver_info.attach(drv_data[index], &drv_cookie[index]);
+		drv_open_count[index] = (res == B_OK) ? 1 : 0;
 	} else {
 		res = B_OK;
-		drv_data[index]->open_count++;
+		drv_open_count[index]++;
 	}
 
 	release_sem(drv_sem);
@@ -163,10 +163,10 @@ ich_free(void* cookie)
 
 	acquire_sem(drv_sem);
 
-	drv_data[index]->open_count--;
+	drv_open_count[index]--;
 
-	if (drv_data[index]->open_count == 0)
-		res = driver_info.detach(drv_data[index]);
+	if (drv_open_count[index] == 0)
+		res = driver_info.detach(drv_data[index], drv_cookie[index]);
 	else
 		res = B_OK;
 	

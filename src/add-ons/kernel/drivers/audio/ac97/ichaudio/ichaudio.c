@@ -2,9 +2,15 @@
 #include "ichaudio.h"
 #include "io.h"
 
-status_t ichaudio_attach(audio_drv_t *drv);
-status_t ichaudio_powerctl(audio_drv_t *drv);
-status_t ichaudio_detach(audio_drv_t *drv);
+status_t ichaudio_attach(audio_drv_t *drv, void **cookie);
+status_t ichaudio_powerctl(audio_drv_t *drv, void *cookie);
+status_t ichaudio_detach(audio_drv_t *drv, void *cookie);
+status_t ichaudio_stream_attach(audio_drv_t *drv, void **cookie, void *param);
+status_t ichaudio_stream_detach(audio_drv_t *drv, void *cookie);
+status_t ichaudio_stream_control(audio_drv_t *drv, void *cookie, int op);
+status_t ichaudio_stream_set_buffers(audio_drv_t *drv, void *cookie, uint32 *buffer_size, stream_buffer_desc_t *desc);
+status_t ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *cookie, uint32 *frame_rate);
+
 
 id_table_t ichaudio_id_table[] = {
 	{ 0x8086, 0x7195, -1, -1, -1, -1, -1, "Intel 82443MX AC97 audio" },
@@ -12,9 +18,9 @@ id_table_t ichaudio_id_table[] = {
 	{ 0x8086, 0x2425, -1, -1, -1, -1, -1, "Intel 82801AB (ICH0) AC97 audio" },
 	{ 0x8086, 0x2445, -1, -1, -1, -1, -1, "Intel 82801BA (ICH2) AC97 audio" },
 	{ 0x8086, 0x2485, -1, -1, -1, -1, -1, "Intel 82801CA (ICH3) AC97 audio" },
-	{ 0x8086, 0x24C5, -1, -1, -1, -1, -1, "Intel 82801DB (ICH4) AC97 audio", TYPE_ICH4 },
-	{ 0x8086, 0x24D5, -1, -1, -1, -1, -1, "Intel 82801EB (ICH5)  AC97 audio", TYPE_ICH4 },
-	{ 0x1039, 0x7012, -1, -1, -1, -1, -1, "SiS SI7012 AC97 audio", TYPE_SIS7012 },
+	{ 0x8086, 0x24C5, -1, -1, -1, -1, -1, "Intel 82801DB (ICH4) AC97 audio", (void *)TYPE_ICH4 },
+	{ 0x8086, 0x24D5, -1, -1, -1, -1, -1, "Intel 82801EB (ICH5)  AC97 audio", (void *)TYPE_ICH4 },
+	{ 0x1039, 0x7012, -1, -1, -1, -1, -1, "SiS SI7012 AC97 audio", (void *)TYPE_SIS7012 },
 	{ 0x10DE, 0x01B1, -1, -1, -1, -1, -1, "NVIDIA nForce (MCP)  AC97 audio" },
 	{ 0x10DE, 0x006A, -1, -1, -1, -1, -1, "NVIDIA nForce 2 (MCP2)  AC97 audio" },
 	{ 0x10DE, 0x00DA, -1, -1, -1, -1, -1, "NVIDIA nForce 3 (MCP3)  AC97 audio" },
@@ -29,30 +35,72 @@ id_table_t ichaudio_id_table[] = {
 
 
 driver_info_t driver_info = {
-	.table			= ichaudio_id_table,
+	.id_table		= ichaudio_id_table,
 	.basename		= "audio/lala/ichaudio",
-	.cookie_size	= sizeof(ichaudio_cookie),
 	.attach			= ichaudio_attach,
 	.detach			= ichaudio_detach,
 	.powerctl		= ichaudio_powerctl,
 };
 
 
+stream_info_t po_stream = {
+	.flags				= B_PLAYBACK_STREAM | B_BUFFER_SIZE_EXPONETIAL | B_SAMPLE_TYPE_INT16,
+	.cookie_size		= sizeof(ichaudio_stream_cookie),
+	.sample_bits		= 16,
+	.channel_count		= 2,
+	.channel_mask		= B_CHANNEL_LEFT | B_CHANNEL_RIGHT,
+	.frame_rate_min 	= 0, // is setup later after device probing
+	.frame_rate_max		= 0, // is setup later after device probing
+	.frame_rate_mask	= 0, // is setup later after device probing
+	.buffer_size_min	= 256,
+	.buffer_size_max	= 32768,
+	.buffer_count		= 2,
+	.attach				= ichaudio_stream_attach,
+	.detach				= ichaudio_stream_detach,
+	.control			= ichaudio_stream_control,
+	.set_buffers		= ichaudio_stream_set_buffers,
+	.set_frame_rate		= ichaudio_stream_set_frame_rate,
+};
+
+
+stream_info_t pi_stream = {
+	.flags				= B_RECORDING_STREAM | B_BUFFER_SIZE_EXPONETIAL | B_SAMPLE_TYPE_INT16,
+	.sample_bits		= 16,
+	.channel_count		= 2,
+	.channel_mask		= B_CHANNEL_LEFT | B_CHANNEL_RIGHT,
+	.frame_rate_min 	= 0, // is setup later after device probing
+	.frame_rate_max		= 0, // is setup later after device probing
+	.frame_rate_mask	= 0, // is setup later after device probing
+	.buffer_size_min	= 256,
+	.buffer_size_max	= 32768,
+	.buffer_count		= 2,
+	.attach				= ichaudio_stream_attach,
+	.detach				= ichaudio_stream_detach,
+	.control			= ichaudio_stream_control,
+	.set_buffers		= ichaudio_stream_set_buffers,
+	.set_frame_rate		= ichaudio_stream_set_frame_rate,
+};
+
 status_t
-ichaudio_attach(audio_drv_t *drv)
+ichaudio_attach(audio_drv_t *drv, void **_cookie)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
+	ichaudio_cookie *cookie;
 	uint32 value;
 	int i;
 	bigtime_t start;
 	bool s0cr, s1cr, s2cr;
 	
 	dprintf("ichaudio_attach\n");
+	
+	*_cookie = cookie = (ichaudio_cookie *) malloc(sizeof(ichaudio_cookie));
+	
+	cookie->pci = drv->pci;
+	cookie->flags = (uint32)drv->param;
 
 	// For old ICHs enable programmed IO and busmaster access,
 	// for ICH4 and up enable memory mapped IO and busmaster access
 	value = drv->pci->read_pci_config(drv->bus, drv->device, drv->function, PCI_command, 2);
-	value |= PCI_PCICMD_BME | (drv->flags & TYPE_ICH4) ? PCI_PCICMD_MSE : PCI_PCICMD_IOS;
+	value |= PCI_PCICMD_BME | (cookie->flags & TYPE_ICH4) ? PCI_PCICMD_MSE : PCI_PCICMD_IOS;
 	drv->pci->write_pci_config(drv->bus, drv->device, drv->function, PCI_command, 2, value);
 
 	// get IRQ, we can compensate it later if IRQ is not available (hack!)
@@ -60,17 +108,17 @@ ichaudio_attach(audio_drv_t *drv)
 	if (cookie->irq == 0xff) cookie->irq = 0;
 	if (cookie->irq == 0) dprintf("ichaudio_attach: no interrupt configured\n");
 
-	if (drv->flags & TYPE_ICH4) {
+	if (cookie->flags & TYPE_ICH4) {
 		// memory mapped access
-		uint32 phy_mmbar = PCI_address_memory_32_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x18, 4);
-		uint32 phy_mbbar = PCI_address_memory_32_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x1C, 4);
-		if (!phy_mmbar || !phy_mbbar) {
+		uint32 phys_mmbar = PCI_address_memory_32_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x18, 4);
+		uint32 phys_mbbar = PCI_address_memory_32_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x1C, 4);
+		if (!phys_mmbar || !phys_mbbar) {
 			dprintf("ichaudio_attach: memory mapped io unconfigured\n");
 			goto err;			
 		}
 		// map into memory
-		cookie->area_mmbar = map_mem(&cookie->mmbar, (void *)phy_mmbar, ICH4_MMBAR_SIZE, 0, "ichaudio mmbar io");
-		cookie->area_mbbar = map_mem(&cookie->mbbar, (void *)phy_mbbar, ICH4_MBBAR_SIZE, 0, "ichaudio mbbar io");
+		cookie->area_mmbar = map_mem(&cookie->mmbar, (void *)phys_mmbar, ICH4_MMBAR_SIZE, 0, "ichaudio mmbar io");
+		cookie->area_mbbar = map_mem(&cookie->mbbar, (void *)phys_mbbar, ICH4_MBBAR_SIZE, 0, "ichaudio mbbar io");
 		if (cookie->area_mmbar < B_OK || cookie->area_mbbar < B_OK) {
 			dprintf("ichaudio_attach: mapping io into memory failed\n");
 			goto err;			
@@ -97,34 +145,34 @@ ichaudio_attach(audio_drv_t *drv)
 	 * reset does also reset GPIO pins, but the ICH hardware does only execute
 	 * the reset request if BIT_CLOCK is not running and if it's really required.
 	 */
-	LOG(("reset starting, ICH_REG_GLOB_CNT = 0x%08x\n", ich_reg_read_32(drv, ICH_REG_GLOB_CNT)));
-	DEBUG_ONLY(start = system_time());
+	LOG(("reset starting, ICH_REG_GLOB_CNT = 0x%08lx\n", ich_reg_read_32(cookie, ICH_REG_GLOB_CNT)));
+	start = system_time();
 	// finish cold reset by writing a 1 and clear all other bits to 0
-	ich_reg_write_32(drv, ICH_REG_GLOB_CNT, CNT_COLD);
-	ich_reg_read_32(drv, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	ich_reg_write_32(cookie, ICH_REG_GLOB_CNT, CNT_COLD);
+	ich_reg_read_32(cookie, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
 	snooze(20000);
 	// request warm reset by setting the bit, it will clear when reset is done
-	ich_reg_write_32(drv, ICH_REG_GLOB_CNT, ich_reg_read_32(drv, ICH_REG_GLOB_CNT) | CNT_WARM);
-	ich_reg_read_32(drv, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	ich_reg_write_32(cookie, ICH_REG_GLOB_CNT, ich_reg_read_32(cookie, ICH_REG_GLOB_CNT) | CNT_WARM);
+	ich_reg_read_32(cookie, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
 	snooze(20000);
 	// wait up to 1 second for warm reset to be finished
 	for (i = 0; i < 20; i++) {
-		value = ich_reg_read_32(drv, ICH_REG_GLOB_CNT);
+		value = ich_reg_read_32(cookie, ICH_REG_GLOB_CNT);
 		if ((value & CNT_WARM) == 0 && (value & CNT_COLD) != 0)
 			break;
 		snooze(50000);
 	}
 	if (i == 20) {
-		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08x\n", value));
+		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08lx\n", value));
 		goto err;
 	}
-	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, value));
+	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08lx\n", system_time() - start, value));
 
 	/* detect which codecs are ready */
 	s0cr = s1cr = s2cr = false;
 	start = system_time();
 	do {
-		value = ich_reg_read_32(drv, ICH_REG_GLOB_STA);
+		value = ich_reg_read_32(cookie, ICH_REG_GLOB_STA);
 		if (!s0cr && (value & STA_S0CR)) {
 			s0cr = true;
 			LOG(("AC_SDIN0 codec ready after %Ld us\n", system_time() - start));
@@ -155,40 +203,40 @@ ichaudio_attach(audio_drv_t *drv)
 		goto err;
 	}
 	
-	if (drv->flags & TYPE_ICH4) {
+	if (cookie->flags & TYPE_ICH4) {
 		/* we are using a ICH4 chipset, and assume that the codec beeing ready
 		 * is the primary one.
 		 */
 		uint8 sdin;
 		uint16 reset;
 		uint8 id;
-		reset = ich_codec_read(drv, 0x00);	/* access the primary codec */
+		reset = ich_codec_read(cookie, 0x00);	/* access the primary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("primary codec not present\n"));
 		} else {
-			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
-			id = 0x02 & (ich_codec_read(drv, 0x00 + 0x28) >> 14);
+			sdin = 0x02 & ich_reg_read_8(cookie, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(cookie, 0x00 + 0x28) >> 14);
 			LOG(("primary codec id %d is connected to AC_SDIN%d\n", id, sdin));
 		}
-		reset = ich_codec_read(drv, 0x80);	/* access the secondary codec */
+		reset = ich_codec_read(cookie, 0x80);	/* access the secondary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("secondary codec not present\n"));
 		} else {
-			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
-			id = 0x02 & (ich_codec_read(drv, 0x80 + 0x28) >> 14);
+			sdin = 0x02 & ich_reg_read_8(cookie, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(cookie, 0x80 + 0x28) >> 14);
 			LOG(("secondary codec id %d is connected to AC_SDIN%d\n", id, sdin));
 		}
-		reset = ich_codec_read(drv, 0x100);	/* access the tertiary codec */
+		reset = ich_codec_read(cookie, 0x100);	/* access the tertiary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("tertiary codec not present\n"));
 		} else {
-			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
-			id = 0x02 & (ich_codec_read(drv, 0x100 + 0x28) >> 14);
+			sdin = 0x02 & ich_reg_read_8(cookie, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(cookie, 0x100 + 0x28) >> 14);
 			LOG(("tertiary codec id %d is connected to AC_SDIN%d\n", id, sdin));
 		}
 		
 		/* XXX this may be wrong */
-		ich_reg_write_8(drv, ICH_REG_SDM, (ich_reg_read_8(drv, ICH_REG_SDM) & 0x0F) | 0x08 | 0x90);
+		ich_reg_write_8(cookie, ICH_REG_SDM, (ich_reg_read_8(cookie, ICH_REG_SDM) & 0x0F) | 0x08 | 0x90);
 	} else {
 		/* we are using a pre-ICH4 chipset, that has a fixed mapping of
 		 * AC_SDIN0 = primary, AC_SDIN1 = secondary codec.
@@ -200,36 +248,168 @@ ichaudio_attach(audio_drv_t *drv)
 		}
 	}
 
+	cookie->po_stream_id = create_stream(&po_stream, (void *)ICH_REG_PO_BASE);
+	cookie->pi_stream_id = create_stream(&pi_stream, (void *)ICH_REG_PI_BASE);
+	if (cookie->po_stream_id < 0 || cookie->pi_stream_id < 0)
+		goto err;
 
 	return B_OK;
 
 err:
+	// delete streams
+	if (cookie->po_stream_id > 0) delete_stream(cookie->po_stream_id);
+	if (cookie->pi_stream_id > 0) delete_stream(cookie->pi_stream_id);
 	// unmap io memory
 	if (cookie->area_mmbar > 0) delete_area(cookie->area_mmbar);
 	if (cookie->area_mbbar > 0) delete_area(cookie->area_mbbar);
+	free(cookie);
 	return B_ERROR;
 }
 
 
 status_t
-ichaudio_detach(audio_drv_t *drv)
+ichaudio_detach(audio_drv_t *drv, void *_cookie)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
+	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 
 	dprintf("ichaudio_detach\n");
 
+	// delete streams
+	if (cookie->po_stream_id > 0) delete_stream(cookie->po_stream_id);
+	if (cookie->pi_stream_id > 0) delete_stream(cookie->pi_stream_id);
 	// unmap io memory
 	if (cookie->area_mmbar > 0) delete_area(cookie->area_mmbar);
 	if (cookie->area_mbbar > 0) delete_area(cookie->area_mbbar);
+	free(cookie);
 	return B_OK;
 }
 
 
 status_t
-ichaudio_powerctl(audio_drv_t *drv)
+ichaudio_powerctl(audio_drv_t *drv, void *_cookie)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
+	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 
 	return B_OK;
+}
+
+void
+stream_reset(ichaudio_stream_cookie *cookie)
+{
+	int i;
+
+	ich_reg_write_8(cookie, cookie->regbase + ICH_REG_X_CR, 0);
+	ich_reg_read_8(cookie, cookie->regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
+	snooze(10000); // 10 ms
+	ich_reg_write_8(cookie, cookie->regbase + ICH_REG_X_CR, CR_RR);
+	for (i = 0; i < 100; i++) {
+		uint8 cr = ich_reg_read_8(cookie, cookie->regbase + ICH_REG_X_CR);
+		if (cr == 0) {
+			LOG(("channel reset finished, %d\n",i));
+			return;
+		}
+		snooze(100);
+	}
+	LOG(("channel reset failed after 10ms\n"));
+}
+
+status_t
+ichaudio_stream_attach(audio_drv_t *drv, void **_cookie, void *param)
+{
+	ichaudio_stream_cookie *cookie;
+	void *bd_virt_base;
+	void *bd_phys_base;
+	int i;
+	
+	*_cookie = cookie = (ichaudio_stream_cookie *) malloc(sizeof(ichaudio_stream_cookie));
+	
+	cookie->regbase = (uint32) param;
+	cookie->lastindex = 0;
+	cookie->processed_samples = 0;
+	
+	stream_reset(cookie);
+
+	// allocate memory for buffer descriptors
+	cookie->bd_area = alloc_mem(&bd_virt_base, &bd_phys_base, ICH_BD_COUNT * sizeof(ich_bd), 0, "ich_ac97 buffer descriptor");
+	if (cookie->bd_area < B_OK)
+		goto err;
+
+	// set physical buffer descriptor base address
+	ich_reg_write_32(cookie->regbase, (uint32)bd_phys_base);
+
+	// setup descriptor pointers
+	for (i = 0; i < ICH_BD_COUNT; i++)
+		cookie->bd[i] = (ich_bd *) ((char *)bd_virt_base + i * sizeof(ich_bd));
+		
+	return B_OK;
+	
+err:
+	free(cookie);
+	return B_ERROR;
+}
+
+
+status_t
+ichaudio_stream_detach(audio_drv_t *drv, void *_cookie)
+{
+	ichaudio_stream_cookie *cookie = (ichaudio_stream_cookie *)_cookie;
+
+	stream_reset(cookie);
+
+	if (cookie->buffer_area > 0) delete_area(cookie->buffer_area);
+	if (cookie->bd_area > 0) delete_area(cookie->bd_area);
+	free(cookie);
+	
+	return B_OK;
+}
+
+
+status_t
+ichaudio_stream_control(audio_drv_t *drv, void *_cookie, int op)
+{
+}
+
+
+status_t
+ichaudio_stream_set_buffers(audio_drv_t *drv, void *_cookie, uint32 *buffer_size, stream_buffer_desc_t *desc)
+{
+	ichaudio_stream_cookie *cookie = (ichaudio_stream_cookie *)_cookie;
+
+	void *buffer_virt_base;
+	void *buffer_phys_base;
+	area_id buffer_area;
+	int i;
+	
+	// round down (could force another size here)
+	*buffer_size &= ~3;
+	
+	// allocate memory buffers
+	buffer_area = alloc_mem(&buffer_virt_base, &buffer_phys_base, 2 * *buffer_size, B_READ_AREA | B_WRITE_AREA, "ich_ac97 buffers");
+
+	// report buffers
+	desc[0].base = (char *)buffer_virt_base;
+	desc[0].stride = 4;
+	desc[1].base = (char *)buffer_virt_base + 2;
+	desc[1].stride = 4;
+
+	// initalize buffer descriptors
+	for (i = 0; i < ICH_BD_COUNT; i++) {
+		cookie->bd[i].buffer = (uint32)buffer_phy_base + (i % 2) * *buffer_size;
+		cookie->bd[i].length = *buffer_size / GET_HW_SAMPLE_SIZE(cookie);
+		cookie->bd[i].flags = ICH_BDC_FLAG_IOC;
+	}
+
+	// free old buffer memory	
+	if (cookie->buffer_area > 0)
+		delete_area(cookie->buffer_area);
+		
+	cookie->buffer_area = buffer_area;
+	return B_OK;
+}
+
+
+status_t
+ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *_cookie, uint32 *frame_rate)
+{
 }
 

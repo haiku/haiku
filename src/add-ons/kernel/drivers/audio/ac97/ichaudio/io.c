@@ -32,96 +32,84 @@
 #include "ichaudio.h"
 #include "io.h"
 
-status_t ich_codec_wait(audio_drv_t *drv);
+status_t ich_codec_wait(ichaudio_cookie *cookie);
 
 uint8
-ich_reg_read_8(audio_drv_t *drv, int regno)
+ich_reg_read_8(ichaudio_cookie *cookie, int regno)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
-	if (drv->flags & TYPE_ICH4) 
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	if (cookie->flags & TYPE_ICH4) 
 		return *(uint8 *)((char *)cookie->mbbar + regno);
 	else
-		return drv->pci->read_io_8(cookie->nabmbar + regno);
+		return cookie->pci->read_io_8(cookie->nabmbar + regno);
 }
 
 uint16
-ich_reg_read_16(audio_drv_t *drv, int regno)
+ich_reg_read_16(ichaudio_cookie *cookie, int regno)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
-	if (drv->flags & TYPE_ICH4) 
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	if (cookie->flags & TYPE_ICH4) 
 		return *(uint16 *)((char *)cookie->mbbar + regno);
 	else
-		return drv->pci->read_io_16(cookie->nabmbar + regno);
+		return cookie->pci->read_io_16(cookie->nabmbar + regno);
 }
 
 uint32
-ich_reg_read_32(audio_drv_t *drv, int regno)
+ich_reg_read_32(ichaudio_cookie *cookie, int regno)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
 	
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		return *(uint32 *)((char *)cookie->mbbar + regno);
 	else
-		return drv->pci->read_io_32(cookie->nabmbar + regno);
+		return cookie->pci->read_io_32(cookie->nabmbar + regno);
 }
 
 void
-ich_reg_write_8(audio_drv_t *drv, int regno, uint8 value)
+ich_reg_write_8(ichaudio_cookie *cookie, int regno, uint8 value)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
 
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		*(uint8 *)((char *)cookie->mbbar + regno) = value;
 	else
-		drv->pci->write_io_8(cookie->nabmbar + regno, value);
+		cookie->pci->write_io_8(cookie->nabmbar + regno, value);
 }
 
 void
-ich_reg_write_16(audio_drv_t *drv, int regno, uint16 value)
+ich_reg_write_16(ichaudio_cookie *cookie, int regno, uint16 value)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
 
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		*(uint16 *)((char *)cookie->mbbar + regno) = value;
 	else
-		drv->pci->write_io_16(cookie->nabmbar + regno, value);
+		cookie->pci->write_io_16(cookie->nabmbar + regno, value);
 }
 
 void
-ich_reg_write_32(audio_drv_t *drv, int regno, uint32 value)
+ich_reg_write_32(ichaudio_cookie *cookie, int regno, uint32 value)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
-
 	ASSERT(regno >= 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 255) || regno <= 63);
 	
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		*(uint32 *)((char *)cookie->mbbar + regno) = value;
 	else
-		drv->pci->write_io_32(cookie->nabmbar + regno, value);
+		cookie->pci->write_io_32(cookie->nabmbar + regno, value);
 }
 
 status_t
-ich_codec_wait(audio_drv_t *drv)
+ich_codec_wait(ichaudio_cookie *cookie)
 {
 	int i;
 	for (i = 0; i < 1100; i++) {
-		if ((ich_reg_read_8(drv, ICH_REG_ACC_SEMA) & 0x01) == 0)
+		if ((ich_reg_read_8(cookie, ICH_REG_ACC_SEMA) & 0x01) == 0)
 			return B_OK;
 		if (i > 100)
 			snooze(1);
@@ -130,39 +118,39 @@ ich_codec_wait(audio_drv_t *drv)
 }
 
 uint16
-ich_codec_read(audio_drv_t *drv, int regno)
+ich_codec_read(void *_cookie, int regno)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
+	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 
 	ASSERT(regno >= 0);
 	ASSERT((regno & 1) == 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 
 	if (regno == 0x54) // intel uses 0x54 for GPIO access, we filter it!
 		return 0;
-	if (B_OK != ich_codec_wait(drv))
+	if (B_OK != ich_codec_wait(cookie))
 		PRINT(("semaphore timeout reading register %#x\n", regno));
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		return *(uint16 *)(((char *)cookie->mmbar) + regno);
 	else
-		return drv->pci->read_io_16(cookie->nambar + regno);
+		return cookie->pci->read_io_16(cookie->nambar + regno);
 }
 
 void
-ich_codec_write(audio_drv_t *drv, int regno, uint16 value)
+ich_codec_write(void *_cookie, int regno, uint16 value)
 {
-	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
+	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
 
 	ASSERT(regno >= 0);
 	ASSERT((regno & 1) == 0);
-	ASSERT(((drv->flags & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
+	ASSERT(((cookie->flags & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 
 	if (regno == 0x54) // intel uses 0x54 for GPIO access, we filter it!
 		return;
-	if (B_OK != ich_codec_wait(drv))
+	if (B_OK != ich_codec_wait(cookie))
 		PRINT(("semaphore timeout writing register %#x\n", regno));
-	if (drv->flags & TYPE_ICH4) 
+	if (cookie->flags & TYPE_ICH4) 
 		*(uint16 *)(((char *)cookie->mmbar) + regno) = value;
 	else
-		drv->pci->write_io_16(cookie->nambar + regno, value);
+		cookie->pci->write_io_16(cookie->nambar + regno, value);
 }

@@ -1,5 +1,6 @@
 #include <SupportDefs.h>
 #include "hardware.h"
+#include "lala/lala.h"
 
 typedef struct
 {
@@ -14,16 +15,37 @@ typedef struct
 	uint32 codecoffset;
 	uint32 input_rate;
 	uint32 output_rate;
+	
+	stream_id	po_stream_id;
+	stream_id	pi_stream_id;
+
+	pci_module_info *	pci;
+	uint32				flags;
 
 } ichaudio_cookie;
+
+
+typedef struct
+{
+	uint32				regbase;
+	ich_bd *			bd[ICH_BD_COUNT];
+	void *				buffer[ICH_BD_COUNT];
+
+	area_id				bd_area;
+	area_id				buffer_area;
+
+	volatile int		lastindex;
+	volatile int64		processed_samples;
+
+} ichaudio_stream_cookie;
 
 
 #define TYPE_ICH4			0x01
 #define TYPE_SIS7012		0x02
 
 /* The SIS7012 chipset has SR and PICB registers swapped when compared to Intel */
-#define	GET_REG_X_PICB(cfg)		(((cfg)->type == TYPE_SIS7012) ? _ICH_REG_X_SR : _ICH_REG_X_PICB)
-#define	GET_REG_X_SR(cfg)		(((cfg)->type == TYPE_SIS7012) ? _ICH_REG_X_PICB : _ICH_REG_X_SR)
+#define	GET_REG_X_PICB(cookie)		(((cookie)->flags & TYPE_SIS7012) ? _ICH_REG_X_SR : _ICH_REG_X_PICB)
+#define	GET_REG_X_SR(cookie)		(((cookie)->flags & TYPE_SIS7012) ? _ICH_REG_X_PICB : _ICH_REG_X_SR)
 /* Each 16 bit sample is counted as 1 in SIS7012 chipsets, 2 in all others */
-#define GET_HW_SAMPLE_SIZE(cfg)	(((cfg)->type == TYPE_SIS7012) ? 1 : 2)
+#define GET_HW_SAMPLE_SIZE(cookie)	(((cookie)->flags & TYPE_SIS7012) ? 1 : 2)
 

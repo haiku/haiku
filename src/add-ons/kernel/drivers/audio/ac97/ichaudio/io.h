@@ -30,15 +30,15 @@
 
 #include "lala/lala.h"
 
-uint8	ich_reg_read_8(audio_drv_t *drv, int regno);
-uint16	ich_reg_read_16(audio_drv_t *drv, int regno);
-uint32	ich_reg_read_32(audio_drv_t *drv, int regno);
+uint8	ich_reg_read_8(ichaudio_cookie *cookie, int regno);
+uint16	ich_reg_read_16(ichaudio_cookie *cookie, int regno);
+uint32	ich_reg_read_32(ichaudio_cookie *cookie, int regno);
 
-void	ich_reg_write_8(audio_drv_t *drv, int regno, uint8 value);
-void	ich_reg_write_16(audio_drv_t *drv, int regno, uint16 value);
-void	ich_reg_write_32(audio_drv_t *drv, int regno, uint32 value);
+void	ich_reg_write_8(ichaudio_cookie *cookie, int regno, uint8 value);
+void	ich_reg_write_16(ichaudio_cookie *cookie, int regno, uint16 value);
+void	ich_reg_write_32(ichaudio_cookie *cookie, int regno, uint32 value);
 
-uint16	ich_codec_read(audio_drv_t *drv, int regno);
-void	ich_codec_write(audio_drv_t *drv, int regno, uint16 value);
+uint16	ich_codec_read(void *_cookie, int regno);
+void	ich_codec_write(void *_cookie, int regno, uint16 value);
 
 #endif
