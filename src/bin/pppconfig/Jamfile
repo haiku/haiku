@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin pppconfig ;
+SubDir OBOS_TOP src bin pppconfig ;
 
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;

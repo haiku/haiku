@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bison lib ;
+SubDir OBOS_TOP src bin bison lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 

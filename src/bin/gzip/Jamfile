@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin gzip ;
+SubDir OBOS_TOP src bin gzip ;
 
 SubDirCcFlags -w ;
 

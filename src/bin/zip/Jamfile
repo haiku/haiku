@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin zip ;
+SubDir OBOS_TOP src bin zip ;
 
 local zip_rsrc = [ FGristFiles zip.rsrc ] ;
 ResComp $(zip_rsrc) : [ FGristFiles zip.rdef ] ;

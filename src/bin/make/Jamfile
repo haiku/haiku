@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin make ;
+SubDir OBOS_TOP src bin make ;
 
 # filter warnings we don't want here
 local originalCCFlags = $(CCFLAGS) ;
@@ -35,7 +35,7 @@ BinCommand make :
 	vpath.c
 : <make>libglob.a : make.rdef ;
 
-SubInclude OBOS_TOP src apps bin make glob ;
+SubInclude OBOS_TOP src bin make glob ;
 
 # restore CCFLAGS
 CCFLAGS = $(originalCCFlags) ;

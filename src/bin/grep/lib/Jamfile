@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin grep lib ;
+SubDir OBOS_TOP src bin grep lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 

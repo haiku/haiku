@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bash ;
+SubDir OBOS_TOP src bin bash ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"sh\"' -DCONF_HOSTTYPE='\"i586\"' -DCONF_OSTYPE='\"beos\"' -DCONF_MACHTYPE='\"i586-pc-beos\"' -DCONF_VENDOR='\"pc\"' -DSHELL ;
 
@@ -72,8 +72,8 @@ Includes [ FGristFiles trap.c ] : <bash>signames.h ;
 # some sources include the generated builtext.h
 Includes [ FGristFiles execute_cmd.c nojobs.c parse.c ] : <bash>builtext.h ;
 
-SubInclude OBOS_TOP src apps bin bash lib ;
-SubInclude OBOS_TOP src apps bin bash builtins ;
+SubInclude OBOS_TOP src bin bash lib ;
+SubInclude OBOS_TOP src bin bash builtins ;
 
 # restore CCFLAGS
 CCFLAGS = $(originalCCFlags) ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin coreutils lib ;
+SubDir OBOS_TOP src bin coreutils lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 

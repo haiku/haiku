@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin rcs ;
+SubDir OBOS_TOP src bin rcs ;
 
 SubDirCcFlags -w ;
 

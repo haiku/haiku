@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin strace ;
+SubDir OBOS_TOP src bin strace ;
 
 # We need our objects dir in the include paths.
 SetupObjectsDir ;

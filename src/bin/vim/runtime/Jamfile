@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin vim runtime ;
+SubDir OBOS_TOP src bin vim runtime ;
 
 # rules difference and glob-tree come from boost project
 #  (C) Copyright David Abrahams and Carlos Pinto Coelho 2001. Permission to 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bison data ;
+SubDir OBOS_TOP src bin bison data ;
 
 MakeLocate <etc>c.m4 : $(OBOS_ETC_DIR) ;
 File <etc>c.m4 : c.m4 ;

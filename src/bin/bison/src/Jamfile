@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bison src ;
+SubDir OBOS_TOP src bin bison src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H   -DPKGDATADIR=\'\"/etc\"\' -DLOCALEDIR=\'\"/etc/locale\"\' ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin zic ;
+SubDir OBOS_TOP src bin zic ;
 
 SubDirCcFlags -DNOID ;
 

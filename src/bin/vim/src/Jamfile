@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin vim src ;
+SubDir OBOS_TOP src bin vim src ;
 
 SubDirHdrs [ FDirName $(SUBDIR) proto ] ;
 SubDirHdrs [ FDirName $(SUBDIR) ] ;

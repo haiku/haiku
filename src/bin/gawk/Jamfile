@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin gawk ;
+SubDir OBOS_TOP src bin gawk ;
 
 # filter warnings we don't want here
 local originalCCFlags = $(CCFLAGS) ;
@@ -35,7 +35,7 @@ RelSymLink awk : gawk ;
 MakeLocate igawk : $(OBOS_BIN_DIR) ;
 RelSymLink igawk : gawk ;
 
-SubInclude OBOS_TOP src apps bin gawk intl ;
+SubInclude OBOS_TOP src bin gawk intl ;
 
 # restore CCFLAGS
 CCFLAGS = $(originalCCFlags) ;

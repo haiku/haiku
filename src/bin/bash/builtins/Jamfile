@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bash builtins ;
+SubDir OBOS_TOP src bin bash builtins ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 

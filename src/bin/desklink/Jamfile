@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin desklink ;
+SubDir OBOS_TOP src bin desklink ;
 
 AddResources desklink : desklink.rsrc ;
 

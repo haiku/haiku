@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin ping ;
+SubDir OBOS_TOP src bin ping ;
 
 UsePrivateHeaders net ;
 

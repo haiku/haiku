@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin traceroute ;
+SubDir OBOS_TOP src bin traceroute ;
 
 UsePrivateHeaders net ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin compress ;
+SubDir OBOS_TOP src bin compress ;
 
 SubDirCcFlags -DSACREDMEM=256000 -D_FPOS_T -DUSERMEM=2097152 -DBEOS=1 -w ;
 

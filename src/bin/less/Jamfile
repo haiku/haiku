@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin less ;
+SubDir OBOS_TOP src bin less ;
 
 # filter warnings we don't want here
 local originalCCFlags = $(CCFLAGS) ;

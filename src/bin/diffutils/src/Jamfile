@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin diffutils src ;
+SubDir OBOS_TOP src bin diffutils src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' -DPR_PROGRAM=\'\"/bin/pr\"\' -DDEFAULT_DIFF_PROGRAM=\'\"diff\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;

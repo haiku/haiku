@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin pc ;
+SubDir OBOS_TOP src bin pc ;
 
 BinCommand pc :
 	pc.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin bash lib tilde ;
+SubDir OBOS_TOP src bin bash lib tilde ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin sharutils lib ;
+SubDir OBOS_TOP src bin sharutils lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin diffutils lib ;
+SubDir OBOS_TOP src bin diffutils lib ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

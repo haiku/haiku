@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin grep src ;
+SubDir OBOS_TOP src bin grep src ;
 
 SubDirCcFlags -DHAVE_CONFIG_H -DLOCALEDIR='\"/boot/beos/share/locale\"' ;
 

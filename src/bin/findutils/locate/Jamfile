@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin findutils locate ;
+SubDir OBOS_TOP src bin findutils locate ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin make glob ;
+SubDir OBOS_TOP src bin make glob ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
 

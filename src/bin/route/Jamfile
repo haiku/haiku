@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src apps bin route ;
+SubDir OBOS_TOP src bin route ;
 
 UsePrivateHeaders net ;
 
