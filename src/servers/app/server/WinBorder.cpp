@@ -75,6 +75,8 @@
 //! TokenHandler object used to provide IDs for all WinBorder objects
 TokenHandler	border_token_handler;
 
+bool			gMouseDown = false;
+
 //---------------------------------------------------------------------------
 WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel,
 		const int32 flags, ServerWindow *win, DisplayDriver *driver)
@@ -89,6 +91,12 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
 	fDecFull		= NULL;
+
+	fIsMoving		= false;
+	fIsResizing		= false;
+	fIsClosing		= false;
+	fIsMinimizing	= false;
+	fIsZooming		= false;
 
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
@@ -137,17 +145,147 @@ void WinBorder::RebuildFullRegion(void){
 //---------------------------------------------------------------------------
 void WinBorder::MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers)
 {
-	// this is important to determine how much we should resize or move the Layer(WinBorder)(window)	
+	// this is important to determine how much we should resize or move the Layer(WinBorder)(window)
+
+	// user clicked on WinBorder's visible region, which is in fact decorator's.
+	// so, if true, we find out if the user clicked the decorator.
+	Layer	*target = LayerAt(pt);
+	if (target == this){
+		click_type		action;
+		// find out where user clicked in Decorator
+		action			= fDecorator->Clicked(pt, buttons, modifiers);
+		switch(action){
+/*
+TODO: add methods like DrawCloseBtnDown(true/false) to let Decorator draw "down" buttoms
+	for closing and zooming for example. Call them here!
+*/
+			case DEC_CLOSE:
+				fIsClosing = true;
+//				fDecorator->DrawClosingBtnDown(true);
+STRACE_CLICK(("===> DEC_CLOSE\n"));
+				break;
+			case DEC_ZOOM:
+				fIsZooming = true;
+//				fDecorator->DrawZoomBtnDown(true);
+STRACE_CLICK(("===> DEC_ZOOM\n"));
+				break;
+			case DEC_RESIZE:
+				fIsResizing = true;
+//				fDecorator->DrawResizingBtnDown(true);
+STRACE_CLICK(("===> DEC_RESIZE\n"));
+				break;
+			case DEC_DRAG:
+				fIsMoving = true;
+//				fDecorator->DrawMovingBtnDown(true);
+STRACE_CLICK(("===> DEC_DRAG\n"));
+				break;
+			case DEC_MOVETOBACK:
+				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
+				break;
+			case DEC_NONE:
+				debugger("WinBorder::MouseDown - Decorator should NOT return DEC_NONE\n");
+				break;
+			default:
+				debugger("WinBorder::MouseDown - Decorator returned UNKNOWN code\n");
+				break;
+		}
+	}
+	else{
+/*
+TODO: implement!
+	The problem here is that, there is no way to get the required data for the B_MOUSE_DOWN
+	message. There should be a method like BWindow::CurrentMessage() to get the input message
+	parameters. The problem is that Poller currently use PortLink message system, and there
+	is no way to get the paramets we need(e.g. when, noOfClicks).
+	This yelds PortLink messages from input_server to be replaced by regulat BMessages!!!
+*/
+/*		BMessage	msg;
+		msg->what		= B_MOUSE_DOWN;
+		msg->AddInt64("when", when);
+		msg->AddPoint("where", where);
+		msg->AddInt32("modifiers", modifiers);
+		msg->AddInt32("buttons", buttons);
+		msg->AddInt32("clicks", noOfClicks);
+		
+		msg->AddInt32("token", token); ??? // Have a look into BLooper::task_looper()!!!
+		Window()->SendMessageToClient(msg);
+*/
+	}
+	
 	fLastMousePosition		= pt;
 }
 //---------------------------------------------------------------------------
 void WinBorder::MouseMoved(const BPoint &pt, const int32 &buttons)
 {
+	if (fIsMoving){
+STRACE_CLICK(("===> Moving...\n"));
+		BPoint		offset = pt;
+		offset		-= fLastMousePosition;
+		MoveBy(offset.x, offset.y);
+		goto MMend;
+	}
+	if (fIsResizing){
+STRACE_CLICK(("===> Resizing...\n"));
+		BPoint		offset = pt;
+		offset		-= fLastMousePosition;
+		ResizeBy(offset.x, offset.y);
+		goto MMend;
+	}
+	if (fIsZooming){
+/*
+TODO: implement!
+	Add what you need to the Decorator API.
+
+		if (fDecorator->GetZoomRegion().Contains(pt)){
+			// do nothing! Mouse still inside the zooming region.
+		}
+		else{
+			fDecorator->DrawZoomBtnDown(false);
+		}
+		goto MMend;
+*/
+	}
+	if (fIsClosing){
+/*
+TODO: implement!
+	Add what you need to the Decorator API.
+
+		if (fDecorator->GetZoomRegion().Contains(pt)){
+			// do nothing! Mouse still inside the zooming region.
+		}
+		else{
+			fDecorator->DrawCloseBtnDown(false);
+		}
+		goto MMend;
+*/
+	}
+
+	MMend:
 	fLastMousePosition		= pt;
 }
 //---------------------------------------------------------------------------
 void WinBorder::MouseUp(const BPoint &pt, const int32 &modifiers)
 {
+	if (fIsMoving){
+		fIsMoving	= false;
+//		DrawMovingBtnDown(false);
+		return;
+	}
+	if (fIsResizing){
+		fIsResizing	= false;
+//		DrawResisingBtnDown(false);
+		return;
+	}
+	if (fIsZooming){
+		fIsZooming	= false;
+//		DrawZoomBtnDown(false);
+		return;
+	}
+	if (fIsClosing){
+		fIsClosing	= false;
+//		DrawCloseBtnDown(false);
+		return;
+	}
 }
 //---------------------------------------------------------------------------
 void WinBorder::HighlightDecorator(const bool &active)
@@ -159,21 +297,19 @@ void WinBorder::Draw(const BRect &r)
 {
 printf("WinBorder(%s)::Draw()\n", GetName());
 	if(fDecorator){
-		BRegion		reg(r);
-		reg.IntersectWith(fDecFull);
-		if (reg.CountRects() > 0){
-			// restrict Decorator drawing to the update region only.
-			fDriver->ConstrainClippingRegion(&fUpdateReg);
+		// restrict Decorator drawing to the update region only.
+		fDriver->ConstrainClippingRegion(&fUpdateReg);
+/*
 fUpdateReg.PrintToStream();
 RGBColor		c(128, 56, 98);
 fDriver->FillRect(r, c);
 snooze(1000000);
-			// NOTE: r is NOT transformed from Screen coordinates
-			fDecorator->Draw(r);
+*/
+		// NOTE: r is NOT transformed from Screen coordinates
+		fDecorator->Draw(r);
 
-			// remove the additional clipping region.
-			fDriver->ConstrainClippingRegion(NULL);
-		}
+		// remove the additional clipping region.
+		fDriver->ConstrainClippingRegion(NULL);
 	}
 }
 //---------------------------------------------------------------------------

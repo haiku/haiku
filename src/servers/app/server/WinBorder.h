@@ -90,12 +90,11 @@ protected:
 			BRegion				*fDecFull;
 
 			WinBorder			*fMainWinBorder;
-/*			bool				fIsMoving;
+			bool				fIsMoving;
 			bool				fIsResizing;
 			bool				fIsClosing;
 			bool				fIsMinimizing;
 			bool				fIsZooming;
-*/
 };
 
 #endif
