@@ -2027,6 +2027,8 @@ static file_system_info sBeFileSystem = {
 
 	&bfs_ioctl,
 	&bfs_set_flags,
+	NULL,	// &bfs_select
+	NULL,	// &bfs_deselect
 	&bfs_fsync,
 
 	&bfs_read_link,

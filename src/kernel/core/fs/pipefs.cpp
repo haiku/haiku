@@ -1439,6 +1439,24 @@ pipefs_set_flags(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, int flag
 }
 
 
+static status_t
+pipefs_select(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
+	uint32 ref, selectsync *sync)
+{
+	// ToDo: Implement!
+	return notify_select_event(sync, ref, event);
+}
+
+
+static status_t
+pipefs_deselect(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
+	selectsync *sync)
+{
+	// ToDo: Implement!
+	return B_OK;
+}
+
+
 static bool
 pipefs_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
 {
@@ -1587,6 +1605,8 @@ file_system_info gPipeFileSystem = {
 	/* common */
 	&pipefs_ioctl,
 	&pipefs_set_flags,
+	&pipefs_select,
+	&pipefs_deselect,
 	&pipefs_fsync,
 
 	NULL,	// fs_read_link()

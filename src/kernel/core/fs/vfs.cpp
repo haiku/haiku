@@ -187,6 +187,10 @@ static status_t file_write(struct file_descriptor *, off_t pos, const void *buff
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
 static status_t file_close(struct file_descriptor *);
+static status_t file_select(struct file_descriptor *, uint8 event, uint32 ref,
+	struct select_sync *sync);
+static status_t file_deselect(struct file_descriptor *, uint8 event,
+	struct select_sync *sync);
 static status_t dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
@@ -230,8 +234,8 @@ static struct fd_ops sFileOps = {
 	file_write,
 	file_seek,
 	common_ioctl,
-	NULL,		// select()
-	NULL,		// deselect()
+	file_select,
+	file_deselect,
 	NULL,		// read_dir()
 	NULL,		// rewind_dir()
 	common_read_stat,
@@ -3145,6 +3149,37 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 		return B_BAD_VALUE;
 
 	return descriptor->pos = pos;
+}
+
+
+static status_t
+file_select(struct file_descriptor *descriptor, uint8 event, uint32 ref,
+	struct select_sync *sync)
+{
+	FUNCTION(("file_select(%p, %u, %lu, %p)\n", descriptor, event, ref, sync));
+
+	struct vnode *vnode = descriptor->u.vnode;
+
+	// If the FS has no select() hook, notify select() now.
+	if (FS_CALL(vnode, select) == NULL)
+		return notify_select_event((selectsync*)sync, ref, event);
+
+	return FS_CALL(vnode, select)(vnode->mount->cookie, vnode->private_node,
+		descriptor->cookie, event, ref, (selectsync*)sync);
+}
+
+
+static status_t
+file_deselect(struct file_descriptor *descriptor, uint8 event,
+	struct select_sync *sync)
+{
+	struct vnode *vnode = descriptor->u.vnode;
+
+	if (FS_CALL(vnode, deselect) == NULL)
+		return B_OK;
+
+	return FS_CALL(vnode, deselect)(vnode->mount->cookie, vnode->private_node,
+		descriptor->cookie, event, (selectsync*)sync);
 }
 
 

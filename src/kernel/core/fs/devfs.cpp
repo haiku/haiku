@@ -1364,6 +1364,44 @@ devfs_set_flags(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, int flags)
 }
 
 
+static status_t
+devfs_select(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
+	uint32 ref, selectsync *sync)
+{
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
+
+	if (!S_ISCHR(vnode->stream.type))
+		return B_NOT_ALLOWED;
+
+	// If the device has no select() hook, notify select() now.
+	if (!vnode->stream.u.dev.info->select)
+		return notify_select_event((selectsync*)sync, ref, event);
+
+	return vnode->stream.u.dev.info->select(cookie->u.dev.dcookie, event, ref,
+		(selectsync*)sync);
+}
+
+
+static status_t
+devfs_deselect(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
+	selectsync *sync)
+{
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
+
+	if (!S_ISCHR(vnode->stream.type))
+		return B_NOT_ALLOWED;
+
+	// If the device has no select() hook, notify select() now.
+	if (!vnode->stream.u.dev.info->deselect)
+		return B_OK;
+
+	return vnode->stream.u.dev.info->deselect(cookie->u.dev.dcookie, event,
+		(selectsync*)sync);
+}
+
+
 static bool
 devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 {
@@ -1545,6 +1583,8 @@ file_system_info gDeviceFileSystem = {
 	/* common */
 	&devfs_ioctl,
 	&devfs_set_flags,
+	&devfs_select,
+	&devfs_deselect,
 	&devfs_fsync,
 
 	&devfs_read_link,

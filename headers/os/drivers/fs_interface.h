@@ -17,6 +17,7 @@
 struct dirent;
 struct stat;
 struct fs_info;
+struct select_sync;
 
 typedef dev_t mount_id;
 typedef ino_t vnode_id;
@@ -83,6 +84,10 @@ typedef struct file_system_info {
 	/* common operations */
 	status_t (*ioctl)(fs_volume fs, fs_vnode v, fs_cookie cookie, ulong op, void *buffer, size_t length);
 	status_t (*set_flags)(fs_volume fs, fs_vnode v, fs_cookie cookie, int flags);
+	status_t (*select)(fs_volume fs, fs_vnode v, fs_cookie cookie, uint8 event,
+				uint32 ref, selectsync *sync);
+	status_t (*deselect)(fs_volume fs, fs_vnode v, fs_cookie cookie,
+				uint8 event, selectsync *sync);
 	status_t (*fsync)(fs_volume fs, fs_vnode v);
 
 	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);

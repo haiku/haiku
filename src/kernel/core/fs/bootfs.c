@@ -979,6 +979,8 @@ file_system_info gBootFileSystem = {
 	/* common */
 	&bootfs_ioctl,
 	NULL,	// set_flags
+	NULL,	// select
+	NULL,	// deselect
 	&bootfs_fsync,
 
 	NULL,	// read_link
