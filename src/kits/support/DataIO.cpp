@@ -395,25 +395,23 @@ BMallocIO::SetSize(off_t size)
 		// size == 0, free the memory
 		free(fData);
 		fData = NULL;
-		fLength = 0;
 	} else {
 		// size != 0, see, if necessary to resize
-		size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
-		if (newSize != fMallocSize) {
+		size = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
+		if (size != fMallocSize) {
 			// we need to resize
-			if (char *newData = static_cast<char*>(realloc(fData, newSize))) {
+			if (char *newData = static_cast<char*>(realloc(fData, size))) {
 				// set the new area to 0
-				if (newSize > fMallocSize)
-					memset(newData + fMallocSize, 0, newSize - fMallocSize);
-				if (fLength > newSize)
-					fLength = newSize;
+				if (size > fMallocSize)
+					memset(newData + fMallocSize, 0, size - fMallocSize);				
 				fData = newData;
-				fMallocSize = newSize;
+				fMallocSize = size;
 			} else	// couldn't alloc the memory
 				error = B_NO_MEMORY;
 		}
 	}
-			
+	if (error == B_OK)
+		fLength = size;	
 	return error;
 }
 
