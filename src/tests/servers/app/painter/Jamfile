@@ -2,9 +2,9 @@ SubDir OBOS_TOP src tests servers app painter ;
 
 UseLibraryHeaders agg ;
 UsePrivateHeaders [ FDirName servers app ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter drawing_modes ] ;
-UseHeaders [ FDirName $(OBOS_TOP) src servers app server Painter font_support ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app Painter ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app Painter drawing_modes ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 SimpleTest Painter :
@@ -41,19 +41,19 @@ SEARCH on [ FGristFiles
 	ServerFont.cpp
 	SystemPalette.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app server ] ;
+	= [ FDirName $(OBOS_TOP) src servers app ] ;
 
 SEARCH on [ FGristFiles
 	Painter.cpp
 	ShapeConverter.cpp
 	Transformable.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app server Painter ] ;
+	= [ FDirName $(OBOS_TOP) src servers app Painter ] ;
 
 SEARCH on [ FGristFiles
 	DrawingModeFactory.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app server Painter drawing_modes ] ;
+	= [ FDirName $(OBOS_TOP) src servers app Painter drawing_modes ] ;
 
 SEARCH on [ FGristFiles
 	agg_font_freetype.cpp
@@ -61,5 +61,5 @@ SEARCH on [ FGristFiles
 	FontManager.cpp
 	TextRenderer.cpp
 	]
-	= [ FDirName $(OBOS_TOP) src servers app server Painter font_support ] ;
+	= [ FDirName $(OBOS_TOP) src servers app Painter font_support ] ;
 
