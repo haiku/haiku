@@ -51,6 +51,9 @@ Painter::Painter()
 	  fOrigin(0.0, 0.0),
 	  fClippingRegion(NULL),
 	  fDrawingMode(B_OP_COPY),
+	  fAlphaSrcMode(B_PIXEL_ALPHA),
+//	  fAlphaSrcMode(B_CONSTANT_ALPHA),
+	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
 	  fPatternHandler(new PatternHandler()),
 	  fFont(be_plain_font),
@@ -87,7 +90,9 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 						buffer->BytesPerRow());
 
 		fPixelFormat = new pixfmt(*fBuffer, fPatternHandler);
-		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode));
+		fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
+																		  fAlphaSrcMode,
+																		  fAlphaFncMode));
 
 		fBaseRenderer = new renderer_base(*fPixelFormat);
 
@@ -242,7 +247,22 @@ Painter::SetDrawingMode(drawing_mode mode)
 	if (fDrawingMode != mode) {
 		fDrawingMode = mode;
 		if (fPixelFormat) {
-			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode));
+			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
+																			  fAlphaSrcMode,
+																			  fAlphaFncMode));
+		}
+	}
+}
+
+// SetBlendingMode
+void
+Painter::SetBlendingMode(source_alpha alphaSrcMode, alpha_function alphaFncMode)
+{
+	if (fAlphaSrcMode != alphaSrcMode || fAlphaFncMode != alphaFncMode) {
+		if (fDrawingMode == B_OP_ALPHA && fPixelFormat) {
+			fPixelFormat->set_drawing_mode(DrawingModeFactory::DrawingModeFor(fDrawingMode,
+																			  fAlphaSrcMode,
+																			  fAlphaFncMode));
 		}
 	}
 }
