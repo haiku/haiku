@@ -69,10 +69,10 @@ private:
 	
 	thread_id fThread;
 	int fFd;
-	bool fQuit;
 			
 	mouse_settings	fSettings;
 
+	static bool sQuit;
 	static FILE *sLogFile;
 
 	static int32 DeviceWatcher(void *arg);

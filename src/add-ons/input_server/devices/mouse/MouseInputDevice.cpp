@@ -37,6 +37,7 @@
 #endif
 
 FILE *MouseInputDevice::sLogFile = NULL;
+bool MouseInputDevice::sQuit = false;
 
 // TODO: These are "stolen" from the kb_mouse driver on bebits, which uses
 // the same protocol as BeOS one. They're just here to test this add-on with
@@ -59,6 +60,13 @@ struct mouse_movement {
 };
 
 
+struct mouse_device {
+	int driver_fd;
+	thread_id device_watcher;
+	uint32 buttons_state;
+};
+
+
 extern "C"
 BInputServerDevice *
 instantiate_input_device()
@@ -69,7 +77,7 @@ instantiate_input_device()
 
 MouseInputDevice::MouseInputDevice()
 	: 	fThread(-1),
-		fQuit(false)
+		sQuit(false)
 {
 	// TODO: Open "/dev/input/mouse/serial/0" as well, and what about USB mouses ?
 	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
@@ -78,7 +86,8 @@ MouseInputDevice::MouseInputDevice()
 			B_FIRST_REAL_TIME_PRIORITY+4, this);
 
 #if DEBUG
-	sLogFile = fopen("/var/log/mouse_device_log.log", "w");
+	if (sLogFile == NULL)
+		sLogFile = fopen("/var/log/mouse_device_log.log", "w");
 #endif
 }
 
@@ -220,11 +229,10 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	mouse_movement movements;
 	BMessage *message;
 	char log[128];
-	while (!dev->fQuit) {
+	while (!sQuit) {
 		if (ioctl(dev->fFd, kGetMouseMovements, &movements) < B_OK)
 			continue;
 		
-		// TODO: send B_MOUSE_UP/B_MOUSE_DOWN messages
 		uint32 buttons = dev->fButtons ^ movements.buttons;
 	
 		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld\n", 
@@ -269,7 +277,6 @@ MouseInputDevice::DeviceWatcher(void *arg)
 				dev->EnqueueMessage(message);
 			}
 		}
-		snooze(1000);
 	}
 	
 	return 0;
