@@ -1736,6 +1736,18 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			}
 			break;
 		}
+		case AS_LAYER_INVERT_RECT:
+		{
+			DTRACE(("ServerWindow %s: Message AS_INVERT_RECT\n",fTitle.String()));
+			
+			// TODO: Add clipping TO AS_INVERT_RECT
+			BRect rect;
+			link.Read<BRect>(&rect);
+			
+			if (cl && cl->fLayerData)
+				desktop->GetDisplayDriver()->InvertRect(cl->ConvertToTop(rect));
+			break;
+		}
 		case AS_STROKE_RECT:
 		{
 			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fTitle.String()));
@@ -2202,9 +2214,43 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 			fMsgSender->Flush();
 			break;
 		}
+		case AS_LAYER_DRAG_IMAGE:
+		{
+			STRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_IMAGE unimplemented\n",fTitle.String()));
+			break;
+		}
+		case AS_LAYER_DRAG_RECT:
+		{
+			STRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_DRAG_RECT unimplemented\n",fTitle.String()));
+			break;
+		}
+		case AS_LAYER_GET_MOUSE_COORDS:
+		{
+			STRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_GET_MOUSE_COORDS unimplemented\n",fTitle.String()));
+			// Attached Data:
+			// 1) port_id reply port
+			
+			// Returns
+			// 1) BPoint mouse location
+			// 2) int32 button state
+			
+			// For now, it's unimplemented, but this is a synchronous call, so to prevent debugging of
+			// applications which make this call, we'll reply with a SERVER_FALSE until it is implemeneted
+			
+			port_id replyport;
+			link.Read<port_id>(&replyport);
+			
+			BPortLink replylink(replyport);
+			replylink.StartMessage(SERVER_FALSE);
+			replylink.Flush();
+			break;
+		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), code - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %ld\n",fTitle.String(), code - SERVER_TRUE);
 			break;
 		}
 	}
