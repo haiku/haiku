@@ -2300,7 +2300,7 @@ MimeTypeTest::SupportingAppsTest() {
 		msg.PrintToStream();
 	} */
 	NextSubTest();
-	if (true)	// Doesn't quite work right yet.
+	if (true)	
 	{
 		std::set<std::string> typeList;							// Stores all installed MIME types
 		std::set<std::string> appList;							// Stores all installed application subtypes
@@ -2377,7 +2377,8 @@ MimeTypeTest::SupportingAppsTest() {
 				}
 			}
 		}
-		
+
+#if !TEST_R5		
 		// Now, add in all the types listed in MIME_DB_DIR/__mime_table
 		{
 			BEntry entry((std::string(mimeDatabaseDir) + "/__mime_table").c_str());
@@ -2406,6 +2407,7 @@ MimeTypeTest::SupportingAppsTest() {
 				}
 			}
 		}
+#endif
 		
 		// For each installed type, get a list of the supported apps, and
 		// verify that the list matches the list we generated. Also check
@@ -2465,7 +2467,7 @@ MimeTypeTest::WildcardAppsTest() {
 #if TEST_R5
 		CHK(BMimeType::GetWildcardApps(NULL) == B_OK);			// R5 == B_OK (???)
 #else
-		CHK(RES(BMimeType::GetWildcardApps(NULL)) != B_OK);		// Personally I think we ought to return B_BAD_VALUE
+		CHK(BMimeType::GetWildcardApps(NULL) == B_BAD_VALUE);		
 #endif
 	}
 	// Normal function (compare to BMimeType("application/octet-stream").GetSupportingApps())
