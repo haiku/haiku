@@ -47,7 +47,7 @@ class Expression {
 
 class Query {
 	public:
-		Query(Volume *volume,Expression *expression);
+		Query(Volume *volume, Expression *expression, uint32 flags);
 		~Query();
 
 		status_t GetNextEntry(struct dirent *,size_t size);
@@ -65,6 +65,7 @@ class Query {
 		Index			fIndex;
 		Stack<Equation *> fStack;
 
+		uint32			fFlags;
 		port_id			fPort;
 		int32			fToken;
 
