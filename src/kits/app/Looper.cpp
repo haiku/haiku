@@ -93,7 +93,7 @@ team_id			BLooper::sTeamID = B_ERROR;
 static property_info gLooperPropInfo[] =
 {
 	{
-		"Handler"
+		"Handler",
 			{},
 			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
 			// TODO: what is the extra_data for?
@@ -103,7 +103,7 @@ static property_info gLooperPropInfo[] =
 			{}
 	},
 	{
-		"Handlers"
+		"Handlers",
 			{B_GET_PROPERTY},
 			{B_DIRECT_SPECIFIER},
 			NULL, 0,
@@ -112,7 +112,7 @@ static property_info gLooperPropInfo[] =
 			{}
 	},
 	{
-		"Handler"
+		"Handler",
 			{B_COUNT_PROPERTIES},
 			{B_DIRECT_SPECIFIER},
 			NULL, 0,

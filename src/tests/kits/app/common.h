@@ -27,13 +27,11 @@
     	strerror(condition),\
         __LINE__, __FILE__))
 
-#define ADD_TEST(suitename, classname, funcname)				\
-	(suitename)->addTest(new TestCaller<classname>((#funcname),	\
-						 &classname::funcname));
-
 #define ADD_TEST4(classbeingtested, suitename, classname, funcname)				\
 	(suitename)->addTest(new TestCaller<classname>((#classbeingtested "::" #funcname),	\
 						 &classname::funcname));
+
+#define ADD_TEST ADD_TEST4
 
 #define CHECK_ERRNO														\
 	cout << endl << "errno == \"" << strerror(errno) << "\" (" << errno	\

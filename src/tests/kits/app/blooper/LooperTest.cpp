@@ -6,6 +6,8 @@
 #include "CountHandlersTest.h"
 #include "HandlerAtTest.h"
 #include "AddHandlerTest.h"
+#include "PerformTest.h"
+#include "RunTest.h"
 
 Test* LooperTestSuite()
 {
@@ -17,6 +19,8 @@ Test* LooperTestSuite()
 	tests->addTest(TCountHandlersTest::Suite());
 	tests->addTest(THandlerAtTest::Suite());
 	tests->addTest(TAddHandlerTest::Suite());
+	tests->addTest(TPerformTest::Suite());
+	tests->addTest(TRunTest::Suite());
 
 	return tests;
 }

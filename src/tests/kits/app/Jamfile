@@ -31,7 +31,9 @@ CommonTestLib libapptest.so
 		HandlerAtTest.cpp
 		IndexOfTest.cpp
 		IsMessageWaitingTest.cpp
-		RemoveHandlerTest.cpp       		
+		RemoveHandlerTest.cpp
+		PerformTest.cpp
+		RunTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp

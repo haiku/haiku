@@ -1,23 +1,31 @@
-BLooper(const char* name = NULL,
-		int32 priority = B_NORMAL_PRIORITY,
-		int32 port_capacity = B_LOOPER_PORT_DEFAULT_CAPACITY);
-~BLooper();
-BLooper(BMessage* data);
-Instantiate(BMessage* data);
-Archive(BMessage* data, bool deep = true) const;
-PostMessage(uint32 command);
-PostMessage(BMessage* message);
-PostMessage(uint32 command,
-			BHandler* handler,
-			BHandler* reply_to = NULL);
-PostMessage(BMessage* message,
-			BHandler* handler,
-			BHandler* reply_to = NULL);
-DispatchMessage(BMessage* message, BHandler* handler);
-MessageReceived(BMessage* msg);
-CurrentMessage() const;
-DetachCurrentMessage();
-MessageQueue() const;
+BLooper(const char* name, int32 priority, int32 port_capacity)
+--------------
+~BLooper()
+--------------
+BLooper(BMessage* data)
+--------------
+Instantiate(BMessage* data)
+--------------
+Archive(BMessage* data, bool deep) const
+--------------
+PostMessage(uint32 command)
+--------------
+PostMessage(BMessage* message)
+--------------
+PostMessage(uint32 command, BHandler* handler, BHandler* reply_to)
+--------------
+PostMessage(BMessage* message, BHandler* handler, BHandler* reply_to);
+--------------
+DispatchMessage(BMessage* message, BHandler* handler)
+--------------
+MessageReceived(BMessage* msg)
+--------------
+CurrentMessage() const
+--------------
+DetachCurrentMessage()
+--------------
+MessageQueue() const
+--------------
 
 IsMessageWaiting()
 --------------
@@ -67,27 +75,45 @@ Run();
 --------------
 case 1: Attempt to call Run() twice
 
-Quit();
-QuitRequested();
-Lock();
-Unlock();
-IsLocked() const;
-LockWithTimeout(bigtime_t timeout);
-Thread() const;
-Team() const;
-LooperForThread(thread_id tid);
-LockingThread() const;
-CountLocks() const;
-CountLockRequests() const;
-Sem() const;
-ResolveSpecifier(BMessage* msg,
-				 int32 index,
-				 BMessage* specifier,
-				 int32 form,
-				 const char* property);
-GetSupportedSuites(BMessage* data);
-AddCommonFilter(BMessageFilter* filter);
-RemoveCommonFilter(BMessageFilter* filter);
-SetCommonFilterList(BList* filters);
-CommonFilterList() const;
-Perform(perform_code d, void* arg);
+Quit()
+--------------
+QuitRequested()
+--------------
+Lock()
+--------------
+Unlock()
+--------------
+IsLocked() const
+--------------
+LockWithTimeout(bigtime_t timeout)
+--------------
+Thread() const
+--------------
+Team() const
+--------------
+LooperForThread(thread_id tid)
+--------------
+LockingThread() const
+--------------
+CountLocks() const
+--------------
+CountLockRequests() const
+--------------
+Sem() const
+--------------
+ResolveSpecifier(BMessage* msg, int32 index, BMessage* specifier, int32 form, const char* property);
+--------------
+GetSupportedSuites(BMessage* data)
+--------------
+AddCommonFilter(BMessageFilter* filter)
+--------------
+RemoveCommonFilter(BMessageFilter* filter)
+--------------
+SetCommonFilterList(BList* filters)
+--------------
+CommonFilterList() const
+--------------
+
+Perform(perform_code d, void* arg)
+--------------
+case 1:	returns B_ERROR;

@@ -41,6 +41,7 @@
 #include <File.h>
 #include <Locker.h>
 #include <Path.h>
+#include <PropertyInfo.h>
 #include <RegistrarDefs.h>
 #include <Roster.h>
 
