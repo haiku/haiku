@@ -40,6 +40,7 @@ KernelLd kernel :
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
 	kernel_posix_unistd.o
+	kernel_posix_time.o
 	posix_string.o
 	:
 	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
@@ -71,6 +72,7 @@ KernelLd kernel.so :
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
 	kernel_posix_unistd.o
+	kernel_posix_time.o
 	posix_string.o
 	:
 	$(SUBDIR)/core/arch/$(OBOS_ARCH)/kernel.ld 
@@ -104,6 +106,7 @@ KernelLd libroot.so :
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
+	posix_time.o
 	posix_unistd.o
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/library.ld
