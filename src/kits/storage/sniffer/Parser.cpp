@@ -584,7 +584,7 @@ TokenStream::SetTo(const std::string &string) {
 					AddToken(CaseInsensitiveFlag, startPos);
 					state = tsssStart;				
 				} else
-					throw new Err(std::string("Sniffer pattern error: incomplete signed number"), pos);
+					throw new Err(std::string("Sniffer pattern error: incomplete signed number or invalid flag"), pos);
 				break;
 
 			case tsssLonelyFloatExtension:
