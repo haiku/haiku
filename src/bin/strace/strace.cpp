@@ -42,7 +42,8 @@ extern void get_syscalls17(vector<Syscall*> &syscalls);
 extern void get_syscalls18(vector<Syscall*> &syscalls);
 extern void get_syscalls19(vector<Syscall*> &syscalls);
 
-static const char *kDefaultCommandName = "strace";
+extern const char *__progname;
+static const char *kCommandName = __progname;
 
 // usage
 static const char *kUsage =
@@ -88,13 +89,8 @@ static map<string, Syscall*>	sSyscallMap;
 void
 print_usage(bool error)
 {
-	// get nice program name
-	const char *programName = (sArgc > 0 ? sArgv[0] : kDefaultCommandName);
-	if (const char *lastSlash = strrchr(programName, '/'))
-		programName = lastSlash + 1;
-
 	// print usage
-	fprintf((error ? stderr : stdout), kUsage, programName);
+	fprintf((error ? stderr : stdout), kUsage, kCommandName);
 }
 
 // print_usage_and_exit
@@ -212,8 +208,8 @@ set_team_debugging_flags(port_id nubPort, int32 flags)
 			return;
 
 		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "Failed to set team debug flags: %s\n",
-				strerror(error));
+			fprintf(stderr, "%s: Failed to set team debug flags: %s\n",
+				kCommandName, strerror(error));
 			exit(1);
 		}
 	}
@@ -235,8 +231,8 @@ set_thread_debugging_flags(port_id nubPort, thread_id thread, int32 flags)
 			return;
 
 		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "Failed to set thread debug flags: %s\n",
-				strerror(error));
+			fprintf(stderr, "%s: Failed to set thread debug flags: %s\n",
+				kCommandName, strerror(error));
 			exit(1);
 		}
 	}
@@ -259,8 +255,8 @@ continue_thread(port_id nubPort, thread_id thread)
 			return;
 
 		if (error != B_INTERRUPTED) {
-			fprintf(stderr, "Failed to run thread %ld: %s\n",
-				thread, strerror(error));
+			fprintf(stderr, "%s: Failed to run thread %ld: %s\n",
+				kCommandName, thread, strerror(error));
 			exit(1);
 		}
 	}
@@ -460,8 +456,8 @@ main(int argc, const char *const *argv)
 
 				outputFile = fopen(filename, "w+");
 				if (outputFile == NULL) {
-					fprintf(stderr, "Could not open `%s': %s\n", filename,
-						strerror(errno));
+					fprintf(stderr, "%s: Could not open `%s': %s\n",
+						kCommandName, filename, strerror(errno));
 					exit(1);
 				}
 			} else {
@@ -495,8 +491,8 @@ main(int argc, const char *const *argv)
 		// we've been given an executable and need to load it
 		thread = load_program(programArgs, programArgCount, traceLoading);
 		if (thread < 0) {
-			fprintf(stderr, "Failed to start `%s': %s\n", programArgs[0],
-				strerror(thread));
+			fprintf(stderr, "%s: Failed to start `%s': %s\n", kCommandName,
+				programArgs[0], strerror(thread));
 			exit(1);
 		}
 	}		
@@ -506,8 +502,8 @@ main(int argc, const char *const *argv)
 		thread_info threadInfo;
 		status_t error = get_thread_info(thread, &threadInfo);
 		if (error != B_OK) {
-			fprintf(stderr, "Failed to get info for thread %ld: %s\n", thread,
-				strerror(error));
+			fprintf(stderr, "%s: Failed to get info for thread %ld: %s\n",
+				kCommandName, thread, strerror(error));
 			exit(1);
 		}
 		team = threadInfo.team;
@@ -516,16 +512,16 @@ main(int argc, const char *const *argv)
 	// create a debugger port
 	port_id debuggerPort = create_port(10, "debugger port");
 	if (debuggerPort < 0) {
-		fprintf(stderr, "Failed to create debugger port: %s\n",
-			strerror(debuggerPort));
+		fprintf(stderr, "%s: Failed to create debugger port: %s\n",
+			kCommandName, strerror(debuggerPort));
 		exit(1);
 	}
 
 	// install ourselves as the team debugger
 	port_id nubPort = install_team_debugger(team, debuggerPort);
 	if (nubPort < 0) {
-		fprintf(stderr, "Failed to install team debugger: %s\n",
-			strerror(nubPort));
+		fprintf(stderr, "%s: Failed to install team debugger: %s\n",
+			kCommandName, strerror(nubPort));
 		exit(1);
 	}
 
@@ -551,6 +547,7 @@ main(int argc, const char *const *argv)
 
 	// debug loop
 	while (true) {
+		bool quitLoop = false;
 		int32 code;
 		debug_debugger_message_data message;
 		ssize_t messageSize = read_port(debuggerPort, &code, &message,
@@ -560,8 +557,8 @@ main(int argc, const char *const *argv)
 			if (messageSize == B_INTERRUPTED)
 				continue;
 
-			fprintf(stderr, "Reading from debugger port failed: %s\n",
-				strerror(messageSize));
+			fprintf(stderr, "%s: Reading from debugger port failed: %s\n",
+				kCommandName, strerror(messageSize));
 			exit(1);
 		}
 
@@ -591,8 +588,12 @@ main(int argc, const char *const *argv)
 
 			case B_DEBUGGER_MESSAGE_TEAM_DELETED:
 				// the debugged team is gone
-				exit(0);
+				quitLoop = true;
+				break;
 		}
+
+		if (quitLoop)
+			break;
 
 		// tell the thread to continue (only when there is a thread and the
 		// message was synchronous)
