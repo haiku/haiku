@@ -958,6 +958,11 @@ StyledEditWindow::SetFontSize(float fontSize)
 	fTextView->GetFontAndColor(&font,&sameProperties);
 	font.SetSize(fontSize);
 	fTextView->SetFontAndColor(&font,B_FONT_SIZE);
+	fClean = false;
+	fUndoCleans = false;
+	fRedoCleans = false;	
+	fRevertItem->SetEnabled(fSaveMessage != NULL);
+	fSaveItem->SetEnabled(true);
 }/***StyledEditWindow::SetFontSize()***/
 
 void
@@ -968,7 +973,11 @@ StyledEditWindow::SetFontColor(rgb_color *color)
 	
 	fTextView->GetFontAndColor(&font,&sameProperties,NULL,NULL);
 	fTextView->SetFontAndColor(&font, B_FONT_ALL,color);
-	
+	fClean = false;
+	fUndoCleans = false;
+	fRedoCleans = false;	
+	fRevertItem->SetEnabled(fSaveMessage != NULL);
+	fSaveItem->SetEnabled(true);
 }/***StyledEditWindow::SetFontColor()***/
 
 void
@@ -984,5 +993,9 @@ StyledEditWindow::SetFontStyle(const char *fontFamily, const char *fontStyle)
 	BMenuItem *superItem;
 	superItem= fMenuBar->FindItem(fontFamily);
 	superItem->SetMarked(true);
-
+	fClean = false;
+	fUndoCleans = false;
+	fRedoCleans = false;	
+	fRevertItem->SetEnabled(fSaveMessage != NULL);
+	fSaveItem->SetEnabled(true);
 }/***StyledEditWindow::SetFontStyle()***/
