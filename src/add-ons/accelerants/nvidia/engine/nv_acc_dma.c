@@ -157,20 +157,20 @@ status_t nv_acc_init_dma()
 		ACCW(HT_VALUE_00, 0x0010114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
-		ACCW(HT_VALUE_01, 0x00101148); /* instance $1146, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_01, 0x00101148); /* instance $1148, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
-		ACCW(HT_VALUE_02, 0x0010114a); /* instance $1147, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_02, 0x0010114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
 		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 		ACCW(HT_VALUE_10, 0x00101142); /* instance $1142, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
-		ACCW(HT_VALUE_11, 0x00101144); /* instance $1143, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_11, 0x00101144); /* instance $1144, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
-		ACCW(HT_VALUE_12, 0x00101146); /* instance $1144, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_12, 0x00101146); /* instance $1146, engine = acc engine, CHID = $00 */
 	}
 	else
 	{
@@ -179,20 +179,20 @@ status_t nv_acc_init_dma()
 		ACCW(HT_VALUE_00, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
-		ACCW(HT_VALUE_01, 0x80011148); /* instance $1146, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_01, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
-		ACCW(HT_VALUE_02, 0x8001114a); /* instance $1147, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_02, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
 		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 		ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
-		ACCW(HT_VALUE_11, 0x80011144); /* instance $1143, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_11, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
 
 		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
-		ACCW(HT_VALUE_12, 0x80011146); /* instance $1144, engine = acc engine, CHID = $00 */
+		ACCW(HT_VALUE_12, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
