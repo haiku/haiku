@@ -37,6 +37,7 @@
 #include <Application.h>
 #include <Handler.h>
 #include <Looper.h>
+#include <LooperList.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <OS.h>
@@ -256,13 +257,8 @@ BMessenger::Target(BLooper **looper) const
 			gDefaultTokens.GetToken(fHandlerToken, B_HANDLER_TOKEN,
 									(void**)&handler);
 		}
-		if (looper) {
-			if (BLooper::sLooperListLock.Lock()) {
-				*looper = BLooper::LooperForPort(fPort);
-				BLooper::sLooperListLock.Unlock();
-			} else
-				*looper = NULL;
-		}
+		if (looper)
+			*looper = BPrivate::gLooperList.LooperForPort(fPort);
 	} else if (looper)
 		*looper = NULL;
 	return handler;
