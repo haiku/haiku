@@ -13,19 +13,39 @@
 #include <signal.h>
 #include <dirent.h>
 #include <fs_interface.h>
+#include <lock.h>
+#include <list.h>
 
 #define DEFAULT_FD_TABLE_SIZE	128
 #define MAX_FD_TABLE_SIZE		2048
+#define MAX_NODE_MONITORS		4096
 
 #include <vfs_types.h>
+
+
+struct file_descriptor;
+struct selectsync;
+struct pollfd;
+
+
+/** The I/O context of a process/team, holds the fd array among others */
+typedef struct io_context {
+	struct vnode *cwd;
+	mutex		io_mutex;
+	uint32		table_size;
+	uint32		num_used_fds;
+	struct file_descriptor **fds;
+	struct list node_monitors;
+	uint32		num_monitors;
+	uint32		max_monitors;
+} io_context;
+
 
 /* macro to allocate a iovec array on the stack */
 #define IOVECS(name, size) \
 	uint8 _##name[sizeof(iovecs) + (size)*sizeof(iovec)]; \
 	iovecs *name = (iovecs *)_##name
 
-struct selectsync;
-struct pollfd;
 
 #ifdef __cplusplus
 extern "C" {

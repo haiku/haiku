@@ -10,21 +10,8 @@
 #include <atomic.h>
 #include <memheap.h>
 #include <sys/stat.h>
+//#include <list.h>
 
-
-struct file_descriptor;
-struct select_sync;
-struct fs_mount;
-struct vnode;
-
-/** The I/O context of a process/team, holds the fd array */
-struct io_context {
-	struct vnode *cwd;
-	mutex	io_mutex;
-	int		table_size;
-	int		num_used_fds;
-	struct file_descriptor **fds;
-};
 
 struct fd_ops {
 	ssize_t		(*fd_read) (struct file_descriptor *, off_t pos, void *buffer, size_t *length);

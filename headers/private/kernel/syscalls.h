@@ -70,6 +70,13 @@ status_t sys_unregister_image(image_id id);
 status_t sys_get_image_info(image_id id, image_info *info, size_t size);
 status_t sys_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
 
+// node monitor functions
+status_t sys_stop_notifying(port_id port, uint32 token);
+status_t sys_start_watching(dev_t device, ino_t node, uint32 flags,
+			port_id port, uint32 token);
+status_t sys_stop_watching(dev_t device, ino_t node, uint32 flags,
+			port_id port, uint32 token);
+
 // area functions
 region_id sys_vm_create_anonymous_region(const char *name, void **address, int addr_type,
 	addr size, int wiring, int lock);

@@ -127,6 +127,9 @@ enum {
 	SYSCALL_UNREGISTER_IMAGE,		/* 115 */
 	SYSCALL_GET_IMAGE_INFO,
 	SYSCALL_GET_NEXT_IMAGE_INFO,
+	SYSCALL_START_WATCHING,
+	SYSCALL_STOP_WATCHING,
+	SYSCALL_STOP_NOTIFYING,			/* 120 */
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);
