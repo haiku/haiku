@@ -33,8 +33,8 @@ public:
 	
 	uint ThreadCount() const;
 	
-private:
 	static const uint kThreadLimit = 12;
+private:
 
 	std::list<RegistrarThread*>::iterator& RemoveThread(std::list<RegistrarThread*>::iterator &i);
 	
