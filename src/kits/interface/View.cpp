@@ -3486,9 +3486,10 @@ bool BView::attachView(BView *aView){
 	
 	owner->session->WriteInt32( AS_LAYER_CREATE );
 	owner->session->WriteInt32( _get_object_token_( aView ) );
+	owner->session->WriteString( aView->Name() );
 	owner->session->WriteRect( aView->Frame() );
-	owner->session->WriteInt32( aView->ResizingMode() );
-	owner->session->WriteInt32( aView->Flags() );
+	owner->session->WriteUInt32( aView->ResizingMode() );
+	owner->session->WriteUInt32( aView->Flags() );
 	owner->session->WriteInt32( aView->CountChildren() );
 	
 	setCachedState();
