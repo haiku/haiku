@@ -377,7 +377,8 @@ extern void	debugger(const char *message);
 extern const int disable_debugger(int state);
 
 // TODO: Remove. Temporary debug helper.
-extern void debug_printf(const char *format, ...);
+extern void debug_printf(const char *format, ...)
+	__attribute__ ((format (__printf__, 1, 2)));
 extern void debug_vprintf(const char *format, va_list args);
 
 
