@@ -10,8 +10,9 @@
 #include <kernel.h>
 #include <kimage.h>
 #include <lock.h>
-#include <thread.h>
 #include <team.h>
+#include <thread.h>
+#include <thread_types.h>
 #include <user_debugger.h>
 
 #include <malloc.h>
@@ -58,13 +59,6 @@ register_image(struct team *team, image_info *_info, size_t size)
 	list_add_item(&team->image_list, image);
 
 	mutex_unlock(&sImageMutex);
-
-	// notify the debugger
-	_info->id = id;
-	user_debug_image_created(_info);
-		// ToDo: Is this too early? Not even the loader knows about the
-		// image (ID) yet. We should probably introduce another syscall, the
-		// loader can invoke just before calling the image's init function.
 
 	TRACE(("register_image(team = %p, image id = %ld, image = %p\n", team, id, image));
 	return id;
@@ -241,6 +235,51 @@ image_init(void)
 }
 
 
+static void
+notify_loading_app(status_t result, bool suspend)
+{
+	cpu_status state;
+	struct team *team;
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team = thread_get_current_thread()->team;
+	if (team->loading_info) {
+		// there's indeed someone waiting
+		struct team_loading_info *loadingInfo = team->loading_info;
+		team->loading_info = NULL;
+
+		loadingInfo->result = result;
+		loadingInfo->done = true;
+
+		// we're done with the team stuff, get the thread lock instead
+		GRAB_THREAD_LOCK();
+		RELEASE_TEAM_LOCK();
+
+		// wake up the waiting thread
+		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
+			loadingInfo->thread->state = B_THREAD_READY;
+			loadingInfo->thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(loadingInfo->thread);
+		}
+
+		// suspend ourselves, if desired
+		if (suspend) {
+			thread_get_current_thread()->next_state = B_THREAD_SUSPENDED;
+			scheduler_reschedule();
+		}
+
+		RELEASE_THREAD_LOCK();
+	} else {
+		// no-one is waiting
+		RELEASE_TEAM_LOCK();
+	}
+
+	restore_interrupts(state);
+}
+
+
 //	#pragma mark -
 //	Functions exported for the user space
 
@@ -265,6 +304,42 @@ _user_register_image(image_info *userInfo, size_t size)
 		return B_BAD_ADDRESS;
 
 	return register_image(thread_get_current_thread()->team, &info, size);
+}
+
+
+void
+_user_image_relocated(image_id id)
+{
+	image_info info;
+	status_t error;
+
+	// get an image info
+	error = _get_image_info(id, &info, sizeof(image_info));
+	if (error != B_OK) {
+		dprintf("_user_image_relocated(%ld): Failed to get image info: %lx\n",
+			id, error);
+		return;
+	}
+
+	// notify the debugger
+	user_debug_image_created(&info);
+
+	// If the image is the app image, loading is done. We need to notify the
+	// thread who initiated the process and is now waiting for us to be done.
+	if (info.type == B_APP_IMAGE)
+		notify_loading_app(B_OK, true);
+}
+
+
+void
+_user_loading_app_failed(status_t error)
+{
+	if (error >= B_OK)
+		error = B_ERROR;
+
+	notify_loading_app(error, false);
+
+	_user_exit_team(error);
 }
 
 
