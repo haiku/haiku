@@ -96,6 +96,7 @@ struct sis_info {
 	uint16 phy;
 	bool autoNegotiationComplete;
 	bool link;
+	uint16 fixedMode;
 
 	// receive data
 	volatile struct buffer_desc rxDescriptor[NUM_Rx_DESCR];

@@ -9,6 +9,7 @@
 #include <PCI.h>
 #include <SupportDefs.h>
 #include <image.h>
+#include <driver_settings.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -144,6 +145,7 @@ createSemaphores(struct sis_info *info)
 {
 	if ((info->rxSem = create_sem(0, "sis900 receive")) < B_OK)
 		return info->rxSem;
+
 	set_sem_owner(info->rxSem, B_SYSTEM_TEAM);
 
 	if ((info->txSem = create_sem(NUM_Tx_DESCR, "sis900 transmit")) < B_OK)
@@ -165,6 +167,39 @@ createSemaphores(struct sis_info *info)
 }
 
 
+static void
+readSettings(struct sis_info *info)
+{
+	const char *parameter;
+
+	void *handle = load_driver_settings("sis900");
+	if (handle == NULL)
+		return;
+
+	parameter = get_driver_parameter(handle, "duplex", "auto", "auto");
+	if (!stricmp(parameter, "full"))
+		info->fixedMode = LINK_FULL_DUPLEX;
+	else if (!stricmp(parameter, "half"))
+		info->fixedMode = LINK_HALF_DUPLEX;
+
+	parameter = get_driver_parameter(handle, "speed", "auto", "auto");
+	if (!stricmp(parameter, "100"))
+		info->fixedMode |= LINK_SPEED_100_MBIT;
+	else if (!stricmp(parameter, "10"))
+		info->fixedMode |= LINK_SPEED_10_MBIT;
+	else if (!stricmp(parameter, "1"))
+		info->fixedMode |= LINK_SPEED_HOME;
+
+	// it's either all or nothing
+
+	if ((info->fixedMode & LINK_DUPLEX_MASK) == 0
+		|| (info->fixedMode & LINK_SPEED_MASK) == 0)
+		info->fixedMode = 0;
+	
+	unload_driver_settings(handle);
+}
+
+
 //--------------------------------------------------------------------------
 //	#pragma mark -
 //	the device will be accessed through the following functions (a.k.a. device hooks)
@@ -177,7 +212,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 	area_id area;
 	int id;
 
-	// verify device access
+	// verify device access (we only allow one user at a time)
 	{
 		char *thisName;
 		int32 mask;
@@ -224,10 +259,12 @@ device_open(const char *name, uint32 flags, void **cookie)
 	else
 		dprintf(DEVICE_NAME ": could not get MAC address\n");
 
+	readSettings(info);
+
 	if (createSemaphores(info) == B_OK) {
 		status_t status = sis900_initPHYs(info);
 		if (status == B_OK) {
-			TRACE((DEVICE_NAME ": MII status = %d\n", mdio_read(info, MII_STATUS)));	
+			TRACE((DEVICE_NAME ": MII status = %d\n", mdio_read(info, MII_STATUS)));
 
 			//sis900_configFIFOs(info);
 			sis900_reset(info);

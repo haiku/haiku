@@ -425,7 +425,7 @@ sis900_selectPHY(struct sis_info *info)
 
 
 void
-sis900_setMode(struct sis_info *info,int32 mode)
+sis900_setMode(struct sis_info *info, int32 mode)
 {
 	uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
 	uint32 txFlags = SiS900_Tx_AUTO_PADDING | SiS900_Tx_FILL_THRES;
@@ -455,8 +455,8 @@ sis900_setMode(struct sis_info *info,int32 mode)
 		rxFlags |= SiS900_Rx_ACCEPT_Tx_PACKETS;
 	}
 
-	write32((uint32)info->registers + SiS900_MAC_Tx_CONFIG,txFlags);
-	write32((uint32)info->registers + SiS900_MAC_Rx_CONFIG,rxFlags);
+	write32((uint32)info->registers + SiS900_MAC_Tx_CONFIG, txFlags);
+	write32((uint32)info->registers + SiS900_MAC_Rx_CONFIG, rxFlags);
 }
 
 
@@ -538,10 +538,17 @@ sis900_checkMode(struct sis_info *info)
 {
 	uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
 
-	if (info->currentPHY->types == MII_LAN) {
+	if (info->fixedMode != 0) {
+		TRACE((DEVICE_NAME ": link mode set via settings\n"));
+
+		// ToDo: what about the excessive deferral timer?
+
+		sis900_setMode(info, info->fixedMode);
+		info->autoNegotiationComplete = true;
+	} else if (info->currentPHY->types == MII_LAN) {
 		TRACE((DEVICE_NAME ": PHY type is LAN\n"));
 
-		// enable excessive defferal timer 
+		// enable excessive deferral timer 
 		write32(address, ~SiS900_MAC_CONFIG_EXCESSIVE_DEFERRAL & read32(address));
 
 		sis900_setAutoNegotiationCapabilities(info);
@@ -549,7 +556,7 @@ sis900_checkMode(struct sis_info *info)
 	} else {
 		TRACE((DEVICE_NAME ": PHY type is not LAN\n"));
 
-		// disable excessive defferal timer 
+		// disable excessive deferral timer 
 		write32(address, SiS900_MAC_CONFIG_EXCESSIVE_DEFERRAL | read32(address));
 
 		sis900_setMode(info, LINK_SPEED_HOME | LINK_HALF_DUPLEX);
