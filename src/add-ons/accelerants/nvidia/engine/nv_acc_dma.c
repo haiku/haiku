@@ -813,25 +813,85 @@ static void nv_start_dma(void)
  * The hardware FIFO state is checked by the DMA hardware automatically. */
 static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 {
-	/* check if the DMA buffer has enough room for the command */
-	if (si->engine.dma.free < cmd_size)
-	{
-		/* not enough room left, so instruct DMA engine to reset the buffer when
-		 * it's done */
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
-		/* reset our buffer pointer, so new commands will be placed at the
-		 * beginning of the buffer. */
-		si->engine.dma.current = 0;
-		/* tell the engine to fetch the remaining command(s) in the DMA buffer
-		 * that where not executed before. */
-		nv_start_dma();
-		/* fixme if needed:
-		 * we are assuming here that a large part in the beginning of the DMA
-		 * cmd buffer is already processed. If this is not true, we need to wait
-		 * here until the engine becomes idle or so... */
+	uint32 dmaget;
 
-		/* update the current free space we have left in the DMA buffer */
-		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+	/* we'd better check for timeouts on the DMA engine as it's theoretically
+	 * breakable by malfunctioning software */
+	uint16 cnt = 0;
+
+	/* check if the DMA buffer has enough room for the command.
+	 * note:
+	 * engine.dma.free is 'cached' */
+	while ((si->engine.dma.free < cmd_size) && (cnt < 10000) && (err < 3))
+	{
+		/* see where the engine is currently fetching from the buffer */
+		dmaget = ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
+			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])) >> 2);
+
+		/* snooze a bit so I do not hammer the bus */
+		snooze (100);
+		cnt++;
+
+		/* where's the engine fetching viewed from us issuing? */
+		if (si->engine.dma.put >= dmaget)
+		{
+			/* engine is fetching 'behind us', the last piece of the buffer is free */
+
+			/* note the 'updated' free space we have in the DMA buffer */
+			si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+			/* if it's enough after all we exit this routine immediately. Else: */
+			if (si->engine.dma.free < cmd_size)
+			{
+				/* not enough room left, so instruct DMA engine to reset the buffer
+				 * when it's reaching the end of it */
+				si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
+				/* reset our buffer pointer, so new commands will be placed at the
+				 * beginning of the buffer. */
+				si->engine.dma.current = 0;
+				/* tell the engine to fetch the remaining command(s) in the DMA buffer
+				 * that where not executed before. */
+				nv_start_dma();
+
+				/* NOW the engine is fetching 'in front of us', so the first piece
+				 * of the buffer is free */
+
+				/* note the updated current free space we have in the DMA buffer */
+				si->engine.dma.free = dmaget - si->engine.dma.current;
+				/* mind this pittfall:
+				 * as the engine is DMA triggered for fetching chunks every 128 bytes,
+				 * we may not touch that much at the end of our free space!
+				 * (confirmed NV11 when it's buffer is full for a longer period of
+				 * time, tested with BeRoMeter 1.2.6.) */
+				if (si->engine.dma.free < 32)
+					si->engine.dma.free = 0;
+				else
+					si->engine.dma.free -= 32;
+			}
+		}
+		else
+		{
+			/* engine is fetching 'in front of us', so the first piece of the buffer
+			 * is free */
+
+			/* note the updated current free space we have in the DMA buffer */
+			si->engine.dma.free = dmaget - si->engine.dma.current;
+			/* mind this pittfall:
+			 * as the engine is DMA triggered for fetching chunks every 128 bytes,
+			 * we may not touch that much at the end of our free space!
+			 * (confirmed NV11 when it's buffer is full for a longer period of
+			 * time, tested with BeRoMeter 1.2.6.) */
+			if (si->engine.dma.free < 32)
+				si->engine.dma.free = 0;
+			else
+				si->engine.dma.free -= 32;
+		}
+	}
+
+	/* log timeout if we had one */
+	if (cnt == 10000)
+	{
+		err++;
+		LOG(4,("ACC_DMA: wait_idle DMA timeout #%d, engine trouble!\n", err));
 	}
 
 	return B_OK;
