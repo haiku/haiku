@@ -5,7 +5,11 @@
 #ifndef NET_STACK_DRIVER_H
 #define NET_STACK_DRIVER_H
 
+#include <OS.h>			
 #include <sys/select.h>
+
+// Forward declaration
+struct sockaddr; 
 
 #define NET_STACK_DRIVER_DEV	"net/stack"
 #define NET_STACK_DRIVER_PATH	"/dev/" ## NET_STACK_DRIVER_DEV

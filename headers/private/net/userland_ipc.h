@@ -9,6 +9,8 @@
 
 
 #include <OS.h>
+#include <Drivers.h>
+
 #include "net_stack_driver.h"
 
 #ifdef __cplusplus
