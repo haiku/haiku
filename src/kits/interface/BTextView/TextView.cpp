@@ -3088,9 +3088,11 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			if (CurrentLine() + 1 < fLines->NumLines()) {
 				line = (*fLines)[CurrentLine() + 1];
 				fClickOffset = PreviousInitialByte(line->offset);
-			} else
-				fClickOffset = fText->Length() - 1;
-
+			} else {
+				fClickOffset = fText->Length();
+				if (ByteAt(fClickOffset - 1) == B_ENTER)
+					fClickOffset--;
+			}
 			ScrollToOffset(fClickOffset);
 			if (shiftDown) {
 				if (fClickOffset >= fSelEnd)
