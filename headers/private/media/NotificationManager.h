@@ -9,14 +9,38 @@
 namespace BPrivate {
 namespace media {
 
+
 class NotificationManager
 {
+public:
+	enum notification_type_mask
+	{
+		notification_no_mask			= 0,
+		notification_node_created 		= (1 <<  0),
+		notification_node_deleted 		= (1 <<  1),
+		notification_connection_made 	= (1 <<  2),
+		notification_connection_broken	= (1 <<  3),
+		notification_buffer_created		= (1 <<  4),
+		notification_buffer_deleted		= (1 <<  5),
+		notification_transport_state	= (1 <<  6),
+		notification_parameter_changed	= (1 <<  7),
+		notification_format_change		= (1 <<  8),
+		notification_web_changed 		= (1 <<  9),
+		notification_default_changed	= (1 << 10),
+		notification_new_parameter_value= (1 << 11),
+		notification_node_stopped		= (1 << 12),
+		notification_flavors_changed	= (1 << 13),
+		notification_error				= (1 << 31), // XXX, um well... always allow error notifications? Handled in the server
+		notification_basic				= (notification_node_created | notification_node_deleted | notification_connection_made | notification_connection_broken),
+		notification_wildcard			= (0xffffffff - notification_error) // exclude error, it is handled in the server
+	};
+
 public:
 	NotificationManager();
 	~NotificationManager();
 		
-	status_t Register(const BMessenger &notifyHandler, const media_node &node, int32 notificationType);
-	status_t Unregister(const BMessenger &notifyHandler, const media_node &node, int32 notificationType);
+	status_t Register(const BMessenger &notifyHandler, const media_node &node, notification_type_mask mask);
+	status_t Unregister(const BMessenger &notifyHandler, const media_node &node, notification_type_mask mask);
 
 	status_t ReportError(const media_node &node, BMediaNode::node_error what, const BMessage * info);
 	
@@ -36,6 +60,7 @@ public:
 	void NodeStopped(const media_node &node, bigtime_t when); // XXX fix
 	
 	static bool IsValidNotificationType(int32 notificationType);
+	static notification_type_mask NotificationType2Mask(int32 notificationType);
 private:
 	status_t SendMessageToMediaServer(BMessage *msg);
 
@@ -45,6 +70,9 @@ private:
 
 }; // namespace media
 }; // namespace BPrivate
+
+#define NOTIFICATION_PARAM_WHAT "be:media:internal:what"
+#define NOTIFICATION_PARAM_MASK "be:media:internal:mask"
 
 extern BPrivate::media::NotificationManager *_NotificationManager;
 
