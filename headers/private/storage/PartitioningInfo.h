@@ -24,7 +24,7 @@ public:
 	int32 CountPartitionableSpaces() const;
 
 private:
-	status_t _SetTo(partition_id partition);
+	status_t _SetTo(partition_id partition, int32 changeCounter);
 
 	friend class BPartition;
 

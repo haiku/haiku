@@ -226,6 +226,7 @@ BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
 		return B_BAD_VALUE;
 	}
 	return _kern_get_next_supported_partition_type(partition->_ShadowID(),
+												   partition->_ChangeCounter(),
 												   cookie, type);
 }
 
@@ -260,7 +261,8 @@ BDiskSystem::IsSubSystemFor(BPartition *parent) const
 {
 	return (InitCheck() == B_OK
 			&& parent && parent->_IsShadow()
-			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID()));
+			&& _kern_is_sub_disk_system_for(fID, parent->_ShadowID(),
+											parent->_ChangeCounter()));
 }
 
 // _SetTo

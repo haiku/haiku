@@ -62,7 +62,7 @@ BPartitioningInfo::CountPartitionableSpaces() const
 
 // _SetTo
 status_t
-BPartitioningInfo::_SetTo(partition_id partition)
+BPartitioningInfo::_SetTo(partition_id partition, int32 changeCounter)
 {
 	Unset();
 	status_t error = B_OK;
@@ -70,8 +70,8 @@ BPartitioningInfo::_SetTo(partition_id partition)
 	int32 count = 0;
 	int32 actualCount = 0;
 	do {
-		error = _kern_get_partitionable_spaces(partition, buffer,
-											   count, &actualCount);
+		error = _kern_get_partitionable_spaces(partition, changeCounter,
+											   buffer, count, &actualCount);
 		if (error == B_BUFFER_OVERFLOW) {
 			// buffer to small re-allocate it
 			if (buffer)
