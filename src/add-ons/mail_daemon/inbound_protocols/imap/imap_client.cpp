@@ -118,12 +118,14 @@ class NoopWorker : public BHandler {
 		time_t last_run;
 };
 
-IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemoteStorageProtocol(settings,run), commandCount(0), net(-1), selected_mb(""), noop(NULL), force_reselect(false) {
+IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemoteStorageProtocol(settings,run), noop(NULL), commandCount(0), net(-1), selected_mb(""), force_reselect(false) {
 	err = B_OK;
 	
 	mb_root = settings->FindString("root");
 	#ifdef USESSL
 		use_ssl = (settings->FindInt32("flavor") == 1);
+		ssl = NULL;
+		ctx = NULL;
 	#endif
 	
 	int port = settings->FindInt32("port");
@@ -270,9 +272,11 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemot
 }
 
 IMAP4Client::~IMAP4Client() {	
-	if (selected_mb != "")
-		SendCommand("CLOSE");
-	SendCommand("LOGOUT");
+	if (net > 0) { 
+		if (selected_mb != "")
+			SendCommand("CLOSE");
+		SendCommand("LOGOUT");
+	}
 	
 	for (int32 i = 0; i < box_info.CountItems(); i++)
 		delete (struct mailbox_info *)(box_info.ItemAt(i));
@@ -281,8 +285,10 @@ IMAP4Client::~IMAP4Client() {
 	
 #ifdef USESSL
 	if (use_ssl) {
-		SSL_shutdown(ssl);
-		SSL_CTX_free(ctx);
+		if (ssl)
+			SSL_shutdown(ssl);
+		if (ctx)
+			SSL_CTX_free(ctx);
 	}
 #endif
 	

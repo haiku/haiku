@@ -21,11 +21,11 @@ class IMAPConfig : public BMailProtocolConfigView {
 
 IMAPConfig::IMAPConfig(BMessage *archive)
 	: BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME | B_MAIL_PROTOCOL_CAN_LEAVE_MAIL_ON_SERVER
-	#ifdef IMAPSSL
+	#ifdef USESSL
 	 | B_MAIL_PROTOCOL_HAS_FLAVORS)
 {
 		AddFlavor("Unencrypted");
-		AddFlavor("IMAP-SSL");
+		AddFlavor("SSL");
 	#else
 		) {
 	#endif
