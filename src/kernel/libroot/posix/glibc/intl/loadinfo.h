@@ -40,9 +40,9 @@
 # endif
 #endif
 
-#ifndef internal_function
-# define internal_function
-#endif
+//#ifndef internal_function
+//# define internal_function
+//#endif
 
 /* Tell the compiler when a conditional or integer expression is
    almost always true or almost always false.  */
