@@ -276,6 +276,7 @@ packet_to_movement(uint8 packet[], mouse_pos *pos)
 		pos->clicks = sClickCount;
 		pos->modifiers = 0;
 		pos->time = currentTime;
+		pos->wheel_delta = 0;
 	}
 }
 
