@@ -589,48 +589,34 @@ err:
 
 
 static int
-bootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, stream_type st, int oflags)
+bootfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
+{
+	return EROFS;
+}
+
+
+static int
+bootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
 {
 	struct bootfs *fs = _fs;
-	struct bootfs_vnode *v = _v;
+	struct bootfs_vnode *vnode = _v;
 	struct bootfs_cookie *cookie;
-	int err = 0;
-	int start = 0;
 
-	TRACE(("bootfs_open: vnode 0x%x, stream_type %d, oflags 0x%x\n", v, st, oflags));
-
-	if(st != STREAM_TYPE_ANY && st != v->stream.type) {
-		err = ERR_VFS_WRONG_STREAM_TYPE;
-		goto err;
-	}
+	TRACE(("bootfs_open: vnode 0x%x, oflags 0x%x\n", vnode, oflags));
 
 	cookie = kmalloc(sizeof(struct bootfs_cookie));
-	if (cookie == NULL) {
-		err = ENOMEM;
-		goto err;
-	}
+	if (cookie == NULL)
+		return ENOMEM;
 
 	mutex_lock(&fs->lock);
 
-	cookie->s = &v->stream;
-	switch(v->stream.type) {
-		case STREAM_TYPE_DIR:
-			cookie->u.dir.ptr = v->stream.u.dir.dir_head;
-			break;
-		case STREAM_TYPE_FILE:
-			cookie->u.file.pos = 0;
-			break;
-		default:
-			err = ERR_VFS_WRONG_STREAM_TYPE;
-			kfree(cookie);
-	}
-
+	cookie->s = &vnode->stream;
+	cookie->u.file.pos = 0;
 	*_cookie = cookie;
 
-err1:
 	mutex_unlock(&fs->lock);
-err:
-	return err;
+
+	return B_OK;
 }
 
 
@@ -648,7 +634,7 @@ bootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static int
-bootfs_freecookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+bootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -656,7 +642,7 @@ bootfs_freecookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 	TRACE(("bootfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
 
-	if(cookie)
+	if (cookie)
 		kfree(cookie);
 
 	return 0;
@@ -799,6 +785,42 @@ bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 
 
 static int
+bootfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+{
+	return EROFS;
+}
+
+
+static int
+bootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
+{
+	struct bootfs *fs = _fs;
+	struct bootfs_vnode *vnode = _v;
+	struct bootfs_cookie *cookie;
+	int status = 0;
+
+	TRACE(("bootfs_open_dir: vnode 0x%x\n", vnode));
+
+	if (vnode->stream.type != STREAM_TYPE_DIR)
+		return EINVAL;
+
+	cookie = kmalloc(sizeof(struct bootfs_cookie));
+	if (cookie == NULL)
+		return ENOMEM;
+
+	mutex_lock(&fs->lock);
+
+	cookie->s = &vnode->stream;
+	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
+	*_cookie = cookie;
+
+	mutex_unlock(&fs->lock);
+
+	return status;
+}
+
+
+static int
 bootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	struct bootfs_cookie *cookie = _cookie;
@@ -918,13 +940,6 @@ bootfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 
 static int
-bootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, stream_type st, void *create_args, vnode_id *new_vnid)
-{
-	return EROFS;
-}
-
-
-static int
 bootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	return EROFS;
@@ -939,12 +954,12 @@ bootfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _ne
 
 
 static int
-bootfs_rstat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
+bootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
 	int err = 0;
-//dprintf("bootfs_rstat:\n");
+
 	TRACE(("bootfs_rstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
 
 	mutex_lock(&fs->lock);
@@ -978,7 +993,7 @@ err:
 
 
 static int
-bootfs_wstat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
+bootfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -1004,30 +1019,36 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_putvnode,
 	&bootfs_removevnode,
 
-	&bootfs_open,
-	&bootfs_close,
-	&bootfs_freecookie,
-	&bootfs_fsync,
-
-	&bootfs_read,
-	&bootfs_write,
-	&bootfs_seek,
-
-	&bootfs_read_dir,
-	&bootfs_rewind_dir,
-
-	&bootfs_ioctl,
-
 	&bootfs_canpage,
 	&bootfs_readpage,
 	&bootfs_writepage,
 
-	&bootfs_create,
+	/* common */
+	&bootfs_ioctl,
+	&bootfs_fsync,
+
 	&bootfs_unlink,
 	&bootfs_rename,
 
-	&bootfs_rstat,
-	&bootfs_wstat,
+	&bootfs_read_stat,
+	&bootfs_write_stat,
+
+	/* file */
+	&bootfs_create,
+	&bootfs_open,
+	&bootfs_close,
+	&bootfs_free_cookie,
+	&bootfs_read,
+	&bootfs_write,
+	&bootfs_seek,
+
+	/* dir */
+	&bootfs_create_dir,
+	&bootfs_open_dir,
+	&bootfs_close,			// we are using the same operations for directories
+	&bootfs_free_cookie,	// and files here - that's intended, not by accident
+	&bootfs_read_dir,
+	&bootfs_rewind_dir,
 };
 
 
@@ -1041,8 +1062,9 @@ bootstrap_bootfs(void)
 
 	// find the bootdir and set it up
 	rid = vm_find_region_by_name(vm_get_kernel_aspace_id(), "bootdir");
-	if(rid < 0)
+	if (rid < 0)
 		panic("bootstrap_bootfs: no bootdir area found!\n");
+
 	vm_get_region_info(rid, &rinfo);
 	bootdir = (char *)rinfo.base;
 	bootdir_len = rinfo.size;

@@ -399,14 +399,14 @@ devfs_mount(fs_cookie *_fs, fs_id id, const char *devfs, void *args, vnode_id *r
 
 	TRACE(("devfs_mount: entry\n"));
 
-	if(thedevfs) {
+	if (thedevfs) {
 		dprintf("double mount of devfs attempted\n");
 		err = ERR_GENERAL;
 		goto err;
 	}
 
 	fs = kmalloc(sizeof(struct devfs));
-	if(fs == NULL) {
+	if (fs == NULL) {
 		err = ENOMEM;
 		goto err;
 	}
@@ -415,20 +415,20 @@ devfs_mount(fs_cookie *_fs, fs_id id, const char *devfs, void *args, vnode_id *r
 	fs->next_vnode_id = 0;
 
 	err = mutex_init(&fs->lock, "devfs_mutex");
-	if(err < 0) {
+	if (err < 0) {
 		goto err1;
 	}
 
 	fs->vnode_list_hash = hash_init(BOOTFS_HASH_SIZE, (addr)&v->all_next - (addr)v,
 		&devfs_vnode_compare_func, &devfs_vnode_hash_func);
-	if(fs->vnode_list_hash == NULL) {
+	if (fs->vnode_list_hash == NULL) {
 		err = ENOMEM;
 		goto err2;
 	}
 
 	// create a vnode
 	v = devfs_create_vnode(fs, "");
-	if(v == NULL) {
+	if (v == NULL) {
 		err = ENOMEM;
 		goto err3;
 	}
@@ -462,7 +462,9 @@ err:
 	return err;
 }
 
-static int devfs_unmount(fs_cookie _fs)
+
+static int
+devfs_unmount(fs_cookie _fs)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *v;
@@ -484,14 +486,18 @@ static int devfs_unmount(fs_cookie _fs)
 	return 0;
 }
 
-static int devfs_sync(fs_cookie fs)
+
+static int
+devfs_sync(fs_cookie fs)
 {
 	TRACE(("devfs_sync: entry\n"));
 
 	return 0;
 }
 
-static int devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
+
+static int
+devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
@@ -528,7 +534,9 @@ err:
 	return err;
 }
 
-static int devfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
+
+static int
+devfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 
@@ -550,7 +558,9 @@ static int devfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 		return ERR_NOT_FOUND;
 }
 
-static int devfs_putvnode(fs_cookie _fs, fs_vnode _v, bool r)
+
+static int
+devfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 #if DEVFS_TRACE
 	struct devfs_vnode *v = (struct devfs_vnode *)_v;
@@ -561,7 +571,9 @@ static int devfs_putvnode(fs_cookie _fs, fs_vnode _v, bool r)
 	return 0; // whatever
 }
 
-static int devfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
+
+static int
+devfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *v = (struct devfs_vnode *)_v;
@@ -587,82 +599,66 @@ static int devfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
 	return err;
 }
 
-static int devfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, stream_type st, int oflags)
+
+static int
+devfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
+{
+	return EROFS;
+}
+
+
+static int
+devfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
 {
 	struct devfs *fs = _fs;
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie;
-	int err = 0;
+	int status = 0;
 
 	TRACE(("devfs_open: vnode 0x%x, oflags 0x%x\n", v, oflags));
 
-	if (st != STREAM_TYPE_ANY && st != v->stream.type) {
-		err = ERR_VFS_WRONG_STREAM_TYPE;
-		goto err;
-	}
-
 	cookie = kmalloc(sizeof(struct devfs_cookie));
-	if (cookie == NULL) {
-		err = ENOMEM;
-		goto err;
-	}
+	if (cookie == NULL)
+		return ENOMEM;
 
-	mutex_lock(&fs->lock);
-
-	cookie->s = &v->stream;
-	switch(v->stream.type) {
-		case STREAM_TYPE_DIR:
-			cookie->u.dir.ptr = v->stream.u.dir.dir_head;
-			break;
-		case STREAM_TYPE_DEVICE:
-			// call the device call, but unlock the devfs first
-			mutex_unlock(&fs->lock);
-			err = v->stream.u.dev.calls->open(v->name, oflags, &cookie->u.dev.dcookie);
-			mutex_lock(&fs->lock);
-			break;
-		default:
-			err = ERR_VFS_WRONG_STREAM_TYPE;
-			kfree(cookie);
-	}
-
+	status = vnode->stream.u.dev.calls->open(vnode->name, oflags, &cookie->u.dev.dcookie);
 	*_cookie = cookie;
 
-	mutex_unlock(&fs->lock);
-err:
-	return err;
+	return status;
 }
 
-static int devfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+
+static int
+devfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
-	int err;
 
 	TRACE(("devfs_close: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
 
-	if(v->stream.type == STREAM_TYPE_DEVICE) {
+	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		err = v->stream.u.dev.calls->close(cookie->u.dev.dcookie);
-	} else {
-		err = 0;
+		return vnode->stream.u.dev.calls->close(cookie->u.dev.dcookie);
 	}
 
-	return err;
+	return B_OK;
 }
 
-static int devfs_freecookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+
+static int
+devfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
 
-	TRACE(("devfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
+	TRACE(("devfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", vnode, cookie));
 
-	if(v->stream.type == STREAM_TYPE_DEVICE) {
+	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		v->stream.u.dev.calls->free(cookie->u.dev.dcookie);
+		vnode->stream.u.dev.calls->free(cookie->u.dev.dcookie);
 	}
 
-	if(cookie)
+	if (cookie)
 		kfree(cookie);
 
 	return 0;
@@ -677,43 +673,32 @@ devfs_fsync(fs_cookie _fs, fs_vnode _v)
 
 
 static ssize_t
-devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buf, off_t pos, size_t *len)
+devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buffer, off_t pos, size_t *length)
 {
 	struct devfs *fs = _fs;
-	struct devfs_vnode *v = _v;
+	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
-	bool is_locked = false;
-	ssize_t err = 0;
-	
-	TRACE(("devfs_read: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", v, cookie, pos, len));
+	struct devfs_part_map *part_map;
 
-	switch (cookie->s->type) {
-		case STREAM_TYPE_DEVICE: {
-			struct devfs_part_map *part_map = v->stream.u.dev.part_map;
-			
-			if (part_map) {
-				if( pos < 0 )
-					pos = 0;
+	TRACE(("devfs_read: vnode 0x%x, cookie 0x%x, pos 0x%x 0x%x, len 0x%x\n", vnode, cookie, pos, len));
 
-				if (pos > part_map->size)
-					return 0;
+	if (cookie->s->type != STREAM_TYPE_DEVICE)
+		return EINVAL;
 
-				*len = min(*len, part_map->size - pos );
-				pos += part_map->offset;
-			}
+	part_map = vnode->stream.u.dev.part_map;
+	if (part_map) {
+		if( pos < 0 )
+			pos = 0;
 
-			// pass the call through to the device
-			err = v->stream.u.dev.calls->read(cookie->u.dev.dcookie, pos, buf, len);
-			break;
-		}
-		default:
-			err = EINVAL;
+		if (pos > part_map->size)
+			return 0;
+
+		*length = min(*length, part_map->size - pos );
+		pos += part_map->offset;
 	}
-err:
-	if (is_locked)
-		mutex_unlock(&fs->lock);
 
-	return err;
+	// pass the call through to the device
+	return vnode->stream.u.dev.calls->read(cookie->u.dev.dcookie, pos, buffer, length);
 }
 
 
@@ -785,6 +770,40 @@ devfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 	}
 
 	return err;
+}
+
+
+static int
+devfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+{
+	return EROFS;
+}
+
+
+static int
+devfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
+{
+	struct devfs *fs = _fs;
+	struct devfs_vnode *vnode = _v;
+	struct devfs_cookie *cookie;
+
+	TRACE(("devfs_open: vnode 0x%x, oflags 0x%x\n", vnode, oflags));
+
+	if (vnode->stream.type != STREAM_TYPE_DIR)
+		return EINVAL;
+
+	cookie = kmalloc(sizeof(struct devfs_cookie));
+	if (cookie == NULL)
+		return ENOMEM;
+
+	mutex_lock(&fs->lock);
+
+	cookie->s = &vnode->stream;
+	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
+	*_cookie = cookie;
+
+	mutex_unlock(&fs->lock);
+	return B_OK;
 }
 
 
@@ -945,13 +964,6 @@ static ssize_t devfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t p
 */
 
 static int
-devfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, stream_type st, void *create_args, vnode_id *new_vnid)
-{
-	return EROFS;
-}
-
-
-static int
 devfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct devfs *fs = _fs;
@@ -994,13 +1006,11 @@ devfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _new
 
 
 static int
-devfs_rstat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
+devfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 {
 	struct devfs_vnode *v = _v;
 
 	TRACE(("devfs_rstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
-
-//dprintf("devfs_rstat\n");
 
 	stat->st_ino = v->id;
 	stat->st_mode = DEFFILEMODE;
@@ -1016,7 +1026,7 @@ devfs_rstat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 
 
 static int
-devfs_wstat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
+devfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 {
 #if DEVFS_TRACE
 	struct devfs_vnode *v = _v;
@@ -1038,34 +1048,40 @@ static struct fs_calls devfs_calls = {
 
 	&devfs_lookup,
 
-	&devfs_getvnode,
-	&devfs_putvnode,
-	&devfs_removevnode,
+	&devfs_get_vnode,
+	&devfs_put_vnode,
+	&devfs_remove_vnode,
 
-	&devfs_open,
-	&devfs_close,
-	&devfs_freecookie,
+	NULL,	// can page (currently commented out for whatever reason...)
+	NULL,	// read page
+	NULL,	// write page
+
+	/* common */
+	&devfs_ioctl,
 	&devfs_fsync,
 
-	&devfs_read,
-	&devfs_write,
-	&devfs_seek,
-	
-	&devfs_read_dir,
-	&devfs_rewind_dir,
-
-	&devfs_ioctl,
-
-	NULL,
-	NULL,
-	NULL,
-
-	&devfs_create,
 	&devfs_unlink,
 	&devfs_rename,
 
-	&devfs_rstat,
-	&devfs_wstat,
+	&devfs_read_stat,
+	&devfs_write_stat,
+
+	/* file */
+	&devfs_create,
+	&devfs_open,
+	&devfs_close,
+	&devfs_free_cookie,
+	&devfs_read,
+	&devfs_write,
+	&devfs_seek,
+
+	/* directory */
+	&devfs_create_dir,
+	&devfs_open_dir,
+	&devfs_close,			// we are using the same operations for directories
+	&devfs_free_cookie,		// and files here - that's intended, not by accident
+	&devfs_read_dir,
+	&devfs_rewind_dir,
 };
 
 

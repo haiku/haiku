@@ -351,7 +351,7 @@ err:
 
 
 static int
-rootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
+rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 
@@ -375,7 +375,7 @@ rootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 
 
 static int
-rootfs_putvnode(fs_cookie _fs, fs_vnode _v, bool r)
+rootfs_put_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 #if ROOTFS_TRACE
 	struct rootfs_vnode *v = (struct rootfs_vnode *)_v;
@@ -387,7 +387,7 @@ rootfs_putvnode(fs_cookie _fs, fs_vnode _v, bool r)
 
 
 static int
-rootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
+rootfs_remove_vnode(fs_cookie _fs, fs_vnode _v, bool r)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *v = (struct rootfs_vnode *)_v;
@@ -407,7 +407,7 @@ rootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
 
 	err = 0;
 
-	if(!r)
+	if (!r)
 		mutex_unlock(&fs->lock);
 
 	return err;
@@ -415,38 +415,17 @@ rootfs_removevnode(fs_cookie _fs, fs_vnode _v, bool r)
 
 
 static int
-rootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, stream_type st, int oflags)
+rootfs_create(fs_cookie _fs, fs_vnode _dir, file_cookie *_cookie, vnode_id *new_vnid, const char *name, int omode, int perms)
 {
-	struct rootfs *fs = (struct rootfs *)_fs;
-	struct rootfs_vnode *v = (struct rootfs_vnode *)_v;
-	struct rootfs_cookie *cookie;
-	int err = 0;
+	return EINVAL;
+}
 
-	TRACE(("rootfs_open: vnode 0x%x, stream_type %d, oflags 0x%x\n", v, st, oflags));
 
-	if (st != STREAM_TYPE_ANY && st != STREAM_TYPE_DIR) {
-		err = ERR_VFS_WRONG_STREAM_TYPE;
-		goto err;
-	}
-
-	cookie = kmalloc(sizeof(struct rootfs_cookie));
-	if (cookie == NULL) {
-		err = ERR_NO_MEMORY;
-		goto err;
-	}
-
-	mutex_lock(&fs->lock);
-
-	cookie->ptr = v->stream.dir.dir_head;
-	cookie->oflags = oflags;
-
-	insert_cookie_in_jar(v, cookie);
-
-	*_cookie = cookie;
-
-	mutex_unlock(&fs->lock);
-err:
-	return err;
+static int
+rootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
+{
+	// allow to open the file, but it can't be done anything with it
+	return B_OK;
 }
 
 
@@ -464,7 +443,7 @@ rootfs_close(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 
 static int
-rootfs_freecookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
+rootfs_free_cookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 {
 	struct rootfs_cookie *cookie = _cookie;
 #if ROOTFS_TRACE
@@ -472,7 +451,7 @@ rootfs_freecookie(fs_cookie _fs, fs_vnode _v, file_cookie _cookie)
 
 	TRACE(("rootfs_freecookie: entry vnode 0x%x, cookie 0x%x\n", v, cookie));
 #endif
-	if(cookie)
+	if (cookie)
 		kfree(cookie);
 
 	return 0;
@@ -533,6 +512,89 @@ rootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 	mutex_unlock(&fs->lock);
 
 	return err;
+}
+
+
+static int
+rootfs_create_dir(fs_cookie _fs, fs_vnode _dir, const char *name, int perms, vnode_id *new_vnid)
+{
+	struct rootfs *fs = _fs;
+	struct rootfs_vnode *dir = _dir;
+	struct rootfs_vnode *new_vnode;
+	struct rootfs_stream *s;
+	int err = 0;
+	bool created_vnode = false;
+
+	TRACE(("rootfs_create: dir 0x%x, name = '%s', stream_type = %d\n", dir, name, st));
+
+	mutex_lock(&fs->lock);
+
+	new_vnode = rootfs_find_in_dir(dir, name);
+	if (new_vnode == NULL) {
+		dprintf("rootfs_create: creating new vnode\n");
+		new_vnode = rootfs_create_vnode(fs);
+		if (new_vnode == NULL) {
+			err = ENOMEM;
+			goto err;
+		}
+		created_vnode = true;
+		new_vnode->name = kstrdup(name);
+		if (new_vnode->name == NULL) {
+			err = ENOMEM;
+			goto err1;
+		}
+		new_vnode->parent = dir;
+		rootfs_insert_in_dir(dir, new_vnode);
+
+		hash_insert(fs->vnode_list_hash, new_vnode);
+
+		s = &new_vnode->stream;
+	} else {
+		// we found the vnode
+		err = ERR_VFS_ALREADY_EXISTS;
+		goto err;
+	}
+
+	new_vnode->stream.dir.dir_head = NULL;
+	new_vnode->stream.dir.jar_head = NULL;
+
+	mutex_unlock(&fs->lock);
+	return 0;
+
+err1:
+	if (created_vnode)
+		rootfs_delete_vnode(fs, new_vnode, false);
+err:
+	mutex_unlock(&fs->lock);
+
+	return err;
+}
+
+
+static int
+rootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
+{
+	struct rootfs *fs = (struct rootfs *)_fs;
+	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_v;
+	struct rootfs_cookie *cookie;
+
+	TRACE(("rootfs_open: vnode 0x%x\n", vnode));
+
+	cookie = kmalloc(sizeof(struct rootfs_cookie));
+	if (cookie == NULL)
+		return ENOMEM;
+
+	mutex_lock(&fs->lock);
+
+	cookie->ptr = vnode->stream.dir.dir_head;
+	//cookie->oflags = oflags;
+
+	insert_cookie_in_jar(vnode, cookie);
+	*_cookie = cookie;
+
+	mutex_unlock(&fs->lock);
+
+	return B_OK;
 }
 
 
@@ -601,88 +663,28 @@ rootfs_ioctl(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, ulong op, void *bu
 
 
 static int
-rootfs_canpage(fs_cookie _fs, fs_vnode _v)
+rootfs_can_page(fs_cookie _fs, fs_vnode _v)
 {
 	return -1;
 }
 
 
 static ssize_t
-rootfs_readpage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+rootfs_read_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	return EPERM;
 }
 
 
 static ssize_t
-rootfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+rootfs_write_page(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	return EPERM;
 }
 
 
 static int
-rootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, stream_type st, void *create_args, vnode_id *new_vnid)
-{
-	struct rootfs *fs = _fs;
-	struct rootfs_vnode *dir = _dir;
-	struct rootfs_vnode *new_vnode;
-	struct rootfs_stream *s;
-	int err = 0;
-	bool created_vnode = false;
-
-	TRACE(("rootfs_create: dir 0x%x, name = '%s', stream_type = %d\n", dir, name, st));
-
-	// we only support stream types of STREAM_TYPE_DIR
-	if (st != STREAM_TYPE_DIR) {
-		err = EPERM;
-		goto err;
-	}
-
-	mutex_lock(&fs->lock);
-
-	new_vnode = rootfs_find_in_dir(dir, name);
-	if (new_vnode == NULL) {
-		dprintf("rootfs_create: creating new vnode\n");
-		new_vnode = rootfs_create_vnode(fs);
-		if(new_vnode == NULL) {
-			err = ENOMEM;
-			goto err;
-		}
-		created_vnode = true;
-		new_vnode->name = kstrdup(name);
-		if(new_vnode->name == NULL) {
-			err = ENOMEM;
-			goto err1;
-		}
-		new_vnode->parent = dir;
-		rootfs_insert_in_dir(dir, new_vnode);
-
-		hash_insert(fs->vnode_list_hash, new_vnode);
-
-		s = &new_vnode->stream;
-	} else {
-		// we found the vnode
-		err = ERR_VFS_ALREADY_EXISTS;
-		goto err;
-	}
-
-	new_vnode->stream.dir.dir_head = NULL;
-	new_vnode->stream.dir.jar_head = NULL;
-
-	mutex_unlock(&fs->lock);
-	return 0;
-
-err1:
-	if(created_vnode)
-		rootfs_delete_vnode(fs, new_vnode, false);
-err:
-	mutex_unlock(&fs->lock);
-
-	return err;
-}
-
-static int rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
+rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
@@ -788,7 +790,7 @@ err:
 	return err;
 }
 
-static int rootfs_rstat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
+static int rootfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 {
 	struct rootfs_vnode *v = _v;
 
@@ -806,7 +808,7 @@ static int rootfs_rstat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 
 
 static int
-rootfs_wstat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
+rootfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 {
 #if ROOTFS_TRACE
 	struct rootfs *fs = _fs;
@@ -829,34 +831,40 @@ static struct fs_calls rootfs_calls = {
 
 	&rootfs_lookup,
 
-	&rootfs_getvnode,
-	&rootfs_putvnode,
-	&rootfs_removevnode,
+	&rootfs_get_vnode,
+	&rootfs_put_vnode,
+	&rootfs_remove_vnode,
 
-	&rootfs_open,
-	&rootfs_close,
-	&rootfs_freecookie,
+	&rootfs_can_page,
+	&rootfs_read_page,
+	&rootfs_write_page,
+
+	/* common */
+	&rootfs_ioctl,
 	&rootfs_fsync,
 
-	&rootfs_read,
-	&rootfs_write,
-	&rootfs_seek,
-	
-	&rootfs_read_dir,
-	&rootfs_rewind_dir,
-
-	&rootfs_ioctl,
-
-	&rootfs_canpage,
-	&rootfs_readpage,
-	&rootfs_writepage,
-
-	&rootfs_create,
 	&rootfs_unlink,
 	&rootfs_rename,
 
-	&rootfs_rstat,
-	&rootfs_wstat,
+	&rootfs_read_stat,
+	&rootfs_write_stat,
+
+	/* file */
+	&rootfs_create,
+	&rootfs_open,
+	&rootfs_close,
+	&rootfs_free_cookie,
+	&rootfs_read,
+	&rootfs_write,
+	&rootfs_seek,
+
+	/* directory */
+	&rootfs_create_dir,
+	&rootfs_open_dir,
+	&rootfs_close,			// we are using the same operations for directories
+	&rootfs_free_cookie,	// and files here - that's intended, not by accident
+	&rootfs_read_dir,
+	&rootfs_rewind_dir,
 };
 
 
