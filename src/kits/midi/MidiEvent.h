@@ -1,16 +1,26 @@
-//-----------------------------------------------------------------------------
-//
-#ifndef _MIDI_EVENT_H_
-#define _MIDI_EVENT_H_
+/**
+ * @file MidiEvent.h
+ *
+ * @author Matthijs Hollemans
+ * @author Paul Stadler
+ */
 
-#include <MidiDefs.h>
+#ifndef _MIDI_EVENT_H
+#define _MIDI_EVENT_H
 
-class BMidiEvent {
+#include "MidiDefs.h"
+
+/**
+ * Describes a MIDI message and its attributes.
+ */
+class BMidiEvent 
+{
 public:
 	BMidiEvent();
 	~BMidiEvent();
 
-	enum Opcode {
+	enum
+	{
 		OP_NONE,
 		OP_NOTE_OFF,
 		OP_NOTE_ON,
@@ -25,64 +35,101 @@ public:
 		OP_TEMPO_CHANGE,
 		OP_ALL_NOTES_OFF,
 		OP_TRACK_END,
-		OP_NUM
-	};
+	}
+	opcode;
 
 	uint32 time;
-	Opcode opcode;
-	union Data {
-		struct NoteOffData {
-			uint8 channel;
-			uint8 note;
-			uint8 velocity;
-		} note_off;
-		struct NoteOnData {
-			uint8 channel;
-			uint8 note;
-			uint8 velocity;
-		} note_on;
-		struct KeyPressureData {
-			uint8 channel;
-			uint8 note;
-			uint8 pressure;
-		} key_pressure;
-		struct ControlChangeData {
-			uint8 channel;
-			uint8 number;
-			uint8 value;
-		} control_change;
-		struct ProgramChangeData {
-			uint8 channel;
-			uint8 number;
-		} program_change;
-		struct ChannelPressureData {
-			uint8 channel;
-			uint8 pressure;
-		} channel_pressure;
-		struct PitchBendData {
-			uint8 channel;
-			uint8 lsb;
-			uint8 msb;
-		} pitch_bend;
-		struct SystemExclusiveData {
-			uint8 * data;
-			int32 length;
-		} system_exclusive;
-		struct SystemCommonData {
-			uint8 status;
-			uint8 data1;
-			uint8 data2;
-		} system_common;
-		struct SystemRealTimeData {
-			uint8 status;
-		} system_real_time;
-		struct TempoChangeData {
-			uint32 beats_per_minute;
-		} tempo_change;
-		struct AllNotesOffData {
-			bool just_channel;
-		} all_notes_off;
-	} data;
+
+	union 
+	{
+		struct 
+		{
+			uchar channel;
+			uchar note;
+			uchar velocity;
+		} 
+		noteOff;
+
+		struct 
+		{
+			uchar channel;
+			uchar note;
+			uchar velocity;
+		} 
+		noteOn;
+
+		struct
+		{
+			uchar channel;
+			uchar note;
+			uchar pressure;
+		} 
+		keyPressure;
+
+		struct 
+		{
+			uchar channel;
+			uchar controlNumber;
+			uchar controlValue;
+		} 
+		controlChange;
+
+		struct 
+		{
+			uchar channel;
+			uchar programNumber;
+		} 
+		programChange;
+
+		struct 
+		{
+			uchar channel;
+			uchar pressure;
+		} 
+		channelPressure;
+
+		struct 
+		{
+			uchar channel;
+			uchar lsb;
+			uchar msb;
+		} 
+		pitchBend;
+
+		struct 
+		{
+			uint8* data;
+			size_t dataLength;
+		} 
+		systemExclusive;
+
+		struct 
+		{
+			uchar status;
+			uchar data1;
+			uchar data2;
+		} 
+		systemCommon;
+
+		struct 
+		{
+			uchar status;
+		} 
+		systemRealTime;
+
+		struct 
+		{
+			uint32 beatsPerMinute;
+		} 
+		tempoChange;
+
+		struct 
+		{
+			bool justChannel;
+		} 
+		allNotesOff;
+	};
 };
 
-#endif _MIDI_EVENT_H_
+#endif _MIDI_EVENT_H
+
