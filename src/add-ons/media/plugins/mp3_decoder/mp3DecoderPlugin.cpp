@@ -83,10 +83,10 @@ mp3Decoder::~mp3Decoder()
 
 
 void 
-mp3Decoder::GetCodecInfo(media_codec_info &info)
+mp3Decoder::GetCodecInfo(media_codec_info *info)
 {
-	strcpy(info.short_name, "mp3");
-	strcpy(info.pretty_name, "MPEG 1/2/2.5 audio layer 1/2/3 decoder, based on mpeg123 mpglib");
+	strcpy(info->short_name, "mp3");
+	strcpy(info->pretty_name, "MPEG audio decoder (mpeg123 mpglib)");
 		// ToDo: could alter the above string depending on the real format
 }
 

@@ -22,14 +22,14 @@ AudioBufferSize(int32 channel_count, uint32 sample_format, float frame_rate, big
 
 
 void
-RawDecoder::GetCodecInfo(media_codec_info &info)
+RawDecoder::GetCodecInfo(media_codec_info *info)
 {
-	strcpy(info.short_name, "raw");
+	strcpy(info->short_name, "raw");
 
 	if (fInputFormat.IsAudio())
-		strcpy(info.pretty_name, "Raw audio decoder");
+		strcpy(info->pretty_name, "Raw audio decoder");
 	else
-		strcpy(info.pretty_name, "Raw video decoder");
+		strcpy(info->pretty_name, "Raw video decoder");
 }
 
 

@@ -68,10 +68,10 @@ SpeexDecoder::~SpeexDecoder()
 
 
 void
-SpeexDecoder::GetCodecInfo(media_codec_info &info)
+SpeexDecoder::GetCodecInfo(media_codec_info *info)
 {
-	strncpy(info.short_name, "speex-libspeex", sizeof(info.short_name));
-	strncpy(info.pretty_name, "speex decoder [libspeex], by Andrew Bachmann", sizeof(info.pretty_name));
+	strncpy(info->short_name, "speex-libspeex", sizeof(info->short_name));
+	strncpy(info->pretty_name, "speex decoder [libspeex], by Andrew Bachmann", sizeof(info->pretty_name));
 }
 
 

@@ -22,10 +22,10 @@ MusePackDecoder::~MusePackDecoder()
 
 
 void
-MusePackDecoder::GetCodecInfo(media_codec_info &info)
+MusePackDecoder::GetCodecInfo(media_codec_info *info)
 {
-	strcpy(info.short_name, "musepack");
-	strcpy(info.pretty_name, "MusePack audio codec based on mpcdec by Andree Buschmann");
+	strcpy(info->short_name, "musepack");
+	strcpy(info->pretty_name, "MusePack audio codec based on mpcdec by Andree Buschmann");
 }
 
 
