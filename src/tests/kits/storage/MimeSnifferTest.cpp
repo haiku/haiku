@@ -9,6 +9,8 @@
 #include <String.h>		// BString
 #include <TestUtils.h>
 
+#include <stdio.h>
+
 using namespace Sniffer;
 
 // Suite
@@ -701,7 +703,30 @@ MimeSnifferTest::ScannerTest() {
 				S("ABCD"),
 				T(RightParen)
 			}
-		}
+		},
+		// The uber test
+		{ "0 -0 +0 1 -2 +3 0. -0. +0. 1. -2. +3. 0.0 -0.1 +0.2 1.0 -2.1 +3.2 "
+		  "0.e0 0.e-1 0.e+2 1.e1 2.e-2 3.e+3 -1.e1 -2.e-2 -3.e+3 +1.e1 +2.e-2 +3.e+3 "
+		  "0.012345 1.23456 ( ) [ ] | & : "
+		  " \"abcxyzABCXYZ_ ( ) [ ] | & : \t\n \\\" ' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 \" "
+		  " 'abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" \\' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 ' "
+		  " \\000abc_xyz123 \\xA1a1 \\!\\?\\\\ "
+		  " 0x00 0x12 0xabCD 0xaBcD 0x0123456789aBcDeFfEdCbA", 49,
+		  	{	I(0), I(0), I(0), I(1), I(-2), I(3), F(0.0), F(0.0), F(0.0),
+		  			F(1.0), F(-2.0), F(3.0), F(0.0), F(-0.1), F(0.2), F(1.0), F(-2.1), F(3.2),
+		  		F(0.0), F(0.0e-1), F(0.0e2), F(1.0e1), F(2.0e-2), F(3.0e3),
+		  			F(-1.0e1), F(-2.0e-2), F(-3.0e3), F(1.0e1), F(2.0e-2), F(3.0e3),
+		  		F(0.012345), F(1.23456), T(LeftParen), T(RightParen), T(LeftBracket),
+		  			T(RightBracket), T(Divider), T(Ampersand), T(Colon),
+		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
+		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
+		  		S("\000abc_xyz123"),
+		  		S("\204a1"),
+		  		S("!?\\"),
+		  		S("\x00"), S("\x12"), S("\xAB\xCD"), S("\xAB\xCD"),
+		  			S("\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFE\xDC\xBA")
+		  	}
+		},
 	};
 	
 // Undefine our nasty macros
@@ -717,39 +742,55 @@ MimeSnifferTest::ScannerTest() {
 		TokenStream stream;
 		try {
 			stream.SetTo(testCases[i].rule);
+
+			CHK(stream.InitCheck() == B_OK);
+			for (int j = 0; j < testCases[i].tokenCount; j++) {
+				const Token *token = stream.Get();
+				CHK(token);
+
+//				cout << tokenTypeToString(token->Type()) << endl;
+/*	
+				if (token->Type() == CharacterString) 
+					cout << " token1 == " << token->String() << endl;
+				if (testCases[i].tokens[j]->Type() == CharacterString)
+					cout << " token2 == " << (testCases[i].tokens[j])->String() << endl;
+					
+				if (token->Type() == CharacterString) 
+				{
+					const char *str = token->String();
+					for (int i = 0; i < strlen(str); i++)
+						printf("%x", str[i]);
+					printf("\n");
+				}
+				if (testCases[i].tokens[j]->Type() == CharacterString)
+				{
+					const char *str = (testCases[i].tokens[j])->String();
+					for (int i = 0; i < strlen(str); i++)
+						printf("%x", str[i]);
+					printf("\n");
+				}
+	
+				switch (token->Type()) {
+					case CharacterString:
+						cout << " string == " << token->String() << endl;
+						break;
+					case Integer:
+						cout << " int == " << token->Int() << endl;
+						break;
+					case FloatingPoint:
+						cout << " float == " << token->Float() << endl;
+						break;
+				}
+*/	
+				CHK(*token == *(testCases[i].tokens[j]));
+				delete testCases[i].tokens[j];
+			}
+			CHK(stream.IsEmpty());
 		} catch (Err *e) {
 			CppUnit::Exception *err = new CppUnit::Exception(e->Msg());
 			delete e;
 			throw *err;
 		}
-		CHK(stream.InitCheck() == B_OK);
-		for (int j = 0; j < testCases[i].tokenCount; j++) {
-			const Token *token = stream.Get();
-			CHK(token);
-//			cout << tokenTypeToString(token->Type()) << endl;
-/*
-			if (token->Type() == CharacterString)
-				cout << " token1 == " << token->String() << endl;
-			if (testCases[i].tokens[j]->Type() == CharacterString)
-				cout << " token2 == " << (testCases[i].tokens[j])->String() << endl;
-*/
-			CHK(*token == *(testCases[i].tokens[j]));
-/*
-			switch (token->Type()) {
-				case CharacterString:
-					cout << " string == " << token->String() << endl;
-					break;
-				case Integer:
-					cout << " int == " << token->Int() << endl;
-					break;
-				case FloatingPoint:
-					cout << " float == " << token->Float() << endl;
-					break;
-			}
-*/
-			delete testCases[i].tokens[j];
-		}
-		CHK(stream.IsEmpty());
 
 	}
 #endif	// !TEST_R5
@@ -758,9 +799,6 @@ MimeSnifferTest::ScannerTest() {
 // Parser Test
 void
 MimeSnifferTest::ParserTest() {
-#if TEST_R5
-	Outputf("(no tests actually performed for R5 version)\n");
-#else	// TEST_R5
 	// test a couple of valid and invalid rules
 	struct test_case {
 		const char	*rule;
@@ -799,52 +837,131 @@ MimeSnifferTest::ParserTest() {
 		{ "0.8 [-5:-3] (\"abc\" & 'abc')", NULL },
 // Also accepted by the R5 sniffer but not the R5 parser. We reject.
 //		{ "0.8 [5:3] (\"abc\" & 'abc')", NULL },
-		{ "1.2 ('ABCD')", NULL },
+		{ "1.0 ('ABCD')", NULL },
 		{ ".2 ('ABCD')", NULL },
 		{ "0. ('ABCD')", NULL },
-		{ "-1 ('ABCD')", NULL },
+		{ "1 ('ABCD')", NULL },
 		{ "+1 ('ABCD')", NULL },
-//		{ "1E25 ('ABCD')", NULL },
+// We accept extended notation floating point numbers now, but
+// not invalid priorities. 
+//		{ "1E25 ('ABCD')", NULL },	
 //		{ "1e25 ('ABCD')", NULL },
+// R5 chokes on this rule :-(
+#if !TEST_R5
+		{ "1e-3 ('ABCD')", NULL },
+#endif
+		{ "+.003e2 ('ABCD')", NULL },
+// This one too. See how much better our parser is? :-)
+#if !TEST_R5
+		{ "-123e-9999999999 ('ABCD')", NULL },	// Hooray for the stunning accuracy of floating point ;-)
+#endif
 		// invalid rules
-		{ "0.0 ('')", "Sniffer pattern error: illegal empty pattern" },	// Fix
-		{ "('ABCD')", "Sniffer pattern error: match level expected" },
-		{ "[0:3] ('ABCD')", "Sniffer pattern error: match level expected" },
+		{ "0.0 ('')",
+			"Sniffer pattern error: illegal empty pattern" },
+		{ "('ABCD')",
+			"Sniffer pattern error: match level expected" },
+		{ "[0:3] ('ABCD')",
+			"Sniffer pattern error: match level expected" },
 		{ "0.8 [0:3] ( | 'abcdefghij')",
 		  "Sniffer pattern error: missing pattern" },
 		{ "0.8 [0:3] ('ABCDEFG' | )",
 		  "Sniffer pattern error: missing pattern" },
-		{ "[0:3] ('ABCD')", "Sniffer pattern error: match level expected" },
-		{ "1.0 (ABCD')", "Sniffer pattern error: misplaced single quote" },
-		{ "1.0 ('ABCD)", "Sniffer pattern error: unterminated rule" },
-		{ "1.0 (ABCD)", "Sniffer pattern error: missing pattern" },
-		{ "1.0 (ABCD 'ABCD')", "Sniffer pattern error: missing pattern" },
-		{ "1.0 'ABCD')", "Sniffer pattern error: missing pattern" },
-		{ "1.0 ('ABCD'", "Sniffer pattern error: unterminated rule" },
-		{ "1.0 'ABCD'", "Sniffer pattern error: missing sniff pattern" },
+		{ "[0:3] ('ABCD')",
+			"Sniffer pattern error: match level expected" },
+		{ "1.0 (ABCD')",
+#if TEST_R5
+			"Sniffer pattern error: misplaced single quote"
+#else
+			"Sniffer pattern error: invalid character 'A'"
+#endif
+		},
+		{ "1.0 ('ABCD)",
+#if TEST_R5
+			"Sniffer pattern error: unterminated rule"
+#else
+			"Sniffer pattern error: unterminated single-quoted string"
+#endif
+		},
+		{ "1.0 (ABCD)",
+#if TEST_R5
+			"Sniffer pattern error: missing pattern"
+#else
+			"Sniffer pattern error: invalid character 'A'"
+#endif
+		},
+		{ "1.0 (ABCD 'ABCD')",
+#if TEST_R5
+			"Sniffer pattern error: missing pattern"
+#else
+			"Sniffer pattern error: invalid character 'A'"
+#endif
+		},
+		{ "1.0 'ABCD')",
+#if TEST_R5
+			"Sniffer pattern error: missing pattern"
+#else
+			"Sniffer pattern error: missing pattern"
+#endif
+		},
+		{ "1.0 ('ABCD'",
+			"Sniffer pattern error: unterminated rule" },
+		{ "1.0 'ABCD'",
+#if TEST_R5
+			"Sniffer pattern error: missing sniff pattern"
+#else
+			"Sniffer pattern error: missing pattern"
+#endif
+		},
 		{ "0.5 [0:3] ('ABCD' | 'abcd' | [13] 'EFGH')", 
-		  "Sniffer pattern error: missing pattern" },
+		  	"Sniffer pattern error: missing pattern" },
 		{ "0.5('ABCD'|'abcd'|[13]'EFGH')",
-		  "Sniffer pattern error: missing pattern" },
+		  	"Sniffer pattern error: missing pattern" },
 		{ "0.5[0:3]([10]'ABCD'|[17]'abcd'|[13]'EFGH')",
-		  "Sniffer pattern error: missing pattern" },
+		  	"Sniffer pattern error: missing pattern" },
 		{ "0.8 [0x10:3] ('ABCDEFG' | 'abcdefghij')",
-		  "Sniffer pattern error: pattern offset expected" },
+		  	"Sniffer pattern error: pattern offset expected" },
 		{ "0.8 [0:A] ('ABCDEFG' | 'abcdefghij')",
-		  "Sniffer pattern error: pattern range end expected" },
+#if TEST_R5
+		  	"Sniffer pattern error: pattern range end expected"
+#else
+			"Sniffer pattern error: invalid character 'A'"
+#endif
+		},
 		{ "0.8 [0:3] ('ABCDEFG' & 'abcdefghij')",
-		  "Sniffer pattern error: pattern and mask lengths do not match" },//
+		  	"Sniffer pattern error: pattern and mask lengths do not match" },
 		{ "0.8 [0:3] ('ABCDEFG' & 'abcdefg' & 'xyzwmno')",
-		  "Sniffer pattern error: unterminated rule" },
-		{ "0.8 [0:3] (\\g&b & 'a')", "Sniffer pattern error: missing mask" },
+#if TEST_R5
+		  	"Sniffer pattern error: unterminated rule"
+#else
+			"Sniffer pattern error: expecting '|', ')', or possibly '&'"
+#endif
+		},
+		{ "0.8 [0:3] (\\g&b & 'a')",
+#if TEST_R5
+			"Sniffer pattern error: missing mask"
+#else
+			"Sniffer pattern error: invalid character 'b'"
+#endif
+		},
 		{ "0.8 [0:3] (\\19 & 'a')",
-		  "Sniffer pattern error: pattern and mask lengths do not match" },
+		  	"Sniffer pattern error: pattern and mask lengths do not match" },
 		{ "0.8 [0:3] (0x345 & 'ab')",
-		  "Sniffer pattern error: bad hex literal" },
+		  	"Sniffer pattern error: bad hex literal" },
 		{ "0.8 [0:3] (0x3457M & 'abc')",
-		  "Sniffer pattern error: expecting '|' or '&'" },
+#if TEST_R5
+		  	"Sniffer pattern error: expecting '|' or '&'"
+#else
+			"Sniffer pattern error: invalid character 'M'"
+#endif
+		},
 		{ "0.8 [0:3] (0x3457\\7 & 'abc')",
-		  "Sniffer pattern error: expecting '|' or '&'" },
+#if TEST_R5
+		  	"Sniffer pattern error: expecting '|' or '&'"
+#else
+			"Sniffer pattern error: expecting '|', ')', or possibly '&'"
+#endif
+		},
+
 //		{ "1E-25 ('ABCD')", "Sniffer pattern error: missing pattern" },
 			// I don't currently understand what's wrong with the above rule... R5
 			// rejects it though, for some reason.
@@ -860,65 +977,26 @@ MimeSnifferTest::ParserTest() {
 		status_t error = BMimeType::CheckSnifferRule(testCase.rule,
 													 &parseError);
 		if (testCase.error == NULL) {
-if (error != B_OK)
-cout << endl << parseError.String() << endl;
+			if (error != B_OK) {
+				cout << endl << "This sucker's gonna fail..."
+				     << endl << "RULE: '" << testCase.rule
+				     << endl << "ERROR: "
+				     << endl << parseError.String()
+				     << endl;
+			}
 			CHK(error == B_OK);
 		} else {
-			// This really isn't doing a proper test at the moment,
-			// but it's more convenient this way while I'm developing...
-			CHK(error == B_BAD_MIME_SNIFFER_RULE);
-			if (error) {
-//				cout << endl << parseError.String(); // << endl;
-//				CHK(parseError.FindLast(testCase.error) >= 0);
+//			cout << endl << parseError.String(); // << endl;
 /*
-				if (parseError.FindLast(testCase.error) >= 0) {
-					cout << " -- OKAY" << endl;
-				} else {
-					cout << " -- NOGO" << endl;
-					cout << testCase.error << endl;
-				}
-*/
+			if (parseError.FindLast(testCase.error) >= 0) {
+				cout << " -- OKAY" << endl;
+			} else {
+				cout << " -- NOGO" << endl;
+				cout << testCase.error << endl;
 			}
+*/
+			CHK(error == B_BAD_MIME_SNIFFER_RULE);
+			CHK(parseError.FindLast(testCase.error) >= 0);
 		}
 	}
-
-/*
-	struct test_case {
-		const char *rule;
-		int thingThatMakesTheDamnTestNotCrash;
-	} testCases[] = {
-		{ "1.0", 0 },
-		{ "[]", 0 }
-	};
-
-	const int testCaseCount = sizeof(testCases) / sizeof(test_case);
-	for (int i = 0; i < testCaseCount; i++) {
-		cout << i << endl;
-		NextSubTest();
-
-		Parser parser;
-		Rule rule;
-		BString str;
-		
-		status_t err = RES(parser.Parse(testCases[i].rule, &rule, &str));
-		if (err)
-			cout << "Error: " << str.String() << endl;;
-	}
-	cout << "DONE!" << endl;
-
-*/
-
-#endif	// !TEST_R5
 }
-
-
-
-
-
-
-
-
-
-
-
-
