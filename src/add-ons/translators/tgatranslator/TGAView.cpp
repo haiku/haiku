@@ -45,10 +45,24 @@
 // Returns:
 // ---------------------------------------------------------------
 TGAView::TGAView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags)
+	uint32 resize, uint32 flags, TGATranslatorSettings *psettings)
 	:	BView(frame, name, resize, flags)
 {
+	fpsettings = psettings;
+	
 	SetViewColor(220,220,220,0);
+	
+	BMessage *pmsgRLE = new BMessage(CHANGE_RLE);
+	fpchkRLE = new BCheckBox(BRect(10, 45, 180, 62),
+		"Save with RLE Compression",
+		"Save with RLE Compression", pmsgRLE);
+		
+	int32 val;
+	val = (psettings->SetGetRLE()) ? 1 : 0;
+
+	fpchkRLE->SetValue(val);
+	fpchkRLE->SetViewColor(ViewColor());
+	AddChild(fpchkRLE);
 }
 
 // ---------------------------------------------------------------
@@ -66,6 +80,29 @@ TGAView::TGAView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 TGAView::~TGAView()
 {
+	fpsettings->Release();
+}
+
+void
+TGAView::AllAttached()
+{
+	BMessenger msgr(this);
+	fpchkRLE->SetTarget(msgr);
+}
+
+void
+TGAView::MessageReceived(BMessage *message)
+{
+	if (message->what == CHANGE_RLE) {
+		bool bnewval;
+		if (fpchkRLE->Value())
+			bnewval = true;
+		else
+			bnewval = false;
+		fpsettings->SetGetRLE(&bnewval);
+		fpsettings->SaveSettings();
+	} else
+		BView::MessageReceived(message);
 }
 
 // ---------------------------------------------------------------
@@ -107,11 +144,6 @@ TGAView::Draw(BRect area)
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 /*	char copyright[] = "© 2002 OpenBeOS Project";
 	DrawString(copyright, BPoint(xbold, yplain * 2 + ybold));
-	
-	char becopyright[] = "Portions Copyright 1991-1999, Be Incorporated.";
-	DrawString(becopyright, BPoint(xbold, yplain * 4 + ybold));
-	char allrights[] = "All rights reserved.";
-	DrawString(allrights, BPoint(xbold, yplain * 5 + ybold));
 */	
 	char writtenby[] = "Written by the OBOS Translation Kit Team";
 	DrawString(writtenby, BPoint(xbold, yplain * 7 + ybold));
