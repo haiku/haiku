@@ -37,26 +37,28 @@ THE SOFTWARE.
 
 class PDFWriter;
 
+class TextLine;
+
 class Link {
 protected:
 	PDFWriter* fWriter;
 	BString*   fUtf8;
-	BFont*     fFont;
-	int        fPos; // into fUtf8
 		
 	bool       fContainsLink;
 	int        fStartPos, fEndPos;
-	BPoint     fStart;
 
 	virtual void DetectLink(int start) = 0;
 	virtual void CreateLink(float llx, float lly, float urx, float ury) = 0;
 	
-	void CreateLink(BPoint end);
+	void CreateLink();
+	bool ContainsLink() const { return fContainsLink; }
+	
+private:
+	bool BoundingBox(BRect* rect);
 	
 public:
-	Link(PDFWriter* writer, BString* utf8, BFont* font);
-	void Init() { DetectLink(0); }
-	void NextChar(int cps, float x, float y, float w);
+	Link(PDFWriter* writer, BString* utf8);
+	void Do();
 };
 
 class WebLink : public Link {
@@ -82,7 +84,7 @@ class WebLink : public Link {
 	void DetectLink(int start);
 	
 public:
-	WebLink(PDFWriter* writer, BString* utf8, BFont* font);
+	WebLink(PDFWriter* writer, BString* utf8);
 };
 
 class TextSegment {
@@ -122,6 +124,8 @@ public:
 	
 	void Add(TextSegment* segment);
 	void Flush();
+	// startPos inclusive, endPos exclusive
+	bool BoundingBox(int startPos, int endPos, BRect* bounds);
 };
 
 

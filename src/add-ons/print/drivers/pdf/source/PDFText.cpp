@@ -321,7 +321,7 @@ PDFWriter::CodePointSize(const char* s)
 
 
 void PDFWriter::RecordDests(const char* s) {
-	::RecordDests record(fXRefDests, fPage);
+	::RecordDests record(fXRefDests, &fTextLine, fPage);
 	fXRefs->Matches(s, &record, true);
 }
 

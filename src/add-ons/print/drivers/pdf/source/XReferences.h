@@ -168,11 +168,13 @@ class Destination {
 private:
 	BString fLabel;
 	int32   fPage;
+	BRect   fBoundingBox;
 	
 public:
-	Destination(const char* label, int32 page);
+	Destination(const char* label, int32 page, BRect bounds);
 	const char* Label() const { return fLabel.String(); }
 	int32       Page() const  { return fPage; }
+	BRect       BoundingBox() const { return fBoundingBox; }
 };
 
 
@@ -194,8 +196,8 @@ class XRefDests {
 	
 public:
 	XRefDests(int32 n);
-	bool Add(XRefDef* def, const char* label, int32 page);
-	bool Find(XRefDef* def, const char* label, int32* page) const;
+	bool Add(XRefDef* def, const char* label, int32 page, BRect boundingBox);
+	bool Find(XRefDef* def, const char* label, int32* page, BRect* boundingBox) const;
 };
 
 
@@ -203,10 +205,11 @@ public:
 
 class RecordDests : public XMatchResult {
 	XRefDests* fDests;
+	TextLine*  fLine;
 	int32      fPage;
-	
+		
 public:
-	RecordDests(XRefDests* dests, int32 page);
+	RecordDests(XRefDests* dests, TextLine* line, int32 page);
 	bool Link(XRefDef* def, MatchResult* result);
 	bool Dest(XRefDef* def, MatchResult* result);	
 };
@@ -217,15 +220,17 @@ public:
 class LocalLink : public Link, XMatchResult {
 protected:
 	XRefDefs*  fDefs;
-	XRefDests* fDests;
+	XRefDests* fDests;	
+	int32      fLinkPage;
 	
-	int32      fLinkPage, fDestPage;
+	int32      fDestPage;
+	BRect      fDestBounds;
 
 	void DetectLink(int start);
 	void CreateLink(float llx, float lly, float urx, float ury);
 
 public:
-	LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BString* utf8, BFont* font, int32 page);
+	LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BString* utf8, int32 page);
 	bool Link(XRefDef* def, MatchResult* result);
 	bool Dest(XRefDef* def, MatchResult* result);
 };

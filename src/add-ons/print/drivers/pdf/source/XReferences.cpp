@@ -214,7 +214,7 @@ Line comment starts with: '#'
 
 Definition = Version {XRefDef}.
 Version    = "CrossReferences" "1.0".
-XRefDef    = Pattern {"," Pattern} "-" ">" Pattern {, Pattern} ".". 
+XRefDef    = Pattern {"," Pattern} "-" ">" Pattern {"," Pattern} ".". 
 Pattern    = '"' string '"'.
 
 Example:
@@ -301,9 +301,10 @@ bool XRefDefs::Read(const char* name) {
 
 // Destination
 
-Destination::Destination(const char* label, int32 page)
+Destination::Destination(const char* label, int32 page, BRect bounds)
 	: fLabel(label)
 	, fPage(page)
+	, fBoundingBox(bounds)
 {
 }
 
@@ -336,23 +337,24 @@ XRefDests::XRefDests(int32 n) {
 }
 
 
-bool XRefDests::Add(XRefDef* def, const char* label, int32 page) {
+bool XRefDests::Add(XRefDef* def, const char* label, int32 page, BRect boundingBox) {
 	DestList* list = GetList(def);
 	ASSERT(list != NULL);
 	if (!list->Find(label)) {
-		list->AddItem(new Destination(label, page));
+		list->AddItem(new Destination(label, page, boundingBox));
 		return true;
 	}
 	return false;
 }
 
 
-bool XRefDests::Find(XRefDef* def, const char* label, int32* page) const {
+bool XRefDests::Find(XRefDef* def, const char* label, int32* page, BRect* boundingBox) const {
 	DestList* list = GetList(def);
 	ASSERT(list != NULL);
 	Destination* dest = list->Find(label);
 	if (dest) {
 		*page = dest->Page();
+		*boundingBox = dest->BoundingBox();
 		return true;
 	}
 	return false;
@@ -361,12 +363,12 @@ bool XRefDests::Find(XRefDef* def, const char* label, int32* page) const {
 
 // RecordDests
 
-RecordDests::RecordDests(XRefDests* dests, int32 page)
+RecordDests::RecordDests(XRefDests* dests, TextLine* line, int32 page)
 	: fDests(dests)
+	, fLine(line)
 	, fPage(page)
 {
 }
-
 
 bool RecordDests::Link(XRefDef* def, MatchResult* result) {
 	return true;
@@ -376,8 +378,11 @@ bool RecordDests::Link(XRefDef* def, MatchResult* result) {
 bool RecordDests::Dest(XRefDef* def, MatchResult* result) {
 	if (result->CountResults() >= 2) {
 		BString s;
+		BRect b;
 		result->GetString(1, &s);
-		fDests->Add(def, s.String(), fPage);
+		if (fLine->BoundingBox(result->StartPos(1), result->EndPos(1), &b)) {
+			fDests->Add(def, s.String(), fPage, b);
+		}
 	}
 	return true;
 }
@@ -385,8 +390,8 @@ bool RecordDests::Dest(XRefDef* def, MatchResult* result) {
 
 // LocalLink
 
-LocalLink::LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BString* utf8, BFont* font, int32 page)
-	: ::Link(writer, utf8, font)
+LocalLink::LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BString* utf8, int32 page)
+	: ::Link(writer, utf8)
 	, fDefs(defs)
 	, fDests(dests)
 	, fLinkPage(page)
@@ -398,7 +403,7 @@ bool LocalLink::Link(XRefDef* def, MatchResult* result) {
 	if (result->CountResults() >= 2) {
 		BString label;
 		result->GetString(1, &label);
-		if (fDests->Find(def, label.String(), &fDestPage)) {
+		if (fDests->Find(def, label.String(), &fDestPage, &fDestBounds)) {
 			result->Start(1);
 			fContainsLink = true;
 			fStartPos     = result->Start(1) - fUtf8->String();
@@ -428,9 +433,11 @@ void LocalLink::DetectLink(int start) {
 
 
 void LocalLink::CreateLink(float llx, float lly, float urx, float ury) {
+	char optList[256];
 	if (fDestPage != fLinkPage) {
 		BString s(&fUtf8->String()[fStartPos], fEndPos-fStartPos+1);
 		REPORT(kInfo, fLinkPage, "Link '%s' to page %d", s.String(), fDestPage);
-		PDF_add_locallink(fWriter->fPdf, llx, lly, urx, ury, fDestPage, "retain");
+		sprintf(optList, "type=fixed left=%f top=%f", fDestBounds.left, fDestBounds.top);
+		PDF_add_locallink(fWriter->fPdf, llx, lly, urx, ury, fDestPage, optList);
 	}
 }

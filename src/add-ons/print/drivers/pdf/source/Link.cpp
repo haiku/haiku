@@ -37,53 +37,43 @@ THE SOFTWARE.
 #include "Log.h"
 #include "Report.h"
 
-Link::Link(PDFWriter* writer, BString* utf8, BFont* font)
+Link::Link(PDFWriter* writer, BString* utf8)
 	: fWriter(writer)
 	, fUtf8(utf8)
-	, fFont(font)
-	, fPos(0)
 	, fContainsLink(false)
 {
+}
+
+bool
+Link::BoundingBox(BRect* rect) {
+	return fWriter->fTextLine.BoundingBox(fStartPos, fEndPos+1, rect);
 }
 
 
 // create link from fStartPos to fEndPos and fStart to end
 void 
-Link::CreateLink(BPoint end)
+Link::CreateLink()
 {
-	if (fFont->Rotation() != 0.0) {
+	static bool reported = false; // report warning once only
+	BRect bounds;
+	if (BoundingBox(&bounds)) {
+		CreateLink(bounds.left, bounds.bottom, bounds.right, bounds.top);
+	} else if (!reported) {
 		REPORT(kWarning, fWriter->fPage, "Warning: Can not create link for rotated font!");
-		return;
+		reported = true;
 	}
-	
-	// calculate rectangle for url
-	font_height height;
-	fFont->GetHeight(&height);
-
-	float llx, lly, urx, ury;	
-
-	llx = fWriter->tx(fStart.x);
-	urx = fWriter->tx(end.x);
-	lly = fWriter->ty(fStart.y + height.descent);
-	ury = fWriter->ty(end.y - height.ascent);
-
-	CreateLink(llx, lly, urx, ury);
 }
 
-
 void
-Link::NextChar(int cps, float x, float y, float w)
-{
-	if (fContainsLink) {
-		if (fPos == fStartPos) {
-			fStart.Set(x, y);
+Link::Do() {
+	int pos = 0;
+	do {
+		DetectLink(pos);
+		if (ContainsLink()) {
+			CreateLink();
+			pos = fEndPos;
 		}
-		if (fPos == fEndPos) {
-			CreateLink(BPoint(x + w, y));
-			DetectLink(fPos + cps);
-		}
-		fPos += cps;
-	}
+	} while (ContainsLink());
 }
 
 // TODO: check this list and add more prefixes
@@ -292,8 +282,8 @@ WebLink::CreateLink(float llx, float lly, float urx, float ury)
 }
 
 
-WebLink::WebLink(PDFWriter* writer, BString* utf8, BFont* font)
-	: Link(writer, utf8, font)
+WebLink::WebLink(PDFWriter* writer, BString* utf8)
+	: Link(writer, utf8)
 {
 }
 
@@ -371,6 +361,78 @@ bool TextLine::Follows(TextSegment* segment) const {
 	return false;
 }
 
+bool TextLine::BoundingBox(int startPos, int endPos, BRect* bounds) {
+	const int32 n = fSegments.CountItems();
+	if (n == 0) return false;
+
+	// build the text in the line	
+	BString line;
+	for (int32 i = 0; i < n; i ++) {
+		line << fSegments.ItemAt(i)->Text();
+	}
+
+	const char* c = line.String();
+	const char* pStart = &c[startPos];
+	const char* pEnd = &c[endPos];	 
+
+	for (int32 i = 0; i < n; i ++) {
+	
+		TextSegment* seg         = fSegments.ItemAt(i);
+		BPoint       pos         = seg->Start();
+		BFont*       font        = seg->Font();
+		const char*  sc          = seg->Text();
+		float        escpSpace   = seg->EscpSpace();
+		float        escpNoSpace = seg->EscpNoSpace();
+		int32        spaces      = seg->Spaces();
+		PDFSystem*   system      = seg->System();
+		
+		
+		while (*sc != 0) {
+			ASSERT(*sc == *c);
+			
+			int s = fWriter->CodePointSize((char*)c);
+	
+			float w = font->StringWidth(c, s);
+	
+			if (c == pStart) {
+				bounds->left = bounds->right = system->tx(pos.x);
+				bounds->top = bounds->bottom = system->ty(pos.y);
+			}
+			if (pStart <= c && c < pEnd) {		
+				font_height height;
+				font->GetHeight(&height);
+				float top = system->ty(pos.y - height.ascent);
+				float bottom = system->ty(pos.y + height.descent);
+				
+				if (bounds->top < top) bounds->top = top;
+				if (bounds->bottom > bottom) bounds->bottom = bottom;
+				bounds->right = system->tx(pos.x+w);
+			}
+			if (spaces == 0) {
+				// position of next character
+				if (*(unsigned char*)c <= 0x20) { // should test if c is a white-space!
+					w += escpSpace;
+				} else {
+					w += escpNoSpace;
+				}
+	
+				pos.x += w;
+			} else {
+				// skip over the prepended spaces
+				spaces --;
+			}
+				
+			// next character
+			c += s; sc += s;
+
+			if (c >= pEnd) {
+				return true;
+			}	
+		}
+	}
+	return false;
+}
+
 
 void TextLine::Flush() {
 	const int32 n = fSegments.CountItems();
@@ -387,65 +449,28 @@ void TextLine::Flush() {
 	if (!fWriter->MakesPDF()) {
 		if (fWriter->fCreateXRefs) fWriter->RecordDests(c);
 	} else {
-		// XXX
-		TextSegment* s = fSegments.ItemAt(0);
-		BFont* f = s->Font();
-
 		// simple link handling for now
-		WebLink webLink(fWriter, &line, f);
-		if (fWriter->fCreateWebLinks) webLink.Init();
+		WebLink webLink(fWriter, &line);
+		if (fWriter->fCreateWebLinks) webLink.Do();
 	
 		// local links
-		LocalLink localLink(fWriter->fXRefs, fWriter->fXRefDests, fWriter, &line, f, fWriter->fPage);
-		if (fWriter->fCreateXRefs) localLink.Init();
+		LocalLink localLink(fWriter->fXRefs, fWriter->fXRefDests, fWriter, &line, fWriter->fPage);
+		if (fWriter->fCreateXRefs) localLink.Do();
 	
-		// simple bookmark adding (XXX: s->Start()
+		// simple bookmark adding
 		if (fWriter->fCreateBookmarks) {
-			BPoint start(s->System()->tx(s->Start().x), s->System()->ty(s->Start().y));
-			fWriter->fBookmark->AddBookmark(start, c, f);
-		}
-	
+			TextSegment* s = fSegments.ItemAt(0);
+			BFont* f = s->Font();
+			PDFSystem* system = s->System();
+			BPoint start(system->tx(s->Start().x), system->ty(s->Start().y));
 
-		for (int32 i = 0; i < n; i ++) {
-		
-			TextSegment* seg         = fSegments.ItemAt(i);
-			BPoint       pos         = seg->Start();
-			BFont*       font        = seg->Font();
-			const char*  sc          = seg->Text();
-			float        escpSpace   = seg->EscpSpace();
-			float        escpNoSpace = seg->EscpNoSpace();
-			int32        spaces      = seg->Spaces();
-			
-			while (*sc != 0) {
-				ASSERT(*sc == *c);
-				
-				int s = fWriter->CodePointSize((char*)c);
-		
-				float w = font->StringWidth(c, s);
-		
-				if (fWriter->fCreateWebLinks) webLink.NextChar(s,   pos.x, pos.y, w);
-				if (fWriter->fCreateXRefs)    localLink.NextChar(s, pos.x, pos.y, w);
-				
-				if (spaces == 0) {
-					// position of next character
-					if (*(unsigned char*)c <= 0x20) { // should test if c is a white-space!
-						w += escpSpace;
-					} else {
-						w += escpNoSpace;
-					}
-		
-					pos.x += w;
-				} else {
-					// skip over the prepended spaces
-					spaces --;
-				}
-					
-				// next character
-				c += s; sc += s;
-			}
+			font_height height;
+			f->GetHeight(&height);
+			float h = system->scale(height.ascent);
+
+			fWriter->fBookmark->AddBookmark(start, h, c, f);
 		}
 	}
-	
 	fSegments.MakeEmpty();
 }
 
