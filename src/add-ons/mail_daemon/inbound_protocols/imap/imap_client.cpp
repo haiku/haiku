@@ -28,7 +28,7 @@
 	#include <socket.h>
 #endif
 
-#ifdef IMAPSSL
+#ifdef USESSL
 	#include <openssl/ssl.h>
 	#include <openssl/rand.h>
 #endif
@@ -89,7 +89,7 @@ class IMAP4Client : public BMailRemoteStorageProtocol {
 		BList box_info;
 		status_t err;
 		
-		#ifdef IMAPSSL
+		#ifdef USESSL
 			SSL_CTX *ctx;
 			SSL *ssl;
 			BIO *sbio;
@@ -122,14 +122,14 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemot
 	err = B_OK;
 	
 	mb_root = settings->FindString("root");
-	#ifdef IMAPSSL
+	#ifdef USESSL
 		use_ssl = (settings->FindInt32("flavor") == 1);
 	#endif
 	
 	int port = settings->FindInt32("port");
 	
 	if (port <= 0)
-		#ifdef IMAPSSL
+		#ifdef USESSL
 			port = use_ssl ? 993 : 143;
 		#else
 			port = 143;
@@ -192,7 +192,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BMailRemot
 		return;
 	}
 	
-#ifdef IMAPSSL
+#ifdef USESSL
 	if (use_ssl) {
 		SSL_library_init();
     	SSL_load_error_strings();
@@ -279,7 +279,7 @@ IMAP4Client::~IMAP4Client() {
 	
 	delete noop;
 	
-#ifdef IMAPSSL
+#ifdef USESSL
 	if (use_ssl) {
 		SSL_shutdown(ssl);
 		SSL_CTX_free(ctx);
@@ -421,7 +421,7 @@ status_t IMAP4Client::AddMessage(const char *mailbox, BPositionIO *data, BString
 		
 	char *buffer = new char[size];
 	data->ReadAt(0,buffer,size);
-#ifdef IMAPSSL
+#ifdef USESSL
 	if (use_ssl) {
 		SSL_write(ssl,buffer,size);
 		SSL_write(ssl,"\r\n",2);
@@ -884,7 +884,7 @@ IMAP4Client::SendCommand(const char* command)
 		
 	static char cmd[255];
 	::sprintf(cmd,"a%.7ld %s"CRLF,++commandCount,command);
-#ifdef IMAPSSL
+#ifdef USESSL
 	if (use_ssl)
 		SSL_write(ssl,cmd,strlen(cmd));
 	else
@@ -918,7 +918,7 @@ IMAP4Client::ReceiveLine(BString &out)
 	/* Set the socket in the mask. */ 
 	FD_SET(net, &fds);
 	int result;
-#ifdef IMAPSSL
+#ifdef USESSL
 	if ((use_ssl) && (SSL_pending(ssl)))
 		result = 1;
 	else
@@ -932,7 +932,7 @@ IMAP4Client::ReceiveLine(BString &out)
 	{
 		while(c != '\n' && c != xEOF)
 		{
-		  #ifdef IMAPSSL
+		  #ifdef USESSL
 			if (use_ssl)
 				r = SSL_read(ssl,&c,1);
 			else
@@ -983,7 +983,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 		
 		/* Set the socket in the mask. */ 
 		FD_SET(net, &fds);
-#ifdef IMAPSSL
+#ifdef USESSL
 		if ((use_ssl) && (SSL_pending(ssl)))
 			result = 1;
 		else
@@ -1001,7 +1001,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 	{
 		while(c != '\n' && c != xEOF)
 		{
-#ifdef IMAPSSL
+#ifdef USESSL
 			if (use_ssl)
 				r = SSL_read(ssl,&c,1);
 			else
@@ -1061,7 +1061,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 						int read_octets = 0;
 						int nibble_size;
 						while (read_octets < octets_to_read) {
-						  #ifdef IMAPSSL
+						  #ifdef USESSL
 							if (use_ssl)
 								nibble_size = SSL_read(ssl,buffer + read_octets,octets_to_read - read_octets);
 							else

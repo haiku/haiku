@@ -9,3 +9,7 @@ Addon Fortune : mail_daemon outbound_fitlers :
 
 LinkSharedOSLibs Fortune :
 	 be mail  ;
+
+Package haiku-maildaemon-cvs :
+	Fortune : 
+	boot home config add-ons mail_daemon outbound_filters ;

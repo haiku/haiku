@@ -11,3 +11,7 @@ Addon SMTP : mail_daemon outbound_protocols :
 
 LinkSharedOSLibs SMTP :
 	 be mail socket bind ;
+
+Package haiku-maildaemon-cvs :
+	SMTP : 
+	boot home config add-ons mail_daemon outbound_protocols ;

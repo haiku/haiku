@@ -13,3 +13,7 @@ Preference E-mail :
 	main.cpp ;
 
 LinkSharedOSLibs E-mail : be mail ;
+
+Package haiku-maildaemon-cvs :
+	E-mail : 
+	boot beos preferences ;

@@ -47,3 +47,7 @@ LinkSharedOSLibs libmail.so :
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libmail.so : libmail.so ;
+
+Package haiku-maildaemon-cvs :
+	libmail.so : 
+	boot beos system lib ;

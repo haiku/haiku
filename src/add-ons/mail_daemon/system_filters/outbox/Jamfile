@@ -8,3 +8,7 @@ Addon Outbox : mail_daemon inbound_filters :
 
 LinkSharedOSLibs Outbox :
 	 be mail ;
+
+Package haiku-maildaemon-cvs :
+	Outbox : 
+	boot home config add-ons mail_daemon system_filters ;

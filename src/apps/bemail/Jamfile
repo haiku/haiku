@@ -22,3 +22,7 @@ App BeMail :
 	KUndoBuffer.cpp ;
 
 LinkSharedOSLibs BeMail : be mail tracker stdc++.r4 ;
+
+Package haiku-maildaemon-cvs :
+	BeMail : 
+	boot beos apps ;

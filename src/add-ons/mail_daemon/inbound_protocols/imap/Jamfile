@@ -1,9 +1,14 @@
 SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols imap ;
 
 UsePrivateHeaders mail ;
+
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
 SubDirC++Flags -DBONE ;
+
+#OpenSSL testing should be automated somehow
+#SubDirC++Flags -DBONE -DUSESSL ;
+#SubDirHdrs [ FDirName / boot home config include ] ;
 
 Addon IMAP : mail_daemon inbound_protocols :
 	imap_client.cpp
@@ -12,3 +17,10 @@ Addon IMAP : mail_daemon inbound_protocols :
 
 LinkSharedOSLibs IMAP :
 	 be mail socket bind ;
+
+#LinkSharedOSLibs IMAP :
+#	be mail socket bind ssl crypto ;
+
+Package haiku-maildaemon-cvs :
+	IMAP : 
+	boot home config add-ons mail_daemon inbound_protocols ;

@@ -10,3 +10,7 @@ Addon Match\ Header : mail_daemon inbound_filters :
 
 LinkSharedOSLibs Match\ Header :
 	 be mail ;
+
+Package haiku-maildaemon-cvs :
+	Match\ Header : 
+	boot home config add-ons mail_daemon inbound_filters ;

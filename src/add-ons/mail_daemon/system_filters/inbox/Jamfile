@@ -8,3 +8,7 @@ Addon Inbox : mail_daemon inbound_filters :
 
 LinkSharedOSLibs Inbox :
 	 be mail ;
+
+Package haiku-maildaemon-cvs :
+	Inbox : 
+	boot home config add-ons mail_daemon system_filters ;

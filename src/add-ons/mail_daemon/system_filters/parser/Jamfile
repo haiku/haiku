@@ -8,3 +8,7 @@ Addon Message\ Parser : mail_daemon inbound_filters :
 
 LinkSharedOSLibs Message\ Parser :
 	 be mail ;
+
+Package haiku-maildaemon-cvs :
+	Message\ Parser : 
+	boot home config add-ons mail_daemon system_filters ;

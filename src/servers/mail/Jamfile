@@ -18,3 +18,7 @@ LinkSharedOSLibs mail_daemon :
 	tracker
 	stdc++.r4
 ;
+
+Package haiku-maildaemon-cvs :
+	mail_daemon : 
+	boot beos system servers ;

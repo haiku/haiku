@@ -8,3 +8,7 @@ Addon New\ Mail\ Notification : mail_daemon inbound_filters :
 
 LinkSharedOSLibs New\ Mail\ Notification :
 	 be mail ;
+
+Package haiku-maildaemon-cvs :
+	New\ Mail\ Notification : 
+	boot home config add-ons mail_daemon system_filters ;
