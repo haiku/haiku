@@ -20,8 +20,12 @@ public:
 	virtual	void	DispatchMessage(BMessage *an_event, BHandler *handler);
 
 private:
-	BFilePanel		* fOpenPanel;
+	BFilePanel *	OpenPanel();
+
 	FileTypesWindow * fWindow;
+	BFilePanel		* fOpenPanel;
+
+	bool			fArgvOkay;
 };
 
 extern FileTypesApp * file_types_app;

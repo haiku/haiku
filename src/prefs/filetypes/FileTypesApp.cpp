@@ -1,6 +1,8 @@
+#include <Path.h>
 #include <Roster.h>
+#include <stdio.h>
 
-#include <Constants.h>
+#include <FileTypesConstants.h>
 #include <FileTypesApp.h>
 #include <FileTypesWindow.h>
 
@@ -68,6 +70,7 @@ FileTypesApp::RefsReceived(BMessage *message)
 void
 FileTypesApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 {
+	BMessage refsReceived(B_REFS_RECEIVED);
 	for (int i = 1 ; (i < argc) ; i++) {
 		BPath path;
 		if (argv[i][0] == '/') {
@@ -93,14 +96,26 @@ FileTypesApp::ArgvReceived(int32 argc, const char *argv[], const char * cwd)
 			printf("\".\n");
 			continue;
 		}
-		OpenDocument(&ref);
 	}
 }
 
 void 
 FileTypesApp::ReadyToRun() 
 {
-	if (fWindowCount == 0) {
-		OpenDocument();
+	if (!fArgvOkay) {
+		Quit();
+		return;
 	}
+	if (fWindow == 0) {
+		OpenPanel()->Show();
+	}
+}
+
+BFilePanel *
+FileTypesApp::OpenPanel()
+{
+	if (fOpenPanel == 0) {
+		fOpenPanel = new BFilePanel(B_OPEN_PANEL);
+	}
+	return fOpenPanel;
 }

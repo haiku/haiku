@@ -9,8 +9,6 @@ Preference FileTypes :
 	FileTypesApp.cpp
 	FileTypesView.cpp
 	FileTypesWindow.cpp
-	FileTypeView.cpp
-	FileTypeWindow.cpp
 	;
 
-LinkSharedOSLibs FileTypes : be ;
+LinkSharedOSLibs FileTypes : be tracker ;

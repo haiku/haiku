@@ -1,7 +1,7 @@
 #ifndef FILE_TYPES_VIEW_H
 #define FILE_TYPES_VIEW_H
 
-#include <BView.h>
+#include <View.h>
 
 class FileTypesView : public BView {
 public:
