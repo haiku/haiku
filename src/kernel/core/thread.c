@@ -53,6 +53,8 @@
 
 #define THREAD_MAX_MESSAGE_SIZE		65536
 
+static status_t receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flags);
+
 struct thread_key {
 	thread_id id;
 };
@@ -715,6 +717,7 @@ thread_exit(void)
 	bool delete_team = false;
 	unsigned int death_stack;
 	sem_id cached_death_sem;
+	status_t status;
 
 	if (!are_interrupts_enabled())
 		dprintf("thread_exit() called with interrupts disabled!\n");
@@ -725,6 +728,24 @@ thread_exit(void)
 
 	// boost our priority to get this over with
 	t->priority = B_FIRST_REAL_TIME_PRIORITY;
+		// ToDo: is it really that urgent?
+
+	// shutdown the thread messaging
+
+	status = acquire_sem_etc(t->msg.write_sem, 1, B_RELATIVE_TIMEOUT, 0);
+	if (status == B_WOULD_BLOCK) {
+		// there is data waiting for us, so let us eat it
+		thread_id sender;
+
+		delete_sem(t->msg.write_sem);
+			// first, let's remove all possibly waiting writers
+		receive_data_etc(&sender, NULL, 0, B_RELATIVE_TIMEOUT);
+	} else {
+		// we probably own the semaphore here, and we're the last to do so
+		delete_sem(t->msg.write_sem);
+	}
+	// now we can safely remove the msg.read_sem
+	delete_sem(t->msg.read_sem);
 
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&t->alarm);
@@ -1218,7 +1239,7 @@ send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 
 
 static status_t
-receive_data_etc(thread_id *sender, void *buffer, size_t bufferSize, int32 flags)
+receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize, int32 flags)
 {
 	struct thread *thread = thread_get_current_thread();
 	status_t status;
@@ -1229,15 +1250,17 @@ receive_data_etc(thread_id *sender, void *buffer, size_t bufferSize, int32 flags
 	if (status < B_OK)
 		return status;
 
-	size = min(bufferSize, thread->msg.size);
-	status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer, 0, size);
-	if (status < B_OK) {
-		cbuf_free_chain(thread->msg.buffer);
-		release_sem(thread->msg.write_sem);
-		return status;
+	if (buffer != NULL && bufferSize != 0) {
+		size = min(bufferSize, thread->msg.size);
+		status = cbuf_user_memcpy_from_chain(buffer, thread->msg.buffer, 0, size);
+		if (status < B_OK) {
+			cbuf_free_chain(thread->msg.buffer);
+			release_sem(thread->msg.write_sem);
+			return status;
+		}
 	}
 
-	*sender = thread->msg.sender;
+	*_sender = thread->msg.sender;
 	code = thread->msg.code;
 
 	cbuf_free_chain(thread->msg.buffer);
