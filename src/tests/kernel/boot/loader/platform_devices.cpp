@@ -91,8 +91,8 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, NodeList *list,
-	boot::Partition **_partition)
+platform_get_boot_partition(struct stage2_args *args, Node *device,
+	NodeList *list, boot::Partition **_partition)
 {
 	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;

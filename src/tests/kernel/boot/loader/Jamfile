@@ -18,6 +18,7 @@ ObjectsDefines
 	elf.cpp
 	menu.cpp
 	loader.cpp
+	kernel_args.cpp
 
 	# partitions
 	amiga_rdb.cpp
@@ -49,7 +50,7 @@ ObjectsDefines
 	#	SubDirC++Flags -include /usr/include/stdio.h ;
 	} else {
 	#	SubDirC++Flags -include /boot/develop/headers/posix/stdio.h ;
-		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 ; # -fcheck-memory-usage -D_NO_INLINE_ASM ;
+		SubDirC++Flags $(defines) -DHAVE_READ_POS=1 -fcheck-memory-usage -D_NO_INLINE_ASM ;
 	}
 }
 
@@ -71,6 +72,7 @@ SimpleTest BootLoaderTest :
 	elf.cpp
 	menu.cpp
 	loader.cpp
+	kernel_args.cpp
 
 	# partitioning systems
 	amiga_rdb.cpp
@@ -97,6 +99,7 @@ SEARCH on [ FGristFiles
 		main.cpp vfs.cpp partitions.cpp
 		heap.cpp RootFileSystem.cpp
 		elf.cpp menu.cpp loader.cpp
+		kernel_args.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel boot loader ] ;
 
 # partitioning system modules
