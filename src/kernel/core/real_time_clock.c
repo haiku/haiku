@@ -1,20 +1,21 @@
 /* 
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
-#include <OS.h>
-#include <debug.h>
-#include <stdlib.h>
+#include <KernelExport.h>
 
 #include <arch/real_time_clock.h>
 #include <real_time_clock.h>
+#include <real_time_data.h>
+#include <vm_types.h>
 
-#define RTC_REGION_SIZE	B_PAGE_SIZE
+#include <stdlib.h>
 
-static bigtime_t *sBootTime;
-static region_id sRtcArea;
+
+static struct real_time_data *sRealTimeData;
 
 
 /** Write the system time to CMOS. */
@@ -24,7 +25,7 @@ rtc_system_to_hw(void)
 {
 	uint32 seconds;
 
-	seconds = (*sBootTime + system_time()) / 1000000;
+	seconds = (sRealTimeData->boot_time + system_time()) / 1000000;
 	arch_rtc_set_hw_time(seconds);
 }
 
@@ -44,7 +45,7 @@ rtc_hw_to_system(void)
 bigtime_t
 rtc_boot_time(void)
 {
-	return *sBootTime;
+	return sRealTimeData->boot_time;
 }
 
 
@@ -53,9 +54,9 @@ rtc_print(void)
 {
 	uint32 currentTime;
 
-	currentTime = (*sBootTime + system_time()) / 1000000;
+	currentTime = (sRealTimeData->boot_time + system_time()) / 1000000;
 	dprintf("system_time:  %Ld\n", system_time());
-	dprintf("boot_time:    %Ld\n", *sBootTime);
+	dprintf("boot_time:    %Ld\n", sRealTimeData->boot_time);
 	dprintf("current_time: %lu\n", currentTime);
 }
 
@@ -78,18 +79,18 @@ rtc_debug(int argc, char **argv)
 status_t
 rtc_init(kernel_args *ka)
 {
-	//dprintf("rtc_init: entry\n");
-	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
-
-	sRtcArea = create_area("rtc_region", (void**)&sBootTime, B_ANY_KERNEL_ADDRESS,
-		RTC_REGION_SIZE, B_NO_LOCK, B_READ_AREA);
-	if (sRtcArea < 0) {
+	area_id area = create_area("real time data", (void **)&sRealTimeData, B_ANY_KERNEL_ADDRESS,
+		PAGE_ALIGN(sizeof(struct real_time_data)), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < B_OK) {
 		panic("rtc_init: error creating rtc region\n");
-		return B_NO_MEMORY;
+		return area;
 	}
+	// ToDo: clone this area for userland read-only access
 
 	rtc_hw_to_system();
 
+	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
 	return B_OK;
 }
 
@@ -101,7 +102,7 @@ rtc_init(kernel_args *ka)
 void
 set_real_time_clock(uint32 currentTime)
 {
-	*sBootTime = currentTime * 1000000LL - system_time();
+	sRealTimeData->boot_time = currentTime * 1000000LL - system_time();
 	rtc_system_to_hw();
 }
 
@@ -110,7 +111,7 @@ uint32
 real_time_clock(void)
 {
 	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return (*sBootTime + system_time()) / 1000000;
+	return (sRealTimeData->boot_time + system_time()) / 1000000;
 }
 
 
@@ -118,7 +119,7 @@ bigtime_t
 real_time_clock_usecs(void)
 {
 	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return *sBootTime + system_time();
+	return sRealTimeData->boot_time + system_time();
 }
 
 
