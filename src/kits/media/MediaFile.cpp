@@ -114,8 +114,11 @@ BMediaFile::TrackAt(int32 index)
 	CALLED();
 	if (!fTrackList || !fExtractor || index < 0 || index >= fTrackNum)
 		return 0;
-	if (!fTrackList[index])
+	if (!fTrackList[index]) {
+		TRACE("BMediaFile::TrackAt, creating new track for index %ld\n", index);
 		fTrackList[index] = new BMediaTrack(fExtractor, index);
+		TRACE("BMediaFile::TrackAt, new track is %p\n", fTrackList[index]);
+	}
 	return fTrackList[index];
 }
 
@@ -132,6 +135,7 @@ BMediaFile::ReleaseTrack(BMediaTrack *track)
 		return B_ERROR;
 	for (int32 i = 0; i < fTrackNum; i++) {
 		if (fTrackList[i] == track) {
+			TRACE("BMediaFile::ReleaseTrack, releasing track %p with index %ld\n", track, i);
 			delete track;
 			fTrackList[i] = 0;
 			return B_OK;
@@ -149,6 +153,7 @@ BMediaFile::ReleaseAllTracks(void)
 		return B_ERROR;
 	for (int32 i = 0; i < fTrackNum; i++) {
 		if (fTrackList[i]) {
+			TRACE("BMediaFile::ReleaseAllTracks, releasing track %p with index %ld\n", fTrackList[i], i);
 			delete fTrackList[i];
 			fTrackList[i] = 0;
 		}

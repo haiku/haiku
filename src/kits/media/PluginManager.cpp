@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "PluginManager.h"
+#include "debug.h"
 
 PluginManager _plugin_manager;
 
@@ -79,11 +80,13 @@ _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *for
 void
 _DestroyReader(Reader *reader)
 {
+	delete reader;
 }
 
 void
 _DestroyDecoder(Decoder *decoder)
 {
+	delete decoder;
 }
 
 status_t
@@ -103,6 +106,7 @@ _PublishDecoder(DecoderPlugin *decoderplugin,
 
 PluginManager::PluginManager()
 {
+	CALLED();
 	fLocker = new BLocker;
 	fPluginList = new List<plugin_info>;
 }
@@ -110,6 +114,7 @@ PluginManager::PluginManager()
 
 PluginManager::~PluginManager()
 {
+	CALLED();
 	while (!fPluginList->IsEmpty()) {
 		plugin_info *info;
 		fPluginList->Get(fPluginList->CountItems() - 1, &info);

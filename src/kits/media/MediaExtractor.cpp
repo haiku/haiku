@@ -61,7 +61,7 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 		fStreamInfo[i].encodedFormat.u.encoded_audio.output.channel_count = 2;
 		fStreamInfo[i].encodedFormat.u.encoded_audio.output.format = 2;
 		fStreamInfo[i].encodedFormat.u.encoded_audio.output.byte_order = B_MEDIA_LITTLE_ENDIAN;
-		fStreamInfo[i].encodedFormat.u.encoded_audio.output.buffer_size = 8 * 1024;
+		fStreamInfo[i].encodedFormat.u.encoded_audio.output.buffer_size = 4 * 1024;
 		string_for_format(fStreamInfo[i].encodedFormat, sz, sizeof(sz));
 		printf("MediaExtractor::MediaExtractor: stream %d has new format %s\n", i, sz);
 	}
@@ -70,6 +70,7 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 MediaExtractor::~MediaExtractor()
 {
 	CALLED();
+
 	// free all stream cookies
 	for (int32 i = 0; i < fStreamCount; i++) {
 		if (fStreamInfo[i].cookie)
@@ -79,7 +80,7 @@ MediaExtractor::~MediaExtractor()
 	if (fReader)
 		_DestroyReader(fReader);
 
-	delete fStreamInfo;
+	delete [] fStreamInfo;
 	delete fSource;
 }
 
@@ -171,7 +172,7 @@ MediaExtractor::GetNextChunk(int32 stream,
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader)
 {
-	CALLED();
+	//CALLED();
 	// get buffered chunk
 	
 	// XXX this should be done in a different thread, and double buffered for each stream

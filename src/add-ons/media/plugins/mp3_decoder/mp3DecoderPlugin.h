@@ -19,7 +19,11 @@ public:
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
 private:
-	struct mpstr fMpgLibPrivate;
+	struct mpstr	fMpgLibPrivate;
+	int32			fResidualBytes;
+	uint8 *			fResidualBuffer;
+	uint8 *			fDecodeBuffer;
+	int32			fFrameSize;	
 };
 
 

@@ -225,7 +225,7 @@ mp3Reader::FreeCookie(void *cookie)
 {
 	TRACE("mp3Reader::FreeCookie\n");
 	mp3data *data = reinterpret_cast<mp3data *>(cookie);
-	delete data->chunkBuffer;
+	delete [] data->chunkBuffer;
 	delete data;
 	
 	return B_OK;
@@ -261,14 +261,14 @@ mp3Reader::Seek(void *cookie,
 	// this isn't very accurate
 
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		pos = fXingVbrInfo ? XingSeekPoint(*frame / (float)data->frameCount) : -1;
+		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *frame / (float)data->frameCount) : -1;
 		if (pos < 0)
 			pos = (*frame * fDataSize) / data->frameCount;
 		TRACE("mp3Reader::Seek to frame %Ld, pos %Ld\n", *frame, pos);
 		*time = (*frame * data->duration) / data->frameCount;
 		TRACE("mp3Reader::Seek newtime %Ld\n", *time);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		pos = fXingVbrInfo ? XingSeekPoint(*time / (float)data->duration) : -1;
+		pos = fXingVbrInfo ? XingSeekPoint(100.0 * *time / (float)data->duration) : -1;
 		if (pos < 0)
 			pos = (*time * fDataSize) / data->duration;
 		TRACE("mp3Reader::Seek to time %Ld, pos %Ld\n", *time, pos);
@@ -352,6 +352,11 @@ mp3Reader::GetNextChunk(void *cookie,
 		
 	*chunkBuffer = data->chunkBuffer;
 	*chunkSize = size + 4;
+	
+	if (*chunkSize > MAX_CHUNK_SIZE) {
+		printf("mp3Reader: chunk buffer overrun, read %ld bytes into %d bytes buffer\n", *chunkSize, MAX_CHUNK_SIZE);
+		exit(1);
+	}
 
 	return B_OK;
 }

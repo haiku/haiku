@@ -118,7 +118,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 						media_header *mh /* = 0 */,
 						media_decode_info *info /* = 0 */)
 {
-	CALLED();
+//	CALLED();
 	if (!fDecoder)
 		return B_NO_INIT;
 	if (!out_buffer || !out_frameCount)
@@ -158,8 +158,10 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time,
 	CALLED();
 	if (!fDecoder || !fExtractor)
 		return B_NO_INIT;
-	if (!inout_time || !(flags & B_MEDIA_SEEK_DIRECTION_MASK))
+	if (!inout_time)
 		return B_BAD_VALUE;
+
+	bigtime_t request = *inout_time;
 
 	status_t result;
 	uint32 seekTo;
@@ -173,16 +175,22 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time,
 	
 	time = seekTime;
 	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
-	if (result != B_OK)
+	if (result != B_OK) {
+		TRACE("BMediaTrack::SeekToTime: extractor seek failed\n");
 		return result;
+	}
 		
 	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
-	if (result != B_OK)
+	if (result != B_OK) {
+		TRACE("BMediaTrack::SeekToTime: decoder seek failed\n");
 		return result;
+	}
 		
 	*inout_time = time;
 	fCurFrame = frame;
 	fCurTime = time;
+	
+	printf("BMediaTrack::SeekToTime finished, requested %.6f, result %.6f\n", request / 1000000.0, *inout_time / 1000000.0);
 
 	return B_OK;
 }
@@ -195,8 +203,10 @@ BMediaTrack::SeekToFrame(int64 *inout_frame,
 	CALLED();
 	if (!fDecoder || !fExtractor)
 		return B_NO_INIT;
-	if (!inout_frame || !(flags & B_MEDIA_SEEK_DIRECTION_MASK))
+	if (!inout_frame)
 		return B_BAD_VALUE;
+
+	int64 request = *inout_frame;
 
 	status_t result;
 	uint32 seekTo;
@@ -210,16 +220,22 @@ BMediaTrack::SeekToFrame(int64 *inout_frame,
 	
 	frame = seekFrame;
 	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
-	if (result != B_OK)
+	if (result != B_OK) {
+		TRACE("BMediaTrack::SeekToFrame: extractor seek failed\n");
 		return result;
+	}
 		
 	result = fDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
-	if (result != B_OK)
+	if (result != B_OK) {
 		return result;
+		TRACE("BMediaTrack::SeekToFrame: decoder seek failed\n");
+	}		
 		
 	*inout_frame = frame;
 	fCurFrame = frame;
 	fCurTime = time;
+
+	printf("BMediaTrack::SeekToTime SeekToFrame, requested %Ld, result %Ld\n", request, *inout_frame);
 
 	return B_OK;
 }
