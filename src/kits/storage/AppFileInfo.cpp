@@ -430,10 +430,21 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 		error = GetMetaMime(&mimeType);
 	if (error == B_OK) {
 		if (types) {
-			// check param
-			ssize_t size = types->FlattenedSize();
-			if (size < 0)
-				error = size;
+			// check param -- supported types must be valid
+			const char *type;
+			for (int32 i = 0;
+				 error == B_OK && types->FindString("types", i, &type) == B_OK;
+				 i++) {
+				if (!BMimeType::IsValid(type))
+					error = B_BAD_VALUE;
+			}
+			// get flattened size
+			ssize_t size = 0;
+			if (error == B_OK) {
+				size = types->FlattenedSize();
+				if (size < 0)
+					error = size;
+			}
 			// allocate a buffer for the flattened data
 			char *buffer = NULL;
 			if (error == B_OK) {
@@ -456,56 +467,8 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 		} else
 			error = _RemoveData(kSupportedTypesAttribute, B_MESSAGE_TYPE);
 		// update the MIME database, if the app signature is installed
-		if (mimeType.IsInstalled()) {
-			// create a set of the removed types
-			set<string> oldTypes;
-			if (syncAll) {
-				BMessage oldTypeMsg;
-				error = mimeType.GetSupportedTypes(&oldTypeMsg);
-				// add all formerly supported types to the set
-				if (error == B_OK) {
-					BString type;
-					for (int32 i = 0;
-						 oldTypeMsg.FindString("types", i, &type) == B_OK;
-						 i++) {
-						oldTypes.insert(string(type.ToLower().String()));
-					}
-				}
-				// remove the newly supported types from the set
-				if (error == B_OK && types) {
-					BString type;
-					for (int32 i = 0;
-						 types->FindString("types", i, &type) == B_OK;
-						 i++) {
-						oldTypes.erase(string(type.ToLower().String()));
-					}
-				}
-			}
-			// create and send the message
-			if (error == B_OK && oldTypes.size() > 0) {
-				BMessage message(B_REG_MIME_UNSUPPORT_TYPES);
-				error = message.AddString("type", mimeType.Type());
-				for (set<string>::iterator it = oldTypes.begin();
-					 error == B_OK && it != oldTypes.end();
-					 it++) {
-					error = message.AddString("unsupported_types",
-											  it->c_str());
-				}
-				BMessage reply;
-				if (error == B_OK) 
-					error = _send_to_roster_(&message, &reply, true);
-				if (error == B_OK)
-					error = (reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE);
-				status_t result;
-				if (error == B_OK)
-					error = reply.FindInt32("result", &result);
-				if (error == B_OK) 
-					error = result;	
-			}
-			// set the type's supported types
-			if (error == B_OK)
-				error = mimeType.SetSupportedTypes(types);
-		}
+		if (error == B_OK && mimeType.IsInstalled())
+			error = mimeType.SetSupportedTypes(types, syncAll);
 	}
 	return error;
 }
@@ -801,14 +764,15 @@ BAppFileInfo::GetIconForType(const char *type, BBitmap *icon,
 	// check type param
 	if (error == B_OK) {
 		if (type) {
-			if (strlen(type) >= B_MIME_TYPE_LENGTH)
+			if (BMimeType::IsValid(type))
+				attributeString += type;
+			else
 				error = B_BAD_VALUE;
 		} else
-			type = kStandardIconType;
+			attributeString += kStandardIconType;
 	}
-	if (error == B_OK)
-		attributeString += type;
 	const char *attribute = attributeString.String();
+
 	// check parameter and initialization
 	if (error == B_OK
 		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds)) {
@@ -903,10 +867,10 @@ BAppFileInfo::SetIconForType(const char *type, const BBitmap *icon,
 	// check type param
 	if (error == B_OK) {
 		if (type) {
-			if (strlen(type) >= B_MIME_TYPE_LENGTH)
-				error = B_BAD_VALUE;
-			else
+			if (BMimeType::IsValid(type))
 				attributeString += type;
+			else
+				error = B_BAD_VALUE;
 		} else
 			attributeString += kStandardIconType;
 	}
