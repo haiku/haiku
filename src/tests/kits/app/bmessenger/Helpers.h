@@ -24,7 +24,11 @@
 class LooperQuitter {
 public:
 	inline LooperQuitter(BLooper *looper) : fLooper(looper) {}
-	inline ~LooperQuitter() { fLooper->Lock(); fLooper->Quit(); }
+	inline ~LooperQuitter()
+	{
+		fLooper->Lock();
+		fLooper->Quit();
+	}
 
 private:
 	BLooper	*fLooper;
