@@ -452,8 +452,9 @@ vm_translation_map_module_init2(kernel_args *ka)
  *	read/write.
  */
 
-int
-vm_translation_map_quick_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, uint8 attributes, addr_t (*get_free_page)(kernel_args *))
+status_t
+vm_translation_map_quick_map(kernel_args *ka, addr_t virtualAddress, addr_t physicalAddress, 
+	uint8 attributes, addr_t (*get_free_page)(kernel_args *))
 {
 	uint32 virtualSegmentID = get_sr((void *)virtualAddress) & 0xffffff;
 
