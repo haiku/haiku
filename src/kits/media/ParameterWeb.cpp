@@ -625,7 +625,7 @@ BParameterWeb::Unflatten(type_code c,
 	//being read in the correct byte order.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_MAGIC)
 	{
-		FATAL("BParameterWeb::Unflatten magic 1 wrong\n");
+		FATAL("BParameterWeb::Unflatten PARAMETER_WEB_FLATTEN_MAGIC wrong\n");
 		return B_BAD_TYPE;
 	}
 	CurrentPos += sizeof(int32);
@@ -634,7 +634,7 @@ BParameterWeb::Unflatten(type_code c,
 	//being read in the correct byte order.  THIS SURELY HAS SOME MEANING I'M NOT AWARE OF.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != PARAMETER_WEB_FLATTEN_VERSION)
 	{
-		FATAL("BParameterWeb::Unflatten magic 2 wrong\n");
+		FATAL("BParameterWeb::Unflatten PARAMETER_WEB_FLATTEN_VERSION wrong\n");
 		return B_ERROR;
 	}
 	CurrentPos += sizeof(int32);
@@ -711,7 +711,7 @@ BParameterWeb::Unflatten(type_code c,
 		
 		if(RetVal != B_OK)
 		{
-			FATAL("BParameterWeb::Unflatten sub.grup Unflatten failed\n");
+			FATAL("BParameterWeb::Unflatten sub-group failed\n");
 			delete NewSubGroup;
 			//don't return, because we should still fix references...
 			break;
@@ -1074,15 +1074,19 @@ status_t
 BParameterGroup::Flatten(void *buffer,
 						 ssize_t size) const
 {
-	if(buffer == NULL)
+	if(buffer == NULL) {
+		FATAL("BParameterGroup::Flatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//NOTICE: It is important that this value is the size returned by BParameterGroup::FlattenedSize,
 	//		  not by a descendent's override of this method.
 	ssize_t ActualFSize = BParameterGroup::FlattenedSize();
 	
-	if(size < ActualFSize)
+	if(size < ActualFSize) {
+		FATAL("BParameterGroup::Flatten size to small\n");
 		return B_NO_MEMORY;
+	}
 	
 	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	
@@ -1221,16 +1225,21 @@ BParameterGroup::Unflatten(type_code c,
 						   const void *buf,
 						   ssize_t size)
 {
-	if(!this->AllowsTypeCode(c))
+	if(!this->AllowsTypeCode(c)) {
+		FATAL("BParameterGroup::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
+	}
 	
-	if(buf == NULL)
+	if(buf == NULL) {
+		FATAL("BParameterGroup::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//if the buffer is smaller than the size needed to read the
 	//signature field, then there is a problem
 	if(size < static_cast<ssize_t>(sizeof(int32)) )
 	{
+		FATAL("BParameterGroup::Unflatten size to small\n");
 		return B_ERROR;
 	}
 
@@ -1251,6 +1260,7 @@ BParameterGroup::Unflatten(type_code c,
 		//check to make sure we've got room to read the flags field
 		if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(uint32)))
 		{
+			FATAL("BParameterGroup::Unflatten can't write flags\n");
 			return B_ERROR;
 		}
 		
@@ -1259,6 +1269,7 @@ BParameterGroup::Unflatten(type_code c,
 	}
 	else
 	{
+		FATAL("BParameterGroup::Unflatten bad magic\n");
 		return B_BAD_TYPE;
 	}
 	
@@ -1380,6 +1391,7 @@ BParameterGroup::Unflatten(type_code c,
 		//need to be careful because ParamType could be invalid
 		if(NewParam == NULL)
 		{
+			FATAL("BParameterGroup::Unflatten MakeControl failed\n");
 			return B_ERROR;
 		}
 		
@@ -1387,6 +1399,7 @@ BParameterGroup::Unflatten(type_code c,
 		
 		if(RetVal != B_OK)
 		{
+			FATAL("BParameterGroup::Unflatten NewParam->Unflatten failed\n");
 			delete NewParam;
 			return RetVal;
 		}
@@ -1454,6 +1467,7 @@ BParameterGroup::Unflatten(type_code c,
 		
 		if(RetVal != B_OK)
 		{
+			FATAL("BParameterGroup::Unflatten NewSubGroup->Unflatten failed\n");
 			delete NewSubGroup;
 			return RetVal;
 		}
@@ -1530,6 +1544,7 @@ BParameterGroup::MakeControl(int32 type)
 		default:
 		{
 			return NULL;
+			FATAL("BParameterGroup::MakeControl unknown type %ld\n", type);
 		}
 		break;
 	}
@@ -1723,6 +1738,7 @@ BParameter::AddOutput(BParameter *output)
 	// but it should be updated
 	if(output == NULL)
 	{
+		FATAL("BParameter::AddOutput output is NULL\n");
 		return;
 	}
 	
@@ -1731,6 +1747,7 @@ BParameter::AddOutput(BParameter *output)
 	if(mOutputs->HasItem(output))
 	{
 		//if already in output list, don't duplicate.
+		FATAL("BParameter::AddOutput output does already exist\n");
 		return;
 	}
 	
@@ -1795,15 +1812,19 @@ status_t
 BParameter::Flatten(void *buffer,
 					ssize_t size) const
 {
-	if(buffer == NULL)
+	if(buffer == NULL) {
+		FATAL("BParameter::Flatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//NOTICE: It is important that this value is the size returned by BParameter::FlattenedSize,
 	//		  not by a descendent's override of this method.
 	ssize_t ActualFSize = BParameter::FlattenedSize();
 	
-	if(size < ActualFSize)
+	if(size < ActualFSize) {
+		FATAL("BParameter::Flatten size too small\n");
 		return B_NO_MEMORY;
+	}
 	
 	byte *CurrentPos = reinterpret_cast<byte *>(buffer);
 	
@@ -1911,16 +1932,21 @@ BParameter::Unflatten(type_code c,
 					  ssize_t size)
 {
 
-	if(!this->AllowsTypeCode(c))
+	if(!this->AllowsTypeCode(c)) {
+		FATAL("BParameter::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
+	}
 	
-	if(buf == NULL)
+	if(buf == NULL) {
+		FATAL("BParameter::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//if the buffer is smaller than the size needed to read the
 	//signature and struct size fields, then there is a problem
 	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
 	{
+		FATAL("BParameter::Unflatten size too small\n");
 		return B_ERROR;
 	}
 
@@ -1931,6 +1957,7 @@ BParameter::Unflatten(type_code c,
 	//being read in the correct byte order.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
 	{
+		FATAL("BParameter::Unflatten bad magic\n");
 		return B_BAD_TYPE;
 	}
 	CurrentPos += sizeof(int32);
@@ -1943,6 +1970,7 @@ BParameter::Unflatten(type_code c,
 	{
 		//if the struct size is larger than the size of the buffer we were given,
 		//there's a problem
+		FATAL("BParameter::Unflatten out of memory\n");
 		return B_MISMATCHED_VALUES;
 	}
 	
@@ -1962,6 +1990,7 @@ BParameter::Unflatten(type_code c,
 	const ssize_t MinFlattenedParamSize(27);
 	if(ParamStructSize < MinFlattenedParamSize)
 	{
+		FATAL("BParameter::Unflatten out of memory (2)\n");
 		return B_ERROR;
 	}
 
@@ -2511,8 +2540,10 @@ status_t
 BContinuousParameter::Flatten(void *buffer,
 							  ssize_t size) const
 {
-	if(buffer == NULL)
+	if(buffer == NULL) {
+		FATAL("BContinuousParameter::Flatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 
 	ssize_t TotalBParameterFlatSize = BParameter::FlattenedSize();
 	//see BContinuousParameter::FlattenedSize() for a description of this value
@@ -2520,6 +2551,7 @@ BContinuousParameter::Flatten(void *buffer,
 	
 	if(size < (TotalBParameterFlatSize + AdditionalBContParamFlatSize))
 	{
+		FATAL("BContinuousParameter::Flatten size to small\n");
 		return B_NO_MEMORY;
 	}
 
@@ -2527,6 +2559,7 @@ BContinuousParameter::Flatten(void *buffer,
 	
 	if(RetVal != B_OK)
 	{
+		FATAL("BContinuousParameter::Flatten BParameter::Flatten failed\n");
 		return RetVal;
 	}
 	
@@ -2571,16 +2604,21 @@ BContinuousParameter::Unflatten(type_code c,
 	 *         the 'this' object has been modified by reading a part of the buffer.
 	 */
 
-	if(!this->AllowsTypeCode(c))
+	if(!this->AllowsTypeCode(c)) {
+		FATAL("BContinuousParameter::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
+	}
 	
-	if(buf == NULL)
+	if(buf == NULL) {
+		FATAL("BContinuousParameter::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//if the buffer is smaller than the size needed to read the
 	//signature and struct size fields, then there is a problem
 	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
 	{
+		FATAL("BContinuousParameter::Unflatten size too small\n");
 		return B_ERROR;
 	}
 
@@ -2591,6 +2629,7 @@ BContinuousParameter::Unflatten(type_code c,
 	//being read in the correct byte order.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
 	{
+		FATAL("BContinuousParameter::Unflatten bad magic\n");
 		return B_BAD_TYPE;
 	}
 	CurrentPos += sizeof(int32);
@@ -2606,6 +2645,7 @@ BContinuousParameter::Unflatten(type_code c,
 	{
 		//if the struct size is larger than the size of the buffer we were given,
 		//there's a problem
+		FATAL("BContinuousParameter::Unflatten out of memory\n");
 		return B_ERROR;
 	}
 	
@@ -2614,6 +2654,7 @@ BContinuousParameter::Unflatten(type_code c,
 	
 	if(RetVal != B_OK)
 	{
+		FATAL("BContinuousParameter::Unflatten BParameter::Unflatten failed\n");
 		return RetVal;
 	}
 	
@@ -2861,8 +2902,10 @@ status_t
 BDiscreteParameter::Flatten(void *buffer,
 							ssize_t size) const
 {
-	if(buffer == NULL)
+	if(buffer == NULL) {
+		FATAL("BDiscreteParameter::Flatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 
 	ssize_t TotalBParameterFlatSize = BParameter::FlattenedSize();
 	
@@ -2887,6 +2930,7 @@ BDiscreteParameter::Flatten(void *buffer,
 	
 	if(size < (TotalBParameterFlatSize + AdditionalBDiscParamFlatSize))
 	{
+		FATAL("BDiscreteParameter::Flatten size too small\n");
 		return B_NO_MEMORY;
 	}
 
@@ -2894,6 +2938,7 @@ BDiscreteParameter::Flatten(void *buffer,
 	
 	if(RetVal != B_OK)
 	{
+		FATAL("BDiscreteParameter::Flatten BParameter::Flatten failed\n");
 		return RetVal;
 	}
 	
@@ -2960,16 +3005,21 @@ BDiscreteParameter::Unflatten(type_code c,
 	 *         the 'this' object has been modified by reading a part of the buffer.
 	 */
 
-	if(!this->AllowsTypeCode(c))
+	if(!this->AllowsTypeCode(c)) {
+		FATAL("BDiscreteParameter::Unflatten bad type code\n");
 		return B_BAD_TYPE;
+	}
 	
-	if(buf == NULL)
+	if(buf == NULL) {
+		FATAL("BDiscreteParameter::Unflatten buffer is NULL\n");
 		return B_NO_INIT;
+	}
 	
 	//if the buffer is smaller than the size needed to read the
 	//signature and struct size fields, then there is a problem
 	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(ssize_t)))
 	{
+		FATAL("BDiscreteParameter::Unflatten size too small\n");
 		return B_ERROR;
 	}
 
@@ -2980,6 +3030,7 @@ BDiscreteParameter::Unflatten(type_code c,
 	//being read in the correct byte order.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x02040607)
 	{
+		FATAL("BDiscreteParameter::Unflatten bad magic\n");
 		return B_BAD_TYPE;
 	}
 	CurrentPos += sizeof(int32);
@@ -2995,6 +3046,7 @@ BDiscreteParameter::Unflatten(type_code c,
 	{
 		//if the struct size is larger than the size of the buffer we were given,
 		//there's a problem
+		FATAL("BDiscreteParameter::Unflatten out of memory\n");
 		return B_ERROR;
 	}
 	
@@ -3003,6 +3055,7 @@ BDiscreteParameter::Unflatten(type_code c,
 	
 	if(RetVal != B_OK)
 	{
+		FATAL("BDiscreteParameter::Unflatten BParameter::Unflatten failed\n");
 		return RetVal;
 	}
 	
