@@ -3,7 +3,13 @@
 #ifndef NETDB_H
 #define NETDB_H
 
+#include <netinet/in.h>
 #include <errno.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif  
+
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 64
@@ -173,5 +179,9 @@ void endservent (void);
  * Return codes for getrrsetbyname()
  */
 #define ERRSET_SUCCESS          0
+
+#ifdef __cplusplus
+}
+#endif 
 
 #endif /* NETDB_H */
