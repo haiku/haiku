@@ -124,14 +124,14 @@ emuxki_chan_write(device_config *config, uint16 chano,
 
 /* Microcode */
 
-void
+static void
 emuxki_write_micro(device_config *config, uint32 pc, uint32 data)
 {
 	emuxki_chan_write(config, 0, (IS_AUDIGY(config) ? EMU_A_MICROCODEBASE :
 		EMU_MICROCODEBASE ) + pc, data);
 }
 
-uint32
+static uint32
 emuxki_read_micro(device_config *config, uint32 pc)
 {
 	return emuxki_chan_read(config, 0, (IS_AUDIGY(config) ? EMU_A_MICROCODEBASE :

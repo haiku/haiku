@@ -522,7 +522,8 @@ emuxki_create_controls_list(multi_dev *multi)
 static status_t 
 emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 {
-	int32 i, id;
+	int32 i;
+	uint32 id;
 	multi_mixer_control *control = NULL;
 	for(i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
@@ -561,7 +562,8 @@ emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 static status_t 
 emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 {
-	int32 i, id;
+	int32 i;
+	uint32 id;
 	multi_mixer_control *control = NULL;
 	for(i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
@@ -625,7 +627,7 @@ static status_t
 emuxki_list_mix_controls(emuxki_dev *card, multi_mix_control_info * MMCI)
 {
 	multi_mix_control	*MMC;
-	int32 i;
+	uint32 i;
 	
 	MMC = MMCI->controls;
 	if(MMCI->control_count < 24)
@@ -690,7 +692,8 @@ static void
 emuxki_create_channels_list(multi_dev *multi)
 {
 	emuxki_stream *stream;
-	uint32 index, i, mode, designations, nchannels;
+	uint32 index, i, designations, nchannels;
+	int32 mode;
 	multi_channel_info *chans;
 	uint32 chan_designations[] = {
 		B_CHANNEL_LEFT,
@@ -769,7 +772,7 @@ emuxki_create_channels_list(multi_dev *multi)
 static status_t 
 emuxki_get_description(emuxki_dev *card, multi_description *data)
 {
-	uint32 size;
+	int32 size;
 
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
@@ -882,7 +885,7 @@ emuxki_get_global_format(emuxki_dev *card, multi_format_info *data)
 static status_t 
 emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 {
-	uint32 i, j, pchannels, pchannels2, rchannels, rchannels2;
+	int32 i, j, pchannels, pchannels2, rchannels, rchannels2;
 	
 	LOG(("flags = %#x\n",data->flags));
 	LOG(("request_playback_buffers = %#x\n",data->request_playback_buffers));
@@ -944,7 +947,7 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 }
 
 
-void
+static void
 emuxki_play_inth(void* inthparams)
 {
 	emuxki_stream *stream = (emuxki_stream *)inthparams;
@@ -962,7 +965,7 @@ emuxki_play_inth(void* inthparams)
 		release_sem_etc(stream->card->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 }
 
-void
+static void
 emuxki_record_inth(void* inthparams)
 {
 	emuxki_stream *stream = (emuxki_stream *)inthparams;

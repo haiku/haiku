@@ -176,7 +176,7 @@ codec_table codecs[] =
 	{ 0x00000000, 0x00000000, &default_ops, "Unknown" } /* must be last one, matches every codec */
 };
 
-codec_table *
+static codec_table *
 find_codec_table(uint32 codecid)
 {
 	codec_table *codec;

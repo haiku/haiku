@@ -46,6 +46,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <midi_driver.h>
 #include "emuxki.h"
 #include "debug.h"
 #include "config.h"
@@ -56,7 +57,6 @@
 #include <malloc.h>
 #include "multi.h"
 #include "ac97.h"
-#include "midi_driver.h"
 
 status_t init_hardware(void);
 status_t init_driver(void);
@@ -82,7 +82,7 @@ extern device_hooks midi_hooks;
 
 /* Hardware Dump */
 
-void 
+static void 
 dump_hardware_regs(device_config *config)
 {
 	LOG(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
@@ -121,7 +121,7 @@ dump_hardware_regs(device_config *config)
 	
 }
 
-void 
+static void 
 trace_hardware_regs(device_config *config)
 {
 	TRACE(("EMU_IPR = %#08x\n",emuxki_reg_read_32(config, EMU_IPR)));
@@ -227,10 +227,10 @@ emuxki_mem_delete(emuxki_mem *mem)
 void *
 emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 {
-	int             i, j;//, s;
+	int             i;//, s;
 	size_t          numblocks;
 	emuxki_mem *mem;
-	uint32      *ptb, silentpage;
+	uint32      j, *ptb, silentpage;
 
 	ptb = card->ptb_log_base;
 	silentpage = ((uint32)card->silentpage_phy_base) << 1;
@@ -296,10 +296,9 @@ emuxki_rmem_alloc(emuxki_dev *card, size_t size)
 void
 emuxki_mem_free(emuxki_dev *card, void *ptr)
 {
-	int             i;//, s;
 	emuxki_mem 		*mem;
 	size_t          numblocks;
-	uint32      	*ptb, silentpage;
+	uint32      	i, *ptb, silentpage;
 
 	ptb = card->ptb_log_base;
 	silentpage = ((uint32)card->silentpage_phy_base) << 1;
@@ -624,8 +623,8 @@ emuxki_channel_stop(emuxki_channel *chan)
 }
 
 /*	Emuxki voice functions */
-
-void emuxki_dump_voice(emuxki_voice *voice)
+static void 
+emuxki_dump_voice(emuxki_voice *voice)
 {
 	LOG(("voice->use = %#u\n", voice->use));
 	LOG(("voice->state = %#u\n", voice->state));
@@ -1545,7 +1544,7 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 			else 
 				break;
 		if(voice) {
-			*buffer = voice->buffer->log_base + (buf * stream->bufframes * sample_size * 2);
+			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size * 2);
 			if(chan % 2 == 1)
 				*buffer += sample_size;
 			*stride = sample_size * 2;
@@ -1561,7 +1560,7 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 			else 
 				break;
 		if(voice) {
-			*buffer = voice->buffer->log_base + (buf * stream->bufframes * sample_size);
+			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size);
 			*stride = sample_size;
 		} else
 			return B_ERROR;
@@ -1858,8 +1857,8 @@ emuxki_parameter_get(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 }
 
 /* Emuxki interrupt */
-
-int32 emuxki_int(void *arg)
+static int32 
+emuxki_int(void *arg)
 {
 	emuxki_dev	 *card = arg;
 	uint32       ipr, curblk;
