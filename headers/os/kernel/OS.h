@@ -215,6 +215,7 @@ typedef struct {
 } team_usage_info;
 
 enum {
+	/* compatible to sys/resource.h RUSAGE_SELF and RUSAGE_CHILDREN */
 	B_TEAM_USAGE_SELF		= 0,
 	B_TEAM_USAGE_CHILDREN	= -1,
 };
