@@ -39,6 +39,7 @@
 #include <string.h>
 #include <ByteOrder.h>
 #include <File.h>
+#include <StorageDefs.h>
 #include <TranslatorFormats.h>
 
 struct ColorSpaceName { 

@@ -16,6 +16,7 @@
 */
 
 #include <File.h>
+#include <StorageDefs.h>
 
 #include <stdlib.h>
 #include <stdio.h>

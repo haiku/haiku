@@ -35,6 +35,7 @@
 /*****************************************************************************/
 #include <ByteOrder.h>
 #include <File.h>
+#include <StorageDefs.h>
 #include <iostream.h>
 #include <stdio.h>
 #include <stdlib.h>
