@@ -432,7 +432,7 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 		run.start += (pos - offset) >> blockShift;
 		run.length -= (pos - offset) >> blockShift;
 
-		if ((run.length << blockShift) > length) {
+		if (uint32(run.length << blockShift) > length) {
 			if (length < blockSize) {
 				Cache cached(fVolume, run);
 				if ((block = cached.Block()) == NULL) {
@@ -453,6 +453,10 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 		}
 
 		int32 bytes = run.length << blockShift;
+#ifdef DEBUG
+		if (bytes > length)
+			DEBUGGER("bytes greater than length");
+#endif
 		length -= bytes;
 		bytesRead += bytes;
 		if (length == 0)
@@ -577,7 +581,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 		run.start += (pos - offset) >> blockShift;
 		run.length -= (pos - offset) >> blockShift;
 
-		if ((run.length << blockShift) > length) {
+		if (uint32(run.length << blockShift) > length) {
 			if (length < blockSize) {
 				Cache cached(fVolume,run);
 				if ((block = cached.Block()) == NULL) {
