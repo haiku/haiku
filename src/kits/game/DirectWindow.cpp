@@ -1,72 +1,60 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		DirectWindow.cpp
-//	Author:			Christopher ML Zumwalt May (zummy@users.sf.net)
-//	Description:	BFileGameSound allow the developer to directly draw to the
-//					app_server's frame buffer.
-//------------------------------------------------------------------------------
+// Copyright 2003 Stefano Ceccherini (burton666@libero.it)
 
-#include <memory.h>
+#include <DirectWindow.h>
 
-#include "DirectWindow.h"
+#include <clipping.h>
 
-BDirectWindow::BDirectWindow(BRect frame,
-							 const char *title,
-							 window_type type,
-							 uint32 flags,
-							 uint32 workspace)
- 		: 	BWindow(frame, title, type, flags, workspace),
- 			fIsFullScreen(false),
- 			fIsConnected(false)
+#include <R5_AppServerLink.h>
+#include <R5_Session.h>
+
+// TODO: We'll want to move this to a private header,
+// accessible by the app server.
+struct dw_sync_data
 {
-	InitData(frame);
+	area_id area;
+	sem_id disableSem;
+	sem_id disableSemAck;
+};
+
+
+// TODO: This commands are used by the BeOS R5 app_server.
+// Change this when our app_server supports BDirectWindow
+#define DW_GET_SYNC_DATA 0x880
+#define DW_SUPPORTS_WINDOW_MODE 0xF2C
+
+
+// We don't need this kind of locking, since the directDeamonFunc 
+// doesn't access critical shared data.
+#define DW_NEEDS_LOCKING 0
+
+enum dw_status_bits {
+	DW_STATUS_AREA_CLONED = 0x01,
+	DW_STATUS_THREAD_STARTED = 0x02,
+	DW_STATUS_SEM_CREATED =0x04
+};
+
+
+BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type, uint32 flags, uint32 workspace)
+	:BWindow(frame, title, type, flags, workspace)
+{
+	InitData();
 }
 
 
-BDirectWindow::BDirectWindow(BRect frame,
-							 const char *title,
-							 window_look look,
-							 window_feel feel,
-							 uint32 flags,
-							 uint32 workspace)
- 		: 	BWindow(frame, title, look, feel, flags, workspace),
- 			fIsFullScreen(false),
- 			fIsConnected(false)
+BDirectWindow::BDirectWindow(BRect frame, const char *title, window_look look, window_feel feel, uint32 flags, uint32 workspace)
+	:BWindow(frame, title, look, feel, flags, workspace)
 {
-	InitData(frame);
+	InitData();
 }
 
 
 BDirectWindow::~BDirectWindow()
 {
-	if (fIsConnected)
-	{
-		fBufferInfo->buffer_state = B_DIRECT_STOP;
-		DoDirectConnected();
-	}
-	
-	delete fBufferInfo;
+	DisposeData();
 }
 
+
+// start of regular BWindow API
 BArchivable *
 BDirectWindow::Instantiate(BMessage *data)
 {
@@ -75,217 +63,209 @@ BDirectWindow::Instantiate(BMessage *data)
 
 
 status_t
-BDirectWindow::Archive(BMessage *data,
-					   bool deep) const
+BDirectWindow::Archive(BMessage *data, bool deep) const
 {
-	return B_ERROR;
+	return inherited::Archive(data, deep);
 }
 
 
 void
-BDirectWindow::Quit(void)
+BDirectWindow::Quit()
 {
-	if (fIsConnected) Disconnect();
-
-	BWindow::Quit();
+	inherited::Quit();
 }
 
 
 void
-BDirectWindow::DispatchMessage(BMessage *message,
-							   BHandler *handler)
+BDirectWindow::DispatchMessage(BMessage *message, BHandler *handler)
 {
-	BWindow::DispatchMessage(message, handler);
+	inherited::DispatchMessage(message, handler);
 }
 
 
 void
 BDirectWindow::MessageReceived(BMessage *message)
 {
-	BWindow::MessageReceived(message);
+	inherited::MessageReceived(message);
 }
 
 
 void
 BDirectWindow::FrameMoved(BPoint new_position)
 {
-	clipping_rect * bounds = &fBufferInfo->window_bounds;
-	
-	int32 dx = int32(new_position.x - bounds->left);
-	int32 dy = int32(new_position.y - bounds->top);
-	
-	bounds->top += dy; 
-	bounds->left += dx;
-	bounds->right += dx;
-	bounds->bottom += dy;
-	
-	fBufferInfo->buffer_state = direct_buffer_state(B_DIRECT_MODIFY | B_BUFFER_MOVED);
-	DoDirectConnected();
+	inherited::FrameMoved(new_position);
 }
 
 
 void
-BDirectWindow::WorkspacesChanged(uint32 old_ws,
-								 uint32 new_ws)
+BDirectWindow::WorkspacesChanged(uint32 old_ws, uint32 new_ws)
 {
+	inherited::WorkspacesChanged(old_ws, new_ws);
 }
 
 
 void
-BDirectWindow::WorkspaceActivated(int32 ws,
-								  bool state)
+BDirectWindow::WorkspaceActivated(int32 ws, bool state)
 {
-	if (state)
-		Connect();
-	else
-		Disconnect();
+	inherited::WorkspaceActivated(ws, state);
 }
 
 
 void
-BDirectWindow::FrameResized(float new_width,
-							float new_height)
+BDirectWindow::FrameResized(float new_width, float new_height)
 {
-	clipping_rect * bounds = &fBufferInfo->window_bounds;
-	
-	bounds->right = int32(bounds->left + new_width);
-	bounds->bottom = int32(bounds->top + new_height);
-	
-	fBufferInfo->buffer_state = direct_buffer_state(B_DIRECT_MODIFY | B_BUFFER_RESIZED);
-	DoDirectConnected();
+	inherited::FrameResized(new_width, new_height);
 }
 
 
 void
 BDirectWindow::Minimize(bool minimize)
 {
-	if (minimize)
-	{
-		Disconnect();
-		BWindow::Minimize(false);
-	}
-	else
-	{
-		BWindow::Minimize(true);
-		Connect();
-	}
+	inherited::Minimize(minimize);
 }
 
 
 void
-BDirectWindow::Zoom(BPoint rec_position,
-					float rec_width,
-					float rec_height)
+BDirectWindow::Zoom(BPoint rec_position, float rec_width, float rec_height)
 {
-	BWindow::Zoom(rec_position, rec_width, rec_height);
+	inherited::Zoom(rec_position, rec_width, rec_height);
 }
 
 
 void
-BDirectWindow::ScreenChanged(BRect screen_size,
-							 color_space depth)
+BDirectWindow::ScreenChanged(BRect screen_size, color_space depth)
 {
-	direct_buffer_state state = B_DIRECT_MODIFY;
-
-	if (fIsConnected && fIsFullScreen)
-	{
-		ResizeTo(screen_size.right, screen_size.bottom);
-		state = direct_buffer_state(state | B_BUFFER_RESIZED);				
-	}
-	
-	GetFrameBuffer();
-	
-	fBufferInfo->buffer_state = direct_buffer_state(state | B_BUFFER_RESET);
-	DoDirectConnected();
+	inherited::ScreenChanged(screen_size, depth);
 }
 
 
 void
 BDirectWindow::MenusBeginning()
 {
+	inherited::MenusBeginning();
 }
 
 
 void
 BDirectWindow::MenusEnded()
 {
+	inherited::MenusEnded();
 }
 
 
 void
 BDirectWindow::WindowActivated(bool state)
 {
-	CreateClippingList();
+	inherited::WindowActivated(state);	
 }
 
 
 void
 BDirectWindow::Show()
 {
-	BWindow::Show();
-	
-	Connect();
+	inherited::Show();
 }
 
 
 void
 BDirectWindow::Hide()
 {
-	Disconnect();
-
-	BWindow::Hide();
+	inherited::Hide();
 }
 
 
 BHandler *
-BDirectWindow::ResolveSpecifier(BMessage *msg,
-								int32 index,
-								BMessage *specifier,
-								int32 form,
-								const char *property)
+BDirectWindow::ResolveSpecifier(BMessage *msg, int32 index,
+				BMessage *specifier, int32 form, const char *property)
 {
-	return NULL;
+	return inherited::ResolveSpecifier(msg, index, specifier, form, property);
 }
 
 
 status_t
 BDirectWindow::GetSupportedSuites(BMessage *data)
 {
-	return B_ERROR;
+	return inherited::GetSupportedSuites(data);
 }
 
 
 status_t
-BDirectWindow::Perform(perform_code d,
-					   void *arg)
+BDirectWindow::Perform(perform_code d, void *arg)
 {
-	return B_ERROR;
+	return inherited::Perform(d, arg);
 }
 
 
 void
 BDirectWindow::task_looper()
 {
-	BWindow::task_looper();
+	inherited::task_looper();
 }
+
 
 BMessage *
 BDirectWindow::ConvertToMessage(void *raw, int32 code)
 {
-	return BWindow::ConvertToMessage(raw, code);
+	return inherited::ConvertToMessage(raw, code);
 }
+// end of BWindow API
 
 
+// BDirectWindow specific API
 void
 BDirectWindow::DirectConnected(direct_buffer_info *info)
 {
+	//implemented in subclasses
 }
 
 
 status_t
-BDirectWindow::GetClippingRegion(BRegion *region,
-								 BPoint *origin) const
+BDirectWindow::GetClippingRegion(BRegion *region, BPoint *origin) const
 {
+	if (region == NULL)
+		return B_BAD_VALUE;
+
+	if (IsLocked())
+		return B_ERROR;
+	
+	if (LockDirect()) {
+		if (in_direct_connect) {
+			UnlockDirect();
+			return B_ERROR;
+		}
+		
+		// BPoint's coordinates are floats. We can only work
+		// with integers.
+		int32 originX, originY;
+		if (origin == NULL) {
+			originX = 0;
+			originY = 0;
+		} else {
+			originX = (int32)origin->x;
+			originY = (int32)origin->y;
+		}
+		
+		// Since we are friend of BRegion, we can access its private members.
+		// Otherwise, we would need to call BRegion::Include(clipping_rect)
+		// for every clipping_rect in our clip_list, and that would be much
+		// more overkill than this.
+		region->set_size(buffer_desc->clip_list_count);
+		region->count = buffer_desc->clip_list_count;		
+		region->bound = buffer_desc->clip_bounds;
+		
+		// adjust bounds by the given origin point 
+		offset_rect(region->bound, -originX, -originY);
+		
+		for (uint32 c = 0; c < buffer_desc->clip_list_count; c++) {
+			region->data[c] = buffer_desc->clip_list[c];
+			offset_rect(region->data[c], -originX, -originY);
+		}
+		
+		UnlockDirect();
+
+		return B_OK;
+	}
+	
 	return B_ERROR;
 }
 
@@ -293,108 +273,211 @@ BDirectWindow::GetClippingRegion(BRegion *region,
 status_t
 BDirectWindow::SetFullScreen(bool enable)
 {
-	return B_ERROR;
+	status_t status = B_ERROR;
+	//TODO: Implement	
+	return status;
 }
 
 
 bool
 BDirectWindow::IsFullScreen() const
 {
-	return fIsFullScreen;
+	return full_screen_enable;
 }
 
 
 bool
-BDirectWindow::SupportsWindowMode(screen_id)
+BDirectWindow::SupportsWindowMode(screen_id id)
 {
-	return true;
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow1()
-{
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow2()
-{
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow3()
-{
-}
-
-
-void
-BDirectWindow::_ReservedDirectWindow4()
-{
-}
-
-
-/* unimplemented for protection of the user:
- *
- * BDirectWindow::BDirectWindow()
- * BDirectWindow::BDirectWindow(BDirectWindow &)
- * BDirectWindow &BDirectWindow::operator=(BDirectWindow &)
- */
-
- 
-void
-BDirectWindow::InitData(BRect frame)
-{
-	fBufferInfo = new direct_buffer_info;
-	memset(fBufferInfo, 0, sizeof(direct_buffer_info));
+	_BAppServerLink_ link;
+	link.fSession->swrite_l(DW_SUPPORTS_WINDOW_MODE);
+	link.fSession->swrite_l(id.id);
+	link.fSession->sync();
 	
-	fBufferInfo->window_bounds.top = int32(frame.top);
-	fBufferInfo->window_bounds.left = int32(frame.left);
-	fBufferInfo->window_bounds.right = int32(frame.right);
-	fBufferInfo->window_bounds.bottom = int32(frame.bottom);
+	int32 result;
+	link.fSession->sread(sizeof(result), &result);
+
+	return result & true;
+}
+
+
+// Private methods
+int32
+BDirectWindow::DirectDeamonFunc(void *arg)
+{
+	BDirectWindow *object = static_cast<BDirectWindow *>(arg);
+
+	while (!object->deamon_killer) {
+		// This sem is released by the app_server when our
+		// clipping region changes, or when our window is moved,
+		// resized, etc. etc.		
+		while (acquire_sem(object->disable_sem) == B_INTERRUPTED)
+			;	
+		
+		if (object->LockDirect()) {
+			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_START)
+				object->connection_enable = true;
+				
+			object->in_direct_connect = true;
+			object->DirectConnected(object->buffer_desc);	
+			object->in_direct_connect = false;
+			
+			if ((object->buffer_desc->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP)
+				object->connection_enable = false;
+						
+			object->UnlockDirect();	
+		}
+		
+		// The app_server then waits (with a timeout) on this sem.
+		// If we aren't quick enough to release this sem, our app
+		// will be terminated by the app_server
+		release_sem(object->disable_sem_ack);
+	}
+
+	return 0;
+}
+
+
+bool
+BDirectWindow::LockDirect() const
+{
+	status_t status = B_OK;
+
+#if DW_NEEDS_LOCKING
+	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
 	
-	GetFrameBuffer();
+	if (atomic_add(&casted->direct_lock, 1) > 0) 
+		do {
+			status = acquire_sem(direct_sem);
+		} while (status == B_INTERRUPTED);
+		
+	if (status == B_OK) {
+		casted->direct_lock_owner = find_thread(NULL);
+		casted->direct_lock_count++;
+	}
+#endif
+
+	return status == B_OK;
 }
 
 
 void
-BDirectWindow::DoDirectConnected()
+BDirectWindow::UnlockDirect() const
 {
-	if (fIsConnected)
-	{
-		direct_buffer_info * info = new direct_buffer_info;
-		memcpy(info, fBufferInfo, sizeof(direct_buffer_info));
+#if DW_NEEDS_LOCKING
+	BDirectWindow *casted = const_cast<BDirectWindow *>(this);
+	
+	if (atomic_add(&casted->direct_lock, -1) > 1)
+		release_sem(direct_sem);
+	
+	casted->direct_lock_count--;
+#endif
+}
+
+
+void
+BDirectWindow::InitData()
+{
+	connection_enable = false;
+	full_screen_enable = false;
+	in_direct_connect = false;
+	
+	dw_init_status = 0;
+	
+	direct_driver_ready = false;
+	direct_driver_type = 0;
+	direct_driver_token = 0;	
+	direct_driver = NULL;
+
+	if (Lock()) {		
+		a_session->swrite_l(DW_GET_SYNC_DATA);
+		a_session->swrite_l(server_token);
+		Flush();
+
+		struct dw_sync_data sync_data;
+		a_session->sread(sizeof(sync_data), &sync_data);
 		
-		DirectConnected(info);
+		status_t status;
+		a_session->sread(4, &status);
 		
-		delete info;
+		Unlock();
+		
+		if (status == B_OK) {
+		
+#if DW_NEEDS_LOCKING	
+			direct_lock = 0;
+			direct_lock_count = 0;
+			direct_lock_owner = B_ERROR;
+			direct_lock_stack = NULL;
+			direct_sem = create_sem(1, "direct sem");
+			if (direct_sem > 0)
+				dw_init_status |= DW_STATUS_SEM_CREATED;
+#endif		
+ 		
+			source_clipping_area = sync_data.area;
+			disable_sem = sync_data.disableSem;
+			disable_sem_ack = sync_data.disableSemAck;
+			
+			cloned_clipping_area = clone_area("Clone direct area", (void**)&buffer_desc,
+				B_ANY_ADDRESS, B_READ_AREA, source_clipping_area);		
+			if (cloned_clipping_area > 0) {			
+				dw_init_status |= DW_STATUS_AREA_CLONED;
+				
+				direct_deamon_id = spawn_thread(DirectDeamonFunc, "direct deamon",
+					B_DISPLAY_PRIORITY, this);
+			
+				if (direct_deamon_id > 0) {
+					deamon_killer = false;
+					if (resume_thread(direct_deamon_id) == B_OK)
+						dw_init_status |= DW_STATUS_THREAD_STARTED;
+					else
+						kill_thread(direct_deamon_id);
+				}
+			}
+		}
 	}
 }
 
-void
-BDirectWindow::Connect()
-{
-	fIsConnected = true;
-	fBufferInfo->buffer_state = B_DIRECT_START;
-	DoDirectConnected();
-}
 
 void
-BDirectWindow::Disconnect()
+BDirectWindow::DisposeData()
 {
-	fBufferInfo->buffer_state = B_DIRECT_STOP;
-	DoDirectConnected();
-	fIsConnected = false;
+	// wait until the connection terminates: we can't destroy
+	// the object until the client receives the B_DIRECT_STOP
+	// notification, or bad things will happen
+	while (connection_enable)
+		snooze(50000);
+	
+	LockDirect();
+	
+	if (dw_init_status & DW_STATUS_THREAD_STARTED) {
+		deamon_killer = true;
+		// Release this sem, otherwise the Direct deamon thread
+		// will wait forever on it
+		release_sem(disable_sem);
+		status_t retVal;
+		wait_for_thread(direct_deamon_id, &retVal);
+	}
+	
+#if DW_NEEDS_LOCKING
+	if (dw_init_status & DW_STATUS_SEM_CREATED)
+		delete_sem(direct_sem);
+#endif	
+
+	if (dw_init_status & DW_STATUS_AREA_CLONED)
+		delete_area(cloned_clipping_area);
 }
 
-void
-BDirectWindow::CreateClippingList()
+
+status_t
+BDirectWindow::DriverSetup() const
 {
+	//Unimplemented
+	return B_OK;
 }
 
-void
-BDirectWindow::GetFrameBuffer()
-{
-}
 
+void BDirectWindow::_ReservedDirectWindow1() {}
+void BDirectWindow::_ReservedDirectWindow2() {}
+void BDirectWindow::_ReservedDirectWindow3() {}
+void BDirectWindow::_ReservedDirectWindow4() {}
