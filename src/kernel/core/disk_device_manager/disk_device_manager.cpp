@@ -220,6 +220,20 @@ update_disk_device_job_extra_progress(disk_job_id jobID, const char *info)
 	return false;
 }
 
+// set_disk_device_job_error_message
+bool
+set_disk_device_job_error_message(disk_job_id jobID, const char *message)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	if (ManagerLocker locker = manager) {
+		if (KDiskDeviceJob *job = manager->FindJob(jobID)) {
+			job->SetErrorMessage(message);
+			return true;
+		}
+	}
+	return false;
+}
+
 // update_disk_device_job_interrupt_properties
 uint32
 update_disk_device_job_interrupt_properties(disk_job_id jobID,

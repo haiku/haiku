@@ -113,6 +113,7 @@ disk_system_id find_disk_system(const char *name);
 bool update_disk_device_job_progress(disk_job_id jobID, float progress);
 bool update_disk_device_job_extra_progress(disk_job_id jobID,
 										   const char *info);
+bool set_disk_device_job_error_message(disk_job_id jobID, const char *message);
 uint32 update_disk_device_job_interrupt_properties(disk_job_id jobID,
 												   uint32 interruptProperties);
 	// returns one of B_DISK_DEVICE_JOB_{CONTINUE,CANCEL,REVERSE}
