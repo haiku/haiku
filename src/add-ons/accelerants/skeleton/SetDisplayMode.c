@@ -89,7 +89,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	/* calculate and set new mode bytes_per_row */
-	nv_general_validate_pic_size (&target, &si->fbc.bytes_per_row, &si->acc_mode);
+	eng_general_validate_pic_size (&target, &si->fbc.bytes_per_row, &si->acc_mode);
 
 	/*Perform the very long mode switch!*/
 	if (target.flags & DUALHEAD_BITS) /*if some dualhead mode*/
@@ -112,8 +112,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* detect which connectors have a CRT connected */
 		//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
 		//or make it work with digital panels connected as well.
-//		crt1 = nv_dac_crt_connected();
-//		crt2 = nv_dac2_crt_connected();
+//		crt1 = eng_dac_crt_connected();
+//		crt2 = eng_dac2_crt_connected();
 		/* connect outputs 'straight-through' */
 //		if (crt1)
 //		{
@@ -132,9 +132,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set output connectors assignment if possible */
 		if ((target.flags & DUALHEAD_BITS) == DUALHEAD_SWITCH)
 			/* invert output assignment in switch mode */
-			nv_general_head_select(true);
+			eng_general_head_select(true);
 		else
-			nv_general_head_select(false);
+			eng_general_head_select(false);
 
 		/* set the pixel clock PLL(s) */
 		LOG(8,("SETMODE: target clock %dkHz\n",target.timing.pixel_clock));
@@ -245,8 +245,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			/* detect which connectors have a CRT connected */
 			//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
 			//or make it work with digital panels connected as well.
-//			crt1 = nv_dac_crt_connected();
-//			crt2 = nv_dac2_crt_connected();
+//			crt1 = eng_dac_crt_connected();
+//			crt2 = eng_dac2_crt_connected();
 			/* connect outputs 'straight-through' */
 //			if (crt1)
 //			{
@@ -263,7 +263,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //					cross = false;
 //			}
 			/* set output connectors assignment if possible */
-			nv_general_head_select(false);
+			eng_general_head_select(false);
 		}
 
 		switch(target.space)
@@ -310,9 +310,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	if (target.flags & DUALHEAD_BITS) head2_dpms(display,h,v);
 
 	/* set up acceleration for this mode */
-	nv_acc_init();
+	eng_acc_init();
 	/* set up overlay unit for this mode */
-	nv_bes_init();
+	eng_bes_init();
 
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 

@@ -5,13 +5,13 @@
 
 #define MODULE_BIT 0x00001000
 
-#include "nv_std.h"
+#include "std.h"
 
 static status_t nv10_nv20_dac2_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /* see if an analog VGA monitor is connected to connector #2 */
-bool nv_dac2_crt_connected()
+bool eng_dac2_crt_connected()
 {
 	uint32 output, dac;
 	bool present;
@@ -69,7 +69,7 @@ bool nv_dac2_crt_connected()
 }
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
-status_t nv_dac2_mode(int mode,float brightness)
+status_t eng_dac2_mode(int mode,float brightness)
 {
 	uint8 *r,*g,*b;
 	int i, ri;
@@ -89,7 +89,7 @@ status_t nv_dac2_mode(int mode,float brightness)
 		b[i] = g[i] = r[i] = ri;
 	}
 
-	if (nv_dac2_palette(r,g,b) != B_OK) return B_ERROR;
+	if (eng_dac2_palette(r,g,b) != B_OK) return B_ERROR;
 
 	/* disable palette RAM adressing mask */
 	NV_REG8(NV8_PAL2MASK) = 0xff;
@@ -99,7 +99,7 @@ status_t nv_dac2_mode(int mode,float brightness)
 }
 
 /*program the DAC palette using the given r,g,b values*/
-status_t nv_dac2_palette(uint8 r[256],uint8 g[256],uint8 b[256])
+status_t eng_dac2_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 {
 	int i;
 
@@ -141,7 +141,7 @@ if (1)
 }
 
 /*program the pixpll - frequency in kHz*/
-status_t nv_dac2_set_pix_pll(display_mode target)
+status_t eng_dac2_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
 //	uint time = 0;
@@ -175,7 +175,7 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	LOG(4,("DAC2: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
 	/* signal that we actually want to set the mode */
-	result = nv_dac2_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
+	result = eng_dac2_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
 	if (result != B_OK)
 	{
 		return result;
@@ -215,7 +215,7 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 }
 
 /* find nearest valid pix pll */
-status_t nv_dac2_pix_pll_find
+status_t eng_dac2_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	switch (si->ps.card_type) {

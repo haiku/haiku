@@ -96,7 +96,7 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 	if ((hds!=si->dm.h_display_start) || (vds!=si->dm.v_display_start)) 
 	{
 		MOVE_DISPLAY(hds,vds);
-		nv_bes_move_overlay();
+		eng_bes_move_overlay();
 	}
 
 	/* put cursor in correct physical position, so stay onscreen (rel. to CRTC) */

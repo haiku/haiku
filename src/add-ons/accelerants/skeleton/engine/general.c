@@ -1,16 +1,16 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-9/2004
+   Rudolf Cornelissen 10/2002-11/2004
 */
 
 #define MODULE_BIT 0x00008000
 
-#include "nv_std.h"
+#include "std.h"
 
 static status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
-static status_t nv_general_bios_to_powergraphics(void);
+static status_t eng_general_bios_to_powergraphics(void);
 
 static void nv_dump_configuration_space (void)
 {
@@ -76,11 +76,11 @@ static void nv_dump_configuration_space (void)
 #undef DUMP_CFG
 }
 
-status_t nv_general_powerup()
+status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.30 running.\n"));
+	LOG(1,("POWERUP: Haiku-OS skeleton Accelerant 0.00 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -89,622 +89,10 @@ status_t nv_general_powerup()
 	switch(CFGR(DEVID))
 	{
 	/* Vendor Nvidia */
-	case 0x002010de: /* Nvidia TNT1 */
+	case 0x000010de: /* non-existing card */
 		si->ps.card_type = NV04;
 		si->ps.card_arch = NV04A;
 		LOG(4,("POWERUP: Detected Nvidia TNT1 (NV04)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002810de: /* Nvidia TNT2 (pro) */
-	case 0x002910de: /* Nvidia TNT2 Ultra */
-	case 0x002a10de: /* Nvidia TNT2 */
-	case 0x002b10de: /* Nvidia TNT2 */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT2 (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002c10de: /* Nvidia Vanta (Lt) */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Vanta (Lt) (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002d10de: /* Nvidia TNT2-M64 (Pro) */
-		si->ps.card_type = NV05M64;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia TNT2-M64 (Pro) (NV05M64)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002e10de: /* Nvidia NV06 Vanta */
-	case 0x002f10de: /* Nvidia NV06 Vanta */
-		si->ps.card_type = NV06;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Vanta (NV06)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x004010de: /* Nvidia GeForce FX 6800 Ultra */
-	case 0x004110de: /* Nvidia GeForce FX 6800 */
-	case 0x004210de: /* Nvidia GeForce FX 6800LE */
-	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
-		si->ps.card_type = NV40;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x004310de: /* Nvidia unknown FX */
-		si->ps.card_type = NV40;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV40)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x004e10de: /* Nvidia Quadro FX 4000 */
-		si->ps.card_type = NV40;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000 (NV40)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00a010de: /* Nvidia Aladdin TNT2 */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia Aladdin TNT2 (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00c010de: /* Nvidia unknown FX */
-	case 0x00c110de: /* Nvidia unknown FX */
-		si->ps.card_type = NV41;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV41)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00f810de: /* Nvidia Quadro FX 3400 PCIe(?) */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3400 PCIe(?) (NV35(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00f910de: /* Nvidia GeForce PCX 6800 PCIe */
-		si->ps.card_type = NV45;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 6800 PCIe (NV45)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00fa10de: /* Nvidia GeForce PCX 5750 PCIe */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5750 PCIe (NV36(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00fb10de: /* Nvidia GeForce PCX 5900 PCIe */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5900 PCIe (NV35(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00fc10de: /* Nvidia GeForce PCX 5300 PCIe */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce PCX 5300 PCIe (NV34(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00fd10de: /* Nvidia Quadro PCX PCIe */
-		si->ps.card_type = NV45;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro PCX PCIe (NV45)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00fe10de: /* Nvidia Quadro FX 1300 PCIe(?) */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1300 PCIe(?) (NV36(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x010010de: /* Nvidia GeForce256 SDR */
-	case 0x010110de: /* Nvidia GeForce256 DDR */
-	case 0x010210de: /* Nvidia GeForce256 Ultra */
-		si->ps.card_type = NV10;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce256 (NV10)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x010310de: /* Nvidia Quadro */
-		si->ps.card_type = NV10;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro (NV10)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x011010de: /* Nvidia GeForce2 MX/MX400 */
-	case 0x011110de: /* Nvidia GeForce2 MX100/MX200 DDR */
-		si->ps.card_type = NV11;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 MX (NV11)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x011210de: /* Nvidia GeForce2 Go */
-		si->ps.card_type = NV11;
-		si->ps.card_arch = NV10A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 Go (NV11)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x011310de: /* Nvidia Quadro2 MXR/EX/Go */
-		si->ps.card_type = NV11;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro2 MXR/EX/Go (NV11)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x014010de: /* Nvidia GeForce FX 6600 GT */
-	case 0x014110de: /* Nvidia GeForce FX 6600 */
-		si->ps.card_type = NV43;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (NV43)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x014510de: /* Nvidia GeForce FX 6610 XL */
-		si->ps.card_type = NV43;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6610 XL (NV43)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x014e10de: /* Nvidia Quadro FX 540 */
-		si->ps.card_type = NV43;
-		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 540 (NV43)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x015010de: /* Nvidia GeForce2 GTS/Pro */
-	case 0x015110de: /* Nvidia GeForce2 Ti DDR */
-	case 0x015210de: /* Nvidia GeForce2 Ultra */
-		si->ps.card_type = NV15;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 (NV15)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x015310de: /* Nvidia Quadro2 Pro */
-		si->ps.card_type = NV15;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro2 Pro (NV15)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x017010de: /* Nvidia GeForce4 MX 460 */
-	case 0x017110de: /* Nvidia GeForce4 MX 440 */
-	case 0x017210de: /* Nvidia GeForce4 MX 420 */ 
-	case 0x017310de: /* Nvidia GeForce4 MX 440SE */ 
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x017410de: /* Nvidia GeForce4 440 Go */ 
-	case 0x017510de: /* Nvidia GeForce4 420 Go */
-	case 0x017610de: /* Nvidia GeForce4 420 Go 32M */
-	case 0x017710de: /* Nvidia GeForce4 460 Go */
-	case 0x017910de: /* Nvidia GeForce4 440 Go 64M (on PPC GeForce4 MX) */
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x017810de: /* Nvidia Quadro4 500 XGL/550 XGL */
-	case 0x017a10de: /* Nvidia Quadro4 200 NVS/400 NVS */
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x017c10de: /* Nvidia Quadro4 500 GoGL */
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 500 GoGL (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x017d10de: /* Nvidia GeForce4 410 Go 16M*/
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 410 Go (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x018110de: /* Nvidia GeForce4 MX 440 AGP8X */
-	case 0x018210de: /* Nvidia GeForce4 MX 440SE AGP8X */
-	case 0x018310de: /* Nvidia GeForce4 MX 420 AGP8X */
-	case 0x018510de: /* Nvidia GeForce4 MX 4000 AGP8X */
-		si->ps.card_type = NV18;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x018610de: /* Nvidia GeForce4 448 Go */
-	case 0x018710de: /* Nvidia GeForce4 488 Go */
-		si->ps.card_type = NV18;
-		si->ps.card_arch = NV10A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Go (NV18)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x018810de: /* Nvidia Quadro4 580 XGL */
-		si->ps.card_type = NV18;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x018910de: /* Nvidia GeForce4 MX AGP8X */
-		si->ps.card_type = NV18;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX AGP8X (NV18)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x018a10de: /* Nvidia Quadro4 280 NVS AGP8X */
-	case 0x018b10de: /* Nvidia Quadro4 380 XGL */
-		si->ps.card_type = NV18;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
-		si->ps.card_type = NV11;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce2 Integrated GPU (CRUSH, NV11)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x01f010de: /* Nvidia GeForce4 MX Integrated GPU */
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 MX Integrated GPU (NFORCE2, NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x020010de: /* Nvidia GeForce3 */
-	case 0x020110de: /* Nvidia GeForce3 Ti 200 */
-	case 0x020210de: /* Nvidia GeForce3 Ti 500 */
-		si->ps.card_type = NV20;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce3 (NV20)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x020310de: /* Nvidia Quadro DCC */
-		si->ps.card_type = NV20;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro DCC (NV20)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x025010de: /* Nvidia GeForce4 Ti 4600 */
-	case 0x025110de: /* Nvidia GeForce4 Ti 4400 */
-	case 0x025210de: /* Nvidia GeForce4 Ti 4600 */
-	case 0x025310de: /* Nvidia GeForce4 Ti 4200 */
-		si->ps.card_type = NV25;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti (NV25)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x025810de: /* Nvidia Quadro4 900 XGL */
-	case 0x025910de: /* Nvidia Quadro4 750 XGL */
-	case 0x025b10de: /* Nvidia Quadro4 700 XGL */
-		si->ps.card_type = NV25;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV25)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x028010de: /* Nvidia GeForce4 Ti 4800 AGP8X */
-	case 0x028110de: /* Nvidia GeForce4 Ti 4200 AGP8X */
-		si->ps.card_type = NV28;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti AGP8X (NV28)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x028210de: /* Nvidia GeForce4 Ti 4800SE */
-		si->ps.card_type = NV28;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 Ti 4800SE (NV28)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x028610de: /* Nvidia GeForce4 4200 Go */
-		si->ps.card_type = NV28;
-		si->ps.card_arch = NV20A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce4 4200 Go (NV28)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x028810de: /* Nvidia Quadro4 980 XGL */
-	case 0x028910de: /* Nvidia Quadro4 780 XGL */
-		si->ps.card_type = NV28;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 XGL (NV28)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x028c10de: /* Nvidia Quadro4 700 GoGL */
-		si->ps.card_type = NV28;
-		si->ps.card_arch = NV20A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro4 700 GoGL (NV28)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x02a010de: /* Nvidia GeForce3 Integrated GPU */
-		si->ps.card_type = NV20;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce3 Integrated GPU (XBOX, NV20)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x030110de: /* Nvidia GeForce FX 5800 Ultra */
-	case 0x030210de: /* Nvidia GeForce FX 5800 */
-		si->ps.card_type = NV30;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5800 (NV30)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x030810de: /* Nvidia Quadro FX 2000 */
-	case 0x030910de: /* Nvidia Quadro FX 1000 */
-		si->ps.card_type = NV30;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX (NV30)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031110de: /* Nvidia GeForce FX 5600 Ultra */
-	case 0x031210de: /* Nvidia GeForce FX 5600 */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031310de: /* Nvidia unknown FX */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031410de: /* Nvidia GeForce FX 5600XT */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600XT (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031610de: /* Nvidia unknown FX Go */
-	case 0x031710de: /* Nvidia unknown FX Go */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031a10de: /* Nvidia GeForce FX 5600 Go */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5600 Go (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031b10de: /* Nvidia GeForce FX 5650 Go */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5650 Go (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031c10de: /* Nvidia Quadro FX 700 Go */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 700 Go (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x031d10de: /* Nvidia unknown FX Go */
-	case 0x031e10de: /* Nvidia unknown FX Go */
-	case 0x031f10de: /* Nvidia unknown FX Go */
-		si->ps.card_type = NV31;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV31)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032010de: /* Nvidia GeForce FX 5200 */
-	case 0x032110de: /* Nvidia GeForce FX 5200 Ultra */
-	case 0x032210de: /* Nvidia GeForce FX 5200 */
-	case 0x032310de: /* Nvidia GeForce FX 5200SE */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032410de: /* Nvidia GeForce FX 5200 Go */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032510de: /* Nvidia GeForce FX 5250 Go */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5250 Go (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032610de: /* Nvidia GeForce FX 5500 */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5500 (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032710de: /* Nvidia GeForce FX 5100 */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5100 (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032810de: /* Nvidia GeForce FX 5200 Go 32M/64M */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 Go (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032910de: /* Nvidia GeForce FX 5200 (PPC) */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5200 (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032a10de: /* Nvidia Quadro NVS 280 PCI */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro NVS 280 PCI (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032b10de: /* Nvidia Quadro FX 500/600 PCI */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 500/600 PCI (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032c10de: /* Nvidia GeForce FX 5300 Go */
-	case 0x032d10de: /* Nvidia GeForce FX 5100 Go */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX Go (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x032e10de: /* Nvidia unknown FX Go */
-	case 0x032f10de: /* Nvidia unknown FX Go */
-		si->ps.card_type = NV34;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX Go (NV34)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033010de: /* Nvidia GeForce FX 5900 Ultra */
-	case 0x033110de: /* Nvidia GeForce FX 5900 */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 (NV35)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033210de: /* Nvidia GeForce FX 5900 XT */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 XT (NV35)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033310de: /* Nvidia GeForce FX 5950 Ultra */
-		si->ps.card_type = NV38;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5950 Ultra (NV38)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033410de: /* Nvidia GeForce FX 5900 ZT */
-		si->ps.card_type = NV38;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5900 ZT (NV38(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033810de: /* Nvidia Quadro FX 3000 */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 3000 (NV35)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x033f10de: /* Nvidia Quadro FX 700 */
-		si->ps.card_type = NV35;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 700 (NV35)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x034110de: /* Nvidia GeForce FX 5700 Ultra */
-	case 0x034210de: /* Nvidia GeForce FX 5700 */
-	case 0x034310de: /* Nvidia GeForce FX 5700LE */
-	case 0x034410de: /* Nvidia GeForce FX 5700VE */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 (NV36)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x034710de: /* Nvidia GeForce FX 5700 Go */
-	case 0x034810de: /* Nvidia GeForce FX 5700 Go */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia GeForce FX 5700 Go (NV36)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x034c10de: /* Nvidia Quadro FX 1000 Go */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		si->ps.laptop = true;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1000 Go (NV36)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x034e10de: /* Nvidia Quadro FX 1100 */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 1100 (NV36)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x034f10de: /* Nvidia unknown FX */
-		si->ps.card_type = NV36;
-		si->ps.card_arch = NV30A;
-		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV36(?))\n"));
-		status = nvxx_general_powerup();
-		break;
-	/* Vendor Elsa GmbH */
-	case 0x0c601048: /* Elsa Gladiac Geforce2 MX */
-		si->ps.card_type = NV11;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Elsa Gladiac Geforce2 MX (NV11)\n"));
-		status = nvxx_general_powerup();
-		break;
-	/* Vendor Nvidia STB/SGS-Thompson */
-	case 0x002012d2: /* Nvidia STB/SGS-Thompson TNT1 */
-		si->ps.card_type = NV04;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT1 (NV04)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002812d2: /* Nvidia STB/SGS-Thompson TNT2 (pro) */
-	case 0x002912d2: /* Nvidia STB/SGS-Thompson TNT2 Ultra */
-	case 0x002a12d2: /* Nvidia STB/SGS-Thompson TNT2 */
-	case 0x002b12d2: /* Nvidia STB/SGS-Thompson TNT2 */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT2 (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002c12d2: /* Nvidia STB/SGS-Thompson Vanta (Lt) */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Vanta (Lt) (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002d12d2: /* Nvidia STB/SGS-Thompson TNT2-M64 (Pro) */
-		si->ps.card_type = NV05M64;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson TNT2-M64 (Pro) (NV05M64)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x002e12d2: /* Nvidia STB/SGS-Thompson NV06 Vanta */
-	case 0x002f12d2: /* Nvidia STB/SGS-Thompson NV06 Vanta */
-		si->ps.card_type = NV06;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Vanta (NV06)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x00a012d2: /* Nvidia STB/SGS-Thompson Aladdin TNT2 */
-		si->ps.card_type = NV05;
-		si->ps.card_arch = NV04A;
-		LOG(4,("POWERUP: Detected Nvidia STB/SGS-Thompson Aladdin TNT2 (NV05)\n"));
-		status = nvxx_general_powerup();
-		break;
-	/* Vendor Varisys Limited */
-	case 0x35031888: /* Varisys GeForce4 MX440 */
-		si->ps.card_type = NV17;
-		si->ps.card_arch = NV10A;
-		LOG(4,("POWERUP: Detected Varisys GeForce4 MX440 (NV17)\n"));
-		status = nvxx_general_powerup();
-		break;
-	case 0x35051888: /* Varisys GeForce4 Ti 4200 */
-		si->ps.card_type = NV25;
-		si->ps.card_arch = NV20A;
-		LOG(4,("POWERUP: Detected Varisys GeForce4 Ti 4200 (NV25)\n"));
 		status = nvxx_general_powerup();
 		break;
 	default:
@@ -790,79 +178,79 @@ void setup_virtualized_heads(bool cross)
 {
 	if (cross)
 	{
-		head1_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
-		head1_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
-		head1_depth				= (crtc_depth)				nv_crtc2_depth;
-		head1_dpms				= (crtc_dpms)				nv_crtc2_dpms;
-		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
-		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
-		head1_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
-		head1_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
-		head1_cursor_show		= (crtc_cursor_show)		nv_crtc2_cursor_show;
-		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
-		head1_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
-		head1_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+		head1_validate_timing	= (crtc_validate_timing)	eng_crtc2_validate_timing;
+		head1_set_timing		= (crtc_set_timing)			eng_crtc2_set_timing;
+		head1_depth				= (crtc_depth)				eng_crtc2_depth;
+		head1_dpms				= (crtc_dpms)				eng_crtc2_dpms;
+		head1_dpms_fetch		= (crtc_dpms_fetch)			eng_crtc2_dpms_fetch;
+		head1_set_display_pitch	= (crtc_set_display_pitch)	eng_crtc2_set_display_pitch;
+		head1_set_display_start	= (crtc_set_display_start)	eng_crtc2_set_display_start;
+		head1_cursor_init		= (crtc_cursor_init)		eng_crtc2_cursor_init;
+		head1_cursor_show		= (crtc_cursor_show)		eng_crtc2_cursor_show;
+		head1_cursor_hide		= (crtc_cursor_hide)		eng_crtc2_cursor_hide;
+		head1_cursor_define		= (crtc_cursor_define)		eng_crtc2_cursor_define;
+		head1_cursor_position	= (crtc_cursor_position)	eng_crtc2_cursor_position;
 
-		head1_mode				= (dac_mode)				nv_dac2_mode;
-		head1_palette			= (dac_palette)				nv_dac2_palette;
-		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac2_set_pix_pll;
-		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac2_pix_pll_find;
+		head1_mode				= (dac_mode)				eng_dac2_mode;
+		head1_palette			= (dac_palette)				eng_dac2_palette;
+		head1_set_pix_pll		= (dac_set_pix_pll)			eng_dac2_set_pix_pll;
+		head1_pix_pll_find		= (dac_pix_pll_find)		eng_dac2_pix_pll_find;
 
-		head2_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
-		head2_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
-		head2_depth				= (crtc_depth)				nv_crtc_depth;
-		head2_dpms				= (crtc_dpms)				nv_crtc_dpms;
-		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
-		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
-		head2_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
-		head2_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
-		head2_cursor_show		= (crtc_cursor_show)		nv_crtc_cursor_show;
-		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
-		head2_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
-		head2_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+		head2_validate_timing	= (crtc_validate_timing)	eng_crtc_validate_timing;
+		head2_set_timing		= (crtc_set_timing)			eng_crtc_set_timing;
+		head2_depth				= (crtc_depth)				eng_crtc_depth;
+		head2_dpms				= (crtc_dpms)				eng_crtc_dpms;
+		head2_dpms_fetch		= (crtc_dpms_fetch)			eng_crtc_dpms_fetch;
+		head2_set_display_pitch	= (crtc_set_display_pitch)	eng_crtc_set_display_pitch;
+		head2_set_display_start	= (crtc_set_display_start)	eng_crtc_set_display_start;
+		head2_cursor_init		= (crtc_cursor_init)		eng_crtc_cursor_init;
+		head2_cursor_show		= (crtc_cursor_show)		eng_crtc_cursor_show;
+		head2_cursor_hide		= (crtc_cursor_hide)		eng_crtc_cursor_hide;
+		head2_cursor_define		= (crtc_cursor_define)		eng_crtc_cursor_define;
+		head2_cursor_position	= (crtc_cursor_position)	eng_crtc_cursor_position;
 
-		head2_mode				= (dac_mode)				nv_dac_mode;
-		head2_palette			= (dac_palette)				nv_dac_palette;
-		head2_set_pix_pll		= (dac_set_pix_pll)			nv_dac_set_pix_pll;
-		head2_pix_pll_find		= (dac_pix_pll_find)		nv_dac_pix_pll_find;
+		head2_mode				= (dac_mode)				eng_dac_mode;
+		head2_palette			= (dac_palette)				eng_dac_palette;
+		head2_set_pix_pll		= (dac_set_pix_pll)			eng_dac_set_pix_pll;
+		head2_pix_pll_find		= (dac_pix_pll_find)		eng_dac_pix_pll_find;
 	}
 	else
 	{
-		head1_validate_timing	= (crtc_validate_timing)	nv_crtc_validate_timing;
-		head1_set_timing		= (crtc_set_timing)			nv_crtc_set_timing;
-		head1_depth				= (crtc_depth)				nv_crtc_depth;
-		head1_dpms				= (crtc_dpms)				nv_crtc_dpms;
-		head1_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc_dpms_fetch;
-		head1_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc_set_display_pitch;
-		head1_set_display_start	= (crtc_set_display_start)	nv_crtc_set_display_start;
-		head1_cursor_init		= (crtc_cursor_init)		nv_crtc_cursor_init;
-		head1_cursor_show		= (crtc_cursor_show)		nv_crtc_cursor_show;
-		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
-		head1_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
-		head1_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
+		head1_validate_timing	= (crtc_validate_timing)	eng_crtc_validate_timing;
+		head1_set_timing		= (crtc_set_timing)			eng_crtc_set_timing;
+		head1_depth				= (crtc_depth)				eng_crtc_depth;
+		head1_dpms				= (crtc_dpms)				eng_crtc_dpms;
+		head1_dpms_fetch		= (crtc_dpms_fetch)			eng_crtc_dpms_fetch;
+		head1_set_display_pitch	= (crtc_set_display_pitch)	eng_crtc_set_display_pitch;
+		head1_set_display_start	= (crtc_set_display_start)	eng_crtc_set_display_start;
+		head1_cursor_init		= (crtc_cursor_init)		eng_crtc_cursor_init;
+		head1_cursor_show		= (crtc_cursor_show)		eng_crtc_cursor_show;
+		head1_cursor_hide		= (crtc_cursor_hide)		eng_crtc_cursor_hide;
+		head1_cursor_define		= (crtc_cursor_define)		eng_crtc_cursor_define;
+		head1_cursor_position	= (crtc_cursor_position)	eng_crtc_cursor_position;
 
-		head1_mode				= (dac_mode)				nv_dac_mode;
-		head1_palette			= (dac_palette)				nv_dac_palette;
-		head1_set_pix_pll		= (dac_set_pix_pll)			nv_dac_set_pix_pll;
-		head1_pix_pll_find		= (dac_pix_pll_find)		nv_dac_pix_pll_find;
+		head1_mode				= (dac_mode)				eng_dac_mode;
+		head1_palette			= (dac_palette)				eng_dac_palette;
+		head1_set_pix_pll		= (dac_set_pix_pll)			eng_dac_set_pix_pll;
+		head1_pix_pll_find		= (dac_pix_pll_find)		eng_dac_pix_pll_find;
 
-		head2_validate_timing	= (crtc_validate_timing)	nv_crtc2_validate_timing;
-		head2_set_timing		= (crtc_set_timing)			nv_crtc2_set_timing;
-		head2_depth				= (crtc_depth)				nv_crtc2_depth;
-		head2_dpms				= (crtc_dpms)				nv_crtc2_dpms;
-		head2_dpms_fetch		= (crtc_dpms_fetch)			nv_crtc2_dpms_fetch;
-		head2_set_display_pitch	= (crtc_set_display_pitch)	nv_crtc2_set_display_pitch;
-		head2_set_display_start	= (crtc_set_display_start)	nv_crtc2_set_display_start;
-		head2_cursor_init		= (crtc_cursor_init)		nv_crtc2_cursor_init;
-		head2_cursor_show		= (crtc_cursor_show)		nv_crtc2_cursor_show;
-		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
-		head2_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
-		head2_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
+		head2_validate_timing	= (crtc_validate_timing)	eng_crtc2_validate_timing;
+		head2_set_timing		= (crtc_set_timing)			eng_crtc2_set_timing;
+		head2_depth				= (crtc_depth)				eng_crtc2_depth;
+		head2_dpms				= (crtc_dpms)				eng_crtc2_dpms;
+		head2_dpms_fetch		= (crtc_dpms_fetch)			eng_crtc2_dpms_fetch;
+		head2_set_display_pitch	= (crtc_set_display_pitch)	eng_crtc2_set_display_pitch;
+		head2_set_display_start	= (crtc_set_display_start)	eng_crtc2_set_display_start;
+		head2_cursor_init		= (crtc_cursor_init)		eng_crtc2_cursor_init;
+		head2_cursor_show		= (crtc_cursor_show)		eng_crtc2_cursor_show;
+		head2_cursor_hide		= (crtc_cursor_hide)		eng_crtc2_cursor_hide;
+		head2_cursor_define		= (crtc_cursor_define)		eng_crtc2_cursor_define;
+		head2_cursor_position	= (crtc_cursor_position)	eng_crtc2_cursor_position;
 
-		head2_mode				= (dac_mode)				nv_dac2_mode;
-		head2_palette			= (dac_palette)				nv_dac2_palette;
-		head2_set_pix_pll		= (dac_set_pix_pll)			nv_dac2_set_pix_pll;
-		head2_pix_pll_find		= (dac_pix_pll_find)		nv_dac2_pix_pll_find;
+		head2_mode				= (dac_mode)				eng_dac2_mode;
+		head2_palette			= (dac_palette)				eng_dac2_palette;
+		head2_set_pix_pll		= (dac_set_pix_pll)			eng_dac2_set_pix_pll;
+		head2_pix_pll_find		= (dac_pix_pll_find)		eng_dac2_pix_pll_find;
 	}
 }
 
@@ -936,13 +324,13 @@ static status_t nvxx_general_powerup()
 
 	/* do powerup needed from pre-inited card state as done by system POST cardBIOS
 	 * execution or driver coldstart above */
-	return nv_general_bios_to_powergraphics();
+	return eng_general_bios_to_powergraphics();
 }
 
 /* this routine switches the CRTC/DAC sets to 'connectors', but only for analog
  * outputs. We need this to make sure the analog 'switch' is set in the same way the
  * digital 'switch' is set by the BIOS or we might not be able to use dualhead. */
-status_t nv_general_output_select(bool cross)
+status_t eng_general_output_select(bool cross)
 {
 	/* make sure this call is warranted */
 	if (si->ps.secondary_head)
@@ -986,7 +374,7 @@ status_t nv_general_output_select(bool cross)
 
 /* this routine switches CRTC/DAC set use. We need this because it's unknown howto
  * switch digital panels to/from a specific CRTC/DAC set. */
-status_t nv_general_head_select(bool cross)
+status_t eng_general_head_select(bool cross)
 {
 	/* make sure this call is warranted */
 	if (si->ps.secondary_head)
@@ -1015,7 +403,7 @@ status_t nv_general_head_select(bool cross)
 
 /* basic change of card state from VGA to enhanced mode:
  * Should work from VGA BIOS POST init state. */
-static status_t nv_general_bios_to_powergraphics()
+static status_t eng_general_bios_to_powergraphics()
 {
 	/* let acc engine make power off/power on cycle to start 'fresh' */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
@@ -1158,7 +546,7 @@ static status_t nv_general_bios_to_powergraphics()
 	 * Note:
 	 * This may only be done when no transfers are in progress on the bus, so now
 	 * is probably a good time.. */
-	nv_agp_setup();
+	eng_agp_setup();
 
 	/* turn screen one on */
 	head1_dpms(true, true, true);
@@ -1173,7 +561,7 @@ static status_t nv_general_bios_to_powergraphics()
  * We use acc or crtc granularity constraints based on the 'worst case' scenario.
  *
  * Mode slopspace is reflected in fbc->bytes_per_row BTW. */
-status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
+status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode)
 {
 	uint32 video_pitch;
 	uint32 acc_mask, crtc_mask;

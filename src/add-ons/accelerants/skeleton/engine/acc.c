@@ -7,7 +7,7 @@
 
 #define MODULE_BIT 0x00080000
 
-#include "nv_std.h"
+#include "std.h"
 
 /*acceleration notes*/
 
@@ -18,7 +18,7 @@ invert rectangle
 blit
 */
 
-status_t nv_acc_wait_idle()
+status_t eng_acc_wait_idle()
 {
 	/* wait until engine completely idle */
 	while (ACCR(STATUS))
@@ -32,7 +32,7 @@ status_t nv_acc_wait_idle()
 
 /* AFAIK this must be done for every new screenmode.
  * Engine required init. */
-status_t nv_acc_init()
+status_t eng_acc_init()
 {
 	uint16 cnt;
 
@@ -698,7 +698,7 @@ status_t nv_acc_init()
 }
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
-status_t nv_acc_setup_blit()
+status_t eng_acc_setup_blit()
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
@@ -729,7 +729,7 @@ status_t nv_acc_setup_blit()
 	return B_OK;
 }
 
-status_t nv_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
+status_t eng_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
 	/* Note: blit-copy direction is determined inside riva hardware: no setup needed */
 
@@ -751,7 +751,7 @@ status_t nv_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 
 /* rectangle fill - i.e. workspace and window background color */
 /* span fill - i.e. (selected) menuitem background color (Dano) */
-status_t nv_acc_setup_rectangle(uint32 color)
+status_t eng_acc_setup_rectangle(uint32 color)
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
@@ -793,7 +793,7 @@ status_t nv_acc_setup_rectangle(uint32 color)
 	return B_OK;
 }
 
-status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
+status_t eng_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
 	/* instruct engine what to fill:
 	 * wait for room in fifo for bitmap cmd if needed.
@@ -811,7 +811,7 @@ status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 }
 
 /* rectangle invert - i.e. text cursor and text selection */
-status_t nv_acc_setup_rect_invert()
+status_t eng_acc_setup_rect_invert()
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
@@ -853,7 +853,7 @@ status_t nv_acc_setup_rect_invert()
 	return B_OK;
 }
 
-status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
+status_t eng_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
 	/* instruct engine what to invert:
 	 * wait for room in fifo for bitmap cmd if needed.
@@ -871,7 +871,7 @@ status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 }
 
 /* screen to screen tranparent blit */
-status_t nv_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
+status_t eng_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h,uint32 colour)
 {
 	//fixme: implement.
 
@@ -879,7 +879,7 @@ status_t nv_acc_transparent_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 
 }
 
 /* screen to screen scaled filtered blit - i.e. scale video in memory */
-status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
+status_t eng_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd)
 {
 	//fixme: implement.

@@ -6,7 +6,7 @@
 
 #define MODULE_BIT 0x00002000
 
-#include "nv_std.h"
+#include "std.h"
 
 /* pins V5.16 and up ROM infoblock stuff */
 typedef struct {
@@ -44,7 +44,7 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom);
 static void	setup_ram_config_nv28(uint8* rom);
 static status_t translate_ISA_PCI(uint32* reg);
-static status_t	nv_crtc_setup_fifo(void);
+static status_t	eng_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -263,12 +263,12 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
-	nv_crtc_cursor_hide();
+	eng_crtc_dpms(false, false, false);
+	eng_crtc_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		nv_crtc2_dpms(false, false, false);
-		nv_crtc2_cursor_hide();
+		eng_crtc2_dpms(false, false, false);
+		eng_crtc2_cursor_hide();
 	}
 
 	/* execute BIOS coldstart script(s) */
@@ -283,7 +283,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
 
 		//temporary: should be called from setmode probably..
-		nv_crtc_setup_fifo();
+		eng_crtc_setup_fifo();
 	}
 	else
 	{
@@ -341,12 +341,12 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
-	nv_crtc_dpms(false, false, false);
-	nv_crtc_cursor_hide();
+	eng_crtc_dpms(false, false, false);
+	eng_crtc_cursor_hide();
 	if (si->ps.secondary_head)
 	{
-		nv_crtc2_dpms(false, false, false);
-		nv_crtc2_cursor_hide();
+		eng_crtc2_dpms(false, false, false);
+		eng_crtc2_cursor_hide();
 	}
 
 	/* execute all BIOS coldstart script(s) */
@@ -389,7 +389,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
 
 		//temporary: should be called from setmode probably..
-		nv_crtc_setup_fifo();
+		eng_crtc_setup_fifo();
 	}
 	else
 	{
@@ -447,7 +447,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			{
 				float calced_clk;
 				uint8 m, n, p;
-				nv_dac_sys_pll_find(((float)data2), &calced_clk, &m, &n, &p, 0);
+				eng_dac_sys_pll_find(((float)data2), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg, data2);
@@ -746,7 +746,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			{
 				float calced_clk;
 				uint8 m, n, p;
-				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
+				eng_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				NV_REG32(reg) = ((p << 16) | (n << 8) | m);
 			}
 			log_pll(reg, (data / 100));
@@ -1100,7 +1100,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			{
 				float calced_clk;
 				uint8 m, n, p;
-				nv_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
+				eng_dac_sys_pll_find((data2 / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
 				data = NV_REG32(reg2);
 				NV_REG32(reg2) = ((data & 0xffff0000) | (n << 8) | m);
@@ -1699,7 +1699,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			{
 				float calced_clk;
 				uint8 m, n, p;
-				nv_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
+				eng_dac_sys_pll_find((data / 100.0), &calced_clk, &m, &n, &p, 0);
 				/* programming the PLL needs to be done in steps! (confirmed NV28) */
 				data2 = NV_REG32(reg);
 				NV_REG32(reg) = ((data2 & 0xffff0000) | (n << 8) | m);
@@ -1964,7 +1964,7 @@ static status_t translate_ISA_PCI(uint32* reg)
 }
 
 //fixme: move to crtc sourcefile, also setup for crtc2(?)
-static status_t	nv_crtc_setup_fifo()
+static status_t	eng_crtc_setup_fifo()
 {
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -2409,16 +2409,16 @@ static void setup_output_matrix()
 		{
 			/* setup defaults: */
 			/* connect analog outputs straight through */
-			nv_general_output_select(false);
+			eng_general_output_select(false);
 
 			/* presetup by the card's BIOS, we can't change this (lack of info) */
 			if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
 			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
 			/* detect analog monitors (confirmed working OK on NV18, NV28 and NV34): */
 			/* sense analog monitor on primary connector */
-			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			if (eng_dac_crt_connected()) si->ps.monitors |= 0x02;
 			/* sense analog monitor on secondary connector */
-			if (nv_dac2_crt_connected()) si->ps.monitors |= 0x20;
+			if (eng_dac2_crt_connected()) si->ps.monitors |= 0x20;
 
 			/* setup correct output and head use */
 			//fixme? add TVout (only, so no CRT(s) connected) support...
@@ -2444,7 +2444,7 @@ static void setup_output_matrix()
 				LOG(2,("INFO: head 2 has nothing connected:\n"));
 				LOG(2,("INFO: correcting...\n"));
 				/* cross connect analog outputs so analog panel or CRT gets head 2 */
-				nv_general_output_select(true);
+				eng_general_output_select(true);
 				LOG(2,("INFO: head 1 has a digital panel;\n"));
 				LOG(2,("INFO: head 2 has an analog panel or CRT:\n"));
 				LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
@@ -2466,7 +2466,7 @@ static void setup_output_matrix()
 				LOG(2,("INFO: head 2 has a digital panel AND an analog panel or CRT:\n"));
 				LOG(2,("INFO: correcting...\n"));
 				/* cross connect analog outputs so analog panel or CRT gets head 1 */
-				nv_general_output_select(true);
+				eng_general_output_select(true);
 				LOG(2,("INFO: head 1 has an analog panel or CRT;\n"));
 				LOG(2,("INFO: head 2 has a digital panel:\n"));
 				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
@@ -2509,7 +2509,7 @@ static void setup_output_matrix()
 			if (si->ps.tmds2_active) si->ps.monitors |= 0x10;
 			/* detect analog monitor (confirmed working OK on NV11): */
 			/* sense analog monitor on primary connector */
-			if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+			if (eng_dac_crt_connected()) si->ps.monitors |= 0x02;
 			/* (sense analog monitor on secondary connector is impossible on NV11) */
 
 			/* setup correct output and head use */
@@ -2567,7 +2567,7 @@ static void setup_output_matrix()
 		if (si->ps.tmds1_active) si->ps.monitors |= 0x01;
 		/* detect analog monitor (confirmed working OK on all cards): */
 		/* sense analog monitor on primary connector */
-		if (nv_dac_crt_connected()) si->ps.monitors |= 0x02;
+		if (eng_dac_crt_connected()) si->ps.monitors |= 0x02;
 
 		//fixme? add TVout (only, so no CRT connected) support...
 	}

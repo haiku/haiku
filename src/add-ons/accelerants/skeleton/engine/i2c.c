@@ -14,7 +14,7 @@
 
 #define MODULE_BIT 0x00004000
 
-#include "nv_std.h"
+#include "std.h"
 
 int i2c_set_lines(int clock, int data);
 int i2c_get_data(void);

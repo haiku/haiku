@@ -7,7 +7,7 @@
 
 #define MODULE_BIT 0x00100000
 
-#include "nv_std.h"
+#include "std.h"
 
 typedef struct {
 	uint32 h_total;

@@ -8,7 +8,7 @@ UseHeaders [ FDirName $(SUBDIR) engine ] ;
 Addon skel.accelerant : accelerants :
 	Acceleration.c
 	Cursor.c
-	EngineManagment.c
+	EngineManagement.c
 	GetAccelerantHook.c
 	GetDeviceInfo.c
 	GetModeInfo.c
@@ -17,7 +17,7 @@ Addon skel.accelerant : accelerants :
 	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
-	: false : libnvidia_engine.a
+	: false : libskeleton_engine.a
 ;
 
 Package haiku-skeleton-cvs :

@@ -5,7 +5,7 @@
 #define MODULE_BIT 0x00000800
 
 #include <stdarg.h>
-#include "nv_std.h"
+#include "std.h"
 
 /*delays in multiple of microseconds*/
 void delay(bigtime_t i)

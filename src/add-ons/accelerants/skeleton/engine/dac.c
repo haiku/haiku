@@ -5,13 +5,13 @@
 
 #define MODULE_BIT 0x00010000
 
-#include "nv_std.h"
+#include "std.h"
 
 static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /* see if an analog VGA monitor is connected to connector #1 */
-bool nv_dac_crt_connected(void)
+bool eng_dac_crt_connected(void)
 {
 	uint32 output, dac;
 	bool present;
@@ -61,7 +61,7 @@ bool nv_dac_crt_connected(void)
 }
 
 /*set the mode, brightness is a value from 0->2 (where 1 is equivalent to direct)*/
-status_t nv_dac_mode(int mode,float brightness)
+status_t eng_dac_mode(int mode,float brightness)
 {
 	uint8 *r,*g,*b;
 	int i, ri;
@@ -81,7 +81,7 @@ status_t nv_dac_mode(int mode,float brightness)
 		b[i] = g[i] = r[i] = ri;
 	}
 
-	if (nv_dac_palette(r,g,b) != B_OK) return B_ERROR;
+	if (eng_dac_palette(r,g,b) != B_OK) return B_ERROR;
 
 	/* disable palette RAM adressing mask */
 	NV_REG8(NV8_PALMASK) = 0xff;
@@ -91,7 +91,7 @@ status_t nv_dac_mode(int mode,float brightness)
 }
 
 /*program the DAC palette using the given r,g,b values*/
-status_t nv_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
+status_t eng_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 {
 	int i;
 
@@ -133,7 +133,7 @@ if (1)
 }
 
 /*program the pixpll - frequency in kHz*/
-status_t nv_dac_set_pix_pll(display_mode target)
+status_t eng_dac_set_pix_pll(display_mode target)
 {
 	uint8 m=0,n=0,p=0;
 //	uint time = 0;
@@ -167,7 +167,7 @@ status_t nv_dac_set_pix_pll(display_mode target)
 	LOG(4,("DAC: Setting PIX PLL for pixelclock %f\n", req_pclk));
 
 	/* signal that we actually want to set the mode */
-	result = nv_dac_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
+	result = eng_dac_pix_pll_find(target,&pix_setting,&m,&n,&p, 1);
 	if (result != B_OK)
 	{
 		return result;
@@ -207,7 +207,7 @@ status_t nv_dac_set_pix_pll(display_mode target)
 }
 
 /* find nearest valid pix pll */
-status_t nv_dac_pix_pll_find
+status_t eng_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	switch (si->ps.card_type) {
@@ -384,7 +384,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 }
 
 /* find nearest valid system PLL setting */
-status_t nv_dac_sys_pll_find(
+status_t eng_dac_sys_pll_find(
 	float req_sclk, float* calc_sclk, uint8* m_result, uint8* n_result, uint8* p_result, uint8 test)
 {
 	int m = 0, n = 0, p = 0, m_max, p_max;

@@ -14,13 +14,13 @@ void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) {
 	int i;
 
 	/* init acc engine for blit function */
-	nv_acc_setup_blit();
+	eng_acc_setup_blit();
 
 	/* do each blit */
 	i=0;
 	while (count--)
 	{
-		nv_acc_blit
+		eng_acc_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -40,7 +40,7 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT(engine_token *et, scaled_blit_params 
 	i=0;
 	while (count--)
 	{
-		nv_acc_video_blit
+		eng_acc_video_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -62,7 +62,7 @@ void SCREEN_TO_SCREEN_TRANSPARENT_BLIT(engine_token *et, uint32 transparent_colo
 	i=0;
 	while (count--)
 	{
-		nv_acc_transparent_blit
+		eng_acc_transparent_blit
 		(
 			list[i].src_left,
 			list[i].src_top,
@@ -80,13 +80,13 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex, fill_rect_params *list,
 	int i;
 
 	/* init acc engine for fill function */
-	nv_acc_setup_rectangle(colorIndex);
+	eng_acc_setup_rectangle(colorIndex);
 
 	/* draw each rectangle */
 	i=0;
 	while (count--)
 	{
-		nv_acc_rectangle
+		eng_acc_rectangle
 		(
 			list[i].left,
 			(list[i].right)+1,
@@ -101,13 +101,13 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) {
 	int i;
 
 	/* init acc engine for invert function */
-	nv_acc_setup_rect_invert();
+	eng_acc_setup_rect_invert();
 
 	/* invert each rectangle */
 	i=0;
 	while (count--)
 	{
-		nv_acc_rectangle_invert
+		eng_acc_rectangle_invert
 		(
 			list[i].left,
 			(list[i].right)+1,
@@ -122,13 +122,13 @@ void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count) 
 	int i;
 
 	/* init acc engine for fill function */
-	nv_acc_setup_rectangle(colorIndex);
+	eng_acc_setup_rectangle(colorIndex);
 
 	/* draw each span */
 	i=0;
 	while (count--)
 	{
-		nv_acc_rectangle
+		eng_acc_rectangle
 		(
 			list[i+1],
 			list[i+2]+1,

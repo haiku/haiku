@@ -5,12 +5,12 @@
 #define MODULE_BIT 0x00000100
 
 #include <unistd.h>
-#include "nv_std.h"
+#include "std.h"
 
-static void nv_agp_list_info(agp_info ai);
-static void nv_agp_list_active(uint32 cmd);
+static void eng_agp_list_info(agp_info ai);
+static void eng_agp_list_active(uint32 cmd);
 
-status_t nv_agp_setup(void)
+status_t eng_agp_setup(void)
 {
 	nv_nth_agp_info nai;
 	nv_cmd_agp nca;
@@ -82,7 +82,7 @@ status_t nv_agp_setup(void)
 		}
 
 		/* log capabilities */
-		nv_agp_list_info(nai.agpi);
+		eng_agp_list_info(nai.agpi);
 	}
 
 	/* if our card is not an AGP type, abort here */
@@ -126,14 +126,14 @@ status_t nv_agp_setup(void)
 
 	/* list mode now activated,
 	 * make sure we have the correct speed scheme for logging */
-	nv_agp_list_active(nca.cmd | (nv_ai.interface.agp_stat & AGP_rate_rev));
+	eng_agp_list_active(nca.cmd | (nv_ai.interface.agp_stat & AGP_rate_rev));
 
 	/* extra check */
 	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
 	return B_OK;
 }
 
-static void nv_agp_list_info(agp_info ai)
+static void eng_agp_list_info(agp_info ai)
 {
 	/*
 		list device
@@ -181,10 +181,10 @@ static void nv_agp_list_info(agp_info ai)
 		list current settings,
 		make sure we have the correct speed scheme for logging
 	 */
-	nv_agp_list_active(ai.interface.agp_cmd | (ai.interface.agp_stat & AGP_rate_rev));
+	eng_agp_list_active(ai.interface.agp_cmd | (ai.interface.agp_stat & AGP_rate_rev));
 }
 
-static void nv_agp_list_active(uint32 cmd)
+static void eng_agp_list_active(uint32 cmd)
 {
 	LOG(4,("AGP: listing settings now in use:\n"));
 	if (!(cmd & AGP_rate_rev))

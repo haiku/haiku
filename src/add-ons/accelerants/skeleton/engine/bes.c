@@ -3,7 +3,7 @@
 
 #define MODULE_BIT 0x00000200
 
-#include "nv_std.h"
+#include "std.h"
 
 typedef struct move_overlay_info move_overlay_info;
 
@@ -16,25 +16,25 @@ struct move_overlay_info
 	uint32 a1orgv;		/* alternate source clipping via startadress of source buffer */
 };
 
-static void nv_bes_calc_move_overlay(move_overlay_info *moi);
-static void nv_bes_program_move_overlay(move_overlay_info moi);
+static void eng_bes_calc_move_overlay(move_overlay_info *moi);
+static void eng_bes_program_move_overlay(move_overlay_info moi);
 
 /* move the overlay output window in virtualscreens */
 /* Note:
  * si->dm.h_display_start and si->dm.v_display_start determine where the new
  * output window is located! */
-void nv_bes_move_overlay()
+void eng_bes_move_overlay()
 {
 	move_overlay_info moi;
 
 	/* abort if overlay is not active */
 	if (!si->overlay.active) return;
 
-	nv_bes_calc_move_overlay(&moi);
-	nv_bes_program_move_overlay(moi);
+	eng_bes_calc_move_overlay(&moi);
+	eng_bes_program_move_overlay(moi);
 }
 
-static void nv_bes_calc_move_overlay(move_overlay_info *moi)
+static void eng_bes_calc_move_overlay(move_overlay_info *moi)
 {
 	/* misc used variables */
 	uint16 temp1, temp2;
@@ -50,12 +50,12 @@ static void nv_bes_calc_move_overlay(move_overlay_info *moi)
 		case DUALHEAD_SWITCH:
 			if ((si->overlay.ow.h_start + (si->overlay.ow.width / 2)) <
 					(si->dm.h_display_start + si->dm.timing.h_display))
-				nv_bes_to_crtc(si->crtc_switch_mode);
+				eng_bes_to_crtc(si->crtc_switch_mode);
 			else
-				nv_bes_to_crtc(!si->crtc_switch_mode);
+				eng_bes_to_crtc(!si->crtc_switch_mode);
 			break;
 		default:
-				nv_bes_to_crtc(si->crtc_switch_mode);
+				eng_bes_to_crtc(si->crtc_switch_mode);
 			break;
 		}
 	}
@@ -289,7 +289,7 @@ static void nv_bes_calc_move_overlay(move_overlay_info *moi)
 	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n", moi->a1orgv));
 }
 
-static void nv_bes_program_move_overlay(move_overlay_info moi)
+static void eng_bes_program_move_overlay(move_overlay_info moi)
 {
 	/*************************************
 	 *** sync to BES (Back End Scaler) ***
@@ -349,7 +349,7 @@ static void nv_bes_program_move_overlay(move_overlay_info moi)
 	}
 }
 
-status_t nv_bes_to_crtc(bool crtc)
+status_t eng_bes_to_crtc(bool crtc)
 {
 	if (si->ps.secondary_head)
 	{
@@ -377,7 +377,7 @@ status_t nv_bes_to_crtc(bool crtc)
 	}
 }
 
-status_t nv_bes_init()
+status_t eng_bes_init()
 {
 	if (si->ps.card_arch < NV10A)
 	{
@@ -469,7 +469,7 @@ status_t nv_configure_bes
 	LOG(4,("Overlay: inputbuffer view (zoom) left %d, top %d, width %d, height %d\n",
 		my_ov.h_start, my_ov.v_start, my_ov.width, my_ov.height));
 
-	/* save for nv_bes_calc_move_overlay() */
+	/* save for eng_bes_calc_move_overlay() */
 	si->overlay.ow = *ow;
 	si->overlay.ob = *ob;
 	si->overlay.my_ov = my_ov;
@@ -518,7 +518,7 @@ status_t nv_configure_bes
 	/* correct factor to prevent most-right visible 'line' from distorting */
 	ifactor -= (1 << 2);
 	hiscalv = ifactor;
-	/* save for nv_bes_calc_move_overlay() */
+	/* save for eng_bes_calc_move_overlay() */
 	si->overlay.h_ifactor = ifactor;
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
@@ -611,7 +611,7 @@ status_t nv_configure_bes
 
 	/* preserve ifactor for source positioning calculations later on */
 	viscalv = ifactor;
-	/* save for nv_bes_calc_move_overlay() */
+	/* save for eng_bes_calc_move_overlay() */
 	si->overlay.v_ifactor = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
@@ -663,7 +663,7 @@ status_t nv_configure_bes
 	/********************************************************************************
 	 *** setup all edges of output window, setup horizontal and vertical clipping ***
 	 ********************************************************************************/
-	nv_bes_calc_move_overlay(&moi);
+	eng_bes_calc_move_overlay(&moi);
 
 
 	/*****************************
@@ -842,7 +842,7 @@ status_t nv_configure_bes
 		}
 	}
 
-	/* note that overlay is in use (for nv_bes_move_overlay()) */
+	/* note that overlay is in use (for eng_bes_move_overlay()) */
 	si->overlay.active = true;
 
 	return B_OK;
@@ -861,7 +861,7 @@ status_t nv_release_bes()
 		BESW(NV10_GENCTRL, 0x00000001);  
 	}
 
-	/* note that overlay is not in use (for nv_bes_move_overlay()) */
+	/* note that overlay is not in use (for eng_bes_move_overlay()) */
 	si->overlay.active = false;
 
 	return B_OK;

@@ -116,7 +116,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	// LOG now available: !NULL si
 	
 	/* call the device specific init code */
-	result = nv_general_powerup();
+	result = eng_general_powerup();
 
 	/* bail out if it failed */
 	if (result != B_OK) goto error1;
@@ -173,7 +173,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 	/* make sure overlay unit is 'marked' as being free */
 	si->overlay.myToken = NULL;	
 
-	/* note that overlay is not in use (for nv_bes_move_overlay()) */
+	/* note that overlay is not in use (for eng_bes_move_overlay()) */
 	si->overlay.active = false;
 
 	/* bail out if something failed */

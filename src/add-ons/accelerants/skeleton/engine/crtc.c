@@ -5,10 +5,10 @@
 
 #define MODULE_BIT 0x00040000
 
-#include "nv_std.h"
+#include "std.h"
 
 /*Adjust passed parameters to a valid mode line*/
-status_t nv_crtc_validate_timing(
+status_t eng_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 )
@@ -89,7 +89,7 @@ status_t nv_crtc_validate_timing(
 }
 
 /*set a mode line - inputs are in pixels*/
-status_t nv_crtc_set_timing(display_mode target)
+status_t eng_crtc_set_timing(display_mode target)
 {
 	uint8 temp;
 
@@ -429,7 +429,7 @@ status_t nv_crtc_set_timing(display_mode target)
 	return B_OK;
 }
 
-status_t nv_crtc_depth(int mode)
+status_t eng_crtc_depth(int mode)
 {
 	uint8 viddelay = 0;
 	uint32 genctrl = 0;
@@ -472,7 +472,7 @@ status_t nv_crtc_depth(int mode)
 	return B_OK;
 }
 
-status_t nv_crtc_dpms(bool display, bool h, bool v)
+status_t eng_crtc_dpms(bool display, bool h, bool v)
 {
 	uint8 temp;
 
@@ -556,7 +556,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 	return B_OK;
 }
 
-status_t nv_crtc_dpms_fetch(bool *display, bool *h, bool *v)
+status_t eng_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 {
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -576,7 +576,7 @@ status_t nv_crtc_dpms_fetch(bool *display, bool *h, bool *v)
 	return B_OK;
 }
 
-status_t nv_crtc_set_display_pitch() 
+status_t eng_crtc_set_display_pitch() 
 {
 	uint32 offset;
 
@@ -597,7 +597,7 @@ status_t nv_crtc_set_display_pitch()
 	return B_OK;
 }
 
-status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp) 
+status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
 	uint8 temp;
 	uint32 timeout = 0;
@@ -655,7 +655,7 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	return B_OK;
 }
 
-status_t nv_crtc_cursor_init()
+status_t eng_crtc_cursor_init()
 {
 	int i;
 	uint32 * fb;
@@ -702,12 +702,12 @@ status_t nv_crtc_cursor_init()
 	NV_REG32(NV32_CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
-	nv_crtc_cursor_show();
+	eng_crtc_cursor_show();
 
 	return B_OK;
 }
 
-status_t nv_crtc_cursor_show()
+status_t eng_crtc_cursor_show()
 {
 	LOG(4,("CRTC: enabling cursor\n"));
 
@@ -720,7 +720,7 @@ status_t nv_crtc_cursor_show()
 	return B_OK;
 }
 
-status_t nv_crtc_cursor_hide()
+status_t eng_crtc_cursor_hide()
 {
 	LOG(4,("CRTC: disabling cursor\n"));
 
@@ -734,7 +734,7 @@ status_t nv_crtc_cursor_hide()
 }
 
 /*set up cursor shape*/
-status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
+status_t eng_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 {
 	int x, y;
 	uint8 b;
@@ -788,7 +788,7 @@ status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 }
 
 /* position the cursor */
-status_t nv_crtc_cursor_position(uint16 x, uint16 y)
+status_t eng_crtc_cursor_position(uint16 x, uint16 y)
 {
 	uint16 yhigh;
 

@@ -1,15 +1,15 @@
 /* general card functions */
-status_t nv_general_powerup(void);
+status_t eng_general_powerup(void);
 status_t nv_set_cas_latency(void);
 void setup_virtualized_heads(bool);
 void set_crtc_owner(bool);
-status_t nv_general_output_select(bool);
-status_t nv_general_head_select(bool);
-status_t nv_general_wait_retrace(void);
-status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
+status_t eng_general_output_select(bool);
+status_t eng_general_head_select(bool);
+status_t eng_general_wait_retrace(void);
+status_t eng_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
 
 /* AGP functions */
-status_t nv_agp_setup(void);
+status_t eng_agp_setup(void);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
@@ -39,19 +39,19 @@ void set_specs(void);
 void dump_pins(void);
 
 /* DAC functions */
-bool nv_dac_crt_connected(void);
-status_t nv_dac_mode(int,float);
-status_t nv_dac_palette(uint8*,uint8*,uint8*);
-status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
-status_t nv_dac_set_pix_pll(display_mode target);
-status_t nv_dac_sys_pll_find(float, float*, uint8*, uint8*, uint8*, uint8);
+bool eng_dac_crt_connected(void);
+status_t eng_dac_mode(int,float);
+status_t eng_dac_palette(uint8*,uint8*,uint8*);
+status_t eng_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
+status_t eng_dac_set_pix_pll(display_mode target);
+status_t eng_dac_sys_pll_find(float, float*, uint8*, uint8*, uint8*, uint8);
 
 /* DAC2 functions */
-bool nv_dac2_crt_connected(void);
-status_t nv_dac2_mode(int,float);
-status_t nv_dac2_palette(uint8*,uint8*,uint8*);
-status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
-status_t nv_dac2_set_pix_pll(display_mode target);
+bool eng_dac2_crt_connected(void);
+status_t eng_dac2_mode(int,float);
+status_t eng_dac2_palette(uint8*,uint8*,uint8*);
+status_t eng_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
+status_t eng_dac2_set_pix_pll(display_mode target);
 
 /*MAVENTV functions*/
 status_t g100_g400max_maventv_vid_pll_find(
@@ -60,64 +60,64 @@ status_t g100_g400max_maventv_vid_pll_find(
 int maventv_init(display_mode target);
 
 /* CRTC1 functions */
-status_t nv_crtc_validate_timing(
+status_t eng_crtc_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 );
-status_t nv_crtc_set_timing(display_mode target);
-status_t nv_crtc_depth(int mode);
-status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp); 
-status_t nv_crtc_set_display_pitch(void);
+status_t eng_crtc_set_timing(display_mode target);
+status_t eng_crtc_depth(int mode);
+status_t eng_crtc_set_display_start(uint32 startadd,uint8 bpp); 
+status_t eng_crtc_set_display_pitch(void);
 
-status_t nv_crtc_dpms(bool, bool, bool);
-status_t nv_crtc_dpms_fetch(bool*, bool*, bool*);
-status_t nv_crtc_mem_priority(uint8);
+status_t eng_crtc_dpms(bool, bool, bool);
+status_t eng_crtc_dpms_fetch(bool*, bool*, bool*);
+status_t eng_crtc_mem_priority(uint8);
 
-status_t nv_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
-status_t nv_crtc_cursor_define(uint8*,uint8*);
-status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
-status_t nv_crtc_cursor_show(void);
-status_t nv_crtc_cursor_hide(void);
+status_t eng_crtc_cursor_init(void); /*Yes, cursor follows CRTC1 - not the DAC!*/
+status_t eng_crtc_cursor_define(uint8*,uint8*);
+status_t eng_crtc_cursor_position(uint16 x ,uint16 y);
+status_t eng_crtc_cursor_show(void);
+status_t eng_crtc_cursor_hide(void);
 
 /* CRTC2 functions */
-status_t nv_crtc2_validate_timing(
+status_t eng_crtc2_validate_timing(
 	uint16 *hd_e,uint16 *hs_s,uint16 *hs_e,uint16 *ht,
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt
 );
-status_t nv_crtc2_set_timing(display_mode target);
-status_t nv_crtc2_depth(int mode);
-status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
-status_t nv_crtc2_set_display_pitch(void);
+status_t eng_crtc2_set_timing(display_mode target);
+status_t eng_crtc2_depth(int mode);
+status_t eng_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
+status_t eng_crtc2_set_display_pitch(void);
 
-status_t nv_crtc2_dpms(bool, bool, bool);
-status_t nv_crtc2_dpms_fetch(bool*, bool*, bool*);
-status_t nv_crtc2_mem_priority(uint8);
+status_t eng_crtc2_dpms(bool, bool, bool);
+status_t eng_crtc2_dpms_fetch(bool*, bool*, bool*);
+status_t eng_crtc2_mem_priority(uint8);
 
-status_t nv_crtc2_cursor_init(void);
-status_t nv_crtc2_cursor_define(uint8*,uint8*);
-status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
-status_t nv_crtc2_cursor_show(void);
-status_t nv_crtc2_cursor_hide(void);
+status_t eng_crtc2_cursor_init(void);
+status_t eng_crtc2_cursor_define(uint8*,uint8*);
+status_t eng_crtc2_cursor_position(uint16 x ,uint16 y);
+status_t eng_crtc2_cursor_show(void);
+status_t eng_crtc2_cursor_hide(void);
 
 /* acceleration functions */
 status_t check_acc_capability(uint32 feature);
-status_t nv_acc_init(void);
-status_t nv_acc_setup_blit(void);
-status_t nv_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
-status_t nv_acc_setup_rectangle(uint32 color);
-status_t nv_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
-status_t nv_acc_setup_rect_invert(void);
-status_t nv_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
-status_t nv_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
-status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
+status_t eng_acc_init(void);
+status_t eng_acc_setup_blit(void);
+status_t eng_acc_blit(uint16,uint16,uint16, uint16,uint16,uint16 );
+status_t eng_acc_setup_rectangle(uint32 color);
+status_t eng_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
+status_t eng_acc_setup_rect_invert(void);
+status_t eng_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl);
+status_t eng_acc_transparent_blit(uint16,uint16,uint16, uint16,uint16,uint16, uint32);
+status_t eng_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 	uint16 xd,uint16 yd,uint16 wd,uint16 hd);
-status_t nv_acc_wait_idle(void);
+status_t eng_acc_wait_idle(void);
 
 /* backend scaler functions */
 status_t check_overlay_capability(uint32 feature);
-void nv_bes_move_overlay(void);
-status_t nv_bes_to_crtc(bool crtc);
-status_t nv_bes_init(void);
+void eng_bes_move_overlay(void);
+status_t eng_bes_to_crtc(bool crtc);
+status_t eng_bes_init(void);
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t nv_release_bes(void);

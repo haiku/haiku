@@ -7,7 +7,7 @@
 	Rudolf Cornelissen 8/2004
 */
 
-#include "nv_std.h"
+#include "std.h"
 
 int fd;
 shared_info *si;
