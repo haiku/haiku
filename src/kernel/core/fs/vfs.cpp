@@ -646,7 +646,7 @@ put_vnode(struct vnode *vnode)
 }
 
 
-/*!	\brief Gets the directory path and leaf name for a given path.
+/**	\brief Gets the directory path and leaf name for a given path.
 
 	The supplied \a path is transformed to refer to the directory part of
 	the entry identified by the original path, and into the buffer \a filename
@@ -925,7 +925,7 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 }
 
 
-/*!	\brief Retrieves the directory vnode and the leaf name of an entry referred
+/**	\brief Retrieves the directory vnode and the leaf name of an entry referred
 		   to by a FD + path pair.
 
 	\a path must be given in either case. \a fd might be omitted, in which
@@ -1652,7 +1652,7 @@ vfs_get_file_map(void *_vnode, off_t offset, size_t size, file_io_vec *vecs, siz
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, pos %Ld, size = %lu\n", vnode, vecs, pos, size));
+	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, offset %Ld, size = %lu\n", vnode, vecs, offset, size));
 
 	return FS_CALL(vnode, get_file_map)(vnode->mount->cookie, vnode->private_node, offset, size, vecs, _count);
 }
@@ -2714,7 +2714,16 @@ common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("common_read_stat: stat %p\n", stat));
-	return FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+	status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+		vnode->private_node, stat);
+
+	// fill in the st_dev and st_ino fields
+	if (status == B_OK) {
+		stat->st_dev = vnode->device;
+		stat->st_ino = vnode->id;
+	}
+
+	return status;
 }
 
 
@@ -2745,6 +2754,12 @@ common_path_read_stat(int fd, char *path, bool traverseLeafLink,
 		return status;
 
 	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+
+	// fill in the st_dev and st_ino fields
+	if (status == B_OK) {
+		stat->st_dev = vnode->device;
+		stat->st_ino = vnode->id;
+	}
 
 	put_vnode(vnode);
 	return status;
@@ -3801,7 +3816,7 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 }
 
 
-/*!	\brief Opens a node specified by a FD + path pair.
+/**	\brief Opens a node specified by a FD + path pair.
 
 	At least one of \a fd and \a path must be specified.
 	If only \a fd is given, the function opens the node identified by this
@@ -3825,7 +3840,7 @@ _kern_open(int fd, const char *path, int omode)
 }
 
 
-/*!	\brief Opens a directory specified by entry_ref or node_ref.
+/**	\brief Opens a directory specified by entry_ref or node_ref.
 
 	The supplied name may be \c NULL, in which case directory identified
 	by \a device and \a inode will be opened. Otherwise \a device and
@@ -3850,7 +3865,7 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 }
 
 
-/*!	\brief Opens a directory specified by a FD + path pair.
+/**	\brief Opens a directory specified by a FD + path pair.
 
 	At least one of \a fd and \a path must be specified.
 	If only \a fd is given, the function opens the directory identified by this
@@ -3919,7 +3934,7 @@ _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perm
 
 
 
-/*!	\brief Creates a directory specified by a FD + path pair.
+/**	\brief Creates a directory specified by a FD + path pair.
 
 	\a path must always be specified (it contains the name of the new directory
 	at least). If only a path is given, this path identifies the location at
@@ -3953,7 +3968,7 @@ _kern_remove_dir(const char *path)
 }
 
 
-/*!	\brief Reads the contents of a symlink referred to by a FD + path pair.
+/**	\brief Reads the contents of a symlink referred to by a FD + path pair.
 
 	At least one of \a fd and \a path must be specified.
 	If only \a fd is given, the function the symlink to be read is the node
@@ -4001,7 +4016,7 @@ _kern_write_link(const char *path, const char *toPath)
 }
 
 
-/*!	\brief Creates a symlink specified by a FD + path pair.
+/**	\brief Creates a symlink specified by a FD + path pair.
 
 	\a path must always be specified (it contains the name of the new symlink
 	at least). If only a path is given, this path identifies the location at
@@ -4046,7 +4061,7 @@ _kern_create_link(const char *path, const char *toPath)
 }
 
 
-/*!	\brief Removes an entry specified by a FD + path pair from its directory.
+/**	\brief Removes an entry specified by a FD + path pair from its directory.
 
 	\a path must always be specified (it contains at least the name of the entry
 	to be deleted). If only a path is given, this path identifies the entry
@@ -4069,7 +4084,7 @@ _kern_unlink(int fd, const char *path)
 }
 
 
-/*!	\brief Moves an entry specified by a FD + path pair to a an entry specified
+/**	\brief Moves an entry specified by a FD + path pair to a an entry specified
 		   by another FD + path pair.
 
 	\a oldPath and \a newPath must always be specified (they contain at least
@@ -4110,7 +4125,7 @@ _kern_access(const char *path, int mode)
 }
 
 
-/*!	\brief Reads stat data of an entity specified by a FD + path pair.
+/**	\brief Reads stat data of an entity specified by a FD + path pair.
 
 	If only \a fd is given, the stat operation associated with the type
 	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
@@ -4175,7 +4190,7 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 }
 
 
-/*!	\brief Writes stat data of an entity specified by a FD + path pair.
+/**	\brief Writes stat data of an entity specified by a FD + path pair.
 
 	If only \a fd is given, the stat operation associated with the type
 	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
@@ -4593,12 +4608,29 @@ _user_open_dir(int fd, const char *userPath)
 }
 
 
+/**	\brief Opens a directory's parent directory and returns the entry name
+		   of the former.
+
+	Aside from that is returns the directory's entry name, this method is
+	equivalent to \code _user_open_dir(fd, "..") \endcode. It really is
+	equivalent, if \a userName is \c NULL.
+
+	If a name buffer is supplied and the name does not fit the buffer, the
+	function fails. A buffer of size \c B_FILE_NAME_LENGTH should be safe.
+
+	\param fd A FD referring to a directory.
+	\param userName Buffer the directory's entry name shall be written into.
+		   May be \c NULL.
+	\param nameLength Size of the name buffer.
+	\return The file descriptor of the opened parent directory, if everything
+			went fine, an error code otherwise.
+*/
 int
 _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 {
 	bool kernel = false;
 
-	if (!IS_USER_ADDRESS(userName))
+	if (userName && !IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
 
 	// open the parent dir
@@ -4607,26 +4639,29 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 		return parentFD;
 	FDCloser fdCloser(parentFD, kernel);
 
-	// get the vnodes
-	struct vnode *parentVNode = get_vnode_from_fd(parentFD, kernel);
-	struct vnode *dirVNode = get_vnode_from_fd(fd, kernel);
-	VNodePutter parentVNodePutter(parentVNode);
-	VNodePutter dirVNodePutter(dirVNode);
-	if (!parentVNode || !dirVNode)
-		return B_FILE_ERROR;
+	if (userName) {
+		// get the vnodes
+		struct vnode *parentVNode = get_vnode_from_fd(parentFD, kernel);
+		struct vnode *dirVNode = get_vnode_from_fd(fd, kernel);
+		VNodePutter parentVNodePutter(parentVNode);
+		VNodePutter dirVNodePutter(dirVNode);
+		if (!parentVNode || !dirVNode)
+			return B_FILE_ERROR;
 
-	// get the vnode name
-	char name[B_FILE_NAME_LENGTH];
-	status_t status = get_vnode_name(dirVNode, parentVNode,
-		name, sizeof(name));
-	if (status != B_OK)
-		return status;
+		// get the vnode name
+		char name[B_FILE_NAME_LENGTH];
+		status_t status = get_vnode_name(dirVNode, parentVNode,
+			name, sizeof(name));
+		if (status != B_OK)
+			return status;
 
-	int len = user_strlcpy(userName, name, nameLength);
-	if (len < 0)
-		return len;
-	if (len >= (int)nameLength)
-		return B_BUFFER_OVERFLOW;
+		// copy the name to the userland buffer
+		int len = user_strlcpy(userName, name, nameLength);
+		if (len < 0)
+			return len;
+		if (len >= (int)nameLength)
+			return B_BUFFER_OVERFLOW;
+	}
 
 	return fdCloser.Detach();
 }
