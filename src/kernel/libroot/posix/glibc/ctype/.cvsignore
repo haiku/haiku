@@ -1,6 +1,0 @@
-*.d *.o *.so *.po *.go stamp.* *.stamp *.ustamp *.udeps
-*.gz *.Z *.tar *.tgz
-=*
-TODO COPYING* AUTHORS copyr-* copying.*
-glibc-*
-distinfo
