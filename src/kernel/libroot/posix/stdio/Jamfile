@@ -1,53 +1,53 @@
 SubDir OBOS_TOP src kernel libroot posix stdio ;
 
-KernelMergeObject posix_stdio.o :
-	<$(SOURCE_GRIST)>fclose.c
-	<$(SOURCE_GRIST)>feof.c
- 	<$(SOURCE_GRIST)>fflush.c
-	<$(SOURCE_GRIST)>fgetc.c
-	<$(SOURCE_GRIST)>fgetln.c
-	<$(SOURCE_GRIST)>fgets.c
-	<$(SOURCE_GRIST)>findfp.c
-	<$(SOURCE_GRIST)>flags.c
-	<$(SOURCE_GRIST)>flockfile.c
- 	<$(SOURCE_GRIST)>fopen.c
- 	<$(SOURCE_GRIST)>fprintf.c
-	<$(SOURCE_GRIST)>fputc.c
-	<$(SOURCE_GRIST)>fputs.c
-	<$(SOURCE_GRIST)>fread.c
-	<$(SOURCE_GRIST)>fseek.c
-	<$(SOURCE_GRIST)>fwrite.c
- 	<$(SOURCE_GRIST)>fvwrite.c
-	<$(SOURCE_GRIST)>fwalk.c
-	<$(SOURCE_GRIST)>getc.c
-	<$(SOURCE_GRIST)>getchar.c
-	<$(SOURCE_GRIST)>gets.c
-	<$(SOURCE_GRIST)>getw.c
- 	<$(SOURCE_GRIST)>makebuf.c
-	<$(SOURCE_GRIST)>printf.c
-	<$(SOURCE_GRIST)>putc.c
-	<$(SOURCE_GRIST)>putchar.c
-	<$(SOURCE_GRIST)>puts.c
-	<$(SOURCE_GRIST)>putw.c
-	<$(SOURCE_GRIST)>refill.c
-	<$(SOURCE_GRIST)>rewind.c
-	<$(SOURCE_GRIST)>rget.c
-	<$(SOURCE_GRIST)>scanf.c
- 	<$(SOURCE_GRIST)>snprintf.c
-	<$(SOURCE_GRIST)>sscanf.c
- 	<$(SOURCE_GRIST)>sprintf.c
- 	<$(SOURCE_GRIST)>stdio.c
-	<$(SOURCE_GRIST)>ungetc.c
-	<$(SOURCE_GRIST)>vfprintf.c
-	<$(SOURCE_GRIST)>vfscanf.c
-	<$(SOURCE_GRIST)>vscanf.c
- 	<$(SOURCE_GRIST)>vsnprintf.c
- 	<$(SOURCE_GRIST)>vsprintf.c
-	<$(SOURCE_GRIST)>wbuf.c
-	<$(SOURCE_GRIST)>wsetup.c
-	:
-	-fPIC -DPIC
-	;
+# KernelMergeObject posix_stdio.o :
+# 	<$(SOURCE_GRIST)>fclose.c
+# 	<$(SOURCE_GRIST)>feof.c
+#  	<$(SOURCE_GRIST)>fflush.c
+# 	<$(SOURCE_GRIST)>fgetc.c
+# 	<$(SOURCE_GRIST)>fgetln.c
+# 	<$(SOURCE_GRIST)>fgets.c
+# 	<$(SOURCE_GRIST)>findfp.c
+# 	<$(SOURCE_GRIST)>flags.c
+# 	<$(SOURCE_GRIST)>flockfile.c
+#  	<$(SOURCE_GRIST)>fopen.c
+#  	<$(SOURCE_GRIST)>fprintf.c
+# 	<$(SOURCE_GRIST)>fputc.c
+# 	<$(SOURCE_GRIST)>fputs.c
+# 	<$(SOURCE_GRIST)>fread.c
+# 	<$(SOURCE_GRIST)>fseek.c
+# 	<$(SOURCE_GRIST)>fwrite.c
+#  	<$(SOURCE_GRIST)>fvwrite.c
+# 	<$(SOURCE_GRIST)>fwalk.c
+# 	<$(SOURCE_GRIST)>getc.c
+# 	<$(SOURCE_GRIST)>getchar.c
+# 	<$(SOURCE_GRIST)>gets.c
+# 	<$(SOURCE_GRIST)>getw.c
+#  	<$(SOURCE_GRIST)>makebuf.c
+# 	<$(SOURCE_GRIST)>printf.c
+# 	<$(SOURCE_GRIST)>putc.c
+# 	<$(SOURCE_GRIST)>putchar.c
+# 	<$(SOURCE_GRIST)>puts.c
+# 	<$(SOURCE_GRIST)>putw.c
+# 	<$(SOURCE_GRIST)>refill.c
+# 	<$(SOURCE_GRIST)>rewind.c
+# 	<$(SOURCE_GRIST)>rget.c
+# 	<$(SOURCE_GRIST)>scanf.c
+#  	<$(SOURCE_GRIST)>snprintf.c
+# 	<$(SOURCE_GRIST)>sscanf.c
+#  	<$(SOURCE_GRIST)>sprintf.c
+#  	<$(SOURCE_GRIST)>stdio.c
+# 	<$(SOURCE_GRIST)>ungetc.c
+# 	<$(SOURCE_GRIST)>vfprintf.c
+# 	<$(SOURCE_GRIST)>vfscanf.c
+# 	<$(SOURCE_GRIST)>vscanf.c
+#  	<$(SOURCE_GRIST)>vsnprintf.c
+#  	<$(SOURCE_GRIST)>vsprintf.c
+# 	<$(SOURCE_GRIST)>wbuf.c
+# 	<$(SOURCE_GRIST)>wsetup.c
+# 	:
+# 	-fPIC -DPIC
+# 	;
 
 KernelMergeObject kernel_posix_stdio.o :
 	<$(SOURCE_GRIST)>kernel_vsprintf.c
