@@ -4,8 +4,9 @@
 #include <Button.h>
 #include <StringView.h>
 #include <ScrollBarWindow.h>
+#include <ScrollBarApp.h>
 
-ScrollBarWindow::ScrollBarWindow() 
+ScrollBarWindow::ScrollBarWindow(void) 
 	: BWindow( BRect(50,50,398,325), "Scroll Bar", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
 {
 	BBox* bigBox = new BBox( BRect(0,0,348,275), NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER );
@@ -73,6 +74,13 @@ ScrollBarWindow::ScrollBarWindow()
 	mainView->AddChild( revertButton );
 }
 
-ScrollBarWindow::~ScrollBarWindow()
+ScrollBarWindow::~ScrollBarWindow(void)
 {
+}
+
+bool
+ScrollBarWindow::QuitRequested(void)
+{
+	scroll_bar_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
 }

@@ -15,4 +15,6 @@ class ScrollBarApp : public BApplication
 		ScrollBarWindow * window;
 };
 
+extern ScrollBarApp * scroll_bar_app;
+
 #endif // SCROLL_BAR_APP_H

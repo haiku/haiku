@@ -5,8 +5,9 @@
 
 class ScrollBarWindow : public BWindow {
 public:
-	ScrollBarWindow();
-	virtual ~ScrollBarWindow();
+	ScrollBarWindow(void);
+	virtual ~ScrollBarWindow(void);
+	virtual bool QuitRequested(void);
 };
 
 #endif // SCROLL_BAR_WINDOW_H
