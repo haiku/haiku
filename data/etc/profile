@@ -17,6 +17,8 @@ bind '"\e[4~":end-of-line'
 bind '"\e[5~":history-search-forward'
 bind '"\e[6~":history-search-backward'
 
+alias ls="ls --color"
+
 #
 # and now we include a few useful things...
 #
