@@ -15,7 +15,13 @@
 
 #include <string.h>
 
-#define PARANOID_KFREE 1
+/* prevent freeing pointers that were not allocated by kmalloc or are already freeed */
+#define PARANOID_POINTER_CHECK 1
+/* initialize newly allocated memory with something non zero */  
+#define PARANOID_KMALLOC 1
+/* check if freed pointers are already freed */  
+#define PARANOID_KFREE 0
+/* print more debug infos in kmalloc and kfree */  
 #define MAKE_NOIZE 0
 
 // heap stuff
@@ -71,6 +77,46 @@ static struct heap_bin bins[] = {
 
 static const int bin_count = sizeof(bins) / sizeof(struct heap_bin);
 static mutex heap_lock;
+
+#if PARANOID_POINTER_CHECK
+
+#define PTRCHECKLIST_ENTRIES 8192
+static void *ptrchecklist[PTRCHECKLIST_ENTRIES]; /* automatically initialized to zero */
+
+static void
+ptrchecklist_store(void *ptr)
+{
+	int i;
+	mutex_lock(&heap_lock);
+	for (i = 0; i != PTRCHECKLIST_ENTRIES; i++)
+		if (ptrchecklist[i] == NULL) {
+			ptrchecklist[i] = ptr;
+			break;
+		}
+	mutex_unlock(&heap_lock);
+	if (i == PTRCHECKLIST_ENTRIES)
+		panic("Sorry, out of entries, increase PTRCHECKLIST_ENTRIES in heap.c\n");
+}
+
+
+static bool
+ptrchecklist_remove(void *ptr)
+{
+	int i;
+	bool found = false;
+	mutex_lock(&heap_lock);
+	for (i = 0; i != PTRCHECKLIST_ENTRIES; i++)
+		if (ptrchecklist[i] == ptr) {
+			ptrchecklist[i] = NULL;
+			found = true;
+			break;
+		}
+	mutex_unlock(&heap_lock);
+	return found;
+}
+
+#endif /* PARANOID_POINTER_CHECK */
+
 
 static void dump_bin(int bin_index)
 {
@@ -228,6 +274,15 @@ out:
 #if MAKE_NOIZE
 	dprintf("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address);
 #endif
+
+#if PARANOID_KMALLOC
+	memset(address,0xCC,size);
+#endif
+
+#if PARANOID_POINTER_CHECK
+	ptrchecklist_store(address);
+#endif
+
 	return address;
 }
 
@@ -244,6 +299,11 @@ kfree(void *address)
 
 	if ((addr)address < heap_base || (addr)address >= (heap_base + heap_size))
 		panic("kfree: asked to free invalid address %p\n", address);
+
+#if PARANOID_POINTER_CHECK
+	if (!ptrchecklist_remove(address))
+		panic("kfree: asked to free invalid pointer %p\n", address);
+#endif
 
 	mutex_lock(&heap_lock);
 
