@@ -205,6 +205,7 @@ class Inode : public CachedBlock {
 
 		status_t FreeStaticStreamArray(Transaction *transaction,int32 level,block_run run,off_t size,off_t offset,off_t &max);
 		status_t FreeStreamArray(Transaction *transaction, block_run *array, uint32 arrayLength, off_t size, off_t &offset, off_t &max);
+		status_t AllocateBlockArray(Transaction *transaction, block_run &run);
 		status_t GrowStream(Transaction *transaction,off_t size);
 		status_t ShrinkStream(Transaction *transaction,off_t size);
 

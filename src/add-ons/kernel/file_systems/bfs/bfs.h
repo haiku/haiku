@@ -12,7 +12,7 @@
 
 #include <SupportDefs.h>
 
-#ifndef B_BAD_DATA
+#ifndef B_BEOS_VERSION_DANO
 #	define B_BAD_DATA B_ERROR
 #endif
 
@@ -85,6 +85,12 @@ struct data_stream
 	off_t		max_double_indirect_range;
 	off_t		size;
 };
+
+// This defines the size of the indirect and double indirect
+// blocks. Note: the code may not work correctly at some places
+// if this value is changed (most notably Inode::FindBlockRun()).
+// In any way, the value must be a power of 2.
+#define NUM_ARRAY_BLOCKS	4
 
 //**************************************
 
