@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems bfs dump_log ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+
+SimpleTest dump_log :
+	dump_log.cpp
+	;
+
