@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _TEAM_H
 #define _TEAM_H
 
@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-int team_init(kernel_args *ka);
+status_t team_init(kernel_args *args);
 team_id team_create_team(const char *path, const char *name, char **args, int argc,
 			char **envp, int envc, int priority);
 status_t wait_for_team(team_id id, status_t *returnCode);
@@ -29,6 +29,8 @@ char **user_team_get_arguments(void);
 int user_team_get_arg_count(void);
 bool team_is_valid(team_id id);
 struct team *team_get_team_struct_locked(team_id id);
+int32 team_max_teams(void);
+int32 team_used_teams(void);
 
 // used in syscalls.c
 thread_id _user_load_image(int32 argCount, const char **args, int32 envCount, const char **envp, int32 priority);

@@ -2,8 +2,8 @@
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _KERNEL_SYSTEM_INFO_H
-#define _KERNEL_SYSTEM_INFO_H
+#ifndef _KERNEL_ARCH_SYSTEM_INFO_H
+#define _KERNEL_ARCH_SYSTEM_INFO_H
 
 
 #include <OS.h>
@@ -15,11 +15,11 @@ struct kernel_args;
 extern "C" {
 #endif
 
-extern status_t system_info_init(struct kernel_args *args);
-extern status_t _user_get_system_info(system_info *userInfo, size_t size);
+status_t arch_system_info_init(struct kernel_args *args);
+status_t arch_get_system_info(system_info *info, size_t size);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif	/* _KRENEL_SYSTEM_INFO_H */
+#endif	/* _KRENEL_ARCH_SYSTEM_INFO_H */

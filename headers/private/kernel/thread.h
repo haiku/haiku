@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _THREAD_H
 #define _THREAD_H
 
@@ -36,6 +36,9 @@ void thread_atkernel_exit(void);
 status_t thread_init(kernel_args *ka);
 status_t thread_per_cpu_init(int32 cpu_num);
 void thread_exit(void);
+
+int32 thread_max_threads(void);
+int32 thread_used_threads(void);
 
 #define thread_get_current_thread arch_thread_get_current_thread
 
