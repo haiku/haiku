@@ -274,19 +274,19 @@ Test* GetAppInfoTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA1);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA2);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestA3);
 
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB1);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB2);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester, GetAppInfoTestB3);
 
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester,
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester,
 			  GetRunningAppInfoTest1);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester,
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester,
 			  GetRunningAppInfoTest2);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppInfoTester,
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppInfoTester,
 			  GetRunningAppInfoTest3);
 
 	return SuiteOfTests;

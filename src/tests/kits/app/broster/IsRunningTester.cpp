@@ -138,13 +138,13 @@ Test* IsRunningTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestA1);
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestA2);
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestA1);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestA2);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestA3);
 
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestB1);
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestB2);
-	ADD_TEST4(BApplication, SuiteOfTests, IsRunningTester, IsRunningTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, IsRunningTester, IsRunningTestB3);
 
 	return SuiteOfTests;
 }

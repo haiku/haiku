@@ -284,12 +284,12 @@ Test* GetAppListTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppListTester, GetAppListTestA1);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppListTester, GetAppListTestA2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppListTester, GetAppListTestA1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppListTester, GetAppListTestA2);
 
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppListTester, GetAppListTestB1);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppListTester, GetAppListTestB2);
-	ADD_TEST4(BApplication, SuiteOfTests, GetAppListTester, GetAppListTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppListTester, GetAppListTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppListTester, GetAppListTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, GetAppListTester, GetAppListTestB3);
 
 	return SuiteOfTests;
 }

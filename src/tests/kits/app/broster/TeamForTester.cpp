@@ -143,13 +143,13 @@ Test* TeamForTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestA1);
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestA2);
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestA1);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestA2);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestA3);
 
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestB1);
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestB2);
-	ADD_TEST4(BApplication, SuiteOfTests, TeamForTester, TeamForTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, TeamForTester, TeamForTestB3);
 
 	return SuiteOfTests;
 }
