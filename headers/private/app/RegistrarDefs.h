@@ -30,11 +30,14 @@
 #include <Errors.h>
 #include <Roster.h>
 
+namespace BPrivate {
+
 // names
 extern const char *kRegistrarSignature;
 extern const char *kRosterThreadName;
-extern const char *kRosterPortName;
 extern const char *kRAppLooperPortName;
+
+extern const char *get_roster_port_name();
 
 // message constants
 enum {
@@ -158,6 +161,8 @@ struct flat_app_info {
 	app_info	info;
 	char		ref_name[B_FILE_NAME_LENGTH + 1];
 };
+
+}	// namespace BPrivate
 
 #endif	// REGISTRAR_DEFS_H
 

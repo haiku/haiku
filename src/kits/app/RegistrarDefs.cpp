@@ -24,11 +24,25 @@
 //	Description:	API classes - registrar interface.
 //------------------------------------------------------------------------------
 
+#include <AppMisc.h>
 #include <RegistrarDefs.h>
 
+namespace BPrivate {
+
 // names
-const char *kRegistrarSignature	= "application/x-vnd.OBOS-Registrar";
-const char *kRosterThreadName	= "_obos_roster_thread_";
-const char *kRosterPortName		= "_obos_roster_port_";
+const char *kRegistrarSignature	= "application/x-vnd.haiku-registrar";
+const char *kRosterThreadName	= "_roster_thread_";
 const char *kRAppLooperPortName	= "rAppLooperPort";
 
+// get_roster_port_name
+/*!	\brief Returns the name of the main request port of the registrar (roster).
+	\return the name of the registrar request port.
+*/
+const char *
+get_roster_port_name()
+{
+	return (BPrivate::is_running_on_haiku()
+		? "_roster_port_" : "_obos_roster_port_");
+}
+
+}	// namespace BPrivate
