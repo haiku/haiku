@@ -281,7 +281,7 @@ public:
 
 			// create the syscall
 			file << "\tsyscall = new Syscall(\"" << syscall.name << "\", "
-				<< "handler);" << endl;
+				<< "\"" << syscall.return_type << "\", "<< "handler);" << endl;
 			file << "\tsyscalls.push_back(syscall);" << endl;
 
 			// add the parameters
@@ -295,7 +295,8 @@ public:
 
 				// add the parameter
 				file << "\tsyscall->AddParameter(\"" << parameter.name << "\", "
-					<< parameter.offset << ", handler);" << endl;
+					<< parameter.offset << ", \"" << parameter.type
+					<< "\", handler);" << endl;
 			}
 		}
 
