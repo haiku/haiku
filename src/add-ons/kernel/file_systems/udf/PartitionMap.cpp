@@ -59,8 +59,8 @@ PartitionMap::Find(uint32 partitionNumber) const
 	SinglyLinkedList<Udf::udf_partition_descriptor>::ConstIterator i;
 	for (i = fList.Begin(); i != fList.End(); ++i) {
 		if (i->partition_number() == partitionNumber) {
-			PRINT(("found partition #%ld\n", partitionNumber));
-			DUMP(*i);
+			PRINT(("found partition #%ld, start == %ld, length == %ld\n", partitionNumber,
+				i->start(), i->length()));
 			return &(*i);
 		}
 	}

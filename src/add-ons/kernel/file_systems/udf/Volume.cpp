@@ -120,10 +120,6 @@ Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 		const udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
 		err = partition ? B_OK : B_BAD_ADDRESS;
 		if (!err) {
-			PRINT(("Offset(): %Ld, partition->start(): %ld, address.block(): %ld\n", Offset(),
-			       partition->start(), address.block()));
-			PRINT(("partition:\n"));
-			PDUMP(partition);
 			*mappedBlock = partition->start() + address.block();	
 		}
 		if (!err) {
@@ -392,7 +388,8 @@ Volume::_WalkAnchorVolumeDescriptorSequences()
 {
 	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
 		const uint8 avds_location_count = 4;
-		const off_t avds_locations[avds_location_count] = { 256,
+		const off_t avds_locations[avds_location_count] = {
+															256,
 		                                                    Length()-256,
 		                                                    Length(),
 		                                                    512,
