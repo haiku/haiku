@@ -4,9 +4,12 @@
 #include <Region.h>
 #include <TranslationUtils.h>
 #include <Node.h>
+#include <stdio.h>
 
 #include "StyledEditView.h"
 #include "Constants.h"
+#include "CharacterSet.h"
+#include "UTF8.h"
 
 StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *handler)
 	: BTextView(viewFrame, "textview", textBounds, 
@@ -88,13 +91,47 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 }
 
 status_t
-StyledEditView::WriteStyledEditFile(BFile * file)
+StyledEditView::WriteStyledEditFile(BFile * file, uint32 charSet)
 {
 	status_t result = B_OK;
 	result = BTranslationUtils::WriteStyledEditFile(this,file);
 	if (result != B_OK) {
 		return result;
 	}
+	if (charSet == 0) {
+		int32 encoding = 65535;
+		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&encoding,sizeof(encoding));
+	} else {
+		result = file->SetSize(0);
+		if (result != B_OK) {
+			return result;
+		}
+		result = file->Seek(0,SEEK_SET);
+		if (result != B_OK) {
+			return result;
+		}
+		CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
+		if (result != B_OK) {
+			return result;
+		}
+		uint32 id = roster->GetCharacterSet(charSet)->GetConversionID();
+		const char * outText = Text();
+		int32 sourceLength = TextLength();
+		int32 state = 0;
+		char buffer[256];
+		while (sourceLength > 0) {
+			int32 length = sourceLength;
+			int32 written = 256;
+			result = convert_from_utf8(id,outText,&length,buffer,&written,&state);
+			if (result != B_OK) {
+				return result;
+			}
+			file->Write(buffer,written);
+			sourceLength -= length;
+		}
+		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
+	} 
+
 	alignment align = Alignment();
 	file->WriteAttr("alignment",B_INT32_TYPE,0,&align,sizeof(align));
 	bool wrap = DoesWordWrap();

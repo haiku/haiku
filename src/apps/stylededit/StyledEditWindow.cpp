@@ -819,7 +819,7 @@ StyledEditWindow::Save(BMessage *message)
 	if(err!= B_OK)
 		return err;
 	
-	err= fTextView->WriteStyledEditFile(&file);
+	err= fTextView->WriteStyledEditFile(&file,fSaveAsEncoding);
 	if(err != B_OK)
 		return err;
 

@@ -14,5 +14,5 @@ App StyledEdit :
 	StyledEditWindow.cpp
 	;
 
-LinkSharedOSLibs StyledEdit : be translation tracker ;
+LinkSharedOSLibs StyledEdit : be translation tracker textencoding ;
 

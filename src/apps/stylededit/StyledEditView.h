@@ -15,7 +15,7 @@ public:
 	
 	virtual void Reset();
 	virtual status_t GetStyledText(BPositionIO * stream);
-	virtual status_t WriteStyledEditFile(BFile * file);
+	virtual status_t WriteStyledEditFile(BFile * file, uint32 charSet = 0);
 protected:
 	virtual void InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs);
 	virtual void DeleteText(int32 start, int32 finish);
