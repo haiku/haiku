@@ -144,6 +144,12 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 	dprintf("mpu401:@open:  mpu_device->workarounds %d\n",mpu_device->workarounds);
 #endif
 
+  // the undocumented V2 module is not complete
+  // we will allow the device to be created since some drivers depend on it
+  // but will return an error if the actual midi device is opened:
+  if ( mpu_device->V2 == TRUE)
+    return (B_ERROR);
+    
   switch (mpu_device->workarounds){
 	  case 0:
 		    // don't know the current mpu state
@@ -177,6 +183,11 @@ midi_open(void * storage, uint32 flags, void ** out_cookie)
 	    
   	//Enable midi interrupts
     mpu_device->interrupt_op(B_MPU_401_ENABLE_CARD_INT, &mpu_device);
+ 
+    // clear midi-in buffer
+    mbuf_bytes=0;   
+    mbuf_current=0;
+    mbuf_start=0;
         
 	if ((mpu_device->readsemaphore > B_OK)&&(mpu_device->writesemaphore > B_OK))
 	{
@@ -221,8 +232,6 @@ midi_close(void * cookie)
 static status_t 
 midi_free(void * cookie)
 {
-	//mpu401device * mpu_device = (mpu401device *)cookie;
-/* I don't think this is ever called ...*/
 #if MPUDEBUG
 	dprintf("mpu401: free\n");
 #endif
@@ -271,38 +280,35 @@ mpu401device *mpu_device = (mpu401device *)cookie;
 
 	i=0;
 	*num_bytes=0;
-	while (count>0)
+	bestat = acquire_sem_etc ( mpu_device->readsemaphore, 1, B_CAN_INTERRUPT, 0);
+	if (bestat == B_INTERRUPTED)
+      {
+		#if MPUDEBUG
+		    dprintf("mpu401: acquire_sem B_INTERRUPTED!\n");
+	  	#endif
+	    return (B_INTERRUPTED);   
+      }
+	if (bestat != B_OK)
+	  {
+	  #if MPUDEBUG
+		   dprintf("mpu401: acquire_sem not B_OK %d\n",bestat);
+	  #endif	   
+		   *num_bytes = 1;
+		return (B_INTERRUPTED);   
+	  }
+	if (bestat == B_OK)
 		{
-			bestat = acquire_sem_etc ( mpu_device->readsemaphore, 1, B_CAN_INTERRUPT, 0);
-		    if (bestat == B_INTERRUPTED)
-		      {
-				#if MPUDEBUG
-				    dprintf("mpu401: acquire_sem B_INTERRUPTED!\n");
-			  	#endif
-			  	   *num_bytes = 1;
-			    return (B_INTERRUPTED);   
-		      }
-		   if (bestat == B_WOULD_BLOCK)
-			  {
-			  #if MPUDEBUG
-				   dprintf("mpu401: acquire_sem B_WOULD_BLOCK!\n");
-			  #endif	   
-				   *num_bytes = 1;
-				return (B_INTERRUPTED);   
-			  }
 			status = lock();
 			*(data+i) = mpubuffer[mbuf_start];
 			i++;
 			mbuf_start++;	// pointer to data in ringbuffer
 			if (mbuf_start >= (MBUF_ELEMENTS-1))
 				  mbuf_start = 0; 		//wraparound of ringbuffer
-			//*num_bytes++;	// tell caller how many bytes are being returned in buffer
-			count--;		 
+			*num_bytes =1;	// tell caller how many bytes are being returned in buffer
 			if (mbuf_bytes>0)  mbuf_bytes--;	// bytes read from buffer, so decrement buffer count
    			unlock(status);
    			//dprintf("mpu401: bytes in buffer: %d\n",mbuf_bytes);
 		}	
-		if (*num_bytes == 0) *num_bytes =1; 
 		
  return (B_OK);
 }
@@ -449,7 +455,7 @@ static generic_mpu401_module mpu401_module2 =
 {
 	{
 		"generic/mpu401/v2",
-		B_KEEP_LOADED /* 0 */,
+		0,
 		std_ops
 	},
 	create_device_v2,
@@ -466,7 +472,7 @@ static generic_mpu401_module mpu401_module2 =
 _EXPORT generic_mpu401_module *modules[] =
 {
 	&mpu401_module,
-	//&mpu401_module2,
+	&mpu401_module2,
 	NULL
 };
 
