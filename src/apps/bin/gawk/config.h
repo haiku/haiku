@@ -149,7 +149,7 @@
 #define HAVE_MEMSET 1
 
 /* we have the mktime function */
-/* #undef HAVE_MKTIME */
+#define HAVE_MKTIME 1
 
 /* Define to 1 if you have a working `mmap' system call. */
 /* #undef HAVE_MMAP */
