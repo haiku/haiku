@@ -508,19 +508,11 @@ printf("ServerWindow %s: Message Set_Workspaces unimplemented\n",_title->String(
 #endif
 			break;
 		}
-		case AS_WINDOW_RESIZEBY:
+		case AS_WINDOW_RESIZE:
 		{
 			// TODO: Implement
 #ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Resize_By unimplemented\n",_title->String());
-#endif
-			break;
-		}
-		case AS_WINDOW_RESIZETO:
-		{
-			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Resize_To unimplemented\n",_title->String());
+printf("ServerWindow %s: Message Resize unimplemented\n",_title->String());
 #endif
 			break;
 		}

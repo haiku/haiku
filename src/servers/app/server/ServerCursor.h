@@ -51,7 +51,7 @@ public:
 	~ServerCursor(void);
 	
 	//! Returns the cursor's hot spot
-	BPoint GetHotSpot(void);
+	BPoint GetHotSpot(void) { return _hotspot; }
 	void SetHotSpot(BPoint pt);
 	const char *GetAppSignature(void) { return _app_signature; }
 	void SetAppSignature(const char *signature);
