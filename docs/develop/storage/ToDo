@@ -63,6 +63,12 @@ Description: Implement.
 Priority:    high
 
 
+Module:      BVolume
+Location:    SetName()
+Description: Should also rename the mount point.
+Priority:    medium
+
+
 Module:      StatableTest
 Location:    GetXYZTest()
 Description: Uncomment GetVolume() test, when BVolume::==() is implemented.
