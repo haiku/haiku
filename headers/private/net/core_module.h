@@ -129,25 +129,26 @@ struct core_module_info {
 
 	struct in_ifaddr *(*get_primary_addr)(void);	
 
-	/* socket functions - used by socket driver */
-	int (*initsocket)(struct socket **);
-	int (*socreate)(int, struct socket *, int, int);
-	int (*soclose)(void *);
-	int (*sobind)(void *, caddr_t, int);
-	int (*solisten)(void *, int);
-	int (*soconnect)(void *, caddr_t, int);
-	int (*recvit)(void *, struct msghdr *, caddr_t, int *);
-	int (*sendit)(void *, struct msghdr *, int, int *);
-	int (*soo_ioctl)(void *, int, caddr_t);
 	int (*net_sysctl)(int *, uint, void *, size_t *, void *, size_t);
-	int (*writeit)(void *, struct iovec *, int);
-	int (*readit)(void*, struct iovec *, int *);
-	int (*sosetopt)(void *, int, int, const void *, size_t);
-	int (*sogetopt)(void *, int, int, void *, size_t *);
-	int (*set_socket_event_callback)(void *, socket_event_callback, void *, int);
-	int (*sogetpeername)(void *, struct sockaddr *, int *);
-	int (*sogetsockname)(void *, struct sockaddr *, int *);
-	int (*soaccept)(struct socket *s, struct socket **news, void *, int *);
+
+	/* socket functions - used by socket driver */
+	int (*socket_init)			(struct socket **nso);
+	int (*socket_create)		(struct socket *so, int dom, int type, int proto);
+	int (*socket_close)			(struct socket *so);
+	int (*socket_bind)			(struct socket *so, caddr_t, int);
+	int (*socket_listen)		(struct socket *so, int backlog);
+	int (*socket_connect)		(struct socket *so, caddr_t, int);
+	int (*socket_accept)		(struct socket *so, struct socket **nso, void *, int *);
+	int (*socket_recv)			(struct socket *so, struct msghdr *, caddr_t namelenp, int *retsize);
+	int (*socket_send)			(struct socket *so, struct msghdr *, int flags, int *retsize);
+	int (*socket_ioctl)			(struct socket *so, int, caddr_t);
+	int (*socket_writev)		(struct socket *so, struct iovec *, int flags);
+	int (*socket_readv)			(struct socket *so, struct iovec *, int *flags);
+	int (*socket_setsockopt)	(struct socket *so, int, int, const void *, size_t);
+	int (*socket_getsockopt)	(struct socket *so, int, int, void *, size_t *);
+	int (*socket_getpeername)	(struct socket *so, struct sockaddr *, int *);
+	int (*socket_getsockname)	(struct socket *so, struct sockaddr *, int *);
+	int (*socket_set_event_callback)(struct socket *so, socket_event_callback, void *, int);
 };
 
 #ifdef _KERNEL_MODE
@@ -157,4 +158,3 @@ struct core_module_info {
 #endif
 
 #endif /* OBOS_CORE_MODULE_H */
-

@@ -98,19 +98,6 @@
 #	define get_interfaces      core->get_interfaces
 #	define get_primary_addr    core->get_primary_addr
 
-#   define initsocket          core->initsocket
-#   define socreate            core->socreate
-#   define soclose             core->soclose
-
-#   define sobind              core->sobind
-#   define soconnect           core->soconnect
-#   define solisten            core->solisten
-#   define soaccept            core->soaccept
-
-#   define soo_ioctl           core->soo_ioctl
 #   define net_sysctl          core->net_sysctl
 
-#   define readit              core->readit
-#   define writeit             core->writeit
- 
 #endif	/* OBOS_CORE_FUNCS_H */

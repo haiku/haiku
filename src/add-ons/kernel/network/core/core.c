@@ -172,24 +172,25 @@ _EXPORT struct core_module_info core_info = {
 	
 	get_primary_addr,
 
-	initsocket,
-	socreate,
-	soclose,
-	sobind,
-	solisten,
-	soconnect,
-	recvit,
-	sendit,
-	soo_ioctl,
 	net_sysctl,
-	writeit,
-	readit,
-	sosetopt,
-	sogetopt,
-	set_socket_event_callback,
-	sogetpeername,
-	sogetsockname,
-	soaccept
+
+	socket_init,
+	socket_create,
+	socket_close,
+	socket_bind,
+	socket_listen,
+	socket_connect,
+	socket_accept,
+	socket_recv,
+	socket_send,
+	socket_ioctl,
+	socket_writev,
+	socket_readv,
+	socket_setsockopt,
+	socket_getsockopt,
+	socket_getpeername,
+	socket_getsockname,
+	socket_set_event_callback
 };
 
 static int32 if_thread(void *data)

@@ -81,7 +81,7 @@ void in_pcbdetach(struct inpcb *inp)
 	 * (SS_NOFDREF) and if there are it doesn't free. We don't have
 	 * the same relationship to our sockets, as we use the socket for
 	 * the kernel cookie, and freeing it here would lead to real problems,
-	 * so we leave the socket until we call soclose()
+	 * so we leave the socket until we call socket_close()
 	 * This may need to be reviewed and an extra layer of abstraction
 	 * added at some point if we find it's using too much system resource.
 	 */

@@ -4,35 +4,33 @@
 #include <sys/socketvar.h>
 #include <mbuf.h>
 
-//uint32 sb_max;
-
 /* Function prototypes */
 
-/* These are the ones we export to libnet.so */
+/* These functions are exported through the core module */
 
-int     initsocket(struct socket **);
-int     socreate  (int, struct socket *, int, int);//XXX
-int     soshutdown(void *, int);
-int     soclose   (void *);
+int socket_init			(struct socket **nso);
+int socket_create		(struct socket *so, int dom, int type, int proto);
+int socket_shutdown		(struct socket *so, int how); // XXX this one is not used at all
+int socket_close		(struct socket *so);
 
-int     sobind    (void *, char *, int);
-int     solisten  (void *, int);
-int     soconnect (void *, char *, int);
-int     soaccept  (struct socket *, struct socket **, void *, int *);
+int socket_bind			(struct socket *so, char *, int);
+int socket_listen		(struct socket *so, int backlog);
+int socket_connect		(struct socket *so, char *, int);
+int socket_accept		(struct socket *so, struct socket **nso, void *, int *);
 
-int     writeit   (void *, struct iovec *, int);
-int     readit    (void *, struct iovec *, int *);
-int     sendit    (void *, struct msghdr *, int, int *);
-int     recvit    (void *, struct msghdr *, char *, int *);
+int socket_writev		(struct socket *so, struct iovec *, int flags);
+int socket_readv		(struct socket *so, struct iovec *, int *flags);
+int socket_send			(struct socket *so, struct msghdr *, int flags, int *retsize);
+int socket_recv			(struct socket *so, struct msghdr *, caddr_t namelenp, int *retsize);
 
-//int     so_ioctl (void *, int, void *, size_t);
-int     sosysctl  (int *, uint, void *, size_t *, void *, size_t);
-int     sosetopt  (void *, int, int, const void *, size_t);
-int     sogetopt  (void *, int, int, void *, size_t *);
-int 	soo_ioctl(void *sp, int cmd, caddr_t data);
+int socket_setsockopt	(struct socket *so, int, int, const void *, size_t);
+int socket_getsockopt	(struct socket *so, int, int, void *, size_t *);
+int socket_ioctl		(struct socket *so, int cmd, caddr_t data);
 
-int     sogetpeername(void *, struct sockaddr *, int *);
-int     sogetsockname(void *, struct sockaddr *, int *);
+int socket_getpeername	(struct socket *so, struct sockaddr *, int *);
+int socket_getsockname	(struct socket *so, struct sockaddr *, int *);
+
+int socket_set_event_callback(struct socket *so, socket_event_callback, void *, int);
 
 
 /* these are all private to the stack...although may be shared with 
@@ -43,7 +41,6 @@ int     sosend(struct socket *so, struct mbuf *addr, struct uio *uio,
                struct mbuf *top, struct mbuf *control, int flags);
 
 struct socket *sonewconn(struct socket *head, int connstatus);
-int 	set_socket_event_callback(void *, socket_event_callback, void *, int);
 int	soreserve (struct socket *so, uint32 sndcc, uint32 rcvcc);
 
 void    sbrelease (struct sockbuf *sb);

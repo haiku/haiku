@@ -106,32 +106,31 @@ int uiomove(caddr_t cp, int n, struct uio *uio)
 	return (error);
 }
 
-int initsocket(struct socket **sp)
+int socket_init(struct socket **nso)
 {
 	struct socket *so;
 	
 	so = (struct socket*)pool_get(spool);
 	
 	if (so == NULL) {
-		printf("initsocket: ENOMEM\n");
+		printf("socket_init: ENOMEM\n");
 		return ENOMEM;
 	}
 
 	memset(so, 0, sizeof(*so));
 
-	*sp = so;
+	*nso = so;
 
 	return 0;
 }
 
-int socreate(int dom, struct socket *sp, int type, int proto)
+int socket_create(struct socket *so, int dom, int type, int proto)
 {
 	struct protosw *prm = NULL; /* protocol module */
-	struct socket *so = sp;
 	int error;
 
 	if (so == NULL) {
-		printf("socreate: EINVAL\n");
+		printf("socket_create: EINVAL\n");
 		return EINVAL;
 	}
 	
@@ -141,12 +140,12 @@ int socreate(int dom, struct socket *sp, int type, int proto)
 		prm = pffindtype(dom, type);
 
 	if (!prm || !prm->pr_userreq) {
-		printf("socreate: EPROTONOSUPPORT\n");
+		printf("socket_create: EPROTONOSUPPORT\n");
 		return EPROTONOSUPPORT;
 	}
 	
 	if (prm->pr_type != type) {
-		printf("socreate: EPROTOTYPE\n");
+		printf("socket_create: EPROTOTYPE\n");
 		return EPROTOTYPE;
 	}
 	
@@ -209,15 +208,14 @@ bad:
 }
 
 
-int sobind(void *sp, caddr_t data, int len)
+int socket_bind(struct socket *so, caddr_t data, int len)
 {
 	int error;
 	struct mbuf *nam;
-	struct socket *so = (struct socket*)sp;
 
 	nam = m_get(MT_SONAME);
 	if (!nam) {
-		printf("sobind: ENOMEM\n");
+		printf("socket_bind: ENOMEM\n");
 		return ENOMEM;
 	}
 
@@ -232,9 +230,8 @@ int sobind(void *sp, caddr_t data, int len)
 	return error;
 }
 
-int solisten(void *sp, int backlog)
+int socket_listen(struct socket *so, int backlog)
 {
-	struct socket *so = (struct socket *)sp;
 	int error;
 
 	error = so->so_proto->pr_userreq(so, PRU_LISTEN, NULL, NULL, NULL);
@@ -252,9 +249,8 @@ int solisten(void *sp, int backlog)
 	return 0;
 }
 
-int soconnect(void *sp, caddr_t data, int len)
+int socket_connect(struct socket *so, caddr_t data, int len)
 {
-	struct socket *so = (struct socket *)sp;
 	struct mbuf *nam = m_get(MT_SONAME);
 	int error;
 
@@ -295,7 +291,7 @@ int soconnect(void *sp, caddr_t data, int len)
 	}
 	
 	while ((so->so_state & SS_ISCONNECTING) && so->so_error == 0)
-		if ((error = nsleep(so->so_timeo, "soconnect", 0)))
+		if ((error = nsleep(so->so_timeo, "socket_connect", 0)))
 			break;
 	
 	if (error == 0) {
@@ -317,7 +313,7 @@ struct socket *sonewconn(struct socket *head, int connstatus)
 
 	if (head->so_qlen + head->so_q0len > 3 * head->so_qlimit / 2)
 		return NULL;
-	if (initsocket(&so) < 0)
+	if (socket_init(&so) < 0)
 		return NULL;
 
 	so->so_type    = head->so_type;
@@ -343,9 +339,8 @@ struct socket *sonewconn(struct socket *head, int connstatus)
 	return so;
 }
 
-int soshutdown(void *sp, int how)
+int socket_shutdown(struct socket *so, int how)
 {
-	struct socket *so = (struct socket*)sp;
 	struct protosw *pr = so->so_proto;
 	
 	how++;
@@ -356,9 +351,8 @@ int soshutdown(void *sp, int how)
 	return 0;
 }
 
-int sendit(void *sp, struct msghdr *mp, int flags, int *retsize)
+int socket_send(struct socket *so, struct msghdr *mp, int flags, int *retsize)
 {
-	struct socket *so = (struct socket *)sp;
 	struct uio auio;
 	struct iovec *iov;
 	int i;
@@ -418,9 +412,8 @@ bad:
 	return error;
 }
 
-int writeit(void *sp, struct iovec *iov, int flags)
+int socket_writev(struct socket *so, struct iovec *iov, int flags)
 {
-	struct socket *so = (struct socket *)sp;
 	struct uio auio;
 	int len = iov->iov_len;
 	int error;
@@ -606,9 +599,8 @@ out:
 	return (error);
 }
 
-int readit(void *sp, struct iovec *iov, int *flags)
+int socket_readv(struct socket *so, struct iovec *iov, int *flags)
 {
-	struct socket *so = (struct socket *)sp;
 	struct uio auio;
 	int len = iov->iov_len;
 	int error;
@@ -626,9 +618,8 @@ int readit(void *sp, struct iovec *iov, int *flags)
 	return (len - auio.uio_resid);
 }
 
-int recvit(void *sp, struct msghdr *mp, caddr_t namelenp, int *retsize)
+int socket_recv(struct socket *so, struct msghdr *mp, caddr_t namelenp, int *retsize)
 {
-	struct socket *so = (struct socket*)sp;
 	struct uio auio;
 	struct iovec *iov;
 	struct mbuf *control = NULL;
@@ -944,10 +935,8 @@ release:
 	return error;
 }
 
-int soo_ioctl(void *sp, int cmd, caddr_t data)
+int socket_ioctl(struct socket *so, int cmd, caddr_t data)
 {
-	struct socket *so = (struct socket*)sp;
-
 	switch (cmd) {
 		case FIONBIO:
 			if (*(int*)data)
@@ -975,9 +964,8 @@ int soo_ioctl(void *sp, int cmd, caddr_t data)
 }
 
 
-int soclose(void *sp)
+int socket_close(struct socket *so)
 {
-	struct socket *so = (struct socket*)sp;
 	int error = 0;
 
 	/* we don't want any more events... */
@@ -1019,7 +1007,7 @@ drop:
 
 discard:
 	if (so->so_state & SS_NOFDREF)
-		printf("PANIC: soclose: NOFDREF");
+		printf("PANIC: socket_close: NOFDREF");
 	so->so_state |= SS_NOFDREF;
 	sofree(so);
 	return error;
@@ -1086,9 +1074,8 @@ void sofree(struct socket *so)
 	return;
 }
 
-int sosetopt(void *sp, int level, int optnum, const void *data, size_t datalen)
+int socket_setsockopt(struct socket *so, int level, int optnum, const void *data, size_t datalen)
 {
-	struct socket *so = (struct socket*)sp;
 	struct mbuf *m, *m0;
 	int error = 0;
 
@@ -1193,9 +1180,8 @@ bad:
 	return error;
 }
 
-int sogetopt(void *sp, int level, int optnum, void *data, size_t *datalen)
+int socket_getsockopt(struct socket *so, int level, int optnum, void *data, size_t *datalen)
 {
-	struct socket *so = (struct socket*)sp;
 	struct mbuf *m;
 	
 	m = m_get(MT_SOOPTS);
@@ -1270,10 +1256,8 @@ int sogetopt(void *sp, int level, int optnum, void *data, size_t *datalen)
 }
 
 
-int set_socket_event_callback(void * sp, socket_event_callback cb, void * cookie, int event)
+int socket_set_event_callback(struct socket *so, socket_event_callback cb, void * cookie, int event)
 {
-	struct socket *so = (struct socket *) sp;
-
 	so->event_callback = cb;
 	so->event_callback_cookie = cookie;
 	if (cb) {
@@ -1469,9 +1453,8 @@ void wakeup(sem_id chan)
 }
 
 /* This file is too big - split it up!! */
-int sogetsockname(void *sp, struct sockaddr *sa, int *alen)
+int socket_getsockname(struct socket *so, struct sockaddr *sa, int *alen)
 {
-	struct socket *so = (struct socket*)sp;
 	struct mbuf *m = m_getclr(MT_SONAME);
 	int len;
 	int error;
@@ -1490,9 +1473,8 @@ int sogetsockname(void *sp, struct sockaddr *sa, int *alen)
 	return error;
 }
 
-int sogetpeername(void *sp, struct sockaddr *sa, int * alen)
+int socket_getpeername(struct socket *so, struct sockaddr *sa, int * alen)
 {
-        struct socket *so = (struct socket*)sp;
         struct mbuf *m = m_getclr(MT_SONAME);
         int len;
         int error;
@@ -1513,7 +1495,7 @@ int sogetpeername(void *sp, struct sockaddr *sa, int * alen)
         return error;
 }
 
-int soaccept(struct socket *so, struct socket **nsp, void *data, int *alen)
+int socket_accept(struct socket *so, struct socket **nso, void *data, int *alen)
 {
 	int len;
 	int error;
@@ -1530,7 +1512,7 @@ int soaccept(struct socket *so, struct socket **nsp, void *data, int *alen)
 			so->so_error = ECONNABORTED;
 			break;
 		}
-		if ((error = nsleep(so->so_timeo, "soaccept", 0)))
+		if ((error = nsleep(so->so_timeo, "socket_accept", 0)))
 			return error;
 	}
 	if (so->so_error) {
@@ -1542,7 +1524,7 @@ int soaccept(struct socket *so, struct socket **nsp, void *data, int *alen)
 	{
 		struct socket *aso = so->so_q;
 		if (soqremque(aso, 1) == 0) {
-			printf("PANIC: soaccept!\n");
+			printf("PANIC: socket_accept!\n");
 			return ENOMEM;
 		}
 		so = aso;
@@ -1559,6 +1541,6 @@ int soaccept(struct socket *so, struct socket **nsp, void *data, int *alen)
 	m_freem(nam);
 	
 	/* assign the socket to the cookie passed in! */
-	*nsp = so;			
+	*nso = so;			
 	return error;
 }
