@@ -49,10 +49,7 @@ _IO_fflush (fp)
 INTDEF(_IO_fflush)
 
 #ifdef weak_alias
-weak_alias (_IO_fflush, fflush)
-
-#ifndef _IO_MTSAFE_IO
-weak_alias (_IO_fflush, fflush_unlocked)
-libc_hidden_weak (fflush_unlocked)
-#endif
+weak_alias(_IO_fflush, fflush)
+weak_alias(_IO_fflush, fflush_unlocked)
+libc_hidden_weak(fflush_unlocked)
 #endif
