@@ -15,20 +15,22 @@ extern "C" {
 #endif
 
 // C API partition representation
+// Fields marked [sys] are set by the system and are not to be changed by
+// the disk system modules.
 typedef struct partition_data {
-	partition_id	id;
+	partition_id	id;				// [sys]
 	off_t			offset;
 	off_t			size;
 	uint32			block_size;
 	int32			child_count;
-	int32			index;			// needed?
-	uint32			status;
+	int32			index;			// [sys]
+	uint32			status;			// [sys]
 	uint32			flags;
-	dev_t			volume;
+	dev_t			volume;			// [sys]
 	char			*name;			// max: B_FILE_NAME_LENGTH
 	char			*content_name;	//
 	char			*type;			//
-	char			*content_type;	//
+	const char		*content_type;	// [sys]
 	char			*parameters;
 	char			*content_parameters;
 	void			*cookie;
