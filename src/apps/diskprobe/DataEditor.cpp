@@ -195,6 +195,8 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fIsReadOnly = true;
 	}
 
+	entry.GetRef(&fRef);
+
 	struct stat stat;
 	stat.st_mode = 0;
 
@@ -435,6 +437,7 @@ DataEditor::SetViewOffset(off_t offset)
 	fViewOffset = offset;
 	fNeedsUpdate = true;
 
+	SendNotices(kMsgDataEditorOffsetChange);
 	return B_OK;
 }
 
@@ -485,19 +488,36 @@ DataEditor::Update()
 
 
 status_t
-DataEditor::GetViewBuffer(const uint8 **_buffer)
+DataEditor::UpdateIfNeeded(bool *_updated = NULL)
 {
-	if (!IsLocked())
-		debugger("DataEditor: view not locked");
+	if (!fNeedsUpdate) {
+		if (_updated)
+			*_updated = false;
+		return B_OK;
+	}
 
 	status_t status = B_OK;
 
 	if (fView == NULL)
 		status = SetViewOffset(fViewOffset);
 
-	if (status == B_OK && fNeedsUpdate)
+	if (status == B_OK && fNeedsUpdate) {
 		status = Update();
+		if (status == B_OK && _updated)
+			*_updated = true;
+	}
 
+	return status;
+}
+
+
+status_t
+DataEditor::GetViewBuffer(const uint8 **_buffer)
+{
+	if (!IsLocked())
+		debugger("DataEditor: view not locked");
+
+	status_t status = UpdateIfNeeded();
 	if (status < B_OK)
 		return status;
 
@@ -515,12 +535,9 @@ DataEditor::SendNotices(uint32 what, BMessage *message)
 	BMessage *notice;
 	if (message) {
 		notice = new BMessage(*message);
-		notice->what = B_OBSERVER_NOTICE_CHANGE;
-		notice->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
+		notice->what = what;
 	} else
-		notice = new BMessage(B_OBSERVER_NOTICE_CHANGE);
-
-	notice->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+		notice = new BMessage(what);
 
 	for (int32 i = fObservers.CountItems(); i-- > 0;) {
 		BMessenger *messenger = fObservers.ItemAt(i);

@@ -61,6 +61,7 @@ class DataEditor : public BLocker {
 		void SetBlockSize(size_t size);
 		size_t BlockSize() const { return fBlockSize; }
 
+		status_t UpdateIfNeeded(bool *_updated = NULL);
 		status_t GetViewBuffer(const uint8 **_buffer);
 
 		status_t StartWatching(BMessenger target);
@@ -69,6 +70,7 @@ class DataEditor : public BLocker {
 		void StopWatching(BHandler *handler, BLooper *looper = NULL);
 
 		BFile &File() { return fFile; }
+		const entry_ref &Ref() const { return fRef; }
 
 	private:
 		void SendNotices(uint32 what, BMessage *message = NULL);
@@ -79,6 +81,7 @@ class DataEditor : public BLocker {
 
 		BObjectList<BMessenger> fObservers;
 
+		entry_ref	fRef;
 		BFile		fFile;
 		const char	*fAttribute;
 		bool		fIsDevice, fIsReadOnly;
@@ -96,7 +99,8 @@ class DataEditor : public BLocker {
 		size_t		fBlockSize;
 };
 
-static const uint32 kDataEditorStateChange = 'deSC';
-static const uint32 kDataEditorUpdate = 'deUp';
+static const uint32 kMsgDataEditorStateChange = 'deSC';
+static const uint32 kMsgDataEditorUpdate = 'deUp';
+static const uint32 kMsgDataEditorOffsetChange = 'deOC';
 
 #endif	/* DATA_EDITOR_H */
