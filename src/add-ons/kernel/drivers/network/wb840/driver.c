@@ -22,6 +22,7 @@ pci_module_info *gPci;
 char* gDevNameList[MAX_CARDS + 1];
 pci_info *gDevList[MAX_CARDS];
 
+
 static bool
 probe(pci_info *item)
 {
@@ -120,8 +121,8 @@ publish_devices()
 device_hooks*
 find_device(const char* name)
 {
-	int32 	i;
-	char 	*item;
+	int32 i;
+	char *item;
 
 	LOG((DEVICE_NAME ": find_device()\n"));
 	// Find device name

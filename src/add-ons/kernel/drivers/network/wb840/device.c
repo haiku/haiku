@@ -319,13 +319,15 @@ wb840_free(void* cookie)
 	gOpenMask &= ~(1L << device->devId);
 	
 	wb_delete_rings(device);
+	free(device->firstPHY);
 	free(device);
 		
 	return B_OK;
 }
 
 
-device_hooks gDeviceHooks = {
+device_hooks
+gDeviceHooks = {
 	wb840_open, 	/* -> open entry point */
 	wb840_close, 	/* -> close entry point */
 	wb840_free,		/* -> free cookie */

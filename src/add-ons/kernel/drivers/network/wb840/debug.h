@@ -4,9 +4,9 @@
 #define ARGS (const char *, ...)
 
 #ifdef DEBUG
-	#define LOG(ARGS)	dprintf ARGS
+	#define LOG(ARGS) dprintf ARGS
 #else
-	#define LOG(ARGS) ;
+	#define LOG(ARGS) 
 #endif // DEBUG
 
 #endif //__MYDEBUG_H

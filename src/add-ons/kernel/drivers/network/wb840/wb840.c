@@ -1,7 +1,8 @@
 /* Copyright (c) 2003-2004 
  * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
  */
- 
+
+#define DEBUG 1
 #include "device.h"
 #include "driver.h"
 #include "debug.h"
@@ -19,20 +20,22 @@
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
 
 // MII chip info table
-
 #define PHY_ID0_DAVICOM_DM9101 	0x0181
 #define PHY_ID1_DAVICOM_DM9101	0xb800
 #define	MII_HOME	0x0001
 #define MII_LAN		0x0002
 
-const static struct mii_chip_info
+struct mii_chip_info
 {
 	const char *name;
 	uint16 id0, id1;
 	uint8  types;
-} 
+};
+
+
+const static struct mii_chip_info
 gMIIChips[] = {
-	{"DAVICOM_DM9101 MII PHY", PHY_ID0_DAVICOM_DM9101, PHY_ID1_DAVICOM_DM9101, MII_LAN},
+	{"DAVICOM_DM9101", PHY_ID0_DAVICOM_DM9101, PHY_ID1_DAVICOM_DM9101, MII_LAN},
 	{NULL,0,0,0}
 };
 
@@ -60,36 +63,6 @@ physicalAddress(volatile void *addr, uint32 length)
 	
 	return (uint32)table.address;
 }
-
-
-#if DEBUG
-static void
-dump_registers(wb_device *device)
-{
-	LOG(("Registers dump:\n"));
-	LOG(("WB_BUSCTL: %x\n", (int)read32(device->reg_base + WB_BUSCTL)));
-	LOG(("WB_TXSTART: %x\n", (int)read32(device->reg_base + WB_TXSTART)));
-	LOG(("WB_RXSTART: %x\n", (int)read32(device->reg_base + WB_RXSTART)));
-	LOG(("WB_RXADDR: %x\n", (int)read32(device->reg_base + WB_RXADDR)));
-	LOG(("WB_TXADDR: %x\n", (int)read32(device->reg_base + WB_TXADDR)));
-	LOG(("WB_ISR: %x\n", (int)read32(device->reg_base + WB_ISR)));
-	LOG(("WB_NETCFG: %x\n", (int)read32(device->reg_base + WB_NETCFG)));
-	LOG(("WB_IMR: %x\n", (int)read32(device->reg_base + WB_IMR)));
-	LOG(("WB_FRAMESDISCARDED: %x\n", (int)read32(device->reg_base + WB_FRAMESDISCARDED)));
-	LOG(("WB_SIO: %x\n", (int)read32(device->reg_base + WB_SIO)));
-	LOG(("WB_BOOTROMADDR: %x\n", (int)read32(device->reg_base + WB_BOOTROMADDR)));
-	LOG(("WB_TIMER: %x\n", (int)read32(device->reg_base + WB_TIMER)));
-	LOG(("WB_CURRXCTL: %x\n", (int)read32(device->reg_base + WB_CURRXCTL)));
-	LOG(("WB_CURRXBUF: %x\n", (int)read32(device->reg_base + WB_CURRXBUF)));
-	LOG(("WB_MAR0: %x\n", (int)read32(device->reg_base + WB_MAR0)));
-	LOG(("WB_MAR1: %x\n", (int)read32(device->reg_base + WB_MAR1)));
-	LOG(("WB_NODE0: %x\n", (int)read32(device->reg_base + WB_NODE0)));
-	LOG(("WB_NODE1: %x\n", (int)read32(device->reg_base + WB_NODE1)));
-	LOG(("WB_BOOTROMSIZE: %x\n", (int)read32(device->reg_base + WB_BOOTROMSIZE)));
-	LOG(("WB_CURTXCTL: %x\n", (int)read32(device->reg_base + WB_CURTXCTL)));
-	LOG(("WB_CURTXBUF: %x\n", (int)read32(device->reg_base + WB_CURTXBUF)));
-}
-#endif
 
 
 // Prepares a RX descriptor to be used by the chip
@@ -216,18 +189,9 @@ wb_init(wb_device *device)
 	
 	write32(device->reg_base + WB_BUSCTL_SKIPLEN, WB_SKIPLEN_4LONG);
 	
-	// Early TX interrupt
+	// Enable early TX/RX interrupt
 	WB_SETBIT(device->reg_base + WB_NETCFG, (WB_NETCFG_TX_EARLY_ON|WB_NETCFG_RX_EARLY_ON));
-	
-	// fullduplex
-	//WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_FULLDUPLEX);
-	
-	//100 MBits
-	//WB_SETBIT(device->reg_base + WB_NETCFG, WB_NETCFG_100MBPS);
-	
-	/* Program the multicast filter, if necessary */
-	//wb_setmulti(device);
-	
+		
 	//Disable promiscuos mode
 	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_ALLPHYS);
 		
@@ -257,7 +221,7 @@ wb_reset(wb_device *device)
 	}
 	
 	if (i == WB_TIMEOUT)
-		LOG(("reset hasn't completed!!!"));
+		LOG((DEVICE_NAME": reset hasn't completed!!!"));
 					
 	/* Wait a bit while the chip reorders his toughts */
 	snooze(1000);
@@ -275,17 +239,17 @@ wb_updateLink(struct wb_device *device)
 		return;
 	}
 
-	if (device->link) {	// link lost
+	if (device->link) {
 		uint16 status = mii_readstatus(device);
 
+		// Check if link lost
 		if ((status & MII_STATUS_LINK) == 0)
 			device->link = false;
-	}
-	
-	if (!device->link) { // new link established
+	} else {
 		uint16 status;
 		wb_selectPHY(device);
-
+		
+		// Check if we have a new link
 		status = mii_readstatus(device);
 		if (status & MII_STATUS_LINK)		
 			device->link = true;
@@ -304,12 +268,11 @@ wb_tick(timer *arg)
 }
 
 /***************** Interrupt handling ******************************/
-status_t
+static status_t
 wb_rxok(struct wb_device *device)
 {
 	uint32 releaseRxSem = 0;
 	int16 limit;
-	LOG(("Rx interrupt\n"));
 	
 	acquire_spinlock(&device->rxSpinlock);
 	
@@ -327,10 +290,8 @@ wb_rxok(struct wb_device *device)
 	write32(device->reg_base + WB_RXSTART, 0xFFFFFFFF);
 	
 	release_spinlock(&device->rxSpinlock);
-	
-	
+		
 	if (releaseRxSem > 0) {
-		//dprintf("releasing read sem %d times\n", releaseRxSem);
 		release_sem_etc(device->rxSem, releaseRxSem, B_DO_NOT_RESCHEDULE);
 		return B_INVOKE_SCHEDULER;
 	}
@@ -339,7 +300,7 @@ wb_rxok(struct wb_device *device)
 }
 
 
-status_t
+static status_t
 wb_tx_nobuf(struct wb_device *info)
 {
 	int16 releaseTxSem = 0;
@@ -350,16 +311,20 @@ wb_tx_nobuf(struct wb_device *info)
 
 	for (limit = info->txSent; limit > 0; limit--) {
 		status = info->txDescriptor[info->txInterruptIndex].wb_status;
-
+		
+		LOG(("wb_tx_nobuf, status: %lx\n", status));
 		if (status & WB_TXSTAT_TXERR) {
 			LOG(("TX_STAT_ERR\n"));
 			break;
 		} else if (status & WB_UNSENT) {
 			LOG(("TX_STAT_UNSENT\n"));
 			break;
-		} else {
+		} else if (status & WB_TXSTAT_OWN) {
+			LOG((DEVICE_NAME": Device still owns the descriptor\n"));
+			break;
+		} else
 			info->txDescriptor[info->txInterruptIndex].wb_status = 0;
-		}
+		
 		releaseTxSem++;	// this many buffers are free
 		info->txInterruptIndex = (info->txInterruptIndex + 1) & WB_TX_CNT_MASK;
 		info->txSent--;
@@ -384,78 +349,76 @@ wb_interrupt(void *arg)
 {
 	struct wb_device *device = (wb_device*)arg;
 	int32 retval = B_UNHANDLED_INTERRUPT;
-	int16 worklimit = 20;
 	uint32 status;
 		
 	acquire_spinlock(&device->intLock);
 	wb_disable_interrupts(device);
 	
-	while (worklimit-- > 0) {		
-		status = read32(device->reg_base + WB_ISR);
+	status = read32(device->reg_base + WB_ISR);
 		
-		/* Is our card the one which requested the interrupt ? */
-		if (!(status & WB_INTRS)) {
-			/* No, bail out. */
-			break;
-		}
-		
-		// Clean all the interrupts
+	// Did this card request the interrupt ?
+	if (status & WB_INTRS) {			
+		// Clean all the interrupts bits
 		if (status)
 			write32(device->reg_base + WB_ISR, status);
-				
-		LOG((DEVICE_NAME":*** Interrupt received ***\n"));	
-					
+		
+		if (status & WB_ISR_ABNORMAL)
+			LOG((DEVICE_NAME": *** Abnormal Interrupt received ***\n"));
+		else
+			LOG((DEVICE_NAME": interrupt received: \n"));
+			
+		if (status & WB_ISR_RX_EARLY) {
+			LOG(("WB_ISR_RX_EARLY\n"));
+		}
+						
 		if (status & WB_ISR_RX_NOBUF) {
-			LOG((DEVICE_NAME ": WB_ISR_RX_NOBUF\n"));	
-			//retval = wb_rx_nobuf(device);
-			continue;
+			LOG(("WB_ISR_RX_NOBUF\n"));	
+			// Something is screwed
 		}
 		
 		if (status & WB_ISR_RX_ERR) {
-			LOG((DEVICE_NAME": WB_ISR_RX_ERR\n"));
-			continue;
+			LOG(("WB_ISR_RX_ERR\n"));
+			// TODO: Do something useful
 		}
 		
 		if (status & WB_ISR_RX_OK) {
-			LOG((DEVICE_NAME": WB_ISR_RX_OK\n"));
+			LOG(("WB_ISR_RX_OK\n"));
 			retval = wb_rxok(device);
-			continue;
 		}
 		
 		if (status & WB_ISR_RX_IDLE) {
-			LOG((DEVICE_NAME": WB_ISR_RX_IDLE\n"));
-			continue;
+			LOG(("WB_ISR_RX_IDLE\n"));
+			// ???
 		}
-				
-		if (status & WB_ISR_TX_NOBUF) {
-			LOG((DEVICE_NAME ": WB_ISR_TX_NOBUF\n"));
+		
+		if (status & (WB_ISR_TX_NOBUF | WB_ISR_TX_EARLY)) {
+			LOG(("WB_ISR_TX_NOBUF/TX_EARLY\n"));
 			retval = wb_tx_nobuf(device);
-			continue;
 		}
 		
 		if (status & WB_ISR_TX_UNDERRUN) {
-			LOG((DEVICE_NAME ": WB_ISR_TX_UNDERRUN\n"));
+			LOG(("WB_ISR_TX_UNDERRUN\n"));
 			// TODO: Jack up TX Threshold
-			continue;
 		}
 		
 		if (status & WB_ISR_TX_IDLE) {
-			LOG((DEVICE_NAME ": WB_ISR_TX_IDLE\n"));
-			continue;
+			LOG(("WB_ISR_TX_IDLE\n"));
 		}
 		
 		if (status & WB_ISR_TX_OK) {
-			LOG((DEVICE_NAME": WB_ISR_TX_OK\n"));
-			continue;
+			LOG(("WB_ISR_TX_OK\n"));
+			// So what ?
 		}
-							
+					
 		if (status & WB_ISR_BUS_ERR) {
-			LOG((DEVICE_NAME": BUS_ERROR: %x\n", (int)(status & WB_ISR_BUSERRTYPE) >> 4));
+			LOG(("WB_ISR_BUS_ERROR: %lx\n", (status & WB_ISR_BUSERRTYPE) >> 4));
 			//wb_reset(device);
-			continue;
 		}
-		
-		LOG((DEVICE_NAME ": unknown interrupt received\n"));
+			
+		if (status & WB_ISR_TIMER_EXPIRED) {
+			LOG(("WB_ISR_TIMER_EXPIRED\n"));
+			// ??
+		}
 	}
 	
 	wb_enable_interrupts(device);
@@ -491,8 +454,6 @@ wb_create_semaphores(struct wb_device *device)
 		return device->rxSem;
 	}
 	
-	set_sem_owner(device->rxSem, B_SYSTEM_TEAM);		
-	
 	device->txSem = create_sem(WB_TX_LIST_CNT, "wb840 transmit");
 	if (device->txSem < B_OK) {
 		LOG(("Couldn't create sem, sem_id %ld\n", device->txSem));
@@ -500,6 +461,7 @@ wb_create_semaphores(struct wb_device *device)
 		return device->txSem;
 	}
 	
+	set_sem_owner(device->rxSem, B_SYSTEM_TEAM);
 	set_sem_owner(device->txSem, B_SYSTEM_TEAM);
 	
 	device->rxLock = 0;
@@ -617,11 +579,10 @@ wb_set_mode(wb_device *info, int mode)
 	
 	// Stop TX and RX queue.
 	if (read32(cfgAddress) & (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON)) {
-		restart = 1;
+		restart = true;
 		WB_CLRBIT(cfgAddress, (WB_NETCFG_TX_ON|WB_NETCFG_RX_ON));
 
 		for (i = 0; i < WB_TIMEOUT; i++) {
-			//delay(10)
 			if ((read32(info->reg_base + WB_ISR) & WB_ISR_TX_IDLE) &&
 				(read32(info->reg_base + WB_ISR) & WB_ISR_RX_IDLE))
 				break;
