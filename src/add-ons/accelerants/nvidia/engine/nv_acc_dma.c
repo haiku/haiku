@@ -60,7 +60,7 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
-	uint32 depth;
+	uint32 surf_depth, patt_depth;
 	//fixme: move to shared info:
 	uint32 max;
 
@@ -647,17 +647,21 @@ status_t nv_acc_init_dma()
 	switch(si->dm.space)
 	{
 	case B_CMAP8:
-		depth = 0x00000001;
+		surf_depth = 0x00000001;
+		patt_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
-		depth = 0x00000004;
+		surf_depth = 0x00000004;
+		patt_depth = 0x00000001;
 		break;
 	case B_RGB16_LITTLE:
-		depth = 0x00000004;
+		surf_depth = 0x00000004;
+		patt_depth = 0x00000001;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
-		depth = 0x00000006;
+		surf_depth = 0x00000006;
+		patt_depth = 0x00000003;
 		break;
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
@@ -666,7 +670,7 @@ status_t nv_acc_init_dma()
 
 	/* now setup 2D surface (writing 5 32bit words) */
 	nv_acc_cmd_dma(NV4_SURFACE, NV4_SURFACE_FORMAT, 4);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = depth; /* Format */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = surf_depth; /* Format */
 	/* setup screen pitch */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		((si->fbc.bytes_per_row & 0x0000ffff) | (si->fbc.bytes_per_row << 16)); /* Pitch */
@@ -675,6 +679,11 @@ status_t nv_acc_init_dma()
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetSource */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
+
+	/*  set pattern colordepth (writing 2 32bit words) */
+	//fixme: switch to NV4_IMAGE_PATTERN from NV_IMAGE_PATTERN???
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
