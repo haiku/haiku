@@ -301,6 +301,9 @@ tab(void)
 	for (; i < console.x; i++) {
 		console.lines[target_line][i] = ' ';
 	}
+	
+	console.lines[target_line][console.x] = '\0';
+
 	// There is no need to mark the line dirty
 }
 
