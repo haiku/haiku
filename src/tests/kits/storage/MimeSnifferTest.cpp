@@ -4,12 +4,15 @@
 #include <cppunit/Test.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/TestCaller.h>
+#include <sniffer/Rule.h>
 #include <sniffer/Parser.h>
+#include <DataIO.h>
 #include <Mime.h>
 #include <String.h>		// BString
 #include <TestUtils.h>
 
 #include <stdio.h>
+#include <string>
 
 using namespace Sniffer;
 
@@ -23,6 +26,8 @@ MimeSnifferTest::Suite() {
 						   &MimeSnifferTest::ScannerTest) );		
 	suite->addTest( new TC("Mime Sniffer::Parser Test",
 						   &MimeSnifferTest::ParserTest) );		
+	suite->addTest( new TC("Mime Sniffer::Sniffer Test",
+						   &MimeSnifferTest::SnifferTest) );		
 						   
 	return suite;
 }		
@@ -718,12 +723,12 @@ MimeSnifferTest::ScannerTest() {
 		  			F(-1.0e1), F(-2.0e-2), F(-3.0e3), F(1.0e1), F(2.0e-2), F(3.0e3),
 		  		F(0.012345), F(1.23456), T(LeftParen), T(RightParen), T(LeftBracket),
 		  			T(RightBracket), T(Divider), T(Ampersand), T(Colon),
-		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
-		  		S("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 "),
-		  		S("\000abc_xyz123"),
+		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 46)),
+		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 46)),
+		  		S(std::string("\000abc_xyz123", 11)),
 		  		S("\241a1"),
 		  		S("!?\\"),
-		  		S("\x00"), S("\x12"), S("\xAB\xCD"), S("\xAB\xCD"),
+		  		S(std::string("\x00", 1)), S("\x12"), S("\xAB\xCD"), S("\xAB\xCD"),
 		  			S("\x01\x23\x45\x67\x89\xAB\xCD\xEF\xFE\xDC\xBA")
 		  	}
 		},
@@ -1080,4 +1085,259 @@ MimeSnifferTest::ParserTest() {
 			CHK(parseError.FindLast(testCase.error) >= 0);
 		}
 	}
+}
+
+void dumpStr(const std::string &string, const char *label = NULL) {
+	if (label)
+		printf("%s: ", label);
+	for (int i = 0; i < string.length(); i++)
+		printf("%x ", string[i]);
+	printf("\n");
+}
+
+
+void
+MimeSnifferTest::SnifferTest() {
+#if TEST_R5
+	Outputf("(no tests actually performed for R5 version)\n");
+#else	// TEST_R5
+	const char *rules[] = {
+		// General tests
+		"1.0 ('#include')",
+		"0.0 [0:32] ('#include')",
+		"0.e-230 [0:32] (\\#include | \\#ifndef)",
+		".2 ([0:32] \"#include\" | [0] '#define' | [0:200] 'int main(')",
+		"1.0 [0:32] ('<html>' | '<head>' | '<body>')",
+		// Range tests
+		"1.0 [0:9] ('rock')",
+		"1.0 ([0:9] 'roll')",
+		"1.0 ([0:9] 'rock' | [0:9] 'roll')",
+		"1.0 [0:9] ('rock' | 'roll')",
+		"1.0 ([0] 'rock')",
+		"1.0 ([0] 'rock' | [0:9] 'roll')",
+		"1.0 ([9] 'rock' | [10] 'roll')",
+		// Mask, octal, and hex tests
+		"1.0 (\\xFF\\xFF & '\\xF0\\xF0')",
+		"1.0 ('\\33\\34' & \\xFF\\x00)",
+		"1.0 (\\33\\34 & \"\\x00\\xFF\")",
+		"1.0 (\\xFF & \\x05)",
+		// Conjunctions
+		"1.0 ([4] 'rock') ([9] 'roll')",
+		"1.0 [5] ('roll') [10] ('rock')",
+		"1.0 [4] ('rock' | 'roll') ([9] 'rock' | [10] 'roll')",		
+	};
+	const int ruleCount = sizeof(rules)/sizeof(char*);
+	struct test_case {
+		const std::string data;
+		const bool	result[ruleCount];
+	} tests[] = {
+
+//------------------------------
+{
+"#include <stdio.h>		\n\
+#include <stdlib.h>		\n\
+						\n\
+int main() {			\n\
+	return 0;			\n\
+}						\n\
+\n\
+",	{	true, true, true, true, false,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"	#include <stdio.h>		\n\
+	#include <stdlib.h>		\n\
+						\n\
+	int main() {			\n\
+		return 0;			\n\
+	}						\n\
+\n\
+",	{	false, true, true, true, false,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"#ifndef SOME_TEST_H		\n\
+#define SOME_TEST_H			\n\
+							\n\
+void main();				\n\
+							\n\
+#endif	// SOME_TEST_H		\n\
+							\n\
+",	{	false, false, true, false, false,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"//------------------		\n\
+// SomeTest.cpp				\n\
+//------------------		\n\
+#include <stdio.h>			\n\
+							\n\
+int main() {				\n\
+	return 0;				\n\
+}							\n\
+							\n\
+",	{	false, false, false, true, false,
+		false, false, false, false, false, false, false,
+		false, false, false, true,
+		//                   ^^^^ <= coincedence 
+		false, false, false
+	}
+},
+//------------------------------
+{
+"<html>									\n\
+<body bgcolor='#ffffff'>				\n\
+HTML is boring as hell		<br>		\n\
+when i write it too much	<br>		\n\
+my head starts to swell		<br>		\n\
+<br>									\n\
+HTML is stupid and dumb		<br>		\n\
+running through traffic		<br>		\n\
+is ten times as fun			<br>		\n\
+</body>									\n\
+</html>									\n\
+",	{	false, false, false, false, true,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false
+	}
+},
+//---------  <= Ten characters in
+{
+"     rock&roll",
+	{	false, false, false, false, false,
+		true, false, true, true, false, false, true,
+		false, false, false, false,
+		false, false, false
+	}
+},
+//---------  <= Ten characters in
+{
+"    rock&roll",
+	{ 	false, false, false, false, false,
+		true, true, true, true, false, true, false,
+		false, false, false, false,
+		true, false, false
+	}
+},
+//---------  <= Ten characters in
+{
+"     roll&rock",
+	{	false, false, false, false, false,
+		false, true, true, true, false, true, false,
+		false, false, false, false,
+		false, true, false
+	}
+},
+//---------  <= Ten characters in
+{
+"    roll&rock",
+	{ 	false, false, false, false, false,
+		true, true, true, true, false, true, true,
+		false, false, false, false,
+		false, false, true
+	}
+},
+//------------------------------
+{
+"\xFF\xFF	FF FF",
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		true, false, false, true,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"\xFA\xFA	FA FA",
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		true, false, false, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"\xAF\xAF	AF AF",
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, false, false, true,
+		false, false, false
+	}
+},
+//------------------------------
+{
+std::string("\033\000	033 000", 10),	// Otherwise, it thinks the NULL is the end of the string
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, true, false, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+std::string("\000\034	000 034", 10),	// Otherwise, it thinks the NULL is the end of the string
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, false, true, false,
+		false, false, false
+	}
+},
+//------------------------------
+{
+"\033\034	033 034",
+	{	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, true, true, false,
+		false, false, false
+	}
+},
+	};	// tests[]
+	const int32 testCount = sizeof(tests)/sizeof(test_case);
+	
+	for (int i = 0; i < testCount; i++) {
+		if (i > 0)
+			NextSubTestBlock();
+		test_case &test = tests[i];
+//		cout << "--------------------------------------------------------------------------------" << endl;
+//		cout << test.data << endl;
+		
+		for (int j = 0; j < ruleCount; j++) {
+			NextSubTest();
+//			cout << "############################################################" << endl;
+//			cout << rules[j] << endl;
+//			cout << test.result[j] << endl;
+			Rule rule;
+			BString errorMsg;
+			status_t err = parse(rules[j], &rule, &errorMsg);
+//			dumpStr(test.data, "str ");
+			if (err) {
+//				cout << "PARSE FAILURE!!!" << endl;
+//				cout << errorMsg.String() << endl;
+			}
+			CHK(err == B_OK);
+			if (!err) {
+				BMallocIO data;
+				data.Write(test.data.data(), test.data.length());//strlen(test.data));
+				bool match = rule.Sniff(&data);
+//				cout << match << endl;
+//				cout << "match == " << (match ? "yes" : "no") << ", "
+//					 << ((match == test.result[j]) ? "SUCCESS" : "FAILURE") << endl;
+				CHK(match == test.result[j]);			
+			} 
+		}
+	}
+#endif // !TEST_R5
 }
