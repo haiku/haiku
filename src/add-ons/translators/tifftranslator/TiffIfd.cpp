@@ -176,7 +176,43 @@ TiffIfd::GetUint(uint16 tag, uint32 index)
 }
 
 uint32
-TiffIfd::GetUintArray(uint16 tag, uint32 **pout)
+TiffIfd::GetAdjustedColorMap(uint8 **pout)
+{
+	TiffField *pfield = GetField(TAG_COLOR_MAP);
+	if (pfield) {
+	
+		TiffUintField *puintField = NULL;		
+		puintField = dynamic_cast<TiffUintField *>(pfield);
+		if (puintField) {
+		
+			uint32 count = puintField->GetCount();
+			(*pout) = new uint8[count];
+			uint8 *puints = (*pout);
+			if (!puints)
+				throw TiffIfdNoMemoryException();
+				
+			for (uint32 i = 0; i < count; i++) {
+				uint32 num;
+				status_t ret = puintField->GetUint(num, i + 1);
+				if (ret == B_BAD_INDEX)
+					throw TiffIfdBadIndexException();
+				else if (ret == B_BAD_TYPE)
+					throw TiffIfdUnexpectedTypeException();
+					
+				puints[i] = num / 256;
+			}
+			
+			return count;
+				
+		} else
+			throw TiffIfdUnexpectedTypeException();
+	}
+	
+	throw TiffIfdFieldNotFoundException();
+}
+
+uint32
+TiffIfd::GetUint32Array(uint16 tag, uint32 **pout)
 {
 	TiffField *pfield = GetField(tag);
 	if (pfield) {

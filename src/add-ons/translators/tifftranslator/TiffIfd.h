@@ -78,7 +78,8 @@ public:
 		// TiffIfdUnexpectedTypeException(),
 		// TiffIfdBadIndexException()
 		
-	uint32 GetUintArray(uint16 tag, uint32 **pout);
+	uint32 GetAdjustedColorMap(uint8 **pout);
+	uint32 GetUint32Array(uint16 tag, uint32 **pout);
 		// copies all of the uints from tag to
 		// the pointer pointed to by pout
 		// and returns the number of uints copied

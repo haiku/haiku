@@ -79,6 +79,7 @@ public:
 	uint32 stripsPerImage;
 	uint32 *pstripOffsets;
 	uint32 *pstripByteCounts;
+	uint8 *pcolorMap;
 	uint16 interpretation;
 	uint16 bitsPerPixel;
 	uint16 imageType;

@@ -117,6 +117,7 @@ TiffDetails::~TiffDetails()
 {
 	delete[] pstripOffsets;
 	delete[] pstripByteCounts;
+	delete[] pcolorMap;
 	
 	memset(this, 0, sizeof(TiffDetails));
 }
@@ -415,10 +416,6 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			compression = COMPRESSION_NONE;
 		else
 			compression = ifd.GetUint(TAG_COMPRESSION);
-		if (compression != COMPRESSION_NONE &&
-			compression != COMPRESSION_HUFFMAN &&
-			compression != COMPRESSION_PACKBITS)
-			return B_NO_TRANSLATOR;
 		
 		uint16 imageType = 0, bitsPerPixel = 0;
 		switch (interpretation) {
@@ -432,12 +429,22 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 					
 				// default value for bits per sample is 1
 				if (!ifd.HasField(TAG_BITS_PER_SAMPLE) ||
-					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 1)
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 1) {
 					bitsPerPixel = 1;
-				else if (ifd.GetUint(TAG_BITS_PER_SAMPLE) == 4 ||
-					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 8)
+					
+					if (compression != COMPRESSION_NONE &&
+						compression != COMPRESSION_HUFFMAN &&
+						compression != COMPRESSION_PACKBITS)
+						return B_NO_TRANSLATOR;
+			
+				} else if (ifd.GetUint(TAG_BITS_PER_SAMPLE) == 4 ||
+					ifd.GetUint(TAG_BITS_PER_SAMPLE) == 8) {
 					bitsPerPixel = ifd.GetUint(TAG_BITS_PER_SAMPLE);
-				else
+					
+					if (compression != COMPRESSION_NONE &&
+						compression != COMPRESSION_PACKBITS)
+						return B_NO_TRANSLATOR;
+				} else
 					return B_NO_TRANSLATOR;
 					
 				imageType = TIFF_BILEVEL;
@@ -446,32 +453,32 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 				
 			// Palette color images
 			case PHOTO_PALETTE:
+				if (compression != COMPRESSION_NONE &&
+					compression != COMPRESSION_PACKBITS)
+					return B_NO_TRANSLATOR;
+					
 				// default value for samples per pixel is 1
-				// if samples per pixel is other than 1, 
-				// it is not valid for this image type
 				if (ifd.HasField(TAG_SAMPLES_PER_PIXEL) &&
 					ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 1)
 					return B_NO_TRANSLATOR;
-				
-				// bits per sample must be present and
-				// can only be 4 or 8
-				if (ifd.GetUint(TAG_BITS_PER_SAMPLE) != 4 &&
-					ifd.GetUint(TAG_BITS_PER_SAMPLE) != 8)
+					
+				bitsPerPixel = ifd.GetUint(TAG_BITS_PER_SAMPLE);
+				if (bitsPerPixel != 4 && bitsPerPixel != 8)
 					return B_NO_TRANSLATOR;
-				
-				// even though other compression types are
-				// supported for other TIFF types,
-				// packbits and uncompressed are the only
-				// compression types supported for palette
-				// images
-				if (compression != COMPRESSION_NONE &&
-					compression != COMPRESSION_PACKBITS)
+					
+				// ensure that the color map is the expected length
+				if (ifd.GetCount(TAG_COLOR_MAP) !=
+					(uint32) (3 * (1 << bitsPerPixel)))
 					return B_NO_TRANSLATOR;
 			
 				imageType = TIFF_PALETTE;
 				break;
 				
 			case PHOTO_RGB:
+				if (compression != COMPRESSION_NONE &&
+					compression != COMPRESSION_PACKBITS)
+					return B_NO_TRANSLATOR;
+					
 				if (ifd.GetUint(TAG_SAMPLES_PER_PIXEL) != 3)
 					return B_NO_TRANSLATOR;
 				if (ifd.GetCount(TAG_BITS_PER_SAMPLE) != 3 ||
@@ -484,6 +491,10 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 				break;
 				
 			case PHOTO_SEPARATED:
+				if (compression != COMPRESSION_NONE &&
+					compression != COMPRESSION_PACKBITS)
+					return B_NO_TRANSLATOR;
+					
 				// CMYK (default ink set)
 				// is the only ink set supported
 				if (ifd.HasField(TAG_INK_SET) &&
@@ -517,8 +528,8 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			ifd.GetCount(TAG_STRIP_BYTE_COUNTS) != stripsPerImage)
 			return B_NO_TRANSLATOR;
 		
-		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\n",
-			width, height, compression, interpretation);
+		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\nbits per pixel: %d\n",
+			width, height, compression, interpretation, bitsPerPixel);
 		
 		// return read in details if output pointer is supplied
 		if (pdetails) {
@@ -531,10 +542,13 @@ check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 			pdetails->bitsPerPixel		= bitsPerPixel;
 			pdetails->imageType			= imageType;
 			
-			ifd.GetUintArray(TAG_STRIP_OFFSETS,
+			ifd.GetUint32Array(TAG_STRIP_OFFSETS,
 				&pdetails->pstripOffsets);
-			ifd.GetUintArray(TAG_STRIP_BYTE_COUNTS,
+			ifd.GetUint32Array(TAG_STRIP_BYTE_COUNTS,
 				&pdetails->pstripByteCounts);
+				
+			if (pdetails->imageType == TIFF_PALETTE)
+				ifd.GetAdjustedColorMap(&pdetails->pcolorMap);
 		}
 			
 	} catch (TiffIfdException) {
@@ -758,6 +772,38 @@ tiff_to_bits(uint8 *ptiff, uint32 tifflen, uint8 *pbits, TiffDetails &details)
 			
 			break;
 			
+		case TIFF_PALETTE:
+		{
+			// NOTE: All of the entries in the color map were
+			// divided by 256 before they were copied to pcolorMap.
+			//
+			// The first 3rd of the color map is made of the Red values,
+			// the second 3rd of the color map is made of the Green values,
+			// and the last 3rd of the color map is made of the Blue values.
+			if (details.bitsPerPixel == 8) {
+				for (uint32 i = 0; i < details.width; i++) {
+					pbits[2] = details.pcolorMap[ptiff[i]];
+					pbits[1] = details.pcolorMap[256 + ptiff[i]];
+					pbits[0] = details.pcolorMap[512 + ptiff[i]];
+
+					pbits += 4;
+				}
+			} else if (details.bitsPerPixel == 4) {
+				const uint8 mask = 0x0f;
+				for (uint32 i = 0; i < details.width; i++) {
+					uint8 indices = (ptiff + (i / 2))[0];
+					uint8 index = (indices >> (4 * (1 - (i % 2)))) & mask;
+					
+					pbits[2] = details.pcolorMap[index];
+					pbits[1] = details.pcolorMap[16 + index];
+					pbits[0] = details.pcolorMap[32 + index];
+					
+					pbits += 4;
+				}
+			}
+			break;
+		}
+			
 		case TIFF_RGB:
 			while (ptiff < ptiffend) {
 				pbits[2] = ptiff[0];
@@ -935,6 +981,7 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, ssize_t amtread,
 		outbufferlen = 4 * details.width;
 		switch (details.imageType) {
 			case TIFF_BILEVEL:
+			case TIFF_PALETTE:
 			{
 				uint32 pixelsPerByte = 8 / details.bitsPerPixel;
 				inbufferlen = (details.width / pixelsPerByte) +
