@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <Drivers.h>
-	// for B_SET_(NON)BLOCKING_IO
+#include <OS.h>
+#include <Drivers.h>	// for B_SET_(NON)BLOCKING_IO
 
 
 typedef struct commands_info {
