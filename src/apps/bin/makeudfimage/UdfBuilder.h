@@ -19,6 +19,7 @@
 
 #include "Allocator.h"
 #include "OutputFile.h"
+#include "PhysicalPartitionAllocator.h"
 #include "ProgressListener.h"
 #include "UdfString.h"
 
@@ -41,6 +42,7 @@ private:
 	Udf::String& _UdfVolumeName() { return fUdfVolumeName; }
 	Udf::String& _IsoVolumeName() { return fIsoVolumeName; }
 	Allocator& _Allocator() { return fAllocator; }
+	PhysicalPartitionAllocator& _PartitionAllocator() { return fPartitionAllocator; }
 	time_t _BuildTime() const { return fBuildTime; }
 	Udf::timestamp& _BuildTimeStamp() { return fBuildTimeStamp; }
 
@@ -62,6 +64,7 @@ private:
 	Udf::String fIsoVolumeName;
 	const ProgressListener &fListener;
 	Allocator fAllocator;
+	PhysicalPartitionAllocator fPartitionAllocator;
 	time_t fBuildTime;
 	Udf::timestamp fBuildTimeStamp;
 };
