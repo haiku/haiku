@@ -6,13 +6,8 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#if defined(SYSTEM_TEST)
-#include <be/app/Looper.h>
-#include <be/app/MessageQueue.h>
-#else
-#include "../../../../lib/application/headers/Looper.h"
-#include "../../../../lib/application/headers/MessageQueue.h"
-#endif
+#include <Looper.h>
+#include <MessageQueue.h>
 
 // Project Includes ------------------------------------------------------------
 

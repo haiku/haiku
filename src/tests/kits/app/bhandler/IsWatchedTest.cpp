@@ -42,7 +42,9 @@ void TIsWatchedTest::IsWatched2()
 	assert(fHandler.IsWatched() == true);
 
 	fHandler.StopWatching(&Watcher, '1234');
+#ifndef TEST_R5
 	assert(fHandler.IsWatched() == false);
+#endif
 }
 //------------------------------------------------------------------------------
 Test* TIsWatchedTest::Suite()

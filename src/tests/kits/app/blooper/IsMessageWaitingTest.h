@@ -13,7 +13,7 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "common.h"
+#include "../common.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -22,6 +22,7 @@
 class TIsMessageWaitingTest : public TestCase
 {
 	public:
+		TIsMessageWaitingTest() {;}
 		TIsMessageWaitingTest(std::string name) : TestCase(name) {;}
 
 		void IsMessageWaiting1();

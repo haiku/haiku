@@ -6,15 +6,9 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#if defined(SYSTEM_TEST)
-#include <be/app/Handler.h>
-#include <be/app/Looper.h>
-#include <be/app/MessageFilter.h>
-#else
-#include "../../../../lib/application/headers/Handler.h"
-#include "../../../../lib/application/headers/Looper.h"
-#include "../../../../lib/application/headers/MessageFilter.h"
-#endif
+#include <Handler.h>
+#include <Looper.h>
+#include <MessageFilter.h>
 
 // Project Includes ------------------------------------------------------------
 

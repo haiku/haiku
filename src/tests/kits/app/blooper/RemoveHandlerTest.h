@@ -13,7 +13,7 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "common.h"
+#include "../common.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -22,6 +22,7 @@
 class TRemoveHandlerTest : public TestCase
 {
 	public:
+		TRemoveHandlerTest() {;}
 		TRemoveHandlerTest(std::string name) : TestCase(name) {;}
 
 		void RemoveHandler1();

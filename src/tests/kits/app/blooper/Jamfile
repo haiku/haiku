@@ -1,13 +1,11 @@
 SubDir OBOS_TOP src tests kits app blooper ;
 
-UsePublicHeaders app support ;
-
-UnitTest BLooperTester : main.cpp
-		IsMessageWaitingTest.cpp
-		RemoveHandlerTest.cpp
-	: kits/app ;
-
-LinkSharedOSLibs BLooperTester :
-	libopenbeos.so
-	be
-	stdc++.r4 ;
+CommonUnitTest BLooperTester
+	: main.cpp
+	  IsMessageWaitingTest.cpp
+	  RemoveHandlerTest.cpp
+	: kits app
+	: libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;
