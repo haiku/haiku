@@ -47,7 +47,7 @@ class Volume {
 
 		off_t				ToOffset(block_run run) const { return ToBlock(run) << BlockShift(); }
 		off_t				ToOffset(off_t block) const { return block << BlockShift(); }
-		off_t				ToBlock(block_run run) const { return ((((off_t)run.AllocationGroup()) << AllocationGroupShift()) | (off_t)run.Start()); }
+		off_t				ToBlock(block_run run) const { return ((off_t)run.AllocationGroup() << AllocationGroupShift()) | (uint32)run.Start(); }
 		block_run			ToBlockRun(off_t block) const;
 		status_t			ValidateBlockRun(block_run run);
 

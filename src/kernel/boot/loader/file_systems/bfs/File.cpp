@@ -47,7 +47,11 @@ File::InitCheck()
 ssize_t 
 File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	return fStream.ReadAt(pos, (uint8 *)buffer, &bufferSize);
+	status_t status = fStream.ReadAt(pos, (uint8 *)buffer, &bufferSize);
+	if (status < B_OK)
+		return status;
+
+	return bufferSize;
 }
 
 
