@@ -391,7 +391,7 @@ BBufferConsumer::HandleMessage(int32 message,
 			BBuffer *buffer;
 			buffer = fBufferCache->GetBuffer(command->buffer);
 			buffer->SetHeader(&command->header);
-			TRACE("calling BBufferConsumer::BufferReceived buffer %ld at perf %Ld and TimeSource()->Now() is %Ld\n", buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now());
+			PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld at perf %Ld and TimeSource()->Now() is %Ld\n", buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now());
 			BufferReceived(buffer);
 			return B_OK;
 		}
