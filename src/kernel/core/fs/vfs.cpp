@@ -2477,8 +2477,10 @@ vfs_exec_io_context(void *_context)
 
 		mutex_unlock(&context->io_mutex);
 
-		if (remove)
+		if (remove) {
+			close_fd(descriptor);
 			put_fd(descriptor);
+		}
 	}
 }
 

@@ -18,10 +18,8 @@
 //#define TRACE_FD
 #ifdef TRACE_FD
 #	define TRACE(x) dprintf x
-#	define PRINT(x) dprintf x
 #else
 #	define TRACE(x)
-#	define PRINT(x)
 #endif
 
 
@@ -40,6 +38,7 @@ dump_fd(int fd,struct file_descriptor *descriptor)
 }
 #endif
 
+
 /** Allocates and initializes a new file_descriptor */
 
 struct file_descriptor *
@@ -54,7 +53,7 @@ alloc_fd(void)
 	descriptor->u.vnode = NULL;
 	descriptor->cookie = NULL;
 	descriptor->ref_count = 1;
-	descriptor->open_count = 1;
+	descriptor->open_count = 0;
 	descriptor->open_mode = 0;
 	descriptor->pos = 0;
 
@@ -87,6 +86,7 @@ new_fd_etc(struct io_context *context, struct file_descriptor *descriptor, int f
 
 	context->fds[fd] = descriptor;
 	context->num_used_fds++;
+	atomic_add(&descriptor->open_count, 1);
 
 err:
 	mutex_unlock(&context->io_mutex);
@@ -240,6 +240,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 		// Now do the work
 		evicted = context->fds[newfd];
 		atomic_add(&context->fds[oldfd]->ref_count, 1);
+		atomic_add(&context->fds[oldfd]->open_count, 1);
 		context->fds[newfd] = context->fds[oldfd];
 	}
 
@@ -326,10 +327,10 @@ common_close(int fd, bool kernel)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	#ifdef TRACE_FD
-		if (!kernel)
-			TRACE(("_user_close(descriptor = %p)\n", descriptor));
-	#endif
+#ifdef TRACE_FD
+	if (!kernel)
+		TRACE(("_user_close(descriptor = %p)\n", descriptor));
+#endif
 
 	close_fd(descriptor);
 	put_fd(descriptor);
@@ -560,7 +561,7 @@ _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 	if (IS_KERNEL_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	PRINT(("user_ioctl: fd %d\n", fd));
+	TRACE(("user_ioctl: fd %d\n", fd));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
@@ -585,7 +586,7 @@ _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 	if (IS_KERNEL_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
-	PRINT(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
+	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -610,7 +611,7 @@ _user_rewind_dir(int fd)
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("user_rewind_dir(fd = %d)\n", fd));
+	TRACE(("user_rewind_dir(fd = %d)\n", fd));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -816,7 +817,7 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 	struct file_descriptor *descriptor;
 	int status;
 
-	PRINT(("sys_ioctl: fd %d\n", fd));
+	TRACE(("sys_ioctl: fd %d\n", fd));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
@@ -838,7 +839,7 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	PRINT(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n",fd, buffer, bufferSize, maxCount));
+	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n",fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
@@ -863,7 +864,7 @@ _kern_rewind_dir(int fd)
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("sys_rewind_dir(fd = %d)\n",fd));
+	TRACE(("sys_rewind_dir(fd = %d)\n",fd));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)

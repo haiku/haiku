@@ -1096,7 +1096,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, 
 	cookie->open_mode = openMode;
 	inode->Open(openMode);
 
-	TRACE(("  create cookie = %p\n", cookie));
+	TRACE(("  create cookie = %p, node = %p\n", cookie, inode));
 	*_cookie = (void *)cookie;
 	*_newVnodeID = inode->ID();
 
