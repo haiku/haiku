@@ -897,12 +897,8 @@ AudioMixer::EnableOutput(const media_source &what, bool enabled, int32 *_depreca
 void
 AudioMixer::NodeRegistered()
 {
-		Run();
-#if DEBUG > 1
-		SetPriority(12);
-#else
-		SetPriority(120);
-#endif
+	Run();
+	SetPriority(120);
 	UpdateParameterWeb();
 }
 
@@ -971,6 +967,11 @@ AudioMixer::CreateBufferGroup()
 {
 	// allocate enough buffers to span our downstream latency (plus one for rounding up), plus one extra
 	int32 count = int32(fDownstreamLatency / BufferDuration()) + 2;
+
+	TRACE("AudioMixer::CreateBufferGroup: fDownstreamLatency %Ld,  BufferDuration %Ld, buffer count = %ld\n", fDownstreamLatency, BufferDuration(), count);
+
+	if (count < 3)
+		count = 3;
 	
 	fCore->Lock();
 	uint32 size = fCore->Output()->MediaOutput().format.u.raw_audio.buffer_size;

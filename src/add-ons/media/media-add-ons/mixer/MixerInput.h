@@ -4,6 +4,7 @@
 #include <RealtimeAlloc.h>
 #include <MediaNode.h>
 #include "MixerCore.h"
+#include "MixerUtils.h" // DEBUG only
 #include "debug.h"
 
 class ByteSwap;
@@ -109,7 +110,17 @@ MixerInput::GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t tim
 {
 	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
 	ASSERT(mixer_channel >= 0 && mixer_channel < fMixerChannelCount);
-	if (time > fLastDataAvailableTime || !fEnabled)
+	if (!fEnabled)
+		return false;
+
+#if 1
+	if (time < (fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount))
+		|| (time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames)) > fLastDataAvailableTime)
+		ERROR("MixerInput::GetMixerChannelInfo: reading wrong data, have %Ld to %Ld, reading from %Ld to %Ld\n",
+				fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate, fMixBufferFrameCount), fLastDataAvailableTime, time, time + duration_for_frames(fMixBufferFrameRate, debugMixBufferFrames));
+#endif
+
+	if (time > fLastDataAvailableTime)
 		return false;
 	
 	int32 offset = framepos % fMixBufferFrameCount;

@@ -4,6 +4,7 @@
 #include <TimeSource.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <StopWatch.h>
 #include <string.h>
 #include "MixerCore.h"
 #include "MixerInput.h"
@@ -355,11 +356,7 @@ MixerCore::StartMixThread()
 	ASSERT(fOutput);
 	fRunning = true;
 	fMixThreadWaitSem = create_sem(0, "mix thread wait");
-#if DEBUG > 1
-	fMixThread = spawn_thread(_mix_thread_, "Yeah baby, very shagadelic", 12, this);
-#else
 	fMixThread = spawn_thread(_mix_thread_, "Yeah baby, very shagadelic", 120, this);
-#endif
 	resume_thread(fMixThread);
 }
 
@@ -399,6 +396,7 @@ MixerCore::MixThread()
 	bigtime_t 	time_base;
 	bigtime_t 	latency;
 	bigtime_t	start;
+	bigtime_t	buffer_request_timeout;
 	int64		frame_base;
 	int64		frame_pos;
 	
@@ -422,8 +420,12 @@ MixerCore::MixThread()
 		return;
 	latency = min(3600LL, bigtime_t(0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)));
 	// XXX we might need to add scheduling latency
+	// latency += 0.4 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio);
 	
-	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld\n", start, latency, fDownstreamLatency);
+	// XXX when the format changes while running, everything is wrong!
+	buffer_request_timeout = (3 * buffer_duration(fOutput->MediaOutput().format.u.raw_audio)) / 4;
+	
+	TRACE("MixerCore: starting MixThread at %Ld with latency %Ld and downstream latency %Ld, buffer_request_timeout %Ld\n", start, latency, fDownstreamLatency, buffer_request_timeout);
 
 	/* We must read from the input buffer at a position (pos) that is always a multiple of fMixBufferFrameCount.
 	 */
@@ -432,9 +434,13 @@ MixerCore::MixThread()
 	time_base = duration_for_frames(fMixBufferFrameRate, frame_base);
 	Unlock();
 	
-	TRACE("starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
+	TRACE("MixerCore: starting MixThread, start %Ld, time_base %Ld, frame_base %Ld\n", start, time_base, frame_base);
 	
 	ASSERT(fMixBufferFrameCount > 0);
+	
+#if DEBUG
+	uint64 buffer_num = 0;
+#endif
 
 	RtList<chan_info> InputChanInfos[MAX_CHANNEL_TYPES];
 	RtList<chan_info> MixChanInfos[fMixBufferChannelCount]; // XXX this does not support changing output channel count
@@ -460,7 +466,7 @@ MixerCore::MixThread()
 		// no inputs or output muted, skip further processing and just send an empty buffer
 		if (fInputs->IsEmpty() || fOutput->IsMuted()) {
 			int size = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
-			BBuffer* buf = fBufferGroup->RequestBuffer(size, 5000);
+			BBuffer* buf = fBufferGroup->RequestBuffer(size, buffer_request_timeout);
 			if (buf) {
 				memset(buf->Data(), 0, size);
 				// fill in the buffer header
@@ -470,11 +476,19 @@ MixerCore::MixThread()
 				hdr->time_source = fTimeSource->ID();
 				hdr->start_time = event_time;
 				if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {
+#if DEBUG
+					ERROR("MixerCore: SendBuffer failed for buffer %Ld\n", buffer_num);
+#else
 					ERROR("MixerCore: SendBuffer failed\n");
+#endif
 					buf->Recycle();
 				}
 			} else {
+#if DEBUG
+				ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n", buffer_num);
+#else
 				ERROR("MixerCore: RequestBuffer failed\n");
+#endif
 			}
 			goto schedule_next_event;
 		}
@@ -550,7 +564,10 @@ MixerCore::MixThread()
 
 		// request a buffer
 		BBuffer	*buf;
-		buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, 5000);
+		{
+//		BStopWatch w("buffer requ");
+		buf = fBufferGroup->RequestBuffer(fOutput->MediaOutput().format.u.raw_audio.buffer_size, buffer_request_timeout);
+		}
 		if (buf) {
 		
 			// copy data from mix buffer into output buffer
@@ -576,12 +593,25 @@ MixerCore::MixThread()
 			fOutput->AdjustByteOrder(buf);
 		
 			// send the buffer
-			if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {
+			status_t res;
+			{
+//				BStopWatch watch("buffer send");
+				res = fNode->SendBuffer(buf, fOutput->MediaOutput().destination);
+			}
+			if (B_OK != res) {
+#if DEBUG
+				ERROR("MixerCore: SendBuffer failed for buffer %Ld\n", buffer_num);
+#else
 				ERROR("MixerCore: SendBuffer failed\n");
+#endif
 				buf->Recycle();
 			}
 		} else {
+#if DEBUG
+			ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n", buffer_num);
+#else
 			ERROR("MixerCore: RequestBuffer failed\n");
+#endif
 		}
 
 		// make all lists empty
@@ -595,5 +625,8 @@ schedule_next_event:
 		frame_pos += fMixBufferFrameCount;
 		event_time = time_base + bigtime_t((1000000LL * frame_pos) / fMixBufferFrameRate);
 		Unlock();
+#if DEBUG
+		buffer_num++;
+#endif
 	}
 }
