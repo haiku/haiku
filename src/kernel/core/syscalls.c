@@ -27,6 +27,10 @@
 #include <sys/ioccom.h>
 #include <sys/socket.h>
 
+#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
+#include <arch/atomic.h>
+#endif
+
 #define INT32TOINT64(x, y) ((int64)(x) | ((int64)(y) << 32))
 
 #define arg0  (((uint32 *)arg_buffer)[0])
@@ -353,6 +357,8 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SETRLIMIT:
 			*call_ret = user_setrlimit((int)arg0, (const struct rlimit *)arg1);
 			break;
+
+#ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 		case SYSCALL_ATOMIC_ADD:
 			*call_ret = user_atomic_add((int32 *)arg0, (int32)arg1);
 			break;
@@ -368,6 +374,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_TEST_AND_SET:
 			*call_ret = user_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
 			break;
+#endif
 
 		// image calls
 		case SYSCALL_REGISTER_IMAGE:
