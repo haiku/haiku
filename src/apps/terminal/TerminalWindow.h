@@ -25,10 +25,17 @@ public:
 	virtual void      MenusBeginning(void);
 	virtual status_t  InitCheck(void);
 	
-private: 
+private:
 	status_t          InitWindow(int32 id, entry_ref * settingsRef = 0);
 	status_t          RestoreSettings(entry_ref * settingsRef = 0);
 
+	// message received helpers
+	void              StartNewTerminal(BMessage * message);
+	void              SwitchTerminals(BMessage * message);
+	void              EditCopy(BMessage * message);
+	void              EditPaste(BMessage * message);
+	void              EditClearAll(BMessage * message);
+	
 	// Menu variables
 	BMenuBar		*fMenuBar;
 	

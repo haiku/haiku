@@ -22,6 +22,8 @@
 #include <TerminalTextView.h>
 #include <TerminalWindow.h>
 
+#include <debugger.h>
+
 int id = 1;
 
 TerminalWindow::TerminalWindow(BPoint topLeft, BMessage * settings)
@@ -238,21 +240,20 @@ void
 TerminalWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what){
-		case TERMINAL_START_NEW_TERMINAL: {
-			status_t result = be_roster->Launch(APP_SIGNATURE);
-			if (result != B_OK) {
-				// TODO: notify user
-			}
-		}
+		case TERMINAL_START_NEW_TERMINAL:
+			StartNewTerminal(message);
 		break;
+		case TERMINAL_SWITCH_TERMINAL:
+			SwitchTerminals(message);
+		break;	
 		case B_COPY:
-			fTextView->Copy(be_clipboard);
+			EditCopy(message);
 		break;
 		case B_PASTE:
-			fTextView->Paste(be_clipboard);
+			EditPaste(message);
 		break;			
 		case EDIT_CLEAR_ALL:
-			fTextView->Clear();
+			EditClearAll(message);
 		break;
 //		case FONT_SIZE:
 //		{
@@ -317,3 +318,57 @@ TerminalWindow::QuitRequested()
 	return true;
 }
 	
+void
+TerminalWindow::StartNewTerminal(BMessage * message)
+{
+	status_t result = be_roster->Launch(APP_SIGNATURE);
+	if (result != B_OK) {
+		// TODO: notify user
+		debugger("TerminalWindow::StartNewTerminal failed in Launch");
+	}
+}
+
+void
+TerminalWindow::SwitchTerminals(BMessage * message)
+{
+	status_t result;
+	thread_id id = find_thread(NULL);
+	thread_info info;
+	result = get_thread_info(id,&info);
+	if (result != B_OK) {
+		// TODO: notify user
+		debugger("TerminalWindow::SwitchTerminals failed in get_thread_info");
+		return;
+	}
+	BList teams;
+	be_roster->GetAppList(APP_SIGNATURE,&teams);
+	int32 index = teams.IndexOf((void*)info.team);
+	if (index < -1) {
+		// TODO: notify user
+		debugger("TerminalWindow::SwitchTerminals failed in IndexOf");
+		return;
+	}
+	do {
+		index = (index-1)%teams.CountItems();
+		team_id next = (team_id)teams.ItemAt(index);
+		result = be_roster->ActivateApp(next);
+	} while (result != B_OK);
+}
+
+void
+TerminalWindow::EditCopy(BMessage * message)
+{
+	fTextView->Copy(be_clipboard);
+}
+
+void
+TerminalWindow::EditPaste(BMessage * message)
+{
+	fTextView->Paste(be_clipboard);
+}
+
+void
+TerminalWindow::EditClearAll(BMessage * message)
+{
+	fTextView->Clear();
+}
