@@ -23,6 +23,7 @@
 #include <TimeSource.h>
 #include <Buffer.h>
 #include <ParameterWeb.h>
+#include <MediaRoster.h>
 #include <limits.h>
 
 #include "../AbstractFileInterfaceNode.h"
@@ -32,139 +33,8 @@
 #include <string.h>
 
 // -------------------------------------------------------- //
-// ctor/dtor
+// lib functions
 // -------------------------------------------------------- //
-
-MediaReader::~MediaReader(void)
-{
-	fprintf(stderr,"MediaReader::~MediaReader\n");
-	if (fBufferGroup != 0) {
-		BBufferGroup * group = fBufferGroup;
-		fBufferGroup = 0;
-		delete group;
-	}	
-}
-
-MediaReader::MediaReader(
-				size_t defaultChunkSize = 8192,
-				float defaultBitRate = 800000,
-				const flavor_info * info = 0,
-				BMessage * config = 0,
-				BMediaAddOn * addOn = 0)
-	: BMediaNode("MediaReader"),
-	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
-	  BBufferProducer(B_MEDIA_MULTISTREAM)
-{
-	fprintf(stderr,"MediaReader::MediaReader\n");
-	// null some fields
-	fBufferGroup = 0;	
-	// start enabled
-	fOutputEnabled = true;
-	// don't overwrite available space, and be sure to terminate
-	strncpy(output.name,"MediaReader Output",B_MEDIA_NAME_LENGTH-1);
-	output.name[B_MEDIA_NAME_LENGTH-1] = '\0';
-	// initialize the output
-	output.node = media_node::null;     // until registration
-	output.source = media_source::null; // until registration
-	output.destination = media_destination::null;
-	GetFormat(&output.format);
-}
-
-// -------------------------------------------------------- //
-// implementation of BMediaNode
-// -------------------------------------------------------- //
-
-void MediaReader::Preroll(void)
-{
-	fprintf(stderr,"MediaReader::Preroll\n");
-	// XXX:Performance opportunity
-	BMediaNode::Preroll();
-}
-
-status_t MediaReader::HandleMessage(
-				int32 message,
-				const void * data,
-				size_t size)
-{
-	fprintf(stderr,"MediaReader::HandleMessage\n");
-	status_t status = B_OK;
-	switch (message) {
-		// no special messages for now
-		default:
-			status = BBufferProducer::HandleMessage(message,data,size);
-			if (status == B_OK) {
-				break;
-			}
-			status = AbstractFileInterfaceNode::HandleMessage(message,data,size);
-			break;
-	}
-	return status;
-}
-
-void MediaReader::NodeRegistered(void)
-{
-	fprintf(stderr,"MediaReader::NodeRegistered\n");
-	
-	// now we can do this
-	output.node = Node();
-	output.source.id = 0;
-	output.source.port = output.node.port; // same as ControlPort();
-
-	// creates the parameter web and starts the looper thread
-	AbstractFileInterfaceNode::NodeRegistered();
-}
-
-// -------------------------------------------------------- //
-// implementation of BFileInterface
-// -------------------------------------------------------- //
-
-status_t MediaReader::SetRef(
-				const entry_ref & file,
-				bool create,
-				bigtime_t * out_time)
-{
-	fprintf(stderr,"MediaReader::SetRef\n");
-	status_t status = AbstractFileInterfaceNode::SetRef(file,B_READ_ONLY,create,out_time);
-	if (status != B_OK) {
-		fprintf(stderr,"AbstractFileInterfaceNode::SetRef returned an error\n");
-		return status;
-	}
-	// reset the format, and set the requirements imposed by this file
-	GetFormat(&output.format);
-	AddRequirements(&output.format);
-	// if we are connected we have to re-negotiate the connection
-	if (output.destination != media_destination::null) {
-		fprintf(stderr,"  error connection re-negotiation not implemented");
-		// XXX: implement re-negotiation
-	}
-	return B_OK;	
-}
-
-// -------------------------------------------------------- //
-// implemention of BBufferProducer
-// -------------------------------------------------------- //
-
-// They are asking us to make the first offering.
-// So, we get a fresh format and then add requirements based
-// on the current file. (if any)
-status_t MediaReader::FormatSuggestionRequested(
-				media_type type,
-				int32 quality,
-				media_format * format)
-{
-	fprintf(stderr,"MediaReader::GetRef\n");
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
-	if ((type != B_MEDIA_MULTISTREAM) && (type != B_MEDIA_UNKNOWN_TYPE)) {
-		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
-		return B_MEDIA_BAD_FORMAT;
-	}
-	GetFormat(format);
-	AddRequirements(format);
-	return B_OK;
-}
 
 /*
 void print_multistream_format(media_multistream_format * format) {
@@ -281,6 +151,196 @@ bool format_is_acceptible(
 	}
 	// should also check non-type fields?
 	return true;
+}
+
+// -------------------------------------------------------- //
+// ctor/dtor
+// -------------------------------------------------------- //
+
+MediaReader::~MediaReader(void)
+{
+	fprintf(stderr,"MediaReader::~MediaReader\n");
+	if (fBufferGroup != 0) {
+		BBufferGroup * group = fBufferGroup;
+		fBufferGroup = 0;
+		delete group;
+	}	
+}
+
+MediaReader::MediaReader(
+				size_t defaultChunkSize = 8192,
+				float defaultBitRate = 800000,
+				const flavor_info * info = 0,
+				BMessage * config = 0,
+				BMediaAddOn * addOn = 0)
+	: BMediaNode("MediaReader"),
+	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
+	  BBufferProducer(B_MEDIA_MULTISTREAM)
+{
+	fprintf(stderr,"MediaReader::MediaReader\n");
+	// null some fields
+	fBufferGroup = 0;	
+	// start enabled
+	fOutputEnabled = true;
+	// don't overwrite available space, and be sure to terminate
+	strncpy(output.name,"MediaReader Output",B_MEDIA_NAME_LENGTH-1);
+	output.name[B_MEDIA_NAME_LENGTH-1] = '\0';
+	// initialize the output
+	output.node = media_node::null;     // until registration
+	output.source = media_source::null; // until registration
+	output.destination = media_destination::null;
+	GetFormat(&output.format);
+}
+
+// -------------------------------------------------------- //
+// implementation of BMediaNode
+// -------------------------------------------------------- //
+
+void MediaReader::Preroll(void)
+{
+	fprintf(stderr,"MediaReader::Preroll\n");
+	// XXX:Performance opportunity
+	BMediaNode::Preroll();
+}
+
+status_t MediaReader::HandleMessage(
+				int32 message,
+				const void * data,
+				size_t size)
+{
+	fprintf(stderr,"MediaReader::HandleMessage\n");
+	status_t status = B_OK;
+	switch (message) {
+		// no special messages for now
+		default:
+			status = BBufferProducer::HandleMessage(message,data,size);
+			if (status == B_OK) {
+				break;
+			}
+			status = AbstractFileInterfaceNode::HandleMessage(message,data,size);
+			break;
+	}
+	return status;
+}
+
+void MediaReader::NodeRegistered(void)
+{
+	fprintf(stderr,"MediaReader::NodeRegistered\n");
+	
+	// now we can do this
+	output.node = Node();
+	output.source.id = 0;
+	output.source.port = output.node.port; // same as ControlPort();
+
+	// creates the parameter web and starts the looper thread
+	AbstractFileInterfaceNode::NodeRegistered();
+}
+
+// -------------------------------------------------------- //
+// implementation of BFileInterface
+// -------------------------------------------------------- //
+
+status_t MediaReader::SetRef(
+				const entry_ref & file,
+				bool create,
+				bigtime_t * out_time)
+{
+	fprintf(stderr,"MediaReader::SetRef\n");
+	status_t status = AbstractFileInterfaceNode::SetRef(file,B_READ_ONLY,create,out_time);
+	if (status != B_OK) {
+		fprintf(stderr,"AbstractFileInterfaceNode::SetRef returned an error\n");
+		return status;
+	}
+	if (output.destination == media_destination::null) {
+		// reset the format, and set the requirements imposed by this file
+		GetFormat(&output.format);
+		AddRequirements(&output.format);
+		return B_OK;
+	}
+	// if we are connected we may have to re-negotiate the connection
+	media_format format;
+	GetFormat(&format);
+	AddRequirements(&format);
+	if (format_is_acceptible(format,output.format)) {
+		fprintf(stderr,"  compatible format = no re-negotiation necessary\n");
+		return B_OK;
+	}
+	// first try the easy way : SORRY DEPRECATED into private :-(
+	// this code from MediaWriter would be different for MediaReader even if it worked...
+//	int32 change_tag = NewChangeTag();
+//	status = this->BBufferConsumer::RequestFormatChange(output.source,output.destination,&format,&change_tag);
+//	if (status == B_OK) {
+//		fprintf(stderr,"  format change successful\n");
+//		return B_OK;
+//	}
+	// okay, the hard way requires we get the MediaRoster
+	BMediaRoster * roster = BMediaRoster::Roster(&status);
+	if (roster == 0) {
+		return B_MEDIA_SYSTEM_FAILURE;
+	}
+	if (status != B_OK) {
+		return status;
+	}
+	// before disconnect one should always stop the nodes (bebook says)
+	// requires run_state cast since the return type on RunState() is
+	// wrong [int32]
+	run_state destinationRunState = run_state(RunState());
+	if (destinationRunState == BMediaEventLooper::B_STARTED) {
+		Stop(0,true); // stop us right now
+	}
+	// should also stop the destination if it is running, but how?
+/*	BMediaNode destinationNode = ??
+	run_state destinationRunState = destinationNode->??;
+	status = destinationNode->StopNode(??,0,true);
+	if (status != B_OK) {
+		return status;
+	}  */
+	// we should disconnect right now
+	media_destination outputDestination = output.destination;
+	status = roster->Disconnect(output.source.id,output.source,
+							    output.destination.id,output.destination);
+	if (status != B_OK) {
+		return status;
+	}
+	// if that went okay, we'll try reconnecting	
+	media_output connectOutput;
+	media_input connectInput;
+	status = roster->Connect(output.source,outputDestination,
+							 &format,&connectOutput,&connectInput);
+	if (status != B_OK) {
+		return status;
+	}
+	// now restart if necessary
+	if (destinationRunState == BMediaEventLooper::B_STARTED) {
+		Start(0);
+	}							 
+	return status;
+}
+
+// -------------------------------------------------------- //
+// implemention of BBufferProducer
+// -------------------------------------------------------- //
+
+// They are asking us to make the first offering.
+// So, we get a fresh format and then add requirements based
+// on the current file. (if any)
+status_t MediaReader::FormatSuggestionRequested(
+				media_type type,
+				int32 quality,
+				media_format * format)
+{
+	fprintf(stderr,"MediaReader::GetRef\n");
+	if (format == 0) {
+		fprintf(stderr,"<- B_BAD_VALUE\n");
+		return B_BAD_VALUE; // no crashing
+	}
+	if ((type != B_MEDIA_MULTISTREAM) && (type != B_MEDIA_UNKNOWN_TYPE)) {
+		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
+		return B_MEDIA_BAD_FORMAT;
+	}
+	GetFormat(format);
+	AddRequirements(format);
+	return B_OK;
 }
 
 // They made an offer to us.  We should make sure that the offer is
