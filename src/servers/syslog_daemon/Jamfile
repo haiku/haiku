@@ -2,7 +2,7 @@ SubDir OBOS_TOP src servers syslog_daemon ;
 
 UsePrivateHeaders syslog_daemon ;
 
-AddResources syslog_daemon : SyslogDaemon.rsrc ;
+AddResources syslog_daemon : SyslogDaemon.rdef ;
 
 Server syslog_daemon :
 	SyslogDaemon.cpp
