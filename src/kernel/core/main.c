@@ -35,6 +35,7 @@
 #include <real_time_clock.h>
 #include <kernel_daemon.h>
 #include <messaging.h>
+#include <user_debugger.h>
 
 #include <string.h>
 
@@ -192,6 +193,10 @@ main2(void *unused)
 		// with the kernel args ranges it contains (and which are freed here).
 		vm_free_kernel_args(&ka);
 	}
+
+	// init userland debugging
+	TRACE(("Init Userland debugging\n"));
+	init_user_debug();
 
 	// init the messaging service
 	TRACE(("Init Messaging Service\n"));
