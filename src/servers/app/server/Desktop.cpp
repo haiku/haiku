@@ -327,17 +327,17 @@ void Desktop::MouseEventHandler(int32 code, BPortLink& msg)
 			{
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
-#if 0
-printf("Target: %s\n", target->GetName());
-printf("Front: %s\n", ws->FrontLayer()->GetName());
-printf("Focus: %s\n", ws->FocusLayer()->GetName());
-#endif
-				if (target != ws->FrontLayer())
+				
+				STRACE(("Target: %s\n", target->GetName()));
+				STRACE(("Front: %s\n", ws->FrontLayer()->GetName()));
+				STRACE(("Focus: %s\n", ws->FocusLayer()->GetName()));
+				
+				WinBorder		*previousFocus=NULL;
+				WinBorder		*activeFocus=NULL;
+				BRegion			invalidRegion;
+				
+				if (target!=ws->FrontLayer())
 				{
-					WinBorder		*previousFocus=NULL;
-					WinBorder		*activeFocus=NULL;
-					BRegion			invalidRegion;
-
 					ws->BringToFrontANormalWindow(target);
 					ws->SearchAndSetNewFront(target);
 					previousFocus	= ws->FocusLayer();
@@ -351,7 +351,7 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 					else
 						target->MouseDown(evt, false);
 
-					// may be or may be empty.
+					// may or may not be empty.
 					
 					// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
 					invalidRegion.Include(&(activeFocus->fFull));
@@ -369,11 +369,10 @@ printf("Focus: %s\n", ws->FocusLayer()->GetName());
 					}
 
 					fMouseTarget = target;
-#if 0
-printf("2Target: %s\n", target->GetName());
-printf("2Front: %s\n", ws->FrontLayer()->GetName());
-printf("2Focus: %s\n", ws->FocusLayer()->GetName());
-#endif
+
+					STRACE(("2Target: %s\n", target->GetName()));
+					STRACE(("2Front: %s\n", ws->FrontLayer()->GetName()));
+					STRACE(("2Focus: %s\n", ws->FocusLayer()->GetName()));
 
 					activeFocus->Window()->Unlock();
 				}
@@ -385,6 +384,39 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 						target->Window()->Lock();
 						target->MouseDown(evt, true);
 						target->Window()->Unlock();
+					}
+					else
+					{
+						previousFocus	= ws->FocusLayer();
+						ws->SearchAndSetNewFocus(target);
+						activeFocus		= ws->FocusLayer();
+					
+						activeFocus->Window()->Lock();
+	
+						if (target == activeFocus && target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK)
+							target->MouseDown(evt, true);
+						else
+							target->MouseDown(evt, false);
+	
+						// may or may not be empty.
+						
+						// TODO: B_MOUSE_DOWN: what if modal of floating windows are in front of us?
+						invalidRegion.Include(&(activeFocus->fFull));
+						invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
+						activeFocus->fParent->RebuildAndForceRedraw(invalidRegion, activeFocus);
+	
+						if (previousFocus != activeFocus && previousFocus)
+						{
+							if (previousFocus->fVisible.CountRects() > 0)
+							{
+								invalidRegion.MakeEmpty();
+								invalidRegion.Include(&(previousFocus->fVisible));
+								activeFocus->fParent->Invalidate(invalidRegion);
+							}
+						}
+						fMouseTarget = target;
+	
+						activeFocus->Window()->Unlock();
 					}
 				}
 

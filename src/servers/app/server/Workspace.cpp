@@ -28,6 +28,8 @@
 //					This object does not use any locking mechanism. It is designed
 //					to be used only by RootLayer class. DO NOT USE from another class!
 //------------------------------------------------------------------------------
+#include <AppDefs.h>
+#include <Message.h>
 #include <stdio.h>
 #include <Window.h>
 
@@ -1093,7 +1095,7 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 		preferred	= fBottomItem? fBottomItem->layerPtr : NULL;
 	
 	bool		selectOthers = false;
-	ListData	*item = NULL;
+	ListData	*item=NULL;
 	
 	for(item = fBottomItem; item != NULL; item = item->upperItem)
 	{
@@ -1155,10 +1157,34 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 	
 	if(item != fFocusItem)
 	{
-		// TODO: redraw old item in inactive colors & send message to client
-		// TODO: redraw new item in active colors & send message to client
-		// TODO: Rebuild & Redraw.
-		fFocusItem		= item;
+		if(fFocusItem)
+		{
+			ListData *oldItem=fFocusItem;
+			
+			oldItem->layerPtr->HighlightDecorator(false);
+			
+			BMessage inactive(B_WINDOW_ACTIVATED);
+			inactive.AddInt64("when",system_time());
+			inactive.AddBool("active",false);
+			oldItem->layerPtr->Window()->Lock();
+			oldItem->layerPtr->Window()->SendMessageToClient(&inactive);
+			oldItem->layerPtr->Window()->Unlock();
+		}
+		
+		fFocusItem=item;
+		
+		if(fFocusItem)
+		{
+			fFocusItem->layerPtr->HighlightDecorator(true);
+			
+			BMessage active(B_WINDOW_ACTIVATED);
+			active.AddInt64("when",system_time());
+			active.AddBool("active",true);
+			
+			fFocusItem->layerPtr->Window()->Lock();
+			fFocusItem->layerPtr->Window()->SendMessageToClient(&active);
+			fFocusItem->layerPtr->Window()->Unlock();
+		}
 	}
 }
 
