@@ -15,7 +15,6 @@
 #include "KeyboardSettings.h"
 #include "KeyboardMessages.h"
 
-const char KeyboardSettings::kKeyboardSettingsFile[] = "Keyboard_settings";
 
 KeyboardSettings::KeyboardSettings()
 {
@@ -30,7 +29,7 @@ KeyboardSettings::KeyboardSettings()
 	BPath path;
 	
 	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) == B_OK) {
-		path.Append(kKeyboardSettingsFile);
+		path.Append(kb_settings_file);
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
 			// Now read in the data
@@ -51,7 +50,7 @@ KeyboardSettings::~KeyboardSettings()
 	if (find_directory(B_USER_SETTINGS_DIRECTORY,&path) < B_OK)
 		return;
 
-	path.Append(kKeyboardSettingsFile);
+	path.Append(kb_settings_file);
 
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	if (file.InitCheck() == B_OK) {

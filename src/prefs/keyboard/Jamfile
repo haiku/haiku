@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src prefs keyboard ;
 
+UsePrivateHeaders input ;
+
 AddResources Keyboard : Keyboard.rdef ;
 
 Preference Keyboard : 

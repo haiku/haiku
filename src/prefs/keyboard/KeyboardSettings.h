@@ -9,11 +9,7 @@
 #define KEYBOARD_SETTINGS_H_
 
 #include <SupportDefs.h>
-
-typedef struct {
-        bigtime_t       key_repeat_delay;
-        int32           key_repeat_rate;
-} kb_settings;
+#include "kb_mouse_settings.h"
 
 class KeyboardSettings{
 public :
