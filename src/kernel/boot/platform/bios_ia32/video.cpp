@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -15,13 +15,22 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
+#include <util/list.h>
 
+#include <stdio.h>
 #include <string.h>
 
 
+struct video_mode {
+	list_link	link;
+	uint16		mode;
+	int32		width, height, bits_per_pixel;
+};
+
 static vbe_info_block sInfo;
-uint16 sMode;
+video_mode *sMode;
 bool sVesaCompatible;
+struct list sModeList;
 
 
 static void
@@ -93,12 +102,15 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 
 
 static status_t
-vesa_init(vbe_info_block *info, uint16 *_standardMode)
+vesa_init(vbe_info_block *info, video_mode **_standardMode)
 {
 	if (vesa_get_vbe_info_block(info) != B_OK)
 		return B_ERROR;
 
-	dprintf("mode list:\n");
+	// fill mode list
+
+	video_mode *standardMode = NULL;
+
 	int32 i = 0;
 	while (true) {
 		uint16 mode = ((uint16 *)info->mode_list)[i++];
@@ -117,22 +129,45 @@ vesa_init(vbe_info_block *info, uint16 *_standardMode)
 			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE | MODE_ATTR_GRAPHICS_MODE
 								| MODE_ATTR_COLOR_MODE | MODE_ATTR_LINEAR_BUFFER;
 
-			if (modeInfo.width >= 800
+			if (modeInfo.width >= 640
 				&& modeInfo.physical_base != 0
 				&& modeInfo.num_planes == 1
 				&& (modeInfo.memory_model == MODE_MEMORY_PACKED_PIXEL
 					|| modeInfo.memory_model == MODE_MEMORY_DIRECT_COLOR)
-				&& (modeInfo.attributes & requiredAttributes) == requiredAttributes
-				&& modeInfo.bits_per_pixel == 8) {
-				*_standardMode = mode;
-				return B_OK;
+				&& (modeInfo.attributes & requiredAttributes) == requiredAttributes) {
+				// this mode fits our needs
+				video_mode *videoMode = (video_mode *)malloc(sizeof(struct video_mode));
+				if (videoMode == NULL)
+					continue;
+
+				videoMode->mode = mode;
+				videoMode->width = modeInfo.width;
+				videoMode->height = modeInfo.height;
+				videoMode->bits_per_pixel = modeInfo.bits_per_pixel;
+
+				// ToDo: for now, only accept 8 bit modes as standard
+				if (standardMode == NULL && modeInfo.bits_per_pixel == 8)
+					standardMode = videoMode;
+				else if (standardMode != NULL) {
+					// switch to the one with the higher resolution
+					// ToDo: is that always a good idea?
+					if (modeInfo.width > standardMode->width)
+						standardMode = videoMode;
+				}
+
+				list_add_item(&sModeList, videoMode);
 			}
 		} else
 			dprintf("(failed)\n");
 	}
 
-	// no usable VESA mode found...
-	return B_ERROR;
+	if (standardMode == NULL) {
+		// no usable VESA mode found...
+		return B_ERROR;
+	}
+
+	*_standardMode = standardMode;
+	return B_OK;
 }
 
 
@@ -209,11 +244,11 @@ vesa_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 extern "C" void
 platform_switch_to_logo(void)
 {
-	if (!sVesaCompatible)
+	if (!sVesaCompatible || sMode == NULL)
 		// no logo for now...
 		return;
 
-	if (vesa_set_mode(sMode) != B_OK)
+	if (vesa_set_mode(sMode->mode) != B_OK)
 		return;
 
 	gKernelArgs.fb.enabled = 1;
@@ -221,7 +256,7 @@ platform_switch_to_logo(void)
 	if (!gKernelArgs.fb.already_mapped) {
 		// the graphics memory has not been mapped yet!
 		struct vbe_mode_info modeInfo;
-		if (vesa_get_mode_info(sMode, &modeInfo) != B_OK) {
+		if (vesa_get_mode_info(sMode->mode, &modeInfo) != B_OK) {
 			platform_switch_to_text_mode();
 			return;
 		}
@@ -276,7 +311,7 @@ platform_switch_to_text_mode(void)
 Menu *
 video_mode_menu()
 {
-	Menu *menu = new Menu(CHOICE_MENU);
+	Menu *menu = new Menu(CHOICE_MENU, "Select video mode:");
 	MenuItem *item;
 
 	menu->AddItem(item = new MenuItem("Default"));
@@ -285,13 +320,13 @@ video_mode_menu()
 
 	menu->AddItem(new MenuItem("Standard VGA"));
 
-	if (sVesaCompatible) {
-		// add VESA modes
-		menu->AddItem(new MenuItem("1024x768 32bit"));
-		menu->AddItem(new MenuItem("800x600 16bit"));
-		menu->AddItem(new MenuItem("800x600 15bit"));
-		menu->AddItem(new MenuItem("800x600 8bit"));
-		menu->AddItem(new MenuItem("640x480 8bit"));
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		char label[64];
+		sprintf(label, "%ldx%ld %ld bit", mode->width, mode->height, mode->bits_per_pixel);
+
+		menu->AddItem(item = new MenuItem(label));
+		item->SetData(mode);
 	}
 
 	menu->AddSeparatorItem();
@@ -301,10 +336,11 @@ video_mode_menu()
 }
 
 
-extern "C" status_t
-video_init(void)
+extern "C" status_t 
+platform_init_video(void)
 {
 	gKernelArgs.fb.enabled = 0;
+	list_init(&sModeList);
 
 	sVesaCompatible = vesa_init(&sInfo, &sMode) == B_OK;
 	if (!sVesaCompatible) {
