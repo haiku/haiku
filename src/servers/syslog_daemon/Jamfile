@@ -8,6 +8,13 @@ Server syslog_daemon :
 	SyslogDaemon.cpp
 	syslog_output.cpp
 	listener_output.cpp
+
+	# that's for a successful build on R5
+	strlcpy.c
 	;
 
 LinkSharedOSLibs syslog_daemon : be ;
+
+SEARCH on [ FGristFiles
+		strlcpy.c
+	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
