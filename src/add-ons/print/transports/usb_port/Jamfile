@@ -1,14 +1,15 @@
 SubDir OBOS_TOP src add-ons print transports usb_port ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
-
 UsePrivateHeaders interface print ;
 
 Addon USB\ Port : Print transport : 
-	print_transport.cpp
+	USBTransport.cpp
+	PrintTransportAddOn.o
 ;
 
-LinkSharedOSLibs USB\ Port : be libprinttransportaddon.a ;
+ObjectReferences <src!add-ons!print!shared>PrintTransportAddOn.o ;
+LinkSharedOSLibs USB\ Port : be ;
 
 Package haiku-printingkit-cvs :
 	USB\ Port :

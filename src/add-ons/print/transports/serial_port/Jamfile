@@ -1,14 +1,15 @@
 SubDir OBOS_TOP src add-ons print transports serial_port ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
-
 UsePrivateHeaders interface print ;
 
 Addon Serial\ Port : Print transport : 
-	print_transport.cpp
+	SerialTransport.cpp
+	PrintTransportAddOn.o
 ;
 
-LinkSharedOSLibs Serial\ Port : be libprinttransportaddon.a ;
+ObjectReferences <src!add-ons!print!shared>PrintTransportAddOn.o ;
+LinkSharedOSLibs Serial\ Port : be ;
 
 Package haiku-printingkit-cvs :
 	Serial\ Port :
