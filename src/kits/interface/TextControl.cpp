@@ -221,7 +221,6 @@ void BTextControl::Draw(BRect updateRect)
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT),
 	nav = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	BRect bounds(Bounds());
 	bool enabled = IsEnabled();
 	bool active = false;
 
