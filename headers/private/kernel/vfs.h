@@ -115,8 +115,8 @@ int sys_create_link(const char *path, const char *toPath);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
 int sys_access(const char *path, int mode);
-int sys_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
-int sys_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
+status_t _kern_read_path_stat(const char *path, bool traverseLink, struct stat *stat, size_t statSize);
+status_t _kern_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, size_t statSize, int statMask);
 int sys_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask);
 int sys_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
@@ -157,8 +157,8 @@ int user_create_link(const char *path, const char *toPath);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
 int user_access(const char *path, int mode);
-int user_read_path_stat(const char *path, bool traverseLink, struct stat *stat);
-int user_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, int statMask);
+status_t _user_read_path_stat(const char *path, bool traverseLink, struct stat *stat, size_t statSize);
+status_t _user_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, size_t statSize, int statMask);
 int user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask);
 int user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
@@ -180,8 +180,8 @@ extern ssize_t sys_write(int fd, off_t pos, const void *buffer, size_t bufferSiz
 extern int sys_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t sys_rewind_dir(int fd);
-extern int sys_read_stat(int fd, struct stat *stat);
-extern int sys_write_stat(int fd, const struct stat *stat, int statMask);
+extern status_t _kern_read_stat(int fd, struct stat *stat, size_t statSize);
+extern status_t _kern_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask);
 extern int sys_close(int fd);
 extern int sys_dup(int fd);
 extern int sys_dup2(int ofd, int nfd);
@@ -192,8 +192,8 @@ extern ssize_t user_write(int fd, off_t pos, const void *buffer, size_t bufferSi
 extern int user_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t user_rewind_dir(int fd);
-extern int user_read_stat(int fd, struct stat *stat);
-extern int user_write_stat(int fd, const struct stat *stat, int statMask);
+extern status_t _user_read_stat(int fd, struct stat *stat, size_t statSize);
+extern status_t _user_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask);
 extern int user_close(int fd);
 extern int user_dup(int fd);
 extern int user_dup2(int ofd, int nfd);
