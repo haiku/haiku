@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers ;
 
+SubInclude OBOS_TOP src add-ons kernel bus_managers agp ;
 SubInclude OBOS_TOP src add-ons kernel bus_managers config_manager ;
 SubInclude OBOS_TOP src add-ons kernel bus_managers ide ;
 SubInclude OBOS_TOP src add-ons kernel bus_managers isa ;
