@@ -59,14 +59,18 @@ struct ico_bitmap_header {
 	void SwapFromHost();
 } _PACKED;
 
-struct ico_color {
+
+// More or less accidently, ICO colors are in the same format as
+// the color information in B_RGBA32 bitmaps
+
+struct rgba32_color {
 	uint8	blue;
 	uint8	green;
 	uint8	red;
 	uint8	alpha;
 
 	inline bool
-	operator==(const ico_color& other) const
+	operator==(const rgba32_color& other) const
 	{
 		return red == other.red && green == other.green && blue == other.blue;
 	}

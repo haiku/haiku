@@ -24,6 +24,9 @@
 using namespace ICO;
 
 
+static const rgba32_color kMagicTransparentColor = *(rgba32_color *)&B_TRANSPARENT_MAGIC_RGBA32;
+
+
 class TempAllocator {
 	public:
 		TempAllocator() : fMemory(NULL) {}
@@ -170,8 +173,15 @@ get_alpha_value(color_space space, uint32 value)
 }
 
 
+static uint16
+rgba32_color_to_16_bit_color(rgba32_color &color)
+{
+	return ((color.blue >> 3) << 11) | ((color.green >> 2) << 5) | (color.red >> 3);
+}
+
+
 static int32
-find_ico_color(ico_color *palette, int32 numColors, ico_color &color)
+find_rgba32_color(rgba32_color *palette, int32 numColors, rgba32_color &color)
 {
 	// ToDo: sorting and binary search?
 	for (int32 i = 0; i < numColors; i++) {
@@ -183,18 +193,18 @@ find_ico_color(ico_color *palette, int32 numColors, ico_color &color)
 }
 
 
-static inline ico_color
-get_ico_color_from_bits(TranslatorBitmap &bitsHeader, uint8 *data, int32 x, int32 y)
+static inline rgba32_color
+get_rgba32_color_from_bits(TranslatorBitmap &bitsHeader, uint8 *data, int32 x, int32 y)
 {
 	data += bitsHeader.rowBytes * y;
 
 	switch (bitsHeader.colors) {
 		case B_RGBA32:
-			return *(ico_color *)(data + 4 * x);
+			return *(rgba32_color *)(data + 4 * x);
 		case B_RGB32:
 		default:
 			// stupid applications like ArtPaint use the alpha channel in B_RGB32 images...
-			ico_color color = *(ico_color *)(data + 4 * x);
+			rgba32_color color = *(rgba32_color *)(data + 4 * x);
 			if (color.alpha >= 128)
 				color.alpha = 255;
 			else
@@ -206,15 +216,15 @@ get_ico_color_from_bits(TranslatorBitmap &bitsHeader, uint8 *data, int32 x, int3
 
 
 static int32
-fill_palette(TranslatorBitmap &bitsHeader, uint8 *data, ico_color *palette)
+fill_palette(TranslatorBitmap &bitsHeader, uint8 *data, rgba32_color *palette)
 {
 	int32 numColors = 0;
 
 	for (int32 y = 0; y < bitsHeader.bounds.IntegerHeight() + 1; y++) {
 		for (int32 x = 0; x < bitsHeader.bounds.IntegerWidth() + 1; x++) {
-			ico_color color = get_ico_color_from_bits(bitsHeader, data, x, y);
+			rgba32_color color = get_rgba32_color_from_bits(bitsHeader, data, x, y);
 
-			int32 index = find_ico_color(palette, numColors, color);
+			int32 index = find_rgba32_color(palette, numColors, color);
 			if (index == -1) {
 				// add this color if there is space left
 				if (numColors == 256)
@@ -255,14 +265,16 @@ has_true_alpha_channel(color_space space, uint8 *data,
 
 static status_t
 convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
-	const uint32 *palette, BPositionIO &source,
+	const rgba32_color *palette, BPositionIO &source,
 	BPositionIO &target)
 {
 	uint16 bitsPerPixel = header.bits_per_pixel;
 
 	// round row bytes to next 4 byte boundary
 	int32 xorRowBytes = get_bytes_per_row(entry.width, header.bits_per_pixel);
-	int32 andRowBytes = get_bytes_per_row(entry.width, 1);
+	int32 andRowBytes = 0;
+	if (bitsPerPixel != 32)
+		andRowBytes = get_bytes_per_row(entry.width, 1);
 	int32 outRowBytes = entry.width * 4;
 
 	// allocate buffers
@@ -274,11 +286,14 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 		return B_NO_MEMORY;
 
 	int32 andDataSize = andRowBytes * entry.height;
-	uint8 *andData = (uint8 *)andAllocator.Allocate(andDataSize);
-	if (andData == NULL)
-		return B_NO_MEMORY;
+	uint8 *andData = NULL;
+	if (bitsPerPixel != 32) {
+		andData = (uint8 *)andAllocator.Allocate(andDataSize);
+		if (andData == NULL)
+			return B_NO_MEMORY;
+	}
 
-	uint32 *outRowData = (uint32 *)rowAllocator.Allocate(outRowBytes);
+	rgba32_color *outRowData = (rgba32_color *)rowAllocator.Allocate(outRowBytes);
 	if (outRowData == NULL)
 		return B_NO_MEMORY;
 
@@ -286,9 +301,11 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 	if (bytesRead != xorDataSize)
 		return B_BAD_DATA;
 
-	bytesRead = source.Read(andData, andDataSize);
-	if (bytesRead != andDataSize)
-		return B_BAD_DATA;
+	if (bitsPerPixel != 32) {
+		bytesRead = source.Read(andData, andDataSize);
+		if (bytesRead != andDataSize)
+			return B_BAD_DATA;
+	}
 
 	for (uint32 row = 0; row < entry.height; row++) {
 		for (uint32 x = 0; x < entry.width; x++) {
@@ -311,16 +328,37 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 				}
 
 				outRowData[x] = palette[index];
-			} else
-				outRowData[x] = ((uint32 *)line)[x];
+			} else {
+				switch (bitsPerPixel) {
+					case 16:
+					{
+						uint16 color = ((uint16 *)line)[x];
+						outRowData[x].blue = (color >> 11) << 3;
+						outRowData[x].green = ((color >> 5) & 0x3f) << 3;
+						outRowData[x].red = (color & 0x1f) << 3;
+						break;
+					}
+
+					case 24:
+						outRowData[x].red = ((rgba32_color *)line)[x].red;
+						outRowData[x].green = ((rgba32_color *)line)[x].green;
+						outRowData[x].blue = ((rgba32_color *)line)[x].blue;
+						break;
+
+					case 32:
+						outRowData[x] = ((rgba32_color *)line)[x];
+						break;
+				}
+			}
 
 			if (bitsPerPixel != 32) {
 				// set alpha channel
 				if (get_1_bit_per_pixel(get_data_row(andData, andDataSize, andRowBytes, row), x))
-					outRowData[x] = B_TRANSPARENT_MAGIC_RGBA32;
+					outRowData[x] = kMagicTransparentColor;
 				else
-					((ico_color *)&outRowData[x])->alpha = 255;
-			}
+					outRowData[x].alpha = 255;
+			} else if (outRowData[x].alpha == 0)
+				outRowData[x] = kMagicTransparentColor;
 		}
 
 		ssize_t bytesWritten = target.Write(outRowData, outRowBytes);
@@ -336,7 +374,7 @@ convert_data_to_bits(ico_dir_entry &entry, ico_bitmap_header &header,
 
 static status_t
 convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entry &entry,
-	ico_bitmap_header &header, ico_color *palette, BPositionIO &target)
+	ico_bitmap_header &header, rgba32_color *palette, BPositionIO &target)
 {
 	int32 bitsPerPixel = header.bits_per_pixel;
 
@@ -361,10 +399,10 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 
 	for (uint32 row = entry.height; row-- > 0;) {
 		for (uint32 x = 0; x < entry.width; x++) {
-			ico_color color = get_ico_color_from_bits(bitsHeader, bitsData, x, row);
+			rgba32_color color = get_rgba32_color_from_bits(bitsHeader, bitsData, x, row);
 
 			if (palette != NULL) {
-				uint8 index = find_ico_color(palette, numColors, color);
+				uint8 index = find_rgba32_color(palette, numColors, color);
 
 				switch (bitsPerPixel) {
 					case 1:
@@ -379,7 +417,30 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 						break;
 				}
 			} else {
-				// ToDo: true color modi
+				switch (bitsPerPixel) {
+					default:
+					case 16:
+					{
+						uint16 *data = (uint16 *)xorRowData;
+						data[x] = rgba32_color_to_16_bit_color(color); 
+						break;
+					}
+
+					case 24:
+					{
+						xorRowData[x * 3 + 0] = color.blue;
+						xorRowData[x * 3 + 1] = color.green;
+						xorRowData[x * 3 + 2] = color.red;
+						break;
+					}
+
+					case 32:
+					{
+						rgba32_color *data = (rgba32_color *)xorRowData;
+						data[x] = color;
+						break;
+					}
+				}
 			}
 		}
 
@@ -399,7 +460,7 @@ convert_bits_to_data(TranslatorBitmap &bitsHeader, uint8 *bitsData, ico_dir_entr
 
 	for (uint32 row = entry.height; row-- > 0;) {
 		for (uint32 x = 0; x < entry.width; x++) {
-			ico_color color = get_ico_color_from_bits(bitsHeader, bitsData, x, row);
+			rgba32_color color = get_rgba32_color_from_bits(bitsHeader, bitsData, x, row);
 			bool transparent = *(uint32 *)&color == B_TRANSPARENT_MAGIC_RGBA32 || color.alpha == 0;
 
 			set_1_bit_per_pixel(andRowData, x, transparent ? 1 : 0);
@@ -468,6 +529,9 @@ ICO::identify(BPositionIO &stream, int32 &bitsPerPixel)
 }
 
 
+/**	Converts an ICO image of any type into a B_RGBA32 B_TRANSLATOR_BITMAP.
+ */
+
 status_t
 ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 {
@@ -519,14 +583,14 @@ ICO::convert_ico_to_bits(BPositionIO &source, BPositionIO &target)
 	if (bitmapHeader.bits_per_pixel <= 8)
 		numColors = 1L << bitmapHeader.bits_per_pixel;
 
-	uint32 palette[256];
+	rgba32_color palette[256];
 	if (numColors > 0) {
 		if (source.Read(palette, numColors * 4) != numColors * 4)
 			return B_BAD_VALUE;
 
-		// clear alpha channel
+		// clear alpha channel (it's not used in ICO color information)
 		for (int32 i = 0; i < numColors; i++)
-			palette[i] &= 0xffffff;
+			palette[i].alpha = 0;
 	}
 
 	// write out Be's Bitmap header
@@ -577,7 +641,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 	if (bytesRead < B_OK)
 		return bytesRead;
 
-	ico_color palette[256];
+	rgba32_color palette[256];
 	if (bitsPerPixel > 8) {
 		// it's a non-palette mode - but does it have to be?
 		if (bitsHeader.colors != B_RGBA32
@@ -627,7 +691,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 
 	entry.size = sizeof(ico_bitmap_header) + width * (xorRowBytes + andRowBytes);
 	if (bitsPerPixel <= 8)
-		entry.size += numColors * sizeof(ico_color);
+		entry.size += numColors * sizeof(rgba32_color);
 	entry.offset = sizeof(ico_header) + sizeof(ico_dir_entry);
 	entry.reserved = 0;
 
@@ -658,7 +722,7 @@ ICO::convert_bits_to_ico(BPositionIO &source, TranslatorBitmap &bitsHeader, BPos
 	bitmapHeader.SwapToHost();
 
 	if (bitsPerPixel <= 8) {
-		bytesWritten = target.Write(palette, numColors * sizeof(ico_color));
+		bytesWritten = target.Write(palette, numColors * sizeof(rgba32_color));
 		if (bytesWritten < B_OK)
 			return bytesWritten;
 	}
