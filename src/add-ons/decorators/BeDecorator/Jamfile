@@ -8,3 +8,5 @@ Addon BeDecorator : decorators :
 	DisplayDriver.cpp
 	RGBColor.cpp
 ;
+
+LinkSharedOSLibs BeDecorator : be ;
