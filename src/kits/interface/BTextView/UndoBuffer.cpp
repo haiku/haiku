@@ -34,6 +34,7 @@
 #include <Clipboard.h>
 
 // Local Includes --------------------------------------------------------------
+#include "MoreUTF8.h"
 #include "UndoBuffer.h"
 
 
@@ -337,23 +338,14 @@ _BTypingUndoBuffer_::Reset()
 }
 
 
-
-// TODO: This isn't completely safe and it's even slower than parsing byte
-// by byte, but I'll change it later.
-static inline int32
-UTF8_char_len(uchar c)
-{
-	return ((0xE5000000 >> ((c >> 3) & 0x1E)) & 3) + 1;
-}
-
-
 void
 _BTypingUndoBuffer_::BackwardErase()
 {
 	int32 start, end;
 	fTextView->GetSelection(&start, &end);
 	
-	int32 charLen = UTF8_char_len(fTextView->ByteAt(start - 1));
+	const char *text = fTextView->Text();
+	int32 charLen = UTF8CharLenBACK(text + start, text);
 	printf("Char Len: %d\n", charLen);
 
 	if (start != fTypedEnd || end != fTypedEnd) {
@@ -384,8 +376,8 @@ _BTypingUndoBuffer_::ForwardErase()
 	int32 start, end;
 
 	fTextView->GetSelection(&start, &end);
-
-	int32 charLen = UTF8_char_len(fTextView->ByteAt(start));	
+	
+	int32 charLen = UTF8CharLenFWD(fTextView->Text() + start);	
 	printf("Char Len: %d\n", charLen);
 
 	if (start != fTypedEnd || end != fTypedEnd || fUndone > 0) {
