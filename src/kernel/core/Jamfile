@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src kernel core ;
 
+local buildSources = ;
+if $(OS) != BEOS {
+	SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src build ] ;
+	buildSources = cpp_support.cpp ;
+}
+
 {
 	local defines =
 		OBOS_ARCH=\\\"$(OBOS_ARCH)\\\"
@@ -42,6 +48,8 @@ KernelMergeObject kernel_core.o :
 	thread.c
 	timer.c
 	user_debugger.cpp
+
+	$(buildSources)
 	: -fno-pic
 	;
 
