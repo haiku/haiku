@@ -72,6 +72,12 @@ SYSCALL3(sys_open_attr, 99)
 SYSCALL2(sys_remove_attr, 101)
 SYSCALL4(sys_rename_attr, 102)
 
+/* VFS index calls */
+SYSCALL1(sys_open_index_dir, 106)
+SYSCALL4(sys_create_index, 107)
+SYSCALL3(sys_read_index_stat, 108)
+SYSCALL2(sys_remove_index, 109)
+
 /* semaphore calls */
 SYSCALL2(sys_create_sem, 18)
 SYSCALL1(sys_delete_sem, 19)

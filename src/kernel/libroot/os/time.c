@@ -39,12 +39,15 @@ set_timezone(char *timezone)
 }
 
 
+/*
+// ToDo: currently defined in atomic.S - but should be in its own file time.S
 bigtime_t
 system_time(void)
 {
-	/* time since booting in microseconds */
+	// time since booting in microseconds
 	return sys_system_time();
 }
+*/
 
 
 bigtime_t

@@ -34,18 +34,15 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$OpenBSD: rewind.c,v 1.2 1996/08/19 08:33:02 tholo Exp $";
-#endif /* LIBC_SCCS and not lint */
-
 #include <errno.h>
 #include <stdio.h>
+
 
 void
 rewind(fp)
 	register FILE *fp;
 {
 	(void) fseek(fp, 0L, SEEK_SET);
-	clearerr(fp);
+	//clearerr(fp);
 	errno = 0;      /* not required, but seems reasonable */
 }
