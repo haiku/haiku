@@ -38,6 +38,7 @@ class AreaLinkHeader;
 
 class AreaLink
 {
+public:
 	AreaLink(area_id area, bool is_arealink_area=false);
 	AreaLink(void);
 	~AreaLink(void);
