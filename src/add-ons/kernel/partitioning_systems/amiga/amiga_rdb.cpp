@@ -1,6 +1,6 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -20,18 +20,16 @@
 #include <string.h>
 
 
-#define TRACE_AMIGA_RDB 0
-#if TRACE_AMIGA_RDB
+//#define TRACE_AMIGA_RDB
+#ifdef TRACE_AMIGA_RDB
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
 #endif
 
-#ifdef _BOOT_MODE
-static const char *kPartitionModuleName = "partitioning_systems/amiga_rdb/v1";
-#else
-static const char *kPartitionModuleName = NULL;
-#endif
+
+#define AMIGA_PARTITION_MODULE_NAME "partitioning_systems/amiga_rdb/v1"
+#define AMIGA_PARTITION_NAME "Amiga Partition Map"
 
 
 template<typename Type> bool
@@ -46,7 +44,7 @@ validate_check_sum(Type *type)
 	for (uint32 i = 0; i < type->SummedLongs(); i++)
 		sum += B_BENDIAN_TO_HOST_INT32(longs[i]);
 
-#if TRACE_AMIGA_RDB
+#ifdef TRACE_AMIGA_RDB
 	if (sum != 0)
 		TRACE(("search_rdb: check sum is incorrect!\n"));
 #endif
@@ -55,7 +53,7 @@ validate_check_sum(Type *type)
 }
 
 
-#if TRACE_AMIGA_RDB
+#ifdef TRACE_AMIGA_RDB
 static char *
 get_tupel(uint32 id)
 {
@@ -211,16 +209,16 @@ amiga_rdb_free_identify_partition_cookie(partition_data *partition, void *_cooki
 
 
 #ifndef _BOOT_MODE
-static partition_module_info gAmigaPartitionModule = {
+static partition_module_info sAmigaPartitionModule = {
 #else
 partition_module_info gAmigaPartitionModule = {
 #endif
 	{
-		kPartitionModuleName,
+		AMIGA_PARTITION_MODULE_NAME,
 		0,
 		amiga_rdb_std_ops
 	},
-	kPartitionTypeAmiga,				// pretty_name
+	AMIGA_PARTITION_NAME,				// pretty_name
 	0,									// flags
 
 	// scanning
@@ -234,7 +232,7 @@ partition_module_info gAmigaPartitionModule = {
 
 #ifndef _BOOT_MODE
 partition_module_info *modules[] = {
-	&gAmigaPartitionModule,
+	&sAmigaPartitionModule,
 	NULL
 };
 #endif

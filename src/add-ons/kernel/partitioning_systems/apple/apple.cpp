@@ -1,6 +1,6 @@
 /*
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -26,7 +26,8 @@
 #	define TRACE(x) ;
 #endif
 
-static const char *kPartitionModuleName = "partitioning_systems/apple/v1";
+#define APPLE_PARTITION_MODULE_NAME "partitioning_systems/apple/v1"
+#define APPLE_PARTITION_NAME "Apple Partition Map"
 
 static const char *kApplePartitionTypes[] = {
 	"partition_map",	// the partition map itself
@@ -198,11 +199,11 @@ static partition_module_info sApplePartitionModule = {
 partition_module_info gApplePartitionModule = {
 #endif
 	{
-		kPartitionModuleName,
+		APPLE_PARTITION_MODULE_NAME,
 		0,
 		apple_std_ops
 	},
-	kPartitionTypeApple,				// pretty_name
+	APPLE_PARTITION_NAME,				// pretty_name
 	0,									// flags
 
 	// scanning

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the Haiku license.
 //---------------------------------------------------------------------
 /*!
 	\file intel.cpp
@@ -33,10 +33,12 @@
 //#define TRACE(x) dprintf x
 
 // module names
-static const char *kPartitionMapModuleName
-	= "partitioning_systems/intel/map/v1";
-static const char *kExtendedPartitionModuleName
-	= "partitioning_systems/intel/extended/v1";
+#define INTEL_PARTITION_MODULE_NAME "partitioning_systems/intel/map/v1"
+#define INTEL_EXTENDED_PARTITION_MODULE_NAME "partitioning_systems/intel/extended/v1"
+
+// these match those in DiskDeviceTypes.cpp
+#define INTEL_PARTITION_NAME "Intel Partition Map"
+#define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
 
 // Maximal number of logical partitions per extended partition we allow.
 static const int32 kMaxLogicalPartitionCount = 128;
@@ -314,11 +316,11 @@ partition_module_info gIntelPartitionMapModule = {
 static partition_module_info intel_partition_map_module = {
 #endif
 	{
-		kPartitionMapModuleName,
+		INTEL_PARTITION_MODULE_NAME,
 		0,
 		pm_std_ops
 	},
-	kPartitionTypeIntel,				// pretty_name
+	INTEL_PARTITION_NAME,				// pretty_name
 	0,									// flags
 
 	// scanning
@@ -405,11 +407,11 @@ partition_module_info gIntelExtendedPartitionModule = {
 static partition_module_info intel_extended_partition_module = {
 #endif
 	{
-		kExtendedPartitionModuleName,
+		INTEL_EXTENDED_PARTITION_MODULE_NAME,
 		0,
 		ep_std_ops
 	},
-	kPartitionTypeIntelExtended,		// pretty_name
+	INTEL_EXTENDED_PARTITION_NAME,		// pretty_name
 	0,									// flags
 
 	// scanning
