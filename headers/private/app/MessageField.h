@@ -44,6 +44,7 @@
 
 // Project Includes ------------------------------------------------------------
 #include <DataBuffer.h>
+#include <MessageUtils.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -127,6 +128,7 @@ struct BMessageFieldSizePolicy
 	}
 	inline static bool		Fixed() { return true; }
 	inline static size_t	Padding(const T&) { return 0; }
+	inline static size_t	Padding(const Store& data) { return 0; }
 };
 //------------------------------------------------------------------------------
 template<class T>
@@ -220,23 +222,38 @@ FlattenedSize() const
 	ssize_t size = 1;						// field flags byte
 	size += sizeof (type_code);				// field type bytes
 	if (!(fFlags & MSG_FLAG_SINGLE_ITEM))	// item count byte
-		++size;
+	{
+		if (fFlags & MSG_FLAG_MINI_DATA)
+			++size;							// item count byte for mini data
+		else
+			size += 4;						// item count bytes for maxi data
+	}
+
 	if (fFlags & MSG_FLAG_MINI_DATA)
 		++size;								// data length byte for mini data
 	else
-		size += sizeof (size_t);			// data length bytes for maxi data
+		size += 4;							// data length bytes for maxi data
+
 	++size;									// name length byte
 	size += Name().length();				// name length
 
-	// data length and item size bytes
+	// item data length
 	size += SizePolicy::Size(fData);
+
+	// Calculate any necessary padding
 	if (!SizePolicy::Fixed())
 	{
+		size += 4 * fData.Size();
+		size += SizePolicy::Padding(fData);
+#if 0
 		for (uint32 i = 0; i < fData.Size(); ++i)
 		{
-			size += SizePolicy::Padding(fData[i]);	// pad to 8-byte boundary
-			size += 4;								// item size bytes
+			// pad to 8-byte boundary, including size bytes in calculation
+			size += calc_padding(SizePolicy::Size(fData[i]) + 4, 8);
+			// item size bytes
+			size += 4;
 		}
+#endif
 	}
 
 	return size;
@@ -257,20 +274,10 @@ Flatten(BDataIO& stream) const
 {
 	status_t	err = B_OK;
 	type_code	type = Type();
-	uint8		count = fData.Size();
+	uint32		count = fData.Size();
 	uint8		nameLen = Name().length();
 	size_t		size = SizePolicy::Size(fData);
 
-	// Calculate any necessary padding
-	if (!SizePolicy::Fixed())
-	{
-		for (uint32 i = 0; i < fData.Size(); ++i)
-		{
-			size += SizePolicy::Padding(fData[i]);	// pad to 8-byte boundary
-			size += 4;								// item size bytes
-		}
-	}
-	
 	err = stream.Write(&fFlags, sizeof (fFlags));
 
 	// Field type_code
@@ -279,11 +286,27 @@ Flatten(BDataIO& stream) const
 
 	// Item count, if more than one
 	if (err >= 0 && !(fFlags & MSG_FLAG_SINGLE_ITEM))
-		err = stream.Write(&count, sizeof (count));
+	{
+		if (fFlags & MSG_FLAG_MINI_DATA)
+		{
+			uint8 miniCount = count;
+			err = stream.Write(&miniCount, sizeof (miniCount));
+		}
+		else
+		{
+			err = stream.Write(&count, sizeof (count));
+		}
+	}
 
 	// Data length
 	if (err >= 0)
 	{
+		if (!(fFlags & MSG_FLAG_FIXED_SIZE))
+		{
+			// Add the bytes for holding the item size for each item
+			size += 4 * fData.Size();
+			size += SizePolicy::Padding(fData);
+		}
 		if (fFlags & MSG_FLAG_MINI_DATA)
 		{
 			uint8 miniSize = size;
@@ -308,16 +331,17 @@ Flatten(BDataIO& stream) const
 	{
 		if (!SizePolicy::Fixed())
 		{
-			int32 size = (int32)SizePolicy::Size(fData[i]);
+			size = (int32)SizePolicy::Size(fData[i]);
 			err = stream.Write(&size, sizeof (size));
 		}
 		if (err >= 0)
 		{
 			err = FlattenPolicy::Flatten(stream, fData[i]);
 		}
-		if (err >= 0)
+		if (err >= 0 && !SizePolicy::Fixed())
 		{
-			err = stream.Write(&BMessageField::sNullData[size],
+			// Add any necessary padding
+			err = stream.Write(BMessageField::sNullData,
 							   SizePolicy::Padding(fData[i]));
 		}
 	}
@@ -361,8 +385,17 @@ AddItem(const T1& data)
 		fMaxSize = SizePolicy::Size(data);
 	}
 
-	if (fData.Size() > 256 || fMaxSize > 256)
-		fFlags &= ~MSG_FLAG_MINI_DATA;
+	if (fFlags & MSG_FLAG_MINI_DATA)
+	{
+		int32 size = SizePolicy::Size(fData);
+		if (!(fFlags & MSG_FLAG_FIXED_SIZE))
+		{
+			size += 4 * fData.Size();
+			size += SizePolicy::Padding(fData);
+		}
+		if (size > 255)
+			fFlags &= ~MSG_FLAG_MINI_DATA;
+	}
 
 	if (fData.Size() > 1)
 		fFlags &= ~MSG_FLAG_SINGLE_ITEM;
@@ -587,18 +620,25 @@ template<> struct BMessageFieldSizePolicy<BString>
 		{
 			size += Size(data[i]);
 		}
-
 		return size;
 	}
 	inline static bool		Fixed()	{ return false; }
 	inline static size_t	Padding(const BString& s)
 	{
-		size_t temp = (Size(s) + 4) % 8;
-		if (temp)
+		// Padding calculations are only done for variable-sized items,
+		// which by definition have four bytes of size info preceeding the
+		// actual data; those four bytes are included in the padding
+		// calculation.  Padding is calculated to an 8-byte boundary
+		return calc_padding(Size(s) + 4, 8);
+	}
+	inline static size_t	Padding(const Store& data)
+	{
+		size_t size = 0;
+		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = 8 - temp;
+			size += Padding(data[i]);
 		}
-		return temp;
+		return size;
 	}
 };
 //------------------------------------------------------------------------------
@@ -621,12 +661,20 @@ template<> struct BMessageFieldSizePolicy<BDataBuffer>
 	inline static bool		Fixed()	{ return false; }
 	inline static size_t	Padding(const BDataBuffer& db)
 	{
-		size_t temp = (Size(db) + 4) % 8;
-		if (temp)
+		// Padding calculations are only done for variable-sized items,
+		// which by definition have four bytes of size info preceeding the
+		// actual data; those four bytes are included in the padding
+		// calculation.  Padding is calculated to an 8-byte boundary
+		return calc_padding(Size(db) + 4, 8);
+	}
+	inline static size_t	Padding(const Store& data)
+	{
+		size_t size = 0;
+		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = 8 - temp;
+			size += Padding(data[i]);
 		}
-		return temp;
+		return size;
 	}
 };
 //------------------------------------------------------------------------------
@@ -649,12 +697,20 @@ template<> struct BMessageFieldSizePolicy<BMessage*>
 	inline static bool		Fixed() { return false; }
 	inline static size_t	Padding(const BMessage* msg)
 	{
-		size_t temp = (Size(msg) + 4) % 8;
-		if (temp)
+		// Padding calculations are only done for variable-sized items,
+		// which by definition have four bytes of size info preceeding the
+		// actual data; those four bytes are included in the padding
+		// calculation.  Padding is calculated to an 8-byte boundary
+		return calc_padding(Size(msg) + 4, 8);
+	}
+	inline static size_t	Padding(const Store& data)
+	{
+		size_t size = 0;
+		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = 8 - temp;
+			size += Padding(data[i]);
 		}
-		return temp;
+		return size;
 	}
 };
 // Flatten policy specializations ----------------------------------------------
