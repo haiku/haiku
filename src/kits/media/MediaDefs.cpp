@@ -416,6 +416,14 @@ bool format_is_compatible(const media_format & a, const media_format & b)	/* a i
 	return a.Matches(&b);
 }
 
+/* those come from
+ * strings /system/lib/libmedia.so | grep 'o;'
+ */
+static const char *_string_fmt_raw_audio = "raw_audio;%g;%d;%x;%d;%x";
+static const char *_string_fmt_raw_video = "raw_video;%g;%d;%d;%d;%s;%d;%d;%d;%d;%d;%d;%d;%d";
+static const char *_string_fmt_caudio = "caudio;%s;%g;%d;(%g;%d;%x;%d;%x)";
+static const char *_string_fmt_cvideo = "cvideo;%s;%g;%g;%d;(%g;%x;%d;%d;%d;%d;%s;%d;%d)";
+
 bool string_for_format(const media_format & f, char * buf, size_t size)
 {
 	char encoding[10]; /* maybe Be wanted to use some 4CCs ? */
