@@ -167,13 +167,13 @@ remove_fd(struct io_context *context, int fd)
 
 
 static int
-fd_dup(int fd, bool kernel)
+dup_fd(int fd, bool kernel)
 {
 	struct io_context *context = get_current_io_context(kernel);
 	struct file_descriptor *descriptor;
 	int status;
 
-	TRACE(("fd_dup: fd = %d\n", fd));
+	TRACE(("dup_fd: fd = %d\n", fd));
 
 	// Try to get the fd structure
 	descriptor = get_fd(context, fd);
@@ -190,12 +190,12 @@ fd_dup(int fd, bool kernel)
 
 
 static int
-fd_dup2(int oldfd, int newfd, bool kernel)
+dup2_fd(int oldfd, int newfd, bool kernel)
 {
 	struct file_descriptor *evicted = NULL;
 	struct io_context *context;
 
-	TRACE(("fd_dup2: ofd = %d, nfd = %d\n", oldfd, newfd));
+	TRACE(("dup2_fd: ofd = %d, nfd = %d\n", oldfd, newfd));
 
 	// quick check
 	if (oldfd < 0 || newfd < 0)
@@ -234,6 +234,70 @@ fd_dup2(int oldfd, int newfd, bool kernel)
 }
 
 
+status_t
+select_fd(int fd, uint8 event, uint32 ref, struct select_sync *sync, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	status_t status;
+
+	PRINT(("select_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
+
+	descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (descriptor->ops->fd_select) {
+		status = descriptor->ops->fd_select(descriptor, event, ref, sync);
+	} else {
+		// if the I/O subsystem doesn't support select(), we will
+		// immediately notify the select call
+		status = notify_select_event((void *)sync, ref);
+	}
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+status_t
+deselect_fd(int fd, uint8 event, struct select_sync *sync, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	status_t status;
+
+	PRINT(("deselect_fd(fd = %d, event = %u, ref = %lu, selectsync = %p)\n", fd, event, ref, sync));
+
+	descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (descriptor->ops->fd_deselect)
+		status = descriptor->ops->fd_deselect(descriptor, event, sync);
+	else
+		status = B_OK;
+
+	put_fd(descriptor);
+	return status;
+}
+
+
+/** This function checks if the specified fd is valid in the current
+ *	context. It can be used for a quick check; the fd is not locked
+ *	so it could become invalid immediately after this check.
+ */
+
+bool
+fd_is_valid(int fd, bool kernel)
+{
+	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return false;
+	
+	put_fd(descriptor);
+	return true;
+}
+
+
 //	#pragma mark -
 /*** USER routines ***/ 
 
@@ -245,7 +309,8 @@ user_read(int fd, off_t pos, void *buffer, size_t length)
 	ssize_t retval;
 
 	/* This is a user_function, so abort if we have a kernel address */
-	CHECK_USER_ADDR(buffer)
+	if (!CHECK_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
@@ -296,7 +361,7 @@ user_seek(int fd, off_t pos, int seekType)
 	if (!descriptor)
 		return B_FILE_ERROR;
 
-	TRACE(("user_seek(descriptor = %p)\n",descriptor));
+	TRACE(("user_seek(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_seek)
 		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
@@ -333,14 +398,14 @@ user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-user_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
+user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
 	CHECK_USER_ADDR(buffer)
 
-	PRINT(("user_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld, count = %d)\n",fd,buffer,bufferSize,maxCount));
+	PRINT(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %d)\n", fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -348,7 +413,7 @@ user_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(descriptor,buffer,bufferSize,&count);
+		retval = descriptor->ops->fd_read_dir(descriptor, buffer, bufferSize, &count);
 		if (retval >= 0)
 			retval = count;
 	} else
@@ -365,7 +430,7 @@ user_rewind_dir(int fd)
 	struct file_descriptor *descriptor;
 	status_t status;
 
-	PRINT(("user_rewind_dir(fd = %d)\n",fd));
+	PRINT(("user_rewind_dir(fd = %d)\n", fd));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
@@ -394,7 +459,7 @@ user_read_stat(int fd, struct stat *userStat)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("user_read_stat(descriptor = %p)\n",descriptor));
+	TRACE(("user_read_stat(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_read_stat) {
 		// we're using the stat buffer on the stack to not have to
@@ -450,7 +515,7 @@ user_close(int fd)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("user_close(descriptor = %p)\n",descriptor));
+	TRACE(("user_close(descriptor = %p)\n", descriptor));
 
 	remove_fd(io, fd);
 
@@ -462,14 +527,14 @@ user_close(int fd)
 int
 user_dup(int fd)
 {
-	return fd_dup(fd, false);
+	return dup_fd(fd, false);
 }
 
 
 int
 user_dup2(int ofd, int nfd)
 {
-	return fd_dup2(ofd, nfd, false);
+	return dup2_fd(ofd, nfd, false);
 }
 
 
@@ -565,12 +630,12 @@ sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 
 ssize_t
-sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
+sys_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount)
 {
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	PRINT(("sys_read_dir(fd = %d, buffer = 0x%p, bufferSize = %ld, count = %u)\n",fd,buffer,bufferSize,maxCount));
+	PRINT(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %u)\n",fd, buffer, bufferSize, maxCount));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
@@ -578,7 +643,7 @@ sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(descriptor,buffer,bufferSize,&count);
+		retval = descriptor->ops->fd_read_dir(descriptor, buffer, bufferSize, &count);
 		if (retval >= 0)
 			retval = count;
 	} else
@@ -621,7 +686,7 @@ sys_read_stat(int fd, struct stat *stat)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("sys_read_stat(descriptor = %p)\n",descriptor));
+	TRACE(("sys_read_stat(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_read_stat)
 		status = descriptor->ops->fd_read_stat(descriptor, stat);
@@ -674,13 +739,13 @@ sys_close(int fd)
 int
 sys_dup(int fd)
 {
-	return fd_dup(fd, true);
+	return dup_fd(fd, true);
 }
 
 
 int
 sys_dup2(int ofd, int nfd)
 {
-	return fd_dup2(ofd, nfd, true);
+	return dup2_fd(ofd, nfd, true);
 }
 

@@ -35,6 +35,10 @@
 #include "rootfs.h"
 #include "bootfs.h"
 
+#include "vfs_select.h"
+#include <sys/select.h>
+#include <poll.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -57,10 +61,6 @@
 #endif
 
 #define MAX_SYM_LINKS SYMLINKS_MAX
-
-// Passed in buffers from user-space shouldn't be in the kernel
-#define CHECK_USER_ADDRESS(x) \
-	((addr)(x) < KERNEL_BASE || (addr)(x) > KERNEL_TOP)
 
 struct vnode {
 	struct vnode	*next;
@@ -177,8 +177,10 @@ struct fd_ops gFileOps = {
 	file_write,
 	file_seek,
 	common_ioctl,
-	NULL,
-	NULL,
+	NULL,		// select()
+	NULL,		// deselect()
+	NULL,		// read_dir()
+	NULL,		// rewind_dir()
 	common_read_stat,
 	common_write_stat,
 	file_close,
@@ -186,10 +188,12 @@ struct fd_ops gFileOps = {
 };
 
 struct fd_ops gDirectoryOps = {
-	NULL,
-	NULL,
-	NULL,
+	NULL,		// read()
+	NULL,		// write()
+	NULL,		// seek()
 	common_ioctl,
+	NULL,		// select()
+	NULL,		// deselect()
 	dir_read,
 	dir_rewind,
 	common_read_stat,
@@ -199,10 +203,12 @@ struct fd_ops gDirectoryOps = {
 };
 
 struct fd_ops gAttributeDirectoryOps = {
-	NULL,
-	NULL,
-	NULL,
+	NULL,		// read()
+	NULL,		// write()
+	NULL,		// seek()
 	common_ioctl,
+	NULL,		// select()
+	NULL,		// deselect()
 	attr_dir_read,
 	attr_dir_rewind,
 	common_read_stat,
@@ -216,8 +222,10 @@ struct fd_ops gAttributeOps = {
 	attr_write,
 	attr_seek,
 	common_ioctl,
-	NULL,
-	NULL,
+	NULL,		// select()
+	NULL,		// deselect()
+	NULL,		// read_dir()
+	NULL,		// rewind_dir()
 	attr_read_stat,
 	attr_write_stat,
 	attr_close,
@@ -229,6 +237,8 @@ struct fd_ops gIndexDirectoryOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	NULL,		// ioctl()
+	NULL,		// select()
+	NULL,		// deselect()
 	index_dir_read,
 	index_dir_rewind,
 	NULL,		// read_stat()
@@ -1498,6 +1508,22 @@ out:
 }
 
 
+status_t
+notify_select_event(selectsync *_sync, uint32 ref)
+{
+	select_sync *sync = (select_sync *)_sync;
+	
+	if (sync == NULL
+		|| sync->sem < B_OK
+		|| INDEX_FROM_REF(ref) > sync->count)
+		return B_BAD_VALUE;
+
+	sync->set[INDEX_FROM_REF(ref)].events |= SELECT_FLAG_FROM_REF(ref);
+
+	return release_sem(sync->sem);
+}
+
+
 int
 vfs_getrlimit(int resource, struct rlimit * rlp)
 {
@@ -2526,6 +2552,245 @@ common_path_write_stat(char *path, bool traverseLeafLink, const struct stat *sta
 	put_vnode(vnode);
 
 	return status;
+}
+
+
+static int
+common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+	bigtime_t timeout, sigset_t *sigMask, bool kernel)
+{
+	struct select_sync sync;
+	status_t status = B_OK;
+	int count = 0;
+	int fd;
+
+	// check if fds are valid before doing anything
+
+	for (fd = 0; fd < numfds; fd++) {
+		if (((readSet && FD_ISSET(fd, readSet))
+			|| (writeSet && FD_ISSET(fd, writeSet))
+			|| (errorSet && FD_ISSET(fd, errorSet)))
+			&& !fd_is_valid(fd, kernel))
+			return B_FILE_ERROR;
+	}
+
+	// allocate resources
+
+	memset(&sync, 0, sizeof(select_sync));
+
+	sync.sem = create_sem(1, "select");
+	if (sync.sem < B_OK)
+		return sync.sem;
+
+	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
+
+	sync.set = kmalloc(sizeof(select_info) * numfds);
+	if (sync.set == NULL) {
+		delete_sem(sync.sem);
+		return B_NO_MEMORY;
+	}
+	memset(sync.set, 0, sizeof(select_info) * numfds);
+	sync.count = numfds;
+
+	// start selecting file descriptors
+
+	for (fd = 0; fd < numfds; fd++) {
+		if (readSet && FD_ISSET(fd, readSet)
+			&& select_fd(fd, B_SELECT_READ, MAKE_SELECT_REF(fd, B_SELECT_READ), &sync, kernel) == B_OK)
+			count++;
+
+		if (writeSet && FD_ISSET(fd, writeSet)
+			&& select_fd(fd, B_SELECT_WRITE, MAKE_SELECT_REF(fd, B_SELECT_WRITE), &sync, kernel) == B_OK)
+			count++;
+
+		if (errorSet && FD_ISSET(fd, errorSet)
+			&& select_fd(fd, B_SELECT_ERROR, MAKE_SELECT_REF(fd, B_SELECT_ERROR), &sync, kernel) == B_OK)
+			count++;
+	}
+
+	if (count < 1) {
+		count = B_BAD_VALUE;
+		goto err;
+	}
+
+	status = acquire_sem_etc(sync.sem, 1,
+		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
+
+	// deselect file descriptors
+
+	for (fd = 0; fd < numfds; fd++) {
+		if (readSet && FD_ISSET(fd, readSet))
+			deselect_fd(fd, B_SELECT_READ, &sync, kernel);
+
+		if (writeSet && FD_ISSET(fd, writeSet))
+			deselect_fd(fd, B_SELECT_WRITE, &sync, kernel);
+
+		if (errorSet && FD_ISSET(fd, errorSet))
+			deselect_fd(fd, B_SELECT_ERROR, &sync, kernel);
+	}
+
+	// collect the events that are happened in the meantime
+
+	switch (status) {
+		case B_OK:
+			// clear sets to store the received events
+			if (readSet)
+				FD_ZERO(readSet);
+			if (writeSet)
+				FD_ZERO(writeSet);
+			if (errorSet)
+				FD_ZERO(errorSet);
+	
+			for (count = 0, fd = 0;fd < numfds; fd++) {
+				if (readSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
+					FD_SET(fd, readSet);
+					count++;
+				}
+				if (writeSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
+					FD_SET(fd, writeSet);
+					count++;
+				}
+				if (errorSet && sync.set[fd].events & SELECT_FLAG(B_SELECT_ERROR)) {
+					FD_SET(fd, errorSet);
+					count++;
+				}
+			}
+			break;
+		case B_INTERRUPTED:
+			count = B_INTERRUPTED;
+			break;
+		default:
+			// B_TIMED_OUT, and B_WOULD_BLOCK
+			count = 0;
+	}
+
+err:
+	delete_sem(sync.sem);
+
+	return count;
+}
+
+
+static int
+common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
+{
+	status_t status = B_OK;
+	int count = 0;
+	int i;
+
+	// allocate resources
+
+	select_sync sync;
+	memset(&sync, 0, sizeof(select_sync));
+
+	sync.sem = create_sem(1, "poll");
+	if (sync.sem < B_OK)
+		return sync.sem;
+
+	set_sem_owner(sync.sem, B_SYSTEM_TEAM);
+
+	sync.set = kmalloc(sizeof(select_info) * numfds);
+	if (sync.set == NULL) {
+		delete_sem(sync.sem);
+		return B_NO_MEMORY;
+	}
+	memset(sync.set, 0, sizeof(select_info) * numfds);
+	sync.count = numfds;
+
+	// start polling file descriptors (by selecting them)
+
+	for (i = 0; i < numfds; i++) {
+		int fd = fds[i].fd;
+
+		// check if fds are valid
+		if (!fd_is_valid(fd, kernel)) {
+			fds[i].revents = POLLNVAL;
+			continue;
+		}
+
+		if ((fds[i].events & POLLIN)
+			&& select_fd(fd, B_SELECT_READ, MAKE_SELECT_REF(fd, B_SELECT_READ), &sync, kernel) == B_OK)
+			count++;
+		if ((fds[i].events & POLLOUT)
+			&& select_fd(fd, B_SELECT_WRITE, MAKE_SELECT_REF(fd, B_SELECT_WRITE), &sync, kernel) == B_OK)
+			count++;
+
+		if ((fds[i].events & POLLRDBAND)
+			&& select_fd(fd, B_SELECT_PRI_READ, MAKE_SELECT_REF(fd, B_SELECT_PRI_READ), &sync, kernel) == B_OK)
+			count++;
+		if ((fds[i].events & POLLWRBAND)
+			&& select_fd(fd, B_SELECT_PRI_WRITE, MAKE_SELECT_REF(fd, B_SELECT_PRI_WRITE), &sync, kernel) == B_OK)
+			count++;
+
+		if ((fds[i].events & POLLPRI)
+			&& select_fd(fd, B_SELECT_HIGH_PRI_READ, MAKE_SELECT_REF(fd, B_SELECT_HIGH_PRI_READ), &sync, kernel) == B_OK)
+			count++;
+
+		// Always select POLLERR and POLLHUB - would be nice if we'd have another
+		// notify_select_event() call which could directly trigger certain events
+		// without a specific select.
+
+		if (select_fd(fd, B_SELECT_ERROR, MAKE_SELECT_REF(fd, B_SELECT_ERROR),
+				&sync, kernel) == B_OK)
+			count++;
+		if (select_fd(fd, B_SELECT_DISCONNECTED, MAKE_SELECT_REF(fd, B_SELECT_DISCONNECTED),
+				&sync, kernel) == B_OK)
+			count++;
+	}
+
+	if (count < 1) {
+		count = B_BAD_VALUE;
+		goto err;
+	}
+
+	status = acquire_sem_etc(sync.sem, 1,
+		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
+
+	// deselect file descriptors
+
+	for (i = 0; i < numfds; i++) {
+		int fd = fds[i].fd;
+
+		if (fds[i].events & POLLIN)
+			deselect_fd(fd, B_SELECT_READ, &sync, kernel);
+		if (fds[i].events & POLLOUT)
+			deselect_fd(fd, B_SELECT_WRITE, &sync, kernel);
+
+		if (fds[i].events & POLLRDBAND)
+			deselect_fd(fd, B_SELECT_PRI_READ, &sync, kernel);
+		if (fds[i].events & POLLWRBAND)
+			deselect_fd(fd, B_SELECT_PRI_WRITE, &sync, kernel);
+
+		if (fds[i].events & POLLPRI)
+			deselect_fd(fd, B_SELECT_HIGH_PRI_READ, &sync, kernel);
+
+		deselect_fd(fd, B_SELECT_ERROR, &sync, kernel);
+		deselect_fd(fd, B_SELECT_DISCONNECTED, &sync, kernel);
+	}
+
+	// collect the events that are happened in the meantime
+
+	switch (status) {
+		case B_OK:
+			for (count = 0, i = 0;i < numfds; i++) {
+				// POLLxxx flags and B_SELECT_xxx flags are compatible
+				fds[i].revents = sync.set[i].events;
+				if (fds[i].revents != 0)
+					count++;
+			}
+			break;
+		case B_INTERRUPTED:
+			count = B_INTERRUPTED;
+			break;
+		default:
+			// B_TIMED_OUT, and B_WOULD_BLOCK
+			count = 0;
+	}
+
+err:
+	delete_sem(sync.sem);
+
+	return count;
 }
 
 
@@ -3665,6 +3930,21 @@ sys_write_path_stat(const char *path, bool traverseLeafLink, const struct stat *
 
 
 int
+sys_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
+	bigtime_t timeout, sigset_t *sigMask)
+{
+	return common_select(numfds, readSet, writeSet, errorSet, timeout, sigMask, true);
+}
+
+
+int
+sys_poll(struct pollfd *fds, int numfds, bigtime_t timeout)
+{
+	return common_poll(fds, numfds, timeout, true);
+}
+
+
+int
 sys_open_attr_dir(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
@@ -4185,6 +4465,92 @@ user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct s
 		return B_BAD_ADDRESS;
 
 	return common_path_write_stat(path, traverseLeafLink, &stat, statMask, false);
+}
+
+
+int
+user_select(int numfds, fd_set *userReadSet, fd_set *userWriteSet, fd_set *userErrorSet,
+	bigtime_t timeout, sigset_t *userSigMask)
+{
+	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
+	uint32 bytes = _howmany(numfds, NFDBITS) * sizeof(fd_mask);
+	sigset_t sigMask;
+	int result;
+
+	if (numfds < 0)
+		return B_BAD_VALUE;
+
+	if ((userReadSet != NULL && !CHECK_USER_ADDRESS(userReadSet))
+		|| (userWriteSet != NULL && !CHECK_USER_ADDRESS(userWriteSet))
+		|| (userErrorSet != NULL && !CHECK_USER_ADDRESS(userErrorSet))
+		|| (userSigMask != NULL && !CHECK_USER_ADDRESS(userSigMask)))
+		return B_BAD_ADDRESS;
+
+	// copy parameters
+
+	if (userReadSet != NULL) {
+		readSet = kmalloc(bytes);
+		if (readSet == NULL) {
+			result = B_NO_MEMORY;
+			goto err;
+		}
+		if (user_memcpy(readSet, userReadSet, bytes) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto err;
+		}
+	}
+
+	if (userWriteSet != NULL) {
+		writeSet = kmalloc(bytes);
+		if (writeSet == NULL) {
+			result = B_NO_MEMORY;
+			goto err;
+		}
+		if (user_memcpy(writeSet, userWriteSet, bytes) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto err;
+		}
+	}
+
+	if (userErrorSet != NULL) {
+		errorSet = kmalloc(bytes);
+		if (errorSet == NULL) {
+			result = B_NO_MEMORY;
+			goto err;
+		}
+		if (user_memcpy(errorSet, userErrorSet, bytes) < B_OK) {
+			result = B_BAD_ADDRESS;
+			goto err;
+		}
+	}
+
+	if (userSigMask != NULL)
+		sigMask = *userSigMask;
+
+	result = common_select(numfds, readSet, writeSet, errorSet, timeout, userSigMask ? &sigMask : NULL, false);
+
+	// copy back results
+
+	if (result >= B_OK
+		&& ((readSet != NULL && user_memcpy(userReadSet, readSet, bytes) < B_OK)
+			|| (writeSet != NULL && user_memcpy(userWriteSet, writeSet, bytes) < B_OK)
+			|| (errorSet != NULL && user_memcpy(userErrorSet, errorSet, bytes) < B_OK)))
+		result = B_BAD_ADDRESS;
+
+err:
+	kfree(readSet);
+	kfree(writeSet);
+	kfree(errorSet);
+
+	return result;
+}
+
+
+int
+user_poll(struct pollfd *userfds, int numfds, bigtime_t timeout)
+{
+	//return common_poll(userfds, numfds, timeout, false);
+	return B_ERROR;
 }
 
 
