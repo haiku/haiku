@@ -1,0 +1,38 @@
+SubDir OBOS_TOP src kits ;
+
+include $(SUBDIR)/app/app.src ;
+include $(SUBDIR)/interface/interface.src ;
+include $(SUBDIR)/support/support.src ;
+
+UsePrivateHeaders app ;
+UsePrivateHeaders interface ;
+UsePrivateHeaders support ;
+
+UsePublicHeaders [ FDirName os app ] ;
+UsePublicHeaders [ FDirName os interface ] ;
+UsePublicHeaders [ FDirName os support ] ;
+
+SharedLibrary openbeos :
+	<$(SOURCE_GRIST)>app/$(APP_KIT_SOURCE)
+	<$(SOURCE_GRIST)>interface/$(INTERFACE_KIT_SOURCE)
+	<$(SOURCE_GRIST)>support/$(SUPPORT_KIT_SOURCE)
+;
+
+LinkSharedOSLibs libopenbeos.so :
+	be
+	stdc++.r4 ;
+
+# Note: If you want to use /boot/home/config/lib/libopenbeos.so in another
+# rule, use the identifier <boot!home!config!lib>libopenbeos.so, otherwise
+# libopenbeos.so.
+File <boot!home!config!lib>/boot/home/config/lib/libopenbeos.so
+	: libopenbeos.so ;
+
+SubInclude OBOS_TOP src kits app ;
+SubInclude OBOS_TOP src kits interface ;
+#SubInclude OBOS_TOP src kits media ;
+#SubInclude OBOS_TOP src kits midi ;
+#SubInclude OBOS_TOP src kits screensaver ;
+#SubInclude OBOS_TOP src kits storage ;
+SubInclude OBOS_TOP src kits support ;
+SubInclude OBOS_TOP src kits translation ;
