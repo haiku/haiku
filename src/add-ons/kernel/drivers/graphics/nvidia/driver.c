@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-6/2004.
+	Rudolf Cornelissen 3/2002-7/2004.
 */
 
 /* standard kernel driver stuff */
@@ -507,6 +507,9 @@ static status_t map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
+	/* disable ROM shadowing, we want the guaranteed exact contents of the chip */
+	set_pci(NVCFG_ROMSHADOW, 4, 0);
+
 	/* enable ROM decoding - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
 	tmpUlong |= 0x00000001;
@@ -529,7 +532,7 @@ static status_t map_device(device_info *di)
 	}
 
 	/* dump ROM to file if selected in nv.settings
-	 * (ROM is always 64Kb: checked TNT1 - FX5950) */
+	 * (ROM always fits in 64Kb: checked TNT1 - FX5950) */
 	if (current_settings.dumprom) dumprom (rom_temp, 65536);
 	/* make a copy of ROM for future reference */
 	memcpy (si->rom_mirror, rom_temp, 65536);
