@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src apps expander ;
+
+AddResources Expander : Expander.rdef ;
+
+App Expander : 
+	ExpanderApp.cpp
+	ExpanderWindow.cpp
+	ExpanderThread.cpp
+	GenericThread.cpp
+	ExpanderSettings.cpp
+	ExpanderPreferences.cpp
+	DirectoryFilePanel.cpp
+	ExpanderRules.cpp ;
+
+LinkSharedOSLibs Expander : be tracker ;
+
