@@ -13,14 +13,23 @@
 #include <util/kernel_cpp.h>
 
 
+#define TRACE_MAIN 0
+#if TRACE_MAIN
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 extern "C" int
 boot(stage2_args *args)
 {
-	puts("Oh yes, we are\n");
+	TRACE(("boot(): enter\n"));
+
 	if (heap_init(args) < B_OK)
 		panic("Could not initialize heap!\n");
 
-	puts("heap initialized...");
+	TRACE(("boot(): heap initialized...\n"));
 
 	// the main platform dependent initialisation
 	// has already taken place at this point.
