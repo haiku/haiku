@@ -1,6 +1,6 @@
 #include <OS.h>
 #include <stdio.h>
-//#include <stdlib.h> -- when exit() is implemented
+#include <stdlib.h>
 #include <string.h>
 
 #include "cpuinfo.h"
@@ -21,7 +21,7 @@ usage()
 	       "  -f   supported processor features\n"
 	       "  -t   TLB and cache info\n"
 	       "  -d   dump registers from CPUID calls\n");
-	//exit(0);
+	exit(0);
 }
 
 
@@ -32,7 +32,7 @@ getoption(char *optstr)
 		|| (strlen(optstr) > 2)
 		|| (strchr("iftd", optstr[1]) == NULL))
 		// invalid option
-		return 0;
+		usage();
 	
 	return optstr[1];
 }
@@ -57,11 +57,8 @@ main(int argc, char *argv[])
 	
 	if (argc == 2)
 		option = getoption(argv[1]);
-	
-	if (option == 0) {
+	else
 		usage();
-		return 0;
-	}
 	
 	// get initial info (max_level and vendor_tag)
 	get_cpuid(info, 0, 0);
