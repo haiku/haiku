@@ -1221,7 +1221,7 @@ em_82547_move_tail(void *arg)
 				adapter->tx_fifo_wrk++;
 				adapter->tx_fifo_timer_handle = 
 					timeout(em_82547_move_tail,
-						adapter, 1);
+						adapter, 100);
 				splx(s);
 				return;
 			}
