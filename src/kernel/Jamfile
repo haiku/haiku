@@ -1,10 +1,7 @@
 SubDir OBOS_TOP src kernel ;
 
 KernelLd stage2 :
-	<$(SOURCE_GRIST)!boot!arch!$(OBOS_ARCH)>stage2.o
-	<$(SOURCE_GRIST)!boot!arch!$(OBOS_ARCH)>stage2_asm.o
-	<$(SOURCE_GRIST)!boot!arch!$(OBOS_ARCH)>smp_boot.o
-	<$(SOURCE_GRIST)!boot!arch!$(OBOS_ARCH)>smp_trampoline.o
+	boot_arch_stage2.o
 
 	# posix functions needed by the stage2 boot loader
 	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
@@ -104,7 +101,8 @@ KernelLd libroot.so :
 	posix_math.o
 	posix_math_arch_$(OBOS_ARCH).o
 	posix_signal.o
-	posix_stdio.o	
+	posix_stdio.o
+#	posix_gnu_libio.o
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
