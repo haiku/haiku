@@ -2,6 +2,9 @@ SubDir OBOS_TOP src add-ons media plugins xvid_decoder ;
 
 UsePrivateHeaders media ;
 
+# Install the xvid.h to this directory
+SubDirHdrs /boot/develop/headers ;
+
 Addon xvid_decoder : media plugins :
 	xvidDecoderPlugin.cpp
 	: 

@@ -1,6 +1,6 @@
 #include "DecoderPlugin.h"
 
-#include "xvidcore/xvid.h"
+#include "xvid.h"
 
 class xvidDecoder : public Decoder
 {
