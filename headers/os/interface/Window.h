@@ -395,9 +395,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 // OBOS BWindow's addon functions
 		uint32		WindowLookToInteger(window_look wl);
 		uint32		WindowFeelToInteger(window_feel wf);
-		BView*		buildTopView();
-		void		attachTopView();
-		void		detachTopView();
+		void		BuildTopView();
 		void		stopConnection();
 		void		setFocus(BView *focusView, bool notifyIputServer=false);
 
@@ -425,7 +423,8 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 
 		uint8*		ReadRawFromPort(int32* code,
 									bigtime_t tout = B_INFINITE_TIMEOUT);
-
+		// Debug
+		void		PrintToStream() const;
 // END: OBOS addon functions
 
 		// 3 deprecated calls
