@@ -907,14 +907,15 @@ Inode::WriteAt(Transaction *transaction,off_t pos,const uint8 *buffer,size_t *_l
  */
 
 status_t
-Inode::FillGapWithZeros(off_t pos,off_t newSize)
+Inode::FillGapWithZeros(off_t pos, off_t newSize)
 {
+	// ToDo: we currently do anything here, same as original BFS!
 	//if (pos >= newSize)
 		return B_OK;
 
 	block_run run;
 	off_t offset;
-	if (FindBlockRun(pos,run,offset) < B_OK)
+	if (FindBlockRun(pos, run, offset) < B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	off_t length = newSize - pos;
@@ -939,16 +940,17 @@ Inode::FillGapWithZeros(off_t pos,off_t newSize)
 		if (length < bytesWritten)
 			bytesWritten = length;
 
-		memset(block + (pos % blockSize),0,bytesWritten);
-		fVolume->WriteBlocks(cached.BlockNumber(),block,1);
+		memset(block + (pos % blockSize), 0, bytesWritten);
+		if (fVolume->WriteBlocks(cached.BlockNumber(), block, 1) < B_OK)
+			RETURN_ERROR(B_IO_ERROR);
 
 		pos += bytesWritten;
-		
+
 		length -= bytesWritten;
 		if (length == 0)
 			return B_OK;
 
-		if (FindBlockRun(pos,run,offset) < B_OK)
+		if (FindBlockRun(pos, run, offset) < B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
 	}
 
@@ -959,25 +961,25 @@ Inode::FillGapWithZeros(off_t pos,off_t newSize)
 
 		CachedBlock cached(fVolume);
 		off_t blockNumber = fVolume->ToBlock(run);
-		for (int32 i = 0;i < run.length;i++) {
-			if ((block = cached.SetTo(blockNumber + i,true)) == NULL)
+		for (int32 i = 0; i < run.length; i++) {
+			if ((block = cached.SetTo(blockNumber + i, true)) == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
-			if (fVolume->WriteBlocks(cached.BlockNumber(),block,1) < B_OK)
+			if (fVolume->WriteBlocks(cached.BlockNumber(), block, 1) < B_OK)
 				RETURN_ERROR(B_IO_ERROR);
 		}
 
 		int32 bytes = run.length << blockShift;
 		length -= bytes;
 		bytesWritten += bytes;
-		
+
 		// since we don't respect a last partial block, length can be lower
 		if (length <= 0)
 			break;
 
 		pos += bytes;
 
-		if (FindBlockRun(pos,run,offset) < B_OK)
+		if (FindBlockRun(pos, run, offset) < B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
 	}
 	return B_OK;
