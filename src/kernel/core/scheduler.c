@@ -129,9 +129,12 @@ context_switch(struct thread *fromThread, struct thread *toThread)
 {
 	bigtime_t now;
 
-	// track kernel time
+	// track kernel & user time
 	now = system_time();
-	fromThread->kernel_time += now - fromThread->last_time;
+	if(fromThread->last_time_type == KERNEL_TIME)
+		fromThread->kernel_time += now - fromThread->last_time;
+	else
+		fromThread->user_time += now - fromThread->last_time;
 	toThread->last_time = now;
 
 	toThread->cpu = fromThread->cpu;

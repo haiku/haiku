@@ -187,6 +187,7 @@ create_thread_struct(const char *name)
 	t->user_time = 0;
 	t->kernel_time = 0;
 	t->last_time = 0;
+	t->last_time_type = KERNEL_TIME;
 	t->return_code = 0;
 	t->return_flags = 0;
 
@@ -248,7 +249,9 @@ _create_user_thread_kentry(void)
 
 	// a signal may have been delivered here
 //	thread_atkernel_exit();
+	// start tracking kernel & user time
 	thread->last_time = system_time();
+	thread->last_time_type = KERNEL_TIME;
 	thread->in_kernel = false;
 
 	// jump to the entry point in user space
@@ -268,7 +271,9 @@ _create_kernel_thread_kentry(void)
 	struct thread *thread = thread_get_current_thread();
 	int (*func)(void *args);
 
+	// start tracking kernel & user time
 	thread->last_time = system_time();
+	thread->last_time_type = KERNEL_TIME;
 
 	// call the entry function with the appropriate args
 	func = (void *)thread->entry;
@@ -905,6 +910,7 @@ thread_atkernel_entry(void)
 	now = system_time();
 	t->user_time += now - t->last_time;
 	t->last_time = now;
+	t->last_time_type = KERNEL_TIME;
 
 	t->in_kernel = true;
 
@@ -937,6 +943,7 @@ thread_atkernel_exit(void)
 	now = system_time();
 	t->kernel_time += now - t->last_time;
 	t->last_time = now;
+	t->last_time_type = USER_TIME;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
