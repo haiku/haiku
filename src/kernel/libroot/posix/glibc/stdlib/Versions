@@ -1,0 +1,105 @@
+libc {
+  GLIBC_2.0 {
+    # functions with required interface outside normal name space
+    __xpg_basename;
+
+    # functions used in inline functions or macros
+    __strto*_internal;
+
+    # functions used in other libraries
+    __secure_getenv;
+
+    # a*
+    a64l; abort; abs; atexit; atof; atoi; atol; atoll;
+
+    # b*
+    bsearch;
+
+    # c*
+    canonicalize_file_name; clearenv;
+
+    # d*
+    div; drand48; drand48_r;
+
+    # e*
+    erand48; erand48_r; exit;
+
+    # g*
+    getenv; getsubopt;
+
+    # i*
+    initstate; initstate_r;
+
+    # l*
+    l64a; labs; lcong48; lcong48_r; ldiv; llabs; lldiv; lrand48; lrand48_r;
+
+    # m*
+    mblen; mbrlen; mbrtowc; mbsinit; mbsnrtowcs; mbsrtowcs; mbstowcs;
+    mbtowc; mcheck; mcount; mrand48; mrand48_r;
+
+    # n*
+    nrand48; nrand48_r;
+
+    # o*
+    on_exit;
+
+    # p*
+    putenv;
+
+    # q*
+    qsort;
+
+    # r*
+    rand; rand_r; random; random_r; realpath; rpmatch;
+
+    # s*
+    seed48; seed48_r; setcontext; setenv; setstate; setstate_r; srand; srand48;
+    srand48_r; srandom; srandom_r; step; strfmon; strtod; strtof; strtol;
+    strtold; strtoll; strtoq; strtoul; strtoull; strtouq; system;
+
+    # u*
+    unsetenv;
+
+    # w*
+    wcstombs; wctomb;
+  }
+  GLIBC_2.1 {
+    # a*
+    addseverity;
+
+    # f*
+    fmtmsg;
+
+    # g*
+    getcontext;
+
+    # m*
+    makecontext;
+
+    # s*
+    strtoimax; strtoumax; swapcontext;
+  }
+  GLIBC_2.1.1 {
+    # _*
+    _Exit;
+
+    # i*
+    imaxabs; imaxdiv;
+  }
+  GLIBC_2.1.3 {
+    # used by new G++ ABI
+    __cxa_atexit; __cxa_finalize;
+  }
+  GLIBC_2.3 {
+    # Silent change in SUS.
+    realpath;
+  }
+  GLIBC_PRIVATE {
+    # functions which have an additional interface since they are
+    # are cancelable.
+    __libc_system;
+
+    # functions used in other libraries.
+    __on_exit;
+  }
+}

@@ -1,0 +1,27 @@
+libc {
+  GLIBC_2.0 {
+    # functions used in inline functions or macros
+    __wcsto*_internal; __mbrlen; __mbrtowc;
+
+    # b*
+    btowc;
+
+    # w*
+    wcpcpy; wcpncpy; wcrtomb; wcscat; wcschr; wcscmp; wcscoll;
+    wcscpy; wcscspn; wcsdup; wcslen; wcsncat; wcsncmp;
+    wcsncpy; wcsnrtombs; wcspbrk; wcsrchr; wcsrtombs; wcsspn; wcsstr;
+    wcstod; wcstof; wcstok; wcstol; wcstold; wcstoq; wcstoul;
+    wcstouq; wcswidth; wcsxfrm; wctob;
+
+    wmemchr; wmemcmp; wmemcpy; wmemmove; wmemset;
+  }
+  GLIBC_2.1 {
+    # w*
+    wcscasecmp; wcsncasecmp; wcsnlen; wcstoll;
+    wcstoimax; wcstoumax; wcstoull; wcswcs; wmemrtombs; wmemrtowcs;
+  }
+  GLIBC_2.2 {
+    # w*
+    wcschrnul; wmempcpy;
+  }
+}

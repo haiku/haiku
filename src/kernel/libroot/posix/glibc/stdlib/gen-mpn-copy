@@ -1,0 +1,35 @@
+#!/bin/sh
+
+translations='
+sparc64		sparc/sparc64
+sparc32/v8	sparc/sparc8
+sparc32		sparc
+x86/pentium	i386/i586
+x86		i386
+m68k/mc68000	m68k/m68000
+m68k/mc68020	m68k/m68020
+m88k/mc88100	m88k/m88100
+m88k/mc88110	m88k/m88110
+mips3		mips/mips3
+mips2		mips
+hppa/hppa1_1	hppa/hppa1.1
+alpha/ev5	alpha/alphaev5
+power		rs6000
+am29000		a29k
+'
+
+set $translations
+while [ $# -ge 2 ]; do
+  gmp=$1 glibc=$2
+  shift; shift
+  echo 'mpn-found-1 := $(filter $(gmp-srcdir)/mpn/'$gmp'/%,$(mpn-found))
+mpn-copy-1 := $(patsubst $(gmp-srcdir)/mpn/'$gmp'/%,$(sysdep_dir)/'$glibc\
+'/%,$(mpn-found-1))
+mpn-found := $(filter-out $(mpn-found-1),$(mpn-found))
+mpn-copy-sysdep := $(mpn-copy-sysdep) $(mpn-copy-1)
+$(mpn-copy-1): $(sysdep_dir)/'$glibc'/%: \
+	       $(ignore gmp2glibc.sed) $(gmp-srcdir)/mpn/'$gmp'/%
+	$(gmp2glibc)'
+done
+
+exit 0
