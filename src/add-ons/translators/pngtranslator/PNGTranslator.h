@@ -45,7 +45,7 @@
 
 // IO Extension Names:
 
-#define PNG_TRANSLATOR_VERSION 100
+#define PNG_TRANSLATOR_VERSION 0x100
 
 #define PNG_IN_QUALITY 0.6
 #define PNG_IN_CAPABILITY 0.2

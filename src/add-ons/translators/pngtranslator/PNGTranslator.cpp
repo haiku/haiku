@@ -181,8 +181,9 @@ PNGTranslator::PNGTranslator()
 		
 	strcpy(fName, "PNG Images");
 	sprintf(fInfo, "PNG image translator v%d.%d.%d %s",
-		PNG_TRANSLATOR_VERSION / 100, (PNG_TRANSLATOR_VERSION / 10) % 10,
-		PNG_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(PNG_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((PNG_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(PNG_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
