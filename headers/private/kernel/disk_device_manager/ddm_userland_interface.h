@@ -3,7 +3,12 @@
 #ifndef _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 #define _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 
-#include "disk_device_manager.h"
+#include <DiskDeviceDefs.h>
+#include <OS.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // userland partition representation
 struct user_partition_data {
@@ -14,6 +19,7 @@ struct user_partition_data {
 	uint32				status;
 	uint32				flags;
 	dev_t				volume;
+	int32				index;
 	int32				change_counter;	// needed?
 	disk_system_id		disk_system;
 	char				*name;
@@ -49,19 +55,22 @@ struct user_disk_device_job_info {
 };
 
 // iterating, retrieving device/partition data
-partition_id get_next_disk_device_id(int32 *cookie, size_t neededSize = NULL);
-status_t get_disk_device_data(partition_id deviceID, bool shadow,
-							  user_disk_device_data *buffer,
-							  size_t bufferSize, size_t *neededSize);
-status_t get_partition_data(partition_id partitionID, bool shadow,
-							user_partition_data *buffer,
-							size_t bufferSize, size_t *neededSize);
-	// Dangerous?!
-status_t get_partitionable_spaces(partition_id partitionID, bool shadow,
-								  user_partitionable_space_data *buffer,
+partition_id _kern_get_next_disk_device_id(int32 *cookie,
+										   size_t *neededSize = NULL);
+status_t _kern_get_disk_device_data(partition_id deviceID, bool shadow,
+									user_disk_device_data *buffer,
+									size_t bufferSize, size_t *neededSize);
+status_t _kern_get_partition_data(partition_id partitionID, bool shadow,
+								  user_partition_data *buffer,
 								  size_t bufferSize, size_t *neededSize);
+	// Dangerous?!
+status_t _kern_get_partitionable_spaces(partition_id partitionID, bool shadow,
+										user_partitionable_space_data *buffer,
+										size_t bufferSize, size_t *neededSize);
 	// Pass the partition change counter? If GetPartitionInfo() is only
 	// allowed, when the device is locked, then we wouldn't need it.
+
+#if 0
 
 // disk systems
 status_t find_disk_system(const char *name, disk_system_id *id);
@@ -113,5 +122,11 @@ status_t start_disk_device_watching(port_id, int32 token, uint32 flags);
 status_t start_disk_device_job_watching(disk_job_id job, port_id, int32 token,
 										uint32 flags);
 status_t stop_disk_device_watching(port_id, int32 token);
+
+#endif	// 0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	// _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
