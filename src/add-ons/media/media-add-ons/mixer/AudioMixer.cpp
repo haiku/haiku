@@ -990,7 +990,7 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Gain", B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, StringForFormat(out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
-		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
+		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.5) 
 									   ->SetChannelCount(out->GetOutputChannelCount()); 
 		group->MakeNullParameter(PARAM_OUTPUT(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
