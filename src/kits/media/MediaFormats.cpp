@@ -116,8 +116,6 @@ operator==(const media_format_description & a, const media_format_description & 
 			return a.u.aiff.codec == b.u.aiff.codec;
 		case B_AVR_FORMAT_FAMILY:
 			return a.u.avr.id == b.u.avr.id;
-		case B_OGG_FORMAT_FAMILY:
-			return false; // XXX fix this
 		case B_MISC_FORMAT_FAMILY:
 			return a.u.misc.file_format == b.u.misc.file_format && a.u.misc.codec == b.u.misc.codec;
 
@@ -152,8 +150,6 @@ operator<(const media_format_description & a, const media_format_description & b
 			return a.u.aiff.codec < b.u.aiff.codec;
 		case B_AVR_FORMAT_FAMILY:
 			return a.u.avr.id < b.u.avr.id;
-		case B_OGG_FORMAT_FAMILY:
-			return false; // XXX fix this
 		case B_MISC_FORMAT_FAMILY:
 			if (a.u.misc.file_format == b.u.misc.file_format)
 				return a.u.misc.codec < b.u.misc.codec;
