@@ -271,6 +271,9 @@ video_mode_menu()
 	menu->AddItem(item = new MenuItem("Default"));
 	item->SetMarked(true);
 	item->Select(true);
+	item->SetHelpText("The Default video mode is the one currently configured in "
+		"the system. If there is no mode configured yet, a viable mode will be chosen "
+		"automatically.");
 
 	menu->AddItem(new MenuItem("Standard VGA"));
 
@@ -281,6 +284,10 @@ video_mode_menu()
 
 		menu->AddItem(item = new MenuItem(label));
 		item->SetData(mode);
+
+		// ToDo: remove this!
+		if (mode->bits_per_pixel != 8)
+			item->SetHelpText("The boot logo will currently only be rendered correctly in 8 bit modes.");
 	}
 
 	menu->AddSeparatorItem();
