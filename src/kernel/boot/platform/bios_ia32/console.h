@@ -11,20 +11,22 @@
 
 
 enum console_color {
+	// foreground and background colors
 	BLACK,
-	NAVY,
-	GREEN,
-	TEAL,
-	MAROON,
-	PURPLE,
-	OLIVE,
-	SILVER,
-	GREY,
 	BLUE,
-	LIME,
-	AQUA,
+	GREEN,
+	CYAN,
 	RED,
-	FUCHSIA,
+	PURPLE,
+	BROWN,
+	GRAY,
+	// foreground colors only
+	DARK_GRAY,
+	BRIGHT_BLUE,
+	BRIGHT_GREEN,
+	BRIGHT_CYAN,
+	BRIGHT_RED,
+	MAGENTA,
 	YELLOW,
 	WHITE
 };
