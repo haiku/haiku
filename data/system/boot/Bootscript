@@ -6,7 +6,7 @@
 
 # launch <executable path> [thread to wait for]
 
-launch () {
+launch() {
 	if [ -f "/boot/$1" ]
 	then
 		"/boot/$1" &
@@ -49,25 +49,31 @@ runprog() {
 exec </dev/null
 exec >/dev/null 2>&1
 
+# Standard locations of boot files
+SCRIPTS=beos/system/boot
+SERVERS=beos/system/servers
+
 # Set up the environment
 
 export SAFEMODE=`/bin/safemode`
 
-SCRIPTS=beos/system/boot
 launchscript $SCRIPTS/SetupEnvironment
 
 # Sets timezone etc.
 runprog beos/bin/clockconfig
 
-# Launch consoled
-launch beos/bin/consoled
-
 # Launch servers
-SERVERS=beos/system/servers
 
+# We must wait for the app_server and registrar to be ready
 #launch $SERVERS/app_server picasso			# launch app_server
 launch $SERVERS/registrar _roster_thread_	# launch registrar
 
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/syslog_daemon
+fi
+
+# Launch consoled (to be removed later - this starts the mini console)
+launch beos/bin/consoled
 
 # Check for daily saving time
 # TODO to be launched when tracker and deskbar are launched
