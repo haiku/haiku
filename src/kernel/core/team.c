@@ -61,6 +61,11 @@ static void *team_hash = NULL;
 static team_id next_team_id = 1;
 static struct team *kernel_team = NULL;
 
+// some arbitrary chosen limits - should probably depend on the available
+// memory (the limit is not yet enforced)
+static int32 sMaxTeams = 2048;
+static int32 sUsedTeams = 1;
+
 spinlock team_spinlock = 0;
 
 static void insert_group_into_session(struct process_session *session, struct process_group *group);
@@ -136,14 +141,14 @@ dump_team_info(int argc, char **argv)
 }
 
 
-int
-team_init(kernel_args *ka)
+status_t
+team_init(kernel_args *args)
 {
 	struct process_session *session;
 	struct process_group *group;
 
 	// create the team hash table
-	team_hash = hash_init(15, (addr_t)&kernel_team->next - (addr_t)kernel_team,
+	team_hash = hash_init(15, offsetof(struct team, next),
 		&team_struct_compare, &team_struct_hash);
 
 	// create initial session and process groups
@@ -178,6 +183,20 @@ team_init(kernel_args *ka)
 
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 	return 0;
+}
+
+
+int32
+team_max_teams(void)
+{
+	return sMaxTeams;
+}
+
+
+int32
+team_used_teams(void)
+{
+	return sUsedTeams;
 }
 
 
@@ -703,6 +722,8 @@ void
 team_remove_team(struct team *team, struct process_group **_freeGroup)
 {
 	hash_remove(team_hash, team);
+	sUsedTeams--;
+
 	team->state = TEAM_STATE_DEATH;
 
 	// reparent each of the team's children
@@ -965,6 +986,7 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 	hash_insert(team_hash, team);
 	insert_team_into_parent(parent, team);
 	insert_team_into_group(parent->group, team);
+	sUsedTeams++;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
@@ -1159,6 +1181,7 @@ fork_team(void)
 	hash_insert(team_hash, team);
 	insert_team_into_parent(parentTeam, team);
 	insert_team_into_group(parentTeam->group, team);
+	sUsedTeams++;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);

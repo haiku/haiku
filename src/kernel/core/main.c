@@ -30,6 +30,7 @@
 #include <kmodule.h>
 #include <int.h>
 #include <team.h>
+#include <system_info.h>
 #include <kdevice_manager.h>
 #include <real_time_clock.h>
 #include <kernel_daemon.h>
@@ -101,6 +102,7 @@ _start(kernel_args *oldka, int cpu_num)
 		debug_init_post_vm(&ka);
 		int_init_post_vm(&ka);
 		cpu_init_post_vm(&ka);
+		system_info_init(&ka);
 
 		TRACE(("init faults\n"));
 		faults_init(&ka);

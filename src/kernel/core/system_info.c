@@ -1,19 +1,24 @@
 /*
-** Copyright 2004, Stefano Ceccherini. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2004, Stefano Ceccherini. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
 #include <KernelExport.h>
 
 #include <system_info.h>
+#include <arch/system_info.h>
+
 #include <vm.h>
 #include <debug.h>
 #include <port.h>
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
+#include <team.h>
+#include <thread.h>
+#include <vm_page.h>
 
 #include <string.h>
 
@@ -29,17 +34,18 @@ _get_system_info(system_info *info, size_t size)
 		return B_BAD_VALUE;
 
 	memset(info, 0, sizeof(system_info));
-	// TODO: Add:
-	// - max_pages
-	// - used_pages
-	// - page_faults
-	// - max_threads
-	// - used_threads
-	// - max_teams
-	// - used_teams
 
 	info->boot_time = rtc_boot_time();
 	info->cpu_count = smp_get_num_cpus();
+
+	// ToDo: Add page_faults
+	info->max_pages = vm_page_num_pages();
+	info->used_pages = vm_page_num_pages() - vm_page_num_free_pages();
+
+	info->used_threads = thread_used_threads();
+	info->max_threads = thread_max_threads();
+	info->used_teams = team_used_teams();
+	info->max_teams = team_max_teams();
 	info->used_ports = port_used_ports();
 	info->max_ports = port_max_ports();
 	info->used_sems = sem_used_sems();
@@ -50,16 +56,19 @@ _get_system_info(system_info *info, size_t size)
 	strlcpy(info->kernel_build_date, __DATE__, B_OS_NAME_LENGTH);
 	strlcpy(info->kernel_build_time, __TIME__, B_OS_NAME_LENGTH);
 
-	// TODO: Add arch specific stuff (arch_get_system_info() ?)
-	// - cpu_type
-	// - cpu_revision
-	// - various cpu_info
-	// - cpu_clock_speed
-	// - bus_clock_speed
-	// - platform_type
-
-	return B_OK;
+	// all other stuff is architecture specific
+	return arch_get_system_info(info, size);
 }
+
+
+status_t 
+system_info_init(struct kernel_args *args)
+{
+	return arch_system_info_init(args);
+}
+
+
+//	#pragma mark -
 
 
 status_t

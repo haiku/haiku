@@ -53,6 +53,11 @@ static struct thread *sIdleThreads[B_MAX_CPU_COUNT];
 static void *sThreadHash = NULL;
 static thread_id sNextThreadID = 1;
 
+// some arbitrary chosen limits - should probably depend on the available
+// memory (the limit is not yet enforced)
+static int32 sMaxThreads = 4096;
+static int32 sUsedThreads = 0;
+
 static sem_id sSnoozeSem = -1;
 
 // death stacks - used temporarily as a thread cleans itself up
@@ -343,6 +348,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	// insert into global list
 	hash_insert(sThreadHash, t);
+	sUsedThreads++;
 	RELEASE_THREAD_LOCK();
 
 	GRAB_TEAM_LOCK();
@@ -712,11 +718,14 @@ thread_exit2(void *_args)
 	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.thread->id));
 
 	disable_interrupts();
+
 	GRAB_TEAM_LOCK();
 	remove_thread_from_team(team_get_kernel_team(), args.thread);
 	RELEASE_TEAM_LOCK();
+
 	GRAB_THREAD_LOCK();
 	hash_remove(sThreadHash, args.thread);
+	sUsedThreads--;
 	RELEASE_THREAD_LOCK();
 
 	// restore former thread interrupts (doesn't matter much at this point anyway)
@@ -1078,6 +1087,27 @@ thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 }
 
 
+thread_id
+spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
+{
+	return create_thread(name, team, (thread_entry_func)function, arg, NULL, priority, true);
+}
+
+
+int32
+thread_max_threads(void)
+{
+	return sMaxThreads;
+}
+
+
+int32
+thread_used_threads(void)
+{
+	return sUsedThreads;
+}
+
+
 status_t
 thread_init(kernel_args *args)
 {
@@ -1134,6 +1164,7 @@ thread_init(kernel_args *args)
 			arch_thread_set_current_thread(t);
 		t->cpu = &cpu[i];
 	}
+	sUsedThreads = args->num_cpus;
 
 	// create a set of death stacks
 
@@ -1181,13 +1212,6 @@ thread_per_cpu_init(int32 cpu_num)
 {
 	arch_thread_set_current_thread(sIdleThreads[cpu_num]);
 	return B_OK;
-}
-
-
-thread_id
-spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
-{
-	return create_thread(name, team, (thread_entry_func)function, arg, NULL, priority, true);
 }
 
 
