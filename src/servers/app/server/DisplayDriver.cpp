@@ -128,7 +128,7 @@ DisplayDriver::DisplayDriver(void)
 	_is_cursor_hidden=false;
 	_is_cursor_obscured=false;
 	_cursor=NULL;
-	_dpms_caps=0;
+	_dpms_caps=B_DPMS_ON;
 	_dpms_state=B_DPMS_ON;
 }
 
@@ -1333,7 +1333,7 @@ void DisplayDriver::ObscureCursor(void)
 	
 	The driver does not take ownership of the given cursor. Subclasses should make
 	a copy of the cursor passed to it. The default version of this function hides the
-	cursor, replaces it, and shows the cursor if previously visible.
+	cursory, replaces it, and shows the cursor if previously visible.
 */
 void DisplayDriver::SetCursor(ServerCursor *cursor)
 {
@@ -2000,33 +2000,6 @@ void DisplayDriver::GetTruncatedStrings( const char **instrings, int32 stringcou
 }
 
 /*!
-	\brief Sets the DPMS state of the driver
-	\param state The new state for the display. See Accelerant.h
-*/
-status_t DisplayDriver::SetDPMSState(uint32 state)
-{
-	return B_OK;
-}
-
-/*!
-	\brief Returns the current DPMS state
-	\return The current DPMS state
-*/
-uint32 DisplayDriver::GetDPMSState(void)
-{
-	return _dpms_state;
-}
-
-/*!
-	\brief Returns the current DPMS capabilities
-	\return The current DPMS capabilities
-*/
-uint32 DisplayDriver::GetDPMSCapabilities(void)
-{
-	return _dpms_caps;
-}
-
-/*!
 	\brief Returns the bit depth for the current screen mode
 	\return Current number of bits per pixel
 */
@@ -2106,6 +2079,148 @@ void DisplayDriver::Unlock(void)
 {
 	_locker->Unlock();
 }
+
+/*!
+	\brief Sets the driver's Display Power Management System state
+	\param state The state which the driver should enter
+	\return B_OK if successful, B_ERROR for failure
+	
+	This function will fail if the driver's rendering context does not support a 
+	particular DPMS state. Use DPMSCapabilities to find out the supported states.
+	The default implementation supports only B_DPMS_ON.
+*/
+status_t DisplayDriver::SetDPMSMode(const uint32 &state)
+{
+	if(state!=B_DPMS_ON)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+/*!
+	\brief Returns the driver's current DPMS state
+	\return The driver's current DPMS state
+*/
+uint32 DisplayDriver::DPMSMode(void) const
+{
+	return _dpms_state;
+}
+
+/*!
+	\brief Returns the driver's DPMS capabilities
+	\return The driver's DPMS capabilities
+	
+	The capabilities are the modes supported by the driver. The default implementation 
+	allows only B_DPMS_ON. Other possible states are B_DPMS_STANDBY, SUSPEND, and OFF.
+*/
+uint32 DisplayDriver::DPMSCapabilities(void) const
+{
+	return _dpms_caps;
+}
+
+/*!
+	\brief Returns data about the rendering device
+	\param info Pointer to an object to receive the device info
+	\return B_OK if this function is supported, B_UNSUPPORTED if not
+	
+	The default implementation of this returns B_UNSUPPORTED and does nothing.
+
+	From Accelerant.h:
+	
+	uint32	version;			// structure version number
+	char 	name[32];			// a name the user will recognize the device by
+	char	chipset[32];		// the chipset used by the device
+	char	serial_no[32];		// serial number for the device
+	uint32	memory;				// amount of memory on the device, in bytes
+	uint32	dac_speed;			// nominal DAC speed, in MHz
+
+*/
+status_t DisplayDriver::GetDeviceInfo(accelerant_device_info *info)
+{
+	return B_ERROR;
+}
+
+/*!
+	\brief Returns data about the rendering device
+	\param mode_list Pointer to receive a list of modes.
+	\param count The number of modes in mode_list
+	\return B_OK if this function is supported, B_UNSUPPORTED if not
+	
+	The default implementation of this returns B_UNSUPPORTED and does nothing.
+*/
+status_t DisplayDriver::GetModeList(display_mode **mode_list, uint32 *count)
+{
+	return B_UNSUPPORTED;
+}
+
+/*!
+	\brief Obtains the minimum and maximum pixel throughput
+	\param mode Structure to receive the data for the given mode
+	\param low Recipient of the minimum clock rate
+	\param high Recipient of the maximum clock rate
+	\return 
+	- \c B_OK: Everything is kosher
+	- \c B_UNSUPPORTED: The function is unsupported
+	- \c B_ERROR: No known pixel clock limits
+	
+	
+	This function returns the minimum and maximum "pixel clock" rates, in 
+	thousands-of-pixels per second, that are possible for the given mode. See 
+	BScreen::GetPixelClockLimits() for more information.
+
+	The default implementation of this returns B_UNSUPPORTED and does nothing.
+*/
+status_t DisplayDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+{
+	return B_UNSUPPORTED;
+}
+
+/*!
+	\brief Obtains the timing constraints of the current display mode. 
+	\param dtc Object to receive the constraints
+	\return 
+	- \c B_OK: Everything is kosher
+	- \c B_UNSUPPORTED: The function is unsupported
+	- \c B_ERROR: No known timing constraints
+	
+	The default implementation of this returns B_UNSUPPORTED and does nothing.
+*/
+status_t DisplayDriver::GetTimingConstraints(display_timing_constraints *dtc)
+{
+	return B_UNSUPPORTED;
+}
+
+/*!
+	\brief Obtains the timing constraints of the current display mode. 
+	\param dtc Object to receive the constraints
+	\return 
+	- \c B_OK: Everything is kosher
+	- \c B_UNSUPPORTED: The function is unsupported
+	
+	The default implementation of this returns B_UNSUPPORTED and does nothing. 
+	This is mostly the responsible of the hardware driver if the DisplayDriver 
+	interfaces with	actual hardware.
+*/
+status_t DisplayDriver::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+{
+	return B_UNSUPPORTED;
+}
+
+/*!
+	\brief Waits for the device's vertical retrace
+	\param timeout Amount of time to wait until retrace. Default is B_INFINITE_TIMEOUT
+	\return 
+	- \c B_OK: Everything is kosher
+	- \c B_ERROR: The function timed out before retrace
+	- \c B_UNSUPPORTED: The function is unsupported
+	
+	The default implementation of this returns B_UNSUPPORTED and does nothing. 
+*/
+status_t DisplayDriver::WaitForRetrace(bigtime_t timeout)
+{
+	return B_UNSUPPORTED;
+}
+
 
 /*!
 	\brief Internal depth-setting function
@@ -2192,6 +2307,17 @@ void DisplayDriver::_SetDPMSCapabilities(uint32 caps)
 }
 
 /*!
+	\brief Internal device info value-setting function
+	\param state The new capabilities of the driver
+
+	_SetDeviceInfo must be called at the initialization of the driver so that
+	GetDeviceInfo returns the proper values.
+*/
+void _SetDeviceInfo(const accelerant_device_info &infO)
+{
+}
+
+/*!
 	\brief Obtains the current cursor for the driver.
 	\return Pointer to the current cursor object.
 	
@@ -2250,3 +2376,5 @@ void DisplayDriver::HLine(int32 x1, int32 x2, int32 y, PatternHandler *pat)
 void DisplayDriver::HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat)
 {
 }
+
+
