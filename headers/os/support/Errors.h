@@ -179,6 +179,21 @@ enum {
 #define EOPNOTSUPP      (B_POSIX_ERROR_BASE + 43)                       
 #define ENOTSOCK		(B_POSIX_ERROR_BASE + 44)
 #define EHOSTDOWN		(B_POSIX_ERROR_BASE + 45)
+#define	EBADMSG		(B_POSIX_ERROR_BASE + 46)
+#define ECANCELED	(B_POSIX_ERROR_BASE + 47)
+#define EDESTADDRREQ	(B_POSIX_ERROR_BASE + 48)
+#define EDQUOT		(B_POSIX_ERROR_BASE + 49)
+#define EIDRM		(B_POSIX_ERROR_BASE + 50)
+#define EMULTIHOP	(B_POSIX_ERROR_BASE + 51)
+#define ENODATA		(B_POSIX_ERROR_BASE + 52)
+#define ENOLINK		(B_POSIX_ERROR_BASE + 53)
+#define ENOSR		(B_POSIX_ERROR_BASE + 54)
+#define ENOSTR		(B_POSIX_ERROR_BASE + 55)
+#define ENOTSUP		(B_POSIX_ERROR_BASE + 56)
+#define EPROTO		(B_POSIX_ERROR_BASE + 57)
+#define ETIME		(B_POSIX_ERROR_BASE + 58)
+#define ETXTBSY		(B_POSIX_ERROR_BASE + 59)
+
 
 /*---- POSIX errors that can be mapped to BeOS error codes ----*/
 #define ENOMEM			B_NO_MEMORY
