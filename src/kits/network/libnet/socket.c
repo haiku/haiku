@@ -208,7 +208,7 @@ _EXPORT int accept(int sock, struct sockaddr *addr, int *addrlen)
 
 
 _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
-             struct sockaddr *addr, size_t *addrlen)
+             struct sockaddr *addr, int *addrlen)
 {
 	struct sockaddr temp;
 	struct msghdr mh;
@@ -244,7 +244,7 @@ _EXPORT ssize_t recvfrom(int sock, void *buffer, size_t buflen, int flags,
 }
 
 _EXPORT ssize_t sendto(int sock, const void *buffer, size_t buflen, int flags,
-           const struct sockaddr *addr, size_t addrlen)
+           const struct sockaddr *addr, int addrlen)
 {
 	struct sockaddr temp;
 	struct msghdr mh;

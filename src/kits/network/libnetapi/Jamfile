@@ -5,7 +5,7 @@ UsePrivateHeaders net ;
 SubDirC++Flags -DBUILDING_R5_LIBNET ;
 
 SharedLibrary netapi :
-#	NetEndpoint.cpp
+	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp

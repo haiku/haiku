@@ -70,7 +70,7 @@
  *     size         : Initial size of buffer (default is zero).
  *
  * Remarks:
- *     This bad boy doubles up as the defalt ctor.
+ *     This bad boy doubles up as the default ctor.
  */
 BNetBuffer::BNetBuffer( size_t size )
            : CTOR_INIT_LIST
