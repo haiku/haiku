@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 #include <stdio.h>
 
+#include <ClipboardPrivate.h>
 #include <MessagePrivate.h>
 #include <RosterPrivate.h>
 
@@ -42,6 +43,7 @@ DBG(OUT("initialize_before()\n"));
 
 	_init_message_();
 	_init_roster_();
+	BPrivate::init_clipboard();
 
 DBG(OUT("initialize_before() done\n"));
 }
