@@ -132,7 +132,7 @@
 
 /* Define if you the function: */
 #define HAVE_BCMP 1
-#define HAVE_FCHDIR 1
+//#define HAVE_FCHDIR 1
 #define HAVE_FCHOWN 1
 #define HAVE_FSEEKO 1
 #define HAVE_FSYNC 1
@@ -156,7 +156,7 @@
 #define HAVE_READLINK 1
 #define HAVE_RENAME 1
 #define HAVE_SELECT 1
-#define HAVE_SETENV 1
+//#define HAVE_SETENV 1
 #define HAVE_SETPGID 1
 #define HAVE_SETSID 1
 #define HAVE_SIGACTION 1
