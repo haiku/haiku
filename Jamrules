@@ -941,19 +941,11 @@ actions KernelStaticLibraryObjects
 
 rule SystemMain
 {
-	# Usage SystemMain <target> : <sources> : <rqd_by> ;
+	# Usage SystemMain <target> : <sources> ;
 	SetupObjectsDir ;
 
-	LINKLIBS = ;
+	LINKLIBS on $(1) = ;
 
-	# This allows us to preset certain commands we use
-	# for building.
-	if $(3) {
-		for obj in $(3) {
-			BUILD_CMD on $(obj) = [ FDirName $(LOCATE_TARGET) $(1) ] ;
-		}
-	}
-	
 	Main $(1) : $(2) ;
 }
 
@@ -1017,51 +1009,86 @@ actions WriteKernelConfig bind SECTION_FILES
 rule BuildKernel
 {
 	# Usage BuildKernel <target> : <config_file> ;
+	local kernel = $(1) ;
+	local configFile = $(2) ;
+	local bootmaker = bootmaker ;
 	
-	Depends all : $(1) ;
-	Depends $(1) : $(2) ;
-	Clean clean : $(1) ;
-	
-	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	Depends all : $(kernel) ;
+	Depends $(kernel) : $(configFile) $(bootmaker) ;
+	Clean clean : $(kernel) ;
+	MakeLocate $(kernel) : $(LOCATE_TARGET) ;
+
+	BOOT_MAKER on $(kernel) = $(bootmaker) ;
 }
 
-actions BuildKernel
+actions BuildKernel bind BOOT_MAKER
 {
-	"$(BUILD_CMD)" --strip-debug --strip-binary strip "$(2)" -o "$(1)" ;
+	"$(BOOT_MAKER)" --strip-debug --strip-binary strip "$(2)" -o "$(1)" ;
 	echo ""
 	echo "Kernel linked!"
 	echo ""
 }
 
-# At present I don't bother moving the final location for
-# the floppy image as it makes copying it onto a floppy easier if it's
-# where you did the build. This is easy enough changed.
 rule KernelFloppyImage
 {
 	# Usage KernelFloppyImage <target> : <kernel> : <bootblock> ;
+	local floppy = $(1) ;
+	local kernel = $(2) ;
+	local bootblock = $(3) ;
+	local makeflop = makeflop ;
 
-	Depends all : $(1) ;
-	Depends $(1) : $(2) ;
-	Clean clean : $(1) ;
+	Depends all : $(floppy) ;
+	Depends $(floppy) : $(kernel) $(bootblock) $(makeflop) ;
+	Clean clean : $(floppy) ;
+	MakeLocate $(floppy) : $(OBOS_OBJECT_TARGET) ;
 
-	BOOT_BLOCK on $(1) = $(3) ;
+	BOOT_BLOCK on $(floppy) = $(bootblock) ;
+	MAKE_FLOP on $(floppy) = $(makeflop) ;
 }
 
 # This may be a bit verbose, but I think it's useful to show what's
 # going on, at least in this early stage of development.
-actions KernelFloppyImage
+actions KernelFloppyImage bind BOOT_BLOCK bind MAKE_FLOP
 {
-	"$(BUILD_CMD)" "$(BOOT_BLOCK)" "$(2)" "$(1)" ;
+	"$(MAKE_FLOP)" "$(BOOT_BLOCK)" "$(2)" "$(1)" ;
+
 	echo ""
 	echo "*************************************************"
 	echo "*         Kernel build completed!               *"
 	echo "*    Boot image for a 1.44M floppy created      *"
 	echo "*************************************************"
 	echo ""
-	echo "Floppy image is $(OBOS_FLOPPY)"
+	echo "Floppy image is $(1)"
 	echo "The following command will write it to a floppy on BeOS"
-	echo "  dd if=$(OBOS_FLOPPY) of=/dev/disk/floppy/raw bs=18k"
+	echo "  dd if=$(1) of=/dev/disk/floppy/raw bs=18k"
+	echo "Alternatively you can run"
+	echo "  ./configure --floppy /dev/disk/floppy/raw"
+	echo "once and build + write the image subsequently via"
+	echo "  jam installfloppy"
 	echo ""
 }
 
+rule InstallFloppy
+{
+	# InstallFloppy <target> : <floppy>
+	# "dd"s <floppy> to $(FLOPPY_PATH).
+
+	local target = $(1) ;
+	local floppy = $(2) ;
+
+	NotFile $(target) ;
+	Always $(target) ;
+	Depends $(target) : $(floppy) ;
+}
+
+actions InstallFloppy
+{
+	if [ -z $(FLOPPY_PATH) ] ; then
+		echo "Can't install floppy: FLOPPY_PATH not set."
+		echo "run: ./configure --floppy <floppy path>"
+		echo
+		exit 0
+	fi
+	dd if=$(2) of=$(FLOPPY_PATH) bs=18k
+}
 
