@@ -390,7 +390,7 @@ free_settings(settings_handle *handle)
 
 
 static void *
-new_settings(char *buffer)
+new_settings(char *buffer, const char *driverName)
 {
 	settings_handle *handle = malloc(sizeof(settings_handle));
 	if (handle == NULL)
@@ -434,7 +434,7 @@ load_driver_settings_from_file(int file, const char *driverName)
 				// make sure the string is null terminated
 				// to avoid misbehaviour
 
-			handle = new_settings(text);
+			handle = new_settings(text, driverName);
 			if (handle != NULL) {
 				// everything went fine!
 				return handle;
@@ -731,7 +731,7 @@ load_driver_settings(const char *driverName)
 		while (settings != NULL) {
 			if (!strcmp(settings->name, driverName)) {
 				// we have it
-				return new_settings(settings->buffer);
+				return new_settings(settings->buffer, driverName);
 			}
 			settings = settings->next;
 		}
