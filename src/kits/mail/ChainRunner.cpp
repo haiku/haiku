@@ -544,7 +544,8 @@ BMailChainRunner::Stop(bool kill)
 		BMessageQueue *looper_queue = MessageQueue();
 		looper_queue->Lock();
 		BMessage *msg;
-		while (msg = looper_queue->NextMessage()) delete msg; //-- Ensure STOP makes the front of the queue
+		while ((msg = looper_queue->NextMessage()))
+			delete msg; //-- Ensure STOP makes the front of the queue
 	 	
 		PostMessage(B_QUIT_REQUESTED);
 		looper_queue->Unlock();
