@@ -181,6 +181,20 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
+		case B_WORKSPACE_ACTIVATED:
+		{
+			BScreen screen;
+			rgb_color col=screen.DesktopColor();
+			settings.ReplaceData("DESKTOP",(type_code)'RGBC',
+					&col,sizeof(rgb_color));
+			
+			if(attrstring=="DESKTOP")
+			{
+				picker->SetValue(col);
+				colorwell->SetColor(col);
+			}
+			break;
+		}
 		case DELETE_COLORSET:
 		{
 			// Construct the path and delete
@@ -609,7 +623,7 @@ printf("Couldn't open file %s for read\n",path.String());
 		SetColorSetName(colorset_name->String());
 
 		BScreen screen;
-		rgb_color col=screen.GetDesktopColor();
+		rgb_color col=screen.DesktopColor();
 		settings.ReplaceData("DESKTOP",(type_code)'RGBC',
 		&col,sizeof(rgb_color));
 
