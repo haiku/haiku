@@ -30,6 +30,7 @@
 #include <Button.h>
 #include <Window.h>
 #include <Errors.h>
+#include <stdio.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -96,7 +97,7 @@ void BButton::Draw(BRect updateRect)
 	if (IsFocusChanging())
 	{
 		float x = (bounds.right - StringWidth(Label())) / 2.0f;
-		float y = bounds.bottom - fh.descent - (IsDefault() ? 6.0f : 3.0f);
+		float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + fh.descent + 1;
 
 		if (IsFocus())
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
@@ -186,7 +187,8 @@ void BButton::Draw(BRect updateRect)
 
 		// Label
 		float x = (bounds.right - StringWidth(Label())) / 2.0f;
-		float y = bounds.bottom - fh.descent - (IsDefault() ? 8.0f : 5.0f);
+		float y = bounds.top + ((bounds.Height() - fh.ascent - fh.descent) / 2.0f) + fh.ascent + 1;
+		
 
 		if (Value())
 		{
@@ -204,7 +206,7 @@ void BButton::Draw(BRect updateRect)
 		// Focus
 		if (IsFocus())
 		{
-			y += 2.0f;
+			y += fh.descent;
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
 		}
@@ -294,7 +296,7 @@ void BButton::MouseDown(BPoint point)
 
 			GetMouse(&point, &buttons, true);
 
- 			bool inside = bounds.Contains(ConvertFromScreen(point));
+ 			bool inside = bounds.Contains(point);
 
 			if ((Value() == B_CONTROL_ON) != inside)
 				SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
