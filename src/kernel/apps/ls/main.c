@@ -61,7 +61,7 @@ display_l(const char *path, const char *filename, struct stat *stat)
 
 	if (S_ISLNK(stat->st_mode)) {
 		char buffer[1024];
-		if (readlink(path, buffer, sizeof(buffer)) != 0)
+		if (readlink(path, buffer, sizeof(buffer)) < 0)
 			strcpy(buffer, "???");
 		printf(" (-> %s)\n", buffer);
 	} else
