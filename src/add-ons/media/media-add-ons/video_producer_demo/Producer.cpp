@@ -39,8 +39,6 @@ VideoProducer::VideoProducer(
 	BBufferProducer(B_MEDIA_RAW_VIDEO),
 	BControllable()
 {
-	status_t err;
-
 	fInitStatus = B_NO_INIT;
 
 	fInternalID = internal_id;
@@ -346,8 +344,6 @@ VideoProducer::PrepareToConnect(const media_source &source,
 		const media_destination &destination, media_format *format,
 		media_source *out_source, char *out_name)
 {
-	status_t err;
-
 	PRINTF(1, ("PrepareToConnect() %ldx%ld\n", \
 			format->u.raw_video.display.line_width, \
 			format->u.raw_video.display.line_count));
@@ -433,8 +429,8 @@ VideoProducer::Connect(status_t error, const media_source &source,
 		return;
 	}
 	bigtime_t now = system_time();
-	for (int y=0;y<fConnectedFormat.display.line_count;y++)
-		for (int x=0;x<fConnectedFormat.display.line_width;x++)
+	for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
+		for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
 			*(p++) = ((((x+y)^0^x)+f) & 0xff) * (0x01010101 & fColor);
 	fProcessingLatency = system_time() - now;
 	free(buffer);
@@ -548,7 +544,7 @@ VideoProducer::SetParameterValue(
 	if ((id != P_COLOR) || !value || (size != sizeof(uint32)))
 		return;
 
-	if (*(int32 *)value == fColor)
+	if (*(uint32 *)value == fColor)
 		return;
 
 	fColor = *(uint32 *)value;
@@ -716,8 +712,8 @@ VideoProducer::FrameGenerator()
 
 		/* Fill in a pattern */
 		uint32 *p = (uint32 *)buffer->Data();
-		for (int y=0;y<fConnectedFormat.display.line_count;y++)
-			for (int x=0;x<fConnectedFormat.display.line_width;x++)
+		for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
+			for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
 				*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
 
 		/* Send the buffer on down to the consumer */
