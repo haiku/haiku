@@ -205,8 +205,6 @@ public:
 	void StrokeTriangle(BPoint *pts, const DrawData *d);
 
 	void GetMode(display_mode *mode);
-	int32 GetMode(void);
-	
 	
 	// Font-related calls
 	void DrawString(const char *string, const int32 &length, const BPoint &pt, const DrawData *d);
@@ -235,12 +233,7 @@ public:
 	virtual bool Lock(bigtime_t timeout=B_INFINITE_TIMEOUT);
 	virtual void Unlock(void);
 
-	virtual void SetMode(const int32 &mode);
 	virtual void SetMode(const display_mode &mode);
-	
-	// Eventually, this method will go away....
-	uint8 GetDepth(void);
-	uint32 GetBytesPerRow(void);
 	
 	virtual bool DumpToFile(const char *path);
 	virtual ServerBitmap *DumpToBitmap(void);
@@ -306,11 +299,6 @@ protected:
 	int fLineThickness;
 	
 	BLocker *_locker;
-	uint8 _buffer_depth;
-	uint16 _buffer_width;
-	uint16 _buffer_height;
-	int32 _buffer_mode;
-	uint32 _bytes_per_row;
 	bool _is_cursor_hidden;
 	bool _is_cursor_obscured;
 
