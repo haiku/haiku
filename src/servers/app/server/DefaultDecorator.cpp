@@ -278,7 +278,7 @@ void DefaultDecorator::MoveBy(float x, float y)
 
 void DefaultDecorator::MoveBy(BPoint pt)
 {
-STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
+	STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -295,19 +295,21 @@ STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 
 void DefaultDecorator::GetFootprint(BRegion *region)
 {
-STRACE(("DefaultDecorator: Get Footprint\n"));
+	STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
 	if(!region)
 		return;
 
-	if(_look == B_NO_BORDER_WINDOW_LOOK){
+	if(_look == B_NO_BORDER_WINDOW_LOOK)
+	{
 		region->Set(_frame);
 		return;
 	}
 	
-	if(_look == B_BORDERED_WINDOW_LOOK){
+	if(_look == B_BORDERED_WINDOW_LOOK)
+	{
 		region->Set(_borderrect);
 		return;
 	}
@@ -316,14 +318,15 @@ STRACE(("DefaultDecorator: Get Footprint\n"));
 	region->Include(_tabrect);
 }
 
-BRect DefaultDecorator::SlideTab(float dx, float dy=0){
+BRect DefaultDecorator::SlideTab(float dx, float dy=0)
+{
 	//return Decorator::SlideTab(dx,dy);
 	return _tabrect;
 }
 
 void DefaultDecorator::_DrawTitle(BRect r)
 {
-STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
 	_layerdata.highcolor=_colors->window_tab_text;
@@ -354,8 +357,6 @@ void DefaultDecorator::_SetFocus(void)
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
 	
-	// Removed Adi's short-term color hack and replaced with a more palatable substitute for the old, 
-	// dark colors
 	if(GetFocus())
 	{
 		button_highcol.SetColor(tint_color(_colors->window_tab.GetColor32(),B_LIGHTEN_2_TINT));
@@ -372,7 +373,8 @@ void DefaultDecorator::_SetFocus(void)
 
 void DefaultDecorator::Draw(BRect update)
 {
-STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
+	STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
+
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
@@ -391,7 +393,7 @@ void DefaultDecorator::Draw(void)
 
 void DefaultDecorator::_DrawZoom(BRect r)
 {
-STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
 	BRect zr( r );
@@ -408,14 +410,14 @@ STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 
 void DefaultDecorator::_DrawClose(BRect r)
 {
-STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Just like DrawZoom, but for a close button
 	DrawBlendedRect( r, GetClose());
 }
 
 void DefaultDecorator::_DrawTab(BRect r)
 {
-STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
 	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
@@ -434,20 +436,6 @@ STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
 						 _layerdata.pensize,_layerdata.highcolor);
 	
-	_layerdata.highcolor = RGBColor( 255, 255, 0 );
-	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1),
-						 BPoint( _tabrect.left + 1, _tabrect.bottom),
-						 _layerdata.pensize,_layerdata.highcolor);
-	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1),
-						 BPoint( _tabrect.right - 1, _tabrect.top + 1),
-						 _layerdata.pensize,_layerdata.highcolor);
-
-	_layerdata.highcolor = RGBColor( 175, 123, 0 );						 
-	_driver->StrokeLine( BPoint( _tabrect.right - 1, _tabrect.top + 2),
-						 BPoint( _tabrect.right - 1, _tabrect.bottom),
-						 _layerdata.pensize,_layerdata.highcolor);
-
-
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
@@ -551,9 +539,8 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 	if(_look == B_NO_BORDER_WINDOW_LOOK)
 		return;
 
-	if(!borderwidth){
+	if(!borderwidth)
 		return;
-	}
 	
 	// Data specifically for the StrokeLineArray call.
 	int32 numlines=0, maxlines=20;
