@@ -109,8 +109,7 @@ arch_cpu_global_TLB_invalidate(void)
 
 
 // ToDo: doesn't belong here!
-#include <OS.h>
-
+#if 0
 long long 
 system_time(void)
 {
@@ -119,6 +118,7 @@ system_time(void)
 	return (time_base * 1000000) / ((66*1000*1000) / 4); 
 		// ToDo: remove hard coded
 }
+#endif
 
 
 int
