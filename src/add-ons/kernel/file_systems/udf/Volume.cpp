@@ -64,6 +64,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 	
 	// If the device is actually a normal file, try to disable the cache
 	// for the file in the parent filesystem
+#if !USER
 	struct stat stat;
 	error = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
 	if (!error) {
@@ -71,6 +72,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 			DIE(("Unable to disable cache of underlying file system.\n"));
 		}
 	}
+#endif
 
 	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
