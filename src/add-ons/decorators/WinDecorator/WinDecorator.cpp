@@ -126,18 +126,18 @@ void WinDecorator::MoveBy(BPoint pt)
 	_zoomrect.OffsetBy(pt);
 	_minimizerect.OffsetBy(pt);
 }
-/*
-SRegion * WinDecorator::GetFootprint(void)
+
+void WinDecorator::GetFootprint(BRegion *region)
 {
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WindowBorder
+	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
+	if(!region)
+		return;
 	
-	SRegion *reg=new SRegion(_borderrect);
-	reg->Include(_tabrect);
-	return reg;
+	region->Set(_borderrect);
+	region->Include(_tabrect);
 }
-*/
 
 void WinDecorator::_DrawTitle(BRect r)
 {

@@ -175,6 +175,18 @@ void MacDecorator::_DrawTitle(BRect r)
 		BPoint(_tabrect.left+textoffset,_closerect.bottom-1),&_layerdata);
 }
 
+void MacDecorator::GetFootprint(BRegion *region)
+{
+	// This function calculates the decorator's footprint in coordinates
+	// relative to the layer. This is most often used to set a WinBorder
+	// object's visible region.
+	if(!region)
+		return;
+	
+	region->Set(_borderrect);
+	region->Include(_tabrect);
+}
+
 void MacDecorator::Draw(BRect update)
 {
 #ifdef DEBUG_DECOR

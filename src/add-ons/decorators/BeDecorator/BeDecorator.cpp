@@ -271,7 +271,7 @@ printf("BeDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
 	_zoomrect.OffsetBy(pt);
 }
 
-BRegion * BeDecorator::GetFootprint(void)
+void BeDecorator::GetFootprint(BRegion *region)
 {
 #ifdef DEBUG_DECORATOR
 printf("BeDecorator: Get Footprint\n");
@@ -279,10 +279,11 @@ printf("BeDecorator: Get Footprint\n");
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
+	if(!region)
+		return;
 	
-	BRegion *reg=new BRegion(_borderrect);
-	reg->Include(_tabrect);
-	return reg;
+	region->Set(_borderrect);
+	region->Include(_tabrect);
 }
 
 void BeDecorator::_DrawTitle(BRect r)

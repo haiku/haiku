@@ -15,7 +15,7 @@ public:
 //	void ResizeBy(BPoint pt);
 	void Draw(BRect r);
 	void Draw(void);
-	//SRegion GetFootprint(void);
+	void GetFootprint(BRegion *region);
 	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 protected:

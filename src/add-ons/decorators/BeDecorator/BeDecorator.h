@@ -40,7 +40,7 @@ public:
 	void MoveBy(BPoint pt);
 	void Draw(BRect r);
 	void Draw(void);
-	BRegion *GetFootprint(void);
+	void GetFootprint(BRegion *region);
 	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 protected:
 	void _DrawClose(BRect r);
