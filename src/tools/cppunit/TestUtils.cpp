@@ -80,7 +80,10 @@ status_t DecodeResult(status_t result) {
 		case B_PARTITION_TOO_SMALL:
 			str = "B_PARTITION_TOO_SMALL";
 			break;
-		
+			
+		case B_BAD_MIME_SNIFFER_RULE:
+			str = "B_BAD_MIME_SNIFFER_RULE";
+			break;		
 		
 		// General Errors
 		case B_NO_MEMORY:
