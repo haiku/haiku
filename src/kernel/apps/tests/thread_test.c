@@ -17,7 +17,7 @@ struct the_test {
 	sem_id the_lock;	
 };
 
-static int counter_thread(void *data)
+static int32 counter_thread(void *data)
 {
 	struct the_test *tt = (struct the_test*)data;
 		
@@ -32,7 +32,7 @@ static int counter_thread(void *data)
 }
 
 
-static int priority_test(void *data)
+static int32 priority_test(void *data)
 {
 	int i;
 	
@@ -44,7 +44,7 @@ static int priority_test(void *data)
 }
 
 
-static int communication_test(void *data)
+static int32 communication_test(void *data)
 {
 	int times = (int)data;
 	int i, code;
