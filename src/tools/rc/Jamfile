@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tools rc ;
+
+GENERATE_C++ on [ FGristFiles lexer.l parser.y ] = true ;
+
+SharedLibrary rdef : compile.cpp decompile.cpp lexer.l parser.y rdef.cpp : be ;
+AbsSymLink <boot!home!config!lib>librdef.so : librdef.so
+		   : /boot/home/config/lib ;
+
+BinCommand rc : rc.cpp : <boot!home!config!lib>librdef.so be ;
