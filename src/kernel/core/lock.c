@@ -138,7 +138,7 @@ mutex_lock(mutex *mutex)
 		panic("mutex_lock: called with interrupts disabled for mutex %p, sem %#lx\n", mutex, mutex->sem);
 
 	if (me == mutex->holder)
-		panic("mutex_lock failure: mutex %p acquired twice by thread 0x%lx\n", mutex, me);
+		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
 
 	acquire_sem(mutex->sem);
 	mutex->holder = me;
