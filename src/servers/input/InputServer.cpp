@@ -50,9 +50,11 @@
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
+#ifndef USE_R5_STYLE_COMM
 // include app_server headers for communication
 #include <PortLink.h>
 #include <ServerProtocol.h>
+#endif
 
 #define FAST_MOUSE_MOVED '_FMM'		// received from app_server when screen res changed, but could be sent to too. 
 
@@ -117,7 +119,9 @@ int main()
  */
 InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	sSafeMode(false),
-	fScreen(B_MAIN_SCREEN_ID)
+	fScreen(B_MAIN_SCREEN_ID),
+	fBLWindow(NULL),
+	fIMAware(false)
 {
 #if DEBUG == 2
 	if (sLogFile == NULL)
@@ -144,7 +148,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 
 	gDeviceManager.LoadState();
 
-#ifdef COMPILE_FOR_R5
+#ifdef USE_R5_STYLE_COMM
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
 		int32 buffer[2];
@@ -175,7 +179,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINTERR(("error when send_data %s\n", strerror(err)));
 	}
-#endif
+#endif // USE_R5_STYLE_COMM
 
 	InitKeyboardMouseStates();
 
@@ -196,12 +200,12 @@ InputServer::~InputServer(void)
 	fAddOnManager->Lock();
 	fAddOnManager->Quit();
 	
-#ifdef COMPILE_FOR_R5
+#ifdef USE_R5_STYLE_COMM
 	delete_port(fAsPort);
 	fAsPort = -1;
 	fAppBuffer = NULL;
 	delete_area(fCloneArea);
-#endif
+#endif // USE_R5_STYLE_COMM
 
 #if DEBUG == 2
 	fclose(sLogFile);
@@ -766,7 +770,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
 	   		}
 
-#ifdef COMPILE_FOR_R5
+#ifdef USE_R5_STYLE_COMM
 			if (fAppBuffer) {
 				fAppBuffer[0] =
        		    	(0x3 << 30)
@@ -1184,8 +1188,7 @@ InputServer::DispatchEvent(BMessage *message)
 		}
 	}
 	
-	// BPortLink is incompatible with R5 one
-#ifndef COMPILE_FOR_R5
+#ifndef USE_R5_STYLE_COMM
 	port_id pid = find_port(SERVER_INPUT_PORT);
 
 	BPortLink *appsvrlink = new BPortLink(pid);
@@ -1378,7 +1381,9 @@ InputServer::DispatchEvent(BMessage *message)
    			
 		}
 	delete appsvrlink;
-#else
+
+#else // USE_R5_STYLE_COMM
+
 	status_t  	err;
 	
 	ssize_t length = message->FlattenedSize();
@@ -1389,7 +1394,7 @@ InputServer::DispatchEvent(BMessage *message)
 	if (fAsPort>0)
 		write_port(fAsPort, 0, buffer, length);
 	
-#endif	// COMPILE_FOR_R5
+#endif	// USE_R5_STYLE_COMM
 
     return true;
 }

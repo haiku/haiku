@@ -53,9 +53,15 @@
 #include <Screen.h>
 #include <SupportDefs.h>
 
+
+#define USE_R5_STYLE_COMM
+	// define this when R5 input_server communication should be used
+
 #define INPUTSERVER_SIGNATURE "application/x-vnd.Be-input_server"
 
+#ifndef USE_R5_STYLE_COMM
 class BPortLink;
+#endif
 
 class InputDeviceListItem
 {
@@ -228,7 +234,7 @@ private:
 	BottomlineWindow 	*fBLWindow;
 	bool			fIMAware;
 
-#ifndef COMPILE_FOR_R5	
+#ifndef USE_R5_STYLE_COMM
 	// added this to communicate via portlink
 	
 	BPortLink 		*serverlink;
