@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src tests servers ;
 
+SubInclude OBOS_TOP src tests servers app ;
 SubInclude OBOS_TOP src tests servers input ;
 SubInclude OBOS_TOP src tests servers registrar ;
