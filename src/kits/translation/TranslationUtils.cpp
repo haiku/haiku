@@ -1,8 +1,8 @@
 /*****************************************************************************/
 //               File: TranslationUtils.h
 //              Class: BTranslationUtils
-//   Reimplimented by: Michael Wilber, Translation Kit Team
-//   Reimplimentation: 2002-04
+//   Reimplemented by: Michael Wilber, Translation Kit Team
+//   Reimplementation: 2002-04
 //
 // Description: Utility functions for the Translation Kit
 //
@@ -363,7 +363,7 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	
 	// copy the stream header from the mallio buffer
 	TranslatorStyledTextStreamHeader stm_header =
-		*((TranslatorStyledTextStreamHeader *) mallio.Buffer());
+		*(reinterpret_cast<const TranslatorStyledTextStreamHeader *> (mallio.Buffer()));
 	
 	// convert the stm_header.header struct to the host format
 	const size_t kRecordHeaderSize = sizeof(TranslatorStyledTextRecordHeader);
@@ -384,8 +384,8 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 		return B_ERROR;
 	
 	TranslatorStyledTextTextHeader txt_header = 
-		*((TranslatorStyledTextTextHeader *) ((char *) mallio.Buffer() +
-			offset));
+		*(reinterpret_cast<const TranslatorStyledTextTextHeader *>
+			(reinterpret_cast<const char *> (mallio.Buffer()) + offset));
 	
 	// convert the stm_header.header struct to the host format
 	if (swap_data(B_UINT32_TYPE, &txt_header.header, kRecordHeaderSize,
@@ -403,7 +403,8 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	if (mallio.BufferLength() < offset + txt_header.header.data_size)
 		return B_ERROR;
 	
-	const char *pTextData = ((const char *) mallio.Buffer()) + offset;
+	const char *pTextData =
+		(reinterpret_cast<const char *> (mallio.Buffer())) + offset;
 		// point text pointer at the actual character data
 	
 	if (mallio.BufferLength() > offset + txt_header.header.data_size) {
@@ -417,8 +418,8 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 			return B_ERROR;
 		
 		TranslatorStyledTextStyleHeader stl_header = 
-			*((TranslatorStyledTextStyleHeader *)
-				((char *) mallio.Buffer() + offset));
+			*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>
+				(reinterpret_cast<const char *> (mallio.Buffer()) + offset));
 		if (swap_data(B_UINT32_TYPE, &stl_header.header, kRecordHeaderSize,
 			B_SWAP_BENDIAN_TO_HOST) != B_OK)
 			return B_ERROR;
@@ -436,8 +437,8 @@ BTranslationUtils::GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 			return B_ERROR;
 		
 		// set pRawData to the flattened run array data
-		const void *kpRawData = (const void *) ((char *) mallio.Buffer() +
-			offset);
+		const void *kpRawData = reinterpret_cast<const void *>
+			(reinterpret_cast<const char *> (mallio.Buffer()) + offset);
 		text_run_array *pRunArray = BTextView::UnflattenRunArray(kpRawData);
 	
 		if (pRunArray) {
