@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src tests kits net ppp src ;
 
-LOCATE_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
-SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+# for cpp.cpp
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
 
 UsePrivateHeaders net ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits net ppp headers ] ;
