@@ -1,10 +1,13 @@
 SubDir OBOS_TOP src tests kits interface ;
 
+UsePrivateHeaders interface ;
+
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bpolygon ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bregion ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bwidthbuffer ] ;
 
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
 
@@ -36,6 +39,10 @@ CommonTestLib libinterfacetest.so
 		RegionInclude.cpp
 		RegionIntersect.cpp
 		RegionOffsetBy.cpp
+
+		#_BWidthBuffer_
+		WidthBufferTest.cpp
+		WidthBufferSimpleTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4

@@ -6,6 +6,7 @@
 #include "bdeskbar/DeskbarTest.h"
 #include "bpolygon/PolygonTest.h"
 #include "bregion/RegionTest.h"
+#include "bwidthbuffer/WidthBufferTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Interface");
@@ -15,6 +16,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BDeskbar", DeskbarTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());
 	suite->addTest("BRegion", RegionTestSuite());
+	suite->addTest("_BWidthBuffer_", WidthBufferTestSuite());
 	
 	return suite;
 }
