@@ -1,0 +1,71 @@
+/*
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
+
+
+#include <SupportDefs.h>
+#include <boot/heap.h>
+
+#include <string.h>
+
+#include "openfirmware.h"
+#include "console.h"
+
+
+void _start(uint32 _unused1, uint32 _unused2, void *openFirmwareEntry);
+void start(void *openFirmwareEntry);
+int boot(stage2_args *args);
+
+// GCC defined globals
+extern void (*__ctor_list)(void);
+extern void (*__ctor_end)(void);
+extern uint8 __bss_start;
+extern uint8 _end;
+
+
+static void
+call_ctors(void)
+{ 
+	void (**f)(void);
+
+	for (f = &__ctor_list; f < &__ctor_end; f++) {		
+		(**f)();
+	}
+}
+
+
+static void
+clear_bss(void)
+{
+	memset(&__bss_start, 0, &_end - &__bss_start);
+}
+
+
+void
+_start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
+{
+	// According to the PowerPC bindings, OpenFirmware should have created
+	// a stack of 32kB or higher for us at this point
+
+	clear_bss();
+	call_ctors();
+		// call C++ constructors before doing anything else
+
+	start(openFirmwareEntry);
+}
+
+
+void
+start(void *openFirmwareEntry)
+{
+	of_init(openFirmwareEntry);
+	console_init();
+
+	boot(NULL);
+		// if everything wents fine, boot() never returns
+
+	of_exit();
+}
+
+
