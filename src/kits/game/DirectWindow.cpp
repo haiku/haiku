@@ -287,9 +287,12 @@ BDirectWindow::SetFullScreen(bool enable)
 		a_session->swrite_l(enable);
 		Flush();
 
-		// TODO: read back status from the app server,
-		// and set the full_screen_enable variable accordingly
+		status_t fullScreen;
+		a_session->sread(sizeof(status_t), &fullScreen);	
+		a_session->sread(sizeof(status_t), &status);
 		Unlock();
+
+		full_screen_enable = (fullScreen == B_OK);
 	}
 	return status;
 }
