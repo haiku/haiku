@@ -1,3 +1,4 @@
+#include <Region.h>
 #include "Decorator.h"
 #include "DisplayDriver.h"
 
@@ -160,6 +161,11 @@ void Decorator::MoveBy(BPoint pt)
 {
 }
 
+BRect Decorator::SlideTab(float dx, float dy=0)
+{
+	return BRect(0,0,0,0);
+}
+
 void Decorator::ResizeBy(float x, float y)
 {
 }
@@ -238,11 +244,12 @@ void Decorator::_DrawZoom(BRect r)
 {
 }
 
-/*
-SRegion Decorator::GetFootprint(void)
+
+BRegion *Decorator::GetFootprint(void)
 {
+	return NULL;
 }
-*/
+
 click_type Decorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
 	return CLICK_NONE;

@@ -11,7 +11,7 @@ class Layer;
 class DisplayDriver;
 
 typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
-	CLICK_TAB, CLICK_DRAG, CLICK_MOVETOBACK, CLICK_MOVETOFRONT,
+	CLICK_TAB, CLICK_DRAG, CLICK_MOVETOBACK, CLICK_MOVETOFRONT, CLICK_SLIDETAB,
 	
 	CLICK_RESIZE, CLICK_RESIZE_L, CLICK_RESIZE_T, 
 	CLICK_RESIZE_R, CLICK_RESIZE_B, CLICK_RESIZE_LT, CLICK_RESIZE_RT, 
@@ -36,7 +36,7 @@ typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 #define WFEEL_FLOATING_SUBSET 4
 #define WFEEL_FLOATING_APP 5
 #define WFEEL_FLOATING_WINDOW 6
-
+/*
 #define NOT_MOVABLE					0x00000001
 #define NOT_CLOSABLE				0x00000020
 #define NOT_ZOOMABLE				0x00000040
@@ -52,7 +52,7 @@ typedef enum { CLICK_NONE=0, CLICK_ZOOM, CLICK_CLOSE, CLICK_MINIMIZE,
 #define NOT_ANCHORED_ON_ACTIVATE	0x00020000
 #define ASYNCHRONOUS_CONTROLS		0x00080000
 #define QUIT_ON_WINDOW_CLOSE		0x00100000
-
+*/
 class Decorator
 {
 public:
@@ -82,6 +82,7 @@ public:
 	
 	virtual void MoveBy(float x, float y);
 	virtual void MoveBy(BPoint pt);
+	virtual BRect SlideTab(float dx, float dy=0);
 	virtual void ResizeBy(float x, float y);
 	virtual void ResizeBy(BPoint pt);
 	virtual void Draw(BRect r);
@@ -92,7 +93,7 @@ public:
 	virtual void DrawTab(void);
 	virtual void DrawTitle(void);
 	virtual void DrawZoom(void);
-	//virtual SRegion GetFootprint(void);
+	virtual BRegion *GetFootprint(void);
 	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 
 protected:

@@ -145,6 +145,7 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	closerect.top+=(look==WLOOK_FLOATING)?6:4;
 	closerect.right=closerect.left+10;
 	closerect.bottom=closerect.top+10;
+	closerect.OffsetBy(taboffset,0);
 
 	borderrect.top+=19;
 	
@@ -155,11 +156,13 @@ printf("BeDecorator()::_DoLayout()"); rect.PrintToStream();
 	if(titlewidth>0)
 	{
 		tabrect.right=closerect.right+textoffset+titlewidth+15;
-		if(tabrect.right>frame.right)
-			tabrect.right=frame.right;
 	}
 	else
 		tabrect.right=tabrect.left+tabrect.Width()/2;
+	tabrect.OffsetBy(taboffset,0);
+	if(tabrect.right>frame.right)
+		tabrect.right=frame.right;
+	
 
 	if(look==WLOOK_FLOATING)
 		tabrect.top+=4;
@@ -201,7 +204,7 @@ void BeDecorator::MoveBy(BPoint pt)
 	zoomrect.OffsetBy(pt);
 }
 
-BPoint BeDecorator::SlideTab(float dx, float dy=0)
+BRect BeDecorator::SlideTab(float dx, float dy=0)
 {
 	// Check to see if we would slide it out of bounde
 	if( (tabrect.right+dx) > frame.right)
@@ -209,10 +212,31 @@ BPoint BeDecorator::SlideTab(float dx, float dy=0)
 	if( (tabrect.left+dx) < frame.left)
 		dx=frame.left-tabrect.left;
 
+	taboffset+=int32(dx);
+	if(taboffset<0)
+	{
+		dx-=taboffset;
+		taboffset=0;
+	}
+
+	BRect oldrect(tabrect);
 	tabrect.OffsetBy(dx,0);
 	closerect.OffsetBy(dx,0);
 	zoomrect.OffsetBy(dx,0);
-	return BPoint(dx,0);
+
+	if(dx>0)
+	{
+		if(tabrect.left<oldrect.right)
+			oldrect.right=tabrect.left;
+	}
+	else
+		if(dx<0)
+		{
+			if(tabrect.right>oldrect.left)
+				oldrect.left=tabrect.right;
+		}
+	
+	return oldrect;
 }
 
 void BeDecorator::ResizeBy(float x, float y)

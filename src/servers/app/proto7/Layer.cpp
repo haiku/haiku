@@ -15,12 +15,19 @@
 #include <OS.h>
 
 //#define DEBUG_LAYERS
+//#define DEBUG_REDRAW
+
 int64 solidhigh64=0xFFFFFFFFFFFFFFFFLL;
 int64 solidlow64=0LL;
 int64 mixedpat64=0xCCCCCCCCCCCCCCCCLL;
 int8 *solidhigh=(int8*)&solidhigh64;
 int8 *solidlow=(int8*)&solidlow64;
 int8 *mixedpat=(int8*)&mixedpat64;
+
+bool TestLineIntersect(const BRect&r, float x1, float y1, float x2, float y2,bool vertical=true);
+bool TestRectIntersection(const BRect &r,const BRect &r2);
+bool TestRegionIntersection(BRegion *r,const BRect &r2);
+void IntersectRegionWith(BRegion *r,const BRect &r2);
 
 Layer::Layer(BRect rect, const char *layername, ServerWindow *srvwin,
 	int32 viewflags, int32 token)
@@ -469,20 +476,21 @@ void Layer::Invalidate(BRect rect)
 {
 	// Make our own section dirty and pass it on to any children, if necessary....
 	// YES, WE ARE SHARING DIRT! Mudpies anyone? :D
-#ifdef DEBUG_LAYERS
-printf("Layer %s::Invalidate\n",name->String());
-printf("Frame: ");frame.PrintToStream();
-printf("Invalid rect: ");rect.PrintToStream();
-printf("Visible: ");visible->PrintToStream();
-printf("----------------\n");
+#ifdef DEBUG_REDRAW
+printf("Layer %s::Invalidate(%f,%f,%f,%f)\n",name->String(),rect.left,rect.top,
+	rect.right,rect.bottom);
 #endif
-	if(Frame().Intersects(rect))
+//	if(Frame().Intersects(rect) || Frame().Contains(rect))
+	if(TestRectIntersection(Frame(),rect))
 	{
 		// Clip the rectangle to the visible region of the layer
-		if(visible->Intersects(rect))
+//		if(visible->Intersects(rect))
+		if(TestRegionIntersection(visible,rect))
 		{
-			BRegion reg(rect);
-			reg.IntersectWith(visible);
+//			BRegion reg(rect);
+//			reg.IntersectWith(visible);
+			BRegion reg(*visible);
+			IntersectRegionWith(&reg,rect);
 			if(reg.CountRects()>0)
 			{
 				is_dirty=true;
@@ -491,6 +499,19 @@ printf("----------------\n");
 				else
 					invalid=new BRegion(reg);
 			}
+			else
+			{
+#ifdef DEBUG_REDRAW
+printf("\tRegion intersection had no rectangles\n");rect.PrintToStream();
+#endif
+			}
+		}
+		else
+		{
+#ifdef DEBUG_REDRAW
+printf("\tRectangle did not intersect frame(%.1f,%.1f,%.1f,%.1f)\n", Frame().left,
+Frame().top,Frame().right,Frame().bottom);
+#endif
 		}
 	}	
 	for(Layer *lay=topchild;lay!=NULL; lay=lay->lowersibling)
@@ -913,7 +934,7 @@ void RootLayer::RequestDraw(void)
 	
 	ASSERT(driver!=NULL);
 
-#ifdef DEBUG_LAYERS
+#ifdef DEBUG_REDRAW
 printf("Root::RequestDraw: invalid rects: %ld\n",invalid->CountRects());
 #endif
 
@@ -923,8 +944,8 @@ printf("Root::RequestDraw: invalid rects: %ld\n",invalid->CountRects());
 	{
 		if(invalid->RectAt(i).IsValid())
 		{
-#ifdef DEBUG_LAYERS
-printf("Root::RequestDraw:FillRect, color ",layerdata->lowcolor.PrintToStream());
+#ifdef DEBUG_REDRAW
+printf("Root::RequestDraw:FillRect, color "); layerdata->lowcolor.PrintToStream();
 #endif
 			driver->FillRect(invalid->RectAt(i),layerdata, solidlow);
 		}
@@ -949,11 +970,65 @@ void RootLayer::SetColor(RGBColor col)
 {
 	layerdata->lowcolor=col;
 #ifdef DEBUG_LAYERS
-printf("Root::SetColor - ",col.PrintToStream());
+printf("Root::SetColor - "); col.PrintToStream();
 #endif
 }
 
 RGBColor RootLayer::GetColor(void) const
 {	
 	return layerdata->lowcolor;
+}
+
+// Code stolen from the OBOS version of Rect.cpp. BeOS R5 version returns false
+// if the rectangles are exactly equal
+bool TestRectIntersection(const BRect &r,const BRect &r2)
+{
+	return	TestLineIntersect(r, r2.left, r2.top, r2.left, r2.bottom)		||
+			TestLineIntersect(r, r2.left, r2.top, r2.right, r2.top, false)	||
+			TestLineIntersect(r, r2.right, r2.top, r2.right, r2.bottom)		||
+			TestLineIntersect(r, r2.left, r2.bottom, r2.right, r2.bottom, false) ||
+			r.Contains(r2) ||
+			r2.Contains(r);
+}
+
+bool TestRegionIntersection(BRegion *r,const BRect &r2)
+{
+	for(int32 i=0; i<r->CountRects(); i++)
+		if(TestRectIntersection(r->RectAt(i),r2));
+			return true;
+	return false;
+}
+
+void IntersectRegionWith(BRegion *r,const BRect &r2)
+{
+	// We have three conditions:
+	// 1) Region frame contains rect. Action: call Include()
+	// 2) Rect intersects region frame. Action: call IntersectWith
+	// 3) Region frame does not intersect rectangle. Make the region empty
+	if(r->Frame().Contains(r2))
+		r->Include(r2);
+	if(r->Frame().Intersects(r2))
+	{
+		BRegion reg(r2);
+		r->IntersectWith(&reg);
+	}
+	else
+		r->MakeEmpty();
+}
+
+bool TestLineIntersect(const BRect& r, float x1, float y1, float x2, float y2,
+					   bool vertical)
+{
+	if (vertical)
+	{
+		return	(x1 >= r.left && x1 <= r.right) &&
+				((y1 >= r.top && y1 <= r.bottom) ||
+				 (y2 >= r.top && y2 <= r.bottom));
+	}
+	else
+	{
+		return	(y1 >= r.top && y1 <= r.bottom) &&
+				((x1 >= r.left && x1 <= r.right) ||
+				 (x2 >= r.left && x2 <= r.right));
+	}
 }

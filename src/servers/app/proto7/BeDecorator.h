@@ -20,6 +20,7 @@ public:
 	void Draw(void);
 	BRegion *GetFootprint(void);
 	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
+	BRect SlideTab(float dx, float dy=0);
 
 protected:
 	void _DrawClose(BRect r);
@@ -30,7 +31,7 @@ protected:
 	void _DoLayout(void);
 	void _SetFocus(void);
 	void DrawBlendedRect(BRect r, bool down);
-	uint32 taboffset;
+	int32 taboffset;
 
 	RGBColor tab_highcol, tab_lowcol;
 	RGBColor button_highcol, button_lowcol;
@@ -40,7 +41,6 @@ protected:
 	uint64 solidhigh, solidlow;
 	float titlewidth;
 
-	bool slidetab;
 	int textoffset, titlechars;
 };
 
