@@ -10,18 +10,18 @@ NotFile NetworkingKit ;
 Depends NetworkingKit :
 	net_stack_driver net_server_driver
 	core
-	ethernet loopback 
+	ethernet loopback ppp
+	pppoe
 	raw	ipv4 icmp udp tcp
-	libnet.so libnetapi.so 
-	ping ifconfig route traceroute arp
+	libnet.so libnetapi.so
+	ping ifconfig route traceroute arp pppconfig
 	sis900 rtl8139
-;	
- 
+;
+
 # Pseudo-target to build the media stuffs only
 NotFile MediaKit ;
 Depends MediaKit :
 	libmedia.so media_server media_addon_server mixer.media_addon tone_producer_demo.media_addon video_producer_demo.media_addon
 ;
- 
-SubInclude OBOS_TOP src ;
 
+SubInclude OBOS_TOP src ;
