@@ -1,7 +1,7 @@
 /*
  * multiaudio replacement media addon for BeOS
  *
- * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
+ * Copyright (c) 2002, 2003 Jerome Duval (jerome.duval@free.fr)
  *
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without modification, 
@@ -207,8 +207,8 @@ void MultiAudioNode::NodeRegistered(void)
 	node_input *currentInput = NULL;
 	int32 currentId = 0;
 	
-	for (int32 i = 0; i < fDevice->MD.output_channel_count; i++)
-	{
+	for (int32 i = 0; i < fDevice->MD.output_channel_count; i++) {
+	
 		if(	(currentInput == NULL)
 			|| (fDevice->MD.channels[i].designations & B_CHANNEL_MONO_BUS)
 			|| (fDevice->MD.channels[currentId].designations & B_CHANNEL_STEREO_BUS
@@ -253,8 +253,8 @@ void MultiAudioNode::NodeRegistered(void)
 	currentId = 0;
 	
 	for (int32 i = fDevice->MD.output_channel_count; 
-		i < (fDevice->MD.output_channel_count + fDevice->MD.input_channel_count); i++)
-	{
+		i < (fDevice->MD.output_channel_count + fDevice->MD.input_channel_count); i++) {
+		
 		if(	(currentOutput == NULL)
 			|| (fDevice->MD.channels[i].designations & B_CHANNEL_MONO_BUS)
 			|| (fDevice->MD.channels[currentId].designations & B_CHANNEL_STEREO_BUS
@@ -299,6 +299,8 @@ void MultiAudioNode::NodeRegistered(void)
 	SetParameterWeb(fWeb);
 	
 	/* apply configuration */
+	bigtime_t start = system_time();
+		
 	int32 index = 0;
 	int32 parameterID = 0;
 	const void *data;
@@ -308,6 +310,8 @@ void MultiAudioNode::NodeRegistered(void)
 			SetParameterValue(parameterID, TimeSource()->Now(), data, size);
 		index++;
 	}
+	
+	PRINT(("apply configuration in : %ld\n", system_time() - start));
 }
 
 status_t MultiAudioNode::RequestCompleted(const media_request_info &info)
@@ -510,21 +514,12 @@ status_t MultiAudioNode::Connected(
 		return B_MEDIA_BAD_DESTINATION;
 	}
 	
-	// compute the latency or just guess
 	// use one buffer length latency
-	/*fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
+	fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
 			/ ( (with_format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 				* with_format.u.raw_audio.channel_count) 
-			/ ((int32)(with_format.u.raw_audio.frame_rate / 100));*/
-	/*char* buffer1 = (char*)malloc(with_format.u.raw_audio.buffer_size);
-	char* buffer2 = (char*)malloc(with_format.u.raw_audio.buffer_size);
-	bigtime_t latency_start = TimeSource()->RealTime();
-	memcpy(buffer2, buffer1, with_format.u.raw_audio.buffer_size);
-	bigtime_t latency_end = TimeSource()->RealTime();
-	fInternalLatency = latency_end - latency_start;
-	*/	
-	fInternalLatency = 50LL;
-		
+			/ ((int32)(with_format.u.raw_audio.frame_rate / 100));
+			
 	PRINT(("  internal latency = %lld\n",fInternalLatency));
 	
 	SetEventLatency(fInternalLatency);
@@ -818,23 +813,23 @@ MultiAudioNode::Connect(status_t error, const media_source& source, const media_
 	channel->fOutput.format = format;
 	strncpy(io_name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
 
+	// reset our buffer duration, etc. to avoid later calculations
+	bigtime_t duration = channel->fOutput.format.u.raw_audio.buffer_size * 10000
+			/ ( (channel->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+				* channel->fOutput.format.u.raw_audio.channel_count) 
+			/ ((int32)(channel->fOutput.format.u.raw_audio.frame_rate / 100));
+	
+	SetBufferDuration(duration);
+	
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
 	PRINT(("\tdownstream latency = %Ld\n", fLatency));
 
-	fInternalLatency = 50LL;
+	fInternalLatency = BufferDuration();
 	PRINT(("\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency));
 	//SetEventLatency(fLatency + fInternalLatency);
-
-	// reset our buffer duration, etc. to avoid later calculations
-	bigtime_t duration = channel->fOutput.format.u.raw_audio.buffer_size * 10000
-			/ ( (channel->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-				* channel->fOutput.format.u.raw_audio.channel_count) 
-			/ ((int32)(channel->fOutput.format.u.raw_audio.frame_rate / 100));
-	//bigtime_t duration = bigtime_t(1000000) * samplesPerBuffer / bigtime_t(fOutput.format.u.raw_audio.frame_rate);
-	SetBufferDuration(duration);
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
@@ -1010,11 +1005,6 @@ status_t MultiAudioNode::HandleBuffer(
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	
-	/*if (buffer->Header()->destination != input.destination.id) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
-		return B_MEDIA_BAD_DESTINATION;
-	}*/
 	
 	media_header* hdr = buffer->Header();
 	bigtime_t now = TimeSource()->Now();
@@ -1360,7 +1350,8 @@ MultiAudioNode::MakeParameterWeb()
 }
 
 void 
-MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParameters) {
+MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParameters)
+{
 	CALLED();
 	multi_mix_control		*parent = &fDevice->MMCI.controls[index];
 	multi_mix_control		*MMC = fDevice->MMCI.controls;
@@ -1417,7 +1408,8 @@ MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParam
 }
 
 void 
-MultiAudioNode::ProcessMux(BDiscreteParameter *parameter, int32 index) {
+MultiAudioNode::ProcessMux(BDiscreteParameter *parameter, int32 index)
+{
 	CALLED();
 	multi_mix_control		*parent = &fDevice->MMCI.controls[index];
 	multi_mix_control		*MMC = fDevice->MMCI.controls;
@@ -1443,27 +1435,6 @@ MultiAudioNode::ProcessMux(BDiscreteParameter *parameter, int32 index) {
 // -------------------------------------------------------- //
 // MultiAudioNode specific functions
 // -------------------------------------------------------- //
-
-/*void
-MultiAudioNode::WriteBuffer( BBuffer *buffer, node_input &input )
-{*/
-	//CALLED();
-	/*
-	//wait for free buffer
-	acquire_sem( fBuffer_free );
-	//PRINT(("MultiAudioNode::WriteBuffer: buffer free (fBufferCycle:%li)\n", fBufferCycle));
-
-	//prepare buffer
-	memcpy( fDevice->fPlay[input.fBufferCycle][input.fChannelId], buffer->Data(), buffer->SizeUsed() );
-	//PRINT(("MultiAudioNode::WriteBuffer: output : %p\n", fPlay[fBufferCycle][0]));
-	//PRINT(("MultiAudioNode::WriteBuffer: buffer prepared\n"));	*/
-	
-	/*if(input.fBuffer != NULL) {
-		PRINT(("MultiAudioNode::WriteBuffer recycling channelId : %i\n", input.fChannelId));
-		//input.fBuffer->Recycle();
-	} else
-	input.fBuffer = buffer;
-}*/
 
 int32
 MultiAudioNode::RunThread()
