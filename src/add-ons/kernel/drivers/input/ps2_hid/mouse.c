@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2004 Haiku, Inc.
+ * Copyright 2001-2005 Haiku, Inc.
  * Distributed under the terms of the Haiku License.
  *
  * ps2mouse.c:
@@ -79,7 +79,7 @@ static bigtime_t sClickSpeed;
 static int32 sClickCount;
 static int sButtonsState;
 
-static uint32 sPacketSize;
+static int32 sPacketSize;
  
 /////////////////////////////////////////////////////////////////////////
 // mouse functions
@@ -268,7 +268,7 @@ mouse_open(const char *name, uint32 flags, void **cookie)
 {
 	status_t status;	
 	int8 commandByte;
-	int8 deviceId;
+	int8 deviceId = -1;
 	
 	TRACE(("mouse_open()\n"));	
 	

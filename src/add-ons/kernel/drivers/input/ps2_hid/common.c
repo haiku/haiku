@@ -1,5 +1,5 @@
 /*
- * Copyright 2004 Haiku, Inc.
+ * Copyright 2004-2005 Haiku, Inc.
  * Distributed under the terms of the Haiku License.
  *
  * common.c:
@@ -9,6 +9,7 @@
  */
 
 #include <Drivers.h>
+#include <string.h>
 
 #include "common.h"
 
