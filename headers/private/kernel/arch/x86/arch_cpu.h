@@ -91,7 +91,7 @@ struct iframe {
 void setup_system_time(unsigned int cv_factor);
 void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir);
 void i386_enter_uspace(addr entry, void *args, addr ustack_top);
-void i386_set_kstack(addr kstack);
+void i386_set_tss_and_kstack(addr kstack);
 void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg);
 void i386_swap_pgdir(addr new_pgdir);
 void i386_fsave(void *fpu_state);

@@ -94,7 +94,7 @@ set_segment_descriptor(struct segment_descriptor *desc, addr base, uint32 limit,
 	desc->present = 1;
 	desc->granularity = 1;	// 4 GB size (in page size steps)
 	desc->available = 0;	// system available bit is currently not used
-	desc->d_b = 1;
+	desc->d_b = 1;			// 32-bit code
 
 	desc->zero = 0;
 }
