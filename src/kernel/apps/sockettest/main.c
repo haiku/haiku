@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <resource.h>
 #include <Errors.h>
+#include <errno.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 
