@@ -26,7 +26,7 @@
 #include <thread.h>
 #include <atomic.h>
 
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <arch/cpu.h>
 #include <arch/vm.h>

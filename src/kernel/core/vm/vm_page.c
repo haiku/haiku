@@ -16,7 +16,7 @@
 #include <smp.h>
 #include <OS.h>
 #include <Errors.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 #include <stdlib.h>
