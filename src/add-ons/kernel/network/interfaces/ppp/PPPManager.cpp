@@ -88,7 +88,7 @@ deleter_thread(void *data)
 		manager->DeleterThreadEvent();
 		
 		// check if the manager is being destroyed
-		if(receive_data_with_timeout(&sender, &code, NULL, 0, 50000) == B_OK)
+		if(receive_data_with_timeout(&sender, &code, NULL, 0, 500) == B_OK)
 			return B_OK;
 	}
 	
@@ -261,6 +261,7 @@ PPPManager::CreateInterface(const driver_settings *settings,
 	interface_entry *entry = new interface_entry;
 	entry->accessing = 1;
 	entry->deleting = false;
+	fRegisterRequestor = PPP_UNDEFINED_INTERFACE_ID;
 	entry->interface = new PPPInterface(id, settings,
 		parentEntry ? parentEntry->interface : NULL);
 	
@@ -269,8 +270,10 @@ PPPManager::CreateInterface(const driver_settings *settings,
 		delete entry;
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
-	
 	fEntries.AddItem(entry);
+	if(fRegisterRequestor == id)
+		entry->interface->RegisterInterface();
+	
 	locker.UnlockNow();
 	
 	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
@@ -332,6 +335,8 @@ PPPManager::RegisterInterface(interface_id ID)
 	
 	LockerHelper locker(fLock);
 	
+	fRegisterRequestor = ID;
+	
 	interface_entry *entry = EntryFor(ID);
 	if(!entry || entry->deleting)
 		return NULL;
@@ -354,7 +359,7 @@ PPPManager::RegisterInterface(interface_id ID)
 	ifp->ioctl = ppp_ifnet_ioctl;
 	
 #if DEBUG
-	printf("PPPManager::DeleteInterface(): Created new ifnet: %s%d\n",
+	printf("PPPManager::RegisterInterface(): Created new ifnet: %s%d\n",
 		ifp->name, ifp->if_unit);
 #endif
 	
@@ -371,6 +376,9 @@ PPPManager::UnregisterInterface(interface_id ID)
 #endif
 	
 	LockerHelper locker(fLock);
+	
+	if(fRegisterRequestor == ID)
+		fRegisterRequestor = PPP_UNDEFINED_INTERFACE_ID;
 	
 	interface_entry *entry = EntryFor(ID);
 	if(!entry)
@@ -677,7 +685,7 @@ PPPManager::FindUnit() const
 	qsort(units, fEntries.CountItems(), sizeof(int32), greater);
 	
 	int32 unit = 0;
-	for(int32 index = 0; index < fEntries.CountItems() - 1; index++) {
+	for(int32 index = 0; index < fEntries.CountItems(); index++) {
 		if(units[index] > unit)
 			return unit;
 		else if(units[index] == unit)

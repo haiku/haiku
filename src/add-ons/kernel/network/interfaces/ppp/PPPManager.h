@@ -75,7 +75,7 @@ class PPPManager {
 		BLocker fLock, fReportLock;
 		PPPReportManager fReportManager;
 		List<interface_entry*> fEntries;
-		interface_id fNextID;
+		interface_id fNextID, fRegisterRequestor;
 		thread_id fDeleterThread;
 		net_timer_id fPulseTimer;
 };
