@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons accelerants neomagic engine ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics neomagic ] ;
+UseHeaders [ FDirName $(SUBDIR) .. ] ;
+
+StaticLibrary neomagic_engine :
+	nm_acc.c
+	nm_bes.c
+	nm_crtc.c
+	nm_dac.c
+	nm_general.c
+	nm_info.c
+	nm_support.c
+	;

@@ -1,0 +1,26 @@
+SubDir OBOS_TOP src add-ons accelerants neomagic ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics neomagic ] ;
+UseHeaders [ FDirName $(SUBDIR) engine ] ;
+
+
+Addon nm.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetDeviceInfo.c
+	GetModeInfo.c
+	GetTimingConstraints.c
+	GlobalData.c
+	InitAccelerant.c
+	Overlay.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false : libneomagic_engine.a
+;
+
+Depends nm.accelerant : nm.driver ;
+
+SubInclude OBOS_TOP src add-ons accelerants neomagic engine ;
