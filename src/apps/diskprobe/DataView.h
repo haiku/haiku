@@ -59,6 +59,8 @@ class DataView : public BView {
 		base_type Base() const { return fBase; }
 		void SetBase(base_type type);
 
+		const uint8 *DataAt(int32 start);
+
 	private:
 		BRect DataBounds(bool inView = false) const;
 		BRect SelectionFrame(view_focus which, int32 start, int32 end);
@@ -88,6 +90,7 @@ class DataView : public BView {
 		bool		fIsActive;
 		int32		fStart, fEnd;
 		int32		fMouseSelectionStart;
+		int32		fBitPosition;
 };
 
 static const uint32 kMsgBaseType = 'base';

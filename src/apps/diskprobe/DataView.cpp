@@ -9,9 +9,13 @@
 
 #include <Window.h>
 #include <ScrollBar.h>
+#include <Autolock.h>
 #include <Clipboard.h>
 #include <Mime.h>
 
+
+typedef uint32 addr_t;
+	// this one is not yet defined in a public place
 
 static const uint32 kBlockSize = 16;
 static const uint32 kHorizontalSpace = 8;
@@ -60,6 +64,7 @@ DataView::DataView(BRect rect, DataEditor &editor)
 
 	if (fEditor.Lock()) {
 		fDataSize = fEditor.ViewSize();
+		fOffset = fEditor.ViewOffset();
 		fEditor.Unlock();
 	} else
 		fDataSize = 512;
@@ -92,14 +97,32 @@ DataView::AttachedToWindow()
 
 
 void 
-DataView::UpdateFromEditor(BMessage */*message*/)
+DataView::UpdateFromEditor(BMessage *message)
 {
 	if (fData == NULL)
 		return;
 
 	if (fEditor.Lock()) {
-		fOffset = fEditor.ViewOffset();
 		fFileSize = fEditor.FileSize();
+
+		// get the range of the changes
+
+		int32 start = 0, end = fDataSize - 1;
+		off_t offset, size;
+		if (message != NULL
+			&& message->FindInt64("offset", &offset) == B_OK
+			&& message->FindInt64("size", &size) == B_OK) {
+			if (offset > fOffset + fDataSize
+				|| offset + size < fOffset) {
+				// the changes are not within our scope, so we can ignore them
+				return;
+			}
+
+			if (offset > fOffset)
+				start = offset - fOffset;
+			if (offset + size < fOffset + fDataSize)
+				end = offset + size - fOffset;
+		}
 
 		if (fOffset + fDataSize > fFileSize)
 			fSizeInView = fFileSize - fOffset;
@@ -108,11 +131,12 @@ DataView::UpdateFromEditor(BMessage */*message*/)
 
 		const uint8 *data;
 		if (fEditor.GetViewBuffer(&data) == B_OK)
+			// ToDo: copy only the relevant part
 			memcpy(fData, data, fDataSize);
 
 		fEditor.Unlock();
 
-		Invalidate();
+		InvalidateRange(start, end);
 	}
 }
 
@@ -124,6 +148,10 @@ DataView::MessageReceived(BMessage *message)
 		case kMsgUpdateData:
 		case kMsgDataEditorUpdate:
 			UpdateFromEditor(message);
+			break;
+
+		case kMsgDataEditorOffsetChange:
+			SetSelection(0, 0);
 			break;
 
 		case kMsgBaseType:
@@ -541,6 +569,8 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 	fEnd = end;
 
 	DrawSelection();
+
+	fBitPosition = 0;
 }
 
 
@@ -555,6 +585,11 @@ DataView::GetSelection(int32 &start, int32 &end)
 void
 DataView::InvalidateRange(int32 start, int32 end)
 {
+	if (start <= 0 && end >= int32(fDataSize) - 1) {
+		Invalidate();
+		return;
+	}
+
 	int32 startLine = start / kBlockSize;
 	int32 endLine = end / kBlockSize;
 	
@@ -615,6 +650,16 @@ DataView::MakeVisible(int32 position)
 		point.y = frame.bottom - bounds.Height();
 
 	ScrollTo(point);
+}
+
+
+const uint8 *
+DataView::DataAt(int32 start)
+{
+	if (start < 0 || start >= int32(fSizeInView) || fData == NULL)
+		return NULL;
+
+	return fData + start;
 }
 
 
@@ -865,6 +910,66 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 			SetFocus(fFocus == kHexFocus ? kAsciiFocus : kHexFocus);
 			MakeVisible(fStart);
 			break;
+
+		case B_FUNCTION_KEY:
+			// this is ignored
+			break;
+
+		case B_BACKSPACE:
+			if (fBitPosition == 0)
+				SetSelection(fStart - 1, fStart - 1);
+			
+			if (fFocus == kHexFocus)
+				fBitPosition = (fBitPosition + 4) % 8;
+
+			// supposed to fall through
+		case B_DELETE:
+		{
+			BAutolock locker(fEditor);
+
+			if (fFocus == kHexFocus) {
+				const uint8 *data = DataAt(fStart);
+				if (data == NULL)
+					break;
+
+				uint8 c = data[0] & (fBitPosition == 0 ? 0x0f : 0xf0);
+					// mask out region to be cleared
+
+				fEditor.Replace(fOffset + fStart, &c, 1);
+			} else
+				fEditor.Replace(fOffset + fStart, (const uint8 *)"", 1);
+			break;
+		}
+
+		default:
+		{
+			BAutolock locker(fEditor);
+			
+			if (fFocus == kHexFocus) {
+				// only hexadecimal characters are allowed to be entered
+				const uint8 *data = DataAt(fStart);
+				uint8 c = bytes[0];
+				if (c >= 'A' && c <= 'F')
+					c += 'A' - 'a';
+				const char *hexNumbers = "0123456789abcdef";
+				addr_t number;
+				if (data == NULL || (number = (addr_t)strchr(hexNumbers, c)) == NULL)
+					break;
+
+				number -= (addr_t)hexNumbers;
+				fBitPosition = (fBitPosition + 4) % 8;
+
+				c = (data[0] & (fBitPosition ? 0x0f : 0xf0)) | (number << fBitPosition);
+					// mask out overwritten region and bit-wise or the number to be inserted
+
+				if (fEditor.Replace(fOffset + fStart, &c, 1) == B_OK && fBitPosition == 0)
+					SetSelection(fStart + 1, fStart + 1);
+			} else {
+				if (fEditor.Replace(fOffset + fStart, (const uint8 *)bytes, numBytes) == B_OK)
+					SetSelection(fStart + 1, fStart + 1);
+			}
+			break;
+		}
 	}
 }
 
