@@ -372,7 +372,12 @@ mp3DecoderPlugin::RegisterDecoder()
 	format.type = B_MEDIA_ENCODED_AUDIO;
 	format.u.encoded_audio = media_encoded_audio_format::wildcard;
 
-	return BMediaFormats().MakeFormatFor(descriptions, numIDs, &format);
+	BMediaFormats formats;
+	status_t result = formats.InitCheck();
+	if (result != B_OK) {
+		return result;
+	}
+	return formats.MakeFormatFor(descriptions, numIDs, &format);
 }
 
 
