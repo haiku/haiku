@@ -114,4 +114,3 @@ private:
 #endif // USE_OPENBEOS_NAMESPACE
 
 #endif // __sk_node_info_h__
-

@@ -104,4 +104,4 @@ class BVolume {
 }
 #endif
 
-#endif
+#endif	// __sk_volume_h__

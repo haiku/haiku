@@ -61,4 +61,4 @@ class BVolumeRoster {
 }
 #endif
 
-#endif
+#endif	// __sk_volumeroster_h__
