@@ -16,6 +16,10 @@
 
 
 static struct real_time_data *sRealTimeData;
+static bool sIsGMT = false;
+static char sTzFilename[B_PATH_NAME_LENGTH] = "";
+static int32 sTimezoneOffset = 0;
+static bool sDaylightSavingTime = false;
 
 
 /** Write the system time to CMOS. */
@@ -25,7 +29,8 @@ rtc_system_to_hw(void)
 {
 	uint32 seconds;
 
-	seconds = (sRealTimeData->boot_time + system_time()) / 1000000;
+	seconds = (sRealTimeData->system_time_offset + system_time()) / 1000000
+					- (sIsGMT ? 0 : sTimezoneOffset);
 	arch_rtc_set_hw_time(seconds);
 }
 
@@ -38,14 +43,14 @@ rtc_hw_to_system(void)
 	uint32 current_time;
 
 	current_time = arch_rtc_get_hw_time();
-	set_real_time_clock(current_time);
+	set_real_time_clock(current_time + (sIsGMT ? 0 : sTimezoneOffset));
 }
 
 
 bigtime_t
-rtc_boot_time(void)
+rtc_system_time_offset(void)
 {
-	return sRealTimeData->boot_time;
+	return sRealTimeData->system_time_offset;
 }
 
 
@@ -54,9 +59,9 @@ rtc_print(void)
 {
 	uint32 currentTime;
 
-	currentTime = (sRealTimeData->boot_time + system_time()) / 1000000;
+	currentTime = (sRealTimeData->system_time_offset + system_time()) / 1000000;
 	dprintf("system_time:  %Ld\n", system_time());
-	dprintf("boot_time:    %Ld\n", sRealTimeData->boot_time);
+	dprintf("system_time_offset:    %Ld\n", sRealTimeData->system_time_offset);
 	dprintf("current_time: %lu\n", currentTime);
 }
 
@@ -105,9 +110,6 @@ rtc_init(kernel_args *args)
 	//	and should be moved there
 	sRealTimeData->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
 	
-	sRealTimeData->timezone_offset = 0;
-	sRealTimeData->dst_observed = false;
-	
 	rtc_hw_to_system();
 
 	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
@@ -122,8 +124,7 @@ rtc_init(kernel_args *args)
 void
 set_real_time_clock(uint32 currentTime)
 {
-	sRealTimeData->boot_time = currentTime * 1000000LL - system_time()
-		+ (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
+	sRealTimeData->system_time_offset = currentTime * 1000000LL - system_time();
 	rtc_system_to_hw();
 }
 
@@ -131,8 +132,7 @@ set_real_time_clock(uint32 currentTime)
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->boot_time + system_time() - 
-		(sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset)) / 1000000;
+	return (sRealTimeData->system_time_offset + system_time()) / 1000000;
 }
 
 
@@ -140,8 +140,7 @@ bigtime_t
 real_time_clock_usecs(void)
 {
 	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return sRealTimeData->boot_time + system_time() -
-		(sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
+	return sRealTimeData->system_time_offset + system_time();
 }
 
 //	#pragma mark -
@@ -165,24 +164,43 @@ _user_set_tzspecs(int32 timezone_offset, bool dst_observed)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 	
-	sRealTimeData->timezone_offset = timezone_offset * 1000000LL;
-	sRealTimeData->dst_observed = dst_observed;
+	sRealTimeData->system_time_offset += (sIsGMT ? 0 : sTimezoneOffset);
+	sTimezoneOffset = timezone_offset;
+	sRealTimeData->system_time_offset -= (sIsGMT ? 0 : sTimezoneOffset);
+	
+	sDaylightSavingTime = dst_observed;
 	return B_OK;
 }
 
 
 status_t
-_user_set_tzfilename(const char *filename, size_t length, bool isGMT)
+_user_set_tzfilename(const char *filename, size_t length, bool is_gmt)
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 	if (!IS_USER_ADDRESS(filename)
 		|| filename == NULL
-		|| user_strlcpy(sRealTimeData->tzfilename, filename, B_PATH_NAME_LENGTH) < B_OK)
+		|| user_strlcpy(sTzFilename, filename, B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	sRealTimeData->isGMT = isGMT;
+	sIsGMT = is_gmt;
 	
 	return B_OK;
 }
 
+
+status_t
+_user_get_tzfilename(char *filename, size_t length, bool *is_gmt)
+{
+	if ((filename == NULL)
+		|| (!IS_USER_ADDRESS(filename))
+		|| (user_strlcpy(filename, sTzFilename, length) < B_OK))
+		return B_BAD_ADDRESS;
+		
+	if ((is_gmt == NULL)
+		|| (!IS_USER_ADDRESS(is_gmt))
+		|| (user_memcpy(is_gmt, &sIsGMT, sizeof(bool)) < B_OK))
+		return B_BAD_ADDRESS;
+		
+	return B_OK;
+}
