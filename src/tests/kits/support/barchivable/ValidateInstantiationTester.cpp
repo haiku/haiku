@@ -134,11 +134,11 @@ void TValidateInstantiationTest::AllValid()
 Test* TValidateInstantiationTest::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
-#if !defined(SYSTEM_TEST)
+#if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TValidateInstantiationTest, AllParamsInvalid);
 #endif
 	ADD_TEST(SuiteOfTests, TValidateInstantiationTest, ClassNameParamInvalid);
-#if !defined(SYSTEM_TEST)
+#if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TValidateInstantiationTest, ArchiveParamInvalid);
 #endif
 	ADD_TEST(SuiteOfTests, TValidateInstantiationTest, ClassFieldEmpty);

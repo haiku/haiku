@@ -105,11 +105,11 @@ Test* TBArchivableTestCase::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, TestPerform);
-#if !defined(SYSTEM_TEST)
+#if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, InvalidArchiveShallow);
 #endif
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, ValidArchiveShallow);
-#if !defined(SYSTEM_TEST)
+#if !defined(TEST_R5)
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, InvalidArchiveDeep);
 #endif
 	ADD_TEST(SuiteOfTests, TBArchivableTestCase, ValidArchiveDeep);

@@ -9,10 +9,10 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#ifdef SYSTEM_TEST
+#ifdef TEST_R5
 #include <be/support/Archivable.h>
 #else
-#include "../../../../../source/lib/support/headers/Archivable.h"
+#include "Archivable.h"
 #endif
 
 // Project Includes ------------------------------------------------------------

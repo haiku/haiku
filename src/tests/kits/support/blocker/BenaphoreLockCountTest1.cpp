@@ -1,5 +1,5 @@
 /*
-	$Id: BenaphoreLockCountTest1.cpp,v 1.1 2002/07/09 12:24:58 ejakowatz Exp $
+	$Id: BenaphoreLockCountTest1.cpp,v 1.2 2002/07/13 22:45:21 bonefish Exp $
 	
 	This file implements a test class for testing BLocker functionality.
 	It tests use cases "Count Lock Requests" for a benaphore style BLocker.
@@ -23,7 +23,7 @@
 
 
 #include "BenaphoreLockCountTest1.h"
-#include "TestSuite.h"
+#include "cppunit/TestSuite.h"
 #include "ThreadedTestCaller.h"
 #include <be/support/Locker.h>
 #include "Locker.h"
