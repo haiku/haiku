@@ -128,7 +128,7 @@ DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 	if (!clipReg || !Lock())
 		return;
 
-// This is the same implementation as in DisplayDriverImpl for now
+// This is the same implementation as in DisplayDriverPainter for now
 
 // since we're not using painter.... this won't do much good, will it?
 //	fPainter->ConstrainClipping(*clipReg);
@@ -753,6 +753,65 @@ DisplayDriverPainter::GetTruncatedStrings(const char **instrings,
 										  char **outstrings)
 {
 	printf("DisplayDriverPainter::GetTruncatedStrings()\n");
+}
+
+// HideCursor
+void
+DisplayDriverPainter::HideCursor()
+{
+	fGraphicsCard->SetCursorVisible(false);
+}
+
+// IsCursorHidden
+bool
+DisplayDriverPainter::IsCursorHidden()
+{
+	return !fGraphicsCard->IsCursorVisible();
+}
+
+// MoveCursorTo
+void
+DisplayDriverPainter::MoveCursorTo(const float &x, const float &y)
+{
+	fGraphicsCard->MoveCursorTo(x, y);
+}
+
+// ShowCursor
+void
+DisplayDriverPainter::ShowCursor()
+{
+	fGraphicsCard->SetCursorVisible(true);
+}
+
+// ObscureCursor
+void
+DisplayDriverPainter::ObscureCursor()
+{
+	// TODO: I don't think this has anything to do with the DisplayDriver
+	// implement elsewhere!!
+}
+
+// SetCursor
+void
+DisplayDriverPainter::SetCursor(ServerCursor *cursor)
+{
+	fGraphicsCard->SetCursor(cursor);
+}
+
+// GetCursorPosition
+BPoint
+DisplayDriverPainter::GetCursorPosition()
+{
+	return fGraphicsCard->GetCursorPosition();
+}
+
+// IsCursorObscured
+bool
+DisplayDriverPainter::IsCursorObscured(bool state)
+{
+	// TODO: I don't think this has anything to do with the DisplayDriver
+	// implement elsewhere!!
+	return false;
 }
 
 // Lock

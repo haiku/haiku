@@ -217,10 +217,8 @@ class DisplayDriverPainter : public DisplayDriver {
 													const float &maxwidth,
 													char **outstrings);
 	
-	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	virtual void				Unlock();
-
-/*	virtual	void				HideCursor();
+	// cursor handling		
+	virtual	void				HideCursor();
 	virtual	bool				IsCursorHidden();
 	virtual	void				MoveCursorTo(	const float &x,
 												const float &y);
@@ -228,9 +226,12 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	void				ObscureCursor();
 	virtual	void				SetCursor(ServerCursor *cursor);
 			BPoint				GetCursorPosition();
-	virtual	bool				IsCursorObscured(bool state);*/
+	virtual	bool				IsCursorObscured(bool state);
 	
-	
+
+	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual void				Unlock();
+
 	// display mode access
 	virtual void				SetMode(const display_mode &mode);
 	

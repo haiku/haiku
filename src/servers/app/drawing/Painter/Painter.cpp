@@ -150,7 +150,7 @@ Painter::SetDrawData(const DrawData* data)
 	SetLowColor(data->lowcolor.GetColor32());
 	SetScale(data->scale);
 	SetPenSize(data->pensize);
-//	SetOrigin();
+//	fOrigin = data->coordOrigin;
 	SetDrawingMode(data->draw_mode);
 	SetBlendingMode(data->alphaSrcMode, data->alphaFncMode);
 	SetPenLocation(data->penlocation);

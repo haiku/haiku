@@ -29,6 +29,7 @@
 #include "BitmapBuffer.h"
 #include "PortLink.h"
 #include "ServerConfig.h"
+#include "ServerCursor.h"
 #include "ServerProtocol.h"
 #include "UpdateQueue.h"
 
@@ -112,12 +113,6 @@ class CardView : public BView {
 private:
 			BPortLink*			fServerLink;
 			const BBitmap*		fBitmap;
-
-/*	int hide_cursor;
-	BBitmap *cursor;
-	
-	BRect cursorframe, oldcursorframe;
-	bool obscure_cursor;*/
 };
 
 class CardWindow : public BWindow {
@@ -157,31 +152,11 @@ CardView::CardView(BRect bounds)
 		return;
 	}
 	fServerLink = new BPortLink(serverInputPort);
-
-	// Create a cursor which isn't just a box
-/*	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);
-	BView *v=new BView(cursor->Bounds(),"v", B_FOLLOW_NONE, B_WILL_DRAW);
-	hide_cursor=0;
-
-	cursor->Lock();
-	cursor->AddChild(v);
-
-	v->SetHighColor(255,255,255,0);
-	v->FillRect(cursor->Bounds());
-	v->SetHighColor(255,0,0,255);
-	v->FillTriangle(cursor->Bounds().LeftTop(),cursor->Bounds().RightTop(),cursor->Bounds().LeftBottom());
-
-	cursor->RemoveChild(v);
-	cursor->Unlock();
-	
-	cursorframe=cursor->Bounds();
-	oldcursorframe=cursor->Bounds();*/
 }
 
 CardView::~CardView()
 {
 	delete fServerLink;
-/*	delete cursor;*/
 }
 
 // AttachedToWindow
@@ -197,16 +172,6 @@ CardView::Draw(BRect updateRect)
 	if (fBitmap) {
 		DrawBitmapAsync(fBitmap, updateRect, updateRect);
 	}
-/*	if (viewbmp) {
-		DrawBitmapAsync(viewbmp,oldcursorframe,oldcursorframe);
-		DrawBitmapAsync(viewbmp,rect,rect);
-	
-		if (hide_cursor == 0 && obscure_cursor == false) {
-			SetDrawingMode(B_OP_ALPHA);
-			DrawBitmapAsync(cursor,cursor->Bounds(), cursorframe);
-			SetDrawingMode(B_OP_COPY);
-		}
-	}*/
 }
 
 // These functions emulate the Input Server by sending the *exact* same kind of messages
@@ -228,12 +193,11 @@ CardView::MouseMoved(BPoint pt, uint32 transit, const BMessage* dragMessage)
 {
 	if (!Bounds().Contains(pt))
 		return;
-// TODO: no cursor support yet
 
 	// A bug in R5 prevents this call from having an effect if
 	// called elsewhere, and calling it here works, if we're lucky :-)
-//	BCursor cursor(kEmptyCursor);
-//	SetViewCursor(&cursor, true);
+	BCursor cursor(kEmptyCursor);
+	SetViewCursor(&cursor, true);
 
 #ifdef ENABLE_INPUT_SERVER_EMULATION
 	send_mouse_moved(fServerLink, pt, Window()->CurrentMessage());
@@ -420,9 +384,6 @@ ViewHWInterface::SetMode(const display_mode &mode)
 
 printf("ViewHWInterface::SetMode(%s)\n", string_for_color_space((color_space)fDisplayMode.space));
 
-// left over code
-//	hide_cursor=0;
-
 	BRect frame(0.0, 0.0,
 				fDisplayMode.virtual_width - 1,
 				fDisplayMode.virtual_height - 1);
@@ -494,9 +455,6 @@ printf("ViewHWInterface::SetMode(%s)\n", string_for_color_space((color_space)fDi
 status_t
 ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
-//	if(!info || !is_initialized)
-//		return B_ERROR;
-
 	// We really don't have to provide anything here because this is strictly
 	// a software-only driver, but we'll have some fun, anyway.
 	
@@ -514,11 +472,6 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 status_t
 ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
 {
-//	if(!count || !is_initialized)
-//		return B_ERROR;
-
-//	screenwin->Lock();
-	
 	// DEPRECATED:
 	// NOTE: Originally, I was going to figure out good timing values to be 
 	// returned in each of the modes supported, but I won't bother, being this
@@ -576,7 +529,6 @@ ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
 		modes[i]->v_display_start=0;
 		modes[i]->flags=B_PARALLEL_ACCESS;
 	}
-//	screenwin->Unlock();
 	
 	return B_OK;
 }
@@ -675,16 +627,14 @@ ViewHWInterface::CopyBackToFront(const BRect& frame)
 //					   && area.Intersects(fBackBuffer->Bitmap()->Bounds())) {
 
 		const BBitmap* from = fBackBuffer->Bitmap();
-		const BBitmap* into = fFrontBuffer->Bitmap();
+//		const BBitmap* into = fFrontBuffer->Bitmap();
 
 		// make sure we don't copy out of bounds
 		area = from->Bounds() & area;
 //		area = into->Bounds() & area;
 
-		uint32 srcBPR = from->BytesPerRow();
-		uint32 dstBPR = into->BytesPerRow();
-		uint8* dst = (uint8*)into->Bits();
-		uint8* src = (uint8*)from->Bits();
+		uint32 srcBPR = fBackBuffer->BytesPerRow();
+		uint8* src = (uint8*)fBackBuffer->Bits();
 
 		// convert to integer coordinates
 		int32 x = (int32)floorf(area.left);
@@ -695,147 +645,234 @@ ViewHWInterface::CopyBackToFront(const BRect& frame)
 		// offset to left top pixel in source buffer (always B_RGBA32)
 		src += y * srcBPR + x * 4;
 
-		// transfer, handle colorspace conversion
-		switch (into->ColorSpace()) {
-			case B_RGB32:
-			case B_RGBA32: {
-				int32 bytes = (right - x + 1) * 4;
-		
-				if (bytes > 0) {
-					// offset to left top pixel in dest buffer
-					dst += y * dstBPR + x * 4;
-					// copy
-					for (; y <= bottom; y++) {
-						memcpy(dst, src, bytes);
-						dst += dstBPR;
-						src += srcBPR;
-					}
-				}
-				break;
-			}
-			// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
-			case B_RGB24: {
-				// offset to left top pixel in dest buffer
-				dst += y * dstBPR + x * 3;
-				int32 left = x;
-				// copy
-				for (; y <= bottom; y++) {
-					uint8* srcHandle = src;
-					uint8* dstHandle = dst;
-					x = left;
-					for (; x <= right; x++) {
-						dstHandle[0] = srcHandle[0];
-						dstHandle[1] = srcHandle[1];
-						dstHandle[2] = srcHandle[2];
-						dstHandle += 3;
-						srcHandle += 4;
-					}
-					dst += dstBPR;
-					src += srcBPR;
-				}
-				break;
-			}
-			case B_RGB16: {
-				// offset to left top pixel in dest buffer
-				dst += y * dstBPR + x * 2;
-				int32 left = x;
-				// copy
-				// TODO: assumes BGR order, does this work on big endian as well?
-				for (; y <= bottom; y++) {
-					uint8* srcHandle = src;
-					uint16* dstHandle = (uint16*)dst;
-					x = left;
-					for (; x <= right; x++) {
-						*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 8) |
-											  ((srcHandle[1] & 0xfc) << 3) |
-											  (srcHandle[0] >> 3));
-						dstHandle ++;
-						srcHandle += 4;
-					}
-					dst += dstBPR;
-					src += srcBPR;
-				}
-				break;
-			}
-			case B_RGB15: {
-				// offset to left top pixel in dest buffer
-				dst += y * dstBPR + x * 2;
-				int32 left = x;
-				// copy
-				// TODO: assumes BGR order, does this work on big endian as well?
-				for (; y <= bottom; y++) {
-					uint8* srcHandle = src;
-					uint16* dstHandle = (uint16*)dst;
-					x = left;
-					for (; x <= right; x++) {
-						*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 7) |
-											  ((srcHandle[1] & 0xf8) << 2) |
-											  (srcHandle[0] >> 3));
-						dstHandle ++;
-						srcHandle += 4;
-					}
-					dst += dstBPR;
-					src += srcBPR;
-				}
-				break;
-			}
-			case B_CMAP8: {
-				// offset to left top pixel in dest buffer
-				dst += y * dstBPR + x;
-				int32 left = x;
-				// copy
-				// TODO: using BScreen will not be an option in the
-				// final implementation, will it? The BBitmap implementation
-				// has a class that handles this, something so useful
-				// should be moved to a more public place.
-				// TODO: assumes BGR order again
-				BScreen screen;
-				for (; y <= bottom; y++) {
-					uint8* srcHandle = src;
-					uint8* dstHandle = dst;
-					x = left;
-					for (; x <= right; x++) {
-						*dstHandle = screen.IndexForColor(srcHandle[2],
-														  srcHandle[1],
-														  srcHandle[0]);
-						dstHandle ++;
-						srcHandle += 4;
-					}
-					dst += dstBPR;
-					src += srcBPR;
-				}
-				break;
-			}
-			case B_GRAY8: {
-				// offset to left top pixel in dest buffer
-				dst += y * dstBPR + x;
-				int32 left = x;
-				// copy
-				// TODO: assumes BGR order, does this work on big endian as well?
-				for (; y <= bottom; y++) {
-					uint8* srcHandle = src;
-					uint8* dstHandle = dst;
-					x = left;
-					for (; x <= right; x++) {
-						*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
-						dstHandle ++;
-						srcHandle += 4;
-					}
-					dst += dstBPR;
-					src += srcBPR;
-				}
-				break;
-			}
-			default:
-				fprintf(stderr, "ViewHWInterface::CopyBackToFront() - unsupported front buffer format!\n");
-				break;
-		}
+		_CopyToFront(src, srcBPR, x, y, right, bottom);
+
+		_DrawCursor(area);
 
 		// update the region on screen
 		fWindow->Invalidate(area);
 	}
 
 	return B_OK;
+}
+
+// _DrawCursor
+void
+ViewHWInterface::_DrawCursor(BRect area) const
+{
+	BRect cf = _CursorFrame();
+	if (cf.IsValid() && area.Intersects(cf)) {
+		// clip to common area
+		area = area & cf;
+
+		int32 left = (int32)floorf(area.left);
+		int32 top = (int32)floorf(area.top);
+		int32 right = (int32)ceilf(area.right);
+		int32 bottom = (int32)ceilf(area.bottom);
+		int32 width = right - left + 1;
+		int32 height = bottom - top + 1;
+
+		// make a bitmap from the backbuffer
+		// that has the cursor blended on top of it
+
+		// blending buffer
+		uint8* buffer = new uint8[width * height * 4];
+
+		// offset into back buffer
+		uint8* src = (uint8*)fBackBuffer->Bits();
+		uint32 srcBPR = fBackBuffer->BytesPerRow();
+		src += top * srcBPR + left * 4;
+
+		// offset into cursor bitmap
+		uint8* crs = (uint8*)fCursor->Bits();
+		uint32 crsBPR = fCursor->BytesPerRow();
+		// since area is clipped to cf,
+		// the diff between top and cf.top is always positive,
+		// same for diff between left and cf.left
+		crs += (top - (int32)floorf(cf.top)) * crsBPR
+				+ (left - (int32)floorf(cf.left)) * 4;
+
+		uint8* dst = buffer;
+
+		// blending
+		for (int32 y = top; y <= bottom; y++) {
+			uint8* s = src;
+			uint8* c = crs;
+			uint8* d = dst;
+			for (int32 x = left; x <= right; x++) {
+				// assume backbuffer alpha = 255
+				// TODO: it appears alpha in cursor us upside down
+				uint8 a = 255 - c[3];
+				d[0] = (((s[0] - c[0]) * a) + (c[0] << 8)) >> 8;
+				d[1] = (((s[1] - c[1]) * a) + (c[1] << 8)) >> 8;
+				d[2] = (((s[2] - c[2]) * a) + (c[2] << 8)) >> 8;
+				d[3] = 255;
+				s += 4;
+				c += 4;
+				d += 4;
+			}
+			crs += crsBPR;
+			src += srcBPR;
+			dst += width * 4;
+		}
+
+		// copy result to front buffer
+		_CopyToFront(buffer, width * 4, left, top, right, bottom);
+
+		delete[] buffer;
+	}
+}
+
+// _CopyToFront
+//
+// * source is assumed to be already at the right offset
+// * source is assumed to be in B_RGBA32 format
+// * location in front buffer is calculated
+// * conversion from B_RGBA32 to format of front buffer is taken care of
+void
+ViewHWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
+							  int32 x, int32 y,
+							  int32 right, int32 bottom) const
+{
+	uint8* dst = (uint8*)fFrontBuffer->Bits();
+	uint32 dstBPR = fFrontBuffer->BytesPerRow();
+
+	// transfer, handle colorspace conversion
+	switch (fFrontBuffer->ColorSpace()) {
+		case B_RGB32:
+		case B_RGBA32: {
+			int32 bytes = (right - x + 1) * 4;
+	
+			if (bytes > 0) {
+				// offset to left top pixel in dest buffer
+				dst += y * dstBPR + x * 4;
+				// copy
+				for (; y <= bottom; y++) {
+					memcpy(dst, src, bytes);
+					dst += dstBPR;
+					src += srcBPR;
+				}
+			}
+			break;
+		}
+		// NOTE: on R5, B_RGB24 bitmaps are not supported by DrawBitmap()
+		case B_RGB24: {
+			// offset to left top pixel in dest buffer
+			dst += y * dstBPR + x * 3;
+			int32 left = x;
+			// copy
+			for (; y <= bottom; y++) {
+				uint8* srcHandle = src;
+				uint8* dstHandle = dst;
+				x = left;
+				for (; x <= right; x++) {
+					dstHandle[0] = srcHandle[0];
+					dstHandle[1] = srcHandle[1];
+					dstHandle[2] = srcHandle[2];
+					dstHandle += 3;
+					srcHandle += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+		case B_RGB16: {
+			// offset to left top pixel in dest buffer
+			dst += y * dstBPR + x * 2;
+			int32 left = x;
+			// copy
+			// TODO: assumes BGR order, does this work on big endian as well?
+			for (; y <= bottom; y++) {
+				uint8* srcHandle = src;
+				uint16* dstHandle = (uint16*)dst;
+				x = left;
+				for (; x <= right; x++) {
+					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 8) |
+										  ((srcHandle[1] & 0xfc) << 3) |
+										  (srcHandle[0] >> 3));
+					dstHandle ++;
+					srcHandle += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+		case B_RGB15: {
+			// offset to left top pixel in dest buffer
+			dst += y * dstBPR + x * 2;
+			int32 left = x;
+			// copy
+			// TODO: assumes BGR order, does this work on big endian as well?
+			for (; y <= bottom; y++) {
+				uint8* srcHandle = src;
+				uint16* dstHandle = (uint16*)dst;
+				x = left;
+				for (; x <= right; x++) {
+					*dstHandle = (uint16)(((srcHandle[2] & 0xf8) << 7) |
+										  ((srcHandle[1] & 0xf8) << 2) |
+										  (srcHandle[0] >> 3));
+					dstHandle ++;
+					srcHandle += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+		case B_CMAP8: {
+			// offset to left top pixel in dest buffer
+			dst += y * dstBPR + x;
+			int32 left = x;
+			// copy
+			// TODO: using BScreen will not be an option in the
+			// final implementation, will it? The BBitmap implementation
+			// has a class that handles this, something so useful
+			// should be moved to a more public place.
+			// TODO: assumes BGR order again
+			BScreen screen;
+			for (; y <= bottom; y++) {
+				uint8* srcHandle = src;
+				uint8* dstHandle = dst;
+				x = left;
+				for (; x <= right; x++) {
+					*dstHandle = screen.IndexForColor(srcHandle[2],
+													  srcHandle[1],
+													  srcHandle[0]);
+					dstHandle ++;
+					srcHandle += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+		case B_GRAY8: {
+			// offset to left top pixel in dest buffer
+			dst += y * dstBPR + x;
+			int32 left = x;
+			// copy
+			// TODO: assumes BGR order, does this work on big endian as well?
+			for (; y <= bottom; y++) {
+				uint8* srcHandle = src;
+				uint8* dstHandle = dst;
+				x = left;
+				for (; x <= right; x++) {
+					*dstHandle = (308 * srcHandle[2] + 600 * srcHandle[1] + 116 * srcHandle[0]) / 1024;
+					dstHandle ++;
+					srcHandle += 4;
+				}
+				dst += dstBPR;
+				src += srcBPR;
+			}
+			break;
+		}
+		default:
+			fprintf(stderr, "ViewHWInterface::CopyBackToFront() - unsupported front buffer format!\n");
+			break;
+	}
+	
 }
 
 

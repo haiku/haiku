@@ -38,8 +38,7 @@
 	\brief Sets up internal variables needed by all DisplayDriver subclasses
 */
 DisplayDriver::DisplayDriver()
-	: fCursorHandler(this),
-	  fDPMSState(B_DPMS_ON),
+	: fDPMSState(B_DPMS_ON),
 	  fDPMSCaps(B_DPMS_ON)
 {
 	fDisplayMode.virtual_width = 640;
@@ -68,7 +67,7 @@ DisplayDriver::~DisplayDriver()
 bool
 DisplayDriver::Initialize()
 {
-	fCursorHandler.SetCursor(new ServerCursor(default_cursor_data));
+	SetCursor(new ServerCursor(default_cursor_data));
 	return true;
 }
 
@@ -81,127 +80,6 @@ DisplayDriver::Initialize()
 void
 DisplayDriver::Shutdown()
 {
-}
-
-/*!
-	\brief Hides the cursor.
-	
-	Hide calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(true) somewhere within this function to ensure that data is
-	maintained accurately. Subclasses must include a call to DisplayDriver::HideCursor
-	for proper state tracking.
-*/
-void
-DisplayDriver::HideCursor()
-{
-	Lock();
-	fCursorHandler.Hide();	
-	Unlock();
-}
-
-/*!
-	\brief Returns whether the cursor is visible or not.
-	\return true if hidden or obscured, false if not.
-
-*/
-bool
-DisplayDriver::IsCursorHidden()
-{
-	Lock();
-	bool value = fCursorHandler.IsHidden();
-	Unlock();
-
-	return value;
-}
-
-/*!
-	\brief Moves the cursor to the given point.
-
-	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
-	range, but the cursor data itself will need to be clipped. A check to see if the 
-	cursor is obscured should be made and if so, a call to _SetCursorObscured(false) 
-	should be made the cursor in addition to displaying at the passed coordinates.
-*/
-void
-DisplayDriver::MoveCursorTo(const float &x, const float &y)
-{
-	Lock();
-	fCursorHandler.MoveTo(BPoint(x, y));
-	Unlock();
-}
-
-/*!
-	\brief Shows the cursor.
-	
-	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
-	call _SetCursorHidden(false) somewhere within this function to ensure that data is
-	maintained accurately. Subclasses must call DisplayDriver::ShowCursor at some point
-	to ensure proper state tracking.
-*/
-void
-DisplayDriver::ShowCursor()
-{
-	Lock();
-	fCursorHandler.Show();
-	Unlock();
-}
-
-/*!
-	\brief Obscures the cursor.
-	
-	Obscure calls are not nestable. Subclasses should call DisplayDriver::ObscureCursor
-	somewhere within this function to ensure that data is maintained accurately. A check
-	will be made by the system before the next MoveCursorTo call to show the cursor if
-	it is obscured.
-*/
-void
-DisplayDriver::ObscureCursor()
-{
-	Lock();
-	fCursorHandler.Obscure();	
-	Unlock();
-
-}
-
-/*!
-	\brief Changes the cursor.
-	\param cursor The new cursor. Guaranteed to be non-NULL.
-	
-	The driver does not take ownership of the given cursor. Subclasses should make
-	a copy of the cursor passed to it. The default version of this function hides the
-	cursory, replaces it, and shows the cursor if previously visible.
-*/
-void
-DisplayDriver::SetCursor(ServerCursor *cursor)
-{
-	Lock();
-	fCursorHandler.SetCursor(cursor);
-	Unlock();
-}
-
-//! Returns the cursor's current position
-BPoint
-DisplayDriver::GetCursorPosition()
-{
-	Lock();
-	BPoint pos = fCursorHandler.GetPosition();
-	Unlock();
-	
-	return pos;
-}
-
-/*!
-	\brief Returns whether or not the cursor is currently obscured
-	\return True if obscured, false if not.
-*/
-bool
-DisplayDriver::IsCursorObscured(bool state)
-{
-	Lock();
-	bool obscured = fCursorHandler.IsObscured();
-	Unlock();
-	
-	return obscured;
 }
 
 // Protected Internal Functions

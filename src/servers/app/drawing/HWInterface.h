@@ -13,9 +13,10 @@
 #include <GraphicsCard.h>
 #include <Locker.h>
 #include <OS.h>
+#include <Rect.h>
 
 class RenderingBuffer;
-class BRect;
+class ServerCursor;
 
 class HWInterface : public BLocker {
  public:
@@ -25,9 +26,9 @@ class HWInterface : public BLocker {
 	virtual	status_t			Initialize() = 0;
 	virtual	status_t			Shutdown() = 0;
 
+	// screen mode stuff
 	virtual	status_t			SetMode(const display_mode &mode) = 0;
 //	virtual	void				GetMode(display_mode *mode) = 0;
-
 
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
 	virtual status_t			GetModeList(display_mode **mode_list,
@@ -46,6 +47,14 @@ class HWInterface : public BLocker {
 	virtual uint32				DPMSMode() const = 0;
 	virtual uint32				DPMSCapabilities() const = 0;
 
+	// cursor handling
+	virtual	void				SetCursor(ServerCursor* cursor);
+	virtual	void				SetCursorVisible(bool visible);
+	virtual	bool				IsCursorVisible();
+	virtual	void				MoveCursorTo(const float& x,
+											 const float& y);
+			BPoint				GetCursorPosition();
+
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
@@ -54,6 +63,13 @@ class HWInterface : public BLocker {
 	virtual	status_t			Invalidate(const BRect& frame) = 0;
 	// while as CopyBackToFront() actually performs the operation
 	virtual	status_t			CopyBackToFront(const BRect& frame) = 0;
+
+ protected:
+			BRect				_CursorFrame() const;
+
+			ServerCursor*		fCursor;
+			bool				fCursorVisible;
+			BPoint				fCursorLocation;
 };
 
 #endif // HW_INTERFACE_H
