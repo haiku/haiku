@@ -21,8 +21,9 @@
 //
 //	File Name:		AccelerantDriver.h
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//	Description:		A display driver which works directly with the
-//					accelerant for the graphics card.
+//					Michael Lotz <mmlr@mlotz.ch>
+//	Description:	A display driver which works directly with the
+//					accelerant of the graphics card.
 //  
 //------------------------------------------------------------------------------
 #ifndef _ACCELERANTDRIVER_H_
@@ -33,7 +34,6 @@
 #include "PatternHandler.h"
 #include "FontServer.h"
 #include "LayerData.h"
-
 #include "DisplayDriverImpl.h"
 
 class ServerBitmap;
@@ -47,26 +47,36 @@ public:
 
 	bool Initialize();
 	void Shutdown();
-	
-	virtual void InvertRect(const BRect &r);
+
+/*
+	virtual bool Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual void Unlock(void);
+*/
+
 	virtual void SetMode(const int32 &mode);
 	virtual void SetMode(const display_mode &mode);
+
 	virtual bool DumpToFile(const char *path);
+	virtual void InvertRect(const BRect &r);
 	virtual void StrokeLineArray(const int32 &numlines, const LineArrayData *linedata,const DrawData *d);
 
 /*
 	virtual status_t SetDPMSMode(const uint32 &state);
 	virtual uint32 DPMSMode() const;
 	virtual uint32 DPMSCapabilities() const;
+*/
+
 	virtual status_t GetDeviceInfo(accelerant_device_info *info);
 	virtual status_t GetModeList(display_mode **mode_list, uint32 *count);
 	virtual status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
 	virtual status_t GetTimingConstraints(display_timing_constraints *dtc);
 	virtual status_t ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high);
 	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
-*/
 
 protected:
+	virtual bool AcquireBuffer(FBBitmap *bmp);
+	virtual void ReleaseBuffer(void);
+
 	void BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY);
 	void ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
@@ -78,14 +88,14 @@ protected:
 	int GetDepthFromColorspace(int space);
 
 	// Support functions for the rest of the driver
-	void Blit(const BRect &src, const BRect &dest, const DrawData *d);
-	void FillSolidRect(const BRect &rect, RGBColor &color);
-	void FillPatternRect(const BRect &rect, const DrawData *d);
-	void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
-	void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
-	void StrokeSolidRect(const BRect &rect, RGBColor &color);
-	void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
-	void CopyToBitmap(ServerBitmap *target, const BRect &source);
+	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
+	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
+	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
+	virtual void StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color);
+	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
+	virtual void StrokeSolidRect(const BRect &rect, const RGBColor &color);
+	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
+	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source); 
 	
 	ServerCursor *cursor, *under_cursor;
 
@@ -93,9 +103,9 @@ protected:
 	int card_fd;
 	image_id accelerant_image;
 	GetAccelerantHook accelerant_hook;
-        engine_token *mEngineToken;
-        acquire_engine AcquireEngine;
-        release_engine ReleaseEngine;
+    engine_token *mEngineToken;
+    acquire_engine AcquireEngine;
+    release_engine ReleaseEngine;
 	fill_rectangle accFillRect;
 	invert_rectangle accInvertRect;
 	set_cursor_shape accSetCursorShape;
@@ -104,7 +114,6 @@ protected:
 	frame_buffer_config mFrameBufferConfig;
 	int mode_count;
 	display_mode *mode_list;
-	display_mode mDisplayMode;
 	display_mode R5DisplayMode; // This should go away once we stop running under r5
 };
 

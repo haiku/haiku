@@ -21,8 +21,9 @@
 //
 //	File Name:		AccelerantDriver.cpp
 //	Author:			Gabe Yoder <gyoder@stny.rr.com>
-//	Description:		A display driver which works directly with the
-//				accelerant for the graphics card.
+//					Michael Lotz <mmlr@mlotz.ch>
+//	Description:	A display driver which works directly with the
+//					accelerant for the graphics card.
 //  
 //------------------------------------------------------------------------------
 #include "AccelerantDriver.h"
@@ -31,15 +32,26 @@
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
 #include "LayerData.h"
+#include "PNGDump.h"
 #include <FindDirectory.h>
 #include <graphic_driver.h>
 #include <malloc.h>
 #include <dirent.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <ServerConfig.h>
+#include <ServerProtocol.h>
 
-#define RUN_UNDER_R5
-#define DRAW_TEST
+//#define TRACE_ACCELERANT
+#ifdef TRACE_ACCELERANT
+#	include <stdio.h>
+#	define ATRACE(x) printf x
+#else
+#	define ATRACE(x)
+#endif
+
+//#define RUN_UNDER_R5
+//#define DRAW_TEST
 
 /* TODO: Add handling of draw modes */
 
@@ -48,21 +60,26 @@
 	
 */
 AccelerantDriver::AccelerantDriver()
-	: DisplayDriverImpl()
+	:	DisplayDriverImpl()
 {
 	cursor=NULL;
 	under_cursor=NULL;
 	cursorframe.Set(0,0,0,0);
-
+	
 	card_fd = -1;
 	accelerant_image = -1;
 	mode_list = NULL;
+	
+	// we need this under Haiku too, as it is where the input_server
+	// sends it's data to.
+	port_id serverInputPort = create_port(200, SERVER_INPUT_PORT);
+	if (serverInputPort == B_NO_MORE_PORTS)
+		debugger("AccelerantDriver: out of ports\n");
 }
 
 
 /*!
 	\brief Deletes the heap memory used by the AccelerantDriver
-	
 */
 AccelerantDriver::~AccelerantDriver()
 {
@@ -81,14 +98,14 @@ AccelerantDriver::~AccelerantDriver()
 	Initialize sets up the driver for display, including the initial clearing
 	of the screen. If things do not go as they should, false should be returned.
 */
-bool AccelerantDriver::Initialize()
+bool
+AccelerantDriver::Initialize()
 {
 	int i;
 	char signature[1024];
 	char path[PATH_MAX];
 	struct stat accelerant_stat;
-	const static directory_which dirs[] =
-	{
+	const static directory_which dirs[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
 		B_BEOS_ADDONS_DIRECTORY
@@ -97,7 +114,7 @@ bool AccelerantDriver::Initialize()
 	card_fd = OpenGraphicsDevice(1);
 	if ( card_fd < 0 )
 	{
-		printf("Failed to open graphics device\n");
+		ATRACE(("Failed to open graphics device\n"));
 		return false;
 	}
 
@@ -106,13 +123,14 @@ bool AccelerantDriver::Initialize()
 		close(card_fd);
 		return false;
 	}
-	//printf("signature %s\n",signature);
+	ATRACE(("accelerant signature: %s\n", signature));
 
 	accelerant_image = -1;
 	for (i=0; i<3; i++)
 	{
 		if ( find_directory(dirs[i], -1, false, path, PATH_MAX) != B_OK )
 			continue;
+		
 		strcat(path,"/accelerants/");
 		strcat(path,signature);
 		if (stat(path, &accelerant_stat) != 0)
@@ -133,7 +151,8 @@ bool AccelerantDriver::Initialize()
 	}
 	if (accelerant_image < 0)
 		return false;
-
+	
+	// TODO: Shouldn't these be (re-)moved. They are implemented elsewhere.
 	accelerant_mode_count GetModeCount = (accelerant_mode_count)accelerant_hook(B_ACCELERANT_MODE_COUNT, NULL);
 	if ( !GetModeCount )
 		return false;
@@ -153,10 +172,10 @@ bool AccelerantDriver::Initialize()
 	get_display_mode GetDisplayMode = (get_display_mode)accelerant_hook(B_GET_DISPLAY_MODE,NULL);
 	if ( !GetDisplayMode )
 		return false;
-	if ( GetDisplayMode(&mDisplayMode) != B_OK )
+	if ( GetDisplayMode(&fDisplayMode) != B_OK )
 		return false;
-	SetMode(mDisplayMode);
-	memcpy(&R5DisplayMode,&mDisplayMode,sizeof(display_mode));
+	SetMode(fDisplayMode);
+	memcpy(&R5DisplayMode,&fDisplayMode,sizeof(display_mode));
 #else
 	SetMode(B_8_BIT_640x480);
 #endif
@@ -166,7 +185,7 @@ bool AccelerantDriver::Initialize()
 		return false;
 	if ( GetFrameBufferConfig(&mFrameBufferConfig) != B_OK )
 		return false;
-
+	
 	AcquireEngine = (acquire_engine)accelerant_hook(B_ACQUIRE_ENGINE,NULL);
 	ReleaseEngine = (release_engine)accelerant_hook(B_RELEASE_ENGINE,NULL);
 	accFillRect = (fill_rectangle)accelerant_hook(B_FILL_RECTANGLE,NULL);
@@ -180,10 +199,10 @@ bool AccelerantDriver::Initialize()
 //	RGBColor red(255,0,0,0);
 //	RGBColor green(0,255,0,0);
 	RGBColor blue(0,0,255,0);
-	FillRect(BRect(0,0,1024,768),blue);
+	FillRect(BRect(0,0,639,479),blue);
 #endif
-	
-	return DisplayDriver::Initialize();
+
+	return true;
 }
 
 /*!
@@ -192,10 +211,9 @@ bool AccelerantDriver::Initialize()
 	Any work done by Initialize() should be undone here. Note that Shutdown() is
 	called even if Initialize() was unsuccessful.
 */
-void AccelerantDriver::Shutdown()
+void
+AccelerantDriver::Shutdown()
 {
-	DisplayDriver::Shutdown();
-
 #ifdef RUN_UNDER_R5
 	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
 	if ( SetDisplayMode )
@@ -244,7 +262,8 @@ void AccelerantDriver::StrokeLineArray(const int32 &numlines, const LineArrayDat
 	\brief Inverts the colors in the rectangle.
 	\param r Rectangle of the area to be inverted. Guaranteed to be within bounds.
 */
-void AccelerantDriver::InvertRect(const BRect &r)
+void
+AccelerantDriver::InvertRect(const BRect &r)
 {
 	Lock();
 	if ( accInvertRect && AcquireEngine && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
@@ -260,7 +279,7 @@ void AccelerantDriver::InvertRect(const BRect &r)
 		Unlock();
 		return;
 	}
-	switch (mDisplayMode.space)
+	switch (fDisplayMode.space)
 	{
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -351,6 +370,33 @@ void AccelerantDriver::InvertRect(const BRect &r)
 	Unlock();
 }
 
+status_t
+AccelerantDriver::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+{
+	Lock();
+	
+	propose_display_mode ProposeDisplayMode = (propose_display_mode)accelerant_hook(B_PROPOSE_DISPLAY_MODE, NULL);
+	if (!ProposeDisplayMode) {
+		ATRACE(("No B_PROPOSE_DISPLAY_MODE hook found\n"));
+		Unlock();
+		return B_UNSUPPORTED;
+	}
+	
+	// avoid const issues
+	display_mode this_high, this_low;
+	this_high = *high;
+	this_low = *low;
+	
+	if (ProposeDisplayMode(candidate, &this_low, &this_high) == B_ERROR) {
+		ATRACE(("ProposeDisplayMode failed\n"));
+		Unlock();
+		return B_ERROR;
+	}
+	
+	Unlock();
+	return B_OK;
+}
+
 
 /*!
 	\brief Sets the screen mode to specified resolution and color depth.
@@ -359,7 +405,8 @@ void AccelerantDriver::InvertRect(const BRect &r)
 	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
 	to update the state variables kept internally by the DisplayDriver class.
 */
-void AccelerantDriver::SetMode(const int32 &mode)
+void
+AccelerantDriver::SetMode(const int32 &mode)
 {
   /* TODO: Still needs some work to fine tune color hassles in picking the mode */
 /*	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
@@ -381,12 +428,12 @@ void AccelerantDriver::SetMode(const int32 &mode)
 			{
 				if ( SetDisplayMode(&(mode_list[i])) == B_OK )
 				{
-					memcpy(&mDisplayMode,&(mode_list[i]),sizeof(display_mode));
-					_SetDepth(GetDepthFromColorspace(mDisplayMode.space));
-					_SetWidth(mDisplayMode.virtual_width);
-					_SetHeight(mDisplayMode.virtual_height);
-					_SetMode(GetModeFromResolution(mDisplayMode.virtual_width,mDisplayMode.virtual_height,
-						GetDepthFromColorspace(mDisplayMode.space)));
+					memcpy(&fDisplayMode,&(mode_list[i]),sizeof(display_mode));
+					_SetDepth(GetDepthFromColorspace(fDisplayMode.space));
+					_SetWidth(fDisplayMode.virtual_width);
+					_SetHeight(fDisplayMode.virtual_height);
+					_SetMode(GetModeFromResolution(fDisplayMode.virtual_width,fDisplayMode.virtual_height,
+						GetDepthFromColorspace(fDisplayMode.space)));
 				}
 				break;
 			}
@@ -397,10 +444,128 @@ void AccelerantDriver::SetMode(const int32 &mode)
 */
 }
 
-void AccelerantDriver::SetMode(const display_mode &mode)
+void
+AccelerantDriver::SetMode(const display_mode &mode)
 {
-	// TODO: Implement
+	Lock();
 	
+	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
+	if (!SetDisplayMode) {
+		ATRACE(("No B_SET_DISPLAY_MODE hook found\n"));
+		Unlock();
+		return;
+	}
+	
+	for (int i = 0; i < mode_count; i++) {
+		if (mode_list[i].virtual_width == mode.virtual_width
+			&& mode_list[i].virtual_height == mode.virtual_height
+			&& mode_list[i].space == mode.space) {
+			
+			fDisplayMode = mode_list[i];
+			break;
+		}
+	}
+	
+	if (SetDisplayMode(&fDisplayMode) != B_OK) {
+		ATRACE(("SetDisplayMode failed\n"));
+		Unlock();
+		return;
+	}
+	
+	// we need to update our framebufferconfig
+	get_frame_buffer_config GetFrameBufferConfig = (get_frame_buffer_config)accelerant_hook(B_GET_FRAME_BUFFER_CONFIG, NULL);
+	if (!GetFrameBufferConfig) {
+		ATRACE(("No B_GET_FRAME_BUFFER_CONFIG hook found\n"));
+		Unlock();
+		return;
+	}
+	
+	if (GetFrameBufferConfig(&mFrameBufferConfig) != B_OK) {
+		ATRACE(("GetFrameBufferConfig failed\n"));
+		Unlock();
+		return;
+	}
+	
+#ifdef DRAW_TEST
+//	RGBColor red(255,0,0,0);
+//	RGBColor green(0,255,0,0);
+	RGBColor blue(0,0,255,0);
+	FillRect(BRect(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1), blue);
+#endif
+	
+	Unlock();
+}
+
+status_t
+AccelerantDriver::GetDeviceInfo(accelerant_device_info *info)
+{
+	Lock();
+	
+	get_accelerant_device_info GetAccelerantDeviceInfo = (get_accelerant_device_info)accelerant_hook(B_GET_ACCELERANT_DEVICE_INFO, NULL);
+	if (!GetAccelerantDeviceInfo) {
+		ATRACE(("No B_GET_ACCELERANT_DEVICE_INFO hook found\n"));
+		Unlock();
+		return B_UNSUPPORTED;
+	}
+	
+	status_t result = GetAccelerantDeviceInfo(info);
+	Unlock();
+	return result;
+}
+
+status_t
+AccelerantDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+{
+	Lock();
+	
+	get_pixel_clock_limits GetPixelClockLimits = (get_pixel_clock_limits)accelerant_hook(B_GET_PIXEL_CLOCK_LIMITS, NULL);
+	if (!GetPixelClockLimits) {
+		ATRACE(("No B_GET_PIXEL_CLOCK_LIMITS hook found\n"));
+		Unlock();
+		return B_UNSUPPORTED;
+	}
+	
+	status_t result = GetPixelClockLimits(mode, low, high);
+	Unlock();
+	return result;
+}
+
+status_t
+AccelerantDriver::GetTimingConstraints(display_timing_constraints *dtc)
+{
+	Lock();
+	
+	get_timing_constraints GetTimingConstraints = (get_timing_constraints)accelerant_hook(B_GET_TIMING_CONSTRAINTS, NULL);
+	if (!GetTimingConstraints) {
+		ATRACE(("No B_GET_TIMING_CONSTRAINTS hook found\n"));
+		Unlock();
+		return B_UNSUPPORTED;
+	}
+	
+	status_t result = GetTimingConstraints(dtc);
+	Unlock();
+	return result;
+}
+
+status_t
+AccelerantDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
+{
+	Lock();
+	
+	accelerant_retrace_semaphore AccelerantRetraceSemaphore = (accelerant_retrace_semaphore)accelerant_hook(B_ACCELERANT_RETRACE_SEMAPHORE, NULL);
+	if (!AccelerantRetraceSemaphore) {
+		ATRACE(("No B_ACCELERANT_RETRACE_SEMAPHORE hook found\n"));
+		Unlock();
+		return B_UNSUPPORTED;
+	}
+	
+	status_t result = B_ERROR;
+	sem_id sem = AccelerantRetraceSemaphore();
+	if (sem >= 0)
+		result = acquire_sem_etc(sem, 1, B_RELATIVE_TIMEOUT, timeout);
+	
+	Unlock();
+	return result;
 }
 
 /*!
@@ -410,18 +575,59 @@ void AccelerantDriver::SetMode(const display_mode &mode)
 	
 	Subclasses should add an extension based on what kind of file is saved
 */
-bool AccelerantDriver::DumpToFile(const char *path)
+bool
+AccelerantDriver::DumpToFile(const char *path)
 {
-        /* TODO: impelement */
-	return false;
+#if 0
+	// TODO: find out why this does not work
+	SaveToPNG(	path,
+				BRect(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1),
+				(color_space)fDisplayMode.space,
+				mFrameBufferConfig.frame_buffer,
+				fDisplayMode.virtual_height * mFrameBufferConfig.bytes_per_row,
+				mFrameBufferConfig.bytes_per_row);*/
+#else
+	// TODO: remove this when SaveToPNG works properly
+	
+	// this does dump each line at a time to ensure that everything
+	// gets written even if we crash somewhere.
+	// it's a bit overkill, but works for now.
+	FILE *output = fopen(path, "w");
+	uint32 row = mFrameBufferConfig.bytes_per_row / 4;
+	for (int i = 0; i < fDisplayMode.virtual_height; i++) {
+		fwrite((uint32 *)mFrameBufferConfig.frame_buffer + i * row, 4, row, output);
+		sync();
+	}
+	fclose(output);
+	sync();
+#endif
+	
+	return true;
 }
 
-/*!
-	\brief Draws a pixel in the specified color
-	\param x The x coordinate (guaranteed to be in bounds)
-	\param y The y coordinate (guaranteed to be in bounds)
-	\param col The color to draw
-*/
+bool
+AccelerantDriver::AcquireBuffer(FBBitmap *bmp)
+{
+	if (!bmp)
+		return false;
+	
+	Lock();
+	
+	bmp->SetBytesPerRow(mFrameBufferConfig.bytes_per_row);
+	bmp->SetSpace((color_space)fDisplayMode.space);
+	bmp->SetSize(fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1);
+	bmp->SetBuffer(mFrameBufferConfig.frame_buffer);
+	bmp->SetBitsPerPixel((color_space)fDisplayMode.space, mFrameBufferConfig.bytes_per_row);
+	
+	Unlock();
+	return true;
+}
+
+void
+AccelerantDriver::ReleaseBuffer(void)
+{
+	/* TODO: maybe we need to unlock something here? */
+}
 
 /*!
 	\brief Copies a bitmap to the screen
@@ -431,13 +637,14 @@ bool AccelerantDriver::DumpToFile(const char *path)
 	\param mode The drawing mode to use when blitting the bitmap
 	The bitmap and the screen must have the same color depth, or this will do nothing.
 */
-void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode)
+void
+AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode)
 {
 	/* TODO: Need to check for hardware support for this. */
 	if(!sourcebmp)
 		return;
 
-	if(sourcebmp->BitsPerPixel() != GetDepthFromColorspace(mDisplayMode.space))
+	if(sourcebmp->BitsPerPixel() != GetDepthFromColorspace(fDisplayMode.space))
 		return;
 
 	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
@@ -469,7 +676,7 @@ void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRe
 			sourcerect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,mDisplayMode.virtual_width-1,mDisplayMode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 
 	if( !(work_rect.Contains(destrect)) )
 	{	// something in selection must be clipped
@@ -560,13 +767,14 @@ void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRe
 	\param sourcerect The rectangle defining the section of the screen to be copied
 	The bitmap and the screen must have the same color depth or this will do nothing.
 */
-void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect)
+void
+AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect)
 {
 	/* TODO: Need to check for hardware support for this. */
 	if(!destbmp)
 		return;
 
-	if(destbmp->BitsPerPixel() != GetDepthFromColorspace(mDisplayMode.space))
+	if(destbmp->BitsPerPixel() != GetDepthFromColorspace(fDisplayMode.space))
 		return;
 
 	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
@@ -598,7 +806,7 @@ void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BR
 			destrect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,mDisplayMode.virtual_width-1,mDisplayMode.virtual_height-1);
+	work_rect.Set(0,0,fDisplayMode.virtual_width-1,fDisplayMode.virtual_height-1);
 
 	if( !(work_rect.Contains(sourcerect)) )
 	{	// something in selection must be clipped
@@ -646,7 +854,8 @@ void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BR
 	opened.  One represents the first card that can be successfully opened (not necessarily
 	the first one listed in the directory).
 */
-int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
+int
+AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 {
 	int current_card_fd = -1;
 	int count = 0;
@@ -685,8 +894,26 @@ int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 			current_card_fd = -1;
 		}
 	}
-
+	
 	return current_card_fd;
+}
+
+status_t
+AccelerantDriver::GetModeList(display_mode **modes, uint32 *count)
+{
+	if (!count || !modes)
+		return B_BAD_VALUE;
+	
+	Lock();
+	
+	*modes = new display_mode[mode_count];
+	*count = mode_count;
+	
+	memcpy(*modes, mode_list, sizeof(display_mode) * mode_count);
+	
+	Unlock();
+	
+	return B_OK;
 }
 
 /*!
@@ -696,7 +923,8 @@ int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
 	\param depth The color depth
 	\return The display mode constant
 */
-int AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
+int
+AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
 {
 	int mode = 0;
 	switch (depth)
@@ -805,7 +1033,8 @@ int AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
 	\param mode The display mode
 	\return The display height (640, 800, 1024, 1152, 1280, or 1600)
 */
-int AccelerantDriver::GetWidthFromMode(int mode)
+int
+AccelerantDriver::GetWidthFromMode(int mode)
 {
 	int width=0;
 
@@ -857,7 +1086,8 @@ int AccelerantDriver::GetWidthFromMode(int mode)
 	\param mode The display mode
 	\return The display height (400, 480, 600, 768, 900, 1024, or 1200)
 */
-int AccelerantDriver::GetHeightFromMode(int mode)
+int
+AccelerantDriver::GetHeightFromMode(int mode)
 {
 	int height=0;
 
@@ -911,7 +1141,8 @@ int AccelerantDriver::GetHeightFromMode(int mode)
 	\param mode The display mode
 	\return The color depth (8,15,16 or 32)
 */
-int AccelerantDriver::GetDepthFromMode(int mode)
+int
+AccelerantDriver::GetDepthFromMode(int mode)
 {
 	int depth=0;
 
@@ -959,7 +1190,8 @@ int AccelerantDriver::GetDepthFromMode(int mode)
 	\param mode The color space constant
 	\return The color depth (1,8,16 or 32)
 */
-int AccelerantDriver::GetDepthFromColorspace(int space)
+int
+AccelerantDriver::GetDepthFromColorspace(int space)
 {
 	int depth=0;
 
@@ -994,28 +1226,31 @@ int AccelerantDriver::GetDepthFromColorspace(int space)
 	return depth;
 }
 
-void AccelerantDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
+void
+AccelerantDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 {
 }
 
-void AccelerantDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+void
+AccelerantDriver::FillSolidRect(const BRect &rect, const RGBColor &_color)
 {
+	RGBColor color = _color;
 	int32 left = (int32)rect.left;
 	int32 right = (int32)rect.right;
 	int32 top = (int32)rect.top;
 	int32 bottom = (int32)rect.bottom;
 #ifndef DISABLE_HARDWARE_ACCELERATION
-	if ( accFillRect && AcquireEngine )
+	if (accFillRect && AcquireEngine)
 	{
-		if ( AcquireEngine(0,0,NULL,&mEngineToken) == B_OK )
+		if (AcquireEngine(0, 0, NULL, &mEngineToken) == B_OK)
 		{
 			fill_rect_params fillParams;
-			uint32 fill_color=0;
+			uint32 fill_color = 0;
 			fillParams.right = (uint16)right;
 			fillParams.left = (uint16)left;
 			fillParams.top = (uint16)top;
 			fillParams.bottom = (uint16)bottom;
-			switch (mDisplayMode.space)
+			switch (fDisplayMode.space)
 			{
 				case B_CMAP8:
 				case B_GRAY8:
@@ -1042,15 +1277,15 @@ void AccelerantDriver::FillSolidRect(const BRect &rect, RGBColor &color)
 					break;
 			}
 			accFillRect(mEngineToken, fill_color, &fillParams, 1);
-			if ( ReleaseEngine )
-				ReleaseEngine(mEngineToken,NULL);
+			if (ReleaseEngine)
+				ReleaseEngine(mEngineToken, NULL);
 			Unlock();
 			return;
 		}
 	}
 #endif
 
-	switch (mDisplayMode.space)
+	switch (fDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
@@ -1114,14 +1349,15 @@ void AccelerantDriver::FillSolidRect(const BRect &rect, RGBColor &color)
 	}
 }
 
-void AccelerantDriver::FillPatternRect(const BRect &rect, const DrawData *d)
+void
+AccelerantDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
 	int32 left = (int32)rect.left;
 	int32 right = (int32)rect.right;
 	int32 top = (int32)rect.top;
 	int32 bottom = (int32)rect.bottom;
 	PatternHandler drawPattern(d->patt);
-	switch (mDisplayMode.space)
+	switch (fDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
@@ -1184,41 +1420,76 @@ void AccelerantDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 	}
 }
 
-void AccelerantDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+#define BRESENHAM_LOOP(color) { \
+	if (steep) \
+		fb[x * width + y] = color; \
+	else \
+		fb[y * width + x] = color; \
+	\
+	while (x != x2) { \
+		x += xstep; \
+		error += derror; \
+		\
+		if (error << 1 >= dx) { \
+			y += ystep; \
+			error -= dx; \
+		} \
+		\
+		if (steep) \
+			fb[x * width + y] = color; \
+		else \
+			fb[y * width + x] = color; \
+	} \
+}
+
+inline uint32
+rgb_to_32(rgb_color color)
 {
-	int32 x1 = ROUND(start.x);
-	int32 y1 = ROUND(start.y);
-	int32 x2 = ROUND(end.x);
-	int32 y2 = ROUND(end.y);
-	int32 dx = x2 - x1;
-	int32 dy = y2 - y1;
-	int32 steps, k;
-	double xInc, yInc;
-	double x = x1;
-	double y = y1;
+	return (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
+}
 
-	// TODO : Convert to Bresenham algorithm
-	if ( abs(dx) > abs(dy) )
-		steps = abs(dx);
-	else
-		steps = abs(dy);
-	xInc = dx / (double) steps;
-	yInc = dy / (double) steps;
-
-	switch (mDisplayMode.space)
+void
+AccelerantDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &_color)
+{
+	RGBColor color = _color;
+	int32 width = mFrameBufferConfig.bytes_per_row;
+	
+	// setup variables for bresenham algorithm
+	bool steep = abs(y2 - y1) > abs(x2 - x1);
+	if (steep) {
+		// swap x1 and y1
+		int32 temp = x1;
+		x1 = y1;
+		y1 = temp;
+		
+		// swap x2 and y2
+		temp = x2;
+		x2 = y2;
+		y2 = temp;
+	}
+	
+	int32 dx = abs(x2 - x1);
+	int32 dy = abs(y2 - y1);
+	int32 error = 0;
+	int32 derror = dy;
+	int32 x = x1;
+	int32 y = y1;
+	int32 xstep = 1;
+	int32 ystep = 1;
+	
+	if (x1 >= x2)
+		xstep = -1;
+	if (y1 >= y2)
+		ystep = -1;
+	
+	switch (fDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
 			{
 				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer;
 				uint8 draw_color = color.GetColor8();
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				}
+				BRESENHAM_LOOP(draw_color);
 			} break;
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
@@ -1227,26 +1498,16 @@ void AccelerantDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, R
 			{
 				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
 				uint16 draw_color = color.GetColor15();
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				}
+				width >>= 1;
+				BRESENHAM_LOOP(draw_color);
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
 			{
 				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
 				uint16 draw_color = color.GetColor16();
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				}
+				width >>= 1;
+				BRESENHAM_LOOP(draw_color);
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -1254,52 +1515,56 @@ void AccelerantDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, R
 		case B_RGBA32_LITTLE:
 			{
 				uint32 *fb = (uint32 *)mFrameBufferConfig.frame_buffer;
-				rgb_color rgbcolor = color.GetColor32();
-				uint32 draw_color = (rgbcolor.alpha << 24) | (rgbcolor.red << 16) | (rgbcolor.green << 8) | (rgbcolor.blue);
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = draw_color;
-				}
+				uint32 draw_color = rgb_to_32(color.GetColor32());
+				width >>= 2;
+				BRESENHAM_LOOP(draw_color);
 			} break;
 		default:
 			printf("Error: Unknown color space\n");
 	}
 }
 
-void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
+void
+AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
-	int32 dx = x2 - x1;
-	int32 dy = y2 - y1;
-	int32 steps, k;
-	double xInc, yInc;
-	double x = x1;
-	double y = y1;
 	PatternHandler drawPattern(d->patt);
-
-	// TODO : Convert to Bresenham algorithm
-	if ( abs(dx) > abs(dy) )
-		steps = abs(dx);
-	else
-		steps = abs(dy);
-	xInc = dx / (double) steps;
-	yInc = dy / (double) steps;
-
-	switch (mDisplayMode.space)
+	int32 width = mFrameBufferConfig.bytes_per_row;
+	
+	// setup variables for bresenham algorithm
+	bool steep = abs(y2 - y1) > abs(x2 - x1);
+	if (steep) {
+		// swap x1 and y1
+		int32 temp = x1;
+		x1 = y1;
+		y1 = temp;
+		
+		// swap x2 and y2
+		temp = x2;
+		x2 = y2;
+		y2 = temp;
+	}
+	
+	int32 dx = abs(x2 - x1);
+	int32 dy = abs(y2 - y1);
+	int32 error = 0;
+	int32 derror = dy;
+	int32 x = x1;
+	int32 y = y1;
+	int32 xstep = 1;
+	int32 ystep = 1;
+	
+	if (x1 >= x2)
+		xstep = -1;
+	if (y1 >= y2)
+		ystep = -1;
+	
+	switch (fDisplayMode.space)
 	{
 		case B_CMAP8:
 		case B_GRAY8:
 			{
 				uint8 *fb = (uint8 *)mFrameBufferConfig.frame_buffer;
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor8();
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor8();
-				}
+				BRESENHAM_LOOP(drawPattern.ColorAt((float)x,(float)y).GetColor8());
 			} break;
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
@@ -1307,25 +1572,15 @@ void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2,
 		case B_RGBA15_LITTLE:
 			{
 				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor15();
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor15();
-				}
+				width >>= 1;
+				BRESENHAM_LOOP(drawPattern.ColorAt((float)x,(float)y).GetColor15());
 			} break;
 		case B_RGB16_BIG:
 		case B_RGB16_LITTLE:
 			{
 				uint16 *fb = (uint16 *)mFrameBufferConfig.frame_buffer;
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor16();
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = drawPattern.ColorAt((float)x,(float)y).GetColor16();
-				}
+				width >>= 1;
+				BRESENHAM_LOOP(drawPattern.ColorAt((float)x,(float)y).GetColor16());
 			} break;
 		case B_RGB32_BIG:
 		case B_RGBA32_BIG:
@@ -1333,51 +1588,41 @@ void AccelerantDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2,
 		case B_RGBA32_LITTLE:
 			{
 				uint32 *fb = (uint32 *)mFrameBufferConfig.frame_buffer;
-				rgb_color color;
-				color = drawPattern.ColorAt((float)x,(float)y).GetColor32();
-				fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-				for (k=0; k<steps; k++)
-				{
-					x += xInc;
-					y += yInc;
-					color = drawPattern.ColorAt((float)x,(float)y).GetColor32();
-					fb[ROUND(y)*mFrameBufferConfig.bytes_per_row + ROUND(x)] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
-				}
+				width >>= 2;
+				BRESENHAM_LOOP(rgb_to_32(drawPattern.ColorAt((float)x,(float)y).GetColor32()));
 			} break;
 		default:
 			printf("Error: Unknown color space\n");
 	}
 }
 
-void AccelerantDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+void
+AccelerantDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
-	BPoint leftTop = rect.LeftTop();
-	BPoint rightTop = rect.RightTop();
-	BPoint leftBottom = rect.LeftBottom();
-	BPoint rightBottom = rect.RightBottom();
-
-	StrokeSolidLine(leftTop,rightTop,color);
-	StrokeSolidLine(leftTop,leftBottom,color);
-	StrokeSolidLine(rightTop,rightBottom,color);
-	StrokeSolidLine(leftBottom,rightBottom,color);
+	StrokeSolidLine(rect.left, rect.top, rect.right, rect.top, color);
+	StrokeSolidLine(rect.left, rect.top, rect.left, rect.bottom, color);
+	StrokeSolidLine(rect.right, rect.top, rect.right, rect.bottom, color);
+	StrokeSolidLine(rect.left, rect.bottom, rect.right, rect.bottom, color);
 }
 
-void AccelerantDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
+void
+AccelerantDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d)
 {
 }
 
-void AccelerantDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
+void
+AccelerantDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 {
   /*
 	if(!destbmp)
 	{
-		printf("CopyToBitmap returned - not init or NULL bitmap\n");
+		fprintf(stdout, "CopyToBitmap returned - not init or NULL bitmap\n");
 		return;
 	}
 	
 	if(((uint32)destbmp->ColorSpace() & 0x000F) != (_displaymode.space & 0x000F))
 	{
-		printf("CopyToBitmap returned - unequal buffer pixel depth\n");
+		fprintf(stdout, "CopyToBitmap returned - unequal buffer pixel depth\n");
 		return;
 	}
 	
