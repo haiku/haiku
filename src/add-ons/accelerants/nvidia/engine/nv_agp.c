@@ -23,7 +23,7 @@ status_t nv_agp_setup(void)
 	for (index = 0; index < 8; index++)
 	{
 		/* get nth AGP device info */
-
+		nai.index = index;
 		ioctl(fd, NV_GET_NTH_AGP_INFO, &nai, sizeof(nai));
 		/* exit if we didn't get one */
 		if (!nai.exist)
