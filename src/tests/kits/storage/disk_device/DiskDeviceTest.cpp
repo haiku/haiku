@@ -20,6 +20,8 @@
 //#include <ObjectList.h>
 #include <OS.h>
 
+const char *kTestFileDevice = "/boot/home/tmp/test-file-device";
+
 // DumpVisitor
 class DumpVisitor : public BDiskDeviceVisitor {
 public:
@@ -506,8 +508,12 @@ main()
 	KDiskDeviceManager::CreateDefault();
 	KDiskDeviceManager::Default()->InitialDeviceScan();
 
-	// list all disk devices and partitions
+	// add a file device
 	BDiskDeviceRoster roster;
+	partition_id id = roster.RegisterFileDevice(kTestFileDevice);
+	if (id < B_OK)
+		printf("registering the file device failed: %s\n", strerror(id));
+	// list all disk devices and partitions
 	DumpVisitor visitor;
 	roster.VisitAll(&visitor);
 	// list disk systems
@@ -518,6 +524,21 @@ main()
 		printf("  pretty name: `%s'\n", diskSystem.PrettyName());
 		printf("  file system: %d (!%d)\n", diskSystem.IsFileSystem(),
 			   diskSystem.IsPartitioningSystem());
+	}
+	// get the file device
+	BDiskDevice device;
+	status_t error = roster.GetDeviceWithID(id, &device);
+	if (error != B_OK)
+		printf("Couldn't get device: %s\n", strerror(error));
+	// prepare for modifications
+	error = device.PrepareModifications();
+	if (error != B_OK)
+		printf("Preparing modifications failed: %s\n", strerror(error));
+	// cancel modifications
+	if (error == B_OK) {
+		error = device.CancelModifications();
+		if (error != B_OK)
+			printf("Cancelling modifications failed: %s\n", strerror(error));
 	}
 
 	// for userland testing only
