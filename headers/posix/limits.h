@@ -50,6 +50,13 @@
 #define LONGLONG_MAX    (9223372036854775807LL)
 #define ULONGLONG_MAX   (0xffffffffffffffffULL)                            
 
+#define	ULLONG_MAX		ULONGLONG_MAX
+#define	LLONG_MAX		LONGLONG_MAX
+#define	LLONG_MIN		LONGLONG_MIN
+
+#define OFF_MAX			LLONG_MAX
+#define OFF_MIN			LLONG_MIN
+
 /* These are various BeOS implementation limits */
 
 #define ARG_MAX			 		(32768)
