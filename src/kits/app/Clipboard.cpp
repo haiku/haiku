@@ -39,7 +39,13 @@
 #include <ClipboardPrivate.h>
 
 // Globals ---------------------------------------------------------------------
-BClipboard *be_clipboard = NULL;
+#ifdef RUN_WITHOUT_REGISTRAR
+	static BClipboard sClipboard(NULL);
+	BClipboard *be_clipboard = &sClipboard;
+#else
+	BClipboard *be_clipboard = NULL;
+#endif
+
 
 using namespace BPrivate;
 
@@ -157,10 +163,13 @@ BClipboard::Lock()
 	// Will this work correctly if clipboard is deleted while still waiting on
 	// fLock.Lock() ?
 	bool locked = fLock.Lock();
+
+#ifndef RUN_WITHOUT_REGISTRAR
 	if (locked && DownloadFromSystem() != B_OK) {
 		locked = false;
 		fLock.Unlock();
 	}
+#endif
 
 	return locked;
 }
