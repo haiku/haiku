@@ -468,83 +468,6 @@ do_dir(int argc, char **argv)
 }
 
 
-#include "bfs_control.h"
-
-static void
-do_chkbfs(int argc, char **argv)
-{
-	struct check_control result;
-	off_t files = 0, directories = 0, indices = 0, attributeDirectories = 0, attributes = 0;
-	int counter = 0;
-
-	int fd = sys_open(1, -1, "/myfs/.", O_RDONLY, S_IFREG, 0);
-	if (fd < 0) {
-	    printf("chkbfs: error opening '.'\n");
-	    return;
-	}
-
-	memset(&result, 0, sizeof(result));
-	result.flags = argc > 1 ? BFS_FIX_BITMAP_ERRORS : 0;
-	if (argc > 2) {
-		printf("will fix any severe errors!\n");
-		result.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
-	}
-
-	// start checking
-	if ((sys_ioctl(1, fd, BFS_IOCTL_START_CHECKING, &result, sizeof(result))) < 0) {
-	    printf("chkbfs: error starting!\n");
-	}
-
-	// check all files and report errors
-	while (sys_ioctl(1, fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == B_OK) {
-		if (++counter % 50 == 0)
-			printf("  %7ld nodes processed\x1b[1A\n", counter);
-
-		if (result.errors) {
-			printf("%s (inode = %Ld)", result.name, result.inode);
-			if (result.errors & BFS_MISSING_BLOCKS)
-				printf(", some blocks weren't allocated");
-			if (result.errors & BFS_BLOCKS_ALREADY_SET)
-				printf(", has blocks already set");
-			if (result.errors & BFS_INVALID_BLOCK_RUN)
-				printf(", has invalid block run(s)");
-			if (result.errors & BFS_COULD_NOT_OPEN)
-				printf(", could not be opened");
-			if (result.errors & BFS_WRONG_TYPE)
-				printf(", has wrong type");
-			if (result.errors & BFS_NAMES_DONT_MATCH)
-				printf(", names don't match");
-			putchar('\n');
-		}
-		if ((result.mode & (S_INDEX_DIR | 0777)) == S_INDEX_DIR)
-			indices++;
-		else if (result.mode & S_ATTR_DIR)
-			attributeDirectories++;
-		else if (result.mode & S_ATTR)
-			attributes++;
-		else if (result.mode & S_IFDIR)
-			directories++;
-		else
-			files++;
-	}
-	if (result.status != B_ENTRY_NOT_FOUND)
-		printf("chkbfs: error occured during scan: %s\n", strerror(result.status));
-
-	// stop checking
-	if ((sys_ioctl(1, fd, BFS_IOCTL_STOP_CHECKING, &result, sizeof(result))) < 0) {
-	    printf("chkbfs: error stopping!\n");
-	}
-
-	printf("checked %ld nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
-		counter, result.stats.missing, result.stats.already_set, result.stats.freed);
-	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. dirs\t%Ld\n\tindices\t\t%Ld\n",
-		files, directories, attributes, attributeDirectories, indices);
-	if (result.flags & BFS_FIX_BITMAP_ERRORS)
-		printf("errors have been fixed\n");
-
-	sys_close(1, fd);
-}
-
 static void
 do_ioctl(int argc, char **argv)
 {
@@ -642,7 +565,6 @@ do_rmall(int argc, char **argv)
 }
 
 
-
 static void
 do_trunc(int argc, char **argv)
 {
@@ -664,8 +586,6 @@ do_trunc(int argc, char **argv)
         printf("truncate to %d bytes failed for %s\n", new_size, fname);
     }
 }
-
-
 
 
 static void
@@ -986,19 +906,18 @@ do_copytest(int argc, char **argv)
 	} else if (argc == 2)
 		fromPath = argv[1];
 	else
-		printf("copying from: %s\n",fromPath);
+		printf("copying from: %s\n", fromPath);
 
-	copydir(fromPath,"/myfs");
+	copydir(fromPath, "/myfs");
 }
 
 
 static int32
 copydirthread(void *data)
 {
-	char *args[] = {"cptest",(char *)data,NULL};
-	char stack_filler[256*1024 - 0 * 1024];
+	char *args[] = {"cptest", (char *)data, NULL};
 
-	do_copytest(2,args);
+	do_copytest(2, args);
 	return 0;
 }
 
@@ -1006,11 +925,11 @@ copydirthread(void *data)
 static void
 do_threadtest(int argc, char **argv)
 {
-	char *paths[] = {"/boot/home/mail/pinc - axeld/in","/boot/home/mail/pinc - axeld/out",NULL};
+	char *paths[] = {"/boot/home/mail/pinc - axeld/in", "/boot/home/mail/pinc - axeld/out", NULL};
 	int32 i;
 	
-	for (i = 0;paths[i] != NULL;i++) {
-		thread_id thread = spawn_thread(copydirthread,"copythread",B_NORMAL_PRIORITY,paths[i]);
+	for (i = 0; paths[i] != NULL; i++) {
+		thread_id thread = spawn_thread(copydirthread, "copythread", B_NORMAL_PRIORITY, paths[i]);
 		resume_thread(thread);
 	}
 
@@ -1024,13 +943,13 @@ int32 gCopyNum;
 static int32
 copyfilethread(void *data)
 {
-	char *args[] = {"cp",(char *)data,NULL,NULL};
+	char *args[] = {"cp", (char *)data, NULL, NULL};
 
 	char name[32];
-	sprintf(name,"target%ld",gCopyNum++);
+	sprintf(name, "target%ld", gCopyNum++);
 	args[2] = name;
 
-	do_copy(3,args);
+	do_copy(3, args);
 	return 0;
 }
 
@@ -1235,7 +1154,6 @@ do_cio(int argc, char **argv)
 }
 
 
-
 static void
 mkfile(char *s, int sz)
 {
@@ -1296,8 +1214,6 @@ do_lat_fs(int argc, char **argv)
 }
 
 
-
-
 static void
 do_create(int argc, char **argv)
 {
@@ -1324,6 +1240,7 @@ do_create(int argc, char **argv)
     }
 }
 
+
 static void
 do_delete(int argc, char **argv)
 {
@@ -1331,7 +1248,7 @@ do_delete(int argc, char **argv)
     char name[64];
 
     if (argc > 1)
-        iter =strtoul(&argv[1][0], NULL, 0);
+        iter = strtoul(&argv[1][0], NULL, 0);
 
     for (j = 0; j < iter; ++j) {
         sprintf(name, "/myfs/test/%.5d", j);
@@ -1341,6 +1258,8 @@ do_delete(int argc, char **argv)
     }
 }
 
+
+#include "additional_commands.c"
 
 
 static void do_help(int argc, char **argv);
@@ -1385,8 +1304,11 @@ cmd_entry fsh_cmds[] =
     { "cptest",  do_copytest, "copies all files from the given path" },
     { "threads", do_threadtest, "copies several files, and does a lat_fs simulaneously" },
     { "mfile",	 do_threadfiletest, "copies several big files simulaneously" },
-    { "chkbfs",	 do_chkbfs, "does a chkbfs on the volume" },
     { "cio",	 do_cio, "does a I/O speed test" },
+
+// additional commands from the file system will be included here
+#	include "additional_commands.h"
+
     { "help",    do_help, "print this help message" },
     { "?",       do_help, "print this help message" },
     { NULL, NULL }
@@ -1399,7 +1321,7 @@ do_help(int argc, char **argv)
     cmd_entry *cmd;
 
     printf("commands fsh understands:\n");
-    for(cmd=fsh_cmds; cmd->name != NULL; cmd++) {
+    for (cmd = fsh_cmds; cmd->name != NULL; cmd++) {
         printf("%8s - %s\n", cmd->name, cmd->help);
     }
 }
@@ -1416,8 +1338,10 @@ getline(char *prompt, char *input, int len)
 static void
 do_fsh(void)
 {
+#if 0
 	char stack_filler[1024 * 1024 * 16 - 32 * 1024];
 		// actually emulating 12kB stack size (BeOS has 16 MB - ~20kB for the main thread)
+#endif
     int   argc, len;
     char *prompt = "fsh>> ";
     char  input[512], **argv;
