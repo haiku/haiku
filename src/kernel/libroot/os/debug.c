@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 void
@@ -51,6 +52,49 @@ status_t
 debug_thread(thread_id thread)
 {
 	return _kern_debug_thread(thread);
+}
+
+static const char *const sDebugWhyStrings[] = {
+	"Thread not running",		// B_THREAD_NOT_RUNNING
+	"Signal received",			// B_SIGNAL_RECEIVED
+	"Team created",				// B_TEAM_CREATED
+	"Thread created",			// B_THREAD_CREATED
+	"Image created",			// B_IMAGE_CREATED
+	"Image deleted",			// B_IMAGE_DELETED
+	"Debugger call",			// B_DEBUGGER_CALL
+	"Breakpoint hit",			// B_BREAKPOINT_HIT
+	"watchpoint hit",			// B_WATCHPOINT_HIT
+	"Before syscall",			// B_PRE_SYSCALL_HIT
+	"After syscall",			// B_POST_SYSCALL_HIT
+	"Single step",				// B_SINGLE_STEP
+
+	"Non-masked interrupt",		// B_NMI
+	"Machine check exception",	// B_MACHINE_CHECK_EXCEPTION
+	"Segment violation",		// B_SEGMENT_VIOLATION
+	"Alignment exception",		// B_ALIGNMENT_EXCEPTION
+	"Divide error",				// B_DIVIDE_ERROR
+	"Overflow exception",		// B_OVERFLOW_EXCEPTION
+	"Bounds check exception",	// B_BOUNDS_CHECK_EXCEPTION
+	"Invalid opcode exception",	// B_INVALID_OPCODE_EXCEPTION
+	"Segment not present",		// B_SEGMENT_NOT_PRESENT
+	"Stack fault",				// B_STACK_FAULT
+	"General protection fault",	// B_GENERAL_PROTECTION_FAULT
+	"Floating point exception",	// B_FLOATING_POINT_EXCEPTION
+};
+static const int32 sDebugWhyStringCount = B_FLOATING_POINT_EXCEPTION + 1;
+
+
+void
+get_why_stopped_string(debug_why_stopped whyStopped, char *buffer,
+	int32 bufferSize)
+{
+	if (!buffer || bufferSize <= 0)
+		return;
+
+	if (whyStopped >= 0 && whyStopped < sDebugWhyStringCount)
+		strlcpy(buffer, sDebugWhyStrings[whyStopped], bufferSize);
+	else
+		snprintf(buffer, bufferSize, "Unknown reason %ld", (int32)whyStopped);
 }
 
 
