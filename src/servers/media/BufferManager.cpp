@@ -1,7 +1,7 @@
 #include <MediaDefs.h>
 #include <Autolock.h>
 #include "BufferManager.h"
-#include "../lib/headers/SharedBufferList.h"
+#include "SharedBufferList.h"
 #include "debug.h"
 
 BufferManager::BufferManager()

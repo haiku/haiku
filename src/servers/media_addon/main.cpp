@@ -14,7 +14,7 @@
 #include <Debug.h>
 #include "debug.h"
 #include "TMap.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 void DumpFlavorInfo(const flavor_info *info);
 
