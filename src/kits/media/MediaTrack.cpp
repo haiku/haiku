@@ -4,6 +4,7 @@
  *  DESCR: 
  ***********************************************************************/
 #include <MediaTrack.h>
+#include <string.h>
 #include "MediaExtractor.h"
 #include "PluginManager.h"
 #include "ReaderPlugin.h"
@@ -135,6 +136,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 		fCurFrame += *out_frameCount;
 		fCurTime = mh->start_time;
 	} else {
+		printf("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n", result, strerror(result));
 		*out_frameCount = 0;
 	}
 	return result;
