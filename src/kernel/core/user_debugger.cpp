@@ -32,6 +32,7 @@ static port_id sDefaultDebuggerPort = -1;
 
 
 static status_t ensure_debugger_installed(team_id teamID, port_id *port = NULL);
+static void get_team_debug_info(team_debug_info &teamDebugInfo);
 
 
 static ssize_t
@@ -52,6 +53,58 @@ kill_interruptable_write_port(port_id port, int32 code, const void *buffer,
 }
 
 
+static status_t
+debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
+	bool dontWait)
+{
+	TRACE(("debugger_write(): thread: %ld, team %ld, port: %ld, code: %lx, message: %p, "
+		"size: %lu, dontWait: %d\n", thread_get_current_thread()->id,
+		thread_get_current_thread()->team->id, port, code, buffer, bufferSize,
+		dontWait));
+
+	status_t error = B_OK;
+
+	// get the team debug info
+	team_debug_info teamDebugInfo;
+	get_team_debug_info(teamDebugInfo);
+	sem_id writeLock = teamDebugInfo.debugger_write_lock;
+
+	// get the write lock
+	TRACE(("debugger_write(): acquiring write lock...\n"));
+	error = acquire_sem_etc(writeLock, 1,
+		(dontWait ? B_RELATIVE_TIMEOUT : B_KILL_CAN_INTERRUPT), 0);
+	if (error != B_OK) {
+		TRACE(("debugger_write() done1: %lx\n", error));
+		return error;
+	}
+
+	// re-get the team debug info
+	get_team_debug_info(teamDebugInfo);
+
+	if (teamDebugInfo.debugger_port != port
+		|| (teamDebugInfo.flags & B_TEAM_DEBUG_DEBUGGER_HANDOVER)) {
+		// The debugger has changed in the meantime or we are about to be
+		// handed over to a new debugger. In either case we don't send the
+		// message.
+		TRACE(("debugger_write(): %s\n",
+			(teamDebugInfo.debugger_port != port ? "debugger port changed"
+				: "handover flag set")));
+	} else {
+		TRACE(("debugger_write(): writing to port...\n"));
+
+		error = write_port_etc(port, code, buffer, bufferSize,
+			(dontWait ? B_RELATIVE_TIMEOUT : B_KILL_CAN_INTERRUPT), 0);
+	}
+
+	// release the write lock
+	release_sem(writeLock);
+
+	TRACE(("debugger_write() done: %lx\n", error));
+
+	return error;
+}
+
+
 /**
  *	For the first initialization the function must be called with \a initLock
  *	set to \c true. If it would be possible that another thread accesses the
@@ -67,6 +120,7 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
 		info->debugger_port = -1;
 		info->nub_thread = -1;
 		info->nub_port = -1;
+		info->debugger_write_lock = -1;
 
 		if (initLock)
 			info->lock = 0;
@@ -90,6 +144,12 @@ destroy_team_debug_info(struct team_debug_info *info)
 {
 	if (info) {
 		arch_destroy_team_debug_info(&info->arch_info);
+
+		// delete the debugger port write lock
+		if (info->debugger_write_lock >= 0) {
+			delete_sem(info->debugger_write_lock);
+			info->debugger_write_lock = -1;
+		}
 
 		// delete the nub port
 		if (info->nub_port >= 0) {
@@ -171,9 +231,11 @@ prepare_thread_stopped_message(debug_thread_stopped &message,
 
 
 static status_t
-thread_hit_debug_event(uint32 event, const void *message, int32 size,
-	debug_why_stopped whyStopped, void *additionalData)
+thread_hit_debug_event_internal(uint32 event, const void *message, int32 size,
+	debug_why_stopped whyStopped, void *additionalData, bool requireDebugger,
+	bool &restart)
 {
+	restart = false;
 	struct thread *thread = thread_get_current_thread();
 
 	TRACE(("thread_hit_debug_event(): thread: %ld, event: %lu, message: %p, "
@@ -204,6 +266,7 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 	// the thread's debug port, and update the thread's debug flags
 	port_id deletePort = port;
 	port_id debuggerPort = -1;
+	port_id nubPort = -1;
 	status_t error = B_OK;
 	cpu_status state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -211,8 +274,13 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 
 	uint32 threadFlags = thread->debug_info.flags;
 	threadFlags &= ~B_THREAD_DEBUG_STOP;
-	if (thread->team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-		debuggerPort = thread->team->debug_info.debugger_port;
+	bool debuggerInstalled
+		= (thread->team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED);
+	if (debuggerInstalled || !requireDebugger) {
+		if (debuggerInstalled) {
+			debuggerPort = thread->team->debug_info.debugger_port;
+			nubPort = thread->team->debug_info.nub_port;
+		}
 
 		if (setPort) {
 			if (threadFlags & B_THREAD_DEBUG_INITIALIZED) {
@@ -255,13 +323,14 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 	}
 
 	// send a message to the debugger port
-	TRACE(("thread_hit_debug_event(): thread: %ld, sending message to debugger "
-		"port %ld\n", thread->id, debuggerPort));
-	do {
-		error = write_port(debuggerPort, event, message, size);
-	} while (error == B_INTERRUPTED);
+	if (debuggerInstalled) {
+		TRACE(("thread_hit_debug_event(): thread: %ld, sending message to "
+			"debugger port %ld\n", thread->id, debuggerPort));
+		error = debugger_write(debuggerPort, event, message, size, false);
+	}
 
 	status_t result = B_THREAD_DEBUG_HANDLE_EVENT;
+	bool singleStep = false;
 
 	if (error == B_OK) {
 		bool done = false;
@@ -286,21 +355,7 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 						thread->id));
 					result = commandMessage.continue_thread.handle_event;
 
-					// update the single-step flag
-					state = disable_interrupts();
-					GRAB_THREAD_LOCK();
-
-					if (commandMessage.continue_thread.single_step) {
-						atomic_or(&thread->debug_info.flags,
-							B_THREAD_DEBUG_SINGLE_STEP);
-					} else {
-						atomic_and(&thread->debug_info.flags,
-							~B_THREAD_DEBUG_SINGLE_STEP);
-					}
-
-					RELEASE_THREAD_LOCK();
-					restore_interrupts(state);
-
+					singleStep = commandMessage.continue_thread.single_step;
 					done = true;
 					break;
 
@@ -309,20 +364,10 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 					port_id replyPort
 						= commandMessage.get_why_stopped.reply_port;
 
-					// get the team debug info (just in case it has changed)
-					team_debug_info teamDebugInfo;
-					get_team_debug_info(teamDebugInfo);
-					if (!(teamDebugInfo.flags
-							& B_TEAM_DEBUG_DEBUGGER_INSTALLED)) {
-						done = true;
-						break;
-					}
-					debuggerPort = teamDebugInfo.debugger_port;
-
 					// prepare the message
 					debug_thread_stopped stoppedMessage;
 					prepare_thread_stopped_message(stoppedMessage, whyStopped,
-						teamDebugInfo.nub_port, additionalData);
+						nubPort, additionalData);
 
 					// send it
 					error = kill_interruptable_write_port(replyPort, event,
@@ -341,6 +386,31 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 					
 					break;
 				}
+
+				case B_DEBUGGED_THREAD_DEBUGGER_CHANGED:
+				{
+					// Check, if the debugger really changed, i.e. is different
+					// than the one we know. 
+					team_debug_info teamDebugInfo;
+					get_team_debug_info(teamDebugInfo);
+
+					if (teamDebugInfo.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+						if (!debuggerInstalled
+							|| teamDebugInfo.debugger_port != debuggerPort) {
+							// debugger was installed or has changed: restart
+							// this function
+							restart = true;
+							done = true;
+						}
+					} else {
+						if (debuggerInstalled) {
+							// debugger is gone: continue the thread normally
+							done = true;
+						}
+					}
+
+					break;
+				}
 			}
 		}
 	} else {
@@ -349,16 +419,58 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 			debuggerPort, error));
 	}
 
-	// unset the "stopped" state
+	// update the thread debug info
+	bool destroyThreadInfo = false;
+	thread_debug_info threadDebugInfo;
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	atomic_and(&thread->debug_info.flags, ~B_THREAD_DEBUG_STOPPED);
+	// check, if the team is still being debugged
+	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
+	if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		// update the single-step flag
+		if (singleStep) {
+			atomic_or(&thread->debug_info.flags,
+				B_THREAD_DEBUG_SINGLE_STEP);
+		} else {
+			atomic_and(&thread->debug_info.flags,
+				~B_THREAD_DEBUG_SINGLE_STEP);
+		}
+
+		// unset the "stopped" state
+		atomic_and(&thread->debug_info.flags, ~B_THREAD_DEBUG_STOPPED);
+
+	} else {
+		// the debugger is gone: cleanup our info completely
+		threadDebugInfo = thread->debug_info;
+		clear_thread_debug_info(&thread->debug_info, false);
+		destroyThreadInfo = true;
+	}
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
+	if (destroyThreadInfo)
+		destroy_thread_debug_info(&threadDebugInfo);
+
 	return (error == B_OK ? result : error);
+}
+
+
+static status_t
+thread_hit_debug_event(uint32 event, const void *message, int32 size,
+	debug_why_stopped whyStopped, void *additionalData, bool requireDebugger)
+{
+	status_t result;
+	bool restart;
+	do {
+		restart = false;
+		result = thread_hit_debug_event_internal(event, message, size,
+			whyStopped, additionalData, requireDebugger, restart);
+	} while (result >= 0 && restart);
+
+	return result;
 }
 
 
@@ -392,7 +504,7 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
-		sizeof(message), B_PRE_SYSCALL_HIT, NULL);
+		sizeof(message), B_PRE_SYSCALL_HIT, NULL, true);
 }
 
 
@@ -430,7 +542,7 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	}
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_POST_SYSCALL, &message,
-		sizeof(message), B_POST_SYSCALL_HIT, NULL);
+		sizeof(message), B_POST_SYSCALL_HIT, NULL, true);
 }
 
 
@@ -453,7 +565,7 @@ stop_thread(debug_why_stopped whyStopped, void *additionalData)
 		additionalData);
 
 	return thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, &message,
-		sizeof(message), whyStopped, additionalData);
+		sizeof(message), whyStopped, additionalData, true);
 }
 
 
@@ -494,7 +606,7 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 	message.deadly = deadly;
 
 	status_t result = thread_hit_debug_event(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,
-		&message, sizeof(message), B_SIGNAL_RECEIVED, NULL);
+		&message, sizeof(message), B_SIGNAL_RECEIVED, NULL, true);
 	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
 }
 
@@ -526,7 +638,7 @@ user_debug_team_created(team_id teamID)
 	message.new_team = teamID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
-		sizeof(message), B_TEAM_CREATED, NULL);
+		sizeof(message), B_TEAM_CREATED, NULL, true);
 }
 
 
@@ -564,7 +676,7 @@ user_debug_thread_created(thread_id threadID)
 	message.new_thread = threadID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
-		sizeof(message), B_THREAD_CREATED, NULL);
+		sizeof(message), B_THREAD_CREATED, NULL, true);
 }
 
 
@@ -603,8 +715,8 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 		message.origin.thread = threadID;
 		message.origin.team = teamID;
 		message.origin.nub_port = -1;
-		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
-			&message, sizeof(message), B_RELATIVE_TIMEOUT, 0);
+		debugger_write(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
+			&message, sizeof(message), true);
 			// TODO: Would it be OK to wait here?
 	}
 }
@@ -629,7 +741,7 @@ user_debug_image_created(const image_info *imageInfo)
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
-		sizeof(message), B_IMAGE_CREATED, NULL);
+		sizeof(message), B_IMAGE_CREATED, NULL, true);
 }
 
 
@@ -652,7 +764,7 @@ user_debug_image_deleted(const image_info *imageInfo)
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
-		sizeof(message), B_IMAGE_DELETED, NULL);
+		sizeof(message), B_IMAGE_DELETED, NULL, true);
 }
 
 
@@ -667,6 +779,48 @@ void
 user_debug_single_stepped()
 {
 	stop_thread(B_SINGLE_STEP, NULL);
+}
+
+
+/**	\brief Called by the debug nub thread of a team to broadcast a message
+ *		   that are initialized for debugging (and thus have a debug port).
+ */
+static void
+broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
+	const void *message, int32 size)
+{
+	// iterate through the threads
+	thread_info threadInfo;
+	int32 cookie = 0;
+	while (get_next_thread_info(nubThread->team->id, &cookie, &threadInfo)
+			== B_OK) {
+		// find the thread and get its debug port
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		port_id threadDebugPort = -1;
+		thread_id threadID = -1;
+		struct thread *thread
+			= thread_get_thread_struct_locked(threadInfo.thread);
+		if (thread && thread != nubThread && thread->team == nubThread->team
+			&& thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED) {
+			threadDebugPort = thread->debug_info.debug_port;
+			threadID = thread->id;
+		}
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		// send the message to the thread
+		if (threadDebugPort >= 0) {
+			status_t error = kill_interruptable_write_port(threadDebugPort,
+				code, message, size);
+			if (error != B_OK) {
+				TRACE(("broadcast_debugged_thread_message(): Failed to send "
+					"message to thread %ld: %lx\n", threadID, error));
+			}
+		}
+	}
 }
 
 
@@ -694,6 +848,10 @@ nub_thread_cleanup(struct thread *nubThread)
 
 	if (destroyDebugInfo)
 		destroy_team_debug_info(&teamDebugInfo);
+
+	// notify all threads that the debugger is gone
+	broadcast_debugged_thread_message(nubThread,
+		B_DEBUGGED_THREAD_DEBUGGER_CHANGED, NULL, 0);
 }
 
 
@@ -766,12 +924,17 @@ debug_nub_thread(void *)
 		return 0;
 
 	port_id port = nubThread->team->debug_info.nub_port;
+	sem_id writeLock = nubThread->team->debug_info.debugger_write_lock;
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 	restore_interrupts(state);
 
 	TRACE(("debug_nub_thread() thread: %ld, team %ld, nub port: %ld\n",
 		nubThread->id, nubThread->team->id, port));
+
+	// notify all threads that a debugger has been installed
+	broadcast_debugged_thread_message(nubThread,
+		B_DEBUGGED_THREAD_DEBUGGER_CHANGED, NULL, 0);
 
 	// command processing loop
 	while (true) {
@@ -794,10 +957,11 @@ debug_nub_thread(void *)
 
 		bool sendReply = false;
 		union {
-			debug_nub_read_memory_reply		read_memory;
-			debug_nub_write_memory_reply	write_memory;
-			debug_nub_set_breakpoint_reply	set_breakpoint;
-			debug_nub_set_watchpoint_reply	set_watchpoint;
+			debug_nub_read_memory_reply			read_memory;
+			debug_nub_write_memory_reply		write_memory;
+			debug_nub_set_breakpoint_reply		set_breakpoint;
+			debug_nub_set_watchpoint_reply		set_watchpoint;
+			debug_nub_prepare_handover_reply	prepare_handover;
 		} reply;
 		int32 replySize = 0;
 		port_id replyPort = -1;
@@ -1142,6 +1306,52 @@ debug_nub_thread(void *)
 
 				break;
 			}
+
+			case B_DEBUG_MESSAGE_PREPARE_HANDOVER:
+			{
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_PREPARE_HANDOVER\n",
+					nubThread->id));
+
+				struct team *team = nubThread->team;
+
+				// Acquire the debugger write lock. As soon as we have it and
+				// have set the B_TEAM_DEBUG_DEBUGGER_HANDOVER flag, no thread
+				// will write anything to the debugger port anymore.
+				status_t result = acquire_sem_etc(writeLock, 1,
+					B_KILL_CAN_INTERRUPT, 0);
+				if (result == B_OK) {
+					// set the respective team debug flag
+					cpu_status state = disable_interrupts();
+					GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+					atomic_or(&team->debug_info.flags,
+						B_TEAM_DEBUG_DEBUGGER_HANDOVER);
+
+					RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+					restore_interrupts(state);
+
+					release_sem(writeLock);
+				} else {
+					// We probably got a SIGKILL. If so, we will terminate when
+					// sending the reply fails.
+				}	
+
+				// prepare the reply
+				reply.prepare_handover.error = result;
+				replySize = sizeof(reply.prepare_handover);
+				sendReply = true;
+
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_HANDED_OVER:
+			{
+				// notify all threads that the debugger has changed
+				broadcast_debugged_thread_message(nubThread,
+					B_DEBUGGED_THREAD_DEBUGGER_CHANGED, NULL, 0);
+
+				break;
+			}
 		}
 
 		// send the reply, if necessary
@@ -1160,62 +1370,59 @@ debug_nub_thread(void *)
 }
 
 
+/**	\brief Helper function for install_team_debugger(), that sets up the team
+ *		   and thread debug infos.
+ *
+ *	Interrupts must be enabled and the team debug info lock of the team to be
+ *	debugged must be held. The function will release the lock, but leave
+ *	interrupts disabled.
+ */
+static void
+install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
+	port_id debuggerPort, port_id nubPort, thread_id nubThread,
+	sem_id debuggerPortWriteLock)
+{
+	atomic_set(&team->debug_info.flags,
+		B_TEAM_DEBUG_DEFAULT_FLAGS | B_TEAM_DEBUG_DEBUGGER_INSTALLED);
+	team->debug_info.nub_port = nubPort;
+	team->debug_info.nub_thread = nubThread;
+	team->debug_info.debugger_team = debuggerTeam;
+	team->debug_info.debugger_port = debuggerPort;
+	team->debug_info.debugger_write_lock = debuggerPortWriteLock;
+
+	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+	// set the user debug flags of all threads to the default
+	GRAB_THREAD_LOCK();
+
+	for (struct thread *thread = team->thread_list;
+		 thread;
+		 thread = thread->team_next) {
+		if (thread->id != nubThread) {
+			int32 flags = thread->debug_info.flags
+				& ~B_THREAD_DEBUG_USER_FLAG_MASK;
+			atomic_set(&thread->debug_info.flags,
+				flags | B_THREAD_DEBUG_DEFAULT_FLAGS);
+		}
+	}
+
+	RELEASE_THREAD_LOCK();
+}
+
+
 static port_id
 install_team_debugger(team_id teamID, port_id debuggerPort, bool useDefault,
 	bool dontFail)
 {
-TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
-"dontFail: %d)\n", teamID, debuggerPort, useDefault, dontFail));
+	TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
+		"dontFail: %d)\n", teamID, debuggerPort, useDefault, dontFail));
 
 	if (useDefault)
 		debuggerPort = atomic_get(&sDefaultDebuggerPort);
 
-	// check, if a debugger is already installed
-
-	status_t error = B_OK;
-	bool done = false;
-	port_id result = B_ERROR;
-
-	cpu_status state = disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	// get a real team ID
-	// We look up the team by ID, even in case of the current team, so we can be
-	// sure, that the team is not already dying.
-	if (teamID == B_CURRENT_TEAM)
-		teamID = thread_get_current_thread()->team->id;
-
-	struct team *team = team_get_team_struct_locked(teamID);
-
-	if (team) {
-		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-		if (team == team_get_kernel_team()) {
-			// don't allow to debug the kernel
-			error = B_NOT_ALLOWED;
-		} else if (team->debug_info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
-			// there's already a debugger installed
-			error = (dontFail ? B_OK : B_BAD_VALUE);
-			done = true;
-			result = team->debug_info.nub_port;
-		}
-
-		RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-	} else
-		error = B_BAD_TEAM_ID;
-
-	RELEASE_TEAM_LOCK();
-	restore_interrupts(state);
-
-	if (done || error != B_OK) {
-		TRACE(("install_team_debugger() done1: %ld\n",
-			(error == B_OK ? result : error)));
-		return (error == B_OK ? result : error);
-	}
-
 	// get the debugger team
 	port_info debuggerPortInfo;
-	error = get_port_info(debuggerPort, &debuggerPortInfo);
+	status_t error = get_port_info(debuggerPort, &debuggerPortInfo);
 	if (error != B_OK) {
 		TRACE(("install_team_debugger(): Failed to get debugger port info: "
 			"%lx\n", error));
@@ -1231,14 +1438,99 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 		return B_NOT_ALLOWED;
 	}
 
-	// create the nub port
+	// check, if a debugger is already installed
+
+	bool done = false;
+	port_id result = B_ERROR;
+	bool handOver = false;
+	port_id nubPort = -1;
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	// get a real team ID
+	// We look up the team by ID, even in case of the current team, so we can be
+	// sure, that the team is not already dying.
+	if (teamID == B_CURRENT_TEAM)
+		teamID = thread_get_current_thread()->team->id;
+
+	struct team *team = team_get_team_struct_locked(teamID);
+
+	if (team) {
+		GRAB_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+
+		int32 teamDebugFlags = team->debug_info.flags;
+
+		if (team == team_get_kernel_team()) {
+			// don't allow to debug the kernel
+			error = B_NOT_ALLOWED;
+		} else if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+			if (teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_HANDOVER) {
+				// a handover to another debugger is requested
+				// clear the flag
+				atomic_and(& team->debug_info.flags,
+					~B_TEAM_DEBUG_DEBUGGER_HANDOVER);
+
+				result = nubPort = team->debug_info.nub_port;
+
+				// set the new debugger
+				install_team_debugger_init_debug_infos(team, debuggerTeam,
+					debuggerPort, nubPort, team->debug_info.nub_thread,
+					team->debug_info.debugger_write_lock);
+
+				handOver = true;
+				done = true;
+			} else {
+				// there's already a debugger installed
+				error = (dontFail ? B_OK : B_BAD_VALUE);
+				done = true;
+				result = team->debug_info.nub_port;
+			}
+		}
+
+		// in case of a handover the lock is already released
+		if (!handOver)
+			RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
+	} else
+		error = B_BAD_TEAM_ID;
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (handOver) {
+		// notify the nub thread
+		kill_interruptable_write_port(nubPort, B_DEBUG_MESSAGE_HANDED_OVER,
+			NULL, 0);
+
+		TRACE(("install_team_debugger() done: handed over to debugger: team: "
+			"%ld, port: %ld\n", debuggerTeam, debuggerPort));
+
+		return result;
+	}
+
+	if (done || error != B_OK) {
+		TRACE(("install_team_debugger() done1: %ld\n",
+			(error == B_OK ? result : error)));
+		return (error == B_OK ? result : error);
+	}
+
+	// create the debugger write lock semaphore
 	char nameBuffer[B_OS_NAME_LENGTH];
+	snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debugger port write",
+		teamID);
+	sem_id debuggerWriteLock = create_sem(1, nameBuffer);
+	if (debuggerWriteLock < 0)
+		error = debuggerWriteLock;
+
+	// create the nub port
 	snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debug", teamID);
-	port_id nubPort = create_port(1, nameBuffer);
-	if (nubPort < 0)
-		error = nubPort;
-	else
-		result = nubPort;
+	if (error == B_OK) {
+		nubPort = create_port(1, nameBuffer);
+		if (nubPort < 0)
+			error = nubPort;
+		else
+			result = nubPort;
+	}
 
 	// make the debugger team the port owner; thus we know, if the debugger is
 	// gone and can cleanup
@@ -1274,31 +1566,8 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 
 				RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 			} else {
-				atomic_set(&team->debug_info.flags,
-					B_TEAM_DEBUG_DEFAULT_FLAGS
-					| B_TEAM_DEBUG_DEBUGGER_INSTALLED);
-				team->debug_info.nub_port = nubPort;
-				team->debug_info.nub_thread = nubThread;
-				team->debug_info.debugger_team = debuggerTeam;
-				team->debug_info.debugger_port = debuggerPort;
-
-				RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
-
-				// set the user debug flags of all threads to the default
-				GRAB_THREAD_LOCK();
-
-				for (struct thread *thread = team->thread_list;
-					 thread;
-					 thread = thread->team_next) {
-					if (thread->id != nubThread) {
-						int32 flags = thread->debug_info.flags
-							& ~B_THREAD_DEBUG_USER_FLAG_MASK;
-						atomic_set(&thread->debug_info.flags,
-							flags | B_THREAD_DEBUG_DEFAULT_FLAGS);
-					}
-				}
-
-				RELEASE_THREAD_LOCK();
+				install_team_debugger_init_debug_infos(team, debuggerTeam,
+					debuggerPort, nubPort, nubThread, debuggerWriteLock);
 			}
 		} else
 			error = B_BAD_TEAM_ID;
@@ -1448,15 +1717,6 @@ _user_remove_team_debugger(team_id teamID)
 	if (error == B_OK)
 		destroy_team_debug_info(&info);
 
-// TODO: There's more to do! There might still be stopped threads blocking on
-// their ports. They should continue now. The same goes, if the debugger just
-// terminates or gets killed, i.e. the nub thread should best do the cleanup.
-// It could just broadcast a new message to all threads and the threads will
-// do the necessary cleanup. To support _user_wait_for_debugger() the thread
-// should enter debugged state (thread_hit_debug_event()) and just wait for
-// the nub thread to broadcast a special message that indicates the begin of
-// debugging.
-
 	return error;
 }
 
@@ -1506,6 +1766,7 @@ _user_debug_thread(thread_id threadID)
 void
 _user_wait_for_debugger(void)
 {
-	// TODO: Implement!
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, NULL, 0,
+		B_THREAD_NOT_RUNNING, NULL, false);
 }
 
