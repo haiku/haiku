@@ -37,6 +37,15 @@ uninit_driver (void)
 static status_t
 acpi_button_open (const char *name, uint32 flags, void** cookie)
 {
+	if (strcmp(name,"power/button/power") == 0) {
+		*cookie = (void *)ACPI_BITREG_POWER_BUTTON_STATUS;
+		acpi->write_acpi_reg(ACPI_BITREG_POWER_BUTTON_ENABLE,0);
+	} else if (strcmp(name,"power/button/sleep") == 0) {
+		*cookie = (void *)ACPI_BITREG_SLEEP_BUTTON_STATUS;
+		acpi->write_acpi_reg(ACPI_BITREG_SLEEP_BUTTON_ENABLE,0);
+	} else {
+		return B_ERROR;
+	}
 	return B_OK;
 }
 
@@ -48,8 +57,13 @@ acpi_button_open (const char *name, uint32 flags, void** cookie)
 static status_t
 acpi_button_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 {
-	*num_bytes = 0;				/* tell caller nothing was read */
-	return B_IO_ERROR;
+	if (*num_bytes < 1)
+		return B_IO_ERROR;
+		
+	*((uint8 *)(buf)) = acpi->read_acpi_reg((uint32)(cookie));
+	acpi->write_acpi_reg((uint32)(cookie),0); //--- Clear sticky status reg
+	*num_bytes = 1;
+	return B_OK;
 }
 
 
@@ -60,8 +74,12 @@ acpi_button_read (void* cookie, off_t position, void *buf, size_t* num_bytes)
 static status_t
 acpi_button_write (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
-	*num_bytes = 0;				/* tell caller nothing was written */
-	return B_IO_ERROR;
+	if (*num_bytes < 1)
+		return B_IO_ERROR;
+		
+	acpi->write_acpi_reg((uint32)(cookie),*((uint8 *)(buffer)));
+	*num_bytes = 1;
+	return B_OK;
 }
 
 
@@ -72,21 +90,7 @@ acpi_button_write (void* cookie, off_t position, const void* buffer, size_t* num
 static status_t
 acpi_button_control (void* cookie, uint32 op, void* arg, size_t len)
 {	
-	switch (op) {
-		case ~ACPI_BITREG_POWER_BUTTON_ENABLE:
-		case ~ACPI_BITREG_SLEEP_BUTTON_ENABLE:
-		case ~ACPI_BITREG_POWER_BUTTON_STATUS:
-		case ~ACPI_BITREG_SLEEP_BUTTON_STATUS:
-			acpi->write_acpi_reg(~op,*((uint32 *)(arg)));
-			break;
-		case ACPI_BITREG_POWER_BUTTON_STATUS:
-		case ACPI_BITREG_SLEEP_BUTTON_STATUS:
-			*((uint32 *)(arg)) = acpi->read_acpi_reg(op);
-			break;
-		default:
-			return B_ERROR;
-	}
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -97,6 +101,10 @@ acpi_button_control (void* cookie, uint32 op, void* arg, size_t len)
 static status_t
 acpi_button_close (void* cookie)
 {
+	if ((uint32)(cookie) == ACPI_BITREG_POWER_BUTTON_STATUS)
+		acpi->write_acpi_reg(ACPI_BITREG_POWER_BUTTON_ENABLE,1);
+	else if ((uint32)(cookie) == ACPI_BITREG_SLEEP_BUTTON_STATUS)
+		acpi->write_acpi_reg(ACPI_BITREG_SLEEP_BUTTON_ENABLE,1);
 	return B_OK;
 }
 
@@ -117,7 +125,8 @@ acpi_button_free (void* cookie)
 ----- */
 
 static const char *acpi_button_name[] = {
-	"power/acpi_button",
+	"power/button/power",
+	"power/button/sleep",
 	NULL
 };
 
