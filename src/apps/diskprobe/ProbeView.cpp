@@ -275,17 +275,23 @@ PositionSlider::DrawBar()
 	frame.top++;
 	frame.left++;
 	frame.right = ThumbFrame().left + ThumbFrame().Width() / 2;
-	view->SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR)); //102, 152, 203);
-		// ToDo: the color should probably be retrieved from one of the ui colors
+	view->SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
 	view->FillRect(frame);
 
 	frame.left = frame.right + 1;
 	frame.right = barFrame.right - 1;
-	view->SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+	view->SetHighColor(tint_color(ViewColor(), IsEnabled() ? B_DARKEN_1_TINT : B_LIGHTEN_1_TINT));
 	view->FillRect(frame);
 
 	rgb_color cornerColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	rgb_color darkColor = tint_color(ViewColor(), B_DARKEN_3_TINT);
+	rgb_color shineColor = ui_color(B_SHINE_COLOR);
+	rgb_color shadowColor =ui_color(B_SHADOW_COLOR);
+	if (!IsEnabled()) {
+		darkColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
+		shineColor = tint_color(shineColor, B_DARKEN_2_TINT);
+		shadowColor = tint_color(shadowColor, B_LIGHTEN_2_TINT);
+	}
 
 	view->BeginLineArray(9);
 
@@ -298,18 +304,18 @@ PositionSlider::DrawBar()
 	view->AddLine(BPoint(barFrame.left, barFrame.top + 1),
 		BPoint(barFrame.left, barFrame.bottom - 1), darkColor);
 	view->AddLine(BPoint(barFrame.right, barFrame.top + 1),
-		BPoint(barFrame.right, barFrame.bottom), ui_color(B_SHINE_COLOR));
+		BPoint(barFrame.right, barFrame.bottom), shineColor);
 
 	barFrame.left++;
 	barFrame.right--;
 	view->AddLine(barFrame.LeftTop(), barFrame.RightTop(), darkColor);
-	view->AddLine(barFrame.LeftBottom(), barFrame.RightBottom(), ui_color(B_SHINE_COLOR));
+	view->AddLine(barFrame.LeftBottom(), barFrame.RightBottom(), shineColor);
 
 	// the inner edges
 	barFrame.top++;
-	view->AddLine(barFrame.LeftTop(), barFrame.RightTop(), ui_color(B_SHADOW_COLOR));
+	view->AddLine(barFrame.LeftTop(), barFrame.RightTop(), shadowColor);
 	view->AddLine(BPoint(barFrame.left, barFrame.top + 1),
-		BPoint(barFrame.left, barFrame.bottom - 1), ui_color(B_SHADOW_COLOR));
+		BPoint(barFrame.left, barFrame.bottom - 1), shadowColor);
 
 	view->EndLineArray();
 }
@@ -320,6 +326,7 @@ void
 PositionSlider::Reset()
 {
 	SetKeyIncrementValue(int32(1.0 * kMaxSliderLimit / ((fSize - 1) / fBlockSize) + 0.5));
+	SetEnabled(fSize > fBlockSize);
 }
 
 
@@ -351,8 +358,6 @@ PositionSlider::SetSize(off_t size)
 {
 	if (size == fSize)
 		return;
-
-	SetEnabled(fSize > fBlockSize);
 
 	off_t position = Position();
 	if (position >= size)
@@ -675,7 +680,7 @@ HeaderView::MessageReceived(BMessage *message)
 			if (message->FindInt32("delta", &delta) != B_OK)
 				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
 			else
-				fPosition += delta * fBlockSize;
+				fPosition += delta * off_t(fBlockSize);
 
 			// update views
 			UpdatePositionViews();
@@ -1038,7 +1043,7 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Write", NULL, 'W', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem("Write", NULL, 'S', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 
 	subMenu = new BMenu("Bookmarks");
