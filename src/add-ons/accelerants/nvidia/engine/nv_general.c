@@ -1267,7 +1267,7 @@ static status_t nv_general_bios_to_powergraphics()
 		}
 		CFGW(AGPCMD, agp_cmd);
 
-		LOG(4,("INIT: AGPCMD register readback &%08x\n", CFGR(AGPCMD)));
+		LOG(4,("INIT: AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
 	}
 
 	/* turn screen one on */
