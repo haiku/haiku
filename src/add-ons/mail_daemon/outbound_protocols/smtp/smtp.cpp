@@ -341,12 +341,18 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 	BString line;
 	ReceiveResponse(line);
-
-	char *cmd = new char[::strlen(address)+8];
+	
+	char localhost[255];
+	gethostname(localhost,255);
+	
+	if (localhost[0] == 0)
+		strcpy(localhost,"namethisbebox");
+	
+	char *cmd = new char[::strlen(localhost)+8];
 	if (!esmtp)
-		::sprintf(cmd,"HELO %s"CRLF, address);
+		::sprintf(cmd,"HELO %s"CRLF, localhost);
 	else
-		::sprintf(cmd,"EHLO %s"CRLF, address);
+		::sprintf(cmd,"EHLO %s"CRLF, localhost);
 
 	if (SendCommand(cmd) != B_OK) {
 		delete[] cmd;
