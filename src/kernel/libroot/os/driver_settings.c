@@ -211,6 +211,8 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 
 			// the flat settings style allows to put a '=' between the
 			// parameter name and its values
+			// ToDo: should this symbol be allowed without surrounding
+			//	white space? like "key=value" instead of "key = value"?
 			if (!strcmp(value, "=") && parameter->value_count == 0)
 				continue;
 
@@ -372,6 +374,9 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 	if (string == NULL)
 		return true;
 
+	// ToDo: we might have to quote the string in question or
+	//	want to escape several of its characters - that's not
+	//	yet implemented!
 	length = strlen(string);
 
 	// update _bufferSize in any way, so that we can chain several
