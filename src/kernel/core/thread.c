@@ -227,7 +227,8 @@ create_thread_struct(const char *name)
 	t->team = NULL;
 	t->cpu = NULL;
 	t->sem_blocking = -1;
-	t->fault_handler = 0;
+	t->fault_handler = NULL;
+	t->page_faults_allowed = 1;
 	t->kernel_stack_region_id = -1;
 	t->kernel_stack_base = 0;
 	t->user_stack_region_id = -1;
@@ -972,7 +973,7 @@ thread_exit(void)
 		vm_delete_aspace(p->_aspace_id);
 		delete_owned_ports(p->id);
 		sem_delete_owned_sems(p->id);
-		vfs_free_io_context(p->ioctx);
+		vfs_free_io_context(p->io_context);
 		free(p);
 	}
 
