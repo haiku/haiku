@@ -28,6 +28,7 @@
 #include <team.h>
 
 #include <boot/stage2.h>
+#include <boot/elf.h>
 
 #include <arch/cpu.h>
 #include <arch/vm.h>
@@ -1602,15 +1603,46 @@ vm_thread_dump_max_commit(void *unused)
 }
 
 
+static void
+create_preloaded_image_areas(struct preloaded_image *image)
+{
+	char name[B_OS_NAME_LENGTH];
+	void *address;
+	int32 length;
+
+	// use file name to create a good area name
+	char *fileName = strrchr(image->name, '/');
+	if (fileName == NULL)
+		fileName = image->name;
+	else
+		fileName++;
+
+	length = strlen(fileName);
+	// make sure there is enough space for the suffix
+	if (length > 25)
+		length = 25;
+
+	memcpy(name, fileName, length);
+	strcpy(name + length, "_text");
+	address = (void *)ROUNDOWN(image->text_region.start, PAGE_SIZE);
+	image->text = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
+		PAGE_ALIGN(image->text_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+
+	strcpy(name + length, "_data");
+	address = (void *)ROUNDOWN(image->data_region.start, PAGE_SIZE);
+	image->data = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, REGION_ADDR_EXACT_ADDRESS,
+		PAGE_ALIGN(image->data_region.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+}
+
+
 int
 vm_init(kernel_args *ka)
 {
 	int err = 0;
 	unsigned int i;
-//	int last_used_virt_range = -1;
-//	int last_used_phys_range = -1;
-	addr heap_base;
-	void *null_addr;
+	struct preloaded_image *image;
+	addr_t heap_base;
+	void *address;
 
 	TRACE(("vm_init: entry\n"));
 	err = vm_translation_map_module_init(ka);
@@ -1641,14 +1673,14 @@ vm_init(kernel_args *ka)
 		vm_address_space *aspace;
 		aspace_table = hash_init(ASPACE_HASH_TABLE_SIZE, (addr)&aspace->hash_next - (addr)aspace,
 			&aspace_compare, &aspace_hash);
-		if(aspace_table == NULL)
+		if (aspace_table == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 	{
 		vm_region *region;
 		region_table = hash_init(REGION_HASH_TABLE_SIZE, (addr)&region->hash_next - (addr)region,
 			&region_compare, &region_hash);
-		if(region_table == NULL)
+		if (region_table == NULL)
 			panic("vm_init: error creating aspace hash table\n");
 	}
 
@@ -1657,7 +1689,7 @@ vm_init(kernel_args *ka)
 	{
 		aspace_id aid;
 		aid = vm_create_aspace("kernel_land", KERNEL_BASE, KERNEL_SIZE, true);
-		if(aid < 0)
+		if (aid < 0)
 			panic("vm_init: error creating kernel address space!\n");
 		kernel_aspace = vm_get_aspace_by_id(aid);
 		vm_put_aspace(kernel_aspace);
@@ -1669,25 +1701,33 @@ vm_init(kernel_args *ka)
 	vm_page_init2(ka);
 
 	// allocate regions to represent stuff that already exists
-	null_addr = (void *)ROUNDOWN(heap_base, PAGE_SIZE);
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &null_addr, REGION_ADDR_EXACT_ADDRESS,
+
+	address = (void *)ROUNDOWN(heap_base, PAGE_SIZE);
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, REGION_ADDR_EXACT_ADDRESS,
 		HEAP_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	null_addr = (void *)ROUNDOWN(ka->kernel_seg0_addr.start, PAGE_SIZE);
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_ro", &null_addr, REGION_ADDR_EXACT_ADDRESS,
+	address = (void *)ROUNDOWN(ka->kernel_seg0_addr.start, PAGE_SIZE);
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_ro", &address, REGION_ADDR_EXACT_ADDRESS,
 		PAGE_ALIGN(ka->kernel_seg0_addr.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	if(ka->kernel_seg1_addr.size > 0) {
-		null_addr = (void *)ROUNDOWN(ka->kernel_seg1_addr.start, PAGE_SIZE);
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_rw", &null_addr, REGION_ADDR_EXACT_ADDRESS,
+	if (ka->kernel_seg1_addr.size > 0) {
+		address = (void *)ROUNDOWN(ka->kernel_seg1_addr.start, PAGE_SIZE);
+		vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_rw", &address, REGION_ADDR_EXACT_ADDRESS,
 			PAGE_ALIGN(ka->kernel_seg1_addr.size), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 	}
-	for(i=0; i < ka->num_cpus; i++) {
+
+	// allocate areas for preloaded images
+	for (image = ka->preloaded_images; image != NULL; image = image->next) {
+		create_preloaded_image_areas(image);
+	}
+
+	// allocate kernel stacks
+	for (i = 0; i < ka->num_cpus; i++) {
 		char temp[64];
 
 		sprintf(temp, "idle_thread%d_kstack", i);
-		null_addr = (void *)ka->cpu_kstack[i].start;
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &null_addr, REGION_ADDR_EXACT_ADDRESS,
+		address = (void *)ka->cpu_kstack[i].start;
+		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, REGION_ADDR_EXACT_ADDRESS,
 			ka->cpu_kstack[i].size, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 	}
 	{
