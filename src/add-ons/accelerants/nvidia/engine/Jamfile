@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src add-ons accelerants nvidia engine ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics nvidia ] ;
+UseHeaders [ FDirName $(SUBDIR) .. ] ;
+
+StaticLibrary nvidia_engine :
+	nv_acc.c
+	nv_bes.c
+	nv_crtc.c
+	nv_crtc2.c
+	nv_dac.c
+	nv_general.c
+	nv_i2c.c
+	nv_info.c
+	nv_maven.c
+	nv_maventv.c
+	nv_support.c
+	;

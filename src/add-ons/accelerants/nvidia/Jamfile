@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src add-ons accelerants nvidia ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics nvidia ] ;
+UseHeaders engine ;
+
+
+Addon nv.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetDeviceInfo.c
+	GetModeInfo.c
+	GetTimingConstraints.c
+	GlobalData.c
+	InitAccelerant.c
+	Overlay.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false : libnvidia_engine.a
+;
+
+SubInclude OBOS_TOP src add-ons accelerants nvidia engine ;
