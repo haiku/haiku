@@ -8,6 +8,7 @@
 namespace BPrivate { namespace media {
 
 typedef std::map<int,ogg_stream_state> ogg_stream_map;
+typedef std::map<int,ogg_packet> ogg_packet_map;
 
 class oggReader : public Reader
 {
@@ -36,8 +37,12 @@ public:
 							 media_header *mediaHeader);
 									 
 private:
+	status_t	GetPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE,
+				        bool short_page = false);
+
 	ogg_sync_state	fSync;
 	ogg_stream_map	fStreams;
+	ogg_packet_map	fPackets;
 };
 
 
