@@ -70,6 +70,7 @@ KPartition::Register()
 void
 KPartition::Unregister()
 {
+	ManagerLocker locker(KDiskDeviceManager::Default());
 	fReferenceCount--;
 }
 
@@ -96,6 +97,22 @@ KPartition::Open(int flags, int *fd)
 	if (*fd < 0)
 		return errno;
 	return B_OK;
+}
+
+// PublishDevice
+status_t
+KPartition::PublishDevice()
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// UnpublishDevice
+status_t
+KPartition::UnpublishDevice()
+{
+	// not implemented
+	return B_ERROR;
 }
 
 // SetBusy
@@ -339,6 +356,8 @@ KPartition::ID() const
 int32
 KPartition::ChangeCounter() const
 {
+	// not implemented
+	return 0;
 }
 
 // GetPath
@@ -484,6 +503,29 @@ KPartition::AddChild(KPartition *partition, int32 index)
 		return B_OK;
 	}
 	return B_ERROR;
+}
+
+// CreateChild
+status_t
+KPartition::CreateChild(partition_id id, int32 index, KPartition **_child)
+{
+	// check parameters
+	int32 count = fPartitionData.child_count;
+	if (index == -1)
+		index = count;
+	if (index < 0 || index > count)
+		return B_BAD_VALUE;
+	// create and add partition
+	KPartition *child = new(nothrow) KPartition(id);
+	if (!child)
+		return B_NO_MEMORY;
+	status_t error = AddChild(child, index);
+	// cleanup / set result
+	if (error != B_OK)
+		delete child;
+	else if (_child)
+		*_child = child;
+	return error;
 }
 
 // RemoveChild

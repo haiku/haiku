@@ -31,12 +31,14 @@ public:
 
 	// Reference counting. As long as there's at least one referrer, the
 	// object won't be deleted.
-	// manager must be locked
+	// manager must be locked (Unregister() locks itself)
 	void Register();
 	void Unregister();
 	int32 CountReferences() const;
 
 	status_t Open(int flags, int *fd);
+	status_t PublishDevice();
+	status_t UnpublishDevice();
 
 	void SetBusy(bool busy);
 	bool IsBusy() const;
@@ -118,6 +120,8 @@ public:
 	KPartition *Parent() const;
 
 	status_t AddChild(KPartition *partition, int32 index = -1);
+	status_t CreateChild(partition_id id, int32 index,
+						 KPartition **child = NULL);
 	KPartition *RemoveChild(int32 index);
 	KPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
