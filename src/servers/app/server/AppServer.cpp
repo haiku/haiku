@@ -25,6 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <AppDefs.h>
+#include <PortMessage.h>
 #include <Entry.h>
 #include <PortMessage.h>
 #include "AppServer.h"

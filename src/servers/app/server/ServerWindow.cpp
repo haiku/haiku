@@ -571,10 +571,10 @@ printf("ServerWindow %s: Message Move_By unimplemented\n",_title->String());
 */
 void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 {
-        int msgPos;
+	int32 msgPos;
 	LayerData *layerdata;
 	int32 code;
-
+	
 	if ( !msgsize || !msgbuffer )
 		return;
 	
@@ -603,7 +603,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ARC:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_ARC_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_ARC_MSG_SIZE )
 				{
 					float left, top, right, bottom, angle, span;
 					msgPos+=4;
@@ -633,7 +633,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_BEZIER:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_BEZIER_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_BEZIER_MSG_SIZE )
 				{
 					BPoint *pts;
 					int i;
@@ -660,7 +660,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ELLIPSE:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_ELLIPSE_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_ELLIPSE_MSG_SIZE )
 				{
 					float left, top, right, bottom;
 					msgPos+=4;
@@ -686,7 +686,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_LINE:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_LINE_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_LINE_MSG_SIZE )
 				{
 					float x1, y1, x2, y2;
 					msgPos+=4;
@@ -723,7 +723,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_RECT:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_RECT_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_RECT_MSG_SIZE )
 				{
 					float left, top, right, bottom;
 					msgPos+=4;
@@ -749,7 +749,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_ROUNDRECT:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_ROUNDRECT_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_ROUNDRECT_MSG_SIZE )
 				{
 					float left, top, right, bottom, xrad, yrad;
 					msgPos+=4;
@@ -784,7 +784,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_STROKE_TRIANGLE:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_STROKE_TRIANGLE_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_STROKE_TRIANGLE_MSG_SIZE )
 				{
 					BPoint *pts;
 					float left, top, right, bottom;
@@ -821,7 +821,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ARC:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_ARC_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_ARC_MSG_SIZE )
 				{
 					float left, top, right, bottom, angle, span;
 					msgPos+=4;
@@ -851,7 +851,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_BEZIER:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_BEZIER_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_BEZIER_MSG_SIZE )
 				{
 					BPoint *pts;
 					int i;
@@ -878,7 +878,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ELLIPSE:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_ELLIPSE_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_ELLIPSE_MSG_SIZE )
 				{
 					float left, top, right, bottom;
 					msgPos+=4;
@@ -909,7 +909,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_RECT:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_RECT_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_RECT_MSG_SIZE )
 				{
 					float left, top, right, bottom;
 					msgPos+=4;
@@ -940,7 +940,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_ROUNDRECT:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_ROUNDRECT_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_ROUNDRECT_MSG_SIZE )
 				{
 					float left, top, right, bottom, xrad, yrad;
 					msgPos+=4;
@@ -975,7 +975,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			case AS_FILL_TRIANGLE:
 			{
 				// TODO:: Add clipping
-				if ( msgsize-msgPos >= AS_FILL_TRIANGLE_MSG_SIZE )
+				if ( uint32(msgsize-msgPos) >= AS_FILL_TRIANGLE_MSG_SIZE )
 				{
 					BPoint *pts;
 					float left, top, right, bottom;
