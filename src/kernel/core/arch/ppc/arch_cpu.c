@@ -3,8 +3,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel/kernel.h>
-#include <kernel/arch/cpu.h>
+
+#include <kernel.h>
+#include <arch/cpu.h>
 #include <boot/stage2.h>
 
 
@@ -59,11 +60,11 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *fault_handle
 		*tmp++ = *s++;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -76,11 +77,11 @@ arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
 		;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -93,11 +94,11 @@ arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handl
 		;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -112,11 +113,11 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 		*xs++ = c;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
