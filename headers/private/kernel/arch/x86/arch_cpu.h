@@ -5,8 +5,6 @@
 #ifndef _KERNEL_ARCH_x86_CPU_H
 #define _KERNEL_ARCH_x86_CPU_H
 
-/* ??? why include this as we're normally included from that file! */
-#include <arch/cpu.h>
 #include <arch/x86/thread_struct.h>
 #include <arch/x86/descriptors.h>
 
@@ -14,10 +12,6 @@
 
 #define _BIG_ENDIAN 0
 #define _LITTLE_ENDIAN 1
-
-typedef struct desc_struct {
-	unsigned int a,b;
-} desc_table;
 
 struct tss {
 	uint16 prev_task;
@@ -38,23 +32,9 @@ struct tss {
 	uint16 io_map_base;
 };
 
-struct tss_descriptor {
-	uint16 limit_00_15;
-	uint16 base_00_15;
-	uint32 base_23_16 : 8;
-	uint32 type : 4;
-	uint32 zero : 1;
-	uint32 dpl : 2;
-	uint32 present : 1;
-	uint32 limit_19_16 : 4;
-	uint32 avail : 1;
-	uint32 zero1 : 1;
-	uint32 zero2 : 1;
-	uint32 granularity : 1;
-	uint32 base_31_24 : 8;
-};
+/**************************************************************************/
 
-typedef struct ptentry {
+typedef struct ptentry {		// page table entry
 	unsigned int present:1;
 	unsigned int rw:1;
 	unsigned int user:1;
@@ -68,7 +48,7 @@ typedef struct ptentry {
 	unsigned int addr:20;
 } ptentry;
 
-typedef struct pdentry {
+typedef struct pdentry {		// page directory entry
 	unsigned int present:1;
 	unsigned int rw:1;
 	unsigned int user:1;
@@ -175,5 +155,6 @@ __asm__ volatile ("inb %%dx,%%al\n" \
 _v; \
 })
 
-#endif
+extern segment_descriptor *gGDT;
 
+#endif	/* _KERNEL_ARCH_x86_CPU_H */

@@ -15,12 +15,6 @@
 #define IDT_LIMIT 0x800
 #define GDT_LIMIT 0x800
 
-struct gdt_idt_descr {
-	unsigned short a;
-	unsigned int *b;
-} _PACKED;
-
-
 // kernel args
 typedef struct {
 	// architecture specific
@@ -45,5 +39,4 @@ typedef struct {
 	unsigned int cpu_apic_version[MAX_BOOT_CPUS];
 } arch_kernel_args;
 
-#endif
-
+#endif	/* _KERNEL_ARCH_x86_STAGE2_H */

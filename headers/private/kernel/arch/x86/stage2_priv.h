@@ -39,6 +39,11 @@ void cpuid(unsigned int selector, unsigned int *data);
 #define SCREEN_HEIGHT 24
 #define ADDR_MASK 0xfffff000
 
+struct gdt_idt_descr {
+	unsigned short a;
+	unsigned int *b;
+} _PACKED;
+
 // SMP stuff
 extern int smp_boot(kernel_args *ka, unsigned int kernel_entry);
 extern void smp_trampoline(void);
