@@ -26,7 +26,7 @@ static const char *kDestinationControlWords[] = {
 };
 
 static char read_char(BDataIO &stream, bool endOfFileAllowed = false) throw (status_t);
-static int32 parse_integer(char first, BDataIO &stream, char &_last) throw (status_t);
+static int32 parse_integer(char first, BDataIO &stream, char &_last, int32 base = 10) throw (status_t);
 
 
 using namespace RTF;
@@ -49,8 +49,9 @@ read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 
 
 static int32
-parse_integer(char first, BDataIO &stream, char &_last) throw (status_t)
+parse_integer(char first, BDataIO &stream, char &_last, int32 base) throw (status_t)
 {
+	const char *kDigits = "0123456789abcdef";
 	int32 integer = 0;
 	int32 count = 0;
 
@@ -60,10 +61,15 @@ parse_integer(char first, BDataIO &stream, char &_last) throw (status_t)
 		digit = read_char(stream);
 
 	while (true) {
-		if (isdigit(digit)) {
-			integer = integer * 10 + digit - '0';
-			count++;
-		} else {
+		int32 pos = 0;
+		for (; pos < base; pos++) {
+			if (kDigits[pos] == digit) {
+				integer = integer * base + pos;
+				count++;
+				break;
+			}
+		}
+		if (pos == base) {
 			_last = digit;
 			goto out;
 		}
@@ -89,7 +95,7 @@ string_array_compare(const char *key, const char **array)
 static void
 dump(Element &element, int32 level = 0)
 {
-	printf("%03ld:", level);
+	printf("%03ld (%p):", level, &element);
 	for (int32 i = 0; i < level; i++)
 		printf("  ");
 
@@ -103,8 +109,8 @@ dump(Element &element, int32 level = 0)
 	} else if (RTF::Text *text = dynamic_cast<RTF::Text *>(&element)) {
 		printf("<Text>");
 		puts(text->String());
-	} else if (dynamic_cast<RTF::Group *>(&element) != NULL)
-		puts("<Group>");
+	} else if (RTF::Group *group = dynamic_cast<RTF::Group *>(&element))
+		printf("<Group \"%s\">\n", group->Name());
 
 	if (RTF::Group *group = dynamic_cast<RTF::Group *>(&element)) {
 		for (uint32 i = 0; i < group->CountElements(); i++)
@@ -536,7 +542,7 @@ Text::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 	size_t position = 0;
 
 	while (true) {
-		if (c == '\\' || c == '}' || c == '{' || c == ';')
+		if (c == '\\' || c == '}' || c == '{' || c == ';' || c == '\n' || c == '\r')
 			break;
 
 		if (position >= maxSize) {
@@ -604,7 +610,7 @@ Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 		first = read_char(stream);
 
 	if (first != '\\')
-		throw B_BAD_TYPE;
+		throw (status_t)B_BAD_TYPE;
 
 	// get name
 	char name[kCommandLength];
@@ -613,7 +619,7 @@ Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 	while (isalpha(c = read_char(stream))) {
 		name[length++] = c;
 		if (length >= kCommandLength - 1)
-			throw B_BAD_TYPE;
+			throw (status_t)B_BAD_TYPE;
 	}
 
 	if (length == 0) {
@@ -635,12 +641,24 @@ Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 
 	last = c;
 
-	if (isdigit(c))
-		SetOption(parse_integer(c, stream, last));
+	if (fName == "'") {
+		// hexadecimal
+		char bytes[2];
+		bytes[0] = read_char(stream);
+		bytes[1] = '\0';
+		BMemoryIO memory(bytes, 2);
 
-	// a space delimiter is eaten up by the command
-	if (isspace(last))
+		SetOption(parse_integer(c, memory, last, 16));
 		last = read_char(stream);
+	} else {
+		// decimal
+		if (isdigit(c))
+			SetOption(parse_integer(c, stream, last));
+	
+		// a space delimiter is eaten up by the command
+		if (isspace(last))
+			last = read_char(stream);
+	}
 }
 
 
