@@ -91,7 +91,7 @@ Painter::AttachToBuffer(RenderingBuffer* buffer)
 
 		// These are the AGG renderes and rasterizes which
 		// will be used for stroking paths
-rgb_color color = fPatternHandler->HighColor();
+rgb_color color = fPatternHandler->HighColor().GetColor32();
 #if ALIASED_DRAWING
 		fOutlineRenderer = new outline_renderer_type(*fBaseRenderer);
 
