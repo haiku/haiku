@@ -28,6 +28,7 @@
 static struct option const kLongOptions[] = {
 	{"volume", required_argument, 0, 'd'},
 	{"type", required_argument, 0, 't'},
+	{"copy-from", required_argument, 0, 'f'},
 	{"verbose", no_argument, 0, 'v'},
 	{"help", no_argument, 0, 'h'},
 	{NULL}
@@ -37,7 +38,41 @@ extern const char *__progname;
 static const char *kProgramName = __progname;
 
 
-void
+static void
+copy_indexes(dev_t from, dev_t to, bool verbose)
+{
+	DIR *indexes = fs_open_index_dir(from);
+	
+	if (verbose)
+		puts("Copying indexes:");
+
+	while (dirent *dirent = fs_read_index_dir(indexes)) {
+		if (!strcmp(dirent->d_name, "name")
+			|| !strcmp(dirent->d_name, "size")
+			|| !strcmp(dirent->d_name, "last_modified"))
+			continue;
+
+		index_info info;
+		if (fs_stat_index(from, dirent->d_name, &info) != 0) {
+			fprintf(stderr, "%s: Skipped index \"%s\": %s\n",
+				kProgramName, dirent->d_name, strerror(errno));
+			continue;
+		}
+
+		if (fs_create_index(to, dirent->d_name, info.type, 0) != 0) {
+			if (errno == B_BAD_VALUE || errno == B_FILE_EXISTS) {
+				// B_BAD_VALUE is what BeOS returns here...
+				continue;
+			}
+			fprintf(stderr, "%s: Could not create index \"%s\": %s\n",
+				kProgramName, dirent->d_name, strerror(errno));
+		} else if (verbose)
+			printf("\t%s\n", dirent->d_name);
+	}
+}
+
+
+static void
 usage(int status)
 {
 	fprintf(stderr,
@@ -49,6 +84,7 @@ usage(int status)
 		"  -t, --type=TYPE	the type of the attribute being indexed.  One of \"int\",\n"
 		"\t\t\t\"llong\", \"string\", \"float\", or \"double\".\n"
 		"\t\t\tDefaults to \"string\".\n"
+		"      --copy-from\tpath to volume to copy the indexes from.\n"
 		"  -v, --verbose\t\tprint information about the index being created\n",
 		kProgramName);
 
@@ -63,7 +99,7 @@ main(int32 argc, char **argv)
 	int indexType = B_STRING_TYPE;
 	char *indexName = NULL;
 	bool verbose = false;
-	dev_t device = 0;
+	dev_t device = -1, copyFromDevice = -1;
 
 	int c;
 	while ((c = getopt_long(argc, argv, "d:ht:v", kLongOptions, NULL)) != -1) {
@@ -73,6 +109,14 @@ main(int32 argc, char **argv)
 			case 'd':
 				device = dev_for_path(optarg);
 				if (device < 0) {
+					fprintf(stderr, "%s: can't get information about volume: %s\n",
+						kProgramName, optarg);
+					return -1;
+				}
+				break;
+			case 'f':
+				copyFromDevice = dev_for_path(optarg);
+				if (copyFromDevice < 0) {
 					fprintf(stderr, "%s: can't get information about volume: %s\n",
 						kProgramName, optarg);
 					return -1;
@@ -105,7 +149,7 @@ main(int32 argc, char **argv)
 		}
 	}
 
-	if (device == 0) {
+	if (device == -1) {
 		// Create the index on the volume of the current
 		// directory if no volume was specified.
 
@@ -114,6 +158,11 @@ main(int32 argc, char **argv)
 			fprintf(stderr, "%s: can't get information about current volume\n", kProgramName);
 			return -1;
 		}
+	}
+
+	if (copyFromDevice != -1) {
+		copy_indexes(copyFromDevice, device, verbose);
+		return 0;
 	}
 
 	if (argc - optind == 1) {
