@@ -40,6 +40,11 @@ enum {
 	B_REG_ERROR						= 'rger',
 	B_REG_GET_MIME_MESSENGER		= 'rgmm',
 	B_REG_GET_CLIPBOARD_MESSENGER	= 'rgcm',
+	B_REG_ADD_APP					= 'rgaa',
+	B_REG_COMPLETE_REGISTRATION		= 'rgcr',
+	B_REG_IS_PRE_REGISTERED			= 'rgip',
+	B_REG_REMOVE_PRE_REGISTERED_APP	= 'rgrp',
+	B_REG_REMOVE_APP				= 'rgra',
 };
 
 // type constants
@@ -51,7 +56,8 @@ enum {
 #define B_REGISTRAR_ERROR_BASE		(B_ERRORS_END + 1)
 
 enum {
-	B_REG_ALREADY_REGISTERED		= B_REGISTRAR_ERROR_BASE,
+// not needed: We have B_ALREADY_RUNNING.
+//	B_REG_ALREADY_REGISTERED		= B_REGISTRAR_ERROR_BASE,
 };
 
 #endif	// REGISTRAR_DEFS_H
