@@ -815,7 +815,8 @@ UdfBuilder::Build()
 			memset(chunk.Data(), 0, _BlockSize());
 			Udf::logical_volume_integrity_descriptor *lvid =
 				reinterpret_cast<Udf::logical_volume_integrity_descriptor*>(chunk.Data());
-			lvid->recording_time() = _BuildTimeStamp();
+			lvid->recording_time() = Udf::timestamp(real_time_clock());
+				// recording time must be later than all file access times
 			lvid->set_integrity_type(Udf::INTEGRITY_CLOSED);
 			lvid->next_integrity_extent() = kNullExtent;
 			memset(lvid->logical_volume_contents_use().data, 0,
@@ -1032,6 +1033,9 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("path: `%s'", path));
 	uint32 udfDataLength = 0;
+	uint64 udfUniqueId = isRootDirectory ? 0 : _NextUniqueId();
+		// file entry id must be numerically lower than unique id's
+		// in all fids that reference it, thus we allocate it now.
 	status_t error = entry.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
 	if (!error) {
 		_PrintUpdate(VERBOSITY_LOW, "Adding `%s'", path);
@@ -1153,7 +1157,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 			
 			// Write iso parent directory
 			
-			// Write udf parent directory
+			// Write udf parent directory fid
 			if (!error && _DoUdf()) {
 				Udf::MemoryChunk chunk((38) + 4);
 				error = chunk.InitCheck();
@@ -1169,6 +1173,8 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 					parent->set_is_parent(true);
 					parent->set_id_length(0);
 					parent->icb() = isRootDirectory ? icbAddress : parentIcbAddress;
+					if (!isRootDirectory)
+						parent->icb().set_unique_id(uint32(_NextUniqueId()));
 					parent->set_implementation_use_length(0);
 					parent->tag().set_id(Udf::TAGID_FILE_ID_DESCRIPTOR);
 					parent->tag().set_version(3);
@@ -1178,7 +1184,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 					                              _BlockSize(), block);
 					if (!error) {
 						parent->tag().set_location(block);
-						parent->tag().set_checksums(*parent);
+						parent->tag().set_checksums(*parent, parent->descriptor_size());
 						ssize_t bytes = udfData->Write(parent, parent->total_length());
 						error = check_size_error(bytes, parent->total_length());
 					}
@@ -1186,6 +1192,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 			}
 			
 			// Process children
+			uint16 childDirCount = 0;
 			if (!error)
 				error = directory.Rewind();
 			while (error == B_OK) {
@@ -1220,6 +1227,8 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 							// Directory							
 							error = _ProcessDirectory(childEntry, childImagePath.c_str(),
 							                          childStats, childNode, icbAddress);
+							if (!error)
+								childDirCount++;
 						} else if (S_ISLNK(childStats.st_mode)) {
 							// Symlink
 							// For now, skip it
@@ -1250,6 +1259,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 								id->set_is_parent(false);
 								id->set_id_length(udfNameLength);
 								id->icb() = childNode.icbAddress;
+								id->icb().set_unique_id(uint32(_NextUniqueId()));
 								id->set_implementation_use_length(0);
 								memcpy(id->id(), udfName.Cs0(), udfNameLength);
 								id->tag().set_id(Udf::TAGID_FILE_ID_DESCRIPTOR);
@@ -1260,7 +1270,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 								                              _BlockSize(), block);
 								if (!error) {
 									id->tag().set_location(block);
-									id->tag().set_checksums(*id);
+									id->tag().set_checksums(*id, id->descriptor_size());
 									PDUMP(id);
 									PRINT(("pos: %Ld\n", udfData->Position()));
 									ssize_t bytes = udfData->Write(id, id->total_length());
@@ -1303,7 +1313,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 				icb->set_permissions(Udf::OTHER_EXECUTE | Udf::OTHER_READ
 				                    | Udf::GROUP_EXECUTE | Udf::GROUP_READ
 				                    | Udf::USER_EXECUTE | Udf::USER_READ);
-				icb->set_file_link_count(1 + attributeCount);
+				icb->set_file_link_count(1 + attributeCount + childDirCount);
 				icb->set_record_format(0);
 				icb->set_record_display_attributes(0);
 				icb->set_record_length(0);
@@ -1322,7 +1332,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 				icb->extended_attribute_icb() = kNullAddress;
 				icb->stream_directory_icb() = kNullAddress;
 				icb->implementation_id() = Udf::kImplementationId;
-				icb->set_unique_id(isRootDirectory ? 0 : _NextUniqueId());
+				icb->set_unique_id(udfUniqueId);
 				icb->set_extended_attributes_length(0);
 				icb->set_allocation_descriptors_length(udfAllocationDescriptorsLength);				
 //				icb->set_allocation_descriptors_length(0);				
