@@ -4,6 +4,7 @@ SubDir OBOS_TOP src tests kits support ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) barchivable ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bautolock ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blocker ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmemoryio ] ;
 
 CommonTestLib libsupporttest.so
 	: SupportKitTestAddon.cpp
@@ -31,6 +32,12 @@ CommonTestLib libsupporttest.so
 		DestructionTest2.cpp
 		LockerTestCase.cpp
 		SemaphoreLockCountTest1.cpp
+
+		# BMemoryIO
+		MemoryIOTest.cpp
+		ConstTest.cpp
+		SeekTest.cpp
+		WriteTest.cpp
 		
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4

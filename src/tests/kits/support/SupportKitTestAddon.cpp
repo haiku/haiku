@@ -5,6 +5,7 @@
 #include "barchivable/ArchivableTest.h"
 #include "bautolock/AutolockTest.h"
 #include "blocker/LockerTest.h"
+#include "bmemoryio/MemoryIOTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Support");
@@ -13,6 +14,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BArchivable", ArchivableTestSuite());
 	suite->addTest("BAutolock", AutolockTestSuite());
 	suite->addTest("BLocker", LockerTestSuite());
+	suite->addTest("BMemoryIO", MemoryIOTestSuite());
 	
 	return suite;
 }
