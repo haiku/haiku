@@ -228,6 +228,23 @@ struct fd_ops gIndexDirectoryOps = {
 	index_dir_free_fd
 };
 
+#if 0
+struct fd_ops gIndexOps = {
+	NULL,		// read()
+	NULL,		// write()
+	NULL,		// seek()
+	NULL,		// ioctl()
+	NULL,		// select()
+	NULL,		// deselect()
+	NULL,		// dir_read()
+	NULL,		// dir_rewind()
+	index_read_stat,	// read_stat()
+	NULL,		// write_stat()
+	NULL,		// dir_close()
+	NULL		// free_fd()
+};
+#endif
+
 
 static int
 mount_compare(void *_m, const void *_key)
@@ -3056,6 +3073,7 @@ out:
 }
 
 
+#if 0
 static status_t
 index_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 {
@@ -3069,6 +3087,19 @@ index_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 	return EOPNOTSUPP;
 	//return FS_CALL(vnode, read_index_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat);
 }
+
+
+static void
+index_free_fd(struct file_descriptor *descriptor)
+{
+	struct vnode *vnode = descriptor->u.vnode;
+
+	if (vnode != NULL) {
+		FS_CALL(vnode, free_index_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		put_vnode(vnode);
+	}
+}
+#endif
 
 
 static status_t
