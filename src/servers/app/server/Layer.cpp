@@ -471,7 +471,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 
 			// calculate the update region, then...
 			fUpdateReg = fVisible;
-			if (fFlags & B_FULL_UPDATE_ON_RESIZE){ }
+			if (fFlags & B_FULL_UPDATE_ON_RESIZE && fFrameAction == B_LAYER_RESIZE){ }
 			else { fUpdateReg.IntersectWith(&reg); }
 
 			if (fUpdateReg.CountRects() > 0)
@@ -1015,9 +1015,9 @@ void Layer::MoveBy(float x, float y)
 		debugger("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-	
+
 	fFrameAction = B_LAYER_MOVE;
-	
+
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
@@ -1120,9 +1120,9 @@ void Layer::ResizeBy(float x, float y)
 		printf("ERROR: in Layer::MoveBy()! - No parent!\n");
 		return;
 	}
-	
+
 	fFrameAction = B_LAYER_RESIZE;
-	
+
 	BPoint pt(x,y);	
 	BRect rect(fFull.Frame());
 	rect.right += x;
@@ -1136,7 +1136,7 @@ void Layer::ResizeBy(float x, float y)
 	EmptyGlobals();
 
 	fFrameAction = B_LAYER_NONE;
-	
+
 	STRACE(("Layer(%s)::ResizeBy() END\n", GetName()));
 }
 
