@@ -184,8 +184,8 @@ int main(int argc,char **argv)
 			printf("You can either create a test file or perform the test.\n"
 				"  Create:\t%s create [filesize]\n"
 				"  Test:  \t%s [loops]\n\n"
-				"Default size = %ld, loops = %ld\n",
-				filename,filename,FILE_SIZE,NUMBER_OF_LOOPS);
+				"Default size = %d, loops = %d\n",
+				filename, filename, FILE_SIZE, NUMBER_OF_LOOPS);
 
 			return 0;
 		}
