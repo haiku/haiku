@@ -128,7 +128,7 @@ rule Server
 {
 	# Server <name> : <sources> ;
 	
-	SetupIncludes ;
+#	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(<) : $(>) ;
 	MakeLocate $(<) : $(OBOS_SERVER_DIR) ;
