@@ -16,38 +16,69 @@ static PluginManager _plugin_manager;
  *************************************************************/
 
 BMediaDecoder::BMediaDecoder()
+ :	fDecoder(0),
+ 	fDecoderID(0),
+ 	fDecoderPlugin(0),
+ 	fDecoderPluginID(0),
+ 	fInitStatus(B_NO_INIT),
+ 	fNeedsInit(false),
+ 	fInitFormat(0),
+ 	fInitInfo(0),
+ 	fInitInfoSize(0),
+ 	fInitMCI(0)
 {
-	fDecoder = NULL;
-	fDecoderPlugin = NULL;
-	fInitStatus = B_NO_INIT;
 }
 
 BMediaDecoder::BMediaDecoder(const media_format *in_format,
 							 const void *info,
 							 size_t info_size)
+ :	fDecoder(0),
+ 	fDecoderID(0),
+ 	fDecoderPlugin(0),
+ 	fDecoderPluginID(0),
+ 	fInitStatus(B_NO_INIT),
+ 	fNeedsInit(true),
+ 	fInitFormat(new media_format(*in_format)),
+ 	fInitInfo(0),
+ 	fInitInfoSize(0),
+ 	fInitMCI(0)
 {
-	fDecoder = NULL;
-	fDecoderPlugin = NULL;
-	SetTo(in_format,info,info_size);
+	if (info_size) {
+		fInitInfoSize = info_size;
+		fInitInfo = new char[info_size];
+		memcpy(fInitInfo, info, info_size);
+	}
 }
 
 BMediaDecoder::BMediaDecoder(const media_codec_info *mci)
+ :	fDecoder(0),
+ 	fDecoderID(0),
+ 	fDecoderPlugin(0),
+ 	fDecoderPluginID(0),
+ 	fInitStatus(B_NO_INIT),
+ 	fNeedsInit(true),
+ 	fInitFormat(0),
+ 	fInitInfo(0),
+ 	fInitInfoSize(0),
+ 	fInitMCI(new media_codec_info(*mci))
 {
-	fDecoder = NULL;
-	fDecoderPlugin = NULL;
-	SetTo(mci);
 }
 
 /* virtual */
 BMediaDecoder::~BMediaDecoder()
 {
 	delete fDecoder;
+	delete fInitFormat;
+	delete fInitInfo;
+	delete fInitMCI;
 }
 
 
 status_t 
 BMediaDecoder::InitCheck() const
 {
+	if (fNeedsInit)
+		const_cast<BMediaDecoder *>(this)->DoLateInit();
 	return fInitStatus;
 }
 
@@ -82,6 +113,7 @@ BMediaDecoder::SetTo(const media_format *in_format,
 					 size_t info_size)
 {
 	status_t result;
+	fNeedsInit = false;
 	fInitStatus = B_NO_INIT;
 	delete fDecoder;
 	DecoderPlugin * plugin = GetDecoderPlugin(in_format);
@@ -95,10 +127,6 @@ BMediaDecoder::SetTo(const media_format *in_format,
 	fDecoder = decoder;
 //	fDecoderID = mci->sub_id;
 	result = SetInputFormat(in_format,info,info_size);
-	if (result != B_OK) {
-		return fInitStatus = result;
-	}
-	result = AttachToDecoder();
 	if (result != B_OK) {
 		return fInitStatus = result;
 	}
@@ -121,7 +149,7 @@ static DecoderPlugin * GetDecoderPlugin(int32 id)
 status_t 
 BMediaDecoder::SetTo(const media_codec_info *mci)
 {
-	status_t result;
+	fNeedsInit = false;
 	fInitStatus = B_NO_INIT;
 	delete fDecoder;
 	DecoderPlugin * plugin = GetDecoderPlugin(mci->id);
@@ -134,10 +162,6 @@ BMediaDecoder::SetTo(const media_codec_info *mci)
 	}
 	fDecoder = decoder;
 	fDecoderID = mci->sub_id;
-	result = AttachToDecoder();
-	if (result != B_OK) {
-		return fInitStatus = result;
-	}
 	return fInitStatus = B_OK;
 }
 
@@ -152,6 +176,8 @@ BMediaDecoder::SetInputFormat(const media_format *in_format,
 							  const void *in_info,
 							  size_t in_size)
 {
+	if (fNeedsInit)
+		DoLateInit();
 	if (fInitStatus != B_OK) {
 		return fInitStatus;
 	}
@@ -167,6 +193,8 @@ BMediaDecoder::SetInputFormat(const media_format *in_format,
 status_t 
 BMediaDecoder::SetOutputFormat(media_format *output_format)
 {
+	if (fNeedsInit)
+		DoLateInit();
 	if (fInitStatus != B_OK) {
 		return fInitStatus;
 	}
@@ -190,6 +218,8 @@ BMediaDecoder::Decode(void *out_buffer,
 					  media_header *out_mh, 
 					  media_decode_info *info)
 {
+	if (fNeedsInit)
+		DoLateInit();
 	if (fInitStatus != B_OK) {
 		return fInitStatus;
 	}
@@ -199,6 +229,8 @@ BMediaDecoder::Decode(void *out_buffer,
 status_t 
 BMediaDecoder::GetDecoderInfo(media_codec_info *out_info) const
 {
+	if (fNeedsInit)
+		const_cast<BMediaDecoder *>(this)->DoLateInit();
 	if (fInitStatus != B_OK) {
 		return fInitStatus;
 	}
@@ -224,28 +256,21 @@ BMediaDecoder::BMediaDecoder(const BMediaDecoder &);
 BMediaDecoder::BMediaDecoder & operator=(const BMediaDecoder &);
 */
 
-status_t
-BMediaDecoder::AttachToDecoder()
+void
+BMediaDecoder::DoLateInit()
 {
-	class MediaDecoderChunkProvider : public ChunkProvider {
-	private:
-		BMediaDecoder * fDecoder;
-	public:
-		MediaDecoderChunkProvider(BMediaDecoder * decoder) {
-			fDecoder = decoder;
-		}
-		virtual status_t GetNextChunk(void **chunkBuffer, int32 *chunkSize,
-	                                  media_header *mediaHeader) {
-			const void ** buffer = const_cast<const void**>(chunkBuffer);
-			size_t * size = reinterpret_cast<size_t*>(chunkSize);
-			return fDecoder->GetNextChunk(buffer,size,mediaHeader);
-		}
-	} * provider = new MediaDecoderChunkProvider(this);
-	if (provider == NULL) {
-		return B_NO_MEMORY;
+	if (fInitFormat) {
+		SetTo(fInitFormat, fInitInfo, fInitInfoSize);
+		delete fInitFormat;
+		delete fInitInfo;
+		fInitFormat = 0;
+		fInitInfo = 0;
 	}
-	fDecoder->Setup(provider);
-	return B_OK;
+	else if (fInitMCI) {
+		SetTo(fInitMCI);
+		delete fInitMCI;
+		fInitMCI = 0;
+	}
 }
 
 
