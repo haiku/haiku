@@ -19,7 +19,7 @@
 #include <user_debugger.h>
 #include <arch/user_debugger.h>
 
-//#define TRACE_USER_DEBUGGER
+#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
 #	define TRACE(x) dprintf x
 #else
@@ -180,6 +180,8 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		atomic_set(&info->flags,
 			B_THREAD_DEBUG_DEFAULT_FLAGS | (dying ? B_THREAD_DEBUG_DYING : 0));
 		info->debug_port = -1;
+		info->ignore_signals = 0;
+		info->ignore_signals_once = 0;
 	}
 }
 
@@ -194,6 +196,9 @@ destroy_thread_debug_info(struct thread_debug_info *info)
 			delete_port(info->debug_port);
 			info->debug_port = -1;
 		}
+
+		info->ignore_signals = 0;
+		info->ignore_signals_once = 0;
 
 		atomic_set(&info->flags, 0);
 	}
@@ -578,17 +583,37 @@ stop_thread(debug_why_stopped whyStopped, void *additionalData)
  *			problem).
  */
 bool
-user_debug_fault_occurred(debug_why_stopped fault)
+user_debug_exception_occurred(debug_exception_type exception, int signal)
 {
-	return (stop_thread(fault, NULL) != B_THREAD_DEBUG_IGNORE_EVENT);
+	// ensure that a debugger is installed for this team
+	struct thread *thread = thread_get_current_thread();
+	port_id nubPort;
+	status_t error = ensure_debugger_installed(B_CURRENT_TEAM, &nubPort);
+	if (error != B_OK) {
+		dprintf("user_debug_exception_occurred(): Failed to install debugger: "
+			"thread: %ld: %s\n", thread->id, strerror(error));
+		return error;
+	}
+
+	// prepare the message
+	debug_exception_occurred message;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
+	message.exception = exception;
+	message.signal = signal;
+
+	status_t result = thread_hit_debug_event(
+		B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED,
+		&message, sizeof(message), B_EXCEPTION_OCCURRED, NULL, true);
+	return (result != B_THREAD_DEBUG_IGNORE_EVENT);
 }
 
 
 bool
 user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 {
-	// check, if a debugger is installed and is interested in team creation
-	// events
+	// check, if a debugger is installed and is interested in signals
 	struct thread *thread = thread_get_current_thread();
 	int32 teamDebugFlags = atomic_get(&thread->team->debug_info.flags);
 	if (~teamDebugFlags
@@ -961,6 +986,8 @@ debug_nub_thread(void *)
 			debug_nub_write_memory_reply		write_memory;
 			debug_nub_set_breakpoint_reply		set_breakpoint;
 			debug_nub_set_watchpoint_reply		set_watchpoint;
+			debug_nub_get_signal_masks_reply	get_signal_masks;
+			debug_nub_get_signal_handler_reply	get_signal_handler;
 			debug_nub_prepare_handover_reply	prepare_handover;
 		} reply;
 		int32 replySize = 0;
@@ -1072,7 +1099,8 @@ debug_nub_thread(void *)
 
 				struct thread *thread
 					= thread_get_thread_struct_locked(threadID);
-				if (thread->team == thread_get_current_thread()->team) {
+				if (thread
+					&& thread->team == thread_get_current_thread()->team) {
 					flags |= thread->debug_info.flags
 						& B_THREAD_DEBUG_KERNEL_FLAG_MASK;
 					atomic_set(&thread->debug_info.flags, flags);
@@ -1307,6 +1335,175 @@ debug_nub_thread(void *)
 				break;
 			}
 
+			case B_DEBUG_MESSAGE_SET_SIGNAL_MASKS:
+			{
+				// get the parameters
+				thread_id threadID = message.set_signal_masks.thread;
+				uint64 ignore = message.set_signal_masks.ignore_mask;
+				uint64 ignoreOnce = message.set_signal_masks.ignore_once_mask;
+				uint32 ignoreOp = message.set_signal_masks.ignore_op;
+				uint32 ignoreOnceOp = message.set_signal_masks.ignore_once_op;
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_SIGNAL_MASKS: "
+					"thread: %ld, ignore: %llx (op: %lu), ignore once: %llx "
+					"(op: %lu)\n", nubThread->id, threadID, ignore,
+						ignoreOp, ignoreOnce, ignoreOnceOp));
+
+				// set the masks
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread
+					&& thread->team == thread_get_current_thread()->team) {
+					thread_debug_info &threadDebugInfo = thread->debug_info;
+					// set ignore mask
+					switch (ignoreOp) {
+						case B_DEBUG_SIGNAL_MASK_AND:
+							threadDebugInfo.ignore_signals &= ignore;
+							break;
+						case B_DEBUG_SIGNAL_MASK_OR:
+							threadDebugInfo.ignore_signals |= ignore;
+							break;
+						case B_DEBUG_SIGNAL_MASK_SET:
+							threadDebugInfo.ignore_signals = ignore;
+							break;
+					}
+
+					// set ignore once mask
+					switch (ignoreOnceOp) {
+						case B_DEBUG_SIGNAL_MASK_AND:
+							threadDebugInfo.ignore_signals_once &= ignoreOnce;
+							break;
+						case B_DEBUG_SIGNAL_MASK_OR:
+							threadDebugInfo.ignore_signals_once |= ignoreOnce;
+							break;
+						case B_DEBUG_SIGNAL_MASK_SET:
+							threadDebugInfo.ignore_signals_once = ignoreOnce;
+							break;
+					}
+				}
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_GET_SIGNAL_MASKS:
+			{
+				// get the parameters
+				replyPort = message.get_signal_masks.reply_port;
+				thread_id threadID = message.get_signal_masks.thread;
+				status_t result = B_OK;
+
+				// get the masks
+				uint64 ignore = 0;
+				uint64 ignoreOnce = 0;
+				
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread) {
+					ignore = thread->debug_info.ignore_signals;
+					ignoreOnce = thread->debug_info.ignore_signals_once;
+				} else
+					result = B_BAD_THREAD_ID;
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_SIGNAL_MASKS: "
+					"reply port: %ld, thread: %ld, ignore: %llx, "
+					"ignore once: %llx, result: %lx\n", nubThread->id,
+					replyPort, threadID, ignore, ignoreOnce, result));
+
+				// prepare the message
+				reply.get_signal_masks.error = result;
+				reply.get_signal_masks.ignore_mask = ignore;
+				reply.get_signal_masks.ignore_once_mask = ignoreOnce;
+				replySize = sizeof(reply.get_signal_masks);
+				sendReply = true;
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER:
+			{
+				// get the parameters
+				thread_id threadID = message.set_signal_handler.thread;
+				int signal = message.set_signal_handler.signal;
+				struct sigaction &handler = message.set_signal_handler.handler;
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_SET_SIGNAL_HANDLER: "
+					"thread: %ld, signal: %d, handler: %p\n", nubThread->id,
+					threadID, signal, handler.sa_handler));
+
+				// check, if the thread exists and is ours
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread
+					&& thread->team != thread_get_current_thread()->team) {
+					thread = NULL;
+				}
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				// set the handler
+				if (thread)
+					sigaction_etc(threadID, signal, &handler, NULL);
+
+				break;
+			}
+
+			case B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER:
+			{
+				// get the parameters
+				replyPort = message.get_signal_handler.reply_port;
+				thread_id threadID = message.get_signal_handler.thread;
+				int signal = message.get_signal_handler.signal;
+				status_t result = B_OK;
+
+				// check, if the thread exists and is ours
+				cpu_status state = disable_interrupts();
+				GRAB_THREAD_LOCK();
+
+				struct thread *thread
+					= thread_get_thread_struct_locked(threadID);
+				if (thread) {
+					if (thread->team != thread_get_current_thread()->team)
+						result = B_BAD_VALUE;
+				} else
+					result = B_BAD_THREAD_ID;
+
+				RELEASE_THREAD_LOCK();
+				restore_interrupts(state);
+
+				// get the handler
+				if (result == B_OK) {
+					result = sigaction_etc(threadID, signal, NULL,
+						&reply.get_signal_handler.handler);
+				}
+
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_SIGNAL_HANDLER: "
+					"reply port: %ld, thread: %ld, signal: %d, "
+					"handler: %p\n", nubThread->id, replyPort,
+					threadID, signal,
+					reply.get_signal_handler.handler.sa_handler));
+
+				// prepare the message
+				reply.get_signal_handler.error = result;
+				replySize = sizeof(reply.get_signal_handler);
+				sendReply = true;
+				break;
+			}
+
 			case B_DEBUG_MESSAGE_PREPARE_HANDOVER:
 			{
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_PREPARE_HANDOVER\n",
@@ -1392,7 +1589,7 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(team->debug_info);
 
-	// set the user debug flags of all threads to the default
+	// set the user debug flags and signal masks of all threads to the default
 	GRAB_THREAD_LOCK();
 
 	for (struct thread *thread = team->thread_list;
@@ -1403,6 +1600,8 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 				& ~B_THREAD_DEBUG_USER_FLAG_MASK;
 			atomic_set(&thread->debug_info.flags,
 				flags | B_THREAD_DEBUG_DEFAULT_FLAGS);
+			thread->debug_info.ignore_signals = 0;
+			thread->debug_info.ignore_signals_once = 0;
 		}
 	}
 

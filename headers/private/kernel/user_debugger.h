@@ -55,6 +55,12 @@ struct thread_debug_info {
 	port_id		debug_port;
 		// the port the thread is waiting on for commands from the nub thread
 
+	uint64		ignore_signals;
+		// the signals the debugger is not interested in
+	uint64		ignore_signals_once;
+		// the signals the debugger wishes not to be notified of, when they
+		// occur the next time
+
 	struct arch_thread_debug_info	arch_info;
 };
 
@@ -139,7 +145,7 @@ void destroy_thread_debug_info(struct thread_debug_info *info);
 void user_debug_pre_syscall(uint32 syscall, void *args);
 void user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 		bigtime_t startTime);
-bool user_debug_fault_occurred(debug_why_stopped fault);
+bool user_debug_exception_occurred(debug_exception_type exception, int signal);
 bool user_debug_handle_signal(int signal, struct sigaction *handler,
 		bool deadly);
 void user_debug_stop_thread();
