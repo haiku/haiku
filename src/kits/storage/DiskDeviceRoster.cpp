@@ -212,8 +212,8 @@ BDiskDeviceRoster::VisitEachPartition(BDiskDeviceVisitor *visitor,
 }
 
 // Traverse
-/*!	\brief Pre-order traverses the tree of the spanned by the BDiskDevices and
-		   their subobjects.
+/*!	\brief Pre-order traverses the trees of the spanned by the BDiskDevices
+		   and their subobjects.
 
 	The supplied visitor's Visit() is invoked for each device, for each
 	session and for each partition.

@@ -53,7 +53,6 @@ BDiskDevice::~BDiskDevice()
 void
 BDiskDevice::Unset()
 {
-printf("BDiskDevice::Unset()\n");
 	fSessions.MakeEmpty();
 	fUniqueID = -1;
 	fChangeCounter = 0;
