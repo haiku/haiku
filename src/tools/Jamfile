@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src tools ;
 
+SubInclude OBOS_TOP src tools copy_to_bfs_image ;
 SubInclude OBOS_TOP src tools cppunit ;
 SubInclude OBOS_TOP src tools elfsymbolpatcher ;
 SubInclude OBOS_TOP src tools gensyscalls ;
