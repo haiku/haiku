@@ -22,7 +22,7 @@ class PPMWindow :
 public:
 	PPMWindow(
 			BRect area) :
-		BWindow(area, "PPMTranslator", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+		BWindow(area, "PPM Settings", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 		{
 		}
 	~PPMWindow()
