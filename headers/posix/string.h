@@ -41,7 +41,7 @@ extern size_t	strcspn(const char *string, const char *set);
 extern int		strcoll(const char *string1, const char *string2);
 extern size_t	strxfrm(char *string1, const char *string2, size_t length);
 
-extern const char *strerror(int error);
+extern char		*strerror(int errorCode);
 
 // ToDo: remove bzero(), bcopy() from here - we don't need those
 //	implementations anyway, since BeOS defines them as macros
