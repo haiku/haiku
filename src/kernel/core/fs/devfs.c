@@ -1329,6 +1329,25 @@ pnp_driver_info gDeviceForDriversModule = {
 
 
 status_t
+devfs_unpublish_partition(const char *path)
+{
+	dprintf("unpublish partition: %s\n", path);
+	return B_OK;
+}
+
+
+status_t
+devfs_publish_partition(const char *path, const partition_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	dprintf("publish partition: %s (device \"%s\", size %Ld)\n", path, info->device, info->size);
+	return B_OK;
+}
+
+
+status_t
 devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 {
 	int err = 0;
