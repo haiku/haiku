@@ -40,6 +40,7 @@ const uint32 MSG_OUTPUT_TYPE		= 'BTMN';
 const uint32 MSG_SAVE_PANEL			= 'mFSP';
 const uint32 MSG_CLEAR_SELECT		= 'mCSL';
 const uint32 MSG_SELECT_ALL			= 'mSAL';
+const uint32 MSG_SELECT_NONE        = 'mSNO';
 const uint32 MSG_DITHER_IMAGE		= 'mDIM';
 const uint32 MSG_UPDATE_STATUS		= 'mUPS';
 const uint32 MSG_PAGE_FIRST			= 'mPGF';

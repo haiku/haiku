@@ -57,6 +57,7 @@ public:
 	ShowImageView *GetShowImageView() const { return fpImageView; }
 	
 	void UpdateTitle();
+	void BuildViewMenu(BMenu *menu);
 	void LoadMenus(BMenuBar *pbar);
 	void WindowRedimension(BBitmap *pbitmap);
 
@@ -69,8 +70,9 @@ private:
 	void UpdateRecentDocumentsMenu();
 	
 	bool ToggleMenuItem(uint32 what);
-	void EnableMenuItem(uint32 what, bool enable);
-	void MarkMenuItem(uint32 what, bool marked);
+	void EnableMenuItem(BMenu *menu, uint32 what, bool enable);
+	void MarkMenuItem(BMenu *menu, uint32 what, bool marked);
+	void MarkSlideShowDelay(float value);
 			
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
@@ -88,6 +90,7 @@ private:
 	BMenu *fpOpenMenu;
 	BMenu *fpBrowseMenu;
 	BMenu *fpGoToPageMenu;
+	BMenu *fpSlideShowDelay;
 	ShowImageView *fpImageView;
 	ShowImageStatusView *fpStatusView;
 	bool fFullScreen;

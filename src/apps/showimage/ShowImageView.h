@@ -46,6 +46,8 @@ public:
 	void SetImage(const entry_ref *pref);
 	void SetShowCaption(bool show);
 	void ResizeToViewBounds(bool resize);
+	bool GetResizeToViewBounds() const { return fResizeToViewBounds; }
+	void SetAlignment(alignment horizontal, vertical_alignment vertical);
 	BBitmap *GetBitmap();
 	void GetName(BString *name);
 	void GetPath(BString *name);
@@ -57,6 +59,8 @@ public:
 	virtual void MouseDown(BPoint point);
 	virtual void MouseMoved(BPoint point, uint32 state, const BMessage *pmsg);
 	virtual void MouseUp(BPoint point);
+	virtual void KeyDown(const char *bytes, int32 numBytes);
+
 	virtual void MessageReceived(BMessage *pmsg);
 	
 	void FixupScrollBars();
@@ -77,6 +81,7 @@ public:
 	bool NextFile();
 	bool PrevFile();
 	void SetSlideShowDelay(float seconds);
+	bool SlideShowStarted() const { return fSlideShow; }
 	void StartSlideShow();
 	void StopSlideShow();
 	void SetZoom(float zoom);
@@ -124,10 +129,18 @@ private:
 	void SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
 	bool OutputFormatForType(BBitmap* bitmap, const char* type, translation_format* format);
 	void HandleDrop(BMessage* msg);
+	void MoveImage();
+	uint32 GetMouseButtons();
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
 	void DrawCaption();
 	void DrawSelectionBox(BRect &rect);
+	float LimitToRange(float v, orientation o, bool absolute);
+	void ScrollRestricted(float x, float y, bool absolute);
+	void ScrollRestrictedTo(float x, float y);
+	void ScrollRestrictedBy(float x, float y);
+	void MouseWheelChanged(BMessage* msg);
+	void ShowPopUpMenu(BPoint screen);
 	
 	entry_ref fCurrentRef;
 	int32 fDocumentIndex;
@@ -135,10 +148,13 @@ private:
 	BBitmap *fpBitmap;
 	float fZoom;
 	bool fResizeToViewBounds;
+	alignment fHAlignment;
+	vertical_alignment fVAlignment;
 	float fLeft;         // the origin of the image in the view
 	float fTop;
 	float fScaleX;
 	float fScaleY;
+	bool fMovesImage;
 	bool fBeginDrag;
 	bool fMakesSelection; // is a selection being made
 	BPoint fFirstPoint;   // first point in image space of selection

@@ -46,9 +46,12 @@
 #include <NodeInfo.h>
 #include <Clipboard.h>
 #include <Path.h>
+#include <PopUpMenu.h>
+
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
+#include "ShowImageWindow.h"
 
 #ifndef min
 #define min(a,b) ((a)>(b)?(b):(a))
@@ -156,11 +159,14 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fAnimateSelection = true;
 	fbHasSelection = false;
 	fResizeToViewBounds = false;
+	fHAlignment = B_ALIGN_LEFT;
+	fVAlignment = B_ALIGN_TOP;
 	fSlideShow = false;
 	SetSlideShowDelay(3); // 3 seconds
 	fBeginDrag = false;
 	fShowCaption = false;
 	fZoom = 1.0;
+	fMovesImage = false;
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -295,6 +301,19 @@ ShowImageView::ResizeToViewBounds(bool resize)
 	}
 }
 
+void 
+ShowImageView::SetAlignment(alignment horizontal, vertical_alignment vertical)
+{
+	bool hasChanged;
+	hasChanged = fHAlignment != horizontal || fVAlignment != vertical;
+	if (hasChanged) {
+		fHAlignment = horizontal;
+		fVAlignment = vertical;
+		FixupScrollBars();
+		Invalidate();
+	}
+}
+
 BBitmap *
 ShowImageView::GetBitmap()
 {
@@ -346,29 +365,54 @@ BRect
 ShowImageView::AlignBitmap() const
 {
 	BRect rect(fpBitmap->Bounds());
+	float width, height;
+	width = Bounds().Width()-2*PEN_SIZE;
+	height = Bounds().Height()-2*PEN_SIZE;
+	if (width == 0 || height == 0) return rect;
 	if (fResizeToViewBounds) {
-		float width, height;
-		width = Bounds().Width()-2*PEN_SIZE;
-		height = Bounds().Height()-2*PEN_SIZE;
-		if (width > 0 && height > 0) {
-			float s;
-			s = width / rect.Width();
+		float s;
+		s = width / rect.Width();
 			
-			if (s * rect.Height() <= height) {
-				rect.right = width;
-				rect.bottom = s * rect.Height();
-				// center horizontally
-				rect.OffsetBy(0, (height - rect.Height()) / 2);
-			} else {
-				rect.right = height / rect.Height() * rect.Width();
-				rect.bottom = height;
-				// center vertically
-				rect.OffsetBy((width - rect.Width()) / 2, 0);
-			}
+		if (s * rect.Height() <= height) {
+			rect.right = width;
+			rect.bottom = s * rect.Height();
+			// center vertically
+			rect.OffsetBy(0, (height - rect.Height()) / 2);
+		} else {
+			rect.right = height / rect.Height() * rect.Width();
+			rect.bottom = height;
+			// center horizontally
+			rect.OffsetBy((width - rect.Width()) / 2, 0);
 		}
 	} else {
-		rect.right *= fZoom; rect.bottom *= fZoom;
-		rect.OffsetBy(BORDER_WIDTH, BORDER_WIDTH);
+		// zoom image
+		rect.right = (rect.right+1)*fZoom-1; 
+		rect.bottom = (rect.bottom+1)*fZoom-1;
+		// align
+		switch (fHAlignment) {
+			case B_ALIGN_CENTER:
+				if (width > rect.Width()) {
+					rect.OffsetBy((width - rect.Width()) / 2.0, 0);
+					break;
+				}
+				// fall through
+			default:
+			case B_ALIGN_LEFT:
+				rect.OffsetBy(BORDER_WIDTH, 0);
+				break;
+		}
+		switch (fVAlignment) {
+			case B_ALIGN_MIDDLE:
+				if (height > rect.Height()) {
+					rect.OffsetBy(0, (height - rect.Height()) / 2.0);
+				break;
+				}
+				// fall through
+			default:
+			case B_ALIGN_TOP:
+				rect.OffsetBy(0, BORDER_WIDTH);
+				break;
+		}
 	}
 	rect.OffsetBy(PEN_SIZE, PEN_SIZE);
 	return rect;
@@ -486,7 +530,8 @@ ShowImageView::Draw(BRect updateRect)
 			// Draw image	
 			DrawBitmap(fpBitmap, fpBitmap->Bounds(), rect);
 						
-			if (fShowCaption) {
+			if (fShowCaption && !fMovesImage) {
+				// to avoid flickering, disabled during moving with mouse
 				DrawCaption();
 			}
 			
@@ -719,14 +764,54 @@ ShowImageView::HandleDrop(BMessage* msg)
 }
 
 void
-ShowImageView::MouseDown(BPoint point)
+ShowImageView::MoveImage()
 {
-	point = ViewToImage(point);
+	BPoint point, delta;
+	uint32 buttons;
+	// get CURRENT position
+	GetMouse(&point, &buttons);
+	point = ConvertToScreen(point);
+	delta = fFirstPoint - point;
+	fFirstPoint = point;
+	ScrollRestrictedBy(delta.x, delta.y);
+	// in case we miss MouseUp
+	if ((GetMouseButtons() & B_TERTIARY_MOUSE_BUTTON) == 0) {
+		fMovesImage = false;
+		Invalidate();
+	}
+}
+
+uint32
+ShowImageView::GetMouseButtons()
+{
+	uint32 buttons;
+	BPoint point;
+	GetMouse(&point, &buttons);
+	if (buttons == B_PRIMARY_MOUSE_BUTTON) {
+		if ((modifiers() & B_CONTROL_KEY) != 0) {
+			buttons = B_SECONDARY_MOUSE_BUTTON; // simulate second button 
+		} else if ((modifiers() & B_SHIFT_KEY) != 0) {
+			buttons = B_TERTIARY_MOUSE_BUTTON; // simulate third button 
+		}
+	}
+	return buttons;
+}
+
+void
+ShowImageView::MouseDown(BPoint position)
+{
+	BPoint point;
+	uint32 buttons;
+	MakeFocus(true);
+
+	point = ViewToImage(position);
+	buttons = GetMouseButtons();
 	
-	if (fbHasSelection && fSelectionRect.Contains(point)) {
+	if (fbHasSelection && fSelectionRect.Contains(point) &&
+		(buttons & (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON))) {
 		// delay drag until mouse is moved
 		fBeginDrag = true; fFirstPoint = point;
-	} else {
+	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
 		// begin new selection
 		fMakesSelection = true;
 		fbHasSelection = true;
@@ -735,6 +820,14 @@ ShowImageView::MouseDown(BPoint point)
 		fFirstPoint = point;
 		fSelectionRect.Set(point.x, point.y, point.x, point.y);
 		Invalidate(); 
+	} else if (buttons == B_SECONDARY_MOUSE_BUTTON) {
+		ShowPopUpMenu(ConvertToScreen(position));
+	} else if (buttons == B_TERTIARY_MOUSE_BUTTON) {
+		// move image in window
+		SetMouseEventMask(B_POINTER_EVENTS);
+		fMovesImage = true;
+		fFirstPoint = ConvertToScreen(position);
+		Invalidate();
 	}
 }
 
@@ -767,6 +860,8 @@ ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
 {
 	if (fMakesSelection) {
 		UpdateSelectionRect(point, false);
+	} else if (fMovesImage) {
+		MoveImage();
 	} else {
 		BeginDrag(point);
 	}
@@ -778,11 +873,141 @@ ShowImageView::MouseUp(BPoint point)
 	if (fMakesSelection) {
 		UpdateSelectionRect(point, true);
 		fMakesSelection = false;
+	} else if (fMovesImage) {
+		MoveImage();
+		if (fMovesImage) {
+			fMovesImage = false;
+			Invalidate();
+		}
 	} else {
 		BeginDrag(point);
+		fBeginDrag = false;
 	}
-	//fBeginDrag = false;
 	AnimateSelection(true);
+}
+
+float
+ShowImageView::LimitToRange(float v, orientation o, bool absolute)
+{
+	BScrollBar* psb = ScrollBar(o);
+	if (psb) {
+		float min, max, pos;
+		pos = v;
+		if (!absolute) {
+			pos += psb->Value();
+		}
+		psb->GetRange(&min, &max);
+		if (pos < min) {
+			pos = min;
+		} else if (pos > max) {
+			pos = max;
+		}
+		v = pos;
+		if (!absolute) {
+			v -= psb->Value();
+		}
+	}
+	return v;
+}
+
+void
+ShowImageView::ScrollRestricted(float x, float y, bool absolute)
+{
+	if (fResizeToViewBounds) return;
+	
+	if (x != 0) {
+		x = LimitToRange(x, B_HORIZONTAL, absolute);
+	}
+	
+	if (y != 0) {
+		y = LimitToRange(y, B_VERTICAL, absolute);
+	}
+	
+	ScrollBy(x, y);
+}
+
+// XXX method is not unused
+void
+ShowImageView::ScrollRestrictedTo(float x, float y)
+{
+	ScrollRestricted(x, y, true);
+}
+
+void
+ShowImageView::ScrollRestrictedBy(float x, float y)
+{
+	ScrollRestricted(x, y, false);
+}
+
+void
+ShowImageView::KeyDown (const char * bytes, int32 numBytes)
+{
+	if (numBytes == 1) {
+		switch (*bytes) {
+			case B_DOWN_ARROW: 
+				ScrollRestrictedBy(0, 10); Invalidate();
+				break;
+			case B_UP_ARROW: 
+				ScrollRestrictedBy(0, -10); Invalidate();
+				break;
+			case B_LEFT_ARROW: 
+				ScrollRestrictedBy(-10, 0); Invalidate();
+				break;
+			case B_RIGHT_ARROW: 
+				ScrollRestrictedBy(10, 0); Invalidate();
+				break;
+			case B_SPACE:
+			case B_ENTER:
+				NextFile();
+				break;
+			case B_BACKSPACE:
+				PrevFile();
+				break;
+			case B_HOME:
+				break;
+			case B_END:
+				break;
+			case B_ESCAPE:
+				if (fSlideShow) {
+					BMessenger msgr(Window());
+					msgr.SendMessage(MSG_SLIDE_SHOW);
+				}
+				break;
+		}	
+	}
+}
+
+void
+ShowImageView::MouseWheelChanged(BMessage *msg)
+{
+	float dy, dx;
+	float x, y;
+	x = 0; y = 0; 
+	if (msg->FindFloat("be:wheel_delta_x", &dx) == B_OK) {
+		x = dx > 0 ? 20 : -20;
+	}
+	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK) {
+		y = dy > 0 ? 20 : -20;
+	}
+	ScrollRestrictedBy(x, y);
+}
+
+void
+ShowImageView::ShowPopUpMenu(BPoint screen)
+{
+	BPopUpMenu* menu = new BPopUpMenu("PopUpMenu");
+	menu->SetAsyncAutoDestruct(true);
+	menu->SetRadioMode(false);
+
+	ShowImageWindow* showImage = dynamic_cast<ShowImageWindow*>(Window());
+	if (showImage) {
+		showImage->BuildViewMenu(menu);
+	}
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem("Cancel", 0, 0));
+	
+	screen -= BPoint(10, 10);
+	menu->Go(screen, true, false, true);
 }
 
 void
@@ -791,6 +1016,9 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 	switch (pmsg->what) {
 		case B_COPY_TARGET:
 			HandleDrop(pmsg);
+			break;
+		case B_MOUSE_WHEEL_CHANGED:
+			MouseWheelChanged(pmsg);
 			break;
 		default:
 			BView::MessageReceived(pmsg);

@@ -58,6 +58,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	fFullScreen = false;
 	fShowCaption = true; // XXX what is best for default?
 	fPrintSettings = NULL;
+	fpImageView = NULL;
 		
 	// create menu bar	
 	fpBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
@@ -115,6 +116,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 
 		fpImageView->FlushToLeftTop();
 		WindowRedimension(fpImageView->GetBitmap());
+		fpImageView->MakeFocus(true); // to receive KeyDown messages
 		Show();
 	} else {
 		BAlert* alert;
@@ -174,6 +176,55 @@ ShowImageWindow::UpdateRecentDocumentsMenu()
 }
 
 void
+ShowImageWindow::BuildViewMenu(BMenu *pmenu)
+{
+	AddItemMenu(pmenu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, 'W', true);
+	if (fpImageView) {
+		// when invoked from SlideShowView
+		MarkMenuItem(pmenu, MSG_SLIDE_SHOW, fpImageView->SlideShowStarted());
+	}
+	BMenu* pDelay = new BMenu("Slide Delay");
+	if (fpImageView == NULL) {
+		// when invoked from this window
+		fpSlideShowDelay = pDelay;
+	}
+	pDelay->SetRadioMode(true);
+	// Note: ShowImage loades images in window thread so it becomes unresponsive if
+	// slide show delay is too short! (Especially if loading the image takes as long as
+	// or longer than the slide show delay). Should load in background thread!
+	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
+	// AddDelayItem(pDelay, "One Second", 1, false);
+	// AddDelayItem(pDelay, "Two Second", 2, false);
+	AddDelayItem(pDelay, "Three Seconds", 3, true);
+	AddDelayItem(pDelay, "Four Second", 4, false);
+	AddDelayItem(pDelay, "Five Seconds", 5, false);
+	AddDelayItem(pDelay, "Six Seconds", 6, false);
+	AddDelayItem(pDelay, "Seven Seconds", 7, false);
+	AddDelayItem(pDelay, "Eight Seconds", 8, false);
+	AddDelayItem(pDelay, "Nine Seconds", 9, false);
+	AddDelayItem(pDelay, "Ten Seconds", 10, false);
+	AddDelayItem(pDelay, "Twenty Seconds", 20, false);
+	pmenu->AddItem(pDelay);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
+	AddItemMenu(pmenu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
+	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
+	MarkMenuItem(pmenu, MSG_SHOW_CAPTION, fShowCaption);
+
+	if (fpImageView) {
+		bool resize = fpImageView->GetResizeToViewBounds();
+		MarkMenuItem(pmenu, MSG_FIT_TO_WINDOW_SIZE, resize);
+		EnableMenuItem(pmenu, MSG_ORIGINAL_SIZE, !resize);
+		EnableMenuItem(pmenu, MSG_ZOOM_IN, !resize);
+		EnableMenuItem(pmenu, MSG_ZOOM_OUT, !resize);
+	}
+}
+
+void
 ShowImageWindow::LoadMenus(BMenuBar *pbar)
 {
 	BMenu *pmenu = new BMenu("File");
@@ -205,9 +256,10 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Cut", B_CUT, 'X', 0, 'W', false);
 	AddItemMenu(pmenu, "Copy", B_COPY, 'C', 0, 'W', true);
 	AddItemMenu(pmenu, "Paste", B_PASTE, 'V', 0, 'W', false);
-	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Clear", MSG_CLEAR_SELECT, 0, 0, 'W', false);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', true);
+	AddItemMenu(pmenu, "Select None", MSG_SELECT_NONE, 0, 0, 'W', true);
 	pbar->AddItem(pmenu);
 
 	pmenu = fpBrowseMenu = new BMenu("Browse");
@@ -235,35 +287,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pbar->AddItem(pmenu);
 
 	pmenu = new BMenu("View");
-	AddItemMenu(pmenu, "Slide Show", MSG_SLIDE_SHOW, 0, 0, 'W', true);
-	BMenu* pDelay = new BMenu("Slide Delay");
-	pDelay->SetRadioMode(true);
-	// Note: ShowImage loades images in window thread so it becomes unresponsive if
-	// slide show delay is too short! (Especially if loading the image takes as long as
-	// or longer than the slide show delay). Should load in background thread!
-	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
-	// AddDelayItem(pDelay, "One Second", 1, false);
-	// AddDelayItem(pDelay, "Two Second", 2, false);
-	AddDelayItem(pDelay, "Three Seconds", 3, true);
-	AddDelayItem(pDelay, "Four Second", 4, false);
-	AddDelayItem(pDelay, "Five Seconds", 5, false);
-	AddDelayItem(pDelay, "Six Seconds", 6, false);
-	AddDelayItem(pDelay, "Seven Seconds", 7, false);
-	AddDelayItem(pDelay, "Eight Seconds", 8, false);
-	AddDelayItem(pDelay, "Nine Seconds", 9, false);
-	AddDelayItem(pDelay, "Ten Seconds", 10, false);
-	AddDelayItem(pDelay, "Twenty Seconds", 20, false);
-	pmenu->AddItem(pDelay);
-	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Original Size", MSG_ORIGINAL_SIZE, 0, 0, 'W', true);
-	AddItemMenu(pmenu, "Zoom In", MSG_ZOOM_IN, '+', 0, 'W', true);
-	AddItemMenu(pmenu, "Zoom Out", MSG_ZOOM_OUT, '-', 0, 'W', true);	
-	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
-	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
-	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
-	pbar->AddItem(pmenu);
-	MarkMenuItem(MSG_SHOW_CAPTION, fShowCaption);
+	BuildViewMenu(pmenu);
+	pbar->AddItem(pmenu);		
 
 	UpdateRecentDocumentsMenu();
 }
@@ -276,8 +301,9 @@ ShowImageWindow::AddItemMenu(BMenu *pmenu, char *caption, long unsigned int msg,
 	pitem = new BMenuItem(caption, new BMessage(msg), shortcut);
 	
 	if (target == 'A')
-	   pitem->SetTarget(be_app);
-	   
+		pitem->SetTarget(be_app);
+	else
+		pitem->SetTarget(this);   
 	pitem->SetEnabled(benabled);	   
 	pmenu->AddItem(pitem);
 	
@@ -293,6 +319,7 @@ ShowImageWindow::AddDelayItem(BMenu *pmenu, char *caption, float value, bool mar
 	pmsg->AddFloat("value", value);
 	
 	pitem = new BMenuItem(caption, pmsg, 0);
+	pitem->SetTarget(this);
 	
 	if (marked) pitem->SetMarked(true);	   
 	pmenu->AddItem(pitem);
@@ -346,28 +373,42 @@ ShowImageWindow::ToggleMenuItem(uint32 what)
 }
 
 void
-ShowImageWindow::EnableMenuItem(uint32 what, bool enable)
+ShowImageWindow::EnableMenuItem(BMenu *menu, uint32 what, bool enable)
 {
 	BMenuItem* item;
-	item = fpBar->FindItem(what);
+	item = menu->FindItem(what);
 	if (item && item->IsEnabled() != enable) {
-		// XXX: Does this apply to menu items too?
-		// Only call this function if the state is changing
-		// to avoid flickering
 		item->SetEnabled(enable);
 	}
 }
 
 void 
-ShowImageWindow::MarkMenuItem(uint32 what, bool marked)
+ShowImageWindow::MarkMenuItem(BMenu *menu, uint32 what, bool marked)
 {
 	BMenuItem* item;
-	item = fpBar->FindItem(what);
+	item = menu->FindItem(what);
 	if (item && item->IsMarked() != marked) {
 		item->SetMarked(marked);
 	}
 }
 
+void
+ShowImageWindow::MarkSlideShowDelay(float value)
+{
+	const int32 n = fpSlideShowDelay->CountItems();
+	float v;
+	for (int32 i = 0; i < n; i ++) {
+		BMenuItem* item = fpSlideShowDelay->ItemAt(i);
+		if (item) {
+			if (item->Message()->FindFloat("value", &v) == B_OK && v == value) {
+				if (!item->IsMarked()) {
+					item->SetMarked(true);
+				}
+				return;
+			}
+		}
+	}
+}
 
 void
 ShowImageWindow::MessageReceived(BMessage *pmsg)
@@ -402,10 +443,10 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			curPage = fpImageView->CurrentPage();
 			
 			bool benable = (pages > 1) ? true : false;
-			EnableMenuItem(MSG_PAGE_FIRST, benable);
-			EnableMenuItem(MSG_PAGE_LAST, benable);
-			EnableMenuItem(MSG_PAGE_NEXT, benable);
-			EnableMenuItem(MSG_PAGE_PREV, benable);
+			EnableMenuItem(fpBar, MSG_PAGE_FIRST, benable);
+			EnableMenuItem(fpBar, MSG_PAGE_LAST, benable);
+			EnableMenuItem(fpBar, MSG_PAGE_NEXT, benable);
+			EnableMenuItem(fpBar, MSG_PAGE_PREV, benable);
 			
 			if (fpGoToPageMenu->CountItems() != pages) {
 				// Only rebuild the submenu if the number of
@@ -466,10 +507,12 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case B_PASTE:
 			break;
 		case MSG_CLEAR_SELECT:
-			fpImageView->Unselect();
 			break;
 		case MSG_SELECT_ALL:
 			fpImageView->SelectAll();
+			break;
+		case MSG_SELECT_NONE:
+			fpImageView->Unselect();
 			break;
 			
 		case MSG_PAGE_FIRST:
@@ -518,9 +561,9 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 				bool resize;
 				resize = ToggleMenuItem(pmsg->what);
 				fpImageView->ResizeToViewBounds(resize);
-				EnableMenuItem(MSG_ORIGINAL_SIZE, !resize);
-				EnableMenuItem(MSG_ZOOM_IN, !resize);
-				EnableMenuItem(MSG_ZOOM_OUT, !resize);
+				EnableMenuItem(fpBar, MSG_ORIGINAL_SIZE, !resize);
+				EnableMenuItem(fpBar, MSG_ZOOM_IN, !resize);
+				EnableMenuItem(fpBar, MSG_ZOOM_OUT, !resize);
 			}
 			break;
 
@@ -558,6 +601,8 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 				float value;
 				if (pmsg->FindFloat("value", &value) == B_OK) {
 					fpImageView->SetSlideShowDelay(value);
+					// in case message is sent from popup menu
+					MarkSlideShowDelay(value);
 				}
 			}
 			break;
@@ -698,10 +743,12 @@ ShowImageWindow::ToggleFullScreen()
 		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
+		fpImageView->SetAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE);
 	} else {
 		frame = fWindowFrame;
 
 		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
+		fpImageView->SetAlignment(B_ALIGN_LEFT, B_ALIGN_TOP);
 	}
 	fpImageView->SetShowCaption(fFullScreen && fShowCaption);
 	MoveTo(frame.left, frame.top);
