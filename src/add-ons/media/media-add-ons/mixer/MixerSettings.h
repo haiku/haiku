@@ -37,9 +37,6 @@ public:
 	bool	RefuseInputFormatChange();
 	void	SetRefuseInputFormatChange(bool yesno);
 
-	bool	DisplayProfilingData();
-	void	SetDisplayProfilingData(bool yesno);
-
 	void	SaveGain(MixerInput *input);
 	void	LoadGain(MixerInput *input);
 
@@ -75,13 +72,12 @@ protected:
 		bool	AttenuateOutput;
 		bool	NonLinearGainSlider;
 		bool	UseBalanceControl;
-			bool	AllowOutputChannelRemapping;
+		bool	AllowOutputChannelRemapping;
 		bool	AllowInputChannelRemapping;
 		int		InputGainControls;
 		int		ResamplingAlgorithm;
 		bool	RefuseOutputFormatChange;
 		bool	RefuseInputFormatChange;
-		bool	DisplayProfilingData;
 	};
 
 	settings	fSettings;

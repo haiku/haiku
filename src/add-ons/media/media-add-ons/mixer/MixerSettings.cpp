@@ -200,25 +200,6 @@ MixerSettings::SetRefuseInputFormatChange(bool yesno)
 	StartDeferredSave();
 }
 
-bool
-MixerSettings::DisplayProfilingData()
-{
-	bool temp;
-	fLocker->Lock();
-	temp = fSettings.DisplayProfilingData;
-	fLocker->Unlock();
-	return temp;
-}
-
-void
-MixerSettings::SetDisplayProfilingData(bool yesno)
-{
-	fLocker->Lock();
-	fSettings.DisplayProfilingData = yesno;
-	fLocker->Unlock();
-	StartDeferredSave();
-}
-
 void
 MixerSettings::SaveGain(MixerInput *input)
 {
@@ -310,7 +291,6 @@ MixerSettings::Load()
 	fSettings.ResamplingAlgorithm = 0;
 	fSettings.RefuseOutputFormatChange = false;
 	fSettings.RefuseInputFormatChange = false;
-	fSettings.DisplayProfilingData = false;
 	
 	fLocker->Unlock();
 }

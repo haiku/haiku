@@ -1087,10 +1087,6 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 				*ioSize = sizeof(int32);
 				static_cast<int32 *>(value)[0] = fCore->Settings()->RefuseInputFormatChange();
 				break;
-			case 100:	// Display performance profiling data
-				*ioSize = sizeof(int32);
-				static_cast<int32 *>(value)[0] = fCore->Settings()->DisplayProfilingData();
-				break;
 			default:
 				ERROR("unhandled ETC 0x%08lx\n", id);
 				break;
@@ -1150,7 +1146,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id)))
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_BALANCE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -1163,18 +1159,59 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 			// input gain control
 			if (fCore->Settings()->InputGainControls() == 0) {
 				// Physical input channels
-				if (*ioSize < input->GetInputChannelCount() * sizeof(float))
-					goto err;
-				*ioSize = input->GetInputChannelCount() * sizeof(float);
-				for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
-					static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetInputChannelGain(chan));
+				if (fCore->Settings()->UseBalanceControl() && input->GetInputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+					// single channel control + balance
+					if (*ioSize < sizeof(float))
+						goto err;
+					*ioSize = sizeof(float);
+					static_cast<float *>(value)[0] = GAIN_TO_DB((input->GetInputChannelGain(0) + input->GetInputChannelGain(1)) / 2);
+				} else {
+					// multi channel control
+					if (*ioSize < input->GetInputChannelCount() * sizeof(float))
+						goto err;
+					*ioSize = input->GetInputChannelCount() * sizeof(float);
+					for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+						static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetInputChannelGain(chan));
+				}
 			} else {
 				// Virtual output channels
-				if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
+				if (fCore->Settings()->UseBalanceControl() && input->GetMixerChannelCount() == 2 && 1 /*channel mask is stereo */) {
+					// single channel control + balance
+					if (*ioSize < sizeof(float))
+						goto err;
+					*ioSize = sizeof(float);
+					static_cast<float *>(value)[0] = GAIN_TO_DB((input->GetMixerChannelGain(0) + input->GetMixerChannelGain(1)) / 2);
+				} else {
+					// multi channel control
+					if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
+						goto err;
+					*ioSize = input->GetMixerChannelCount() * sizeof(float);
+					for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+						static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetMixerChannelGain(chan));
+				}
+			}
+		}
+		if (PARAM_IS_BALANCE(id)) {
+			if (fCore->Settings()->InputGainControls() == 0) {
+				// Physical input channels
+				float l = input->GetInputChannelGain(0);
+				float r = input->GetInputChannelGain(1);
+				float v = r / (l+r);
+				TRACE("balance l %1.3f, r %1.3f, v %1.3f\n",l,r,v);
+				if (*ioSize < sizeof(float))
 					goto err;
-				*ioSize = input->GetMixerChannelCount() * sizeof(float);
-				for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-					static_cast<float *>(value)[chan] = GAIN_TO_DB(input->GetMixerChannelGain(chan));
+				*ioSize = sizeof(float);
+				static_cast<float *>(value)[0] = v * 100;
+			} else {
+				// Virtual output channels
+				float l = input->GetMixerChannelGain(0);
+				float r = input->GetMixerChannelGain(1);
+				float v = r / (l+r);
+				TRACE("balance l %1.3f, r %1.3f, v %1.3f\n",l,r,v);
+				if (*ioSize < sizeof(float))
+					goto err;
+				*ioSize = sizeof(float);
+				static_cast<float *>(value)[0] = v * 100;
 			}
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
@@ -1257,12 +1294,6 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 					goto err;
 				fCore->Settings()->SetRefuseInputFormatChange(static_cast<const int32 *>(value)[0]);
 				break;
-			case 100:	// Display performance profiling data
-				if (size != sizeof(int32))
-					goto err;
-				fCore->Settings()->SetDisplayProfilingData(static_cast<const int32 *>(value)[0]);
-				// XXX tell the core to display it
-				break;
 			default:
 				ERROR("unhandled ETC 0x%08lx\n", id);
 				break;
@@ -1327,7 +1358,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id)))
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_BALANCE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -1339,16 +1370,67 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			// input gain control
 			if (fCore->Settings()->InputGainControls() == 0) {
 				// Physical input channels
-				if (size < input->GetInputChannelCount() * sizeof(float))
-					goto err;
-				for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
-					input->SetInputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+				if (fCore->Settings()->UseBalanceControl() && input->GetInputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+					// single channel control + balance
+					float l = input->GetInputChannelGain(0);
+					float r = input->GetInputChannelGain(1);
+					float m = (l + r) / 2;	// master volume
+					float v = DB_TO_GAIN(static_cast<const float *>(value)[0]);
+					float f = v / m;		// factor for both channels
+					TRACE("gain set l %1.3f, r %1.3f, m %1.3f, v %1.3f, f %1.3f\n",l,r,m,v,f);
+					input->SetInputChannelGain(0, input->GetInputChannelGain(0) * f);
+					input->SetInputChannelGain(1, input->GetInputChannelGain(1) * f);
+				} else {
+					// multi channel control
+					if (size < input->GetInputChannelCount() * sizeof(float))
+						goto err;
+					for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
+						input->SetInputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+				}
 			} else {
 				// Virtual output channels
-				if (size < input->GetMixerChannelCount() * sizeof(float))
-					goto err;
-				for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
-					input->SetMixerChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+				if (fCore->Settings()->UseBalanceControl() && input->GetMixerChannelCount() == 2 && 1 /*channel mask is stereo */) {
+					// single channel control + balance
+					float l = input->GetMixerChannelGain(0);
+					float r = input->GetMixerChannelGain(1);
+					float m = (l + r) / 2;	// master volume
+					float v = DB_TO_GAIN(static_cast<const float *>(value)[0]);
+					float f = v / m;		// factor for both channels
+					TRACE("gain set l %1.3f, r %1.3f, m %1.3f, v %1.3f, f %1.3f\n",l,r,m,v,f);
+					input->SetMixerChannelGain(0, input->GetMixerChannelGain(0) * f);
+					input->SetMixerChannelGain(1, input->GetMixerChannelGain(1) * f);
+				} else {
+					// multi channel control
+					if (size < input->GetMixerChannelCount() * sizeof(float))
+						goto err;
+					for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+						input->SetMixerChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+				}
+			}
+		}
+		if (PARAM_IS_BALANCE(id)) {
+			if (fCore->Settings()->InputGainControls() == 0) {
+				// Physical input channels
+				float l = input->GetInputChannelGain(0);
+				float r = input->GetInputChannelGain(1);
+				float m = (l + r) / 2;	// master volume
+				float v = static_cast<const float *>(value)[0] / 100; // current balance value
+				float fl = 2 * (1 - v);	// left channel factor of master volume
+				float fr = 2 * v;		// right channel factor of master volume
+				TRACE("balance set l %1.3f, r %1.3f, m %1.3f, v %1.3f, fl %1.3f, fr %1.3f\n",l,r,m,v,fl,fr);
+				input->SetInputChannelGain(0, m * fl);
+				input->SetInputChannelGain(1, m * fr);
+			} else {
+				// Virtual output channels
+				float l = input->GetMixerChannelGain(0);
+				float r = input->GetMixerChannelGain(1);
+				float m = (l + r) / 2;	// master volume
+				float v = static_cast<const float *>(value)[0] / 100; // current balance value
+				float fl = 2 * (1 - v);	// left channel factor of master volume
+				float fr = 2 * v;		// right channel factor of master volume
+				TRACE("balance set l %1.3f, r %1.3f, m %1.3f, v %1.3f, fl %1.3f, fr %1.3f\n",l,r,m,v,fl,fr);
+				input->SetMixerChannelGain(0, m * fl);
+				input->SetMixerChannelGain(1, m * fr);
 			}
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
@@ -1524,7 +1606,6 @@ AudioMixer::UpdateParameterWeb()
 */
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
-	group->MakeDiscreteParameter(PARAM_ETC(100), B_MEDIA_RAW_AUDIO, "Display performance profiling data", B_ENABLE);
 
 	group = top->MakeGroup("");
 	group->MakeNullParameter(PARAM_ETC(1001), B_MEDIA_RAW_AUDIO, "Info:", B_GENERIC);
