@@ -5,6 +5,7 @@ KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>debug.c
 	<$(SOURCE_GRIST)>fs_attr.c
 	<$(SOURCE_GRIST)>fs_index.c
+	<$(SOURCE_GRIST)>image.c
 	<$(SOURCE_GRIST)>port.c
 	<$(SOURCE_GRIST)>sem.c
 	<$(SOURCE_GRIST)>systeminfo.c

@@ -111,6 +111,12 @@ SYSCALL3(sys_get_next_thread_info, 89)
 SYSCALL2(sys_get_team_info, 90)
 SYSCALL2(sys_get_next_team_info, 91)
 
+/* image calls */
+SYSCALL2(sys_register_image, 114)
+SYSCALL1(sys_unregister_image, 115)
+SYSCALL3(sys_get_image_info, 116)
+SYSCALL4(sys_get_next_image_info, 117)
+
 /* VM calls */
 SYSCALL6(sys_vm_create_anonymous_region, 29)
 SYSCALL6(sys_vm_clone_region, 30)
