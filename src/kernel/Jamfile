@@ -51,6 +51,7 @@ KernelLd kernel :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_cache.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
 
@@ -79,6 +80,7 @@ KernelLd kernel.so :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_cache.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
 
@@ -120,6 +122,7 @@ KernelLd libroot.so :
 	os_main.o
 	os_arch_$(OBOS_ARCH).o
 
+	posix_arch_$(OBOS_ARCH).o
 	posix_locale.o
 	posix_main.o
 	posix_malloc.o
