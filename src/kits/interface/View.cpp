@@ -191,12 +191,7 @@ BView::BView(BMessage *archive)
 
 		SetEventMask( evMask, options );
 	}
-/*
-NOTE: this flag is not used any more
-	uint32				dBuf;
-	if ( archive->FindInt32("_dbuf", (int32*)&dBuf) == B_OK ){
-	}
-*/
+
 	BPoint				origin;
 	if ( archive->FindPoint("_origin", &origin) == B_OK)
 		SetOrigin( origin );
@@ -342,6 +337,8 @@ NOTE: we do not use this flag any more
 				data->AddMessage( "_views", &childArchive );
 		}
 	}
+
+	return retval;
 }
 
 //---------------------------------------------------------------------------
@@ -679,7 +676,7 @@ void BView::SetFlags( uint32 flags ){
 		}
 	}
 			
-/*	Some usefull info:
+/*	Some useful info:
 		fFlags is a unsigned long (32 bits)
 		* bits 1-16 are used for BView's flags
 		* bits 17-32 are used for BView' resize mask
@@ -1804,7 +1801,7 @@ void BView:GetFont(BFont* font){
 //---------------------------------------------------------------------------
 
 void BView::GetFontHeight(font_height* height) const{
-	return fState->font.GetHeight( height );
+	fState->font.GetHeight( height );
 }
 
 //---------------------------------------------------------------------------
@@ -2689,9 +2686,9 @@ void BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col){
 		
 		if (comm->count < comm->maxCount){
 			comm->array[ comm->count ].startX	= pt0.x;
-			comm->array[ comm->count ].startX	= pt0.y;
+			comm->array[ comm->count ].startY	= pt0.y;
 			comm->array[ comm->count ].endX		= pt1.x;
-			comm->array[ comm->count ].endX		= pt1.y;
+			comm->array[ comm->count ].endY		= pt1.y;
 			_set_ptr_rgb_color( &(comm->array[ comm->count ].color),
 								col.red, col.green, col.blue, col.alpha );
 			
@@ -2716,6 +2713,7 @@ void BView::EndLineArray(){
 
 		delete comm->array;
 		delete comm;
+		comm = NULL;
 	}
 }
 
@@ -2950,7 +2948,7 @@ void BView::Invalidate(BRect invalRect){
 
 		owner->session->WriteInt32( AS_LAYER_INVAL_RECT );
 		owner->session->WriteRect( invalRect );
-			// ... becasue we want to see the results ASAP
+			// ... because we want to see the results ASAP
 		owner->session->Sync();
 	}
 }

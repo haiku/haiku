@@ -2227,14 +2227,15 @@ void BWindow::decomposeType(window_type type,
 	case B_BORDERED_WINDOW:
 		*look = B_BORDERED_WINDOW_LOOK;
 		*feel = B_NORMAL_WINDOW_FEEL;
-
+		break;
 	case B_UNTYPED_WINDOW:
 		*look = B_TITLED_WINDOW_LOOK;
 		*feel = B_NORMAL_WINDOW_FEEL;
-
+		break;
 	default:
 		*look = B_TITLED_WINDOW_LOOK;
 		*feel = B_NORMAL_WINDOW_FEEL;
+		break;
 	}
 }
 
@@ -3202,21 +3203,21 @@ void BWindow::_ReservedWindow7() { }
 void BWindow::_ReservedWindow8() { }
 
 void BWindow::PrintToStream() const{
-	printf("BWindow '%s' data:
-		Title			= %s
-		Token			= %ld
-		InTransaction 	= %s
-		Active 			= %s
-		fShowLevel		= %d
-		Flags			= %lx
-		send_port		= %ld
-		receive_port	= %ld
-		top_view name	= %s
-		focus view name	= %s
-		lastMouseMoved	= %s
-		session			= %s
-		KeyMenuBar name	= %s
-		DefaultButton	= %s
+	printf("BWindow '%s' data:\
+		Title			= %s\
+		Token			= %ld\
+		InTransaction 	= %s\
+		Active 			= %s\
+		fShowLevel		= %d\
+		Flags			= %lx\
+		send_port		= %ld\
+		receive_port	= %ld\
+		top_view name	= %s\
+		focus view name	= %s\
+		lastMouseMoved	= %s\
+		session			= %s\
+		KeyMenuBar name	= %s\
+		DefaultButton	= %s\
 		# of shortcuts	= %ld",
 		Name(),
 		fTitle!=NULL? fTitle:"NULL",
@@ -3241,25 +3242,25 @@ void BWindow::PrintToStream() const{
 		key->message->PrintToStream();
 	}
 */	
-	printf("
-		topViewToken	= %ld
-		pluseEnabled	= %s
-		isFilePanel		= %s
-		MaskActivated	= %s
-		pulseRate		= %lld
-		waitingForMenu	= %s
-		minimized		= %s
-		Menu semaphore	= %ld
-		maxZoomHeight	= %f
-		maxZoomWidth	= %f
-		minWindHeight	= %f
-		minWindWidth	= %f
-		maxWindHeight	= %f
-		maxWindWidth	= %f
-		frame			= ( %f, %f, %f, %f )
-		look			= %d
-		feel			= %d
-		lastViewToken	= %ld
+	printf("\
+		topViewToken	= %ld\
+		pluseEnabled	= %s\
+		isFilePanel		= %s\
+		MaskActivated	= %s\
+		pulseRate		= %lld\
+		waitingForMenu	= %s\
+		minimized		= %s\
+		Menu semaphore	= %ld\
+		maxZoomHeight	= %f\
+		maxZoomWidth	= %f\
+		minWindHeight	= %f\
+		minWindWidth	= %f\
+		maxWindHeight	= %f\
+		maxWindWidth	= %f\
+		frame			= ( %f, %f, %f, %f )\
+		look			= %d\
+		feel			= %d\
+		lastViewToken	= %ld\
 		pulseRUNNER		= %s\n",
 		fTopViewToken,
 		fPulseEnabled==true?"Yes":"No",
