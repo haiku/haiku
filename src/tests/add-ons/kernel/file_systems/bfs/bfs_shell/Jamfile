@@ -13,14 +13,16 @@ SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 		malloc_debug_flags = -fcheck-memory-usage ;
 	}
 
-	local defines = [ FDefines USER DEBUG $(malloc_debug_defines) ] ;
+	local defines = [ FDefines USER DEBUG
+		#BFS_BIG_ENDIAN_ONLY
+		$(malloc_debug_defines) ] ;
 	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
 }
 
 SimpleTest bfs_shell
 	:
-	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
+	fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
 	sysdep.c hexdump.c argv.c
 
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
@@ -37,6 +39,6 @@ SEARCH on [ FGristFiles
 	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
 
 SEARCH on [ FGristFiles
-		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c
+		fsh.c rootfs.c initfs.c kernel.c cache.c sl.c stub.c tracker.cpp
 		sysdep.c hexdump.c argv.c
 	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
