@@ -168,6 +168,7 @@ BBufferProducer::HandleMessage(int32 message,
 			// when changing this, also change NODE_SET_RUN_MODE
 			fDelay = command->delay;
 			fRunMode = command->mode;
+			TRACE("PRODUCER_SET_RUN_MODE_DELAY: fDelay now %Ld\n", fDelay);
 			SetRunMode(fRunMode);
 			return B_OK;
 		}
@@ -410,6 +411,7 @@ BBufferProducer::SendBuffer(BBuffer *buffer,
 	command.header = *(buffer->Header());
 	command.header.buffer = command.buffer; // buffer->ID();
 	command.header.destination = destination.id;
+	command.header.owner = 0; // XXX fill with "buffer owner info area"
 	command.header.start_time += fDelay; // time compensation as set by BMediaRoster::SetProducerRunModeDelay()
 
 	return SendToPort(destination.port, CONSUMER_BUFFER_RECEIVED, &command, sizeof(command));
