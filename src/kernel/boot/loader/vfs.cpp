@@ -52,7 +52,7 @@ class Descriptor {
 		int32	fRefCount;
 };
 
-#define MAX_VFS_DESCRIPTORS 32
+#define MAX_VFS_DESCRIPTORS 64
 
 list gBootDevices;
 list gPartitions;
@@ -364,7 +364,7 @@ mount_boot_file_systems()
 static Descriptor *
 get_descriptor(int fd)
 {
-	if (fd >= MAX_VFS_DESCRIPTORS)
+	if (fd < 0 || fd >= MAX_VFS_DESCRIPTORS)
 		return NULL;
 
 	return gDescriptors[fd];
