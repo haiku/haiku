@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src add-ons media media-add-ons radeon ;
 
+UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 
