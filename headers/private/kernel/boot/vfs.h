@@ -8,7 +8,7 @@
 
 #include <SupportDefs.h>
 
-#include <util/list.h>
+#include <util/DoublyLinkedList.h>
 #include <boot/stage2_args.h>
 
 
@@ -34,10 +34,14 @@ class Node {
 		status_t Acquire();
 		status_t Release();
 
+		DoublyLinked::Link	fLink;
+
 	protected:
-		list_link	fLink;
 		int32		fRefCount;
 };
+
+typedef DoublyLinked::List<Node> NodeList;
+typedef DoublyLinked::Iterator<Node> NodeIterator;
 
 
 class Directory : public Node {

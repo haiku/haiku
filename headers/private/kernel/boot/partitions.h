@@ -12,7 +12,7 @@
 
 namespace boot {
 
-class Partition : public partition_data, public Node {
+class Partition : public Node, public partition_data {
 	public:
 		Partition(int deviceFD);
 		virtual ~Partition();
@@ -31,13 +31,11 @@ class Partition : public partition_data, public Node {
 		Partition *Parent() const { return fParent; }
 		bool IsFileSystem() const { return fIsFileSystem; }
 
-		static size_t LinkOffset() { return sizeof(partition_data); }
-
 	private:
 		void SetParent(Partition *parent) { fParent = parent; }
 
 		int			fFD;
-		list		fChildren;
+		NodeList	fChildren;
 		Partition	*fParent;
 		bool		fIsFileSystem;
 };
