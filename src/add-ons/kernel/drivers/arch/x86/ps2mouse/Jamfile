@@ -5,7 +5,7 @@ UsePrivateHeaders input kernel ;
 KernelObjects
 	ps2mouse.c
 	:
-	-fno-pic -D_KERNEL_MODE -D_PS2MOUSE_
+	-fno-pic -D_KERNEL_MODE 
 	;
 
 KernelLd ps2mouse :
