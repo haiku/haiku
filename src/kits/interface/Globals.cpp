@@ -33,7 +33,11 @@
 #include <Screen.h>
 #include <PortMessage.h>
 #include <Roster.h>
+#include <Menu.h>
 #include <stdlib.h>
+#include <TextView.h>
+
+#include <WidthBuffer.h>
 
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
@@ -534,22 +538,59 @@ ui_color(color_which which)
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {
-	// Internally calculates the color
-	// TODO: Implement
+	rgb_color result;
+
+	#define LIGHTEN(x) ((uint8)(255.0f - (255.0f - x) * tint))
+	#define DARKEN(x)  ((uint8)(x * (2 - tint)))
+
+	if (tint < 1.0f)
+	{
+		result.red   = LIGHTEN(color.red);
+		result.green = LIGHTEN(color.green);
+		result.blue  = LIGHTEN(color.blue);
+		result.alpha = color.alpha;
+	}
+	else
+	{
+		result.red   = DARKEN(color.red);
+		result.green = DARKEN(color.green);
+		result.blue  = DARKEN(color.blue);
+		result.alpha = color.alpha;
+	}
+
+	#undef LIGHTEN
+	#undef DARKEN
+
+	return result;
 }
 
 
 extern "C" status_t
 _init_interface_kit_()
 {
-	// TODO: Find out what this does and when it's called
+	sem_id widthSem = create_sem(1, "TextView WidthBuffer Sem");
+	if (widthSem < 0)
+		return widthSem;
+	BTextView::sWidthSem = widthSem;
+	BTextView::sWidthAtom = 0;
+	BTextView::sWidths = new _BWidthBuffer_;
+		
+	status_t result = get_menu_info(&BMenu::sMenuInfo);
+	if (result != B_OK)  
+		return result;
+	
+	//TODO: fill the other static members
+		
+	return B_OK;
 }
 
 
 extern "C" status_t
 _fini_interface_kit_()
 {
-	// TODO: Find out what this does and when it's called
+	//TODO: Implement ?
+	
+	return B_OK;
 }
 
 
