@@ -648,7 +648,7 @@ put_death_stack_and_reschedule(uint32 index)
 // used to pass messages between thread_exit and thread_exit2
 
 struct thread_exit_args {
-	struct thread *t;
+	struct thread *thread;
 	region_id old_kernel_stack;
 	int int_state;
 	uint32 death_stack;
@@ -671,19 +671,19 @@ thread_exit2(void *_args)
 
 	// delete the old kernel stack region
 	TRACE(("thread_exit2: deleting old kernel stack id 0x%lx for thread 0x%lx\n",
-		args.old_kernel_stack, args.t->id));
+		args.old_kernel_stack, args.thread->id));
 
 	delete_area(args.old_kernel_stack);
 
 	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.t->id));
+	TRACE(("thread_exit2: removing thread 0x%lx from global lists\n", args.thread->id));
 
 	disable_interrupts();
 	GRAB_TEAM_LOCK();
-	remove_thread_from_team(team_get_kernel_team(), args.t);
+	remove_thread_from_team(team_get_kernel_team(), args.thread);
 	RELEASE_TEAM_LOCK();
 	GRAB_THREAD_LOCK();
-	hash_remove(sThreadHash, args.t);
+	hash_remove(sThreadHash, args.thread);
 	RELEASE_THREAD_LOCK();
 
 	// restore former thread interrupts (doesn't matter much at this point anyway)
@@ -695,7 +695,7 @@ thread_exit2(void *_args)
 		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
 
 	// set the next state to be gone. Will return the thread structure to a ready pool upon reschedule
-	args.t->next_state = THREAD_STATE_FREE_ON_RESCHED;
+	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
 
 	// return the death stack and reschedule one last time
 	put_death_stack_and_reschedule(args.death_stack);
@@ -712,7 +712,7 @@ thread_exit(void)
 	struct thread *t = thread_get_current_thread();
 	struct team *team = t->team;
 	thread_id mainParentThread = -1;
-	bool delete_team = false;
+	bool deleteTeam = false;
 	uint32 death_stack;
 	sem_id cached_death_sem;
 	status_t status;
@@ -747,7 +747,7 @@ thread_exit(void)
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&t->alarm);
 
-	// delete the user stack region first
+	// delete the user stack region first, we won't need it anymore
 	if (team->aspace != NULL && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
 		t->user_stack_region_id = -1;
@@ -765,7 +765,7 @@ thread_exit(void)
 
 		if (team->main_thread == t) {
 			// this was main thread in this team
-			delete_team = true;
+			deleteTeam = true;
 
 			// remember who our parent was so we can send a signal
 			mainParentThread = team->parent->main_thread->id;
@@ -781,7 +781,7 @@ thread_exit(void)
 	}
 
 	// delete the team if we're its main thread
-	if (delete_team) {
+	if (deleteTeam) {
 		team_delete_team(team);
 
 		send_signal_etc(mainParentThread, SIGCHLD, B_DO_NOT_RESCHEDULE);
@@ -803,7 +803,7 @@ thread_exit(void)
 		args.int_state = get_death_stack(&death_stack);
 			// this disables interrups for us
 
-		args.t = t;
+		args.thread = t;
 		args.old_kernel_stack = t->kernel_stack_region_id;
 		args.death_stack = death_stack;
 		args.death_sem = cached_death_sem;
@@ -1512,53 +1512,58 @@ snooze_until(bigtime_t timeout, int timebase)
 status_t
 wait_for_thread(thread_id id, status_t *_returnCode)
 {
-	sem_id sem;
+	struct thread *thread;
 	cpu_status state;
-	struct thread *t;
-	int rc;
+	status_t status;
+	sem_id sem;
 
-	rc = send_signal_etc(id, SIGCONT, 0);
-	if (rc != B_OK)
-		return rc;
-	
+	// we need to resume the thread we're waiting for first
+	status = resume_thread(id);
+	if (status != B_OK)
+		return status;
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	t = thread_get_thread_struct_locked(id);
-	sem = t != NULL ? t->return_code_sem : B_BAD_THREAD_ID;
+	thread = thread_get_thread_struct_locked(id);
+	sem = thread != NULL ? thread->return_code_sem : B_BAD_THREAD_ID;
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	rc = acquire_sem(sem);
+	if (sem == B_BAD_THREAD_ID)
+		return B_BAD_THREAD_ID;
+
+	status = acquire_sem(sem);
 
 	/* This thread died the way it should, dont ripple a non-error up */
-	if (rc == B_BAD_SEM_ID) {
-		rc = B_NO_ERROR;
+	if (status == B_BAD_SEM_ID) {
+		status = B_NO_ERROR;
 
 		if (_returnCode) {
-			t = thread_get_current_thread();
+			thread = thread_get_current_thread();
 			TRACE(("wait_for_thread: thread %ld got return code 0x%x\n",
-				t->id, t->sem_deleted_retcode));
-			*_returnCode = t->sem_deleted_retcode;
+				thread->id, thread->sem_deleted_retcode));
+			*_returnCode = thread->sem_deleted_retcode;
 		}
-	}
+	} else if (status == B_OK)
+		panic("could acquire return_code_sem for thread %lx\n", id);
 
-	return rc;
+	return status;
 }
 
 
 status_t
 suspend_thread(thread_id id)
 {
-	return send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
+	return send_signal(id, SIGSTOP);
 }
 
 
 status_t
 resume_thread(thread_id id)
 {
-	return send_signal_etc(id, SIGCONT, B_DO_NOT_RESCHEDULE);
+	return send_signal(id, SIGCONT);
 }
 
 
@@ -1748,7 +1753,8 @@ _user_wait_for_thread(thread_id id, status_t *userReturnCode)
 
 	status = wait_for_thread(id, &returnCode);
 
-	if (userReturnCode && user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK)
+	if (status == B_OK && userReturnCode != NULL
+		&& user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
