@@ -810,6 +810,10 @@ bfs_write_stat(void *_ns, void *_node, struct stat *stat, long mask)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
+
 	WriteLocked locked(inode->Lock());
 	if (locked.IsLocked() < B_OK)
 		RETURN_ERROR(B_ERROR);
@@ -901,6 +905,9 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 	cookie->last_size = 0;
 	cookie->last_notification = system_time();
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	status = Inode::Create(&transaction, directory, name, S_FILE | (mode & S_IUMSK),
@@ -939,6 +946,9 @@ bfs_symlink(void *_ns, void *_directory, const char *name, const char *path)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	Inode *link;
@@ -1001,6 +1011,9 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 	if (status < B_OK)
 		return status;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
@@ -1061,8 +1074,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	if (oldDirectory != newDirectory) {
 		vnode_id parent = volume->ToVnode(newDirectory->Parent());
 		vnode_id root = volume->RootNode()->ID();
-		while (true)
-		{
+
+		while (true) {
 			if (parent == id)
 				return B_BAD_VALUE;
 			else if (parent == root || parent == oldDirectory->ID())
@@ -1228,8 +1241,8 @@ bfs_open(void *_ns, void *_node, int omode, void **_cookie)
 
 	// Should we truncate the file?
 	if (omode & O_TRUNC) {
-		Transaction transaction(volume, inode->BlockNumber());
 		WriteLocked locked(inode->Lock());
+		Transaction transaction(volume, inode->BlockNumber());
 
 		status_t status = inode->SetFileSize(&transaction, 0);
 		if (status < B_OK) {
@@ -1342,6 +1355,9 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 	Inode *inode = (Inode *)_node;
 
 	if (cookie->open_mode & O_RWMASK) {
+#ifdef UNSAFE_GET_VNODE
+		RecursiveLocker locker(volume->Lock());
+#endif
 		ReadLocked locked(inode->Lock());
 
 		// trim the preallocated blocks and update the size,
@@ -1487,6 +1503,9 @@ bfs_mkdir(void *_ns, void *_directory, const char *name, int mode)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	// Inode::Create() locks the inode if we pass the "id" parameter, but we
@@ -1515,6 +1534,9 @@ bfs_rmdir(void *_ns, void *_directory, const char *name)
 	Volume *volume = (Volume *)_ns;
 	Inode *directory = (Inode *)_directory;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, directory->BlockNumber());
 
 	off_t id;
@@ -1738,6 +1760,9 @@ bfs_remove_attr(void *_ns, void *_node, const char *name)
 	if (status < B_OK)
 		return status;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, inode->BlockNumber());
 
 	status = inode->RemoveAttribute(&transaction, name);
@@ -1827,6 +1852,9 @@ bfs_write_attr(void *_ns, void *_node, const char *name, int type, const void *b
 	if (status < B_OK)
 		return status;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, inode->BlockNumber());
 
 	status = inode->WriteAttribute(&transaction, name, type, pos, (const uint8 *)buffer, _length);
@@ -1947,6 +1975,9 @@ bfs_create_index(void *_ns, const char *name, int type, int flags)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, volume->Indices());
 
 	Index index(volume);
@@ -1979,6 +2010,9 @@ bfs_remove_index(void *_ns, const char *name)
 	if ((indices = volume->IndicesNode()) == NULL)
 		return B_ENTRY_NOT_FOUND;
 
+#ifdef UNSAFE_GET_VNODE
+	RecursiveLocker locker(volume->Lock());
+#endif
 	Transaction transaction(volume, volume->Indices());
 
 	status_t status = indices->Remove(&transaction, name);

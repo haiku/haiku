@@ -971,6 +971,9 @@ BlockAllocator::CheckNextNode(check_control *control)
 				// if we are allowed to fix errors, we should remove the file
 				if (control->flags & BFS_REMOVE_WRONG_TYPES
 					&& control->flags & BFS_FIX_BITMAP_ERRORS) {
+#ifdef UNSAFE_GET_VNODE
+					RecursiveLocker locker(fVolume->Lock());
+#endif
 					// it's safe to start a transaction, because Inode::Remove()
 					// won't touch the block bitmap (which we hold the lock for)
 					// if we set the INODE_DONT_FREE_SPACE flag - since we fix

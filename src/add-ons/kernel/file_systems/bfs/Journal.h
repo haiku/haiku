@@ -36,6 +36,14 @@ struct log_entry : node<log_entry> {
 };
 
 
+// Locking policy in BFS: if you need both, the volume lock and the
+//	journal lock, you must lock the volume first - or else you will
+//	end up in a deadlock.
+//	That is, if you start a transaction, and will need to lock the
+//	volume while the transaction is in progress (for the unsafe
+//	get_vnode() call, for example), you must lock the volume before
+//	starting the transaction.
+
 class Journal {
 	public:
 		Journal(Volume *);
