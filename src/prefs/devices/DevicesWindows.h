@@ -15,6 +15,18 @@ Devices Windows Header by Sikosis
 class DevicesView;
 class ResourceUsageView;
 
+class ResourceUsageWindow : public BWindow
+{
+	public:
+    	ResourceUsageWindow(BRect frame);
+	    ~ResourceUsageWindow();
+	    virtual void MessageReceived(BMessage *message);
+	private:
+		void InitWindow(void);
+	    ResourceUsageView*	 ptrResourceUsageView;
+};
+
+
 class DevicesWindow : public BWindow
 {
 	public:
@@ -27,24 +39,13 @@ class DevicesWindow : public BWindow
 		void InitWindow(void);
 		void LoadSettings(BMessage *msg);
 		void SaveSettings(void);
+		ResourceUsageWindow* ptrResourceUsageWindow; 
 		
         BStringView      *stvDeviceName;
         BStringView      *stvCurrentState;
         BMenuBar		 *menubar;        
         
 	    DevicesView*	 ptrDevicesView;
-};
-
-
-class ResourceUsageWindow : public BWindow
-{
-	public:
-    	ResourceUsageWindow(BRect frame);
-	    ~ResourceUsageWindow();
-	    virtual void MessageReceived(BMessage *message);
-	private:
-		void InitWindow(void);
-	    ResourceUsageView*	 ptrResourceUsageView;
 };
 
 #endif

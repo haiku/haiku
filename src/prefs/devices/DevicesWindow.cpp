@@ -280,6 +280,11 @@ void DevicesWindow::MessageReceived (BMessage *message)
 				QuitRequested();
 			}	
 			break;
+		case MENU_DEVICES_RESOURCE_USAGE:
+			{
+				ptrResourceUsageWindow = new ResourceUsageWindow(BRect (0,0,430,350));
+			}
+			break;	
 		default:
 			BWindow::MessageReceived(message);
 			break;

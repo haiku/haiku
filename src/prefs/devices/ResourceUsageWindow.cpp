@@ -41,7 +41,7 @@ static void CenterWindowOnScreen(BWindow* w)
 // -------------------------------------------------------------------------------------------------- //
 
 // ResourceUsageWindow - Constructor
-ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "ResourceUsageWindow", B_TITLED_WINDOW, B_NORMAL_WINDOW_FEEL , 0)
+ResourceUsageWindow::ResourceUsageWindow(BRect frame) : BWindow (frame, "Resource Usage", B_TITLED_WINDOW, B_MODAL_SUBSET_WINDOW_FEEL , 0)
 {
 	InitWindow();
 	CenterWindowOnScreen(this);
