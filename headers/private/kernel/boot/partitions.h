@@ -49,8 +49,10 @@ class Partition : public Node, public partition_data {
 
 // DiskDeviceTypes we need/support in the boot loader
 #define kPartitionTypeAmiga		"Amiga RDB"
-#define kPartitionTypeIntel		"Intel"
-#define kPartitionTypeIntelExtended "Intel Extended"
+#define kPartitionTypeIntel		"Intel Partition Map"
+#define kPartitionTypeIntelExtended "Intel Extended Partition"
+	// Note: The naming of these two at least must be consistent with
+	// DiskDeviceTypes.cpp.
 #define kPartitionTypeApple		"Apple"
 
 #define kPartitionTypeBFS		"BFS Filesystem"
