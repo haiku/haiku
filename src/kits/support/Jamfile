@@ -1,1 +1,13 @@
 SubDir OBOS_TOP src kits support ;
+
+UsePrivateHeaders support ;
+
+SharedLibrary textencoding :
+	CharacterSet.cpp
+	CharacterSetRoster.cpp
+	character_sets.cpp
+	utf8_conversions.cpp
+	;
+LinkSharedOSLibs libtextencoding.so :
+	be
+	;
