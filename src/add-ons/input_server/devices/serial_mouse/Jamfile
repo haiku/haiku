@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src add-ons input_server devices serial_mouse ;
+
+UsePrivateHeaders input ;
+
+Addon <input>serial_mouse : input_server/devices : 
+	MouseInputDevice.cpp 
+	SerialMouse.cpp
+	: false 
+	: be device <nogrist>input_server ;
+
+if $(COMPILE_FOR_R5) {
+} else {
+        LinkSharedOSLibs <input>mouse : <boot!home!config!lib>libopenbeos.so ;
+}
+
+Package haiku-inputkit-cvs :
+        <input>serial_mouse :
+        boot home config add-ons input_server devices ;
