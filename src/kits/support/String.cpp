@@ -451,9 +451,8 @@ BString::RemoveFirst(const char *str)
 {
 	if (str) {
 		int32 pos = _FindAfter(str, 0, -1);
-		int32 len = strlen(str);
 		if (pos >= 0)
-			_privateData = _ShrinkAtBy(pos, len);
+			_privateData = _ShrinkAtBy(pos, strlen(str));
 	}
 	return *this;
 }
@@ -610,11 +609,8 @@ BString::FindFirst(const char *string, int32 fromOffset) const
 int32
 BString::FindFirst(char c) const
 {
-	char *tmp = (char*)malloc(2);
-	tmp[0] = c;
-	tmp[1] = '\0';
+	char tmp[2] = { c, '\0' };
 	int32 result = _FindAfter(tmp, 0, -1);
-	free(tmp);
 	
 	return result;	
 }
@@ -623,11 +619,8 @@ BString::FindFirst(char c) const
 int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
-	char *tmp = (char*)malloc(2);
-	tmp[0] = c;
-	tmp[1] = '\0';
+	char tmp[2] = { c, '\0' };
 	int32 result = _FindAfter(tmp, fromOffset, -1);
-	free(tmp);
 	
 	return result;	
 }
@@ -814,9 +807,7 @@ BString::UnlockBuffer(int32 length)
 BString&
 BString::ToLower()
 {
-	int count = 0;
-	for (; count < Length(); count++)
-		if (isalpha(_privateData[count]))
+	for (int count = 0; count < Length(); count++)
 			_privateData[count] = tolower(_privateData[count]);
 	
 	return *this;
@@ -825,10 +816,8 @@ BString::ToLower()
 
 BString&
 BString::ToUpper()
-{
-	int count = 0;
-	for (; count < Length(); count++)
-		if (isalpha(_privateData[count]))
+{	
+	for (int count = 0; count < Length(); count++)
 			_privateData[count] = toupper(_privateData[count]);
 	
 	return *this;
@@ -838,8 +827,8 @@ BString::ToUpper()
 BString&
 BString::Capitalize()
 {
-	int count = 0;
-	for (; count < Length(); count++)
+	
+	for (int count = 0; count < Length(); count++)
 		if (isalpha(_privateData[count])) {
 			_privateData[count] = toupper(_privateData[count]);
 			break;
