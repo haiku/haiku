@@ -14,9 +14,9 @@ char	netsh_id[]="\
 #include <sys/types.h>
 #ifndef WIN32
 #include <unistd.h>
-#ifndef __VMS
+#if !defined(__VMS) && !defined(__BEOS__)
 #include <sys/ipc.h>
-#endif /* __VMS */
+#endif /* __VMS or __BEOS__ */
 #endif /* WIN32 */
 #include <fcntl.h>
 #include <errno.h>

@@ -55,9 +55,9 @@ char	nettest_id[]="\
 #endif /* NOSTDLIBH */
 
 #ifndef WIN32
-#if !defined(__VMS)
+#if !defined(__VMS) && !defined(__BEOS__)
 #include <sys/ipc.h>
-#endif /* !defined(__VMS) */
+#endif /* !defined(__VMS) && !define(__BEOS__) */
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
