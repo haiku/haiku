@@ -177,7 +177,7 @@ enum {
 
 	// ToDo: these are here only temporarily - it's a private
 	//	addition to the BeOS create_area() flags
-	B_ALREADY_WIRED = 5
+	B_ALREADY_WIRED = 6
 };
 
 enum {
@@ -202,7 +202,7 @@ enum {
 
 #define LOCK_RO		0
 #define LOCK_RW		1
-#define LOCK_KERNEL	(B_KERNEL_PROTECTION)
+#define LOCK_KERNEL	2
 
 #define PROTECTION_TO_LOCK(protection) \
 	(protection & B_KERNEL_PROTECTION ? \
