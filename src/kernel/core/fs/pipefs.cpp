@@ -575,6 +575,8 @@ read_request::PutBuffer(const void **_buffer, size_t *_bufferSize)
 
 	uint8 *source = (uint8 *)*_buffer;
 
+	// ToDo: how is that supposed to work if the addresses are in
+	//	different address spaces?
 	if (user_memcpy((uint8 *)buffer + bytes_read, source, bytes) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -932,6 +934,11 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 	read_request request;
 	request.buffer = buffer;
+		// ToDo: what the hell? How is this supposed to work with applications
+		//	that have a different address space? At least read_request::PutBuffer()
+		//	is problematic - it should only do something if the buffer is either
+		//	local, or large enough so that mirroring/copying the other address
+		//	space is faster than the buffer chain.
 	request.buffer_size = *_length;
 	request.bytes_read = 0;
 
