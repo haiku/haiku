@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-1/2004.
+	Rudolf Cornelissen 10/2002-3/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -110,7 +110,6 @@ report success or failure.
 */
 status_t INIT_ACCELERANT(int the_fd) {
 	status_t result;
-	int pointer_reservation; //mem reserved for pointer
 	int cnt; 				 //used for iteration through the overlay buffers
 
 	if (1) {
@@ -161,15 +160,13 @@ status_t INIT_ACCELERANT(int the_fd) {
 	si->cursor.y = 0;
 
 	/*
-	Put the frame buffer immediately following the cursor data. We store this
+	Put the frame buffer at the beginning of the cardRAM because the acc engine
+	does not support offsets, or we lack info to get that ability. We store this
 	info in a frame_buffer_config structure to make it convienient to return
 	to the app_server later.
 	*/
-	pointer_reservation = 0;
-	if (si->settings.hardcursor) pointer_reservation = si->ps.curmem_size;
-
-	si->fbc.frame_buffer = (void *)((char *)si->framebuffer+pointer_reservation);
-	si->fbc.frame_buffer_dma = (void *)((char *)si->framebuffer_pci+pointer_reservation);
+	si->fbc.frame_buffer = si->framebuffer;
+	si->fbc.frame_buffer_dma = si->framebuffer_pci;
 
 	/* count of issued parameters or commands */
 	si->engine.last_idle = si->engine.count = 0;

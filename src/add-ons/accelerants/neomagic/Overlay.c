@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/06-2003 */
+/* Written by Rudolf Cornelissen 05-2002/03-2004 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -176,9 +176,10 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* calculate first free RAM adress in card:
 		 * Driver setup is as follows: 
-		 * card base: 		- hardware cursor bitmap (if used),
-		 * directly above	- screen memory for both heads */
-		adress2 = (((uint32)((uint8*)si->fbc.frame_buffer)) +	/* cursor already included here */
+		 * card base: 		- screen memory,
+		 * free space:      - used for overlay,
+		 * card top:        - hardware cursor bitmap (if used) */
+		adress2 = (((uint32)((uint8*)si->fbc.frame_buffer)) +	/* cursor not yet included here */
 			(si->fbc.bytes_per_row * si->dm.virtual_height));	/* size in bytes of screen(s) */
 		LOG(4,("Overlay: first free cardRAM virtual adress $%08x\n", adress2));
 
@@ -189,6 +190,9 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* calculate virtual memory adress that would be needed for a new bitmap */
 		adress = (((uint32)((uint8*)si->framebuffer)) + (si->ps.memory_size * 1024));
+		/* take cursor into account (if it exists) */
+		if(si->settings.hardcursor) adress -= si->ps.curmem_size;
+		LOG(4,("Overlay: last free cardRAM virtual adress $%08x\n", (adress - 1)));
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;
@@ -273,6 +277,8 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 
 		/* calculate physical memory adress (for dma use) */
 		adress = (((uint32)((uint8*)si->framebuffer_pci)) + (si->ps.memory_size * 1024));
+		/* take cursor into account (if it exists) */
+		if(si->settings.hardcursor) adress -= si->ps.curmem_size;
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
 			adress -= si->overlay.myBufInfo[cnt].size;

@@ -23,11 +23,11 @@ blit
 status_t nm_acc_wait_idle()
 {
 	/* wait until engine completely idle */
-	while (ACCR(STATUS) & 0x00000001)
-	{
-		/* snooze a bit so I do not hammer the bus */
-		snooze (100); 
-	}
+	/* Note:
+	 * because we have no FIFO functionality we have to make sure we return ASAP(!).
+	 * snoozing() for just 1 microSecond already more than halfs the engine
+	 * performance... */
+	while (ACCR(STATUS) & 0x00000001);
 
 	return B_OK;
 }
@@ -101,11 +101,13 @@ status_t nm_acc_init()
 
 	/* setup buffer startadress */
 	/* fixme when/if possible:
-	 * not possible on all cards or not enough specs known :-/ (tried NM2160)
-	 * workaround: place cursor bitmap _after_ screenbuffer instead of vice versa. */
+	 * not possible on all cards or not enough specs known. (tried NM2160)
+	 * workaround: place cursor bitmap at _end_ of cardRAM instead of in _beginning_. */
 
 	/* setup clipping */
-	/* apparantly not needed. */
+	si->engine.control |= (1 << 26);
+	ACCW(CLIPLT, 0);
+	ACCW(CLIPRB, ((si->dm.virtual_height << 16) | (si->dm.virtual_width & 0x0000ffff)));
 
 	return B_OK;
 }
@@ -123,7 +125,7 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
     {
 		/* start with upper left corner */
 		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
-		ACCW(BLTCNTL, si->engine.control | 0x830c0000);
+		ACCW(CONTROL, si->engine.control | 0x830c0000);
 		/* send command and exexute */
 		ACCW(SRCSTARTOFF, ((ys << 16) | (xs & 0x0000ffff)));
 		ACCW(DSTSTARTOFF, ((yd << 16) | (xd & 0x0000ffff)));
@@ -133,7 +135,7 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
     {
 		/* start with lower right corner */
 		/* use ROP GXcopy (b16-19), and use XY coord. system (b24-25) */
-		ACCW(BLTCNTL, (si->engine.control | 0x830c0013));
+		ACCW(CONTROL, (si->engine.control | 0x830c0013));
 		/* send command and exexute */
 		ACCW(SRCSTARTOFF, (((ys + h) << 16) | ((xs + w) & 0x0000ffff)));
 		ACCW(DSTSTARTOFF, (((yd + h) << 16) | ((xd + w) & 0x0000ffff)));
@@ -153,7 +155,7 @@ status_t nm_acc_setup_rectangle(uint32 color)
 	nm_acc_wait_idle();
 
 	/* use ROP GXcopy (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
-	ACCW(BLTCNTL, (si->engine.control | 0x830c0008));
+	ACCW(CONTROL, (si->engine.control | 0x830c0008));
 	/* setup color */
 	ACCW(FGCOLOR, color);
 
@@ -162,6 +164,12 @@ status_t nm_acc_setup_rectangle(uint32 color)
 
 status_t nm_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
+	/* The engine does not take kindly if we try to let it fill a rect with
+	 * zero width. Dano's app_server occasionally tries to let us do that though!
+	 * Testable with BeRoMeter 1.2.6, all Ellipses tests. Effect of zero width fill:
+	 * horizontal lines across the entire screen at top and bottom of ellipses. */
+	if (xe == xs) return B_OK;
+
 	/* make sure the previous command (if any) is completed */
 //	does not work yet:
 //	nm_acc_wait_fifo(2);
@@ -185,7 +193,7 @@ status_t nm_acc_setup_rect_invert()
 	nm_acc_wait_idle();
 
 	/* use ROP GXinvert (b16-19), use XY coord. system (b24-25), do foreground color (b3) */
-	ACCW(BLTCNTL, (si->engine.control | 0x83050008));
+	ACCW(CONTROL, (si->engine.control | 0x83050008));
 	/* reset color */
 	ACCW(FGCOLOR, 0);
 
@@ -194,6 +202,10 @@ status_t nm_acc_setup_rect_invert()
 
 status_t nm_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
+	/* The engine probably also does not take kindly if we try to let it invert a
+	 * rect with zero width... (see nm_acc_rectangle() routine for explanation.) */
+	if (xe == xs) return B_OK;
+
 	/* make sure the previous command (if any) is completed */
 //	does not work yet:
 //	nm_acc_wait_fifo(4);

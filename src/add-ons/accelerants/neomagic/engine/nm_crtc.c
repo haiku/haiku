@@ -569,14 +569,17 @@ status_t nm_crtc_cursor_init()
 {
 	int i;
 	uint32 * fb;
-	/* cursor bitmap will be stored at the start of the framebuffer */
-	uint32 curadd = 0, curreg;
+	uint32 curadd, curreg;
+
+	/* the cursor is at the end of cardRAM */
+	curadd = ((si->ps.memory_size * 1024) - si->ps.curmem_size);
 
 	/* set cursor bitmap adress on a 1kb boundary, and move the bits around
 	 * so they get placed at the correct registerbits */
-	//fixme: NM2380 must have an extra bit for > 4Mb???
 	curreg = (((curadd >> 10) & 0x000f) << 8);
 	curreg |= (((curadd >> 10) & 0x0ff0) >> 4);
+	/* NM2380 must have an extra bit for > 4Mb: assuming it to be on b12... */
+	curreg |= ((curadd >> 10) & 0x1000);
 
 	if (si->ps.card_type < NM2200)
 		CR1W(CURADDRESS, curreg);
@@ -650,8 +653,9 @@ status_t nm_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 	uint8 y;
 	uint8 * cursor;
 
-	/*get a pointer to the cursor*/
+	/* get a pointer to the cursor: it's at the end of cardRAM */
 	cursor = (uint8*) si->framebuffer;
+	cursor += ((si->ps.memory_size * 1024) - si->ps.curmem_size);
 
 	/*draw the cursor*/
 	for(y=0;y<16;y++)
