@@ -2,6 +2,7 @@
 #define _OGG_READER_PLUGIN_H
 
 #include "ReaderPlugin.h"
+#include "ogg/ogg.h"
 
 namespace BPrivate { namespace media {
 
@@ -34,38 +35,9 @@ public:
 	BPositionIO *Source() { return fSeekableSource; }
 
 private:
-	bool		ParseFile();
-	bool 		IsMp3File();
-	
-	// checks if the buffer contains a valid ogg stream, length should be
-	bool		IsValidStream(uint8 *buffer, int size);
-	
-	int			GetFrameLength(void *header);
-	int			GetXingVbrLength(uint8 *header);
-	int			GetFraunhoferVbrLength(uint8 *header);
-	int			GetLameVbrLength(uint8 *header);
-	int			GetId3v2Length(uint8 *header);
-	int			GetInfoCbrLength(uint8 *header);
-	
-	bool		FindData();
-
-	void		ParseXingVbrHeader(int64 pos);
-	void		ParseFraunhoferVbrHeader(int64 pos);
-	
-	int64		XingSeekPoint(float percent);
-	
-private:
 	BPositionIO *	fSeekableSource;
-	int64			fFileSize;
-	
-	int64			fDataStart;
-	int64			fDataSize;
-	
-	struct xing_vbr_info;
-	struct fhg_vbr_info;
-	
-	xing_vbr_info *	fXingVbrInfo;
-	fhg_vbr_info *	fFhgVbrInfo;
+	ogg_stream_state fOggStreamState;
+	ogg_sync_state	fOggSyncState;
 };
 
 
