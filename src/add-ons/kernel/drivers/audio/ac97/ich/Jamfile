@@ -25,6 +25,11 @@ R5KernelAddon ich_ac97 : kernel drivers bin :
 #	-fno-pic -D_KERNEL_MODE
 #	;
 
+Package openbeos-ich-ac97-cvs :
+	distro/README.html distro/install.sh distro/uninstall.sh ich_ac97 ;
+Package openbeos-ich-ac97-debug-cvs :
+	distro/README.html distro/install.sh distro/uninstall.sh ich_ac97 ;
+
 # Link to kernel/drivers/dev/audio/multi
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
