@@ -18,12 +18,6 @@ stack one global variable is created with the name 'data'.
 every thread that reads or writes in the 'data' struct. 
 	The USB stack will support multiple host controllers. The USB specification says this is enough, however, there will possibly systems with more controllers. Between the usb core and the host controller driver (essentially another module), is a private api (that will be documented for future additions of host controllers). 
 
-DEVICES AND HOW THEY'RE MANAGED
-The stack keeps an internal tree of all the devices. A single device is represented by the Device
-class. This class is inherited by the RootHub and Hub classes. Hubs are also  devices,
-but they can contain children and therefore are a special case. The root hub is even more special,
-because there are nonstandard ways of accessing information on these ports. 
-
 THE INITIALISATION PHASE
 As soon as a device driver calls the usb module, and the module isn't loaded before, a single instance
 of the stack class is made. The constructor initialises the object, and it starts the search for host
@@ -31,10 +25,21 @@ controllers. All the host controller modules are called, and if there is no hard
 hardware corresponding to that host controller is malfunctioning, the controller returns B_ERROR. If
 there is no controller that works, the USB module will fail to initialise.
 	If a controller succeeds in initialising the hardware, and the module initialisation succeeds, the 
-USB Stack class will call the hw_start() call. One of the arguments is a structure with some pointers to
-functions that the host controller needs. The host controller will register it's root hub. using the function 
-register_roothub() and the supplied argument will be a struct that holds some functions (see later what
-these functions do).
+USB Stack class will create an instance of the BusManager class: the class that manages a bus. This
+class will continue to control the host controller and it will do the hw_start() method that it provided
+via de module struct. The host controller will do the proper initialisation. 
+
+BASIC OPERATION
+	After all host controllers have been registered and prepared to go, the BusManager will spawn
+a thread that will keep exploring the device tree. The thread called 'usb_main_thread' will continually
+pull all devices and hubs in order to see if there are any changes to the device tree, and, if so, will
+communicate this to the device tree. 
+
+DEVICES AND HOW THEY'RE MANAGED
+The Busmanager keeps an internal tree of all the devices. A single device is represented by the
+Device class. This class is inherited by the Hub class. Hubs are also  devices,
+but they can contain children and therefore are a special case. The root hub is represented as a
+Hub too, but the host controller itself will decide on how to handle messages sent to it.
 
 THE UHCI CONTROLLER
 ==============
