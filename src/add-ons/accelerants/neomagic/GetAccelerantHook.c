@@ -112,12 +112,12 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		/* only export 2D acceleration functions in modes that are capable of it */
 		/* used by the app_server and applications (BWindowScreen) */
 		CHKA(SCREEN_TO_SCREEN_BLIT);
-//		CHKA(FILL_RECTANGLE);
-//		CHKA(INVERT_RECTANGLE);
-//		CHKA(FILL_SPAN);
+		CHKA(FILL_RECTANGLE);
+		CHKA(INVERT_RECTANGLE);
+		CHKA(FILL_SPAN);
 		/* not (yet) used by the app_server:
 		 * so just for application use (BWindowScreen) */
-//		CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
+		//CHKA(SCREEN_TO_SCREEN_TRANSPARENT_BLIT);
 		//CHKA(SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT;
 	}
 
