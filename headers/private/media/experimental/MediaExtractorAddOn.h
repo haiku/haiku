@@ -98,15 +98,13 @@ public:
   // B_OK : No error
   // B_NO_MEMORY : Storage for the buffer could not be allocated.
   // B_MEDIA_NO_HANDLER : This extractor doesn't handle that format
-  virtual status_t SetSource(const BDataIO * source);
-  virtual status_t SetSource(const BPositionIO * source) = 0;
-  virtual status_t SetSource(const BDataIO * source);
   virtual status_t SetSource(const BFile * source);
+  virtual status_t SetSource(const entry_ref * source, int32 flags = 0);
+  virtual status_t SetSource(const BDataIO * source);
 /* begin transcoding functions */
-  virtual status_t SetDestination(const BDataIO * source);
-  virtual status_t SetDestination(const BPositionIO * source);
-  virtual status_t SetDestination(const BDataIO * source);
   virtual status_t SetDestination(const BFile * source);
+  virtual status_t SetDestination(const entry_ref * source, int32 flags = 0);
+  virtual status_t SetDestination(const BDataIO * source);
 /* end transcoding functions */
 
   //// stateful functions
