@@ -23,46 +23,87 @@
 #include "Constants.h"
 #include "Utility.h"
 
-static const char*
-colorspace_to_string(uint32 colorspace)
+static uint32
+colorspace_to_bpp(uint32 colorspace)
 {
 	switch (colorspace) {
-		case B_RGB32:
-			return "32 Bits/Pixel";	
-		case B_RGB16:
-			return"16 Bits/Pixel";
-		case B_RGB15:
-			return "15 Bits/Pixel";
-		case B_CMAP8:
-		default:		
-			return "8 Bits/Pixel";
+	case B_RGB32:	return 32;
+	case B_RGB24:	return 24;
+	case B_RGB16:	return 16;
+	case B_RGB15:	return 15;
+	case B_CMAP8:	return 8;
+	default:		return 0;
 	}
 }
 
+static void
+colorspace_to_string(uint32 colorspace, char dest[])
+{
+	sprintf(dest,"%lu Bits/Pixel",colorspace_to_bpp(colorspace));
+}
 
 static uint32
 string_to_colorspace(const char* string)
 {
-	if (!strcmp(string, "8 Bits/Pixel"))
-		return B_CMAP8;
-	else if (!strcmp(string, "15 Bits/Pixel"))
-		return B_RGB15;
-	else if (!strcmp(string, "16 Bits/Pixel"))	
-		return B_RGB16;
-	else if (!strcmp(string, "32 Bits/Pixel"))
-		return B_RGB32;
-	
-	return B_CMAP8; //Should return an error?
+	uint32 bits = 0;
+	sscanf(string,"%ld",&bits);
+	switch (bits) {
+	case 8:		return B_CMAP8;
+	case 15:	return B_RGB15;
+	case 16:	return B_RGB16;
+	case 24:	return B_RGB24;
+	case 32:	return B_RGB32;
+	default:	return B_CMAP8; // Should return an error?
+	}
 }
 
 
 static void
 mode_to_string(display_mode mode, char dest[])
 {
-	sprintf(dest, "%d x %d", mode.virtual_width, mode.virtual_height);
+	sprintf(dest, "%hu x %hu", mode.virtual_width, mode.virtual_height);
 }
 
-		 	
+
+static void
+string_to_mode(const char * source, display_mode * mode)
+{
+	sscanf(source,"%hu x %hu", &(mode->virtual_width), &(mode->virtual_height));
+}
+
+
+static void
+refresh_rate_to_string(float refresh_rate, char dest[])
+{
+	sprintf(dest, "%.1f Hz",refresh_rate);
+}
+
+
+/*
+static float
+string_to_refresh_rate(const char * source)
+{
+	float refresh_rate = 0;
+	sscanf(source,"%f Hz", &refresh_rate);
+	return refresh_rate;
+}
+*/
+
+static float
+get_refresh_rate(display_mode mode)
+{
+	return (mode.timing.pixel_clock * 1000.0) / (mode.timing.h_total * mode.timing.v_total);
+}
+
+
+static void
+set_pixel_clock(display_mode * mode, float refresh_rate)
+{
+	mode->timing.pixel_clock
+	    = (uint32)((mode->timing.h_total * mode->timing.v_total * refresh_rate) / 1000);
+}
+
+
 ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	: BWindow(Settings->WindowFrame(), "Screen", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
@@ -166,23 +207,28 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	// build this menu using the available refresh rates, without limiting ourself
 	// to 85 hz.
 	fRefreshMenu = new BPopUpMenu("", true, true);
-	fRefreshMenu->AddItem(new BMenuItem("56 Hz", new BMessage(POP_REFRESH_MSG)));
-	fRefreshMenu->AddItem(new BMenuItem("60 Hz", new BMessage(POP_REFRESH_MSG)));
-	fRefreshMenu->AddItem(new BMenuItem("70 Hz", new BMessage(POP_REFRESH_MSG)));
-	fRefreshMenu->AddItem(new BMenuItem("75 Hz", new BMessage(POP_REFRESH_MSG)));
-	fRefreshMenu->AddItem(new BMenuItem("85 Hz", new BMessage(POP_REFRESH_MSG)));
-	fRefreshMenu->AddItem(new BMenuItem("100 Hz", new BMessage(POP_REFRESH_MSG)));
+	char str[256];
+	refresh_rate_to_string(56,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	refresh_rate_to_string(60,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	refresh_rate_to_string(70,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	refresh_rate_to_string(75,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	refresh_rate_to_string(85,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
+	refresh_rate_to_string(100,str);
+	fRefreshMenu->AddItem(new BMenuItem(str, new BMessage(POP_REFRESH_MSG)));
 	
-	fRefreshMenu->AddItem(new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG)));
+	fOtherRefresh = new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG));
+	fRefreshMenu->AddItem(fOtherRefresh);
 	
 		
 	const char * refreshLabel = "Refresh Rate: ";
 	float refreshWidth = controlsBox->StringWidth(refreshLabel);
 	controlMenuRect.Set(88.0-refreshWidth, 86.0, 171.0, 104.0);
 	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", refreshLabel, fRefreshMenu, true);
-	
-	marked = fRefreshMenu->FindItem("60 Hz");
-	marked->SetMarked(true);
 	
 	fRefreshField->SetDivider(refreshWidth);
 	
@@ -210,60 +256,57 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fRevertButton->SetEnabled(false);
 	
 	fScreenView->AddChild(fRevertButton);
-		
-	display_mode mode;	
+	
+	SetStateByMode();
+
+	fCustomRefresh = fInitialRefreshN;
+}
+
+void
+ScreenWindow::SetStateByMode()
+{	
+	BString string;
+	BMenuItem *marked;
+	display_mode mode;
+	BScreen screen(B_MAIN_SCREEN_ID);
+	
+	if (!screen.IsValid()) {
+		//debugger() ?
+		return;
+	}
+
 	screen.GetMode(&mode);
 	fInitialMode = mode;
 	
-	string.Truncate(0);
-	
-	string << (uint32)mode.virtual_width << " x " << (uint32)mode.virtual_height;
-
-	marked = fResolutionMenu->FindItem(string.String());
+	char str[256];
+	mode_to_string(mode,str);
+	marked = fResolutionMenu->FindItem(str);
 	marked->SetMarked(true);
-	
 	fInitialResolution = marked;
 	
-	marked = fColorsMenu->FindItem(colorspace_to_string(mode.space));
-		
+	colorspace_to_string(mode.space,str);
+	marked = fColorsMenu->FindItem(str);
 	marked->SetMarked(true);
 	fInitialColors = marked;
 	
-	string.Truncate(0);
-	
-	float total_size = mode.timing.h_total * mode.timing.v_total;
-	
-	fInitialRefreshN = round((mode.timing.pixel_clock * 1000) / total_size, 1);
-	
-	fCustomRefresh = fInitialRefreshN;
-	
-	string << fInitialRefreshN << " Hz";
-	
-	marked = fRefreshMenu->FindItem(string.String());
+	fInitialRefreshN = get_refresh_rate(mode);
+	refresh_rate_to_string(fInitialRefreshN,str);
+	marked = fRefreshMenu->FindItem(str);
 	
 	if (marked != NULL)	{	
 		marked->SetMarked(true);	
 		fInitialRefresh = marked;	
-	} else 	{		
-		BMenuItem *other = fRefreshMenu->FindItem("Other...");	
-		string.Truncate(0);
+	} else 	{
+		BString string(str);
+		string << "/Other...";
 	
-		string << fInitialRefreshN;
+		fOtherRefresh->SetLabel(string.String());
+		fOtherRefresh->SetMarked(true);
 		
-		int32 point = string.FindFirst('.');
-		string.Truncate(point + 2);
+		fRefreshMenu->Superitem()->SetLabel(str);
 		
-		string << " Hz/Other...";
-	
-		other->SetLabel(string.String());
-		other->SetMarked(true);
-		
-		point = string.FindFirst('/');
-		string.Truncate(point);
-		
-		fRefreshMenu->Superitem()->SetLabel(string.String());
-		
-		fInitialRefresh = other;
+		fInitialRefresh = fOtherRefresh;
+		fCustomRefresh = fInitialRefreshN;
 	}
 }
 
@@ -434,69 +477,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 		case BUTTON_APPLY_MSG:
 		{	
-			BScreen screen(B_MAIN_SCREEN_ID);
-			
-			if (!screen.IsValid())
-				break;
-							
-			display_mode *mode = NULL;
-			BString string;
-			int32 height;
-			int32 width;
-			float refresh;
-								
-			BString menuLabel = fResolutionMenu->FindMarked()->Label();
-			int32 space = menuLabel.FindFirst(' ');
-			menuLabel.MoveInto(string, 0, space);
-			menuLabel.Remove(0, 3);
-					
-			width = atoi(string.String());
-			height = atoi(menuLabel.String());
-			
-			if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				refresh = fCustomRefresh;
-			else
-				refresh = atof(fRefreshMenu->FindMarked()->Label());
-			
-			for (uint32 c = 0; c < fTotalModes; c++) {			
-				if ((fSupportedModes[c].virtual_width == width)
-					&& (fSupportedModes[c].virtual_height == height)
-					&& (fSupportedModes[c].space == string_to_colorspace(fColorsMenu->FindMarked()->Label())))
-				mode = &fSupportedModes[c];
-			}
-							
-			mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);					
-			
-			//mode->space = string_to_colorspace(fColorsMenu->FindMarked()->Label());			
-			mode->h_display_start = 0;
-			mode->v_display_start = 0;
-
-			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
-				BAlert *WorkspacesAlert =
-					new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted",
-						"Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
- 				
- 				int32 button = WorkspacesAlert->Go();
- 				
- 				if (button == 1) {
- 					PostMessage(new BMessage(BUTTON_REVERT_MSG));
- 					break;
- 				}
- 					
-			}
-			screen.SetMode(mode);
-				
-			BRect rect(100.0, 100.0, 400.0, 193.0);
-			
-			rect.left = (screen.Frame().right / 2) - 150;
-			rect.top = (screen.Frame().bottom / 2) - 42;
-			rect.right = rect.left + 300.0;
-			rect.bottom = rect.top + 93.0;
-			
-		 	(new AlertWindow(rect))->Show();
-									
-			fApplyButton->SetEnabled(false);
-			
+			ApplyMode();
 			break;
 		}
 				
@@ -554,12 +535,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			} else
 				screen.SetMode(&mode, true);
 		
-			fInitialRefreshN = fCustomRefresh;
-			fInitialResolution = fResolutionMenu->FindMarked();
-			fInitialColors = fColorsMenu->FindMarked();
-			fInitialRefresh = fRefreshMenu->FindMarked();
-			fInitialMode = mode;
-			
+			SetStateByMode();
 			break;
 		}
 		
@@ -601,9 +577,9 @@ ScreenWindow::CheckUpdateDisplayModes()
 	}
 	
 	// Add supported colorspaces to the menu
+	char colorSpace[128];
 	for (c = 0; c < fTotalModes; c++) {
-		const char *colorSpace = colorspace_to_string(fSupportedModes[c].space);
-		
+		colorspace_to_string(fSupportedModes[c].space, colorSpace);
 		if (!fColorsMenu->FindItem(colorSpace))
 			fColorsMenu->AddItem(new BMenuItem(colorSpace, new BMessage(POP_COLORS_MSG)));		
 	}
@@ -647,4 +623,133 @@ ScreenWindow::CheckModesByResolution(const char *res)
 		fColorsMenu->ItemAt(fColorsMenu->IndexOf(fColorsMenu->FindMarked()) - 1)->SetMarked(true);	
 		printf("not found\n");
 	}
+}
+
+void
+ScreenWindow::ApplyMode()
+{
+	BScreen screen(B_MAIN_SCREEN_ID);
+	
+	if (!screen.IsValid())
+		return;
+					
+	display_mode requested_mode;
+						
+	BString menuLabel = fResolutionMenu->FindMarked()->Label();
+	string_to_mode(menuLabel.String(),&requested_mode);
+	requested_mode.space = string_to_colorspace(fColorsMenu->FindMarked()->Label());
+	requested_mode.h_display_start = 0;
+	requested_mode.v_display_start = 0;
+	
+	display_mode * supported_mode = 0;
+	display_mode * mismatch_mode = 0;
+	for (uint32 c = 0; c < fTotalModes; c++) {			
+		if ((fSupportedModes[c].virtual_width == requested_mode.virtual_width)
+			&& (fSupportedModes[c].virtual_height == requested_mode.virtual_height)) {
+			if (!mismatch_mode || (colorspace_to_bpp(mismatch_mode->space)
+                                   < colorspace_to_bpp(fSupportedModes[c].space))) {
+				mismatch_mode = &fSupportedModes[c];
+            }
+			if (fSupportedModes[c].space == requested_mode.space) {
+				supported_mode = &fSupportedModes[c];
+			}
+		}
+	}
+	if (supported_mode) {
+		requested_mode = *supported_mode;
+	} else {
+		display_mode proposed_mode = requested_mode;
+//		if (screen.ProposeMode(&proposed_mode,&proposed_mode,&proposed_mode) == B_ERROR) {
+		if (!mismatch_mode) {
+			BAlert * UnsupportedModeAlert = 
+				new BAlert("UnsupportedModeAlert", "This mode is not supported.",
+				           "Okay", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			UnsupportedModeAlert->Go();
+			return;
+		}
+		proposed_mode = *mismatch_mode;
+		BString string;
+		char str[256];
+		colorspace_to_string(requested_mode.space,str);
+		string << str;
+		mode_to_string(requested_mode,str);
+		string << " is not supported at " << str << ".  ";
+		string << "Use ";
+		colorspace_to_string(proposed_mode.space,str);
+		string << str;
+		mode_to_string(proposed_mode,str);
+		string << " at " << str << " instead?";
+		BAlert * BadColorsAlert = 
+			new BAlert("BadColorsAlert", string.String(),
+			           "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+		int32 button = BadColorsAlert->Go();
+		if (button == 1) {
+			return;
+		}
+		requested_mode = proposed_mode;
+	}	
+
+	float refresh;
+	if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
+		refresh = fCustomRefresh;
+	else
+		refresh = atof(fRefreshMenu->FindMarked()->Label());
+	set_pixel_clock(&requested_mode,refresh);
+
+	uint32 low_clock = 0, high_clock = 0;
+	screen.GetPixelClockLimits(&requested_mode,&low_clock,&high_clock);
+	if (requested_mode.timing.pixel_clock < low_clock) {
+		display_mode low_mode = requested_mode;
+		low_mode.timing.pixel_clock = low_clock;
+		BString string;
+		string << refresh << " Hz is too low.  ";
+		string << "Use " << get_refresh_rate(low_mode) << " Hz instead?";
+		BAlert * TooLowAlert = 
+		   new BAlert("TooLowAlert", string.String(),
+				      "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 button = TooLowAlert->Go();
+		if (button == 1) {
+			return;
+		}
+		requested_mode.timing.pixel_clock = low_clock;
+	}
+	if (requested_mode.timing.pixel_clock > high_clock) {
+		display_mode high_mode = requested_mode;
+		high_mode.timing.pixel_clock = high_clock;
+		BString string;
+		string << refresh << " Hz is too high.";
+		string << "Use " << get_refresh_rate(high_mode) << " Hz instead?";
+		BAlert * TooHighAlert = 
+		   new BAlert("TooHighAlert", string.String(),
+				      "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		int32 button = TooHighAlert->Go();
+		if (button == 1) {
+			return;
+		}
+		requested_mode.timing.pixel_clock = high_clock;
+	}	
+	if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces")) {			
+		BAlert *WorkspacesAlert =
+			new BAlert("WorkspacesAlert", "Change all workspaces?\nThis action cannot be reverted",
+				"Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+ 				
+		int32 button = WorkspacesAlert->Go();
+		
+		if (button == 1) {
+			PostMessage(new BMessage(BUTTON_REVERT_MSG));
+			return;
+		}
+	}
+	screen.SetMode(&requested_mode);
+
+	BRect rect(100.0, 100.0, 400.0, 193.0);
+	
+	rect.left = (screen.Frame().right / 2) - 150;
+	rect.top = (screen.Frame().bottom / 2) - 42;
+	rect.right = rect.left + 300.0;
+	rect.bottom = rect.top + 93.0;
+	
+ 	(new AlertWindow(rect))->Show();
+							
+	fApplyButton->SetEnabled(false);
 }

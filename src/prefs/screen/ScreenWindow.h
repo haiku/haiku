@@ -23,9 +23,11 @@ public:
 	virtual void ScreenChanged(BRect frame, color_space mode);
 
 private:
+	void SetStateByMode();
 	void CheckApplyEnabled();
 	void CheckUpdateDisplayModes();
 	void CheckModesByResolution(const char*);
+	void ApplyMode();
 	
 	BBox *fScreenView;
 	ScreenSettings *fSettings;
@@ -50,6 +52,7 @@ private:
 	BMenuItem *fInitialResolution;
 	BMenuItem *fInitialColors;
 	BMenuItem *fInitialRefresh;
+	BMenuItem *fOtherRefresh;
 	
 	display_mode fInitialMode;
 	display_mode *fSupportedModes;
