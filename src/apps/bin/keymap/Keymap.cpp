@@ -220,13 +220,18 @@ Keymap::Dump()
 }
 
 
-void
+status_t
 Keymap::LoadCurrent()
 {
-	key_map *keys;
+	key_map *keys = NULL;
 	get_key_map(&keys, &fChars);
+	if (!keys) {
+		fprintf(stderr, "error while getting current keymap!\n");
+		return B_ERROR;
+	}
 	memcpy(&fKeys, keys, sizeof(fKeys));
 	delete keys;
+	return B_OK;
 }
 
 /*

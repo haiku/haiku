@@ -46,7 +46,8 @@ int main(int argc, char **argv)
 				break;
 			if (operation == 'd') {
 				Keymap keymap;
-				keymap.LoadCurrent();
+				if (keymap.LoadCurrent() != B_OK)
+					return 1;
 				keymap.Dump();
 				return 0;
 			} else if (operation == 'r') {

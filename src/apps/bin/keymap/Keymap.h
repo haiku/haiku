@@ -23,7 +23,7 @@
 class Keymap 
 {
 public:
-	void LoadCurrent();
+	status_t LoadCurrent();
 	status_t Load(entry_ref &ref);
 	status_t Save(entry_ref &ref);
 	status_t LoadSource(FILE *f);
