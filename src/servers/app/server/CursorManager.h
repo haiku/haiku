@@ -51,11 +51,6 @@ public:
 	int32 AddCursor(ServerCursor *sc);
 	void DeleteCursor(int32 token);
 	void RemoveAppCursors(team_id team);
-	void ShowCursor(void);
-	void HideCursor(void);
-	void ObscureCursor(void);
-	void SetCursor(int32 token);
-	void SetCursor(cursor_which which);
 	void SetCursorSet(const char *path);
 	ServerCursor *GetCursor(cursor_which which);
 	cursor_which GetCursorWhich(void);
@@ -64,7 +59,7 @@ public:
 private:
 	ServerCursor *FindCursor(int32 token);
 
-	BList *fCursorList;
+	BList fCursorList;
 	TokenHandler fTokenizer;
 
 	// System cursor members

@@ -40,8 +40,6 @@ CursorManager *cursormanager;
 //! Initializes the CursorManager
 CursorManager::CursorManager(void)
 {
-	fCursorList=new BList(0);
-
 	// Error code for AddCursor
 	fTokenizer.ExcludeValue(B_ERROR);
 
@@ -88,14 +86,12 @@ CursorManager::CursorManager(void)
 CursorManager::~CursorManager(void)
 {
 	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList->CountItems();i++)
+	for(int32 i=0; i<fCursorList.CountItems();i++)
 	{
-		temp=(ServerCursor*)fCursorList->ItemAt(i);
+		temp=(ServerCursor*)fCursorList.ItemAt(i);
 		if(temp)
 			delete temp;
 	}
-	fCursorList->MakeEmpty();
-	delete fCursorList;
 	
 	// Note that it is not necessary to remove and delete the system
 	// cursors. These cursors are kept in the list with a NULL application
@@ -115,7 +111,7 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 		return B_ERROR;
 	
 	Lock();
-	fCursorList->AddItem(sc);
+	fCursorList.AddItem(sc);
 	int32 value=fTokenizer.GetToken();
 	sc->fToken=value;
 	Unlock();
@@ -134,12 +130,12 @@ void CursorManager::DeleteCursor(int32 token)
 	Lock();
 
 	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList->CountItems();i++)
+	for(int32 i=0; i<fCursorList.CountItems();i++)
 	{
-		temp=(ServerCursor*)fCursorList->ItemAt(i);
+		temp=(ServerCursor*)fCursorList.ItemAt(i);
 		if(temp && temp->fToken==token)
 		{
-			fCursorList->RemoveItem(i);
+			fCursorList.RemoveItem(i);
 			delete temp;
 			break;
 		}
@@ -156,19 +152,19 @@ void CursorManager::RemoveAppCursors(team_id team)
 	Lock();
 	
 	int32 i=0;
-	ServerCursor *temp=(ServerCursor*)fCursorList->ItemAt(i);
+	ServerCursor *temp=(ServerCursor*)fCursorList.ItemAt(i);
 	while(temp)
 	{
 		if(temp && temp->OwningTeam()==team)
 		{
-			fCursorList->RemoveItem(i);
+			fCursorList.RemoveItem(i);
 			delete temp;
 		}
 		else
 		{
 			i++;
 		}
-		temp=(ServerCursor*)fCursorList->ItemAt(i);
+		temp=(ServerCursor*)fCursorList.ItemAt(i);
 	}
 	Unlock();
 }
@@ -373,7 +369,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
 
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_TEXT:
@@ -385,7 +381,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_MOVE:
@@ -397,7 +393,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_DRAG:
@@ -409,7 +405,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE:
@@ -421,7 +417,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
@@ -433,7 +429,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
@@ -445,7 +441,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
@@ -457,7 +453,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
@@ -469,7 +465,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			fCursorList->RemoveItem(cursor);
+			fCursorList.RemoveItem(cursor);
 			break;
 		}
 		default:
@@ -487,9 +483,9 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 ServerCursor *CursorManager::FindCursor(int32 token)
 {
 	ServerCursor *temp;
-	for(int32 i=0; i<fCursorList->CountItems();i++)
+	for(int32 i=0; i<fCursorList.CountItems();i++)
 	{
-		temp=(ServerCursor*)fCursorList->ItemAt(i);
+		temp=(ServerCursor*)fCursorList.ItemAt(i);
 		if(temp && temp->fToken==token)
 			return temp;
 	}
