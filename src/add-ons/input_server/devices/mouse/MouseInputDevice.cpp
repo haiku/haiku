@@ -51,7 +51,7 @@ const static uint32 kSetClickSpeed = 10108;
 
 struct mouse_movement {
   int32 ser_fd_index;
-  int32 buttons;
+  uint32 buttons;
   int32 xdelta;
   int32 ydelta;
   int32 click_count;
@@ -234,8 +234,9 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		
 		uint32 buttons = dev->fButtons ^ movements.buttons;
 	
-		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld\n", 
-				movements.buttons, movements.xdelta, movements.ydelta);
+		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld, clicks:%ld\n", 
+				movements.buttons, movements.xdelta, movements.ydelta,
+				movements.click_count);
 			
 		LOG(log);
 
@@ -244,7 +245,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		// for some reason. Check if they reach the input server.
 		if (buttons != 0) {
 			message = new BMessage;				
-			if (buttons & movements.buttons > 0) {
+			if ((buttons & movements.buttons) > 0) {
 				message->what = B_MOUSE_DOWN;
 				LOG("B_MOUSE_DOWN\n");
 				
