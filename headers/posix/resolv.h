@@ -98,6 +98,10 @@
 #include <sys/socket.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Revision information.  This is the release date in YYYYMMDD format.
  * It can change every day so the right thing to do with it is use it
@@ -345,5 +349,9 @@ int		res_nameinquery (const char *, int, int,
 int		res_queriesmatch (const uchar *, const uchar *,
 				      const uchar *, const uchar *);
 void		res_close (void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* !_RESOLV_H_ */

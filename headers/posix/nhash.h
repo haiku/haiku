@@ -6,6 +6,10 @@
 
 #include "pools.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct net_hash_entry	net_hash_entry;
 typedef struct net_hash		net_hash;
 typedef struct net_hash_index	net_hash_index;
@@ -36,5 +40,9 @@ struct net_hash {
 net_hash *nhash_make(void);
 void *nhash_get(net_hash *, const void *key, ssize_t klen);
 void nhash_set(net_hash *, const void *, ssize_t , const void *);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OBOS_NHASH_H */
