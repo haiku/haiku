@@ -34,6 +34,7 @@ R5UnitTest UnitTesterHelper
 ;
 
 SubInclude OBOS_TOP src tests add-ons ;
+SubInclude OBOS_TOP src tests apps ;
 SubInclude OBOS_TOP src tests kernel ;
 SubInclude OBOS_TOP src tests kits ;
 SubInclude OBOS_TOP src tests servers ;
