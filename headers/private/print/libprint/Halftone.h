@@ -24,6 +24,12 @@ public:
 		TYPE2,
 		TYPE3
 	};
+	enum GrayFunction {
+		kMixToGray,
+		kRedChannel,
+		kGreenChannel,
+		kBlueChannel
+	};
 	Halftone(color_space cs, double gamma = 1.4, DITHERTYPE dither_type = TYPE3);
 	~Halftone();
 	int dither(uchar *dst, const uchar *src, int x, int y, int width);
@@ -33,6 +39,7 @@ public:
 	void setPattern(const uchar *pattern);
 	PFN_gray getGrayFunction() const;
 	void setGrayFunction(PFN_gray gray);
+	void setGrayFunction(GrayFunction grayFunction);
 
 protected:
 	void createGammaTable(double gamma);

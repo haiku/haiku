@@ -18,13 +18,28 @@ using namespace std;
 
 #include "Pattern.h"
 
-uint gray(rgb_color c)
+static uint gray(rgb_color c)
 {
 	if (c.red == c.green && c.red == c.blue) {
 		return 255 - c.red;
 	} else {
 		return 255 - (c.red * 3 + c.green * 6 + c.blue) / 10;
 	}
+}
+
+static uint channel_red(rgb_color c)
+{
+	return c.red;	
+}
+
+static uint channel_green(rgb_color c)
+{
+	return c.green;	
+}
+
+static uint channel_blue(rgb_color c)
+{
+	return c.blue;	
 }
 
 Halftone::Halftone(color_space cs, double gamma, DITHERTYPE dither_type)
@@ -107,6 +122,23 @@ int Halftone::dither(
 {
 	return (this->*__dither)(dst, src, x, y, width);
 }
+
+void Halftone::setGrayFunction(GrayFunction grayFunction)
+{
+	PFN_gray function = NULL;
+	switch (grayFunction) {
+		case kMixToGray: function = gray;
+			break;
+		case kRedChannel: function = channel_red;
+			break;
+		case kGreenChannel: function = channel_green;
+			break;
+		case kBlueChannel: function = channel_blue;
+			break;
+	};
+	setGrayFunction(function);
+}
+
 
 int Halftone::ditherGRAY1(
 	uchar *dst,
