@@ -59,6 +59,13 @@ StringPrependTest::PerformTest(void)
 	str1->Prepend('c', 4);
 	CPPUNIT_ASSERT(strcmp(str1->String(), "ccccaString") == 0);
 	delete str1;
+	
+	NextSubTest();
+	str1 = new BString;
+	str1->Prepend("PREPENDED");
+	CPPUNIT_ASSERT(strcmp(str1->String(), "PREPENDED") == 0);
+	delete str1;
+
 }
 
 

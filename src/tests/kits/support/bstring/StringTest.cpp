@@ -8,6 +8,8 @@
 #include "StringSubCopyTest.h"
 #include "StringPrependTest.h"
 #include "StringCaseTest.h"
+#include "StringInsertTest.h"
+#include "StringEscapeTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -20,6 +22,8 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringSubCopyTest::suite());
 	testSuite->addTest(StringPrependTest::suite());
 	testSuite->addTest(StringCaseTest::suite());
+	testSuite->addTest(StringInsertTest::suite());
+	testSuite->addTest(StringEscapeTest::suite());
 	
 	return(testSuite);
 }
