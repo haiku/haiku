@@ -41,17 +41,6 @@ BDiskDevice::~BDiskDevice()
 {
 }
 
-// IsRemovable
-/*!	\brief Returns whether the device media are removable.
-	\return \c true, if the device media are removable, \c false otherwise.
-*/
-bool
-BDiskDevice::IsRemovable() const
-{
-	return (fDeviceData
-			&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
-}
-
 // HasMedia
 /*!	\brief Returns whether the device contains a media.
 	\return \c true, if the device contains a media, \c false otherwise.
@@ -61,6 +50,33 @@ BDiskDevice::HasMedia() const
 {
 	return (fDeviceData
 			&& fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA);
+}
+
+// IsRemovableMedia
+/*!	\brief Returns whether the device media are removable.
+	\return \c true, if the device media are removable, \c false otherwise.
+*/
+bool
+BDiskDevice::IsRemovableMedia() const
+{
+	return (fDeviceData
+			&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
+}
+
+// IsReadOnlyMedia
+bool
+BDiskDevice::IsReadOnlyMedia() const
+{
+	return (fDeviceData
+			&& fDeviceData->device_flags & B_DISK_DEVICE_READ_ONLY);
+}
+
+// IsWriteOnceMedia
+bool
+BDiskDevice::IsWriteOnceMedia() const
+{
+	return (fDeviceData
+			&& fDeviceData->device_flags & B_DISK_DEVICE_WRITE_ONCE);
 }
 
 // Eject

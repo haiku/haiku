@@ -15,8 +15,10 @@ public:
 	BDiskDevice();
 	virtual ~BDiskDevice();
 
-	bool IsRemovable() const;
 	bool HasMedia() const;
+	bool IsRemovableMedia() const;
+	bool IsReadOnlyMedia() const;
+	bool IsWriteOnceMedia() const;
 
 	status_t Eject(bool update = false);
 
