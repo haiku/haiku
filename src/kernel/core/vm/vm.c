@@ -6,8 +6,8 @@
 
 #include <OS.h>
 #include <KernelExport.h>
+
 #include <kerrors.h>
-#include <kernel.h>
 #include <vm.h>
 #include <vm_priv.h>
 #include <vm_page.h>
@@ -25,6 +25,7 @@
 #include <lock.h>
 #include <khash.h>
 #include <thread.h>
+#include <team.h>
 
 #include <boot/stage2.h>
 
@@ -493,6 +494,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 	/* check parameters */
 	if (addr_type != REGION_ADDR_ANY_ADDRESS && addr_type != REGION_ADDR_EXACT_ADDRESS)
 		return B_BAD_VALUE;
+
 	switch (wiring) {
 		case REGION_WIRING_WIRED:
 		case REGION_WIRING_WIRED_ALREADY:

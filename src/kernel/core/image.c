@@ -1,14 +1,14 @@
 /* User Runtime Loader support in the kernel
 ** 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include <KernelExport.h>
 #include <kimage.h>
-#include <thread_types.h>
 #include <thread.h>
+#include <team.h>
 
 #include <malloc.h>
 #include <string.h>

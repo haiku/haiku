@@ -3,16 +3,16 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001, Mark-Jan Bastian. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
 #include <OS.h>
+
 #include <port.h>
 #include <sem.h>
+#include <team.h>
 #include <util/list.h>
 #include <arch/int.h>
 #include <cbuf.h>

@@ -15,7 +15,7 @@
 #include <khash.h>
 #include <lock.h>
 #include <vm.h>
-#include <thread.h>
+#include <team.h>
 
 #include <malloc.h>
 #include <string.h>

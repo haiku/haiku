@@ -1,6 +1,8 @@
 /* POSIX signals handling routines
 ** 
 ** Copyright 2002, Angelo Mottola, a.mottola@libero.it. All rights reserved.
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+**
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -8,7 +10,7 @@
 #include <KernelExport.h>
 #include <debug.h>
 #include <thread.h>
-#include <arch/thread.h>
+#include <team.h>
 #include <int.h>
 #include <sem.h>
 #include <ksignal.h>

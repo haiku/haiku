@@ -8,9 +8,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <OS.h>
+
 #include <boot/kernel_args.h>
-#include <Errors.h>
-#include <kernel.h>
 #include <console.h>
 #include <debug.h>
 #include <arch/faults.h>
@@ -19,7 +19,6 @@
 #include <vm.h>
 #include <timer.h>
 #include <smp.h>
-#include <OS.h>
 #include <sem.h>
 #include <port.h>
 #include <vfs.h>
@@ -31,6 +30,7 @@
 #include <bus.h>
 #include <kmodule.h>
 #include <int.h>
+#include <team.h>
 #include <real_time_clock.h>
 #include <kernel_daemon.h>
 

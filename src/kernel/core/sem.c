@@ -3,25 +3,20 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
 #include <OS.h>
+
 #include <sem.h>
 #include <smp.h>
 #include <int.h>
 #include <arch/int.h>
-#include <timer.h>
 #include <debug.h>
-#include <malloc.h>
 #include <thread.h>
-#include <Errors.h>
-
+#include <team.h>
 #include <boot/kernel_args.h>
 
 #include <string.h>
